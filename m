@@ -1,163 +1,307 @@
-Return-Path: <netdev+bounces-242311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38E37C8EC63
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 15:34:41 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74B9EC8ECB5
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 15:39:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2645E4E146F
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 14:34:40 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id DAD97353199
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 14:39:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9588A328B55;
-	Thu, 27 Nov 2025 14:34:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 578E4333739;
+	Thu, 27 Nov 2025 14:38:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="bLzEP1Xp";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="OeWgNI6O"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K5Dsq1qq"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D95411CBA;
-	Thu, 27 Nov 2025 14:34:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CF1B2FBE03
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 14:38:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764254076; cv=none; b=pirjLS5bQVnlFAHjC65e0GE9VLuqQXW513FnzVizF+vPCtc5sIJuB7AJjMSXIUAsd7pZwlBT3Tygj0kiGmrfpbhu1k/tzxlfHVErhWiLZiiAPq82i8sXYe5K+hYyNN2ooOMgSy6neyPpVI2Ilr1vPfDMDZDCcWDuLkQynlPPwug=
+	t=1764254333; cv=none; b=WpnSDYmepddbCa8YaVqHBxxleX1KFDzGpGGx/7y5yHe5PuGTfI+fmmBZ7iDv85nfcyj3k573qpeNXS5UlDlPydAuOsz17bfMDQrE9sfAbTJFuwXHZEgLOxGDFE9+I9VnOql+azuXahT345VH00ryc1oh0zhx31DracZruBE2tak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764254076; c=relaxed/simple;
-	bh=/ADRS2Syjol7k1tms1MXqhOe7X8+moGHAlbEFE5n85o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KnfeMxO60viymTT4aKbIW2PZYyZIfMoJaoM1y6qKQEo4jGPisacSEGurfQ3G1Kmto5JgHJDIvqKpZ498sG/z3RUO88ZVdUhUKJh6+CXeCoDRHbyGtzgt3mPxxrSqlvNkVQer2cUuNdEA0RVWw9n2rIdyNoU8M/ZQEMrUCPv6v+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=bLzEP1Xp; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=OeWgNI6O; arc=none smtp.client-ip=103.168.172.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 48C8414001DA;
-	Thu, 27 Nov 2025 09:34:32 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-02.internal (MEProxy); Thu, 27 Nov 2025 09:34:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1764254072; x=
-	1764340472; bh=XVCU+8u6WBdn6tCaDdY+B4uGVoYEEaJVi7u1cDaBD7w=; b=b
-	LzEP1XpFNQGBxcjcvWfb4u5CBzusR6Okcfy84e4OsXmUTqfWDQ5T3z6bcayVQYgD
-	uDyFIAQUh2P8Q+Q8iFdZB0QLcajYFOw12z3f8I1/Ytd3pUGFP5WaUInc9rUalrE5
-	WYQ92ju2tjh5SJAqxugm1Z48NwTifcbFV0NHsBIO6Ec2l9HCn+pifngcvxpwkQvW
-	wcQHX9jCo9Jn9z1OcmdQtnBAFKq23PfUIsx23rFG+H3ZMp1iR87bdoDY8bEMZwUx
-	2hzVJcoNtzK5pEnofahSJanw0fw/ud/HK6hwSNJ0tmRwk0cdUW5CcC3JWpnt+/Lx
-	QQzEhFMhDxhwXOjZJ6NvA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1764254072; x=1764340472; bh=XVCU+8u6WBdn6tCaDdY+B4uGVoYEEaJVi7u
-	1cDaBD7w=; b=OeWgNI6OTYGehnLJjrf6pFS0xmCP7ZcxPXToOWdt/irsh8fxoOV
-	f20akD0+zDOd/ViMBhSOCfcTkBllo3O2eQW1dMYO618WRxJDheC78mV0vVh8AGx2
-	bu6jxoZACVkRRYL58xbEe/Tarf7J6U4JT5qgOgWgDJMXtNoaKvgl6ndNBa4bpYNr
-	F3Lu4DQGu0q2sryEebEfVZ9sOklS4HoT5j7VjhEnRWl7Y0rQ1b6VzSODz+X8hTBY
-	g8iOXVUeK1nXp7Pw15fWoMsmeDhfAfPg9Tf2+QjnnJbuiIsoWiyMrQDe5yLXTW0g
-	eV5Qh0m1q0VI4rPuCwTylg3OGeX4ipCv04A==
-X-ME-Sender: <xms:d2EoaQ6tHJ-E-fGaI24KJxMHN8CLrsmdblv1BnE-ZhEOn3YggAlfUA>
-    <xme:d2EoabOyhRORhGwefl_xFRBSFute_ico9hCZ75KI9QVX82UWMiXBCj_pHzxPa9lrt
-    S1H-ceCxc5Pgv0-Pv0S5TxRuOEtBLwoxM_NUYRJnt3gRYWSIrWLUmM>
-X-ME-Received: <xmr:d2EoaWu388tGh5b4Pb14VWDjHifl_VLKf2u7kgP9jxTsZHxqkoIySdijYzgA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvgeejgeejucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeeipdhmohgu
-    vgepshhmthhpohhuthdprhgtphhtthhopegrnhhtohhnihhosehophgvnhhvphhnrdhnvg
-    htpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghp
-    thhtoheprhgrlhhfsehmrghnuggvlhgsihhtrdgtohhmpdhrtghpthhtohepkhhusggrse
-    hkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkshgvlhhfthgvshhtsehv
-    ghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrd
-    horhhg
-X-ME-Proxy: <xmx:d2EoaWZZYz12e28m_a7hCERZsE0Kp8VI-aRVVjsLNIJRu0Ed_AiQQA>
-    <xmx:d2EoaQwrr1H6jlmCklfYSurevS5zn9GDdRGc1kMJJQRyUObXQUnOng>
-    <xmx:d2EoaWggID6wW1OJynHwPWHXO2fW-5hXKbmRHWw6RFDdIXBw128A8A>
-    <xmx:d2EoaUkY70uvFPQpmxtMfDP8B5W-UBh2h6JfkUefldzDDaeufAsw4w>
-    <xmx:eGEoafxG5Y08_oUhFXky9SPmoJDdntczFrI-xh0xPxIomwg_KUau1KN9>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 27 Nov 2025 09:34:31 -0500 (EST)
-Date: Thu, 27 Nov 2025 15:34:29 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Ralf Lici <ralf@mandelbit.com>,
-	Jakub Kicinski <kuba@kernel.org>, linux-kselftest@vger.kernel.org,
-	Shuah Khan <shuah@kernel.org>
-Subject: Re: [RFC net-next 13/13] selftests: ovpn: add test for bound address
-Message-ID: <aShhdULYMt58e2_B@krikkit>
-References: <20251121002044.16071-1-antonio@openvpn.net>
- <20251121002044.16071-14-antonio@openvpn.net>
+	s=arc-20240116; t=1764254333; c=relaxed/simple;
+	bh=U/9boMjt36wt9x4xKyaP0x/QdGpbuuN6EEXiWms98EU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=N6w1N4MIi+kZkkW5dDNnZEJU0grHKDm3ZEKZm9G1g0eDQf8Ly9YQQiq3k75pgwg9PaRnkXJFIPLOj4gkH2pLIRf6c7M36hP1m3wDJbEvHDTL2rcP/81TUiPI2kpOHKNjbeA02pfzmLo6JMl7eWcxcVVoSuhnTBtewBl8vByB4m0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K5Dsq1qq; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764254330;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=MqBqOmVjVY1/zEK4FjHFWDDe1Eu3blA56gyNLfT+3PI=;
+	b=K5Dsq1qqlS+SUT2SR82phKYfTTcZfLbnhiWfVWRTJmZ9ZPpA0uvNBxqCxGomJ4TxcJED6x
+	AgAr2yCP0aj6mDJpsKIL3j7h+WrJX+abV59le9jK5QgdtFvbc1KZ4sRv8H6mhrjDjYYk8b
+	cusuu17DJUeJmifCsogpNLsv1yGc2e0=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-605-U5-3eLzNNzOQHj3OyAZEVQ-1; Thu,
+ 27 Nov 2025 09:38:44 -0500
+X-MC-Unique: U5-3eLzNNzOQHj3OyAZEVQ-1
+X-Mimecast-MFC-AGG-ID: U5-3eLzNNzOQHj3OyAZEVQ_1764254323
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5B407180122F;
+	Thu, 27 Nov 2025 14:38:43 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.224.178])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3038818004A3;
+	Thu, 27 Nov 2025 14:38:40 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [GIT PULL] Networking for v6.18-rc8
+Date: Thu, 27 Nov 2025 15:38:30 +0100
+Message-ID: <20251127143830.279720-1-pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20251121002044.16071-14-antonio@openvpn.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-2025-11-21, 01:20:44 +0100, Antonio Quartulli wrote:
-> From: Ralf Lici <ralf@mandelbit.com>
-> 
-> Add a selftest to verify that when a socket is bound to a local address,
-> UDP traffic from ovpn is correctly routed through that address.
-> 
-> This test extends test-bind.sh by binding to the addresses on each veth
-> pair and uses tcpdump to confirm that traffic flows as expected.
+Hi Linus!
 
-Same as the other bind scenario, the test works even if we don't bind
-to that address.
+The following changes since commit 8e621c9a337555c914cf1664605edfaa6f839774:
 
+  Merge tag 'net-6.18-rc7' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-11-20 08:52:07 -0800)
 
-A few small comments on the implementation:
+are available in the Git repository at:
 
-> @@ -547,45 +518,83 @@ static int ovpn_socket(struct ovpn_ctx *ctx, sa_family_t family, int proto)
->  		if (setsockopt(s, SOL_SOCKET, SO_BINDTODEVICE, ctx->bind_dev,
->  			       strlen(ctx->bind_dev) + 1) != 0) {
->  			perror("setsockopt for SO_BINDTODEVICE");
-> -			return -1;
-> +			goto close;
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.18-rc8
 
-ret isn't reset here, ovpn_socket will return a stale value.
+for you to fetch changes up to f07f4ea53e22429c84b20832fa098b5ecc0d4e35:
 
->  		}
->  	}
->  
-> -	ret = bind(s, (struct sockaddr *)&local_sock, sock_len);
-> -	if (ret < 0) {
-> -		perror("cannot bind socket");
-> -		goto err_socket;
-> +	return s;
-> +close:
-> +	close(s);
-> +	return ret;
-> +}
-> +
-[...]
-> @@ -2221,6 +2228,9 @@ static int ovpn_parse_cmd_args(struct ovpn_ctx *ovpn, int argc, char *argv[])
->  
->  		ovpn->sa_family = AF_INET;
->  
-> +		ovpn->laddr = NULL;
-> +		ovpn->lport = "1";
+  mptcp: Initialise rcv_mss before calling tcp_send_active_reset() in mptcp_do_fastclose(). (2025-11-27 13:10:16 +0100)
 
-Why do we want lport=1 on the CONNECT side now?
+----------------------------------------------------------------
+Including fixes from bluetooth and CAN. No known outstanding
+regressions.
 
-> +
->  		ret = ovpn_parse_new_peer(ovpn, argv[3], argv[4], argv[5], argv[6],
->  					  NULL);
->  		if (ret < 0) {
+Current release - regressions:
 
--- 
-Sabrina
+  - mptcp: initialize rcv_mss before calling tcp_send_active_reset()
+
+  - eth: mlx5e: fix validation logic in rate limiting
+
+Previous releases - regressions:
+
+  - xsk: avoid data corruption on cq descriptor number
+
+  - bluetooth:
+    - prevent race in socket write iter and sock bind
+    - fix not generating mackey and ltk when repairing
+
+  - can:
+    - kvaser_usb: fix potential infinite loop in command parsers
+    - rcar_canfd: fix CAN-FD mode as default
+
+  - eth: veth: reduce XDP no_direct return section to fix race
+
+  - eth: virtio-net: avoid unnecessary checksum calculation on guest RX
+
+Previous releases - always broken:
+
+  - sched: fix TCF_LAYER_TRANSPORT handling in tcf_get_base_ptr()
+
+  - bluetooth: mediatek: fix kernel crash when releasing iso interface
+
+  - vhost: rewind next_avail_head while discarding descriptors
+
+  - eth: r8169: fix RTL8127 hang on suspend/shutdown
+
+  - eth: aquantia: add missing descriptor cache invalidation on ATL2
+
+  - dsa: microchip: fix resource releases in error path
+
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+
+----------------------------------------------------------------
+Alexandra Winter (1):
+      s390/net: list Aswin Karuvally as maintainer
+
+Alexey Kodanev (1):
+      net: sxgbe: fix potential NULL dereference in sxgbe_rx()
+
+Bastien Curutchet (Schneider Electric) (5):
+      net: dsa: microchip: common: Fix checks on irq_find_mapping()
+      net: dsa: microchip: ptp: Fix checks on irq_find_mapping()
+      net: dsa: microchip: Don't free uninitialized ksz_irq
+      net: dsa: microchip: Free previously initialized ports on init failures
+      net: dsa: microchip: Fix symetry in ksz_ptp_msg_irq_{setup/free}()
+
+Biju Das (1):
+      can: rcar_canfd: Fix CAN-FD mode as default
+
+Chris Lu (1):
+      Bluetooth: btusb: mediatek: Fix kernel crash when releasing mtk iso interface
+
+Daniel Golle (2):
+      net: phy: mxl-gpy: fix bogus error on USXGMII and integrated PHY
+      net: phy: mxl-gpy: fix link properties on USXGMII and internal PHYs
+
+Danielle Costantino (1):
+      net/mlx5e: Fix validation logic in rate limiting
+
+Douglas Anderson (1):
+      Bluetooth: btusb: mediatek: Avoid btusb_mtk_claim_iso_intf() NULL deref
+
+Edward Adam Davis (1):
+      Bluetooth: hci_sock: Prevent race in socket write iter and sock bind
+
+Eric Dumazet (1):
+      net: sched: fix TCF_LAYER_TRANSPORT handling in tcf_get_base_ptr()
+
+Fernando Fernandez Mancera (1):
+      xsk: avoid data corruption on cq descriptor number
+
+Gui-Dong Han (1):
+      atm/fore200e: Fix possible data race in fore200e_open()
+
+Heiner Kallweit (1):
+      r8169: fix RTL8127 hang on suspend/shutdown
+
+Horatiu Vultur (1):
+      net: lan966x: Fix the initialization of taprio
+
+Jakub Kicinski (2):
+      Merge tag 'for-net-2025-11-21' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth
+      Merge tag 'linux-can-fixes-for-6.18-20251126' of git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can
+
+Jason Wang (1):
+      vhost: rewind next_avail_head while discarding descriptors
+
+Jeremy Kerr (1):
+      net: mctp: unconditionally set skb->dev on dst output
+
+Jesper Dangaard Brouer (1):
+      veth: reduce XDP no_direct return section to fix race
+
+Jiefeng Zhang (1):
+      net: atlantic: fix fragment overflow handling in RX path
+
+Jon Kohler (2):
+      virtio-net: avoid unnecessary checksum calculation on guest RX
+      MAINTAINERS: separate VIRTIO NET DRIVER and add netdev
+
+Kai-Heng Feng (1):
+      net: aquantia: Add missing descriptor cache invalidation on ATL2
+
+Kuniyuki Iwashima (1):
+      mptcp: Initialise rcv_mss before calling tcp_send_active_reset() in mptcp_do_fastclose().
+
+Luiz Augusto von Dentz (2):
+      Bluetooth: hci_core: Fix triggering cmd_timer for HCI_OP_NOP
+      Bluetooth: SMP: Fix not generating mackey and ltk when repairing
+
+Marc Kleine-Budde (5):
+      can: gs_usb: gs_usb_xmit_callback(): fix handling of failed transmitted URBs
+      can: gs_usb: gs_usb_receive_bulk_callback(): check actual_length before accessing header
+      can: gs_usb: gs_usb_receive_bulk_callback(): check actual_length before accessing data
+      Merge patch series "can: gs_usb: fix USB bulk in and out callbacks"
+      can: sun4i_can: sun4i_can_interrupt(): fix max irq loop handling
+
+Mohsin Bashir (1):
+      eth: fbnic: Fix counter roll-over issue
+
+Nikola Z. Ivanov (1):
+      team: Move team device type change at the end of team_port_add
+
+Paolo Abeni (3):
+      Merge branch 'net-dsa-microchip-fix-resource-releases-in-error-path'
+      mptcp: clear scheduled subflows on retransmit
+      Merge branch 'net-fec-fix-some-ptp-related-issues'
+
+Pauli Virtanen (1):
+      Bluetooth: hci_core: lookup hci_conn on RX path on protocol side
+
+Sayooj K Karun (1):
+      net: atm: fix incorrect cleanup function call in error path
+
+Seungjin Bae (1):
+      can: kvaser_usb: leaf: Fix potential infinite loop in command parsers
+
+Shaurya Rane (1):
+      net/sched: em_canid: fix uninit-value in em_canid_match
+
+Slark Xiao (1):
+      net: wwan: mhi: Keep modem name match with Foxconn T99W640
+
+Thomas Mühlbacher (1):
+      can: sja1000: fix max irq loop handling
+
+Vladimir Oltean (1):
+      net: dsa: sja1105: fix SGMII linking at 10M or 100M but not passing traffic
+
+Wei Fang (4):
+      net: fec: cancel perout_timer when PEROUT is disabled
+      net: fec: do not update PEROUT if it is enabled
+      net: fec: do not allow enabling PPS and PEROUT simultaneously
+      net: fec: do not register PPS event for PEROUT
+
+ MAINTAINERS                                        |  19 ++-
+ drivers/atm/fore200e.c                             |   2 +
+ drivers/bluetooth/btusb.c                          |  39 +++++-
+ drivers/net/can/rcar/rcar_canfd.c                  |  53 ++++----
+ drivers/net/can/sja1000/sja1000.c                  |   4 +-
+ drivers/net/can/sun4i_can.c                        |   4 +-
+ drivers/net/can/usb/gs_usb.c                       | 100 ++++++++++++--
+ drivers/net/can/usb/kvaser_usb/kvaser_usb_leaf.c   |   4 +-
+ drivers/net/dsa/microchip/ksz_common.c             |  31 +++--
+ drivers/net/dsa/microchip/ksz_ptp.c                |  22 ++--
+ drivers/net/dsa/sja1105/sja1105_main.c             |   7 -
+ .../net/ethernet/aquantia/atlantic/aq_hw_utils.c   |  22 ++++
+ .../net/ethernet/aquantia/atlantic/aq_hw_utils.h   |   1 +
+ drivers/net/ethernet/aquantia/atlantic/aq_ring.c   |   5 +
+ .../ethernet/aquantia/atlantic/hw_atl/hw_atl_b0.c  |  19 +--
+ .../ethernet/aquantia/atlantic/hw_atl2/hw_atl2.c   |   2 +-
+ drivers/net/ethernet/freescale/fec.h               |   1 +
+ drivers/net/ethernet/freescale/fec_ptp.c           |  64 +++++++--
+ drivers/net/ethernet/mellanox/mlx5/core/en_dcbnl.c |   2 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_fw.c         |   2 +-
+ .../net/ethernet/microchip/lan966x/lan966x_ptp.c   |   5 +-
+ drivers/net/ethernet/realtek/r8169_main.c          |  19 ++-
+ drivers/net/ethernet/samsung/sxgbe/sxgbe_main.c    |   4 +-
+ drivers/net/phy/mxl-gpy.c                          |  20 +--
+ drivers/net/team/team_core.c                       |  23 ++--
+ drivers/net/tun_vnet.h                             |   2 +-
+ drivers/net/veth.c                                 |   7 +-
+ drivers/net/virtio_net.c                           |   3 +-
+ drivers/net/wwan/mhi_wwan_mbim.c                   |   2 +-
+ drivers/vhost/net.c                                |  53 +++++---
+ drivers/vhost/vhost.c                              |  76 +++++++++--
+ drivers/vhost/vhost.h                              |  10 +-
+ include/linux/virtio_net.h                         |   7 +-
+ include/net/bluetooth/hci_core.h                   |  21 ++-
+ include/net/pkt_cls.h                              |   2 +
+ net/atm/common.c                                   |   2 +-
+ net/bluetooth/hci_core.c                           |  89 ++++++-------
+ net/bluetooth/hci_sock.c                           |   2 +
+ net/bluetooth/iso.c                                |  30 ++++-
+ net/bluetooth/l2cap_core.c                         |  23 +++-
+ net/bluetooth/sco.c                                |  35 +++--
+ net/bluetooth/smp.c                                |  31 +----
+ net/mctp/route.c                                   |   1 +
+ net/mptcp/protocol.c                               |  19 ++-
+ net/sched/em_canid.c                               |   3 +
+ net/sched/em_cmp.c                                 |   5 +-
+ net/sched/em_nbyte.c                               |   2 +
+ net/sched/em_text.c                                |  11 +-
+ net/xdp/xsk.c                                      | 143 +++++++++++++--------
+ 49 files changed, 700 insertions(+), 353 deletions(-)
+
 
