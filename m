@@ -1,232 +1,384 @@
-Return-Path: <netdev+bounces-242322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10695C8F340
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 16:15:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AE45C8F352
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 16:16:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E08AB4F2751
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 15:09:13 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5180E4F266C
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 15:09:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9CA0336ED3;
-	Thu, 27 Nov 2025 15:08:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9782E336EC3;
+	Thu, 27 Nov 2025 15:07:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="re5ZTWIQ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="yEy+UqOI"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8922A336ECA;
-	Thu, 27 Nov 2025 15:07:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56526336EC4
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 15:07:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764256080; cv=none; b=C+hB2reW84YZdc6nH5Id9WL+gUpZjYumtkoqCgYSykd34hgB3EFdUMcTYxl0iXTxSp/Ut71zDFOEF6qxyKomT6y2wsDEAerLbT7d3mgHtFki0IlsuLeB/L66PaD7NKPD/i+VryUwSmLyS6GTFPsi0LrrIboRf56WlNStLQeaEiA=
+	t=1764256079; cv=none; b=DS0T5Q+FiiMWJrZjuMgiyYrh7BhiOn9j5g3Fa7QdoBIN9LJGsvhrTCm94FU6oeP95yx/zJ/MioyHS2+EaoUrVT1up/V/lEWPjvYstPpp5WRtFyONKOecwNIYphlK0k7DqogLdrQvznD9M5CdVXin1tvbxB0pVcDth7i8kBxzjpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764256080; c=relaxed/simple;
-	bh=SKl7N/vatZhz32UkCiL+rrjstFLT9YkXItDjPdV7/Iw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XkWrQgaGHlrmXcPFZJ4PLuArzZFZNwVuZ/89D8MSvazZe2f+nFzD8POHgA/lk5eVjT2LptQw0OWPzM7zu3orK97XsnOI7+pa2zYw+1YOCxheGKuda7ZdWr6491U4/XbdngIFEgYZAOnfrO4hYLh7pgQj5XChUu1S6kZOW/RUcd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=re5ZTWIQ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=b2eRslw/HX549zCYLSeLWEyOjDTk+74w7WJ3XR4XnVI=; b=re5ZTWIQeEKdA7XH21vxqv2/mR
-	U9ghc36TB/R6HC6BoD70XJIr1thXxuL+ycx7JotBHSibqVxYgU3k/uyaixvjiXH6YHbARaf4qv2Go
-	fsFI1MR2ol49No2Oqt5781Whhi8MyDnVJ07pHltid4LrJgncaVjOi6vRqSq7G0lvtKDY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vOdaZ-00FGy8-QU; Thu, 27 Nov 2025 16:07:19 +0100
-Date: Thu, 27 Nov 2025 16:07:19 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Eric Dumazet <edumazet@google.com>, Rob Herring <robh@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jonathan Corbet <corbet@lwn.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Lukasz Majewski <lukma@denx.de>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Divya.Koppera@microchip.com,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org,
-	Sabrina Dubroca <sd@queasysnail.net>, linux-kernel@vger.kernel.org,
-	kernel@pengutronix.de, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [PATCH net-next v8 1/1] Documentation: net: add flow control
- guide and document ethtool API
-Message-ID: <7a5a9201-4c26-42f8-94f2-02763f26e8c1@lunn.ch>
-References: <20251119140318.2035340-1-o.rempel@pengutronix.de>
- <20251125181957.5b61bdb3@kernel.org>
- <aSa8Gkl1AP1U2C9j@pengutronix.de>
- <20251126144225.3a91b8cc@kernel.org>
- <aSgX9ue6uUheX4aB@pengutronix.de>
+	s=arc-20240116; t=1764256079; c=relaxed/simple;
+	bh=8ZvzTTRNEAfD2sAgx5JDxlXB/DDOqQnXLAzKFzy8HA8=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:To:From:Subject:
+	 References:In-Reply-To; b=R9b10sOgmQUEms2xicf6ilLr4B4xVf5i/jvFx0dPbfn/kXTV49QV2/kV6wZSb8aGstQMKCWLBixs5Zj60Q/Nu4PGLsRoIa1xqynuv6xw+TNLrQNcmtnLUMVLcvMnAEDBD29eDUg6fIIHmYSKhYHYBRB3ouwlBgV/jOPFkx99hQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=yEy+UqOI; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id E9B1D1A1DB0;
+	Thu, 27 Nov 2025 15:07:55 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id BEC7C6068C;
+	Thu, 27 Nov 2025 15:07:55 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 6C7C3102F218C;
+	Thu, 27 Nov 2025 16:07:53 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1764256075; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=8crqLJchFkTj6DCWTiXRlQ+eBQ+IUxM75HJ4UnuadO4=;
+	b=yEy+UqOILIThkQwW4lG2nRqI94Nv3mR8rRFdSZNLO3DgJfk022PoXtFZrPHVjtdie9iNVF
+	wpp0q/qSNztOYEg4ixeafn0+s5hc7O1CR3hlj3lyqGhHTUxOA4wxsI6tV/yTampL47UfOj
+	scsOA0/txjf1z9KFRIsGQR6NUtMdcCjp7N6KImhom0S3XLrTpjeHtfeR4F+zLnOzv3hrCS
+	CG4I2XJoGvMx9N1iBx6Ej/MVu/MOPS6zJ+HLHeB3wgSt6fsdB+ptI9dqPJyagyISZ9XG+M
+	NEUnD9foBhxXGcBfjuekmH2g3Y9HyBJWL/FFMwNqjW88U34/hLCOXqFslhtb9g==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aSgX9ue6uUheX4aB@pengutronix.de>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 27 Nov 2025 16:07:52 +0100
+Message-Id: <DEJKKYXTM4TH.2MK2CNLW7L5D3@bootlin.com>
+Cc: "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
+ <claudiu.beznea@tuxon.dev>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
+ "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
+ "Lorenzo Bianconi" <lorenzo@kernel.org>
+To: "Paolo Valerio" <pvalerio@redhat.com>, <netdev@vger.kernel.org>
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+Subject: Re: [PATCH RFC net-next 6/6] cadence: macb/gem: introduce xmit
+ support
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20251119135330.551835-1-pvalerio@redhat.com>
+ <20251119135330.551835-7-pvalerio@redhat.com>
+In-Reply-To: <20251119135330.551835-7-pvalerio@redhat.com>
+X-Last-TLS-Session-Version: TLSv1.3
 
-> Haw about following wording:
-> Kernel Policy: Administrative vs. Operational State
-> ===================================================
-> 
-> The ethtool pause API configures the **administrative state** of the network
-> device. The **operational state** (the actual pause behavior active on the
-> wire) depends on the active link mode and the link partner.
-> 
-> The semantics of the configuration depend on the ``autoneg`` parameter:
-> 
-> 1. **Autonegotiation Mode** (``autoneg on``)
->    In this mode, the ``rx`` and ``tx`` parameters specify the **advertisement**
->    (the "wish").
-> 
->    - The driver configures the PHY to advertise these capabilities.
->    - The actual Flow Control mode is determined by the standard resolution
->      truth table (see "Link-wide PAUSE Autonegotiation Details") based on the
->      link partner's advertisement.
->    - ``get_pauseparam`` reports the advertisement policy, not the resolved
->      outcome.
-> 
-> 2. **Forced Mode** (``autoneg off``)
->    In this mode, the ``rx`` and ``tx`` parameters constitute a direct
->    **command** to the interface.
-> 
->    - The system bypasses advertisement and forces the MAC into the specified
->      configuration.
->    - Drivers should reject configurations that the hardware cannot support in
->      forced mode.
->    - ``get_pauseparam`` reports the forced configuration.
+Hello Paolo, netdev,
 
-There is one additional thing which plays into this, link
-autonegotiation, ethtool -s autoneg on|off.
+On Wed Nov 19, 2025 at 2:53 PM CET, Paolo Valerio wrote:
+> Add XDP_TX verdict support, also introduce ndo_xdp_xmit function for
+> redirection, and update macb_tx_unmap() to handle both skbs and xdp
+> frames advertising NETDEV_XDP_ACT_NDO_XMIT capability and the ability
+> to process XDP_TX verdicts.
+>
+> Signed-off-by: Paolo Valerio <pvalerio@redhat.com>
+> ---
+>  drivers/net/ethernet/cadence/macb_main.c | 166 +++++++++++++++++++++--
+>  1 file changed, 153 insertions(+), 13 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ether=
+net/cadence/macb_main.c
+> index eeda1a3871a6..bd62d3febeb1 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -969,6 +969,17 @@ static int macb_halt_tx(struct macb *bp)
+>  					bp, TSR);
+>  }
+> =20
+> +static void release_buff(void *buff, enum macb_tx_buff_type type, int bu=
+dget)
+> +{
+> +	if (type =3D=3D MACB_TYPE_SKB) {
+> +		napi_consume_skb(buff, budget);
+> +	} else if (type =3D=3D MACB_TYPE_XDP_TX) {
+> +		xdp_return_frame_rx_napi(buff);
+> +	} else {
+> +		xdp_return_frame(buff);
+> +	}
+> +}
+> +
+>  static void macb_tx_unmap(struct macb *bp, struct macb_tx_buff *tx_buff,
+>  			  int budget)
+>  {
+> @@ -983,10 +994,7 @@ static void macb_tx_unmap(struct macb *bp, struct ma=
+cb_tx_buff *tx_buff,
+>  	}
+> =20
+>  	if (tx_buff->data) {
+> -		if (tx_buff->type !=3D MACB_TYPE_SKB)
+> -			netdev_err(bp->dev, "BUG: Unexpected tx buffer type while unmapping (=
+%d)",
+> -				   tx_buff->type);
+> -		napi_consume_skb(tx_buff->data, budget);
+> +		release_buff(tx_buff->data, tx_buff->type, budget);
+>  		tx_buff->data =3D NULL;
+>  	}
+>  }
+> @@ -1076,8 +1084,8 @@ static void macb_tx_error_task(struct work_struct *=
+work)
+>  		tx_buff =3D macb_tx_buff(queue, tail);
+> =20
+>  		if (tx_buff->type !=3D MACB_TYPE_SKB)
+> -			netdev_err(bp->dev, "BUG: Unexpected tx buffer type (%d)",
+> -				   tx_buff->type);
+> +			goto unmap;
+> +
+>  		skb =3D tx_buff->data;
+> =20
+>  		if (ctrl & MACB_BIT(TX_USED)) {
+> @@ -1118,6 +1126,7 @@ static void macb_tx_error_task(struct work_struct *=
+work)
+>  			desc->ctrl =3D ctrl | MACB_BIT(TX_USED);
+>  		}
+> =20
+> +unmap:
+>  		macb_tx_unmap(bp, tx_buff, 0);
+>  	}
+> =20
+> @@ -1196,6 +1205,7 @@ static int macb_tx_complete(struct macb_queue *queu=
+e, int budget)
+>  	spin_lock_irqsave(&queue->tx_ptr_lock, flags);
+>  	head =3D queue->tx_head;
+>  	for (tail =3D queue->tx_tail; tail !=3D head && packets < budget; tail+=
++) {
+> +		void			*data =3D NULL;
+>  		struct macb_tx_buff	*tx_buff;
+>  		struct sk_buff		*skb;
+>  		struct macb_dma_desc	*desc;
+> @@ -1218,11 +1228,16 @@ static int macb_tx_complete(struct macb_queue *qu=
+eue, int budget)
+>  		for (;; tail++) {
+>  			tx_buff =3D macb_tx_buff(queue, tail);
+> =20
+> -			if (tx_buff->type =3D=3D MACB_TYPE_SKB)
+> -				skb =3D tx_buff->data;
+> +			if (tx_buff->type !=3D MACB_TYPE_SKB) {
+> +				data =3D tx_buff->data;
+> +				goto unmap;
+> +			}
+> =20
+>  			/* First, update TX stats if needed */
+> -			if (skb) {
+> +			if (tx_buff->type =3D=3D MACB_TYPE_SKB && tx_buff->data) {
+> +				data =3D tx_buff->data;
+> +				skb =3D tx_buff->data;
+> +
+>  				if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP) &&
+>  				    !ptp_one_step_sync(skb))
+>  					gem_ptp_do_txstamp(bp, skb, desc);
+> @@ -1238,6 +1253,7 @@ static int macb_tx_complete(struct macb_queue *queu=
+e, int budget)
+>  				bytes +=3D skb->len;
+>  			}
+> =20
+> +unmap:
+>  			/* Now we can safely release resources */
+>  			macb_tx_unmap(bp, tx_buff, budget);
+> =20
+> @@ -1245,7 +1261,7 @@ static int macb_tx_complete(struct macb_queue *queu=
+e, int budget)
+>  			 * WARNING: at this point skb has been freed by
+>  			 * macb_tx_unmap().
+>  			 */
+> -			if (skb)
+> +			if (data)
+>  				break;
+>  		}
+>  	}
+> @@ -1357,8 +1373,124 @@ static void discard_partial_frame(struct macb_que=
+ue *queue, unsigned int begin,
+>  	 */
+>  }
+> =20
+> +static int macb_xdp_submit_frame(struct macb *bp, struct xdp_frame *xdpf=
+,
+> +				 struct net_device *dev, dma_addr_t addr)
+> +{
+> +	enum macb_tx_buff_type buff_type;
+> +	struct macb_tx_buff *tx_buff;
+> +	int cpu =3D smp_processor_id();
+> +	struct macb_dma_desc *desc;
+> +	struct macb_queue *queue;
+> +	unsigned long flags;
+> +	dma_addr_t mapping;
+> +	u16 queue_index;
+> +	int err =3D 0;
+> +	u32 ctrl;
+> +
+> +	queue_index =3D cpu % bp->num_queues;
+> +	queue =3D &bp->queues[queue_index];
+> +	buff_type =3D !addr ? MACB_TYPE_XDP_NDO : MACB_TYPE_XDP_TX;
 
-If link auto negotiation is on, you can then have both of the two
-cases above, negotiated pause, or forced pause. If link auto
-negotiation is off, you can only have forced mode. The text you have
-below does however cover this. But this is one of the areas developers
-get wrong, they don't consider how the link autoneg affects the pause
-autoneg.
+I am not the biggest fan of piggy-backing on !!addr to know which
+codepath called us. If the macb_xdp_submit_frame() call in gem_xdp_run()
+ever gives an addr=3D0 coming from macb_get_addr(bp, desc), then we will
+be submitting NDO typed frames and creating additional DMA mappings
+which would be a really hard to debug bug.
 
-But i do agree that get_pauseparam is rather odd. It returns the
-current configuration, not necessarily how the MAC hardware has been
-programmed.
+> +	spin_lock_irqsave(&queue->tx_ptr_lock, flags);
+> +
+> +	/* This is a hard error, log it. */
+> +	if (CIRC_SPACE(queue->tx_head, queue->tx_tail,
+> +		       bp->tx_ring_size) < 1) {
 
-> **Common Constraints**
-> Regardless of the mode, the following constraints apply:
-> 
-> - Link-wide PAUSE is not valid on half-duplex links.
-> - Link-wide PAUSE cannot be used together with Priority-based Flow Control
->   (PFC).
-> 
-> 
-> /**
->  * ...
->  * @get_pauseparam: Report the configured administrative policy for link-wide
->  *	PAUSE (IEEE 802.3 Annex 31B). Drivers must fill struct ethtool_pauseparam
->  *	such that:
->  *	@autoneg:
->  *		This refers to **Pause Autoneg** (IEEE 802.3 Annex 31B) only
->  *		and is part of the link autonegotiation process.
->  *		true  -> the device follows the negotiated result of pause
->  *			 autonegotiation (Pause/Asym);
->  *		false -> the device uses a forced configuration independent
->  *			 of negotiation.
->  *	@rx_pause/@tx_pause:
->  *		represent the desired policy (administrative state).
->  *		In autoneg mode they describe what is to be advertised;
->  *		in forced mode they describe the MAC configuration to be forced.
->  *
->  * @set_pauseparam: Apply a policy for link-wide PAUSE (IEEE 802.3 Annex 31B).
->  *	@rx_pause/@tx_pause:
->  *		Desired state. If @autoneg is true, these define the
->  *		advertisement. If @autoneg is false, these define the
->  *		forced MAC configuration.
->  *	@autoneg:
->  *		Select autonegotiation or forced mode.
->  *
->  *	**Constraint Checking:**
->  *	Drivers should reject a non-zero setting of @autoneg when
->  *	autonegotiation is disabled (or not supported) for the link.
->  *	Drivers should reject unsupported rx/tx combinations with -EINVAL.
+Hard wrapped line is not required, it fits in one line.
 
-I'm not so keen on this last little section. What we actually want is
-the drivers use phylink, and let phylink implement all the 'business
-logic'. phylink will then tell the MAC driver the two bits it needs to
-program the hardware. phylink does all the validation, so all a MAC
-driver needs to do is call phylink_ethtool_get_pauseparam() and
-phylink_ethtool_set_pauseparam(). If we say the driver reject some
-combinations, we might have developers implementing that before
-calling phylink_ethtool_set_pauseparam(), which is pointless, and
-maybe getting it wrong.
+> +		netif_stop_subqueue(dev, queue_index);
+> +		netdev_dbg(bp->dev, "tx_head =3D %u, tx_tail =3D %u\n",
+> +			   queue->tx_head, queue->tx_tail);
+> +		err =3D -ENOMEM;
+> +		goto unlock;
+> +	}
+> +
+> +	if (!addr) {
+> +		mapping =3D dma_map_single(&bp->pdev->dev,
+> +					 xdpf->data,
+> +					 xdpf->len, DMA_TO_DEVICE);
+> +		if (unlikely(dma_mapping_error(&bp->pdev->dev, mapping))) {
+> +			err =3D -ENOMEM;
+> +			goto unlock;
+> +		}
+> +	} else {
+> +		mapping =3D addr;
+> +		dma_sync_single_for_device(&bp->pdev->dev, mapping,
+> +					   xdpf->len, DMA_BIDIRECTIONAL);
+> +	}
+> +
+> +	unsigned int tx_head =3D queue->tx_head + 1;
 
-So i would prefer something more like:
+Middle scope variable definition. Weirdly named as it isn't storing the
+current head offset but the future head offset.
 
- *	**Constraint Checking:**
+> +	ctrl =3D MACB_BIT(TX_USED);
+> +	desc =3D macb_tx_desc(queue, tx_head);
+> +	desc->ctrl =3D ctrl;
+> +
+> +	desc =3D macb_tx_desc(queue, queue->tx_head);
+> +	tx_buff =3D macb_tx_buff(queue, queue->tx_head);
+> +	tx_buff->data =3D xdpf;
+> +	tx_buff->type =3D buff_type;
+> +	tx_buff->mapping =3D mapping;
+> +	tx_buff->size =3D xdpf->len;
+> +	tx_buff->mapped_as_page =3D false;
+> +
+> +	ctrl =3D (u32)tx_buff->size;
+> +	ctrl |=3D MACB_BIT(TX_LAST);
+> +
+> +	if (unlikely(macb_tx_ring_wrap(bp, queue->tx_head) =3D=3D (bp->tx_ring_=
+size - 1)))
+> +		ctrl |=3D MACB_BIT(TX_WRAP);
+> +
+> +	/* Set TX buffer descriptor */
+> +	macb_set_addr(bp, desc, tx_buff->mapping);
+> +	/* desc->addr must be visible to hardware before clearing
+> +	 * 'TX_USED' bit in desc->ctrl.
+> +	 */
+> +	wmb();
+> +	desc->ctrl =3D ctrl;
+> +	queue->tx_head =3D tx_head;
+> +
+> +	/* Make newly initialized descriptor visible to hardware */
+> +	wmb();
+> +
+> +	spin_lock(&bp->lock);
+> +	macb_writel(bp, NCR, macb_readl(bp, NCR) | MACB_BIT(TSTART));
+> +	spin_unlock(&bp->lock);
+> +
+> +	if (CIRC_SPACE(queue->tx_head, queue->tx_tail, bp->tx_ring_size) < 1)
+> +		netif_stop_subqueue(dev, queue_index);
 
- *	 Ideally, drivers should simply call phylink_ethtool_get_pauseparam()
- *       and phylink_ethtool_set_pauseparam(). phylink will then perform
- *       all the needed validation, and perform all the actions based on
- *	 the current **Pause Autoneg** and link Autoneg.
- *
- *       If phylink is not being used, the driver most perform validation,
- *       reject a non-zero setting of @autoneg when autonegotiation is disabled
- *       (or not supported) for the link. Drivers should reject unsupported rx/tx
- *       combinations with -EINVAL.
+The above 30~40 lines are super similar to macb_start_xmit() &
+macb_tx_map(). They implement almost the same logic; can we avoid the
+duplication?
 
-> Open Questions:
-> 
-> Pre-link Configuration (Administrative UP, Physical DOWN) How should drivers
-> handle set_pauseparam when the link is physically down?
+> +
+> +unlock:
+> +	spin_unlock_irqrestore(&queue->tx_ptr_lock, flags);
+> +
+> +	if (err)
+> +		release_buff(xdpf, buff_type, 0);
+> +
+> +	return err;
+> +}
+> +
+> +static int
+> +macb_xdp_xmit(struct net_device *dev, int num_frame,
+> +	      struct xdp_frame **frames, u32 flags)
+> +{
+> +	struct macb *bp =3D netdev_priv(dev);
+> +	u32 xmitted =3D 0;
+> +	int i;
+> +
+> +	if (!macb_is_gem(bp))
+> +		return -EOPNOTSUPP;
+> +
+> +	if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
+> +		return -EINVAL;
+> +
+> +	for (i =3D 0; i < num_frame; i++) {
+> +		if (macb_xdp_submit_frame(bp, frames[i], dev, 0))
+> +			break;
+> +
+> +		xmitted++;
+> +	}
+> +
+> +	return xmitted;
+> +}
+> +
+>  static u32 gem_xdp_run(struct macb_queue *queue, struct xdp_buff *xdp,
+> -		       struct net_device *dev)
+> +		       struct net_device *dev, dma_addr_t addr)
+>  {
+>  	struct bpf_prog *prog;
+>  	u32 act =3D XDP_PASS;
+> @@ -1379,6 +1511,12 @@ static u32 gem_xdp_run(struct macb_queue *queue, s=
+truct xdp_buff *xdp,
+>  			break;
+>  		}
+>  		goto out;
+> +	case XDP_TX:
+> +		struct xdp_frame *xdpf =3D xdp_convert_buff_to_frame(xdp);
+> +
+> +		if (!xdpf || macb_xdp_submit_frame(queue->bp, xdpf, dev, addr))
+> +			act =3D XDP_DROP;
+> +		goto out;
+>  	default:
+>  		bpf_warn_invalid_xdp_action(dev, prog, act);
+>  		fallthrough;
+> @@ -1467,7 +1605,7 @@ static int gem_rx(struct macb_queue *queue, struct =
+napi_struct *napi,
+>  				 false);
+>  		xdp_buff_clear_frags_flag(&xdp);
+> =20
+> -		ret =3D gem_xdp_run(queue, &xdp, bp->dev);
+> +		ret =3D gem_xdp_run(queue, &xdp, bp->dev, addr);
+>  		if (ret =3D=3D XDP_REDIRECT)
+>  			xdp_flush =3D true;
+> =20
+> @@ -4546,6 +4684,7 @@ static const struct net_device_ops macb_netdev_ops =
+=3D {
+>  	.ndo_hwtstamp_get	=3D macb_hwtstamp_get,
+>  	.ndo_setup_tc		=3D macb_setup_tc,
+>  	.ndo_bpf		=3D macb_xdp,
+> +	.ndo_xdp_xmit		=3D macb_xdp_xmit,
 
-You can program the PHY/PCS with what you want it to negotiate. Once
-the link comes up, you can then look if you are in a half duplex mode
-when determining how to program the MAC hardware.
+I'd expect macb_xdp_xmit() to be called gem_xdp_xmit() as well.
 
->  Parallel Detection: If the link comes up later (e.g., as Half Duplex via
->  parallel detection), a previously accepted "forced pause" configuration might
->  become invalid. Should we block forced pause settings until the link is
->  physically up?
+Thanks,
 
-Forced is forced. Forced is always a potential foot gun, since you can
-end up with the link peers having different ideas about what is being
-used on the link. autoneg of half duplex link is just one of the
-scenarios where you gain a hole in your foot.
+--
+Th=C3=A9o Lebrun, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
-> State Persistence and Toggling When toggling autoneg (e.g., autoneg on -> off
-> -> on), should the kernel or driver cache the previous advertisement?
-
-This has been discussed in the past, and i _think_ phylink does.
-
-But before we go too far into edge causes, my review experience is
-that MAC drivers get the basics wrong. What we really want to do here
-is:
-
-1) Push driver developers towards phylink
-2) For those who don't use phylink give clear documentation of the
-   basics.
-
-We can look at edge cases, but i would only do it in the context of
-phylink. Its one central implementation means we can add complexity
-there and not overload developers who get the basics wrong.
-
-	Andrew
 
