@@ -1,152 +1,201 @@
-Return-Path: <netdev+bounces-242328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04C64C8F40A
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 16:24:11 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EA4DC8F407
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 16:23:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9AA504E7DE7
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 15:20:29 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6FE8D34427E
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 15:23:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B30E0296BC2;
-	Thu, 27 Nov 2025 15:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 809E826F471;
+	Thu, 27 Nov 2025 15:23:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="0F/8lGzb"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="IFqY2jcD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D806254B19;
-	Thu, 27 Nov 2025 15:20:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B720332BF40
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 15:23:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764256826; cv=none; b=B1AwBuzyNWOOwu0sl72JhRke1zQQN9Z/ubRyjIwq9Mv1J3pAhPfrRf+dLtkXA4iabnj0TO6Npozw6/wetJ2p9emtbeYFUTp2hvMOjTVuu509Lj4znKUxjBqz+8NKVK43xHgGQ2t326N8zaIjEURU4NtXQL7YuEvEyqoVoe5eeag=
+	t=1764257013; cv=none; b=brhS9902Yw4vRXXGRE3r6LUZkkolObaLUqxrqH/a+K8igXcnaZI4k87EZE1V4+DGryR2TdFup9w04b1WFDDBoe4PGVov9wuX9lYy3BCh0azP444tdVHhZjP8zMxuj4V5osjy40scHf1rMuv9Y/4DSwueqAczQMTSn8zspYDblGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764256826; c=relaxed/simple;
-	bh=xqRunuevmmfFKidkTCWnTlY5sOaxP7ZKZklDajSh+OU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lauN3wWQCtW/ckdyG4u6rghqZ73bZ/siTqOcEXZHwWR2oJKHbqM8ZM9OteCsKscd/ohK/EjBCwKVUDwLaom4bD36536qYWEVKX7MoVL9+dBt54r2ImH2w90G2dneX6rJZjBtzCQVHEl/LGRicQKiZr6tOfTQJCdlXEfWFmkr9p4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=0F/8lGzb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C741C4CEF8;
-	Thu, 27 Nov 2025 15:20:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1764256826;
-	bh=xqRunuevmmfFKidkTCWnTlY5sOaxP7ZKZklDajSh+OU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=0F/8lGzbC9PyxV1j6N95sbzvghGCGLCXOUTkmkhql0IYICyC/xwRC+JNwziycD0Sq
-	 akXMyMpRWeXmUfuS1RGS9tu/LpYjupw5PhczQ2SgpNwaR1PdyURXLVTVllijFNvlv9
-	 jBN3iMsJeYU2+KniP3gKdmTaVkz+zyFdNx4jzhKQ=
-Date: Thu, 27 Nov 2025 16:20:23 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: ssrane_b23@ee.vjti.ac.in
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Felix Maurer <fmaurer@redhat.com>,
-	Jaakko Karrenpalo <jkarrenpalo@gmail.com>,
-	Arvid Brodin <arvid.brodin@alten.se>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
-	linux-kernel-mentees@lists.linux.dev, david.hunter.linux@gmail.com,
-	khalid@kernel.org,
-	syzbot+2fa344348a579b779e05@syzkaller.appspotmail.com
-Subject: Re: [PATCH] hsr: fix NULL pointer dereference in skb_clone with hw
- tag insertion
-Message-ID: <2025112706-deafness-agreeable-2e34@gregkh>
-References: <20251125210158.224431-1-ssranevjti@gmail.com>
+	s=arc-20240116; t=1764257013; c=relaxed/simple;
+	bh=snVZQrqTVEWex2m9bNxSVbf5nmhz6O7pQs+yrCT0LGU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Kot4U6NWGabcdZ5jFiUsHKahFUYrLdSxBnhnCaV0pgx+qrhq6GSxIebsY0iCuw/Wj1ZWY024b7S8o053JmF9njPgi5fACBu/tqrElZ9RlUIUpcrwIfpuei1nkC4MCiCODWx4Ql1b/Zn5EqW0PCDcno+bYO+k+ekEMjsxeYQuGK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=IFqY2jcD; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-343806688c5so733212a91.0
+        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 07:23:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1764257011; x=1764861811; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yF5SVznq17En29aIlJHSRTajaPhzGUPfWZ5+s0SFU9Y=;
+        b=IFqY2jcDeMLWA/uZtpA71pegI77/AQMccCFkrJdnUXkZLaKCF+O1szG6CnznmZq+j7
+         DI7pPduKjTtPaim1czqDwGIKCoKoCLGBfRHSXciPApMPGPbBKjv/ZY1Ov+baGIERWlW0
+         KupHlUZOBSkXnPXIkuBecBVU5q4YMrQBpELKsIK72INkKz2W5joewrNKoR2RiGLId686
+         sZ4G7tlH+a9UbUzJBjLFAUKBpNzFuTOe1CcrXVJit0LOW50gMMVsu/WOx2PwMX+VNVkC
+         UWi0senLXwI6lP/RqB8vuowU8QGUu2zkoQHgeVd59T+RfB4lLR+G7oScPo0rlzua0Rfr
+         HF2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764257011; x=1764861811;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=yF5SVznq17En29aIlJHSRTajaPhzGUPfWZ5+s0SFU9Y=;
+        b=OpMKOTlyTPDaM9Qxvs/Ue7CQfIq1729FWU+Xrr27tfwLw7Y7uKb24laoAB/XCJAebI
+         GPkp8i0mRlIoTYTr1ykkVlCW9aNQ0b0q2+T6nCDxuETMPcsv0PGkdGCwDCVO4IdDcyN2
+         V7L/v9jwNITCnidZR4p3dPq6c8DxXw0FOFdpnZJzfXnmaM/8ALik0S3w97l3674MlyYu
+         FT5340HFPZhP/GUKUuZI1EOUdW+TLal/MoOFT579QxBRcAoJkbFLwV5liuG+7qykOSez
+         MvyUjLzSe1+j5D7M8jNUkbuplgDrzfQI778ea8y+4lULz6kVdVJRh9g9AWBig9OcUEa0
+         QqbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVGjXLS/R9E4c2e5KKdas6oCUiCW3xAq7YffrZ11OmQbe2dUyYqn0civiwIRV7VEWUm/povW4E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzCcUKOVF5KnkSjHiuyFow+c6EzSl4pi37I+e2ZhlQVwdtv5HUE
+	LOA1aMZkAYDGLalojuQi4ZZMVkQhO2IXfY9mwxKpvWb94+uxiO4h2UPR9i/dMMg0QF1pt+5+FAn
+	1zKulswIAFNpJzqLBjAeh5pASokKg1cxUlG4r4oUI
+X-Gm-Gg: ASbGncvP0k37Hw6MdqDwoCCV2/knvvnf2/aIJr8YAH5icee6No/TIv+X7b1k05Oy5lq
+	hu6J5dqAlq5gC84jvcanCpOfYBI2iDkY0h+DqD45gSncH/K0U0UvHbL7ttqo3DhztHHrlVFJDdB
+	7TOR088tMvr+kyj2JDCrWIAUYZh/p948E5HY9uRSiOpVUw3HkNl4WKcvi2eDWsU7VAmvebyn+6T
+	CXTDLoVu+U9ZH/0ETAV3POT+4yPVTBLW+mWrVNFFKZAOQfqI1xaxPT1fEzJ71QSeNIPxTuWwl8s
+	Lu4=
+X-Google-Smtp-Source: AGHT+IEvwYQ59s4V8ZKMwK+fUJseLYJ2ZtT0dvG7JcsGOEEdlwV0+sLEi6XI7Y/ZVcsl+C+Ccm1sURPrKSCjcSaV+zI=
+X-Received: by 2002:a17:90b:57cc:b0:340:5b6a:5bb0 with SMTP id
+ 98e67ed59e1d1-3475ed68e2amr10534410a91.26.1764257010955; Thu, 27 Nov 2025
+ 07:23:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251125210158.224431-1-ssranevjti@gmail.com>
+References: <20251124200825.241037-1-jhs@mojatatu.com> <20251124145115.30c01882@kernel.org>
+ <CAM0EoM=jDt_CeCop82aH=Fch+4M9QawX4aQdKdiUCsdFzuC2rQ@mail.gmail.com>
+ <CAM0EoM=Rci1sfLFzenP9KyGhWNuLsprRZu0jS5pg2Wh35--4wg@mail.gmail.com>
+ <CANn89iJiapfb3OULLv8FxQET4e-c7Kei_wyx2EYb7Wt_0qaAtw@mail.gmail.com>
+ <CAM0EoMm4UZ9cM6zOTH+uT1kwyMdgEsP2BPR3C+d_-nmbXfrYyQ@mail.gmail.com>
+ <CANn89i+_4Hj2WApgy_UBFhsDy+FEM8M1HhutrUcUHKmqbMR1-A@mail.gmail.com>
+ <CAM0EoMmoMUtrBHyYUWNeBnFFj8kDFYPyQB+O1fdGB4xk_bMWZA@mail.gmail.com>
+ <CANn89i+zDW5ttPZ7fw2gDbVQqXj2uFoeEeTRSU6gzFLM3zGCeA@mail.gmail.com>
+ <CAM0EoMmzt1tDpoqK=mMZoj1=6UU2Ytim2aqJWOBAZmPfNyZSfQ@mail.gmail.com> <CANn89iKKKwj33WgSbGKDa7JB=qRBXSH6VbiAV=umwOgwYsbmTQ@mail.gmail.com>
+In-Reply-To: <CANn89iKKKwj33WgSbGKDa7JB=qRBXSH6VbiAV=umwOgwYsbmTQ@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Thu, 27 Nov 2025 10:23:20 -0500
+X-Gm-Features: AWmQ_bkhAmtiB5ahdfZcgYIiBrWCu43ByF1a9wOtseuiN-pDKiymddGvyRRB67E
+Message-ID: <CAM0EoMngngPdwCqFrbEQAFgu+cMe0eVfBs1XKD4zTUCTpYYHOw@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] net/sched: act_mirred: Fix infinite loop
+To: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, pabeni@redhat.com, 
+	jiri@resnulli.us, xiyou.wangcong@gmail.com, netdev@vger.kernel.org, 
+	dcaratti@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 26, 2025 at 02:31:58AM +0530, ssrane_b23@ee.vjti.ac.in wrote:
-> From: Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
-> 
-> When hardware HSR tag insertion is enabled (NETIF_F_HW_HSR_TAG_INS) and
-> frame->skb_std is NULL, both hsr_create_tagged_frame() and
-> prp_create_tagged_frame() will call skb_clone() with a NULL skb pointer,
-> causing a kernel crash.
-> 
-> Fix this by adding NULL checks for frame->skb_std before calling
-> skb_clone() in the functions.
-> 
-> Reported-by: syzbot+2fa344348a579b779e05@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=2fa344348a579b779e05
-> Fixes: f266a683a480 ("net/hsr: Better frame dispatch")
-> Signed-off-by: Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
-> ---
->  net/hsr/hsr_forward.c | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/net/hsr/hsr_forward.c b/net/hsr/hsr_forward.c
-> index 339f0d220212..4c1a311b900f 100644
-> --- a/net/hsr/hsr_forward.c
-> +++ b/net/hsr/hsr_forward.c
-> @@ -211,6 +211,9 @@ struct sk_buff *prp_get_untagged_frame(struct hsr_frame_info *frame,
->  				  __FILE__, __LINE__, port->dev->name);
->  			return NULL;
->  		}
-> +
-> +		if (!frame->skb_std)
-> +			return NULL;
->  	}
->  
->  	return skb_clone(frame->skb_std, GFP_ATOMIC);
-> @@ -341,6 +344,8 @@ struct sk_buff *hsr_create_tagged_frame(struct hsr_frame_info *frame,
->  		hsr_set_path_id(frame, hsr_ethhdr, port);
->  		return skb_clone(frame->skb_hsr, GFP_ATOMIC);
->  	} else if (port->dev->features & NETIF_F_HW_HSR_TAG_INS) {
-> +		if (!frame->skb_std)
-> +			return NULL;
->  		return skb_clone(frame->skb_std, GFP_ATOMIC);
->  	}
->  
-> @@ -385,6 +390,8 @@ struct sk_buff *prp_create_tagged_frame(struct hsr_frame_info *frame,
->  		}
->  		return skb_clone(frame->skb_prp, GFP_ATOMIC);
->  	} else if (port->dev->features & NETIF_F_HW_HSR_TAG_INS) {
-> +		if (!frame->skb_std)
-> +			return NULL;
->  		return skb_clone(frame->skb_std, GFP_ATOMIC);
->  	}
->  
-> -- 
-> 2.34.1
-> 
-> 
-Hi,
+On Thu, Nov 27, 2025 at 10:11=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
+ wrote:
+>
+> On Thu, Nov 27, 2025 at 6:45=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.co=
+m> wrote:
+> >
+> > On Wed, Nov 26, 2025 at 3:30=E2=80=AFPM Eric Dumazet <edumazet@google.c=
+om> wrote:
+> > >
+> > > On Wed, Nov 26, 2025 at 12:20=E2=80=AFPM Jamal Hadi Salim <jhs@mojata=
+tu.com> wrote:
+> > > >
+> > > > On Wed, Nov 26, 2025 at 1:20=E2=80=AFPM Eric Dumazet <edumazet@goog=
+le.com> wrote:
+> > > > >
+> > > > > On Wed, Nov 26, 2025 at 10:14=E2=80=AFAM Jamal Hadi Salim <jhs@mo=
+jatatu.com> wrote:
+> > > > >
+> > > > > > It's the multiport redirection, particularly to ingress. When i=
+t get
+> > > > > > redirected to ingress it will get queued and then transitioned =
+back.
+> > > > > > xmit struct wont catch this as a recursion, so MIRRED_NEST_LIMI=
+T will
+> > > > > > not help you.
+> > > > > > Example (see the first accompanying tdc test):
+> > > > > > packet showing up on port0:ingress mirred redirect --> port1:eg=
+ress
+> > > > > > packet showing up on port1:egress mirred redirect --> port0:ing=
+ress
+> > > > >
+> > > > > Have you tried recording both devices ?
+> > > > >
+> > > > > diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+> > > > > index f27b583def78e4afecc7112854b93d59c2520201..711fc2e31cb0451c0=
+7a39f9c94226357d5faec09
+> > > > > 100644
+> > > > > --- a/net/sched/act_mirred.c
+> > > > > +++ b/net/sched/act_mirred.c
+> > > > > @@ -445,15 +445,17 @@ TC_INDIRECT_SCOPE int tcf_mirred_act(struct=
+ sk_buff *skb,
+> > > > >                 return retval;
+> > > > >         }
+> > > > >         for (i =3D 0; i < xmit->sched_mirred_nest; i++) {
+> > > > > -               if (xmit->sched_mirred_dev[i] !=3D dev)
+> > > > > +               if (xmit->sched_mirred_dev[i] !=3D dev &&
+> > > > > +                   xmit->sched_mirred_dev[i] !=3D skb->dev)
+> > > > >                         continue;
+> > > > > -               pr_notice_once("tc mirred: loop on device %s\n",
+> > > > > -                              netdev_name(dev));
+> > > > > +               pr_notice_once("tc mirred: loop on device %s/%s\n=
+",
+> > > > > +                              netdev_name(dev), netdev_name(skb-=
+>dev));
+> > > > >                 tcf_action_inc_overlimit_qstats(&m->common);
+> > > > >                 return retval;
+> > > > >         }
+> > > > >
+> > > > >         xmit->sched_mirred_dev[xmit->sched_mirred_nest++] =3D dev=
+;
+> > > > > +       xmit->sched_mirred_dev[xmit->sched_mirred_nest++] =3D skb=
+->dev;
+> > > > >
+> > > > >         m_mac_header_xmit =3D READ_ONCE(m->tcfm_mac_header_xmit);
+> > > > >         m_eaction =3D READ_ONCE(m->tcfm_eaction);
+> > > >
+> > > > Did you mean not to decrement sched_mirred_nest twice?
+> > >
+> > > No, sorry, we should decrement twice of course.
+> > >
+> >
+> > Ok, I tested.
+> > While it "fixes" it - it's not really a fix. It works by ignoring direc=
+tion.
+> > Example, this is not a loop but currently would be claimed to be a
+> > loop because port0 appears twice:
+> > port0 ingress --> port1 ingress --> port1 egress
+> > Note: port0 ingress and port0 egress cannot create a loop.
+>
+> I am not familiar with this stuff, can the direction be known and
+> taken into account ?
+>
 
-This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
-a patch that has triggered this response.  He used to manually respond
-to these common problems, but in order to save his sanity (he kept
-writing the same thing over and over, yet to different people), I was
-created.  Hopefully you will not take offence and will fix the problem
-in your patch and resubmit it so that it can be accepted into the Linux
-kernel tree.
+Yes, it can.
+To figure the target direction see tcf_mirred_act_wants_ingress() and
+to get what the current direction see code like:
+at_ingress =3D skb_at_tc_ingress(skb);
 
-You are receiving this message because of the following common error(s)
-as indicated below:
+> Really, anything but adding new bits in sk_buff.
 
-- You have marked a patch with a "Fixes:" tag for a commit that is in an
-  older released kernel, yet you do not have a cc: stable line in the
-  signed-off-by area at all, which means that the patch will not be
-  applied to any older kernel releases.  To properly fix this, please
-  follow the documented rules in the
-  Documentation/process/stable-kernel-rules.rst file for how to resolve
-  this.
+If we can fix it without restoring those two bits i will be happy.
+To repeat something i said earlier:
+The bigger challenge is somewhere along the way (after removing those
+two bits) we ended sending the egress->ingress to netif_rx() (see
+tcf_mirred_forward()), so any flow with that kind of setup will
+nullify your xmit count i.e when we come back for the next leg the
+xmit counter will be 0.
 
-If you wish to discuss this problem further, or you have questions about
-how to resolve this issue, please feel free to respond to this email and
-Greg will reply once he has dug out from the pending patches received
-from other developers.
-
-thanks,
-
-greg k-h's patch email bot
+cheers,
+jamal
 
