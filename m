@@ -1,452 +1,902 @@
-Return-Path: <netdev+bounces-242225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5835C8DC22
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 11:30:06 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97CB1C8DC34
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 11:31:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 96CA034C8A1
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 10:30:05 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 78A7C4E63B3
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 10:31:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6B28328B5C;
-	Thu, 27 Nov 2025 10:30:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4A0F3233F4;
+	Thu, 27 Nov 2025 10:31:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="CdTlXQ6C";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="hGsSfT8j"
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=louisalexis.eyraud@collabora.com header.b="e8orGadU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from sender3-pp-f112.zoho.com (sender3-pp-f112.zoho.com [136.143.184.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0685C2C15A9;
-	Thu, 27 Nov 2025 10:29:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47BBA79DA;
+	Thu, 27 Nov 2025 10:31:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.184.112
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764239400; cv=fail; b=pwjiPMSGqQ7rv+vf2u/inL8sthC6wMw+9Z7flpNxop7q3SvHwqYZVHokgk1ipp6FRi1rjvRQ8YtmHwFex92N9/CSzUWpP3R81h6t5PF0IjEf4uzHwQqJO7Y30Mi6GAIlOzBzWngpVZR6qbbYyHiFl9brhvYgHjoId4pijlOUTMc=
+	t=1764239488; cv=pass; b=pYoVMWmaIMS3Zxyo3cbyrYVWDiyLQGd0y+3sCYyJRQy3B5mPykRv81bTfmSQuMoxBHXygH6Z/ThC2AjkqsI0ObPJm3pcBjebBButqyuojztuYg9ePU07w5ejc1ezJ5yL6hl1cRDrQenxPQmOuuWIRmuGhdYOJATmiNZqR30NuNs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764239400; c=relaxed/simple;
-	bh=7MwPm/w+2hGZoBxyHszb2F2CJJP6TMtk64YuOFM3YhA=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Xg03zBENlF8R2mSTv6GnlOcmRBjS2hdzeEl6Ikup9yBtGerz8IOKUTCf/bnPryv2yWU2XVRlO0YByAzv6GVk/KzbDLYIbFJt2oDcdm8S+OC7dkM/M4utalhwD4RNvxkc5q3Ic462Uj2yFE01fMs5etUIbxBeWzKbpDrP2bk17q4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=CdTlXQ6C; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=hGsSfT8j; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AR7Jotd4134166;
-	Thu, 27 Nov 2025 10:29:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2025-04-25; bh=31VD3/DcjC5YV5ILc2ObdFMxEwLdQXOBBsTyTLW7P1Y=; b=
-	CdTlXQ6Cz6XABKj+MR0X4My9vgby9Oz+yeHPFLFiAP8631xtgpgZOAelPlUYC2WS
-	mjrI/7SBYnXa0l/goqmGxeMtmCOFdyERTX52/MFzBlcJ2xiM85oFV+nz0ENSJYKB
-	GZTSTBH57/WcUbRvDGFMclmXrQDY6E5ce790U3VBaTbexZ+ifUudYV6PFpfs1Q7Q
-	w/xBFhY2wQWs/Qi/6VKTREdBlMnUTlglmo0rP0mOjdfTQ6m/DXI+1U+fKzjwrG9v
-	syRcKLb6WpO1XOEpAbQyeNm3kA49tEeLRjVY5flKSyL8fV1uCRAsyGR8j7oJ9+8e
-	t9cAtsKSQJcIsgYUN9Gn1g==
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4ak7ycqsje-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 27 Nov 2025 10:29:44 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5AR8cc9T022160;
-	Thu, 27 Nov 2025 10:29:43 GMT
-Received: from ph0pr06cu001.outbound.protection.outlook.com (mail-westus3azon11011055.outbound.protection.outlook.com [40.107.208.55])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4ak3mfw7v8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 27 Nov 2025 10:29:43 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=aSFcIEfvZgC5BHyYgxlldbBuxOq3agGUAyltrqVascMtJhMILaWtCOfpSsBc3keaIrrRV6/ansz6T2pjQSFk6Djs0AOTJtigYXVx3cDRxaKWdtVBsqUR8gEURl0REe8cNraGJGPAIKdK63vPrrv9RVbCK8cdzy7bWcsQTooJgzVb5E7xTWK2Wf/jK8d/Cwss8KDSvXdaS31DlJI0VchnTi16zeoqPUOzAmnHp6gZgTW4wkmV1i33nTvadCl+EQisL+lF86lPaP2npj0D4Da7w0c220+4yrFmvo/8JLOEkBYjsdwm6OMQaRslOyOt1pH2HW9Iy5WTP0P8O6z1jRyQuQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=31VD3/DcjC5YV5ILc2ObdFMxEwLdQXOBBsTyTLW7P1Y=;
- b=irazt7fcBwShBAxo5zzZleiRndp9cUgpqgoAl6egkC6fdceMboy2+hZ82i4Yr1Cr9Tz9bQ0gRW65JsrLScnHQaqkc/TJzheBa04BIotH/28vXPeTzq3+WKkTwbo3vzNe8iZI4vR4s75zGH+hHf7xhS0K5A5dV/S1T5Q1npNfCxXlba/kFmuqncLkn2W5e+mDBprjL0zI+HAuL6nrVrnwaBsQGzy3YdjyhRatoK3xxzoge95KUWU8C84R12RzxajtznFpZzfEAwMw2FkKeCpnPyhGaBXtQ9GCNtOBDerL4F/3T3lInTglh+IyppqMuf1fqc/oWoFG/TyQUUhiKrwEfQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=31VD3/DcjC5YV5ILc2ObdFMxEwLdQXOBBsTyTLW7P1Y=;
- b=hGsSfT8jDcAhz8Il1ckw4j6Cx0c6BMjfJhMMi+InCS60cw0RKAQtsXG8RTpYBd8UvARVx52tuIC5HinijwrPcnIRN5JG0vSHePzDhpzx+wbISanjeLAaSYDcCYUggZxoEZZBT3ajE/S59Xj9XAux0JyeZNIHykYuZACAD/BQeYE=
-Received: from DS7PR10MB5328.namprd10.prod.outlook.com (2603:10b6:5:3a6::12)
- by MN6PR10MB7423.namprd10.prod.outlook.com (2603:10b6:208:46c::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.14; Thu, 27 Nov
- 2025 10:29:37 +0000
-Received: from DS7PR10MB5328.namprd10.prod.outlook.com
- ([fe80::ea13:c6c1:9956:b29c]) by DS7PR10MB5328.namprd10.prod.outlook.com
- ([fe80::ea13:c6c1:9956:b29c%6]) with mapi id 15.20.9366.012; Thu, 27 Nov 2025
- 10:29:37 +0000
-Message-ID: <291580c9-d68a-4910-8f28-58852055d7ee@oracle.com>
-Date: Thu, 27 Nov 2025 15:59:25 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [External] : [v3, net-next 08/12] bng_en: Add support for TPA
- events
-To: Bhargava Marreddy <bhargava.marreddy@broadcom.com>, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        andrew+netdev@lunn.ch, horms@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
-        vsrama-krishna.nemani@broadcom.com, vikas.gupta@broadcom.com,
-        Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
-References: <20251126194931.455830-1-bhargava.marreddy@broadcom.com>
- <20251126194931.455830-9-bhargava.marreddy@broadcom.com>
-Content-Language: en-US
-From: ALOK TIWARI <alok.a.tiwari@oracle.com>
-In-Reply-To: <20251126194931.455830-9-bhargava.marreddy@broadcom.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN2PR01CA0163.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:26::18) To DS7PR10MB5328.namprd10.prod.outlook.com
- (2603:10b6:5:3a6::12)
+	s=arc-20240116; t=1764239488; c=relaxed/simple;
+	bh=/1QMQrolSWtXL/Vlzdu84lc/8O8LgFFB7H+SZER7qHU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=XQAoGC+CnWziB8gGsEXSMu+N+8+OzNcjEnfpyOHF2xi1vJrFKTmvhOrfabk9JBhZIpWP8VVPpC22OD+KNyCkpqJy5VxT0I6K2NHC0BSE1z19Yt93goA1XHYG3P4D3p4Ew4aGFLRIbtrH9GsNHNZRPYYl3gvbWBSjTvBXWkdUpX8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=louisalexis.eyraud@collabora.com header.b=e8orGadU; arc=pass smtp.client-ip=136.143.184.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+ARC-Seal: i=1; a=rsa-sha256; t=1764239462; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=BXTmQJoyAqKNglXhf/6+ZBBTW0Pt9ieQFMbRCC8j5jd7dRNJI5Bg1+1E71sy0VfgGOq7kvOkERc8NlJNhoAOl2jhHgaKKF/jzoRpF0zgVmuB4ufbtWrBHaVREo70MxatBLTlLJ2LTmapo8+gfQXDVPnZTJ0Cgdv1hRX28WRZPF8=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1764239462; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=sFpb7/oyqgBY3Ko7hDMWP9xluGBkEhFif0085Nl8otQ=; 
+	b=LEMWfV5+J8VSO/CjgXSEHBgaX920u7SbgBGnEXhBquDobAPfe+oEBPfSdEbHthQnn35aXeIyeU3SE1y8BM7SOKAPfeXwiEBKMedSYwPRLJyb8W2h04gX8FZ7lOWnZ/eQGf4FaxOXmVlb6O/fk8e0tyQSsKMizsD4jHci8cXHhEY=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=louisalexis.eyraud@collabora.com;
+	dmarc=pass header.from=<louisalexis.eyraud@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1764239462;
+	s=zohomail; d=collabora.com; i=louisalexis.eyraud@collabora.com;
+	h=Message-ID:Subject:Subject:From:From:To:To:Cc:Cc:Date:Date:In-Reply-To:References:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-Id:Reply-To;
+	bh=sFpb7/oyqgBY3Ko7hDMWP9xluGBkEhFif0085Nl8otQ=;
+	b=e8orGadUArF7fIuHcdghGnQu8vrUEMqg0IWM48ieHzyC8hmFl8P/i6L68RAdNdw/
+	ebyVQ1b/bPZ6lIfRrwdlm2/T1LPOtW+lV+gBmFoPUPf+jG+XSBRpVuzT7/cLn53Vqgh
+	PoYgYZq/jT8oOqjuaNojK/DxT2/TvRLOljyOc/kI=
+Received: by mx.zohomail.com with SMTPS id 1764239460544354.51993417277845;
+	Thu, 27 Nov 2025 02:31:00 -0800 (PST)
+Message-ID: <a50e6d433afcf8b08a47694bc5a52acc28871ee5.camel@collabora.com>
+Subject: Re: [PATCH v3 01/21] dt-bindings: clock: mediatek: Add MT8189 clock
+ definitions
+From: Louis-Alexis Eyraud <louisalexis.eyraud@collabora.com>
+To: "irving.ch.lin" <irving-ch.lin@mediatek.com>, Michael Turquette	
+ <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, Rob Herring	
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley	
+ <conor+dt@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Ulf
+ Hansson <ulf.hansson@linaro.org>, Richard Cochran	
+ <richardcochran@gmail.com>
+Cc: Qiqi Wang <qiqi.wang@mediatek.com>, linux-clk@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+	linux-pm@vger.kernel.org, netdev@vger.kernel.org, 
+	Project_Global_Chrome_Upstream_Group@mediatek.com,
+ sirius.wang@mediatek.com, 	vince-wl.liu@mediatek.com, jh.hsu@mediatek.com
+Date: Thu, 27 Nov 2025 11:30:55 +0100
+In-Reply-To: <20251106124330.1145600-2-irving-ch.lin@mediatek.com>
+References: <20251106124330.1145600-1-irving-ch.lin@mediatek.com>
+	 <20251106124330.1145600-2-irving-ch.lin@mediatek.com>
+Organization: Collabora Ltd
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.1 (3.58.1-1.fc43) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR10MB5328:EE_|MN6PR10MB7423:EE_
-X-MS-Office365-Filtering-Correlation-Id: b3e69ed3-af4b-444c-f830-08de2d9fdd31
-X-LD-Processed: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
- =?utf-8?B?SkZOcEtHbUZBWlY3OHlLeHZxNVRwbFBpRnlncDRUcHdGd3F1ekVJWWhGM0c3?=
- =?utf-8?B?TjhTSHhBaXZiYURGTkp5bVBuR3RBZDVLcUlqZHNMS2FyNmt2UWVWNERHd0h1?=
- =?utf-8?B?dDU1a1krTWVZZ2dram5XWUZ3WlA5QlVXL0xYY2lLRlE4M1BESVFybzAzOGo5?=
- =?utf-8?B?UTRVVlZiOGlkSHNZVlhwRElocHcxZTJBZktGRVVOSXFjUkRFSHNqdVhxUUl4?=
- =?utf-8?B?T0hkNTRSdmdLelF0VUk4S083dmFIVmdoQjlHOFRwcXN2RXlReXlCK3lqTUYw?=
- =?utf-8?B?MkZHRER4bnZXV1pqQ2dvcHByRVd5OUloMmxna2M5MFgzMnY3aDcvbzh4b0tE?=
- =?utf-8?B?NzJ4MHRaUDJONXp3UnVVWkRUcWVKcDkrRUdnaTk0bzlrcUc2eENuMEk5a1Y2?=
- =?utf-8?B?cWZHSHRXQmI5d2htNktmbURjR0VodndiRlBpUldnc1dxL2pCRVJFWWJpNk1L?=
- =?utf-8?B?NFFGZkRUMjNBSGFCcnZEY0hkTmdTcDAwUzdnOC9BcEQwQngvSWlnQUZHei9V?=
- =?utf-8?B?bTlmazhzblhLN1UrczFPd0tOVWlxcG41cjJRaE1WbStvOUhMbzJvcFM2QTl6?=
- =?utf-8?B?NVFISS9RRHRkL1pSYU1tUExsdTR0ejNNZGJxTnQxcWRNZVJKSVFxTFNVWEl6?=
- =?utf-8?B?b2pZMWhYa05rcUQ3NkJGdnZwSWtLVG03Y3JlYld6UWZYYzNGSlY2R2wxdkhK?=
- =?utf-8?B?bW96azVVdjdwSDhyeHpUMm9FaFlZTGJoRUdIWjhNQzN0c1VTQ1RQUTZjc2o2?=
- =?utf-8?B?MDM4b3g1SjB2WEJIRWtONWVZbFdIR3QyblIwYnpJVEt3Qk5zcVJLYjNKUXhN?=
- =?utf-8?B?K2ZvSVREWlVXNjVJRHA5bFpTSGFmY0prbTVlZnN2czdnaWtaMFZ3b2g0MXlI?=
- =?utf-8?B?SEEwSmNCeDBkM2N1VDVoTjNGUnZpRFYwUTg5c1pKREJnSUwyTHFCZFN6WFE0?=
- =?utf-8?B?L2dITWdaZnQyOTU5d0VNMjR6eWNZZ1JCZU1hZkhXRSsyZUEyc1lvQ2NWcmdV?=
- =?utf-8?B?dWRlWkJJNFFqMFgwWU1ORnk0Yzk2MTY1VHYrMFhZank2Q1VNb1JHVUJHaFp5?=
- =?utf-8?B?WWhsZCtFd0Q2RXNhOENUenpQVno5K3dMUy95RTFGTnRRWWpOQkVQRFRFZ3E0?=
- =?utf-8?B?ZVBLdW1KQURzdlRKbnhkMC9mS1pQZ1hiUVhNVFFrdHdUaVFGSU1mV0pmY0Y0?=
- =?utf-8?B?UFEwbHlNVkpKaUNybFFpUCtGb2Y4MlltQ1V6MkV0Rmo2WmIyck5aZWdOLzFl?=
- =?utf-8?B?S0p2eDJjbGZJcWM1UGRKY1FnMG9xSHBvRnhRSmJjbGsrdHB4bWk0OHB4Um5S?=
- =?utf-8?B?d1ZKOUJ0V2xGN0Z3VCsza3JxbC9JV2xFR0RKMitnUGpGaTZncWtscVdCWnZv?=
- =?utf-8?B?RzBWUGt4WDBmNXlIZVJlVXplSnNlYk9Tb1pqbEtGeEpjM3JIOEZOb2V2Y1Rp?=
- =?utf-8?B?K3A3REJLTG92Y0tNTlB4SS9JcWZLd3FqdGVXbGhGUzZVd0VQODhmTmk1S2tv?=
- =?utf-8?B?WkFkS0hJbkVJMnp1cEtHUTVIMWltK29CTm9zYkV3TkFNWGdnT0YyQ0Q0azVw?=
- =?utf-8?B?bEM2N2ovblpTTnNHN2VQNzRZSDBkb2t5OTZTa0RUNUtHUHJMdTJiU2g4eEZw?=
- =?utf-8?B?ZnRPWWFiOUJjb05uYkU0ejZod2ZlTTlkRHhVU2NaREtkczlZRG8vK2x5bXBS?=
- =?utf-8?B?QmFZcWpEa3JnaHlZdEpIalJ5a3ZqUDE1NnFNVTFIQVo0Z216Z0xHUXVMd2dh?=
- =?utf-8?B?REFKaVZrS0wrL3B3a1l6Vnd6ODdrdndLRWo1SjhLaEkxKyt1c3IrMERqdVM0?=
- =?utf-8?B?cW5TTTRkRkNXNFA2M1JvM1dsZnFRVkFvRjdvYkhtYk9OaEJqZkJoMHp1b09i?=
- =?utf-8?B?MFNEVzlIaGZNTWEvUlhZaXdXbTlBRmpnZVVkdUNaSEV6bkJvN2lXV0E2cllz?=
- =?utf-8?Q?VqrvNAIsvu/MoXY2nBmshMkr0g46OJ0j?=
-X-Forefront-Antispam-Report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR10MB5328.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
- =?utf-8?B?M3JuRUNVOVdscmI4RWhkd3RjMGNWRnUvbUFDUXRaaHNBc3N4aklMRXAyVjN6?=
- =?utf-8?B?UUQ1bTBsaGxRa0c3c3ZFWnF1aDF3Qno5SnJvSWJmZGV6V2RzR2JWUU82VjNO?=
- =?utf-8?B?N0g1K0EvRnh4WDc4cXUxV3pEOXk2UlNjVks3RVY4Smw2OTRBQmNFL1c1QWk1?=
- =?utf-8?B?TExxMXZabkpyMlpnVE1GOHZUbkRobnhrQ3UyRGkxMHdsQ2d2cCtwQUpjT1BW?=
- =?utf-8?B?QXBQNGJjN01PYUdLeGxlZXo3U2I5NTRBcCs1ZzNOTE5UbTdmRzVZMGFXWXNS?=
- =?utf-8?B?RjFTSjM2N0Eya1dLR2gxWUhmRG5CZjBBN3pOUDNSblFoR0E1N3dHRk5hdDY2?=
- =?utf-8?B?bzBwcmkwRFdFalNydUFtZzZob2hEdzRQdkVTYTk1VDlQNXlNQzdQNVRlaFNv?=
- =?utf-8?B?SVdrTjBOekdKaXZ3eHN3cWNndVpwZUUyelllY2wyUnBONWdCVXpVZmViYjNh?=
- =?utf-8?B?UVJnaURkU3U2MkhKTVhhUkt4YnU3YmMwZjF0R2w1cDRreTV1TWM2Wmc4VE5t?=
- =?utf-8?B?UThRYkYzemhwK3U2MHBQaE1oNEora2tvUFNhdzNsdk1OZ1J2dWRBK2VwZDBR?=
- =?utf-8?B?em5FV09Ua2NLZnEraisydUFLMzhMbURIVUl6dExoYkxqOEtOdVFWNmJzb0Zh?=
- =?utf-8?B?Z1lQeGN2bm9QeUVGMmcrT0lrZGVrMWJLcjNhYzZPWTRnVXJYSVc1cHNSUHFR?=
- =?utf-8?B?c08yZEVWRGkxNjlYa0Q2VWZCUUw3NTd0ZlRFWVNsUUlnTUVlNmhmYWFkaWti?=
- =?utf-8?B?TEQ4NXJMa3p6SnB1cmFxZitYMS9RMDNQaEFsS1BRMUFOaGp3TWdCaXhENjJD?=
- =?utf-8?B?eUNtaHo4eENGZlRQc1lTRTh5UjZMWXFPbGk5bm9PQ2JXeW8xUmtXQXZFUk01?=
- =?utf-8?B?Nno5ZmF5dVowUjdNRFhuVFlqR3ZqY0dmbGkrQ2R1Q0Evc2FzaCtRTWdhcmZj?=
- =?utf-8?B?dGIrZXJHN1RVQzFmOFA2N3hIeXJ3U2RJaWtUMkxYcUVFRWhBRFRCRkRQZkZJ?=
- =?utf-8?B?aVp2cDVrbjRSOXdLZy9OZnJDZkF2T1paWHVBakQybTBZbVJzS0V4QWVsZWYz?=
- =?utf-8?B?VUFydHN6RFRjNjBseGZtZEt6bElUK2VRVmppa0crek5XR0ZTSGJSU3lQVmdN?=
- =?utf-8?B?bWcrK1RBQUtXcElqdzk2bVFXQTBxbE85U3c5b3ZVV3RKMnJYejR5UG1ORUNO?=
- =?utf-8?B?ZmNMa01PT0pNTEFObTh5ZWMxRzRvRXJkRDdwSFlpbUp5QXdGcmgwZHJlc2FS?=
- =?utf-8?B?RW5jbDlqYnMwNWJnQUdXQXVVZWw3ZWdMcEpGRmdqdllKUDY1N29lUEFxME9S?=
- =?utf-8?B?eEtBVVVuZDk3SXVqYmxUT2Zpc3cvT3orSGlBWko5WEdZTjVRWUdoZW1vM0g4?=
- =?utf-8?B?aTZQdno4Q0xhb3hMVVUzQnhHVWVSbHcvMkd1TGhjczlmMUtoQ3BiSFNYSStQ?=
- =?utf-8?B?eWRlMGJoR1ovdE81SHBlQndOTDZ4SnNhUERxY21wRkpMV2ZVQjRJYUlGekt2?=
- =?utf-8?B?bmVlN3lodndUQmdIWDQvOFJ2cVZLMzVwN242Qk9sOFJWQkhBQ3JJbERIN3VZ?=
- =?utf-8?B?Mm9GU0RKRE5ETzhLZnpTS01EMlJ2MHRGNS95TUhiVkY5Mzc1elB5ZWNnNXBC?=
- =?utf-8?B?U2dEdVA4eWgwd1B3bGM3Yzc2ck5kcGNHUVF0MUFwV3h1Qi9UZDBKalYybmxP?=
- =?utf-8?B?Qm5yTWRlcVdZR0s0RGh3U05NSWtsanFmaTM0dFZ5YWxYNHA3TmJaUkxQc3V5?=
- =?utf-8?B?SkVDVEpmOGlyWS9FcW15QU8zcVgzNEM4ZWRwTHRQV1lGWm9sYzNLQzZzMGc1?=
- =?utf-8?B?WDVYS0JyTURPckxtaHRmN1JLQVhFUmlqL01IQUk5MCtONXJWK200N1VGMk0r?=
- =?utf-8?B?b3FzcWZxNFBWZHZQSjdseTNrUGx2aTVIWXhSSGlVMGk3SVVQWjBNak9BN3Nz?=
- =?utf-8?B?L2oyRjBHWmhZaTdIY0p3bmxkcVdoR3pNQlpRa3dOZ3U1aXRZNEZtWWoybm1B?=
- =?utf-8?B?QlRUYzZGR2s1bHQxWEYwaVBsOCttUmNpSVVENndNQUpSRHVnaDF0TXVEM21o?=
- =?utf-8?B?bXJRNld3eFhobEtBNW54Y0xNV2xNRHppRjJFTytndFQrZ0lPRlVTTzUwNzJi?=
- =?utf-8?B?ZC9ZZmxFYndVSi95NW9WVlNRTytTbDViUGduZVZJclRVNTNORFlUcUc1NDJK?=
- =?utf-8?B?Tnc9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	GV2/Xq6w7pQovWeRby8VxLYZejlIpWRXfbkT/HgtZY8py3y9DksFw5UqqDvlmTY8EsAprAPiRr4nF+gG+8W3O5D+sB45sB5cw6LQLPOfQaoIg1aO67poWWWKfpWihIQWN+XXVoFlfpMxZT5nv0TlKYT+JfSnDp/h9FB5ZAPY8VGMzRMXBAV7BNOi0AWUOm3itdjw2pyQSYXkIqZN3ikHk/TuzH+N8KfDl/DSrqOSIY94ofZK5DMObRrEs4E6qByO2rFOaYHWh39POxXVX8l35HCZcl9QV24+/t0bymHluncKAPsaprxlfv/0xUlJMGLNGgqOj5bAj+0jzcz6r1QmE6K/dX8EY7PZMSZ12yaYhUKEpKxaDnGTIt6K5ITXl9zWmPCsz2NmLoMaa2RzCtOt6+WvqyxS6p4wLmwWK+qwNF8oMm4hinb0HIx2nnldGSjjnpra8I6H6/cKPxQXJFIySDZsaS+VvbVPq0I+G8azIWCBVH3LnASymWCiIVntyJduxkaFgxA/E0OfnuEKi86iGtyoXgKrgfNgCzL46WlSNIO+ThbrcMCSvMjhoU0z1a+HLKyCYZl41XBw/J43HwNp7DT6isKQIOO54ule2aOAVso=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b3e69ed3-af4b-444c-f830-08de2d9fdd31
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR10MB5328.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Nov 2025 10:29:37.0630
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: aBZT9dCOcCiUKvNm8jVzqr9xni/oV6cEfES4KIGlCGF86y2/nxAJ0/deyYkhbDsqA8DiDglCw89hOCqJAX0WwWdPjEFfJ94WU1/ha1Mndio=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR10MB7423
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-25_02,2025-11-26_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999
- bulkscore=0 malwarescore=0 phishscore=0 suspectscore=0 spamscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2510240000 definitions=main-2511270076
-X-Proofpoint-GUID: -Nyd0F016LKrivRAsA_ac1SiM4yIiB0a
-X-Proofpoint-ORIG-GUID: -Nyd0F016LKrivRAsA_ac1SiM4yIiB0a
-X-Authority-Analysis: v=2.4 cv=RofI7SmK c=1 sm=1 tr=0 ts=69282818 b=1 cx=c_pps
- a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
- a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19
- a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10
- a=6UeiqGixMTsA:10 a=GoEa3M9JfhUA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=5982OBc320K5flDJv-AA:9 a=QEXdDO2ut3YA:10 cc=ntf awl=host:12098
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTI3MDA3NiBTYWx0ZWRfX6hBrUS6cAncL
- VwYuuxCLmnZm4QRKX0gd0lJTw6Yh8O/dzTMznjjvW1d0YJt7+FnRYZuA+TVXg3lo3G/ufYoLzW/
- lkAmsqNUIAR0euBfemkM6MqO0Wkk8t18c5nt/OnTd//KQtE45k7ppo1VJKPXKX8sQCVDfD915dV
- x6P0btTK0FOvsmahdWZiG2dEhGQTb55Z+Owb0QeTTq8TJErdNiO3YW6n0Qvo6LuVEwIS6cCkXEm
- 5/HoBf0aGjYaLL9cxHsXz5HwSuF0anPsZQ7b4S5yrVb6O+4cNPuxs+R8lnx27f2vhovbWu2rr03
- ijTtUKX8HxD7nFy8smSOTZBKJ4aoNW0BdyN58380Lwcz0hpOfaNXLib+LadBeponZlxuom8XKIt
- dI420VcN5Pp3ZJDiqyNEeU8Vc4kpv5oXZ5xuuYAc7LYYOMIOsRY=
+X-ZohoMailClient: External
 
-> +static inline struct sk_buff *bnge_gro_skb(struct bnge_net *bn,
-> +					   struct bnge_tpa_info *tpa_info,
-> +					   struct rx_tpa_end_cmp *tpa_end,
-> +					   struct rx_tpa_end_cmp_ext *tpa_end1,
-> +					   struct sk_buff *skb)
-> +{
-> +	int payload_off;
-> +	u16 segs;
-> +
-> +	segs = TPA_END_TPA_SEGS(tpa_end);
-> +	if (segs == 1)
-> +		return skb;
-> +
-> +	NAPI_GRO_CB(skb)->count = segs;
-> +	skb_shinfo(skb)->gso_size =
-> +		le32_to_cpu(tpa_end1->rx_tpa_end_cmp_seg_len);
-> +	skb_shinfo(skb)->gso_type = tpa_info->gso_type;
-> +	payload_off = TPA_END_PAYLOAD_OFF(tpa_end1);
-> +	skb = bnge_gro_func(tpa_info, payload_off,
-> +			    TPA_END_GRO_TS(tpa_end), skb);
-> +	if (likely(skb))
-> +		tcp_gro_complete(skb);
-> +
-> +	return skb;
-> +}
-> +#endif
-> +
-> +static inline struct sk_buff *bnge_tpa_end(struct bnge_net *bn,
-> +					   struct bnge_cp_ring_info *cpr,
-> +					   u32 *raw_cons,
-> +					   struct rx_tpa_end_cmp *tpa_end,
-> +					   struct rx_tpa_end_cmp_ext *tpa_end1,
-> +					   u8 *event)
-> +{
-> +	struct bnge_napi *bnapi = cpr->bnapi;
-> +	struct net_device *dev = bn->netdev;
-> +	struct bnge_tpa_info *tpa_info;
-> +	struct bnge_rx_ring_info *rxr;
-> +	u8 *data_ptr, agg_bufs;
-> +	struct sk_buff *skb;
-> +	u16 idx = 0, agg_id;
-> +	dma_addr_t mapping;
-> +	unsigned int len;
-> +	void *data;
-> +
-> +	rxr = bnapi->rx_ring;
-> +	agg_id = TPA_END_AGG_ID(tpa_end);
-> +	agg_id = bnge_lookup_agg_idx(rxr, agg_id);
-> +	agg_bufs = TPA_END_AGG_BUFS(tpa_end1);
-> +	tpa_info = &rxr->rx_tpa[agg_id];
-> +	if (unlikely(agg_bufs != tpa_info->agg_count)) {
-> +		netdev_warn(bn->netdev, "TPA end agg_buf %d != expected agg_bufs %d\n",
-> +			    agg_bufs, tpa_info->agg_count);
-> +		agg_bufs = tpa_info->agg_count;
-> +	}
-> +	tpa_info->agg_count = 0;
-> +	*event |= BNGE_AGG_EVENT;
-> +	bnge_free_agg_idx(rxr, agg_id);
-> +	idx = agg_id;
-> +	data = tpa_info->data;
-> +	data_ptr = tpa_info->data_ptr;
-> +	prefetch(data_ptr);
-> +	len = tpa_info->len;
-> +	mapping = tpa_info->mapping;
-> +
-> +	if (unlikely(agg_bufs > MAX_SKB_FRAGS || TPA_END_ERRORS(tpa_end1))) {
-> +		bnge_abort_tpa(cpr, idx, agg_bufs);
-> +		if (agg_bufs > MAX_SKB_FRAGS)
-> +			netdev_warn(bn->netdev, "TPA frags %d exceeded MAX_SKB_FRAGS %d\n",
-> +				    agg_bufs, (int)MAX_SKB_FRAGS);
-> +		return NULL;
-> +	}
-> +
-> +	if (len <= bn->rx_copybreak) {
-> +		skb = bnge_copy_skb(bnapi, data_ptr, len, mapping);
-> +		if (!skb) {
-> +			bnge_abort_tpa(cpr, idx, agg_bufs);
-> +			return NULL;
-> +		}
-> +	} else {
-> +		u8 *new_data;
-> +		dma_addr_t new_mapping;
-> +
-> +		new_data = __bnge_alloc_rx_frag(bn, &new_mapping, rxr,
-> +						GFP_ATOMIC);
-> +		if (!new_data) {
-> +			bnge_abort_tpa(cpr, idx, agg_bufs);
-> +			return NULL;
-> +		}
-> +
-> +		tpa_info->data = new_data;
-> +		tpa_info->data_ptr = new_data + bn->rx_offset;
-> +		tpa_info->mapping = new_mapping;
-> +
-> +		skb = napi_build_skb(data, bn->rx_buf_size);
-> +		dma_sync_single_for_cpu(bn->bd->dev, mapping,
-> +					bn->rx_buf_use_size, bn->rx_dir);
-> +
-> +		if (!skb) {
-> +			page_pool_free_va(rxr->head_pool, data, true);
-> +			bnge_abort_tpa(cpr, idx, agg_bufs);
-> +			return NULL;
-> +		}
-> +		skb_mark_for_recycle(skb);
-> +		skb_reserve(skb, bn->rx_offset);
-> +		skb_put(skb, len);
-> +	}
-> +
-> +	if (agg_bufs) {
-> +		skb = bnge_rx_agg_netmems_skb(bn, cpr, skb, idx, agg_bufs,
-> +					      true);
-> +		/* Page reuse already handled by bnge_rx_agg_netmems_skb(). */
-> +		if (!skb)
-> +			return NULL;
-> +	}
-> +
-> +	skb->protocol = eth_type_trans(skb, dev);
-> +
-> +	if (tpa_info->hash_type != PKT_HASH_TYPE_NONE)
-> +		skb_set_hash(skb, tpa_info->rss_hash, tpa_info->hash_type);
-> +
-> +	if (tpa_info->vlan_valid &&
-> +	    (dev->features & BNGE_HW_FEATURE_VLAN_ALL_RX)) {
-> +		__be16 vlan_proto = htons(tpa_info->metadata >>
-> +					  RX_CMP_FLAGS2_METADATA_TPID_SFT);
-> +		u16 vtag = tpa_info->metadata & RX_CMP_FLAGS2_METADATA_TCI_MASK;
-> +
-> +		if (eth_type_vlan(vlan_proto)) {
-> +			__vlan_hwaccel_put_tag(skb, vlan_proto, vtag);
-> +		} else {
-> +			dev_kfree_skb(skb);
-> +			return NULL;
-> +		}
-> +	}
-> +
-> +	skb_checksum_none_assert(skb);
-> +	if (likely(tpa_info->flags2 & RX_TPA_START_CMP_FLAGS2_L4_CS_CALC)) {
-> +		skb->ip_summed = CHECKSUM_UNNECESSARY;
-> +		skb->csum_level =
-> +			(tpa_info->flags2 & RX_CMP_FLAGS2_T_L4_CS_CALC) >> 3;
-> +	}
-> +
-> +#ifdef CONFIG_INET
-> +	if (bn->priv_flags & BNGE_NET_EN_GRO)
-> +		skb = bnge_gro_skb(bn, tpa_info, tpa_end, tpa_end1, skb);
-> +#endif
-> +
-> +	return skb;
-> +}
-> +
->   static enum pkt_hash_types bnge_rss_ext_op(struct bnge_net *bn,
->   					   struct rx_cmp *rxcmp)
->   {
-> @@ -380,6 +751,7 @@ static struct sk_buff *bnge_rx_skb(struct bnge_net *bn,
->   
->   /* returns the following:
->    * 1       - 1 packet successfully received
-> + * 0       - successful TPA_START, packet not completed yet
->    * -EBUSY  - completion ring does not have all the agg buffers yet
->    * -ENOMEM - packet aborted due to out of memory
->    * -EIO    - packet aborted due to hw error indicated in BD
-> @@ -413,6 +785,11 @@ static int bnge_rx_pkt(struct bnge_net *bn, struct bnge_cp_ring_info *cpr,
->   
->   	cmp_type = RX_CMP_TYPE(rxcmp);
->   
-> +	if (cmp_type == CMP_TYPE_RX_TPA_AGG_CMP) {
-> +		bnge_tpa_agg(bn, rxr, (struct rx_agg_cmp *)rxcmp);
-> +		goto next_rx_no_prod_no_len;
-> +	}
-> +
->   	tmp_raw_cons = NEXT_RAW_CMP(tmp_raw_cons);
->   	cp_cons = RING_CMP(bn, tmp_raw_cons);
->   	rxcmp1 = (struct rx_cmp_ext *)
-> @@ -427,6 +804,32 @@ static int bnge_rx_pkt(struct bnge_net *bn, struct bnge_cp_ring_info *cpr,
->   	dma_rmb();
->   	prod = rxr->rx_prod;
->   
-> +	if (cmp_type == CMP_TYPE_RX_L2_TPA_START_CMP ||
-> +	    cmp_type == CMP_TYPE_RX_L2_TPA_START_V3_CMP) {
-> +		bnge_tpa_start(bn, rxr, cmp_type,
-> +			       (struct rx_tpa_start_cmp *)rxcmp,
-> +			       (struct rx_tpa_start_cmp_ext *)rxcmp1);
-> +
-> +		*event |= BNGE_RX_EVENT;
-> +		goto next_rx_no_prod_no_len;
-> +
-> +	} else if (cmp_type == CMP_TYPE_RX_L2_TPA_END_CMP) {
-> +		skb = bnge_tpa_end(bn, cpr, &tmp_raw_cons,
-> +				   (struct rx_tpa_end_cmp *)rxcmp,
-> +				   (struct rx_tpa_end_cmp_ext *)rxcmp1, event);
+Hi Irving-CH,=20
 
-bnge_tpa_end never return an ERR_PTR
-why use IS_ERR, not if (!skb) ?
+On Thu, 2025-11-06 at 20:41 +0800, irving.ch.lin wrote:
+> From: Irving-CH Lin <irving-ch.lin@mediatek.com>
+>=20
+> Add device tree bindings for the clock of MediaTek MT8189 SoC.
+>=20
+> Signed-off-by: Irving-CH Lin <irving-ch.lin@mediatek.com>
+> ---
+> =C2=A0.../bindings/clock/mediatek,mt8189-clock.yaml |=C2=A0 90 +++
+> =C2=A0.../clock/mediatek,mt8189-sys-clock.yaml=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 |=C2=A0 58 ++
+> =C2=A0.../dt-bindings/clock/mediatek,mt8189-clk.h=C2=A0=C2=A0 | 580
+> ++++++++++++++++++
+> =C2=A03 files changed, 728 insertions(+)
+> =C2=A0create mode 100644
+> Documentation/devicetree/bindings/clock/mediatek,mt8189-clock.yaml
+> =C2=A0create mode 100644
+> Documentation/devicetree/bindings/clock/mediatek,mt8189-sys-
+> clock.yaml
+> =C2=A0create mode 100644 include/dt-bindings/clock/mediatek,mt8189-clk.h
+>=20
+> diff --git a/Documentation/devicetree/bindings/clock/mediatek,mt8189-
+> clock.yaml b/Documentation/devicetree/bindings/clock/mediatek,mt8189-
+> clock.yaml
+> new file mode 100644
+> index 000000000000..25f7c9fb99fe
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/clock/mediatek,mt8189-
+> clock.yaml
+> @@ -0,0 +1,90 @@
+> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/clock/mediatek,mt8189-clock.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: MediaTek Functional Clock Controller for MT8189
+> +
+> +maintainers:
+> +=C2=A0 - Qiqi Wang <qiqi.wang@mediatek.com>
+> +
+> +description: |
+> +=C2=A0 The clock architecture in MediaTek like below
+> +=C2=A0 PLLs -->
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dividers -->
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 muxes -->
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 clock gate
+> +
+> +=C2=A0 The devices provide clock gate control in different IP blocks.
+> +
+> +properties:
+> +=C2=A0 compatible:
+> +=C2=A0=C2=A0=C2=A0 items:
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - enum:
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189-camsys-main
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189-camsys-rawa
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189-camsys-rawb
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189-dbg-ao
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189-dem
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189-dispsys
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189-dvfsrc-top
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189-gce-d
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189-gce-m
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189-iic-wrap-e
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189-iic-wrap-en
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189-iic-wrap-s
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189-iic-wrap-ws
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189-imgsys1
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189-imgsys2
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189-infra-ao
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189-ipesys
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189-mdpsys
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189-mfgcfg
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189-mm-infra
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189-peri-ao
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189-scp-clk
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189-scp-i2c-clk
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189-ufscfg-ao
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189-ufscfg-pdn
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189-vdec-core
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189-venc
+This enum has an indentation issue, reported by `make
+dt_binding_check`:
+```
+/Documentation/devicetree/bindings/clock/mediatek,mt8189-
+clock.yaml:25:9: [warning] wrong indentation: expected 10 but found 8
+(indentation)
+```
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - const: syscon
+> +
+> +=C2=A0 reg:
+> +=C2=A0=C2=A0=C2=A0 maxItems: 1
+> +
+> +=C2=A0 '#clock-cells':
+> +=C2=A0=C2=A0=C2=A0 const: 1
+> +
+> +=C2=A0 '#reset-cells':
+> +=C2=A0=C2=A0=C2=A0 const: 1
+> +
+> +required:
+> +=C2=A0 - compatible
+> +=C2=A0 - reg
+> +=C2=A0 - '#clock-cells'
+> +
+> +allOf:
+> +=C2=A0 - if:
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 properties:
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 compatible:
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 contains:
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 enum:
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 - mediatek,mt8189-peri-ao
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 - mediatek,mt8189-ufscfg-ao
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 - mediatek,mt8189-ufscfg-pdn
+> +
+> +=C2=A0=C2=A0=C2=A0 then:
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 required:
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - '#reset-cells'
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +=C2=A0 - |
+> +=C2=A0=C2=A0=C2=A0 clock-controller@11b21000 {
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 compatible =3D "mediatek,mt81=
+89-iic-wrap-ws", "syscon";
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 reg =3D <0x11b21000 0x1000>;
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 #clock-cells =3D <1>;
+> +=C2=A0=C2=A0=C2=A0 };
+> diff --git a/Documentation/devicetree/bindings/clock/mediatek,mt8189-
+> sys-clock.yaml
+> b/Documentation/devicetree/bindings/clock/mediatek,mt8189-sys-
+> clock.yaml
+> new file mode 100644
+> index 000000000000..ba36c303617e
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/clock/mediatek,mt8189-sys-
+> clock.yaml
+> @@ -0,0 +1,58 @@
+> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id:
+> http://devicetree.org/schemas/clock/mediatek,mt8189-sys-clock.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: MediaTek System Clock Controller for MT8189
+> +
+> +maintainers:
+> +=C2=A0 - Qiqi Wang <qiqi.wang@mediatek.com>
+> +
+> +description: |
+> +=C2=A0 The clock architecture in MediaTek like below
+> +=C2=A0 PLLs -->
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dividers -->
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 muxes -->
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 clock gate
+> +
+> +=C2=A0 The apmixedsys provides most of PLLs which generated from SoC 26m=
+.
+> +=C2=A0 The topckgen provides dividers and muxes which provide the clock
+> source to other IP blocks.
+> +=C2=A0 The infracfg_ao provides clock gate in peripheral and
+> infrastructure IP blocks.
+> +=C2=A0 The mcusys provides mux control to select the clock source in AP
+> MCU.
+> +=C2=A0 The device nodes also provide the system control capacity for
+> configuration.
+> +
+> +properties:
+> +=C2=A0 compatible:
+> +=C2=A0=C2=A0=C2=A0 items:
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - enum:
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189=
+-apmixedsys
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189=
+-topckgen
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189=
+-vlpckgen
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189=
+-vlp-ao-ckgen
+This compatible string does not match the one declared in the clk-
+mt8189-vlpcfg driver from your patch 7 ("clk: mediatek: Add MT8189
+vlpcfg clock support").
+It should be mediatek,mt8189-vlp-ao.
 
+Regards,
+Louis-Alexis
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - mediatek,mt8189=
+-vlpcfg-ao
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 - const: syscon
 > +
-> +		if (IS_ERR(skb))
-> +			return -EBUSY;
+> +=C2=A0 reg:
+> +=C2=A0=C2=A0=C2=A0 maxItems: 1
 > +
-> +		rc = -ENOMEM;
-> +		if (likely(skb)) {
-> +			bnge_deliver_skb(bn, bnapi, skb);
-> +			rc = 1;
-> +		}
-> +		*event |= BNGE_RX_EVENT;
-> +		goto next_rx_no_prod_no_len;
-> +	}
+> +=C2=A0 '#clock-cells':
+> +=C2=A0=C2=A0=C2=A0 const: 1
 > +
->   	cons = rxcmp->rx_cmp_opaque;
->   	if (unlikely(cons != rxr->rx_next_cons)) {
->   		int rc1 = bnge_discard_rx(bn, cpr, &tmp_raw_cons, rxcmp);
-> @@ -461,7 +864,8 @@ static int bnge_rx_pkt(struct bnge_net *bn, struct bnge_cp_ring_info *cpr,
->   	if (rxcmp1->rx_cmp_cfa_code_errors_v2 & RX_CMP_L2_ERRORS) {
->   		bnge_reuse_rx_data(rxr, cons, data);
->   		if (agg_bufs)
-> -			bnge_reuse_rx_agg_bufs(cpr, cp_cons, 0, agg_bufs);
-> +			bnge_reuse_rx_agg_bufs(cpr, cp_cons, 0, agg_bufs,
-> +					       false);
->   		rc = -EIO;
->   		goto next_rx_no_len;
-
-Thanks,
-Alok
+> +=C2=A0 '#reset-cells':
+> +=C2=A0=C2=A0=C2=A0 const: 1
+> +
+> +required:
+> +=C2=A0 - compatible
+> +=C2=A0 - reg
+> +=C2=A0 - '#clock-cells'
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +=C2=A0 - |
+> +=C2=A0=C2=A0=C2=A0 clock-controller@10000000 {
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 compatible =3D "mediatek,mt81=
+89-topckgen", "syscon";
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 reg =3D <0x10000000 0x1000>;
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 #clock-cells =3D <1>;
+> +=C2=A0=C2=A0=C2=A0 };
+> diff --git a/include/dt-bindings/clock/mediatek,mt8189-clk.h
+> b/include/dt-bindings/clock/mediatek,mt8189-clk.h
+> new file mode 100644
+> index 000000000000..139db869a3ec
+> --- /dev/null
+> +++ b/include/dt-bindings/clock/mediatek,mt8189-clk.h
+> @@ -0,0 +1,580 @@
+> +/* SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)=C2=A0 */
+> +/*
+> + * Copyright (c) 2025 MediaTek Inc.
+> + * Author: Qiqi Wang <qiqi.wang@mediatek.com>
+> + */
+> +
+> +#ifndef _DT_BINDINGS_CLK_MT8189_H
+> +#define _DT_BINDINGS_CLK_MT8189_H
+> +
+> +/* TOPCKGEN */
+> +#define CLK_TOP_AXI_SEL					0
+> +#define CLK_TOP_AXI_PERI_SEL				1
+> +#define CLK_TOP_AXI_U_SEL				2
+> +#define CLK_TOP_BUS_AXIMEM_SEL				3
+> +#define CLK_TOP_DISP0_SEL				4
+> +#define CLK_TOP_MMINFRA_SEL				5
+> +#define CLK_TOP_UART_SEL				6
+> +#define CLK_TOP_SPI0_SEL				7
+> +#define CLK_TOP_SPI1_SEL				8
+> +#define CLK_TOP_SPI2_SEL				9
+> +#define CLK_TOP_SPI3_SEL				10
+> +#define CLK_TOP_SPI4_SEL				11
+> +#define CLK_TOP_SPI5_SEL				12
+> +#define CLK_TOP_MSDC_MACRO_0P_SEL			13
+> +#define CLK_TOP_MSDC50_0_HCLK_SEL			14
+> +#define CLK_TOP_MSDC50_0_SEL				15
+> +#define CLK_TOP_AES_MSDCFDE_SEL				16
+> +#define CLK_TOP_MSDC_MACRO_1P_SEL			17
+> +#define CLK_TOP_MSDC30_1_SEL				18
+> +#define CLK_TOP_MSDC30_1_HCLK_SEL			19
+> +#define CLK_TOP_MSDC_MACRO_2P_SEL			20
+> +#define CLK_TOP_MSDC30_2_SEL				21
+> +#define CLK_TOP_MSDC30_2_HCLK_SEL			22
+> +#define CLK_TOP_AUD_INTBUS_SEL				23
+> +#define CLK_TOP_ATB_SEL					24
+> +#define CLK_TOP_DISP_PWM_SEL				25
+> +#define CLK_TOP_USB_TOP_P0_SEL				26
+> +#define CLK_TOP_USB_XHCI_P0_SEL				27
+> +#define CLK_TOP_USB_TOP_P1_SEL				28
+> +#define CLK_TOP_USB_XHCI_P1_SEL				29
+> +#define CLK_TOP_USB_TOP_P2_SEL				30
+> +#define CLK_TOP_USB_XHCI_P2_SEL				31
+> +#define CLK_TOP_USB_TOP_P3_SEL				32
+> +#define CLK_TOP_USB_XHCI_P3_SEL				33
+> +#define CLK_TOP_USB_TOP_P4_SEL				34
+> +#define CLK_TOP_USB_XHCI_P4_SEL				35
+> +#define CLK_TOP_I2C_SEL					36
+> +#define CLK_TOP_SENINF_SEL				37
+> +#define CLK_TOP_SENINF1_SEL				38
+> +#define CLK_TOP_AUD_ENGEN1_SEL				39
+> +#define CLK_TOP_AUD_ENGEN2_SEL				40
+> +#define CLK_TOP_AES_UFSFDE_SEL				41
+> +#define CLK_TOP_U_SEL					42
+> +#define CLK_TOP_U_MBIST_SEL				43
+> +#define CLK_TOP_AUD_1_SEL				44
+> +#define CLK_TOP_AUD_2_SEL				45
+> +#define CLK_TOP_VENC_SEL				46
+> +#define CLK_TOP_VDEC_SEL				47
+> +#define CLK_TOP_PWM_SEL					48
+> +#define CLK_TOP_AUDIO_H_SEL				49
+> +#define CLK_TOP_MCUPM_SEL				50
+> +#define CLK_TOP_MEM_SUB_SEL				51
+> +#define CLK_TOP_MEM_SUB_PERI_SEL			52
+> +#define CLK_TOP_MEM_SUB_U_SEL				53
+> +#define CLK_TOP_EMI_N_SEL				54
+> +#define CLK_TOP_DSI_OCC_SEL				55
+> +#define CLK_TOP_AP2CONN_HOST_SEL			56
+> +#define CLK_TOP_IMG1_SEL				57
+> +#define CLK_TOP_IPE_SEL					58
+> +#define CLK_TOP_CAM_SEL					59
+> +#define CLK_TOP_CAMTM_SEL				60
+> +#define CLK_TOP_DSP_SEL					61
+> +#define CLK_TOP_SR_PKA_SEL				62
+> +#define CLK_TOP_DXCC_SEL				63
+> +#define CLK_TOP_MFG_REF_SEL				64
+> +#define CLK_TOP_MDP0_SEL				65
+> +#define CLK_TOP_DP_SEL					66
+> +#define CLK_TOP_EDP_SEL					67
+> +#define CLK_TOP_EDP_FAVT_SEL				68
+> +#define CLK_TOP_ETH_250M_SEL				69
+> +#define CLK_TOP_ETH_62P4M_PTP_SEL			70
+> +#define CLK_TOP_ETH_50M_RMII_SEL			71
+> +#define CLK_TOP_SFLASH_SEL				72
+> +#define CLK_TOP_GCPU_SEL				73
+> +#define CLK_TOP_MAC_TL_SEL				74
+> +#define CLK_TOP_VDSTX_DG_CTS_SEL			75
+> +#define CLK_TOP_PLL_DPIX_SEL				76
+> +#define CLK_TOP_ECC_SEL					77
+> +#define CLK_TOP_APLL_I2SIN0_MCK_SEL			78
+> +#define CLK_TOP_APLL_I2SIN1_MCK_SEL			79
+> +#define CLK_TOP_APLL_I2SIN2_MCK_SEL			80
+> +#define CLK_TOP_APLL_I2SIN3_MCK_SEL			81
+> +#define CLK_TOP_APLL_I2SIN4_MCK_SEL			82
+> +#define CLK_TOP_APLL_I2SIN6_MCK_SEL			83
+> +#define CLK_TOP_APLL_I2SOUT0_MCK_SEL			84
+> +#define CLK_TOP_APLL_I2SOUT1_MCK_SEL			85
+> +#define CLK_TOP_APLL_I2SOUT2_MCK_SEL			86
+> +#define CLK_TOP_APLL_I2SOUT3_MCK_SEL			87
+> +#define CLK_TOP_APLL_I2SOUT4_MCK_SEL			88
+> +#define CLK_TOP_APLL_I2SOUT6_MCK_SEL			89
+> +#define CLK_TOP_APLL_FMI2S_MCK_SEL			90
+> +#define CLK_TOP_APLL_TDMOUT_MCK_SEL			91
+> +#define CLK_TOP_MFG_SEL_MFGPLL				92
+> +#define CLK_TOP_APLL12_CK_DIV_I2SIN0			93
+> +#define CLK_TOP_APLL12_CK_DIV_I2SIN1			94
+> +#define CLK_TOP_APLL12_CK_DIV_I2SOUT0			95
+> +#define CLK_TOP_APLL12_CK_DIV_I2SOUT1			96
+> +#define CLK_TOP_APLL12_CK_DIV_FMI2S			97
+> +#define CLK_TOP_APLL12_CK_DIV_TDMOUT_M			98
+> +#define CLK_TOP_APLL12_CK_DIV_TDMOUT_B			99
+> +#define CLK_TOP_MAINPLL_D3				100
+> +#define CLK_TOP_MAINPLL_D4				101
+> +#define CLK_TOP_MAINPLL_D4_D2				102
+> +#define CLK_TOP_MAINPLL_D4_D4				103
+> +#define CLK_TOP_MAINPLL_D4_D8				104
+> +#define CLK_TOP_MAINPLL_D5				105
+> +#define CLK_TOP_MAINPLL_D5_D2				106
+> +#define CLK_TOP_MAINPLL_D5_D4				107
+> +#define CLK_TOP_MAINPLL_D5_D8				108
+> +#define CLK_TOP_MAINPLL_D6				109
+> +#define CLK_TOP_MAINPLL_D6_D2				110
+> +#define CLK_TOP_MAINPLL_D6_D4				111
+> +#define CLK_TOP_MAINPLL_D6_D8				112
+> +#define CLK_TOP_MAINPLL_D7				113
+> +#define CLK_TOP_MAINPLL_D7_D2				114
+> +#define CLK_TOP_MAINPLL_D7_D4				115
+> +#define CLK_TOP_MAINPLL_D7_D8				116
+> +#define CLK_TOP_MAINPLL_D9				117
+> +#define CLK_TOP_UNIVPLL_D2				118
+> +#define CLK_TOP_UNIVPLL_D3				119
+> +#define CLK_TOP_UNIVPLL_D4				120
+> +#define CLK_TOP_UNIVPLL_D4_D2				121
+> +#define CLK_TOP_UNIVPLL_D4_D4				122
+> +#define CLK_TOP_UNIVPLL_D4_D8				123
+> +#define CLK_TOP_UNIVPLL_D5				124
+> +#define CLK_TOP_UNIVPLL_D5_D2				125
+> +#define CLK_TOP_UNIVPLL_D5_D4				126
+> +#define CLK_TOP_UNIVPLL_D6				127
+> +#define CLK_TOP_UNIVPLL_D6_D2				128
+> +#define CLK_TOP_UNIVPLL_D6_D4				129
+> +#define CLK_TOP_UNIVPLL_D6_D8				130
+> +#define CLK_TOP_UNIVPLL_D6_D16				131
+> +#define CLK_TOP_UNIVPLL_D7				132
+> +#define CLK_TOP_UNIVPLL_D7_D2				133
+> +#define CLK_TOP_UNIVPLL_D7_D3				134
+> +#define CLK_TOP_LVDSTX_DG_CTS				135
+> +#define CLK_TOP_UNIVPLL_192M				136
+> +#define CLK_TOP_UNIVPLL_192M_D2				137
+> +#define CLK_TOP_UNIVPLL_192M_D4				138
+> +#define CLK_TOP_UNIVPLL_192M_D8				139
+> +#define CLK_TOP_UNIVPLL_192M_D10			140
+> +#define CLK_TOP_UNIVPLL_192M_D16			141
+> +#define CLK_TOP_UNIVPLL_192M_D32			142
+> +#define CLK_TOP_APLL1_D2				143
+> +#define CLK_TOP_APLL1_D4				144
+> +#define CLK_TOP_APLL1_D8				145
+> +#define CLK_TOP_APLL1_D3				146
+> +#define CLK_TOP_APLL2_D2				147
+> +#define CLK_TOP_APLL2_D4				148
+> +#define CLK_TOP_APLL2_D8				149
+> +#define CLK_TOP_APLL2_D3				150
+> +#define CLK_TOP_MMPLL_D4				151
+> +#define CLK_TOP_MMPLL_D4_D2				152
+> +#define CLK_TOP_MMPLL_D4_D4				153
+> +#define CLK_TOP_VPLL_DPIX				154
+> +#define CLK_TOP_MMPLL_D5				155
+> +#define CLK_TOP_MMPLL_D5_D2				156
+> +#define CLK_TOP_MMPLL_D5_D4				157
+> +#define CLK_TOP_MMPLL_D6				158
+> +#define CLK_TOP_MMPLL_D6_D2				159
+> +#define CLK_TOP_MMPLL_D7				160
+> +#define CLK_TOP_MMPLL_D9				161
+> +#define CLK_TOP_TVDPLL1_D2				162
+> +#define CLK_TOP_TVDPLL1_D4				163
+> +#define CLK_TOP_TVDPLL1_D8				164
+> +#define CLK_TOP_TVDPLL1_D16				165
+> +#define CLK_TOP_TVDPLL2_D2				166
+> +#define CLK_TOP_TVDPLL2_D4				167
+> +#define CLK_TOP_TVDPLL2_D8				168
+> +#define CLK_TOP_TVDPLL2_D16				169
+> +#define CLK_TOP_ETHPLL_D2				170
+> +#define CLK_TOP_ETHPLL_D8				171
+> +#define CLK_TOP_ETHPLL_D10				172
+> +#define CLK_TOP_MSDCPLL_D2				173
+> +#define CLK_TOP_VOWPLL=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ 174
+> +#define CLK_TOP_UFSPLL_D2				175
+> +#define CLK_TOP_F26M_CK_D2				176
+> +#define CLK_TOP_OSC_D2					177
+> +#define CLK_TOP_OSC_D4					178
+> +#define CLK_TOP_OSC_D8					179
+> +#define CLK_TOP_OSC_D16					180
+> +#define CLK_TOP_OSC_D3					181
+> +#define CLK_TOP_OSC_D7					182
+> +#define CLK_TOP_OSC_D10					183
+> +#define CLK_TOP_OSC_D20					184
+> +#define CLK_TOP_FMCNT_P0_EN				185
+> +#define CLK_TOP_FMCNT_P1_EN				186
+> +#define CLK_TOP_FMCNT_P2_EN				187
+> +#define CLK_TOP_FMCNT_P3_EN				188
+> +#define CLK_TOP_FMCNT_P4_EN				189
+> +#define CLK_TOP_USB_F26M_CK_EN				190
+> +#define CLK_TOP_SSPXTP_F26M_CK_EN			191
+> +#define CLK_TOP_USB2_PHY_RF_P0_EN			192
+> +#define CLK_TOP_USB2_PHY_RF_P1_EN			193
+> +#define CLK_TOP_USB2_PHY_RF_P2_EN			194
+> +#define CLK_TOP_USB2_PHY_RF_P3_EN			195
+> +#define CLK_TOP_USB2_PHY_RF_P4_EN			196
+> +#define CLK_TOP_USB2_26M_CK_P0_EN			197
+> +#define CLK_TOP_USB2_26M_CK_P1_EN			198
+> +#define CLK_TOP_USB2_26M_CK_P2_EN			199
+> +#define CLK_TOP_USB2_26M_CK_P3_EN			200
+> +#define CLK_TOP_USB2_26M_CK_P4_EN			201
+> +#define CLK_TOP_F26M_CK_EN				202
+> +#define CLK_TOP_AP2CON_EN				203
+> +#define CLK_TOP_EINT_N_EN				204
+> +#define CLK_TOP_TOPCKGEN_FMIPI_CSI_UP26M_CK_EN		205
+> +#define CLK_TOP_DRAMULP_CK_EN				206
+> +#define CLK_TOP_EINT_E_EN				207
+> +#define CLK_TOP_EINT_W_EN				208
+> +#define CLK_TOP_EINT_S_EN				209
+> +
+> +/* INFRACFG_AO */
+> +#define CLK_IFRAO_CQ_DMA_FPC				0
+> +#define CLK_IFRAO_DEBUGSYS				1
+> +#define CLK_IFRAO_DBG_TRACE				2
+> +#define CLK_IFRAO_CQ_DMA				3
+> +
+> +/* APMIXEDSYS */
+> +#define CLK_APMIXED_ARMPLL_LL				0
+> +#define CLK_APMIXED_ARMPLL_BL				1
+> +#define CLK_APMIXED_CCIPLL				2
+> +#define CLK_APMIXED_MAINPLL				3
+> +#define CLK_APMIXED_UNIVPLL				4
+> +#define CLK_APMIXED_MMPLL				5
+> +#define CLK_APMIXED_MFGPLL				6
+> +#define CLK_APMIXED_APLL1				7
+> +#define CLK_APMIXED_APLL2				8
+> +#define CLK_APMIXED_EMIPLL				9
+> +#define CLK_APMIXED_APUPLL2				10
+> +#define CLK_APMIXED_APUPLL				11
+> +#define CLK_APMIXED_TVDPLL1				12
+> +#define CLK_APMIXED_TVDPLL2				13
+> +#define CLK_APMIXED_ETHPLL				14
+> +#define CLK_APMIXED_MSDCPLL				15
+> +#define CLK_APMIXED_UFSPLL				16
+> +
+> +/* PERICFG_AO */
+> +#define CLK_PERAO_UART0					0
+> +#define CLK_PERAO_UART1					1
+> +#define CLK_PERAO_UART2					2
+> +#define CLK_PERAO_UART3					3
+> +#define CLK_PERAO_PWM_H					4
+> +#define CLK_PERAO_PWM_B					5
+> +#define CLK_PERAO_PWM_FB1				6
+> +#define CLK_PERAO_PWM_FB2				7
+> +#define CLK_PERAO_PWM_FB3				8
+> +#define CLK_PERAO_PWM_FB4				9
+> +#define CLK_PERAO_DISP_PWM0				10
+> +#define CLK_PERAO_DISP_PWM1				11
+> +#define CLK_PERAO_SPI0_B				12
+> +#define CLK_PERAO_SPI1_B				13
+> +#define CLK_PERAO_SPI2_B				14
+> +#define CLK_PERAO_SPI3_B				15
+> +#define CLK_PERAO_SPI4_B				16
+> +#define CLK_PERAO_SPI5_B				17
+> +#define CLK_PERAO_SPI0_H				18
+> +#define CLK_PERAO_SPI1_H				19
+> +#define CLK_PERAO_SPI2_H				20
+> +#define CLK_PERAO_SPI3_H				21
+> +#define CLK_PERAO_SPI4_H				22
+> +#define CLK_PERAO_SPI5_H				23
+> +#define CLK_PERAO_AXI					24
+> +#define CLK_PERAO_AHB_APB				25
+> +#define CLK_PERAO_TL					26
+> +#define CLK_PERAO_REF					27
+> +#define CLK_PERAO_I2C					28
+> +#define CLK_PERAO_DMA_B					29
+> +#define CLK_PERAO_SSUSB0_REF				30
+> +#define CLK_PERAO_SSUSB0_FRMCNT				31
+> +#define CLK_PERAO_SSUSB0_SYS				32
+> +#define CLK_PERAO_SSUSB0_XHCI				33
+> +#define CLK_PERAO_SSUSB0_F				34
+> +#define CLK_PERAO_SSUSB0_H				35
+> +#define CLK_PERAO_SSUSB1_REF				36
+> +#define CLK_PERAO_SSUSB1_FRMCNT				37
+> +#define CLK_PERAO_SSUSB1_SYS				38
+> +#define CLK_PERAO_SSUSB1_XHCI				39
+> +#define CLK_PERAO_SSUSB1_F				40
+> +#define CLK_PERAO_SSUSB1_H				41
+> +#define CLK_PERAO_SSUSB2_REF				42
+> +#define CLK_PERAO_SSUSB2_FRMCNT				43
+> +#define CLK_PERAO_SSUSB2_SYS				44
+> +#define CLK_PERAO_SSUSB2_XHCI				45
+> +#define CLK_PERAO_SSUSB2_F				46
+> +#define CLK_PERAO_SSUSB2_H				47
+> +#define CLK_PERAO_SSUSB3_REF				48
+> +#define CLK_PERAO_SSUSB3_FRMCNT				49
+> +#define CLK_PERAO_SSUSB3_SYS				50
+> +#define CLK_PERAO_SSUSB3_XHCI				51
+> +#define CLK_PERAO_SSUSB3_F				52
+> +#define CLK_PERAO_SSUSB3_H				53
+> +#define CLK_PERAO_SSUSB4_REF				54
+> +#define CLK_PERAO_SSUSB4_FRMCNT				55
+> +#define CLK_PERAO_SSUSB4_SYS				56
+> +#define CLK_PERAO_SSUSB4_XHCI				57
+> +#define CLK_PERAO_SSUSB4_F				58
+> +#define CLK_PERAO_SSUSB4_H				59
+> +#define CLK_PERAO_MSDC0					60
+> +#define CLK_PERAO_MSDC0_H				61
+> +#define CLK_PERAO_MSDC0_FAES				62
+> +#define CLK_PERAO_MSDC0_MST_F				63
+> +#define CLK_PERAO_MSDC0_SLV_H				64
+> +#define CLK_PERAO_MSDC1					65
+> +#define CLK_PERAO_MSDC1_H				66
+> +#define CLK_PERAO_MSDC1_MST_F				67
+> +#define CLK_PERAO_MSDC1_SLV_H				68
+> +#define CLK_PERAO_MSDC2					69
+> +#define CLK_PERAO_MSDC2_H				70
+> +#define CLK_PERAO_MSDC2_MST_F				71
+> +#define CLK_PERAO_MSDC2_SLV_H				72
+> +#define CLK_PERAO_SFLASH				73
+> +#define CLK_PERAO_SFLASH_F				74
+> +#define CLK_PERAO_SFLASH_H				75
+> +#define CLK_PERAO_SFLASH_P				76
+> +#define CLK_PERAO_AUDIO0				77
+> +#define CLK_PERAO_AUDIO1				78
+> +#define CLK_PERAO_AUDIO2				79
+> +#define CLK_PERAO_AUXADC_26M				80
+> +
+> +/* UFSCFG_AO_REG */
+> +#define CLK_UFSCFG_AO_REG_UNIPRO_TX_SYM			0
+> +#define CLK_UFSCFG_AO_REG_UNIPRO_RX_SYM0		1
+> +#define CLK_UFSCFG_AO_REG_UNIPRO_RX_SYM1		2
+> +#define CLK_UFSCFG_AO_REG_UNIPRO_SYS			3
+> +#define CLK_UFSCFG_AO_REG_U_SAP_CFG			4
+> +#define CLK_UFSCFG_AO_REG_U_PHY_TOP_AHB_S_BUS		5
+> +
+> +/* UFSCFG_PDN_REG */
+> +#define CLK_UFSCFG_REG_UFSHCI_UFS			0
+> +#define CLK_UFSCFG_REG_UFSHCI_AES			1
+> +#define CLK_UFSCFG_REG_UFSHCI_U_AHB			2
+> +#define CLK_UFSCFG_REG_UFSHCI_U_AXI			3
+> +
+> +/* IMP_IIC_WRAP_WS */
+> +#define CLK_IMPWS_I2C2					0
+> +
+> +/* IMP_IIC_WRAP_E */
+> +#define CLK_IMPE_I2C0					0
+> +#define CLK_IMPE_I2C1					1
+> +
+> +/* IMP_IIC_WRAP_S */
+> +#define CLK_IMPS_I2C3					0
+> +#define CLK_IMPS_I2C4					1
+> +#define CLK_IMPS_I2C5					2
+> +#define CLK_IMPS_I2C6					3
+> +
+> +/* IMP_IIC_WRAP_EN */
+> +#define CLK_IMPEN_I2C7					0
+> +#define CLK_IMPEN_I2C8					1
+> +
+> +/* MFG */
+> +#define CLK_MFG_BG3D					0
+> +
+> +/* DISPSYS_CONFIG */
+> +#define CLK_MM_DISP_OVL0_4L				0
+> +#define CLK_MM_DISP_OVL1_4L				1
+> +#define CLK_MM_VPP_RSZ0					2
+> +#define CLK_MM_VPP_RSZ1					3
+> +#define CLK_MM_DISP_RDMA0				4
+> +#define CLK_MM_DISP_RDMA1				5
+> +#define CLK_MM_DISP_COLOR0				6
+> +#define CLK_MM_DISP_COLOR1				7
+> +#define CLK_MM_DISP_CCORR0				8
+> +#define CLK_MM_DISP_CCORR1				9
+> +#define CLK_MM_DISP_CCORR2				10
+> +#define CLK_MM_DISP_CCORR3				11
+> +#define CLK_MM_DISP_AAL0				12
+> +#define CLK_MM_DISP_AAL1				13
+> +#define CLK_MM_DISP_GAMMA0				14
+> +#define CLK_MM_DISP_GAMMA1				15
+> +#define CLK_MM_DISP_DITHER0				16
+> +#define CLK_MM_DISP_DITHER1				17
+> +#define CLK_MM_DISP_DSC_WRAP0				18
+> +#define CLK_MM_VPP_MERGE0				19
+> +#define CLK_MMSYS_0_DISP_DVO				20
+> +#define CLK_MMSYS_0_DISP_DSI0				21
+> +#define CLK_MM_DP_INTF0					22
+> +#define CLK_MM_DPI0					23
+> +#define CLK_MM_DISP_WDMA0				24
+> +#define CLK_MM_DISP_WDMA1				25
+> +#define CLK_MM_DISP_FAKE_ENG0				26
+> +#define CLK_MM_DISP_FAKE_ENG1				27
+> +#define CLK_MM_SMI_LARB					28
+> +#define CLK_MM_DISP_MUTEX0				29
+> +#define CLK_MM_DIPSYS_CONFIG				30
+> +#define CLK_MM_DUMMY					31
+> +#define CLK_MMSYS_1_DISP_DSI0				32
+> +#define CLK_MMSYS_1_LVDS_ENCODER			33
+> +#define CLK_MMSYS_1_DPI0				34
+> +#define CLK_MMSYS_1_DISP_DVO				35
+> +#define CLK_MM_DP_INTF					36
+> +#define CLK_MMSYS_1_LVDS_ENCODER_CTS			37
+> +#define CLK_MMSYS_1_DISP_DVO_AVT			38
+> +
+> +/* IMGSYS1 */
+> +#define CLK_IMGSYS1_LARB9				0
+> +#define CLK_IMGSYS1_LARB11				1
+> +#define CLK_IMGSYS1_DIP					2
+> +#define CLK_IMGSYS1_GALS				3
+> +
+> +/* IMGSYS2 */
+> +#define CLK_IMGSYS2_LARB9				0
+> +#define CLK_IMGSYS2_LARB11				1
+> +#define CLK_IMGSYS2_MFB					2
+> +#define CLK_IMGSYS2_WPE					3
+> +#define CLK_IMGSYS2_MSS					4
+> +#define CLK_IMGSYS2_GALS				5
+> +
+> +/* VDEC_CORE */
+> +#define CLK_VDEC_CORE_LARB_CKEN				0
+> +#define CLK_VDEC_CORE_VDEC_CKEN				1
+> +#define CLK_VDEC_CORE_VDEC_ACTIVE			2
+> +
+> +/* VENC_GCON */
+> +#define CLK_VEN1_CKE0_LARB				0
+> +#define CLK_VEN1_CKE1_VENC				1
+> +#define CLK_VEN1_CKE2_JPGENC				2
+> +#define CLK_VEN1_CKE3_JPGDEC				3
+> +#define CLK_VEN1_CKE4_JPGDEC_C1				4
+> +#define CLK_VEN1_CKE5_GALS				5
+> +#define CLK_VEN1_CKE6_GALS_SRAM				6
+> +
+> +/* VLPCFG_REG */
+> +#define CLK_VLPCFG_REG_SCP				0
+> +#define CLK_VLPCFG_REG_RG_R_APXGPT_26M			1
+> +#define CLK_VLPCFG_REG_DPMSRCK_TEST			2
+> +#define CLK_VLPCFG_REG_RG_DPMSRRTC_TEST			3
+> +#define CLK_VLPCFG_REG_DPMSRULP_TEST			4
+> +#define CLK_VLPCFG_REG_SPMI_P_MST			5
+> +#define CLK_VLPCFG_REG_SPMI_P_MST_32K			6
+> +#define CLK_VLPCFG_REG_PMIF_SPMI_P_SYS			7
+> +#define CLK_VLPCFG_REG_PMIF_SPMI_P_TMR			8
+> +#define CLK_VLPCFG_REG_PMIF_SPMI_M_SYS			9
+> +#define CLK_VLPCFG_REG_PMIF_SPMI_M_TMR			10
+> +#define CLK_VLPCFG_REG_DVFSRC				11
+> +#define CLK_VLPCFG_REG_PWM_VLP				12
+> +#define CLK_VLPCFG_REG_SRCK				13
+> +#define CLK_VLPCFG_REG_SSPM_F26M			14
+> +#define CLK_VLPCFG_REG_SSPM_F32K			15
+> +#define CLK_VLPCFG_REG_SSPM_ULPOSC			16
+> +#define CLK_VLPCFG_REG_VLP_32K_COM			17
+> +#define CLK_VLPCFG_REG_VLP_26M_COM			18
+> +
+> +/* VLP_CKSYS */
+> +#define CLK_VLP_CK_SCP_SEL				0
+> +#define CLK_VLP_CK_PWRAP_ULPOSC_SEL			1
+> +#define CLK_VLP_CK_SPMI_P_MST_SEL			2
+> +#define CLK_VLP_CK_DVFSRC_SEL				3
+> +#define CLK_VLP_CK_PWM_VLP_SEL				4
+> +#define CLK_VLP_CK_AXI_VLP_SEL				5
+> +#define CLK_VLP_CK_SYSTIMER_26M_SEL			6
+> +#define CLK_VLP_CK_SSPM_SEL				7
+> +#define CLK_VLP_CK_SSPM_F26M_SEL			8
+> +#define CLK_VLP_CK_SRCK_SEL				9
+> +#define CLK_VLP_CK_SCP_SPI_SEL				10
+> +#define CLK_VLP_CK_SCP_IIC_SEL				11
+> +#define CLK_VLP_CK_SCP_SPI_HIGH_SPD_SEL			12
+> +#define CLK_VLP_CK_SCP_IIC_HIGH_SPD_SEL			13
+> +#define CLK_VLP_CK_SSPM_ULPOSC_SEL			14
+> +#define CLK_VLP_CK_APXGPT_26M_SEL			15
+> +#define CLK_VLP_CK_VADSP_SEL				16
+> +#define CLK_VLP_CK_VADSP_VOWPLL_SEL			17
+> +#define CLK_VLP_CK_VADSP_UARTHUB_BCLK_SEL		18
+> +#define CLK_VLP_CK_CAMTG0_SEL				19
+> +#define CLK_VLP_CK_CAMTG1_SEL				20
+> +#define CLK_VLP_CK_CAMTG2_SEL				21
+> +#define CLK_VLP_CK_AUD_ADC_SEL				22
+> +#define CLK_VLP_CK_KP_IRQ_GEN_SEL			23
+> +#define CLK_VLP_CK_VADSYS_VLP_26M_EN			24
+> +#define CLK_VLP_CK_SEJ_13M_EN				25
+> +#define CLK_VLP_CK_SEJ_26M_EN				26
+> +#define CLK_VLP_CK_FMIPI_CSI_UP26M_CK_EN		27
+> +
+> +/* SCP_IIC */
+> +#define CLK_SCP_IIC_I2C0_W1S				0
+> +#define CLK_SCP_IIC_I2C1_W1S				1
+> +
+> +/* SCP */
+> +#define CLK_SCP_SET_SPI0				0
+> +#define CLK_SCP_SET_SPI1				1
+> +
+> +/* CAMSYS_MAIN */
+> +#define CLK_CAM_M_LARB13				0
+> +#define CLK_CAM_M_LARB14				1
+> +#define CLK_CAM_M_CAMSYS_MAIN_CAM			2
+> +#define CLK_CAM_M_CAMSYS_MAIN_CAMTG			3
+> +#define CLK_CAM_M_SENINF				4
+> +#define CLK_CAM_M_CAMSV1				5
+> +#define CLK_CAM_M_CAMSV2				6
+> +#define CLK_CAM_M_CAMSV3				7
+> +#define CLK_CAM_M_FAKE_ENG				8
+> +#define CLK_CAM_M_CAM2MM_GALS				9
+> +#define CLK_CAM_M_CAMSV4				10
+> +#define CLK_CAM_M_PDA					11
+> +
+> +/* CAMSYS_RAWA */
+> +#define CLK_CAM_RA_CAMSYS_RAWA_LARBX			0
+> +#define CLK_CAM_RA_CAMSYS_RAWA_CAM			1
+> +#define CLK_CAM_RA_CAMSYS_RAWA_CAMTG			2
+> +
+> +/* CAMSYS_RAWB */
+> +#define CLK_CAM_RB_CAMSYS_RAWB_LARBX			0
+> +#define CLK_CAM_RB_CAMSYS_RAWB_CAM			1
+> +#define CLK_CAM_RB_CAMSYS_RAWB_CAMTG			2
+> +
+> +/* IPESYS */
+> +#define CLK_IPE_LARB19					0
+> +#define CLK_IPE_LARB20					1
+> +#define CLK_IPE_SMI_SUBCOM				2
+> +#define CLK_IPE_FD					3
+> +#define CLK_IPE_FE					4
+> +#define CLK_IPE_RSC					5
+> +#define CLK_IPESYS_GALS					6
+> +
+> +/* VLPCFG_AO_REG */
+> +#define CLK_VLPCFG_AO_APEINT_RX				0
+> +
+> +/* DVFSRC_TOP */
+> +#define CLK_DVFSRC_TOP_DVFSRC_EN			0
+> +
+> +/* MMINFRA_CONFIG */
+> +#define CLK_MMINFRA_GCE_D				0
+> +#define CLK_MMINFRA_GCE_M				1
+> +#define CLK_MMINFRA_SMI					2
+> +#define CLK_MMINFRA_GCE_26M				3
+> +
+> +/* GCE_D */
+> +#define CLK_GCE_D_TOP					0
+> +
+> +/* GCE_M */
+> +#define CLK_GCE_M_TOP					0
+> +
+> +/* MDPSYS_CONFIG */
+> +#define CLK_MDP_MUTEX0					0
+> +#define CLK_MDP_APB_BUS					1
+> +#define CLK_MDP_SMI0					2
+> +#define CLK_MDP_RDMA0					3
+> +#define CLK_MDP_RDMA2					4
+> +#define CLK_MDP_HDR0					5
+> +#define CLK_MDP_AAL0					6
+> +#define CLK_MDP_RSZ0					7
+> +#define CLK_MDP_TDSHP0					8
+> +#define CLK_MDP_COLOR0					9
+> +#define CLK_MDP_WROT0					10
+> +#define CLK_MDP_FAKE_ENG0				11
+> +#define CLK_MDPSYS_CONFIG				12
+> +#define CLK_MDP_RDMA1					13
+> +#define CLK_MDP_RDMA3					14
+> +#define CLK_MDP_HDR1					15
+> +#define CLK_MDP_AAL1					16
+> +#define CLK_MDP_RSZ1					17
+> +#define CLK_MDP_TDSHP1					18
+> +#define CLK_MDP_COLOR1					19
+> +#define CLK_MDP_WROT1					20
+> +#define CLK_MDP_RSZ2					21
+> +#define CLK_MDP_WROT2					22
+> +#define CLK_MDP_RSZ3					23
+> +#define CLK_MDP_WROT3					24
+> +#define CLK_MDP_BIRSZ0					25
+> +#define CLK_MDP_BIRSZ1					26
+> +
+> +/* DBGAO */
+> +#define CLK_DBGAO_ATB_EN				0
+> +
+> +/* DEM */
+> +#define CLK_DEM_ATB_EN					0
+> +#define CLK_DEM_BUSCLK_EN				1
+> +#define CLK_DEM_SYSCLK_EN				2
+> +
+> +#endif /* _DT_BINDINGS_CLK_MT8189_H */
 
