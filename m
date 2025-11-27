@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-242111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85D42C8C6CA
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 01:30:49 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6549C8C6D3
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 01:31:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 293A43505F1
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 00:30:49 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E6D864E5AF8
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 00:30:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BABF81DB551;
-	Thu, 27 Nov 2025 00:30:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE25E225A3B;
+	Thu, 27 Nov 2025 00:30:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GM/q5umk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KDaCXXn7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B0ED14B977;
-	Thu, 27 Nov 2025 00:30:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 997F2225390
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 00:30:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764203445; cv=none; b=X7MAhRl1XQ7JPEOn1yQJnZisUz34xeeFSEDXsL0vem8cI/E4q1rkarq2V+bFwF79Z6Jon6UQJoZA2YHgXkVs49iySv8puE/9IITl1L7wUonPMGNr3iAIfrVIJ9JcUkkgyHFm0K/OQkzGD1fhWQWrBP2+SveQ7BLPtpYPK2Z7ZVs=
+	t=1764203446; cv=none; b=TpCepbfX7lwj4kbSM8yhXDQ5WCXgC0nOFuy3uqOKqgAMJ02wfRBOHAGPBBE4z1FerdVdRlo2hxFClYUGrEQcOgs7f6a9cVCiGqy/yrWU5+Z8yGiAmebcrZgh1+c92xMtqJj+0L9kIbYMRHbBwk7KPxpX43Rj+JPXWH5/aRcI2m0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764203445; c=relaxed/simple;
-	bh=V0196ynFBYC1b+wV/oNiVxE5CbD62NKpfYCvkobiNeY=;
+	s=arc-20240116; t=1764203446; c=relaxed/simple;
+	bh=FWlDWLN/GOvKln0+cgwxIbSneFEuh7/t32eEroEvHsE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=GBGQc45HMnTV2gbfmoM/dTgtV/rvqda0Mx3V+zHFel6kDn2snfAN0SJaJeBJ2eq5qU9K6g+0cQaYb1+B3QpFqW09y+a1W7Lk2Po2T1d8tV09ORgvdDW8jbIe4aA9roOBHCX0qtG0O84Vd14f8AvQWAQ3BAT7xTAyCwy9ydvGITY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GM/q5umk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A5C1C4CEF7;
-	Thu, 27 Nov 2025 00:30:45 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=AfUa3I8jdpZwaxJxZ77r9aIw51expMTSivIrVARvfYBj9gS+BBgT1tBvU0DkOUQ9bUXR+K5NenGag+JyY2sD9K8ZE1KQvzjAzyx8Aqx2mhwd3aHzJcZBiOEJ21s/PMM17Uwzpz/Y+PNEOsfpGHAclEZK/vyKMT1tWVFu//CKJDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KDaCXXn7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D8EDC4CEF7;
+	Thu, 27 Nov 2025 00:30:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764203445;
-	bh=V0196ynFBYC1b+wV/oNiVxE5CbD62NKpfYCvkobiNeY=;
+	s=k20201202; t=1764203446;
+	bh=FWlDWLN/GOvKln0+cgwxIbSneFEuh7/t32eEroEvHsE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GM/q5umkGDaeAwuOnTZduVPolSNnD4H4euUHKX2elkgGH3FRZ8FAgjUjLTP5kY5I8
-	 +9hWMp7KsVt7jWrGJeYewuxxRO+2Cj7PTidgZK6BF24nptvavURLwnUc4oyYeiE0G8
-	 tCd8UE2h4soqyMWHS1NETugwF5DlTQd1CgTQuBn61dIO1CcueYdFB/ttxO2bTRB5Jv
-	 salNytaEh3FrhlyhoDWPRVT21hp3KtB9Uh1pbuQ5eSkAW3JetW/nMD+o6HV8rE+JWd
-	 rbPO7FwIenY6CYzTTk3vrRLj4WpB2ALY4Shd16kxx5WW4vJYChNztpt9o5aHrbSxbQ
-	 PaSWTYLplTFSA==
+	b=KDaCXXn7MofxhlXEuRUmlVkiLRk89rbWUa4IBBMh6JEuksgbUH8U6WI76P6XcSaxs
+	 LCCoLYqe0/DtCn4nmvLY03bp2bDD2tpTbhWyMH3n1kbAdcyhiWsmHYX/gPGe7QtRff
+	 VsnWYv9WVCaea1s2O+5Ba15pieIvHjzX8g+3rCuUIRnO8W7saQKH3784v8E5MIKqAC
+	 feSYI+x14gNqsPwPiO+/h4HwXpx/mtEhzM/5OSOMv58elcuKcIaDSa3OOe+eANB21z
+	 XV9y0pfeMDt8zW6E9DmjzIPOeHNrbBX1RMfDYKnAoh2rEXpqQ0fp99H/d1gA93RC+0
+	 mo4X3qYesrUfg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF37380CEF6;
-	Thu, 27 Nov 2025 00:30:07 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 1F517380CEF6;
+	Thu, 27 Nov 2025 00:30:09 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] selftests/net: initialize char variable to
- null
+Subject: Re: [PATCH net] selftests/net: packetdrill: pass send_omit_free to
+ MSG_ZEROCOPY tests
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176420340676.1898314.13893932035551539532.git-patchwork-notify@kernel.org>
-Date: Thu, 27 Nov 2025 00:30:06 +0000
-References: <20251125165302.20079-1-ankitkhushwaha.linux@gmail.com>
-In-Reply-To: <20251125165302.20079-1-ankitkhushwaha.linux@gmail.com>
-To: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
-Cc: willemdebruijn.kernel@gmail.com, kernelxing@tencent.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, shuah@kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+ <176420340799.1898314.5169503478990413263.git-patchwork-notify@kernel.org>
+Date: Thu, 27 Nov 2025 00:30:07 +0000
+References: <20251125234029.1320984-1-willemdebruijn.kernel@gmail.com>
+In-Reply-To: <20251125234029.1320984-1-willemdebruijn.kernel@gmail.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+ ncardwell@google.com, kuniyu@google.com, willemb@google.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 25 Nov 2025 22:23:02 +0530 you wrote:
-> char variable in 'so_txtime.c' & 'txtimestamp.c' were left uninitilized
-> when switch default case taken. which raises following warning.
+On Tue, 25 Nov 2025 18:35:05 -0500 you wrote:
+> From: Willem de Bruijn <willemb@google.com>
 > 
-> 	txtimestamp.c:240:2: warning: variable 'tsname' is used uninitialized
-> 	whenever switch default is taken [-Wsometimes-uninitialized]
+> The --send_omit_free flag is needed for TCP zero copy tests, to ensure
+> that packetdrill doesn't free the send() buffer after the send() call.
 > 
-> 	so_txtime.c:210:3: warning: variable 'reason' is used uninitialized
-> 	whenever switch default is taken [-Wsometimes-uninitialized]
+> Fixes: 1e42f73fd3c2 ("selftests/net: packetdrill: import tcp/zerocopy")
+> Closes: https://lore.kernel.org/netdev/20251124071831.4cbbf412@kernel.org/
+> Suggested-by: Neal Cardwell <ncardwell@google.com>
+> Signed-off-by: Willem de Bruijn <willemb@google.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2] selftests/net: initialize char variable to null
-    https://git.kernel.org/netdev/net-next/c/af7273cc7ae0
+  - [net] selftests/net: packetdrill: pass send_omit_free to MSG_ZEROCOPY tests
+    https://git.kernel.org/netdev/net-next/c/c01a6e5b2e4f
 
 You are awesome, thank you!
 -- 
