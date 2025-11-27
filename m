@@ -1,82 +1,53 @@
-Return-Path: <netdev+bounces-242367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 255A3C8FC1D
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 18:47:52 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBE1EC8FC32
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 18:48:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C4DF3AC115
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 17:47:50 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E089034FF3B
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 17:48:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B42F2F3625;
-	Thu, 27 Nov 2025 17:47:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 412022F6919;
+	Thu, 27 Nov 2025 17:47:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F0jYaSac"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="k9vbGoB0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 228682F3601
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 17:47:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9BBE2F691F;
+	Thu, 27 Nov 2025 17:47:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764265667; cv=none; b=RsYsGnXX+pAVIEUIOaI1TmB9AAFMt7J4cebd6VVK4fVKFs4vdyh9SUQLtBJhgMi+EDPCGs4O4/JN3lBYMwCo05WM00r1zul6/whmE70FJJS69PAm9zWQIwDHdM4Lk7Ls+p2H3mqVOCRdXwF5fJP/fN0C24Cq8YPklo1i3udIHL4=
+	t=1764265673; cv=none; b=bhT6wwAZGTOK8JFTOM5kRVsA7eCgmhFk3S8f80AYfmGfrEUC8eQQa2Sj+wGynFbBpfgmIIbiKTmbFBTYSMD2fzmHb6G3l42ZHqTiu4dGORxx0MvexoLLEY0gDzJ7f+GPoz9u7XeIesaybQT/6lJzx0itkudsqU2IExIy30a0ads=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764265667; c=relaxed/simple;
-	bh=BRI81MYuXb7h8xyD8XLP96rM8Y/COrnSldLvFnFiQlg=;
+	s=arc-20240116; t=1764265673; c=relaxed/simple;
+	bh=6SRI1/kljnwIBuRhbjlGOtjbA6nlJv61vSHbPIAR7Ek=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ld+M8CuyrtPmr6A7fJHqbPn2s4qDSG1Yfw54MjZf5UVqhNZ3FTAi15h5vPKkRPfGbuMf8cCbqujGI4MSceLkmzywlEvglkb7eDpZVKMZB3kNTwPnpK4u0X4fly1NzE8b24uwRduHDhw5OqiwaTx31M5TUEjTh/jsVS21mX+HhFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F0jYaSac; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-29568d93e87so10685825ad.2
-        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 09:47:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764265665; x=1764870465; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BRI81MYuXb7h8xyD8XLP96rM8Y/COrnSldLvFnFiQlg=;
-        b=F0jYaSacv9Wwc3reFEH83i4RcNwDcldXqFr4PIQ6HhaltnZhDhWw6Y5FmvrwukO/D0
-         1fUNLubZ/RC0I6Hfb/H5711FkrDBqxN2FMtpG0ay6VMMwlHFr5xCHqfUKL8u9Mj5JgVy
-         bv3HqvYvL2Me+M3XnpwkhPYlDnB0bialuZlBbyzs7Xcaor3j8xwbSLwzNShdoIXMW2Vj
-         pb//UTCjol9NfPB2PM0aV3dP7zvmyDu5YGKvyHI43S084ItDclo7Zs1b4pS5ERoDns8p
-         8boRltxeRXFg7zMEOqhdp+p9ahfxSivosGFbozvZ9rr3dHNqjZ+14vEcXfJhW7wKLm2Y
-         fd2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764265665; x=1764870465;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BRI81MYuXb7h8xyD8XLP96rM8Y/COrnSldLvFnFiQlg=;
-        b=vUGF7Bc3qMmHBB7cmI2p/wnX69j6WkH+QGuVbbMv+KLr9wTvIvjZI5U6Iv9VwTpc2y
-         z1MLk35r+jljb0roFwG2zKpqA05x6EdaJUHbuJ02exWZgR/C6r2MJtMDPGfRQEgjLzIu
-         uJiYrobCQEFHmgNJ+69hPJ8nlBBY7z/28ZNkJ1UhKZbe1l+0KB7yQLdYd3O7S33mg0PU
-         yR4lUWa5vUcj1QK/Ee0LVBM3vRM8uegbwQNZYYh56pBVHMaI+U9vEXKwXoGpeEG7yY5F
-         31a+EnxrVv67mNA5NDSStA0inM+6MZ3iTq7i51MVhgunJ44TeYUeSjWRzcGAhU+B3DDF
-         uEZw==
-X-Forwarded-Encrypted: i=1; AJvYcCXRrAwPlobQ0f1ZEfCdDKVCNgASSvuX8HbF59hLLRaclH+72XxXjDDKo4VclSaOptXEjEXeABg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNskws+bmnj5KZWBpyq8uFfJaaUgKjk4CHGBSuQrVAU2SLXBC7
-	2w0ERCosUsF6NaU2IF6iD/uRuV1TLd3ZlxaBc4mrwz9ielg163f4LTvA
-X-Gm-Gg: ASbGnctNKRpDTl+AFVEn7/Htx0Z9sfvCTmcKiiXi+uDQ9hPAVL5L4aJtM3jaIOHPrOk
-	yzYafKwO2otyvP4CYoiEUDEEe6yO2UHYC7DZXVbhxGNV8zYbs2WdMQOhabwWeSZiuChNi+rodjy
-	FbQ83z9zKvKUnnLqy7j9omQWneiRzv4uShPC+LrJBRkb7FdyW/R6Kl5X6CIeoAb0bL5cnQWLKXv
-	exYsZTRRVFAJwQcHwXfQt73rBqIJm7WncUSViTiNwFBjU/b0icaGRnrTFhy7ZBjEeX4CZ+R4PEy
-	juRCcJA9Dex1fgxSJ4dnjB6Plb6XW2+RWo331n++I/Fx/sUQ93MGzGGLZGlHJpvpwlZh1ihm5lr
-	1OOkgo1XmJRpIm7yYQEYKzFu1zqYiAxEvLUqSJQDnGgWRpDObpxQ7hOszWTgvgBX1AZ07hT51tw
-	2F98q4ce4jBlAvAGQ/kSEdYoeQsjnGtqP+RyixCGQj7sWBGaLDxwYhUZLL6Tx4l7y3Y2Slmw==
-X-Google-Smtp-Source: AGHT+IFQMns4p7mYuQDAf8KkttHI4Vx6NTBg4hreeujJapPT/8zqqg74Cep/q2QlnjNERCvMI0q1AQ==
-X-Received: by 2002:a17:903:2ecb:b0:26d:58d6:3fb2 with SMTP id d9443c01a7336-29baae4ee0cmr142565705ad.12.1764265665311;
-        Thu, 27 Nov 2025 09:47:45 -0800 (PST)
-Received: from ?IPV6:2001:ee0:4f4c:210:de47:e88:2ad3:8735? ([2001:ee0:4f4c:210:de47:e88:2ad3:8735])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29bce40a5ffsm23791225ad.18.2025.11.27.09.47.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Nov 2025 09:47:44 -0800 (PST)
-Message-ID: <a61dc7ee-d00b-41b4-b6fd-8a5152c3eae3@gmail.com>
-Date: Fri, 28 Nov 2025 00:47:36 +0700
+	 In-Reply-To:Content-Type; b=crD2bpYSQWxOtL9mPZq6SZ0JwgYufPmYFtVq77kj3MahEbnmHX20qTAZ1sT0N7SGkWAS9aVyCOJgMzSN8IN1ZIVgt4WDgmZgQGz8Y2u4Gc4carWOMP7Vb3DaGgME3KV00mDCApfyTUhUC8uyiQNedlKqnIdcDD6ivhuGcKhRnZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=k9vbGoB0; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=461Vy01Zb0nwzw3ifoGzpi9dK4EZy7C3bNQOK9nUwXw=; b=k9vbGoB0kfzIMMqR8vXteUGamz
+	ooV5kYNXah6tFldH1rDE4Wshj5wUDlA7CLUxvd/HbcfRNo5IyFdjG8+AKEcvTPb1p6ObMXYuakp1b
+	Irusrg5dlETX8KQ7MmuTaa6LwU/rwou1Q3+Xrbgj9xEnllAtDQbPqJCIjn8vsAMRG+y8175ofdQdd
+	ziAGF2nQ0sqw3LluD7cn2D5PNpGENV0XNfGCbJD3ehsImK1CWZs+CTGT6zv0zzlOzB69xq4pLX1Rf
+	TTZj4fgoPlaDOJ3K/4OmGZYqwAKG284x+tT9qvUlcldYl82tE8AKIAX2tN3OBjb/fhkbSp/LbjmKm
+	pCyNzanGt3wWFXvyTBrmP9YyuNAT8xSWrLBhXaGpaAP20ud3nfnsaRNcl/Ix3D9IpLfHf7wLaL8qS
+	BVjf9vSb1PbgYRgMHzokaEthQL6FpMQ1rev19toZDhiPJsiE/xwX/TdL/BhemSQXw8eS+Mqc28BPy
+	28mbKXm/2zIscztuxegPStsp;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1vOg5r-00G22i-01;
+	Thu, 27 Nov 2025 17:47:47 +0000
+Message-ID: <53eb849d-d5c1-4b8c-8d83-bacd18d129b1@samba.org>
+Date: Thu, 27 Nov 2025 18:47:46 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,86 +55,98 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC] virtio_net: gate delayed refill scheduling
-To: "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
-Cc: Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, virtualization@lists.linux.dev,
- netdev@vger.kernel.org, bpf@vger.kernel.org
-References: <40af2b73239850e7bf1a81abb71ee99f1b563b9c.1764226734.git.mst@redhat.com>
+Subject: Re: [PATCH] net: define IPPROTO_SMBDIRECT and SOL_SMBDIRECT constants
+To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
+ Willem de Bruijn <willemb@google.com>, Steve French <smfrench@gmail.com>,
+ Tom Talpey <tom@talpey.com>, Long Li <longli@microsoft.com>,
+ Namjae Jeon <linkinjeon@kernel.org>, Xin Long <lucien.xin@gmail.com>,
+ linux-kernel@vger.kernel.org, linux-cifs@vger.kernel.org,
+ samba-technical@lists.samba.org, linux-rdma@vger.kernel.org,
+ quic@lists.linux.dev
+References: <20251126111407.1786854-1-metze@samba.org>
+ <3dd5c950-e3e4-42b8-a40b-f0ee04feb563@redhat.com>
 Content-Language: en-US
-From: Bui Quang Minh <minhquangbui99@gmail.com>
-In-Reply-To: <40af2b73239850e7bf1a81abb71ee99f1b563b9c.1764226734.git.mst@redhat.com>
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <3dd5c950-e3e4-42b8-a40b-f0ee04feb563@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-I think the the requeue in refill_work is not the problem here. In
-virtnet_rx_pause[_all](), we use cancel_work_sync() which is safe to
-use "even if the work re-queues itself". AFAICS, cancel_work_sync()
-will disable work -> flush work -> enable again. So if the work requeue
-itself in flush work, the requeue will fail because the work is already
-disabled.
+Hi Paolo,
 
-I think what triggers the deadlock here is a bug in
-virtnet_rx_resume_all(). virtnet_rx_resume_all() calls to
-__virtnet_rx_resume() which calls napi_enable() and may schedule
-refill. It schedules the refill work right after napi_enable the first
-receive queue. The correct way must be napi_enable all receive queues
-before scheduling refill work.
+> On 11/26/25 12:14 PM, Stefan Metzmacher wrote:
+>> In order to avoid conflicts with the addition of IPPROTO_QUIC,
+>> the patch is based on netdev-next/main + the patch adding
+>> IPPROTO_QUIC and SOL_QUIC [2].
+>>
+>> [2]
+>> https://lore.kernel.org/quic/0cb58f6fcf35ac988660e42704dae9960744a0a7.1763994509.git.lucien.xin@gmail.com/T/#u
+>>
+>> As the numbers of IPPROTO_QUIC and SOL_QUIC are already used
+>> in various userspace applications it would be good to have
+>> this merged to netdev-next/main even if the actual
+>> implementation is still waiting for review.
+> 
+> Let me start from here... Why exactly? such applications will not work
+> (or at least will not use IPPROTO_QUIC) without the actual protocol
+> implementation.
 
-The fix is like this (there are quite duplicated code, I will clean up
-and send patches later if it is correct)
+There's the out of tree quic driver, that is used by some people
+see https://github.com/lxin/quic.
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 8e04adb57f52..892aa0805d1b 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -3482,20 +3482,25 @@ static void __virtnet_rx_resume(struct virtnet_info *vi,
-  static void virtnet_rx_resume_all(struct virtnet_info *vi)
-  {
-      int i;
-+    bool schedule_refill = false;
-+
-+    for (i = 0; i < vi->max_queue_pairs; i++)
-+        __virtnet_rx_resume(vi, &vi->rq[i], false);
+And Samba 4.23 already uses the specific *_QUIC values,
+so it would be good to make sure the values are not used for
+something else, by accident.
 
-      enable_delayed_refill(vi);
--    for (i = 0; i < vi->max_queue_pairs; i++) {
--        if (i < vi->curr_queue_pairs)
--            __virtnet_rx_resume(vi, &vi->rq[i], true);
--        else
--            __virtnet_rx_resume(vi, &vi->rq[i], false);
--    }
-+
-+    for (i = 0; i < vi->curr_queue_pairs; i++)
-+        if (!try_fill_recv(vi, &vi->rq[i], GFP_KERNEL))
-+            schedule_refill = true;
-+
-+    if (schedule_refill)
-+        schedule_delayed_work(&vi->refill, 0);
-  }
+> Build time issues are much more easily solved with the usual:
+> 
+> #ifndef IPPROTO_*
+> #define IPPROTO_
+> #endif
 
-  static void virtnet_rx_resume(struct virtnet_info *vi, struct receive_queue *rq)
-  {
--    enable_delayed_refill(vi);
-      __virtnet_rx_resume(vi, rq, true);
-+    enable_delayed_refill(vi);
-  }
+Sure, but that still only works reliable if the constants
+don't change.
 
-  static int virtnet_rx_resize(struct virtnet_info *vi,
+> that the application code should still carry for a bit of time (until
+> all the build hosts kernel headers are updated).
 
-I also move the enable_delayed_refill() after we __virtnet_rx_resume()
-to ensure no refill is scheduled before napi_enable().
+The build hosts often don't have current kernel headers
+anyway, that's why applications have the hard coded (at least fallback values).
 
-What do you think?
+But a host might have a newer kernel (or out of tree module)
+at runtime, which would allow the application to use the feature.
 
-Thanks,
-Quang Minh
+> The above considerations also apply to this patch. What is the net
+> benefit? Why something like the above preprocessor's macros are not enough?
 
+It's mainly to have the constants reserved in order to avoid collisions
+at runtime.
+
+And in the current case also the merge conflict between the two patchsets,
+that's another why I thought it would be good to the _QUIC patch already
+accepted.
+
+> We need at least to see the paired implementation to accept this patch,
+
+I hope to post the first part of the _SMBDIRECT socket code next
+week, it's already working for the in kernel users cifs.ko and ksmbd.ko,
+but I want to split the relatively large commit into smaller chunks,
+for better review, the current state consists of the top 3 commits of
+https://git.samba.org/?p=metze/linux/wip.git;a=shortlog;h=refs/heads/master-ipproto-smbdirect-v0.5
+1. the addition of the socket layer above the existing code, for in kernel use only
+2. change cifs.ko to use it
+3. change ksmbd.ko to use it.
+
+Opening it for userspace will be developed in the next weeks.
+
+ > and I personally think it would be better to let the IPPROTO definition
+ > and the actual implementation land together.
+
+In general I'd agree with you, I'm fine with deferring this patch
+a bit and will cope if the _QUIC patch is also deferred.
+
+Anyway thanks for the feedback!
+metze
 
