@@ -1,94 +1,139 @@
-Return-Path: <netdev+bounces-242273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF4C6C8E3C4
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 13:20:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DF14C8E418
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 13:29:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 169B934CC9B
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 12:20:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 481163ACE48
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 12:29:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CC9232F768;
-	Thu, 27 Nov 2025 12:20:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5A81330322;
+	Thu, 27 Nov 2025 12:29:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UROH+dL1"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="cyR5QCPr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35E8A32E156
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 12:20:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56B8832AADA;
+	Thu, 27 Nov 2025 12:29:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764246046; cv=none; b=KD4Mk0cgJi6wv9BCqVjY5CwLYfq3JtIHWqwPwCoLCgxIR86sywT6KMgJowmTtTnuSY5UIDScmZ2KRAbOyu3o3mOAX88aXEj0JiQNoVY9cz8RkZnko62j/PiK7K4eQkTWfws5smht7+VLu2hOw1iJCZeAde2Xf5hPbQTGkjzUhek=
+	t=1764246583; cv=none; b=ChYJOehuqrVP/B/Iz1PcDccvcPAecsHfwW4ajH8WbyehDxVo8lGcXA0yrjAdkqiKzRCJWma4ssE0dFkKsYs30JT+JPv4xgwp04uYQFgcF3eXNYGIzJNut0WkxoFOxh3z1JJheLdJTQEee73BzSB5CM+ZaQ4yi1akT6J2p5PXSKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764246046; c=relaxed/simple;
-	bh=3ERbXbzNJtuwcEyji1irl/PUVl+PwRw7QXzK6uwGFo0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tz77WuzI0FEO1pc3ypyHH524An49M7Etczhk06gk4h+WWy8xYtc88w6O7Pv0zTMctKkWSuWslA5AwKAMU/onK7R3IdHv98nLuq9RLPGHnNOnRn9HOaqJ1h07KY6jav9Ldkcbw5AWGUaR3Edx6v70rDF+9FHSnDiFySrCcZDSjPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UROH+dL1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0048C4CEF8;
-	Thu, 27 Nov 2025 12:20:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764246045;
-	bh=3ERbXbzNJtuwcEyji1irl/PUVl+PwRw7QXzK6uwGFo0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=UROH+dL1BT98VjAR40MCm23j6PODqjZ5JQ4KW8sKHwkhGPxeC2UjF94/ujC7CVjz3
-	 YqnOoxWUU7JcLbcWNyZu6+R4UQ6DzYH5ERyntC9Iu1bUOD7R/HysBIP+h29wC2/4uU
-	 fo2DzACTvAwp6rfhYmH/zeAWaV/ibQV68KZrmECP21bQ7m/MtjOdHZ59PuH106OcIx
-	 mu/0e9HOHXPyXlkTwp614n8EQchIAarud8LGPIGw3+yS35WtuctbHw/YoUGoIWm/t3
-	 IDPjJbJM5ZVt/VL9ZtpQbe1MJaLZZJMaNEeqlAaHl4S5RoxlqP43FecGwoYLE9/rNA
-	 dxctHziIp2bXQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E0D380CFEF;
-	Thu, 27 Nov 2025 12:20:08 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1764246583; c=relaxed/simple;
+	bh=hIpYSKfO4HFhoXiKbSUCF4+uYzXtrNa5Zd9QByI/HlY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=K2e9ETUB9IMcikNg0fQNx/VnA6czb2wp6nickeaykTU+Qy5ejWflWxSxVCs/mlMCluGzNFWBj96eixISDKlNi8ZLh/rKyMYi+SGl6P2yTbRUBUBSkY88/myyUvyyLG7WICCK654+/UW0X/d57Rj6jfIB5jZLC9otZIMCY97tYI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=cyR5QCPr; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id 61B832126F76; Thu, 27 Nov 2025 04:29:36 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 61B832126F76
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1764246576;
+	bh=vux0D5GHamUSpvMt2OhA+/x0C3GHs6iaT+YVZ4z6yO0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cyR5QCPrYnWU/vEE4vKVZIXcqOxV6Pc5P3nQ56VXpaSbuu3FyKr8/6/NBDou5zMAt
+	 TyEW74s5Mjs8Xfrj5KC+OvK1AhlPJ2aEnOOc9zrJEaJWO+qEwMFxlgvDyiTVdv4NeQ
+	 Kz4/aeuROIC7qasPZ3l+2cn8pXSpOAtiNUYe0des=
+Date: Thu, 27 Nov 2025 04:29:36 -0800
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, longli@microsoft.com,
+	kotaranov@microsoft.com, horms@kernel.org,
+	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	dipayanroy@microsoft.com
+Subject: Re: [PATCH net-next, v4] net: mana: Implement ndo_tx_timeout and
+ serialize queue resets per port.
+Message-ID: <20251127122936.GA10090@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20251123180818.GA18398@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <20251126200541.00e5270f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1 net-next] mptcp: Initialise rcv_mss before calling
- tcp_send_active_reset() in mptcp_do_fastclose().
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176424600726.2553841.2265045087455449510.git-patchwork-notify@kernel.org>
-Date: Thu, 27 Nov 2025 12:20:07 +0000
-References: <20251125195331.309558-1-kuniyu@google.com>
-In-Reply-To: <20251125195331.309558-1-kuniyu@google.com>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: matttbe@kernel.org, martineau@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, geliang@kernel.org,
- horms@kernel.org, kuni1840@gmail.com, netdev@vger.kernel.org,
- syzbot+3a92d359bc2ec6255a33@syzkaller.appspotmail.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251126200541.00e5270f@kernel.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-Hello:
+Hi Jakub,
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Tue, 25 Nov 2025 19:53:29 +0000 you wrote:
-> syzbot reported divide-by-zero in __tcp_select_window() by
-> MPTCP socket. [0]
+On Wed, Nov 26, 2025 at 08:05:41PM -0800, Jakub Kicinski wrote:
+> On Sun, 23 Nov 2025 10:08:18 -0800 Dipayaan Roy wrote:
+> > Implement .ndo_tx_timeout for MANA so any stalled TX queue can be detected
+> > and a device-controlled port reset for all queues can be scheduled to a
+> > ordered workqueue. The reset for all queues on stall detection is
+> > recomended by hardware team.
+> > 
+> > The change introduces a single ordered workqueue
+> > "mana_per_port_queue_reset_wq" queuing one work_struct per port,
+> > using WQ_UNBOUND | WQ_MEM_RECLAIM so stalled queue reset work can
+> > run on any CPU and still make forward progress under memory
+> > pressure.
 > 
-> We had a similar issue for the bare TCP and fixed in commit
-> 499350a5a6e7 ("tcp: initialize rcv_mss to TCP_MIN_MSS instead
-> of 0").
+> And we need to be able to reset the NIC queue under memory pressure
+> because.. ?  I could be wrong but I still find this unusual / defensive
+> programming, if you could point me at some existing drivers that'd help.
+>
+I found these existing drivers using 'create_singlethread_workqueue',
+
+drivers/net/ethernet/mellanox/mlx4/en_main.c
+drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
+drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+
+'create_singlethread_workqueue' in turn uses  WQ_MEM_RECLAIM
+
+as in below macros 
+#define alloc_ordered_workqueue(fmt, flags, args...) \
+	alloc_workqueue(fmt, WQ_UNBOUND | __WQ_ORDERED | (flags), 1,
+##args)
+
+...
+#define create_singlethread_workqueue(name) \
+	alloc_ordered_workqueue("%s", __WQ_LEGACY | WQ_MEM_RECLAIM,
+name)
+
+I will switch to directly using create_singlethread_workqueue instead
+of explicitly mentioning the flags in the next version. 
+
+ 
+> > @@ -3287,6 +3341,7 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
+> >  	ndev->min_mtu = ETH_MIN_MTU;
+> >  	ndev->needed_headroom = MANA_HEADROOM;
+> >  	ndev->dev_port = port_idx;
+> > +	ndev->watchdog_timeo = 15 * HZ;
 > 
-> [...]
+> 5 sec is typical, off the top of my head
+> 
+As per our internal discussion, 15 second timeout recommended by HW team based on the FPGA reconfig
+scenario.
+> > @@ -3647,6 +3717,11 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
+> >  		free_netdev(ndev);
+> >  	}
+> >  
+> > +	if (ac->per_port_queue_reset_wq) {
+> > +		destroy_workqueue(ac->per_port_queue_reset_wq);
+> > +		ac->per_port_queue_reset_wq = NULL;
+> > +	}
+> 
+> I think you're missing this cleanup in the failure path of mana_probe
+Right, if all the ports fail to probe the clean up will get skipped from
+mana_remove. I will fix this in the v5.
+> -- 
+> pw-bot: cr
 
-Here is the summary with links:
-  - [v1,net-next] mptcp: Initialise rcv_mss before calling tcp_send_active_reset() in mptcp_do_fastclose().
-    https://git.kernel.org/netdev/net/c/f07f4ea53e22
+Thank you for the comments, I will work on it in v5.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Regards
 
