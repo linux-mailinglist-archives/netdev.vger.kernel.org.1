@@ -1,260 +1,231 @@
-Return-Path: <netdev+bounces-242175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7D64C8CFCA
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 08:02:44 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98C8CC8CFB8
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 08:02:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 380EB3B03B7
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 07:02:16 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1B6E934B550
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 07:02:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C86D53112D5;
-	Thu, 27 Nov 2025 07:02:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E66C30504A;
+	Thu, 27 Nov 2025 07:02:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="X77b/vjz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hfnf3juB";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Id9swuIQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A791630FC37
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 07:02:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764226930; cv=fail; b=Vw+Kh7Oqh7eaY8OgdjpdEU2M1urlCqAlm/rI/XBkAxzutYmIlm5YZoi1E0n1ykKutUBEG2sWzns7HcJaVQn7LQ/QwXAUCL341HIMWZAe4ZkYqnb/el2/YcCbN72d0gCJ2S9uSiAHUaXNi4xHPR3n5OeghPAlivMou1ImO73oYOU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764226930; c=relaxed/simple;
-	bh=El8/MPaS4ewB8+hiMg2YrKHULI9A/WdNgYzS70JFzzc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=al0wWV0ZmFSIMWPTN+bofd+8vUHZIA/QmELu5R3zhnPKIZeNUbPlvCr26ifuZwjEz0wv6BAO13/M/jbYwketAiCvAll6KmOM20QMriNydiewoNGmTnXqIwiHi64b8Lxqk5r4Er3qgVRSGjaefyH+4aY3+jP1kE4QfPKrXg++xgs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=X77b/vjz; arc=fail smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764226929; x=1795762929;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=El8/MPaS4ewB8+hiMg2YrKHULI9A/WdNgYzS70JFzzc=;
-  b=X77b/vjzwmdPZNh3Ugy+8C/EuFoMPrIWEnB9bpPYb6a7CpKqHNLgH571
-   rZs7NjVtEUTwS0ZQ0zR3qDjxNoWRV1Px9rHmKPIbqPe0L2FfOUuGXEzNz
-   O59RwSLRJjZjwG/epKQRmunfHXRBXyAQl0KcZ60H3tJWEQmR8NP33AHqG
-   Jk1WydxLbKMYCzjyvHpJE3F835SpvQU4XADRYKM2aNt5EmFA5XI8zAxZR
-   GuvsN8yWDI2lOurmhbEohQiXtEDOQ1WI4zXEcfqSYYRf6mtgFsibG/Psm
-   I+Rh3zTJHwcn/yDdOU7y4xA/3XBcLHN7F9xqxVG6yvCzykzseIOeKEBt5
-   Q==;
-X-CSE-ConnectionGUID: W9ku3fwQTD6pvdyOpzRDcA==
-X-CSE-MsgGUID: uLBhbnduQIKB5bOjRee9DA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11625"; a="53838516"
-X-IronPort-AV: E=Sophos;i="6.20,230,1758610800"; 
-   d="scan'208";a="53838516"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2025 23:02:07 -0800
-X-CSE-ConnectionGUID: /F6O1CwCQnKzVf7TlB+zXw==
-X-CSE-MsgGUID: vEIMKplMS2qmoVIhUOU/VA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,230,1758610800"; 
-   d="scan'208";a="193966926"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2025 23:02:07 -0800
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Wed, 26 Nov 2025 23:02:06 -0800
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29 via Frontend Transport; Wed, 26 Nov 2025 23:02:06 -0800
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (40.93.195.61)
- by edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Wed, 26 Nov 2025 23:02:04 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=aCJI2B3E9cU0M5LLKIvTp5FQgCo30Js9GaRww3andR4Cef84yusDgvWmeL5VQGIuwCoxyD0OAp8osLmP/YWkmpp4+MQD1yXxPz1U3qeYkoWjt6ugjm1npf4bqGDrQ5v9BHHYSI+yNfx/7ujR6NgwPsYCVdjiNU8/zrjaLZgi3NQeKUyGwpaYxMNJOIWBCufxqGgz/ySvxS6ROPf4FLHEycoZLdxXwmZ8KfpFcU3RoA9kbKX4AquZwLqVA+QkrhPaY1L4NH1sA2KKwnKwyvJVl4TPnFBWjP49Ba20XYWN2wdyS+50GbRY2+4PvUKkMpz9BWf1RZUPcVhRb4NVTh0QkA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Nn4rhkVFD5Inqs2Mi19kGQfcvGI+KjFHQAP7Zgq0Yyk=;
- b=jgcT9890k1BTNS3lEy0Uv3q+x0A9snasgwB+ju1Fyx+vs8NcwsDIXXh4hHAlHLSRwmDjaYGTDbp/9mIptLWcT+tkP8/LKtyIfQikUWEQU2mRuZhKGownFY3u7pq/NELD0NpAH8WQvM+48xkJap8vstmA9r+84aRMEukPE/tBHhS4AdDA6NouwIKw5OUJTpPGJRgbI9RCP4rDSRpwnL1wNyHw15OtyNltXIi4uCOX8vzfYF8lnKYAb1FFgZc6JXMA7k8+/rylf1Ez0iuFOjw5Y+Dxm5TeJ1dwV1uUWd03+Ahfz16yBDA6kP3OvqXtU3unKT0CYxk83WLm4tA+Vz1D9w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
- by DM4PR11MB7277.namprd11.prod.outlook.com (2603:10b6:8:10b::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.14; Thu, 27 Nov
- 2025 07:01:57 +0000
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::395e:7a7f:e74c:5408]) by IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::395e:7a7f:e74c:5408%3]) with mapi id 15.20.9366.009; Thu, 27 Nov 2025
- 07:01:57 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>,
-	"intel-wired-lan@osuosl.org" <intel-wired-lan@osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "horms@kernel.org" <horms@kernel.org>,
-	"kuba@kernel.org" <kuba@kernel.org>, "edumazet@google.com"
-	<edumazet@google.com>, "davem@davemloft.net" <davem@davemloft.net>,
-	"pabeni@redhat.com" <pabeni@redhat.com>
-CC: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v1 1/1] e1000e: introduce
- private flag to override XTAL clock frequency
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v1 1/1] e1000e: introduce
- private flag to override XTAL clock frequency
-Thread-Index: AQHcX1arbuTyFdkjc0umf07U/pyY67UGFlDQ
-Date: Thu, 27 Nov 2025 07:01:57 +0000
-Message-ID: <IA3PR11MB898649A13E7FE4FF54F6601AE5DFA@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <20251127043047.728116-1-vitaly.lifshits@intel.com>
-In-Reply-To: <20251127043047.728116-1-vitaly.lifshits@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|DM4PR11MB7277:EE_
-x-ms-office365-filtering-correlation-id: 495f59d2-0eb2-4bdd-7720-08de2d82dabe
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|921020|7053199007|38070700021;
-x-microsoft-antispam-message-info: =?us-ascii?Q?OYpeGCM+KnzOytnASssrfUJQKQGu+GTlszsafvY9o4wE0CuM9SD6oOIiSRVr?=
- =?us-ascii?Q?0+RYgu7Cf3irk+0MXpJhGZWxWwqjk2rsFG0He5NmcH+geLQP0sgc37DIduJn?=
- =?us-ascii?Q?zIQZCfY+jh1gQ71aT4HNQcS+VNBeMGJLRHZ2+WdKeg5OXg5uhcI3PoPh63eV?=
- =?us-ascii?Q?qL93H4grlAWPOvEF1yWyeL4N7SlvLA972CY13Iuapojba5FXzBn1yLJJiyz+?=
- =?us-ascii?Q?K7hy3L0YoQ/uEMyQFU1YTq01hJ6SeY8zhUjUTAZrzn7XooW1GV8EYVxsQfsN?=
- =?us-ascii?Q?lzipAE51VnrArq2Hsf7nK9v/vZCxa69sJGwuvmzxPuoJJHPg18JSunwccijt?=
- =?us-ascii?Q?1kvV/Q1yKp7C+dPmQX1rtNIGcWPOSHWwHkx3XB6xDp64bZAZLx0e3e/jO2Qq?=
- =?us-ascii?Q?Lma8p8TjuTUX3a+Bz26eU8e8l21ZtirQ6CgF6VW0ZpPEyZQ3zrbUtfvnGWF3?=
- =?us-ascii?Q?nJyU3IiSG6J/MI7/axt0PoiUJSEEZgLAofFh73qdXBXWJX6zMML9X4cjKJiV?=
- =?us-ascii?Q?/Wfj8mVdWmNqjeD7bbU+GOILZHtmJ/1IS98szWPZ8U2Uvt9gJYjbvy3fY4ks?=
- =?us-ascii?Q?jtgh4uovVUK8yWOgPfVADZufI0nceK0iksBFtvK2ETToha/GwmAjQsxWBWHZ?=
- =?us-ascii?Q?A5Zh7blo/qZWEXh22DUpEOxp12FSmCSbR/R/CI3EA0H7jgUXgEVRsIxCDy7I?=
- =?us-ascii?Q?zccWiWWdD1/ycLyhHZoGWwlL/gJZeVhFrNCzqPQZZ+u0xBEVPRrwYVr9T0s9?=
- =?us-ascii?Q?jb4eRtlPKFduLhb/kflB3Z+ygSM6grM+zGQTr/d2H+YukgvA2f+bw+CsRenE?=
- =?us-ascii?Q?H9oACu4RCUBlULnlK2lEjx9XRIXOVP+f3+sap6aOTN/Dji7NhRgw5GKirEzr?=
- =?us-ascii?Q?YRpcYa1ScVvmYwupdXXTrt8pTCjoX6LIlyynbJRAKRFPEgBtc6SCKSgCXK6x?=
- =?us-ascii?Q?CsWA14XBumtMf6LeXEhQuVSNnQojO43qWx3GKfFwHBeXrNAXUw7/J7jA2EH4?=
- =?us-ascii?Q?mDP+Ewr4mhUVNfrJasQSdE65YNzntV835H+FmQFjSXML78etmG5SZPsU5ajv?=
- =?us-ascii?Q?+wMLT0MYNZPKjc0gvb0dzza/Ky+ItGaS9S4584PcKna2VY0MMPoMFYjXA0ng?=
- =?us-ascii?Q?Q7X7/o31rsLUYZfReNwXh0bXfYJkB2M3q5qCbS6Zfaf8apiyjOwuEcCVL6D8?=
- =?us-ascii?Q?OMw5BhW63p2LeANGJb0TXi+I7/dgnYY9sq/6oSfZreRoKdlDqTR/LMLVs5cp?=
- =?us-ascii?Q?NIvQXJyvQruqQ8CTc0cDY5ScgTQlV8LjixgZe1+9x9P2O1YuvUsge+qaAv0p?=
- =?us-ascii?Q?E8YL/RVYZ3E6sZHQ/ZTHQ9tHGohn9oQv/quQmLDOnX0U4Y58m7SDvd5+UWpX?=
- =?us-ascii?Q?h5ly9zGzlqzADsStdOxnl9k+0JOBCArXtd8LVyFIIGCELgZOeWCLoGTX7DPc?=
- =?us-ascii?Q?w6/yIxrTWsRcLHI14b4civ2qOjELO/TVL84HUN+jD1z6MvMN9r2xJPvcWYIC?=
- =?us-ascii?Q?EXO/a31qRRLF0NomYQQ6g2pw/IWQsZBhOz8Ief72bdcRBrtxOV0xB8/NeQ?=
- =?us-ascii?Q?=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(921020)(7053199007)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?fvUhG/DYEgDPbifJyKCQahKG/Vh3rREHZIZ/tGwhcthCainSHDj635BNpJLp?=
- =?us-ascii?Q?QorsOvEjJ2pTJpoqCXGCJmhPTJTbyIxJRycCvdLVFYrZYL/oUyZs7ubLegxT?=
- =?us-ascii?Q?6toaBiC5VvP2u/1widOaAw41W+MSDeVpAp2AUgntaSvapUexdprsmcsEENS2?=
- =?us-ascii?Q?n+4d06g6Csw9hay8SFViEJEayXSi8wbA8P/imXcGEAMnA49HRN6cBLrHW5na?=
- =?us-ascii?Q?C1ZmH9oaRAjyMJVmQNZJ7PvDdkozPubcBKFKNoqxhUXlkXvJEiGC/gIg/gMk?=
- =?us-ascii?Q?d6RpnbhV97VgtRtpnd01M/pxYsNgxB0cN3zi/khy3JUH6250TaOBwiEQFhdg?=
- =?us-ascii?Q?i4RlxwOdF/2FtG6An8DX24fILoBfFteWTLkcVI9v5llJvXlWYIVrJf8WJfI6?=
- =?us-ascii?Q?1Gb/Q8pXECxOgcf0EN0MTTnKBwvQYIZPsAHHTP7E4cRcdchsbo/QRFogt0eW?=
- =?us-ascii?Q?AuHQjv+/yWC5VVQ4TNDQlWc8tIeTH0T8CERN3VvF6z73Tl4giacc4eOAtXHI?=
- =?us-ascii?Q?Vc27sUvjmiz8ntOxFPxwOtj7fVtwh5pcNfGlgdg7znaPmUgo3/2hv9XFegAQ?=
- =?us-ascii?Q?OzbqkRhG1u1MHNcy2IqZUBgTmRoT1tCTk2SrWV8eONJ/Y8ivApC/aYqhsHNy?=
- =?us-ascii?Q?oN1na1k2HoonkV5ww1nT2lldPrUvnmZBEoFmAiM5vCOEQ/OxJ81mObaB8Otn?=
- =?us-ascii?Q?0AM7vpwuOe/ivnKCuAG7gwK42sRI1weVO44Um42CTNfen9PYExqr36oS9lTj?=
- =?us-ascii?Q?beUeQ5W+or53sv287iO64PNdYj1DsHxB1wJmbLN8lZoYRE2fry11sNQpJHuh?=
- =?us-ascii?Q?u/x05+n6J6s45hh0DYQbejrLXePDLOThhLGM5eUsOhnJTTIE+wZQW/E4cFIF?=
- =?us-ascii?Q?5nrX2VgoHeQL2ge7hn8BR+wMMmQswKqupH1LnL2uwNzIE74oHxYukunVZHGU?=
- =?us-ascii?Q?M5qeWHI3Gymu6fsg8jCi5ifw9HToznIRBjNbXotVCthJMVORh0X4NLOYQcjO?=
- =?us-ascii?Q?C+5Wm8ba2qRy4Gi7E6wgroWbxzegAuaMnAm0y+HCD+mUb7AVCyUP6ZVFlVbK?=
- =?us-ascii?Q?UZb4SdQaSYGrLLMBF/qbJcl6H6MAb/03V+uluPpp2n73Rsie45EukOSWq73p?=
- =?us-ascii?Q?Qt0lFA43g+l4LdfBgy8uAQ0R+7L0VyfpsbFRZ7R6+YrKtaeFZzURZpmVMbhO?=
- =?us-ascii?Q?6VDml0mf2K4gb9EKtDBNkC9OTlnwU/6rUeB+g5EpSCEtoCR+yslsWZgswg+z?=
- =?us-ascii?Q?hXg64eOpBhAu31A2WtavYoBbxOwzK/nfY34f1DWrgncCGJMu/yjU3hyraGYp?=
- =?us-ascii?Q?VsJE/PYT1360OALos4CFWH4+6z/HcsnbgVII9MGAQFO+88qWdgJ7PI4QYYHQ?=
- =?us-ascii?Q?/KuzxsyHz1OpIMH3TXAFRdsNoPRHf8WtYZVKPoGYqCnSbuxlxYTeiZPm5nnD?=
- =?us-ascii?Q?WUAIRQdAEDA/qZ7YtdpZHUXUFCVizNZeMa1NIPD2opnVS875f5Fv1Ep7l5JQ?=
- =?us-ascii?Q?xZ8eeQqmmj4bBY+n8YZL8Bk4A46D5k9uPLHp9qta2SXxmkvBJqMwZJO3u52h?=
- =?us-ascii?Q?m1a4ryU9x8i8itfoEN2s3w9W32ZbEWUwwvTakHBpUfrtWxph7tSB69NyFhZ8?=
- =?us-ascii?Q?dQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D2432D94B5
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 07:02:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764226927; cv=none; b=ekzP64GbYfs7H30FXt3rN6YA905gTI8dtwo5qS1iJ43C8MO7CXxcpWiHl0h0gAIX9djFxAQ+ScDX6gWGducAdw3PdEa5Te+x4TMAtGoVFj00m6ksIWhdPXSn9ChUT3O/dkgLiztVjKlc8ZhPiyz0sRV6THbrhjkE0JSdNINgyLE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764226927; c=relaxed/simple;
+	bh=xjYmOYkC6hQCN6h0Wrd6wD3+n3RutDCKmgFu6vCgU3E=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=OqI+ATzCRCIC8HSWvODpJUMz9XYl1qtUOX7v4mK9jgId5s1ErjsSZmCo7XXNOmwZiAR4VgfdFOSfwaJ2LStjCw6BFtKgU/chWCZtLduhPzVaaPw5CWgHw2XbmyDcEhU4iD59jPATwvJWV4LmFJ7c1Y3seB4BPjuJyUZPttqtGMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Hfnf3juB; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Id9swuIQ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764226924;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to; bh=zSWWelL3VjQzbwp1FSCA4jXNnLH0PC4MUEaJbD9i6vM=;
+	b=Hfnf3juBPkmeP7VdstvkZEPGyQPlTuGTMJX3AaOlTWZwZn+TFO52RDbzK6dYNDilntSs0F
+	RcExJNgIXZsc2B2Cv9wwpL+mOkjmWK7YZhOaXqT0cs7zPbgMIJWPF2SO5w7STG1jdzCkIn
+	niBOg18rXPRMNzcR70xKX0jql2Crw+0=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-211-QqbKBDp2MjqvFgrlyiSPSQ-1; Thu, 27 Nov 2025 02:02:02 -0500
+X-MC-Unique: QqbKBDp2MjqvFgrlyiSPSQ-1
+X-Mimecast-MFC-AGG-ID: QqbKBDp2MjqvFgrlyiSPSQ_1764226921
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4775d110fabso3730605e9.1
+        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 23:02:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1764226921; x=1764831721; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zSWWelL3VjQzbwp1FSCA4jXNnLH0PC4MUEaJbD9i6vM=;
+        b=Id9swuIQMmOfW94DIy0QI99WwQmUkEfNVLU6wypz0c1Rob6vt7JEqkACq4XoV7Dzxb
+         U+V2yjdlgx96WxsT38WtD2Cnt8HX+dBNzCyZNJfyyGoyVgxSWwfiGqPEdW9U1blU8rCy
+         dlCeif/5K+LJjhuRBzsG1Occr42FnHkDFCLIcB1cPAjAwkWcS3Xkf14ukVLEizb3uVUG
+         gKrDb58lOu2qVgX0WHyiAwfHePTrriDdO6t1R5qiH365gHuDFB3OPQirpDgZ6cZhwXrz
+         OdpTuWRRH+YkUz5//it/R71HSnrWlTOUH8p1Ry97gmHYL4lWNN67BIClGZK6P+n8KRYi
+         eLBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764226921; x=1764831721;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zSWWelL3VjQzbwp1FSCA4jXNnLH0PC4MUEaJbD9i6vM=;
+        b=lKr41JIoGlaIND/3KW0L4HC46UUnxbZeEh3fx/1uQt5cwOjLRZJRIObkik2zdVy6XP
+         ckfzg3GL18dKcwkXJPpOTb4BhAKmYtDVG8ybkKAmdNbrT94hR3f3qBYhEgVJkq5gItfx
+         LBGuJve15B0orXfQZrB7aKfI6rjkFlNqjKnPWpvSMYnIPANS1QpBN5axfjnuaOTcdn5t
+         euLeQMVqu474kuIOEhzFalk6Zt9SI20bQaBkkzCZojc86ZvShYxQ1rE7N+StDzNOdkqi
+         2W2CGcmVVg67rmJyaZk/6I+0oq/hPQfiAjl6sFm6wFoBy9gGeg1hqMoYx8VOTzT2cUl8
+         VU9g==
+X-Forwarded-Encrypted: i=1; AJvYcCXkTYn/X18UJTpoHi6+gvCc+QMINtS4ivIjGaxKB8Gl5Dysoojuy63K0fyURmDT7VUYBHL6EZE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPKs77qseBxxoolYrC6QBG13WxoVYd4BkDmnabS3v3kXI816MI
+	eNULzli9z5HYfenRvHEWz+oSs/J4gs7999Y40odutuvRiSFVsENGl99l2Rv9NgXCycbjsAbRSlN
+	Ra+MJj2ePdamtWU0+M0KZaVrFIT33dLgYWz3kWoiBH152gT5SDohEngCM6g==
+X-Gm-Gg: ASbGnct0hVlxys8AzmzZRQuDlE7t37OCl9opsEw4GNEHGa/QJdCcJAUE8KW9zgmRuhH
+	NBdxeVBjwCkitCMzC/HUk4/JikZZvL0QAObBmDN/4A1YdQb+Ui+FNihIK0cWtkCeM7Bg9ESQDmZ
+	v7V5tINBcEFTYCvKxhbaWYk0d+SLGjCtzLmPqNY6RRTjGFetZ7/9lvjgUlKQPYWdcYvVhPxugTt
+	hUpoFGuhuwGeLdwFj4nde2bWrWaQOYz49Haa0kD7G3I2S7K+2v9rTzJeJrOfkanqN++dbaolcT4
+	HVsZJQFFPz8d+oPGplU/Yy/1zutC97N0Yqz/K183oc7Ctsxnt2uIgYvVrp1YT4x0+bKyuJ26Ycn
+	KyPPRw3rOktJo84wHUUuHWa09uWWYew==
+X-Received: by 2002:a05:600c:4e91:b0:477:7a95:b971 with SMTP id 5b1f17b1804b1-47904b2c3dfmr100075865e9.31.1764226920844;
+        Wed, 26 Nov 2025 23:02:00 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHeJSq2o5Jh57pm1UqzfET6pe+NMDqgpP0OpHkh/lilO5EV4Yb7bQ/OQj6YpndJYbLTati9Ig==
+X-Received: by 2002:a05:600c:4e91:b0:477:7a95:b971 with SMTP id 5b1f17b1804b1-47904b2c3dfmr100075365e9.31.1764226920341;
+        Wed, 26 Nov 2025 23:02:00 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-479111438b9sm17019475e9.2.2025.11.26.23.01.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Nov 2025 23:01:59 -0800 (PST)
+Date: Thu, 27 Nov 2025 02:01:57 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Bui Quang Minh <minhquangbui99@gmail.com>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH RFC] virtio_net: gate delayed refill scheduling
+Message-ID: <40af2b73239850e7bf1a81abb71ee99f1b563b9c.1764226734.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 495f59d2-0eb2-4bdd-7720-08de2d82dabe
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Nov 2025 07:01:57.1519
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: lK28ehXIAvgwwrmrs59gjZpxs27DyZCoCTCBpb+NcMkFx1z2vuBY1pKrKjvRDKObBFacusmGuBBYHSmwXXIT9XqdnJCCGbFEGvJlK/A2ASw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB7277
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <526b5396-459d-4d02-8635-a222d07b46d7@redhat.com>
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
 
+Make the delayed refill worker honor the "refill_enabled" flag by
+checking it under refill_lock before requeueing itself. This
+prevents a window where virtnet_rx_pause[_all]() disables NAPI and
+synchronously waits for the current refill_work instance to finish only
+for that instance to immediately arm another run, which then deadlocks
+when it tries to double-disable NAPI.
 
+Add and use a helper that encapsulates the locking and flag check so all
+refill scheduling paths behave consistently and we no longer replicate
+the spin_lock/unlock pattern.
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> Vitaly Lifshits
-> Sent: Thursday, November 27, 2025 5:31 AM
-> To: intel-wired-lan@osuosl.org; netdev@vger.kernel.org;
-> andrew+netdev@lunn.ch; horms@kernel.org; kuba@kernel.org;
-> edumazet@google.com; davem@davemloft.net; pabeni@redhat.com
-> Cc: Lifshits, Vitaly <vitaly.lifshits@intel.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-next v1 1/1] e1000e: introduce priv=
-ate
-> flag to override XTAL clock frequency
->=20
-> On some TGP and ADP systems, the hardware XTAL clock is incorrectly set t=
-o
-Please expand platform abbreviations ("TGP (Tiger Lake PCH)", "ADP (Alder L=
-ake PCH)") and add minimal test context (kernel ver., device PCI ID, FW, ph=
-c_ctl version, and whether CLOCK_REALTIME vs PHC was compared).=20
+This fixes the deadlock triggered by the XDP selftests when XDP is toggled
+and RX is paused/resumed quickly.
 
-> 24MHz instead of the expected 38.4MHz, causing PTP timer inaccuracies. Si=
-nce
-> affected systems cannot be reliably detected, introduce an ethtool privat=
-e
-> flag that allows user-space to override the XTAL clock frequency.
->=20
-> Tested on an affected system using the phc_ctl tool:
->=20
-> Without the flag:
->   sudo phc_ctl enp0s31f6 set 0.0 wait 10 get
->   phc_ctl[...] clock time is 16.000541250 (expected ~10s)
->=20
-> With the flag:
->   sudo phc_ctl enp0s31f6 set 0.0 wait 10 get
->   phc_ctl[...] clock time is 9.984407212 (expected ~10s)
->=20
-If the XTAL override is applied via a devlink driverinit param, this reset =
-is expected and should be documented.
-If it remains a runtime privflag, I think you should explain why a reset is=
- required.
-I'd recommend documenting the reset requirement and user impact (link flap,=
- timestamp discontinuity).
-/* Add a short comment near the reset logic in code and
-   Documentation/networking/devlink/e1000e.rst (if converted to devlink par=
-am)
-Or Documentation/networking/ethtool-netlink.rst (if kept as privflag) */
+Fixes: 4bc12818b363 ("virtio-net: disable delayed refill when pausing rx")
+Reported-by: Paolo Abeni <pabeni@redhat.com>
+Closes: https://netdev-ctrl.bots.linux.dev/logs/vmksft/drv-hw-dbg/results/400961/3-xdp-py/stderr
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
 
-> Signed-off-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
-> ---
->  drivers/net/ethernet/intel/e1000e/e1000.h   |  7 ++--
->  drivers/net/ethernet/intel/e1000e/ethtool.c | 39 ++++++++++-----------
-> drivers/net/ethernet/intel/e1000e/ich8lan.c |  4 +--
-> drivers/net/ethernet/intel/e1000e/netdev.c  | 18 +++++++---
->  4 files changed, 39 insertions(+), 29 deletions(-)
->=20
+Lightly tested.
 
-...
+Paolo is there a way to confirm this actually fixes the bug?
+Could you help with that?
 
-> --
-> 2.34.1
+ drivers/net/virtio_net.c | 29 ++++++++++++++++-------------
+ 1 file changed, 16 insertions(+), 13 deletions(-)
+
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 8855a994e12b..e2bfe8337f50 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -734,6 +734,15 @@ static void disable_delayed_refill(struct virtnet_info *vi)
+ 	spin_unlock_bh(&vi->refill_lock);
+ }
+ 
++static void virtnet_schedule_refill_work(struct virtnet_info *vi,
++					 unsigned long delay)
++{
++	spin_lock_bh(&vi->refill_lock);
++	if (vi->refill_enabled)
++		schedule_delayed_work(&vi->refill, delay);
++	spin_unlock_bh(&vi->refill_lock);
++}
++
+ static void enable_rx_mode_work(struct virtnet_info *vi)
+ {
+ 	rtnl_lock();
+@@ -2959,7 +2968,7 @@ static void refill_work(struct work_struct *work)
+ 		 * we will *never* try to fill again.
+ 		 */
+ 		if (still_empty)
+-			schedule_delayed_work(&vi->refill, HZ/2);
++			virtnet_schedule_refill_work(vi, HZ/2);
+ 	}
+ }
+ 
+@@ -3026,12 +3035,8 @@ static int virtnet_receive(struct receive_queue *rq, int budget,
+ 		packets = virtnet_receive_packets(vi, rq, budget, xdp_xmit, &stats);
+ 
+ 	if (rq->vq->num_free > min((unsigned int)budget, virtqueue_get_vring_size(rq->vq)) / 2) {
+-		if (!try_fill_recv(vi, rq, GFP_ATOMIC)) {
+-			spin_lock(&vi->refill_lock);
+-			if (vi->refill_enabled)
+-				schedule_delayed_work(&vi->refill, 0);
+-			spin_unlock(&vi->refill_lock);
+-		}
++		if (!try_fill_recv(vi, rq, GFP_ATOMIC))
++			virtnet_schedule_refill_work(vi, 0);
+ 	}
+ 
+ 	u64_stats_set(&stats.packets, packets);
+@@ -3216,7 +3221,7 @@ static int virtnet_open(struct net_device *dev)
+ 		if (i < vi->curr_queue_pairs)
+ 			/* Make sure we have some buffers: if oom use wq. */
+ 			if (!try_fill_recv(vi, &vi->rq[i], GFP_KERNEL))
+-				schedule_delayed_work(&vi->refill, 0);
++				virtnet_schedule_refill_work(vi, 0);
+ 
+ 		err = virtnet_enable_queue_pair(vi, i);
+ 		if (err < 0)
+@@ -3469,7 +3474,7 @@ static void __virtnet_rx_resume(struct virtnet_info *vi,
+ 		virtnet_napi_enable(rq);
+ 
+ 	if (schedule_refill)
+-		schedule_delayed_work(&vi->refill, 0);
++		virtnet_schedule_refill_work(vi, 0);
+ }
+ 
+ static void virtnet_rx_resume_all(struct virtnet_info *vi)
+@@ -3815,10 +3820,8 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
+ succ:
+ 	vi->curr_queue_pairs = queue_pairs;
+ 	/* virtnet_open() will refill when device is going to up. */
+-	spin_lock_bh(&vi->refill_lock);
+-	if (dev->flags & IFF_UP && vi->refill_enabled)
+-		schedule_delayed_work(&vi->refill, 0);
+-	spin_unlock_bh(&vi->refill_lock);
++	if (dev->flags & IFF_UP)
++		virtnet_schedule_refill_work(vi, 0);
+ 
+ 	return 0;
+ }
+-- 
+MST
 
 
