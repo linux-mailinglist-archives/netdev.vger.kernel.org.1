@@ -1,509 +1,361 @@
-Return-Path: <netdev+bounces-242179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A5CDC8D2C8
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 08:47:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FA9FC8D2FB
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 08:48:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 228D63500AE
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 07:47:13 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7CA93351C20
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 07:48:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0DAF322749;
-	Thu, 27 Nov 2025 07:45:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67DEC27FD49;
+	Thu, 27 Nov 2025 07:47:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lC43C5qh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gBFtq/AG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18856322C65;
-	Thu, 27 Nov 2025 07:45:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D54F31DDBB
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 07:47:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764229535; cv=none; b=Qq+eJ7bWlrwGZ3FE3Rg9APH2rdzCQfczF/NBK5b8gQ5ijxZC4EFbt0mMsUFiq3toXmfURcn3xK9IA2pojMR/bMdMeU6GjkaRTl4XJmJl25Ef0MULfIAXvewVpjlAq0jt9nAERBOUsg+/sAVZ+3G0TnPNM/UxeL1Fq4BDM7NRn+s=
+	t=1764229665; cv=none; b=eg0GlIcb+zDBA32Lw57JyPSmcgviXMz6B5xLKRhVYR3zknKeQ/MQkPg18SfVO6nPLs20jDaWDH1Cfkpy2CPPFKjbS1Akt7LnQ1qrpS+T1x8BlvZkY8r2HXgPedR8iaVOpB1uxtycYKJ5VYPa4AJOd7FOjoQ4bqQLSRKTXLyR+ZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764229535; c=relaxed/simple;
-	bh=3tQ7dfVOCFrM7EamkaD4WsIwnebOZw+oja+WkMdpyHc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ttfmIKh5m06d/r/pT4JHKt5SzIGmRuhC5c6uUG3/0C0BfZIBdMKgenK5aKB+1t2AcpNj/B1ZLlxyOdTqlF5xyFtuGLslf16nIDDHoi4FTeeY8cjTH+ovP94qctTEmxv1zq03K6pR/P5VogxpJVmXMOlhDQI40/QOSikqoOu1Qtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lC43C5qh; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764229533; x=1795765533;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=3tQ7dfVOCFrM7EamkaD4WsIwnebOZw+oja+WkMdpyHc=;
-  b=lC43C5qhRiguLPx86SB+sgsyXR2oh2Et97qTL/NcRitZbm7hx1mP6aU3
-   5L85o/vF8JTwIpfGTdEbM9ImjBtDdcVsISGeJQKFzEFkN3f/57u7KyMzT
-   gsh2BXfU5CDFxFkPUrZOdwFjYRWRcgIT/oo1ny2Jw1tAs77WsYgnAm9FS
-   rPSk8dFZ+lj8UfAYVHwiiZj4mUl1rDPaSfbO+QffoNDwxUHca748qGcGU
-   o7luGP9MKkbhKt0FRgL1FQj8Mc0xmzSc5CKIaQGrDoIX+A8LRV7OpNs2c
-   KHhLbT2l4G2IcXBlx2/Qdxzz83TuAcXtV5tbdL77hXBQFfIjqboUBQj3S
-   w==;
-X-CSE-ConnectionGUID: 9XivmC9TShmaZ59ClgdLVA==
-X-CSE-MsgGUID: iNA+W94VTMKby9frnewBYQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11625"; a="66163809"
-X-IronPort-AV: E=Sophos;i="6.20,230,1758610800"; 
-   d="scan'208";a="66163809"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2025 23:45:22 -0800
-X-CSE-ConnectionGUID: CJhGAkj+S8yzAEFbdlo3jw==
-X-CSE-MsgGUID: o359mKLNTsKiYdromlvE7w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,230,1758610800"; 
-   d="scan'208";a="193263876"
-Received: from black.igk.intel.com ([10.91.253.5])
-  by orviesa008.jf.intel.com with ESMTP; 26 Nov 2025 23:45:19 -0800
-Received: by black.igk.intel.com (Postfix, from userid 1003)
-	id 50276A0; Thu, 27 Nov 2025 08:45:17 +0100 (CET)
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: [PATCH net-next v2 1/1] idpf: Fix kernel-doc descriptions to avoid warnings
-Date: Thu, 27 Nov 2025 08:44:52 +0100
-Message-ID: <20251127074516.2385922-1-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1764229665; c=relaxed/simple;
+	bh=TNNne8XLhqlNlunNPucnkVWhceVeGlCmRI4NfOKpkeA=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=LcXOJmgSH1GTEBQ8x9a0O4ANkZe7zSEMreONv3RPopdIwFmACzBz4SY+6xTrU28azGgqnjyOL2phUA/3XHXuTDzaihStHrFk9wFXUI2ktNeZ0p9AHGiYCf+HcC6j75ssp7c6l0Faqobx+WUAk0nYvG4UotQoRecUnCazB/6Amsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gBFtq/AG; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7ba92341f83so951263b3a.0
+        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 23:47:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764229663; x=1764834463; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0ZAA6uw9c2Lc+DAsj4spPmKywmkPEH3VXjHiCbvXTz0=;
+        b=gBFtq/AGQfQ4WPUOfpnY47e4dslwjrapyyGrQmxVYfWpI+0mcJP6S5BxYQXYpGRi0m
+         SoC4HUdaKw4NpmlozzwNcXrrE42oUBV434nAW975eStH8JDyKTP6OrU3FItJz8iVaRCI
+         iQRy/w7lFWINxEbsWu/iCw6Cy3STWMgbBQzHh57Z11cl0ZHCu31mwHoYBG+lfXAX2M7B
+         w5R4s+DXEyZmi/m/b6mplAFIDVoecb4ghsVHG7rmAMiyFkZ4NZ6UiLpc9HV9beQEF3zh
+         fwZ7TjvBTX2uPKIivdp/6gzDe5UdBEXRWIvS9/bzjLm66D8jjvLXVj7RXw6Hl90yNGQQ
+         JzpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764229663; x=1764834463;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0ZAA6uw9c2Lc+DAsj4spPmKywmkPEH3VXjHiCbvXTz0=;
+        b=pN9KfsxGSZHnBIYjvgBlGygX19koRWRwneKI7Nsra6b1hELtHHcHmX/FS7aGJxUHL6
+         sHk1PF909Bpr0eQf7EqS0kAs+BFpYtN7Cnl6GwOjAwm3CBSiYEBdRfGVF2WQ0zkUTeik
+         FGkvWRgIoDyx44WDFyDC9e46YE8RaMuLZysV2/zLVbFAPB6p3sJb0HqL2t3R4W4PS0MH
+         o1Plv0uzOprbGmGCEQuLPn8U8m8bxe+oF5nEDhVnf7jicynimOQXaK3X1LqZQiFUHum4
+         0i85WMH7Qe3cFY0lTfKOpHdwRiDHge6ygnbevFyEi098teOrMDX1p907xM9LOrxj6TVh
+         b+xw==
+X-Forwarded-Encrypted: i=1; AJvYcCVXbsd3Peu2Gd1CBaNOpdEhITrgpyppIAeEMzy7PHZZyXun//lJ841dORVoZAI7/Y1o2N6nW3w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwttG9rBrUXMXpKRVJ9z5wK3enKJBHGRRpTCDM1xwwRMxUHdkmb
+	sRfb5JtUm03qVxJrdrB5OrHAtvR1xZwAUu3fXxN1Y0XUaD8y8rZhr9P8/QlPJ50J
+X-Gm-Gg: ASbGncujEwc0YcQ4ekIZKYIH/I1vcOfIoS7TpG7Ue+1Uzhu3EHBXBFqXFkvk7wEEZYj
+	K/XWUHN+kURZcuChElkiIbFs2CnqAtEY/QNWuAK8vIlGSA95/g8oqQplUOd5wJo84/AcV/sPre2
+	pCUveoRGZMW4p6lIBjRej0qEPHRRfCJBi08zayah8h4PMuH01JfjsJt2I0ZsK/4RJZrDXnsSxlq
+	Q5VVUPHQ4Tlvldk00bsqxgEm0ru/m6P7TXvBUORgVPxmBl3cwF2E/kA0rpfpwEk2LmdzWokihEn
+	HpGBHjRg9rgGZhQKPa4ydEK+G7/Q79vYC3tiXUxFxS/DAqBgFU8n1YBqNqjex9ld/7iysf9Tg1V
+	zHQpRf9myGoC2RiA+lYnqMYInJwdp4uDC3e1ENZAKhUpZTVeHM0PRXwMTR8pwZBPkJJZ7j5d9e3
+	OyRuuzoxVf/cfSs0MubEg=
+X-Google-Smtp-Source: AGHT+IEMHFIfTY6i1S/akQaQN4HyWaVoZ4LOyH7x2PsJhD3hks5PhCeUCyC7Oz/YmSm3eXvprDRIbw==
+X-Received: by 2002:a05:6a20:12cb:b0:361:1cef:c39b with SMTP id adf61e73a8af0-3637e0b12camr11136512637.45.1764229662566;
+        Wed, 26 Nov 2025 23:47:42 -0800 (PST)
+Received: from localhost ([2a03:2880:2ff:3::])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7d15e9c3d90sm919235b3a.38.2025.11.26.23.47.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Nov 2025 23:47:41 -0800 (PST)
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+Subject: [PATCH net-next v12 00/12] vsock: add namespace support to
+ vhost-vsock and loopback
+Date: Wed, 26 Nov 2025 23:47:29 -0800
+Message-Id: <20251126-vsock-vmtest-v12-0-257ee21cd5de@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIABICKGkC/5WTS27bQBBEr0LMWh109/yFIPA9Ai/m07SJmJIjM
+ oQDQ3cPxAgWM/Ima+LVGxa63tUkp0Emte/e1UmWYRqOB7XviHedKs/p8CQwVLXvFCNb1GxhmY7
+ lByzjLNMMWSemyoRcWO069XqSfnhb876rg8xwkLdZPe469TxM8/H0exUttH5fIw3hv5ELAUGvb
+ QpUU46hPDyNaXj5Uo7jGrTwFvYNzECgI1JirzVJaGG9gTk0sAYCCpR6R073WlrY3GCLrdkAgRN
+ O0bPjUt0G3l3rC2jvIAS0UYqllInoYZQ53YR2IyTdsBYIjHhbTDK2SP5MyP4OQsCcbMAsVWxuh
+ G4rbB/rgCCmnkpB1hHxE2EkdwchoDOVJWMJsTZC/yEkZGpYv7KOss+ux7Bp5+r7L2b1ha2vbTQ
+ AQpUUg6nIOWPDEt5gurs8wgvdY+jJ2Xy5noamDc13R0+AYG3JJSCbmPyGPv8d1kl+/hqmYb6ua
+ 5RpSus8993X6w/xNXWSl/6SO8G6RkiHCsP4ejouMsphni4jQ5AqmXyszjj9oft26TanSaAcx3G
+ Y9110nIotKcZkixZvXGSyuTfeejYGDXLtq43q8Xz+A9UoUFJQBAAA
+X-Change-ID: 20250325-vsock-vmtest-b3a21d2102c2
+To: Stefano Garzarella <sgarzare@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ "K. Y. Srinivasan" <kys@microsoft.com>, 
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
+ Dexuan Cui <decui@microsoft.com>, Bryan Tan <bryan-bt.tan@broadcom.com>, 
+ Vishnu Dasa <vishnu.dasa@broadcom.com>, 
+ Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, 
+ netdev@vger.kernel.org, kvm@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, berrange@redhat.com, 
+ Sargun Dhillon <sargun@sargun.me>, Bobby Eshleman <bobbyeshleman@gmail.com>, 
+ Bobby Eshleman <bobbyeshleman@meta.com>
+X-Mailer: b4 0.14.3
 
-In many functions the Return section is missing. Fix kernel-doc
-descriptions to address that and other warnings.
+This series adds namespace support to vhost-vsock and loopback. It does
+not add namespaces to any of the other guest transports (virtio-vsock,
+hyperv, or vmci).
 
-Before the change:
+The current revision supports two modes: local and global. Local
+mode is complete isolation of namespaces, while global mode is complete
+sharing between namespaces of CIDs (the original behavior).
 
-$ scripts/kernel-doc -none -Wreturn drivers/net/ethernet/intel/idpf/idpf_txrx.c 2>&1 | wc -l
-85
+The mode is set using /proc/sys/net/vsock/ns_mode.
 
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Modes are per-netns and write-once. This allows a system to configure
+namespaces independently (some may share CIDs, others are completely
+isolated). This also supports future possible mixed use cases, where
+there may be namespaces in global mode spinning up VMs while there are
+mixed mode namespaces that provide services to the VMs, but are not
+allowed to allocate from the global CID pool (this mode is not
+implemented in this series).
+
+If a socket or VM is created when a namespace is global but the
+namespace changes to local, the socket or VM will continue working
+normally. That is, the socket or VM assumes the mode behavior of the
+namespace at the time the socket/VM was created. The original mode is
+captured in vsock_create() and so occurs at the time of socket(2) and
+accept(2) for sockets and open(2) on /dev/vhost-vsock for VMs. This
+prevents a socket/VM connection from suddenly breaking due to a
+namespace mode change. Any new sockets/VMs created after the mode change
+will adopt the new mode's behavior.
+
+Additionally, added tests for the new namespace features:
+
+tools/testing/selftests/vsock/vmtest.sh
+1..28
+ok 1 vm_server_host_client
+ok 2 vm_client_host_server
+ok 3 vm_loopback
+ok 4 ns_host_vsock_ns_mode_ok
+ok 5 ns_host_vsock_ns_mode_write_once_ok
+ok 6 ns_global_same_cid_fails
+ok 7 ns_local_same_cid_ok
+ok 8 ns_global_local_same_cid_ok
+ok 9 ns_local_global_same_cid_ok
+ok 10 ns_diff_global_host_connect_to_global_vm_ok
+ok 11 ns_diff_global_host_connect_to_local_vm_fails
+ok 12 ns_diff_global_vm_connect_to_global_host_ok
+ok 13 ns_diff_global_vm_connect_to_local_host_fails
+ok 14 ns_diff_local_host_connect_to_local_vm_fails
+ok 15 ns_diff_local_vm_connect_to_local_host_fails
+ok 16 ns_diff_global_to_local_loopback_local_fails
+ok 17 ns_diff_local_to_global_loopback_fails
+ok 18 ns_diff_local_to_local_loopback_fails
+ok 19 ns_diff_global_to_global_loopback_ok
+ok 20 ns_same_local_loopback_ok
+ok 21 ns_same_local_host_connect_to_local_vm_ok
+ok 22 ns_same_local_vm_connect_to_local_host_ok
+ok 23 ns_mode_change_connection_continue_vm_ok
+ok 24 ns_mode_change_connection_continue_host_ok
+ok 25 ns_mode_change_connection_continue_both_ok
+ok 26 ns_delete_vm_ok
+ok 27 ns_delete_host_ok
+ok 28 ns_delete_both_ok
+SUMMARY: PASS=28 SKIP=0 FAIL=0
+
+Dependent on series:
+https://lore.kernel.org/all/20251108-vsock-selftests-fixes-and-improvements-v4-0-d5e8d6c87289@meta.com/
+
+Thanks again for everyone's help and reviews!
+
+Suggested-by: Sargun Dhillon <sargun@sargun.me>
+Signed-off-by: Bobby Eshleman <bobbyeshleman@gmail.com>
+
+Changes in v12:
+- add ns mode checking to _allow() callbacks to reject local mode for
+  incompatible transports (Stefano)
+- flip vhost/loopback to return true for stream_allow() and
+  seqpacket_allow() in "vsock: add netns support to virtio transports"
+  (Stefano)
+- add VMADDR_CID_ANY + local mode documentation in af_vsock.c (Stefano)
+- change "selftests/vsock: add tests for host <-> vm connectivity with
+  namespaces" to skip test 29 in vsock_test for namespace local
+  vsock_test calls in a host local-mode namespace. There is a
+  false-positive edge case for that test encountered with the
+  ->stream_allow() approach. More details in that patch.
+- updated cover letter with new test output
+- Link to v11: https://lore.kernel.org/r/20251120-vsock-vmtest-v11-0-55cbc80249a7@meta.com
+
+Changes in v11:
+- vmtest: add a patch to use ss in wait_for_listener functions and
+  support vsock, tcp, and unix. Change all patches to use the new
+  functions.
+- vmtest: add a patch to re-use vm dmesg / warn counting functions
+- Link to v10: https://lore.kernel.org/r/20251117-vsock-vmtest-v10-0-df08f165bf3e@meta.com
+
+Changes in v10:
+- Combine virtio common patches into one (Stefano)
+- Resolve vsock_loopback virtio_transport_reset_no_sock() issue
+  with info->vsk setting. This eliminates the need for skb->cb,
+  so remove skb->cb patches.
+- many line width 80 fixes
+- Link to v9: https://lore.kernel.org/all/20251111-vsock-vmtest-v9-0-852787a37bed@meta.com
+
+Changes in v9:
+- reorder loopback patch after patch for virtio transport common code
+- remove module ordering tests patch because loopback no longer depends
+  on pernet ops
+- major simplifications in vsock_loopback
+- added a new patch for blocking local mode for guests, added test case
+  to check
+- add net ref tracking to vsock_loopback patch
+- Link to v8: https://lore.kernel.org/r/20251023-vsock-vmtest-v8-0-dea984d02bb0@meta.com
+
+Changes in v8:
+- Break generic cleanup/refactoring patches into standalone series,
+  remove those from this series
+- Link to dependency: https://lore.kernel.org/all/20251022-vsock-selftests-fixes-and-improvements-v1-0-edeb179d6463@meta.com/
+- Link to v7: https://lore.kernel.org/r/20251021-vsock-vmtest-v7-0-0661b7b6f081@meta.com
+
+Changes in v7:
+- fix hv_sock build
+- break out vmtest patches into distinct, more well-scoped patches
+- change `orig_net_mode` to `net_mode`
+- many fixes and style changes in per-patch change sets (see individual
+  patches for specific changes)
+- optimize `virtio_vsock_skb_cb` layout
+- update commit messages with more useful descriptions
+- vsock_loopback: use orig_net_mode instead of current net mode
+- add tests for edge cases (ns deletion, mode changing, loopback module
+  load ordering)
+- Link to v6: https://lore.kernel.org/r/20250916-vsock-vmtest-v6-0-064d2eb0c89d@meta.com
+
+Changes in v6:
+- define behavior when mode changes to local while socket/VM is alive
+- af_vsock: clarify description of CID behavior
+- af_vsock: use stronger langauge around CID rules (dont use "may")
+- af_vsock: improve naming of buf/buffer
+- af_vsock: improve string length checking on proc writes
+- vsock_loopback: add space in struct to clarify lock protection
+- vsock_loopback: do proper cleanup/unregister on vsock_loopback_exit()
+- vsock_loopback: use virtio_vsock_skb_net() instead of sock_net()
+- vsock_loopback: set loopback to NULL after kfree()
+- vsock_loopback: use pernet_operations and remove callback mechanism
+- vsock_loopback: add macros for "global" and "local"
+- vsock_loopback: fix length checking
+- vmtest.sh: check for namespace support in vmtest.sh
+- Link to v5: https://lore.kernel.org/r/20250827-vsock-vmtest-v5-0-0ba580bede5b@meta.com
+
+Changes in v5:
+- /proc/net/vsock_ns_mode -> /proc/sys/net/vsock/ns_mode
+- vsock_global_net -> vsock_global_dummy_net
+- fix netns lookup in vhost_vsock to respect pid namespaces
+- add callbacks for vsock_loopback to avoid circular dependency
+- vmtest.sh loads vsock_loopback module
+- remove vsock_net_mode_can_set()
+- change vsock_net_write_mode() to return true/false based on success
+- make vsock_net_mode enum instead of u8
+- Link to v4: https://lore.kernel.org/r/20250805-vsock-vmtest-v4-0-059ec51ab111@meta.com
+
+Changes in v4:
+- removed RFC tag
+- implemented loopback support
+- renamed new tests to better reflect behavior
+- completed suite of tests with permutations of ns modes and vsock_test
+  as guest/host
+- simplified socat bridging with unix socket instead of tcp + veth
+- only use vsock_test for success case, socat for failure case (context
+  in commit message)
+- lots of cleanup
+
+Changes in v3:
+- add notion of "modes"
+- add procfs /proc/net/vsock_ns_mode
+- local and global modes only
+- no /dev/vhost-vsock-netns
+- vmtest.sh already merged, so new patch just adds new tests for NS
+- Link to v2:
+  https://lore.kernel.org/kvm/20250312-vsock-netns-v2-0-84bffa1aa97a@gmail.com
+
+Changes in v2:
+- only support vhost-vsock namespaces
+- all g2h namespaces retain old behavior, only common API changes
+  impacted by vhost-vsock changes
+- add /dev/vhost-vsock-netns for "opt-in"
+- leave /dev/vhost-vsock to old behavior
+- removed netns module param
+- Link to v1:
+  https://lore.kernel.org/r/20200116172428.311437-1-sgarzare@redhat.com
+
+Changes in v1:
+- added 'netns' module param to vsock.ko to enable the
+  network namespace support (disabled by default)
+- added 'vsock_net_eq()' to check the "net" assigned to a socket
+  only when 'netns' support is enabled
+- Link to RFC: https://patchwork.ozlabs.org/cover/1202235/
+
 ---
-v2: collected tags
- drivers/net/ethernet/intel/idpf/idpf_txrx.c | 96 +++++++++++++--------
- 1 file changed, 59 insertions(+), 37 deletions(-)
+Bobby Eshleman (12):
+      vsock: a per-net vsock NS mode state
+      vsock: add netns to vsock core
+      virtio: set skb owner of virtio_transport_reset_no_sock() reply
+      vsock: add netns support to virtio transports
+      selftests/vsock: add namespace helpers to vmtest.sh
+      selftests/vsock: prepare vm management helpers for namespaces
+      selftests/vsock: add vm_dmesg_{warn,oops}_count() helpers
+      selftests/vsock: use ss to wait for listeners instead of /proc/net
+      selftests/vsock: add tests for proc sys vsock ns_mode
+      selftests/vsock: add namespace tests for CID collisions
+      selftests/vsock: add tests for host <-> vm connectivity with namespaces
+      selftests/vsock: add tests for namespace deletion and mode changes
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index 828f7c444d30..28eb34c35d57 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -19,6 +19,8 @@ LIBETH_SQE_CHECK_PRIV(u32);
-  * Make sure we don't exceed maximum scatter gather buffers for a single
-  * packet.
-  * TSO case has been handled earlier from idpf_features_check().
-+ *
-+ * Return: %true if skb exceeds max descriptors per packet, %false otherwise.
-  */
- static bool idpf_chk_linearize(const struct sk_buff *skb,
- 			       unsigned int max_bufs,
-@@ -172,7 +174,7 @@ static void idpf_tx_desc_rel_all(struct idpf_vport *vport)
-  * idpf_tx_buf_alloc_all - Allocate memory for all buffer resources
-  * @tx_q: queue for which the buffers are allocated
-  *
-- * Returns 0 on success, negative on failure
-+ * Return: 0 on success, negative on failure
-  */
- static int idpf_tx_buf_alloc_all(struct idpf_tx_queue *tx_q)
- {
-@@ -196,7 +198,7 @@ static int idpf_tx_buf_alloc_all(struct idpf_tx_queue *tx_q)
-  * @vport: vport to allocate resources for
-  * @tx_q: the tx ring to set up
-  *
-- * Returns 0 on success, negative on failure
-+ * Return: 0 on success, negative on failure
-  */
- static int idpf_tx_desc_alloc(const struct idpf_vport *vport,
- 			      struct idpf_tx_queue *tx_q)
-@@ -297,7 +299,7 @@ static int idpf_compl_desc_alloc(const struct idpf_vport *vport,
-  * idpf_tx_desc_alloc_all - allocate all queues Tx resources
-  * @vport: virtual port private structure
-  *
-- * Returns 0 on success, negative on failure
-+ * Return: 0 on success, negative on failure
-  */
- static int idpf_tx_desc_alloc_all(struct idpf_vport *vport)
- {
-@@ -548,7 +550,7 @@ static void idpf_rx_buf_hw_update(struct idpf_buf_queue *bufq, u32 val)
-  * idpf_rx_hdr_buf_alloc_all - Allocate memory for header buffers
-  * @bufq: ring to use
-  *
-- * Returns 0 on success, negative on failure.
-+ * Return: 0 on success, negative on failure.
-  */
- static int idpf_rx_hdr_buf_alloc_all(struct idpf_buf_queue *bufq)
- {
-@@ -600,7 +602,7 @@ static void idpf_post_buf_refill(struct idpf_sw_queue *refillq, u16 buf_id)
-  * @bufq: buffer queue to post to
-  * @buf_id: buffer id to post
-  *
-- * Returns false if buffer could not be allocated, true otherwise.
-+ * Return: %false if buffer could not be allocated, %true otherwise.
-  */
- static bool idpf_rx_post_buf_desc(struct idpf_buf_queue *bufq, u16 buf_id)
- {
-@@ -649,7 +651,7 @@ static bool idpf_rx_post_buf_desc(struct idpf_buf_queue *bufq, u16 buf_id)
-  * @bufq: buffer queue to post working set to
-  * @working_set: number of buffers to put in working set
-  *
-- * Returns true if @working_set bufs were posted successfully, false otherwise.
-+ * Return: %true if @working_set bufs were posted successfully, %false otherwise.
-  */
- static bool idpf_rx_post_init_bufs(struct idpf_buf_queue *bufq,
- 				   u16 working_set)
-@@ -717,7 +719,7 @@ static int idpf_rx_bufs_init_singleq(struct idpf_rx_queue *rxq)
-  * idpf_rx_buf_alloc_all - Allocate memory for all buffer resources
-  * @rxbufq: queue for which the buffers are allocated
-  *
-- * Returns 0 on success, negative on failure
-+ * Return: 0 on success, negative on failure
-  */
- static int idpf_rx_buf_alloc_all(struct idpf_buf_queue *rxbufq)
- {
-@@ -745,7 +747,7 @@ static int idpf_rx_buf_alloc_all(struct idpf_buf_queue *rxbufq)
-  * @bufq: buffer queue to create page pool for
-  * @type: type of Rx buffers to allocate
-  *
-- * Returns 0 on success, negative on failure
-+ * Return: 0 on success, negative on failure
-  */
- static int idpf_rx_bufs_init(struct idpf_buf_queue *bufq,
- 			     enum libeth_fqe_type type)
-@@ -779,7 +781,7 @@ static int idpf_rx_bufs_init(struct idpf_buf_queue *bufq,
-  * idpf_rx_bufs_init_all - Initialize all RX bufs
-  * @vport: virtual port struct
-  *
-- * Returns 0 on success, negative on failure
-+ * Return: 0 on success, negative on failure
-  */
- int idpf_rx_bufs_init_all(struct idpf_vport *vport)
- {
-@@ -834,7 +836,7 @@ int idpf_rx_bufs_init_all(struct idpf_vport *vport)
-  * @vport: vport to allocate resources for
-  * @rxq: Rx queue for which the resources are setup
-  *
-- * Returns 0 on success, negative on failure
-+ * Return: 0 on success, negative on failure
-  */
- static int idpf_rx_desc_alloc(const struct idpf_vport *vport,
- 			      struct idpf_rx_queue *rxq)
-@@ -896,7 +898,7 @@ static int idpf_bufq_desc_alloc(const struct idpf_vport *vport,
-  * idpf_rx_desc_alloc_all - allocate all RX queues resources
-  * @vport: virtual port structure
-  *
-- * Returns 0 on success, negative on failure
-+ * Return: 0 on success, negative on failure
-  */
- static int idpf_rx_desc_alloc_all(struct idpf_vport *vport)
- {
-@@ -1424,7 +1426,7 @@ void idpf_vport_queues_rel(struct idpf_vport *vport)
-  * dereference the queue from queue groups.  This allows us to quickly pull a
-  * txq based on a queue index.
-  *
-- * Returns 0 on success, negative on failure
-+ * Return: 0 on success, negative on failure
-  */
- static int idpf_vport_init_fast_path_txqs(struct idpf_vport *vport)
- {
-@@ -1557,7 +1559,7 @@ void idpf_vport_calc_num_q_desc(struct idpf_vport *vport)
-  * @vport_msg: message to fill with data
-  * @max_q: vport max queue info
-  *
-- * Return 0 on success, error value on failure.
-+ * Return: 0 on success, error value on failure.
-  */
- int idpf_vport_calc_total_qs(struct idpf_adapter *adapter, u16 vport_idx,
- 			     struct virtchnl2_create_vport *vport_msg,
-@@ -1692,7 +1694,7 @@ static void idpf_rxq_set_descids(const struct idpf_vport *vport,
-  * @vport: vport to allocate txq groups for
-  * @num_txq: number of txqs to allocate for each group
-  *
-- * Returns 0 on success, negative on failure
-+ * Return: 0 on success, negative on failure
-  */
- static int idpf_txq_group_alloc(struct idpf_vport *vport, u16 num_txq)
- {
-@@ -1784,7 +1786,7 @@ static int idpf_txq_group_alloc(struct idpf_vport *vport, u16 num_txq)
-  * @vport: vport to allocate rxq groups for
-  * @num_rxq: number of rxqs to allocate for each group
-  *
-- * Returns 0 on success, negative on failure
-+ * Return: 0 on success, negative on failure
-  */
- static int idpf_rxq_group_alloc(struct idpf_vport *vport, u16 num_rxq)
- {
-@@ -1913,7 +1915,7 @@ static int idpf_rxq_group_alloc(struct idpf_vport *vport, u16 num_rxq)
-  * idpf_vport_queue_grp_alloc_all - Allocate all queue groups/resources
-  * @vport: vport with qgrps to allocate
-  *
-- * Returns 0 on success, negative on failure
-+ * Return: 0 on success, negative on failure
-  */
- static int idpf_vport_queue_grp_alloc_all(struct idpf_vport *vport)
- {
-@@ -1942,8 +1944,9 @@ static int idpf_vport_queue_grp_alloc_all(struct idpf_vport *vport)
-  * idpf_vport_queues_alloc - Allocate memory for all queues
-  * @vport: virtual port
-  *
-- * Allocate memory for queues associated with a vport.  Returns 0 on success,
-- * negative on failure.
-+ * Allocate memory for queues associated with a vport.
-+ *
-+ * Return: 0 on success, negative on failure.
-  */
- int idpf_vport_queues_alloc(struct idpf_vport *vport)
- {
-@@ -2170,7 +2173,7 @@ static void idpf_tx_handle_rs_completion(struct idpf_tx_queue *txq,
-  * @budget: Used to determine if we are in netpoll
-  * @cleaned: returns number of packets cleaned
-  *
-- * Returns true if there's any budget left (e.g. the clean is finished)
-+ * Return: %true if there's any budget left (e.g. the clean is finished)
-  */
- static bool idpf_tx_clean_complq(struct idpf_compl_queue *complq, int budget,
- 				 int *cleaned)
-@@ -2396,7 +2399,7 @@ void idpf_tx_splitq_build_flow_desc(union idpf_tx_flex_desc *desc,
- }
- 
- /**
-- * idpf_tx_splitq_has_room - check if enough Tx splitq resources are available
-+ * idpf_txq_has_room - check if enough Tx splitq resources are available
-  * @tx_q: the queue to be checked
-  * @descs_needed: number of descriptors required for this packet
-  * @bufs_needed: number of Tx buffers required for this packet
-@@ -2527,6 +2530,8 @@ unsigned int idpf_tx_res_count_required(struct idpf_tx_queue *txq,
-  * idpf_tx_splitq_bump_ntu - adjust NTU and generation
-  * @txq: the tx ring to wrap
-  * @ntu: ring index to bump
-+ *
-+ * Return: the next ring index hopping to 0 when wraps around
-  */
- static unsigned int idpf_tx_splitq_bump_ntu(struct idpf_tx_queue *txq, u16 ntu)
- {
-@@ -2795,7 +2800,7 @@ static void idpf_tx_splitq_map(struct idpf_tx_queue *tx_q,
-  * @skb: pointer to skb
-  * @off: pointer to struct that holds offload parameters
-  *
-- * Returns error (negative) if TSO was requested but cannot be applied to the
-+ * Return: error (negative) if TSO was requested but cannot be applied to the
-  * given skb, 0 if TSO does not apply to the given skb, or 1 otherwise.
-  */
- int idpf_tso(struct sk_buff *skb, struct idpf_tx_offload_params *off)
-@@ -2873,6 +2878,8 @@ int idpf_tso(struct sk_buff *skb, struct idpf_tx_offload_params *off)
-  *
-  * Since the TX buffer rings mimics the descriptor ring, update the tx buffer
-  * ring entry to reflect that this index is a context descriptor
-+ *
-+ * Return: pointer to the next descriptor
-  */
- static union idpf_flex_tx_ctx_desc *
- idpf_tx_splitq_get_ctx_desc(struct idpf_tx_queue *txq)
-@@ -2891,6 +2898,8 @@ idpf_tx_splitq_get_ctx_desc(struct idpf_tx_queue *txq)
-  * idpf_tx_drop_skb - free the SKB and bump tail if necessary
-  * @tx_q: queue to send buffer on
-  * @skb: pointer to skb
-+ *
-+ * Return: always NETDEV_TX_OK
-  */
- netdev_tx_t idpf_tx_drop_skb(struct idpf_tx_queue *tx_q, struct sk_buff *skb)
- {
-@@ -2992,7 +3001,7 @@ static bool idpf_tx_splitq_need_re(struct idpf_tx_queue *tx_q)
-  * @skb: send buffer
-  * @tx_q: queue to send buffer on
-  *
-- * Returns NETDEV_TX_OK if sent, else an error code
-+ * Return: NETDEV_TX_OK if sent, else an error code
-  */
- static netdev_tx_t idpf_tx_splitq_frame(struct sk_buff *skb,
- 					struct idpf_tx_queue *tx_q)
-@@ -3118,7 +3127,7 @@ static netdev_tx_t idpf_tx_splitq_frame(struct sk_buff *skb,
-  * @skb: send buffer
-  * @netdev: network interface device structure
-  *
-- * Returns NETDEV_TX_OK if sent, else an error code
-+ * Return: NETDEV_TX_OK if sent, else an error code
-  */
- netdev_tx_t idpf_tx_start(struct sk_buff *skb, struct net_device *netdev)
- {
-@@ -3268,10 +3277,10 @@ idpf_rx_splitq_extract_csum_bits(const struct virtchnl2_rx_flex_desc_adv_nic_3 *
-  * @rx_desc: Receive descriptor
-  * @decoded: Decoded Rx packet type related fields
-  *
-- * Return 0 on success and error code on failure
-- *
-  * Populate the skb fields with the total number of RSC segments, RSC payload
-  * length and packet type.
-+ *
-+ * Return: 0 on success and error code on failure
-  */
- static int idpf_rx_rsc(struct idpf_rx_queue *rxq, struct sk_buff *skb,
- 		       const struct virtchnl2_rx_flex_desc_adv_nic_3 *rx_desc,
-@@ -3369,6 +3378,8 @@ idpf_rx_hwtstamp(const struct idpf_rx_queue *rxq,
-  * This function checks the ring, descriptor, and packet information in
-  * order to populate the hash, checksum, protocol, and
-  * other fields within the skb.
-+ *
-+ * Return: 0 on success and error code on failure
-  */
- static int
- __idpf_rx_process_skb_fields(struct idpf_rx_queue *rxq, struct sk_buff *skb,
-@@ -3463,6 +3474,7 @@ static u32 idpf_rx_hsplit_wa(const struct libeth_fqe *hdr,
-  * @stat_err_field: field from descriptor to test bits in
-  * @stat_err_bits: value to mask
-  *
-+ * Return: %true if any of given @stat_err_bits are set, %false otherwise.
-  */
- static bool idpf_rx_splitq_test_staterr(const u8 stat_err_field,
- 					const u8 stat_err_bits)
-@@ -3474,8 +3486,8 @@ static bool idpf_rx_splitq_test_staterr(const u8 stat_err_field,
-  * idpf_rx_splitq_is_eop - process handling of EOP buffers
-  * @rx_desc: Rx descriptor for current buffer
-  *
-- * If the buffer is an EOP buffer, this function exits returning true,
-- * otherwise return false indicating that this is in fact a non-EOP buffer.
-+ * Return: %true if the buffer is an EOP buffer, %false otherwise, indicating
-+ * that this is in fact a non-EOP buffer.
-  */
- static bool idpf_rx_splitq_is_eop(struct virtchnl2_rx_flex_desc_adv_nic_3 *rx_desc)
- {
-@@ -3494,7 +3506,7 @@ static bool idpf_rx_splitq_is_eop(struct virtchnl2_rx_flex_desc_adv_nic_3 *rx_de
-  * expensive overhead for IOMMU access this provides a means of avoiding
-  * it by maintaining the mapping of the page to the system.
-  *
-- * Returns amount of work completed
-+ * Return: amount of work completed
-  */
- static int idpf_rx_splitq_clean(struct idpf_rx_queue *rxq, int budget)
- {
-@@ -3624,7 +3636,7 @@ static int idpf_rx_splitq_clean(struct idpf_rx_queue *rxq, int budget)
-  * @buf_id: buffer ID
-  * @buf_desc: Buffer queue descriptor
-  *
-- * Return 0 on success and negative on failure.
-+ * Return: 0 on success and negative on failure.
-  */
- static int idpf_rx_update_bufq_desc(struct idpf_buf_queue *bufq, u32 buf_id,
- 				    struct virtchnl2_splitq_rx_buf_desc *buf_desc)
-@@ -3751,6 +3763,7 @@ static void idpf_rx_clean_refillq_all(struct idpf_buf_queue *bufq, int nid)
-  * @irq: interrupt number
-  * @data: pointer to a q_vector
-  *
-+ * Return: always IRQ_HANDLED
-  */
- static irqreturn_t idpf_vport_intr_clean_queues(int __always_unused irq,
- 						void *data)
-@@ -3872,6 +3885,8 @@ static void idpf_vport_intr_dis_irq_all(struct idpf_vport *vport)
- /**
-  * idpf_vport_intr_buildreg_itr - Enable default interrupt generation settings
-  * @q_vector: pointer to q_vector
-+ *
-+ * Return: value to be written back to HW to enable interrupt generation
-  */
- static u32 idpf_vport_intr_buildreg_itr(struct idpf_q_vector *q_vector)
- {
-@@ -4003,6 +4018,8 @@ void idpf_vport_intr_update_itr_ena_irq(struct idpf_q_vector *q_vector)
- /**
-  * idpf_vport_intr_req_irq - get MSI-X vectors from the OS for the vport
-  * @vport: main vport structure
-+ *
-+ * Return: 0 on success, negative on failure
-  */
- static int idpf_vport_intr_req_irq(struct idpf_vport *vport)
- {
-@@ -4213,7 +4230,7 @@ static void idpf_vport_intr_napi_ena_all(struct idpf_vport *vport)
-  * @budget: Used to determine if we are in netpoll
-  * @cleaned: returns number of packets cleaned
-  *
-- * Returns false if clean is not complete else returns true
-+ * Return: %false if clean is not complete else returns %true
-  */
- static bool idpf_tx_splitq_clean_all(struct idpf_q_vector *q_vec,
- 				     int budget, int *cleaned)
-@@ -4240,7 +4257,7 @@ static bool idpf_tx_splitq_clean_all(struct idpf_q_vector *q_vec,
-  * @budget: Used to determine if we are in netpoll
-  * @cleaned: returns number of packets cleaned
-  *
-- * Returns false if clean is not complete else returns true
-+ * Return: %false if clean is not complete else returns %true
-  */
- static bool idpf_rx_splitq_clean_all(struct idpf_q_vector *q_vec, int budget,
- 				     int *cleaned)
-@@ -4283,6 +4300,8 @@ static bool idpf_rx_splitq_clean_all(struct idpf_q_vector *q_vec, int budget,
-  * idpf_vport_splitq_napi_poll - NAPI handler
-  * @napi: struct from which you get q_vector
-  * @budget: budget provided by stack
-+ *
-+ * Return: how many packets were cleaned
-  */
- static int idpf_vport_splitq_napi_poll(struct napi_struct *napi, int budget)
- {
-@@ -4431,7 +4450,9 @@ static void idpf_vport_intr_map_vector_to_qs(struct idpf_vport *vport)
-  * idpf_vport_intr_init_vec_idx - Initialize the vector indexes
-  * @vport: virtual port
-  *
-- * Initialize vector indexes with values returened over mailbox
-+ * Initialize vector indexes with values returned over mailbox.
-+ *
-+ * Return: 0 on success, negative on failure
-  */
- static int idpf_vport_intr_init_vec_idx(struct idpf_vport *vport)
- {
-@@ -4497,8 +4518,9 @@ static void idpf_vport_intr_napi_add_all(struct idpf_vport *vport)
-  * idpf_vport_intr_alloc - Allocate memory for interrupt vectors
-  * @vport: virtual port
-  *
-- * We allocate one q_vector per queue interrupt. If allocation fails we
-- * return -ENOMEM.
-+ * Allocate one q_vector per queue interrupt.
-+ *
-+ * Return: 0 on success, if allocation fails we return -ENOMEM.
-  */
- int idpf_vport_intr_alloc(struct idpf_vport *vport)
- {
-@@ -4585,7 +4607,7 @@ int idpf_vport_intr_alloc(struct idpf_vport *vport)
-  * idpf_vport_intr_init - Setup all vectors for the given vport
-  * @vport: virtual port
-  *
-- * Returns 0 on success or negative on failure
-+ * Return: 0 on success or negative on failure
-  */
- int idpf_vport_intr_init(struct idpf_vport *vport)
- {
-@@ -4624,7 +4646,7 @@ void idpf_vport_intr_ena(struct idpf_vport *vport)
-  * idpf_config_rss - Send virtchnl messages to configure RSS
-  * @vport: virtual port
-  *
-- * Return 0 on success, negative on failure
-+ * Return: 0 on success, negative on failure
-  */
- int idpf_config_rss(struct idpf_vport *vport)
- {
-@@ -4660,7 +4682,7 @@ static void idpf_fill_dflt_rss_lut(struct idpf_vport *vport)
-  * idpf_init_rss - Allocate and initialize RSS resources
-  * @vport: virtual port
-  *
-- * Return 0 on success, negative on failure
-+ * Return: 0 on success, negative on failure
-  */
- int idpf_init_rss(struct idpf_vport *vport)
- {
+ MAINTAINERS                             |    1 +
+ drivers/vhost/vsock.c                   |   59 +-
+ include/linux/virtio_vsock.h            |   12 +-
+ include/net/af_vsock.h                  |   57 +-
+ include/net/net_namespace.h             |    4 +
+ include/net/netns/vsock.h               |   17 +
+ net/vmw_vsock/af_vsock.c                |  272 +++++++-
+ net/vmw_vsock/hyperv_transport.c        |    7 +-
+ net/vmw_vsock/virtio_transport.c        |   19 +-
+ net/vmw_vsock/virtio_transport_common.c |   75 ++-
+ net/vmw_vsock/vmci_transport.c          |   26 +-
+ net/vmw_vsock/vsock_loopback.c          |   23 +-
+ tools/testing/selftests/vsock/vmtest.sh | 1077 +++++++++++++++++++++++++++++--
+ 13 files changed, 1522 insertions(+), 127 deletions(-)
+---
+base-commit: 962ac5ca99a5c3e7469215bf47572440402dfd59
+change-id: 20250325-vsock-vmtest-b3a21d2102c2
+prerequisite-message-id: <20251022-vsock-selftests-fixes-and-improvements-v1-0-edeb179d6463@meta.com>
+prerequisite-patch-id: a2eecc3851f2509ed40009a7cab6990c6d7cfff5
+prerequisite-patch-id: 501db2100636b9c8fcb3b64b8b1df797ccbede85
+prerequisite-patch-id: ba1a2f07398a035bc48ef72edda41888614be449
+prerequisite-patch-id: fd5cc5445aca9355ce678e6d2bfa89fab8a57e61
+prerequisite-patch-id: 795ab4432ffb0843e22b580374782e7e0d99b909
+prerequisite-patch-id: 1499d263dc933e75366c09e045d2125ca39f7ddd
+prerequisite-patch-id: f92d99bb1d35d99b063f818a19dcda999152d74c
+prerequisite-patch-id: e3296f38cdba6d903e061cff2bbb3e7615e8e671
+prerequisite-patch-id: bc4662b4710d302d4893f58708820fc2a0624325
+prerequisite-patch-id: f8991f2e98c2661a706183fde6b35e2b8d9aedcf
+prerequisite-patch-id: 44bf9ed69353586d284e5ee63d6fffa30439a698
+prerequisite-patch-id: d50621bc630eeaf608bbaf260370c8dabf6326df
+
+Best regards,
 -- 
-2.50.1
+Bobby Eshleman <bobbyeshleman@meta.com>
 
 
