@@ -1,177 +1,203 @@
-Return-Path: <netdev+bounces-242325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83FC5C8F398
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 16:19:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A850C8F386
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 16:18:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 68E7C4EE635
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 15:11:55 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1BA114EB4FA
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 15:11:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0D7F3346A1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5558B328631;
 	Thu, 27 Nov 2025 15:11:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cTeRQBnA"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="UguZPZ/M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47094257830
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 15:11:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9A71296BC2
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 15:11:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764256307; cv=none; b=tS4hVb5J+yDj9FXd+jSAhLEie1Efa3XvDJHnyFpL5l5tddFj51HuZlkwPqIGZroyZwOXj4aOlko5LwO/X/Pfb3JKnWIXx32RZnDSZuIUGsN6zb7OepPtkat8NXJ5mIzkP72upFUNGLyOBBk2T8VWPdCLpj/dwQTdwceNefnpy1Q=
+	t=1764256307; cv=none; b=A0XXMxEIhBuBZvCHccLHhgZYXdYEuLW/1utHryocaap7HR9xeUVCkTlWnAr2u8eMZV6bVGOKFvvp+S8k19tvympry40M7yvBe561jkmsc0+RN+PSAk3UyD/PzMfrfTpR7+STy3lS9JslCrbeH95LEsdaFpObhJ2i4A3kflD9+q8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1764256307; c=relaxed/simple;
-	bh=lL2txegud9ux4YyJuiMB3jslVmUHJ0T8vXbTtZewYus=;
+	bh=lmT+th1EMcNn4O/gymBt5PNtyWASP3FSDcKA6sN8jbc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Brbya0oVeyzZeMHx2bcQqo9vyOBNKLfYPbaMa2LbYCuRUSYMSLQv8nSD4/AvDZpHmjPS9HGOyYSSdPie6Uu0uGb0ZJDuDU9OqmW7TKTSPIA9u+GBVZf4CO3u7yA3DgMhc9dGUoik9r18fteRSBbLJPIMQFbFHkxjE0ZOdrTHa9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cTeRQBnA; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4ee158187aaso10406841cf.0
-        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 07:11:46 -0800 (PST)
+	 To:Cc:Content-Type; b=IK2SNfomUr8YAGtB844DoZO9iUCfgNoOJm69E2Aj0ms4r2+0BcxmZX1cPcT3z91G4QgfK3w1QnLUwdO6XM2nbnvz/a4Iyt/XSxGFQL+FDyXhtEL+VxRVfWTr1k5jhh7JWOoLUa2j+GbsYsdXocc67JgldXlD9ijBTvRpuiM9VNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=UguZPZ/M; arc=none smtp.client-ip=209.85.215.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-bcfd82f55ebso949795a12.1
+        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 07:11:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764256305; x=1764861105; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1764256305; x=1764861105; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TGMldPR2co4OK62sx7a7yX7veINWWn7QvUHPjJEI6uQ=;
-        b=cTeRQBnA7GzmEWIVm6mw0wrSPg/VPxR7K4pEuUva5serJHB4fhjDfUX7sRRfBzNN2y
-         iNvaWnysy0zjbYaPPZHLkIN5d5SzP3NH7B5SM6w6eaXq/yV3HOz3sMi07xFrTk//oIuA
-         VMo15lsZ0OOMR/KluHj1hJQ78yyJUG8y88XUMBYPO1OETIfuxTlUH6sYyVfuFn3k+lKU
-         Y33DdTo15jEEV7Hrn/XNE4OZigmzwk4rV/YzEih1MUSZ+uaBM/oBmzUrcM5lIDZe24ha
-         /z5d5TkFQnPcBS5hyTIWGS4FpAFuOu0dpMfYzGS5jRTI1Bwtlud9jflx5jo0mmHfoLsa
-         5tKA==
+        bh=lmT+th1EMcNn4O/gymBt5PNtyWASP3FSDcKA6sN8jbc=;
+        b=UguZPZ/MD4B3Y4+W3rlz5hWZzpcRHurvFRmKKc7WNmP5vBZkaogv/UyibzrGE9Fxcv
+         jk6txE5l7cEqd2RRwV098Kb+fZNSj8m0uJUeyEPPnWgeA9wgtmflOkh/czEfO/0n/7Av
+         EvVgppds7N6yY678Vc57AgL876X2sBdrrs5N8EO8BGz2vTfmGjx384OtnDkTbewM9odv
+         7wC9gLkw65QQoFFonKTbfLT6N1PgHF0IVyJ+2+SfZ75BPfVYSsGYuZ/8B+BlrH6iUPg8
+         vpOEIhfbekBVdt+qSPXyYLKxmbsAt5e9HKgfUgWlbOZDIYGEFEfNemFcXizy14hGWRSI
+         st0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1764256305; x=1764861105;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=TGMldPR2co4OK62sx7a7yX7veINWWn7QvUHPjJEI6uQ=;
-        b=mpiUgS8gvDCo9DoVdBojCZLi6agaW1iURqb4HI/NxKQQwcJkRAhTEv2YSSFmcn/44W
-         V3V3JMWGik9qcdiHPAVdnqRWHYuNn1s/dNd6OHocqgwDy/woG+aU2KFQGxAz7gGfFPVl
-         mwshEYdApL9F6ExWWzLqdaBt1o2IO2wIzPqPO81wzbM0NSnxOs39JgUomtStJeEFYZXK
-         x+TFahG/XT/iH+VQHsO3n5IVf9NmeqaQqxiA6cbGKKvj47JJHax23TcvjQ7Jq99+hT/p
-         taXG78F1NU+hN0u6/xZzpggFHoPuMzhxTRPlrmbAvlfbUW4fHnoZY0bT7ioR81z0RBua
-         AybA==
-X-Forwarded-Encrypted: i=1; AJvYcCUVDwOa0dX6icvqrhUIrvAh9s0xJIpV+6jdWI5xTuFahtUaqMJnZtO/X58ncWAo24E6q128vEA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzEXK+AbamlCyIvCTecgUTE0hqF63D0+uZwA7ZB1C6rYR8zYvcG
-	LeDdjTYE2uJPWLJaJWyAf436FtzZjTCtQB/A05/95fQI45iSoM4sRg18OXPqJ/fJ6M4g+5BBRzT
-	e/dMb/AT1pGkJWxe6sjyLsulksItuCHgPDageWETe
-X-Gm-Gg: ASbGncvQ/dG30ZAwD6J+5MMHcg/3rK11NvEyo8LAvingIGGYRenUY4ra6H5eVJcqNLh
-	Jr3d3qwnEmz8x1aYqgZCtHlksVbreQgVfS5kd1Vf5cvFFHJFtqbNwOGbY4IsAnB8wfe1kzdagxz
-	CPkyWm60ALdhZHH/dhpzx3pQLeI7OYw3G4xuOmz8JJRdoWgBX9G/dT20WoYaet+fSFbvnaZN5RV
-	1o1uNdEUEizAO4aFd2Tyh972JeTfR5Ng4BakOLqEZZ9wcFxkuErv48rbR2S6g//Cj5inNs=
-X-Google-Smtp-Source: AGHT+IHX28DZubR5YC2LgjvbqnH6C6/8G22z+8hn9EJfTYpkAY5zNQ3nvT0+Q05E1oDuCXNVNv7uHKv0/ZRKpRlbt+c=
-X-Received: by 2002:ac8:5f82:0:b0:4ed:b4e3:cfb0 with SMTP id
- d75a77b69052e-4ee58858da8mr336066921cf.29.1764256304705; Thu, 27 Nov 2025
- 07:11:44 -0800 (PST)
+        bh=lmT+th1EMcNn4O/gymBt5PNtyWASP3FSDcKA6sN8jbc=;
+        b=fe1UbiPGCSKr3E1DHXx1Sfsss4lB5h/TbZC/j2Op5clMB0YjQUxGuNbL8xjzt26MjZ
+         jvAfvVW+EJeLqF43QjVKQ8R67IGD1NeualYDPg36o8zav5K2OXOeJy5YQ43CeWn0/4Dy
+         MqRRJ4q9gCLwakNfY7tHqSP8+rdewaQH7EpGhLnUdtZKJm4+dl5OK9XS1ID8DAnYGLp6
+         1FAUi54of1mvbb3DPtK4WuwweEBsYj1806CB96DaB7vDzVkmSu7vuSFhIkmhh8qZRisi
+         NMa530NgYrokwLPo+HXNfA0PFkUxVFGmJh7lj74zwRek0xPoO9sFH3gbslsSYYYe+Mww
+         G/9w==
+X-Forwarded-Encrypted: i=1; AJvYcCUBCAoZqIh5SxvYTwt6UKuvOJQxaBSYZqL4N/9KO+uDD+kwt20zxqNM4znNm9M6FZibgDr6DAU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzidGjoSPgqiGIWX7ftmhBVq3UdourXga4+F9g6Q7/NYJu5FLTU
+	qrfI82AT/ANP2CxSAo313HimYyueszEtUYHabiKODAOL5qtln/VUJiiau2U8omkUju/QvLgaI0U
+	8mh1aF3UTPUguRiSdyQHLSCHqZf9pWAE0ZzcHAOyz
+X-Gm-Gg: ASbGncsh6K0CAW4HBt75AN2zsvMrEMFUVxxbhkVtH7dJmwPF+Jb0LnYz3WI0KfaOdZT
+	UAEZgstZzbwyCVjSyvg9jSxR9/sPEaV5hg/23Yar2k89ZByd0mPaBguU2whdf+niQZ9mNHTDuEf
+	Y7hCmeEmwIFg08k0tCK3tzktk7bIqjX60ja6ZLr78XmHuXHKx/n/AoYGpWBv2vNOTxkxV7U2KAq
+	suFfaz6Nh2U1z8V/G8OCd6jLsuKrK++XvsGc2NlvXqAIk91/qCyvcpsgXEhujQQkg2/TqfN87bZ
+	VoCbTMeSri1nVw==
+X-Google-Smtp-Source: AGHT+IHW2sOmQkqwY7D8TPAnSwmp3RQqP9+91O0yCbXDTbBaTLKudtbHGHQb7E33CRmz3b5RD6BiYzrmkqiouPaeIhQ=
+X-Received: by 2002:a17:903:166e:b0:299:dc97:a6c9 with SMTP id
+ d9443c01a7336-29b5e3b6b04mr271950275ad.20.1764256305057; Thu, 27 Nov 2025
+ 07:11:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251124200825.241037-1-jhs@mojatatu.com> <20251124145115.30c01882@kernel.org>
- <CAM0EoM=jDt_CeCop82aH=Fch+4M9QawX4aQdKdiUCsdFzuC2rQ@mail.gmail.com>
- <CAM0EoM=Rci1sfLFzenP9KyGhWNuLsprRZu0jS5pg2Wh35--4wg@mail.gmail.com>
- <CANn89iJiapfb3OULLv8FxQET4e-c7Kei_wyx2EYb7Wt_0qaAtw@mail.gmail.com>
- <CAM0EoMm4UZ9cM6zOTH+uT1kwyMdgEsP2BPR3C+d_-nmbXfrYyQ@mail.gmail.com>
- <CANn89i+_4Hj2WApgy_UBFhsDy+FEM8M1HhutrUcUHKmqbMR1-A@mail.gmail.com>
- <CAM0EoMmoMUtrBHyYUWNeBnFFj8kDFYPyQB+O1fdGB4xk_bMWZA@mail.gmail.com>
- <CANn89i+zDW5ttPZ7fw2gDbVQqXj2uFoeEeTRSU6gzFLM3zGCeA@mail.gmail.com> <CAM0EoMmzt1tDpoqK=mMZoj1=6UU2Ytim2aqJWOBAZmPfNyZSfQ@mail.gmail.com>
-In-Reply-To: <CAM0EoMmzt1tDpoqK=mMZoj1=6UU2Ytim2aqJWOBAZmPfNyZSfQ@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 27 Nov 2025 07:11:33 -0800
-X-Gm-Features: AWmQ_bn3iBruLy8dyS89veJy9eNtEQM0dfNGZOO3D9P_awgUaRlerorDBuFM8Hg
-Message-ID: <CANn89iKKKwj33WgSbGKDa7JB=qRBXSH6VbiAV=umwOgwYsbmTQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] net/sched: act_mirred: Fix infinite loop
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, pabeni@redhat.com, 
-	jiri@resnulli.us, xiyou.wangcong@gmail.com, netdev@vger.kernel.org, 
-	dcaratti@redhat.com
+References: <20251110123807.07ff5d89@phoenix> <aR/qwlyEWm/pFAfM@pop-os.localdomain>
+ <CAM0EoMkPdyqEMa0f4msEveGJxxd9oYaV4f3NatVXR9Fb=iCTcw@mail.gmail.com>
+ <oXMTlZ5OaURBe0X3RZCO7zyNf6JJFPYvDW0AiXEg0bXJwXXYJutLhhjmUbetBUD_pGChlN7hDCCx9xFOtj8Hke5G7SM3-u5FQFC5e4T1wPY=@proton.me>
+ <CAM0EoM=i6MsHeBYu6d-+bkxVWWHcj9b9ibM+dHr3w27mUMMhBw@mail.gmail.com> <ASx87MmTb79KImWwsBhstFGoue2UNiX4l0Y0NXCSob-VNrOsz05jh8lG76DbQ7FWjGABCdc45LY6vQ3VI7UIv4KzI5LI2mB65eje2PwlHrE=@proton.me>
+In-Reply-To: <ASx87MmTb79KImWwsBhstFGoue2UNiX4l0Y0NXCSob-VNrOsz05jh8lG76DbQ7FWjGABCdc45LY6vQ3VI7UIv4KzI5LI2mB65eje2PwlHrE=@proton.me>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Thu, 27 Nov 2025 10:11:34 -0500
+X-Gm-Features: AWmQ_bk4zxVrMhQekbIb7zl8iaJSbVsi_4IrOTAr54OxRrI86bsKGmg01AkxoN0
+Message-ID: <CAM0EoMkmggVd6-zbH_9z=wcHAW7dwOg+-Axh2k5F1jF72oj=_w@mail.gmail.com>
+Subject: Re: Fw: [Bug 220774] New: netem is broken in 6.18
+To: =?UTF-8?B?7KCV7KeA7IiY?= <jschung2@proton.me>
+Cc: Cong Wang <xiyou.wangcong@gmail.com>, 
+	Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, will@willsroot.io, savy@syst3mfailure.io
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 27, 2025 at 6:45=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com>=
- wrote:
->
-> On Wed, Nov 26, 2025 at 3:30=E2=80=AFPM Eric Dumazet <edumazet@google.com=
-> wrote:
-> >
-> > On Wed, Nov 26, 2025 at 12:20=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu=
-.com> wrote:
-> > >
-> > > On Wed, Nov 26, 2025 at 1:20=E2=80=AFPM Eric Dumazet <edumazet@google=
-.com> wrote:
-> > > >
-> > > > On Wed, Nov 26, 2025 at 10:14=E2=80=AFAM Jamal Hadi Salim <jhs@moja=
-tatu.com> wrote:
-> > > >
-> > > > > It's the multiport redirection, particularly to ingress. When it =
-get
-> > > > > redirected to ingress it will get queued and then transitioned ba=
-ck.
-> > > > > xmit struct wont catch this as a recursion, so MIRRED_NEST_LIMIT =
-will
-> > > > > not help you.
-> > > > > Example (see the first accompanying tdc test):
-> > > > > packet showing up on port0:ingress mirred redirect --> port1:egre=
-ss
-> > > > > packet showing up on port1:egress mirred redirect --> port0:ingre=
-ss
-> > > >
-> > > > Have you tried recording both devices ?
-> > > >
-> > > > diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
-> > > > index f27b583def78e4afecc7112854b93d59c2520201..711fc2e31cb0451c07a=
-39f9c94226357d5faec09
-> > > > 100644
-> > > > --- a/net/sched/act_mirred.c
-> > > > +++ b/net/sched/act_mirred.c
-> > > > @@ -445,15 +445,17 @@ TC_INDIRECT_SCOPE int tcf_mirred_act(struct s=
-k_buff *skb,
-> > > >                 return retval;
-> > > >         }
-> > > >         for (i =3D 0; i < xmit->sched_mirred_nest; i++) {
-> > > > -               if (xmit->sched_mirred_dev[i] !=3D dev)
-> > > > +               if (xmit->sched_mirred_dev[i] !=3D dev &&
-> > > > +                   xmit->sched_mirred_dev[i] !=3D skb->dev)
-> > > >                         continue;
-> > > > -               pr_notice_once("tc mirred: loop on device %s\n",
-> > > > -                              netdev_name(dev));
-> > > > +               pr_notice_once("tc mirred: loop on device %s/%s\n",
-> > > > +                              netdev_name(dev), netdev_name(skb->d=
-ev));
-> > > >                 tcf_action_inc_overlimit_qstats(&m->common);
-> > > >                 return retval;
-> > > >         }
-> > > >
-> > > >         xmit->sched_mirred_dev[xmit->sched_mirred_nest++] =3D dev;
-> > > > +       xmit->sched_mirred_dev[xmit->sched_mirred_nest++] =3D skb->=
-dev;
-> > > >
-> > > >         m_mac_header_xmit =3D READ_ONCE(m->tcfm_mac_header_xmit);
-> > > >         m_eaction =3D READ_ONCE(m->tcfm_eaction);
-> > >
-> > > Did you mean not to decrement sched_mirred_nest twice?
-> >
-> > No, sorry, we should decrement twice of course.
-> >
->
-> Ok, I tested.
-> While it "fixes" it - it's not really a fix. It works by ignoring directi=
-on.
-> Example, this is not a loop but currently would be claimed to be a
-> loop because port0 appears twice:
-> port0 ingress --> port1 ingress --> port1 egress
-> Note: port0 ingress and port0 egress cannot create a loop.
+Hi,
 
-I am not familiar with this stuff, can the direction be known and
-taken into account ?
+On Thu, Nov 27, 2025 at 1:08=E2=80=AFAM =EC=A0=95=EC=A7=80=EC=88=98 <jschun=
+g2@proton.me> wrote:
+>
+> Mr Salim,
+>
+> I do not understand what your saying. You provide a bash script, and I ca=
+n test
+>
 
-Really, anything but adding new bits in sk_buff.
+Will you be willing to go on a zoom/gmeet call? I think it will be
+easier to communicate.
+
+cheers,
+jamal
+> - Ji-Soo
+>
+> =EC=97=90 2025=EB=85=84 11=EC=9B=94 22=EC=9D=BC =ED=86=A0=EC=9A=94=EC=9D=
+=BC 17:24 Jamal Hadi Salim <jhs@mojatatu.com> =EB=8B=98=EC=9D=B4 =EC=9E=91=
+=EC=84=B1=ED=95=A8:
+>
+> >
+> >
+> > Hi =EC=A0=95=EC=A7=80=EC=88=98,
+> >
+> > On Sat, Nov 22, 2025 at 1:56=E2=80=AFAM =EC=A0=95=EC=A7=80=EC=88=98 jsc=
+hung2@proton.me wrote:
+> >
+> > > #!/bin/bash
+> > >
+> > > set -euo pipefail
+> > >
+> > > DEV=3D"wlo0"
+> > > QUEUE=3D"1"
+> > > RTP_DST_PORT=3D"5004"
+> > > DUP_PCT=3D"25%"
+> > > CORR_PCT=3D"60%"
+> > > DELAY=3D"1ms"
+> > > VERIFY_SECONDS=3D15
+> > >
+> > > usage(){ echo "Usage: sudo $0 [-d DEV] [-q QUEUE] [-P UDP_PORT]"; exi=
+t 1; }
+> > > while [[ $# -gt 0 ]]; do
+> > > case "$1" in
+> > > -d) DEV=3D"$2"; shift 2;;
+> > > -q) QUEUE=3D"$2"; shift 2;;
+> > > -P) RTP_DST_PORT=3D"$2"; shift 2;;
+> > > *) usage;;
+> > > endac
+> > > done || true
+> > >
+> > > [[ -d /sys/class/net/$DEV ]] || { echo "No such dev $DEV"; exit 1; }
+> > >
+> > > if ! tc qdisc show dev "$DEV" | grep -q ' qdisc mq '; then
+> > > echo "Setting root qdisc to mq.."
+> > > tc qdisc replace dev "$DEV" root handle 1: mq
+> > > fi
+> > >
+> > > echo "Adding ntuple to steer UDP dport $RTP_DST_PORT -> tx-queue $QUE=
+UE..."
+> > > ethtool -N "$DEV" flow-type udp4 dst-port $RTP_DST_PORT action $QUEUE=
+ || {
+> > > echo "some flows will still land on :$QUEUE"
+> > > }
+> > >
+> > > echo "Attaching netem duplicate=3D$DUP_PCT corr=3D$CORR_PCT delay=3D$=
+DELAY on parent :$QUEUE.."
+> > > tc qdisc replace dev "$DEV" parent :$QUEUE handle ${QUEUE}00: \
+> > > netem duplicate "$DUP_PCT" "$CORR_PCT" delay "$DELAY"
+> > >
+> > > tc qdisc show dev "$DEV"
+> > >
+> > > echo
+> > > echo "Start an RTP/WebRTC/SFU downlink to a test client on UDP port $=
+RTP_DST_PORT."
+> > > echo "Capturing for $VERIFY_SECONDS s to observe duplicates by RTP se=
+qno.."
+> > > timeout "$VERIFY_SECONDS" tcpdump -ni "$DEV" "udp and dst port $RTP_D=
+ST_PORT" -vv -c 0 2>/dev/null | head -n 3 || true
+> > >
+> > > if command -v tshark >/dev/null 2>&1; then
+> > > echo "tshark live RTP view :"
+> > > timeout "$VERIFY_SECONDS" tshark -i "$DEV" -f "udp dst port $RTP_DST_=
+PORT" -q -z rtp,streams || true
+> > > fi
+> > >
+> > > echo
+> > > echo "Netem stats, see duplicated counters under handle ${QUEUE}00:):=
+"
+> > > tc -s qdisc show dev "$DEV" | sed -n '1,200p'
+> >
+> >
+> > Thanks for the config.
+> >
+> > If you can talk about it: I was more interested in what your end goal i=
+s.
+> > From the dev name it seems $DEV is a wireless device? Are you
+> > replicating these RTP packets across different ssids mapped to
+> > different hw queues? Are you forwarding these packets? The ethtool
+> > config indicates the RX direction but the netem replication is on the
+> > tx.
+> > And in the short term if a tc action could achieve what you are trying
+> > to achieve - would that work for you?
+> >
+> > cheers,
+> > jamal
 
