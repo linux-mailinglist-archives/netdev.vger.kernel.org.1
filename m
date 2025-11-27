@@ -1,223 +1,144 @@
-Return-Path: <netdev+bounces-242369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5D3EC8FD31
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 18:59:08 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39280C8FDA4
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 19:02:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 113613AD150
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 17:58:33 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 534DD4E3007
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 18:02:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 679FD2F6909;
-	Thu, 27 Nov 2025 17:58:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 631782EE611;
+	Thu, 27 Nov 2025 18:02:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SO6Uiu/m";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="rcquEUCf"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="gvrmCN0Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 927F82F60CA
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 17:58:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A86F62405ED;
+	Thu, 27 Nov 2025 18:02:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764266309; cv=none; b=kLYTQEoYOq5KGypKNqKs3wjdTLJTXrS3ivd2OitgQoO4oSQEEPlEvSeRFRNeiJJrWYL1+Q9mb/zPn/3WOfBEqlhnoPqTgau2SqyFkJflxZefHGY0TJcJ8e5F5v6hEtf9Vh0BgqKFu9ehnKHBnuDIysmMzrx3ZSbebWeYO8am9E4=
+	t=1764266569; cv=none; b=EMfO7+EKkQ2iXtNgV19vXV0ARtNHEp59AeUK9ZIdzuRX4UhrmTIZwsSXNAi5O8uS0S6WidpZ05lZ4iOhJaMC0gQkMPGnt/QEps6upUL/iqCjlxAnZ0z3ZurYILU7JX9D5d7BaB3z1D2fXYlq34j5gyMkk7hTiVR83ioyqM2xyN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764266309; c=relaxed/simple;
-	bh=TPEliOZDbEMTucSchU26H1mgBRnCr+iif0iy/Krl6TE=;
-	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To; b=jFiPk34iLFGaRvu5PjFvpji9tBjDu4e2FOZ5RgxMSOXbfFgTBmLS1jOgL6nG0rr16Na2daLDmupjQaA5PLPDT+l8gRP1RDLwzjHBHMWmmDfSiLnTm1rIFoiAn+/PWXLOeLO8jTeiCv8KJcbIYFycjlrLxvkcj0gDE2d0syUWkN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SO6Uiu/m; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=rcquEUCf; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764266306;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DY2OZoOg2Jn10jb874/Zht9ZmafIol/m0aMFjx0QUms=;
-	b=SO6Uiu/mJ+V8yxYH4ytu6endZgpCSVIzBV2Yqsiedu5MDNsNvx1foLso/PdcnLgUaueWfS
-	D0k2/k6XIWFS9vKu7Oss1noZ4yANucyo4WoUqnfr02RMvG/s9UY77/NYRH+uJztoAfH8jX
-	wwWhvw6Tu9aAC/LxYeBsjA1Bu9DcxLg=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-152-VCUkL7RgP1a1Q5Gtvmvd-w-1; Thu, 27 Nov 2025 12:58:23 -0500
-X-MC-Unique: VCUkL7RgP1a1Q5Gtvmvd-w-1
-X-Mimecast-MFC-AGG-ID: VCUkL7RgP1a1Q5Gtvmvd-w_1764266302
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-42b2c8fb84fso681465f8f.2
-        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 09:58:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764266302; x=1764871102; darn=vger.kernel.org;
-        h=in-reply-to:from:content-language:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DY2OZoOg2Jn10jb874/Zht9ZmafIol/m0aMFjx0QUms=;
-        b=rcquEUCfROmwhFDdhqn8XS+VDCZkL0P9VH9X2ss4CYngPcPIJiAISEDh52TBDCY4B8
-         NV/leAJDoAjgQJd+dRpu7SeYt19H2nyVF8pTb/x07Jp/ZcDLeLcgIeUggRFbDea50N/U
-         PavDwtYrtOCc/yyRbyE4qCkZMnao1YSfd2mJkyfo5JSIuW9J+FgpJAnNumB10aIeIIsT
-         p01fyiLQb19SaO5PjVUIelU0UCUkgQtqklILyUxTp28k9v26tUdY6UiWh6QdcczCM2i9
-         ERsK98vJRzUZ99Et834S/SxXnNvHJw3GejURDZwxebka7/2nyW82Yzd2lLNubzAM5/iK
-         TSSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764266302; x=1764871102;
-        h=in-reply-to:from:content-language:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DY2OZoOg2Jn10jb874/Zht9ZmafIol/m0aMFjx0QUms=;
-        b=H9nvSJXuKOUfLNRnk8vZwM80ParVMXB9NB0ViOBWTuTyu833u0mLpLSZMzsehHKH+h
-         lwA5anmf8oHPH9kkuB9pBGWhUslkBScIdUkMHdBkuulhsimCyDunMV8MN8mjBeailzHB
-         Y3NuGaPX6Hf7d6tyOz+uxzs+ZomM8osC1ejxN5UJMuZGR30L/Gj21m4XnbskGlHRuFfT
-         /3g3wNOYN/XlxwueS/DlfPq+SDRZ9+LGT5VSaKeMyIxKKGWDlGj1m/apd9dOcFe7hufV
-         MhCHZlAKtBHFbYCS1TglASopYNcOXPKPDI95z6v6AVzXbwRXo+0cWWeJ0wbW7idq48xi
-         SLRg==
-X-Forwarded-Encrypted: i=1; AJvYcCXWBtRSwtGcyUiE5BVW2vEFsJjxOU47wzQMUqj9KElKDP5ra1hwxh6gAnBlgGf2/w/izdyy1wI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw//8g2l6ezcNY0vWSZ/uGi03Bu8/+yOWjbFuPmdhEbLaYRxoOj
-	dZj9J1YLZcEm3kbzfBC961sycm/NA/CjOgAT7Vrd36mpoq1JW66HP6ofphL9ZVeBfZJ+pd6fVwu
-	LsmnBUiyJStEIMyArvMUbYTIxBPGClcXY8FwVLhbc72l7e+lgKgXQbY/Mmg==
-X-Gm-Gg: ASbGncuDvNG/NPVKCcNPKhlkhj1HXClcpPL9FcWey37ogOrCMXG4uOMRfXDhVYCCohU
-	vghweHT5g9Ce1VBeqHtKzGjMctpx8MgB/AKd5Jmp9d7SkgBC7W0zKTEQv5uooDbmHQ/+j4sgx6c
-	UNK03qYnrKx+XBjU+ksue+umbzL8N2Sc5ndAIKa+LkWynZo7XBeIGZJG6kGyamrdTe1fvjARl0l
-	ZkHS0Wij33GAArKgHCqa33htwJs5j1Rnevj7OL22Xa3tNNc7C7lMbRQ+eKCe75JjLN5KH1jQYvL
-	ukxbI6thf+b2t63uh3eHKg+UoubT0RKgtcH6g5AGgJVu2idSqeICZ/T5HD7nzpanD3e7IfDPFkW
-	4PyVXLG1TbdrmUw==
-X-Received: by 2002:a05:6000:2506:b0:429:b525:6dc2 with SMTP id ffacd0b85a97d-42e0f213901mr12126302f8f.17.1764266301753;
-        Thu, 27 Nov 2025 09:58:21 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGLRSA4nZtw3RbOLioK1qcRhOZy0uuInbULKsyGs0r8xbhY31cwWTMcCnjCEwBSM0N/0WJA6A==
-X-Received: by 2002:a05:6000:2506:b0:429:b525:6dc2 with SMTP id ffacd0b85a97d-42e0f213901mr12126275f8f.17.1764266301322;
-        Thu, 27 Nov 2025 09:58:21 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.155.212])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42e1caa767dsm4882115f8f.38.2025.11.27.09.58.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Nov 2025 09:58:20 -0800 (PST)
-Content-Type: multipart/mixed; boundary="------------YlcUvmJr0yf8fUFaZ0Spby8F"
-Message-ID: <f8d6dbe0-b213-4990-a8af-2f95d25d21be@redhat.com>
-Date: Thu, 27 Nov 2025 18:58:18 +0100
+	s=arc-20240116; t=1764266569; c=relaxed/simple;
+	bh=WvAyNrlGE2aXLm4k+iVAjckeSn6Xr1pOSWuhhB4dnEw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eYuiKOkFSW3Y5R1sZyljUEYuBWkQx+ZFU0LOU436SnTDcNEjN/3Vp0CEvYpxTlCCivD//18kawN4dOfnVqceS4+Fqq6kgqOwyjXtRz130De9qIW1X5Pg5iIVX4vvcByqQ1WRygOCrDPeA3xxAyNWSTyW1Wbl23/AuhBr/UcTtrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=gvrmCN0Z; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=yVdDa+AOG7bxWU39wPpsETVv0gcMopDlgo6rv4+/GLk=; b=gvrmCN0Zi73LvKtmWnZsdXwbhE
+	VipcmGRjHq0XseALF1uILbX2uMIKqrWTRWnrNc9qcJWUKoAUHIjtVpIkBIkmi8t4LeptiTKkWrxtM
+	+dctiqLiZUtvmEkHwbQeoBMFFE+Ocz+TnechLPiolnGtBfMzRXbFNrlQg45T6rjMEx8mE1I7JVTJU
+	SFISvjY8LzPKivCBFAgsP+hqJiitfWl3JQKv9U2puBiDBuxCLsH/DT33udPcpZxDVe+R/alQd3H6K
+	yA75fj55BGkUmYcI8yavLJ4DTLatLEplEVjk5hqfzfntWnr6BDiVJQjR6s1qO9GTVrmGfdIezJdw+
+	mI1+nC1Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50158)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vOgKB-000000005at-0qZB;
+	Thu, 27 Nov 2025 18:02:35 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vOgK5-000000002rM-06I7;
+	Thu, 27 Nov 2025 18:02:29 +0000
+Date: Thu, 27 Nov 2025 18:02:28 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+	Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [PATCH net-next v20 02/14] net: ethtool: Introduce
+ ETHTOOL_LINK_MEDIUM_* values
+Message-ID: <aSiSNA1PaM5Md8ju@shell.armlinux.org.uk>
+References: <20251127171800.171330-1-maxime.chevallier@bootlin.com>
+ <20251127171800.171330-3-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3] xsk: skip validating skb list in xmit path
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- bjorn@kernel.org, magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
- jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org,
- daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
- bpf@vger.kernel.org, netdev@vger.kernel.org,
- Jason Xing <kernelxing@tencent.com>
-References: <20251125115754.46793-1-kerneljasonxing@gmail.com>
- <b859fd65-d7bb-45bf-b7f8-e6701c418c1f@redhat.com>
- <CAL+tcoDdntkJ8SFaqjPvkJoCDwiitqsCNeFUq7CYa_fajPQL4A@mail.gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CAL+tcoDdntkJ8SFaqjPvkJoCDwiitqsCNeFUq7CYa_fajPQL4A@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251127171800.171330-3-maxime.chevallier@bootlin.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-This is a multi-part message in MIME format.
---------------YlcUvmJr0yf8fUFaZ0Spby8F
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-
-On 11/27/25 1:49 PM, Jason Xing wrote:
-> On Thu, Nov 27, 2025 at 8:02 PM Paolo Abeni <pabeni@redhat.com> wrote:
->> On 11/25/25 12:57 PM, Jason Xing wrote:
->>> This patch also removes total ~4% consumption which can be observed
->>> by perf:
->>> |--2.97%--validate_xmit_skb
->>> |          |
->>> |           --1.76%--netif_skb_features
->>> |                     |
->>> |                      --0.65%--skb_network_protocol
->>> |
->>> |--1.06%--validate_xmit_xfrm
->>>
->>> The above result has been verfied on different NICs, like I40E. I
->>> managed to see the number is going up by 4%.
->>
->> I must admit this delta is surprising, and does not fit my experience in
->> slightly different scenarios with the plain UDP TX path.
+On Thu, Nov 27, 2025 at 06:17:45PM +0100, Maxime Chevallier wrote:
+> In an effort to have a better representation of Ethernet ports,
+> introduce enumeration values representing the various ethernet Mediums.
 > 
-> My take is that when the path is extremely hot, even the mathematics
-> calculation could cause unexpected overhead. You can see the pps is
-> now over 2,000,000. The reason why I say this is because I've done a
-> few similar tests to verify this thought.
-
-Uhm... 2M is not that huge. Prior to the H/W vulnerability fallout
-(spectre and friends) reasonable good H/W (2016 old) could do ~2Mpps
-with a single plain UDP socket.
-
-Also validate_xmit_xfrm() should be basically a no-op, possibly some bad
-luck with icache?
-
-Could you please try the attached patch instead?
-
-Should not be as good as skipping the whole validation but should give
-some measurable gain.
->>> [1] - analysis of the validate_xmit_skb()
->>> 1. validate_xmit_unreadable_skb()
->>>    xsk doesn't initialize skb->unreadable, so the function will not free
->>>    the skb.
->>> 2. validate_xmit_vlan()
->>>    xsk also doesn't initialize skb->vlan_all.
->>> 3. sk_validate_xmit_skb()
->>>    skb from xsk_build_skb() doesn't have either sk_validate_xmit_skb or
->>>    sk_state, so the skb will not be validated.
->>> 4. netif_needs_gso()
->>>    af_xdp doesn't support gso/tso.
->>> 5. skb_needs_linearize() && __skb_linearize()
->>>    skb doesn't have frag_list as always, so skb_has_frag_list() returns
->>>    false. In copy mode, skb can put more data in the frags[] that can be
->>>    found in xsk_build_skb_zerocopy().
->>
->> I'm not sure  parse this last sentence correctly, could you please
->> re-phrase?
->>
->> I read it as as the xsk xmit path could build skb with nr_frags > 0.
->> That in turn will need validation from
->> validate_xmit_skb()/skb_needs_linearize() depending on the egress device
->> (lack of NETIF_F_SG), regardless of any other offload required.
+> This is part of the 802.3 naming convention, for example :
 > 
-> There are two paths where the allocation of frags happen:
-> 1) xsk_build_skb() -> xsk_build_skb_zerocopy() -> skb_fill_page_desc()
-> -> shinfo->frags[i]
-> 2) xsk_build_skb() -> skb_add_rx_frag() -> ... -> shinfo->frags[i]
+> 1000 Base T 4
+>  |    |   | |
+>  |    |   | \_ pairs (4)
+>  |    |   \___ Medium (T == Twisted Copper Pairs)
+>  |    \_______ Baseband transmission
+>  \____________ Speed
 > 
-> Neither of them touch skb->frag_list, which means frag_list is NULL.
-> IIUC, there is no place where frag_list is used (which actually I
-> tested). we can see skb_needs_linearize() needs to check
-> skb_has_frag_list() first, so it will not proceed after seeing it
-> return false.
-https://elixir.bootlin.com/linux/v6.18-rc7/source/include/linux/skbuff.h#L4322
+>  Other example :
+> 
+> 10000 Base K X 4
+>            | | \_ lanes (4)
+>            | \___ encoding (BaseX is 8b/10b while BaseR is 66b/64b)
+>            \_____ Medium (K is backplane ethernet)
+> 
+> In the case of representing a physical port, only the medium and number
+> of pairs should be relevant. One exception would be 1000BaseX, which is
+> currently also used as a medium in what appears to be any of
+> 1000BaseSX, 1000BaseCX and 1000BaseLX. This was reflected in the mediums
+> associated with the 1000BaseX linkmode.
 
-return skb_is_nonlinear(skb) &&
-	       ((skb_has_frag_list(skb) && !(features & NETIF_F_FRAGLIST)) ||
-		(skb_shinfo(skb)->nr_frags && !(features & NETIF_F_SG)));
+There's more than just those three for 1000BASE-X:
+	SX
+	LX
+	CX
+	EX
+	BX10 - single fibre strand, single mode, 1310nm and 1490nm over
+		10km.
 
-can return true even if `!skb_has_frag_list(skb)`.
+to name a few more. SFP modules don't have a way to indicate EX, but do
+have a way to indicate 1000BASE-BX10 (BaseBX10 bit set with the rate
+indicating 1000M.)
 
-I think you still need to call validate_xmit_skb()
+Also note that 100BASE-T encompasses 100BASE-TX (what we generally see
+as fast ethernet), 100BASE-T4, etc. Should we be getting these
+descriptions correct as we're introducing this level of detail?
 
-/P
-
-
---------------YlcUvmJr0yf8fUFaZ0Spby8F
-Content-Type: text/x-patch; charset=UTF-8; name="sec_path.patch"
-Content-Disposition: attachment; filename="sec_path.patch"
-Content-Transfer-Encoding: base64
-
-ZGlmZiAtLWdpdCBhL25ldC9jb3JlL2Rldi5jIGIvbmV0L2NvcmUvZGV2LmMKaW5kZXggOTA5
-NGMwZmI4YzY4Li4zOTUxNmE1NzY2ZTUgMTAwNjQ0Ci0tLSBhL25ldC9jb3JlL2Rldi5jCisr
-KyBiL25ldC9jb3JlL2Rldi5jCkBAIC00MDMwLDcgKzQwMzAsOCBAQCBzdGF0aWMgc3RydWN0
-IHNrX2J1ZmYgKnZhbGlkYXRlX3htaXRfc2tiKHN0cnVjdCBza19idWZmICpza2IsIHN0cnVj
-dCBuZXRfZGV2aWNlCiAJCX0KIAl9CiAKLQlza2IgPSB2YWxpZGF0ZV94bWl0X3hmcm0oc2ti
-LCBmZWF0dXJlcywgYWdhaW4pOworCWlmIChza2Jfc2VjX3BhdGgoc2tiKQorCQlza2IgPSB2
-YWxpZGF0ZV94bWl0X3hmcm0oc2tiLCBmZWF0dXJlcywgYWdhaW4pOwogCiAJcmV0dXJuIHNr
-YjsKIAo=
-
---------------YlcUvmJr0yf8fUFaZ0Spby8F--
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
