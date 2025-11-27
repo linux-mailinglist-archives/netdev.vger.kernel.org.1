@@ -1,76 +1,83 @@
-Return-Path: <netdev+bounces-242151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AAFBC8CC3F
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 04:43:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66DACC8CC4E
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 04:48:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EA09A34C142
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 03:43:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 068323AEC53
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 03:48:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 591FC29D294;
-	Thu, 27 Nov 2025 03:43:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45CA02BE7AD;
+	Thu, 27 Nov 2025 03:48:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kxrf74cC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Coo35Sns"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 341C51391
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 03:43:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D0D5225416;
+	Thu, 27 Nov 2025 03:48:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764214988; cv=none; b=hKfaxalJVhqdJMGqgRJ+mk5YWAr7Zf2KNSch9RCk9TCDFhSsI61rOyIbV67PankjemZwUCPgFukbetYTAfSct6IzV6X84/746xEUHT8FLqODsmIHxBohIG2OlSy7Fo22lQ4oIvFxkUbz4OjAmFTTpN68WQvEf5Jiy69kXbu9aE4=
+	t=1764215289; cv=none; b=rNjRTPBjFz5Z08rknYoNVof630GUGDYuWxMiBjKrxOHWqMFq+2WLF2BqEhnLXo3R2ZVa5+w+g8z2Es96V+cIFRSt0JX4p1Mh6fhZ/EJ9UmzY1s0uE5QuR8aF2yMWbWkd676RT+BZ8uy0I8YmQ4hdGQdzAIu9gHUPcZ+QFhqyisk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764214988; c=relaxed/simple;
-	bh=n9n3yGRDHka3SDIZ8zG0ckFrHUiNrWlkVL4RqQb4kmw=;
+	s=arc-20240116; t=1764215289; c=relaxed/simple;
+	bh=ARpE24dRbbn0AGmA6audrYNoVgjKJW6i3Rl1fEyJOm4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hTAA32F6fRsQMlSMex96Ld3CYTPcZWxNNIJ7GYm0PfhVI55cYDTWgtgKbr2k0+1oHdq54q1BqnFfxAcCzYhwJ7k9jqGDGlYBgysNWKnIhrIiabA5eSYI86+wQGOi78t40PsullPGfmVDi89M1Ls8cLzAgtUpYWXMylNw3syo2K0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kxrf74cC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E832C4CEF8;
-	Thu, 27 Nov 2025 03:43:06 +0000 (UTC)
+	 MIME-Version:Content-Type; b=C9LvlkInrUdokYyhgv0huA6594MwGmdCStQWsXxo/IDZ+f4vZiDYFaW+uM4UvUEAJxf9qz3Cy0ns6E/rL9zBJVwUo7X8wzyMStnVUi2sswCD3OrJ4meBhGaa4ILQ18M3FmnRUd+VDlIvdwhel4yRcnolZPunELqVbff25lM3bDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Coo35Sns; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2776C4CEF8;
+	Thu, 27 Nov 2025 03:48:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764214986;
-	bh=n9n3yGRDHka3SDIZ8zG0ckFrHUiNrWlkVL4RqQb4kmw=;
+	s=k20201202; t=1764215286;
+	bh=ARpE24dRbbn0AGmA6audrYNoVgjKJW6i3Rl1fEyJOm4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kxrf74cCmUAwvrhSqC3+oIkwm20Zh8Fq+Q8cmPEfOyF1E1nX1++myYJ2qkRgUCTCb
-	 oIYg74skYLzxxF98VssOSKUKeINiNNwqlkBaEIAmFM7lJLXvUU8skebZ/53hjWkoYL
-	 CvM/WrSOFvFgdapAZ7ifouoBY4kz9D2JHeAfs875CkIHWnWYUq3rE7LnDJS7n9mtu9
-	 hfuk26MVddvvxEQlmYtgfXuNnpPMH+/qsKqKEPIg/7m35lPanaRRkV5wxRHje5o7ZP
-	 JmOqp4Jr/lzSFGAt8zw0yJ1dcoHvmqAUTC6YV2G+DY/rn17+5uBgN32C/v5lpGJZfy
-	 WydEqk8ts7uEA==
-Date: Wed, 26 Nov 2025 19:43:05 -0800
+	b=Coo35SnsktbtAy15Xe/7Nr4jYGaiedZxsGCI5rLUuXAtKcuuVzlShQSusqoVSeq+M
+	 uB/hP9v5bZCjFZrJdV6GL6wK675Acz8Bt/uTSVvt046w9U8D1Mqi63TnDwmsIS6Xzb
+	 T6GTqn3Os2LdXiLoyBlHj9Ey1A+00TmFQRsjqbbtOUXuQ/0pbfyLUMhoujJCSo3i7g
+	 OycRZyb/RkSEkznzhE76aK0vDbSZ1odFsUkaKXGrIH7AzQBpSvNWf+MBflD3epy9Me
+	 GIS9AzYPLp0TXY+lGwjsfwCCIEw17mEZ5fV65p941aRlP/J/qtUYydFe/i4PDhL2b5
+	 DuJQZHd3YSpbw==
+Date: Wed, 26 Nov 2025 19:48:04 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@redhat.com>
-Cc: Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@toke.dk>, Jamal Hadi
- Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko
- <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Jonas =?UTF-8?B?S8O2cHBlbGVy?=
- <j.koeppeler@tu-berlin.de>, cake@lists.bufferbloat.net,
- netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 0/4] Multi-queue aware sch_cake
-Message-ID: <20251126194305.31ebd8e7@kernel.org>
-In-Reply-To: <20251124-mq-cake-sub-qdisc-v1-0-a2ff1dab488f@redhat.com>
-References: <20251124-mq-cake-sub-qdisc-v1-0-a2ff1dab488f@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: Jon Kohler <jon@nutanix.com>, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Michael S.
+ Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio
+ =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "virtualization@lists.linux.dev"
+ <virtualization@lists.linux.dev>
+Subject: Re: [PATCH net v3] virtio-net: avoid unnecessary checksum
+ calculation on guest RX
+Message-ID: <20251126194804.62737172@kernel.org>
+In-Reply-To: <CACGkMEt2FFSiodAN=FFT7JnV78pmVRN4VTr_XDm05J0xpSfmHA@mail.gmail.com>
+References: <20251125222754.1737443-1-jon@nutanix.com>
+	<CACGkMEvK1M_h783QyEXJ5jz25T-Vtkj4=-_dPLzYGwPg8NSU5Q@mail.gmail.com>
+	<8FC82034-6D22-4CDC-B444-60F67A25514C@nutanix.com>
+	<CACGkMEt2FFSiodAN=FFT7JnV78pmVRN4VTr_XDm05J0xpSfmHA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, 24 Nov 2025 15:59:31 +0100 Toke H=C3=B8iland-J=C3=B8rgensen wrote:
-> This series adds a multi-queue aware variant of the sch_cake scheduler,
-> called 'cake_mq'. Using this makes it possible to scale the rate shaper
-> of sch_cake across multiple CPUs, while still enforcing a single global
-> rate on the interface.
+On Thu, 27 Nov 2025 09:27:16 +0800 Jason Wang wrote:
+> > It could, sure. This made it into 6.17 branch.
+> >
+> > Would you like me to send a separate patch with a Cc: stable
+> > or could someone just edit the commit msg when they queue
+> > this?  
+> 
+> I think a new version might be better.
 
-Looks like this needs a respin after Eric's recent changes.
---=20
-pw-bot: cr
+Added.
 
