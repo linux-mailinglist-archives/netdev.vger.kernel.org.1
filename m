@@ -1,183 +1,177 @@
-Return-Path: <netdev+bounces-242323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2087DC8F2F2
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 16:14:05 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83FC5C8F398
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 16:19:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 19BE1353EEE
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 15:09:52 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 68E7C4EE635
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 15:11:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6E39335067;
-	Thu, 27 Nov 2025 15:08:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0D7F3346A1;
+	Thu, 27 Nov 2025 15:11:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="izeMkxUc";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="E4p5nSWA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cTeRQBnA"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C19028A3F2
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 15:08:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47094257830
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 15:11:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764256137; cv=none; b=e3HI9lvmbg9aomSpEDpYbZsKloHT0ZVpVF2nB7ADiM6zLI6gfHyaTRFsEd/isn9Ou2bhwvU7Q1/skwsPJrOgeT4CyLL4w/J7k3hLz4w5ppodbmBCznDMa2pS8uPUmtxTILmbvyGPwW1v7XDrV/YpVJu1/JaosuR96pmUEXfR7Fg=
+	t=1764256307; cv=none; b=tS4hVb5J+yDj9FXd+jSAhLEie1Efa3XvDJHnyFpL5l5tddFj51HuZlkwPqIGZroyZwOXj4aOlko5LwO/X/Pfb3JKnWIXx32RZnDSZuIUGsN6zb7OepPtkat8NXJ5mIzkP72upFUNGLyOBBk2T8VWPdCLpj/dwQTdwceNefnpy1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764256137; c=relaxed/simple;
-	bh=r4ZzWf622tsNVtnWwIdu20nyqNsXO5bOWbpImO2ygDo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WTEsMS+oDWvvQ0c43OaOfZEVEGgzYHBKbJRo+P9/Yu2kb2q+6q5qCBQLYADJvw20gNjcegrw9HcI/4cNkHy5M15XWggTd3o5szu2rcHfIWLvMqIKSVF1OKjHQ71tkK+Ph9ikM2GKrO9B6xYOqnEkcN7YBZubx+BdukyLvDAZo0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=izeMkxUc; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=E4p5nSWA; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764256135;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=975phbBgu5VyA1MivZ3ZkCvdliAL8o8g367hqsGdYL0=;
-	b=izeMkxUcEpi9N2BZ/ZRKCw3A8n/LBtjZ1oriu7joYBpRVZ1AWhqG3Jr/DmUnq4SxOShRyR
-	hgASRRI0x9TZsVZvrp+7AMOiCZuU0zGf91+TCyVCisVDRYzMMBalQG7QVRLClyF6mQzTdJ
-	Vxc/0+WiHGL8MQoPJ4XH+30oF7eeLrU=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-586-0MeI-0xGM6e-Zxq9J0g_hg-1; Thu, 27 Nov 2025 10:08:53 -0500
-X-MC-Unique: 0MeI-0xGM6e-Zxq9J0g_hg-1
-X-Mimecast-MFC-AGG-ID: 0MeI-0xGM6e-Zxq9J0g_hg_1764256133
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-b71043a0e4fso90399066b.2
-        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 07:08:53 -0800 (PST)
+	s=arc-20240116; t=1764256307; c=relaxed/simple;
+	bh=lL2txegud9ux4YyJuiMB3jslVmUHJ0T8vXbTtZewYus=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Brbya0oVeyzZeMHx2bcQqo9vyOBNKLfYPbaMa2LbYCuRUSYMSLQv8nSD4/AvDZpHmjPS9HGOyYSSdPie6Uu0uGb0ZJDuDU9OqmW7TKTSPIA9u+GBVZf4CO3u7yA3DgMhc9dGUoik9r18fteRSBbLJPIMQFbFHkxjE0ZOdrTHa9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cTeRQBnA; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4ee158187aaso10406841cf.0
+        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 07:11:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764256132; x=1764860932; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=975phbBgu5VyA1MivZ3ZkCvdliAL8o8g367hqsGdYL0=;
-        b=E4p5nSWANwxuXM8zq0rhGoqCVu6E6wrGVYyPMolnMCdFHSm2SKcji8uTCGMxMgN/3U
-         3mHa5sfewNpy5Xy3jfBbTPTSRzVacaAFqSNyyTeZyJ8iQhdhPq11pkJGKO9FxPGE/7vu
-         jsTHo5QIDeYNEAkSTW5BqFYs6IUXIGUUqpHkJB5dYZTpIYJT05We0FxHO7vJc1fEi676
-         CP4eN3deWXznE2e+ilxFWkbZPoXnV3F6SvnOakuIzJKZDKsyAEYfk616WlnMbttdMB77
-         1tV43w76464HznRlaf3zNAL2AD8U0eeoscXnMuxlG6QX4kyMlB7FXzl/QSDgSImyOTt8
-         QP2A==
+        d=google.com; s=20230601; t=1764256305; x=1764861105; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TGMldPR2co4OK62sx7a7yX7veINWWn7QvUHPjJEI6uQ=;
+        b=cTeRQBnA7GzmEWIVm6mw0wrSPg/VPxR7K4pEuUva5serJHB4fhjDfUX7sRRfBzNN2y
+         iNvaWnysy0zjbYaPPZHLkIN5d5SzP3NH7B5SM6w6eaXq/yV3HOz3sMi07xFrTk//oIuA
+         VMo15lsZ0OOMR/KluHj1hJQ78yyJUG8y88XUMBYPO1OETIfuxTlUH6sYyVfuFn3k+lKU
+         Y33DdTo15jEEV7Hrn/XNE4OZigmzwk4rV/YzEih1MUSZ+uaBM/oBmzUrcM5lIDZe24ha
+         /z5d5TkFQnPcBS5hyTIWGS4FpAFuOu0dpMfYzGS5jRTI1Bwtlud9jflx5jo0mmHfoLsa
+         5tKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764256132; x=1764860932;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=975phbBgu5VyA1MivZ3ZkCvdliAL8o8g367hqsGdYL0=;
-        b=VB5dSsH5srVwmLrzMvDU9aDm8pD3frIM0UDdWr2IEPPAkKJBznqkO25e+K3Rdu7zLT
-         iJOGHQ4JuJD3wItdRl2HlrwixnjakTBeovETltaschDTArSbx0cgRgb8N5vFpAm36n+0
-         +qs3NsSNeE2vsEZduZ+0DU1pEqofp9Sm2kkAHeuIdyeiu9IUdJSIQUKWEzMWFDkoayFc
-         n1+sAHBTIMrcburAcfOMgx0s4QInAe7z7twrPbFCcimEYS6k48jt5qK5eXwJTClHH9cE
-         ELt990w1am13YsiWjKvBRIZjRjHm7KKUpesoMvPJaosTWxB0aHv4oOrJRxvs8B7b0Gkm
-         a1Mw==
-X-Forwarded-Encrypted: i=1; AJvYcCVY/E3LK+Gn0nKIIMSDmqt6ER4z3L4JVG1aBFbnJYnNCUQrsb9QYjkUoTIF2uadRnXU3QN17hs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwwQJEiiaUo6VKVXPBXqi73mnx3DzlJ+LbM5hBH1wil2mogTJUs
-	rrwUMvOecGnr620aKsDt3HvCtuSXQrpRRDT3AozZPlJ6bDjo6MhQvmFVAWDTvJ138afOYR/gX0L
-	5MTNBN4vY0o+Bjfh+LyRKX9K4lVtU6miJKAVMtTv66tODpGKZkd54M9Om3g==
-X-Gm-Gg: ASbGnctRUAVz3gYhcZX6EcX2Ov50CJDu06MgPhbJWq3N2GgJ8gFNOka81BkaC8OV639
-	LePAa5Ql+s31mLK7idvPefMfkKi38c2QIRqIDJ0SmAh228Tp4K9MNd7BdqcoTvNKLBqglxlE3DQ
-	8b2Y55SgSX8ffqxV4XwpPtgW4QxKtzl0sHpJ32U6coPjUI1nP6PvT4+pkawihRqZLMh1qY+Tc5E
-	J36fg5yq42fEcDTaOEyYQ1YdEV/EBgR8Vkbf9NX6ea9JYDsgArqp8qBNVwfkQc3h8MBxS8w2IwQ
-	2DXCxfts+kwfzx4Msxhe9oRiNdPWBLHu8W/KT3h8xLocLwygMtqLM9Ft93G+76HzK+dda1csMMy
-	xd4ndYMmYn4gTlA==
-X-Received: by 2002:a17:907:1b0c:b0:b76:3dbe:7bf0 with SMTP id a640c23a62f3a-b767150b850mr2168751866b.2.1764256132443;
-        Thu, 27 Nov 2025 07:08:52 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGb4ULpaNMWei1hmL/IxRSlagWdzmISZEpog2WtfT3XFsalNSmZPmRvV9TSFmgMpjPfhmMZ7w==
-X-Received: by 2002:a17:907:1b0c:b0:b76:3dbe:7bf0 with SMTP id a640c23a62f3a-b767150b850mr2168747466b.2.1764256131941;
-        Thu, 27 Nov 2025 07:08:51 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.155.212])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b76f5163903sm195890366b.7.2025.11.27.07.08.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Nov 2025 07:08:51 -0800 (PST)
-Message-ID: <4362bcbe-4e82-4198-955f-e64b3ff2d9c9@redhat.com>
-Date: Thu, 27 Nov 2025 16:08:49 +0100
+        d=1e100.net; s=20230601; t=1764256305; x=1764861105;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=TGMldPR2co4OK62sx7a7yX7veINWWn7QvUHPjJEI6uQ=;
+        b=mpiUgS8gvDCo9DoVdBojCZLi6agaW1iURqb4HI/NxKQQwcJkRAhTEv2YSSFmcn/44W
+         V3V3JMWGik9qcdiHPAVdnqRWHYuNn1s/dNd6OHocqgwDy/woG+aU2KFQGxAz7gGfFPVl
+         mwshEYdApL9F6ExWWzLqdaBt1o2IO2wIzPqPO81wzbM0NSnxOs39JgUomtStJeEFYZXK
+         x+TFahG/XT/iH+VQHsO3n5IVf9NmeqaQqxiA6cbGKKvj47JJHax23TcvjQ7Jq99+hT/p
+         taXG78F1NU+hN0u6/xZzpggFHoPuMzhxTRPlrmbAvlfbUW4fHnoZY0bT7ioR81z0RBua
+         AybA==
+X-Forwarded-Encrypted: i=1; AJvYcCUVDwOa0dX6icvqrhUIrvAh9s0xJIpV+6jdWI5xTuFahtUaqMJnZtO/X58ncWAo24E6q128vEA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEXK+AbamlCyIvCTecgUTE0hqF63D0+uZwA7ZB1C6rYR8zYvcG
+	LeDdjTYE2uJPWLJaJWyAf436FtzZjTCtQB/A05/95fQI45iSoM4sRg18OXPqJ/fJ6M4g+5BBRzT
+	e/dMb/AT1pGkJWxe6sjyLsulksItuCHgPDageWETe
+X-Gm-Gg: ASbGncvQ/dG30ZAwD6J+5MMHcg/3rK11NvEyo8LAvingIGGYRenUY4ra6H5eVJcqNLh
+	Jr3d3qwnEmz8x1aYqgZCtHlksVbreQgVfS5kd1Vf5cvFFHJFtqbNwOGbY4IsAnB8wfe1kzdagxz
+	CPkyWm60ALdhZHH/dhpzx3pQLeI7OYw3G4xuOmz8JJRdoWgBX9G/dT20WoYaet+fSFbvnaZN5RV
+	1o1uNdEUEizAO4aFd2Tyh972JeTfR5Ng4BakOLqEZZ9wcFxkuErv48rbR2S6g//Cj5inNs=
+X-Google-Smtp-Source: AGHT+IHX28DZubR5YC2LgjvbqnH6C6/8G22z+8hn9EJfTYpkAY5zNQ3nvT0+Q05E1oDuCXNVNv7uHKv0/ZRKpRlbt+c=
+X-Received: by 2002:ac8:5f82:0:b0:4ed:b4e3:cfb0 with SMTP id
+ d75a77b69052e-4ee58858da8mr336066921cf.29.1764256304705; Thu, 27 Nov 2025
+ 07:11:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next,v2 00/16] Netfilter updates for net-next
-To: Pablo Neira Ayuso <pablo@netfilter.org>, netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org,
- edumazet@google.com, fw@strlen.de, horms@kernel.org
-References: <20251126205611.1284486-1-pablo@netfilter.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251126205611.1284486-1-pablo@netfilter.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20251124200825.241037-1-jhs@mojatatu.com> <20251124145115.30c01882@kernel.org>
+ <CAM0EoM=jDt_CeCop82aH=Fch+4M9QawX4aQdKdiUCsdFzuC2rQ@mail.gmail.com>
+ <CAM0EoM=Rci1sfLFzenP9KyGhWNuLsprRZu0jS5pg2Wh35--4wg@mail.gmail.com>
+ <CANn89iJiapfb3OULLv8FxQET4e-c7Kei_wyx2EYb7Wt_0qaAtw@mail.gmail.com>
+ <CAM0EoMm4UZ9cM6zOTH+uT1kwyMdgEsP2BPR3C+d_-nmbXfrYyQ@mail.gmail.com>
+ <CANn89i+_4Hj2WApgy_UBFhsDy+FEM8M1HhutrUcUHKmqbMR1-A@mail.gmail.com>
+ <CAM0EoMmoMUtrBHyYUWNeBnFFj8kDFYPyQB+O1fdGB4xk_bMWZA@mail.gmail.com>
+ <CANn89i+zDW5ttPZ7fw2gDbVQqXj2uFoeEeTRSU6gzFLM3zGCeA@mail.gmail.com> <CAM0EoMmzt1tDpoqK=mMZoj1=6UU2Ytim2aqJWOBAZmPfNyZSfQ@mail.gmail.com>
+In-Reply-To: <CAM0EoMmzt1tDpoqK=mMZoj1=6UU2Ytim2aqJWOBAZmPfNyZSfQ@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 27 Nov 2025 07:11:33 -0800
+X-Gm-Features: AWmQ_bn3iBruLy8dyS89veJy9eNtEQM0dfNGZOO3D9P_awgUaRlerorDBuFM8Hg
+Message-ID: <CANn89iKKKwj33WgSbGKDa7JB=qRBXSH6VbiAV=umwOgwYsbmTQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] net/sched: act_mirred: Fix infinite loop
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, pabeni@redhat.com, 
+	jiri@resnulli.us, xiyou.wangcong@gmail.com, netdev@vger.kernel.org, 
+	dcaratti@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/26/25 9:55 PM, Pablo Neira Ayuso wrote:
-> v2: - Move ifidx to avoid adding a hole, per Eric Dumazet.
->     - Update pppoe xmit inline patch description, per Qingfang Deng.
-> 
-> -o-
-> 
-> Hi,
-> 
-> The following batch contains Netfilter updates for net-next:
->  
-> 1) Move the flowtable path discovery code to its own file, the
->    nft_flow_offload.c mixes the nf_tables evaluation with the path
->    discovery logic, just split this in two for clarity.
->  
-> 2) Consolidate flowtable xmit path by using dev_queue_xmit() and the
->    real device behind the layer 2 vlan/pppoe device. This allows to
->    inline encapsulation. After this update, hw_ifidx can be removed
->    since both ifidx and hw_ifidx now point to the same device.
->  
-> 3) Support for IPIP encapsulation in the flowtable, extend selftest
->    to cover for this new layer 3 offload, from Lorenzo Bianconi.
->  
-> 4) Push down the skb into the conncount API to fix duplicates in the
->    conncount list for packets with non-confirmed conntrack entries,
->    this is due to an optimization introduced in d265929930e2
->    ("netfilter: nf_conncount: reduce unnecessary GC").
->    From Fernando Fernandez Mancera.
->  
-> 5) In conncount, disable BH when performing garbage collection 
->    to consolidate existing behaviour in the conncount API, also
->    from Fernando.
->  
-> 6) A matching packet with a confirmed conntrack invokes GC if
->    conncount reaches the limit in an attempt to release slots.
->    This allows the existing extensions to be used for real conntrack
->    counting, not just limiting new connections, from Fernando.
->  
-> 7) Support for updating ct count objects in nf_tables, from Fernando.
->  
-> 8) Extend nft_flowtables.sh selftest to send IPv6 TCP traffic,
->    from Lorenzo Bianconi.
->  
-> 9) Fixes for UAPI kernel-doc documentation, from Randy Dunlap.
-> 
-> Please, pull these changes from:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git nf-next-25-11-26
-> 
-> Thanks.
+On Thu, Nov 27, 2025 at 6:45=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com>=
+ wrote:
+>
+> On Wed, Nov 26, 2025 at 3:30=E2=80=AFPM Eric Dumazet <edumazet@google.com=
+> wrote:
+> >
+> > On Wed, Nov 26, 2025 at 12:20=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu=
+.com> wrote:
+> > >
+> > > On Wed, Nov 26, 2025 at 1:20=E2=80=AFPM Eric Dumazet <edumazet@google=
+.com> wrote:
+> > > >
+> > > > On Wed, Nov 26, 2025 at 10:14=E2=80=AFAM Jamal Hadi Salim <jhs@moja=
+tatu.com> wrote:
+> > > >
+> > > > > It's the multiport redirection, particularly to ingress. When it =
+get
+> > > > > redirected to ingress it will get queued and then transitioned ba=
+ck.
+> > > > > xmit struct wont catch this as a recursion, so MIRRED_NEST_LIMIT =
+will
+> > > > > not help you.
+> > > > > Example (see the first accompanying tdc test):
+> > > > > packet showing up on port0:ingress mirred redirect --> port1:egre=
+ss
+> > > > > packet showing up on port1:egress mirred redirect --> port0:ingre=
+ss
+> > > >
+> > > > Have you tried recording both devices ?
+> > > >
+> > > > diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+> > > > index f27b583def78e4afecc7112854b93d59c2520201..711fc2e31cb0451c07a=
+39f9c94226357d5faec09
+> > > > 100644
+> > > > --- a/net/sched/act_mirred.c
+> > > > +++ b/net/sched/act_mirred.c
+> > > > @@ -445,15 +445,17 @@ TC_INDIRECT_SCOPE int tcf_mirred_act(struct s=
+k_buff *skb,
+> > > >                 return retval;
+> > > >         }
+> > > >         for (i =3D 0; i < xmit->sched_mirred_nest; i++) {
+> > > > -               if (xmit->sched_mirred_dev[i] !=3D dev)
+> > > > +               if (xmit->sched_mirred_dev[i] !=3D dev &&
+> > > > +                   xmit->sched_mirred_dev[i] !=3D skb->dev)
+> > > >                         continue;
+> > > > -               pr_notice_once("tc mirred: loop on device %s\n",
+> > > > -                              netdev_name(dev));
+> > > > +               pr_notice_once("tc mirred: loop on device %s/%s\n",
+> > > > +                              netdev_name(dev), netdev_name(skb->d=
+ev));
+> > > >                 tcf_action_inc_overlimit_qstats(&m->common);
+> > > >                 return retval;
+> > > >         }
+> > > >
+> > > >         xmit->sched_mirred_dev[xmit->sched_mirred_nest++] =3D dev;
+> > > > +       xmit->sched_mirred_dev[xmit->sched_mirred_nest++] =3D skb->=
+dev;
+> > > >
+> > > >         m_mac_header_xmit =3D READ_ONCE(m->tcfm_mac_header_xmit);
+> > > >         m_eaction =3D READ_ONCE(m->tcfm_eaction);
+> > >
+> > > Did you mean not to decrement sched_mirred_nest twice?
+> >
+> > No, sorry, we should decrement twice of course.
+> >
+>
+> Ok, I tested.
+> While it "fixes" it - it's not really a fix. It works by ignoring directi=
+on.
+> Example, this is not a loop but currently would be claimed to be a
+> loop because port0 appears twice:
+> port0 ingress --> port1 ingress --> port1 egress
+> Note: port0 ingress and port0 egress cannot create a loop.
 
-The AI review tool found a few possible issue on this PR:
+I am not familiar with this stuff, can the direction be known and
+taken into account ?
 
-https://netdev-ai.bots.linux.dev/ai-review.html?id=fd5a6706-c2f8-4cf2-a220-0c01492fdb90
-
-I'm still digging the report, but I think that at least first item
-reported (possibly wrong ifidx used in nf_flow_offload_ipv6_hook() by
-patch "netfilter: flowtable: consolidate xmit path") makes sense.
-
-I *think* that at least for that specific point it would be better to
-follow-up on net (as opposed to a v3 and possibly miss the cycle), but
-could you please have a look at that report, too?
-
-Thanks,
-
-Paolo
-
+Really, anything but adding new bits in sk_buff.
 
