@@ -1,168 +1,155 @@
-Return-Path: <netdev+bounces-242108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34893C8C660
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 01:01:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E0AEC8C672
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 01:08:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D0F0A4E1512
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 00:01:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5A103AEFAC
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 00:07:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E340A19CD1D;
-	Thu, 27 Nov 2025 00:01:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9967F20311;
+	Thu, 27 Nov 2025 00:07:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AZt5mN2E"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LW00lKRJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f52.google.com (mail-yx1-f52.google.com [74.125.224.52])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F21912B94
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 00:01:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F788944F
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 00:07:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764201686; cv=none; b=GQvubFJNzVLC4rUAMIU8EReIpsD58zFQng1Am0pT4ED+UoRbdZF7rQgUjtRRH+vXFyvl6y3Y2FybC+k1Qls05ukJnfBi7BandzPK6+pYsBzTGOEdS/jk9kJXoo1DiU/j9blwtysrBdB96Kk0rYRfe1gaSCuGLgyLNfh/iwbn3c4=
+	t=1764202077; cv=none; b=pGv8SMI+Iph4cjMTdUPnblKTc/LcWFpU1bFdyiXwwF5xUf3w0nkSglTOMn0EhfFC7g0XCmhHrLBSSMZVIM7RRFECOxHp23pEPC4bh9PbIZXghIsV2wlBbWfBIsK/VUlVqPWgNSU+Q2je0LHqBG4zYqfiw4fFux3mNL2qW6jei4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764201686; c=relaxed/simple;
-	bh=qtu1nb2Krxpt4zEcBrO4lg25dacbILv1IGv5eZFGv08=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=dMMw17Cyi8osi8w2d0ujYQsO4F1tkb3Z2/GVgC68W/F+OpK1fjqW45uLgmvbiSWm9nNT/QFf9Q2HUJxX5bOX926TkygN2sk5gjJ83Uv3Sm2FXDZkJgODy1BShtEnftwUXPkNGIbmGBvZv5dBUcEkxdai24mH2vHVIpmyJdzJ9vE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AZt5mN2E; arc=none smtp.client-ip=74.125.224.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-64308342458so308040d50.0
-        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 16:01:25 -0800 (PST)
+	s=arc-20240116; t=1764202077; c=relaxed/simple;
+	bh=PVwqPtohHLQR8u+q6aeUNdyYbu/y4oRVcTilsjce+Ko=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=AgcxMA+c5GPSNSvWTN1OXNDIR6KM+q9mUhrNU5xErpgv/CkqQ4bBZ6wkSbKSZyt6wjUXddPGVbjU5LRBQpXR70R+m4C4RFyqsOWRoQCOq6lKLh4MpyaW16hos2YVkvDhBafF85BhYhBs4RG6xBAJFUVFZtMilVy1lvJ37Mroyd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LW00lKRJ; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7ae3e3e0d06so177310b3a.0
+        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 16:07:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764201684; x=1764806484; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EVT/rFi5k1cz1OWOuO76TzsQ6NfdN9/fjnD9KoCNbVI=;
-        b=AZt5mN2EpGAfYw79MzXpTkuvXkIPDW2vbVpP+aitpSM3nGF0uC9rIfe+2X85Dk0VQ5
-         ft/wZ3DsYyQchqY5R/4+JFU7LHkU7ekuDxgQ8wTlDSFYFfkC8vmAS0kPt+nAFw/mRzLj
-         NRBoIDi8s0IeN7JaugJwpWEzK92NeJ+YycM9Xclec3bR9Yv2vzPB8yZxFDkXge2+k5kj
-         yrfubMJeCOY/0KXLNYRK1bslzF9PULphiyur96H6qLma8xwZDWVntKbJsAZ+Ft1M/cMT
-         sV4Lhuso6uD/SYPiftisfV6IXBbUTlqUqAD3D491Vz8Nj5XDfnnKRy7+jGkn5lC4HZg4
-         1Gew==
+        d=google.com; s=20230601; t=1764202075; x=1764806875; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=dnKcf2+51kURgvBReSH5vkNuGQRyYKTVBdC22OlhFiE=;
+        b=LW00lKRJCOD6broJZk7Pq8M2gSC4MrqhNlwmhzdH8V58SKBkpdSGZjmirZnoiui0tA
+         m39d20pL1k0QwPXD8mdAZpKLiZC4tU2EYy0M8nidcJGMSVLT1Ft2cpgokAlLZnQZNLN1
+         9WHKobmlfKz73kZyDrCVhC0ZlreDJdRtYeNpfLvxymPNdyPY22iu2bA1eJR85f6ce2V9
+         6l2Za59AuQOtKv2Nl7q8cA/Vm7E3RQME6cQaAUDpFRSZjtMpFKp3/y09jMp9b1YALqe1
+         qCguFzSnx/E43O7eXppws+5ImOFl8kLiPv1on5WJDq33pccHSy5KHmpEXzefVwVfQMsW
+         zh0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764201684; x=1764806484;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+        d=1e100.net; s=20230601; t=1764202075; x=1764806875;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=EVT/rFi5k1cz1OWOuO76TzsQ6NfdN9/fjnD9KoCNbVI=;
-        b=q3Z4sZ83xvRUlti77kaK7ZHFUkiKfVfBrTNtUR5wFg/tkvPEt/ZzUb6ZD1/4lr8Jxb
-         /AVdWCO6rlwXjjioLtMx11uShDkwt+YbxeIo92Iuh6tPuZuFQgc3tH2ST7zKzo//0qAn
-         pT4juSHFcLivDdcXoouWpMxZaCbdK3LD70kCna+vl2lRpw2a3UXLqI9pYiMaRu5t54br
-         EjhJsIc/z9CW7sB+w4jWu/sBkZQvOnoBYx0ptS1FZD1gAT/+KDn/fhk8hj6mZIG8xqSt
-         o9wiP4+8ry/3YghyybOLJSZyBdGWiVc70SA4DgUW5gfHslB/gO1evtFJT9Oo+9nlhGrB
-         CXTw==
-X-Gm-Message-State: AOJu0Yy03Y/6spWTKkyV83CjMp03YIr58HCAK5T2xoctt1DAxWU/Kluk
-	+6kShiMZ7v866XbzkzmBMggZTlRPbU6u5Z+7O2wcFSUhUViGeTfPXkll
-X-Gm-Gg: ASbGncvHtYbO823JghosLqHAvzcVgI10Rvd0NwkPwekzUxr5YwJNPAWzV3c8sK8k+Sr
-	szKYduDM0dPPlIyNDX7UBw4ypjzIl2smT1qkWTPkKVXc5r2oKpd7ANxSWNf12JbKJunQRZ63s9N
-	ZWE406tUCH5q8CeFDZRsq4mEvAoCascjGQttzAH2T7kbzaZzFJPM228kXcBuE3xedlnXiGRnfTx
-	EqbuG6iDwsRnnCL3OygnlNXLP+f5jnxlfRAu72uhT8Q+FP55YlZ6YU5o5ZaUVpGkjuzmBY38Dr4
-	k/zpaY3f8SzM97ezViJK16/nYoNrJaXFYIn99wJuvfXmk4QBWXNOMS3wriMWtRQjmX+2oBVDtJi
-	dFPGzZeBXvZFtDxK9nteuBP3yQK0lyyrKT/e9O/vBzGKGB9zUBf2WNO/6A2djaMvX8ui1qyOjhF
-	PrL/rBu9BQp52S+7B/mhmgonxHZeSYAjNEb4v7zKPCrwA6m/MLRcBShxmJ/1ZJeifpl+I=
-X-Google-Smtp-Source: AGHT+IEcIuDSkM93TaEpjT+Lj3ojXyq6Cmhov4hMW/enDCWCx6CMSQZykaizGFHGM60nqXFzYcngEg==
-X-Received: by 2002:a05:690c:6885:b0:788:1adf:fa6c with SMTP id 00721157ae682-78a8b5284f7mr179101657b3.33.1764201683867;
-        Wed, 26 Nov 2025 16:01:23 -0800 (PST)
-Received: from gmail.com (116.235.236.35.bc.googleusercontent.com. [35.236.235.116])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-78a798a82a0sm71622947b3.17.2025.11.26.16.01.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Nov 2025 16:01:23 -0800 (PST)
-Date: Wed, 26 Nov 2025 19:01:22 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Xing <kernelxing@tencent.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
-Message-ID: <willemdebruijn.kernel.2349231b3c41@gmail.com>
-In-Reply-To: <20251125165302.20079-1-ankitkhushwaha.linux@gmail.com>
-References: <20251125165302.20079-1-ankitkhushwaha.linux@gmail.com>
-Subject: Re: [PATCH net-next v2] selftests/net: initialize char variable to
- null
+        bh=dnKcf2+51kURgvBReSH5vkNuGQRyYKTVBdC22OlhFiE=;
+        b=J/MOLV+u8C9knw9nlNyaomwCSRIl0GX9t2VkmuQl2udwNQLoSrzqp4HJ7y9LLPystI
+         Zuel72T7wwzeD/Di2EZ03+8jR/ikcoEhx6ouAo/1YB8xTHuA44trDeIa44bI3YSIS0SF
+         zzfYg0sTtv6Xz+dduO8w/m+3cazwuwsY3JDkqrnax1WHvVXhMHMBnyrcDqrjzIcIOPDo
+         hpvSiNRjKnjcHuR2mgoe5qWNXc7Y/YZfbR/ZyBfAqVpmU1EjzOTY9URWNo6zMHAgtT4I
+         YwImRaAWOPdxDLG879MLb5JdVWO4oqvqYrw9+dFoO11dB8unk7id13ykPqbWL3qxobGg
+         RYBQ==
+X-Gm-Message-State: AOJu0Ywrf6xC2GysuY3WRTy6F3I947n4nVMXPUHZ8FlpzhMfyqEXcxS4
+	Tx7eD1ZD+ubfZxa57o4htB3iRfkdwPiJXfbY8Zuq4wloAdzjUGybfXuyM0SicDFU+tEJu1c4N/R
+	cnWAc2IARzvCJ8lq/xhbHzpq11QPyTiD/SsSwuSS+YHHcdAQ/1o0lpSLFUnnDg4XiwgX6OQyuyF
+	xY/hYmvUBQ4oNZL425DGtH52NHHmwfgAOtf9SkeHEDuUnP5XeLNrg0+Hrs7Rr3iNo=
+X-Google-Smtp-Source: AGHT+IGnhmhMCtW2cqlbfM3z72gA3XlXtWRfaLc1b3OcMPSW0COKY++7leT3iMEM1SYLmLlnoSD7fB5Ar+eIczA8Pg==
+X-Received: from pfbfx22.prod.google.com ([2002:a05:6a00:8216:b0:7cf:2dad:ff8d])
+ (user=hramamurthy job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6a00:9508:b0:7aa:93d5:820f with SMTP id d2e1a72fcca58-7c58e9f97bcmr22294145b3a.30.1764202075226;
+ Wed, 26 Nov 2025 16:07:55 -0800 (PST)
+Date: Thu, 27 Nov 2025 00:07:51 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+X-Mailer: git-send-email 2.52.0.487.g5c8c507ade-goog
+Message-ID: <20251127000751.662959-1-hramamurthy@google.com>
+Subject: [PATCH net-next] gve: Fix race condition on tx->dropped_pkt update
+From: Harshitha Ramamurthy <hramamurthy@google.com>
+To: netdev@vger.kernel.org
+Cc: joshwash@google.com, hramamurthy@google.com, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	willemb@google.com, pkaligineedi@google.com, linux-kernel@vger.kernel.org, 
+	Max Yuan <maxyuan@google.com>, Jordan Rhee <jordanrhee@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Ankit Khushwaha wrote:
-> char variable in 'so_txtime.c' & 'txtimestamp.c' were left uninitilized
-> when switch default case taken. which raises following warning.
-> 
-> 	txtimestamp.c:240:2: warning: variable 'tsname' is used uninitialized
-> 	whenever switch default is taken [-Wsometimes-uninitialized]
-> 
-> 	so_txtime.c:210:3: warning: variable 'reason' is used uninitialized
-> 	whenever switch default is taken [-Wsometimes-uninitialized]
-> 
-> initializing these variables to NULL to fix this.
-> 
-> Signed-off-by: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
+From: Max Yuan <maxyuan@google.com>
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+The tx->dropped_pkt counter is a 64-bit integer that is incremented
+directly. On 32-bit architectures, this operation is not atomic and
+can lead to read/write tearing if a reader accesses the counter during
+the update. This can result in incorrect values being reported for
+dropped packets.
 
-minor typo in the first sentence, and there is somewhat interesting
-context in the v1. But no need to respin just for that.
+To prevent this potential data corruption, wrap the increment
+operation with u64_stats_update_begin() and u64_stats_update_end().
+This ensures that updates to the 64-bit counter are atomic, even on
+32-bit systems, by using a sequence lock.
 
-> ---
-> changelog:
-> v2:
-> change patch name to net-next.
-> 
-> v1:
-> https://lore.kernel.org/all/20251124161324.16901-1-ankitkhushwaha.linux@gmail.com/
-> ---
->  tools/testing/selftests/net/so_txtime.c   | 2 +-
->  tools/testing/selftests/net/txtimestamp.c | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/net/so_txtime.c b/tools/testing/selftests/net/so_txtime.c
-> index 8457b7ccbc09..b76df1efc2ef 100644
-> --- a/tools/testing/selftests/net/so_txtime.c
-> +++ b/tools/testing/selftests/net/so_txtime.c
-> @@ -174,7 +174,7 @@ static int do_recv_errqueue_timeout(int fdt)
->  	msg.msg_controllen = sizeof(control);
-> 
->  	while (1) {
-> -		const char *reason;
-> +		const char *reason = NULL;
-> 
->  		ret = recvmsg(fdt, &msg, MSG_ERRQUEUE);
->  		if (ret == -1 && errno == EAGAIN)
-> diff --git a/tools/testing/selftests/net/txtimestamp.c b/tools/testing/selftests/net/txtimestamp.c
-> index dae91eb97d69..bcc14688661d 100644
-> --- a/tools/testing/selftests/net/txtimestamp.c
-> +++ b/tools/testing/selftests/net/txtimestamp.c
-> @@ -217,7 +217,7 @@ static void print_timestamp_usr(void)
->  static void print_timestamp(struct scm_timestamping *tss, int tstype,
->  			    int tskey, int payload_len)
->  {
-> -	const char *tsname;
-> +	const char *tsname = NULL;
-> 
->  	validate_key(tskey, tstype);
-> 
-> --
-> 2.52.0
-> 
+The u64_stats_sync API requires the writer to have exclusive access,
+which is already provided in this context by the network stack's
+serialization of the transmit path (net_device_ops::ndo_start_xmit
+[1]) for a given queue.
 
+[1]: https://www.kernel.org/doc/Documentation/networking/netdevices.txt
+
+Signed-off-by: Max Yuan <maxyuan@google.com>
+Reviewed-by: Jordan Rhee <jordanrhee@google.com>
+Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
+---
+ drivers/net/ethernet/google/gve/gve_tx.c     | 2 ++
+ drivers/net/ethernet/google/gve/gve_tx_dqo.c | 6 ++++++
+ 2 files changed, 8 insertions(+)
+
+diff --git a/drivers/net/ethernet/google/gve/gve_tx.c b/drivers/net/ethernet/google/gve/gve_tx.c
+index c6ff0968929d..97efc8d27e6f 100644
+--- a/drivers/net/ethernet/google/gve/gve_tx.c
++++ b/drivers/net/ethernet/google/gve/gve_tx.c
+@@ -730,7 +730,9 @@ static int gve_tx_add_skb_no_copy(struct gve_priv *priv, struct gve_tx_ring *tx,
+ 		gve_tx_unmap_buf(tx->dev, &tx->info[idx & tx->mask]);
+ 	}
+ drop:
++	u64_stats_update_begin(&tx->statss);
+ 	tx->dropped_pkt++;
++	u64_stats_update_end(&tx->statss);
+ 	return 0;
+ }
+ 
+diff --git a/drivers/net/ethernet/google/gve/gve_tx_dqo.c b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
+index 6f1d515673d2..40b89b3e5a31 100644
+--- a/drivers/net/ethernet/google/gve/gve_tx_dqo.c
++++ b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
+@@ -1002,7 +1002,9 @@ static int gve_try_tx_skb(struct gve_priv *priv, struct gve_tx_ring *tx,
+ 	return 0;
+ 
+ drop:
++	u64_stats_update_begin(&tx->statss);
+ 	tx->dropped_pkt++;
++	u64_stats_update_end(&tx->statss);
+ 	dev_kfree_skb_any(skb);
+ 	return 0;
+ }
+@@ -1324,7 +1326,11 @@ static void remove_miss_completions(struct gve_priv *priv,
+ 		/* This indicates the packet was dropped. */
+ 		dev_kfree_skb_any(pending_packet->skb);
+ 		pending_packet->skb = NULL;
++
++		u64_stats_update_begin(&tx->statss);
+ 		tx->dropped_pkt++;
++		u64_stats_update_end(&tx->statss);
++
+ 		net_err_ratelimited("%s: No reinjection completion was received for: %d.\n",
+ 				    priv->dev->name,
+ 				    (int)(pending_packet - tx->dqo.pending_packets));
+-- 
+2.52.0.487.g5c8c507ade-goog
 
 
