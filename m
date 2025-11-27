@@ -1,97 +1,113 @@
-Return-Path: <netdev+bounces-242217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF83AC8DA9C
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 11:00:58 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E845C8DB1D
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 11:11:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CC9254E5CB9
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 10:00:57 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1B9834E1072
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 10:10:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF2832750FE;
-	Thu, 27 Nov 2025 10:00:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B35B2FF672;
+	Thu, 27 Nov 2025 10:10:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="b9d35gq6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DDF+Dk7+"
 X-Original-To: netdev@vger.kernel.org
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EFFBC13B;
-	Thu, 27 Nov 2025 10:00:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72A412E0418
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 10:10:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764237652; cv=none; b=d0ia3SVp0wgSVwaZKuWSY48A5niHQa+8nZ0/XpdnRwBPJMoU8lziGw40FSl+jsnF/lFpC9R2/mFhA1cTCDqYoProfOLvQP89wQI0xel2/sKXd9aLuFJhlYkMqJIGnkryk4x7J3+pknZLtFl4mFDYP0SMg/EO3OvB0pNBRa4wxko=
+	t=1764238257; cv=none; b=U9Yc79Y3Q3waBoFIFhM3dGOjZn1xfB9LZHPTrf/2jYy6QwEkmJvFSJkb6kwE4n0wP5/waQyxP395zNMSwhHd0Pz/a97G0XI4y1xfypQJlCpEwrvSqtLG3FiDjgarOvs+hhjvxKoCWVkq3RbVb1f+onWe7E4uVBhBrLM1L+ge0iY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764237652; c=relaxed/simple;
-	bh=mTNcRsNUmAZxjUjhRGk/zXfnFuxw9csNeCE1CCJVepA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PGtqEb1CzsCChUL7fYH+L7wtHO6JcRddpB0KST2EpzCHjynkBYFPxS17kVHUAqdHjouBgeVr5SbUwURQyhruj63vfreuzuvANzCRxWgScMmfGbhFKsxZ96euJgrW+9XK9GCfcZcCHxg9SKHGF+tqZ+7SkpsZZTtZGpJoD4W8drY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=b9d35gq6; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=F2zpbaJahseu3rIsIrIii/w/rv9EwhaYzhHAWVmULG0=; b=b9d35gq6J96c21yDOOYWinZkAP
-	Dv8FJ/2OZc/965A1Kc3+DagB/UAd3UWjA3JEI/yO3n/nxIsM3hzTI3K9D+Lk7UM2OQKW1EujSQvm9
-	FwY51z276Ow3YvsR3TLqrzcV/tOCZ91dR6We/Ibb+CSBALCJr2dgcN0FGxTwgCZywOtxCUAnp9pN3
-	W/bdJztYiWs8COH6C2qP6m8WTBY4dGc6BEhCwVkEvS59TqE09/WxlHQpL+cZWRVMlunYSW/LSvgQd
-	B9BxxASlR7rQMvDyChn/2NWZFaVCSpjArs6Ltl33TjuvKUjKoNTDtRvw3XQoX0dIdiJRlQLTFMWkx
-	EM2Q4CBT9/D5/0jq+fFbeSqR4yCm1ukoHUE4r2lHUhJh9lQmEFwdG187Z/oUqvt6Dpf0bTzD9m6Yg
-	TaYFfLEFIFc1Wn5hmACK4bqeIu5ZRIF9i9PRf/j54r5kdveRX4SkdFMXTAAn9dt4w6ytAPGQs4/vf
-	tWAVhPaOhgTmFbGBytWN5miz;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1vOYnt-00FygN-2c;
-	Thu, 27 Nov 2025 10:00:45 +0000
-Message-ID: <b36b09c0-95ad-4437-8076-9d8d73a6dbc6@samba.org>
-Date: Thu, 27 Nov 2025 11:00:45 +0100
+	s=arc-20240116; t=1764238257; c=relaxed/simple;
+	bh=DAF01hAWK4F1G2WkXZYb493HZknwri3FfkNRByBwVZQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Bz0hn4AdOfHVjDjkbfIh6mi6ADbELsCz6tvQPlR3ta6/xbGAumgBVFqyUK6W/AcmB7RSvgvYdZV/4w6QdvNEiH4k7Qw4CoBrC8KCq4IbB7oVw9krIuQr6mndAnMZCZ1Ipb8y5rNTEz1REJmwdxZ/pjVKUkh7w8kC4ZftprTzPWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DDF+Dk7+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE2C9C4CEF8;
+	Thu, 27 Nov 2025 10:10:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764238257;
+	bh=DAF01hAWK4F1G2WkXZYb493HZknwri3FfkNRByBwVZQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=DDF+Dk7+4GjOrElfMB7ViPBg0+pdJHUrgcmqfsOKMs4cYJ7voaKDlPZGhD0FVwHjF
+	 4UQ5u9IsLcSsS35o7DSm3falOX83DxXkqnhDh5FjUjPPTToWKLMlSr4CObdMVmBoLz
+	 xYw0oEl6s8irFPnk1UqbC6KNjGnahjcrvUQYbSMiHfyuDsJLNcxUTVpEXein3VELa9
+	 o1IdcZbT3ucD+Z+8KVQVkGRzJ1Kfvy2yUvwLWn0uSNHAV0XXioNC1pX0E+W2XH4BwV
+	 XzTG5BoTzllcLrB8kKicXgE8WaPw1l7ARX5yrEG+mpssEmcjVtuOlzHaarir60b2dg
+	 4FYyW4vLlq0pw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADFAD380CFC3;
+	Thu, 27 Nov 2025 10:10:19 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] io_uring/net: wire up support for
- sk->sk_prot->uring_cmd() with SOCKET_URING_OP_PASSTHROUGH_FLAG
-To: Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
- <willemb@google.com>, netdev@vger.kernel.org, linux-cifs@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20251126111931.1788970-1-metze@samba.org>
- <46280bc6-0db9-4526-aa7d-3e1143c33303@kernel.dk>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <46280bc6-0db9-4526-aa7d-3e1143c33303@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [net-next PATCH v5 0/9] net: phy: Add support for fbnic PHY w/
+ 25G,
+ 50G, and 100G support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176423821850.2508458.8740995882109823586.git-patchwork-notify@kernel.org>
+Date: Thu, 27 Nov 2025 10:10:18 +0000
+References: 
+ <176374310349.959489.838154632023183753.stgit@ahduyck-xeon-server.home.arpa>
+In-Reply-To: 
+ <176374310349.959489.838154632023183753.stgit@ahduyck-xeon-server.home.arpa>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, kernel-team@meta.com,
+ andrew+netdev@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ pabeni@redhat.com, davem@davemloft.net
 
-Am 26.11.25 um 23:19 schrieb Jens Axboe:
-> On 11/26/25 4:19 AM, Stefan Metzmacher wrote:
->> This will allow network protocols to implement async operations
->> instead of using ioctl() syscalls.
->>
->> By using the high bit there's more than enough room for generic
->> calls to be added, but also more than enough for protocols to
->> implement their own specific opcodes.
->>
->> The IPPROTO_SMBDIRECT socket layer [1] I'm currently working on,
->> will use this in future in order to let Samba use efficient RDMA offload.
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Fri, 21 Nov 2025 08:39:48 -0800 you wrote:
+> To transition the fbnic driver to using the XPCS driver we need to address
+> the fact that we need a representation for the FW managed PMD that is
+> actually a SerDes PHY to handle link bouncing during link training.
 > 
-> Patch looks fine to me, but I think it needs to be submitted with an
-> actual user of it too. If not, then it's just unused infrastructure...
+> This patch set introduces the necessary bits to the XPCS driver code to
+> enable it to read 25G, 50G, and 100G speeds from the PCS ctrl1 register,
+> and adds support for the approriate interfaces.
 > 
->> [1]
->> https://git.samba.org/?p=metze/linux/wip.git;a=shortlog;h=refs/heads/master-ipproto-smbdirect
+> [...]
 
-Ok, thanks for the feedback, I'll resubmit once I'm ready to use it.
+Here is the summary with links:
+  - [net-next,v5,1/9] net: phy: Add MDIO_PMA_CTRL1_SPEED for 2.5G and 5G to reflect PMA values
+    https://git.kernel.org/netdev/net-next/c/e6c43c950090
+  - [net-next,v5,2/9] net: pcs: xpcs: Add support for 25G, 50G, and 100G interfaces
+    https://git.kernel.org/netdev/net-next/c/7622d5527693
+  - [net-next,v5,3/9] net: pcs: xpcs: Fix PMA identifier handling in XPCS
+    https://git.kernel.org/netdev/net-next/c/39e138173ae7
+  - [net-next,v5,4/9] net: pcs: xpcs: Add support for FBNIC 25G, 50G, 100G PMD
+    https://git.kernel.org/netdev/net-next/c/3f29dd34f75a
+  - [net-next,v5,5/9] fbnic: Rename PCS IRQ to MAC IRQ as it is actually a MAC interrupt
+    https://git.kernel.org/netdev/net-next/c/f18dd1b15f7a
+  - [net-next,v5,6/9] fbnic: Add logic to track PMD state via MAC/PCS signals
+    https://git.kernel.org/netdev/net-next/c/9963117a2b9b
+  - [net-next,v5,7/9] fbnic: Add handler for reporting link down event statistics
+    https://git.kernel.org/netdev/net-next/c/1fe7978329d7
+  - [net-next,v5,8/9] fbnic: Add SW shim for MDIO interface to PMD and PCS
+    https://git.kernel.org/netdev/net-next/c/d0ce9fd7eae0
+  - [net-next,v5,9/9] fbnic: Replace use of internal PCS w/ Designware XPCS
+    https://git.kernel.org/netdev/net-next/c/d0fe7104c795
 
-metze
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
