@@ -1,146 +1,317 @@
-Return-Path: <netdev+bounces-242294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EE73C8E6D5
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 14:20:50 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91022C8E707
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 14:22:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A3C394E8A6E
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 13:19:38 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1080F343022
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 13:22:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54462265298;
-	Thu, 27 Nov 2025 13:19:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF23B1E0B9C;
+	Thu, 27 Nov 2025 13:22:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l7+IgnCf"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="gSw2ayDf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EBF5248F4E
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 13:19:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19D4E17A2E0
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 13:21:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764249569; cv=none; b=tOA8USOE2WOaGEGai7mWpjO+Tg1Xhp2CzeS7D6JpN/NQnumia909CeYnZPUZoSr2jEZ/Pp+1/rksXAFh7W1mymXTXyHPIztdRLQ4ZF06F+KJFCjPCzh5KRmcMRXn2UcW0GbLZ8E9+Vey3ek+lYzLC02nBi1L1YSKbFyY7aiQ1C8=
+	t=1764249723; cv=none; b=AhoTpKZZB33O6qmKuGPCHTbzcqmlo6mzGxo00NyaneP69xA9y/xeVRtewC2eDR6PGoPgUqULy3x7eMDQmkTKHvm1AVbR/dhrGxwsBpk0Sj2bXuAezv0iV5vuRaM8ZAKG+G2IxI/9t47GBrW94XCc3AlKX3ZJlFqMMefwYph9JHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764249569; c=relaxed/simple;
-	bh=ED9Iw7nQWKNLvI4J4Zwk2uO1v5iCGTYPUwXUk54PHHk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mio9hNfgnXCBvwRztMIUPYC8nMN6xy9viatm6NddBPCk2gAaAz/ZJkg+HZWC8pGf3X7ai8Y82ycMlCJDCwfNQShyPo0QZFFrOR5s2w9/q1tBoF+IEFrCy2Av+x6zkysRZtolKscnpuoNHfDbGu1yJM0ERcqiikDGMiTKeswsB64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l7+IgnCf; arc=none smtp.client-ip=209.85.166.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-433770ba959so3896535ab.1
-        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 05:19:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764249567; x=1764854367; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yCzBPQmriWwNoC+w7AkUbAJ2/r1P5CTIHfbguhPRxvQ=;
-        b=l7+IgnCfYfQmVA0ahf5SJLwobvYpnoQkOcwXSSzYeRsycqvDP7fqxQeebT+MISs8xX
-         SnZcoadmhxmFZ0fbPF6NHIqhs61D4Hs76xIdEyjfZt5XyJ6+eTDh+HVwyn/FjcJmddb9
-         CmGJ4X8JbmQA1md6DUMLi7B4lMi2eUtGCdeglaUQP/F4j6B3iycfTb/CPYcRXU+qISpG
-         /NOFH4vXAzpgTECLeYlw1wQak+FJqGy/hrG7ccBqW513INf4YmjV6f006lBM6Bc2/4ae
-         Y1Do9byfisUxR0QEiHko6PC6bXbQochYeG9M1u8U9Rwglpm1OxeywRAcMkJgAZX5jYXV
-         9D7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764249567; x=1764854367;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=yCzBPQmriWwNoC+w7AkUbAJ2/r1P5CTIHfbguhPRxvQ=;
-        b=FD93F7LuK+2JC6FBExzfpDCsXuXATr0CST1486T05oeFrb31WLnQkZTlLBGjlJ2UdD
-         X954ANaFItSDcsPabsufNotcEiEkVqkEfM/UCuJPA59vrdJWOeXc4yCv7EXWw2DxqI/c
-         aULKtoXSRvKgPw/pc89oUmAmNgmA8pGy9gzph5JiKU5Gv05+Lv2WpnWKrY9q+IUeGtG5
-         hkuCRyeUvmW/xREaeiDP84kFyCdG4sfIYQB6QZ42PpQgNsh+SB6acDsYoG33guetUAtb
-         1E+0sVU5JAfwDqUocxzYCpkdcgeP0m1ogqPUl0/jL0y39U+Oclf356b1BgrlSm5vQcM4
-         HmkA==
-X-Forwarded-Encrypted: i=1; AJvYcCVYaHMmTtW8uyY5B115LK2vZmRmF1SdWhRVfUFRCPoK7oye5OGLuq7p6WA5Oea8ozDkNfMFjM0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwkZc5bq/Mi++W2inwAAWUzwL9Wf4nmmX9uY5bff/EG/ROIDtlk
-	3dcoJSsHE/ITUJl/cbGnFElmcrgcTzCJU1F9Z520fNvVf5A9ZkvFZ6Vk8QP4miZ1bL0ubvdoiZ2
-	eDdJHH1lQ3CwK5Srt2sraDekhzs3UDNE=
-X-Gm-Gg: ASbGncujDtFa8rfB0966Qr6sFlck2zVypGVu9FJ62VXt7N71c3yKC2AuFw5szn9Cz1q
-	Ty/QosARToEPT35weomf9Acoc86ST6qXoRvLboEuAymI0ibfRhipJ1inPP4PXDKGi0mYg3eG4yM
-	RPsrASLZtAV9um2YIx4+x1IAb0F2oN8GFgCpHDYMU3f496I9VQhlfT1hMgSpTH6wk6Prfy4Y/I9
-	fp03DxVXddLMRbRTUV9TGk1+lnYl/kYXrJ7UZBQWuASYImPa1KVfH7Mgr4NBTsnQyBAths=
-X-Google-Smtp-Source: AGHT+IE4MPYVosxTC2+EJOGxZIxKrRHl5ytzM1bMPnB4+uDlXJz18MUFbQTwVk2VSGwTUC4TMLDXCCCMKpXrlupsIHw=
-X-Received: by 2002:a05:6e02:248f:b0:433:5b75:64d6 with SMTP id
- e9e14a558f8ab-435b98d77f7mr242863045ab.28.1764249566692; Thu, 27 Nov 2025
- 05:19:26 -0800 (PST)
+	s=arc-20240116; t=1764249723; c=relaxed/simple;
+	bh=38i99MzDfb2hhc5uhaJfl6AdBxfYXsbw5xwaKcjC06Q=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
+	 References:In-Reply-To; b=XYg5fuTjCLI+BVvT31kfvUMvsABQB/rSm2lHasfEJeCYW7a1fsdo+X8ZmLOo+0admcLg8GlFO/akY0w+0WP3V76vrtZbiLmIdA1ue30C0YEExr5qTGwGOXodo+TLT+D2Xw5BDhDJ+8P8YzCkv43njXi/AeNdo47cY+9vsGu0WzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=gSw2ayDf; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 6050F1A1DBF;
+	Thu, 27 Nov 2025 13:21:57 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 2887B6068C;
+	Thu, 27 Nov 2025 13:21:57 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D8946102F2767;
+	Thu, 27 Nov 2025 14:21:52 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1764249716; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=8mr4wjVmWLd6MFjWI29nQzZAl05whLdZX6g5CnHvI8A=;
+	b=gSw2ayDfYGgb8bm3ucDbcn64ETy1l0IRvjlRN43IxbbAMFWTpucRj9c5Zzh0GtJOcAtYWo
+	3eZqDAl9+ecOcHGiAuBdacm9HfXYT17IjZfZicT/XA+kbDmqwAmkyWomvJ3JrfFtKWEAsu
+	fLJ3BkQ9x2IDyWi1UySoqKrujPGxoPRZ8yVRmxeUk/1wJmHrVy+rkVdXVzbw+I/E3MuznA
+	kh7oKuHKkqcjCUEfSL8pZyq73f/aJlXKNwDN4urxra5HqdjepvBjMXM5LdoQ3FcXnvonm3
+	kcSjl8Zd8gtZtrEBOO1g0g7fclfQnIkxaXsEcEcvXoRXtTN4f0HRRYSn5LBUbg==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251125085431.4039-1-kerneljasonxing@gmail.com>
- <20251125085431.4039-4-kerneljasonxing@gmail.com> <4c645223-8c52-40d3-889b-f3cf7fa09f89@redhat.com>
-In-Reply-To: <4c645223-8c52-40d3-889b-f3cf7fa09f89@redhat.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 27 Nov 2025 21:18:49 +0800
-X-Gm-Features: AWmQ_bkKPR_pnFH29-61JqMam70K4G6NNdS95YVbrn36Ae8NT1OjfixQBrvQSp0
-Message-ID: <CAL+tcoAQZRNnmwCdaH_TNGSmepx1KO93H-4NmVzoUrNfY7pU6A@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 3/3] xsk: remove spin lock protection of cached_prod
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	bjorn@kernel.org, magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
-	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org, 
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 27 Nov 2025 14:21:52 +0100
+Message-Id: <DEJIBSTL1UKX.2IQYBHZMHS65O@bootlin.com>
+Subject: Re: [PATCH RFC net-next 1/6] cadence: macb/gem: Add page pool
+ support
+Cc: "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
+ <claudiu.beznea@tuxon.dev>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
+ "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
+ "Lorenzo Bianconi" <lorenzo@kernel.org>, =?utf-8?q?Gr=C3=A9gory_Clement?=
+ <gregory.clement@bootlin.com>, =?utf-8?q?Beno=C3=AEt_Monin?=
+ <benoit.monin@bootlin.com>, "Thomas Petazzoni"
+ <thomas.petazzoni@bootlin.com>
+To: "Paolo Valerio" <pvalerio@redhat.com>, <netdev@vger.kernel.org>
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20251119135330.551835-1-pvalerio@redhat.com>
+ <20251119135330.551835-2-pvalerio@redhat.com>
+In-Reply-To: <20251119135330.551835-2-pvalerio@redhat.com>
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Thu, Nov 27, 2025 at 7:29=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On 11/25/25 9:54 AM, Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > Remove the spin lock protection along with some functions adjusted.
-> >
-> > Now cached_prod is fully converted to atomic, which improves the
-> > performance by around 5% over different platforms.
->
-> I must admit that I'm surprised of the above delta; AFAIK replacing 1to1
-> spinlock with atomic should not impact performances measurably, as the
-> thread should still see the same contention, and will use the same
-> number of atomic operation on the bus.
+Hello Paolo,
 
-Interesting point.
+On Wed Nov 19, 2025 at 2:53 PM CET, Paolo Valerio wrote:
+> Subject: [PATCH RFC net-next 1/6] cadence: macb/gem: Add page pool suppor=
+t
 
->
->
-> > @@ -585,11 +574,9 @@ static void xsk_cq_submit_addr_locked(struct xsk_b=
-uff_pool *pool,
-> >       spin_unlock_irqrestore(&pool->cq_prod_lock, flags);
-> >  }
-> >
-> > -static void xsk_cq_cancel_locked(struct xsk_buff_pool *pool, u32 n)
-> > +static void xsk_cq_cached_prod_cancel(struct xsk_buff_pool *pool, u32 =
-n)
-> >  {
-> > -     spin_lock(&pool->cq_cached_prod_lock);
-> >       atomic_sub(n, &pool->cq->cached_prod_atomic);
->
-> It looks like that the spinlock and the protected data are on different
-> structs.
->
-> I wild guess/suspect the real gain comes from avoiding touching an
-> additional cacheline.
-> `struct xsk_queue` size is 48 bytes and such struct is allocated via
-> kmalloc. Adding up to 16 bytes there will not change the slub used and
-> thus the actual memory usage.
->
-> I think that moving the cq_cached* spinlock(s) in xsk_queue should give
-> the same gain, with much less code churn. Could you please have a look
-> at such option?
+`git log --oneline drivers/net/ethernet/cadence/` tells us all commits
+in this series should be prefixed with "net: macb: ".
 
-I just did some tests and observed the same result as you predicted.
-Thanks for the lesson!
+> diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/c=
+adence/macb.h
+> index 87414a2ddf6e..dcf768bd1bc1 100644
+> --- a/drivers/net/ethernet/cadence/macb.h
+> +++ b/drivers/net/ethernet/cadence/macb.h
+> @@ -14,6 +14,8 @@
+>  #include <linux/interrupt.h>
+>  #include <linux/phy/phy.h>
+>  #include <linux/workqueue.h>
+> +#include <net/page_pool/helpers.h>
+> +#include <net/xdp.h>
+> =20
+>  #define MACB_GREGS_NBR 16
+>  #define MACB_GREGS_VERSION 2
+> @@ -957,6 +959,10 @@ struct macb_dma_desc_ptp {
+>  /* Scaled PPM fraction */
+>  #define PPM_FRACTION	16
+> =20
+> +/* The buf includes headroom compatible with both skb and xdpf */
+> +#define MACB_PP_HEADROOM		XDP_PACKET_HEADROOM
+> +#define MACB_PP_MAX_BUF_SIZE(num)	(((num) * PAGE_SIZE) - MACB_PP_HEADROO=
+M)
+
+From my previous review, you know I think MACB_PP_MAX_BUF_SIZE() should
+disappear.
+
+I also don't see the point of MACB_PP_HEADROOM. Maybe if it was
+max(XDP_PACKET_HEADROOM, NET_SKB_PAD) it would be more useful, but that
+isn't useful anyway. Can we drop it and use XDP_PACKET_HEADROOM directly
+in the code?
+
+>  /* struct macb_tx_skb - data about an skb which is being transmitted
+>   * @skb: skb currently being transmitted, only set for the last buffer
+>   *       of the frame
+> @@ -1262,10 +1268,11 @@ struct macb_queue {
+>  	unsigned int		rx_tail;
+>  	unsigned int		rx_prepared_head;
+>  	struct macb_dma_desc	*rx_ring;
+> -	struct sk_buff		**rx_skbuff;
+> +	void			**rx_buff;
+
+It would help review if the s/rx_skbuff/rx_buff/ renaming was done in a
+separate commit with a commit message being "this only renames X and
+implies no functional changes".
+
+>  	void			*rx_buffers;
+>  	struct napi_struct	napi_rx;
+>  	struct queue_stats stats;
+> +	struct page_pool	*page_pool;
+>  };
+> =20
+>  struct ethtool_rx_fs_item {
+> @@ -1289,6 +1296,7 @@ struct macb {
+>  	struct macb_dma_desc	*rx_ring_tieoff;
+>  	dma_addr_t		rx_ring_tieoff_dma;
+>  	size_t			rx_buffer_size;
+> +	u16			rx_offset;
+
+u16 makes me worried that we might do mistakes. For example the
+following propagates the u16 type.
+
+        bp->rx_offset + data - page_address(page)
+
+We can spare the additional 6 bytes and turn it into a size_t. It'll
+fall in holes anyway, at least it does for my target according to pahole.
+
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ether=
+net/cadence/macb_main.c
+> index e461f5072884..985c81913ba6 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -1250,11 +1250,28 @@ static int macb_tx_complete(struct macb_queue *qu=
+eue, int budget)
+>  	return packets;
+>  }
+> =20
+> -static void gem_rx_refill(struct macb_queue *queue)
+> +static void *gem_page_pool_get_buff(struct page_pool *pool,
+> +				    dma_addr_t *dma_addr, gfp_t gfp_mask)
+> +{
+> +	struct page *page;
+> +
+> +	if (!pool)
+> +		return NULL;
+> +
+> +	page =3D page_pool_alloc_pages(pool, gfp_mask | __GFP_NOWARN);
+> +	if (!page)
+> +		return NULL;
+> +
+> +	*dma_addr =3D page_pool_get_dma_addr(page) + MACB_PP_HEADROOM;
+> +
+> +	return page_address(page);
+> +}
+
+Do we need a separate function called from only one location? Or we
+could change its name to highlight it allocates and does not just "get"
+a buffer.
+
+> @@ -1267,25 +1284,17 @@ static void gem_rx_refill(struct macb_queue *queu=
+e)
+> =20
+>  		desc =3D macb_rx_desc(queue, entry);
+> =20
+> -		if (!queue->rx_skbuff[entry]) {
+> +		if (!queue->rx_buff[entry]) {
+>  			/* allocate sk_buff for this free entry in ring */
+> -			skb =3D netdev_alloc_skb(bp->dev, bp->rx_buffer_size);
+> -			if (unlikely(!skb)) {
+> +			data =3D gem_page_pool_get_buff(queue->page_pool, &paddr,
+> +						      napi ? GFP_ATOMIC : GFP_KERNEL);
+
+I don't get why the gfp flags computation is spread across
+gem_page_pool_get_buff() and gem_rx_refill().
+
+> @@ -1349,12 +1344,16 @@ static int gem_rx(struct macb_queue *queue, struc=
+t napi_struct *napi,
+>  		  int budget)
+>  {
+>  	struct macb *bp =3D queue->bp;
+> +	int			buffer_size;
+>  	unsigned int		len;
+>  	unsigned int		entry;
+> +	void			*data;
+>  	struct sk_buff		*skb;
+>  	struct macb_dma_desc	*desc;
+>  	int			count =3D 0;
+> =20
+> +	buffer_size =3D DIV_ROUND_UP(bp->rx_buffer_size, PAGE_SIZE) * PAGE_SIZE=
+;
+
+This looks like
+
+        buffer_size =3D ALIGN(bp->rx_buffer_size, PAGE_SIZE);
+
+no? Anyway I think it should be dropped. It does get dropped next patch
+in this RFC.
+
+> @@ -1387,24 +1386,49 @@ static int gem_rx(struct macb_queue *queue, struc=
+t napi_struct *napi,
+>  			queue->stats.rx_dropped++;
+>  			break;
+>  		}
+> -		skb =3D queue->rx_skbuff[entry];
+> -		if (unlikely(!skb)) {
+> +		data =3D queue->rx_buff[entry];
+> +		if (unlikely(!data)) {
+>  			netdev_err(bp->dev,
+>  				   "inconsistent Rx descriptor chain\n");
+>  			bp->dev->stats.rx_dropped++;
+>  			queue->stats.rx_dropped++;
+>  			break;
+>  		}
+> +
+> +		skb =3D napi_build_skb(data, buffer_size);
+> +		if (unlikely(!skb)) {
+> +			netdev_err(bp->dev,
+> +				   "Unable to allocate sk_buff\n");
+> +			page_pool_put_full_page(queue->page_pool,
+> +						virt_to_head_page(data),
+> +						false);
+> +			break;
+
+We should `queue->rx_skbuff[entry] =3D NULL` here no?
+We free a page and keep a pointer to it.
+
+> +		}
+> +
+> +		/* Properly align Ethernet header.
+> +		 *
+> +		 * Hardware can add dummy bytes if asked using the RBOF
+> +		 * field inside the NCFGR register. That feature isn't
+> +		 * available if hardware is RSC capable.
+> +		 *
+> +		 * We cannot fallback to doing the 2-byte shift before
+> +		 * DMA mapping because the address field does not allow
+> +		 * setting the low 2/3 bits.
+> +		 * It is 3 bits if HW_DMA_CAP_PTP, else 2 bits.
+> +		 */
+> +		skb_reserve(skb, bp->rx_offset);
+> +		skb_mark_for_recycle(skb);
+
+I have a platform with RSC support and NET_IP_ALIGN=3D2. What is yours
+like? It'd be nice if we can test different cases of this RBOF topic.
+
+>  		/* now everything is ready for receiving packet */
+> -		queue->rx_skbuff[entry] =3D NULL;
+> +		queue->rx_buff[entry] =3D NULL;
+>  		len =3D ctrl & bp->rx_frm_len_mask;
+> =20
+>  		netdev_vdbg(bp->dev, "gem_rx %u (len %u)\n", entry, len);
+> =20
+> +		dma_sync_single_for_cpu(&bp->pdev->dev,
+> +					addr, len,
+> +					page_pool_get_dma_dir(queue->page_pool));
+
+Any reason for the call to dma_sync_single_for_cpu(), we could hardcode
+it to DMA_FROM_DEVICE no?
+
+> @@ -2477,13 +2497,13 @@ static int gem_alloc_rx_buffers(struct macb *bp)
+> =20
+>  	for (q =3D 0, queue =3D bp->queues; q < bp->num_queues; ++q, ++queue) {
+>  		size =3D bp->rx_ring_size * sizeof(struct sk_buff *);
+
+sizeof is called with the wrong type. Not that it matters because
+pointers are pointers, but we can take this opportunity to move to
+
+        sizeof(*queue->rx_buff)
+
+> -		queue->rx_skbuff =3D kzalloc(size, GFP_KERNEL);
+> -		if (!queue->rx_skbuff)
+> +		queue->rx_buff =3D kzalloc(size, GFP_KERNEL);
+> +		if (!queue->rx_buff)
+>  			return -ENOMEM;
+>  		else
+>  			netdev_dbg(bp->dev,
+> -				   "Allocated %d RX struct sk_buff entries at %p\n",
+> -				   bp->rx_ring_size, queue->rx_skbuff);
+> +				   "Allocated %d RX buff entries at %p\n",
+> +				   bp->rx_ring_size, queue->rx_buff);
+
+Opportunity to deindent this block?
 
 Thanks,
-Jason
+
+--
+Th=C3=A9o Lebrun, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
+
 
