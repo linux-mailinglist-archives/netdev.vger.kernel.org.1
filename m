@@ -1,134 +1,481 @@
-Return-Path: <netdev+bounces-242299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1846FC8E7F7
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 14:35:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C4A68C8E818
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 14:38:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6682D3AE4AC
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 13:33:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E3B63B07B8
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 13:38:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3977B202F7E;
-	Thu, 27 Nov 2025 13:33:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D35827703C;
+	Thu, 27 Nov 2025 13:38:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hY7928W7"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="sdenKurl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C112524678D
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 13:33:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4724429A1
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 13:38:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764250393; cv=none; b=WKjvKNZQ2hFwESMR332RUYqZ7gmNE8VFHOseH+d9HR0Ghd68yT74FdGsKoJxKzqv3vw68bgx/ggjRJQDKB7+cOYSXMAnEc/t+rWW7PNqCVVGCrFgNo56tCviYREtTMb6pY/L3uNv4xZk7SB8v9d1hXue4f/2TxKGmN1IoW/X474=
+	t=1764250736; cv=none; b=CFp0vuWEToxb294n5EjCkXZs97JT+PBkg63fOXRbSrIxMz27Y+GllMm/qv8omiV/WTG73LcjukAuG6LX9Kcp4MYyK93zOKT6shOMmWsJlhjDAjzEpqoSAqrbs1DFuB/ZxX3r8jMxNhfRR/abwWncJvQHxuJ/mW1LvpGlngYSCzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764250393; c=relaxed/simple;
-	bh=PKnMN7L8VSS+kJC9dPTUoVxP1v3xNVRK25ulK7BmeeQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qn5JSB/3K3IGkKT952wTJoonAvPKeIVuLC1NCHdG8+k9v+Own4UOMWF60WRXq/YhSQSP72gDXjAYo9+LSZO8Bb6eQQ1jO3vN4E1tH4yQ3qW0c1rLMiuzOCZSXxI9Gm9b+vguCsp0P8V1/7DGDj+fDThkZ/XEg7XbVuoIUjg+O0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hY7928W7; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-3436cbb723fso708740a91.2
-        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 05:33:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764250391; x=1764855191; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=1fpTM6tqyqWgHaxiKCBQC8qkvCctuubNQhJsNf2o1nc=;
-        b=hY7928W7eLWh6R/O7mutlun1gqj3czXFTiKSTK5i1ehJNtKTgDoLDEe1HGgbFGvOT8
-         RtJF5SETKzlOf7DgeX/5baSyo60btbP9hjsqP4WNcbzNXwTCze0nzIMYYduL1b37yA+O
-         01l1LidCxx8Oc+z79M7xC1HL7xbv+wVLWclIWdFXanv4LFXEHsnGVzvllqRfbW+FuFEA
-         mR9gBN2rIhzGF67HvygxLZwln9VYKzRuAX4A/ytMLDv8Ojs2Rxm09yJhFKsSZ3ab1R+w
-         3gtaea2MJ9cLL9rhAmFAXzCa92/D3PbhownDhhGIzWXqUSVAzTlSa19vNrvpklwOYYi6
-         wbtw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764250391; x=1764855191;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1fpTM6tqyqWgHaxiKCBQC8qkvCctuubNQhJsNf2o1nc=;
-        b=Qn8EUnuiCcXMcnXv2X3iaOHC7rx9LH0L6wesjgOz4LelOGSnXNkHwIiifTl7hVhqlL
-         TALujkoYZv84xYR5ZLXkFNM0gYBpe7YhLODDotwApdCGjw0npc/IJQhJQvkNIeQQ4CG3
-         emOC2v6Lt7flBHhvVvHQpnHDXoX43qlhXvvQtm7RtEKU6mGDHdAbDaWGAMe6iLmsybnO
-         Oox0jKoVSLOo7GmWC1bY98Z6aeYvj/x3VEzI87/obH8JrY5G79hJ3XpgZrXprEBLmh2t
-         CZRNypCw7pRq4KEIYdUJB2v5jgf/O8tQEW2ynZJI48D9ombUh9t0Losn/hF98Qm5PWwf
-         c1DQ==
-X-Gm-Message-State: AOJu0Yxf9KAzpFKs0UZCvNPtTRAyktmcFSqUe+2LMlU4iNWgFU2WPGk2
-	lNTa/Em0EDj2VKRzJABF5AtWFS5kUaBFzxYZDItl4mIsBjgfVGFwiUzy
-X-Gm-Gg: ASbGncs4YF7nlgWDRskteq1a/lAXG3TZqFYgXhVCOr02IrOreMC2UJYesCcxEYebqXh
-	AzythoWeDs7hKwMwmSwSvY+7AUGACBy6G8NTL6dZ6Ro+4LxLOban9OVicg2DBv5dZ3WTrVr/a4m
-	NFP0P/jk0rWPU3kuAbmUt25/MAswOWVnWX/mTp4MBwzxXpXHMLyP8p+ZldbGbKrldr6JZc3u++7
-	HT0+H6Zxbmpd7uOc/BWAWd54DIIyzf4G3vs/FE5VjQxdcHzuwjmblCGjHGJ2vXlSfeUZdCmDFIs
-	pvMBV05V7oYXygUlZ0GqGLpOMcneQf+7bqqHAf74oTmIKBXQreeNu3PgEXcl8eq+zQvcb2zJUzY
-	zq7izv1EQGyeqOmJs2sqBewpmHx8U2IsRBVMBWn9lFdmnAV1RtoJn3fATFjhQ9Xer7sxSheVKPn
-	SaO8kpkAr0rcjqYJxF7wBZx2czFQ==
-X-Google-Smtp-Source: AGHT+IGZgefJ9FF/0TIPU2sVzMBGCjWda13CanScSDwN5wkfyEQhDOWujx2ObUAwK3Eeo4CdaWyGjg==
-X-Received: by 2002:a17:90b:5744:b0:327:9e88:7714 with SMTP id 98e67ed59e1d1-3475ed7d917mr11260306a91.37.1764250390903;
-        Thu, 27 Nov 2025 05:33:10 -0800 (PST)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7d1516f6970sm2041436b3a.17.2025.11.27.05.33.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Nov 2025 05:33:10 -0800 (PST)
-Date: Thu, 27 Nov 2025 13:33:03 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-	Mahesh Bandewar <maheshb@google.com>, Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net 1/3] bonding: set AD_RX_PORT_DISABLED when disabling
- a port
-Message-ID: <aShTD0PAqLOtQChR@fedora>
-References: <20251124043310.34073-1-liuhangbin@gmail.com>
- <20251124043310.34073-2-liuhangbin@gmail.com>
- <63768c05-e755-48fe-a4be-9715f8b5ab2b@redhat.com>
+	s=arc-20240116; t=1764250736; c=relaxed/simple;
+	bh=iAqOVwWgKogsbyIZ/QF1R7BcAXoHbhzeYKOSqFVOshs=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:To:From:Subject:
+	 References:In-Reply-To; b=g8oqvD+ZQJsUuNT4PjnHTacLFTXf5SZdHox/UweLGbQ25p15WhpICD19GudJNmPK3m/wVyQ1ZsaZUv4fhL/pD89Z5TwrxNjmQUtL5LLuyCkYz96tfskhAoi4llWQdvKWuQ0Fkh63wGO1wUDi21Nn0oFxceUbDopt0s/ss0Shq24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=sdenKurl; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 3CF4D1A1DC3;
+	Thu, 27 Nov 2025 13:38:49 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 097396068C;
+	Thu, 27 Nov 2025 13:38:49 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3C1F9102F2772;
+	Thu, 27 Nov 2025 14:38:45 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1764250728; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=gOuN+UVPz8uRQd/4TeqkfCBVMWkoXElH/Mjy8DKgOaE=;
+	b=sdenKurlrQZQMtqPW727ezGElHd6uCu+lsDvh2T20MiDgpgmE+fpH8xjO/xUaomPxHXy0c
+	mD3aEF9w43Xqvlt8yoWUoUmiESp6Gro9FrLpb6LAKxmVxtYbmw4+LNR2N0lEKzLXe0pPJD
+	/f3dQvgEdx3ryDDEhvoVAL3SObE8lrqqNFVXhgdYNbBzpNjT/2c0PpwnBnI8nSntdUIcYt
+	4j5Mll266SV6h8AmDM67Xg51WQITKdl7NqASj3cf5y4Nfj5wDazueA5nBR77KXDN+Hj2zz
+	zbIaak9UnneFmA7RJ0vXQiy3Y+kIop2UcYTpDNP15EVX+VByuB329Kg/AYriKA==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <63768c05-e755-48fe-a4be-9715f8b5ab2b@redhat.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 27 Nov 2025 14:38:45 +0100
+Message-Id: <DEJIOQFT9I2J.16KSODWK6IH6L@bootlin.com>
+Cc: "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
+ <claudiu.beznea@tuxon.dev>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
+ "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
+ "Lorenzo Bianconi" <lorenzo@kernel.org>, =?utf-8?q?Gr=C3=A9gory_Clement?=
+ <gregory.clement@bootlin.com>, =?utf-8?q?Beno=C3=AEt_Monin?=
+ <benoit.monin@bootlin.com>, "Thomas Petazzoni"
+ <thomas.petazzoni@bootlin.com>
+To: "Paolo Valerio" <pvalerio@redhat.com>, <netdev@vger.kernel.org>
+From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
+Subject: Re: [PATCH RFC net-next 2/6] cadence: macb/gem: handle
+ multi-descriptor frame reception
+X-Mailer: aerc 0.21.0-0-g5549850facc2
+References: <20251119135330.551835-1-pvalerio@redhat.com>
+ <20251119135330.551835-3-pvalerio@redhat.com>
+In-Reply-To: <20251119135330.551835-3-pvalerio@redhat.com>
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Thu, Nov 27, 2025 at 11:15:24AM +0100, Paolo Abeni wrote:
-> On 11/24/25 5:33 AM, Hangbin Liu wrote:
-> > When disabling a port’s collecting and distributing states, updating only
-> > rx_disabled is not sufficient. We also need to set AD_RX_PORT_DISABLED
-> > so that the rx_machine transitions into the AD_RX_EXPIRED state.
-> > 
-> > One example is in ad_agg_selection_logic(): when a new aggregator is
-> > selected and old active aggregator is disabled, if AD_RX_PORT_DISABLED is
-> > not set, the disabled port may remain stuck in AD_RX_CURRENT due to
-> > continuing to receive partner LACP messages.
-> > 
-> > The __disable_port() called by ad_disable_collecting_distributing()
-> > does not have this issue, since its caller also clears the
-> > collecting/distributing bits.
-> > 
-> > The __disable_port() called by bond_3ad_bind_slave() should also be fine,
-> > as the RX state machine is re-initialized to AD_RX_INITIALIZE.
-> 
-> Given the above, why don't you apply the change in
-> ad_agg_selection_logic() only, to reduce the chances of unintended side
-> effects?
-> 
-> /P
-> 
+On Wed Nov 19, 2025 at 2:53 PM CET, Paolo Valerio wrote:
+> Add support for receiving network frames that span multiple DMA
+> descriptors in the Cadence MACB/GEM Ethernet driver.
+>
+> The patch removes the requirement that limited frame reception to
+> a single descriptor (RX_SOF && RX_EOF), also avoiding potential
+> contiguous multi-page allocation for large frames. It also uses
+> page pool fragments allocation instead of full page for saving
+> memory.
+>
+> Signed-off-by: Paolo Valerio <pvalerio@redhat.com>
+> ---
+>  drivers/net/ethernet/cadence/macb.h      |   4 +-
+>  drivers/net/ethernet/cadence/macb_main.c | 180 ++++++++++++++---------
+>  2 files changed, 111 insertions(+), 73 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/c=
+adence/macb.h
+> index dcf768bd1bc1..e2f397b7a27f 100644
+> --- a/drivers/net/ethernet/cadence/macb.h
+> +++ b/drivers/net/ethernet/cadence/macb.h
+> @@ -960,8 +960,7 @@ struct macb_dma_desc_ptp {
+>  #define PPM_FRACTION	16
+> =20
+>  /* The buf includes headroom compatible with both skb and xdpf */
+> -#define MACB_PP_HEADROOM		XDP_PACKET_HEADROOM
+> -#define MACB_PP_MAX_BUF_SIZE(num)	(((num) * PAGE_SIZE) - MACB_PP_HEADROO=
+M)
+> +#define MACB_PP_HEADROOM	XDP_PACKET_HEADROOM
+> =20
+>  /* struct macb_tx_skb - data about an skb which is being transmitted
+>   * @skb: skb currently being transmitted, only set for the last buffer
+> @@ -1273,6 +1272,7 @@ struct macb_queue {
+>  	struct napi_struct	napi_rx;
+>  	struct queue_stats stats;
+>  	struct page_pool	*page_pool;
+> +	struct sk_buff		*skb;
+>  };
+> =20
+>  struct ethtool_rx_fs_item {
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ether=
+net/cadence/macb_main.c
+> index 985c81913ba6..be0c8e101639 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -1250,21 +1250,25 @@ static int macb_tx_complete(struct macb_queue *qu=
+eue, int budget)
+>  	return packets;
+>  }
+> =20
+> -static void *gem_page_pool_get_buff(struct page_pool *pool,
+> +static void *gem_page_pool_get_buff(struct  macb_queue *queue,
+>  				    dma_addr_t *dma_addr, gfp_t gfp_mask)
+>  {
+> +	struct macb *bp =3D queue->bp;
+>  	struct page *page;
+> +	int offset;
+> =20
+> -	if (!pool)
+> +	if (!queue->page_pool)
+>  		return NULL;
+> =20
+> -	page =3D page_pool_alloc_pages(pool, gfp_mask | __GFP_NOWARN);
+> +	page =3D page_pool_alloc_frag(queue->page_pool, &offset,
+> +				    bp->rx_buffer_size,
+> +				    gfp_mask | __GFP_NOWARN);
+>  	if (!page)
+>  		return NULL;
+> =20
+> -	*dma_addr =3D page_pool_get_dma_addr(page) + MACB_PP_HEADROOM;
+> +	*dma_addr =3D page_pool_get_dma_addr(page) + MACB_PP_HEADROOM + offset;
+> =20
+> -	return page_address(page);
+> +	return page_address(page) + offset;
+>  }
+> =20
+>  static void gem_rx_refill(struct macb_queue *queue, bool napi)
+> @@ -1286,7 +1290,7 @@ static void gem_rx_refill(struct macb_queue *queue,=
+ bool napi)
+> =20
+>  		if (!queue->rx_buff[entry]) {
+>  			/* allocate sk_buff for this free entry in ring */
+> -			data =3D gem_page_pool_get_buff(queue->page_pool, &paddr,
+> +			data =3D gem_page_pool_get_buff(queue, &paddr,
+>  						      napi ? GFP_ATOMIC : GFP_KERNEL);
+>  			if (unlikely(!data)) {
+>  				netdev_err(bp->dev,
+> @@ -1344,20 +1348,17 @@ static int gem_rx(struct macb_queue *queue, struc=
+t napi_struct *napi,
+>  		  int budget)
+>  {
+>  	struct macb *bp =3D queue->bp;
+> -	int			buffer_size;
+>  	unsigned int		len;
+>  	unsigned int		entry;
+>  	void			*data;
+> -	struct sk_buff		*skb;
+>  	struct macb_dma_desc	*desc;
+> +	int			data_len;
+>  	int			count =3D 0;
+> =20
+> -	buffer_size =3D DIV_ROUND_UP(bp->rx_buffer_size, PAGE_SIZE) * PAGE_SIZE=
+;
+> -
+>  	while (count < budget) {
+>  		u32 ctrl;
+>  		dma_addr_t addr;
+> -		bool rxused;
+> +		bool rxused, first_frame;
+> =20
+>  		entry =3D macb_rx_ring_wrap(bp, queue->rx_tail);
+>  		desc =3D macb_rx_desc(queue, entry);
+> @@ -1368,6 +1369,9 @@ static int gem_rx(struct macb_queue *queue, struct =
+napi_struct *napi,
+>  		rxused =3D (desc->addr & MACB_BIT(RX_USED)) ? true : false;
+>  		addr =3D macb_get_addr(bp, desc);
+> =20
+> +		dma_sync_single_for_cpu(&bp->pdev->dev,
+> +					addr, bp->rx_buffer_size - bp->rx_offset,
+> +					page_pool_get_dma_dir(queue->page_pool));
 
-I think setting port->sm_rx_state = AD_RX_PORT_DISABLED and
-slave->rx_disabled = 1 should be an atomic operation. The later 2 functions
-just did similar stuff(not same the fixed one) on other places.
+page_pool_get_dma_dir() will always return the same value, we could
+hardcode it.
 
-Thanks
-Hagnbin
+>  		if (!rxused)
+>  			break;
+> =20
+> @@ -1379,13 +1383,6 @@ static int gem_rx(struct macb_queue *queue, struct=
+ napi_struct *napi,
+>  		queue->rx_tail++;
+>  		count++;
+> =20
+> -		if (!(ctrl & MACB_BIT(RX_SOF) && ctrl & MACB_BIT(RX_EOF))) {
+> -			netdev_err(bp->dev,
+> -				   "not whole frame pointed by descriptor\n");
+> -			bp->dev->stats.rx_dropped++;
+> -			queue->stats.rx_dropped++;
+> -			break;
+> -		}
+>  		data =3D queue->rx_buff[entry];
+>  		if (unlikely(!data)) {
+>  			netdev_err(bp->dev,
+> @@ -1395,64 +1392,102 @@ static int gem_rx(struct macb_queue *queue, stru=
+ct napi_struct *napi,
+>  			break;
+>  		}
+> =20
+> -		skb =3D napi_build_skb(data, buffer_size);
+> -		if (unlikely(!skb)) {
+> -			netdev_err(bp->dev,
+> -				   "Unable to allocate sk_buff\n");
+> -			page_pool_put_full_page(queue->page_pool,
+> -						virt_to_head_page(data),
+> -						false);
+> -			break;
+> +		first_frame =3D ctrl & MACB_BIT(RX_SOF);
+> +		len =3D ctrl & bp->rx_frm_len_mask;
+> +
+> +		if (len) {
+> +			data_len =3D len;
+> +			if (!first_frame)
+> +				data_len -=3D queue->skb->len;
+> +		} else {
+> +			data_len =3D SKB_WITH_OVERHEAD(bp->rx_buffer_size) - bp->rx_offset;
+>  		}
+> =20
+> -		/* Properly align Ethernet header.
+> -		 *
+> -		 * Hardware can add dummy bytes if asked using the RBOF
+> -		 * field inside the NCFGR register. That feature isn't
+> -		 * available if hardware is RSC capable.
+> -		 *
+> -		 * We cannot fallback to doing the 2-byte shift before
+> -		 * DMA mapping because the address field does not allow
+> -		 * setting the low 2/3 bits.
+> -		 * It is 3 bits if HW_DMA_CAP_PTP, else 2 bits.
+> -		 */
+> -		skb_reserve(skb, bp->rx_offset);
+> -		skb_mark_for_recycle(skb);
+> +		if (first_frame) {
+> +			queue->skb =3D napi_build_skb(data, bp->rx_buffer_size);
+> +			if (unlikely(!queue->skb)) {
+> +				netdev_err(bp->dev,
+> +					   "Unable to allocate sk_buff\n");
+> +				goto free_frags;
+> +			}
+> +
+> +			/* Properly align Ethernet header.
+> +			 *
+> +			 * Hardware can add dummy bytes if asked using the RBOF
+> +			 * field inside the NCFGR register. That feature isn't
+> +			 * available if hardware is RSC capable.
+> +			 *
+> +			 * We cannot fallback to doing the 2-byte shift before
+> +			 * DMA mapping because the address field does not allow
+> +			 * setting the low 2/3 bits.
+> +			 * It is 3 bits if HW_DMA_CAP_PTP, else 2 bits.
+> +			 */
+> +			skb_reserve(queue->skb, bp->rx_offset);
+> +			skb_mark_for_recycle(queue->skb);
+> +			skb_put(queue->skb, data_len);
+> +			queue->skb->protocol =3D eth_type_trans(queue->skb, bp->dev);
+> +
+> +			skb_checksum_none_assert(queue->skb);
+> +			if (bp->dev->features & NETIF_F_RXCSUM &&
+> +			    !(bp->dev->flags & IFF_PROMISC) &&
+> +			    GEM_BFEXT(RX_CSUM, ctrl) & GEM_RX_CSUM_CHECKED_MASK)
+> +				queue->skb->ip_summed =3D CHECKSUM_UNNECESSARY;
+> +		} else {
+> +			if (!queue->skb) {
+> +				netdev_err(bp->dev,
+> +					   "Received non-starting frame while expecting it\n");
+> +				goto free_frags;
+> +			}
+
+Here as well we want `queue->rx_buff[entry] =3D NULL;` no?
+Maybe put it in the free_frags codepath to ensure it isn't forgotten?
+
+> +			struct skb_shared_info *shinfo =3D skb_shinfo(queue->skb);
+> +			struct page *page =3D virt_to_head_page(data);
+> +			int nr_frags =3D shinfo->nr_frags;
+
+Variable definitions in the middle of a scope? I think it is acceptable
+when using __attribute__((cleanup)) but otherwise not so much (yet).
+
+> +			if (nr_frags >=3D ARRAY_SIZE(shinfo->frags))
+> +				goto free_frags;
+> +
+> +			skb_add_rx_frag(queue->skb, nr_frags, page,
+> +					data - page_address(page) + bp->rx_offset,
+> +					data_len, bp->rx_buffer_size);
+> +		}
+> =20
+>  		/* now everything is ready for receiving packet */
+>  		queue->rx_buff[entry] =3D NULL;
+> -		len =3D ctrl & bp->rx_frm_len_mask;
+> -
+> -		netdev_vdbg(bp->dev, "gem_rx %u (len %u)\n", entry, len);
+> =20
+> -		dma_sync_single_for_cpu(&bp->pdev->dev,
+> -					addr, len,
+> -					page_pool_get_dma_dir(queue->page_pool));
+> -		skb_put(skb, len);
+> -		skb->protocol =3D eth_type_trans(skb, bp->dev);
+> -		skb_checksum_none_assert(skb);
+> -		if (bp->dev->features & NETIF_F_RXCSUM &&
+> -		    !(bp->dev->flags & IFF_PROMISC) &&
+> -		    GEM_BFEXT(RX_CSUM, ctrl) & GEM_RX_CSUM_CHECKED_MASK)
+> -			skb->ip_summed =3D CHECKSUM_UNNECESSARY;
+> +		netdev_vdbg(bp->dev, "%s %u (len %u)\n", __func__, entry, data_len);
+> =20
+> -		bp->dev->stats.rx_packets++;
+> -		queue->stats.rx_packets++;
+> -		bp->dev->stats.rx_bytes +=3D skb->len;
+> -		queue->stats.rx_bytes +=3D skb->len;
+> +		if (ctrl & MACB_BIT(RX_EOF)) {
+> +			bp->dev->stats.rx_packets++;
+> +			queue->stats.rx_packets++;
+> +			bp->dev->stats.rx_bytes +=3D queue->skb->len;
+> +			queue->stats.rx_bytes +=3D queue->skb->len;
+> =20
+> -		gem_ptp_do_rxstamp(bp, skb, desc);
+> +			gem_ptp_do_rxstamp(bp, queue->skb, desc);
+> =20
+>  #if defined(DEBUG) && defined(VERBOSE_DEBUG)
+> -		netdev_vdbg(bp->dev, "received skb of length %u, csum: %08x\n",
+> -			    skb->len, skb->csum);
+> -		print_hex_dump(KERN_DEBUG, " mac: ", DUMP_PREFIX_ADDRESS, 16, 1,
+> -			       skb_mac_header(skb), 16, true);
+> -		print_hex_dump(KERN_DEBUG, "data: ", DUMP_PREFIX_ADDRESS, 16, 1,
+> -			       skb->data, 32, true);
+> +			netdev_vdbg(bp->dev, "received skb of length %u, csum: %08x\n",
+> +				    queue->skb->len, queue->skb->csum);
+> +			print_hex_dump(KERN_DEBUG, " mac: ", DUMP_PREFIX_ADDRESS, 16, 1,
+> +				       skb_mac_header(queue->skb), 16, true);
+> +			print_hex_dump(KERN_DEBUG, "data: ", DUMP_PREFIX_ADDRESS, 16, 1,
+> +				       queue->skb->data, 32, true);
+>  #endif
+> =20
+> -		napi_gro_receive(napi, skb);
+> +			napi_gro_receive(napi, queue->skb);
+> +			queue->skb =3D NULL;
+> +		}
+> +
+> +		continue;
+> +
+> +free_frags:
+> +		if (queue->skb) {
+> +			dev_kfree_skb(queue->skb);
+> +			queue->skb =3D NULL;
+> +		} else {
+> +			page_pool_put_full_page(queue->page_pool,
+> +						virt_to_head_page(data),
+> +						false);
+> +		}
+>  	}
+> =20
+>  	gem_rx_refill(queue, true);
+> @@ -2394,7 +2429,10 @@ static void macb_init_rx_buffer_size(struct macb *=
+bp, size_t size)
+>  	if (!macb_is_gem(bp)) {
+>  		bp->rx_buffer_size =3D MACB_RX_BUFFER_SIZE;
+>  	} else {
+> -		bp->rx_buffer_size =3D size;
+> +		bp->rx_buffer_size =3D size + SKB_DATA_ALIGN(sizeof(struct skb_shared_=
+info))
+> +			+ MACB_PP_HEADROOM;
+> +		if (bp->rx_buffer_size > PAGE_SIZE)
+> +			bp->rx_buffer_size =3D PAGE_SIZE;
+> =20
+>  		if (bp->rx_buffer_size % RX_BUFFER_MULTIPLE) {
+>  			netdev_dbg(bp->dev,
+> @@ -2589,18 +2627,15 @@ static int macb_alloc_consistent(struct macb *bp)
+> =20
+>  static void gem_create_page_pool(struct macb_queue *queue)
+>  {
+> -	unsigned int num_pages =3D DIV_ROUND_UP(queue->bp->rx_buffer_size, PAGE=
+_SIZE);
+> -	struct macb *bp =3D queue->bp;
+>  	struct page_pool_params pp_params =3D {
+> -		.order =3D order_base_2(num_pages),
+> +		.order =3D 0,
+>  		.flags =3D PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV,
+>  		.pool_size =3D queue->bp->rx_ring_size,
+>  		.nid =3D NUMA_NO_NODE,
+>  		.dma_dir =3D DMA_FROM_DEVICE,
+>  		.dev =3D &queue->bp->pdev->dev,
+>  		.napi =3D &queue->napi_rx,
+> -		.offset =3D bp->rx_offset,
+> -		.max_len =3D MACB_PP_MAX_BUF_SIZE(num_pages),
+> +		.max_len =3D PAGE_SIZE,
+>  	};
+>  	struct page_pool *pool;
+
+I forgot about it in [PATCH 1/6], but the error handling if
+gem_create_page_pool() fails is odd. We set queue->page_pool to NULL
+and keep on going. Then once opened we'll fail allocating any buffer
+but still be open. Shouldn't we fail the link up operation?
+
+If we want to support this codepath (page pool not allocated), then we
+should unmask Rx interrupts only if alloc succeeded. I don't know if
+we'd want that though.
+
+	queue_writel(queue, IER, bp->rx_intr_mask | ...);
+
+> @@ -2784,8 +2819,9 @@ static void macb_configure_dma(struct macb *bp)
+>  	unsigned int q;
+>  	u32 dmacfg;
+> =20
+> -	buffer_size =3D bp->rx_buffer_size / RX_BUFFER_MULTIPLE;
+>  	if (macb_is_gem(bp)) {
+> +		buffer_size =3D SKB_WITH_OVERHEAD(bp->rx_buffer_size) - bp->rx_offset;
+> +		buffer_size /=3D RX_BUFFER_MULTIPLE;
+>  		dmacfg =3D gem_readl(bp, DMACFG) & ~GEM_BF(RXBS, -1L);
+>  		for (q =3D 0, queue =3D bp->queues; q < bp->num_queues; ++q, ++queue) =
+{
+>  			if (q)
+> @@ -2816,6 +2852,8 @@ static void macb_configure_dma(struct macb *bp)
+>  		netdev_dbg(bp->dev, "Cadence configure DMA with 0x%08x\n",
+>  			   dmacfg);
+>  		gem_writel(bp, DMACFG, dmacfg);
+> +	} else {
+> +		buffer_size =3D bp->rx_buffer_size / RX_BUFFER_MULTIPLE;
+>  	}
+>  }
+
+You do:
+
+static void macb_configure_dma(struct macb *bp)
+{
+	u32 buffer_size;
+
+	if (macb_is_gem(bp)) {
+		buffer_size =3D SKB_WITH_OVERHEAD(bp->rx_buffer_size) - bp->rx_offset;
+		buffer_size /=3D RX_BUFFER_MULTIPLE;
+		// ... use buffer_size ...
+	} else {
+		buffer_size =3D bp->rx_buffer_size / RX_BUFFER_MULTIPLE;
+	}
+}
+
+Instead I'd vote for:
+
+static void macb_configure_dma(struct macb *bp)
+{
+	u32 buffer_size;
+
+	if (!macb_is_gem(bp))
+		return;
+
+	buffer_size =3D SKB_WITH_OVERHEAD(bp->rx_buffer_size) - bp->rx_offset;
+	buffer_size /=3D RX_BUFFER_MULTIPLE;
+	// ... use buffer_size ...
+}
+
+Thanks,
+
+--
+Th=C3=A9o Lebrun, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
+
 
