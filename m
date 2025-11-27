@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-242122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64311C8C882
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 02:20:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15554C8C888
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 02:21:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 230A13B02CD
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 01:20:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF6D93B10CE
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 01:21:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0D9B21771B;
-	Thu, 27 Nov 2025 01:20:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF6742236E3;
+	Thu, 27 Nov 2025 01:21:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LN10YqxM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sAKqyTga"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C876618FDDE;
-	Thu, 27 Nov 2025 01:20:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C793518FDDE;
+	Thu, 27 Nov 2025 01:21:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764206444; cv=none; b=MYAHgyDqR8Q7Jh75No/AbLGQqemqv8wf1mSywySoqRO41BCxusNmRLMQDhmqEkW+E+NXY49MNUK9qDog8BX3a/uMK58WPQVtO1jRJLxCzMf6Ti0f3dfStKrokEN60dJWIxXXnMXsSgTRfrIw1cNRlqDYWdKzPONecRDra/fFoJw=
+	t=1764206465; cv=none; b=r91SgzYN874GixOZ5N9T8EWKEoOH5XTsazl/boPek4DigFhkcRdPFr/Mcil0/IYRgcZfTGccDvPDRP3tRaS3nPv2U43dXmMf3JEqr10u0oJC0e/42MEvwXjHhLKZezvDN3nT7tuxE7Cp4qIrXwAYO07EaRa15uMUsttdQi1m/WE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764206444; c=relaxed/simple;
-	bh=wM7dKGQih8wNeHB3SYwddmyWbom77K0D1phrZv4gnCo=;
+	s=arc-20240116; t=1764206465; c=relaxed/simple;
+	bh=H3Sk4FkNlLvO2pxRyLrNJOf23k9YNgMuCOiAIH2os1Y=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Dt/S5jdLYEtyiF/H2rx8/CBXzUdG5QadqeQFyQtK5cDoqAZm4vzYA1+Gn1vjsHmin5RYtuTQnTzb0pz0xpm8xT5B90pB6hKym0QbwXuf2tRo1nu+Qs1YnRwzuVD06Ai0mjwQWblBhdGEhdQd6kuschKjo/OL90oG2iPDO4fE1cM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LN10YqxM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 486D1C4CEF7;
-	Thu, 27 Nov 2025 01:20:44 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=VhW26IgaUF5FmnnvHu0ddCwAHE30+2+/clt5jNLJqRvRCfln/W39k4buYdtAyli/OmMIhmi7hPJTGG4tJ7KoT3ojvJ1jjBEVRy8eemzVidIy9R0+g7/FDtAEEBw3zpJs9YCM+kyfWjCd9VoMwPiVO8eGR3N7wlzfrj/UbJbOOi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sAKqyTga; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C94DC4CEF7;
+	Thu, 27 Nov 2025 01:21:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764206444;
-	bh=wM7dKGQih8wNeHB3SYwddmyWbom77K0D1phrZv4gnCo=;
+	s=k20201202; t=1764206464;
+	bh=H3Sk4FkNlLvO2pxRyLrNJOf23k9YNgMuCOiAIH2os1Y=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LN10YqxMrMqw1Ulg9TOwGWLMhZYG1iCgtJ+J2oBnv0tL5hPKE/I1bKqBj1lJ3JNIk
-	 Tsuo8Rf5+u6hBiAp/226iOjr5W06DrbY4b5HvAKOMPAwdxmsSBxDmbBXZ4n8TSv+QW
-	 O//PncOqLjLlyobWxEYJIefRh8RJh72/gpky35vJC9iQ+ZsicvS/9mWfSROPJAQCKG
-	 5RnuEglKD08cdZxil8cSxVQLhKmNakhBeI0gzNZlYobrV6dWjLFJsDTydlGyV99IPB
-	 H9tY/3Ie0Y+F9lT3HMop9tyGsQ7MC9DCa0NxW9Ahwd4pLGGNCbIHNHRG1JBtIHLeTT
-	 p+ZV9qlogR+/w==
+	b=sAKqyTgaMimz0WCFD8grun5Hjmibsqz3q9iVzkV7dsecfNNk/89w3I06e8UQlV3nH
+	 C4ro0oTboWtZQYbhqjChXkJsStlm9W09if6B4VErCf6dUcKfKwl7RVtynHi0y1dWfT
+	 bbPWY01ABapbeDurhIPy1s/NWlf88dJ6CgIkiKByKnPYBBEWigQct4AoCHE0WI8Tg8
+	 7luWl0vOHPQD3DkYcZ/SoS5a71f0Qwk1+Bf3h8dnjrclkHBQqS8i0o36Mmensq4mHN
+	 FC2p/J6ocUhFvvygtiilW2cbQldkqVLP90Rkz7GbFEqqehRnsO73Fa6rvGAjhdRUK5
+	 tOeW6oj16QLeA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E83380CEF8;
-	Thu, 27 Nov 2025 01:20:07 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 340F7380CEF8;
+	Thu, 27 Nov 2025 01:20:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,56 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] s390/net: list Aswin Karuvally as maintainer
+Subject: Re: [PATCH net-next v2 0/8] net: intel: migrate to
+ .get_rx_ring_count() ethtool callback
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176420640585.1910295.5604261419675228939.git-patchwork-notify@kernel.org>
-Date: Thu, 27 Nov 2025 01:20:05 +0000
-References: <20251125085829.3679506-1-wintera@linux.ibm.com>
-In-Reply-To: <20251125085829.3679506-1-wintera@linux.ibm.com>
-To: Alexandra Winter <wintera@linux.ibm.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
- linux-s390@vger.kernel.org, aswin@linux.ibm.com, hca@linux.ibm.com,
- gor@linux.ibm.com, agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
- svens@linux.ibm.com, horms@kernel.org
+ <176420642599.1910295.10418248024267534204.git-patchwork-notify@kernel.org>
+Date: Thu, 27 Nov 2025 01:20:25 +0000
+References: <20251125-gxring_intel-v2-0-f55cd022d28b@debian.org>
+In-Reply-To: <20251125-gxring_intel-v2-0-f55cd022d28b@debian.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: aleksander.lobakin@intel.com, anthony.l.nguyen@intel.com,
+ przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-team@meta.com,
+ aleksandr.loktionov@intel.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 25 Nov 2025 09:58:29 +0100 you wrote:
-> Thank you Aswin for taking this responsibility.
+On Tue, 25 Nov 2025 02:19:43 -0800 you wrote:
+> This series migrates Intel network drivers to use the new .get_rx_ring_count()
+> ethtool callback introduced in commit 84eaf4359c36 ("net: ethtool: add
+> get_rx_ring_count callback to optimize RX ring queries").
 > 
-> Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
-> Acked-by: Aswin Karuvally <aswin@linux.ibm.com>
-> ---
->  MAINTAINERS | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> The new callback simplifies the .get_rxnfc() implementation by removing
+> ETHTOOL_GRXRINGS handling and moving it to a dedicated callback. This provides
+> a cleaner separation of concerns and aligns these drivers with the modern
+> ethtool API.
+> 
+> [...]
 
 Here is the summary with links:
-  - [net-next] s390/net: list Aswin Karuvally as maintainer
-    https://git.kernel.org/netdev/net/c/b9ba6338bc6e
+  - [net-next,v2,1/8] i40e: extract GRXRINGS from .get_rxnfc
+    https://git.kernel.org/netdev/net-next/c/a8acbcbaf6d0
+  - [net-next,v2,2/8] iavf: extract GRXRINGS from .get_rxnfc
+    https://git.kernel.org/netdev/net-next/c/fe0a3d7d1dca
+  - [net-next,v2,3/8] ice: extract GRXRINGS from .get_rxnfc
+    https://git.kernel.org/netdev/net-next/c/8e8c00e1d213
+  - [net-next,v2,4/8] idpf: extract GRXRINGS from .get_rxnfc
+    https://git.kernel.org/netdev/net-next/c/873a1942fbc6
+  - [net-next,v2,5/8] igb: extract GRXRINGS from .get_rxnfc
+    https://git.kernel.org/netdev/net-next/c/d6c744f46816
+  - [net-next,v2,6/8] igc: extract GRXRINGS from .get_rxnfc
+    https://git.kernel.org/netdev/net-next/c/768ce58dddb2
+  - [net-next,v2,7/8] ixgbevf: extract GRXRINGS from .get_rxnfc
+    https://git.kernel.org/netdev/net-next/c/3399fd519dd4
+  - [net-next,v2,8/8] fm10k: extract GRXRINGS from .get_rxnfc
+    https://git.kernel.org/netdev/net-next/c/73d834cd1774
 
 You are awesome, thank you!
 -- 
