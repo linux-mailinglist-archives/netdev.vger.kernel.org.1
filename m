@@ -1,351 +1,227 @@
-Return-Path: <netdev+bounces-242396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E75DC901DD
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 21:29:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC585C9021C
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 21:41:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E760E3A994A
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 20:29:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59CBE3A9F2C
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 20:41:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 312423128D0;
-	Thu, 27 Nov 2025 20:29:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D07CE311C10;
+	Thu, 27 Nov 2025 20:41:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.de header.i=w_armin@gmx.de header.b="rTJnv/Na"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kLjFcnh6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2453C304994;
-	Thu, 27 Nov 2025 20:29:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6DE1304BCA
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 20:40:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764275372; cv=none; b=QKeEcTyieeKm2mBhVaQ7nXipvoPD83Xf+X8azvyKPi4+vRkxiVvHlwuNnDSCqPI3LwXqi/6g7/kAE6FnKs2QKL+CUy0QLRx6o3MZ9eLMncdnTXAK7Xe1PTbNT4z2vSSvonnbGBPV+4/eCHzr0aPHonpe2O5WcrtFs+5tbhEgcxw=
+	t=1764276061; cv=none; b=fivZ3Ec4HMqN5O0Sc5q04ObeYxNItHhoWBJhpUfiUS1b7MH1cMIOfQT5nQEEmDAjrQO8qy5PlFfpvMu2buxYzg2xX1WRNUDAhOsdtXb5UGi2UngcKNCoAzYvq41KjzjnbH9M+Ppmqs6r1V1pnXNJ8qxr8SLmWyILapXIBHo18uk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764275372; c=relaxed/simple;
-	bh=FIjMiK+SYTLiDc4XFHboj2kU8rgfBAXOEP1UPudrwHo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QnDb0/srrBbrkIeSk356Sct7v07li3geLknDXJR6iw708PWg3guDiWsK0Uxm1lF28W+pJEqbnQyVFdKXF8JBAW+am862z/8poRNJEO5gdB/XIeFxK8L58ejzdmbK+SSK+KqW1nzRAseNJdp0UuzruQlXu3lX9FicUyUfoCG/eOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=w_armin@gmx.de header.b=rTJnv/Na; arc=none smtp.client-ip=212.227.17.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
-	s=s31663417; t=1764275362; x=1764880162; i=w_armin@gmx.de;
-	bh=Yd13Nfp4oksgRJLK18sDWP0myaxbW5mj/m/FYQoCxqg=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=rTJnv/NaVpg2R5keG7D8J5cSpYaN4U9bOtgfHX5mvkcguQlWmQdQuqk6dfU6AhNG
-	 59FQWFhB4NyrAnwcmeQwN7v21qAWh1574dK0+dyVi/OO7sPniSXY4ao7Vu71Kwa6k
-	 jUNJpd1xWwJ6vtDEmUrQnWr0+02OA/mD1F0QcHTUyGCW9iTeukWzQJcZ0jrkIQof4
-	 Ob0jgbiHF77i2HkIIP1RNgUYS5r/B8bsUeA84OCG4FMbTM/YpvoDFwJoi9v3DdwTH
-	 HsUojQr/3+8iVuK/XCUg8fRt1HEaler3P0++tFQqXAuwyKEvVnM3c4K3KSzSWKtEU
-	 zvzTVbwOHe8nLm1tWg==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [192.168.0.69] ([93.202.247.91]) by mail.gmx.net (mrgmx104
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1N6KYb-1w950F1mY5-00s55S; Thu, 27
- Nov 2025 21:29:22 +0100
-Message-ID: <cf86344b-d9f1-4d3c-9fe9-deeb4ade9304@gmx.de>
-Date: Thu, 27 Nov 2025 21:29:15 +0100
+	s=arc-20240116; t=1764276061; c=relaxed/simple;
+	bh=Mnn9wb9sRTkIJLXCShYMZgz7pZo/y5Y+Ja2/AUVncu4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ID+aabQRX1ZwvmKmOwI1ejo8//BPlRb1MuJXZaq4SCNqNTboWgZ476kU9K/KkAcVtzhvLtRFtRUBr+k6XmWxmEjM3xmEjonYR8Ndsx8L8zJQ5jSQC0UpyH5BbsVWuLO5m/soueE9s7rD2lF7odP8Mfg2SDxN9CHST2gSKW/OE0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kLjFcnh6; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-42b3ac40ae4so801810f8f.0
+        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 12:40:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764276058; x=1764880858; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=TZrDwUzk1jhJojipsQHKrfyEq2t/8kD+pLesRqPqbM4=;
+        b=kLjFcnh65TVvNis9UzA5QyzAMXh9A9nOmmEnsGJirYIiQjtpOXnbKZP6PGAgiboaw4
+         7YWspoKxfR1ICz6b0akDzUW0Awf/KZwH5r8+HKWt234Rm2YTMGsTMOxSIuROehWE2iqD
+         f/fbVY1/d64W679sRX66AqfSE6iyeRnZm5T7Qzio/akBtgYTPhBEKfWyadXF/9E1mrXI
+         ATDc2a9O3JQFa/0nFV1G0GVAVTYf2lXqLeicH3P1AqWFgxhkQbhZ7UtR1qM7otsQOftj
+         uupoSZP/aOEhaVb7uBg8tLwO4LaMj8Uw+9+5yKxYufUkMJWPzMkOig8WgG4T0Exs7Kfc
+         uXCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764276058; x=1764880858;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TZrDwUzk1jhJojipsQHKrfyEq2t/8kD+pLesRqPqbM4=;
+        b=C/rBtXPYl3rMwAQlHqTQZQYN1mLSXi7RYCdaKP/GZamkCFjLA1VCJPxU4JbMgzLO6C
+         xfpsu6pR5jxR7AIusI5pfvezDZXKh+X9xzb0DPSmKmf8j4+PVG3I4NB+gX+rY3jsCP+z
+         +etFrMw2Qz9LGR3hRrx7SwfZuQISIdQ4zR1kkG2uOthw6f7sPmFrIXnsAHsACkzdkO7m
+         LOJsdMfr4qJv2kDUbMAzSTOEJoW+E3Vs3WzSDcYaBVzyLMjXSYGnKB6B3NDyeMDoiA9d
+         7/Wa3T4G3w2tkpyEK6q411ja6RaMpLxEI1OhasldrByjCmrOZZqh9NPdfZPvWeUK/Q2L
+         Zd7w==
+X-Forwarded-Encrypted: i=1; AJvYcCXX93OO9Rt3IWZK+1uzACRBIXAHP6jQWDQVyJq1poBPHgliIe26ytYbKhUN3Bs+QqPZqTJprYw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxbEapL1VlTOTpxJwNQkDvS2IQNEgrPB8GW2Zc9Z/BWRRXL9Qs+
+	YqYBlXis0Ii8u1cw1DkocTBZ6phL3ReFhRVrIpfnziMJTvJ+mOh0iSF65Z8MFQ==
+X-Gm-Gg: ASbGncvfHejWaxa8WkNdtdvTyQQLKMkF/vpO2pTbL+PIgqJExxsALV6aeaILOzL4L8J
+	12e71pEUiULbZkpiSryef11c0TTo2nfQ8d3QSxPXLZaJlNcGP7jIEEA1SpYHsPn4Pq8GMWINQ9M
+	g8/3ZxNXO9bTKUQ7uUbEd4dWNHEneAS301wu5v1Flx8zYfdFpkmr7jwlHsAVnODF09cvX0tWs+/
+	VWc3H3ysL/wo4+YZ8pPxmSSqK+MmpM8yZlKdPej4poToz9iKdT0zwc2yOyPoUDerh37JVsCIwlI
+	iNSvtjAkfGRDFI/3ZXV1fB2rx8WVEBedAyIJyIrlGBBmuRjDVoUVCSYyt4B3WBbs3PBLw6a19eN
+	EhHygJ4oGK8cqmk0HBzKfhY1+PR6i03awJlPfFHBK89gh/he/AxdbIJAGUt6UxP82dBUrDy6OQM
+	dvKdixQMuYjmcfOQ==
+X-Google-Smtp-Source: AGHT+IGBTqkssyUQXy37QRTA7vMYiUC3UhkdYS3Gn35v/sgqJjvtbjsODVx5dVN3kGxZDzZmup4B9w==
+X-Received: by 2002:a05:6000:2084:b0:42b:3cc6:a4d7 with SMTP id ffacd0b85a97d-42cc1cf825bmr27330752f8f.37.1764276058065;
+        Thu, 27 Nov 2025 12:40:58 -0800 (PST)
+Received: from 127.mynet ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42e1ca1a2easm5757423f8f.23.2025.11.27.12.40.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Nov 2025 12:40:57 -0800 (PST)
+From: Pavel Begunkov <asml.silence@gmail.com>
+To: io-uring@vger.kernel.org
+Cc: asml.silence@gmail.com,
+	netdev@vger.kernel.org
+Subject: [PATCH review-only] io_uring/zcrx: implement large rx buffer support
+Date: Thu, 27 Nov 2025 20:40:52 +0000
+Message-ID: <7486ab32e99be1f614b3ef8d0e9bc77015b173f7.1764265323.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC RESEND 0/8] thermal: core: Allow setting the parent
- device of thermal zone/cooling devices
-To: "Rafael J. Wysocki" <rafael@kernel.org>
-Cc: Daniel Lezcano <daniel.lezcano@linaro.org>,
- Zhang Rui <rui.zhang@intel.com>, Lukasz Luba <lukasz.luba@arm.com>,
- Len Brown <lenb@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
- linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org,
- etnaviv@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
- linux-tegra@vger.kernel.org, linux-acpi@vger.kernel.org,
- linux-doc@vger.kernel.org, netdev@vger.kernel.org,
- linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
- ath11k@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, platform-driver-x86@vger.kernel.org,
- linux-pci@vger.kernel.org, imx@lists.linux.dev,
- linux-renesas-soc@vger.kernel.org
-References: <20251120-thermal-device-v1-0-bbdad594d57a@gmx.de>
- <CAJZ5v0jOPrBcozzJMsB1eE12MuZRWDAV-+=jfrhJbi=S0p5J9Q@mail.gmail.com>
- <5f3ef610-4024-4ca0-a934-2649f5d25f40@gmx.de>
- <CAJZ5v0hdqY-=O5Ai6c5qjMr_pRFc+SDyV1QruM=ZeHH9Z=guSg@mail.gmail.com>
-Content-Language: en-US
-From: Armin Wolf <W_Armin@gmx.de>
-In-Reply-To: <CAJZ5v0hdqY-=O5Ai6c5qjMr_pRFc+SDyV1QruM=ZeHH9Z=guSg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:ze+2vo8ED78xoOrvJ36miC1oEQfJjNTUlWuWjASXtJHjsrUA405
- YZDMIbIrWzGit90P9Czhl0GttAUpo1b392W4Ymvc5mXeA8zW+l1CJc6HzQ+E3iBdUMok7pZ
- QDWa0aCmsN6V1X7AxbYNlL/KNIB46dtMpZQ7sakxcltUWF7mpHpZ5XlckY+5ozbWDBX1v4H
- 4rvQFhr2LYkgKymN5+Ucg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:F6q/9h+YC/0=;971bq6CGsSOcPgES6YNWNdeOwg+
- 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
- 0gcrLdnv8iX/IozjTfxNPakm5wgdn
+Content-Transfer-Encoding: 8bit
 
-Am 27.11.25 um 19:22 schrieb Rafael J. Wysocki:
+There are network cards that support receive buffers larger than 4K, and
+that can be vastly beneficial for performance, and benchmarks for this
+patch showed up to 30% CPU util improvement for 32K vs 4K buffers.
 
-> On Sat, Nov 22, 2025 at 3:18=E2=80=AFPM Armin Wolf <W_Armin@gmx.de> wrot=
-e:
->> Am 21.11.25 um 21:35 schrieb Rafael J. Wysocki:
->>
->>> On Thu, Nov 20, 2025 at 4:41=E2=80=AFAM Armin Wolf <W_Armin@gmx.de> wr=
-ote:
-> [...]
->
->>>> ---
->>>> Armin Wolf (8):
->>>>         thermal: core: Allow setting the parent device of cooling dev=
-ices
->>>>         thermal: core: Set parent device in thermal_of_cooling_device=
-_register()
->>>>         ACPI: processor: Stop creating "device" sysfs link
->>> That link is not to the cooling devices' parent, but to the ACPI
->>> device object (a struct acpi_device) that corresponds to the parent.
->>> The parent of the cooling device should be the processor device, not
->>> its ACPI companion, so I'm not sure why there would be a conflict.
->>   From the perspective of the Linux device core, a parent device does n=
-ot have to be
->> a "physical" device. In the case of the ACPI processor driver, the ACPI=
- device is used,
->> so the cooling device registered by said driver belongs to the ACPI dev=
-ice.
-> Well, that's a problem.  A struct acpi_device should not be a parent
-> of anything other than a struct acpi_device.
+Allows zcrx users to specify the size in struct
+io_uring_zcrx_ifq_reg::rx_buf_len. If set to zero, zcrx will use a
+default value. zcrx will check and fail if the memory backing the area
+can't be split into physically contiguous chunks of the required size.
+It's more restrictive as it only needs dma addresses to be contig, but
+that's beyond this series.
 
-Understandable, in this case we should indeed use the the CPU device, espe=
-cially since the fwnode
-associated with it already points to the correct ACPI processor object (at=
- least on my machine).
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+---
 
->> I agree that using the Linux processor device would make more sense, bu=
-t this will require
->> changes inside the ACPI processor driver.
-> So be it.
+Depends on networking patches
 
-OK.
+ include/uapi/linux/io_uring.h |  2 +-
+ io_uring/zcrx.c               | 39 ++++++++++++++++++++++++++++++-----
+ 2 files changed, 35 insertions(+), 6 deletions(-)
 
->> As for the "device" symlink: The conflict would be a naming conflict, a=
-s both "device" symlinks
->> (the one created by the ACPI processor driver and the one created by th=
-e device core) will
->> be created in the same directory (which is the directory of the cooling=
- device).
-> I see.
->
-> But why is the new symlink needed in the first place?  If the device
-> has a parent, it will appear under that parent in /sys/devices/, won't
-> it?
->
-> Currently, all of the thermal class devices appear under
-> /sys/devices/virtual/thermal/ because they have no parents and they
-> all get a class parent kobject under /sys/devices/virtual/, as that's
-> what get_device_parent() does.
->
-> If they have real parents, they will appear under those parents, so
-> why will the parents need to be pointed to additionally?
-
-The "device" smylink is a comfort feature provided by the device core itse=
-lf to allow user space
-application to traverse the device tree from bottom to top, like a double-=
-linked list. We cannot
-disable the creation of this symlink, nor should we.
-
-> BTW, this means that the layout of /sys/devices/ will change when
-> thermal devices get real parents.  I'm not sure if this is a problem,
-> but certainly something to note.
-
-I know, most applications likely use /sys/class/thermal/, so they are not =
-impacted by this. I will
-note this in the cover letter of the next revision.
-
->>>>         ACPI: fan: Stop creating "device" sysfs link
->>>>         ACPI: video: Stop creating "device" sysfs link
->>> Analogously in the above two cases AFAICS.
->>>
->>> The parent of a cooling device should be a "physical" device object,
->>> like a platform device or a PCI device or similar, not a struct
->>> acpi_device (which in fact is not a device even).
->>   From the perspective of the Linux device core, a ACPI device is a per=
-fectly valid device.
-> The driver core is irrelevant here.
->
-> As I said before, a struct acpi_device object should not be a parent
-> of anything other than a struct acpi_device object.  Those things are
-> not devices and they cannot be used for representing PM dependencies,
-> for example.
->
->> I agree that using a platform device or PCI device is better, but this =
-already happens
->> inside the ACPI fan driver (platform device).
-> So it should not happen there.
-
-I meant that the ACPI fan driver already uses the platform device as the p=
-arent device of the
-cooling device, so the ACPI device is only used for interacting with the A=
-CPI control methods
-(and registering sysfs attributes i think).
-
->> Only the ACPI video driver created a "device" sysfs link that points to=
- the ACPI device
->> instead of the PCI device. I just noticed that i accidentally changed t=
-his by using the
->> PCI device as the parent device for the cooling device.
->>
->> If you want then we can keep this change.
-> The PCI device should be its parent.
-
-Alright, i will note this in the patch description.
-
->>>>         thermal: core: Set parent device in thermal_cooling_device_re=
-gister()
->>>>         ACPI: thermal: Stop creating "device" sysfs link
->>> And this link is to the struct acpi_device representing the thermal zo=
-ne itself.
->> Correct, the ACPI thermal zone driver is a ACPI driver, meaning that he=
- binds to
->> ACPI devices. Because of this all (thermal zone) devices created by an =
-instance of
->> said driver are descendants of the ACPI device said instance is bound t=
-o.
->>
->> We can of course convert the ACPI thermal zone driver into a platform d=
-river, but
->> this would be a separate patch series.
-> If you want parents, this needs to be done first, but I'm still not
-> sure what the parent of a thermal zone would represent.
->
-> In the ACPI case it is kind of easy - it would be the (platform)
-> device corresponding to a given ThermalZone object in the ACPI
-> namespace - but it only has a practical meaning if that device has a
-> specific parent.  For example, if the corresponding ThermalZone object
-> is present in the \_SB scope, the presence of the thermal zone parent
-> won't provide any additional information.
-
-To the device core it will, as the platform device will need to be suspend=
-ed
-after the thermal zone device has been suspended, among other things.
-
-> Unfortunately, the language in the specification isn't particularly
-> helpful here: "Thermal zone objects should appear in the namespace
-> under the portion of the system that comprises the thermal zone. For
-> example, a thermal zone that is isolated to a docking station should
-> be defined within the scope of the docking station device."  To me
-> "the portion of the system" is not too meaningful unless it is just
-> one device without children.  That's why _TZD has been added AFAICS.
-
-I think you are confusing the parent device of the ThermalZone ACPI device
-with the parent device of the struct thermal_zone_device.
-
-I begin to wonder if mentioning the ACPI ThermalZone device together with =
-the
-struct thermal_zone_device was a bad idea on my side xd.
-
->>>>         thermal: core: Allow setting the parent device of thermal zon=
-e devices
->>> I'm not sure if this is a good idea, at least until it is clear what
->>> the role of a thermal zone parent device should be.
->> Take a look at my explanation with the Intel Wifi driver.
-> I did and I think that you want the parent to be a device somehow
-> associated with the thermal zone, but how exactly?  What should that
-> be in the Wifi driver case, the PCI device or something else?
->
-> And what if the thermal zone affects multiple devices?  Which of them
-> (if any) would be its parent?  And would it be consistent with the
-> ACPI case described above?
->
-> All of that needs consideration IMV.
-
-I agree, but there is a difference between "this struct thermal_zone_devic=
-e depends on
-device X to be operational" and "this thermal zone affects device X, devic=
-e Y and device Z".
-
-This patch series exclusively deals with telling the driver core that "thi=
-s struct thermal_zone_device
-depends on device X to be operational".
-
-Thanks,
-Armin Wolf
+diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+index b5b23c0d5283..3184f7e7f1f2 100644
+--- a/include/uapi/linux/io_uring.h
++++ b/include/uapi/linux/io_uring.h
+@@ -1082,7 +1082,7 @@ struct io_uring_zcrx_ifq_reg {
+ 
+ 	struct io_uring_zcrx_offsets offsets;
+ 	__u32	zcrx_id;
+-	__u32	__resv2;
++	__u32	rx_buf_len;
+ 	__u64	__resv[3];
+ };
+ 
+diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
+index b99cf2c6670a..30dbdf1cff13 100644
+--- a/io_uring/zcrx.c
++++ b/io_uring/zcrx.c
+@@ -15,6 +15,7 @@
+ #include <net/netlink.h>
+ #include <net/netdev_queues.h>
+ #include <net/netdev_rx_queue.h>
++#include <net/netdev_queues.h>
+ #include <net/tcp.h>
+ #include <net/rps.h>
+ 
+@@ -55,6 +56,18 @@ static inline struct page *io_zcrx_iov_page(const struct net_iov *niov)
+ 	return area->mem.pages[net_iov_idx(niov) << niov_pages_shift];
+ }
+ 
++static int io_area_max_shift(struct io_zcrx_mem *mem)
++{
++	struct sg_table *sgt = mem->sgt;
++	struct scatterlist *sg;
++	unsigned shift = -1U;
++	unsigned i;
++
++	for_each_sgtable_dma_sg(sgt, sg, i)
++		shift = min(shift, __ffs(sg->length));
++	return shift;
++}
++
+ static int io_populate_area_dma(struct io_zcrx_ifq *ifq,
+ 				struct io_zcrx_area *area)
+ {
+@@ -416,12 +429,21 @@ static int io_zcrx_append_area(struct io_zcrx_ifq *ifq,
+ }
+ 
+ static int io_zcrx_create_area(struct io_zcrx_ifq *ifq,
+-			       struct io_uring_zcrx_area_reg *area_reg)
++			       struct io_uring_zcrx_area_reg *area_reg,
++			       struct io_uring_zcrx_ifq_reg *reg)
+ {
++	int buf_size_shift = PAGE_SHIFT;
+ 	struct io_zcrx_area *area;
+ 	unsigned nr_iovs;
+ 	int i, ret;
+ 
++	if (reg->rx_buf_len) {
++		if (!is_power_of_2(reg->rx_buf_len) ||
++		     reg->rx_buf_len < PAGE_SIZE)
++			return -EINVAL;
++		buf_size_shift = ilog2(reg->rx_buf_len);
++	}
++
+ 	ret = -ENOMEM;
+ 	area = kzalloc(sizeof(*area), GFP_KERNEL);
+ 	if (!area)
+@@ -432,7 +454,12 @@ static int io_zcrx_create_area(struct io_zcrx_ifq *ifq,
+ 	if (ret)
+ 		goto err;
+ 
+-	ifq->niov_shift = PAGE_SHIFT;
++	if (buf_size_shift > io_area_max_shift(&area->mem)) {
++		ret = -ERANGE;
++		goto err;
++	}
++
++	ifq->niov_shift = buf_size_shift;
+ 	nr_iovs = area->mem.size >> ifq->niov_shift;
+ 	area->nia.num_niovs = nr_iovs;
+ 
+@@ -742,8 +769,7 @@ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
+ 		return -EINVAL;
+ 	if (copy_from_user(&reg, arg, sizeof(reg)))
+ 		return -EFAULT;
+-	if (!mem_is_zero(&reg.__resv, sizeof(reg.__resv)) ||
+-	    reg.__resv2 || reg.zcrx_id)
++	if (!mem_is_zero(&reg.__resv, sizeof(reg.__resv)) || reg.zcrx_id)
+ 		return -EINVAL;
+ 	if (reg.flags & ZCRX_REG_IMPORT)
+ 		return import_zcrx(ctx, arg, &reg);
+@@ -800,10 +826,11 @@ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
+ 	}
+ 	get_device(ifq->dev);
+ 
+-	ret = io_zcrx_create_area(ifq, &area);
++	ret = io_zcrx_create_area(ifq, &area, &reg);
+ 	if (ret)
+ 		goto netdev_put_unlock;
+ 
++	mp_param.rx_buf_len = 1U << ifq->niov_shift;
+ 	mp_param.mp_ops = &io_uring_pp_zc_ops;
+ 	mp_param.mp_priv = ifq;
+ 	ret = __net_mp_open_rxq(ifq->netdev, reg.if_rxq, &mp_param, NULL);
+@@ -821,6 +848,8 @@ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
+ 			goto err;
+ 	}
+ 
++	reg.rx_buf_len = 1U << ifq->niov_shift;
++
+ 	if (copy_to_user(arg, &reg, sizeof(reg)) ||
+ 	    copy_to_user(u64_to_user_ptr(reg.region_ptr), &rd, sizeof(rd)) ||
+ 	    copy_to_user(u64_to_user_ptr(reg.area_ptr), &area, sizeof(area))) {
+-- 
+2.52.0
 
 
