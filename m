@@ -1,189 +1,152 @@
-Return-Path: <netdev+bounces-242331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37BE2C8F44C
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 16:30:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FBA5C8F464
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 16:31:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B320F341D8C
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 15:29:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D0AD3A7F58
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 15:31:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2BDE334396;
-	Thu, 27 Nov 2025 15:29:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NNoF6weI";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="c4o19SF0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7B072BEFF8;
+	Thu, 27 Nov 2025 15:30:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F99927602C
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 15:29:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F2E42BEC43
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 15:30:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764257395; cv=none; b=eMM6KJ17qbn8bm+2uLIJoZ3/6Z/6UAxxC8Q+x/qeFoxCIZACeeDSFoC5pXTkb2TeTZDx/TC+9ihZXAaZ+Lwaqcv6akgmhN296DE16iWfHiuOmEG9tUaKdp8lvX6EtAC48GkmDmiEVIApKbEH+ZPL4mSM6eH03azWUGCcidUAxmU=
+	t=1764257446; cv=none; b=ItphqcGp3qPybdCk/oPItMnTNnwbHNMxjSn5NZOipyspJyHVRIQJduoGYo7nHFwdFl+Z0AisfuD2sqc+vcQ/t/rxjUhsGilyRwMk962Lz8UVNjqsfV2tjXBfv4ydat6lvSFGcpD1aUrFxPFlqpdgVmdgL1nPRPWQgDu0HiWyRLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764257395; c=relaxed/simple;
-	bh=Q+yvDDwFY1D+geMCQr2vNJ4z+lz0BHU2Zk7Ni0x8J78=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t1QnysjPEK8ctr+a5v2e6jya6IsHRdiAIZqmRZ6f+0tHsTpgn6G8naDDBWnEwSWD9aO0KQvCRYQXF0D10iYW3ovGQuhV9oeCvnGToeYBTH4Jb8cpgwVTXQ2dbdJy2gd94TcgXzofA/PH4G13kedsBh5lyJtaDcOOWHGe+65pdEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NNoF6weI; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=c4o19SF0; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764257392;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8qr2PgG7xe5f+wEkqXvKcY1v2BMi6s2PMaZnRkPGnt8=;
-	b=NNoF6weIhWqAh6bg2m9ySrMqgXpTVz7enZWpOI8uN4arfE9/y6uYD9tI7xyTN4wUojW8ue
-	P73wZ8hwRnXxsMzq/sy+BBMDJxJjxS4i3pdJb3skCIxE5CFQJWDuBti3M7Bi8OHmPWgP84
-	UXtssbVZ2wxOjmX7rdukAgZcm7EkM2s=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-52-4XFtMsE_PzSyUTUAMtTtrQ-1; Thu, 27 Nov 2025 10:29:51 -0500
-X-MC-Unique: 4XFtMsE_PzSyUTUAMtTtrQ-1
-X-Mimecast-MFC-AGG-ID: 4XFtMsE_PzSyUTUAMtTtrQ_1764257390
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4779b432aecso6245615e9.0
-        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 07:29:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764257390; x=1764862190; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8qr2PgG7xe5f+wEkqXvKcY1v2BMi6s2PMaZnRkPGnt8=;
-        b=c4o19SF0FnABCVYBe29uQ3meY7YPWYOFSjLTSAPaw87Kn6BPRf1T2Qw+/lYYb1K10j
-         mFxpxqv1DQleHr3baCVrM1Vg1nY/JcBF4A0rfvZbDaO8FW2yD6GcM8LiMs9ZPFUQSXp/
-         PJhKmCoGnhD2JWFzF+P8xm0kHYkeAv+aa0kIp/Q2IjNjDrzF8mlOAtmWJQwz13BM+xXZ
-         JZYo5zd1HanHB39Q8LMFxP9S+FyPrDi+hNVFzVzW131bj7Sqtpn6R3hnnPsu+QWwfr2P
-         ADHJ+XC4eKuC66Ncw+D0Bf59lm2FF8dYEsYwGERD5uFiMBTisVR/GyOQmDRkyEAKAWpD
-         G63Q==
+	s=arc-20240116; t=1764257446; c=relaxed/simple;
+	bh=QxWXz8I2QLGbWNLfwE68rNFGhHNA5j7MyCQzwVPeZ0M=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=DzBJHdQ9roCH7HN5na1/WOtJaRW3GgTno6dyuSbpFmAiP7sj6b0ljLeOdFMHJlmBWrpd6F57ulJ6YX30j2Y/gMJ34erQGKpphQMR9QuxTDqIst2Ui+bi6s52OKj2asAXHilZe63ykiR/wR71CdkdlzE66oxhWO8FgIQTX9niHzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.160.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-3ec3e769759so203216fac.3
+        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 07:30:44 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764257390; x=1764862190;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8qr2PgG7xe5f+wEkqXvKcY1v2BMi6s2PMaZnRkPGnt8=;
-        b=YoOv3zbHqx0APPOgPg32NoXxbd2wCrnpetCxS55m/izrr2DJ/GqDfwSXIPRMHqiyqe
-         Qwej096ykl0cQUrMZ6sKRX3j31g0FbjHbZc+NGhDJljB844Be/J0cMlFwGZm2Y4WNoVf
-         Yz4a05pD7uQO0S5eWoC+K5B9aW01YYw9MZBWd0kCsPl5TUgdQXMgE2iwJ1FJFA2Ujpoo
-         yXj9I+R6cSFlCLWu2AvljFc9i8xRYEwc35KSJcIl1KAyaWTbO1VH5boElIG/JmjFQL0k
-         XGZIugkA6I8kyUBoRBLlDYYgZpFdbRAWBTNibbFfJyedMCOA48P8PQY/5RQLICx3+kzP
-         ut5Q==
-X-Gm-Message-State: AOJu0Yzmtw+eRrdz+o8fnxnUY9SnaPIbnOxzjAsQRnb9kUrqrBeCwvLZ
-	r4Qdazv9fnNL56HmpVmN4S6vtbduYzOHaRJQcB7JoxGrJfQLY0AwERKmmFpv0iUh1/eDA+mCTT4
-	036L2Vjo5sIIRNvHSqMBs2/tN5WwsLDApS/ZKbJ5XTOzY4pCsrAlfc7hBpA==
-X-Gm-Gg: ASbGncs6L1aQINE99C8lF852raZXt/T2NlqwXU9xaxzZ3lvdVZ2AGLqp3rw0qA88t6t
-	WllR/3QALkZh/87AyGkaLQtcs5QVbXeYnNPiDAYWLjnZR+l9saaTSJO0dKkzP0C62YD01Nd8GXY
-	9mWruUqaVZ7zpX9lGj5AYSvXvN+27dnTyvxMQnfPK3iPCw6Z1uZNriAxmCMJE+elgIQk3Oo4Zt+
-	OK7MFc7VgWeDtP+QAqDfamxZH/vQdDi4EN2HPZzOhMETVmzdlWq00yUnRCPxmWsSYicQfZqtdD9
-	Ygq86DB5/677PCGswdSGhL9SsfThyToLHJuwtz8h/vQpvApohs/15vqtw6UwRwPRggO3cAIkvHU
-	T1ze6onM0EG+uFw==
-X-Received: by 2002:a05:600c:19d4:b0:477:63b5:6f3a with SMTP id 5b1f17b1804b1-477c112635amr208634645e9.27.1764257390228;
-        Thu, 27 Nov 2025 07:29:50 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG6EjJopCbjI/4LJUJi5H8NRT2Y1f3vZt8QNHKaMLuh5wJZtyqrpT4xy5o+MTv2JVA9T3EZvA==
-X-Received: by 2002:a05:600c:19d4:b0:477:63b5:6f3a with SMTP id 5b1f17b1804b1-477c112635amr208634365e9.27.1764257389834;
-        Thu, 27 Nov 2025 07:29:49 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.155.212])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-479052def4bsm67904185e9.13.2025.11.27.07.29.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Nov 2025 07:29:49 -0800 (PST)
-Message-ID: <7f7238d8-bf0d-43f3-8474-7798e8b18090@redhat.com>
-Date: Thu, 27 Nov 2025 16:29:47 +0100
+        d=1e100.net; s=20230601; t=1764257444; x=1764862244;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=W8Qg3/vkOFUP1Lt1PguyJULS0qEUFEpw0xRXueJJTxk=;
+        b=goR5kUnJpukYV//mOhNhhqPygfuIZK6NLx1wQbUYCVvW+LxGmaw1gu3FsY/CDmrJYM
+         6qApaimpu3ypscNBdAMrYTT2J2cnxZ+d9ACLtuKWunfnsqFAJbr50RgW2Vn8cmo7qbNK
+         InACTM/ZjVeF4qadnLJyhgzdTdF2im38fGhL6t0dnB1nUkLFhbQUm39kTnRt6s7D6cP+
+         YzjveCmjnSYjOwxuXsBlqarav4Tp3gS5x8+6BZRt9nSQcrJW8Mv0MVy4sNiug3FkptpH
+         GJMDEcIajdY65X9XPCrniXg6cEstPJRV3JzPjz79vlTH5vq7nZ5sPdBkMMXa9itBVdZL
+         Mmyg==
+X-Gm-Message-State: AOJu0YzDutJfFtAacCGm+YJaWcDx8Ls/L70zhaRPNRAdeOUQKVcgNuv1
+	IJILFJDLXY4+zCEDUDK5OJT/Pvq9vSOWT59TGxnTR6UANBq+aRHG5/R9
+X-Gm-Gg: ASbGnctIFIxOChSLzxm+26LxIT78Zig0x+b4xvWQQe++M8Y8N1f/CFQSXcrj26YL5nk
+	H8vIhZaFmQg0QtmSjLU9upoyMr22fgUoHgFUw/ioa+Q/PWFMlyoYgatdb+A+2vbjUXxMkO3NWJe
+	YWcQOje7OlRAGb03flMCL1WExv6aIPPkku3ZWFxTgfNIwC5L+XQzEALjRdkv9a0QAWEzcK/iCC+
+	QPefBhypnIE85V3hVnpooTSf69BppWCqO+2//6ycGXCvIKEsEJIn4p6DvoHpDRcCWnhqaANB4B4
+	PI0BuLR/a1/UOMPyW7va4nhWi6fCRNxEeMkuszvDvT2Wq/AVZFZH2IE84Ac6ymAtqApLM+58zn1
+	d6F5zvAJi5wADOQtamjsvk4xKZpcGmVkhcpgibEdLNxee43GBDXm8mI4QBbQZBQtyCe0RzXZqI8
+	ffuWshVp9i8CqH+w==
+X-Google-Smtp-Source: AGHT+IE1IykwWNaeiEry9VhtjSQOXUoWbhcJ5famo3M5NrucKs2+1V7YLL+7MzjnA8KRYH24RuRu1Q==
+X-Received: by 2002:a05:6870:e189:b0:3e7:eee7:948f with SMTP id 586e51a60fabf-3ecbe28c234mr10135629fac.9.1764257444028;
+        Thu, 27 Nov 2025 07:30:44 -0800 (PST)
+Received: from localhost ([2a03:2880:10ff:70::])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-3f0dca01676sm681892fac.5.2025.11.27.07.30.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Nov 2025 07:30:43 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+Date: Thu, 27 Nov 2025 07:30:15 -0800
+Subject: [PATCH net] net: netpoll: initialize work queue before error
+ checks
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 2/3] bonding: restructure ad_churn_machine
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
- Mahesh Bandewar <maheshb@google.com>, Shuah Khan <shuah@kernel.org>,
- linux-kselftest@vger.kernel.org, Liang Li <liali@redhat.com>
-References: <20251124043310.34073-1-liuhangbin@gmail.com>
- <20251124043310.34073-3-liuhangbin@gmail.com>
- <75349e9f-3851-48de-9f7e-757f65d67f56@redhat.com> <aShbAp7RZo8sfq2C@fedora>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <aShbAp7RZo8sfq2C@fedora>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20251127-netpoll_fix_init_work-v1-1-65c07806d736@debian.org>
+X-B4-Tracking: v=1; b=H4sIAIduKGkC/x3MUQrDIBAFwKss7ztCldiAVylFilnbpWENKmkg5
+ O6BzgHmQOMq3BDoQOVNmhRFIDsQ0uelbzYyIxDczXlr3WSU+1qWJWbZo6j0+Cv1azyPc74nP6X
+ sMBDWyln2//uAcsfzPC8HDLrPbAAAAA==
+X-Change-ID: 20251127-netpoll_fix_init_work-5e4df6c57cf2
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ gustavold@gmail.com, asantostc@gmail.com, kernel-team@meta.com, 
+ Breno Leitao <leitao@debian.org>
+X-Mailer: b4 0.15-dev-a6db3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1874; i=leitao@debian.org;
+ h=from:subject:message-id; bh=QxWXz8I2QLGbWNLfwE68rNFGhHNA5j7MyCQzwVPeZ0M=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpKG6iG0QG4IzWJfv7r7dibnjvjdDNxCeej7eHY
+ NEmqg2RiteJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaShuogAKCRA1o5Of/Hh3
+ beR4EACHVJ6a2Qdwmvsswtj8ylfPoezGyaIkHootvPBqM9calNRGBPjHRVM1qiqUWPaUBxbetVx
+ rwVX7xpgbJXhyzL1NMsxaL4Gvfzyy/LdoUWdk7epv34GHXnGJyy0zZlDHr/67WvoMDbvRJqDdmE
+ ZL2ZXw/uI4UbG57BCBl7MQb7w2QECbDiY8aUNKia0/dWTkgGDCCF/ck3W8X0zC+doVZgpDVzeaA
+ idwra4nyB//J84l7UWkxKCrs1br/CStPjX9dzkl6JKMV3LcVR4RG72x/M17YXcMyktchjw1C1vv
+ ZTmWF8dnHxCIPRqlw/y48y7a4DqQFZpE0VnxWZOeiRiUIMeX1zG2xEdsHe9G1Uv4XJ3yjc2S7Rt
+ VOB7Zjhd6T0U2hZ7aHvzXdGrfG2wvmANEbSgE/JourJJkPIGaGdJOX3RW0bKLKhfWeZFqx2KA34
+ lg09MwIqd2ZF2XP8mOT2BnWDtSrIF3M8aw4kKWgMmxRTznd24SeT1SadHUlf3XR1jQ8Gts7QeIX
+ QEqJc8uo1PDpNeAzu49CQ+kXuMpqtYf0DcXVxVfoh4x2bAihiY3Bb8jSX9gxhhPF6fevhPdcJwi
+ AFIVj8h3irSnLTsL6cgdrTboMRGI46p4oe9tLjgpr98OOLFs/HRKe+xgcJHn00m4Anfz48ZqSYg
+ ZJp3Ys5d4nGP79A==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-On 11/27/25 3:06 PM, Hangbin Liu wrote:
-> On Thu, Nov 27, 2025 at 11:36:43AM +0100, Paolo Abeni wrote:
->> On 11/24/25 5:33 AM, Hangbin Liu wrote:
->>>  static void ad_churn_machine(struct port *port)
->>>  {
->>> -	if (port->sm_vars & AD_PORT_CHURNED) {
->>> +	bool partner_synced = port->partner_oper.port_state & LACP_STATE_SYNCHRONIZATION;
->>> +	bool actor_synced = port->actor_oper_port_state & LACP_STATE_SYNCHRONIZATION;
->>> +	bool partner_churned = port->sm_vars & AD_PORT_PARTNER_CHURN;
->>> +	bool actor_churned = port->sm_vars & AD_PORT_ACTOR_CHURN;
->>> +
->>> +	/* ---- 1. begin or port not enabled ---- */
->>> +	if ((port->sm_vars & AD_PORT_BEGIN) || !port->is_enabled) {
->>>  		port->sm_vars &= ~AD_PORT_CHURNED;
->>> +
->>>  		port->sm_churn_actor_state = AD_CHURN_MONITOR;
->>>  		port->sm_churn_partner_state = AD_CHURN_MONITOR;
->>> +
->>>  		port->sm_churn_actor_timer_counter =
->>>  			__ad_timer_to_ticks(AD_ACTOR_CHURN_TIMER, 0);
->>>  		port->sm_churn_partner_timer_counter =
->>> -			 __ad_timer_to_ticks(AD_PARTNER_CHURN_TIMER, 0);
->>> +			__ad_timer_to_ticks(AD_PARTNER_CHURN_TIMER, 0);
->>> +
->>
->> Please avoid white-space changes only, or if you are going to target
->> net-next, move them to a pre-req patch.
-> 
-> OK, what's pre-req patch?
+Prevent a kernel warning when netconsole setup fails on devices with
+IFF_DISABLE_NETPOLL flag. The warning (at kernel/workqueue.c:4242 in
+__flush_work) occurs because the cleanup path tries to cancel an
+uninitialized work queue.
 
-I mean: a separate patch, earlier in the series, to keep cosmetic and
-functional changes separated and more easily reviewable.
->>> +		if (actor_synced) {
->>> +			port->sm_vars &= ~AD_PORT_ACTOR_CHURN;
->>>  			port->sm_churn_actor_state = AD_NO_CHURN;
->>> -		} else {
->>> -			port->churn_actor_count++;
->>> -			port->sm_churn_actor_state = AD_CHURN;
->>> +			actor_churned = false;
->>>  		}
->>
->> I think this part is not described by the state diagram above?!?
-> 
-> This part is about path (3), port in monitor or churn, and actor is in sync.
-> Then move to state no_churn.
-> 
-> Do you mean port->sm_vars &= ~AD_PORT_ACTOR_CHURN is not described?
-> Hmm, maybe we don't need this after re-organise.
+When __netpoll_setup() encounters a device with IFF_DISABLE_NETPOLL,
+it fails early and calls skb_pool_flush() for cleanup. This function
+calls cancel_work_sync(&np->refill_wq), but refill_wq hasn't been
+initialized yet, triggering the warning.
 
-I mean the state change in the else part, I can't map them in the state
-machine diagram.
+Move INIT_WORK() to the beginning of __netpoll_setup(), ensuring the
+work queue is properly initialized before any potential failure points.
+This allows the cleanup path to safely cancel the work queue regardless
+of where the setup fails.
 
->>>  	}
->>> +
->>> +	/* ---- 4. NO_CHURN + !sync -> MONITOR ---- */
->>> +	if (port->sm_churn_actor_state == AD_NO_CHURN && !actor_churned && !actor_synced) {
->>> +		port->sm_churn_actor_state = AD_CHURN_MONITOR;
->>> +		port->sm_churn_actor_timer_counter =
->>> +			__ad_timer_to_ticks(AD_ACTOR_CHURN_TIMER, 0);
->>
->> Should this clear sm_vars & AD_PORT_ACTOR_CHURN, too?
-> 
-> Yes, or we can just remove AD_PORT_ACTOR_CHURN as I said above.
-Generally speaking less state sounds simpler and better.
+Fixes: 248f6571fd4c5 ("netpoll: Optimize skb refilling on critical path")
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+ net/core/netpoll.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-/P
+diff --git a/net/core/netpoll.c b/net/core/netpoll.c
+index 331764845e8f..09f72f10813c 100644
+--- a/net/core/netpoll.c
++++ b/net/core/netpoll.c
+@@ -554,6 +554,7 @@ int __netpoll_setup(struct netpoll *np, struct net_device *ndev)
+ 	int err;
+ 
+ 	skb_queue_head_init(&np->skb_pool);
++	INIT_WORK(&np->refill_wq, refill_skbs_work_handler);
+ 
+ 	if (ndev->priv_flags & IFF_DISABLE_NETPOLL) {
+ 		np_err(np, "%s doesn't support polling, aborting\n",
+@@ -591,7 +592,6 @@ int __netpoll_setup(struct netpoll *np, struct net_device *ndev)
+ 
+ 	/* fill up the skb queue */
+ 	refill_skbs(np);
+-	INIT_WORK(&np->refill_wq, refill_skbs_work_handler);
+ 
+ 	/* last thing to do is link it to the net device structure */
+ 	rcu_assign_pointer(ndev->npinfo, npinfo);
+
+---
+base-commit: f07f4ea53e22429c84b20832fa098b5ecc0d4e35
+change-id: 20251127-netpoll_fix_init_work-5e4df6c57cf2
+
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
 
 
