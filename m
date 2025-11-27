@@ -1,481 +1,198 @@
-Return-Path: <netdev+bounces-242300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242301-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4A68C8E818
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 14:38:58 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32CB6C8E8A8
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 14:44:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E3B63B07B8
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 13:38:57 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 061684EB320
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 13:42:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D35827703C;
-	Thu, 27 Nov 2025 13:38:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 133E32868A9;
+	Thu, 27 Nov 2025 13:42:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="sdenKurl"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="FQ381jcZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011037.outbound.protection.outlook.com [52.101.70.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4724429A1
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 13:38:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764250736; cv=none; b=CFp0vuWEToxb294n5EjCkXZs97JT+PBkg63fOXRbSrIxMz27Y+GllMm/qv8omiV/WTG73LcjukAuG6LX9Kcp4MYyK93zOKT6shOMmWsJlhjDAjzEpqoSAqrbs1DFuB/ZxX3r8jMxNhfRR/abwWncJvQHxuJ/mW1LvpGlngYSCzo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764250736; c=relaxed/simple;
-	bh=iAqOVwWgKogsbyIZ/QF1R7BcAXoHbhzeYKOSqFVOshs=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:To:From:Subject:
-	 References:In-Reply-To; b=g8oqvD+ZQJsUuNT4PjnHTacLFTXf5SZdHox/UweLGbQ25p15WhpICD19GudJNmPK3m/wVyQ1ZsaZUv4fhL/pD89Z5TwrxNjmQUtL5LLuyCkYz96tfskhAoi4llWQdvKWuQ0Fkh63wGO1wUDi21Nn0oFxceUbDopt0s/ss0Shq24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=sdenKurl; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 3CF4D1A1DC3;
-	Thu, 27 Nov 2025 13:38:49 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 097396068C;
-	Thu, 27 Nov 2025 13:38:49 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3C1F9102F2772;
-	Thu, 27 Nov 2025 14:38:45 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1764250728; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=gOuN+UVPz8uRQd/4TeqkfCBVMWkoXElH/Mjy8DKgOaE=;
-	b=sdenKurlrQZQMtqPW727ezGElHd6uCu+lsDvh2T20MiDgpgmE+fpH8xjO/xUaomPxHXy0c
-	mD3aEF9w43Xqvlt8yoWUoUmiESp6Gro9FrLpb6LAKxmVxtYbmw4+LNR2N0lEKzLXe0pPJD
-	/f3dQvgEdx3ryDDEhvoVAL3SObE8lrqqNFVXhgdYNbBzpNjT/2c0PpwnBnI8nSntdUIcYt
-	4j5Mll266SV6h8AmDM67Xg51WQITKdl7NqASj3cf5y4Nfj5wDazueA5nBR77KXDN+Hj2zz
-	zbIaak9UnneFmA7RJ0vXQiy3Y+kIop2UcYTpDNP15EVX+VByuB329Kg/AYriKA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C223C5695
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 13:42:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764250947; cv=fail; b=kuNt2uLtLCMFQvshIuehuRjXeWuKBciNfYSYIPWnm1ifkWSbt+hpeP3k+xb1XvWRQqv5Th9PrROfLSVR+QlsZCtN6Ts1p+Ed0+wPPHRVvGENTFEYOcVcPduSfPlmfrtm7AqTT3dBhgALbfLnxIRoT4JQCdU+5k1jtzGtgoDu++8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764250947; c=relaxed/simple;
+	bh=QylXXFDKP8QWmBucuKTWoAHDWf4xFQ60TPcwniKLBZ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=YoHfttPFtqqPvLgKtyOA23euOvKZOiD+EcXw0a4QcvJzKbbsYcm0E0PsKrMVagk9Ao5B9vuE5oHtTZkvppy1/g/SJ/qmB9NUCRy5SOPOo3gr1ZVSSRKf3H3B4bcaxoM+nwsITUiTvlFv8DjZnjy3RsisEFZ+Zi1QoPJF64qnNio=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=FQ381jcZ; arc=fail smtp.client-ip=52.101.70.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=sX49ckt4KmHDtwfXniC10Kg1MXRgq0izUmuR1dRJSg46hYDm0H7MUCu5HbI11WZS2b5akOeolBeuE0gAlfoiURP2L2Cqt1EnfnetuIqWUvdbXR1+9O0xzzPQOze2RQ5xfuy5B0GEuoOnCqCEeXtDwURsjENYgFpG2/m7dtNsDp/qJrkNkVjdEjHtTFT+WqbKJcxmTeEGnHi1au810GqL8BXnrNCH+c7l5Eo+EapxX4CC5iJgVLbT6jLfmgqB7uHgs/e/j9tYSVmKG1C2Ap6uWfFGYc1m4klucp6eaaJX0jJ7CDmiF8nGVJZ9AXpenBaLQym6psc0OUjqL5VdTE9NVg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2li4na9TXtRidw7uL2iPdtXHsrczI1oo/Qaf9qPvaTA=;
+ b=FX/3PZXBswpX+zTfDMlyHaRIfhVNIxaI9+yBX0gHwo28beWI62Nxz+lMB6UsVnhz75nlbwd9oYV9wEq1tne/bdYEBrJ2v7Z0MQ4lJ4O6xOjBSiWFmtf1ssKyW2enMoAczOqzFFSpQj/kOA9Nd8nOojZuNQsKUxS2o3U+vj8vYu85Yq0CNkLyoeVVxXjOiFpBHaZFJ1RId3CsQbM0lLcs1/ITE0sZoOlAQDA801QDP3cYFHVIBQ8nDFGIR06Qbar6QGrwBiQUw+H7PT9DFDFdgBnrAVhXRTuBb2k4g0SD7qaQHtBR/QxZajotXBjKl/hgyqJ3r60gch+TssmkIMOi9g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2li4na9TXtRidw7uL2iPdtXHsrczI1oo/Qaf9qPvaTA=;
+ b=FQ381jcZzGHItr3mBeGNdiEyNZRMujE0oqieuUQYWcoxRsIeQPvjErLKIV0apT/rUrFa/YSIukTO0+7Kfbw8VK8dvlbWYvL0G4L9zAz7FEE1mFuaoYdUBIYsF4g3axgT04juWNjQjNERVw/qfYP/rjCHwQ3KaOCTn5/JkwprwrmTkJKIlOo0PE5d5/SMb4KueQPx0EdKaoUIQ5lq0PRJGLIPOQQjcdb3+n40n8SVK3TTGXyZDcGnjZjY+WQvQo+1HLueaqQrklRru3L1U7bu41X+8/4qKWkMSr+Ib3KCk83E1VLXw7J12hp9Q/fhFxeCLJPFEgNdskLFNACqFiDt7g==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM9PR04MB8585.eurprd04.prod.outlook.com (2603:10a6:20b:438::13)
+ by AM8PR04MB7283.eurprd04.prod.outlook.com (2603:10a6:20b:1c7::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.14; Thu, 27 Nov
+ 2025 13:42:16 +0000
+Received: from AM9PR04MB8585.eurprd04.prod.outlook.com
+ ([fe80::8063:666f:9a2e:1dab]) by AM9PR04MB8585.eurprd04.prod.outlook.com
+ ([fe80::8063:666f:9a2e:1dab%5]) with mapi id 15.20.9366.012; Thu, 27 Nov 2025
+ 13:42:16 +0000
+Date: Thu, 27 Nov 2025 15:42:12 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Jonas Gorski <jonas.gorski@gmail.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>
+Subject: Re: [PATCH net-next 02/15] net: dsa: tag_brcm: use the
+ dsa_xmit_port_mask() helper
+Message-ID: <20251127134212.wh7d7djiv23lyv2e@skbuf>
+References: <20251127120902.292555-1-vladimir.oltean@nxp.com>
+ <20251127120902.292555-3-vladimir.oltean@nxp.com>
+ <CAOiHx=miR4JAbnYeRJwcHowgBUmvCn4X19syCxuwk8N7=xAXRQ@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOiHx=miR4JAbnYeRJwcHowgBUmvCn4X19syCxuwk8N7=xAXRQ@mail.gmail.com>
+X-ClientProxiedBy: VI1PR06CA0184.eurprd06.prod.outlook.com
+ (2603:10a6:803:c8::41) To AM9PR04MB8585.eurprd04.prod.outlook.com
+ (2603:10a6:20b:438::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 27 Nov 2025 14:38:45 +0100
-Message-Id: <DEJIOQFT9I2J.16KSODWK6IH6L@bootlin.com>
-Cc: "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
- <claudiu.beznea@tuxon.dev>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- "Lorenzo Bianconi" <lorenzo@kernel.org>, =?utf-8?q?Gr=C3=A9gory_Clement?=
- <gregory.clement@bootlin.com>, =?utf-8?q?Beno=C3=AEt_Monin?=
- <benoit.monin@bootlin.com>, "Thomas Petazzoni"
- <thomas.petazzoni@bootlin.com>
-To: "Paolo Valerio" <pvalerio@redhat.com>, <netdev@vger.kernel.org>
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-Subject: Re: [PATCH RFC net-next 2/6] cadence: macb/gem: handle
- multi-descriptor frame reception
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20251119135330.551835-1-pvalerio@redhat.com>
- <20251119135330.551835-3-pvalerio@redhat.com>
-In-Reply-To: <20251119135330.551835-3-pvalerio@redhat.com>
-X-Last-TLS-Session-Version: TLSv1.3
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8585:EE_|AM8PR04MB7283:EE_
+X-MS-Office365-Filtering-Correlation-Id: b6448cf4-8c35-42df-cbb5-08de2dbac6a8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|366016|1800799024|10070799003|19092799006;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?pwyupqm+sS9rnZxTdd6dekm47qbt3SDDtaYKkbfYySNY5WpB4mgbpnSXHZkN?=
+ =?us-ascii?Q?3nI5X5uiVTVH9vf0Ea1SGr8kJOg7iYPdFs1cSrDLE1+84Rrx6KZr2aCfJvyO?=
+ =?us-ascii?Q?oDpQtR93+Hufo82m2BTDfP6MmGw686oO7v+OMEXwxFyQV9RSa0m/nbxw6M+R?=
+ =?us-ascii?Q?MBN1LR21T+rvOwpYbyTzhrtqYbpVqsWkUC+QIhXg4S4A0mImkLnenfH5OFG7?=
+ =?us-ascii?Q?QYpnyQHH8tvUtuxD2tbhKC11k2P1sxaprfzLE1hD4m3a2k3txBWoVOICKVf6?=
+ =?us-ascii?Q?iOM8ZcVkc1rfa6tukRGofzUMoZaFsva+aIiyhVW9cx/tDpLEDzSYnzFbbAQc?=
+ =?us-ascii?Q?tpFpYoWFAj7s4mGv2nLSUCbov6xe+BN7/WyJCwS+kAqEyDfQshqWItgSYR1X?=
+ =?us-ascii?Q?8G3HS2msBcM7m0o5e6wQvFNQwJtG8gzIl0QnxonO4TUcRnkqG9QlEVV5i4Rb?=
+ =?us-ascii?Q?+y6QcaMgQErPZ4M2/ozSm1qVoifAv2PPdOXpp/nKAXbkXTxsj+47JVAdO4Z0?=
+ =?us-ascii?Q?2RLuzfK734LBbR7ZdK7s5Enq++9QINZiAQdnO+SWCIeC7j9gKV8W8Hiwh8SO?=
+ =?us-ascii?Q?1NbB9HQ796C/kVDkPidsc10BJ7kEK3eUdTlTv6K0rXvyM0g9OUuYX/8a0V44?=
+ =?us-ascii?Q?bH0q+TzK8CMY5aj1odynRDMd+XXF9qWGUfu9PDCrDmUYrXcp4qOfngL2++3d?=
+ =?us-ascii?Q?y7RrICwMoGTP+b97DlKK/x2JqWWMNwJFCMDcrjvnPZkVIvIUKmycO080jrZw?=
+ =?us-ascii?Q?LC6CrS03y+hIP/GT8zUGd0WMjTasZfu9Lu1SEzdNsGEogD51RDkfhzu4U1th?=
+ =?us-ascii?Q?kDW7VJGVnfX78Usxa+vXHy/y54C5Vu6UXyoeN8eR3MZlrMGm2+4kB+GfZLwa?=
+ =?us-ascii?Q?Fu/Y3HnW5ebwH+HyuTogsmD68osfTteE2Q43o8AdKK54M/EZI+Q1ZLuGoeup?=
+ =?us-ascii?Q?PQrsaC+pfQfCWl/3F5Eg6MrZuQAc8MogpQn3VsRtKA3XHFGjRuLO5ig9X67H?=
+ =?us-ascii?Q?Df3PrThv7knI8zwmESdtdbbnt/WkNuW1RhjYmYB+NmTOyp7wfjJuoM4oRhmR?=
+ =?us-ascii?Q?PTUUCdUnnBhsYTyIo1h/A30ZFf4S3XDluq7/KyxTq/eTwIUAJJSXCh2+Ohga?=
+ =?us-ascii?Q?rP5u4OldFufXmCONjiZF1lfD1Wy1NWG1vuxSgfNVe9MF88OOJEZq/Am/T6Xk?=
+ =?us-ascii?Q?g8eLVCJumzje2K7oWsXZ3p+BCdTgXJIvOCxhA8zFbY7Q5gzrieRgY840/yb/?=
+ =?us-ascii?Q?kH2e5X45uGsyopQCvVkj70pmD8247mE9kR+jRscO68BxFZQkOVc/WzGjyJ2b?=
+ =?us-ascii?Q?80vWHIn//+QD60GT0L6ztRvjIXEkiSM++NBNhRXlj1X8Xb1kNMiwUdIfClaZ?=
+ =?us-ascii?Q?b0abMi5OrlbvyIZsO70LaoM7vrpE4rkHlTP0gEFVdQO8v1K/Ys10HcYyrCRH?=
+ =?us-ascii?Q?wz0uuXyYYgrg6A7wAT6c3HiJFQUqd8wh?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8585.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(10070799003)(19092799006);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?T7W6on8sueSbGpDZ0BJ66dVLxlQjsFMdYkein6az78Xz81nzDFDWZggmYrVU?=
+ =?us-ascii?Q?OCx1/4U6vR/LaUNFAFoZGUZEt+wwkX1hop4wBRoQ+Vxc26GIjDxKcOwlvTpv?=
+ =?us-ascii?Q?sBQoiKJk5sajZHoDR2DR6iYMm9/BMr/vQQ22ZBBax1DiAcMJoVyvPI25JrpG?=
+ =?us-ascii?Q?93lKRki0/Ta/QaMp5rjKu7HF4F98/QivowHIL2hu+fJp96DRCPVjtcYkwWNA?=
+ =?us-ascii?Q?dqcCuApPpO1p4IgAytWuIHPpKJkYsuSPGqDxWT3EigbBaAMk0raceS2s3wOj?=
+ =?us-ascii?Q?a/lkYSuCCAdKGDlMLAqMkJMzjMkKshvoeezgoAFphDWlrzY1JS5ZLWvLJ9uz?=
+ =?us-ascii?Q?OJsMRyN+6cVzasaSwl1n4VOzIy5NAwzrp3DfqsL7nLiPkKS8xQSU2R8HhYka?=
+ =?us-ascii?Q?hlbXq5bwd07pKyJNNDhHgrJ3rNwbkVKMhBBpVZ4R5aYj0amqh4J/h2081/qR?=
+ =?us-ascii?Q?g1NVHB2JRrOR5VUZxM84mk2S4qtnGC5BVia+LO1FEY4o1JPsvhds+d5EaMHi?=
+ =?us-ascii?Q?5PzhuP9PqWhiBvdxlBMEdarKqI5mFCX7rjJpFrOKt03mAk33muJHhnV8hF+h?=
+ =?us-ascii?Q?2aF1RdCEEm3CoZx6Q5fF7Z7CiGDeJtCH9SG2cBHu5xa4QufhLKnXlje+h24Y?=
+ =?us-ascii?Q?veBUA7kGsPqeYS6yyL+njzf/qpDR7Dy6Fn9Pk1WU6O4oPqWRtPaW9K9+qwxD?=
+ =?us-ascii?Q?JIIChjKE6stSCnm475opYIUPxwcBkD/rsCYHMqhLocsM8qCBQ73NNx8wXNbo?=
+ =?us-ascii?Q?kejyyEH/xqU7hd1/+YnIk5UAqcPegbGdqR7cv/YWjzJNlKk/mblZeCAm53Kh?=
+ =?us-ascii?Q?v5XmMSwMvzt9sFWcbzGJhp1IkMwsPStkJu6H5AZgv4gA5lvgmQs/kW6egt+0?=
+ =?us-ascii?Q?7OOoKxvICSY/NJ6hd8xWU+7pvvI9wiCt+hZYI0cqJDlDZLYhOQUOl2je6v0/?=
+ =?us-ascii?Q?QwHCkuWUPlnI89WjHHRqXHa36YaBjk2awHqAK3IyMZQrpnb4fXTpkxM2qnOs?=
+ =?us-ascii?Q?sV6UIbEJqxpihR97bwIzhqx2CFV4CHEDxdZ6hxCThVXant1oQxyKmcEnFeU3?=
+ =?us-ascii?Q?C4pVDhGNj/iBEfyFV1v9rHwr7xG/UeU4yL+yK0HB+9xi4Px2zJY1UtE89tH9?=
+ =?us-ascii?Q?TwM9e1A5RQknzA6j1lT6yKEiD4Ryc0As5LuXZ8vj8mKRLIGRjbxbWoHc+xWg?=
+ =?us-ascii?Q?aiUPWVGu/Lia1kp4g9L8uAKorc2icH4H4JgJdZPIgSWz0PVyExZ6MN8ktNoM?=
+ =?us-ascii?Q?d4yCJyOhknPT/xEqH2MNS4114TbMy59dQ5rqKZDWbE7kizhInzdQ7zyc/QiM?=
+ =?us-ascii?Q?f+U9F/z0JdQfPO1I8BiRctZ+Gd5CyDvXXRkYFpdP2leLFBOBDYZrGLy6j1T6?=
+ =?us-ascii?Q?Lk8nudKNFGe+SIRSukewYJ7xv6hxyvcg+pgDCKbC3HKcntRXdYrZHFAYP6Jb?=
+ =?us-ascii?Q?np3MW2QyLPKia9hv42oKllIOeAV1Q0C7/xnu+YVA+AvxCbIkdpENIEGWKqE9?=
+ =?us-ascii?Q?stFV9RLxVGUlPEmQTxrynz2ai2CAjWGPk4578qA7f7FrMBbEEkLd1LkUzk+P?=
+ =?us-ascii?Q?CnhF2XOJWr8+1yy9/0XeSPYacQmwVksh+iAeRkES8qrjeAyTeRycbnXpWEdj?=
+ =?us-ascii?Q?MGjUoFTQ33g+5tuxA4320h8AYAsPus+tzgUUb3ds71OyGRpk01HxhQwDHCQy?=
+ =?us-ascii?Q?ORZ+og=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b6448cf4-8c35-42df-cbb5-08de2dbac6a8
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8585.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Nov 2025 13:42:16.2392
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7lIl41T9ykTY93n+AMEACxNXlaDoAoDUCU8q2JP7IdhJGLPi/pN+6lRo5E0odKAcaytxD27opU+1Dvcu3iXg+A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR04MB7283
 
-On Wed Nov 19, 2025 at 2:53 PM CET, Paolo Valerio wrote:
-> Add support for receiving network frames that span multiple DMA
-> descriptors in the Cadence MACB/GEM Ethernet driver.
->
-> The patch removes the requirement that limited frame reception to
-> a single descriptor (RX_SOF && RX_EOF), also avoiding potential
-> contiguous multi-page allocation for large frames. It also uses
-> page pool fragments allocation instead of full page for saving
-> memory.
->
-> Signed-off-by: Paolo Valerio <pvalerio@redhat.com>
-> ---
->  drivers/net/ethernet/cadence/macb.h      |   4 +-
->  drivers/net/ethernet/cadence/macb_main.c | 180 ++++++++++++++---------
->  2 files changed, 111 insertions(+), 73 deletions(-)
->
-> diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/c=
-adence/macb.h
-> index dcf768bd1bc1..e2f397b7a27f 100644
-> --- a/drivers/net/ethernet/cadence/macb.h
-> +++ b/drivers/net/ethernet/cadence/macb.h
-> @@ -960,8 +960,7 @@ struct macb_dma_desc_ptp {
->  #define PPM_FRACTION	16
-> =20
->  /* The buf includes headroom compatible with both skb and xdpf */
-> -#define MACB_PP_HEADROOM		XDP_PACKET_HEADROOM
-> -#define MACB_PP_MAX_BUF_SIZE(num)	(((num) * PAGE_SIZE) - MACB_PP_HEADROO=
-M)
-> +#define MACB_PP_HEADROOM	XDP_PACKET_HEADROOM
-> =20
->  /* struct macb_tx_skb - data about an skb which is being transmitted
->   * @skb: skb currently being transmitted, only set for the last buffer
-> @@ -1273,6 +1272,7 @@ struct macb_queue {
->  	struct napi_struct	napi_rx;
->  	struct queue_stats stats;
->  	struct page_pool	*page_pool;
-> +	struct sk_buff		*skb;
->  };
-> =20
->  struct ethtool_rx_fs_item {
-> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ether=
-net/cadence/macb_main.c
-> index 985c81913ba6..be0c8e101639 100644
-> --- a/drivers/net/ethernet/cadence/macb_main.c
-> +++ b/drivers/net/ethernet/cadence/macb_main.c
-> @@ -1250,21 +1250,25 @@ static int macb_tx_complete(struct macb_queue *qu=
-eue, int budget)
->  	return packets;
->  }
-> =20
-> -static void *gem_page_pool_get_buff(struct page_pool *pool,
-> +static void *gem_page_pool_get_buff(struct  macb_queue *queue,
->  				    dma_addr_t *dma_addr, gfp_t gfp_mask)
->  {
-> +	struct macb *bp =3D queue->bp;
->  	struct page *page;
-> +	int offset;
-> =20
-> -	if (!pool)
-> +	if (!queue->page_pool)
->  		return NULL;
-> =20
-> -	page =3D page_pool_alloc_pages(pool, gfp_mask | __GFP_NOWARN);
-> +	page =3D page_pool_alloc_frag(queue->page_pool, &offset,
-> +				    bp->rx_buffer_size,
-> +				    gfp_mask | __GFP_NOWARN);
->  	if (!page)
->  		return NULL;
-> =20
-> -	*dma_addr =3D page_pool_get_dma_addr(page) + MACB_PP_HEADROOM;
-> +	*dma_addr =3D page_pool_get_dma_addr(page) + MACB_PP_HEADROOM + offset;
-> =20
-> -	return page_address(page);
-> +	return page_address(page) + offset;
->  }
-> =20
->  static void gem_rx_refill(struct macb_queue *queue, bool napi)
-> @@ -1286,7 +1290,7 @@ static void gem_rx_refill(struct macb_queue *queue,=
- bool napi)
-> =20
->  		if (!queue->rx_buff[entry]) {
->  			/* allocate sk_buff for this free entry in ring */
-> -			data =3D gem_page_pool_get_buff(queue->page_pool, &paddr,
-> +			data =3D gem_page_pool_get_buff(queue, &paddr,
->  						      napi ? GFP_ATOMIC : GFP_KERNEL);
->  			if (unlikely(!data)) {
->  				netdev_err(bp->dev,
-> @@ -1344,20 +1348,17 @@ static int gem_rx(struct macb_queue *queue, struc=
-t napi_struct *napi,
->  		  int budget)
->  {
->  	struct macb *bp =3D queue->bp;
-> -	int			buffer_size;
->  	unsigned int		len;
->  	unsigned int		entry;
->  	void			*data;
-> -	struct sk_buff		*skb;
->  	struct macb_dma_desc	*desc;
-> +	int			data_len;
->  	int			count =3D 0;
-> =20
-> -	buffer_size =3D DIV_ROUND_UP(bp->rx_buffer_size, PAGE_SIZE) * PAGE_SIZE=
-;
-> -
->  	while (count < budget) {
->  		u32 ctrl;
->  		dma_addr_t addr;
-> -		bool rxused;
-> +		bool rxused, first_frame;
-> =20
->  		entry =3D macb_rx_ring_wrap(bp, queue->rx_tail);
->  		desc =3D macb_rx_desc(queue, entry);
-> @@ -1368,6 +1369,9 @@ static int gem_rx(struct macb_queue *queue, struct =
-napi_struct *napi,
->  		rxused =3D (desc->addr & MACB_BIT(RX_USED)) ? true : false;
->  		addr =3D macb_get_addr(bp, desc);
-> =20
-> +		dma_sync_single_for_cpu(&bp->pdev->dev,
-> +					addr, bp->rx_buffer_size - bp->rx_offset,
-> +					page_pool_get_dma_dir(queue->page_pool));
+On Thu, Nov 27, 2025 at 02:29:27PM +0100, Jonas Gorski wrote:
+> > @@ -119,10 +120,9 @@ static struct sk_buff *brcm_tag_xmit_ll(struct sk_buff *skb,
+> >         brcm_tag[0] = (1 << BRCM_OPCODE_SHIFT) |
+> >                        ((queue & BRCM_IG_TC_MASK) << BRCM_IG_TC_SHIFT);
+> >         brcm_tag[1] = 0;
+> > -       brcm_tag[2] = 0;
+> > -       if (dp->index == 8)
+> > -               brcm_tag[2] = BRCM_IG_DSTMAP2_MASK;
+> > -       brcm_tag[3] = (1 << dp->index) & BRCM_IG_DSTMAP1_MASK;
+> > +       port_mask = dsa_xmit_port_mask(skb, dev);
+> > +       brcm_tag[2] = (port_mask >> 8) & BRCM_IG_DSTMAP2_MASK;
+> > +       brcm_tag[3] = port_mask & BRCM_IG_DSTMAP1_MASK;
+> 
+> Since this is a consecutive bitmask (actually [22:0]), I wonder if doing
+> 
+> put_unaligned_be16(port_mask, &brcm_tag[2]);
+> 
+> would be a bit more readable.
+> 
+> Or even more correct put_unaligned_be24(port_mask, &brcm_tag[1]), but
+> we don't support any switches with that many ports.
 
-page_pool_get_dma_dir() will always return the same value, we could
-hardcode it.
+I don't think there's a technical requirement for unaligned access here.
+We have to use unaligned access for tail tags, but this here is handling
+EtherType and/or prepended headers, which are both aligned to a boundary
+of 2 due to NET_IP_ALIGN AFAIK.
 
->  		if (!rxused)
->  			break;
-> =20
-> @@ -1379,13 +1383,6 @@ static int gem_rx(struct macb_queue *queue, struct=
- napi_struct *napi,
->  		queue->rx_tail++;
->  		count++;
-> =20
-> -		if (!(ctrl & MACB_BIT(RX_SOF) && ctrl & MACB_BIT(RX_EOF))) {
-> -			netdev_err(bp->dev,
-> -				   "not whole frame pointed by descriptor\n");
-> -			bp->dev->stats.rx_dropped++;
-> -			queue->stats.rx_dropped++;
-> -			break;
-> -		}
->  		data =3D queue->rx_buff[entry];
->  		if (unlikely(!data)) {
->  			netdev_err(bp->dev,
-> @@ -1395,64 +1392,102 @@ static int gem_rx(struct macb_queue *queue, stru=
-ct napi_struct *napi,
->  			break;
->  		}
-> =20
-> -		skb =3D napi_build_skb(data, buffer_size);
-> -		if (unlikely(!skb)) {
-> -			netdev_err(bp->dev,
-> -				   "Unable to allocate sk_buff\n");
-> -			page_pool_put_full_page(queue->page_pool,
-> -						virt_to_head_page(data),
-> -						false);
-> -			break;
-> +		first_frame =3D ctrl & MACB_BIT(RX_SOF);
-> +		len =3D ctrl & bp->rx_frm_len_mask;
-> +
-> +		if (len) {
-> +			data_len =3D len;
-> +			if (!first_frame)
-> +				data_len -=3D queue->skb->len;
-> +		} else {
-> +			data_len =3D SKB_WITH_OVERHEAD(bp->rx_buffer_size) - bp->rx_offset;
->  		}
-> =20
-> -		/* Properly align Ethernet header.
-> -		 *
-> -		 * Hardware can add dummy bytes if asked using the RBOF
-> -		 * field inside the NCFGR register. That feature isn't
-> -		 * available if hardware is RSC capable.
-> -		 *
-> -		 * We cannot fallback to doing the 2-byte shift before
-> -		 * DMA mapping because the address field does not allow
-> -		 * setting the low 2/3 bits.
-> -		 * It is 3 bits if HW_DMA_CAP_PTP, else 2 bits.
-> -		 */
-> -		skb_reserve(skb, bp->rx_offset);
-> -		skb_mark_for_recycle(skb);
-> +		if (first_frame) {
-> +			queue->skb =3D napi_build_skb(data, bp->rx_buffer_size);
-> +			if (unlikely(!queue->skb)) {
-> +				netdev_err(bp->dev,
-> +					   "Unable to allocate sk_buff\n");
-> +				goto free_frags;
-> +			}
-> +
-> +			/* Properly align Ethernet header.
-> +			 *
-> +			 * Hardware can add dummy bytes if asked using the RBOF
-> +			 * field inside the NCFGR register. That feature isn't
-> +			 * available if hardware is RSC capable.
-> +			 *
-> +			 * We cannot fallback to doing the 2-byte shift before
-> +			 * DMA mapping because the address field does not allow
-> +			 * setting the low 2/3 bits.
-> +			 * It is 3 bits if HW_DMA_CAP_PTP, else 2 bits.
-> +			 */
-> +			skb_reserve(queue->skb, bp->rx_offset);
-> +			skb_mark_for_recycle(queue->skb);
-> +			skb_put(queue->skb, data_len);
-> +			queue->skb->protocol =3D eth_type_trans(queue->skb, bp->dev);
-> +
-> +			skb_checksum_none_assert(queue->skb);
-> +			if (bp->dev->features & NETIF_F_RXCSUM &&
-> +			    !(bp->dev->flags & IFF_PROMISC) &&
-> +			    GEM_BFEXT(RX_CSUM, ctrl) & GEM_RX_CSUM_CHECKED_MASK)
-> +				queue->skb->ip_summed =3D CHECKSUM_UNNECESSARY;
-> +		} else {
-> +			if (!queue->skb) {
-> +				netdev_err(bp->dev,
-> +					   "Received non-starting frame while expecting it\n");
-> +				goto free_frags;
-> +			}
+Anyway, with the replacement of u8 by u8 -> u16 by u16 access I do agree
+it would be a good idea, as long as u16 is used throughout (not just in
+order not to split the bit mask). Alternatively if there are more than
+16 ports, there's pack() which tolerates bit fields crossing any
+alignment boundary (but still performs u8 by u8 access).
 
-Here as well we want `queue->rx_buff[entry] =3D NULL;` no?
-Maybe put it in the free_frags codepath to ensure it isn't forgotten?
-
-> +			struct skb_shared_info *shinfo =3D skb_shinfo(queue->skb);
-> +			struct page *page =3D virt_to_head_page(data);
-> +			int nr_frags =3D shinfo->nr_frags;
-
-Variable definitions in the middle of a scope? I think it is acceptable
-when using __attribute__((cleanup)) but otherwise not so much (yet).
-
-> +			if (nr_frags >=3D ARRAY_SIZE(shinfo->frags))
-> +				goto free_frags;
-> +
-> +			skb_add_rx_frag(queue->skb, nr_frags, page,
-> +					data - page_address(page) + bp->rx_offset,
-> +					data_len, bp->rx_buffer_size);
-> +		}
-> =20
->  		/* now everything is ready for receiving packet */
->  		queue->rx_buff[entry] =3D NULL;
-> -		len =3D ctrl & bp->rx_frm_len_mask;
-> -
-> -		netdev_vdbg(bp->dev, "gem_rx %u (len %u)\n", entry, len);
-> =20
-> -		dma_sync_single_for_cpu(&bp->pdev->dev,
-> -					addr, len,
-> -					page_pool_get_dma_dir(queue->page_pool));
-> -		skb_put(skb, len);
-> -		skb->protocol =3D eth_type_trans(skb, bp->dev);
-> -		skb_checksum_none_assert(skb);
-> -		if (bp->dev->features & NETIF_F_RXCSUM &&
-> -		    !(bp->dev->flags & IFF_PROMISC) &&
-> -		    GEM_BFEXT(RX_CSUM, ctrl) & GEM_RX_CSUM_CHECKED_MASK)
-> -			skb->ip_summed =3D CHECKSUM_UNNECESSARY;
-> +		netdev_vdbg(bp->dev, "%s %u (len %u)\n", __func__, entry, data_len);
-> =20
-> -		bp->dev->stats.rx_packets++;
-> -		queue->stats.rx_packets++;
-> -		bp->dev->stats.rx_bytes +=3D skb->len;
-> -		queue->stats.rx_bytes +=3D skb->len;
-> +		if (ctrl & MACB_BIT(RX_EOF)) {
-> +			bp->dev->stats.rx_packets++;
-> +			queue->stats.rx_packets++;
-> +			bp->dev->stats.rx_bytes +=3D queue->skb->len;
-> +			queue->stats.rx_bytes +=3D queue->skb->len;
-> =20
-> -		gem_ptp_do_rxstamp(bp, skb, desc);
-> +			gem_ptp_do_rxstamp(bp, queue->skb, desc);
-> =20
->  #if defined(DEBUG) && defined(VERBOSE_DEBUG)
-> -		netdev_vdbg(bp->dev, "received skb of length %u, csum: %08x\n",
-> -			    skb->len, skb->csum);
-> -		print_hex_dump(KERN_DEBUG, " mac: ", DUMP_PREFIX_ADDRESS, 16, 1,
-> -			       skb_mac_header(skb), 16, true);
-> -		print_hex_dump(KERN_DEBUG, "data: ", DUMP_PREFIX_ADDRESS, 16, 1,
-> -			       skb->data, 32, true);
-> +			netdev_vdbg(bp->dev, "received skb of length %u, csum: %08x\n",
-> +				    queue->skb->len, queue->skb->csum);
-> +			print_hex_dump(KERN_DEBUG, " mac: ", DUMP_PREFIX_ADDRESS, 16, 1,
-> +				       skb_mac_header(queue->skb), 16, true);
-> +			print_hex_dump(KERN_DEBUG, "data: ", DUMP_PREFIX_ADDRESS, 16, 1,
-> +				       queue->skb->data, 32, true);
->  #endif
-> =20
-> -		napi_gro_receive(napi, skb);
-> +			napi_gro_receive(napi, queue->skb);
-> +			queue->skb =3D NULL;
-> +		}
-> +
-> +		continue;
-> +
-> +free_frags:
-> +		if (queue->skb) {
-> +			dev_kfree_skb(queue->skb);
-> +			queue->skb =3D NULL;
-> +		} else {
-> +			page_pool_put_full_page(queue->page_pool,
-> +						virt_to_head_page(data),
-> +						false);
-> +		}
->  	}
-> =20
->  	gem_rx_refill(queue, true);
-> @@ -2394,7 +2429,10 @@ static void macb_init_rx_buffer_size(struct macb *=
-bp, size_t size)
->  	if (!macb_is_gem(bp)) {
->  		bp->rx_buffer_size =3D MACB_RX_BUFFER_SIZE;
->  	} else {
-> -		bp->rx_buffer_size =3D size;
-> +		bp->rx_buffer_size =3D size + SKB_DATA_ALIGN(sizeof(struct skb_shared_=
-info))
-> +			+ MACB_PP_HEADROOM;
-> +		if (bp->rx_buffer_size > PAGE_SIZE)
-> +			bp->rx_buffer_size =3D PAGE_SIZE;
-> =20
->  		if (bp->rx_buffer_size % RX_BUFFER_MULTIPLE) {
->  			netdev_dbg(bp->dev,
-> @@ -2589,18 +2627,15 @@ static int macb_alloc_consistent(struct macb *bp)
-> =20
->  static void gem_create_page_pool(struct macb_queue *queue)
->  {
-> -	unsigned int num_pages =3D DIV_ROUND_UP(queue->bp->rx_buffer_size, PAGE=
-_SIZE);
-> -	struct macb *bp =3D queue->bp;
->  	struct page_pool_params pp_params =3D {
-> -		.order =3D order_base_2(num_pages),
-> +		.order =3D 0,
->  		.flags =3D PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV,
->  		.pool_size =3D queue->bp->rx_ring_size,
->  		.nid =3D NUMA_NO_NODE,
->  		.dma_dir =3D DMA_FROM_DEVICE,
->  		.dev =3D &queue->bp->pdev->dev,
->  		.napi =3D &queue->napi_rx,
-> -		.offset =3D bp->rx_offset,
-> -		.max_len =3D MACB_PP_MAX_BUF_SIZE(num_pages),
-> +		.max_len =3D PAGE_SIZE,
->  	};
->  	struct page_pool *pool;
-
-I forgot about it in [PATCH 1/6], but the error handling if
-gem_create_page_pool() fails is odd. We set queue->page_pool to NULL
-and keep on going. Then once opened we'll fail allocating any buffer
-but still be open. Shouldn't we fail the link up operation?
-
-If we want to support this codepath (page pool not allocated), then we
-should unmask Rx interrupts only if alloc succeeded. I don't know if
-we'd want that though.
-
-	queue_writel(queue, IER, bp->rx_intr_mask | ...);
-
-> @@ -2784,8 +2819,9 @@ static void macb_configure_dma(struct macb *bp)
->  	unsigned int q;
->  	u32 dmacfg;
-> =20
-> -	buffer_size =3D bp->rx_buffer_size / RX_BUFFER_MULTIPLE;
->  	if (macb_is_gem(bp)) {
-> +		buffer_size =3D SKB_WITH_OVERHEAD(bp->rx_buffer_size) - bp->rx_offset;
-> +		buffer_size /=3D RX_BUFFER_MULTIPLE;
->  		dmacfg =3D gem_readl(bp, DMACFG) & ~GEM_BF(RXBS, -1L);
->  		for (q =3D 0, queue =3D bp->queues; q < bp->num_queues; ++q, ++queue) =
-{
->  			if (q)
-> @@ -2816,6 +2852,8 @@ static void macb_configure_dma(struct macb *bp)
->  		netdev_dbg(bp->dev, "Cadence configure DMA with 0x%08x\n",
->  			   dmacfg);
->  		gem_writel(bp, DMACFG, dmacfg);
-> +	} else {
-> +		buffer_size =3D bp->rx_buffer_size / RX_BUFFER_MULTIPLE;
->  	}
->  }
-
-You do:
-
-static void macb_configure_dma(struct macb *bp)
-{
-	u32 buffer_size;
-
-	if (macb_is_gem(bp)) {
-		buffer_size =3D SKB_WITH_OVERHEAD(bp->rx_buffer_size) - bp->rx_offset;
-		buffer_size /=3D RX_BUFFER_MULTIPLE;
-		// ... use buffer_size ...
-	} else {
-		buffer_size =3D bp->rx_buffer_size / RX_BUFFER_MULTIPLE;
-	}
-}
-
-Instead I'd vote for:
-
-static void macb_configure_dma(struct macb *bp)
-{
-	u32 buffer_size;
-
-	if (!macb_is_gem(bp))
-		return;
-
-	buffer_size =3D SKB_WITH_OVERHEAD(bp->rx_buffer_size) - bp->rx_offset;
-	buffer_size /=3D RX_BUFFER_MULTIPLE;
-	// ... use buffer_size ...
-}
-
-Thanks,
-
---
-Th=C3=A9o Lebrun, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
+But I don't feel like changing the access pattern of the tagger is in
+the scope of this change set.
 
