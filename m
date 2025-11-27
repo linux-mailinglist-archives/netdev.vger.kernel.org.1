@@ -1,77 +1,79 @@
-Return-Path: <netdev+bounces-242279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 537B8C8E46C
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 13:36:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C6AFFC8E46F
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 13:36:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 78C9634ED47
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 12:35:50 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D3C6734E6D9
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 12:35:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11B5A3314C8;
-	Thu, 27 Nov 2025 12:35:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A63A331A72;
+	Thu, 27 Nov 2025 12:35:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DgI5uJi8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EgZPGHs5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50C92330B1F
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 12:35:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51BC83314AE
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 12:35:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764246928; cv=none; b=DiI4mAu/jJD8G9BGRIxaW+zpDqj/4uqJQwZqvpUO+KqlkBZTeskXaZJx8uAXF72Wch+dkHyHdBIkJIuzopLb19QL/IitEinkM0CumPSJBYsMUukUzP/642HLdJkatY9JNfISg8bWuBOAKekqgRReOUbbMcCR2GRy3k3feMGMp18=
+	t=1764246929; cv=none; b=E8z34Noisvc6Xr36uOWW0tt75F5QDH5NKXqfxnFrLyBECUQQv9Vu2n9Vlw/3t1n5/ISXfFHSieVp9wS+PE15RYFkXeVCdPNwvnhIDwuyiFyGEoxcxq/p7D1Jfy61FbqmIBxvOMFaX1lmojI6Ad0UbkYrOa2x9umtpo4FQHlnWPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764246928; c=relaxed/simple;
-	bh=oFQAQr+guZ9WJ+rPsOs//O0mt8Vcr7rWKA2Syf0mx9s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uFeZw2PpHsWddFr/4wVVbe0vayQmWDkNR786NNC4eDq2HquYcrwlbhihVdFITIr13VcVI9zoXxrZN7hhOEdRLRvpjLh4+bVNDID2bP/ZBWx4VfNI8XhSru0D0P15CD3mFu67OpifR92HVP1PZzgpcAt/hBsxBlUMwegw9LHCKbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DgI5uJi8; arc=none smtp.client-ip=209.85.221.43
+	s=arc-20240116; t=1764246929; c=relaxed/simple;
+	bh=mb7drmhTSTpp7WC4xjdhsaHPj5ZBAbfT0ENp4pkV7ek=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=uqylDrlN7PGUsPjbke5siipW5zBLUu4WFLfr6skJiUt2vL0eu19bEQnldaipt7B18l0E180ep8rp/aJdhm/i+19OXIHBoFQYR5C8F2B0INnzD4KTIymdzt59ZVwBbZbqmyAjE4kUYar6fMJAsdIVwNTNdTgDhzpng27bWA8ab8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EgZPGHs5; arc=none smtp.client-ip=209.85.221.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-42bb288c17bso533144f8f.2
-        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 04:35:26 -0800 (PST)
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-42b3c965cc4so387588f8f.0
+        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 04:35:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764246924; x=1764851724; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JFSE3qlztEPFHXYaOuOeoAXc9urd+2kpsmMnNVBXBIY=;
-        b=DgI5uJi8mDO0s30xCTNoW0wr7MfhR8DFn/P+x+AyQ42JU/7maTK3xh711KS6RdAc4K
-         0AJUZz3YBa9U1zW9UKgxeT8aPnkGP7R2H1OTC63ne5jLpR6YBZnmw9aF26RQGCGZSDea
-         4Ah2+68WCuSNOGBLJ/jJySCMR6qb4As/TxL2LV/fhbB0QJm1gU48/ACa8IpQ2otsC5UN
-         QUtkkPIOBvFmjpLqPO1br1kN7stutm+eOei7oUjQODABkwXoMxX4gEzmJPJzBstMH0sx
-         ZMTq3nQYBZ2tNdWLgDWUOQQsSs7gwZfHfv2Z/EFbxEULIWODGLXAHPZxVnUZx8wnmJ4T
-         T20g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764246924; x=1764851724;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1764246926; x=1764851726; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JFSE3qlztEPFHXYaOuOeoAXc9urd+2kpsmMnNVBXBIY=;
-        b=U7qfUBbUu3sJEkGDefgRAGNUy61O9o0BitqYlLy4wyxE6UR/aNdzDEApXXGX0F2uVw
-         rhopvavS2/v4VF9sSAz0ZspGA2h39jNYVA+sPxeoL1Os7Nxw2BVkG1PvgvxHbAgzlZSv
-         keUV/GhvzcSwLY/iPXO8fqyfGhEqehAB73e31WRSMPKm6gXlz5HxveAnnoY5RXx7xLXy
-         DstHkG9n/fzWw1w4NCH5aGPOLRrYncDmpqSRPOnXdEo6F1xKump6XSFMCt730HiiXXdb
-         584JltTkWOzKxw6V5Uu6NmOnLGp/gW+MACyIxrJSd/hvd7JWWIQIvx0TdWL+97MYpQ3o
-         bhmA==
-X-Forwarded-Encrypted: i=1; AJvYcCVuyipJMdZHBFp2B/9o0SFqmMW//3jfzAu3JmDMqlr8tu09sdZSaEgrwFoBcWgfZfl/U65CpuI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEonwxI2RuAB8Lbrx+Q31HPcAwxCzmEAl9Pe3O/u3vGhCYfVKi
-	z74drVgjXMpfwuRv5whcH2/CtekMnz6ZX/mP9Ky8g81mI646zm61cYo0
-X-Gm-Gg: ASbGncvvzf7ocui/nahZsyCoA3Bjdu43vNF6BaBFYoAkhypZDbUZi654k/CBQa5IIVZ
-	vbigLbf3S3j5NH33cTzkngnRxmB1G0qNRd1l+o96ijditZzn/zyoGNvDgjJ2V0nD8jpxSk4A54l
-	WnPaduzLEbG6MWN6JhFxiBK6uWEH1bSd1i5zz6UYffQXO6gZtwx7K/uT10ELvbXmzmvsGIjZ9sD
-	edmH/mMtYAOx7YLFv30xST59D8BXiqkjYEjhnCp41RGs5AEBBVS0/BjV8lJv310ZcIDdKxxXMoC
-	0TvvnlKEYww+tVv+tJc8ph0L6Q1F5Ruedper9tDfB0gkGU9m5rMhHnN/R/gFhzz5cx42wDZLR9f
-	FywIJ0BsH92A6D0C2U9oxojTgIxbibnwkfle/EmHehB+/N4gEhl0304x7/5T5B46etiLr26Bg1J
-	2hcfvRAR/khllSv673oj2FxAzvJg==
-X-Google-Smtp-Source: AGHT+IF0emZFKM88VnuIpz692MetuXeb4OfphPqaHgKp0/MlOrsZDvpjdLEm1OuF2Fi4dfspC2YQiQ==
-X-Received: by 2002:a5d:5f44:0:b0:42b:3701:c4c6 with SMTP id ffacd0b85a97d-42cc1cf3c16mr26202368f8f.38.1764246924278;
-        Thu, 27 Nov 2025 04:35:24 -0800 (PST)
+        bh=V+gXz/CH4Pv1gx23xe74dERW313MnXcOXvNaurzXXT4=;
+        b=EgZPGHs5fGXI1lBRBBNMjN1D/tnnFdgcq86svDQRgxJW5FM5tAIo4UxN4vjs0WzfgY
+         mGe22BEModImO0mX7le1BmtWgn3t9R85+sgeO9fZL9GsDV7hIrtrYhaQvbfvCBD+Wlun
+         Z9J/oZ1TiqHrK+SDUfPxoWci2pPMFnyLZAaf5GyMCWKFccW9AdFAg73tTo0mUu2Kzryh
+         H/MYJfw2f3m3PT0kEyDZ9o3usUs5ryV+JSWx384cwGuLgMy08mEKOE4+sbtu9mEVzBvH
+         4EUXaCdPYFWPohczSFIeEv/UhUUczVQqIFZ/od+e/xHSX5ADTKnJnMrh9i1agGcti8w7
+         Pv0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764246926; x=1764851726;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=V+gXz/CH4Pv1gx23xe74dERW313MnXcOXvNaurzXXT4=;
+        b=pwCdz1VtYAo0j0en59vY3weHY8lMHZc/zzw3oCuWZUy+VdpJqCFao8XhT1tI2Iirew
+         QbKl3hKIEKNRVjSFOeiRpaDl/FmeS3pyCugEpHzjECGYHCCPDYQ0uLdzYI30H37Ip5y9
+         kb+ZThb5mARmIJ9qqYHPrHryuDdt1v6WaxVPnRwVuKmB+xvGiiL/mzIUWcxdw7Z5Fz04
+         vjhOKn47aVn8AWW5q6phFnyC18gm/3T0CA9lgnbxW9ry0g4u6TCXGzYlkjvPbwj74QyV
+         M5ur28FCxDEOYu6DrERf+/ekPGgI5nF+yiE11oiuGhD8wC5ZuMqoEw46eL9rO+vtHJmV
+         T+qg==
+X-Forwarded-Encrypted: i=1; AJvYcCUIX69mzCRk6ZUhJV1TEmStrT2veeMnXBZgBvWjntS2aeZ4zKeYx+ngaX6LZ6FTdk4xsfWiODw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQdOGLQGIrauULz0g3PB2ALFkSzta0BXOEvM3QOEOXAEOgY4fm
+	jX76f3yykjqDjWwLStWLOHf046ZCRoxKJRDqBS/86kAOB8g2GC/WZ7dG
+X-Gm-Gg: ASbGnctRyaKJzxI8RUoGoCQ+fz1WwIm4vXs1zqtIgBAo1zJKcZWr4n63mUaFS3FPglX
+	z3CYdKPEdkPqb/wgYnnpd/uM9rSx+PtbD323eJVoIMYj2gZWQ9d643/9B/W4yGDeWi4QCfpAdga
+	TlBwFP4znwyHuWDdspteZShKyFPqJ1tGO8l+7+xpMahXbcgMwzuCagnD50HypnxnuW6vvJiDq6l
+	z3FJ80YL24XU+FBV3WkpQuCKSHCBfkS+vtBD+xBSF5261AzrgG8jtbkb9CX1L9VxX/gVDg2PeLU
+	tt/7Gz6UAIMDOCcoN+0lL6HVPccFg/ElHJl1/2O3mT3W+SR6ey10UwOjZVyyNwBTVE8IFbziLKF
+	qPmI3Jv649pI17K+xhglUVx/SVKbdV3vLrjX7TLTztpeOy66630PXZaniu5SeibYH0skpo+zPGm
+	pUQ5jYo9Wwq16R87E5PQ9n3pRbOQ==
+X-Google-Smtp-Source: AGHT+IGs4gFYZBIVV1fjTHGphZnXYlgKzD+a9aYDimjlZ8q8xO5xME7rPi1k4V6dDmNpf4vWRqsscg==
+X-Received: by 2002:a05:6000:24c1:b0:42b:2a41:f20 with SMTP id ffacd0b85a97d-42cc135db5amr25344539f8f.18.1764246925540;
+        Thu, 27 Nov 2025 04:35:25 -0800 (PST)
 Received: from imac.lan ([2a02:8010:60a0:0:7864:d69:c1a:dad8])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42e1ca4078csm3220718f8f.29.2025.11.27.04.35.23
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42e1ca4078csm3220718f8f.29.2025.11.27.04.35.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Nov 2025 04:35:23 -0800 (PST)
+        Thu, 27 Nov 2025 04:35:25 -0800 (PST)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: Jakub Kicinski <kuba@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -92,10 +94,12 @@ To: Jakub Kicinski <kuba@kernel.org>,
 	Nimrod Oren <noren@nvidia.com>,
 	netdev@vger.kernel.org
 Cc: Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v1 0/4] tools: ynl: add schema checking
-Date: Thu, 27 Nov 2025 12:34:58 +0000
-Message-ID: <20251127123502.89142-1-donald.hunter@gmail.com>
+Subject: [PATCH net-next v1 1/4] tools: ynl: add schema checking
+Date: Thu, 27 Nov 2025 12:34:59 +0000
+Message-ID: <20251127123502.89142-2-donald.hunter@gmail.com>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20251127123502.89142-1-donald.hunter@gmail.com>
+References: <20251127123502.89142-1-donald.hunter@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,25 +108,116 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add schema checking and yaml linting for the YNL specs.
+Add a --validate flag to pyynl for explicit schema check with error
+reporting and add a schema_check make target to check all YNL specs.
 
-Patch 1 adds a schema_check make target using a pyynl --validate option
-Patch 2 adds a lint make target using yamllint
-Patches 3,4 fix issues reported by make -C tools/net/ynl lint schema_check
+make -C tools/net/ynl schema_check
+make: Entering directory '/home/donaldh/net-next/tools/net/ynl'
+ok 1 binder.yaml schema validation
+not ok 2 conntrack.yaml schema validation
+'labels mask' does not match '^[0-9a-z-]+$'
 
-Donald Hunter (4):
-  tools: ynl: add schema checking
-  tools: ynl: add a lint makefile target
-  ynl: fix a yamllint warning in ethtool spec
-  ynl: fix schema check errors
+Failed validating 'pattern' in schema['properties']['attribute-sets']['items']['properties']['attributes']['items']['properties']['name']:
+    {'type': 'string', 'pattern': '^[0-9a-z-]+$'}
 
- Documentation/netlink/specs/conntrack.yaml |  2 +-
- Documentation/netlink/specs/ethtool.yaml   |  2 +-
- Documentation/netlink/specs/nftables.yaml  |  2 +-
- tools/net/ynl/Makefile                     | 22 +++++++++++++++++++++-
- tools/net/ynl/pyynl/cli.py                 | 21 ++++++++++++++++-----
- 5 files changed, 40 insertions(+), 9 deletions(-)
+On instance['attribute-sets'][14]['attributes'][22]['name']:
+    'labels mask'
 
+ok 3 devlink.yaml schema validation
+[...]
+
+Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+---
+ tools/net/ynl/Makefile     | 20 +++++++++++++++++++-
+ tools/net/ynl/pyynl/cli.py | 21 ++++++++++++++++-----
+ 2 files changed, 35 insertions(+), 6 deletions(-)
+
+diff --git a/tools/net/ynl/Makefile b/tools/net/ynl/Makefile
+index a40591e513b7..b23083b2dfb2 100644
+--- a/tools/net/ynl/Makefile
++++ b/tools/net/ynl/Makefile
+@@ -12,6 +12,8 @@ endif
+ libdir  ?= $(prefix)/$(libdir_relative)
+ includedir ?= $(prefix)/include
+ 
++SPECDIR=../../../Documentation/netlink/specs
++
+ SUBDIRS = lib generated samples ynltool tests
+ 
+ all: $(SUBDIRS) libynl.a
+@@ -54,4 +56,20 @@ install: libynl.a lib/*.h
+ run_tests:
+ 	@$(MAKE) -C tests run_tests
+ 
+-.PHONY: all clean distclean install run_tests $(SUBDIRS)
++
++schema_check:
++	@N=1; \
++	for spec in $(SPECDIR)/*.yaml ; do \
++		NAME=$$(basename $$spec) ; \
++		OUTPUT=$$(./pyynl/cli.py --spec $$spec --validate) ; \
++		if [ $$? -eq 0 ] ; then \
++			echo "ok $$N $$NAME schema validation" ; \
++		else \
++			echo "not ok $$N $$NAME schema validation" ; \
++			echo "$$OUTPUT" ; \
++			echo ; \
++		fi ; \
++		N=$$((N+1)) ; \
++	done
++
++.PHONY: all clean distclean install run_tests schema_check $(SUBDIRS)
+diff --git a/tools/net/ynl/pyynl/cli.py b/tools/net/ynl/pyynl/cli.py
+index ff81ff083764..af02a5b7e5a2 100755
+--- a/tools/net/ynl/pyynl/cli.py
++++ b/tools/net/ynl/pyynl/cli.py
+@@ -10,7 +10,7 @@ import sys
+ import textwrap
+ 
+ sys.path.append(pathlib.Path(__file__).resolve().parent.as_posix())
+-from lib import YnlFamily, Netlink, NlError
++from lib import YnlFamily, Netlink, NlError, SpecFamily
+ 
+ sys_schema_dir='/usr/share/ynl'
+ relative_schema_dir='../../../../Documentation/netlink'
+@@ -127,6 +127,7 @@ def main():
+     group.add_argument('--list-msgs', action='store_true')
+     group.add_argument('--list-attrs', dest='list_attrs', metavar='OPERATION', type=str,
+                        help='List attributes for an operation')
++    group.add_argument('--validate', action='store_true')
+ 
+     parser.add_argument('--duration', dest='duration', type=int,
+                         help='when subscribed, watch for DURATION seconds')
+@@ -168,15 +169,25 @@ def main():
+ 
+     if args.family:
+         spec = f"{spec_dir()}/{args.family}.yaml"
+-        if args.schema is None and spec.startswith(sys_schema_dir):
+-            args.schema = '' # disable schema validation when installed
+-        if args.process_unknown is None:
+-            args.process_unknown = True
+     else:
+         spec = args.spec
+     if not os.path.isfile(spec):
+         raise Exception(f"Spec file {spec} does not exist")
+ 
++    if args.validate:
++        try:
++            SpecFamily(spec, args.schema)
++        except Exception as error:
++            print(error)
++            exit(1)
++        return
++
++    if args.family: # set behaviour when using installed specs
++        if args.schema is None and spec.startswith(sys_schema_dir):
++            args.schema = '' # disable schema validation when installed
++        if args.process_unknown is None:
++            args.process_unknown = True
++
+     ynl = YnlFamily(spec, args.schema, args.process_unknown,
+                     recv_size=args.dbg_small_recv)
+     if args.dbg_small_recv:
 -- 
 2.51.1
 
