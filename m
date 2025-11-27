@@ -1,113 +1,125 @@
-Return-Path: <netdev+bounces-242218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E845C8DB1D
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 11:11:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AF7DDC8DB24
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 11:11:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1B9834E1072
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 10:10:59 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9ADB04E60FF
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 10:11:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B35B2FF672;
-	Thu, 27 Nov 2025 10:10:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E173831815D;
+	Thu, 27 Nov 2025 10:11:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DDF+Dk7+"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Idmcn53Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72A412E0418
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 10:10:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54D922FF672;
+	Thu, 27 Nov 2025 10:11:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764238257; cv=none; b=U9Yc79Y3Q3waBoFIFhM3dGOjZn1xfB9LZHPTrf/2jYy6QwEkmJvFSJkb6kwE4n0wP5/waQyxP395zNMSwhHd0Pz/a97G0XI4y1xfypQJlCpEwrvSqtLG3FiDjgarOvs+hhjvxKoCWVkq3RbVb1f+onWe7E4uVBhBrLM1L+ge0iY=
+	t=1764238275; cv=none; b=hUoGAgorQWnS4fxQ7bKTRFIe9kBdfR9KR63l177xw12rXXGBeaeSeb0kSjw3abNeSI59T00pcoNdmq5RSTnTf3KmDtOKiXtzYquyvaLUM5bzIorJwSt+molQNY3D5mPKcP+Sq2JL3nNVBt+dxTYNF/wHNmx6NZxP2Lr6stje6wM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764238257; c=relaxed/simple;
-	bh=DAF01hAWK4F1G2WkXZYb493HZknwri3FfkNRByBwVZQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Bz0hn4AdOfHVjDjkbfIh6mi6ADbELsCz6tvQPlR3ta6/xbGAumgBVFqyUK6W/AcmB7RSvgvYdZV/4w6QdvNEiH4k7Qw4CoBrC8KCq4IbB7oVw9krIuQr6mndAnMZCZ1Ipb8y5rNTEz1REJmwdxZ/pjVKUkh7w8kC4ZftprTzPWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DDF+Dk7+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE2C9C4CEF8;
-	Thu, 27 Nov 2025 10:10:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764238257;
-	bh=DAF01hAWK4F1G2WkXZYb493HZknwri3FfkNRByBwVZQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=DDF+Dk7+4GjOrElfMB7ViPBg0+pdJHUrgcmqfsOKMs4cYJ7voaKDlPZGhD0FVwHjF
-	 4UQ5u9IsLcSsS35o7DSm3falOX83DxXkqnhDh5FjUjPPTToWKLMlSr4CObdMVmBoLz
-	 xYw0oEl6s8irFPnk1UqbC6KNjGnahjcrvUQYbSMiHfyuDsJLNcxUTVpEXein3VELa9
-	 o1IdcZbT3ucD+Z+8KVQVkGRzJ1Kfvy2yUvwLWn0uSNHAV0XXioNC1pX0E+W2XH4BwV
-	 XzTG5BoTzllcLrB8kKicXgE8WaPw1l7ARX5yrEG+mpssEmcjVtuOlzHaarir60b2dg
-	 4FYyW4vLlq0pw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADFAD380CFC3;
-	Thu, 27 Nov 2025 10:10:19 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1764238275; c=relaxed/simple;
+	bh=2HGfB5j9YlLHgtEiJGWYzgf7NIn4w1hqog7vUncJOd8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=s24ZdINUHiGXJpjFXkBsD3niWQlryvvER5vujQxmIBrVDHBHr6q1s3tmCyv5JbcIWGzW9mD0ja2rSXnibrgTD4Sf+pYG+paIsgkMcMZ6poTUHTIDzCeDWPp7bn0Zo2ipaMi/0ndpThBP+tXYz+LcVer9DEXaR2RadE/6A3iB4Ps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Idmcn53Q; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id AB8724E4191A;
+	Thu, 27 Nov 2025 10:11:11 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 7ABC06068C;
+	Thu, 27 Nov 2025 10:11:11 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 813CE102F275A;
+	Thu, 27 Nov 2025 11:11:00 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1764238270; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=3UuhlMt+xKMZUo21Zwoyz9Z0SmtmmUjCG1ylmETi6EM=;
+	b=Idmcn53QlfBfCgbcymkMTd0ok7+aou9cOVD0Hlxmegy9ogCg3hnJIYpRN9wkK5QRcyAbHV
+	VeYPG/lv+3K4E5atdFIx5vbbTSTWoI5Et1hxldmQI63H8ZT8ZpISh8W12V1IBP7TLjVVGx
+	qNJWvt8vA5+6Yfudrvf6DeYftZrLLSevl7NARl3PS1m4wgCt61KAWPZR6qXNFJr6oteavV
+	7G+SOjSoV5eqnHW7zbJ3KaFD66CejCXEUihtV8DmVuI81n4Pj0CMZ/l605ffTIDW2LssuQ
+	Cuw/bB6b1tFMv9dJJfE8o2rCAeZlyeS7i+vH2tINTIS+baB12qkYubtEuxdYcg==
+Message-ID: <966bb724-59bd-4f45-a2a6-89a1967a851e@bootlin.com>
+Date: Thu, 27 Nov 2025 11:10:59 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [net-next PATCH v5 0/9] net: phy: Add support for fbnic PHY w/
- 25G,
- 50G, and 100G support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176423821850.2508458.8740995882109823586.git-patchwork-notify@kernel.org>
-Date: Thu, 27 Nov 2025 10:10:18 +0000
-References: 
- <176374310349.959489.838154632023183753.stgit@ahduyck-xeon-server.home.arpa>
-In-Reply-To: 
- <176374310349.959489.838154632023183753.stgit@ahduyck-xeon-server.home.arpa>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, kernel-team@meta.com,
- andrew+netdev@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- pabeni@redhat.com, davem@davemloft.net
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v19 00/15] net: phy: Introduce PHY ports
+ representation
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
+ =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
+ Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+ Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
+ Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
+ Romain Gantois <romain.gantois@bootlin.com>,
+ Daniel Golle <daniel@makrotopia.org>,
+ Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
+ Tariq Toukan <tariqt@nvidia.com>
+References: <20251122124317.92346-1-maxime.chevallier@bootlin.com>
+ <20251126190035.2a4e0558@kernel.org>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20251126190035.2a4e0558@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-Hello:
+Hi Jakub,
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri, 21 Nov 2025 08:39:48 -0800 you wrote:
-> To transition the fbnic driver to using the XPCS driver we need to address
-> the fact that we need a representation for the FW managed PMD that is
-> actually a SerDes PHY to handle link bouncing during link training.
+On 27/11/2025 04:00, Jakub Kicinski wrote:
+> On Sat, 22 Nov 2025 13:42:59 +0100 Maxime Chevallier wrote:
+>> This is v19 of the phy_port work. Patches 2 and 3 lack PHY maintainers reviews.
+>>
+>> This v19 has no changes compared to v18, but patch 2 was rebased on top
+>> of the recent 1.6T linkmodes.
+>>
+>> Thanks for everyone's patience and reviews on that work ! Now, the
+>> usual blurb for the series description.
 > 
-> This patch set introduces the necessary bits to the XPCS driver code to
-> enable it to read 25G, 50G, and 100G speeds from the PCS ctrl1 register,
-> and adds support for the approriate interfaces.
+> Hopefully we can still make v6.19, but we hooked up Claude Code review
+> to patchwork this week, and it points out some legit issues here :(
+> Some look transient but others are definitely legit, please look thru
+> this:
 > 
-> [...]
+> https://netdev-ai.bots.linux.dev/ai-review.html?id=5388d317-98c9-458e-8655-d60f31112574
 
-Here is the summary with links:
-  - [net-next,v5,1/9] net: phy: Add MDIO_PMA_CTRL1_SPEED for 2.5G and 5G to reflect PMA values
-    https://git.kernel.org/netdev/net-next/c/e6c43c950090
-  - [net-next,v5,2/9] net: pcs: xpcs: Add support for 25G, 50G, and 100G interfaces
-    https://git.kernel.org/netdev/net-next/c/7622d5527693
-  - [net-next,v5,3/9] net: pcs: xpcs: Fix PMA identifier handling in XPCS
-    https://git.kernel.org/netdev/net-next/c/39e138173ae7
-  - [net-next,v5,4/9] net: pcs: xpcs: Add support for FBNIC 25G, 50G, 100G PMD
-    https://git.kernel.org/netdev/net-next/c/3f29dd34f75a
-  - [net-next,v5,5/9] fbnic: Rename PCS IRQ to MAC IRQ as it is actually a MAC interrupt
-    https://git.kernel.org/netdev/net-next/c/f18dd1b15f7a
-  - [net-next,v5,6/9] fbnic: Add logic to track PMD state via MAC/PCS signals
-    https://git.kernel.org/netdev/net-next/c/9963117a2b9b
-  - [net-next,v5,7/9] fbnic: Add handler for reporting link down event statistics
-    https://git.kernel.org/netdev/net-next/c/1fe7978329d7
-  - [net-next,v5,8/9] fbnic: Add SW shim for MDIO interface to PMD and PCS
-    https://git.kernel.org/netdev/net-next/c/d0ce9fd7eae0
-  - [net-next,v5,9/9] fbnic: Replace use of internal PCS w/ Designware XPCS
-    https://git.kernel.org/netdev/net-next/c/d0fe7104c795
+Is there a canonical way to reply to these reviews ? Some are good, some
+aren't.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+I'll summarize what I've done in the changelog, but it skips any
+potential discussions that could've been triggered by these reviews. I
+guess this is a matter of letting this process stabilize :)
+
+Anyhow I'm impressed by what it found (when correct), that's pretty nice.
+
+Maxime
 
 
 
