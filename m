@@ -1,202 +1,181 @@
-Return-Path: <netdev+bounces-242290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46409C8E63A
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 14:15:58 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DA06C8E646
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 14:16:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5930D4E7BD0
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 13:15:35 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 468AC34FC9B
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 13:16:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB5602417D9;
-	Thu, 27 Nov 2025 13:15:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iJZUeKHA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55A3D1AF0BB;
+	Thu, 27 Nov 2025 13:16:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19E8313A244
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 13:15:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E5921A9F97
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 13:16:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764249328; cv=none; b=je2d1llWeOKOBE1gwgm0s1GnI5ta5+hiTkjz72IwAycpOy37rBkfju90RW7172hvA5Ixm5ipT7h6KkQHiLaBlkeRQdVQC02sL1JQmLegIU1Tb/AXax75IMi8zNcetIKAjSuHxnRxe1W8lFarl6YKuwM8QvYDKZrTNIHYBq723D4=
+	t=1764249379; cv=none; b=rKwv2ON3IBHuHE4hGWN3I6Ozadeg1rB/tmDizYPe4ohNb+KwG2SUNCW0f51+mkwSFyvlL5pds7Id0wIfziBduArFYNjX/X1oTTu7ElkuGhdOkeXh4b98cl1U9qvBCg+L5ZKxDDW2kldTDNGJwuBX3peadyfamhfI+qIE2/Q+M9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764249328; c=relaxed/simple;
-	bh=Skm7K/dIrPMAbBA2uQ9rZcLHG04QPXkiqk8NG0TYs30=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FMAXrWJ0ix5RBaQZaAPHvOooSAZR2wNNAIJ1zX9u1rZWn3mWYcYjyKK2rMdkOYXVeRbu33mu9aKToaGfH8+E0QikLttYk+d28X8BOLCky8R6URoFR3yAMk6xo42xGLtVnMSrTxrA3OvUZPjPD4cFkNNzgg9pjF7VvB05FbyOb8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iJZUeKHA; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764249327; x=1795785327;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Skm7K/dIrPMAbBA2uQ9rZcLHG04QPXkiqk8NG0TYs30=;
-  b=iJZUeKHA9d6I1xZ1m9dGhlQ7CFP+lbhAbjmtfnUWdlUuu6kefZlRlbOd
-   RANGmVWUZz+hJb2EYaMyj22gjEZjusPSE+ML5t1ZYfHwIovs4lXbjqWgk
-   YsUiPXvoKxKlstfdG6+XqNQCYIEJ4SG4BJAfCnpfihX55QuGS0MFwm9LD
-   tl1wBtZ020L18oMr3XKF6erJ7jtwsI2dj0DVbOuJZJrEoJG5iGKoQQGtx
-   Q0v1++5RgJcmqHilTP++Da+77pXXDwzt/GPXnd7emy/z3+5ugUCK+QokK
-   AxZqny0jXRVMLeX5AhPaaBCzO5llfmEt+7D3M0NA6oA8V+/gsSQkf41CM
-   A==;
-X-CSE-ConnectionGUID: 3ct9bJeSTKmBSge5x7qUXQ==
-X-CSE-MsgGUID: KZmD1SxnRMWQqWtvrKU21A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11625"; a="70157520"
-X-IronPort-AV: E=Sophos;i="6.20,231,1758610800"; 
-   d="scan'208";a="70157520"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2025 05:15:24 -0800
-X-CSE-ConnectionGUID: n6NhTIkLTfWeofTQL9kCOA==
-X-CSE-MsgGUID: tdeuWFwQQIiCFvfxL5vhow==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,231,1758610800"; 
-   d="scan'208";a="192892760"
-Received: from black.igk.intel.com ([10.91.253.5])
-  by fmviesa007.fm.intel.com with ESMTP; 27 Nov 2025 05:15:22 -0800
-Received: by black.igk.intel.com (Postfix, from userid 1001)
-	id 4C41AA3; Thu, 27 Nov 2025 14:15:21 +0100 (CET)
-From: Mika Westerberg <mika.westerberg@linux.intel.com>
-To: netdev@vger.kernel.org
-Cc: Yehezkel Bernat <YehezkelShB@gmail.com>,
-	Ian MacDonald <ian@netstatz.com>,
-	Salvatore Bonaccorso <carnil@debian.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Mika Westerberg <mika.westerberg@linux.intel.com>
-Subject: [PATCH net-next 3/3] net: thunderbolt: Allow reading link settings
-Date: Thu, 27 Nov 2025 14:15:21 +0100
-Message-ID: <20251127131521.2580237-4-mika.westerberg@linux.intel.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20251127131521.2580237-1-mika.westerberg@linux.intel.com>
-References: <20251127131521.2580237-1-mika.westerberg@linux.intel.com>
+	s=arc-20240116; t=1764249379; c=relaxed/simple;
+	bh=i0+NI2Bud3BlBikNUo49+8Zo8rRsxq05UxY0PW6sYJY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=m3a7JaDBbLA4JE30IdkssMB8Urcw6+q6RFjg2HzhGabjKLUPTrgcCMJi0rFCGcHWXkK9Toej/eE5mlWHq6Vp3A4UP9UFAEFKAG+nWVnCZHYZXjNEmINguTsxWTdm8hb6iP6f1VKwDAUDBUQIIEYTBynVqxJROI8jFXsFw3SlREc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-8b2ec756de0so79897385a.3
+        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 05:16:16 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764249376; x=1764854176;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=/la0b8NwFw52ANl4NaAU+Zs/xhH8L5L8IfhP5J6VHSo=;
+        b=dDk3pmVL+njVh3v3j0tgADVaTaDcfTWw2lmHVhr9dO1wb6JkA6jgRwgx14mNM3lBVT
+         oQl+dCY0LHrbgVC0LYGqDuxmO8C75rKa6/Asjcr/12lp8xFag9vSMTtz4JmfxWNKmHmM
+         yhbH1dwlDSP+hkKT49vv71ep+RpKfy4bpeFZDf2w8vQLQkfiSVdkLf0ijfknShrQN1dr
+         s7oh+vdq1AS80xsZrl1ZZbyS1RmTA55PbO7NcTVHvR3u+b0Awl1qIiuUuViyI5IklIKT
+         nlXyo6088WbGlkeT8JxtX00EoMrfmKxRU1Noy7VxmhE+B3n/XxK8hfdq/gryzdfXUP8I
+         WK6A==
+X-Forwarded-Encrypted: i=1; AJvYcCXJ41X4Z436Tf/ojqdgsD8TPsSi+b1QE+tljTkGvkOWisRs6NuBCUiPS60m8+HGibasYU+lhX8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7+NYUyvf0PLKUteHLq21EKM9TuX5ct9hpyC9m8BIwnbywZgGW
+	uRuimxSNO8NPHtpdYCkHlK+wnxBNiP/MANM9EvpU6KPGhqqfznmWmxzkr7/wKjw9
+X-Gm-Gg: ASbGnctHv9GoFMRr55q3m+JOzBDLJVPQtk/VqX4sBnYB2TSzT6X1Bx4U32E1xjhLQoO
+	z9pGrDhloWEg8HJMsCybpEPMhqY28DeH6T7WKAbB7czweYX372oj+b02Hbn0gG31bbZ5d5thFWD
+	V7dy7u9OTGB39FLRKnhJHM7hBET6hVsM4w4tQW/EcM5S62y/GPMSzsSl1QIGSrRRB8Ug9LBQhlF
+	VbgeUd0lF24qRIsHOA7jRzOgP35wYv978kaFPZpAdnGiv1+dAd975zK3DCF5UPFBt8wv8KmjqAu
+	JHGYr0n/6w2XHp8Whbj8pE++M393AC1oHiNyobx9ip9FlXd9e7GEW1AWwJpblbjEmE8kavKg9sb
+	9fktH0xGvirXj5alq7I/JEQBzJX69x4qJApVSUlyCtyTjEySy6j97fKUWXAA74FPCipC3ZTtVcx
+	U4GMWQ3m6AeWsQjGTHmMtZ/wXcjRACd+vM7X2HnADXeGrYlU9x
+X-Google-Smtp-Source: AGHT+IGzuqatvvrNZ84luy5p14I7EflQsLt2sJErX3JZyGPStdG3krQ4Qqnd7a2ttFLt8/2Z19RFzQ==
+X-Received: by 2002:a05:620a:4116:b0:8b2:d259:6138 with SMTP id af79cd13be357-8b4ebdb0681mr1222079885a.58.1764249375824;
+        Thu, 27 Nov 2025 05:16:15 -0800 (PST)
+Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com. [209.85.222.42])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b52a1dd353sm103611885a.49.2025.11.27.05.16.13
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 Nov 2025 05:16:13 -0800 (PST)
+Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-93720298f86so478171241.2
+        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 05:16:13 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWuC4RDox0RGlNqHCHUfhLkOlbQkDFMAlR9WpI/NKyYmz0oBEx/0wsSBRvjQAHTn/0xAvpsipA=@vger.kernel.org
+X-Received: by 2002:a05:6102:5e93:b0:5db:ceaa:1dbf with SMTP id
+ ada2fe7eead31-5e224417a9bmr4411857137.41.1764249373279; Thu, 27 Nov 2025
+ 05:16:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20251121113553.2955854-1-prabhakar.mahadev-lad.rj@bp.renesas.com> <20251121113553.2955854-5-prabhakar.mahadev-lad.rj@bp.renesas.com>
+In-Reply-To: <20251121113553.2955854-5-prabhakar.mahadev-lad.rj@bp.renesas.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Thu, 27 Nov 2025 14:16:02 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdVtxLCRHdhj5=iOHyDJFQUfALYj8MXGLA+bT=YSvWtbbQ@mail.gmail.com>
+X-Gm-Features: AWmQ_blYrSklJ3vMkio_CRlMnvD_t9kp1obUj6YpfU6Kqg0TYQcNKUPeqWm26t4
+Message-ID: <CAMuHMdVtxLCRHdhj5=iOHyDJFQUfALYj8MXGLA+bT=YSvWtbbQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 04/11] dt-bindings: net: dsa: renesas,rzn1-a5psw:
+ Add RZ/T2H and RZ/N2H ETHSW support
+To: Prabhakar <prabhakar.csengg@gmail.com>
+Cc: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Simon Horman <horms@kernel.org>, Philipp Zabel <p.zabel@pengutronix.de>, 
+	Russell King <linux@armlinux.org.uk>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Magnus Damm <magnus.damm@gmail.com>, linux-renesas-soc@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Biju Das <biju.das.jz@bp.renesas.com>, 
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Ian MacDonald <ian@netstatz.com>
+Hi Prabhakar, Cl=C3=A9ment,
 
-In order to use Thunderbolt networking as part of bonding device it
-needs to support ->get_link_ksettings() ethtool operation, so that the
-bonding driver can read the link speed and the related attributes. Add
-support for this to the driver.
+On Fri, 21 Nov 2025 at 12:37, Prabhakar <prabhakar.csengg@gmail.com> wrote:
+> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+>
+> Extend the A5PSW DSA binding to cover the ETHSW variant used on newer
+> Renesas RZ/T2H and RZ/N2H SoCs. ETHSW is derived from the A5PSW switch
+> found on RZ/N1 but differs in register layout, clocking and interrupt
+> topology, and exposes four ports in total (including the CPU/management
+> port) instead of five.
+>
+> Update the schema to describe these differences by adding dedicated
+> compatible strings for RZ/T2H and RZ/N2H, tightening requirements on
+> clocks, resets and interrupts, and documenting the expanded 24-interrupt
+> set used by ETHSW for timestamping and timer functions. Conditional
+> validation ensures that RZ/T2H/RZ/N2H instances provide the correct
+> resources while keeping the original A5PSW constraints intact.
+>
+> Use the RZ/T2H compatible string as the fallback for RZ/N2H, reflecting
+> that both SoCs integrate the same ETHSW IP.
+>
+> Add myself as a co-maintainer of the binding to support ongoing work on
+> the ETHSW family across RZ/T2H and RZ/N2H devices.
+>
+> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-Signed-off-by: Ian MacDonald <ian@netstatz.com>
-Signed-off-by: Mika Westerberg <mika.westerberg@linux.intel.com>
----
- drivers/net/thunderbolt/main.c | 73 ++++++++++++++++++++++++++++++++++
- 1 file changed, 73 insertions(+)
+Thanks for your patch!
 
-diff --git a/drivers/net/thunderbolt/main.c b/drivers/net/thunderbolt/main.c
-index 20bac55a3e20..b056c22ad129 100644
---- a/drivers/net/thunderbolt/main.c
-+++ b/drivers/net/thunderbolt/main.c
-@@ -10,6 +10,7 @@
-  */
- 
- #include <linux/atomic.h>
-+#include <linux/ethtool.h>
- #include <linux/highmem.h>
- #include <linux/if_vlan.h>
- #include <linux/jhash.h>
-@@ -1276,6 +1277,77 @@ static const struct net_device_ops tbnet_netdev_ops = {
- 	.ndo_change_mtu	= tbnet_change_mtu,
- };
- 
-+static int tbnet_get_link_ksettings(struct net_device *dev,
-+				    struct ethtool_link_ksettings *cmd)
-+{
-+	const struct tbnet *net = netdev_priv(dev);
-+	const struct tb_xdomain *xd = net->xd;
-+	int speed;
-+
-+	ethtool_link_ksettings_zero_link_mode(cmd, supported);
-+	ethtool_link_ksettings_zero_link_mode(cmd, advertising);
-+
-+	/* Figure out the current link speed and width */
-+	switch (xd->link_speed) {
-+	case 40:
-+		/* For Gen 4 80G symmetric link the closest one
-+		 * available is 56G so we report that.
-+		 */
-+		ethtool_link_ksettings_add_link_mode(cmd, supported,
-+						     56000baseKR4_Full);
-+		ethtool_link_ksettings_add_link_mode(cmd, advertising,
-+						     56000baseKR4_Full);
-+		speed = SPEED_56000;
-+		break;
-+
-+	case 20:
-+		if (xd->link_width == 2) {
-+			ethtool_link_ksettings_add_link_mode(cmd, supported,
-+							     40000baseKR4_Full);
-+			ethtool_link_ksettings_add_link_mode(cmd, advertising,
-+							     40000baseKR4_Full);
-+			speed = SPEED_40000;
-+		} else {
-+			ethtool_link_ksettings_add_link_mode(cmd, supported,
-+							     20000baseKR2_Full);
-+			ethtool_link_ksettings_add_link_mode(cmd, advertising,
-+							     20000baseKR2_Full);
-+			speed = SPEED_20000;
-+		}
-+		break;
-+
-+	case 10:
-+		if (xd->link_width == 2) {
-+			ethtool_link_ksettings_add_link_mode(cmd, supported,
-+							     20000baseKR2_Full);
-+			ethtool_link_ksettings_add_link_mode(cmd, advertising,
-+							     20000baseKR2_Full);
-+			speed = SPEED_20000;
-+			break;
-+		}
-+		fallthrough;
-+
-+	default:
-+		ethtool_link_ksettings_add_link_mode(cmd, supported,
-+						     10000baseT_Full);
-+		ethtool_link_ksettings_add_link_mode(cmd, advertising,
-+						     10000baseT_Full);
-+		speed = SPEED_10000;
-+		break;
-+	}
-+
-+	cmd->base.speed = speed;
-+	cmd->base.duplex = DUPLEX_FULL;
-+	cmd->base.autoneg = AUTONEG_DISABLE;
-+	cmd->base.port = PORT_OTHER;
-+
-+	return 0;
-+}
-+
-+static const struct ethtool_ops tbnet_ethtool_ops = {
-+	.get_link_ksettings = tbnet_get_link_ksettings,
-+};
-+
- static void tbnet_generate_mac(struct net_device *dev)
- {
- 	const struct tbnet *net = netdev_priv(dev);
-@@ -1326,6 +1398,7 @@ static int tbnet_probe(struct tb_service *svc, const struct tb_service_id *id)
- 
- 	strcpy(dev->name, "thunderbolt%d");
- 	dev->netdev_ops = &tbnet_netdev_ops;
-+	dev->ethtool_ops = &tbnet_ethtool_ops;
- 
- 	/* ThunderboltIP takes advantage of TSO packets but instead of
- 	 * segmenting them we just split the packet into Thunderbolt
--- 
-2.50.1
+> --- a/Documentation/devicetree/bindings/net/dsa/renesas,rzn1-a5psw.yaml
+> +++ b/Documentation/devicetree/bindings/net/dsa/renesas,rzn1-a5psw.yaml
 
+> @@ -73,14 +145,48 @@ properties:
+>                phandle pointing to a PCS sub-node compatible with
+>                renesas,rzn1-miic.yaml#
+>
+> -unevaluatedProperties: false
+> -
+>  required:
+>    - compatible
+>    - reg
+>    - clocks
+>    - clock-names
+>    - power-domains
+> +  - interrupts
+> +  - interrupt-names
+
+FTR, this causes warning for RZ/N1:
+
+    arm/boot/dts/renesas/r9a06g032-rzn1d400-db.dtb: switch@44050000
+(renesas,r9a06g032-a5psw): 'oneOf' conditional failed, one must be
+fixed:
+            'interrupts' is a required property
+            'interrupts-extended' is a required property
+            from schema $id:
+http://devicetree.org/schemas/net/dsa/renesas,rzn1-a5psw.yaml  DTC
+arch/arm/boot/dts/renesas/r8a7740-armadillo800eva-con15-quad-7seg-red.dtbo
+
+    arm/boot/dts/renesas/r9a06g032-rzn1d400-db.dtb: switch@44050000
+(renesas,r9a06g032-a5psw): 'interrupt-names' is a required property
+            from schema $id:
+http://devicetree.org/schemas/net/dsa/renesas,rzn1-a5psw.yaml
+
+Cl=C3=A9ment added the interrupts to the binding, but never sent a patch
+to update the DTS.  I have submitted a fix:
+https://lore.kernel.org/53d45eed3709cba589a4ef3e9ad198d7e44fd9a5.1764249063=
+.git.geert+renesas@glider.be
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
