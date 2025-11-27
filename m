@@ -1,87 +1,88 @@
-Return-Path: <netdev+bounces-242375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id D499DC8FE53
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 19:21:42 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8B87C8FE5F
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 19:22:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B27A14E2EE6
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 18:21:41 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 960994E1C54
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 18:22:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA17A2FFFA6;
-	Thu, 27 Nov 2025 18:21:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49D212FDC35;
+	Thu, 27 Nov 2025 18:22:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ry8hthPc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="em3NUuDq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 699BD24886A
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 18:21:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 429B324886A
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 18:22:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764267700; cv=none; b=XV7LjGNCwyeOqjZLbj3sE55942wmI4OToJth1EOy7PhtccSvVjcAqyeb5Z8H9NiXRASt2xovngLqEhsLEVqzs+VX5VIjNF/fY9DbFWcEbNz2xkI7k8swI91OOiu29k4VKHcDlXsaoha+VWMEfShqog0wpdu+ZEe6orRk0g/CKbY=
+	t=1764267735; cv=none; b=e09neCd1ClGYL91586LiYIJeao1O+y43JnY1jqPvKobXJ2J02GPo5FbIvTYeFXckku2qTUKL3X9t9jtbjOkAOtVC72N5HvBdfuthApMjunaZ4ZKHUEyxAcXl1xMdMoL1CrRqh5hI5ydMBEcTK/eOc2/+o7KWjy1yFWnMJOXW4B8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764267700; c=relaxed/simple;
-	bh=igWAjH0xNQvJLP11ckoZjjC7ciLsokNpa7VjOwFJSMk=;
+	s=arc-20240116; t=1764267735; c=relaxed/simple;
+	bh=fjQtqN+YUKlDuW7ycIzofip76NFL/CXU2USqYgPJLhU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YFvQ/GvWjhUjeYBg/mRGqWiiL1R1x9ntDixNUmCr0b5/LyJ78ObDWec6gAXSgabblgfpClPwEcPvqek/EhDu/y0U/QY76SL61KZHU9OWSit4yuuhm3mTuWykWuWqImLz8oFkR5nZbWmrDnTBTZ1q7Vg/RE7cmZ5BkSfkunnFqhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ry8hthPc; arc=none smtp.client-ip=209.85.214.173
+	 Content-Type:Content-Disposition:In-Reply-To; b=c40XwReFTr5RbC4IcOQJ/YF8bFNCycRQaPXjs1hxI0Ulrm/KUJXD3NrTx9CXQTjHKZMEVADbtqGPMq2xcE/gkQIV4iP6uPWo5Y/Af/2ZkLcyXhlOz9TDpJ0JozILY4gAzsCaCS06A/LY5LFcBEIHb7UYNyWyI6BrhgNOAK8tjmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=em3NUuDq; arc=none smtp.client-ip=209.85.216.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-29845b06dd2so14865095ad.2
-        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 10:21:39 -0800 (PST)
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-3418ad69672so670238a91.3
+        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 10:22:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764267699; x=1764872499; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1764267732; x=1764872532; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=S832dEXRRuljnsRC8l5OHuN+DNSJW8AFtuJhBdXtnKQ=;
-        b=Ry8hthPcoRaxhU5rUfrj0+ggSPuvHjYR9cfw3AGrRRuYyRLWTLMDggAT+x4Z4H87ID
-         Ls0pYZ8FCbgzaJ+VMy0z6ddbiAoCmzv0D5EwhtieocNtpzPOQzsjdZ6nAQ8aLcMoPSfc
-         os24/nqVPxwl6uP+cKZHj+zrFVHrOa+XFAHJxem1wOB4R+Bed5JntYyY6nlXm5JkE8Y+
-         pONmS+ahw/JoBYPZ8evCn3VYUvl83Gbt/da4/Jvos61WKhXnVHNQAIwMQbSfnJP6gc1m
-         prjc4LTYr/qWO//5wFFdMeocsmU8BPUbx6ERs+1gyMZ2bMaUeG5nDQpddooMsQb4dzVY
-         v9mA==
+        bh=kLlmHa9xtqFKgo7ETYW4T2wGIj/hShZNl/WxQYt+MiM=;
+        b=em3NUuDqHwGd0xFI2f++ZJnjPpmPq8naLJKjkRBhgG4wY4MS6awe9EbiKXKGCh9gXQ
+         U8l6bLxXDBPguqHCNCGdyJ+63BBDViPL1+F/riAcS0vLPeLDxfTScHBJ0I4z3EZQevyC
+         Ga1xbZqVYlNf2noMlfXo47fZk7LDZN+4ZSvCiTQEiu0HYGt4xsyhNT42PbSuJVi6u+pN
+         C/AquDKeOGmhk4UjhGTobJEF4qFyJ8ZNSlGbXI5Pf324mMSlQzF/Uwnup6Pd8IPYXh2H
+         JJ4IBfqfgHR06SJi1Ts9E3E+wKJIQPGFvOQdP4IOLM23KFKCJLcvpwrLWOsVrhPKZ0s5
+         DFbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764267699; x=1764872499;
+        d=1e100.net; s=20230601; t=1764267732; x=1764872532;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=S832dEXRRuljnsRC8l5OHuN+DNSJW8AFtuJhBdXtnKQ=;
-        b=ISQOqr64SsOGLqAYEiPI+zBg3DpWD/gs0Xw28XoTC2pMXLVRO9cq7ohHS4bptkh2XC
-         k7PB5zYz9lGa/H7gcUNl2MAUCYpGqH+ZYL9jFYmd9SPyGM7aae1LimZTzAhx38IyQRUH
-         rICDKWmarbLrltWWRDvTDbOnsTigN0Ud6mgW0BIOjEL+9m/X23vTcObxgYwnzu9F6jPO
-         1GPIZPwNWhVWvuqTQrT+M0AuMN+gtJvSjVdWxcOmjKjf1FVdXepoNqdmHxV8leTow3It
-         gG9LHUhAKGlmlPIgI5D93J+ogfwoolTpBwSyzk8yJiU03arwTOAvGI4929vhiWB429It
-         2MXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW41JGcWyhUi2Vlw0O+GKagMBcjG3RFgNEAxO2QccF4cvud6p475p4nl2PDIDXk+/1/CowQJ3g=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1iiK1QYnmrQyrY8weLU/K8ijs/cQPqPG6p3nuU5i3HJ7EQAup
-	V5Y2p00tkAFYhvs+ZVOyHycFR/FYUMHNP1cSkxc28yFL2CcmXMoWgnhnguEJ3LRg
-X-Gm-Gg: ASbGncuGYBXRoN+hZxRrXrjTOTXECY+Af8XBd2fs/Di9gY63ZsXfHS5DKsWS74KbJT9
-	GtvXqHd9LoNUuSUM3bcrHeTv1jhROll0e3xZa3QZ2hfeszPjv9k+xAPrcVF4X+5oZPls1w/U91r
-	98i2YzShshitLKPQC+aTAB0IlQh7A3CnKXXeaGr3aQTHa4zWyWsE4FPf1qKBXfyV4vV6O53HppF
-	LNMRWRU3qpOk2QE1BqWEiqTEa0qaYcVkuVvl4CLH7C6CZtyQtZKgkzEQrywHe/54UqJF4uZ3GYR
-	PQbdC8zYheiNgFDAdAtQg9u8rxyUSWllQEqGoBIjK/liIECz/K0QFwtSoXrv7vjYuHProauJEh2
-	om2JnArZRaV3J+nBrUNu8M4zPKC9Fh4PnKtk81OdKbcbfBHXSaxCP36KkNTg/mQtypoYicIxxhm
-	aeyd3fe+0b0RnYkEVJFQ==
-X-Google-Smtp-Source: AGHT+IFQ4/2Vr/mxY0n+SqNV37TuiRIhfMDvknz5AL9lBvrVetHKItz/kUdW0miXU+pEjIjEpFDdWQ==
-X-Received: by 2002:a17:903:2c06:b0:290:94ed:184c with SMTP id d9443c01a7336-29b6c3e86acmr242338025ad.15.1764267698678;
-        Thu, 27 Nov 2025 10:21:38 -0800 (PST)
+        bh=kLlmHa9xtqFKgo7ETYW4T2wGIj/hShZNl/WxQYt+MiM=;
+        b=ioM6h+kKLgr96EH02Lboppl4jjLg9cgTL12cPXMMrmxA5pYPo3mdqeTCt2F3EiTYRh
+         YE2hvb2X8jEEQecRxkiPNt1zT+p16c2KH8FSllFGLkfr0oLvs2OloLOJugCmWStmPLgk
+         F4vxQGtOB4MLWM6bzDSbR/sPHeVa0UWCxrhrfvK3u4R46ZLnjIvsy2O6XG/kmH7L/+lO
+         iScqQrJPMTReFq7pNR6RfcMT3GzbEaDrk6vbM+piqYS6mKz2rZHHAyoefyMa3bIwpw7x
+         Ufq89mpCAtn4iHwu87lcdHFSMH6bL34D4BJg0Hg62aPa72EKSR3F9SvPMIGaVncPbg1J
+         U+/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUyJhGckheLRrt5gi2/IMmbAzhFtyACW2yDnlIz4rRoimlewzA2y1d3+8ZXor8DywmHD3oIImY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyaJ9T9CQI0JMNC1fTbDhzU6jtdDgBSm2SmMaabhg/THw0NgWF5
+	wq8MG02kjEszSMVppFNgavthnYcf6fjhevzCZDtf5bIK1ycsbO1QgoWQ
+X-Gm-Gg: ASbGncshBgfsHedSMFKqtydR+RHY7kp5zjbodyW6gqOIFSXHIOCrs7gTWRSkdblInHB
+	ZZC9t3WVbx56K/SGc7IRF9k+XvIeA6JekS3WdId7cjSsYPCRBKfzcMBjAisIr3GsPw+QGjA+keA
+	40wvrWmqGmnIheGneu11Y6Btn2FCAWBHULtPFHo1G7nEEQUb9RGAfpnKlwAITlDaEcX+FdOD8eT
+	sNMMj7zXoz2Nu4Ef+g/BqbBxRVL/OlJLMIcpgjA+UN+TMjA9/09pFJNmMIMAatMcn2uqNBhYGjQ
+	aLngm7f/jppegdt5r5TbDv5HJUU2MZfWcQkCE+YHSzeJVeTU+1NsD2VQlWL680VcXd7QF7bdtD8
+	UYoCjsAbJ66YvVq4qHb7/x+uPuLEGFIlR1VHLsRog/BfEsqCeeJ0xuEX8d2bMTZ9CZxj0YlIS0O
+	bJpCIJUwlqKrRNkIxODw==
+X-Google-Smtp-Source: AGHT+IE8xcHYZfCXh6tP7khVEJw8vLXqjkwggDLc7ntQcLdUlt4y/KaDurVYmBOCuN1rVQOzoyCJ3w==
+X-Received: by 2002:a17:90b:48cd:b0:340:fb6a:cb52 with SMTP id 98e67ed59e1d1-34733f4acfbmr21840475a91.25.1764267732245;
+        Thu, 27 Nov 2025 10:22:12 -0800 (PST)
 Received: from localhost ([2601:647:6802:dbc0:ef22:445e:1e79:6b9a])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-be508b06867sm2467380a12.23.2025.11.27.10.21.37
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3477b733381sm2473813a91.12.2025.11.27.10.22.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Nov 2025 10:21:38 -0800 (PST)
-Date: Thu, 27 Nov 2025 10:21:36 -0800
+        Thu, 27 Nov 2025 10:22:11 -0800 (PST)
+Date: Thu, 27 Nov 2025 10:22:10 -0800
 From: Cong Wang <xiyou.wangcong@gmail.com>
 To: Xiang Mei <xmei5@asu.edu>
 Cc: security@kernel.org, netdev@vger.kernel.org, toke@toke.dk,
 	cake@lists.bufferbloat.net, bestswngs@gmail.com
-Subject: Re: [PATCH net v7 1/2] net/sched: sch_cake: Fix incorrect qlen
- reduction in cake_drop
-Message-ID: <aSiWsNrWQ8PDhk29@pop-os.localdomain>
+Subject: Re: [PATCH net v7 2/2] selftests/tc-testing: Test CAKE scheduler
+ when enqueue drops packets
+Message-ID: <aSiW0k7Z13TvG8yy@pop-os.localdomain>
 References: <20251126194513.3984722-1-xmei5@asu.edu>
+ <20251126194513.3984722-2-xmei5@asu.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,29 +91,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251126194513.3984722-1-xmei5@asu.edu>
+In-Reply-To: <20251126194513.3984722-2-xmei5@asu.edu>
 
-On Wed, Nov 26, 2025 at 12:45:12PM -0700, Xiang Mei wrote:
-> In cake_drop(), qdisc_tree_reduce_backlog() is used to update the qlen
-> and backlog of the qdisc hierarchy. Its caller, cake_enqueue(), assumes
-> that the parent qdisc will enqueue the current packet. However, this
-> assumption breaks when cake_enqueue() returns NET_XMIT_CN: the parent
-> qdisc stops enqueuing current packet, leaving the tree qlen/backlog
-> accounting inconsistent. This mismatch can lead to a NULL dereference
-> (e.g., when the parent Qdisc is qfq_qdisc).
+On Wed, Nov 26, 2025 at 12:45:13PM -0700, Xiang Mei wrote:
+> Add tests that trigger packet drops in cake_enqueue(): "CAKE with QFQ
+> Parent - CAKE enqueue with packets dropping". It forces CAKE_enqueue to
+> return NET_XMIT_CN after dropping the packets when it has a QFQ parent.
 > 
-> This patch computes the qlen/backlog delta in a more robust way by
-> observing the difference before and after the series of cake_drop()
-> calls, and then compensates the qdisc tree accounting if cake_enqueue()
-> returns NET_XMIT_CN.
-> 
-> To ensure correct compensation when ACK thinning is enabled, a new
-> variable is introduced to keep qlen unchanged.
-> 
-> Fixes: 15de71d06a40 ("net/sched: Make cake_enqueue return NET_XMIT_CN when past buffer_limit")
 > Signed-off-by: Xiang Mei <xmei5@asu.edu>
+> ---
+> v2: place the test in qdiscs.json
 
 Acked-by: Cong Wang <cwang@multikernel.io>
-
-Thanks for your patience!
 
