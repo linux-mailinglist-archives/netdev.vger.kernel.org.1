@@ -1,101 +1,95 @@
-Return-Path: <netdev+bounces-242272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65902C8E35D
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 13:13:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E12CC8E354
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 13:12:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43D253B51A6
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 12:10:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24C863B0216
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 12:10:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64C4E32D43C;
-	Thu, 27 Nov 2025 12:10:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4D2632E141;
+	Thu, 27 Nov 2025 12:10:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RO0NRAZl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YvBOuKP9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AC7C32ABEF;
-	Thu, 27 Nov 2025 12:10:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B31CD32B9AB;
+	Thu, 27 Nov 2025 12:10:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764245445; cv=none; b=dFeFAv42Re+B7Qf/P8hcmNzpiK632whWs2AyFzB1VOYD/jImuqxPMh+u24lDV8XBL3vN85VxO6XDTbTeOQZutjSrAT6OGyP0iuOUwrDkXWhFnBbowRu3lO6qKagGcT/+KUhHWYDOsIuzAdtO1+d9u1qdTYHL81Qf4bI/3kz4/pc=
+	t=1764245414; cv=none; b=ZSVM2GqORQblEnAn6YzDQwmPz236kBjZFEOQ+o8gyOJMuPSLMy0SO6Sg9+wkoWIBH5P8tSM3BM8MfxsQ57NCjqhwc8iid6hZxhnhoHZR1zUilCMLscNBVIDdnzfAvjLTqHwE+ysLUVLDr16o/1uhn+KGRlxn24o2NJi+n8Cb6z8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764245445; c=relaxed/simple;
-	bh=uhnsNrqtMtQkysk9EvtLzQf+itpVm8Usek2r6BnT+ak=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=kBw+adTTueb2eW6Z2ZC5BsjzQbumQe4FhUIgQRrN3ecTHWjx068wTRPRzz+1WXtpEwYjtwv7EHPM5PJg90jWIgxuEUrKH0j7mr9E18rtAVlII1msd7oeIx38Li26D2HNnrTz/yyWDUX3ZXJQKpY0j75jsYJUw3OrGvsvfBJqg9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RO0NRAZl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C802DC4CEF8;
-	Thu, 27 Nov 2025 12:10:44 +0000 (UTC)
+	s=arc-20240116; t=1764245414; c=relaxed/simple;
+	bh=C7MVLvgjgS9a0L9qwa1j+bF+TVGED+r0Nji9vIH+zOE=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=O939FoiE3kZ/AdAmX8c48y9zPPTYE+nxpkX7HdKHdk3ezKg6fm9VbMSRaz9fXH9HcA467EsWDEbCwAD+z0/JQ7yxokRLo3wUvbg2252wsIJOwqqKPV+IxOzwHeU0x/wgD+3U6YWFDDjT/TcY3+27YO1UA07IoOh57vKJb3DKdzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YvBOuKP9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C511CC4CEF8;
+	Thu, 27 Nov 2025 12:10:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764245444;
-	bh=uhnsNrqtMtQkysk9EvtLzQf+itpVm8Usek2r6BnT+ak=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RO0NRAZl45XA5ot75mAHnDowIjR04X6kevxTP/ht/X0iW+aJV/HSqd1DkqPUzJ/38
-	 fgQjlsjNIbmzTKhnimVO/Q4XPHv+9aOkw4qaBvEhSfjfRSKhGp9awCsJls/EpcBN//
-	 0wkqkJQhuGucl1fTvtcmKfQaJovPFZWhWvsqnEH+Ibw64NhrYhNTHCVTGSIvhqQLEo
-	 bM6DopBszbn9uoufcaoFKgkt25IZ3o8eR7khWLioY+8QJxSjMJRT9Ew2DA4SXydBKQ
-	 CIoq1Ylo/saAP8rponTA2pcglH4509X+vLM0zaAk3aH5Raam+16WKfpx2KmYSXlmVm
-	 1qQALIu6z0POQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 710E4380CFEF;
-	Thu, 27 Nov 2025 12:10:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1764245414;
+	bh=C7MVLvgjgS9a0L9qwa1j+bF+TVGED+r0Nji9vIH+zOE=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=YvBOuKP9HpqWLMGBdXEknJfm+KH/82MMdqtTjarygEBS23Uzb67F4pm8JLpJXQkR9
+	 pOOjAnnxZowXT53bzbN+fOpbYxTT5sskcpZ+BxbmJgkiuqmAWNDnq5dVL47atfNwPd
+	 ONzthabtx7l1GdAgWBIO2HAZ6KiqwYheVDzVkTnNXHWumG1dNP2Ev/Z5zEGa/JdSEj
+	 l4xxyuK845wart7W6npz5IRhiJa2tJq+Pme6NBentZbEMNOmxv87moofnSA2Fn44/5
+	 8kkNuVeXCEpUPVdQ3WRmhy56pyZY7QXBlWOS1vTuk2pRSU0yC+I2PYdBd6pKt1U5WE
+	 FhNAELA30d0Jg==
+From: Leon Romanovsky <leon@kernel.org>
+To: linux-rdma@vger.kernel.org, Stefan Metzmacher <metze@samba.org>
+Cc: Bernard Metzler <bernard.metzler@linux.dev>, 
+ Jason Gunthorpe <jgg@ziepe.ca>, netdev@vger.kernel.org, 
+ linux-cifs@vger.kernel.org
+In-Reply-To: <20251126150842.1837072-1-metze@samba.org>
+References: <20251126150842.1837072-1-metze@samba.org>
+Subject: Re: [PATCH v2] RDMA/siw: reclassify sockets in order to avoid
+ false positives from lockdep
+Message-Id: <176424541100.1853134.12455314070226986319.b4-ty@kernel.org>
+Date: Thu, 27 Nov 2025 07:10:11 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: stmmac: dwmac: Disable flushing frames on
- Rx
- Buffer Unavailable
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176424540625.2550562.3416257212075007570.git-patchwork-notify@kernel.org>
-Date: Thu, 27 Nov 2025 12:10:06 +0000
-References: <20251126-a10_ext_fix-v1-1-d163507f646f@altera.com>
-In-Reply-To: <20251126-a10_ext_fix-v1-1-d163507f646f@altera.com>
-To: G@codeaurora.org, Thomas@codeaurora.org,
-	Rohan <rohan.g.thomas@altera.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
- alexandre.torgue@foss.st.com, maxime.chevallier@bootlin.com,
- netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- matthew.gerlach@altera.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15-dev-a6db3
 
-Hello:
 
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Wed, 26 Nov 2025 00:37:12 +0800 you wrote:
-> From: Rohan G Thomas <rohan.g.thomas@altera.com>
+On Wed, 26 Nov 2025 16:08:42 +0100, Stefan Metzmacher wrote:
+> While developing IPPROTO_SMBDIRECT support for the code
+> under fs/smb/common/smbdirect [1], I noticed false positives like this:
 > 
-> In Store and Forward mode, flushing frames when the receive buffer is
-> unavailable, can cause the MTL Rx FIFO to go out of sync. This results
-> in buffering of a few frames in the FIFO without triggering Rx DMA
-> from transferring the data to the system memory until another packet
-> is received. Once the issue happens, for a ping request, the packet is
-> forwarded to the system memory only after we receive another packet
-> and hece we observe a latency equivalent to the ping interval.
+> [T79] ======================================================
+> [T79] WARNING: possible circular locking dependency detected
+> [T79] 6.18.0-rc4-metze-kasan-lockdep.01+ #1 Tainted: G           OE
+> [T79] ------------------------------------------------------
+> [T79] kworker/2:0/79 is trying to acquire lock:
+> [T79] ffff88801f968278 (sk_lock-AF_INET){+.+.}-{0:0},
+>                         at: sock_set_reuseaddr+0x14/0x70
+> [T79]
+>         but task is already holding lock:
+> [T79] ffffffffc10f7230 (lock#9){+.+.}-{4:4},
+>                         at: rdma_listen+0x3d2/0x740 [rdma_cm]
+> [T79]
+>         which lock already depends on the new lock.
 > 
 > [...]
 
-Here is the summary with links:
-  - [net-next] net: stmmac: dwmac: Disable flushing frames on Rx Buffer Unavailable
-    https://git.kernel.org/netdev/net-next/c/45d100ee0d6e
+Applied, thanks!
 
-You are awesome, thank you!
+[1/1] RDMA/siw: reclassify sockets in order to avoid false positives from lockdep
+      https://git.kernel.org/rdma/rdma/c/3a2c32d357db8d
+
+Best regards,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Leon Romanovsky <leon@kernel.org>
 
 
