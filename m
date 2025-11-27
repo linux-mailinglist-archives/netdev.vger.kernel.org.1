@@ -1,89 +1,88 @@
-Return-Path: <netdev+bounces-242127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C2FFC8C95D
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 02:40:01 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0510EC8C96F
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 02:41:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 87B174E7729
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 01:39:17 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id ADDB34E057B
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 01:41:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84F5D2135C5;
-	Thu, 27 Nov 2025 01:36:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FC6820E03F;
+	Thu, 27 Nov 2025 01:41:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hp83jhUP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kH7YLe7z"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5907220E03F;
-	Thu, 27 Nov 2025 01:36:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA6D1FC110
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 01:41:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764207410; cv=none; b=sB0ieVtA4Q0DE5x/BvPp1NRxXWKT/x9J0hR0gPuPHlpEBk3cniYEft//t7ISdbyzo1ZqgXW/VcpkpqPNa+3dsloM2djb7gspND9dhDtfaOJOznKoJVHafUj7il58aLTEx6IQ7Ke51tC2GK3gcZxj2kCHj423MP7G9r3VsrRFzGI=
+	t=1764207705; cv=none; b=LUNZqKHBoqjscpZ4wG0+lWzkVZ62/kHNNiA8rrhe4BEMhx8cl/HkBA4lFUOxtmtDY1OfqYHej5/Pi1XhqAFSgfJmqDsgY9/TlPsEhh/L85ylsWsbfYvYj2PNQeCv7lmUYsbJ1JPUzbXvJVmSKcqEBP8qg4Puv3/5+W4St5VwVhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764207410; c=relaxed/simple;
-	bh=DkSzyBbm8LAaNI51IZ7Ph7CrpZ9emDRymVlXWzz2Q8U=;
+	s=arc-20240116; t=1764207705; c=relaxed/simple;
+	bh=WDzhQcoArmUT10u6xhBacX74Qy9LBlIo9mHKCdQgwQQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=euxf/hQm7OJoCLyACJ0XPtHLQiSFj/3h1TIJAttqP+OVD75NpRcbC3g6/o3Md4sGO4HTgOUJ44s61vjgd7FKE8JJYVfaQzj/CcpIZJocCbZs2/na2CmQXI2JWMsWG7LoCjf9NBnYi0Gy7AkTOCVEU7FA7K1oiA/jl9qbB7lyyvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hp83jhUP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 756FFC4CEF7;
-	Thu, 27 Nov 2025 01:36:47 +0000 (UTC)
+	 MIME-Version:Content-Type; b=OD66B7LWFV+eYxNUXL8MBZHN1OwY8rZgwnD0HxWTOHXf1XcuP5beJRNcl2zjfxvdQiIQWLIhTKa1zr6YBnRXObNAMJcjUXRTpouN9dpYJ3lKGnKB05hAk8uXqY21s+U5JORtE6blREMKpImH8F+LRjMKB0x119SoixdYRq0svK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kH7YLe7z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E218AC4CEF7;
+	Thu, 27 Nov 2025 01:41:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764207407;
-	bh=DkSzyBbm8LAaNI51IZ7Ph7CrpZ9emDRymVlXWzz2Q8U=;
+	s=k20201202; t=1764207705;
+	bh=WDzhQcoArmUT10u6xhBacX74Qy9LBlIo9mHKCdQgwQQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Hp83jhUPZLatowt7+3ZPT/a7nFr+rgIKNWdW/CJDwf4WLX6Qsx523ewu6xdSUxP7/
-	 79ECMBeV99ltMGQ8Pg1rDKqObeAnRx2kHrd5p1T8qur3t8mIHEJp0TcOe/V4s1s7ks
-	 fd9nddEQmSUAGzymOs3Fx3YvmJ0JHLsEWVvd/3mV82/mcZFpO4PHbmY5wzGlxs8UZi
-	 HO23lNUiUNca5whQI1InS7ZNPD/YMCtv6Jv0AOSUcz5ehXKllMbLcS/3mTFaC76gkU
-	 tnYsjSh+L4A4VSjy0WzX/OBKaPKZ2CLV9NIUM1HQ+Xyt3Zfs80peVsgOOBW3W5D9vn
-	 MtJec2DBlqtMw==
-Date: Wed, 26 Nov 2025 17:36:46 -0800
+	b=kH7YLe7zpPvWQAhyHiRXetKmdDljywADgfAm8b2J6EDdpgyEAyFD35ntq11JMV8sy
+	 5dkmfKgdZyk3BoiWpOmhK7Jk/C6GURT4B+EWCz2II2SewJ1J3TTvCPU7zwi4h/eoZ1
+	 skM6MFe6luQrvoGr8tvUbewCk0d3siYCzvocgnGMNhjzJLON3nSyrRzGs7IHijbpEA
+	 X93HZ/SIlxNfCnHj9U7jbnLlnCCCiP02XwE8AiwvCk+ljUFtKYixrhbPsghf5PrO2L
+	 cpqJ9lJ0A9bsEfq5OQ1lFkfyFw5aI0FOegcsrTHowNUZaidl/jPKPyScJbndiw6j68
+	 cnxVagy4mrQ+w==
+Date: Wed, 26 Nov 2025 17:41:44 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Andre Carvalho <asantostc@gmail.com>
-Cc: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
- <shuah@kernel.org>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v7 0/5] netconsole: support automatic target
- recovery
-Message-ID: <20251126173646.696537af@kernel.org>
-In-Reply-To: <20251126-netcons-retrigger-v7-0-1d86dba83b1c@gmail.com>
-References: <20251126-netcons-retrigger-v7-0-1d86dba83b1c@gmail.com>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [TEST] bond_macvlan_ipvlan.sh flakiness
+Message-ID: <20251126174144.7e9bf70b@kernel.org>
+In-Reply-To: <aSem5ppfiGP8RgvK@fedora>
+References: <20251114082014.750edfad@kernel.org>
+	<aRrbvkW1_TnCNH-y@fedora>
+	<aRwMJWzy6f1OEUdy@fedora>
+	<20251118071302.5643244a@kernel.org>
+	<20251126071930.76b42c57@kernel.org>
+	<aSemD3xMfbVfps0D@fedora>
+	<aSem5ppfiGP8RgvK@fedora>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 26 Nov 2025 20:22:52 +0000 Andre Carvalho wrote:
-> This patchset introduces target resume capability to netconsole allowing
-> it to recover targets when underlying low-level interface comes back
-> online.
-> 
-> The patchset starts by refactoring netconsole state representation in
-> order to allow representing deactivated targets (targets that are
-> disabled due to interfaces going down).
-> 
-> It then modifies netconsole to handle NETDEV_UP events for such targets
-> and setups netpoll. Targets are matched with incoming interfaces
-> depending on how they were initially bound in netconsole (by mac or
-> interface name).
+On Thu, 27 Nov 2025 01:18:30 +0000 Hangbin Liu wrote:
+> On Thu, Nov 27, 2025 at 01:15:00AM +0000, Hangbin Liu wrote:
+> > > Hi Hangbin!
+> > >=20
+> > > The 0.25 sec sleep was added locally 1 week ago and 0 flakes since.
+> > > Would you mind submitting it officially? =20
+> >=20
+> > Good to hear this. I will submit it. =20
+>=20
+> Oh, I pressed the send button too fast. I forgot to ask=E2=80=94should we=
+ keep it at
+> 0.25s or extend it to 0.5s to avoid flaky tests later?
 
-Netpoll does not seem to handle DOWN events, so I'm guessing your
-primary use case is that the device had a HW fault and netdev was
-recreated after device reset?
+I'd stick to 0.25sec since it was solid for a week.
+I don't think the race window is very large, we could even experiment
+with a smaller delay, because debug kernels don't hit the issue. The
+debug kernel can't be >0.1sec slower I reckon.
 
-Should we not be listening for the REGISTER event then? On boot
-we force UP the device if we find it, theoretically there may
-be a case where user space is not configured to UP the device,
-and then we'd never resume the target?
+IOW I hope 0.25sec already has pretty solid safety margin?
+As I mentioned last week - this is called almost 100 times by the test
+so the longer delays will be quite visible in the test runtime.
 
