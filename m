@@ -1,185 +1,141 @@
-Return-Path: <netdev+bounces-242149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242150-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02F42C8CBDC
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 04:21:24 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DD5EC8CC09
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 04:32:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 998063A6436
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 03:21:23 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8B5C834B8FE
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 03:32:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E9372BEC4A;
-	Thu, 27 Nov 2025 03:21:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40D13201113;
+	Thu, 27 Nov 2025 03:32:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o5JvYELa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GkRF1lCd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2D5F125A9;
-	Thu, 27 Nov 2025 03:21:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3389225416
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 03:32:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764213681; cv=none; b=WVB3eP+SgV3hrPoEsYG28V2lGiGVDYHgnkwnQhbVV4ywNVaB233K+kg9MV5DkCEHTaoHQ8XdJWvXo2eHsCmPI/zEVSYkApFdxki7RY7Fl1+71R+z6BSTx98XHmW1dkbKf/cNPm1dF3r/jbqLRou3aZPkDg+OChqUnxINI68D+O8=
+	t=1764214322; cv=none; b=qo1yJmxaINouqUbg+ucUmmUiaYemjWx0py9oorL/pfOE1L0yV9DqsiLOQiI0GSOfdhQuxN/AFfilyZIMEHUQeKuMwq1Oj+3f3DOjTb4nGKJ3XPRODQ3y/5D7WeEdsozLqLULF2REHk4sfPOpEpvSpVPmvscCDdf1oiLv0aYNjH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764213681; c=relaxed/simple;
-	bh=P8jxfYSJftEgcsHOR5X5lyo7/LvzrbP9eo130pWUCSo=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=MJT7Yisf2ED1plz79pBscldVEPSDaf+r8x7ylMDNkWPpMi0SDsTEv/ELkq5ufAGxNbk5jP2fdWWscC6Xg2tY1mDYzvU4KFE5I797TVDHxUOkkJjFdppQKgFlKhM8augNWvBUFRpipeKd5Egsnr0Q/0PXUTX51fMLrsee+5IHFpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o5JvYELa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3D8BC4CEF7;
-	Thu, 27 Nov 2025 03:21:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764213680;
-	bh=P8jxfYSJftEgcsHOR5X5lyo7/LvzrbP9eo130pWUCSo=;
-	h=Date:From:To:Cc:Subject:From;
-	b=o5JvYELai7QNJZ+381QC1V2zfSxr4NG0KVrLgR4mrGcloTZ0vtuSUC/I/Dwlm/LTV
-	 G9LeEX1EKqrack8LUpSrQqc37ED3DhRNeAWW3Px+gpuIAh6j0ofUQDPXeGjaykJf9L
-	 G74GHtb4L2cI303IfT8NzZKtK+enfv0Fk7Exht8x76Q6XjyXsp9QSsC8gS4RkV47GW
-	 dvfFv9GraDWRErjicaohl8Ydjyvt6gpF/Hx/P0zBp3xoaDZ9l7MCkIdqIsY1iLPWpl
-	 8OXSQiumw7ZerdhvMrK4mPsBXbV7KH9PNLCNJcFlIEzcPfPXyXQiBSaKlbdc2IjLP4
-	 moavstTSQolgw==
-Date: Thu, 27 Nov 2025 12:21:14 +0900
-From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1764214322; c=relaxed/simple;
+	bh=nT/7FpNKVxlkNX/0BE0ZS0c76peMlAFGMA7mJQm9fYw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fX7xjhnL9Ht9qgYuSw8zRLqQSCO8q9Myi8M7Hl9Pq4esZBiQrpe9wqv2zq3u+ijVxcK2KeBmcn7JAoX8rQzu5phULgvb6qEHBjUiZT/UWBVgko87elbuK1gulom6qFd6b58R0Ykp1BSWMj7Kh/a6oYCvExBrmvVBk2DoSNAECxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GkRF1lCd; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7b75e366866so167052b3a.2
+        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 19:32:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764214320; x=1764819120; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=QUFNUJWqhYYw/xBj2z5KmwgDhZilUoWRmrncYuADH7U=;
+        b=GkRF1lCd85guXJQrAIAVYjg1KtChOIJk+gYuuBEeVa6jyPErt0zTO3/ZKdb9J4zuxW
+         QToJS8Lc1jwBZK6U3sEpUszoo/RcSVA8FiQ3IqaCHbzaJ7uYzQdmaPRPQ1GOERp45wgd
+         od4E7KwsEghz5oAKM5F8BBi7f7AYDgZ0GSMabEWig+934qc7DRl32AC+ZSardcNi/2Qq
+         XFel6OWJ7pivf5BMJoFir1BgK+IEfDmbtDaOSSaQkL1TJ0gVvO0CzXK3Y6IsKYUnxE3k
+         /o0ZbhfrC4bVRG4NE7Ypajmcswajg+2rzeKXo01LQVi3E4SwWpMjxqUm6EpyUS/bRwhK
+         A6AA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764214320; x=1764819120;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QUFNUJWqhYYw/xBj2z5KmwgDhZilUoWRmrncYuADH7U=;
+        b=Cnf9qAeL6WrdHanPF8E5AREVt3QrvSUfS9ZIhre4ope1umEWc9SYUBfG/cvv0g5bHo
+         XkRskMCu/8gHJlhfu9FEPgriykMNUZVISxrd/9zy5j+pZs8vSmUVfw1bKoZl+mNXPg1o
+         K2wIzmOTnkSzBdWM49+kx6gda9GMK7+uekAN9rDNCOfx/uLfF3+lpiJv+11kB0isXGiU
+         NUj79nmnazPGtKEGnuwpPta+GwbwTrgr8JhQJp3RimxHzWKcOFdUkxzOGE88FObNAjJh
+         TzO3tDTm2Nr+3/eaNvvry35VYP9H6lyazZCSxcLjKFP0B6VT2FREXgLLFv+Hyn0lDFqw
+         gREw==
+X-Gm-Message-State: AOJu0Yy9aun+Ry1secfCo/G7J4nnTqBDophBEWw6zdzYDmiNaYF+SR5U
+	Al+X7wjhM+H/KKnF+UmbSMbkfATkPt4xvhTHqlpv2aVDBs8tmQvEpPMy
+X-Gm-Gg: ASbGncs+v6jyV+vram7IaFF3JFzIo0JEIsBmoXJuzmi37SQ7iATHac1fPUXAXz+b25+
+	TgYYxLl+mqZo5Cx5XhbrSBoEXyeDH5LscgXaaw3a6hNNhJC3VG6hVbholXJRWF/qHAQk/4PuXTU
+	nqcbNAhn8ZHo8xS4hyNR6I6cPu034C7chLvZcJuVhNDrtBbZiaBN/RZXYjFSIwuRSjLwrGt9EJd
+	WG12/s8P6tTHHc6D0u2U3RpM4yHiGdcaw5ADpB6kRzGDKA74Y58OK5Mf8LIdothdh48dVFoSYJQ
+	CeB9Ss65HRTzzWxJTq8HtgAVVGHXfQXtZkcmMnXqlWSE05d8YyD7Vd+/9zGbyt+u8Yjttpt/RZ9
+	TNAMR2rhmAQMZZjDqL/ThBPDQy3fQdueyiEuTXBlliX03/8aPDOmyrTjgHM0gXdjEKd4RbFcihm
+	1nps6Qo1q7klqU6IY=
+X-Google-Smtp-Source: AGHT+IHPlo75bfwll7Gp40Mn24GSQvzhAn4nMBC9jRuod5hISEC66YhruUuUAH/dbGo5n4FDiU24Zw==
+X-Received: by 2002:a05:6a20:3ca6:b0:35d:ce99:cc23 with SMTP id adf61e73a8af0-3637e0b49cemr10657154637.49.1764214319671;
+        Wed, 26 Nov 2025 19:31:59 -0800 (PST)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7d15e9c40a2sm80452b3a.32.2025.11.26.19.31.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Nov 2025 19:31:59 -0800 (PST)
+Date: Thu, 27 Nov 2025 03:31:50 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: =?iso-8859-1?Q?Asbj=F8rn_Sloth_T=F8nnesen?= <ast@fiberby.net>
+Cc: netdev@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Cc: oss-drivers@corigine.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	linux-hardening@vger.kernel.org
-Subject: [PATCH v2][next] nfp: tls: Avoid -Wflex-array-member-not-at-end
- warnings
-Message-ID: <aSfDqouLFcA4h8JX@kspp>
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	"Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Yuyang Huang <yuyanghuang@google.com>,
+	Daniel Borkmann <daniel@iogearbox.net>
+Subject: Re: [PATCH net-next] netlink: specs: add big-endian byte-order for
+ u32 IPv4 addresses
+Message-ID: <aSfGJpUFz9A_xFtz@fedora>
+References: <20251125112048.37631-1-liuhangbin@gmail.com>
+ <8564b02f-18f9-4132-ab69-5ee1babeb18c@fiberby.net>
+ <aSaf1D-N5ONmnys8@fedora>
+ <43630b97-4dd4-423a-97e3-ca6aa3b56ad4@fiberby.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <43630b97-4dd4-423a-97e3-ca6aa3b56ad4@fiberby.net>
 
--Wflex-array-member-not-at-end was introduced in GCC-14, and we are
-getting ready to enable it, globally.
+On Wed, Nov 26, 2025 at 01:32:22PM +0000, Asbjørn Sloth Tønnesen wrote:
+> I prefer exact-len over min-len. The current tally is:
+> 
+> $ git grep 'len.*: 16' Documentation/netlink/specs/ | cut -d: -f2- | sed -e 's/^ *//' | sort | uniq -c
+>       7 exact-len: 16
+>       5 len: 16
+>       6 min-len: 16
+> (assuming that only IPv6 has a length of 16)
+> 
+> "len: 16" as used in ovs_flow's ipv6-src and ipv6-dst only works because they
+> are struct members, not attributes.
 
-So, in order to avoid ending up with flexible-array members in the
-middle of other structs, we use the `struct_group_tagged()` helper
-to separate the flexible array from the rest of the members in the
-flexible structure. We then use the newly created tagged `struct
-nfp_crypto_req_add_front_hdr` to replace the type of the objects
-causing trouble in a couple of structures.
 
-We also want to ensure that when new members need to be added to the
-flexible structure, they are always included within the newly created
-tagged struct. For this, we use `static_assert()`. This ensures that the
-memory layout for both the flexible structure and the new tagged struct
-is the same after any changes.
+Talking about the ovs, it's looks like that the struct members are used in
+flow metadata, like in ip_tun_from_nlattr():
 
-Lastly, use container_of() to retrieve a pointer to the flexible
-structure and, through that, access the flexible-array member when
-needed.
+                case OVS_TUNNEL_KEY_ATTR_IPV6_SRC:
+                        SW_FLOW_KEY_PUT(match, tun_key.u.ipv6.src,
+                                        nla_get_in6_addr(a), is_mask);
+                        ipv6 = true;
+                        break;
 
-So, with these changes, fix the following warnings:
+While attributes are used in __ip_tun_to_nlattr():
 
-drivers/net/ethernet/netronome/nfp/nfd3/../crypto/fw.h:58:41: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-drivers/net/ethernet/netronome/nfp/nfd3/../crypto/fw.h:65:41: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+        case AF_INET6:
+                if (!ipv6_addr_any(&output->u.ipv6.src) &&
+                    nla_put_in6_addr(skb, OVS_TUNNEL_KEY_ATTR_IPV6_SRC,
+                                     &output->u.ipv6.src))
+                        return -EMSGSIZE;
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
----
-Changes in v2:
- - Avoid 80+ character lines.
- - Add RB tag.
+So I think we can also convert the ipv6-src/ipv6-dst using exact-len? WDYT?
 
-v1:
- - Link: https://lore.kernel.org/linux-hardening/aR5_a1tD9KKp363I@kspp/
-
- .../net/ethernet/netronome/nfp/crypto/fw.h    | 24 ++++++++++++-------
- .../net/ethernet/netronome/nfp/crypto/tls.c   |  8 +++++--
- 2 files changed, 21 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/net/ethernet/netronome/nfp/crypto/fw.h b/drivers/net/ethernet/netronome/nfp/crypto/fw.h
-index dcb67c2b5e5e..1e869599febb 100644
---- a/drivers/net/ethernet/netronome/nfp/crypto/fw.h
-+++ b/drivers/net/ethernet/netronome/nfp/crypto/fw.h
-@@ -32,16 +32,22 @@ struct nfp_crypto_req_reset {
- #define NFP_NET_TLS_VLAN_UNUSED			4095
- 
- struct nfp_crypto_req_add_front {
--	struct nfp_ccm_hdr hdr;
--	__be32 ep_id;
--	u8 resv[3];
--	u8 opcode;
--	u8 key_len;
--	__be16 ipver_vlan __packed;
--	u8 l4_proto;
-+	/* New members MUST be added within the struct_group() macro below. */
-+	struct_group_tagged(nfp_crypto_req_add_front_hdr, __hdr,
-+		struct nfp_ccm_hdr hdr;
-+		__be32 ep_id;
-+		u8 resv[3];
-+		u8 opcode;
-+		u8 key_len;
-+		__be16 ipver_vlan __packed;
-+		u8 l4_proto;
-+	);
- #define NFP_NET_TLS_NON_ADDR_KEY_LEN	8
- 	u8 l3_addrs[];
- };
-+static_assert(offsetof(struct nfp_crypto_req_add_front, l3_addrs) ==
-+	      sizeof(struct nfp_crypto_req_add_front_hdr),
-+	      "struct member likely outside of struct_group_tagged()");
- 
- struct nfp_crypto_req_add_back {
- 	__be16 src_port;
-@@ -55,14 +61,14 @@ struct nfp_crypto_req_add_back {
- };
- 
- struct nfp_crypto_req_add_v4 {
--	struct nfp_crypto_req_add_front front;
-+	struct nfp_crypto_req_add_front_hdr front;
- 	__be32 src_ip;
- 	__be32 dst_ip;
- 	struct nfp_crypto_req_add_back back;
- };
- 
- struct nfp_crypto_req_add_v6 {
--	struct nfp_crypto_req_add_front front;
-+	struct nfp_crypto_req_add_front_hdr front;
- 	__be32 src_ip[4];
- 	__be32 dst_ip[4];
- 	struct nfp_crypto_req_add_back back;
-diff --git a/drivers/net/ethernet/netronome/nfp/crypto/tls.c b/drivers/net/ethernet/netronome/nfp/crypto/tls.c
-index f252ecdcd2cd..9983d7aa2b9c 100644
---- a/drivers/net/ethernet/netronome/nfp/crypto/tls.c
-+++ b/drivers/net/ethernet/netronome/nfp/crypto/tls.c
-@@ -180,7 +180,9 @@ nfp_net_tls_set_ipv4(struct nfp_net *nn, struct nfp_crypto_req_add_v4 *req,
- 	req->front.key_len += sizeof(__be32) * 2;
- 
- 	if (direction == TLS_OFFLOAD_CTX_DIR_TX) {
--		nfp_net_tls_assign_conn_id(nn, &req->front);
-+		nfp_net_tls_assign_conn_id(nn,
-+			container_of(&req->front,
-+				     struct nfp_crypto_req_add_front, __hdr));
- 	} else {
- 		req->src_ip = inet->inet_daddr;
- 		req->dst_ip = inet->inet_saddr;
-@@ -199,7 +201,9 @@ nfp_net_tls_set_ipv6(struct nfp_net *nn, struct nfp_crypto_req_add_v6 *req,
- 	req->front.key_len += sizeof(struct in6_addr) * 2;
- 
- 	if (direction == TLS_OFFLOAD_CTX_DIR_TX) {
--		nfp_net_tls_assign_conn_id(nn, &req->front);
-+		nfp_net_tls_assign_conn_id(nn,
-+			container_of(&req->front,
-+				     struct nfp_crypto_req_add_front, __hdr));
- 	} else {
- 		memcpy(req->src_ip, &sk->sk_v6_daddr, sizeof(req->src_ip));
- 		memcpy(req->dst_ip, &np->saddr, sizeof(req->dst_ip));
--- 
-2.43.0
-
+Thanks
+Hangbin
 
