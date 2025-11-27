@@ -1,155 +1,208 @@
-Return-Path: <netdev+bounces-242109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242110-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E0AEC8C672
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 01:08:01 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51AFEC8C693
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 01:13:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5A103AEFAC
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 00:07:59 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9B70B34DD31
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 00:13:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9967F20311;
-	Thu, 27 Nov 2025 00:07:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 710A578F2B;
+	Thu, 27 Nov 2025 00:13:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LW00lKRJ"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="H8jWnAO6";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="HT683tKC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-b6-smtp.messagingengine.com (fout-b6-smtp.messagingengine.com [202.12.124.149])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F788944F
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 00:07:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C08CD3FBA7;
+	Thu, 27 Nov 2025 00:13:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764202077; cv=none; b=pGv8SMI+Iph4cjMTdUPnblKTc/LcWFpU1bFdyiXwwF5xUf3w0nkSglTOMn0EhfFC7g0XCmhHrLBSSMZVIM7RRFECOxHp23pEPC4bh9PbIZXghIsV2wlBbWfBIsK/VUlVqPWgNSU+Q2je0LHqBG4zYqfiw4fFux3mNL2qW6jei4o=
+	t=1764202425; cv=none; b=mVbTKRpv2j4lMfBnxP8I3deti1AhSUWwz/ro4uKxNGGx+A8F1w5Uvt0iW94zwMD+abnnzO8P4e8l9POfzqOZgGNu6sXeu6hZ5QAAV/qCeabXmKD1oEMeKpOxyIAMgGUXnDu7zDip4wEw2m+budsbzGnXwpUbKvHdpMNJ82TnFVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764202077; c=relaxed/simple;
-	bh=PVwqPtohHLQR8u+q6aeUNdyYbu/y4oRVcTilsjce+Ko=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=AgcxMA+c5GPSNSvWTN1OXNDIR6KM+q9mUhrNU5xErpgv/CkqQ4bBZ6wkSbKSZyt6wjUXddPGVbjU5LRBQpXR70R+m4C4RFyqsOWRoQCOq6lKLh4MpyaW16hos2YVkvDhBafF85BhYhBs4RG6xBAJFUVFZtMilVy1lvJ37Mroyd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LW00lKRJ; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7ae3e3e0d06so177310b3a.0
-        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 16:07:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764202075; x=1764806875; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=dnKcf2+51kURgvBReSH5vkNuGQRyYKTVBdC22OlhFiE=;
-        b=LW00lKRJCOD6broJZk7Pq8M2gSC4MrqhNlwmhzdH8V58SKBkpdSGZjmirZnoiui0tA
-         m39d20pL1k0QwPXD8mdAZpKLiZC4tU2EYy0M8nidcJGMSVLT1Ft2cpgokAlLZnQZNLN1
-         9WHKobmlfKz73kZyDrCVhC0ZlreDJdRtYeNpfLvxymPNdyPY22iu2bA1eJR85f6ce2V9
-         6l2Za59AuQOtKv2Nl7q8cA/Vm7E3RQME6cQaAUDpFRSZjtMpFKp3/y09jMp9b1YALqe1
-         qCguFzSnx/E43O7eXppws+5ImOFl8kLiPv1on5WJDq33pccHSy5KHmpEXzefVwVfQMsW
-         zh0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764202075; x=1764806875;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dnKcf2+51kURgvBReSH5vkNuGQRyYKTVBdC22OlhFiE=;
-        b=J/MOLV+u8C9knw9nlNyaomwCSRIl0GX9t2VkmuQl2udwNQLoSrzqp4HJ7y9LLPystI
-         Zuel72T7wwzeD/Di2EZ03+8jR/ikcoEhx6ouAo/1YB8xTHuA44trDeIa44bI3YSIS0SF
-         zzfYg0sTtv6Xz+dduO8w/m+3cazwuwsY3JDkqrnax1WHvVXhMHMBnyrcDqrjzIcIOPDo
-         hpvSiNRjKnjcHuR2mgoe5qWNXc7Y/YZfbR/ZyBfAqVpmU1EjzOTY9URWNo6zMHAgtT4I
-         YwImRaAWOPdxDLG879MLb5JdVWO4oqvqYrw9+dFoO11dB8unk7id13ykPqbWL3qxobGg
-         RYBQ==
-X-Gm-Message-State: AOJu0Ywrf6xC2GysuY3WRTy6F3I947n4nVMXPUHZ8FlpzhMfyqEXcxS4
-	Tx7eD1ZD+ubfZxa57o4htB3iRfkdwPiJXfbY8Zuq4wloAdzjUGybfXuyM0SicDFU+tEJu1c4N/R
-	cnWAc2IARzvCJ8lq/xhbHzpq11QPyTiD/SsSwuSS+YHHcdAQ/1o0lpSLFUnnDg4XiwgX6OQyuyF
-	xY/hYmvUBQ4oNZL425DGtH52NHHmwfgAOtf9SkeHEDuUnP5XeLNrg0+Hrs7Rr3iNo=
-X-Google-Smtp-Source: AGHT+IGnhmhMCtW2cqlbfM3z72gA3XlXtWRfaLc1b3OcMPSW0COKY++7leT3iMEM1SYLmLlnoSD7fB5Ar+eIczA8Pg==
-X-Received: from pfbfx22.prod.google.com ([2002:a05:6a00:8216:b0:7cf:2dad:ff8d])
- (user=hramamurthy job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:9508:b0:7aa:93d5:820f with SMTP id d2e1a72fcca58-7c58e9f97bcmr22294145b3a.30.1764202075226;
- Wed, 26 Nov 2025 16:07:55 -0800 (PST)
-Date: Thu, 27 Nov 2025 00:07:51 +0000
+	s=arc-20240116; t=1764202425; c=relaxed/simple;
+	bh=GUOcb88AY8JEoO4WchKej0jtVcO4dD47lu0oAZqHQ7E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IYBOci+BZ2ngclNMgjbGGVsWCp8l8UKoeYkGvJr2Qv+4U5hMToi1O8tqj4z/dOyjxx+Mp7E84SnNKXzEB50lvB5Uoa3AAAdw/VRKlXhCnXsdrzTJ/TVNJ+LhT1T5dVvhpOOSjhmjUnSRlfAlwwFIys2WqK3JA2M9/JWl/3qKZ2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=H8jWnAO6; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=HT683tKC; arc=none smtp.client-ip=202.12.124.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfout.stl.internal (Postfix) with ESMTP id BDB481D0013F;
+	Wed, 26 Nov 2025 19:13:40 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-01.internal (MEProxy); Wed, 26 Nov 2025 19:13:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1764202420; x=
+	1764288820; bh=/OCQpu8LbBoJ3Ap4le197jNM1y1bW7w3PIGHBYpNjBU=; b=H
+	8jWnAO6xmBRJhdeksZBLvgN4Nj39fzI53NQoUJiA0hU2YhH/jSCZ2S+qgCrBPxUu
+	gNaOWc/3IcgwwniAc7vxQUcS/WoocaUTDUKOzRBccC1jhBTm7imA4tN0OlRauyaN
+	TJ74jsIwYDM/PhU2ZyavZmCPhaaVeVd6NNUuBrZJxE4Q/hr8MtljW2ivYTsC7B+m
+	R+TsVJf8EUIYKtXIz/2vBnZFy5pa4IDh8kfitd1BhlMHfCJ1lav1YyBX1cR9EEmQ
+	ReuOSXpfRhFbME/71RF3q4JxmNzjY/i1f1UqUZdtN5JRXduxtSeRxaDrmkNR1xkv
+	julKoEhq/tpVGt/a8lk0g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1764202420; x=1764288820; bh=/OCQpu8LbBoJ3Ap4le197jNM1y1bW7w3PIG
+	HBYpNjBU=; b=HT683tKC+qzI5CNXMkfRV/cX8ArWrI8RKbCV6llNfhJS2TTxGzX
+	Li3cUSOiiTqOmt+lVX6IhDMEMY9kBryhihAsfGoyS9CpnfkCNydxVAFXtKmAyGyM
+	T1xb4cJc32phKNgoT1QW7XznN3/QCXBTQJYHsGYXYk4pk5+001Cds+w2ADfCFzVo
+	6Nl1DKDhRFs3N75D86IdRB2PmFcQCsgLaMK4ylj4gSCuYwVW1DF0I1zeCEublwGp
+	QCVKCE+dCDdr3Arxf+TUixnE63m5up+PSn359JlY4Xf0a4nhvQK6HPocSu/VIa0w
+	PT7YXTJI6ZkwS5EnezTOeiIgYAqqT3DmXLQ==
+X-ME-Sender: <xms:tJcnad5WsUXAF8UGNCMe-KpZYJa0lkUufdmlrSG_38mdbtjAxZ34Cg>
+    <xme:tJcnaUPgIn31hEeKv6qqLu2w8q6cAAo3cYuP8fpP7477g9Zz8A3ZyW62Bi9aFrB_T
+    s2hPSXVzbOfc_iiGIEvzQLjlqjvoYqFhEP5fliePCYGO-Rf1CBHeRJV>
+X-ME-Received: <xmr:tJcnabt9j9tCfQoYUPQ9LKzpGxBLPDOhQvHD79Wmnu0R2TxPqQX7MhYW_Z8Z>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvgeehjeehucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeeipdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopegrnhhtohhnihhosehophgvnhhvphhnrdhnvg
+    htpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghp
+    thhtoheprhgrlhhfsehmrghnuggvlhgsihhtrdgtohhmpdhrtghpthhtohepkhhusggrse
+    hkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkshgvlhhfthgvshhtsehv
+    ghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrd
+    horhhg
+X-ME-Proxy: <xmx:tJcnaXapogjotsW6QGv_4Tv55SYqXwZYmxKo3zVLADrKCskz3KGGuA>
+    <xmx:tJcnadyhUmwbLHnLMvcWYo7kHJHKsg9q78CinzUcdDOuwtJCKYJCsw>
+    <xmx:tJcnafiWOFp8roMeBHmt9qDFvUOYuIWBLBk9JZvw0GLyzoB2lWIvLA>
+    <xmx:tJcnaZnznmnLEbFTKPler4-30W_CfUteHENWXEqRn8mLQZgpmedfcw>
+    <xmx:tJcnacxoEVF3QVRrH3snoSwB3b9gVvoab6KZGjnH30TjR8ES1Ty1UENi>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 26 Nov 2025 19:13:39 -0500 (EST)
+Date: Thu, 27 Nov 2025 01:13:37 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Ralf Lici <ralf@mandelbit.com>,
+	Jakub Kicinski <kuba@kernel.org>, linux-kselftest@vger.kernel.org,
+	Shuah Khan <shuah@kernel.org>
+Subject: Re: [RFC net-next 07/13] selftests: ovpn: check asymmetric peer-id
+Message-ID: <aSeXsX7dwx1YI8Ea@krikkit>
+References: <20251121002044.16071-1-antonio@openvpn.net>
+ <20251121002044.16071-8-antonio@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.52.0.487.g5c8c507ade-goog
-Message-ID: <20251127000751.662959-1-hramamurthy@google.com>
-Subject: [PATCH net-next] gve: Fix race condition on tx->dropped_pkt update
-From: Harshitha Ramamurthy <hramamurthy@google.com>
-To: netdev@vger.kernel.org
-Cc: joshwash@google.com, hramamurthy@google.com, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	willemb@google.com, pkaligineedi@google.com, linux-kernel@vger.kernel.org, 
-	Max Yuan <maxyuan@google.com>, Jordan Rhee <jordanrhee@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20251121002044.16071-8-antonio@openvpn.net>
 
-From: Max Yuan <maxyuan@google.com>
+2025-11-21, 01:20:38 +0100, Antonio Quartulli wrote:
+> diff --git a/tools/testing/selftests/net/ovpn/common.sh b/tools/testing/selftests/net/ovpn/common.sh
+> index b91cf17ab01f..d926413c9f16 100644
+> --- a/tools/testing/selftests/net/ovpn/common.sh
+> +++ b/tools/testing/selftests/net/ovpn/common.sh
+> @@ -75,13 +75,14 @@ add_peer() {
+>  					data64.key
+>  			done
+>  		else
+> -			RADDR=$(awk "NR == ${1} {print \$2}" ${UDP_PEERS_FILE})
+> -			RPORT=$(awk "NR == ${1} {print \$3}" ${UDP_PEERS_FILE})
+> -			LPORT=$(awk "NR == ${1} {print \$5}" ${UDP_PEERS_FILE})
+> -			ip netns exec peer${1} ${OVPN_CLI} new_peer tun${1} ${1} ${LPORT} \
+> -				${RADDR} ${RPORT}
+> -			ip netns exec peer${1} ${OVPN_CLI} new_key tun${1} ${1} 1 0 ${ALG} 1 \
+> -				data64.key
+> +			TX_ID=$(awk "NR == ${1} {print \$2}" ${UDP_PEERS_FILE})
+> +			RADDR=$(awk "NR == ${1} {print \$3}" ${UDP_PEERS_FILE})
+> +			RPORT=$(awk "NR == ${1} {print \$4}" ${UDP_PEERS_FILE})
+> +			LPORT=$(awk "NR == ${1} {print \$6}" ${UDP_PEERS_FILE})
+> +			ip netns exec peer${1} ${OVPN_CLI} new_peer tun${1} ${TX_ID} ${1} \
+> +				${LPORT} ${RADDR} ${RPORT}
+> +			ip netns exec peer${1} ${OVPN_CLI} new_key tun${1} ${TX_ID} 1 0 \
+> +				${ALG} 1 data64.key
 
-The tx->dropped_pkt counter is a 64-bit integer that is incremented
-directly. On 32-bit architectures, this operation is not atomic and
-can lead to read/write tearing if a reader accesses the counter during
-the update. This can result in incorrect values being reported for
-dropped packets.
+IIUC, we're creating a "client" with peer_id=$TX_ID and tx_id=$ID so
+that they're flipped from what we installed on the multi-peer side?
 
-To prevent this potential data corruption, wrap the increment
-operation with u64_stats_update_begin() and u64_stats_update_end().
-This ensures that updates to the 64-bit counter are atomic, even on
-32-bit systems, by using a sequence lock.
 
-The u64_stats_sync API requires the writer to have exclusive access,
-which is already provided in this context by the network stack's
-serialization of the transmit path (net_device_ops::ndo_start_xmit
-[1]) for a given queue.
+> diff --git a/tools/testing/selftests/net/ovpn/ovpn-cli.c b/tools/testing/selftests/net/ovpn/ovpn-cli.c
+> index 064453d16fdd..baabb4c9120e 100644
+> --- a/tools/testing/selftests/net/ovpn/ovpn-cli.c
+> +++ b/tools/testing/selftests/net/ovpn/ovpn-cli.c
+> @@ -103,7 +103,7 @@ struct ovpn_ctx {
+>  
+>  	sa_family_t sa_family;
+>  
+> -	unsigned long peer_id;
+> +	unsigned long peer_id, tx_id;
+>  	unsigned long lport;
+>  
+>  	union {
+> @@ -649,6 +649,7 @@ static int ovpn_new_peer(struct ovpn_ctx *ovpn, bool is_tcp)
+>  
+>  	attr = nla_nest_start(ctx->nl_msg, OVPN_A_PEER);
+>  	NLA_PUT_U32(ctx->nl_msg, OVPN_A_PEER_ID, ovpn->peer_id);
+> +	NLA_PUT_U32(ctx->nl_msg, OVPN_A_PEER_TX_ID, ovpn->tx_id);
 
-[1]: https://www.kernel.org/doc/Documentation/networking/netdevices.txt
+So, with these changes, it's no longer possible to test a userspace
+not passing the new OVPN_A_PEER_TX_ID attribute? But I guess we could
+simulate that behavior by passing TX_ID==ID (is there still a test
+doing that?).
 
-Signed-off-by: Max Yuan <maxyuan@google.com>
-Reviewed-by: Jordan Rhee <jordanrhee@google.com>
-Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
----
- drivers/net/ethernet/google/gve/gve_tx.c     | 2 ++
- drivers/net/ethernet/google/gve/gve_tx_dqo.c | 6 ++++++
- 2 files changed, 8 insertions(+)
+Do we need to preserve some testing of the case where userspace is not
+passing the new attribute?
 
-diff --git a/drivers/net/ethernet/google/gve/gve_tx.c b/drivers/net/ethernet/google/gve/gve_tx.c
-index c6ff0968929d..97efc8d27e6f 100644
---- a/drivers/net/ethernet/google/gve/gve_tx.c
-+++ b/drivers/net/ethernet/google/gve/gve_tx.c
-@@ -730,7 +730,9 @@ static int gve_tx_add_skb_no_copy(struct gve_priv *priv, struct gve_tx_ring *tx,
- 		gve_tx_unmap_buf(tx->dev, &tx->info[idx & tx->mask]);
- 	}
- drop:
-+	u64_stats_update_begin(&tx->statss);
- 	tx->dropped_pkt++;
-+	u64_stats_update_end(&tx->statss);
- 	return 0;
- }
- 
-diff --git a/drivers/net/ethernet/google/gve/gve_tx_dqo.c b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-index 6f1d515673d2..40b89b3e5a31 100644
---- a/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-+++ b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-@@ -1002,7 +1002,9 @@ static int gve_try_tx_skb(struct gve_priv *priv, struct gve_tx_ring *tx,
- 	return 0;
- 
- drop:
-+	u64_stats_update_begin(&tx->statss);
- 	tx->dropped_pkt++;
-+	u64_stats_update_end(&tx->statss);
- 	dev_kfree_skb_any(skb);
- 	return 0;
- }
-@@ -1324,7 +1326,11 @@ static void remove_miss_completions(struct gve_priv *priv,
- 		/* This indicates the packet was dropped. */
- 		dev_kfree_skb_any(pending_packet->skb);
- 		pending_packet->skb = NULL;
-+
-+		u64_stats_update_begin(&tx->statss);
- 		tx->dropped_pkt++;
-+		u64_stats_update_end(&tx->statss);
-+
- 		net_err_ratelimited("%s: No reinjection completion was received for: %d.\n",
- 				    priv->dev->name,
- 				    (int)(pending_packet - tx->dqo.pending_packets));
+
+>  	NLA_PUT_U32(ctx->nl_msg, OVPN_A_PEER_SOCKET, ovpn->socket);
+>  
+>  	if (!is_tcp) {
+> @@ -767,6 +768,10 @@ static int ovpn_handle_peer(struct nl_msg *msg, void (*arg)__always_unused)
+>  		fprintf(stderr, "* Peer %u\n",
+>  			nla_get_u32(pattrs[OVPN_A_PEER_ID]));
+>  
+> +	if (pattrs[OVPN_A_PEER_TX_ID])
+> +		fprintf(stderr, "\tTX peer ID %u\n",
+> +			nla_get_u32(pattrs[OVPN_A_PEER_TX_ID]));
+> +
+>  	if (pattrs[OVPN_A_PEER_SOCKET_NETNSID])
+>  		fprintf(stderr, "\tsocket NetNS ID: %d\n",
+>  			nla_get_s32(pattrs[OVPN_A_PEER_SOCKET_NETNSID]));
+> @@ -1676,11 +1681,13 @@ static void usage(const char *cmd)
+>  		"\tkey_file: file containing the symmetric key for encryption\n");
+>  
+>  	fprintf(stderr,
+> -		"* new_peer <iface> <peer_id> <lport> <raddr> <rport> [vpnaddr]: add new peer\n");
+> +		"* new_peer <iface> <peer_id> <tx_id> <lport> <raddr> <rport> [vpnaddr]: add new peer\n");
+>  	fprintf(stderr, "\tiface: ovpn interface name\n");
+>  	fprintf(stderr, "\tlport: local UDP port to bind to\n");
+>  	fprintf(stderr,
+> -		"\tpeer_id: peer ID to be used in data packets to/from this peer\n");
+> +		"\tpeer_id: peer ID found in data packets received from this peer\n");
+> +	fprintf(stderr,
+> +		"\ttx_id: peer ID to be used when sending to this peer\n");
+>  	fprintf(stderr, "\traddr: peer IP address\n");
+>  	fprintf(stderr, "\trport: peer UDP port\n");
+>  	fprintf(stderr, "\tvpnaddr: peer VPN IP\n");
+> @@ -1691,7 +1698,7 @@ static void usage(const char *cmd)
+>  	fprintf(stderr, "\tlport: local UDP port to bind to\n");
+>  	fprintf(stderr,
+>  		"\tpeers_file: text file containing one peer per line. Line format:\n");
+> -	fprintf(stderr, "\t\t<peer_id> <raddr> <rport> <vpnaddr>\n");
+> +	fprintf(stderr, "\t\t<peer_id> <tx_id> <raddr> <rport> <laddr> <lport> <vpnaddr>\n");
+
+Looks like this is missing similar updates for connect and listen,
+based on changes to ovpn_run_cmd and ovpn_parse_cmd_args?
+
 -- 
-2.52.0.487.g5c8c507ade-goog
-
+Sabrina
 
