@@ -1,59 +1,58 @@
-Return-Path: <netdev+bounces-242247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BEA8C8E158
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 12:45:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B563C8E161
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 12:45:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2654134FA5F
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 11:45:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D8543AA4B4
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 11:45:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB40832C95F;
-	Thu, 27 Nov 2025 11:45:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5F1932AACC;
+	Thu, 27 Nov 2025 11:45:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QHp8Wbcu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bOPbEcRE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7B8932D0DF
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 11:45:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1D212FBE03
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 11:45:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764243902; cv=none; b=LOaorkGEfkOoghV3/GlVF4XWKAz/gwcCNOYIZEL+25Djv5JyMbTnrD6rUAov4krZ7/CIelTvtThkuH04/fQl/Agt1QZOYfhE76t8dCnsVSN+fWQf3phSMCdraFCb0maPtLzrFtLfBMz3T10BEnvhVz3m0YCgMlBzxNSE5C/5Svg=
+	t=1764243921; cv=none; b=huJWm4metD4dkThgNLDc2ixX3k7q0cODRUke2FPLJuaCeaKD+r35EuPvOZitWSlN0/GuZH1i9zsZr46YixeG3s9Znv9hh4QdY66QaHHUVmgjhX3RrSCKJg72UlMBp88mXEGsj2Rnv5AsQBlkYAMtxARy/N3w5fZ3WE0JTE1pF28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764243902; c=relaxed/simple;
-	bh=bhEiLZJrUMZE5RAfsENKBxd0m7eM54hwM9QpdUvUm44=;
+	s=arc-20240116; t=1764243921; c=relaxed/simple;
+	bh=4N8aVeG3r57xJFID0/PYHsDmVbIx5RzBSTf7W1TTCIg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UWduPJyFMW5LRiAub4y9xllS7I5SXdbJhRMDwctRfpT4I0td2sMns8aJzmYAkaq7DHE/9HphwctSkFwd+K5o6zZhgKUCh0jxZtHdf9dElns5uj7RNiELNrk4Zre8O4NL9dwpynucHVd9U120YN5n+uC0pT+n5U1Sie1zMiOY9xQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QHp8Wbcu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E18DBC4CEF8;
-	Thu, 27 Nov 2025 11:45:00 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=gOxAuULWknZN0PmyTBgGsfKDfQv90C7YDKDNOxaqS0HFiioiSx/STkdbPBZApCeXJQxu9IIdC/8WbQ/sbqTMXAHw7pPm8MMvGlE/9Hp1JkZigsS6CizrJy6vCg6X9Kyzk3j1SjlTz0dm5LLFTAASys2NZOt7iXpkWsdic1cAO64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bOPbEcRE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03090C4CEF8;
+	Thu, 27 Nov 2025 11:45:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764243902;
-	bh=bhEiLZJrUMZE5RAfsENKBxd0m7eM54hwM9QpdUvUm44=;
+	s=k20201202; t=1764243921;
+	bh=4N8aVeG3r57xJFID0/PYHsDmVbIx5RzBSTf7W1TTCIg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QHp8WbcuOlkfl9aApJ2sX4htFuk9y4kYsjirnlH9RFfdwzGWCW5H+yTllSh1QQZAM
-	 q+CJz8eiHUg09XWsp3N1R+iO+FemrSz9Azi3hPVHzsbNRTSZ2WWf/kX4vpfR0LYUpi
-	 ZE3I4NtTABE98WcpfcMVwOe1wO/b3GflE9FY7y+Z4IGyPwCel29aX/7Sqj43+/ZZXa
-	 R/NVh144ENx0Jgc+UcrAtWEsmHQu7YbqWx+0jd1eERRD4qB6Kd+10LS14JFGJClfql
-	 RA62517drMCuRjOZqtRw+OHcUEeb+6SDJngBKajgmV4fAhtakpcLoxGIClo9pl2Mcb
-	 OHl4PjlJUxAXQ==
-Date: Thu, 27 Nov 2025 11:44:58 +0000
+	b=bOPbEcREP3YuG7SxiKodW5WZlTPecxukASxDGGJ0NiJyIn8zD943JUJ3g23XPF+WA
+	 EOzRZIlz2/MXGZytK3x9a3T/Zc4t5M2lEsiy7U5+gzJ/Fp+emW3Gq/Fu58h6pYeKgH
+	 PKiNDw9xtZArenxemSOniO4HFFrDNeOr6CBOcvEXjfyeXsEmgblsxXBPfieOcUXWJ4
+	 IedvA9QpqRRpq3gYDYh5iV8NPDywHsdtgWclupnxN+FekY6/4UD8RMjJQu1Kf6VW++
+	 TcR4reF7yjQi2BAXeSk6JtK4zlLwpL2FQQ+PTG5G6Pl5WHM178uDXGEHe8hyHZLFvS
+	 z3yhXYt19VHMA==
+Date: Thu, 27 Nov 2025 11:45:17 +0000
 From: Simon Horman <horms@kernel.org>
 To: Sreedevi Joshi <sreedevi.joshi@intel.com>
 Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Emil Tantilov <emil.s.tantilov@intel.com>,
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Paul Menzel <pmenzel@molgen.mpg.de>
-Subject: Re: [PATCH iwl-net v2 1/3] idpf: Fix RSS LUT NULL pointer crash on
- early ethtool operations
-Message-ID: <aSg5uiOiAyRds6gM@horms.kernel.org>
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Emil Tantilov <emil.s.tantilov@intel.com>
+Subject: Re: [PATCH iwl-net v2 3/3] idpf: Fix RSS LUT NULL ptr issue after
+ soft reset
+Message-ID: <aSg5zR-6ZYXBuIVd@horms.kernel.org>
 References: <20251124184750.3625097-1-sreedevi.joshi@intel.com>
- <20251124184750.3625097-2-sreedevi.joshi@intel.com>
+ <20251124184750.3625097-4-sreedevi.joshi@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,61 +61,64 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251124184750.3625097-2-sreedevi.joshi@intel.com>
+In-Reply-To: <20251124184750.3625097-4-sreedevi.joshi@intel.com>
 
-On Mon, Nov 24, 2025 at 12:47:48PM -0600, Sreedevi Joshi wrote:
-> The RSS LUT is not initialized until the interface comes up, causing
-> the following NULL pointer crash when ethtool operations like rxhash on/off
-> are performed before the interface is brought up for the first time.
+On Mon, Nov 24, 2025 at 12:47:50PM -0600, Sreedevi Joshi wrote:
+> During soft reset, the RSS LUT is freed and not restored unless the
+> interface is up. If an ethtool command that accesses the rss lut is
+> attempted immediately after reset, it will result in NULL ptr
+> dereference. Also, there is no need to reset the rss lut if the soft reset
+> does not involve queue count change.
 > 
-> Move RSS LUT initialization from ndo_open to vport creation to ensure LUT
-> is always available. This enables RSS configuration via ethtool before
-> bringing the interface up. Simplify LUT management by maintaining all
-> changes in the driver's soft copy and programming zeros to the indirection
-> table when rxhash is disabled. Defer HW programming until the interface
-> comes up if it is down during rxhash and LUT configuration changes.
+> After soft reset, set the RSS LUT to default values based on the updated
+> queue count only if the reset was a result of a queue count change and
+> the LUT was not configured by the user. In all other cases, don't touch
+> the LUT.
 > 
 > Steps to reproduce:
-> ** Load idpf driver; interfaces will be created
-> 	modprobe idpf
-> ** Before bringing the interfaces up, turn rxhash off
-> 	ethtool -K eth2 rxhash off
 > 
-> [89408.371875] BUG: kernel NULL pointer dereference, address: 0000000000000000
-> [89408.371908] #PF: supervisor read access in kernel mode
-> [89408.371924] #PF: error_code(0x0000) - not-present page
-> [89408.371940] PGD 0 P4D 0
-> [89408.371953] Oops: Oops: 0000 [#1] SMP NOPTI
+> ** Bring the interface down (if up)
+> ifconfig eth1 down
+> 
+> ** update the queue count (eg., 27->20)
+> ethtool -L eth1 combined 20
+> 
+> ** display the RSS LUT
+> ethtool -x eth1
+> 
+> [82375.558338] BUG: kernel NULL pointer dereference, address: 0000000000000000
+> [82375.558373] #PF: supervisor read access in kernel mode
+> [82375.558391] #PF: error_code(0x0000) - not-present page
+> [82375.558408] PGD 0 P4D 0
+> [82375.558421] Oops: Oops: 0000 [#1] SMP NOPTI
 > <snip>
-> [89408.372052] RIP: 0010:memcpy_orig+0x16/0x130
-> [89408.372310] Call Trace:
-> [89408.372317]  <TASK>
-> [89408.372326]  ? idpf_set_features+0xfc/0x180 [idpf]
-> [89408.372363]  __netdev_update_features+0x295/0xde0
-> [89408.372384]  ethnl_set_features+0x15e/0x460
-> [89408.372406]  genl_family_rcv_msg_doit+0x11f/0x180
-> [89408.372429]  genl_rcv_msg+0x1ad/0x2b0
-> [89408.372446]  ? __pfx_ethnl_set_features+0x10/0x10
-> [89408.372465]  ? __pfx_genl_rcv_msg+0x10/0x10
-> [89408.372482]  netlink_rcv_skb+0x58/0x100
-> [89408.372502]  genl_rcv+0x2c/0x50
-> [89408.372516]  netlink_unicast+0x289/0x3e0
-> [89408.372533]  netlink_sendmsg+0x215/0x440
-> [89408.372551]  __sys_sendto+0x234/0x240
-> [89408.372571]  __x64_sys_sendto+0x28/0x30
-> [89408.372585]  x64_sys_call+0x1909/0x1da0
-> [89408.372604]  do_syscall_64+0x7a/0xfa0
-> [89408.373140]  ? clear_bhb_loop+0x60/0xb0
-> [89408.373647]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> [89408.378887]  </TASK>
+> [82375.558516] RIP: 0010:idpf_get_rxfh+0x108/0x150 [idpf]
+> [82375.558786] Call Trace:
+> [82375.558793]  <TASK>
+> [82375.558804]  rss_prepare.isra.0+0x187/0x2a0
+> [82375.558827]  rss_prepare_data+0x3a/0x50
+> [82375.558845]  ethnl_default_doit+0x13d/0x3e0
+> [82375.558863]  genl_family_rcv_msg_doit+0x11f/0x180
+> [82375.558886]  genl_rcv_msg+0x1ad/0x2b0
+> [82375.558902]  ? __pfx_ethnl_default_doit+0x10/0x10
+> [82375.558920]  ? __pfx_genl_rcv_msg+0x10/0x10
+> [82375.558937]  netlink_rcv_skb+0x58/0x100
+> [82375.558957]  genl_rcv+0x2c/0x50
+> [82375.558971]  netlink_unicast+0x289/0x3e0
+> [82375.558988]  netlink_sendmsg+0x215/0x440
+> [82375.559005]  __sys_sendto+0x234/0x240
+> [82375.559555]  __x64_sys_sendto+0x28/0x30
+> [82375.560068]  x64_sys_call+0x1909/0x1da0
+> [82375.560576]  do_syscall_64+0x7a/0xfa0
+> [82375.561076]  ? clear_bhb_loop+0x60/0xb0
+> [82375.561567]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
 > <snip>
 > 
-> Fixes: a251eee62133 ("idpf: add SRIOV support and other ndo_ops")
+> Fixes: 02cbfba1add5 ("idpf: add ethtool callbacks")
 > Signed-off-by: Sreedevi Joshi <sreedevi.joshi@intel.com>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 > Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
 > Reviewed-by: Emil Tantilov <emil.s.tantilov@intel.com>
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 
