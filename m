@@ -1,289 +1,281 @@
-Return-Path: <netdev+bounces-242418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88436C90473
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 23:14:45 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id B04A1C9049B
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 23:22:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E84344E403F
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 22:14:43 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 388563505AA
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 22:22:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE66631B800;
-	Thu, 27 Nov 2025 22:14:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9354E3128C9;
+	Thu, 27 Nov 2025 22:22:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mxXJsiNx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kp5JguR/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A83E2312800
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 22:14:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 625C5311C3C;
+	Thu, 27 Nov 2025 22:21:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764281680; cv=none; b=D6TpqoNwT3++Ht0krUmqmg7vSYt4u6x0VPKRrxyJjcYXL4MpZcjSq/OEz55kD5VezNcKKoNUOC+tjKRTaKBpnxa5QayBqphBID2PCdQKdCDXJq0586Jw3z92/dQ5HPaxzAteafLz4O3Mi2/r7zeJ+7GlTx6yZhOORqENfzU1rx4=
+	t=1764282121; cv=none; b=fdF7THdAAd/MnrpGaeYazdgbokZyaj0cgYL0AaR+pIdrXrLv+lNmrZIKAnApcmByvguiD9X9WYzBjkWeMPBj84ii0Ms7qYBGcMTLIv48dD8rjoUtrl3AtLUlwyucaYbsfH6zoWjQTBTNTreyY2eehwkUs6ztW7o0NVl4K7qmtWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764281680; c=relaxed/simple;
-	bh=eBS0CUizpUI0IUV5eENk604ryPB8tzKxAgoT6Iv/rNI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tZGClp/5SsBrW11WYW+A3Q2rs5m59cH+uealki6S2mq3K8QSJ0cHrid7R0MA/mKSgI1LvtBLer9a4hEYMDroSCTBDnOtotj/dg03GOxUv3wacuRXEvuXupOumJtn0WkZBzxFERvcEXWwOjjvXp1vK8mxKVmIddEH+j6mmGomaK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mxXJsiNx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F823C116D0
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 22:14:40 +0000 (UTC)
+	s=arc-20240116; t=1764282121; c=relaxed/simple;
+	bh=BzEMECmzgVJDJoiQhj621xYOXsdnWnXY9xcYY4dEQQM=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=o/ELXpIbL8izB2080KfhTlPfzNs2okFxROwUoiX2iM2Tl5knl0tRwkgvPcWLyqKPl0Qg1WY/Mc7S71tuJllyMu6ug3TZeaSdWjb23pxDxRydyaAxiSbQVCyayEwJpFbO07w5M5jc465szDRejufvjR/zwAFBzC/Lf1da7XGnrss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kp5JguR/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C250C4CEF8;
+	Thu, 27 Nov 2025 22:21:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764281680;
-	bh=eBS0CUizpUI0IUV5eENk604ryPB8tzKxAgoT6Iv/rNI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=mxXJsiNxhN1S4+aaL4NbV6VQmJPpBrqirZIT11lmoiHRFXWYqOdHgLT8nO/dex4lu
-	 b7GrvOOExqharqQdAnDFbOwJ2/6KIKAoGI8Ov0Jz1/eH7uCa4i3sUatetNWNmLla/b
-	 gmKseYf9lrbt/ekwpRBQ+j5p9AvkGXK0MueOr/uY+Bcmk8YsZ3jw+EmPr5EM9Xyyal
-	 w1SmZZ/DOWEfb+N8J8aZQSBGaoJh/eg6OzG5nfJN1KPSC3nC0ViYIRVVicAehr2FDP
-	 LCDRlTMMeoJ5ENTrtfXzS6KAU7rPSkbbhwwkQO9+40ZZb5aHdlQzERXU+RPoNg/4Gr
-	 IufmTo+X4LXXQ==
-Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-656b52c0f88so444654eaf.0
-        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 14:14:40 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWqihq0UtmKYomTBcGUtjLop/vvLLFymQIOkbDNvnPR8Zo4I1oX6L9Sz51t8MFjh+hTkuI3I6s=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxaw09O3uoRxxKcqusUgxOLjXn5UIcVSHal2mFwKL8Y1WkANF4L
-	zgiufoDjX1IBGSHiF1tJLx9hHFxszSR5rKDFFxb+oQ8nNmI4j8hEh51MCwvnmXR0SbUeL4MGNHY
-	K2jGLhnx0qbrWlcnxDvvGGVxnT0lF9Gk=
-X-Google-Smtp-Source: AGHT+IFwPll0f82sEFyAgxPzXsJ3Sz08LKmddouqPj3T99a8UMq1Mqm0U4kLPk1yoT7JDPl2CGsyiJV/R33trqfiRI4=
-X-Received: by 2002:a05:6820:2982:b0:657:60b8:b07c with SMTP id
- 006d021491bc7-657bdae7b8bmr3877565eaf.2.1764281679535; Thu, 27 Nov 2025
- 14:14:39 -0800 (PST)
+	s=k20201202; t=1764282119;
+	bh=BzEMECmzgVJDJoiQhj621xYOXsdnWnXY9xcYY4dEQQM=;
+	h=From:Date:Subject:To:Cc:From;
+	b=Kp5JguR/NR/pJGcDLRqAzxS9wKFUSB7l8OLBFu8Co09P/ME/NF87lsdJO2M930tBq
+	 vAxiM2j54D2egRUnqzDPR0bNtYSpqcYd6v1hbhRZF7ywzL9WkDbT2TV19tQ2MFqR/5
+	 65Aoxn5bV3ehDVq9hdaw27JFNSgbtqwnk9okqVdH0GOW2AKHck1L7XqnRIm9yj7o15
+	 RpmtGXLulPyfYHkNHbNlOcoGw+Kg6woOX1raDxCTmz9EMunv5M9gtvTm6rlMv+22xi
+	 xUWEFWuMw1DtAq0WSbI27QBrvFGTU8sbO4sA8TeaMfWrT7bgBqMqffzUXqhFoyXDea
+	 7QPLQukhgIFnw==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Thu, 27 Nov 2025 23:21:43 +0100
+Subject: [PATCH nf-next v2] selftests: netfilter: nft_flowtable.sh: Add the
+ capability to send IPv6 TCP traffic
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251120-thermal-device-v1-0-bbdad594d57a@gmx.de>
- <CAJZ5v0jOPrBcozzJMsB1eE12MuZRWDAV-+=jfrhJbi=S0p5J9Q@mail.gmail.com>
- <5f3ef610-4024-4ca0-a934-2649f5d25f40@gmx.de> <CAJZ5v0hdqY-=O5Ai6c5qjMr_pRFc+SDyV1QruM=ZeHH9Z=guSg@mail.gmail.com>
- <cf86344b-d9f1-4d3c-9fe9-deeb4ade9304@gmx.de>
-In-Reply-To: <cf86344b-d9f1-4d3c-9fe9-deeb4ade9304@gmx.de>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Thu, 27 Nov 2025 23:14:27 +0100
-X-Gmail-Original-Message-ID: <CAJZ5v0iH8jkqJaSNtqaTHxt_305DeiEq0AqQCo4Eho5hMKkU4Q@mail.gmail.com>
-X-Gm-Features: AWmQ_bnDEMFFW397UhskjKnrkd8ZW685Q6DyeE8xXCdq63xxksrcXk6fCdtHXQ8
-Message-ID: <CAJZ5v0iH8jkqJaSNtqaTHxt_305DeiEq0AqQCo4Eho5hMKkU4Q@mail.gmail.com>
-Subject: Re: [PATCH RFC RESEND 0/8] thermal: core: Allow setting the parent
- device of thermal zone/cooling devices
-To: Armin Wolf <W_Armin@gmx.de>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>, Daniel Lezcano <daniel.lezcano@linaro.org>, 
-	Zhang Rui <rui.zhang@intel.com>, Lukasz Luba <lukasz.luba@arm.com>, Len Brown <lenb@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, 
-	linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	etnaviv@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
-	linux-tegra@vger.kernel.org, linux-acpi@vger.kernel.org, 
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, ath10k@lists.infradead.org, 
-	ath11k@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
-	linux-mediatek@lists.infradead.org, platform-driver-x86@vger.kernel.org, 
-	linux-pci@vger.kernel.org, imx@lists.linux.dev, 
-	linux-renesas-soc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20251127-nft_flowtable-sh-ipv6-tcp-v2-1-c4162e5ee014@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/42NQQ6CMBBFr0Jm7RhasCIr72GIQTqFiaQlbVM1h
+ LtbOYHL95L//gqBPFOAtljBU+LAzmaQhwKGqbcjIevMIEt5EkJKtCbezexesX/MhGFCXpLCOCx
+ 4VqbSshHqogXk/eLJ8Htv37rME4fo/Ge/SuJn/6kmgQLruil1NTSq6uX1Sd7SfHR+hG7bti8eR
+ ugOwwAAAA==
+X-Change-ID: 20251122-nft_flowtable-sh-ipv6-tcp-76f3d28169d1
+To: Pablo Neira Ayuso <pablo@netfilter.org>, 
+ Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>, 
+ Phil Sutter <phil@nwl.cc>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Lorenzo Bianconi <lorenzo@kernel.org>
+X-Mailer: b4 0.14.2
 
-On Thu, Nov 27, 2025 at 9:29=E2=80=AFPM Armin Wolf <W_Armin@gmx.de> wrote:
->
-> Am 27.11.25 um 19:22 schrieb Rafael J. Wysocki:
->
-> > On Sat, Nov 22, 2025 at 3:18=E2=80=AFPM Armin Wolf <W_Armin@gmx.de> wro=
-te:
-> >> Am 21.11.25 um 21:35 schrieb Rafael J. Wysocki:
-> >>
-> >>> On Thu, Nov 20, 2025 at 4:41=E2=80=AFAM Armin Wolf <W_Armin@gmx.de> w=
-rote:
-> > [...]
-> >
-> >>>> ---
-> >>>> Armin Wolf (8):
-> >>>>         thermal: core: Allow setting the parent device of cooling de=
-vices
-> >>>>         thermal: core: Set parent device in thermal_of_cooling_devic=
-e_register()
-> >>>>         ACPI: processor: Stop creating "device" sysfs link
-> >>> That link is not to the cooling devices' parent, but to the ACPI
-> >>> device object (a struct acpi_device) that corresponds to the parent.
-> >>> The parent of the cooling device should be the processor device, not
-> >>> its ACPI companion, so I'm not sure why there would be a conflict.
-> >>   From the perspective of the Linux device core, a parent device does =
-not have to be
-> >> a "physical" device. In the case of the ACPI processor driver, the ACP=
-I device is used,
-> >> so the cooling device registered by said driver belongs to the ACPI de=
-vice.
-> > Well, that's a problem.  A struct acpi_device should not be a parent
-> > of anything other than a struct acpi_device.
->
-> Understandable, in this case we should indeed use the the CPU device, esp=
-ecially since the fwnode
-> associated with it already points to the correct ACPI processor object (a=
-t least on my machine).
->
-> >> I agree that using the Linux processor device would make more sense, b=
-ut this will require
-> >> changes inside the ACPI processor driver.
-> > So be it.
->
-> OK.
->
-> >> As for the "device" symlink: The conflict would be a naming conflict, =
-as both "device" symlinks
-> >> (the one created by the ACPI processor driver and the one created by t=
-he device core) will
-> >> be created in the same directory (which is the directory of the coolin=
-g device).
-> > I see.
-> >
-> > But why is the new symlink needed in the first place?  If the device
-> > has a parent, it will appear under that parent in /sys/devices/, won't
-> > it?
-> >
-> > Currently, all of the thermal class devices appear under
-> > /sys/devices/virtual/thermal/ because they have no parents and they
-> > all get a class parent kobject under /sys/devices/virtual/, as that's
-> > what get_device_parent() does.
-> >
-> > If they have real parents, they will appear under those parents, so
-> > why will the parents need to be pointed to additionally?
->
-> The "device" smylink is a comfort feature provided by the device core its=
-elf to allow user space
-> application to traverse the device tree from bottom to top, like a double=
--linked list. We cannot
-> disable the creation of this symlink, nor should we.
+Introduce the capability to send TCP traffic over IPv6 to
+nft_flowtable netfilter selftest.
 
-I think you mean device_add_class_symlinks(), but that's just for
-class devices.  Of course, thermal devices are class devices, so
-they'll get those links if they get parents.  Fair enough.
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+Changes in v2:
+- Fix checkpatch warnings
+- Add TCP test for IPv6 IPsec traffic
+- Link to v1: https://lore.kernel.org/r/20251122-nft_flowtable-sh-ipv6-tcp-v1-1-4480d3c863a2@kernel.org
+---
+ .../selftests/net/netfilter/nft_flowtable.sh       | 57 ++++++++++++++++------
+ 1 file changed, 43 insertions(+), 14 deletions(-)
 
-> > BTW, this means that the layout of /sys/devices/ will change when
-> > thermal devices get real parents.  I'm not sure if this is a problem,
-> > but certainly something to note.
->
-> I know, most applications likely use /sys/class/thermal/, so they are not=
- impacted by this. I will
-> note this in the cover letter of the next revision.
->
-> >>>>         ACPI: fan: Stop creating "device" sysfs link
-> >>>>         ACPI: video: Stop creating "device" sysfs link
-> >>> Analogously in the above two cases AFAICS.
-> >>>
-> >>> The parent of a cooling device should be a "physical" device object,
-> >>> like a platform device or a PCI device or similar, not a struct
-> >>> acpi_device (which in fact is not a device even).
-> >>   From the perspective of the Linux device core, a ACPI device is a pe=
-rfectly valid device.
-> > The driver core is irrelevant here.
-> >
-> > As I said before, a struct acpi_device object should not be a parent
-> > of anything other than a struct acpi_device object.  Those things are
-> > not devices and they cannot be used for representing PM dependencies,
-> > for example.
-> >
-> >> I agree that using a platform device or PCI device is better, but this=
- already happens
-> >> inside the ACPI fan driver (platform device).
-> > So it should not happen there.
->
-> I meant that the ACPI fan driver already uses the platform device as the =
-parent device of the
-> cooling device, so the ACPI device is only used for interacting with the =
-ACPI control methods
-> (and registering sysfs attributes i think).
+diff --git a/tools/testing/selftests/net/netfilter/nft_flowtable.sh b/tools/testing/selftests/net/netfilter/nft_flowtable.sh
+index 1fbfc8ad8dcdc5db2ab1a1ea9310f655d09eee83..a68bc882fa4ec0175d8db3df8337bb5fe6c42e26 100755
+--- a/tools/testing/selftests/net/netfilter/nft_flowtable.sh
++++ b/tools/testing/selftests/net/netfilter/nft_flowtable.sh
+@@ -127,6 +127,8 @@ ip -net "$nsr1" addr add fee1:2::1/64 dev veth1 nodad
+ ip -net "$nsr2" addr add 192.168.10.2/24 dev veth0
+ ip -net "$nsr2" addr add fee1:2::2/64 dev veth0 nodad
+ 
++ip netns exec "$nsr1" sysctl net.ipv6.conf.all.forwarding=1 > /dev/null
++ip netns exec "$nsr2" sysctl net.ipv6.conf.all.forwarding=1 > /dev/null
+ for i in 0 1; do
+   ip netns exec "$nsr1" sysctl net.ipv4.conf.veth$i.forwarding=1 > /dev/null
+   ip netns exec "$nsr2" sysctl net.ipv4.conf.veth$i.forwarding=1 > /dev/null
+@@ -153,7 +155,9 @@ ip -net "$ns1" route add default via dead:1::1
+ ip -net "$ns2" route add default via dead:2::1
+ 
+ ip -net "$nsr1" route add default via 192.168.10.2
++ip -6 -net "$nsr1" route add default via fee1:2::2
+ ip -net "$nsr2" route add default via 192.168.10.1
++ip -6 -net "$nsr2" route add default via fee1:2::1
+ 
+ ip netns exec "$nsr1" nft -f - <<EOF
+ table inet filter {
+@@ -352,8 +356,9 @@ test_tcp_forwarding_ip()
+ 	local nsa=$1
+ 	local nsb=$2
+ 	local pmtu=$3
+-	local dstip=$4
+-	local dstport=$5
++	local proto=$4
++	local dstip=$5
++	local dstport=$6
+ 	local lret=0
+ 	local socatc
+ 	local socatl
+@@ -363,12 +368,14 @@ test_tcp_forwarding_ip()
+ 		infile="$nsin_small"
+ 	fi
+ 
+-	timeout "$SOCAT_TIMEOUT" ip netns exec "$nsb" socat -4 TCP-LISTEN:12345,reuseaddr STDIO < "$infile" > "$ns2out" &
++	timeout "$SOCAT_TIMEOUT" ip netns exec "$nsb" socat -${proto} \
++            TCP"${proto}"-LISTEN:12345,reuseaddr STDIO < "$infile" > "$ns2out" &
+ 	lpid=$!
+ 
+ 	busywait 1000 listener_ready
+ 
+-	timeout "$SOCAT_TIMEOUT" ip netns exec "$nsa" socat -4 TCP:"$dstip":"$dstport" STDIO < "$infile" > "$ns1out"
++	timeout "$SOCAT_TIMEOUT" ip netns exec "$nsa" socat -${proto} \
++            TCP"${proto}":"$dstip":"$dstport" STDIO < "$infile" > "$ns1out"
+ 	socatc=$?
+ 
+ 	wait $lpid
+@@ -394,8 +401,11 @@ test_tcp_forwarding_ip()
+ test_tcp_forwarding()
+ {
+ 	local pmtu="$3"
++	local proto="$4"
++	local dstip="$5"
++	local dstport="$6"
+ 
+-	test_tcp_forwarding_ip "$1" "$2" "$pmtu" 10.0.2.99 12345
++	test_tcp_forwarding_ip "$1" "$2" "$pmtu" "$proto" "$dstip" "$dstport"
+ 
+ 	return $?
+ }
+@@ -403,6 +413,9 @@ test_tcp_forwarding()
+ test_tcp_forwarding_set_dscp()
+ {
+ 	local pmtu="$3"
++	local proto="$4"
++	local dstip="$5"
++	local dstport="$6"
+ 
+ ip netns exec "$nsr1" nft -f - <<EOF
+ table netdev dscpmangle {
+@@ -413,7 +426,7 @@ table netdev dscpmangle {
+ }
+ EOF
+ if [ $? -eq 0 ]; then
+-	test_tcp_forwarding_ip "$1" "$2" "$3" 10.0.2.99 12345
++	test_tcp_forwarding_ip "$1" "$2" "$pmtu" "$proto" "$dstip" "$dstport"
+ 	check_dscp "dscp_ingress" "$pmtu"
+ 
+ 	ip netns exec "$nsr1" nft delete table netdev dscpmangle
+@@ -430,7 +443,7 @@ table netdev dscpmangle {
+ }
+ EOF
+ if [ $? -eq 0 ]; then
+-	test_tcp_forwarding_ip "$1" "$2" "$pmtu"  10.0.2.99 12345
++	test_tcp_forwarding_ip "$1" "$2" "$pmtu" "$proto" "$dstip" "$dstport"
+ 	check_dscp "dscp_egress" "$pmtu"
+ 
+ 	ip netns exec "$nsr1" nft delete table netdev dscpmangle
+@@ -441,7 +454,7 @@ fi
+ 	# partial.  If flowtable really works, then both dscp-is-0 and dscp-is-cs3
+ 	# counters should have seen packets (before and after ft offload kicks in).
+ 	ip netns exec "$nsr1" nft -a insert rule inet filter forward ip dscp set cs3
+-	test_tcp_forwarding_ip "$1" "$2" "$pmtu"  10.0.2.99 12345
++	test_tcp_forwarding_ip "$1" "$2" "$pmtu" "$proto" "$dstip" "$dstport"
+ 	check_dscp "dscp_fwd" "$pmtu"
+ }
+ 
+@@ -455,7 +468,7 @@ test_tcp_forwarding_nat()
+ 
+ 	[ "$pmtu" -eq 0 ] && what="$what (pmtu disabled)"
+ 
+-	test_tcp_forwarding_ip "$nsa" "$nsb" "$pmtu" 10.0.2.99 12345
++	test_tcp_forwarding_ip "$nsa" "$nsb" "$pmtu" 4 10.0.2.99 12345
+ 	lret=$?
+ 
+ 	if [ "$lret" -eq 0 ] ; then
+@@ -465,7 +478,7 @@ test_tcp_forwarding_nat()
+ 			echo "PASS: flow offload for ns1/ns2 with masquerade $what"
+ 		fi
+ 
+-		test_tcp_forwarding_ip "$1" "$2" "$pmtu" 10.6.6.6 1666
++		test_tcp_forwarding_ip "$1" "$2" "$pmtu" 4 10.6.6.6 1666
+ 		lret=$?
+ 		if [ "$pmtu" -eq 1 ] ;then
+ 			check_counters "flow offload for ns1/ns2 with dnat $what"
+@@ -487,7 +500,7 @@ make_file "$nsin_small" "$filesize_small"
+ # Due to MTU mismatch in both directions, all packets (except small packets like pure
+ # acks) have to be handled by normal forwarding path.  Therefore, packet counters
+ # are not checked.
+-if test_tcp_forwarding "$ns1" "$ns2" 0; then
++if test_tcp_forwarding "$ns1" "$ns2" 0 4 10.0.2.99 12345; then
+ 	echo "PASS: flow offloaded for ns1/ns2"
+ else
+ 	echo "FAIL: flow offload for ns1/ns2:" 1>&2
+@@ -495,6 +508,14 @@ else
+ 	ret=1
+ fi
+ 
++if test_tcp_forwarding "$ns1" "$ns2" 0 6 "[dead:2::99]" 12345; then
++	echo "PASS: IPv6 flow offloaded for ns1/ns2"
++else
++	echo "FAIL: IPv6 flow offload for ns1/ns2:" 1>&2
++	ip netns exec "$nsr1" nft list ruleset
++	ret=1
++fi
++
+ # delete default route, i.e. ns2 won't be able to reach ns1 and
+ # will depend on ns1 being masqueraded in nsr1.
+ # expect ns1 has nsr1 address.
+@@ -520,7 +541,7 @@ table ip nat {
+ EOF
+ 
+ check_dscp "dscp_none" "0"
+-if ! test_tcp_forwarding_set_dscp "$ns1" "$ns2" 0 ""; then
++if ! test_tcp_forwarding_set_dscp "$ns1" "$ns2" 0 4 10.0.2.99 12345; then
+ 	echo "FAIL: flow offload for ns1/ns2 with dscp update and no pmtu discovery" 1>&2
+ 	exit 0
+ fi
+@@ -546,7 +567,7 @@ ip netns exec "$ns2" sysctl net.ipv4.ip_no_pmtu_disc=0 > /dev/null
+ ip netns exec "$nsr1" nft reset counters table inet filter >/dev/null
+ ip netns exec "$ns2"  nft reset counters table inet filter >/dev/null
+ 
+-if ! test_tcp_forwarding_set_dscp "$ns1" "$ns2" 1 ""; then
++if ! test_tcp_forwarding_set_dscp "$ns1" "$ns2" 1 4 10.0.2.99 12345; then
+ 	echo "FAIL: flow offload for ns1/ns2 with dscp update and pmtu discovery" 1>&2
+ 	exit 0
+ fi
+@@ -752,7 +773,7 @@ ip -net "$ns2" route del 192.168.10.1 via 10.0.2.1
+ ip -net "$ns2" route add default via 10.0.2.1
+ ip -net "$ns2" route add default via dead:2::1
+ 
+-if test_tcp_forwarding "$ns1" "$ns2" 1; then
++if test_tcp_forwarding "$ns1" "$ns2" 1 4 10.0.2.99 12345; then
+ 	check_counters "ipsec tunnel mode for ns1/ns2"
+ else
+ 	echo "FAIL: ipsec tunnel mode for ns1/ns2"
+@@ -760,6 +781,14 @@ else
+ 	ip netns exec "$nsr1" cat /proc/net/xfrm_stat 1>&2
+ fi
+ 
++if test_tcp_forwarding "$ns1" "$ns2" 1 6 "[dead:2::99]" 12345; then
++	check_counters "IPv6 ipsec tunnel mode for ns1/ns2"
++else
++	echo "FAIL: IPv6 ipsec tunnel mode for ns1/ns2"
++	ip netns exec "$nsr1" nft list ruleset 1>&2
++	ip netns exec "$nsr1" cat /proc/net/xfrm_stat 1>&2
++fi
++
+ if [ "$1" = "" ]; then
+ 	low=1280
+ 	mtu=$((65536 - low))
 
-OK
+---
+base-commit: b044de87bae07a50b2d99d9acfea5a4323da95ed
+change-id: 20251122-nft_flowtable-sh-ipv6-tcp-76f3d28169d1
 
-> >> Only the ACPI video driver created a "device" sysfs link that points t=
-o the ACPI device
-> >> instead of the PCI device. I just noticed that i accidentally changed =
-this by using the
-> >> PCI device as the parent device for the cooling device.
-> >>
-> >> If you want then we can keep this change.
-> > The PCI device should be its parent.
->
-> Alright, i will note this in the patch description.
->
-> >>>>         thermal: core: Set parent device in thermal_cooling_device_r=
-egister()
-> >>>>         ACPI: thermal: Stop creating "device" sysfs link
-> >>> And this link is to the struct acpi_device representing the thermal z=
-one itself.
-> >> Correct, the ACPI thermal zone driver is a ACPI driver, meaning that h=
-e binds to
-> >> ACPI devices. Because of this all (thermal zone) devices created by an=
- instance of
-> >> said driver are descendants of the ACPI device said instance is bound =
-to.
-> >>
-> >> We can of course convert the ACPI thermal zone driver into a platform =
-driver, but
-> >> this would be a separate patch series.
-> > If you want parents, this needs to be done first, but I'm still not
-> > sure what the parent of a thermal zone would represent.
-> >
-> > In the ACPI case it is kind of easy - it would be the (platform)
-> > device corresponding to a given ThermalZone object in the ACPI
-> > namespace - but it only has a practical meaning if that device has a
-> > specific parent.  For example, if the corresponding ThermalZone object
-> > is present in the \_SB scope, the presence of the thermal zone parent
-> > won't provide any additional information.
->
-> To the device core it will, as the platform device will need to be suspen=
-ded
-> after the thermal zone device has been suspended, among other things.
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
 
-Let's set suspend aside for now, I think I've explained my viewpoint
-on this enough elsewhere.
-
-> > Unfortunately, the language in the specification isn't particularly
-> > helpful here: "Thermal zone objects should appear in the namespace
-> > under the portion of the system that comprises the thermal zone. For
-> > example, a thermal zone that is isolated to a docking station should
-> > be defined within the scope of the docking station device."  To me
-> > "the portion of the system" is not too meaningful unless it is just
-> > one device without children.  That's why _TZD has been added AFAICS.
->
-> I think you are confusing the parent device of the ThermalZone ACPI devic=
-e
-> with the parent device of the struct thermal_zone_device.
-
-No, I'm not.
-
-> I begin to wonder if mentioning the ACPI ThermalZone device together with=
- the
-> struct thermal_zone_device was a bad idea on my side xd.
-
-Maybe.
-
-> >>>>         thermal: core: Allow setting the parent device of thermal zo=
-ne devices
-> >>> I'm not sure if this is a good idea, at least until it is clear what
-> >>> the role of a thermal zone parent device should be.
-> >> Take a look at my explanation with the Intel Wifi driver.
-> > I did and I think that you want the parent to be a device somehow
-> > associated with the thermal zone, but how exactly?  What should that
-> > be in the Wifi driver case, the PCI device or something else?
-> >
-> > And what if the thermal zone affects multiple devices?  Which of them
-> > (if any) would be its parent?  And would it be consistent with the
-> > ACPI case described above?
-> >
-> > All of that needs consideration IMV.
->
-> I agree, but there is a difference between "this struct thermal_zone_devi=
-ce depends on
-> device X to be operational" and "this thermal zone affects device X, devi=
-ce Y and device Z".
-
-Yes, there is.
-
-> This patch series exclusively deals with telling the driver core that "th=
-is struct thermal_zone_device
-> depends on device X to be operational".
-
-Maybe let's take care of cooling devices first and get back to this later?
 
