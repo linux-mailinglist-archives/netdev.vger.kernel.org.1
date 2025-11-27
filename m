@@ -1,129 +1,192 @@
-Return-Path: <netdev+bounces-242240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54588C8DEF5
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 12:17:44 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 440B5C8E0A4
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 12:26:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id CD04234D5F3
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 11:17:43 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 779934E5AE7
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 11:25:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 785C4315D2C;
-	Thu, 27 Nov 2025 11:17:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22EC53233FA;
+	Thu, 27 Nov 2025 11:25:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="Hk6Nj2WK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bfjTDYge"
 X-Original-To: netdev@vger.kernel.org
-Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4618B2DF150;
-	Thu, 27 Nov 2025 11:17:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6FCD2DF150;
+	Thu, 27 Nov 2025 11:25:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764242258; cv=none; b=Qevo11yGug5T783pNNTwYW9G34tVOI0NjS+qA/2S6p50nF2UJeSdGPo+8TwYbXPaKMvRGloOYl3WN++xwVsr4EEbrHthC4/U1IoWBP48vz3za/5mo73tEzAYUoZiYjjUO6JN7PZKvQrLGmJugh7Bcl1lmyBC/SEJtWSWOVEE5lk=
+	t=1764242741; cv=none; b=WHA7LmAuvMRI/q1MQMxMIBwE0u7lv1+RAgbSXSNWzV0+RLjet1mnI5vcmOaNLaRLyc9z+LZKUwnIrgwJJ+cHL1HywN75AyHD62q1pfR5gwoW63UzVDFbjUnqMRXurGFs4hhkkZu8gYf9VxqBpPU/aNMly7fHtCx4DI+WUU+QSEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764242258; c=relaxed/simple;
-	bh=lnq9RCKczDMZP1xdBgExGaKBVbQEE6lNzOOdc21yd80=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qbwR3NlAe26gteIUF2XSUer/jQ90eT1yDfLyrjAe8dtTHss+XJvv8xyIs7nKDsEWdN3HR9KOs7U4MHTwHdaX89+K6YaPAkbvOQlF1tEbRx1yYUlk1w4uKJf1JW+Mqtp89dL0RZDhjwZrC/j7jirQl7JBifGQ9rkV38OcA2V88sQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=Hk6Nj2WK; arc=none smtp.client-ip=193.68.50.107
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
-Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
-	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 4AE1CA0CC8;
-	Thu, 27 Nov 2025 12:17:26 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
-	:cc:content-type:content-type:date:from:from:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to; s=mail; bh=w7hRsXVqzhVA+p/mOHCtQlbuNpvrwqdArvrBFqwpRFI=; b=
-	Hk6Nj2WKRzTgLHKzn2hvJ5X7TIAwt7VL5qf2qr8bkUU/GqV22YBZLBna/1GRFUIi
-	vh4NpXRwfcFrpPx/uudWfP/ila9fA5XgH96BlN2Jdu6yBoi4A4Ec+afcCH5msEFt
-	Sih1nAL3KGIrZ+P6t6A/+X0qHZ2KT3qShkMkD887Ep00bmrg+4VsyQhlCbHWJSJH
-	KtuSBsQI05+SgddmhB0XitXy48sMAFveI4EfpZp1mdkA4KqdptRmQuKyjoXe7VJi
-	go9RGqrIEIwQlXip+pVHwwNp0Y9u6vXwh3juIHcOxsstnxVXZrS4csZ1AeAuie8H
-	ra+dpN28i3LZ8lPdZjJCT/CP4nDrmMzxTI/WB0fDJ9o9ShJecZ340RhERqqPqIdm
-	69f3HamJtsyxRZjdtO/nebND/ISzsvq/U38jVAoTN7o1jwKjXFuSdjL3U8Sw+7yl
-	ogvQgrBqpqSBBA9vzKUdqjEKY398Xs/34cprWjGUwcVVTpDAQyo6OBv06PYx3d9X
-	WGe0D4T1WwsVUCH9LKd6bSeEkQ+GCcgWjYRH/g2pqwZO+CLnuvIvc6kTz0lHKLTa
-	bBBbG55EDNkWxx6HnCChSnxjTDojZFcmxq9O5I+mZ2PJ8jmWVK5ZcAzwMECWr2kr
-	uJFT27J3oX+oE67nN/qgzz9dsFybvw8BLGEGowIjE4o=
-Date: Thu, 27 Nov 2025 12:17:24 +0100
-From: Buday Csaba <buday.csaba@prolan.hu>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 1/1] net: mdio: reset PHY before attempting to
- access ID register
-Message-ID: <aSgzRMf1LZycQoni@debianbuilder>
-References: <6cb97b7bfd92d8dc1c1c00662114ece03b6d2913.1764069248.git.buday.csaba@prolan.hu>
- <20251125184335.040f015e@kernel.org>
+	s=arc-20240116; t=1764242741; c=relaxed/simple;
+	bh=klsQXQWIM/W0A3+8u+ebvJsqnxI8wgEmwKoXWgVRls8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DBrLIudwTkoiy3gmlCGU02bKmGSCgApE8O1RvC1N8A2gtqTv2r2PjoSC/EHuYoBckGXxL+4Z4Cqw1N27UNUx3fS46j8plr73ZZMKAbIzSxbg5Uyah2cY0WRON9S7uwiw71N38CVFV0I+zkv3SIxyZiQzAf8w1Piust7qSKNDC/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bfjTDYge; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6B7CC4CEF8;
+	Thu, 27 Nov 2025 11:25:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764242740;
+	bh=klsQXQWIM/W0A3+8u+ebvJsqnxI8wgEmwKoXWgVRls8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bfjTDYgenpiyb2DhdPl2ZZ8I8Poy7JxyW7aGXys/GVmXe2l8W8kpCc9O35XSxpriQ
+	 5cXXRLxq2F9HbjRAhDti+/b+jMjUaoASHlDtlQUVjpFzUagyn5D+CzMcv1tFIZuLie
+	 XOGWT0of0wgN1HnV73xovyC5NlcXBU0ptQo2Toeh+t9yg9qGa9FnAO2BobRzqmjJ0f
+	 SF/MRQm/rILAIFvmHrKVsHcXTsr5uLAoNcKuQkSCHt4bJl7Gl5Yat5pA9HiTTEkx1U
+	 yvIa6239Off+I9k2Pwecgq7QrGrB6H8s9ogVZMM6uSceoTnUbl9p8Yy+XBQYxt0LKY
+	 j5sFcLQOkRelg==
+Date: Thu, 27 Nov 2025 12:25:37 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH nf-next] selftests: netfilter: nft_flowtable.sh: Add the
+ capability to send IPv6 TCP traffic
+Message-ID: <aSg1MWLUx0GyCWij@lore-desk>
+References: <20251122-nft_flowtable-sh-ipv6-tcp-v1-1-4480d3c863a2@kernel.org>
+ <aSgllQoIqNHIXqrs@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="2PK2emLCa6m1sKgr"
 Content-Disposition: inline
-In-Reply-To: <20251125184335.040f015e@kernel.org>
-X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1764242245;VERSION=8002;MC=715725827;ID=140077;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
-X-ESET-Antispam: OK
-X-EsetResult: clean, is OK
-X-EsetId: 37303A2998FD515F607266
+In-Reply-To: <aSgllQoIqNHIXqrs@horms.kernel.org>
 
-On Tue, Nov 25, 2025 at 06:43:35PM -0800, Jakub Kicinski wrote:
-> On Tue, 25 Nov 2025 12:15:51 +0100 Buday Csaba wrote:
-> > When the ID of an Ethernet PHY is not provided by the 'compatible'
-> > string in the device tree, its actual ID is read via the MDIO bus.
-> > For some PHYs this could be unsafe, since a hard reset may be
-> > necessary to safely access the MDIO registers.
-> 
-> You may be missing exports because it doesn't build with allmodconfig:
-> 
-> ERROR: modpost: "mdio_device_register_reset" [drivers/net/mdio/fwnode_mdio.ko] undefined!
-> ERROR: modpost: "mdio_device_unregister_reset" [drivers/net/mdio/fwnode_mdio.ko] undefined!
-> -- 
-> pw-bot: cr
-> 
 
-I require some advice on how to do it properly.
-The high level functionality belongs to either fwnode_mdio.c or maybe
-phy_device.c
+--2PK2emLCa6m1sKgr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The latter may be better, since get_phy_device() already performs some
-kind of recovery for PHYs with a certain unexpected behaviour.
+> On Sat, Nov 22, 2025 at 07:41:38PM +0100, Lorenzo Bianconi wrote:
+> > Introduce the capability to send TCP traffic over IPv6 to
+> > nft_flowtable netfilter selftest.
+> >=20
+> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> > ---
+> >  .../selftests/net/netfilter/nft_flowtable.sh       | 47 ++++++++++++++=
++-------
+> >  1 file changed, 33 insertions(+), 14 deletions(-)
+> >=20
+> > diff --git a/tools/testing/selftests/net/netfilter/nft_flowtable.sh b/t=
+ools/testing/selftests/net/netfilter/nft_flowtable.sh
+> > index 1fbfc8ad8dcdc5db2ab1a1ea9310f655d09eee83..24b4e60b91451e7ea7f6a04=
+1b0335233047c6242 100755
+> > --- a/tools/testing/selftests/net/netfilter/nft_flowtable.sh
+> > +++ b/tools/testing/selftests/net/netfilter/nft_flowtable.sh
+> > @@ -127,6 +127,8 @@ ip -net "$nsr1" addr add fee1:2::1/64 dev veth1 nod=
+ad
+> >  ip -net "$nsr2" addr add 192.168.10.2/24 dev veth0
+> >  ip -net "$nsr2" addr add fee1:2::2/64 dev veth0 nodad
+> > =20
+> > +ip netns exec "$nsr1" sysctl net.ipv6.conf.all.forwarding=3D1 > /dev/n=
+ull
+> > +ip netns exec "$nsr2" sysctl net.ipv6.conf.all.forwarding=3D1 > /dev/n=
+ull
+> >  for i in 0 1; do
+> >    ip netns exec "$nsr1" sysctl net.ipv4.conf.veth$i.forwarding=3D1 > /=
+dev/null
+> >    ip netns exec "$nsr2" sysctl net.ipv4.conf.veth$i.forwarding=3D1 > /=
+dev/null
+> > @@ -153,7 +155,9 @@ ip -net "$ns1" route add default via dead:1::1
+> >  ip -net "$ns2" route add default via dead:2::1
+> > =20
+> >  ip -net "$nsr1" route add default via 192.168.10.2
+> > +ip -6 -net "$nsr1" route add default via fee1:2::2
+> >  ip -net "$nsr2" route add default via 192.168.10.1
+> > +ip -6 -net "$nsr2" route add default via fee1:2::1
+> > =20
+> >  ip netns exec "$nsr1" nft -f - <<EOF
+> >  table inet filter {
+> > @@ -352,8 +356,9 @@ test_tcp_forwarding_ip()
+> >  	local nsa=3D$1
+> >  	local nsb=3D$2
+> >  	local pmtu=3D$3
+> > -	local dstip=3D$4
+> > -	local dstport=3D$5
+> > +	local proto=3D$4
+> > +	local dstip=3D$5
+> > +	local dstport=3D$6
+> >  	local lret=3D0
+> >  	local socatc
+> >  	local socatl
+> > @@ -363,12 +368,12 @@ test_tcp_forwarding_ip()
+> >  		infile=3D"$nsin_small"
+> >  	fi
+> > =20
+> > -	timeout "$SOCAT_TIMEOUT" ip netns exec "$nsb" socat -4 TCP-LISTEN:123=
+45,reuseaddr STDIO < "$infile" > "$ns2out" &
+> > +	timeout "$SOCAT_TIMEOUT" ip netns exec "$nsb" socat -${proto} TCP${pr=
+oto}-LISTEN:12345,reuseaddr STDIO < "$infile" > "$ns2out" &
+>=20
+> Hi Lorenzo,
+>=20
+> Some minor nits:
+>=20
+> 1. This line is (and was) excessively long.
+>    Maybe it can be addressed as the line is being modified anyway.
+>=20
+>    Flagged by checkpatch
+>=20
+> 2. Prior to this patch, variables on this line were enclosed in "" to
+>    guard against word splitting when expansion occurs.
+>    This is no longer the case.
+>=20
+>    Flagged by shellcheck
+>=20
+> >  	lpid=3D$!
+> > =20
+> >  	busywait 1000 listener_ready
+> > =20
+> > -	timeout "$SOCAT_TIMEOUT" ip netns exec "$nsa" socat -4 TCP:"$dstip":"=
+$dstport" STDIO < "$infile" > "$ns1out"
+> > +	timeout "$SOCAT_TIMEOUT" ip netns exec "$nsa" socat -${proto} TCP${pr=
+oto}:"$dstip":"$dstport" STDIO < "$infile" > "$ns1out"
+> >  	socatc=3D$?
+>=20
+> Likewise here.
+>=20
+> > =20
+> >  	wait $lpid
+>=20
+> Otherwise this LGTM.
 
-But the low level functionality: registering the reset properties are
-now in their proper place in mdio_device.c
+Hi Simon,
 
-These three source files build into three different modules, so I only
-see the following options:
+ack, fine. Is it ok to address them in subsequent patch or do you prefer to
+address them here?
+@Pablo: what do you prefer?
 
-a) make mdio_device_register_reset() and its counterpart public
-   But we have already agreed that they should not be, and keep them
-   internal
+Regards,
+Lorenzo
 
-b) create a new helper function in mdio_device.c, and make that public
-   This could work, but then what is the point of hiding
-   mdio_device_register_reset()? My idea was something like
-   mdio_device_reset_strobe(), which calls register/unregister reset
-   while also performing the assertion/deassertion of the reset.
-   But such a function is unsafe on an already established mdio_device,
-   so making that exported may be questionable as well.
-   It is possible to work around that, but then it is getting out of hand
-   fast, and does not follow the keep it simple and stupid principle.
+--2PK2emLCa6m1sKgr
+Content-Type: application/pgp-signature; name=signature.asc
 
-c) what about using EXPORT_SYMBOL_FOR_MODULES() on the problematic
-   functions? Are there any objections against it?
-   This type of export is rarely used in the kernel, so I am uncertain
-   about that. Is using it on functions declared in private headers
-   also discouraged?
+-----BEGIN PGP SIGNATURE-----
 
-Thank you in advance,
-Csaba
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaSg1MQAKCRA6cBh0uS2t
+rGKLAQC521bkBKE4oBPFXY9p1BVo39UkFs8KP1qysYGPohM/GQEA8wCjhIq5DGuv
+iJsBvnoothxCgO9sCvS3V4SQJKOyZwY=
+=OfbJ
+-----END PGP SIGNATURE-----
 
+--2PK2emLCa6m1sKgr--
 
