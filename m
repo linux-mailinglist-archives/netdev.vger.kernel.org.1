@@ -1,58 +1,131 @@
-Return-Path: <netdev+bounces-242164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E827C8CE49
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 07:08:34 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 008EBC8CECD
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 07:32:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C04F3AA2A7
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 06:08:33 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3F45434ECA9
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 06:31:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F564242D62;
-	Thu, 27 Nov 2025 06:08:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEC3E27FB32;
+	Thu, 27 Nov 2025 06:31:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="im9e9ddc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MGT62KQH";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="sQQJUms5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-07.mail-europe.com (mail-0701.mail-europe.com [51.83.17.38])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80943258EFB
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 06:08:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.83.17.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABAF2347C6
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 06:31:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764223711; cv=none; b=B815VO4EQe4aV/BHZ+e2zMQ4rgZWuKdNMVzZXIONeRr2mfgH0DLb7x44hgcRxblJzS4XWk26OiiFsC/ihRPB2GohR0BzN4Iv0ohvyw7+YnWOvaTbuEkoVC+4AVZvswwFBqhMQ33++MunOcERnnAkXjPWK3SREgOxG+hEzsqu/Ko=
+	t=1764225107; cv=none; b=TDsphkryZb4rwJ67mSpFKBvRNc+1TRUZ0S58UfNcXvQEHukmLP0O98SDCILgY03gAF3iPb9UDMouDyHvC+5rH/+KqL7KrijNzFu0MgrOXBcma8WVyVak/PvG0WYhAJVxeCLi5C69MlXqyzg6PmWO/xdgg7sofZ8FekGLapLZ4XM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764223711; c=relaxed/simple;
-	bh=08Hd5rD81Quc+8M/4WmMVmqKdYZHuyxo3wb8LH7jeKY=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nVCOvTgXTuigqDQFBYW8G3lXQ/lYyKupgMb8yx86mnQH+fKukiwKcnCPKuUPmQphUsB4JZ38nMxzI5VvEUe+TFPXg27qC5eJyreRM/hb09ieLlmXNdmAy/P7YRADYzKOFELPA7QZP49SdzafvVsCjXDhtu6AEVRHJm3XFbSVISI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=fail smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=im9e9ddc; arc=none smtp.client-ip=51.83.17.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=proton.me
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=fmkahaajpzg5jdicaadshb2fvy.protonmail; t=1764223698; x=1764482898;
-	bh=08Hd5rD81Quc+8M/4WmMVmqKdYZHuyxo3wb8LH7jeKY=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=im9e9ddc9y+uSapR/rLRrzKkJObxkvH3vtEVY6U2CkNSMhYUCIB6PNWFVXNZYLt/4
-	 6loQBnF5X+cGB0MwaQl29Sw4sJWNrJR/jhOMQ1kz4x/hcdGzJYf68Lqc20nCxm7vf1
-	 Ps3/9TZ+tmIf4qLlgg3Gf58z9DZVEyW+M8x9G6xyznluhej9Ih1jN+LRNQRqU2cVPK
-	 HWNfYXYKkTSnL7acuF9sxSk1fr2nQMX6tfxxhnkqfPdppOMy6sN4rl8BOmzPHWgl0F
-	 NYWg9NU30WkhvnMtJsC50grXTdalQarZNsJup0ky7sN7D/7UewXY55X03jhEYiGx+u
-	 e0Le11O4BGE2g==
-Date: Thu, 27 Nov 2025 06:08:13 +0000
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-From: =?utf-8?B?7KCV7KeA7IiY?= <jschung2@proton.me>
-Cc: Cong Wang <xiyou.wangcong@gmail.com>, Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, will@willsroot.io, savy@syst3mfailure.io
-Subject: Re: Fw: [Bug 220774] New: netem is broken in 6.18
-Message-ID: <ASx87MmTb79KImWwsBhstFGoue2UNiX4l0Y0NXCSob-VNrOsz05jh8lG76DbQ7FWjGABCdc45LY6vQ3VI7UIv4KzI5LI2mB65eje2PwlHrE=@proton.me>
-In-Reply-To: <CAM0EoM=i6MsHeBYu6d-+bkxVWWHcj9b9ibM+dHr3w27mUMMhBw@mail.gmail.com>
-References: <20251110123807.07ff5d89@phoenix> <aR/qwlyEWm/pFAfM@pop-os.localdomain> <CAM0EoMkPdyqEMa0f4msEveGJxxd9oYaV4f3NatVXR9Fb=iCTcw@mail.gmail.com> <oXMTlZ5OaURBe0X3RZCO7zyNf6JJFPYvDW0AiXEg0bXJwXXYJutLhhjmUbetBUD_pGChlN7hDCCx9xFOtj8Hke5G7SM3-u5FQFC5e4T1wPY=@proton.me> <CAM0EoM=i6MsHeBYu6d-+bkxVWWHcj9b9ibM+dHr3w27mUMMhBw@mail.gmail.com>
-Feedback-ID: 167072316:user:proton
-X-Pm-Message-ID: a77bbff09d9bc9bec0c745682ac547eabea15c9b
+	s=arc-20240116; t=1764225107; c=relaxed/simple;
+	bh=iogX3xSa4Ao8v9GCUKTEnMEzH4Cl34v0hHkamugQyEA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sXta4zcO0XdKrFs0JRfhk71vIIl9P4jkSFTFmxA+yA+/l7S64EuVnRjASe0CVqQNXwPx2mMrRFmON6EZDf1hq8fN6yuqCuhc1uzREiXArJqUCRF3YTv/TSN2AqcGbhHVoIWt329RMXhLBKW5A4pgRVl2QmEuH/kapaywQ6FW0CU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MGT62KQH; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=sQQJUms5; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764225104;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iTNP02ec2EQFhb0BUUIU5hF1KwMT2YSIi7cgt/pgdoc=;
+	b=MGT62KQHGdhu4fdKYnh/tA3vmHTigHsJZnqLRFO7KMCr1+mn4jbjPrw46xld3LczryvRrJ
+	MCGcXbz0px3189lxfpskEusAAjzV4sQhyo9h18B6+ORaKb5Wo829rBTFoWjXDFcy7E22QV
+	OVEoEXd7lIOaz2fOxHUdKqdRFskvawg=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-166-p8v3OlTPMjK3ON91Uv1MhQ-1; Thu, 27 Nov 2025 01:31:42 -0500
+X-MC-Unique: p8v3OlTPMjK3ON91Uv1MhQ-1
+X-Mimecast-MFC-AGG-ID: p8v3OlTPMjK3ON91Uv1MhQ_1764225101
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4779edba8f3so2586955e9.3
+        for <netdev@vger.kernel.org>; Wed, 26 Nov 2025 22:31:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1764225101; x=1764829901; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=iTNP02ec2EQFhb0BUUIU5hF1KwMT2YSIi7cgt/pgdoc=;
+        b=sQQJUms5dREIehGvJaGVpqRcIGoi86zORlgaqgUZhL1CP3f/4OAVKrYBOS/a9eB7ZR
+         jQH1oFGkk1x0uOAjZ7Yi/E0+j88/1I7+IIQg34cAi4qG0AI7e8V0L1oRmOUBW93+RSvZ
+         69Dgrdwg8wVfEmDl8E62VQtC3o8n42Uh8saS0bbbyuac70SG098+HVovU1KWu+mR/4mi
+         2qsLr1fAczMam9EeHwbBTEgvApLwZxItI/92JepBripMbW4XjenTqTUhXahBVyTQeLXy
+         D0nOqmKDd6/WmypJ0gs1z9GUxzBp+cIxhSv1YM5W6W6L8JHerbvoKXuPZYoGs7w8bG2E
+         dXKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764225101; x=1764829901;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iTNP02ec2EQFhb0BUUIU5hF1KwMT2YSIi7cgt/pgdoc=;
+        b=pbg1oZuXQnCyHrorDmkhZ218JvRrUqZ4epqgL1zOahUhIvsfhiPyah1zQc+yFqWf6N
+         SuXL19q5RPR66cdjyk/AfD54VWOo9CW0L1I2j5EX/2oEJbEYxv+A3VIYFqKwSaOrrsIt
+         bIso4bDUW/OE/mGFtu/lvCtY5bIw2u3H0s8zfsCrDrEal2zaDvnqNFpY1+LcV0sMyK+9
+         R9l2URwP9ktyrXBWXsrq75B9z6jPjOGoGWxiFNFcmnUGYftH5joJwiCy5Lo+SliX5r1X
+         vKRSrC2uvggqS/1wPXDkd4BxiViOSTYs0o6hvyNOgD7ae75GWWr1dYIHniYLddx8laaG
+         SxiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUCwr9OXU9d1YV7agH+zyxO85zaTdF9/uOPxx7oWn47kSFBjYM1KBdSfIy1uxa/F9J1C2lsOIU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzxr3R0gIq0WaaOptijGl24aLxzhCB44hW4eCCYYWqgkuZGi2pp
+	QzzxDiR78smkFL395DyU8bwjORJvOiYjBKP48v+39ssTdgQ8mvBDmAqmjiwxqI701diqUxOAcyG
+	GRDqQ5kPslG2N3+I2ISpGCibWcSoFXwFpby7TZJApZ/8szUkqIRTyY5p2oQ==
+X-Gm-Gg: ASbGncsDeVanCm+QpRy2/6kFkz0W7z9CodXJ7fuNvw9qArsPsO9rbJK41NmtU6YKKnj
+	pWaKR9+gauavddOcv4qV4kBNWUstfUOVsX5DB4ay19kX7+pp66vwTjb4c1NkXMqJRhW9fsdEuKJ
+	giFlsMaMWpeLZ6u8q/0A1mmhyzbBIqhvWjmG+CtXaX0qaU5AErQt7uJ1ojXk202QlD7HWNDRTJG
+	xE1zgvnJgsuT2KLbP8NYsRMrW8MuYcsBUbn4M30+5/J+4k8Vctk/hr5HpJEn9XSEKsOze/iWC/m
+	qCM/eTMAcnnpNgqp0wFLu9hMxiWG9CkWeb+IOhjcZQFZU7EGZ/wipYyBCmUChC+YCFgh2Ah01s8
+	rk7paPYQD5TlrRkwlkiSOLvC83yW98g==
+X-Received: by 2002:a05:600c:358d:b0:477:55c9:c3ea with SMTP id 5b1f17b1804b1-477c01f0b32mr221886345e9.35.1764225100918;
+        Wed, 26 Nov 2025 22:31:40 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEz3QdxbLT7pjNEA0+4issjfnX1wytvw1rWR9IPHXTXDwSvYj8EJcg5Kea3fFSq+htQYjsONA==
+X-Received: by 2002:a05:600c:358d:b0:477:55c9:c3ea with SMTP id 5b1f17b1804b1-477c01f0b32mr221885885e9.35.1764225100423;
+        Wed, 26 Nov 2025 22:31:40 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-39-63.inter.net.il. [80.230.39.63])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4791165b1fesm13552265e9.15.2025.11.26.22.31.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Nov 2025 22:31:39 -0800 (PST)
+Date: Thu, 27 Nov 2025 01:31:36 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jon Kohler <jon@nutanix.com>
+Cc: Jason Wang <jasowang@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+	Netdev <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Borislav Petkov <bp@alien8.de>,
+	Sean Christopherson <seanjc@google.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Drew Fustini <fustini@kernel.org>
+Subject: Re: [PATCH net-next] vhost: use "checked" versions of get_user() and
+ put_user()
+Message-ID: <20251127013110-mutt-send-email-mst@kernel.org>
+References: <E1226897-C6D1-439C-AB3B-012F8C4A72DF@nutanix.com>
+ <CACGkMEuPK4=Tf3x-k0ZHY1rqL=2rg60-qdON8UJmQZTqpUryTQ@mail.gmail.com>
+ <A0AFD371-1FA3-48F7-A259-6503A6F052E5@nutanix.com>
+ <CACGkMEvD16y2rt+cXupZ-aEcPZ=nvU7+xYSYBkUj7tH=ER3f-A@mail.gmail.com>
+ <121ABD73-9400-4657-997C-6AEA578864C5@nutanix.com>
+ <CACGkMEtk7veKToaJO9rwo7UeJkN+reaoG9_XcPG-dKAho1dV+A@mail.gmail.com>
+ <61102cff-bb35-4fe4-af61-9fc31e3c65e0@app.fastmail.com>
+ <02B0FDF1-41D4-4A7D-A57E-089D2B69CEF2@nutanix.com>
+ <CACGkMEshKS84YBuqyEzYuuWJqUwGML4N+5Ev6owbiPHvogO=3Q@mail.gmail.com>
+ <5EB2ED95-0BA3-4E71-8887-2FCAF002577C@nutanix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,100 +133,108 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <5EB2ED95-0BA3-4E71-8887-2FCAF002577C@nutanix.com>
 
-Mr Salim,
+On Thu, Nov 27, 2025 at 03:11:57AM +0000, Jon Kohler wrote:
+> 
+> 
+> > On Nov 26, 2025, at 8:08 PM, Jason Wang <jasowang@redhat.com> wrote:
+> > 
+> > On Thu, Nov 27, 2025 at 3:48 AM Jon Kohler <jon@nutanix.com> wrote:
+> >> 
+> >> 
+> >>> On Nov 26, 2025, at 5:25 AM, Arnd Bergmann <arnd@arndb.de> wrote:
+> >>> 
+> >>> On Wed, Nov 26, 2025, at 07:04, Jason Wang wrote:
+> >>>> On Wed, Nov 26, 2025 at 3:45 AM Jon Kohler <jon@nutanix.com> wrote:
+> >>>>>> On Nov 19, 2025, at 8:57 PM, Jason Wang <jasowang@redhat.com> wrote:
+> >>>>>> On Tue, Nov 18, 2025 at 1:35 AM Jon Kohler <jon@nutanix.com> wrote:
+> >>>>> Same deal goes for __put_user() vs put_user by way of commit
+> >>>>> e3aa6243434f ("ARM: 8795/1: spectre-v1.1: use put_user() for __put_user()”)
+> >>>>> 
+> >>>>> Looking at arch/arm/mm/Kconfig, there are a variety of scenarios
+> >>>>> where CONFIG_CPU_SPECTRE will be enabled automagically. Looking at
+> >>>>> commit 252309adc81f ("ARM: Make CONFIG_CPU_V7 valid for 32bit ARMv8 implementations")
+> >>>>> it says that "ARMv8 is a superset of ARMv7", so I’d guess that just
+> >>>>> about everything ARM would include this by default?
+> >>> 
+> >>> I think the more relevant commit is for 64-bit Arm here, but this does
+> >>> the same thing, see 84624087dd7e ("arm64: uaccess: Don't bother
+> >>> eliding access_ok checks in __{get, put}_user").
+> >> 
+> >> Ah! Right, this is definitely the important bit, as it makes it
+> >> crystal clear that these are exactly the same thing. The current
+> >> code is:
+> >> #define get_user        __get_user
+> >> #define put_user        __put_user
+> >> 
+> >> So, this patch changing from __* to regular versions is a no-op
+> >> on arm side of the house, yea?
+> >> 
+> >>> I would think that if we change the __get_user() to get_user()
+> >>> in this driver, the same should be done for the
+> >>> __copy_{from,to}_user(), which similarly skips the access_ok()
+> >>> check but not the PAN/SMAP handling.
+> >> 
+> >> Perhaps, thats a good call out. I’d file that under one battle
+> >> at a time. Let’s get get/put user dusted first, then go down
+> >> that road?
+> >> 
+> >>> In general, the access_ok()/__get_user()/__copy_from_user()
+> >>> pattern isn't really helpful any more, as Linus already
+> >>> explained. I can't tell from the vhost driver code whether
+> >>> we can just drop the access_ok() here and use the plain
+> >>> get_user()/copy_from_user(), or if it makes sense to move
+> >>> to the newer user_access_begin()/unsafe_get_user()/
+> >>> unsafe_copy_from_user()/user_access_end() and try optimize
+> >>> out a few PAN/SMAP flips in the process.
+> > 
+> > Right, according to my testing in the past, PAN/SMAP is a killer for
+> > small packet performance (PPS).
+> 
+> For sure, every little bit helps along that path
+> 
+> > 
+> >> 
+> >> In general, I think there are a few spots where we might be
+> >> able to optimize (vhost_get_vq_desc perhaps?) as that gets
+> >> called quite a bit and IIRC there are at least two flips
+> >> in there that perhaps we could elide to one? An investigation
+> >> for another day I think.
+> > 
+> > Did you mean trying to read descriptors in a batch, that would be
+> > better and with IN_ORDER it would be even faster as a single (at most
+> > two) copy_from_user() might work (without the need to use
+> > user_access_begin()/user_access_end().
+> 
+> Yep. I haven’t fully thought through it, just a drive-by idea
+> from looking at code for the recent work I’ve been doing, just
+> scratching my head thinking there *must* be something we can do
+> better there.
+> 
+> Basically on the get rx/tx bufs path as well as the
+> vhost_add_used_and_signal_n path, I think we could cluster together
+> some of the get/put users and copy to/from’s. Would take some
+> massaging, but I think there is something there.
+> 
+> >> 
+> >> Anyhow, with this info - Jason - is there anything else you
+> >> can think of that we want to double click on?
+> > 
+> > Nope.
+> > 
+> > Thanks
+> 
+> Ok thanks. Perhaps we can land this in next and let it soak in,
+> though, knock on wood, I don’t think there will be fallout
+> (famous last words!) ?
 
-I do not understand what your saying. You provide a bash script, and I can =
-test
+Yea I'll put this in linux-next and we'll see what happens.
 
-- Ji-Soo
 
-=EC=97=90 2025=EB=85=84 11=EC=9B=94 22=EC=9D=BC =ED=86=A0=EC=9A=94=EC=9D=
-=BC 17:24 Jamal Hadi Salim <jhs@mojatatu.com> =EB=8B=98=EC=9D=B4 =EC=9E=
-=91=EC=84=B1=ED=95=A8:
+-- 
+MST
 
->=20
->=20
-> Hi =EC=A0=95=EC=A7=80=EC=88=98,
->=20
-> On Sat, Nov 22, 2025 at 1:56=E2=80=AFAM =EC=A0=95=EC=A7=80=EC=88=98 jschu=
-ng2@proton.me wrote:
->=20
-> > #!/bin/bash
-> >=20
-> > set -euo pipefail
-> >=20
-> > DEV=3D"wlo0"
-> > QUEUE=3D"1"
-> > RTP_DST_PORT=3D"5004"
-> > DUP_PCT=3D"25%"
-> > CORR_PCT=3D"60%"
-> > DELAY=3D"1ms"
-> > VERIFY_SECONDS=3D15
-> >=20
-> > usage(){ echo "Usage: sudo $0 [-d DEV] [-q QUEUE] [-P UDP_PORT]"; exit =
-1; }
-> > while [[ $# -gt 0 ]]; do
-> > case "$1" in
-> > -d) DEV=3D"$2"; shift 2;;
-> > -q) QUEUE=3D"$2"; shift 2;;
-> > -P) RTP_DST_PORT=3D"$2"; shift 2;;
-> > *) usage;;
-> > endac
-> > done || true
-> >=20
-> > [[ -d /sys/class/net/$DEV ]] || { echo "No such dev $DEV"; exit 1; }
-> >=20
-> > if ! tc qdisc show dev "$DEV" | grep -q ' qdisc mq '; then
-> > echo "Setting root qdisc to mq.."
-> > tc qdisc replace dev "$DEV" root handle 1: mq
-> > fi
-> >=20
-> > echo "Adding ntuple to steer UDP dport $RTP_DST_PORT -> tx-queue $QUEUE=
-..."
-> > ethtool -N "$DEV" flow-type udp4 dst-port $RTP_DST_PORT action $QUEUE |=
-| {
-> > echo "some flows will still land on :$QUEUE"
-> > }
-> >=20
-> > echo "Attaching netem duplicate=3D$DUP_PCT corr=3D$CORR_PCT delay=3D$DE=
-LAY on parent :$QUEUE.."
-> > tc qdisc replace dev "$DEV" parent :$QUEUE handle ${QUEUE}00: \
-> > netem duplicate "$DUP_PCT" "$CORR_PCT" delay "$DELAY"
-> >=20
-> > tc qdisc show dev "$DEV"
-> >=20
-> > echo
-> > echo "Start an RTP/WebRTC/SFU downlink to a test client on UDP port $RT=
-P_DST_PORT."
-> > echo "Capturing for $VERIFY_SECONDS s to observe duplicates by RTP seqn=
-o.."
-> > timeout "$VERIFY_SECONDS" tcpdump -ni "$DEV" "udp and dst port $RTP_DST=
-_PORT" -vv -c 0 2>/dev/null | head -n 3 || true
-> >=20
-> > if command -v tshark >/dev/null 2>&1; then
-> > echo "tshark live RTP view :"
-> > timeout "$VERIFY_SECONDS" tshark -i "$DEV" -f "udp dst port $RTP_DST_PO=
-RT" -q -z rtp,streams || true
-> > fi
-> >=20
-> > echo
-> > echo "Netem stats, see duplicated counters under handle ${QUEUE}00:):"
-> > tc -s qdisc show dev "$DEV" | sed -n '1,200p'
->=20
->=20
-> Thanks for the config.
->=20
-> If you can talk about it: I was more interested in what your end goal is.
-> From the dev name it seems $DEV is a wireless device? Are you
-> replicating these RTP packets across different ssids mapped to
-> different hw queues? Are you forwarding these packets? The ethtool
-> config indicates the RX direction but the netem replication is on the
-> tx.
-> And in the short term if a tc action could achieve what you are trying
-> to achieve - would that work for you?
->=20
-> cheers,
-> jamal
 
