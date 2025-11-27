@@ -1,76 +1,78 @@
-Return-Path: <netdev+bounces-242398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 765D7C90246
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 21:44:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11019C90243
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 21:44:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5B098350D11
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 20:44:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A60433A9DF6
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 20:44:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD0AF314B7F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E349F3164AB;
 	Thu, 27 Nov 2025 20:44:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MtnF1z11"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aUPfxoq0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 915B0314B88
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 20:44:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C99E9314D03
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 20:44:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764276274; cv=none; b=jbiX+mbqYIWNK8cCDd4BU8YHFdjefequfS6EVSNC/FZw358eOVn+D11iFivU7+Th9F7aOHegTBjDruFMah38CCSKIIEBhfepw5YD+cQQSgpQgCv+s2dnbE5vHHupmj3QlPK0fgDX5m0rDVHA0RBIuXNFkcfJmDT7pc1NGhc+lC0=
+	t=1764276274; cv=none; b=MUThsuZRKGA+9DzsStJhGprwxw45M5RGmz5VE9wcjRLaKtFl0L6csxAZImifg7yISDI/LYfcludxZL61qBQ+Z/I2Ra3C3NDjLjc7ikItmyWyUWs8Yy4KMK1PtDRn6PIFj7qFGlKC/HLR9Lx+GZbKNRjTUZwqA9+lJEZK8oIGGD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1764276274; c=relaxed/simple;
-	bh=/EjJ09gOItV7saCsoFehzrNjoCEq456We2WFPrNbPig=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qVSbw4zYEm9jMVRKPq/2/sHBVeDq4wZeYxSZHuC3Bz7CBZmCPUkY1fMMzQe5LVNprr7UdM4lSUXHzk/n0zWluaYD+RkFnMU5dxDpSs3kFsJ7OVcn6r0+C+JEzr6OFW73fp59+ZZ3ksu7RO0HTS2IgEXdcBpIaVyq3V/PeQIirl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MtnF1z11; arc=none smtp.client-ip=209.85.221.45
+	bh=wKLX50upMBXTkaYsn5OUPjFxWSff+rFLBPN8t4x3gXA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=YzKQcr51NO+jVoEOHsezmtodOqv8TnbmEBIKjZnfz63tMR57NXGFPF/EcpY3S+abOPFwRpFOibcTSySJ55FRCON7mLuiwcu0hiGyMLfoNh7Yv0kccilECBLTSXXRL0XIcRnuNc/7HfcS/NKlFM+hRygz+rCKIfvUgoc1dOkRJpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aUPfxoq0; arc=none smtp.client-ip=209.85.221.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-42b2e9ac45aso792149f8f.0
-        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 12:44:31 -0800 (PST)
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-42b566859ecso1157049f8f.2
+        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 12:44:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764276269; x=1764881069; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=FpIVeIXOM3u5t7UAKdTuYXobohTRnPpHVwMbUQwuMXY=;
-        b=MtnF1z11uyVfucV3hrIGnx3dGye2q5hcej7HJQy1FIckJUt3NlaCd+g8PhmbUsgvnL
-         S9yiC9OI4bEdd+cxBywHV+FcXreG8xJjcK1ggzTvb8sON1lc1OLvWVpe5H/hJLFKiFxA
-         sKsL1Upn+kPYJ9b54FztslZVcU6oEnFPNL2X8UtYl6cWjhFMSun3CAD+vLcIwkzEbBCs
-         HJ5fHbHoY5Y5t4YE53Tfimys/xZPcuGrOCwKvddoBcyuwrAyOsgyfu4sneC6VtuYcsIV
-         3NQPXI7DPSE6HhmBRamshZm3uAyU82gFUvwzz/XGbfo7OHKU7QnwhI74uSHYSCe7fxno
-         sPQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764276269; x=1764881069;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1764276271; x=1764881071; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FpIVeIXOM3u5t7UAKdTuYXobohTRnPpHVwMbUQwuMXY=;
-        b=UV+tiaCUqd6wWI+PYHbdqaU2f4sqiiKh6O2KrlAWGGM2TYDUP9C4yZDdetsC128vNd
-         X1T9DuZiJMMQH3ToHMEB9guYuzOk1os3O56oldFULcEn5/8vrExJYUCZQ04QEsmdjWT2
-         hBNnRH2CrczxpsBphZTtfymcY2qbyL95A73IY46LgT0nPPL61kXZXXclqgpgcP8MSGut
-         xADfUUmtq8XhCoatXPLS7qJ+MckcKRD08btme69jQBLhoOrcgSU6NclBtC3215objLCv
-         uDajRMBpWPsa/zb5D7u6KldVnJsdZjoDvAURKGKSmuxuiLMGkFV4fQA0YaQmdjIjblN+
-         ttzw==
-X-Gm-Message-State: AOJu0YyMCrIyEiP4mZmqX7jmUatE6XRUCwDAMOCP0NRHk21em08iRlz4
-	8+gqF1XnanIhp2WORbxA022KMaHk2/RCRoMNufhjQeGEUGCVVE+5LzxxhCZTTw==
-X-Gm-Gg: ASbGnctYvFvDoKEn2dKVlKXMivpLobD+UXrk3Q2yC4M2jgaCemVukrmNF4LgnavHpkW
-	bk9XqI6PLt6kvANVV0CCEW7zrjSz9k/VdwAq4G3VhKZ1L6M5YsHdYT7MGifJTFoPJY6RgoUgViW
-	6Fl8eRwndvm6/+4XoLiM9r3BC/b7rtSFVDZ646bjppoXPjrCfpvvqpuxvmFolyxS3l5jBdNK/So
-	Hz1cJWvrTXk/4L5rWW17aj4VdR6NzmuTAOZxGZweXT6/QWlfjtCdUwKuvk5cuPzxD//jO3RLlPt
-	eGwsSk43fXdKV1+wqcf1QM2fZz9gNvBtPHD2QMN3NFsQ+n0DQMDRRKK2QbxbAHBx6VviBmSEv1Q
-	FXStaedg1a1h70Z7bxLnXlAApiIH5BxFaM/MSIPucKuwIIngz7ZUgLF995I+jDNGdym0WkUJ22u
-	nvNubN/WjIJ/L+Xw==
-X-Google-Smtp-Source: AGHT+IEvLAp8f+ARTRxSpj80ry7mwrxLtVe2+RcRZGsNrSm5FpD7CnOSq8CVScpcjLQRd3+QWGXFdQ==
-X-Received: by 2002:a05:6000:40c9:b0:42b:47da:c31c with SMTP id ffacd0b85a97d-42e0f344674mr13716391f8f.37.1764276269148;
-        Thu, 27 Nov 2025 12:44:29 -0800 (PST)
+        bh=QqckiZGHf3bNG1zTutRGSVS8PaQ4OMxeAJnwQy2/Q0I=;
+        b=aUPfxoq0Hio5ZQS2G2fSjo0D2AbYa5RAD/3sviTaZmeuhfDe4kUhhkqG2F9uicqq0T
+         8NM/Iw5A++YZYbDOWzRar66j0C11LjMgtJQF7Dr5fk1sihqoS+x+sa3pvL9OeooNkjq7
+         KrYdJIji7Lnlis05CvAHPwGc33gcPaQFQmFnwH5+zLPNn5KYaumjEHhuj4TqR6GZeilF
+         a2i7co6DnN73ELuYq1t1Tdl9td/uKBKv3Ggw3Oe6Cfv+n5nxpVI/CpOmzwBx9XMxr2O9
+         V0o5xHOiytQhzFticuvKM+PxRrxyhK1ykMRjt0+y7fkSOZcr6gq1zdHtYoW0onuSX8wI
+         iyWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764276271; x=1764881071;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=QqckiZGHf3bNG1zTutRGSVS8PaQ4OMxeAJnwQy2/Q0I=;
+        b=FS49JNArRHexEE+b1lgz7TPn26ZgoEDMzzCkFS5jySQ0G9FHHnSFSHFz0mCQRcAsNm
+         ZUXbBJe4dxgTuWQbZGK4Uvwka0uyfBtlBXP+J9QzF+2Z/ENkdp1NC02JPsaMVrHdTfS8
+         /H8iw73egFK466qDYzckp+f/9vZeyECrm1kcx7l85fWCoVGWyLBKwsluurYIrUSLNowx
+         Q86pGTDzs6FxmTbWKOQ9ERxSO9Cy8AvRCIkEq6HZAZE3VcgP5H8HQbr1HnM/BOSXFeZc
+         +z37GlyDOo/j+iGOJ8lKL0ZJP5NtmTn/YphsSgTzKKQAY/aEEFS6p7AvGUpDnIUjYC0v
+         FwcQ==
+X-Gm-Message-State: AOJu0YxfhBYPNZjPB7+g7aaL0hl5OKdYyGd+ght4kn21CyJaEdYhiqBM
+	DCFAmdimzQ4aCLmx8Pcgqh9386Vn2Tn3m0ivy0wxVIrEFMzVIBvIlnnYjfAhrQ==
+X-Gm-Gg: ASbGncvtmXgh82iFAytKVfLiJHA64Hct8LpQnIXljoK6Wo/TCkv3SDzdadTcfnj8P+S
+	hM71Km34/IWOFwsqLASOsPqaF9n8n4mCaHmR7NzmGT2PybF/UjEZirQNmZFGkUOTVJG082WpW1z
+	kZXyPRQ+D7UQEdCWvblovT6O8a2oPs1dYTYH2h8A4eSo49xGv1PVioaVvW3h0okrHekN1v18MGx
+	vHQ58xtiVBTXFk+b1NQvbXi2jZCmupVXqtEAK+dQTXkHyCPsvVFEa9m/pzjlbYIHYSpQdx9qr5J
+	9ra88sNdYaoidxRENoInoLpDvSILmSQQ+doL/i34Qo591pCOm0vbwHEQVwVSq1/h3nCwDRFgbpd
+	2xCXe3hLnOuuZnvMHpRz7DbXY5YXEs8smgC+Ee84j01x4u8j7MjHp7D6teWHCaUW80WS8bx56pP
+	q1rq+u/ZS2ufTYxmAOpIxUmjQI
+X-Google-Smtp-Source: AGHT+IG8xP4HJO4DnqjJPYdufQcB54g2uija30UcXEQTiQoRe6u8ZY63WY3zQ9RB9/Vh8e5LOItojw==
+X-Received: by 2002:a05:6000:2c0c:b0:42b:2c61:86f1 with SMTP id ffacd0b85a97d-42e0f34a082mr13136672f8f.35.1764276270574;
+        Thu, 27 Nov 2025 12:44:30 -0800 (PST)
 Received: from 127.mynet ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42e1c5d614asm5346105f8f.12.2025.11.27.12.44.28
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42e1c5d614asm5346105f8f.12.2025.11.27.12.44.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Nov 2025 12:44:28 -0800 (PST)
+        Thu, 27 Nov 2025 12:44:29 -0800 (PST)
 From: Pavel Begunkov <asml.silence@gmail.com>
 To: netdev@vger.kernel.org
 Cc: "David S . Miller" <davem@davemloft.net>,
@@ -89,11 +91,15 @@ Cc: "David S . Miller" <davem@davemloft.net>,
 	linux-doc@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	io-uring@vger.kernel.org,
-	dtatulea@nvidia.com
-Subject: [PATCH net-next v6 0/8][pull request] Add support for providers with large rx buffer
-Date: Thu, 27 Nov 2025 20:44:13 +0000
-Message-ID: <cover.1764264798.git.asml.silence@gmail.com>
+	dtatulea@nvidia.com,
+	Stanislav Fomichev <stfomichev@gmail.com>,
+	Mina Almasry <almasrymina@google.com>
+Subject: [PATCH net-next v6 1/8] net: page_pool: sanitise allocation order
+Date: Thu, 27 Nov 2025 20:44:14 +0000
+Message-ID: <337ee90a6464e9b9ab09d1850fd9aedcb0e13679.1764264798.git.asml.silence@gmail.com>
 X-Mailer: git-send-email 2.52.0
+In-Reply-To: <cover.1764264798.git.asml.silence@gmail.com>
+References: <cover.1764264798.git.asml.silence@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,111 +108,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Note: it's net/ only bits and doesn't include changes, which shoulf be
-merged separately and are posted separately. The full branch for
-convenience is at [1], and the patch is here:
+We're going to give more control over rx buffer sizes to user space, and
+since we can't always rely on driver validation, let's sanitise it in
+page_pool_init() as well. Note that we only need to reject over
+MAX_PAGE_ORDER allocations for normal page pools, as current memory
+providers don't need to use the buddy allocator and must check the order
+on init.i
 
-https://lore.kernel.org/io-uring/7486ab32e99be1f614b3ef8d0e9bc77015b173f7.1764265323.git.asml.silence@gmail.com
-
-Many modern NICs support configurable receive buffer lengths, and zcrx and
-memory providers can use buffers larger than 4K/PAGE_SIZE on x86 to improve
-performance. When paired with hw-gro larger rx buffer sizes can drastically
-reduce the number of buffers traversing the stack and save a lot of processing
-time. It also allows to give to users larger contiguous chunks of data. The
-idea was first floated around by Saeed during netdev conf 2024 and was
-asked about by a few folks.
-
-Single stream benchmarks showed up to ~30% CPU util improvement.
-E.g. comparison for 4K vs 32K buffers using a 200Gbit NIC:
-
-packets=23987040 (MB=2745098), rps=199559 (MB/s=22837)
-CPU    %usr   %nice    %sys %iowait    %irq   %soft   %idle
-  0    1.53    0.00   27.78    2.72    1.31   66.45    0.22
-packets=24078368 (MB=2755550), rps=200319 (MB/s=22924)
-CPU    %usr   %nice    %sys %iowait    %irq   %soft   %idle
-  0    0.69    0.00    8.26   31.65    1.83   57.00    0.57
-
-This series adds net infrastructure for memory providers configuring
-the size and implements it for bnxt. It's an opt-in feature for drivers,
-they should advertise support for the parameter in the qops and must check
-if the hardware supports the given size. It's limited to memory providers
-as it drastically simplifies implementation. It doesn't affect the fast
-path zcrx uAPI, and the sizes is defined in zcrx terms, which allows it
-to be flexible and adjusted in the future, see Patch 7 for details.
-
-A liburing example can be found at [2]
-
-full branch:
-[1] https://github.com/isilence/linux.git zcrx/large-buffers-v6
-Liburing example:
-[2] https://github.com/isilence/liburing.git zcrx/rx-buf-len
-
+Suggested-by: Stanislav Fomichev <stfomichev@gmail.com>
+Reviewed-by: Mina Almasry <almasrymina@google.com>
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 ---
+ net/core/page_pool.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-The following changes since commit ac3fd01e4c1efce8f2c054cdeb2ddd2fc0fb150d:
-
-  Linux 6.18-rc7 (2025-11-23 14:53:16 -0800)
-
-are available in the Git repository at:
-
-  https://github.com/isilence/linux.git tags/net-queue-rx-buf-len-v6
-
-for you to fetch changes up to ef9cc9f58d60656a8afef1fc84f066aeb7b27378:
-
-  selftests: iou-zcrx: test large chunk sizes (2025-11-27 13:19:32 +0000)
-
-
-v6: - Update docs and add a selftest
-
-v5: https://lore.kernel.org/netdev/cover.1760440268.git.asml.silence@gmail.com/
-    - Remove all unnecessary bits like configuration via netlink, and
-      multi-stage queue configuration.
-
-v4: https://lore.kernel.org/all/cover.1760364551.git.asml.silence@gmail.com/
-    - Update fbnic qops
-    - Propagate max buf len for hns3
-    - Use configured buf size in __bnxt_alloc_rx_netmem
-    - Minor stylistic changes
-v3: https://lore.kernel.org/all/cover.1755499375.git.asml.silence@gmail.com/
-    - Rebased, excluded zcrx specific patches
-    - Set agg_size_fac to 1 on warning
-v2: https://lore.kernel.org/all/cover.1754657711.git.asml.silence@gmail.com/
-    - Add MAX_PAGE_ORDER check on pp init
-    - Applied comments rewording
-    - Adjust pp.max_len based on order
-    - Patch up mlx5 queue callbacks after rebase
-    - Minor ->queue_mgmt_ops refactoring
-    - Rebased to account for both fill level and agg_size_fac
-    - Pass providers buf length in struct pp_memory_provider_params and
-      apply it in __netdev_queue_confi().
-    - Use ->supported_ring_params to validate drivers support of set
-      qcfg parameters.
-
-Jakub Kicinski (1):
-  eth: bnxt: adjust the fill level of agg queues with larger buffers
-
-Pavel Begunkov (7):
-  net: page_pool: sanitise allocation order
-  net: memzero mp params when closing a queue
-  net: let pp memory provider to specify rx buf len
-  eth: bnxt: store rx buffer size per queue
-  eth: bnxt: allow providers to set rx buf size
-  io_uring/zcrx: document area chunking parameter
-  selftests: iou-zcrx: test large chunk sizes
-
- Documentation/networking/iou-zcrx.rst         |  20 +++
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 118 ++++++++++++++----
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |   2 +
- drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |   6 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h |   2 +-
- include/net/netdev_queues.h                   |   9 ++
- include/net/page_pool/types.h                 |   1 +
- net/core/netdev_rx_queue.c                    |  14 ++-
- net/core/page_pool.c                          |   3 +
- .../selftests/drivers/net/hw/iou-zcrx.c       |  72 +++++++++--
- .../selftests/drivers/net/hw/iou-zcrx.py      |  37 ++++++
- 11 files changed, 235 insertions(+), 49 deletions(-)
-
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index 1a5edec485f1..635c77e8050b 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -301,6 +301,9 @@ static int page_pool_init(struct page_pool *pool,
+ 		}
+ 
+ 		static_branch_inc(&page_pool_mem_providers);
++	} else if (pool->p.order > MAX_PAGE_ORDER) {
++		err = -EINVAL;
++		goto free_ptr_ring;
+ 	}
+ 
+ 	return 0;
 -- 
 2.52.0
 
