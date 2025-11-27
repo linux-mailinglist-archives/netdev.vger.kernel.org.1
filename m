@@ -1,147 +1,97 @@
-Return-Path: <netdev+bounces-242296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06582C8E770
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 14:30:01 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7369C8E7D0
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 14:33:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2873A3B152C
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 13:29:41 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 994444E8D94
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 13:32:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D02526ED4F;
-	Thu, 27 Nov 2025 13:29:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AFE1331A52;
+	Thu, 27 Nov 2025 13:30:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CiOB2sSe"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Z6HPxH7X"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 011FF269AE9
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 13:29:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A79035695;
+	Thu, 27 Nov 2025 13:30:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764250180; cv=none; b=HKyJH1FKxcbA5rj6vPQkmAH/Ay4VhQZg/Fo42pwFLF5FAEei0AS3VLDjceBLCFV16W1g6Yos0wEXWQhK/ZkANggzH4IbyGfx6ldHACjoIQxeshFaDKQTJN18ycB5zFT4NO8V+QRQgvISj/bEgX4aIWyu6sT/vyuZAHIZ+C47XaA=
+	t=1764250248; cv=none; b=WivTg7NOgOKMkRQIE7dPFtGR5xNhH+76MI9uUaRJv46RnreAveY8x0gbSXHf0l9s1ciHPOnEwB04lscfp1d2BF/fP56VlUJJVffrP4fzO7GeOSsWBvq4Mt0xzX0hVyMtNKSU6QKOowKrhLMJBiSW9NcmTFa0Rm1n9CsDBJrRZJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764250180; c=relaxed/simple;
-	bh=T0k6LeJ5oLeqXJ8ppKB2TmvacdWxh0+b9xsZkfWINxg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=N3WsQYYyAl1+djl/aZRtqfxJk4TW0IjPSlQJpmqGLQiwepX47QRg/KTHCqpaZG8IIk2Wb66RnoWLiRSEOmX4rf1cCeqnLMvmFDjFYy5crfCOtYeVOm1WTfbCCinAJp4mVfmnvsRsXKIqXx/I9ifIndUP9cjatONu31vkVzEXdS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CiOB2sSe; arc=none smtp.client-ip=209.85.128.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-78ab03c30ceso7978717b3.2
-        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 05:29:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764250178; x=1764854978; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CCG84odQYbmqLqvf+/rxN52Xhfd3eI4U/Ar5xvc78lQ=;
-        b=CiOB2sSeqAzs0EZiweC+JE2cWJhO3u8xf7fK2pn/Yp5vnnRHodmo1C3+RXxlQStcKK
-         L1d9GybFVhFoIEF8ooVn0xGICKagF4qWvPR5o2bX3GhzvPttsuWQBGtsEo60eP2k2dyR
-         KH0RWDGvwHCk2Lwxr5BzKm1FyZhZoZmqJFJP9aEu0Q7XpJ/8jTJ+IlZQYC+prfesJPZk
-         l0zjeLC8af+APw9l8U2YSnrnks9D0NBnbTAR73xIS/PzNdDimRrZiFPG8stB9WtqmShx
-         wKHrxxQjcwE79NzePbMBaeJwc8pCs+skCZ4g6cuGKtsU/KCV1PYMARBklz0IYk03FIae
-         rLJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764250178; x=1764854978;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=CCG84odQYbmqLqvf+/rxN52Xhfd3eI4U/Ar5xvc78lQ=;
-        b=J5iWHcNZEP7IuPiuQAVrDjo+oqI03pbPj+EkkUhmeQLp5pL8XB2LLslTi9zUEaAj06
-         y+gGXguRA95VWRI2zBlZqApMwig0SAQbwEorjkVIEax8sAkIuEChbOCO+KJc/VGqHhOL
-         jREcy8bytaQU/cDyvSdg33RyLJrVFZI3QRoiJ1xzU6FOXXd3JSQKmu+MjjvZlq79JAhL
-         djLTpXUZpeILSS1dy6TTKL4N+bDAgawwBOnsgVoG+jXKVyU46IOMYzD+Ws1Nmf7YWWtI
-         SxILDbhhJMYedIB0/Oi0RLF+Ccggs07frTUhxcMFKogGqkOAjMebaXQj569E6BBOYqKu
-         pHpg==
-X-Gm-Message-State: AOJu0YwDeAiteSDc9IAdMvLyI41GE0HXjPn/1zNdSomxPLnLz0dzBuMR
-	6XadeWqJRJAlfdt4H6mbriCXrZdOsfe52ul27wXs4EROeXGE2vQ4sEWLUxbm8ReUKExpBVSDNav
-	xM0aW4RA+/fyzvSrkK4Bw/xHsuocRMtk=
-X-Gm-Gg: ASbGncvxXSe1svyFFEGaPGMGWht8gULqBn6yObKAsk3vXZz98GeEgsXDRb/910+Xiv8
-	32KA7WvaZqjS4JIxaENYVH+WeGyNOx9SomWusc/5JN8900x/zHwRKCgPZej5k+WqeGJVnC0SMdL
-	VgwIUF52G3oSipnICB9VfVH349nIJiYs41pgnq4AA/KYMulFhjgzNBnDjqmED2rmqkNXiowqb9t
-	7YOficcg9Zs/Cm7JFHwCQjltTP68IJrtQ6j7ymd/RzTo86ehdiS3OicfUnxb4lveAicyQt4Quwa
-	nCuG
-X-Google-Smtp-Source: AGHT+IHpTUa2hqHESyAtNwL998ANNhr9hkzafHdwjgOrlK+xkRt/nphLe+rAq5wP0pUgv4QW71MAHijRtBHDq6YGp1o=
-X-Received: by 2002:a05:690c:9c01:b0:788:763:17c5 with SMTP id
- 00721157ae682-78a8b47a778mr198344097b3.12.1764250177889; Thu, 27 Nov 2025
- 05:29:37 -0800 (PST)
+	s=arc-20240116; t=1764250248; c=relaxed/simple;
+	bh=XVshO5fwex/FWJdbvLDHA7GTxSigtdmElE27ZLpbIyQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fc5Pu7rOtWV4hPhCS3411m4e2ADckydob1vHvUrB6oWnDVaf4P6U0SpHw4LhmCutAqpR4A2FfQuD/2Nzzb3vNKls6X03Xi1K5R7jc1G6rAxvOaAZk0Dandwb/vfrTuYwXOGAHRRgfsB0IODEd2qFR+X5cYxEC39pUeMInJZL9SA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Z6HPxH7X; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=F2ElVsdrp+lG3pazHvx7/VtoAiVWvnMpN0u2nWWuwxo=; b=Z6HPxH7XDec96l4g0YNkCIIWxE
+	DUXqJ0NvhNC8LaVWAcrUuD0yHOZYKVobGLlqCiuhMP+584AOyyOOmNDfslYV9JBcTR6+OSqan0Fxd
+	tPeqS7CBt4u1ueNelksvAOzLjXA+HeyAR8zIfklfFY4ryirclJlGf4jM4vCfAmp4a0Mx2lv+QCxLP
+	6ZSvnMqVHmOtdBGA1MhkL5vtH/wcbuoEEjsQqgzcO3vpWeQeBNjwI72snA1VUucW8lYW8XK6kfX0/
+	qsbPM+k2krYCbHMKPQDNkE1vEuqC8oWfE6r2tS8ApeQftMQ5nxq4gIlx/QHdZdnYC80dDd406M7CB
+	z+wPRlbg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60740)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vOc4z-000000005Js-0DVp;
+	Thu, 27 Nov 2025 13:30:37 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vOc4w-000000002hl-1UOE;
+	Thu, 27 Nov 2025 13:30:34 +0000
+Date: Thu, 27 Nov 2025 13:30:34 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Robert Marko <robimarko@gmail.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	ansuelsmth@gmail.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: phy: aquantia: check for NVMEM deferral
+Message-ID: <aShSesEATBaKnO0A@shell.armlinux.org.uk>
+References: <20251127114514.460924-1-robimarko@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251127120902.292555-1-vladimir.oltean@nxp.com> <20251127120902.292555-3-vladimir.oltean@nxp.com>
-In-Reply-To: <20251127120902.292555-3-vladimir.oltean@nxp.com>
-From: Jonas Gorski <jonas.gorski@gmail.com>
-Date: Thu, 27 Nov 2025 14:29:27 +0100
-X-Gm-Features: AWmQ_bmB5J_RQTCPPSgUUrXYs-CXaJ8DU1cXNXQ_EBeTsKzMtWtmjgKRtGanjXQ
-Message-ID: <CAOiHx=miR4JAbnYeRJwcHowgBUmvCn4X19syCxuwk8N7=xAXRQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 02/15] net: dsa: tag_brcm: use the
- dsa_xmit_port_mask() helper
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Florian Fainelli <florian.fainelli@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251127114514.460924-1-robimarko@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, Nov 27, 2025 at 1:09=E2=80=AFPM Vladimir Oltean <vladimir.oltean@nx=
-p.com> wrote:
->
-> The "brcm" and "brcm-prepend" tagging protocols populate a bit mask for
-> the TX ports, so we can use dsa_xmit_port_mask() to centralize the
-> decision of how to set that field. The port mask is written u8 by u8,
-> first the high octet and then the low octet.
->
-> Cc: Florian Fainelli <florian.fainelli@broadcom.com>
-> Cc: Jonas Gorski <jonas.gorski@gmail.com>
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> ---
->  net/dsa/tag_brcm.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/net/dsa/tag_brcm.c b/net/dsa/tag_brcm.c
-> index eadb358179ce..cf9420439054 100644
-> --- a/net/dsa/tag_brcm.c
-> +++ b/net/dsa/tag_brcm.c
-> @@ -92,6 +92,7 @@ static struct sk_buff *brcm_tag_xmit_ll(struct sk_buff =
-*skb,
->  {
->         struct dsa_port *dp =3D dsa_user_to_port(dev);
->         u16 queue =3D skb_get_queue_mapping(skb);
-> +       u16 port_mask;
->         u8 *brcm_tag;
->
->         /* The Ethernet switch we are interfaced with needs packets to be=
- at
-> @@ -119,10 +120,9 @@ static struct sk_buff *brcm_tag_xmit_ll(struct sk_bu=
-ff *skb,
->         brcm_tag[0] =3D (1 << BRCM_OPCODE_SHIFT) |
->                        ((queue & BRCM_IG_TC_MASK) << BRCM_IG_TC_SHIFT);
->         brcm_tag[1] =3D 0;
-> -       brcm_tag[2] =3D 0;
-> -       if (dp->index =3D=3D 8)
-> -               brcm_tag[2] =3D BRCM_IG_DSTMAP2_MASK;
-> -       brcm_tag[3] =3D (1 << dp->index) & BRCM_IG_DSTMAP1_MASK;
-> +       port_mask =3D dsa_xmit_port_mask(skb, dev);
-> +       brcm_tag[2] =3D (port_mask >> 8) & BRCM_IG_DSTMAP2_MASK;
-> +       brcm_tag[3] =3D port_mask & BRCM_IG_DSTMAP1_MASK;
+On Thu, Nov 27, 2025 at 12:44:35PM +0100, Robert Marko wrote:
+> Currently, if NVMEM provider is probed later than Aquantia, loading the
+> firmware will fail with -EINVAL.
+> 
+> To fix this, simply check for -EPROBE_DEFER when NVMEM is attempted and
+> return it.
+> 
+> Fixes: e93984ebc1c8 ("net: phy: aquantia: add firmware load support")
+> Signed-off-by: Robert Marko <robimarko@gmail.com>
 
-Since this is a consecutive bitmask (actually [22:0]), I wonder if doing
+As aqr_firmware_load() is called from the probe function, returning
+-EPROBE_DEFER from here is fine.
 
-put_unaligned_be16(port_mask, &brcm_tag[2]);
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-would be a bit more readable.
+Thanks!
 
-Or even more correct put_unaligned_be24(port_mask, &brcm_tag[1]), but
-we don't support any switches with that many ports.
-
-Best regards,
-Jonas
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
