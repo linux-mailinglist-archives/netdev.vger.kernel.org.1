@@ -1,83 +1,110 @@
-Return-Path: <netdev+bounces-242152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66DACC8CC4E
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 04:48:15 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9172EC8CC6F
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 05:01:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 068323AEC53
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 03:48:14 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 08B004E00D3
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 04:01:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45CA02BE7AD;
-	Thu, 27 Nov 2025 03:48:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77F8024886A;
+	Thu, 27 Nov 2025 04:00:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Coo35Sns"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KBAJJbsE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D0D5225416;
-	Thu, 27 Nov 2025 03:48:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5A31E9B22;
+	Thu, 27 Nov 2025 04:00:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764215289; cv=none; b=rNjRTPBjFz5Z08rknYoNVof630GUGDYuWxMiBjKrxOHWqMFq+2WLF2BqEhnLXo3R2ZVa5+w+g8z2Es96V+cIFRSt0JX4p1Mh6fhZ/EJ9UmzY1s0uE5QuR8aF2yMWbWkd676RT+BZ8uy0I8YmQ4hdGQdzAIu9gHUPcZ+QFhqyisk=
+	t=1764216059; cv=none; b=KdMWe3n+iDeg9ml/4faEVPQFxpdCn7DpNXwG80Y1VZNVA60KWSIm8UvQktk9cNvCHs9Errn5v6il0/pwfidLbgCZFEf+Q7714BGg2pZ+DlSM4u0fN/9PFBgVTuoV4Fj2vNezuolG8EztQhjelTWPGQRPY5I8HTL4rjjooVQvj/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764215289; c=relaxed/simple;
-	bh=ARpE24dRbbn0AGmA6audrYNoVgjKJW6i3Rl1fEyJOm4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C9LvlkInrUdokYyhgv0huA6594MwGmdCStQWsXxo/IDZ+f4vZiDYFaW+uM4UvUEAJxf9qz3Cy0ns6E/rL9zBJVwUo7X8wzyMStnVUi2sswCD3OrJ4meBhGaa4ILQ18M3FmnRUd+VDlIvdwhel4yRcnolZPunELqVbff25lM3bDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Coo35Sns; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2776C4CEF8;
-	Thu, 27 Nov 2025 03:48:05 +0000 (UTC)
+	s=arc-20240116; t=1764216059; c=relaxed/simple;
+	bh=pTrVoHNCoqlghXKp0rth5p2LvoOyvpfZTGzC0j7v+Io=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ckDVo0blVVd8Eh+4yVJ4/28XEw7y/20qMgB9gtwoQtyCzR8bUzNvl8IBYkTZIpE4dwxVPMHUUgHFQJbOtw2n5kTI0YdudO0Hef2Y8asCr/tiujXnh48KaI757svOZCB+G5JooQ7l28e4WutmVCYmyYE1gw11ffEN39iy4RWCPa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KBAJJbsE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB7EDC4CEF8;
+	Thu, 27 Nov 2025 04:00:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764215286;
-	bh=ARpE24dRbbn0AGmA6audrYNoVgjKJW6i3Rl1fEyJOm4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Coo35SnsktbtAy15Xe/7Nr4jYGaiedZxsGCI5rLUuXAtKcuuVzlShQSusqoVSeq+M
-	 uB/hP9v5bZCjFZrJdV6GL6wK675Acz8Bt/uTSVvt046w9U8D1Mqi63TnDwmsIS6Xzb
-	 T6GTqn3Os2LdXiLoyBlHj9Ey1A+00TmFQRsjqbbtOUXuQ/0pbfyLUMhoujJCSo3i7g
-	 OycRZyb/RkSEkznzhE76aK0vDbSZ1odFsUkaKXGrIH7AzQBpSvNWf+MBflD3epy9Me
-	 GIS9AzYPLp0TXY+lGwjsfwCCIEw17mEZ5fV65p941aRlP/J/qtUYydFe/i4PDhL2b5
-	 DuJQZHd3YSpbw==
-Date: Wed, 26 Nov 2025 19:48:04 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Jon Kohler <jon@nutanix.com>, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Michael S.
- Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio
- =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "virtualization@lists.linux.dev"
- <virtualization@lists.linux.dev>
-Subject: Re: [PATCH net v3] virtio-net: avoid unnecessary checksum
- calculation on guest RX
-Message-ID: <20251126194804.62737172@kernel.org>
-In-Reply-To: <CACGkMEt2FFSiodAN=FFT7JnV78pmVRN4VTr_XDm05J0xpSfmHA@mail.gmail.com>
-References: <20251125222754.1737443-1-jon@nutanix.com>
-	<CACGkMEvK1M_h783QyEXJ5jz25T-Vtkj4=-_dPLzYGwPg8NSU5Q@mail.gmail.com>
-	<8FC82034-6D22-4CDC-B444-60F67A25514C@nutanix.com>
-	<CACGkMEt2FFSiodAN=FFT7JnV78pmVRN4VTr_XDm05J0xpSfmHA@mail.gmail.com>
+	s=k20201202; t=1764216058;
+	bh=pTrVoHNCoqlghXKp0rth5p2LvoOyvpfZTGzC0j7v+Io=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=KBAJJbsESum0Zvtf2U4wNCfQdJQBmfvU+4HyNzAwljAunVcv17DQnRmNb7N08LUJB
+	 9nChuzK7GinpX0Quwi7PVR0sC0NR233VYjp8JmxADUXlUyuYzXV7Y8gE316DJ3decK
+	 Par9sGP2EFclMam8AA5f6bCf1XCTRiLNkX5QhuhclSPIUg3TTCV0K9cGjLlZFSmS7t
+	 qGAZWfBr1bZ/vPdp9dpQgVC/Db1EyY5E37Jh4tU1eV++PjfDio7nx4Lu+jlSwaibxQ
+	 SowmGWhxI021fe4E1Ev16tphu9g0VN8zt4W0cdX4awM0MkG2D9HvvpZfmWtdjTSEz1
+	 RSlpwg33w4HLA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE39380CEF8;
+	Thu, 27 Nov 2025 04:00:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 1/8] can: kvaser_usb: leaf: Fix potential infinite
+ loop in
+ command parsers
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176421602051.2412149.15004873997876598906.git-patchwork-notify@kernel.org>
+Date: Thu, 27 Nov 2025 04:00:20 +0000
+References: <20251126155713.217105-2-mkl@pengutronix.de>
+In-Reply-To: <20251126155713.217105-2-mkl@pengutronix.de>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ linux-can@vger.kernel.org, kernel@pengutronix.de, eeodqql09@gmail.com,
+ extja@kvaser.com
 
-On Thu, 27 Nov 2025 09:27:16 +0800 Jason Wang wrote:
-> > It could, sure. This made it into 6.17 branch.
-> >
-> > Would you like me to send a separate patch with a Cc: stable
-> > or could someone just edit the commit msg when they queue
-> > this?  
+Hello:
+
+This series was applied to netdev/net.git (main)
+by Marc Kleine-Budde <mkl@pengutronix.de>:
+
+On Wed, 26 Nov 2025 16:41:11 +0100 you wrote:
+> From: Seungjin Bae <eeodqql09@gmail.com>
 > 
-> I think a new version might be better.
+> The `kvaser_usb_leaf_wait_cmd()` and `kvaser_usb_leaf_read_bulk_callback`
+> functions contain logic to zero-length commands. These commands are used
+> to align data to the USB endpoint's wMaxPacketSize boundary.
+> 
+> The driver attempts to skip these placeholders by aligning the buffer
+> position `pos` to the next packet boundary using `round_up()` function.
+> 
+> [...]
 
-Added.
+Here is the summary with links:
+  - [net,1/8] can: kvaser_usb: leaf: Fix potential infinite loop in command parsers
+    https://git.kernel.org/netdev/net/c/0c73772cd2b8
+  - [net,2/8] can: sja1000: fix max irq loop handling
+    https://git.kernel.org/netdev/net/c/30db4451c7f6
+  - [net,3/8] can: gs_usb: gs_usb_xmit_callback(): fix handling of failed transmitted URBs
+    https://git.kernel.org/netdev/net/c/516a0cd1c03f
+  - [net,4/8] can: gs_usb: gs_usb_receive_bulk_callback(): check actual_length before accessing header
+    https://git.kernel.org/netdev/net/c/6fe9f3279f7d
+  - [net,5/8] can: gs_usb: gs_usb_receive_bulk_callback(): check actual_length before accessing data
+    https://git.kernel.org/netdev/net/c/395d988f9386
+  - [net,6/8] can: sun4i_can: sun4i_can_interrupt(): fix max irq loop handling
+    https://git.kernel.org/netdev/net/c/76544beea7cf
+  - [net,7/8] can: rcar_canfd: Fix CAN-FD mode as default
+    https://git.kernel.org/netdev/net/c/6d849ff57372
+  - [net,8/8] net/sched: em_canid: fix uninit-value in em_canid_match
+    https://git.kernel.org/netdev/net/c/0c922106d7a5
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
