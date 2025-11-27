@@ -1,103 +1,94 @@
-Return-Path: <netdev+bounces-242406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8895FC9029A
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 21:46:37 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF4C7C902CB
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 22:08:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id BD38D352958
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 20:46:00 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7D6BA4E21C7
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 21:08:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B4DE328253;
-	Thu, 27 Nov 2025 20:44:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B9C6311C10;
+	Thu, 27 Nov 2025 21:08:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dt9Zt17j"
+	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="Uzw7fxh4";
+	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="rWpr80g8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D9193203AE
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 20:44:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764276283; cv=none; b=gHIBI+Y90bjZTJ/exq+CTAmnzGNp0SCm+CusIJ5T3SSq+VsbCldP4F2vNjj8HMZiV6PwH/3JQyndoqRnVzBOmmBm6Xn0T6nMXqpA0bj1IRXfEAOkv3tI5W4vJFNiLGrMSla/27AH6zhx4i5qjz+hlfWSMz8jXXZp8LBCum02eC8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764276283; c=relaxed/simple;
-	bh=2LyuBsPor15Og8w8FehldYD9uvgj0U/Qd8569PQOz/I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ltNI2606LOtdGZI6HS7rnkazkcYDuWAzjIhRm34ViTSPFwlwXAZBf+dLwu1Qlxmcm5B3GhuzV9p9tOFFd+P6N2BqIeas76mBhOF3eCJPOq4T9lhEhQSwSQHp4eQuZhYDs6h5LkZ1zxMsOA3thqqrjtuSXBaz488x1o4wtME5osM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dt9Zt17j; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-42b32900c8bso826167f8f.0
-        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 12:44:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764276280; x=1764881080; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M8Gbmeh89/N4kjz62es84Em0iR2fT9OzX01rnhn2RRU=;
-        b=Dt9Zt17jvBDfWOm7l30BS/Oc9Qe4F/BCWiKv+NhmEU+EbZvJPCxVKJjkVJ7p05Qsk7
-         f+8HMtAEyrJ/LQu9mxbnstQIKAqZWcOo7jj53Um9pLTE1/W5SgENl/f71t6civSLcKS6
-         TaFFcDsqJ8YuQSea11TSOhuoTfDcqc3QveUkZsU0qlpRkGXJAJuyUJi2LeFrufincLTE
-         mMa9vRq30CO//JeW4SAmfpybZg/NdMb02WZLscsQcs6SoNP9RKnwlzc4iHx/ow4os4XJ
-         +rir21G5YO0AvWbqVK4MN9F94EakNOkiLfbxe7G9f8ik8N7dk+z8OCgg+COok/ENF4ZF
-         7jiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764276280; x=1764881080;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=M8Gbmeh89/N4kjz62es84Em0iR2fT9OzX01rnhn2RRU=;
-        b=XgCnes17eFgxFKqOhJVyctOKUDPfSkcMiee/EZngGn95lRMbWDjGRTXCSrrhVu7NSQ
-         fbPERhohHy5LAeccOeuGpjRxo1nEdt4Quq0Xh7DlgivFS6q3t5eGk+yxy2hmsnxdfNju
-         O40q3+C0Mz6bqW3ChK8Q0wl0GrG4t8rQeJL/2i23c4nDLGRlX8gWQOqru0nKe4oP+yAi
-         A5OpHpKopCLL828Cs+3zZrH7wtzy2sdQWln1qA8l0Z871w/csj/VTIfUi7qKAfAHaA85
-         +UmrEmG7KniymHq8QF3vO8Wy+oo6BH/Vgd4e3DmxfOAHabCH1oDg98AknCxBt/3ghe1N
-         e+Pg==
-X-Gm-Message-State: AOJu0YyyXEmqV43SwW2eCTkGxH2yabhfusvBcAWuK6lrvwnqYzxg3faj
-	kqtLPJN+qzqKUdft0I+0ZqZ1hCeOPPLH9IL5T2dF3v7ptujyGxNOnd8u9ft1MA==
-X-Gm-Gg: ASbGncsRk3AZx66DwN8WiYMtnSzDlNj06EBGz1im3DZFftWYU6NkX3Wvz/Nium6HaDD
-	pQ2GxE0vSlf644LGKxThDvlON5jg0oKdmjkESudntBsufZdIQ8emiXKoigdOYLyGZQl/IYg+xjc
-	EeJo9HeHoTQi+GlFGus6Z/PctYOy13TSRv8KS8nk/EZhR0FB1e2nDZrymRxKrORvme+5KJ8tyx6
-	MjNnZcVVrNCpljg+qTaJ8nrGiUdVxmMnKAXS/WWv22q2i29pb/isIjcHDzMjFrMFRpZx661nzPZ
-	LbqTAWrU7RgGTKhh66IOpB01VaY6+a5KqoC0qsD1WzEKFJd9yP/2/C/YYQk5Pnfve/KviGmWP8b
-	ARsWs1QZ0hR6sUbatogLxIirzF6rxTgUF2Y+WsKHWWVZWdsjYwmlltf1a4wYgrQaxaUqlbUAb6/
-	n8KcxRd9dZr/vVTQ==
-X-Google-Smtp-Source: AGHT+IGuV2DWxNxvizrrGr6FH3gzPVUslsgMTwKhOGOXoIvvKJIWs4/U+A5R9xyG+U9svjhm0G8y7A==
-X-Received: by 2002:a05:6000:26c9:b0:42b:30f9:79b6 with SMTP id ffacd0b85a97d-42cc1d62843mr26242387f8f.58.1764276279891;
-        Thu, 27 Nov 2025 12:44:39 -0800 (PST)
-Received: from 127.mynet ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42e1c5d614asm5346105f8f.12.2025.11.27.12.44.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Nov 2025 12:44:39 -0800 (PST)
-From: Pavel Begunkov <asml.silence@gmail.com>
-To: netdev@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Simon Horman <horms@kernel.org>,
-	linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	io-uring@vger.kernel.org,
-	dtatulea@nvidia.com
-Subject: [PATCH net-next v6 8/8] selftests: iou-zcrx: test large chunk sizes
-Date: Thu, 27 Nov 2025 20:44:21 +0000
-Message-ID: <ef9cc9f58d60656a8afef1fc84f066aeb7b27378.1764264798.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <cover.1764264798.git.asml.silence@gmail.com>
-References: <cover.1764264798.git.asml.silence@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 089B9305E28;
+	Thu, 27 Nov 2025 21:08:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764277686; cv=pass; b=WC52D+PyNqRFISATwX8yjf75BOxXCsi9t76Vgc5LRErnRwR93aIQpdU4tmBIRGRGXbn3gcWKiTpYSwU2lu5di6nH8nKH9b59SscCv/C/aC+30Aja47/SDQJcSBEWeEqZgCM6eoacdvwkxWZ/xPR+Kj3uD8hOWO/q499WCx7F388=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764277686; c=relaxed/simple;
+	bh=hYnQf5OORS1eNmLfHb/yHxGMlHy1Hf50VdgLGijes0g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dCYipnvqMYq1CM/y0ot5bMc4AW+pZvv8W/wR7j1OyOsjbV6JdPncdlKDQI+P6tOQWLhsUMrBns3Wm/nff9glwfcUUogXEqHRv7ibNZ3YTvxJmo4uMtgbSVrtzJSC4m3CMz6Hb4XDsE3IMn0/zgIPZH1yDpZCEOv3uJ1lgt14RvA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=Uzw7fxh4; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=rWpr80g8; arc=pass smtp.client-ip=85.215.255.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
+ARC-Seal: i=1; a=rsa-sha256; t=1764277661; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=jZtrWWKgjeXIj3CBDgxDShRI0DNUO0oR6DTnt0VvUE94J3tG+rML5cMAM6xyWt1ymd
+    qV4e0aXxVI1oVMeDhpishllZWwzqrgHU30bL/+7Sn62qg9n1OVZYgyz1EoXEkzPYP+1q
+    vLx0w47QmL5jFnBCev0fkOUbCq9Sm134ffsvU7bzolKgAJQkKyepKxs8EJMC8RNkSUfc
+    CY25bTw72vrvriatRgGym5oDL88c9g7tf/JQCWb20Rxz+bDuJTf1+FTpGUZif0fBDvI7
+    S5BpJk7Id+snMB/ATTgjBftWrOISY4TUH6VQKksI7mlh+E3wZ8pmx1KuleNHTLIRTP9X
+    Yx0A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1764277661;
+    s=strato-dkim-0002; d=strato.com;
+    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=dYOBhnmaJLalmRTcFXcEdjjp5HKm9Nxmm+2azfoQxjc=;
+    b=YHVEXuuG050LMS4/U/xz7uNet+EqqhbQ3/I38JBNgv8W69u1jSaVuVGE4BrI39IK03
+    6pBtjYoAW8CzythfVHiOWWOY/oieHDcgmFQr39/RoO26DlkIOP4LbDVdscYX8VZXuQtA
+    PPYOvrHN7i6puJ7hitMF7vkIQ9Gvb5vOCu4I60kRh4mgC8qPti7PB4bSF9/iO49E9UqH
+    FG2Y+mHn0Xnm+fMzoOdlK1iZ2Hr5YFSXjzya5tVFjbYNNkexWIFwGEPh5kkildGfijxS
+    /bS1uj9YhdyzeiCUQnrje65nXNXZMYFO6AL7vjJ1zWcmClgtslbRy0k4bC68Bv8H0nSN
+    CBtA==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1764277661;
+    s=strato-dkim-0002; d=hartkopp.net;
+    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=dYOBhnmaJLalmRTcFXcEdjjp5HKm9Nxmm+2azfoQxjc=;
+    b=Uzw7fxh4NXnuSlNkPXFweJAckZXeaG1nqauNWnXECFip1/t5i74+83i1sDk91r0hFf
+    gE4CE2gYLpeK54+J3SHFnwlUm46OTSI8qKjh2CFP8seZL3iXHYnNVPL19AUhuMianvJG
+    PVMYTmQ7zb6GcK5yH560dT5zeqB3ZSbvfci4i9tcSwgFa/08Nru/ZeMEm2bm3mDhvMkc
+    h4PQ+ywK3CT/yQ8IONEHvqMTiH0cguV4wDXPiHvjc6YqdvLVQycSQAC6USah3dSMNKSG
+    YZTq/+1t124xg0xL9rvFi6td0yvfe33XjttHbY9EBraQ0eVXFsQilLwbUonsvibWCIhs
+    llWA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1764277661;
+    s=strato-dkim-0003; d=hartkopp.net;
+    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=dYOBhnmaJLalmRTcFXcEdjjp5HKm9Nxmm+2azfoQxjc=;
+    b=rWpr80g8R0uktyinaSrnIeZofF/iS1rx0AMCWDmrrjaRUd8gD9mR/9x/ORFu9mHkwJ
+    um3JmseEDsJD2B2QQ9DA==
+X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tTUsMrZpkO3Mw3lZ/t54cFxeEQ7s8bGWj0Q=="
+Received: from lenov17.lan
+    by smtp.strato.de (RZmta 54.0.0 AUTH)
+    with ESMTPSA id Ke2b461ARL7edAO
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Thu, 27 Nov 2025 22:07:40 +0100 (CET)
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+To: linux-can@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	kernel@pengutronix.de,
+	mkl@pengutronix.de,
+	Oliver Hartkopp <socketcan@hartkopp.net>,
+	Vincent Mailhol <mailhol@kernel.org>
+Subject: [net-next] can: raw: fix build without CONFIG_CAN_DEV
+Date: Thu, 27 Nov 2025 22:07:10 +0100
+Message-ID: <20251127210710.25800-1-socketcan@hartkopp.net>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,211 +96,108 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
 
-Add a test using large chunks for zcrx memory area.
+The feature to instantly reject unsupported CAN frames makes use of CAN
+netdevice specific flags which are only accessible when the CAN device
+driver infrastructure is built.
 
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+Therefore check for CONFIG_CAN_DEV and fall back to MTU testing when the
+CAN device driver infrastructure is absent.
+
+Fixes: 1a620a723853 ("can: raw: instantly reject unsupported CAN frames")
+Reported-by: Vincent Mailhol <mailhol@kernel.org>
+Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
 ---
- .../selftests/drivers/net/hw/iou-zcrx.c       | 72 +++++++++++++++----
- .../selftests/drivers/net/hw/iou-zcrx.py      | 37 ++++++++++
- 2 files changed, 97 insertions(+), 12 deletions(-)
+ net/can/raw.c | 32 ++++++++++++++++++--------------
+ 1 file changed, 18 insertions(+), 14 deletions(-)
 
-diff --git a/tools/testing/selftests/drivers/net/hw/iou-zcrx.c b/tools/testing/selftests/drivers/net/hw/iou-zcrx.c
-index 62456df947bc..fed5452e2ca3 100644
---- a/tools/testing/selftests/drivers/net/hw/iou-zcrx.c
-+++ b/tools/testing/selftests/drivers/net/hw/iou-zcrx.c
-@@ -12,6 +12,7 @@
- #include <unistd.h>
- 
- #include <arpa/inet.h>
-+#include <linux/mman.h>
- #include <linux/errqueue.h>
- #include <linux/if_packet.h>
- #include <linux/ipv6.h>
-@@ -37,6 +38,23 @@
- 
- #include <liburing.h>
- 
-+#define SKIP_CODE	42
-+
-+struct t_io_uring_zcrx_ifq_reg {
-+	__u32	if_idx;
-+	__u32	if_rxq;
-+	__u32	rq_entries;
-+	__u32	flags;
-+
-+	__u64	area_ptr; /* pointer to struct io_uring_zcrx_area_reg */
-+	__u64	region_ptr; /* struct io_uring_region_desc * */
-+
-+	struct io_uring_zcrx_offsets offsets;
-+	__u32	zcrx_id;
-+	__u32	rx_buf_len;
-+	__u64	__resv[3];
-+};
-+
- static long page_size;
- #define AREA_SIZE (8192 * page_size)
- #define SEND_SIZE (512 * 4096)
-@@ -65,6 +83,8 @@ static bool cfg_oneshot;
- static int cfg_oneshot_recvs;
- static int cfg_send_size = SEND_SIZE;
- static struct sockaddr_in6 cfg_addr;
-+static unsigned cfg_rx_buf_len = 0;
-+static bool cfg_dry_run;
- 
- static char *payload;
- static void *area_ptr;
-@@ -128,14 +148,28 @@ static void setup_zcrx(struct io_uring *ring)
- 	if (!ifindex)
- 		error(1, 0, "bad interface name: %s", cfg_ifname);
- 
--	area_ptr = mmap(NULL,
--			AREA_SIZE,
--			PROT_READ | PROT_WRITE,
--			MAP_ANONYMOUS | MAP_PRIVATE,
--			0,
--			0);
--	if (area_ptr == MAP_FAILED)
--		error(1, 0, "mmap(): zero copy area");
-+	if (cfg_rx_buf_len && cfg_rx_buf_len != page_size) {
-+		area_ptr = mmap(NULL,
-+				AREA_SIZE,
-+				PROT_READ | PROT_WRITE,
-+				MAP_ANONYMOUS | MAP_PRIVATE |
-+				MAP_HUGETLB | MAP_HUGE_2MB,
-+				-1,
-+				0);
-+		if (area_ptr == MAP_FAILED) {
-+			printf("Can't allocate huge pages\n");
-+			exit(SKIP_CODE);
-+		}
-+	} else {
-+		area_ptr = mmap(NULL,
-+				AREA_SIZE,
-+				PROT_READ | PROT_WRITE,
-+				MAP_ANONYMOUS | MAP_PRIVATE,
-+				0,
-+				0);
-+		if (area_ptr == MAP_FAILED)
-+			error(1, 0, "mmap(): zero copy area");
-+	}
- 
- 	ring_size = get_refill_ring_size(rq_entries);
- 	ring_ptr = mmap(NULL,
-@@ -157,17 +191,23 @@ static void setup_zcrx(struct io_uring *ring)
- 		.flags = 0,
- 	};
- 
--	struct io_uring_zcrx_ifq_reg reg = {
-+	struct t_io_uring_zcrx_ifq_reg reg = {
- 		.if_idx = ifindex,
- 		.if_rxq = cfg_queue_id,
- 		.rq_entries = rq_entries,
- 		.area_ptr = (__u64)(unsigned long)&area_reg,
- 		.region_ptr = (__u64)(unsigned long)&region_reg,
-+		.rx_buf_len = cfg_rx_buf_len,
- 	};
- 
--	ret = io_uring_register_ifq(ring, &reg);
--	if (ret)
-+	ret = io_uring_register_ifq(ring, (void *)&reg);
-+	if (cfg_rx_buf_len && (ret == -EINVAL || ret == -EOPNOTSUPP ||
-+			       ret == -ERANGE)) {
-+		printf("Large chunks are not supported %i\n", ret);
-+		exit(SKIP_CODE);
-+	} else if (ret) {
- 		error(1, 0, "io_uring_register_ifq(): %d", ret);
-+	}
- 
- 	rq_ring.khead = (unsigned int *)((char *)ring_ptr + reg.offsets.head);
- 	rq_ring.ktail = (unsigned int *)((char *)ring_ptr + reg.offsets.tail);
-@@ -323,6 +363,8 @@ static void run_server(void)
- 	io_uring_queue_init(512, &ring, flags);
- 
- 	setup_zcrx(&ring);
-+	if (cfg_dry_run)
-+		return;
- 
- 	add_accept(&ring, fd);
- 
-@@ -383,7 +425,7 @@ static void parse_opts(int argc, char **argv)
- 		usage(argv[0]);
- 	cfg_payload_len = max_payload_len;
- 
--	while ((c = getopt(argc, argv, "sch:p:l:i:q:o:z:")) != -1) {
-+	while ((c = getopt(argc, argv, "sch:p:l:i:q:o:z:x:d")) != -1) {
- 		switch (c) {
- 		case 's':
- 			if (cfg_client)
-@@ -418,6 +460,12 @@ static void parse_opts(int argc, char **argv)
- 		case 'z':
- 			cfg_send_size = strtoul(optarg, NULL, 0);
- 			break;
-+		case 'x':
-+			cfg_rx_buf_len = page_size * strtoul(optarg, NULL, 0);
-+			break;
-+		case 'd':
-+			cfg_dry_run = true;
-+			break;
- 		}
+diff --git a/net/can/raw.c b/net/can/raw.c
+index 223630f0f9e9..9d5c43df06dd 100644
+--- a/net/can/raw.c
++++ b/net/can/raw.c
+@@ -890,62 +890,66 @@ static void raw_put_canxl_vcid(struct raw_sock *ro, struct sk_buff *skb)
+ 		cxl->prio &= CANXL_PRIO_MASK;
+ 		cxl->prio |= ro->tx_vcid_shifted;
  	}
+ }
  
-diff --git a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-index 712c806508b5..83061b27f2f2 100755
---- a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-+++ b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-@@ -7,6 +7,7 @@ from lib.py import ksft_run, ksft_exit, KsftSkipEx
- from lib.py import NetDrvEpEnv
- from lib.py import bkg, cmd, defer, ethtool, rand_port, wait_port_listen
+-static inline bool raw_dev_cc_enabled(struct net_device *dev,
+-				      struct can_priv *priv)
++static bool raw_dev_cc_enabled(struct net_device *dev)
+ {
++#ifdef CONFIG_CAN_DEV
++	struct can_priv *priv = safe_candev_priv(dev);
++
+ 	/* The CANXL-only mode disables error-signalling on the CAN bus
+ 	 * which is needed to send CAN CC/FD frames
+ 	 */
+ 	if (priv)
+ 		return !can_dev_in_xl_only_mode(priv);
+-
++#endif
+ 	/* virtual CAN interfaces always support CAN CC */
+ 	return true;
+ }
  
-+SKIP_CODE = 42
+-static inline bool raw_dev_fd_enabled(struct net_device *dev,
+-				      struct can_priv *priv)
++static bool raw_dev_fd_enabled(struct net_device *dev)
+ {
++#ifdef CONFIG_CAN_DEV
++	struct can_priv *priv = safe_candev_priv(dev);
++
+ 	/* check FD ctrlmode on real CAN interfaces */
+ 	if (priv)
+ 		return (priv->ctrlmode & CAN_CTRLMODE_FD);
+-
++#endif
+ 	/* check MTU for virtual CAN FD interfaces */
+ 	return (READ_ONCE(dev->mtu) >= CANFD_MTU);
+ }
  
- def _get_current_settings(cfg):
-     output = ethtool(f"-g {cfg.ifname}", json=True)[0]
-@@ -132,6 +133,42 @@ def test_zcrx_rss(cfg) -> None:
-         cmd(tx_cmd, host=cfg.remote)
+-static inline bool raw_dev_xl_enabled(struct net_device *dev,
+-				      struct can_priv *priv)
++static bool raw_dev_xl_enabled(struct net_device *dev)
+ {
++#ifdef CONFIG_CAN_DEV
++	struct can_priv *priv = safe_candev_priv(dev);
++
+ 	/* check XL ctrlmode on real CAN interfaces */
+ 	if (priv)
+ 		return (priv->ctrlmode & CAN_CTRLMODE_XL);
+-
++#endif
+ 	/* check MTU for virtual CAN XL interfaces */
+ 	return can_is_canxl_dev_mtu(READ_ONCE(dev->mtu));
+ }
  
+ static unsigned int raw_check_txframe(struct raw_sock *ro, struct sk_buff *skb,
+ 				      struct net_device *dev)
+ {
+-	struct can_priv *priv = safe_candev_priv(dev);
+-
+ 	/* Classical CAN */
+-	if (can_is_can_skb(skb) && raw_dev_cc_enabled(dev, priv))
++	if (can_is_can_skb(skb) && raw_dev_cc_enabled(dev))
+ 		return CAN_MTU;
  
-+def test_zcrx_large_chunks(cfg) -> None:
-+    cfg.require_ipver('6')
-+
-+    combined_chans = _get_combined_channels(cfg)
-+    if combined_chans < 2:
-+        raise KsftSkipEx('at least 2 combined channels required')
-+    (rx_ring, hds_thresh) = _get_current_settings(cfg)
-+    port = rand_port()
-+
-+    ethtool(f"-G {cfg.ifname} tcp-data-split on")
-+    defer(ethtool, f"-G {cfg.ifname} tcp-data-split auto")
-+
-+    ethtool(f"-G {cfg.ifname} hds-thresh 0")
-+    defer(ethtool, f"-G {cfg.ifname} hds-thresh {hds_thresh}")
-+
-+    ethtool(f"-G {cfg.ifname} rx 64")
-+    defer(ethtool, f"-G {cfg.ifname} rx {rx_ring}")
-+
-+    ethtool(f"-X {cfg.ifname} equal {combined_chans - 1}")
-+    defer(ethtool, f"-X {cfg.ifname} default")
-+
-+    flow_rule_id = _set_flow_rule(cfg, port, combined_chans - 1)
-+    defer(ethtool, f"-N {cfg.ifname} delete {flow_rule_id}")
-+
-+    rx_cmd = f"{cfg.bin_local} -s -p {port} -i {cfg.ifname} -q {combined_chans - 1} -x 2"
-+    tx_cmd = f"{cfg.bin_remote} -c -h {cfg.addr_v['6']} -p {port} -l 12840"
-+
-+    probe = cmd(rx_cmd + " -d", fail=False)
-+    if probe.ret == SKIP_CODE:
-+        raise KsftSkipEx(probe.stdout)
-+
-+    with bkg(rx_cmd, exit_wait=True):
-+        wait_port_listen(port, proto="tcp")
-+        cmd(tx_cmd, host=cfg.remote)
-+
-+
- def main() -> None:
-     with NetDrvEpEnv(__file__) as cfg:
-         cfg.bin_local = path.abspath(path.dirname(__file__) + "/../../../drivers/net/hw/iou-zcrx")
+ 	/* CAN FD */
+ 	if (ro->fd_frames && can_is_canfd_skb(skb) &&
+-	    raw_dev_fd_enabled(dev, priv))
++	    raw_dev_fd_enabled(dev))
+ 		return CANFD_MTU;
+ 
+ 	/* CAN XL */
+ 	if (ro->xl_frames && can_is_canxl_skb(skb) &&
+-	    raw_dev_xl_enabled(dev, priv))
++	    raw_dev_xl_enabled(dev))
+ 		return CANXL_MTU;
+ 
+ 	return 0;
+ }
+ 
 -- 
-2.52.0
+2.47.3
 
 
