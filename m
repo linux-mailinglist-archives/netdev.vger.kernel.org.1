@@ -1,174 +1,152 @@
-Return-Path: <netdev+bounces-242234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63F0FC8DD82
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 11:53:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45915C8DDA0
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 11:55:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id ED93034B277
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 10:53:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F288F3AFE9F
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 10:55:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 796A532ABCF;
-	Thu, 27 Nov 2025 10:53:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h6ZkOMpx";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="VDobi9ht"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BE4C32AADA;
+	Thu, 27 Nov 2025 10:55:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D56CC315D3E
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 10:53:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E7C4329368
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 10:55:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764240789; cv=none; b=qkShhK1BVhXxU1H7fH9bntGlc/v0K9iR+94c9M4yQTnLIsAA2tq81ujggH5lF0+CR9t9ihV5/bTSIDAyEQAZ3O/wDT7zZ1wjQ3BlGhjRcg0SUyZBaHRFvvMmQZDBcbFVDGSmBr8YrRZ/iBSEmJ3cMTrYdf4UCKtfF7rk1hM8vRo=
+	t=1764240929; cv=none; b=IHul17rySGpjROSOZUkq72d9ng6wjZfvR+GXXZtyqx+wwN415m+U3ndPO1c7cTVoa5N0bhtbP0qW4l5CAYJusry0+xohd87q9Eit/I/92+d0lvndD2iMs2duJH51aU3wwSBMseE95vPiZ5c7+PDVPliskm92Wwqbxs/INaw8O0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764240789; c=relaxed/simple;
-	bh=dcwrY/ZJN91y8VKMVtZWMrFkXvzI5f8E1cX3IfcGFlI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nJ5wMJV2W2FwiSI5vkRS0qvTbK1+hh1FOHKC0KcUd3bsr7ZawWSG7/PE4S3kDG8M5d5gqmnWU67Cx0pjwknSALjo2l+7zYoENTnig8pn5dwObu/TbbKyc71gFiFrt3CXvvoGkOondBwgz/yyR1sn0lbQfe54cVlmu4YAhgoLQS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h6ZkOMpx; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=VDobi9ht; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764240786;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ia9KLe6KKWosICN6WhPtsQJNk42J7XjtbWZtakRXDh8=;
-	b=h6ZkOMpxF2kZPd+LGmDZ8ItesLKjz2uEVujPawUkQMoxA6m5VBgXd8QKgyXy+nhFwX7ifK
-	wLleQCyPEOxOr4PzSTG6W460ITa7R/M0xEikW5kok50u2W5Jm/d/9rYyVIZFs6AlK1LnGH
-	KVTQHLjnBVDZLhKvlZSUlhMJP/cYlQI=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-657-66z5w6qLO8-U3UEVq6QElw-1; Thu, 27 Nov 2025 05:53:04 -0500
-X-MC-Unique: 66z5w6qLO8-U3UEVq6QElw-1
-X-Mimecast-MFC-AGG-ID: 66z5w6qLO8-U3UEVq6QElw_1764240783
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-6411fc67650so1014360a12.0
-        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 02:53:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764240783; x=1764845583; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Ia9KLe6KKWosICN6WhPtsQJNk42J7XjtbWZtakRXDh8=;
-        b=VDobi9htot0b//4JIG6gpekF0SrRDd40rwQ6rhYTzmO5opmj3Lf6N9e8W0fgxjULJk
-         tffeJwoTk9h6xjXRTF4Q2hnmDtH1uEX+KLLMR9izOe0sFdR5E+nzEnzcabh7csP7FdzX
-         192xL+mtFq3XQki3Pek6cx2AqOaZJbAGTSzYAaUfKUMrLteWR9O+tVau1qDA2SJcQaW0
-         rrLyHs+Wo7+FGSq7KqCIqUKYMuga95u/GvN0vJjanpOyEXyd/svf9ZHZADR/AIVc0rau
-         h5frWRc8OVuzj9DvYIic7HrwAgwkvsm3ffuGmvkRLXjW/zdZ+teOQRhMt1GHqKZHg2zX
-         akmA==
+	s=arc-20240116; t=1764240929; c=relaxed/simple;
+	bh=F6Q0w7C86PUsJ01iPUmoE2PdDCOmTthnRvUUfckMMEo=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=GIIF8M2+Xi0/e/xyFBT8eME/hyoSLSVfAj/VU+9d5ZTwBulL9rZAd47Jk4uPtMLlOHMgSXikVS1nMqb3lzooXtMQTLaHHwek/NeGwuqFqKRAqmrnqtxYoAIDXmo9zyf/9ZuV3O17+Av/DwzBIx/V8MCqczJLrhiiDTdE/vo9Fbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-43322fcfae7so7088895ab.1
+        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 02:55:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764240783; x=1764845583;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Ia9KLe6KKWosICN6WhPtsQJNk42J7XjtbWZtakRXDh8=;
-        b=Y3wjboEUJqPl1Ho9Av5+LygGrbJbH7MXsaNx+12hOZZX30CFMxttFDJhws0qc3gd7o
-         tND1MbD2WvDrUHfGzAZhV5MqrZM7PAwP8br7PZ2NJO0Wvv7Cgp+l0MZgLz01DQHfCdSQ
-         +cLTnk6qph8GZLOJAkuQLZbOIiw9DfCJAG4mT/wbux7AUpnj8nfYvlssLUeOwcOvl/1i
-         hZwSMDncyUR4QkPLC1/Hn8z9ayW7TUceS/qJhwKlNs/8ULikwzRN/0fncC/cDFnTW77d
-         IEGyc2dc2fWEmv+vn/3KB9/bQFS4knQyIo2oC88T3/ShcfKIZQKRhxbq5Os4dzRQu7f9
-         L17w==
-X-Forwarded-Encrypted: i=1; AJvYcCXRVAY01EAwnpxUqtK4Ogw14Xg6J0xFr+FEObR1Vq4IHgPJKknKcVkVljb6yx2eQ3LFElb+FiU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQPkSv1PnpChKywWqY0UrR8qteuzsMcULhaVKNm8iQsKlM7fWC
-	ZYD8noWvRa787F36xYltAsiVc5I/9HTRr4CfS/umJ1ptRN4RKkwgX/EytCqlzKweiwklPSVID7V
-	Pwjv5vf+kbxuUsaifz3hAfryM7ooRcnLQHJSokS0Kk9ln8LNvaiCx4hp9VQ==
-X-Gm-Gg: ASbGncvUa5KmHciiBP4NX02gZMAvVnC4+LBzFhp0osJsvhEOTr7k1FdsgfeHojVcMuJ
-	gdcS2G9oC3QOXywdQbpP5ZZqhP8g5g3wt8/tLRX8XhF3W70qbWQJE/1rHhc/qkqpDTG3TcvojnO
-	a42Nezl56602IuLEKWEfl7T5WZdQhUT75M7UBPdOUrd4mnLvp3y9RsD+GGLZu+1tBMevs1tQA05
-	b6sMJwZCRgQ/zaD0zeAU+d7+OabvUwADDwyhVbFoxXYUMJ3cci/Z1zCzOmC6cTpgzBCmicMbGho
-	QhhUDVQdEsebVWrE6nUwdvhwdkLR1xsAMDcVIK3SVYNhzEV8XN2h2SN58NHC451Bmj3LEpXeaBU
-	I/bonZFhcGVgy8Q==
-X-Received: by 2002:a05:6402:3054:20b0:645:c6b1:5f9d with SMTP id 4fb4d7f45d1cf-645c6b15fd9mr10852295a12.5.1764240783197;
-        Thu, 27 Nov 2025 02:53:03 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHeDyRIqcyD3zKEeif485rXKITX1uTQeYkqs0WbdFhc4RqC7yJG2evwVTiptKplRdNES0CvPg==
-X-Received: by 2002:a05:6402:3054:20b0:645:c6b1:5f9d with SMTP id 4fb4d7f45d1cf-645c6b15fd9mr10852281a12.5.1764240782769;
-        Thu, 27 Nov 2025 02:53:02 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.155.212])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-647509896d1sm1316264a12.0.2025.11.27.02.53.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Nov 2025 02:53:02 -0800 (PST)
-Message-ID: <383aed26-aa07-4759-92b9-5448161ba6a4@redhat.com>
-Date: Thu, 27 Nov 2025 11:53:00 +0100
+        d=1e100.net; s=20230601; t=1764240926; x=1764845726;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XDIhq/FuDE9UFMDa6n2SoeVFELouWXOLgjXJDPEteI0=;
+        b=TNCBk5vL/TQenkX5HKiSMOb5OYsxNCePafF+Ot7L1i/RyfRy0mFCqxRMQgA5cpJRh+
+         lwA75o3bEtgbedJ3KNQQReCe6PvRFS02fERMSggzv4gJFPjdcqzxomyli5ypjjM/myo3
+         iatE+ysbYioV4/gq4t+cA9GTQuX8py26Nb2blhhlH/KmKIbkpibQd8Kxx5ziNF/WeGRY
+         vQLHJ1kBpD9W8WAqP01J/CPDbup6BY3tKwhukzE3wC8ONKcC0Rpir2dpQ8Yah/xPJeJc
+         PqaylVUKpZzw4JQcvQ68DzeMukFQekVleWRI7uSIvo/fdeppD/7smHLyv8OUkH46LT12
+         4ARQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVaryMSpuGd5SzNwiPLcvnm3m2FZDb7c4ZycbPE9OT1/6Oz05mIZ9RgiOTieC3lkod/c9HGW2w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHrvwoJYYCySbhhH1/5w9QaQEHJndFLOX5/0tsswBclZv48gjh
+	H8yKv003p6KxYmKV/LLw+0H73cFicZOWanEtMb3rLw8jVoohcmmI5frUMvVqbJz/jtZo+7ll0wQ
+	syZsDxK8TE3ue6Vi7ivvDf/FhyzeAhT6BtIa7yqPStlm+yHTtUD6SIJ2L9cQ=
+X-Google-Smtp-Source: AGHT+IHmz+DiewTIBYaot8YJxr/JEi9dTgI6U3gX3hcFdYxA6bWYEJ9IZP3O+itociUoTsdPuBSByO49eKT25G6NYQJYtcJeCsNg
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/3] net: Introduce
- netif_xmit_time_out_duration() helper
-To: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>
-Cc: Jian Shen <shenjian15@huawei.com>, Salil Mehta <salil.mehta@huawei.com>,
- Jijie Shao <shaojijie@huawei.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Mark Bloch <mbloch@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
- Gal Pressman <gal@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
- Yael Chemla <ychemla@nvidia.com>, Shahar Shitrit <shshitrit@nvidia.com>
-References: <1764054776-1308696-1-git-send-email-tariqt@nvidia.com>
- <1764054776-1308696-2-git-send-email-tariqt@nvidia.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <1764054776-1308696-2-git-send-email-tariqt@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:1a49:b0:434:a78e:f6f0 with SMTP id
+ e9e14a558f8ab-435dd07483cmr86341575ab.14.1764240926493; Thu, 27 Nov 2025
+ 02:55:26 -0800 (PST)
+Date: Thu, 27 Nov 2025 02:55:26 -0800
+In-Reply-To: <689229ec.050a0220.7f033.002a.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69282e1e.a70a0220.d98e3.00fa.GAE@google.com>
+Subject: Re: [syzbot] [wireless?] WARNING in drv_unassign_vif_chanctx (3)
+From: syzbot <syzbot+6506f7abde798179ecc4@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 11/25/25 8:12 AM, Tariq Toukan wrote:
-> From: Shahar Shitrit <shshitrit@nvidia.com>
-> 
-> Introduce a new helper function netif_xmit_time_out_duration() to
-> check if a TX queue has timed out and report the timeout duration.
-> This helper consolidates the logic that is duplicated in several
-> locations and also encapsulates the check for whether the TX queue
-> is stopped.
-> 
-> As the first user, convert dev_watchdog() to use this helper.
-> 
-> Signed-off-by: Shahar Shitrit <shshitrit@nvidia.com>
-> Reviewed-by: Yael Chemla <ychemla@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-> ---
->  include/linux/netdevice.h | 15 +++++++++++++++
->  net/sched/sch_generic.c   |  7 +++----
->  2 files changed, 18 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index e808071dbb7d..3cd73769fcfa 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -3680,6 +3680,21 @@ static inline bool netif_xmit_stopped(const struct netdev_queue *dev_queue)
->  	return dev_queue->state & QUEUE_STATE_ANY_XOFF;
->  }
->  
-> +static inline unsigned int
-> +netif_xmit_timeout_ms(struct netdev_queue *txq, unsigned long *trans_start)
-> +{
-> +	unsigned long txq_trans_start = READ_ONCE(txq->trans_start);
-> +
-> +	if (trans_start)
-> +		*trans_start = txq_trans_start;
+syzbot has found a reproducer for the following issue on:
 
-What about making this argument mandatory?
+HEAD commit:    4941a17751c9 Merge tag 'trace-ringbuffer-v6.18-rc7' of git..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=12503e12580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6824ec1757ea1310
+dashboard link: https://syzkaller.appspot.com/bug?extid=6506f7abde798179ecc4
+compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=168cee12580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15536f42580000
 
-> +
-> +	if (netif_xmit_stopped(txq) &&
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-4941a177.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/df31d5f8fbe6/vmlinux-4941a177.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/5039c51e9d30/bzImage-4941a177.xz
 
-Why restricting to the <queue stopped> case? AFAICS the watchdog is
-intended to additionally catch the scenarios where the rx ring is not
-full but the H/W is stuck for whatever reasons, and this change will not
-catch them anymore.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+6506f7abde798179ecc4@syzkaller.appspotmail.com
 
-/P
+netdevsim netdevsim0 netdevsim3 (unregistering): unset [1, 0] type 2 family 0 port 6081 - 0
+netdevsim netdevsim0 netdevsim2 (unregistering): unset [1, 0] type 2 family 0 port 6081 - 0
+netdevsim netdevsim0 netdevsim1 (unregistering): unset [1, 0] type 2 family 0 port 6081 - 0
+netdevsim netdevsim0 netdevsim0 (unregistering): unset [1, 0] type 2 family 0 port 6081 - 0
+bridge_slave_1: left allmulticast mode
+bridge_slave_1: left promiscuous mode
+bridge0: port 2(bridge_slave_1) entered disabled state
+bridge_slave_0: left allmulticast mode
+bridge_slave_0: left promiscuous mode
+bridge0: port 1(bridge_slave_0) entered disabled state
+bond0 (unregistering): (slave bond_slave_0): Releasing backup interface
+bond0 (unregistering): (slave bond_slave_1): Releasing backup interface
+bond0 (unregistering): (slave wlan1): Releasing backup interface
+bond0 (unregistering): Released all slaves
+------------[ cut here ]------------
+wlan1: Failed check-sdata-in-driver check, flags: 0x0
+WARNING: CPU: 0 PID: 13 at net/mac80211/driver-ops.c:366 drv_unassign_vif_chanctx+0x247/0x850 net/mac80211/driver-ops.c:366
+Modules linked in:
+CPU: 0 UID: 0 PID: 13 Comm: kworker/u32:1 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Workqueue: netns cleanup_net
+RIP: 0010:drv_unassign_vif_chanctx+0x247/0x850 net/mac80211/driver-ops.c:366
+Code: 74 24 10 48 81 c6 20 01 00 00 48 89 74 24 10 e8 af ec ee f6 8b 54 24 04 48 8b 74 24 10 48 c7 c7 40 b6 e2 8c e8 fa 1f ad f6 90 <0f> 0b 90 90 e8 90 ec ee f6 4c 89 f2 48 b8 00 00 00 00 00 fc ff df
+RSP: 0018:ffffc900001075a8 EFLAGS: 00010282
+RAX: 0000000000000000 RBX: ffff8880501e8d80 RCX: ffffffff817b1cd8
+RDX: ffff88801da88000 RSI: ffffffff817b1ce5 RDI: 0000000000000001
+RBP: ffff888052578e80 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000001 R12: ffff8880501eaad8
+R13: 0000000000000000 R14: ffff8880501e97b8 R15: ffff8880501eaa80
+FS:  0000000000000000(0000) GS:ffff8880d6a05000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fd732ef6fe8 CR3: 000000000e182000 CR4: 0000000000352ef0
+Call Trace:
+ <TASK>
+ ieee80211_assign_link_chanctx+0x3f1/0xf00 net/mac80211/chan.c:905
+ __ieee80211_link_release_channel+0x273/0x4b0 net/mac80211/chan.c:1879
+ ieee80211_link_release_channel+0x128/0x200 net/mac80211/chan.c:2154
+ unregister_netdevice_many_notify+0x1402/0x25c0 net/core/dev.c:12305
+ unregister_netdevice_many net/core/dev.c:12347 [inline]
+ unregister_netdevice_queue+0x305/0x3f0 net/core/dev.c:12161
+ unregister_netdevice include/linux/netdevice.h:3389 [inline]
+ _cfg80211_unregister_wdev+0x64b/0x830 net/wireless/core.c:1284
+ ieee80211_remove_interfaces+0x34e/0x740 net/mac80211/iface.c:2394
+ ieee80211_unregister_hw+0x55/0x3a0 net/mac80211/main.c:1681
+ mac80211_hwsim_del_radio drivers/net/wireless/virtual/mac80211_hwsim.c:5915 [inline]
+ hwsim_exit_net+0x788/0x1590 drivers/net/wireless/virtual/mac80211_hwsim.c:6806
+ ops_exit_list net/core/net_namespace.c:199 [inline]
+ ops_undo_list+0x2ee/0xab0 net/core/net_namespace.c:252
+ cleanup_net+0x41b/0x8b0 net/core/net_namespace.c:695
+ process_one_work+0x9cf/0x1b70 kernel/workqueue.c:3263
+ process_scheduled_works kernel/workqueue.c:3346 [inline]
+ worker_thread+0x6c8/0xf10 kernel/workqueue.c:3427
+ kthread+0x3c5/0x780 kernel/kthread.c:463
+ ret_from_fork+0x675/0x7d0 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
 
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
