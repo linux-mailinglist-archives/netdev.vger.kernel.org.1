@@ -1,63 +1,57 @@
-Return-Path: <netdev+bounces-242157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D56BC8CC90
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 05:05:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E334DC8CC9C
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 05:09:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF0103B0C6B
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 04:05:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 723673B0FB3
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 04:09:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99C4429D294;
-	Thu, 27 Nov 2025 04:05:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24447298CAB;
+	Thu, 27 Nov 2025 04:09:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aBBg9IU/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OxeS/TaY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FCFD3595D;
-	Thu, 27 Nov 2025 04:05:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F316324886A
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 04:09:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764216343; cv=none; b=CDUySK467ZFa6nGKysd7cuN0YA6dbi76Z6WdHIFSDY21uPeFDurWvOtw94/bcO9RDP4MsVcBJzXfZfgIRLZV9otYVsdaVTT+3rT72kk8jiRY6UKAuoSobjdIHdJnPlQo3pro37RwRXyGGghwNhNRypLsXck2vhaDmaI0Z34GOuI=
+	t=1764216589; cv=none; b=U+uXvJ9Qck1DzLXqhf1Tnf57J7J+b9oZKXC9RU+ap+Ch6RMtvt94HA8VEKGl3+pGqdTXhKK6JZueKLMXAv1lXso8vPhCdoqvgwIwHwrLdz++H9XHg3JUpKw18n9OJbG27+V9L50mZ4M7ChSOIGVoDrIt4l7xPHptgiT94n3Em3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764216343; c=relaxed/simple;
-	bh=ngfO4JdLWiXUNR+lbSQDH07CvdmvNAc4Esy3trJSZYM=;
+	s=arc-20240116; t=1764216589; c=relaxed/simple;
+	bh=47ibqBgbYElV5Xv8nOGdu0lOSoSqZMG9McnHZvhgKjg=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=p/jQBjtMmetfVNQpO1imIntgyF+s1f1vElcvNMp2S0iBdnsAfGQ2z6tQbXQmjfE+f9Fi4oO1xsn2LubNDD03xq7QTs2lF8ujYdtK02brJ6mM7UkJcsV195Puz2WLZbLhCMyQ2sxxfHurWyZ1R6e8+iXgTNwbLaQbl0Qm1ITEUCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aBBg9IU/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55022C4CEF8;
-	Thu, 27 Nov 2025 04:05:42 +0000 (UTC)
+	 MIME-Version:Content-Type; b=f5Qcg3UphzNJeaxsHj4mvWQP0DqKz6ahwZrfwb373i4QdaBdAWddZ2oijJ1S/3QHQ+9DLdKbMKpViCl+j6Genu1o7xjAy/4kY6SPBQTFWoKy4gI4BOWFUZU21a0XubxvWApSii94RRvxDIhOq4BtxiRGdu6rzyK9TLcLIVT4zMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OxeS/TaY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B51CC4CEF8;
+	Thu, 27 Nov 2025 04:09:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764216343;
-	bh=ngfO4JdLWiXUNR+lbSQDH07CvdmvNAc4Esy3trJSZYM=;
+	s=k20201202; t=1764216588;
+	bh=47ibqBgbYElV5Xv8nOGdu0lOSoSqZMG9McnHZvhgKjg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aBBg9IU/SdfDU/VUSINnIwuz3NItEv8TvI/efpdI7lT9AlmfpXzlkGF4d8+TnAZTP
-	 3fW3jYxFYOHeDxcfMqmcjvJShrJSURqktJsS5m7ercDz1ksUHbxla3EuVUQeJuoBXZ
-	 aQCj+KD2bMB6aww72EdN9tATqFd8lsGnYuNwPs2WaMsVYX8WItwSzPllBGY3tUprw8
-	 PGKuWrg5yBVFLAxOpkovq1SwpFACY8IS2hP7g4fcPXUjxS3zSs9VCIEmCQCw4a4dFa
-	 vvgBQwWdJC0HQdpP13Ry54BVRbCFg+0VV4SAg7cWbYkmMxqxj2iYYFxSMp5aJbvfL1
-	 rV/gRl8t6gZQA==
-Date: Wed, 26 Nov 2025 20:05:41 -0800
+	b=OxeS/TaYMyuvb9sn03RKnoBbKzYdQ9gINXXJUwXOcmf5ulXtA9ZrHrCLG62+xFKmf
+	 kH0nwdzMN3sxs7UHpA3ejFwQZMAhkpz2mq6GDQC//XALx45NDRvGIcyADKP8AjQRoS
+	 1YeI+9MfraD8CZ2ASF0Qrfk+pnq7iOE3YpxMInvpg0VrNBoNme/MmvHMFuwvvzv15w
+	 4MxgJGScg44s3QauUKYc+DT8O2M/zqCocrgFXjZnTm73WxSJ9QuYh4GfNV+anPq5YK
+	 JcAoOfPmu43PS+cCp2T2q8OHsaz2r+khUJtBuStt9vYMFRN9un0kIfaYoCGwq/lQr8
+	 1HNww5HTidWDA==
+Date: Wed, 26 Nov 2025 20:09:47 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
- decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, longli@microsoft.com,
- kotaranov@microsoft.com, horms@kernel.org,
- shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
- ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
- linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
- dipayanroy@microsoft.com
-Subject: Re: [PATCH net-next, v4] net: mana: Implement ndo_tx_timeout and
- serialize queue resets per port.
-Message-ID: <20251126200541.00e5270f@kernel.org>
-In-Reply-To: <20251123180818.GA18398@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <20251123180818.GA18398@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+To: Michael Chan <michael.chan@broadcom.com>, Bhargava Marreddy
+ <bhargava.marreddy@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, pavan.chebbi@broadcom.com,
+ andrew.gospodarek@broadcom.com
+Subject: Re: [PATCH net-next 0/7] bnxt_en: Updates for net-next
+Message-ID: <20251126200947.6180d62c@kernel.org>
+In-Reply-To: <20251126215648.1885936-1-michael.chan@broadcom.com>
+References: <20251126215648.1885936-1-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,40 +61,17 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sun, 23 Nov 2025 10:08:18 -0800 Dipayaan Roy wrote:
-> Implement .ndo_tx_timeout for MANA so any stalled TX queue can be detected
-> and a device-controlled port reset for all queues can be scheduled to a
-> ordered workqueue. The reset for all queues on stall detection is
-> recomended by hardware team.
-> 
-> The change introduces a single ordered workqueue
-> "mana_per_port_queue_reset_wq" queuing one work_struct per port,
-> using WQ_UNBOUND | WQ_MEM_RECLAIM so stalled queue reset work can
-> run on any CPU and still make forward progress under memory
-> pressure.
+On Wed, 26 Nov 2025 13:56:41 -0800 Michael Chan wrote:
+> This series includes an enhnacement to the priority TX counters,
+> an enhancement to a PHY module error extack message, cleanup of
+> unneeded MSIX logic in bnxt_ulp.c, adding CQ dump during TX timeout,
+> LRO/HW_GRO performance improvement by enabling Relaxed Ordering,
+> improved SRIOV admin link state support, and PTP .getcrosststamp()
+> support.
 
-And we need to be able to reset the NIC queue under memory pressure
-because.. ?  I could be wrong but I still find this unusual / defensive
-programming, if you could point me at some existing drivers that'd help.
+Hi Michael, Bhargava, 
 
-> @@ -3287,6 +3341,7 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
->  	ndev->min_mtu = ETH_MIN_MTU;
->  	ndev->needed_headroom = MANA_HEADROOM;
->  	ndev->dev_port = port_idx;
-> +	ndev->watchdog_timeo = 15 * HZ;
-
-5 sec is typical, off the top of my head
-
-> @@ -3647,6 +3717,11 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
->  		free_netdev(ndev);
->  	}
->  
-> +	if (ac->per_port_queue_reset_wq) {
-> +		destroy_workqueue(ac->per_port_queue_reset_wq);
-> +		ac->per_port_queue_reset_wq = NULL;
-> +	}
-
-I think you're missing this cleanup in the failure path of mana_probe
--- 
-pw-bot: cr
+in the interest of fairness it'd be good if you could coordinate 
+to make sure there's never >15 patches outstanding in patchwork 
+for bng_en + bnxt.
 
