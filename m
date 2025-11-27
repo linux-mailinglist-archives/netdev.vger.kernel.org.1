@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-242282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5152EC8E475
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 13:36:47 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FDF2C8E47B
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 13:37:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 027863AE33E
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 12:36:09 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9EE773524AA
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 12:36:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2F15332907;
-	Thu, 27 Nov 2025 12:35:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AAE9331A69;
+	Thu, 27 Nov 2025 12:35:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="elVLvy/x"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TKXtZQlT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAC823328E3
-	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 12:35:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB0EA3314D1
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 12:35:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764246931; cv=none; b=Ql4ucyzzvuryRtEFf39lCatNEuX70JhoNTLy1sycYmcy06olIuTm3efsuYsfaXIxdT+bjnTjnyItuIl8RGifQTVidoCc7i7WyWL8yzdQpCA0Pi7/gE8VJPQW84oTkQWU1JkLcfv7Fa4ls0L0CTVngmjInDilmWPGs8AVQ0jDMIk=
+	t=1764246932; cv=none; b=nLtDStj7kMeBpiKDwtnS3UrNUO7ONX1cAI4SzgCynJJ6Q2VpCL78nSjCYS6eFJuwHAX8pfcTDaNoIoJEBaVKeUGhYat3gauResPaeelCk1zqy4nWiXFnfPYsp9SNeH966ptq9IZwZhR66EkXvhs/NcpcyqUliiDuEd8U/tOrgkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764246931; c=relaxed/simple;
-	bh=SDD/uY9lDrnQ0wCJ8W/3GAz+Ix4zBrgPCC/2BlbMuWU=;
+	s=arc-20240116; t=1764246932; c=relaxed/simple;
+	bh=0FDBQgD/WbD9xj1dDF1gPq7NyjyfJGnGGRSZGnr4ZJA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kdXMG0lPPDU0r/1mtGWQIm3RZ8L39bo+JUehL6Jyli5GKyUFfCqBq+kSBdBcVsuX+eINudZYpL/0Ro7qADAkCMaY7w/+9DuzvU/L8olAD7sSl/k6pfjjJNpfZJ+/yg2cioNwUHXxN/SIBNevO0DRIO5K7pmpgymUjYf8zUSqxZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=elVLvy/x; arc=none smtp.client-ip=209.85.221.50
+	 MIME-Version; b=qcnyLBojmIKKDxNEXaPvtsgIFeKxZpxvytxNkrcyGh67UX40W4tOyxWb8F0ztFIE7p41hKAcLfoD/X/Q+3dlL4n+qRmsnGbLFDQUZiaFfUizMb79ptrE0PFcKCE9Z2O4QYX805Pdhe7UPM+LH2FxPl997dO+3BoeWX9ibG+L6MM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TKXtZQlT; arc=none smtp.client-ip=209.85.221.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-42b3669ca3dso405618f8f.0
-        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 04:35:29 -0800 (PST)
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-42b3c965ca9so490900f8f.1
+        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 04:35:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764246928; x=1764851728; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1764246929; x=1764851729; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7ngQqzbRobx7rR+xWDwzr0ZNj41Wwc2wJJl825y6NO4=;
-        b=elVLvy/xr8RypNkflJAKHJDSMoqMJ5TA+6WbImw9z807aJxkpbBzlCQ5v3xYkAuyUh
-         29fU3J96Y3bDt0z9ykgB8ljiwe5SsVVgyGW8xezMTeVUpjXCSoURBM16KMVI8isdywTE
-         98Q3kcIDi0xeZKugC+Scl/aJn+eLBg4+jbTVcNsizTt6dxhAtQ5zlIZ8uj0q32tcvZRK
-         cKiYnfb4ZaRm8Yo0wFBFKk2rqfnIx4xlpsXOiQ4ZSYRZOE/l3zTFbDUgRs2RuIMngq4+
-         mQdvBe0eXdhr1A5KHRy6m53YRskRSjBbGYC0bLzBdSOUU+V1TTBK5iTd8ZGOMR/n9Q+Q
-         5EVw==
+        bh=W10nyLh56RvLREhpVcYR0h98rN9abER2e9fA19uOK34=;
+        b=TKXtZQlTkNtfi+b1mcY5zvdKhaPmvN+vfZhQqUnAg/7iDRPY7hFddpBAL1VW7YuthS
+         RwQCUbf41c/dXalfGawYOOj8v7EvzAp8k17hrt1Irq1uzVmkxk2CPJSCqyGkiVwto3v/
+         t6qM1PWt1Xy42LuJ4s7t3NR2nsa60muDiXLAEARYH5ISlG8E272VOZoRr4sszSQz5AY+
+         OG3lxB33OwnUgKkzuumv8mhPLRSsdqcE8nwgwJDwsnZvlkyop/45+tURwmxWUozT1zO9
+         R20wxBQCJxL2ixFovK8GMscsQlGosWSWsw9dKmpK0uIzpMYYMaqq6SsY+7NWq5GcdXuY
+         p8uw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764246928; x=1764851728;
+        d=1e100.net; s=20230601; t=1764246929; x=1764851729;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=7ngQqzbRobx7rR+xWDwzr0ZNj41Wwc2wJJl825y6NO4=;
-        b=Y8zGpCEedoo8xLQ7xSGRpk0GiJEpjToxXHwPsq3uSCZGUkWnw4oC3VmHDgxhZ0ObT1
-         I/JWfM/qBcDPaHu9p6t1RgC1TcTTQL5Ttx1ASS4yszsU83rVhdMuk3izuVgwQmf9QRqg
-         +ie0A/CAOcNJDlirmPzhyYwg+6z42V0A+zu5Ool7mahgGxNFF7jzbdRNO9y4vXuPbLWZ
-         t+QwD4BbqXHyqMlHknQdDHBgDP9y1UZqkk+cj/tkcEl4YqXnDzrW5Dj1q43hEtH3H34u
-         aMO3xV4C+tBPFJMGoXE/16+ZAdNz9yaplcSUvPxYxzOczvn2hWPzmusY7jdU4W1Njesn
-         DZkw==
-X-Forwarded-Encrypted: i=1; AJvYcCUzObvWqBxP3RTei9jXTRDkb+Rby1oTRnxV+HS0HZWuKi4/TCaVHe+zKKPbSqpfJ+0Gw+KFSf0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz5fO1tSM8waAT9ot6UDkCjR5ndy8kG+igcWzut43IOmVR/TDHL
-	Mu1voRV+8DSmrA3/2NNp9xssyT4x9ReOnIQJeoVHfBF5aq3sn9n4gf9w
-X-Gm-Gg: ASbGncsiVcNhkkAlDEi4UUVKuzywbjFOnPWwNF0w+eCgsKe7A/PG/mR1q3Oj7j/TdsH
-	CP3rDEssXUGykHnhcPCa/ehSSmqXuqlAunpFexjrJQJPURZXShtR+8RRHvVcnfFjgkwmgaV4sQq
-	4QKSDKdtY86bKCMX1y1pIm9wexeuX42YUbguD9wVAWG0Qh3VFDi9Hw4JlBUI9LfnbQblHiY+0+Z
-	Ef5boaagk6kCABdr+S9N3OOg2Y1cAWhzrX0QE5ALnec0faEOBllcHeG3bUn3RC9K6ouBFVEpv5P
-	aW5kilumoaTPKolfvkcquGX4yENadlLFMzFkfJ1Mu1XiCSkzPA4V70jp4fWmR8XAzPIeswWUR/t
-	ed6fPi4hJv7ky/P2hnTbV2hoAHbjlCLrvGRLpCMlMDSr3MBzoBZI5sOOWADe0BSnDTfTWRRVmI9
-	CkvxJyfoe3gAnipiQWVtZIx0qp9A==
-X-Google-Smtp-Source: AGHT+IHDZdCE9vumQVh6zBHi/PT3YiBvMpxnKXGHwzuYsn+Ob/wzUHavIuCOpiqTfaA9TMZgdtVABA==
-X-Received: by 2002:a05:6000:25c4:b0:425:769e:515a with SMTP id ffacd0b85a97d-42cc1d1969emr25100243f8f.42.1764246927902;
-        Thu, 27 Nov 2025 04:35:27 -0800 (PST)
+        bh=W10nyLh56RvLREhpVcYR0h98rN9abER2e9fA19uOK34=;
+        b=WV5pWW/hZl67Xzy7F+9v4bGPMsPlfFTAv3sXeD1KjhqC9wZsn1kFDgBYdrHkVHd8yE
+         4N+3Y+EgVhD3QctFfLO++vsD37RtM8i9HUNu91vwDQViGtLEIW7w4Foo44cvU+/Liyce
+         H1Fs+eAqxZ5x1t0OodMWOYVgVZ3n09HLb38iHIQh/HkYt+vuSZM4e6MQOLQijidZPotv
+         VnmOOeg4PVMl++HBvC+JEuhxxItis6YeULBlLO5j6XDBQieywFSGMHDN0rsfRDTjbrHF
+         gNkiJRkx+Dl7P8O1WGKtMcOcOg05RoOo9iKHm6IE++cNHBLtE2RbtJeazofGFt/d02UB
+         aQpw==
+X-Forwarded-Encrypted: i=1; AJvYcCXmyZnYhFnxGymKIEsjYwe0P6UYEOdfo8yu3JN8byOnZEtHFrAyg4aDyHhpyFOGFJTifG93XN0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3SQYcofSmINP+tZ0JPiKsZo4cr1R1kdXfZQUBjfLn2AS7f7Lx
+	mWwAHpdAIgFOw9h2kOiQR8qTgauFUDKPhaV0uDJ0tf0RV1DpBZ2lJrVo
+X-Gm-Gg: ASbGncsXrmWwVjQhkXTnuYm1BBH+1mr6EAWkCKS5QcsnJOiUhxxFsOemtxL3Rjq4seD
+	YzxrFbxYOcoK5XOhuyhu3SsB143m5wOK+f3zncOc6EPUCuxOCpvBkDFH8hOS500fWDMJGy5LVJW
+	Qwlbwcj+u3tcBWWbiOEjPUHQ32Nircg9//ZxUwzx7X6LcVJXeT7aRdDehsBgUc7os0WazeFVbMC
+	vAKMTi/mLB0Ch9uw8Gs2sfyiw70PbOyD7gw3TBrPyqEUTU6ndkzP6CK1j5EJk4PetzRlwVLC98t
+	UlC4KFu1GPlcwuuUiDKkGlpPwWscMl8HqVULU+7h4cNyIUtKInypvFjcMMz5kXcCoX11lZUBYJz
+	nQP8Y5zNATRKFw3tziR6jrS2MQg0CqrO0kP6F1pDO+FCOVsVzQWpOXKpwNEdYzHCKz2P1YDt2ul
+	hE8i/KyLc/IEl8JRv6IFcu49E25w==
+X-Google-Smtp-Source: AGHT+IHXORm3KFNXD04SNdvnPgnH0/frSdf1r/gKWxW9SIbJH71wBa9z1k//4rtrUz0r/MeNpOLoAQ==
+X-Received: by 2002:a05:6000:40cc:b0:42b:3cd2:e9bb with SMTP id ffacd0b85a97d-42cc1d2e29dmr24285467f8f.32.1764246929109;
+        Thu, 27 Nov 2025 04:35:29 -0800 (PST)
 Received: from imac.lan ([2a02:8010:60a0:0:7864:d69:c1a:dad8])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42e1ca4078csm3220718f8f.29.2025.11.27.04.35.26
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42e1ca4078csm3220718f8f.29.2025.11.27.04.35.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Nov 2025 04:35:27 -0800 (PST)
+        Thu, 27 Nov 2025 04:35:28 -0800 (PST)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: Jakub Kicinski <kuba@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -94,9 +94,9 @@ To: Jakub Kicinski <kuba@kernel.org>,
 	Nimrod Oren <noren@nvidia.com>,
 	netdev@vger.kernel.org
 Cc: Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v1 3/4] ynl: fix a yamllint warning in ethtool spec
-Date: Thu, 27 Nov 2025 12:35:01 +0000
-Message-ID: <20251127123502.89142-4-donald.hunter@gmail.com>
+Subject: [PATCH net-next v1 4/4] ynl: fix schema check errors
+Date: Thu, 27 Nov 2025 12:35:02 +0000
+Message-ID: <20251127123502.89142-5-donald.hunter@gmail.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20251127123502.89142-1-donald.hunter@gmail.com>
 References: <20251127123502.89142-1-donald.hunter@gmail.com>
@@ -108,29 +108,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Fix warning reported by yamllint:
+Fix two schema check errors that have lurked since the attribute name
+validation was made more strict:
 
-../../../Documentation/netlink/specs/ethtool.yaml
-  1272:21   warning  truthy value should be one of [false, true]  (truthy)
+not ok 2 conntrack.yaml schema validation
+'labels mask' does not match '^[0-9a-z-]+$'
+
+not ok 13 nftables.yaml schema validation
+'set id' does not match '^[0-9a-z-]+$'
 
 Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
 ---
- Documentation/netlink/specs/ethtool.yaml | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ Documentation/netlink/specs/conntrack.yaml | 2 +-
+ Documentation/netlink/specs/nftables.yaml  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-index 05d2b6508b59..0a2d2343f79a 100644
---- a/Documentation/netlink/specs/ethtool.yaml
-+++ b/Documentation/netlink/specs/ethtool.yaml
-@@ -1269,7 +1269,7 @@ attribute-sets:
+diff --git a/Documentation/netlink/specs/conntrack.yaml b/Documentation/netlink/specs/conntrack.yaml
+index bef528633b17..db7cddcda50a 100644
+--- a/Documentation/netlink/specs/conntrack.yaml
++++ b/Documentation/netlink/specs/conntrack.yaml
+@@ -457,7 +457,7 @@ attribute-sets:
+         name: labels
+         type: binary
        -
-         name: hist
-         type: nest
--        multi-attr: True
-+        multi-attr: true
-         nested-attributes: fec-hist
-   -
-     name: fec
+-        name: labels mask
++        name: labels-mask
+         type: binary
+       -
+         name: synproxy
+diff --git a/Documentation/netlink/specs/nftables.yaml b/Documentation/netlink/specs/nftables.yaml
+index cce88819ba71..17ad707fa0d5 100644
+--- a/Documentation/netlink/specs/nftables.yaml
++++ b/Documentation/netlink/specs/nftables.yaml
+@@ -915,7 +915,7 @@ attribute-sets:
+         type: string
+         doc: Name of set to use
+       -
+-        name: set id
++        name: set-id
+         type: u32
+         byte-order: big-endian
+         doc: ID of set to use
 -- 
 2.51.1
 
