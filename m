@@ -1,229 +1,340 @@
-Return-Path: <netdev+bounces-242230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45F26C8DC8F
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 11:34:27 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id F076FC8DCD5
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 11:37:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 016633B1179
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 10:33:53 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7080B34312B
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 10:37:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22CF432ABC6;
-	Thu, 27 Nov 2025 10:32:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CABB329C7D;
+	Thu, 27 Nov 2025 10:37:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.es header.i=@amazon.es header.b="cuGecbHa"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UI3O9UfB";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mz//7ulA"
 X-Original-To: netdev@vger.kernel.org
-Received: from fra-out-004.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-004.esa.eu-central-1.outbound.mail-perimeter.amazon.com [3.74.81.189])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A40C132AAB6;
-	Thu, 27 Nov 2025 10:32:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.74.81.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC53079DA
+	for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 10:36:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764239572; cv=none; b=NSe/5ubeSzFommmBysqgROxkhgUXiUY49+CDyi6B/eRzsyRE2vUi0Xnv6MvwR3QmDeUC1iIYRMyYJ7bUQHgHujRJSAYFYh44tsyvYcdUXs4omZ5r02KcUiEnEvajtJROD3obLIVxB/szrMDC1HWuwQ8trx77yT6K9e+m6cC6uUc=
+	t=1764239821; cv=none; b=NbOV2Eztwtmf/SZXcVVH0SpdDNRhdDnfGc0s5LPb1CJaAysSKTfL8XQJsfzLXrR10eQ7K3RmNOyuzxcSsGup+z2wqK/RcDq6wcnbZEDctlCSRbfXiBWMEjUCf4HE7vkdst9y3BaIInsovM1HN12Tb/GOpTe6nlhHpV+VNfoB3vI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764239572; c=relaxed/simple;
-	bh=ZbadQDStXXXIyobHkT2/9WRnqdq3KTYXRzMVK39GgYc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=VD6Hr8BUdhNXcZc0Ys8XE+uNDTlNn+yRy/ddJOzrCiIoN/AopMP6ANmGfdyzlpaRi42NavjDUzNeQgB8gDA71srDLKyjEXeg08eviYWcA0pOhDmWFVrmC7GzGXsygIeIkqSDeypL5mF7m6zueRhoUHPQvGeDhqmYQu4+YAd80lo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.es; spf=pass smtp.mailfrom=amazon.es; dkim=pass (2048-bit key) header.d=amazon.es header.i=@amazon.es header.b=cuGecbHa; arc=none smtp.client-ip=3.74.81.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.es
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.es
+	s=arc-20240116; t=1764239821; c=relaxed/simple;
+	bh=zsMZrscbJSC5ej1CL+cuK7QTVsa/DgbjjF3adgXy8HQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PTLXNXdDcKxMEHowCCdh4XswttbJgrMuHzBnC4lIHLCaeuNVurcWmIn53bCXEbloKkZuYT1gYD3VMVGHE0meh6s3e3GSJPGWV5praNAWhq9voiBIeqbOFScbVgsr4axUzgLFQQDefpuxWlQzVUjmODDalbt3z2ERoaoFhzNexKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UI3O9UfB; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Mz//7ulA; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764239814;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=r+MlgGs88qXgfdL+n9ReF5tJArJSHzqjXvUzDrxfllg=;
+	b=UI3O9UfBgwW0MDrX50a65AvgTBzPxLECHr+ByQXNU7DRXlALgtjHrRzeCLWi3rrooMEDKN
+	HKX4P7qmw7somdMJ5LGXqRQNzV4KppVK8lOShQ9afz509gOH6Q1vN7WnwgU9A/oZAHGik3
+	5UwtBTIWvTBBXPCsOg6s356ABJkczrI=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-96-M5JSBIzKOROoAt8OtCi2xA-1; Thu, 27 Nov 2025 05:36:53 -0500
+X-MC-Unique: M5JSBIzKOROoAt8OtCi2xA-1
+X-Mimecast-MFC-AGG-ID: M5JSBIzKOROoAt8OtCi2xA_1764239806
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-42b3086a055so571612f8f.3
+        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 02:36:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.es; i=@amazon.es; q=dns/txt; s=amazoncorp2;
-  t=1764239570; x=1795775570;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=ZbadQDStXXXIyobHkT2/9WRnqdq3KTYXRzMVK39GgYc=;
-  b=cuGecbHab8iaqidTuGb/Gq9nLpKtDCluEW+sErvgcQ1jVyvdSFHV1yuF
-   EOTkjiPJa1OFgUuftzkZxHp0XRErwjCvwaRMxrv12bUSQMKQgB+Yuq2J/
-   IjQ9VMv1lGJViBtxb3Nnbe/9x1Ai0VEmrV1Ni3sm2fmRKAu1fzBBZl7sf
-   lr8OBilsvayyiRGg5NEU1+4sPJ5W6rcs8wIN2wFRbJS7cFrtKSqyP0LLI
-   kfdSCwW6BWm7UDyqRNG885s0a8HkGKTBX6GBwGxOSwC5DvAPGEtCIZT6t
-   /qVgdOG089eQ/BrO9MmtaGyETIUVWXL4wWC4634K3Ta9oPb7UZQg2h6Fm
-   w==;
-X-CSE-ConnectionGUID: foLQkyLQQ8u+9XREjnwlQQ==
-X-CSE-MsgGUID: 82+8iU/2SWWwTaSIS42Efw==
-X-IronPort-AV: E=Sophos;i="6.20,230,1758585600"; 
-   d="scan'208";a="5890120"
-Received: from ip-10-6-3-216.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.3.216])
-  by internal-fra-out-004.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2025 10:32:25 +0000
-Received: from EX19MTAEUC002.ant.amazon.com [54.240.197.228:16480]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.14.220:2525] with esmtp (Farcaster)
- id 874d0eb0-8f81-4ca6-8710-042741d6d790; Thu, 27 Nov 2025 10:32:25 +0000 (UTC)
-X-Farcaster-Flow-ID: 874d0eb0-8f81-4ca6-8710-042741d6d790
-Received: from EX19D012EUA001.ant.amazon.com (10.252.50.122) by
- EX19MTAEUC002.ant.amazon.com (10.252.51.245) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
- Thu, 27 Nov 2025 10:32:25 +0000
-Received: from EX19D012EUA001.ant.amazon.com (10.252.50.122) by
- EX19D012EUA001.ant.amazon.com (10.252.50.122) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
- Thu, 27 Nov 2025 10:32:24 +0000
-Received: from EX19D012EUA001.ant.amazon.com ([fe80::b7ea:84f7:2c4b:2719]) by
- EX19D012EUA001.ant.amazon.com ([fe80::b7ea:84f7:2c4b:2719%3]) with mapi id
- 15.02.2562.029; Thu, 27 Nov 2025 10:32:24 +0000
-From: "Chalios, Babis" <bchalios@amazon.es>
-To: "richardcochran@gmail.com" <richardcochran@gmail.com>,
-	"dwmw2@infradead.org" <dwmw2@infradead.org>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-CC: "Chalios, Babis" <bchalios@amazon.es>, "Graf (AWS), Alexander"
-	<graf@amazon.de>, "mzxreary@0pointer.de" <mzxreary@0pointer.de>
-Subject: [PATCH 2/2] ptp: vmclock: support device notifications
-Thread-Topic: [PATCH 2/2] ptp: vmclock: support device notifications
-Thread-Index: AQHcX4ke+4fBjoV1skyomXn3io9u8w==
-Date: Thu, 27 Nov 2025 10:32:24 +0000
-Message-ID: <20251127103159.19816-3-bchalios@amazon.es>
-References: <20251127103159.19816-1-bchalios@amazon.es>
-In-Reply-To: <20251127103159.19816-1-bchalios@amazon.es>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D1ABED4F52371440BDD14F7822643430@amazon.com>
-Content-Transfer-Encoding: base64
+        d=redhat.com; s=google; t=1764239806; x=1764844606; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=r+MlgGs88qXgfdL+n9ReF5tJArJSHzqjXvUzDrxfllg=;
+        b=Mz//7ulA4teG/p8Z+P5fSvuwAvF9xMQCWoMkzLinZwG9amMTgob1rNs4tfNVM5SKuT
+         mxq2JPYMlEwwGVJiLT+VW2XyUelBbmiVf/dahkLXKK3QlBBV2BlD0NuEq4UChqWVPZa0
+         2S84AKmuJncGBUBhJSJE6sMjV1oyfY6+hTnYlrjOpTXGTu9tknNXlNtu4QzZaAyiU+36
+         /8KA2xRGiDHQb0uMTY5mJdLdNQHQSGLzjcOSMPMVyqpFl6Xzi/637E15vv/z5s35CLBi
+         YkYpAV3v1DMLxq0WZuDCl69IKYEsU0h1FjFQ/ntiUEWQ9407EqXIOkclzC3uMz0+bEa9
+         MUXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764239806; x=1764844606;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=r+MlgGs88qXgfdL+n9ReF5tJArJSHzqjXvUzDrxfllg=;
+        b=N05aMjKX7CxR6tL2Wh42UXnWChaQkT7U5Ab5DrND7vWYoxTGGORNCuLYOdiEY6+SfB
+         G4KcYLjEJwfkkDX/AuN/rAQRVSr/KKZ6r1wxcw/HXKbT599NEGUXWEEQJY4+FTnpEFaF
+         pcoiLtTBzoWpW1z8WUeB/IbIIfg3i2ucPEnHDDVYmQBAbUgM4S7zoqkNMVKj09VX50wT
+         UTZ8E/YP60PBs9KCilyIrhTMH8g0Na/LGPAydy+0i9D9FJ67m8O3KJOt3QTv2oEdsa64
+         FV0wJYzCMOazLERDA91amwwTpFv/V+Ambj/ne1roYwqpbhPbFXD5OAVsosdW/h9atcp9
+         wtBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUEtv46V4Spy8207R2/TgleyH8DK8cgxlRxwT0krQlQnHpa30i24R6y1De8IUmBMXk+QmwqYuk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAdU352bhjLAXq0PhtgzeySRZexWBbcB1/JxTl8+4z/dZV/LQr
+	82AomJc+Oi7p014QWiNYLvNSxozCBMs7Ily7uWhA3yp8vLUXbbT0hVfcBsHzGPzw+DkCe/MiLS8
+	5nu3tl7PU7HDVU63VDSqSn9nQWPMfPkM8tFScfSO+eBEnz+7IqScQZNeXVQ==
+X-Gm-Gg: ASbGnctrFkspsh5XMki9oLcKfPO7EUkNAW8WcFZH5ooKOrm4gz5kk/kZyxn8zGtedVA
+	Q6u8O+I2SIdeJQ1yT13V/rJSzPombuMapEBqAotAJ51QxiKs36+ZTEuhRbZ993XmdT634yO06bG
+	3IaaG5QtUwk6lsY7W6i+kqjXqxUhCZKQWARLEDFxZlTY6gE1yTajE4NDzGWi6CCeoRa+OrsAcMW
+	Y1bCN4SAuzlbdFUKkpSzQi8h6HsE8GvecW42gpOYqtbl7cBApNsDH5+1f4eaNTO914oK7iXwCpN
+	yZ5HckFhGBzAnseEc0QuqxkmicGkilSXobPTgHoen24lxeb2ScdiHfYgCFXc+xKU2ySG0hc5IP0
+	CP7cvu/Nvsw2qZw==
+X-Received: by 2002:adf:ed0c:0:b0:42b:3d93:9a27 with SMTP id ffacd0b85a97d-42e0f3492b2mr8227450f8f.36.1764239806073;
+        Thu, 27 Nov 2025 02:36:46 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEJYo2GyThIlij+vvWAIstPjNssVKhAIzBpEAXrV77Fq+IsFEmYZe9P2TLzAeDoin2OZX4vhA==
+X-Received: by 2002:adf:ed0c:0:b0:42b:3d93:9a27 with SMTP id ffacd0b85a97d-42e0f3492b2mr8227411f8f.36.1764239805581;
+        Thu, 27 Nov 2025 02:36:45 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.212])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42e1c5d613esm2940137f8f.11.2025.11.27.02.36.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 Nov 2025 02:36:44 -0800 (PST)
+Message-ID: <75349e9f-3851-48de-9f7e-757f65d67f56@redhat.com>
+Date: Thu, 27 Nov 2025 11:36:43 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 2/3] bonding: restructure ad_churn_machine
+To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
+Cc: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+ Mahesh Bandewar <maheshb@google.com>, Shuah Khan <shuah@kernel.org>,
+ linux-kselftest@vger.kernel.org, Liang Li <liali@redhat.com>
+References: <20251124043310.34073-1-liuhangbin@gmail.com>
+ <20251124043310.34073-3-liuhangbin@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251124043310.34073-3-liuhangbin@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-QWRkIG9wdGlvbmFsIHN1cHBvcnQgZm9yIGRldmljZSBub3RpZmljYXRpb25zIGluIFZNQ2xvY2su
-IFdoZW4Kc3VwcG9ydGVkLCB0aGUgaHlwZXJ2aXNvciB3aWxsIHNlbmQgYSBkZXZpY2Ugbm90aWZp
-Y2F0aW9uIGV2ZXJ5IHRpbWUgaXQKdXBkYXRlcyB0aGUgc2VxX2NvdW50IHRvIGEgbmV3IGV2ZW4g
-dmFsdWUuCgpNb3Jlb3ZlciwgYWRkIHN1cHBvcnQgZm9yIHBvbGwoKSBpbiBWTUNsb2NrIGFzIGEg
-bWVhbnMgdG8gcHJvcGFnYXRlIHRoaXMKbm90aWZpY2F0aW9uIHRvIHVzZXIgc3BhY2UuIHBvbGwo
-KSB3aWxsIHJldHVybiBhIFBPTExJTiBldmVudCB0bwpsaXN0ZW5lcnMgZXZlcnkgdGltZSBzZXFf
-Y291bnQgY2hhbmdlcyB0byBhIHZhbHVlIGRpZmZlcmVudCB0aGFuIHRoZSBvbmUKbGFzdCBzZWVu
-IChzaW5jZSBvcGVuKCkgb3IgbGFzdCByZWFkKCkvcHJlYWQoKSkuIFRoaXMgbWVhbnMgdGhhdCB3
-aGVuCnBvbGwoKSByZXR1cm5zIGEgUE9MTElOIGV2ZW50LCBsaXN0ZW5lcnMgbmVlZCB0byB1c2Ug
-cmVhZCgpIHRvIG9ic2VydmUKd2hhdCBoYXMgY2hhbmdlZCBhbmQgdXBkYXRlIHRoZSByZWFkZXIn
-cyB2aWV3IG9mIHNlcV9jb3VudC4gSW4gb3RoZXIKd29yZHMsIGFmdGVyIGEgcG9sbCgpIHJldHVy
-bmVkLCBhbGwgc3Vic2VxdWVudCBjYWxscyB0byBwb2xsKCkgd2lsbAppbW1lZGlhdGVseSByZXR1
-cm4gd2l0aCBhIFBPTExJTiBldmVudCB1bnRpbCB0aGUgbGlzdGVuZXIgY2FsbHMgcmVhZCgpLgoK
-VGhlIGRldmljZSBhZHZlcnRpc2VzIHN1cHBvcnQgZm9yIHRoZSBub3RpZmljYXRpb24gbWVjaGFu
-aXNtIGJ5IHNldHRpbmcKZmxhZyBWTUNMT0NLX0ZMQUdfTk9USUZJQ0FUSU9OX1BSRVNFTlQgaW4g
-dm1jbG9ja19hYmkgZmxhZ3MgZmllbGQuIElmCnRoZSBmbGFnIGlzIG5vdCBwcmVzZW50IHRoZSBk
-cml2ZXIgd29uJ3Qgc2V0dXAgdGhlIEFDUEkgbm90aWZpY2F0aW9uCmhhbmRsZXIgYW5kIHBvbGwo
-KSB3aWxsIGFsd2F5cyBpbW1lZGlhdGVseSByZXR1cm4gUE9MTEhVUC4KClNpZ25lZC1vZmYtYnk6
-IEJhYmlzIENoYWxpb3MgPGJjaGFsaW9zQGFtYXpvbi5lcz4KLS0tCiBkcml2ZXJzL3B0cC9wdHBf
-dm1jbG9jay5jICAgICAgICB8IDExMyArKysrKysrKysrKysrKysrKysrKysrKysrKysrKy0tCiBp
-bmNsdWRlL3VhcGkvbGludXgvdm1jbG9jay1hYmkuaCB8ICAgNSArKwogMiBmaWxlcyBjaGFuZ2Vk
-LCAxMTMgaW5zZXJ0aW9ucygrKSwgNSBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9kcml2ZXJz
-L3B0cC9wdHBfdm1jbG9jay5jIGIvZHJpdmVycy9wdHAvcHRwX3ZtY2xvY2suYwppbmRleCBiM2E4
-M2IwM2Q5YzEuLmZhNTE1Mzc1ZDU0ZiAxMDA2NDQKLS0tIGEvZHJpdmVycy9wdHAvcHRwX3ZtY2xv
-Y2suYworKysgYi9kcml2ZXJzL3B0cC9wdHBfdm1jbG9jay5jCkBAIC01LDYgKzUsOSBAQAogICog
-Q29weXJpZ2h0IMKpIDIwMjQgQW1hem9uLmNvbSwgSW5jLiBvciBpdHMgYWZmaWxpYXRlcy4KICAq
-LwogCisjaW5jbHVkZSAibGludXgvcG9sbC5oIgorI2luY2x1ZGUgImxpbnV4L3R5cGVzLmgiCisj
-aW5jbHVkZSAibGludXgvd2FpdC5oIgogI2luY2x1ZGUgPGxpbnV4L2FjcGkuaD4KICNpbmNsdWRl
-IDxsaW51eC9kZXZpY2UuaD4KICNpbmNsdWRlIDxsaW51eC9lcnIuaD4KQEAgLTM5LDYgKzQyLDcg
-QEAgc3RydWN0IHZtY2xvY2tfc3RhdGUgewogCXN0cnVjdCByZXNvdXJjZSByZXM7CiAJc3RydWN0
-IHZtY2xvY2tfYWJpICpjbGs7CiAJc3RydWN0IG1pc2NkZXZpY2UgbWlzY2RldjsKKwl3YWl0X3F1
-ZXVlX2hlYWRfdCBkaXNydXB0X3dhaXQ7CiAJc3RydWN0IHB0cF9jbG9ja19pbmZvIHB0cF9jbG9j
-a19pbmZvOwogCXN0cnVjdCBwdHBfY2xvY2sgKnB0cF9jbG9jazsKIAllbnVtIGNsb2Nrc291cmNl
-X2lkcyBjc19pZCwgc3lzX2NzX2lkOwpAQCAtMzU3LDEwICszNjEsMTUgQEAgc3RhdGljIHN0cnVj
-dCBwdHBfY2xvY2sgKnZtY2xvY2tfcHRwX3JlZ2lzdGVyKHN0cnVjdCBkZXZpY2UgKmRldiwKIAly
-ZXR1cm4gcHRwX2Nsb2NrX3JlZ2lzdGVyKCZzdC0+cHRwX2Nsb2NrX2luZm8sIGRldik7CiB9CiAK
-K3N0cnVjdCB2bWNsb2NrX2ZpbGVfc3RhdGUgeworCXN0cnVjdCB2bWNsb2NrX3N0YXRlICpzdDsK
-Kwl1aW50MzJfdCBzZXE7Cit9OworCiBzdGF0aWMgaW50IHZtY2xvY2tfbWlzY2Rldl9tbWFwKHN0
-cnVjdCBmaWxlICpmcCwgc3RydWN0IHZtX2FyZWFfc3RydWN0ICp2bWEpCiB7Ci0Jc3RydWN0IHZt
-Y2xvY2tfc3RhdGUgKnN0ID0gY29udGFpbmVyX29mKGZwLT5wcml2YXRlX2RhdGEsCi0JCQkJCQlz
-dHJ1Y3Qgdm1jbG9ja19zdGF0ZSwgbWlzY2Rldik7CisJc3RydWN0IHZtY2xvY2tfZmlsZV9zdGF0
-ZSAqZnN0ID0gZnAtPnByaXZhdGVfZGF0YTsKKwlzdHJ1Y3Qgdm1jbG9ja19zdGF0ZSAqc3QgPSBm
-c3QtPnN0OwogCiAJaWYgKCh2bWEtPnZtX2ZsYWdzICYgKFZNX1JFQUR8Vk1fV1JJVEUpKSAhPSBW
-TV9SRUFEKQogCQlyZXR1cm4gLUVST0ZTOwpAQCAtMzc5LDggKzM4OCw5IEBAIHN0YXRpYyBpbnQg
-dm1jbG9ja19taXNjZGV2X21tYXAoc3RydWN0IGZpbGUgKmZwLCBzdHJ1Y3Qgdm1fYXJlYV9zdHJ1
-Y3QgKnZtYSkKIHN0YXRpYyBzc2l6ZV90IHZtY2xvY2tfbWlzY2Rldl9yZWFkKHN0cnVjdCBmaWxl
-ICpmcCwgY2hhciBfX3VzZXIgKmJ1ZiwKIAkJCQkgICAgc2l6ZV90IGNvdW50LCBsb2ZmX3QgKnBw
-b3MpCiB7Ci0Jc3RydWN0IHZtY2xvY2tfc3RhdGUgKnN0ID0gY29udGFpbmVyX29mKGZwLT5wcml2
-YXRlX2RhdGEsCi0JCQkJCQlzdHJ1Y3Qgdm1jbG9ja19zdGF0ZSwgbWlzY2Rldik7CisJc3RydWN0
-IHZtY2xvY2tfZmlsZV9zdGF0ZSAqZnN0ID0gZnAtPnByaXZhdGVfZGF0YTsKKwlzdHJ1Y3Qgdm1j
-bG9ja19zdGF0ZSAqc3QgPSBmc3QtPnN0OworCiAJa3RpbWVfdCBkZWFkbGluZSA9IGt0aW1lX2Fk
-ZChrdGltZV9nZXQoKSwgVk1DTE9DS19NQVhfV0FJVCk7CiAJc2l6ZV90IG1heF9jb3VudDsKIAl1
-aW50MzJfdCBzZXE7CkBAIC00MDIsOCArNDEyLDEwIEBAIHN0YXRpYyBzc2l6ZV90IHZtY2xvY2tf
-bWlzY2Rldl9yZWFkKHN0cnVjdCBmaWxlICpmcCwgY2hhciBfX3VzZXIgKmJ1ZiwKIAogCQkvKiBQ
-YWlycyB3aXRoIGh5cGVydmlzb3Igd21iICovCiAJCXZpcnRfcm1iKCk7Ci0JCWlmIChzZXEgPT0g
-bGUzMl90b19jcHUoc3QtPmNsay0+c2VxX2NvdW50KSkKKwkJaWYgKHNlcSA9PSBsZTMyX3RvX2Nw
-dShzdC0+Y2xrLT5zZXFfY291bnQpKSB7CisJCQlmc3QtPnNlcSA9IHNlcTsKIAkJCWJyZWFrOwor
-CQl9CiAKIAkJaWYgKGt0aW1lX2FmdGVyKGt0aW1lX2dldCgpLCBkZWFkbGluZSkpCiAJCQlyZXR1
-cm4gLUVUSU1FRE9VVDsKQEAgLTQxMywxMCArNDI1LDU4IEBAIHN0YXRpYyBzc2l6ZV90IHZtY2xv
-Y2tfbWlzY2Rldl9yZWFkKHN0cnVjdCBmaWxlICpmcCwgY2hhciBfX3VzZXIgKmJ1ZiwKIAlyZXR1
-cm4gY291bnQ7CiB9CiAKK3N0YXRpYyBfX3BvbGxfdCB2bWNsb2NrX21pc2NkZXZfcG9sbChzdHJ1
-Y3QgZmlsZSAqZnAsIHBvbGxfdGFibGUgKndhaXQpCit7CisJc3RydWN0IHZtY2xvY2tfZmlsZV9z
-dGF0ZSAqZnN0ID0gZnAtPnByaXZhdGVfZGF0YTsKKwlzdHJ1Y3Qgdm1jbG9ja19zdGF0ZSAqc3Qg
-PSBmc3QtPnN0OworCXVpbnQzMl90IHNlcTsKKworCS8qCisJICogSHlwZXJ2aXNvciB3aWxsIG5v
-dCBzZW5kIHVzIGFueSBub3RpZmljYXRpb25zLCBzbyBmYWlsIGltbWVkaWF0ZWx5CisJICogdG8g
-YXZvaWQgaGF2aW5nIGNhbGxlciBzbGVlcGluZyBmb3IgZXZlci4KKwkgKi8KKwlpZiAoIShzdC0+
-Y2xrLT5mbGFncyAmIFZNQ0xPQ0tfRkxBR19OT1RJRklDQVRJT05fUFJFU0VOVCkpCisJCXJldHVy
-biBQT0xMSFVQOworCisJcG9sbF93YWl0KGZwLCAmc3QtPmRpc3J1cHRfd2FpdCwgd2FpdCk7CisK
-KwlzZXEgPSBsZTMyX3RvX2NwdShzdC0+Y2xrLT5zZXFfY291bnQpOworCWlmIChmc3QtPnNlcSAh
-PSBzZXEpCisJCXJldHVybiBQT0xMSU4gfCBQT0xMUkROT1JNOworCisJcmV0dXJuIDA7Cit9CisK
-K3N0YXRpYyBpbnQgdm1jbG9ja19taXNjZGV2X29wZW4oc3RydWN0IGlub2RlICppbm9kZSwgc3Ry
-dWN0IGZpbGUgKmZwKQoreworCXN0cnVjdCB2bWNsb2NrX3N0YXRlICpzdCA9IGNvbnRhaW5lcl9v
-ZihmcC0+cHJpdmF0ZV9kYXRhLAorCQkJCQkJc3RydWN0IHZtY2xvY2tfc3RhdGUsIG1pc2NkZXYp
-OworCXN0cnVjdCB2bWNsb2NrX2ZpbGVfc3RhdGUgKmZzdCA9IGt6YWxsb2Moc2l6ZW9mKCpmc3Qp
-LCBHRlBfS0VSTkVMKTsKKworCWlmICghZnN0KQorCQlyZXR1cm4gLUVOT01FTTsKKworCWZzdC0+
-c3QgPSBzdDsKKwlmc3QtPnNlcSA9IGxlMzJfdG9fY3B1KHN0LT5jbGstPnNlcV9jb3VudCk7CisK
-KwlmcC0+cHJpdmF0ZV9kYXRhID0gZnN0OworCisJcmV0dXJuIDA7Cit9CisKK3N0YXRpYyBpbnQg
-dm1jbG9ja19taXNjZGV2X3JlbGVhc2Uoc3RydWN0IGlub2RlICppbm9kZSwgc3RydWN0IGZpbGUg
-KmZwKQoreworCWtmcmVlKGZwLT5wcml2YXRlX2RhdGEpOworCXJldHVybiAwOworfQorCiBzdGF0
-aWMgY29uc3Qgc3RydWN0IGZpbGVfb3BlcmF0aW9ucyB2bWNsb2NrX21pc2NkZXZfZm9wcyA9IHsK
-IAkub3duZXIgPSBUSElTX01PRFVMRSwKKwkub3BlbiA9IHZtY2xvY2tfbWlzY2Rldl9vcGVuLAor
-CS5yZWxlYXNlID0gdm1jbG9ja19taXNjZGV2X3JlbGVhc2UsCiAJLm1tYXAgPSB2bWNsb2NrX21p
-c2NkZXZfbW1hcCwKIAkucmVhZCA9IHZtY2xvY2tfbWlzY2Rldl9yZWFkLAorCS5wb2xsID0gdm1j
-bG9ja19taXNjZGV2X3BvbGwsCiB9OwogCiAvKiBtb2R1bGUgb3BlcmF0aW9ucyAqLwpAQCAtNDU5
-LDYgKzUxOSw0NCBAQCBzdGF0aWMgYWNwaV9zdGF0dXMgdm1jbG9ja19hY3BpX3Jlc291cmNlcyhz
-dHJ1Y3QgYWNwaV9yZXNvdXJjZSAqYXJlcywgdm9pZCAqZGF0YQogCXJldHVybiBBRV9FUlJPUjsK
-IH0KIAorc3RhdGljIHZvaWQKK3ZtY2xvY2tfYWNwaV9ub3RpZmljYXRpb25faGFuZGxlcihhY3Bp
-X2hhbmRsZSBfX2Fsd2F5c191bnVzZWQgaGFuZGxlLAorCQkJCSAgdTMyIF9fYWx3YXlzX3VudXNl
-ZCBldmVudCwgdm9pZCAqZGV2KQoreworCXN0cnVjdCBkZXZpY2UgKmRldmljZSA9IGRldjsKKwlz
-dHJ1Y3Qgdm1jbG9ja19zdGF0ZSAqc3QgPSBkZXZpY2UtPmRyaXZlcl9kYXRhOworCisJd2FrZV91
-cF9pbnRlcnJ1cHRpYmxlKCZzdC0+ZGlzcnVwdF93YWl0KTsKK30KKworc3RhdGljIGludCB2bWNs
-b2NrX3NldHVwX25vdGlmaWNhdGlvbihzdHJ1Y3QgZGV2aWNlICpkZXYsIHN0cnVjdCB2bWNsb2Nr
-X3N0YXRlICpzdCkKK3sKKwlzdHJ1Y3QgYWNwaV9kZXZpY2UgKmFkZXYgPSBBQ1BJX0NPTVBBTklP
-TihkZXYpOworCWFjcGlfc3RhdHVzIHN0YXR1czsKKworCS8qCisJICogVGhpcyBzaG91bGQgbmV2
-ZXIgaGFwcGVuIGFzIHRoaXMgZnVuY3Rpb24gaXMgb25seSBjYWxsZWQgd2hlbgorCSAqIGhhc19h
-Y3BpX2NvbXBhbmlvbihkZXYpIGlzIHRydWUsIGJ1dCB0aGUgbG9naWMgaXMgc3VmZmljaWVudGx5
-CisJICogY29tcGxleCB0aGF0IENvdmVyaXR5IGNhbid0IHNlZSB0aGUgdGF1dG9sb2d5LgorCSAq
-LworCWlmICghYWRldikKKwkJcmV0dXJuIC1FTk9ERVY7CisKKwkvKiBUaGUgZGV2aWNlIGRvZXMg
-bm90IHN1cHBvcnQgbm90aWZpY2F0aW9ucy4gTm90aGluZyBlbHNlIHRvIGRvICovCisJaWYgKCEo
-bGU2NF90b19jcHUoc3QtPmNsay0+ZmxhZ3MpICYgVk1DTE9DS19GTEFHX05PVElGSUNBVElPTl9Q
-UkVTRU5UKSkKKwkJcmV0dXJuIDA7CisKKwlzdGF0dXMgPSBhY3BpX2luc3RhbGxfbm90aWZ5X2hh
-bmRsZXIoYWRldi0+aGFuZGxlLCBBQ1BJX0RFVklDRV9OT1RJRlksCisJCQkJCSAgICAgdm1jbG9j
-a19hY3BpX25vdGlmaWNhdGlvbl9oYW5kbGVyLAorCQkJCQkgICAgIGRldik7CisJaWYgKEFDUElf
-RkFJTFVSRShzdGF0dXMpKSB7CisJCWRldl9lcnIoZGV2LCAiZmFpbGVkIHRvIGluc3RhbGwgbm90
-aWZpY2F0aW9uIGhhbmRsZXIiKTsKKwkJcmV0dXJuIC1FTk9ERVY7CisJfQorCisJcmV0dXJuIDA7
-Cit9CisKIHN0YXRpYyBpbnQgdm1jbG9ja19wcm9iZV9hY3BpKHN0cnVjdCBkZXZpY2UgKmRldiwg
-c3RydWN0IHZtY2xvY2tfc3RhdGUgKnN0KQogewogCXN0cnVjdCBhY3BpX2RldmljZSAqYWRldiA9
-IEFDUElfQ09NUEFOSU9OKGRldik7CkBAIC01NDksNiArNjQ3LDkgQEAgc3RhdGljIGludCB2bWNs
-b2NrX3Byb2JlKHN0cnVjdCBwbGF0Zm9ybV9kZXZpY2UgKnBkZXYpCiAJaWYgKHJldCkKIAkJcmV0
-dXJuIHJldDsKIAorCWluaXRfd2FpdHF1ZXVlX2hlYWQoJnN0LT5kaXNydXB0X3dhaXQpOworCXZt
-Y2xvY2tfc2V0dXBfbm90aWZpY2F0aW9uKGRldiwgc3QpOworCiAJLyoKIAkgKiBJZiB0aGUgc3Ry
-dWN0dXJlIGlzIGJpZyBlbm91Z2gsIGl0IGNhbiBiZSBtYXBwZWQgdG8gdXNlcnNwYWNlLgogCSAq
-IFRoZW9yZXRpY2FsbHkgYSBndWVzdCBPUyBldmVuIHVzaW5nIGxhcmdlciBwYWdlcyBjb3VsZCBz
-dGlsbApAQCAtNTgxLDYgKzY4Miw4IEBAIHN0YXRpYyBpbnQgdm1jbG9ja19wcm9iZShzdHJ1Y3Qg
-cGxhdGZvcm1fZGV2aWNlICpwZGV2KQogCQlyZXR1cm4gLUVOT0RFVjsKIAl9CiAKKwlkZXYtPmRy
-aXZlcl9kYXRhID0gc3Q7CisKIAlkZXZfaW5mbyhkZXYsICIlczogcmVnaXN0ZXJlZCAlcyVzJXNc
-biIsIHN0LT5uYW1lLAogCQkgc3QtPm1pc2NkZXYubWlub3IgPyAibWlzY2RldiIgOiAiIiwKIAkJ
-IChzdC0+bWlzY2Rldi5taW5vciAmJiBzdC0+cHRwX2Nsb2NrKSA/ICIsICIgOiAiIiwKZGlmZiAt
-LWdpdCBhL2luY2x1ZGUvdWFwaS9saW51eC92bWNsb2NrLWFiaS5oIGIvaW5jbHVkZS91YXBpL2xp
-bnV4L3ZtY2xvY2stYWJpLmgKaW5kZXggOTM3ZmUwMGU0ZjMzLi5kMzIwNjIzYjAxMTggMTAwNjQ0
-Ci0tLSBhL2luY2x1ZGUvdWFwaS9saW51eC92bWNsb2NrLWFiaS5oCisrKyBiL2luY2x1ZGUvdWFw
-aS9saW51eC92bWNsb2NrLWFiaS5oCkBAIC0xMjEsNiArMTIxLDExIEBAIHN0cnVjdCB2bWNsb2Nr
-X2FiaSB7CiAJICogbG9hZGVkIGZyb20gc29tZSBzYXZlIHN0YXRlIChyZXN0b3JlZCBmcm9tIGEg
-c25hcHNob3QpLgogCSAqLwogI2RlZmluZSBWTUNMT0NLX0ZMQUdfVk1fR0VOX0NPVU5URVJfUFJF
-U0VOVCAgICAgKDEgPDwgOCkKKwkvKgorCSAqIElmIHRoZSBOT1RJRklDQVRJT05fUFJFU0VOVCBm
-bGFnIGlzIHNldCwgdGhlIGh5cGVydmlzb3Igd2lsbCBzZW5kCisJICogYSBub3RpZmljYXRpb24g
-ZXZlcnkgdGltZSBpdCB1cGRhdGVzIHNlcV9jb3VudCB0byBhIG5ldyBldmVuIG51bWJlci4KKwkg
-Ki8KKyNkZWZpbmUgVk1DTE9DS19GTEFHX05PVElGSUNBVElPTl9QUkVTRU5UICAgICAgICgxIDw8
-IDkpCiAKIAlfX3U4IHBhZFsyXTsKIAlfX3U4IGNsb2NrX3N0YXR1czsKLS0gCjIuMzQuMQoK
+On 11/24/25 5:33 AM, Hangbin Liu wrote:
+> The current ad_churn_machine implementation only transitions the
+> actor/partner churn state to churned or none after the churn timer expires.
+> However, IEEE 802.1AX-2014 specifies that a port should enter the none
+> state immediately once the actor’s port state enters synchronization.
+> 
+> Another issue is that if the churn timer expires while the churn machine is
+> not in the monitor state (e.g. already in churn), the state may remain
+> stuck indefinitely with no further transitions. This becomes visible in
+> multi-aggregator scenarios. For example:
+> 
+> Ports 1 and 2 are in aggregator 1 (active)
+> Ports 3 and 4 are in aggregator 2 (backup)
+> 
+> Ports 1 and 2 should be in none
+> Ports 3 and 4 should be in churned
+> 
+> If a failover occurs due to port 2 link down/up, aggregator 2 becomes active.
+> Under the current implementation, the resulting states may look like:
+> 
+> agg 1 (backup): port 1 -> none, port 2 -> churned
+> agg 2 (active): ports 3,4 keep in churned.
+> 
+> The root cause is that ad_churn_machine() only clears the
+> AD_PORT_CHURNED flag and starts a timer. When a churned port becomes active,
+> its RX state becomes AD_RX_CURRENT, preventing the churn flag from being set
+> again, leaving no way to retrigger the timer. Fixing this solely in
+> ad_rx_machine() is insufficient.
+> 
+> This patch rewrites ad_churn_machine according to IEEE 802.1AX-2014
+> (Figures 6-23 and 6-24), ensuring correct churn detection, state transitions,
+> and timer behavior. With new implementation, there is no need to set
+> AD_PORT_CHURNED in ad_rx_machine().
+
+I think this change is too invasive at this point of the cycle. I think
+it should be moved to the next one or even to net-next.
+
+> Fixes: 14c9551a32eb ("bonding: Implement port churn-machine (AD standard 43.4.17).")
+> Reported-by: Liang Li <liali@redhat.com>
+> Tested-by: Liang Li <liali@redhat.com>
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> ---
+>  drivers/net/bonding/bond_3ad.c | 104 ++++++++++++++++++++++++++-------
+>  1 file changed, 84 insertions(+), 20 deletions(-)
+> 
+> diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
+> index d6bd3615d129..98b8d5040148 100644
+> --- a/drivers/net/bonding/bond_3ad.c
+> +++ b/drivers/net/bonding/bond_3ad.c
+> @@ -1240,7 +1240,6 @@ static void ad_rx_machine(struct lacpdu *lacpdu, struct port *port)
+>  	/* first, check if port was reinitialized */
+>  	if (port->sm_vars & AD_PORT_BEGIN) {
+>  		port->sm_rx_state = AD_RX_INITIALIZE;
+> -		port->sm_vars |= AD_PORT_CHURNED;
+>  	/* check if port is not enabled */
+>  	} else if (!(port->sm_vars & AD_PORT_BEGIN) && !port->is_enabled)
+>  		port->sm_rx_state = AD_RX_PORT_DISABLED;
+> @@ -1248,8 +1247,6 @@ static void ad_rx_machine(struct lacpdu *lacpdu, struct port *port)
+>  	else if (lacpdu && ((port->sm_rx_state == AD_RX_EXPIRED) ||
+>  		 (port->sm_rx_state == AD_RX_DEFAULTED) ||
+>  		 (port->sm_rx_state == AD_RX_CURRENT))) {
+> -		if (port->sm_rx_state != AD_RX_CURRENT)
+> -			port->sm_vars |= AD_PORT_CHURNED;
+>  		port->sm_rx_timer_counter = 0;
+>  		port->sm_rx_state = AD_RX_CURRENT;
+>  	} else {
+> @@ -1333,7 +1330,6 @@ static void ad_rx_machine(struct lacpdu *lacpdu, struct port *port)
+>  			port->partner_oper.port_state |= LACP_STATE_LACP_TIMEOUT;
+>  			port->sm_rx_timer_counter = __ad_timer_to_ticks(AD_CURRENT_WHILE_TIMER, (u16)(AD_SHORT_TIMEOUT));
+>  			port->actor_oper_port_state |= LACP_STATE_EXPIRED;
+> -			port->sm_vars |= AD_PORT_CHURNED;
+>  			break;
+>  		case AD_RX_DEFAULTED:
+>  			__update_default_selected(port);
+> @@ -1365,39 +1361,107 @@ static void ad_rx_machine(struct lacpdu *lacpdu, struct port *port)
+>   * ad_churn_machine - handle port churn's state machine
+>   * @port: the port we're looking at
+>   *
+> + * IEEE 802.1AX-2014 Figure 6-23 - Actor Churn Detection machine state diagram
+> + *
+> + *                                                     BEGIN || (! port_enabled)
+> + *                                                               |
+> + *                                      (3)                (1)   v
+> + *   +----------------------+     ActorPort.Sync     +-------------------------+
+> + *   |    NO_ACTOR_CHURN    | <--------------------- |   ACTOR_CHURN_MONITOR   |
+> + *   |======================|                        |=========================|
+> + *   | actor_churn = FALSE; |    ! ActorPort.Sync    | actor_churn = FALSE;    |
+> + *   |                      | ---------------------> | Start actor_churn_timer |
+> + *   +----------------------+           (4)          +-------------------------+
+> + *             ^                                                 |
+> + *             |                                                 |
+> + *             |                                      actor_churn_timer expired
+> + *             |                                                 |
+> + *       ActorPort.Sync                                          |  (2)
+> + *             |              +--------------------+             |
+> + *        (3)  |              |   ACTOR_CHURN      |             |
+> + *             |              |====================|             |
+> + *             +------------- | actor_churn = True | <-----------+
+> + *                            |                    |
+> + *                            +--------------------+
+> + *
+> + * Similar for the Figure 6-24 - Partner Churn Detection machine state diagram
+>   */
+>  static void ad_churn_machine(struct port *port)
+>  {
+> -	if (port->sm_vars & AD_PORT_CHURNED) {
+> +	bool partner_synced = port->partner_oper.port_state & LACP_STATE_SYNCHRONIZATION;
+> +	bool actor_synced = port->actor_oper_port_state & LACP_STATE_SYNCHRONIZATION;
+> +	bool partner_churned = port->sm_vars & AD_PORT_PARTNER_CHURN;
+> +	bool actor_churned = port->sm_vars & AD_PORT_ACTOR_CHURN;
+> +
+> +	/* ---- 1. begin or port not enabled ---- */
+> +	if ((port->sm_vars & AD_PORT_BEGIN) || !port->is_enabled) {
+>  		port->sm_vars &= ~AD_PORT_CHURNED;
+> +
+>  		port->sm_churn_actor_state = AD_CHURN_MONITOR;
+>  		port->sm_churn_partner_state = AD_CHURN_MONITOR;
+> +
+>  		port->sm_churn_actor_timer_counter =
+>  			__ad_timer_to_ticks(AD_ACTOR_CHURN_TIMER, 0);
+>  		port->sm_churn_partner_timer_counter =
+> -			 __ad_timer_to_ticks(AD_PARTNER_CHURN_TIMER, 0);
+> +			__ad_timer_to_ticks(AD_PARTNER_CHURN_TIMER, 0);
+> +
+
+Please avoid white-space changes only, or if you are going to target
+net-next, move them to a pre-req patch.
+
+>  		return;
+>  	}
+> -	if (port->sm_churn_actor_timer_counter &&
+> -	    !(--port->sm_churn_actor_timer_counter) &&
+> -	    port->sm_churn_actor_state == AD_CHURN_MONITOR) {
+> -		if (port->actor_oper_port_state & LACP_STATE_SYNCHRONIZATION) {
+> +
+> +	if (port->sm_churn_actor_timer_counter)
+> +		port->sm_churn_actor_timer_counter--;
+> +
+> +	if (port->sm_churn_partner_timer_counter)
+> +		port->sm_churn_partner_timer_counter--;
+> +
+> +	/* ---- 2. timer expired, enter CHURN ---- */
+> +	if (port->sm_churn_actor_state == AD_CHURN_MONITOR &&
+> +	    !actor_churned && !port->sm_churn_actor_timer_counter) {
+> +		port->sm_vars |= AD_PORT_ACTOR_CHURN;
+> +		port->sm_churn_actor_state = AD_CHURN;
+> +		port->churn_actor_count++;
+> +		actor_churned = true;
+> +	}
+> +
+> +	if (port->sm_churn_partner_state == AD_CHURN_MONITOR &&
+> +	    !partner_churned && !port->sm_churn_partner_timer_counter) {
+> +		port->sm_vars |= AD_PORT_PARTNER_CHURN;
+> +		port->sm_churn_partner_state = AD_CHURN;
+> +		port->churn_partner_count++;
+> +		partner_churned = true;
+> +	}
+> +
+> +	/* ---- 3. CHURN_MONITOR/CHURN + sync -> NO_CHURN ---- */
+> +	if ((port->sm_churn_actor_state == AD_CHURN_MONITOR && !actor_churned) ||
+> +	    (port->sm_churn_actor_state == AD_CHURN && actor_churned)) {
+
+Is this                                             ^^^^^^^^^^^^^^^^
+
+test needed ? I *think* the state machine `actor_churned == true` when
+`sm_churn_actor_state == AD_CHURN`
+
+> +		if (actor_synced) {
+> +			port->sm_vars &= ~AD_PORT_ACTOR_CHURN;
+>  			port->sm_churn_actor_state = AD_NO_CHURN;
+> -		} else {
+> -			port->churn_actor_count++;
+> -			port->sm_churn_actor_state = AD_CHURN;
+> +			actor_churned = false;
+>  		}
+
+I think this part is not described by the state diagram above?!?
+
+>  	}
+> -	if (port->sm_churn_partner_timer_counter &&
+> -	    !(--port->sm_churn_partner_timer_counter) &&
+> -	    port->sm_churn_partner_state == AD_CHURN_MONITOR) {
+> -		if (port->partner_oper.port_state & LACP_STATE_SYNCHRONIZATION) {
+> +
+> +	if ((port->sm_churn_partner_state == AD_CHURN_MONITOR && !partner_churned) ||
+> +	    (port->sm_churn_partner_state == AD_CHURN && partner_churned)) {
+> +		if (partner_synced) {
+> +			port->sm_vars &= ~AD_PORT_PARTNER_CHURN;
+>  			port->sm_churn_partner_state = AD_NO_CHURN;
+> -		} else {
+> -			port->churn_partner_count++;
+> -			port->sm_churn_partner_state = AD_CHURN;
+> +			partner_churned = false;
+>  		}
+
+Possibly move this `if` block in a separate helper and reuse for both
+partner and actor.
+
+>  	}
+> +
+> +	/* ---- 4. NO_CHURN + !sync -> MONITOR ---- */
+> +	if (port->sm_churn_actor_state == AD_NO_CHURN && !actor_churned && !actor_synced) {
+> +		port->sm_churn_actor_state = AD_CHURN_MONITOR;
+> +		port->sm_churn_actor_timer_counter =
+> +			__ad_timer_to_ticks(AD_ACTOR_CHURN_TIMER, 0);
+
+Should this clear sm_vars & AD_PORT_ACTOR_CHURN, too?
+
+> +	}
+> +
+> +	if (port->sm_churn_partner_state == AD_NO_CHURN && !partner_churned && !partner_synced) {
+> +		port->sm_churn_partner_state = AD_CHURN_MONITOR;
+> +		port->sm_churn_partner_timer_counter =
+> +			__ad_timer_to_ticks(AD_PARTNER_CHURN_TIMER, 0);
+
+Same question here.
+
+/P
+
 
