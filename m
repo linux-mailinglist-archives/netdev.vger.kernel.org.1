@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-242337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 291E2C8F65C
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 16:58:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A9F9C8F6F5
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 17:06:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9EDA33A975A
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 15:57:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9022D3B028D
+	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 16:03:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 521BA338F5B;
-	Thu, 27 Nov 2025 15:56:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06EAE2C3768;
+	Thu, 27 Nov 2025 16:03:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="AyyGsmkv"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="DHM9AxF5"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6721633893A;
-	Thu, 27 Nov 2025 15:56:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DD202773FE;
+	Thu, 27 Nov 2025 16:03:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764258989; cv=none; b=LbgGHkWpIR/jnJJO7UHY2U+Q75K90+RBMVZcPtAGKROVzFT5AtcQ9OmAdh+WDdTKt0c5tZ+8txUPQ8psaakWWAc614ZbXcT6bQrXBdtKCk1OiMobvK4mdsZ3nLMFnmRwEZ4cbjZgFaGYbiBmYKb+Xn2ScyMYKnLLMEBTFD6oAiY=
+	t=1764259400; cv=none; b=PjRK8oUiMp1KCMBZx1o02/JLbMBrBHEA6GVmWT2WkachlAFalWS/xfO0WRdTnwvL2CQ3+OQ+Tq3u/PHpQYmSfPbacXPz2NWU4ICAtmo9PQVWTqXooXmKTEuHW6lmUSBEChwvcNImklp0bkO4yt8CIRJQCYthpxv553GGhfU0CyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764258989; c=relaxed/simple;
-	bh=tV6Mko4OcH+BRs/hwl+PIoVt+JtdqFrzfqVvSDARuu0=;
+	s=arc-20240116; t=1764259400; c=relaxed/simple;
+	bh=sbgEdlv1wPoAwZUuJe05jWfgntu+pPSzCo3LKb3oZ9A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=afNv6pYbrY0AnCebvCYt+y3ecQ4U89mBIEv/Pjc7W1hXx9oNh9QT+BTdSmZvkndC7IUIdQQT2q3c2+JW2mlv/ShisX8kX7orFNnmf8sM/JcfN9WRGpJZWU3h0g5VNW0CkSfHbHlfnWC+0RL+a263c17QEX5eCEeiMCt8j1B5NU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=AyyGsmkv; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=YyrM/QdQKys41eNDoLYVHaUSNGUS5CSkct2Hn02ypPypajdYzyN8cOEw093roWu7R2qEklQhUMwWHWQt3lmk5PpZDefg1xvSIdB4tHreGJC9sIXtuSU4j8TH/BACDQKoMMRdIJk152LV//DKhVVQBjEPjjNE4Cu76D3lHq8Qtqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=DHM9AxF5; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,27 +36,46 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=76FJT75Kjp6ENeuKI3CQYQWgK2lcdUAiw2gY9LhCcoc=; b=AyyGsmkvks1nnkGd1W5pyGGNPb
-	yJKQe9ApPw+DNqiWRINv0KnW4D9S8XfJstMBR/Eao77Glyr02m/InixHitansVmVgQaCVa1pTJwFg
-	JaJEq7OxyNBnGFFS0cy8N4IQ+WAOQofmMPXk+Waa9goI3pBA7k5iI4HA992fMhjq5bKI=;
+	bh=owe7I/Y8XZS6Idd5CW00nQx+Gv8h1DU+2jb8WZ+oZIQ=; b=DHM9AxF5Kp5fPteW+s9ySpUrNc
+	VxKWImbzedUNvBzw0Dzc3MofZMiuN3ZN9vkwDu6t2SVunnj3PcmjJdVloqjR7nvSXvrgSnFIn15aS
+	rAtEHsjFbJKvcWfE3dFE72+9XDhg7/bG1DeP5rHxxhzW/VOeTnGnP/OFT6zCiNg4hPZk=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vOeLw-00FHEe-VQ; Thu, 27 Nov 2025 16:56:16 +0100
-Date: Thu, 27 Nov 2025 16:56:16 +0100
+	id 1vOeSY-00FHHL-3U; Thu, 27 Nov 2025 17:03:06 +0100
+Date: Thu, 27 Nov 2025 17:03:06 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Buday Csaba <buday.csaba@prolan.hu>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Chris Mason <clm@meta.com>, davem@davemloft.net,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Eric Dumazet <edumazet@google.com>,
 	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/1] net: mdio: reset PHY before attempting to
- access ID register
-Message-ID: <54f2a7ff-640d-4a9d-bfc9-5190f295f466@lunn.ch>
-References: <6cb97b7bfd92d8dc1c1c00662114ece03b6d2913.1764069248.git.buday.csaba@prolan.hu>
- <20251125184335.040f015e@kernel.org>
- <aSgzRMf1LZycQoni@debianbuilder>
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+	Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [PATCH net-next v19 00/15] net: phy: Introduce PHY ports
+ representation
+Message-ID: <92076cf5-e136-4bcb-8ae7-58fdf93dcdf2@lunn.ch>
+References: <20251122124317.92346-1-maxime.chevallier@bootlin.com>
+ <20251126190035.2a4e0558@kernel.org>
+ <f753719e-2370-401d-a001-821bdd5ee838@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,21 +84,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aSgzRMf1LZycQoni@debianbuilder>
+In-Reply-To: <f753719e-2370-401d-a001-821bdd5ee838@bootlin.com>
 
-> c) what about using EXPORT_SYMBOL_FOR_MODULES() on the problematic
->    functions? Are there any objections against it?
->    This type of export is rarely used in the kernel, so I am uncertain
->    about that. Is using it on functions declared in private headers
->    also discouraged?
+> It's a bit tricky I guess, as the call-site in question
+> is introduced by a previous patch in the same series though.
 
-Rather than _FOR_MODULES, how about using a namespace.
+That is an interesting point. Does the AI retain its 'memory' when
+processing a patch series. Or does it see each patch individually?
 
-https://docs.kernel.org/core-api/symbol-namespaces.html#how-to-use-symbols-exported-in-namespaces
-
-Add a name space "NET_PHY_CORE_ONLY", and put these symbols into that
-name space. We should notice any driver importing that namespace and
-reject it.
+We encourage developers to create lots of small patches, in a patch
+series. The AI needs to be able to handle that.
 
 	Andrew
 
