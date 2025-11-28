@@ -1,204 +1,149 @@
-Return-Path: <netdev+bounces-242578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED64EC922F3
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 14:53:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 040EEC9248F
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 15:21:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9FBAF4E1AC1
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 13:53:50 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9B28D4E2CCE
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 14:20:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FA0B30EF65;
-	Fri, 28 Nov 2025 13:53:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1C9A230274;
+	Fri, 28 Nov 2025 14:20:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="pvHBeaEH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jFpd3jIm";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ndz3sy9/"
 X-Original-To: netdev@vger.kernel.org
-Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C81652417F0;
-	Fri, 28 Nov 2025 13:53:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60412227E95
+	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 14:20:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764338028; cv=none; b=Bu0+gAM/uCGQx4KOU4ouGCqd67Ej1tMxzELPBXBHqeBrGSSNUIv7UrlofhbYNOqq/SSnA2VtCF6QWyDwxssMjZJdw97m8xbsE5F1RTZTYKvZQmzGV4DNfDVW76OLlMvkXZXi7I08koaRGdszgE5shj5gn4vbII6Mjk9RkyJfVuM=
+	t=1764339618; cv=none; b=fLn9FvbpkH5pWwvGpjryXZSSKJhMRAEjCIeLS245B9N8lbkZLbWWcQR0j4iJKspYrSD0svevIHi/EVDX0Z5mABgmXljVTGivG21owb+a6u7DAnR0CNqszrYLtBw8YN0XZ6DeFNeJ+9L36A6DOBKDYFjXwxrnSxYFCfWdN4eoFLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764338028; c=relaxed/simple;
-	bh=fggz5XWbuFAd74CkiIlkgzkZvPGv9x5GbKR4bFumAEA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=FMQH0saxlYAMExQSxThpUktI1XjuPG1+WZdIfp5MuNnI7ciU8fdPy38+wsZpDQOi6ldu7I5jw3AQAzocHRt0pfhlAclfcYcBFLoouwF14VFzs1vbiQ4KJ9UpcTm0ICGxvlVk4um4cL7YxcqtILdYzaSN3ZNsmpbaoEeW2691cLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=pvHBeaEH; arc=none smtp.client-ip=193.68.50.107
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
-Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
-	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id DB8EDA078B;
-	Fri, 28 Nov 2025 14:53:35 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:from:from:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=mail; bh=sLAchPg2rSsKp7RAybq9EonQbR9aCHhSrvXpvaorBVk=; b=
-	pvHBeaEHioXMLsAEfJUGsudT5f8C3TBIqRMCmDnkkhUWtLuX1rhXOUI+WTPs14Dg
-	P8mTVSDUM+DptyteVKo/DQNa/9K50tE8gv9G4wzyE2EGTl8s70+D/utlMQ9y567p
-	XbhvhIp0pihrOuFWkM/DwJuDWGIJLGRtLBlcilieNRdcVsO36jIyYV4DPM/jIT1h
-	J3aYAd/tqvOe44UYVenxcTLNWFW/DNSyO0+fxar63p8lwhJdFefrLejHxNOo6dXH
-	M0k3FRVW7suG3YO8SSb4bOfGlizeCOhIIXCgcy864RlhX96L9eLQSGwssvGe/WUc
-	7pzRQtXtxC6dvJi0MV4xrWhaRHV9mLylSrs/y/0Vj7mSvT869O3IEkVUFRYcawIU
-	cEj+UslHzTCGk5Gw+Pzm5dT+JDl/6rUaVR6kdlwI1Ae3Je1llzBic8aT8kEjqBpa
-	4fNWRPbbF2XDsJCFS42PuiBnxM5jjof7zmv0PqFTNwLE1qIQGGMuRNCCbmnW+Nvv
-	eNKEuatiDGiZ++8CH0fff0GF1pGNqK6dLxXaucMFOOWTPzu/qjq82Q3YbEHQ7AGE
-	UOtaiaSXF7ZQbZXUaD59nvrAtwIL93w1jnVX70fCRXv8S/EDTk7o2RYZlVC++WcR
-	opEq5hlskXTYsCnmRayGk273J4TlHQX+IsmG58lRnWY=
-From: Buday Csaba <buday.csaba@prolan.hu>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: Buday Csaba <buday.csaba@prolan.hu>
-Subject: [PATCH net-next v2 1/1] net: mdio: reset PHY before attempting to access ID register
-Date: Fri, 28 Nov 2025 14:53:32 +0100
-Message-ID: <5701a9faafd1769b650b79c2d0c72cc10b5bdbc8.1764337894.git.buday.csaba@prolan.hu>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1764339618; c=relaxed/simple;
+	bh=8ZG50ZqkqkDxqSfIjwekhMuh5XfBJIyhfIgk+C9P604=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gd5gmvvLEfH0w3KfNe8lGYNAXSgW6wT8nq5PnYAe3h83oUwr/Cegv1lUsAqab3++PxRSaVj/aPonk2axOyKF7qP/dgWKjkEdleoMT5Utqm65/ZlbgQ5HZ0wIFP3hM7YBpel/jMSAQilOX5Obj9IaQLXnvXcsfSAMKaiWMmjEfaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jFpd3jIm; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ndz3sy9/; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764339616;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Kr44LRycnRrIIIsoZeGxJLnFhlm7tgfT91Z2PQUzwxE=;
+	b=jFpd3jImFXVGsEF5O8R58GdP+xTPJ0zVtIA9SUpY0nw1hA9i6AZ6rfHyM7J/P+ZRstfPmK
+	71D7mIX06E/TlDZEfQpJJmFBhEcXaF6KEU4vTpl6fycI8qjLRklr+xTVwdk0C1cfnh/sBb
+	2N4Zrz9gijvkQYgzW7yh3tG09o4bCaI=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-80-PfQqtoGBPr-yzO7wMGwr3Q-1; Fri, 28 Nov 2025 09:20:13 -0500
+X-MC-Unique: PfQqtoGBPr-yzO7wMGwr3Q-1
+X-Mimecast-MFC-AGG-ID: PfQqtoGBPr-yzO7wMGwr3Q_1764339613
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-429c5f1e9faso1516265f8f.3
+        for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 06:20:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1764339612; x=1764944412; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Kr44LRycnRrIIIsoZeGxJLnFhlm7tgfT91Z2PQUzwxE=;
+        b=ndz3sy9/hjkmQz0NNvuMezEAo99sApEe8085gVh3Y2wKXYGmrbrlxTMBkyDrB9LFA7
+         IFF4vGYTi+lwUgt+MAWr5wwfvH+Whu0JiFeD6rvttabugICur+sSQCP57WQbaY4Yp7wq
+         22ziiTkzFun9CSsQLPTmOuesmsmbjBdZDVnGTSonjFWb/N+T/1y99Ebxvs/4TH0w88+l
+         7igSFCk4mA1Jvcqy7ZSuwE0aJ9ECAalKYfjBZyWRc7zKcNEucP7nPMS1Ophysq7v2nqB
+         cV9nZ2FFPeMVFSL1l2KZ7SX3TrB9nSaTtwAGeyZcN26dK4SNh9MfInmk4ZU1DJI8R0+T
+         j1qQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764339612; x=1764944412;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Kr44LRycnRrIIIsoZeGxJLnFhlm7tgfT91Z2PQUzwxE=;
+        b=QYchCKcjDY1av5fp6BKgC8oTFu+GNnSeHFRp9NTSVNkDO7hX556BvmEB77rfD76+0x
+         4FSkkR939yFYZNPXMTfIlRUjjfrOT4VOJDXyaTg+YODgNoO2jY5jJ97oqA4xCTuoO9tg
+         ZwFnLLdvo5NqkwTLWQvsyOABQ+N3+FmDgWJIYZ9a8CxPgsxoq/zEhOArL4rUMH8j46lo
+         8AMU8fy4skjEYC7/3IyBJSdxkqSOza+K6WmvQenclP7V4cM4NoRXR2WVS/wYpKKV48aX
+         6sroo8vbebyH5dviWE+HVq3xqH3In9R4DkF0JE8VXuM1Uv42ORboub7xB9s2Qfsvk6q2
+         iPuA==
+X-Forwarded-Encrypted: i=1; AJvYcCXX9FSuYoPH1lBGeUPwz5e1edaHOrUTlZDwdFGBkUQnh9wNixoIXzmGsU4kr6wceqQMqU8Q5E8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxff2CL6GKZYZ6/Dln+piV02TawyqT/pkTN1b3CBubW0xoonNHc
+	PTdIsETzSJo1MDmJUhXlsfx4IXnD0xvaqp7p6cR6LacORRQ+bU2amjoNXywVbt2UJ+9Kdrih8wk
+	ZD13MFZoskYsZi7s5OS30jOMRQp0LpXE/wV65bknXWIhUaQTK3N2i5r5/TQ==
+X-Gm-Gg: ASbGncttxq6B6OrshubGdKWZuFP88U79opF5YbDLg6MtPCbM03Chk5Oesuzhg/4AyfS
+	Vno0JqLp7f7MwuZdWW2/uKxmpT/BuZAuS3XGDnHJ4RsiQEqU6JamaYhHVS79VSorl4ufEap2MpH
+	2oOniQQq05rKZIs25mnla5Jla6zByYt7Vz8pyg/kE6HLNTe8m0GZOKJ/Cg/yhL7OJFymaKRQfRC
+	KhOAQK2/vUvQ37p/Jmm4MtTU6MrBfCmHISh/glyOqM7pETawOikHLWeONCgyKPnqkuh1mfsLEPl
+	GN2SF79a8Kj22z8HSghjA5xcIPydznkBa/4e7/AXxPx9U/L1EuGq7DMccbI7xquG/CKUFQ67VBC
+	2PKLQUjMNQdDQBw==
+X-Received: by 2002:a05:6000:1a8f:b0:42b:3c25:cd06 with SMTP id ffacd0b85a97d-42cc1cee419mr30438923f8f.22.1764339612535;
+        Fri, 28 Nov 2025 06:20:12 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFPEkA/LoZdallg49g1MUTRCeyrnm9WywP2P1KOTjKBH4y40uAcYN4UEnTmkp4kPiOrnajn8Q==
+X-Received: by 2002:a05:6000:1a8f:b0:42b:3c25:cd06 with SMTP id ffacd0b85a97d-42cc1cee419mr30438877f8f.22.1764339612057;
+        Fri, 28 Nov 2025 06:20:12 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.212])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42e1c5c304csm9948281f8f.8.2025.11.28.06.20.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 28 Nov 2025 06:20:11 -0800 (PST)
+Message-ID: <8fa70565-0f4a-4a73-a464-5530b2e29fa5@redhat.com>
+Date: Fri, 28 Nov 2025 15:20:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1764338014;VERSION=8002;MC=3517599472;ID=166272;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
-X-ESET-Antispam: OK
-X-EsetResult: clean, is OK
-X-EsetId: 37303A296767155F607D64
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 2/3] xsk: use atomic operations around
+ cached_prod for copy mode
+To: Jason Xing <kerneljasonxing@gmail.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, bjorn@kernel.org,
+ magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
+ jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org,
+ daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+ horms@kernel.org, andrew+netdev@lunn.ch
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ Jason Xing <kernelxing@tencent.com>
+References: <20251128134601.54678-1-kerneljasonxing@gmail.com>
+ <20251128134601.54678-3-kerneljasonxing@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251128134601.54678-3-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-When the ID of an Ethernet PHY is not provided by the 'compatible'
-string in the device tree, its actual ID is read via the MDIO bus.
-For some PHYs this could be unsafe, since a hard reset may be
-necessary to safely access the MDIO registers.
+On 11/28/25 2:46 PM, Jason Xing wrote:
+> From: Jason Xing <kernelxing@tencent.com>
+> 
+> Use atomic_try_cmpxchg operations to replace spin lock. Technically
+> CAS (Compare And Swap) is better than a coarse way like spin-lock
+> especially when we only need to perform a few simple operations.
+> Similar idea can also be found in the recent commit 100dfa74cad9
+> ("net: dev_queue_xmit() llist adoption") that implements the lockless
+> logic with the help of try_cmpxchg.
+> 
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> ---
+> Paolo, sorry that I didn't try to move the lock to struct xsk_queue
+> because after investigation I reckon try_cmpxchg can add less overhead
+> when multiple xsks contend at this point. So I hope this approach
+> can be adopted.
 
-Add a fallback mechanism for such devices: when reading the ID
-fails, the reset will be asserted, and the ID read is retried.
+I still think that moving the lock would be preferable, because it makes
+sense also from a maintenance perspective. Can you report the difference
+you measure atomics vs moving the spin lock?
 
-This allows such devices to be used with an autodetected ID.
+Have you tried moving cq_prod_lock, too?
 
-The fallback mechanism is activated in the error handling path, and
-the return code of fwnode_mdiobus_register_phy() is unaltered, except
-when the reset fails with -EPROBE_DEFER, which is propagated to the
-caller.
-
-Signed-off-by: Buday Csaba <buday.csaba@prolan.hu>
----
-Patch split from a larger series:
-https://lore.kernel.org/all/cover.1761732347.git.buday.csaba@prolan.hu/
-
-The refactoring parts of the previous patchset were already merged,
-leaving this one. Functionally identical to:
-https://lore.kernel.org/all/5f8d93021a7aa6eeb4fb67ab27ddc7de9101c59f.1761732347.git.buday.csaba@prolan.hu/
-
-Comments were added for clarity.
-V1 -> V2: added missing EXPORT_SYMBOL_NS_GPL for
-          mdio_device_register/unregister_reset functions
----
- drivers/net/mdio/fwnode_mdio.c | 42 +++++++++++++++++++++++++++++++++-
- drivers/net/phy/mdio_device.c  |  2 ++
- 2 files changed, 43 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/mdio/fwnode_mdio.c b/drivers/net/mdio/fwnode_mdio.c
-index ba7091518..28daabe63 100644
---- a/drivers/net/mdio/fwnode_mdio.c
-+++ b/drivers/net/mdio/fwnode_mdio.c
-@@ -13,9 +13,12 @@
- #include <linux/phy.h>
- #include <linux/pse-pd/pse.h>
- 
-+#include "../phy/mdio-private.h"
-+
- MODULE_AUTHOR("Calvin Johnson <calvin.johnson@oss.nxp.com>");
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("FWNODE MDIO bus (Ethernet PHY) accessors");
-+MODULE_IMPORT_NS("NET_PHY_CORE_ONLY");
- 
- static struct pse_control *
- fwnode_find_pse_control(struct fwnode_handle *fwnode,
-@@ -67,6 +70,34 @@ fwnode_find_mii_timestamper(struct fwnode_handle *fwnode)
- 	return mii_ts;
- }
- 
-+/* Hard-reset a PHY before registration */
-+static int fwnode_reset_phy(struct mii_bus *bus, u32 addr,
-+			    struct fwnode_handle *phy_node)
-+{
-+	struct mdio_device *tmpdev;
-+	int rc;
-+
-+	/* Create a temporary MDIO device to allocate reset resources */
-+	tmpdev = mdio_device_create(bus, addr);
-+	if (IS_ERR(tmpdev))
-+		return PTR_ERR(tmpdev);
-+
-+	device_set_node(&tmpdev->dev, fwnode_handle_get(phy_node));
-+	rc = mdio_device_register_reset(tmpdev);
-+	if (rc) {
-+		mdio_device_free(tmpdev);
-+		return rc;
-+	}
-+
-+	mdio_device_reset(tmpdev, 1);
-+	mdio_device_reset(tmpdev, 0);
-+
-+	mdio_device_unregister_reset(tmpdev);
-+	mdio_device_free(tmpdev);
-+
-+	return 0;
-+}
-+
- int fwnode_mdiobus_phy_device_register(struct mii_bus *mdio,
- 				       struct phy_device *phy,
- 				       struct fwnode_handle *child, u32 addr)
-@@ -129,8 +160,17 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
- 		return PTR_ERR(mii_ts);
- 
- 	is_c45 = fwnode_device_is_compatible(child, "ethernet-phy-ieee802.3-c45");
--	if (is_c45 || fwnode_get_phy_id(child, &phy_id))
-+	if (is_c45 || fwnode_get_phy_id(child, &phy_id)) {
- 		phy = get_phy_device(bus, addr, is_c45);
-+		if (IS_ERR(phy)) {
-+			/* get_phy_device() failed, retry after a reset */
-+			rc = fwnode_reset_phy(bus, addr, child);
-+			if (rc == -EPROBE_DEFER)
-+				goto clean_mii_ts;
-+			else if (!rc)
-+				phy = get_phy_device(bus, addr, is_c45);
-+		}
-+	}
- 	else
- 		phy = phy_device_create(bus, addr, phy_id, 0, NULL);
- 	if (IS_ERR(phy)) {
-diff --git a/drivers/net/phy/mdio_device.c b/drivers/net/phy/mdio_device.c
-index fd0e16dbc..1125c89e4 100644
---- a/drivers/net/phy/mdio_device.c
-+++ b/drivers/net/phy/mdio_device.c
-@@ -156,6 +156,7 @@ int mdio_device_register_reset(struct mdio_device *mdiodev)
- 
- 	return 0;
- }
-+EXPORT_SYMBOL_NS_GPL(mdio_device_register_reset, "NET_PHY_CORE_ONLY");
- 
- /**
-  * mdio_device_unregister_reset - uninitialize the reset properties of
-@@ -171,6 +172,7 @@ void mdio_device_unregister_reset(struct mdio_device *mdiodev)
- 	mdiodev->reset_assert_delay = 0;
- 	mdiodev->reset_deassert_delay = 0;
- }
-+EXPORT_SYMBOL_NS_GPL(mdio_device_unregister_reset, "NET_PHY_CORE_ONLY");
- 
- void mdio_device_reset(struct mdio_device *mdiodev, int value)
- {
-
-base-commit: e2c20036a8879476c88002730d8a27f4e3c32d4b
--- 
-2.39.5
-
+/P
 
 
