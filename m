@@ -1,220 +1,128 @@
-Return-Path: <netdev+bounces-242530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8A0CC91773
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 10:35:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C0F94C917CA
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 10:42:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7F02B4E17E8
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 09:35:42 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A70AE4E2D99
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 09:42:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD94530215F;
-	Fri, 28 Nov 2025 09:35:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B923330507E;
+	Fri, 28 Nov 2025 09:42:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="MpgQLZr8"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hRJ/n4WJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 298972FBE13;
-	Fri, 28 Nov 2025 09:35:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07DC617736
+	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 09:42:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764322539; cv=none; b=XvexQ7laCHC4AUGWWmMOrLDWi+KjCMFwlBPDREm+RT4cUR/mYvC81TRpcUotc09eRHGdP5vfu4gVSxRnEluUAP+2ATrnlGH8lVrMgFX1VYpj3SWtkl8vMCoOsplN/vKDHDXk9lT2xw/nuZz4mXJBMjOGsUdFS+dPpTRWxM4ZNAY=
+	t=1764322934; cv=none; b=GEFi7Azb4ksZ7sigw5tvU5Ev85/kji1lJ8U6z/6owK5rxMe9zVUjL2CjA/wGUooVUXgMPCDKBwiGd0I+ie4702RHYfd4o0YlrRgFkYbKvjjxGfuibcNOuN+SZygTPVMhuOIPIGtp16g9NWGrQbt4T2zj/uKwnmWylm9b7mdRIpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764322539; c=relaxed/simple;
-	bh=LxZNurDtZQlI3O4ffGZayxev8Armj+0IK42p9XxDEqI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gd+vkPaadHrwz/0VhMwLV0Gc53AE9bcb30QS0ZUHkKrIynXQyYjkmCDCl/Lx9JsQuWTY99PvqdQRnkToFUxtmi3AL6EjiOTt6AKHQhFm2uOD5UZ/HRkbN4F9RIfa4IguXp1Jm9Pryf7CC4KwKV3+LMlBVX94xV41iCN69si16hk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=MpgQLZr8; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=YBDbgV1xyIJg31hTV5NRVxxvkcbuknzb54xGsQt3Zb4=; b=MpgQLZr8H3JIRhTiRkXjP5WgcB
-	ed8XG49Yq6Z2XUGpy+aCN3V0kFNFlMRg4PDwC0JdhB581zVs/KnRnj7U0bd84C7Nl8ie+PP13LZli
-	iT40bYEoy37a7i8LU9Fj7VH8/8Fb7ZbFyQFjGqoq4DQ6eOvE049uuNDfASBG1tg5MZ1g2iFxFPSvW
-	NlEhOKNBHbZNJqj4OrY95HBeQZBLgLDHR5Uz04XaNKR9ieC31md7sLcdg8WwBisaVI78MYd1+CJQf
-	a3nXQC3KY5VOVewbr+MWBBh2xed0Bq8gJWCw7tWPOBTLl6/TaIN9yI75A9zMXTRrGajNbW16L/v/q
-	KKQzNfPA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55722)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vOusc-000000006Bj-41Vc;
-	Fri, 28 Nov 2025 09:35:07 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vOusW-000000003XB-3cVt;
-	Fri, 28 Nov 2025 09:35:00 +0000
-Date: Fri, 28 Nov 2025 09:35:00 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Rob Herring <robh@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jonathan Corbet <corbet@lwn.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Lukasz Majewski <lukma@denx.de>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Divya.Koppera@microchip.com,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org,
-	Sabrina Dubroca <sd@queasysnail.net>, linux-kernel@vger.kernel.org,
-	kernel@pengutronix.de, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [PATCH net-next v8 1/1] Documentation: net: add flow control
- guide and document ethtool API
-Message-ID: <aSlsxNo_bpGbkfhe@shell.armlinux.org.uk>
-References: <20251119140318.2035340-1-o.rempel@pengutronix.de>
- <20251125181957.5b61bdb3@kernel.org>
- <aSa8Gkl1AP1U2C9j@pengutronix.de>
- <aSj6gM_m-7ZXGchw@shell.armlinux.org.uk>
- <aSj_OxBzq_gJOb4q@shell.armlinux.org.uk>
- <aSljeggP5UHYhFaP@pengutronix.de>
+	s=arc-20240116; t=1764322934; c=relaxed/simple;
+	bh=eguvVuFTb5erkQcXUlXAuM+wpFWHAT4U/nzSD7V9iGM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uhsEcJ4hooSlbu2yCWjlztFyn2OkNnBq7eBahER+dJou0bCuQgVCgqJCkNNH5n/RB1Kht9OkVfZcmkCyoobU1d7Yxif6wagyCf9OiBtXKKJOsbwBD6HhamNRXWG6QnVVUxirKz2yQfI8dl55ZvKjsepOTkGMfiVP6bLvXLuTW2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=hRJ/n4WJ; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 4142C1A1DFB;
+	Fri, 28 Nov 2025 09:42:10 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 141B660706;
+	Fri, 28 Nov 2025 09:42:10 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C6448103C8F63;
+	Fri, 28 Nov 2025 10:42:02 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1764322929; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=Oyy5lXXtjli4NPNnXaTo7F8VObMfhMfoIMl2ZuA0ezo=;
+	b=hRJ/n4WJH47TkI6k6507FmjwC328r6bNs7ssGFPIKXizvELFCEj4cdvMeFoy3xuqG8CrjW
+	1Iu2IxCgUla+UYXERcBRpHkwaTxGowrMw09AkmgIu65Eo2LqudMtmGQP6xemV6TqBo7PRH
+	yja7Bzhi8AfSNZqn4Gk/ElkMfodgMC1NOtOZKw9/YOWuR9tucHK1fu+mK3pvHe6WpbdvsM
+	s3lHVlo/DTDYjpXDJGW3E36Tms6idYfTQdPdtMv8k94emFYfE6ymD/RwbyD3gliorH6Jc+
+	jEHs7vguGOCC7MKzTtDVr6GhndwZCNJ3BBaIKj4XaFLbj06Xl7paYJgnXnrkMA==
+Date: Fri, 28 Nov 2025 10:41:59 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Russell King
+ <linux@armlinux.org.uk>, Heiner Kallweit <hkallweit1@gmail.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Richard
+ Cochran <richardcochran@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Simon
+ Horman <horms@kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>, Jacob
+ Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 1/4] net: phy: micrel: improve HW timestamping
+ config logic
+Message-ID: <20251128104159.0756d624@kmaincent-XPS-13-7390>
+In-Reply-To: <20251127211245.279737-2-vadim.fedorenko@linux.dev>
+References: <20251127211245.279737-1-vadim.fedorenko@linux.dev>
+	<20251127211245.279737-2-vadim.fedorenko@linux.dev>
+Organization: bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aSljeggP5UHYhFaP@pengutronix.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Fri, Nov 28, 2025 at 09:55:22AM +0100, Oleksij Rempel wrote:
-> Hi all,
-> 
-> Before sending v9, I would like to summarize the discussion and validate
-> the intended logic one last time.
-> 
-> Based on the feedback (specifically Russell's clarification on API
-> semantics and Phylink behavior), I will document the following logic.
-> 
-> Proposed Text: Documentation/networking/flow_control.rst
-> --------------------------------------------------------
-> 
-> Kernel Policy: User Intent & Resolution
-> =======================================
-> 
-> The ethtool pause API ('ethtool -A' or '--pause') configures the **User
-> Intent** for **Link-wide PAUSE** (IEEE 802.3 Annex 31B). The
-> **Operational State** (what actually happens on the wire) is derived
-> from this intent, the active link mode, and the link partner.
-> 
-> **Disambiguation: Pause Autoneg vs. Link Autoneg**
-> In this section, "autonegotiation" refers exclusively to the **Pause
-> Autonegotiation** parameter ('ethtool -A / --pause ... autoneg <on|off>').
-> This is distinct from, but interacts with, **Generic Link
-> Autonegotiation** ('ethtool -s / --change ... autoneg <on|off>').
-> 
-> The semantics of the Pause API depend on the 'autoneg' parameter:
-> 
-> 1. **Resolution Mode** ('ethtool -A ... autoneg on')
->    The user intends for the device to **respect the negotiated result**.
-> 
->    - **Advertisement:** The system updates the PHY advertisement
->      (Symmetric/Asymmetric pause bits if the link medium supports
->      advertisement) to match the ``rx`` and ``tx`` parameters.
->    - **Resolution:** The system configures the MAC to follow the standard
->      IEEE 802.3 Resolution Truth Table based on the Local Advertisement
->      vs. Link Partner Advertisement.
->    - **Constraint:** If Link Autonegotiation ('ethtool -s / --change')
->      is disabled, the resolution cannot occur. The Operational State
->      effectively becomes **Disabled** (as negotiation is impossible)
->      regardless of the advertisement. However, the system **MUST**
->      accept this configuration as a valid stored intent for future use.
+On Thu, 27 Nov 2025 21:12:42 +0000
+Vadim Fedorenko <vadim.fedorenko@linux.dev> wrote:
 
-This looks fine to me now, thanks.
+> The driver was adjusting stored values independently of what was
+> actually supported and configured. Improve logic to store values
+> once all checks are passing
+>=20
+> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> ---
+>  drivers/net/phy/micrel.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+> index 05de68b9f719..2c9a17d4ff18 100644
+> --- a/drivers/net/phy/micrel.c
+> +++ b/drivers/net/phy/micrel.c
+> @@ -3157,9 +3157,6 @@ static int lan8814_hwtstamp_set(struct mii_timestam=
+per
+> *mii_ts, int txcfg =3D 0, rxcfg =3D 0;
+>  	int pkt_ts_enable;
+> =20
+> -	ptp_priv->hwts_tx_type =3D config->tx_type;
+> -	ptp_priv->rx_filter =3D config->rx_filter;
+> -
+>  	switch (config->rx_filter) {
+>  	case HWTSTAMP_FILTER_NONE:
+>  		ptp_priv->layer =3D 0;
+> @@ -3187,6 +3184,9 @@ static int lan8814_hwtstamp_set(struct mii_timestam=
+per
+> *mii_ts, return -ERANGE;
+>  	}
+> =20
+> +	ptp_priv->hwts_tx_type =3D config->tx_type;
+> +	ptp_priv->rx_filter =3D config->rx_filter;
+> +
+>  	if (ptp_priv->layer & PTP_CLASS_L2) {
+>  		rxcfg =3D PTP_RX_PARSE_CONFIG_LAYER2_EN_;
+>  		txcfg =3D PTP_TX_PARSE_CONFIG_LAYER2_EN_;
 
-> 
-> 2. **Forced Mode** ('ethtool -A ... autoneg off')
->    The user intends to **override negotiation** and force a specific
->    state (if the link mode permits).
-> 
->    - **Advertisement:** The system should update the PHY advertisement
->      (if the link medium supports advertisement) to match the ``rx`` and
->      ``tx`` parameters, ensuring the link partner is aware of the forced
->      configuration.
->    - **Resolution:** The system configures the MAC according to the
->      specified ``rx`` and ``tx`` parameters, ignoring the link partner's
->      advertisement.
-> 
-> **Global Constraint: Full-Duplex Only**
-> Link-wide PAUSE (Annex 31B) is strictly defined for **Full-Duplex** links.
-> If the link mode is **Half-Duplex** (whether forced or negotiated),
-> Link-wide PAUSE is operationally **disabled** regardless of the
-> parameters set above.
-> 
-> **Summary of "autoneg" Flag Meaning:**
-> - true  -> **Delegate decision:** "Use the IEEE 802.3 logic to decide."
-> - false -> **Force decision:** "Do exactly what I say (if the link supports it)."
+There is still an issue with tx_type.
+HWTSTAMP_TX_ONESTEP_P2P is not supported but the driver does not return -ER=
+ANGE
+if we try to set it. Could you add also this check?
 
-"if the network device supports it"
-
-> 
-> Proposed Text: include/linux/ethtool.h
-> --------------------------------------
-> 
-> /**
->  * @get_pauseparam: Report the configured administrative policy for
->  * link-wide PAUSE (IEEE 802.3 Annex 31B). Drivers must fill struct
->  * ethtool_pauseparam such that:
->  * @autoneg:
->  *   This refers to **Pause Autoneg** (IEEE 802.3 Annex 31B) only.
->  *   true  -> the device follows the negotiated result of pause
->  *     autonegotiation (Pause/Asym) when the link allows it;
-
-               "the device follows the result of pause autonegotiation
-	 when the link allows it;"
-
->  *   false -> the device uses a forced configuration.
->  * @rx_pause/@tx_pause:
->  *   Represent the desired policy (Administrative State).
->  *   In autoneg mode they describe what is to be advertised;
->  *   in forced mode they describe the MAC configuration to be forced.
->  *
->  * @set_pauseparam: Apply a policy for link-wide PAUSE (IEEE 802.3 Annex 31B).
->  * @rx_pause/@tx_pause:
->  *   Desired state. If @autoneg is true, these define the
->  *   advertisement. If @autoneg is false, these define the
->  *   forced MAC configuration (and preferably the advertisement too).
->  * @autoneg:
->  *   Select Resolution Mode (true) or Forced Mode (false).
->  *
->  * **Constraint Checking:**
->  *   Drivers MUST accept a setting of @autoneg (true) even if generic
->  *   link autonegotiation ('ethtool -s / --change') is currently disabled.
->  *   This allows the user to pre-configure the desired policy for future
->  *   link modes.
->  *
->  * New drivers are strongly encouraged to use phylink_ethtool_get_pauseparam()
->  * and phylink_ethtool_set_pauseparam() which implement this logic
->  * correctly.
->  */
-
-Apart from the two minor issues above,
-
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-
-Thanks!
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
