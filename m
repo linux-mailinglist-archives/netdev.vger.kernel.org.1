@@ -1,66 +1,61 @@
-Return-Path: <netdev+bounces-242617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 433EFC92EB1
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 19:41:09 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id F290BC92EC9
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 19:44:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 221644E51D8
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 18:41:06 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 91A2334A62E
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 18:44:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B0522C2364;
-	Fri, 28 Nov 2025 18:40:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 916352BDC34;
+	Fri, 28 Nov 2025 18:44:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fW/2B9BJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iHtxhZCy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 503F5134AB;
-	Fri, 28 Nov 2025 18:40:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68249134AB;
+	Fri, 28 Nov 2025 18:44:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764355259; cv=none; b=fH9Q1L0OvWLmI7AG/3SITUHh+pC/c4+2FpyFqCOXLJU08GxS0GEsBXSoO47P4qAWwgm/zwg8VxeXCbfdQI9CrTG2p02HXmqioUjckHRCscCFmRc/zYlUpq4tFhAlW3orLpEuuz8/PsAbrwhR5beHGWn60JCNOfdbWLlo96kHDkM=
+	t=1764355473; cv=none; b=rr8IXp6o3vEgbX/xckeh9um+DjE+8oLlJqM0MEeGQt2n5HtinUhnqtleRS4cA42NCItuF4Q4e1Z9OVirMysMbjyGXfVnFCP4/2HQ16iKXPpyElDQRmMtemSqNjkleJ8Jz7NVDs9zj1n2jdlapr5HTFOy8u5AIc4/ucgKr1xOz0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764355259; c=relaxed/simple;
-	bh=5voKoMVuu7QsuhZYJ1cod2oYlHK99ijfW7kHtIb9TEk=;
+	s=arc-20240116; t=1764355473; c=relaxed/simple;
+	bh=Kku4oiBmqT8HaZpKNB9V4YiWk9uu3/VqUtt5DwojzgY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UoBxV11O/5cL6u+9fsfOtrB6OMfwOPwkQEvff3+6pNI2CS0gAENnFCd8NWadtNzk3cLaSkmn6HgSuBsObParY+g0Ccs3yZrUUpxPKIOPB0u9Uhc5kj9gEgedjIzOz6MLWLBnUjHdNOaM/u31/pO1toRM97GfC1TK8M3nsoBTzMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fW/2B9BJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 286A4C4CEF1;
-	Fri, 28 Nov 2025 18:40:58 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Lz8qkJniqrtFEOIZ75Hm/d5qVl2o43YB/Qco9USMBzWogdhZILSxbtyIAhkZieM0XL5xZZtVl9YaAuu1p3xezLyMyUx9uqRDUR7RvhByDS1uQt6rhNGkulSUGBpnRz2Js1d4A2J/wYFV7Iqtz1yyOyA7S3UgRocPeR6DKHBVjAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iHtxhZCy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4345C4CEF1;
+	Fri, 28 Nov 2025 18:44:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764355258;
-	bh=5voKoMVuu7QsuhZYJ1cod2oYlHK99ijfW7kHtIb9TEk=;
+	s=k20201202; t=1764355473;
+	bh=Kku4oiBmqT8HaZpKNB9V4YiWk9uu3/VqUtt5DwojzgY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fW/2B9BJYsgMSteBfwjqkaBXdcV+7bKUYZxUt9VbApeN5Q1MunbgJ/YRzrcHXdYM/
-	 dVP8b1PtqRlarORK91yK4jB44otH9/z7+5/0jKRE9k8mgKrh9yNBxltuUDid5b9WK5
-	 e6bJSTXi+moRiRycq/cC2IGQAa4Uk9DEqTtfAkVljzFTr4zHKr83ZqzCnFf5/iKPeg
-	 ZAZoDe6iiMJ8t/8l3lscaQzEV0T+IeBzN8AGSDWkEzaVuy3awTZXEfL23hkazPiGwl
-	 Vd5TJ0hYMzdw+gx/6HCDlgK1gSl+AxccrNBc1dcdFqKdGh9iCIT3WzvEQ04rcr7K9c
-	 UuKCT6gGCkCBw==
-Date: Fri, 28 Nov 2025 10:40:57 -0800
+	b=iHtxhZCyIfIZmLFoKi5R/XAEhfD44WCJrOICDWP8SsEIA/EEC3M/61VcsBNvyQzpV
+	 UIg9B8PjVykbtCkBz2YtLY5TceiNOsHzBZm1X+sPkoSn5BRDeUVshGy8CQieuj9RJW
+	 gea09K6BaBuw9N4FkHn2KGqIvV3JEQhe6cc4cp4pRBZqlGKXXgDr+wy79/7tz11UHR
+	 SZE0Iw57Detcnxo3aKXptNfpSql/EX7u507yOErsO4sECBuAKBVBbYlI0Vj9kFRLPm
+	 PEEKNMM4A0WDB+MORrxzZxkddNwDBxDsKwLrA66R3AJHwYMWfJpD5BPg4LIu8l7/OI
+	 MQzVDBoFFpXkg==
+Date: Fri, 28 Nov 2025 10:44:31 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>,
- netdev@vger.kernel.org, mptcp@lists.linux.dev,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- llvm@lists.linux.dev, Shuah Khan <shuah@kernel.org>, Mat Martineau
- <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Nathan
- Chancellor <nathan@kernel.org>, Nick Desaulniers
- <nick.desaulniers+lkml@gmail.com>, Bill Wendling <morbo@google.com>, Justin
- Stitt <justinstitt@google.com>
-Subject: Re: [PATCH] selftests: mptcp: initialize raw_addr to Null
-Message-ID: <20251128104057.047704b5@kernel.org>
-In-Reply-To: <603f6c4f-20a1-4b6b-80a8-c9d9d3373d7e@kernel.org>
-References: <20251126163046.58615-1-ankitkhushwaha.linux@gmail.com>
-	<795a8f3c-eff7-46d9-9175-a4ebe3f9ffd8@kernel.org>
-	<20251127170041.0613c50e@kernel.org>
-	<603f6c4f-20a1-4b6b-80a8-c9d9d3373d7e@kernel.org>
+To: Bhargava Chenna Marreddy <bhargava.marreddy@broadcom.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, horms@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, michael.chan@broadcom.com,
+ pavan.chebbi@broadcom.com, vsrama-krishna.nemani@broadcom.com,
+ vikas.gupta@broadcom.com
+Subject: Re: [v3, net-next 00/12] bng_en: enhancements for link, Rx/Tx,
+ LRO/TPA & stats
+Message-ID: <20251128104431.70ba577b@kernel.org>
+In-Reply-To: <CANXQDtYySxN6kcDh3hPAUcFBiu0vDuVX_7mdLSbkKcf562MoWg@mail.gmail.com>
+References: <20251126194931.455830-1-bhargava.marreddy@broadcom.com>
+	<20251127191439.2f665ca0@kernel.org>
+	<CANXQDtYySxN6kcDh3hPAUcFBiu0vDuVX_7mdLSbkKcf562MoWg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,16 +65,31 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 28 Nov 2025 11:34:38 +0100 Matthieu Baerts wrote:
-> > Including kselftest.h will be needed.  
+On Fri, 28 Nov 2025 20:29:47 +0530 Bhargava Chenna Marreddy wrote:
+> > On Thu, 27 Nov 2025 01:19:19 +0530 Bhargava Marreddy wrote:  
+> > > This series enhances the bng_en driver by adding:
+> > > 1. Link query support
+> > > 2. Tx support (standard + TSO)
+> > > 3. Rx support (standard + LRO/TPA)
+> > > 4. ethtool link set/get functionality
+> > > 5. Hardware statistics reporting via ethtool S  
+> >  
+> > >  13 files changed, 5729 insertions(+), 50 deletions(-)  
+> >
+> > This should be 2 or 3 series, really.  
 > 
-> Because mptcp_connect.c is a tool that is used by other selftests, but
-> it doesn't interact directly with the selftests, maybe we don't need to
-> include it, and only add this #define in mptcp_connect.c?
-> 
->   #define __noreturn __attribute__((__noreturn__))
+> We would appreciate it if you could allow this current patch series to
+> be accepted for review. We commit to ensuring all future patch series
+> submissions will be smaller and more manageable.
+> If this is not acceptable, please let us know, and we will rework the
+> current series.
 
-Up to you, I'd be worried that some semi-automated patch generator will
-send us a "cleanup" to remove this as duplication. But I'm overly
-sensitive to this sort of followups so we can try if you prefer :)
+current as in v3? Or you'll make v4 similarly humongous?
+Look, we're not trying to be difficult. If you keep posting 6kLoC
+at a time it will sit in a queue for 3 days each time and probably
+reach v20. It is just quicker to get code upstream with smaller
+submissions.
+
+There are some very seasoned upstream contributors within Broadcom,
+please talk to them?
 
