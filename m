@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-242627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB2DAC93207
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 21:42:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D4FCC93210
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 21:44:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1BC45348A60
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 20:42:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9F2F3A8D6B
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 20:44:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DDB82D7DF8;
-	Fri, 28 Nov 2025 20:42:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 511A02DAFD7;
+	Fri, 28 Nov 2025 20:44:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tjn0gA6M"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="da+eUEIR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 997C71391
-	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 20:42:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A38A327280F
+	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 20:44:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764362564; cv=none; b=GaJupVea0Ws8s4smA7hKnGZEWdfxlyvFCyvbry2wOuGJpSDdc8Kx1t62y5KGUDlIGkN/F4SrJQkYcg794KLqi9/h6iaBT/SCxr9BJtB3li6ic/FOC1dmqnvtUTMosKdiRXgnj1oRdFra7lSjtT14YI79+vr67sBOlhp+iqQ2frA=
+	t=1764362650; cv=none; b=oiZLkPHEn2Bc2VYV0d+mvDC3du6BYcgWAlOCrydQzn/LXgJw7fRDZnoo3Sy8TR3PAokwjHaN+olAmVAztyVG3nJFYQsKnQRHqTt+cAmwMu/7HV7vZ1Mv9wg1nzjSRsZlgZMGhzHJ3unAVSrK6ib341UqFmxWpvlNW0YDx/vVO6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764362564; c=relaxed/simple;
-	bh=FdLCN53CTxUt6hfjsmo7yzH6TbLjZDUb1d/794EyTeQ=;
+	s=arc-20240116; t=1764362650; c=relaxed/simple;
+	bh=RKONEjWtCXcKuedr9wFHNDcMCLGG7Ccum/K31JfFUvI=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=ORW5JVgqPNJ9lz/4bsi/VIoEEbGlP3BklUptcMhd8xKz3cT7G/2mFraaxsBpdETiv/fsjwCKUD7u+JhtAdb9WrrWKSJEEi3q+2aVb93DN/IgUQ0Xogade60V5/kUdKh2I+lrSgjM3DPASAUwa9c2VgjhUM6ImHGZS68zOtBnCS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tjn0gA6M; arc=none smtp.client-ip=209.85.128.174
+	 Mime-Version:Content-Type; b=otuwh1i7cIjH6Ahqyx1znPYGM+AT41w28mzjSpZ2JUKjvkmlEI3cZfRyfQw4gL+V0dS1btSoVrt5gEMmfPdIBWH/cjckfR1dBJ+e+M7rLa+4S6whPGIpLPRTQRYUis26RnDEksYjAIYwib1nA2TRiFwkBoiYvWEFzLDORd9BJkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=da+eUEIR; arc=none smtp.client-ip=209.85.128.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-78a6a7654a4so20719217b3.0
-        for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 12:42:42 -0800 (PST)
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-7866aca9ff4so22253717b3.3
+        for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 12:44:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764362561; x=1764967361; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1764362647; x=1764967447; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=D+7+Hhp2jQFXeR9sNBlLTHUXZh0f0zWtgYdAbER5ats=;
-        b=Tjn0gA6MwkcWaTQZShGGeXmA2bQ3cwEAjhyWvvDOHk3ppe6kcOJC2N/j4wWbEfE7d/
-         JMZxmZIo9gCL4enP1zoPEAQsWI3YCDmEKKZTdwQedjx3p1tq21fhfZyeVOonGYmg5Vmu
-         Dj4G7RX0IH99vUniFFRXcpA0vIgFB9+bWZgmy65M7UhyBWEFaAtIVYf2lyT91pnYbSLy
-         kLB+1khhHyHbi+5LDgist+VcP5wUBEGmjQzdnB2N3gJQBMjHcBR273phdK1aUoe4r36W
-         uojqF7ejsOMH+DvScl6SqR3M1ukwJ10AIAQjPL/IbeJ9ZlYkewGwGbGMDRitHAPVHWC7
-         KxDw==
+        bh=3579fpvRdDByAHFJwL7M17Ky/UTPJOpn3cS9FXXfw6o=;
+        b=da+eUEIR6KlgxHAYUzLUbXnwKidxt+dDLhim/zVNlHsdjHk/aqPi2gfrYMyfolKisZ
+         a21WwydgDAYsjOO8Rpa+FAi3hmQxARiUbJ52Oj2ruJnrmr/kDLasCkVEHyePDeefpuxu
+         y6YgyIpoWskaPm5ueuEgBUmCEC9SW0hnd8fx2PwoGzDDY1vLHDwLyeQbja17ULYy/YYH
+         YTlTUB6RtrZyC/LvTtlAOAGW63xoHMbERpsszQwwbbSoCw7dXM0GQyxgn6Z5XkDMsFGb
+         SKgNG1/PvXAMqQ91VcoFo0ycYLg4n972s2Pe5/NqjBQGMrWfkSFRF0r4wtV6q6tMPis2
+         1e0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764362561; x=1764967361;
+        d=1e100.net; s=20230601; t=1764362647; x=1764967447;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=D+7+Hhp2jQFXeR9sNBlLTHUXZh0f0zWtgYdAbER5ats=;
-        b=V+Yxd7nvbCMl/dKcCUxrW6Duk/EZkgWilsaEVgUFP9tDd3Y3aykZcbZBiY6p28ahHV
-         /e9K80E65YkXDUtMsj4EA/DA03PSHjQCGUWnveUK/09gqQTTvv5QpcQX2BG5sh9Pi0pi
-         qwmMLHx3JV6t8ioddHwTIc9nlHXhT+mhMCoxsCzSPmRM06sHcIkhh2HpmJbtDLdYj9Ix
-         vyyRLYXhh614A6bDOUJBkmVfVKQtrcYwji8Xa2g+xsULQUlikAWdEi8JTQwCiKjt28io
-         4A+MComHv2HTpM06uqQW1lw7CVbeqMOsGsGYDRhEDcSnzq6KH1J6IEPTFzuqKwU1zYQn
-         mkdA==
-X-Gm-Message-State: AOJu0Yz8hmSDo0OeE8jGbE/4kmKKBQ6YqHRkiw+yfHs8YIDPRgGXi371
-	EOxDx5LsS++8k7VkK7WSp4mXu2xx3Yry51EaSVogt2s9Z2d9PAIIVwQs
-X-Gm-Gg: ASbGncvI5ViZtaZAxN0j7nz5LLlLgik/xmnt9MjsYc/N3PeshFxisNjoZS4vsU5CZiT
-	xi/Jo6G/A6Ii+F+2IwAcGfVKCaJDDtkPjta0OiHPnBqXP4v6EuILUyOZk5gF4pzTL9/E727YsU6
-	sXj2lFqKSqmwekqc01l+1klXgou1h2n7eCHDu/1Ptzr2i4LJ2+N9sBpt56RBKa4L8urNv/Nk8fk
-	EpBsrcb70xmsjknc+3cWcp8IyqXhUQAYxuEB/3nviVbr2YdtpBi5GMZHBdvUmRFZ1W/IriZ3rA/
-	VEHw/xhWrGBKOnJdCE8TX2QPbcD3XstZC57A+/nHdymgfizvY5Fu5zadQiTY235MzPP4X3oCwen
-	Vm+PBYXgqHsCqT6rUbeo7NYbAOzUShFmAs6P1x4hHgDGfr4BJk0cNt+k61+i6ileZ7A1ECdWhzX
-	Y0oBWUzoK39gDtxzsGeTF8RxHk5MsvTsXzs8VkYBu34yr5IlcNBOY1gx1FZDEO0sVzGUc=
-X-Google-Smtp-Source: AGHT+IGlh3CaKo66q0t/WA7R/9iHG6rR3lNisWg2UxowlWp92jlr5rECxCFCgWZq1RwhOh19sYOsUA==
-X-Received: by 2002:a05:690c:3690:b0:787:d4db:33be with SMTP id 00721157ae682-78a8b55fad4mr244374977b3.57.1764362561479;
-        Fri, 28 Nov 2025 12:42:41 -0800 (PST)
+        bh=3579fpvRdDByAHFJwL7M17Ky/UTPJOpn3cS9FXXfw6o=;
+        b=JleqGn+GyDWOFRdee+yDOXMHCJlgKl5JF9YOufiml4Uuqf6pnGejIwmGfNGKD0gULS
+         AB2UpuZ+L0dR443AQKMSlWzmgeML/9mI6poLq1KLT9cc8s4xkBhku7l1dRjVklfwDBjI
+         FnxBuqWuSHza17DPEv4+Rs9PnJDV11UwbAcbDO1jn0c0uxCNeCmihAAO3KuGLU0jYp6M
+         dzjF4Hi2fq3HCWPEUQX2eldVYIDTD0Q2kRjBdDJDRCQnG+W03vUkpW02LcYAXqJvCm2w
+         V5IfV+YJUWzHAiRKYQkdjO+2R3mcIMzLbrSbDi3mQIlBK5l7ds0uUCmxCvqCNNatZk1V
+         iNTg==
+X-Gm-Message-State: AOJu0YwmjOFG0gyDM9hq2LHRrfstBHZtt56mIqbQA9ICQevobXNLKSq4
+	55mw7CXbBywCP79kdem1wu9CUIaExvXYm96zhAnxk+amuxifnMPiJNED
+X-Gm-Gg: ASbGncsmJeaBBPTdiE5xxe7zs43xIIn198pcPufL45w4s+unQ1Fxz8Eri0RmXKnlsBU
+	nHtxWuqQVgkW8cc9Lrg13dlpTmIg1PH97crvjp4sY7P4LiJX1OoXDi0YgOJ3Pt24Z9wAXalNcaw
+	Cndd2IEAWOYQY/rQTsh2bl2uBBZt5JTsDFQ0MHTzNnrWaa394clXUpgx4542yiK2Dw/OngNWob1
+	/9GAP0rO4hSA74lycf7MYd9n/KKBdkVkIMkW1ud0OLDhVvksIM2ZISiTBXu2pAtH4q+0Z6oeGCN
+	JJBRltKyMrmB+YL5RJl7TDOFz2pJb1vloFrw/MvazrqM6soTIZ2meOGM34LqLvfSUVVJ2oWor23
+	v4VMKbODJOL9JI8jo85NrdrAu6l7JT/4kv0+hRLXji4lIBBVOX2+TSpI8+jHKBi9qCLxW3bvpnn
+	kjTmHeYINcRCTxXgCoS++pfTaS0S9dpiQpQBY4VHAvZSOmj0smsdiqiqPkYbhTnDCEe9s=
+X-Google-Smtp-Source: AGHT+IGu3WRwQ31grW/pHvbyCQ48ZzjBut8XFoPTUW0YMmrEld0S7dR9C7F6VKFG6SPrFs235+X3Qg==
+X-Received: by 2002:a05:690c:6606:b0:787:e9bc:fad5 with SMTP id 00721157ae682-78a8b538ccemr254718307b3.33.1764362647484;
+        Fri, 28 Nov 2025 12:44:07 -0800 (PST)
 Received: from gmail.com (116.235.236.35.bc.googleusercontent.com. [35.236.235.116])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-78ad0d3f5c8sm18737697b3.3.2025.11.28.12.42.40
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-78ad0d3f616sm18817477b3.1.2025.11.28.12.44.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Nov 2025 12:42:40 -0800 (PST)
-Date: Fri, 28 Nov 2025 15:42:40 -0500
+        Fri, 28 Nov 2025 12:44:07 -0800 (PST)
+Date: Fri, 28 Nov 2025 15:44:06 -0500
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 To: Jakub Kicinski <kuba@kernel.org>, 
  davem@davemloft.net
@@ -85,14 +85,12 @@ Cc: netdev@vger.kernel.org,
  willemdebruijn.kernel@gmail.com, 
  Jakub Kicinski <kuba@kernel.org>, 
  shuah@kernel.org, 
- sdf@fomichev.me, 
  linux-kselftest@vger.kernel.org
-Message-ID: <willemdebruijn.kernel.468ae2cb7a74@gmail.com>
-In-Reply-To: <20251128005242.2604732-2-kuba@kernel.org>
+Message-ID: <willemdebruijn.kernel.2a528ef888696@gmail.com>
+In-Reply-To: <20251128005242.2604732-1-kuba@kernel.org>
 References: <20251128005242.2604732-1-kuba@kernel.org>
- <20251128005242.2604732-2-kuba@kernel.org>
-Subject: Re: [PATCH net-next 2/2] selftests: drv-net: gro: run the test
- against HW GRO and LRO
+Subject: Re: [PATCH net-next 1/2] selftests: drv-net: gro: improve feature
+ config
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,111 +102,111 @@ Content-Type: text/plain;
 Content-Transfer-Encoding: 7bit
 
 Jakub Kicinski wrote:
-> Run the test against HW GRO and LRO. NICs I have pass the base cases.
-> Interestingly all are happy to build GROs larger than 64k.
+> We'll need to do a lot more feature handling to test HW-GRO and LRO.
+> Clean up the feature handling for SW GRO a bit to let the next commit
+> focus on the new test cases, only.
+> 
+> Make sure HW GRO-like features are not enabled for the SW tests.
+> Be more careful about changing features as "nothing changed"
+> situations may result in non-zero error code from ethtool.
+> 
+> Don't disable TSO on the local interface (receiver) when running over
+> netdevsim, we just want GSO to break up the segments on the sender.
 > 
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-
 > ---
 > CC: shuah@kernel.org
-> CC: sdf@fomichev.me
 > CC: linux-kselftest@vger.kernel.org
 > ---
->  tools/testing/selftests/drivers/net/gro.py | 50 ++++++++++++++++------
->  1 file changed, 36 insertions(+), 14 deletions(-)
+>  tools/testing/selftests/drivers/net/gro.py | 38 ++++++++++++++++++++--
+>  1 file changed, 35 insertions(+), 3 deletions(-)
 > 
 > diff --git a/tools/testing/selftests/drivers/net/gro.py b/tools/testing/selftests/drivers/net/gro.py
-> index 6d633bdc7e67..ea7070b033d4 100755
+> index ba83713bf7b5..6d633bdc7e67 100755
 > --- a/tools/testing/selftests/drivers/net/gro.py
 > +++ b/tools/testing/selftests/drivers/net/gro.py
-> @@ -91,7 +91,7 @@ from lib.py import ksft_variants
->      defer(ethtool, " ".join(old), host=host)
+> @@ -20,7 +20,7 @@ coalescing behavior.
+>  import os
+>  from lib.py import ksft_run, ksft_exit, ksft_pr
+>  from lib.py import NetDrvEpEnv, KsftXfailEx
+> -from lib.py import cmd, defer, bkg, ip
+> +from lib.py import cmd, defer, bkg, ethtool, ip
+
+Is there a pattern behind this order. Since inserted rather than
+appended. Intended to be alphabetical?
+
+>  from lib.py import ksft_variants
 >  
 >  
-> -def _setup(cfg, test_name):
-> +def _setup(cfg, mode, test_name):
+> @@ -70,6 +70,27 @@ from lib.py import ksft_variants
+>          defer(ip, f"link set dev {dev['ifname']} mtu {dev['mtu']}", host=host)
+>  
+>  
+> +def _set_ethtool_feat(dev, current, feats, host=None):
+> +    s2n = {True: "on", False: "off"}
+> +
+> +    new = ["-K", dev]
+> +    old = ["-K", dev]
+> +    no_change = True
+> +    for name, state in feats.items():
+> +        new += [name, s2n[state]]
+> +        old += [name, s2n[not state]]
+
+Should the change set not only include items for which
+current != state?
+
+Now old assumes not state, but that is not necessarily true?
+> +
+> +        if current[name]["active"] != state:
+> +            no_change = False
+> +            if current[name]["fixed"]:
+> +                raise KsftXfailEx(f"Device does not support {name}")
+> +    if no_change:
+> +        return
+> +
+> +    ethtool(" ".join(new), host=host)
+> +    defer(ethtool, " ".join(old), host=host)
+> +
+> +
+>  def _setup(cfg, test_name):
 >      """ Setup hardware loopback mode for GRO testing. """
 >  
->      if not hasattr(cfg, "bin_remote"):
-> @@ -108,16 +108,37 @@ from lib.py import ksft_variants
+> @@ -77,6 +98,11 @@ from lib.py import ksft_variants
+>          cfg.bin_local = cfg.test_dir / "gro"
+>          cfg.bin_remote = cfg.remote.deploy(cfg.bin_local)
+>  
+> +    if not hasattr(cfg, "feat"):
+> +        cfg.feat = ethtool(f"-k {cfg.ifname}", json=True)[0]
+> +        cfg.remote_feat = ethtool(f"-k {cfg.remote_ifname}",
+> +                                  host=cfg.remote, json=True)[0]
+> +
+>      # "large" test needs at least 4k MTU
+>      if test_name == "large":
 >          _set_mtu_restore(cfg.dev, 4096, None)
->          _set_mtu_restore(cfg.remote_dev, 4096, cfg.remote)
+> @@ -88,15 +114,21 @@ from lib.py import ksft_variants
+>      _write_defer_restore(cfg, flush_path, "200000", defer_undo=True)
+>      _write_defer_restore(cfg, irq_path, "10", defer_undo=True)
 >  
-> -    flush_path = f"/sys/class/net/{cfg.ifname}/gro_flush_timeout"
-> -    irq_path = f"/sys/class/net/{cfg.ifname}/napi_defer_hard_irqs"
-> +    if mode == "sw":
-> +        flush_path = f"/sys/class/net/{cfg.ifname}/gro_flush_timeout"
-> +        irq_path = f"/sys/class/net/{cfg.ifname}/napi_defer_hard_irqs"
->  
-> -    _write_defer_restore(cfg, flush_path, "200000", defer_undo=True)
-> -    _write_defer_restore(cfg, irq_path, "10", defer_undo=True)
-> +        _write_defer_restore(cfg, flush_path, "200000", defer_undo=True)
-> +        _write_defer_restore(cfg, irq_path, "10", defer_undo=True)
->  
-> -    _set_ethtool_feat(cfg.ifname, cfg.feat,
-> -                      {"generic-receive-offload": True,
-> -                       "rx-gro-hw": False,
-> -                       "large-receive-offload": False})
-> +        _set_ethtool_feat(cfg.ifname, cfg.feat,
-> +                          {"generic-receive-offload": True,
-> +                           "rx-gro-hw": False,
-> +                           "large-receive-offload": False})
-> +    elif mode == "hw":
-> +        # The only way to get HW GRO but elide SW GRO is to install
-> +        # a dummy XDP generic program. Disabling SW GRO as a feature
-> +        # would also disable HW GRO.
-> +        prog = cfg.net_lib_dir / "xdp_dummy.bpf.o"
-> +        ip(f"link set dev {cfg.ifname} xdpgeneric obj {prog} sec xdp")
-> +        defer(ip, f"link set dev {cfg.ifname} xdpgeneric off")
+> +    _set_ethtool_feat(cfg.ifname, cfg.feat,
+> +                      {"generic-receive-offload": True,
+> +                       "rx-gro-hw": False,
+> +                       "large-receive-offload": False})
 > +
-> +        # Attaching XDP may change features, fetch the latest state
-> +        feat = ethtool(f"-k {cfg.ifname}", json=True)[0]
-> +
-> +        _set_ethtool_feat(cfg.ifname, feat,
-> +                          {"generic-receive-offload": True,
-> +                           "rx-gro-hw": True,
-> +                           "large-receive-offload": False})
-> +    elif mode == "lro":
-> +        _set_ethtool_feat(cfg.ifname, cfg.feat,
-> +                          {"generic-receive-offload": False,
-
-So GRO off disables HW_GRO, but not LRO? That difference is behavior
-is confusing. Could we still see this as a regression and make the
-ethtool HW_GRO feature equally independent from SW_GRO?
-
-> +                           "rx-gro-hw": False,
-> +                           "large-receive-offload": True})
->  
 >      try:
 >          # Disable TSO for local tests
-> @@ -132,19 +153,20 @@ from lib.py import ksft_variants
+>          cfg.require_nsim()  # will raise KsftXfailEx if not running on nsim
+>  
+> -        cmd(f"ethtool -K {cfg.ifname} gro on tso off")
+> -        cmd(f"ethtool -K {cfg.remote_ifname} gro on tso off", host=cfg.remote)
+> +        _set_ethtool_feat(cfg.remote_ifname, cfg.remote_feat, {"tso": False},
+> +                          host=cfg.remote)
+>      except KsftXfailEx:
+>          pass
+>  
+> +
 >  def _gro_variants():
 >      """Generator that yields all combinations of protocol and test types."""
 >  
-> -    for protocol in ["ipv4", "ipv6", "ipip"]:
-> -        for test_name in ["data", "ack", "flags", "tcp", "ip", "large"]:
-> -            yield protocol, test_name
-> +    for mode in ["sw", "hw", "lro"]:
-> +        for protocol in ["ipv4", "ipv6", "ipip"]:
-> +            for test_name in ["data", "ack", "flags", "tcp", "ip", "large"]:
-> +                yield mode, protocol, test_name
->  
->  
->  @ksft_variants(_gro_variants())
-> -def test(cfg, protocol, test_name):
-> +def test(cfg, mode, protocol, test_name):
->      """Run a single GRO test with retries."""
->  
->      ipver = "6" if protocol[-1] == "6" else "4"
->      cfg.require_ipver(ipver)
->  
-> -    _setup(cfg, test_name)
-> +    _setup(cfg, mode, test_name)
->  
->      base_cmd_args = [
->          f"--{protocol}",
 > -- 
 > 2.51.1
 > 
