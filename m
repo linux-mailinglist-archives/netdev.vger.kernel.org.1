@@ -1,104 +1,64 @@
-Return-Path: <netdev+bounces-242577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51F8AC922CC
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 14:46:56 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED64EC922F3
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 14:53:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 80ED64E51A7
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 13:46:34 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9FBAF4E1AC1
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 13:53:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8767E23BD01;
-	Fri, 28 Nov 2025 13:46:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FA0B30EF65;
+	Fri, 28 Nov 2025 13:53:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UMvD/KVB"
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="pvHBeaEH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5CA1F4631
-	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 13:46:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C81652417F0;
+	Fri, 28 Nov 2025 13:53:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764337586; cv=none; b=DbOyYGt2/SmP0HjpBtwucA6gFW+6GWWlZ5WM4jRqFXrBX+8px2WYIaw2NZZD7yUI27NjA/LZ13RvU5VHjcbY1YwwgRVcjVpxIxgEOz6TxjcSIY/pT8zpp27aFGbcDWQ2yMM9b4HElG2tpFoPFiS9mXJSoz7NO1/zS98lnYsiSPI=
+	t=1764338028; cv=none; b=Bu0+gAM/uCGQx4KOU4ouGCqd67Ej1tMxzELPBXBHqeBrGSSNUIv7UrlofhbYNOqq/SSnA2VtCF6QWyDwxssMjZJdw97m8xbsE5F1RTZTYKvZQmzGV4DNfDVW76OLlMvkXZXi7I08koaRGdszgE5shj5gn4vbII6Mjk9RkyJfVuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764337586; c=relaxed/simple;
-	bh=KR4grrT8SD955/MgFQUYQtPvjQ/NO97IWPVFe4EfgGI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=SHag6NBi8cM56Zmier//uycv6IS0WE/rPMEDacVGO47QPXIJRVhlcK89pzl1ASQA4dAWg4qQi4QqUCyUlto50ncfU5Ytc8a3H4AiZAooTG0gPILHfUZkCBHALLDHuClGOEM2DguJdKVIozr+hVv7U1zjhfaPcBscteeVLlaTP0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UMvD/KVB; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7b852bb31d9so2182607b3a.0
-        for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 05:46:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764337584; x=1764942384; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WpxD35MumNPzTl+ELYmx5t3jmJ1EzXuG/pCsj8wGD00=;
-        b=UMvD/KVBtn86VuMdmnsGZxewjXBSAcF5YelKQJP4LZYeS6QrM3PO9mnwC5467jYmhV
-         LxrI7/rg18wcPW3utRaW1zLZgzjqWubuOpXZ8R1bSrSwaSs5IxVnue/HoMVqt6gqpg5e
-         1GWtU0umLyYT5yjFZsWOAESTH5+HmeaqHEcXPRUdymxRutoGF2PaHsITCIxKI1pTggev
-         EO0FeGqblxnJJJMKKbwpo00FuirWES489Eo4ZZGuGksYbDOYub/e/hdjPrJxU85hTO2N
-         54r9HS8Ot1vSTjtOBq9F3Rmm3SbGwgzbfDaUvXn1H7y2QBL4aEOQ8HkCQBSPGRc0U42u
-         cHYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764337584; x=1764942384;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=WpxD35MumNPzTl+ELYmx5t3jmJ1EzXuG/pCsj8wGD00=;
-        b=YxGjgNbEuX3lzoy8eE+pcMqL2emHAAD2N7Sl+Ekpr4CEQLZBKpsVCowFu7RLdlnnw4
-         6G6iKOw+/lDejtp6MGEe5+YEqWmfFuBkSzYXiAdOua23/1AoT3Ug2D/49US6MmGUXEf1
-         2U3/rIljYfQ+mr7WXbWb6Zo1ttIM9V+zmx/PaRVzeEO3ltAK7uPtSV1yFQDRkTZJYLIG
-         NC5LhmwPh1YV4l6+h37UF/ya8MEkKMGVbXe/bnYJdmokpzlNm215TigKng2WNHV+CIZ2
-         vQbmiiRNIhzcUF49jzMBwEQDUJj0IL3auxIdau1evr5NgbsCFyWcq47LaT2D0c40jabe
-         uVlA==
-X-Forwarded-Encrypted: i=1; AJvYcCXS7WdKF9jExyJsdGdjWCzvfyvXVEY7kAkM8SdHO3hw1h+15TUYfcLds9QUxS7SmmYoMhpZWeI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwS/tRQKEczEBfcSCyGGMOhelT6CkNowTt5F/vgWGsTUpOxxn4Y
-	PIB9u4H+i1kZri+AjbZdABubLs/EwNkzTkZVFxylDNIxZruFn51ad6dD
-X-Gm-Gg: ASbGnct5wHNiTXlXrpegXLxDciBqw/nSG/uGhgbhDo5pipDSon0cc6WwvPIptBGNjcZ
-	AT1XJQXOUJ6x+My/C5bzHZdID4es23pq/9d2kfsVbJ1nHMKDsgqBOf4kaEhYPPWqzNKL4GPBC1q
-	CM0obtBRFbBaM/uL0Pr6v9vGZ3SAjwzVOo8QKyrmmWsUmMd8RiNqhJxx//9Qcs6cQbEAKuub4S3
-	6C5TIyWKsU9J/Zdyqu/4RgKBiaIYBJXEjXboYb7LjsQBcQdBNHXNnay1P77ALvHlSP+d+/FY/Yt
-	2b9RvMZVR1TKx4KySCQOjQkVe8iwN5XTSci26Lajl9i359ksvxBkqJpQPWUiSlRkhSvYrU1kCVc
-	v0GJ6cEconFwwx9pozplRlsjGlHMvGImQzH5hNxaobi30sqCJ2/ZLbUpJXhhsio2w8iRtGcPhMK
-	uJzcSxPAKuIXfHbZjG4RJwc0+FqNrTulG0FKXueVYOrNukASy+dc5425eDTT0=
-X-Google-Smtp-Source: AGHT+IH1Xp/RilpJaPDY23Ob1bPvy5Lw52/NTeRatwcDcPJ5Jh5g/Sv8tRwJSmrQj6zb2SgjnwP7GQ==
-X-Received: by 2002:a05:6300:8b0f:b0:35f:9743:f4a with SMTP id adf61e73a8af0-36150ea9786mr31081390637.26.1764337584044;
-        Fri, 28 Nov 2025 05:46:24 -0800 (PST)
-Received: from KERNELXING-MC1.tencent.com ([114.253.35.215])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-be4fbde37d7sm4792674a12.13.2025.11.28.05.46.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Nov 2025 05:46:23 -0800 (PST)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	bjorn@kernel.org,
-	magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com,
-	jonathan.lemon@gmail.com,
-	sdf@fomichev.me,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	horms@kernel.org,
-	andrew+netdev@lunn.ch
-Cc: bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next v3 3/3] xsk: remove spin lock protection of cached_prod
-Date: Fri, 28 Nov 2025 21:46:01 +0800
-Message-Id: <20251128134601.54678-4-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20251128134601.54678-1-kerneljasonxing@gmail.com>
-References: <20251128134601.54678-1-kerneljasonxing@gmail.com>
+	s=arc-20240116; t=1764338028; c=relaxed/simple;
+	bh=fggz5XWbuFAd74CkiIlkgzkZvPGv9x5GbKR4bFumAEA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=FMQH0saxlYAMExQSxThpUktI1XjuPG1+WZdIfp5MuNnI7ciU8fdPy38+wsZpDQOi6ldu7I5jw3AQAzocHRt0pfhlAclfcYcBFLoouwF14VFzs1vbiQ4KJ9UpcTm0ICGxvlVk4um4cL7YxcqtILdYzaSN3ZNsmpbaoEeW2691cLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=pvHBeaEH; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id DB8EDA078B;
+	Fri, 28 Nov 2025 14:53:35 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=mail; bh=sLAchPg2rSsKp7RAybq9EonQbR9aCHhSrvXpvaorBVk=; b=
+	pvHBeaEHioXMLsAEfJUGsudT5f8C3TBIqRMCmDnkkhUWtLuX1rhXOUI+WTPs14Dg
+	P8mTVSDUM+DptyteVKo/DQNa/9K50tE8gv9G4wzyE2EGTl8s70+D/utlMQ9y567p
+	XbhvhIp0pihrOuFWkM/DwJuDWGIJLGRtLBlcilieNRdcVsO36jIyYV4DPM/jIT1h
+	J3aYAd/tqvOe44UYVenxcTLNWFW/DNSyO0+fxar63p8lwhJdFefrLejHxNOo6dXH
+	M0k3FRVW7suG3YO8SSb4bOfGlizeCOhIIXCgcy864RlhX96L9eLQSGwssvGe/WUc
+	7pzRQtXtxC6dvJi0MV4xrWhaRHV9mLylSrs/y/0Vj7mSvT869O3IEkVUFRYcawIU
+	cEj+UslHzTCGk5Gw+Pzm5dT+JDl/6rUaVR6kdlwI1Ae3Je1llzBic8aT8kEjqBpa
+	4fNWRPbbF2XDsJCFS42PuiBnxM5jjof7zmv0PqFTNwLE1qIQGGMuRNCCbmnW+Nvv
+	eNKEuatiDGiZ++8CH0fff0GF1pGNqK6dLxXaucMFOOWTPzu/qjq82Q3YbEHQ7AGE
+	UOtaiaSXF7ZQbZXUaD59nvrAtwIL93w1jnVX70fCRXv8S/EDTk7o2RYZlVC++WcR
+	opEq5hlskXTYsCnmRayGk273J4TlHQX+IsmG58lRnWY=
+From: Buday Csaba <buday.csaba@prolan.hu>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: Buday Csaba <buday.csaba@prolan.hu>
+Subject: [PATCH net-next v2 1/1] net: mdio: reset PHY before attempting to access ID register
+Date: Fri, 28 Nov 2025 14:53:32 +0100
+Message-ID: <5701a9faafd1769b650b79c2d0c72cc10b5bdbc8.1764337894.git.buday.csaba@prolan.hu>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -106,118 +66,139 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1764338014;VERSION=8002;MC=3517599472;ID=166272;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
+X-ESET-Antispam: OK
+X-EsetResult: clean, is OK
+X-EsetId: 37303A296767155F607D64
 
-From: Jason Xing <kernelxing@tencent.com>
+When the ID of an Ethernet PHY is not provided by the 'compatible'
+string in the device tree, its actual ID is read via the MDIO bus.
+For some PHYs this could be unsafe, since a hard reset may be
+necessary to safely access the MDIO registers.
 
-Remove the spin lock protection along with some functions adjusted.
+Add a fallback mechanism for such devices: when reading the ID
+fails, the reset will be asserted, and the ID read is retried.
 
-Now cached_prod is fully converted to atomic, which does help in the
-contended case where umem is shared between xsks.
+This allows such devices to be used with an autodetected ID.
 
-Removing that lock can avoid manipulating one extra cacheline in the
-extremely hot path which directly improves the performance by around
-5% over different platforms as Paolo found[1].
+The fallback mechanism is activated in the error handling path, and
+the return code of fwnode_mdiobus_register_phy() is unaltered, except
+when the reset fails with -EPROBE_DEFER, which is propagated to the
+caller.
 
-[1]: https://lore.kernel.org/all/4c645223-8c52-40d3-889b-f3cf7fa09f89@redhat.com/
-
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
+Signed-off-by: Buday Csaba <buday.csaba@prolan.hu>
 ---
- include/net/xsk_buff_pool.h |  5 -----
- net/xdp/xsk.c               | 21 ++++-----------------
- net/xdp/xsk_buff_pool.c     |  1 -
- 3 files changed, 4 insertions(+), 23 deletions(-)
+Patch split from a larger series:
+https://lore.kernel.org/all/cover.1761732347.git.buday.csaba@prolan.hu/
 
-diff --git a/include/net/xsk_buff_pool.h b/include/net/xsk_buff_pool.h
-index 92a2358c6ce3..0b1abdb99c9e 100644
---- a/include/net/xsk_buff_pool.h
-+++ b/include/net/xsk_buff_pool.h
-@@ -90,11 +90,6 @@ struct xsk_buff_pool {
- 	 * destructor callback.
- 	 */
- 	spinlock_t cq_prod_lock;
--	/* Mutual exclusion of the completion ring in the SKB mode.
--	 * Protect: when sockets share a single cq when the same netdev
--	 * and queue id is shared.
--	 */
--	spinlock_t cq_cached_prod_lock;
- 	struct xdp_buff_xsk *free_heads[];
- };
+The refactoring parts of the previous patchset were already merged,
+leaving this one. Functionally identical to:
+https://lore.kernel.org/all/5f8d93021a7aa6eeb4fb67ab27ddc7de9101c59f.1761732347.git.buday.csaba@prolan.hu/
+
+Comments were added for clarity.
+V1 -> V2: added missing EXPORT_SYMBOL_NS_GPL for
+          mdio_device_register/unregister_reset functions
+---
+ drivers/net/mdio/fwnode_mdio.c | 42 +++++++++++++++++++++++++++++++++-
+ drivers/net/phy/mdio_device.c  |  2 ++
+ 2 files changed, 43 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/mdio/fwnode_mdio.c b/drivers/net/mdio/fwnode_mdio.c
+index ba7091518..28daabe63 100644
+--- a/drivers/net/mdio/fwnode_mdio.c
++++ b/drivers/net/mdio/fwnode_mdio.c
+@@ -13,9 +13,12 @@
+ #include <linux/phy.h>
+ #include <linux/pse-pd/pse.h>
  
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index b63409b1422e..ae8a92c168b8 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -546,17 +546,6 @@ static int xsk_wakeup(struct xdp_sock *xs, u8 flags)
- 	return dev->netdev_ops->ndo_xsk_wakeup(dev, xs->queue_id, flags);
++#include "../phy/mdio-private.h"
++
+ MODULE_AUTHOR("Calvin Johnson <calvin.johnson@oss.nxp.com>");
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("FWNODE MDIO bus (Ethernet PHY) accessors");
++MODULE_IMPORT_NS("NET_PHY_CORE_ONLY");
+ 
+ static struct pse_control *
+ fwnode_find_pse_control(struct fwnode_handle *fwnode,
+@@ -67,6 +70,34 @@ fwnode_find_mii_timestamper(struct fwnode_handle *fwnode)
+ 	return mii_ts;
  }
  
--static int xsk_cq_reserve_locked(struct xsk_buff_pool *pool)
--{
--	int ret;
--
--	spin_lock(&pool->cq_cached_prod_lock);
--	ret = xsk_cq_cached_prod_reserve(pool->cq);
--	spin_unlock(&pool->cq_cached_prod_lock);
--
--	return ret;
--}
--
- static void xsk_cq_submit_addr_locked(struct xsk_buff_pool *pool,
- 				      struct sk_buff *skb)
++/* Hard-reset a PHY before registration */
++static int fwnode_reset_phy(struct mii_bus *bus, u32 addr,
++			    struct fwnode_handle *phy_node)
++{
++	struct mdio_device *tmpdev;
++	int rc;
++
++	/* Create a temporary MDIO device to allocate reset resources */
++	tmpdev = mdio_device_create(bus, addr);
++	if (IS_ERR(tmpdev))
++		return PTR_ERR(tmpdev);
++
++	device_set_node(&tmpdev->dev, fwnode_handle_get(phy_node));
++	rc = mdio_device_register_reset(tmpdev);
++	if (rc) {
++		mdio_device_free(tmpdev);
++		return rc;
++	}
++
++	mdio_device_reset(tmpdev, 1);
++	mdio_device_reset(tmpdev, 0);
++
++	mdio_device_unregister_reset(tmpdev);
++	mdio_device_free(tmpdev);
++
++	return 0;
++}
++
+ int fwnode_mdiobus_phy_device_register(struct mii_bus *mdio,
+ 				       struct phy_device *phy,
+ 				       struct fwnode_handle *child, u32 addr)
+@@ -129,8 +160,17 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
+ 		return PTR_ERR(mii_ts);
+ 
+ 	is_c45 = fwnode_device_is_compatible(child, "ethernet-phy-ieee802.3-c45");
+-	if (is_c45 || fwnode_get_phy_id(child, &phy_id))
++	if (is_c45 || fwnode_get_phy_id(child, &phy_id)) {
+ 		phy = get_phy_device(bus, addr, is_c45);
++		if (IS_ERR(phy)) {
++			/* get_phy_device() failed, retry after a reset */
++			rc = fwnode_reset_phy(bus, addr, child);
++			if (rc == -EPROBE_DEFER)
++				goto clean_mii_ts;
++			else if (!rc)
++				phy = get_phy_device(bus, addr, is_c45);
++		}
++	}
+ 	else
+ 		phy = phy_device_create(bus, addr, phy_id, 0, NULL);
+ 	if (IS_ERR(phy)) {
+diff --git a/drivers/net/phy/mdio_device.c b/drivers/net/phy/mdio_device.c
+index fd0e16dbc..1125c89e4 100644
+--- a/drivers/net/phy/mdio_device.c
++++ b/drivers/net/phy/mdio_device.c
+@@ -156,6 +156,7 @@ int mdio_device_register_reset(struct mdio_device *mdiodev)
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL_NS_GPL(mdio_device_register_reset, "NET_PHY_CORE_ONLY");
+ 
+ /**
+  * mdio_device_unregister_reset - uninitialize the reset properties of
+@@ -171,6 +172,7 @@ void mdio_device_unregister_reset(struct mdio_device *mdiodev)
+ 	mdiodev->reset_assert_delay = 0;
+ 	mdiodev->reset_deassert_delay = 0;
+ }
++EXPORT_SYMBOL_NS_GPL(mdio_device_unregister_reset, "NET_PHY_CORE_ONLY");
+ 
+ void mdio_device_reset(struct mdio_device *mdiodev, int value)
  {
-@@ -585,11 +574,9 @@ static void xsk_cq_submit_addr_locked(struct xsk_buff_pool *pool,
- 	spin_unlock_irqrestore(&pool->cq_prod_lock, flags);
- }
- 
--static void xsk_cq_cancel_locked(struct xsk_buff_pool *pool, u32 n)
-+static void xsk_cq_cached_prod_cancel(struct xsk_buff_pool *pool, u32 n)
- {
--	spin_lock(&pool->cq_cached_prod_lock);
- 	atomic_sub(n, &pool->cq->cached_prod_atomic);
--	spin_unlock(&pool->cq_cached_prod_lock);
- }
- 
- static void xsk_inc_num_desc(struct sk_buff *skb)
-@@ -643,7 +630,7 @@ static void xsk_consume_skb(struct sk_buff *skb)
- 	}
- 
- 	skb->destructor = sock_wfree;
--	xsk_cq_cancel_locked(xs->pool, num_descs);
-+	xsk_cq_cached_prod_cancel(xs->pool, num_descs);
- 	/* Free skb without triggering the perf drop trace */
- 	consume_skb(skb);
- 	xs->skb = NULL;
-@@ -860,7 +847,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- 		xskq_cons_release(xs->tx);
- 	} else {
- 		/* Let application retry */
--		xsk_cq_cancel_locked(xs->pool, 1);
-+		xsk_cq_cached_prod_cancel(xs->pool, 1);
- 	}
- 
- 	return ERR_PTR(err);
-@@ -898,7 +885,7 @@ static int __xsk_generic_xmit(struct sock *sk)
- 		 * if there is space in it. This avoids having to implement
- 		 * any buffering in the Tx path.
- 		 */
--		err = xsk_cq_reserve_locked(xs->pool);
-+		err = xsk_cq_cached_prod_reserve(xs->pool->cq);
- 		if (err) {
- 			err = -EAGAIN;
- 			goto out;
-diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
-index 51526034c42a..9539f121b290 100644
---- a/net/xdp/xsk_buff_pool.c
-+++ b/net/xdp/xsk_buff_pool.c
-@@ -91,7 +91,6 @@ struct xsk_buff_pool *xp_create_and_assign_umem(struct xdp_sock *xs,
- 	INIT_LIST_HEAD(&pool->xsk_tx_list);
- 	spin_lock_init(&pool->xsk_tx_list_lock);
- 	spin_lock_init(&pool->cq_prod_lock);
--	spin_lock_init(&pool->cq_cached_prod_lock);
- 	refcount_set(&pool->users, 1);
- 
- 	pool->fq = xs->fq_tmp;
+
+base-commit: e2c20036a8879476c88002730d8a27f4e3c32d4b
 -- 
-2.41.3
+2.39.5
+
 
 
