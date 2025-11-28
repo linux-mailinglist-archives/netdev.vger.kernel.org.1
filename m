@@ -1,105 +1,124 @@
-Return-Path: <netdev+bounces-242519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C45FC913FA
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 09:40:48 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A091AC913A9
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 09:38:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1164A4E631C
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 08:37:35 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 64F90344440
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 08:37:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 776D52E6CDF;
-	Fri, 28 Nov 2025 08:37:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 610362E92C0;
+	Fri, 28 Nov 2025 08:35:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Z8U6qp+Z"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="kG/emZ/q"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D8142DF143
-	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 08:37:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9761C1FF7D7;
+	Fri, 28 Nov 2025 08:35:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764319053; cv=none; b=utrlXvp/BsndcC7cpusQ2iXSHbpAlkf7O+0zoq/M+wlqJkTS79lzjjqfgzceP2aaxezGAGNCJL3xgsc3JBNMeq4R5RF0jsnbrmf8poxcDFnPVDGKwsznV5+nMKpksBLIlYwxNGurdK6KNzeXXUv5jgr32K3MPFoGSB2a2T9+9l0=
+	t=1764318932; cv=none; b=rgcJtjQ+fSO/rXPCBOJRxWdGu69mWRWon+6FwZpCk55fstqA4QhDq26eEFt6TNT0eXh2Ej+qSi1Zper4VG9t1IGvgqJYEJ78pVC7tzLg0WLg1j0TuuAmza4hevqOdEZkGEanPuK+lXOJSRbN6xwS7o2WLF1iksgDEf2TXHaHQzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764319053; c=relaxed/simple;
-	bh=9i+ZOslImSzH+rtTb32TMEw6DQ2RdZx+xwT+FK6/hBM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BCPrGcJFObVCoFbID5QZMp/mSXDO0PiA4gbeCiyTWv4VI1VgeTiu2hJ0a7F2XxozQvM6jFfLUbsK/VTY5IJ4QHtc9DKuok2/lPmJIr/kTHf5omLHnXBjg28rhTZj+i3XFLSt80QbdZmwOp+x6bWDFDUO5SFWZybWsiTSgLMKCkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Z8U6qp+Z; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1764319046;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=AyCpr73GW8D3C48mDnr3WbOCxeZIjoR/nJdSxDsAdd8=;
-	b=Z8U6qp+ZG8Kh9H8cEXi372x0/esxUPuU5GVuZBDLvbFQrOBF5Lc/+7zdBVgCs2ZZ4cpBec
-	ErznVfrMxkj8BiqH3nlIFaDf3Zalb60kiHmSVWqW8CicvSGM0rBPfL1v7DxDSARjpd2/In
-	gEl4GmftFAfRvAvXBi6CK2QSIunK6PA=
-From: Fushuai Wang <fushuai.wang@linux.dev>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	wangfushuai@baidu.com,
-	Fushuai Wang <fushuai.wang@linux.dev>
-Subject: [PATCH] rtnl: Add guard support
-Date: Fri, 28 Nov 2025 16:34:55 +0800
-Message-Id: <20251128083455.67474-1-fushuai.wang@linux.dev>
+	s=arc-20240116; t=1764318932; c=relaxed/simple;
+	bh=cNQfnriMaenwW717i8RQ5vp8YIX3PGdSlwhtPm85SMk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EFzgwNtxH+8BWS0XR+wgl0Sqyt9bVUETwMguu8xK4Ed7xzQ1ixs/N7NeeTUJ7hMX5oEdVXZ/LQzML4jQe6bVYdfaOXSPZ3oeAvPpB8FOUvFPiPxuDNs6v1OrrvQmmJoDOrKVwM/oUiLfLF5z44UlJBnLUFbjo1iwdzhgS+F9Mck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=kG/emZ/q; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 352771A1DE6;
+	Fri, 28 Nov 2025 08:35:28 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 09EB760706;
+	Fri, 28 Nov 2025 08:35:28 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id CF2A1103C8EF1;
+	Fri, 28 Nov 2025 09:35:21 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1764318926; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=bt0bVS+dg/E4D/40L3Rqo22NkXCeP8ALUu6d+/7zrIE=;
+	b=kG/emZ/q4AlsESETvUY6cJ8iOxWvuUVxDCqR93cSukgqmqi5/LCMQVLWn/a0bOrFtfiqi1
+	68f2icCURNipB7gan5YKT06hmGsb8iD1dJUFYG7yGUylVTCAo5ymdoA9MhwUUidaouAkfn
+	Gqzd9OJ0nNQwvnw/W9hfs+rDAgG6d0iXOcyD8/W9wqgGKlbmBmkQsp8ENDCEizVp9zvBJ8
+	Uuj2ONgLAtSYjz4ugMOwi8Vx58ErimfuTiAf0LUOmcoaIcOTZMRAqlnOyx8sqBQIRPsGFD
+	qwKJriMsgATLDwEaiIhlJ17qgWibLeMK9Ip9chCU6yM2cLx+Wg1gAt+8/b4x4A==
+Message-ID: <dff88906-d1f5-4ad1-840b-df1cbec56fc5@bootlin.com>
+Date: Fri, 28 Nov 2025 09:35:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v20 05/14] dt-bindings: net: dp83822: Deprecate
+ ti,fiber-mode
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Romain Gantois <romain.gantois@bootlin.com>,
+ linux-arm-msm@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+ Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+ Florian Fainelli <f.fainelli@gmail.com>, mwojtas@chromium.org,
+ devicetree@vger.kernel.org, Tariq Toukan <tariqt@nvidia.com>,
+ thomas.petazzoni@bootlin.com, Conor Dooley <conor+dt@kernel.org>,
+ Dimitri Fedrau <dimitri.fedrau@liebherr.com>, Simon Horman
+ <horms@kernel.org>, =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Eric Dumazet
+ <edumazet@google.com>, Herve Codina <herve.codina@bootlin.com>,
+ linux-arm-kernel@lists.infradead.org, Paolo Abeni <pabeni@redhat.com>,
+ Daniel Golle <daniel@makrotopia.org>,
+ =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
+ Oleksij Rempel <o.rempel@pengutronix.de>, Antoine Tenart
+ <atenart@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
+ =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20251127171800.171330-1-maxime.chevallier@bootlin.com>
+ <20251127171800.171330-6-maxime.chevallier@bootlin.com>
+ <176426738519.367608.14469073626442288770.robh@kernel.org>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <176426738519.367608.14469073626442288770.robh@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-Introduce guard support to simplify the usage of the
-lock about rtnl.
+Hi,
 
-Signed-off-by: Fushuai Wang <wangfushuai@baidu.com>
----
- include/linux/rtnetlink.h | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+On 27/11/2025 19:16, Rob Herring (Arm) wrote:
+> 
+> On Thu, 27 Nov 2025 18:17:48 +0100, Maxime Chevallier wrote:
+>> The newly added ethernet-connector binding allows describing an Ethernet
+>> connector with greater precision, and in a more generic manner, than
+>> ti,fiber-mode. Deprecate this property.
+>>
+>> Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+>> Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+>> Tested-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+>> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+>> ---
+>>  Documentation/devicetree/bindings/net/ti,dp83822.yaml | 9 ++++++++-
+>>  1 file changed, 8 insertions(+), 1 deletion(-)
+>>
+> 
+> My bot found errors running 'make dt_binding_check' on your patch:
+> 
+> yamllint warnings/errors:
+> 
+> dtschema/dtc warnings/errors:
+> 
+> 
+> doc reference errors (make refcheckdocs):
 
-diff --git a/include/linux/rtnetlink.h b/include/linux/rtnetlink.h
-index ea39dd23a197..61e727c35927 100644
---- a/include/linux/rtnetlink.h
-+++ b/include/linux/rtnetlink.h
-@@ -7,6 +7,7 @@
- #include <linux/netdevice.h>
- #include <linux/wait.h>
- #include <linux/refcount.h>
-+#include <linux/cleanup.h>
- #include <uapi/linux/rtnetlink.h>
- 
- extern int rtnetlink_send(struct sk_buff *skb, struct net *net, u32 pid, u32 group, int echo);
-@@ -158,6 +159,16 @@ static inline void ASSERT_RTNL_NET(struct net *net)
- 	rcu_replace_pointer_rtnl(rp, p)
- #endif
- 
-+DEFINE_LOCK_GUARD_0(rtnl, rtnl_lock(), rtnl_unlock())
-+
-+DEFINE_GUARD(__rtnl_net, struct net *, __rtnl_net_lock(_T),
-+	     __rtnl_net_unlock(_T))
-+
-+DEFINE_GUARD(rtnl_net, struct net *, rtnl_net_lock(_T),
-+	     rtnl_net_unlock(_T))
-+DEFINE_GUARD_COND(rtnl_net, _try, rtnl_net_trylock(_T))
-+DEFINE_GUARD_COND(rtnl_net, _kill, rtnl_net_lock_killable(_T), _RET == 0)
-+
- static inline struct netdev_queue *dev_ingress_queue(struct net_device *dev)
- {
- 	return rtnl_dereference(dev->ingress_queue);
--- 
-2.36.1
 
+I don't see any error here :) maybe an issue with the bot ?
+
+Maxime
 
