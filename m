@@ -1,150 +1,206 @@
-Return-Path: <netdev+bounces-242513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6EEDC911A1
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 09:09:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF208C91217
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 09:21:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9909C3450FC
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 08:08:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C11A3AC01F
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 08:21:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 119192F1FD0;
-	Fri, 28 Nov 2025 08:06:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8E25288CA6;
+	Fri, 28 Nov 2025 08:21:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KvZRDNb5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KJaaVBRy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 590112E7F1D
-	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 08:06:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26EB31F94A
+	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 08:21:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764317213; cv=none; b=pm1SdeqN2oIF705feF8UtgHVaOM7F4zs0JYytsweoVTvNmkJFaK78GyR35Ycv4ZvIiABSE5fc+PSKkvqkz03jESFYJkxHR1i/gZ7eFeFERZFvVdjLbKPM/jPbTtCrn8Ia5FOthzPPsotk1DkE8UD/kqw6v8PZsYgd2orJBryzvY=
+	t=1764318084; cv=none; b=qJ8Y+MklzBjVqVSHsDriLJg5qQmDj5WlUsnGiHlh/PJY3StJhC/2hUQdJPE8JfLfhTVF+zS8/bT+JbwHZkplQ3FsAs2O9iyLj/1/wz5/UtbC17kP5OebH6FZKy26Djjh3Pk7cgw71UHf3LAadyORQ55VA3JWZohvebw7SeYpbfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764317213; c=relaxed/simple;
-	bh=dVGM7YzgCKLuuKDe4mee+rTwbCjC2sQraxKVJra6rhE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=S7zQLq7RAkwtMePeNVz3AhNpz3Fe5E6NIhjfu8c4/K6aGr3gdjJsfMLNntfLSCACZLzACWWT3H49Feo5XJAgy3boc3veKbQVgsffc6uCcQdbVyl6h29hj+WWIgOa8xrcpahbDkH+yZ4qKZauYAGJZnMizfk8Y84yjJzdwZyN6aU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KvZRDNb5; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-b736d883ac4so66953066b.2
-        for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 00:06:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764317210; x=1764922010; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pQd3PLzZ8AJbcv65jBMHGIJOzjOGRj9r3Be1kNVC/Ic=;
-        b=KvZRDNb5irA94iilqxfownV+vH9M+4O80BC8bHlybQz8G9u4x1MI9O7FlAwg6AnoIn
-         hXewKpbYIHX522tPwRv2NcIbyooJ1/7R2D5dBOkCmBnfCx+DJSnX6lx5zBVCRp9pTnJz
-         Tlu93ZpcOQO0vgLxaa7n/MPMjX+xqAyUoM4sT0woZPK0gAmR4HfcFqrNh9EDNzQKmOZa
-         XciFLp8NUDR4vNxDqJfZUMQLYd2x+9zTcYWBW0hbHQIcAiWmmBRSZOwd5u0bmtNRTLwl
-         FRrUrJn9WzlPZS9ipmvG8O3GXYn7U/yFjoIRj+lqFijJn6xgtrz/7Zg5M0h3xKBL6f8g
-         xf0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764317210; x=1764922010;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=pQd3PLzZ8AJbcv65jBMHGIJOzjOGRj9r3Be1kNVC/Ic=;
-        b=nzcJjXfywDIppYpMSxN7SY8vA9IBXiGTFNNKdgSXY+oj6Sdp2ELW/4bsGAEL5ATFPw
-         XQHqQbQBo15/yZZjXpHXvL3olfEgFRQc+UE13fqbvMHj/w+YJCwMWzdIU7nQE9aDaSFH
-         Z+rwRsi2F3IPiwbvE0uxv1h2HUucgOqzAl9+UixMVainv6CKP28yZ/XwYrIk2LnV5bTa
-         akKwX4hbKrKLXMs32sUdMVyiRDPoQgWIQW4TJTHeSldpahxln2iv+x35rFMYiK2qoYhB
-         WLhdVIokWGEDfXYQVwBKYTUopwKaqLhhIsFIJyY5rcSjSSxbwHFiiQOkU1VmpPVzC507
-         sXaA==
-X-Forwarded-Encrypted: i=1; AJvYcCUx49HKKv+t09fbsSsCggTkg4JItZ6TxPSTuL7dpZG/BrwYWPzs7L+TyOHdEFJfX7g51bDnzBQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8DKz+9NyO5iKtZJJB14NRCukwU/B4au7Y1IDCXl7JRkW9tWhT
-	ou7gy9aTwvFZaufVLi+P5468LIg5zVVXR/0/wCgbKk2DYmzSvzT0nkSQ
-X-Gm-Gg: ASbGncvLJ1BHS69+VEVxd3L6j8SlVtoXlQvcAu62Ta9yioUImYg9O9d2kXDxRb8j/jx
-	gBBgjjXQpcpdENJVbpVWj/Dq2HkEvNyjcd1vWFWAiT2JipGUavvV5ikGJtfZ0icCeUdEbxygAj2
-	mD1jIyw1Bj8mwraBiuVXyl0JFxEk05+XhvawGLOrfhrkeTFoPA2yceyAgGKkNebpWymxg69mVPN
-	g674uqg6sVkLMg5sKo/pjhhJIOsRC95Iw27OKmF7YMSul/SP7BO8hskD88hKxF31eu6YjuEmJOX
-	C7TvcPZWeb6+90tmsxlZNDaeHId6pvd5EuaLYeuPvY+phkAJh0KIZnA8Q3v6ENRW9H7aKwXQWNG
-	d5kkvHRxR74+acXUN1rIhfBu9w31axyU6Axzmc777/nt/bc+v9AuTqsve1HKp+Qn38w6NvlsGOK
-	KEXrtCxV7ngOFX2SMruT0D9KBZmO63i5Pv6PoFbPuB7Zya8J7GYR119W8dZsMxIhbda0/YrpL6N
-	aaoEg==
-X-Google-Smtp-Source: AGHT+IEBGcglZmu8UrcQJT0JgBbFxWtKvu+DEkJonDsMZMH6PC17vDq/FnrusP+b1vwXSbsvChKoVg==
-X-Received: by 2002:a17:907:3e95:b0:b75:7b39:88bc with SMTP id a640c23a62f3a-b76718b286fmr3231326066b.58.1764317209502;
-        Fri, 28 Nov 2025 00:06:49 -0800 (PST)
-Received: from localhost (dslb-002-205-018-238.002.205.pools.vodafone-ip.de. [2.205.18.238])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b76f5162d31sm385418766b.9.2025.11.28.00.06.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Nov 2025 00:06:49 -0800 (PST)
-From: Jonas Gorski <jonas.gorski@gmail.com>
-To: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	=?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 7/7] net: dsa: b53: allow VID 0 for BCM5325/65
-Date: Fri, 28 Nov 2025 09:06:25 +0100
-Message-ID: <20251128080625.27181-8-jonas.gorski@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251128080625.27181-1-jonas.gorski@gmail.com>
-References: <20251128080625.27181-1-jonas.gorski@gmail.com>
+	s=arc-20240116; t=1764318084; c=relaxed/simple;
+	bh=AdekLcG7GqFd0zXze/fg+up7Ax95SZCCQWtu33K7Uug=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PuAlBjzNOR5I+C3H/9rnsyF1TZQ6aNjsOmwfMqtibH7YSGTKTZrl2oFg4GRoNC19F3BdgHFF37WZhbNGECs9CdRQshrmgiWYwb6wQ2zJgbIhEE2SRJHfaB2BLPMZ6OJd3QxwnxrW715VW44LD7WEvfiDZFcGHiw5an60wfZgGJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KJaaVBRy; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764318081;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=KKgF0At3T0HdCWd5M90J6uZEDhRAo1+0Ul43YUDqtPI=;
+	b=KJaaVBRyQHSnZCyun2lsxOgBK/kjze9Iw5x4iRCjGkkBQefhMOeF061VbNNPxdAdL9Cz7+
+	ErAYyt3waqY7lDwZ4ytjsV2WHfGYBjcc8xVrhOaYuE6Bn3BpMPtl6zQVBC9vcRmiq0/bt8
+	ZBO5mq6s7Sxv+F8fSZh730rRks4vNrk=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-517-6eCKOMHFMpmCpH__rJnQ0Q-1; Fri,
+ 28 Nov 2025 03:21:17 -0500
+X-MC-Unique: 6eCKOMHFMpmCpH__rJnQ0Q-1
+X-Mimecast-MFC-AGG-ID: 6eCKOMHFMpmCpH__rJnQ0Q_1764318075
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5CFF51800447;
+	Fri, 28 Nov 2025 08:21:15 +0000 (UTC)
+Received: from thinkpad (unknown [10.45.225.196])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D07C619560B0;
+	Fri, 28 Nov 2025 08:21:09 +0000 (UTC)
+Date: Fri, 28 Nov 2025 09:21:05 +0100
+From: Felix Maurer <fmaurer@redhat.com>
+To: Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, jkarrenpalo@gmail.com,
+	arvid.brodin@alten.se, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
+	linux-kernel-mentees@lists.linux.dev, david.hunter.linux@gmail.com,
+	khalid@kernel.org,
+	syzbot+2fa344348a579b779e05@syzkaller.appspotmail.com,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net v2] net/hsr: fix NULL pointer dereference in
+ skb_clone with hw tag insertion
+Message-ID: <aSlbccUo_YwqehWL@thinkpad>
+References: <20251127163219.40389-1-ssrane_b23@ee.vjti.ac.in>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251127163219.40389-1-ssrane_b23@ee.vjti.ac.in>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Now that writing ARL entries works properly, we can actually use VID 0
-as the default untagged VLAN for BCM5325 and BCM5365 as well.
+On Thu, Nov 27, 2025 at 10:02:19PM +0530, Shaurya Rane wrote:
+> When NETIF_F_HW_HSR_TAG_INS is enabled and frame->skb_std is NULL,
+> hsr_create_tagged_frame() and prp_create_tagged_frame() call skb_clone()
+> with a NULL pointer.
 
-So use 0 as default PVID for all chips and do not reject VLAN 0 anymore,
-which we ignored since commit 45e9d59d3950 ("net: dsa: b53: do not allow
-to configure VLAN 0") anyway.
+Have you acually tested this or do you have any other indication that
+this can happen? After all, you are suggesting that this kernel crash in
+a syzbot VM is caused by a (very uncommon) feature of hardware NICs.
 
-Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
----
- * just let b53_default_pvid() return 0 instead of replacing its call
-   everywhere
- * drop the explicit rejection of VID 0 for bcm5325/65
- * reword and expand the commit message a bit
+> Similarly, prp_get_untagged_frame() doesn't check
+> if __pskb_copy() fails before calling skb_clone().
 
- drivers/net/dsa/b53/b53_common.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+I suspect that this is really the only condition that can trigger the
+crash in question. This would also match that the syzbot reproducer hits
+this with a PRP interface (IFLA_HSR_PROTOCOL=0x1).
 
-diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
-index ac995f36ed95..a1a177713d99 100644
---- a/drivers/net/dsa/b53/b53_common.c
-+++ b/drivers/net/dsa/b53/b53_common.c
-@@ -872,10 +872,7 @@ static void b53_enable_stp(struct b53_device *dev)
- 
- static u16 b53_default_pvid(struct b53_device *dev)
- {
--	if (is5325(dev) || is5365(dev))
--		return 1;
--	else
--		return 0;
-+	return 0;
- }
- 
- static bool b53_vlan_port_needs_forced_tagged(struct dsa_switch *ds, int port)
-@@ -1699,9 +1696,6 @@ static int b53_vlan_prepare(struct dsa_switch *ds, int port,
- {
- 	struct b53_device *dev = ds->priv;
- 
--	if ((is5325(dev) || is5365(dev)) && vlan->vid == 0)
--		return -EOPNOTSUPP;
--
- 	/* Port 7 on 7278 connects to the ASP's UniMAC which is not capable of
- 	 * receiving VLAN tagged frames at all, we can still allow the port to
- 	 * be configured for egress untagged.
--- 
-2.43.0
+> This causes a kernel crash reported by Syzbot:
+>
+> Oops: general protection fault, probably for non-canonical address 0xdffffc000000000f: 0000 [#1] SMP KASAN NOPTI
+> KASAN: null-ptr-deref in range [0x0000000000000078-0x000000000000007f]
+> CPU: 0 UID: 0 PID: 5625 Comm: syz.1.18 Not tainted syzkaller #0 PREEMPT(full)
+> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+> RIP: 0010:skb_clone+0xd7/0x3a0 net/core/skbuff.c:2041
+> Code: 03 42 80 3c 20 00 74 08 4c 89 f7 e8 23 29 05 f9 49 83 3e 00 0f 85 a0 01 00 00 e8 94 dd 9d f8 48 8d 6b 7e 49 89 ee 49 c1 ee 03 <43> 0f b6 04 26 84 c0 0f 85 d1 01 00 00 44 0f b6 7d 00 41 83 e7 0c
+> RSP: 0018:ffffc9000d00f200 EFLAGS: 00010207
+> RAX: ffffffff892235a1 RBX: 0000000000000000 RCX: ffff88803372a480
+> RDX: 0000000000000000 RSI: 0000000000000820 RDI: 0000000000000000
+> RBP: 000000000000007e R08: ffffffff8f7d0f77 R09: 1ffffffff1efa1ee
+> R10: dffffc0000000000 R11: fffffbfff1efa1ef R12: dffffc0000000000
+> R13: 0000000000000820 R14: 000000000000000f R15: ffff88805144cc00
+> FS:  0000555557f6d500(0000) GS:ffff88808d72f000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000555581d35808 CR3: 000000005040e000 CR4: 0000000000352ef0
+> Call Trace:
+>  <TASK>
+>  hsr_forward_do net/hsr/hsr_forward.c:-1 [inline]
+>  hsr_forward_skb+0x1013/0x2860 net/hsr/hsr_forward.c:741
+>  hsr_handle_frame+0x6ce/0xa70 net/hsr/hsr_slave.c:84
+>  __netif_receive_skb_core+0x10b9/0x4380 net/core/dev.c:5966
+>  __netif_receive_skb_one_core net/core/dev.c:6077 [inline]
+>  __netif_receive_skb+0x72/0x380 net/core/dev.c:6192
+>  netif_receive_skb_internal net/core/dev.c:6278 [inline]
+>  netif_receive_skb+0x1cb/0x790 net/core/dev.c:6337
+>  tun_rx_batched+0x1b9/0x730 drivers/net/tun.c:1485
+>  tun_get_user+0x2b65/0x3e90 drivers/net/tun.c:1953
+>  tun_chr_write_iter+0x113/0x200 drivers/net/tun.c:1999
+>  new_sync_write fs/read_write.c:593 [inline]
+>  vfs_write+0x5c9/0xb30 fs/read_write.c:686
+>  ksys_write+0x145/0x250 fs/read_write.c:738
+>  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>  do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> RIP: 0033:0x7f0449f8e1ff
+> Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 f9 92 02 00 48 8b 54 24 18 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 31 44 89 c7 48 89 44 24 08 e8 4c 93 02 00 48
+> RSP: 002b:00007ffd7ad94c90 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
+> RAX: ffffffffffffffda RBX: 00007f044a1e5fa0 RCX: 00007f0449f8e1ff
+> RDX: 000000000000003e RSI: 0000200000000500 RDI: 00000000000000c8
+> RBP: 00007ffd7ad94d20 R08: 0000000000000000 R09: 0000000000000000
+> R10: 000000000000003e R11: 0000000000000293 R12: 0000000000000001
+> R13: 00007f044a1e5fa0 R14: 00007f044a1e5fa0 R15: 0000000000000003
+>  </TASK>
+>
+> Fix this by adding NULL checks for frame->skb_std before calling
+> skb_clone() in the affected functions.
+>
+> Reported-by: syzbot+2fa344348a579b779e05@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=2fa344348a579b779e05
+> Fixes: f266a683a480 ("net/hsr: Better frame dispatch")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
+> ---
+>  net/hsr/hsr_forward.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> diff --git a/net/hsr/hsr_forward.c b/net/hsr/hsr_forward.c
+> index 339f0d220212..8a8559f0880f 100644
+> --- a/net/hsr/hsr_forward.c
+> +++ b/net/hsr/hsr_forward.c
+> @@ -205,6 +205,8 @@ struct sk_buff *prp_get_untagged_frame(struct hsr_frame_info *frame,
+>  				__pskb_copy(frame->skb_prp,
+>  					    skb_headroom(frame->skb_prp),
+>  					    GFP_ATOMIC);
+> +			if (!frame->skb_std)
+> +				return NULL;
+>  		} else {
+>  			/* Unexpected */
+>  			WARN_ONCE(1, "%s:%d: Unexpected frame received (port_src %s)\n",
+
+This check looks good to me.
+
+> @@ -341,6 +343,8 @@ struct sk_buff *hsr_create_tagged_frame(struct hsr_frame_info *frame,
+>  		hsr_set_path_id(frame, hsr_ethhdr, port);
+>  		return skb_clone(frame->skb_hsr, GFP_ATOMIC);
+>  	} else if (port->dev->features & NETIF_F_HW_HSR_TAG_INS) {
+> +		if (!frame->skb_std)
+> +			return NULL;
+>  		return skb_clone(frame->skb_std, GFP_ATOMIC);
+>  	}
+>
+> @@ -385,6 +389,8 @@ struct sk_buff *prp_create_tagged_frame(struct hsr_frame_info *frame,
+>  		}
+>  		return skb_clone(frame->skb_prp, GFP_ATOMIC);
+>  	} else if (port->dev->features & NETIF_F_HW_HSR_TAG_INS) {
+> +		if (!frame->skb_std)
+> +			return NULL;
+>  		return skb_clone(frame->skb_std, GFP_ATOMIC);
+>  	}
+
+If any of these two conditions happen we have a different, serious
+problem that needs to be fixed elsewhere.
+
+In hsr_create_tagged_frame(), we first check if we have an skb_hsr (an
+skb containing an already tagged message). If we don't, it has to be an
+skb_std (an skb without any tag). If !skb_std, we are either 1) handing
+around a frame without any skb; or 2) handing a PRP frame to an HSR
+function. In both cases, this would need to be fixed where the problem
+is introduced.
+
+Thanks,
+   Felix
 
 
