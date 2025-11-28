@@ -1,62 +1,56 @@
-Return-Path: <netdev+bounces-242469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C70CC90971
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 03:11:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BA70DC909B4
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 03:17:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 45B53342BF9
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 02:11:33 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2746C342F55
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 02:17:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3EA61E3DDE;
-	Fri, 28 Nov 2025 02:11:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6D361A840A;
+	Fri, 28 Nov 2025 02:17:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tjMCBhTR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WaIA7XpY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA061D9346
-	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 02:11:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBA782AEE4;
+	Fri, 28 Nov 2025 02:17:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764295889; cv=none; b=B98nZFFLY4xXSZFXk7DKKz5pfjXR0FyObRrJT/aGME9eqn5Wwfg726bFv01alnMSaRmpHj/Ue6afyFXYqAIre1R3A6lV9Qr/q82zzo9D2J9Zu2EwmgHuRg1jhnFrcwA80GXVAwzbG0fG0bMLmto+J9NYy7uXmU1CGVN7D4qdYSY=
+	t=1764296265; cv=none; b=mZdbRxS/4KWG7BLMQu9R6x3Y0UpK0LGuV+j7SF6MsrR/DR5CtMLppgHsWpxDITMC8/JX5ltfu8DvZ5n0oM6Jco80SphNBG63YFrXwiauBXO/UzPQ2JduIQNy9MjkFLat6nsBgllkMyzb0ul1ID1kwiAyLXXMcP9feGZe5mRo+18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764295889; c=relaxed/simple;
-	bh=TkmPFlH4dLbLupR99jE6HJGld/tA3KOdzlC3Zw+aUVg=;
+	s=arc-20240116; t=1764296265; c=relaxed/simple;
+	bh=SzV7gS7eT16VNQgode+21fYqzP9alV9kbhEuiViEoLc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=di16vp9eBQrQ7DLhNQNicBAL9/y/SCvE2b+U3jHYrI6qOCng0eHxRXC/2ttmGkgOmmyweecy3odSad0oK2NV8SOa7030NMkOKpneKBj+3QmX0yCMqeGlElRgktG16/buMsvxEmiTSksr4X11AmoaXlkMPUXD+hiN48eGYGZV+oI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tjMCBhTR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B5AEC4CEF8;
-	Fri, 28 Nov 2025 02:11:28 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ChCwfCwVvvpkF6nnVP1CQrmyryMIJubYNtiiOey1bGu86tNKcP2W4Jwo2+MeevwgTH3N3O2x1KTqU0hMHwt/TYQELolb6LIxHZUqCDHaDb6SwKCAQCTfmavUBoPo+bGHa+Qce4VrkqIIKz832bbLqJvShpQQT54Dd6cx5BdTtM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WaIA7XpY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAEC3C4CEF8;
+	Fri, 28 Nov 2025 02:17:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764295889;
-	bh=TkmPFlH4dLbLupR99jE6HJGld/tA3KOdzlC3Zw+aUVg=;
+	s=k20201202; t=1764296265;
+	bh=SzV7gS7eT16VNQgode+21fYqzP9alV9kbhEuiViEoLc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tjMCBhTRHP0wGjCRE/bejtH8pwNgI7LLuHSPa6tU4s6YR3231kKQIngu8rFDhOZSF
-	 gJXPco2rRzyGApBjI91gRgedDW5WIxu63bQd4HPUb9Imp5NvYM589p+AiWtECMJEBJ
-	 ZqoiWYQb/oyq84EjtoqgoF2hd4++T6ooI+Ppsiqo1vaJUMUYvqfkHIphlQAiEOHsPs
-	 JmpNwP/uxGYJVF4QDIbgnURuB5j7bKS2qWaVd2SH7RkRhN75076KkrMhMdGzRj2F1z
-	 RCoDC/+9SZdby94ffMNlJcz6PzxqOvnh26cbuNMvnmV4WzCxxnTtO+rdwSiuE4tKA6
-	 SRG1edvR3An4Q==
-Date: Thu, 27 Nov 2025 18:11:27 -0800
+	b=WaIA7XpYYx5ZLn/vi2dD2KdoJVTlG+SjHi8n4BDDSdBQb2HHu7c9QLrgEA5djDHXl
+	 yErlCwNUOSUSvEdmwsghQeyIzIiJ4fwjLLw5NroOnaifBvpmwOvPYZWfwIjMr+Oe1f
+	 F6adfMqjtJbXmO5JUZWbKRhaXSrj36omgvbVN/fM1DMxcvAsUsnZFpDB+c/0dFTPAb
+	 nqlonrc2EPc9V9Dw5C4x2LVI5ALVRMQVXgqbWYOoIDi1li7OtmrFI9IR5th4KTtf+4
+	 AenLbKQsXO790lyctulqyeuqBqBcq48Ijzut98LScKKbwIpbvohI9RZwT4XojoCrvg
+	 L5zBBGL2cqMzw==
+Date: Thu, 27 Nov 2025 18:17:43 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik
- <kadlec@netfilter.org>
-Cc: Heiko Carstens <hca@linux.ibm.com>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Florian Westphal
- <fw@strlen.de>, "D . Wythe" <alibuda@linux.alibaba.com>, Dust Li
- <dust.li@linux.alibaba.com>, Sidraya Jayagond <sidraya@linux.ibm.com>,
- Wenjia Zhang <wenjia@linux.ibm.com>, Alexandra Winter
- <wintera@linux.ibm.com>, Thorsten Winkler <twinkler@linux.ibm.com>,
- netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: Remove KMSG_COMPONENT macro
-Message-ID: <20251127181127.5f89447b@kernel.org>
-In-Reply-To: <20251126140705.1944278-1-hca@linux.ibm.com>
-References: <20251126140705.1944278-1-hca@linux.ibm.com>
+To: Clara Engler <cve@cve.cx>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org
+Subject: Re: [PATCH] ipv4: Fix log message for martian source
+Message-ID: <20251127181743.2bdf214b@kernel.org>
+In-Reply-To: <aSd4Xj8rHrh-krjy@4944566b5c925f79>
+References: <aSd4Xj8rHrh-krjy@4944566b5c925f79>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,11 +60,20 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 26 Nov 2025 15:07:05 +0100 Heiko Carstens wrote:
->  net/iucv/af_iucv.c                      | 3 +--
->  net/iucv/iucv.c                         | 3 +--
->  net/netfilter/ipvs/ip_vs_app.c          | 3 +--
->  net/netfilter/ipvs/ip_vs_conn.c         | 3 +--
+On Wed, 26 Nov 2025 22:59:58 +0100 Clara Engler wrote:
+> @@ -1796,7 +1796,7 @@ static void ip_handle_martian_source(struct net_device *dev,
+>  		 *	the only hint is MAC header.
+>  		 */
+>  		pr_warn("martian source %pI4 from %pI4, on dev %s\n",
+> -			&daddr, &saddr, dev->name);
+> +			&saddr, &daddr, dev->name);
 
-Jozsef, Pablo, should we ask the author to split this up or just apply as is?
+imagine there was another comma in this print:
+
+	martian source, %pI4 from %pI4, on dev %s
+
+we should leave it as is, I think.
+People may be grepping logs for this exact format..
+-- 
+pw-bot: reject
 
