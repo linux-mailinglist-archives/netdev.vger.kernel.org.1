@@ -1,155 +1,105 @@
-Return-Path: <netdev+bounces-242516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242519-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FF76C913BB
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 09:38:50 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C45FC913FA
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 09:40:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 113C34E9F6F
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 08:36:37 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1164A4E631C
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 08:37:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B35B62E8B6F;
-	Fri, 28 Nov 2025 08:34:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 776D52E6CDF;
+	Fri, 28 Nov 2025 08:37:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="jL2lRw+t"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Z8U6qp+Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6545D2E718B
-	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 08:34:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D8142DF143
+	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 08:37:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764318868; cv=none; b=k9zd9bddf9VGngK85H5h5lsrE99kfSh5LcduImqrxLfiNE6Lm/YmV4zIMs5zI+hV4y8QWDp0qxOtOPC1kqDb9HPrS8UKPFRJrkM37cXEggLLPaSiKwKsmR3S8eiMiz4zFUwDZTbqzFaPDmlIP4cHAO2a09s0wDuy+orlH1182bo=
+	t=1764319053; cv=none; b=utrlXvp/BsndcC7cpusQ2iXSHbpAlkf7O+0zoq/M+wlqJkTS79lzjjqfgzceP2aaxezGAGNCJL3xgsc3JBNMeq4R5RF0jsnbrmf8poxcDFnPVDGKwsznV5+nMKpksBLIlYwxNGurdK6KNzeXXUv5jgr32K3MPFoGSB2a2T9+9l0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764318868; c=relaxed/simple;
-	bh=Us60MkmM1JBxfHUQhViQbEpdjWLDx5b8qa9Za3ab5F0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r1TWiuD7Zfo5TWucBWjf5eTTMKAgs3x1iBfxS0UAJ6in0eUas5vY8djnpDtpUTewnYjc11cngiEkSPlydmRjvafE77MyjKcgD9Q6DDyO51Y9qDsu1+7ZA/Mm+j5w0B2zCwocn/GuyIq40iFrC6MinA+x0spC8QFPrkbUzlVFaIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=jL2lRw+t; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 671B4C16A36;
-	Fri, 28 Nov 2025 08:34:01 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 3542F60706;
-	Fri, 28 Nov 2025 08:34:24 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 98471103C8EF1;
-	Fri, 28 Nov 2025 09:34:13 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1764318862; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=tgzdODyZLz4GqNmYM3p+s4koXLC462zunCov83SK9t0=;
-	b=jL2lRw+ta61DisBvuQJKHw75eiScP4u/1eTq3Dj/KyRjxC3HVIySdyvLe8gSIopegLCoT/
-	+Uia2DSqjS8XMe8u1I2OTmhBnCvSELWEu+5Ehg+vwRe6VOy+dmWcv/qVFteEOwoB2G+t2r
-	joPlaQWkBOl8qiD1HuDQFn7nSwQgb/S/Ei2ayADTXDtoxlOav4V4ZnWfrtBn7k7BOkgWDC
-	KID8FwOyJXvlt1wtcFRKgExuatU20+T1XHrO5LSpGMdbMe682d6vpu+kX5RDlTr+F3PhvL
-	BsTDqkzZGLpxkRR0H8HwX3fiM4cVIesD2WLVhzB4FFz6ZAlzdjfggDZ6b5O64A==
-Message-ID: <b8d12481-2637-470d-a3f1-784c0d7b4b3e@bootlin.com>
-Date: Fri, 28 Nov 2025 09:34:12 +0100
+	s=arc-20240116; t=1764319053; c=relaxed/simple;
+	bh=9i+ZOslImSzH+rtTb32TMEw6DQ2RdZx+xwT+FK6/hBM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BCPrGcJFObVCoFbID5QZMp/mSXDO0PiA4gbeCiyTWv4VI1VgeTiu2hJ0a7F2XxozQvM6jFfLUbsK/VTY5IJ4QHtc9DKuok2/lPmJIr/kTHf5omLHnXBjg28rhTZj+i3XFLSt80QbdZmwOp+x6bWDFDUO5SFWZybWsiTSgLMKCkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Z8U6qp+Z; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1764319046;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=AyCpr73GW8D3C48mDnr3WbOCxeZIjoR/nJdSxDsAdd8=;
+	b=Z8U6qp+ZG8Kh9H8cEXi372x0/esxUPuU5GVuZBDLvbFQrOBF5Lc/+7zdBVgCs2ZZ4cpBec
+	ErznVfrMxkj8BiqH3nlIFaDf3Zalb60kiHmSVWqW8CicvSGM0rBPfL1v7DxDSARjpd2/In
+	gEl4GmftFAfRvAvXBi6CK2QSIunK6PA=
+From: Fushuai Wang <fushuai.wang@linux.dev>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	wangfushuai@baidu.com,
+	Fushuai Wang <fushuai.wang@linux.dev>
+Subject: [PATCH] rtnl: Add guard support
+Date: Fri, 28 Nov 2025 16:34:55 +0800
+Message-Id: <20251128083455.67474-1-fushuai.wang@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v20 01/14] dt-bindings: net: Introduce the
- ethernet-connector description
-To: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>, davem@davemloft.net,
- Daniel Golle <daniel@makrotopia.org>, Florian Fainelli
- <f.fainelli@gmail.com>, Romain Gantois <romain.gantois@bootlin.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
- Herve Codina <herve.codina@bootlin.com>, =?UTF-8?Q?Marek_Beh=C3=BAn?=
- <kabel@kernel.org>, mwojtas@chromium.org, Antoine Tenart
- <atenart@kernel.org>, linux-arm-kernel@lists.infradead.org,
- =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
- thomas.petazzoni@bootlin.com, Russell King <linux@armlinux.org.uk>,
- Simon Horman <horms@kernel.org>, linux-arm-msm@vger.kernel.org,
- Eric Dumazet <edumazet@google.com>, Vladimir Oltean
- <vladimir.oltean@nxp.com>, Conor Dooley <conor+dt@kernel.org>,
- =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
- Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- devicetree@vger.kernel.org, Tariq Toukan <tariqt@nvidia.com>
-References: <20251127171800.171330-1-maxime.chevallier@bootlin.com>
- <20251127171800.171330-2-maxime.chevallier@bootlin.com>
- <176426738405.367554.14295793625592890396.robh@kernel.org>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <176426738405.367554.14295793625592890396.robh@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi,
+Introduce guard support to simplify the usage of the
+lock about rtnl.
 
-On 27/11/2025 19:16, Rob Herring (Arm) wrote:
-> 
-> On Thu, 27 Nov 2025 18:17:44 +0100, Maxime Chevallier wrote:
->> The ability to describe the physical ports of Ethernet devices is useful
->> to describe multi-port devices, as well as to remove any ambiguity with
->> regard to the nature of the port.
->>
->> Moreover, describing ports allows for a better description of features
->> that are tied to connectors, such as PoE through the PSE-PD devices.
->>
->> Introduce a binding to allow describing the ports, for now with 2
->> attributes :
->>
->>  - The number of pairs, which is a quite generic property that allows
->>    differentating between multiple similar technologies such as BaseT1
->>    and "regular" BaseT (which usually means BaseT4).
->>
->>  - The media that can be used on that port, such as BaseT for Twisted
->>    Copper, BaseC for coax copper, BaseS/L for Fiber, BaseK for backplane
->>    ethernet, etc. This allows defining the nature of the port, and
->>    therefore avoids the need for vendor-specific properties such as
->>    "micrel,fiber-mode" or "ti,fiber-mode".
->>
->> The port description lives in its own file, as it is intended in the
->> future to allow describing the ports for phy-less devices.
->>
->> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
->> Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
->> Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
->> Tested-by: Christophe Leroy <christophe.leroy@csgroup.eu>
->> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
->> ---
->>  .../bindings/net/ethernet-connector.yaml      | 57 +++++++++++++++++++
->>  .../devicetree/bindings/net/ethernet-phy.yaml | 18 ++++++
->>  MAINTAINERS                                   |  1 +
->>  3 files changed, 76 insertions(+)
->>  create mode 100644 Documentation/devicetree/bindings/net/ethernet-connector.yaml
->>
-> 
-> My bot found errors running 'make dt_binding_check' on your patch:
-> 
-> yamllint warnings/errors:
-> 
-> dtschema/dtc warnings/errors:
-> Documentation/devicetree/bindings/thermal/thermal-zones.example.dtb: /example-0/soc/thermal-sensor@c263000: failed to match any schema with compatible: ['qcom,sdm845-tsens', 'qcom,tsens-v2']
-> Documentation/devicetree/bindings/thermal/thermal-zones.example.dtb: /example-0/soc/thermal-sensor@c263000: failed to match any schema with compatible: ['qcom,sdm845-tsens', 'qcom,tsens-v2']
-> Documentation/devicetree/bindings/thermal/thermal-zones.example.dtb: /example-0/soc/thermal-sensor@c265000: failed to match any schema with compatible: ['qcom,sdm845-tsens', 'qcom,tsens-v2']
-> Documentation/devicetree/bindings/thermal/thermal-zones.example.dtb: /example-0/soc/thermal-sensor@c265000: failed to match any schema with compatible: ['qcom,sdm845-tsens', 'qcom,tsens-v2']
-> Documentation/devicetree/bindings/thermal/thermal-sensor.example.dtb: /example-0/soc/thermal-sensor@c263000: failed to match any schema with compatible: ['qcom,sdm845-tsens', 'qcom,tsens-v2']
-> Documentation/devicetree/bindings/thermal/thermal-sensor.example.dtb: /example-0/soc/thermal-sensor@c263000: failed to match any schema with compatible: ['qcom,sdm845-tsens', 'qcom,tsens-v2']
-> Documentation/devicetree/bindings/thermal/thermal-sensor.example.dtb: /example-0/soc/thermal-sensor@c265000: failed to match any schema with compatible: ['qcom,sdm845-tsens', 'qcom,tsens-v2']
-> Documentation/devicetree/bindings/thermal/thermal-sensor.example.dtb: /example-0/soc/thermal-sensor@c265000: failed to match any schema with compatible: ['qcom,sdm845-tsens', 'qcom,tsens-v2']
+Signed-off-by: Fushuai Wang <wangfushuai@baidu.com>
+---
+ include/linux/rtnetlink.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-Hmm I don't see the connection between this error and my patch...
-
-Make dt_binding_check doesn't show any issue related to the binding
-introduced by this patch :(
-
-Maxime
-
+diff --git a/include/linux/rtnetlink.h b/include/linux/rtnetlink.h
+index ea39dd23a197..61e727c35927 100644
+--- a/include/linux/rtnetlink.h
++++ b/include/linux/rtnetlink.h
+@@ -7,6 +7,7 @@
+ #include <linux/netdevice.h>
+ #include <linux/wait.h>
+ #include <linux/refcount.h>
++#include <linux/cleanup.h>
+ #include <uapi/linux/rtnetlink.h>
+ 
+ extern int rtnetlink_send(struct sk_buff *skb, struct net *net, u32 pid, u32 group, int echo);
+@@ -158,6 +159,16 @@ static inline void ASSERT_RTNL_NET(struct net *net)
+ 	rcu_replace_pointer_rtnl(rp, p)
+ #endif
+ 
++DEFINE_LOCK_GUARD_0(rtnl, rtnl_lock(), rtnl_unlock())
++
++DEFINE_GUARD(__rtnl_net, struct net *, __rtnl_net_lock(_T),
++	     __rtnl_net_unlock(_T))
++
++DEFINE_GUARD(rtnl_net, struct net *, rtnl_net_lock(_T),
++	     rtnl_net_unlock(_T))
++DEFINE_GUARD_COND(rtnl_net, _try, rtnl_net_trylock(_T))
++DEFINE_GUARD_COND(rtnl_net, _kill, rtnl_net_lock_killable(_T), _RET == 0)
++
+ static inline struct netdev_queue *dev_ingress_queue(struct net_device *dev)
+ {
+ 	return rtnl_dereference(dev->ingress_queue);
+-- 
+2.36.1
 
 
