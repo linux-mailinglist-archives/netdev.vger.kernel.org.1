@@ -1,141 +1,163 @@
-Return-Path: <netdev+bounces-242536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4504FC91925
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 11:09:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23218C91AA9
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 11:35:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 095754E4961
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 10:08:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B85E23A2FFA
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 10:35:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CE593093C1;
-	Fri, 28 Nov 2025 10:08:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F8B730E82D;
+	Fri, 28 Nov 2025 10:34:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="YDibelj0";
-	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="Cj1IbLv8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L534N7tR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.53])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E39DA3093BC;
-	Fri, 28 Nov 2025 10:08:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764324525; cv=pass; b=BfaHn1z3Lfkb+OdIYLcvwtkQCqnOfFmGiobqyZWIxlD5kRkg5Sih1O9FWHChOByNSBawqwRlaANZUMjEjL5GXp97kyq1AHaDCg5brYF2BAVKkavOqxQeM7B5e6VOj0EnWMAaSEAsDskL7STJnKg2T8CpxodHt7IVWiR+FSSuXcw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764324525; c=relaxed/simple;
-	bh=BDhEwiNMvCsw1e+L7fXg3zof9WO0GC2k06hQKyCEx9I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HwXM9BTyyfpKaYjSXvQTGYdOEm6A5quLnfqf9zifrQsJU83d9e+h29DiePNbtdIUxWzZWumvrJDaAfo1vhMa54o6/JZuzt3qyUxpalmNmVUO8GXCKaV2MVnlUPrTbRjq2OewS4nPhkLMiBdwDI2Iqi/zpPi6Lv9muD3zonfnyz8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=YDibelj0; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=Cj1IbLv8; arc=pass smtp.client-ip=85.215.255.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
-ARC-Seal: i=1; a=rsa-sha256; t=1764324500; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=WPuDPTAAaGNs9zYPGFpcH74HY1MLff7ZVlEzyFMWVCDipRdQHuFBkg5E3rFTWKKX6y
-    Gla46LbET/Mt98jjOaRLS6QFlDo8XBZ/dY62IQRZZ9SFJmb1z6bCsN0nKzITMbSsqzhZ
-    ZtEZRzaVlIBikdDTBupAvVBHtUQUCSU2YOvauBl8Ck36j5jPPVBWOEi8SfdkjBeeVPcd
-    RTXJS5P5V3ha2t3hcJn5brO1aGjSnduy/z30Ygldni2jMAiAlDQTk7X6DJLwjvaclIfp
-    EzE5Ir4yVxtP7NVmi4hd965sFyqZEZW6gVF4IGPK5NjOnsRpzGZCr08uNRqmlsod1bwB
-    sDDw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1764324500;
-    s=strato-dkim-0002; d=strato.com;
-    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
-    bh=OFpluY9Z9z4FiIIa1eg7NoQirZeau3C11jdEeP4BnBE=;
-    b=Yx2X/V6p2wU1oECF6W3cHqpKE0cMUt90LsY7C87yVebCeeWl4mU4gvXtJ8cgg2FxUu
-    ilOvXE2AVPZUNDCqtWeFThXEgBFdycJkqRSLWoWXPYE+TTs1OkNVuZEwoJ9ixqjO/kmn
-    ML1XjNaXYNAn7EcQdLjhVEgAOipukPZ9NB7wNDKDjw9BWHa19LD/OZSHlRyhTYr6e0mA
-    sMnUyP6rZlaANxtSl0Dqxr0AMU6ZZAH5N9cywfPa51mmJdTKmgSGeYV+fZI2J6IV97xe
-    le3/cVcQ3UsH/aaWP7YWq5wjoJgKcndFknygdhWImuzod2jaQ5wMjU+izLaUota2JSFB
-    w7eg==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1764324500;
-    s=strato-dkim-0002; d=hartkopp.net;
-    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
-    bh=OFpluY9Z9z4FiIIa1eg7NoQirZeau3C11jdEeP4BnBE=;
-    b=YDibelj0MtAie0CVzSsk3OvWVIsrIJupQ/wju3gFsSkz2IqLZ7TG9aG7jM6luGdH27
-    FlElBpILwS8YDOWCRuAnuAkT5JK1FWqKFX83oR6PjRvH3oc5RwpQOhjeR8eHViSx3JVa
-    Evt6t2oD4kGsQfs980aVY0Kf7DNHjEKbPBrE9sc2Dd9wpGleSrEL3cGrpCF0N2Z0dvAm
-    NyyqwS3yCdxDv2vOsMDQNpJ9ftruiuPkQdDSNUFLhtXVrhSIfDmVmuw1ME6oxK/zBfUi
-    xB/t8DLpQh1mzUBJ4TgAI02vTUrAqB5E3UgJTS4OrOkuyv/H6S/KXwJF0lvBerylN5Ic
-    5PVg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1764324500;
-    s=strato-dkim-0003; d=hartkopp.net;
-    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
-    bh=OFpluY9Z9z4FiIIa1eg7NoQirZeau3C11jdEeP4BnBE=;
-    b=Cj1IbLv8y/XqktDDrpWpip8CSqgS7xbrSKywZN2mdvqRvzw4oVz+oGYc741rcE2oVb
-    4+h/Y/TalbunG+a7hRAA==
-X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tTUsMrZpkO3Mw3lZ/t54cFxeEQ7s8bGWj0Q=="
-Received: from lenov17.lan
-    by smtp.strato.de (RZmta 54.0.0 AUTH)
-    with ESMTPSA id Ke2b461ASA8KesL
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Fri, 28 Nov 2025 11:08:20 +0100 (CET)
-From: Oliver Hartkopp <socketcan@hartkopp.net>
-To: linux-can@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	kernel@pengutronix.de,
-	mkl@pengutronix.de,
-	Oliver Hartkopp <socketcan@hartkopp.net>,
-	Vincent Mailhol <mailhol@kernel.org>
-Subject: [can-next] can: Kconfig: select CAN driver infrastructure by default
-Date: Fri, 28 Nov 2025 11:08:03 +0100
-Message-ID: <20251128100803.65707-1-socketcan@hartkopp.net>
-X-Mailer: git-send-email 2.47.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46C1F309DDC;
+	Fri, 28 Nov 2025 10:34:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764326086; cv=none; b=Tz+pHsprn0NXflujc3GVAbXuZX4SDq2LbGghE1Lj+Sctztak/PLmhYnCEXuAwQUD208XYhiEyNPRUgCv2WmEs7KoeprDr+SHLC8EnizLkR4gScxhofbOWuNOCtGrk48VS6nOpKy55Ves8GIQQ4LAd9g+uFmWyEu6D9oFNbvW7Ac=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764326086; c=relaxed/simple;
+	bh=T8rMJ9WQqCt8iW4inKGGya8zVOnvpEEz3CtrHRql3ho=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=B4/bwyu3Im1eB+WX1vBS78YsL1dceCA9dXE2aUI7ibTOs6tdeDjbxuLowQz9iEHg34MJGor1r1WmN8F1WS64q9VoJEuJzwilkZuHvg2CwjXQMyYCNBaEuYiyvlkAu3q64a9lSh6POUccM2qRnSPFG+qhmT20spZPi7h0EXGvd4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L534N7tR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F779C4CEF1;
+	Fri, 28 Nov 2025 10:34:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764326085;
+	bh=T8rMJ9WQqCt8iW4inKGGya8zVOnvpEEz3CtrHRql3ho=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=L534N7tR4Sj3EszcNh91K/KXrjAqxIIXhxLjSgBzebXP5EhbP5hcZTai4AZe1cUDl
+	 zj/qCyRsCSoAzVtNaDqCV/GFUduUCKmXA7NNKWLtFCwAkjZbnGKRDSMQfPA9hLXY/5
+	 5CIXWe6Nj5xSuZfykZBxXTKgJ2iua1nsgbaQdenTIwFDlt/eWMbXboSNxPBjQFl1P9
+	 AMLOQ18HAKSQWmlya1GGCkevDI/PobDcgxEJzmjD+6u3zt8uYE0YCYrAjxFrm6Vr78
+	 V4wtFXZ7ITaXW+doRRgeV1NQhKiK9YDPmyAIt7pHe+8vJGVUbUfNNAewGPGCm2WoC0
+	 3KpRtMsSJIdJg==
+Message-ID: <603f6c4f-20a1-4b6b-80a8-c9d9d3373d7e@kernel.org>
+Date: Fri, 28 Nov 2025 11:34:38 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="us-ascii"
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH] selftests: mptcp: initialize raw_addr to Null
+Content-Language: en-GB, fr-BE
+To: Jakub Kicinski <kuba@kernel.org>,
+ Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
+Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+ llvm@lists.linux.dev, Shuah Khan <shuah@kernel.org>,
+ Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Nathan Chancellor <nathan@kernel.org>,
+ Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>
+References: <20251126163046.58615-1-ankitkhushwaha.linux@gmail.com>
+ <795a8f3c-eff7-46d9-9175-a4ebe3f9ffd8@kernel.org>
+ <20251127170041.0613c50e@kernel.org>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20251127170041.0613c50e@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The CAN bus support enabled with CONFIG_CAN provides a socket-based
-access to CAN interfaces. With the introduction of the latest CAN protocol
-CAN XL additional configuration status information needs to be exposed to
-the network layer than formerly provided by standard Linux network drivers.
+Hi Jakub, Ankit,
 
-This requires the CAN driver infrastructure to be selected by default.
-As the CAN network layer can only operate on CAN interfaces anyway all
-distributions and common default configs enable at least one CAN driver.
+On 28/11/2025 02:00, Jakub Kicinski wrote:
+> On Wed, 26 Nov 2025 17:55:14 +0100 Matthieu Baerts wrote:
+>> I confirm this, I can reproduce the warning with Clang 21.
+>>
+>> It is indeed a false positive, because the code does that:
+>>
+>>
+>>   if (addr.ss_family == AF_INET)
+>>           raw_addr = &(((struct sockaddr_in *)&addr)->sin_addr);
+>>   else if (addr.ss_family == AF_INET6)
+>>           raw_addr = &(((struct sockaddr_in6 *)&addr)->sin6_addr);
+>>   else
+>>           xerror("bad family");
+>>
+>>
+>> "xerror()" calls "exit(1)", so "raw_addr" is never used uninitialized.
+>>
+>> I'm not sure why Clang 21 reports that now, and not before, but well,
+>> the modification you did in the selftests doesn't hurt:
+> 
+> I think annotating xerror with __noreturn is a better fix.
 
-So selecting CONFIG_CAN_DEV when CONFIG_CAN is selected by the user has
-no effect on established configurations but solves potential build issues
-when CONFIG_CAN[_XXX]=y is set together with CANFIG_CAN_DEV=m
+Good idea, I didn't know about that!
 
-Fixes: 1a620a723853 ("can: raw: instantly reject unsupported CAN frames")
-Reported-by: Vincent Mailhol <mailhol@kernel.org>
-Suggested-by: Marc Kleine-Budde <mkl@pengutronix.de>
-Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
----
- net/can/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+Thank you for the review!
 
-diff --git a/net/can/Kconfig b/net/can/Kconfig
-index af64a6f76458..e4ccf731a24c 100644
---- a/net/can/Kconfig
-+++ b/net/can/Kconfig
-@@ -3,10 +3,11 @@
- # Controller Area Network (CAN) network layer core configuration
- #
- 
- menuconfig CAN
- 	tristate "CAN bus subsystem support"
-+	select CAN_DEV
- 	help
- 	  Controller Area Network (CAN) is a slow (up to 1Mbit/s) serial
- 	  communications protocol. Development of the CAN bus started in
- 	  1983 at Robert Bosch GmbH, and the protocol was officially
- 	  released in 1986. The CAN bus was originally mainly for automotive,
+> Including kselftest.h will be needed.
+
+Because mptcp_connect.c is a tool that is used by other selftests, but
+it doesn't interact directly with the selftests, maybe we don't need to
+include it, and only add this #define in mptcp_connect.c?
+
+  #define __noreturn __attribute__((__noreturn__))
+
+(I don't know if a #ifndef/#endif is needed.)
+
+That's a detail, I guess either is fine and shouldn't cause other issues.
+
+Cheers,
+Matt
 -- 
-2.47.3
+Sponsored by the NGI0 Core fund.
 
 
