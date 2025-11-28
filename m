@@ -1,139 +1,167 @@
-Return-Path: <netdev+bounces-242589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35EE1C925EB
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 15:51:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C267C925FD
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 15:57:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 179714E20DC
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 14:51:25 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E6B794E1181
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 14:57:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C5C227F16C;
-	Fri, 28 Nov 2025 14:51:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF9B53093C1;
+	Fri, 28 Nov 2025 14:57:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="o26WZO/B";
-	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="OjTHfHHu"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="lbJbalB2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.54])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE7B727B336;
-	Fri, 28 Nov 2025 14:51:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764341483; cv=pass; b=DsIcNDxrAen+1b0jDv2C/0uPyAk89fxP4Oak1+tjo0sqAFSJ1NOyL7olP9Qpz2WS9ZRLN8G9JIIoQY1wSKlmeSsckboew1IR/aSflg0vG7CoWju4FOMKanIcm6Axbo66WTBoeRSbZxe+8klmffwz6SNLWG3GzDTG+ol8z1+H7/c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764341483; c=relaxed/simple;
-	bh=3FShlcCg+Pr5j1E+pNyuVtI7M+H2N+PyiCSx+4YrszU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=I+eQ9d1C/cNbiJ+Od8W8pviCadofbHd4Hv6I5rFhM6cIIA6PazCzOC5+V/sqQU+iHCxIuk1Xq+MNV55ZbUJyAPv28zSk7jzKuHNoM9cbbte/WkdMnfKt0ApnejV1sgy5jlmlbO8Y6u5yIpNfed93zrx/TrLKLvbaImOd2SV1pfE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=o26WZO/B; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=OjTHfHHu; arc=pass smtp.client-ip=85.215.255.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
-ARC-Seal: i=1; a=rsa-sha256; t=1764341459; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=gxZxGw/cEC3+v+h3QzmWxGwrK7RNLt/UbFnOpaiVhMsGExiNxlJPIroYlHNv46R466
-    rIyamhf3ek+BDmlJDECHLGYpQcTQwPBYZtHmfoH3EKh5psA7kYhvo27P4MO9Ugv3SveT
-    hBdvmyP/wV05EBSjDN/ei8FD8GI1n5vM3LTrrXg/SfS1GCDlkrz/q7koNkA91xwhrgfQ
-    3XbTG046NF8G0kTjpx1sRkbRj6abKQKZt5FS5lQ4evPiXGlmSPfFsoB+P++A0XZzuhNL
-    SgLT7rYKdu5GNr8fOFt8FTKX5h77FjDTZH1n4DOPytAFeRj34sBJ4UdnHVPdm8r5Xvjh
-    LmFA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1764341459;
-    s=strato-dkim-0002; d=strato.com;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=VlyUY3+VdrFQqkZ6djdBbXTEwwj2zJnGsCTpqBJE/OE=;
-    b=kVFpWQ0h4Fs17+p4IMkYaHtmSOpgW5X98sQmXp0jGfb/8h3Dw5OHEeO83oXEIuOtM1
-    /sUNChrt/DsuM2ZPZMoLFPSyfYiG8liWc+Uz9zmFQDsI2nhspNUzEwbBy0hzfIl+Maog
-    AnwYr6G5FCDJAS5p/4uir5YIc9wxYk+A9P/MwQlp/pUKfg7qiw7rh9lXSo1JShcmH/FP
-    e24UqDhN/y5uT5syBv6SHxuSRxEDQhxj+Fs1y4+mwHNZ7l00KPMOJDfp6bRHwRIu80fg
-    L10gXnUa++rWTmxjZXhHMRtAqE2LibI4Tbu31SDcL+X+t1OkIjaXJzzGN3PFQNyRi01Y
-    Bbyg==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1764341459;
-    s=strato-dkim-0002; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=VlyUY3+VdrFQqkZ6djdBbXTEwwj2zJnGsCTpqBJE/OE=;
-    b=o26WZO/BzzvPxf7j70tgHPlD7GS1Rmc/9GcW9FlvCP4DjXaQW7FPVRsgzyjsJcwtiD
-    Lj52+JQm8qxiSU0br2wy8Dtk75CNhi2PtZrw13mEOcIS9A312SSfNjgf4XTW5KR/EJXW
-    H3LCxbyXwY/RyfsPEy+pE6CrZirhZfwjjIoKCXdIP86kFzsByKsk8gzIBD7obDaInQFW
-    QPkPhi0doD0YQHYUeUG9Hu6oeVahBfKM5ohmAp57ewRjrRO+EkoFOqX6HOfS5B5trArQ
-    ZNJzqgIEi38RoNG2G1gTSU/eDJAxSOxKGlqIq+GPzP0MsJkTh/kVrotnujObbsvSwKk6
-    Ahmw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1764341459;
-    s=strato-dkim-0003; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=VlyUY3+VdrFQqkZ6djdBbXTEwwj2zJnGsCTpqBJE/OE=;
-    b=OjTHfHHuzZcONW07PsXFo5c1sDpTRDgxm+4FAP1BEHc/Iw2/pQDwCgbGsRAxP4zrgZ
-    i1fCiq67ENwvq8Uw5cDQ==
-X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tTUsMrZpkO3Mw3lZ/t54cFxeEQ7s8bGWj0Q=="
-Received: from [IPV6:2a00:6020:4a38:6810::9f3]
-    by smtp.strato.de (RZmta 54.0.0 AUTH)
-    with ESMTPSA id Ke2b461ASEoxg6U
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Fri, 28 Nov 2025 15:50:59 +0100 (CET)
-Message-ID: <1cc79929-ec7b-4d34-8cf3-25132da77e64@hartkopp.net>
-Date: Fri, 28 Nov 2025 15:50:52 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173671FECCD
+	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 14:57:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764341835; cv=none; b=p9zyiDIUjYV1cUlJB3bj780dupnY151mV/xvn0G6AwRi0R6GyPOGbCL0UFjS+f6hChucywyUVUz9HUSE5P+rdPygasWDO6x9XkKfnV2gxTm3Ls+bT0Hc9ztUa3lL3pAu9Au5TvDZN/VBAwg/5W0oXwCyq2ITpUycXlPnBuGDpJs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764341835; c=relaxed/simple;
+	bh=aELHQl8K1HKjCIXX40jXNZBMmMkYahSK6M/I7JQG/Vc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kpCb0rAySeSRo4wncGKa12+lcfWWITbX3m+oHzMIxRZAWPR6H1u9F41sElLbDSAgUf+S/QRPuqsUf4wtHQ/x0YHpfNgsdf+3POhQKST/wXllsNEewu/PjkKC3762azr5eSt2rKD1dS2/R7PGcFw7HpsH1N8WXKksmUz5jSQFujE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=lbJbalB2; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=AyRbPVnjabNqxyJEQWBCuEGPJ7CqQLz5zTMyLbptNUw=; b=lbJbalB27uiBuUCCwGQtBPn6Kf
+	lkSV7FNxwaGc9t1d9IRi4CLBf4FDdaZOIkxPKaarjg/XhCc/0bwycfBpwTAMmVvYuDwcYbj+7bgBe
+	Pcr6cyDfwuuIWB7xLHaeQFi262vEDzs5T6JKgDpWJbdGePu3Od1EPmwCfVx06q4E2D7c=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vOzuF-00FLwL-8l; Fri, 28 Nov 2025 15:57:07 +0100
+Date: Fri, 28 Nov 2025 15:57:07 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Mika Westerberg <mika.westerberg@linux.intel.com>
+Cc: netdev@vger.kernel.org, Yehezkel Bernat <YehezkelShB@gmail.com>,
+	Ian MacDonald <ian@netstatz.com>,
+	Salvatore Bonaccorso <carnil@debian.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 3/3] net: thunderbolt: Allow reading link
+ settings
+Message-ID: <e4f3eefa-9a01-413d-9ba6-ec9ebc381061@lunn.ch>
+References: <20251127131521.2580237-1-mika.westerberg@linux.intel.com>
+ <20251127131521.2580237-4-mika.westerberg@linux.intel.com>
+ <3ac72bf4-aa0e-4e3f-b6ef-4ed2dce923e1@lunn.ch>
+ <20251128072351.GB2580184@black.igk.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [can-next] can: Kconfig: select CAN driver infrastructure by
- default
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net,
- kuba@kernel.org, kernel@pengutronix.de, Vincent Mailhol <mailhol@kernel.org>
-References: <20251128100803.65707-1-socketcan@hartkopp.net>
- <20251128-terrestrial-gainful-goose-0723b2-mkl@pengutronix.de>
-Content-Language: en-US
-From: Oliver Hartkopp <socketcan@hartkopp.net>
-In-Reply-To: <20251128-terrestrial-gainful-goose-0723b2-mkl@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251128072351.GB2580184@black.igk.intel.com>
 
-
-
-On 28.11.25 15:43, Marc Kleine-Budde wrote:
-> On 28.11.2025 11:08:03, Oliver Hartkopp wrote:
->> The CAN bus support enabled with CONFIG_CAN provides a socket-based
->> access to CAN interfaces. With the introduction of the latest CAN protocol
->> CAN XL additional configuration status information needs to be exposed to
->> the network layer than formerly provided by standard Linux network drivers.
->>
->> This requires the CAN driver infrastructure to be selected by default.
->> As the CAN network layer can only operate on CAN interfaces anyway all
->> distributions and common default configs enable at least one CAN driver.
->>
->> So selecting CONFIG_CAN_DEV when CONFIG_CAN is selected by the user has
->> no effect on established configurations but solves potential build issues
->> when CONFIG_CAN[_XXX]=y is set together with CANFIG_CAN_DEV=m
->>
->> Fixes: 1a620a723853 ("can: raw: instantly reject unsupported CAN frames")
->> Reported-by: Vincent Mailhol <mailhol@kernel.org>
->> Suggested-by: Marc Kleine-Budde <mkl@pengutronix.de>
->> Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
+On Fri, Nov 28, 2025 at 08:23:51AM +0100, Mika Westerberg wrote:
+> On Thu, Nov 27, 2025 at 08:20:53PM +0100, Andrew Lunn wrote:
+> > > +static int tbnet_get_link_ksettings(struct net_device *dev,
+> > > +				    struct ethtool_link_ksettings *cmd)
+> > > +{
+> > > +	const struct tbnet *net = netdev_priv(dev);
+> > > +	const struct tb_xdomain *xd = net->xd;
+> > > +	int speed;
+> > > +
+> > > +	ethtool_link_ksettings_zero_link_mode(cmd, supported);
+> > > +	ethtool_link_ksettings_zero_link_mode(cmd, advertising);
+> > > +
+> > > +	/* Figure out the current link speed and width */
+> > > +	switch (xd->link_speed) {
+> > > +	case 40:
+> > > +		/* For Gen 4 80G symmetric link the closest one
+> > > +		 * available is 56G so we report that.
+> > > +		 */
+> > > +		ethtool_link_ksettings_add_link_mode(cmd, supported,
+> > > +						     56000baseKR4_Full);
+> > > +		ethtool_link_ksettings_add_link_mode(cmd, advertising,
+> > > +						     56000baseKR4_Full);
+> > > +		speed = SPEED_56000;
+> > 
+> > Please add SPEED_80000.
 > 
-> I think we take this, at least for now. But I'll remove my Suggested-by,
-> which was a leftover from v3.
+> Sure. One additional question though. Comment on top of SPEED_ definitions
+> suggest changing __get_link_speed() of the bonding driver accordingly but
+> it basically converts from SPEED_ to AD_LINK_SPEED_ which I think we need
+> to add too. However, these are user-facing values so should I add the
+> AD_LINK_SPEED_80000 entry to the end of that enum to avoid any possible
+> breakage?
 
-Sure?
+Are they user facing? They should be define in include/uapi if they
+were. I would keep the list sorted, and Cc: the bonding driver
+Maintainer, Jay Vosburgh <jv@jvosburgh.net> (maintainer:BONDING DRIVER).
 
-I remember you suggested some Kconfig magic :-D
+Also:
 
-Ok, this patch has not so much magic inside ... but it is tested!
+cb8dda90c28e2 (Jianhua Xie                 2014-11-19 16:48:58 +0800   61) enum ad_link_speed_type {
+cb8dda90c28e2 (Jianhua Xie                 2014-11-19 16:48:58 +0800   62)      AD_LINK_SPEED_1MBPS = 1,
+cb8dda90c28e2 (Jianhua Xie                 2014-11-19 16:48:58 +0800   63)      AD_LINK_SPEED_10MBPS,
+cb8dda90c28e2 (Jianhua Xie                 2014-11-19 16:48:58 +0800   64)      AD_LINK_SPEED_100MBPS,
+cb8dda90c28e2 (Jianhua Xie                 2014-11-19 16:48:58 +0800   65)      AD_LINK_SPEED_1000MBPS,
+424c3232b04ac (Jianhua Xie                 2014-11-19 16:48:59 +0800   66)      AD_LINK_SPEED_2500MBPS,
+c7c550670afda (Thibaut Collet              2017-06-08 11:18:11 +0200   67)      AD_LINK_SPEED_5000MBPS,
+424c3232b04ac (Jianhua Xie                 2014-11-19 16:48:59 +0800   68)      AD_LINK_SPEED_10000MBPS,
+3fcd64cfa0e9c (Nicolas Dichtel             2017-06-08 11:18:12 +0200   69)      AD_LINK_SPEED_14000MBPS,
+424c3232b04ac (Jianhua Xie                 2014-11-19 16:48:59 +0800   70)      AD_LINK_SPEED_20000MBPS,
+19ddde1eeca1e (Jarod Wilson                2017-03-14 11:48:32 -0400   71)      AD_LINK_SPEED_25000MBPS,
+424c3232b04ac (Jianhua Xie                 2014-11-19 16:48:59 +0800   72)      AD_LINK_SPEED_40000MBPS,
+c7c550670afda (Thibaut Collet              2017-06-08 11:18:11 +0200   73)      AD_LINK_SPEED_50000MBPS,
+3952af4d50343 (Jiri Pirko                  2015-12-03 12:12:05 +0100   74)      AD_LINK_SPEED_56000MBPS,
+3952af4d50343 (Jiri Pirko                  2015-12-03 12:12:05 +0100   75)      AD_LINK_SPEED_100000MBPS,
+ab73447c38e4f (Nikolay Aleksandrov         2021-02-10 22:43:31 +0200   76)      AD_LINK_SPEED_200000MBPS,
+138e3b3cc0bbb (Nikolay Aleksandrov         2021-02-10 22:43:32 +0200   77)      AD_LINK_SPEED_400000MBPS,
+41305d3781d70 (Amit Cohen                  2022-10-20 17:20:05 +0200   78)      AD_LINK_SPEED_800000MBPS,
+cb8dda90c28e2 (Jianhua Xie                 2014-11-19 16:48:58 +0800   79) };
 
-Best regards,
-Oliver
+suggests you can insert in the middle:
 
+commit c7c550670afda2e16f9e2d06a1473885312eb6b5
+Author: Thibaut Collet <thibaut.collet@6wind.com>
+Date:   Thu Jun 8 11:18:11 2017 +0200
+
+    bonding: fix 802.3ad support for 5G and 50G speeds
+    
+    This patch adds [5|50] Gbps enum definition, and fixes
+    aggregated bandwidth calculation based on above slave links.
+    
+    Fixes: c9a70d43461d ("net-next: ethtool: Added port speed macros.")
+    Signed-off-by: Thibaut Collet <thibaut.collet@6wind.com>
+    Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+    Acked-by: Andy Gospodarek <andy@greyhouse.net>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
+index b44a6aeb346d..d1b09be63ba4 100644
+--- a/drivers/net/bonding/bond_3ad.c
++++ b/drivers/net/bonding/bond_3ad.c
+@@ -90,10 +90,12 @@ enum ad_link_speed_type {
+        AD_LINK_SPEED_100MBPS,
+        AD_LINK_SPEED_1000MBPS,
+        AD_LINK_SPEED_2500MBPS,
++       AD_LINK_SPEED_5000MBPS,
+        AD_LINK_SPEED_10000MBPS,
+        AD_LINK_SPEED_20000MBPS,
+        AD_LINK_SPEED_25000MBPS,
+        AD_LINK_SPEED_40000MBPS,
++       AD_LINK_SPEED_50000MBPS,
+        AD_LINK_SPEED_56000MBPS,
+        AD_LINK_SPEED_100000MBPS,
+
+
+	Andrew
 
