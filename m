@@ -1,140 +1,140 @@
-Return-Path: <netdev+bounces-242636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B314C933E1
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 23:17:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E4CD7C933EA
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 23:21:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id CCDDE34A0F9
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 22:17:17 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8BC0234A3B4
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 22:21:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B29A32C08B6;
-	Fri, 28 Nov 2025 22:17:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AB762DCF7C;
+	Fri, 28 Nov 2025 22:21:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DeSOjpZM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mEsOnfPe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86FCE339A8;
-	Fri, 28 Nov 2025 22:17:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06887221FB4
+	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 22:21:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764368233; cv=none; b=KiKdmFyo8mNbwqgLKZsnUnaBrFdm5hhkh326X+QMb2pn6RPsOLRFM+SMIkyEf8IbdTWHvfGcoXSF41wJlXgBuj2hGUJPOHnmGNxE0tkQW+dUMtb1tWSbeKmkNGtPCY/baImOKE2pS/1ugcTnh89l00ljRawZfL+fGjjrNTfb1sw=
+	t=1764368504; cv=none; b=ifBpOeUOirp+l4LkDVP8gjz06opKmENjGuhARAltLjnpaqnRXRBbd65wRQkJtVNoKSL070ur/XheBzIXX537KdB+rKX0dB5+MDZ7ARR1cCclCQ1/7TpwrhNQS0NLJTBADFPLav9bt9zf9lygn/G3ShWwXIByKifb3J7451xZLmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764368233; c=relaxed/simple;
-	bh=VK3TROkm++47NldOYtUn5768UQNgyjfwlBEzoPIfPwE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=desVnFZjlAH+vFfWSfNESQSj00E6pQBg1Xe3H6wMOyKA7J/tPsmP7yO7ZTV07ewIlz6Zllq+RHNBOST1ugbp5Q7v/jevlzcNEgyJEayRZWw7LRRvPhys8CZ+IcXTkI26zpDGfnyFG6/jEeCe3+fKUR0UfWeWrdT8bskgv8XwFVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DeSOjpZM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCA1CC4CEF1;
-	Fri, 28 Nov 2025 22:17:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764368233;
-	bh=VK3TROkm++47NldOYtUn5768UQNgyjfwlBEzoPIfPwE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DeSOjpZMMzqaR0W4PR0o3fCvOkMhFOJ7Rw8Ru6e5xod68/kQi1y2eMmMEsvoKf4Df
-	 YHbzCcmJlNVFWfncGpG5Dti5kPYMbLhcvDDBKoLavDfnN20NCQMzWPwAWdXbTlv3Ih
-	 OgaiNsYwVPXqz+OwqgrUHuQxR4233qQ7QgJ+uAHcPyHPMA28N/ipdK30JNPvvUv5pD
-	 fc6M6vUKkM2ZgvyuQDZIkiFoPHc2s/g+28dqeik++BjGSuVjxhJpo6oNrlzCXPxOik
-	 ih31NtB2FPmSXWoKTja6iJ2PVn9Tpta6Lql5QK47BcFslkSPaThvcNzrrH6x16au5L
-	 spxINepkPoUrA==
-Date: Fri, 28 Nov 2025 14:17:10 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, Alexei Starovoitov
- <ast@kernel.org>, Eric Dumazet <edumazet@google.com>, Rob Herring
- <robh@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>, Donald Hunter
- <donald.hunter@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>, Jonathan
- Corbet <corbet@lwn.net>, John Fastabend <john.fastabend@gmail.com>, Lukasz
- Majewski <lukma@denx.de>, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, Stanislav Fomichev <sdf@fomichev.me>,
- Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Jesper
- Dangaard Brouer <hawk@kernel.org>, Divya.Koppera@microchip.com, Kory
- Maincent <kory.maincent@bootlin.com>, Vadim Fedorenko
- <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org, Sabrina Dubroca
- <sd@queasysnail.net>, linux-kernel@vger.kernel.org, kernel@pengutronix.de,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [PATCH net-next v8 1/1] Documentation: net: add flow control
- guide and document ethtool API
-Message-ID: <20251128141710.4fa38296@kernel.org>
-In-Reply-To: <aSoIREdMWGeygnD_@shell.armlinux.org.uk>
-References: <20251119140318.2035340-1-o.rempel@pengutronix.de>
-	<20251125181957.5b61bdb3@kernel.org>
-	<aSa8Gkl1AP1U2C9j@pengutronix.de>
-	<aSj6gM_m-7ZXGchw@shell.armlinux.org.uk>
-	<aSj_OxBzq_gJOb4q@shell.armlinux.org.uk>
-	<aSljeggP5UHYhFaP@pengutronix.de>
-	<20251128103259.258f6fa5@kernel.org>
-	<63082064-44b1-42b0-b6c8-a7d9585c82f5@lunn.ch>
-	<aSoIREdMWGeygnD_@shell.armlinux.org.uk>
+	s=arc-20240116; t=1764368504; c=relaxed/simple;
+	bh=SQTVp2Fzpk0NoZcAVL+rErGbsCS+UUMcmvwU/jMKSLc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=p7ASQQOLbpy6KfITAmfdrj16icIMYqVv0GwnihiNJ8o5KX8Cya4ey4JhjIOSvpivRNnpfpu2T5Iqs6BOyCYNVwXOdkT99REcOZT0erthPhFmRn5C0mnq672XVxL6tyYWAiSOI/LUiZ91Ah1NAgvM7FzitLCKFa4vwFIgZnOWQeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mEsOnfPe; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-343f52d15efso2101133a91.3
+        for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 14:21:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764368502; x=1764973302; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6P18mAZ1MqIvbh3CmMm45KSEcmyyptIsJafX5Z8hVww=;
+        b=mEsOnfPe1MmbaOXdCmcOe9zlD7foecT34f3cdDyjJSltfw7qWTJb5F/vW6YxZOla3M
+         siLCqucECoMPj6LQOP+gpU7GzZjuilcbmAvgFag5KG59XqopR2MmjL0+L35fuhzDkKLO
+         e2wOSntE1gq/Vt/zOeg4864kUcA/28pP0H3WNGh3n/MO7E54NKV6b2qVSAOL9gKThX9L
+         AZg2C0C1133VK5UykZZj7eT0uxZbdWX581ExlyryucxXyGBhKh/2fd0x0yCGD66VihJr
+         nbnXVJOGthSkC4QtBA6p/7rvBQ+UEYANc8jrGeEGEn1LODZm9wgHhOLGDThCxaB9SM4Q
+         y9ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764368502; x=1764973302;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=6P18mAZ1MqIvbh3CmMm45KSEcmyyptIsJafX5Z8hVww=;
+        b=PdvlFgYqpr88g1HN3gOHYO5+HS8WHw8VlzbMRPj3HqaxjQicNCxLDeU8YE1WWsD2XM
+         PCowZxHG1qXTx/wJ6LX9Igy+rD/0c4D+jflgY5cpO6A+IrFhz+4psj305KVH1seIbmLy
+         C0DR+/tHwYrmoW8rYVLfdg8+0s7sfs4WImE2z9tkVMv4N5l94IhNkVkULbYfB5iLv19n
+         yJt+TDUjsnRCz0CbkYGnKndxBL9p/3MHjd3A1iBKUSF+zL6BqDynb/vbfQ+rX2cINdqJ
+         Yv7eKU7XYOVVDFhKYvll3+uV1OgQCoUKkRNoHcYlXI13GHv2cvQxDSW507qOj23Oq9Pg
+         l1qg==
+X-Gm-Message-State: AOJu0YxLNzy+4Lbf6oVU1feyYShRYVTa3pF8WyMjelexRvE9bhKTQXPw
+	a6xiawpVpjo827IcWWqv5ZP33u0x2Sr/Jm+VVaaYnRO8d4eyL6JZ3cB/GVZP0SbVA8IHACXv8vw
+	f2uRSl3WRga2XOUxxnz3JNMu0drtYMNg=
+X-Gm-Gg: ASbGncttFZVVjuzDDA2XiUIoRMMHUDw0HkUFfhL4G1QOKi/4fezbqUrNv/cA/xFtv6W
+	3PHSPYwYQbJKOlcnJZ5oArLBppgl6opnrcSqxWBbcYiqrgFpM4Li9Nfrm/2l1j1C0qAcpojhQq2
+	HMBxFoA+M1liuYVcDO6FLLIFqMV1+e5qEks0nFOl8/DZu0CNtjoos2swIp3XghXJxkGjExFCilF
+	eSQzaMUiyByxArFsG0J2Dsg8Mn8XNkNG3N/HwcMLOOn6twIap8Q+xxPhXbNLzCwXkjzA4EgtAR5
+	cTwOYcsg
+X-Google-Smtp-Source: AGHT+IGouVmSRU2+5FPtU7PZ4bxQ1L1TS/rzuH0An62oT/VAqyxTOEwsLF/KPWgDyeqL2eIE6oHNOz0m/r6ekRLZB7U=
+X-Received: by 2002:a17:90b:3b41:b0:340:be44:dd11 with SMTP id
+ 98e67ed59e1d1-3475ed6944amr17150643a91.27.1764368502014; Fri, 28 Nov 2025
+ 14:21:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <cover.1763994509.git.lucien.xin@gmail.com> <20251127183008.5ee6757f@kernel.org>
+In-Reply-To: <20251127183008.5ee6757f@kernel.org>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Fri, 28 Nov 2025 17:21:30 -0500
+X-Gm-Features: AWmQ_blWIFPPlXbZwBvgkwqvDmPpeWwfQI3WVoQuGLEtMYmvXkBsPdiaHSosH1o
+Message-ID: <CADvbK_crxSB+TwDgEtjV6TUEeO9VYtsE6rqy7L_=rzoDrCfORQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 00/16] net: introduce QUIC infrastructure and
+ core subcomponents
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
+	Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>, linux-cifs@vger.kernel.org, 
+	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, 
+	David Howells <dhowells@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, 
+	John Ericson <mail@johnericson.me>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	"D . Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>, 
+	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 28 Nov 2025 20:38:28 +0000 Russell King (Oracle) wrote:
-> On Fri, Nov 28, 2025 at 09:16:24PM +0100, Andrew Lunn wrote:
-> > > Can you please tell me what is preventing us from deprecating pauseparam
-> > > API *for autoneg* and using linkmodes which are completely unambiguous.  
-> > 
-> > Just to make sure i understand you here...
-> > 
-> > You mean make use of
-> > 
-> >         ETHTOOL_LINK_MODE_Pause_BIT             = 13,
-> >         ETHTOOL_LINK_MODE_Asym_Pause_BIT        = 14,
-> > 
-> > So i would do a ksettings_set() with
-> > 
-> > __ETHTOOL_LINK_MODE_LEGACY_MASK(Pause) | __ETHTOOL_LINK_MODE_LEGACY_MASK(Asym_Pause)
-> > 
-> > to indicate both pause and asym pause should be advertised.
-> > 
-> > The man page for ethtool does not indicate you can do this. It does
-> > have a list of link mode bits you can pass via the advertise option to
-> > ethtool -s, bit they are all actual link modes, not features like TP,
-> > AUI, BNC, Pause, Backplane, FEC none, FEC baser, etc.  
-> 
-> I see the latest ethtool now supports -s ethX advertise MODE on|off,
-> but it doesn't describe that in the parameter entry for "advertise"
-> and doesn't suggest what MODE should be, nor how to specify multiple
-> modes that one may wish to turn on/off. I'm guessing this is what you're
-> referring to.
-> 
-> The ports never get advertised, so I don't think they're relevant.
-> 
-> However, the lack of the pause bits means that one is forced to use
-> the hex number, and I don't deem that to be a user interface. That's
-> a programmers interface, or rather a nightmare, because even if you're
-> a programmer, you still end up looking at include/uapi/linux/ethtool.h
-> and doing the maths to work out the hex number to pass, and then you
-> mistype it with the wrong number of zeros, so you try again, and
-> eventually you get the advertisement you wanted.
-> 
-> So no, I don't accept Jakub's argument right now. Forcing people into
-> the nightmare of working out a hex number isn't something for users.
+On Thu, Nov 27, 2025 at 9:30=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Mon, 24 Nov 2025 09:28:13 -0500 Xin Long wrote:
+> > The QUIC protocol, defined in RFC 9000, is a secure, multiplexed transp=
+ort
+> > built on top of UDP. It enables low-latency connection establishment,
+> > stream-based communication with flow control, and supports connection
+> > migration across network paths, while ensuring confidentiality, integri=
+ty,
+> > and availability.
+>
+> Please look thru the Claude review and address the legit complaints:
+>
+> https://netdev-ai.bots.linux.dev/ai-review.html?id=3D8ac157b3-6222-4e89-a=
+c52-28e4ca52d6c4
+>
+> If the tool is confused but not in an dumb way - it may be worth adding
+> a relevant comment or info in the commit message. Otherwise a note under
+> --- would be appreciated to avoid maintainers having to re-check the
+> comments you already considered and disproved.
+Thanks for the link.
 
-I did some digging, too, just now. Looks like the options are indeed
-not documented in the man page but ethtool uses the "forward compatible"
-scheme with strings coming from the kernel. So this:
+I just went through the tool=E2=80=99s report. It found one real issue in
+quic_packet_backlog_work(), which I=E2=80=99ll fix. The other items aren=E2=
+=80=99t
+actual problems, and I=E2=80=99ll add some inline comments or --- notes to
+explain them.
 
-  ethtool -s enp0s13f0u1u1 advertise Pause on Asym_Pause on
-
-works just fine, with no changes in CLI.
-
-We should probably document that it works in the ethtool help and man
-page. And possibly add some synthetic options like Receive-Only /
-Transmit-Only so that users don't have to be aware of the encoding
-details? Let me know if it's impractical, otherwise I think we'll
-agree that having ethtool that makes it obvious how to achieve the
-desired configuration beats best long form docs in the kernel..
+>
+> Thanks for adding the MAINTAINERS entry, two notes on that:
+>  - the entries must be sorted, so you need to move it down under Q
+>    instead of putting it next to SCTP
+>  - you seem to have copy/pasted the uAPI path for SCTP to the entry
+>    instead of QUIC ;)
+You're right, thanks!
 
