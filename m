@@ -1,154 +1,133 @@
-Return-Path: <netdev+bounces-242522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC48FC914A1
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 09:48:22 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2986C9146C
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 09:45:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 37A3B4E471C
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 08:42:59 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A12AB34AC71
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 08:45:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C736F2EC54D;
-	Fri, 28 Nov 2025 08:42:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC6932EF66E;
+	Fri, 28 Nov 2025 08:45:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="MWpzIeTB"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="BBTHcI0a"
 X-Original-To: netdev@vger.kernel.org
-Received: from out203-205-221-240.mail.qq.com (out203-205-221-240.mail.qq.com [203.205.221.240])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E652EC086
-	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 08:42:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.240
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E9212ED87F;
+	Fri, 28 Nov 2025 08:45:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764319377; cv=none; b=KluY7brjB9jqtDtbwH+85asuTMuR/2jHmcjAALk8J7v7WLcfKOea0QGgGLqwZTiYdw9oOfPy3bQyYpsWb2+riV3X/U+HFY2klbIEG6Q4WP+FvwhZS7+aUAHtIZaHbl616chb99axcadJVIp/NLmH0gxUbZwMLwkUz2LD+3ObQzw=
+	t=1764319513; cv=none; b=fPnFwuIV6PEHJ/FJnzyvC/2D2Sg7uicGeghisOjkkxRc9cghvxRXLxXwB5AYezo9lcl0eY5Wljpxx2zZB42FBhEt1qmLHPRe8oRsLnkBsKFj20ZyrOiSSg+PiXMOsgUzpqb4PA7fbshwYt59eBKIhRWslHSlHDkhPv1HAlB1vyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764319377; c=relaxed/simple;
-	bh=ObBQE2s6w9HpNtJAwbYSXSwHgGEn8nc872DiGO97wuw=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=O3S2Kdg7R17IcyhyVqov/cOk9A0vTIqBDkoJGN3mC+2w/38wBSmGtIGWvF/0DQajYxuxXHsUGFH1F/p21b3d6IPmP7h7Ztf6S+oQpoJNMTUCFOCEWz09nsbJSy6SYl2zYObWxYm/4oZ1JKXbuJvE3pka2ZzEM/cE+jyQ7b0hXqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=MWpzIeTB; arc=none smtp.client-ip=203.205.221.240
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1764319373; bh=A8mGR1d0H3r4bTkQhku0Qmh1ZtU7rdJN6hfaTO0TCCM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=MWpzIeTB9m8HTf4VVg1KZQZtZ0DlCFnJFHtuQhKgnBG+pR8LL0mpttdMrGw3f8Nms
-	 J+u8c/jv1PgPmNf+V73EBXzpOyRQ4z2k3EQ9E/ZlQETdFVn1+LvflMq8GUnu6u7V56
-	 zPIGPU8cZ8uN0sOfxMqSlgSGMFk6/2Uk4w0jTJj8=
-Received: from lxu-ped-host.. ([111.201.7.117])
-	by newxmesmtplogicsvrsza53-0.qq.com (NewEsmtp) with SMTP
-	id A660CEAC; Fri, 28 Nov 2025 16:41:38 +0800
-X-QQ-mid: xmsmtpt1764319298t8lg5qfwq
-Message-ID: <tencent_387517772566B03DBD365896C036264AA809@qq.com>
-X-QQ-XMAILINFO: OATpkVjS499uRkp6Iutn8gH3U/2cUmQ2vbZNRc0DRSeKbGa5dtJo5Ioh9IVQjx
-	 t64wGLlZUkU+vMD8fMxdF0pACrDiveMTe3zsI10UdlU6h+6OljpXgZzKuWbXuB6EyTn+YkWJiJ4a
-	 nezFiCWi2eVIJfWiRh1OYxMgtYC4FU7ql0FoA48AE+pjTMczj7A1BL/U4/BImO7ppUM5wKom+WtX
-	 C7TXUtJgDOZ3+Q5lbBwh65Ey8ggUt/WlwCnm3O+q5bJE4EC20SRSIxR3Y2uGh3WBdEFmXb+HIZHL
-	 Bvq3dQOHCnLAR6sRB51wx+V2H3Dac6V/ZDkvl/JChQU9Tj4f7JrF/JeZLWyMAd7ytFY/fQ9k6lVM
-	 wOTZ5iQKqB8zpBgXpUs7nQ82QPkuqvoWB6gsoCdJKAuKsNg/lwA6t6pmp7oErpgT2YNyRlPZigbj
-	 sOMv7LEmhw/YqMKdBfRK3EGDPDqmnBPTxwk0Yueq4d7aCBTQSGU46139JdcD/J3cf+Ogf+KKaylP
-	 3oIEXNyIYvwyvZu71sCDRM9Wuv5KyKF5zC5WVO2a5Eav36HBdpw4a/KCmDlNwvGrHfK9FMJoiFid
-	 jpOC/KMHbSHistD3Ikz7/B9TV1oYFJJoE20Rs8IvdHX/XMPe5ph5TkvkQQ2/Z6qclGZ+amo5/okW
-	 fdfaxtyIK6TsMur2uA0SLTzoJSAzh4QdvVibQ8p9Ql7ul3jT1wi6MvBaFOlh08vooIEZsgQxH+JZ
-	 0KazWIga4LwbR71i2j2onIqAT2tEyqCxt3u0KKe/CRE6zyAwLWuDAhUk+FiFYdLeqP0lCFOUG51x
-	 LHoC39ULfKvsqd27ESsaTYMeElVXf0ttE/LJZx4xW4jhMavBBiZMb+Y/yAP0Fh2yTtDetsRKx2X6
-	 uxXXCK7cmdS9ArHz8h7hEiKeWz0szd9WcAHGBoA4e2LQiojE9S+PYTLsER86q2xKT8Ku3VCJ1pu3
-	 MXH7gbOGuhDYENSVJy5Jd8O+tQnHiBY8fB93ZKBH1GxjAsVGpRe3vlDzHKUY3yIGJRwd2+QQY=
-X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
-From: Edward Adam Davis <eadavis@qq.com>
-To: syzbot+28e5f3d207b14bae122a@syzkaller.appspotmail.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	eperezma@redhat.com,
-	horms@kernel.org,
-	jasowang@redhat.com,
-	kuba@kernel.org,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	mst@redhat.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	sgarzare@redhat.com,
-	stefanha@redhat.com,
-	syzkaller-bugs@googlegroups.com,
-	virtualization@lists.linux.dev,
-	xuanzhuo@linux.alibaba.com
-Subject: [PATCH Next] net: restore the iterator to its original state when an error occurs
-Date: Fri, 28 Nov 2025 16:41:38 +0800
-X-OQ-MSGID: <20251128084137.112073-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <6928fe78.a70a0220.d98e3.012a.GAE@google.com>
-References: <6928fe78.a70a0220.d98e3.012a.GAE@google.com>
+	s=arc-20240116; t=1764319513; c=relaxed/simple;
+	bh=0X/ydzoWDB4ZtJE0RBBBD7ONqrPxkKp/vJTWLZBq2/g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Pjk8UyGrC5gwH7KBnTqkN3mP2eIRWpMqO/lqykwUg8gVAQxggcFl1kuxn3y1XytRxqjiaLAe8Ao7JoRUGcVv5I1Jy7zf+4tQLzpLoClt50SKdoN/TKC2io9XESnVX+VLVWc+ImH5By0xxqoy409uqcIDIvsWxIvhVmCDbtrI8Sw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=BBTHcI0a; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 4F494C16A36;
+	Fri, 28 Nov 2025 08:44:46 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 2F9C460706;
+	Fri, 28 Nov 2025 08:45:09 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id E6FCF103C8F20;
+	Fri, 28 Nov 2025 09:45:00 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1764319507; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=P0+e6XTu3A6o5AA0Sdf7CPZ+DssyTSsdo2j6rOigGDU=;
+	b=BBTHcI0acimD4Z+tf+m+ZYYQA+zUHulwmzzRJl76h86HdO/UEPydJHf53ev70bfY4aiIby
+	QuEkZFbcYpZU7rQRtod433l/ajomrZ1uWGCGGr0l2SO47MVJUcvI1kR5L970OEDTluHjI3
+	pEnCGUJI2MMc3t/PnM4WWvL+BFtbp0iGLF7aSAtnWpCqyQDi+E5Kaj+ze9PK4QNAHccyAH
+	ac8AAZKSGrBDmlX2aKRaPiA/E1xPCoBhK5pDjL4OpzQZL+XYsWWIg/QioPv7f2ih3dBrZK
+	hzJIAu0eoVuAonbYRSOcYMQOgmDLjKqaEfceDzdP04sLoN84YN+sIGr8YyG2oA==
+Message-ID: <e18d4197-b06e-493a-a843-e195fbc46d6c@bootlin.com>
+Date: Fri, 28 Nov 2025 09:45:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v20 03/14] net: phy: Introduce PHY ports
+ representation
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, linux-arm-kernel@lists.infradead.org,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
+ =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
+ Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+ Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
+ Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
+ Romain Gantois <romain.gantois@bootlin.com>,
+ Daniel Golle <daniel@makrotopia.org>,
+ Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
+ Tariq Toukan <tariqt@nvidia.com>
+References: <20251127171800.171330-1-maxime.chevallier@bootlin.com>
+ <20251127171800.171330-4-maxime.chevallier@bootlin.com>
+ <aSiSxbE-XY_zxMBC@shell.armlinux.org.uk>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <aSiSxbE-XY_zxMBC@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-In zerocopy_fill_skb_from_iter(), if two copy operations are performed
-and the first one succeeds while the second one fails, it returns a
-failure but the count in iterator has already been decremented due to
-the first successful copy. This ultimately affects the local variable
-rest_len in virtio_transport_send_pkt_info(), causing the remaining
-count in rest_len to be greater than the actual iterator count. As a
-result, packet sending operations continue even when the iterator count
-is zero, which further leads to skb->len being 0 and triggers the warning
-reported by syzbot [1].
+Hi Russell,
 
-Therefore, if the zerocopy operation fails, we should revert the iterator
-to its original state.
+On 27/11/2025 19:04, Russell King (Oracle) wrote:
+> On Thu, Nov 27, 2025 at 06:17:46PM +0100, Maxime Chevallier wrote:
+>> Ethernet provides a wide variety of layer 1 protocols and standards for
+>> data transmission. The front-facing ports of an interface have their own
+>> complexity and configurability.
+>>
+>> Introduce a representation of these front-facing ports. The current code
+>> is minimalistic and only support ports controlled by PHY devices, but
+>> the plan is to extend that to SFP as well as raw Ethernet MACs that
+>> don't use PHY devices.
+>>
+>> This minimal port representation allows describing the media and number
+>> of pairs of a BaseT port. From that information, we can derive the
+>> linkmodes usable on the port, which can be used to limit the
+>> capabilities of an interface.
+>>
+>> For now, the port pairs and medium is derived from devicetree, defined
+>> by the PHY driver, or populated with default values (as we assume that
+>> all PHYs expose at least one port).
+>>
+>> The typical example is 100M ethernet. 100BaseT can work using only 2
+>> pairs on a Cat 5 cables.
+> 
+> Correction: 100BASE-TX. 100BASE-T, which covers the family of 100BASE-T
+> media, includes 100BASE-T4 which is over all four pairs of the cable.
+> 
+ As Rob's bot made what appears at a first glance to be incorrect
+comments, I'm not sure a resend is on the table yet. Do you want me to
+send a v21 with the updated description ? I have the same question about
+your comment on patch 2 :)
 
-[1]
-'send_pkt()' returns 0, but 4096 expected
-WARNING: net/vmw_vsock/virtio_transport_common.c:430 at virtio_transport_send_pkt_info+0xd1e/0xef0 net/vmw_vsock/virtio_transport_common.c:428, CPU#1: syz.0.17/5986
-Call Trace:
- virtio_transport_stream_enqueue net/vmw_vsock/virtio_transport_common.c:1113 [inline]
- virtio_transport_seqpacket_enqueue+0x143/0x1c0 net/vmw_vsock/virtio_transport_common.c:841
- vsock_connectible_sendmsg+0xabf/0x1040 net/vmw_vsock/af_vsock.c:2158
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg+0x21c/0x270 net/socket.c:746
+I'll gladly resend, but that'll be after the 24h cooldown.
 
-Reported-by: syzbot+28e5f3d207b14bae122a@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=28e5f3d207b14bae122a
-Tested-by: syzbot+28e5f3d207b14bae122a@syzkaller.appspotmail.com
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
----
- net/core/datagram.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Thanks a lot for taking a look a this,
 
-diff --git a/net/core/datagram.c b/net/core/datagram.c
-index c285c6465923..da10465cd8a4 100644
---- a/net/core/datagram.c
-+++ b/net/core/datagram.c
-@@ -748,10 +748,13 @@ int __zerocopy_sg_from_iter(struct msghdr *msg, struct sock *sk,
- 			    size_t length,
- 			    struct net_devmem_dmabuf_binding *binding)
- {
-+	struct iov_iter_state state;
- 	unsigned long orig_size = skb->truesize;
- 	unsigned long truesize;
- 	int ret;
- 
-+	iov_iter_save_state(from, &state);
-+
- 	if (msg && msg->msg_ubuf && msg->sg_from_iter)
- 		ret = msg->sg_from_iter(skb, from, length);
- 	else if (binding)
-@@ -759,6 +762,9 @@ int __zerocopy_sg_from_iter(struct msghdr *msg, struct sock *sk,
- 	else
- 		ret = zerocopy_fill_skb_from_iter(skb, from, length);
- 
-+	if (ret)
-+		iov_iter_restore(from, &state);
-+
- 	truesize = skb->truesize - orig_size;
- 	if (sk && sk->sk_type == SOCK_STREAM) {
- 		sk_wmem_queued_add(sk, truesize);
--- 
-2.43.0
-
+Maxime
 
