@@ -1,446 +1,405 @@
-Return-Path: <netdev+bounces-242553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 687F8C920EB
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 14:01:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 083C2C92109
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 14:05:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5B4B3A5D36
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 13:00:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B35153AB7E9
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 13:05:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 368472FD699;
-	Fri, 28 Nov 2025 13:00:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="m3P7lKb7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4361232C31C;
+	Fri, 28 Nov 2025 13:05:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 706AA19AD90;
-	Fri, 28 Nov 2025 13:00:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2470E329C7E
+	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 13:05:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764334845; cv=none; b=rJNVir8MSKzy/ZY6Qotf9qV8oa8QDJ8ZXRK7G1jYg48qk17sSiZj9AiSoxDZu+iw/8JzV5M1KmjK+aDEzdM3Og8Mo8SMnBz3xqvjfchOpSB/ld7Mb3I57ICxHIygqHKbS/0Gf0t1+T+UEPDO4m8K6PtBeBeMVr4YEQD+CsGlnJ4=
+	t=1764335144; cv=none; b=mBqcHd2DFACU7a3Mv1YefUv0gzdZ2OaMf4OBeRiU0SUcciO5MK/ha34f1TBOqyqen0LA6oks1S5apv3hH6Z3vOZEEUh/D3vUFfHz/yC8NY9C8wSJmScfeqt2iRspM1zNcyyl8wGuNOHWuB86N94b59ipQ1v3uqMm2TxKgsFK6Zg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764334845; c=relaxed/simple;
-	bh=N+FoN1xdF1zkg49nYQZJUBG0IxW/s3cAzVTz1awWzMQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=RrOrLDHL6LAIkNK2ohTV/Epb8gDTpU1zi99aX9aksddIfOZV+wGxL0edAOnzeH0vfStt1AUU6FINrUKKzNHxDWT5R47DQhHUq7xuxg2By4Omg1eQHxg7OR+ag2dOwjYqJ50NWSGBBvuBOyFLbwxHwixLe/125aFYxiHnJRLLkmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=m3P7lKb7; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=kL+ol8JrNo6WwzplCIN7z+k9ZfC0OPGULbYQqMaNzdI=; b=m3P7lKb7ZnaqncL3fxBP+AE7NL
-	0aZNhOn/cQMttg0HCLSer5sEDLI5+Q9z6F5Zr6Ca8A3coowQ0zteL80oxsa/gThvCJkG1KHkgyQy8
-	3tyAJblPUSTXpKFYAIwUFaAG+QgqCJHXBpKY5gu/nUXZRMaTnlz5mkuGO6widAnwVIUn0QFQTaFKP
-	1F6LDQLHE6MmcoJy0JqNG2scQCHNsPQtE+P0+sjaZOHy4gpPGXvzW/EZzket2ge/jQUliw4D1C2cp
-	Gjj6Pe5E021CFK2VXTVrq2rooNFosJbOxNANokrokpcbn9DQBLn9ktoLJKfEJ3FKN/7GQwQiGtCva
-	+6lM4uVw==;
-Received: from [172.31.31.148] (helo=u09cd745991455d.lumleys.internal)
-	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vOxDu-0000000BvfI-44wk;
-	Fri, 28 Nov 2025 12:05:15 +0000
-Message-ID: <e1d7c2208ea0ec2aa6836bf4db5bf0c2bd9e4b86.camel@infradead.org>
-Subject: Re: [PATCH 2/2] ptp: vmclock: support device notifications
-From: David Woodhouse <dwmw2@infradead.org>
-To: "Chalios, Babis" <bchalios@amazon.es>, "richardcochran@gmail.com"
- <richardcochran@gmail.com>, "andrew+netdev@lunn.ch"
- <andrew+netdev@lunn.ch>,  "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,  "kuba@kernel.org"
- <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, 
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Cc: "Graf (AWS), Alexander" <graf@amazon.de>, "mzxreary@0pointer.de"
-	 <mzxreary@0pointer.de>
-Date: Fri, 28 Nov 2025 13:00:36 +0000
-In-Reply-To: <20251127103159.19816-3-bchalios@amazon.es>
-References: <20251127103159.19816-1-bchalios@amazon.es>
-	 <20251127103159.19816-3-bchalios@amazon.es>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-XR97w2tl/RYS2W1LkAle"
-User-Agent: Evolution 3.52.3-0ubuntu1 
+	s=arc-20240116; t=1764335144; c=relaxed/simple;
+	bh=MSF4aTwuFnQTXhiEntI/RhAaXdYOrI6HvD4olloE9sk=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=bZFkY+rIsUoRFOVjuNKg+DTs/RtiwYgSSjkjpkwIw8S3Y605xDxcKLosbvHfinoZAlusfKU80YbYAbyyN+at4pHjtriHw+p4hf7jap3cYL8S0ea9fC1lFTnibQRGsyrGpNXJCbY3TNmZ+il4L1ByBtDvw8d17yjgZcuyFAbOEOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-433795a17c1so14545135ab.2
+        for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 05:05:41 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764335141; x=1764939941;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Da0mSrGpOFlbh6E2JEojgyN0ezFOVK3IlslJDHEfAIQ=;
+        b=kFedslmPbZ/QtlzjMsUSQmyfvSfO6K+06imX+YxAXxT/IOD2g2e32OGkCksh4+kVb1
+         K488LA6woWRYTFYwXgze1Qp1YhagUzNsxwavWB7H6qv2fweWc4uRer8O6PMtmMjxDwx6
+         7sXiUUjM1HxdyzGoaUR9t0ODp87LoTDQT9ENAMolFd4fBC3Jby9QVAZTT4nUjvC7zsIP
+         aA5Pj+elkHlbOuD3RcKfntE2gTNHzg4GIgezMzEqCcpd3FL6zrmoDcgQpvwryc4v8+Jk
+         +4PZjZRglr3XAcxEUeCr9hrUPyYF/VA+yIQ9VzsG8qnAwKyQLqHXQZmXPQthGsARdq1c
+         fVLw==
+X-Forwarded-Encrypted: i=1; AJvYcCXhQrAnc2BC1sAmpmNUdQakHjPo8ngUwkOaZNZenzi26KEB2KHMPe29SV9t9lFrl+8Ym901Nqk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJ3kO8BUobOa/vRR9R7AljUx49n8tCRAt+3R41xprYzo59d700
+	Ou2TQqu4RwnsMtpiXPMjcUZN4kQ+u5WNhh3AHVh6FAwuUo6XhNOQTlEkQ8zJGyzcLgAZ1oNtijs
+	8T8yK+hinSMitA5nk0C8G6YmCxbTFL3UZ19PzGEgG6brWvVY0uKckofbPuzA=
+X-Google-Smtp-Source: AGHT+IEBwlSo3XKolPMOG7fHkjwUfS0AUvLx4Cv0IByV/okyV1JWVbR2iRFgZXa+4T1X2tWRPtEucwMQyr6HjV1meHe6+VgDwmSP
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
-
-
---=-XR97w2tl/RYS2W1LkAle
+X-Received: by 2002:a05:6e02:174a:b0:434:8ec2:9a69 with SMTP id
+ e9e14a558f8ab-435b98c6d20mr188254195ab.19.1764335141112; Fri, 28 Nov 2025
+ 05:05:41 -0800 (PST)
+Date: Fri, 28 Nov 2025 05:05:41 -0800
+In-Reply-To: <tencent_387517772566B03DBD365896C036264AA809@qq.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69299e25.a70a0220.d98e3.013e.GAE@google.com>
+Subject: [syzbot ci] Re: net: restore the iterator to its original state when
+ an error occurs
+From: syzbot ci <syzbot+ci3edb9412aeb2e703@syzkaller.appspotmail.com>
+To: davem@davemloft.net, eadavis@qq.com, edumazet@google.com, 
+	eperezma@redhat.com, horms@kernel.org, jasowang@redhat.com, kuba@kernel.org, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, mst@redhat.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, sgarzare@redhat.com, 
+	stefanha@redhat.com, syzbot@syzkaller.appspotmail.com, 
+	syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev, 
+	xuanzhuo@linux.alibaba.com
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2025-11-27 at 10:32 +0000, Chalios, Babis wrote:
-> Add optional support for device notifications in VMClock. When
-> supported, the hypervisor will send a device notification every time it
-> updates the seq_count to a new even value.
->=20
-> Moreover, add support for poll() in VMClock as a means to propagate this
-> notification to user space. poll() will return a POLLIN event to
-> listeners every time seq_count changes to a value different than the one
-> last seen (since open() or last read()/pread()). This means that when
-> poll() returns a POLLIN event, listeners need to use read() to observe
-> what has changed and update the reader's view of seq_count. In other
-> words, after a poll() returned, all subsequent calls to poll() will
-> immediately return with a POLLIN event until the listener calls read().
->=20
-> The device advertises support for the notification mechanism by setting
-> flag VMCLOCK_FLAG_NOTIFICATION_PRESENT in vmclock_abi flags field. If
-> the flag is not present the driver won't setup the ACPI notification
-> handler and poll() will always immediately return POLLHUP.
->=20
-> Signed-off-by: Babis Chalios <bchalios@amazon.es>
+syzbot ci has tested the following series
 
-Generally looks sane to me, thanks.
+[v1] net: restore the iterator to its original state when an error occurs
+https://lore.kernel.org/all/tencent_387517772566B03DBD365896C036264AA809@qq.com
+* [PATCH Next] net: restore the iterator to its original state when an error occurs
 
-I haven't given much brain power to whether POLLHUP is the right thing
-to return when poll() is invalid; I guess you have.
+and found the following issues:
+* KASAN: slab-out-of-bounds Read in iov_iter_revert
+* KASAN: stack-out-of-bounds Read in iov_iter_revert
 
-I also haven't looked hard into the locking on fst->seq which is
-accessed during poll() and read(). Have you?
+Full report is available here:
+https://ci.syzbot.org/series/b5c506f4-f657-428b-bd21-8d50aedef42c
 
-Your vmclock_setup_notification() function can return error, but you
-ignore that. Which *might* have been intentional, to allow the device
-to be used even without notifications if something goes wrong... but
-then the condition for poll() returning POLLHUP is wrong, because that
-only checks the flag that the hypervisor set, and not whether
-notifications are *actually* working.
+***
 
-In open() you simply read seq_count from the vmclock structure but it
-might be odd at that point. Do we want to wait for it to be even, like
-read() does? Or just initialise fst->seq to zero?
+KASAN: slab-out-of-bounds Read in iov_iter_revert
 
-And is there really no devm-like helper which will free your
-fp->private_data for you on release()? That seems surprising.
+tree:      net-next
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
+base:      db4029859d6fd03f0622d394f4cdb1be86d7ec62
+arch:      amd64
+compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+config:    https://ci.syzbot.org/builds/253e310d-d693-4611-8760-36e2b39c0752/config
+syz repro: https://ci.syzbot.org/findings/1bbe297c-62ec-4071-9df3-d1c80a2bb758/syz_repro
 
-> ---
-> =C2=A0drivers/ptp/ptp_vmclock.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- | 113 +++++++++++++++++++++++++++++--
-> =C2=A0include/uapi/linux/vmclock-abi.h |=C2=A0=C2=A0 5 ++
-> =C2=A02 files changed, 113 insertions(+), 5 deletions(-)
->=20
-> diff --git a/drivers/ptp/ptp_vmclock.c b/drivers/ptp/ptp_vmclock.c
-> index b3a83b03d9c1..fa515375d54f 100644
-> --- a/drivers/ptp/ptp_vmclock.c
-> +++ b/drivers/ptp/ptp_vmclock.c
-> @@ -5,6 +5,9 @@
-> =C2=A0 * Copyright =C2=A9 2024 Amazon.com, Inc. or its affiliates.
-> =C2=A0 */
-> =C2=A0
-> +#include "linux/poll.h"
-> +#include "linux/types.h"
-> +#include "linux/wait.h"
-> =C2=A0#include <linux/acpi.h>
-> =C2=A0#include <linux/device.h>
-> =C2=A0#include <linux/err.h>
-> @@ -39,6 +42,7 @@ struct vmclock_state {
-> =C2=A0	struct resource res;
-> =C2=A0	struct vmclock_abi *clk;
-> =C2=A0	struct miscdevice miscdev;
-> +	wait_queue_head_t disrupt_wait;
-> =C2=A0	struct ptp_clock_info ptp_clock_info;
-> =C2=A0	struct ptp_clock *ptp_clock;
-> =C2=A0	enum clocksource_ids cs_id, sys_cs_id;
-> @@ -357,10 +361,15 @@ static struct ptp_clock *vmclock_ptp_register(struc=
-t device *dev,
-> =C2=A0	return ptp_clock_register(&st->ptp_clock_info, dev);
-> =C2=A0}
-> =C2=A0
-> +struct vmclock_file_state {
-> +	struct vmclock_state *st;
-> +	uint32_t seq;
-> +};
-> +
-> =C2=A0static int vmclock_miscdev_mmap(struct file *fp, struct vm_area_str=
-uct *vma)
-> =C2=A0{
-> -	struct vmclock_state *st =3D container_of(fp->private_data,
-> -						struct vmclock_state, miscdev);
-> +	struct vmclock_file_state *fst =3D fp->private_data;
-> +	struct vmclock_state *st =3D fst->st;
-> =C2=A0
-> =C2=A0	if ((vma->vm_flags & (VM_READ|VM_WRITE)) !=3D VM_READ)
-> =C2=A0		return -EROFS;
-> @@ -379,8 +388,9 @@ static int vmclock_miscdev_mmap(struct file *fp, stru=
-ct vm_area_struct *vma)
-> =C2=A0static ssize_t vmclock_miscdev_read(struct file *fp, char __user *b=
-uf,
-> =C2=A0				=C2=A0=C2=A0=C2=A0 size_t count, loff_t *ppos)
-> =C2=A0{
-> -	struct vmclock_state *st =3D container_of(fp->private_data,
-> -						struct vmclock_state, miscdev);
-> +	struct vmclock_file_state *fst =3D fp->private_data;
-> +	struct vmclock_state *st =3D fst->st;
-> +
-> =C2=A0	ktime_t deadline =3D ktime_add(ktime_get(), VMCLOCK_MAX_WAIT);
-> =C2=A0	size_t max_count;
-> =C2=A0	uint32_t seq;
-> @@ -402,8 +412,10 @@ static ssize_t vmclock_miscdev_read(struct file *fp,=
- char __user *buf,
-> =C2=A0
-> =C2=A0		/* Pairs with hypervisor wmb */
-> =C2=A0		virt_rmb();
-> -		if (seq =3D=3D le32_to_cpu(st->clk->seq_count))
-> +		if (seq =3D=3D le32_to_cpu(st->clk->seq_count)) {
-> +			fst->seq =3D seq;
-> =C2=A0			break;
-> +		}
-> =C2=A0
-> =C2=A0		if (ktime_after(ktime_get(), deadline))
-> =C2=A0			return -ETIMEDOUT;
-> @@ -413,10 +425,58 @@ static ssize_t vmclock_miscdev_read(struct file *fp=
-, char __user *buf,
-> =C2=A0	return count;
-> =C2=A0}
-> =C2=A0
-> +static __poll_t vmclock_miscdev_poll(struct file *fp, poll_table *wait)
-> +{
-> +	struct vmclock_file_state *fst =3D fp->private_data;
-> +	struct vmclock_state *st =3D fst->st;
-> +	uint32_t seq;
-> +
-> +	/*
-> +	 * Hypervisor will not send us any notifications, so fail immediately
-> +	 * to avoid having caller sleeping for ever.
-> +	 */
-> +	if (!(st->clk->flags & VMCLOCK_FLAG_NOTIFICATION_PRESENT))
-> +		return POLLHUP;
-> +
-> +	poll_wait(fp, &st->disrupt_wait, wait);
-> +
-> +	seq =3D le32_to_cpu(st->clk->seq_count);
-> +	if (fst->seq !=3D seq)
-> +		return POLLIN | POLLRDNORM;
-> +
-> +	return 0;
-> +}
-> +
-> +static int vmclock_miscdev_open(struct inode *inode, struct file *fp)
-> +{
-> +	struct vmclock_state *st =3D container_of(fp->private_data,
-> +						struct vmclock_state, miscdev);
-> +	struct vmclock_file_state *fst =3D kzalloc(sizeof(*fst), GFP_KERNEL);
-> +
-> +	if (!fst)
-> +		return -ENOMEM;
-> +
-> +	fst->st =3D st;
-> +	fst->seq =3D le32_to_cpu(st->clk->seq_count);
-> +
-> +	fp->private_data =3D fst;
-> +
-> +	return 0;
-> +}
-> +
-> +static int vmclock_miscdev_release(struct inode *inode, struct file *fp)
-> +{
-> +	kfree(fp->private_data);
-> +	return 0;
-> +}
-> +
-> =C2=A0static const struct file_operations vmclock_miscdev_fops =3D {
-> =C2=A0	.owner =3D THIS_MODULE,
-> +	.open =3D vmclock_miscdev_open,
-> +	.release =3D vmclock_miscdev_release,
-> =C2=A0	.mmap =3D vmclock_miscdev_mmap,
-> =C2=A0	.read =3D vmclock_miscdev_read,
-> +	.poll =3D vmclock_miscdev_poll,
-> =C2=A0};
-> =C2=A0
-> =C2=A0/* module operations */
-> @@ -459,6 +519,44 @@ static acpi_status vmclock_acpi_resources(struct acp=
-i_resource *ares, void *data
-> =C2=A0	return AE_ERROR;
-> =C2=A0}
-> =C2=A0
-> +static void
-> +vmclock_acpi_notification_handler(acpi_handle __always_unused handle,
-> +				=C2=A0 u32 __always_unused event, void *dev)
-> +{
-> +	struct device *device =3D dev;
-> +	struct vmclock_state *st =3D device->driver_data;
-> +
-> +	wake_up_interruptible(&st->disrupt_wait);
-> +}
-> +
-> +static int vmclock_setup_notification(struct device *dev, struct vmclock=
-_state *st)
-> +{
-> +	struct acpi_device *adev =3D ACPI_COMPANION(dev);
-> +	acpi_status status;
-> +
-> +	/*
-> +	 * This should never happen as this function is only called when
-> +	 * has_acpi_companion(dev) is true, but the logic is sufficiently
-> +	 * complex that Coverity can't see the tautology.
-> +	 */
-> +	if (!adev)
-> +		return -ENODEV;
-> +
-> +	/* The device does not support notifications. Nothing else to do */
-> +	if (!(le64_to_cpu(st->clk->flags) & VMCLOCK_FLAG_NOTIFICATION_PRESENT))
-> +		return 0;
-> +
-> +	status =3D acpi_install_notify_handler(adev->handle, ACPI_DEVICE_NOTIFY=
-,
-> +					=C2=A0=C2=A0=C2=A0=C2=A0 vmclock_acpi_notification_handler,
-> +					=C2=A0=C2=A0=C2=A0=C2=A0 dev);
-> +	if (ACPI_FAILURE(status)) {
-> +		dev_err(dev, "failed to install notification handler");
-> +		return -ENODEV;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> =C2=A0static int vmclock_probe_acpi(struct device *dev, struct vmclock_st=
-ate *st)
-> =C2=A0{
-> =C2=A0	struct acpi_device *adev =3D ACPI_COMPANION(dev);
-> @@ -549,6 +647,9 @@ static int vmclock_probe(struct platform_device *pdev=
-)
-> =C2=A0	if (ret)
-> =C2=A0		return ret;
-> =C2=A0
-> +	init_waitqueue_head(&st->disrupt_wait);
-> +	vmclock_setup_notification(dev, st);
-> +
-> =C2=A0	/*
-> =C2=A0	 * If the structure is big enough, it can be mapped to userspace.
-> =C2=A0	 * Theoretically a guest OS even using larger pages could still
-> @@ -581,6 +682,8 @@ static int vmclock_probe(struct platform_device *pdev=
-)
-> =C2=A0		return -ENODEV;
-> =C2=A0	}
-> =C2=A0
-> +	dev->driver_data =3D st;
-> +
-> =C2=A0	dev_info(dev, "%s: registered %s%s%s\n", st->name,
-> =C2=A0		 st->miscdev.minor ? "miscdev" : "",
-> =C2=A0		 (st->miscdev.minor && st->ptp_clock) ? ", " : "",
-> diff --git a/include/uapi/linux/vmclock-abi.h b/include/uapi/linux/vmcloc=
-k-abi.h
-> index 937fe00e4f33..d320623b0118 100644
-> --- a/include/uapi/linux/vmclock-abi.h
-> +++ b/include/uapi/linux/vmclock-abi.h
-> @@ -121,6 +121,11 @@ struct vmclock_abi {
-> =C2=A0	 * loaded from some save state (restored from a snapshot).
-> =C2=A0	 */
-> =C2=A0#define VMCLOCK_FLAG_VM_GEN_COUNTER_PRESENT=C2=A0=C2=A0=C2=A0=C2=A0=
- (1 << 8)
-> +	/*
-> +	 * If the NOTIFICATION_PRESENT flag is set, the hypervisor will send
-> +	 * a notification every time it updates seq_count to a new even number.
-> +	 */
-> +#define VMCLOCK_FLAG_NOTIFICATION_PRESENT=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 (1 << 9)
-> =C2=A0
-> =C2=A0	__u8 pad[2];
-> =C2=A0	__u8 clock_status;
+==================================================================
+BUG: KASAN: slab-out-of-bounds in iov_iter_revert+0x4d5/0x5f0 lib/iov_iter.c:645
+Read of size 8 at addr ffff888112061ff8 by task syz.1.18/5997
+
+CPU: 0 UID: 0 PID: 5997 Comm: syz.1.18 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:378 [inline]
+ print_report+0xca/0x240 mm/kasan/report.c:482
+ kasan_report+0x118/0x150 mm/kasan/report.c:595
+ iov_iter_revert+0x4d5/0x5f0 lib/iov_iter.c:645
+ skb_zerocopy_iter_stream+0x27d/0x660 net/core/skbuff.c:1911
+ tcp_sendmsg_locked+0x1815/0x5540 net/ipv4/tcp.c:1300
+ tcp_sendmsg+0x2f/0x50 net/ipv4/tcp.c:1412
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg+0x19c/0x270 net/socket.c:742
+ ____sys_sendmsg+0x52d/0x830 net/socket.c:2630
+ ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2684
+ __sys_sendmmsg+0x227/0x430 net/socket.c:2773
+ __do_sys_sendmmsg net/socket.c:2800 [inline]
+ __se_sys_sendmmsg net/socket.c:2797 [inline]
+ __x64_sys_sendmmsg+0xa0/0xc0 net/socket.c:2797
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f6942f8f749
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f6943d8a038 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
+RAX: ffffffffffffffda RBX: 00007f69431e5fa0 RCX: 00007f6942f8f749
+RDX: 0000000000000004 RSI: 0000200000000d00 RDI: 0000000000000003
+RBP: 00007f6943013f91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000004000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f69431e6038 R14: 00007f69431e5fa0 R15: 00007fff3f790f38
+ </TASK>
+
+Allocated by task 5913:
+ kasan_save_stack mm/kasan/common.c:56 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:77
+ poison_kmalloc_redzone mm/kasan/common.c:400 [inline]
+ __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:417
+ kasan_kmalloc include/linux/kasan.h:262 [inline]
+ __do_kmalloc_node mm/slub.c:5650 [inline]
+ __kmalloc_noprof+0x411/0x7f0 mm/slub.c:5662
+ kmalloc_noprof include/linux/slab.h:961 [inline]
+ kzalloc_noprof include/linux/slab.h:1094 [inline]
+ ip6t_alloc_initial_table+0x6b/0x6d0 net/ipv6/netfilter/ip6_tables.c:40
+ ip6table_security_table_init+0x1b/0x70 net/ipv6/netfilter/ip6table_security.c:42
+ xt_find_table_lock+0x30c/0x3e0 net/netfilter/x_tables.c:1260
+ xt_request_find_table_lock+0x26/0x100 net/netfilter/x_tables.c:1285
+ get_info net/ipv6/netfilter/ip6_tables.c:979 [inline]
+ do_ip6t_get_ctl+0x730/0x1180 net/ipv6/netfilter/ip6_tables.c:1668
+ nf_getsockopt+0x26e/0x290 net/netfilter/nf_sockopt.c:116
+ ipv6_getsockopt+0x1ed/0x290 net/ipv6/ipv6_sockglue.c:1473
+ do_sock_getsockopt+0x372/0x450 net/socket.c:2421
+ __sys_getsockopt net/socket.c:2450 [inline]
+ __do_sys_getsockopt net/socket.c:2457 [inline]
+ __se_sys_getsockopt net/socket.c:2454 [inline]
+ __x64_sys_getsockopt+0x1a5/0x250 net/socket.c:2454
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Freed by task 5913:
+ kasan_save_stack mm/kasan/common.c:56 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:77
+ __kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:587
+ kasan_save_free_info mm/kasan/kasan.h:406 [inline]
+ poison_slab_object mm/kasan/common.c:252 [inline]
+ __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:284
+ kasan_slab_free include/linux/kasan.h:234 [inline]
+ slab_free_hook mm/slub.c:2543 [inline]
+ slab_free mm/slub.c:6642 [inline]
+ kfree+0x19a/0x6d0 mm/slub.c:6849
+ ip6table_security_table_init+0x4b/0x70 net/ipv6/netfilter/ip6table_security.c:46
+ xt_find_table_lock+0x30c/0x3e0 net/netfilter/x_tables.c:1260
+ xt_request_find_table_lock+0x26/0x100 net/netfilter/x_tables.c:1285
+ get_info net/ipv6/netfilter/ip6_tables.c:979 [inline]
+ do_ip6t_get_ctl+0x730/0x1180 net/ipv6/netfilter/ip6_tables.c:1668
+ nf_getsockopt+0x26e/0x290 net/netfilter/nf_sockopt.c:116
+ ipv6_getsockopt+0x1ed/0x290 net/ipv6/ipv6_sockglue.c:1473
+ do_sock_getsockopt+0x372/0x450 net/socket.c:2421
+ __sys_getsockopt net/socket.c:2450 [inline]
+ __do_sys_getsockopt net/socket.c:2457 [inline]
+ __se_sys_getsockopt net/socket.c:2454 [inline]
+ __x64_sys_getsockopt+0x1a5/0x250 net/socket.c:2454
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+The buggy address belongs to the object at ffff888112061800
+ which belongs to the cache kmalloc-1k of size 1024
+The buggy address is located 1016 bytes to the right of
+ allocated 1024-byte region [ffff888112061800, ffff888112061c00)
+
+The buggy address belongs to the physical page:
+page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x112060
+head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+flags: 0x17ff00000000040(head|node=0|zone=2|lastcpupid=0x7ff)
+page_type: f5(slab)
+raw: 017ff00000000040 ffff888100041dc0 dead000000000122 0000000000000000
+raw: 0000000000000000 0000000000100010 00000000f5000000 0000000000000000
+head: 017ff00000000040 ffff888100041dc0 dead000000000122 0000000000000000
+head: 0000000000000000 0000000000100010 00000000f5000000 0000000000000000
+head: 017ff00000000003 ffffea0004481801 00000000ffffffff 00000000ffffffff
+head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000008
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 5913, tgid 5913 (syz-executor), ts 67648433769, free_ts 67644331621
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x234/0x290 mm/page_alloc.c:1845
+ prep_new_page mm/page_alloc.c:1853 [inline]
+ get_page_from_freelist+0x2365/0x2440 mm/page_alloc.c:3879
+ __alloc_frozen_pages_noprof+0x181/0x370 mm/page_alloc.c:5178
+ alloc_pages_mpol+0x232/0x4a0 mm/mempolicy.c:2416
+ alloc_slab_page mm/slub.c:3059 [inline]
+ allocate_slab+0x96/0x350 mm/slub.c:3232
+ new_slab mm/slub.c:3286 [inline]
+ ___slab_alloc+0xf56/0x1990 mm/slub.c:4655
+ __slab_alloc+0x65/0x100 mm/slub.c:4778
+ __slab_alloc_node mm/slub.c:4854 [inline]
+ slab_alloc_node mm/slub.c:5276 [inline]
+ __do_kmalloc_node mm/slub.c:5649 [inline]
+ __kmalloc_noprof+0x471/0x7f0 mm/slub.c:5662
+ kmalloc_noprof include/linux/slab.h:961 [inline]
+ kzalloc_noprof include/linux/slab.h:1094 [inline]
+ ipt_alloc_initial_table+0x6b/0x6a0 net/ipv4/netfilter/ip_tables.c:36
+ iptable_security_table_init+0x1b/0x70 net/ipv4/netfilter/iptable_security.c:43
+ xt_find_table_lock+0x30c/0x3e0 net/netfilter/x_tables.c:1260
+ xt_request_find_table_lock+0x26/0x100 net/netfilter/x_tables.c:1285
+ get_info net/ipv4/netfilter/ip_tables.c:963 [inline]
+ do_ipt_get_ctl+0x730/0x1180 net/ipv4/netfilter/ip_tables.c:1659
+ nf_getsockopt+0x26e/0x290 net/netfilter/nf_sockopt.c:116
+ ip_getsockopt+0x1c4/0x220 net/ipv4/ip_sockglue.c:1777
+ do_sock_getsockopt+0x372/0x450 net/socket.c:2421
+page last free pid 5913 tgid 5913 stack trace:
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ free_pages_prepare mm/page_alloc.c:1394 [inline]
+ __free_frozen_pages+0xbc4/0xd30 mm/page_alloc.c:2901
+ __slab_free+0x2e7/0x390 mm/slub.c:5970
+ qlink_free mm/kasan/quarantine.c:163 [inline]
+ qlist_free_all+0x97/0x140 mm/kasan/quarantine.c:179
+ kasan_quarantine_reduce+0x148/0x160 mm/kasan/quarantine.c:286
+ __kasan_slab_alloc+0x22/0x80 mm/kasan/common.c:352
+ kasan_slab_alloc include/linux/kasan.h:252 [inline]
+ slab_post_alloc_hook mm/slub.c:4978 [inline]
+ slab_alloc_node mm/slub.c:5288 [inline]
+ kmem_cache_alloc_noprof+0x367/0x6e0 mm/slub.c:5295
+ getname_flags+0xb8/0x540 fs/namei.c:146
+ getname include/linux/fs.h:2924 [inline]
+ do_sys_openat2+0xbc/0x1c0 fs/open.c:1431
+ do_sys_open fs/open.c:1452 [inline]
+ __do_sys_openat fs/open.c:1468 [inline]
+ __se_sys_openat fs/open.c:1463 [inline]
+ __x64_sys_openat+0x138/0x170 fs/open.c:1463
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Memory state around the buggy address:
+ ffff888112061e80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff888112061f00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>ffff888112061f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+                                                                ^
+ ffff888112062000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+ ffff888112062080: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+==================================================================
 
 
---=-XR97w2tl/RYS2W1LkAle
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+***
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCD9Aw
-ggSOMIIDdqADAgECAhAOmiw0ECVD4cWj5DqVrT9PMA0GCSqGSIb3DQEBCwUAMGUxCzAJBgNVBAYT
-AlVTMRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAi
-BgNVBAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yNDAxMzAwMDAwMDBaFw0zMTEx
-MDkyMzU5NTlaMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYDVQQDExdWZXJv
-a2V5IFNlY3VyZSBFbWFpbCBHMjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMjvgLKj
-jfhCFqxYyRiW8g3cNFAvltDbK5AzcOaR7yVzVGadr4YcCVxjKrEJOgi7WEOH8rUgCNB5cTD8N/Et
-GfZI+LGqSv0YtNa54T9D1AWJy08ZKkWvfGGIXN9UFAPMJ6OLLH/UUEgFa+7KlrEvMUupDFGnnR06
-aDJAwtycb8yXtILj+TvfhLFhafxroXrflspavejQkEiHjNjtHnwbZ+o43g0/yxjwnarGI3kgcak7
-nnI9/8Lqpq79tLHYwLajotwLiGTB71AGN5xK+tzB+D4eN9lXayrjcszgbOv2ZCgzExQUAIt98mre
-8EggKs9mwtEuKAhYBIP/0K6WsoMnQCcCAwEAAaOCAVwwggFYMBIGA1UdEwEB/wQIMAYBAf8CAQAw
-HQYDVR0OBBYEFIlICOogTndrhuWByNfhjWSEf/xwMB8GA1UdIwQYMBaAFEXroq/0ksuCMS1Ri6en
-IZ3zbcgPMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDBAYIKwYBBQUHAwIweQYI
-KwYBBQUHAQEEbTBrMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wQwYIKwYB
-BQUHMAKGN2h0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydEFzc3VyZWRJRFJvb3RD
-QS5jcnQwRQYDVR0fBD4wPDA6oDigNoY0aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0
-QXNzdXJlZElEUm9vdENBLmNybDARBgNVHSAECjAIMAYGBFUdIAAwDQYJKoZIhvcNAQELBQADggEB
-ACiagCqvNVxOfSd0uYfJMiZsOEBXAKIR/kpqRp2YCfrP4Tz7fJogYN4fxNAw7iy/bPZcvpVCfe/H
-/CCcp3alXL0I8M/rnEnRlv8ItY4MEF+2T/MkdXI3u1vHy3ua8SxBM8eT9LBQokHZxGUX51cE0kwa
-uEOZ+PonVIOnMjuLp29kcNOVnzf8DGKiek+cT51FvGRjV6LbaxXOm2P47/aiaXrDD5O0RF5SiPo6
-xD1/ClkCETyyEAE5LRJlXtx288R598koyFcwCSXijeVcRvBB1cNOLEbg7RMSw1AGq14fNe2cH1HG
-W7xyduY/ydQt6gv5r21mDOQ5SaZSWC/ZRfLDuEYwggWbMIIEg6ADAgECAhAH5JEPagNRXYDiRPdl
-c1vgMA0GCSqGSIb3DQEBCwUAMEExCzAJBgNVBAYTAkFVMRAwDgYDVQQKEwdWZXJva2V5MSAwHgYD
-VQQDExdWZXJva2V5IFNlY3VyZSBFbWFpbCBHMjAeFw0yNDEyMzAwMDAwMDBaFw0yODAxMDQyMzU5
-NTlaMB4xHDAaBgNVBAMME2R3bXcyQGluZnJhZGVhZC5vcmcwggIiMA0GCSqGSIb3DQEBAQUAA4IC
-DwAwggIKAoICAQDali7HveR1thexYXx/W7oMk/3Wpyppl62zJ8+RmTQH4yZeYAS/SRV6zmfXlXaZ
-sNOE6emg8WXLRS6BA70liot+u0O0oPnIvnx+CsMH0PD4tCKSCsdp+XphIJ2zkC9S7/yHDYnqegqt
-w4smkqUqf0WX/ggH1Dckh0vHlpoS1OoxqUg+ocU6WCsnuz5q5rzFsHxhD1qGpgFdZEk2/c//ZvUN
-i12vPWipk8TcJwHw9zoZ/ZrVNybpMCC0THsJ/UEVyuyszPtNYeYZAhOJ41vav1RhZJzYan4a1gU0
-kKBPQklcpQEhq48woEu15isvwWh9/+5jjh0L+YNaN0I//nHSp6U9COUG9Z0cvnO8FM6PTqsnSbcc
-0j+GchwOHRC7aP2t5v2stVx3KbptaYEzi4MQHxm/0+HQpMEVLLUiizJqS4PWPU6zfQTOMZ9uLQRR
-ci+c5xhtMEBszlQDOvEQcyEG+hc++fH47K+MmZz21bFNfoBxLP6bjR6xtPXtREF5lLXxp+CJ6KKS
-blPKeVRg/UtyJHeFKAZXO8Zeco7TZUMVHmK0ZZ1EpnZbnAhKE19Z+FJrQPQrlR0gO3lBzuyPPArV
-hvWxjlO7S4DmaEhLzarWi/ze7EGwWSuI2eEa/8zU0INUsGI4ywe7vepQz7IqaAovAX0d+f1YjbmC
-VsAwjhLmveFjNwIDAQABo4IBsDCCAawwHwYDVR0jBBgwFoAUiUgI6iBOd2uG5YHI1+GNZIR//HAw
-HQYDVR0OBBYEFFxiGptwbOfWOtMk5loHw7uqWUOnMDAGA1UdEQQpMCeBE2R3bXcyQGluZnJhZGVh
-ZC5vcmeBEGRhdmlkQHdvb2Rob3Uuc2UwFAYDVR0gBA0wCzAJBgdngQwBBQEBMA4GA1UdDwEB/wQE
-AwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwewYDVR0fBHQwcjA3oDWgM4YxaHR0
-cDovL2NybDMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDA3oDWgM4YxaHR0
-cDovL2NybDQuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNybDB2BggrBgEFBQcB
-AQRqMGgwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTBABggrBgEFBQcwAoY0
-aHR0cDovL2NhY2VydHMuZGlnaWNlcnQuY29tL1Zlcm9rZXlTZWN1cmVFbWFpbEcyLmNydDANBgkq
-hkiG9w0BAQsFAAOCAQEAQXc4FPiPLRnTDvmOABEzkIumojfZAe5SlnuQoeFUfi+LsWCKiB8Uextv
-iBAvboKhLuN6eG/NC6WOzOCppn4mkQxRkOdLNThwMHW0d19jrZFEKtEG/epZ/hw/DdScTuZ2m7im
-8ppItAT6GXD3aPhXkXnJpC/zTs85uNSQR64cEcBFjjoQDuSsTeJ5DAWf8EMyhMuD8pcbqx5kRvyt
-JPsWBQzv1Dsdv2LDPLNd/JUKhHSgr7nbUr4+aAP2PHTXGcEBh8lTeYea9p4d5k969pe0OHYMV5aL
-xERqTagmSetuIwolkAuBCzA9vulg8Y49Nz2zrpUGfKGOD0FMqenYxdJHgDCCBZswggSDoAMCAQIC
-EAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQELBQAwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoT
-B1Zlcm9rZXkxIDAeBgNVBAMTF1Zlcm9rZXkgU2VjdXJlIEVtYWlsIEcyMB4XDTI0MTIzMDAwMDAw
-MFoXDTI4MDEwNDIzNTk1OVowHjEcMBoGA1UEAwwTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJ
-KoZIhvcNAQEBBQADggIPADCCAgoCggIBANqWLse95HW2F7FhfH9bugyT/danKmmXrbMnz5GZNAfj
-Jl5gBL9JFXrOZ9eVdpmw04Tp6aDxZctFLoEDvSWKi367Q7Sg+ci+fH4KwwfQ8Pi0IpIKx2n5emEg
-nbOQL1Lv/IcNiep6Cq3DiyaSpSp/RZf+CAfUNySHS8eWmhLU6jGpSD6hxTpYKye7PmrmvMWwfGEP
-WoamAV1kSTb9z/9m9Q2LXa89aKmTxNwnAfD3Ohn9mtU3JukwILRMewn9QRXK7KzM+01h5hkCE4nj
-W9q/VGFknNhqfhrWBTSQoE9CSVylASGrjzCgS7XmKy/BaH3/7mOOHQv5g1o3Qj/+cdKnpT0I5Qb1
-nRy+c7wUzo9OqydJtxzSP4ZyHA4dELto/a3m/ay1XHcpum1pgTOLgxAfGb/T4dCkwRUstSKLMmpL
-g9Y9TrN9BM4xn24tBFFyL5znGG0wQGzOVAM68RBzIQb6Fz758fjsr4yZnPbVsU1+gHEs/puNHrG0
-9e1EQXmUtfGn4InoopJuU8p5VGD9S3Ikd4UoBlc7xl5yjtNlQxUeYrRlnUSmdlucCEoTX1n4UmtA
-9CuVHSA7eUHO7I88CtWG9bGOU7tLgOZoSEvNqtaL/N7sQbBZK4jZ4Rr/zNTQg1SwYjjLB7u96lDP
-sipoCi8BfR35/ViNuYJWwDCOEua94WM3AgMBAAGjggGwMIIBrDAfBgNVHSMEGDAWgBSJSAjqIE53
-a4blgcjX4Y1khH/8cDAdBgNVHQ4EFgQUXGIam3Bs59Y60yTmWgfDu6pZQ6cwMAYDVR0RBCkwJ4ET
-ZHdtdzJAaW5mcmFkZWFkLm9yZ4EQZGF2aWRAd29vZGhvdS5zZTAUBgNVHSAEDTALMAkGB2eBDAEF
-AQEwDgYDVR0PAQH/BAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDBDB7BgNVHR8E
-dDByMDegNaAzhjFodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMDegNaAzhjFodHRwOi8vY3JsNC5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVtYWlsRzIu
-Y3JsMHYGCCsGAQUFBwEBBGowaDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29t
-MEAGCCsGAQUFBzAChjRodHRwOi8vY2FjZXJ0cy5kaWdpY2VydC5jb20vVmVyb2tleVNlY3VyZUVt
-YWlsRzIuY3J0MA0GCSqGSIb3DQEBCwUAA4IBAQBBdzgU+I8tGdMO+Y4AETOQi6aiN9kB7lKWe5Ch
-4VR+L4uxYIqIHxR7G2+IEC9ugqEu43p4b80LpY7M4KmmfiaRDFGQ50s1OHAwdbR3X2OtkUQq0Qb9
-6ln+HD8N1JxO5nabuKbymki0BPoZcPdo+FeRecmkL/NOzzm41JBHrhwRwEWOOhAO5KxN4nkMBZ/w
-QzKEy4PylxurHmRG/K0k+xYFDO/UOx2/YsM8s138lQqEdKCvudtSvj5oA/Y8dNcZwQGHyVN5h5r2
-nh3mT3r2l7Q4dgxXlovERGpNqCZJ624jCiWQC4ELMD2+6WDxjj03PbOulQZ8oY4PQUyp6djF0keA
-MYIDuzCCA7cCAQEwVTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMX
-VmVyb2tleSBTZWN1cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJYIZIAWUDBAIBBQCg
-ggE3MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MTEyODEzMDAz
-NlowLwYJKoZIhvcNAQkEMSIEIAku+0bKPoyS1fWVnxttvkmnKOE1gAGjglp5KZvX5zI+MGQGCSsG
-AQQBgjcQBDFXMFUwQTELMAkGA1UEBhMCQVUxEDAOBgNVBAoTB1Zlcm9rZXkxIDAeBgNVBAMTF1Zl
-cm9rZXkgU2VjdXJlIEVtYWlsIEcyAhAH5JEPagNRXYDiRPdlc1vgMGYGCyqGSIb3DQEJEAILMVeg
-VTBBMQswCQYDVQQGEwJBVTEQMA4GA1UEChMHVmVyb2tleTEgMB4GA1UEAxMXVmVyb2tleSBTZWN1
-cmUgRW1haWwgRzICEAfkkQ9qA1FdgOJE92VzW+AwDQYJKoZIhvcNAQEBBQAEggIAgx80z+1+8uFW
-Y+K2ZduGj+1Lwvnv7175qjC8riWzswEQDx+9ge4oHK/CULh+bvDaCCxFQffChdOCUGdquE7MvCSO
-DUsO1z0tvr3oKeopvGZCjTS/xNIpVDZfddxSnr47c1c+g1LNPJjQS8HbdzN3x8Zo4OtEhuANp9F9
-Zp4T/NNu5xYCbzLw40zv/Nc7cQnn3e8XciQ1O13L4pZ9PxuRc9F2m48H5H6sp/mdAHK4w95i03g9
-wFk6OknqpEFLaouTu9Z/b2Rdeo8rXVXm8/pi3ShLbG3exA00CEcGw4fmUI+RZebCaHkY1SFXr6cY
-IxIrzZ8ONbjnx24HgTVyuE0ysIJWm48sktnBrZ9GNrLhVMYCq21h8hlGvU9GsKvu6rqj/714SiZW
-t/eSxxzJfOkexJHCtcypwPgmhbOdt7skYyyXrzQMv4gtbFjyJgqwK/Dm0Gw9RW+zHseU3ma7fNiR
-F8N/8sBxh2n066wAS8CUdV+JFyo1hPBI/7mxvDkOChGzBar/ytVUdzosQDsRoyy6orvz9BlMR3Xq
-B/Et71E+r4f1FsOZPUmCH6+CGoqZJnWMoPvk365/H9aRk5IdcJHqSDoYuGkzBmvaExVlTavsfkUe
-OwJbcnBnQ5xxXNMwtE+VxOmY0v7HOBTYZOU1SQvoahLv1vj+dpbTiI895kmk3QoAAAAAAAA=
+KASAN: stack-out-of-bounds Read in iov_iter_revert
+
+tree:      net-next
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
+base:      db4029859d6fd03f0622d394f4cdb1be86d7ec62
+arch:      amd64
+compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+config:    https://ci.syzbot.org/builds/253e310d-d693-4611-8760-36e2b39c0752/config
+C repro:   https://ci.syzbot.org/findings/be09fb4c-b087-441e-a7d7-eb8da4f7a000/c_repro
+syz repro: https://ci.syzbot.org/findings/be09fb4c-b087-441e-a7d7-eb8da4f7a000/syz_repro
+
+==================================================================
+BUG: KASAN: stack-out-of-bounds in iov_iter_revert+0x4d5/0x5f0 lib/iov_iter.c:645
+Read of size 8 at addr ffffc90003847b58 by task syz.0.17/5946
+
+CPU: 0 UID: 0 PID: 5946 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:378 [inline]
+ print_report+0xca/0x240 mm/kasan/report.c:482
+ kasan_report+0x118/0x150 mm/kasan/report.c:595
+ iov_iter_revert+0x4d5/0x5f0 lib/iov_iter.c:645
+ skb_zerocopy_iter_stream+0x27d/0x660 net/core/skbuff.c:1911
+ tcp_sendmsg_locked+0x1815/0x5540 net/ipv4/tcp.c:1300
+ tcp_sendmsg+0x2f/0x50 net/ipv4/tcp.c:1412
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg+0x19c/0x270 net/socket.c:742
+ ____sys_sendmsg+0x52d/0x830 net/socket.c:2630
+ ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2684
+ __sys_sendmmsg+0x227/0x430 net/socket.c:2773
+ __do_sys_sendmmsg net/socket.c:2800 [inline]
+ __se_sys_sendmmsg net/socket.c:2797 [inline]
+ __x64_sys_sendmmsg+0xa0/0xc0 net/socket.c:2797
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fe7c078f749
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fe7c1647038 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
+RAX: ffffffffffffffda RBX: 00007fe7c09e5fa0 RCX: 00007fe7c078f749
+RDX: 0000000000000004 RSI: 0000200000000d00 RDI: 0000000000000003
+RBP: 00007fe7c0813f91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000004000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fe7c09e6038 R14: 00007fe7c09e5fa0 R15: 00007ffd19e95ea8
+ </TASK>
+
+The buggy address belongs to stack of task syz.0.17/5946
+ and is located at offset 280 in frame:
+ ___sys_sendmsg+0x0/0x2a0 net/socket.c:2713
+
+This frame has 4 objects:
+ [32, 88) 'msg.i.i'
+ [128, 256) 'address'
+ [288, 416) 'iovstack'
+ [448, 456) 'iov'
+
+The buggy address belongs to a 8-page vmalloc region starting at 0xffffc90003840000 allocated at copy_process+0x54b/0x3c00 kernel/fork.c:2012
+The buggy address belongs to the physical page:
+page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1135fc
+memcg:ffff88810c5ca102
+flags: 0x17ff00000000000(node=0|zone=2|lastcpupid=0x7ff)
+raw: 017ff00000000000 0000000000000000 dead000000000122 0000000000000000
+raw: 0000000000000000 0000000000000000 00000001ffffffff ffff88810c5ca102
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 0, migratetype Unmovable, gfp_mask 0x2dc2(GFP_KERNEL|__GFP_HIGHMEM|__GFP_ZERO|__GFP_NOWARN), pid 5869, tgid 5869 (syz-executor), ts 56973482428, free_ts 56803199363
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x234/0x290 mm/page_alloc.c:1845
+ prep_new_page mm/page_alloc.c:1853 [inline]
+ get_page_from_freelist+0x2365/0x2440 mm/page_alloc.c:3879
+ __alloc_frozen_pages_noprof+0x181/0x370 mm/page_alloc.c:5178
+ alloc_pages_mpol+0x232/0x4a0 mm/mempolicy.c:2416
+ alloc_frozen_pages_noprof mm/mempolicy.c:2487 [inline]
+ alloc_pages_noprof+0xa9/0x190 mm/mempolicy.c:2507
+ vm_area_alloc_pages mm/vmalloc.c:3647 [inline]
+ __vmalloc_area_node mm/vmalloc.c:3724 [inline]
+ __vmalloc_node_range_noprof+0x96c/0x12d0 mm/vmalloc.c:3897
+ __vmalloc_node_noprof+0xc2/0x110 mm/vmalloc.c:3960
+ alloc_thread_stack_node kernel/fork.c:311 [inline]
+ dup_task_struct+0x3d4/0x830 kernel/fork.c:881
+ copy_process+0x54b/0x3c00 kernel/fork.c:2012
+ kernel_clone+0x21e/0x840 kernel/fork.c:2609
+ __do_sys_clone kernel/fork.c:2750 [inline]
+ __se_sys_clone kernel/fork.c:2734 [inline]
+ __x64_sys_clone+0x18b/0x1e0 kernel/fork.c:2734
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+page last free pid 5845 tgid 5845 stack trace:
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ free_pages_prepare mm/page_alloc.c:1394 [inline]
+ __free_frozen_pages+0xbc4/0xd30 mm/page_alloc.c:2901
+ kasan_depopulate_vmalloc_pte+0x6d/0x90 mm/kasan/shadow.c:495
+ apply_to_pte_range mm/memory.c:3143 [inline]
+ apply_to_pmd_range mm/memory.c:3187 [inline]
+ apply_to_pud_range mm/memory.c:3223 [inline]
+ apply_to_p4d_range mm/memory.c:3259 [inline]
+ __apply_to_page_range+0xb66/0x13d0 mm/memory.c:3295
+ kasan_release_vmalloc+0xa2/0xd0 mm/kasan/shadow.c:616
+ kasan_release_vmalloc_node mm/vmalloc.c:2255 [inline]
+ purge_vmap_node+0x214/0x8f0 mm/vmalloc.c:2272
+ __purge_vmap_area_lazy+0x7a4/0xb40 mm/vmalloc.c:2362
+ drain_vmap_area_work+0x27/0x40 mm/vmalloc.c:2396
+ process_one_work kernel/workqueue.c:3263 [inline]
+ process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3346
+ worker_thread+0x8a0/0xda0 kernel/workqueue.c:3427
+ kthread+0x711/0x8a0 kernel/kthread.c:463
+ ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+Memory state around the buggy address:
+ ffffc90003847a00: 00 00 00 00 00 00 00 00 f1 f1 f1 f1 00 00 00 00
+ ffffc90003847a80: 00 00 00 f2 f2 f2 f2 f2 00 00 00 00 00 00 00 00
+>ffffc90003847b00: 00 00 00 00 00 00 00 00 f2 f2 f2 f2 00 00 00 00
+                                                    ^
+ ffffc90003847b80: 00 00 00 00 00 00 00 00 00 00 00 00 f2 f2 f2 f2
+ ffffc90003847c00: 00 f3 f3 f3 00 00 00 00 00 00 00 00 00 00 00 00
+==================================================================
 
 
---=-XR97w2tl/RYS2W1LkAle--
+***
+
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
+
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
