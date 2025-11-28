@@ -1,405 +1,286 @@
-Return-Path: <netdev+bounces-242554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 083C2C92109
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 14:05:48 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 744CFC92118
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 14:07:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B35153AB7E9
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 13:05:46 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EE7F9349284
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 13:07:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4361232C31C;
-	Fri, 28 Nov 2025 13:05:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70FB7329C7E;
+	Fri, 28 Nov 2025 13:07:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="RjFB40Ap"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2470E329C7E
-	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 13:05:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764335144; cv=none; b=mBqcHd2DFACU7a3Mv1YefUv0gzdZ2OaMf4OBeRiU0SUcciO5MK/ha34f1TBOqyqen0LA6oks1S5apv3hH6Z3vOZEEUh/D3vUFfHz/yC8NY9C8wSJmScfeqt2iRspM1zNcyyl8wGuNOHWuB86N94b59ipQ1v3uqMm2TxKgsFK6Zg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764335144; c=relaxed/simple;
-	bh=MSF4aTwuFnQTXhiEntI/RhAaXdYOrI6HvD4olloE9sk=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=bZFkY+rIsUoRFOVjuNKg+DTs/RtiwYgSSjkjpkwIw8S3Y605xDxcKLosbvHfinoZAlusfKU80YbYAbyyN+at4pHjtriHw+p4hf7jap3cYL8S0ea9fC1lFTnibQRGsyrGpNXJCbY3TNmZ+il4L1ByBtDvw8d17yjgZcuyFAbOEOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-433795a17c1so14545135ab.2
-        for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 05:05:41 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764335141; x=1764939941;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Da0mSrGpOFlbh6E2JEojgyN0ezFOVK3IlslJDHEfAIQ=;
-        b=kFedslmPbZ/QtlzjMsUSQmyfvSfO6K+06imX+YxAXxT/IOD2g2e32OGkCksh4+kVb1
-         K488LA6woWRYTFYwXgze1Qp1YhagUzNsxwavWB7H6qv2fweWc4uRer8O6PMtmMjxDwx6
-         7sXiUUjM1HxdyzGoaUR9t0ODp87LoTDQT9ENAMolFd4fBC3Jby9QVAZTT4nUjvC7zsIP
-         aA5Pj+elkHlbOuD3RcKfntE2gTNHzg4GIgezMzEqCcpd3FL6zrmoDcgQpvwryc4v8+Jk
-         +4PZjZRglr3XAcxEUeCr9hrUPyYF/VA+yIQ9VzsG8qnAwKyQLqHXQZmXPQthGsARdq1c
-         fVLw==
-X-Forwarded-Encrypted: i=1; AJvYcCXhQrAnc2BC1sAmpmNUdQakHjPo8ngUwkOaZNZenzi26KEB2KHMPe29SV9t9lFrl+8Ym901Nqk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJ3kO8BUobOa/vRR9R7AljUx49n8tCRAt+3R41xprYzo59d700
-	Ou2TQqu4RwnsMtpiXPMjcUZN4kQ+u5WNhh3AHVh6FAwuUo6XhNOQTlEkQ8zJGyzcLgAZ1oNtijs
-	8T8yK+hinSMitA5nk0C8G6YmCxbTFL3UZ19PzGEgG6brWvVY0uKckofbPuzA=
-X-Google-Smtp-Source: AGHT+IEBwlSo3XKolPMOG7fHkjwUfS0AUvLx4Cv0IByV/okyV1JWVbR2iRFgZXa+4T1X2tWRPtEucwMQyr6HjV1meHe6+VgDwmSP
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9B8332C30A;
+	Fri, 28 Nov 2025 13:07:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.153.30
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764335224; cv=fail; b=ldysRo1zaOcLi5WmZrrw4GyY9Jqf9s3ncDaeezqOEtIElWceNowh3x1GRmRO+QTyTFEBOh1Y2yxJhUxr7rnkA/UPw2saO2pwaJhKaV08TeY/rrGKgLxrFX/JKi+dZaKcqhGwp2VtrEtLlRugG7p48+Lbd/TeDKJj/0KKr8Uw6oQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764335224; c=relaxed/simple;
+	bh=ZWscVtzjmrLyuZzM6frg9lfMSd/Fu6IdFU2s88sVges=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=NYoxU8g4FnesHQPfYteB1CL6n/LveW+h97w/j2t1W7L+RiWUDOf+gOkTOTIvy09rus62pLcAekYk9uUlsrR00U3LAGNnhjtW3QpitlY36V1SAO4XP5YV+QKrD3PSAoA38U3KMXS9sKHSc2BUsGsuJgNmwjjXWkl+H6Y7vVLrgzQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=RjFB40Ap; arc=fail smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5ASB1XCc2624573;
+	Fri, 28 Nov 2025 05:06:32 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
+	 bh=nXyzlFHJ4kK4VHadMDHjwlOyZRwlzyzLNr0yydHbkRs=; b=RjFB40Apxrf3
+	ZdEAGkHpi8Beqw08R03ZGMQSpi6CE/96tZprBaFEyUqkWllVXZOM6dOu1woGDrkT
+	67h282TFJrUgzOiH2Mq5kRty/NnxudaTDGHiANlJK3XQ3ur3Q5FAPC39LrDNpsMn
+	O4uTiC1SobbCCpd1vBwDWqh+d0N7QDsDpdnO9l9D61YaA6Sek0dwK74XJmA+E3qj
+	StprB9rWeg3vtWY4r9LjoDtx5oWRgRW3+faOekLpmKpboL/vTaTHDeBdMPEiltRc
+	cBsD0C3Z41Rgs+j7zqyVrJEHNcnNDanGYiuaZ0xWKNlpHPCgJEAQsJVcOuO3hVXo
+	VasDmM+g0w==
+Received: from ph0pr06cu001.outbound.protection.outlook.com (mail-westus3azon11011030.outbound.protection.outlook.com [40.107.208.30])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4aq4002921-2
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
+	Fri, 28 Nov 2025 05:06:32 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=du9Y5WfWBj+LHzRtDGvkxcq9HVJV8mRd7cGCYE8e0LDogYxGsQ7gIkj4JyeQXV81JzBowMpH//uDE6ta9iRMWpti7FOTgoqsLfinc13klW/R/skSznR+F6J9ZLKkYRx/eIlPesEXUs7SgMIwLxQT5BvnUFKXWrMl97FdK9/kgheBVoZEYvZjyQs8dqbH79KGuXXryiyWkKfcOspsz/YF4BHoMj+4J56J7KjTprJbLjwAvmOqwfE0cxWgi99AA45kZpBdnjySQ4JTvyHJrE9fhAHNvAd8/1D/eNBCP6Zl3ZSzi6QKuFt5nhynI67u3Ywk7aGc8wlGMELcU2Q7Nf5oWQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nXyzlFHJ4kK4VHadMDHjwlOyZRwlzyzLNr0yydHbkRs=;
+ b=OHoFAwjwFNQIBdoDaCkHnu+no+btfNczkxvQrqVa8VF9Twaqa+IoXy1aQaqeQSs+kHxbRDy1yCmUxAiYlqJ4ir7pLnE905ByNUxt16ahspAkMByTsFv/jyUu/u7AY1BOWA0qBNs+Q4RrYZe4KXms8o7tEXfMGxnxwgELOau0gb4jbKyqd3M6vKTow2P8nHsfPjZeonPhtCHwIQEJz1u5IJ8A80z5p7U/zLBTmZ0EssS6tap8eX6UXVH74GIWlOhO1HjDIBeVE8VbWML/RY80WJ5tfYLBzuWk2Penu2A5/DaX62BgJGMd4jfbcSfLsIlBRHcH3yF7wlUVv3MlWdjcTw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=meta.com; dmarc=pass action=none header.from=meta.com;
+ dkim=pass header.d=meta.com; arc=none
+Received: from LV3PR15MB6455.namprd15.prod.outlook.com (2603:10b6:408:1ad::10)
+ by DS0PR15MB6144.namprd15.prod.outlook.com (2603:10b6:8:117::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.17; Fri, 28 Nov
+ 2025 13:06:29 +0000
+Received: from LV3PR15MB6455.namprd15.prod.outlook.com
+ ([fe80::8102:bfca:2805:316e]) by LV3PR15MB6455.namprd15.prod.outlook.com
+ ([fe80::8102:bfca:2805:316e%5]) with mapi id 15.20.9366.009; Fri, 28 Nov 2025
+ 13:06:29 +0000
+Message-ID: <4910c9a6-0586-474c-b2e2-4c599e44272f@meta.com>
+Date: Fri, 28 Nov 2025 08:06:12 -0500
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v19 00/15] net: phy: Introduce PHY ports
+ representation
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, thomas.petazzoni@bootlin.com,
+        Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+        Russell King <linux@armlinux.org.uk>,
+        linux-arm-kernel@lists.infradead.org,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Herve Codina <herve.codina@bootlin.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Vladimir Oltean <vladimir.oltean@nxp.com>,
+        =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
+        =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
+        Oleksij Rempel <o.rempel@pengutronix.de>,
+        =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
+        Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+        Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
+        Conor Dooley <conor+dt@kernel.org>,
+        Krzysztof Kozlowski
+ <krzk+dt@kernel.org>,
+        Rob Herring <robh@kernel.org>,
+        Romain Gantois <romain.gantois@bootlin.com>,
+        Daniel Golle <daniel@makrotopia.org>,
+        Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
+        Tariq Toukan <tariqt@nvidia.com>
+References: <20251122124317.92346-1-maxime.chevallier@bootlin.com>
+ <20251126190035.2a4e0558@kernel.org>
+ <f753719e-2370-401d-a001-821bdd5ee838@bootlin.com>
+From: Chris Mason <clm@meta.com>
+Content-Language: en-US
+In-Reply-To: <f753719e-2370-401d-a001-821bdd5ee838@bootlin.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BL0PR05CA0011.namprd05.prod.outlook.com
+ (2603:10b6:208:91::21) To LV3PR15MB6455.namprd15.prod.outlook.com
+ (2603:10b6:408:1ad::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:174a:b0:434:8ec2:9a69 with SMTP id
- e9e14a558f8ab-435b98c6d20mr188254195ab.19.1764335141112; Fri, 28 Nov 2025
- 05:05:41 -0800 (PST)
-Date: Fri, 28 Nov 2025 05:05:41 -0800
-In-Reply-To: <tencent_387517772566B03DBD365896C036264AA809@qq.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69299e25.a70a0220.d98e3.013e.GAE@google.com>
-Subject: [syzbot ci] Re: net: restore the iterator to its original state when
- an error occurs
-From: syzbot ci <syzbot+ci3edb9412aeb2e703@syzkaller.appspotmail.com>
-To: davem@davemloft.net, eadavis@qq.com, edumazet@google.com, 
-	eperezma@redhat.com, horms@kernel.org, jasowang@redhat.com, kuba@kernel.org, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, mst@redhat.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com, sgarzare@redhat.com, 
-	stefanha@redhat.com, syzbot@syzkaller.appspotmail.com, 
-	syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev, 
-	xuanzhuo@linux.alibaba.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV3PR15MB6455:EE_|DS0PR15MB6144:EE_
+X-MS-Office365-Filtering-Correlation-Id: 40c21d40-6e8f-49fd-3375-08de2e7ef1e0
+X-LD-Processed: 8ae927fe-1255-47a7-a2af-5f3a069daaa2,ExtAddr
+X-FB-Source: Internal
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+ =?utf-8?B?WnVQM1M2T0ttRUNJbCtZNTJHVnZLRjNvY01RSTV6SWtUenM2bGJjRlpYK1hR?=
+ =?utf-8?B?N2Y3NzAwWllGQmpDRnVzUHQ1aHVZT2N4OHh6dnZad3ZBUmhxek1sWkVDOHF6?=
+ =?utf-8?B?N2lYZVFVUFNaQmFCd2RsV3NpUXZLOFFYWGVkV1pkWUZzUVJjaU5IbXMyYlRR?=
+ =?utf-8?B?Zlp1VThhTk1YUG9SUmlBWWpRU3o2Nlh1T0VXdWc0eFMzcnpSU2Y3TnZvNVJj?=
+ =?utf-8?B?dktMbnFJaHlyaVZ5bnJaYUhYN2s1RkZlZWx2ZXNYREZtelVPUEJ5d1dJeDdD?=
+ =?utf-8?B?b3ZmaWlMRWtzSm45R3BWbnQyb1V1TXJidDJ4dnV6cndYL0Z3WVIxRS92VUp5?=
+ =?utf-8?B?RVBlQlVKQ0FDODgzeDl2TlpyQmk2SWU2ejlldlluQ0pSMW1PY0MvdnNXaFRC?=
+ =?utf-8?B?elREb0xCbVlzeVdhZlRxSXF4MG1sSXNxY1FSMk5NcFJrR0lSeGFLOGpuR05h?=
+ =?utf-8?B?RTZSVXFXZUhwSWxaZU9KaXJ3a2pZSXpQMmFZbTNUQ25vdVVEUUlOck1nc1Fv?=
+ =?utf-8?B?RjZCV3lqcVBHQ1N3ZzZJQmdGUWVDNU5UUDdxNzdWTkZqd1ZXSnFpQUU2Wld6?=
+ =?utf-8?B?RHUrTkVDYWR6dHNHQjlHVEFYcng1Qkk2dXh5czUweHZvcXZyZ0s2SGNMeHg0?=
+ =?utf-8?B?a0UzQTZuUUYxZThaQnRBWERzb1RNQ3NNNU1aSXhadXZyc1VpMmNobnRwK0lU?=
+ =?utf-8?B?aDFaRHZVblovZlJIMjh6NENZSjFiajA4TDZxb1BESExuUUpyTFlQaExuVXJs?=
+ =?utf-8?B?aGlKSU5KMCtHVndQcVNmUjhjOS80b3R3QlhLNUsxbHczWWkwSzl5WFJpQUN2?=
+ =?utf-8?B?NjVFWkF3dmFha0xzR3VJaWc4RHVYT1QwU2hkQU5ZYjk5c0k0ZDl4QmlWam1P?=
+ =?utf-8?B?eUxGZFJPZVlpWmlSbjE0RE1taHBTSDNPb0dMaGlxQ0k4Kzg2WFRmOUZ6T0xX?=
+ =?utf-8?B?SlorK1RmYnB4YUlSRVdxRTNBZWVkL25pL2wvaXEyeFJnS3RZM2pSVzl6T0JF?=
+ =?utf-8?B?d01DQ1lDbHdlN0J4NUhXcWxnK2Q0ZHJuQnZsa3UzOXovNzJnNWdJTXEzbDRm?=
+ =?utf-8?B?NStSVjgxYW9KUUtvM1JnNzFOaDdKdXg2SnpQUmwxb2ROd1MwU3ZlUGxjTE1J?=
+ =?utf-8?B?Wm01dU1weXZNQTBnYzhoT0dyaVJXdXBObkt4c0lqS1JvTXB2b1dRVDdQVWRm?=
+ =?utf-8?B?QWVHdVQwSUNYY2tGZHJJVWZYYXkzN21lUXZXVGFFY2F4N25LRW1PNXFid0VS?=
+ =?utf-8?B?OVUwWlQrcGVjeUgwQWpoS1RQVVJrYmJyWTRRS3lzRFdsWllPbEN2Yllkd2dI?=
+ =?utf-8?B?Nm5QUm8vdnJ5cWpacVlHbUFBTC9OSC92dFhBTWlBWFRnTk9FaUxQb0JNd1U1?=
+ =?utf-8?B?UHBrb2s0dUgvM2JpTXYvdkRNekdZMk5uWlFHQmtaVUphWU9qYUkzTFk3OWdj?=
+ =?utf-8?B?b1o4YUNGcFRxSXVjemQ3bjhpYnMwWEhrWnkzRXowZXJTeXJFYXdVZXdlWHRm?=
+ =?utf-8?B?clpvN2N2VVo2bE9GeS9OK0RvbWtnUU1vamlHcDdjS1QzSHhiUy9RUzR3M016?=
+ =?utf-8?B?T0NXNEYxUDVGbXVoejIrV1E3NlE1N09BTUtKVXJTYmh5Wlk5bGh1K1lqWEY0?=
+ =?utf-8?B?V0hwKzROaFdzdjdrWEc4OXVuSzg3dFhGRWhOZDN4UFVOVm56NXZTRDBSTnBT?=
+ =?utf-8?B?OFhRcFg0Zk51UUVCeDBjaHdvSXpMVG5jVVN0aFpzcHE2VC9GK1l0SDRiR0lM?=
+ =?utf-8?B?VUVpV0ZBT2VmampDQ1E3NnFxMlFyaU56VjdRTm1oWURsUGhlOG04aE1PekFz?=
+ =?utf-8?B?SU1XdnhBcE5tYUNVQURNTURLT1N6VERtUUJtMWs1SC9WRkhGcG8wSFZuQ0NO?=
+ =?utf-8?B?ZmZuNTkvYWxNdkZyRHlVK2pFcTRYb0dlOWlMSzR6TTZDQzh4MGRtSGpQWDda?=
+ =?utf-8?Q?Kv9V21rtFfH49I8BEbp2u+4F+eIOCWBw?=
+X-Forefront-Antispam-Report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR15MB6455.namprd15.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+ =?utf-8?B?VzlrWlU0RWJDbWpyVThQbFRWcHJ2YWIyTzdHTzdVMDA1bDBQQVJ3L2dPVW0r?=
+ =?utf-8?B?dlM5dnNXeVRkZmJjVXVMcDhVZmNBbUxTOHdQaGJsNlphdW9KSUZWY2F1NkN0?=
+ =?utf-8?B?R0NnTkhKRzNwUFozeTFad3FQVGhiWDNoemNIakk1Q0s4Z3VwS3pLL1ZCWmx1?=
+ =?utf-8?B?cWw4YmxMWHFpdzlUcml6cHVoSklBdGRjWWN2R0xheG5MM09ubjhRaVNrWjRP?=
+ =?utf-8?B?alg5YkRMTDhjQ2hqZ1RhU2VBMzJSWmlPL0NKWng2QUlpOURTbDRrUldkL2xq?=
+ =?utf-8?B?RFgrTWovT2ZKbm50Q0s0cUhOYXJvTVljTm95SlBNZkZVeFNZNmpWSU1ocGRk?=
+ =?utf-8?B?V20vSUhoOS9UL1RzQnRwVEtQdkd1UE5PUjlCeUVpeFYzY2hmUFZlVXUzSFBh?=
+ =?utf-8?B?ZlEveUdkZ081ZHZaeHp1MVBpelk0NzlMWlEyTThXVzlRQXZKM1BYQjFzempa?=
+ =?utf-8?B?anQyRnUzaHlhd2FaUlNwVXNBK0Q4aDg1dDBRcFhEcjlKRWFkYWo3YkxHVmEw?=
+ =?utf-8?B?VWE1d1kzTHI5N3JyU2FFZXA0TWFOMXdZRjN6ZUpwR01Sa3UrTm9OOUtIcXg1?=
+ =?utf-8?B?MlEybFhQQmlJZnppK2RTYko0OUx3SU5YNzFCNUJveTdZOENNd2MyTXRvRGFE?=
+ =?utf-8?B?QWhSWStzRnNRYWd5NjF0bzhCcnZraXZ3WjJLeTlmY1dERHBiMHduMW8rcDk3?=
+ =?utf-8?B?Q3BiSUVhSDZhc0lLSEloM2dVQ0ZyVTcvMm5mK2NXaTNXS3hHY2FQQmNTUWx1?=
+ =?utf-8?B?Z1ErTWJySUdieHI4ZXQrMkxiRVhIU0FpcnBMUEh5bTNYZWFKbmpTcnN2STNk?=
+ =?utf-8?B?QWF2bXgvbmIwTWFieHVuMWlmcWV6QmMxOHJpVVpkRmx3RHpqbGxiUmM4ZnpO?=
+ =?utf-8?B?N1poVFE1OUVVcm1qRkpmbTQyQTVrR2hQdHdGQW13eTRvUDZhWk5KUFdUVHRX?=
+ =?utf-8?B?Yk4rYklnZzJpVXR0RU0vZStXSXlFZmNMU2VLK3owdEFZaXBKZmFpVkNzNmVh?=
+ =?utf-8?B?ZEc1OUhXSEJvOWhlWm5Rc2Q5NmYraXJFd0FUWXZmU1NOM3VNbEVGZzdXK0FF?=
+ =?utf-8?B?OG56bDhzK08wWEJMMFppbmV3WU04MitTZG1jOWxtM1h1ZVY2NXRUVWFvenNO?=
+ =?utf-8?B?bGFxNmpOUm1BSlBHd3lXVlRSSk9VZGpZN1Q4NDgvTDlUS1hVKzZqQkNlVWcw?=
+ =?utf-8?B?eHIrODhWTEJkZGtCQTRkWWNEVHBrdUlINTBVcmw2ZjNMS2taNmVrRjNNQnNE?=
+ =?utf-8?B?RDhRSTE0ZTR1NGZJbGYwOGpucnZLTm5aQVA1TEYrdmFuTnRwWUdRU295M2ZC?=
+ =?utf-8?B?aThBK2JYT3pSQjFYbmdEUEJFeHJDTnlUKzhzR3h2OUtTUWxITndza3J1T3hi?=
+ =?utf-8?B?UEF0SkxsTjkwMndrQUwyczFoa0JmNUZIVU1mSGd6Y0szZGtaYmMwUzg1c3RO?=
+ =?utf-8?B?R1pRVHNOald6N1JEc0loVERobmV2dmFHMk1HUkNlazRLa1gwUWtaZkp0VW9x?=
+ =?utf-8?B?WDJRQlpTOVdhSyt4a2JmWHpLNUlXWWFxeTd1YWRpaGhPaHBMV0lTRVZPeDg5?=
+ =?utf-8?B?cHI3ODJtL25lUzcwTlhGaEpBN05MYWZ3VUc1OW1DREppOStJWmV6eFB2WjE2?=
+ =?utf-8?B?Z1dKby9RNE5pZXpLOVFERkFDd3A1Y3BoOUZydWNlcVBnUTVtSE9JZVdrWFFN?=
+ =?utf-8?B?OTBJWFdoVnFUTVo2SmNmUEd5Q3VXT1hwb3BFbTdNRTV2YnhpNFRVb3h3Mkxi?=
+ =?utf-8?B?bHNJTm03MWNJOVpPdDBiczdqYW5aU0VqVUc5NTFyTUx2RkNqZnh1ZTdzT1Ev?=
+ =?utf-8?B?VlVncWhIZFgrZmNkeVdwUitrNUN4NFhrYlJjeURmT1FRTG9raUtXbkRnWUFw?=
+ =?utf-8?B?L0hMak84bHdZV1cxVE4xT09HL0FWQTlVSDNVWTNDd2x3Uk5TKzVyR0k5bWJT?=
+ =?utf-8?B?ZFovYUJZZGJCV2Vabm9pL0ZrQzhud3pubDk2cGxoZzBGTnd2VnNEd0pNZy80?=
+ =?utf-8?B?M2VQSHE3Ym9SR0E4UFNQTlQzK2ZLME1MWVp5SjJPL09BK2lGaXZUNlI1b0Jo?=
+ =?utf-8?B?ZGpmaHJvVHFIbWhydkpOeGRWZVAvYXJ0RDRmazRPdHVzMFBYU0xmL05GWkRw?=
+ =?utf-8?Q?cPmY=3D?=
+X-OriginatorOrg: meta.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 40c21d40-6e8f-49fd-3375-08de2e7ef1e0
+X-MS-Exchange-CrossTenant-AuthSource: LV3PR15MB6455.namprd15.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Nov 2025 13:06:29.3967
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: W8Vqu9RoGamQGEOwiUPjudR34wK2XuHRpmM3YDOcAGaUZ3munEn2z32+471MtsMA
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR15MB6144
+X-Proofpoint-ORIG-GUID: y6Xc4jBhefYJAboQa8aasH_xFEHrG-mz
+X-Proofpoint-GUID: y6Xc4jBhefYJAboQa8aasH_xFEHrG-mz
+X-Authority-Analysis: v=2.4 cv=bI4b4f+Z c=1 sm=1 tr=0 ts=69299e58 cx=c_pps
+ a=ysgzExocFkmHQmNOaQPFvQ==:117 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19
+ a=z/mQ4Ysz8XfWz/Q5cLBRGdckG28=:19 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19
+ a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=CjCV1Wvz5ey77DIHvEEA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTI4MDA5NCBTYWx0ZWRfX7Y3OAOZyJFKl
+ BZtcOcLV8g95cbnARumdsMU57ov/3z2Ice8DHBWVyoEYhPUq7ba69wst6xRnEk01t46GsroG7SM
+ TK9kto/Qd7vldJ+C9ObJS4shhezkVV+nCsqanRJMXWhbxdO4XWjZ27jqAxayWoH7z44qZPDb3hC
+ zZjpts7n2yloNzVoL7H2iqR8AsaM/KO7sFqwxTjbcevSLJtKlDpBxZmeIrrnY3wguo7eqsY6/+z
+ WIB6bM/F88GAqcBxPvfFY6f5Qc+QvdlJc5ZN8TR39p/IIythH+cJHzo/5fT1YexG+w1pTpgg6y6
+ +vfsV9WJ7s/8bB3hB5x1tsBwufwqvkbYgZH8UTPCR6eLSokGwJGum92xP3YQ5cF5ONvm0Nkx8+l
+ PWR7xUR3ScnJeN7OreY4YZ6i5kbbKQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-28_03,2025-11-27_02,2025-10-01_01
 
-syzbot ci has tested the following series
+On 11/27/25 10:53 AM, Maxime Chevallier wrote:
+> Hi Chris,
+> 
+> On 27/11/2025 04:00, Jakub Kicinski wrote:
+>> On Sat, 22 Nov 2025 13:42:59 +0100 Maxime Chevallier wrote:
+>>> This is v19 of the phy_port work. Patches 2 and 3 lack PHY maintainers reviews.
+>>>
+>>> This v19 has no changes compared to v18, but patch 2 was rebased on top
+>>> of the recent 1.6T linkmodes.
+>>>
+>>> Thanks for everyone's patience and reviews on that work ! Now, the
+>>> usual blurb for the series description.
+>>
+>> Hopefully we can still make v6.19, but we hooked up Claude Code review
+>> to patchwork this week, and it points out some legit issues here :(
+>> Some look transient but others are definitely legit, please look thru
+>> this:
+>>
 
-[v1] net: restore the iterator to its original state when an error occurs
-https://lore.kernel.org/all/tencent_387517772566B03DBD365896C036264AA809@qq.com
-* [PATCH Next] net: restore the iterator to its original state when an error occurs
+[ ... urls mangled by meta email ... ]
 
-and found the following issues:
-* KASAN: slab-out-of-bounds Read in iov_iter_revert
-* KASAN: stack-out-of-bounds Read in iov_iter_revert
+> I was told by Paolo to reach out with any feedback on the LLM reviews :
+>
 
-Full report is available here:
-https://ci.syzbot.org/series/b5c506f4-f657-428b-bd21-8d50aedef42c
+Thanks for sending these along, it really helps me fix up the prompts.
 
-***
+[ ... ]
 
-KASAN: slab-out-of-bounds Read in iov_iter_revert
+> 
+> Does priv->line_interface need to be reset when enable is false? The
+> old mv2222_sfp_remove() explicitly set it to PHY_INTERFACE_MODE_NA,
+> but the new code leaves it at whatever value was set during the last
+> module insertion. Functions like mv2222_config_aneg() check whether
+> priv->line_interface equals PHY_INTERFACE_MODE_NA to determine if a
+> module is present.
+> 
+> --------x8----------------------------------------------------------------------
+> 
+> 
+> Looking at the call-sites, we can see that when the .configure_mii port ops is
+> called with enabled = false, the interface is always PHY_INTERFACE_MODE_NA.
+> 
+> Looks like the potential problem was identified correctly, but it failed to see
+> that this can't ever happen.
 
-tree:      net-next
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
-base:      db4029859d6fd03f0622d394f4cdb1be86d7ec62
-arch:      amd64
-compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-config:    https://ci.syzbot.org/builds/253e310d-d693-4611-8760-36e2b39c0752/config
-syz repro: https://ci.syzbot.org/findings/1bbe297c-62ec-4071-9df3-d1c80a2bb758/syz_repro
+This is also a problem for bpf reviews, where claude finds a pretty
+detailed path to a bug that can never happen in practice.  I'll use this
+and a few similar false positive reports to try and improve the
+elimination of impossible bugs.
 
-==================================================================
-BUG: KASAN: slab-out-of-bounds in iov_iter_revert+0x4d5/0x5f0 lib/iov_iter.c:645
-Read of size 8 at addr ffff888112061ff8 by task syz.1.18/5997
+> It's a bit tricky I guess, as the call-site in question
+> is introduced by a previous patch in the same series though.
 
-CPU: 0 UID: 0 PID: 5997 Comm: syz.1.18 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0xca/0x240 mm/kasan/report.c:482
- kasan_report+0x118/0x150 mm/kasan/report.c:595
- iov_iter_revert+0x4d5/0x5f0 lib/iov_iter.c:645
- skb_zerocopy_iter_stream+0x27d/0x660 net/core/skbuff.c:1911
- tcp_sendmsg_locked+0x1815/0x5540 net/ipv4/tcp.c:1300
- tcp_sendmsg+0x2f/0x50 net/ipv4/tcp.c:1412
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg+0x19c/0x270 net/socket.c:742
- ____sys_sendmsg+0x52d/0x830 net/socket.c:2630
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2684
- __sys_sendmmsg+0x227/0x430 net/socket.c:2773
- __do_sys_sendmmsg net/socket.c:2800 [inline]
- __se_sys_sendmmsg net/socket.c:2797 [inline]
- __x64_sys_sendmmsg+0xa0/0xc0 net/socket.c:2797
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f6942f8f749
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f6943d8a038 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
-RAX: ffffffffffffffda RBX: 00007f69431e5fa0 RCX: 00007f6942f8f749
-RDX: 0000000000000004 RSI: 0000200000000d00 RDI: 0000000000000003
-RBP: 00007f6943013f91 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000004000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f69431e6038 R14: 00007f69431e5fa0 R15: 00007fff3f790f38
- </TASK>
+This part shouldn't be a factor (I hope), but I'll check.
 
-Allocated by task 5913:
- kasan_save_stack mm/kasan/common.c:56 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:77
- poison_kmalloc_redzone mm/kasan/common.c:400 [inline]
- __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:417
- kasan_kmalloc include/linux/kasan.h:262 [inline]
- __do_kmalloc_node mm/slub.c:5650 [inline]
- __kmalloc_noprof+0x411/0x7f0 mm/slub.c:5662
- kmalloc_noprof include/linux/slab.h:961 [inline]
- kzalloc_noprof include/linux/slab.h:1094 [inline]
- ip6t_alloc_initial_table+0x6b/0x6d0 net/ipv6/netfilter/ip6_tables.c:40
- ip6table_security_table_init+0x1b/0x70 net/ipv6/netfilter/ip6table_security.c:42
- xt_find_table_lock+0x30c/0x3e0 net/netfilter/x_tables.c:1260
- xt_request_find_table_lock+0x26/0x100 net/netfilter/x_tables.c:1285
- get_info net/ipv6/netfilter/ip6_tables.c:979 [inline]
- do_ip6t_get_ctl+0x730/0x1180 net/ipv6/netfilter/ip6_tables.c:1668
- nf_getsockopt+0x26e/0x290 net/netfilter/nf_sockopt.c:116
- ipv6_getsockopt+0x1ed/0x290 net/ipv6/ipv6_sockglue.c:1473
- do_sock_getsockopt+0x372/0x450 net/socket.c:2421
- __sys_getsockopt net/socket.c:2450 [inline]
- __do_sys_getsockopt net/socket.c:2457 [inline]
- __se_sys_getsockopt net/socket.c:2454 [inline]
- __x64_sys_getsockopt+0x1a5/0x250 net/socket.c:2454
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+-chris
 
-Freed by task 5913:
- kasan_save_stack mm/kasan/common.c:56 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:77
- __kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:587
- kasan_save_free_info mm/kasan/kasan.h:406 [inline]
- poison_slab_object mm/kasan/common.c:252 [inline]
- __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:284
- kasan_slab_free include/linux/kasan.h:234 [inline]
- slab_free_hook mm/slub.c:2543 [inline]
- slab_free mm/slub.c:6642 [inline]
- kfree+0x19a/0x6d0 mm/slub.c:6849
- ip6table_security_table_init+0x4b/0x70 net/ipv6/netfilter/ip6table_security.c:46
- xt_find_table_lock+0x30c/0x3e0 net/netfilter/x_tables.c:1260
- xt_request_find_table_lock+0x26/0x100 net/netfilter/x_tables.c:1285
- get_info net/ipv6/netfilter/ip6_tables.c:979 [inline]
- do_ip6t_get_ctl+0x730/0x1180 net/ipv6/netfilter/ip6_tables.c:1668
- nf_getsockopt+0x26e/0x290 net/netfilter/nf_sockopt.c:116
- ipv6_getsockopt+0x1ed/0x290 net/ipv6/ipv6_sockglue.c:1473
- do_sock_getsockopt+0x372/0x450 net/socket.c:2421
- __sys_getsockopt net/socket.c:2450 [inline]
- __do_sys_getsockopt net/socket.c:2457 [inline]
- __se_sys_getsockopt net/socket.c:2454 [inline]
- __x64_sys_getsockopt+0x1a5/0x250 net/socket.c:2454
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-The buggy address belongs to the object at ffff888112061800
- which belongs to the cache kmalloc-1k of size 1024
-The buggy address is located 1016 bytes to the right of
- allocated 1024-byte region [ffff888112061800, ffff888112061c00)
-
-The buggy address belongs to the physical page:
-page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x112060
-head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-flags: 0x17ff00000000040(head|node=0|zone=2|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 017ff00000000040 ffff888100041dc0 dead000000000122 0000000000000000
-raw: 0000000000000000 0000000000100010 00000000f5000000 0000000000000000
-head: 017ff00000000040 ffff888100041dc0 dead000000000122 0000000000000000
-head: 0000000000000000 0000000000100010 00000000f5000000 0000000000000000
-head: 017ff00000000003 ffffea0004481801 00000000ffffffff 00000000ffffffff
-head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000008
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 5913, tgid 5913 (syz-executor), ts 67648433769, free_ts 67644331621
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x234/0x290 mm/page_alloc.c:1845
- prep_new_page mm/page_alloc.c:1853 [inline]
- get_page_from_freelist+0x2365/0x2440 mm/page_alloc.c:3879
- __alloc_frozen_pages_noprof+0x181/0x370 mm/page_alloc.c:5178
- alloc_pages_mpol+0x232/0x4a0 mm/mempolicy.c:2416
- alloc_slab_page mm/slub.c:3059 [inline]
- allocate_slab+0x96/0x350 mm/slub.c:3232
- new_slab mm/slub.c:3286 [inline]
- ___slab_alloc+0xf56/0x1990 mm/slub.c:4655
- __slab_alloc+0x65/0x100 mm/slub.c:4778
- __slab_alloc_node mm/slub.c:4854 [inline]
- slab_alloc_node mm/slub.c:5276 [inline]
- __do_kmalloc_node mm/slub.c:5649 [inline]
- __kmalloc_noprof+0x471/0x7f0 mm/slub.c:5662
- kmalloc_noprof include/linux/slab.h:961 [inline]
- kzalloc_noprof include/linux/slab.h:1094 [inline]
- ipt_alloc_initial_table+0x6b/0x6a0 net/ipv4/netfilter/ip_tables.c:36
- iptable_security_table_init+0x1b/0x70 net/ipv4/netfilter/iptable_security.c:43
- xt_find_table_lock+0x30c/0x3e0 net/netfilter/x_tables.c:1260
- xt_request_find_table_lock+0x26/0x100 net/netfilter/x_tables.c:1285
- get_info net/ipv4/netfilter/ip_tables.c:963 [inline]
- do_ipt_get_ctl+0x730/0x1180 net/ipv4/netfilter/ip_tables.c:1659
- nf_getsockopt+0x26e/0x290 net/netfilter/nf_sockopt.c:116
- ip_getsockopt+0x1c4/0x220 net/ipv4/ip_sockglue.c:1777
- do_sock_getsockopt+0x372/0x450 net/socket.c:2421
-page last free pid 5913 tgid 5913 stack trace:
- reset_page_owner include/linux/page_owner.h:25 [inline]
- free_pages_prepare mm/page_alloc.c:1394 [inline]
- __free_frozen_pages+0xbc4/0xd30 mm/page_alloc.c:2901
- __slab_free+0x2e7/0x390 mm/slub.c:5970
- qlink_free mm/kasan/quarantine.c:163 [inline]
- qlist_free_all+0x97/0x140 mm/kasan/quarantine.c:179
- kasan_quarantine_reduce+0x148/0x160 mm/kasan/quarantine.c:286
- __kasan_slab_alloc+0x22/0x80 mm/kasan/common.c:352
- kasan_slab_alloc include/linux/kasan.h:252 [inline]
- slab_post_alloc_hook mm/slub.c:4978 [inline]
- slab_alloc_node mm/slub.c:5288 [inline]
- kmem_cache_alloc_noprof+0x367/0x6e0 mm/slub.c:5295
- getname_flags+0xb8/0x540 fs/namei.c:146
- getname include/linux/fs.h:2924 [inline]
- do_sys_openat2+0xbc/0x1c0 fs/open.c:1431
- do_sys_open fs/open.c:1452 [inline]
- __do_sys_openat fs/open.c:1468 [inline]
- __se_sys_openat fs/open.c:1463 [inline]
- __x64_sys_openat+0x138/0x170 fs/open.c:1463
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Memory state around the buggy address:
- ffff888112061e80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff888112061f00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->ffff888112061f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-                                                                ^
- ffff888112062000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
- ffff888112062080: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-==================================================================
-
-
-***
-
-KASAN: stack-out-of-bounds Read in iov_iter_revert
-
-tree:      net-next
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
-base:      db4029859d6fd03f0622d394f4cdb1be86d7ec62
-arch:      amd64
-compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-config:    https://ci.syzbot.org/builds/253e310d-d693-4611-8760-36e2b39c0752/config
-C repro:   https://ci.syzbot.org/findings/be09fb4c-b087-441e-a7d7-eb8da4f7a000/c_repro
-syz repro: https://ci.syzbot.org/findings/be09fb4c-b087-441e-a7d7-eb8da4f7a000/syz_repro
-
-==================================================================
-BUG: KASAN: stack-out-of-bounds in iov_iter_revert+0x4d5/0x5f0 lib/iov_iter.c:645
-Read of size 8 at addr ffffc90003847b58 by task syz.0.17/5946
-
-CPU: 0 UID: 0 PID: 5946 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0xca/0x240 mm/kasan/report.c:482
- kasan_report+0x118/0x150 mm/kasan/report.c:595
- iov_iter_revert+0x4d5/0x5f0 lib/iov_iter.c:645
- skb_zerocopy_iter_stream+0x27d/0x660 net/core/skbuff.c:1911
- tcp_sendmsg_locked+0x1815/0x5540 net/ipv4/tcp.c:1300
- tcp_sendmsg+0x2f/0x50 net/ipv4/tcp.c:1412
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg+0x19c/0x270 net/socket.c:742
- ____sys_sendmsg+0x52d/0x830 net/socket.c:2630
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2684
- __sys_sendmmsg+0x227/0x430 net/socket.c:2773
- __do_sys_sendmmsg net/socket.c:2800 [inline]
- __se_sys_sendmmsg net/socket.c:2797 [inline]
- __x64_sys_sendmmsg+0xa0/0xc0 net/socket.c:2797
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fe7c078f749
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fe7c1647038 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
-RAX: ffffffffffffffda RBX: 00007fe7c09e5fa0 RCX: 00007fe7c078f749
-RDX: 0000000000000004 RSI: 0000200000000d00 RDI: 0000000000000003
-RBP: 00007fe7c0813f91 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000004000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fe7c09e6038 R14: 00007fe7c09e5fa0 R15: 00007ffd19e95ea8
- </TASK>
-
-The buggy address belongs to stack of task syz.0.17/5946
- and is located at offset 280 in frame:
- ___sys_sendmsg+0x0/0x2a0 net/socket.c:2713
-
-This frame has 4 objects:
- [32, 88) 'msg.i.i'
- [128, 256) 'address'
- [288, 416) 'iovstack'
- [448, 456) 'iov'
-
-The buggy address belongs to a 8-page vmalloc region starting at 0xffffc90003840000 allocated at copy_process+0x54b/0x3c00 kernel/fork.c:2012
-The buggy address belongs to the physical page:
-page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1135fc
-memcg:ffff88810c5ca102
-flags: 0x17ff00000000000(node=0|zone=2|lastcpupid=0x7ff)
-raw: 017ff00000000000 0000000000000000 dead000000000122 0000000000000000
-raw: 0000000000000000 0000000000000000 00000001ffffffff ffff88810c5ca102
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 0, migratetype Unmovable, gfp_mask 0x2dc2(GFP_KERNEL|__GFP_HIGHMEM|__GFP_ZERO|__GFP_NOWARN), pid 5869, tgid 5869 (syz-executor), ts 56973482428, free_ts 56803199363
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x234/0x290 mm/page_alloc.c:1845
- prep_new_page mm/page_alloc.c:1853 [inline]
- get_page_from_freelist+0x2365/0x2440 mm/page_alloc.c:3879
- __alloc_frozen_pages_noprof+0x181/0x370 mm/page_alloc.c:5178
- alloc_pages_mpol+0x232/0x4a0 mm/mempolicy.c:2416
- alloc_frozen_pages_noprof mm/mempolicy.c:2487 [inline]
- alloc_pages_noprof+0xa9/0x190 mm/mempolicy.c:2507
- vm_area_alloc_pages mm/vmalloc.c:3647 [inline]
- __vmalloc_area_node mm/vmalloc.c:3724 [inline]
- __vmalloc_node_range_noprof+0x96c/0x12d0 mm/vmalloc.c:3897
- __vmalloc_node_noprof+0xc2/0x110 mm/vmalloc.c:3960
- alloc_thread_stack_node kernel/fork.c:311 [inline]
- dup_task_struct+0x3d4/0x830 kernel/fork.c:881
- copy_process+0x54b/0x3c00 kernel/fork.c:2012
- kernel_clone+0x21e/0x840 kernel/fork.c:2609
- __do_sys_clone kernel/fork.c:2750 [inline]
- __se_sys_clone kernel/fork.c:2734 [inline]
- __x64_sys_clone+0x18b/0x1e0 kernel/fork.c:2734
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-page last free pid 5845 tgid 5845 stack trace:
- reset_page_owner include/linux/page_owner.h:25 [inline]
- free_pages_prepare mm/page_alloc.c:1394 [inline]
- __free_frozen_pages+0xbc4/0xd30 mm/page_alloc.c:2901
- kasan_depopulate_vmalloc_pte+0x6d/0x90 mm/kasan/shadow.c:495
- apply_to_pte_range mm/memory.c:3143 [inline]
- apply_to_pmd_range mm/memory.c:3187 [inline]
- apply_to_pud_range mm/memory.c:3223 [inline]
- apply_to_p4d_range mm/memory.c:3259 [inline]
- __apply_to_page_range+0xb66/0x13d0 mm/memory.c:3295
- kasan_release_vmalloc+0xa2/0xd0 mm/kasan/shadow.c:616
- kasan_release_vmalloc_node mm/vmalloc.c:2255 [inline]
- purge_vmap_node+0x214/0x8f0 mm/vmalloc.c:2272
- __purge_vmap_area_lazy+0x7a4/0xb40 mm/vmalloc.c:2362
- drain_vmap_area_work+0x27/0x40 mm/vmalloc.c:2396
- process_one_work kernel/workqueue.c:3263 [inline]
- process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3346
- worker_thread+0x8a0/0xda0 kernel/workqueue.c:3427
- kthread+0x711/0x8a0 kernel/kthread.c:463
- ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-Memory state around the buggy address:
- ffffc90003847a00: 00 00 00 00 00 00 00 00 f1 f1 f1 f1 00 00 00 00
- ffffc90003847a80: 00 00 00 f2 f2 f2 f2 f2 00 00 00 00 00 00 00 00
->ffffc90003847b00: 00 00 00 00 00 00 00 00 f2 f2 f2 f2 00 00 00 00
-                                                    ^
- ffffc90003847b80: 00 00 00 00 00 00 00 00 00 00 00 00 f2 f2 f2 f2
- ffffc90003847c00: 00 f3 f3 f3 00 00 00 00 00 00 00 00 00 00 00 00
-==================================================================
-
-
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
