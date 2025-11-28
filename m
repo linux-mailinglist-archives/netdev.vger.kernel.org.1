@@ -1,217 +1,113 @@
-Return-Path: <netdev+bounces-242487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF81BC90A45
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 03:40:20 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FD94C90A5A
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 03:43:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD0993A954B
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 02:40:18 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 638694E1BEC
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 02:43:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FD4427B4F9;
-	Fri, 28 Nov 2025 02:40:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81EA2272805;
+	Fri, 28 Nov 2025 02:43:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dtp8CLyy";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="WUBPBups"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l1t7eRza"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A540272805
-	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 02:40:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DAFC81724
+	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 02:43:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764297615; cv=none; b=XKp3yyqYUdGc0Iq1j5iyLdkm7IZHwsgX+iLIgkiM0fK8XLoUu4DqjzcpPwxGEIl057cyCkzcRdQj1AkTk9c2eddm/9OyjdW52LWAUcCLzDAD6iPvFHnjR0V0cNdKPzXDvISZOQBclwOvldJtc1ew4p8qN8Drvz4EoZDVVI3tb5c=
+	t=1764297794; cv=none; b=puN4FkNvQdzCm0ktpKqZpFjkHaPe+pWWkUn+zr4IOH9gJg0QMLYil+dUn5oQoZUSi+AEa+cnv6y9CwP0i0xWUYnc5896s8pzmCx+TMyJIN/swonMYgjemmgKcEugmmCQaUenqwDwFtPUE6u9NXDV1cuMYWrP+5fGhK/bRI1CQyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764297615; c=relaxed/simple;
-	bh=nqBlYAzg6qxQEMzgk9fJKhYVwAMlfJjMd6zbIrDkIsA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=o47dZS89pMN9ck8gF65jiKHttiMJX6xG2UCl97WsYXI22HtAqDcFpQIflH4JpEBzwyT9cbleDDFOEwrLVt73QDN9/bT2BqBXQMSUup198gaD+BX96qBphqAaEUoFDn2VbWc+jzg8DVyKwro/BXjAI3yIMA76zlJZtddXkX/qZuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dtp8CLyy; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=WUBPBups; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764297612;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sgfHeihlC+8u1mHu0tUzhZgmVFrgBxrrACIpxiuhkOQ=;
-	b=dtp8CLyyKRQXNaHy2h0DqYw002b993NEL55QQeWV650jqOXn/5yWY5CI5MbL8LBtmFodyp
-	pq7cx9JjQhy2f+MKYCehG9YDx95BGkECU2k3Cgpk6dGNfxqmmSenBr3uzHNqbfSjYbtALH
-	BEp9G6iFQhHlD/bFiaf/xgTmGz+yf94=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-441-hwxpQNXXMDiBqM8zMOpXCA-1; Thu, 27 Nov 2025 21:40:10 -0500
-X-MC-Unique: hwxpQNXXMDiBqM8zMOpXCA-1
-X-Mimecast-MFC-AGG-ID: hwxpQNXXMDiBqM8zMOpXCA_1764297609
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-343e262230eso1429317a91.2
-        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 18:40:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764297609; x=1764902409; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sgfHeihlC+8u1mHu0tUzhZgmVFrgBxrrACIpxiuhkOQ=;
-        b=WUBPBupsLTGwrL4ustwHzBDcKuoNA5oKsMOehyx9mLuhCOA2lb6TQjmjkb0d4Dasif
-         7aoYs5ij7ruDxYXAr+4ESxWkbxoDIFpmAaB0aLI9W8/vSBQd4wMnQNh+YDhkx1KvVT4e
-         98iVKMpju8aNiaVHDShGYm0+K5a3d4+0b7CE8mFdYRe5TzX4x/zv+BcWJfzgysFydcRe
-         5DnU9CgH9Npy9KoqWusAbN4at0lgC/ao05wD3jNHVaOD2Rr0NLWhyU8qmNGrQxyXxlZO
-         d5ZKTlN+lOWgA80obEltLPpimpWBV8oorkYlOmJM9r2yrwMyx9KoyvgBuMlCWpfUvi5M
-         rrwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764297609; x=1764902409;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=sgfHeihlC+8u1mHu0tUzhZgmVFrgBxrrACIpxiuhkOQ=;
-        b=seBl/Y1EWRZnFJsPOz+bTHq7Qd1+ZdWnEOudqnl6rOgN679fH3d0MonvX1A8cAXtZs
-         rW0jtqQ35RMYhy4BB59s/5jVAO6mbpHbh86V6MHRS1Iqh1IBoqZo+y8OBuJ7wGEhfFE1
-         k2m/5PJvL7nIp90I3vxU/uo9SSn53dMUnw0PE5NuMGkdyfKQkG9EIOOm6uffE7ZdtUNv
-         9ECYitkbUDYIsPW4Pr3Ue26pRkE3sCWQJHenKL68lSj/QGFYXfUKSsGs/L8OoAK8B8/m
-         qMRSX4TVuEY3mf4jzDDz5XyEiVbm4lriQkHQxNx2oavgwmF7/LHodBD6LrN1igdhkqdP
-         5Lnw==
-X-Forwarded-Encrypted: i=1; AJvYcCUckK91n8j0JbfFoWEynBpdiQX+/m1KjKCOE0wR5HdZQYIiAXGJv5FmzzZOriUIDo8tlEKFn6c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwUArfrppOb7si07b/X/X81W14aEchXyHyNCpr/COZVq0KBY6XH
-	4g1TOEqfiwG3Tshg9wLD07U0fTdf3Abgm0zz28rMeGfNrouTeRkaJ7urpjFPqYEB3EUTNLz64MT
-	/z2MvaY+gNKu+7+ogb+39xx2O7F8wlMY6BWu/WpKzOZDxr62nmlVLKmsZPrhy1CKaqHgZBND/b6
-	rYen2nUMkstf5RUmNybcRLIfaIHPkY0RgQ
-X-Gm-Gg: ASbGncv/yw/FMn2XuH4KnWmmwtei7KdBDbJc4lVmDNiNLmg3wjCOeCrcYWdZGcJ08sn
-	7dkyTyW96TpiFhMzXzFE5lXko+TPiG9kYIG9kkWqxAWD9RdBrlGQY9+1Z5lBqjucnL6G75HwZ80
-	kzqoRPW9YcF79CsqA73jhDI5yEoA6fmsY6Wy96xNLQ36mEDJ+iJZ6ZyFDYpy8wsLKi
-X-Received: by 2002:a17:90b:1c04:b0:340:dd2c:a3da with SMTP id 98e67ed59e1d1-3475ebe6a55mr11921908a91.8.1764297609156;
-        Thu, 27 Nov 2025 18:40:09 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG4wo+b8mDxiFvbp2FfPvxTIFKnSoRJlDC8td/QTiw0D2SXKZ1egJpMpwXj6ItWG1NiPOtXpEz0QFH1u2tvrDA=
-X-Received: by 2002:a17:90b:1c04:b0:340:dd2c:a3da with SMTP id
- 98e67ed59e1d1-3475ebe6a55mr11921862a91.8.1764297608647; Thu, 27 Nov 2025
- 18:40:08 -0800 (PST)
+	s=arc-20240116; t=1764297794; c=relaxed/simple;
+	bh=RGGT0165BFO2BCJDwFwoCfhDphbvaPk5RlfZvnewMoY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=XVdbkAV2hHQyB5XMjiusSM1xpkQ22seLTvdMCCgmIuKrgwUjz7LwTCwid5mA5r3LR607/vQPjSLhoxnMxYG7cWH/DFFs/83fPqSqdp01I27ojG3jC2k+4Xt0fqjylhDdlo5/qgtg7hWufa3ug5559qpGd/YuzYZvSD5Kz3c2onk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l1t7eRza; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6225C4CEF8;
+	Fri, 28 Nov 2025 02:43:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764297793;
+	bh=RGGT0165BFO2BCJDwFwoCfhDphbvaPk5RlfZvnewMoY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=l1t7eRzaDba365tEYo+t+8Ex3Z1+VrZw3HJxjIiQ+UfKMBP+iVA8mRRs+OdLhwtcu
+	 kOnqKEteWlCtQe7xwDGc8sy21abfwwAeSGJxgyWcXnOvBU0InC2xwANPtcDdA+xIFp
+	 sFiCx/QhtoaB6gQpuaJVjyEvbggUUP+4KHE/EpF1fwvYgB4uczmSO2XN6u85xLLAOR
+	 hB4ryKDT2CIaU4TM670i6yfLRBIwlli+8mubA1gUkZo6OUEuFh+s7OEI7nsCUZ7WOC
+	 mrX8NwrE1BU/4j+R5RNGkopsI7i6dqMZWKKmjEyTzcVFQhX/YftHQVSEJAwd9PYnHg
+	 /HplvVUrfGCIg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3B7063808204;
+	Fri, 28 Nov 2025 02:40:17 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1764225384.git.mst@redhat.com> <637e182e139980e5930d50b928ba5ac072d628a9.1764225384.git.mst@redhat.com>
-In-Reply-To: <637e182e139980e5930d50b928ba5ac072d628a9.1764225384.git.mst@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 28 Nov 2025 10:39:57 +0800
-X-Gm-Features: AWmQ_bm__a-YRsaDl414Cee-_MAMOHTjKQ-R-ohBFRIeA6P5kRzykoXAUMexjlk
-Message-ID: <CACGkMEsw7mgQdJieHz6CT3p5Pew=vH1qp5H2BSag_55w+q9Vnw@mail.gmail.com>
-Subject: Re: [PATCH v6 3/3] vhost: switch to arrays of feature bits
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: linux-kernel@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, 
-	Paolo Abeni <pabeni@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-doc@vger.kernel.org, Mike Christie <michael.christie@oracle.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	Stefano Garzarella <sgarzare@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 00/11][pull request] Intel Wired LAN Driver
+ Updates
+ 2025-11-25 (ice, idpf, iavf, ixgbe, ixgbevf, e1000e)
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176429761604.120099.17554633926820737992.git-patchwork-notify@kernel.org>
+Date: Fri, 28 Nov 2025 02:40:16 +0000
+References: <20251125223632.1857532-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20251125223632.1857532-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org
 
-On Thu, Nov 27, 2025 at 2:40=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
- wrote:
->
-> The current interface where caller has to know in which 64 bit chunk
-> each bit is, is inelegant and fragile.
-> Let's simply use arrays of bits.
-> By using unroll macros text size grows only slightly.
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->  drivers/vhost/net.c   | 19 ++++++++++---------
->  drivers/vhost/scsi.c  |  9 ++++++---
->  drivers/vhost/test.c  |  6 +++++-
->  drivers/vhost/vhost.h | 42 ++++++++++++++++++++++++++++++++++--------
->  drivers/vhost/vsock.c | 10 ++++++----
->  5 files changed, 61 insertions(+), 25 deletions(-)
->
-> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> index d057ea55f5ad..f8ed39337f56 100644
-> --- a/drivers/vhost/net.c
-> +++ b/drivers/vhost/net.c
-> @@ -69,15 +69,15 @@ MODULE_PARM_DESC(experimental_zcopytx, "Enable Zero C=
-opy TX;"
->
->  #define VHOST_DMA_IS_DONE(len) ((__force u32)(len) >=3D (__force u32)VHO=
-ST_DMA_DONE_LEN)
->
-> -static const u64 vhost_net_features[VIRTIO_FEATURES_U64S] =3D {
-> -       VHOST_FEATURES |
-> -       (1ULL << VHOST_NET_F_VIRTIO_NET_HDR) |
-> -       (1ULL << VIRTIO_NET_F_MRG_RXBUF) |
-> -       (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
-> -       (1ULL << VIRTIO_F_RING_RESET) |
-> -       (1ULL << VIRTIO_F_IN_ORDER),
-> -       VIRTIO_BIT(VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO) |
-> -       VIRTIO_BIT(VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO),
-> +static const int vhost_net_bits[] =3D {
-> +       VHOST_FEATURES,
-> +       VHOST_NET_F_VIRTIO_NET_HDR,
-> +       VIRTIO_NET_F_MRG_RXBUF,
-> +       VIRTIO_F_ACCESS_PLATFORM,
-> +       VIRTIO_F_RING_RESET,
-> +       VIRTIO_F_IN_ORDER,
-> +       VIRTIO_NET_F_GUEST_UDP_TUNNEL_GSO,
-> +       VIRTIO_NET_F_HOST_UDP_TUNNEL_GSO
->  };
->
->  enum {
-> @@ -1720,6 +1720,7 @@ static long vhost_net_set_owner(struct vhost_net *n=
-)
->  static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
->                             unsigned long arg)
->  {
-> +       const DEFINE_VHOST_FEATURES_ARRAY(vhost_net_features, vhost_net_b=
-its);
->         u64 all_features[VIRTIO_FEATURES_U64S];
->         struct vhost_net *n =3D f->private_data;
->         void __user *argp =3D (void __user *)arg;
-> diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
-> index 98e4f68f4e3c..f43c1fe9fad9 100644
-> --- a/drivers/vhost/scsi.c
-> +++ b/drivers/vhost/scsi.c
-> @@ -197,11 +197,14 @@ enum {
->  };
->
->  /* Note: can't set VIRTIO_F_VERSION_1 yet, since that implies ANY_LAYOUT=
-. */
-> -enum {
-> -       VHOST_SCSI_FEATURES =3D VHOST_FEATURES | (1ULL << VIRTIO_SCSI_F_H=
-OTPLUG) |
-> -                                              (1ULL << VIRTIO_SCSI_F_T10=
-_PI)
-> +static const int vhost_scsi_bits[] =3D {
-> +       VHOST_FEATURES,
-> +       VIRTIO_SCSI_F_HOTPLUG,
-> +       VIRTIO_SCSI_F_T10_PI
->  };
->
-> +#define VHOST_SCSI_FEATURES VHOST_FEATURES_U64(vhost_scsi_bits, 0)
-> +
->  #define VHOST_SCSI_MAX_TARGET  256
->  #define VHOST_SCSI_MAX_IO_VQ   1024
->  #define VHOST_SCSI_MAX_EVENT   128
-> diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
-> index 94cd09f36f59..f592b2f548e8 100644
-> --- a/drivers/vhost/test.c
-> +++ b/drivers/vhost/test.c
-> @@ -28,7 +28,11 @@
->   */
->  #define VHOST_TEST_PKT_WEIGHT 256
->
-> -#define VHOST_TEST_FEATURES VHOST_FEATURES
-> +static const int vhost_test_bits[] =3D {
-> +       VHOST_FEATURES
-> +};
-> +
-> +#define VHOST_TEST_FEATURES VHOST_FEATURES_U64(vhost_test_features, 0)
+Hello:
 
-Did you mean vhost_test_bits actually?
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Thanks
+On Tue, 25 Nov 2025 14:36:19 -0800 you wrote:
+> Arkadiusz adds support for unmanaged DPLL for ice E830 devices; device
+> settings are fixed but can be queried by DPLL.
+> 
+> Grzegorz commonizes firmware loading process across all ice devices.
+> 
+> Birger Koblitz adds support for 10G-BX to ixgbe.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,01/11] ice: add support for unmanaged DPLL on E830 NIC
+    (no matching commit)
+  - [net-next,02/11] ice: unify PHY FW loading status handler for E800 devices
+    (no matching commit)
+  - [net-next,03/11] ixgbe: Add 10G-BX support
+    (no matching commit)
+  - [net-next,04/11] ixgbevf: ixgbevf_q_vector clean up
+    https://git.kernel.org/netdev/net-next/c/1645759a0405
+  - [net-next,05/11] idpf: convert vport state to bitmap
+    https://git.kernel.org/netdev/net-next/c/8dd72ebc73f3
+  - [net-next,06/11] e1000e: Remove unneeded checks
+    https://git.kernel.org/netdev/net-next/c/954ba97cca16
+  - [net-next,07/11] ixgbe: avoid redundant call to ixgbe_non_sfp_link_config()
+    https://git.kernel.org/netdev/net-next/c/5849b56addbf
+  - [net-next,08/11] idpf: use desc_ring when checking completion queue DMA allocation
+    https://git.kernel.org/netdev/net-next/c/d89a5c27e4f3
+  - [net-next,09/11] idpf: correct queue index in Rx allocation error messages
+    https://git.kernel.org/netdev/net-next/c/79bb84758f2c
+  - [net-next,10/11] ice: fix comment typo and correct module format string
+    https://git.kernel.org/netdev/net-next/c/1105a7a12051
+  - [net-next,11/11] iavf: clarify VLAN add/delete log messages and lower log level
+    https://git.kernel.org/netdev/net-next/c/57bb13d7eb50
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
