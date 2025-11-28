@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-242633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 269DBC933AA
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 23:09:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37E70C933BF
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 23:10:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A81F33AE31E
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 22:08:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FD153AD2A5
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 22:09:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EACBB2EA16C;
-	Fri, 28 Nov 2025 22:08:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3CA92F2607;
+	Fri, 28 Nov 2025 22:08:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dGXJVnti"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OvR96LBC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A4FE2DC776
-	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 22:08:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 538C72E7F06
+	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 22:08:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764367709; cv=none; b=XS3TFE4nzgGbI9mgEPulWKt9Z76IlDv45reGqOTvmmZmOsLYUgSR74mfe1CExAuzj7jcRVYts9Yr2G3rls7FXZYWXMUMQWVxlz8nQhzrOGugVEzUHhL1L2teAipZuoWius2EeGxpgpq8L6ywMal+ieTqmxSjj4nlfhCZNojUB4k=
+	t=1764367716; cv=none; b=bzs+tz4Pluov2sI8PkH0elJ7xUZiz4D3Osl42541NfGItXZgWX6/txSsa7hjH/UwF+2sKYJylZ0yfFglmAwE2mhWk/VohC9uRUIeKAnSy9/rJ6TnKdRDsZf303jmyV3sR7Vvi/hwRWdQPVCs7C3p/FXvb5iAjyLE6vXZ5V0aPM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764367709; c=relaxed/simple;
-	bh=oZlSrKc5HSf8OTgk8Y9zCO1ND/6B7m7anVTBiZTQDCE=;
+	s=arc-20240116; t=1764367716; c=relaxed/simple;
+	bh=uRxi3ExLlnech7TAng7vW1n1AwVuV0imGtM6odd89oA=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=DaH4h2R1C1y7ccCrhRN/aSKqt3Hy/dt4Imt3OZnojRzK6LdEPAE68wCuJI04HFJTredZOtapY8NAguNlIu3Ez+RKiLhMJ3R0N61aMXRab1s/+UG6ncd7nuE+84Z6hNi8Z572Vzp3QVp+tlG7EswE0m7f0/vx0FEBCfBU8AxPsmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dGXJVnti; arc=none smtp.client-ip=209.85.210.173
+	 In-Reply-To:To:Cc; b=Rh5em1ABRssA0hbZXmG5Pk+nZ45n9Ujr8GT9SP4o2G17K56YL0Xz9uP9HmPVLHgG0hzjTR/dfOsV+5HBcCANXWnR1FtasDPVCWv4faqnrjPJIiVnKscbz6pFV4qF9dqRjWyt3sAlQGA6G6icaYE1WN4bCqn4QS3zur6nrrw6dS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OvR96LBC; arc=none smtp.client-ip=209.85.210.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7a9c64dfa8aso1930348b3a.3
-        for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 14:08:28 -0800 (PST)
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7b89c1ce9easo2747975b3a.2
+        for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 14:08:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764367708; x=1764972508; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1764367713; x=1764972513; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=J4d7URFdeCPYu3U6zdfTOnUzmMHd/kT6rS033v+6Sa8=;
-        b=dGXJVntiSZZidJaEYQWYuCXXdwg4QByX3kDzwShDuhfPI6XVLwcgUtmaN9qZbF5+wT
-         Lw+x8n5rBVq91z55Q5bpvj2VClxgbo5oVz1HqtWViBrbRuZe8QppnsOmCLfBVuabEcsr
-         BS1ByUHd+mc2eNZyUyi+OEgejnsULwit/q7wtX0O7l47kPKc6kaMRv99qVRh0Kn6kxAv
-         6HkAKiaGByk1Dwd6jTrE+Br2V3eh0xA8h/GLSEJ9+cdFoo7rJfqX6Vv5NdHdJLw0Q1HU
-         3nzQw4dZQgJNu7ISRaXqELscEzdNrTcgdhTbFAEjkkFe0MpPiS2yPurG8/dk3S/GHI54
-         OEqw==
+        bh=qDEZdi1tgBa9T8trLOVAUVe2SLe1h53tBsuf6xYe7Gw=;
+        b=OvR96LBCEuLEs9iorkIUlykmtzVgQZKMsTfp0lY38ObY/tNzfC5c7imFzwRpQPvK6R
+         AikL4RQ5uCA7xW2ZAJvz2KEQAhdB6g1vj81edaGpNAciBDTHBdNyBIb9bhXt+JptWYmz
+         jIVZL9AH7mj2ISVXowiHaOOGDDp2FojHW6r9/Uwik1FDIfzKqFxSICn94wJWPrAOdqDA
+         p6yTXiWenkjOpUR4uxpnTo6/4tSku0BTfDhGEyyYWZ6jXXpd5s5KS854TEcsGk5FAkti
+         ia30q87LvhiPkMTNcry2DmJYYtGmGjtYnpcnQNhb7x8TDL9HicRPbg3nuKu3TOiH6CdJ
+         YNOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764367708; x=1764972508;
+        d=1e100.net; s=20230601; t=1764367713; x=1764972513;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=J4d7URFdeCPYu3U6zdfTOnUzmMHd/kT6rS033v+6Sa8=;
-        b=laSsZMEXhugbhyFItdppX1Vrl7X580Hif4Fr5qOjJlFJXXZDUbp/miBKAsKb06LKI3
-         lkVFvLZTW8TCXslpA3p/qOFl3hawaXr6EJHsXJ6nYy0CewLyBSNdwkuWbfQ60VssnN4O
-         7B1UUNpzma+O0jiLDhY52PyKFkwZ13tR75JtWu1Y48DBe1ES3n66/7dDO5Jyc3Uypt1q
-         wJZM9GvHPkM3YuQY0LzN8ZnC8Ukb0gWvy20fL3eriG4pL2zvA17m3UMEWLsEOv5ZPRDv
-         uCgUIan+dvPwyqwKtLBvpjLud1PmlkHA4dxbgdAVv5fcL1GHyLNyWtY8EbMvsMveDW26
-         s8Zw==
-X-Gm-Message-State: AOJu0YyccQh8onUCGoAPZftJfEU0yF3DxwLbOsl3Diee/NzCBg8su+eB
-	+KQdJIUw49p42FnYoukvBvSGl+gJZ6NmM+ykFVF9HtfRrZOGmO9SznqD
-X-Gm-Gg: ASbGncsb7sJMu8cle9y5Qd2CBqGYLmAJaFrTtTOOQLZrPZP5AQo9ZYcI4B9Kz5FT9n1
-	4j4JOn029+qMkd+JIHosH6tP2I51pH5XZTFp3+C6g023dkSuYYPBuN+TAjEPbg363qhqPguT8Jd
-	33XOJ/YBo4Ce9HkLWxFLO85VFINS7q97fFx8fH8vZ5yCFWqXAxuA9deWZuAOd5SgSkHuAZo94xa
-	NzvOc1XbWsakMoOMJs0K5zKcaRJ+Qq8zfdrQwRBHlLDq/qQ3pFPON6CAD05EvwGlw3EfFDCAQeE
-	ITPsxNVFWoK70UveYBwKHQ5kLNSA2VNy6oPUzDA1pnvmkqbVH5AqICIe5Di9vVxDMUbpO198+M+
-	nnC8swhwrvvFXjTa0X/pQk/Sw+V4sDMCqk8O7nGIcN+6DJqodyW5b+7TNvtSa68vgnx2QKaAO5V
-	U3ZZzg+lnVUeEqXKwWOA==
-X-Google-Smtp-Source: AGHT+IHP9cacM3sLthbsJDzciAEys52jMWZBJESkwrB9/1Buq/1iB5QinbxCfCe5nE75YPOMpByUNQ==
-X-Received: by 2002:a05:7022:1506:b0:119:e55a:9c06 with SMTP id a92af1059eb24-11cbba6f374mr13160663c88.34.1764367707518;
-        Fri, 28 Nov 2025 14:08:27 -0800 (PST)
+        bh=qDEZdi1tgBa9T8trLOVAUVe2SLe1h53tBsuf6xYe7Gw=;
+        b=wm7H7svBeSED8ByxS3BpjcWXVxhG2Ljc+pYbuz1euwVU1mmuADe8TEiiZy9qEDninS
+         ahj3iEWAGbsFDWVtHjS+VsBcaLiyMW8r6QKhzYfzj5s+cG1fEOH2lgauxjW/MhGc0ZtO
+         /ifEw+vSadwSJhBO5ko0xpZAzCkRh4nfMErySyBXwsQ/txibecKosAdk10/vMjJ/U9A/
+         G2GKIaZvwMsYv7mu0EA63YKyZIZPjmG9yFDUjpGddWLGeDkIY1KKrqc41Ts26oJ0MWQ+
+         EJERjCX13qOlIRpzW3J/Hp3/sIQWAS76btgdWyyuIge8Jm5AD6l/ksPWVur+O/6iWPZu
+         +TjQ==
+X-Gm-Message-State: AOJu0Yy+5+kgIlnlqV25wq9fvaE5Ni5F/1aeImHcxdVclF2Uns3HOrNs
+	r+Bm95AW0/VQM1i8h/tddTr/YMLAz4xK4W+55gttyGQ2BFNooeCG81Ew
+X-Gm-Gg: ASbGnctzk81JioesC8iRHngSmV8XE20pOOpCXFEFFqZuT3cG9J2v2fN6nfL/bdD413Y
+	Nzrjd3pWDi48JhZLxqKgCuu63Fq2kJT/r6+P/UtcUEp/d3RIjf2wPqpxIhH3ihjHT/YCI8poE/w
+	1eIg5HKbQEYIb3uPcIQa6zqN6uYMN90O2xKm8BbMCVHP1kYszUbvEjyDyctfiLp5wCNMgq5LvWU
+	IiraOB9KOjK80l9WHNUV4uOADqpD7NOpgwrKMVo18SxPttFIoSEs+pK8nm8jwtnKUKnW1vErq3U
+	PQJk6Vyh6B9EWuFrQlvcxTFATpk+goTIuUqIoi044mVck0mSnQzVWq5WUkjsvKsrHIlK/4gWJK+
+	eaHSVUUY6R4Ei2E3ltb4wwidvBDtKR5AQOzDK0q1XklfOb2mKTpfOhop7eo8npSNk1L4On2Bn/m
+	EWwxdEyCOeGMqV/F9/Cg==
+X-Google-Smtp-Source: AGHT+IFA9W0tMqiQpDtVLv/EbbD8yYhv0beq+7UKoKsKuyIshhuFT7CV1u/tP795KYKT7Al+rnAVxw==
+X-Received: by 2002:a05:7022:e19:b0:119:e569:f262 with SMTP id a92af1059eb24-11c9d7185c7mr23676868c88.11.1764367713091;
+        Fri, 28 Nov 2025 14:08:33 -0800 (PST)
 Received: from [192.168.15.94] ([2804:7f1:ebc3:752f:12e1:8eff:fe46:88b8])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11dcaee660asm26824205c88.3.2025.11.28.14.08.22
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11dcaee660asm26824205c88.3.2025.11.28.14.08.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Nov 2025 14:08:26 -0800 (PST)
+        Fri, 28 Nov 2025 14:08:32 -0800 (PST)
 From: Andre Carvalho <asantostc@gmail.com>
-Date: Fri, 28 Nov 2025 22:08:02 +0000
-Subject: [PATCH net-next v8 3/5] netconsole: add STATE_DEACTIVATED to track
- targets disabled by low level
+Date: Fri, 28 Nov 2025 22:08:03 +0000
+Subject: [PATCH net-next v8 4/5] netconsole: resume previously deactivated
+ target
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,7 +85,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251128-netcons-retrigger-v8-3-0bccbf4c6385@gmail.com>
+Message-Id: <20251128-netcons-retrigger-v8-4-0bccbf4c6385@gmail.com>
 References: <20251128-netcons-retrigger-v8-0-0bccbf4c6385@gmail.com>
 In-Reply-To: <20251128-netcons-retrigger-v8-0-0bccbf4c6385@gmail.com>
 To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -95,83 +95,201 @@ To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
  linux-kselftest@vger.kernel.org, Andre Carvalho <asantostc@gmail.com>
 X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1764367687; l=2409;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1764367687; l=6908;
  i=asantostc@gmail.com; s=20250807; h=from:subject:message-id;
- bh=Bc0ee9DYK1oiSRrahxYGeDv2Y4gYudwUsG3FQq7nt2Y=;
- b=OKYBLhWd1IZ93XaJ9r5FNHNxrv9gpqahkExk6+Sfgd6RO3fy3SSFjwyesY0i0145zbiJbCC8N
- kESIR+0Us6cCG4UmGvJUiw55zckCUS23UxCkJ2i8G9SSdcO+03E87C7
+ bh=uRxi3ExLlnech7TAng7vW1n1AwVuV0imGtM6odd89oA=;
+ b=w3CNQpU1d93HMFlJIEbcCmw4xQefnx6kAgjeL7PNL7v2SW3IdsAcZMJzYuuaAGa0ZVkmwlMrp
+ ISLZAq7BdS8C3Vvg3+B6oERZ7/3BwR4XG2LEP4vPgdYbEeUCcO8Xgcb
 X-Developer-Key: i=asantostc@gmail.com; a=ed25519;
  pk=eWre+RwFHCxkiaQrZLsjC67mZ/pZnzSM/f7/+yFXY4Q=
 
-From: Breno Leitao <leitao@debian.org>
+Attempt to resume a previously deactivated target when the associated
+interface comes back (NETDEV_REGISTER) or when it changes name
+(NETDEV_CHANGENAME) by calling netpoll_setup on the device.
 
-When the low level interface brings a netconsole target down, record this
-using a new STATE_DEACTIVATED state. This allows netconsole to distinguish
-between targets explicitly disabled by users and those deactivated due to
-interface state changes.
+Depending on how the target was setup (by mac or interface name), the
+corresponding field is compared with the device being brought up. Targets
+that match the incoming device, are scheduled for resume on resume_wq, so
+that netpoll_setup is able to force the device UP.
 
-It also enables automatic recovery and re-enabling of targets if the
-underlying low-level interfaces come back online.
+Target transitions to STATE_DISABLED in case of failures resuming it to
+avoid retrying the same target indefinitely.
 
-From a code perspective, anything that is not STATE_ENABLED is disabled.
-
-Devices (de)enslaving are marked STATE_DISABLED to prevent automatically
-resuming as enslaved interfaces cannot have netconsole enabled.
-
-Signed-off-by: Breno Leitao <leitao@debian.org>
 Signed-off-by: Andre Carvalho <asantostc@gmail.com>
 ---
- drivers/net/netconsole.c | 20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
+ drivers/net/netconsole.c | 98 +++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 92 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index b21ecea60d52..7a1e5559fc0d 100644
+index 7a1e5559fc0d..b31762f2ee45 100644
 --- a/drivers/net/netconsole.c
 +++ b/drivers/net/netconsole.c
-@@ -122,6 +122,7 @@ enum sysdata_feature {
- enum target_state {
- 	STATE_DISABLED,
- 	STATE_ENABLED,
-+	STATE_DEACTIVATED,
+@@ -39,6 +39,7 @@
+ #include <linux/u64_stats_sync.h>
+ #include <linux/utsname.h>
+ #include <linux/rtnetlink.h>
++#include <linux/workqueue.h>
+ 
+ MODULE_AUTHOR("Matt Mackall <mpm@selenic.com>");
+ MODULE_DESCRIPTION("Console driver for network interfaces");
+@@ -138,10 +139,14 @@ enum target_state {
+  * @stats:	Packet send stats for the target. Used for debugging.
+  * @state:	State of the target.
+  *		Visible from userspace (read-write).
+- *		We maintain a strict 1:1 correspondence between this and
+- *		whether the corresponding netpoll is active or inactive.
++ *		From a userspace perspective, the target is either enabled or
++ *		disabled. Internally, although both STATE_DISABLED and
++ *		STATE_DEACTIVATED correspond to inactive targets, the latter is
++ *		due to automatic interface state changes and will try
++ *		recover automatically, if the interface comes back
++ *		online.
+  *		Also, other parameters of a target may be modified at
+- *		runtime only when it is disabled (state == STATE_DISABLED).
++ *		runtime only when it is disabled (state != STATE_ENABLED).
+  * @extended:	Denotes whether console is extended or not.
+  * @release:	Denotes whether kernel release version should be prepended
+  *		to the message. Depends on extended console.
+@@ -155,6 +160,7 @@ enum target_state {
+  *		local_mac	(read-only)
+  *		remote_mac	(read-write)
+  * @buf:	The buffer used to send the full msg to the network stack
++ * @resume_wq:	Workqueue to resume deactivated target
+  */
+ struct netconsole_target {
+ 	struct list_head	list;
+@@ -177,6 +183,7 @@ struct netconsole_target {
+ 	struct netpoll		np;
+ 	/* protected by target_list_lock */
+ 	char			buf[MAX_PRINT_CHUNK];
++	struct work_struct	resume_wq;
  };
  
- /**
-@@ -580,6 +581,14 @@ static ssize_t enabled_store(struct config_item *item,
- 	if (ret)
- 		goto out_unlock;
+ #ifdef	CONFIG_NETCONSOLE_DYNAMIC
+@@ -242,6 +249,75 @@ static void populate_configfs_item(struct netconsole_target *nt,
+ }
+ #endif	/* CONFIG_NETCONSOLE_DYNAMIC */
  
-+	/* When the user explicitly enables or disables a target that is
-+	 * currently deactivated, reset its state to disabled. The DEACTIVATED
-+	 * state only tracks interface-driven deactivation and should _not_
-+	 * persist when the user manually changes the target's enabled state.
-+	 */
-+	if (nt->state == STATE_DEACTIVATED)
-+		nt->state = STATE_DISABLED;
++/* Check if the target was bound by mac address. */
++static bool bound_by_mac(struct netconsole_target *nt)
++{
++	return is_valid_ether_addr(nt->np.dev_mac);
++}
 +
- 	ret = -EINVAL;
- 	current_enabled = nt->state == STATE_ENABLED;
- 	if (enabled == current_enabled) {
-@@ -1445,10 +1454,19 @@ static int netconsole_netdev_event(struct notifier_block *this,
- 				break;
- 			case NETDEV_RELEASE:
- 			case NETDEV_JOIN:
--			case NETDEV_UNREGISTER:
-+				/* transition target to DISABLED instead of
-+				 * DEACTIVATED when (de)enslaving devices as
-+				 * their targets should not be automatically
-+				 * resumed when the interface is brought up.
-+				 */
- 				nt->state = STATE_DISABLED;
- 				list_move(&nt->list, &target_cleanup_list);
++/* Attempts to resume logging to a deactivated target. */
++static void resume_target(struct netconsole_target *nt)
++{
++	int ret;
++
++	/* check if target is still deactivated as it may have been disabled
++	 * while resume was being scheduled.
++	 */
++	if (nt->state != STATE_DEACTIVATED)
++		return;
++
++	if (bound_by_mac(nt))
++		/* ensure netpoll_setup will retrieve device by mac */
++		memset(&nt->np.dev_name, 0, IFNAMSIZ);
++
++	ret = netpoll_setup(&nt->np);
++	if (ret) {
++		/* netpoll fails setup once, do not try again. */
++		nt->state = STATE_DISABLED;
++		return;
++	}
++
++	nt->state = STATE_ENABLED;
++	pr_info("network logging resumed on interface %s\n", nt->np.dev_name);
++}
++
++/* Checks if a deactivated target matches a device. */
++static bool deactivated_target_match(struct netconsole_target *nt,
++				     struct net_device *ndev)
++{
++	if (nt->state != STATE_DEACTIVATED)
++		return false;
++
++	if (bound_by_mac(nt))
++		return !memcmp(nt->np.dev_mac, ndev->dev_addr, ETH_ALEN);
++	return !strncmp(nt->np.dev_name, ndev->name, IFNAMSIZ);
++}
++
++/* Process work scheduled for target resume. */
++static void process_resume_target(struct work_struct *work)
++{
++	struct netconsole_target *nt =
++		container_of(work, struct netconsole_target, resume_wq);
++	unsigned long flags;
++
++	/* resume_target is IRQ unsafe, remove target from
++	 * target_list in order to resume it with IRQ enabled.
++	 */
++	spin_lock_irqsave(&target_list_lock, flags);
++	list_del_init(&nt->list);
++	spin_unlock_irqrestore(&target_list_lock, flags);
++
++	resume_target(nt);
++
++	/* At this point the target is either enabled or disabled and
++	 * was cleaned up before getting deactivated. Either way, add it
++	 * back to target list.
++	 */
++	spin_lock_irqsave(&target_list_lock, flags);
++	list_add(&nt->list, &target_list);
++	spin_unlock_irqrestore(&target_list_lock, flags);
++}
++
+ /* Allocate and initialize with defaults.
+  * Note that these targets get their config_item fields zeroed-out.
+  */
+@@ -264,6 +340,7 @@ static struct netconsole_target *alloc_and_init(void)
+ 	nt->np.remote_port = 6666;
+ 	eth_broadcast_addr(nt->np.remote_mac);
+ 	nt->state = STATE_DISABLED;
++	INIT_WORK(&nt->resume_wq, process_resume_target);
+ 
+ 	return nt;
+ }
+@@ -1434,13 +1511,14 @@ static int prepare_sysdata(struct netconsole_target *nt)
+ static int netconsole_netdev_event(struct notifier_block *this,
+ 				   unsigned long event, void *ptr)
+ {
+-	unsigned long flags;
+-	struct netconsole_target *nt, *tmp;
+ 	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
++	struct netconsole_target *nt, *tmp;
+ 	bool stopped = false;
++	unsigned long flags;
+ 
+ 	if (!(event == NETDEV_CHANGENAME || event == NETDEV_UNREGISTER ||
+-	      event == NETDEV_RELEASE || event == NETDEV_JOIN))
++	      event == NETDEV_RELEASE || event == NETDEV_JOIN ||
++	      event == NETDEV_REGISTER))
+ 		goto done;
+ 
+ 	mutex_lock(&target_cleanup_list_lock);
+@@ -1469,6 +1547,13 @@ static int netconsole_netdev_event(struct notifier_block *this,
  				stopped = true;
-+				break;
-+			case NETDEV_UNREGISTER:
-+				nt->state = STATE_DEACTIVATED;
-+				list_move(&nt->list, &target_cleanup_list);
-+				stopped = true;
  			}
  		}
++		if ((event == NETDEV_REGISTER || event == NETDEV_CHANGENAME) &&
++		    deactivated_target_match(nt, dev))
++			/* Schedule resume on a workqueue as it will attempt
++			 * to UP the device, which can't be done as part of this
++			 * notifier.
++			 */
++			schedule_work(&nt->resume_wq);
  		netconsole_target_put(nt);
+ 	}
+ 	spin_unlock_irqrestore(&target_list_lock, flags);
+@@ -1937,6 +2022,7 @@ static struct netconsole_target *alloc_param_target(char *target_config,
+ /* Cleanup netpoll for given target (from boot/module param) and free it */
+ static void free_param_target(struct netconsole_target *nt)
+ {
++	cancel_work_sync(&nt->resume_wq);
+ 	netpoll_cleanup(&nt->np);
+ #ifdef	CONFIG_NETCONSOLE_DYNAMIC
+ 	kfree(nt->userdata);
 
 -- 
 2.52.0
