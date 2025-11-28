@@ -1,227 +1,272 @@
-Return-Path: <netdev+bounces-242567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7EC2C921D6
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 14:22:41 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id E612BC921E2
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 14:23:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C4E5E4E237B
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 13:22:37 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CABC34E12E6
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 13:23:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C78632E734;
-	Fri, 28 Nov 2025 13:22:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D120303CAB;
+	Fri, 28 Nov 2025 13:23:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=astralinux.ru header.i=@astralinux.ru header.b="ReVJ1faD"
+	dkim=pass (1024-bit key) header.d=rosa.ru header.i=@rosa.ru header.b="a4vULGpH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-gw02.astralinux.ru (mail-gw02.astralinux.ru [93.188.205.243])
+Received: from forward205d.mail.yandex.net (forward205d.mail.yandex.net [178.154.239.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6703230E0F3;
-	Fri, 28 Nov 2025 13:22:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.188.205.243
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1066223708;
+	Fri, 28 Nov 2025 13:22:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764336145; cv=none; b=S1PYtZPWyMsUCNS1uNBf0XBuM88FUAgC/6JzdfZAYF1eiqKyGTegNLO2NFQyFpokfGFNqbElXhCvDFzfdHhdgTkUVWgOa1W73yBYz1ihSkRAns0iteWWF+gW477km5Zr5gvBqTrBFfZOvAp92CQDyNoO5g0MrPMMhiRwdfJIY64=
+	t=1764336183; cv=none; b=SRRKq2k/Hfv8lyIGrewE3KEfIYjYFMNd2FrLC+iiFZb7+JMobrElYy0jH5KRCN7iFqjjDTJe2pdI9oJybiRXwBj6VKlg7ju4dd320YuWVbfbKNfs3kRuA3T+BqI4EVsgdGiRaYC0eRp51JYYEcqZpwNV2oHQEEQ8ocVwAuGPnM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764336145; c=relaxed/simple;
-	bh=0duWjTUsbySq3CaYAyrFjiAslVzcsNwSMNp0T9yZa6Q=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=oOE/skPqHCB/q7va9zj4ApGACiL9CjZNmKrctIGmqFPWETdpjLV0PVtYoDaoFH3vXeFcEQjZT7AmLSRUJ1dzzFHG/1a0OVzLFNdypv0+T3RtzWtosx1ohFQESQxktnpnE3PMLKks8AEtZlp3ABOd48fR+v40ojUktaF5giokJ60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=astralinux.ru; spf=pass smtp.mailfrom=astralinux.ru; dkim=pass (2048-bit key) header.d=astralinux.ru header.i=@astralinux.ru header.b=ReVJ1faD; arc=none smtp.client-ip=93.188.205.243
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=astralinux.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=astralinux.ru
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=astralinux.ru;
-	s=mail; t=1764336141;
-	bh=0duWjTUsbySq3CaYAyrFjiAslVzcsNwSMNp0T9yZa6Q=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ReVJ1faDtdfMY+5dXYMSdIViHqOUEIto3OdUsmB13sQnWTzMjoyCyQdJXbZbyIYbM
-	 170X1PaZ/5bEQQ5mYK6bzVCJ/7P8Tz25DYPsb6lVdAWTdXEXHKdB31SCChpwsel5HC
-	 71BxzXXELUn7Cya4aiLTOBy0BmX5V/C0XN69szDiWMXO7ZBB9L5FSCFLPhdYxs4w3j
-	 mD+89pPja5NiHjB3WnVCxRIHEFklS1vUuSVEdraVkXKrFohm0Kg1TxtBAntr5bg5uf
-	 zk4JtUP8UcXE8Ql/QSAn7G7mOiaMB3IW79+vFpRnu6X2jxzE3S30cV3JcSAi9V/Vn1
-	 jlC2RM38YxCBA==
-Received: from gca-msk-a-srv-ksmg01 (localhost [127.0.0.1])
-	by mail-gw02.astralinux.ru (Postfix) with ESMTP id A310B1F9C1;
-	Fri, 28 Nov 2025 16:22:21 +0300 (MSK)
-Received: from new-mail.astralinux.ru (unknown [10.205.207.13])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail-gw02.astralinux.ru (Postfix) with ESMTPS;
-	Fri, 28 Nov 2025 16:22:19 +0300 (MSK)
-Received: from rbta-msk-lt-156703.astralinux.ru.astracloud.ru (rbta-msk-lt-156703.astralinux.ru [10.198.57.41])
-	by new-mail.astralinux.ru (Postfix) with ESMTPA id 4dHv8V2sZqzJqMr;
-	Fri, 28 Nov 2025 16:21:46 +0300 (MSK)
-From: Alexey Panov <apanov@astralinux.ru>
-To: stable@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Alexey Panov <apanov@astralinux.ru>,
-	Jay Vosburgh <j.vosburgh@gmail.com>,
-	Veaceslav Falico <vfalico@gmail.com>,
-	Andy Gospodarek <andy@greyhouse.net>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1764336183; c=relaxed/simple;
+	bh=E4B5VCDbms+bcj2g2cyjgs9JpBW8JrKvSAjwBf4NdFY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=sYNjuCKt9p0/aNEPFLmVMprNlPOYJpEpGg1dXmfpH66BKyFMr25E5WR1pd3+/2WDRG0j2VTxWiTQDD7iz2j6ZkrjXTzEDTqy7LjDzGfLmz1Mf2iJNwuDE/gUw/Nm8/hnV86MKb0XtCdGlq20CijddNsI296gVXhEwPA2VZqpgGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rosa.ru; spf=pass smtp.mailfrom=rosa.ru; dkim=pass (1024-bit key) header.d=rosa.ru header.i=@rosa.ru header.b=a4vULGpH; arc=none smtp.client-ip=178.154.239.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rosa.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rosa.ru
+Received: from forward100d.mail.yandex.net (forward100d.mail.yandex.net [IPv6:2a02:6b8:c41:1300:1:45:d181:d100])
+	by forward205d.mail.yandex.net (Yandex) with ESMTPS id E3C7184DEF;
+	Fri, 28 Nov 2025 16:22:48 +0300 (MSK)
+Received: from mail-nwsmtp-smtp-production-main-63.klg.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-63.klg.yp-c.yandex.net [IPv6:2a02:6b8:c42:4f41:0:640:844:0])
+	by forward100d.mail.yandex.net (Yandex) with ESMTPS id F0ABEC0051;
+	Fri, 28 Nov 2025 16:22:38 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-63.klg.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id ZMf4KILMEa60-j9uv4mE4;
+	Fri, 28 Nov 2025 16:22:38 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rosa.ru; s=mail;
+	t=1764336158; bh=WC/sNX3wMEH+gjxpfTXF6rJfMZy6ju6WJ5+VjRCK1EI=;
+	h=Message-ID:Date:Cc:Subject:To:From;
+	b=a4vULGpHAN7Y/2v0qvhza/pVjDLljo5I9tzrJjPtOUHaxk4H0EZbW9Kv7SDD/Qmw7
+	 i1RFldhrKMHOs3WiEuePbkhd7JEpUX1SiA8NhWHGqFaIQoggluw/jgN3mm3t/7vAJp
+	 JwxP4XoJO08uR8SYA6z0HETkHVC98VuQE7tMmy50=
+Authentication-Results: mail-nwsmtp-smtp-production-main-63.klg.yp-c.yandex.net; dkim=pass header.i=@rosa.ru
+From: Mikhail Lobanov <m.lobanov@rosa.ru>
+To: "David S. Miller" <davem@davemloft.net>
+Cc: Mikhail Lobanov <m.lobanov@rosa.ru>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Moni Shoua <monis@Voltaire.COM>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	David Bauer <mail@david-bauer.net>,
+	James Chapman <jchapman@katalix.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <kafai@fb.com>,
-	Song Liu <songliubraving@fb.com>,
-	Yonghong Song <yhs@fb.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Nikolay Aleksandrov <nikolay@cumulusnetworks.com>,
-	bpf@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	syzbot+9dfc3f3348729cc82277@syzkaller.appspotmail.com,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Michal Kubiak <michal.kubiak@intel.com>,
-	Jonathan Toppins <jtoppins@redhat.com>,
-	Jay Vosburgh <jay.vosburgh@canonical.com>
-Subject: [PATCH 5.10 v3 3/3] bonding: restore bond's IFF_SLAVE flag if a non-eth dev enslave fails
-Date: Fri, 28 Nov 2025 16:21:26 +0300
-Message-Id: <20251128132126.7467-4-apanov@astralinux.ru>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20251128132126.7467-1-apanov@astralinux.ru>
-References: <20251128132126.7467-1-apanov@astralinux.ru>
+	lvc-project@linuxtesting.org
+Subject: [PATCH net-next v5] l2tp: fix double dst_release() on sk_dst_cache race
+Date: Fri, 28 Nov 2025 16:22:11 +0300
+Message-ID: <20251128132214.2876-1-m.lobanov@rosa.ru>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-KSMG-AntiPhishing: NotDetected, bases: 2025/11/28 10:15:00
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Envelope-From: apanov@astralinux.ru
-X-KSMG-AntiSpam-Info: LuaCore: 81 0.3.81 2adfceff315e7344370a427642ad41a4cfd99e1f, {Tracking_one_url}, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, {Tracking_spam_in_reply_from_match_msgid}, new-mail.astralinux.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;astralinux.ru:7.1.1;syzkaller.appspot.com:7.1.1,5.0.1, FromAlignment: s
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiSpam-Lua-Profiles: 198520 [Nov 28 2025]
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Version: 6.1.1.20
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.0.7854, bases: 2025/11/28 12:43:00 #27986045
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-LinksScanning: NotDetected, bases: 2025/11/28 10:15:00
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 1
 
-From: Nikolay Aleksandrov <razor@blackwall.org>
+A reproducible rcuref - imbalanced put() warning is observed under
+IPv6 L2TP (pppol2tp) traffic with blackhole routes, indicating an
+imbalance in dst reference counting for routes cached in
+sk->sk_dst_cache and pointing to a subtle lifetime/synchronization
+issue between the helpers that validate and drop cached dst entries.
 
-[ Upstream commit e667d469098671261d558be0cd93dca4d285ce1e ]
+rcuref - imbalanced put()
+WARNING: CPU: 0 PID: 899 at lib/rcuref.c:266 rcuref_put_slowpath+0x1ce/0x240 lib/rcuref.>
+Modules linked in:
+CPSocket connected tcp:127.0.0.1:48148,server=on <-> 127.0.0.1:33750
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01>
+RIP: 0010:rcuref_put_slowpath+0x1ce/0x240 lib/rcuref.c:266
 
-syzbot reported a warning[1] where the bond device itself is a slave and
-we try to enslave a non-ethernet device as the first slave which fails
-but then in the error path when ether_setup() restores the bond device
-it also clears all flags. In my previous fix[2] I restored the
-IFF_MASTER flag, but I didn't consider the case that the bond device
-itself might also be a slave with IFF_SLAVE set, so we need to restore
-that flag as well. Use the bond_ether_setup helper which does the right
-thing and restores the bond's flags properly.
+Call Trace:
+ <TASK>
+ __rcuref_put include/linux/rcuref.h:97 [inline]
+ rcuref_put include/linux/rcuref.h:153 [inline]
+ dst_release+0x291/0x310 net/core/dst.c:167
+ __sk_dst_check+0x2d4/0x350 net/core/sock.c:604
+ __inet6_csk_dst_check net/ipv6/inet6_connection_sock.c:76 [inline]
+ inet6_csk_route_socket+0x6ed/0x10c0 net/ipv6/inet6_connection_sock.c:104
+ inet6_csk_xmit+0x12f/0x740 net/ipv6/inet6_connection_sock.c:121
+ l2tp_xmit_queue net/l2tp/l2tp_core.c:1214 [inline]
+ l2tp_xmit_core net/l2tp/l2tp_core.c:1309 [inline]
+ l2tp_xmit_skb+0x1404/0x1910 net/l2tp/l2tp_core.c:1325
+ pppol2tp_sendmsg+0x3ca/0x550 net/l2tp/l2tp_ppp.c:302
+ sock_sendmsg_nosec net/socket.c:729 [inline]
+ __sock_sendmsg net/socket.c:744 [inline]
+ ____sys_sendmsg+0xab2/0xc70 net/socket.c:2609
+ ___sys_sendmsg+0x11d/0x1c0 net/socket.c:2663
+ __sys_sendmmsg+0x188/0x450 net/socket.c:2749
+ __do_sys_sendmmsg net/socket.c:2778 [inline]
+ __se_sys_sendmmsg net/socket.c:2775 [inline]
+ __x64_sys_sendmmsg+0x98/0x100 net/socket.c:2775
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x64/0x140 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
+RIP: 0033:0x7fe6960ec719
+ </TASK>
 
-Steps to reproduce using a nlmon dev:
- $ ip l add nlmon0 type nlmon
- $ ip l add bond1 type bond
- $ ip l add bond2 type bond
- $ ip l set bond1 master bond2
- $ ip l set dev nlmon0 master bond1
- $ ip -d l sh dev bond1
- 22: bond1: <BROADCAST,MULTICAST,MASTER> mtu 1500 qdisc noqueue master bond2 state DOWN mode DEFAULT group default qlen 1000
- (now bond1's IFF_SLAVE flag is gone and we'll hit a warning[3] if we
-  try to delete it)
+The race occurs between the lockless UDPv6 transmit path
+(udpv6_sendmsg() -> sk_dst_check()) and the locked L2TP/pppol2tp
+transmit path (pppol2tp_sendmsg() -> l2tp_xmit_skb() ->
+... -> inet6_csk_xmit() → __sk_dst_check()), when both handle
+the same obsolete dst from sk->sk_dst_cache: the UDPv6 side takes
+an extra reference and atomically steals and releases the cached
+dst, while the L2TP side, using a stale cached pointer, still
+calls dst_release() on it, and together these updates produce
+an extra final dst_release() on that dst, triggering
+rcuref - imbalanced put().
 
-[1] https://syzkaller.appspot.com/bug?id=391c7b1f6522182899efba27d891f1743e8eb3ef
-[2] commit 7d5cd2ce5292 ("bonding: correctly handle bonding type change on enslave failure")
-[3] example warning:
- [   27.008664] bond1: (slave nlmon0): The slave device specified does not support setting the MAC address
- [   27.008692] bond1: (slave nlmon0): Error -95 calling set_mac_address
- [   32.464639] bond1 (unregistering): Released all slaves
- [   32.464685] ------------[ cut here ]------------
- [   32.464686] WARNING: CPU: 1 PID: 2004 at net/core/dev.c:10829 unregister_netdevice_many+0x72a/0x780
- [   32.464694] Modules linked in: br_netfilter bridge bonding virtio_net
- [   32.464699] CPU: 1 PID: 2004 Comm: ip Kdump: loaded Not tainted 5.18.0-rc3+ #47
- [   32.464703] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.1-2.fc37 04/01/2014
- [   32.464704] RIP: 0010:unregister_netdevice_many+0x72a/0x780
- [   32.464707] Code: 99 fd ff ff ba 90 1a 00 00 48 c7 c6 f4 02 66 96 48 c7 c7 20 4d 35 96 c6 05 fa c7 2b 02 01 e8 be 6f 4a 00 0f 0b e9 73 fd ff ff <0f> 0b e9 5f fd ff ff 80 3d e3 c7 2b 02 00 0f 85 3b fd ff ff ba 59
- [   32.464710] RSP: 0018:ffffa006422d7820 EFLAGS: 00010206
- [   32.464712] RAX: ffff8f6e077140a0 RBX: ffffa006422d7888 RCX: 0000000000000000
- [   32.464714] RDX: ffff8f6e12edbe58 RSI: 0000000000000296 RDI: ffffffff96d4a520
- [   32.464716] RBP: ffff8f6e07714000 R08: ffffffff96d63600 R09: ffffa006422d7728
- [   32.464717] R10: 0000000000000ec0 R11: ffffffff9698c988 R12: ffff8f6e12edb140
- [   32.464719] R13: dead000000000122 R14: dead000000000100 R15: ffff8f6e12edb140
- [   32.464723] FS:  00007f297c2f1740(0000) GS:ffff8f6e5d900000(0000) knlGS:0000000000000000
- [   32.464725] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
- [   32.464726] CR2: 00007f297bf1c800 CR3: 00000000115e8000 CR4: 0000000000350ee0
- [   32.464730] Call Trace:
- [   32.464763]  <TASK>
- [   32.464767]  rtnl_dellink+0x13e/0x380
- [   32.464776]  ? cred_has_capability.isra.0+0x68/0x100
- [   32.464780]  ? __rtnl_unlock+0x33/0x60
- [   32.464783]  ? bpf_lsm_capset+0x10/0x10
- [   32.464786]  ? security_capable+0x36/0x50
- [   32.464790]  rtnetlink_rcv_msg+0x14e/0x3b0
- [   32.464792]  ? _copy_to_iter+0xb1/0x790
- [   32.464796]  ? post_alloc_hook+0xa0/0x160
- [   32.464799]  ? rtnl_calcit.isra.0+0x110/0x110
- [   32.464802]  netlink_rcv_skb+0x50/0xf0
- [   32.464806]  netlink_unicast+0x216/0x340
- [   32.464809]  netlink_sendmsg+0x23f/0x480
- [   32.464812]  sock_sendmsg+0x5e/0x60
- [   32.464815]  ____sys_sendmsg+0x22c/0x270
- [   32.464818]  ? import_iovec+0x17/0x20
- [   32.464821]  ? sendmsg_copy_msghdr+0x59/0x90
- [   32.464823]  ? do_set_pte+0xa0/0xe0
- [   32.464828]  ___sys_sendmsg+0x81/0xc0
- [   32.464832]  ? mod_objcg_state+0xc6/0x300
- [   32.464835]  ? refill_obj_stock+0xa9/0x160
- [   32.464838]  ? memcg_slab_free_hook+0x1a5/0x1f0
- [   32.464842]  __sys_sendmsg+0x49/0x80
- [   32.464847]  do_syscall_64+0x3b/0x90
- [   32.464851]  entry_SYSCALL_64_after_hwframe+0x44/0xae
- [   32.464865] RIP: 0033:0x7f297bf2e5e7
- [   32.464868] Code: 64 89 02 48 c7 c0 ff ff ff ff eb bb 0f 1f 80 00 00 00 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 2e 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 89 54 24 1c 48 89 74 24 10
- [   32.464869] RSP: 002b:00007ffd96c824c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
- [   32.464872] RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f297bf2e5e7
- [   32.464874] RDX: 0000000000000000 RSI: 00007ffd96c82540 RDI: 0000000000000003
- [   32.464875] RBP: 00000000640f19de R08: 0000000000000001 R09: 000000000000007c
- [   32.464876] R10: 00007f297bffabe0 R11: 0000000000000246 R12: 0000000000000001
- [   32.464877] R13: 00007ffd96c82d20 R14: 00007ffd96c82610 R15: 000055bfe38a7020
- [   32.464881]  </TASK>
- [   32.464882] ---[ end trace 0000000000000000 ]---
+The Race Condition:
 
-Fixes: 7d5cd2ce5292 ("bonding: correctly handle bonding type change on enslave failure")
-Reported-by: syzbot+9dfc3f3348729cc82277@syzkaller.appspotmail.com
-Link: https://syzkaller.appspot.com/bug?id=391c7b1f6522182899efba27d891f1743e8eb3ef
-Signed-off-by: Nikolay Aleksandrov <razor@blackwall.org>
-Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
-Acked-by: Jonathan Toppins <jtoppins@redhat.com>
-Acked-by: Jay Vosburgh <jay.vosburgh@canonical.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
-Signed-off-by: Alexey Panov <apanov@astralinux.ru>
+Initial:
+  sk->sk_dst_cache = dst
+  ref(dst) = 1   
+
+Thread 1: sk_dst_check()                Thread 2: __sk_dst_check()
+------------------------               ----------------------------
+sk_dst_get(sk):
+  rcu_read_lock()
+  dst = rcu_dereference(sk->sk_dst_cache)
+  rcuref_get(dst) succeeds
+  rcu_read_unlock()
+  // ref = 2  
+
+                                            dst = __sk_dst_get(sk)
+                                    // reads same dst from sk_dst_cache
+                                    // ref still = 2 (no extra get)
+
+[both see dst obsolete & check() == NULL]
+
+sk_dst_reset(sk):
+  old = xchg(&sk->sk_dst_cache, NULL)
+    // old = dst
+  dst_release(old)
+    // drop cached ref
+    // ref: 2 -> 1 
+
+                                  RCU_INIT_POINTER(sk->sk_dst_cache, NULL)
+                                  // cache already NULL after xchg
+                                            dst_release(dst)
+                                              // ref: 1 -> 0
+
+  dst_release(dst)
+  // tries to drop its own ref after final put
+  // rcuref_put_slowpath() -> "rcuref - imbalanced put()"
+
+Make L2TP’s IPv6 transmit path stop using inet6_csk_xmit()
+(and thus __sk_dst_check()) and instead open-code the same
+routing and transmit sequence using ip6_sk_dst_lookup_flow()
+and ip6_xmit(). The new code builds a flowi6 from the socket
+fields in the same way as inet6_csk_route_socket(), then calls
+ip6_sk_dst_lookup_flow(), which internally relies on the lockless
+sk_dst_check()/sk_dst_reset() pattern shared with UDPv6, and
+attaches the resulting dst to the skb before invoking ip6_xmit().
+This makes both the UDPv6 and L2TP IPv6 paths use the same
+dst-cache handling logic for a given socket and removes the
+possibility that sk_dst_check() and __sk_dst_check() concurrently
+drop the same cached dst and trigger the rcuref - imbalanced put()
+warning under concurrent traffic.
+
+Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
+
+Fixes: b0270e91014d ("ipv4: add a sock pointer to ip_queue_xmit()")
+Signed-off-by: Mikhail Lobanov <m.lobanov@rosa.ru>
 ---
- drivers/net/bonding/bond_main.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+v2: move fix to L2TP as suggested by Eric Dumazet.
+v3: dropped the lockless sk_dst_check() pre-validation
+and the extra sk_dst_get() reference; instead, under
+the socket lock, mirror __sk_dst_check()’s condition
+and invalidate the cached dst via sk_dst_reset(sk) so
+the cache-owned ref is released exactly once via the 
+xchg-based helper.
+v4: switch L2TP IPv6 xmit to open-coded (using sk_dst_check()) 
+and test with tools/testing/selftests/net/l2tp.sh.
+https://lore.kernel.org/netdev/a601c049-0926-418b-aa54-31686eea0a78@redhat.com/T/#t
+v5: use sk_uid(sk) and add READ_ONCE() for sk_mark and
+sk_bound_dev_if as suggested by Eric Dumazet.
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 127242101c8e..0c5bda75dc60 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -2176,9 +2176,7 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
- 			eth_hw_addr_random(bond_dev);
- 		if (bond_dev->type != ARPHRD_ETHER) {
- 			dev_close(bond_dev);
--			ether_setup(bond_dev);
--			bond_dev->flags |= IFF_MASTER;
--			bond_dev->priv_flags &= ~IFF_TX_SKB_SHARING;
-+			bond_ether_setup(bond_dev);
- 		}
- 	}
+ net/l2tp/l2tp_core.c | 49 ++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 45 insertions(+), 4 deletions(-)
+
+diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
+index 0710281dd95a..eab7265c944f 100644
+--- a/net/l2tp/l2tp_core.c
++++ b/net/l2tp/l2tp_core.c
+@@ -55,6 +55,7 @@
+ #include <net/inet_ecn.h>
+ #include <net/ip6_route.h>
+ #include <net/ip6_checksum.h>
++#include <net/sock.h>
  
+ #include <asm/byteorder.h>
+ #include <linux/atomic.h>
+@@ -1206,15 +1207,55 @@ static int l2tp_build_l2tpv3_header(struct l2tp_session *session, void *buf)
+ static int l2tp_xmit_queue(struct l2tp_tunnel *tunnel, struct sk_buff *skb, struct flowi *fl)
+ {
+ 	int err;
++	struct sock *sk = tunnel->sock;
+ 
+ 	skb->ignore_df = 1;
+ 	skb_dst_drop(skb);
+ #if IS_ENABLED(CONFIG_IPV6)
+-	if (l2tp_sk_is_v6(tunnel->sock))
+-		err = inet6_csk_xmit(tunnel->sock, skb, NULL);
+-	else
++	if (l2tp_sk_is_v6(sk)) {
++		struct ipv6_pinfo *np = inet6_sk(sk);
++		struct inet_sock *inet = inet_sk(sk);
++		struct flowi6 fl6;
++		struct dst_entry *dst;
++		struct in6_addr *final_p, final;
++		struct ipv6_txoptions *opt;
++
++		memset(&fl6, 0, sizeof(fl6));
++		fl6.flowi6_proto = sk->sk_protocol;
++		fl6.daddr        = sk->sk_v6_daddr;
++		fl6.saddr        = np->saddr;
++		fl6.flowlabel    = np->flow_label;
++		IP6_ECN_flow_xmit(sk, fl6.flowlabel);
++
++		fl6.flowi6_oif   = READ_ONCE(sk->sk_bound_dev_if);
++		fl6.flowi6_mark  = READ_ONCE(sk->sk_mark);
++		fl6.fl6_sport    = inet->inet_sport;
++		fl6.fl6_dport    = inet->inet_dport;
++		fl6.flowi6_uid   = sk_uid(sk);
++
++		security_sk_classify_flow(sk, flowi6_to_flowi_common(&fl6));
++
++		rcu_read_lock();
++		opt = rcu_dereference(np->opt);
++		final_p = fl6_update_dst(&fl6, opt, &final);
++
++		dst = ip6_sk_dst_lookup_flow(sk, &fl6, final_p, true);
++		if (IS_ERR(dst)) {
++			rcu_read_unlock();
++			kfree_skb(skb);
++			return NET_XMIT_DROP;
++		}
++
++		skb_dst_set(skb, dst);
++		fl6.daddr = sk->sk_v6_daddr;
++
++		err = ip6_xmit(sk, skb, &fl6, READ_ONCE(sk->sk_mark),
++			       opt, np->tclass,
++			       READ_ONCE(sk->sk_priority));
++		rcu_read_unlock();
++	} else
+ #endif
+-		err = ip_queue_xmit(tunnel->sock, skb, fl);
++		err = ip_queue_xmit(sk, skb, fl);
+ 
+ 	return err >= 0 ? NET_XMIT_SUCCESS : NET_XMIT_DROP;
+ }
 -- 
-2.30.2
+2.47.2
 
 
