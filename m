@@ -1,123 +1,204 @@
-Return-Path: <netdev+bounces-242524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F8ABC91515
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 09:53:55 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5090C9152D
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 09:55:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBF3B3AA88B
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 08:53:53 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7852C3417C8
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 08:55:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD2842FD7C3;
-	Fri, 28 Nov 2025 08:53:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="KKhtqKl7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 709F02F1FD3;
+	Fri, 28 Nov 2025 08:55:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2B0A2FD668
-	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 08:53:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E964288B1
+	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 08:55:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764320026; cv=none; b=hXCJn3NcDXmMveqpbKh73HMx0yJFQ6OhewaYW3KBbporhvqgl0NGOSjB/v2uGs9kVtn60IVOt+dcepmMPHAUINhNojb37pe5IU+DW7WVmWk13cl7Fnkrjd5alZqd1i9bCxpNGR0xk0wSe3/CTiqtUat6pF4V7HpUooEOnK0CPjE=
+	t=1764320152; cv=none; b=CP2+yzS5sYRT3j7ZQeViSLt4OEU/mBJubW1KCFWb1KzkbXmstKxw55PhSMvwlaQEK59xvc532R9BmAxEY9SeXXeUSI493v8DGPkQJOoNSHPHD/IttE4VSqzhI99J7+/dnBFgPljJc2OdBGXP0pFI8GvDGO5UuV+bfskpVon5zT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764320026; c=relaxed/simple;
-	bh=OBSmjV+7meHP1rGMO9tDjTk4DyTM4GEeiQCa9XdkFe4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=g6aw7YD4PkbH80f0zs+rYVIhuYx/FbK39meno8bfXGMm+X6qdLO5eX4BhaMPTSmM8/+9f3Zin96xOtDNvqD1AYrMlNKgJDiEUBB2qpKCQI/u6grnRDMIWTfqxrhk4uIIfKu6Ksw289Tm769TuTGvEqkYiSzhGmX+SqYaPcKZD6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=KKhtqKl7; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AS7uQoq2925758;
-	Fri, 28 Nov 2025 08:53:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=kKDgTC21y3fyx/3WZzRX19j1BCz5K
-	ppprJg1KGFen1c=; b=KKhtqKl7OjXmiL8B1m+0sLlmT6kdzqlPhpzpymsrxrDrY
-	fV0mqTun9rsmEkZFEdNK1S9JGQZn5VkxCUug6ntUW0qHw+/ZeIpuqTug06hXn1KX
-	IZejntDrpy/8qh7+XELKV9b8nZ0ZrH2NWyKBAaa/nr2pO+Cu7L7zWwbk5XSiHteo
-	3tPjDXwDKmXCmHzMVglebspTzSSWWVFnfOWcdiwEXet437Voju+mtND0SzCypfkH
-	URPlAJ/YxsljO9wewqgVMjqCfEwNMnGO3N1IvXoUcIBZfb41xyEvwGR4myDzsBnP
-	PNf3NdIaviE53c7xIiLTGzBpwXGmlGTKRqA1/crXg==
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4aq3s28a8p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 28 Nov 2025 08:53:32 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5AS7pIrK019718;
-	Fri, 28 Nov 2025 08:53:31 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4ak3md1w4p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 28 Nov 2025 08:53:31 +0000
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5AS8rUaw026427;
-	Fri, 28 Nov 2025 08:53:30 GMT
-Received: from ca-dev110.us.oracle.com (ca-dev110.us.oracle.com [10.129.136.45])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 4ak3md1w43-1;
-	Fri, 28 Nov 2025 08:53:30 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
-        pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org
-Cc: alok.a.tiwarilinux@gmail.com, alok.a.tiwari@oracle.com
-Subject: [PATCH net-next] l2tp: correct debugfs label for tunnel tx stats
-Date: Fri, 28 Nov 2025 00:52:57 -0800
-Message-ID: <20251128085300.3377210-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1764320152; c=relaxed/simple;
+	bh=wmX3gPnpy65zBgCRFHUTOTzrjtNfIm2hU2YxVXTd/OU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DRQGAtsHqHbMK7zjZ8s5uwDF2KawHq6dtdBXwy/5x//qTikUYkKggZI+uc4DcFCGPY+Mr8ojBlzZjBI02qYhrmnhewBdGIH28fAoMt9y6v4mTiFYEgHMwOEA0Bqsy9XLIudEzBVCj2QdiVj7GKIMIHi3DRss4O+3lmpRySdVyOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vOuGE-0004V8-AT; Fri, 28 Nov 2025 09:55:26 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vOuGA-002vV3-3C;
+	Fri, 28 Nov 2025 09:55:23 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vOuGA-00BZR3-2i;
+	Fri, 28 Nov 2025 09:55:22 +0100
+Date: Fri, 28 Nov 2025 09:55:22 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Rob Herring <robh@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jonathan Corbet <corbet@lwn.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Lukasz Majewski <lukma@denx.de>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Divya.Koppera@microchip.com,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org,
+	Sabrina Dubroca <sd@queasysnail.net>, linux-kernel@vger.kernel.org,
+	kernel@pengutronix.de, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Subject: Re: [PATCH net-next v8 1/1] Documentation: net: add flow control
+ guide and document ethtool API
+Message-ID: <aSljeggP5UHYhFaP@pengutronix.de>
+References: <20251119140318.2035340-1-o.rempel@pengutronix.de>
+ <20251125181957.5b61bdb3@kernel.org>
+ <aSa8Gkl1AP1U2C9j@pengutronix.de>
+ <aSj6gM_m-7ZXGchw@shell.armlinux.org.uk>
+ <aSj_OxBzq_gJOb4q@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-28_03,2025-11-27_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 adultscore=0 spamscore=0
- bulkscore=0 mlxscore=0 suspectscore=0 mlxlogscore=999 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2510240000
- definitions=main-2511280064
-X-Proofpoint-ORIG-GUID: vY10kv64-KCeDhbUzZJOuS2JDUurPjxw
-X-Proofpoint-GUID: vY10kv64-KCeDhbUzZJOuS2JDUurPjxw
-X-Authority-Analysis: v=2.4 cv=SLJPlevH c=1 sm=1 tr=0 ts=6929630c cx=c_pps
- a=OOZaFjgC48PWsiFpTAqLcw==:117 a=OOZaFjgC48PWsiFpTAqLcw==:17
- a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=yPCof4ZbAAAA:8
- a=Lxq-UBtxJWYXIj6hXk0A:9
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTI4MDA2NCBTYWx0ZWRfX8cLMUoBeyIKk
- u7yjtFhKltp+2SAkLGQbS76hlHIgTUG8KM75iMMxfSoyerCUh36YwC7QmhElmjzURX/Xfqjj20X
- bbsIk/HznKB2IXo9RKAeBx2KIKwUKnuZ4BvHLOgFs0ROoa0rLwVHhYfKlzWGbM0sQ6c2ha1hT6F
- B+8YSTP0dLySfY/XZAlIeGKwyYpWpBj/liHoOkrg1Ll6Qx/PNcDU+ZuO6K8okrDATrfjSsK74W6
- kVotA+gwhFQagdpNKEXMBzyD3xwpdBdrlSG/zw9dAVSYIu+nxOZUnroGHd/zyTQDChAV4GAbizt
- QSBHCESN3pMFwcvmXmEM4bBaUBgyss9iWVCp7s6HfrfQm0Olkd7YqaMbLb3YBPh/d/lRwDl7B4M
- cVfQrdBdWWC4g7eDzC52RsbSapgX0g==
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aSj_OxBzq_gJOb4q@shell.armlinux.org.uk>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-l2tp_dfs_seq_tunnel_show prints two groups of tunnel statistics. The
-first group reports transmit counters, but the code labels it as rx.
-Set the label to "tx" so the debugfs output reflects the actual meaning.
+Hi all,
 
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
----
- net/l2tp/l2tp_debugfs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Before sending v9, I would like to summarize the discussion and validate
+the intended logic one last time.
 
-diff --git a/net/l2tp/l2tp_debugfs.c b/net/l2tp/l2tp_debugfs.c
-index 2d0c8275a3a8..5cfaab7d0890 100644
---- a/net/l2tp/l2tp_debugfs.c
-+++ b/net/l2tp/l2tp_debugfs.c
-@@ -163,7 +163,7 @@ static void l2tp_dfs_seq_tunnel_show(struct seq_file *m, void *v)
- 	seq_printf(m, " %d sessions, refcnt %d/%d\n", session_count,
- 		   tunnel->sock ? refcount_read(&tunnel->sock->sk_refcnt) : 0,
- 		   refcount_read(&tunnel->ref_count));
--	seq_printf(m, " %08x rx %ld/%ld/%ld rx %ld/%ld/%ld\n",
-+	seq_printf(m, " %08x tx %ld/%ld/%ld rx %ld/%ld/%ld\n",
- 		   0,
- 		   atomic_long_read(&tunnel->stats.tx_packets),
- 		   atomic_long_read(&tunnel->stats.tx_bytes),
+Based on the feedback (specifically Russell's clarification on API
+semantics and Phylink behavior), I will document the following logic.
+
+Proposed Text: Documentation/networking/flow_control.rst
+--------------------------------------------------------
+
+Kernel Policy: User Intent & Resolution
+=======================================
+
+The ethtool pause API ('ethtool -A' or '--pause') configures the **User
+Intent** for **Link-wide PAUSE** (IEEE 802.3 Annex 31B). The
+**Operational State** (what actually happens on the wire) is derived
+from this intent, the active link mode, and the link partner.
+
+**Disambiguation: Pause Autoneg vs. Link Autoneg**
+In this section, "autonegotiation" refers exclusively to the **Pause
+Autonegotiation** parameter ('ethtool -A / --pause ... autoneg <on|off>').
+This is distinct from, but interacts with, **Generic Link
+Autonegotiation** ('ethtool -s / --change ... autoneg <on|off>').
+
+The semantics of the Pause API depend on the 'autoneg' parameter:
+
+1. **Resolution Mode** ('ethtool -A ... autoneg on')
+   The user intends for the device to **respect the negotiated result**.
+
+   - **Advertisement:** The system updates the PHY advertisement
+     (Symmetric/Asymmetric pause bits if the link medium supports
+     advertisement) to match the ``rx`` and ``tx`` parameters.
+   - **Resolution:** The system configures the MAC to follow the standard
+     IEEE 802.3 Resolution Truth Table based on the Local Advertisement
+     vs. Link Partner Advertisement.
+   - **Constraint:** If Link Autonegotiation ('ethtool -s / --change')
+     is disabled, the resolution cannot occur. The Operational State
+     effectively becomes **Disabled** (as negotiation is impossible)
+     regardless of the advertisement. However, the system **MUST**
+     accept this configuration as a valid stored intent for future use.
+
+2. **Forced Mode** ('ethtool -A ... autoneg off')
+   The user intends to **override negotiation** and force a specific
+   state (if the link mode permits).
+
+   - **Advertisement:** The system should update the PHY advertisement
+     (if the link medium supports advertisement) to match the ``rx`` and
+     ``tx`` parameters, ensuring the link partner is aware of the forced
+     configuration.
+   - **Resolution:** The system configures the MAC according to the
+     specified ``rx`` and ``tx`` parameters, ignoring the link partner's
+     advertisement.
+
+**Global Constraint: Full-Duplex Only**
+Link-wide PAUSE (Annex 31B) is strictly defined for **Full-Duplex** links.
+If the link mode is **Half-Duplex** (whether forced or negotiated),
+Link-wide PAUSE is operationally **disabled** regardless of the
+parameters set above.
+
+**Summary of "autoneg" Flag Meaning:**
+- true  -> **Delegate decision:** "Use the IEEE 802.3 logic to decide."
+- false -> **Force decision:** "Do exactly what I say (if the link supports it)."
+
+Proposed Text: include/linux/ethtool.h
+--------------------------------------
+
+/**
+ * @get_pauseparam: Report the configured administrative policy for
+ * link-wide PAUSE (IEEE 802.3 Annex 31B). Drivers must fill struct
+ * ethtool_pauseparam such that:
+ * @autoneg:
+ *   This refers to **Pause Autoneg** (IEEE 802.3 Annex 31B) only.
+ *   true  -> the device follows the negotiated result of pause
+ *     autonegotiation (Pause/Asym) when the link allows it;
+ *   false -> the device uses a forced configuration.
+ * @rx_pause/@tx_pause:
+ *   Represent the desired policy (Administrative State).
+ *   In autoneg mode they describe what is to be advertised;
+ *   in forced mode they describe the MAC configuration to be forced.
+ *
+ * @set_pauseparam: Apply a policy for link-wide PAUSE (IEEE 802.3 Annex 31B).
+ * @rx_pause/@tx_pause:
+ *   Desired state. If @autoneg is true, these define the
+ *   advertisement. If @autoneg is false, these define the
+ *   forced MAC configuration (and preferably the advertisement too).
+ * @autoneg:
+ *   Select Resolution Mode (true) or Forced Mode (false).
+ *
+ * **Constraint Checking:**
+ *   Drivers MUST accept a setting of @autoneg (true) even if generic
+ *   link autonegotiation ('ethtool -s / --change') is currently disabled.
+ *   This allows the user to pre-configure the desired policy for future
+ *   link modes.
+ *
+ * New drivers are strongly encouraged to use phylink_ethtool_get_pauseparam()
+ * and phylink_ethtool_set_pauseparam() which implement this logic
+ * correctly.
+ */
+
+Best Regards,
+Oleksij
 -- 
-2.50.1
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
