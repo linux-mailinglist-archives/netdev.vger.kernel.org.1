@@ -1,116 +1,176 @@
-Return-Path: <netdev+bounces-242571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41AB1C9221B
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 14:30:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F113C9225A
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 14:36:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2F5E234E2F3
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 13:30:46 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1C0A334272B
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 13:36:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0D1932AAAE;
-	Fri, 28 Nov 2025 13:30:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4DA532B9A9;
+	Fri, 28 Nov 2025 13:36:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=astralinux.ru header.i=@astralinux.ru header.b="nt2PhpbI"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="JIj+ErPv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-gw02.astralinux.ru (mail-gw02.astralinux.ru [93.188.205.243])
+Received: from xmbghk7.mail.qq.com (xmbghk7.mail.qq.com [43.163.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 720D01E32A2;
-	Fri, 28 Nov 2025 13:30:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.188.205.243
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 570991E32A2
+	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 13:36:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.163.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764336633; cv=none; b=OWvSv4gHB9AkBaj341DbM6CgWQOVR3S8uaDlFKofyR/Hw3D0hsWp9qiVsO5XokM7LY91BAVBxV8WT61a+lnq91Wddo8unJafQkVDx1qfV10yXLEg+6JtO4P07qeEPwqWfqdHkL/64L/N/glQ1KcSIJdwpyHDKNeTrErLGQ0Tgpk=
+	t=1764336971; cv=none; b=qvOFeGtGNhYSQhQWRU33m6ytYAJi7UfXQuoQ0FEmeVn/e+iS9uO5oQ9Go9Xq8+p1R6VL+Ynb5VJxohnKVkD21nt4z+dJ54YOeUxCsCbx8vqtat7c++cB+Ups0ymvzhEGseF3X7chFC/FvkTwCWjJ7fMYuAiI+RGBmn9at5x+VsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764336633; c=relaxed/simple;
-	bh=vUh/7k2pNcs1qKtAadocXz/3E+juXBsA3fyjDgDAYpA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=g7xMgbwGpSs6af43S+ktWHPJV94otKtwbC9NaLbW2Bi19K9J++SCQIPJvTD2tXyt9MDIJZ6HjFGCDbr8Tm/BnYJ2mW0zJTyxeFLeemfjkNaqkv+S9Lo55iccQjlC6qDsQZW8O0u+7HGZ3EHuOVGDhFwYPyPCV8n+MdK2FfWHOEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=astralinux.ru; spf=pass smtp.mailfrom=astralinux.ru; dkim=pass (2048-bit key) header.d=astralinux.ru header.i=@astralinux.ru header.b=nt2PhpbI; arc=none smtp.client-ip=93.188.205.243
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=astralinux.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=astralinux.ru
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=astralinux.ru;
-	s=mail; t=1764336628;
-	bh=vUh/7k2pNcs1qKtAadocXz/3E+juXBsA3fyjDgDAYpA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=nt2PhpbIr2pwtrWu1/j5I4KBUiKfEHpY/p6Fq6qkN9a7wD6DotZ1r1tsvUaTinItq
-	 F8h3/V7sccTzxh6QCB//D4NKa3NQVPyiN6Dn1REhpxig8T2DlbsoTlL58FK+PRQEGh
-	 8/8yJvz2Fe5TjBOL+3wYdqTni+ot8BIHjop9poxjKmD0jKsOJVR576jvKus3Kz0yA1
-	 d1NnT2M0nB1CV9E8WpwXQqBCRjG+IU9cTlHT3RxJs4tT7IkEfymWzMVeSN0L0HbTZn
-	 LXSHJbL//8pHQPJN9sr5ZGqpJs7d9HROp0P4e+6zLRzvmkj1a2DSOCF4iOucOzbT4f
-	 vMU/h83fvzeIg==
-Received: from gca-msk-a-srv-ksmg01 (localhost [127.0.0.1])
-	by mail-gw02.astralinux.ru (Postfix) with ESMTP id 24A901F97D;
-	Fri, 28 Nov 2025 16:30:28 +0300 (MSK)
-Received: from new-mail.astralinux.ru (unknown [10.205.207.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail-gw02.astralinux.ru (Postfix) with ESMTPS;
-	Fri, 28 Nov 2025 16:30:22 +0300 (MSK)
-Received: from [10.198.57.41] (rbta-msk-lt-156703.astralinux.ru [10.198.57.41])
-	by new-mail.astralinux.ru (Postfix) with ESMTPA id 4dHvKk2DPGz2xBj;
-	Fri, 28 Nov 2025 16:29:46 +0300 (MSK)
-Message-ID: <8c5bbb80-3d28-422e-9dc7-0caebb699986@astralinux.ru>
-Date: Fri, 28 Nov 2025 16:29:36 +0300
+	s=arc-20240116; t=1764336971; c=relaxed/simple;
+	bh=0wdbCIc855L4BW9vPRiQBOWRg5Gv82OzeG1iDyCsJzY=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=qOAAk1xW42k7NMKw5sWhzniLwqrXBgpmkGy6csHgw5tB4/L6ARydTp+Gb/josKEfRcR9GeM3yn4iIIN6OP0f3Q4r/cL3YHCp4zt5YmRma8Qu3EQ4r7ypedjy7w0Le4Oz4YOgDFMN/LWQ758ehi388cy++WVmpUawvUVN7GluIMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=JIj+ErPv; arc=none smtp.client-ip=43.163.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1764336962; bh=wPOMlJVMi7elv2tofGeiE7lameaJVv50F8wAp+2Pdbg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=JIj+ErPvZ8hATO83oSAOFyvdkDLW7XuBTiK0qOyrXUs+7qSG3CmccwjU7Rg5APY9v
+	 x7WbhomJ+oxpVZxqh+mtBLIDBV170TQobV1sMaBcLdSRMSDW/+/2BuVbwBoKIENJeu
+	 s+CWZcxjulFUQklaDcCQV45IVT9nCWTL5NhJ/vg4=
+Received: from lxu-ped-host.. ([111.201.7.117])
+	by newxmesmtplogicsvrszb51-0.qq.com (NewEsmtp) with SMTP
+	id 8F909ECE; Fri, 28 Nov 2025 21:35:57 +0800
+X-QQ-mid: xmsmtpt1764336957t7h28wf36
+Message-ID: <tencent_BA768766163C533724966E36344AAE754709@qq.com>
+X-QQ-XMAILINFO: MZtEYADUG4Ag0E7GGGvsLR0ioWfRhR4FVYxB2sEiKH4ET++04qDfM5x+DELc4k
+	 KW+H+dwKYNKShG9lWc3z9ummB+mQLISKmL07LNfXNDGaDYpi/PvFlUcSZEnkVjnbfEfW1Z9hkdy3
+	 Qjy0jY7zKZnAYSXRFTcCOM3Y5MhxkxAZXY/zOej4Csl8zAvjeESiNyUPe8MhqAL8xcyeMglBe9MI
+	 NAE+NuBFwXx9wOYiBE6Rr1rwbO9eKZmfSiZYBzHd5+RR0cWy5fjNQHkTjMmJI6pyjOcLfgB+yYpN
+	 G1ex8nYBXThmgyuRAFL5/QkjSobBaKP78ChEJ4dqkBn/O0tZ/enGZkUu7bbcWtbyb6iwid/N2HAP
+	 uPQnuI3bwVJkzqJZhYU3Oc/+CsQ6YReUZZ1oeP+3tVRI+MAUQps2jxQGNuSb9fAxFzzOPbe6Hxp5
+	 Q+5snoP94sxpyAt0o6ZIQFMdmyM9DKxBPvnQAU6g9omv4WWj5jIPIfRac/h/KnSNdkMwkuWZx7ZE
+	 FeIcvy8S8VYnaZnk/cRGMNGhz8tbKFaUv2lwXf0i6i5q80siOn3BhB51QGxviAHGlomyPq7i2ecF
+	 QRYHejfaOhHM/0Ycnz636VSBNFK0cAnpUYKbCjcdLIEuwfPE8auFxVdSTR4oEziWJZoBEBs/VPF+
+	 zdkYz+EYUNik7fU1qF3i+WcvVm220ZSm1VjsRlh2DiqhdOKjD86Oubekl3OJg+CyFyssaSNdjePW
+	 XomOlpcIm4JHf7qohj4hQ85OQSLOLLuBD9diK1R3RxDbMNHpdkiGVkF9/spdzaHG+TXYkSCx15YQ
+	 PLJ7F1+DRl5C6B5WUde3JDweyNojWCnmhN/iiXMC+7Llvl+S2upe/uT4cla5sZPjDDgvbJsHv/gR
+	 23+1gEprJmTV28HoY6SkisLHuCcIBiuNTH4zW8ed3eotREsYRsQbNVtMlIm8bkoD+iqNAyAc11g+
+	 jeqYR2jDLb7zYzE9rnjvYQVXH5dm/JJ5wjYfruVWtKYRu2asoNAqsCjhplwijU3QzBIlD0/fdBLL
+	 PHmtFDHOhKKl7b3y+4eN0wNsqz5kU=
+X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
+From: Edward Adam Davis <eadavis@qq.com>
+To: syzbot+ci3edb9412aeb2e703@syzkaller.appspotmail.com
+Cc: davem@davemloft.net,
+	eadavis@qq.com,
+	edumazet@google.com,
+	eperezma@redhat.com,
+	horms@kernel.org,
+	jasowang@redhat.com,
+	kuba@kernel.org,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	mst@redhat.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	sgarzare@redhat.com,
+	stefanha@redhat.com,
+	syzbot@lists.linux.dev,
+	syzbot@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com,
+	virtualization@lists.linux.dev,
+	xuanzhuo@linux.alibaba.com
+Subject: [PATCH Next V2] net: restore the iterator to its original state when an error occurs
+Date: Fri, 28 Nov 2025 21:35:57 +0800
+X-OQ-MSGID: <20251128133556.127045-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <69299e25.a70a0220.d98e3.013e.GAE@google.com>
+References: <69299e25.a70a0220.d98e3.013e.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: RuPost Desktop
-Subject: Re: [PATCH 5.10 1/2] bonding: restore IFF_MASTER/SLAVE flags on bond
- enslave ether type change
-Content-Language: ru
-To: Fedor Pchelkin <pchelkin@ispras.ru>
-Cc: stable@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Song Liu <songliubraving@fb.com>, Martin KaFai Lau <kafai@fb.com>,
- lvc-project@linuxtesting.org, Daniel Borkmann <daniel@iogearbox.net>,
- Nikolay Aleksandrov <nikolay@cumulusnetworks.com>,
- Jay Vosburgh <j.vosburgh@gmail.com>,
- Nikolay Aleksandrov <razor@blackwall.org>,
- John Fastabend <john.fastabend@gmail.com>, linux-kernel@vger.kernel.org,
- Alexei Starovoitov <ast@kernel.org>, Yonghong Song <yhs@fb.com>,
- Andrii Nakryiko <andrii@kernel.org>, netdev@vger.kernel.org,
- Veaceslav Falico <vfalico@gmail.com>, Moni Shoua <monis@voltaire.com>,
- KP Singh <kpsingh@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- bpf@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Andy Gospodarek <andy@greyhouse.net>
-References: <20251127190140.346-1-apanov@astralinux.ru>
- <20251128114704-2369311bf17518b70a95dcb7-pchelkin@ispras>
-From: Alexey Panov <apanov@astralinux.ru>
-In-Reply-To: <20251128114704-2369311bf17518b70a95dcb7-pchelkin@ispras>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-KSMG-AntiPhishing: NotDetected
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Envelope-From: apanov@astralinux.ru
-X-KSMG-AntiSpam-Info: LuaCore: 81 0.3.81 2adfceff315e7344370a427642ad41a4cfd99e1f, {Tracking_arrow_text}, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;astralinux.ru:7.1.1;new-mail.astralinux.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiSpam-Lua-Profiles: 198520 [Nov 28 2025]
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Version: 6.1.1.20
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.0.7854, bases: 2025/11/28 12:43:00 #27986045
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-LinksScanning: NotDetected
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 1
+Content-Transfer-Encoding: 8bit
 
-28/11/25 11:50, Fedor Pchelkin wrote:
->> [ Upstream commit 9ec7eb60dcbcb6c41076defbc5df7bbd95ceaba5 ]
-> 
-> c484fcc058ba ("bonding: Fix memory leak when changing bond type to
-> Ethernet") has a Fixes tag pointing to the above-mentioned commit so
-> should be ported as well I think.
+In zerocopy_fill_skb_from_iter(), if two copy operations are performed
+and the first one succeeds while the second one fails, it returns a
+failure but the count in iterator has already been decremented due to
+the first successful copy. This ultimately affects the local variable
+rest_len in virtio_transport_send_pkt_info(), causing the remaining
+count in rest_len to be greater than the actual iterator count. As a
+result, packet sending operations continue even when the iterator count
+is zero, which further leads to skb->len being 0 and triggers the warning
+reported by syzbot [1].
 
-Thanks for the suggestion. I've added this patch to v3.
+Therefore, if the zerocopy operation fails, we should revert the iterator
+to its original state.
 
---
-Alexey
+The iov_iter_revert() in skb_zerocopy_iter_stream() is no longer needed
+and has been removed.
+
+[1]
+'send_pkt()' returns 0, but 4096 expected
+WARNING: net/vmw_vsock/virtio_transport_common.c:430 at virtio_transport_send_pkt_info+0xd1e/0xef0 net/vmw_vsock/virtio_transport_common.c:428, CPU#1: syz.0.17/5986
+Call Trace:
+ virtio_transport_stream_enqueue net/vmw_vsock/virtio_transport_common.c:1113 [inline]
+ virtio_transport_seqpacket_enqueue+0x143/0x1c0 net/vmw_vsock/virtio_transport_common.c:841
+ vsock_connectible_sendmsg+0xabf/0x1040 net/vmw_vsock/af_vsock.c:2158
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg+0x21c/0x270 net/socket.c:746
+
+Reported-by: syzbot+28e5f3d207b14bae122a@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=28e5f3d207b14bae122a
+Tested-by: syzbot+28e5f3d207b14bae122a@syzkaller.appspotmail.com
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+V1 -> V2: Remove iov_iter_revert() in skb_zerocopy_iter_stream()
+
+ net/core/datagram.c | 6 ++++++
+ net/core/skbuff.c   | 1 -
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/net/core/datagram.c b/net/core/datagram.c
+index c285c6465923..da10465cd8a4 100644
+--- a/net/core/datagram.c
++++ b/net/core/datagram.c
+@@ -748,10 +748,13 @@ int __zerocopy_sg_from_iter(struct msghdr *msg, struct sock *sk,
+ 			    size_t length,
+ 			    struct net_devmem_dmabuf_binding *binding)
+ {
++	struct iov_iter_state state;
+ 	unsigned long orig_size = skb->truesize;
+ 	unsigned long truesize;
+ 	int ret;
+ 
++	iov_iter_save_state(from, &state);
++
+ 	if (msg && msg->msg_ubuf && msg->sg_from_iter)
+ 		ret = msg->sg_from_iter(skb, from, length);
+ 	else if (binding)
+@@ -759,6 +762,9 @@ int __zerocopy_sg_from_iter(struct msghdr *msg, struct sock *sk,
+ 	else
+ 		ret = zerocopy_fill_skb_from_iter(skb, from, length);
+ 
++	if (ret)
++		iov_iter_restore(from, &state);
++
+ 	truesize = skb->truesize - orig_size;
+ 	if (sk && sk->sk_type == SOCK_STREAM) {
+ 		sk_wmem_queued_add(sk, truesize);
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 5a1d123e7ef7..77ed045c28ff 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -1908,7 +1908,6 @@ int skb_zerocopy_iter_stream(struct sock *sk, struct sk_buff *skb,
+ 		struct sock *save_sk = skb->sk;
+ 
+ 		/* Streams do not free skb on error. Reset to prev state. */
+-		iov_iter_revert(&msg->msg_iter, skb->len - orig_len);
+ 		skb->sk = sk;
+ 		___pskb_trim(skb, orig_len);
+ 		skb->sk = save_sk;
+-- 
+2.43.0
 
 
