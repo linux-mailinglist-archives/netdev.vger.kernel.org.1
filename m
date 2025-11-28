@@ -1,92 +1,101 @@
-Return-Path: <netdev+bounces-242484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E670C90A0A
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 03:25:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D40B1C90A30
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 03:30:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1F8A34E47EF
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 02:24:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A8CB3A934D
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 02:30:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF4722C0F89;
-	Fri, 28 Nov 2025 02:23:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6520C277C96;
+	Fri, 28 Nov 2025 02:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ecsOdr89"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SCJeOXW/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A39029E11B
-	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 02:23:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06D9E211499;
+	Fri, 28 Nov 2025 02:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764296613; cv=none; b=vB+y4WCog5YWg0+jtGXrFj7TTE0pye6DOEdXHw3zzdtSlgUa9fFzfA/HJTxg0N5oY5TaICDBIzI82E/Nq+6kuF6AFmLzpP4lZhPE0LCxDV/Zpvn+S2fMXGV5rhuuqiayzLDTOCVqLlG9P46mlqYxrZrKvFGli9t4EDeaC+TL4Aw=
+	t=1764297011; cv=none; b=ovYP5kgG32d58hwQeOnmA8V7hJR5fPQ8ppKR1aP5MqCdK/Kp/E+KvE2BJTcTezCAuMGSj3reovroJmk4244pSApVovBbkZ5kWpAcTQg9vO1/mOVx+489Cjb9EvzYeSw5v8JkpOU6NUAw8mJOAaU5g+zRM03+QAccojS8XB8aVxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764296613; c=relaxed/simple;
-	bh=K2Xr8A9fSQ4EItW2U1DFgjbtA11o/Mr9EMYz9HnInRA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=r5kCFwkJI2xz50w9u+ot8B5LejXQexlRhsa6MWM1VFBxHDE+N6KSzxVUzij21YVtTfBXOeM6VcdP8wWkhW5ZR/uEXxfz0vn7P7GBQGQ0lpoP2gkPUD3lTmhaxk1u8sUDaGQ+9Kuzr6zWQTYGg7NTkI+ZmF68/+F5khdyhaVy+vo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ecsOdr89; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3ED23C4CEF8;
-	Fri, 28 Nov 2025 02:23:33 +0000 (UTC)
+	s=arc-20240116; t=1764297011; c=relaxed/simple;
+	bh=YDXNnmOa4Z7WmUwl8ISusVadhfoEwmvPNMjaE0J6jpM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AwR9QzMkEdCzw2n1L0txXJ82HiVcnrMYBsLKZ5XldeuKutdVU9WnAFQ2IP0Sa15SC7/zwtjW8Q4uzBMiaPIeJBSX6DYOeArpa30IIL/+iHpv+Mr21Tb/06d54Reg4eezNx3llSuH6Aa0kNzmnImIexxsfGzU5Q4U7j88OkX5MiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SCJeOXW/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55585C116B1;
+	Fri, 28 Nov 2025 02:30:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764296613;
-	bh=K2Xr8A9fSQ4EItW2U1DFgjbtA11o/Mr9EMYz9HnInRA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ecsOdr89hRc0cl4moNY8aXdu6fB8BT7C2P4k1ldOTLasPZ+17QaVLO4pj3iVVi84z
-	 +Bp3X4N8GgKM6cdIgGVmqLOrwyJ5192RjMl9NHYCwIs76q3D9Q0PVjEs3nR+lKCDT2
-	 lr9+Oip1XCoHMjZPObNj4oZzZvmecb6SE+n0IcYIlBVP6T+QkiQcKw2XISUGWC1Tqt
-	 lS/sF1FUwpvzpLt6X0nOcI3y/SwJEyE4F/GaBjlexk/9Yg/+MdqjWJoWJJSaXDPCpY
-	 rMsNTJaAi4NmPpwJBPdczJQ4uuv1/x4ZO1W6b4JSb5FXVcwbtcHGESMs5VzINE7Dhf
-	 aRV1qZ+AshE3w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B5C573808204;
-	Fri, 28 Nov 2025 02:20:36 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1764297010;
+	bh=YDXNnmOa4Z7WmUwl8ISusVadhfoEwmvPNMjaE0J6jpM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=SCJeOXW/6eetBUMzyh9LFNg0qp5bqT+vdgmGJQ9pEs0FD4UQkLvct6uqTJKmAZ+qG
+	 lXIRy4dJy/EFYQjTrgr39mPG7RwFHUeldfEJYzAahzbAs+duhWAB+R3ic28sx778M0
+	 pXeZcdQsbu15Zca2qUOoHPB6l5ouTL+8o+fhd9C3+1yIhjYqkZoXT/r6l91EjM8KtS
+	 gfVkKY775ZrrCz2fkSXHAdCCuHYixiepblWaM6mxfMQLNkQFJkjJJytfrFqOMijudI
+	 8GA6+BCX8sP0CUgum4Y3j0sOB8JZz0YRtrROwpTfQSDhb2HEyE8/5HT4xQZDZHf2OM
+	 sTcsQTWzzlkUA==
+Date: Thu, 27 Nov 2025 18:30:08 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Xin Long <lucien.xin@gmail.com>
+Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev,
+ davem@davemloft.net, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Stefan Metzmacher
+ <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli
+ <tfanelli@redhat.com>, Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz
+ <dreibh@simula.no>, linux-cifs@vger.kernel.org, Steve French
+ <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, Paulo Alcantara
+ <pc@manguebit.com>, Tom Talpey <tom@talpey.com>,
+ kernel-tls-handshake@lists.linux.dev, Chuck Lever <chuck.lever@oracle.com>,
+ Jeff Layton <jlayton@kernel.org>, Steve Dickson <steved@redhat.com>, Hannes
+ Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, David
+ Howells <dhowells@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, John
+ Ericson <mail@johnericson.me>, Cong Wang <xiyou.wangcong@gmail.com>, "D .
+ Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>,
+ illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
+ Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg
+ <daniel@haxx.se>, Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Subject: Re: [PATCH net-next v5 00/16] net: introduce QUIC infrastructure
+ and core subcomponents
+Message-ID: <20251127183008.5ee6757f@kernel.org>
+In-Reply-To: <cover.1763994509.git.lucien.xin@gmail.com>
+References: <cover.1763994509.git.lucien.xin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] dibs: Remove KMSG_COMPONENT macro
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176429643527.114872.11233539510222940718.git-patchwork-notify@kernel.org>
-Date: Fri, 28 Nov 2025 02:20:35 +0000
-References: <20251126142242.2124317-1-hca@linux.ibm.com>
-In-Reply-To: <20251126142242.2124317-1-hca@linux.ibm.com>
-To: Heiko Carstens <hca@linux.ibm.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, wintera@linux.ibm.com,
- netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Mon, 24 Nov 2025 09:28:13 -0500 Xin Long wrote:
+> The QUIC protocol, defined in RFC 9000, is a secure, multiplexed transport
+> built on top of UDP. It enables low-latency connection establishment,
+> stream-based communication with flow control, and supports connection
+> migration across network paths, while ensuring confidentiality, integrity,
+> and availability.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Please look thru the Claude review and address the legit complaints:
 
-On Wed, 26 Nov 2025 15:22:42 +0100 you wrote:
-> The KMSG_COMPONENT macro is a leftover of the s390 specific "kernel message
-> catalog" from 2008 [1] which never made it upstream.
-> 
-> The macro was added to s390 code to allow for an out-of-tree patch which
-> used this to generate unique message ids. Also this out-of-tree doesn't
-> exist anymore.
-> 
-> [...]
+https://netdev-ai.bots.linux.dev/ai-review.html?id=8ac157b3-6222-4e89-ac52-28e4ca52d6c4
 
-Here is the summary with links:
-  - [net-next] dibs: Remove KMSG_COMPONENT macro
-    https://git.kernel.org/netdev/net-next/c/4636b4e797f7
+If the tool is confused but not in an dumb way - it may be worth adding
+a relevant comment or info in the commit message. Otherwise a note under
+--- would be appreciated to avoid maintainers having to re-check the
+comments you already considered and disproved.
 
-You are awesome, thank you!
+Thanks for adding the MAINTAINERS entry, two notes on that:
+ - the entries must be sorted, so you need to move it down under Q
+   instead of putting it next to SCTP
+ - you seem to have copy/pasted the uAPI path for SCTP to the entry
+   instead of QUIC ;)
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
