@@ -1,82 +1,101 @@
-Return-Path: <netdev+bounces-242520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB107C91421
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 09:42:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCCCAC9142A
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 09:42:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 379594E6B4D
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 08:38:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C061B3AF85B
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 08:40:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E6F32E7658;
-	Fri, 28 Nov 2025 08:38:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 569812F7AAD;
+	Fri, 28 Nov 2025 08:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="G75b3cx8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JbnQHvey";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="RUp1JPjx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89C9A2E717B
-	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 08:38:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5878B2E8B9B
+	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 08:40:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764319092; cv=none; b=s9WeGNflMl3/IAws8yEpsbzaTwtMgm2Xf/0rNNJoFnJ0kiJWqYdaxrVEeVivhqJEjciHVdpTnqCNzoO1PNf2GOwZytI84a8SmHpHXutcwY97mimgbogh+QwvAMcIOzTQx9vAdTgWJfzgT1ouJ9FoSkeatW6umDGrK5WI4VH0Cs4=
+	t=1764319230; cv=none; b=NkaRXBPnDqikuNabe5n26IESRcPjWNnL/B+Ri9Dwj49hjrqPumuQoUV/frjbajLXSTqLLgZhrZIU5iXTBX8UQsef/xF8zO351S2BVkefnd/UojMqoWnoXq/Soxsh+NsKenhHiPIap6CXcjubqGA7NrfTMZhSq8+W7wXYLMFuCVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764319092; c=relaxed/simple;
-	bh=haJn/3UOjunIAU6P6BQCym51EG14zWyLcsUuaxNDf8o=;
+	s=arc-20240116; t=1764319230; c=relaxed/simple;
+	bh=FAr/GGpauPyMQGkemE6ZZD1cchU8P44wQZ64H/RgQSc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eovkuJf/R1V2eGnooaIEG81T9EC3sKvM/tcl7ka3GuxOPdZsfnAcBumaYm7elDevS4mwKcvq2pzY8n5hW9UX84WR22XiBdG7dg2uBgSows9IhCVGXDwzOhfuWQWgxpg5YMyRE4U8i/xQ4tcfz0Bo8dKpkVO6vQTaliCePYknZO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=G75b3cx8; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-429c844066fso140073f8f.3
-        for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 00:38:10 -0800 (PST)
+	 In-Reply-To:Content-Type; b=ED3ma9ZVEYNxDgp2RMwfSPymiCnlCNK0QJax7LHfE3ug0VHnkeycpQ6bwmmw+lMTbncPnfuwloN2Z4KWi0IHJ48kGy6GJIQI0YrYnKtyqARyksqYFaRi86Xs1V7IbwMHu4IjHMY6BioSJ9sCqhIaAGOftYI7xESwuF5gEi8mmTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JbnQHvey; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=RUp1JPjx; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764319223;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JOXCyi+N+bccxvaPF3v4Z/F/wizbKPeceUefBWj6M50=;
+	b=JbnQHveyqATP4yRrnhWDkh0+RkhsbgV+wtqDBsff6fAe+iFzuhd25RQclWFIWTafAK+2Bc
+	Mld1iT1t8EVbgUJNLDsG9FkZZXcL38hLFm9K+rFWuZb7pFVNO/KvEo5oWTQyshPJPI/n7W
+	dLr8RlzV2hQuXSLSJUlJV3OMYgN/BfY=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-70-TAD54T56PBSLNLs7pz2OoA-1; Fri, 28 Nov 2025 03:40:21 -0500
+X-MC-Unique: TAD54T56PBSLNLs7pz2OoA-1
+X-Mimecast-MFC-AGG-ID: TAD54T56PBSLNLs7pz2OoA_1764319220
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-47106720618so17417905e9.1
+        for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 00:40:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1764319089; x=1764923889; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=712AyLLLFB0b3oxGfBICwKxqOrRvtEZjrinsv8wp6uA=;
-        b=G75b3cx8IHobzDD5Iq7QPWOnLEn+WJDbxgYC+D8YM13m0yTIP49Hp0JaX4wpJezSka
-         T5/3MuB5/QnyKKWa5T/sTQBuqsbVDICb/BiFt79P29HnIRKAVIdIrIcgHmcFaYR5ozkg
-         oxnECZrF/omalATbVlp3oj6RR1KOxKde6oG22aEjbLULoWzASWS3mNNA2vB3i3onT+Lb
-         zWzDV/ikVDrBfpDLgSGRx5xURL0tku71Ozqvi0sk9qhBrFEMyxEtJdKTNtw8hSwRZYmt
-         FeCDneVEOQcI+aKOC/2mt9+9eRGLhGuXmiUTu32bDeoYcYq7gVQ0nByzBvHHhrucCZhI
-         fBcg==
+        d=redhat.com; s=google; t=1764319220; x=1764924020; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JOXCyi+N+bccxvaPF3v4Z/F/wizbKPeceUefBWj6M50=;
+        b=RUp1JPjxLc2QvlSfGlJcvPfsStR0TDGxWdwlKorle1aiRS3rPt+IIXRt6GGYx74u5v
+         hN50NNYHKlI+UcHWidE21bg3IOWrVlE+Jjh3mVNFFHxRwCCYO6vCZ67WkzVZuW3TQBm3
+         CDLefF6DDB0sJ1tZIghzmc1ZeBFfHlN50qvYL0K/QMmBJgZj2NQot35Ff5nPPZ368Hd6
+         0RF7O6QFwC+45Xpq7Oiunk2eJTdg+XTxPb63cP8rpTMeZpjntzlHZTApwE25X69Dnd02
+         3myfP9UZXgAEu4sILKaPQHXbiiG8iDde2PmZm0kEtmEC9l+O1JGQa716ZiLAMqzHUTiW
+         arzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764319089; x=1764923889;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=712AyLLLFB0b3oxGfBICwKxqOrRvtEZjrinsv8wp6uA=;
-        b=Q8vU3NLkO8KQIAwE8iSFA8CbD6KS8bvcjjwFZZnB/jOkylCuMkYMW/610gMbxhdNH2
-         67pTECfl6RHFTos1+hXtvJTVb2w2SsN6IRDs6HD+z4e+KxJ9dHCjpckwURS7r4gI7/j1
-         PQQmz6PRs2O1UAC6aTxuoxFth+eYejQJx9GJ9gzmo4To6+d3tGY1wrYAp9RtSTpIxOs+
-         /5Dz5D37uvKPrYC0NW9BT3s+sI2TF2fNKQH1ZXhpgPbFh69x+bDUlMErN4rbF0koT4Ex
-         s+ekJTpemUbjQIuF9krku6X/uTQ/t5Bbf2wkmndDludOtyEH4VbInmut6WLFooVwmEeS
-         2Iyg==
-X-Forwarded-Encrypted: i=1; AJvYcCVGojZCDhuxBLm70DDiL7tOvbBYxqQeBcszcMbSNTTc6DfEo52fItJyLf8Pz6UU1eCmLW+ddhE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yza29PwXxW1I8sil8bTYdAWlt419BUI38J2fUvUQu8/r4qdyMyN
-	M1oiUS4Srjps2NQlhKjXFNzyYi4MExVSltCTOCxkMLGqYJfITJwr9TFk4eoWxaRr0Z0=
-X-Gm-Gg: ASbGncvNzYo1KhvjElh7R1c7E3ZgB3xOB5y/pVnOCMNE/uAGNXTA3mNIYy9rQEKf5ng
-	/mbmRW4EvgtIziZNK0Ka3eA50qwMG8prAKA+OYWs5tkdyjs3+eNQ6zFpY+Taumw/bCZvkMVSQki
-	BCKjO59TyyMRbEbGg/K1cn5RK6Zje8+TGW3XthA39ztgMnWXjsugTm8M4Cl7USMAar2KFf5H6p3
-	/dh+QxZtJal1Ny3KFWqL8gHpvBYOzRxrFMydNKI8A4BE6jF1Wu1gycLmUybZUIwG4Fz+oxuY9xA
-	yga2ZD4rvNVsGJXE7LtGjsXTguMsYlkstJTXsK8YAf43tlgMgtbFf0wOpRzbyTomaub5GCt4BE6
-	34496XIXtdNkfQj0J2MfH7nZzO1FFStkYOhtp7LA8dUEPbslMxZKsVD5bcyGCD4y2CQLV6e5Zwc
-	6Oqv46Iok58UI7vfGQXFfDo/RPPYVpt0KoSW3uUN4jkXEf5XAg86XWzQ6JZ82MydA=
-X-Google-Smtp-Source: AGHT+IHIwe5aOZs6Nk4J/OFcq9T/e8G0iERVqqbqg2l9vqDQsMWiyEtgawO7E/I0iade+U4xJkVakw==
-X-Received: by 2002:a05:6000:240c:b0:429:bde0:1da8 with SMTP id ffacd0b85a97d-42cc3fdf636mr15176816f8f.7.1764319088767;
-        Fri, 28 Nov 2025 00:38:08 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:b41:c160:6a1d:efff:fe52:1959? ([2a01:e0a:b41:c160:6a1d:efff:fe52:1959])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42e1ca1a310sm8386127f8f.26.2025.11.28.00.38.07
+        d=1e100.net; s=20230601; t=1764319220; x=1764924020;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JOXCyi+N+bccxvaPF3v4Z/F/wizbKPeceUefBWj6M50=;
+        b=bbR2/NVIxcTP9oEX2TxkiTsNK92jfdv9RcVgRCwFq6ZqzdPYZ11c6eqXHsIdAMsoja
+         c2JKFKqqxcG7ikx8VPWbWd0FFgVCq6tNrMmg98a9+9RgFD8ijRoWzs1Pp7y2FigpTuQA
+         cVFiqbRlY5AtmjOXT5TZtWKZiQaRUkQfE6fuE21NwIcIS3zd0bbO1V5yIFE/yqlUmzGk
+         d8vGhjjOINCiMTDfF698HU7Bkx7N8oXpFulQicJFKh+KfdTp4G64pD0phTzpJM7LAgkz
+         7WBgV0tOyrby0C67uOt9NIvsSxvuOpeWF4bU1dG3yWCyQ0y9/Ty1YfmQ/6w1hwG5LkE6
+         Cvzw==
+X-Forwarded-Encrypted: i=1; AJvYcCWpYl0LlfkXn4+23Y79vtio1RgAPDV6nmYdW0J0nZlFxysDpjnEY6E9FkqBYDrQOvGa+VWpZEY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2mpWJkGVf3GAGGgdbJeyUF+8wWma2Naxa06Iuwo1vqp6C4OCX
+	sjccRlwMvpXqzELqm3kcoYRzursQPLrnyTqAhYvb7koS4UeBkheiJYFQEWAUrKToqvn16g4CTcm
+	sLMJR25SVsRQKxvpX30KL7kDZMda4UZ/HrI37j+EOV3aocz2XhcAWndiFFg==
+X-Gm-Gg: ASbGncvmPDfTqlcwYtzMONcfridADiKb/1E9EhShO5uG67s6TxXmaan8EAtw2FrydH4
+	2hZe5vn201o+IFpUr9ZzlP4YM3zFUDMpBfBvoatJ05RLiMh/q62u0cPT5esFiuMlsgNklVrkFxL
+	EkLXHBw+K3GPuzvVyAOTBcO5yGXpGzneotVwdBn+DVQLIXapaDL0Uno12aosOHvCvIO/08ZW575
+	azVDmopXSKSd7soYN0VIs+ecbtMUIZYGfPyxG6+4ty9bPKKwsS/pF7EUl5G1jraaJaXAccRrD9v
+	dUHl6Q7efk7xAGzxqxkwjFloXuerPQm5yN7tNMBuxIQa+mW1PUSU6OwOkK5vac8JH26t8GZZMHE
+	/asMmlk4czK2MEQ==
+X-Received: by 2002:a05:600c:470d:b0:471:1717:411 with SMTP id 5b1f17b1804b1-477c01edab1mr330071515e9.24.1764319220212;
+        Fri, 28 Nov 2025 00:40:20 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGc0xj3JcNVsG3D1+mRDnvoXzRumm+1p3khoPuro2XJiejhlWvTPbmuCWFmwSqh/cpTWZ4R1A==
+X-Received: by 2002:a05:600c:470d:b0:471:1717:411 with SMTP id 5b1f17b1804b1-477c01edab1mr330070905e9.24.1764319219730;
+        Fri, 28 Nov 2025 00:40:19 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.212])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47913870b38sm23292005e9.15.2025.11.28.00.40.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 28 Nov 2025 00:38:07 -0800 (PST)
-Message-ID: <1d44e105-77bd-42e7-81f5-6e235fd12554@6wind.com>
-Date: Fri, 28 Nov 2025 09:38:07 +0100
+        Fri, 28 Nov 2025 00:40:19 -0800 (PST)
+Message-ID: <66f0659a-c7f1-4ebd-8f75-98e053c9f390@redhat.com>
+Date: Fri, 28 Nov 2025 09:40:17 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,60 +103,98 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH v2] net/ipv6: allow device-only routes via the multipath
- API
-To: azey <me@azey.net>
-Cc: Jakub Kicinski <kuba@kernel.org>, David Ahern <dsahern@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev <netdev@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>
-References: <3k3facg5fiajqlpntjqf76cfc6vlijytmhblau2f2rdstiez2o@um2qmvus4a6b>
- <20251124190044.22959874@kernel.org>
- <19ac14b0748.af1e2f2513010.3648864297965639099@azey.net>
- <85a27a0d-de08-413d-af07-0eb3a3732602@6wind.com>
- <19ac5a2ee05.c5da832c80393.3479213523717146821@azey.net>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Subject: Re: [PATCH net-next v3] xsk: skip validating skb list in xmit path
+To: Jason Xing <kerneljasonxing@gmail.com>, edumazet@google.com
+Cc: davem@davemloft.net, kuba@kernel.org, bjorn@kernel.org,
+ magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
+ jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org,
+ daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+ bpf@vger.kernel.org, netdev@vger.kernel.org,
+ Jason Xing <kernelxing@tencent.com>
+References: <20251125115754.46793-1-kerneljasonxing@gmail.com>
+ <b859fd65-d7bb-45bf-b7f8-e6701c418c1f@redhat.com>
+ <CAL+tcoDdntkJ8SFaqjPvkJoCDwiitqsCNeFUq7CYa_fajPQL4A@mail.gmail.com>
+ <f8d6dbe0-b213-4990-a8af-2f95d25d21be@redhat.com>
+ <CAL+tcoAY5uaYRC2EyMQTn+Hjb62KKD1DRyymW+M27BT=n+MUOw@mail.gmail.com>
 Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <19ac5a2ee05.c5da832c80393.3479213523717146821@azey.net>
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <CAL+tcoAY5uaYRC2EyMQTn+Hjb62KKD1DRyymW+M27BT=n+MUOw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Le 27/11/2025 à 15:06, azey a écrit :
-> On 2025-11-27 08:58:59 +0100  Nicolas Dichtel <nicolas.dichtel@6wind.com> wrote:
->> I still think that there could be regressions because this commit changes the
->> default behavior.
+On 11/28/25 2:44 AM, Jason Xing wrote:
+> On Fri, Nov 28, 2025 at 1:58 AM Paolo Abeni <pabeni@redhat.com> wrote:
+>> On 11/27/25 1:49 PM, Jason Xing wrote:
+>>> On Thu, Nov 27, 2025 at 8:02 PM Paolo Abeni <pabeni@redhat.com> wrote:
+>>>> On 11/25/25 12:57 PM, Jason Xing wrote:
+>>>>> This patch also removes total ~4% consumption which can be observed
+>>>>> by perf:
+>>>>> |--2.97%--validate_xmit_skb
+>>>>> |          |
+>>>>> |           --1.76%--netif_skb_features
+>>>>> |                     |
+>>>>> |                      --0.65%--skb_network_protocol
+>>>>> |
+>>>>> |--1.06%--validate_xmit_xfrm
+>>>>>
+>>>>> The above result has been verfied on different NICs, like I40E. I
+>>>>> managed to see the number is going up by 4%.
+>>>>
+>>>> I must admit this delta is surprising, and does not fit my experience in
+>>>> slightly different scenarios with the plain UDP TX path.
+>>>
+>>> My take is that when the path is extremely hot, even the mathematics
+>>> calculation could cause unexpected overhead. You can see the pps is
+>>> now over 2,000,000. The reason why I say this is because I've done a
+>>> few similar tests to verify this thought.
+>>
+>> Uhm... 2M is not that huge. Prior to the H/W vulnerability fallout
+>> (spectre and friends) reasonable good H/W (2016 old) could do ~2Mpps
+>> with a single plain UDP socket.
 > 
-> I don't think it should - my reasoning is that any routes created via
-> ip6_route_multipath_add() would always pass rt6_qualify_for_ecmp()
-> before this patch anyway:
-> - RAs get added as single routes via ip6_route_add(), so RTF_ADDRCONF
->   wouldn't be set
-> - f6i->nh wouldn't be set, since:
->   - ip6_route_info_create_nh() only sets nh if cfg->fc_nh_id is set,
->     otherwise sets fib6_nh
->   - rtm_to_fib6_config() prevents RTA_NH_ID and RTA_MULTIPATH from being
->     set at the same time, and only sets fc_nh_id if RTA_NH_ID is set
-> - f6i->fib6_nh->fib_nh_gw_family would always be set, as dev-only routes
->   were stopped by the check in rtm_to_fib6_multipath_config()
+> Interesting number that I'm not aware of. Thanks.
 > 
-> Did I get anything wrong? I should've probably included this in the commit
-> message, sorry.
-With IPv6, unlike IPv4, the ECMP next hops can be added one by one. Your commit
-doesn't allow this:
+> But for now it's really hard for xsk (in copy mode) to reach over 2M
+> pps even with some recent optimizations applied. I wonder how you test
+> UDP? Could you share the benchmark here?
+> 
+> IMHO, xsk should not be slower than a plain UDP socket. So I think it
+> should be a huge room for xsk to improve...
 
-$ ip -6 route add 2002::/64 via fd00:125::2 dev ntfp2
-$ ip -6 route append 2002::/64 dev ntfp3
-$ ip -6 route
-2002::/64 via fd00:125::2 dev ntfp2 metric 1024 pref medium
-2002::/64 dev ntfp3 metric 1024 pref medium
-...
-$ ip -6 route append 2002::/64 via fd00:175::2 dev ntfp3
-$ ip -6 route
-2002::/64 metric 1024 pref medium
-        nexthop via fd00:125::2 dev ntfp2 weight 1
-        nexthop via fd00:175::2 dev ntfp3 weight 1
+I can agree with that. Do you have baseline UDP figures for your H/W?
 
-Note that the previous route via ntfp3 has been removed.
+>> Also validate_xmit_xfrm() should be basically a no-op, possibly some bad
+>> luck with icache?
+> 
+> Maybe. I strongly feel that I need to work on the layout of those structures.
+>>
+>> Could you please try the attached patch instead?
+> 
+> Yep, and I didn't manage to see any improvement.
+
+That is unexpected. At very least that 1% due to validate_xmit_xfrm()
+should go away. Could you please share the exact perf command line you
+are using? Sometimes I see weird artifacts in perf reports that go away
+adding the ":ppp" modifier on the command line, i.e.:
+
+perf record -ag cycles:ppp <workload>
+
+>> I think you still need to call validate_xmit_skb()
+> 
+> I can simplify the whole logic as much as possible that is only
+> suitable for xsk: only keeping the linear check. That is the only
+> place that xsk could run into.
+What about checksum offload? If I read correctly xsk could build
+CSUM_PARTIAL skbs, and they will need skb_csum_hwoffload_help().
+
+Generally speaking if validate_xmit_skb() takes a relevant slice of time
+for frequently generated traffic, I guess we should try to optimize it.
+
+@Eric: if you have the data handy, do you see validate_xmit_skb() as a
+relevant cost in your UDP xmit tests?
+
+Thanks,
+
+Paolo
+
 
