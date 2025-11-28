@@ -1,361 +1,246 @@
-Return-Path: <netdev+bounces-242431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242432-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6CB8C905ED
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 00:53:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24268C90638
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 01:14:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 597D24E144B
-	for <lists+netdev@lfdr.de>; Thu, 27 Nov 2025 23:53:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5A253A95E5
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 00:14:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71C54327202;
-	Thu, 27 Nov 2025 23:53:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54AA62F85B;
+	Fri, 28 Nov 2025 00:14:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.de header.i=w_armin@gmx.de header.b="b4FpeI0G"
+	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="YWPeDVth"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 212FD23ABA7;
-	Thu, 27 Nov 2025 23:53:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 812302AD13
+	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 00:14:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764287592; cv=none; b=TFt4rsroNd1NwEl/R8GmoY4MAs5JMAq5tmxrM5Im4SNpuONNEk56H1pF6eKn97bciY5MOrrdNkPOvmXnSXkR4012ZuCqAGHCvA5b4aEdnThFNV0tkUMTR2SbkiEQOg+v4v2e3SahrAf4uOsC/Y360oa9B/5GZIsBiFaXyt2zcYQ=
+	t=1764288870; cv=none; b=qBsYBglDGh0pRANE2TPnTM7fZdAJCIPB9CdIIxya965QS5xQGh7XvOgtUJSVVaQrLijAzCNfcduwC2TyUSAgds87q0DNW4SbKfLvVYjeFjB8rixtLRa4i8eUkTlB6e6XY7R2MurNkAK6RTp5EjkOENLJipKh2tk8MEpinH9cNkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764287592; c=relaxed/simple;
-	bh=Pzd5CdLCzueTjM9HaCRB+hjzWcatsgYas/5VNPfLIbk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pgF32nJtM0uIGbHc1G8bVK5ja4vTjZwVsxkXZAdvEByrBkOhU2DrIBgzjsN/twUdNEgWYSVI+8JoycngDNpd16snk7KSAbT27S+Ye0JY3wXxab3/lS0qCyKofgdmVfHzWWfCVPZTvTPzjI5h0YjGdJi47fhY8hX8jaxUgxdHjQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=w_armin@gmx.de header.b=b4FpeI0G; arc=none smtp.client-ip=212.227.15.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
-	s=s31663417; t=1764287573; x=1764892373; i=w_armin@gmx.de;
-	bh=XH4L8vJd3Pgpkz5I5/5j7PvlshtX9zs5NurfTRvHPhc=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=b4FpeI0GdvrvQyS6l8P2lezwX5ckkF2u6ginTiTt37wA7LMBOLrv99J5QRQLj1Uy
-	 k1kVy5Oj/I91rUSmge7JLM0p7+0n7z0nRY2slB89KPqIRcz+63YNBV35lZhUHtDLB
-	 B0nbHZV4srXiazlOU6gZFpZ1WpHHAuSZ4RXeQAxk8h7uY+8/nAMeMUCIGQTPClhJO
-	 wMYI5wzlQv37qSl4LjiG9hg+6LS1+0vOOp/LxW2pTEoJ9jrOncwKijg9H613lgbvv
-	 FsjHxgfNDzoUFgPlljajXeDpxQnNclRPEhc1GV2uswTdLk+EEhQVGFwyDBEoXm6j5
-	 Fhl5h/Gw7BO8d+uanQ==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [192.168.0.69] ([93.202.247.91]) by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1N7QxL-1wA7ku0qHF-0156NT; Fri, 28
- Nov 2025 00:52:53 +0100
-Message-ID: <a2ef1a42-6c06-4186-83ef-e13414fb818a@gmx.de>
-Date: Fri, 28 Nov 2025 00:52:47 +0100
+	s=arc-20240116; t=1764288870; c=relaxed/simple;
+	bh=v5i/EmFaBPgs6nlSq7GL06zXBoB1G+7bxvYfuktyJ/w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ja4W+3e/+apb4B3EAWCqp5QSah/LZBkCN2kK/K4C6lvjjVBTuOFblwtKlHTj5sILIZA1Nd6t+P/MZtr/qY44o5o65uAaIKlHVWZisHz8FmvNnswPRaCvgXxO5zJE8TY/NI4pG3qqRXw7s+tA3Lyt+2SfF8LMh6xrbYqcKJsGb+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=YWPeDVth; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-bc2abdcfc6fso792130a12.2
+        for <netdev@vger.kernel.org>; Thu, 27 Nov 2025 16:14:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=asu.edu; s=google; t=1764288868; x=1764893668; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HTp1SGwTKk2hZyC3Yj3TH2Fee95cP69A2MpxOAn+dMw=;
+        b=YWPeDVthg4uxGKLPwqyrwHwNAUOIRzSHNndZR0PefU4nW6htsLrbJeXusM3g9oxWC7
+         Z9F/HayabEvpfH53EzOrmDXGbeyhykRiW8GWbONUEFx9Vkzg4bdBGTCTiiBFGU7XgI5e
+         uwTmwONKgPArMqa4v3QFTPOo2ZD0gKL+98sGhwaMCRwUqmhbGzWc0SJNBPvthXZSVO+o
+         A/35JTPkAhoGbhNig/3cBuyHBrTlOJnZVU2hjDwdlzHkPdmScKpuzW2Y349xi3FrBG0G
+         ktnqt6JONZx6RmjzbYvOw0mWzx7e4xLT6LiIk/1m2IM7ZvWV7uqxPSPSqJ8ekTRFeTK/
+         RtEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764288868; x=1764893668;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HTp1SGwTKk2hZyC3Yj3TH2Fee95cP69A2MpxOAn+dMw=;
+        b=NkIU4Gxxv+Wlx/WmWQGkkBTODl5RKZiENXUMWLIDuXhGMlINWNkIg6/yBqYJwzuKFp
+         Uh7x4lu8TUjxdd1iVDhgt15X5hpCyOeQwjTngVjoULKWigP03+muH/cGR2BVCVqyxLPQ
+         JVvXZH2L8CchsnHV5NbMhytI8ZzGRfgOepi5tkAuN8F4JEEzpMyD2oCQz4RcFX/KfK3W
+         qnuojzCiDKPb9WP3EHRfJ5mnHdJxuMXRdz3Haz+Pvh4jnv/eXF/H4a+2urjd1W9zsdSI
+         f91R+URCkDLFlPWWc68BF5h3e6F6Ppc9Um+DqmPy7ynF6YU/9lKVBRSwtrTFNXBlDbi7
+         3upQ==
+X-Gm-Message-State: AOJu0YzadOiraclJcep60g/Yy/KlViY1dWfQt+cmx4LuQAeorFrBdPfR
+	rL3Jd/FssUIeHb+djbhrW63XCqR/iXw+l2HI/bWWaRZ81qgMFuUaHn8Cdrt+cFKivLVfEtd3sDj
+	8QpU=
+X-Gm-Gg: ASbGncueFFFbIbqE32aQbZ/uY29F6bY4e44j+HUlOJxHI4pdvvjASIzQyJZ9sI1A+i9
+	zG1WFfFmh3D0m60WtOX68YsO9lx4MECFackLfdxGRIDVCxSOKJJVyrTMDRwdjnebwkKE4WvhCFY
+	x2TlV/l4RskMJlr9VhsYPzNEl4Ka3rmtRLRN8Pi2+7XrzTFJeuO4amagUSuvbBLYPfvCECVttCW
+	NdD1w28rh+ICruJFiWpMeftr5oGCe0erA9ndDcR0Z/rI874EOY2/+WuneGLCsFY105a4byMT0PF
+	WESbHjVzpQlHNm0e2RMm7oC+KP8/MfJSoVvmds4BK7arPXyf95zS0gLjva64sOzUOgwU6dNAcwv
+	b12elpevmjxY3EhtD2agqxSh6vPwYHZzN1oaAGhR0yw6XVv6Zco5qU/C0Ha4jQthzYFzFqEAYSd
+	hDRf0IrSmyCQWE2c7X9fLHgh3MHoIQ3dS6kFbKc422
+X-Google-Smtp-Source: AGHT+IGMHEUfgIYw2AAmbDPAgqMQw4zD5YxfPYyEm1HQvDzWLdelfQlnl64DN5ws3BlZ+HRBPf6ZEQ==
+X-Received: by 2002:a05:7300:570d:b0:2a4:5c3b:e2bc with SMTP id 5a478bee46e88-2a719d80133mr14284109eec.19.1764288867608;
+        Thu, 27 Nov 2025 16:14:27 -0800 (PST)
+Received: from p1.tailc0aff1.ts.net (209-147-139-51.nat.asu.edu. [209.147.139.51])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2a965ae9d06sm11209080eec.4.2025.11.27.16.14.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Nov 2025 16:14:26 -0800 (PST)
+From: Xiang Mei <xmei5@asu.edu>
+To: security@kernel.org
+Cc: netdev@vger.kernel.org,
+	toke@toke.dk,
+	xiyou.wangcong@gmail.com,
+	cake@lists.bufferbloat.net,
+	bestswngs@gmail.com,
+	Xiang Mei <xmei5@asu.edu>
+Subject: [PATCH net v8 1/2] net/sched: sch_cake: Fix incorrect qlen reduction in cake_drop
+Date: Thu, 27 Nov 2025 17:14:14 -0700
+Message-ID: <20251128001415.377823-1-xmei5@asu.edu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC RESEND 0/8] thermal: core: Allow setting the parent
- device of thermal zone/cooling devices
-To: "Rafael J. Wysocki" <rafael@kernel.org>
-Cc: Daniel Lezcano <daniel.lezcano@linaro.org>,
- Zhang Rui <rui.zhang@intel.com>, Lukasz Luba <lukasz.luba@arm.com>,
- Len Brown <lenb@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
- linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org,
- etnaviv@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
- linux-tegra@vger.kernel.org, linux-acpi@vger.kernel.org,
- linux-doc@vger.kernel.org, netdev@vger.kernel.org,
- linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
- ath11k@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, platform-driver-x86@vger.kernel.org,
- linux-pci@vger.kernel.org, imx@lists.linux.dev,
- linux-renesas-soc@vger.kernel.org
-References: <20251120-thermal-device-v1-0-bbdad594d57a@gmx.de>
- <CAJZ5v0jOPrBcozzJMsB1eE12MuZRWDAV-+=jfrhJbi=S0p5J9Q@mail.gmail.com>
- <5f3ef610-4024-4ca0-a934-2649f5d25f40@gmx.de>
- <CAJZ5v0hdqY-=O5Ai6c5qjMr_pRFc+SDyV1QruM=ZeHH9Z=guSg@mail.gmail.com>
- <cf86344b-d9f1-4d3c-9fe9-deeb4ade9304@gmx.de>
- <CAJZ5v0iH8jkqJaSNtqaTHxt_305DeiEq0AqQCo4Eho5hMKkU4Q@mail.gmail.com>
-Content-Language: en-US
-From: Armin Wolf <W_Armin@gmx.de>
-In-Reply-To: <CAJZ5v0iH8jkqJaSNtqaTHxt_305DeiEq0AqQCo4Eho5hMKkU4Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:D6Q5pBOhq7j59tqn32AlaC7zNQxXY6IiWSrkHAM6P3gKJlbj6J6
- uTxSkHZHP7Jrt8LS6M31wBcEB910kNJD6DwnAUq6LpINXEEK63L9fmub3s1O8nU0ES+qChr
- O97vvWnAxbDtjA1N9QuygQJuv/Ks2U1ByUKDErVnqBHvBEKF+SSKyPhz2w1uTWQeFAg5N+n
- SOOeHBClzmSGO95ACdnBg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:MOyX3V+VNO8=;uFxfjrT42UHTZLKfvOt2xMNe9rm
- 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
- 8RvIZEcv5bZF5XQUwLjDfTq6sEgl3
+Content-Transfer-Encoding: 8bit
 
-Am 27.11.25 um 23:14 schrieb Rafael J. Wysocki:
+In cake_drop(), qdisc_tree_reduce_backlog() is used to update the qlen
+and backlog of the qdisc hierarchy. Its caller, cake_enqueue(), assumes
+that the parent qdisc will enqueue the current packet. However, this
+assumption breaks when cake_enqueue() returns NET_XMIT_CN: the parent
+qdisc stops enqueuing current packet, leaving the tree qlen/backlog
+accounting inconsistent. This mismatch can lead to a NULL dereference
+(e.g., when the parent Qdisc is qfq_qdisc).
 
-> On Thu, Nov 27, 2025 at 9:29=E2=80=AFPM Armin Wolf <W_Armin@gmx.de> wrot=
-e:
->> Am 27.11.25 um 19:22 schrieb Rafael J. Wysocki:
->>
->>> On Sat, Nov 22, 2025 at 3:18=E2=80=AFPM Armin Wolf <W_Armin@gmx.de> wr=
-ote:
->>>> Am 21.11.25 um 21:35 schrieb Rafael J. Wysocki:
->>>>
->>>>> On Thu, Nov 20, 2025 at 4:41=E2=80=AFAM Armin Wolf <W_Armin@gmx.de> =
-wrote:
->>> [...]
->>>
->>>>>> ---
->>>>>> Armin Wolf (8):
->>>>>>          thermal: core: Allow setting the parent device of cooling =
-devices
->>>>>>          thermal: core: Set parent device in thermal_of_cooling_dev=
-ice_register()
->>>>>>          ACPI: processor: Stop creating "device" sysfs link
->>>>> That link is not to the cooling devices' parent, but to the ACPI
->>>>> device object (a struct acpi_device) that corresponds to the parent.
->>>>> The parent of the cooling device should be the processor device, not
->>>>> its ACPI companion, so I'm not sure why there would be a conflict.
->>>>    From the perspective of the Linux device core, a parent device doe=
-s not have to be
->>>> a "physical" device. In the case of the ACPI processor driver, the AC=
-PI device is used,
->>>> so the cooling device registered by said driver belongs to the ACPI d=
-evice.
->>> Well, that's a problem.  A struct acpi_device should not be a parent
->>> of anything other than a struct acpi_device.
->> Understandable, in this case we should indeed use the the CPU device, e=
-specially since the fwnode
->> associated with it already points to the correct ACPI processor object =
-(at least on my machine).
->>
->>>> I agree that using the Linux processor device would make more sense, =
-but this will require
->>>> changes inside the ACPI processor driver.
->>> So be it.
->> OK.
->>
->>>> As for the "device" symlink: The conflict would be a naming conflict,=
- as both "device" symlinks
->>>> (the one created by the ACPI processor driver and the one created by =
-the device core) will
->>>> be created in the same directory (which is the directory of the cooli=
-ng device).
->>> I see.
->>>
->>> But why is the new symlink needed in the first place?  If the device
->>> has a parent, it will appear under that parent in /sys/devices/, won't
->>> it?
->>>
->>> Currently, all of the thermal class devices appear under
->>> /sys/devices/virtual/thermal/ because they have no parents and they
->>> all get a class parent kobject under /sys/devices/virtual/, as that's
->>> what get_device_parent() does.
->>>
->>> If they have real parents, they will appear under those parents, so
->>> why will the parents need to be pointed to additionally?
->> The "device" smylink is a comfort feature provided by the device core i=
-tself to allow user space
->> application to traverse the device tree from bottom to top, like a doub=
-le-linked list. We cannot
->> disable the creation of this symlink, nor should we.
-> I think you mean device_add_class_symlinks(), but that's just for
-> class devices.  Of course, thermal devices are class devices, so
-> they'll get those links if they get parents.  Fair enough.
->
->>> BTW, this means that the layout of /sys/devices/ will change when
->>> thermal devices get real parents.  I'm not sure if this is a problem,
->>> but certainly something to note.
->> I know, most applications likely use /sys/class/thermal/, so they are n=
-ot impacted by this. I will
->> note this in the cover letter of the next revision.
->>
->>>>>>          ACPI: fan: Stop creating "device" sysfs link
->>>>>>          ACPI: video: Stop creating "device" sysfs link
->>>>> Analogously in the above two cases AFAICS.
->>>>>
->>>>> The parent of a cooling device should be a "physical" device object,
->>>>> like a platform device or a PCI device or similar, not a struct
->>>>> acpi_device (which in fact is not a device even).
->>>>    From the perspective of the Linux device core, a ACPI device is a =
-perfectly valid device.
->>> The driver core is irrelevant here.
->>>
->>> As I said before, a struct acpi_device object should not be a parent
->>> of anything other than a struct acpi_device object.  Those things are
->>> not devices and they cannot be used for representing PM dependencies,
->>> for example.
->>>
->>>> I agree that using a platform device or PCI device is better, but thi=
-s already happens
->>>> inside the ACPI fan driver (platform device).
->>> So it should not happen there.
->> I meant that the ACPI fan driver already uses the platform device as th=
-e parent device of the
->> cooling device, so the ACPI device is only used for interacting with th=
-e ACPI control methods
->> (and registering sysfs attributes i think).
-> OK
->
->>>> Only the ACPI video driver created a "device" sysfs link that points =
-to the ACPI device
->>>> instead of the PCI device. I just noticed that i accidentally changed=
- this by using the
->>>> PCI device as the parent device for the cooling device.
->>>>
->>>> If you want then we can keep this change.
->>> The PCI device should be its parent.
->> Alright, i will note this in the patch description.
->>
->>>>>>          thermal: core: Set parent device in thermal_cooling_device=
-_register()
->>>>>>          ACPI: thermal: Stop creating "device" sysfs link
->>>>> And this link is to the struct acpi_device representing the thermal =
-zone itself.
->>>> Correct, the ACPI thermal zone driver is a ACPI driver, meaning that =
-he binds to
->>>> ACPI devices. Because of this all (thermal zone) devices created by a=
-n instance of
->>>> said driver are descendants of the ACPI device said instance is bound=
- to.
->>>>
->>>> We can of course convert the ACPI thermal zone driver into a platform=
- driver, but
->>>> this would be a separate patch series.
->>> If you want parents, this needs to be done first, but I'm still not
->>> sure what the parent of a thermal zone would represent.
->>>
->>> In the ACPI case it is kind of easy - it would be the (platform)
->>> device corresponding to a given ThermalZone object in the ACPI
->>> namespace - but it only has a practical meaning if that device has a
->>> specific parent.  For example, if the corresponding ThermalZone object
->>> is present in the \_SB scope, the presence of the thermal zone parent
->>> won't provide any additional information.
->> To the device core it will, as the platform device will need to be susp=
-ended
->> after the thermal zone device has been suspended, among other things.
-> Let's set suspend aside for now, I think I've explained my viewpoint
-> on this enough elsewhere.
->
-Agreed.
+This patch computes the qlen/backlog delta in a more robust way by
+observing the difference before and after the series of cake_drop()
+calls, and then compensates the qdisc tree accounting if cake_enqueue()
+returns NET_XMIT_CN.
 
->>> Unfortunately, the language in the specification isn't particularly
->>> helpful here: "Thermal zone objects should appear in the namespace
->>> under the portion of the system that comprises the thermal zone. For
->>> example, a thermal zone that is isolated to a docking station should
->>> be defined within the scope of the docking station device."  To me
->>> "the portion of the system" is not too meaningful unless it is just
->>> one device without children.  That's why _TZD has been added AFAICS.
->> I think you are confusing the parent device of the ThermalZone ACPI dev=
-ice
->> with the parent device of the struct thermal_zone_device.
-> No, I'm not.
->
->> I begin to wonder if mentioning the ACPI ThermalZone device together wi=
-th the
->> struct thermal_zone_device was a bad idea on my side xd.
-> Maybe.
->
->>>>>>          thermal: core: Allow setting the parent device of thermal =
-zone devices
->>>>> I'm not sure if this is a good idea, at least until it is clear what
->>>>> the role of a thermal zone parent device should be.
->>>> Take a look at my explanation with the Intel Wifi driver.
->>> I did and I think that you want the parent to be a device somehow
->>> associated with the thermal zone, but how exactly?  What should that
->>> be in the Wifi driver case, the PCI device or something else?
->>>
->>> And what if the thermal zone affects multiple devices?  Which of them
->>> (if any) would be its parent?  And would it be consistent with the
->>> ACPI case described above?
->>>
->>> All of that needs consideration IMV.
->> I agree, but there is a difference between "this struct thermal_zone_de=
-vice depends on
->> device X to be operational" and "this thermal zone affects device X, de=
-vice Y and device Z".
-> Yes, there is.
->
->> This patch series exclusively deals with telling the driver core that "=
-this struct thermal_zone_device
->> depends on device X to be operational".
-> Maybe let's take care of cooling devices first and get back to this late=
-r?
->
-Agreed.
+To ensure correct compensation when ACK thinning is enabled, a new
+variable is introduced to keep qlen unchanged.
+
+Fixes: 15de71d06a40 ("net/sched: Make cake_enqueue return NET_XMIT_CN when past buffer_limit")
+Signed-off-by: Xiang Mei <xmei5@asu.edu>
+---
+v2: add missing cc
+v3: move qdisc_tree_reduce_backlog out of cake_drop
+v4: remove redundant variable and handle ack branch correctly
+v5: add the PoC as a test case
+v6: split test and patch; fix the wrong drop count
+v7: remove redundant comments
+v8: no change
+---
+
+ net/sched/sch_cake.c | 58 ++++++++++++++++++++++++--------------------
+ 1 file changed, 32 insertions(+), 26 deletions(-)
+
+diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
+index 32bacfc314c2..d325a90cde9e 100644
+--- a/net/sched/sch_cake.c
++++ b/net/sched/sch_cake.c
+@@ -1597,7 +1597,6 @@ static unsigned int cake_drop(struct Qdisc *sch, struct sk_buff **to_free)
+ 
+ 	qdisc_drop_reason(skb, sch, to_free, SKB_DROP_REASON_QDISC_OVERLIMIT);
+ 	sch->q.qlen--;
+-	qdisc_tree_reduce_backlog(sch, 1, len);
+ 
+ 	cake_heapify(q, 0);
+ 
+@@ -1743,14 +1742,14 @@ static void cake_reconfigure(struct Qdisc *sch);
+ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 			struct sk_buff **to_free)
+ {
++	u32 idx, tin, prev_qlen, prev_backlog, drop_id;
+ 	struct cake_sched_data *q = qdisc_priv(sch);
+-	int len = qdisc_pkt_len(skb);
+-	int ret;
++	int len = qdisc_pkt_len(skb), ret;
+ 	struct sk_buff *ack = NULL;
+ 	ktime_t now = ktime_get();
+ 	struct cake_tin_data *b;
+ 	struct cake_flow *flow;
+-	u32 idx, tin;
++	bool same_flow = false;
+ 
+ 	/* choose flow to insert into */
+ 	idx = cake_classify(sch, &b, skb, q->flow_mode, &ret);
+@@ -1823,6 +1822,8 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 		consume_skb(skb);
+ 	} else {
+ 		/* not splitting */
++		int ack_pkt_len = 0;
++
+ 		cobalt_set_enqueue_time(skb, now);
+ 		get_cobalt_cb(skb)->adjusted_len = cake_overhead(q, skb);
+ 		flow_queue_add(flow, skb);
+@@ -1833,13 +1834,13 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 		if (ack) {
+ 			b->ack_drops++;
+ 			sch->qstats.drops++;
+-			b->bytes += qdisc_pkt_len(ack);
+-			len -= qdisc_pkt_len(ack);
++			ack_pkt_len = qdisc_pkt_len(ack);
++			b->bytes += ack_pkt_len;
+ 			q->buffer_used += skb->truesize - ack->truesize;
+ 			if (q->rate_flags & CAKE_FLAG_INGRESS)
+ 				cake_advance_shaper(q, b, ack, now, true);
+ 
+-			qdisc_tree_reduce_backlog(sch, 1, qdisc_pkt_len(ack));
++			qdisc_tree_reduce_backlog(sch, 1, ack_pkt_len);
+ 			consume_skb(ack);
+ 		} else {
+ 			sch->q.qlen++;
+@@ -1848,11 +1849,11 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 
+ 		/* stats */
+ 		b->packets++;
+-		b->bytes	    += len;
+-		b->backlogs[idx]    += len;
+-		b->tin_backlog      += len;
+-		sch->qstats.backlog += len;
+-		q->avg_window_bytes += len;
++		b->bytes	    += len - ack_pkt_len;
++		b->backlogs[idx]    += len - ack_pkt_len;
++		b->tin_backlog      += len - ack_pkt_len;
++		sch->qstats.backlog += len - ack_pkt_len;
++		q->avg_window_bytes += len - ack_pkt_len;
+ 	}
+ 
+ 	if (q->overflow_timeout)
+@@ -1927,24 +1928,29 @@ static s32 cake_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 	if (q->buffer_used > q->buffer_max_used)
+ 		q->buffer_max_used = q->buffer_used;
+ 
+-	if (q->buffer_used > q->buffer_limit) {
+-		bool same_flow = false;
+-		u32 dropped = 0;
+-		u32 drop_id;
++	if (q->buffer_used <= q->buffer_limit)
++		return NET_XMIT_SUCCESS;
+ 
+-		while (q->buffer_used > q->buffer_limit) {
+-			dropped++;
+-			drop_id = cake_drop(sch, to_free);
++	prev_qlen = sch->q.qlen;
++	prev_backlog = sch->qstats.backlog;
+ 
+-			if ((drop_id >> 16) == tin &&
+-			    (drop_id & 0xFFFF) == idx)
+-				same_flow = true;
+-		}
+-		b->drop_overlimit += dropped;
++	while (q->buffer_used > q->buffer_limit) {
++		drop_id = cake_drop(sch, to_free);
++		if ((drop_id >> 16) == tin &&
++		    (drop_id & 0xFFFF) == idx)
++			same_flow = true;
++	}
++
++	prev_qlen -= sch->q.qlen;
++	prev_backlog -= sch->qstats.backlog;
++	b->drop_overlimit += prev_qlen;
+ 
+-		if (same_flow)
+-			return NET_XMIT_CN;
++	if (same_flow) {
++		qdisc_tree_reduce_backlog(sch, prev_qlen - 1,
++					  prev_backlog - len);
++		return NET_XMIT_CN;
+ 	}
++	qdisc_tree_reduce_backlog(sch, prev_qlen, prev_backlog);
+ 	return NET_XMIT_SUCCESS;
+ }
+ 
+-- 
+2.43.0
 
 
