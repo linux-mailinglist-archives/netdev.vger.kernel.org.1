@@ -1,115 +1,98 @@
-Return-Path: <netdev+bounces-242461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02C06C90775
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 02:04:13 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 911CCC907AF
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 02:21:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7338234D389
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 01:04:13 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3FC8734DBC9
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 01:21:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5367218E91;
-	Fri, 28 Nov 2025 01:04:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF8AD207DF7;
+	Fri, 28 Nov 2025 01:21:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="r2uPPnlp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ok+ds5L5"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B551B87EB;
-	Fri, 28 Nov 2025 01:04:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C15BC6A33B;
+	Fri, 28 Nov 2025 01:21:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764291850; cv=none; b=C0hX2jkAA7TLrtyFvKugXteONEYK98la8kRCsSgwqOD66sbDQNrmyb+wLYtdlNn7wUkWSmWe33GtwPWQhsxSlQOMbkqwm0uQKE87pau64j9GR/rHhV20BjML3FeGTtYPvd2iM+A2kc6Y0tgn5yv/UvDSFL3LWVrsfWicRPeVWzI=
+	t=1764292901; cv=none; b=JWfpjThT+AkCV+SoEpjWt5MtMogzLKrTUMRecWKG5MEcs4t9/MZ9HdyiAU7D84JsyQJ3mSjajBMJEGyrtkxx/Dr8PLyD04PiLTBMmOUn2SgA3QQKyImCZRuH7rC1YbV3hn6s3qGUR01/K12g3ZvV1j6Hn7aJN0uR40QcsPqRw/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764291850; c=relaxed/simple;
-	bh=u1DLrAR42ZJoXkwxYCBzYk/hzRVwcFcfj0mxEl0ya80=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jc79krp+BzFsq44bc5te5B0mpAXvwS0mpBih7uyCEyQ3NcUNUr6GTMMYlI7JWm8XtZInGxB1EhB1seGk0uaw7K2cbZ29REuBaQfGaK5+G5K0y9/2gQk3Q6xcGHawmvwWrH+dz3HnUxOGmOBLvNPlAKgOc+VPdgm+YlnZ21v8PAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=r2uPPnlp; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=UEOCDML1vgJ6otyKocfjE2Jgo6ba+jFiMjqlYw0GOP0=; b=r2uPPnlpjMQ8lwJadGjCByKLlt
-	jrhkjKRCkJoiP3y16e2WLuMNt+s5khmMYlV+KKYOyLhswONkQAzh5HNbvj2qYGUq809om0UG4V2gY
-	2n9F0lAEYDmIETyvqZ7gjvJhZMfobMax7Vr5uIGOhd6HZ6yFHZgnWh6DJnT0XJr7kJSPQHKV0Mgr9
-	V/QUSA/3uphNHf7Fns6UoxXvNS5OR46TBQJ3xtXQjysM+AtWho9G8PhQu5Qo+YQFbPWW9j9A/oClF
-	93+uKqdeHUm/sHo2LqeOrrz+WVVShnOn2iupje7tkXPtKhpKZqLsxrjZ0B/Ry+Mm/e1eZJ5Jn7ftd
-	qMCLlCDw==;
-Received: from [50.53.43.113] (helo=bombadil.infradead.org)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vOmu2-0000000HNDq-17oM;
-	Fri, 28 Nov 2025 01:04:02 +0000
-From: Randy Dunlap <rdunlap@infradead.org>
-To: netdev@vger.kernel.org
-Cc: Randy Dunlap <rdunlap@infradead.org>,
-	Jiri Slaby <jirislaby@kernel.org>,
-	Nick Kossifidis <mickflemm@gmail.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-wireless@vger.kernel.org
-Subject: [PATCH net-next] ath5k: debug.h: fix enum ath5k_debug_level kernel-doc
-Date: Thu, 27 Nov 2025 17:04:01 -0800
-Message-ID: <20251128010401.546506-1-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.52.0
+	s=arc-20240116; t=1764292901; c=relaxed/simple;
+	bh=vi+R73dniB1Wr54wJaEcDwuZlYn7UjMXzgUkFkXI2To=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mZacxH+RB2lE386OYvH53ziU3O+7HUN8H5AQTgQEdtsuhSdxC4/Iyrri7e/Lc1TOmD0bIxIDLnt9X46etth0gHMcttKaatqNN3pr+UkOwhgv6UjT4XfGyvKpDmG4IA40vQ5odGoxjPonCjlf4WjRZ1yvXCL4W4crGf9UMs7ZM6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ok+ds5L5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07F16C4CEF8;
+	Fri, 28 Nov 2025 01:21:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764292901;
+	bh=vi+R73dniB1Wr54wJaEcDwuZlYn7UjMXzgUkFkXI2To=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Ok+ds5L5wqUqJc5Y5m/BonhGZr5g2Ajtdpdp7Gpi2hk1HG4zV+sA5pKZTrQkPblft
+	 lLUAQbAmRMOLtirjC1vMj+NL2r6Ah1VlqbkKoOlIk3az8m2IdjKfxeeGa2chZAWb9s
+	 P5ZLDCNryp8g226tvbTJuXLDE02Tcj547u47ZvO5uogplO1iaWMNlmiSqHDEi8jwsO
+	 IqyJrHs0BLYc3GR645B7Ulp2XoY6L0HBR6I0StBowEJ6LjaFvPqWUtyOX0q7XgvD1D
+	 Nt835HiW8dFInw5MV7IL5H+cgQ53njXZnBAqwfI7NuSPGFUeU8/RJfhSP7jYCOiLdA
+	 9x0YumbxDkH1Q==
+Date: Thu, 27 Nov 2025 17:21:39 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, Alexei Starovoitov
+ <ast@kernel.org>, Eric Dumazet <edumazet@google.com>, Rob Herring
+ <robh@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>, Donald Hunter
+ <donald.hunter@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>, Jonathan
+ Corbet <corbet@lwn.net>, John Fastabend <john.fastabend@gmail.com>, Lukasz
+ Majewski <lukma@denx.de>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Stanislav Fomichev <sdf@fomichev.me>,
+ Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, Divya.Koppera@microchip.com, Kory
+ Maincent <kory.maincent@bootlin.com>, Vadim Fedorenko
+ <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org, Sabrina Dubroca
+ <sd@queasysnail.net>, linux-kernel@vger.kernel.org, kernel@pengutronix.de,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Heiner Kallweit <hkallweit1@gmail.com>
+Subject: Re: [PATCH net-next v8 1/1] Documentation: net: add flow control
+ guide and document ethtool API
+Message-ID: <20251127172139.5b4c34d0@kernel.org>
+In-Reply-To: <aSh411Hogj3O4VT5@shell.armlinux.org.uk>
+References: <20251119140318.2035340-1-o.rempel@pengutronix.de>
+	<20251125181957.5b61bdb3@kernel.org>
+	<aSa8Gkl1AP1U2C9j@pengutronix.de>
+	<20251126144225.3a91b8cc@kernel.org>
+	<aSgX9ue6uUheX4aB@pengutronix.de>
+	<7a5a9201-4c26-42f8-94f2-02763f26e8c1@lunn.ch>
+	<aSh411Hogj3O4VT5@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Add a description for ATH5K_DEBUG_ANI and delete the descriptions for
-3 undefined enum descriptions to prevent these warnings:
+On Thu, 27 Nov 2025 16:14:15 +0000 Russell King (Oracle) wrote:
+> > >  *	**Constraint Checking:**
+> > >  *	Drivers should reject a non-zero setting of @autoneg when
+> > >  *	autonegotiation is disabled (or not supported) for the link.
+> > >  *	Drivers should reject unsupported rx/tx combinations with -EINVAL.  
+> 
+> Definitely not. Drivers should accept autoneg=1 because that is the
+> user stating "my desire is to use the result of autonegotiation when
+> it becomes available". Just because autoneg may be disabled doesn't
+> mean it will remain disabled, and having to issue ethtool commands
+> in the right sequence leads to poor user experiences.
 
-Warning: drivers/net/wireless/ath/ath5k/debug.h:111 Enum value
- 'ATH5K_DEBUG_ANI' not described in enum 'ath5k_debug_level'
-Warning: drivers/net/wireless/ath/ath5k/debug.h:111 Excess enum value
- '%ATH5K_DEBUG_DUMP_RX' description in 'ath5k_debug_level'
-Warning: drivers/net/wireless/ath/ath5k/debug.h:111 Excess enum value
- '%ATH5K_DEBUG_DUMP_TX' description in 'ath5k_debug_level'
-Warning: drivers/net/wireless/ath/ath5k/debug.h:111 Excess enum value
- '%ATH5K_DEBUG_TRACE' description in 'ath5k_debug_level'
-
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
----
-Cc: Jiri Slaby <jirislaby@kernel.org>
-Cc: Nick Kossifidis <mickflemm@gmail.com>
-Cc: Luis Chamberlain <mcgrof@kernel.org>
-Cc: Johannes Berg <johannes@sipsolutions.net>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: linux-wireless@vger.kernel.org
----
- drivers/net/wireless/ath/ath5k/debug.h |    4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
-
---- linux-next-20251127.orig/drivers/net/wireless/ath/ath5k/debug.h
-+++ linux-next-20251127/drivers/net/wireless/ath/ath5k/debug.h
-@@ -80,11 +80,9 @@ struct ath5k_dbg_info {
-  * @ATH5K_DEBUG_CALIBRATE: periodic calibration
-  * @ATH5K_DEBUG_TXPOWER: transmit power setting
-  * @ATH5K_DEBUG_LED: led management
-- * @ATH5K_DEBUG_DUMP_RX: print received skb content
-- * @ATH5K_DEBUG_DUMP_TX: print transmit skb content
-  * @ATH5K_DEBUG_DUMPBANDS: dump bands
-  * @ATH5K_DEBUG_DMA: debug dma start/stop
-- * @ATH5K_DEBUG_TRACE: trace function calls
-+ * @ATH5K_DEBUG_ANI: debug Adaptive Noise Immunity
-  * @ATH5K_DEBUG_DESC: descriptor setup
-  * @ATH5K_DEBUG_ANY: show at any debug level
-  *
+It's an existing recommendation, coming from 6a7a1081cebacc4.
+I thought it's just because of the ambiguity what the settings mean
+with autoneg on or off. But looks like Ben has been trying to push
+people towards link mode bits 11 years ago already :(
 
