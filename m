@@ -1,148 +1,217 @@
-Return-Path: <netdev+bounces-242626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6193C93201
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 21:39:13 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB2DAC93207
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 21:42:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3CF004E17EC
-	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 20:39:12 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1BC45348A60
+	for <lists+netdev@lfdr.de>; Fri, 28 Nov 2025 20:42:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA5062D249A;
-	Fri, 28 Nov 2025 20:39:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DDB82D7DF8;
+	Fri, 28 Nov 2025 20:42:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="zli/wAC/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tjn0gA6M"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB1182DC77F;
-	Fri, 28 Nov 2025 20:39:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 997C71391
+	for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 20:42:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764362349; cv=none; b=mc9Q8XZhqDufuA2OTMIr+CvL8ria9vvDDrByVvBuTaWL6AQvoOkATY/m9Y2htJD+4CBpHSMvEr1XRV/bGQTs2ng/jcxawhv9nNYZkMDLfMzxqai0BUu9uc0/v7gUy/olEIj867KiAaSAWeAzLSJiKGlzontEBJ/gfIOKfM6XUrU=
+	t=1764362564; cv=none; b=GaJupVea0Ws8s4smA7hKnGZEWdfxlyvFCyvbry2wOuGJpSDdc8Kx1t62y5KGUDlIGkN/F4SrJQkYcg794KLqi9/h6iaBT/SCxr9BJtB3li6ic/FOC1dmqnvtUTMosKdiRXgnj1oRdFra7lSjtT14YI79+vr67sBOlhp+iqQ2frA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764362349; c=relaxed/simple;
-	bh=i6YCKnT4456ULC0TOq8QP4LrrJ2DGjGsAE3ZDOdQnoQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P3SODJc9Y2lbMtGVrM+mwrzv1SsIfJhkinGxvYiE5o0i1sqAu0Gf2wC79CwUmTFKOhBfGxcd/UWfA/O3arSYAXLF2qihBLd9WlhVMNaJv6Fr08X1OS26r96FRBkSdslm7nhqkbDxEx/YG4AA52DCX8xXjgqEK3rVUWOMBN8M7bg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=zli/wAC/; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=4SqRJzI2Gohny4zVfWkfoaWufiOVWnzLfXSrgmIu/lU=; b=zli/wAC/d6JA53S/zZ/lglmNiT
-	sLSF12WLDjoNnYSekUdnEDJHvazsvbH0HGDUfbtSKWQcH0cFS8FNIIydxU+2Ajb6e9lTvQL16cool
-	6hUK2tWCv+3liuh8d4SGJFI638vyjMtn/D/Zsss4nwFHu0Nf0XUC6pvQVu+Nf3zTQHfqtiRRmk/WR
-	ZoKenQ8M2CPicuQXqyd8D9zFusBMjKHYfDd+6jRN0D1DsRfZ2C1LIGf1ABUoviOiQkvCxXHRGULLI
-	2VxlzMF6w10zoppR811MLu+TC5kfThhndgJWNhpzdZYn9c84vXmBTumvx/vkEkCxvHhplEsH49knR
-	/rcwH7fw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41630)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vP5Eg-000000007JO-17HQ;
-	Fri, 28 Nov 2025 20:38:34 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vP5Ea-000000003uv-1Vmu;
-	Fri, 28 Nov 2025 20:38:28 +0000
-Date: Fri, 28 Nov 2025 20:38:28 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Rob Herring <robh@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jonathan Corbet <corbet@lwn.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Lukasz Majewski <lukma@denx.de>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Divya.Koppera@microchip.com,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org,
-	Sabrina Dubroca <sd@queasysnail.net>, linux-kernel@vger.kernel.org,
-	kernel@pengutronix.de, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [PATCH net-next v8 1/1] Documentation: net: add flow control
- guide and document ethtool API
-Message-ID: <aSoIREdMWGeygnD_@shell.armlinux.org.uk>
-References: <20251119140318.2035340-1-o.rempel@pengutronix.de>
- <20251125181957.5b61bdb3@kernel.org>
- <aSa8Gkl1AP1U2C9j@pengutronix.de>
- <aSj6gM_m-7ZXGchw@shell.armlinux.org.uk>
- <aSj_OxBzq_gJOb4q@shell.armlinux.org.uk>
- <aSljeggP5UHYhFaP@pengutronix.de>
- <20251128103259.258f6fa5@kernel.org>
- <63082064-44b1-42b0-b6c8-a7d9585c82f5@lunn.ch>
+	s=arc-20240116; t=1764362564; c=relaxed/simple;
+	bh=FdLCN53CTxUt6hfjsmo7yzH6TbLjZDUb1d/794EyTeQ=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=ORW5JVgqPNJ9lz/4bsi/VIoEEbGlP3BklUptcMhd8xKz3cT7G/2mFraaxsBpdETiv/fsjwCKUD7u+JhtAdb9WrrWKSJEEi3q+2aVb93DN/IgUQ0Xogade60V5/kUdKh2I+lrSgjM3DPASAUwa9c2VgjhUM6ImHGZS68zOtBnCS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tjn0gA6M; arc=none smtp.client-ip=209.85.128.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-78a6a7654a4so20719217b3.0
+        for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 12:42:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764362561; x=1764967361; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=D+7+Hhp2jQFXeR9sNBlLTHUXZh0f0zWtgYdAbER5ats=;
+        b=Tjn0gA6MwkcWaTQZShGGeXmA2bQ3cwEAjhyWvvDOHk3ppe6kcOJC2N/j4wWbEfE7d/
+         JMZxmZIo9gCL4enP1zoPEAQsWI3YCDmEKKZTdwQedjx3p1tq21fhfZyeVOonGYmg5Vmu
+         Dj4G7RX0IH99vUniFFRXcpA0vIgFB9+bWZgmy65M7UhyBWEFaAtIVYf2lyT91pnYbSLy
+         kLB+1khhHyHbi+5LDgist+VcP5wUBEGmjQzdnB2N3gJQBMjHcBR273phdK1aUoe4r36W
+         uojqF7ejsOMH+DvScl6SqR3M1ukwJ10AIAQjPL/IbeJ9ZlYkewGwGbGMDRitHAPVHWC7
+         KxDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764362561; x=1764967361;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=D+7+Hhp2jQFXeR9sNBlLTHUXZh0f0zWtgYdAbER5ats=;
+        b=V+Yxd7nvbCMl/dKcCUxrW6Duk/EZkgWilsaEVgUFP9tDd3Y3aykZcbZBiY6p28ahHV
+         /e9K80E65YkXDUtMsj4EA/DA03PSHjQCGUWnveUK/09gqQTTvv5QpcQX2BG5sh9Pi0pi
+         qwmMLHx3JV6t8ioddHwTIc9nlHXhT+mhMCoxsCzSPmRM06sHcIkhh2HpmJbtDLdYj9Ix
+         vyyRLYXhh614A6bDOUJBkmVfVKQtrcYwji8Xa2g+xsULQUlikAWdEi8JTQwCiKjt28io
+         4A+MComHv2HTpM06uqQW1lw7CVbeqMOsGsGYDRhEDcSnzq6KH1J6IEPTFzuqKwU1zYQn
+         mkdA==
+X-Gm-Message-State: AOJu0Yz8hmSDo0OeE8jGbE/4kmKKBQ6YqHRkiw+yfHs8YIDPRgGXi371
+	EOxDx5LsS++8k7VkK7WSp4mXu2xx3Yry51EaSVogt2s9Z2d9PAIIVwQs
+X-Gm-Gg: ASbGncvI5ViZtaZAxN0j7nz5LLlLgik/xmnt9MjsYc/N3PeshFxisNjoZS4vsU5CZiT
+	xi/Jo6G/A6Ii+F+2IwAcGfVKCaJDDtkPjta0OiHPnBqXP4v6EuILUyOZk5gF4pzTL9/E727YsU6
+	sXj2lFqKSqmwekqc01l+1klXgou1h2n7eCHDu/1Ptzr2i4LJ2+N9sBpt56RBKa4L8urNv/Nk8fk
+	EpBsrcb70xmsjknc+3cWcp8IyqXhUQAYxuEB/3nviVbr2YdtpBi5GMZHBdvUmRFZ1W/IriZ3rA/
+	VEHw/xhWrGBKOnJdCE8TX2QPbcD3XstZC57A+/nHdymgfizvY5Fu5zadQiTY235MzPP4X3oCwen
+	Vm+PBYXgqHsCqT6rUbeo7NYbAOzUShFmAs6P1x4hHgDGfr4BJk0cNt+k61+i6ileZ7A1ECdWhzX
+	Y0oBWUzoK39gDtxzsGeTF8RxHk5MsvTsXzs8VkYBu34yr5IlcNBOY1gx1FZDEO0sVzGUc=
+X-Google-Smtp-Source: AGHT+IGlh3CaKo66q0t/WA7R/9iHG6rR3lNisWg2UxowlWp92jlr5rECxCFCgWZq1RwhOh19sYOsUA==
+X-Received: by 2002:a05:690c:3690:b0:787:d4db:33be with SMTP id 00721157ae682-78a8b55fad4mr244374977b3.57.1764362561479;
+        Fri, 28 Nov 2025 12:42:41 -0800 (PST)
+Received: from gmail.com (116.235.236.35.bc.googleusercontent.com. [35.236.235.116])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-78ad0d3f5c8sm18737697b3.3.2025.11.28.12.42.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Nov 2025 12:42:40 -0800 (PST)
+Date: Fri, 28 Nov 2025 15:42:40 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ davem@davemloft.net
+Cc: netdev@vger.kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ andrew+netdev@lunn.ch, 
+ horms@kernel.org, 
+ willemdebruijn.kernel@gmail.com, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ shuah@kernel.org, 
+ sdf@fomichev.me, 
+ linux-kselftest@vger.kernel.org
+Message-ID: <willemdebruijn.kernel.468ae2cb7a74@gmail.com>
+In-Reply-To: <20251128005242.2604732-2-kuba@kernel.org>
+References: <20251128005242.2604732-1-kuba@kernel.org>
+ <20251128005242.2604732-2-kuba@kernel.org>
+Subject: Re: [PATCH net-next 2/2] selftests: drv-net: gro: run the test
+ against HW GRO and LRO
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <63082064-44b1-42b0-b6c8-a7d9585c82f5@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Nov 28, 2025 at 09:16:24PM +0100, Andrew Lunn wrote:
-> > Can you please tell me what is preventing us from deprecating pauseparam
-> > API *for autoneg* and using linkmodes which are completely unambiguous.
+Jakub Kicinski wrote:
+> Run the test against HW GRO and LRO. NICs I have pass the base cases.
+> Interestingly all are happy to build GROs larger than 64k.
 > 
-> Just to make sure i understand you here...
-> 
-> You mean make use of
-> 
->         ETHTOOL_LINK_MODE_Pause_BIT             = 13,
->         ETHTOOL_LINK_MODE_Asym_Pause_BIT        = 14,
-> 
-> So i would do a ksettings_set() with
-> 
-> __ETHTOOL_LINK_MODE_LEGACY_MASK(Pause) | __ETHTOOL_LINK_MODE_LEGACY_MASK(Asym_Pause)
-> 
-> to indicate both pause and asym pause should be advertised.
-> 
-> The man page for ethtool does not indicate you can do this. It does
-> have a list of link mode bits you can pass via the advertise option to
-> ethtool -s, bit they are all actual link modes, not features like TP,
-> AUI, BNC, Pause, Backplane, FEC none, FEC baser, etc.
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-I see the latest ethtool now supports -s ethX advertise MODE on|off,
-but it doesn't describe that in the parameter entry for "advertise"
-and doesn't suggest what MODE should be, nor how to specify multiple
-modes that one may wish to turn on/off. I'm guessing this is what you're
-referring to.
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
-The ports never get advertised, so I don't think they're relevant.
+> ---
+> CC: shuah@kernel.org
+> CC: sdf@fomichev.me
+> CC: linux-kselftest@vger.kernel.org
+> ---
+>  tools/testing/selftests/drivers/net/gro.py | 50 ++++++++++++++++------
+>  1 file changed, 36 insertions(+), 14 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/drivers/net/gro.py b/tools/testing/selftests/drivers/net/gro.py
+> index 6d633bdc7e67..ea7070b033d4 100755
+> --- a/tools/testing/selftests/drivers/net/gro.py
+> +++ b/tools/testing/selftests/drivers/net/gro.py
+> @@ -91,7 +91,7 @@ from lib.py import ksft_variants
+>      defer(ethtool, " ".join(old), host=host)
+>  
+>  
+> -def _setup(cfg, test_name):
+> +def _setup(cfg, mode, test_name):
+>      """ Setup hardware loopback mode for GRO testing. """
+>  
+>      if not hasattr(cfg, "bin_remote"):
+> @@ -108,16 +108,37 @@ from lib.py import ksft_variants
+>          _set_mtu_restore(cfg.dev, 4096, None)
+>          _set_mtu_restore(cfg.remote_dev, 4096, cfg.remote)
+>  
+> -    flush_path = f"/sys/class/net/{cfg.ifname}/gro_flush_timeout"
+> -    irq_path = f"/sys/class/net/{cfg.ifname}/napi_defer_hard_irqs"
+> +    if mode == "sw":
+> +        flush_path = f"/sys/class/net/{cfg.ifname}/gro_flush_timeout"
+> +        irq_path = f"/sys/class/net/{cfg.ifname}/napi_defer_hard_irqs"
+>  
+> -    _write_defer_restore(cfg, flush_path, "200000", defer_undo=True)
+> -    _write_defer_restore(cfg, irq_path, "10", defer_undo=True)
+> +        _write_defer_restore(cfg, flush_path, "200000", defer_undo=True)
+> +        _write_defer_restore(cfg, irq_path, "10", defer_undo=True)
+>  
+> -    _set_ethtool_feat(cfg.ifname, cfg.feat,
+> -                      {"generic-receive-offload": True,
+> -                       "rx-gro-hw": False,
+> -                       "large-receive-offload": False})
+> +        _set_ethtool_feat(cfg.ifname, cfg.feat,
+> +                          {"generic-receive-offload": True,
+> +                           "rx-gro-hw": False,
+> +                           "large-receive-offload": False})
+> +    elif mode == "hw":
+> +        # The only way to get HW GRO but elide SW GRO is to install
+> +        # a dummy XDP generic program. Disabling SW GRO as a feature
+> +        # would also disable HW GRO.
+> +        prog = cfg.net_lib_dir / "xdp_dummy.bpf.o"
+> +        ip(f"link set dev {cfg.ifname} xdpgeneric obj {prog} sec xdp")
+> +        defer(ip, f"link set dev {cfg.ifname} xdpgeneric off")
+> +
+> +        # Attaching XDP may change features, fetch the latest state
+> +        feat = ethtool(f"-k {cfg.ifname}", json=True)[0]
+> +
+> +        _set_ethtool_feat(cfg.ifname, feat,
+> +                          {"generic-receive-offload": True,
+> +                           "rx-gro-hw": True,
+> +                           "large-receive-offload": False})
+> +    elif mode == "lro":
+> +        _set_ethtool_feat(cfg.ifname, cfg.feat,
+> +                          {"generic-receive-offload": False,
 
-However, the lack of the pause bits means that one is forced to use
-the hex number, and I don't deem that to be a user interface. That's
-a programmers interface, or rather a nightmare, because even if you're
-a programmer, you still end up looking at include/uapi/linux/ethtool.h
-and doing the maths to work out the hex number to pass, and then you
-mistype it with the wrong number of zeros, so you try again, and
-eventually you get the advertisement you wanted.
+So GRO off disables HW_GRO, but not LRO? That difference is behavior
+is confusing. Could we still see this as a regression and make the
+ethtool HW_GRO feature equally independent from SW_GRO?
 
-So no, I don't accept Jakub's argument right now. Forcing people into
-the nightmare of working out a hex number isn't something for users.
-That's a debug tool at best.
+> +                           "rx-gro-hw": False,
+> +                           "large-receive-offload": True})
+>  
+>      try:
+>          # Disable TSO for local tests
+> @@ -132,19 +153,20 @@ from lib.py import ksft_variants
+>  def _gro_variants():
+>      """Generator that yields all combinations of protocol and test types."""
+>  
+> -    for protocol in ["ipv4", "ipv6", "ipip"]:
+> -        for test_name in ["data", "ack", "flags", "tcp", "ip", "large"]:
+> -            yield protocol, test_name
+> +    for mode in ["sw", "hw", "lro"]:
+> +        for protocol in ["ipv4", "ipv6", "ipip"]:
+> +            for test_name in ["data", "ack", "flags", "tcp", "ip", "large"]:
+> +                yield mode, protocol, test_name
+>  
+>  
+>  @ksft_variants(_gro_variants())
+> -def test(cfg, protocol, test_name):
+> +def test(cfg, mode, protocol, test_name):
+>      """Run a single GRO test with retries."""
+>  
+>      ipver = "6" if protocol[-1] == "6" else "4"
+>      cfg.require_ipver(ipver)
+>  
+> -    _setup(cfg, test_name)
+> +    _setup(cfg, mode, test_name)
+>  
+>      base_cmd_args = [
+>          f"--{protocol}",
+> -- 
+> 2.51.1
+> 
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+
 
