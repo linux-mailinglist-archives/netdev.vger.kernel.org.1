@@ -1,186 +1,211 @@
-Return-Path: <netdev+bounces-242695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A685DC93B88
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 10:37:38 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADF00C93BC7
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 10:57:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2570C3486E4
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 09:37:38 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8137C4E1BE3
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 09:57:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1402274B4A;
-	Sat, 29 Nov 2025 09:37:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E25C26738B;
+	Sat, 29 Nov 2025 09:57:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vjti.ac.in header.i=@vjti.ac.in header.b="N0b3P1Qj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n1rlC5L1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D681135A53
-	for <netdev@vger.kernel.org>; Sat, 29 Nov 2025 09:37:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 889872405ED
+	for <netdev@vger.kernel.org>; Sat, 29 Nov 2025 09:57:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764409052; cv=none; b=Y462bv90tnkcg5Tyzou4ix9wVRgKOARE8PLYRptzQ4r9ZDNtqZQkQsbhq1Ktdtobft0NgqQ4EDLmf4+oaYcavrhIlu9N/HctgyjAcE7Zu/doP6iSMdFQO+csAaWi+M7TqaiXBy5Bqumh3AeQk0eLSU6nXo2ypcYo5oBRirBEaR8=
+	t=1764410267; cv=none; b=PkyfUTrJjBNyoXvxVEE7x+C1jhzWR51d1KximVuaWl0l61AZI9fD0/6NO3mpAGybBsf7qcyyg3zps/Zs0w9+5OsOHMgZBPeTT44dMgzkEtyBHJOi2RQ8yjo9SMUrZ8Wav0t+aP5eQAnWpMrf5e9yYQsQYKGxOiLhXfn4ncBfehA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764409052; c=relaxed/simple;
-	bh=ZlTvxu3VWssXrEln8HvuE9rP2j0RUbWa4IrghVjwy5M=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XPoidhOtk7wgLlWqmzUYWDq1h9mkuFVD51vW8fbzQA27iuuXe1QZN+w6XvEvqybbwzK0e6nEFPxk1MnDz3MFq96Lgj2npG88jpM7fMjPAlzXybuV0k+fVTCBfidz5hgozXKAeQcQkXYPuo4yo2OsjF297hZBZmmFY/M2red9PqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ee.vjti.ac.in; spf=none smtp.mailfrom=ee.vjti.ac.in; dkim=pass (1024-bit key) header.d=vjti.ac.in header.i=@vjti.ac.in header.b=N0b3P1Qj; arc=none smtp.client-ip=209.85.214.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ee.vjti.ac.in
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ee.vjti.ac.in
-Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-297e239baecso26309005ad.1
-        for <netdev@vger.kernel.org>; Sat, 29 Nov 2025 01:37:30 -0800 (PST)
+	s=arc-20240116; t=1764410267; c=relaxed/simple;
+	bh=kjC2CRoj1ICKpdLHPJNJwc/suA2ZEqoPeuQugHkxNh8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=SoOslbCh7snILi00suKkTxB0yzs2OixfNe4YsJ2tEUH0R77syMxmfB+op8QnFmLKHGoKpxeSk3904VmE0qjezoYcR7ka3my7NplVpEDqgD5xsrVjaOWYDZRwTdEuF3eObKyXTVIZRE48g8P81A9xBOplPEW4uI0Qcf32N+02W94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n1rlC5L1; arc=none smtp.client-ip=209.85.160.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-4ed79dd4a47so47169581cf.3
+        for <netdev@vger.kernel.org>; Sat, 29 Nov 2025 01:57:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vjti.ac.in; s=google; t=1764409050; x=1765013850; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jGXKKxMGK1eysZNyH6QH0SU/9g3Orh82OvwO5tAJksY=;
-        b=N0b3P1QjHu3dFTAcd/Y+/kNSw1yZRdjZsMZPaER6ynVaotAVAzR/bcOBeELj96O9U5
-         tZVoRQFJRR1cnQiu9xcpnohSbOuLGMyBeVEX/bpjme/8FrqMJlFrUS0Nncv7rN0RcD/k
-         vAti72gfw39rZt5XYXuDKuCtx+djB1TQTc69g=
+        d=google.com; s=20230601; t=1764410264; x=1765015064; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=RaHWpzLeVxoNOwQpfQ6Ps3eCZ1QEUD7c077XzEg2PUA=;
+        b=n1rlC5L1Yuo5AgXpxUcRROP9hTO6oVTyIkZ+rfMJ/LnSarblaqqZxDbklhx5JUU+F1
+         R4mgjsQdKtaw4oOdcqL+iLWwXdDMxeeNjRxvMpAXZyZ/UeWoNuGbJ2EO4jhfi7ooJ4pb
+         +IvGqVsNDjVs/DLkriuMTGVh0QbqVszO71hrspw47FBFjHpC2AIlsGf8/Ae3FBnCXx3Q
+         BihRYed6HwAAkthUiypT/MSTVIt0Q9Zb1V+4Udfcv65niAWsO+imho6kHHM0RFXFrCN9
+         NAUGKtw3VdSRNiaDDLwhYcW5zZsHK632jvGZALXgNlx0T96FcoB+lhRL34NMq4/9HHyx
+         /ipg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764409050; x=1765013850;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jGXKKxMGK1eysZNyH6QH0SU/9g3Orh82OvwO5tAJksY=;
-        b=dVlHCUjor0hhhomDSu68iX2eq54rqZPaNiWqROBfUhU0DsYs17uIq1MNlM32h78nEd
-         MNE4qYC/TMOQ9M6yEfqa8eTIedPy5XxfS7v4Ub7lZTovUvel8UZHpciZwtg9RXFAsoK4
-         gF2GspDssYNfYwYcMy/SIqHwlGe6J2gkiTjyDovXZQHRVllNQceAGx8nagqpJJyq/rVR
-         oBqO3a+3fX2YRrXHQ0WdZE/BzpUmYW7pxVQ7tZ/OeXWq7MSGj7y01th8ut9KQ+tfBoeQ
-         z9MEvMu1gknIv9isixMQmfS7QYUYOdE2/hlWevHeYF16ZAQmfKn5dDJR9cXheizdm/ER
-         izDg==
-X-Forwarded-Encrypted: i=1; AJvYcCVmvwpPQWDop6fUigoZa8cpzKhMZjsXrGXALZHovONOb4ZD9FgwJ+ZWsmV87A8WaZbgNoDdkMk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIHWFq922uMjLbzehyGdGrFVb/6zqnAbHaxqLelQykSwoLAXqC
-	iq9lmZbGi4WFsRL6U3b1VWMCpBdTxsdjbXCrHrTco0JEcLYNxFQ1p6ZDuvK/nx8HbBE=
-X-Gm-Gg: ASbGncuevfwZ4V8faG70wF4igrAq595NSlu51rprgkrQwH98KrWYZyrsKd/d1ijo0+Y
-	89dhSWGnqeottxtycsMudjBeEijBHYpPvTbuCBGfBPURkVGc5x3hMY5Q9rupkTSzTCinW2Zzvt3
-	JRYLTVxQ1WwnlCpYsBkd5/cchb1fWjdic+p+Z9EPlfdRlzRM1YPcQ7Nmd0fVPR9tnyGlfRcP7zi
-	UxNM9UET6+wKfNjg1AtWHEIROTtNAx588korYCZFfxfIICA/ivi736wzveinsoGYs84BEzSqG4E
-	D8DLJ9p9ALGtrLHzfwVwgcbBdNheJwskHXazUUJ9+5N20Kz9XDxIfX7Z9GNQhfJEn4bT3ZCgJSs
-	S76Mfp5C/y+r7cUf8dN8EaHJAdYDMknOTFHOyTLpIqoFELq1gQ59Winq8aXwN/qPDQIvL7b3LKt
-	9ak1FqgSd4/TMxjUtuQGx08NI18btwKskBfVkYzFGB4s8gBzoLfQcuswohbZs=
-X-Google-Smtp-Source: AGHT+IEI8230ifO4LYJAs7VvXkSTCZgJ9OOKZGhnRbVSZR7l7RNsQuwaVaZI1pZEkHGHHbd0YQM1Pg==
-X-Received: by 2002:a17:903:98c:b0:299:dc97:a694 with SMTP id d9443c01a7336-29b5e3b86f5mr378476365ad.24.1764409050232;
-        Sat, 29 Nov 2025 01:37:30 -0800 (PST)
-Received: from ranegod-HP-ENVY-x360-Convertible-13-bd0xxx.. ([2405:201:31:d869:ca83:6d4:140:3932])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29bceb542a4sm67075505ad.86.2025.11.29.01.37.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 29 Nov 2025 01:37:29 -0800 (PST)
-From: Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jaakko Karrenpalo <jkarrenpalo@gmail.com>,
-	Felix Maurer <fmaurer@redhat.com>,
-	Arvid Brodin <arvid.brodin@alten.se>,
-	skhan@linuxfoundation.org,
-	linux-kernel-mentees@lists.linux.dev,
-	david.hunter.linux@gmail.com,
-	khalid@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Shaurya Rane <ssrane_b23@ee.vjti.ac.in>,
-	syzbot+2fa344348a579b779e05@syzkaller.appspotmail.com,
-	stable@vger.kernel.org
-Subject: [PATCH net v3] net/hsr: fix NULL pointer dereference in prp_get_untagged_frame()
-Date: Sat, 29 Nov 2025 15:07:18 +0530
-Message-Id: <20251129093718.25320-1-ssrane_b23@ee.vjti.ac.in>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1764410264; x=1765015064;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=RaHWpzLeVxoNOwQpfQ6Ps3eCZ1QEUD7c077XzEg2PUA=;
+        b=F4NMV8xHwHbDM5bD80xnVzGR6hgt1mEKIxr6DCTiSY0rzovfkbI2ooxqJQFTRZnyHn
+         41eNjwoJZlHRnJ7Ezxn802Doi27iTChbgNxE1ySfz0A973vGqy6uYfKhzRvucrFIaylb
+         e+/onF4g0wMKjPWFfdJV2NlI/5G/+EBNichsqnPaos/RUWtUhzY9SmUsqd9lhuDdGsgP
+         umCf0p0n2RbxyJbXOJ4f90YjuR5P6OOd3Joa5KgmhJWeK4aN09kwzszOtuf86eVvke7H
+         sooulMeSa80dpFCgVPsOf4E9uIx3UZA5K0eSxD16ZqRqqAKKURPMz0KkQnjMsZ9vwmr7
+         AGdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX9ZQrSAXgwQ1SnJxlpzjIMklra8SctUP6CatoJlpu4+VsZ8KTsyfxc1pDpJOMNrLye7miVfGI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzT2UQvgoLcqFZuQ9saZlFb/PKrlxv9/6tTOJ+LjBlP6U7miJfS
+	esxCdELjLPo440kcF8Dk4keuz3UbWE9ThZtW9zZDfBxJlNhZ+wVds2+mXfgOKtdMbk08jDEFOGq
+	BREU0wNhj2kx9qQ==
+X-Google-Smtp-Source: AGHT+IE9e52KmeeUSI7PHmKs+tbnInUYzJa7BV62x1xd1VKYwrIlfZmBDNqCs536+iI8/0ZLLbiasYsjsJ41Ug==
+X-Received: from qtql8.prod.google.com ([2002:ac8:4a88:0:b0:4ed:3cc:ba24])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:ac8:7d0e:0:b0:4ed:70fd:1453 with SMTP id d75a77b69052e-4ee58935f18mr428211591cf.60.1764410264593;
+ Sat, 29 Nov 2025 01:57:44 -0800 (PST)
+Date: Sat, 29 Nov 2025 09:57:40 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.107.ga0afd4fd5b-goog
+Message-ID: <20251129095740.3338476-1-edumazet@google.com>
+Subject: [PATCH] time/timecounter: inline timecounter_cyc2time()
+From: Eric Dumazet <edumazet@google.com>
+To: John Stultz <jstultz@google.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Stephen Boyd <sboyd@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, 
+	Eric Dumazet <eric.dumazet@gmail.com>, Eric Dumazet <edumazet@google.com>, 
+	Kevin Yang <yyd@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Neal Cardwell <ncardwell@google.com>, Yuchung Cheng <ycheng@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-prp_get_untagged_frame() calls __pskb_copy() to create frame->skb_std
-but doesn't check if the allocation failed. If __pskb_copy() returns
-NULL, skb_clone() is called with a NULL pointer, causing a crash:
-Oops: general protection fault, probably for non-canonical address 0xdffffc000000000f: 0000 [#1] SMP KASAN NOPTI
-KASAN: null-ptr-deref in range [0x0000000000000078-0x000000000000007f]
-CPU: 0 UID: 0 PID: 5625 Comm: syz.1.18 Not tainted syzkaller #0 PREEMPT(full)
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-RIP: 0010:skb_clone+0xd7/0x3a0 net/core/skbuff.c:2041
-Code: 03 42 80 3c 20 00 74 08 4c 89 f7 e8 23 29 05 f9 49 83 3e 00 0f 85 a0 01 00 00 e8 94 dd 9d f8 48 8d 6b 7e 49 89 ee 49 c1 ee 03 <43> 0f b6 04 26 84 c0 0f 85 d1 01 00 00 44 0f b6 7d 00 41 83 e7 0c
-RSP: 0018:ffffc9000d00f200 EFLAGS: 00010207
-RAX: ffffffff892235a1 RBX: 0000000000000000 RCX: ffff88803372a480
-RDX: 0000000000000000 RSI: 0000000000000820 RDI: 0000000000000000
-RBP: 000000000000007e R08: ffffffff8f7d0f77 R09: 1ffffffff1efa1ee
-R10: dffffc0000000000 R11: fffffbfff1efa1ef R12: dffffc0000000000
-R13: 0000000000000820 R14: 000000000000000f R15: ffff88805144cc00
-FS:  0000555557f6d500(0000) GS:ffff88808d72f000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000555581d35808 CR3: 000000005040e000 CR4: 0000000000352ef0
-Call Trace:
- <TASK>
- hsr_forward_do net/hsr/hsr_forward.c:-1 [inline]
- hsr_forward_skb+0x1013/0x2860 net/hsr/hsr_forward.c:741
- hsr_handle_frame+0x6ce/0xa70 net/hsr/hsr_slave.c:84
- __netif_receive_skb_core+0x10b9/0x4380 net/core/dev.c:5966
- __netif_receive_skb_one_core net/core/dev.c:6077 [inline]
- __netif_receive_skb+0x72/0x380 net/core/dev.c:6192
- netif_receive_skb_internal net/core/dev.c:6278 [inline]
- netif_receive_skb+0x1cb/0x790 net/core/dev.c:6337
- tun_rx_batched+0x1b9/0x730 drivers/net/tun.c:1485
- tun_get_user+0x2b65/0x3e90 drivers/net/tun.c:1953
- tun_chr_write_iter+0x113/0x200 drivers/net/tun.c:1999
- new_sync_write fs/read_write.c:593 [inline]
- vfs_write+0x5c9/0xb30 fs/read_write.c:686
- ksys_write+0x145/0x250 fs/read_write.c:738
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f0449f8e1ff
-Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 f9 92 02 00 48 8b 54 24 18 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 31 44 89 c7 48 89 44 24 08 e8 4c 93 02 00 48
-RSP: 002b:00007ffd7ad94c90 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 00007f044a1e5fa0 RCX: 00007f0449f8e1ff
-RDX: 000000000000003e RSI: 0000200000000500 RDI: 00000000000000c8
-RBP: 00007ffd7ad94d20 R08: 0000000000000000 R09: 0000000000000000
-R10: 000000000000003e R11: 0000000000000293 R12: 0000000000000001
-R13: 00007f044a1e5fa0 R14: 00007f044a1e5fa0 R15: 0000000000000003
- </TASK>
-Add a NULL check immediately after __pskb_copy() to handle allocation
-failures gracefully.
+New network transport protocols want NIC drivers to get hwtstamps
+of all incoming packets, and possibly all outgoing packets.
 
-Reported-by: syzbot+2fa344348a579b779e05@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=2fa344348a579b779e05
-Fixes: f266a683a480 ("net/hsr: Better frame dispatch")
-Cc: stable@vger.kernel.org
-Signed-off-by: Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
+Swift congestion control is used by good old TCP transport and is
+our primary need for timecounter_cyc2time(). This will be upstreamed soon.
+
+This means timecounter_cyc2time() can be called more than 100 million
+times per second on a busy server.
+
+Inlining timecounter_cyc2time() brings a 12 % improvement on a
+UDP receive stress test on a 100Gbit NIC.
+
+Note that FDO, LTO, PGO are unable to magically help for this
+case, presumably because NIC drivers are almost exclusively shipped
+as modules.
+
+Add an unlikely() around the cc_cyc2ns_backwards() case,
+even if FDO (when used) is able to take care of this optimization.
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Link: https://research.google/pubs/swift-delay-is-simple-and-effective-for-congestion-control-in-the-datacenter/
+Cc: Kevin Yang <yyd@google.com>
+Cc: Willem de Bruijn <willemb@google.com>
+Cc: Neal Cardwell <ncardwell@google.com>
+Cc: Yuchung Cheng <ycheng@google.com>
 ---
-v3:
-  - Keep only prp_get_untagged_frame() fix as the other two
-    NETIF_F_HW_HSR_TAG_INS checks are not needed for this bug
-  - Move NULL check immediately after __pskb_copy() call
+ include/linux/timecounter.h | 33 +++++++++++++++++++++++++++++++--
+ kernel/time/timecounter.c   | 35 -----------------------------------
+ 2 files changed, 31 insertions(+), 37 deletions(-)
 
-v2:
-  - Add stack trace to commit message
-  - Target net tree with [PATCH net]
-  - Add Cc: stable@vger.kernel.org
----
- net/hsr/hsr_forward.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/net/hsr/hsr_forward.c b/net/hsr/hsr_forward.c
-index 339f0d220212..aefc9b6936ba 100644
---- a/net/hsr/hsr_forward.c
-+++ b/net/hsr/hsr_forward.c
-@@ -205,6 +205,8 @@ struct sk_buff *prp_get_untagged_frame(struct hsr_frame_info *frame,
- 				__pskb_copy(frame->skb_prp,
- 					    skb_headroom(frame->skb_prp),
- 					    GFP_ATOMIC);
-+			if (!frame->skb_std)
-+				return NULL;
- 		} else {
- 			/* Unexpected */
- 			WARN_ONCE(1, "%s:%d: Unexpected frame received (port_src %s)\n",
+diff --git a/include/linux/timecounter.h b/include/linux/timecounter.h
+index dce03a5cafb7cfe61bd83304ef49f7721735da64..de21312ebed0f41946304f95f05cc625ea7f2a68 100644
+--- a/include/linux/timecounter.h
++++ b/include/linux/timecounter.h
+@@ -115,6 +115,16 @@ extern void timecounter_init(struct timecounter *tc,
+  */
+ extern u64 timecounter_read(struct timecounter *tc);
+ 
++/*
++ * This is like cyclecounter_cyc2ns(), but it is used for computing a
++ * time previous to the time stored in the cycle counter.
++ */
++static inline u64 cc_cyc2ns_backwards(const struct cyclecounter *cc,
++				      u64 cycles, u64 frac)
++{
++	return ((cycles * cc->mult) - frac) >> cc->shift;
++}
++
+ /**
+  * timecounter_cyc2time - convert a cycle counter to same
+  *                        time base as values returned by
+@@ -131,7 +141,26 @@ extern u64 timecounter_read(struct timecounter *tc);
+  *
+  * Returns: cycle counter converted to nanoseconds since the initial time stamp
+  */
+-extern u64 timecounter_cyc2time(const struct timecounter *tc,
+-				u64 cycle_tstamp);
++static inline u64 timecounter_cyc2time(const struct timecounter *tc,
++				       u64 cycle_tstamp)
++{
++	const struct cyclecounter *cc = tc->cc;
++	u64 delta = (cycle_tstamp - tc->cycle_last) & cc->mask;
++	u64 nsec = tc->nsec, frac = tc->frac;
++
++	/*
++	 * Instead of always treating cycle_tstamp as more recent
++	 * than tc->cycle_last, detect when it is too far in the
++	 * future and treat it as old time stamp instead.
++	 */
++	if (unlikely(delta > cc->mask / 2)) {
++		delta = (tc->cycle_last - cycle_tstamp) & cc->mask;
++		nsec -= cc_cyc2ns_backwards(cc, delta, frac);
++	} else {
++		nsec += cyclecounter_cyc2ns(cc, delta, tc->mask, &frac);
++	}
++
++	return nsec;
++}
+ 
+ #endif
+diff --git a/kernel/time/timecounter.c b/kernel/time/timecounter.c
+index 3d2a354cfe1c1b205aa960a748a76f8dd94335e2..2e64dbb6302d71d8b092d92dda0b71c99cdc053d 100644
+--- a/kernel/time/timecounter.c
++++ b/kernel/time/timecounter.c
+@@ -62,38 +62,3 @@ u64 timecounter_read(struct timecounter *tc)
+ }
+ EXPORT_SYMBOL_GPL(timecounter_read);
+ 
+-/*
+- * This is like cyclecounter_cyc2ns(), but it is used for computing a
+- * time previous to the time stored in the cycle counter.
+- */
+-static u64 cc_cyc2ns_backwards(const struct cyclecounter *cc,
+-			       u64 cycles, u64 mask, u64 frac)
+-{
+-	u64 ns = (u64) cycles;
+-
+-	ns = ((ns * cc->mult) - frac) >> cc->shift;
+-
+-	return ns;
+-}
+-
+-u64 timecounter_cyc2time(const struct timecounter *tc,
+-			 u64 cycle_tstamp)
+-{
+-	u64 delta = (cycle_tstamp - tc->cycle_last) & tc->cc->mask;
+-	u64 nsec = tc->nsec, frac = tc->frac;
+-
+-	/*
+-	 * Instead of always treating cycle_tstamp as more recent
+-	 * than tc->cycle_last, detect when it is too far in the
+-	 * future and treat it as old time stamp instead.
+-	 */
+-	if (delta > tc->cc->mask / 2) {
+-		delta = (tc->cycle_last - cycle_tstamp) & tc->cc->mask;
+-		nsec -= cc_cyc2ns_backwards(tc->cc, delta, tc->mask, frac);
+-	} else {
+-		nsec += cyclecounter_cyc2ns(tc->cc, delta, tc->mask, &frac);
+-	}
+-
+-	return nsec;
+-}
+-EXPORT_SYMBOL_GPL(timecounter_cyc2time);
 -- 
-2.34.1
+2.52.0.107.ga0afd4fd5b-goog
 
 
