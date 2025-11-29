@@ -1,95 +1,91 @@
-Return-Path: <netdev+bounces-242671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73E9CC9382A
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 05:38:32 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15247C938B1
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 07:37:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A0FA3A88E3
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 04:38:31 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 43E7C3489AE
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 06:37:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1C04222560;
-	Sat, 29 Nov 2025 04:38:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7D5423ABB9;
+	Sat, 29 Nov 2025 06:37:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KaT9f2AV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S2rhf68M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
+Received: from mail-pl1-f193.google.com (mail-pl1-f193.google.com [209.85.214.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F23AB226D02
-	for <netdev@vger.kernel.org>; Sat, 29 Nov 2025 04:38:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 717D81D5141
+	for <netdev@vger.kernel.org>; Sat, 29 Nov 2025 06:37:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764391107; cv=none; b=Z6oOQRTf8y+0BDzOudaN6th2ocCZFZo108ARZr+UJry98cNIgfP+r89vV/WOvMXy1Yb6ewaIsWPBgsX9H650T+bitGY4pYWbJdjVEZ0k+ZmJjIlRoK6BpG6a4hIML0YXz8EE57FHTjMXk8VrXopTD3xMRvgPyxklnpyGTquFTKs=
+	t=1764398262; cv=none; b=rVDtsWbMzeUOCGwYKHXMpacbexMypcT2dEdX1qPdyx34ugZhnY/4ac7AMQu+7cX7ZaRIZQyr3+yWrUXd6yNev2dCC5pDIS9fV4E8hiGqF0h7K5msaomCH+3YKtDDcUMprFHIDEdp68cm62TK9YmRw/9/B+QQRMAIS+nxICv/EIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764391107; c=relaxed/simple;
-	bh=MY6OepM4iCbQKboU2CzDmLhc+cf4XBwZQTl9an9blRg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=X28B3ZguxJ9tWCj30W2nkwm9pF2SHqAlR/Y/gPy82FwWUHzVX1obAdzt9myTEQOpHSJYEFd4TaQO0/umVQra7PRs3hT+AW+KNlLyyV1T9FyhlAUclglkSOrVOSLi8eg3WD5HKrzlYnKdT/5UKs1/SJpYhhtQB6mm2R7wcM0mQ6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KaT9f2AV; arc=none smtp.client-ip=209.85.214.195
+	s=arc-20240116; t=1764398262; c=relaxed/simple;
+	bh=6/EuxpMvYyBJYYef7g8AlAQiEmb0sStBq/SkcQ2Uci0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TDEHDtUdxlV+OnJwCKKaps5A9b1Hu4mH32Tv9SFkz9PpGTX4C/o0vgcAfwkgRCnXfeOZCTv1WpbnMpN5kz56V/2jap1fg8OnDKJLAPRZ7ellHGBcXBFvxO0VXd32vHdiyUsgyHJPbKhl58HNNVWvDEzO8xjQrSoChiQ2GSeJvQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S2rhf68M; arc=none smtp.client-ip=209.85.214.193
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-297e264528aso26501645ad.2
-        for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 20:38:25 -0800 (PST)
+Received: by mail-pl1-f193.google.com with SMTP id d9443c01a7336-29853ec5b8cso31165155ad.3
+        for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 22:37:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764391105; x=1764995905; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1764398261; x=1765003061; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=LoUjNl1uE2KTMWSYxjynIphVvFokAcjMOIAnwbmph0g=;
-        b=KaT9f2AVWPNLrm0ULxEbpsToNTOx4XXcs6RFfLUxV/lSuTt8CcBBbl9Pyn0d5N2EVv
-         RBUO9OFGcEb4j3VjCyxY6w1BLQBmdL4f1Zexbj9f6gKWtOagVKXj3cRBAJGYhgXwRqyD
-         0SB9xMgOYx5Z4RFr9m5i46zFx5C3WNl4LnkIfwb2W+fKW0v5Llk/xnIqRPHO3libEHZC
-         WDBKTjjNosMOJSvJVlB0O+4XMRW16/ErgIZXXJGqnS4OOVrVdFx3m4X4CN3Wi+j3Cqe3
-         UZOOMYpBa1DE5qjdxsDQxmmT0AQvUomPIRatyq5F/RxFaERQe9Gl9JPTU37l3yDqWtup
-         I4YA==
+        bh=M9JIRExjGfyiG438dj4Np3p8Uoc3QzZ6U/1+WKHx1+0=;
+        b=S2rhf68MuFtqmIm59Unxu+iRa3iZQWP7Y5l1+y5tcK/JncLZ9NP20Svka0YvzSTSOh
+         GcCgUmmJXx5/ls7UWlsTiD9KhV4F3ZtsaC7mQIfyuPHtcFQOGrr0yg8do4QGH93CmEtc
+         1hNv5sVzSbX5epxW3NN8Iqbp4LfdQxjihngW5ncSdUrkQ/D+ZnCC+HikoDJtFTGQPSuD
+         oM8Cx7p5Tgpb+XsqU/Lj4CyKdeIFw7eYo4MuyBmW44Tv+e1mgVQ4lnKe7/NpyoFAg5qg
+         9oy2sccJVclokK3BZFF3VyFi5ecIt/7UJFIy5uN33+2sgWoX9mE9pKd5LLHbmjWZVUE0
+         4FPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764391105; x=1764995905;
+        d=1e100.net; s=20230601; t=1764398261; x=1765003061;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LoUjNl1uE2KTMWSYxjynIphVvFokAcjMOIAnwbmph0g=;
-        b=hzHchLf2keltwW294m7ohtSee8JAzJtRbi+Blsp571sR9oLqlbhEuZXMk7qPMk6ISt
-         wDRiICXMP10IpUnpjKrHg1q7UA6Sc4DQrTIZsnWz9/aRmuCYXbblWjSgj2Ymin255aDh
-         RixwJgGOW8Kxf/cDEhzopYrmgE2yJeyQN5mHIDBqORE50GbWQ3+nkLuPTV89zSpUaTMJ
-         OM1vZ3M7gwZ5k7Sqy55ktrYjqmvSYFDZd9CxOJXBn+7VMe9cVwgp0YXw2SUIMJlY/mve
-         Dziir+d2m54OZJ2E74JwOPfFJpL4m89Sj3gn3UkqypkfwkIqW0kNbQvU4UYYWvwNw8yA
-         vJ+g==
-X-Forwarded-Encrypted: i=1; AJvYcCVxaqeLfGEIMnZRBN0I9qtOd3bbZlFAF0HYPmVpmWjR5/qHOge1juHHhCty69dYNsuHKoAS8xU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKc1H/OANpxhMHZCr4fXNpUTbJNCREo4HZftiuUqAEIwyZs6wY
-	TBFj84buYuyPigWv7rijfjmZmkBiMpBfbZgf62hoy1HdiEBYzJkUnA/H
-X-Gm-Gg: ASbGncuLG/CpU+N4lWrkR+5bYrIDEasnmSZtnXp7unoJ7cf5+9l7qM37zZlWOI7h5OQ
-	qq4d5HaDFjYjQtUJj2Qt7aupA5N51HTlbtf/v086lAvkCPBY1X9JObrLoouton8tL1KKi2W5843
-	ZfGNYPT7soAS2LDhC5wkUFHe/QY8BN7nh5+v3RqnPgh5/XMzqEx2xn29QbDbkFShXgFGaYKPsBg
-	nbk8U0kqwK/g/f5w77LHvG1zoFUnVXcGNQfda891PpxF/m3FXprKSLoUkUSQ3kj6GEXwVBmzzrK
-	WgArMRpLe6ahnMNTfP/oTtGKNi+S20Q1rvmwBTO58KsoUq2umuJFlVTj2G4PPZlANkaHkgxlnr3
-	siOjMwM67GnSx30PPZLPMlpzBFzbSSydBqHG+loMTDSVmsNCFXoFBqo04YJ0VNBbLy10y/nC1Fy
-	itFne5QhkPbcan91ffODbrIXNK9A5f3EzghGnL2zQI
-X-Google-Smtp-Source: AGHT+IE3d227D6O/a6E8EeYXs1AA4qchJAYZ2y3RerwefcyJ6amSAoYNHYb6emQiTrh6d6t1kWOLlA==
-X-Received: by 2002:a17:903:1105:b0:23f:fa79:15d0 with SMTP id d9443c01a7336-29bab1a156fmr189382745ad.46.1764391104946;
-        Fri, 28 Nov 2025 20:38:24 -0800 (PST)
+        bh=M9JIRExjGfyiG438dj4Np3p8Uoc3QzZ6U/1+WKHx1+0=;
+        b=U/bRhBHx1l0cYra9+FneCMfp2kHwmRin+82cx81Rhd380UcqYuiNxXGluqCYRlH1LW
+         E+QVp6IQITBFXaJB2jQysHARjopRmokg1bYrurw2AlXMScnp1YekApE4WsLFvxWcN3K4
+         eSrK8ycdVlxPJktl/iX2DvgHW+FtcZGA/s8lACJ71EIagoHC9VaCFcFO3PdlfJd7wgwj
+         czSYuZBjUZz/jMmwr/aZy5fyGLMeKW4ZRYUtFvAv5qHMSdSMNtpy5CoXawxilrGEs6eM
+         RGsb7jKU4Krl/L9R1Opww9REtj3PKBVRRJPWkqMarmFIt8jzAr2OPPytRG6tgJBLIntX
+         IsiA==
+X-Forwarded-Encrypted: i=1; AJvYcCVzMcxzlJCCwnBCfjgJpj1Hqzd6hZHMJOcd3cB3JIqIaK586J/8BCIYtx24nOrc/k9mqZV8xvc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzjz4rV5mIGektyGQ8Ig29Xo9msm/5eI8cSihdIMx0I20MF2/mT
+	UY3y+gjg61FF7uAUHSGMQK0IiSy4MGLoV5iowbxowVbHEY6rRhniUwa5
+X-Gm-Gg: ASbGncv583JRRktGZJ+VUZxIqhKgjXGccWTkY3vZcYYEsdl47cvFJAh3cyRN1Rcj1yI
+	WOYWKoJ8vMOhvyDCYTGww/cHetCgOEKsCs06/614wZjozwgc0SSEQ6YQgixrtTpkrXeUPpaQl1Q
+	3x8iUM4i8JFxjRMNUWFx276S+8L1MibkjCHXRaEhjxbeoHUUDgFN5tmNaJpbwNlCkToTwvJG4bc
+	RqgIb0Om311fMiBoZ4Eode+O+Qw68BmkAan1LbDBjgGmgBJBjRQqIkvHXwZMRem/s3M3xoEypdx
+	sHZCXfyHYZAwFvs56TyYVZdKxQJa+8qVX1OZdOLk+iWA5op/WNrRxK4Gvv2MHipfo5IPHrc1QzM
+	75fgvE52xuZMbQK6HKYZAGPjC6THWqWp/IvjZUn5H7uARFm99k8HBs/77WpcNlKIu6i/6LAlFvb
+	5lb015trQTXgEBmT5gbSwzHMPnTeAS5w==
+X-Google-Smtp-Source: AGHT+IE+aUtzrPI3FDbOHHRFu36ei5nU763U+WhkfUbFs5Z/CcLc3K+MGQu87yTW0Esg48CsLOc47w==
+X-Received: by 2002:a17:903:458d:b0:298:616a:ba93 with SMTP id d9443c01a7336-29b6c3db802mr260455355ad.9.1764398260748;
+        Fri, 28 Nov 2025 22:37:40 -0800 (PST)
 Received: from fedora ([103.120.31.122])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29bceb5c6c9sm60774995ad.97.2025.11.28.20.38.19
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29bce46e001sm64784635ad.39.2025.11.28.22.37.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Nov 2025 20:38:24 -0800 (PST)
+        Fri, 28 Nov 2025 22:37:40 -0800 (PST)
 From: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
-To: Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
+To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>
 Cc: Shuah Khan <shuah@kernel.org>,
 	netdev@vger.kernel.org,
-	mptcp@lists.linux.dev,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
-Subject: [PATCH net-next v2] selftests: mptcp: Mark xerror __noreturn
-Date: Sat, 29 Nov 2025 10:08:08 +0530
-Message-ID: <20251129043808.16714-1-ankitkhushwaha.linux@gmail.com>
+Subject: [PATCH] selftests: tls: fix read/write of garbage value
+Date: Sat, 29 Nov 2025 12:07:26 +0530
+Message-ID: <20251129063726.31210-1-ankitkhushwaha.linux@gmail.com>
 X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -99,109 +95,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Compiler reports potential uses of uninitialized variables in
-mptcp_connect.c when xerror() is called from failure paths.
+In 'poll_partial_rec_async' a uninitialized char variable 'token' with
+*garbage* value is used for write/read instruction to synchronize
+between threads via a pipe.
 
-mptcp_connect.c:1262:11: warning: variable 'raw_addr' is used
-      uninitialized whenever 'if' condition is false
-      [-Wsometimes-uninitialized]
+tls.c:2833:26: warning: variable 'token' is uninitialized
+      when passed as a const pointer argument here
+      [-Wuninitialized-const-pointer]
+ 2833 |            EXPECT_EQ(write(p[1], &token, 1), 1); /* Barrier #1 */
 
-xerror() terminates execution by calling exit(), but it is not visible
-to the compiler & assumes control flow may continue past the call.
-
-Annotate xerror() with __noreturn so the compiler can correctly reason
-about control flow and avoid false-positive uninitialized variable
-warnings.
+Initialize 'token' to '\0' to prevent write/read of garbage value.
 
 Signed-off-by: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
 ---
-changelog:
-v2: 
-- annotate 'xerror()' with __noreturn
-- remove defining 'raw_addr' to NULL
-
-v1: https://lore.kernel.org/all/20251126163046.58615-1-ankitkhushwaha.linux@gmail.com/
+compiler used: clang version 21.1.5 (Fedora 21.1.5-1.fc43).
 ---
- tools/testing/selftests/net/mptcp/Makefile        | 4 ++++
- tools/testing/selftests/net/mptcp/mptcp_connect.c | 3 ++-
- tools/testing/selftests/net/mptcp/mptcp_inq.c     | 3 ++-
- tools/testing/selftests/net/mptcp/mptcp_sockopt.c | 3 ++-
- 4 files changed, 10 insertions(+), 3 deletions(-)
+ tools/testing/selftests/net/tls.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/net/mptcp/Makefile b/tools/testing/selftests/net/mptcp/Makefile
-index 15d144a25d82..4c94c01b893a 100644
---- a/tools/testing/selftests/net/mptcp/Makefile
-+++ b/tools/testing/selftests/net/mptcp/Makefile
-@@ -35,3 +35,7 @@ TEST_INCLUDES := ../lib.sh $(wildcard ../lib/sh/*.sh)
- EXTRA_CLEAN := *.pcap
-
- include ../../lib.mk
-+
-+$(OUTPUT)/mptcp_connect: CFLAGS += -I$(top_srcdir)/tools/include
-+$(OUTPUT)/mptcp_sockopt: CFLAGS += -I$(top_srcdir)/tools/include
-+$(OUTPUT)/mptcp_inq: CFLAGS += -I$(top_srcdir)/tools/include
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_connect.c b/tools/testing/selftests/net/mptcp/mptcp_connect.c
-index 404a77bf366a..10f6f99cfd4e 100644
---- a/tools/testing/selftests/net/mptcp/mptcp_connect.c
-+++ b/tools/testing/selftests/net/mptcp/mptcp_connect.c
-@@ -33,6 +33,7 @@
- #include <linux/tcp.h>
- #include <linux/time_types.h>
- #include <linux/sockios.h>
-+#include <linux/compiler.h>
-
- extern int optind;
-
-@@ -140,7 +141,7 @@ static void die_usage(void)
- 	exit(1);
- }
-
--static void xerror(const char *fmt, ...)
-+static void __noreturn xerror(const char *fmt, ...)
+diff --git a/tools/testing/selftests/net/tls.c b/tools/testing/selftests/net/tls.c
+index a3ef4b57eb5f..a4d16a460fbe 100644
+--- a/tools/testing/selftests/net/tls.c
++++ b/tools/testing/selftests/net/tls.c
+@@ -2786,10 +2786,10 @@ TEST_F(tls_err, epoll_partial_rec)
+ TEST_F(tls_err, poll_partial_rec_async)
  {
- 	va_list ap;
-
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_inq.c b/tools/testing/selftests/net/mptcp/mptcp_inq.c
-index 8e8f6441ad8b..d4a729814662 100644
---- a/tools/testing/selftests/net/mptcp/mptcp_inq.c
-+++ b/tools/testing/selftests/net/mptcp/mptcp_inq.c
-@@ -28,6 +28,7 @@
-
- #include <linux/tcp.h>
- #include <linux/sockios.h>
-+#include <linux/compiler.h>
-
- #ifndef IPPROTO_MPTCP
- #define IPPROTO_MPTCP 262
-@@ -52,7 +53,7 @@ static void die_usage(int r)
- 	exit(r);
- }
-
--static void xerror(const char *fmt, ...)
-+static void __noreturn xerror(const char *fmt, ...)
- {
- 	va_list ap;
-
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_sockopt.c b/tools/testing/selftests/net/mptcp/mptcp_sockopt.c
-index 286164f7246e..15cea5e919b5 100644
---- a/tools/testing/selftests/net/mptcp/mptcp_sockopt.c
-+++ b/tools/testing/selftests/net/mptcp/mptcp_sockopt.c
-@@ -25,6 +25,7 @@
- #include <netinet/in.h>
-
- #include <linux/tcp.h>
-+#include <linux/compiler.h>
-
- static int pf = AF_INET;
-
-@@ -139,7 +140,7 @@ static void die_usage(int r)
- 	exit(r);
- }
-
--static void xerror(const char *fmt, ...)
-+static void __noreturn xerror(const char *fmt, ...)
- {
- 	va_list ap;
+ 	struct pollfd pfd = { };
++	char token = '\0';
+ 	ssize_t rec_len;
+ 	char rec[256];
+ 	char buf[128];
+-	char token;
+ 	int p[2];
+ 	int ret;
 
 --
 2.52.0
