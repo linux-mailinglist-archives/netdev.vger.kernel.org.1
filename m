@@ -1,121 +1,140 @@
-Return-Path: <netdev+bounces-242750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36EFDC9488C
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 23:04:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6146EC948C7
+	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 00:14:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A601B345F98
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 22:04:01 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0F048345DF5
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 23:14:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FF2A26463A;
-	Sat, 29 Nov 2025 22:03:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90AE9263F4E;
+	Sat, 29 Nov 2025 23:13:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="AkF1R5Xk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CfLv7VME"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDB6021770B
-	for <netdev@vger.kernel.org>; Sat, 29 Nov 2025 22:03:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55F4236D51E;
+	Sat, 29 Nov 2025 23:13:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764453838; cv=none; b=IaOWyw9FJcNrnkvactV2KfoAj+Int+FW9azQwtHr0Mr5wl8miEpS6otqQf/zhEkY1qR2s9UTcAHWckO3OTa01uiMlSSH4uJdb4YsmU1F0LjcVAMMEHYjyFhNl495EqxaBmRyzwJ8cAJnX6HrxvItkHrADKO9v0HEZzlVjndjL/c=
+	t=1764458039; cv=none; b=EYRlXWnG0RCoCUHdDkptG4dbmpQBVer2lWtg3izVlqJqPfGgkohU0WgstWlLSQrX6Nh5QjZl6diVvdGIutgfVQ9LRHNnJsE2mjozQS8fP+A0QgsAOkI49VCbKyZewDB6WOP6if/uJG/b2uuqRwvRtOXZUw+M0ZVdOpoH5iZlejo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764453838; c=relaxed/simple;
-	bh=R0pMG/TeWCHtg66bm4iqDQjTOUPugG9N+yKgbqvbMMY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=S+47pj1AE9JKves7zGpTeHueWDZp+C+SCfzD2PtxTUEA0XDZLvWgGryVSBYp8N6zqiW7HX7EUxbl6VUuxl8byqdBZzAGxanO8skOzgx60C7DS3lFYhL0uVTUgVOnTzcuykYswGx1QEUO+a6ppeHcHqW8iy4ya+ueKYcfHGTHHPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=AkF1R5Xk; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=s6RuCxwYOgYQxD3+ZcJ/XadV0QmYbU3gdFKZEGvGigI=; b=AkF1R5Xkdp6RzXjdfut6HLvi0Y
-	IkpzZOn/O06lfstJc8bGxSIGsGGyIGwFjHnxTEN8FgLTfj6FK+W+JpU4TH8gpBl1A7aMjU5S4y2hK
-	OmGFvDW2fypwyH2YmET8Hqycj0cFPScn5t3wJBhNhBzxEdGRxqFLHoXRZ/RsXIFU4JK5W4eF7ArxP
-	5tNHTlKq3LakAy0iXogpuGSxLvFOP92IwmlUWm7o/7YhwfjmnAHXtGNhM1n/JRHVamWs94UTodFbe
-	IoLtj8DqRXAVqttUrdnUe8nN/R5GupiTLUSeIF869Ey6Wc0owIq2GKlbZsT/qL9nhwiu1kp90A2Wo
-	EoihBeCQ==;
-Received: from [50.53.43.113] (helo=bombadil.infradead.org)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vPT2n-00000001pN6-279Z;
-	Sat, 29 Nov 2025 22:03:53 +0000
-From: Randy Dunlap <rdunlap@infradead.org>
-To: netdev@vger.kernel.org
-Cc: Randy Dunlap <rdunlap@infradead.org>,
-	Edward Cree <ecree.xilinx@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-net-drivers@amd.com
-Subject: [PATCH net-next] sfc: correct kernel-doc complaints
-Date: Sat, 29 Nov 2025 14:03:51 -0800
-Message-ID: <20251129220351.1980981-1-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.52.0
+	s=arc-20240116; t=1764458039; c=relaxed/simple;
+	bh=m0Obm5gIwV7F7Qt1kS9OIm8ga5wdZIb7eYbpMlTuqSg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fcYKKvGcoxb1KxdSf648nXcMI1uZbLOtrBK53HbQe9jSeXiyk3bqL4GMF1fR6WR9qVE2KddmWLOLN3+/5MFwcfGvCL+If4JmsRhr/thqZbjKERM48rYWxObwX0T6lZwzg6BpdAPwmYJkA8LHI4+qI403mDlmW45VUobDHsTCEjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CfLv7VME; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5532C4CEF7;
+	Sat, 29 Nov 2025 23:13:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764458038;
+	bh=m0Obm5gIwV7F7Qt1kS9OIm8ga5wdZIb7eYbpMlTuqSg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=CfLv7VMEyziaZ5zu+XRGN3AnoTOGtUNVwTp4McnwG2D4ydPb1tdSRm76VuvRFdEvJ
+	 KDmn9AJt3y/JIRzYTEH9aYt0H5kJrK1Rb2Up+ht+YbpUQMjFqgvPPQuWgZ/zJwXEpO
+	 SwUfvdQxFgxqFa6U6RF3sdAjtdX42RxNBotSckDEv4SIvZQqtOs0xI9RyVrC1jgo4Q
+	 bBC2/Yu1x8+ls2xe6wYOHxGhZuCKWLXaa6KIhqeHLE2DaCkreQhLFMnQSwRPg7c4Dc
+	 bG9G5rw10lvfKm8a+2Ivuh0q3/CNovuPiv3dc1Rj+GjqDvqxoB7O7Xvl3PNqL+wt/g
+	 iBC9HNekiSVIg==
+Message-ID: <fc2c8f97-b481-4c77-99ba-5d3df7c74644@kernel.org>
+Date: Sun, 30 Nov 2025 00:13:53 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 5/7] iplink_can: add initial CAN XL support
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org, Marc Kleine-Budde <mkl@pengutronix.de>,
+ Oliver Hartkopp <socketcan@hartkopp.net>, David Ahern <dsahern@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-can@vger.kernel.org
+References: <20251129-canxl-netlink-v1-0-96f2c0c54011@kernel.org>
+ <20251129-canxl-netlink-v1-5-96f2c0c54011@kernel.org>
+ <20251129090403.5185f2ee@phoenix.local>
+Content-Language: en-US
+From: Vincent Mailhol <mailhol@kernel.org>
+Autocrypt: addr=mailhol@kernel.org; keydata=
+ xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
+ JFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbEBrZXJuZWwub3JnPsKZBBMWCgBBFiEE7Y9wBXTm
+ fyDldOjiq1/riG27mcIFAmdfB/kCGwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcC
+ F4AACgkQq1/riG27mcKBHgEAygbvORJOfMHGlq5lQhZkDnaUXbpZhxirxkAHwTypHr4A/joI
+ 2wLjgTCm5I2Z3zB8hqJu+OeFPXZFWGTuk0e2wT4JzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrb
+ YZzu0JG5w8gxE6EtQe6LmxKMqP6EyR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDl
+ dOjiq1/riG27mcIFAmceMvMCGwwFCQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8V
+ zsZwr/S44HCzcz5+jkxnVVQ5LZ4BANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
+In-Reply-To: <20251129090403.5185f2ee@phoenix.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Fix kernel-doc warnings by adding 3 missing struct member descriptions
-in struct efx_ef10_nic_data and removing preprocessor directives (which
-are not handled by kernel-doc).
+On 29/11/2025 at 18:04, Stephen Hemminger wrote:
+> On Sat, 29 Nov 2025 16:29:10 +0100
+> Vincent Mailhol <mailhol@kernel.org> wrote:
+> 
+>> +		} else if (matches(*argv, "xl") == 0) {
+>> +			NEXT_ARG();
+>> +			set_ctrlmode("xl", *argv, &cm, CAN_CTRLMODE_XL);
+>> +		} else if (matches(*argv, "xbitrate") == 0) {
+>> +			NEXT_ARG();
+>> +			if (get_u32(&xl_dbt.bitrate, *argv, 0))
+>> +				invarg("invalid \"xbitrate\" value", *argv);
+>> +		} else if (matches(*argv, "xsample-point") == 0) {
+>> +			float sp;
+>> +
+>> +			NEXT_ARG();
+>> +			if (get_float(&sp, *argv))
+>> +				invarg("invalid \"xsample-point\" value", *argv);
+>> +			xl_dbt.sample_point = (__u32)(sp * 1000);
+>> +		} else if (matches(*argv, "xtq") == 0) {
+>> +			NEXT_ARG();
+>> +			if (get_u32(&xl_dbt.tq, *argv, 0))
+>> +				invarg("invalid \"xtq\" value", *argv);
+>> +		} else if (matches(*argv, "xprop-seg") == 0) {
+>> +			NEXT_ARG();
+>> +			if (get_u32(&xl_dbt.prop_seg, *argv, 0))
+>> +				invarg("invalid \"xprop-seg\" value", *argv);
+>> +		} else if (matches(*argv, "xphase-seg1") == 0) {
+>> +			NEXT_ARG();
+>> +			if (get_u32(&xl_dbt.phase_seg1, *argv, 0))
+>> +				invarg("invalid \"xphase-seg1\" value", *argv);
+>> +		} else if (matches(*argv, "xphase-seg2") == 0) {
+>> +			NEXT_ARG();
+>> +			if (get_u32(&xl_dbt.phase_seg2, *argv, 0))
+>> +				invarg("invalid \"xphase-seg2\" value", *argv);
+>> +		} else if (matches(*argv, "xsjw") == 0) {
+>> +			NEXT_ARG();
+>> +			if (get_u32(&xl_dbt.sjw, *argv, 0))
+>> +				invarg("invalid \"xsjw\" value", *argv);
+>> +		} else if (matches(*argv, "xtdcv") == 0) {
+>> +			NEXT_ARG();
+>> +			if (get_u32(&xl.tdcv, *argv, 0))
+>> +				invarg("invalid \"xtdcv\" value", *argv);
+>> +		} else if (matches(*argv, "xtdco") == 0) {
+>> +			NEXT_ARG();
+>> +			if (get_u32(&xl.tdco, *argv, 0))
+>> +				invarg("invalid \"xtdco\" value", *argv);
+>> +		} else if (matches(*argv, "xtdcf") == 0) {
+>> +			NEXT_ARG();
+>> +			if (get_u32(&xl.tdcf, *argv, 0))
+>> +				invarg("invalid \"xtdcf\" value", *argv);
+>>  		} else if (matches(*argv, "loopback") == 0) {
+>>  			NEXT_ARG();
+> 
+> not accepting any new code with matches()
 
-Fixes these 5 warnings:
-Warning: drivers/net/ethernet/sfc/nic.h:158 bad line: #ifdef CONFIG_SFC_SRIOV
-Warning: drivers/net/ethernet/sfc/nic.h:160 bad line: #endif
-Warning: drivers/net/ethernet/sfc/nic.h:204 struct member 'port_id'
- not described in 'efx_ef10_nic_data'
-Warning: drivers/net/ethernet/sfc/nic.h:204 struct member 'vf_index'
- not described in 'efx_ef10_nic_data'
-Warning: drivers/net/ethernet/sfc/nic.h:204 struct member 'licensed_features'
- not described in 'efx_ef10_nic_data'
+Ack. I will do a s/matches/strcmp/g in the next version.
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
----
-Cc: Edward Cree <ecree.xilinx@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>
-Cc: linux-net-drivers@amd.com
----
- drivers/net/ethernet/sfc/nic.h |    6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+For the old code, I assume that we should keep it as-is, otherwise that would be
+a breaking change.
 
---- linux-next-20251128.orig/drivers/net/ethernet/sfc/nic.h
-+++ linux-next-20251128/drivers/net/ethernet/sfc/nic.h
-@@ -156,9 +156,10 @@ enum {
-  * @tx_dpcpu_fw_id: Firmware ID of the TxDPCPU
-  * @must_probe_vswitching: Flag: vswitching has yet to be setup after MC reboot
-  * @pf_index: The number for this PF, or the parent PF if this is a VF
--#ifdef CONFIG_SFC_SRIOV
-+ * @port_id: port id (Ethernet address) if !CONFIG_SFC_SRIOV;
-+ *   for CONFIG_SFC_SRIOV, the VF port id
-+ * @vf_index: Index of particular VF in the VF data structure
-  * @vf: Pointer to VF data structure
--#endif
-  * @vport_mac: The MAC address on the vport, only for PFs; VFs will be zero
-  * @vlan_list: List of VLANs added over the interface. Serialised by vlan_lock.
-  * @vlan_lock: Lock to serialize access to vlan_list.
-@@ -166,6 +167,7 @@ enum {
-  * @udp_tunnels_dirty: flag indicating a reboot occurred while pushing
-  *	@udp_tunnels to hardware and thus the push must be re-done.
-  * @udp_tunnels_lock: Serialises writes to @udp_tunnels and @udp_tunnels_dirty.
-+ * @licensed_features: used to enable features if the adapter is licensed for it
-  */
- struct efx_ef10_nic_data {
- 	struct efx_buffer mcdi_buf;
+
+Yours sincerely,
+Vincent Mailhol
+
 
