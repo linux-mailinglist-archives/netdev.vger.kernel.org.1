@@ -1,139 +1,74 @@
-Return-Path: <netdev+bounces-242697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB40EC93BF2
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 11:22:18 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99B07C93CB7
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 11:54:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 50F3E34947D
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 10:22:18 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8C9B24E063A
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 10:54:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE10226E6FD;
-	Sat, 29 Nov 2025 10:22:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51A54309EEE;
+	Sat, 29 Nov 2025 10:54:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="dkbF/YgT";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ToluMmLW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E9VEpF8z"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F73122B5A3;
-	Sat, 29 Nov 2025 10:22:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B286309DCF
+	for <netdev@vger.kernel.org>; Sat, 29 Nov 2025 10:54:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764411733; cv=none; b=moySxT8IqPuvXIo1qs5NGHYXxT211o1SNGbozRBgOjFG78UmffPRN05ar4J1UsVE89NCmT+TE8QOtdYzisODwaJpvBG6sdrYw7wRd1T0VE4bjHUtMqYwU3Me1UsyXxvWCnbLbtQpVRBSgi8XrHGTbZZeH2R6TB08OrVeQuFbhHQ=
+	t=1764413695; cv=none; b=R/EuE0McrocLCKAfz6TnTpqi0z2CU4xmBw6qBIXMit2BTWF8jORad9mS4dIU1u4r5Wr64UJzeM0aq2+8YwfATHaJsi435DZtvOo36cJn+SovSkqWg0GND9YCE7X8nSLoU2HcD/vx0Yf57f0EQUj3eO88/gW5bGD06pRwkaBP0F0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764411733; c=relaxed/simple;
-	bh=oVz44O4lt9xJul45styEiQsd5Qo4kmSSz0E2+IoHbdk=;
+	s=arc-20240116; t=1764413695; c=relaxed/simple;
+	bh=KNVUGzbjxkkJ9TPlKItSaotNjp2ctuWkFyPczALT4jc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BPSIqhymYb5RKIYD6yIg+9WVXMuldxP6PIKxZN/f/AZ3qLUE74eJTmt8y8FGFqfnUPXw40XePN9vkcbGnNeXncZohl7cxQZSkDCZrUDeanvHrVKzDMNYZbeUDEe28ywkL2Mx4OT074SdK3shIIV4N7DtozdajhFX3aHjbmMC7aM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=dkbF/YgT; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ToluMmLW; arc=none smtp.client-ip=103.168.172.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfout.phl.internal (Postfix) with ESMTP id 0477DEC0101;
-	Sat, 29 Nov 2025 05:22:09 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Sat, 29 Nov 2025 05:22:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1764411729; x=
-	1764498129; bh=jlPq/Wh5BfJbRcxs5REUD2RG4sozKHuQgt5SRlpBaA4=; b=d
-	kbF/YgTEk/mvpv+u80Ys0Atl7ZniPzPKaqAdnNN8CMyemobQxJuI+EFKqjq2r5jh
-	wuoBTWuedGHQbKW5C26sAss6TGX9CqijY59prIJypAERum9VatV08pI5YVVnus2L
-	gpR4hLOaUyhNtfiGffgjjHJyCT4uAVGylgS2G6oE6CUCKyyfPllS4BSVx9F3OffZ
-	zUEAJE9zBajvT+zBlrNQwtnPDqkRf7J9+sHSVXGK2uN+uLqUYCeuDams1BTcFtFU
-	tUhWwNEsb8/OutHdti5LGOTd/xWfwRf/MlwGp/2y6sZcstL+LzOQ374/f9m3LEBZ
-	tccJUMerLLDtaEq70f8cA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1764411729; x=1764498129; bh=jlPq/Wh5BfJbRcxs5REUD2RG4sozKHuQgt5
-	SRlpBaA4=; b=ToluMmLWPwrKiANLLaL+5rLfsokdw7XsNN2srTOy7V221n5FQKU
-	SnTT/dmEE1+qq5IGN0CClgQUY8j73ubJ+g9B/RlBBoohhM+XxlrkD6k7RL0Z+Sp6
-	6K9I7YUoST58GZ/YgSX5b8yPLZJG80SxMBllLXgn3UzQNOhFfb2W8qwL0DZpeIW0
-	+6oVYh6hCPz7TZUxxl/QOVs6G83ac3EB5fi52z+EEVWhYuhSs2RGvZAXWW+cm7wI
-	OT40WKrgsTkmT4lV5lPo8090V2gg81rW1xxBaydwaGOZSDfNswCD57bIxC4wMOX/
-	v5Wq+q+qdleNaLmyyXFMDiPYrtiWAxkGsRw==
-X-ME-Sender: <xms:UMkqafYGWYcuJdUoFVZJVpMipl_uXfYzDzJJVz4k8lDX0d1wUqOdaA>
-    <xme:UMkqaUZy8zRDQCbld7l8127RwtUltnDROl2pxxOGIUmHL7kuqPoSwNHCtc-AB5GJN
-    TYNIt1wfM9gBVQb0kxwncfI8Rm_rkfjQApknimyd4eOfk_3yy-Faw>
-X-ME-Received: <xmr:UMkqacz0muQlQet9M6uwSORlonUxAiRLfmXR11ZrFxA9zjYuI3pcukcKTsxkP0vHTHnYGcAMBFr0ccPvnAQPIkP1_g>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvhedvvdduucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepgefhffdtvedugfekffejvdeiieelhfetffeffefghedvvefhjeejvdek
-    feelgefgnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiii
-    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdr
-    nhgvthdpnhgspghrtghpthhtohepuddtpdhmohguvgepshhmthhpohhuthdprhgtphhtth
-    hopegrnhhkihhtkhhhuhhshhifrghhrgdrlhhinhhugiesghhmrghilhdrtghomhdprhgt
-    phhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuh
-    hmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghl
-    rdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtth
-    hopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehshhhurghhsehkvghr
-    nhgvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdroh
-    hrghdprhgtphhtthhopehlihhnuhigqdhkshgvlhhfthgvshhtsehvghgvrhdrkhgvrhhn
-    vghlrdhorhhg
-X-ME-Proxy: <xmx:UMkqaYeTa-QXFWrPb87OZNYvDNMw8RZjKZTYQIaL_T33qCeNgA0keA>
-    <xmx:UMkqaZ7cR4TV17GOzc0JFVOEovtrer_h3Glyw-Jjc2M1ksI680syEg>
-    <xmx:UMkqaVJp76qGzRDrqGiIHCHS7BtYrcTqD6AsFaY-BNsl3N08fMYthg>
-    <xmx:UMkqaZzHdQugoLHZlNdL_PhSS9SP0KyTzcHv6BNkLx61OZP_keCMPQ>
-    <xmx:UMkqaTb8vGRoPm3lmQGgdfwSEOJxZsRTWylUzLnUZg5G-wA7PrdHFHLe>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
- 29 Nov 2025 05:22:08 -0500 (EST)
-Date: Sat, 29 Nov 2025 11:22:06 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] selftests: tls: fix read/write of garbage value
-Message-ID: <aSrJTmtJqOX0rNDh@krikkit>
-References: <20251129063726.31210-1-ankitkhushwaha.linux@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=RxmVYNCdwQJjU8t8uQIFk5e1Ka81n5exry0/4kGYPdE60TesmKwEin1pP9uwavUwnLezjmtgyCFJG4UiAMkaOYlzbaGE6Kl2rj+e9CWj0P1MpwSi8z2rtPoVMJ5a387mDPrm3BoQI0myjdehMVht2UvSXN2I2geHzBCX8pgUNpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E9VEpF8z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A659FC4CEF7;
+	Sat, 29 Nov 2025 10:54:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764413694;
+	bh=KNVUGzbjxkkJ9TPlKItSaotNjp2ctuWkFyPczALT4jc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=E9VEpF8zQDQUtR1tN1CIBLikWMOX3ZqU/3lgyYAmTjddsAQP5nvHPOKiIMLAt/wxX
+	 /sm17y5VrmneN9mck7S2dRWegdZqj6vGBkP/3OV/l+QAR6rTm0mgxopDkRx32DR92Q
+	 7pLfMS+S0SiOnlMf0Uuk+Jt6BDasAJeMR3z3LykhNgH8vwcYCQGcEwbri+CFCOW94G
+	 6sqNUCFwHD8XWnlCJV6oLviVJ4tCZMzTy2j5rChVlwj85ghWbak+33OKLtumIuVHD4
+	 2sHI6k+MPiacU06s3icQ1FL36qLBVIr+cAkNTl/7VXBGnk+xO62wkn9ah0p8QoS3wK
+	 eRx6L3MswiOGA==
+Date: Sat, 29 Nov 2025 10:54:51 +0000
+From: Simon Horman <horms@kernel.org>
+To: Sreedevi Joshi <sreedevi.joshi@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: Re: [PATCH iwl-next] idpf: update idpf_up_complete() return type to
+ void
+Message-ID: <aSrQ-2nLnQabIO34@horms.kernel.org>
+References: <20251126170216.267289-1-sreedevi.joshi@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251129063726.31210-1-ankitkhushwaha.linux@gmail.com>
+In-Reply-To: <20251126170216.267289-1-sreedevi.joshi@intel.com>
 
-2025-11-29, 12:07:26 +0530, Ankit Khushwaha wrote:
-> In 'poll_partial_rec_async' a uninitialized char variable 'token' with
-> *garbage* value is used for write/read instruction to synchronize
-> between threads via a pipe.
+On Wed, Nov 26, 2025 at 11:02:16AM -0600, Sreedevi Joshi wrote:
+> idpf_up_complete() function always returns 0 and no callers use this return
+> value. Although idpf_vport_open() checks the return value, it only handles
+> error cases which never occur. Change the return type to void to simplify
+> the code.
 > 
-> tls.c:2833:26: warning: variable 'token' is uninitialized
->       when passed as a const pointer argument here
->       [-Wuninitialized-const-pointer]
->  2833 |            EXPECT_EQ(write(p[1], &token, 1), 1); /* Barrier #1 */
-> 
-> Initialize 'token' to '\0' to prevent write/read of garbage value.
+> Signed-off-by: Sreedevi Joshi <sreedevi.joshi@intel.com>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
-I'm not opposed to making the compiler happy, but in this case
-"garbage" is completely fine, we don't care about the value.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-So I think the subject and the commit message should talk about
-"silencing a compiler warning" rather than "fixing use of garbage
-value".
-
-And your patch should indicate the target tree in the subject (here,
-with [PATCH net-next]), see
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
-
--- 
-Sabrina
 
