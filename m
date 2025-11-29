@@ -1,290 +1,242 @@
-Return-Path: <netdev+bounces-242724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64B91C9433E
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 17:26:26 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6551C94344
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 17:29:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 174763A6991
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 16:26:25 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B174D4E13A8
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 16:29:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D29DF2652A6;
-	Sat, 29 Nov 2025 16:26:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E5CC280309;
+	Sat, 29 Nov 2025 16:29:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="V0N3C8Na"
+	dkim=pass (1024-bit key) header.d=vjti.ac.in header.i=@vjti.ac.in header.b="VbDmX63L"
 X-Original-To: netdev@vger.kernel.org
-Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011023.outbound.protection.outlook.com [52.101.62.23])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F35DE217F24;
-	Sat, 29 Nov 2025 16:26:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.23
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764433582; cv=fail; b=C9k1eupNmrhTcTUkj8BvKkgnANRTA2clmII23gP+SOAjWfvsz962Re7cpfnDtkJR9tp+NAsYF0Zc/oR4tajlsrYrF2l1B06XR2zfVfwA0koKD+3AuiOvTKKgtB18Tykj5pr3ofTeNDCURxUTX1F4bQ3Udjo2m3inKVmra5S160s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764433582; c=relaxed/simple;
-	bh=Pwr5QVyG0S9aOc7fGr69UF6GD0pU4LPGJcEttbTHvtY=;
-	h=Message-ID:Date:Subject:From:To:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=TQ7dT5V13qGPkaeNdlH6+fspvcUiyMAlpnKnJLSmhP6clKDm3EeqjK/HS9sQQg1y6UidMAzuBoKZIC0QINvbxyLMvcrUcwD/qB13bUxkotKIixWrcgg0XcrYki40Ogb4x0Ud0nugfMgQpc3tdqaqW0XD9OeT4hVzz9MxNnsxYwE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=V0N3C8Na; arc=fail smtp.client-ip=52.101.62.23
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Ve/uH+TYAKEQF6uwbMAbNoK+TwuGE5x1/aguQrlVzLxSL8HSvsjiYaxb8/jih58VBF/ssvUqhvqNt7EFEm2ximNiUGEyCg3axVzxB7C/g7b/1NbL3yfkBo0wFC/b/peBumkJTCU66SXH3ob8duNFFWG6Gabif9JsVKI+25SOOOmaM5jASLmyPL7oQSQ6MjHIdpoULxot5F4xUwVsHhgUK7+bijT0/95zwas89JFAUWGWI3jw5ez9LJb6UeA7IFnJzgMJA4d/sX5/Ua9GMm/x8cDrK6UGBoq5LFeMvIsicPeAvzhZQ14U0/os3U2ctLOd+63QtHAjkeOh19618EY9qQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rFbcXH7Db4xNiC1u0J4oQuc4+eYJLAe1CVv8E1x5LK4=;
- b=vS0UFSbVlGrUvMEKa56x+CySLwGR3ks6g1F5finMMPJmyGQtycXs9sHRfpA+J0XcUVCDZQ78/8E/XWAYCPKTGvlWvlDL5Df65+RwqKnJDNyHoKDjjl/PEKQgs/pLhD1TKqUFQouWy6KNe2v7nMD9+aXNEfKJE6DZJXKx4Z/5fBaqGr0z9COZtrWsbaCfAQyI1X+wiQudKUEGtFV5w2Wfox3pvl0AghNn44ekcXtGqKKrVqA4Xhii0ULGvobpZ6uiZaSKJJH5Xj0C61BBizR6vppA+23wvKY/HaVevtYFLHn+Ir3tYMetjnR0jp1RRhc3q4M1v3YXElOxOgbJMWWFJw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rFbcXH7Db4xNiC1u0J4oQuc4+eYJLAe1CVv8E1x5LK4=;
- b=V0N3C8Nay+3J0pMgh3DMNyfhBFhj5qYhif7EOKtCVlSIYXkoIBb0fBVcpvcVoNGyr3bTVDmmUigUyOx6D0M7NvY0mMQ6vANFGm/P96Cs2ytqdF3nspz8c7dpYP/OP/yEtko0ljxEQBZ+o0GMVdHXbFxdSwf78/6/WaRLLWBRMaI=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
- by SN7PR12MB8001.namprd12.prod.outlook.com (2603:10b6:806:340::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.13; Sat, 29 Nov
- 2025 16:26:18 +0000
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79%5]) with mapi id 15.20.9366.012; Sat, 29 Nov 2025
- 16:26:17 +0000
-Message-ID: <ada17fb1-0935-461d-bb60-05beaeb2d0fe@amd.com>
-Date: Sat, 29 Nov 2025 16:26:13 +0000
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v21 00/23] Type2 device basic support
-Content-Language: en-US
-From: Alejandro Lucero Palau <alucerop@amd.com>
-To: PJ Waskiewicz <ppwaskie@kernel.org>, alejandro.lucero-palau@amd.com,
- linux-cxl@vger.kernel.org, netdev@vger.kernel.org, dan.j.williams@intel.com,
- edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com
-References: <20251119192236.2527305-1-alejandro.lucero-palau@amd.com>
- <31dae6910b0863dee44069d01a909f8ed0b19bb2.camel@kernel.org>
- <d1de6633-e068-442f-98be-8d0cf5345f04@amd.com>
-In-Reply-To: <d1de6633-e068-442f-98be-8d0cf5345f04@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: LO4P265CA0164.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:312::13) To DM6PR12MB4202.namprd12.prod.outlook.com
- (2603:10b6:5:219::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63A42221F26
+	for <netdev@vger.kernel.org>; Sat, 29 Nov 2025 16:29:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764433784; cv=none; b=hk5yHK3XjICKdL6Uk2fW9PNi1cZ9kFjwdp29Fz/A51YCCyhNckn/gxfBq8CKolAMP7N6eVg3yE2Xx019WEeavHlrcu86NxSslu3KZAla9F/hDSJLqmZbaIpmuORdqHYpitRuB2mJxehXOdpX9O6Q1GNNfSADIstWUXCc3N/c8/E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764433784; c=relaxed/simple;
+	bh=XxPsk9Eb43fSNiSNuZ5XLjWkiKMYwSYxirqZOM8CWWA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=t0bZmVo3/2EbjxEgvGalnnqqIWhxZBSaD32M45PHH9SiI+DCC+otDvgVoYYrgsEb611khI27vYlQ4px5rcDnZVtb2PrumpBRVnVzRqGRHI83bU86Q67gHaPwuLf4hizzvGZSHDA5/W6NVW+4SchOrhSLIfEj7oZKOhHpkRsjm50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ee.vjti.ac.in; spf=none smtp.mailfrom=ee.vjti.ac.in; dkim=pass (1024-bit key) header.d=vjti.ac.in header.i=@vjti.ac.in header.b=VbDmX63L; arc=none smtp.client-ip=209.85.128.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ee.vjti.ac.in
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ee.vjti.ac.in
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-7866bca6765so22736747b3.1
+        for <netdev@vger.kernel.org>; Sat, 29 Nov 2025 08:29:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=vjti.ac.in; s=google; t=1764433781; x=1765038581; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0YIaZWkYsG2+766HIF9sMG2jvdVnfYyu8Q7qgPYfzlE=;
+        b=VbDmX63LVfP0mKSxI4ECJi15XwrKxGIX075svRoiU9UdtCBvcZrTlvmTOnDbK+hJ8K
+         pFjSr5iP7UE8EXasMIRIu2B0P/+eXDNhQ5l5fxYbY+dpzdMbRuz3ZPNKqUGhKBOR1dkI
+         9B3XzoJaRpOhUwevZYcSkz2plTZtc9jBwHV+g=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764433781; x=1765038581;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=0YIaZWkYsG2+766HIF9sMG2jvdVnfYyu8Q7qgPYfzlE=;
+        b=NRhJz7G5pY+Tc/trlC58FzveWLDpiRDqT75n3QDsTWqbAOhGMgihScfqR5Iw5sqqxW
+         r5SazucnGUs7o+5bCl1XQekAwXNnnrGMcyg10J0qGa0KsRkq52fYM6ebyhb1Kc2sxo1g
+         lrUQAkN16SDalsH/On/lQVTfPZvt7Z3ZpowLPFv20sBZ7SFqIXYTo3XvnRhGCPWWhIsN
+         uHgqOApiaaYdTJRIxxyGHQ/I1kOpfFqXMKbYY9wd/3HAeHXOW4IWt2L3lG3/0ddud0MY
+         h/FUOF9dZ8gOj46UqAaPZKrBMSICUX5tw/9xj3Wln6gLqwJOCSvV4G9psNLriwZg5hG3
+         J/XA==
+X-Forwarded-Encrypted: i=1; AJvYcCUHIvHn/482mSJDNb3vcSZPomsV+BGXxfU1sR0EeK+scSSPQTvgwLnz7h5N4IQH8ExIVXT0tbA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzCpMt794WMTslA2mImQn6s+83pLszA6Wq3E/mAX3UKIVT06uCv
+	hQoR+KSoGA1HIcHXb2yxLXcVqnmCWYeMRCN3j6VTtVmMXfDHwwD7RlGG6X5436MvrGUpdprMdYu
+	+nRqv0Uv95lBeMCkMo7Kstfg11DfaU99rPgD/CS6JJg==
+X-Gm-Gg: ASbGncu3cjlTiJGHqGfFsMdOAool/m2qVPmCXAFb3D+Kf35DC3gkre0pwalx4se9rrL
+	bo4l/DeWYSvD6yI+L5hdF2szz4S5xhvk/1/oDkzTArUhXfyMxH0Voj7XnvXq4ywbbVz5vCPM6P3
+	cXhxH1sN6JbBw2pBr3/ZYHgLWPjaCGHtKTDsZUVq0vgX0kg7cypbrM2pfxQEFy6fft/Fox1F6rq
+	yrN1GgPgFCZkf+5l1Tk8DKMe56Zgs0+JogB372JqFSvcbt/y76aQZ6Ea59zyrPzBAUofrzPKePa
+	4jcOp3187hUd81rLYi0crzA=
+X-Google-Smtp-Source: AGHT+IH/amgjYZ4hepMx4cefCAqunHQoT6K399Q1T0St+afGYxSlkQhRoNJixWcVurrbQATvkbcwVxuu1x05BYn110A=
+X-Received: by 2002:a05:690c:7448:b0:788:763:179b with SMTP id
+ 00721157ae682-78a8b5284e1mr261258247b3.45.1764433781248; Sat, 29 Nov 2025
+ 08:29:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|SN7PR12MB8001:EE_
-X-MS-Office365-Filtering-Correlation-Id: ecf6903a-6782-4524-de41-08de2f6405d9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?QVg2RitTZGxicTdDT1NwQitxZWVBbTBVc0RhaDlDcHVncitiS3pKenBRYlZ6?=
- =?utf-8?B?RTN4Q2doSDJHdjB5S2s4cEM3SEh2OW9VUkV5V3BKcHF0Y1RNeHFuSjRNdmlx?=
- =?utf-8?B?V0tRZkkrT2w4QlBhSXhKUFZjcE5jNDdxd3pacVBQbmpQeUV6S2dEMUluczhE?=
- =?utf-8?B?Zm1sL29IeG8yRzNja3RWUmVvMzlTV2t0L3RZZHkrSmV2UDA2UHZUeWJ5bjhC?=
- =?utf-8?B?MmJ3eGlNcFNzaUFxSGNhSmdWellsb2hYVk1lOWVQOGphUEZzMUJsRU9RYlFz?=
- =?utf-8?B?cUYyVk5EcFBKM3JaM1I4THpITkxNcmVtWndJZHVpS0pNM1NJTHlBMTBpcXVw?=
- =?utf-8?B?aVhmalpmUHhodzRXbFRvaUM4T25idUdyK0E2ekhPSU5LdkVuckZES0pDK3BC?=
- =?utf-8?B?WVFFTFBwUnVHdU1UWHE3dkdzN1cyNzYySWdJUmd1bTVPVjF3b2ZGQ1dzWnZ4?=
- =?utf-8?B?RkM4YUNNT3RZSTRtNWVjM2g4dlRHVG9NZ0dlbS9keWl2MkorelM1WlRDSHZU?=
- =?utf-8?B?cVBLK0pOZVZrYjV5dVJVbml6cEZmcWFrbkNBK3I1L3ZHQmhKWlNleEJjekJN?=
- =?utf-8?B?bVFmeEc1TDMxTmJvdzdCbGs3QTBoaVJjckk3anFSODFFdExrTysxWFVNdUNH?=
- =?utf-8?B?U2h2eWtwaEhTT3R1anBBU0I1c29XWkovQTg0clJPSWp2ZEVZc242V0YxMVli?=
- =?utf-8?B?UHlYZ2JxQnBTUTJ1VHpvSXFDeC9iK0xqbEcyaHRTN09lT0hJYmNkUWJzUER3?=
- =?utf-8?B?UFRQSE8vNHZXbWRpeGZqakpzb3A5a3kxQUJsY3pXVy94clFDdXE4TEUwUHZU?=
- =?utf-8?B?SEZzZnhMVUgycklGbXBUVGNscnphc21Qa2pnWFpFazNPMHNHdWtSVDJ2ZTcr?=
- =?utf-8?B?ZXIvaHNEQjZwR1BCSVJnbUNlMnJJUXVCdVBYNGpjUUJydXJzN3hJblM3MHgv?=
- =?utf-8?B?MDhSZ2FwRmZTanZsQllGd3VNUGQxMStDWEtqV0lrQWo4RUYxUmJHZ1B4aklC?=
- =?utf-8?B?d2pPakZFM0UzYlJwNGduOTZCMjIzRlFkS3hOSkxTd2lpK0NOOU5rRWpJcnNX?=
- =?utf-8?B?ZG5wOGNGQVVSMlRCYlFqemVEbm5TODNvTFFoTEhtWFJTNkFRV201Q3FGMzFv?=
- =?utf-8?B?NDdZYVE0V296cjFpVXA0czFVS0dLKzJEejVibXowVmd3ak8xQ3dma21VUEZm?=
- =?utf-8?B?NXdzR1RMRlg3cWxxVTdSNHF5bHBRZ0lFQlN0Q2liME9jNVpyV1Myc0dxS1Bz?=
- =?utf-8?B?VFVlUE9vL2dTa216WU9sbEp6dm5qVGtNbnhuODY1LzdSU3pRS0EzdGNEclpk?=
- =?utf-8?B?M0RRdGtrZUVRRENScjZLSElsSzBpY1R3Q2o3bXVaNElsUkl0cTFtVUhuVkRW?=
- =?utf-8?B?TmtZS1l3VXdFRitsZDJTcTNaOHBjKzF3THNDM2FzU3VOTkorRDF3V0JZc1FJ?=
- =?utf-8?B?VDhvb2V2Z0JRQmZBTXFFNGk0RllaYjBPWWZiOVc0Rmh6WGtMektLVDdXR2hO?=
- =?utf-8?B?VXhERmNIU0ZQZWgvUXRTVXlUcW16bmwxZ3FLUURjclI4eEIxdGpMTThxOFZP?=
- =?utf-8?B?TDM3dkF5MzQ2ejVOaUQvUzBURFk1UW9aMlh0ODBkNFJEbmgyY2tlbHpnMmpP?=
- =?utf-8?B?c1J1WDhtQ29GTFlCUTFuL0xFUk15ZWhGYnd1T3hkaTE5cXlzblNHMk1kd0N2?=
- =?utf-8?B?SHdta3hTWHltNWRxQ3gxYjNuVjNIMWFiZk5INXFBSUxHb3FoVmFnaWQ5ZGdM?=
- =?utf-8?B?eXRReUNyemtSNHFwc1VLQkN2UVVMU3kzNnh5YVl6TGRZaHJreTVxRGtUTlhV?=
- =?utf-8?B?UUhYUmYwQXJYYjZaU1kwUHhFYWZYS0lxdE1ObUpPOWtkaXorbEIyVjNjN2VF?=
- =?utf-8?B?bGlIdVlyeml3VThwbGJLZU1HV1NxejJNLzFwZ0dzMXZ3ZmpxV0UwWlJHeGk3?=
- =?utf-8?B?TzZhTGljWHlNZEZqcWtrZXA4SDVWem81Vis2NENncmlGc3pQZ2xmQ2xPY245?=
- =?utf-8?B?cElRemc0MjhHMk9aOFExMnI3eGF4MzdoY1R6UVFBMmNPWFlxcE5TTzhoTVRy?=
- =?utf-8?Q?TiR+a8?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?VXJneldic1NQZ3BXNmx2Um5KVFlrV08wZUxxTkNPYnZpbEl6dHBwcDJKSVBV?=
- =?utf-8?B?TTNzUzVIdzNvZEdvelVUY1RXQWZlL0dSYTlRVmtnZTRZNGxiL0dZTHBCK0F0?=
- =?utf-8?B?eThMWVhMYXluZkg3dHR4MElkQWxnZ0VtTEs0Z09VenhrSkhSbHh2c0JQK3Ni?=
- =?utf-8?B?Y2FmcFJTdW9GNElKWGVXa0pvbE9zcGd2VHpGc2VYZ0w0c0tMN2NCbFpwTnZp?=
- =?utf-8?B?VUlJRitMTWJkeWxpWGNwVXRFMzc2OHRNV3lldnBoRWdubDNoUjlKaVM0Y3ZD?=
- =?utf-8?B?U1ZTRGttUnA4OWVYanc3Q2tiR0w1azJ6ZkFvakRiUGVLdVJVTHVST2pQNzVq?=
- =?utf-8?B?ZFZTSVBtU0RnVGM3eTJIemY1THMyL1BPZDVUQW1YWjJkZmVGQWRnVDlsV3hw?=
- =?utf-8?B?Zit4VS8yTVVDd2RaNW1uVDRzRERPT040Z1VxcVJIcXJDM3Z4OHZNTTl1VWY5?=
- =?utf-8?B?c1lSSzZTVm9QT1BwY3FMS3ZiQzlKb2RmRXdzbCtlUDVCZWp4cUZybGFhenFJ?=
- =?utf-8?B?dlZZREJneVkrOXZ3dnIvTHUyN1RnRElxTnhvYUZqYTBYdVlMdEhXdGdicTZ6?=
- =?utf-8?B?QWFkQ25Hcjd4WE5KZ1k5cGMvNGRoMFZRMFJjZjRHT3hBUFN6V2ljbksvQVhR?=
- =?utf-8?B?VERnWVdoVnNtcHY0bE9LdVpOeTlnRmRxdHpmbVF1NlhObi9iVkF2TVQ5Vnpz?=
- =?utf-8?B?a3VRbHhDSXRHZFNhUWVtTEhzYjZlTFZkZ3BTLzBCMjAya29OWjhZUm45MndO?=
- =?utf-8?B?eHI3OTdnMi8wRnZQbWJURlp2K2V3TnFnTWdYT2pzZGt5NkRCY3ZjeS85ZTFK?=
- =?utf-8?B?aVBDNXpiSzJrSEdTZ2R4VHcwdFdSQW9GRmEvRDFQSThpUFVJakpPRDBEOFRt?=
- =?utf-8?B?dEZQYzBVS0ZQOC85b3dTMTBVT0Y4T0JkTCtCRUNJMGtuOWJZcU13bGU1L1Jt?=
- =?utf-8?B?SmlSczhtNWhlTkVjdHk1NVFwUjFlQ2diR1RIUkZaSnhYMkFtTlY5UjhpZERM?=
- =?utf-8?B?ZVNNZmk1R0J4U3JIT0FzY0srUE1ML0Y1ZmZ3dXVrWDAxRm96UmpNTklvaFF0?=
- =?utf-8?B?OE84ZS9XQXdDNjVMMnlxUjlpbk5WOFFtYWxwU08zaTNiNEdkeDVFS2tKUC9t?=
- =?utf-8?B?UUZGZHJIUGVZNFBEQmdsMTlLc2svUXlPa2hWclI3UmJJWnA4TWg1Y3lzMXQv?=
- =?utf-8?B?MzAvV2VsY3FDVnlrd09YdzhNN01UREZBeEtveFlLV2NIZTlpb09vdnZVUldN?=
- =?utf-8?B?KzJJYTJ0ME5EVXpsbnBuQjRxUDFNM2NWcTNjMmoxQ2p4cEJqVjZYQVAzSUdL?=
- =?utf-8?B?azZDRnByWDhrUCtMSGhVZlBRTDM1eEhmRzlJcjV3YkNNN2xTOTAydjZZTXdC?=
- =?utf-8?B?dTIvVTdBZXc2Rm5IdFpZRkJ3Sk03cDN4WDZWdUY1WnpPWHozSDNyMWpFZ0F2?=
- =?utf-8?B?TGwzeWRKKzZ6d01HdHgrdG5UZjRCNmFvNEJQeExXTjdxVk9GM1NnSzkwL0Fm?=
- =?utf-8?B?QndVS1hwS2Y2QldlRW1Lbk9BaktVWDg0N1hxSGNoMVUrOE1WQzJ5akdsdTVx?=
- =?utf-8?B?cldqWHNIOHRGVlNGTjZIWTRwWFBkUnFwVWRDck5wVnRSZE9DOUYzU2VSSmNu?=
- =?utf-8?B?U2VoRE5LTTVselZnamQrWWRPZUdoMHBNQkZKUVpjWk10QWFCRTFROVJuSGlt?=
- =?utf-8?B?TDlRWVhwTllzaTc1cmw2d0ZFTUludmU5ZDI3QitGZExFbTd3eElFNXNqelNp?=
- =?utf-8?B?dTRQNUUwY0hVNmpJL290RHV4czVGM283L1dqR3dhQ2JzR20vdWFCdW1vbTBq?=
- =?utf-8?B?eGMrRk1VdjRHMGZGYU1aUEV6cjdyM3dLRlFlTTBETjg3UkdyRVMwRW91WDcy?=
- =?utf-8?B?OHJReUczZjRRajBFM1U2MDdVekgxcTNURmprbUFZQVpCb2IrWDEwL0pFUnVm?=
- =?utf-8?B?R3N0a1dqTnJ6cVNkMWczTHFGK25tU1RDKzN4RzNkOFcydGlCZUE2QkdPdVZ4?=
- =?utf-8?B?NDVyeUNSREdycnBXZjU1amwrMmF0MG53MFVmMGZpMkZNTytSd3ROTy9zRmhl?=
- =?utf-8?B?WlluUkFYVXQ2dFpyK0w0bUlhQU9TVzNLWW5mWHF6enY2Y3ptK21oYXpsMm50?=
- =?utf-8?Q?Z0LafoxLwUx3KF1ymZNxmCVTO?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ecf6903a-6782-4524-de41-08de2f6405d9
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Nov 2025 16:26:17.7068
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3ShzVokxCGM8iJ+k7yPPjyiHsiOQOZBPJLPxTzK10JqXbteg+LsKWxihNaH0XTbjCDll2+QiCYwHozazrI4HoQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB8001
+References: <20251127163219.40389-1-ssrane_b23@ee.vjti.ac.in> <aSlbccUo_YwqehWL@thinkpad>
+In-Reply-To: <aSlbccUo_YwqehWL@thinkpad>
+From: SHAURYA RANE <ssrane_b23@ee.vjti.ac.in>
+Date: Sat, 29 Nov 2025 21:59:29 +0530
+X-Gm-Features: AWmQ_bncfrkXutO0UvCWkOMRLGDeLeQrwA1iDa4opKW2TpPzUzBDSLvdOBQIILQ
+Message-ID: <CANNWa06MVDaEGKVyNW=LGUsFg+OM-RRW-vfBBkR5Vpb+pk4pxw@mail.gmail.com>
+Subject: Re: [PATCH net v2] net/hsr: fix NULL pointer dereference in skb_clone
+ with hw tag insertion
+To: Felix Maurer <fmaurer@redhat.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, jkarrenpalo@gmail.com, 
+	arvid.brodin@alten.se, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	skhan@linuxfoundation.org, linux-kernel-mentees@lists.linux.dev, 
+	david.hunter.linux@gmail.com, khalid@kernel.org, 
+	syzbot+2fa344348a579b779e05@syzkaller.appspotmail.com, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Nov 28, 2025 at 1:51=E2=80=AFPM Felix Maurer <fmaurer@redhat.com> w=
+rote:
+>
+> On Thu, Nov 27, 2025 at 10:02:19PM +0530, Shaurya Rane wrote:
+> > When NETIF_F_HW_HSR_TAG_INS is enabled and frame->skb_std is NULL,
+> > hsr_create_tagged_frame() and prp_create_tagged_frame() call skb_clone(=
+)
+> > with a NULL pointer.
+>
+> Have you acually tested this or do you have any other indication that
+> this can happen? After all, you are suggesting that this kernel crash in
+> a syzbot VM is caused by a (very uncommon) feature of hardware NICs.
+>
+Agreed. The syzbot reproducer uses PRP (protocol=3D1), and the crash
+path goes through prp_get_untagged_frame() where __pskb_copy() can
+fail and return NULL. I tested the patch with syzbot and the bug no
+longer reproduces, confirming this is the actual root cause.
 
-On 11/28/25 20:29, Alejandro Lucero Palau wrote:
+> > Similarly, prp_get_untagged_frame() doesn't check
+> > if __pskb_copy() fails before calling skb_clone().
 >
-> On 11/28/25 19:44, PJ Waskiewicz wrote:
->> Hi Alejandro,
->>
->> On Wed, 2025-11-19 at 19:22 +0000, alejandro.lucero-palau@amd.com
->> wrote:
->>> From: Alejandro Lucero <alucerop@amd.com>
->>>
->>> The patchset should be applied on the described base commit then
->>> applying
->>> Terry's v13 about CXL error handling. The first 4 patches come from
->>> Dan's
->>> for-6.18/cxl-probe-order branch with minor modifications.
->>>
->>> v21 changes;
->>>
->>>    patch1-2: v20 patch1 splitted up doing the code move in the second
->>>         patch in v21. (Jonathan)
->>>      patch1-4: adding my Signed-off tag along with Dan's
->>>
->>>    patch5: fix duplication of CXL_NR_PARTITION definition
->>>
->>>    patch7: dropped the cxl test fixes removing unused function. It was
->>>       sent independently ahead of this version.
->>>
->>>    patch12: optimization for max free space calculation (Jonathan)
->>>
->>>    patch19: optimization for returning on error (Jonathan)
->>>
->> So I'm unable to get these patches working with a Type2 device that
->> just needs its existing resources auto-discovered by the CXL core.
->> These patches are assuming the underlying device will require full
->> setup and allocations for DPA and HPA.  I'd argue that a true Type2
->> device will not be doing that today with existing BIOS implementations.
+> I suspect that this is really the only condition that can trigger the
+> crash in question. This would also match that the syzbot reproducer hits
+> this with a PRP interface (IFLA_HSR_PROTOCOL=3D0x1).
+That makes sense. I've dropped the NETIF_F_HW_HSR_TAG_INS checks and
+sent v3 with only the prp_get_untagged_frame() fix.That makes sense.
+I've dropped the NETIF_F_HW_HSR_TAG_INS checks and sent v3 with only
+the prp_get_untagged_frame() fix and tested it with the syzbot
+reproducer .
 >
+> > This causes a kernel crash reported by Syzbot:
+> >
+> > Oops: general protection fault, probably for non-canonical address 0xdf=
+fffc000000000f: 0000 [#1] SMP KASAN NOPTI
+> > KASAN: null-ptr-deref in range [0x0000000000000078-0x000000000000007f]
+> > CPU: 0 UID: 0 PID: 5625 Comm: syz.1.18 Not tainted syzkaller #0 PREEMPT=
+(full)
+> > Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-=
+1.16.3-2~bpo12+1 04/01/2014
+> > RIP: 0010:skb_clone+0xd7/0x3a0 net/core/skbuff.c:2041
+> > Code: 03 42 80 3c 20 00 74 08 4c 89 f7 e8 23 29 05 f9 49 83 3e 00 0f 85=
+ a0 01 00 00 e8 94 dd 9d f8 48 8d 6b 7e 49 89 ee 49 c1 ee 03 <43> 0f b6 04 =
+26 84 c0 0f 85 d1 01 00 00 44 0f b6 7d 00 41 83 e7 0c
+> > RSP: 0018:ffffc9000d00f200 EFLAGS: 00010207
+> > RAX: ffffffff892235a1 RBX: 0000000000000000 RCX: ffff88803372a480
+> > RDX: 0000000000000000 RSI: 0000000000000820 RDI: 0000000000000000
+> > RBP: 000000000000007e R08: ffffffff8f7d0f77 R09: 1ffffffff1efa1ee
+> > R10: dffffc0000000000 R11: fffffbfff1efa1ef R12: dffffc0000000000
+> > R13: 0000000000000820 R14: 000000000000000f R15: ffff88805144cc00
+> > FS:  0000555557f6d500(0000) GS:ffff88808d72f000(0000) knlGS:00000000000=
+00000
+> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > CR2: 0000555581d35808 CR3: 000000005040e000 CR4: 0000000000352ef0
+> > Call Trace:
+> >  <TASK>
+> >  hsr_forward_do net/hsr/hsr_forward.c:-1 [inline]
+> >  hsr_forward_skb+0x1013/0x2860 net/hsr/hsr_forward.c:741
+> >  hsr_handle_frame+0x6ce/0xa70 net/hsr/hsr_slave.c:84
+> >  __netif_receive_skb_core+0x10b9/0x4380 net/core/dev.c:5966
+> >  __netif_receive_skb_one_core net/core/dev.c:6077 [inline]
+> >  __netif_receive_skb+0x72/0x380 net/core/dev.c:6192
+> >  netif_receive_skb_internal net/core/dev.c:6278 [inline]
+> >  netif_receive_skb+0x1cb/0x790 net/core/dev.c:6337
+> >  tun_rx_batched+0x1b9/0x730 drivers/net/tun.c:1485
+> >  tun_get_user+0x2b65/0x3e90 drivers/net/tun.c:1953
+> >  tun_chr_write_iter+0x113/0x200 drivers/net/tun.c:1999
+> >  new_sync_write fs/read_write.c:593 [inline]
+> >  vfs_write+0x5c9/0xb30 fs/read_write.c:686
+> >  ksys_write+0x145/0x250 fs/read_write.c:738
+> >  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+> >  do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+> >  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> > RIP: 0033:0x7f0449f8e1ff
+> > Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 f9 92 02 00 48 8b 54 24=
+ 18 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 01 00 00 00 0f 05 <48> 3d 00 f0 =
+ff ff 77 31 44 89 c7 48 89 44 24 08 e8 4c 93 02 00 48
+> > RSP: 002b:00007ffd7ad94c90 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
+> > RAX: ffffffffffffffda RBX: 00007f044a1e5fa0 RCX: 00007f0449f8e1ff
+> > RDX: 000000000000003e RSI: 0000200000000500 RDI: 00000000000000c8
+> > RBP: 00007ffd7ad94d20 R08: 0000000000000000 R09: 0000000000000000
+> > R10: 000000000000003e R11: 0000000000000293 R12: 0000000000000001
+> > R13: 00007f044a1e5fa0 R14: 00007f044a1e5fa0 R15: 0000000000000003
+> >  </TASK>
+> >
+> > Fix this by adding NULL checks for frame->skb_std before calling
+> > skb_clone() in the affected functions.
+> >
+> > Reported-by: syzbot+2fa344348a579b779e05@syzkaller.appspotmail.com
+> > Closes: https://syzkaller.appspot.com/bug?extid=3D2fa344348a579b779e05
+> > Fixes: f266a683a480 ("net/hsr: Better frame dispatch")
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
+> > ---
+> >  net/hsr/hsr_forward.c | 6 ++++++
+> >  1 file changed, 6 insertions(+)
+> >
+> > diff --git a/net/hsr/hsr_forward.c b/net/hsr/hsr_forward.c
+> > index 339f0d220212..8a8559f0880f 100644
+> > --- a/net/hsr/hsr_forward.c
+> > +++ b/net/hsr/hsr_forward.c
+> > @@ -205,6 +205,8 @@ struct sk_buff *prp_get_untagged_frame(struct hsr_f=
+rame_info *frame,
+> >                               __pskb_copy(frame->skb_prp,
+> >                                           skb_headroom(frame->skb_prp),
+> >                                           GFP_ATOMIC);
+> > +                     if (!frame->skb_std)
+> > +                             return NULL;
+> >               } else {
+> >                       /* Unexpected */
+> >                       WARN_ONCE(1, "%s:%d: Unexpected frame received (p=
+ort_src %s)\n",
 >
-> Well, I'd argue this patchset is what the sfc driver needs, which is 
-> the client for this "initial Type2 basic support".
+> This check looks good to me.
 >
+> > @@ -341,6 +343,8 @@ struct sk_buff *hsr_create_tagged_frame(struct hsr_=
+frame_info *frame,
+> >               hsr_set_path_id(frame, hsr_ethhdr, port);
+> >               return skb_clone(frame->skb_hsr, GFP_ATOMIC);
+> >       } else if (port->dev->features & NETIF_F_HW_HSR_TAG_INS) {
+> > +             if (!frame->skb_std)
+> > +                     return NULL;
+> >               return skb_clone(frame->skb_std, GFP_ATOMIC);
+> >       }
+> >
+> > @@ -385,6 +389,8 @@ struct sk_buff *prp_create_tagged_frame(struct hsr_=
+frame_info *frame,
+> >               }
+> >               return skb_clone(frame->skb_prp, GFP_ATOMIC);
+> >       } else if (port->dev->features & NETIF_F_HW_HSR_TAG_INS) {
+> > +             if (!frame->skb_std)
+> > +                     return NULL;
+> >               return skb_clone(frame->skb_std, GFP_ATOMIC);
+> >       }
 >
->> I've tested this behavior on both Intel and AMD platforms (GNR and
->> Turin), and they're behaving the same way.  Both will train up the
->> Type2 device, see there's an advertised CXL.mem region marked EFI
->> Special Purpose memory, and will map it and program the decoders.
->> These patches partially see those decoders are already programmed, but
->> does not bypass that fact, and still attemps to dynamically allocate,
->> configure, and commit, the whole flow.  This assumption fails the init
->> path.
+> If any of these two conditions happen we have a different, serious
+> problem that needs to be fixed elsewhere.
 >
+> In hsr_create_tagged_frame(), we first check if we have an skb_hsr (an
+> skb containing an already tagged message). If we don't, it has to be an
+> skb_std (an skb without any tag). If !skb_std, we are either 1) handing
+> around a frame without any skb; or 2) handing a PRP frame to an HSR
+> function. In both cases, this would need to be fixed where the problem
+> is introduced.
 >
-> Fair enough. We knew about this and as I said, something I would 
-> prefer to do as a follow up work or this patchset will be delayed, 
-> likely until a new requirement is found out like the problem about 
-> DVSEC BAR already being mapped, then waiting for the next thing not 
-> covered in this "initial Type2 basic support".
+> Thanks,
+>    Felix
 >
->
->>
->> I think there needs to be a bit of a re-think here.  I briefly chatted
->> with Dan offline about this, and we do think a different approach is
->> likely needed.  The current CXL core for Type3 devices can handle when
->> the BIOS/platform firmware already discovers and maps resources, so we
->> should be able to do that for this case.
->
->
-> I'm sad to hear that ... I'm getting internal pressure for getting 
-> this Type2 done and I realize now it will require "a different 
-> approach" for being accepted.
->
->
-> Being honest, this is quite demoralizing. Maybe I'm not the right 
-> person to get this through.
->
->
-
-Feeling more positive today ...
-
-
-Looking at my hack for solving this problem, what I suffered (as I did 
-explain) with my testing with a BIOS not supporting yet the 
-EFI_RESERVED_TYPE and the EFI_ADAPTER_INFO_PROTOCOL  protocol, I think 
-it is possible to include the changes with some minor adjustments and 
-without too much code. It relies on the same code than for Type3 when 
-initializing the endpoint decoder, so the region will be created 
-automatically at that point, although through the device creation + 
-probe for the port and the region, so the way for the type2 driver to 
-get the HPA to work with (iorenmap) needs to be based on other means 
-since the region could not be there after the call for creation the memdev.
-
-
-It brings other things to discuss about what the type2 should do on 
-exit, since the endpoint HDM and the CXL Host Bridge HDM should not be 
-modified then when doing the unwinding. So the sooner we can see what 
-could be done the better for starting such discussion.
-
-
-I will send v22 including this functionality early next week. Benjamin 
-Cheatham solved this problem with a different approach, what, IMO, is 
-more complex, mainly due to the region creation when endpoint decoder is 
-initialised precluded by a check, which interestingly Ben proposed in 
-earlier patchset versions ...
-
-
->
->> If you're going to be at Plumbers in a week or so, this would be a
->> great topic if we could grab a whiteboard somewhere and just hack on
->> it.  Otherwise we can also chat on the Discord (I just joined finally)
->>
->> Cheers,
->> -PJ
+Thanks, Shaurya
 
