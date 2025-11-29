@@ -1,125 +1,126 @@
-Return-Path: <netdev+bounces-242661-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242663-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71DBFC937B7
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 05:01:31 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69D5AC937ED
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 05:13:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0CCBC4E18F0
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 04:01:30 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 166623487CD
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 04:13:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDF231EE7B7;
-	Sat, 29 Nov 2025 04:01:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7708D22F77E;
+	Sat, 29 Nov 2025 04:13:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="4NgXew0S"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ch2N2R2i"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A5C23C17;
-	Sat, 29 Nov 2025 04:01:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46D54226D02;
+	Sat, 29 Nov 2025 04:13:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764388886; cv=none; b=c7jYS8q2gIckcOk/82eRLLi1WZWzexR7Xi7aX8WFwPt1L9iEHqwcNnPc5XRJetnuer3WfrYIDM0R45mzSVI9aSB0Yz2BSnOLwPjNaI7UjVXJ6RYgV3gWzAka88/bl0z7L94RZyTIAl4Lnt/U0qD8eJKhtKNGiSMRwFlDzG+KD94=
+	t=1764389608; cv=none; b=GCwI8cQWqnXDyh7W1S/7JgFN8fow+1wi4Ut0gtDDXppE6Z4mCu52qMgaqvR6yeQQTE7FlJrAPSSTCiMhdDPyW2C+HznExIJ/8M4aOStwhV9rvEMfm35wmJYcMcVzzAnYJHqCdi2c3veGb+OnZtmSKxLWRCaIq0arrvvyceHVxN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764388886; c=relaxed/simple;
-	bh=3qW7JUmVgKHM+MEsT6lk1sKvrS6m1FSVEHtDSmOIfik=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=G2qYjVK6ifW2qK4CT6Z3nPTj148q59D/bvFFTMu4O+zKod5Pw+NeLBau/kqUcy+ntwRajS17H75BZQDri2ClOrxKALknNbtEqT9z23zylu+JOMO2QRUubVaB1ZSUKutznlB7/FaUBEKkGwwNr8ilL3D5wAJ1v/ODnAlB6ezBOoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=4NgXew0S; arc=none smtp.client-ip=113.46.200.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=B2Q59GRZ2Vr7+M8qAogZOt38f65MXVF5cCT2NkOwias=;
-	b=4NgXew0SFtTvwTNSGUpKUyO/JXkAsDDMxgn3oZGpiqmV/ml2PR7cHkrDaiOF6BKhs8yZ0QQhN
-	6oyUror0hLHmdGG5KZuvwvRrDSY6GhLI3bapwUXXo6qBeL5yE31MKiSRkEtIHXz2zHUlNel7mXk
-	nqf148Z5Q6DifJzuUDZuBSc=
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4dJGcd6Vqrz12LD2;
-	Sat, 29 Nov 2025 11:58:57 +0800 (CST)
-Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
-	by mail.maildlp.com (Postfix) with ESMTPS id 15142180478;
-	Sat, 29 Nov 2025 12:01:22 +0800 (CST)
-Received: from [10.174.177.19] (10.174.177.19) by
- dggpemf500016.china.huawei.com (7.185.36.197) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 29 Nov 2025 12:01:21 +0800
-Message-ID: <17e41b73-3497-4ea0-b91c-4710514f7b14@huawei.com>
-Date: Sat, 29 Nov 2025 12:01:20 +0800
+	s=arc-20240116; t=1764389608; c=relaxed/simple;
+	bh=jVt2VZrxSvr4OBx8ByQS9DhjVELgdDft9Gv+fjiNEMc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=lCJKmT59XZNs3y0fDWlw1+yzkwuhgBsJ7crrmL72CiJ0rUgZzQiDCZ2I/HOZFv56pLNZic9rs2BjNLIgToMYf37PWEyeZIn5uiy3zQQhXqC0T25we2XzUnR79Sy+wNG1PjvNyXnjlDYL/b7hLUw4T8F7sE2TG2hkRJcQkbVMxwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ch2N2R2i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8CDFC4CEF7;
+	Sat, 29 Nov 2025 04:13:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764389607;
+	bh=jVt2VZrxSvr4OBx8ByQS9DhjVELgdDft9Gv+fjiNEMc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ch2N2R2iF2KrK0IGpW2AlE2RI5VVft01ynxAybUgtLurY+YcyOXgYe4E4TyRimhz2
+	 g1RAAnhPuxs2Gve0HMoMYMfUd8+rGoLIzQ7UKQvT5rLzvLLk3q9Lew4G2c3gq3Uxtf
+	 PlbO37fiapVgKJvy/ThqxLPtplBjjPVwF1oHnnSNEzakoZ+wH/HG/vY9o/q5g9S9I5
+	 dTWB7yt7PAFaL4bWNeWGYz57rRuXowcX8B2bxaSCKIOOTcnsCBSzNWTOQUa+mJ6QN0
+	 VuLBZ9fICY5Eus3YretVQvRoyRQTt4OqLQmdrSs9GuHSZqPOUh7PBQQFSncd381ywO
+	 PZKz5kyRUVqKA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AA5C9380692B;
+	Sat, 29 Nov 2025 04:10:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: netrom: fix memory leak in nr_output()
-To: Deepanshu Kartikey <kartikey406@gmail.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<horms@kernel.org>
-CC: <linux-hams@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>,
-	<syzbot+d7abc36bbbb6d7d40b58@syzkaller.appspotmail.com>
-References: <20251129034232.405203-1-kartikey406@gmail.com>
-From: Wang Liang <wangliang74@huawei.com>
-In-Reply-To: <20251129034232.405203-1-kartikey406@gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- dggpemf500016.china.huawei.com (7.185.36.197)
+Subject: Re: [PATCH net-next 00/15] Introduce the dsa_xmit_port_mask() tagging
+ protocol helper
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176438942956.896171.5589128104353485627.git-patchwork-notify@kernel.org>
+Date: Sat, 29 Nov 2025 04:10:29 +0000
+References: <20251127120902.292555-1-vladimir.oltean@nxp.com>
+In-Reply-To: <20251127120902.292555-1-vladimir.oltean@nxp.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ alsi@bang-olufsen.dk, clement.leger@bootlin.com, daniel@makrotopia.org,
+ mmyangfl@gmail.com, dqfext@gmail.com, florian.fainelli@broadcom.com,
+ george.mccollister@gmail.com, hauke@hauke-m.de, jonas.gorski@gmail.com,
+ kurt@linutronix.de, linus.walleij@linaro.org,
+ linux-renesas-soc@vger.kernel.org, sean.wang@mediatek.com,
+ UNGLinuxDriver@microchip.com, woojung.huh@microchip.com
+
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 27 Nov 2025 14:08:47 +0200 you wrote:
+> What
+> ----
+> 
+> Some DSA tags have just the port number in the TX header format, others
+> have a bit field where in theory, multiple bits can be set, even though
+> DSA only sets one.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,01/15] net: dsa: introduce the dsa_xmit_port_mask() tagging protocol helper
+    https://git.kernel.org/netdev/net-next/c/6f2e1c75bc5e
+  - [net-next,02/15] net: dsa: tag_brcm: use the dsa_xmit_port_mask() helper
+    https://git.kernel.org/netdev/net-next/c/621d06a40e47
+  - [net-next,03/15] net: dsa: tag_gswip: use the dsa_xmit_port_mask() helper
+    https://git.kernel.org/netdev/net-next/c/e094428fb40c
+  - [net-next,04/15] net: dsa: tag_hellcreek: use the dsa_xmit_port_mask() helper
+    https://git.kernel.org/netdev/net-next/c/f59e44cc0d6c
+  - [net-next,05/15] net: dsa: tag_ksz: use the dsa_xmit_port_mask() helper
+    https://git.kernel.org/netdev/net-next/c/ea659a9292b1
+  - [net-next,06/15] net: dsa: tag_mtk: use the dsa_xmit_port_mask() helper
+    https://git.kernel.org/netdev/net-next/c/84a60bbec503
+  - [net-next,07/15] net: dsa: tag_mxl_gsw1xx: use the dsa_xmit_port_mask() helper
+    https://git.kernel.org/netdev/net-next/c/a4a00d9e365a
+  - [net-next,08/15] net: dsa: tag_ocelot: use the dsa_xmit_port_mask() helper
+    https://git.kernel.org/netdev/net-next/c/5733fe2a7ad1
+  - [net-next,09/15] net: dsa: tag_qca: use the dsa_xmit_port_mask() helper
+    https://git.kernel.org/netdev/net-next/c/48afabaf4aaa
+  - [net-next,10/15] net: dsa: tag_rtl4_a: use the dsa_xmit_port_mask() helper
+    https://git.kernel.org/netdev/net-next/c/4abf39c8aef5
+  - [net-next,11/15] net: dsa: tag_rtl8_4: use the dsa_xmit_port_mask() helper
+    https://git.kernel.org/netdev/net-next/c/5afe4ccc33f4
+  - [net-next,12/15] net: dsa: tag_rzn1_a5psw: use the dsa_xmit_port_mask() helper
+    https://git.kernel.org/netdev/net-next/c/b33aa90e68b4
+  - [net-next,13/15] net: dsa: tag_trailer: use the dsa_xmit_port_mask() helper
+    https://git.kernel.org/netdev/net-next/c/3c1975bbdf92
+  - [net-next,14/15] net: dsa: tag_xrs700x: use the dsa_xmit_port_mask() helper
+    https://git.kernel.org/netdev/net-next/c/24099389a63f
+  - [net-next,15/15] net: dsa: tag_yt921x: use the dsa_xmit_port_mask() helper
+    https://git.kernel.org/netdev/net-next/c/64b0d2edb61a
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-在 2025/11/29 11:42, Deepanshu Kartikey 写道:
-> When nr_output() fragments a large packet, it calls sock_alloc_send_skb()
-
-
-Hi!
-
-Coincidentally, we both are working on this issue simultaneously.
-
- From the syz test requests:
-https://syzkaller.appspot.com/bug?extid=d7abc36bbbb6d7d40b58
-
-I sended the test patch earlier, only a dozen seconds...
-
-------
-Best regards
-Wang Liang
-
-> in a loop to allocate skbs for each fragment. If this allocation fails,
-> the function returns without freeing the original skb that was passed in,
-> causing a memory leak.
->
-> Add the missing kfree_skb() call before returning on allocation failure.
->
-> Reported-by: syzbot+d7abc36bbbb6d7d40b58@syzkaller.appspotmail.com
-> Tested-by: syzbot+d7abc36bbbb6d7d40b58@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=d7abc36bbbb6d7d40b58
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Signed-off-by: Deepanshu Kartikey <kartikey406@gmail.com>
-> ---
->   net/netrom/nr_out.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/net/netrom/nr_out.c b/net/netrom/nr_out.c
-> index 5e531394a724..2b3cbceb0b52 100644
-> --- a/net/netrom/nr_out.c
-> +++ b/net/netrom/nr_out.c
-> @@ -43,8 +42,11 @@ void nr_output(struct sock *sk, struct sk_buff *skb)
->   		frontlen = skb_headroom(skb);
->   
->   		while (skb->len > 0) {
-> -			if ((skbn = sock_alloc_send_skb(sk, frontlen + NR_MAX_PACKET_SIZE, 0, &err)) == NULL)
-> 			skbn = sock_alloc_send_skb(sk, frontlen + NR_MAX_PACKET_SIZE, 0, &err);
-> 			if (skbn == NULL) {
-> +				kfree_skb(skb);
->   				return;
-> +			}
->   
->   			skb_reserve(skbn, frontlen);
->   
 
