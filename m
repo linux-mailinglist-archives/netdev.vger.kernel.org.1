@@ -1,175 +1,112 @@
-Return-Path: <netdev+bounces-242690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20F7FC93ACA
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 10:05:48 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C0BAC93B13
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 10:21:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE0A43A4B64
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 09:05:46 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D1B594E101B
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 09:21:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD9601DB34C;
-	Sat, 29 Nov 2025 09:05:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 330EF224B06;
+	Sat, 29 Nov 2025 09:21:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="eI9oXloz";
-	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="pUFSeI7e"
+	dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b="B8illfKG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.167])
+Received: from mail.toke.dk (mail.toke.dk [45.145.95.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E520C182B7;
-	Sat, 29 Nov 2025 09:05:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.167
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764407144; cv=pass; b=hMEIrky4o2vQu9CwHC9Lqmu+2Xn0ND+O3F2C8HnleSF9078PtSWA6LMVeWKeq4To4pKCosX6CW9E1ipiHmD17xg2gk1YF5nMYoBRhISlCV69/Rq9/Xn+xpG61BcxNPOY4S++I0igeHip7R7oQhD7ahLgImPvunOEnIyyxMSyTAo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764407144; c=relaxed/simple;
-	bh=bfMBh4mimLEPfGPDi75INKA79yyZVuJeabO1DwElFPM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ruWFw92MayRNtvoP2PkRRQMg0EfDfgU9i+hUpc12bcfvVDCijdV/OyG1WyKJtUMmrwz6raD6QPMfShPzBIbtuh4iCoPmG/vje6/wvYrSrYBoLHKvJA2yWIEFJczFEWyh08ddd+9BMeRVY+iwb3iP2pDYmdwyp21R9k8y14N9BJg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=eI9oXloz; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=pUFSeI7e; arc=pass smtp.client-ip=81.169.146.167
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
-ARC-Seal: i=1; a=rsa-sha256; t=1764407120; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=efE7kTKabNBm82ie9wqEguihMXevEEj4taeX8DYM9MtQCowfZibngzDAZ6oAnWKcWB
-    R+7AQBBLVW1fQ6SjQoV92qxLnfere6C9YqWoxuy0QxDmmqAPcx+nxvDpr/OSeBHR2XxX
-    aS41J1ZYlumyDjXfsS+UqtZmnuGwjEHboAPtwZBZsfXk47j7W40FNCT6Z5qa5JHPNjx1
-    PQr+xgilnTntGkthVDbl+t3i0aZm1EexBmyuesLMbilnS3HcSa/LwZThzs9Y3GvpHRBd
-    d0sq+P3tck9Tks9aVo4glmY1b9r3sNsdqhYiGQTAGZCsgoHB2sVF4SyGmw4KFB2WAboy
-    f5JQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1764407120;
-    s=strato-dkim-0002; d=strato.com;
-    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
-    bh=Ozjv4i0J+m53PPTrH8/6rc/sa1uDjmueK5DsDlPmUYY=;
-    b=f0ViQELnIkW78lblQbdeKNfVdfGimrMpJ4AClEp5COgxjgZpN9tfXUST5y04Gts2rU
-    bYiyKMgYlr4C0XTMvWRdcFrqdRtxh2lM2LRSek7y9PAt2XUu3nhiu3yrLHHa2KiWVLBW
-    7I8xhmR1Ph6aW9BQFfNzBw8onuZtleZnKenvAPU8Cy/qshEACcqa3SVwWsELlZHVnrsq
-    Kga0TFclYhvZUuB+JkexonZd/tC77mgq5OVa1edWc9cw8L1J7q0Uc961aSGhihCf3WU6
-    Ddrw+oaxijKxcYQ6uHHpFC/QTv+QQnv7ZhtPO7OSlenbpT53HwUSET8uwIWGJ5qWaG9H
-    OF5A==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1764407120;
-    s=strato-dkim-0002; d=hartkopp.net;
-    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
-    bh=Ozjv4i0J+m53PPTrH8/6rc/sa1uDjmueK5DsDlPmUYY=;
-    b=eI9oXlozKQin2YljHHEQ5ZU3jSKHbG9p9voB3+b+imG7e2gw/GHT2WlBgY3hfQ8kX7
-    I/zbJULvh3gKwKdIcXtKS49+OpunQgLBNyLjswrpZWwbCeXHSOMhZ1vYAlXNhRQVgO5K
-    M2oobY2XwJH+MMA11NJ3RuhgxnRVJ/q+EuG/KpPw1JTGpDTdfu4rkGjHPAzeGa6coKDQ
-    720rH4OQu8NeUZhxTb3f5s1EYgd2Wh4m9KLv40767GObKZ6rLVluIf3qc/08aCiSv62d
-    OF06f0W0D9qw9WTO7HcqttMjyDRiYG7TOk9fBPHp8aadirjiTOhrBc492e5Tv331Vr6s
-    48gQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1764407120;
-    s=strato-dkim-0003; d=hartkopp.net;
-    h=Message-ID:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
-    bh=Ozjv4i0J+m53PPTrH8/6rc/sa1uDjmueK5DsDlPmUYY=;
-    b=pUFSeI7eDzmWLsJLUWffY/2YKiWhHcd4KdHbJAlabZwZclgrHafnzWcfF0j6S79RlI
-    Q3niX1oEZTK2X6pBjPAw==
-X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tTUsMrZpkO3Mw3lZ/t54cFxeEQ7s8bGWj0Q=="
-Received: from lenov17.lan
-    by smtp.strato.de (RZmta 54.0.0 AUTH)
-    with ESMTPSA id Ke2b461AT95IiQW
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Sat, 29 Nov 2025 10:05:18 +0100 (CET)
-From: Oliver Hartkopp <socketcan@hartkopp.net>
-To: linux-can@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	kernel@pengutronix.de,
-	mkl@pengutronix.de,
-	Oliver Hartkopp <socketcan@hartkopp.net>,
-	Vincent Mailhol <mailhol@kernel.org>,
-	kernel test robot <lkp@intel.com>
-Subject: [can-next v3] can: Kconfig: select CAN driver infrastructure by default
-Date: Sat, 29 Nov 2025 10:05:00 +0100
-Message-ID: <20251129090500.17484-1-socketcan@hartkopp.net>
-X-Mailer: git-send-email 2.47.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DDCA3B2A0
+	for <netdev@vger.kernel.org>; Sat, 29 Nov 2025 09:21:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.145.95.4
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764408110; cv=none; b=Pl0wcICC5kSHuCMXwZuFrlQJaMRcVQunEBnyVaqMc5E5Q3MTAsoC6Fi2ntwYqRlhPb8EqwBXMOmYM91XYZKhq5hXMcUMCoi8QGr2+YXvKfRqlzPIxQOlXsX5LufOfnLfG8h2EJXpL2GpVnkxk2F/v7S5xLayy2uq2PZI7mXhUQk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764408110; c=relaxed/simple;
+	bh=TcHF9XI+kpMbFyGDJlrjny70cbMfdgOug3ms9WKBPl4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Ovfls/tcFZy0igZJtwJGWMZXY+Jjb2AtCY7F8fomWi0FKqoThy56pawKaPGQIxrPwgKIqhj8HX1glSzl7pk1QbsKnbv2i5hxxUeOpxl+CWEb8vFwBL1ykO2K9iubns2Qo8CJAq7J4glLfVAVNmMbQgKd994mtdROgn8HZEfzC2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk; spf=pass smtp.mailfrom=toke.dk; dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b=B8illfKG; arc=none smtp.client-ip=45.145.95.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=toke.dk
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=toke.dk; s=20161023;
+	t=1764408095; bh=TcHF9XI+kpMbFyGDJlrjny70cbMfdgOug3ms9WKBPl4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=B8illfKGqRmxTe+Hw/pryELSotuukBz7eIrdjZ14eGSw49arwh8yrw5fGQTwF6CjL
+	 HRrHmziB7DQqVW29bk4WSXKkCwRqioiiJQrOV1+jShpdMXsIT9HOAw9+9GqjysDnRt
+	 IVi8hybtYRmeIHA4ZbQBQxQAnRwN8/MkjX9dqA1iWr2nioV/d24DVfHgm8Yb+su5jV
+	 Pwy7DE16Sxi5oZ/JJ6/OA+Fy/XtY2gVNBgkTVzhNTCseSkYoKWpe+KiTUf42m246dR
+	 WXftBuGoKDN4+Wdn8tJZcbjLhro/ES1sy77ybXSa7YvSJQ6phJJ6Fh5L+Zt6fTIXGp
+	 JRsNS2REtfP9Q==
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jamal Hadi Salim
+ <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko
+ <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: Jonas =?utf-8?Q?K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>,
+ cake@lists.bufferbloat.net,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 2/4] net/sched: sch_cake: Add cake_mq qdisc
+ for using cake on mq devices
+In-Reply-To: <willemdebruijn.kernel.2e44851dd8b26@gmail.com>
+References: <20251127-mq-cake-sub-qdisc-v2-0-24d9ead047b9@redhat.com>
+ <20251127-mq-cake-sub-qdisc-v2-2-24d9ead047b9@redhat.com>
+ <willemdebruijn.kernel.2e44851dd8b26@gmail.com>
+Date: Sat, 29 Nov 2025 10:21:34 +0100
+X-Clacks-Overhead: GNU Terry Pratchett
+Message-ID: <87a505b3dt.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-The CAN bus support enabled with CONFIG_CAN provides a socket-based
-access to CAN interfaces. With the introduction of the latest CAN protocol
-CAN XL additional configuration status information needs to be exposed to
-the network layer than formerly provided by standard Linux network drivers.
+Willem de Bruijn <willemdebruijn.kernel@gmail.com> writes:
 
-This requires the CAN driver infrastructure to be selected by default.
-As the CAN network layer can only operate on CAN interfaces anyway all
-distributions and common default configs enable at least one CAN driver.
+> Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>> Add a cake_mq qdisc which installs cake instances on each hardware
+>> queue on a multi-queue device.
+>>=20
+>> This is just a copy of sch_mq that installs cake instead of the default
+>> qdisc on each queue. Subsequent commits will add sharing of the config
+>> between cake instances, as well as a multi-queue aware shaper algorithm.
+>>=20
+>> Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
+>> Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+>> ---
+>>  net/sched/sch_cake.c | 214 ++++++++++++++++++++++++++++++++++++++++++++=
+++++++-
+>>  1 file changed, 213 insertions(+), 1 deletion(-)
+>
+> Is this code duplication unavoidable?
+>
+> Could the same be achieved by either
+>
+> extending the original sch_mq to have a variant that calls the
+> custom cake_mq_change.
+>
+> Or avoid hanging the shared state off of parent mq entirely. Have the
+> cake instances share it directly. E.g., where all but the instance on
+> netdev_get_tx_queue(dev, 0) are opened in a special "shared" mode (a
+> bit like SO_REUSEPORT sockets) and lookup the state from that
+> instance.
 
-So selecting CONFIG_CAN_DEV when CONFIG_CAN is selected by the user has
-no effect on established configurations but solves potential build issues
-when CONFIG_CAN[_XXX]=y is set together with CANFIG_CAN_DEV=m
+We actually started out with something like that, but ended up with the
+current variant for primarily UAPI reasons: Having the mq variant be a
+separate named qdisc is simple and easy to understand ('cake' gets you
+single-queue, 'cake_mq' gets you multi-queue).
 
-Fixes: 1a620a723853 ("can: raw: instantly reject unsupported CAN frames")
-Reported-by: Vincent Mailhol <mailhol@kernel.org>
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202511282325.uVQFRTkA-lkp@intel.com/
-Suggested-by: Marc Kleine-Budde <mkl@pengutronix.de>
-Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
----
+I think having that variant live with the cake code makes sense. I
+suppose we could reuse a couple of the mq callbacks by exporting them
+and calling them from the cake code and avoid some duplication that way.
+I can follow up with a patch to consolidate those if you think it is
+worth it to do so?
 
-v2: In fact CONFIG_CAN_NETLINK was missing too. Reported by kernel test robot.
-v3: With the change in dev.h the compilation of the of the netlink code can be
-    avoided when only virtual CAN interfaces (vcan, vxcan) are required.
-
----
-
- include/linux/can/dev.h | 7 +++++++
- net/can/Kconfig         | 1 +
- 2 files changed, 8 insertions(+)
-
-diff --git a/include/linux/can/dev.h b/include/linux/can/dev.h
-index 13b25b0dceeb..2514a5c942e5 100644
---- a/include/linux/can/dev.h
-+++ b/include/linux/can/dev.h
-@@ -109,11 +109,18 @@ struct net_device *alloc_candev_mqs(int sizeof_priv, unsigned int echo_skb_max,
- #define alloc_candev_mq(sizeof_priv, echo_skb_max, count) \
- 	alloc_candev_mqs(sizeof_priv, echo_skb_max, count, count)
- void free_candev(struct net_device *dev);
- 
- /* a candev safe wrapper around netdev_priv */
-+#if IS_ENABLED(CONFIG_CAN_NETLINK)
- struct can_priv *safe_candev_priv(struct net_device *dev);
-+#else
-+static inline struct can_priv *safe_candev_priv(struct net_device *dev)
-+{
-+	return NULL;
-+}
-+#endif
- 
- int open_candev(struct net_device *dev);
- void close_candev(struct net_device *dev);
- void can_set_default_mtu(struct net_device *dev);
- int __must_check can_set_static_ctrlmode(struct net_device *dev,
-diff --git a/net/can/Kconfig b/net/can/Kconfig
-index af64a6f76458..e4ccf731a24c 100644
---- a/net/can/Kconfig
-+++ b/net/can/Kconfig
-@@ -3,10 +3,11 @@
- # Controller Area Network (CAN) network layer core configuration
- #
- 
- menuconfig CAN
- 	tristate "CAN bus subsystem support"
-+	select CAN_DEV
- 	help
- 	  Controller Area Network (CAN) is a slow (up to 1Mbit/s) serial
- 	  communications protocol. Development of the CAN bus started in
- 	  1983 at Robert Bosch GmbH, and the protocol was officially
- 	  released in 1986. The CAN bus was originally mainly for automotive,
--- 
-2.47.3
-
+-Toke
 
