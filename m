@@ -1,87 +1,48 @@
-Return-Path: <netdev+bounces-242708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7AEEC93E51
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 14:37:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F3F78C93F0C
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 15:08:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 88DF74E1713
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 13:37:20 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8FEB84E1A71
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 14:08:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C26F22773CB;
-	Sat, 29 Nov 2025 13:37:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DF11272E54;
+	Sat, 29 Nov 2025 14:08:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="XfG/umdu";
-	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="GXISY155"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EL1xuBM/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.165])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD95723ABB0;
-	Sat, 29 Nov 2025 13:37:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.165
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764423437; cv=pass; b=MDcFsd7g2roqgKJfVJviFDk7S/e3vxb4are5cKH2uY0txUWvCxF6N2el7BCOWhvexUxZ46KP0HBsCwti4Pb1M4V5SHJCXdwlshkEBeImp05gLBo8/5GAWWvd9FsUrNr8VdHumRzzWqRoq0G4ZV8uyFCJNnRj5sYluyenJPsMExo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764423437; c=relaxed/simple;
-	bh=Nqvm+8eKDFhQsWRma3qttlk2onY5yvqFcmbPxlFQGKQ=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06573D531;
+	Sat, 29 Nov 2025 14:08:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764425291; cv=none; b=jQX2DLk1bD8jyNIn2wwLq9HNHj1lHW1lWfLz5BKrJwngMyeYwAY6UMoK09T8qZw1E2dLZyxU1lcWYFGrFIK8oIjksU4Z5o5kWPvLA1x0xDJGWs2l2QV50YG6MfHUC4qcT8DcDJmslV12BHRfAkwwiVinXedR9Gz7NnhtLqzZ5pI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764425291; c=relaxed/simple;
+	bh=2wLaW6J+5lucMrLRBbj46SiVk6R9/H6dyc5D1IxBoBg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OO8d4YWa0fyMOm+TBpEY7uPdsLGWjt1euLuMx6me21bkTrD2iJQ+hmgYKuNn4CkzaXFS8dOmBknen3eV6nyFhoVtOnKoKcE3zYtChKbZXv9PZQ3XdzmZvD/i3b62PxERor4Sctsb3kBn5DNd9Pr3DiTj1UXzXDL8uLNZipaLY/4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=XfG/umdu; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=GXISY155; arc=pass smtp.client-ip=81.169.146.165
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
-ARC-Seal: i=1; a=rsa-sha256; t=1764423414; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=pinhKtEon57rW2sNKR/tSzLQNHU6UgJykAnlvRXFfsh++gDtiSWAfEUnrKZvlidlF7
-    ynHb0iRAsX//dCnjMlA3W1RnJw4xpv3yHPvrKj7kBT3K2G7AinN/nxhErnrO7IFhqO6k
-    ZX6zO+lpND6li99SAEOV6LhmSPRIbLV5HGv/mIFU7yBpMcmfEIRKUtkmExIHjHi2INRF
-    Gytm5o4ptIJwt62KPt7sI1igL9PQmqqYXzLiRP2sa2cuouJJ7MY6MfuAzk+S2AvDAWHc
-    le+1IZ9CTADZXT976nIiqNRatAgiVDBx1DktYF63pxOJVz9eU2V7PZfqKGXI7dx5xu12
-    zwbg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1764423414;
-    s=strato-dkim-0002; d=strato.com;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=aCAiSwPD73VNdECVmnPR4OE06tOBC6TL2sMZyKjHBTw=;
-    b=AiJ9r4PCCZGuVO8J6kRRBa7NQIXbgLbNu0Uh9lunFJlebh1MmvOSTzKX8vUXyTtAdy
-    GFs1mSlle989hcoWPV0NMd3S3qHKHxxuiQ3lTlcn2cubhUnR9lrXG1OBDMCp4Vi/9Aou
-    SRGsdP5f75QpxHZLHcSE3uu+kUNqyj/FJ2gU+Dh5eBxY5uSaVBPYHgfgD57fnNYnPOiN
-    ylocImFuoTEOmBcs06OGZz89jux1Y3/HO9c37PbZryOJZQx6eUQ9wmmTQyDLHoRTyAB+
-    AYlKy+NzLt8oh0wRuwSwNO4Cntsi/NcXBMbE4cgLV294Cs4Cm3qtLLNVE5e7/9kbqv3I
-    SZSA==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1764423414;
-    s=strato-dkim-0002; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=aCAiSwPD73VNdECVmnPR4OE06tOBC6TL2sMZyKjHBTw=;
-    b=XfG/umduxy7pQhmAAgdU0YeeQYxdm9/FSc3kWObtMc1Wc9lbFMPn/qNK1WjKj1skOi
-    IfIAlIN4tWUgvvFFDbOABMWqkt2v7reMwHxafIcy+Eaj2WgV3s1YcaVK/8U4JBlFSafZ
-    IujJ6vHYBCW2UJAsSvbvVPxsJSnbgxvK+nZeaBdR/fGJbIU1K+ujYn6qBLWcet/x50gN
-    YOFTjC9ub8BgEqbjNbul58TRrc9S5/Onivo9ihVPJNzvO08m1d4reOLCm7lr69n/qji3
-    r0pfO3SeC9ugNKp4xPcxjly7kUevvwBt+4VQC+uMJp1/JdNGZXcQq1+TLZk4RsswWVDG
-    g3+w==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1764423414;
-    s=strato-dkim-0003; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=aCAiSwPD73VNdECVmnPR4OE06tOBC6TL2sMZyKjHBTw=;
-    b=GXISY155DZac/T2JgLv0Z7p4KZGTFhRjptmDj2tJmwhx4I2jylFOWLroCQi6RLP/tA
-    OCARRxb3l6QeQX8RpOBw==
-X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tTUsMrZpkO3Mw3lZ/t54cFxeEQ7s8bGWj0Q=="
-Received: from [IPV6:2a00:6020:4a38:6810::9f3]
-    by smtp.strato.de (RZmta 54.0.0 AUTH)
-    with ESMTPSA id Ke2b461ATDarjHt
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Sat, 29 Nov 2025 14:36:53 +0100 (CET)
-Message-ID: <fea87139-c114-4d86-96e0-b41b2458f102@hartkopp.net>
-Date: Sat, 29 Nov 2025 14:36:47 +0100
+	 In-Reply-To:Content-Type; b=jHqwTCeNbr1gaOjBz/mlO20ApLq/46RuqxymynMhVW40kTd4z3yiMv4r7R/LEzQS4Vl7kLj81QtWsDqUKZGdRdxKoegLhcGyBKSPOYmZlkfq4vkIh4KoJiTvEym0aL4YvTOjih+ZOTUIS0AS93ygv34aKy2r028/RvcegWyTC9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EL1xuBM/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6A86C4CEF7;
+	Sat, 29 Nov 2025 14:08:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764425290;
+	bh=2wLaW6J+5lucMrLRBbj46SiVk6R9/H6dyc5D1IxBoBg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=EL1xuBM/tAr74urXgSNDauXofpfFkvPAko2w/bU+eHta/dtYnE+sWsmu6tN0GjZh6
+	 2skbgae0IEYgCqoFnHxIf2KdNivAZpQcC6Ra9lFbSVOoiSclPNwScXTG0Z0JL2g3Ox
+	 JSnaXtJjG42/Up7LwzuJdXMLmKOM8sjWkW1vhCfZ5KPrp+TWnpGo4FPfX2hAKsb65C
+	 9XtcsomExkzrDkFdDpgH+Zeeg27M03ukOf6lGnCaJ7Ga+5NdCUSs4bRqFLiJVbbqtH
+	 W2SwwJGb0RDoZt8kNFm4IIo8Hq0s9rHY+aLe824nXwWbO1sqgFNcHc+IPOwZv58AkN
+	 ZPcBk6s1gFLAg==
+Message-ID: <2df5ac80-5db6-4b8f-ab5b-b8b89237777f@kernel.org>
+Date: Sat, 29 Nov 2025 15:08:03 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,35 +50,113 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [can-next v3] can: Kconfig: select CAN driver infrastructure by
- default
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net,
- kuba@kernel.org, kernel@pengutronix.de, Vincent Mailhol
- <mailhol@kernel.org>, kernel test robot <lkp@intel.com>
-References: <20251129090500.17484-1-socketcan@hartkopp.net>
- <20251129-ultraviolet-sponge-of-focus-e788eb-mkl@pengutronix.de>
+Subject: Re: [PATCH net-next V4 09/14] net/mlx5: Introduce shared devlink
+ instance for PFs on same chip
+To: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>
+Cc: Donald Hunter <donald.hunter@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+ Jonathan Corbet <corbet@lwn.net>, Saeed Mahameed <saeedm@nvidia.com>,
+ Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
+ Gal Pressman <gal@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
+ Carolina Jubran <cjubran@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>,
+ Jiri Pirko <jiri@nvidia.com>, Randy Dunlap <rdunlap@infradead.org>
+References: <1764101173-1312171-1-git-send-email-tariqt@nvidia.com>
+ <1764101173-1312171-10-git-send-email-tariqt@nvidia.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
-From: Oliver Hartkopp <socketcan@hartkopp.net>
-In-Reply-To: <20251129-ultraviolet-sponge-of-focus-e788eb-mkl@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <1764101173-1312171-10-git-send-email-tariqt@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
+On 25/11/2025 21:06, Tariq Toukan wrote:
+> +
+> +static void mlx5_shd_destroy(struct mlx5_shd *shd)
+> +{
+> +	list_del(&shd->list);
+> +	kfree(shd->sn);
+> +	faux_device_destroy(shd->faux_dev);
+> +}
+> +
+> +int mlx5_shd_init(struct mlx5_core_dev *dev)
+> +{
+> +	u8 *vpd_data __free(kfree) = NULL;
 
-On 29.11.25 13:51, Marc Kleine-Budde wrote:
-> On 29.11.2025 10:05:00, Oliver Hartkopp wrote:
+This is undesired syntax explicitly documented as one to avoid. Please
+don't use cleanup.h if you do not intend to follow it.
 
->> Fixes: 1a620a723853 ("can: raw: instantly reject unsupported CAN frames")
->> Reported-by: Vincent Mailhol <mailhol@kernel.org>
->> Reported-by: kernel test robot <lkp@intel.com>
->> Closes: https://lore.kernel.org/oe-kbuild-all/202511282325.uVQFRTkA-lkp@intel.com/
->> Suggested-by: Marc Kleine-Budde <mkl@pengutronix.de>
->> Signed-off-by: Oliver Hartkopp <socketcan@hartkopp.net>
-> 
-> Added to linux-can-next and included in my latest PR.
+Plus netdev dislikes cleanup, that's another point.
 
-Thanks Marc!
+> +	struct pci_dev *pdev = dev->pdev;
+> +	unsigned int vpd_size, kw_len;
+> +	struct mlx5_shd *shd;
+> +	const char *sn;
+> +	char *end;
+> +	int start;
+> +	int err;
+> +
+> +	if (!mlx5_core_is_pf(dev))
+> +		return 0;
+> +
+> +	vpd_data = pci_vpd_alloc(pdev, &vpd_size);
 
-BR Oliver
+Here....
 
+> +	if (IS_ERR(vpd_data)) {
+> +		err = PTR_ERR(vpd_data);
+> +		return err == -ENODEV ? 0 : err;
+
+And here you kfree(IS_ERR).
+
+This is either buggy code or very confusing. Please do not use cleanup.h
+if to intend not to read it.
+
+
+Best regards,
+Krzysztof
 
