@@ -1,50 +1,91 @@
-Return-Path: <netdev+bounces-242667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 563CBC93806
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 05:23:39 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C0CEC93800
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 05:22:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 30B164E10B5
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 04:23:38 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7AD65348B3E
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 04:22:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8394C226D02;
-	Sat, 29 Nov 2025 04:23:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83D8F223DDF;
+	Sat, 29 Nov 2025 04:21:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nxQlOGPm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LwgoR3n1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B83C1DED40;
-	Sat, 29 Nov 2025 04:23:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EC1F188CC9
+	for <netdev@vger.kernel.org>; Sat, 29 Nov 2025 04:21:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764390215; cv=none; b=SdBQeiV3jqRsb/tW4mWGp0m5g0vVNEf/7wt9j6Zx4e2X+wNnTS7vEJGOU7g6fhknC21JsOGrrvywidEzkbdrgbeS//uCOZWkCY6PEeQNt5JUapI9ljjI/a6+Pc3twBOqfUXdd62udBU/HEH6Ibqx5ZYQwbR/TB+SzpzThdR6LTA=
+	t=1764390118; cv=none; b=TtkcoG7DeNAIZiwT40NGn6c4Xd0Wy32IYsKait03TFpp7NVXlmKnnnAVIpY0x+TxXkSfE64eIvnby2zIQ5S1TKmscGnvQQ8f4yc/14svI0a8SgWZixnM/YC7WE5Vw9clLPjsPNCeomi3ifGbgSH4R+28ylwlGAv+KeERg2pCT2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764390215; c=relaxed/simple;
-	bh=9Lb6Q6a6ZbFUilIGtODLpDXbVu9ihECtyWZmMDZEaUk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FFEMoPdpDIDfXMa5//0+Y4Xo6FqrjYCazEQDk6CKsF5G+1lwB4gQSr4HJ22/kgJym2mHHc2n0B3KNIgSemYBtZyl8ZHYuY7FDVT9zXQfpP7b1oKJbxWuMhKuAkQ6t8VG1O7XoeGkdwMr8d6A51juD/4jD89Ng61Ta9VizxKhvfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nxQlOGPm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A259C4CEF7;
-	Sat, 29 Nov 2025 04:23:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764390215;
-	bh=9Lb6Q6a6ZbFUilIGtODLpDXbVu9ihECtyWZmMDZEaUk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=nxQlOGPmeUOX0MVbvPFrMgk9GPJL8IlXHQLX1BvIa01wkWn5Skw71R8urM06VjJz7
-	 H11sZV1fKthrLekmFPcthIAdmbRv7fV1P9J4Qy2TyO/AxwoymPSoGhH24dYfUjNuI/
-	 3Vs5OlnEpIj5oMU5wxebFxIxgdSID/RywVJIUr2BI3OPXj3Fbn36D8Oa6pAldtp09I
-	 L7Xs2JsSKqsu0/XM3vsvu0W+g0Wvn9ovC1B6dHvy2Bcq4XPK5XMmQqoJhEISp46Q6l
-	 dWPzTc6m5n/YLK3V2a4MxRDKWTfkJSBTLfu2hdfyKA5HnCq9QBveB2oP94j0F9zgjR
-	 Vn/4lSYsOoszw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F2C4C380692B;
-	Sat, 29 Nov 2025 04:20:37 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1764390118; c=relaxed/simple;
+	bh=e7l6wzKTukbDEuaa1Urag72pSBUniuTYMdV1yTwwuNA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RiZlDdkVHrrmtKieJP5l21DdiyAMz2K+/ADh0r5tFqPLmQ96E9aRbZ+cdt2rv498io6HIsaTS2oIUqqNSmPOHz7Jk3S+EGuMV0DljfiA2NZk/0oIZTKFhq6CJMOUwE74hkGbsclikdCGDzaXx0Sky8qw2M86ScQ8JpluSKTxirM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LwgoR3n1; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-298039e00c2so35027975ad.3
+        for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 20:21:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764390116; x=1764994916; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=c2GkItaOT5ykQMkZu9n7CrnGme19dmT3HH8CwuLA6PM=;
+        b=LwgoR3n111IrV7l8CDvEMV6gExz0neaYCsaDtjMtM0IA2hFpdwqy+J0KznUq2Gd9fK
+         DzzOfVHW2+M9Jv6fQYQUkRSbGod5pavk4PjeUAlHiRXQGEkKk7awkK1yK2mDWvHuOaEr
+         W/YM7u3mkdkPtv2Igb2e3k4o8TdtcWntVFXfIwaEuVNDJqJiYfJHcd1LN3GRYlbpk62z
+         iyUfFLa+OwOKH13beX5YIplQDdlmyLR7JXQ2ZzIpRm52A23eIDEkgMPybyxeyAoEq7R4
+         JfoG7HUmL6W1NR/eGCYlyt5wKLr6GwkJTYXWVPE0YRtHGpckLquKHfzKwNEhU+0OwFxV
+         QCeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764390116; x=1764994916;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c2GkItaOT5ykQMkZu9n7CrnGme19dmT3HH8CwuLA6PM=;
+        b=GhjXXs+nTN/WAQgDDAYNoQoKi1FlVKdPnHDo7s+y9gOWecT++u0JJuSbt7U1iKgbxw
+         mzx94CYx8jjPd+cHJfBYAqWRO5P3C3DIxRRbRAy5u181oeezp28cKUz/IglDr19mAk8K
+         XhkS2XXjM1VUY2f6IpAsRyc2aiAaP3PnDPaDuMOUhAAKTZeOckyCvKLXlX5XB1cOh7EH
+         SU574yZDFp3L67rzyo1WJjUE2o91wtc/WoLEmdMbMref7LI7qbgIZLLKYWfOK6D0tjBM
+         0gEm0HqeFThmc3H0Os1zdQdufq3gj1yG85Mlp4VF2k+zXxnhB+iJbdZF4KN1TEGrRMkZ
+         pICQ==
+X-Gm-Message-State: AOJu0Yz9eJuS2U/t4rS/OPu0a33DEjZU3oQEJrxaC+BIYT7BDM21qwy+
+	xdrum7ZqX6EOgDLepv6+93REprduE29DlRNmNiN60n0aK8mGX+Q8M5PGKsgBng==
+X-Gm-Gg: ASbGncvtHa7G4EdwHWOoyRLdNjuw0MkGLoXDos4WcdxO9a4UXRdB6u5QWXZnOfti+MX
+	FuhIeMsEe80qKRkmVRNG2z2RfOZ6D5zFZ6YHWZKPCqmiO78XqqaYF8L1Oa5qp1s61driExsSvN6
+	Iytle2koExlezPeX+dqIkkJBfwq2t8KQ5VscwetKO92fJBlndqEUXXZFFEyiYEbO1onQTL+pNH9
+	RfG4jWgVtPvB28Cwj98WEulkz5Eh0Ew+Ax+rdU0Q0DQmqZfWt9bQrHu5UELE6xmyujEz2sJr7Zz
+	rPziOliV/GyKyr5JkzQjX8NuQI6bXFYailapsVfxOT0ei7swXWsNyy3mQwzMTINTwddIHF7UOU4
+	8TI4MkJ+IgKscvOa++23CM8DGW9QddYTmgSnYiB1fext3OoI8G4gAF6Mhli3YqdTvLNrB6ULbla
+	MztFrfsyoBuif4an4SSA==
+X-Google-Smtp-Source: AGHT+IEM+GsTacTkyzLmyuERcxe4E2+rFECrPLm0tnsZSHkAiPQfzhopk/bWEVpyNXxu7L0lhrWdxg==
+X-Received: by 2002:a17:903:11c7:b0:296:ec5:ab3d with SMTP id d9443c01a7336-29b6bfa0be1mr343221825ad.61.1764390116114;
+        Fri, 28 Nov 2025 20:21:56 -0800 (PST)
+Received: from d.home.mmyangfl.tk ([45.32.227.231])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29bceb54915sm59879455ad.92.2025.11.28.20.21.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Nov 2025 20:21:55 -0800 (PST)
+From: David Yang <mmyangfl@gmail.com>
+To: netdev@vger.kernel.org
+Cc: David Yang <mmyangfl@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] net: dsa: yt921x: Set ageing_time_min/ageing_time_max
+Date: Sat, 29 Nov 2025 12:21:34 +0800
+Message-ID: <20251129042137.3034032-1-mmyangfl@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,75 +93,29 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 01/17] netfilter: flowtable: check for maximum
- number
- of encapsulations in bridge vlan
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176439003680.903126.14289643088710062788.git-patchwork-notify@kernel.org>
-Date: Sat, 29 Nov 2025 04:20:36 +0000
-References: <20251128002345.29378-2-pablo@netfilter.org>
-In-Reply-To: <20251128002345.29378-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de, horms@kernel.org
 
-Hello:
+The ageing time is in 5s step, ranging from 1 step to 0xffff steps, so
+add appropriate attributes.
 
-This series was applied to netdev/net-next.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
+Signed-off-by: David Yang <mmyangfl@gmail.com>
+---
+ drivers/net/dsa/yt921x.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-On Fri, 28 Nov 2025 00:23:28 +0000 you wrote:
-> Add a sanity check to skip path discovery if the maximum number of
-> encapsulation is reached. While at it, check for underflow too.
-> 
-> Fixes: 26267bf9bb57 ("netfilter: flowtable: bridge vlan hardware offload and switchdev")
-> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
-> ---
->  net/netfilter/nft_flow_offload.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
-
-Here is the summary with links:
-  - [net-next,01/17] netfilter: flowtable: check for maximum number of encapsulations in bridge vlan
-    https://git.kernel.org/netdev/net-next/c/634f3853cc98
-  - [net-next,02/17] netfilter: flowtable: move path discovery infrastructure to its own file
-    https://git.kernel.org/netdev/net-next/c/93d7a7ed0734
-  - [net-next,03/17] netfilter: flowtable: consolidate xmit path
-    https://git.kernel.org/netdev/net-next/c/b5964aac51e0
-  - [net-next,04/17] netfilter: flowtable: inline vlan encapsulation in xmit path
-    https://git.kernel.org/netdev/net-next/c/c653d5a78f34
-  - [net-next,05/17] netfilter: flowtable: inline pppoe encapsulation in xmit path
-    https://git.kernel.org/netdev/net-next/c/18d27bed0880
-  - [net-next,06/17] netfilter: flowtable: remove hw_ifidx
-    https://git.kernel.org/netdev/net-next/c/030feea3097c
-  - [net-next,07/17] netfilter: flowtable: use tuple address to calculate next hop
-    https://git.kernel.org/netdev/net-next/c/a0d98b641d67
-  - [net-next,08/17] netfilter: flowtable: Add IPIP rx sw acceleration
-    https://git.kernel.org/netdev/net-next/c/ab427db17885
-  - [net-next,09/17] netfilter: flowtable: Add IPIP tx sw acceleration
-    https://git.kernel.org/netdev/net-next/c/d30301ba4b07
-  - [net-next,10/17] selftests: netfilter: nft_flowtable.sh: Add IPIP flowtable selftest
-    https://git.kernel.org/netdev/net-next/c/fe8313316eaf
-  - [net-next,11/17] netfilter: nf_conncount: rework API to use sk_buff directly
-    https://git.kernel.org/netdev/net-next/c/be102eb6a0e7
-  - [net-next,12/17] netfilter: nf_conncount: make nf_conncount_gc_list() to disable BH
-    https://git.kernel.org/netdev/net-next/c/c0362b574828
-  - [net-next,13/17] netfilter: nft_connlimit: update the count if add was skipped
-    https://git.kernel.org/netdev/net-next/c/69894e5b4c5e
-  - [net-next,14/17] netfilter: nft_connlimit: add support to object update operation
-    https://git.kernel.org/netdev/net-next/c/c4cbe4a4df39
-  - [net-next,15/17] selftests: netfilter: nft_flowtable.sh: Add the capability to send IPv6 TCP traffic
-    https://git.kernel.org/netdev/net-next/c/c0bd21682aed
-  - [net-next,16/17] netfilter: ip6t_srh: fix UAPI kernel-doc comments format
-    https://git.kernel.org/netdev/net-next/c/c4f0ab06e1e0
-  - [net-next,17/17] netfilter: nf_tables: improve UAPI kernel-doc comments
-    https://git.kernel.org/netdev/net-next/c/d3a439e55c19
-
-You are awesome, thank you!
+diff --git a/drivers/net/dsa/yt921x.c b/drivers/net/dsa/yt921x.c
+index ebfd34f72314..d5fb17d2b6e0 100644
+--- a/drivers/net/dsa/yt921x.c
++++ b/drivers/net/dsa/yt921x.c
+@@ -2855,6 +2855,8 @@ static int yt921x_mdio_probe(struct mdio_device *mdiodev)
+ 	ds->assisted_learning_on_cpu_port = true;
+ 	ds->priv = priv;
+ 	ds->ops = &yt921x_dsa_switch_ops;
++	ds->ageing_time_min = 1 * 5000;
++	ds->ageing_time_max = U16_MAX * 5000;
+ 	ds->phylink_mac_ops = &yt921x_phylink_mac_ops;
+ 	ds->num_ports = YT921X_PORT_NUM;
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.51.0
 
 
