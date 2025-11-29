@@ -1,97 +1,116 @@
-Return-Path: <netdev+bounces-242718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 885F8C94148
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 16:38:39 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53D12C9415A
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 16:41:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EA4ED4E201D
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 15:38:37 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D05A1346307
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 15:41:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC80B1EE7B9;
-	Sat, 29 Nov 2025 15:38:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D6961F4262;
+	Sat, 29 Nov 2025 15:41:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i0mPbLZA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JAKydBKh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FA941A9FAC;
-	Sat, 29 Nov 2025 15:38:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A4461F03C5
+	for <netdev@vger.kernel.org>; Sat, 29 Nov 2025 15:40:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764430714; cv=none; b=GUAJGkgFcF5LCP3cdVyF0WLQhSKKKqHOLbnxgyNW9vVRpdhqHAVcWpUuXnhIxWZeEFP9TjtlfrQlZcRfJ/IBa1oqP3tAEqIUfDgwTtEYQrbmvWdX2X20dkf4xYQ7mfuBPw9ix+rVOh9T6pucwkIrdZ6HK8ta6sfZb2WH2n6Y9aA=
+	t=1764430861; cv=none; b=JQo7p8O3Y0O/D2h9VIVWlbWVXaJDelG+Q1qbxP9cy5cGNnOl898Z33U1bSIZXPhHkYYGokZZoY9j3m3SvU2edIAwFxfG14adcGtIka+qaPbZFfbfCdw4+N9R0GF0Qoh5Ppdcn0ESFmQXZipJrwRbXIz1rbaw4lOqjpABkezdqiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764430714; c=relaxed/simple;
-	bh=yOVZrjSgdGUXJCSv0UyYa5kyrQktCFZ8kgydJPtl8do=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=p3zPyH0Gqgj72UfLPtV5n5Ei/enzEWAlYpWEGBNDy2WuTZ/Ji8v2/P5dR3IE1J8H20YrdvxfooREp1j1qm0vXm/+A9HID9BAI6dxcUtnqm+Kbh3k2C8FsbOyex0EL28KddozN7J1rqfcH5c2RphoGwhmE+YK4cbGYHazpN5KTVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i0mPbLZA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD1C8C4CEF7;
-	Sat, 29 Nov 2025 15:38:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764430714;
-	bh=yOVZrjSgdGUXJCSv0UyYa5kyrQktCFZ8kgydJPtl8do=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=i0mPbLZAD1sKD8pOlEubg8cyIpry7d/U5YeqLDf4ErE0wPA3kwr/pMp5qD7SJtev4
-	 SVZu0Xm44IQncCAhYb+64IV1RZq2BqNbJGDlF2pBSfg8k9WHkojyXvI49KgPNq8XjF
-	 O5LRov9XOPRy90290bTAOODie2em3cL6wsr3LImvSANgz9LpurUfanyiNbagFCsbNn
-	 aU4nNGSeinBOOX5/em5MvQVcs45ZhAjWHoWrpiYXCNDzwTeh6JAewW54sHiKJ0iMrb
-	 aX6otAwMc7nSHETPfBPtFB5DUISZ9hqpxDFJjz3eYWh3+DSbdVZie8HnVVsgOqqg/7
-	 +5FrujzQkxlng==
-Message-ID: <e2ab2f04-35fc-462f-b4d0-a8429b765111@kernel.org>
-Date: Sat, 29 Nov 2025 16:38:25 +0100
+	s=arc-20240116; t=1764430861; c=relaxed/simple;
+	bh=98ShLA3Gc+8iz5Ta26raelUKEqRHNI5RcMvSUa3Fzio=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rqrdqhtnPP2zsiyKqxSFLTk96mPCsmytJk3Df3S3AUOkCu8DNrjdZ3ir6JMgeWO4oGKudGBn+HNuCoMHJ4k9lRY1hifvIV5LYg0Ox/lmwvskMW8qvUGzUSAMZAx5PMGRNcESOCVrUeua2UXTBCJyA6f9YPswgIgTU3XbxyUdMiA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JAKydBKh; arc=none smtp.client-ip=209.85.214.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-2958db8ae4fso27929265ad.2
+        for <netdev@vger.kernel.org>; Sat, 29 Nov 2025 07:40:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764430859; x=1765035659; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1bbXgvlnENKnsdEGuYPN5PUkGwl/lkMRHa8r0W5LEG8=;
+        b=JAKydBKhXsU0ISH+XEd016ZmB7u5XXayZU64X4rslL8+aJJE4J+QEmV0IXMgotpmfr
+         pDtCeB68jznjPpy+L6bGWtsoivnKtKLKXeBliYKm8opsDjqVOaWG3/xTnxO6fLa7tzkm
+         rh3OiJFh4zyxH0HMiWkWKOTqD4WVBCfZL3lZFF/oK6zPXtalQFCHBNj7dcfRHpcixUZ+
+         8o+G8QX3o504DUHhEcs+uAFBem2qSPpWbYyngzWAL88tqmZe7wBUtNtM8HrD9CJTvMva
+         pmKMY9MtNeShVYB40N591/YW4/sQsd4B/Ka+8Y++pxBqwa+JiqTgryEtfliFK2ktnNRS
+         aGGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764430859; x=1765035659;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1bbXgvlnENKnsdEGuYPN5PUkGwl/lkMRHa8r0W5LEG8=;
+        b=FYUwTtjq4C3UgYcubhIj9ss/nAYq3MG27tYLRJufZPzn6PdFGCXNSFKs0WSp346qCD
+         dWUtxqwvvB81UOh+BlQqgWjOZfBZN2qwqYHIvztHLwgO0/O1OmdMu84bNhqQKEg45w3b
+         MhXGiNByLG3CH4v93hw497OT5mQcZjDGlPOhTqxl3ypo9BzLuAE3OWprNQlRpdQ2+BM2
+         tcI8MTkEQHuDLxEQcJg2rY627udJivXPuLctx/3MjkOHN4GDDW4SxcS3nmNY+g2OYj8z
+         dZdwnBv0jjsAc6V+VPzixR9XQo9VOvvRSutBb4st9fBFNBJpfkYmWJshqO+7z/4HKwzn
+         2hdg==
+X-Forwarded-Encrypted: i=1; AJvYcCX24PKNmsrvzOG3bge1e3wcKaupy29pgFHpRJNnffZAFfIs7X37s86Dxb39bCnsw5KbJ83fj6w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrBdwHtNLPJ6x+bQabGW+O/4ywznyGftrU7VWPuyagnLuc7ZbE
+	WjRx0PPjm/pqQQM25MjOaXxVNsoscYwsv1jdM1j9OInXv9dAXQMWXVHj
+X-Gm-Gg: ASbGncs5QTjTg+3IjQOfBuAmZ0mc6JqgzGfQWepirQH2ky09QpFYXeATJgI1TzjJe66
+	/HhP+TizpGjYH90JA0MvxexdPUhn+m2d+UXMJQyws0eQ/iXFP6ic1ew17tlVANSOX8vISuflHVE
+	I3dgv2NptfcCDR3NnomlBi+MNa1vnivG9Y7/DCM/lnagoWfaHcoI9J/KN4U3QwPzfiKGxD0zmz4
+	aE0avrC9Hs80G4zvNmo7u0L61KO779OTIVD55Wv3mR/vF5XBFnnJA681o7Ku+UqAP1baZbaukKD
+	panULHgrEk+FaXvEqIn/dYLJyH9N0Xowvl1GCH3XwhQ2o8skh6dWrjdTrlt7O3a1CYdRDZo/UTI
+	6nDttC3IV4IKkSp1oLHni3ntM9d462bWO27j/q3mYDiCaEYi78r54X+p0teaIh4EkQW/g8sYU/+
+	ydutTF5k+U4xKahiQ4ib92FRXWo+XqfX/kvek0/4Bm
+X-Google-Smtp-Source: AGHT+IGR6+gSpgs55IR0ytGEOhQiXrSj5OpdthG/7BED4fO3xJA8Xtb2N1uITeOdeAVbOohzMgttKg==
+X-Received: by 2002:a17:903:1b4d:b0:27e:eabd:4b41 with SMTP id d9443c01a7336-29b6c3c30d4mr328707135ad.7.1764430859202;
+        Sat, 29 Nov 2025 07:40:59 -0800 (PST)
+Received: from fedora ([103.120.31.122])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29bceb7cf89sm76573825ad.99.2025.11.29.07.40.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 29 Nov 2025 07:40:58 -0800 (PST)
+Date: Sat, 29 Nov 2025 21:10:50 +0530
+From: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] selftests: tls: fix read/write of garbage value
+Message-ID: <aSsUAvnn9dnwk91E@fedora>
+References: <20251129063726.31210-1-ankitkhushwaha.linux@gmail.com>
+ <aSrJTmtJqOX0rNDh@krikkit>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/7] iplink_can: add CAN XL support
-To: netdev@vger.kernel.org, Stephen Hemminger <stephen@networkplumber.org>,
- Marc Kleine-Budde <mkl@pengutronix.de>,
- Oliver Hartkopp <socketcan@hartkopp.net>, David Ahern <dsahern@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-can@vger.kernel.org
-References: <20251129-canxl-netlink-v1-0-96f2c0c54011@kernel.org>
-Content-Language: en-US
-From: Vincent Mailhol <mailhol@kernel.org>
-Autocrypt: addr=mailhol@kernel.org; keydata=
- xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
- JFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbEBrZXJuZWwub3JnPsKZBBMWCgBBFiEE7Y9wBXTm
- fyDldOjiq1/riG27mcIFAmdfB/kCGwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcC
- F4AACgkQq1/riG27mcKBHgEAygbvORJOfMHGlq5lQhZkDnaUXbpZhxirxkAHwTypHr4A/joI
- 2wLjgTCm5I2Z3zB8hqJu+OeFPXZFWGTuk0e2wT4JzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrb
- YZzu0JG5w8gxE6EtQe6LmxKMqP6EyR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDl
- dOjiq1/riG27mcIFAmceMvMCGwwFCQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8V
- zsZwr/S44HCzcz5+jkxnVVQ5LZ4BANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
-In-Reply-To: <20251129-canxl-netlink-v1-0-96f2c0c54011@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aSrJTmtJqOX0rNDh@krikkit>
 
-On 29/11/2025 at 16:29, Vincent Mailhol wrote:
-> Support for CAN XL was added to the kernel in [1]. This series is the
-> iproute2 counterpart.
+On Sat, Nov 29, 2025 at 11:22:06AM +0100, Sabrina Dubroca wrote:
+> I'm not opposed to making the compiler happy, but in this case
+> "garbage" is completely fine, we don't care about the value.
 > 
-> Patches #1 to #3 are clean-ups. They refactor iplink_can's
-> print_usage()'s function.
-> 
-> Patches #4 to #7 add the CAN XL interface to iplink_can.
-> 
-> [1] commit 113aa9101a91 ("Merge patch series "can: netlink: add CAN XL support")
-> Link: https://git.kernel.org/netdev/net-next/c/113aa9101a91
-> 
-> Signed-off-by: Vincent Mailhol <mailhol@kernel.org>
+> So I think the subject and the commit message should talk about
+> "silencing a compiler warning" rather than "fixing use of garbage
+> value".
+ 
+> And your patch should indicate the target tree in the subject (here,
+> with [PATCH net-next]), see
+> https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
 
-And just after sending, I realized that I forgot to add the "iproute2-next"
-prefix in the patch subjects.
+Hi Sabrina,
+thanks for the review, i will send a v2 patch with suggested changes.
 
-Well, I will wait for the comments first and resent on Monday with the correct tag.
-
-
-Yours sincerely,
-Vincent Mailhol
-
+--
+Ankit
 
