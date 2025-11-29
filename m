@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-242747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B87EC94824
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 21:50:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2D93C94827
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 21:50:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0F9574E1094
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 20:50:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88E4D3A7019
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 20:50:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28B1023D291;
-	Sat, 29 Nov 2025 20:50:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB8862652AC;
+	Sat, 29 Nov 2025 20:50:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FSMhgavF"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="n7iboDGX"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3839936B
-	for <netdev@vger.kernel.org>; Sat, 29 Nov 2025 20:49:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 250E423D291
+	for <netdev@vger.kernel.org>; Sat, 29 Nov 2025 20:50:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764449400; cv=none; b=gL2lpM5X59gY4ftdnefjmPn2hGlrIqc8Vc3avy/6MajHJRHDyLVrJ1+Jih0uAbUtU+4IUxbiG6AeJr43cw1aKLNzLEfmakLf/QTZubAzizhU64zmDvvf/mxOGWjYXvwEPhXRbmlA2SxjHX9Edl+yBM/Nesvsmv37IGvaKvpqaiM=
+	t=1764449419; cv=none; b=YYXSZRrGh9eaKp1QPxt57K83APJ/C3//Gykr6M4tzZIT+rPJMlSSWeIcoLzIWh4nX84V1Fu4rtbva8Wj9EygfkgwDQjt5yX3HNpB4CdV98a88EB6LdEV669710OQFzrObNlmdkjZYT/yR9uf+Qexbha3xxWkxLdnYhm5Mf4kKjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764449400; c=relaxed/simple;
-	bh=PSllV1OR6NdbEcUeS5hJpWDjVsxPfphzJOhsT7gEj3o=;
+	s=arc-20240116; t=1764449419; c=relaxed/simple;
+	bh=VnzxCjqZ+Bwzo7mMpaHs1MwXEFH223N4s+1vl95c8M4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NG4KwLXVrR6wsEAZoF33cwWbPN0rHGQlGkz+NJ4BjHuV5rf9EF+3SFasgXVw7IrGpjBhIZ7o+aADffIeqakakiOeZqyvHCV9OZNEqD60SqdnOy3GWTsj8A64GN303xaR+p1w5jrbpXBQDMKV+aFUfW87+RkxQ7TI1OTnmFSkIcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=FSMhgavF; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=kOgB0UDCDiJDS+jHus4rj5MIsSQGqfFT0UWlvye98elqdvp8GIRHXXi72qPjqvuJnxjtVsEKur072Wo7W0korFRjm6RkDm06s2VNC7SliS9t+KMl6dneRDtFOHbLxsePar7LMEN8+8ez1Tp7Fd377ROkTXoIwr7d7SOqFnZs3JM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=n7iboDGX; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=DLTamV30JjMuWvMwN0E8d4IRFb+IO3FrdemZX88bmj8=; b=FSMhgavFiwEcHpj05RkHNTqiKT
-	b1E1npLESkDqdKRQIErk4AMIGMXyj3A6fMe8Dtjcze9aZ0Pv1J66+5CWIkvYXe+43JF5adVrHu8Ip
-	qvlu3s6V9k7dKay/m6hRzaNMv911qMtYENvbWUK9tDtkNGHcGp9xnTHMb4PGZfzYrZX4=;
+	bh=h2EDQBB1WY4CJMVykS72ztk1cLDmjD877K18mmscGpw=; b=n7iboDGX2gYAhHen1UY4gszDni
+	GF/akgayQvzq+ve5QOKD5fUrK24im9dbkmAOQpX8RcCAQclHVXI9Pl0WeZbIPRcrhgkS+tpUHKP8T
+	nOQCo/lVH2dYPF9WYALtisZdhDqJcdarXoxMAqs7O57BZd2z6fl4VpCLc0KLEPs5OCnk=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vPRsj-00FQUD-9I; Sat, 29 Nov 2025 21:49:25 +0100
-Date: Sat, 29 Nov 2025 21:49:25 +0100
+	id 1vPRtH-00FQV2-3d; Sat, 29 Nov 2025 21:49:59 +0100
+Date: Sat, 29 Nov 2025 21:49:59 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -56,11 +56,11 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Vladimir Oltean <vladimir.oltean@nxp.com>,
 	Jacob Keller <jacob.e.keller@intel.com>,
 	Kory Maincent <kory.maincent@bootlin.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/4] net: phy: micrel: improve HW
- timestamping config logic
-Message-ID: <1b80a0c7-5c44-4fbf-a44e-a43d394fdecc@lunn.ch>
+Subject: Re: [PATCH net-next v2 2/4] net: phy: micrel: add HW timestamp
+ configuration reporting
+Message-ID: <33b60cdb-b869-4213-a1a8-22c89b806c88@lunn.ch>
 References: <20251129195334.985464-1-vadim.fedorenko@linux.dev>
- <20251129195334.985464-2-vadim.fedorenko@linux.dev>
+ <20251129195334.985464-3-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,12 +69,11 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251129195334.985464-2-vadim.fedorenko@linux.dev>
+In-Reply-To: <20251129195334.985464-3-vadim.fedorenko@linux.dev>
 
-On Sat, Nov 29, 2025 at 07:53:31PM +0000, Vadim Fedorenko wrote:
-> The driver was adjusting stored values independently of what was
-> actually supported and configured. Improve logic to store values
-> once all checks are passing
+On Sat, Nov 29, 2025 at 07:53:32PM +0000, Vadim Fedorenko wrote:
+> The driver stores HW timestamping configuration and can technically
+> report it. Add callback to do it.
 > 
 > Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
