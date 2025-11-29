@@ -1,149 +1,135 @@
-Return-Path: <netdev+bounces-242728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80559C9453A
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 18:04:15 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F3A2C9456D
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 18:06:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6BCDA4E068E
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 17:04:14 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 434244E228C
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 17:06:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B83674CB5B;
-	Sat, 29 Nov 2025 17:04:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF5152376FD;
+	Sat, 29 Nov 2025 17:06:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="jAHcuCL7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i+lp7/0C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+Received: from mail-yx1-f46.google.com (mail-yx1-f46.google.com [74.125.224.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47A355B21A
-	for <netdev@vger.kernel.org>; Sat, 29 Nov 2025 17:04:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 626E71F4168
+	for <netdev@vger.kernel.org>; Sat, 29 Nov 2025 17:06:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764435852; cv=none; b=WAI8vJphAXIVWB9H+Vg3DmRBDN+O1Tb24FDCG4+D87DBIvxF1JfE2C49OcqqjBN+dRiW1+gWUkqOtPdmqJL8M6Zkq9TnJlOfY3y4u9OxYPxWprxmq0jfQc3aEV3aESimqnpBzPmg3ka2V+zezjFqOdlY7LMMmfvDMQOxMsMksLk=
+	t=1764436014; cv=none; b=iJRxJWmGLq8gcg8wsk+iIutYokQB1mCKEnBkrmzYSUuXIc2/AW77EAe6mvs9h9v+5kaAsn1LPlHNdTuOc1tSrChuruBvvGW7Bsv6Wb0NIiQXe1E03rg4ekBM1rTGFLoEJjlmgtbIqhaali5iPNNorJ9qMfQSA4IZKxwYaloEwFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764435852; c=relaxed/simple;
-	bh=1ofg9EbWX3TxmwN9MuMZWoXX9LDX+R4phsPu3w2Jy7c=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KUL79OogwQBBU109Esn7VvZ6VE0SmOwC/jpxt7nD7/5xIYXnjC21+nup5DWI2zAGJdcFGw6MsQDJgSe6Ijbaj32cVoYRj9L4XDoIoTs+BK48gHRJi8Z7c2OH7NM8i6qu/wITWXeW2pHR6g5ueRNkZo3QuY22Tf1EEbgDr8degKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=jAHcuCL7; arc=none smtp.client-ip=209.85.219.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-8826b83e405so38564726d6.0
-        for <netdev@vger.kernel.org>; Sat, 29 Nov 2025 09:04:09 -0800 (PST)
+	s=arc-20240116; t=1764436014; c=relaxed/simple;
+	bh=mMptPi/5yPZvjITg7ksI28lKa/3fRSiDMoQzVc16cbY=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=eG3jIpd2gZ7FNjz9jWfZuBqLqvZJvGMgR9mk5e0+GSZx8w+BwhbPAZSjf2NAXGzQa77kdUh1bjpbmKuzi1g9KpnUfnrJkV0PeKaQ6ym2wW0DCpF+sIqOxnEJn0e4o8hb6xcLm0KlD1tctMPl9LoHdxsTmlYmiqMLFywbRYzh1yw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i+lp7/0C; arc=none smtp.client-ip=74.125.224.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f46.google.com with SMTP id 956f58d0204a3-640c857ce02so2493481d50.0
+        for <netdev@vger.kernel.org>; Sat, 29 Nov 2025 09:06:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1764435847; x=1765040647; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1764436012; x=1765040812; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=e0JrUY6rvuTDOtsRxKK87/+s+sI+ekupf3sIqBsYK/M=;
-        b=jAHcuCL7uwpZnl40rR2bXPZRfEbNhO7WD6ASwTW58LSD05Lhk+gOiwKWSThKUsCpq8
-         OOgStgmS42YMV1t6dPSJ5I7khNpvx96odfvOJOOj6Rs9HWlBQtJdh1oM5DvZTwgkNdh/
-         6Ags8VhexSN4/tO5OF5RT2Uje8bjdq5HHhXTP7fqr0vWNVkyNFWIKR2/Q8QlsI+IPTqz
-         16LXjQOOrrunN1xevzuaPEHJ8a21ubbXh3p3LYCM/svD80s2HlvPg1ucw7or7wElpZAM
-         Fpjmd1CA6HhA7WS0X+nEDLgUn9Z2S+msQZgAhkWBvPKaRhb2B3134CotX3x3yI+EPn4X
-         Y9jQ==
+        bh=GpVPHqrbrf9GwH41mb12avIzuZD6va8OPE/RSv+PMD8=;
+        b=i+lp7/0Cd3BU0algU0MXmgHM/JjFCEKA0STcv71hBvh3QTkEJcUQ4chaSvdVrfBzJO
+         3q1yc/SNybpONXcpAWVLWwmB1YOgtttO1Lb7y45eLW8Dvq3WBlShmdN/f1t5dJy0/MI6
+         Evpzub2JM3ZBWHfy+BgMkbQSOfbwM2wpJeliwvJfinT8uap/FuFAVMxMEk0W6ulbg8X4
+         95inaXfm3PN4GlUFGao5w82EVrSoCqwu+hMiWx1nK3CRv+VfyE1F0zjhvcMOX0lCS97+
+         QfoU9L1/p4eejYJxrj4qVyoqiD8C1SW8CrJgTK5BUEPWUbWaTXTMXXiCT490gkcKbroj
+         QVJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764435847; x=1765040647;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=e0JrUY6rvuTDOtsRxKK87/+s+sI+ekupf3sIqBsYK/M=;
-        b=tQF4IPizp7MJ5tavj3f1UBm/35IotMUWdCdxi3MCoLEsB8r619sZ8WOw1OL1zXs/aQ
-         osoQm+W7//k0a4fM+xoEIU4Du/ahkAFSUysDhpCDMKEai4Rtvwi/FkHwnfT6XtMID1Gn
-         hWinuBRznBfgW3w/P2EzhIg/ezTZC+57l9DNCfq7WgEDFmmy6TqgG1pJOEm6aO1VzZ6g
-         vQuxtLJmwpE2Pnx5JEXKKIzMkOaTh6lOsSUwVMDL4wwSQxmE2aDIR8WwHO6RRYOV/eRG
-         282NJgLZkEvhtrNk8Avg/kOzD5FH/9D4rshSHDyrI0wNoO/ZvJ1Ku7XFPQndZglveuZB
-         3BzA==
-X-Gm-Message-State: AOJu0YxtC+9o60lH7jTKmf/OMrWK5I06SfWAS81tB3iddwIPUijkOpEW
-	BkidkmOyJN8inhwbK4XE7llc0atZffWeI213JwVpvoyGs6Kgre7CzNukPHc2EznX8s4=
-X-Gm-Gg: ASbGnctII+i/g/PrXiRiZh3VRj9r3xgcIXvSX8D42eYPdoML1W8C5X9tsoZUPx98EJ4
-	o7vteKPBvMquA2arVTSHIkRdBwHUVVif+3BXmLG1eplEU4edWVqSUu6a+RcMeuvZ52nPbk3JOXS
-	HseIkLF6updMXkyyUBnKXFKDuBOuU8C8iHtyXs31Qa6+64PGrt4Q9vWj+mHBVS0VG14YHold4kf
-	AwyB7ItnkzY3+9pzCY5elu93lEmrn2/K8XgenvK3h/qJuJRlOKcuhfdDyR4E1JeSdxN4uvWbVta
-	iCZ5gssHt3AA8WY/SGmD9Giu1YMMQOpUV8WK52NhwKy1YYxZWm3DI+4mQ+NCHOIRgWBjUiV5/eB
-	mQVr6mX+XVmcTx/9kjTSpAcJTUX2EkOqoUwizFOrjctkY79VhZCDU20r8XlF2u2Wwvz5kNmCoVT
-	at9u0jXih+DdSqAP4wrP0qqr/45YVi232lvkwjcbIR9PP02VJP/Z0D
-X-Google-Smtp-Source: AGHT+IEsSYkJd/FdkKfzHFclbNhdV73ou4fwyHJU3DgvCYF8sNlh+2gMj51qTXwK/lGbmiBeIwi1Zw==
-X-Received: by 2002:ad4:5c68:0:b0:882:4976:5eda with SMTP id 6a1803df08f44-8847c49c7b2mr465642206d6.4.1764435847467;
-        Sat, 29 Nov 2025 09:04:07 -0800 (PST)
-Received: from phoenix.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-886524e5cfcsm51008366d6.19.2025.11.29.09.04.06
+        d=1e100.net; s=20230601; t=1764436012; x=1765040812;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GpVPHqrbrf9GwH41mb12avIzuZD6va8OPE/RSv+PMD8=;
+        b=Zs9oJ4bxo+xdwMGb3BNQ2Fx5ZOjKzwF3/NRj9ShptfN4ooMxWAPAoX/1Kq24jwGz2B
+         MvgOSRsordhB0Sb1tvEP8eePl/RogIQHYStVIHX6qVEZ6WcXShPZTdx6cTfNAd1XRgfK
+         yEFpVO6VI0AQVeY8U1HNuampSf566rUvCqJFAydZCEqhf6sn/ITKk788iTvIddlEJtf0
+         M9L7VG3JebDwSYDX704txP03Nj8IycQ5V026wtdr6X3wgQ2EhgGKDeN+JcspMtRnRC9L
+         ttq5zAQq0STviLqtYyw8rys2exMd+R/sa1nThStma5UVv4YkgW8VAvUva1CbsspDT/sr
+         afkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXcHNtrVFG1PiRVy+zo8EeF8zx1ZXg/x2hrf16CvBVe+JFYi30O/GFsYENQJgwYmOzVr4XKvMg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlkA6GAtIMxRVz/C+zfPlX1E7aQtT0p6ItC67tT3XqvlrbF+4H
+	Tez6y6yethZPkvPHSZ9UbYWfbwOoQxCbP/sDu8XkBWJq0NiTBFJ4yvgzexqclw==
+X-Gm-Gg: ASbGncsbEF/PEimC/3G9nvwSEv75a4R4vMS0FmPosgkUFPKBBl/GAK40lSS42G14m59
+	XJxFltboLyiUtm7IiNwfMzTcD0el3JJQNGuU+jKZzUOjt4fq6NBIJ4y1hb3BjGSTtFHJ4PZFER5
+	9xd8xSTr5trANDR1i4OmAbuwi0FuM2cmg5ND+hWh7gVXm7lfNfZumsYVT3MQ/OmnAiMAFP8zGus
+	jMZOI7w86whLSRVsjv0E1PuGqX7glj44BBd+BUhd2qFc7lG+cZCuIoCA77kITJr8nTFQaZpaVuh
+	jwySnVLHujDhJsopmSnsF8rI4y7iZjq+xKaFZnSsQf5OUlINYd8rRMsFLBYCN9PyGDU+km0vGfB
+	r6KYn/l0fQbfhAHLxyU13PwNv56csSSkohbYDFDJNiMWDGOwXZTqHOoDYt6eNT9A+c7ebD4MEmP
+	szo0tcWiW1Wq8r1sHvVRV4IMeK+H3rNrlKI92uBVPsj/N9AU8i/IR9l4Lejmdh9p6rWy8=
+X-Google-Smtp-Source: AGHT+IF+XDxpUAIUULEjXGGMBjh+RMsC+JzeQv27qoe2yb8sqkZJX44LbNpuPOerCMfGVoJVPEMEWg==
+X-Received: by 2002:a05:690e:23c6:b0:629:acb6:d8a with SMTP id 956f58d0204a3-64302a90a70mr17599354d50.26.1764436012179;
+        Sat, 29 Nov 2025 09:06:52 -0800 (PST)
+Received: from gmail.com (116.235.236.35.bc.googleusercontent.com. [35.236.235.116])
+        by smtp.gmail.com with UTF8SMTPSA id 956f58d0204a3-6433c48472dsm2702283d50.22.2025.11.29.09.06.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 29 Nov 2025 09:04:07 -0800 (PST)
-Date: Sat, 29 Nov 2025 09:04:03 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Vincent Mailhol <mailhol@kernel.org>
-Cc: netdev@vger.kernel.org, Marc Kleine-Budde <mkl@pengutronix.de>, Oliver
- Hartkopp <socketcan@hartkopp.net>, David Ahern <dsahern@kernel.org>,
- linux-kernel@vger.kernel.org, linux-can@vger.kernel.org
-Subject: Re: [PATCH 5/7] iplink_can: add initial CAN XL support
-Message-ID: <20251129090403.5185f2ee@phoenix.local>
-In-Reply-To: <20251129-canxl-netlink-v1-5-96f2c0c54011@kernel.org>
-References: <20251129-canxl-netlink-v1-0-96f2c0c54011@kernel.org>
-	<20251129-canxl-netlink-v1-5-96f2c0c54011@kernel.org>
+        Sat, 29 Nov 2025 09:06:51 -0800 (PST)
+Date: Sat, 29 Nov 2025 12:06:51 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Eric Dumazet <edumazet@google.com>, 
+ John Stultz <jstultz@google.com>, 
+ Thomas Gleixner <tglx@linutronix.de>, 
+ Stephen Boyd <sboyd@kernel.org>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: linux-kernel <linux-kernel@vger.kernel.org>, 
+ netdev@vger.kernel.org, 
+ Eric Dumazet <eric.dumazet@gmail.com>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Kevin Yang <yyd@google.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Neal Cardwell <ncardwell@google.com>, 
+ Yuchung Cheng <ycheng@google.com>
+Message-ID: <willemdebruijn.kernel.e4c6aa98a939@gmail.com>
+In-Reply-To: <20251129095740.3338476-1-edumazet@google.com>
+References: <20251129095740.3338476-1-edumazet@google.com>
+Subject: Re: [PATCH] time/timecounter: inline timecounter_cyc2time()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-On Sat, 29 Nov 2025 16:29:10 +0100
-Vincent Mailhol <mailhol@kernel.org> wrote:
+Eric Dumazet wrote:
+> New network transport protocols want NIC drivers to get hwtstamps
+> of all incoming packets, and possibly all outgoing packets.
+> 
+> Swift congestion control is used by good old TCP transport and is
+> our primary need for timecounter_cyc2time(). This will be upstreamed soon.
+> 
+> This means timecounter_cyc2time() can be called more than 100 million
+> times per second on a busy server.
+> 
+> Inlining timecounter_cyc2time() brings a 12 % improvement on a
+> UDP receive stress test on a 100Gbit NIC.
+> 
+> Note that FDO, LTO, PGO are unable to magically help for this
+> case, presumably because NIC drivers are almost exclusively shipped
+> as modules.
+> 
+> Add an unlikely() around the cc_cyc2ns_backwards() case,
+> even if FDO (when used) is able to take care of this optimization.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Link: https://research.google/pubs/swift-delay-is-simple-and-effective-for-congestion-control-in-the-datacenter/
+> Cc: Kevin Yang <yyd@google.com>
+> Cc: Willem de Bruijn <willemb@google.com>
+> Cc: Neal Cardwell <ncardwell@google.com>
+> Cc: Yuchung Cheng <ycheng@google.com>
 
-> +		} else if (matches(*argv, "xl") == 0) {
-> +			NEXT_ARG();
-> +			set_ctrlmode("xl", *argv, &cm, CAN_CTRLMODE_XL);
-> +		} else if (matches(*argv, "xbitrate") == 0) {
-> +			NEXT_ARG();
-> +			if (get_u32(&xl_dbt.bitrate, *argv, 0))
-> +				invarg("invalid \"xbitrate\" value", *argv);
-> +		} else if (matches(*argv, "xsample-point") == 0) {
-> +			float sp;
-> +
-> +			NEXT_ARG();
-> +			if (get_float(&sp, *argv))
-> +				invarg("invalid \"xsample-point\" value", *argv);
-> +			xl_dbt.sample_point = (__u32)(sp * 1000);
-> +		} else if (matches(*argv, "xtq") == 0) {
-> +			NEXT_ARG();
-> +			if (get_u32(&xl_dbt.tq, *argv, 0))
-> +				invarg("invalid \"xtq\" value", *argv);
-> +		} else if (matches(*argv, "xprop-seg") == 0) {
-> +			NEXT_ARG();
-> +			if (get_u32(&xl_dbt.prop_seg, *argv, 0))
-> +				invarg("invalid \"xprop-seg\" value", *argv);
-> +		} else if (matches(*argv, "xphase-seg1") == 0) {
-> +			NEXT_ARG();
-> +			if (get_u32(&xl_dbt.phase_seg1, *argv, 0))
-> +				invarg("invalid \"xphase-seg1\" value", *argv);
-> +		} else if (matches(*argv, "xphase-seg2") == 0) {
-> +			NEXT_ARG();
-> +			if (get_u32(&xl_dbt.phase_seg2, *argv, 0))
-> +				invarg("invalid \"xphase-seg2\" value", *argv);
-> +		} else if (matches(*argv, "xsjw") == 0) {
-> +			NEXT_ARG();
-> +			if (get_u32(&xl_dbt.sjw, *argv, 0))
-> +				invarg("invalid \"xsjw\" value", *argv);
-> +		} else if (matches(*argv, "xtdcv") == 0) {
-> +			NEXT_ARG();
-> +			if (get_u32(&xl.tdcv, *argv, 0))
-> +				invarg("invalid \"xtdcv\" value", *argv);
-> +		} else if (matches(*argv, "xtdco") == 0) {
-> +			NEXT_ARG();
-> +			if (get_u32(&xl.tdco, *argv, 0))
-> +				invarg("invalid \"xtdco\" value", *argv);
-> +		} else if (matches(*argv, "xtdcf") == 0) {
-> +			NEXT_ARG();
-> +			if (get_u32(&xl.tdcf, *argv, 0))
-> +				invarg("invalid \"xtdcf\" value", *argv);
->  		} else if (matches(*argv, "loopback") == 0) {
->  			NEXT_ARG();
-
-not accepting any new code with matches()
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
