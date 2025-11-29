@@ -1,97 +1,140 @@
-Return-Path: <netdev+bounces-242644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6357EC935EB
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 02:26:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E093C9367E
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 03:08:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8A85E4E190D
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 01:26:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB1E63A8D19
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 02:08:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8983B1A76BB;
-	Sat, 29 Nov 2025 01:26:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E0371C4A20;
+	Sat, 29 Nov 2025 02:08:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="LrE6FJBV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ec8U5Jm6"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout01.his.huawei.com (canpmsgout01.his.huawei.com [113.46.200.216])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF5D83B2BA;
-	Sat, 29 Nov 2025 01:26:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F7A19E97B
+	for <netdev@vger.kernel.org>; Sat, 29 Nov 2025 02:08:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764379598; cv=none; b=rsABnOPCj29SqYAlqL+F2/1RVLKKkuTkwgazmUc3i3NqdH15KH8NelLj67H+XWKhjqZ3GiFaE/q4AA1rRo0YseHjw6G5vfXuH/iMCVwiJQeaXxKdLT+Hw/A8jXY056HP+Y+pmRH4qc1nPpgJ+sGqvO6//FzQwiYtS/oCUodbZd0=
+	t=1764382097; cv=none; b=KPLiMVcKOXE/HwrsWFxR9jyXI13iPrztxTwuQx91uZ2vksn+9X0HfHbUbiWKU5yijQCT5anlb9oc646RqYahyM/7C7Gq52efUyVa9p5NA2k1VzFcWM29WQAt8nCqg0A6t0eaNKSG9sH0OG/eFUjH3QNj3I2DHoxOnnC9ix3cQbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764379598; c=relaxed/simple;
-	bh=ewOzqBKwdXP2n5uFK7vR5ZffAKyeil1Qzl64Ul+4IRI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KFRyoPId8PpzKrUO4z9Apm/soN2rYY0zKU59suEx1XxoUZyKnaeAW09/lXYl/uWtJDTZFAvkJhlUM/+hGTl8OcZcC/lTB4quEcIvhAT/zGkiBiz66m75/er84v6qOO/IzArj5UMH7qR0G8Q+TgRcAFO1LJfDVZ4H6+z5tCVii34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=LrE6FJBV; arc=none smtp.client-ip=113.46.200.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=GiqVXD80ZeUaSSf/XrxvOWEFSml7KvNySEMk5eirPLE=;
-	b=LrE6FJBVlzSyrlV6Q6dSkv9nTgGYqLICTUB2vkWq1U+3jCxQa5Am2ycQKP5ntdLfd8vVc3CjJ
-	OL4aeAipKEbERHZdq+Ct1iKPLFtfgiz4BcVtrhSbAdqjaJa502jySZGPms/cWPU1b+cATx776wL
-	wU3R2fOLAL/dqem+9dMS4ho=
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by canpmsgout01.his.huawei.com (SkyGuard) with ESMTPS id 4dJCBk5ZBCz1T4G3;
-	Sat, 29 Nov 2025 09:24:46 +0800 (CST)
-Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
-	by mail.maildlp.com (Postfix) with ESMTPS id 44B42180481;
-	Sat, 29 Nov 2025 09:26:33 +0800 (CST)
-Received: from huawei.com (10.50.85.128) by dggpemf500016.china.huawei.com
- (7.185.36.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Sat, 29 Nov
- 2025 09:26:32 +0800
-From: Wang Liang <wangliang74@huawei.com>
-To: <syzbot+d7abc36bbbb6d7d40b58@syzkaller.appspotmail.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
-	<kuba@kernel.org>, <linux-hams@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <syzkaller-bugs@googlegroups.com>,
-	<yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
-	<wangliang74@huawei.com>
-Subject: Re: [syzbot] [hams?] memory leak in nr_sendmsg
-Date: Sat, 29 Nov 2025 09:47:43 +0800
-Message-ID: <20251129014743.1368452-1-wangliang74@huawei.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <692a2462.a70a0220.d98e3.0152.GAE@google.com>
-References: <692a2462.a70a0220.d98e3.0152.GAE@google.com>
+	s=arc-20240116; t=1764382097; c=relaxed/simple;
+	bh=CRc4BissXiBFHsGxmQeeGYsKNXpLm3Hmb6y7vM/q4E0=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=dFd+WhueZiutBY3IF5xQMBRbpQFBqrGRauaBS8PR+eM2RUVF7/3mzfdoa/trxqoMhKimAzB5gmR2VbMhXJ6MA985QN1tpGhsEq3BCqpN0qUrviLR5W8slA9nNjWf/DHXsoVX+rlmtkRjC9YdtteVHMHw1FlevSEsDnOBJR0mUz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ec8U5Jm6; arc=none smtp.client-ip=209.85.128.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-786943affbaso16211407b3.0
+        for <netdev@vger.kernel.org>; Fri, 28 Nov 2025 18:08:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764382095; x=1764986895; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lsRYCdc4G4wEDADpE0nWasPGvye4RSjOQQ03w+jfvak=;
+        b=ec8U5Jm6LrgoizdqlsjfvLZVaF/TzvnaRy4dXkvr/d1JTSGPJhdI3VHT3vWfsZ95O+
+         Kg7T7hs3LpGiIuwy61WOvZ/6LLDZC7rfkGNexFCfHVVV65nH1TcPHfLntsJ1KUXSezrd
+         Z1S6G+BDvf1nTbJJhD5untHkCUM0z6+dEEgMdzSOvlXjSa2neBtoSC/Hww6UT0BUtTVO
+         hZLZU3Ijagw1D9XZ/dnc7o6UwGHV5A30pa27A2mJpmW1JF/+LXNDyRmrJqHc2P3inv1o
+         y19Z2rtv5EwnWYQiX5KNsVTayVxHEGXkhYortYaWrWAWL7MSN7GOOK3GfwCYqX7wuahE
+         Yl9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764382095; x=1764986895;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lsRYCdc4G4wEDADpE0nWasPGvye4RSjOQQ03w+jfvak=;
+        b=IeXMJVkVZfGJd4H71N25EW5XuQ65KdY7Q42bW3qvUUrWcQhNTcStVguYpGSAnzYhWR
+         Hik/FJP2J4T+aEUiBaXeElqgydtaOK09JG5pDYfNBvVKG6DeSQO+ketws2o1KC1LRyGT
+         /VSmnEzl23R29EexG/ychi4W2sDg/tAGVn9Y9PetIHEwCClzishRph/UbWtudwSHhHBD
+         6j+7eAzf1tG06ywFymr0UC8GWeA+O/GeIDX0uag4ZyWnjvGv5XTiuGcSw9jIvO1GpKWK
+         d0eNL0eBtBOLrQI+XQxM6s7NwwKg4kGb0tscPXMnlf0OI+TnK47DUSfcei6c62Lytb/t
+         KDZg==
+X-Forwarded-Encrypted: i=1; AJvYcCWbDPtRUqe7mTD2tPDM9VNC1AKC6xvedmTd/udvYANkpiqnBkcBqBooNL+uReCm910TBrAXPts=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyNZnl31eSzA+uF5gvZ7Ma5h5HBOCbJuWhR4/1orU67UUh5hYBR
+	k4FzeMbjluP71FFJDSwQKRSk1sOsqnlMz57EA3M2dYm9ufKhZ1rpvYpq1urY3Q==
+X-Gm-Gg: ASbGncv9sGbdZKi4H9LNPYbsQy3GR4nJ3IDjebGoQ3EHirqykhAzm6Agcxty2/BLnil
+	v1+FEM1n1g8QuzJkX5Apx8lhbGtSL7YPJkMrJO3qdwrDa2ED9vp7tOvjo89U+a9PaQcgSpvhsGn
+	4t2vF7Hqa0Zj6z/zSoCaBW0nID9r5ocLMICUZaT8+C1njUq1E2Upn6JG8/NRSvcW2+LLUoBh/J6
+	QOyIiHthGTEf33vK7BtR7ZUMxr+7hTr7MBlYNveqiuU+sEJ9UEP1Gz73ToPULKThAYSm19chgYx
+	/L6jW5JydTjMQOxcmW7/RWF1g/HutHNdiVz8obtmazlPiSX/j6HzrJKhdh0xrhvG1CtTrLAfpgb
+	rRmZeZd2KnCiogwCWo6XOu27DFB3IkBiCNobrtNn/EhrySTbZwox0RWsquriqGctDlnbXKns1mz
+	r0uJDIyQfPt+2ZELQ+cH7jTdern+OQEEJajswhf6fD+T2i6Bw9FrdqpdytMysMwVgc8FY=
+X-Google-Smtp-Source: AGHT+IEmqYXBYpPqEYCSQkz8zSv3rzNYAa0HQAd47UXkkbuR8k3qdccCqSRbB3zv+SwTOcIUYRCuAw==
+X-Received: by 2002:a05:690c:6d93:b0:787:cb0c:c240 with SMTP id 00721157ae682-78ab6e01205mr143757197b3.19.1764382094910;
+        Fri, 28 Nov 2025 18:08:14 -0800 (PST)
+Received: from gmail.com (116.235.236.35.bc.googleusercontent.com. [35.236.235.116])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-78ad102d25csm20916737b3.44.2025.11.28.18.08.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Nov 2025 18:08:14 -0800 (PST)
+Date: Fri, 28 Nov 2025 21:08:13 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+ =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@toke.dk>, 
+ Jamal Hadi Salim <jhs@mojatatu.com>, 
+ Cong Wang <xiyou.wangcong@gmail.com>, 
+ Jiri Pirko <jiri@resnulli.us>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: =?UTF-8?B?Sm9uYXMgS8O2cHBlbGVy?= <j.koeppeler@tu-berlin.de>, 
+ cake@lists.bufferbloat.net, 
+ netdev@vger.kernel.org, 
+ =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
+Message-ID: <willemdebruijn.kernel.2e44851dd8b26@gmail.com>
+In-Reply-To: <20251127-mq-cake-sub-qdisc-v2-2-24d9ead047b9@redhat.com>
+References: <20251127-mq-cake-sub-qdisc-v2-0-24d9ead047b9@redhat.com>
+ <20251127-mq-cake-sub-qdisc-v2-2-24d9ead047b9@redhat.com>
+Subject: Re: [PATCH net-next v2 2/4] net/sched: sch_cake: Add cake_mq qdisc
+ for using cake on mq devices
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
- dggpemf500016.china.huawei.com (7.185.36.197)
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-#syz test
+Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+> Add a cake_mq qdisc which installs cake instances on each hardware
+> queue on a multi-queue device.
+> =
 
-diff --git a/net/netrom/nr_out.c b/net/netrom/nr_out.c
-index 5e531394a724..2b3cbceb0b52 100644
---- a/net/netrom/nr_out.c
-+++ b/net/netrom/nr_out.c
-@@ -43,8 +43,10 @@ void nr_output(struct sock *sk, struct sk_buff *skb)
- 		frontlen = skb_headroom(skb);
- 
- 		while (skb->len > 0) {
--			if ((skbn = sock_alloc_send_skb(sk, frontlen + NR_MAX_PACKET_SIZE, 0, &err)) == NULL)
-+			if ((skbn = sock_alloc_send_skb(sk, frontlen + NR_MAX_PACKET_SIZE, 0, &err)) == NULL) {
-+				kfree_skb(skb);
- 				return;
-+			}
- 
- 			skb_reserve(skbn, frontlen);
- 
--- 
-2.34.1
+> This is just a copy of sch_mq that installs cake instead of the default=
 
+> qdisc on each queue. Subsequent commits will add sharing of the config
+> between cake instances, as well as a multi-queue aware shaper algorithm=
+.
+> =
+
+> Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+> ---
+>  net/sched/sch_cake.c | 214 +++++++++++++++++++++++++++++++++++++++++++=
++++++++-
+>  1 file changed, 213 insertions(+), 1 deletion(-)
+
+Is this code duplication unavoidable?
+
+Could the same be achieved by either
+
+extending the original sch_mq to have a variant that calls the
+custom cake_mq_change.
+
+Or avoid hanging the shared state off of parent mq entirely. Have the
+cake instances share it directly. E.g., where all but the instance on
+netdev_get_tx_queue(dev, 0) are opened in a special "shared" mode (a
+bit like SO_REUSEPORT sockets) and lookup the state from that
+instance.=
 
