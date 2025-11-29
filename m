@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-242663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242664-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69D5AC937ED
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 05:13:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id ECBB9C937F0
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 05:13:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 166623487CD
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 04:13:32 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 139E334312F
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 04:13:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7708D22F77E;
-	Sat, 29 Nov 2025 04:13:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CF8523496F;
+	Sat, 29 Nov 2025 04:13:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ch2N2R2i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u9zs4T6/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46D54226D02;
-	Sat, 29 Nov 2025 04:13:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5098C233D88;
+	Sat, 29 Nov 2025 04:13:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764389608; cv=none; b=GCwI8cQWqnXDyh7W1S/7JgFN8fow+1wi4Ut0gtDDXppE6Z4mCu52qMgaqvR6yeQQTE7FlJrAPSSTCiMhdDPyW2C+HznExIJ/8M4aOStwhV9rvEMfm35wmJYcMcVzzAnYJHqCdi2c3veGb+OnZtmSKxLWRCaIq0arrvvyceHVxN4=
+	t=1764389609; cv=none; b=RnckWRbw+XAD2OQcxsye+yxU0K1+bZO/bYngkuuoUX4jjddHH1WM3j80t2KTJ1V+NM5+zMIwSr35h3aqjnw04/lIAScqM3Z2SZlHszUHWS8q5mSP5dVfllvg2RNJMoFJ/mktA2RHs6hALNbf4u8OuMJ3J+ExcQFZJoclmFYxCFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764389608; c=relaxed/simple;
-	bh=jVt2VZrxSvr4OBx8ByQS9DhjVELgdDft9Gv+fjiNEMc=;
+	s=arc-20240116; t=1764389609; c=relaxed/simple;
+	bh=16CWBlAjMnObwnvBeLCcvrZwKLKX1E3MHiTXKgkowVc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=lCJKmT59XZNs3y0fDWlw1+yzkwuhgBsJ7crrmL72CiJ0rUgZzQiDCZ2I/HOZFv56pLNZic9rs2BjNLIgToMYf37PWEyeZIn5uiy3zQQhXqC0T25we2XzUnR79Sy+wNG1PjvNyXnjlDYL/b7hLUw4T8F7sE2TG2hkRJcQkbVMxwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ch2N2R2i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8CDFC4CEF7;
-	Sat, 29 Nov 2025 04:13:27 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=TLjfF9tyYTdoruVb79QjE/L4MFnLhbs9iGRu6KLyheamHxWE5sjPBdMDeQln7m26xz4rDmcBXf25x4bC9ZBevp4Tb1zeOjYOHKTkm5RTUVcBAeRws8XwlyYUVznwooY2FZ+GB67UMmhrZD+ITAOVCA7J113gzp41hJrRiYw9YPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u9zs4T6/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26FF0C4CEFB;
+	Sat, 29 Nov 2025 04:13:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764389607;
-	bh=jVt2VZrxSvr4OBx8ByQS9DhjVELgdDft9Gv+fjiNEMc=;
+	s=k20201202; t=1764389609;
+	bh=16CWBlAjMnObwnvBeLCcvrZwKLKX1E3MHiTXKgkowVc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ch2N2R2iF2KrK0IGpW2AlE2RI5VVft01ynxAybUgtLurY+YcyOXgYe4E4TyRimhz2
-	 g1RAAnhPuxs2Gve0HMoMYMfUd8+rGoLIzQ7UKQvT5rLzvLLk3q9Lew4G2c3gq3Uxtf
-	 PlbO37fiapVgKJvy/ThqxLPtplBjjPVwF1oHnnSNEzakoZ+wH/HG/vY9o/q5g9S9I5
-	 dTWB7yt7PAFaL4bWNeWGYz57rRuXowcX8B2bxaSCKIOOTcnsCBSzNWTOQUa+mJ6QN0
-	 VuLBZ9fICY5Eus3YretVQvRoyRQTt4OqLQmdrSs9GuHSZqPOUh7PBQQFSncd381ywO
-	 PZKz5kyRUVqKA==
+	b=u9zs4T6/2ZR7ree9yxOE9MV/kx2v+QiYIvGzc8lI3rOt92Nc/Ip7arN6zQf11N+4F
+	 UnEnEjkNIbJz4hMblezjNwgof9PTL96e6l2grFuULwuN1z/XHo9jLJ9Yyi2F9UEaAX
+	 nOE5rVD/ssl8iI75mSAvM3t3ISj+f/muX3Y99FPHhbX41mpngYU29MI3rtJI1VLpPq
+	 FCxpOjLS7Ugez/v8KXauwl8beXoFo8cXRPDBQER2Joeq3Iis79TVkRp8Z5tmO60rzD
+	 za3wIt7jCL1MDBeWMQp5z+s/lCbD2DVcm2Gbs55Wi7+cQILNToqUIU1NBTXA39pMme
+	 tCfgxDJ7mim2w==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AA5C9380692B;
-	Sat, 29 Nov 2025 04:10:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 01B34380692B;
+	Sat, 29 Nov 2025 04:10:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,70 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 00/15] Introduce the dsa_xmit_port_mask() tagging
- protocol helper
+Subject: Re: [PATCH net-next 0/2] net: broadcom: migrate to
+ .get_rx_ring_count() ethtool callback
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176438942956.896171.5589128104353485627.git-patchwork-notify@kernel.org>
-Date: Sat, 29 Nov 2025 04:10:29 +0000
-References: <20251127120902.292555-1-vladimir.oltean@nxp.com>
-In-Reply-To: <20251127120902.292555-1-vladimir.oltean@nxp.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- alsi@bang-olufsen.dk, clement.leger@bootlin.com, daniel@makrotopia.org,
- mmyangfl@gmail.com, dqfext@gmail.com, florian.fainelli@broadcom.com,
- george.mccollister@gmail.com, hauke@hauke-m.de, jonas.gorski@gmail.com,
- kurt@linutronix.de, linus.walleij@linaro.org,
- linux-renesas-soc@vger.kernel.org, sean.wang@mediatek.com,
- UNGLinuxDriver@microchip.com, woojung.huh@microchip.com
+ <176438943073.896171.9965500132545324533.git-patchwork-notify@kernel.org>
+Date: Sat, 29 Nov 2025 04:10:30 +0000
+References: <20251127-grxrings_broadcom-v1-0-b0b182864950@debian.org>
+In-Reply-To: <20251127-grxrings_broadcom-v1-0-b0b182864950@debian.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, opendmb@gmail.com,
+ florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 27 Nov 2025 14:08:47 +0200 you wrote:
-> What
-> ----
+On Thu, 27 Nov 2025 02:17:14 -0800 you wrote:
+> This series migrates Broadcom ethernet drivers to use the new
+> .get_rx_ring_count() ethtool callback introduced in commit 84eaf4359c36
+> ("net: ethtool: add get_rx_ring_count callback to optimize RX ring
+> queries").
 > 
-> Some DSA tags have just the port number in the TX header format, others
-> have a bit field where in theory, multiple bits can be set, even though
-> DSA only sets one.
+> This change simplifies the .get_rxnfc() implementation by
+> extracting the ETHTOOL_GRXRINGS case handling into a dedicated callback,
+> making the code cleaner and aligning these drivers with the updated
+> ethtool API.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,01/15] net: dsa: introduce the dsa_xmit_port_mask() tagging protocol helper
-    https://git.kernel.org/netdev/net-next/c/6f2e1c75bc5e
-  - [net-next,02/15] net: dsa: tag_brcm: use the dsa_xmit_port_mask() helper
-    https://git.kernel.org/netdev/net-next/c/621d06a40e47
-  - [net-next,03/15] net: dsa: tag_gswip: use the dsa_xmit_port_mask() helper
-    https://git.kernel.org/netdev/net-next/c/e094428fb40c
-  - [net-next,04/15] net: dsa: tag_hellcreek: use the dsa_xmit_port_mask() helper
-    https://git.kernel.org/netdev/net-next/c/f59e44cc0d6c
-  - [net-next,05/15] net: dsa: tag_ksz: use the dsa_xmit_port_mask() helper
-    https://git.kernel.org/netdev/net-next/c/ea659a9292b1
-  - [net-next,06/15] net: dsa: tag_mtk: use the dsa_xmit_port_mask() helper
-    https://git.kernel.org/netdev/net-next/c/84a60bbec503
-  - [net-next,07/15] net: dsa: tag_mxl_gsw1xx: use the dsa_xmit_port_mask() helper
-    https://git.kernel.org/netdev/net-next/c/a4a00d9e365a
-  - [net-next,08/15] net: dsa: tag_ocelot: use the dsa_xmit_port_mask() helper
-    https://git.kernel.org/netdev/net-next/c/5733fe2a7ad1
-  - [net-next,09/15] net: dsa: tag_qca: use the dsa_xmit_port_mask() helper
-    https://git.kernel.org/netdev/net-next/c/48afabaf4aaa
-  - [net-next,10/15] net: dsa: tag_rtl4_a: use the dsa_xmit_port_mask() helper
-    https://git.kernel.org/netdev/net-next/c/4abf39c8aef5
-  - [net-next,11/15] net: dsa: tag_rtl8_4: use the dsa_xmit_port_mask() helper
-    https://git.kernel.org/netdev/net-next/c/5afe4ccc33f4
-  - [net-next,12/15] net: dsa: tag_rzn1_a5psw: use the dsa_xmit_port_mask() helper
-    https://git.kernel.org/netdev/net-next/c/b33aa90e68b4
-  - [net-next,13/15] net: dsa: tag_trailer: use the dsa_xmit_port_mask() helper
-    https://git.kernel.org/netdev/net-next/c/3c1975bbdf92
-  - [net-next,14/15] net: dsa: tag_xrs700x: use the dsa_xmit_port_mask() helper
-    https://git.kernel.org/netdev/net-next/c/24099389a63f
-  - [net-next,15/15] net: dsa: tag_yt921x: use the dsa_xmit_port_mask() helper
-    https://git.kernel.org/netdev/net-next/c/64b0d2edb61a
+  - [net-next,1/2] net: bnxt: extract GRXRINGS from .get_rxnfc
+    https://git.kernel.org/netdev/net-next/c/bba18f3ba7cc
+  - [net-next,2/2] net: bcmgenet: extract GRXRINGS from .get_rxnfc
+    https://git.kernel.org/netdev/net-next/c/335d78c6161b
 
 You are awesome, thank you!
 -- 
