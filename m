@@ -1,88 +1,140 @@
-Return-Path: <netdev+bounces-242649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01119C936F2
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 03:48:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58D1EC936FD
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 04:07:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F16C94E121C
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 02:48:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1B723A7061
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 03:07:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2C371DED40;
-	Sat, 29 Nov 2025 02:48:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79BFC221F15;
+	Sat, 29 Nov 2025 03:07:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ipDH2/ar"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RSnrFOJd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4A961891A9
-	for <netdev@vger.kernel.org>; Sat, 29 Nov 2025 02:48:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 523E413A86C;
+	Sat, 29 Nov 2025 03:07:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764384534; cv=none; b=pVWFypEn+/5Ac7o13rJmlji+VtOO89zA7+CllNH66GLLYKzQ7361zUIFqkBfAOgfPa5H1uON75H++WJsMXoqz8jokiNzhqIRc+6PTb96ZRPfq6CA4hHBmnFZoQnMY8a/f43HVmpBpOp0HBydBEa71S+xAzdtx+DaL+dn0veXp4c=
+	t=1764385629; cv=none; b=NcMoBvdsZseb6BQOzroi/oq4oVaVaHtTs1bLrsm4a7FY4Ashi0dUPudxiyuXLZMLhqAuQkCLzYThI2yq/ip67Jx2egQxiBYishCK2nrHBVThWYwG0ONiXOy57JGyZufwK5eh9m4Oh0+Jd6cRR1iGx/xvDO4F2SXWSalCjVnVX5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764384534; c=relaxed/simple;
-	bh=/enZJ3f1Xj+OcCbUp/ebQOy2ec39G9qi6aMo7DqvXzI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BGChYWyHRxtiSdiPjhnveDtPnRmFKNCFuYSRS7j3IThGP/fjN/jlke60MH2xZ8fDqeu8r8Si5+gphWnqQRIHc+aGTpbHaI5ZDSxfNMaTTYJV+YdBoA538t+fJpSMrvVurrqE7Dotlg75EOyHmPflAR+6SzaqKxoR3Yn7QHm8rL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ipDH2/ar; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B11BDC4CEF1;
-	Sat, 29 Nov 2025 02:48:53 +0000 (UTC)
+	s=arc-20240116; t=1764385629; c=relaxed/simple;
+	bh=oSrDrkLL0unf1zQp33y275Hq4OhWlbnPmE5nxZPWLGQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Qj6LZgm8gvSKV1sCyTOcPFC1HSLlvL8I4Y3wijynCgenc91MfManrkY1LceDFpWOy8maPboKQI0w6hlQX1FvyET+0zietl5yTsctEUK3TT8MLc79dGZ8/9WkXmXZe4h7GyVHsFf4ifESKm2HcbOmJyUqL1OImtxUfQIR7EbF+2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RSnrFOJd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C81CAC4CEF1;
+	Sat, 29 Nov 2025 03:07:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764384534;
-	bh=/enZJ3f1Xj+OcCbUp/ebQOy2ec39G9qi6aMo7DqvXzI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ipDH2/arN7XL9Qq6UL21XUqMvbTZp1rqjJgXXW75p6yksT3yhS30VYjZy+JkbY5ue
-	 XEkdLKASN+jcEbaU8hdrMmzUoZmDoGWXO0artnxYwFHY9PaIYdkryibMFx2gAVVN6m
-	 lGp+biCN18f0ekjWjB+86pR5WZnhstMceCyXJdenWwtAxzrvvlslm/1C39NFbMDWrC
-	 2XvTbLtEcU+IgB1YJ2WbuQqrz6h9LU4sV9fJpPeomfne/f47NikrQnl0pePmgFC5nK
-	 SMe+3ajQBbMNXCIzYxDXChl+E+onoORxqs9PN5Bt0wepttsnWeMVTD2PvRGxAzIaSd
-	 e032W1rf7Ywow==
-Date: Fri, 28 Nov 2025 18:48:52 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@toke.dk>
-Cc: Cong Wang <xiyou.wangcong@gmail.com>, Jamal Hadi Salim
- <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonas
- =?UTF-8?B?S8O2cHBlbGVy?= <j.koeppeler@tu-berlin.de>,
- cake@lists.bufferbloat.net, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 0/4] Multi-queue aware sch_cake
-Message-ID: <20251128184852.7ceb3e72@kernel.org>
-In-Reply-To: <87cy51bxe1.fsf@toke.dk>
-References: <20251127-mq-cake-sub-qdisc-v2-0-24d9ead047b9@redhat.com>
-	<aSiYGOyPk+KeXAhn@pop-os.localdomain>
-	<87o6onb7ii.fsf@toke.dk>
-	<20251128095041.29df1d22@kernel.org>
-	<87cy51bxe1.fsf@toke.dk>
+	s=k20201202; t=1764385628;
+	bh=oSrDrkLL0unf1zQp33y275Hq4OhWlbnPmE5nxZPWLGQ=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=RSnrFOJdrIcDIDsS63ZzQFUUFV7zsaYa8bLRg+RSmbHbi2HuYpqWT5C/I7I2E4GRc
+	 xTxJbuJ3y9oR3VWVhYJYM0MPFsnxMgwIE6Ek2Eu5ZxhrCbE7gpUGK6L2p04iPH0xbV
+	 pGrSd51LFelolglloYGyc0Z2wlO5EZxEectD5s6T9Pom1qij41pqeRqkPIaCytciaB
+	 N3RiscsnTbud050XDacA8Sf30LSV2I5y8w5TffI3evHyVfhe5wFzadS0mYke6OX1EZ
+	 ZNnRz0FltmvTEDy8DNnBxYMXk0Hf6oYIadDRcbwYPKWMYj1RkUaO10ZGLuPz0Hxquy
+	 NkiU+W+7jU7IA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC340CFD376;
+	Sat, 29 Nov 2025 03:07:08 +0000 (UTC)
+From: Rohan G Thomas via B4 Relay <devnull+rohan.g.thomas.altera.com@kernel.org>
+Date: Sat, 29 Nov 2025 11:07:05 +0800
+Subject: [PATCH net v2] net: stmmac: Fix E2E delay mechanism
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20251129-ext-ptp-2v-v2-1-d23aca3e694f@altera.com>
+X-B4-Tracking: v=1; b=H4sIAFhjKmkC/x3MQQqAIBBA0avErBvIiQi7SrRQm2o2JioSSHdPW
+ r7F/xUSR+EES1chcpEkt2+gvgN3GX8yyt4MNNCkFGnkJ2PIAamgJedGO1tjJg0tCJEPef7ZCp4
+ zbO/7AXYW/YxhAAAA
+X-Change-ID: 20251129-ext-ptp-2v-b2cc3b7baa59
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Jose Abreu <Jose.Abreu@synopsys.com>, Fugang Duan <fugang.duan@nxp.com>, 
+ Kurt Kanzenbach <kurt@linutronix.de>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ Rohan G Thomas <rohan.g.thomas@altera.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1764385627; l=2236;
+ i=rohan.g.thomas@altera.com; s=20250815; h=from:subject:message-id;
+ bh=Vs44KaAN7n7X6+9HvqUBUtY37vLPXrYhMYfOJlZqUys=;
+ b=ypg60oy/Dq2QN4TFD9EqHDMaOwPxa/g2c6RB6k+kdjcWlbpXEr4zWM2FB81DBAhG2qhirq7o5
+ UOB5pBk6njBBKZaiVooSWo3wK5OrXnH96mGtc2G/POG28scDk2eNeg4
+X-Developer-Key: i=rohan.g.thomas@altera.com; a=ed25519;
+ pk=5yZXkXswhfUILKAQwoIn7m6uSblwgV5oppxqde4g4TY=
+X-Endpoint-Received: by B4 Relay for rohan.g.thomas@altera.com/20250815
+ with auth_id=494
+X-Original-From: Rohan G Thomas <rohan.g.thomas@altera.com>
+Reply-To: rohan.g.thomas@altera.com
 
-On Fri, 28 Nov 2025 23:33:26 +0100 Toke H=C3=B8iland-J=C3=B8rgensen wrote:
-> Jakub Kicinski <kuba@kernel.org> writes:
-> > On Thu, 27 Nov 2025 20:27:49 +0100 Toke H=C3=B8iland-J=C3=B8rgensen wro=
-te: =20
-> >> Yeah; how about I follow up with a selftest after this has been merged
-> >> into both the kernel and iproute2? =20
-> >
-> > Why is iproute2 a blocker? Because you're not sure if the "API" won't
-> > change or because you're worried about NIPA or.. ? =20
->=20
-> No, just that the patch that adds the new qdisc to iproute2 needs to be
-> merged before the selftests can use them. Which they won't be until the
-> kernel patches are merged, so we'll have to follow up with the selftests
-> once that has happened. IIUC, at least :)
+From: Rohan G Thomas <rohan.g.thomas@altera.com>
 
-You can add a URL to the branch with the pending iproute2 changes
-when you post the selftests and we'll pull them in NIPA, or post=20
-the patches at the same time (just not in one thread).
+For E2E delay mechanism, "received DELAY_REQ without timestamp" error
+messages show up for dwmac v3.70+ and dwxgmac IPs.
+
+This issue affects socfpga platforms, Agilex7 (dwmac 3.70) and
+Agilex5 (dwxgmac). According to the databook, to enable timestamping
+for all events, the SNAPTYPSEL bits in the MAC_Timestamp_Control
+register must be set to 2'b01, and the TSEVNTENA bit must be cleared
+to 0'b0.
+
+Commit 3cb958027cb8 ("net: stmmac: Fix E2E delay mechanism") already
+addresses this problem for all dwmacs above version v4.10. However,
+same holds true for v3.70 and above, as well as for dwxgmac. Updates
+the check accordingly.
+
+Fixes: 14f347334bf2 ("net: stmmac: Correctly take timestamp for PTPv2")
+Fixes: f2fb6b6275eb ("net: stmmac: enable timestamp snapshot for required PTP packets in dwmac v5.10a")
+Fixes: 3cb958027cb8 ("net: stmmac: Fix E2E delay mechanism")
+Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
+---
+v1 -> v2:
+   - Rebased patch to net tree
+   - Replace core_type with has_xgmac
+   - Nit changes in the commit message
+   - Link: https://lore.kernel.org/all/20251125-ext-ptp-fix-v1-1-83f9f069cb36@altera.com/
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 7b90ecd3a55e600458b0c87d6125831626f4683d..cfc6e5aaf6f631b9d00dab9f6339778123d4bc75 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -590,7 +590,8 @@ static int stmmac_hwtstamp_set(struct net_device *dev,
+ 			config->rx_filter = HWTSTAMP_FILTER_PTP_V2_EVENT;
+ 			ptp_v2 = PTP_TCR_TSVER2ENA;
+ 			snap_type_sel = PTP_TCR_SNAPTYPSEL_1;
+-			if (priv->synopsys_id < DWMAC_CORE_4_10)
++			if (priv->synopsys_id < DWMAC_CORE_3_70 &&
++			    !priv->plat->has_xgmac)
+ 				ts_event_en = PTP_TCR_TSEVNTENA;
+ 			ptp_over_ipv4_udp = PTP_TCR_TSIPV4ENA;
+ 			ptp_over_ipv6_udp = PTP_TCR_TSIPV6ENA;
+
+---
+base-commit: 527d39cba164fd11e5a46dc38d8f330c72cf992b
+change-id: 20251129-ext-ptp-2v-b2cc3b7baa59
+
+Best regards,
+-- 
+Rohan G Thomas <rohan.g.thomas@altera.com>
+
+
 
