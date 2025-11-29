@@ -1,211 +1,139 @@
-Return-Path: <netdev+bounces-242696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADF00C93BC7
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 10:57:50 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB40EC93BF2
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 11:22:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8137C4E1BE3
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 09:57:49 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 50F3E34947D
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 10:22:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E25C26738B;
-	Sat, 29 Nov 2025 09:57:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE10226E6FD;
+	Sat, 29 Nov 2025 10:22:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n1rlC5L1"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="dkbF/YgT";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ToluMmLW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 889872405ED
-	for <netdev@vger.kernel.org>; Sat, 29 Nov 2025 09:57:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F73122B5A3;
+	Sat, 29 Nov 2025 10:22:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764410267; cv=none; b=PkyfUTrJjBNyoXvxVEE7x+C1jhzWR51d1KximVuaWl0l61AZI9fD0/6NO3mpAGybBsf7qcyyg3zps/Zs0w9+5OsOHMgZBPeTT44dMgzkEtyBHJOi2RQ8yjo9SMUrZ8Wav0t+aP5eQAnWpMrf5e9yYQsQYKGxOiLhXfn4ncBfehA=
+	t=1764411733; cv=none; b=moySxT8IqPuvXIo1qs5NGHYXxT211o1SNGbozRBgOjFG78UmffPRN05ar4J1UsVE89NCmT+TE8QOtdYzisODwaJpvBG6sdrYw7wRd1T0VE4bjHUtMqYwU3Me1UsyXxvWCnbLbtQpVRBSgi8XrHGTbZZeH2R6TB08OrVeQuFbhHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764410267; c=relaxed/simple;
-	bh=kjC2CRoj1ICKpdLHPJNJwc/suA2ZEqoPeuQugHkxNh8=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=SoOslbCh7snILi00suKkTxB0yzs2OixfNe4YsJ2tEUH0R77syMxmfB+op8QnFmLKHGoKpxeSk3904VmE0qjezoYcR7ka3my7NplVpEDqgD5xsrVjaOWYDZRwTdEuF3eObKyXTVIZRE48g8P81A9xBOplPEW4uI0Qcf32N+02W94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n1rlC5L1; arc=none smtp.client-ip=209.85.160.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-4ed79dd4a47so47169581cf.3
-        for <netdev@vger.kernel.org>; Sat, 29 Nov 2025 01:57:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764410264; x=1765015064; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=RaHWpzLeVxoNOwQpfQ6Ps3eCZ1QEUD7c077XzEg2PUA=;
-        b=n1rlC5L1Yuo5AgXpxUcRROP9hTO6oVTyIkZ+rfMJ/LnSarblaqqZxDbklhx5JUU+F1
-         R4mgjsQdKtaw4oOdcqL+iLWwXdDMxeeNjRxvMpAXZyZ/UeWoNuGbJ2EO4jhfi7ooJ4pb
-         +IvGqVsNDjVs/DLkriuMTGVh0QbqVszO71hrspw47FBFjHpC2AIlsGf8/Ae3FBnCXx3Q
-         BihRYed6HwAAkthUiypT/MSTVIt0Q9Zb1V+4Udfcv65niAWsO+imho6kHHM0RFXFrCN9
-         NAUGKtw3VdSRNiaDDLwhYcW5zZsHK632jvGZALXgNlx0T96FcoB+lhRL34NMq4/9HHyx
-         /ipg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764410264; x=1765015064;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RaHWpzLeVxoNOwQpfQ6Ps3eCZ1QEUD7c077XzEg2PUA=;
-        b=F4NMV8xHwHbDM5bD80xnVzGR6hgt1mEKIxr6DCTiSY0rzovfkbI2ooxqJQFTRZnyHn
-         41eNjwoJZlHRnJ7Ezxn802Doi27iTChbgNxE1ySfz0A973vGqy6uYfKhzRvucrFIaylb
-         e+/onF4g0wMKjPWFfdJV2NlI/5G/+EBNichsqnPaos/RUWtUhzY9SmUsqd9lhuDdGsgP
-         umCf0p0n2RbxyJbXOJ4f90YjuR5P6OOd3Joa5KgmhJWeK4aN09kwzszOtuf86eVvke7H
-         sooulMeSa80dpFCgVPsOf4E9uIx3UZA5K0eSxD16ZqRqqAKKURPMz0KkQnjMsZ9vwmr7
-         AGdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX9ZQrSAXgwQ1SnJxlpzjIMklra8SctUP6CatoJlpu4+VsZ8KTsyfxc1pDpJOMNrLye7miVfGI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzT2UQvgoLcqFZuQ9saZlFb/PKrlxv9/6tTOJ+LjBlP6U7miJfS
-	esxCdELjLPo440kcF8Dk4keuz3UbWE9ThZtW9zZDfBxJlNhZ+wVds2+mXfgOKtdMbk08jDEFOGq
-	BREU0wNhj2kx9qQ==
-X-Google-Smtp-Source: AGHT+IE9e52KmeeUSI7PHmKs+tbnInUYzJa7BV62x1xd1VKYwrIlfZmBDNqCs536+iI8/0ZLLbiasYsjsJ41Ug==
-X-Received: from qtql8.prod.google.com ([2002:ac8:4a88:0:b0:4ed:3cc:ba24])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:7d0e:0:b0:4ed:70fd:1453 with SMTP id d75a77b69052e-4ee58935f18mr428211591cf.60.1764410264593;
- Sat, 29 Nov 2025 01:57:44 -0800 (PST)
-Date: Sat, 29 Nov 2025 09:57:40 +0000
+	s=arc-20240116; t=1764411733; c=relaxed/simple;
+	bh=oVz44O4lt9xJul45styEiQsd5Qo4kmSSz0E2+IoHbdk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BPSIqhymYb5RKIYD6yIg+9WVXMuldxP6PIKxZN/f/AZ3qLUE74eJTmt8y8FGFqfnUPXw40XePN9vkcbGnNeXncZohl7cxQZSkDCZrUDeanvHrVKzDMNYZbeUDEe28ywkL2Mx4OT074SdK3shIIV4N7DtozdajhFX3aHjbmMC7aM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=dkbF/YgT; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ToluMmLW; arc=none smtp.client-ip=103.168.172.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfout.phl.internal (Postfix) with ESMTP id 0477DEC0101;
+	Sat, 29 Nov 2025 05:22:09 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-06.internal (MEProxy); Sat, 29 Nov 2025 05:22:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1764411729; x=
+	1764498129; bh=jlPq/Wh5BfJbRcxs5REUD2RG4sozKHuQgt5SRlpBaA4=; b=d
+	kbF/YgTEk/mvpv+u80Ys0Atl7ZniPzPKaqAdnNN8CMyemobQxJuI+EFKqjq2r5jh
+	wuoBTWuedGHQbKW5C26sAss6TGX9CqijY59prIJypAERum9VatV08pI5YVVnus2L
+	gpR4hLOaUyhNtfiGffgjjHJyCT4uAVGylgS2G6oE6CUCKyyfPllS4BSVx9F3OffZ
+	zUEAJE9zBajvT+zBlrNQwtnPDqkRf7J9+sHSVXGK2uN+uLqUYCeuDams1BTcFtFU
+	tUhWwNEsb8/OutHdti5LGOTd/xWfwRf/MlwGp/2y6sZcstL+LzOQ374/f9m3LEBZ
+	tccJUMerLLDtaEq70f8cA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1764411729; x=1764498129; bh=jlPq/Wh5BfJbRcxs5REUD2RG4sozKHuQgt5
+	SRlpBaA4=; b=ToluMmLWPwrKiANLLaL+5rLfsokdw7XsNN2srTOy7V221n5FQKU
+	SnTT/dmEE1+qq5IGN0CClgQUY8j73ubJ+g9B/RlBBoohhM+XxlrkD6k7RL0Z+Sp6
+	6K9I7YUoST58GZ/YgSX5b8yPLZJG80SxMBllLXgn3UzQNOhFfb2W8qwL0DZpeIW0
+	+6oVYh6hCPz7TZUxxl/QOVs6G83ac3EB5fi52z+EEVWhYuhSs2RGvZAXWW+cm7wI
+	OT40WKrgsTkmT4lV5lPo8090V2gg81rW1xxBaydwaGOZSDfNswCD57bIxC4wMOX/
+	v5Wq+q+qdleNaLmyyXFMDiPYrtiWAxkGsRw==
+X-ME-Sender: <xms:UMkqafYGWYcuJdUoFVZJVpMipl_uXfYzDzJJVz4k8lDX0d1wUqOdaA>
+    <xme:UMkqaUZy8zRDQCbld7l8127RwtUltnDROl2pxxOGIUmHL7kuqPoSwNHCtc-AB5GJN
+    TYNIt1wfM9gBVQb0kxwncfI8Rm_rkfjQApknimyd4eOfk_3yy-Faw>
+X-ME-Received: <xmr:UMkqacz0muQlQet9M6uwSORlonUxAiRLfmXR11ZrFxA9zjYuI3pcukcKTsxkP0vHTHnYGcAMBFr0ccPvnAQPIkP1_g>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddvhedvvdduucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepgefhffdtvedugfekffejvdeiieelhfetffeffefghedvvefhjeejvdek
+    feelgefgnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiii
+    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdr
+    nhgvthdpnhgspghrtghpthhtohepuddtpdhmohguvgepshhmthhpohhuthdprhgtphhtth
+    hopegrnhhkihhtkhhhuhhshhifrghhrgdrlhhinhhugiesghhmrghilhdrtghomhdprhgt
+    phhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuh
+    hmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghl
+    rdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtth
+    hopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehshhhurghhsehkvghr
+    nhgvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdroh
+    hrghdprhgtphhtthhopehlihhnuhigqdhkshgvlhhfthgvshhtsehvghgvrhdrkhgvrhhn
+    vghlrdhorhhg
+X-ME-Proxy: <xmx:UMkqaYeTa-QXFWrPb87OZNYvDNMw8RZjKZTYQIaL_T33qCeNgA0keA>
+    <xmx:UMkqaZ7cR4TV17GOzc0JFVOEovtrer_h3Glyw-Jjc2M1ksI680syEg>
+    <xmx:UMkqaVJp76qGzRDrqGiIHCHS7BtYrcTqD6AsFaY-BNsl3N08fMYthg>
+    <xmx:UMkqaZzHdQugoLHZlNdL_PhSS9SP0KyTzcHv6BNkLx61OZP_keCMPQ>
+    <xmx:UMkqaTb8vGRoPm3lmQGgdfwSEOJxZsRTWylUzLnUZg5G-wA7PrdHFHLe>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
+ 29 Nov 2025 05:22:08 -0500 (EST)
+Date: Sat, 29 Nov 2025 11:22:06 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] selftests: tls: fix read/write of garbage value
+Message-ID: <aSrJTmtJqOX0rNDh@krikkit>
+References: <20251129063726.31210-1-ankitkhushwaha.linux@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.52.0.107.ga0afd4fd5b-goog
-Message-ID: <20251129095740.3338476-1-edumazet@google.com>
-Subject: [PATCH] time/timecounter: inline timecounter_cyc2time()
-From: Eric Dumazet <edumazet@google.com>
-To: John Stultz <jstultz@google.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Stephen Boyd <sboyd@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-kernel <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org, 
-	Eric Dumazet <eric.dumazet@gmail.com>, Eric Dumazet <edumazet@google.com>, 
-	Kevin Yang <yyd@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Neal Cardwell <ncardwell@google.com>, Yuchung Cheng <ycheng@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20251129063726.31210-1-ankitkhushwaha.linux@gmail.com>
 
-New network transport protocols want NIC drivers to get hwtstamps
-of all incoming packets, and possibly all outgoing packets.
+2025-11-29, 12:07:26 +0530, Ankit Khushwaha wrote:
+> In 'poll_partial_rec_async' a uninitialized char variable 'token' with
+> *garbage* value is used for write/read instruction to synchronize
+> between threads via a pipe.
+> 
+> tls.c:2833:26: warning: variable 'token' is uninitialized
+>       when passed as a const pointer argument here
+>       [-Wuninitialized-const-pointer]
+>  2833 |            EXPECT_EQ(write(p[1], &token, 1), 1); /* Barrier #1 */
+> 
+> Initialize 'token' to '\0' to prevent write/read of garbage value.
 
-Swift congestion control is used by good old TCP transport and is
-our primary need for timecounter_cyc2time(). This will be upstreamed soon.
+I'm not opposed to making the compiler happy, but in this case
+"garbage" is completely fine, we don't care about the value.
 
-This means timecounter_cyc2time() can be called more than 100 million
-times per second on a busy server.
+So I think the subject and the commit message should talk about
+"silencing a compiler warning" rather than "fixing use of garbage
+value".
 
-Inlining timecounter_cyc2time() brings a 12 % improvement on a
-UDP receive stress test on a 100Gbit NIC.
+And your patch should indicate the target tree in the subject (here,
+with [PATCH net-next]), see
+https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
 
-Note that FDO, LTO, PGO are unable to magically help for this
-case, presumably because NIC drivers are almost exclusively shipped
-as modules.
-
-Add an unlikely() around the cc_cyc2ns_backwards() case,
-even if FDO (when used) is able to take care of this optimization.
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Link: https://research.google/pubs/swift-delay-is-simple-and-effective-for-congestion-control-in-the-datacenter/
-Cc: Kevin Yang <yyd@google.com>
-Cc: Willem de Bruijn <willemb@google.com>
-Cc: Neal Cardwell <ncardwell@google.com>
-Cc: Yuchung Cheng <ycheng@google.com>
----
- include/linux/timecounter.h | 33 +++++++++++++++++++++++++++++++--
- kernel/time/timecounter.c   | 35 -----------------------------------
- 2 files changed, 31 insertions(+), 37 deletions(-)
-
-diff --git a/include/linux/timecounter.h b/include/linux/timecounter.h
-index dce03a5cafb7cfe61bd83304ef49f7721735da64..de21312ebed0f41946304f95f05cc625ea7f2a68 100644
---- a/include/linux/timecounter.h
-+++ b/include/linux/timecounter.h
-@@ -115,6 +115,16 @@ extern void timecounter_init(struct timecounter *tc,
-  */
- extern u64 timecounter_read(struct timecounter *tc);
- 
-+/*
-+ * This is like cyclecounter_cyc2ns(), but it is used for computing a
-+ * time previous to the time stored in the cycle counter.
-+ */
-+static inline u64 cc_cyc2ns_backwards(const struct cyclecounter *cc,
-+				      u64 cycles, u64 frac)
-+{
-+	return ((cycles * cc->mult) - frac) >> cc->shift;
-+}
-+
- /**
-  * timecounter_cyc2time - convert a cycle counter to same
-  *                        time base as values returned by
-@@ -131,7 +141,26 @@ extern u64 timecounter_read(struct timecounter *tc);
-  *
-  * Returns: cycle counter converted to nanoseconds since the initial time stamp
-  */
--extern u64 timecounter_cyc2time(const struct timecounter *tc,
--				u64 cycle_tstamp);
-+static inline u64 timecounter_cyc2time(const struct timecounter *tc,
-+				       u64 cycle_tstamp)
-+{
-+	const struct cyclecounter *cc = tc->cc;
-+	u64 delta = (cycle_tstamp - tc->cycle_last) & cc->mask;
-+	u64 nsec = tc->nsec, frac = tc->frac;
-+
-+	/*
-+	 * Instead of always treating cycle_tstamp as more recent
-+	 * than tc->cycle_last, detect when it is too far in the
-+	 * future and treat it as old time stamp instead.
-+	 */
-+	if (unlikely(delta > cc->mask / 2)) {
-+		delta = (tc->cycle_last - cycle_tstamp) & cc->mask;
-+		nsec -= cc_cyc2ns_backwards(cc, delta, frac);
-+	} else {
-+		nsec += cyclecounter_cyc2ns(cc, delta, tc->mask, &frac);
-+	}
-+
-+	return nsec;
-+}
- 
- #endif
-diff --git a/kernel/time/timecounter.c b/kernel/time/timecounter.c
-index 3d2a354cfe1c1b205aa960a748a76f8dd94335e2..2e64dbb6302d71d8b092d92dda0b71c99cdc053d 100644
---- a/kernel/time/timecounter.c
-+++ b/kernel/time/timecounter.c
-@@ -62,38 +62,3 @@ u64 timecounter_read(struct timecounter *tc)
- }
- EXPORT_SYMBOL_GPL(timecounter_read);
- 
--/*
-- * This is like cyclecounter_cyc2ns(), but it is used for computing a
-- * time previous to the time stored in the cycle counter.
-- */
--static u64 cc_cyc2ns_backwards(const struct cyclecounter *cc,
--			       u64 cycles, u64 mask, u64 frac)
--{
--	u64 ns = (u64) cycles;
--
--	ns = ((ns * cc->mult) - frac) >> cc->shift;
--
--	return ns;
--}
--
--u64 timecounter_cyc2time(const struct timecounter *tc,
--			 u64 cycle_tstamp)
--{
--	u64 delta = (cycle_tstamp - tc->cycle_last) & tc->cc->mask;
--	u64 nsec = tc->nsec, frac = tc->frac;
--
--	/*
--	 * Instead of always treating cycle_tstamp as more recent
--	 * than tc->cycle_last, detect when it is too far in the
--	 * future and treat it as old time stamp instead.
--	 */
--	if (delta > tc->cc->mask / 2) {
--		delta = (tc->cycle_last - cycle_tstamp) & tc->cc->mask;
--		nsec -= cc_cyc2ns_backwards(tc->cc, delta, tc->mask, frac);
--	} else {
--		nsec += cyclecounter_cyc2ns(tc->cc, delta, tc->mask, &frac);
--	}
--
--	return nsec;
--}
--EXPORT_SYMBOL_GPL(timecounter_cyc2time);
 -- 
-2.52.0.107.ga0afd4fd5b-goog
-
+Sabrina
 
