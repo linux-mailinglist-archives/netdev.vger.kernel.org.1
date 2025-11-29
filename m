@@ -1,50 +1,62 @@
-Return-Path: <netdev+bounces-242664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECBB9C937F0
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 05:13:40 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61A3BC9377E
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 04:52:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 139E334312F
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 04:13:36 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0B7634E1511
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 03:52:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CF8523496F;
-	Sat, 29 Nov 2025 04:13:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D37EB1A23B6;
+	Sat, 29 Nov 2025 03:52:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u9zs4T6/"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="Ox0yXWg+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from canpmsgout02.his.huawei.com (canpmsgout02.his.huawei.com [113.46.200.217])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5098C233D88;
-	Sat, 29 Nov 2025 04:13:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0A2715A864;
+	Sat, 29 Nov 2025 03:52:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.217
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764389609; cv=none; b=RnckWRbw+XAD2OQcxsye+yxU0K1+bZO/bYngkuuoUX4jjddHH1WM3j80t2KTJ1V+NM5+zMIwSr35h3aqjnw04/lIAScqM3Z2SZlHszUHWS8q5mSP5dVfllvg2RNJMoFJ/mktA2RHs6hALNbf4u8OuMJ3J+ExcQFZJoclmFYxCFQ=
+	t=1764388331; cv=none; b=KuBespvR+viZTYgQxmekKnvyM/c/8ywsc2eF9hBSWn041HUIJ7Pi55xgIwm+S5uahO1stn6+Usfy8XtmQQt0EhPA1nwIWSLmzEJ8DiUEsg1FZzLR3Q9qWxr0LvlXjAxrGpA1cKMTN1hYjYWst2NjYu7dN3LjTWT5mR2m/miwiDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764389609; c=relaxed/simple;
-	bh=16CWBlAjMnObwnvBeLCcvrZwKLKX1E3MHiTXKgkowVc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=TLjfF9tyYTdoruVb79QjE/L4MFnLhbs9iGRu6KLyheamHxWE5sjPBdMDeQln7m26xz4rDmcBXf25x4bC9ZBevp4Tb1zeOjYOHKTkm5RTUVcBAeRws8XwlyYUVznwooY2FZ+GB67UMmhrZD+ITAOVCA7J113gzp41hJrRiYw9YPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u9zs4T6/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26FF0C4CEFB;
-	Sat, 29 Nov 2025 04:13:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764389609;
-	bh=16CWBlAjMnObwnvBeLCcvrZwKLKX1E3MHiTXKgkowVc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=u9zs4T6/2ZR7ree9yxOE9MV/kx2v+QiYIvGzc8lI3rOt92Nc/Ip7arN6zQf11N+4F
-	 UnEnEjkNIbJz4hMblezjNwgof9PTL96e6l2grFuULwuN1z/XHo9jLJ9Yyi2F9UEaAX
-	 nOE5rVD/ssl8iI75mSAvM3t3ISj+f/muX3Y99FPHhbX41mpngYU29MI3rtJI1VLpPq
-	 FCxpOjLS7Ugez/v8KXauwl8beXoFo8cXRPDBQER2Joeq3Iis79TVkRp8Z5tmO60rzD
-	 za3wIt7jCL1MDBeWMQp5z+s/lCbD2DVcm2Gbs55Wi7+cQILNToqUIU1NBTXA39pMme
-	 tCfgxDJ7mim2w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 01B34380692B;
-	Sat, 29 Nov 2025 04:10:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1764388331; c=relaxed/simple;
+	bh=UcdZnP2wKdHIt5BZMfGDUxEGIodjgsA2zh4IMyYRj08=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qYCatPwg8cg0rLrHZ2+8YQFaxQBktHWCqW79qU9pAUutoEq0aQzk0mG+SZ0Y2bVKYawPrAasgmpCK5qCKCKi84uP189SaIEuzSmxcavX6k4J7vErgCNPUgMDCs6zIzN31lWiY8IlhL6NElPrlTHC6KcEpqkRkSvCrr45rHDUwVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=Ox0yXWg+; arc=none smtp.client-ip=113.46.200.217
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=1mNJRAfvIbnJNCFsjrluULGbKW9aYcUOkpw+8htNpoY=;
+	b=Ox0yXWg+QBK2FX4LEGL70UPzj43pWMSNiB6b0TPDoa72mb5LaIE9a/0PDPTAttr6rNUEzYLZG
+	sOJ8VMJifmPsMQcj5o+ZNyr4j3jxA0veRr+0bZ2T+fxRSgNThRuDdpqnYtgZksE47+YfK5WHjL0
+	h5n9nCB9D8yYrKNo/1Fv/DY=
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by canpmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4dJGQ05xf8zcZyQ;
+	Sat, 29 Nov 2025 11:49:44 +0800 (CST)
+Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
+	by mail.maildlp.com (Postfix) with ESMTPS id F003F140275;
+	Sat, 29 Nov 2025 11:52:04 +0800 (CST)
+Received: from huawei.com (10.50.85.128) by dggpemf500016.china.huawei.com
+ (7.185.36.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Sat, 29 Nov
+ 2025 11:52:04 +0800
+From: Wang Liang <wangliang74@huawei.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <horms@kernel.org>
+CC: <linux-hams@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <yuehaibing@huawei.com>,
+	<zhangchangzhong@huawei.com>, <wangliang74@huawei.com>
+Subject: [PATCH net] netrom: Fix memory leak in nr_sendmsg()
+Date: Sat, 29 Nov 2025 12:13:15 +0800
+Message-ID: <20251129041315.1550766-1-wangliang74@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,49 +64,70 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/2] net: broadcom: migrate to
- .get_rx_ring_count() ethtool callback
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176438943073.896171.9965500132545324533.git-patchwork-notify@kernel.org>
-Date: Sat, 29 Nov 2025 04:10:30 +0000
-References: <20251127-grxrings_broadcom-v1-0-b0b182864950@debian.org>
-In-Reply-To: <20251127-grxrings_broadcom-v1-0-b0b182864950@debian.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, opendmb@gmail.com,
- florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
+ dggpemf500016.china.huawei.com (7.185.36.197)
 
-Hello:
+syzbot reported a memory leak [1].
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+When function sock_alloc_send_skb() return NULL in nr_output(), the
+original skb is not freed, which was allocated in nr_sendmsg(). Fix this
+by freeing it before return.
 
-On Thu, 27 Nov 2025 02:17:14 -0800 you wrote:
-> This series migrates Broadcom ethernet drivers to use the new
-> .get_rx_ring_count() ethtool callback introduced in commit 84eaf4359c36
-> ("net: ethtool: add get_rx_ring_count callback to optimize RX ring
-> queries").
-> 
-> This change simplifies the .get_rxnfc() implementation by
-> extracting the ETHTOOL_GRXRINGS case handling into a dedicated callback,
-> making the code cleaner and aligning these drivers with the updated
-> ethtool API.
-> 
-> [...]
+[1]
+BUG: memory leak
+unreferenced object 0xffff888129f35500 (size 240):
+  comm "syz.0.17", pid 6119, jiffies 4294944652
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 10 52 28 81 88 ff ff  ..........R(....
+  backtrace (crc 1456a3e4):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4983 [inline]
+    slab_alloc_node mm/slub.c:5288 [inline]
+    kmem_cache_alloc_node_noprof+0x36f/0x5e0 mm/slub.c:5340
+    __alloc_skb+0x203/0x240 net/core/skbuff.c:660
+    alloc_skb include/linux/skbuff.h:1383 [inline]
+    alloc_skb_with_frags+0x69/0x3f0 net/core/skbuff.c:6671
+    sock_alloc_send_pskb+0x379/0x3e0 net/core/sock.c:2965
+    sock_alloc_send_skb include/net/sock.h:1859 [inline]
+    nr_sendmsg+0x287/0x450 net/netrom/af_netrom.c:1105
+    sock_sendmsg_nosec net/socket.c:727 [inline]
+    __sock_sendmsg net/socket.c:742 [inline]
+    sock_write_iter+0x293/0x2a0 net/socket.c:1195
+    new_sync_write fs/read_write.c:593 [inline]
+    vfs_write+0x45d/0x710 fs/read_write.c:686
+    ksys_write+0x143/0x170 fs/read_write.c:738
+    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+    do_syscall_64+0xa4/0xfa0 arch/x86/entry/syscall_64.c:94
+    entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-Here is the summary with links:
-  - [net-next,1/2] net: bnxt: extract GRXRINGS from .get_rxnfc
-    https://git.kernel.org/netdev/net-next/c/bba18f3ba7cc
-  - [net-next,2/2] net: bcmgenet: extract GRXRINGS from .get_rxnfc
-    https://git.kernel.org/netdev/net-next/c/335d78c6161b
+Reported-by: syzbot+d7abc36bbbb6d7d40b58@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=d7abc36bbbb6d7d40b58
+Tested-by: syzbot+d7abc36bbbb6d7d40b58@syzkaller.appspotmail.com
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Wang Liang <wangliang74@huawei.com>
+---
+ net/netrom/nr_out.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-You are awesome, thank you!
+diff --git a/net/netrom/nr_out.c b/net/netrom/nr_out.c
+index 5e531394a724..2b3cbceb0b52 100644
+--- a/net/netrom/nr_out.c
++++ b/net/netrom/nr_out.c
+@@ -43,8 +43,10 @@ void nr_output(struct sock *sk, struct sk_buff *skb)
+ 		frontlen = skb_headroom(skb);
+ 
+ 		while (skb->len > 0) {
+-			if ((skbn = sock_alloc_send_skb(sk, frontlen + NR_MAX_PACKET_SIZE, 0, &err)) == NULL)
++			if ((skbn = sock_alloc_send_skb(sk, frontlen + NR_MAX_PACKET_SIZE, 0, &err)) == NULL) {
++				kfree_skb(skb);
+ 				return;
++			}
+ 
+ 			skb_reserve(skbn, frontlen);
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.34.1
 
 
