@@ -1,133 +1,149 @@
-Return-Path: <netdev+bounces-242656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61A3BC9377E
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 04:52:17 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03579C937F9
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 05:15:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0B7634E1511
-	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 03:52:16 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7558C342C86
+	for <lists+netdev@lfdr.de>; Sat, 29 Nov 2025 04:15:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D37EB1A23B6;
-	Sat, 29 Nov 2025 03:52:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 016D11EEA3C;
+	Sat, 29 Nov 2025 04:15:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="Ox0yXWg+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OgtTFEct"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout02.his.huawei.com (canpmsgout02.his.huawei.com [113.46.200.217])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0A2715A864;
-	Sat, 29 Nov 2025 03:52:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBC601922FD;
+	Sat, 29 Nov 2025 04:15:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764388331; cv=none; b=KuBespvR+viZTYgQxmekKnvyM/c/8ywsc2eF9hBSWn041HUIJ7Pi55xgIwm+S5uahO1stn6+Usfy8XtmQQt0EhPA1nwIWSLmzEJ8DiUEsg1FZzLR3Q9qWxr0LvlXjAxrGpA1cKMTN1hYjYWst2NjYu7dN3LjTWT5mR2m/miwiDo=
+	t=1764389731; cv=none; b=YzZs/kttzhlkrOlOcDJXgSNNG/SS/evUeL0/oVzSZMt2aHh2UOH4cJYTmNtgQo5gm39XhL05ksmpIeg70Nfk6Rxrw0ilNPcg0jxXsdaRJUGZAChieTksBIp/NamFnsyCZ2sWY1HFrAVuD+kEJhoM75SDRBId337dPWaHh/C/xrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764388331; c=relaxed/simple;
-	bh=UcdZnP2wKdHIt5BZMfGDUxEGIodjgsA2zh4IMyYRj08=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qYCatPwg8cg0rLrHZ2+8YQFaxQBktHWCqW79qU9pAUutoEq0aQzk0mG+SZ0Y2bVKYawPrAasgmpCK5qCKCKi84uP189SaIEuzSmxcavX6k4J7vErgCNPUgMDCs6zIzN31lWiY8IlhL6NElPrlTHC6KcEpqkRkSvCrr45rHDUwVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=Ox0yXWg+; arc=none smtp.client-ip=113.46.200.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=1mNJRAfvIbnJNCFsjrluULGbKW9aYcUOkpw+8htNpoY=;
-	b=Ox0yXWg+QBK2FX4LEGL70UPzj43pWMSNiB6b0TPDoa72mb5LaIE9a/0PDPTAttr6rNUEzYLZG
-	sOJ8VMJifmPsMQcj5o+ZNyr4j3jxA0veRr+0bZ2T+fxRSgNThRuDdpqnYtgZksE47+YfK5WHjL0
-	h5n9nCB9D8yYrKNo/1Fv/DY=
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by canpmsgout02.his.huawei.com (SkyGuard) with ESMTPS id 4dJGQ05xf8zcZyQ;
-	Sat, 29 Nov 2025 11:49:44 +0800 (CST)
-Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
-	by mail.maildlp.com (Postfix) with ESMTPS id F003F140275;
-	Sat, 29 Nov 2025 11:52:04 +0800 (CST)
-Received: from huawei.com (10.50.85.128) by dggpemf500016.china.huawei.com
- (7.185.36.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Sat, 29 Nov
- 2025 11:52:04 +0800
-From: Wang Liang <wangliang74@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <horms@kernel.org>
-CC: <linux-hams@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <yuehaibing@huawei.com>,
-	<zhangchangzhong@huawei.com>, <wangliang74@huawei.com>
-Subject: [PATCH net] netrom: Fix memory leak in nr_sendmsg()
-Date: Sat, 29 Nov 2025 12:13:15 +0800
-Message-ID: <20251129041315.1550766-1-wangliang74@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1764389731; c=relaxed/simple;
+	bh=8WexRr1xKoDFh0h6dwKD2VYjaGgi8tX/eVJj97/fOGY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nM0ztH1RvMky7kL+DiKIlN902F2r9TcrtKGfEqNy2IxJGkCLJ9IOvGVWn6yjygW/SWOzGZgtcoaGQiRMdB+Cyiqf6d2c63W5i5gRoI3iA7GWgCFEMX6Esr77hG4pyzuotaL+PVpNY9jJav99/pa69Tf7t9Q0brrYszI8YtvQIVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OgtTFEct; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1D0FC4CEF7;
+	Sat, 29 Nov 2025 04:15:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764389731;
+	bh=8WexRr1xKoDFh0h6dwKD2VYjaGgi8tX/eVJj97/fOGY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OgtTFEctARdVOawgLjHO5RGFxmT3IKYXA4HCj5WnCeoyn1Kdg2XIiT3/C5qJxPQWA
+	 BvbaGzh1USIt+f8jGv77JjW9oi3RgqZooQOZCk4tdOQ2ff/4vMZAE4eVdXNyeF/pAo
+	 bGLjJ5twNPf5JMO6kAI+wOTfK1pAchA5t4Baz4KMBX0s8VtjIV5A3J1okp8CKiYJUs
+	 YZ1clarns9/IrIaE1bt7VTXtr/rJjG/2RRjcNWd88rjjdHbuiRN2hNQsvXj6bjeShM
+	 uOlW4tRWOeN6pCfOKesxqEpRV/G0LlbxjmlCUURf9TqM9NrvppNXe0sTTz26M1wslD
+	 6bsT5q1ykp7NQ==
+Date: Fri, 28 Nov 2025 20:15:30 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
+ fw@strlen.de, horms@kernel.org
+Subject: Re: [PATCH net-next 11/17] netfilter: nf_conncount: rework API to
+ use sk_buff directly
+Message-ID: <20251128201530.10e5c3c2@kernel.org>
+In-Reply-To: <20251128002345.29378-12-pablo@netfilter.org>
+References: <20251128002345.29378-1-pablo@netfilter.org>
+	<20251128002345.29378-12-pablo@netfilter.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems200001.china.huawei.com (7.221.188.67) To
- dggpemf500016.china.huawei.com (7.185.36.197)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-syzbot reported a memory leak [1].
+On Fri, 28 Nov 2025 00:23:38 +0000 Pablo Neira Ayuso wrote:
+>  static int __nf_conncount_add(struct net *net,
+> -			      struct nf_conncount_list *list,
+> -			      const struct nf_conntrack_tuple *tuple,
+> -			      const struct nf_conntrack_zone *zone)
+> +			      const struct sk_buff *skb,
+> +			      u16 l3num,
+> +			      struct nf_conncount_list *list)
+>  {
+> +	const struct nf_conntrack_zone *zone = &nf_ct_zone_dflt;
+>  	const struct nf_conntrack_tuple_hash *found;
+>  	struct nf_conncount_tuple *conn, *conn_n;
+> +	struct nf_conntrack_tuple tuple;
+> +	struct nf_conn *ct = NULL;
+>  	struct nf_conn *found_ct;
+>  	unsigned int collect = 0;
+> +	bool refcounted = false;
+> +
+> +	if (!get_ct_or_tuple_from_skb(net, skb, l3num, &ct, &tuple, &zone, &refcounted))
+> +		return -ENOENT;
+> +
+> +	if (ct && nf_ct_is_confirmed(ct)) {
+> +		if (refcounted)
+> +			nf_ct_put(ct);
+> +		return 0;
+> +	}
+>  	if ((u32)jiffies == list->last_gc)
+>  		goto add_new_node;
+> @@ -144,10 +194,10 @@ static int __nf_conncount_add(struct net *net,
+>  		if (IS_ERR(found)) {
+>  			/* Not found, but might be about to be confirmed */
+>  			if (PTR_ERR(found) == -EAGAIN) {
+> -				if (nf_ct_tuple_equal(&conn->tuple, tuple) &&
+> +				if (nf_ct_tuple_equal(&conn->tuple, &tuple) &&
+>  				    nf_ct_zone_id(&conn->zone, conn->zone.dir) ==
+>  				    nf_ct_zone_id(zone, zone->dir))
+> -					return 0; /* already exists */
+> +					goto out_put; /* already exists */
+>  			} else {
+>  				collect++;
+>  			}
+> @@ -156,7 +206,7 @@ static int __nf_conncount_add(struct net *net,
+>  
+>  		found_ct = nf_ct_tuplehash_to_ctrack(found);
+>  
+> -		if (nf_ct_tuple_equal(&conn->tuple, tuple) &&
+> +		if (nf_ct_tuple_equal(&conn->tuple, &tuple) &&
+>  		    nf_ct_zone_equal(found_ct, zone, zone->dir)) {
+>  			/*
+>  			 * We should not see tuples twice unless someone hooks
+> @@ -165,7 +215,7 @@ static int __nf_conncount_add(struct net *net,
+>  			 * Attempt to avoid a re-add in this case.
+>  			 */
+>  			nf_ct_put(found_ct);
+> -			return 0;
+> +			goto out_put;
+>  		} else if (already_closed(found_ct)) {
+>  			/*
+>  			 * we do not care about connections which are
+> @@ -188,31 +238,35 @@ static int __nf_conncount_add(struct net *net,
+>  	if (conn == NULL)
+>  		return -ENOMEM;
 
-When function sock_alloc_send_skb() return NULL in nr_output(), the
-original skb is not freed, which was allocated in nr_sendmsg(). Fix this
-by freeing it before return.
 
-[1]
-BUG: memory leak
-unreferenced object 0xffff888129f35500 (size 240):
-  comm "syz.0.17", pid 6119, jiffies 4294944652
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    00 00 00 00 00 00 00 00 00 10 52 28 81 88 ff ff  ..........R(....
-  backtrace (crc 1456a3e4):
-    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
-    slab_post_alloc_hook mm/slub.c:4983 [inline]
-    slab_alloc_node mm/slub.c:5288 [inline]
-    kmem_cache_alloc_node_noprof+0x36f/0x5e0 mm/slub.c:5340
-    __alloc_skb+0x203/0x240 net/core/skbuff.c:660
-    alloc_skb include/linux/skbuff.h:1383 [inline]
-    alloc_skb_with_frags+0x69/0x3f0 net/core/skbuff.c:6671
-    sock_alloc_send_pskb+0x379/0x3e0 net/core/sock.c:2965
-    sock_alloc_send_skb include/net/sock.h:1859 [inline]
-    nr_sendmsg+0x287/0x450 net/netrom/af_netrom.c:1105
-    sock_sendmsg_nosec net/socket.c:727 [inline]
-    __sock_sendmsg net/socket.c:742 [inline]
-    sock_write_iter+0x293/0x2a0 net/socket.c:1195
-    new_sync_write fs/read_write.c:593 [inline]
-    vfs_write+0x45d/0x710 fs/read_write.c:686
-    ksys_write+0x143/0x170 fs/read_write.c:738
-    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-    do_syscall_64+0xa4/0xfa0 arch/x86/entry/syscall_64.c:94
-    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+The AI review tool points out this an another direct return missing a put(ct).
 
-Reported-by: syzbot+d7abc36bbbb6d7d40b58@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=d7abc36bbbb6d7d40b58
-Tested-by: syzbot+d7abc36bbbb6d7d40b58@syzkaller.appspotmail.com
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Wang Liang <wangliang74@huawei.com>
----
- net/netrom/nr_out.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Similar issue in count_tree(). Please take a look and follow up where
+appropriate:
+https://netdev-ai.bots.linux.dev/ai-review.html?id=348ddc42-0343-4832-9047-0c62767f074f
 
-diff --git a/net/netrom/nr_out.c b/net/netrom/nr_out.c
-index 5e531394a724..2b3cbceb0b52 100644
---- a/net/netrom/nr_out.c
-+++ b/net/netrom/nr_out.c
-@@ -43,8 +43,10 @@ void nr_output(struct sock *sk, struct sk_buff *skb)
- 		frontlen = skb_headroom(skb);
- 
- 		while (skb->len > 0) {
--			if ((skbn = sock_alloc_send_skb(sk, frontlen + NR_MAX_PACKET_SIZE, 0, &err)) == NULL)
-+			if ((skbn = sock_alloc_send_skb(sk, frontlen + NR_MAX_PACKET_SIZE, 0, &err)) == NULL) {
-+				kfree_skb(skb);
- 				return;
-+			}
- 
- 			skb_reserve(skbn, frontlen);
- 
--- 
-2.34.1
-
+> -	conn->tuple = *tuple;
+> +	conn->tuple = tuple;
+>  	conn->zone = *zone;
+>  	conn->cpu = raw_smp_processor_id();
+>  	conn->jiffies32 = (u32)jiffies;
+>  	list_add_tail(&conn->node, &list->head);
+>  	list->count++;
+>  	list->last_gc = (u32)jiffies;
+> +
+> +out_put:
+> +	if (refcounted)
+> +		nf_ct_put(ct);
+>  	return 0;
+>  }
 
