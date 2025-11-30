@@ -1,255 +1,150 @@
-Return-Path: <netdev+bounces-242846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242847-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 119A6C9556D
-	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 23:31:51 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C7EDC95576
+	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 23:34:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B507E4E024B
-	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 22:31:49 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 49175341A37
+	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 22:34:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DDEA2417F0;
-	Sun, 30 Nov 2025 22:31:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4BE4242D60;
+	Sun, 30 Nov 2025 22:33:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="L7wR2Ldr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 858ED1EF091
-	for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 22:31:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 390EC1B142D;
+	Sun, 30 Nov 2025 22:33:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764541905; cv=none; b=cZyhqg3flsfkODWD07Kdibe2cd3c4H3ueNlN8sSSqkoUnb8T1eZVdCq8juYem5dWkVD5eOukGFgqIs5ywyS1Q0IK+9ICRJrzcx9hLjfMDiTTSMF7J2kqGf6JGfX7qlFvzh5Oz8/bdeOF9+CeNjNe9s4xG7MrSq+eweYJP3FngbY=
+	t=1764542034; cv=none; b=NXCreQae48NPGQQ25btrfQ8xrxkVfdmkMbvQLUI2SpkkBFCRpckjWd9jBYDGw8Rr7vTvm4xNHJseIEnUB02oxoCOxZKSVvYEWnF25Zkwin8k5fTvF3XzvOX4agatClRcWEIc6ctKEULmdMM/sl5ZK3nOfp4nO7W+tQ8KeviCG9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764541905; c=relaxed/simple;
-	bh=6+4uZImWSiMTBq4+/nhPhZXP1PQJeW9bCnVdfcHjOzk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nv/sME0cGRfY2kOsyKuG2uKqItRzko5PapYD43z1fCK8GqwWlXPt7fnSM+uRe8+oHRiaR/F/WIc22EoDyRl0PTNvscQttRE4jF6EyNabZc6I2eGyWF0JXOFphH1w/jPgDxNhlyqKRapmJ+9YmsDf/t+t7QIdlwH7VtoHBbK02dk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-47798ded6fcso18515245e9.1
-        for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 14:31:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764541901; x=1765146701;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xcQPpGxPe5sL+9Hgs4hRWML4oh/qUbrpFwVuPEgD/H8=;
-        b=hgWzSwLf3Hxw7zECo5rlbidFEO1aha7xP+ObajWE8WTH7glOv4pKvaryHzGKX6Tyh8
-         5z6/JjxJSbccsnZRyIsa1lXP2y+J7hc1PAK78PIT/DZC5vsNJQ7IgTZ4A2ajbaU9cUT8
-         9TzqFd9wMiT6tXZ40+/s/3s0p9zN9ZgaIFMtsmiKPQfNKR0HhQNu7XAmBFi5U3Mibo21
-         ViITPCRFyXWY6BZQKW1QhyCkUfEgcMBH+uyLMjdwvfQ+q4Sf/KMDMM7X8H6+TEBWBSiD
-         U0hFHmG2Bi8g3keIZ7JxYSu5lo/nMBXZedHTxvvgfSUVZW9nUyW+g2d0LtaVrOqUH3u5
-         A4lQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUB8Eg63Nwl7+0i5YnuDyoCF78hknKfafYWPMZeORoNote4VKL4B/H9So5i2svA8vteHAPEvXw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyC11DIPZd9qOS+Bm+mIR6TdegeoYu7BbdxKTN0XkIzArOCIrO2
-	gQkBfU4A7frZKw+pN3kd8+J9iHz/UkC/e4FWkEX7HZYf8NvUWVpj4/3w
-X-Gm-Gg: ASbGnctgyXVOAzdq5J2av9LLx2QKxxOZbkIjigsQktTzQM/cnex9wQJxyKxqu9i3Mxh
-	5/RieB1JMNCpJsrXEDVTKwqmvTqq1v7DSjK5s8rjk1gsP0y1NT83w2fWqa73RIqtERb8yBFftEr
-	akcB9p8olYXjsizKbE7dyPyaKJvnauAFa3IIVwnkuHm0oSTHfmHI4q1CAy0+Z7StxP7hPMTPd9y
-	54reeEALf6akhk7RkpS2lESRreXmGZUaAMzFll3IuiPn5RU9zjO6UMZF3lEEqy8vSlCOnBicr2t
-	U5wIs/DBVi4BcMXjv1f4G0khhmbazMScSIwFqIKHFbV0H3S2W/+zIZvTbHUEPlBJIfblfCNCkQX
-	fV94pV1gVjAnUTN22+eBkgn7nUSdArbFhBnsQIjgHQIi4tudIwmdZ0d8NlyTQ59vzys+YM4cX9O
-	m+a16ihPYxbw8Q3QJcnUYKdcQ1qmH40xbBKuImxEGq
-X-Google-Smtp-Source: AGHT+IE06nECDAq+Uk5QtE1+56tfrJDdijXtZ3fW9Zv+27AAc3S+rK/IWGF+IFYLl0pdMZ3C0cSJQA==
-X-Received: by 2002:a05:600c:1f0f:b0:477:8b2e:aa7d with SMTP id 5b1f17b1804b1-477c1132bf2mr354572535e9.30.1764541900754;
-        Sun, 30 Nov 2025 14:31:40 -0800 (PST)
-Received: from [10.100.102.74] (89-138-71-2.bb.netvision.net.il. [89.138.71.2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4791163e36csm198706755e9.9.2025.11.30.14.31.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 30 Nov 2025 14:31:40 -0800 (PST)
-Message-ID: <1184961b-5488-4150-b647-29ed363e2276@grimberg.me>
-Date: Mon, 1 Dec 2025 00:31:38 +0200
+	s=arc-20240116; t=1764542034; c=relaxed/simple;
+	bh=aI2Fjh0EuTgp06sWFPtjxV496etyQtSHdlELtSsfuUg=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=Z/QL8+11B3Ld4Y90kVEAFXMhN2EG8X4ZejvSBXYUpMmwoRn5luQ9DRMqrheZ/5/B3VMO+nDeAgVhTsKzmHF82x4fFD/Cy4lSuWpvsmi0rDbylEyiHhYR42q6Pkcwmau6tWg3bbaNfQr5jBppYCelcaC53gzyO8R1MRM588rQiyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=L7wR2Ldr; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1764542026;
+	bh=cYbQRbqRxs7AFwZkYvZ2Rbg+w/wWCE2C0/Vz0z8ZdW8=;
+	h=Date:From:To:Cc:Subject:From;
+	b=L7wR2LdrqrFm62drylRcdgxkzu/nWZWppsHI3WT7ZUqVKI/ih7rT+9MrGsZxmxkTU
+	 JX7DxdOy4bHFkHcNIKE/KA2/remMcHEbxTdV4d5ti4evAjYGyO8qSZbKZXj5G2eY2v
+	 PF37bQVQWnKQ/iHpmOxiya2vE6Yp27rU9DMnCH5NQZ0vrAlVWxrmGOkDmbqKXROEtA
+	 /ooTL4lmu2HMupq2qq2T8I3bGBHn7b8G//IlPS3NZW56cnFvDoC71yG3BY76f6PAEt
+	 WxfYwsxBb6VcfLzCSpxwKlMbHR1iciUqM5ysYySRRxPwHHQYyZgcgk4zk9IlGJu3iD
+	 +FAzvJnIrBmEg==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4dKMJT0YCtz4wCm;
+	Mon, 01 Dec 2025 09:33:44 +1100 (AEDT)
+Date: Mon, 1 Dec 2025 09:33:43 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Alexei
+ Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>
+Cc: Menglong Dong <dongml2@chinatelecom.cn>, Menglong Dong
+ <menglong8.dong@gmail.com>, bpf <bpf@vger.kernel.org>, Networking
+ <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: manual merge of the ftrace tree with the bpf-next tree
+Message-ID: <20251201093343.63ef2596@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 5/6] nvme-tcp: Support KeyUpdate
-To: alistair23@gmail.com, chuck.lever@oracle.com, hare@kernel.org,
- kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org
-Cc: kbusch@kernel.org, axboe@kernel.dk, hch@lst.de, kch@nvidia.com,
- hare@suse.de, Alistair Francis <alistair.francis@wdc.com>
-References: <20251112042720.3695972-1-alistair.francis@wdc.com>
- <20251112042720.3695972-6-alistair.francis@wdc.com>
-Content-Language: en-US
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20251112042720.3695972-6-alistair.francis@wdc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; boundary="Sig_/iS7vxE.ekFe8CJNQF9TLIBJ";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
+--Sig_/iS7vxE.ekFe8CJNQF9TLIBJ
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
+Hi all,
 
-On 12/11/2025 6:27, alistair23@gmail.com wrote:
-> From: Alistair Francis <alistair.francis@wdc.com>
->
-> If the nvme_tcp_try_send() or nvme_tcp_try_recv() functions return
-> EKEYEXPIRED then the underlying TLS keys need to be updated. This occurs
-> on an KeyUpdate event as described in RFC8446
-> https://datatracker.ietf.org/doc/html/rfc8446#section-4.6.3.
->
-> If the NVMe Target (TLS server) initiates a KeyUpdate this patch will
-> allow the NVMe layer to process the KeyUpdate request and forward the
-> request to userspace. Userspace must then update the key to keep the
-> connection alive.
->
-> This patch allows us to handle the NVMe target sending a KeyUpdate
-> request without aborting the connection. At this time we don't support
-> initiating a KeyUpdate.
->
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> ---
+Today's linux-next merge of the ftrace tree got a conflict in:
 
-I see this is on top of Hannes recvmsg patch. Worth noting in the patch 
-here at least.
+  kernel/trace/Kconfig
 
-> v5:
->   - Cleanup code flow
->   - Check for MSG_CTRUNC in the msg_flags return from recvmsg
->     and use that to determine if it's a control message
-> v4:
->   - Remove all support for initiating KeyUpdate
->   - Don't call cancel_work() when updating keys
-> v3:
->   - Don't cancel existing handshake requests
-> v2:
->   - Don't change the state
->   - Use a helper function for KeyUpdates
->   - Continue sending in nvme_tcp_send_all() after a KeyUpdate
->   - Remove command message using recvmsg
->
->   drivers/nvme/host/tcp.c | 85 +++++++++++++++++++++++++++++++++--------
->   1 file changed, 70 insertions(+), 15 deletions(-)
->
-> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-> index 4797a4532b0d..5cec5a974bbf 100644
-> --- a/drivers/nvme/host/tcp.c
-> +++ b/drivers/nvme/host/tcp.c
-> @@ -172,6 +172,7 @@ struct nvme_tcp_queue {
->   	bool			tls_enabled;
->   	u32			rcv_crc;
->   	u32			snd_crc;
-> +	key_serial_t		handshake_session_id;
->   	__le32			exp_ddgst;
->   	__le32			recv_ddgst;
->   	struct completion       tls_complete;
-> @@ -858,7 +859,10 @@ static void nvme_tcp_handle_c2h_term(struct nvme_tcp_queue *queue,
->   static int nvme_tcp_recvmsg_pdu(struct nvme_tcp_queue *queue)
->   {
->   	char *pdu = queue->pdu;
-> +	char cbuf[CMSG_LEN(sizeof(char))] = {};
->   	struct msghdr msg = {
-> +		.msg_control = cbuf,
-> +		.msg_controllen = sizeof(cbuf),
->   		.msg_flags = MSG_DONTWAIT,
->   	};
->   	struct kvec iov = {
-> @@ -873,12 +877,17 @@ static int nvme_tcp_recvmsg_pdu(struct nvme_tcp_queue *queue)
->   	if (ret <= 0)
->   		return ret;
->   
-> +	hdr = queue->pdu;
-> +	if (hdr->type == TLS_HANDSHAKE_KEYUPDATE) {
-> +		dev_err(queue->ctrl->ctrl.device, "KeyUpdate message\n");
-> +		return 1;
-> +	}
-> +
->   	queue->pdu_remaining -= ret;
->   	queue->pdu_offset += ret;
->   	if (queue->pdu_remaining)
->   		return 0;
->   
-> -	hdr = queue->pdu;
->   	if (unlikely(hdr->hlen != sizeof(struct nvme_tcp_rsp_pdu))) {
->   		if (!nvme_tcp_recv_pdu_supported(hdr->type))
->   			goto unsupported_pdu;
-> @@ -944,6 +953,7 @@ static int nvme_tcp_recvmsg_data(struct nvme_tcp_queue *queue)
->   	struct request *rq =
->   		nvme_cid_to_rq(nvme_tcp_tagset(queue), pdu->command_id);
->   	struct nvme_tcp_request *req = blk_mq_rq_to_pdu(rq);
-> +	char cbuf[CMSG_LEN(sizeof(char))] = {};
->   
->   	if (nvme_tcp_recv_state(queue) != NVME_TCP_RECV_DATA)
->   		return 0;
-> @@ -976,10 +986,26 @@ static int nvme_tcp_recvmsg_data(struct nvme_tcp_queue *queue)
->   
->   		ret = sock_recvmsg(queue->sock, &msg, msg.msg_flags);
->   		if (ret < 0) {
-> -			dev_err(queue->ctrl->ctrl.device,
-> -				"queue %d failed to receive request %#x data",
-> -				nvme_tcp_queue_id(queue), rq->tag);
-> -			return ret;
-> +			/* If MSG_CTRUNC is set, it's a control message,
-> +			 * so let's read the control message.
-> +			 */
-> +			if (msg.msg_flags & MSG_CTRUNC) {
-> +				memset(&msg, 0, sizeof(msg));
-> +				msg.msg_flags = MSG_DONTWAIT;
-> +				msg.msg_control = cbuf;
-> +				msg.msg_controllen = sizeof(cbuf);
-> +
-> +				ret = sock_recvmsg(queue->sock, &msg, msg.msg_flags);
-> +			}
-> +
-> +			if (ret < 0) {
-> +				dev_dbg(queue->ctrl->ctrl.device,
-> +					"queue %d failed to receive request %#x data, %d",
-> +					nvme_tcp_queue_id(queue), rq->tag, ret);
-> +				return ret;
-> +			}
-> +
-> +			return 0;
->   		}
->   		if (queue->data_digest)
->   			nvme_tcp_ddgst_calc(req, &queue->rcv_crc, ret);
-> @@ -1384,15 +1410,39 @@ static int nvme_tcp_try_recvmsg(struct nvme_tcp_queue *queue)
->   		}
->   	} while (result >= 0);
->   
-> -	if (result < 0 && result != -EAGAIN) {
-> -		dev_err(queue->ctrl->ctrl.device,
-> -			"receive failed:  %d\n", result);
-> -		queue->rd_enabled = false;
-> -		nvme_tcp_error_recovery(&queue->ctrl->ctrl);
-> -	} else if (result == -EAGAIN)
-> -		result = 0;
-> +	if (result < 0) {
-> +		if (result != -EKEYEXPIRED && result != -EAGAIN) {
-> +			dev_err(queue->ctrl->ctrl.device,
-> +				"receive failed:  %d\n", result);
-> +			queue->rd_enabled = false;
-> +			nvme_tcp_error_recovery(&queue->ctrl->ctrl);
-> +		}
-> +		return result;
-> +	}
-> +
-> +	queue->nr_cqe = nr_cqe;
-> +	return nr_cqe;
-> +}
-> +
-> +static void update_tls_keys(struct nvme_tcp_queue *queue)
-> +{
-> +	int qid = nvme_tcp_queue_id(queue);
-> +	int ret;
-> +
-> +	dev_dbg(queue->ctrl->ctrl.device,
-> +		"updating key for queue %d\n", qid);
->   
-> -	return result < 0 ? result : (queue->nr_cqe = nr_cqe);
-> +	flush_work(&(queue->ctrl->ctrl).async_event_work);
-> +
-> +	ret = nvme_tcp_start_tls(&(queue->ctrl->ctrl),
-> +				 queue, queue->ctrl->ctrl.tls_pskid,
-> +				 HANDSHAKE_KEY_UPDATE_TYPE_RECEIVED);
+between commit:
 
-No need to quiesce the queue or anything like that? everything continues 
-as usual?
-Why are you flushing async_event_work?
+  25e4e3565d45 ("ftrace: Introduce FTRACE_OPS_FL_JMP")
+
+from the bpf-next tree and commit:
+
+  f93a7d0caccd ("ftrace: Allow tracing of some of the tracing code")
+
+from the ftrace tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc kernel/trace/Kconfig
+index 4661b9e606e0,e1214b9dc990..000000000000
+--- a/kernel/trace/Kconfig
++++ b/kernel/trace/Kconfig
+@@@ -336,12 -330,20 +336,26 @@@ config DYNAMIC_FTRACE_WITH_ARG
+  	depends on DYNAMIC_FTRACE
+  	depends on HAVE_DYNAMIC_FTRACE_WITH_ARGS
+ =20
+ +config DYNAMIC_FTRACE_WITH_JMP
+ +	def_bool y
+ +	depends on DYNAMIC_FTRACE
+ +	depends on DYNAMIC_FTRACE_WITH_DIRECT_CALLS
+ +	depends on HAVE_DYNAMIC_FTRACE_WITH_JMP
+ +
++ config FUNCTION_SELF_TRACING
++ 	bool "Function trace tracing code"
++ 	depends on FUNCTION_TRACER
++ 	help
++ 	  Normally all the tracing code is set to notrace, where the function
++ 	  tracer will ignore all the tracing functions. Sometimes it is useful
++ 	  for debugging to trace some of the tracing infratructure itself.
++ 	  Enable this to allow some of the tracing infrastructure to be traced
++ 	  by the function tracer. Note, this will likely add noise to function
++ 	  tracing if events and other tracing features are enabled along with
++ 	  function tracing.
++=20
++ 	  If unsure, say N.
++=20
+  config FPROBE
+  	bool "Kernel Function Probe (fprobe)"
+  	depends on HAVE_FUNCTION_GRAPH_FREGS && HAVE_FTRACE_GRAPH_FUNC
+
+--Sig_/iS7vxE.ekFe8CJNQF9TLIBJ
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmksxkcACgkQAVBC80lX
+0GzsYAf/bC8k6CqMic4MYcWrv09d9J/PUzka+bJsjsucLZcdt0WGgZ6Tb02IRJUE
+J17ihYlGocqjaIXM82xmGgRfceqLmnjcS81N43bMlxGmjHeho7SsgTtELTZPuWpC
+Bywr5095cb6O2QhJrGx1qZ/rRCb5DyzemH0CvcrLouTW+zUA2+mVE9jUj/u7J9CD
+G//38nr4L0Z0/RRSGGw0EKD/Qkrx7yfXW+TqwX/BL51331vElW/nou/hhdoRcFR8
+PQkMamgEVisiGmFr8Ogmiy7CQfmBLKNLzhl5pF7gPxmeVI3+bQrP3+Cyi8qpd9Z0
+7TDmaZ5gTuR41Z2HzZoMk1ZKSOArGA==
+=MNus
+-----END PGP SIGNATURE-----
+
+--Sig_/iS7vxE.ekFe8CJNQF9TLIBJ--
 
