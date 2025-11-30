@@ -1,163 +1,124 @@
-Return-Path: <netdev+bounces-242773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242774-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54D0FC94C4A
-	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 09:20:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 891F4C94C4D
+	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 09:22:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id BEED6343ECB
-	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 08:20:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 456093A485D
+	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 08:22:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82747239E8B;
-	Sun, 30 Nov 2025 08:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46DAB239E8B;
+	Sun, 30 Nov 2025 08:22:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k4WQmxO+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a1r8MlOD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5523722068A;
-	Sun, 30 Nov 2025 08:20:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B27D1391
+	for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 08:22:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764490832; cv=none; b=EnxdR+2NCCNJlvwXKhez+/grl6J3YqaNYGAKb1efkw5OjiE5TAPyHHIWXk31JrD0PmIsfV7qrOZHK8Ii2rw6CRPY6B8QvyxStZaKHpguN4Mt0V/fXnHkjBN48HGjdMF2xFj6KT+tITtikP8t11uD4+wRFqQNu9n31WDOQ7kJzRA=
+	t=1764490945; cv=none; b=LZDqKvmngXGCOwMlNWSl+0kTOmKcllG+Sip3L7jgpZaHM8j/13AaIw+yT8RfDBUTHXc1BtntRlDQ4wznoqqdLpVy2Enmn0bhXETlgv8uQutJmADJ4ZpK83v1qOB9oYw7GsA9HMJ4oZCe49x+rFjB0s0Lvxbv2LqkG4x1V5tmcPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764490832; c=relaxed/simple;
-	bh=ix7X7fSFO+etWXtLPVudV3/mpH8HoQRTbfNpg6nM6AY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A68elVDx+MRtSaI74XOaI0VoEJPy0tsDRj8rcIdCmZIBc86Ct3DLa/oTWotcMQrXwbB+VtFKBn+53DjdcE9FKoB/OdGjWPcZcu5+I7ywatY5Sn95yvCWp0IERU1hFVNYTM2xkGHNGhXgApRJaFnHOAo8nSmbpHlkUAlkUDsVn90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k4WQmxO+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1393FC4CEF8;
-	Sun, 30 Nov 2025 08:20:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764490831;
-	bh=ix7X7fSFO+etWXtLPVudV3/mpH8HoQRTbfNpg6nM6AY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=k4WQmxO+4Mtx724ofRO4hcbNwZjwha6lCGTulXXcAiS2vCLJqwxkxXheiF2nswcfD
-	 /cuhzOj+ltxnGhini115yDnMigHL7fnGb0jSvO568TaYtOpiOwTT46IgY/TrmNp6Ye
-	 cxCfIAvVHDH+v1R07Okdc00A8MnB8EDP5UXnby+ev7CJP1Ftz1q4Y6Cj5IXUzGHp5/
-	 xc4BkPw3aEzTVp6q25dmBm1P2bILT2O+V2eVjUJ6pRMtRWDkn5Sumj4+41lyRaYvX1
-	 LZwCd9L71EvVpQXlMaMV9t5waqDsEzfzAw5Wbaean8KJV7/s8ptFTkLoPKyLjCclq4
-	 rgpfrh2CCOXxA==
-Message-ID: <f3046826-a44c-4aa9-8a94-351e7fe83f06@kernel.org>
-Date: Sun, 30 Nov 2025 09:20:26 +0100
+	s=arc-20240116; t=1764490945; c=relaxed/simple;
+	bh=FMjxTGWZnc7ZEhZJMTa/55xtVT734ANCN6WX3PTPVUI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P9LL3Enf0U4xIa+u4PEC0W7GdBQxlJbjJSGK7QbDWrahlHfFIdVhbhrUuW7xem/MQD9NKuQuFLVtYZSUhSAT3CewHYE8AYEyA+DJYEv07f2iN+HtR63q/Gkqs5Berx5H7dqnoZYRdRXGPr1VSixJkHxc/1fmCHi79L81yDm+cD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a1r8MlOD; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-47798f4059fso3752675e9.2
+        for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 00:22:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764490942; x=1765095742; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tMyv7xHpzBEGqAA6Ujonxbq3JvKho8WXoic6wC5QnCg=;
+        b=a1r8MlODyRMePL6XzSaVDGyyJg/GfZUHfz0FLEjHdzwuE4lmldCYRgYG65/jaTTW4H
+         aUEZsgolYvVS4aimOjiUM8VmT7UtblwgM065lUsGa0RmkTr3Ui7QRLY0qmdmt2kvqwXN
+         7bkDru20lNwEwJJgj7ez3kmjlyNYIp7OWFP0vBrxcQlpqD/MH6Kjc6NBWp3XsZfdJd1v
+         Q6F+xY0aYYB/0qwLzp5wuzlmoRZdZmC51bYR3NE+agY6FW6wrJdUd0q8tpkt7gmUkx26
+         52Oh+sYgDtLoXXgxqoIete4omxsgIrClYbz/UnylvCMbmwZvqG0As9VvGhpjDFrnosks
+         TmMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764490942; x=1765095742;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tMyv7xHpzBEGqAA6Ujonxbq3JvKho8WXoic6wC5QnCg=;
+        b=A3Iz3mqcA4V+QZfnHuFCrPN2o05IghZPCS2JLQ9igBIRK3NtWKEBCnEFYA4RBARul/
+         txlclAP20s3lofDc0e/3CBQxJaILAV+GuxTnm4aNfQzQFQanzT6GP+nRX4s2Kr9H5Rzf
+         ogeliXyIVCY1laEYJiaYgcx0V8cuvYpEUzJfh3gYOAV+7jh45X83FEP92CH0Zn4I6N7R
+         Qp2iuTarMiq/F92xfDEQ7lWeuU2ZfAaUYA64YKuklYkxBocko3b5k6KvSlKChcOzEDqH
+         DMHKgxaMCzUmom2aOcoka7ucmZqhU+9w6bQQ8m2+9kW1p79L7ETOfBk4F/6m6SC/qXe1
+         p86A==
+X-Forwarded-Encrypted: i=1; AJvYcCXu/JcR4+btb4NrtD7YwyScSMPm9RVagEmWe4ObthTE/MLHvRcY1WSHzgwemohfzGW8ZI8TJec=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxqNSY1cn2M9gIuPP9xnEnN2+qp7ZxT1W0M6h9flK/hcxpUVe/Y
+	kw6/0vlnHyJPPW8EykmYdN1ASLB1OEr3etS59ibhOIqP0JKpJOBgu3Xw
+X-Gm-Gg: ASbGncvMEV3Z7Fp+jUCZI0QgHWhyq/5i83+DqbmOghG8K0o/bRQhBK0jM0GeSZjgLWE
+	+GKdUCfJbsTAISsFHE4tFvCks7llS6Fexl3+6o8vjKTjD2ucXCev3V6EQhpQqbqm7/KQ5iZ+S4M
+	KYZrkeuZzGJxyRtQULS66RJ4eU41tSY1naEtD+6v/G0wU/Yrc+yvrw2fTHRZTXCPYRERYlOH2kB
+	p8ohGpFqkLYIHrjELQI/Bh3XCzKWi0j3n6mUjvrBKLpg2ZiM0LsNpHZ3gGTd0dNigYOb6cvvaE+
+	xsT9/oRMG25IxD1wQXU5mTcsspC5FhixP/9L2FTogbT4TknNhbVluk1qXLi80a60wqAhfT80Ei5
+	j3gYqYXdv8H1gh9OpKvmRegc7vueMzJThtYlSzDl3hvDMBB1l6hb12+6OsN64bQxqKF/vxHo6Py
+	D7oQ==
+X-Google-Smtp-Source: AGHT+IFxf5DCmAQb4WegUpiiTFHp05rmbMw9OobLeUqiCuq6pkZ68STqGne2876uNBNRHt3VzIgFBA==
+X-Received: by 2002:a05:600c:4443:b0:471:1387:377e with SMTP id 5b1f17b1804b1-477c01ddc08mr202058375e9.6.1764490941614;
+        Sun, 30 Nov 2025 00:22:21 -0800 (PST)
+Received: from skbuf ([2a02:2f04:d106:d600:36d7:677f:b37:8ba9])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4791115caa7sm172799055e9.6.2025.11.30.00.22.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 30 Nov 2025 00:22:20 -0800 (PST)
+Date: Sun, 30 Nov 2025 10:22:18 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Chen Minqiang <ptpt52@gmail.com>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	"Chester A. Unal" <chester.a.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v3 2/2] net: dsa: mt7530: Use GPIO polarity to generate
+ correct reset sequence
+Message-ID: <20251130082218.mvxlk3p2pxdny2ij@skbuf>
+References: <20251129234603.2544-1-ptpt52@gmail.com>
+ <20251129234603.2544-2-ptpt52@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next,PATCH 2/3] dt-bindings: net: realtek,rtl82xx: Document
- realtek,ssc-enable property
-To: Marek Vasut <marek.vasut@mailbox.org>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Aleksander Jan Bajkowski <olek2@wp.pl>, Andrew Lunn <andrew@lunn.ch>,
- Conor Dooley <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Florian Fainelli <f.fainelli@gmail.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Michael Klein <michael@fossekall.de>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Russell King <linux@armlinux.org.uk>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, devicetree@vger.kernel.org
-References: <20251130005843.234656-1-marek.vasut@mailbox.org>
- <20251130005843.234656-2-marek.vasut@mailbox.org>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20251130005843.234656-2-marek.vasut@mailbox.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251129234603.2544-2-ptpt52@gmail.com>
 
-On 30/11/2025 01:58, Marek Vasut wrote:
-> Document support for spread spectrum clocking (SSC) on RTL8211F(D)(I)-CG,
-> RTL8211FS(I)(-VS)-CG, RTL8211FG(I)(-VS)-CG PHYs. Introduce new DT property
-> 'realtek,ssc-enable' to enable SSC mode for both RXC and SYSCLK clock
-> signals.
-> 
-> Signed-off-by: Marek Vasut <marek.vasut@mailbox.org>
-> ---
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
-> Cc: Andrew Lunn <andrew@lunn.ch>
-> Cc: Conor Dooley <conor+dt@kernel.org>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Florian Fainelli <f.fainelli@gmail.com>
-> Cc: Heiner Kallweit <hkallweit1@gmail.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>
-> Cc: Michael Klein <michael@fossekall.de>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: Rob Herring <robh@kernel.org>
-> Cc: Russell King <linux@armlinux.org.uk>
-> Cc: Vladimir Oltean <vladimir.oltean@nxp.com>
-> Cc: devicetree@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> ---
->  Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
-> index eafcc2f3e3d66..f1bd0095026be 100644
-> --- a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
-> +++ b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
-> @@ -50,6 +50,11 @@ properties:
->      description:
->        Disable CLKOUT clock, CLKOUT clock default is enabled after hardware reset.
->  
-> +  realtek,ssc-enable:
-> +    type: boolean
-> +    description:
-> +      Enable SSC mode, SSC mode default is disabled after hardware reset.
+On Sun, Nov 30, 2025 at 07:46:03AM +0800, Chen Minqiang wrote:
+> This change makes the driver fully backward-compatible with older,
+> incorrect DTS files that marked the reset line as GPIO_ACTIVE_HIGH
 
-I don't want more SSC properties. We already had a big discussions about
-it - one person pushing vendor property and only shortly after we learnt
-that more vendors want it and they are actually working on this.
+The driver _is_ already backward-compatible with incorrect device trees.
+This patch makes it compatible with "correct" device trees.
 
-Best regards,
-Krzysztof
+We need care taken in one more area: when you make updates to the device
+tree, *old* versions of the kernel are not compatible with the latest
+device tree, which is not OK.
+
+So ideally:
+- patch 2/2 should be considered a bug fix and backported to stable kernels
+- you wait for some time to pass between when patch 2/2 is merged, and
+  when patch 1/2 is merged, so that users who get an updated device tree
+  have gotten the kernel compatibility patch through stable channels
+
+Then you need to consider that you break "git bisect" if you keep the
+device tree the same (i.e. the latest) and just change kernels. That is
+a trade-off that needs to be well justified (cost/benefit).
 
