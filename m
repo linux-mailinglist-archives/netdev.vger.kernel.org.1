@@ -1,129 +1,163 @@
-Return-Path: <netdev+bounces-242772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDA84C94C37
-	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 09:07:43 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54D0FC94C4A
+	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 09:20:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2C9CA3441CD
-	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 08:07:43 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id BEED6343ECB
+	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 08:20:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFBAE1FF1B4;
-	Sun, 30 Nov 2025 08:07:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82747239E8B;
+	Sun, 30 Nov 2025 08:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aDWhMsDq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k4WQmxO+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FB781FD4
-	for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 08:07:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5523722068A;
+	Sun, 30 Nov 2025 08:20:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764490059; cv=none; b=nd5zQvsh5WaF5Wcf7IjeUqPYLVgW8TxmuQDMq6d+xuc7uYUaa1qGViG+p58WyGDi7O3ydEJcPfniJPk2RbPT8d2sMRptF672GVNrRGVi6+zPPrd/cjmpdaIlNuva7vXnYuoQI4g3h8cR/P/IWh06TRe89t2F5jHpJaT1KhTQiw4=
+	t=1764490832; cv=none; b=EnxdR+2NCCNJlvwXKhez+/grl6J3YqaNYGAKb1efkw5OjiE5TAPyHHIWXk31JrD0PmIsfV7qrOZHK8Ii2rw6CRPY6B8QvyxStZaKHpguN4Mt0V/fXnHkjBN48HGjdMF2xFj6KT+tITtikP8t11uD4+wRFqQNu9n31WDOQ7kJzRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764490059; c=relaxed/simple;
-	bh=4BqR8i04DJ4LHGlawmh3d7XuP4glW6AD9nAnEQwn4CM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fbCQlsyBBlwr7+mcJyGMjWHUrPhUJvmOGAaBfkBkT9hI4MBd7TFjzWBjQ6SLCUrtSBTo0A/N+wfn0ljUz3SQTxYJYPCRRExjNSS324Ud4BhFI/jyrRJD2s/G9plh9Zft2k6JjF6lhYVBw5AdbYMeX9chtYiuRxHnLqw8kSPQECA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aDWhMsDq; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4779b49d724so4489245e9.0
-        for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 00:07:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764490057; x=1765094857; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xlsTM8X40xseZoss4FmEjFSiPfPo4hKAiGVqNHsXGAU=;
-        b=aDWhMsDqBJKMQXfNVIHTsNL8BCw2LKygoSnqFA9hUPwJxuORsiRzy6AzDXPOA5xMbC
-         oZYRf5TVvXXn+oIGRCZdyttLU++DW0X2OdAUuP5+e425VQurQLD8h/LcQfdIv4bNRIFl
-         BjdgRdTcYsHDmDYPl+5RPWdrm5n3tWnqlECLPJ9/aW6uMSuQbYsaK2e8A9MetYZvfL9B
-         xR5igGUh9aODBWfY5E+mnR7fL03AW2C7gRLn359isgHchZSdQSKRqmzt1aG6yYT3Sm+F
-         96o+gABO6sNoVLK1S0sjMCJnBte4/BrQ9saA7BEk35rNvgpzRSJanBywRKOym9iSRjN/
-         1lnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764490057; x=1765094857;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xlsTM8X40xseZoss4FmEjFSiPfPo4hKAiGVqNHsXGAU=;
-        b=DA4UMkzsuVzG/N8LxKMIJYn52cuBKB1fIUffIV+AU5OhgqPpdTeZgew/oYHtPT1kV/
-         qZOk7WqHFrZuQpoAJJMyWczi1vUzZGeqUyBrmCtF1c/PucNWm5zZ45xIToW9Dt99gkRA
-         jsZVevgQ+6KbcdCv//qoKyqb4bXGR6GqFRUvt3pXB4IBreGLFcpw52Z/KfCOanAtNepY
-         NCIOpxNlUTKzp6gRsbikb97ZvcquDH1aNewFpNTgA+kJ09peyvZBuZ60QnS76ssgtICA
-         VvWUK1CCm6keb5IQuZqv4qHel7C7xZgo/o6LKhApQiZ4b9znDb1UPucRNZlqGt7ij5nk
-         waQA==
-X-Forwarded-Encrypted: i=1; AJvYcCUIhGR1coPYE4B+FHKqTHS/n/11ZJRTH/dCPteiAq6qBMyzWgDbSiblE/DONUb0IefSbgxq3Fs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyHQKMhvL6+PgUeEv9618Zr45H1pD7zQhfLgpPo+KqX1cu1sfZ8
-	KPeGed0EBP8bzBBquP2jCYRyZuwH8DFMKnBzmvl1RHloEWcA6FalJ2kz
-X-Gm-Gg: ASbGncvrUDq+yIQNR+HFdA51i0uBUeytU42yFzXAzAuC4ImXEdSQ055aIYOr4CtFLZB
-	3ULIuvQdW3b/sNoZEOVuLeLQp4D8Wkrm923ETQL4L5qFOMrhhw/7ITZM8DSB5qDNcBrFk3j4YGe
-	jEx5Ov7qCLlJtryqGLTtGN1xZXwHLM1fQganrahM5MNTHTcO9tOCqcy/NVlo+imztDyntZVStJ6
-	NEQno7wdRsvZ24FeUhVpb2I/TaTjLe3T69173WyacUlIdWwa/8LHc6wGzQpOjrAQ8Xl8/h49tz5
-	2Q7TD0PDaTIEN6/O5oX4ol2g++L2aFB4vSDLQ1b5pr2itNHQLUTNVG2Uet2BJAVQfObZKYuwoc6
-	Kk/N9yeJmjlXZRDufmbG6DwGDAtjR/73rduQxc88c97yGLCdBxW5HaNWCskq3TDsOdZkOyqTHP5
-	zmNg==
-X-Google-Smtp-Source: AGHT+IFlU1lz0wAxOd6SVfn1aivlWfEl/Ou+5sEfrekzWHqCsdYXRmCmN0O23F/dtfV/GF8aZsAtOg==
-X-Received: by 2002:a05:600c:628f:b0:477:9fa8:bc99 with SMTP id 5b1f17b1804b1-477c01bc376mr183264015e9.4.1764490056388;
-        Sun, 30 Nov 2025 00:07:36 -0800 (PST)
-Received: from skbuf ([2a02:2f04:d106:d600:36d7:677f:b37:8ba9])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-479040a9cf4sm134950185e9.1.2025.11.30.00.07.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 30 Nov 2025 00:07:34 -0800 (PST)
-Date: Sun, 30 Nov 2025 10:07:31 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Chen Minqiang <ptpt52@gmail.com>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	"Chester A. Unal" <chester.a.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v3 2/2] net: dsa: mt7530: Use GPIO polarity to generate
- correct reset sequence
-Message-ID: <20251130080731.ty2dlxaypxvodxiw@skbuf>
-References: <20251129234603.2544-1-ptpt52@gmail.com>
- <20251129234603.2544-2-ptpt52@gmail.com>
- <0675b35f-217d-4261-9e3f-2eb24753d43c@lunn.ch>
+	s=arc-20240116; t=1764490832; c=relaxed/simple;
+	bh=ix7X7fSFO+etWXtLPVudV3/mpH8HoQRTbfNpg6nM6AY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=A68elVDx+MRtSaI74XOaI0VoEJPy0tsDRj8rcIdCmZIBc86Ct3DLa/oTWotcMQrXwbB+VtFKBn+53DjdcE9FKoB/OdGjWPcZcu5+I7ywatY5Sn95yvCWp0IERU1hFVNYTM2xkGHNGhXgApRJaFnHOAo8nSmbpHlkUAlkUDsVn90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k4WQmxO+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1393FC4CEF8;
+	Sun, 30 Nov 2025 08:20:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764490831;
+	bh=ix7X7fSFO+etWXtLPVudV3/mpH8HoQRTbfNpg6nM6AY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=k4WQmxO+4Mtx724ofRO4hcbNwZjwha6lCGTulXXcAiS2vCLJqwxkxXheiF2nswcfD
+	 /cuhzOj+ltxnGhini115yDnMigHL7fnGb0jSvO568TaYtOpiOwTT46IgY/TrmNp6Ye
+	 cxCfIAvVHDH+v1R07Okdc00A8MnB8EDP5UXnby+ev7CJP1Ftz1q4Y6Cj5IXUzGHp5/
+	 xc4BkPw3aEzTVp6q25dmBm1P2bILT2O+V2eVjUJ6pRMtRWDkn5Sumj4+41lyRaYvX1
+	 LZwCd9L71EvVpQXlMaMV9t5waqDsEzfzAw5Wbaean8KJV7/s8ptFTkLoPKyLjCclq4
+	 rgpfrh2CCOXxA==
+Message-ID: <f3046826-a44c-4aa9-8a94-351e7fe83f06@kernel.org>
+Date: Sun, 30 Nov 2025 09:20:26 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0675b35f-217d-4261-9e3f-2eb24753d43c@lunn.ch>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next,PATCH 2/3] dt-bindings: net: realtek,rtl82xx: Document
+ realtek,ssc-enable property
+To: Marek Vasut <marek.vasut@mailbox.org>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Aleksander Jan Bajkowski <olek2@wp.pl>, Andrew Lunn <andrew@lunn.ch>,
+ Conor Dooley <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Michael Klein <michael@fossekall.de>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Russell King <linux@armlinux.org.uk>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, devicetree@vger.kernel.org
+References: <20251130005843.234656-1-marek.vasut@mailbox.org>
+ <20251130005843.234656-2-marek.vasut@mailbox.org>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
+ cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
+ JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
+ gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
+ J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
+ NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
+ BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
+ vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
+ Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
+ TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
+ S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
+ FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJoF1BKBQkWlnSaAAoJEBuTQ307
+ QWKbHukP/3t4tRp/bvDnxJfmNdNVn0gv9ep3L39IntPalBFwRKytqeQkzAju0whYWg+R/rwp
+ +r2I1Fzwt7+PTjsnMFlh1AZxGDmP5MFkzVsMnfX1lGiXhYSOMP97XL6R1QSXxaWOpGNCDaUl
+ ajorB0lJDcC0q3xAdwzRConxYVhlgmTrRiD8oLlSCD5baEAt5Zw17UTNDnDGmZQKR0fqLpWy
+ 786Lm5OScb7DjEgcA2PRm17st4UQ1kF0rQHokVaotxRM74PPDB8bCsunlghJl1DRK9s1aSuN
+ hL1Pv9VD8b4dFNvCo7b4hfAANPU67W40AaaGZ3UAfmw+1MYyo4QuAZGKzaP2ukbdCD/DYnqi
+ tJy88XqWtyb4UQWKNoQqGKzlYXdKsldYqrLHGoMvj1UN9XcRtXHST/IaLn72o7j7/h/Ac5EL
+ 8lSUVIG4TYn59NyxxAXa07Wi6zjVL1U11fTnFmE29ALYQEXKBI3KUO1A3p4sQWzU7uRmbuxn
+ naUmm8RbpMcOfa9JjlXCLmQ5IP7Rr5tYZUCkZz08LIfF8UMXwH7OOEX87Y++EkAB+pzKZNNd
+ hwoXulTAgjSy+OiaLtuCys9VdXLZ3Zy314azaCU3BoWgaMV0eAW/+gprWMXQM1lrlzvwlD/k
+ whyy9wGf0AEPpLssLVt9VVxNjo6BIkt6d1pMg6mHsUEVzsFNBFVDXDQBEADNkrQYSREUL4D3
+ Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
+ MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
+ OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
+ GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
+ 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
+ YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
+ 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
+ BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
+ JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
+ 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
+ YpsFAmgXUF8FCRaWWyoACgkQG5NDfTtBYptO0w//dlXJs5/42hAXKsk+PDg3wyEFb4NpyA1v
+ qmx7SfAzk9Hf6lWwU1O6AbqNMbh6PjEwadKUk1m04S7EjdQLsj/MBSgoQtCT3MDmWUUtHZd5
+ RYIPnPq3WVB47GtuO6/u375tsxhtf7vt95QSYJwCB+ZUgo4T+FV4hquZ4AsRkbgavtIzQisg
+ Dgv76tnEv3YHV8Jn9mi/Bu0FURF+5kpdMfgo1sq6RXNQ//TVf8yFgRtTUdXxW/qHjlYURrm2
+ H4kutobVEIxiyu6m05q3e9eZB/TaMMNVORx+1kM3j7f0rwtEYUFzY1ygQfpcMDPl7pRYoJjB
+ dSsm0ZuzDaCwaxg2t8hqQJBzJCezTOIkjHUsWAK+tEbU4Z4SnNpCyM3fBqsgYdJxjyC/tWVT
+ AQ18NRLtPw7tK1rdcwCl0GFQHwSwk5pDpz1NH40e6lU+NcXSeiqkDDRkHlftKPV/dV+lQXiu
+ jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
+ zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
+ XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
+In-Reply-To: <20251130005843.234656-2-marek.vasut@mailbox.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Nov 30, 2025 at 02:11:05AM +0100, Andrew Lunn wrote:
-> > -		gpiod_set_value_cansleep(priv->reset, 0);
-> > +		int is_active_low = !!gpiod_is_active_low(priv->reset);
-> > +		gpiod_set_value_cansleep(priv->reset, is_active_low);
+On 30/11/2025 01:58, Marek Vasut wrote:
+> Document support for spread spectrum clocking (SSC) on RTL8211F(D)(I)-CG,
+> RTL8211FS(I)(-VS)-CG, RTL8211FG(I)(-VS)-CG PHYs. Introduce new DT property
+> 'realtek,ssc-enable' to enable SSC mode for both RXC and SYSCLK clock
+> signals.
 > 
-> I think you did not correctly understand what Russell said. You pass
-> the logical value to gpiod_set_value(). If the GPIO has been marked as
-> active LOW, the GPIO core will invert the logical values to the raw
-> value. You should not be using gpiod_is_active_low().
+> Signed-off-by: Marek Vasut <marek.vasut@mailbox.org>
+> ---
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
+> Cc: Andrew Lunn <andrew@lunn.ch>
+> Cc: Conor Dooley <conor+dt@kernel.org>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Florian Fainelli <f.fainelli@gmail.com>
+> Cc: Heiner Kallweit <hkallweit1@gmail.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>
+> Cc: Michael Klein <michael@fossekall.de>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Rob Herring <robh@kernel.org>
+> Cc: Russell King <linux@armlinux.org.uk>
+> Cc: Vladimir Oltean <vladimir.oltean@nxp.com>
+> Cc: devicetree@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> ---
+>  Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml | 5 +++++
+>  1 file changed, 5 insertions(+)
 > 
-> But as i said to the previous patch, i would just leave everything as
-> it is, except document the issue.
-> 
-> 	Andrew
-> 
+> diff --git a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
+> index eafcc2f3e3d66..f1bd0095026be 100644
+> --- a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
+> +++ b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
+> @@ -50,6 +50,11 @@ properties:
+>      description:
+>        Disable CLKOUT clock, CLKOUT clock default is enabled after hardware reset.
+>  
+> +  realtek,ssc-enable:
+> +    type: boolean
+> +    description:
+> +      Enable SSC mode, SSC mode default is disabled after hardware reset.
 
-It was my suggestion to do it like this (but I don't understand why I'm
-again not in CC).
+I don't want more SSC properties. We already had a big discussions about
+it - one person pushing vendor property and only shortly after we learnt
+that more vendors want it and they are actually working on this.
 
-We _know_ that the reset pin of the switch should be active low. So by
-using gpiod_is_active_low(), we can determine whether the device tree is
-wrong or not, and we can work with a wrong device tree too (just invert
-the logical values).
+Best regards,
+Krzysztof
 
