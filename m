@@ -1,234 +1,203 @@
-Return-Path: <netdev+bounces-242837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F2FDC95480
-	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 21:34:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CF437C954AB
+	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 21:37:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CBBF3A2872
-	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 20:34:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EC8B3A2452
+	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 20:37:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 416CA23D7DB;
-	Sun, 30 Nov 2025 20:34:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 505F62C21E5;
+	Sun, 30 Nov 2025 20:37:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b="RHVjMNFv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QHNLoidb";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="odq9Ib0+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.toke.dk (mail.toke.dk [45.145.95.4])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59A3821E098
-	for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 20:34:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.145.95.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98BF321E098
+	for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 20:37:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764534870; cv=none; b=lw1zC5dPbVCTy6G+tbIWcMFNRbZMgZdeL8bmb+Bw4IcwlHFiMU+q7myFQfRUmxKKTtiyLFRd6Ilo2ICkLOy7SHNhuRklP0Xqm40SSC2j+X+1qruuePsZfY504V+ZD0JAiLJg3hen5YYLeYSd5Ur6Zo3F7GGGvTVcQ0Am4qVZQ14=
+	t=1764535054; cv=none; b=bJmgNBKKqCsPmcuTi0OYS39excepyaabifaRhjiA59bWbguhoDF/7a4m591MfDkrkL5brahtnqDE1y+Gzk7Y/b/0TzNhLpNp4iO9AbdpmtuEGdmadAMcLvvRoA6gHK2P/h9vm/bA2DEDa2GdVvq05PqzJSPGIFXJhPqbfbYoYSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764534870; c=relaxed/simple;
-	bh=/XVLRUvvO1SSEaQUOc5WImXhXd0adtg+yKhUJbCiaTM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=hxsJLl03W4QPnAOhZdauUucn3/6NguIRkWH/5atZeBqcaXkogLVM9kGFvrDwtiyIXo/MQMrvFEZ95sKTS+KOA8NjbPtUQRO12xFAF8QuZu+43Sj1H6Op/KbBvOBVnHVucze2NcM6WecPBOe6w+7kzONXIZjXQpg845ziSRYR4J4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk; spf=pass smtp.mailfrom=toke.dk; dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b=RHVjMNFv; arc=none smtp.client-ip=45.145.95.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=toke.dk
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=toke.dk; s=20161023;
-	t=1764534863; bh=/XVLRUvvO1SSEaQUOc5WImXhXd0adtg+yKhUJbCiaTM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=RHVjMNFvXKgd7MAGIsx41eHiSlt5iM5/4qnxfw9xCYUTc5fSViB6kh0X6TIeSHZnM
-	 GRHgIembIBp7dhYVcGk1UrKdzfBIsymCN19prz+4C0+D86XbYiETAqbQ1cMUkkUI8f
-	 U7GvDeAe6Lv5VYaOQpagT0f3CZWEtuDDe5b8UYuf6CDAuO/EibaB1hoyeT9WTAgGYE
-	 KJ32a9U3oOZSilP8Btko9+ZDueiJ9x1LIeZPQsBF0qbhA11pSLqsK2tAnPJ1slJJ5X
-	 2WsNEfc0vY67CA+WZ1pH//tTutKkwtxSUn24phWXjGy1NOJXFRcTjxZ971ZYAvQS42
-	 OE5q6/yStRyIA==
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Jamal Hadi Salim <jhs@mojatatu.com>,
- Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: Jonas =?utf-8?Q?K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>,
- cake@lists.bufferbloat.net,
- netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/4] net/sched: sch_cake: Add cake_mq qdisc
- for using cake on mq devices
-In-Reply-To: <willemdebruijn.kernel.69fe80979368@gmail.com>
-References: <20251127-mq-cake-sub-qdisc-v2-0-24d9ead047b9@redhat.com>
- <20251127-mq-cake-sub-qdisc-v2-2-24d9ead047b9@redhat.com>
- <willemdebruijn.kernel.2e44851dd8b26@gmail.com> <87a505b3dt.fsf@toke.dk>
- <willemdebruijn.kernel.352b3243bf88@gmail.com> <87zf84ab2d.fsf@toke.dk>
- <willemdebruijn.kernel.12cce168f29d0@gmail.com> <87tsyba3wx.fsf@toke.dk>
- <willemdebruijn.kernel.69fe80979368@gmail.com>
-Date: Sun, 30 Nov 2025 21:34:21 +0100
-X-Clacks-Overhead: GNU Terry Pratchett
-Message-ID: <87pl8z9s4y.fsf@toke.dk>
+	s=arc-20240116; t=1764535054; c=relaxed/simple;
+	bh=YwvRLmvf8g4chDxRz9C6auQvbO+2SRo81WRaUQE6B6Q=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Lh/aqqSQXhwUvgf6xT7qC31wzK0GbTKODwpmRwYRQ8yyW34BG4Q/hNrvwVvw0xSQZHhviCPO9aA3uH8CHC5A3lOSDhHwqLGQP/g3r4s7GO6/u6141swziCoB55PTHaydaAx3CCTFHfIVrFEbw3URB5v/fdFfitCrsgqRB3mmUec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QHNLoidb; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=odq9Ib0+; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764535051;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+aQZT4b2Nu/IBd7NvYkGdOpZxCNL6++4JZQfNH7Vtno=;
+	b=QHNLoidb4Jtq723F342Fnefgrg1wNgHmQjqJ0jQ2ErlLzcd9FzVPzO3cHXgHptbbuXxUf6
+	IkB8mWMl1+7XegPtHrMsOPgzLiWSeLhXRvOeL0gEzqqyHlz9h2Tlo0sdPUcwGbgjrOg2GM
+	0IATcUtiI7Xo5XkOHs2aPdOTDjiD0qs=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-280-8iObUitgOaeLlJugkbtyKQ-1; Sun, 30 Nov 2025 15:37:30 -0500
+X-MC-Unique: 8iObUitgOaeLlJugkbtyKQ-1
+X-Mimecast-MFC-AGG-ID: 8iObUitgOaeLlJugkbtyKQ_1764535049
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-6409f6d6800so5177741a12.0
+        for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 12:37:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1764535049; x=1765139849; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+aQZT4b2Nu/IBd7NvYkGdOpZxCNL6++4JZQfNH7Vtno=;
+        b=odq9Ib0+21xZEaWV+onF712ivlUUo8A0d4svl0MYa7qzBNKbwMINu8rQWtDh6y+iWB
+         JCE+XMKQ37BF7RhiQtJR+Qq3w+SBYkI+qtIuee1WVC59xM5AmvgPXwbsPt7CPEdn+KZC
+         7Ye3CuV0lz6v4SnmB2Bh9wfIbFm2K+84d3SU7ScjmqzqU+hyEB+aZ0QbD+CUbmPYuHaM
+         xe1+q0FOEyHrTPnsLWvEaHgXw3ZXYDRS+zksAbh7nOKkjKUUoH6YbEf1RO/GVHCONsuv
+         yeEJkvRlFgY1RXJPqOqG4O4hRcck7p/7QQBsCbWgxtKPxzCct8SQFz2Qn4h/CHFxVVr1
+         UIYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764535049; x=1765139849;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+aQZT4b2Nu/IBd7NvYkGdOpZxCNL6++4JZQfNH7Vtno=;
+        b=Nv0rbnOdHQX+stnH5wuamm1syMnuEcR0HP42JYxNJuc2MF5mq8WZPO0TaqabP1luKG
+         vWAEp8DZJe4v2uXGyWepDiuZ+utzVrUT90OlNxQPGNU6bCIXKlK4oIXrLwPi1ktmkH4Q
+         Jw8CGA30mYFOzjjWPl0d1ErrG/Vm8q3GQxLZscec2URDGwXvMf5tFKV5y7/L2YTfs+zZ
+         9vcJDQCittq3R3CWpn9M2hM/JJ3Aef+7otKc9PvA2UBosBhiJC6D0pAmsX/NbHZlQBkd
+         HH1nTA4LQe1bv//EqNHg48tLtqihi+j2pZ6Vgb4QQ2Q9Aaxdl1DEDS8dv5C+JltjtmjP
+         0dbg==
+X-Forwarded-Encrypted: i=1; AJvYcCWck4BHSlpdnzQIX82N3/e663S5g/DHj8IetsGS7toOi7apdSRQDI8JeS1ioYDAZ9hIl8MNJtU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEL0sUDHYMuVEibT+yYd/Y3L3FVAjk28F1QefC4hUj1ZvAUOAw
+	C9RnRml3eBl7+omDgc8DOxPCLeTT27KQPVdUrT1zacHe5tve4jXLroB54RjvlIVeAk2M79Swdzq
+	n4BArPMtG46gjAJOakHBmc06wjkq+aX/4ACA7HbLpgPT0bL+JYp6xv4g1Rg==
+X-Gm-Gg: ASbGncvPPP5Fbt/FC1pu6QDbmeMP24GMkOVTUuFZovCbZTmPjH9CCqzSl0AbvOuURfQ
+	vhfCSW+bTHNwytSSFA0JCKCcj18yQakjaNKh7lCEbIYkTv0I2ecPaTo8FM8RiW+O5OUJgKBLLlw
+	i72+DPI3FlSvclWalo6kbcxjqoxGTAgqmQz0v5w9gNsqYHUpujS92W70jr1q9TN+MMBiBsKbcU4
+	bcKqzk/3RoBnpdrukagUg6onYZ1bxqwpfabCE3Fw2rd/NHjZvZ8M6dCnUlCSiOwNXNIKmVk4ECp
+	HR4S/fghAOzhuCEYd7iNK01Ejx8CKBbMUgFd+/5AgCZGksmJ3m6BrEDPKxGVT33aWoYtLEvvydO
+	l8ktHiDmJSb74BwdIoJCMA1eVaIf3dcX+ig==
+X-Received: by 2002:a05:6402:5246:b0:62f:8274:d6bd with SMTP id 4fb4d7f45d1cf-64555b965e5mr31799458a12.8.1764535048858;
+        Sun, 30 Nov 2025 12:37:28 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH+MHlVb+HXR1Syt7OiQv3LYgQRsQyXTTIn3F85nqKzPRN8lUMKxM5xLTDLbFxEpo1vxAa8mA==
+X-Received: by 2002:a05:6402:5246:b0:62f:8274:d6bd with SMTP id 4fb4d7f45d1cf-64555b965e5mr31799443a12.8.1764535048454;
+        Sun, 30 Nov 2025 12:37:28 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-64751062709sm10284515a12.35.2025.11.30.12.37.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 30 Nov 2025 12:37:26 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 390B2395C21; Sun, 30 Nov 2025 21:37:26 +0100 (CET)
+From: =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+Subject: [PATCH net-next v3 0/5] Multi-queue aware sch_cake
+Date: Sun, 30 Nov 2025 21:37:17 +0100
+Message-Id: <20251130-mq-cake-sub-qdisc-v3-0-5f66c548ecdc@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAP2qLGkC/3XNQQrCMBAF0KtI1o4kY6rWlSB4ALfiIs1MbJC2m
+ tSiSO9uqCCKuvz8+W/uInLwHMVydBeBOx99U6cwHY+ELU19YPCUskCJmcwlQnUGa44M8VLAmXy
+ 0YMnJIssJHWci7U6Bnb8O5k7U3ELN11bsU1P62DbhNjzbbtbDwRNG/QPuFEjQUyNnkpRSaFaBq
+ TTtxDbV4HXqRaT6L2HQOUWm0IuF+yLwnZj/IjARqClnQ1LPi/yD6Pv+AVGxSYlEAQAA
+X-Change-ID: 20250902-mq-cake-sub-qdisc-cdf0b59d2fe5
+To: =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>, 
+ Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+ Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: =?utf-8?q?Jonas_K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>, 
+ cake@lists.bufferbloat.net, netdev@vger.kernel.org, 
+ =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+X-Mailer: b4 0.14.3
 
-Willem de Bruijn <willemdebruijn.kernel@gmail.com> writes:
+This series adds a multi-queue aware variant of the sch_cake scheduler,
+called 'cake_mq'. Using this makes it possible to scale the rate shaper
+of sch_cake across multiple CPUs, while still enforcing a single global
+rate on the interface.
 
-> Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->> Willem de Bruijn <willemdebruijn.kernel@gmail.com> writes:
->>=20
->> > Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->> >> Willem de Bruijn <willemdebruijn.kernel@gmail.com> writes:
->> >>=20
->> >> > Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->> >> >> Willem de Bruijn <willemdebruijn.kernel@gmail.com> writes:
->> >> >>=20
->> >> >> > Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->> >> >> >> Add a cake_mq qdisc which installs cake instances on each hardw=
-are
->> >> >> >> queue on a multi-queue device.
->> >> >> >>=20
->> >> >> >> This is just a copy of sch_mq that installs cake instead of the=
- default
->> >> >> >> qdisc on each queue. Subsequent commits will add sharing of the=
- config
->> >> >> >> between cake instances, as well as a multi-queue aware shaper a=
-lgorithm.
->> >> >> >>=20
->> >> >> >> Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
->> >> >> >> Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.co=
-m>
->> >> >> >> ---
->> >> >> >>  net/sched/sch_cake.c | 214 +++++++++++++++++++++++++++++++++++=
-+++++++++++++++-
->> >> >> >>  1 file changed, 213 insertions(+), 1 deletion(-)
->> >> >> >
->> >> >> > Is this code duplication unavoidable?
->> >> >> >
->> >> >> > Could the same be achieved by either
->> >> >> >
->> >> >> > extending the original sch_mq to have a variant that calls the
->> >> >> > custom cake_mq_change.
->> >> >> >
->> >> >> > Or avoid hanging the shared state off of parent mq entirely. Hav=
-e the
->> >> >> > cake instances share it directly. E.g., where all but the instan=
-ce on
->> >> >> > netdev_get_tx_queue(dev, 0) are opened in a special "shared" mod=
-e (a
->> >> >> > bit like SO_REUSEPORT sockets) and lookup the state from that
->> >> >> > instance.
->> >> >>=20
->> >> >> We actually started out with something like that, but ended up wit=
-h the
->> >> >> current variant for primarily UAPI reasons: Having the mq variant =
-be a
->> >> >> separate named qdisc is simple and easy to understand ('cake' gets=
- you
->> >> >> single-queue, 'cake_mq' gets you multi-queue).
->> >> >>=20
->> >> >> I think having that variant live with the cake code makes sense. I
->> >> >> suppose we could reuse a couple of the mq callbacks by exporting t=
-hem
->> >> >> and calling them from the cake code and avoid some duplication tha=
-t way.
->> >> >> I can follow up with a patch to consolidate those if you think it =
-is
->> >> >> worth it to do so?
->> >> >
->> >> > Since most functions are identical, I do think reusing them is
->> >> > preferable over duplicating them.
->> >>=20
->> >> Sure, that's fair. Seems relatively straight forward too:
->> >>=20
->> >> https://git.kernel.org/pub/scm/linux/kernel/git/toke/linux.git/commit=
-/?h=3Dmq-cake-sub-qdisc&id=3Dfdb6891cc584a22d4823d771a602f9f1ee56eeae
->> >
->> > Great. That's good enough for me.
->>=20
->> Cool. I folded it into the series, and it does make the patch a lot
->> simpler, so thank you for the suggestion!
->>=20
->> >> > I'm not fully convinced that mq_cake + cake is preferable over
->> >> > mq + cake (my second suggestion). We also do not have a separate
->> >> > mq_fq, say. But mine is just one opinion from the peanut gallery.
->> >>=20
->> >> Right, I do see what you mean; as I said we did consider this initial=
-ly,
->> >> but went with this implementation from a configuration simplicity
->> >> consideration.=20
->> >
->> > Then admins have only to install one qdisc, rather than what we do for
->> > FQ today which is one MQ + a loop over the FQs.
->> >
->> > I don't know if we have to coddle admins like that.
->>=20
->> I don't really view it as coddling, but as making it as easy as possible
->> to take advantage of the mq variant in the most common configuration.
->> The primary use case for cake is shaping on the whole link (on home
->> routers, in particular), and the mq extension came about to address the
->> common bottleneck here where the cake shaper can't keep up with link
->> speeds on a single CPU. So I think it's worthwhile to make it as easy as
->> possible to consume that seems worthwhile, in a way that retains
->> compatibility with the existing tools that work on top of cake, such as
->> the autorate scripts:
->>=20
->> https://github.com/sqm-autorate/sqm-autorate
->>=20
->> >> If we were to implement this as an option when running
->> >> under the existing mq, we'd have to add an option to cake itself to o=
-pt
->> >> in to this behaviour, and then deal with the various combinations of
->> >> sub-qdiscs being added and removed (including mixing cake and non-cake
->> >> sub-qdiscs of the same mq). And userspace would have to setup the mq,
->> >> then manually add the cake instances with the shared flag underneath =
-it.
->> >
->> > One question is whether the kernel needs to protect admins from doing
->> > the unexpected thing, which would be mixing mq children of different
->> > type when using shared cake state between children.
->> >
->> > Honestly, I don't think so. But it could be done. For instance by
->> > adding an mq option that requires all children to be of the same kind,
->> > or even by silently setting this if the first child added is a cake
->> > instance with shared option set.
->> >
->> > As for shared state, in cake_init the qdisc could check that the dev
->> > root is mq and it is a direct child of this qdisc, and then scan the
->> > mq children for the existence of a cake child. If one exists, take a
->> > ref on a shared state struct. If not, create the struct. Again, like
->> > SO_REUSEPORT.
->> >
->> > All easier said than implemented, of course, but seems doable?
->>=20
->> Yeah, I do think it's doable; just needs a bit of thought around the
->> lifetime management of the shared config struct as sub-qdiscs come and
->> go.
->>=20
->> I am not necessarily opposed to supporting this mode, including the case
->> where there's a mix of qdiscs on different HW queues. However, I view it
->> as an extension of the base use case, as described above. Now that we're
->> reusing the mq code, cake_mq becomes quite a lightweight addition, so we
->> could potentially support both? I.e., the cake_mq qdisc would be the
->> straight-forward way to load cake across a device, but we could add
->> support for sharing cake state across (a subset of) regular mq as well?
->> WDYT?
->
-> I'd only plan to do it once, do it right.
->
-> mq_cake has the advantage of being simpler to configure.
->
-> The alternative that it allows more configurations. But we don't
-> immediately see real use cases for those.
->
-> Your call, assuming no one else chimes in.
+The approach taken in this patch series is to implement a separate qdisc
+called 'cake_mq', which is based on the existing 'mq' qdisc, but differs
+in a couple of aspects:
 
-Right. Well, given the somewhat speculative nature of the combination
-use cases, I am still leaning towards the cake_mq version. Will submit a
-v3 with the shared sch_mq code.
+- It will always install a cake instance on each hardware queue (instead
+  of using the default qdisc for each queue like 'mq' does).
 
-Thank you for looking at the code and chiming in!
+- The cake instances on the queues will share their configuration, which
+  can only be modified through the parent cake_mq instance.
 
--Toke
+Doing things this way simplifies user configuration by centralising
+all configuration through the cake_mq qdisc (which also serves as an
+obvious way of opting into the multi-queue aware behaviour). The cake_mq
+qdisc takes all the same configuration parameters as the cake qdisc.
+
+An earlier version of this work was presented at this year's Netdevconf:
+https://netdevconf.info/0x19/sessions/talk/mq-cake-scaling-software-rate-limiting-across-cpu-cores.html
+
+The patch series is structured as follows:
+
+- Patch 1 exports the mq qdisc functions for reuse.
+
+- Patch 2 factors out the sch_cake configuration variables into a
+  separate struct that can be shared between instances.
+
+- Patch 3 adds the basic cake_mq qdisc, reusing the exported mq code
+
+- Patch 4 adds configuration sharing across the cake instances installed
+  under cake_mq
+
+- Patch 5 adds the shared shaper state that enables the multi-core rate
+  shaping
+
+A selftest, and a patch to iproute2 to make it aware of the cake_mq
+qdisc, will be submitted separately.
+
+---
+Changes in v3:
+- Export the functions from sch_mq and reuse them instead of copy-pasting
+- Dropped Jamal's reviewed-by on the patches that changed due to the above
+- Fixed a crash if cake_mq_init is called with a NULL opt parameter
+- Link to v2: https://lore.kernel.org/r/20251127-mq-cake-sub-qdisc-v2-0-24d9ead047b9@redhat.com
+
+Changes in v2:
+- Rebase on top of net-next, incorporating Eric's changes
+- Link to v1: https://lore.kernel.org/r/20251124-mq-cake-sub-qdisc-v1-0-a2ff1dab488f@redhat.com
+
+Changes in v1 (since RFC):
+- Drop the sync_time parameter for now and always use the 200 us value.
+  We are planning to explore auto-configuration of the sync time, so
+  this is to avoid committing to a UAPI. If needed, a parameter can be
+  added back later.
+- Keep the tc yaml spec in sync with the new stats member
+- Rebase on net-next
+- Link to RFC: https://lore.kernel.org/r/20250924-mq-cake-sub-qdisc-v1-0-43a060d1112a@redhat.com
+
+---
+Jonas Köppeler (1):
+      net/sched: sch_cake: share shaper state across sub-instances of cake_mq
+
+Toke Høiland-Jørgensen (4):
+      net/sched: Export mq functions for reuse
+      net/sched: sch_cake: Factor out config variables into separate struct
+      net/sched: sch_cake: Add cake_mq qdisc for using cake on mq devices
+      net/sched: sch_cake: Share config across cake_mq sub-qdiscs
+
+ Documentation/netlink/specs/tc.yaml |   3 +
+ include/net/sch_generic.h           |  19 ++
+ include/uapi/linux/pkt_sched.h      |   1 +
+ net/sched/sch_cake.c                | 476 ++++++++++++++++++++++++++----------
+ net/sched/sch_mq.c                  |  69 ++++--
+ 5 files changed, 422 insertions(+), 146 deletions(-)
+---
+base-commit: f93505f35745637b6d94efe8effa97ef26819784
+change-id: 20250902-mq-cake-sub-qdisc-cdf0b59d2fe5
+
 
