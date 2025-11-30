@@ -1,105 +1,147 @@
-Return-Path: <netdev+bounces-242813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C0C1C950A9
-	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 16:06:52 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2076AC95042
+	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 15:36:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 096B7342CEE
-	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 15:06:52 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 10F124E0303
+	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 14:36:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 564682222A1;
-	Sun, 30 Nov 2025 15:06:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="tcpivgYv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25C5A221F11;
+	Sun, 30 Nov 2025 14:36:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
+Received: from smtp.blochl.de (mail.blochl.de [151.80.40.192])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B13F120102B;
-	Sun, 30 Nov 2025 15:06:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFBC91373;
+	Sun, 30 Nov 2025 14:36:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=151.80.40.192
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764515207; cv=none; b=QNVixuZXSGZyHjhS6QaPKuLaKcx4pL7IS5cpY4KjGn+1yMOfXMDHH1nLuyuwBOJeC4JodUMFj7ORMavFf3GQQsQhS1NQGPim9xYxMTupPtcGsJYhbTxFIrEKbFtc7BCSJfMbyBEw5HzLW0kyNkvDUGTNsFGcZ96B11dqMiJz4HE=
+	t=1764513388; cv=none; b=eV2qMXy2cmZ0ybsN8VrOe3X6k+QJPO2isdaN41LwDdC41uLVRFAFxg4kOAsx7FxkOVAFPuec0eXTvcuhFxhKS+Jvqmrfbyzz0AqxcXmII/t+p9fVWZKWvjXj8hMEWaepnuHyyyzw3+NzBgFnWn4N0U9213fMPp32XsN3ouUtIQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764515207; c=relaxed/simple;
-	bh=8NkleLSJyu3K6P2pyhAUZfOAhBzqzPgbJxzHtjzFIi8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ai+26uiGfRUNH2851PW7KIRVSH6tbnxn/McK5Z9qgzbAhasaGsNEh3VtV3NSIQqhjbLZK85+pibBHsZCM/0HIl+RruCsORD6ub8SCCSODqcl6sdTjLeYZxRbkui/E+zCnE1jSMcLrXHu8qIzFrU4sjCojl/3ALkBmb1MMatBdR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=tcpivgYv; arc=none smtp.client-ip=80.241.56.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4dK9NX4NW1z9skw;
-	Sun, 30 Nov 2025 16:06:36 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1764515196;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0R7sIdDzMoYc9IlPupimaflVi4E9vAHoqacC89Z98uw=;
-	b=tcpivgYv7ZVGrTb8235/AcurwAZ5HRfprTh8o6nj/PfB9qPyPYONLEeY6NEqf1n0z0sX/j
-	WsHQey9gm4FM0gHCvDq2yLrckTtuhDeEhg6g5pGbrzIa0ufKfGba9s8cmXETvfMP8fGtcu
-	sLN0sfV+nac3T1I6bIBWKJ57RvFgo2ncHbFIZCghPz+7b3m6RfnOeL/8ORSoFCPoi+iXpA
-	TSGOmeeLcIvhf2CUlKw2rPS7hu/z15Jt/3vtnUim8XGjfMue5EedtVAd+yt9n6d2arU7w7
-	J9QSuey1AQsRwmWEi/0DOREFcp5K7bv4RQGuZ/rnZgyq8IHzrlDhmfmgNUXvwQ==
-Message-ID: <67f96fd7-d2f7-444a-b448-55883f8e7fc2@mailbox.org>
-Date: Sun, 30 Nov 2025 14:43:08 +0100
+	s=arc-20240116; t=1764513388; c=relaxed/simple;
+	bh=XmnQM8sZ9HzvhVQ5Q3tBbO/m5wUKCrvEKKj3bunjzJQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NVQ/6u7LyoXih7qoYGMIcelcNZY4zVejn4zvofSuziA1rRWC0lU6AQ7u8wqlSzj1o42uFrkAg/g9ch09sK4dnOxqAjtBkevbZb7abeHopwv3HCHDqV2T32K2y30DWT9ZhjaEgLr47g9ny7QKwluRtkHkz1p4s2uIDyVZXuclWvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blochl.de; spf=pass smtp.mailfrom=blochl.de; arc=none smtp.client-ip=151.80.40.192
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blochl.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=blochl.de
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.blochl.de 446E14641E8A
+Authentication-Results: mail.blochl.de; dmarc=none (p=none dis=none) header.from=blochl.de
+Authentication-Results: mail.blochl.de; spf=fail smtp.mailfrom=blochl.de
+Received: from WorkKnecht (ppp-93-104-7-227.dynamic.mnet-online.de [93.104.7.227])
+	by smtp.blochl.de (Postfix) with ESMTPSA id 446E14641E8A;
+	Sun, 30 Nov 2025 14:28:39 +0000 (UTC)
+X-Virus-Status: Clean
+X-Virus-Scanned: clamav-milter 1.4.3 at 449b6f9d6baf
+Date: Sun, 30 Nov 2025 15:28:35 +0100
+From: Markus =?utf-8?Q?Bl=C3=B6chl?= <markus@blochl.de>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, 
+	Markus =?utf-8?Q?Bl=C3=B6chl?= <markus.bloechl@ipetronik.com>, intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] i40e: fix ptp time increment while link is down
+Message-ID: <zmw3whfzcipegeyxpydgctio62q3vlpktddhidu4lskffgr3uk@irzoprznarmd>
+References: <20251119-i40e_ptp_link_down-v1-1-b351fed254b3@blochl.de>
+ <5b824df7-205e-4356-a33b-9937a1367517@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [net-next,PATCH 2/3] dt-bindings: net: realtek,rtl82xx: Document
- realtek,ssc-enable property
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Aleksander Jan Bajkowski <olek2@wp.pl>, Conor Dooley <conor+dt@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Florian Fainelli <f.fainelli@gmail.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Michael Klein <michael@fossekall.de>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Russell King <linux@armlinux.org.uk>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, devicetree@vger.kernel.org
-References: <20251130005843.234656-1-marek.vasut@mailbox.org>
- <20251130005843.234656-2-marek.vasut@mailbox.org>
- <a7f83059-76aa-44df-aeb5-41b5072dd0d1@lunn.ch>
-Content-Language: en-US
-From: Marek Vasut <marek.vasut@mailbox.org>
-In-Reply-To: <a7f83059-76aa-44df-aeb5-41b5072dd0d1@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-MBO-RS-ID: b96559a7e2a9fed2306
-X-MBO-RS-META: 9p54kwky9h81iqehjhniun8d7tksef5s
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <5b824df7-205e-4356-a33b-9937a1367517@intel.com>
+X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.6.4 (smtp.blochl.de [0.0.0.0]); Sun, 30 Nov 2025 14:28:39 +0000 (UTC)
 
-On 11/30/25 2:43 AM, Andrew Lunn wrote:
-
-Hello Andrew,
-
->> diff --git a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
->> index eafcc2f3e3d66..f1bd0095026be 100644
->> --- a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
->> +++ b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
->> @@ -50,6 +50,11 @@ properties:
->>       description:
->>         Disable CLKOUT clock, CLKOUT clock default is enabled after hardware reset.
->>   
->> +  realtek,ssc-enable:
->> +    type: boolean
->> +    description:
->> +      Enable SSC mode, SSC mode default is disabled after hardware reset.
+On Tue, Nov 25, 2025 at 02:48:20PM -0800, Tony Nguyen wrote:
 > 
-> Spread Spectrum Clocking is a generic concept, applicable to more than
-> Ethernet PHYs. Do we really need a vendor property for this? Or is
-> there a generic property already?
-Let's see what Krzysztof has to say about this, I am fine with generic 
-property ... unless it would be desirable to control the RXC and SYSCLK 
-spread spectrum separately ?
+> 
+> On 11/19/2025 8:09 AM, Markus Blöchl wrote:
+> > When an X710 ethernet port with an active ptp daemon (like the ptp4l and phc2sys combo)
+> > suddenly loses its link and regains it after a while, the ptp daemon has a hard time
+> > to recover synchronization and sometimes entirely fails to do so.
+> > 
+> > The issue seems to be related to a wrongly configured increment while the link is down.
+> > This could not be observed with the Intel reference driver. We identified the fix to appear in
+> > Intels official ethernet-linux-i40e release version 2.17.4.
+> > 
+> > Include the relevant changes in the kernel version of this driver.
+> > 
+> > Fixes: beb0dff1251d ("i40e: enable PTP")
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Markus Blöchl <markus@blochl.de>
+> > ---
+> 
+> ...
+> 
+> > --- a/drivers/net/ethernet/intel/i40e/i40e_ptp.c
+> > +++ b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
+> > @@ -847,6 +847,65 @@ void i40e_ptp_rx_hwtstamp(struct i40e_pf *pf, struct sk_buff *skb, u8 index)
+> >   	i40e_ptp_convert_to_hwtstamp(skb_hwtstamps(skb), ns);
+> >   }
+> > +/**
+> > + * i40e_ptp_get_link_speed_hw - get the link speed
+> > + * @pf: Board private structure
+> > + *
+> > + * Calculate link speed depending on the link status.
+> > + * Return the link speed.
+> 
+> Can you make this 'Return:' to conform with kdoc expectations?
+> 
+> > + **/
+> > +static enum i40e_aq_link_speed i40e_ptp_get_link_speed_hw(struct i40e_pf *pf)
+> > +{
+> > +	bool link_up = pf->hw.phy.link_info.link_info & I40E_AQ_LINK_UP;
+> > +	enum i40e_aq_link_speed link_speed = I40E_LINK_SPEED_UNKNOWN;
+> > +	struct i40e_hw *hw = &pf->hw;
+> > +
+> > +	if (link_up) {
+> > +		struct i40e_link_status *hw_link_info = &hw->phy.link_info;
+> > +
+> > +		i40e_aq_get_link_info(hw, true, NULL, NULL);
+> > +		link_speed = hw_link_info->link_speed;
+> > +	} else {
+> > +		enum i40e_prt_mac_link_speed prtmac_linksta;
+> > +		u64 prtmac_pcs_linksta;
+> > +
+> > +		prtmac_linksta = (rd32(hw, I40E_PRTMAC_LINKSTA(0))
+> > +			& I40E_PRTMAC_LINKSTA_MAC_LINK_SPEED_MASK)
+> > +			>> I40E_PRTMAC_LINKSTA_MAC_LINK_SPEED_SHIFT;
+> 
+> I believe operators are supposed to end the line rather than start a new
+> one.
+> 
+> > +		if (prtmac_linksta == I40E_PRT_MAC_LINK_SPEED_40GB) {
+> > +			link_speed = I40E_LINK_SPEED_40GB;
+> > +		} else {
+> > +			i40e_aq_debug_read_register(hw,
+> > +						    I40E_PRTMAC_PCS_LINK_STATUS1(0),
+> > +						    &prtmac_pcs_linksta,
+> > +						    NULL);
+> > +
+> > +			prtmac_pcs_linksta = (prtmac_pcs_linksta
+> > +			& I40E_PRTMAC_PCS_LINK_STATUS1_LINK_SPEED_MASK)
+> > +			>> I40E_PRTMAC_PCS_LINK_STATUS1_LINK_SPEED_SHIFT;
+> 
+> Same operator comment. Also, indentation looks off here.
+> 
+> Thanks,
+> Tony
+> 
+
+Thanks for the close look, Tony.
+Will be fixed in v2.
+I needed a reason to reroll anyway, since I forgot to base this on
+net...
+
+-- 
 
