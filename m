@@ -1,280 +1,195 @@
-Return-Path: <netdev+bounces-242833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19B03C953E6
-	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 20:28:43 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10304C95443
+	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 20:52:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CF07C4E01FF
-	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 19:28:41 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4804C342096
+	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 19:52:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45A8F2C08D1;
-	Sun, 30 Nov 2025 19:28:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A04E32C15AB;
+	Sun, 30 Nov 2025 19:52:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jfg32BGk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AEF51B87C9;
-	Sun, 30 Nov 2025 19:28:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D081E229B12
+	for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 19:51:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764530919; cv=none; b=gdXF32D0EehYqWyOttD8d5vpnejmLe4Idq6VF4MV58gBbVUT7NLUdWJkc1ImraVDlYavdYyB+Dt3yqdYO9n0NLcgb0kRNSAEOchliSHR+R+CQL2yGl8/BLyRVzkLo9SErm+eyg96rTTD62Dz3Xv5YjHnwYDHSOt6ROLd3VxTmp0=
+	t=1764532323; cv=none; b=GJSOzMzrFhUWI7N96w+3Fu4tmS354wa+aSkMXItG46ztbz/Eop3x6fKUIMsoM9Euew1xhdvAN9gpLikjpZGpaNabeZw1KgEZh78ZJzwp00xLP5OvlAZmTSZeFjM1hojtertbsWo5lufxicsXdKlSVK8F5RcgBOcRPVltZSjjpis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764530919; c=relaxed/simple;
-	bh=/3NtXpBqqkX2KBuXqBLrK+wVLh+0QKXcA4PpwZOodL8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ah1zMYtEk2BVmggwpoKjjvsfUbG9hTVlbtwl23dRE0/wesncZ8/3F5+5nVGX7kVrUyluRuArUAhtlLMvPj78BiHeVxvC1+v/NNEJl/E31xKiQNsHd3wE8S8TztoZ17vJh6sNfgcVt3vslz6lfOWQogH7hx3+i811ke5j9NGspz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [10.0.57.174] (unknown [62.214.191.67])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id E3DE261CC3FDB;
-	Sun, 30 Nov 2025 20:27:25 +0100 (CET)
-Message-ID: <e765a7ca-c3dc-49cc-a8a5-de6c0fa58f2f@molgen.mpg.de>
-Date: Sun, 30 Nov 2025 20:27:21 +0100
+	s=arc-20240116; t=1764532323; c=relaxed/simple;
+	bh=KWBzc2p2M9xed8ruLMYJXFllVygEW9BBNPyn4AcpHr4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qrWhPx+OYM1uJBGVx6v07+jlqsYoRVyK/xSFPBJulERZSX2IPASGT4+HnfGb1+XYG3/mZWKLc2Vk/VAOKKQ7m+InqgXhhSMN4cz1/iHCi5vysvrju54QIBGvW0rzCRgCRXPJznz3wW6EN5jicHspdhLHSKa3LlSQAG38cgy72f8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jfg32BGk; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4779cc419b2so34014015e9.3
+        for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 11:51:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764532318; x=1765137118; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/DEo1+0Da+YijlU/Zfn1c1EqlK38ud5yDKP0+nxdYn8=;
+        b=Jfg32BGkgJ3QMmZqakk/Wk8k5stJxzOBT+yONlGIbIv6Ni55sTg3XTLuask0oIVv2o
+         aivIOOpj8J9842jYO+JggrtETRBctS/RFU3ufrIQp+jqj/qiFUQ+dJSRyVHNz1wIayOp
+         Dd2g09/XjH/C7OvUpk+tfMMbpcah93B/3b46qBt0yjkZhNmI7IZaie4EdgOmu9YR4Js4
+         YkWkaBzObrKLUau3L4xRfOpemHaM7VUSWS6YxP9cf2JGS6ro2uLmRi6Z3jlXnLNVgDCV
+         IXPHXqX3gY6fMnzZ9xoLSE3oYJ+j4NQNrmqnDDX0NI2GQYIKdEvaZuvT+LIExHqL6cDo
+         +4Qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764532318; x=1765137118;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/DEo1+0Da+YijlU/Zfn1c1EqlK38ud5yDKP0+nxdYn8=;
+        b=wXKrvdMGwr6CFpJ70YJu39U+NeY23jD9fxFAFZFRCtLA926tDEt95hzCA6A34Vov8d
+         1DbDDSRY3+ng8zae2Asq712jCPcmLi5RPnbhuf0bsrepV7iL/Qh8i+dOdRroOuMvTybV
+         2mv3Z7qHOkVLKfpF1iXVMSKxsyemLkbtsvzLBaHR5JPfULuJ7ZBIHm2ksqmGUDdCJvPj
+         +NrP+SjQdLLx6I5QZFgHQV3obqt6FGlTvaD1SQOBbvhLaf1UUjr6kScIILlhymhHkIco
+         G9YwUN2wyBC5TgK4grvTOjy5C48zD8EZAkhkt7pX7KMiQb0AzdpnJVZdq+roEmFKm5aX
+         LFWg==
+X-Forwarded-Encrypted: i=1; AJvYcCVbeccHMxS6YdDHYUQyqTPhn55by+K/sREI5GZEFqyWs8AcVy+UtIZQevVmleYDILTzWtKuViY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlzrrcHfXW57uRnqVpFetqFC/rP+KrNhTeDPSx4gtjd0L58dWl
+	Tc8occcTshZKPgRA3bfXtFo9XESIasg1uXyNMZJa/fhDj+wJLvm6v4VFMZRZeQY=
+X-Gm-Gg: ASbGncs7vhzYQ/tNR6DunP+SqOD2oDkZNIwJDU7QUm7If8JGQ2nN7CbNA6XfYdEB/gy
+	++9MSdV+ZBp4neiH8W8CqNfGj/XoCzRQoOjB5rwKD6EHDEj0NxMSRVgRmgHdwsXDC6O0C1avBBd
+	9J9/k/VTrQnP9wgiTWsWWeEgNFGA5W33EthliEdUvl0NsznqwS0wnDR3++4VGBQ98i6vajUPnRa
+	OmUkod5tGLACb/xLkTP/vsrPDssE8wWP0m4lfb+wwyHuOhZqeCes7x/YVAIuQomCvzwohq+FbZW
+	tEJB7zybzyxbWv+BO4tu5uroMRTGg8BefxQ/TuJxRbKAyzBWRbQe4RSRVjDLGOVScc14Bm4RaUs
+	LhLjRoB1ZbQhOOEEvPuMkJLEKOBZi5DUBLQqkGlB+T3Ldj+V9Xk7AuKfSEbome4cN9bSD1yZEBs
+	gO5ITy5tPMvb9hER/t2xsRQROdL+2H7xUfKt139Wk+hppYdAKWFksMMVTd/HveVj3H4geu
+X-Google-Smtp-Source: AGHT+IHpMEnKorixDu8qIt6p2z3sKWM6DYKhdWytPD6KeENQCqF5f7FvWF1BtO+epXxKsRq5U6IKMw==
+X-Received: by 2002:a05:600c:3543:b0:477:1ae1:fa5d with SMTP id 5b1f17b1804b1-477c1142268mr303410735e9.20.1764532317801;
+        Sun, 30 Nov 2025 11:51:57 -0800 (PST)
+Received: from localhost ([2a02:810d:4a94:b300:c379:32d5:1107:4f59])
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-4790b0cc1d6sm258597365e9.12.2025.11.30.11.51.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 30 Nov 2025 11:51:57 -0800 (PST)
+From: Florian Fuchs <fuchsfl@gmail.com>
+To: Geoff Levand <geoff@infradead.org>,
+	netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <chleroy@kernel.org>,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-kernel@vger.kernel.org,
+	fuchsfl@gmail.com
+Subject: [PATCH net-next] net: ps3_gelic_net: Use napi_alloc_skb() and napi_gro_receive()
+Date: Sun, 30 Nov 2025 20:41:55 +0100
+Message-ID: <20251130194155.1950980-1-fuchsfl@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH net v2] i40e: fix ptp time increment
- while link is down
-To: =?UTF-8?Q?Markus_Bl=C3=B6chl?= <markus@blochl.de>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Jacob Keller <jacob.e.keller@intel.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
- =?UTF-8?Q?Markus_Bl=C3=B6chl?= <markus.bloechl@ipetronik.com>,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20251130-i40e_ptp_link_down-v2-1-8d6dfc10a661@blochl.de>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20251130-i40e_ptp_link_down-v2-1-8d6dfc10a661@blochl.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Dear Markus,
+Use the napi functions napi_alloc_skb() and napi_gro_receive() instead
+of netdev_alloc_skb() and netif_receive_skb() for more efficient packet
+receiving. The switch to napi aware functions increases the RX
+throughput, reduces the occurrence of retransmissions and improves the
+resilience against SKB allocation failures.
 
+Signed-off-by: Florian Fuchs <fuchsfl@gmail.com>
+---
+Note: This change has been tested on real hardware Sony PS3 (CECHL04 PAL),
+the patch was tested for many hours, with continuous system load, high
+network transfer load and injected failslab errors.
 
-Thank you for the patch.
+In my tests, the RX throughput increased up to 100% and reduced the
+occurrence of retransmissions drastically, with GRO enabled:
 
-Am 30.11.25 um 16:23 schrieb Markus Blöchl:
-> When an X710 ethernet port with an active ptp daemon (like the ptp4l and
-> phc2sys combo) suddenly loses its link and regains it after a while, the
-> ptp daemon has a hard time to recover synchronization and sometimes
-> entirely fails to do so.
-> 
-> The issue seems to be related to a wrongly configured increment while the
-> link is down. This could not be observed with the Intel reference driver.
-> We identified the fix to appear in Intels official ethernet-linux-i40e
+iperf3 before and after the commit, where PS3 (with this driver) is on
+the receiving side:
+Before: [  5]   0.00-10.00  sec   551 MBytes   462 Mbits/sec receiver
+After:  [  5]   0.00-10.00  sec  1.09 GBytes   939 Mbits/sec receiver
 
-Intel’s
+stats from the sending client to the PS3:
+Before: [  5]   0.00-10.00  sec   552 MBytes   463 Mbits/sec  3151 sender
+After:  [  5]   0.00-10.00  sec  1.09 GBytes   940 Mbits/sec   37  sender
 
-> release version 2.17.4.
-> 
-> Include the relevant changes in the kernel version of this driver.
-> 
-> Fixes: beb0dff1251d ("i40e: enable PTP")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Markus Blöchl <markus@blochl.de>
-> ---
-> Tested with an X710 at 10G link speed and kernel version 6.12.42.
+ drivers/net/ethernet/toshiba/ps3_gelic_net.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-I’d really appreciate it, if you put the in the commit message above, 
-and if you provided exact steps for reproducing this in the commit message.
+diff --git a/drivers/net/ethernet/toshiba/ps3_gelic_net.c b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
+index 591866fc9055..d35d1f3c10a1 100644
+--- a/drivers/net/ethernet/toshiba/ps3_gelic_net.c
++++ b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
+@@ -364,6 +364,7 @@ static int gelic_card_init_chain(struct gelic_card *card,
+  * gelic_descr_prepare_rx - reinitializes a rx descriptor
+  * @card: card structure
+  * @descr: descriptor to re-init
++ * @napi_mode: is it running in napi poll
+  *
+  * return 0 on success, <0 on failure
+  *
+@@ -374,7 +375,8 @@ static int gelic_card_init_chain(struct gelic_card *card,
+  * must be a multiple of GELIC_NET_RXBUF_ALIGN.
+  */
+ static int gelic_descr_prepare_rx(struct gelic_card *card,
+-				  struct gelic_descr *descr)
++				  struct gelic_descr *descr,
++				  bool napi_mode)
+ {
+ 	static const unsigned int rx_skb_size =
+ 		ALIGN(GELIC_NET_MAX_FRAME, GELIC_NET_RXBUF_ALIGN) +
+@@ -392,7 +394,10 @@ static int gelic_descr_prepare_rx(struct gelic_card *card,
+ 	descr->hw_regs.payload.dev_addr = 0;
+ 	descr->hw_regs.payload.size = 0;
+ 
+-	descr->skb = netdev_alloc_skb(*card->netdev, rx_skb_size);
++	if (napi_mode)
++		descr->skb = napi_alloc_skb(&card->napi, rx_skb_size);
++	else
++		descr->skb = netdev_alloc_skb(*card->netdev, rx_skb_size);
+ 	if (!descr->skb) {
+ 		descr->hw_regs.payload.dev_addr = 0; /* tell DMAC don't touch memory */
+ 		return -ENOMEM;
+@@ -464,7 +469,7 @@ static int gelic_card_fill_rx_chain(struct gelic_card *card)
+ 
+ 	do {
+ 		if (!descr->skb) {
+-			ret = gelic_descr_prepare_rx(card, descr);
++			ret = gelic_descr_prepare_rx(card, descr, false);
+ 			if (ret)
+ 				goto rewind;
+ 		}
+@@ -964,7 +969,7 @@ static void gelic_net_pass_skb_up(struct gelic_descr *descr,
+ 	netdev->stats.rx_bytes += skb->len;
+ 
+ 	/* pass skb up to stack */
+-	netif_receive_skb(skb);
++	napi_gro_receive(&card->napi, skb);
+ }
+ 
+ /**
+@@ -1069,7 +1074,7 @@ static int gelic_card_decode_one_descr(struct gelic_card *card)
+ 	/*
+ 	 * this call can fail, propagate the error
+ 	 */
+-	prepare_rx_ret = gelic_descr_prepare_rx(card, descr);
++	prepare_rx_ret = gelic_descr_prepare_rx(card, descr, true);
+ 	if (prepare_rx_ret)
+ 		return prepare_rx_ret;
+ 
 
-> ---
-> Changes in v2:
-> - Fix kdoc and code formatting
-> - Rebase onto net tree
-> - Link to v1: https://lore.kernel.org/r/20251119-i40e_ptp_link_down-v1-1-b351fed254b3@blochl.de
-> ---
->   drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h |  9 +++
->   drivers/net/ethernet/intel/i40e/i40e_ptp.c        | 69 +++++++++++++++++++++--
->   drivers/net/ethernet/intel/i40e/i40e_register.h   |  9 +++
->   drivers/net/ethernet/intel/i40e/i40e_type.h       |  8 +++
->   4 files changed, 90 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h b/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h
-> index cc02a85ad42b..ec176e9569ad 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h
-> @@ -1488,6 +1488,15 @@ enum i40e_aq_link_speed {
->   	I40E_LINK_SPEED_25GB	= BIT(I40E_LINK_SPEED_25GB_SHIFT),
->   };
->   
-> +enum i40e_prt_mac_pcs_link_speed {
-> +	I40E_PRT_MAC_PCS_LINK_SPEED_UNKNOWN = 0,
-> +	I40E_PRT_MAC_PCS_LINK_SPEED_100MB,
-> +	I40E_PRT_MAC_PCS_LINK_SPEED_1GB,
-> +	I40E_PRT_MAC_PCS_LINK_SPEED_10GB,
-> +	I40E_PRT_MAC_PCS_LINK_SPEED_40GB,
-> +	I40E_PRT_MAC_PCS_LINK_SPEED_20GB
-> +};
-> +
->   struct i40e_aqc_module_desc {
->   	u8 oui[3];
->   	u8 reserved1;
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_ptp.c b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-> index 33535418178b..89abe2f22216 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-> @@ -847,6 +847,66 @@ void i40e_ptp_rx_hwtstamp(struct i40e_pf *pf, struct sk_buff *skb, u8 index)
->   	i40e_ptp_convert_to_hwtstamp(skb_hwtstamps(skb), ns);
->   }
->   
-> +/**
-> + * i40e_ptp_get_link_speed_hw - get the link speed
-> + * @pf: Board private structure
-> + *
-> + * Calculate link speed depending on the link status.
-> + *
-> + * Return: current link speed.
-> + **/
-> +static enum i40e_aq_link_speed i40e_ptp_get_link_speed_hw(struct i40e_pf *pf)
-> +{
-> +	bool link_up = pf->hw.phy.link_info.link_info & I40E_AQ_LINK_UP;
-> +	enum i40e_aq_link_speed link_speed = I40E_LINK_SPEED_UNKNOWN;
-> +	struct i40e_hw *hw = &pf->hw;
-> +
-> +	if (link_up) {
-> +		struct i40e_link_status *hw_link_info = &hw->phy.link_info;
-> +
-> +		i40e_aq_get_link_info(hw, true, NULL, NULL);
-> +		link_speed = hw_link_info->link_speed;
-> +	} else {
-> +		enum i40e_prt_mac_link_speed prtmac_linksta;
-> +		u64 prtmac_pcs_linksta;
-> +
-> +		prtmac_linksta = (rd32(hw, I40E_PRTMAC_LINKSTA(0)) &
-> +				  I40E_PRTMAC_LINKSTA_MAC_LINK_SPEED_MASK) >>
-> +				  I40E_PRTMAC_LINKSTA_MAC_LINK_SPEED_SHIFT;
-> +		if (prtmac_linksta == I40E_PRT_MAC_LINK_SPEED_40GB) {
-> +			link_speed = I40E_LINK_SPEED_40GB;
-> +		} else {
-> +			i40e_aq_debug_read_register(hw,
-> +						    I40E_PRTMAC_PCS_LINK_STATUS1(0),
-> +						    &prtmac_pcs_linksta,
-> +						    NULL);
-> +
-> +			prtmac_pcs_linksta = (prtmac_pcs_linksta &
-> +					      I40E_PRTMAC_PCS_LINK_STATUS1_LINK_SPEED_MASK) >>
-> +					      I40E_PRTMAC_PCS_LINK_STATUS1_LINK_SPEED_SHIFT;
-> +
-> +			switch (prtmac_pcs_linksta) {
-> +			case I40E_PRT_MAC_PCS_LINK_SPEED_100MB:
-> +				link_speed = I40E_LINK_SPEED_100MB;
-> +				break;
-> +			case I40E_PRT_MAC_PCS_LINK_SPEED_1GB:
-> +				link_speed = I40E_LINK_SPEED_1GB;
-> +				break;
-> +			case I40E_PRT_MAC_PCS_LINK_SPEED_10GB:
-> +				link_speed = I40E_LINK_SPEED_10GB;
-> +				break;
-> +			case I40E_PRT_MAC_PCS_LINK_SPEED_20GB:
-> +				link_speed = I40E_LINK_SPEED_20GB;
-> +				break;
-> +			default:
-> +				link_speed = I40E_LINK_SPEED_UNKNOWN;
-> +			}
-> +		}
-> +	}
-> +
-> +	return link_speed;
-> +}
-> +
->   /**
->    * i40e_ptp_set_increment - Utility function to update clock increment rate
->    * @pf: Board private structure
-> @@ -857,16 +917,14 @@ void i40e_ptp_rx_hwtstamp(struct i40e_pf *pf, struct sk_buff *skb, u8 index)
->    **/
->   void i40e_ptp_set_increment(struct i40e_pf *pf)
->   {
-> -	struct i40e_link_status *hw_link_info;
-> +	enum i40e_aq_link_speed link_speed;
->   	struct i40e_hw *hw = &pf->hw;
->   	u64 incval;
->   	u32 mult;
->   
-> -	hw_link_info = &hw->phy.link_info;
-> +	link_speed = i40e_ptp_get_link_speed_hw(pf);
->   
-> -	i40e_aq_get_link_info(&pf->hw, true, NULL, NULL);
-> -
-> -	switch (hw_link_info->link_speed) {
-> +	switch (link_speed) {
+base-commit: ff736a286116d462a4067ba258fa351bc0b4ed80
+-- 
+2.43.0
 
-Excuse my ignorance, but could you or the Intel authors explain in the 
-commit message, why `hw_link_info->link_speed` is incorrect?
-
->   	case I40E_LINK_SPEED_10GB:
->   		mult = I40E_PTP_10GB_INCVAL_MULT;
->   		break;
-> @@ -909,6 +967,7 @@ void i40e_ptp_set_increment(struct i40e_pf *pf)
->   	/* Update the base adjustement value. */
->   	WRITE_ONCE(pf->ptp_adj_mult, mult);
->   	smp_mb(); /* Force the above update. */
-> +	i40e_ptp_set_1pps_signal_hw(pf);
-
- From the commit message, I would have thought, only this line would be 
-needed.
-
->   }
->   
->   /**
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_register.h b/drivers/net/ethernet/intel/i40e/i40e_register.h
-> index 432afbb64201..c4051dbcc297 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_register.h
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_register.h
-> @@ -530,6 +530,15 @@
->   #define I40E_PRTMAC_HSEC_CTL_TX_PAUSE_REFRESH_TIMER_SHIFT 0
->   #define I40E_PRTMAC_HSEC_CTL_TX_PAUSE_REFRESH_TIMER_MASK I40E_MASK(0xFFFF, \
->   	I40E_PRTMAC_HSEC_CTL_TX_PAUSE_REFRESH_TIMER_SHIFT)
-> +/* _i=0...3 */ /* Reset: GLOBR */
-> +#define I40E_PRTMAC_PCS_LINK_STATUS1(_i) (0x0008C200 + ((_i) * 4))
-> +#define I40E_PRTMAC_PCS_LINK_STATUS1_LINK_SPEED_SHIFT 24
-> +#define I40E_PRTMAC_PCS_LINK_STATUS1_LINK_SPEED_MASK I40E_MASK(0x7, I40E_PRTMAC_PCS_LINK_STATUS1_LINK_SPEED_SHIFT)
-> +#define I40E_PRTMAC_PCS_LINK_STATUS2 0x0008C220
-> +/* _i=0...3 */ /* Reset: GLOBR */
-> +#define I40E_PRTMAC_LINKSTA(_i) (0x001E2420 + ((_i) * 4))
-> +#define I40E_PRTMAC_LINKSTA_MAC_LINK_SPEED_SHIFT 27
-> +#define I40E_PRTMAC_LINKSTA_MAC_LINK_SPEED_MASK I40E_MASK(0x7, I40E_PRTMAC_LINKSTA_MAC_LINK_SPEED_SHIFT)
->   #define I40E_GLNVM_FLA 0x000B6108 /* Reset: POR */
->   #define I40E_GLNVM_FLA_LOCKED_SHIFT 6
->   #define I40E_GLNVM_FLA_LOCKED_MASK I40E_MASK(0x1, I40E_GLNVM_FLA_LOCKED_SHIFT)
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_type.h b/drivers/net/ethernet/intel/i40e/i40e_type.h
-> index ed8bbdb586da..98c8c5709e5f 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_type.h
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_type.h
-> @@ -115,6 +115,14 @@ enum i40e_queue_type {
->   	I40E_QUEUE_TYPE_UNKNOWN
->   };
->   
-> +enum i40e_prt_mac_link_speed {
-> +	I40E_PRT_MAC_LINK_SPEED_100MB = 0,
-> +	I40E_PRT_MAC_LINK_SPEED_1GB,
-> +	I40E_PRT_MAC_LINK_SPEED_10GB,
-> +	I40E_PRT_MAC_LINK_SPEED_40GB,
-> +	I40E_PRT_MAC_LINK_SPEED_20GB
-> +};
-> +
->   struct i40e_link_status {
->   	enum i40e_aq_phy_type phy_type;
->   	enum i40e_aq_link_speed link_speed;
-
-
-Kind regards,
-
-Pul
 
