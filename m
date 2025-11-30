@@ -1,195 +1,110 @@
-Return-Path: <netdev+bounces-242834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10304C95443
-	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 20:52:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1979BC9545C
+	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 21:17:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4804C342096
-	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 19:52:11 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 52C753424DD
+	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 20:17:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A04E32C15AB;
-	Sun, 30 Nov 2025 19:52:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A63B1221545;
+	Sun, 30 Nov 2025 20:17:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jfg32BGk"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jTLmQRdf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D081E229B12
-	for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 19:51:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37BF97640E;
+	Sun, 30 Nov 2025 20:17:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764532323; cv=none; b=GJSOzMzrFhUWI7N96w+3Fu4tmS354wa+aSkMXItG46ztbz/Eop3x6fKUIMsoM9Euew1xhdvAN9gpLikjpZGpaNabeZw1KgEZh78ZJzwp00xLP5OvlAZmTSZeFjM1hojtertbsWo5lufxicsXdKlSVK8F5RcgBOcRPVltZSjjpis=
+	t=1764533866; cv=none; b=enlxHkNBIr54bD/3xY+kb1l7bzxja8eQOFn/u7MmerrySPs31hV5rg5A1jgfiEYjGxRz22uVWKUOdNOsoYbGwnkCp/0DqrwjmXyMqWfVPvf1J8TIr3fWwOz20SoGSoMyhpNnfbcKOZknayRKpdqwJPBGVWOto2USEfczo+Fs+8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764532323; c=relaxed/simple;
-	bh=KWBzc2p2M9xed8ruLMYJXFllVygEW9BBNPyn4AcpHr4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qrWhPx+OYM1uJBGVx6v07+jlqsYoRVyK/xSFPBJulERZSX2IPASGT4+HnfGb1+XYG3/mZWKLc2Vk/VAOKKQ7m+InqgXhhSMN4cz1/iHCi5vysvrju54QIBGvW0rzCRgCRXPJznz3wW6EN5jicHspdhLHSKa3LlSQAG38cgy72f8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jfg32BGk; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4779cc419b2so34014015e9.3
-        for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 11:51:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764532318; x=1765137118; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/DEo1+0Da+YijlU/Zfn1c1EqlK38ud5yDKP0+nxdYn8=;
-        b=Jfg32BGkgJ3QMmZqakk/Wk8k5stJxzOBT+yONlGIbIv6Ni55sTg3XTLuask0oIVv2o
-         aivIOOpj8J9842jYO+JggrtETRBctS/RFU3ufrIQp+jqj/qiFUQ+dJSRyVHNz1wIayOp
-         Dd2g09/XjH/C7OvUpk+tfMMbpcah93B/3b46qBt0yjkZhNmI7IZaie4EdgOmu9YR4Js4
-         YkWkaBzObrKLUau3L4xRfOpemHaM7VUSWS6YxP9cf2JGS6ro2uLmRi6Z3jlXnLNVgDCV
-         IXPHXqX3gY6fMnzZ9xoLSE3oYJ+j4NQNrmqnDDX0NI2GQYIKdEvaZuvT+LIExHqL6cDo
-         +4Qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764532318; x=1765137118;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/DEo1+0Da+YijlU/Zfn1c1EqlK38ud5yDKP0+nxdYn8=;
-        b=wXKrvdMGwr6CFpJ70YJu39U+NeY23jD9fxFAFZFRCtLA926tDEt95hzCA6A34Vov8d
-         1DbDDSRY3+ng8zae2Asq712jCPcmLi5RPnbhuf0bsrepV7iL/Qh8i+dOdRroOuMvTybV
-         2mv3Z7qHOkVLKfpF1iXVMSKxsyemLkbtsvzLBaHR5JPfULuJ7ZBIHm2ksqmGUDdCJvPj
-         +NrP+SjQdLLx6I5QZFgHQV3obqt6FGlTvaD1SQOBbvhLaf1UUjr6kScIILlhymhHkIco
-         G9YwUN2wyBC5TgK4grvTOjy5C48zD8EZAkhkt7pX7KMiQb0AzdpnJVZdq+roEmFKm5aX
-         LFWg==
-X-Forwarded-Encrypted: i=1; AJvYcCVbeccHMxS6YdDHYUQyqTPhn55by+K/sREI5GZEFqyWs8AcVy+UtIZQevVmleYDILTzWtKuViY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlzrrcHfXW57uRnqVpFetqFC/rP+KrNhTeDPSx4gtjd0L58dWl
-	Tc8occcTshZKPgRA3bfXtFo9XESIasg1uXyNMZJa/fhDj+wJLvm6v4VFMZRZeQY=
-X-Gm-Gg: ASbGncs7vhzYQ/tNR6DunP+SqOD2oDkZNIwJDU7QUm7If8JGQ2nN7CbNA6XfYdEB/gy
-	++9MSdV+ZBp4neiH8W8CqNfGj/XoCzRQoOjB5rwKD6EHDEj0NxMSRVgRmgHdwsXDC6O0C1avBBd
-	9J9/k/VTrQnP9wgiTWsWWeEgNFGA5W33EthliEdUvl0NsznqwS0wnDR3++4VGBQ98i6vajUPnRa
-	OmUkod5tGLACb/xLkTP/vsrPDssE8wWP0m4lfb+wwyHuOhZqeCes7x/YVAIuQomCvzwohq+FbZW
-	tEJB7zybzyxbWv+BO4tu5uroMRTGg8BefxQ/TuJxRbKAyzBWRbQe4RSRVjDLGOVScc14Bm4RaUs
-	LhLjRoB1ZbQhOOEEvPuMkJLEKOBZi5DUBLQqkGlB+T3Ldj+V9Xk7AuKfSEbome4cN9bSD1yZEBs
-	gO5ITy5tPMvb9hER/t2xsRQROdL+2H7xUfKt139Wk+hppYdAKWFksMMVTd/HveVj3H4geu
-X-Google-Smtp-Source: AGHT+IHpMEnKorixDu8qIt6p2z3sKWM6DYKhdWytPD6KeENQCqF5f7FvWF1BtO+epXxKsRq5U6IKMw==
-X-Received: by 2002:a05:600c:3543:b0:477:1ae1:fa5d with SMTP id 5b1f17b1804b1-477c1142268mr303410735e9.20.1764532317801;
-        Sun, 30 Nov 2025 11:51:57 -0800 (PST)
-Received: from localhost ([2a02:810d:4a94:b300:c379:32d5:1107:4f59])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-4790b0cc1d6sm258597365e9.12.2025.11.30.11.51.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 30 Nov 2025 11:51:57 -0800 (PST)
-From: Florian Fuchs <fuchsfl@gmail.com>
-To: Geoff Levand <geoff@infradead.org>,
-	netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <chleroy@kernel.org>,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org,
-	fuchsfl@gmail.com
-Subject: [PATCH net-next] net: ps3_gelic_net: Use napi_alloc_skb() and napi_gro_receive()
-Date: Sun, 30 Nov 2025 20:41:55 +0100
-Message-ID: <20251130194155.1950980-1-fuchsfl@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1764533866; c=relaxed/simple;
+	bh=DYRAh9KflgXV1PkjrqXZyEYkWix4qtvJ4wy1cspUhKs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=khxzQgpt1MsWBynRXcnFVDEDIN/NHs5cD/VEtDjtE0DjtKCMZDpljc1rzdPPyK57UUlbKDkWKjTl34jq1/G9e3FTH6jVo18TkoC5FlybRz76TFHHkmLSEJSn+R8Q9wzR94pa7gOaJEdIPWecqSKOS4zTwVA6Ggrh+79/0SjP6GM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jTLmQRdf; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=TMeL4JyWTglPNStJrCnRRegNxn7l/H0tOrgAzvtGHzw=; b=jTLmQRdf4HJhzV66zMbIIGcOdK
+	tId1vBslJDT5vLxueql2nfF37y4DcGRxg9XZzVq39KHCFivb6Wss3r05d3u42f6zeYCNL8m4ZdVzC
+	vnmIDC1OUSjYLAF0q0O1/cJR76fWo7sltq7jsWObxvu3GpoHrxbP9zO7Cq13IjSaF7MU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vPnrH-00FTH9-QN; Sun, 30 Nov 2025 21:17:23 +0100
+Date: Sun, 30 Nov 2025 21:17:23 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Chen Minqiang <ptpt52@gmail.com>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	"Chester A. Unal" <chester.a.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v3 2/2] net: dsa: mt7530: Use GPIO polarity to generate
+ correct reset sequence
+Message-ID: <3fbc4e67-b931-421c-9d83-2214aaa2f6ed@lunn.ch>
+References: <20251129234603.2544-1-ptpt52@gmail.com>
+ <20251129234603.2544-2-ptpt52@gmail.com>
+ <0675b35f-217d-4261-9e3f-2eb24753d43c@lunn.ch>
+ <20251130080731.ty2dlxaypxvodxiw@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251130080731.ty2dlxaypxvodxiw@skbuf>
 
-Use the napi functions napi_alloc_skb() and napi_gro_receive() instead
-of netdev_alloc_skb() and netif_receive_skb() for more efficient packet
-receiving. The switch to napi aware functions increases the RX
-throughput, reduces the occurrence of retransmissions and improves the
-resilience against SKB allocation failures.
+On Sun, Nov 30, 2025 at 10:07:31AM +0200, Vladimir Oltean wrote:
+> On Sun, Nov 30, 2025 at 02:11:05AM +0100, Andrew Lunn wrote:
+> > > -		gpiod_set_value_cansleep(priv->reset, 0);
+> > > +		int is_active_low = !!gpiod_is_active_low(priv->reset);
+> > > +		gpiod_set_value_cansleep(priv->reset, is_active_low);
+> > 
+> > I think you did not correctly understand what Russell said. You pass
+> > the logical value to gpiod_set_value(). If the GPIO has been marked as
+> > active LOW, the GPIO core will invert the logical values to the raw
+> > value. You should not be using gpiod_is_active_low().
+> > 
+> > But as i said to the previous patch, i would just leave everything as
+> > it is, except document the issue.
+> > 
+> > 	Andrew
+> > 
+> 
+> It was my suggestion to do it like this (but I don't understand why I'm
+> again not in CC).
+> 
+> We _know_ that the reset pin of the switch should be active low. So by
+> using gpiod_is_active_low(), we can determine whether the device tree is
+> wrong or not, and we can work with a wrong device tree too (just invert
+> the logical values).
 
-Signed-off-by: Florian Fuchs <fuchsfl@gmail.com>
----
-Note: This change has been tested on real hardware Sony PS3 (CECHL04 PAL),
-the patch was tested for many hours, with continuous system load, high
-network transfer load and injected failslab errors.
+Assuming there is not a NOT gate placed between the GPIO and the reset
+pin, because the board designer decided to do that for some reason?
 
-In my tests, the RX throughput increased up to 100% and reduced the
-occurrence of retransmissions drastically, with GRO enabled:
+So lets work on the commit message some more, but i'm still not
+convinced it is worth the effort, unless there is some board today
+which really is broken and cannot be fixed unless a change like this
+is made.
 
-iperf3 before and after the commit, where PS3 (with this driver) is on
-the receiving side:
-Before: [  5]   0.00-10.00  sec   551 MBytes   462 Mbits/sec receiver
-After:  [  5]   0.00-10.00  sec  1.09 GBytes   939 Mbits/sec receiver
-
-stats from the sending client to the PS3:
-Before: [  5]   0.00-10.00  sec   552 MBytes   463 Mbits/sec  3151 sender
-After:  [  5]   0.00-10.00  sec  1.09 GBytes   940 Mbits/sec   37  sender
-
- drivers/net/ethernet/toshiba/ps3_gelic_net.c | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/ethernet/toshiba/ps3_gelic_net.c b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
-index 591866fc9055..d35d1f3c10a1 100644
---- a/drivers/net/ethernet/toshiba/ps3_gelic_net.c
-+++ b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
-@@ -364,6 +364,7 @@ static int gelic_card_init_chain(struct gelic_card *card,
-  * gelic_descr_prepare_rx - reinitializes a rx descriptor
-  * @card: card structure
-  * @descr: descriptor to re-init
-+ * @napi_mode: is it running in napi poll
-  *
-  * return 0 on success, <0 on failure
-  *
-@@ -374,7 +375,8 @@ static int gelic_card_init_chain(struct gelic_card *card,
-  * must be a multiple of GELIC_NET_RXBUF_ALIGN.
-  */
- static int gelic_descr_prepare_rx(struct gelic_card *card,
--				  struct gelic_descr *descr)
-+				  struct gelic_descr *descr,
-+				  bool napi_mode)
- {
- 	static const unsigned int rx_skb_size =
- 		ALIGN(GELIC_NET_MAX_FRAME, GELIC_NET_RXBUF_ALIGN) +
-@@ -392,7 +394,10 @@ static int gelic_descr_prepare_rx(struct gelic_card *card,
- 	descr->hw_regs.payload.dev_addr = 0;
- 	descr->hw_regs.payload.size = 0;
- 
--	descr->skb = netdev_alloc_skb(*card->netdev, rx_skb_size);
-+	if (napi_mode)
-+		descr->skb = napi_alloc_skb(&card->napi, rx_skb_size);
-+	else
-+		descr->skb = netdev_alloc_skb(*card->netdev, rx_skb_size);
- 	if (!descr->skb) {
- 		descr->hw_regs.payload.dev_addr = 0; /* tell DMAC don't touch memory */
- 		return -ENOMEM;
-@@ -464,7 +469,7 @@ static int gelic_card_fill_rx_chain(struct gelic_card *card)
- 
- 	do {
- 		if (!descr->skb) {
--			ret = gelic_descr_prepare_rx(card, descr);
-+			ret = gelic_descr_prepare_rx(card, descr, false);
- 			if (ret)
- 				goto rewind;
- 		}
-@@ -964,7 +969,7 @@ static void gelic_net_pass_skb_up(struct gelic_descr *descr,
- 	netdev->stats.rx_bytes += skb->len;
- 
- 	/* pass skb up to stack */
--	netif_receive_skb(skb);
-+	napi_gro_receive(&card->napi, skb);
- }
- 
- /**
-@@ -1069,7 +1074,7 @@ static int gelic_card_decode_one_descr(struct gelic_card *card)
- 	/*
- 	 * this call can fail, propagate the error
- 	 */
--	prepare_rx_ret = gelic_descr_prepare_rx(card, descr);
-+	prepare_rx_ret = gelic_descr_prepare_rx(card, descr, true);
- 	if (prepare_rx_ret)
- 		return prepare_rx_ret;
- 
-
-base-commit: ff736a286116d462a4067ba258fa351bc0b4ed80
--- 
-2.43.0
-
+	Andrew
 
