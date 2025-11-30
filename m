@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-242850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 114C3C9565D
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 00:36:08 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAE7FC95666
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 00:36:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2370E4E05C5
-	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 23:36:00 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id ED126341D31
+	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 23:36:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 494472FF64D;
-	Sun, 30 Nov 2025 23:35:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC5B72FF159;
+	Sun, 30 Nov 2025 23:35:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S+se13Sj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PWPJXlyG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B3002FE585
-	for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 23:35:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF5AC2FF645
+	for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 23:35:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764545737; cv=none; b=KparahwtNzjQLvNStSQp/J1dLQAfwUBeMhw3itWnskrzRw7rwdxceTS08cm7lj/Yk+DChghsq6zTynyL4PLr1FHSPfzKSTMYaMMSzPc+CqBTofNZto0hQkYQtDqTa8S1zqrxygDSOkWsZ6JIDZmBKajVFvh+ZducHhREutWvXac=
+	t=1764545738; cv=none; b=PGbFV3FFT1nvO3Ig+sGC30LgW4OB48HLItvW4eLKydmRyZtOOTVFQKcHR65ixkemIdZ4h3/vQ9phuZWbOWjO4nk5cuBCxoZ9RnbDF0Jui7d+AuZFs1cr+jFRnLX3u3VGpzd44yh/ipmSq8LYCGK3OLoNxm1vbBMq5UEl4MkqLzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764545737; c=relaxed/simple;
-	bh=J+v78DVUuvU5F3kifckIxv2vG5fH2TZFf9LLLr3M6jQ=;
+	s=arc-20240116; t=1764545738; c=relaxed/simple;
+	bh=G7RQvwuA5HOESStkbO7E13FYoPystOeEJRkdlljNekE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cdEa0rG3G73zt5gVxxLTdlp1tZG7K2mbiHG+YDzEXqbcQHghUw734eDq+3AGlko5RyTlmRS2WmqrCXS6eUIE12vlirABehUGTqG5UMUIv29GrJJ2W5djCFgs+UhIhiALgLV6w0aS/jiPzsv+EA/gHU13WBcucsUV7SrVtpxiSDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S+se13Sj; arc=none smtp.client-ip=209.85.128.41
+	 MIME-Version; b=i4qhOY2akYtZTUYRIGZjv67spyZV1nYc5NDo2erpZOVB+ep+UM8Vwz+KztJB3I9vyskr2TAv70Yq7nLKINe7GFwuxdd8zBw5K6ubu01ZdBt372LEPgkxlJKAi4PH35LpscgwuGEWZt6J6cuAFcb4PjIdkg1PW3b1lVdWbB0vapE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PWPJXlyG; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-47798ded6fcso18657005e9.1
-        for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 15:35:35 -0800 (PST)
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-477bf34f5f5so22006535e9.0
+        for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 15:35:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764545733; x=1765150533; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1764545735; x=1765150535; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CGfI5v2bo8QpS6mN8gMlhUgE+Lz+xF251MkehL1RpaY=;
-        b=S+se13SjkHj/Mp9LCNMSncllJh85+8gmEePKyT9QQ1FeU1NvA4/hKKHhtgxeY22vuA
-         RezFwgh7Zx6Tvg0ocqgegG0eczuKVtH2u3dBoZV0GE86hPg6BOGNtEX4DHQJVlSHniIr
-         rNaablOfsG333wImhegHcAcvHj+KnTDJiw0aFsWHNStAn6oXX50ViBNQ4iMAIgLqaxOM
-         AhuwWCzFBZSgZJw14DjgVoa8icC/ZLgZAGsgAa4oZdx/vRpTJksBJWpriR1ABkAVL3Gx
-         rwo7hR9F5GiAGeEJBhr/wqfzTqitjKfSqWIjJdL0iShISoRwma0XU4o0vdhkOkjnmJVK
-         E37A==
+        bh=sqQYwi6yKkW0pXFhK5Fhz7jwEEb4HUCqJfGCd/MpDPo=;
+        b=PWPJXlyGt4wao7lV6oiZY0rxvEb8bgtplIE237q+H4mxDYxj3xg0vcLxj7XidXCpmU
+         Lvi5QQfarmRv5UKCd7OviYxXSpVaYeXR6/4cBy1r+sYwURl6ydLsuBa3tNEqcwhranPO
+         CbmBRJvmSsdsP52OcGlwC/xVB49PUQ+zUJoEDBLpDMVtS0ih6tlBIlk0zNNlxJDV9ioL
+         P94dYAmPleF6O0lQM5syKuOR+kfsjbjiAx58dzpTzKKxRgW8pM5mLBQ+eRO8ofsFA0L8
+         UsL1T7fG9mJOsg/TwyUEdclaUtmt2tTbsPzNawTJPjJCvHgxbx/ZHi2JaRiCMG9PWtBF
+         5Mfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764545733; x=1765150533;
+        d=1e100.net; s=20230601; t=1764545735; x=1765150535;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=CGfI5v2bo8QpS6mN8gMlhUgE+Lz+xF251MkehL1RpaY=;
-        b=Kp53t7VKROsxFbUQeIGfN6nzAoBpaKzhw8kaQrKPt68DAqxxMYrNPBWhldSpUQLUhf
-         PdxbczDLwQatlPvdLE/ZiKEX1nvnuCNbbM5RSsTGs3oRAD7Ku+f3KlgS4sdALVnWLyJJ
-         A2EvEfBriU3iD/TZKgSzn5YpGRxp9jlpw3kfNCLEm4jYFlzBP0vf4RFgM+VybCSJ4TsM
-         yAXKvkFIhXSTUGvcJPCpzmgFirVfe6JXE0fGrJVN4yAyU/n/v7OBIlfvWiYJVM/owTh+
-         TlJX+gg63Db/bAP2U4fEQL2dUs1y6PoxA/64wlg2lPiIx6j9LLVCLsPB1fFCdu6MmEyJ
-         ZuYA==
-X-Gm-Message-State: AOJu0YwQHkD36Oz8aP6TEkKOTysZpymLZz705pVOrZyQ+Jf6qV6fJN8F
-	wSiIwjs2NaI+p+U09jZbtxpvHRAvy3dBd3vIKXZKl9HgqSdmbaEh+BceyUIB3Q==
-X-Gm-Gg: ASbGncs4kwGXF6WX9qEhNpDU9VMqjhR0EK+Yp+8JXlwOhizD/4Oe38I+iIgrmL78aOr
-	gUi+uRTku0mwPS6NVy5KwCQ/9iZkhDmufRYa+2X1pOINUZPhG/I3oxDSHK+Bgy+4mpcZzBLYKEi
-	bnpz5+lwOK6P3EVoQ7o3eP0dUWDYk8iSmQQtkA2p199UnVD2VAeS5DxQbLhmirqTHDHhZmENaQM
-	cWmHadeJtPzA36oyq0cqQ8GoiOb2UGKv46AgtL33NboJ1AseJ0TX3y2qsOPF1mnFmnJnXjD8JTM
-	+UiViBkzhX2MHzy2AaBkE+5LuiicMvgIzf6+PXG30EUikZFM+09MtWLQ/rVIhAekjJxw+XDxg8m
-	9N65+0AGDCxo0zOkObhsy1BE3edUIRVGmJU1r7AFUUzM/gM/jKP+GuckEqBhvtahpjoAfBFTpu5
-	801GDOnBulqEK8mqaYxigH48xsunsVkaphdMBgtLcJSDMFKWeeklfj+kszhWMeM2y7eewuDezYO
-	znqqCd91SnywEwXZHYfa46ce/E=
-X-Google-Smtp-Source: AGHT+IF67CntAQ/arhcWo5ytqV99C28dV2Q49OsMgdQEXfIMhJP+Hcig8yH6oHJJ/T2ZRfd3/soE3A==
-X-Received: by 2002:a05:600c:c490:b0:477:b734:8c41 with SMTP id 5b1f17b1804b1-477c10c8596mr322154935e9.1.1764545732812;
-        Sun, 30 Nov 2025 15:35:32 -0800 (PST)
+        bh=sqQYwi6yKkW0pXFhK5Fhz7jwEEb4HUCqJfGCd/MpDPo=;
+        b=FLvlaY+dYhVuCygHIyJMFN2izio+tNwwIZaiwMo7L/nYhckkTrcJw1V3WElpd6LCZK
+         r+uSKDbQcCelTmWiRpkDhP/+rS2Qk3C8G+NYZLXY29vuOj5/1RkZhZhHcidWOiOxn9nH
+         ZanPn0O5ItMd4tLfAmflc4BBVlr8zswdVtDI+29ZvzkdPfvFK0OVXW01GC6PewdZLDaX
+         bEvJ9OY715Vzj1Vre+uKDYa0s3b6tdlQXzuHCvvAINVgVxH4M4Ybb59uaTri8Fgm+WwM
+         QMGLs0+khfJXaBnWR7tHq4SNPoJJoRP6msBaSmc7XpkpIZBVNNt1PF60a7fGSk0Je3aS
+         Z5bg==
+X-Gm-Message-State: AOJu0YxIP3To7PgB7GtqcH4aTZIKhNnJ8DLKGs2HssqtFpXcs9C/k3Za
+	ExpRGWA2qYTUhpMPZMtL7uhJK3qWUQO5szxfAdi4uQIgqf80HW0OKBkKM4lXaA==
+X-Gm-Gg: ASbGncuKs4tIdbqXVbA3tFZa8NQxPIJOcCCCLW8nR2480iPogZNBgPqtDAmC60cR9SG
+	edMCOehgA+z81cQp3Qby6SlmAHaptLFvhUfGzua2iN4B5U8tcJu3tcvjqNM1BTTP5otaBE9bmZn
+	cBG1ROAaEfSO6d8z6947LwnP6t7PmdmzrPyuXdo8I60u6i8tTz11Z/PHKqkNzFslFU73+WuOu1V
+	Zk7vs9pwruFZmsAGhbycg/VA87MVLucOZofaL3NqWwh2rQORBx+noHu3Mtli8tvWXUtEMJHRyBa
+	o7+vaVfagSnqDyeofVHYCa6kagsjAhRpQBowl1gKdZyhkrYs/JV2o5WM59Mv8J7avVRdXbklGKX
+	Ne2YvzCuA6F2GuFKLEvsjOhdke97o37WmBfmZlsegnFHqvrKGBCvLvVzLxZDR8qiKjqMJ2GmR2D
+	gyj90mxn1lDF0kDlm+4HdBeiP66WEMllGRkSKB6ddn/VHQlC5fuUbAjx0M+i1qmcOrqyMK+54yA
+	JLS+HoapUlD+h0yJZmt8xn+BVY=
+X-Google-Smtp-Source: AGHT+IHgav/tPp3nDxDwQbNFJXjlN5z5JlpJjaWPnlbmKTfJs2yUPwa5uXWlHjxmsi5Gji90OcciDA==
+X-Received: by 2002:a05:600c:1c1b:b0:471:14b1:da13 with SMTP id 5b1f17b1804b1-47904aebebdmr257224195e9.14.1764545734689;
+        Sun, 30 Nov 2025 15:35:34 -0800 (PST)
 Received: from 127.mynet ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-479040b3092sm142722075e9.1.2025.11.30.15.35.30
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-479040b3092sm142722075e9.1.2025.11.30.15.35.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 30 Nov 2025 15:35:30 -0800 (PST)
+        Sun, 30 Nov 2025 15:35:33 -0800 (PST)
 From: Pavel Begunkov <asml.silence@gmail.com>
 To: netdev@vger.kernel.org
 Cc: "David S . Miller" <davem@davemloft.net>,
@@ -105,10 +105,11 @@ Cc: "David S . Miller" <davem@davemloft.net>,
 	bpf@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	io-uring@vger.kernel.org,
-	dtatulea@nvidia.com
-Subject: [PATCH net-next v7 1/9] net: page pool: xa init with destroy on pp init
-Date: Sun, 30 Nov 2025 23:35:16 +0000
-Message-ID: <02904c6d83dbe5cc1c671106a5c97bd93ab31006.1764542851.git.asml.silence@gmail.com>
+	dtatulea@nvidia.com,
+	Stanislav Fomichev <stfomichev@gmail.com>
+Subject: [PATCH net-next v7 2/9] net: page_pool: sanitise allocation order
+Date: Sun, 30 Nov 2025 23:35:17 +0000
+Message-ID: <77ad83c1aec66cbd00e7b3952f74bc3b7a988150.1764542851.git.asml.silence@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <cover.1764542851.git.asml.silence@gmail.com>
 References: <cover.1764542851.git.asml.silence@gmail.com>
@@ -120,28 +121,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The free_ptr_ring label path initialises ->dma_mapped xarray but doesn't
-destroy it in case of an error. That's not a real problem since init
-itself doesn't do anything requiring destruction, but still match it
-with xa_destroy() to silence warnings.
+We're going to give more control over rx buffer sizes to user space, and
+since we can't always rely on driver validation, let's sanitise it in
+page_pool_init() as well. Note that we only need to reject over
+MAX_PAGE_ORDER allocations for normal page pools, as current memory
+providers don't need to use the buddy allocator and must check the order
+on init.i
 
+Suggested-by: Stanislav Fomichev <stfomichev@gmail.com>
+Reviewed-by: Mina Almasry <almasrymina@google.com>
 Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 ---
- net/core/page_pool.c | 1 +
- 1 file changed, 1 insertion(+)
+ net/core/page_pool.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 1a5edec485f1..a085fd199ff0 100644
+index a085fd199ff0..265a729431bb 100644
 --- a/net/core/page_pool.c
 +++ b/net/core/page_pool.c
-@@ -307,6 +307,7 @@ static int page_pool_init(struct page_pool *pool,
+@@ -301,6 +301,9 @@ static int page_pool_init(struct page_pool *pool,
+ 		}
  
- free_ptr_ring:
- 	ptr_ring_cleanup(&pool->ring, NULL);
-+	xa_destroy(&pool->dma_mapped);
- #ifdef CONFIG_PAGE_POOL_STATS
- 	if (!pool->system)
- 		free_percpu(pool->recycle_stats);
+ 		static_branch_inc(&page_pool_mem_providers);
++	} else if (pool->p.order > MAX_PAGE_ORDER) {
++		err = -EINVAL;
++		goto free_ptr_ring;
+ 	}
+ 
+ 	return 0;
 -- 
 2.52.0
 
