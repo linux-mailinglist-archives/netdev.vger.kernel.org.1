@@ -1,289 +1,165 @@
-Return-Path: <netdev+bounces-242830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4D9AC952EA
-	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 18:29:47 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63FC7C95335
+	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 19:16:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4C6EA34262B
-	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 17:29:47 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id DD31A3421B9
+	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 18:16:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A454A2BE7DC;
-	Sun, 30 Nov 2025 17:29:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94E092C0260;
+	Sun, 30 Nov 2025 18:16:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aOe11aQZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KkkABKgO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42B26229B2A
-	for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 17:29:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE59B285C99
+	for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 18:16:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764523780; cv=none; b=BOtXo/WKTJ4rHQKu7PlCB6Blh/56MyvuhAzaFcsACuvU6LCprRC0gjyMCasNzrAJZxLIf0KKB+WukCW8502V+8UEi6aOSdaN2soRAeraFJ8JcJN5e0TGh2u+Q2YrojRTFNC3OCOvd4eMfi+agALnyvWpjEA8GcuDLar1Vg2HMAM=
+	t=1764526610; cv=none; b=tnznti78i9Pn34fCxoX7NGho1C+pujJKnMjVjO1SLJwO1rMh6Qz0Ugt8BPSFt3mPAG0YiqiXkxqK9wWzMJ+Lzj2ZQqDE+89sR0jmsbg0wpwtH2ayf741HUmQSSdabrqWhXLloUBfzwI071VfQJzS0ZBAPBZ3VhFDFhxKwELzjVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764523780; c=relaxed/simple;
-	bh=Mu+DZaanwEBg4FEHkyAe6Mn64+PlLTqLU9xScAMTXNY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iykNntFd8kdKcmKxPajMW7jCPzYNZhdYopPyV6ze0Iz7/uMZtTquaF7U3uRAR0AQCE0JcPborsD8OgH9eX8trYYTo0o3Zuz0pNqD05Zk6iyGMxyn+O6wemsqJ9Zgicw6bVi2AS+c+3qOqKsAqVqNU5sO0DYjUJb5pKsr4PPqVL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aOe11aQZ; arc=none smtp.client-ip=209.85.216.42
+	s=arc-20240116; t=1764526610; c=relaxed/simple;
+	bh=KvguCsz4pFutF0DfQ4yn73w4b9PB3j46YC5jFCOIPbI=;
+	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=ZV5FTjSma1GFFllob/9p9sLUm10wPXFsBzaH5JLL3/iYFet8TOeOiOzxIgZBhH6jNFLt4VfrOW04fuWxk8p0bSmHKBzHdg3+ebZEPSzAdsS4kCzK/+kggmEJbJPXhrt6bML8J/JRWhFxP0OBWtQIw67vCoMEjWjdOmXJUaT8OEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KkkABKgO; arc=none smtp.client-ip=74.125.224.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-341988c720aso2898933a91.3
-        for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 09:29:38 -0800 (PST)
+Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-640d0895d7cso4299465d50.1
+        for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 10:16:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764523777; x=1765128577; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=vf5Y6PF0mnQ0gDxdyhdlhJnQdfMfj542mYRZWiFpENU=;
-        b=aOe11aQZkYQeFxL4I4A2kuWeWcFGaywEIirMnY1EnBfCNSYOLUMZSgozNL02Tz933T
-         HZBX0k24UUMfWcxde3Av/S+dvrMAxrhwq1bPmOaFmIYwf3udOrjSQZX4QRTU5DwHNWm6
-         zNBlIvY7lLlct9pdo4ilWlMZ553+wWIUQpCLY04HF31wFhULiBc+HsgEsYInMA1ftzsN
-         9OdoIy+PZ3ojKa+9ZXNi8ssfO6yKslC/ZhKlva+e265b9YSNhNp94MArTxA+JTMQuWKX
-         9v3WHGdPI3jvjEuOyiDW8+fL/7att5Se7udwCPVIqyBcbSwsaFulhVST5rAZ/MNCJjhC
-         lhTw==
+        d=gmail.com; s=20230601; t=1764526608; x=1765131408; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JyAdI2hiDQd5HiIOsukC026FiEA0dW/JcjYmFaMww+Q=;
+        b=KkkABKgO3i88qTaPEM8l4qF0qVQb2Oc83BM9rlYPGe6aEwWoQk123eSP/qOL5VkvoT
+         E4dmxtIWk/0xbe+d+bzyYeGwnhpcpHZsoEGPmH5hySMmmJzY2Bgnp7D7BRW5mClEBjOT
+         sRLDyOA0f+VmAPmyWKsCLRMXNOvjWG00sZIJHX5/XTu1EfDgvx7CbpXsOsHXUdu83Zaq
+         bdwvnjyz9ZW6ZBEg6GC3ThYkdExYlDGb4aqnNL8olod4IdW8CDxGT+0eMdzGBduAvJMN
+         1dlUee4gJ7YdZ9jtpFDb/pxtjAaQIO+Z27wL4RZSrsedGsly/OeAqaR0cKNjMQ+qVfL0
+         Jw9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764523777; x=1765128577;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vf5Y6PF0mnQ0gDxdyhdlhJnQdfMfj542mYRZWiFpENU=;
-        b=PZkIApEhgr/6f+K+1bsXjZbMuxHBaqbEyc2zlOee5SN9ojmnk0N6ZQAjgoFkDKhsv7
-         JMMIfM4b6IY2Qs9XaA2AahLouzMLMPa09OqxzUhI8//+sSm10GA88pwsazgid1fVASJD
-         CyU2iy7qhlbiWg3sEHrl0e6NBP/xZcC38ZvKm9n9G0m/beSOmOnzMVTYEV5VMJ2IpdIw
-         oWD+H66c/oAK27jOZsl9/iO7k6NUHCC0ykFLY1f1gVcoBGd+V7j9u472WPSaF+PgF8Eh
-         TtfFRLGr1a8aWCxw8pTfX0UE3VJ5wKkbpqutop0qiWQcu7Ic23o6g2/FazIWrvpHgzLo
-         XnxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWjODf8O6BaoscR85glnkt/4OruUumP9RpRlNFJRja0qIevovnnslckDkhuElMNLP21HAEWg6g=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4/PVQvMAIhlmLe0kPkqoISt0duyPijegxkEydY/s046ZAKkm1
-	fj9f8JvGxHEEbGhgjgrxBOZTEVQ/dH+zhU7aZCmVK/aPJu6J9zkmwySu
-X-Gm-Gg: ASbGnctXIqgBnAVXEk1y1cwLrJ1kKj8fyG+WBHW3aCNT3XogCifZ886cAyWzibA2cT/
-	bWIIeDfGPowP5EpCBmou4jyEz9lX+8+oVFoy5bCdQmR3+hHxC96ECDLNKobg+Wkc/f+KtH2o54Q
-	kPrTzkWlgQ0jgL2moJHT93I8v3UKxWxRYmQcBSzLyq+RhKcxs9afF66wf/OHkL7QYjF0uDUGK8y
-	I5NQ7C888miMbF/0Qkjmw5Hl9OdLg71f4PK7+z10V+Apv/ng09UhSCQ8BBL19nTfnuJYAZqyp1+
-	dUUsW7naPO7E2FlEcjcTp6EosEghYPGRCjlDBZ0w7UduX34wYm1XxH5NZJyYCLRAItvF7N8e4V2
-	8ugdmqIAiMZ/75sa/mGjxUDcuCWwePc598WkoWt25jlO0hxbfnWOIIj3/IZW96c0GqcszKXLz7d
-	8KI8AUO1mAdOeYEcdqNroe
-X-Google-Smtp-Source: AGHT+IHYodHXs9x9NXGCPLYUYzvf/eA37WxLpZ6dYfV4pmUOmeNy3dSjPJJZM8NPqCP/wRPJleggCw==
-X-Received: by 2002:a17:90b:510a:b0:340:f05a:3ec3 with SMTP id 98e67ed59e1d1-34733f5b79bmr34695562a91.33.1764523777428;
-        Sun, 30 Nov 2025 09:29:37 -0800 (PST)
-Received: from inspiron ([114.79.136.226])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7d15e9c3f23sm11016850b3a.36.2025.11.30.09.29.34
+        d=1e100.net; s=20230601; t=1764526608; x=1765131408;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=JyAdI2hiDQd5HiIOsukC026FiEA0dW/JcjYmFaMww+Q=;
+        b=GDEBwzOK9DpF1FXGaXkOxVx4bt1elWacjvPc/C9oKJ8QKQNh7LSyO3Sj7rbRXAT5hi
+         wFshOhKm4H3NjMWUEmjJrUuLde3EFMEPnAz/aXS62vgwSN/SXrDDG/HHdnCKnQK0gbGp
+         F6Yoo4PC2fdB9tJHDbkNAD8KCzBTK9ihDQUiPrphM3fSZ50tcOr38U6iCbEKTObQhk++
+         4tA1PJZ/5/+lAMwEGrhtKj9St8nwlyW2/lEVDXDnbbtK03+YbtfUql/RlYweMbfr/47H
+         35LFFVyUcE//dTNmTdwF3z5BC5gsOjAVKjOx6PFxJ1MmdimIu/QgcAxtIMfBibDbsBdN
+         nDFA==
+X-Forwarded-Encrypted: i=1; AJvYcCXFxfZWfcZhvYfsOdcuC1EVLlAEwRiEyoOCOlVnM7vw357X1TZ9+KqZS5JOrmY65qNBirs1tIQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMgGEcN2jBjcMBdx5rPDxqzWBnVCPXtxPWELeCrF9WH0UKn3vY
+	9BKgXrvlegtg1r62wzWT4kqYGhp8VLwY6AcwHLEFlCkrGe05ho0XIj+r
+X-Gm-Gg: ASbGncvuKqOluX03dWSau990XdUiUHX3ZEmcmrn7zmBfOeZ3fd+0pdKM9YZGe7PD4le
+	KU+U2vpF+6mDOLLFWUlYgXMmO5vgpttkrwGs0MrvZkoDG4aXHoNwy7CHzyHuZLc0j2v2HONLDmH
+	Z7q2siJ7OYoHx7fJO0tKGhWL7afmsm6sOJtTIWcFn2adMc7m87lkDYkGGmJDjbgFWVYxX/6+8vP
+	b0DiPP0pi/5ooVit8nQraAa19/h2RYM/GFjnb3thWiycx7/Ubvb6syo1JnTYpkVwhXgvmvcnlOv
+	biBou2LNz+wLnZml3bB5oJGnQqZSxXLXVoIoQVqx3a0Zi8Xczs0tWSEOutKlPW60Ag28DZzX+SU
+	gAiJVPs1/px61qH9PzxROHeWmK7aIHiQuSUp8J1louluGRrL2zX4x4A1gS4YWU+5V7RcYH0eyS5
+	huhvHPyRSGwuJQyJ+OK/G9oTx1gWGFMy/UUIajvqeMPyK9h6Zqbme6/bfC/ovvFDRLkQ4=
+X-Google-Smtp-Source: AGHT+IGjUNSaNMlSY1qlNbQudRZSgfRbmbbf/B0rphetUkGqwnK/CkPwKVh/ASYpHjSaXoMyaE9Zng==
+X-Received: by 2002:a05:690e:1489:b0:63f:b1fd:3850 with SMTP id 956f58d0204a3-64302631797mr26472073d50.33.1764526607842;
+        Sun, 30 Nov 2025 10:16:47 -0800 (PST)
+Received: from gmail.com (116.235.236.35.bc.googleusercontent.com. [35.236.235.116])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-78ad1045723sm39215937b3.55.2025.11.30.10.16.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 30 Nov 2025 09:29:36 -0800 (PST)
-Date: Sun, 30 Nov 2025 22:59:31 +0530
-From: Prithvi Tambewagh <activprithvi@gmail.com>
-To: Oliver Hartkopp <socketcan@hartkopp.net>, mkl@pungutronix.de
-Cc: linux-can@vger.kernel.org, linux-kernel@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com, netdev@vger.kernel.org
-Subject: Re: Question about to KMSAN: uninit-value in can_receive
-Message-ID: <aSx++4VrGOm8zHDb@inspiron>
-References: <20251117173012.230731-1-activprithvi@gmail.com>
- <0c98b1c4-3975-4bf5-9049-9d7f10d22a6d@hartkopp.net>
- <c2cead0a-06ed-4da4-a4e4-8498908aae3e@hartkopp.net>
+        Sun, 30 Nov 2025 10:16:47 -0800 (PST)
+Date: Sun, 30 Nov 2025 13:16:46 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Simon Schippers <simon.schippers@tu-dortmund.de>, 
+ willemdebruijn.kernel@gmail.com, 
+ jasowang@redhat.com, 
+ andrew+netdev@lunn.ch, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ mst@redhat.com, 
+ eperezma@redhat.com, 
+ jon@nutanix.com, 
+ tim.gebauer@tu-dortmund.de, 
+ simon.schippers@tu-dortmund.de, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ kvm@vger.kernel.org, 
+ virtualization@lists.linux.dev
+Message-ID: <willemdebruijn.kernel.2ef79a77ca3ec@gmail.com>
+In-Reply-To: <20251120152914.1127975-3-simon.schippers@tu-dortmund.de>
+References: <20251120152914.1127975-1-simon.schippers@tu-dortmund.de>
+ <20251120152914.1127975-3-simon.schippers@tu-dortmund.de>
+Subject: Re: [PATCH net-next v6 2/8] ptr_ring: add helper to check if consume
+ created space
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c2cead0a-06ed-4da4-a4e4-8498908aae3e@hartkopp.net>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Nov 30, 2025 at 01:44:32PM +0100, Oliver Hartkopp wrote:
->
->
->On 29.11.25 18:04, Oliver Hartkopp wrote:
->>Hello Prithvi,
->>
->>thanks for picking up this topic!
->>
->>I had your mail in my open tabs and I was reading some code several 
->>times without having a really good idea how to continue.
->>
->>On 17.11.25 18:30, Prithvi Tambewagh wrote:
->>
->>>The call trace suggests that the bug appears to be due to effect 
->>>of change
->>>in headroom by pskb_header_expand(). The new headroom remains 
->>>uninitialized
->>>and when can_receive tries accessing can_skb_prv(skb)->skbcnt, indirectly
->>>skb->head is accessed which causes KMSAN uninitialized value read bug.
->>
->>Yes.
->>
->>If you take a look at the KMSAN message:
->>
->>https://lore.kernel.org/linux- 
->>can/68bae75b.050a0220.192772.0190.GAE@google.com/T/ 
->>#m0372e223746b9da19cbf39348ab1cda52a5cfadc
->>
->>I wonder why anybody is obviously fiddling with the with the 
->>skb->head here.
->>
->>When initially creating skb for the CAN subsystem we use 
->>can_skb_reserve() which does a
->>
->>skb_reserve(skb, sizeof(struct can_skb_priv));
->>
->>so that we get some headroom for struct can_skb_priv.
->>
->>Then we access this struct by referencing skb->head:
->>
->>static inline struct can_skb_priv *can_skb_prv(struct sk_buff *skb)
->>{
->>     return (struct can_skb_priv *)(skb->head);
->>}
->>
->>If anybody is now extending the headroom skb->head will likely not 
->>pointing to struct can_skb_priv anymore, right?
->>
->>>To fix this bug, I think we can call can_dropped_invalid_skb() in 
->>>can_rcv()
->>>just before calling can_receive(). Further, we can add a condition 
->>>for these
->>>sk_buff with uninitialized headroom to initialize the skb, the way it had
->>>been done in the patch for an earlier packet injection case in a similar
->>>KMSAN bug:
->>>https://lore.kernel.org/linux-can/20191207183418.28868-1- 
->>>socketcan@hartkopp.net/
->>
->>No. This is definitely a wrong approach. You can not wildly poke 
->>values behind skb->head, when the correctly initialized struct 
->>can_skb_priv just sits somewhere else.
->>
->>In opposite to the case in your referenced patch we do not get a skb 
->>from PF_PACKET but we handle a skb that has been properly created in 
->>isotp_sendmsg(). Including can_skb_reserve() and an initialized 
->>struct can_skb_priv.
->>
->>>However, I am not getting on what basis can I filter the sk_buff so that
->>>only those with an uninitialized headroom will be initialized via 
->>>this path.
->>>Is this the correct approach?
->>
->>No.
->>
->>When we are creating CAN skbs with [can_]skb_reserve(), the struct 
->>can_skb_priv is located directly "before" the struct can_frame which 
->>is at skb->data.
->>
->>I'm therefore currently thinking in the direction of using skb->data 
->>instead of skb->head as reference to struct can_skb_priv:
->>
->>diff --git a/include/linux/can/skb.h b/include/linux/can/skb.h
->>index 1abc25a8d144..8822d7d2e3df 100644
->>--- a/include/linux/can/skb.h
->>+++ b/include/linux/can/skb.h
->>@@ -60,11 +60,11 @@ struct can_skb_priv {
->>         struct can_frame cf[];
->>  };
->>
->>  static inline struct can_skb_priv *can_skb_prv(struct sk_buff *skb)
->>  {
->>-       return (struct can_skb_priv *)(skb->head);
->>+       return (struct can_skb_priv *)(skb->data - sizeof(struct 
->>can_skb_priv));
->>  }
->>
->>  static inline void can_skb_reserve(struct sk_buff *skb)
->>  {
->>         skb_reserve(skb, sizeof(struct can_skb_priv));
->>
->>I have not checked what effect this might have to this patch
->>
->>https://lore.kernel.org/linux-can/20191207183418.28868-1- 
->>socketcan@hartkopp.net/
->>
->>when we initialize struct can_skb_priv inside skbs we did not create 
->>in the CAN subsystem. The difference would be that we access struct 
->>can_skb_priv via skb->data and not via skb->head. The effect to the 
->>system should be similar.
->>
->>What do you think about such approach?
->>
->>Best regards,
->>Oliver
->>
->
->Hello Prithvi,
->
->I'm answering in this mail thread as you answered on the other thread 
->which does not preserve the discussion above.
+Simon Schippers wrote:
+> Add __ptr_ring_consume_created_space() to check whether the previous
+> __ptr_ring_consume() call successfully consumed an element and created
+> space in the ring buffer. This enables callers to conditionally notify
+> producers when space becomes available.
+> 
+> The function is only valid immediately after a single consume operation
+> and should not be used after calling __ptr_ring_consume_batched().
 
-Hello Oliver,
+Please explain why it is only valid in that case.
+ 
+> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
+> Co-developed by: Jon Kohler <jon@nutanix.com>
+> Signed-off-by: Jon Kohler <jon@nutanix.com>
+> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
+> ---
+>  include/linux/ptr_ring.h | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
+> 
+> diff --git a/include/linux/ptr_ring.h b/include/linux/ptr_ring.h
+> index da141cc8b075..76d6840b45a3 100644
+> --- a/include/linux/ptr_ring.h
+> +++ b/include/linux/ptr_ring.h
+> @@ -453,6 +453,23 @@ static inline int ptr_ring_consume_batched_bh(struct ptr_ring *r,
+>  	return ret;
+>  }
+>  
+> +/*
+> + * Check if the previous consume operation created space
+> + *
+> + * Returns true if the last call to __ptr_ring_consume() has created
+> + * space in the ring buffer (i.e., an element was consumed).
+> + *
+> + * Note: This function is only valid immediately after a single call to
+> + * __ptr_ring_consume(). If multiple calls to ptr_ring_consume*() have
+> + * been made, this check must be performed after each call individually.
+> + * Likewise, do not use this function after calling
+> + * __ptr_ring_consume_batched().
+> + */
+> +static inline bool __ptr_ring_consume_created_space(struct ptr_ring *r)
+> +{
+> +	return r->consumer_tail >= r->consumer_head;
+> +}
+> +
+>  /* Cast to structure type and call a function without discarding from FIFO.
+>   * Function must return a value.
+>   * Callers must take consumer_lock.
+> -- 
+> 2.43.0
+> 
 
-Apologies for this, I was using git send-email and probably messed up with
-the Message ID. I have just set up mutt, this should be correct now.
 
->
->On 30.11.25 13:04, Prithvi Tambewagh wrote:
->> Hello Oliver,
->>
->> Thanks for the feedback! I now understand how struct can_skb_priv is
->> reserved in the headroom, more clearly, given that I am relatively new
->> to kernel development. I agree on your patch.
->>
->> I tested it locally  using the reproducer program for this bug 
->provided by
->> syzbot and it didn't crash the kernel. Also, I checked the patch here
->>
->> https://lore.kernel.org/linux-can/20191207183418.28868-1-socketcan@hartkopp.net/
->>
->> looking at it, I think your patch will work fine with the above patch as
->> well, since data will be accessed at
->>
->> skb->data - sizeof(struct can_skb_priv)
->>
->> which is the intended place for it, according to te action of
->> can_skb_reserve() which increases headroom by length
->> sizeof(struct can_skb_priv), reserving the space just before skb->data.
->>
->> I think it solves this specific KMSAN bug. Kindly correct me if I am 
->wrong.
->
->Yes. It solves that specific bug. But IMO we need to fix the root 
->cause of this issue.
->
->The CAN skb is passed to NAPI and XDP code
->
-> kmalloc_reserve+0x23e/0x4a0 net/core/skbuff.c:609
-> pskb_expand_head+0x226/0x1a60 net/core/skbuff.c:2275
-> netif_skb_check_for_xdp net/core/dev.c:5081 [inline]
-> netif_receive_generic_xdp net/core/dev.c:5112 [inline]
-> do_xdp_generic+0x9e3/0x15a0 net/core/dev.c:5180
-> __netif_receive_skb_core+0x25c3/0x6f10 net/core/dev.c:5524
->
->which invoked pskb_expand_head() which manipulates skb->head and 
->therefore removes the reference to our struct can_skb_priv.
->> Would you like to fix this bug by sending your patch upstream? Or else
->> shall I send this patch upstream and mention your name in 
->Suggested-by tag?
->
->No. Neither of that - as it will not fix the root cause.
->
->IMO we need to check who is using the headroom in CAN skbs and for 
->what reason first. And when we are not able to safely control the 
->headroom for our struct can_skb_priv content we might need to find 
->another way to store that content.
->E.g. by creating this space behind skb->data or add new attributes to 
->struct sk_buff.
-
-I will work in this direction. Just to confirm, what you mean is
-that first it should be checked where the headroom is used while also
-checking whether the data from region covered by struct can_skb_priv is 
-intact, and if not then we need to ensure that it is intact by other 
-measures, right? 
-
->
->Best regards,
->Oliver
-
-Thank You,
-Prithvi
 
