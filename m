@@ -1,87 +1,43 @@
-Return-Path: <netdev+bounces-242832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242833-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3050EC953AF
-	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 20:10:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 19B03C953E6
+	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 20:28:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D6CB24E01E8
-	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 19:09:58 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CF07C4E01FF
+	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 19:28:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF12D27FB1C;
-	Sun, 30 Nov 2025 19:09:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="OLtF7Q7a";
-	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="kgMmZk+2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45A8F2C08D1;
+	Sun, 30 Nov 2025 19:28:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mo4-p00-ob.smtp.rzone.de (mo4-p00-ob.smtp.rzone.de [85.215.255.23])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58D7B36D510;
-	Sun, 30 Nov 2025 19:09:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.23
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764529795; cv=pass; b=o6+UH7xL1xyZMJ/SGG5j5uKKCj8e2zFTRBBuKfC8sH5khKj/lXXWMe99wsdu2y57IhePffO3KmqTRU4sWSvfAX7RBmF002NlI6aYg7y4KndAtcRj8/AnZ8vbQki66tfHvoVR+6JbzNFtx3uuykfZjjywsGUdKyc9845kUrZtXWk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764529795; c=relaxed/simple;
-	bh=UPiA3LE5hC+O2zConxOpW9nBiWBBe92XTpcFFFD+8gU=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AEF51B87C9;
+	Sun, 30 Nov 2025 19:28:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764530919; cv=none; b=gdXF32D0EehYqWyOttD8d5vpnejmLe4Idq6VF4MV58gBbVUT7NLUdWJkc1ImraVDlYavdYyB+Dt3yqdYO9n0NLcgb0kRNSAEOchliSHR+R+CQL2yGl8/BLyRVzkLo9SErm+eyg96rTTD62Dz3Xv5YjHnwYDHSOt6ROLd3VxTmp0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764530919; c=relaxed/simple;
+	bh=/3NtXpBqqkX2KBuXqBLrK+wVLh+0QKXcA4PpwZOodL8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H+swYmOdiFfRVM7wrfkDG3lg/7DVSuiL88+vBeJhLu5q7uSs519JU8bBs3iwRTTXUcQQHncT2RA4KbsRwb3f2mkFvP78k8W4ry4nhbiq5UhtuoC26xTth5GJT/Nxep/UGEK+VqHkL5VS3yBzl/2hJTzl4EuNU+1UXHhgfXAHj74=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=OLtF7Q7a; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=kgMmZk+2; arc=pass smtp.client-ip=85.215.255.23
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
-ARC-Seal: i=1; a=rsa-sha256; t=1764529789; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=ixDL2hvWIhWsizWncy/v7JLtTyzPCuLgggCUoN/efMZ04K+5hd/bfYLsiEvTuwhoVW
-    ylUB1h2ylz2L9ZTNMm3/C7PqO8NysTORISKjNrg4PVEf7F5YM2t2zu89GzS5ck/iPFgS
-    qGT25eqG3Yu0xK1YAtQFTUviOs4Syo9mG+wLsiTGW8f54IlE0czO1tdOGyn7neDbewB6
-    EWxt6Gp/bs87/iA74+eP3DIyQatb1VClkyJ35ZJUzqszRHbrOJv7XdvdRnUGCZ4JsfiA
-    UyO8Xo/WjSDKG3JqXJCEtwCFFIxD+OUMWdFq19Ih/F0hyYtBX2lAkGQbX9tq2Q18E8yh
-    7Caw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1764529789;
-    s=strato-dkim-0002; d=strato.com;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=H/U65BYu8VYVK/POJqt3lDI2a7KF/fLhF+u64QoDvLo=;
-    b=sB2rqDJjomM+sb92qWVDjalA2L0YHJsKqiibDBlNV1sMru1+4gP1d/t4H6DxQ8w8/b
-    9dxYgrEEE/2eSa3ZEfTacyzZVSRVh+J1vBT0OLsn7AS86z2XBjY7mGNA307rLOgd33Zp
-    DE1LfsWVsSIq7j6S9ihF0wqNNuikl4Y/4lR0jeQzm/8XlSNmCla55oTdDZp4CjhGiuN7
-    DkbUprPFx6XVItTeotzB+QdrIWBZRoL990klGdKqbAJo8mDIlDw0fZo36THwLFDkZ4ro
-    xSWVkCcQ596QohpoPFPYIZAnSkKQtCQV5vn9F6Ezit2sI2eieOTHhpBZh0kA2g1AxFmH
-    9maA==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo00
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1764529789;
-    s=strato-dkim-0002; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=H/U65BYu8VYVK/POJqt3lDI2a7KF/fLhF+u64QoDvLo=;
-    b=OLtF7Q7a61bNi32IXljB7S7kl7DmPsETgRdMBuWZ5q422S7DrpFksrCyy/bGe7Frtd
-    RQk4hPThhR4uslOKAENmHX4DtiOy+Ptd/wCqtu/BKkIQm+UTW4LewjPXSUEq7VfAajbZ
-    s721xAKrwvclNsDSjs+2DwNPnkQw6WFo862Jm97HKmbD+4BOdN5Oe0m4eD4kH/RGx4pU
-    ioC5rKXsSMgxFhpe67v2kT3XQHoSy0ZeyCSEt+R+4eOlFS8nOIIH57u9/CqR0/ZFeh7O
-    dclor7mmKIsA4QnQvS+ogW6K+/+zHLvDDI6TfIRjv7x74hRtxTHJ2MfnhfQMh//6/09+
-    8rGA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1764529789;
-    s=strato-dkim-0003; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=H/U65BYu8VYVK/POJqt3lDI2a7KF/fLhF+u64QoDvLo=;
-    b=kgMmZk+2Hz8J0KGSSNMcf8tJ3Ccwn92rpl69PPNaqSiO6dew0BvkAMWOU5LLxT+5RP
-    MSggb39h1SnX8PtPeUDA==
-X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tTUsMrZpkO3Mw3lZ/t54cFxeEQ7s8bGWj0Q=="
-Received: from [IPV6:2a00:6020:4a38:6810::9f3]
-    by smtp.strato.de (RZmta 54.0.0 AUTH)
-    with ESMTPSA id Ke2b461AUJ9nnJw
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Sun, 30 Nov 2025 20:09:49 +0100 (CET)
-Message-ID: <d6077d36-93ed-4a6d-9eed-42b1b22cdffb@hartkopp.net>
-Date: Sun, 30 Nov 2025 20:09:48 +0100
+	 In-Reply-To:Content-Type; b=ah1zMYtEk2BVmggwpoKjjvsfUbG9hTVlbtwl23dRE0/wesncZ8/3F5+5nVGX7kVrUyluRuArUAhtlLMvPj78BiHeVxvC1+v/NNEJl/E31xKiQNsHd3wE8S8TztoZ17vJh6sNfgcVt3vslz6lfOWQogH7hx3+i811ke5j9NGspz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [10.0.57.174] (unknown [62.214.191.67])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id E3DE261CC3FDB;
+	Sun, 30 Nov 2025 20:27:25 +0100 (CET)
+Message-ID: <e765a7ca-c3dc-49cc-a8a5-de6c0fa58f2f@molgen.mpg.de>
+Date: Sun, 30 Nov 2025 20:27:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,148 +45,236 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Question about to KMSAN: uninit-value in can_receive
-To: Prithvi Tambewagh <activprithvi@gmail.com>,
- Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: linux-can@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzkaller-bugs@googlegroups.com, netdev@vger.kernel.org
-References: <20251117173012.230731-1-activprithvi@gmail.com>
- <0c98b1c4-3975-4bf5-9049-9d7f10d22a6d@hartkopp.net>
- <c2cead0a-06ed-4da4-a4e4-8498908aae3e@hartkopp.net>
- <aSx++4VrGOm8zHDb@inspiron>
+Subject: Re: [Intel-wired-lan] [PATCH net v2] i40e: fix ptp time increment
+ while link is down
+To: =?UTF-8?Q?Markus_Bl=C3=B6chl?= <markus@blochl.de>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Jacob Keller <jacob.e.keller@intel.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
+ =?UTF-8?Q?Markus_Bl=C3=B6chl?= <markus.bloechl@ipetronik.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20251130-i40e_ptp_link_down-v2-1-8d6dfc10a661@blochl.de>
 Content-Language: en-US
-From: Oliver Hartkopp <socketcan@hartkopp.net>
-In-Reply-To: <aSx++4VrGOm8zHDb@inspiron>
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20251130-i40e_ptp_link_down-v2-1-8d6dfc10a661@blochl.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Prithvi,
+Dear Markus,
 
-On 30.11.25 18:29, Prithvi Tambewagh wrote:
-> On Sun, Nov 30, 2025 at 01:44:32PM +0100, Oliver Hartkopp wrote:
 
->>> shall I send this patch upstream and mention your name in 
->> Suggested-by tag?
->>
->> No. Neither of that - as it will not fix the root cause.
->>
->> IMO we need to check who is using the headroom in CAN skbs and for 
->> what reason first. And when we are not able to safely control the 
->> headroom for our struct can_skb_priv content we might need to find 
->> another way to store that content.
->> E.g. by creating this space behind skb->data or add new attributes to 
->> struct sk_buff.
+Thank you for the patch.
+
+Am 30.11.25 um 16:23 schrieb Markus Blöchl:
+> When an X710 ethernet port with an active ptp daemon (like the ptp4l and
+> phc2sys combo) suddenly loses its link and regains it after a while, the
+> ptp daemon has a hard time to recover synchronization and sometimes
+> entirely fails to do so.
 > 
-> I will work in this direction. Just to confirm, what you mean is
-> that first it should be checked where the headroom is used while also
-> checking whether the data from region covered by struct can_skb_priv is 
-> intact, and if not then we need to ensure that it is intact by other 
-> measures, right?
+> The issue seems to be related to a wrongly configured increment while the
+> link is down. This could not be observed with the Intel reference driver.
+> We identified the fix to appear in Intels official ethernet-linux-i40e
 
-I have added skb_dump(KERN_WARNING, skb, true) in my local dummy_can.c
-an sent some CAN frames with cansend.
+Intel’s
 
-CAN CC:
+> release version 2.17.4.
+> 
+> Include the relevant changes in the kernel version of this driver.
+> 
+> Fixes: beb0dff1251d ("i40e: enable PTP")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Markus Blöchl <markus@blochl.de>
+> ---
+> Tested with an X710 at 10G link speed and kernel version 6.12.42.
 
-[ 3351.708018] skb len=16 headroom=16 headlen=16 tailroom=288
-                mac=(16,0) mac_len=0 net=(16,0) trans=16
-                shinfo(txflags=0 nr_frags=0 gso(size=0 type=0 segs=0))
-                csum(0x0 start=0 offset=0 ip_summed=1 complete_sw=0 
-valid=0 level=0)
-                hash(0x0 sw=0 l4=0) proto=0x000c pkttype=5 iif=0
-                priority=0x0 mark=0x0 alloc_cpu=5 vlan_all=0x0
-                encapsulation=0 inner(proto=0x0000, mac=0, net=0, trans=0)
-[ 3351.708151] dev name=can0 feat=0x0000000000004008
-[ 3351.708159] sk family=29 type=3 proto=0
-[ 3351.708166] skb headroom: 00000000: 07 00 00 00 00 00 00 00 00 00 00 
-00 00 00 00 00
-[ 3351.708173] skb linear:   00000000: 23 01 00 00 04 00 00 00 11 22 33 
-44 00 00 00 00
+I’d really appreciate it, if you put the in the commit message above, 
+and if you provided exact steps for reproducing this in the commit message.
 
-(..)
+> ---
+> Changes in v2:
+> - Fix kdoc and code formatting
+> - Rebase onto net tree
+> - Link to v1: https://lore.kernel.org/r/20251119-i40e_ptp_link_down-v1-1-b351fed254b3@blochl.de
+> ---
+>   drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h |  9 +++
+>   drivers/net/ethernet/intel/i40e/i40e_ptp.c        | 69 +++++++++++++++++++++--
+>   drivers/net/ethernet/intel/i40e/i40e_register.h   |  9 +++
+>   drivers/net/ethernet/intel/i40e/i40e_type.h       |  8 +++
+>   4 files changed, 90 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h b/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h
+> index cc02a85ad42b..ec176e9569ad 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_adminq_cmd.h
+> @@ -1488,6 +1488,15 @@ enum i40e_aq_link_speed {
+>   	I40E_LINK_SPEED_25GB	= BIT(I40E_LINK_SPEED_25GB_SHIFT),
+>   };
+>   
+> +enum i40e_prt_mac_pcs_link_speed {
+> +	I40E_PRT_MAC_PCS_LINK_SPEED_UNKNOWN = 0,
+> +	I40E_PRT_MAC_PCS_LINK_SPEED_100MB,
+> +	I40E_PRT_MAC_PCS_LINK_SPEED_1GB,
+> +	I40E_PRT_MAC_PCS_LINK_SPEED_10GB,
+> +	I40E_PRT_MAC_PCS_LINK_SPEED_40GB,
+> +	I40E_PRT_MAC_PCS_LINK_SPEED_20GB
+> +};
+> +
+>   struct i40e_aqc_module_desc {
+>   	u8 oui[3];
+>   	u8 reserved1;
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_ptp.c b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
+> index 33535418178b..89abe2f22216 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_ptp.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
+> @@ -847,6 +847,66 @@ void i40e_ptp_rx_hwtstamp(struct i40e_pf *pf, struct sk_buff *skb, u8 index)
+>   	i40e_ptp_convert_to_hwtstamp(skb_hwtstamps(skb), ns);
+>   }
+>   
+> +/**
+> + * i40e_ptp_get_link_speed_hw - get the link speed
+> + * @pf: Board private structure
+> + *
+> + * Calculate link speed depending on the link status.
+> + *
+> + * Return: current link speed.
+> + **/
+> +static enum i40e_aq_link_speed i40e_ptp_get_link_speed_hw(struct i40e_pf *pf)
+> +{
+> +	bool link_up = pf->hw.phy.link_info.link_info & I40E_AQ_LINK_UP;
+> +	enum i40e_aq_link_speed link_speed = I40E_LINK_SPEED_UNKNOWN;
+> +	struct i40e_hw *hw = &pf->hw;
+> +
+> +	if (link_up) {
+> +		struct i40e_link_status *hw_link_info = &hw->phy.link_info;
+> +
+> +		i40e_aq_get_link_info(hw, true, NULL, NULL);
+> +		link_speed = hw_link_info->link_speed;
+> +	} else {
+> +		enum i40e_prt_mac_link_speed prtmac_linksta;
+> +		u64 prtmac_pcs_linksta;
+> +
+> +		prtmac_linksta = (rd32(hw, I40E_PRTMAC_LINKSTA(0)) &
+> +				  I40E_PRTMAC_LINKSTA_MAC_LINK_SPEED_MASK) >>
+> +				  I40E_PRTMAC_LINKSTA_MAC_LINK_SPEED_SHIFT;
+> +		if (prtmac_linksta == I40E_PRT_MAC_LINK_SPEED_40GB) {
+> +			link_speed = I40E_LINK_SPEED_40GB;
+> +		} else {
+> +			i40e_aq_debug_read_register(hw,
+> +						    I40E_PRTMAC_PCS_LINK_STATUS1(0),
+> +						    &prtmac_pcs_linksta,
+> +						    NULL);
+> +
+> +			prtmac_pcs_linksta = (prtmac_pcs_linksta &
+> +					      I40E_PRTMAC_PCS_LINK_STATUS1_LINK_SPEED_MASK) >>
+> +					      I40E_PRTMAC_PCS_LINK_STATUS1_LINK_SPEED_SHIFT;
+> +
+> +			switch (prtmac_pcs_linksta) {
+> +			case I40E_PRT_MAC_PCS_LINK_SPEED_100MB:
+> +				link_speed = I40E_LINK_SPEED_100MB;
+> +				break;
+> +			case I40E_PRT_MAC_PCS_LINK_SPEED_1GB:
+> +				link_speed = I40E_LINK_SPEED_1GB;
+> +				break;
+> +			case I40E_PRT_MAC_PCS_LINK_SPEED_10GB:
+> +				link_speed = I40E_LINK_SPEED_10GB;
+> +				break;
+> +			case I40E_PRT_MAC_PCS_LINK_SPEED_20GB:
+> +				link_speed = I40E_LINK_SPEED_20GB;
+> +				break;
+> +			default:
+> +				link_speed = I40E_LINK_SPEED_UNKNOWN;
+> +			}
+> +		}
+> +	}
+> +
+> +	return link_speed;
+> +}
+> +
+>   /**
+>    * i40e_ptp_set_increment - Utility function to update clock increment rate
+>    * @pf: Board private structure
+> @@ -857,16 +917,14 @@ void i40e_ptp_rx_hwtstamp(struct i40e_pf *pf, struct sk_buff *skb, u8 index)
+>    **/
+>   void i40e_ptp_set_increment(struct i40e_pf *pf)
+>   {
+> -	struct i40e_link_status *hw_link_info;
+> +	enum i40e_aq_link_speed link_speed;
+>   	struct i40e_hw *hw = &pf->hw;
+>   	u64 incval;
+>   	u32 mult;
+>   
+> -	hw_link_info = &hw->phy.link_info;
+> +	link_speed = i40e_ptp_get_link_speed_hw(pf);
+>   
+> -	i40e_aq_get_link_info(&pf->hw, true, NULL, NULL);
+> -
+> -	switch (hw_link_info->link_speed) {
+> +	switch (link_speed) {
 
-CAN FD:
+Excuse my ignorance, but could you or the Intel authors explain in the 
+commit message, why `hw_link_info->link_speed` is incorrect?
 
-[ 3557.069471] skb len=72 headroom=16 headlen=72 tailroom=232
-                mac=(16,0) mac_len=0 net=(16,0) trans=16
-                shinfo(txflags=0 nr_frags=0 gso(size=0 type=0 segs=0))
-                csum(0x0 start=0 offset=0 ip_summed=1 complete_sw=0 
-valid=0 level=0)
-                hash(0x0 sw=0 l4=0) proto=0x000d pkttype=5 iif=0
-                priority=0x0 mark=0x0 alloc_cpu=6 vlan_all=0x0
-                encapsulation=0 inner(proto=0x0000, mac=0, net=0, trans=0)
-[ 3557.069499] dev name=can0 feat=0x0000000000004008
-[ 3557.069507] sk family=29 type=3 proto=0
-[ 3557.069513] skb headroom: 00000000: 07 00 00 00 00 00 00 00 00 00 00 
-00 00 00 00 00
-[ 3557.069520] skb linear:   00000000: 33 03 00 00 10 05 00 00 00 11 22 
-33 44 55 66 77
-[ 3557.069526] skb linear:   00000010: 88 aa bb cc dd ee ff 00 00 00 00 
-00 00 00 00 00
+>   	case I40E_LINK_SPEED_10GB:
+>   		mult = I40E_PTP_10GB_INCVAL_MULT;
+>   		break;
+> @@ -909,6 +967,7 @@ void i40e_ptp_set_increment(struct i40e_pf *pf)
+>   	/* Update the base adjustement value. */
+>   	WRITE_ONCE(pf->ptp_adj_mult, mult);
+>   	smp_mb(); /* Force the above update. */
+> +	i40e_ptp_set_1pps_signal_hw(pf);
 
-(..)
+ From the commit message, I would have thought, only this line would be 
+needed.
 
-CAN XL:
+>   }
+>   
+>   /**
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_register.h b/drivers/net/ethernet/intel/i40e/i40e_register.h
+> index 432afbb64201..c4051dbcc297 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_register.h
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_register.h
+> @@ -530,6 +530,15 @@
+>   #define I40E_PRTMAC_HSEC_CTL_TX_PAUSE_REFRESH_TIMER_SHIFT 0
+>   #define I40E_PRTMAC_HSEC_CTL_TX_PAUSE_REFRESH_TIMER_MASK I40E_MASK(0xFFFF, \
+>   	I40E_PRTMAC_HSEC_CTL_TX_PAUSE_REFRESH_TIMER_SHIFT)
+> +/* _i=0...3 */ /* Reset: GLOBR */
+> +#define I40E_PRTMAC_PCS_LINK_STATUS1(_i) (0x0008C200 + ((_i) * 4))
+> +#define I40E_PRTMAC_PCS_LINK_STATUS1_LINK_SPEED_SHIFT 24
+> +#define I40E_PRTMAC_PCS_LINK_STATUS1_LINK_SPEED_MASK I40E_MASK(0x7, I40E_PRTMAC_PCS_LINK_STATUS1_LINK_SPEED_SHIFT)
+> +#define I40E_PRTMAC_PCS_LINK_STATUS2 0x0008C220
+> +/* _i=0...3 */ /* Reset: GLOBR */
+> +#define I40E_PRTMAC_LINKSTA(_i) (0x001E2420 + ((_i) * 4))
+> +#define I40E_PRTMAC_LINKSTA_MAC_LINK_SPEED_SHIFT 27
+> +#define I40E_PRTMAC_LINKSTA_MAC_LINK_SPEED_MASK I40E_MASK(0x7, I40E_PRTMAC_LINKSTA_MAC_LINK_SPEED_SHIFT)
+>   #define I40E_GLNVM_FLA 0x000B6108 /* Reset: POR */
+>   #define I40E_GLNVM_FLA_LOCKED_SHIFT 6
+>   #define I40E_GLNVM_FLA_LOCKED_MASK I40E_MASK(0x1, I40E_GLNVM_FLA_LOCKED_SHIFT)
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_type.h b/drivers/net/ethernet/intel/i40e/i40e_type.h
+> index ed8bbdb586da..98c8c5709e5f 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_type.h
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_type.h
+> @@ -115,6 +115,14 @@ enum i40e_queue_type {
+>   	I40E_QUEUE_TYPE_UNKNOWN
+>   };
+>   
+> +enum i40e_prt_mac_link_speed {
+> +	I40E_PRT_MAC_LINK_SPEED_100MB = 0,
+> +	I40E_PRT_MAC_LINK_SPEED_1GB,
+> +	I40E_PRT_MAC_LINK_SPEED_10GB,
+> +	I40E_PRT_MAC_LINK_SPEED_40GB,
+> +	I40E_PRT_MAC_LINK_SPEED_20GB
+> +};
+> +
+>   struct i40e_link_status {
+>   	enum i40e_aq_phy_type phy_type;
+>   	enum i40e_aq_link_speed link_speed;
 
-[ 5477.498205] skb len=908 headroom=16 headlen=908 tailroom=804
-                mac=(16,0) mac_len=0 net=(16,0) trans=16
-                shinfo(txflags=0 nr_frags=0 gso(size=0 type=0 segs=0))
-                csum(0x0 start=0 offset=0 ip_summed=1 complete_sw=0 
-valid=0 level=0)
-                hash(0x0 sw=0 l4=0) proto=0x000e pkttype=5 iif=0
-                priority=0x0 mark=0x0 alloc_cpu=6 vlan_all=0x0
-                encapsulation=0 inner(proto=0x0000, mac=0, net=0, trans=0)
-[ 5477.498236] dev name=can0 feat=0x0000000000004008
-[ 5477.498244] sk family=29 type=3 proto=0
-[ 5477.498251] skb headroom: 00000000: 07 00 00 00 00 00 00 00 00 00 00 
-00 00 00 00 00
-[ 5477.498258] skb linear:   00000000: b0 05 92 00 81 cd 80 03 cd b4 92 
-58 4c a1 f6 0c
-[ 5477.498264] skb linear:   00000010: 1a c9 6d 0a 4c a1 f6 0c 1a c9 6d 
-0a 4c a1 f6 0c
-[ 5477.498269] skb linear:   00000020: 1a c9 6d 0a 4c a1 f6 0c 1a c9 6d 
-0a 4c a1 f6 0c
-[ 5477.498275] skb linear:   00000030: 1a c9 6d 0a 4c a1 f6 0c 1a c9 6d 
-0a 4c a1 f6 0c
 
+Kind regards,
 
-I will also add skb_dump(KERN_WARNING, skb, true) in the CAN receive 
-path to see what's going on there.
-
-My main problem with the KMSAN message
-https://lore.kernel.org/linux-can/68bae75b.050a0220.192772.0190.GAE@google.com/
-is that it uses
-
-NAPI, XDP and therefore pskb_expand_head():
-
-  kmalloc_reserve+0x23e/0x4a0 net/core/skbuff.c:609
-  pskb_expand_head+0x226/0x1a60 net/core/skbuff.c:2275
-  netif_skb_check_for_xdp net/core/dev.c:5081 [inline]
-  netif_receive_generic_xdp net/core/dev.c:5112 [inline]
-  do_xdp_generic+0x9e3/0x15a0 net/core/dev.c:5180
-  __netif_receive_skb_core+0x25c3/0x6f10 net/core/dev.c:5524
-  __netif_receive_skb_one_core net/core/dev.c:5702 [inline]
-  __netif_receive_skb+0xca/0xa00 net/core/dev.c:5817
-  process_backlog+0x4ad/0xa50 net/core/dev.c:6149
-  __napi_poll+0xe7/0x980 net/core/dev.c:6902
-  napi_poll net/core/dev.c:6971 [inline]
-
-As you can see in
-https://syzkaller.appspot.com/x/log.txt?x=144ece64580000
-
-[pid  5804] socket(AF_CAN, SOCK_DGRAM, CAN_ISOTP) = 5
-[pid  5804] ioctl(5, SIOCGIFINDEX, {ifr_name="vxcan0", ifr_ifindex=20}) = 0
-
-they are using the vxcan driver which is mainly derived from vcan.c and 
-veth.c (~2017). The veth.c driver supports all those GRO, NAPI and XDP 
-features today which vxcan.c still does NOT support.
-
-Therefore I wonder how the NAPI and XDP code can be used together with 
-vxcan. And if this is still the case today, as the syzcaller kernel 
-6.13.0-rc7-syzkaller-00039-gc3812b15000c is already one year old.
-
-Many questions ...
-
-Best regards,
-Oliver
+Pul
 
