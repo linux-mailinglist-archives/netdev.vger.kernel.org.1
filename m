@@ -1,68 +1,52 @@
-Return-Path: <netdev+bounces-242835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1979BC9545C
-	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 21:17:51 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48CB5C95465
+	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 21:30:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 52C753424DD
-	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 20:17:50 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B1AEA341FE3
+	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 20:30:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A63B1221545;
-	Sun, 30 Nov 2025 20:17:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jTLmQRdf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E881219319;
+	Sun, 30 Nov 2025 20:30:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37BF97640E;
-	Sun, 30 Nov 2025 20:17:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D262213254
+	for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 20:30:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764533866; cv=none; b=enlxHkNBIr54bD/3xY+kb1l7bzxja8eQOFn/u7MmerrySPs31hV5rg5A1jgfiEYjGxRz22uVWKUOdNOsoYbGwnkCp/0DqrwjmXyMqWfVPvf1J8TIr3fWwOz20SoGSoMyhpNnfbcKOZknayRKpdqwJPBGVWOto2USEfczo+Fs+8I=
+	t=1764534643; cv=none; b=nQNhaAhMlpLbKOe7femelfJimKOLeK/jBJX70inxKeuiGBTGgtNffrFgV+w5Utw17fN7+7JgquRDQY72haR2ih0P1lgOWfCjWTqRDAdfZwUyDJFVtAifz9Y4TrIyRiGC6zCXX54OEWvqsOCcEceNiwfjzK1xw/+0cPwZ0mq1qMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764533866; c=relaxed/simple;
-	bh=DYRAh9KflgXV1PkjrqXZyEYkWix4qtvJ4wy1cspUhKs=;
+	s=arc-20240116; t=1764534643; c=relaxed/simple;
+	bh=wxDHYGASRkYEzgGWn/OKmQaGs6C8SuYjkQ2scIIJGo4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=khxzQgpt1MsWBynRXcnFVDEDIN/NHs5cD/VEtDjtE0DjtKCMZDpljc1rzdPPyK57UUlbKDkWKjTl34jq1/G9e3FTH6jVo18TkoC5FlybRz76TFHHkmLSEJSn+R8Q9wzR94pa7gOaJEdIPWecqSKOS4zTwVA6Ggrh+79/0SjP6GM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jTLmQRdf; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=TMeL4JyWTglPNStJrCnRRegNxn7l/H0tOrgAzvtGHzw=; b=jTLmQRdf4HJhzV66zMbIIGcOdK
-	tId1vBslJDT5vLxueql2nfF37y4DcGRxg9XZzVq39KHCFivb6Wss3r05d3u42f6zeYCNL8m4ZdVzC
-	vnmIDC1OUSjYLAF0q0O1/cJR76fWo7sltq7jsWObxvu3GpoHrxbP9zO7Cq13IjSaF7MU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vPnrH-00FTH9-QN; Sun, 30 Nov 2025 21:17:23 +0100
-Date: Sun, 30 Nov 2025 21:17:23 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Chen Minqiang <ptpt52@gmail.com>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=cEK4SQFY20DQVIUxmp11KvfS+EzTbtp3fN2AQe6Vzlujux2RKpmDQsBPd2CDgw3K3e0j1lPbK4P7Y9KAScMgqsqIV2WVW+U1aIj089FoJxZNb3kITFbVC3cUFiPOzbbenuS/KQUoxMUwiCs36/iV93NMec7DYxLfzhwPoEJFiq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1vPo3z-000000001g3-1U3v;
+	Sun, 30 Nov 2025 20:30:31 +0000
+Date: Sun, 30 Nov 2025 20:30:22 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
 	"Chester A. Unal" <chester.a.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
 	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v3 2/2] net: dsa: mt7530: Use GPIO polarity to generate
- correct reset sequence
-Message-ID: <3fbc4e67-b931-421c-9d83-2214aaa2f6ed@lunn.ch>
-References: <20251129234603.2544-1-ptpt52@gmail.com>
- <20251129234603.2544-2-ptpt52@gmail.com>
- <0675b35f-217d-4261-9e3f-2eb24753d43c@lunn.ch>
- <20251130080731.ty2dlxaypxvodxiw@skbuf>
+	Sean Wang <sean.wang@mediatek.com>
+Subject: Re: [PATCH net-next 01/15] net: dsa: mt7530: unexport
+ mt7530_switch_ops
+Message-ID: <aSypSUayaaCMgAkH@makrotopia.org>
+References: <20251130131657.65080-1-vladimir.oltean@nxp.com>
+ <20251130131657.65080-2-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,40 +55,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251130080731.ty2dlxaypxvodxiw@skbuf>
+In-Reply-To: <20251130131657.65080-2-vladimir.oltean@nxp.com>
 
-On Sun, Nov 30, 2025 at 10:07:31AM +0200, Vladimir Oltean wrote:
-> On Sun, Nov 30, 2025 at 02:11:05AM +0100, Andrew Lunn wrote:
-> > > -		gpiod_set_value_cansleep(priv->reset, 0);
-> > > +		int is_active_low = !!gpiod_is_active_low(priv->reset);
-> > > +		gpiod_set_value_cansleep(priv->reset, is_active_low);
-> > 
-> > I think you did not correctly understand what Russell said. You pass
-> > the logical value to gpiod_set_value(). If the GPIO has been marked as
-> > active LOW, the GPIO core will invert the logical values to the raw
-> > value. You should not be using gpiod_is_active_low().
-> > 
-> > But as i said to the previous patch, i would just leave everything as
-> > it is, except document the issue.
-> > 
-> > 	Andrew
-> > 
+On Sun, Nov 30, 2025 at 03:16:43PM +0200, Vladimir Oltean wrote:
+> Commit cb675afcddbb ("net: dsa: mt7530: introduce separate MDIO driver")
+> exported mt7530_switch_ops for use from mt7530-mmio.c. Later in the
+> patch set, mt7530-mmio.c used mt7530_probe_common() to access the
+> mt7530_switch_ops still from mt7530.c - see commit 110c18bfed41 ("net:
+> dsa: mt7530: introduce driver for MT7988 built-in switch").
 > 
-> It was my suggestion to do it like this (but I don't understand why I'm
-> again not in CC).
+> This proves that exporting mt7530_switch_ops was unnecessary, so
+> unexport it back.
 > 
-> We _know_ that the reset pin of the switch should be active low. So by
-> using gpiod_is_active_low(), we can determine whether the device tree is
-> wrong or not, and we can work with a wrong device tree too (just invert
-> the logical values).
+> Cc: "Chester A. Unal" <chester.a.unal@arinc9.com>
+> Cc: Daniel Golle <daniel@makrotopia.org>
+> Cc: DENG Qingfang <dqfext@gmail.com>
+> Cc: Sean Wang <sean.wang@mediatek.com>
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-Assuming there is not a NOT gate placed between the GPIO and the reset
-pin, because the board designer decided to do that for some reason?
+Reviewed-by: Daniel Golle <daniel@makrotopia.org>
+Acked-by: Daniel Golle <daniel@makrotopia.org>
 
-So lets work on the commit message some more, but i'm still not
-convinced it is worth the effort, unless there is some board today
-which really is broken and cannot be fixed unless a change like this
-is made.
-
-	Andrew
+> ---
+>  drivers/net/dsa/mt7530.c | 3 +--
+>  drivers/net/dsa/mt7530.h | 1 -
+>  2 files changed, 1 insertion(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+> index 548b85befbf4..1acb57002014 100644
+> --- a/drivers/net/dsa/mt7530.c
+> +++ b/drivers/net/dsa/mt7530.c
+> @@ -3254,7 +3254,7 @@ static int mt7988_setup(struct dsa_switch *ds)
+>  	return mt7531_setup_common(ds);
+>  }
+>  
+> -const struct dsa_switch_ops mt7530_switch_ops = {
+> +static const struct dsa_switch_ops mt7530_switch_ops = {
+>  	.get_tag_protocol	= mtk_get_tag_protocol,
+>  	.setup			= mt753x_setup,
+>  	.preferred_default_local_cpu_port = mt753x_preferred_default_local_cpu_port,
+> @@ -3291,7 +3291,6 @@ const struct dsa_switch_ops mt7530_switch_ops = {
+>  	.conduit_state_change	= mt753x_conduit_state_change,
+>  	.port_setup_tc		= mt753x_setup_tc,
+>  };
+> -EXPORT_SYMBOL_GPL(mt7530_switch_ops);
+>  
+>  static const struct phylink_mac_ops mt753x_phylink_mac_ops = {
+>  	.mac_select_pcs	= mt753x_phylink_mac_select_pcs,
+> diff --git a/drivers/net/dsa/mt7530.h b/drivers/net/dsa/mt7530.h
+> index 7e47cd9af256..3e0090bed298 100644
+> --- a/drivers/net/dsa/mt7530.h
+> +++ b/drivers/net/dsa/mt7530.h
+> @@ -939,7 +939,6 @@ static inline void INIT_MT7530_DUMMY_POLL(struct mt7530_dummy_poll *p,
+>  int mt7530_probe_common(struct mt7530_priv *priv);
+>  void mt7530_remove_common(struct mt7530_priv *priv);
+>  
+> -extern const struct dsa_switch_ops mt7530_switch_ops;
+>  extern const struct mt753x_info mt753x_table[];
+>  
+>  #endif /* __MT7530_H */
+> -- 
+> 2.34.1
+> 
 
