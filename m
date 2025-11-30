@@ -1,165 +1,236 @@
-Return-Path: <netdev+bounces-242831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63FC7C95335
-	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 19:16:53 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3050EC953AF
+	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 20:10:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id DD31A3421B9
-	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 18:16:52 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D6CB24E01E8
+	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 19:09:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94E092C0260;
-	Sun, 30 Nov 2025 18:16:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF12D27FB1C;
+	Sun, 30 Nov 2025 19:09:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KkkABKgO"
+	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="OLtF7Q7a";
+	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="kgMmZk+2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mo4-p00-ob.smtp.rzone.de (mo4-p00-ob.smtp.rzone.de [85.215.255.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE59B285C99
-	for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 18:16:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764526610; cv=none; b=tnznti78i9Pn34fCxoX7NGho1C+pujJKnMjVjO1SLJwO1rMh6Qz0Ugt8BPSFt3mPAG0YiqiXkxqK9wWzMJ+Lzj2ZQqDE+89sR0jmsbg0wpwtH2ayf741HUmQSSdabrqWhXLloUBfzwI071VfQJzS0ZBAPBZ3VhFDFhxKwELzjVA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764526610; c=relaxed/simple;
-	bh=KvguCsz4pFutF0DfQ4yn73w4b9PB3j46YC5jFCOIPbI=;
-	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=ZV5FTjSma1GFFllob/9p9sLUm10wPXFsBzaH5JLL3/iYFet8TOeOiOzxIgZBhH6jNFLt4VfrOW04fuWxk8p0bSmHKBzHdg3+ebZEPSzAdsS4kCzK/+kggmEJbJPXhrt6bML8J/JRWhFxP0OBWtQIw67vCoMEjWjdOmXJUaT8OEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KkkABKgO; arc=none smtp.client-ip=74.125.224.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-640d0895d7cso4299465d50.1
-        for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 10:16:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764526608; x=1765131408; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JyAdI2hiDQd5HiIOsukC026FiEA0dW/JcjYmFaMww+Q=;
-        b=KkkABKgO3i88qTaPEM8l4qF0qVQb2Oc83BM9rlYPGe6aEwWoQk123eSP/qOL5VkvoT
-         E4dmxtIWk/0xbe+d+bzyYeGwnhpcpHZsoEGPmH5hySMmmJzY2Bgnp7D7BRW5mClEBjOT
-         sRLDyOA0f+VmAPmyWKsCLRMXNOvjWG00sZIJHX5/XTu1EfDgvx7CbpXsOsHXUdu83Zaq
-         bdwvnjyz9ZW6ZBEg6GC3ThYkdExYlDGb4aqnNL8olod4IdW8CDxGT+0eMdzGBduAvJMN
-         1dlUee4gJ7YdZ9jtpFDb/pxtjAaQIO+Z27wL4RZSrsedGsly/OeAqaR0cKNjMQ+qVfL0
-         Jw9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764526608; x=1765131408;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=JyAdI2hiDQd5HiIOsukC026FiEA0dW/JcjYmFaMww+Q=;
-        b=GDEBwzOK9DpF1FXGaXkOxVx4bt1elWacjvPc/C9oKJ8QKQNh7LSyO3Sj7rbRXAT5hi
-         wFshOhKm4H3NjMWUEmjJrUuLde3EFMEPnAz/aXS62vgwSN/SXrDDG/HHdnCKnQK0gbGp
-         F6Yoo4PC2fdB9tJHDbkNAD8KCzBTK9ihDQUiPrphM3fSZ50tcOr38U6iCbEKTObQhk++
-         4tA1PJZ/5/+lAMwEGrhtKj9St8nwlyW2/lEVDXDnbbtK03+YbtfUql/RlYweMbfr/47H
-         35LFFVyUcE//dTNmTdwF3z5BC5gsOjAVKjOx6PFxJ1MmdimIu/QgcAxtIMfBibDbsBdN
-         nDFA==
-X-Forwarded-Encrypted: i=1; AJvYcCXFxfZWfcZhvYfsOdcuC1EVLlAEwRiEyoOCOlVnM7vw357X1TZ9+KqZS5JOrmY65qNBirs1tIQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMgGEcN2jBjcMBdx5rPDxqzWBnVCPXtxPWELeCrF9WH0UKn3vY
-	9BKgXrvlegtg1r62wzWT4kqYGhp8VLwY6AcwHLEFlCkrGe05ho0XIj+r
-X-Gm-Gg: ASbGncvuKqOluX03dWSau990XdUiUHX3ZEmcmrn7zmBfOeZ3fd+0pdKM9YZGe7PD4le
-	KU+U2vpF+6mDOLLFWUlYgXMmO5vgpttkrwGs0MrvZkoDG4aXHoNwy7CHzyHuZLc0j2v2HONLDmH
-	Z7q2siJ7OYoHx7fJO0tKGhWL7afmsm6sOJtTIWcFn2adMc7m87lkDYkGGmJDjbgFWVYxX/6+8vP
-	b0DiPP0pi/5ooVit8nQraAa19/h2RYM/GFjnb3thWiycx7/Ubvb6syo1JnTYpkVwhXgvmvcnlOv
-	biBou2LNz+wLnZml3bB5oJGnQqZSxXLXVoIoQVqx3a0Zi8Xczs0tWSEOutKlPW60Ag28DZzX+SU
-	gAiJVPs1/px61qH9PzxROHeWmK7aIHiQuSUp8J1louluGRrL2zX4x4A1gS4YWU+5V7RcYH0eyS5
-	huhvHPyRSGwuJQyJ+OK/G9oTx1gWGFMy/UUIajvqeMPyK9h6Zqbme6/bfC/ovvFDRLkQ4=
-X-Google-Smtp-Source: AGHT+IGjUNSaNMlSY1qlNbQudRZSgfRbmbbf/B0rphetUkGqwnK/CkPwKVh/ASYpHjSaXoMyaE9Zng==
-X-Received: by 2002:a05:690e:1489:b0:63f:b1fd:3850 with SMTP id 956f58d0204a3-64302631797mr26472073d50.33.1764526607842;
-        Sun, 30 Nov 2025 10:16:47 -0800 (PST)
-Received: from gmail.com (116.235.236.35.bc.googleusercontent.com. [35.236.235.116])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-78ad1045723sm39215937b3.55.2025.11.30.10.16.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 30 Nov 2025 10:16:47 -0800 (PST)
-Date: Sun, 30 Nov 2025 13:16:46 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Simon Schippers <simon.schippers@tu-dortmund.de>, 
- willemdebruijn.kernel@gmail.com, 
- jasowang@redhat.com, 
- andrew+netdev@lunn.ch, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- mst@redhat.com, 
- eperezma@redhat.com, 
- jon@nutanix.com, 
- tim.gebauer@tu-dortmund.de, 
- simon.schippers@tu-dortmund.de, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- kvm@vger.kernel.org, 
- virtualization@lists.linux.dev
-Message-ID: <willemdebruijn.kernel.2ef79a77ca3ec@gmail.com>
-In-Reply-To: <20251120152914.1127975-3-simon.schippers@tu-dortmund.de>
-References: <20251120152914.1127975-1-simon.schippers@tu-dortmund.de>
- <20251120152914.1127975-3-simon.schippers@tu-dortmund.de>
-Subject: Re: [PATCH net-next v6 2/8] ptr_ring: add helper to check if consume
- created space
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58D7B36D510;
+	Sun, 30 Nov 2025 19:09:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.23
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764529795; cv=pass; b=o6+UH7xL1xyZMJ/SGG5j5uKKCj8e2zFTRBBuKfC8sH5khKj/lXXWMe99wsdu2y57IhePffO3KmqTRU4sWSvfAX7RBmF002NlI6aYg7y4KndAtcRj8/AnZ8vbQki66tfHvoVR+6JbzNFtx3uuykfZjjywsGUdKyc9845kUrZtXWk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764529795; c=relaxed/simple;
+	bh=UPiA3LE5hC+O2zConxOpW9nBiWBBe92XTpcFFFD+8gU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=H+swYmOdiFfRVM7wrfkDG3lg/7DVSuiL88+vBeJhLu5q7uSs519JU8bBs3iwRTTXUcQQHncT2RA4KbsRwb3f2mkFvP78k8W4ry4nhbiq5UhtuoC26xTth5GJT/Nxep/UGEK+VqHkL5VS3yBzl/2hJTzl4EuNU+1UXHhgfXAHj74=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=OLtF7Q7a; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=kgMmZk+2; arc=pass smtp.client-ip=85.215.255.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
+ARC-Seal: i=1; a=rsa-sha256; t=1764529789; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=ixDL2hvWIhWsizWncy/v7JLtTyzPCuLgggCUoN/efMZ04K+5hd/bfYLsiEvTuwhoVW
+    ylUB1h2ylz2L9ZTNMm3/C7PqO8NysTORISKjNrg4PVEf7F5YM2t2zu89GzS5ck/iPFgS
+    qGT25eqG3Yu0xK1YAtQFTUviOs4Syo9mG+wLsiTGW8f54IlE0czO1tdOGyn7neDbewB6
+    EWxt6Gp/bs87/iA74+eP3DIyQatb1VClkyJ35ZJUzqszRHbrOJv7XdvdRnUGCZ4JsfiA
+    UyO8Xo/WjSDKG3JqXJCEtwCFFIxD+OUMWdFq19Ih/F0hyYtBX2lAkGQbX9tq2Q18E8yh
+    7Caw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1764529789;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=H/U65BYu8VYVK/POJqt3lDI2a7KF/fLhF+u64QoDvLo=;
+    b=sB2rqDJjomM+sb92qWVDjalA2L0YHJsKqiibDBlNV1sMru1+4gP1d/t4H6DxQ8w8/b
+    9dxYgrEEE/2eSa3ZEfTacyzZVSRVh+J1vBT0OLsn7AS86z2XBjY7mGNA307rLOgd33Zp
+    DE1LfsWVsSIq7j6S9ihF0wqNNuikl4Y/4lR0jeQzm/8XlSNmCla55oTdDZp4CjhGiuN7
+    DkbUprPFx6XVItTeotzB+QdrIWBZRoL990klGdKqbAJo8mDIlDw0fZo36THwLFDkZ4ro
+    xSWVkCcQ596QohpoPFPYIZAnSkKQtCQV5vn9F6Ezit2sI2eieOTHhpBZh0kA2g1AxFmH
+    9maA==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo00
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1764529789;
+    s=strato-dkim-0002; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=H/U65BYu8VYVK/POJqt3lDI2a7KF/fLhF+u64QoDvLo=;
+    b=OLtF7Q7a61bNi32IXljB7S7kl7DmPsETgRdMBuWZ5q422S7DrpFksrCyy/bGe7Frtd
+    RQk4hPThhR4uslOKAENmHX4DtiOy+Ptd/wCqtu/BKkIQm+UTW4LewjPXSUEq7VfAajbZ
+    s721xAKrwvclNsDSjs+2DwNPnkQw6WFo862Jm97HKmbD+4BOdN5Oe0m4eD4kH/RGx4pU
+    ioC5rKXsSMgxFhpe67v2kT3XQHoSy0ZeyCSEt+R+4eOlFS8nOIIH57u9/CqR0/ZFeh7O
+    dclor7mmKIsA4QnQvS+ogW6K+/+zHLvDDI6TfIRjv7x74hRtxTHJ2MfnhfQMh//6/09+
+    8rGA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1764529789;
+    s=strato-dkim-0003; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=H/U65BYu8VYVK/POJqt3lDI2a7KF/fLhF+u64QoDvLo=;
+    b=kgMmZk+2Hz8J0KGSSNMcf8tJ3Ccwn92rpl69PPNaqSiO6dew0BvkAMWOU5LLxT+5RP
+    MSggb39h1SnX8PtPeUDA==
+X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tTUsMrZpkO3Mw3lZ/t54cFxeEQ7s8bGWj0Q=="
+Received: from [IPV6:2a00:6020:4a38:6810::9f3]
+    by smtp.strato.de (RZmta 54.0.0 AUTH)
+    with ESMTPSA id Ke2b461AUJ9nnJw
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Sun, 30 Nov 2025 20:09:49 +0100 (CET)
+Message-ID: <d6077d36-93ed-4a6d-9eed-42b1b22cdffb@hartkopp.net>
+Date: Sun, 30 Nov 2025 20:09:48 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: Question about to KMSAN: uninit-value in can_receive
+To: Prithvi Tambewagh <activprithvi@gmail.com>,
+ Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: linux-can@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com, netdev@vger.kernel.org
+References: <20251117173012.230731-1-activprithvi@gmail.com>
+ <0c98b1c4-3975-4bf5-9049-9d7f10d22a6d@hartkopp.net>
+ <c2cead0a-06ed-4da4-a4e4-8498908aae3e@hartkopp.net>
+ <aSx++4VrGOm8zHDb@inspiron>
+Content-Language: en-US
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+In-Reply-To: <aSx++4VrGOm8zHDb@inspiron>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Simon Schippers wrote:
-> Add __ptr_ring_consume_created_space() to check whether the previous
-> __ptr_ring_consume() call successfully consumed an element and created
-> space in the ring buffer. This enables callers to conditionally notify
-> producers when space becomes available.
-> 
-> The function is only valid immediately after a single consume operation
-> and should not be used after calling __ptr_ring_consume_batched().
+Hi Prithvi,
 
-Please explain why it is only valid in that case.
- 
-> Co-developed-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
-> Signed-off-by: Tim Gebauer <tim.gebauer@tu-dortmund.de>
-> Co-developed by: Jon Kohler <jon@nutanix.com>
-> Signed-off-by: Jon Kohler <jon@nutanix.com>
-> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
-> ---
->  include/linux/ptr_ring.h | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
+On 30.11.25 18:29, Prithvi Tambewagh wrote:
+> On Sun, Nov 30, 2025 at 01:44:32PM +0100, Oliver Hartkopp wrote:
+
+>>> shall I send this patch upstream and mention your name in 
+>> Suggested-by tag?
+>>
+>> No. Neither of that - as it will not fix the root cause.
+>>
+>> IMO we need to check who is using the headroom in CAN skbs and for 
+>> what reason first. And when we are not able to safely control the 
+>> headroom for our struct can_skb_priv content we might need to find 
+>> another way to store that content.
+>> E.g. by creating this space behind skb->data or add new attributes to 
+>> struct sk_buff.
 > 
-> diff --git a/include/linux/ptr_ring.h b/include/linux/ptr_ring.h
-> index da141cc8b075..76d6840b45a3 100644
-> --- a/include/linux/ptr_ring.h
-> +++ b/include/linux/ptr_ring.h
-> @@ -453,6 +453,23 @@ static inline int ptr_ring_consume_batched_bh(struct ptr_ring *r,
->  	return ret;
->  }
->  
-> +/*
-> + * Check if the previous consume operation created space
-> + *
-> + * Returns true if the last call to __ptr_ring_consume() has created
-> + * space in the ring buffer (i.e., an element was consumed).
-> + *
-> + * Note: This function is only valid immediately after a single call to
-> + * __ptr_ring_consume(). If multiple calls to ptr_ring_consume*() have
-> + * been made, this check must be performed after each call individually.
-> + * Likewise, do not use this function after calling
-> + * __ptr_ring_consume_batched().
-> + */
-> +static inline bool __ptr_ring_consume_created_space(struct ptr_ring *r)
-> +{
-> +	return r->consumer_tail >= r->consumer_head;
-> +}
-> +
->  /* Cast to structure type and call a function without discarding from FIFO.
->   * Function must return a value.
->   * Callers must take consumer_lock.
-> -- 
-> 2.43.0
-> 
+> I will work in this direction. Just to confirm, what you mean is
+> that first it should be checked where the headroom is used while also
+> checking whether the data from region covered by struct can_skb_priv is 
+> intact, and if not then we need to ensure that it is intact by other 
+> measures, right?
+
+I have added skb_dump(KERN_WARNING, skb, true) in my local dummy_can.c
+an sent some CAN frames with cansend.
+
+CAN CC:
+
+[ 3351.708018] skb len=16 headroom=16 headlen=16 tailroom=288
+                mac=(16,0) mac_len=0 net=(16,0) trans=16
+                shinfo(txflags=0 nr_frags=0 gso(size=0 type=0 segs=0))
+                csum(0x0 start=0 offset=0 ip_summed=1 complete_sw=0 
+valid=0 level=0)
+                hash(0x0 sw=0 l4=0) proto=0x000c pkttype=5 iif=0
+                priority=0x0 mark=0x0 alloc_cpu=5 vlan_all=0x0
+                encapsulation=0 inner(proto=0x0000, mac=0, net=0, trans=0)
+[ 3351.708151] dev name=can0 feat=0x0000000000004008
+[ 3351.708159] sk family=29 type=3 proto=0
+[ 3351.708166] skb headroom: 00000000: 07 00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00
+[ 3351.708173] skb linear:   00000000: 23 01 00 00 04 00 00 00 11 22 33 
+44 00 00 00 00
+
+(..)
+
+CAN FD:
+
+[ 3557.069471] skb len=72 headroom=16 headlen=72 tailroom=232
+                mac=(16,0) mac_len=0 net=(16,0) trans=16
+                shinfo(txflags=0 nr_frags=0 gso(size=0 type=0 segs=0))
+                csum(0x0 start=0 offset=0 ip_summed=1 complete_sw=0 
+valid=0 level=0)
+                hash(0x0 sw=0 l4=0) proto=0x000d pkttype=5 iif=0
+                priority=0x0 mark=0x0 alloc_cpu=6 vlan_all=0x0
+                encapsulation=0 inner(proto=0x0000, mac=0, net=0, trans=0)
+[ 3557.069499] dev name=can0 feat=0x0000000000004008
+[ 3557.069507] sk family=29 type=3 proto=0
+[ 3557.069513] skb headroom: 00000000: 07 00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00
+[ 3557.069520] skb linear:   00000000: 33 03 00 00 10 05 00 00 00 11 22 
+33 44 55 66 77
+[ 3557.069526] skb linear:   00000010: 88 aa bb cc dd ee ff 00 00 00 00 
+00 00 00 00 00
+
+(..)
+
+CAN XL:
+
+[ 5477.498205] skb len=908 headroom=16 headlen=908 tailroom=804
+                mac=(16,0) mac_len=0 net=(16,0) trans=16
+                shinfo(txflags=0 nr_frags=0 gso(size=0 type=0 segs=0))
+                csum(0x0 start=0 offset=0 ip_summed=1 complete_sw=0 
+valid=0 level=0)
+                hash(0x0 sw=0 l4=0) proto=0x000e pkttype=5 iif=0
+                priority=0x0 mark=0x0 alloc_cpu=6 vlan_all=0x0
+                encapsulation=0 inner(proto=0x0000, mac=0, net=0, trans=0)
+[ 5477.498236] dev name=can0 feat=0x0000000000004008
+[ 5477.498244] sk family=29 type=3 proto=0
+[ 5477.498251] skb headroom: 00000000: 07 00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00
+[ 5477.498258] skb linear:   00000000: b0 05 92 00 81 cd 80 03 cd b4 92 
+58 4c a1 f6 0c
+[ 5477.498264] skb linear:   00000010: 1a c9 6d 0a 4c a1 f6 0c 1a c9 6d 
+0a 4c a1 f6 0c
+[ 5477.498269] skb linear:   00000020: 1a c9 6d 0a 4c a1 f6 0c 1a c9 6d 
+0a 4c a1 f6 0c
+[ 5477.498275] skb linear:   00000030: 1a c9 6d 0a 4c a1 f6 0c 1a c9 6d 
+0a 4c a1 f6 0c
 
 
+I will also add skb_dump(KERN_WARNING, skb, true) in the CAN receive 
+path to see what's going on there.
+
+My main problem with the KMSAN message
+https://lore.kernel.org/linux-can/68bae75b.050a0220.192772.0190.GAE@google.com/
+is that it uses
+
+NAPI, XDP and therefore pskb_expand_head():
+
+  kmalloc_reserve+0x23e/0x4a0 net/core/skbuff.c:609
+  pskb_expand_head+0x226/0x1a60 net/core/skbuff.c:2275
+  netif_skb_check_for_xdp net/core/dev.c:5081 [inline]
+  netif_receive_generic_xdp net/core/dev.c:5112 [inline]
+  do_xdp_generic+0x9e3/0x15a0 net/core/dev.c:5180
+  __netif_receive_skb_core+0x25c3/0x6f10 net/core/dev.c:5524
+  __netif_receive_skb_one_core net/core/dev.c:5702 [inline]
+  __netif_receive_skb+0xca/0xa00 net/core/dev.c:5817
+  process_backlog+0x4ad/0xa50 net/core/dev.c:6149
+  __napi_poll+0xe7/0x980 net/core/dev.c:6902
+  napi_poll net/core/dev.c:6971 [inline]
+
+As you can see in
+https://syzkaller.appspot.com/x/log.txt?x=144ece64580000
+
+[pid  5804] socket(AF_CAN, SOCK_DGRAM, CAN_ISOTP) = 5
+[pid  5804] ioctl(5, SIOCGIFINDEX, {ifr_name="vxcan0", ifr_ifindex=20}) = 0
+
+they are using the vxcan driver which is mainly derived from vcan.c and 
+veth.c (~2017). The veth.c driver supports all those GRO, NAPI and XDP 
+features today which vxcan.c still does NOT support.
+
+Therefore I wonder how the NAPI and XDP code can be used together with 
+vxcan. And if this is still the case today, as the syzcaller kernel 
+6.13.0-rc7-syzkaller-00039-gc3812b15000c is already one year old.
+
+Many questions ...
+
+Best regards,
+Oliver
 
