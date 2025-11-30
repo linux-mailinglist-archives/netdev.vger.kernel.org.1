@@ -1,122 +1,94 @@
-Return-Path: <netdev+bounces-242763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E87E2C94A39
-	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 02:43:54 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA8D3C94A54
+	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 02:53:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 982043A635D
-	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 01:43:53 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3D1E034636A
+	for <lists+netdev@lfdr.de>; Sun, 30 Nov 2025 01:53:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D26721A457;
-	Sun, 30 Nov 2025 01:43:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1F3720C488;
+	Sun, 30 Nov 2025 01:53:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="u84KKSLd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u+aYmnJE"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3945C36D508;
-	Sun, 30 Nov 2025 01:43:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88D113B2A0;
+	Sun, 30 Nov 2025 01:53:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764467031; cv=none; b=EkIusCDhrUc36DYFTdd5RIvBICxZ1JQgKrO29CAEty4OBlK7oIrbU4PNRLdiT9WdNdBwJ1TWGNOHL2c2PvAlR84K1/M2SAo6LvTCQswkcBeXi6R+fj+xVkhD7wr3k00CgEH/UEp2EoGzJ5fFDNj0Grv2KIr6erxvBJwqDNW1IlQ=
+	t=1764467585; cv=none; b=f00wDDEAd6i6W9fItXY8DlIgJ3KQJ+XwISwOJMO28xV+VgbIou0cUQ8PgSqyN2SIf4Poj3d53yUtec9UHuhAO/AV29e1cnV277GnmartqK/1BOTygd72AcmpQwxylhyUXW9UNy9Tln0GB9KJa1bQ9NyMfcjXpwJ552xkJRuG4pg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764467031; c=relaxed/simple;
-	bh=P8Z5woiRy6EoTDvCQKM87i8WHxCI3afW2uLvRA08wVo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GhwMIkbW4MjWQ06ugG2KVeyEMSdPm9ZNZvvQzcSFUSk2HiPfpmW0sf0SIBVV6ZWy3slqjLCMrumC3u5syUYbsw5ueDVmW0+7nbkLJpmh4fi3spRTeApQkbnJlkVaJEy0SWswnWqXuz3s9Vlcc8jBGqCy0S00yk8CioGF3vw5aAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=u84KKSLd; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=hOKba22rvQaW7Abhgc1ihsuiQLeitBhJdLwu9kx38lE=; b=u84KKSLdSJw+u2pQ2NP/2RKqnW
-	t3aUz9qus+h6hJzQfXGC8FhE4Pf88GS1EByF+jkl6H9YbXODg8L7E2CwE1nqtaK/c/rXkJ65hinaN
-	qnrwuIZUgQ8wjstlId+eZhI9y+0sN6B4KD990ubI2XjceYkknuFyRAMZz0tPMMI3g61Y=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vPWTH-00FRDv-B6; Sun, 30 Nov 2025 02:43:27 +0100
-Date: Sun, 30 Nov 2025 02:43:27 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Marek Vasut <marek.vasut@mailbox.org>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Aleksander Jan Bajkowski <olek2@wp.pl>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Michael Klein <michael@fossekall.de>,
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	devicetree@vger.kernel.org
-Subject: Re: [net-next,PATCH 2/3] dt-bindings: net: realtek,rtl82xx: Document
- realtek,ssc-enable property
-Message-ID: <a7f83059-76aa-44df-aeb5-41b5072dd0d1@lunn.ch>
-References: <20251130005843.234656-1-marek.vasut@mailbox.org>
- <20251130005843.234656-2-marek.vasut@mailbox.org>
+	s=arc-20240116; t=1764467585; c=relaxed/simple;
+	bh=97QLNmAtJNGNwtkr5WeLOLnH7LV0rO4IDCqQcz2p7Bg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=L4VkuFSNC9Siy9nDmAOGOIHUS7XsdtfOE8fEBVpmqcxv0ZEs6avDwaSiQCK4C58XHY0EzdK20zFwZyu79JtaiBlHFpmwN9hdPXLu7D5kMXebtpvlqv1ICTAVuBmEyPtf7DvU8BaggsJta1SjKvqwZnk/cOwugVbp8T2r9yahVSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u+aYmnJE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2E88C4CEF7;
+	Sun, 30 Nov 2025 01:53:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764467585;
+	bh=97QLNmAtJNGNwtkr5WeLOLnH7LV0rO4IDCqQcz2p7Bg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=u+aYmnJEwtlx6y2b7afzqqA29wJc2jeYFrxz2evhWN+bAizIZIIEmmPAamuEsN/Vf
+	 /umIoMSZdAFKNFvP0RnD7mTFobcYgAmHONKOW9571MHU44MkLa637wQka9hV5ccZnR
+	 bS+irjyBoM45X7xELSrHeU2+n7JeEFlIHHJ01WBmq+IPQ5tUZB/ISy2U+xZ9Qa3pIA
+	 5SW2AZW0V8PjTyhXQV5JvtWCw4EKY6rBF8D8rSX4kMORisPDsxf2Wpve6j1wnpD9Yn
+	 YBK0XniLcAeUpzKRMw0nKrZnprulyPPeDRmAQbeix2oJm9s0lJLwD99MAruYEyE0Az
+	 wT1VzU+Ahq4mA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3B7673806936;
+	Sun, 30 Nov 2025 01:50:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251130005843.234656-2-marek.vasut@mailbox.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] can: Kconfig: select CAN driver infrastructure
+ by
+ default
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176446740605.1148447.5623807742098177728.git-patchwork-notify@kernel.org>
+Date: Sun, 30 Nov 2025 01:50:06 +0000
+References: <20251129125036.467177-2-mkl@pengutronix.de>
+In-Reply-To: <20251129125036.467177-2-mkl@pengutronix.de>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ linux-can@vger.kernel.org, kernel@pengutronix.de, socketcan@hartkopp.net,
+ mailhol@kernel.org, lkp@intel.com
 
-On Sun, Nov 30, 2025 at 01:58:33AM +0100, Marek Vasut wrote:
-> Document support for spread spectrum clocking (SSC) on RTL8211F(D)(I)-CG,
-> RTL8211FS(I)(-VS)-CG, RTL8211FG(I)(-VS)-CG PHYs. Introduce new DT property
-> 'realtek,ssc-enable' to enable SSC mode for both RXC and SYSCLK clock
-> signals.
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Marc Kleine-Budde <mkl@pengutronix.de>:
+
+On Sat, 29 Nov 2025 13:47:19 +0100 you wrote:
+> From: Oliver Hartkopp <socketcan@hartkopp.net>
 > 
-> Signed-off-by: Marek Vasut <marek.vasut@mailbox.org>
-> ---
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
-> Cc: Andrew Lunn <andrew@lunn.ch>
-> Cc: Conor Dooley <conor+dt@kernel.org>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Florian Fainelli <f.fainelli@gmail.com>
-> Cc: Heiner Kallweit <hkallweit1@gmail.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>
-> Cc: Michael Klein <michael@fossekall.de>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: Rob Herring <robh@kernel.org>
-> Cc: Russell King <linux@armlinux.org.uk>
-> Cc: Vladimir Oltean <vladimir.oltean@nxp.com>
-> Cc: devicetree@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> ---
->  Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml | 5 +++++
->  1 file changed, 5 insertions(+)
+> The CAN bus support enabled with CONFIG_CAN provides a socket-based
+> access to CAN interfaces. With the introduction of the latest CAN protocol
+> CAN XL additional configuration status information needs to be exposed to
+> the network layer than formerly provided by standard Linux network drivers.
 > 
-> diff --git a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
-> index eafcc2f3e3d66..f1bd0095026be 100644
-> --- a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
-> +++ b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
-> @@ -50,6 +50,11 @@ properties:
->      description:
->        Disable CLKOUT clock, CLKOUT clock default is enabled after hardware reset.
->  
-> +  realtek,ssc-enable:
-> +    type: boolean
-> +    description:
-> +      Enable SSC mode, SSC mode default is disabled after hardware reset.
+> [...]
 
-Spread Spectrum Clocking is a generic concept, applicable to more than
-Ethernet PHYs. Do we really need a vendor property for this? Or is
-there a generic property already?
+Here is the summary with links:
+  - [net-next] can: Kconfig: select CAN driver infrastructure by default
+    https://git.kernel.org/netdev/net-next/c/cb2dc6d2869a
 
-	Andrew
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
