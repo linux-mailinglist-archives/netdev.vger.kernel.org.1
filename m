@@ -1,71 +1,63 @@
-Return-Path: <netdev+bounces-243048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4ADEC98CD7
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 20:04:39 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B939C98D19
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 20:16:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2CE1B4E320D
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 19:04:05 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0BCA54E02E5
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 19:16:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FED922ACEB;
-	Mon,  1 Dec 2025 19:04:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 072451ACEDE;
+	Mon,  1 Dec 2025 19:16:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZfEFJfVW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HlJ3KRjP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4069B21883E;
-	Mon,  1 Dec 2025 19:04:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C78BA10F1;
+	Mon,  1 Dec 2025 19:15:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764615841; cv=none; b=bfdFaH9NvUOp3syju4MfCGDMwdJh6wGtPbX1UJjz/Z3NTliFe4j7ZjYbHvM4rRm832ZMWueDCjCMnDjmLnxh3evDh6DAuqyME/LWI1IGowBfy84Mf0y1Tn7k9AhHOcGnTXPvHv1lKJLdgMFFyYPUEavxMDe0dN+rPx5snFmLMuc=
+	t=1764616559; cv=none; b=jWEQTdkhwNlMazxnf1TtpGTHsOLipymqBKFCnZnLG05Tc16fiin3zzNqt6ihKoW1rIH2rU6yQcvMs4Hr4Y7sl9EpJ2TbNdkbuswsoPz7QaWNbh0lI8U5JmGMb8qKoREuoWep3Iu8xC1iDxTf64jXTYcZo30rZBE760JUkRtcKKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764615841; c=relaxed/simple;
-	bh=o+FCanS35An+MiDwhjJ8w/zhkp0tC/kZk0IrIBLdhJA=;
+	s=arc-20240116; t=1764616559; c=relaxed/simple;
+	bh=4XgmDLSCEg6VsFoBcwzl521M4IJOdgdZ7BMmz88L2/M=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bkI6CQLd5emcntFiSEwvDDGPkOrzw+hPdVVKbjVewxOT/gRhiFIzj8R0v9hkoGqAxzS3KphT6BOgjGxPfWvP6+Xt30amU2VmW5/Ji4AYrTPCmxzdt/1G4puy3W3ltKsSKxmxMwNU9LcUoiyF9+59Rfs5sZNtb3vW5WQIRA1blxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZfEFJfVW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2750C113D0;
-	Mon,  1 Dec 2025 19:03:59 +0000 (UTC)
+	 MIME-Version:Content-Type; b=jidf7kkmulpSrfhbT6zLqFmXgfHJagYGJg34YvG2MUQEA5Fdgw68yCn+hlvbatALSZgr2x5lb+gBpabT2CtTFungxTawB+NIZ9wucYdNkfjlGJ8UsCufGADFhp+p99feHtLssJI83InaSd36ojlY5uNOqZAH8Yd+PBpilgthsXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HlJ3KRjP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CD9BC4CEF1;
+	Mon,  1 Dec 2025 19:15:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764615840;
-	bh=o+FCanS35An+MiDwhjJ8w/zhkp0tC/kZk0IrIBLdhJA=;
+	s=k20201202; t=1764616559;
+	bh=4XgmDLSCEg6VsFoBcwzl521M4IJOdgdZ7BMmz88L2/M=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ZfEFJfVWww3xEELw2OmQMyV36tKdSwDRtdofxmKQfb+ILyEXpPhPrUNkl5MMnvqdk
-	 MeHgecGP2EhHmfAgvv4cg3ASh6ilA8h5W5ooFuflZZi0/2Tle/0ibXxbnDItRhMwBf
-	 DyiYWSDS+Z74LDiwCXVOZE4rbj4OZxE9c9IQprfUrnef8s0TdGKK+7J61DS0IwlNy/
-	 gneE8GMMGdaj/GSHF4HUhsFhpFBITU5tvY/NPYYgqw+RUhepWKj/qtMUshYwc2/avJ
-	 z4/v4E+SwVV/7np/kW8g/FiFhIR+l/Qoonk0nHp4I+hBfxNx56o36KwMo5F6mIaYeI
-	 NLv4o7cfZK56A==
-Date: Mon, 1 Dec 2025 11:03:58 -0800
+	b=HlJ3KRjP7xZ4T9ko7eFxV7P6PoXSWyCu3HrexUTNs8fV3q+nABoR50xZLZKAzpGNa
+	 ADyv8W1zgjFaujFUmt88AkFSgo2NDY7bT1mmvqKppbdXFiBm7yNvoVFcbZoOhHFKXj
+	 ZZlSoYYVw+0jbvdRNqzJLmN1JxyjhH/KsEKWI2z27KIarFfW9BcXFPoPejMDxnUuyt
+	 WHT4zqZu1fr3xCQNnE8UkS9fWmat3w/7+wlNQuRe1MAEFQW7SUwSZWx2kYcTzahhz7
+	 fk3vdyF7i7BFoNI67EtyLp2penSN5GgpwofhL5VPA1TiZcHr6gLcyXvEtyz6Rtcaww
+	 b7z6WXVZjzQkg==
+Date: Mon, 1 Dec 2025 11:15:57 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Vinod Koul <vkoul@kernel.org>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-phy@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, Daniel Golle <daniel@makrotopia.org>,
- Horatiu Vultur <horatiu.vultur@microchip.com>, Andrew Lunn
- <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>, Matthias
- Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
- <angelogioacchino.delregno@collabora.com>, Eric Woudstra
- <ericwouds@gmail.com>, Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Lee
- Jones <lee@kernel.org>, Patrice Chotard <patrice.chotard@foss.st.com>
-Subject: Re: [PATCH net-next 5/9] phy: add phy_get_rx_polarity() and
- phy_get_tx_polarity()
-Message-ID: <20251201110358.7618fee2@kernel.org>
-In-Reply-To: <aS1T5i3pCHsNVql6@vaman>
-References: <20251122193341.332324-1-vladimir.oltean@nxp.com>
-	<20251122193341.332324-6-vladimir.oltean@nxp.com>
-	<20251124200121.5b82f09e@kernel.org>
-	<aS1T5i3pCHsNVql6@vaman>
+To: Edward Adam Davis <eadavis@qq.com>
+Cc: davem@davemloft.net, edumazet@google.com, eperezma@redhat.com,
+ horms@kernel.org, jasowang@redhat.com, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, mst@redhat.com, netdev@vger.kernel.org,
+ pabeni@redhat.com, sgarzare@redhat.com, stefanha@redhat.com,
+ syzbot+ci3edb9412aeb2e703@syzkaller.appspotmail.com,
+ syzbot@lists.linux.dev, syzbot@syzkaller.appspotmail.com,
+ syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev,
+ xuanzhuo@linux.alibaba.com
+Subject: Re: [PATCH Next V2] net: restore the iterator to its original state
+ when an error occurs
+Message-ID: <20251201111557.15cb9415@kernel.org>
+In-Reply-To: <tencent_7B73E6D013636363696CC3A34444F77AF705@qq.com>
+References: <20251128093946.18c645c6@kernel.org>
+	<tencent_7B73E6D013636363696CC3A34444F77AF705@qq.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,32 +67,39 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 1 Dec 2025 14:07:58 +0530 Vinod Koul wrote:
-> > > Push the supported mask of polarities to these helpers, to simplify
-> > > drivers such that they don't need to validate what's in the device tree
-> > > (or other firmware description).
-> > > 
-> > > The proposed maintainership model is joint custody between netdev and
-> > > linux-phy, because of the fact that these properties can be applied to
-> > > Ethernet PCS blocks just as well as Generic PHY devices. I've added as
-> > > maintainers those from "ETHERNET PHY LIBRARY", "NETWORKING DRIVERS" and
-> > > "GENERIC PHY FRAMEWORK".  
+On Mon,  1 Dec 2025 11:41:07 +0800 Edward Adam Davis wrote:
+> On Fri, 28 Nov 2025 09:39:46 -0800, Jakub Kicinski wrote:
+> > > In zerocopy_fill_skb_from_iter(), if two copy operations are performed
+> > > and the first one succeeds while the second one fails, it returns a
+> > > failure but the count in iterator has already been decremented due to
+> > > the first successful copy. This ultimately affects the local variable
+> > > rest_len in virtio_transport_send_pkt_info(), causing the remaining
+> > > count in rest_len to be greater than the actual iterator count. As a
+> > > result, packet sending operations continue even when the iterator count
+> > > is zero, which further leads to skb->len being 0 and triggers the warning
+> > > reported by syzbot [1].  
 > > 
-> > I dunno.. ain't no such thing as "joint custody" maintainership.
-> > We have to pick one tree. Given the set of Ms here, I suspect 
-> > the best course of action may be to bubble this up to its own tree.
-> > Ask Konstantin for a tree in k.org, then you can "co-post" the patches
-> > for review + PR link in the cover letter (e.g. how Tony from Intel
-> > submits their patches). This way not networking and PHY can pull
-> > the shared changes with stable commit IDs.  
-> 
-> How much is the volume of the changes that we are talking about, we can
-> always ack and pull into each other trees..?
+> > Please follow the subsystem guidelines for posting patches:
+> > https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
+> > Your patch breaks zerocopy tests.  
+> I see that they all timed out. I'm not familiar with this test, how can
+> I get more details about it?
 
-We have such ad-hoc situations with multiple subsystems. Letting
-Vladimir and co create their own tree is basically shifting the 
-work of managing the stable branches from netdev maintainers
-downstream. I'd strongly prefer that we lean on git in this way, 
-rather than reenact the 3 spiderman meme multiple times in each
-release.
+IIRC its was the packetdrill tests:
+
+tools/testing/selftests/net/packetdrill/tcp_fastopen_server_basic-zero-payload.pkt
+tools/testing/selftests/net/packetdrill/tcp_zerocopy_basic.pkt
+tools/testing/selftests/net/packetdrill/tcp_zerocopy_batch.pkt
+tools/testing/selftests/net/packetdrill/tcp_zerocopy_client.pkt
+tools/testing/selftests/net/packetdrill/tcp_zerocopy_closed.pkt
+tools/testing/selftests/net/packetdrill/tcp_zerocopy_epoll_edge.pkt
+tools/testing/selftests/net/packetdrill/tcp_zerocopy_epoll_exclusive.pkt
+tools/testing/selftests/net/packetdrill/tcp_zerocopy_epoll_oneshot.pkt
+tools/testing/selftests/net/packetdrill/tcp_zerocopy_fastopen-client.pkt
+tools/testing/selftests/net/packetdrill/tcp_zerocopy_fastopen-server.pkt
+tools/testing/selftests/net/packetdrill/tcp_zerocopy_maxfrags.pkt
+tools/testing/selftests/net/packetdrill/tcp_zerocopy_small.pkt
+
+If you have the packetdrill command installed those _should_ be
+relatively easy to run via standard kselftest commands
 
