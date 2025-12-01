@@ -1,48 +1,102 @@
-Return-Path: <netdev+bounces-243034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B15C0C98894
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 18:33:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC757C988F8
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 18:41:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 32E12344A18
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 17:33:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85D143A3BBF
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 17:41:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE8FF333727;
-	Mon,  1 Dec 2025 17:33:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6088A338907;
+	Mon,  1 Dec 2025 17:41:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r/yD3p2p"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="ZxyuzaXv";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="R3IFI0He"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90DBA21CC4F;
-	Mon,  1 Dec 2025 17:33:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AD31336EF4
+	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 17:41:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764610393; cv=none; b=e2FLNzv0mvabsUNENHi7BtNFVi2gqIxNqgGoWPGB/8SE4U7kRS5/blnMvvfDASNV7zT9iuIPFhXsylHkGK9yMY9UW4CSAdUbiCsG8JfGnqnmVJBxPIGL/AN84esW/I1FFXdU3Mu/0uDKEwQ7cxy2e/mXl/VQXl8gVU+4BAx9kXo=
+	t=1764610868; cv=none; b=OERqLIEC9wPKDZ3TK6QcBLvCJ54hJemp8pxgJoEYpHWCTNO/L9mgF0f2Hcf7+KGgjUJ+1q0gFU13Bi3I6M3iK5lxftzvOoiaHr/pQ093t5PpgQmXteU7w3EXv8kK1MX0R1SlzM/aznZHdAUEu1iaXJTYlE7OZeL0XzPD0zfSG6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764610393; c=relaxed/simple;
-	bh=vZzWjqKwBCifJUL7S/hk8AvPEyWly2FaYZdeQ4GB3io=;
+	s=arc-20240116; t=1764610868; c=relaxed/simple;
+	bh=kQ0Zplu74sroYykShKNsBr0haSMA+a+HAxKkzuexd9w=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jQHxaldWrl0cvn4FfRwQERpbPtSVWZPvE9RzDyw71fpMl8mjkobraicnJY1eikuB+lmYD9KSxVW7yGm4Aj0LaFLEdfe+CLPBqF7ivMwSMxfaRlI2pjfeTN3m5xgfloITN5nUBBQAdjoDjfzWcHJIylCcFioLGxH+M9tyZpCiiKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r/yD3p2p; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B67D4C4CEF1;
-	Mon,  1 Dec 2025 17:33:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764610393;
-	bh=vZzWjqKwBCifJUL7S/hk8AvPEyWly2FaYZdeQ4GB3io=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=r/yD3p2pnPlaBW2Ui94UJkgH+PqfrB0VuDESq6+x1dgsNIs6+Ey+jR6nxWu2gs7vb
-	 peGCeiu+DsZiGhIHo8P6Xq7xDJ5N5QzEghAdWIKRL18AuAD0xJ+lmlFoMU7FFpTAgD
-	 3exHo19lEKixc6kgJuEmGtfWImUIdX4Z+mKcnd6jtCcdDkhuT0V8oW2hll9bfAmEzD
-	 ytx20NxLBInYakGHg7wJAShUpWtTW2vaWrvZKUl8Jt/QGWx86EEm4SqIWV3AZTvJuX
-	 S0T4S/eXZCycGCTXGiSWPoL+CD57MxXeh0I2dDliQw9ReO0os/Jypoe33AbizOjBet
-	 OYM1zeUbZ4evw==
-Message-ID: <16bb96e9-c632-457c-8179-82c17bd2a685@kernel.org>
-Date: Mon, 1 Dec 2025 18:33:07 +0100
+	 In-Reply-To:Content-Type; b=N2Way0fABwgTYaVcpd6QRw6BRQctgcww1ysIUDFTCTpHknMxEGQfskgJNLbL7+BochAyslISajiq7BIxrKHXEi+7BEviiahdgAz0wXsjkqmPldtHJtrgRrUR7u3RmQ+Tjap45IHVBBznC1inQUsQUmlKVMEcfgpDRIVPd7FgdwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=ZxyuzaXv; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=R3IFI0He; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5B1CGBmj060617
+	for <netdev@vger.kernel.org>; Mon, 1 Dec 2025 17:41:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	exm+out2T1Pb1oWg34oExcEhVExwIO1gE6DHWlTI8qw=; b=ZxyuzaXv6A26qiRW
+	3ib+4vKjJnwB99Ulmz3+RRb3QOIt9IEjEBZ2SK904Gsv6nMU2UluCtxKVvgbRPW5
+	aXIV0VxAUSTF9gt+hZmetm/hPC3OkeqsVaPFydPZLYXkVi6jmR1m7IIpi7WMdh31
+	G1p/Mm5LYsJGCX7rhrWPgKhgo7vMYyzGcSbUtkJSFYm8z2SL/nbgk217ze6jfZvJ
+	eC0pkwM6QvoPRK63MsxQXNL1M+QTG01ljbQaMRJVju5uvMdOjxXBsAqaxu4C3s4H
+	/zjOeRaj09yH4rJo95lgrRbtjeRy5qN6DQvXd2C/tC2nj88agyNrKRoRmpFD/Fpd
+	eNuP+w==
+Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com [209.85.210.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4asavh8yme-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 17:41:04 +0000 (GMT)
+Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-7b8a12f0cb4so4088230b3a.3
+        for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 09:41:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1764610864; x=1765215664; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=exm+out2T1Pb1oWg34oExcEhVExwIO1gE6DHWlTI8qw=;
+        b=R3IFI0HeBkThA5/dEjl/SXdjufhQWzWrBEqdCZ6hX0XB8pkzY+WuHwq9oBx6ggMqIZ
+         iw4ZTPbRXAnc3Zwk3XGsv8Z0XRXyq+XIpmAVe+c+FtkaqWGVsqvm7FHOFTPYjIo+tc3a
+         96JJ0SuVzviwZSQyFK8/eCIheHJIAugRQsVunYjiqmVvOp+OdTjZDkmGPLqr4xQ6GSJp
+         0vkavj2mS9x0DiNYkr4Va/iFwVD5LUpRLms/OGgSCUPUPuDWtHF4d1dP+jxcx/rAXk5l
+         WvJTYpkGYBvEQ9HxWDluG29F3zk+zc2rTuQu+YUGkPkSAcKkF2weTij6kTpdFaLfaBDf
+         /jnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764610864; x=1765215664;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=exm+out2T1Pb1oWg34oExcEhVExwIO1gE6DHWlTI8qw=;
+        b=n0U0Kj3y5o1XFeMbzKHexHDsGqveSIGfsQEmeP61hURCeEQPc52iljPX3GaYejXnli
+         +d8b7QPydNbMJSyo41AwNoXgeSOCCw9VisnOOBp423pLFw/Sr8d6u2v/sq3t6r4xRUnZ
+         2hJrc5cAlmmkYfwoG0nwli+54XfU2RYcUbURSkNWB0zYutpon/dJRMMKIPd9hmM6Al/T
+         eJbg6MPEaoC/P+nKnKPQQbiITs1NEALM7m7Z1XqN36wtkE5cEKbVdwZudze7ua/aWN0p
+         dqy7vQh0IfNxRg2QPOouBe4d0OQs+E3A57QUwtC0gvSQ7fddh35a8paov653D7U7NM0N
+         qmKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVps/2nkXqemYHBjlRrFW+GIlbVYW3oJUC6MfEdyGDklTLhGfiIV5uEXifTO3klwnTS21qWXuo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz203+1Me/kdVdm8K+uFc76k3A++BC3aY2lP+AJixgkY3R1R3pX
+	BbW7opkyvLr+ABCf1bnRLEFOGeMmKzKUv45SZRj/IQ0VggKEDu//hsTjq2mhwaUylWFStmDurCF
+	CC7Mb43v9lCDpoP9eZavbCSTyM6Wi2S8H+vZ23nCSbfyMtd6qi7YDwx31yls=
+X-Gm-Gg: ASbGncvpKsAnRQ9iXnKxXbUloH0XiQYk/tMXqrN5CGdU8ZHn/R//kZTccoWRHFzzjeb
+	fC8hTYGxykvcWfeDhYXkZ9ijIryusB0IKLDeQ2AiQ1Z5mFL8i4a3Y6ZuOL+DOoiQDmRiqgWIp+9
+	EUJ+rbOLgBRroyj58NwSLWPGQjtM4uPDk5BCvSZn+WuZdxTI2H7fw419KbjjDiDYFLNIKA7Rb3x
+	Mv6gef8qFoGd+n4GomxN0IdDdAoBiauvorTKCQGC3g8eZcf71yypZXjo4gWR+jlesviuft1yxbf
+	rqPUK4ozMItKgdiKzqpZqWnBj/d2+sDWCUMVrO39sJ8WaZ9ynNRMpmBnUrjbCNeL7GJPkudn867
+	V6MK/zmDECr0h5SS8xnwXCrVoRdhWskQ/n5MjSiNq51w9NWsZ2vUvJq8B
+X-Received: by 2002:a05:6a20:3ca6:b0:361:2d0c:fd70 with SMTP id adf61e73a8af0-3637db29723mr30315555637.17.1764610863733;
+        Mon, 01 Dec 2025 09:41:03 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFuoKHcI6kog7ZiSeUimSTc1QQRfMcR0gyLQvIhQiA98rGJvDjNieYJ0dzMpSwyxYjBOD4K6Q==
+X-Received: by 2002:a05:6a20:3ca6:b0:361:2d0c:fd70 with SMTP id adf61e73a8af0-3637db29723mr30315517637.17.1764610863190;
+        Mon, 01 Dec 2025 09:41:03 -0800 (PST)
+Received: from [10.73.112.168] (pat_11.qualcomm.com. [192.35.156.11])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7d150c618e7sm14245014b3a.3.2025.12.01.09.41.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 01 Dec 2025 09:41:02 -0800 (PST)
+Message-ID: <ce68d28f-c737-402c-9f6d-f13fec4d2e82@oss.qualcomm.com>
+Date: Mon, 1 Dec 2025 09:41:01 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,105 +104,149 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/4] dt-bindings: net: nxp,s32-dwmac: Use the GPR syscon
-To: Dan Carpenter <dan.carpenter@linaro.org>,
- Jan Petrous <jan.petrous@oss.nxp.com>
-Cc: s32@nxp.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linaro-s32@linaro.org
-References: <cover.1764592300.git.dan.carpenter@linaro.org>
- <333487ea3d23699c7953524cda082813ac4d7be3.1764592300.git.dan.carpenter@linaro.org>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH 3/4] net: mhi_net: Implement runtime PM support
+To: Krishna Chaitanya Chundru <krishna.chundru@oss.qualcomm.com>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        Jeff Hugo <jeff.hugo@oss.qualcomm.com>,
+        Carl Vanderlip <carl.vanderlip@oss.qualcomm.com>,
+        Oded Gabbay <ogabbay@kernel.org>, Jeff Johnson <jjohnson@kernel.org>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Chris Lew <quic_clew@quicinc.com>
+Cc: mhi@lists.linux.dev, linux-arm-msm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
+        ath12k@lists.infradead.org, netdev@vger.kernel.org,
+        quic_vbadigan@quicinc.com, vivek.pernamitta@oss.qualcomm.com
+References: <20251201-mhi_runtimepm-v1-0-fab94399ca75@oss.qualcomm.com>
+ <20251201-mhi_runtimepm-v1-3-fab94399ca75@oss.qualcomm.com>
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <333487ea3d23699c7953524cda082813ac4d7be3.1764592300.git.dan.carpenter@linaro.org>
-Content-Type: text/plain; charset=UTF-8
+From: Mayank Rana <mayank.rana@oss.qualcomm.com>
+In-Reply-To: <20251201-mhi_runtimepm-v1-3-fab94399ca75@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Proofpoint-ORIG-GUID: u_PbhQIxMe2Oj1kOO_22f16GaWRyKDZW
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjAxMDE0NCBTYWx0ZWRfXz986ehGXjzW1
+ I/CADdoq8jg75B+z45sh0a9d2RJSUi7EnFdpDc7W22+h4Frvq5FMNblVSj73wtRtvmDVrtU7xR8
+ Kzh1Z8Tj36EO/b64iaI5fEO+nEYvmphGCpKY5EATS8cAi8VIPuLlq0v98zXP+nig3iJkEJi+liB
+ QqOW7CS6w10Ucjh9yipcTMJE9VLtRmU4M1SAJXRAmgs0Wtbtg4LFQBwi+gPvq5TIcopVE+e4LqZ
+ PRKnDKGoSR9OMqdlIfpQSp7wqqJ+Gf3qknMy6zMG7W421gQJlANtSygSWvHhKYqqEwdqiS0yRPP
+ p4SbHn6wgWFdiMhxa1E5r1zC5f3wOOE1MWM4HdEW/cmFme9GeEpZQrAISzD9hEw6r0gkY/o2GDc
+ r4ycrEya60QaDMBqA1o5HUODf/1SUA==
+X-Authority-Analysis: v=2.4 cv=QutTHFyd c=1 sm=1 tr=0 ts=692dd330 cx=c_pps
+ a=rEQLjTOiSrHUhVqRoksmgQ==:117 a=ZdW6uxA9NKXbfdqeeS2OGA==:17
+ a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=EUspDBNiAAAA:8 a=vwh-6NgWTdBnnHhUpCYA:9
+ a=QEXdDO2ut3YA:10 a=2VI0MkxyNR6bbpdq8BZq:22
+X-Proofpoint-GUID: u_PbhQIxMe2Oj1kOO_22f16GaWRyKDZW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-28_08,2025-11-27_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 adultscore=0 suspectscore=0 phishscore=0 spamscore=0
+ malwarescore=0 impostorscore=0 lowpriorityscore=0 clxscore=1011
+ priorityscore=1501 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2510240001
+ definitions=main-2512010144
 
-On 01/12/2025 14:08, Dan Carpenter wrote:
-> The S32 chipset has a GPR region which has a miscellaneous registers
-> including the GMAC_0_CTRL_STS register.  Originally this code accessed
-> that register in a sort of ad-hoc way, but we want to access it using
-> the syscon interface.
++ Chris
+
+Do we need to consider updating client driver (net/qrtr/mhi.c) ?
+
+Regards,
+Mayank
+
+On 12/1/2025 4:43 AM, Krishna Chaitanya Chundru wrote:
+> Add runtime power management support to the mhi_net driver to align with
+> the updated MHI framework, which expects runtime PM to be enabled by client
+> drivers. This ensures the controller remains active during data transfers
+> and can autosuspend when idle.
 > 
-> We still need to maintain the old method of accessing the GMAC register
-> but using a syscon will let us access other registers more cleanly.
+> The driver now uses pm_runtime_get() and pm_runtime_put() around
+> transmit, receive, and buffer refill operations. Runtime PM is initialized
+> during probe with autosuspend enabled and a 100ms delay. The device is
+> marked with pm_runtime_no_callbacks() to notify PM framework that there
+> are no callbacks for this driver.
 > 
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Signed-off-by: Krishna Chaitanya Chundru <krishna.chundru@oss.qualcomm.com>
 > ---
->  Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml | 6 ++++++
->  1 file changed, 6 insertions(+)
+>   drivers/net/mhi_net.c | 13 +++++++++++++
+>   1 file changed, 13 insertions(+)
 > 
-> diff --git a/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml b/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
-> index 2b8b74c5feec..17f6c50dca03 100644
-> --- a/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
-> @@ -32,6 +32,11 @@ properties:
->        - description: Main GMAC registers
->        - description: GMAC PHY mode control register
->  
-> +  phy-sel:
+> diff --git a/drivers/net/mhi_net.c b/drivers/net/mhi_net.c
+> index ae169929a9d8e449b5a427993abf68e8d032fae2..c5c697f29e69e9bc874b6cfff4699de12a4af114 100644
+> --- a/drivers/net/mhi_net.c
+> +++ b/drivers/net/mhi_net.c
+> @@ -9,6 +9,7 @@
+>   #include <linux/mod_devicetable.h>
+>   #include <linux/module.h>
+>   #include <linux/netdevice.h>
+> +#include <linux/pm_runtime.h>
+>   #include <linux/skbuff.h>
+>   #include <linux/u64_stats_sync.h>
+>   
+> @@ -76,6 +77,7 @@ static netdev_tx_t mhi_ndo_xmit(struct sk_buff *skb, struct net_device *ndev)
+>   	struct mhi_device *mdev = mhi_netdev->mdev;
+>   	int err;
+>   
+> +	pm_runtime_get(&mdev->dev);
+>   	err = mhi_queue_skb(mdev, DMA_TO_DEVICE, skb, skb->len, MHI_EOT);
+>   	if (unlikely(err)) {
+>   		net_err_ratelimited("%s: Failed to queue TX buf (%d)\n",
+> @@ -94,6 +96,7 @@ static netdev_tx_t mhi_ndo_xmit(struct sk_buff *skb, struct net_device *ndev)
+>   	u64_stats_inc(&mhi_netdev->stats.tx_dropped);
+>   	u64_stats_update_end(&mhi_netdev->stats.tx_syncp);
+>   
+> +	pm_runtime_put_autosuspend(&mdev->dev);
+>   	return NETDEV_TX_OK;
+>   }
+>   
+> @@ -261,6 +264,7 @@ static void mhi_net_ul_callback(struct mhi_device *mhi_dev,
+>   	}
+>   	u64_stats_update_end(&mhi_netdev->stats.tx_syncp);
+>   
+> +	pm_runtime_put_autosuspend(&mdev->dev);
+>   	if (netif_queue_stopped(ndev) && !mhi_queue_is_full(mdev, DMA_TO_DEVICE))
+>   		netif_wake_queue(ndev);
+>   }
+> @@ -277,6 +281,7 @@ static void mhi_net_rx_refill_work(struct work_struct *work)
+>   
+>   	size = mhi_netdev->mru ? mhi_netdev->mru : READ_ONCE(ndev->mtu);
+>   
+> +	pm_runtime_get_sync(&mdev->dev);
+>   	while (!mhi_queue_is_full(mdev, DMA_FROM_DEVICE)) {
+>   		skb = netdev_alloc_skb(ndev, size);
+>   		if (unlikely(!skb))
+> @@ -296,6 +301,7 @@ static void mhi_net_rx_refill_work(struct work_struct *work)
+>   		cond_resched();
+>   	}
+>   
+> +	pm_runtime_put_autosuspend(&mdev->dev);
+>   	/* If we're still starved of rx buffers, reschedule later */
+>   	if (mhi_get_free_desc_count(mdev, DMA_FROM_DEVICE) == mhi_netdev->rx_queue_sz)
+>   		schedule_delayed_work(&mhi_netdev->rx_refill, HZ / 2);
+> @@ -362,12 +368,19 @@ static int mhi_net_probe(struct mhi_device *mhi_dev,
+>   
+>   	SET_NETDEV_DEV(ndev, &mhi_dev->dev);
+>   
+> +	pm_runtime_no_callbacks(&mhi_dev->dev);
+> +	devm_pm_runtime_set_active_enabled(&mhi_dev->dev);
+> +	pm_runtime_set_autosuspend_delay(&mhi_dev->dev, 100);
+> +	pm_runtime_use_autosuspend(&mhi_dev->dev);
+> +	pm_runtime_get(&mhi_dev->dev);
+>   	err = mhi_net_newlink(mhi_dev, ndev);
+>   	if (err) {
+>   		free_netdev(ndev);
+> +		pm_runtime_put_autosuspend(&mhi_dev->dev);
+>   		return err;
+>   	}
+>   
+> +	pm_runtime_put_autosuspend(&mhi_dev->dev);
+>   	return 0;
+>   }
+>   
+> 
 
-Missing vendor prefix.
-
-> +    $ref: /schemas/types.yaml#/definitions/phandle-array
-> +    items:
-> +      - description: The offset into the s32 GPR syscon
-
-No, first item is not the offset but the phandle. You need syntax like here:
-
-https://elixir.bootlin.com/linux/v5.18-rc1/source/Documentation/devicetree/bindings/soc/samsung/exynos-usi.yaml#L42
-
-The description of the first item (unlike in example above) should say
-what is the purpose, how this device is using GPR region, what is it
-needed for.
-
-Best regards,
-Krzysztof
 
