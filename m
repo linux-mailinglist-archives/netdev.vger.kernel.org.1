@@ -1,157 +1,101 @@
-Return-Path: <netdev+bounces-243054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27841C98EB8
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 20:53:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83DE9C98F1B
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 21:03:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EA11A345B9E
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 19:53:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A72F3A3B9D
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 20:03:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C49F0251795;
-	Mon,  1 Dec 2025 19:52:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A033246BB9;
+	Mon,  1 Dec 2025 20:03:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YSJ97xtt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZStsFEZE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25B87246766
-	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 19:52:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C7C922578D;
+	Mon,  1 Dec 2025 20:03:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764618771; cv=none; b=EY1mOuWEf9Y5RArXkHPSPdm2tll7csQGYZ6Xi/5Yu+ckeLK1S9ikpZwfOOdcoLIeFQRjeUtOL6OufvBMrS4FzKhaOQtGv1vedkyYEUplg7keStKfOdJALB19t/yz77DFdNi98KslI4IOFEnmWRrbxgaeiyPu57Dbg+6/NtbY+ys=
+	t=1764619392; cv=none; b=rSOkQtR0yRHUgbFZ6TXTP/p0zXvnQCAfRqarGG2s/+MbW2t80USofnetgkP7C34MI7EebroCou8cEfpDIWykipMsDd8rCHZHsUKcYqGSq+GNe2MCCCJ9bcyHGRMPL89DUYP6VQWZWiMNAfaJMjDQTffnmOlUJfjQGMFComvMSm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764618771; c=relaxed/simple;
-	bh=8MUOzw68ESrWDnroAv8LhfLlXFPmVBMxNYCgDlG2Crw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Maf8BV+6MKIejJhJzpqy1yP8bShUoPsSWo63TP6p2VYaHI8jTH5GKKt0PsBQxfVjX4U2lmG/Iz4AXr9jZC2NtvHD3+PPeNx7/Wl6Lmyt2AsqG0Akztnpm3PL1WXnMTLhSzcoPG0OsohwOiaOmqzVrEck8YZB5ud7cXJtqwgUFF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YSJ97xtt; arc=none smtp.client-ip=209.85.128.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-7866aca9ff4so46212297b3.3
-        for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 11:52:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764618765; x=1765223565; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ukxcfNeIHOLPW1NfuM1mukBFBPznM6uJdqjJDXn4M7g=;
-        b=YSJ97xttAZfeNo/2jQgkT7zAmVlq5BMNOGx5fCpWzbtQVAUJZTGT3WOL5fIe59WP+X
-         6rWJYc5XUD26jKe2M/0NqKuVdGh2jWhpGonkUTGvp2P81cT6CkFggWSh7uaQcD7uYSKR
-         5e3MaQCe20wXApKfvQzPcyE+oYEEklCRzCrRpj1wbX6/YKe9I49U8OB5KTG0ShTtty73
-         ZvUl3Y8A+H67aG4XZC+l0tu4izmG6K8BpNBJcncGuFRvyn1o2AKK5R5dO2X3iwFLNdLX
-         fvA2xF93P7SwGNP9RwnGQwLPHZOi3Pdz/u4nNZ69H1glYzu76uS3+OufADSpE9QD7qLE
-         IVDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764618765; x=1765223565;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ukxcfNeIHOLPW1NfuM1mukBFBPznM6uJdqjJDXn4M7g=;
-        b=orMVF0XbPFwnsOGKEAHEYt2uAhTBIv/8Yav7tovW6JQoLQb2cbz+c+deRxPs8GtDJZ
-         tI2bmAp3ATywBvsRkLsZfLEfQiaakzSnzKG3cs6f/2/nvoRKRVm89B9YxlWuHyDbf6ix
-         BGJaERcjkzj1YZ8fzR/Rq5294e0fV/2TaMGvYVyQHtCGqPMRcUEX6IWu2b+srW2rbkU7
-         Zye/DhJJSkIWA/k83dp7xVLEPe3UuFR02zU2HLYJaARAZT9tbGE92yOWzG2NI9d9T6j/
-         X8z2gdv+08oWY5CH8cAITYQMETPAPAFyfa9dtk27xfhzB/XfN7N3l9CPtrfmbFFPeGdb
-         hVbg==
-X-Forwarded-Encrypted: i=1; AJvYcCVPzJiBciU8PKNEe+Frug3xm7kgNeZ7stOAC65UucvSWRhjr2mFpJMWkisDD0Z0ZvNqvPL5sWY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxt5mJq7OYLKjIIwRmnG3jF+a4hrOdxNmdrm1PfTl3zscs0NsED
-	y/vS5tZoNwSf0KCMLs0SYB0zz5Qnc3kc8Z6Sa0Fcy8yxbnxGCXEjZbWOR7sf73ienEx02VfThi6
-	7HnOmGPbr1VbJcZAPWGyyf76YUiZQwiU=
-X-Gm-Gg: ASbGnctrXJF3+BYBJCkbqTc2uRTdRrs7LNJ+fSS/6AJFqURyn5DKBm8NSjJzKhpy6+Y
-	hmWxkRRvxgnEd3i9qdqmufNk1A8wQBmftLeEUgdSUVEyoEP00403tGomTYvDgVvr6dn+/jvb4Vw
-	0tuWcdyQzquYipRWGHjC7sho8B6rb5/IHYEiaV10MlFcFNn2rl7sqV5e79/mWX7DSmBY9MUuMcU
-	PDRaX+qo3N1+SEVb/K1sAZdMF6tj+USzjMXckyDG/+ZzvGmWRgFPBoQrXKVImn3JPNdvoYfQL60
-	/7nC
-X-Google-Smtp-Source: AGHT+IGvVaZ28++/jLtLsHwDYfDZfjA0jZXCxwXEjV9/leMSdeKZ58eWSu020+gEAXzwztS/Xn87qN4od+07+/vEJ9w=
-X-Received: by 2002:a05:690c:3383:b0:786:2f01:16fb with SMTP id
- 00721157ae682-78a8b499e1amr336642907b3.26.1764618765077; Mon, 01 Dec 2025
- 11:52:45 -0800 (PST)
+	s=arc-20240116; t=1764619392; c=relaxed/simple;
+	bh=FEMsSSZ5HXl/D+Uyr8Mh2BCsw+8YVrF0kXmFD4v30Mw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=E98wtPt6iUN302eY0kHI9ci1VF0QzWlRCvUm0ul4yjR0cv1YTU9l4ykc5/43xdauulbxiaQ/pdWOLzUT4I3Ytbvu/jMMzILVCcAu5nMITVZ869UCakOZsckl7m75uSiJ+Z09oDvboT3ZLMQXC94mcErrsQdht4UE+N+bh71FGJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZStsFEZE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE966C4CEF1;
+	Mon,  1 Dec 2025 20:03:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764619391;
+	bh=FEMsSSZ5HXl/D+Uyr8Mh2BCsw+8YVrF0kXmFD4v30Mw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ZStsFEZEQegj9Lhobtrq7rCpPn+GKlz1ArXjQDt15T6H2MRbiuReeijNW+Opf+FGD
+	 zuzKlOSc4I1uL2bKUlP35cQCkhezyUmELuuH8u5450F9H2QtRdeEe59BsEpLU2R+jF
+	 zcRwtqcCBqoIzA0B4P9MiWeKkE8fUOLj9R8m7ITJRlmc+aEBqMq6OVCxO5PVd733vs
+	 qzaLar3BaNKTHHvJtU5ahQ9n4yVLgm/mWLMvfsg6z7PXu9lzQxS6v6PQY0v8I1ljFB
+	 cS8ookcwrRc3OXeo+WNsvpNjLQxoP12ZPnK8guVTKPbfhmP/mZZm0tAG71oB58w+wi
+	 bmSeOmQJGwzYw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F28E1381196A;
+	Mon,  1 Dec 2025 20:00:12 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251201102817.301552-1-jonas.gorski@gmail.com>
- <20251201102817.301552-2-jonas.gorski@gmail.com> <aS2qnzL2WC-sFlnJ@horms.kernel.org>
-In-Reply-To: <aS2qnzL2WC-sFlnJ@horms.kernel.org>
-From: Jonas Gorski <jonas.gorski@gmail.com>
-Date: Mon, 1 Dec 2025 20:52:34 +0100
-X-Gm-Features: AWmQ_bn_3VNOfcboUxyIrP6GzrSjs_4ElvAa-ipPBD9VjAt0vsz6sjCYLC19MdM
-Message-ID: <CAOiHx=mog+8Grm1QTnqU_F3=BnWmJqTj+ko-nZiRMAb4-hvSqw@mail.gmail.com>
-Subject: Re: [PATCH RFC/RFT net-next v2 1/5] net: dsa: deny bridge VLAN with
- existing 8021q upper on any port
-To: Simon Horman <horms@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/3] net: freescale: migrate to
+ .get_rx_ring_count() ethtool callback
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176461921179.2515760.13851100903689517014.git-patchwork-notify@kernel.org>
+Date: Mon, 01 Dec 2025 20:00:11 +0000
+References: <20251128-gxring_freescale-v1-0-22a978abf29e@debian.org>
+In-Reply-To: <20251128-gxring_freescale-v1-0-22a978abf29e@debian.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: claudiu.manoil@nxp.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ ioana.ciornei@nxp.com, vladimir.oltean@nxp.com, wei.fang@nxp.com,
+ xiaoning.wang@nxp.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ imx@lists.linux.dev
 
-Hi,
+Hello:
 
-On Mon, Dec 1, 2025 at 3:48=E2=80=AFPM Simon Horman <horms@kernel.org> wrot=
-e:
->
-> On Mon, Dec 01, 2025 at 11:28:13AM +0100, Jonas Gorski wrote:
->
-> ...
->
-> > diff --git a/net/dsa/user.c b/net/dsa/user.c
-> > index f59d66f0975d..fa1fe0f1493a 100644
-> > --- a/net/dsa/user.c
-> > +++ b/net/dsa/user.c
-> > @@ -653,21 +653,30 @@ static int dsa_user_port_attr_set(struct net_devi=
-ce *dev, const void *ctx,
-> >
-> >  /* Must be called under rcu_read_lock() */
-> >  static int
-> > -dsa_user_vlan_check_for_8021q_uppers(struct net_device *user,
-> > +dsa_user_vlan_check_for_8021q_uppers(struct dsa_port *dp,
-> >                                    const struct switchdev_obj_port_vlan=
- *vlan)
-> >  {
-> > -     struct net_device *upper_dev;
-> > -     struct list_head *iter;
-> > +     struct dsa_switch *ds =3D dp->ds;
-> > +     struct dsa_port *other_dp;
-> >
-> > -     netdev_for_each_upper_dev_rcu(user, upper_dev, iter) {
-> > -             u16 vid;
-> > +     dsa_switch_for_each_user_port(other_dp, ds) {
-> > +             struct net_device *user =3D other_dp->user;
->
-> Hi Jonas,
->
-> The AI robot is concerned that user may be NULL here.
-> And I can't convince myself that cannot be the case.
->
-> Could you take a look?
->
-> https://netdev-ai.bots.linux.dev/ai-review.html?id=3D3d47057e-e740-4b66-9=
-d60-9ec2a7ee92a1#patch-0
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-At this point it can be NULL. But it being NULL is not an issue, as ...
->
-> > +             struct net_device *upper_dev;
-> > +             struct list_head *iter;
-> >
-> > -             if (!is_vlan_dev(upper_dev))
-> > +             if (!dsa_port_bridge_same(dp, other_dp))
-> >                       continue;
+On Fri, 28 Nov 2025 05:11:44 -0800 you wrote:
+> This series migrates Freescale network drivers to use the new .get_rx_ring_count()
+> ethtool callback introduced in commit 84eaf4359c36 ("net: ethtool: add
+> get_rx_ring_count callback to optimize RX ring queries").
+> 
+> The new callback simplifies the .get_rxnfc() implementation by removing
+> ETHTOOL_GRXRINGS handling and moving it to a dedicated callback. This provides
+> a cleaner separation of concerns and aligns these drivers with the modern
+> ethtool API.
+> 
+> [...]
 
-... this condition will filter all cases where it is NULL. For
-dsa_port_bridge_same() to return true both ports need to be attached
-to a bridge (and to the same bridge), and to be attached to a bridge a
-net_device is required, so other_dp->user cannot be NULL. And we only
-access user after here.
+Here is the summary with links:
+  - [net-next,1/3] net: gianfar: convert to use .get_rx_ring_count
+    https://git.kernel.org/netdev/net-next/c/d3fbfb8b2c4a
+  - [net-next,2/3] net: dpaa2: convert to use .get_rx_ring_count
+    https://git.kernel.org/netdev/net-next/c/b2d633926901
+  - [net-next,3/3] net: enetc: convert to use .get_rx_ring_count
+    https://git.kernel.org/netdev/net-next/c/ca8df5b877d4
 
-Best regards,
-Jonas
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
