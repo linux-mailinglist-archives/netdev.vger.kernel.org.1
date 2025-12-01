@@ -1,155 +1,122 @@
-Return-Path: <netdev+bounces-242916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C289EC964A0
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 09:58:14 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26EFBC964E6
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 10:01:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81F543A3F3E
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 08:58:13 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1A8ED4E0439
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 09:01:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A74E62FCC16;
-	Mon,  1 Dec 2025 08:58:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7D252EBB8B;
+	Mon,  1 Dec 2025 09:01:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="YOM5Lr5d";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="v0HBoub+";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="YOM5Lr5d";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="v0HBoub+"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="V+ej+Dn7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E40B22FD680
-	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 08:58:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A864A2C030E
+	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 09:01:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764579491; cv=none; b=JfC2Qnfebxi4vMlEwXw5Gp/y96IJ0uYp3hPGm0bvimbWWk7AlK6b02RvwOjLps8/FHbCPTcaMzVFe8SSl4ksYMIoPEONAV8PcOBM0XNe3fXzLoDKVW64SQL6p/MP4I+3dXAief/da52VGXb8K1n9N1ifZAFmwT0AnRrs/R7MpLs=
+	t=1764579707; cv=none; b=h9hZ4fTKCQjNFHWdDWc4QyrlYulRTWqjaZ4ORRGFLQb7A/oVjb3yxROvOTK47xWerxMCm0lqUkizH711ZHWN37HUwT4MKIItDHb3UqmYqcgauzxxmf9d8L0uDq5SZ4KgBTxb7I/QuhKgo/qWr2thCnCI4MStZx7U3FhZD0duZj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764579491; c=relaxed/simple;
-	bh=X5wRJC7lZfI2JxXrlOHVkK8Dhcp5VBRZVeLW6lB6M00=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KL7qisNq1Ur1u3xV6NczkJBESUMOuQPwChTZda9ucmC3gA86AP4U1yQ8CdTnPmi2uv1HtP5mnxlavUuGjX5YCNqBTxbWfNHA42UE+/7T1ocIk8lZgevelrw5IeIyFbRvz9rRRZ1c/R4wpdeFFf8vucXDTo6W9NEwHLu0BF3ynM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=YOM5Lr5d; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=v0HBoub+; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=YOM5Lr5d; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=v0HBoub+; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	s=arc-20240116; t=1764579707; c=relaxed/simple;
+	bh=H+iJGWdBNt2Bhj49PeJmHMqb/ySZVm/J5km51i3J7zU=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=doAums55cxYdweVU8f+bAfrt28g/rLlmEGBBjIrW5NOzR/m22BKHiVitIPtpNCkNGO6R052IZiETmVg+hhtJgyxWBCoREQM5AH/yj37td0bBvBfma+xSdUUZsjbx/qyNP2Mz97hHKHGrL8JLmWTDD0D59Q/Rb9obvq0bIWhxd2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=V+ej+Dn7; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 9B8E220612;
+	Mon,  1 Dec 2025 10:01:43 +0100 (CET)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 1Kwz3g4ZyC8f; Mon,  1 Dec 2025 10:01:42 +0100 (CET)
+Received: from EXCH-01.secunet.de (unknown [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 1CADA5BD51;
-	Mon,  1 Dec 2025 08:58:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1764579488; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8SiUpfX9M8LLIqmWf8iz9EvnoQHx9wwh9z4++DhczXg=;
-	b=YOM5Lr5dxO2NFsFswzCU51zzS1qdtnJeDKu5HqEeXhHcokcFpHOT/YkSFTteG2ofDyp5ju
-	b7wb7ewP1jiRifhUcozu2vUV7AJO3E9RqSPrkLSAsO0pG6VUooI+LX6olSeTMPYIKu2PN4
-	pahFrNPO88p4q7bKyjIEVzztho88ALE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1764579488;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8SiUpfX9M8LLIqmWf8iz9EvnoQHx9wwh9z4++DhczXg=;
-	b=v0HBoub+/l86Qc2eTq9Z2v25Szy1lPy4LVcsWTsNjpQlUCREwgmPIsKqxx1t0gtlaPBbfG
-	gBVEqacIEikG/TDg==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1764579488; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8SiUpfX9M8LLIqmWf8iz9EvnoQHx9wwh9z4++DhczXg=;
-	b=YOM5Lr5dxO2NFsFswzCU51zzS1qdtnJeDKu5HqEeXhHcokcFpHOT/YkSFTteG2ofDyp5ju
-	b7wb7ewP1jiRifhUcozu2vUV7AJO3E9RqSPrkLSAsO0pG6VUooI+LX6olSeTMPYIKu2PN4
-	pahFrNPO88p4q7bKyjIEVzztho88ALE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1764579488;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8SiUpfX9M8LLIqmWf8iz9EvnoQHx9wwh9z4++DhczXg=;
-	b=v0HBoub+/l86Qc2eTq9Z2v25Szy1lPy4LVcsWTsNjpQlUCREwgmPIsKqxx1t0gtlaPBbfG
-	gBVEqacIEikG/TDg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 960073EA63;
-	Mon,  1 Dec 2025 08:58:07 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id OVbFIZ9YLWmCPAAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Mon, 01 Dec 2025 08:58:07 +0000
-Message-ID: <30ee83e6-bed4-43c8-bbe2-ea19fbf17ce3@suse.de>
-Date: Mon, 1 Dec 2025 09:58:00 +0100
+	by mx1.secunet.com (Postfix) with ESMTPS id C332020518;
+	Mon,  1 Dec 2025 10:01:42 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com C332020518
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1764579702;
+	bh=xU/9uyJgMBz4E2lc0h8DAmnMIQlhFbBYDZmoeL04dhU=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=V+ej+Dn7y4eKYQJw4+5RxKLBoPeaea1q+EjKL2J4Zjml7JtMtme7qh2vz6SMn17ej
+	 vOPgxI0Lr6RcXDqkHmz1ERTvEFspduagRKnrO2DtIB2o9AROx6o5hc5fkRrjOYrq1e
+	 cCkT61sGD+Oa2TJyFQCnRrJG6PykqnS2FWMpgelqtlpZAnI24DHand2qevl972PaHi
+	 LSq3Ec52J0rEl1I7IlBLI4WPp4wV8b2+kyFB2Iv3IqLN03zKX4nGuiNGW0/Wfaou5D
+	 W53uicQz9jviceIR1fgsgzAPeIT1tZpniUnWsqzAkQuHU772xY445hDxKHGpr87BwC
+	 H0/huOOZ+AqOg==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.2562.17; Mon, 1 Dec
+ 2025 10:01:42 +0100
+Received: (nullmailer pid 1123638 invoked by uid 1000);
+	Mon, 01 Dec 2025 09:01:41 -0000
+Date: Mon, 1 Dec 2025 10:01:41 +0100
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Cosmin Ratiu <cratiu@nvidia.com>
+CC: <netdev@vger.kernel.org>, Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Taehee Yoo
+	<ap420073@gmail.com>, Jianbo Liu <jianbol@nvidia.com>, Sabrina Dubroca
+	<sd@queasysnail.net>, Herbert Xu <herbert@gondor.apana.org.au>, Leon
+ Romanovsky <leonro@nvidia.com>
+Subject: Re: [RFC PATCH ipsec 0/2] Fix bonding IPSec races
+Message-ID: <aS1ZdbElmUB7VyPU@secunet.com>
+References: <20251121151644.1797728-1-cratiu@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2 net-next] selftests: ipv6_icmp: add tests for ICMPv6
- handling
-To: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org
-Cc: linux-kselftest@vger.kernel.org, shuah@kernel.org, horms@kernel.org,
- pabeni@redhat.com, kuba@kernel.org, edumazet@google.com, davem@davemloft.net
-References: <20251126201943.4480-1-fmancera@suse.de>
- <20251126201943.4480-2-fmancera@suse.de>
- <341a110e-7ba0-4846-abf4-5143042c8e80@kernel.org>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <341a110e-7ba0-4846-abf4-5143042c8e80@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	URIBL_BLOCKED(0.00)[suse.de:mid,imap1.dmz-prg2.suse.org:helo];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Level: 
-X-Spam-Score: -4.30
-X-Spam-Flag: NO
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20251121151644.1797728-1-cratiu@nvidia.com>
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ EXCH-01.secunet.de (10.32.0.171)
 
-On 11/29/25 4:56 PM, David Ahern wrote:
-> On 11/26/25 12:19 PM, Fernando Fernandez Mancera wrote:
->> Test ICMPv6 to link local address and local address. In addition, this
->> test set could be extended to cover more situations in the future.
->>
->> ICMPv6 to local addresses
->>      TEST: Ping to link local address                                   [OK]
->>      TEST: Ping to link local address from ::1                          [OK]
->>      TEST: Ping to local address                                        [OK]
->>      TEST: Ping to local address from ::1                               [OK]
->>
+On Fri, Nov 21, 2025 at 05:16:42PM +0200, Cosmin Ratiu wrote:
+> These patches are an alternate proposed fix to the bonding IPSec races
+> which could result in unencrypted IPSec packets on the wire.
+> I'm sending them as RFC based on the discussion with Sabrina on the
+> primary approach [1].
 > 
-> VRF based tests are needed as well to ensure this change works properly
-> with VRFs.
+> [1] https://lore.kernel.org/netdev/20251113104310.1243150-1-cratiu@nvidia.com/T/#u
 > 
+> Cosmin Ratiu (2):
+>   xfrm: Add explicit offload_handle to some xfrm callbacks
+>   bonding: Maintain offloaded xfrm on all devices
+> 
+>  Documentation/networking/xfrm_device.rst      |  13 +-
+>  drivers/net/bonding/bond_main.c               | 284 ++++++++++--------
+>  .../net/ethernet/chelsio/cxgb4/cxgb4_main.c   |  20 +-
+>  .../inline_crypto/ch_ipsec/chcr_ipsec.c       |  25 +-
+>  .../net/ethernet/intel/ixgbe/ixgbe_ipsec.c    |  47 +--
+>  drivers/net/ethernet/intel/ixgbevf/ipsec.c    |  18 +-
+>  .../marvell/octeontx2/nic/cn10k_ipsec.c       |  13 +-
+>  .../mellanox/mlx5/core/en_accel/ipsec.c       |  26 +-
+>  .../net/ethernet/netronome/nfp/crypto/ipsec.c |  10 +-
+>  drivers/net/netdevsim/ipsec.c                 |   8 +-
+>  include/linux/netdevice.h                     |   7 +-
+>  include/net/bonding.h                         |  22 +-
+>  net/xfrm/xfrm_device.c                        |   3 +-
+>  net/xfrm/xfrm_state.c                         |   7 +-
+>  14 files changed, 295 insertions(+), 208 deletions(-)
 
-Thank you David. I am reposting it with VRF based tests once net-next 
-tree is open again.
+There are only minor changes to the IPsec subsystem,
+compared to drivers and bonding. Also this is a rather
+big change for a fix. So if this patchset should go to
+the ipsec tree, we would need some ACKs from the drivers
+an bonding maintainers.
+
 
