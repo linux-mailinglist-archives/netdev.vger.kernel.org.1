@@ -1,87 +1,69 @@
-Return-Path: <netdev+bounces-243103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13E1FC99833
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 00:05:17 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92277C99872
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 00:08:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E63504E2472
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 23:05:15 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 96A3E344F70
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 23:08:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AA7A2874E0;
-	Mon,  1 Dec 2025 23:05:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 568CB288C34;
+	Mon,  1 Dec 2025 23:07:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EySsHka1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eimEgyZd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 152F3200110;
-	Mon,  1 Dec 2025 23:05:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C6E28725D
+	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 23:07:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764630312; cv=none; b=MeWmMEUUD72FoFa+Nvw1O60FWiQjrvpzyB5GukE7lGsyTnRw7J+1JZj/MCA6x1gyH4p6Wxrso1GziAtcc5vACF+i/imOZyHppIt4f0okGluuhLEJLjiE9uG1D3jA8qw49K7c3HADHwdVSGeW0PfvElgqq8T0Ji2nI8omN2uxTE0=
+	t=1764630451; cv=none; b=DNjKOsIfvIJVFBn6lvFWv3RmDh+v2iYIRYiXFxo34skq2seXQLVCCuzVrS3dbTlmlHwX6U8HEjHj3e/X5g+nlJ3Nfj9EdhVeFbcVvKPjRMLI5bLTfNGlTjksBFAWi/jWzUVd8/LglArQiK8Z8lIG0BfPZUqFo6CSXy/YXqAEnC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764630312; c=relaxed/simple;
-	bh=+RwdZzAxVA6x5/ldXNRxGJfwfndyYVCm7OwfFpRdce0=;
+	s=arc-20240116; t=1764630451; c=relaxed/simple;
+	bh=aoupLO/Cmc7kzJqFpK2+jsxfj766QCKn9BTbHcOeH+g=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tBNQUxDtAYZJj8jQ9A89l/WXsq7kDaGBqkqHKPywXrLHE8C/qsu53QtQ6Lh1+gAYlBjpOCoILWb3tUEvJIOD+G6jTl/FKETBDDJm4VGnoNzvZyn9Q0hUI69QB5m66u5FT5l5jDy19/ElWsLPxek1cvjJKeWzc6ACTRDRcxJemZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EySsHka1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58E86C4CEF1;
-	Mon,  1 Dec 2025 23:05:10 +0000 (UTC)
+	 MIME-Version:Content-Type; b=o7GtCSehthsRU1F3Y35sGbBRxkSJJJzrjZXwgCtt2Pvj7HvX81n3AUGnOf9Uj2g4nZgiDcPnvFCW1+ZLtDx4I8yOAZNMqCqvgb6xpfkB62pVQQyMKYZUV0iPxux2io13VmeW3z3tWYcL5D1WIbMdxUbsHU94D0DiIM1BcFl9NE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eimEgyZd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FFCFC4CEF1;
+	Mon,  1 Dec 2025 23:07:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764630311;
-	bh=+RwdZzAxVA6x5/ldXNRxGJfwfndyYVCm7OwfFpRdce0=;
+	s=k20201202; t=1764630450;
+	bh=aoupLO/Cmc7kzJqFpK2+jsxfj766QCKn9BTbHcOeH+g=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EySsHka1wYUk7NkXPmW4y/vX+DwSxu3o7dZOI3+z7Ghe8EmbpwLuO7HHRsN7lwKN+
-	 rfdTf4XtggqLYDrCV0JtT0qvsrMtRa1wY+wXqFrnIql/DLpwJ4KXKg3n3vo/+SqbKp
-	 LZsxt1Rphkxg48fMhGk+I+Rg4ucsFRVfXy2JLUUXL5ncWFnYaHfaZMU9Z9U5pTx9gS
-	 GxlInJ0+hjJuenWwRhipkERPPRUGLGxMWQ+5sFbjRF7a4MxJ7y/Dl7R6SvFELA66Jw
-	 bg1X1WQuhjGipOoz5SztV8pYY/e4EiqWfKMmdQqIprJAnSkXjCDWcrbvk+JFtpMBz+
-	 AOPYDAl2avm1A==
-Date: Mon, 1 Dec 2025 15:05:09 -0800
+	b=eimEgyZdn5w2UyRMZ1m0AIWOlU6payeLM5nW/GugUSYUhgQRZlcJ5oniKy+OeB25K
+	 dZSgdhT43+Voqz5buma1tlu00tmyu1Y01NkT2GBP6RzcDMCUpYXQ4baJ3VGPwNrd/G
+	 Q6s03l9JgcCbcBch/KxxBRC1iYLgjc5wR8wmFoZqTyNhOWvt3IkgwTxLYCrGPFBnqb
+	 Uow0Q97AvMKqO9T7UxcwcyRjRv+QUt16dgIxo+4+IBdqv1YlE8ofAdkwSbutrj7FEx
+	 YWwZJ/uQp8ikn/FULJm70RI5v67mM+/9GpDn1r5FqUUwVTD8tGS6hMk37togsEiNqa
+	 0h+yXbyLkN70A==
+Date: Mon, 1 Dec 2025 15:07:29 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: chia-yu.chang@nokia-bell-labs.com
-Cc: pabeni@redhat.com, edumazet@google.com, parav@nvidia.com,
- linux-doc@vger.kernel.org, corbet@lwn.net, horms@kernel.org,
- dsahern@kernel.org, kuniyu@google.com, bpf@vger.kernel.org,
- netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com,
- stephen@networkplumber.org, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- davem@davemloft.net, andrew+netdev@lunn.ch, donald.hunter@gmail.com,
- ast@fiberby.net, liuhangbin@gmail.com, shuah@kernel.org,
- linux-kselftest@vger.kernel.org, ij@kernel.org, ncardwell@google.com,
- koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com,
- ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com,
- cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com,
- vidhi_goel@apple.com
-Subject: Re: [PATCH v7 net-next 00/13] AccECN protocol case handling series
-Message-ID: <20251201150509.6cd9fefc@kernel.org>
-In-Reply-To: <20251201163800.3965-1-chia-yu.chang@nokia-bell-labs.com>
-References: <20251201163800.3965-1-chia-yu.chang@nokia-bell-labs.com>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH net-next 00/11] wireguard updates for 6.19
+Message-ID: <20251201150729.521a927d@kernel.org>
+In-Reply-To: <20251201022849.418666-1-Jason@zx2c4.com>
+References: <20251201022849.418666-1-Jason@zx2c4.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon,  1 Dec 2025 17:37:47 +0100 chia-yu.chang@nokia-bell-labs.com
-wrote:
-> Plesae find the v7 AccECN case handling patch series, which covers
-> several excpetional case handling of Accurate ECN spec (RFC9768),
-> adds new identifiers to be used by CC modules, adds ecn_delta into
-> rate_sample, and keeps the ACE counter for computation, etc.
-> 
-> This patch series is part of the full AccECN patch series, which is available at
-> https://github.com/L4STeam/linux-net-next/commits/upstream_l4steam/
+On Mon,  1 Dec 2025 03:28:38 +0100 Jason A. Donenfeld wrote:
+> Please find here Asbj=C3=B8rn's yml series. This has been sitting in my
+> testing for the last week or so, since he sent out the latest series,
+> and I haven't found any issues so far. Please pull!
 
-Linux tagged 6.18 final, so net-next is closed for new code submissions
-per the announcement at
-https://lore.kernel.org/20251130174502.3908e3ee@kernel.org
--- 
-pw-bot: defer
+Hi Jason! Thanks for the quick turn around! You say "please pull"
+did you mean to include a PR in this or should I apply the patches=20
+from the list?
 
