@@ -1,292 +1,408 @@
-Return-Path: <netdev+bounces-243037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2AE3C989FA
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 18:56:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7495CC98A15
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 18:57:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B11713A6431
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 17:54:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEBCB3A4391
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 17:57:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBD633385BE;
-	Mon,  1 Dec 2025 17:54:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E84353385B9;
+	Mon,  1 Dec 2025 17:57:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D4IUtPHX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com [209.85.210.72])
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2C3933890B
-	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 17:54:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09F0B335BAA
+	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 17:57:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764611649; cv=none; b=u1urDIN6QhaRhr6SNtlKDmyHUPyLmk2XZPkO73oTChLOF+WSJ6kIMzLBcKbinyXrIB0NAmzY/WORZHAJGlwKPOXnsnENpiuzcRKGAPysC1e1IlSqw7gUV4COVfbDWh9hR2YpOTZraOq/z2yWMPz5uXkcWLh9dPlt4kPUAb8rx/w=
+	t=1764611844; cv=none; b=VgffhxW93ZRdyAFmBRC5P7Y6I9FN9hNioo+KnjdEzH7Rxj+kUSAQTc0WV32iuYuHLLCCqifMV8ouPKtY3wCr8zb+7jQReo+BPGqmShYk7px8/LvxEmWc32yk69aykBEtFxt1lY1OnmH5VEy3VH0DfBrdVv+XsJmyY9IXMrhGUxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764611649; c=relaxed/simple;
-	bh=nyM5B04WuEeoHFU+XeboANqmb9rEd5fYWiqE8ERWhpg=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=dr27vV/8yXBujho/LnVmulZj65Zpy+PjI9IFkzja5kj3F2kguGgi6rXWfB3kuqF5FGXn6LpyPEQSrmWFn0y5ZbRE5T+IWg+e+kW/S1vDpbu2TxTie08zZN719ZCp7dB5nPq6aVPL6Of8tiqG+M6DaS4JET/6t8G4mb5VUBDOVPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-7c75290862cso8547670a34.2
-        for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 09:54:07 -0800 (PST)
+	s=arc-20240116; t=1764611844; c=relaxed/simple;
+	bh=c4usMbBj3/G86A0FdsSpAon/EhuYcqKwiGhrgdLC5zs=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=q+u+BHcw4KZoyQdnMPtZ0yCJ5euNsHWO60R8JT0UbD1uWed2wYzm3UgmZXBiySQ6MFgA/by5h+pa8hIiaBSqF0/qaAQspegQ3+k5zg/kEuNX23gtR4KJNuXYi4o8GoPtj3X/n2ifnyjQG9thzE0kiUSVSiPBAxCq2rkYN0K/ohQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D4IUtPHX; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-787e7aa1631so56028197b3.1
+        for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 09:57:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764611842; x=1765216642; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tkqmpx35EBVYyHz+sYsqNnuEOUKwB0sqoFFtTjdVi3U=;
+        b=D4IUtPHX3vd97uc16dyLGDG9nmtNR/KA0daJIPl3EMNH8tN+1HUAUtSOI9XqEnGCBm
+         ulU5y9il/1Hc1MaXclJcU180ym34lezPO+pNK2kPGHnwdkFNp3yVLdNh7CfWR6pVYMwx
+         oYxqYxcG4kHGuGDi91c4jeV7SE/t/O3HElgDS8Ae3e/LZhYydI0JM0UaFxE9SWXmS7am
+         kwjnasUY4r9sAi7QXj9bd/hR8jlwwwsl5v9+BteR1IdIk7K7r1CB5/f25ieQ7tkJa2Zz
+         2cyo5/KMVVOkURp70rGAP9tM/ih/ykFu9zjF8A3zscuNXJ5XrAJomK5oeITv46cRN311
+         qcew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764611647; x=1765216447;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Wyc6WjZ8Em7woNiV98DJoyRaZxKfm+HKgB4Z/K976KI=;
-        b=mPV46JWekYfn84gbXHXcwHZkHIEMKypvI99DPyq7JUqOoe++Dd5lYR5IqQZFcX42AB
-         6MKpoI1fWgJxY+1lEbILBryCvIsG8qZOWWahnp2Ss9DlbqsqmZWMc7F6ieWSwHgcd4zT
-         thf/UFrz7TyXwWC2nvWQBTGsy7UbAf0BsTE68ANmg5ZKLGagzQvuWjCh72966wL0ucry
-         nPtlYs5bAQ7TO9Y5V7EcsBCDl6L60htdQniipuBn3XtnzHKMbROGMILJWkjp8+pkGJ0M
-         zvK5rNksWyhMnf1BjNAjpG9kYfd4xhXTDzEkjiawWygYzP24Wi6cwrsxE+p0RC5mGFVF
-         ce9w==
-X-Forwarded-Encrypted: i=1; AJvYcCU2MiFYhtH/NaxomiZzy17gqSux/B4Rdy0ZMZloTBWJ3oDekxiMpz46D9ymHYEUzrZQitY4kC0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwlKT04JHgnTo1yPbx0sK5Jax1ITy/Lnk9SB6j38mVclpWq4fp0
-	zDPjKkeuWohF6PwbAndD8hsa/nnzsUMHMK7MXH3rWRs1nVSlxDqk5BFGiSrv3g3hcSgxEJRLgcZ
-	MfT60evQ7bl7sJBUlnHDnz3+vbbcM7KKptV6t+peH7dJjjmzaugRNXpg43sc=
-X-Google-Smtp-Source: AGHT+IHMd8XzOHphqg33Hf8c3lCpH6nTpq0tWYN6ecFTHLilPens0485mvdEtkuPcdfEFKdo6fl/wZBHEdqpTQ+GAUxlbz1vkJXp
+        d=1e100.net; s=20230601; t=1764611842; x=1765216642;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tkqmpx35EBVYyHz+sYsqNnuEOUKwB0sqoFFtTjdVi3U=;
+        b=oDCADOIflWbkoVgf1flmmy/DpqAvGAuKcgUDrjDI7R65cDsjUBrOAGNlyvx8wFlSvJ
+         mCp0SOGxAk31Oni6i0NVVm8JXGfDcAG2ne+3g5dqt+fcbiSj56HTUcbB4rzyJAjVmaNy
+         CCnAXxe5XJeUQZZSHDW4wvsdfEl4tpqY3p91dakqXMvHjOwfQHu0hchWVaHP/a4bZLAf
+         2onZh2OnngzYiKhVGkN4lSie/k/SW8s1PWPr6lxP59O3WTayb73EyeYf++sz3f2NBbBA
+         KP8KEXSvWCnU90m+ykALHrrbeGRxUlZrehxlXNZA4KVItYqgBUivN4l3BohSWnj57Oq1
+         heNw==
+X-Forwarded-Encrypted: i=1; AJvYcCVzBBhKAAqiDvo566qCjJSa42owvZ1eNNKpbIzZTwF48gL0xJmidCv/fvTY+RWrma4KmJb4bKE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkgRLIh5bXoqExzJpWCckIhSjjvs4FAAHg8Aa891/QYFEapSJU
+	/clOphGUoFZI6xi0ZTVKJvfRPFqmNbF8SKhq81cmMKDfSEa0XSMZyvxd
+X-Gm-Gg: ASbGncujAGksoOfB4LFM/bz3j3r4FwSyWE4roY0watfjAm1/evFTLtSPmypPoSjHLpT
+	eeMtrb/veT8GSIrXVMGk7xfDCLBBLbvKt3e0Nm4h+OUpy9lXy7FqxxOJY3ttBHPAUJ9e/T4T3VG
+	w/uQV04M30/cavzwvUxn32D73qjWeHQ/0rQL14HNU86ZlEeyc97tFMAArS9X+Osz+H/GDBwyehw
+	P1Y1za3iCZHv4Hb6cqJjgFPIvOYpIIarwGke6AT0B3xgK+xSAMVdQl9UI9dnN5EAm1kj/wP39UE
+	ARFwSis4L/rmlvTwrTHnIBtP6f9nibLIhD458q1LJCT9vGxI5hx+uvdhlowN+L16EzXkH+qr1Tp
+	gF9mCSJtYpSKTt9JCYX8yq0Hd97ckqrxueuxGwtJImlXqw/d20RwRUHUpvffYPEutX6bos8cD3S
+	r8UgdKy9sNyehlXWxToEDE9kogYyrPpyfnCgcAK9HAdsz9BGK11Hc2DWFI2z29vk88/j0=
+X-Google-Smtp-Source: AGHT+IHtwRV3z+eEprkjPN1JlQVtx9G4JjRCbnGZDpI5VxqHcgiCtPJziT1NzvZ10SNonlVHTRvkuA==
+X-Received: by 2002:a05:690e:429c:10b0:63f:96d7:a369 with SMTP id 956f58d0204a3-643026257f4mr28216730d50.28.1764611841786;
+        Mon, 01 Dec 2025 09:57:21 -0800 (PST)
+Received: from gmail.com (116.235.236.35.bc.googleusercontent.com. [35.236.235.116])
+        by smtp.gmail.com with UTF8SMTPSA id 956f58d0204a3-6433bf5f366sm5191475d50.0.2025.12.01.09.57.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Dec 2025 09:57:20 -0800 (PST)
+Date: Mon, 01 Dec 2025 12:57:20 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+ =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@toke.dk>, 
+ Jamal Hadi Salim <jhs@mojatatu.com>, 
+ Cong Wang <xiyou.wangcong@gmail.com>, 
+ Jiri Pirko <jiri@resnulli.us>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: =?UTF-8?B?Sm9uYXMgS8O2cHBlbGVy?= <j.koeppeler@tu-berlin.de>, 
+ cake@lists.bufferbloat.net, 
+ netdev@vger.kernel.org, 
+ =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
+Message-ID: <willemdebruijn.kernel.1b99d2d13dcba@gmail.com>
+In-Reply-To: <20251130-mq-cake-sub-qdisc-v3-1-5f66c548ecdc@redhat.com>
+References: <20251130-mq-cake-sub-qdisc-v3-0-5f66c548ecdc@redhat.com>
+ <20251130-mq-cake-sub-qdisc-v3-1-5f66c548ecdc@redhat.com>
+Subject: Re: [PATCH net-next v3 1/5] net/sched: Export mq functions for reuse
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6808:1794:b0:450:cc6d:d4ce with SMTP id
- 5614622812f47-4514e84c99emr12733411b6e.63.1764611646967; Mon, 01 Dec 2025
- 09:54:06 -0800 (PST)
-Date: Mon, 01 Dec 2025 09:54:06 -0800
-In-Reply-To: <20251201-flowtable-offload-ip6ip6-v1-0-1dabf534c074@kernel.org>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <692dd63e.a70a0220.d98e3.018c.GAE@google.com>
-Subject: [syzbot ci] Re: Add IP6IP6 flowtable SW acceleration
-From: syzbot ci <syzbot+ci42934faa3c3455b7@syzkaller.appspotmail.com>
-To: coreteam@netfilter.org, davem@davemloft.net, dsahern@kernel.org, 
-	edumazet@google.com, fw@strlen.de, horms@kernel.org, kadlec@netfilter.org, 
-	kuba@kernel.org, linux-kselftest@vger.kernel.org, lorenzo@kernel.org, 
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, pabeni@redhat.com, 
-	pablo@netfilter.org, phil@nwl.cc, shuah@kernel.org
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-syzbot ci has tested the following series
+Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+> To enable the cake_mq qdisc to reuse code from the mq qdisc, export a
+> bunch of functions from sch_mq. Split common functionality out from som=
+e
+> functions so it can be composed with other code, and export other
+> functions wholesale.
+> =
 
-[v1] Add IP6IP6 flowtable SW acceleration
-https://lore.kernel.org/all/20251201-flowtable-offload-ip6ip6-v1-0-1dabf534c074@kernel.org
-* [PATCH RFC nf-next 1/4] netfilter: Introduce tunnel metadata info in nf_flowtable_ctx struct
-* [PATCH RFC nf-next 2/4] netfilter: flowtable: Add IP6IP6 rx sw acceleration
-* [PATCH RFC nf-next 3/4] netfilter: flowtable: Add IP6IP6 tx sw acceleration
-* [PATCH RFC nf-next 4/4] selftests: netfilter: nft_flowtable.sh: Add IP6IP6 flowtable selftest
+> No functional change intended.
+> =
 
-and found the following issue:
-KASAN: slab-use-after-free Read in nf_flow_skb_encap_protocol
+> Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+> ---
+>  include/net/sch_generic.h | 19 +++++++++++++
+>  net/sched/sch_mq.c        | 69 ++++++++++++++++++++++++++++++++-------=
+--------
+>  2 files changed, 67 insertions(+), 21 deletions(-)
+> =
 
-Full report is available here:
-https://ci.syzbot.org/series/df395c22-6768-4a9f-9a96-56b5307acbc6
+> diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+> index c3a7268b567e..f2281914d962 100644
+> --- a/include/net/sch_generic.h
+> +++ b/include/net/sch_generic.h
 
-***
+We probably want to avoid random users. This may be better suited to a
+local header, similar to net/core/devmem.h.
 
-KASAN: slab-use-after-free Read in nf_flow_skb_encap_protocol
+I don't mean to derail this feature if these are the only concerns.
+This can be revised later in -rcX too.
 
-tree:      nf-next
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netfilter/nf-next.git
-base:      ff736a286116d462a4067ba258fa351bc0b4ed80
-arch:      amd64
-compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-config:    https://ci.syzbot.org/builds/018f7259-7abc-4b77-b40c-e8e520e1e793/config
-C repro:   https://ci.syzbot.org/findings/5cb5bc43-721b-4a9e-a093-4d52aab5ba9f/c_repro
-syz repro: https://ci.syzbot.org/findings/5cb5bc43-721b-4a9e-a093-4d52aab5ba9f/syz_repro
+> @@ -1419,7 +1419,26 @@ void mini_qdisc_pair_init(struct mini_Qdisc_pair=
+ *miniqp, struct Qdisc *qdisc,
+>  void mini_qdisc_pair_block_init(struct mini_Qdisc_pair *miniqp,
+>  				struct tcf_block *block);
+>  =
 
-==================================================================
-BUG: KASAN: slab-use-after-free in nf_flow_ip6_tunnel_proto net/netfilter/nf_flow_table_ip.c:383 [inline]
-BUG: KASAN: slab-use-after-free in nf_flow_skb_encap_protocol+0x1336/0x14e0 net/netfilter/nf_flow_table_ip.c:433
-Read of size 2 at addr ffff888115de92b6 by task syz.0.20/5970
+> +struct mq_sched {
+> +	struct Qdisc		**qdiscs;
+> +};
+> +
+> +int mq_init_common(struct Qdisc *sch, struct nlattr *opt,
+> +		   struct netlink_ext_ack *extack,
+> +		   const struct Qdisc_ops *qdisc_ops);
+> +void mq_destroy_common(struct Qdisc *sch);
+> +void mq_attach(struct Qdisc *sch);
+>  void mq_change_real_num_tx(struct Qdisc *sch, unsigned int new_real_tx=
+);
+> +void mq_dump_common(struct Qdisc *sch, struct sk_buff *skb);
+> +struct netdev_queue *mq_select_queue(struct Qdisc *sch,
+> +				     struct tcmsg *tcm);
+> +struct Qdisc *mq_leaf(struct Qdisc *sch, unsigned long cl);
+> +unsigned long mq_find(struct Qdisc *sch, u32 classid);
+> +int mq_dump_class(struct Qdisc *sch, unsigned long cl,
+> +		  struct sk_buff *skb, struct tcmsg *tcm);
+> +int mq_dump_class_stats(struct Qdisc *sch, unsigned long cl,
+> +			struct gnet_dump *d);
+> +void mq_walk(struct Qdisc *sch, struct qdisc_walker *arg);
+>  =
 
-CPU: 0 UID: 0 PID: 5970 Comm: syz.0.20 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0xca/0x240 mm/kasan/report.c:482
- kasan_report+0x118/0x150 mm/kasan/report.c:595
- nf_flow_ip6_tunnel_proto net/netfilter/nf_flow_table_ip.c:383 [inline]
- nf_flow_skb_encap_protocol+0x1336/0x14e0 net/netfilter/nf_flow_table_ip.c:433
- nf_flow_offload_ipv6_lookup net/netfilter/nf_flow_table_ip.c:1065 [inline]
- nf_flow_offload_ipv6_hook+0x131/0x3380 net/netfilter/nf_flow_table_ip.c:1092
- nf_hook_entry_hookfn include/linux/netfilter.h:158 [inline]
- nf_hook_slow+0xc5/0x220 net/netfilter/core.c:623
- nf_hook_ingress include/linux/netfilter_netdev.h:34 [inline]
- nf_ingress net/core/dev.c:5900 [inline]
- __netif_receive_skb_core+0x241c/0x2f90 net/core/dev.c:5996
- __netif_receive_skb_one_core net/core/dev.c:6135 [inline]
- __netif_receive_skb+0x72/0x380 net/core/dev.c:6250
- netif_receive_skb_internal net/core/dev.c:6336 [inline]
- netif_receive_skb+0x1cb/0x790 net/core/dev.c:6395
- tun_rx_batched+0x1b9/0x730 drivers/net/tun.c:1485
- tun_get_user+0x2b65/0x3e90 drivers/net/tun.c:1953
- tun_chr_write_iter+0x113/0x200 drivers/net/tun.c:1999
- new_sync_write fs/read_write.c:593 [inline]
- vfs_write+0x5c9/0xb30 fs/read_write.c:686
- ksys_write+0x145/0x250 fs/read_write.c:738
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f8b24f8f7c9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f8b25e26038 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 00007f8b251e6090 RCX: 00007f8b24f8f7c9
-RDX: 000000000000fdef RSI: 0000200000000440 RDI: 0000000000000003
-RBP: 00007f8b24ff297f R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f8b251e6128 R14: 00007f8b251e6090 R15: 00007ffe014b8a38
- </TASK>
+>  int sch_frag_xmit_hook(struct sk_buff *skb, int (*xmit)(struct sk_buff=
+ *skb));
+>  =
 
-Allocated by task 5970:
- kasan_save_stack mm/kasan/common.c:56 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:77
- unpoison_slab_object mm/kasan/common.c:342 [inline]
- __kasan_slab_alloc+0x6c/0x80 mm/kasan/common.c:368
- kasan_slab_alloc include/linux/kasan.h:252 [inline]
- slab_post_alloc_hook mm/slub.c:4978 [inline]
- slab_alloc_node mm/slub.c:5288 [inline]
- kmem_cache_alloc_node_noprof+0x433/0x710 mm/slub.c:5340
- __alloc_skb+0x255/0x430 net/core/skbuff.c:679
- alloc_skb include/linux/skbuff.h:1383 [inline]
- alloc_skb_with_frags+0xca/0x890 net/core/skbuff.c:6712
- sock_alloc_send_pskb+0x84d/0x980 net/core/sock.c:2995
- tun_alloc_skb drivers/net/tun.c:1461 [inline]
- tun_get_user+0xa43/0x3e90 drivers/net/tun.c:1794
- tun_chr_write_iter+0x113/0x200 drivers/net/tun.c:1999
- new_sync_write fs/read_write.c:593 [inline]
- vfs_write+0x5c9/0xb30 fs/read_write.c:686
- ksys_write+0x145/0x250 fs/read_write.c:738
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> diff --git a/net/sched/sch_mq.c b/net/sched/sch_mq.c
+> index c860119a8f09..0bcabdcd1f44 100644
+> --- a/net/sched/sch_mq.c
+> +++ b/net/sched/sch_mq.c
+> @@ -17,10 +17,6 @@
+>  #include <net/pkt_sched.h>
+>  #include <net/sch_generic.h>
+>  =
 
-Freed by task 5970:
- kasan_save_stack mm/kasan/common.c:56 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:77
- __kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:587
- kasan_save_free_info mm/kasan/kasan.h:406 [inline]
- poison_slab_object mm/kasan/common.c:252 [inline]
- __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:284
- kasan_slab_free include/linux/kasan.h:234 [inline]
- slab_free_hook mm/slub.c:2543 [inline]
- slab_free mm/slub.c:6642 [inline]
- kmem_cache_free+0x19b/0x690 mm/slub.c:6752
- icmpv6_param_prob include/linux/icmpv6.h:95 [inline]
- ipv6_rthdr_rcv+0x150e/0x2020 net/ipv6/exthdrs.c:828
- nf_flow_ip6_tunnel_proto net/netfilter/nf_flow_table_ip.c:381 [inline]
- nf_flow_skb_encap_protocol+0x9b5/0x14e0 net/netfilter/nf_flow_table_ip.c:433
- nf_flow_offload_ipv6_lookup net/netfilter/nf_flow_table_ip.c:1065 [inline]
- nf_flow_offload_ipv6_hook+0x131/0x3380 net/netfilter/nf_flow_table_ip.c:1092
- nf_hook_entry_hookfn include/linux/netfilter.h:158 [inline]
- nf_hook_slow+0xc5/0x220 net/netfilter/core.c:623
- nf_hook_ingress include/linux/netfilter_netdev.h:34 [inline]
- nf_ingress net/core/dev.c:5900 [inline]
- __netif_receive_skb_core+0x241c/0x2f90 net/core/dev.c:5996
- __netif_receive_skb_one_core net/core/dev.c:6135 [inline]
- __netif_receive_skb+0x72/0x380 net/core/dev.c:6250
- netif_receive_skb_internal net/core/dev.c:6336 [inline]
- netif_receive_skb+0x1cb/0x790 net/core/dev.c:6395
- tun_rx_batched+0x1b9/0x730 drivers/net/tun.c:1485
- tun_get_user+0x2b65/0x3e90 drivers/net/tun.c:1953
- tun_chr_write_iter+0x113/0x200 drivers/net/tun.c:1999
- new_sync_write fs/read_write.c:593 [inline]
- vfs_write+0x5c9/0xb30 fs/read_write.c:686
- ksys_write+0x145/0x250 fs/read_write.c:738
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> -struct mq_sched {
+> -	struct Qdisc		**qdiscs;
+> -};
+> -
+>  static int mq_offload(struct Qdisc *sch, enum tc_mq_command cmd)
+>  {
+>  	struct net_device *dev =3D qdisc_dev(sch);
+> @@ -49,23 +45,29 @@ static int mq_offload_stats(struct Qdisc *sch)
+>  	return qdisc_offload_dump_helper(sch, TC_SETUP_QDISC_MQ, &opt);
+>  }
+>  =
 
-The buggy address belongs to the object at ffff888115de9200
- which belongs to the cache skbuff_head_cache of size 240
-The buggy address is located 182 bytes inside of
- freed 240-byte region [ffff888115de9200, ffff888115de92f0)
+> -static void mq_destroy(struct Qdisc *sch)
+> +void mq_destroy_common(struct Qdisc *sch)
+>  {
+>  	struct net_device *dev =3D qdisc_dev(sch);
+>  	struct mq_sched *priv =3D qdisc_priv(sch);
+>  	unsigned int ntx;
+>  =
 
-The buggy address belongs to the physical page:
-page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x115de8
-head: order:1 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-flags: 0x17ff00000000040(head|node=0|zone=2|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 017ff00000000040 ffff8881036ba8c0 ffffea0004280a80 dead000000000002
-raw: 0000000000000000 0000000080150015 00000000f5000000 0000000000000000
-head: 017ff00000000040 ffff8881036ba8c0 ffffea0004280a80 dead000000000002
-head: 0000000000000000 0000000080150015 00000000f5000000 0000000000000000
-head: 017ff00000000001 ffffea0004577a01 00000000ffffffff 00000000ffffffff
-head: ffffffffffffffff 0000000000000000 00000000ffffffff 0000000000000002
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 1, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 5555, tgid 5555 (dhcpcd), ts 36767395595, free_ts 35122573404
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x234/0x290 mm/page_alloc.c:1845
- prep_new_page mm/page_alloc.c:1853 [inline]
- get_page_from_freelist+0x2365/0x2440 mm/page_alloc.c:3879
- __alloc_frozen_pages_noprof+0x181/0x370 mm/page_alloc.c:5178
- alloc_pages_mpol+0x232/0x4a0 mm/mempolicy.c:2416
- alloc_slab_page mm/slub.c:3059 [inline]
- allocate_slab+0x96/0x350 mm/slub.c:3232
- new_slab mm/slub.c:3286 [inline]
- ___slab_alloc+0xf56/0x1990 mm/slub.c:4655
- __slab_alloc+0x65/0x100 mm/slub.c:4778
- __slab_alloc_node mm/slub.c:4854 [inline]
- slab_alloc_node mm/slub.c:5276 [inline]
- kmem_cache_alloc_node_noprof+0x4c5/0x710 mm/slub.c:5340
- __alloc_skb+0x255/0x430 net/core/skbuff.c:679
- alloc_skb include/linux/skbuff.h:1383 [inline]
- alloc_skb_with_frags+0xca/0x890 net/core/skbuff.c:6712
- sock_alloc_send_pskb+0x84d/0x980 net/core/sock.c:2995
- unix_dgram_sendmsg+0x454/0x1840 net/unix/af_unix.c:2139
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg+0x21c/0x270 net/socket.c:742
- sock_write_iter+0x279/0x360 net/socket.c:1195
- do_iter_readv_writev+0x623/0x8c0 fs/read_write.c:-1
- vfs_writev+0x31a/0x960 fs/read_write.c:1057
-page last free pid 5262 tgid 5262 stack trace:
- reset_page_owner include/linux/page_owner.h:25 [inline]
- free_pages_prepare mm/page_alloc.c:1394 [inline]
- __free_frozen_pages+0xbc4/0xd30 mm/page_alloc.c:2901
- __slab_free+0x2e7/0x390 mm/slub.c:5970
- qlink_free mm/kasan/quarantine.c:163 [inline]
- qlist_free_all+0x97/0x140 mm/kasan/quarantine.c:179
- kasan_quarantine_reduce+0x148/0x160 mm/kasan/quarantine.c:286
- __kasan_slab_alloc+0x22/0x80 mm/kasan/common.c:352
- kasan_slab_alloc include/linux/kasan.h:252 [inline]
- slab_post_alloc_hook mm/slub.c:4978 [inline]
- slab_alloc_node mm/slub.c:5288 [inline]
- kmem_cache_alloc_noprof+0x367/0x6e0 mm/slub.c:5295
- getname_flags+0xb8/0x540 fs/namei.c:146
- getname include/linux/fs.h:2924 [inline]
- do_sys_openat2+0xbc/0x1c0 fs/open.c:1431
- do_sys_open fs/open.c:1452 [inline]
- __do_sys_openat fs/open.c:1468 [inline]
- __se_sys_openat fs/open.c:1463 [inline]
- __x64_sys_openat+0x138/0x170 fs/open.c:1463
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> -	mq_offload(sch, TC_MQ_DESTROY);
+> -
+>  	if (!priv->qdiscs)
+>  		return;
+>  	for (ntx =3D 0; ntx < dev->num_tx_queues && priv->qdiscs[ntx]; ntx++)=
 
-Memory state around the buggy address:
- ffff888115de9180: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff888115de9200: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff888115de9280: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fc fc
-                                     ^
- ffff888115de9300: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff888115de9380: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
+>  		qdisc_put(priv->qdiscs[ntx]);
+>  	kfree(priv->qdiscs);
+>  }
+> +EXPORT_SYMBOL(mq_destroy_common);
+
+On a similar note, this would be a good use of EXPORT_SYMBOL_NS_GPL.
+
+Maybe not even NETDEV_INTERNAL but a dedicated NET_SCHED_MQ.
+
+> -static int mq_init(struct Qdisc *sch, struct nlattr *opt,
+> -		   struct netlink_ext_ack *extack)
+> +static void mq_destroy(struct Qdisc *sch)
+> +{
+> +	mq_offload(sch, TC_MQ_DESTROY);
+> +	mq_destroy_common(sch);
+> +}
+> +
+> +int mq_init_common(struct Qdisc *sch, struct nlattr *opt,
+> +		   struct netlink_ext_ack *extack,
+> +		   const struct Qdisc_ops *qdisc_ops)
+>  {
+>  	struct net_device *dev =3D qdisc_dev(sch);
+>  	struct mq_sched *priv =3D qdisc_priv(sch);
+> @@ -87,7 +89,8 @@ static int mq_init(struct Qdisc *sch, struct nlattr *=
+opt,
+>  =
+
+>  	for (ntx =3D 0; ntx < dev->num_tx_queues; ntx++) {
+>  		dev_queue =3D netdev_get_tx_queue(dev, ntx);
+> -		qdisc =3D qdisc_create_dflt(dev_queue, get_default_qdisc_ops(dev, nt=
+x),
+> +		qdisc =3D qdisc_create_dflt(dev_queue,
+> +					  qdisc_ops ?: get_default_qdisc_ops(dev, ntx),
+>  					  TC_H_MAKE(TC_H_MAJ(sch->handle),
+>  						    TC_H_MIN(ntx + 1)),
+>  					  extack);
+> @@ -98,12 +101,24 @@ static int mq_init(struct Qdisc *sch, struct nlatt=
+r *opt,
+>  	}
+>  =
+
+>  	sch->flags |=3D TCQ_F_MQROOT;
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL(mq_init_common);
+> +
+> +static int mq_init(struct Qdisc *sch, struct nlattr *opt,
+> +		   struct netlink_ext_ack *extack)
+> +{
+> +	int ret;
+> +
+> +	ret =3D mq_init_common(sch, opt, extack, NULL);
+> +	if (ret)
+> +		return ret;
+>  =
+
+>  	mq_offload(sch, TC_MQ_CREATE);
+>  	return 0;
+>  }
+>  =
+
+> -static void mq_attach(struct Qdisc *sch)
+> +void mq_attach(struct Qdisc *sch)
+>  {
+>  	struct net_device *dev =3D qdisc_dev(sch);
+>  	struct mq_sched *priv =3D qdisc_priv(sch);
+> @@ -124,8 +139,9 @@ static void mq_attach(struct Qdisc *sch)
+>  	kfree(priv->qdiscs);
+>  	priv->qdiscs =3D NULL;
+>  }
+> +EXPORT_SYMBOL(mq_attach);
+>  =
+
+> -static int mq_dump(struct Qdisc *sch, struct sk_buff *skb)
+> +void mq_dump_common(struct Qdisc *sch, struct sk_buff *skb)
+>  {
+>  	struct net_device *dev =3D qdisc_dev(sch);
+>  	struct Qdisc *qdisc;
+> @@ -152,7 +168,12 @@ static int mq_dump(struct Qdisc *sch, struct sk_bu=
+ff *skb)
+>  =
+
+>  		spin_unlock_bh(qdisc_lock(qdisc));
+>  	}
+> +}
+> +EXPORT_SYMBOL(mq_dump_common);
+>  =
+
+> +static int mq_dump(struct Qdisc *sch, struct sk_buff *skb)
+> +{
+> +	mq_dump_common(sch, skb);
+>  	return mq_offload_stats(sch);
+>  }
+>  =
+
+> @@ -166,11 +187,12 @@ static struct netdev_queue *mq_queue_get(struct Q=
+disc *sch, unsigned long cl)
+>  	return netdev_get_tx_queue(dev, ntx);
+>  }
+>  =
+
+> -static struct netdev_queue *mq_select_queue(struct Qdisc *sch,
+> -					    struct tcmsg *tcm)
+> +struct netdev_queue *mq_select_queue(struct Qdisc *sch,
+> +				     struct tcmsg *tcm)
+>  {
+>  	return mq_queue_get(sch, TC_H_MIN(tcm->tcm_parent));
+>  }
+> +EXPORT_SYMBOL(mq_select_queue);
+>  =
+
+>  static int mq_graft(struct Qdisc *sch, unsigned long cl, struct Qdisc =
+*new,
+>  		    struct Qdisc **old, struct netlink_ext_ack *extack)
+> @@ -198,14 +220,15 @@ static int mq_graft(struct Qdisc *sch, unsigned l=
+ong cl, struct Qdisc *new,
+>  	return 0;
+>  }
+>  =
+
+> -static struct Qdisc *mq_leaf(struct Qdisc *sch, unsigned long cl)
+> +struct Qdisc *mq_leaf(struct Qdisc *sch, unsigned long cl)
+>  {
+>  	struct netdev_queue *dev_queue =3D mq_queue_get(sch, cl);
+>  =
+
+>  	return rtnl_dereference(dev_queue->qdisc_sleeping);
+>  }
+> +EXPORT_SYMBOL(mq_leaf);
+>  =
+
+> -static unsigned long mq_find(struct Qdisc *sch, u32 classid)
+> +unsigned long mq_find(struct Qdisc *sch, u32 classid)
+>  {
+>  	unsigned int ntx =3D TC_H_MIN(classid);
+>  =
+
+> @@ -213,9 +236,10 @@ static unsigned long mq_find(struct Qdisc *sch, u3=
+2 classid)
+>  		return 0;
+>  	return ntx;
+>  }
+> +EXPORT_SYMBOL(mq_find);
+>  =
+
+> -static int mq_dump_class(struct Qdisc *sch, unsigned long cl,
+> -			 struct sk_buff *skb, struct tcmsg *tcm)
+> +int mq_dump_class(struct Qdisc *sch, unsigned long cl,
+> +		  struct sk_buff *skb, struct tcmsg *tcm)
+>  {
+>  	struct netdev_queue *dev_queue =3D mq_queue_get(sch, cl);
+>  =
+
+> @@ -224,9 +248,10 @@ static int mq_dump_class(struct Qdisc *sch, unsign=
+ed long cl,
+>  	tcm->tcm_info =3D rtnl_dereference(dev_queue->qdisc_sleeping)->handle=
+;
+>  	return 0;
+>  }
+> +EXPORT_SYMBOL(mq_dump_class);
+>  =
+
+> -static int mq_dump_class_stats(struct Qdisc *sch, unsigned long cl,
+> -			       struct gnet_dump *d)
+> +int mq_dump_class_stats(struct Qdisc *sch, unsigned long cl,
+> +			struct gnet_dump *d)
+>  {
+>  	struct netdev_queue *dev_queue =3D mq_queue_get(sch, cl);
+>  =
+
+> @@ -236,8 +261,9 @@ static int mq_dump_class_stats(struct Qdisc *sch, u=
+nsigned long cl,
+>  		return -1;
+>  	return 0;
+>  }
+> +EXPORT_SYMBOL(mq_dump_class_stats);
+>  =
+
+> -static void mq_walk(struct Qdisc *sch, struct qdisc_walker *arg)
+> +void mq_walk(struct Qdisc *sch, struct qdisc_walker *arg)
+>  {
+>  	struct net_device *dev =3D qdisc_dev(sch);
+>  	unsigned int ntx;
+> @@ -251,6 +277,7 @@ static void mq_walk(struct Qdisc *sch, struct qdisc=
+_walker *arg)
+>  			break;
+>  	}
+>  }
+> +EXPORT_SYMBOL(mq_walk);
+>  =
+
+>  static const struct Qdisc_class_ops mq_class_ops =3D {
+>  	.select_queue	=3D mq_select_queue,
+> =
+
+> -- =
+
+> 2.52.0
+> =
 
 
-***
 
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
