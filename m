@@ -1,76 +1,92 @@
-Return-Path: <netdev+bounces-242975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8235AC979D2
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 14:31:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF261C97B46
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 14:47:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 60F6C342BB8
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 13:30:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A22F53A19A5
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 13:47:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B833314B85;
-	Mon,  1 Dec 2025 13:30:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B756331353D;
+	Mon,  1 Dec 2025 13:45:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Kq9Ghp6m"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sOrWo9IJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8A6F314B6E;
-	Mon,  1 Dec 2025 13:30:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87AA972639;
+	Mon,  1 Dec 2025 13:45:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764595827; cv=none; b=Qf9c2I5mpUdJbjFCvNVOtCuN11trLkEqRmrEvl1o1mTR2tDNv+JAt89QVplZ2a9arDltQdVQvuTNRhM/95ge3kAxYytNd4trgKMhLwbKy5FAgbhcTIuCHEGzgBpNW8BCTNqvphKSrkWsQxgzaITKq+PdEWmtWGYMgob7muCxDQg=
+	t=1764596736; cv=none; b=P68H2DTOJeqtgAVYtQT1OavLdmcg+i504fpY+FVZPk+M+JtFstE2caXWk2UctME5cl+t1eRbG5vihYSd2PsWIUdoeG9ap/P01ReZtWOgBr5A9lf3r7WZRgpj0cKq63ktvO6HBf8gL9q8rHO1kfSgmBo9ox3KezBWclGM/U1tohI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764595827; c=relaxed/simple;
-	bh=QMBJF6xR5E2HsR69IgyQcq53LJsXDW0YfjfElIhfnmM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PNjon/1cE/nINpQdvcXdP6fUv4hFGD+7RPzPE1rAqzF9YClv7oNlUS/9h/1Mn5VE7uoZ1OIsaNef0a87IO8ystYs6PluPrhP9rtNHrfWstMjK9+D3W5RNHkg99VD4lntk2bz+Tn7tdc9aS6ajfS95E5NfpqEDFCUMbERYwLrisk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Kq9Ghp6m; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Qpv0J/6Q491UqUv0ZFU2N8evkkM9o/anB4SEZCZJc2Q=; b=Kq9Ghp6m66tatk5JttmgVulzcY
-	0t0qxJSIRT7vn/yH1HU1wLH0EjjATUTaCz6OJutvhB8oJeMuY5m1TvOKZlnmJv6D+txWhfHnKK49K
-	VOD2vhXwfWzpLfAPKNEZ+3J/DGZM+pJdbjcdygSCG0WLROePPuBXpeshFnm81+kdRpRI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vQ3yr-00FZjS-UC; Mon, 01 Dec 2025 14:30:17 +0100
-Date: Mon, 1 Dec 2025 14:30:17 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: David Yang <mmyangfl@gmail.com>
-Cc: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v4 2/2] net: dsa: yt921x: Add STP/MST support
-Message-ID: <a1f5b946-b4f6-4079-bdbf-7b75aa9856b1@lunn.ch>
-References: <20251201094232.3155105-1-mmyangfl@gmail.com>
- <20251201094232.3155105-3-mmyangfl@gmail.com>
+	s=arc-20240116; t=1764596736; c=relaxed/simple;
+	bh=N9MUCTaemGf7+uVYHLi0WhukbGT11K7J/3L6Cv+wswE=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=lPFM3cH5oIsBjKhBwzMyoKO+hiKuz0Q6iTdnrZPI1EfJICERJFDGnvO2FSRQH3bnLlYlHbivcTiytOuYSnGT4w3z7Ob8PkIplsKtE/DsMIRfwAre3JRMis8XEjlrFlev6SwjE1CQW1GFmUGFsjwtjagqxqpWyQYz6QyIt4cClxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sOrWo9IJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCA0BC4CEF1;
+	Mon,  1 Dec 2025 13:45:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764596736;
+	bh=N9MUCTaemGf7+uVYHLi0WhukbGT11K7J/3L6Cv+wswE=;
+	h=From:Subject:Date:To:Cc:From;
+	b=sOrWo9IJ9c6/4ospZKg4niu7jwb1bNjr1hRpO5Jm4uydHxTQZjm4Djm4Fl+4FPY8u
+	 Dx2Ix1H2c3axvKEKK+UWUd09hmAMFbcrbazAXKAmxBrlKBGUcz+zUJubTT0D3HmhqD
+	 9iKCg3hUMibH7YHr4nMo8U8T901l1GXr64u8aHHdWpdWTXN3EGDzhTgWYJL0psYhnx
+	 8Ix2DHdOSPWAwoBREQmFD89d3pEdtemwPYpS1XFmak815Fcl2dmnIR7nGYMdeDUKMC
+	 l82voU0BI0oG2HTmbcZ6Ro/am45MmloKpgsT9lSl0vRZZU8VzXYdMY3+dRtP1wZGKl
+	 SlFd0m1rOkptQ==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Subject: [PATCH RFC nf-next 0/4] Add IP6IP6 flowtable SW acceleration
+Date: Mon, 01 Dec 2025 14:45:12 +0100
+Message-Id: <20251201-flowtable-offload-ip6ip6-v1-0-1dabf534c074@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251201094232.3155105-3-mmyangfl@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x2MQQqDMBBFrxJm3YEkaJRuCz2AW+ki1okOSCKJq
+ CDevUPhLf5b/HdBocxU4KkuyLRz4RRFzEPBd/ZxIuRRHKy2tbHaYFjSsflhIUxBth+RVydg3bS
+ DM9o1rmpB7mumwOc/3UP3fqkYMNK5wee+f4gqPvp3AAAA
+X-Change-ID: 20251201-flowtable-offload-ip6ip6-578b61067648
+To: Pablo Neira Ayuso <pablo@netfilter.org>, 
+ Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>, 
+ Phil Sutter <phil@nwl.cc>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+X-Mailer: b4 0.14.2
 
-On Mon, Dec 01, 2025 at 05:42:29PM +0800, David Yang wrote:
-> Support for STP/MST was deferred from the initial submission of the
-> driver.
-> 
-> Signed-off-by: David Yang <mmyangfl@gmail.com>
+Introduce SW acceleration for IP6IP6 tunnels in the netfilter flowtable
+infrastructure.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+---
+Lorenzo Bianconi (4):
+      netfilter: Introduce tunnel metadata info in nf_flowtable_ctx struct
+      netfilter: flowtable: Add IP6IP6 rx sw acceleration
+      netfilter: flowtable: Add IP6IP6 tx sw acceleration
+      selftests: netfilter: nft_flowtable.sh: Add IP6IP6 flowtable selftest
 
-    Andrew
+ net/ipv6/ip6_tunnel.c                              |  27 +++
+ net/netfilter/nf_flow_table_ip.c                   | 239 ++++++++++++++++++---
+ .../selftests/net/netfilter/nft_flowtable.sh       |  62 +++++-
+ 3 files changed, 285 insertions(+), 43 deletions(-)
+---
+base-commit: 0177f0f07886e54e12c6f18fa58f63e63ddd3c58
+change-id: 20251201-flowtable-offload-ip6ip6-578b61067648
+
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
+
 
