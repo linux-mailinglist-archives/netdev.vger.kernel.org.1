@@ -1,84 +1,94 @@
-Return-Path: <netdev+bounces-243061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5EB2C9920B
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 22:03:51 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F736C99248
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 22:13:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 960424E403F
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 21:02:30 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 07D444E1102
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 21:13:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FA28221D92;
-	Mon,  1 Dec 2025 21:02:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF5A226F476;
+	Mon,  1 Dec 2025 21:13:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="fwxxCeFh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LkYAjxhh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ACF22620E5
-	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 21:02:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 859972080C8;
+	Mon,  1 Dec 2025 21:13:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764622943; cv=none; b=Szpud0rUuIjF1jnpJDFUULBhEQyE3iatEU62RnuBGMNFEquqqfCMaKVrSfv7546Ltmodbp1jdJCgxXw8uq9MKkiBXsYYyZ2a2jtP8XVT7gAdUYoPiRLpcfom34GJhgJAzK2j4fOabBEJd/4Mc5XE7vE+4pHjIgySnzkQ3mPQ4yE=
+	t=1764623593; cv=none; b=UEDyo9mXXMREBB7Aca0wPIbWGqEa7LYxxXvp0Oa6vea1lNOcOE7BRLrlSdJkvqA7lYYpw6VlATiP1QiUEGGrLrXF8JLZa5UjlQaVahmBD7RbZSB4vJXBJ37Frnda87t6EEnSRAuLo2Rx5LapwPsHihv3FletrfleyXOBspWq7fU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764622943; c=relaxed/simple;
-	bh=9cUDLSkPdyDaC/BrK1O399X9jDOfZM7Q7QWdbcnPRdo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=PUfAgEziSQIQAvB1Z8OFZFn/YFxh1UBhaMo+UGFoNwOWM4tPwsIMIdSJR1mmn2jVxG+RUzKG79y4A4p1Pnih5bRaevUe0JF8JnVJKk/Cv5EekGEWzISt7yOEVVRDrURI3CLxiFcvsPBOW1113Hun2yfrAsU5fwzVbTijJVeETDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=fwxxCeFh; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1764622932;
-	bh=9cUDLSkPdyDaC/BrK1O399X9jDOfZM7Q7QWdbcnPRdo=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=fwxxCeFh+G9IE9JQrGLxpd/PNBWqEukilLECtKkdPXOfXHFLTSwOXOaKrreq374zh
-	 pyDaNPT9o97pFMVfrlivB4se/tMXqXBFbX7fdQNZ6ilSly6ghVp/LgweBVKSLgAOev
-	 4hSvVuGiMJxj5lOrNDwkcjijbvrDUE9gxptnQnUuY101MfF1Heh0Sm4pOCI5dEoRAq
-	 3+fOQscbuzADlzfAZxotyGlitOFICIHyuLKl/vMU52x8qvJZGCk4o2V/mV/iyoa1Xc
-	 zGVVtzfyV+YccPqt1ee9xBS0JjHZL/otsn2FyWmLwL8PpTOKF5zSFZTg1g3ynDgjdn
-	 xXxQn7HcQve+A==
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 73A0A60075;
-	Mon,  1 Dec 2025 21:02:12 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	by x201s (Postfix) with ESMTP id 740A8200C91;
-	Mon, 01 Dec 2025 21:00:42 +0000 (UTC)
-Message-ID: <21cf5582-61b7-469b-a235-3d44be898e7e@fiberby.net>
-Date: Mon, 1 Dec 2025 21:00:41 +0000
+	s=arc-20240116; t=1764623593; c=relaxed/simple;
+	bh=F84Wp9ZacxJuA8nQ5UNgVTWn176hOYaZrODhvvrM8q0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=VDMTB95rNtTPCWT19Fb6PHYwzQfh+xe7o/uxjCfHLAsUy2mQqFxLLQwAKPTnY4ASnS1aLf2f7Tw/oGDvwu5/Y0hL1S+1SZEq9cpvehAtmbDPPrDdpywHqUbjbDPpKxD8cgD45BqKuSQq+Wgjifz4WHlbYjf2FBuf2ey526SRUbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LkYAjxhh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD2BEC4CEF1;
+	Mon,  1 Dec 2025 21:13:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764623591;
+	bh=F84Wp9ZacxJuA8nQ5UNgVTWn176hOYaZrODhvvrM8q0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=LkYAjxhhzXd/1XiJ+h9Fk+LYNuLW+MqWnYbI7kVdOL5gmYMCeADgHqxKxJaVHceXs
+	 nqYEYzaBvAlcqiD8hOCsSNvULZ7ceAZNoMXJDhpV76/kjknXxZS6k3WTLNUCm/wtgH
+	 t8AgTb4IevI08z4xjzBFXxj06q9wr5H50gKUsr/VoeEnNg1kilqXZ5+Gcmv+ekp5pS
+	 Cr6b2bfMRU8AmnQwg8gvttA6/r1LDCsf7iCGqw8WoBMzrlaxd0CRPdeuTQ8mxzmX9D
+	 7OhigDpHi2e3PqVDzsJ2jrAI4l2XsayqSYaI+GPM8R6DHSNji+JJlXxB9orF/cZYpi
+	 jWB8Md6taFgIA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F2DF9381196A;
+	Mon,  1 Dec 2025 21:10:12 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 10/11] tools: ynl: add sample for wireguard
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>, netdev@vger.kernel.org,
- kuba@kernel.org, pabeni@redhat.com
-References: <20251201022849.418666-1-Jason@zx2c4.com>
- <20251201022849.418666-11-Jason@zx2c4.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
-In-Reply-To: <20251201022849.418666-11-Jason@zx2c4.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] selftests: net: add a hint about
+ MACAddressPolicy=persistent
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176462341180.2539359.6028588116142220492.git-patchwork-notify@kernel.org>
+Date: Mon, 01 Dec 2025 21:10:11 +0000
+References: <20251127194556.2409574-1-kuba@kernel.org>
+In-Reply-To: <20251127194556.2409574-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org
 
-On 12/1/25 2:28 AM, Jason A. Donenfeld wrote:
-> [..]
-> +
-> +	req = wireguard_get_device_req_alloc();
-> +	build_request(req, argv[1]);
-> +
-> +	ys = ynl_sock_create(&ynl_wireguard_family, NULL);
-> +	if (!ys)
-> +		return 2;
+Hello:
 
-I will send a patch for fixing up the error patch here, and call
-wireguard_get_device_req_free() before returning here, after rc1.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-The broken error path here was pointed out by the AI reviewer.
+On Thu, 27 Nov 2025 11:45:56 -0800 you wrote:
+> New NIPA installation had been reporting a few flaky tests.
+> arp_ndisc_evict_nocarrier is most flaky of them all.
+> I suspect that the flakiness is due to udev swapping the MAC
+> addresses on the interfaces. Extend the message in
+> arp_ndisc_evict_nocarrier to hint at this potential issue.
+> Having the neigh get fail right after ping is rather unusual,
+> unless udev changes the MAC addr causing a flush in the meantime.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] selftests: net: add a hint about MACAddressPolicy=persistent
+    https://git.kernel.org/netdev/net-next/c/aadff9f76639
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
