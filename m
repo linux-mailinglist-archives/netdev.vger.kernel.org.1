@@ -1,128 +1,112 @@
-Return-Path: <netdev+bounces-242952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFDC7C96D6F
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 12:12:52 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB8D4C96D7B
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 12:13:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 403004E237E
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 11:12:11 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 759D53422D7
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 11:13:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8522330B51F;
-	Mon,  1 Dec 2025 11:10:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 833BA306B04;
+	Mon,  1 Dec 2025 11:13:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="K4JZezq2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pn4Nvlb4"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A4543074AE;
-	Mon,  1 Dec 2025 11:09:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE013054C5
+	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 11:13:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764587401; cv=none; b=SLCC9YUw2xgu6XzRQkhmi0GE8fjD7hvDiAF0OXIYk2pcVHoxz0bDaQivC5lZy+y3zM43HUQk5Kj/kHhn6FLDJLYE7V2NQ6BJY0vkBKl5FlGc7PX8Ivw8+5yBlFv41n5Zi0U+7vCE8dWqHTFrKYeeJN3n8Id2NFqMlQTc/40XlUY=
+	t=1764587590; cv=none; b=plYS1U1MzYMvvKaC/RZbVT2IlEpK6aAW+OapOqP4gbJVh6ifFZjD03l517Gsar0TaIc7ldpQohpDoP1SqDdMUAH13S8BYLx8yFfr/UldOazSWksJbN8MQOpisz/ftBJTuDQwJJeAMJvkvgEyvjXzMllrS/HAVRmJiFBAQMl7Vco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764587401; c=relaxed/simple;
-	bh=Pv1IQ51X0pudiAZXtLYDSjapHMQ71+Hadzj3B7QsbTs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JT/B6PXGfv9xjsBWpKv0+PJzjvUv0zHEOqLl9/7FmeYexgEllhFf/UJ84RhJMc7vwL9Jp9D00lddiGuQcNf2VYUOpnbTvOdTGMRP4xnoCyTuh04ynx4QDXBhHCpypPHOTEx8+XxzF7k2vEoAsvRdrxX0v3p/R1YsF/LkC8bvQoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=K4JZezq2; arc=none smtp.client-ip=220.197.31.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-Id:MIME-Version:
-	Content-Type; bh=JYF+JHVCM5WmwlI4QfpzF6nTb6eCo8XGkwwqSahw5S0=;
-	b=K4JZezq2Yz/JDanhpzuIT2ddgKEU9JdFw7QMnoW3cmZ/JQ/fDwqog5RHcYfM+z
-	cbRnrfXzoZ2hiUm0dBbC7GNJcrlgnpeE3llL77JyALWXsc/kcWagxHDxo9f/Vt/N
-	a0PVTf78c5Nuj2myYdsIk6Y/KsrXUkhnl+zgeorA6hKY4=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g1-0 (Coremail) with SMTP id _____wD3n5Q5dy1pWombDw--.29581S4;
-	Mon, 01 Dec 2025 19:08:43 +0800 (CST)
-From: lvxiafei <xiafei_xupt@163.com>
-To: fw@strlen.de
-Cc: coreteam@netfilter.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	horms@kernel.org,
-	kadlec@netfilter.org,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvxiafei@sensetime.com,
-	netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	pabeni@redhat.com,
-	pablo@netfilter.org,
-	xiafei_xupt@163.com
-Subject: Re: [PATCH V6] netfilter: netns nf_conntrack: per-netns net.netfilter.nf_conntrack_max sysctl
-Date: Mon,  1 Dec 2025 19:08:41 +0800
-Message-Id: <20251201110841.9519-1-xiafei_xupt@163.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <aO5WDcNAegXi1Umg@strlen.de>
-References: <aO5WDcNAegXi1Umg@strlen.de>
+	s=arc-20240116; t=1764587590; c=relaxed/simple;
+	bh=fYMUbue3Ka37fHtYbiOTRTL0VUjzqr8ncwExp4fw1FE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=s6qVigy9z+UNjlwVVMh4omY6IUtatiYGl9bJrY8b43R28rVTB0K27RIb0u3lErB9dp0Vm3xh76v2wZ/u/Qk7AHz/LNF/m//p/0JmFPw5bFsTtKXTPgD1U+kQKlpNh2iMkNP4lfvAjdTFCGhheYUtyjbeMu1y3QDF6EsngoHE00g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pn4Nvlb4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FD66C113D0;
+	Mon,  1 Dec 2025 11:13:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764587586;
+	bh=fYMUbue3Ka37fHtYbiOTRTL0VUjzqr8ncwExp4fw1FE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Pn4Nvlb4RGM/2J1Djw/JQddi/rPHy2L2SrgU5wUXUnhXZ3erHzGf44qJlxd7ZqHwA
+	 yJN7Vle/JIEZF0TQeGO1vFt8693jeI7pr/V94TDEHSF8mfHH0xSgIjXAmPAXXim7Bm
+	 Yjz5RGABeUJ3Ze/bYIsjU/vtpQ8W1S6Mz2gS/YxxxbhDhf6Twvo6DG2FSyOTT4fGUh
+	 jMZEpDLyHunt9uxqS8oFWE7G72LSqK3a0jK/eKFABDtWYJxZynlB45SneYduYroF+G
+	 S9LGtt+fxGQLHTHgGi/TrM9Lp6yVGuNTtYDNuve6IUXFkmmMgMoW1dq6xMTQaIHEE6
+	 /89T5rQuMh1KQ==
+Date: Mon, 1 Dec 2025 11:13:02 +0000
+From: Simon Horman <horms@kernel.org>
+To: 2694439648@qq.com
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com, hailong.fan@siengine.com,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, inux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: stmmac: Modify the judgment condition of "tx_avail"
+ from 1 to 2
+Message-ID: <aS14PnwjbFcD_J70@horms.kernel.org>
+References: <tencent_22959DC8315158E23D77C14B9B33C97EA60A@qq.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3n5Q5dy1pWombDw--.29581S4
-X-Coremail-Antispam: 1Uf129KBjvJXoW7Kw4fJFWxZFyUZr48Jr4rGrg_yoW8tFy5pF
-	Wrtw1Iyrs7JF4jya9xKwn7ZF4rCrWfAF4akr98J340v3Z8Xa4Fvr4fKr4YvF9rCr1DGw4j
-	va1IvrykAa4vvaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0JUGD7xUUUUU=
-X-CM-SenderInfo: x0ldwvplb031rw6rljoofrz/1tbiKBAXU2ktbpq7CQAAs+
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <tencent_22959DC8315158E23D77C14B9B33C97EA60A@qq.com>
+
+On Mon, Dec 01, 2025 at 10:57:01AM +0800, 2694439648@qq.com wrote:
+> From: "hailong.fan" <hailong.fan@siengine.com>
+> 
+>     Under certain conditions, a WARN_ON will be triggered
+>     if avail equals 1.
+> 
+>     For example, when a VLAN packet is to send,
+>     stmmac_vlan_insert consumes one unit of space,
+>     and the data itself consumes another.
+>     actually requiring 2 units of space in total.
+
+Hi,
+
+I am wondering if there are other cases where an extra
+descriptor is needed. And if so, can multiple such conditions
+occur at the same time?
+
+I am also wondering if the VLAN condition can be detected,
+so a descriptor is only reserved for VLAN use if it will
+actually be used for a VLAN.
+
+And I think it would be worth noting how this problem was discovered
+e.g. by inspection, using tooling (static analysis, AI, ...).
+And how it has been tested e.g. On real HW, compile tested only.
 
 
->  I've applied a variant of this patch to nf-next:testing.
->  
->  Could you please check that I adapted it correctly?
->  https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git/commit/?h=testing&id=b7bfa7d96fa5a7f3c2a69ad406ede520e658cb07
->  
->  (I added a patch right before that rejects conntrack_max=0).
+As this is a fix for Networking code present in the net tree
+it should be based on that tree. And targeted at that tree like this:
 
-Historically, some systems or scripts have used 0 to mean “unlimited”.
-In this way, some scripts that are set to 0 need to be adjusted.
-Rejecting this value may break compatibility, so it would be good to document 
-this behavior change clearly in the commit message and/or changelog.
+Subject: [PATCH net] ...
 
->  
->  I wonder if we should update the sysctl path to reflect the
->  effective value, i.e., so that when netns sets
->  
->  nf_conntrack_max=1000000
->  
->  ... but init_net is capped at 65536, then a listing
->  shows the sysctl at 65536.
->  
->  It would be similar to what we do for max_buckets.
+Also, as a fix for net, it should have a fixes tag.
+Generally, this should denote the first patch where the problem would
+manifest. In this case this seems to be a likely candidate:
 
-I would argue against updating the sysctl path to reflect the 
-effective value. Doing so could be misleading, as it would no 
-longer show the value actually configured in the namespace, 
-but rather the clamped or capped value. Users might feel that 
-their explicit configuration has been silently altered, which 
-can be frustrating for professional users who rely on precise 
-control. If there is a genuine need to see the effective value, 
-it can be computed on demand or exposed via a separate parameter 
-specifically indicating the effective value. Keeping the sysctl 
-path as-is preserves transparency, predictability, and user trust.
+Fixes: 30d932279dc2 ("net: stmmac: Add support for VLAN Insertion Offload")
 
->  
->  I also considered to make such a request fail at set time, but it
->  would make the sysctl fail/not fail 'randomly' and it also would
->  not do the right thing when init_net setting is reduced later.
+The tag should go immediately above other tags, in this case your
+Signed-off-by line, without any blank lines in between. And, like other
+tags, it should not be line-wrapped.
 
-I would be cautious about making the sysctl fail at set time. Doing 
-so could lead to seemingly “random” failures depending on the current 
-state of init_net, which would be confusing for users. Moreover, if 
-init_net’s setting is reduced later, the sysctl behavior would not be 
-consistent, and users might end up with invalid or unexpected values 
-anyway. It seems safer to allow the set operation to succeed but let 
-the effective value be determined by the existing limits, maintaining
-predictable behavior.
+For more information on the workflow for Networking changes please see:
+https://docs.kernel.org/process/maintainer-netdev.html
 
+> 
+> Signed-off-by: hailong.fan <hailong.fan@siengine.com>
 
