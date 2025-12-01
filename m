@@ -1,118 +1,106 @@
-Return-Path: <netdev+bounces-243047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243048-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15FA0C98CA1
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 20:00:24 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4ADEC98CD7
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 20:04:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A94643453AF
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 19:00:15 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2CE1B4E320D
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 19:04:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BB29239E9B;
-	Mon,  1 Dec 2025 18:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FED922ACEB;
+	Mon,  1 Dec 2025 19:04:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="ZWJFnwje"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZfEFJfVW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFDD924677D
-	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 18:59:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4069B21883E;
+	Mon,  1 Dec 2025 19:04:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764615597; cv=none; b=Q2wQcqBQqdtfAZ7oJQf/bSF9wYJ5UJxiYKZ5u20FU32wkILnHCI9/jp47SLenoVsSXINh9/MauW/+meD20wwdFe29V4CMg6fvfnNROKy6qjIVucOT+6/rxodkaS0FY4fmdWKtmB+KXbWn0EGF7NG69nj4QWBKYpU6c7v8LsAmzA=
+	t=1764615841; cv=none; b=bfdFaH9NvUOp3syju4MfCGDMwdJh6wGtPbX1UJjz/Z3NTliFe4j7ZjYbHvM4rRm832ZMWueDCjCMnDjmLnxh3evDh6DAuqyME/LWI1IGowBfy84Mf0y1Tn7k9AhHOcGnTXPvHv1lKJLdgMFFyYPUEavxMDe0dN+rPx5snFmLMuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764615597; c=relaxed/simple;
-	bh=N92YPaj7o7GNabX4ghSuaH+u8KSbRHDRHEzpQW5LD1s=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VCYjaDBGothuYlYOZbCpQoNAkOFGYt/5YJ5y9lk8P9mYLYPs8j5arccRtQkLgrWBfQTsLd7PWKcKhq830aHQtMU1A/ru5t1yMiKwsO4lxkZDBPpk128Y4Li9i7DSkZZHxFnq/KsMMSLuvzR6KHP0Cv+pdHfrTXOx7+8MyGqJlhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=ZWJFnwje; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7a9cdf62d31so5776049b3a.3
-        for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 10:59:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=herbertland.com; s=google; t=1764615595; x=1765220395; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=a/hmcvHY1zb6BM0ItbDrHOl91BPNEPPwb+1fauDZ6JE=;
-        b=ZWJFnwjexeR39dsEUj07oX6St8kjGoR3qhRCllqBCifl36+ZUINN7GCDav5kQHzDM5
-         QpNq6WZBLi+Dby2HOu05wIWyUI+dKyMLot/3NYwhp9aRWIQA9fCA5JHfGusMv7HM5Pli
-         MycALGOgH3ea7iprf09BS1X2orWD8xVUytDS4SqhAF9XsMgmRyvlkTTjqdh+sGdW3Wjr
-         ojeAg2n7zmAR/0pznVjH2Brf70LcE7xbhPM9X/m+FgF4y2GRmT4Jyh+3nbfO9KKd4YhT
-         wCmGjw3pI51I9/0smSoA/8UvIsSYO4Dc7kIXG8SYhPh1zZ+w9KHdzdcHmDb6Yme/BArI
-         wpzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764615595; x=1765220395;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=a/hmcvHY1zb6BM0ItbDrHOl91BPNEPPwb+1fauDZ6JE=;
-        b=T7SMGkN1NFfgbhWEEFjdehIM4GqcZA1uUOM644ThGcDZhLUdjb0JpYjMGps7oehUlM
-         aYmKVSNXDd9huGOvlxQ00F/o4Jy3agB6D13wHNli9L8Q2uQXqjHwBL1XhbFa5gBX91t4
-         /vVT8mvgZS4DtSFiGXw0i9vpVUXnraHofhmWTpkVIQc4UwNCg0slRwUfebsCLBkweS5f
-         tM0JorMRGQ5oTf5YgTOviXc3LlkMHuOe9wKo1pDHaOaBgNvFyzG52RnzqVB3OpLXAqMO
-         FRChq3TUSCi/9k5LFnkc/5eRUbFJA/5W9/QEd1ItyQGakQuKz+wc4AIE9lglD2zj//Us
-         CvZA==
-X-Forwarded-Encrypted: i=1; AJvYcCVWV/mpU//SsZp4W7CD/+iuwhiu3wE0VCRfYtdpIjFAuiVBF4pkhdzPWBgp3YtkgEyAStLxXMk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzv817RsyeDEGpKFII+3g5SgQ5s0DjZ3EkTtDfsxQkGfmsxJDCz
-	gKr0bXXX9Z4ZRRjCbL9VHv3VaNT5Qy+DYxmpCC6R1eQHdoEFR4YG4gWuzbW3E4Fbng==
-X-Gm-Gg: ASbGnct/LP6ZC1mmftzz3Tk0gzMDNuQ7mAyt80AKrrpCfxxOrTauCes0SsxlM5Cs5on
-	bcbmjilAlj6iPSu3OyybvnPY1gMVuYIRmG1SuXuhfMilmzEFjCk06O7nzqQJmZ4klq4HAa7tj1v
-	/IzyOW+rDlq6XwsA9JujJQbqHCNVc5CHtxF8HEIsKpqtE5gN+qnzCPA1MCvFb9qoEp8mMvyS61e
-	yM/AKSRwSIdz/UbKYh3Nl4IABz881njtOqUCKD0WM4E6H2e4HfhsilMsjw/H8LH0K2+BYmkdDj0
-	GtQ5CsOjVuk73AEI00UPCRioWE2Xm2Wp4rtS9JmI3HExpMpQhslh7sCVgPMWP8u8l/1ZoCxcCQy
-	lp8r3TmfO9KamvA08JFTDSzJ1QZ2h5snLME4P407JWpnieHfLOFoeqXLnyiWeJ1SM+lUAu0p2dL
-	+/lk0OgcYypF/sGvzwFIQGhUjF6fOioiG6sic6R2cQbcRPsLEFLgGf4WlA
-X-Google-Smtp-Source: AGHT+IHBvcPSMRgy2sxnuIzMNNaRhwcxl90iD1Bt5mo79Q9GbJYhhMzKORihE2fWVevSsObir6CPXQ==
-X-Received: by 2002:a05:6a21:3392:b0:35d:8881:e6ba with SMTP id adf61e73a8af0-3614ee3889dmr46121361637.49.1764615595238;
-        Mon, 01 Dec 2025 10:59:55 -0800 (PST)
-Received: from pong.herbertland.com ([2601:646:8980:b330:14e3:ac6f:380c:fcf3])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7d1520a03a3sm14522852b3a.29.2025.12.01.10.59.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Dec 2025 10:59:54 -0800 (PST)
-From: Tom Herbert <tom@herbertland.com>
-To: tom@herbertland.com,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next 5/5] ipv6: Document default of one for max_hbh_opts_number
-Date: Mon,  1 Dec 2025 10:55:34 -0800
-Message-ID: <20251201185817.1003392-6-tom@herbertland.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251201185817.1003392-1-tom@herbertland.com>
-References: <20251201185817.1003392-1-tom@herbertland.com>
+	s=arc-20240116; t=1764615841; c=relaxed/simple;
+	bh=o+FCanS35An+MiDwhjJ8w/zhkp0tC/kZk0IrIBLdhJA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bkI6CQLd5emcntFiSEwvDDGPkOrzw+hPdVVKbjVewxOT/gRhiFIzj8R0v9hkoGqAxzS3KphT6BOgjGxPfWvP6+Xt30amU2VmW5/Ji4AYrTPCmxzdt/1G4puy3W3ltKsSKxmxMwNU9LcUoiyF9+59Rfs5sZNtb3vW5WQIRA1blxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZfEFJfVW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2750C113D0;
+	Mon,  1 Dec 2025 19:03:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764615840;
+	bh=o+FCanS35An+MiDwhjJ8w/zhkp0tC/kZk0IrIBLdhJA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZfEFJfVWww3xEELw2OmQMyV36tKdSwDRtdofxmKQfb+ILyEXpPhPrUNkl5MMnvqdk
+	 MeHgecGP2EhHmfAgvv4cg3ASh6ilA8h5W5ooFuflZZi0/2Tle/0ibXxbnDItRhMwBf
+	 DyiYWSDS+Z74LDiwCXVOZE4rbj4OZxE9c9IQprfUrnef8s0TdGKK+7J61DS0IwlNy/
+	 gneE8GMMGdaj/GSHF4HUhsFhpFBITU5tvY/NPYYgqw+RUhepWKj/qtMUshYwc2/avJ
+	 z4/v4E+SwVV/7np/kW8g/FiFhIR+l/Qoonk0nHp4I+hBfxNx56o36KwMo5F6mIaYeI
+	 NLv4o7cfZK56A==
+Date: Mon, 1 Dec 2025 11:03:58 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Vinod Koul <vkoul@kernel.org>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-phy@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, Daniel Golle <daniel@makrotopia.org>,
+ Horatiu Vultur <horatiu.vultur@microchip.com>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>, Matthias
+ Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+ <angelogioacchino.delregno@collabora.com>, Eric Woudstra
+ <ericwouds@gmail.com>, Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Lee
+ Jones <lee@kernel.org>, Patrice Chotard <patrice.chotard@foss.st.com>
+Subject: Re: [PATCH net-next 5/9] phy: add phy_get_rx_polarity() and
+ phy_get_tx_polarity()
+Message-ID: <20251201110358.7618fee2@kernel.org>
+In-Reply-To: <aS1T5i3pCHsNVql6@vaman>
+References: <20251122193341.332324-1-vladimir.oltean@nxp.com>
+	<20251122193341.332324-6-vladimir.oltean@nxp.com>
+	<20251124200121.5b82f09e@kernel.org>
+	<aS1T5i3pCHsNVql6@vaman>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Changge documentation that the default limit for number of
-Hop-by-Hop options is one
----
- Documentation/networking/ip-sysctl.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Mon, 1 Dec 2025 14:07:58 +0530 Vinod Koul wrote:
+> > > Push the supported mask of polarities to these helpers, to simplify
+> > > drivers such that they don't need to validate what's in the device tree
+> > > (or other firmware description).
+> > > 
+> > > The proposed maintainership model is joint custody between netdev and
+> > > linux-phy, because of the fact that these properties can be applied to
+> > > Ethernet PCS blocks just as well as Generic PHY devices. I've added as
+> > > maintainers those from "ETHERNET PHY LIBRARY", "NETWORKING DRIVERS" and
+> > > "GENERIC PHY FRAMEWORK".  
+> > 
+> > I dunno.. ain't no such thing as "joint custody" maintainership.
+> > We have to pick one tree. Given the set of Ms here, I suspect 
+> > the best course of action may be to bubble this up to its own tree.
+> > Ask Konstantin for a tree in k.org, then you can "co-post" the patches
+> > for review + PR link in the cover letter (e.g. how Tony from Intel
+> > submits their patches). This way not networking and PHY can pull
+> > the shared changes with stable commit IDs.  
+> 
+> How much is the volume of the changes that we are talking about, we can
+> always ack and pull into each other trees..?
 
-diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
-index 7ccfdc74dc91..de078f7f6a17 100644
---- a/Documentation/networking/ip-sysctl.rst
-+++ b/Documentation/networking/ip-sysctl.rst
-@@ -2503,7 +2503,7 @@ max_hbh_opts_number - INTEGER
-         and the number of known TLVs allowed is the absolute value of this
-         number.
- 
--        Default: 8
-+        Default: 1
- 
- max_dst_opts_length - INTEGER
- 	Maximum length allowed for a Destination options extension
--- 
-2.43.0
-
+We have such ad-hoc situations with multiple subsystems. Letting
+Vladimir and co create their own tree is basically shifting the 
+work of managing the stable branches from netdev maintainers
+downstream. I'd strongly prefer that we lean on git in this way, 
+rather than reenact the 3 spiderman meme multiple times in each
+release.
 
