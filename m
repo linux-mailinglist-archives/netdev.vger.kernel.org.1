@@ -1,157 +1,208 @@
-Return-Path: <netdev+bounces-242908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id F32B0C960D8
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 08:50:24 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EDD8C96102
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 08:59:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BAF294E04D9
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 07:50:23 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id AEF7D34365E
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 07:59:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A73E02C0F89;
-	Mon,  1 Dec 2025 07:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E71E2D73BA;
+	Mon,  1 Dec 2025 07:59:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IGaOaA7N"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="mEhg779g"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012026.outbound.protection.outlook.com [52.101.43.26])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C6767E110;
-	Mon,  1 Dec 2025 07:50:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764575420; cv=none; b=BTwuKJRK7PlaPVIzFHTHs47p5XefS7R/yHqEZa6rLx3+AIYGOxrI4XrjGzM0j4vvb2USOw0lkv9XfIaT/6fVNrPOKylCMtQzxeJYKUNm2XdxdtJhmGIoSwF40VObGhz3lsN3N5uoICWvQ7O8h2z7zsuuHvcYdb1PmF/OxKjv9Zs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764575420; c=relaxed/simple;
-	bh=INY7q4Pn4Mmpzwb4yWPpL5We9LC3VdX6yH4lheqK310=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cVr4jX0c9myCDqXsntoKHBdiGUkI1/QJQFDYQr1ZaJDorSYAxZjl/37JjC7H3PZMmTqkOku1rEnmhzvONAQTh4FYnP2ZtQ2r8846FvMkwd14xwj+HXozLgkdgptvgSQ0wkKksTe+r8kj5uomSn+VlJsugjpIMW9zP2GGJHrWY9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IGaOaA7N; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BFECC4CEF1;
-	Mon,  1 Dec 2025 07:50:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764575420;
-	bh=INY7q4Pn4Mmpzwb4yWPpL5We9LC3VdX6yH4lheqK310=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=IGaOaA7NnR747m2EUDz76udIk1n0FNjHmoFeU8j2uRaecSn/mGvS9vYV1T+TBCj1X
-	 QMTYtJ27rc1Ua4y9n+lQe8OhNlb8/T3ZuQ7LCKUXStZzcxOUoYBivwOQPv74yFQ84Q
-	 AChv6sup6G4zBAuwMgJSK6WzyKkqn8jLPPVRL5dwn9GTWge4Or38hu57PN62sQDLQ/
-	 6hAapRYoaQqV371NYzGK0rGw0FFOGFgLWopQbB6kTeHh/D2LRjeZtnsKd3Izn9FHOc
-	 6/XJCZLAAXpOnTTTApIIyiT+7Nobo3+Yt6jIrzLUUbVYh0nE5yW2iDThfYm++/+AaA
-	 c+fSeB+yqtjjg==
-Message-ID: <0070f2ca-551d-4c55-9ff7-2ef6d93d4cb9@kernel.org>
-Date: Mon, 1 Dec 2025 08:50:15 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 881822D3EF2;
+	Mon,  1 Dec 2025 07:59:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.26
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764575954; cv=fail; b=R53VwIE6+jU4DZ+HhdUPKZybgrCjAj6n5efvGuUV0yD1qDFO2HBQr8xE8hpoi1eFLT8SBM8zftvBXiXVTo0kYeEl36ZNGzlCh5UvKzYEYxUv1amtcVfhKKFyKOy6nj+erhjDed7EA7FK0HPLvQTL9BdSRhU8/p6cI+2AJGzauPk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764575954; c=relaxed/simple;
+	bh=iksaNFs69nCJn0LOQSKlXMB0oVDFNkqt0kk6P2X7Jh8=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=I9eyTIk8aqW6Rp+MptkuRLX7t9Eq2wlAmdF0frBX1JEOAqhslsztTFtmT4k0ghiFny5m0JpWddpP0VWLjSYGu1Vpv5V/y+kz/rm+dhurdg8fu2XAu52AH2mo3u648D74wdwuYd8qXj0ovVTowmgDlubwvgSuFUMrVnpi2O4dYfk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=mEhg779g; arc=fail smtp.client-ip=52.101.43.26
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jg21LB3jpAqflzuvWPHVZhco2duE4oZ/2Jxt0qUYoDrMZfxV+Xc3XKiS/xyV8HuWOzbOc5L3W9d7uFmV1hzoEG7FUbv96kBFGRRRRkYN3dRW31J4lvFnV1b+y+eWQbnZPwAm9j+iYpuNvKr72kbMeRBBq/38aYAa6dl+ssNLsDl+bu0UovEzl6Jd+fD4N2T/ZIOvscs9QL8zw6t1z2BOLeoVn6ylrAblQdEw9fkOX0Bt78zgkB0owq6sKi3qjpMJlXn5Lj3RfUk9Df+QjKocK04YptKkkgFXh5iLEBQNG1J2gmp1E/bgIxB37NEzaLW2MGHyBYcOdWZIbp2Df241dw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GMDbAPQZZMA0ZMxD1HR3r31jI5hut6Zh8Z4IRiWumAk=;
+ b=hI+vQEKOWzXM1uhHYyjZzR2rkg5yW+WGhPkniLBB/VOs9NVfAJsYIR5q8eUdF92kSy8D5owuYYfIz+bIiM0UEsDy8tiySebBt8gqaIQs9MXj/sFWXR0C51yfbDo2UySgFIoS9rUppXPhqyCSNHu1WKQ2IykS0sRgpIr1OxlJn5FRVG73yKuheXaaci4buRq5yi5rGzTiqVnes9HQrdTdFVWzhmULNj+kpF/ItSw5S8SLLLvcO/Zg2m1v93ea6VZ4TTQ8tsNJN1DQsAaOscXm7jZ0mXyD08Gmn8eYL8LwwL9z1BsIW9+iaZRWMN1kpgQ8HZc37shsG1cNNkgGnztDKA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GMDbAPQZZMA0ZMxD1HR3r31jI5hut6Zh8Z4IRiWumAk=;
+ b=mEhg779gMVbMhXpXU8xfc6/XeOq6fEBQ91V8gre6td3DQSZjmc7b6ylo2xEae1nHvrMIhRAT3TuVX1IAjdS8YpqxJ4NvxiAG/Uxzdz5W91K2xY6Yih6LOCDeSYDwDLVBX4cEaiTgBOr1zZ5JJ5Ae98/ogw/JuB4Teg9ITF4o6t+9LIrVp71qtJCGXPMaZMqw+BwvAWjiyLEcNAHg93x0IP1G3BnZcebYUKiUe2PBJscxHOV3LMKHpH/K6sN7YpGPK5kPDRXhp/fzVCh5uj3goVxJl4XDsBwg4Ins8nYOkIOXPbBymqZ7KQpQps2zuQChRec8/vHVdSv6vFiCXyY5tA==
+Received: from MN0PR02CA0022.namprd02.prod.outlook.com (2603:10b6:208:530::25)
+ by IA1PR12MB6411.namprd12.prod.outlook.com (2603:10b6:208:388::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.17; Mon, 1 Dec
+ 2025 07:59:08 +0000
+Received: from BN3PEPF0000B36E.namprd21.prod.outlook.com
+ (2603:10b6:208:530:cafe::7e) by MN0PR02CA0022.outlook.office365.com
+ (2603:10b6:208:530::25) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9366.17 via Frontend Transport; Mon,
+ 1 Dec 2025 07:59:09 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BN3PEPF0000B36E.mail.protection.outlook.com (10.167.243.165) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9412.0 via Frontend Transport; Mon, 1 Dec 2025 07:59:08 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 30 Nov
+ 2025 23:58:52 -0800
+Received: from fedora (10.126.230.35) by rnnvmail201.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 30 Nov
+ 2025 23:58:42 -0800
+References: <20251128004846.2602687-1-kuba@kernel.org>
+User-agent: mu4e 1.8.14; emacs 30.2
+From: Petr Machata <petrm@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
+	<shuah@kernel.org>, <willemb@google.com>, <petrm@nvidia.com>,
+	<linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH net-next] selftests: net: py: handle interrupt during
+ cleanup
+Date: Mon, 1 Dec 2025 08:57:24 +0100
+In-Reply-To: <20251128004846.2602687-1-kuba@kernel.org>
+Message-ID: <87fr9uy6oq.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/2] net: dsa: mt7530: Use GPIO polarity to generate
- correct reset sequence
-To: Chen Minqiang <ptpt52@gmail.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- "Chester A. Unal" <chester.a.unal@arinc9.com>,
- Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>
-Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-References: <20251129234603.2544-1-ptpt52@gmail.com>
- <20251129234603.2544-2-ptpt52@gmail.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20251129234603.2544-2-ptpt52@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-
-On 30/11/2025 00:46, Chen Minqiang wrote:
-> The MT7530/MT7531 reset pin is active-low in hardware, but the driver
-> historically hardcoded a high-active reset sequence by toggling the GPIO
-> as 0 → 1. This only worked because several DTS files incorrectly marked
-> the reset GPIO as active-high, making both DTS and driver wrong in the
-> same way.
-> 
-> This patch changes the driver to respect the GPIO polarity using
-> gpiod_is_active_low(), and generates the reset sequence as:
-> 
->     assert   = drive logical active level
->     deassert = drive logical inactive level
-> 
-> As a result, both cases now correctly produce the required
-> high → low → high transition on the actual reset pin.
-> 
-> Compatibility
-> -------------
-> 
-> This change makes the driver fully backward-compatible with older,
-> incorrect DTS files that marked the reset line as GPIO_ACTIVE_HIGH:
-> 
-
-You must describe all cases, so old DTS using inverter, thus described
-as active-low. This is perfectly possible setup.
-
->  * Old DTS marked active-high:
->        is_active_low = 0
->        driver drives 0 → 1
->        actual levels: high → low → high  (correct)
-> 
->  * New DTS marked active-low:
->        is_active_low = 1
->        driver drives 1 → 0
->        actual levels: high → low → high  (correct)
-> 
-
-And new DTS working with inverter, so described with active-high.
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN3PEPF0000B36E:EE_|IA1PR12MB6411:EE_
+X-MS-Office365-Filtering-Correlation-Id: f87b1d47-8288-4c84-57e0-08de30af8199
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|1800799024|376014|7416014|82310400026|7053199007|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?X0XHidCv4Fw/8fDKBdgPYpt1qHYJbkQzmORdsCNSveXP7KW+ZjZLNVKW4nWL?=
+ =?us-ascii?Q?/aUcASiz1Y0er8IktmcUx3Jrk5+8MccDmBUgmgIl1Ri90zsjFAtjaB40oxeH?=
+ =?us-ascii?Q?yrg8PGYARvkOCYNCFJiBCyMsxjAU9EXRNrzIrx/7392vvIwd87sYmCJqs7gC?=
+ =?us-ascii?Q?xTSkCESI81BUhBMguOXL3M1hxCAgYNtDMDEVZW9ULhhzwaqED0C+8pEekCTG?=
+ =?us-ascii?Q?uEkKE1brjz4I0uHvJtjYXGXYqUy6bMucHulX2GeJud7PIqml5J4ZuMw+yjPC?=
+ =?us-ascii?Q?HRo14L6cknd7Fxoawo67gkeMDAOnZoWkrKDj1reYav6lpNv/T+n6WEQYZHI4?=
+ =?us-ascii?Q?V+GnUji3vk78WEPAdUv0X/VatS1GVWGECEhgKJSvWnRpon0bwvnVqBDZUiaj?=
+ =?us-ascii?Q?ZJsCJaRZTcJnYzaSy2vAOzTn4UCl9vrsv02KwbfmOeS007ummdGE7npqE3EX?=
+ =?us-ascii?Q?oT3oYtgUwAcEKYhcD/Vmcu42S6a5WmUqVLcyXrDi3oS+xeR6L4XfnsAEgoPU?=
+ =?us-ascii?Q?Xb62oM4/QXxliYdpFV2xgN1uqSBa+xW210FIosNblvufD3OE6TWheZlrj2Va?=
+ =?us-ascii?Q?m205jFylloGeeVTp2yLzPCJ98d8Hc8ALFP4GGK1g2Hb7Vn7z3VQRsadTdI3L?=
+ =?us-ascii?Q?SQJLg6xO6BnGCiZyUq6DE0n71AP9slrnFEI1GsR99L5G1I58W0IdAEveTkIT?=
+ =?us-ascii?Q?l2ZbgYPFxSVephCu77/xDowYISKTzMQeBK8BzkGbFxPelNA05F0ur40DURp+?=
+ =?us-ascii?Q?sXXThmw5bMWJiItyGQ82PN8ve8Fy1689zXhXGFUfIkcOqBQby2OyzJ3oGsB8?=
+ =?us-ascii?Q?nwY9G/bh71SKUh3VEdqftOx2E2KLbuF2vC9MuBP7o1/MTy6twpvWHTYmQEjI?=
+ =?us-ascii?Q?H7tZNNYijTGqfeRto2OmBrulCAY5Gm/wabB0O7PKFabReIx+W5KQlWnzlVAv?=
+ =?us-ascii?Q?KuLJ0MDsFnK12YMSJQfoVpP1MfPub0eDwn7N6mqByK1RC/iOs60hLuc8li7H?=
+ =?us-ascii?Q?Pm8CZiVftTSVCvOCUQWGk/brdThJQ3ceTRyYvtlvpIuah88KwYiaiq9DC2w7?=
+ =?us-ascii?Q?l476Jr65Tjpic+TY206O+T5qpmrW99trwf8T+muVW1OvWan5G9yQuiAyVNA+?=
+ =?us-ascii?Q?SXla/ISTd44Z2MEdQYlRdwuUr2KnRJipkJlUctELf6EOIXASIwYlcxo27RbL?=
+ =?us-ascii?Q?/TeBQ9/kmgVxCW9R8yVFka4ZAmV+ZtDDpi/0LPZVgJzJorDZZgy5th/vEnmS?=
+ =?us-ascii?Q?k0yLO5MWzrpOdDxpqzb9wAz6LcXnNV8Y4vES6cwe4ZmysaOd+ExPE3jSqSgo?=
+ =?us-ascii?Q?srvqo+q8D4k9mF2+zFO5mWTg0bMVUkqa/9w68+PfeQfzKx7TFjbVY+arehNF?=
+ =?us-ascii?Q?oRi28ccYPGakHpozxjLa6s0MY8xP6pSl0seDmSiMa8zrsSgHWwcO/ADPgnG8?=
+ =?us-ascii?Q?rk87byTzl5LUvpViplipcua+Ps9D78Pa+6rjxL3y0uXEUduFqsNVoeseRBF6?=
+ =?us-ascii?Q?HKLxo7BT2W2paBSynZksTNfHsRBuyzkdvb+IoV2N7ZAs/4+F6WRUGZYZHOON?=
+ =?us-ascii?Q?d2LtNxZ2/fWfDX0xRbI=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(7416014)(82310400026)(7053199007)(13003099007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2025 07:59:08.3006
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f87b1d47-8288-4c84-57e0-08de30af8199
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN3PEPF0000B36E.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6411
 
 
-Best regards,
-Krzysztof
+Jakub Kicinski <kuba@kernel.org> writes:
+
+> Following up on the old discussion [1]. Let the BaseExceptions out of
+> defer()'ed cleanup. And handle it in the main loop. This allows us to
+> exit the tests if user hit Ctrl-C during defer().
+>
+> Link: https://lore.kernel.org/20251119063228.3adfd743@kernel.org # [1]
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: shuah@kernel.org
+> CC: willemb@google.com
+> CC: petrm@nvidia.com
+> CC: linux-kselftest@vger.kernel.org
+> ---
+>  tools/testing/selftests/net/lib/py/ksft.py | 18 ++++++++++++++++--
+>  1 file changed, 16 insertions(+), 2 deletions(-)
+>
+> diff --git a/tools/testing/selftests/net/lib/py/ksft.py b/tools/testing/selftests/net/lib/py/ksft.py
+> index ebd82940ee50..531e7fa1b3ea 100644
+> --- a/tools/testing/selftests/net/lib/py/ksft.py
+> +++ b/tools/testing/selftests/net/lib/py/ksft.py
+> @@ -163,7 +163,7 @@ KSFT_DISRUPTIVE = True
+>          entry = global_defer_queue.pop()
+>          try:
+>              entry.exec_only()
+> -        except BaseException:
+> +        except Exception:
+>              ksft_pr(f"Exception while handling defer / cleanup (callback {i} of {qlen_start})!")
+>              tb = traceback.format_exc()
+>              for line in tb.strip().split('\n'):
+> @@ -333,7 +333,21 @@ KsftCaseFunction = namedtuple("KsftCaseFunction",
+>              KSFT_RESULT = False
+>              cnt_key = 'fail'
+>  
+> -        ksft_flush_defer()
+> +        try:
+> +            ksft_flush_defer()
+> +        except BaseException as e:
+> +            tb = traceback.format_exc()
+> +            for line in tb.strip().split('\n'):
+> +                ksft_pr("Exception|", line)
+> +            if isinstance(e, KeyboardInterrupt):
+> +                ksft_pr()
+> +                ksft_pr("WARN: defer() interrupted, cleanup may be incomplete.")
+> +                ksft_pr("      Attempting to finish cleanup before exiting.")
+> +                ksft_pr("      Interrupt again to exit immediately.")
+> +                ksft_pr()
+> +                stop = True
+> +            # Flush was interrupted, try to finish the job best we can
+> +            ksft_flush_defer()
+>  
+>          if not cnt_key:
+>              cnt_key = 'pass' if KSFT_RESULT else 'fail'
+
+Nice.
+
+Reviewed-by: Petr Machata <petrm@nvidia.com>
 
