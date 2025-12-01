@@ -1,319 +1,130 @@
-Return-Path: <netdev+bounces-242891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AD3AC95BD5
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 07:00:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 24AE8C95BFC
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 07:05:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1CB023425B3
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 06:00:25 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C3560341CE5
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 06:05:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1DDF209F5A;
-	Mon,  1 Dec 2025 06:00:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD67B22E3F0;
+	Mon,  1 Dec 2025 06:05:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b="M4Ch+tZc"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="VjW2dD7R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B45F200110
-	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 06:00:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22E92229B2A;
+	Mon,  1 Dec 2025 06:05:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764568819; cv=none; b=lby46X2H9jBkZkE42SwZzqEwpnv3rGV3QeApAETfaQiDs8bTUiMXFXZaMslaQhEpTJhItsTitkmC2ppK7SYKhGWgFlddmCtaE4zaldBvEBaVhKLuQqYeJljP5Y5U0RJhNgnZ6esViptQWQHBLyzW1JLygdx2HY8TdK/hif/Zb3E=
+	t=1764569112; cv=none; b=ryH4zRCRt4xk7/RO2StQQ9SMeTl5NySNNH2Z35OzPx+wwB60H0UF8aM0A8mvOkpCDeXVOyq96uCLXdMmI1LzMqr3AVJbG5uPrpxFZrjUvLw4+KIYI5OOouVEr0rvhPQSYiZ0T/9B+MJcLe5MbfvrLqjrfXqcXnMJv42SXeGaFQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764568819; c=relaxed/simple;
-	bh=8a9J5WKlLvagBRrqbTenQf3r/ZwqfeRPqvzIiOxHGhg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IrdeF4zwWGs4rN1QFJ4hURjPht9Gz5tqMCzoZBOmD9/1EmLHO6nc58IFp4eTO6m37BeQnDiEs5937nuV5F7Ae776iLT3PfYyG/lSE9qNw1C+6TWCwnZtGRqL3Rblira8oqmoKgo/Ba25S8cjY6JFV7fX1+h5Q0TpgCL/42qq3co=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com; spf=pass smtp.mailfrom=ionos.com; dkim=pass (2048-bit key) header.d=ionos.com header.i=@ionos.com header.b=M4Ch+tZc; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ionos.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ionos.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-b734a4b788cso55991166b.3
-        for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 22:00:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google; t=1764568814; x=1765173614; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wN9NHGJJqJ2uT92gc86Y3fDq1QkhW11R9R2p8AAGxuc=;
-        b=M4Ch+tZcd3KadkSSZeQN1U3y0RQC9nyDresTF4lnSpxpmFYg28POEDKAbT3ik5P3JU
-         x0vMcZa2uYF8OPQUDHEk3HDHxT/j4jzWfTttui+x9d1pnGUMP2P03V3cKLI/DhFjScKn
-         UJakMbBW1TIu50YGYz/ETv/wIFsv8IVd5GcxJ3ao8KGlb83TR5r2x97f5lP6t49Qdmhv
-         2PGq1iUbajOJZXKKroRHMypKqkli642jKuuoXX57MCWL9yIxqyXoxpACsf4XZI2nKbY3
-         PeYLRntjkzBz0OUUfT899SnQls5RG9BweJZ2BQ2ZCxbfJ2bxd4FmtFKDrRbXmuX6d/6X
-         l2UQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764568814; x=1765173614;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=wN9NHGJJqJ2uT92gc86Y3fDq1QkhW11R9R2p8AAGxuc=;
-        b=rr0NAQw4xkqWJ2fKHIipfFahNDB8dXnbreNdDCqBvbEPPc3c/Ky6Q0v12NuqB3wFWV
-         tmfLBz4hzwmFifF/4l27CLNa+TFZI3umvhSX92qNiYXx3S6g8lzd6McG0qOI/HtGNeYT
-         dsQI6Gs5p7yPi/kt6hCB2ILvPxzflS36azRFwWuaY5Zr7XiX+A9P7bVaMolIEx6AAJpg
-         lly7y/zI+gjPPZqXfP9CnooUXbFq902WGgj5lne3NCvJgaqffTPGgXUCsHnopYdzivE0
-         dYgGqSYZy594O/B1IWAr11SFxSq6NkAEjNhQB2LPB+SBYgRybKFsbJcZVulJG++ct85v
-         SRLg==
-X-Gm-Message-State: AOJu0Yz8m9UwlvBX95E+Nza6EfbVZsPINqOUR86kgxSzCLIR3FpGfArZ
-	fi50TSCXtjNGHJRuTNBTXKm9WZPtwZUTMltE+emU3oEBykC1zrfCNUiHuv9hRCtMkaHI/D1xWgQ
-	kyLvXbs3wV8CEvkk5eZmGkAYmm1gGJAzUu+b1RwY2LA==
-X-Gm-Gg: ASbGncv7tRoniOrxHKgY6W3Luz6zCA0wsDQpufMdfEJUcz2vRpm9MmZBf1Q2v/7gkbB
-	iAVUALSGYMPfbmDZ0y1MWbwq5YM2w4d391WWZM2BKFe/b3FAcbpj+yx5KbX8yOJHoCgaIZAY1Ez
-	UqGKlcMHE/sauQ1XSwlF4Wiirw1OeEI2OypKTM0IrtdIfUUPoljzvehjkAqrQQ8J9UKaO7MgMp8
-	l3EZJQfp7HDaMrUX83lqFFGJJd3JkGbS6WmWDHYiYkBLYXWLE39rjss8n0zF1/wDHuxraB62Jd7
-	PwQ67zp8ekSsSYoX0P6t5TpiOU0=
-X-Google-Smtp-Source: AGHT+IGMMFBsVZC+omOIGrSvCw2NUGYUDspEWO6UPlUjmuWjs4dn3dxhi0Gk6ch1+CvmC+7S+sFywZW1F26haNuXhyc=
-X-Received: by 2002:a17:906:c115:b0:b70:e685:5ac8 with SMTP id
- a640c23a62f3a-b76717243b8mr2259002166b.3.1764568814116; Sun, 30 Nov 2025
- 22:00:14 -0800 (PST)
+	s=arc-20240116; t=1764569112; c=relaxed/simple;
+	bh=Ud9g2Bcti0ViS/cO9GVYleAX19SkiB7ZfHACfKgHNZw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bzzhvHTQy8k8thTly50H93OZYnahcQGA6s9vEKBhsJGFmFlZyK0WQwO0LKrFQyKnAx7wOV/9Dw24cLWgzba/za0lqNFVAPcpZomU3KcnCxNojzzgKeANZN78FVtiAAQIiYIjs58Fcgnsdif2hQi8ifGHTIONMWWZSvkXr2u8+ck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=VjW2dD7R; arc=none smtp.client-ip=115.124.30.97
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1764569099; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=icuWV4fS+7IDzs1gMNWLxbwa/xoEMhaLFLpYh8hPNL4=;
+	b=VjW2dD7RMjkidkY9ZcYv2MSq3JaYNLLIYTPdAUI0Ea6meoDhb2vYzToIjaS+FWLv4XqopU3rs/+q4XO0Eyk/H/Svu350HKjFn5BMon8ErTzIx5wGPyMnBg/D+M1Z4P0xHRlCy3mnExwQ36aeBRLErM5LI181LDR7763lXBc5nhU=
+Received: from 30.221.145.112(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WtmfeuK_1764569098 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 01 Dec 2025 14:04:58 +0800
+Message-ID: <9a75e3b2-4d1c-4911-81e4-cab988c24b77@linux.alibaba.com>
+Date: Mon, 1 Dec 2025 14:04:57 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251129022146.1498273-1-rdunlap@infradead.org>
-In-Reply-To: <20251129022146.1498273-1-rdunlap@infradead.org>
-From: Jinpu Wang <jinpu.wang@ionos.com>
-Date: Mon, 1 Dec 2025 07:00:02 +0100
-X-Gm-Features: AWmQ_bkWyZaMbXEG2V-GYWWmd2Fq94zbD7UPY-vyVpF63ukh0jcAABXXbVCqRoQ
-Message-ID: <CAMGffEnvLJ0oB5S_PDG3XzD2Gw1G0JiY_zNQu3=eYa0GP4cf_Q@mail.gmail.com>
-Subject: Re: [PATCH] RTRS/rtrs: clean up rtrs headers kernel-doc
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: netdev@vger.kernel.org, "Md. Haris Iqbal" <haris.iqbal@ionos.com>, 
-	Jason Gunthorpe <jgg@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, linux-rdma@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 1/2] ptp: introduce Alibaba CIPU PHC driver
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Richard Cochran <richardcochran@gmail.com>, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ xuanzhuo@linux.alibaba.com, dust.li@linux.alibaba.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20251030121314.56729-1-guwen@linux.alibaba.com>
+ <20251030121314.56729-2-guwen@linux.alibaba.com>
+ <20251031165820.70353b68@kernel.org>
+ <8a74f801-1de5-4a1d-adc7-66a91221485d@linux.alibaba.com>
+ <20251105162429.37127978@kernel.org>
+ <34b30157-6d67-46ec-abde-da9087fbf318@linux.alibaba.com>
+ <20251127083610.6b66a728@kernel.org>
+ <f2afb292-287e-4f2f-b131-50a1650bbb1d@linux.alibaba.com>
+ <20251128102437.7657f88f@kernel.org>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <20251128102437.7657f88f@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sat, Nov 29, 2025 at 3:21=E2=80=AFAM Randy Dunlap <rdunlap@infradead.org=
-> wrote:
->
-> Fix all (30+) kernel-doc warnings in rtrs.h and rtrs-pri.h.
-> The changes are:
->
-> - add ending ':' to enum member names
-> - change enum description separators from '-' to ':'
-> - add "struct" keyword to kernel-doc for structs where missing
-> - fix enum names in enum rtrs_clt_con_type
-> - add a '-' separator and drop the "()" in enum rtrs_clt_con_type
-> - convert struct rtrs_addr to kernel-doc format
-> - add missing struct member descriptions for struct rtrs_attrs
->
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-lgtm, thx!
-Acked-by: Jack Wang <jinpu.wang@ionos.com>
-> ---
-> Cc: "Md. Haris Iqbal" <haris.iqbal@ionos.com>
-> Cc: Jack Wang <jinpu.wang@ionos.com>
-> Cc: Jason Gunthorpe <jgg@nvidia.com>
-> Cc: Leon Romanovsky <leonro@nvidia.com>
-> Cc: linux-rdma@vger.kernel.org
-> ---
->  drivers/infiniband/ulp/rtrs/rtrs-pri.h |   32 +++++++++++++++--------
->  drivers/infiniband/ulp/rtrs/rtrs.h     |   24 ++++++++++-------
->  2 files changed, 36 insertions(+), 20 deletions(-)
->
-> --- linux-next-20251128.orig/drivers/infiniband/ulp/rtrs/rtrs.h
-> +++ linux-next-20251128/drivers/infiniband/ulp/rtrs/rtrs.h
-> @@ -24,8 +24,8 @@ struct rtrs_srv_op;
->
->  /**
->   * enum rtrs_clt_link_ev - Events about connectivity state of a client
-> - * @RTRS_CLT_LINK_EV_RECONNECTED       Client was reconnected.
-> - * @RTRS_CLT_LINK_EV_DISCONNECTED      Client was disconnected.
-> + * @RTRS_CLT_LINK_EV_RECONNECTED:      Client was reconnected.
-> + * @RTRS_CLT_LINK_EV_DISCONNECTED:     Client was disconnected.
->   */
->  enum rtrs_clt_link_ev {
->         RTRS_CLT_LINK_EV_RECONNECTED,
-> @@ -33,7 +33,9 @@ enum rtrs_clt_link_ev {
->  };
->
->  /**
-> - * Source and destination address of a path to be established
-> + * struct rtrs_addr - Source and destination address of a path to be est=
-ablished
-> + * @src:       source address
-> + * @dst:       destination address
->   */
->  struct rtrs_addr {
->         struct sockaddr_storage *src;
-> @@ -41,7 +43,7 @@ struct rtrs_addr {
->  };
->
->  /**
-> - * rtrs_clt_ops - it holds the link event callback and private pointer.
-> + * struct rtrs_clt_ops - it holds the link event callback and private po=
-inter.
->   * @priv: User supplied private data.
->   * @link_ev: Event notification callback function for connection state c=
-hanges
->   *     @priv: User supplied data that was passed to rtrs_clt_open()
-> @@ -67,10 +69,10 @@ enum wait_type {
->  };
->
->  /**
-> - * enum rtrs_clt_con_type() type of ib connection to use with a given
-> + * enum rtrs_clt_con_type - type of ib connection to use with a given
->   * rtrs_permit
-> - * @ADMIN_CON - use connection reserved for "service" messages
-> - * @IO_CON - use a connection reserved for IO
-> + * @RTRS_ADMIN_CON: use connection reserved for "service" messages
-> + * @RTRS_IO_CON: use a connection reserved for IO
->   */
->  enum rtrs_clt_con_type {
->         RTRS_ADMIN_CON,
-> @@ -85,7 +87,7 @@ void rtrs_clt_put_permit(struct rtrs_clt
->                          struct rtrs_permit *permit);
->
->  /**
-> - * rtrs_clt_req_ops - it holds the request confirmation callback
-> + * struct rtrs_clt_req_ops - it holds the request confirmation callback
->   * and a private pointer.
->   * @priv: User supplied private data.
->   * @conf_fn:   callback function to be called as confirmation
-> @@ -105,7 +107,11 @@ int rtrs_clt_request(int dir, struct rtr
->  int rtrs_clt_rdma_cq_direct(struct rtrs_clt_sess *clt, unsigned int inde=
-x);
->
->  /**
-> - * rtrs_attrs - RTRS session attributes
-> + * struct rtrs_attrs - RTRS session attributes
-> + * @queue_depth:       queue_depth saved from rtrs_clt_sess message
-> + * @max_io_size:       max_io_size from rtrs_clt_sess message, capped to
-> + *                       @max_segments * %SZ_4K
-> + * @max_segments:      max_segments saved from rtrs_clt_sess message
->   */
->  struct rtrs_attrs {
->         u32             queue_depth;
-> --- linux-next-20251128.orig/drivers/infiniband/ulp/rtrs/rtrs-pri.h
-> +++ linux-next-20251128/drivers/infiniband/ulp/rtrs/rtrs-pri.h
-> @@ -150,7 +150,7 @@ enum rtrs_msg_types {
->
->  /**
->   * enum rtrs_msg_flags - RTRS message flags.
-> - * @RTRS_NEED_INVAL:   Send invalidation in response.
-> + * @RTRS_MSG_NEED_INVAL_F: Send invalidation in response.
->   * @RTRS_MSG_NEW_RKEY_F: Send refreshed rkey in response.
->   */
->  enum rtrs_msg_flags {
-> @@ -179,16 +179,19 @@ struct rtrs_sg_desc {
->   * @recon_cnt:    Reconnections counter
->   * @sess_uuid:    UUID of a session (path)
->   * @paths_uuid:           UUID of a group of sessions (paths)
-> - *
-> + * @first_conn:    %1 if the connection request is the first for that se=
-ssion,
-> + *                     otherwise %0
->   * NOTE: max size 56 bytes, see man rdma_connect().
->   */
->  struct rtrs_msg_conn_req {
-> -       /* Is set to 0 by cma.c in case of AF_IB, do not touch that.
-> -        * see https://www.spinics.net/lists/linux-rdma/msg22397.html
-> +       /**
-> +        * @__cma_version: Is set to 0 by cma.c in case of AF_IB, do not =
-touch
-> +        * that. See https://www.spinics.net/lists/linux-rdma/msg22397.ht=
-ml
->          */
->         u8              __cma_version;
-> -       /* On sender side that should be set to 0, or cma_save_ip_info()
-> -        * extract garbage and will fail.
-> +       /**
-> +        * @__ip_version: On sender side that should be set to 0, or
-> +        * cma_save_ip_info() extract garbage and will fail.
->          */
->         u8              __ip_version;
->         __le16          magic;
-> @@ -199,6 +202,7 @@ struct rtrs_msg_conn_req {
->         uuid_t          sess_uuid;
->         uuid_t          paths_uuid;
->         u8              first_conn : 1;
-> +       /* private: */
->         u8              reserved_bits : 7;
->         u8              reserved[11];
->  };
-> @@ -211,6 +215,7 @@ struct rtrs_msg_conn_req {
->   * @queue_depth:   max inflight messages (queue-depth) in this session
->   * @max_io_size:   max io size server supports
->   * @max_hdr_size:  max msg header size server supports
-> + * @flags:        RTRS message flags for this message
->   *
->   * NOTE: size is 56 bytes, max possible is 136 bytes, see man rdma_accep=
-t().
->   */
-> @@ -222,22 +227,24 @@ struct rtrs_msg_conn_rsp {
->         __le32          max_io_size;
->         __le32          max_hdr_size;
->         __le32          flags;
-> +       /* private: */
->         u8              reserved[36];
->  };
->
->  /**
-> - * struct rtrs_msg_info_req
-> + * struct rtrs_msg_info_req - client additional info request
->   * @type:              @RTRS_MSG_INFO_REQ
->   * @pathname:          Path name chosen by client
->   */
->  struct rtrs_msg_info_req {
->         __le16          type;
->         u8              pathname[NAME_MAX];
-> +       /* private: */
->         u8              reserved[15];
->  };
->
->  /**
-> - * struct rtrs_msg_info_rsp
-> + * struct rtrs_msg_info_rsp - server additional info response
->   * @type:              @RTRS_MSG_INFO_RSP
->   * @sg_cnt:            Number of @desc entries
->   * @desc:              RDMA buffers where the client can write to server
-> @@ -245,12 +252,14 @@ struct rtrs_msg_info_req {
->  struct rtrs_msg_info_rsp {
->         __le16          type;
->         __le16          sg_cnt;
-> +       /* private: */
->         u8              reserved[4];
-> +       /* public: */
->         struct rtrs_sg_desc desc[];
->  };
->
->  /**
-> - * struct rtrs_msg_rkey_rsp
-> + * struct rtrs_msg_rkey_rsp - server refreshed rkey response
->   * @type:              @RTRS_MSG_RKEY_RSP
->   * @buf_id:            RDMA buf_id of the new rkey
->   * @rkey:              new remote key for RDMA buffers id from server
-> @@ -264,6 +273,7 @@ struct rtrs_msg_rkey_rsp {
->  /**
->   * struct rtrs_msg_rdma_read - RDMA data transfer request from client
->   * @type:              always @RTRS_MSG_READ
-> + * @flags:             RTRS message flags (enum rtrs_msg_flags)
->   * @usr_len:           length of user payload
->   * @sg_cnt:            number of @desc entries
->   * @desc:              RDMA buffers where the server can write the resul=
-t to
-> @@ -277,7 +287,7 @@ struct rtrs_msg_rdma_read {
->  };
->
->  /**
-> - * struct_msg_rdma_write - Message transferred to server with RDMA-Write
-> + * struct rtrs_msg_rdma_write - Message transferred to server with RDMA-=
-Write
->   * @type:              always @RTRS_MSG_WRITE
->   * @usr_len:           length of user payload
->   */
-> @@ -287,7 +297,7 @@ struct rtrs_msg_rdma_write {
->  };
->
->  /**
-> - * struct_msg_rdma_hdr - header for read or write request
-> + * struct rtrs_msg_rdma_hdr - header for read or write request
->   * @type:              @RTRS_MSG_WRITE | @RTRS_MSG_READ
->   */
->  struct rtrs_msg_rdma_hdr {
+
+
+On 2025/11/29 02:24, Jakub Kicinski wrote:
+> On Fri, 28 Nov 2025 14:22:21 +0800 Wen Gu wrote:
+>>> Could you go complain to clock people? Or virtualization people?
+>>
+>> I understand that the PTP implementations in drivers/ptp aren't closely
+>> related to networking though drivers/ptp is included in NETWORKING DRIVERS
+>> in the MAINTAINER file.
+>>
+>> I noticed that drivers/ptp/* is also inclued in PTP HARDWARE CLOCK SUPPORT.
+>> This attribution seems more about 'clock'.
+>>
+>> Hi @Richard Cochran, could you please review this? Thanks! :)
+> 
+> It's Thanksgiving weekend in the US, Richard may be AFK so excuse my
+> speaking for him, but he mentioned in the past that he is also not
+> interested in becoming a maintainer for general clocks, unrelated
+> to PTP.
+> 
+
+Wishing you a Happy Thanksgiving!
+
+I think you misunderstood. I didn't encourage Richard to maintain
+general clocks unrelated to PTP. Rather, I believe this driver should
+belong to the PTP subsystem, and here are my reasons (which have been
+mentioned in previous emails):
+
+1. CIPU provides high-precision PHCs for VMs or bare metals, which
+    are exposed as ptp_clock according to the definition in [1]. its
+    usage is no different from other ptp devices. So this is a PTP
+    driver.
+
+[1] https://docs.kernel.org/driver-api/ptp.html
+
+2. The PTP implementations that are independent of networking and
+    NICs are placed under drivers/ptp. These devices are provided from
+    chip/FPGA/hypervisor and maintain clock accuracy in their own unique
+    ways. CIPU ptp driver is no different and should also be placed
+    under the drivers/ptp from this perspective.
+
+According to the MAINTAINERS file, drivers/ptp/* is maintained by the
+NETWORKING DRIVERS and PTP HARDWARE CLOCK SUPPORT subsystems. Considering
+you mentioned that drivers/ptp is not closely related to networking, I
+think it might be more appropriate for the PTP HARDWARE CLOCK SUPPORT
+subsystem maintainer to review it. After it merges into the upstream,
+we will be its maintainers.
+
+> Search the mailing list, there are at least 3 drivers like yours being
+> proposed. Maybe you can get together with also the KVM and VMclock
+> authors and form a new subsystem?
+
+I think drivers under drivers/ptp are all similar. But aside from the
+fact that they are all exposed as PTP devices and therefore classified
+in the PTP subsystem, I haven't been able to find a way to classify
+them into another class (note that CIPU ptp can't be considered a
+VM/hypervisor clock class since bare metal scenario is also applicable).
+
+Regards.
 
