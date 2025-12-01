@@ -1,134 +1,141 @@
-Return-Path: <netdev+bounces-242981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17960C97BD9
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 14:56:24 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B849C97D1B
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 15:19:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6A5A94E161A
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 13:56:14 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7D30F4E1315
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 14:19:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B9C313E2B;
-	Mon,  1 Dec 2025 13:56:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B110B314D2F;
+	Mon,  1 Dec 2025 14:19:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bvhiwYOe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SF6nRt7Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F39F312816
-	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 13:56:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84EC1311C05;
+	Mon,  1 Dec 2025 14:19:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764597372; cv=none; b=usX8nvUXVudQHRK+qAMrizag8NrX9ApiKAo8iItH03r8nAR4Dc1ZBshRhp+a7MD//H+5LATFP6kssbNQqmTLaVBnckRloiBQbnuRJobYa8BZrTOUuJxwvtH04RzEi4hjrocAukuAONmt7BHYlvOkITJ88rL0KcOb+LW/BlDxu0Q=
+	t=1764598785; cv=none; b=fNHKD1Nsud2RrSK/VUp5MQL3L5pbhvpg5cPdqkCzug0H2LKYxHUciLl4ztLD23UFBHahXUbiGMAV1SWMNtBBmfh2Ljiixmkeym8RF37Ix+0vMUhRhuk/ephgOV8qiO/OgCQluiFtEUu32/Glyr+VaB5BiKCKqNF2AHNNpAIfRHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764597372; c=relaxed/simple;
-	bh=A0Z3Vafv0bAi6uB0xlY0j5MJXQ4H/3TpH7xNzz91rmM=;
+	s=arc-20240116; t=1764598785; c=relaxed/simple;
+	bh=CdVnOG+TPZOo7rgy6OxDnhs0rc15k6LGBWxJ00eufvY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Uy1QMf1Qh8zKps6qK0Xa+gIau0OznP3Twm27eNkLVCuiadY0zczMWzq2skhP9ualNwmeUfI2LO2ulKfCYEYyPV79g21EDj1k7wMujVmoIjkdXtNdnEHNhC2EOOq/Wny1oHErpSQNN0dpy/gkYETupRXkafxPV34xpbVbz3a6pvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bvhiwYOe; arc=none smtp.client-ip=209.85.216.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-34381ec9197so3592809a91.1
-        for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 05:56:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764597370; x=1765202170; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=a2Enl1wPQpF6gzSuxvAtr6YsK77ubEdlhUGNIlCPzkM=;
-        b=bvhiwYOeK9Ocm+VJg1rvC/Vy9WKQrg9aTrJzcg/mgHIWO0OagY2XuMe9h8iXj7KlxG
-         pYEGOkuhj4CINOU/0jmk3FSBaSlt4FMm3LOSPBsRouQfoTqSIxlbFqzAd8Th2509y9OV
-         xzCJ02gbDzr4niE2/SvrqthINatATTkaiZnJsPeAMcRwtdGDW10TrauPWQ8untHvfS31
-         9+sPRduHypvNou3obnqGICHWF9OqURanhYI/XMLsxPbePaNrVfyRq9WzR9ErL0UzKsRk
-         o7fTVHPY2X2DEIygTbclX0Ot3x8ril1WPbRXvJbQ9rdsiZ5g6uFHuqOYSbRVjkhJcUg6
-         TWmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764597370; x=1765202170;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=a2Enl1wPQpF6gzSuxvAtr6YsK77ubEdlhUGNIlCPzkM=;
-        b=DePfHrznickfwTobB2QclsuyJ7vb4et4ga0vNMy7IiC9fHeItjnBJ54/KaRPQB1KzO
-         IcPMUapea8S0D7SdKIAiqg+oaBkJnvV0kINNeBlkOUa4fFcNhC9DqfsymNMVtc9lVU9X
-         aKqN/cAXiwzTvPrRXioCDbnwxcZluj+I7s/qm+0i/KScVm37rSp1IO3j/uIUiA0le4gu
-         bkT0qzFGdLJ1VvMhfLfluWIowMFNjTqx1HtUHAWNObD4X9x4hYeZCKlT/pow2IQBAnvg
-         iOj+il1yhUnBt+dPd4LLBVtg0QV4Nkravcsf3pmcnkVibb9GeQ/OlatGxKR7OATNLQxb
-         sObg==
-X-Gm-Message-State: AOJu0Yw/QJY5hC9Jx77TUsmydEqS9INuy3Pt1bTsNKQGJPolxPq2hXKN
-	yHNPgMy6YHib1fwm6FRbffpCjBRfNkOUURGCRF/QLMe0mI+klzDRXWrtW7WDZQRL
-X-Gm-Gg: ASbGncu9CSiYpQ8s9eR8gnUTx7lNkseUM9Z1nMzL09qgZHmzDcqW4DkmSyTf1SLz/jw
-	S+kc7amS1rLiExfljKlPFrVYHvHbglo07Cmqi3EXBm5/azwZyCg9Q0j+VFRzIkVef6JYfiHnHbV
-	7wd+xFnpAs318XRQp/zKcsNbtqb8815HYo/0RGFxAkDcMQertED+UI+O5ixCGM7ZJUOC5TrDKDs
-	8rhkeoo08keSL4RF8oQHNujkl3NiiOQ/kncIQ1bCwsXtHFuAad3t72XI1dumA7lEvFjg3K18Z2A
-	gDIaRT2kE7qDhAg28JRoQ7iZZZZbN7q9xOugd+PkMn3teep8Q7ChnZNMPJOs4Zy8qQgsFqj6LJu
-	NJuzovHAip1APziuVwtEIGNG7w6h8BdwDfj7TvvZQjAJWNRiRB1s/KwPFDUdGOk0nwXjMpX/q4J
-	j2sOu+M7//2gOUAR8=
-X-Google-Smtp-Source: AGHT+IHC1wmy2ZG5D5VMtKk4CNz18DjmyrTOYSp4UP0rE+HfOuUQjsv/DToUmWIoj3Ko2HrpUikIHg==
-X-Received: by 2002:a17:90b:4a08:b0:336:b60f:3936 with SMTP id 98e67ed59e1d1-34733e72342mr40901994a91.12.1764597370320;
-        Mon, 01 Dec 2025 05:56:10 -0800 (PST)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3476a55ed00sm16991422a91.5.2025.12.01.05.56.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Dec 2025 05:56:09 -0800 (PST)
-Date: Mon, 1 Dec 2025 13:56:02 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Jay Vosburgh <jv@jvosburgh.net>, Tonghao Zhang <tonghao@bamaicloud.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=g9aFwgivvHWE8Lh8b97pNeX47x8zZtpitzzA4A07TlcG7Wr/LcwEJOHth11h26qR4cgb0fatyVJwZ7z64Keei6VpgauPO9HlbyDNSp8BIUBo8y1/SrLS6tSHaaZq2VQfCrOUihWp7y6XoQAS6LxY8qVSUCuipWh04/sQzNQ3lnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SF6nRt7Q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94300C4CEF1;
+	Mon,  1 Dec 2025 14:19:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764598785;
+	bh=CdVnOG+TPZOo7rgy6OxDnhs0rc15k6LGBWxJ00eufvY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SF6nRt7QQZgjpVcUpwjW6vRPhHFLS1Xttv9RzecDetxlSOXMf8Cm6mmqKbN5xKtSq
+	 pqsb0SVKFKnC9UTiyn4gHoReIsBByKowUs6wK6BXjMbMWPFjdb5Ws/X1eos9HRS0Hj
+	 00qWYMIRiE/B62TE+OTfKS/NI6ZYLSTszhdps0hQb1quZmzdf//oJ9dSLLwMBAjM+4
+	 Cxp7Yju9LuiduTsCwii2BoHjQnGxnhooRmRlZaqOqcsJ3wh+CZkjjMAVUj5OWdvfSn
+	 QDyQuriQRxcl0FYGYmg14CInkWkthUBDvrHkfIbcPjcufqhacxRMQSXN4LyAzFftXB
+	 wYs/3tP4pO+BA==
+Date: Mon, 1 Dec 2025 14:19:40 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jonas Gorski <jonas.gorski@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Jason Xing <kerneljasonxing@gmail.com>
-Subject: Re: [PATCH net-next v3 1/4] net: bonding: use workqueue to make sure
- peer notify updated in lacp mode
-Message-ID: <aS2ecn0U6rlNHP0r@fedora>
-References: <20251130074846.36787-1-tonghao@bamaicloud.com>
- <20251130074846.36787-2-tonghao@bamaicloud.com>
- <aS08d1dOC2EOvz-U@fedora>
- <AACE3A98-C0C0-4B24-BC29-B8EC3A758D90@bamaicloud.com>
- <aS1ocogQc01owxSC@fedora>
- <7FEDE75E-551D-4B29-86A2-526AA3556CDC@bamaicloud.com>
+	Shuah Khan <shuah@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH RFC/RFT net-next v2 3/5] selftests: no_forwarding: test
+ VLAN uppers on VLAN aware bridged ports
+Message-ID: <aS2j_BsYHJ3MT41o@horms.kernel.org>
+References: <20251201102817.301552-1-jonas.gorski@gmail.com>
+ <20251201102817.301552-4-jonas.gorski@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <7FEDE75E-551D-4B29-86A2-526AA3556CDC@bamaicloud.com>
+In-Reply-To: <20251201102817.301552-4-jonas.gorski@gmail.com>
 
-On Mon, Dec 01, 2025 at 07:01:23PM +0800, Tonghao Zhang wrote:
-> >>> I don’t see the benefit of moving NETDEV_NOTIFY_PEERS before NETDEV_BONDING_FAILOVER.
-> >>> Is there a specific reason or scenario where this ordering change is required?
-> >> No, to simplify the code, and use common peer notify reset function.
-> > 
-> > bond_change_active_slave() is called under RTNL lock. We can use
-> > bond_peer_notify_reset() here. But I don't think there is a need to move
-> > NETDEV_NOTIFY_PEERS before NETDEV_BONDING_FAILOVER.
-> Is there a dependency relationship between NETDEV_NOTIFY_PEERS and NETDEV_BONDING_FAILOVER?
-> In vlan, macvlan, ipvlan netdev, NETDEV_NOTIFY_PEERS and NETDEV_BONDING_FAILOVER use the same action.
-> net/8021q/vlan.c
-> drivers/net/macvlan.c
-> drivers/net/ipvlan/ipvlan_main.c
+On Mon, Dec 01, 2025 at 11:28:15AM +0100, Jonas Gorski wrote:
+> Add a test (mainly for switchdev implementors) to test that multiple
+> VLAN uppers on a VLAN aware bridge for the same VLAN do not enable
+> forwarding of that VLAN between those ports.
+> 
+> Since we are testing VLAN uppers, skip checking untagged traffic in
+> those cases.
+> 
+> Disallowing VLAN uppers on bridge ports is a valid choice for switchdev
+> drivers, so test if we can create them first and skip the tests if not.
+> 
+> Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
+> ---
+> v1 -> v2:
+> * new patch
+> 
+>  .../selftests/net/forwarding/no_forwarding.sh | 89 ++++++++++++++-----
+>  1 file changed, 67 insertions(+), 22 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/net/forwarding/no_forwarding.sh b/tools/testing/selftests/net/forwarding/no_forwarding.sh
+> index 694ece9ba3a7..c8adf04e1328 100755
+> --- a/tools/testing/selftests/net/forwarding/no_forwarding.sh
+> +++ b/tools/testing/selftests/net/forwarding/no_forwarding.sh
+> @@ -1,7 +1,7 @@
+>  #!/bin/bash
+>  # SPDX-License-Identifier: GPL-2.0
+>  
+> -ALL_TESTS="standalone two_bridges one_bridge_two_pvids"
+> +ALL_TESTS="standalone two_bridges one_bridge_two_pvids bridge_aware_vlan_uppers"
+>  NUM_NETIFS=4
+>  
+>  source lib.sh
+> @@ -90,6 +90,7 @@ check_rcv()
+>  run_test()
+>  {
+>  	local test_name="$1"
+> +	local swp_uppers=${2:0}
 
-Quote from ad246c992bea ("ipv4, ipv6, bonding: Restore control over number of peer notifications")
+Hi Jonas,
 
-"""
-    For backward compatibility, we should retain the module parameters and
-    sysfs attributes to control the number of peer notifications
-    (gratuitous ARPs and unsolicited NAs) sent after bonding failover.
-"""
+Should this be as follows?
 
-In theory we should send notify after failover. The infiniband driver also
-has specific functions to handle NETDEV_BONDING_FAILOVER. I'm not sure if the
-miss-order affect it. Maybe Jay knows more.
+	local swp_uppers=${2:-0}
 
-Thanks
-Hangbin
+
+I.e. default to 0 if $2 is not set,
+     rather than take a substring of $2 at index 0 (which is all of $2)
+
+Flagged by Claude Code with review-prompts.
+
+https://netdev-ai.bots.linux.dev/ai-review.html?id=3d47057e-e740-4b66-9d60-9ec2a7ee92a1#patch-2
+
+
+>  	local smac=$(mac_get $h1)
+>  	local dmac=$(mac_get $h2)
+>  	local h1_ipv6_lladdr=$(ipv6_lladdr_get $h1)
+
+...
+
+> +bridge_aware_vlan_uppers()
+> +{
+
+...
+
+> +	run_test "Switch ports in VLAN-aware bridge with VLAN uppers" 2
+> +
+> +	ip link del br0
+> +}
+> +
+
+...
 
