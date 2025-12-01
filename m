@@ -1,97 +1,133 @@
-Return-Path: <netdev+bounces-243083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4BECC9956C
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 23:11:33 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3076CC995C9
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 23:16:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9824B4E2D71
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 22:11:21 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 28E573418A2
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 22:16:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1E17286897;
-	Mon,  1 Dec 2025 22:09:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8B76288C86;
+	Mon,  1 Dec 2025 22:16:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cJN+CSLU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com [209.85.167.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23D84286410
-	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 22:09:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A65A7288502;
+	Mon,  1 Dec 2025 22:16:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764626944; cv=none; b=Jgnen6m4nV/NIUgtLlspqM1HfL9PS7JmGJzOmMPqI+OUsZ2Jox3i6S+Irtz/glD3Fb7YaGr7YDixHXFq2sQdbWykLz8WUx0ICfrOBppBudZQzz9Xa/7R/eQAsUnqEAo0fVvdtnNmC3CSB1KEYrzehsk1r4WNpxZY9v3DIN8Rouc=
+	t=1764627401; cv=none; b=snptyPdRivubdEzbLOyDHx2/r65cFsu98MV5Jhs5vI59tmKr00KYZCpcooVtDBWcxNh3kfcZ84cduOG9kXbJ4LGlnF0+H5UcZ6IOHWcEQMCmL5iHvHg1U5tlpA5GX0ey5AcxE1Bzr9lKbHsWSVhsV55snX0AXSz0Mfa9ndJRZdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764626944; c=relaxed/simple;
-	bh=Uw9kUV9EdAkxOYByN1jtz7gLbs5Uy6OVyl/gd7NOE5s=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=Q0ecVGbZeVqbCpc0go+BZVUnxgwYXWyQRn734bu5q+kr5JiBM0axjSDNCbbX/3VFa+928BJR5epokvf9fvmC3cDsBagikqjm4rPpkrC48cvGPxAIrjHMHaKB+lNuhlBZprXqE4Y5+tmdV+AKQfOw/3RwWg2f4tY5TjfitjTDsvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-4510650aea0so5321937b6e.3
-        for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 14:09:02 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764626942; x=1765231742;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/vkKw1aMFMsjt7cPjue/zTtcAVsiSrnVVB8Q6f0BvOw=;
-        b=mKtXYuBeKvhDfT5dj+CDqixs5kjLjxcofOJl5eHmUq4S7tpUd/A6FZJxF0JKbl3hzF
-         WR4blXPaZw6NZy9skWisp/olax1BjeTA5UrvXf5Wqah3VquEc2Niw3HC2A53AqgjKlES
-         +qQBw6X9gD7f+EHw2ZPS82tjGvaRaDGkniHX5BIU/BxTzKVennF7GuOJjAnfskXXncZH
-         Q4G5FCNsE0m1oOkPyhdlm/cH+uJfA8DXaTw6vVwnTYTUCIfahc3RUdixfkKKpA/sAll6
-         gd77i19vPBl/buACZGjPyBNM73msSAOBobkOd1QsiK0IrctAnPzJXIXVLqWR/ckVt/xE
-         1VAw==
-X-Forwarded-Encrypted: i=1; AJvYcCX9CExrDFtHSf8+dW6X22/iYWLqv9r9ECmpWTgQS0rWQQb3rJUtKtLXwv8JpsUMBlwF+TBvfT4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKzkkxzFHVXvlC7KPIbrMhdoT5FoInoG2EXd5JUyGZ7NVfNJ1G
-	oJRtMwB8hyvKCw+ABlC7bsYsdenzwchU6YHsd7AiC59p8aRbbWfwcWrdr14fJdhHY9aHSpIe7LQ
-	YQWPtmcwU4ZpnkIuZ2uz4VPqbJHQbk1DWLXldrVjP+YybbgT+Y0i7bbhX/kc=
-X-Google-Smtp-Source: AGHT+IFCVn9SmBjyBhDsZVB9FNp97B50jkWsVXck4orrLX/hYWor8khmXtZ+VRasjlQ64ebDCoYjuVDiltI/XEWnqYdManqfsXti
+	s=arc-20240116; t=1764627401; c=relaxed/simple;
+	bh=Y5DXQhCcAA3uAQApHosfzKwCVgNUTGcLBLCzMK7rFYA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sT+26wHzPw8jut84nOuSeyXUYUSFeQyLmLJfRNP+k3+3QHO82CXOARGedSpqDpYDb2l4xdjeqXmOh/DG88VvwNWz+0W5GO1JK4yVFODGTT/KVXiYx3Osbxgi0YQJ1uOc/Bzo+84CuiBZQbz1Hm+VR5KxXarfM4rR84Lofj55nAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cJN+CSLU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15FB7C4CEF1;
+	Mon,  1 Dec 2025 22:16:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764627400;
+	bh=Y5DXQhCcAA3uAQApHosfzKwCVgNUTGcLBLCzMK7rFYA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=cJN+CSLUNy5QDd3ER0bYvT9C4PV9ONNGYQdGGYyw/enTuSyOCUuL0O7Wfn9//CzT/
+	 S3AzLMoK6HNzctpwqjHUAF8s08ygOjp4mSX0djPyeksLZQk+9nEWc751ScWHs6IMDi
+	 d0/af/j1V0rBjo7QrPcQgV9c4cngItV5N2ekWOQ8N8j49Bg+0WlGTG7IF3mTFn0QSl
+	 FeC3CleOEhgQhkdhPTa6eIN+W8TL2nsIRZnFXLO1yNdE6s/7wT9QwXypo218/2+C4G
+	 erfzPuny75bfKIxfb38hiCt/f+oyFrpKIWD5Wcfu8DV3K5DzShAH2CETeEgn1ytiZ+
+	 klW1xo8xUXiUA==
+Date: Mon, 1 Dec 2025 14:16:38 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Parvathi Pudi <parvathi@couthit.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, danishanwar@ti.com, rogerq@kernel.org,
+ pmohan@couthit.com, basharath@couthit.com, afd@ti.com,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, alok.a.tiwari@oracle.com,
+ horms@kernel.org, pratheesh@ti.com, j-rameshbabu@ti.com, vigneshr@ti.com,
+ praneeth@ti.com, srk@ti.com, rogerq@ti.com, krishna@couthit.com,
+ mohan@couthit.com
+Subject: Re: [PATCH net-next v8 2/3] net: ti: icssm-prueth: Add switchdev
+ support for icssm_prueth driver
+Message-ID: <20251201141638.00a986dd@kernel.org>
+In-Reply-To: <20251126163056.2697668-3-parvathi@couthit.com>
+References: <20251126163056.2697668-1-parvathi@couthit.com>
+	<20251126163056.2697668-3-parvathi@couthit.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:210c:b0:450:a9d0:b799 with SMTP id
- 5614622812f47-45115a10e29mr18815486b6e.17.1764626942248; Mon, 01 Dec 2025
- 14:09:02 -0800 (PST)
-Date: Mon, 01 Dec 2025 14:09:02 -0800
-In-Reply-To: <692d66d3.a70a0220.2ea503.00b2.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <692e11fe.a70a0220.d98e3.018e.GAE@google.com>
-Subject: Re: [syzbot] [fs?] kernel BUG in sctp_getsockopt_peeloff_common
-From: syzbot <syzbot+984a5c208d87765b2ee7@syzkaller.appspotmail.com>
-To: brauner@kernel.org, davem@davemloft.net, edumazet@google.com, 
-	horms@kernel.org, jack@suse.cz, kuba@kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-sctp@vger.kernel.org, lucien.xin@gmail.com, marcelo.leitner@gmail.com, 
-	mjguzik@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, torvalds@linux-foundation.org, 
-	viro@zeniv.linux.org.uk
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-syzbot has bisected this issue to:
+On Wed, 26 Nov 2025 21:57:13 +0530 Parvathi Pudi wrote:
+> + */
+> +static void icssm_prueth_sw_switchdev_event_work(struct work_struct *work)
+> +{
+> +	struct icssm_prueth_sw_switchdev_event_work *switchdev_work =
+> +		container_of(work,
+> +			     struct icssm_prueth_sw_switchdev_event_work, work);
 
-commit 457528eb27c3a3053181939ca65998477cc39c49
-Author: Christian Brauner <brauner@kernel.org>
-Date:   Sun Nov 23 16:33:47 2025 +0000
+Consider using shorter type names.
 
-    net/sctp: convert sctp_getsockopt_peeloff_common() to FD_PREPARE()
+> +	struct prueth_emac *emac = switchdev_work->emac;
+> +	struct switchdev_notifier_fdb_info *fdb;
+> +	struct prueth *prueth = emac->prueth;
+> +	int port = emac->port_id;
+> +
+> +	rtnl_lock();
+> +
+> +	/* Interface is not up */
+> +	if (!emac->prueth->fdb_tbl) {
+> +		rtnl_unlock();
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1136a512580000
-start commit:   7d31f578f323 Add linux-next specific files for 20251128
-git tree:       linux-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=1336a512580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=1536a512580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6336d8e94a7c517d
-dashboard link: https://syzkaller.appspot.com/bug?extid=984a5c208d87765b2ee7
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16a2322c580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12a3c512580000
+Are you not leaking the device reference here?
 
-Reported-by: syzbot+984a5c208d87765b2ee7@syzkaller.appspotmail.com
-Fixes: 457528eb27c3 ("net/sctp: convert sctp_getsockopt_peeloff_common() to FD_PREPARE()")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+> +		return;
+> +	}
+> +
+> +	switch (switchdev_work->event) {
+> +	case SWITCHDEV_FDB_ADD_TO_DEVICE:
+> +		fdb = &switchdev_work->fdb_info;
+> +		dev_dbg(prueth->dev,
+> +			"prueth fdb add: MACID = %pM vid = %u flags = %u -- port %d\n",
+> +			fdb->addr, fdb->vid, fdb->added_by_user, port);
+> +
+> +		if (!fdb->added_by_user)
+> +			break;
+> +
+> +		if (fdb->is_local)
+> +			break;
+> +
+> +		icssm_prueth_sw_fdb_add(emac, fdb);
+> +		icssm_prueth_sw_fdb_offload_notify(emac->ndev, fdb);
+> +		break;
+> +	case SWITCHDEV_FDB_DEL_TO_DEVICE:
+> +		fdb = &switchdev_work->fdb_info;
+> +		dev_dbg(prueth->dev,
+> +			"prueth fdb del: MACID = %pM vid = %u flags = %u -- port %d\n",
+> +			fdb->addr, fdb->vid, fdb->added_by_user, port);
+> +
+> +		if (fdb->is_local)
+> +			break;
+> +
+> +		icssm_prueth_sw_fdb_del(emac, fdb);
+> +		break;
+> +	default:
+> +		break;
+> +	}
+> +	rtnl_unlock();
+> +
+> +	netdev_put(emac->ndev, &switchdev_work->ndev_tracker);
+> +	kfree(switchdev_work->fdb_info.addr);
+> +	kfree(switchdev_work);
+-- 
+pw-bot: cr
 
