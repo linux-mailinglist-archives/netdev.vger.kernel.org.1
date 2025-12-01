@@ -1,163 +1,154 @@
-Return-Path: <netdev+bounces-243033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06807C98789
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 18:17:49 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id B15C0C98894
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 18:33:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A3A07344A45
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 17:17:48 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 32E12344A18
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 17:33:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C40821D2F42;
-	Mon,  1 Dec 2025 17:17:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE8FF333727;
+	Mon,  1 Dec 2025 17:33:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="TfE27fxs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r/yD3p2p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C454F35975
-	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 17:17:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90DBA21CC4F;
+	Mon,  1 Dec 2025 17:33:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764609465; cv=none; b=WK1otchJAdshyhc22Bv5XSChjL3/We9uNjUjbQRfIOdQwCmIPkowX4tpfMst4dXahxfb8O+6RyiOoQz4EmV9kSjAPRROge2qMhuJXnR6OTTdDQe5wCT40vlY0EFe/0oKCPuzl0XVsA0av/R3g/2ZN53pC9S1jFH+Bi2+l/YVSC4=
+	t=1764610393; cv=none; b=e2FLNzv0mvabsUNENHi7BtNFVi2gqIxNqgGoWPGB/8SE4U7kRS5/blnMvvfDASNV7zT9iuIPFhXsylHkGK9yMY9UW4CSAdUbiCsG8JfGnqnmVJBxPIGL/AN84esW/I1FFXdU3Mu/0uDKEwQ7cxy2e/mXl/VQXl8gVU+4BAx9kXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764609465; c=relaxed/simple;
-	bh=FSRGo57moHALBKhfEJ+b6dZN5wpu2x5I3GpTRODOmlQ=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=QqfMJXTpezdvsrsKiwZ8Ad/txZTBvMYr39PEmYgicy3k2wKKUFHPZze2qIcKkoxXt55EH/8/tY7Avk1XAkfaDZfqFIaramPt6+cIHoo1Rfk3pW3brZ1cE8loXJwtBGU5/yPdlVlKBiAoYMcb5ikoFEqiD00f/aow54GGx0SGNXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=TfE27fxs; arc=none smtp.client-ip=209.85.222.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-8b28f983333so421073385a.3
-        for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 09:17:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1764609462; x=1765214262; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:subject:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=V2uD2RiUz2I4VGKg4Jom7KpKnjuxYXVMpNFqul+So0w=;
-        b=TfE27fxsbl42Fq9zT6RM8UaY7Dk7v8MqJeXjNrJ8V/94kbLJC7Glvq73o+FbD4HQb+
-         N9tvidrJbnXtu/e303i8XFt8KreCzSGF6kQhDp+gt1ReZib9sIC6UcM/vJDfZbdzvGoe
-         r8DxNvDBJHlrOrybHHjrsrNo6gZVLLhxhk8Hs0xb7jcpOwBIyqsjYoHwZRjX7HH4goPC
-         YUicKwyEFDGFHEylbtZoLlEUs1KyMYkYF+F4oS0cZhCRk6Zq7BuykIWDN8lBq2hhl2rq
-         AMUp55qZVteJL8voHqLHaW3VjxeZaSjGoQRMWdkWQkKCgbsxAX4ta+SEHVaGFFHNTuHP
-         93qg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764609462; x=1765214262;
-        h=content-transfer-encoding:mime-version:message-id:subject:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=V2uD2RiUz2I4VGKg4Jom7KpKnjuxYXVMpNFqul+So0w=;
-        b=ZMQI6hvtjW5rjRyBKwUIY+Fw28GdZRf9KzJ611CBTNVyPfprdxl92C0c43yZCLxfz6
-         t6URUbvkFw8/48hP/z2FOJj3p1mUUbE9w1556D+1YWKcgSYxjFM+054IAPNimABKWrWD
-         +SPr9KZDIshruk9XpXIXGKOnNpjWkQ5yuCxeYqO5bHTUhn90rd0ruZAhCwj8sznoiWz6
-         JF2KuNxfOv1v0mTBeiks8vNpQYUccytWw+YRBqHSydfeLXKgFbrQMyYoimZb8NrXfYfO
-         Q5ouOespK5v5Qpo4lqpzKPKAd2GYucf5CvVZ7AaRpCoZCE+WQbrxiXPSEdjxzHx9c94B
-         4npg==
-X-Gm-Message-State: AOJu0Yyvz9M0bb+4TIAyvV6cREnYI893O6VgpDfr8XAwlUxbfoReXU6n
-	8CGAgtA+vQmVMnH+DhFVNBw4y5/rbNloOYDGwVNO1EZbLOvePHIQanY6s6x6FBbX8WfQtZA9qtZ
-	xmPZm
-X-Gm-Gg: ASbGnct9Jy5vwRBhox1ziH8dz5BFty91hLaluRfhTbX8j50pCDa1xvC6viOLKXiNf0l
-	ef5a7rdVLJ3MR0MtLo2KxFo31dA0S8xCy6IZ490c8zix6eruSywWZHc+FupQH3b90sdbHnCx3/L
-	EoRqayPmfMvGEtKAknJfQtz7rYISphGAqjN4Za9RUw+YcfnAMiSrkjI/Q3Ac3RqkS1gVXJF1UjD
-	rQvO4+xTE3aKM9oagBa2LDPw/lx+0PogN1prt2KHsASj4fcap8iLCHQjbepST4GIxHbmLCD2NCV
-	r18YCp2S63QI1MRiExVGCC0OBiSiT4+t6MhVzRIwza8VvfntP0W7aFOfvk3NpTt9P0tiMc8eQHI
-	6fOQ596WGaQ58MpToUsWxje6AtcehU0H4N/fDcikhxxrsr2eTiwWnEFxR/666WnRtV+w2VBMfT+
-	0YXxiKpdc9ngytbh8sHPkOn/Eah+5EL5013HschrcnANTlanq4u+o6
-X-Google-Smtp-Source: AGHT+IG8O54+EW6DOK51U8CUPE+UcWw5b3ZHb/UQHYQgR+gb2beJzlctv9Hmyn26Dcr8GE3FpAKSuQ==
-X-Received: by 2002:a05:620a:7103:b0:8b1:ac18:acc8 with SMTP id af79cd13be357-8b4ebd4ea76mr3412589485a.26.1764609462334;
-        Mon, 01 Dec 2025 09:17:42 -0800 (PST)
-Received: from phoenix.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b52a1dabb7sm885911785a.48.2025.12.01.09.17.41
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Dec 2025 09:17:42 -0800 (PST)
-Date: Mon, 1 Dec 2025 09:17:38 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: netdev@vger.kernel.org
-Subject: [ANNOUNCE] iproute2 6.18
-Message-ID: <20251201091738.3a8b4303@phoenix.local>
+	s=arc-20240116; t=1764610393; c=relaxed/simple;
+	bh=vZzWjqKwBCifJUL7S/hk8AvPEyWly2FaYZdeQ4GB3io=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jQHxaldWrl0cvn4FfRwQERpbPtSVWZPvE9RzDyw71fpMl8mjkobraicnJY1eikuB+lmYD9KSxVW7yGm4Aj0LaFLEdfe+CLPBqF7ivMwSMxfaRlI2pjfeTN3m5xgfloITN5nUBBQAdjoDjfzWcHJIylCcFioLGxH+M9tyZpCiiKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r/yD3p2p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B67D4C4CEF1;
+	Mon,  1 Dec 2025 17:33:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764610393;
+	bh=vZzWjqKwBCifJUL7S/hk8AvPEyWly2FaYZdeQ4GB3io=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=r/yD3p2pnPlaBW2Ui94UJkgH+PqfrB0VuDESq6+x1dgsNIs6+Ey+jR6nxWu2gs7vb
+	 peGCeiu+DsZiGhIHo8P6Xq7xDJ5N5QzEghAdWIKRL18AuAD0xJ+lmlFoMU7FFpTAgD
+	 3exHo19lEKixc6kgJuEmGtfWImUIdX4Z+mKcnd6jtCcdDkhuT0V8oW2hll9bfAmEzD
+	 ytx20NxLBInYakGHg7wJAShUpWtTW2vaWrvZKUl8Jt/QGWx86EEm4SqIWV3AZTvJuX
+	 S0T4S/eXZCycGCTXGiSWPoL+CD57MxXeh0I2dDliQw9ReO0os/Jypoe33AbizOjBet
+	 OYM1zeUbZ4evw==
+Message-ID: <16bb96e9-c632-457c-8179-82c17bd2a685@kernel.org>
+Date: Mon, 1 Dec 2025 18:33:07 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/4] dt-bindings: net: nxp,s32-dwmac: Use the GPR syscon
+To: Dan Carpenter <dan.carpenter@linaro.org>,
+ Jan Petrous <jan.petrous@oss.nxp.com>
+Cc: s32@nxp.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linaro-s32@linaro.org
+References: <cover.1764592300.git.dan.carpenter@linaro.org>
+ <333487ea3d23699c7953524cda082813ac4d7be3.1764592300.git.dan.carpenter@linaro.org>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <333487ea3d23699c7953524cda082813ac4d7be3.1764592300.git.dan.carpenter@linaro.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-This is the regular release of iproute2 corresponding to the 6.18 kernel.
-The only big new item in this release is the addition of the netshaper
-command to control hardware shaping (implemented in Azure). It also includes
-support for DualPi2 scheduler and a couple of small changes to bonding.
+On 01/12/2025 14:08, Dan Carpenter wrote:
+> The S32 chipset has a GPR region which has a miscellaneous registers
+> including the GMAC_0_CTRL_STS register.  Originally this code accessed
+> that register in a sort of ad-hoc way, but we want to access it using
+> the syscon interface.
+> 
+> We still need to maintain the old method of accessing the GMAC register
+> but using a syscon will let us access other registers more cleanly.
+> 
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> ---
+>  Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml b/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
+> index 2b8b74c5feec..17f6c50dca03 100644
+> --- a/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
+> @@ -32,6 +32,11 @@ properties:
+>        - description: Main GMAC registers
+>        - description: GMAC PHY mode control register
+>  
+> +  phy-sel:
 
-Download:
-    https://www.kernel.org/pub/linux/utils/net/iproute2/iproute2-6.18.0.tar.gz
+Missing vendor prefix.
 
-Repository for current release
-    https://github.com/shemminger/iproute2.git
-    git://git.kernel.org/pub/scm/network/iproute2/iproute2.git
+> +    $ref: /schemas/types.yaml#/definitions/phandle-array
+> +    items:
+> +      - description: The offset into the s32 GPR syscon
 
-And future release (net-next):
-    git://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git
+No, first item is not the offset but the phandle. You need syntax like here:
 
-Contributions:
+https://elixir.bootlin.com/linux/v5.18-rc1/source/Documentation/devicetree/bindings/soc/samsung/exynos-usi.yaml#L42
 
-Andrea Claudi (3):
-      tc: gred: fix debug print
-      mptcp: add implicit flag to the 'ip mptcp' inline help
-      netshaper: fix build failure
+The description of the first item (unlike in example above) should say
+what is the purpose, how this device is using GPR region, what is it
+needed for.
 
-Chia-Yu Chang (2):
-      Add get_float_min_max() in lib/utils.c
-      tc: add dualpi2 scheduler module
-
-David Ahern (2):
-      Update kernel headers
-      Update kernel headers
-
-Eric Biggers (1):
-      man8: ip-sr: Document that passphrase must be high-entropy
-
-Erni Sri Satya Vennela (1):
-      netshaper: Add netshaper command
-
-Hangbin Liu (1):
-      iplink: bond_slave: add support for actor_port_prio
-
-Ivan Vecera (1):
-      devlink: fix devlink flash error reporting
-
-Jay Vosburgh (4):
-      lib: Update backend of print_size to accept 64 bit size
-      tc: Add get_size64 and get_size64_and_cell
-      tc: Expand tc_calc_xmittime, tc_calc_xmitsize to u64
-      tc/police: enable use of 64 bit burst parameter
-
-Kory Maincent (1):
-      scripts: Add uapi header import script
-
-Petr Machata (1):
-      ip: iplink_bridge: Support fdb_local_vlan_0
-
-Stephen Hemminger (8):
-      uapi: update headers to 6.18-rc1
-      netshaper: update include files
-      Revert "mptcp: add implicit flag to the 'ip mptcp' inline help"
-      uapi: update to virtio_net.h
-      netshaper: remove unused variable
-      netshaper: ignore build result
-      tuntap: add missing brackets to json output
-      v6.18.0
-
-Tonghao Zhang (1):
-      ip/bond: add broadcast_neighbor support
-
-Yijing Zeng (1):
-      dcb: fix tc-maxrate unit conversions
-
-Yureka (1):
-      lib: bridge: avoid redefinition of in6_addr
-
+Best regards,
+Krzysztof
 
