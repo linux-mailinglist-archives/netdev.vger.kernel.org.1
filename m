@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-242869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B82A5C95955
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 03:29:17 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD5DFC95961
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 03:29:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEA593A1C1E
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 02:29:10 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5A6634E151E
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 02:29:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 340B81917F1;
-	Mon,  1 Dec 2025 02:29:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C6F51A9FB0;
+	Mon,  1 Dec 2025 02:29:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="d/X4DClG"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="WCfwj2jg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FACA18787A
-	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 02:29:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 172951A3166
+	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 02:29:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764556143; cv=none; b=Wt2WoKA11RGYtGjEcjO8Nhh5NQN6KY5SEiG3LVFVgSqdMuW+tO7h4xsF5eivDcD0AA5Pr7VBhsqLG6onPoKzOK1xho1ZuehBvXgUzOmw07qFqxgSVTRuJ2sB9KJ7McfUQqcvoGrF+DeS0KznCZUxyVlIIrLgfnx8QlvvNWofWHY=
+	t=1764556149; cv=none; b=kQS4OsPCJDS12BX9bjtFlJWLmJzRW7A82j5aMMloqOaifold9uA5SkFj9tqCs6aKtduAa2kWQ5ZzheFEtiLdr3iopiSRbWNPaEPzwHTWSo/qG3b9SFrVZx6phbENy6PyFQ7WgEuQgKv+IBK4qCORttvwn58fPJIi65mSWttMig0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764556143; c=relaxed/simple;
-	bh=aKdEidnnn7F4+921fI3OKuGesw29/oMU99EBnnZVLvI=;
+	s=arc-20240116; t=1764556149; c=relaxed/simple;
+	bh=Vt0MJ5oM0Nhl6sMoITbeXpIkwPURFtI2kT5kyR+KBoQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZeaKcHwGP6DssbA/LzKU9C/tuOJOWp8DycYqL+/qexyPEUs5UP79F+yTh1vtcCD8BoINh/4+FayNnYrJsoOOAG6QSxW0DezNnqRC3p0nPaac1K4cT8iTz9OgvjgpQSpOk+aFb3pu8lh+RZiFMKq2SHJhto+lZCT79nxGLW/1z8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=d/X4DClG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5164AC16AAE;
-	Mon,  1 Dec 2025 02:29:02 +0000 (UTC)
+	 MIME-Version:Content-Type; b=F1CQIzlICpvmgyX6cVSCmk+BqLrZ4xFgz496Fn7rASFG1JlDvOhzvXtHUfhc+Wbzu6XAvQCLeGO3+/x4wYJ2e74JNp/TMijLeWC+DRFQbU/wj8unr3Fg+dVto3quhKEAmTrvjKjFDxCr3djA9vgay/scl8URf+HTy2zT8qCxC/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=WCfwj2jg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D2B0C16AAE;
+	Mon,  1 Dec 2025 02:29:04 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="d/X4DClG"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="WCfwj2jg"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1764556141;
+	t=1764556143;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=IGZdu7nZNPqK19bISU8Hi5aMXvuoFPIngRwJk5GALfY=;
-	b=d/X4DClGsoSqZ70VRLjGtkSjsUbQzMUQhcd8ohhG44nV7IESxZjGjUAZZjPrZiu/ojUCt/
-	cdytoqqC7eO3xOoho76Jy7Izc5JR87Fza/w659CPSI1ehNzR3cWaedQ5LObQa8H8j092Dj
-	IvwPry/bpssxAMMIQbzKjM03u31yNAg=
+	bh=bqzRaWYReYKNiIQxDPGlXBoA5Pn5VEJYLOXXxd7mDnc=;
+	b=WCfwj2jgeGUqAyGjewF4djPMIIi9HEsl2FOd9w7gol51S1ZyaFewwOPOgEmM8SWjQ0WR/K
+	w0rEeBNavxCrzhH5DegqvCZgf2PVl0/E5WPb5PXBbQHFsz6No9u30UZ4/S3V6I7YI84fom
+	Q9xYApxdPI+Dy7HQku7FwNyq5L3rN48=
 Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 7c46d37d (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Mon, 1 Dec 2025 02:29:01 +0000 (UTC)
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id d41ab872 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Mon, 1 Dec 2025 02:29:03 +0000 (UTC)
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
 To: netdev@vger.kernel.org,
 	kuba@kernel.org,
 	pabeni@redhat.com
 Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
 	"Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH net-next 04/11] wireguard: netlink: convert to split ops
-Date: Mon,  1 Dec 2025 03:28:42 +0100
-Message-ID: <20251201022849.418666-5-Jason@zx2c4.com>
+Subject: [PATCH net-next 05/11] wireguard: netlink: lower .maxattr for WG_CMD_GET_DEVICE
+Date: Mon,  1 Dec 2025 03:28:43 +0100
+Message-ID: <20251201022849.418666-6-Jason@zx2c4.com>
 In-Reply-To: <20251201022849.418666-1-Jason@zx2c4.com>
 References: <20251201022849.418666-1-Jason@zx2c4.com>
 Precedence: bulk
@@ -68,67 +68,47 @@ Content-Transfer-Encoding: 8bit
 
 From: Asbjørn Sloth Tønnesen <ast@fiberby.net>
 
-This patch converts WireGuard from using the legacy struct genl_ops
-to struct genl_split_ops, by applying the same transformation as
-genl_cmd_full_to_split() would otherwise do at runtime.
+Previously .maxattr was shared for both WG_CMD_GET_DEVICE and
+WG_CMD_SET_DEVICE. Now that it is split, then we can lower it
+for WG_CMD_GET_DEVICE to follow the documentation which defines
+.maxattr as WGDEVICE_A_IFNAME for WG_CMD_GET_DEVICE.
 
-WGDEVICE_A_MAX is swapped for WGDEVICE_A_PEERS, while they are
-currently equivalent, then .maxattr should be the maximum attribute
-that a given command supports, and not change along with WGDEVICE_A_MAX.
+$ grep -hC5 'one but not both of:' include/uapi/linux/wireguard.h
+ * WG_CMD_GET_DEVICE
+ * -----------------
+ *
+ * May only be called via NLM_F_REQUEST | NLM_F_DUMP. The command
+ * should contain one but not both of:
+ *
+ *    WGDEVICE_A_IFINDEX: NLA_U32
+ *    WGDEVICE_A_IFNAME: NLA_NUL_STRING, maxlen IFNAMSIZ - 1
+ *
+ * The kernel will then return several messages [...]
 
-This is an incremental step towards adopting netlink policy code
-generated by ynl-gen, ensuring that the code and spec is aligned.
+While other attributes weren't rejected previously, the consensus
+is that nobody sends those attributes, so nothing should break.
 
-This is a trivial patch with no behavioural changes intended.
-
+Link: https://lore.kernel.org/r/aRyLoy2iqbkUipZW@zx2c4.com/
+Suggested-by: Jason A. Donenfeld <Jason@zx2c4.com>
 Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
- drivers/net/wireguard/netlink.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+ drivers/net/wireguard/netlink.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/net/wireguard/netlink.c b/drivers/net/wireguard/netlink.c
-index 682678d24a9f..e7efe5f8465d 100644
+index e7efe5f8465d..c2d0576e96f5 100644
 --- a/drivers/net/wireguard/netlink.c
 +++ b/drivers/net/wireguard/netlink.c
-@@ -616,28 +616,30 @@ static int wg_set_device(struct sk_buff *skb, struct genl_info *info)
- 	return ret;
- }
- 
--static const struct genl_ops genl_ops[] = {
-+static const struct genl_split_ops wireguard_nl_ops[] = {
- 	{
- 		.cmd = WG_CMD_GET_DEVICE,
- 		.start = wg_get_device_start,
+@@ -623,7 +623,7 @@ static const struct genl_split_ops wireguard_nl_ops[] = {
  		.dumpit = wg_get_device_dump,
  		.done = wg_get_device_done,
--		.flags = GENL_UNS_ADMIN_PERM
-+		.policy = device_policy,
-+		.maxattr = WGDEVICE_A_PEERS,
-+		.flags = GENL_UNS_ADMIN_PERM | GENL_CMD_CAP_DUMP,
+ 		.policy = device_policy,
+-		.maxattr = WGDEVICE_A_PEERS,
++		.maxattr = WGDEVICE_A_IFNAME,
+ 		.flags = GENL_UNS_ADMIN_PERM | GENL_CMD_CAP_DUMP,
  	}, {
  		.cmd = WG_CMD_SET_DEVICE,
- 		.doit = wg_set_device,
--		.flags = GENL_UNS_ADMIN_PERM
-+		.policy = device_policy,
-+		.maxattr = WGDEVICE_A_PEERS,
-+		.flags = GENL_UNS_ADMIN_PERM | GENL_CMD_CAP_DO,
- 	}
- };
- 
- static struct genl_family genl_family __ro_after_init = {
--	.ops = genl_ops,
--	.n_ops = ARRAY_SIZE(genl_ops),
-+	.split_ops = wireguard_nl_ops,
-+	.n_split_ops = ARRAY_SIZE(wireguard_nl_ops),
- 	.name = WG_GENL_NAME,
- 	.version = WG_GENL_VERSION,
--	.maxattr = WGDEVICE_A_MAX,
- 	.module = THIS_MODULE,
--	.policy = device_policy,
- 	.netnsok = true
- };
- 
 -- 
 2.52.0
 
