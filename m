@@ -1,113 +1,127 @@
-Return-Path: <netdev+bounces-242885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10E91C95A8C
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 04:41:45 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 201F3C95AFB
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 05:08:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C36613A1B69
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 03:41:43 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id ECA074E0540
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 04:08:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F4B1200110;
-	Mon,  1 Dec 2025 03:41:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 455281E47C5;
+	Mon,  1 Dec 2025 04:08:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="zrNYlckH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PKX24BN1"
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-58-211.mail.qq.com (out162-62-58-211.mail.qq.com [162.62.58.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f65.google.com (mail-pj1-f65.google.com [209.85.216.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6F7A1EF39E;
-	Mon,  1 Dec 2025 03:41:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C291413A88C
+	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 04:08:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764560485; cv=none; b=iusOhDS3B3hCo225vZl/NSaZLEp709cmqCEDXvWB/wdNZZnDKEusIhzzAQfQ5Mu/LmlxmAnZIpTuRYxhB5/vBdHZY1c4NVw70Fio97IercT1kMxN/LWZqWJYFRVAW5cVnJLzFoqj42XOY7hpkURDuqoR+qKX1FwmqCee9g3C7Ho=
+	t=1764562082; cv=none; b=fi9eUtWGrhXUMmGQbdt/0XSm8elwLMEeavSWVdq75ylpkEYEuveY54XBaj/1oW7p9dY5ahCtC4Gjm+bWY2uEaViUkSPQFNZ7uomIKzBmaaNblhoy82WGzC+exC5xvMMCrRYiTd+1l+iUFd6xYQUL1AbUQ55gHJqtCQHsOEi6pMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764560485; c=relaxed/simple;
-	bh=leCy//KoczHnqhz2R2YoPDhsJC6dgrFmCg+gWRwh7T4=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=NBej2KJHNXqUQqVWpQOKMvTFDUuRVqqVnoLbGAvk2S9vSKZhETtVdkkHqHCyQd5V0XYxhxGY7uVQltLzgIK8Ii+Lh1yAc20YcCRoac7LJz4bBdchCdqsd8z7i51WwWcdacU8VdcpBJcceT777fXwXzGPgUtuLNT1GbhCM/oB4ao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=zrNYlckH; arc=none smtp.client-ip=162.62.58.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1764560470; bh=h1ElSL1Dua1skk8vctxiE38fat4PN7OeW8/o828lFH0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=zrNYlckHZ29+sbZuH9lr99zbht65ADgBrT3M3JyfW06Iquh2IdciCnWyq/Ix8aD82
-	 SHPaKYnVuDacKN3rjr9u3cqBDd2eJ7z382WT9r9zyiyYZDwNtxafQ+qny0K0TYZcQD
-	 gS4e16spgpBMXAnTTldE0UqeHF/Warl9LwDPonJ4=
-Received: from lxu-ped-host.. ([111.201.7.117])
-	by newxmesmtplogicsvrszb51-0.qq.com (NewEsmtp) with SMTP
-	id A4628C90; Mon, 01 Dec 2025 11:41:06 +0800
-X-QQ-mid: xmsmtpt1764560466tv4m7kq4c
-Message-ID: <tencent_7B73E6D013636363696CC3A34444F77AF705@qq.com>
-X-QQ-XMAILINFO: M1rD3f8svNznlXm1wtdwYLpaX6NI7m7ByGt+tAfGDFF8BgBVgBU80YYV6OZs9/
-	 gcY/Piad/qhewzLPwuV6BMcBWBTLZEie7bvFNEg+wIq735cke7o6NP/VBDpAgH+9Mmntxou+p/RT
-	 +zJDJFLXvnHWK8vUtE4d4NsFNZ2tvH3hmF1MkivD2geXIoKsHb0e14GN9RWpzneXjpyjyhvnWdEm
-	 0b3lORU9WItCgu9bLGMJL4jDlXptvmZj+jI6zCZoxmhtZ+Q0UFxApFfYuvYkuVGyTTPg1tVJkGqW
-	 pJusXEdL25gPBK4NehgzrgZyRItZsVGx0n8q/fm3O3QAfLAoJtQ0C3X2kLeukTqMWbe15e5QSXBe
-	 wTOedVbVCRUTKWpTalubRdI9OAWaFAdHlLKGaM1WKa+b+ujrwnAdD7CCgJXUvmv3NZvI0klw1Qxc
-	 tTBehPxv+fbFYoCuZVMwfv0i8PojyO7e+66rq70IzngkdhfY86uDa3tuaIMDVIRehKmP5ivabJ0T
-	 og0pEEf3c931ms1HrqP8wTv7wVG1D54uORehCKxrwIaug/fbMk3VWvp2XKgceVXQD7Z+t/pqRw0W
-	 o4/eOurfxJE7S15h6D6xafRauGnXXlagotaLgzJL+8VbRf2crCNxeVY1ZUv5PJblr3AO8LGJM5SM
-	 vGb43NI4lrKyljLEuQDLibHsGH6Tzco4xtX5UWi1Bcpc0JCY7LVMMGSmnyHT2CxxQXa/HsH9WNEC
-	 DutOMuFdQMy95sL0dlPw0eJPlWmEbHSrHdB4jGxId0VjVOu+sAhJv/zlHeyvFFNv9FjDQgPMSgzX
-	 5uGwcui810S5yNIhX/7RUhM/rHNeLecqJvkNzHOGGRWsiv7TAmbWfw+o0sYQ/WkoMdQIag625WfU
-	 IwHP6EeNFUsLUYh9zsE4uR7thsUeqImvfqGlTYMVvmGFlyVdWwxWwp+LPhgDLhsju16TMoUFIgIV
-	 E+eTCVAqg2vBezwVz96fexbPF/TPGTgcdfrhQfQ7AiZPFJMAXu/Lx27IHx2CEOa4aV5Wo0yHEbXn
-	 ixccxcLUM2rv0fxa6Xp4Bf6uHze3w=
-X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
-From: Edward Adam Davis <eadavis@qq.com>
-To: kuba@kernel.org
-Cc: davem@davemloft.net,
-	eadavis@qq.com,
-	edumazet@google.com,
-	eperezma@redhat.com,
-	horms@kernel.org,
-	jasowang@redhat.com,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	mst@redhat.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	sgarzare@redhat.com,
-	stefanha@redhat.com,
-	syzbot+ci3edb9412aeb2e703@syzkaller.appspotmail.com,
-	syzbot@lists.linux.dev,
-	syzbot@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com,
-	virtualization@lists.linux.dev,
-	xuanzhuo@linux.alibaba.com
-Subject: Re: [PATCH Next V2] net: restore the iterator to its original state when an error occurs
-Date: Mon,  1 Dec 2025 11:41:07 +0800
-X-OQ-MSGID: <20251201034106.206190-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251128093946.18c645c6@kernel.org>
-References: <20251128093946.18c645c6@kernel.org>
+	s=arc-20240116; t=1764562082; c=relaxed/simple;
+	bh=I5WnbEMYMvxMMyC0dGDFfkJkD1UwMDR1rRygcGxyK70=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E86Il+mFKzqAzgL20HdKvfAl8tjLPk4OkUGO49GyV1B12ip+BXXbWHMQIaI6tlXrazidy4hmZu0YOR8bi9GO9iOYO7MqIwyANAsGTCQxcWOzpwTgPnBbeRhnvBe9TErzOWY/XeQsPKxSVszupaFQS19H1vgMhRMyTigGUtx4kos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PKX24BN1; arc=none smtp.client-ip=209.85.216.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f65.google.com with SMTP id 98e67ed59e1d1-343ff854297so4899697a91.1
+        for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 20:08:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764562080; x=1765166880; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xHYB6uxWCS1cMIYtl4torJ0Vkz15tXZo+qs17i5jW2c=;
+        b=PKX24BN1VHfnGnfG0wJANp/3qY8+b9GPJ+0AcBC1Fe1R3x4daGkWoKtcDjEe7UN376
+         l0pxh9HFeafIYzxMot56Iorg+NhxGv6svrxCFpmHahOdE/2uw7ugRDbYpL3pwVtn989o
+         aTNOB3RlhDCmfTq5D4oNMFN46oN/adtnu963Mk+WDAIkI2XboVyWHkZsAPVmM1unqzrL
+         sdVZHsmgRrhd0K6MtCRf3l08cgDC+mvkSMhGCATkgChLFKCq1+AIudQiq5AC5naKwAcx
+         CxRVutgH6i1TX9oZMWO6dEG1bXCCwqpk4GbjPScr3hAANWvyU+w1hGhQeeLsNOaY+fXu
+         W5ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764562080; x=1765166880;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xHYB6uxWCS1cMIYtl4torJ0Vkz15tXZo+qs17i5jW2c=;
+        b=c9s1uyGEYsmealdMzLGvil3iN3WNGNQn6AU5kIruP0fa7Vy7nUMbIXQEoFlD4YFB1q
+         pgUnL1pJEfTi2Q+K7dtgDqtXjvXWjKr4fcbZu9JTC9IByb5H8P0UPL/ZeQlWVU6m241g
+         ve4TSrR7Z9xaScwB30S4yXk1C7jYiduINS94tGq635CmNfdLNJLvbqPVYv56TPp4VTa8
+         EGzoh8YdAAVx/qrbgc5JPk6TPDrOLihYuy5cjZ3gbrsHPjKsLhTOR5JYUplsaaHmVnna
+         sczGXUHlep3vkvZ8npEEnyUqTIy4T46QkueRQ5kXXB4g7UjLuRKqUdTRNYpvbJHCEWBY
+         kYuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXWxKw2850K1eJyF//KV5fzgB7bttxeBhNINdfPEZyjd9mz15H+kWIpX5TTJyL6fi+dOltR+gA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6y5Ab/T/gyye9BUXR3Ve2aJ8qu7DqBCCtKyav+5UzFkQ6flMf
+	CD04fWb0p6nLe/hyI+aSPXEOeJi9X0lr0MO0f2EOCuBmqKmu8zJvc07N
+X-Gm-Gg: ASbGnctnCQoUGrjap1w19oMa56pRuEXVeobodmJ+ZtZ0396UqqGZhnfOQwnhXuZqWzW
+	/g5IKqTd6HTlBZ5H9SYEfUEAlPSmaLHHIX4bfo7cytlTfIBmxwwlrjUVJ98oe8Zq2VsxD2cZsvg
+	MS0L5hoHnx2rYDx1k3t3NoGrH3eHd0gxTnNfIn6WN3Th8eanHlJiBThEiLcGAUhaqKtkGiS4EZX
+	hlMvUOWO74ZJtVnWiGmxkbGRSBSKPDN/IWnAixC9gkAvqSiTu9ftLxUr9iXrRFVAymjS4U9rfyT
+	vhT+J7Z3fiQ5pEr4iWkm/dU4viYoswwAT/tqVR6fJf9+4h390yneo3e4eyNx5t303yRSB8kMdBP
+	EwvQUWmkZ4u0WVM3EjP6no3X7vfkdWWrUfvMHS/xSePyB0N9djgXfSthDpwkXrJ4VKC01j4YWgH
+	LTKglKIgBtINEedNeXlF8Z+6JhZgCucSyjNl83go5U
+X-Google-Smtp-Source: AGHT+IGPl5jq66QKAxKuT1zbMmX7cVCg83U7Ow4OS33Os0vlctAPTudYRAxHElLQlJEOckDjjbES5A==
+X-Received: by 2002:a17:90b:48c5:b0:345:badf:f1b7 with SMTP id 98e67ed59e1d1-34733f3eb64mr33856675a91.28.1764562079912;
+        Sun, 30 Nov 2025 20:07:59 -0800 (PST)
+Received: from fedora ([103.120.31.122])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3477aeb88a1sm11486769a91.0.2025.11.30.20.07.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 30 Nov 2025 20:07:59 -0800 (PST)
+Date: Mon, 1 Dec 2025 09:37:50 +0530
+From: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Mat Martineau <martineau@kernel.org>,
+	Geliang Tang <geliang@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	netdev@vger.kernel.org, mptcp@lists.linux.dev,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] selftests: mptcp: Mark xerror __noreturn
+Message-ID: <aS0UlhHP5aEzDZlv@fedora>
+References: <20251129043808.16714-1-ankitkhushwaha.linux@gmail.com>
+ <632d57cf-becd-4d09-bb21-0e3db6776c49@kernel.org>
+ <20251129174133.0e369f80@kernel.org>
+ <d4656eca-3c65-407b-a487-0a1816c38036@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d4656eca-3c65-407b-a487-0a1816c38036@kernel.org>
 
-On Fri, 28 Nov 2025 09:39:46 -0800, Jakub Kicinski wrote:
-> > In zerocopy_fill_skb_from_iter(), if two copy operations are performed
-> > and the first one succeeds while the second one fails, it returns a
-> > failure but the count in iterator has already been decremented due to
-> > the first successful copy. This ultimately affects the local variable
-> > rest_len in virtio_transport_send_pkt_info(), causing the remaining
-> > count in rest_len to be greater than the actual iterator count. As a
-> > result, packet sending operations continue even when the iterator count
-> > is zero, which further leads to skb->len being 0 and triggers the warning
-> > reported by syzbot [1].
+Hi Matthieu, Jakub,
+
+On Sun, Nov 30, 2025 at 06:09:18PM +0100, Matthieu Baerts wrote:
+> Hi Jakub, Ankit,
 > 
-> Please follow the subsystem guidelines for posting patches:
-> https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
-> Your patch breaks zerocopy tests.
-I see that they all timed out. I'm not familiar with this test, how can
-I get more details about it?
+> On 30/11/2025 02:41, Jakub Kicinski wrote:
+> > On Sat, 29 Nov 2025 19:13:08 +0100 Matthieu Baerts wrote:
+> >>> +$(OUTPUT)/mptcp_connect: CFLAGS += -I$(top_srcdir)/tools/include
+> >>> +$(OUTPUT)/mptcp_sockopt: CFLAGS += -I$(top_srcdir)/tools/include
+> >>> +$(OUTPUT)/mptcp_inq: CFLAGS += -I$(top_srcdir)/tools/include  
+> > 
+> > I believe this is being added via MM or kselftest tree at level of the
+> > main ksft makefile. Since this is a false positive, maybe let's defer
+> > fixing the issue until after the merge window? When the -I.. flag
+> > will be implicitly in place?
+> 
+> @Ankit: do you mind sending a v3 without the modifications of the
+> Makefile, and supporting die_perror() in a bit more than 2 weeks or
+> later, please?
 
+I will surely send v3 patch after merge window with the requested
+changes.
+
+Thanks,
+-- Ankit
 
