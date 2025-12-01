@@ -1,156 +1,139 @@
-Return-Path: <netdev+bounces-242888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242889-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id B59A0C95B2C
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 05:32:39 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53BACC95B8E
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 06:43:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5AB274E03D8
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 04:32:38 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 42FD14E0327
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 05:43:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1499F134AB;
-	Mon,  1 Dec 2025 04:32:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB2421E9B3D;
+	Mon,  1 Dec 2025 05:43:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="s8bEoRdg"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="OHXzIddx"
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-57-87.mail.qq.com (out162-62-57-87.mail.qq.com [162.62.57.87])
+Received: from duck.ash.relay.mailchannels.net (duck.ash.relay.mailchannels.net [23.83.222.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAE773FF1;
-	Mon,  1 Dec 2025 04:32:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.87
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764563555; cv=none; b=JicCSBe6ApjpULgndi+5jAgPhwaNWFWBkLPk8hU0y6daM1hPtb5d7LANYNaVJLqMN1WFjciSw0mnbaBw31PSgw58uGy8h5uxce6KeNNG1R8r+4UDWQsEqr6f6rGSZPFmIMBl4n4A6b9JgNCPu3r34HFYQgzZOFUmqYOOp+a/DEk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764563555; c=relaxed/simple;
-	bh=aIsmLS28js9v+qMK69BeAdTkTc0T1prP2RjT0y4XJsg=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=g0dUWfqEI7A2pY5pYHKKQrPAf19pI+H/9lkC6a26DTWP8zSm4ASaj7k2b12vbDbGJj24KARQCEwA85LD5HBqx4WCkfWto2qGAVhfe/CARg59CYO76U55t5dxmO9Px7YMEBJjnebT4ohMW+66QmtvT3fWLCWKe2d8o62tPsNLwpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=s8bEoRdg; arc=none smtp.client-ip=162.62.57.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1764563543; bh=7W8fmnRYbgpMXROOPMJtWpH15NqeQQrDdkNqgTI8MxM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=s8bEoRdgDrsl2HdyHhmh+FABEtlg4GpCERSGZQ0P/VhmwmjumbuyUuUfJy2DpMs/k
-	 FWGyrULnWkz1NNI7Yb79yYyI7QBaoUyrPvbtYr4niFTuh22gXPA6SdF3mnXuVAmel7
-	 VNIefDXakL27ZxQBE5pjiPc55AfgZrnMiUDGD47U=
-Received: from lxu-ped-host.. ([111.201.7.117])
-	by newxmesmtplogicsvrszb51-1.qq.com (NewEsmtp) with SMTP
-	id 7C9BDC89; Mon, 01 Dec 2025 12:31:09 +0800
-X-QQ-mid: xmsmtpt1764563469t85pkbrpw
-Message-ID: <tencent_E83074AB763967783C9D36949674363C4A09@qq.com>
-X-QQ-XMAILINFO: NGZp1yYNf7Y+TNOM5q4bORcDsgzTrtF+TOdMGg0IZy1TeprqxoPgB/Zm8exzvD
-	 jmXN/yx5dY+GV/umKjOmz36hH/v7YUawWXnLfKOTKH8kaL9FHMGXXhPgQXO9mJYZ81BTKBwYfsD5
-	 afuCjSDju0wU+BxfwRbcihJkh2YnWTjQZ3xNaxUEeJfcFFG5A0wCHf+BR+A+SS1UJB124SEDvQA3
-	 2EbaLW+J2pNHUqEtSfcECrszcRrEyw9nMEpoa3DxvczmM9rb1WouL5cOtz+GcS17TWPbiepIgqn5
-	 llmz+z9fEH4XLTEiZw5qsTaP9j4wHdgljkUDfSbCWDJ0Nty4iUC2wEM8ZhOPo88VrllC1iRFXOt/
-	 c2QyKL+LNDHPrtB/ci8r7WHbqe+L81nO/XeBf7Yw11Ikfe4UFfWSogkhBx+ZEPZFk3sGUE3usSSV
-	 9gZAaoI1pZ+UCwoPiRLw15Atv3BgZZJlVyc/F/YFXaR9d6n7ut+iHGHBs485LiZimAJPzSnHrKsV
-	 mPxHL/w7gqZHnxsacHrqd2YwLlYDLoYEjdmBy9/ekkiYII67lop85LWW15kL1hADLlygJLiw8zv/
-	 vD+FrGrzDjmypvv/nBnnuVNe7zju9gRCXj9CZJkuLDtGRk9UbCICPwUuQFFZ4d5WQWPn/lk1unmc
-	 WZpj05g5RymEd+CV0FSz4PXxLBx7BE6NY6Gqv4YhqYuHk4gbbp1TV1sllNyXUtLAAsg2SB4HuBgk
-	 XO0eEvDsdjXk5MEO4JygmXdRBt7Z92y6EBXAXyHtqGSJ6Yg66b/rd4cELGS/e/FwgpIt6oTX/Zcp
-	 uAM8l7s09hy7RLLZMjF2mk/fqgQaZm120nd3x3pLAiI07w9dSPsyNLDXsqOoo65UMMdZdukBwY5H
-	 vlHBM3/U3cOWdD30X4DjGLIamaRMLsljTuBMmoPd66wUpIo9eIUqDxz5K+IN9EZejhr9U0RrrzLx
-	 85j1fhl2EPa+KBY9Jdi9Sk9+1vYhjmamLrHw+oyj7wsTOxRDwc56mMoW6xqfU3q3I4WOjSzPrdJh
-	 sB0x1KLccYaCms0Qv05uEQM3lPDDwCf2bNiSgpHg==
-X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
-From: Edward Adam Davis <eadavis@qq.com>
-To: horms@kernel.org
-Cc: davem@davemloft.net,
-	eadavis@qq.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	syzbot+5dd615f890ddada54057@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: [PATCH net v2] net: atm: implement pre_send to check input before sending
-Date: Mon,  1 Dec 2025 12:31:10 +0800
-X-OQ-MSGID: <20251201043109.209601-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <aSxpOjsmyMPlB-Mg@horms.kernel.org>
-References: <aSxpOjsmyMPlB-Mg@horms.kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 496261E766E
+	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 05:43:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.222.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764567824; cv=pass; b=s9nipdmt/z0o4bM1f+clAe4MswEAl9kPHppGdm8ApCnFeg+s4hdwB7MUooXbS69YVwmVuW11snXSe90WzEcFlRIm5gM3KBZp/11g2YeEESI4vidMnWdvAAQArpfH3mWTsdcEPUPgytktyJQB8GQ4isjcfz4gSttt4q+0eK0ZZa8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764567824; c=relaxed/simple;
+	bh=8dOPAeTbiq2igiRHSNGUX30z/Tum0KvFCU8iH8lL5Sw=;
+	h=Message-ID:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:Date; b=QUw8wolfE0Am6bzLT9ECOeRFYeMFzU+Kh6vMz193ZkKBAfiT2zIrW2NwhGiSQabgfPCSu8T4/4Q/b80FHQxB+h15GsGX6mUsRAgu2yyw1Wrg326IoACdx8gkN+JtSujz3a3iA0AMdhw+1gFTlNCUMbKaI/WS9nPj8Rx6gczkYno=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=OHXzIddx; arc=pass smtp.client-ip=23.83.222.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+X-Sender-Id: hostingeremail|x-authuser|chester.a.unal@arinc9.com
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+	by relay.mailchannels.net (Postfix) with ESMTP id 2EEA0581496;
+	Mon, 01 Dec 2025 05:43:35 +0000 (UTC)
+Received: from de-fra-smtpout8.hostinger.io (trex-green-0.trex.outbound.svc.cluster.local [100.100.24.71])
+	(Authenticated sender: hostingeremail)
+	by relay.mailchannels.net (Postfix) with ESMTPA id 1A80E581A9F;
+	Mon, 01 Dec 2025 05:43:32 +0000 (UTC)
+ARC-Seal: i=1; a=rsa-sha256; d=mailchannels.net; s=arc-2022; cv=none;
+	t=1764567814;
+	b=PZHyCV1edhE+oHsa+49uMr/Y2BaeTiBVadjvwI1j6AUsMzsvBhXPsd28at68Cdp8sf8i5E
+	718BR1ZmXoVC63PD8Ve240bxrgNVW1FQvhDAfzkF5yy+TB01V7ADqIh2O1FxvLH3w83o7Y
+	N+ekWG56v3SkQV6nfRBCujhSxP/MHJvBx46j/SyKvJdKO/TQHlk/XkiEr4+2i4UcMMWjOs
+	4MD/EjnM5KLNMwCOsr71J4lbvNrpZL1CW6WCzs7B6vLsefLVtf2ZttrOURe4YT4QIT/RoP
+	B3xh3rFHq0FZ7dz+RWPWwP83kw9H8LuqmAXquRD5whVtsnmiNW9NhnVqEj+mQA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mailchannels.net;
+	s=arc-2022; t=1764567814;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:dkim-signature;
+	bh=RI1T/z4gATf1cofag4tNjlFCI3XLLUgeAdveHH2uT0w=;
+	b=T7RHDajrEAmFvYGPtU2woYI4jmj1ebdDCXJzGbibaDcSb9CFarDeTmXb9dNtLjpFNaWLA1
+	t3KLHzzWogy0T+dMro3AnIuMA4m6Bm+4ITiRxQXfqemuF3ZjlayscoL4fpCixSqovb78xy
+	tmtWVl2xh6lCseFbphYtoxyrah/OZ4yiaiBBo8gK+lzb6sSTI0TlKzdfItcJDzfQ39FTOQ
+	gErFocJHm2x8U7N4Iev7hfDdq6hP2w5HDhOBplDUprfjWKqdepdDzyyurbU2pafLJQORp7
+	4wvGmn7qh/LtSfJIrvMbTIEU6xM1lOsorBYymg6UHU7dNEu6DUj26W5P4Jfsdw==
+ARC-Authentication-Results: i=1;
+	rspamd-65d9b4cff4-dn7d2;
+	auth=pass smtp.auth=hostingeremail smtp.mailfrom=chester.a.unal@arinc9.com
+X-Sender-Id: hostingeremail|x-authuser|chester.a.unal@arinc9.com
+X-MC-Relay: Neutral
+X-MailChannels-SenderId: hostingeremail|x-authuser|chester.a.unal@arinc9.com
+X-MailChannels-Auth-Id: hostingeremail
+X-Cooing-Bubble: 1dca7e7b703a42d6_1764567815038_778101955
+X-MC-Loop-Signature: 1764567815038:3632105617
+X-MC-Ingress-Time: 1764567815038
+Received: from de-fra-smtpout8.hostinger.io (de-fra-smtpout8.hostinger.io
+ [148.222.55.13])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
+	by 100.100.24.71 (trex/7.1.3);
+	Mon, 01 Dec 2025 05:43:35 +0000
+Received: from [192.168.65.172] (unknown [155.93.179.162])
+	(Authenticated sender: chester.a.unal@arinc9.com)
+	by smtp.hostinger.com (smtp.hostinger.com) with ESMTPSA id 4dKXrK5nN7z3wlY;
+	Mon,  1 Dec 2025 05:43:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com;
+	s=hostingermail-a; t=1764567811;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RI1T/z4gATf1cofag4tNjlFCI3XLLUgeAdveHH2uT0w=;
+	b=OHXzIddxe82Cd6uABjG+QirCrCj7gSLm22q9sxQhclXRP0mz4d16nbSu7nH3Mi1XjP0tou
+	wRNrDl3SHp8O/OP8/mFE6NzTyIHxwNPygovTWcxsDnzmc80rypHT9U03fF6GrWFxURvB3d
+	Ta3JguQ5xecXdg0VtUSdgtktp3+nxbsXS0DMNcY6XirC5qz2+KY4VGYNEUQ2es5d3hX5wp
+	zDdSDNMaZQoPhy3QnlZcnOZYz6F12NSDSjGoWVLSPh7+QngBxnEzyAPLHuhOXpyZQdsWyM
+	W9FoSu7vkTLTXw8JT8xJeHbqjB8hlF/LAOyJoTwoCkkcPnXzNPcY20wQUoDmCg==
+Message-ID: <8f80b7c5-8440-4e6b-a3a9-4ce72d943a73@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 01/15] net: dsa: mt7530: unexport
+ mt7530_switch_ops
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Daniel Golle
+ <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>
+References: <20251130131657.65080-1-vladimir.oltean@nxp.com>
+ <20251130131657.65080-2-vladimir.oltean@nxp.com>
+Content-Language: en-US
+From: "Chester A. Unal" <chester.a.unal@arinc9.com>
+In-Reply-To: <20251130131657.65080-2-vladimir.oltean@nxp.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Mon,  1 Dec 2025 05:43:29 +0000 (UTC)
+X-CM-Analysis: v=2.4 cv=etGNzZpX c=1 sm=1 tr=0 ts=692d2b03 a=M86+Nsf21j+Nx4MJSknohA==:117 a=M86+Nsf21j+Nx4MJSknohA==:17 a=IkcTkHD0fZMA:10 a=GvHEsTVZAAAA:8 a=VT4XjZGOAAAA:8 a=pGLkceISAAAA:8 a=mpaa-ttXAAAA:8 a=8AirrxEcAAAA:8 a=N24Blf2EF_22bh_IVDcA:9 a=QEXdDO2ut3YA:10 a=zZCYzV9kfG8A:10 a=aajZ2D0djhd3YR65f-bR:22 a=6CpsfURP9XNmmWg3j1mJ:22 a=ST-jHhOKWsTCqRlWije3:22
+X-CM-Envelope: MS4xfGcP0UF+QKuba0Wt8172iFaucA9/tX5MtS0WWNs9408eLGc5Z+FasllzGZaoXBMw9FXEUywn1qEgd5X96UwOSVQ3Qz41dplQkPzVgstbks+lCcTo4B4V LXwINpi7BBLlKQfEo5hFpGvlqLZlO9rQ2hEpWKkvXYKxyMiUy2KQwffbLT0v7pae3nCGDx4vzCKl7qTot84+hs0JaDwICIadB2W2MVop3wqPqG7foFj31e7Y WxZam8mflkkvvkIhGfTQm/M7hpE7OHxB+TtqXUMWGrbXSxoqlUcAQ8bZY5Bu8Is33fLRXa/6Oz+joRthDm9YZ5g1yqSXs607xi3s7YmXGZ98YBDQJipkYKHg /70HX76p1Wu6FWXt3cnXRSDz3oxZeA==
+X-AuthUser: chester.a.unal@arinc9.com
 
-syzbot found an uninitialized targetless variable. The user-provided
-data was only 28 bytes long, but initializing targetless requires at
-least 44 bytes. This discrepancy ultimately led to the uninitialized
-variable access issue reported by syzbot [1].
+On 30/11/2025 13:16, Vladimir Oltean wrote:
+> Commit cb675afcddbb ("net: dsa: mt7530: introduce separate MDIO driver")
+> exported mt7530_switch_ops for use from mt7530-mmio.c. Later in the
+> patch set, mt7530-mmio.c used mt7530_probe_common() to access the
+> mt7530_switch_ops still from mt7530.c - see commit 110c18bfed41 ("net:
+> dsa: mt7530: introduce driver for MT7988 built-in switch").
+> 
+> This proves that exporting mt7530_switch_ops was unnecessary, so
+> unexport it back.
+> 
+> Cc: "Chester A. Unal" <chester.a.unal@arinc9.com>
+> Cc: Daniel Golle <daniel@makrotopia.org>
+> Cc: DENG Qingfang <dqfext@gmail.com>
+> Cc: Sean Wang <sean.wang@mediatek.com>
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-Besides the issues reported by syzbot regarding targetless messages
-[1], similar problems exist in other types of messages as well. We will
-uniformly add input data checks to pre_send to prevent uninitialized
-issues from recurring.
+Acked-by: Chester A. Unal <chester.a.unal@arinc9.com>
 
-Additionally, for cases where sizeoftlvs is greater than 0, the skb
-requires more memory, and this will also be checked.
-
-[1]
-BUG: KMSAN: uninit-value in lec_arp_update net/atm/lec.c:1845 [inline]
- lec_arp_update net/atm/lec.c:1845 [inline]
- lec_atm_send+0x2b02/0x55b0 net/atm/lec.c:385
- vcc_sendmsg+0x1052/0x1190 net/atm/common.c:650
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: syzbot+5dd615f890ddada54057@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=5dd615f890ddada54057
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
----
-v2:
-  - update subject and comments for pre_send
-v1: https://lore.kernel.org/all/tencent_B31D1B432549BA28BB5633CB9E2C1B124B08@qq.com
-
- net/atm/lec.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
-
-diff --git a/net/atm/lec.c b/net/atm/lec.c
-index afb8d3eb2185..8a9660abd134 100644
---- a/net/atm/lec.c
-+++ b/net/atm/lec.c
-@@ -340,6 +340,23 @@ static int lec_close(struct net_device *dev)
- 	return 0;
- }
- 
-+static int lec_atm_pre_send(struct atm_vcc *vcc, struct sk_buff *skb)
-+{
-+	struct atmlec_msg *mesg;
-+	int sizeoftlvs;
-+	int msg_size = sizeof(struct atmlec_msg);
-+
-+	if (skb->len < msg_size)
-+		return -EINVAL;
-+
-+	mesg = (struct atmlec_msg *)skb->data;
-+	sizeoftlvs = mesg->sizeoftlvs;
-+	if (sizeoftlvs > 0 && !pskb_may_pull(skb, msg_size + sizeoftlvs))
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
- static int lec_atm_send(struct atm_vcc *vcc, struct sk_buff *skb)
- {
- 	static const u8 zero_addr[ETH_ALEN] = {};
-@@ -491,6 +508,7 @@ static void lec_atm_close(struct atm_vcc *vcc)
- 
- static const struct atmdev_ops lecdev_ops = {
- 	.close = lec_atm_close,
-+	.pre_send = lec_atm_pre_send,
- 	.send = lec_atm_send
- };
- 
--- 
-2.43.0
-
+Cheers.
+Chester A.
 
