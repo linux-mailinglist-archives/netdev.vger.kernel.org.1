@@ -1,166 +1,170 @@
-Return-Path: <netdev+bounces-242863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67514C957FD
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 02:31:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C33EC9581B
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 02:36:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F1F23A24F4
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 01:31:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A6463A2AF4
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 01:36:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD89D182D2;
-	Mon,  1 Dec 2025 01:31:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 287B735958;
+	Mon,  1 Dec 2025 01:36:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="TxtGpf0G"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="RfVSjdyz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f226.google.com (mail-pl1-f226.google.com [209.85.214.226])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out162-62-57-49.mail.qq.com (out162-62-57-49.mail.qq.com [162.62.57.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73FAA2F851
-	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 01:31:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5970436D4F7;
+	Mon,  1 Dec 2025 01:36:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764552681; cv=none; b=Q+G4T6aKf6ygWWR+NPbxHM5+zzIMCMe/P1dcV+Q30sBil224Bsem2Zlq4ZtelwODGbpSpMFApgMfMHHSnq0bftH7+996K4NgA8KDPaVMmUdLRoCgo+scI9cmA13nJKGMp+uHTlP8BWeOlm6lsAj1YP49GdUlSndHZghR+xLiZvk=
+	t=1764552992; cv=none; b=ecxOrrnpyKQ2CgOO1wumJUoHr7gVB7yvdz7DxlNqRg/eSB0kHngsjIladOcfGl6RYekTexav006flTazWTicSH+lbEaBbsZKVtcuYbqkeEpIT7T9LW2U9jET8E3OJgXJC/fWld5WLyfkkcm7ou+ADxxNMfx6FQnZ1/CxjurgWls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764552681; c=relaxed/simple;
-	bh=8xZPo82FqnYcMjA4uo0/zy5adrorUMsaTrXYel3dtWs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DgugF7ypGeZc86fGL+tcNVaMSPW5wQE3/jXJVW3U/3RDu6vIQfU8Jicf3DNeQQmKz1l78ECqkza0BqKpdaqr+Ao8V6gDqcSq9bgvQ9zb8zDgD1jlwZAYLLGfrNRBKZuiLpLrGe8TWOZwAX8fRBAeBoAmi8UMouMjbvZZWROgCQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=TxtGpf0G; arc=none smtp.client-ip=209.85.214.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f226.google.com with SMTP id d9443c01a7336-297d4ac44fbso25056085ad.0
-        for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 17:31:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764552680; x=1765157480;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:dkim-signature:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=DG+8lEGfAuh75xC6rWWUCrLVSutdgptnAEiclt9ZLRw=;
-        b=XboK2W/e10PZEmN9iXeb/GNcDzosAc6pk3ZE1b0D9JPNwjijZaumHkQy810azCdHf6
-         4ak+Zodh+LNTAQ6fyb/Tez+bCZOHnnuTVGatz8v3GdXpEMgzDe26+PbHPJh4EOaCmqid
-         GQ/vnfy/rdgPFXWVsCXoZqnN0L1yk1/QnztKRv9oHSGdYEpeAkHIoefH+lg7pHg1+dLd
-         ICB7TS1K9YNpJJjLfrOnBEQM4z8D1pjl6WtJnARIeFprD2Uj+SI1nz0P8xtGWmgO1WkY
-         GTXPupPQBNV/anXVc0zf5BcVKBYLc8YLtypu+B7L5EtOndNBwryVh9K5wdMEI26IdxRD
-         31Mw==
-X-Forwarded-Encrypted: i=1; AJvYcCUnvjN9QMrZ/1f1yNSuzXlFh2EyN0469HV8dkJAylvukKq5FmGuxreOR4m92EZUFP5HS+cTl7g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YymGr9SzMgZr9rbfaht/X8GLncAXotuwhb8CbWYeDCpDAML/Kaj
-	VURDOT+TcMr2nErBTnhIDQypjtUEGjMtNYiRfXQjNlJtQmjsh8bMotrL/rf7QQUKIMKySQZMbsR
-	wXFZLI0GtwO8/eWei4uaAVK6JWEJlGLElqkHAyNgZUObP8OSrpVksRmFct06DUjZupxOppwpCBJ
-	WoCB/te/fHC1T4Lja7pOFqX1/y/JhjeXAC1kYet8tfFgokd3OH7KqosNIa7YBpVfepKqiLAH4ee
-	i4Hh3hoiibBC7op
-X-Gm-Gg: ASbGncvmQwlQxA8ZMcP1wpK9MaCMHPecRBTM5aD6HdmmM6hutjiyd7VAXk9B+YZVeQA
-	/bB4BSGcGZgwBzLQfvjIXY4ptBKvAk0ywv2xwXsSP8mQpOEtbNBY6ESeYkz6OKFtbl8pVcfU450
-	0DgH4QVC1qfTkhB8k3y3LkPx4yE2rqaFkKy3FsG4BzrPhu+YoKmF47NFCtallMjfeqAylYjVHmO
-	9sjExsR1Zur9Mi1NrMxWFCcZK9iKaTsB+KGiMoeWvveoPtvreyr4V78RzTcjEuHAMezp/A8ZdFS
-	5ywd9+t+wqaZwL5XImcj1h5GXuSCk5l7L3iEtoDGDjihoPjwtLjDIs54tzEwYw+4zxL8fbFHS/n
-	ROrh8EgY2bhNZubn+42wPyWKK268bMqpCVutGdGEVeZY6VtyvPZwfpTlm34x+sc3neGyXYohSqC
-	Wltdf6CpU73nyoEcjMgwFF4MwPfEcoWmZqvR072Ls9d/lyYkwdZcl5
-X-Google-Smtp-Source: AGHT+IGAIHfevjefmNVnScmhu0uE9dBHW2SB8x6SRKgkgyzo8cQc7lOy2e9qElt3xMi0SGzDG2vIun2L9/8u
-X-Received: by 2002:a17:903:37cf:b0:297:f0c3:32e0 with SMTP id d9443c01a7336-29b6bf1c73bmr384565165ad.12.1764552679637;
-        Sun, 30 Nov 2025 17:31:19 -0800 (PST)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-116.dlp.protect.broadcom.com. [144.49.247.116])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-29bceb0d314sm13519045ad.51.2025.11.30.17.31.19
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 30 Nov 2025 17:31:19 -0800 (PST)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-dl1-f70.google.com with SMTP id a92af1059eb24-11ddcc9f85eso558918c88.0
-        for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 17:31:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1764552678; x=1765157478; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=DG+8lEGfAuh75xC6rWWUCrLVSutdgptnAEiclt9ZLRw=;
-        b=TxtGpf0G/HbjpweX6h5qd9KQ7Ynnq5e5oIIM5c/TvLA2WeBU+HilFO1Guq2h1pecQm
-         +4EBm+qk51l4D04cAhLLqVJbPfSfVs3p7rHSEKOThWH2N0pc0RYopBMMbB18bT9pG1X4
-         WtSi+YG6G07i5MVGMIAWccJXi29egC4OrsUwU=
-X-Forwarded-Encrypted: i=1; AJvYcCVeiD7cvkgf1bIQG7EiH40UIOfT+l1cpVMs4sHpUqX3AZV4XYe355FDYruA7ZqC5mpvoDsHMdU=@vger.kernel.org
-X-Received: by 2002:a05:7022:ff47:b0:119:e569:f85b with SMTP id a92af1059eb24-11c94b7a37bmr30103208c88.18.1764552678054;
-        Sun, 30 Nov 2025 17:31:18 -0800 (PST)
-X-Received: by 2002:a05:7022:ff47:b0:119:e569:f85b with SMTP id a92af1059eb24-11c94b7a37bmr30103181c88.18.1764552677488;
-        Sun, 30 Nov 2025 17:31:17 -0800 (PST)
-Received: from [192.168.1.3] (ip68-4-215-93.oc.oc.cox.net. [68.4.215.93])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11dcb03c232sm52297129c88.6.2025.11.30.17.31.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 30 Nov 2025 17:31:16 -0800 (PST)
-Message-ID: <4bc00769-2eeb-43a7-887d-6b70ea71a5f0@broadcom.com>
-Date: Sun, 30 Nov 2025 17:31:16 -0800
+	s=arc-20240116; t=1764552992; c=relaxed/simple;
+	bh=i5JtFS7XLtOcD5HB7iMuaTFHZMasDhQNzqAqotDDq78=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=dzQCJK04HqRrNVDAyh2zCiwJDXKh9vqOgpi8GsiZGAD58/Lz6blEkuOK8WQTCqIUU77XYM6f0DgCHXCwd1+KKO39c0KNR5T+cto8TN02NPipeN4EpvznVtc6eAvDDmNuEEg5ax2LHeUO/aknhzCP/Y0UWVNpZzNs/mCWBK7Vqaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=RfVSjdyz; arc=none smtp.client-ip=162.62.57.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1764552978; bh=WoR00mXRqcmIrzUT/ZjLb+MO4Y/wZIXJqzDfcrLYEJM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=RfVSjdyzGnKRpk2pc6BK5739M7C+AE2XnWBBxa/shmJLVSVkvPdOQF0YU/V8sWbZg
+	 nvVg0oz2CXFuFz12rlbWGD+vhsKzaOEtWza9NApJebYOCev0pssVUyoeqEkVutqFyC
+	 CEm5EN89UMbLOWszFjodOuwtP9kDfUquIsOyI2y0=
+Received: from lxu-ped-host.. ([111.201.7.117])
+	by newxmesmtplogicsvrsza56-0.qq.com (NewEsmtp) with SMTP
+	id 8BBB22EA; Mon, 01 Dec 2025 09:34:59 +0800
+X-QQ-mid: xmsmtpt1764552899tiab0swj4
+Message-ID: <tencent_AF3D7D376E965E371A4BBE74CF765566DE09@qq.com>
+X-QQ-XMAILINFO: NkHKfw09D6j8BOSjpyDRh6RdCIM9WyWIAuA/crt8obmgqvwrv9ObpXfKcolT+5
+	 w1YoBx7cVYmcMJU/kEPaYL+OhYmMOfsQSLie0bYaVI0vBHdpUs0Sadbidu0qLcpQuM+UZ7wdyZFB
+	 pXSuGdZd1q5BBHEh+qAPZxW+MpnI5+HWNJgVJkAZi/PPyQnXN88KJSK3D67nBzOg23yjE7xn7air
+	 GjKi7ov/lZrYlcoKmy/E4fzfpYUdp99twYLrE5Z9zEM7eV5w73oEsMKYyq74KA2bwDvT/NT38Ks6
+	 ksVM8PQtn74zsJMu7Rel775KUYNl2cnacPoqeEw6PdJuWEWQ4TTXHsC37B5lQ1CX5xUcVnt/G308
+	 qJyxKD/YQFa/wMyGx60dP4MdO1h3v1WtS7cIxTJ1zS+sxN/cAihoLYuwUIizk08keBWf+0keoSSZ
+	 q4sCUA1IsqpbF3Q/8x+XVIkCa6xrVvHChPbSkEtIbC7VglTrWuzYbTspI0lAuJGfpuKCoeogHYoc
+	 W+fHEPqiDqUCfPv7u/m0FIyrhrgbxDHhgsM6OVcyj9UD5jWeSihwIo5XMJVInzhV7o+BHblwPTuB
+	 s1cFA6BSzPjRGPGGyVZ5sjfKkwLUDdFPhqzhAfTvn1awZUKhLmRWMVFr4EMUG0BkJ0KsWd3KAuvh
+	 mtg2fX7mFEJRHfiqm2zg1JLc0xy3DXQ8IhmAf8mbLgI5YiVk4OQMO00fLFdzni4+E8767krU89B4
+	 ONilCrinNe1FigjHcJvoNwb4OltNr9LFYsA/ET90gu0TOp4VBUs8LmyGwScydSfxcJ5A9T2U6cH+
+	 mQlxt8y5c0+Y6nUOTyoj27sFPtQUNDjfKs2azyc1749dQ8LJdsgX7rUJf/JzHgjvSF6sgIWw+A1e
+	 OzQi74oyRQb8IYjfHZMTZwk7TbwUuEr/ADvRPJqOpuoU4iHUa7PJWHzi0KGlygKds9BeoEVFaFmN
+	 IrJztLSy2FZvG3hHdmssIMRofQgqe3oLTEqUTypwQ4oyUwMQUOWcRLShclqMH8brfNuIBywel/KN
+	 ITgZSN6ba4ZAMepRGfJNAbc9drt7DHBno+e+75AhRWzyuNJkDN6lElH6MK+SI=
+X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
+From: Edward Adam Davis <eadavis@qq.com>
+To: horms@kernel.org
+Cc: davem@davemloft.net,
+	eadavis@qq.com,
+	edumazet@google.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	syzbot+5dd615f890ddada54057@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [PATCH] net: atm: targetless need more input msg
+Date: Mon,  1 Dec 2025 09:35:00 +0800
+X-OQ-MSGID: <20251201013459.200747-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <aSxpOjsmyMPlB-Mg@horms.kernel.org>
+References: <aSxpOjsmyMPlB-Mg@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 7/7] net: dsa: b53: allow VID 0 for BCM5325/65
-To: Jonas Gorski <jonas.gorski@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- =?UTF-8?Q?=C3=81lvaro_Fern=C3=A1ndez_Rojas?= <noltari@gmail.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20251128080625.27181-1-jonas.gorski@gmail.com>
- <20251128080625.27181-8-jonas.gorski@gmail.com>
-Content-Language: en-US
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
- M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
- JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
- PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
- KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
- AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
- IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
- ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
- bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
- Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
- tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
- TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
- zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
- WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
- IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
- U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
- 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
- pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
- MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
- IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
- gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
- obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
- N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
- CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
- C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
- wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
- EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
- fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
- MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
- 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
- 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20251128080625.27181-8-jonas.gorski@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Transfer-Encoding: 8bit
 
-
-
-On 11/28/2025 12:06 AM, Jonas Gorski wrote:
-> Now that writing ARL entries works properly, we can actually use VID 0
-> as the default untagged VLAN for BCM5325 and BCM5365 as well.
+Sun, 30 Nov 2025 15:56:42 +0000, Simon Horman wrote:
+> > syzbot found an uninitialized targetless variable. The user-provided
+> > data was only 28 bytes long, but initializing targetless requires at
+> > least 44 bytes. This discrepancy ultimately led to the uninitialized
+> > variable access issue reported by syzbot [1].
+> > 
+> > Adding a message length check to the arp update process eliminates
+> > the uninitialized issue in [1].
+> > 
+> > [1]
+> > BUG: KMSAN: uninit-value in lec_arp_update net/atm/lec.c:1845 [inline]
+> >  lec_arp_update net/atm/lec.c:1845 [inline]
+> >  lec_atm_send+0x2b02/0x55b0 net/atm/lec.c:385
+> >  vcc_sendmsg+0x1052/0x1190 net/atm/common.c:650
+> > 
+> > Reported-by: syzbot+5dd615f890ddada54057@syzkaller.appspotmail.com
 > 
-> So use 0 as default PVID for all chips and do not reject VLAN 0 anymore,
-> which we ignored since commit 45e9d59d3950 ("net: dsa: b53: do not allow
-> to configure VLAN 0") anyway.
+> I think it would be useful to also include:
 > 
-> Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
-
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+> Closes: https://syzkaller.appspot.com/bug?extid=5dd615f890ddada54057
+> 
+> And as a fix for Networking code it should include a fixes tag.
+> Briefly examining the history of this code, using git annotate,
+> it seems that this problem has existed since the beginning of git history.
+> If so, this tag seems appropriate:
+> 
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> 
+> Also, as a fix for Networking code present in the net tree,
+> it should be targeted at that tree, like this:
+> 
+> Subject: [PATCH net] ...
+Thanks very much for your oppinions. I will send v2 for it.
+> 
+> More information on the Networking development workflow can be found here:
+> https://docs.kernel.org/process/maintainer-netdev.html
+> 
+> 
+> > Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+> > ---
+> >  net/atm/lec.c | 10 ++++++++++
+> >  1 file changed, 10 insertions(+)
+> > 
+> > diff --git a/net/atm/lec.c b/net/atm/lec.c
+> > index afb8d3eb2185..178132b2771a 100644
+> > --- a/net/atm/lec.c
+> > +++ b/net/atm/lec.c
+> > @@ -382,6 +382,15 @@ static int lec_atm_send(struct atm_vcc *vcc, struct sk_buff *skb)
+> >  			break;
+> >  		fallthrough;
+> >  	case l_arp_update:
+> > +	{
+> > +		int need_size = offsetofend(struct atmlec_msg,
+> > +				content.normal.targetless_le_arp);
+> > +		if (skb->len < need_size) {
+> 
+> As per Eric's comment on a similar fix [1],
+> you should probably be using pskb_may_pull().
+The pskb_may_pull() function performs a more thorough check of the skb
+length, which is especially suitable for handling non-linear data areas.
+> 
+> Also, I see that this patch addresses the l_arp_update case.
+> But it looks like a similar problem exist in least in the l_config case
+> too.
+I noticed this, and it's not just these; several types of atmlec_msg
+handled in lec_atm_send() are also involved.
+Strictly speaking, they all require relevant checks.
+> 
+> So I think it would be useful take a more holistic approach.
+> Perhaps in the form of a patchset if you want to restrict this
+> patch to addressing the specific problem flagged by syzbot.
+Okay, I'll carefully consider how to handle the others.
+> 
+> [1] https://lore.kernel.org/netdev/20251126034601.236922-1-ssranevjti@gmail.com/
+> 
+> > +			pr_info("Input msg size too small, need %d got %u\n",
+> > +				 need_size, skb->len);
+> > +			dev_kfree_skb(skb);
+> > +			return -EINVAL;
+> > +		}
+> >  		lec_arp_update(priv, mesg->content.normal.mac_addr,
+> >  			       mesg->content.normal.atm_addr,
+> >  			       mesg->content.normal.flag,
 
 
