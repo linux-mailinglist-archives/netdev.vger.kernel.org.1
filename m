@@ -1,163 +1,161 @@
-Return-Path: <netdev+bounces-242948-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242949-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A9DCC96B77
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 11:49:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95A5EC96B92
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 11:50:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 10B3E4E123A
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 10:49:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F55C3A2841
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 10:50:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56BDC3043C7;
-	Mon,  1 Dec 2025 10:49:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 433BE304980;
+	Mon,  1 Dec 2025 10:50:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="en7fphsj"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="x0H5Sflv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A725E3043B2
-	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 10:49:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 127A53043CA
+	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 10:50:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764586156; cv=none; b=cJTJLv5wpLBjyBUNy1coffwdYQZJG5+/18RMpG0YTlLVJynn79cOluId7SDiGjG2Udiz6nyPMfTZASYdQy185luaM5NaRciWPMgA70wzxdYpHKjANGWkYnhGRo8lGVObakt+Nu1YjMA0T3SqXyd85yNCVMf4Qu8yKyiwIXW0/rg=
+	t=1764586216; cv=none; b=G1XN2It5OPwSRTRptjGt/0dCoZ0vCkN3cUtHud+4WMF27x5JsustuDyU2kq+5m71yj+HdCi+FhWt7GOg5GIHzN5fqmskPvJcK/hy5++rCHOnBTSWtl+9zo2V8+okKR49wm7w91/RZICgAzcDOBEnL4gX/QN17Os3Ch3HNPibejw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764586156; c=relaxed/simple;
-	bh=TnpLZv/eAabP1iHpY+pfjsPQM6Sa6zGvz4Sh2TFf9ro=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fryPgXz3Bg01crf7UJ5jgt3/8SOsOZHfdlW9uTxUpOLLriYAhn+LY9Yko/w9j66Xk26rn5sKI2JqlQ22GwH4B8hqu4GpCqmRfc2HDwlgAXLVB/k2Qxib4zPrDoETLgeR4n88b9rYswHZju0kp6H2SZYY7asMNO+iXXCy6WrK7XE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=en7fphsj; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4edf1be4434so26865381cf.1
-        for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 02:49:14 -0800 (PST)
+	s=arc-20240116; t=1764586216; c=relaxed/simple;
+	bh=Vl5Pt6fbbWhiVMNLXXFQfg4zF9/xEjpl7rTTd1qmuhc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f/R58PP/MNBJ0Miu9XqZPWbphHHFVre1S74hco3aEKrJnpKqZR9EOQ4iZErSBrYhcuT4sJfCj0ApcxG4HpND2wKfasnFKTUnOC1YgElnlm1ZYMT6BaiWS3N7DmqQ0xizT0ZL86mkf9/XLIkCGoovJlclS/SA+usF/C37hbvChL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=x0H5Sflv; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4779adb38d3so28477795e9.2
+        for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 02:50:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764586153; x=1765190953; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yihN9u3dF1KUw0IDsBYumhdTC5gzkqr3jpKi5G7muSI=;
-        b=en7fphsjBWonaEu34O3kNIFbzo6yshGNN0E3tYEwrAhUt00Xh7BNPguaBj4pvq815h
-         erqr9Q/L/V18DBvy0/a28/ehD1vO2ZL2vG4UyrjUaJ3U6RBT8jN234sQqEDb/knz6+Zg
-         dGezRnP2gbe8lmffOAfWwMgtv4j9FKdA85aMc2BFe4XCp67EIuS7i+swst/pvRrcK4o+
-         XRqWv79RvGRObfU/J8I3hTC/uFp/VLEh2JIK+c1b52QYeAhoLSIvEgkDW0ggbYd9m8M/
-         zwVffMX3nlJa4xkIxo7QHLEgg/IfNvqNDe1eergXtp3c07GEFFHaRqd0y5RIe993BQtE
-         G9zQ==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1764586212; x=1765191012; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vsBhiX0PVPZ+1c2Xkz/7qg2YuqZk4pwJLdnYaEMKyy4=;
+        b=x0H5SflvsYhHeVejbOzjFjA6IxemuZ+5XE0kEgoxSRNMgoLmme6pS0YKTpXhsCKumV
+         SWWrYbtAZqZQwqCkDtK3HePLav9G9ld614dc+jmCpOWPfv51eTLRgKlutWSVmSJqkzdx
+         VVTG5IGZAQ+cxj2sR0af8arQOyytwYBKAO8hZ/RFIh3v8+Kp0i/udQXKCB3yhfnkkUMf
+         RirGGb5O0S95DPE569OB4HsFg7WRlxbBd8buPYcGNdaYwAipotN7MDWRF+gHm8Z/4gaL
+         UkiyVG46MY+yzzJxHOYZjInitRclZ3H6J0j6C8eLIFScQhn5cNsfD3oHGQgoZZioC+gW
+         rUGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764586153; x=1765190953;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=yihN9u3dF1KUw0IDsBYumhdTC5gzkqr3jpKi5G7muSI=;
-        b=bA4QzpUp4tut6SOCyi79OI2i4QMFK/C/gOZQQrd15XBPeQjpYgqqU2rZ9hB1XTdqH/
-         75X51OPCN95zRiroxEvPAKhT5wWzsXtFxOnbI7TxAce/5W4eW6RhXDl358lpnbZxyOqt
-         pypAKWPy9KD1uJwbv7FKHOI/O8w1rzA4VHLr7kPag8WClc5Yuuy7Vrl9zPNhZm8OcJIt
-         5HBAEw9b99SqNETWAOZdTuAiUxHvmsZqWLxqAtJ3n/BVcYOw47l9msaK6mC28NMVBCqK
-         xqHgF/sTxeWByjhoq/X0a9s2C9Q7XOTHv2o3pXGQ7K009ArrBBgT5oFlP/5gbYisGyC6
-         fjFg==
-X-Forwarded-Encrypted: i=1; AJvYcCUOnKYFx+4KzVLmRy2Z75Mmo/jYjtJaKb0tBrYKAb0KB0J22eFq4E1AMyoeWBYs3RrSv3fhqQw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqW8PQA2aTo70itZwWx+yjLzZX1Mkg+RWTWzy2NfBmmou/ctGS
-	oz0k3AxG6UwwWErTE3wjH6lf29ZGImtNuC0x9nJRMqGvUEj6/6j/siJbAzB7neUSPxhOPx8YuTW
-	UlplRHtolNbW5EuLoPXYD8FnncOZItUb1HMGwGwNV
-X-Gm-Gg: ASbGnctt7rExb+GDRekjVdiNECP9kSfKEKQ1Ajd8tZdc5iS1v1SEut8SS/SW5bhV8Z4
-	sZw3iYq16Tz5sAHOis0RE6jl/RZKWxs7sldkHF1YAxqCGJdYLcYKMYH3GSNSzHTkGvgyUP7CLNU
-	ZFQu90J4aYAOF+FtZ/8kIv8w+IUllWT7fWy6EWavkMWpPAchycPqqoDySajHAQO6w75BcCi6mPy
-	4OqUCUjLnuD4PjywfmlmZPxUT4qT33MwbyZCiQ3Oh61lhEhzz3SOD3uyXor6B/8uy277uI=
-X-Google-Smtp-Source: AGHT+IGqTMyLMeV3gzlRJ5J3VL0WOmmtcnKrZXIoiJ1bzkojBYcF7sQxz7mTmbSH1hosg/jSy8ZcU8HAn5LKIhuoRgA=
-X-Received: by 2002:a05:622a:13d0:b0:4ee:1bc7:9d7b with SMTP id
- d75a77b69052e-4efbdacff00mr346898301cf.39.1764586153287; Mon, 01 Dec 2025
- 02:49:13 -0800 (PST)
+        d=1e100.net; s=20230601; t=1764586212; x=1765191012;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vsBhiX0PVPZ+1c2Xkz/7qg2YuqZk4pwJLdnYaEMKyy4=;
+        b=ouCjZBkp2+YQMAJgxhxzqINclzcCgLCHVDMlvwohsDVWfNY7fHbU+D9r/I8wyAAtrO
+         O30Cm5OyrnSCxQCFJb870PgcAKEGH0vFOQxCIU6QiRwNH++WxodbDbnX7D02zZqkJ5ic
+         N8iZQzqPDb/k5tVjVWAELjeMiB6FTBsfFGAGzRA3PjQBRm9MJeC8TW6WA5TInZldT6vL
+         N754ucdgm1U8LuzFA6JOc/TaCBgscVJD+QnvJurKDHJvhjCHOmsm76mUI4PH0qLL+oR6
+         nNPzpBdmBFs4Sk2x8kEPT/VCTqdELTP4heQCnUK0ICkJBBnuMcx7t3mCTuQqa52Arubt
+         FcxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWldMabO78AG1R+f0J29LeI5qSEFgjFKuwrkR1YUiDaOCR8yPXIH8KUD1tI4l6Ek+MwNQyGa/A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzIRAOF59RAt4wqtShee8gsYwWkQpzAy8Wl27I4FPqyaKGoj2dM
+	16XwbGpDNtdxHmha43FNEsU9IVEQVsjmrAvhQ/oNDo8XMZHNhcMFQ/u71myBAymglQQ=
+X-Gm-Gg: ASbGncsNn9cA1c53l3o6i5Xnm9CQ8cKsTTcmoE0YLt2RmkX95CUR6oKYS7coA91Mk7r
+	8m7i6LZv1PaPYEn8Ofk4rjnv2IYWlOtgF0+4LlyXsW8/Coipxw1f5XTlqhh1e3QClemIHSbZ2ku
+	TM817digBWT7sjTqLGhJoTayZkT7HpnbB/nVDro+LubtpA1rJCNqIYQhKysAhqEP8rm8P10wxvP
+	ZifX+7dEUNYDTA/8pzWmcByfmvhahZpjwdsUpzZG43dz/ys8a6kBUuW4HVyoiUdefED1Ve3dKww
+	ZIYA6oOaO+FcF1t34VTY1Bi9Ujep+rB1Y1E1fpJzdTS1IZjT1lGiqOtDdv/5QnrOqYh5l2g77wr
+	crET+KI4Xat1hNmoMSHi19dvpsI1HBHA6h2bUG7CjgYRTRDzERoFtit00nXWTobkJIPcYmxTBUz
+	6VDLOZJUGgLkjIdXd/PZPzJg==
+X-Google-Smtp-Source: AGHT+IF8Tu4veq+TqWb6qimoMPLbdTzxlzvlIjg1tAKG25deNHRi+KLPl07N+U3YsCQceTPRWYr3CA==
+X-Received: by 2002:a05:6000:2288:b0:429:c4bb:fbbb with SMTP id ffacd0b85a97d-42e0f2129cemr26950630f8f.13.1764586211765;
+        Mon, 01 Dec 2025 02:50:11 -0800 (PST)
+Received: from FV6GYCPJ69 ([140.209.217.211])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42e1caa5d02sm25827129f8f.36.2025.12.01.02.50.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Dec 2025 02:50:11 -0800 (PST)
+Date: Mon, 1 Dec 2025 11:50:08 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Donald Hunter <donald.hunter@gmail.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	Gal Pressman <gal@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>, 
+	Carolina Jubran <cjubran@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>, 
+	Randy Dunlap <rdunlap@infradead.org>
+Subject: Re: [PATCH net-next V4 02/14] documentation: networking: add shared
+ devlink documentation
+Message-ID: <n6mey5dbfpw7ykp3wozgtxo5grvac642tskcn4mqknrurhpwy7@ugolzkzzujba>
+References: <1764101173-1312171-1-git-send-email-tariqt@nvidia.com>
+ <1764101173-1312171-3-git-send-email-tariqt@nvidia.com>
+ <20251127201645.3d7a10f6@kernel.org>
+ <hidhx467pn6pcisuoxdw3pykyvnlq7rdicmjksbozw4dtqysti@yd5lin3qft4q>
+ <20251128191924.7c54c926@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251201104526.2711505-1-evan.li@linux.alibaba.com>
-In-Reply-To: <20251201104526.2711505-1-evan.li@linux.alibaba.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 1 Dec 2025 02:49:02 -0800
-X-Gm-Features: AWmQ_bl7MiduXAikfTXo_VS5voLFOvo9DSXqCWHzDH__vp1XXmfflcmqJSAFGEE
-Message-ID: <CANn89i+E1kVsY4nZ1jZowEiPLxjRbdtR-eoEs1KGTaj_iDUFVw@mail.gmail.com>
-Subject: Re: [PATCH] net: tcp: avoid division by zero in __tcp_select_window
-To: Evan Li <evan.li@linux.alibaba.com>
-Cc: ncardwell@google.com, kuniyu@google.com, davem@davemloft.net, 
-	dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kitta <kitta@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251128191924.7c54c926@kernel.org>
 
-On Mon, Dec 1, 2025 at 2:45=E2=80=AFAM Evan Li <evan.li@linux.alibaba.com> =
-wrote:
+Sat, Nov 29, 2025 at 04:19:24AM +0100, kuba@kernel.org wrote:
+>On Fri, 28 Nov 2025 12:00:13 +0100 Jiri Pirko wrote:
+>> >> +Shared devlink instances allow multiple physical functions (PFs) on the same
+>> >> +chip to share an additional devlink instance for chip-wide operations. This
+>> >> +should be implemented within individual drivers alongside the individual PF
+>> >> +devlink instances, not replacing them.
+>> >> +
+>> >> +The shared devlink instance should be backed by a faux device and should
+>> >> +provide a common interface for operations that affect the entire chip
+>> >> +rather than individual PFs.  
+>> >
+>> >If we go with this we must state very clearly that this is a crutch and
+>> >_not_ the recommended configuration...  
+>> 
+>> Why "not recommented". If there is a usecase for this in a dirrerent
+>> driver, it is probably good to utilize the shared instance, isn't it?
+>> Perhaps I'm missing something.
 >
-> We discovered a division-by-zero bug in __tcp_select_window() since
-> commit ae155060247b ("mptcp: fix duplicate reset on fastclose").
->
-> Under certain conditions during MPTCP fastclose, the mss value passed to
-> __tcp_select_window can be zero. The existing logic attempts to perform
-> rounddown(free_space, mss) without validating mss, leading to a division
-> operation in the helper (via do_div() or inline assembly) that triggers a
-> UBSAN overflow and kernel oops:
->
-> UBSAN: division-overflow in net/ipv4/tcp_output.c:3333:13
-> division by zero
-> RIP: __tcp_select_window+0x58a/0x1240
-> Call Trace:
->  __tcp_transmit_skb+0xca3/0x38b0
->  tcp_send_active_reset+0x422/0x7e0
->  mptcp_do_fastclose+0x158/0x1e0
->  ...
->
-> The issue occurs when tcp_send_active_reset() is called on a subflow with
-> an unset or zero mss, which can happen during fastclose teardown due to
-> earlier state transitions.
->
-> This patch adds a guard to return 0 immediately if mss =3D=3D 0, preventi=
-ng
-> the unsafe rounding operation. This is safe because a zero MSS implies
-> invalid or uninitialized state, and returning zero window reflects that n=
-o
-> reliable data transmission can proceed.
->
-> Fixes: ae155060247b ("mptcp: fix duplicate reset on fastclose")
-> Reported-by: kitta <kitta@linux.alibaba.com>
-> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=3D220820
-> Co-developed-by: kitta <kitta@linux.alibaba.com>
-> Signed-off-by: Evan Li <evan.li@linux.alibaba.com>
-> ---
->  net/ipv4/tcp_output.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->
-> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-> index b94efb3050d2..e6d2851a0ae9 100644
-> --- a/net/ipv4/tcp_output.c
-> +++ b/net/ipv4/tcp_output.c
-> @@ -3329,9 +3329,11 @@ u32 __tcp_select_window(struct sock *sk)
->                  * We also don't do any window rounding when the free spa=
-ce
->                  * is too small.
->                  */
-> -               if (window <=3D free_space - mss || window > free_space)
-> +               if (window <=3D free_space - mss || window > free_space) =
-{
-> +                       if (unlikely(mss =3D=3D 0))
-> +                               return 0;  /* Prevent division by zero */
->                         window =3D rounddown(free_space, mss);
-> -               else if (mss =3D=3D full_space &&
-> +               } else if (mss =3D=3D full_space &&
->                          free_space > window + (full_space >> 1))
->                         window =3D free_space;
->         }
+>Having a single instance seems preferable from user's point of view.
 
-I think you are missing a fix in MPTCP.
+Sure, if there is no need for sharing, correct.
 
-commit f07f4ea53e22429c84b20832fa098b5ecc0d4e35
-Author: Kuniyuki Iwashima <kuniyu@google.com>
-Date:   Tue Nov 25 19:53:29 2025 +0000
 
-    mptcp: Initialise rcv_mss before calling tcp_send_active_reset()
-in mptcp_do_fastclose().
+>
+>> >... because presumably we could use this infra to manage a single
+>> >devlink instance? Which is what I asked for initially.  
+>> 
+>> I'm not sure I follow. If there is only one PF bound, there is 1:1
+>> relationship. Depends on how many PFs of the same ASIC you have.
+>
+>I'm talking about multi-PF devices. mlx5 supports multi-PF setup for
+>NUMA locality IIUC. In such configurations per-PF parameters can be
+>configured on PCI PF ports.
+
+Correct. IFAIK there is one PF devlink instance per NUMA node. The
+shared instance on top would make sense to me. That was one of
+motivations to introduce it. Then this shared instance would hold
+netdev, vf representors etc.
+
+
+>
+>> >Why can't this mutex live in the core?  
+>> 
+>> Well, the mutex protect the list of instances which are managed in the
+>> driver. If you want to move the mutex, I don't see how to do it without
+>> moving all the code related to shared devlink instances, including faux
+>> probe etc. Is that what you suggest?
+>
+>Multiple ways you can solve it, but drivers should have to duplicate
+>all the instance management and locking. BTW please don't use guard().
+
+I'm having troubles to undestand what you say, sorry :/ Do you prefer to
+move the code from driver to devlink core or not?
+Regarding guard(), sure. I wonder how much more time it's gonna take
+since this resistentance fades out :)
 
