@@ -1,87 +1,79 @@
-Return-Path: <netdev+bounces-242879-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242880-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id A16CFC959F7
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 03:54:41 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BFCDC95A03
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 03:57:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5F2CE4E05D0
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 02:54:40 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1500A3418FC
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 02:57:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17E541885A5;
-	Mon,  1 Dec 2025 02:54:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44E7619E97F;
+	Mon,  1 Dec 2025 02:57:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="eLum1Sys"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from out162-62-58-216.mail.qq.com (out162-62-58-216.mail.qq.com [162.62.58.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE5079F2;
-	Mon,  1 Dec 2025 02:54:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BA221885A5
+	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 02:57:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764557678; cv=none; b=N4H2jGRIyo8P2NwldDQlgItJtrL0dtA63DEOQbqKZcUF2UFJWY0LfEydFRMe8JSTsAPSOXXdSbBGHjjz0JtcYCtLY9etj0UUskzMCKpchvxPZG9YTu4xiz7cjZ0XT0QPX+BR96ixTPXrdJf/Gg814U55vxGEB34nsOUUO5V8BG8=
+	t=1764557833; cv=none; b=SCocefmPrH2XcXGJ2UTbsaDuH2MsTXMYOVRXMZ4bOdj+YIVyHyAYGNUvGiTR+FcVIhay2hD0qfTAVWfmD1bEl77tGnaLeqEXbTpx3NmVvHjIbySzBi4UW5zWTvsosmY6Pbdq7RHFhOC1aeMUxXgCMQzkeaYtlL+JeYPBy4eHfL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764557678; c=relaxed/simple;
-	bh=zPeVun2lXFp3lUxpiMBe+ba5hiR+qBkiq2MyrQzJhII=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GVRqv2k5Wc+KQTtfZ3tq6Ww7NVi8Lpq+2jy79SQY6nmiNRJCSVc5tVxE8doFfkbCGWAvNxrpTRXPPO1xYvqP7eQb+tnHJZQIjcgJADb9PCpo6l/TbCLmk6PRDh5ijlItuKJan34OSReusPE48dJodJKnj/tq/d6v1jpRWzUUKc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 086434cece6111f0a38c85956e01ac42-20251201
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
-	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
-	HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM, HR_SJ_PHRASE
-	HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT, HR_TO_NAME
-	IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_TRUSTED, SA_EXISTED
-	SN_TRUSTED, SN_EXISTED, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS
-	CIE_BAD, CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS, GTI_RG_INFO
-	GTI_C_BU, AMN_GOOD, ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.6,REQID:ddb1dc57-30c1-436e-9238-ced6a748a4aa,IP:10,U
-	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:0
-X-CID-INFO: VERSION:1.3.6,REQID:ddb1dc57-30c1-436e-9238-ced6a748a4aa,IP:10,URL
-	:0,TC:0,Content:-5,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:a9d874c,CLOUDID:bebccebbb77851cf1f91f6494c5bc2fb,BulkI
-	D:2512011054219RRSEZPR,BulkQuantity:0,Recheck:0,SF:17|19|38|66|78|102|127|
-	850|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:nil
-	,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:
-	0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 086434cece6111f0a38c85956e01ac42-20251201
-X-User: zhaochenguang@kylinos.cn
-Received: from localhost.localdomain [(223.70.159.239)] by mailgw.kylinos.cn
-	(envelope-from <zhaochenguang@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 241223005; Mon, 01 Dec 2025 10:54:19 +0800
-From: Chenguang Zhao <zhaochenguang@kylinos.cn>
-To: Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	NeilBrown <neil@brown.name>,
-	Olga Kornievskaia <okorniev@redhat.com>,
-	Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: Chenguang Zhao <zhaochenguang@kylinos.cn>,
-	linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH linux-next] SUNRPC: Optimize list definition method
-Date: Mon,  1 Dec 2025 10:54:04 +0800
-Message-Id: <20251201025404.113550-1-zhaochenguang@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1764557833; c=relaxed/simple;
+	bh=tbe1UpgQWOX4QJj3OSyk2spATTcO63b4zAdneq5D1n8=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=EQjixURlcZ038COHyEvcNiL8ILrVLu4i88PiMgJ+54rhug9QscKLD/ZgYx4HecS7IZJmSyGtGspGGtEaXSSh9U9+TEl7FnOkeia64PSLmUujZPPukpmue4KnnpsB6G6kpKG0hyPJTbO2U2mp+DvRcjN0MRNLBxq/Z/6RPsNOTGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=eLum1Sys; arc=none smtp.client-ip=162.62.58.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1764557825; bh=9HG5vIZeG6DjcNDNCfRzCXn+GiaKTQ413V1uAk2ip2E=;
+	h=From:To:Cc:Subject:Date;
+	b=eLum1SysUyevzkZNTmmEMOovuTPPzDfFc5UZ90E08r2Of1AmBaMYCwSSHeVxjDhqF
+	 DRRhGxBwAYrGtOqJmPkm7eiwgW0ZXW7ZpYAK+CX96xnMpLIKwiM1hA40fvYwsnxQ1V
+	 ng0B9ZhlW1Z2F3K4vzb9U/FrYa8x8+7jlzPUfxnQ=
+Received: from localhost ([58.246.87.66])
+	by newxmesmtplogicsvrszb51-1.qq.com (NewEsmtp) with SMTP
+	id E4322249; Mon, 01 Dec 2025 10:57:03 +0800
+X-QQ-mid: xmsmtpt1764557823tgzuvzj06
+Message-ID: <tencent_22959DC8315158E23D77C14B9B33C97EA60A@qq.com>
+X-QQ-XMAILINFO: Na23fxG1dahlIHagbvu0S9yGh7KvCtlJ+jcO/sOXy3vdAOPN2yFS719FrteZgF
+	 L9diDzWuXJWqZExU1tGfwGTKoKbsQPd96/dhd0X3ALf6++rAzohULa9kz10xikHQGUm6Zpp66kWv
+	 EndmwTpJ8176XDKHY1VAOHYbrUfwparkH+uDFkbXszQ/mGkfGX6OwaOolMEeOQbfZdEo6nUdXERA
+	 qgfyqsGWSOePTr0hKC9QobH5+OhwOjqqpCoDKKhLZ6bdqdQnbit7pe13ow92TD0b5RBcsn28o8eE
+	 2yBClEfCtCYb1acj+6km3ATA4kvFqOZrmhY918y0MjHCcfWJpz3QNw4rN7AQ4Snovfxruj/pMU0f
+	 9Z1T2Nxo4L20WvWv7R9Tyqw+vtbJO8/Ok0MP/ZpZJACbt0pO4lZjGfipAmEGt2vzw9SDEX3v9ZVg
+	 /99UFmu9HuQGV9kmVdZSxQ/Nc1CijR4geosETVN37f8SjA0Pg+fBEvkCuU2nfZLLtV8THT6RMs8/
+	 N5nBmKRq9W/2jeCANQ4GgmW6XtHxSlcKEiPJNZzDELEBU/v679NxGXtlG6GN/PXbuZxDD7hw02VA
+	 f6Y/VPu2sVpBQrwsXQTwy1FH8rxbbCYbXgQO/InaNpsIVECYkCFtPcbUhEJJc9yhVcI52We3KR21
+	 cwYL3gyXWs5Z3i1X10ykvfajeF3xQrVXbwE/DVvy18DuiONWy54hx9SREU6piKdV7gTEfpbVUqwm
+	 JaRNBXmM4hKyz0nNlSzU2vBnh+Fyxke/VJrjd03Zbm6T9SLasLq9mLkRKL0sQJYmOCLBfJARz3Bk
+	 pWKaI43RIDyXVY3QX1vlACYHKwRDm+rCP0EtVrJixx+m2VuwAq/NrPSbXC0ZAjPn6xrQBWphlfXP
+	 +PfxuWaq7ShJwjhnXYBIWq9SjEoWpEC4TxjzDKj2gFASzfya1n3jPu7nzjyhs4csv+LFVEg8Ygs0
+	 BOJVKB9qmkGx5qRg2CZSisgMNL9p72YCL/YV3jp5n3k71Rr6ArCHz8aa/NPUC8znOV2Ie8OlFPVS
+	 Y82Q+woOejaL6Bcw4h
+X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
+From: 2694439648@qq.com
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com,
+	hailong.fan@siengine.com
+Cc: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	inux-kernel@vger.kernel.org
+Subject: [PATCH] net: stmmac: Modify the judgment condition of "tx_avail" from 1 to 2
+Date: Mon,  1 Dec 2025 10:57:01 +0800
+X-OQ-MSGID: <20251201025701.16345-1-2694439648@qq.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,35 +82,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Integrate list definition and initialization into LIST_HEAD macro
+From: "hailong.fan" <hailong.fan@siengine.com>
 
-Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
+    Under certain conditions, a WARN_ON will be triggered
+    if avail equals 1.
+
+    For example, when a VLAN packet is to send,
+    stmmac_vlan_insert consumes one unit of space,
+    and the data itself consumes another.
+    actually requiring 2 units of space in total.
+
+Signed-off-by: hailong.fan <hailong.fan@siengine.com>
 ---
- net/sunrpc/backchannel_rqst.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/sunrpc/backchannel_rqst.c b/net/sunrpc/backchannel_rqst.c
-index caa94cf57123..949022c5574c 100644
---- a/net/sunrpc/backchannel_rqst.c
-+++ b/net/sunrpc/backchannel_rqst.c
-@@ -131,7 +131,7 @@ EXPORT_SYMBOL_GPL(xprt_setup_backchannel);
- int xprt_setup_bc(struct rpc_xprt *xprt, unsigned int min_reqs)
- {
- 	struct rpc_rqst *req;
--	struct list_head tmp_list;
-+	LIST_HEAD(tmp_list);
- 	int i;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 7b90ecd3a..b575384cd 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -4529,7 +4529,7 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		}
+ 	}
  
- 	dprintk("RPC:       setup backchannel transport\n");
-@@ -147,7 +147,6 @@ int xprt_setup_bc(struct rpc_xprt *xprt, unsigned int min_reqs)
- 	 * lock is held on the rpc_xprt struct.  It also makes cleanup
- 	 * easier in case of memory allocation errors.
- 	 */
--	INIT_LIST_HEAD(&tmp_list);
- 	for (i = 0; i < min_reqs; i++) {
- 		/* Pre-allocate one backchannel rpc_rqst */
- 		req = xprt_alloc_bc_req(xprt);
+-	if (unlikely(stmmac_tx_avail(priv, queue) < nfrags + 1)) {
++	if (unlikely(stmmac_tx_avail(priv, queue) < nfrags + 2)) {
+ 		if (!netif_tx_queue_stopped(netdev_get_tx_queue(dev, queue))) {
+ 			netif_tx_stop_queue(netdev_get_tx_queue(priv->dev,
+ 								queue));
 -- 
-2.25.1
+2.34.1
 
 
