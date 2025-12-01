@@ -1,208 +1,192 @@
-Return-Path: <netdev+bounces-242909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EDD8C96102
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 08:59:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 26AD1C96138
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 09:11:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id AEF7D34365E
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 07:59:16 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6EC03343D04
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 08:11:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E71E2D73BA;
-	Mon,  1 Dec 2025 07:59:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="mEhg779g"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B9162BE7CB;
+	Mon,  1 Dec 2025 08:11:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012026.outbound.protection.outlook.com [52.101.43.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 881822D3EF2;
-	Mon,  1 Dec 2025 07:59:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.26
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764575954; cv=fail; b=R53VwIE6+jU4DZ+HhdUPKZybgrCjAj6n5efvGuUV0yD1qDFO2HBQr8xE8hpoi1eFLT8SBM8zftvBXiXVTo0kYeEl36ZNGzlCh5UvKzYEYxUv1amtcVfhKKFyKOy6nj+erhjDed7EA7FK0HPLvQTL9BdSRhU8/p6cI+2AJGzauPk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764575954; c=relaxed/simple;
-	bh=iksaNFs69nCJn0LOQSKlXMB0oVDFNkqt0kk6P2X7Jh8=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=I9eyTIk8aqW6Rp+MptkuRLX7t9Eq2wlAmdF0frBX1JEOAqhslsztTFtmT4k0ghiFny5m0JpWddpP0VWLjSYGu1Vpv5V/y+kz/rm+dhurdg8fu2XAu52AH2mo3u648D74wdwuYd8qXj0ovVTowmgDlubwvgSuFUMrVnpi2O4dYfk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=mEhg779g; arc=fail smtp.client-ip=52.101.43.26
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=jg21LB3jpAqflzuvWPHVZhco2duE4oZ/2Jxt0qUYoDrMZfxV+Xc3XKiS/xyV8HuWOzbOc5L3W9d7uFmV1hzoEG7FUbv96kBFGRRRRkYN3dRW31J4lvFnV1b+y+eWQbnZPwAm9j+iYpuNvKr72kbMeRBBq/38aYAa6dl+ssNLsDl+bu0UovEzl6Jd+fD4N2T/ZIOvscs9QL8zw6t1z2BOLeoVn6ylrAblQdEw9fkOX0Bt78zgkB0owq6sKi3qjpMJlXn5Lj3RfUk9Df+QjKocK04YptKkkgFXh5iLEBQNG1J2gmp1E/bgIxB37NEzaLW2MGHyBYcOdWZIbp2Df241dw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GMDbAPQZZMA0ZMxD1HR3r31jI5hut6Zh8Z4IRiWumAk=;
- b=hI+vQEKOWzXM1uhHYyjZzR2rkg5yW+WGhPkniLBB/VOs9NVfAJsYIR5q8eUdF92kSy8D5owuYYfIz+bIiM0UEsDy8tiySebBt8gqaIQs9MXj/sFWXR0C51yfbDo2UySgFIoS9rUppXPhqyCSNHu1WKQ2IykS0sRgpIr1OxlJn5FRVG73yKuheXaaci4buRq5yi5rGzTiqVnes9HQrdTdFVWzhmULNj+kpF/ItSw5S8SLLLvcO/Zg2m1v93ea6VZ4TTQ8tsNJN1DQsAaOscXm7jZ0mXyD08Gmn8eYL8LwwL9z1BsIW9+iaZRWMN1kpgQ8HZc37shsG1cNNkgGnztDKA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GMDbAPQZZMA0ZMxD1HR3r31jI5hut6Zh8Z4IRiWumAk=;
- b=mEhg779gMVbMhXpXU8xfc6/XeOq6fEBQ91V8gre6td3DQSZjmc7b6ylo2xEae1nHvrMIhRAT3TuVX1IAjdS8YpqxJ4NvxiAG/Uxzdz5W91K2xY6Yih6LOCDeSYDwDLVBX4cEaiTgBOr1zZ5JJ5Ae98/ogw/JuB4Teg9ITF4o6t+9LIrVp71qtJCGXPMaZMqw+BwvAWjiyLEcNAHg93x0IP1G3BnZcebYUKiUe2PBJscxHOV3LMKHpH/K6sN7YpGPK5kPDRXhp/fzVCh5uj3goVxJl4XDsBwg4Ins8nYOkIOXPbBymqZ7KQpQps2zuQChRec8/vHVdSv6vFiCXyY5tA==
-Received: from MN0PR02CA0022.namprd02.prod.outlook.com (2603:10b6:208:530::25)
- by IA1PR12MB6411.namprd12.prod.outlook.com (2603:10b6:208:388::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.17; Mon, 1 Dec
- 2025 07:59:08 +0000
-Received: from BN3PEPF0000B36E.namprd21.prod.outlook.com
- (2603:10b6:208:530:cafe::7e) by MN0PR02CA0022.outlook.office365.com
- (2603:10b6:208:530::25) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9366.17 via Frontend Transport; Mon,
- 1 Dec 2025 07:59:09 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- BN3PEPF0000B36E.mail.protection.outlook.com (10.167.243.165) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9412.0 via Frontend Transport; Mon, 1 Dec 2025 07:59:08 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 30 Nov
- 2025 23:58:52 -0800
-Received: from fedora (10.126.230.35) by rnnvmail201.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 30 Nov
- 2025 23:58:42 -0800
-References: <20251128004846.2602687-1-kuba@kernel.org>
-User-agent: mu4e 1.8.14; emacs 30.2
-From: Petr Machata <petrm@nvidia.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
-	<shuah@kernel.org>, <willemb@google.com>, <petrm@nvidia.com>,
-	<linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH net-next] selftests: net: py: handle interrupt during
- cleanup
-Date: Mon, 1 Dec 2025 08:57:24 +0100
-In-Reply-To: <20251128004846.2602687-1-kuba@kernel.org>
-Message-ID: <87fr9uy6oq.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B55EA3C17
+	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 08:11:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764576713; cv=none; b=VnFPh+QCvEe4lNv+jnaEFZDfJ0tPcFb13ttmhBrnh18WL0upNipXWCn0gL5s4NJXLMrXWemEHKInDbHQ5Hgy88fzOnTY2hxD0MbfDaaA+MxjHzZkNtYvC8Bms3bO4mHXlYXZOI0QBbXVbLuJdAyC9Ju2LAGDiZX0m2wAGnkTamk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764576713; c=relaxed/simple;
+	bh=ShU51z3AynPrFjHAh4KfNUZbxOoRPr0IF81C2XIZjWA=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=aqiUAiaeAO9ffpRAizFxl4og9M3IneFNKSYvGO+B6gm/bL3jRDJODcaWfoyvraxd946zvZNIYDwGNS28ZV6CO5lR30r0RZcSUjLZ9YHHTztHIauYo3Cef8uN/MNbQo4ixoyloxScI2uatTubs8CmwAkhCYldwKAtLTbrdXcMSCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-4331d49b5b3so27737735ab.0
+        for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 00:11:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764576711; x=1765181511;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6Iwc2hfL2CiUbmYOuavqFWE6zzw3VAAADszoXI4JzTo=;
+        b=tXBgEf9zM9XjmNiTZ+gTVlaF/qfBztK+zSgrgo9Tir5WwjjbyAt/+PaGLMHCBON4cL
+         1VNg1m2LXAVE0ijA7nsiCe2L98xzhJ5Aijx4t+obeoIjlusJLmEkz9q3tVOvv8a7W5uu
+         wLretkMDHGMJBL5FgifsYKsy+9AbEV42mJvT+B4NzNuEDTxTIu19WlNsYH+5XxTTapi8
+         lWe/8FOjRns2CDfRK9p0iZybEeYqWjb1TCLr/ZEUNPhlgVKSLMuvF7hL2pKzG4Lg8EOH
+         u+0fSPXM505G+4buxAGxyhh/nQegDACm6udCwzas1x+m+53pT/cxMmx2YMFFvbxH+OCQ
+         ne+A==
+X-Forwarded-Encrypted: i=1; AJvYcCXAsMTwMCd+PzGfTx8HCs+3bncsP5mfLf4fd8Yx2gAHDEtB6sOGGWZ5pSWzjob7i0PR/e6PXsc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxf02DL/KKp3UhkzXPA9E7EdXSQDPwYVNR+QLJWPxRZPAK0OTC9
+	3JmyspDg0eI7C4+Ro5dA0iZD91qZLAgC2WrYm62nY3MMV0VPAbKF2vg/L0GkOlcDsp/2EmxOMrT
+	VXH8pOozTB/btcVNewlVmxUHqSC3mJCdK+cf8vRoxMHC6IUrPDCQ1s90bYXM=
+X-Google-Smtp-Source: AGHT+IEubtOWf/nm6qTJVAaELjGS41IpizzAg3T3+r3yI5jsV8yKX1haTWUVtUf4FQ9kx2zzNLcvkFNqjbXIUzxSpdzZsqCY6JK7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN3PEPF0000B36E:EE_|IA1PR12MB6411:EE_
-X-MS-Office365-Filtering-Correlation-Id: f87b1d47-8288-4c84-57e0-08de30af8199
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|376014|7416014|82310400026|7053199007|13003099007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?X0XHidCv4Fw/8fDKBdgPYpt1qHYJbkQzmORdsCNSveXP7KW+ZjZLNVKW4nWL?=
- =?us-ascii?Q?/aUcASiz1Y0er8IktmcUx3Jrk5+8MccDmBUgmgIl1Ri90zsjFAtjaB40oxeH?=
- =?us-ascii?Q?yrg8PGYARvkOCYNCFJiBCyMsxjAU9EXRNrzIrx/7392vvIwd87sYmCJqs7gC?=
- =?us-ascii?Q?xTSkCESI81BUhBMguOXL3M1hxCAgYNtDMDEVZW9ULhhzwaqED0C+8pEekCTG?=
- =?us-ascii?Q?uEkKE1brjz4I0uHvJtjYXGXYqUy6bMucHulX2GeJud7PIqml5J4ZuMw+yjPC?=
- =?us-ascii?Q?HRo14L6cknd7Fxoawo67gkeMDAOnZoWkrKDj1reYav6lpNv/T+n6WEQYZHI4?=
- =?us-ascii?Q?V+GnUji3vk78WEPAdUv0X/VatS1GVWGECEhgKJSvWnRpon0bwvnVqBDZUiaj?=
- =?us-ascii?Q?ZJsCJaRZTcJnYzaSy2vAOzTn4UCl9vrsv02KwbfmOeS007ummdGE7npqE3EX?=
- =?us-ascii?Q?oT3oYtgUwAcEKYhcD/Vmcu42S6a5WmUqVLcyXrDi3oS+xeR6L4XfnsAEgoPU?=
- =?us-ascii?Q?Xb62oM4/QXxliYdpFV2xgN1uqSBa+xW210FIosNblvufD3OE6TWheZlrj2Va?=
- =?us-ascii?Q?m205jFylloGeeVTp2yLzPCJ98d8Hc8ALFP4GGK1g2Hb7Vn7z3VQRsadTdI3L?=
- =?us-ascii?Q?SQJLg6xO6BnGCiZyUq6DE0n71AP9slrnFEI1GsR99L5G1I58W0IdAEveTkIT?=
- =?us-ascii?Q?l2ZbgYPFxSVephCu77/xDowYISKTzMQeBK8BzkGbFxPelNA05F0ur40DURp+?=
- =?us-ascii?Q?sXXThmw5bMWJiItyGQ82PN8ve8Fy1689zXhXGFUfIkcOqBQby2OyzJ3oGsB8?=
- =?us-ascii?Q?nwY9G/bh71SKUh3VEdqftOx2E2KLbuF2vC9MuBP7o1/MTy6twpvWHTYmQEjI?=
- =?us-ascii?Q?H7tZNNYijTGqfeRto2OmBrulCAY5Gm/wabB0O7PKFabReIx+W5KQlWnzlVAv?=
- =?us-ascii?Q?KuLJ0MDsFnK12YMSJQfoVpP1MfPub0eDwn7N6mqByK1RC/iOs60hLuc8li7H?=
- =?us-ascii?Q?Pm8CZiVftTSVCvOCUQWGk/brdThJQ3ceTRyYvtlvpIuah88KwYiaiq9DC2w7?=
- =?us-ascii?Q?l476Jr65Tjpic+TY206O+T5qpmrW99trwf8T+muVW1OvWan5G9yQuiAyVNA+?=
- =?us-ascii?Q?SXla/ISTd44Z2MEdQYlRdwuUr2KnRJipkJlUctELf6EOIXASIwYlcxo27RbL?=
- =?us-ascii?Q?/TeBQ9/kmgVxCW9R8yVFka4ZAmV+ZtDDpi/0LPZVgJzJorDZZgy5th/vEnmS?=
- =?us-ascii?Q?k0yLO5MWzrpOdDxpqzb9wAz6LcXnNV8Y4vES6cwe4ZmysaOd+ExPE3jSqSgo?=
- =?us-ascii?Q?srvqo+q8D4k9mF2+zFO5mWTg0bMVUkqa/9w68+PfeQfzKx7TFjbVY+arehNF?=
- =?us-ascii?Q?oRi28ccYPGakHpozxjLa6s0MY8xP6pSl0seDmSiMa8zrsSgHWwcO/ADPgnG8?=
- =?us-ascii?Q?rk87byTzl5LUvpViplipcua+Ps9D78Pa+6rjxL3y0uXEUduFqsNVoeseRBF6?=
- =?us-ascii?Q?HKLxo7BT2W2paBSynZksTNfHsRBuyzkdvb+IoV2N7ZAs/4+F6WRUGZYZHOON?=
- =?us-ascii?Q?d2LtNxZ2/fWfDX0xRbI=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(7416014)(82310400026)(7053199007)(13003099007);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2025 07:59:08.3006
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f87b1d47-8288-4c84-57e0-08de30af8199
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN3PEPF0000B36E.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6411
+X-Received: by 2002:a05:6e02:156a:b0:434:96ea:ff6e with SMTP id
+ e9e14a558f8ab-435dd13b1e8mr225511735ab.39.1764576710886; Mon, 01 Dec 2025
+ 00:11:50 -0800 (PST)
+Date: Mon, 01 Dec 2025 00:11:50 -0800
+In-Reply-To: <20251130-mq-cake-sub-qdisc-v3-0-5f66c548ecdc@redhat.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <692d4dc6.a70a0220.2ea503.00af.GAE@google.com>
+Subject: [syzbot ci] Re: Multi-queue aware sch_cake
+From: syzbot ci <syzbot+ci3207a09d67ffd3f9@syzkaller.appspotmail.com>
+To: cake@lists.bufferbloat.net, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, j.koeppeler@tu-berlin.de, jhs@mojatatu.com, 
+	jiri@resnulli.us, kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	toke@redhat.com, toke@toke.dk, xiyou.wangcong@gmail.com
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+
+syzbot ci has tested the following series
+
+[v3] Multi-queue aware sch_cake
+https://lore.kernel.org/all/20251130-mq-cake-sub-qdisc-v3-0-5f66c548ecdc@redhat.com
+* [PATCH net-next v3 1/5] net/sched: Export mq functions for reuse
+* [PATCH net-next v3 2/5] net/sched: sch_cake: Factor out config variables into separate struct
+* [PATCH net-next v3 3/5] net/sched: sch_cake: Add cake_mq qdisc for using cake on mq devices
+* [PATCH net-next v3 4/5] net/sched: sch_cake: Share config across cake_mq sub-qdiscs
+* [PATCH net-next v3 5/5] net/sched: sch_cake: share shaper state across sub-instances of cake_mq
+
+and found the following issue:
+general protection fault in cake_destroy
+
+Full report is available here:
+https://ci.syzbot.org/series/469dbe1a-fdda-4481-ae02-4a1ec685d27e
+
+***
+
+general protection fault in cake_destroy
+
+tree:      net-next
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
+base:      db4029859d6fd03f0622d394f4cdb1be86d7ec62
+arch:      amd64
+compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+config:    https://ci.syzbot.org/builds/e4777953-23df-407f-8d5c-6b069ad52321/config
+C repro:   https://ci.syzbot.org/findings/c250604b-a027-4732-9850-88499503b6a4/c_repro
+syz repro: https://ci.syzbot.org/findings/c250604b-a027-4732-9850-88499503b6a4/syz_repro
+
+netlink: 'syz.0.17': attribute type 9 has an invalid length.
+Oops: general protection fault, probably for non-canonical address 0xdffffc0000000006: 0000 [#1] SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x0000000000000030-0x0000000000000037]
+CPU: 1 UID: 0 PID: 5958 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:cake_destroy+0x9f/0x100 net/sched/sch_cake.c:2790
+Code: 81 c3 98 02 00 00 48 89 d8 48 c1 e8 03 42 80 3c 38 00 74 08 48 89 df e8 bf 0f c8 f8 48 8b 1b 4c 8d 73 34 4c 89 f0 48 c1 e8 03 <42> 0f b6 04 38 84 c0 75 35 41 0f b6 2e 31 ff 89 ee e8 eb 4e 62 f8
+RSP: 0018:ffffc90003247298 EFLAGS: 00010207
+RAX: 0000000000000006 RBX: 0000000000000000 RCX: 13d577b5b867bd00
+RDX: 0000000000000000 RSI: ffffffff8bbf08c0 RDI: ffffffff8bbf0880
+RBP: ffffc90003247410 R08: ffffc9000324727f R09: 0000000000000000
+R10: ffffc90003247260 R11: fffff52000648e50 R12: ffffffff895db710
+R13: 00000000ffffffde R14: 0000000000000034 R15: dffffc0000000000
+FS:  000055555e5bf500(0000) GS:ffff8882a9f31000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055555e5bf808 CR3: 00000001bb50a000 CR4: 00000000000006f0
+Call Trace:
+ <TASK>
+ qdisc_create+0xaa3/0xea0 net/sched/sch_api.c:1353
+ __tc_modify_qdisc net/sched/sch_api.c:1753 [inline]
+ tc_modify_qdisc+0x1547/0x2020 net/sched/sch_api.c:1817
+ rtnetlink_rcv_msg+0x77c/0xb70 net/core/rtnetlink.c:6967
+ netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2550
+ netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+ netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1344
+ netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1894
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg+0x21c/0x270 net/socket.c:742
+ ____sys_sendmsg+0x505/0x830 net/socket.c:2630
+ ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2684
+ __sys_sendmsg net/socket.c:2716 [inline]
+ __do_sys_sendmsg net/socket.c:2721 [inline]
+ __se_sys_sendmsg net/socket.c:2719 [inline]
+ __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2719
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7ff769b8f7c9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffd59035098 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007ff769de5fa0 RCX: 00007ff769b8f7c9
+RDX: 0000000000000000 RSI: 0000200000000000 RDI: 0000000000000003
+RBP: 00007ff769bf297f R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ff769de5fa0 R14: 00007ff769de5fa0 R15: 0000000000000003
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:cake_destroy+0x9f/0x100 net/sched/sch_cake.c:2790
+Code: 81 c3 98 02 00 00 48 89 d8 48 c1 e8 03 42 80 3c 38 00 74 08 48 89 df e8 bf 0f c8 f8 48 8b 1b 4c 8d 73 34 4c 89 f0 48 c1 e8 03 <42> 0f b6 04 38 84 c0 75 35 41 0f b6 2e 31 ff 89 ee e8 eb 4e 62 f8
+RSP: 0018:ffffc90003247298 EFLAGS: 00010207
+RAX: 0000000000000006 RBX: 0000000000000000 RCX: 13d577b5b867bd00
+RDX: 0000000000000000 RSI: ffffffff8bbf08c0 RDI: ffffffff8bbf0880
+RBP: ffffc90003247410 R08: ffffc9000324727f R09: 0000000000000000
+R10: ffffc90003247260 R11: fffff52000648e50 R12: ffffffff895db710
+R13: 00000000ffffffde R14: 0000000000000034 R15: dffffc0000000000
+FS:  000055555e5bf500(0000) GS:ffff8882a9f31000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055555e5bf808 CR3: 00000001bb50a000 CR4: 00000000000006f0
+----------------
+Code disassembly (best guess):
+   0:	81 c3 98 02 00 00    	add    $0x298,%ebx
+   6:	48 89 d8             	mov    %rbx,%rax
+   9:	48 c1 e8 03          	shr    $0x3,%rax
+   d:	42 80 3c 38 00       	cmpb   $0x0,(%rax,%r15,1)
+  12:	74 08                	je     0x1c
+  14:	48 89 df             	mov    %rbx,%rdi
+  17:	e8 bf 0f c8 f8       	call   0xf8c80fdb
+  1c:	48 8b 1b             	mov    (%rbx),%rbx
+  1f:	4c 8d 73 34          	lea    0x34(%rbx),%r14
+  23:	4c 89 f0             	mov    %r14,%rax
+  26:	48 c1 e8 03          	shr    $0x3,%rax
+* 2a:	42 0f b6 04 38       	movzbl (%rax,%r15,1),%eax <-- trapping instruction
+  2f:	84 c0                	test   %al,%al
+  31:	75 35                	jne    0x68
+  33:	41 0f b6 2e          	movzbl (%r14),%ebp
+  37:	31 ff                	xor    %edi,%edi
+  39:	89 ee                	mov    %ebp,%esi
+  3b:	e8 eb 4e 62 f8       	call   0xf8624f2b
 
 
-Jakub Kicinski <kuba@kernel.org> writes:
+***
 
-> Following up on the old discussion [1]. Let the BaseExceptions out of
-> defer()'ed cleanup. And handle it in the main loop. This allows us to
-> exit the tests if user hit Ctrl-C during defer().
->
-> Link: https://lore.kernel.org/20251119063228.3adfd743@kernel.org # [1]
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: shuah@kernel.org
-> CC: willemb@google.com
-> CC: petrm@nvidia.com
-> CC: linux-kselftest@vger.kernel.org
-> ---
->  tools/testing/selftests/net/lib/py/ksft.py | 18 ++++++++++++++++--
->  1 file changed, 16 insertions(+), 2 deletions(-)
->
-> diff --git a/tools/testing/selftests/net/lib/py/ksft.py b/tools/testing/selftests/net/lib/py/ksft.py
-> index ebd82940ee50..531e7fa1b3ea 100644
-> --- a/tools/testing/selftests/net/lib/py/ksft.py
-> +++ b/tools/testing/selftests/net/lib/py/ksft.py
-> @@ -163,7 +163,7 @@ KSFT_DISRUPTIVE = True
->          entry = global_defer_queue.pop()
->          try:
->              entry.exec_only()
-> -        except BaseException:
-> +        except Exception:
->              ksft_pr(f"Exception while handling defer / cleanup (callback {i} of {qlen_start})!")
->              tb = traceback.format_exc()
->              for line in tb.strip().split('\n'):
-> @@ -333,7 +333,21 @@ KsftCaseFunction = namedtuple("KsftCaseFunction",
->              KSFT_RESULT = False
->              cnt_key = 'fail'
->  
-> -        ksft_flush_defer()
-> +        try:
-> +            ksft_flush_defer()
-> +        except BaseException as e:
-> +            tb = traceback.format_exc()
-> +            for line in tb.strip().split('\n'):
-> +                ksft_pr("Exception|", line)
-> +            if isinstance(e, KeyboardInterrupt):
-> +                ksft_pr()
-> +                ksft_pr("WARN: defer() interrupted, cleanup may be incomplete.")
-> +                ksft_pr("      Attempting to finish cleanup before exiting.")
-> +                ksft_pr("      Interrupt again to exit immediately.")
-> +                ksft_pr()
-> +                stop = True
-> +            # Flush was interrupted, try to finish the job best we can
-> +            ksft_flush_defer()
->  
->          if not cnt_key:
->              cnt_key = 'pass' if KSFT_RESULT else 'fail'
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
 
-Nice.
-
-Reviewed-by: Petr Machata <petrm@nvidia.com>
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
