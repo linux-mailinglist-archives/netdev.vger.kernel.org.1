@@ -1,92 +1,92 @@
-Return-Path: <netdev+bounces-243059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AC8BC99114
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 21:42:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 28A6BC99159
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 21:51:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0BF614E1705
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 20:42:21 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 01F394E2479
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 20:51:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FF40268C40;
-	Mon,  1 Dec 2025 20:42:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C678F25C804;
+	Mon,  1 Dec 2025 20:51:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bADbBy+k"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dt0WKWEZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCFB925392C
-	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 20:42:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FE3523D7CA
+	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 20:51:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764621738; cv=none; b=RTGVtY432XH2B+waH6Hxs+rTCHNDTA25YyTeoYzL55Q4lXp1bmDAENfXHUjGhYXIuTzX91xSxcdTihZkvsi33tpAtDN1dliPlJ2Y1wRyl+NtifpRNSLRHVLySX01jHoJT0gBvrz83b/thH9vphSbFL9gO3pmSVzh5rj/UlCR8+A=
+	t=1764622311; cv=none; b=btabVXpuoTZJugnwc2ryHnNGFW332bvCVA7stTDrTWaGrKDIv0bTRqBd53QnCezTM80BmQP8bS6zqr0MuzNt/iNkaJV/scV1Id8OJVSFrC0Y08AaTqD0Uc+QFTWIuN40yvTn3ysGTCNfXFo8rp1Vj2hZRjmqeYVrT6sZ//UVtyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764621738; c=relaxed/simple;
-	bh=vWhHYWcd8FkuJuynK1LVlrehlybhEZwZ8sV261Ob9ls=;
+	s=arc-20240116; t=1764622311; c=relaxed/simple;
+	bh=4KoOzqv+ipGv0rqgnbX7X1rXY08lVBleYOU3gfU0n9k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eDRErF0d7Z3vR7KUOtVe7jSr29EGqZ2OfZb/7lB5JfZAWne9YS6nq75Dx2TVVdM3N02bSB+8LBk887XvsmJRAcxC4GmHdMQhtU7FC6K/R++i+aUacCnUPyn1CRzBGo8XApufsIp7SB0R+wSSj9FrOUpRltKRaqnsmUy0Z7YXNwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bADbBy+k; arc=none smtp.client-ip=209.85.215.178
+	 Content-Type:Content-Disposition:In-Reply-To; b=mu25I3iNJeWYrBraSp3cY8jDdUfYXoeH8YNSz5PnT6Pn5mLq/yY0OCMUSKX5ORhjstVSJB4wgC7afSc8yBiK/t7BguvkDbSEAlEoYUzzJaw8//ln7kvfR/yFDektjv2Ke7iJg1xcXKDmlvvkYgnY9TDEH6R7QjCC6SgpiXg16+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dt0WKWEZ; arc=none smtp.client-ip=209.85.215.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-bd1ce1b35e7so3327911a12.0
-        for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 12:42:16 -0800 (PST)
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-bc17d39ccd2so2437407a12.3
+        for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 12:51:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764621736; x=1765226536; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1764622309; x=1765227109; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=j4a04C7Gv91IN9J+tTHkfFNqJRITFzlmgP6sbkAcNZg=;
-        b=bADbBy+kPosRZap3x0D1liAwG3ltp6OTkNftnDLS44Otcr2uW6D0m7qEO5Z6zp1VSp
-         h2p2xW8eKGvUSd2lUrdIYt9//UsQkS9RCKxSiGEBIxT8QI/AnKTBmRWtQ/Ud2TXuHBVU
-         6HhRusuPi/5XK9ImAF8X3bG60CzszvS/TU22ZnYrmAcDJUdFWioSFz+bgdcmbjl7kIRq
-         y2U74owvaDAO7fSH8zWF6K88bYIxyosIoAmXLuUgWcHoN8PLWwCN2WCtE+nm7hBwU1QF
-         RPBghEFWc1jGyLMI7xsyk/27JAQCRwnRxlorpHI2OFCc3F//8Eb8qGQzIlX+tnXcSNzY
-         ZEeg==
+        bh=Q/UP587KpUNebVt7/3EF26h5ZIXHGWKuQxdNdoes2rQ=;
+        b=Dt0WKWEZP2HNGIllH2dcLL4ZwZj4/mgYUDslS3QdzzPUmfGyRV8VL/yguiJ8kVqiKI
+         +3sI1664knGB7gdgHRVt1pIAa4ztYb8mZOi4Si73rvZOcPWh3PuAkzvSV+GhLkWAGQTs
+         GGnehs1wha9IvGLfs2GTd9PBmlE1CnsRqsudX27lVeyMG8WwJWk8COX/NWFf/j1wjD4I
+         P2EznpYfONe++XTFYcbyegiFk0wYyZaBrf6Pwd57rJWEsBTdLL1wkKr57cN7Kk1gSDSa
+         Xzce/cff7VKGeBNTVBRByiqIOdcqElSsmRFaDe31NjqQz4f6poO7/iFPb3RUMyQ2q66u
+         DbYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764621736; x=1765226536;
+        d=1e100.net; s=20230601; t=1764622309; x=1765227109;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=j4a04C7Gv91IN9J+tTHkfFNqJRITFzlmgP6sbkAcNZg=;
-        b=p5abg2dw8c1m8/VY3xDK0hFFkX4UjUUOp8ocB5B59tfRlLKZ+jwT42Ok9nSzWx4Sv/
-         HPDZn054Qeu36EkxM+DN7c8zuJhgQE5ATZHH7frOXvCxr3CbvIrtPSwH5KGndS/23+mV
-         rLhmTwYxb5Lb6+TxzExgSzoNjIb3Oss2OQIN4cD5wUJgHntlgCSQT5GkEA6O65ON4PQ+
-         yc8WAFqAsMik4SqGF8Z3Xl/rW/yKC1nxNeSeFCEFsZjNzoHD/pVaE3MkzSwjgJtSBWBH
-         XnHyuynPP+Uo6spWtsCmZkInGcAlO8ln8yk/KiL+3Q6ZddfFryK+adglHkZHobEdQgaA
-         F4qg==
-X-Forwarded-Encrypted: i=1; AJvYcCWSeB9carLF33CO+7K2TCGuh/gcooMgZM6ooFMxNAIStXXETuzgAo+wD0PalgT//DqaZoMIMZY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwthXBaz2geAnmxR55gEbdhvRaGZGGSlaMLKebqr7tjZ9tn9bOC
-	XzjcD9uoAtE2OnUe+ZI+cm+NcIhscm+TUq/QhcQscMZOKFOEuGixpNsx
-X-Gm-Gg: ASbGncuHpYTO/PjRbn4/Y4YLVVaacadm0BvWloroNS5CEe1wg+OSgROL0PNhHMu+dkv
-	HzKw+HaiPBfWiFUbzy8iLMmHqmbefUdfY8TeqnXF5Dg/oOynTb+sLVmeCfQGyk/KuC/7w0CHlIU
-	xRsy+QbbRTS2tZil/H9v9EZAW4xD2T/+F9jgFkeq8F6syb9RSz+E26CQWyvXFY8mcr7QYQQTiR2
-	RWxXOq2uw7DVgGQDhoIxtiQvB2H+cw6X/WI+0NFjdHTqmD4E79raKgXQUJOvM4+y13oWbXf7wVV
-	htuM5vOLBUEH5+ZOVwc5OVRPdbuBtsYao5owN+6HwqN6ci0go9++pFiAwX4WdzfDmgwUjp7fFbl
-	iMZ9mjgJmtJuXYf+s6SwRcfuPIFeTSypB39wjdPVxzkYMFbeZLoJtLc+NJSC+KZ9rQgziopY8rv
-	M6+fGv+XPttA==
-X-Google-Smtp-Source: AGHT+IEUCOu8J3fhboGnkGeN6j7MlyXHwAIoUZSiGO7WSwiFSdrln4sag31RrIgUhi5uAsL3T41UWg==
-X-Received: by 2002:a05:7301:4887:b0:2a4:3594:72d7 with SMTP id 5a478bee46e88-2a719098177mr23906464eec.6.1764621735855;
-        Mon, 01 Dec 2025 12:42:15 -0800 (PST)
+        bh=Q/UP587KpUNebVt7/3EF26h5ZIXHGWKuQxdNdoes2rQ=;
+        b=E81vN/OJQO/qgbmUEF3yHbtnsHRfgktIg6gIV1sVeVtcDJ7wqGtkiuaOJ0qG/UF7bW
+         jlKwRkjC9xjqm9Ynx0I6+7r24mGer0MlfQ4vVWsIPHab8GDQ3Bny1myf2GQOrQ5AshaA
+         LFKU5K2Hh/oNfD0xEOrITrAGAD6ujNpHKCGon1+c0KhxVxWFY/SqyGIQGFflFOjiU5kR
+         WrgIVpJW6xOzvudIr08oUNKr7Jh998YF8GSpT2hH8AnS9g4SYN+Xs6WnjaFnDGcE1Qb4
+         RNevr70UkNUbt4Ilrl7m6dkQBbtl04bdaybfgKTGNJdpkT+jNm9EjIYz0sc53wXFTQps
+         O74g==
+X-Forwarded-Encrypted: i=1; AJvYcCUvJOnwT88+cm44e6d1jbqUGh9VCFjilNtj6Bw3iTsGKO+xjVUHkNQ+cpXgOL26G2UGNFpjUKI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzL9tvavKFO5mourPOt2955gUOg8xyc7SriErZVBjrWhTLEJ1Sq
+	cWIgyUJZieeOFv/+KqKtntYYcznWIijGyVsAoSwOHsdWt30IwXDcrxx8
+X-Gm-Gg: ASbGncuHdavuDwYYVICgKq/s1Qdy7IhAVTt7oOX7I1QZJDFnTbaVcFppIfr8TdKCWpk
+	NnExuXqs1vH7DIgYqApPrlt8b8gVAhpF7I3ngc/24sE1lWCaVCZ0kspYtshf670G5f4gn1YR7gz
+	u2/Int79IfS3T8i+lmVHrhbtnaHRHE3uf0XfQ03eORxwle3q5dORfW8xr8soWW8opkxFTztPxJL
+	faqQ/ANUrLuoG0kEgDgQKEFbwmAtTaJMid0/O+1CkEm27U4aJarL797DecEsdRD+2x5T0vttm1r
+	jqij0I4ZEwyyz/gH0p2s5dmsgKRHcrhA0VI3UEcbvtiDTjkZAFaNvore7nnyODb/zQTEfFgTADm
+	jgwJwLzJhgRyNAsFOpS1qW0SAj+e50pff3wUlW8yBhTTqIq0/ekvaPvZ6P6gBomNN351iu+6/jB
+	NJBoCDfDzTEztnfe84xzkq
+X-Google-Smtp-Source: AGHT+IFSdO41XCfP0s9UoVBQECd3PUp4tktUJA19IyF8le2ikthW676EtTvcvuJcSrLdqZ8+wP3wiw==
+X-Received: by 2002:a05:693c:2504:b0:2a4:3593:466d with SMTP id 5a478bee46e88-2a9415a2a6dmr12482341eec.9.1764622309241;
+        Mon, 01 Dec 2025 12:51:49 -0800 (PST)
 Received: from archlinux ([2804:7f1:ebc3:d24b:12e1:8eff:fe46:88b8])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2a965b1ceeesm46285150eec.5.2025.12.01.12.42.11
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2a965b1ceeesm46355372eec.5.2025.12.01.12.51.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Dec 2025 12:42:15 -0800 (PST)
-Date: Mon, 1 Dec 2025 20:42:07 +0000
+        Mon, 01 Dec 2025 12:51:48 -0800 (PST)
+Date: Mon, 1 Dec 2025 20:51:40 +0000
 From: Andre Carvalho <asantostc@gmail.com>
 To: Breno Leitao <leitao@debian.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
 	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v8 0/5] netconsole: support automatic target
- recovery
-Message-ID: <5gwhtnb6yo56u2gozm566mlhorg4j6cjfrqtqqmw5naj2i7s2b@42a7wsrajnt2>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v8 4/5] netconsole: resume previously
+ deactivated target
+Message-ID: <gmzstxyozxprqt4g6qotq6tjkbzx25e2c5mvvah6w43uvullw4@6vzf7qtvvh62>
 References: <20251128-netcons-retrigger-v8-0-0bccbf4c6385@gmail.com>
- <20251128161133.3397b20c@kernel.org>
- <htqwtsgxsffbjbccd62kzcdaa2uxezdtywudcrfghydym7axad@4j46eyxzvhte>
- <q4l6chqvikl4zgypqysdd5ri2vt6p4qdq2f4l66nxfbm7q5wo2@qwvwkilyzzoh>
+ <20251128-netcons-retrigger-v8-4-0bccbf4c6385@gmail.com>
+ <65vs7a63onl37a7q7vjxo7wgmgkdcixkittcrirdje2e6qmkkj@syujqrygyvcd>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,26 +95,89 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <q4l6chqvikl4zgypqysdd5ri2vt6p4qdq2f4l66nxfbm7q5wo2@qwvwkilyzzoh>
+In-Reply-To: <65vs7a63onl37a7q7vjxo7wgmgkdcixkittcrirdje2e6qmkkj@syujqrygyvcd>
 
-On Mon, Dec 01, 2025 at 02:46:25AM -0800, Breno Leitao wrote:
-> > 
-> > Looks like it comes from Breno's patch [1] which was also part of the same testing branch.
-> > Not sure how to proceed here, I suppose we would need to pick one of the series to apply
-> > first and then respind the other one.
+On Mon, Dec 01, 2025 at 03:35:04AM -0800, Breno Leitao wrote:
+> Given you are completely lockless here, so, there is a chance you hit
+> a TOCTOU, also.
 > 
-> I would like to have this patchset intergrated first, and I will rebase
-> mine on top of yours.
+> I think you want to have dynamic_netconsole_mutex held during the
+> operation of process_resume_target().
 > 
+>   * mutex_lock(&dynamic_netconsole_mutex);
+>   * remove from the list
+>   * resume
+>   * re-add to the list
+>   * mutex_unlock(&dynamic_netconsole_mutex);
+>   
+
+This is a pretty good point. Will address this on the next version.
+
+> > +	if (bound_by_mac(nt))
+> > +		/* ensure netpoll_setup will retrieve device by mac */
+> > +		memset(&nt->np.dev_name, 0, IFNAMSIZ);
+> 
+> This is a clean-up step that was missing whent the target is getting
+> down, and htis is just a work around that doesn't belong in here.
+> 
+> Please move it to netconsole_process_cleanups_core(), in a separate
+> patch.
+
+Sounds good. Will include this as a separated patch on the next version of this
+series.
+
+> Something as: 
+> 
+> 	list_for_each_entry_safe(nt, tmp, &target_cleanup_list, list)
+> 		do_netpoll_cleanup(&nt->np);
+> 		if (bound_by_mac(nt))
+> 			memset(&nt->np.dev_name, 0, IFNAMSIZ);
+> 			
+> 
+> Ideally this should belong to do_netpoll_cleanup(), but let's keep it in
+> netconsole_process_cleanups_core() for three reasons:
+> 
+> 
+> 1) Bounding by mac is a netconsole concept
+> 2) do_netpoll_cleanup() is only used by netconsole, and I plan to move
+>    it back to netconsole. Some PoC in [1]
+> 3) bound_by_mac() should be in netconsole and we do not want to export
+>    it.
+> 
+> [1]:
+> https://lore.kernel.org/all/20250902-netpoll_untangle_v3-v1-3-51a03d6411be@debian.org/
+
+The reasoning makes sense to me. I considered performing this cleanup on netpoll,
+but given your patch opted for this 'hack' before setup - I think doing it on
+netconsole_process_cleanups_core makes more sense. 
+
+I need to check this more, but I'm wondering if we would be able to completely
+remove dev_name and dev_mac from netpoll and make it part of the netconsole_target.
+Perhaps as a future refactoring after your patch series.
+
+> 
+> It needs to be initialized earlier before the kzalloc, otherwise we
+> might hit a similar problem to the one fixed by e5235eb6cfe0  ("net:
+> netpoll: initialize work queue before error checks")
+> 
+> The code path would be:
+>   * alloc_param_target()
+> 	  * alloc_and_init()
+> 		  * kzalloc() fails and return NULL.
+> 		  * resume_wq() is still not initialized
+>   fail:
+> 	* free_param_target()
+> 		* cancel_work_sync(&nt->resume_wq); and resume_wq is not
+> 		  initialized
+
+Ack. Will fix this.
+
+> 
+> Thanks for the patch,
 > --breno
 
-Hi Breno,
-
-Sounds good. Since I'm going to respon this to address your comments and will
-wait for net-next to re-open I'm also completely fine with rebasing/addressing
-the incompatibility in case yours is ready to go. Up to you!
-
-Thanks
+Thanks again for the review. Will submit a new version addressing all the comments
+once net-next re-opens.
 
 -- 
 Andre Carvalho
