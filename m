@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-243065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0D4CC99256
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 22:13:46 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB0A3C9925C
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 22:14:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D95FB4E29D0
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 21:13:26 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C8E0D4E249D
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 21:13:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CB492848BE;
-	Mon,  1 Dec 2025 21:13:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77328286D72;
+	Mon,  1 Dec 2025 21:13:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FzW94nFe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZqZmczoi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1635B2848A4;
-	Mon,  1 Dec 2025 21:13:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FAF2286418;
+	Mon,  1 Dec 2025 21:13:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764623595; cv=none; b=RcApwRlbZyCx7aiTLhl8vy9D74QsELRqthKSWd0TPi0xijZp0rK1d30NK+XHdHwlzVkbXHIahZ+Ae1xNT0TVwlgJ5bxLVDL3E2niLrPb2g+c5SmIITxSQO51AxQfiHTPbD7VKUP/cirPM0xFPSe3ie5+7AwywRNmlw7ONvH7bUI=
+	t=1764623596; cv=none; b=jzzcaThWTcw844neJBiKCk7UjdnnJF09oeIerqfs34JZKBYlGIFAWiRjXtn5Hhxme/LBwEhGi0qTEtZW0CI2ORuxPNjRmGUofv7mpUbu6onp3J3/rQprxSj55HIhQJWUOFax+ci2NNy2VPWFtfjOXDvU0Zxs1Y8aZ8n+g946oHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764623595; c=relaxed/simple;
-	bh=alCTcQluu+L0ZBPFjhtp8GkMPj31UpMHXoYwlY70EA0=;
+	s=arc-20240116; t=1764623596; c=relaxed/simple;
+	bh=tY1DXM8ZSq3IEqnZKUV4mOlLDuSi5609HpoHw/gSg+g=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Tnwgp6Cpeu0mKyLeGaEbtuCreFLb3EOwbPx6MHZz7a3r98rqsO3QYQafbSZFjlHG+GGh2C8Ef0lQDQtLYsbeXdiZbqikD+bM33LC1jVgxltJHi9y3pshPeBt76c1ENrEdGLItGyQVg4v/YOjTt5qneGw3Y1R6rvL5dR/U5Vq7jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FzW94nFe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89515C4CEF1;
-	Mon,  1 Dec 2025 21:13:14 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=AwHuGglFKTaUX0Nomxi3OGrkNlfk0xELkwDlerQqz7QgNuxeboUtdcTeptyMuxeR5gDJcgiTTQqfC2fF94Z5WKKMetMTVDrO0X+X8CjiuqKxeiyJ0J2Zkvd/Z6BhKGRaz/309N+X9SFQcDctFSsQuLkmlB6NUY4Y6YZtlwsjw+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZqZmczoi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9C05C116C6;
+	Mon,  1 Dec 2025 21:13:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764623594;
-	bh=alCTcQluu+L0ZBPFjhtp8GkMPj31UpMHXoYwlY70EA0=;
+	s=k20201202; t=1764623595;
+	bh=tY1DXM8ZSq3IEqnZKUV4mOlLDuSi5609HpoHw/gSg+g=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=FzW94nFe8AzKq8Sp7TY3/mc4TH/+DowJrGouQAKjpi4PACKB7r4iv4UW3JCA012g0
-	 y3wclMc465s/eB3lHG+m12mg3v/0htZfgn9BzZ/YNqljR6+OlW8SJ6kQopZouZd67r
-	 jo9M8dGJBBIrUI4jOs6Yijlpcm7m8P0eqlfFWMSxgxmUe/MZO8Ozav2V38DOFvrv5f
-	 r+cwEKDY3KAxToxVXSS1XkxEpZSo+2BIlE5rkBORWHk4XC9IEyOyDavYCfD673FQvM
-	 DZdQS1JppALLzr/F39dQIfAdu8lKaUuKQGp2/40eTnlfjxxkYTYuPNx04evExloQwd
-	 VEEkrY79E3OIQ==
+	b=ZqZmczoiNdlJzsE/PTYGXlG7cmbnJOdmZRLP6clOSHNqnbNbEohDoPIJkrVDQIvHP
+	 paVbD9yBI5bfO4PchxbPxy2fcjKfAIykzlrvhRxIx6zmI2xyM0qIS+P9/XZdl1Yudw
+	 9gbD0Yl9mgKMfuP6U9nT3wJsvCm68R64m5Kv2OXg/Z3q+F+ZC9xi+mXw0Oo1edaZ5D
+	 wp2OzRxlg/APPeH3vIRzn2IGDXBD4tfvoi/Gwdh+Gnrhq4Y9XOFuaFQU8zS+0yJr3j
+	 hbgErjqxdhNlu8M+HVBzfDeUaRO4LqSiB3JjFG5rV+aXgA5/NxpYkjesOlCAEHRJ63
+	 I4qiUkXkz5Ung==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B590C381196A;
-	Mon,  1 Dec 2025 21:10:15 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F2775381196A;
+	Mon,  1 Dec 2025 21:10:16 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: dlink: fix several spelling mistakes in
- comments
+Subject: Re: [PATCH net-next] selftests: net: py: handle interrupt during
+ cleanup
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176462341428.2539359.4401989672794830061.git-patchwork-notify@kernel.org>
-Date: Mon, 01 Dec 2025 21:10:14 +0000
-References: <20251130220652.5425-2-yyyynoom@gmail.com>
-In-Reply-To: <20251130220652.5425-2-yyyynoom@gmail.com>
-To: Yeounsu Moon <yyyynoom@gmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ <176462341577.2539359.474015232966302072.git-patchwork-notify@kernel.org>
+Date: Mon, 01 Dec 2025 21:10:15 +0000
+References: <20251128004846.2602687-1-kuba@kernel.org>
+In-Reply-To: <20251128004846.2602687-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
+ willemb@google.com, petrm@nvidia.com, linux-kselftest@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon,  1 Dec 2025 07:06:53 +0900 you wrote:
-> This patch fixes multiple spelling mistakes in dl2k driver comments:
+On Thu, 27 Nov 2025 16:48:46 -0800 you wrote:
+> Following up on the old discussion [1]. Let the BaseExceptions out of
+> defer()'ed cleanup. And handle it in the main loop. This allows us to
+> exit the tests if user hit Ctrl-C during defer().
 > 
-> - "deivices" -> "devices"
-> - "Ttransmit" -> "Transmit"
-> - "catastronphic" -> "catastrophic"
-> - "Extened" -> "Extended"
+> Link: https://lore.kernel.org/20251119063228.3adfd743@kernel.org # [1]
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net: dlink: fix several spelling mistakes in comments
-    https://git.kernel.org/netdev/net-next/c/40d5ce4af206
+  - [net-next] selftests: net: py: handle interrupt during cleanup
+    https://git.kernel.org/netdev/net-next/c/4b1639cac04c
 
 You are awesome, thank you!
 -- 
