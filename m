@@ -1,164 +1,159 @@
-Return-Path: <netdev+bounces-242906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A9CDC960A2
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 08:43:25 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 098B5C960D5
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 08:49:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 04245343458
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 07:43:25 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7C8EC4E11C9
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 07:49:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF6912BDC29;
-	Mon,  1 Dec 2025 07:43:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D64012C08D5;
+	Mon,  1 Dec 2025 07:48:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E9zGbIVA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eR7qheCD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43C8E2882B7
-	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 07:43:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABEC07E110;
+	Mon,  1 Dec 2025 07:48:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764575000; cv=none; b=l2vTOb2w+SARcFY/tOFSHMrICLULO9sVytFgrMpEchjFy5TJNMSAd7lQd9ulMDZVZRexLs8iyuShUXIrN6hrSZ/6VgmOcwfhCU0lSNvrj7YGS0CFlMh7tHEovA8J6q9HYmhUhebsf0p2u45vR/RZP5VYhnAJ47qXh37cDfKn1hM=
+	t=1764575337; cv=none; b=r6TG20AcooFHe9uhnhDJ77+s9D5jt7DP1uSdijwe5C5ayxFov5kRsIJQE+5GeR83y46j3ZBbXNqstMUTpznL5SyVWkt4YNaXi6DGcA7jaQlHbAPIOhszaL5afixK+dFQiEQEXVDuJc1YS9nynn5atoqTQD7AduJA9XUZucIkfMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764575000; c=relaxed/simple;
-	bh=nB4KU6Fqp2bXgE/0Yo/+PobWzkr4bvHULqgFGB8+xR4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kc/3w6HctYQAzvT5U8SLVUuIncUvVCKXaYBWlkYuu5jMTb7cjX5IqO9Jto8n5yXmVguyaF5+WCPoKt1f6cdd2oX3Fa6aKcNBkmB6elD1rjwOmIpiL6OPqTiPtnnJY+L8nDDvlNfaDeyOTeFwQ/6rsb1oSEK7PVlIHjY4Mqoo30I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E9zGbIVA; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-343f35d0f99so2899761a91.0
-        for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 23:43:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764574998; x=1765179798; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fZj+RuFEFi0w12bkYaEUrPOeFpTx+IAsLhnJ0WkDL4k=;
-        b=E9zGbIVAbcrpe6uZSaIxffP3qcwlwWNZLRhQHQAvUw34GijBNJ8oeVWWcpqDjuvJxe
-         zuH2MhKgyJuPgk7pVU90VOvz87XS7PkG2nlnPhtC+1sfHV0/+dJo8inXN/Oxfts86Zwc
-         JrqDtT930zKNpJa1q7VYeOqhheL2Dhn2ycO/MulVtjbBaM/wm7qs8IoHquBny7uFP2H9
-         pZLyCc1PDXLYfVX1Umd/+oscsLFsenigYWL+K1qPzYNk7kR1z5r2TjyD+GucXPPrpPLR
-         kgggQ5voi4v0IFs5huu0GrTT6XPiOyQUGOmuh5zO7P2eUgGxNTeZ9sjS6+TiVaLgjmup
-         2HhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764574998; x=1765179798;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fZj+RuFEFi0w12bkYaEUrPOeFpTx+IAsLhnJ0WkDL4k=;
-        b=ft2Q02/QjA/1Pdovebd81J/kH3rMW+HhB3AkQrlda4t9qHB3k5BxtkkW/kHsgOW4sO
-         NqctwkRLiWHcSecOU7HXoFfKMBJVquuQvnTW2T2w/K1pLk4yh61/VT4cKZQUxQ6KaFEu
-         cvIJg//5OiuW/PYdT8d8QrRY0lDrG0KO7/QWNF/dcih8+rVKOs+UMz27ylbrUnqpDzsm
-         elvr2VLsPNkD39b+yQaVfZQYiZx2liSKVGNh7fLXdm5Q4nhreYQM1UYpO/xUyjFodpT4
-         ttzrarNENrLYZV0Kc75wFqCYZpgox4MqqQo1/j9WFYoQZ6kJvWLAX3KlTRqBiGOHdYbY
-         v98A==
-X-Gm-Message-State: AOJu0Yxf6TKHXjL+kNGXJshqNCgthm4Zp/J4UgkyvZEPVym9IKReVaxP
-	h28VcKc5qThdS4rhz4pzZllaLTyOhM6cfwWeLD69MkFoxsUmtoRajcY/
-X-Gm-Gg: ASbGnctl5K2KS6cvCZoA4u4y1AtI0JSWGsAERZwvhWELRuF/KQ5ULHsKyHpqA0K+qcI
-	RrFLrFIIdK1eTNj9cv/mWXfcHgOa1HyFJk/OZ9WN4b7sETo/VW2Eqk5vWNA+cxt4uDYxxmAU7Tt
-	L46xYzfbCpQnu6Dlu3EE2NrCKZ1+yCujf/AqjP/PUeeJNzzcxLEIishJKcYm0V8fNvkDzbrvUnU
-	y0E0K1MpJnRxz4XxFxNlxHcdEKS281ixLVZ0Sxilo1jPgkYgmbaljOCTD+V4o5OKxVK5T6pqAZI
-	xVY8ZYePOFrUOa2O8lWxZm7Ma85fKUtYOpfUdqskTtqjDKDEY1ybH6IlAS6oz70LB2W6c2u9I44
-	EGHnvHXNw0xu3Dfub7F5zRES/FhJifqQs2bWI+HL2rjAzoGWwglAO0UjlZ8EWVRLZCGSo+igI1s
-	NqxOp8nipFUoX3X9FTfH6NbS7Zhw==
-X-Google-Smtp-Source: AGHT+IH2AIz19o+eqZzvWi0ffDboSqKhDx7JR4ZLoPxVT6DujnUcLu9xScixjJ4Ld7AlQuDmavaL6A==
-X-Received: by 2002:a17:90b:54cd:b0:33b:a5d8:f198 with SMTP id 98e67ed59e1d1-3475ed6ada7mr21401913a91.25.1764574998526;
-        Sun, 30 Nov 2025 23:43:18 -0800 (PST)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7d15e9c3e41sm12660370b3a.33.2025.11.30.23.43.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 30 Nov 2025 23:43:17 -0800 (PST)
-Date: Mon, 1 Dec 2025 07:43:10 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Tonghao Zhang <tonghao@bamaicloud.com>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Jason Xing <kerneljasonxing@gmail.com>
-Subject: Re: [PATCH net-next v3 4/4] net: bonding: add the
- READ_ONCE/WRITE_ONCE for outside lock accessing
-Message-ID: <aS1HDqDJr9pwzp2X@fedora>
-References: <20251130074846.36787-1-tonghao@bamaicloud.com>
- <20251130074846.36787-5-tonghao@bamaicloud.com>
+	s=arc-20240116; t=1764575337; c=relaxed/simple;
+	bh=ApiKeWk7l2n9AEHF0GepRCqj/I+yFEZRN/cLigpZgjI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DXPLQrFBhSjnPbBy54hTSBxZRSUeTWiFM/3WxVvolmmcKVTscBwO4qrchff2iJH6RJQqyQRoKY5Fnv7V1VMu9Qg//wocW+3XWP0D5Nao0nipzzS1Nazf0XHFi6tl560i0JUpIx9gWqwba4DQjr8Kx5RRMh94LxsTV+B/cPfqw4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eR7qheCD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3CEFC4CEF1;
+	Mon,  1 Dec 2025 07:48:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764575337;
+	bh=ApiKeWk7l2n9AEHF0GepRCqj/I+yFEZRN/cLigpZgjI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=eR7qheCDq9My39TYxbj6tuTkMQfC5dOQ2sj31W2q8yKvXbwgs8Ob9i8HdISFujFgy
+	 qawRngLCFL/cnnR0HisS3tRWhRMEUM6BVqfkXZufpFnwjRl8oR6+l4Ri72cRaYRFle
+	 81JsjrCl/NSb4xsu0M6xsuaGd3uj7gotmOsDkTcTwtqFW/jGz0HG3i5/YTgTYM/BUj
+	 VoGVOaxDseG3kmZNTVUv0uYpO+RG7FSeGym5ojFcaRd/2h5pkk+60J6G2R3RbjAL52
+	 LWgdDlzIfT8cjGi6kDEY6xtGosui4GfP6nCMenfvV9xvg+F66TemoVkPFClVCTCpf2
+	 C3o2DxtvS0oQg==
+Message-ID: <0d85e1e6-ea75-4f20-aef1-90d446b4bfa1@kernel.org>
+Date: Mon, 1 Dec 2025 08:48:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251130074846.36787-5-tonghao@bamaicloud.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/2] net: dsa: mt7530: Use GPIO polarity to generate
+ correct reset sequence
+To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>
+Cc: Chen Minqiang <ptpt52@gmail.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ "Chester A. Unal" <chester.a.unal@arinc9.com>,
+ Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ netdev@vger.kernel.org
+References: <20251129234603.2544-1-ptpt52@gmail.com>
+ <20251129234603.2544-2-ptpt52@gmail.com>
+ <0675b35f-217d-4261-9e3f-2eb24753d43c@lunn.ch>
+ <20251130080731.ty2dlxaypxvodxiw@skbuf>
+ <3fbc4e67-b931-421c-9d83-2214aaa2f6ed@lunn.ch>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
+ cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
+ JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
+ gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
+ J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
+ NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
+ BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
+ vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
+ Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
+ TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
+ S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
+ FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJoF1BKBQkWlnSaAAoJEBuTQ307
+ QWKbHukP/3t4tRp/bvDnxJfmNdNVn0gv9ep3L39IntPalBFwRKytqeQkzAju0whYWg+R/rwp
+ +r2I1Fzwt7+PTjsnMFlh1AZxGDmP5MFkzVsMnfX1lGiXhYSOMP97XL6R1QSXxaWOpGNCDaUl
+ ajorB0lJDcC0q3xAdwzRConxYVhlgmTrRiD8oLlSCD5baEAt5Zw17UTNDnDGmZQKR0fqLpWy
+ 786Lm5OScb7DjEgcA2PRm17st4UQ1kF0rQHokVaotxRM74PPDB8bCsunlghJl1DRK9s1aSuN
+ hL1Pv9VD8b4dFNvCo7b4hfAANPU67W40AaaGZ3UAfmw+1MYyo4QuAZGKzaP2ukbdCD/DYnqi
+ tJy88XqWtyb4UQWKNoQqGKzlYXdKsldYqrLHGoMvj1UN9XcRtXHST/IaLn72o7j7/h/Ac5EL
+ 8lSUVIG4TYn59NyxxAXa07Wi6zjVL1U11fTnFmE29ALYQEXKBI3KUO1A3p4sQWzU7uRmbuxn
+ naUmm8RbpMcOfa9JjlXCLmQ5IP7Rr5tYZUCkZz08LIfF8UMXwH7OOEX87Y++EkAB+pzKZNNd
+ hwoXulTAgjSy+OiaLtuCys9VdXLZ3Zy314azaCU3BoWgaMV0eAW/+gprWMXQM1lrlzvwlD/k
+ whyy9wGf0AEPpLssLVt9VVxNjo6BIkt6d1pMg6mHsUEVzsFNBFVDXDQBEADNkrQYSREUL4D3
+ Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
+ MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
+ OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
+ GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
+ 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
+ YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
+ 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
+ BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
+ JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
+ 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
+ YpsFAmgXUF8FCRaWWyoACgkQG5NDfTtBYptO0w//dlXJs5/42hAXKsk+PDg3wyEFb4NpyA1v
+ qmx7SfAzk9Hf6lWwU1O6AbqNMbh6PjEwadKUk1m04S7EjdQLsj/MBSgoQtCT3MDmWUUtHZd5
+ RYIPnPq3WVB47GtuO6/u375tsxhtf7vt95QSYJwCB+ZUgo4T+FV4hquZ4AsRkbgavtIzQisg
+ Dgv76tnEv3YHV8Jn9mi/Bu0FURF+5kpdMfgo1sq6RXNQ//TVf8yFgRtTUdXxW/qHjlYURrm2
+ H4kutobVEIxiyu6m05q3e9eZB/TaMMNVORx+1kM3j7f0rwtEYUFzY1ygQfpcMDPl7pRYoJjB
+ dSsm0ZuzDaCwaxg2t8hqQJBzJCezTOIkjHUsWAK+tEbU4Z4SnNpCyM3fBqsgYdJxjyC/tWVT
+ AQ18NRLtPw7tK1rdcwCl0GFQHwSwk5pDpz1NH40e6lU+NcXSeiqkDDRkHlftKPV/dV+lQXiu
+ jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
+ zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
+ XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
+In-Reply-To: <3fbc4e67-b931-421c-9d83-2214aaa2f6ed@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Nov 30, 2025 at 03:48:46PM +0800, Tonghao Zhang wrote:
-> Although operations on the variable send_peer_notif are already within
-> a lock-protected critical section, there are cases where it is accessed
-> outside the lock. Therefore, READ_ONCE() and WRITE_ONCE() should be
-> added to it.
+On 30/11/2025 21:17, Andrew Lunn wrote:
+> On Sun, Nov 30, 2025 at 10:07:31AM +0200, Vladimir Oltean wrote:
+>> On Sun, Nov 30, 2025 at 02:11:05AM +0100, Andrew Lunn wrote:
+>>>> -		gpiod_set_value_cansleep(priv->reset, 0);
+>>>> +		int is_active_low = !!gpiod_is_active_low(priv->reset);
+>>>> +		gpiod_set_value_cansleep(priv->reset, is_active_low);
+>>>
+>>> I think you did not correctly understand what Russell said. You pass
+>>> the logical value to gpiod_set_value(). If the GPIO has been marked as
+>>> active LOW, the GPIO core will invert the logical values to the raw
+>>> value. You should not be using gpiod_is_active_low().
+>>>
+>>> But as i said to the previous patch, i would just leave everything as
+>>> it is, except document the issue.
+>>>
+>>> 	Andrew
+>>>
+>>
+>> It was my suggestion to do it like this (but I don't understand why I'm
+>> again not in CC).
+>>
+>> We _know_ that the reset pin of the switch should be active low. So by
+>> using gpiod_is_active_low(), we can determine whether the device tree is
+>> wrong or not, and we can work with a wrong device tree too (just invert
+>> the logical values).
 > 
-> Cc: Jay Vosburgh <jv@jvosburgh.net>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: Simon Horman <horms@kernel.org>
-> Cc: Jonathan Corbet <corbet@lwn.net>
-> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-> Cc: Nikolay Aleksandrov <razor@blackwall.org>
-> Cc: Hangbin Liu <liuhangbin@gmail.com>
-> Cc: Jason Xing <kerneljasonxing@gmail.com>
-> Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
-> ---
-> v2: fix compilation errors
-> ---
->  drivers/net/bonding/bond_main.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-> index 025ca0a45615..14396e39b1f0 100644
-> --- a/drivers/net/bonding/bond_main.c
-> +++ b/drivers/net/bonding/bond_main.c
-> @@ -1204,8 +1204,9 @@ void bond_peer_notify_work_rearm(struct bonding *bond, unsigned long delay)
->  /* Peer notify update handler. Holds only RTNL */
->  static void bond_peer_notify_reset(struct bonding *bond)
->  {
-> -	bond->send_peer_notif = bond->params.num_peer_notif *
-> -		max(1, bond->params.peer_notif_delay);
-> +	WRITE_ONCE(bond->send_peer_notif,
-> +		   bond->params.num_peer_notif *
-> +		   max(1, bond->params.peer_notif_delay));
->  }
->  
->  static void bond_peer_notify_handler(struct work_struct *work)
-> @@ -2825,7 +2826,7 @@ static void bond_mii_monitor(struct work_struct *work)
->  
->  	rcu_read_unlock();
->  
-> -	if (commit || bond->send_peer_notif) {
-> +	if (commit || READ_ONCE(bond->send_peer_notif)) {
->  		/* Race avoidance with bond_close cancel of workqueue */
->  		if (!rtnl_trylock()) {
->  			delay = 1;
-> @@ -3784,7 +3785,7 @@ static void bond_activebackup_arp_mon(struct bonding *bond)
->  	should_notify_rtnl = bond_ab_arp_probe(bond);
->  	rcu_read_unlock();
->  
-> -	if (bond->send_peer_notif || should_notify_rtnl) {
-> +	if (READ_ONCE(bond->send_peer_notif) || should_notify_rtnl) {
->  		if (!rtnl_trylock()) {
->  			delta_in_ticks = 1;
->  			goto re_arm;
-> -- 
-> 2.34.1
-> 
+> Assuming there is not a NOT gate placed between the GPIO and the reset
+> pin, because the board designer decided to do that for some reason?
 
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+Yeah, I cannot imagine how this could possibly support old and new DTS
+without breaking some users, unless people over-simplified and discarded
+some cases. But then this should clearly mark these broken cases instead
+of falsely claim that impossible task of rewriting the flag is done
+correctly.
+
+BTW, the code clearly does not handle such cases, so "we can determine
+whether the device tree is wrong or not" statement is obviously not true.
+
+Best regards,
+Krzysztof
 
