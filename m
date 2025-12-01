@@ -1,353 +1,128 @@
-Return-Path: <netdev+bounces-242965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19F07C975BA
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 13:49:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 670F0C9788E
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 14:16:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C0E3E344D3D
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 12:48:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C84C63A84AE
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 13:10:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FE6432039B;
-	Mon,  1 Dec 2025 12:43:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 450BA311961;
+	Mon,  1 Dec 2025 13:08:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Gv12s/IH";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="RFBlkD0V"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lO+COmcK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB13D3112D2
-	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 12:43:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B7A33115BD
+	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 13:08:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764593034; cv=none; b=At5XQmdQGkTEGDmCX4zi7aXAPr6gO2Ir0xd/HgUtcu9jaRwpeCDpce9JVhyDsqNLWLrpNQcRnyxHqnuHFRJ6hxh/OtW7JwjdbCp7D+GPtIk9G2EJOO6Ecns8PhOkdUZX6I0igPQWhrTjP4F8cfb3fHNKQDi/m+BFgkNjb8xBa7w=
+	t=1764594502; cv=none; b=gTrE7RIlzVI6WBkFVGNA9EB10nsVOQA6IPUXASDP72gg7/SGpF2qhNkWWDPXKmWH+kfrshm26kZtgL1WxcuTI0pdvCO3raQHB0Rv0aSRJIvQicIQUeTzWEJWbTpHUz0/50gnXPwS19yqCg8K2KliO4t88YqjiL0/u86CRt0kyXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764593034; c=relaxed/simple;
-	bh=GH482HQseJW7R4QoliiIACcw54hmP3LITJI8fgJuTts=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=rHmg2QNVd4+Dv+JLO91+AvWFs05EZOmVTyr+6qXiM3V04hSUWWgl+g6GL7+RUCE6mmOBAXlZTnDXrTOmn7bjUNTyJjQUjIturmHNj0PZia1njElDf+rQLzHtN4WhVt0OgUn5sYAtEvhIJZJ9Dea4zQKQLTlv4OHo3tzpaCWJBAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Gv12s/IH; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=RFBlkD0V; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5B16iY1v3689107
-	for <netdev@vger.kernel.org>; Mon, 1 Dec 2025 12:43:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	g3eWAp1Uztlnh+JGWFxdF/vF9gNgmc6EwOi5LM6HCKM=; b=Gv12s/IHP5hSlfis
-	zkDXZpDoYamcMTEOyJ1p0r9bM8Y/Puj1Ba5v1QbW66gJM65C5DN6JbercA1y2ldq
-	L+G6uEw/hBvpwRCn5FIlG4qwn9yhQ+Gv95ANFSAAv6zTVyHy193kJ3zh7Lt9hv3N
-	+j2iUG1JQpkggG+Grfn/zCN1oLMPTuOI5RTe1UxdRd57RaRxkOT6QfGGMBOJaffb
-	kaC284BGLOz+3TgYmBwWjvRIskHXXTkI7/qCdvCYvN/zr7yruadYlpX0bgnir+KF
-	AVy5Z5waXZt0KH2Ziw7eTTTKWxlHQkQ3iaaIAJ8iGkFBDVX7ywTeTE5NqJyJTQAR
-	L5PYBQ==
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com [209.85.216.69])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4as6141210-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 12:43:51 +0000 (GMT)
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-340c0604e3dso4298429a91.2
-        for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 04:43:51 -0800 (PST)
+	s=arc-20240116; t=1764594502; c=relaxed/simple;
+	bh=1jljBYnLYrj5OzlfckI0vPQHKYIf0MNNW7lVPMiJMvU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=UTeJCTH98jAxc6aYmU5OjijYfWm3iHzI0OktiA11++AanaKfJNVY4E6v4IzgPl0PygY98b0E5gglLacBHK3sBwn6AyPpq/IPRa0ZS2IEaQJXyM9AztHUrN4Q1tKRM8BsO1tc7OC0K5Fw93apUzVPnD5G0x+6VPTlVGkXU91zYKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=lO+COmcK; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b73545723ebso822940566b.1
+        for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 05:08:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1764593031; x=1765197831; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=g3eWAp1Uztlnh+JGWFxdF/vF9gNgmc6EwOi5LM6HCKM=;
-        b=RFBlkD0V2TDmgh+NIgAzFMqCVo5YGFkGU52x7CELdO3LfozUcGRalX6s29b/kWw00K
-         9fMCGJ5SU7WS+ZmJ/o7gDEMe863pAun14XkHEkB8Zpv+e+qbkC1VlW0nVKRmHYgAMIMK
-         Q8AzvRaQvVMs56kcW0rIinnMF/a1tp/6/M3esGtry0X6ZHxlTa6b/StzGKFKJU9vFn3o
-         aGgzvgsgnp+HeDUgP/wakE8Myws9K2YF49fsT4V2cZWzn2xqcM7i0EdahlVOcX7cJnb8
-         abiYW/lPByIru1JxMMm8HN22JQj5ET+ywWQNHwkiPmMwRkjypwwDviUIuInp0ulxUdRi
-         dOpA==
+        d=linaro.org; s=google; t=1764594499; x=1765199299; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jmWOE8tsVdZV+/3MWOEyJyy+ZPffvlIHcvjJiju9iok=;
+        b=lO+COmcKvnJhcrxFanTFpDbzru4ALcUnWfCnrg+XyGCRdvOv9jfwwZsQJx7i3CoU7G
+         jfoT3GA8lSYP8e7R6+odB1SOzBywspxQDRGiVAErl0h4TMpBt6FH2mmiSndG75dWm+JY
+         7N5YSso6MhvnEOVtIx93jnLjsWQ5LRQQ4RrYw+Lin2mWYg3QEp20sjS+/rbUJl7hPihM
+         dtDsN2hSFJgE0fh/+umpEdYz3DA/IZyfhP5BWI7INgooht9X9jpAQbiPz2d1VRgaR7xE
+         DaFz+29UmRZkznM/QAOwEJW5SMMnBLydRsDt1FrIVuVJrGe+ajbUsoXRjBrU4EwWhyHg
+         d0TA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764593031; x=1765197831;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=g3eWAp1Uztlnh+JGWFxdF/vF9gNgmc6EwOi5LM6HCKM=;
-        b=QC1Ha8Io9XH3kuxtuc0aELzOKfw1aYn42OwOGxdrAvExOb1DGichVBWHfY0l/lORbd
-         v/qpV9+rTjK0gA2TWLMHUE1Rj/C2bqvwbt8bBvI9lGsCI661dBG4xTR60IYCNHVUvq52
-         NjdU8xCqRSgLYWnLfYkUdXduai31E23SO3R0zIOH0cApHtyylYo1b5pW2XQc+9eRjsp8
-         oSKLeBTWoPIPlNJprUkgVnCjAA1kjuGD9aY/yGetnnPCIfmOyp4xdTMxWH97QrE9hYYT
-         D8j176iVGLMH2oIiMoGKAhePT41bKChSLXnt6YGm6E8GzzbTNu68ykoHled4S6r7oWnG
-         baOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUSJhdG9T2XUfgLtadI9EuTlcH3LH5XNyk6Df89pDy8JSrzQQZ9KEQUuB0GVOoKCX+eUban7nM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiJ7YQtdxS6MkeOfmjPw4cOOdpzSCRKH1N2lJBKzGiKMi28hkV
-	JfWJH8n44pZddKXXz/N0/CGBzRV3mUPwtOrGYn7wxwy3stDkKYVJoDqmX60hd+JKHk0YtU8Gcsp
-	abUjaIs62Z/su8RG931Kd/e5HiqDQuz3ODsev7DYjl14g9V1Ux2kylbRKE1Y=
-X-Gm-Gg: ASbGncv9uZJ7OIwpow2D692eOAbMaZ97P3W81zf9LZZpkY4nFXbyPcB/7OrC1DoI9Th
-	UeqRj/xdYKh/OLmHZZJbsGL/kWTOGYbJHiDMujlTBDp78ZxGXBgiX5gqIaP3UPZKRHUDL08n9a/
-	o1rOkE0ghoPrpG1Fl8SPjDH+u5XccW/1PW4dho48sPSqh2aLp/DqSKH9ZRuzvp2sXASjumjxSxd
-	/bwFKaCyohv9YMCU8nJ7incZiXhMV9zYZbqmGbJvMEbZ3WPM8N9ON6PvoiiBWLPjG9e1wcjW76B
-	VIBN7oDhJoLioijzQsfAyPHta5U6HUu1ngOFNP4s8ag/EwcFVlpi9AHCS1hKBlr7ezN1NdvBfox
-	TOedQo8kgtwUgLIdWaYAf+lMr1RhWWUxG47hNjNL1J+qB
-X-Received: by 2002:a17:90b:4ec7:b0:341:88d5:a74e with SMTP id 98e67ed59e1d1-34733f4ac35mr37194024a91.29.1764593030903;
-        Mon, 01 Dec 2025 04:43:50 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE+1AJmch3kW0mA+J5AWIFl5cR6CskMUYu3HyMBvIiPCYmUUTKrD3aXjJSClrHjHz/ZGceKoA==
-X-Received: by 2002:a17:90b:4ec7:b0:341:88d5:a74e with SMTP id 98e67ed59e1d1-34733f4ac35mr37194006a91.29.1764593030406;
-        Mon, 01 Dec 2025 04:43:50 -0800 (PST)
-Received: from hu-krichai-hyd.qualcomm.com ([202.46.23.25])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3477b733381sm13146374a91.12.2025.12.01.04.43.44
+        d=1e100.net; s=20230601; t=1764594499; x=1765199299;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jmWOE8tsVdZV+/3MWOEyJyy+ZPffvlIHcvjJiju9iok=;
+        b=H32UoaUDv7Am5K/6yIywdneH9wTmh4bK2q+FyCV3RlVh4KqLUzMBUhpdzgyEhAnxfE
+         MEi8gpaw/L4WewODMZFYDzJAhAQSSmfDuyq+UN4qZEZN+EHX0LKWVmZeOtD08eFMajvc
+         UnIkZt0dXMMEwVS4+WhxUNczKPHIgXHp/vSHLMy8kLTEHG89BaKbJGmdWzINSysgo7HP
+         BQWe8QQ202SLSC38Y0o+Pntkov8Qyrg7yPsQUDHDO3+7TpOqnZ6SFLseXTELtNjf3qN4
+         538sX1ooilvnaCCHRFYuG2AA50L5lzPY1VxcUIiKFlwDlo3fZ2V2i2amhrUkuNnl9MYL
+         HmPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWqcrt1LL4Yv2iDjNpvER/61Nh7vfUKwm29LOUq3mC+0ZiwM0iC5mn38Nf/XJRjQHhbwz5i8EY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxUTY2XFe4oWA2W1uq9KiFbWbxz/U/OobdCcL2wwv8EATqitgwf
+	TZHdZg+YBsb8CL+KYqSlVJew13TlRzF70lsLDKwQOFdnLR8IwKqmYq9chry4pRIZwp8=
+X-Gm-Gg: ASbGnct4zD6VgIriwZ5P6QJzXoUEJKiUS/paB8xhmMke5e61UqlBNSJV2BGjfV8hn9D
+	gfvDlRNUSItK6r8IObYxQ4QN55nm9kp6TagB6+5/3KgkMiuXN7LcRcEwj2zHXPV6xh1tbUnZ84f
+	ZXI/c/4ouj7haHIXZjXEoybVdb1C/MPUjqa0wolARZwsnLVOcduSYDOuU+IbWwZYI2U+qCle8tw
+	WAV3FO1DTu/u4GAFSE0Igmvn3II8YH6J1spPMM3rpQOzY1F5rybuXHKzU8rJBsi8mNZMkcbvErl
+	/gAda8pCdhGw+vjcENbXWlYHSG8bFiS+64O2p6AxMS6GBOWx5HqsthbMUJ1E09svpJpz5ZFQ+aR
+	WSnavDkojUXcLBh7XNn2TT/PgiE8HiMiJIBL3C2D68w9YpMPJPU6+00afK0ww7cC+9jWDMW4SMA
+	8WaQ0g/iYSxKRdo/zj
+X-Google-Smtp-Source: AGHT+IG+9MCSjBtPt6W2+zBUhes3WpovLtX4vLeIrokTyK95t4Xc4QrjoCg1IRxwpvpD0DbH6J0bKQ==
+X-Received: by 2002:a17:907:e8c:b0:b72:eaba:aac2 with SMTP id a640c23a62f3a-b767173c3f7mr4361122366b.26.1764594498454;
+        Mon, 01 Dec 2025 05:08:18 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-b76f59aecd4sm1238751566b.44.2025.12.01.05.08.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Dec 2025 04:43:50 -0800 (PST)
-From: Krishna Chaitanya Chundru <krishna.chundru@oss.qualcomm.com>
-Date: Mon, 01 Dec 2025 18:13:20 +0530
-Subject: [PATCH 4/4] bus: mhi: Fix broken runtime PM design
+        Mon, 01 Dec 2025 05:08:17 -0800 (PST)
+Date: Mon, 1 Dec 2025 16:08:14 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Chester Lin <chester62515@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>, devicetree@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Fabio Estevam <festevam@gmail.com>,
+	Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>,
+	imx@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
+	Jan Petrous <jan.petrous@oss.nxp.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Lee Jones <lee@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Matthias Brugger <mbrugger@suse.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	NXP S32 Linux Team <s32@nxp.com>, Paolo Abeni <pabeni@redhat.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Rob Herring <robh@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Shawn Guo <shawnguo@kernel.org>, linaro-s32@linaro.org
+Subject: [PATCH 0/4] s32g: Use a syscon for GPR
+Message-ID: <cover.1764592300.git.dan.carpenter@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251201-mhi_runtimepm-v1-4-fab94399ca75@oss.qualcomm.com>
-References: <20251201-mhi_runtimepm-v1-0-fab94399ca75@oss.qualcomm.com>
-In-Reply-To: <20251201-mhi_runtimepm-v1-0-fab94399ca75@oss.qualcomm.com>
-To: Manivannan Sadhasivam <mani@kernel.org>,
-        Jeff Hugo <jeff.hugo@oss.qualcomm.com>,
-        Carl Vanderlip <carl.vanderlip@oss.qualcomm.com>,
-        Oded Gabbay <ogabbay@kernel.org>, Jeff Johnson <jjohnson@kernel.org>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-Cc: mhi@lists.linux.dev, linux-arm-msm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
-        ath12k@lists.infradead.org, netdev@vger.kernel.org,
-        mayank.rana@oss.qualcomm.com, quic_vbadigan@quicinc.com,
-        vivek.pernamitta@oss.qualcomm.com,
-        Krishna Chaitanya Chundru <krishna.chundru@oss.qualcomm.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1764593001; l=7600;
- i=krishna.chundru@oss.qualcomm.com; s=20230907; h=from:subject:message-id;
- bh=GH482HQseJW7R4QoliiIACcw54hmP3LITJI8fgJuTts=;
- b=6iTeiDENHrbVLHbi/ceLO/7iDY2j59zpb8UbDBQqB3y4mszKHxMTOmMfNQCmVJepmbVUaIH3P
- FIGaMVQ5N2wAm3TcemuMJi1WTt4sNs8Uya2mNRCAqG28Z03+njJQ/cu
-X-Developer-Key: i=krishna.chundru@oss.qualcomm.com; a=ed25519;
- pk=10CL2pdAKFyzyOHbfSWHCD0X0my7CXxj8gJScmn1FAg=
-X-Authority-Analysis: v=2.4 cv=J/KnLQnS c=1 sm=1 tr=0 ts=692d8d87 cx=c_pps
- a=vVfyC5vLCtgYJKYeQD43oA==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
- a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=EUspDBNiAAAA:8 a=A8rfxp3GyOsx1I41rDQA:9
- a=QEXdDO2ut3YA:10 a=rl5im9kqc5Lf4LNbBjHf:22
-X-Proofpoint-GUID: e8MWs33lC8YfQQL6mdRQj77_tI2ZEzuE
-X-Proofpoint-ORIG-GUID: e8MWs33lC8YfQQL6mdRQj77_tI2ZEzuE
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjAxMDEwMyBTYWx0ZWRfX/gt8Pr8YDHPo
- dFOHtdRj3aHbGGKeP/3SLemRpcqSCo5jQYN3rd6hY8QwbcfXPO+RteEMEq2vN4LrSdy8NGl5zLt
- UJls2NujK8iCygikHX0tvjPVhrsWzG01FbnuXrAVATM9mXoSxqtUzPMWZBEwttJaAUM99njwip5
- drz93GbZrWmDPX0Y+72rTZIAJObRYOaBXhEjszlBCAsEtOmM+9plOeRY9jdrecQxoFPTXpehU64
- H9sxC5psyB/uavBdFZSyHsN3Ja6W1nmxk2+3ukrUInyrtqj9s3gmi81z7VI2fB/ozano+LN70xA
- uOEv4lkiSEUuQ8YbVpK7eGThj/LJuC6+VLCtHuNPLTWe9wgmCYW64XWSyukY3da2H44kJRwr+5A
- VAV+Visfbr9uPtNzl7oM6lhz4xOYww==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-28_08,2025-11-27_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 bulkscore=0 malwarescore=0 priorityscore=1501 lowpriorityscore=0
- adultscore=0 phishscore=0 clxscore=1015 impostorscore=0 suspectscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2512010103
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-The current MHI runtime PM design is flawed, as the MHI core attempts to
-manage power references internally via mhi_queue() and related paths.
-This is problematic because the controller drivers do not have the
-knowledge of the client PM status due to the broken PM topology. So when
-they runtime suspend the controller, the client drivers could no longer
-function.
+*** BLURB HERE ***
 
-To address this, in the new design, the client drivers reports their own
-runtime PM status now and the PM framework makes sure that the parent
-(controller driver) and other components up in the chain remain active.
-This leverages the standard parent-child PM relationship.
+Dan Carpenter (4):
+  net: stmmac: s32: use the syscon interface PHY_INTF_SEL_RGMII
+  dt-bindings: mfd: syscon: Document the GPR syscon for the NXP S32 SoCs
+  dt-bindings: net: nxp,s32-dwmac: Use the GPR syscon
+  dts: s32g: Add GPR syscon region
 
-Since MHI creates a mhi_dev device without an associated driver, we
-explicitly enable runtime PM on it and mark it with
-pm_runtime_no_callbacks() to indicate the PM core that no callbacks
-exist for this device. This is only needed for MHI controller, since
-the controller driver uses the bus device just like PCI device.
-
-Also Update the MHI core to explicitly manage runtime PM references in
-__mhi_device_get_sync() and mhi_device_put() to ensure the controller
-does not enter suspend while a client device is active.
-
-Signed-off-by: Krishna Chaitanya Chundru <krishna.chundru@oss.qualcomm.com>
----
- drivers/bus/mhi/host/internal.h |  6 +++---
- drivers/bus/mhi/host/main.c     | 28 ++++------------------------
- drivers/bus/mhi/host/pm.c       | 18 ++++++++----------
- 3 files changed, 15 insertions(+), 37 deletions(-)
-
-diff --git a/drivers/bus/mhi/host/internal.h b/drivers/bus/mhi/host/internal.h
-index 61e03298e898e6dd02d2a977cddc4c87b21e3a6c..d6a3168bb3ecc34eab1036c0e74f8d70cf422fed 100644
---- a/drivers/bus/mhi/host/internal.h
-+++ b/drivers/bus/mhi/host/internal.h
-@@ -355,9 +355,9 @@ static inline bool mhi_is_active(struct mhi_controller *mhi_cntrl)
- static inline void mhi_trigger_resume(struct mhi_controller *mhi_cntrl)
- {
- 	pm_wakeup_event(&mhi_cntrl->mhi_dev->dev, 0);
--	pm_runtime_get(mhi_cntrl->cntrl_dev);
--	pm_runtime_mark_last_busy(mhi_cntrl->cntrl_dev);
--	pm_runtime_put(mhi_cntrl->cntrl_dev);
-+	pm_runtime_get(&mhi_cntrl->mhi_dev->dev);
-+	pm_runtime_mark_last_busy(&mhi_cntrl->mhi_dev->dev);
-+	pm_runtime_put(&mhi_cntrl->mhi_dev->dev);
- }
- 
- /* Register access methods */
-diff --git a/drivers/bus/mhi/host/main.c b/drivers/bus/mhi/host/main.c
-index 7ac1162a0a81ae11245a2bbd9bf6fd6c0f86fbc1..85a9a5a62a6d3f92b0e9dc35b13fd867db89dd95 100644
---- a/drivers/bus/mhi/host/main.c
-+++ b/drivers/bus/mhi/host/main.c
-@@ -427,6 +427,8 @@ void mhi_create_devices(struct mhi_controller *mhi_cntrl)
- 		if (ret)
- 			put_device(&mhi_dev->dev);
- 	}
-+	pm_runtime_no_callbacks(&mhi_cntrl->mhi_dev->dev);
-+	devm_pm_runtime_set_active_enabled(&mhi_cntrl->mhi_dev->dev);
- }
- 
- irqreturn_t mhi_irq_handler(int irq_number, void *dev)
-@@ -658,12 +660,8 @@ static int parse_xfer_event(struct mhi_controller *mhi_cntrl,
- 			/* notify client */
- 			mhi_chan->xfer_cb(mhi_chan->mhi_dev, &result);
- 
--			if (mhi_chan->dir == DMA_TO_DEVICE) {
-+			if (mhi_chan->dir == DMA_TO_DEVICE)
- 				atomic_dec(&mhi_cntrl->pending_pkts);
--				/* Release the reference got from mhi_queue() */
--				pm_runtime_mark_last_busy(mhi_cntrl->cntrl_dev);
--				pm_runtime_put(mhi_cntrl->cntrl_dev);
--			}
- 
- 			/*
- 			 * Recycle the buffer if buffer is pre-allocated,
-@@ -1152,12 +1150,6 @@ static int mhi_queue(struct mhi_device *mhi_dev, struct mhi_buf_info *buf_info,
- 
- 	read_lock_irqsave(&mhi_cntrl->pm_lock, flags);
- 
--	/* Packet is queued, take a usage ref to exit M3 if necessary
--	 * for host->device buffer, balanced put is done on buffer completion
--	 * for device->host buffer, balanced put is after ringing the DB
--	 */
--	pm_runtime_get(mhi_cntrl->cntrl_dev);
--
- 	/* Assert dev_wake (to exit/prevent M1/M2)*/
- 	mhi_cntrl->wake_toggle(mhi_cntrl);
- 
-@@ -1167,11 +1159,6 @@ static int mhi_queue(struct mhi_device *mhi_dev, struct mhi_buf_info *buf_info,
- 	if (likely(MHI_DB_ACCESS_VALID(mhi_cntrl)))
- 		mhi_ring_chan_db(mhi_cntrl, mhi_chan);
- 
--	if (dir == DMA_FROM_DEVICE) {
--		pm_runtime_mark_last_busy(mhi_cntrl->cntrl_dev);
--		pm_runtime_put(mhi_cntrl->cntrl_dev);
--	}
--
- 	read_unlock_irqrestore(&mhi_cntrl->pm_lock, flags);
- 
- 	return ret;
-@@ -1377,7 +1364,6 @@ static int mhi_update_channel_state(struct mhi_controller *mhi_cntrl,
- 	ret = mhi_device_get_sync(mhi_cntrl->mhi_dev);
- 	if (ret)
- 		return ret;
--	pm_runtime_get(mhi_cntrl->cntrl_dev);
- 
- 	reinit_completion(&mhi_chan->completion);
- 	ret = mhi_send_cmd(mhi_cntrl, mhi_chan, cmd);
-@@ -1408,8 +1394,6 @@ static int mhi_update_channel_state(struct mhi_controller *mhi_cntrl,
- 
- 	trace_mhi_channel_command_end(mhi_cntrl, mhi_chan, to_state, TPS("Updated"));
- exit_channel_update:
--	pm_runtime_mark_last_busy(mhi_cntrl->cntrl_dev);
--	pm_runtime_put(mhi_cntrl->cntrl_dev);
- 	mhi_device_put(mhi_cntrl->mhi_dev);
- 
- 	return ret;
-@@ -1592,12 +1576,8 @@ static void mhi_reset_data_chan(struct mhi_controller *mhi_cntrl,
- 	while (tre_ring->rp != tre_ring->wp) {
- 		struct mhi_buf_info *buf_info = buf_ring->rp;
- 
--		if (mhi_chan->dir == DMA_TO_DEVICE) {
-+		if (mhi_chan->dir == DMA_TO_DEVICE)
- 			atomic_dec(&mhi_cntrl->pending_pkts);
--			/* Release the reference got from mhi_queue() */
--			pm_runtime_mark_last_busy(mhi_cntrl->cntrl_dev);
--			pm_runtime_put(mhi_cntrl->cntrl_dev);
--		}
- 
- 		if (!buf_info->pre_mapped)
- 			mhi_cntrl->unmap_single(mhi_cntrl, buf_info);
-diff --git a/drivers/bus/mhi/host/pm.c b/drivers/bus/mhi/host/pm.c
-index b4ef115189b505c3450ff0949ad2d09f3ed53386..fd690e8af693109ed8c55248db0ea153f9e69423 100644
---- a/drivers/bus/mhi/host/pm.c
-+++ b/drivers/bus/mhi/host/pm.c
-@@ -429,6 +429,7 @@ static int mhi_pm_mission_mode_transition(struct mhi_controller *mhi_cntrl)
- 
- 	if (MHI_PM_IN_ERROR_STATE(mhi_cntrl->pm_state)) {
- 		ret = -EIO;
-+		read_unlock_bh(&mhi_cntrl->pm_lock);
- 		goto error_mission_mode;
- 	}
- 
-@@ -459,11 +460,9 @@ static int mhi_pm_mission_mode_transition(struct mhi_controller *mhi_cntrl)
- 	 */
- 	mhi_create_devices(mhi_cntrl);
- 
--	read_lock_bh(&mhi_cntrl->pm_lock);
- 
- error_mission_mode:
--	mhi_cntrl->wake_put(mhi_cntrl, false);
--	read_unlock_bh(&mhi_cntrl->pm_lock);
-+	mhi_device_put(mhi_cntrl->mhi_dev);
- 
- 	return ret;
- }
-@@ -1038,9 +1037,11 @@ int __mhi_device_get_sync(struct mhi_controller *mhi_cntrl)
- 		read_unlock_bh(&mhi_cntrl->pm_lock);
- 		return -EIO;
- 	}
-+	read_unlock_bh(&mhi_cntrl->pm_lock);
-+
-+	pm_runtime_get_sync(&mhi_cntrl->mhi_dev->dev);
-+	read_lock_bh(&mhi_cntrl->pm_lock);
- 	mhi_cntrl->wake_get(mhi_cntrl, true);
--	if (MHI_PM_IN_SUSPEND_STATE(mhi_cntrl->pm_state))
--		mhi_trigger_resume(mhi_cntrl);
- 	read_unlock_bh(&mhi_cntrl->pm_lock);
- 
- 	ret = wait_event_timeout(mhi_cntrl->state_event,
-@@ -1049,9 +1050,7 @@ int __mhi_device_get_sync(struct mhi_controller *mhi_cntrl)
- 				 msecs_to_jiffies(mhi_cntrl->timeout_ms));
- 
- 	if (!ret || MHI_PM_IN_ERROR_STATE(mhi_cntrl->pm_state)) {
--		read_lock_bh(&mhi_cntrl->pm_lock);
--		mhi_cntrl->wake_put(mhi_cntrl, false);
--		read_unlock_bh(&mhi_cntrl->pm_lock);
-+		mhi_device_put(mhi_cntrl->mhi_dev);
- 		return -EIO;
- 	}
- 
-@@ -1339,11 +1338,10 @@ void mhi_device_put(struct mhi_device *mhi_dev)
- 
- 	mhi_dev->dev_wake--;
- 	read_lock_bh(&mhi_cntrl->pm_lock);
--	if (MHI_PM_IN_SUSPEND_STATE(mhi_cntrl->pm_state))
--		mhi_trigger_resume(mhi_cntrl);
- 
- 	mhi_cntrl->wake_put(mhi_cntrl, false);
- 	read_unlock_bh(&mhi_cntrl->pm_lock);
-+	pm_runtime_put(&mhi_cntrl->mhi_dev->dev);
- }
- EXPORT_SYMBOL_GPL(mhi_device_put);
- 
+ .../devicetree/bindings/mfd/syscon.yaml       |  2 ++
+ .../bindings/net/nxp,s32-dwmac.yaml           |  6 +++++
+ arch/arm64/boot/dts/freescale/s32g2.dtsi      |  8 +++++++
+ arch/arm64/boot/dts/freescale/s32g3.dtsi      |  8 +++++++
+ .../net/ethernet/stmicro/stmmac/dwmac-s32.c   | 23 +++++++++++++++----
+ 5 files changed, 42 insertions(+), 5 deletions(-)
 
 -- 
-2.34.1
+2.51.0
 
 
