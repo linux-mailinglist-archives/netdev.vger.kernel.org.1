@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-243064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77544C99250
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 22:13:18 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0D4CC99256
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 22:13:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A53EC3A385F
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 21:13:16 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D95FB4E29D0
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 21:13:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B58E0274B4A;
-	Mon,  1 Dec 2025 21:13:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CB492848BE;
+	Mon,  1 Dec 2025 21:13:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MzzxbbfK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FzW94nFe"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8592F78F4A;
-	Mon,  1 Dec 2025 21:13:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1635B2848A4;
+	Mon,  1 Dec 2025 21:13:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764623593; cv=none; b=M6GFWYtwBtXERT+qDTQI1O+mZVbcRIrGLURzqvxV6J1wFY9FTnEcyv6uvNp6JZ4rNlL0dKMRSHxTlgU8iEV+x9Zf74zZVAm/S5As6HCpGjAkqEe7rTpEUmrC70DmO1WnYSFd0VJejXIcs1Un4jWSaXXjNbLQDgRy53BThbUfJaE=
+	t=1764623595; cv=none; b=RcApwRlbZyCx7aiTLhl8vy9D74QsELRqthKSWd0TPi0xijZp0rK1d30NK+XHdHwlzVkbXHIahZ+Ae1xNT0TVwlgJ5bxLVDL3E2niLrPb2g+c5SmIITxSQO51AxQfiHTPbD7VKUP/cirPM0xFPSe3ie5+7AwywRNmlw7ONvH7bUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764623593; c=relaxed/simple;
-	bh=liix6GXfbAMaE20RwHi3LqcsJpqnCqXgGGCqZOTyZ3o=;
+	s=arc-20240116; t=1764623595; c=relaxed/simple;
+	bh=alCTcQluu+L0ZBPFjhtp8GkMPj31UpMHXoYwlY70EA0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=bc0ZshtBNmpD12p8XoITEjMxi8vAsCjWVOk4i+w3mcTmtRP7au9qS3ht9TeSds4sbbVBCEFMm/zfe8i6ILatyybqdmfslx/U0DzLT3lI5hp9wwTH5ST+y0pGdgsf3cCajpT6fRmoHHFJYI55Rb4NBkZwD2kFwxS4sWO4Jw2Rftk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MzzxbbfK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D7B8C116C6;
-	Mon,  1 Dec 2025 21:13:13 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Tnwgp6Cpeu0mKyLeGaEbtuCreFLb3EOwbPx6MHZz7a3r98rqsO3QYQafbSZFjlHG+GGh2C8Ef0lQDQtLYsbeXdiZbqikD+bM33LC1jVgxltJHi9y3pshPeBt76c1ENrEdGLItGyQVg4v/YOjTt5qneGw3Y1R6rvL5dR/U5Vq7jg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FzW94nFe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89515C4CEF1;
+	Mon,  1 Dec 2025 21:13:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764623593;
-	bh=liix6GXfbAMaE20RwHi3LqcsJpqnCqXgGGCqZOTyZ3o=;
+	s=k20201202; t=1764623594;
+	bh=alCTcQluu+L0ZBPFjhtp8GkMPj31UpMHXoYwlY70EA0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MzzxbbfKx0FQkmGUZX+VPn+40sIlIvags6+JpnMegqfkE89/uc4lIrl+L6xB2wNeP
-	 fG6AOwia5z4D7GcoofdsajfTBta6Gw0dSlEvsI3SppzivFodojn9ks0rg/GS/XUhHl
-	 WSm+yvNAm4FdmiVVfn1ji7LSsjuwGm7ojQP6Y4A7Vt735XBQ/Re49fhqf/jGdj5yKH
-	 N4Lx7zgRcHA864Zf0U+gvu0HpfrbPqb1JhHN2i77nhi5amS52wvJBem/0r4D+POyfE
-	 NK7zCDi+U0AujR/mwBcKGj4g9/mFS6bL1toxMShO+51GlB5ITMYtg75dHUz9qaNXHP
-	 ttXU1vdRNefUg==
+	b=FzW94nFe8AzKq8Sp7TY3/mc4TH/+DowJrGouQAKjpi4PACKB7r4iv4UW3JCA012g0
+	 y3wclMc465s/eB3lHG+m12mg3v/0htZfgn9BzZ/YNqljR6+OlW8SJ6kQopZouZd67r
+	 jo9M8dGJBBIrUI4jOs6Yijlpcm7m8P0eqlfFWMSxgxmUe/MZO8Ozav2V38DOFvrv5f
+	 r+cwEKDY3KAxToxVXSS1XkxEpZSo+2BIlE5rkBORWHk4XC9IEyOyDavYCfD673FQvM
+	 DZdQS1JppALLzr/F39dQIfAdu8lKaUuKQGp2/40eTnlfjxxkYTYuPNx04evExloQwd
+	 VEEkrY79E3OIQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3BE81381196A;
-	Mon,  1 Dec 2025 21:10:14 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B590C381196A;
+	Mon,  1 Dec 2025 21:10:15 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,18 +52,17 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] selftests: netconsole: remove log noise due to
- socat exit
+Subject: Re: [PATCH net-next] net: dlink: fix several spelling mistakes in
+ comments
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176462341303.2539359.9995367418686827424.git-patchwork-notify@kernel.org>
-Date: Mon, 01 Dec 2025 21:10:13 +0000
-References: <20251129-netcons-socat-noise-v1-1-605a0cea8fca@gmail.com>
-In-Reply-To: <20251129-netcons-socat-noise-v1-1-605a0cea8fca@gmail.com>
-To: Andre Carvalho <asantostc@gmail.com>
-Cc: leitao@debian.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ <176462341428.2539359.4401989672794830061.git-patchwork-notify@kernel.org>
+Date: Mon, 01 Dec 2025 21:10:14 +0000
+References: <20251130220652.5425-2-yyyynoom@gmail.com>
+In-Reply-To: <20251130220652.5425-2-yyyynoom@gmail.com>
+To: Yeounsu Moon <yyyynoom@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org
 
 Hello:
@@ -71,36 +70,19 @@ Hello:
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sat, 29 Nov 2025 12:24:19 +0000 you wrote:
-> This removes some noise that can be distracting while looking at
-> selftests by redirecting socat stderr to /dev/null.
+On Mon,  1 Dec 2025 07:06:53 +0900 you wrote:
+> This patch fixes multiple spelling mistakes in dl2k driver comments:
 > 
-> Before this commit, netcons_basic would output:
-> 
-> Running with target mode: basic (ipv6)
-> 2025/11/29 12:08:03 socat[259] W exiting on signal 15
-> 2025/11/29 12:08:03 socat[271] W exiting on signal 15
-> basic : ipv6 : Test passed
-> Running with target mode: basic (ipv4)
-> 2025/11/29 12:08:05 socat[329] W exiting on signal 15
-> 2025/11/29 12:08:05 socat[322] W exiting on signal 15
-> basic : ipv4 : Test passed
-> Running with target mode: extended (ipv6)
-> 2025/11/29 12:08:08 socat[386] W exiting on signal 15
-> 2025/11/29 12:08:08 socat[386] W exiting on signal 15
-> 2025/11/29 12:08:08 socat[380] W exiting on signal 15
-> extended : ipv6 : Test passed
-> Running with target mode: extended (ipv4)
-> 2025/11/29 12:08:10 socat[440] W exiting on signal 15
-> 2025/11/29 12:08:10 socat[435] W exiting on signal 15
-> 2025/11/29 12:08:10 socat[435] W exiting on signal 15
-> extended : ipv4 : Test passed
+> - "deivices" -> "devices"
+> - "Ttransmit" -> "Transmit"
+> - "catastronphic" -> "catastrophic"
+> - "Extened" -> "Extended"
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] selftests: netconsole: remove log noise due to socat exit
-    https://git.kernel.org/netdev/net-next/c/e3b8cbf40c6e
+  - [net-next] net: dlink: fix several spelling mistakes in comments
+    https://git.kernel.org/netdev/net-next/c/40d5ce4af206
 
 You are awesome, thank you!
 -- 
