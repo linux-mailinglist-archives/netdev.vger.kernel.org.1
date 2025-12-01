@@ -1,78 +1,72 @@
-Return-Path: <netdev+bounces-242880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BFCDC95A03
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 03:57:16 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9A1EC95A41
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 04:24:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1500A3418FC
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 02:57:16 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1F3DE342056
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 03:24:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44E7619E97F;
-	Mon,  1 Dec 2025 02:57:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2845619258E;
+	Mon,  1 Dec 2025 03:24:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="eLum1Sys"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="YLNXUHNH"
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-58-216.mail.qq.com (out162-62-58-216.mail.qq.com [162.62.58.216])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BA221885A5
-	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 02:57:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84B6463CF;
+	Mon,  1 Dec 2025 03:24:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764557833; cv=none; b=SCocefmPrH2XcXGJ2UTbsaDuH2MsTXMYOVRXMZ4bOdj+YIVyHyAYGNUvGiTR+FcVIhay2hD0qfTAVWfmD1bEl77tGnaLeqEXbTpx3NmVvHjIbySzBi4UW5zWTvsosmY6Pbdq7RHFhOC1aeMUxXgCMQzkeaYtlL+JeYPBy4eHfL8=
+	t=1764559459; cv=none; b=HYRRyQvalSJjSRpYzV7YAr5i998IAY/vmzPeVd74A1/VBPzvMIsei4IfKEjQP54dxOFBKAbza7o6Opx1V0S7GkrF8A6xNZKyDJPHYqnJD4QDTuCosEp4m0vpkPylzFzSpJQBbsONzXRdbC40oSlyjnLdXRFbhTddN0qkRm5d8u8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764557833; c=relaxed/simple;
-	bh=tbe1UpgQWOX4QJj3OSyk2spATTcO63b4zAdneq5D1n8=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=EQjixURlcZ038COHyEvcNiL8ILrVLu4i88PiMgJ+54rhug9QscKLD/ZgYx4HecS7IZJmSyGtGspGGtEaXSSh9U9+TEl7FnOkeia64PSLmUujZPPukpmue4KnnpsB6G6kpKG0hyPJTbO2U2mp+DvRcjN0MRNLBxq/Z/6RPsNOTGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=eLum1Sys; arc=none smtp.client-ip=162.62.58.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1764557825; bh=9HG5vIZeG6DjcNDNCfRzCXn+GiaKTQ413V1uAk2ip2E=;
-	h=From:To:Cc:Subject:Date;
-	b=eLum1SysUyevzkZNTmmEMOovuTPPzDfFc5UZ90E08r2Of1AmBaMYCwSSHeVxjDhqF
-	 DRRhGxBwAYrGtOqJmPkm7eiwgW0ZXW7ZpYAK+CX96xnMpLIKwiM1hA40fvYwsnxQ1V
-	 ng0B9ZhlW1Z2F3K4vzb9U/FrYa8x8+7jlzPUfxnQ=
-Received: from localhost ([58.246.87.66])
-	by newxmesmtplogicsvrszb51-1.qq.com (NewEsmtp) with SMTP
-	id E4322249; Mon, 01 Dec 2025 10:57:03 +0800
-X-QQ-mid: xmsmtpt1764557823tgzuvzj06
-Message-ID: <tencent_22959DC8315158E23D77C14B9B33C97EA60A@qq.com>
-X-QQ-XMAILINFO: Na23fxG1dahlIHagbvu0S9yGh7KvCtlJ+jcO/sOXy3vdAOPN2yFS719FrteZgF
-	 L9diDzWuXJWqZExU1tGfwGTKoKbsQPd96/dhd0X3ALf6++rAzohULa9kz10xikHQGUm6Zpp66kWv
-	 EndmwTpJ8176XDKHY1VAOHYbrUfwparkH+uDFkbXszQ/mGkfGX6OwaOolMEeOQbfZdEo6nUdXERA
-	 qgfyqsGWSOePTr0hKC9QobH5+OhwOjqqpCoDKKhLZ6bdqdQnbit7pe13ow92TD0b5RBcsn28o8eE
-	 2yBClEfCtCYb1acj+6km3ATA4kvFqOZrmhY918y0MjHCcfWJpz3QNw4rN7AQ4Snovfxruj/pMU0f
-	 9Z1T2Nxo4L20WvWv7R9Tyqw+vtbJO8/Ok0MP/ZpZJACbt0pO4lZjGfipAmEGt2vzw9SDEX3v9ZVg
-	 /99UFmu9HuQGV9kmVdZSxQ/Nc1CijR4geosETVN37f8SjA0Pg+fBEvkCuU2nfZLLtV8THT6RMs8/
-	 N5nBmKRq9W/2jeCANQ4GgmW6XtHxSlcKEiPJNZzDELEBU/v679NxGXtlG6GN/PXbuZxDD7hw02VA
-	 f6Y/VPu2sVpBQrwsXQTwy1FH8rxbbCYbXgQO/InaNpsIVECYkCFtPcbUhEJJc9yhVcI52We3KR21
-	 cwYL3gyXWs5Z3i1X10ykvfajeF3xQrVXbwE/DVvy18DuiONWy54hx9SREU6piKdV7gTEfpbVUqwm
-	 JaRNBXmM4hKyz0nNlSzU2vBnh+Fyxke/VJrjd03Zbm6T9SLasLq9mLkRKL0sQJYmOCLBfJARz3Bk
-	 pWKaI43RIDyXVY3QX1vlACYHKwRDm+rCP0EtVrJixx+m2VuwAq/NrPSbXC0ZAjPn6xrQBWphlfXP
-	 +PfxuWaq7ShJwjhnXYBIWq9SjEoWpEC4TxjzDKj2gFASzfya1n3jPu7nzjyhs4csv+LFVEg8Ygs0
-	 BOJVKB9qmkGx5qRg2CZSisgMNL9p72YCL/YV3jp5n3k71Rr6ArCHz8aa/NPUC8znOV2Ie8OlFPVS
-	 Y82Q+woOejaL6Bcw4h
-X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
-From: 2694439648@qq.com
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com,
-	hailong.fan@siengine.com
-Cc: netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	inux-kernel@vger.kernel.org
-Subject: [PATCH] net: stmmac: Modify the judgment condition of "tx_avail" from 1 to 2
-Date: Mon,  1 Dec 2025 10:57:01 +0800
-X-OQ-MSGID: <20251201025701.16345-1-2694439648@qq.com>
+	s=arc-20240116; t=1764559459; c=relaxed/simple;
+	bh=L0Va06MhdT78s3CnnqaoAkGMxzlx0FOX+Lm4zGUg+/Y=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=IlXB+oLdxK1DYIY0vdPGhy6scuD+ecoRWEwoRb3YoD5CFErsLRKwjvBpPMYHKbc/BiZCRoyb6yrZZjC3EM3Ykhi7+EMKwx0PFV0wLlCzqXk9FzelInMp2oZQd7kPxi/jZett2Qgny/pYk0wE4/4LvG4PksbsU8F2NFlXnt4oDds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=YLNXUHNH; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1764559457; x=1796095457;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=L0Va06MhdT78s3CnnqaoAkGMxzlx0FOX+Lm4zGUg+/Y=;
+  b=YLNXUHNHaLA9HyIW6yztrAC1w7nERJr0BjIb2bzN9Jw0Fj5o4UfUfP6z
+   AmiGBiGW6Q3keZ52Xg6lXICHLjTy4fKN7ABqgyKxO2CC6mlxTzfXN0PdW
+   z5px+oHC1lhKW8I++NvUziCBSY6WXNx3DzZgK2ANxOJ5ICerbrOtWwc3L
+   6vwKtYwiVjFpdfR2YdVSWxQcuRfnZNtmWm4rpQnAkpQE9S0Bv6foR0uuP
+   p0TusQvO+KyjIhX0kI3wPP3sKwxkZyolR1CBAyXAVgDkH2gKXUzHliukl
+   0H+dpzmx2rMAj7fN5UQrkNEV4O/vZQi8apBENwHglfRlmsGpxaBQiffS/
+   A==;
+X-CSE-ConnectionGUID: lRLhGS1/QleSDXijaJpBXQ==
+X-CSE-MsgGUID: qsbBkjooTCGMvAGfXF3ZTg==
+X-IronPort-AV: E=Sophos;i="6.20,240,1758610800"; 
+   d="scan'208";a="217188627"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2025 20:24:08 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.87.71) by
+ chn-vm-ex4.mchp-main.com (10.10.87.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.29; Sun, 30 Nov 2025 20:23:52 -0700
+Received: from che-ll-i17164.microchip.com (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.58 via Frontend Transport; Sun, 30 Nov 2025 20:23:48 -0700
+From: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
+To: <Parthiban.Veerasooran@microchip.com>, <piergiorgio.beruto@gmail.com>,
+	<andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "Parthiban
+ Veerasooran" <parthiban.veerasooran@microchip.com>
+Subject: [PATCH net-next v4 0/2] Add SQI and SQI+ support for OATC14 10Base-T1S PHYs and Microchip T1S driver
+Date: Mon, 1 Dec 2025 08:53:44 +0530
+Message-ID: <20251201032346.6699-1-parthiban.veerasooran@microchip.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -80,36 +74,66 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
 
-From: "hailong.fan" <hailong.fan@siengine.com>
+This patch series adds Signal Quality Indicator (SQI) and enhanced SQI+
+support for OATC14 10Base-T1S PHYs, along with integration into the
+Microchip T1S PHY driver. This enables ethtool to report the SQI value for
+OATC14 10Base-T1S PHYs.
 
-    Under certain conditions, a WARN_ON will be triggered
-    if avail equals 1.
+Patch Summary:
+1. add SQI and SQI+ support for OATC14 10Base-T1S PHYs
+   - Introduces MDIO register definitions for DCQ_SQI and DCQ_SQIPLUS.
+   - Adds genphy_c45_oatc14_get_sqi_max() to report the maximum SQI/SQI+
+     level.
+   - Adds genphy_c45_oatc14_get_sqi() to return the current SQI or SQI+
+     value.
+   - Updates include/linux/phy.h to expose the new APIs.
+   - SQI+ capability is read from the Advanced Diagnostic Features
+     Capability register (ADFCAP). If unsupported, the driver falls back
+     to basic SQI (0–7 levels).
+   - If SQI+ capability is supported, the function returns the extended
+     SQI+ value; otherwise, it returns the basic SQI value.
+   - Open Alliance TC14 10BASE-T1S Advanced Diagnostic PHY Features.
+     https://opensig.org/wp-content/uploads/2025/06/OPEN_Alliance_10BASE-T1S_Advanced_PHY_features_for-automotive_Ethernet_V2.1b.pdf
+	
+2. add SQI support for LAN867x Rev.D0 PHYs
+   - Registers .get_sqi and .get_sqi_max callbacks in the Microchip T1S
+     driver.
+   - Enables network drivers and diagnostic tools to query link signal
+     quality for LAN867x Rev.D0 PHYs.
+   - Existing PHY functionality remains unchanged.
 
-    For example, when a VLAN packet is to send,
-    stmmac_vlan_insert consumes one unit of space,
-    and the data itself consumes another.
-    actually requiring 2 units of space in total.
+v2:
+ - Updated cover letter description for better clarity.
+ - Added oatc14_sqiplus_bits variable to cache the SQI+ capability in the
+   phy device structure.
+ - Fixed function description comment style warnings reported by the
+   kernel test robot.
 
-Signed-off-by: hailong.fan <hailong.fan@siengine.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+v3:
+ - Reworked SQI/SQI+ update sequencing to address the issue,
+   oatc14_sqiplus_bits being 0 until after
+   genphy_c45_oatc14_get_sqi_max() is called.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 7b90ecd3a..b575384cd 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -4529,7 +4529,7 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
- 		}
- 	}
- 
--	if (unlikely(stmmac_tx_avail(priv, queue) < nfrags + 1)) {
-+	if (unlikely(stmmac_tx_avail(priv, queue) < nfrags + 2)) {
- 		if (!netif_tx_queue_stopped(netdev_get_tx_queue(dev, queue))) {
- 			netif_tx_stop_queue(netdev_get_tx_queue(priv->dev,
- 								queue));
+v4:
+ - Added the missing description for the  member
+    to fix the kernel-doc warning.
+
+
+Parthiban Veerasooran (2):
+  net: phy: phy-c45: add SQI and SQI+ support for OATC14 10Base-T1S PHYs
+  net: phy: microchip_t1s: add SQI support for LAN867x Rev.D0 PHYs
+
+ drivers/net/phy/mdio-open-alliance.h |  13 +++
+ drivers/net/phy/microchip_t1s.c      |   2 +
+ drivers/net/phy/phy-c45.c            | 137 +++++++++++++++++++++++++++
+ include/linux/phy.h                  |  29 ++++++
+ 4 files changed, 181 insertions(+)
+
+
+base-commit: 0177f0f07886e54e12c6f18fa58f63e63ddd3c58
 -- 
 2.34.1
 
