@@ -1,115 +1,151 @@
-Return-Path: <netdev+bounces-242935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CF32C96999
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 11:15:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AC63C969EB
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 11:23:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F1503A3789
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 10:14:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FC483A2878
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 10:23:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 263CA30216F;
-	Mon,  1 Dec 2025 10:14:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E526F302747;
+	Mon,  1 Dec 2025 10:23:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LoCgp+dQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WvqBgENG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFB1C30215C;
-	Mon,  1 Dec 2025 10:14:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCC1D301475;
+	Mon,  1 Dec 2025 10:23:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764584056; cv=none; b=naOQgqzH+a3+hxiDpvkd66OiYvS++7YYmDe0eXH4qlrF6LVE2q/0aI9Nsr2F3YfZcHT8OX6K3q9gQlNJmGUmhjAjVkeUHFUPEBTsalR5qJmvrqb79UaVxe1O4lCveepD+mRFfSA4OrM+nA0Lc0RV9cVLzExHMte6ZZWNUjtk0o4=
+	t=1764584589; cv=none; b=QjZqb61h0OA3QzmVdy0re0xV6BxnstyybL5Kzc6KDWMayoPX+OtpDu2+eVF5HlZCLn76mpn1NacBTjC27e7HgOozxPPjT2d/qhx55ueaDLwI1/Oy+pqOSJzmRvaR0CF2fSwhInFXoZBm51z7sKzllv0dYk9fX0Q9/bW+F6sg1Us=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764584056; c=relaxed/simple;
-	bh=jbH32GfphK99V2xFL7pk3dVlmunWspL46P+bLaITSAk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n2Xv5EPIyP7lA0icaDAg1yIKKWMYv5LFm9+zslTWUcPbSW1FdkbGhn7V/p044OzkTE29Hvcdbtn61gvcS6LuXqw/ktHPb3Z3jxFa6yjoyFg1Re7x7qLUIr3u6HbpiEXKT0zWeQXgV6kHK06vIQMlyVlmrAHYIt3TIwxkJPBk7fo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LoCgp+dQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9177FC4CEF1;
-	Mon,  1 Dec 2025 10:14:12 +0000 (UTC)
+	s=arc-20240116; t=1764584589; c=relaxed/simple;
+	bh=kwh+Hg/LLxhbNL95rorHfY6ghNbojJFzs7vONsAbfOc=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ngd4dx31UD6ZIulc93v6I7jCW4q8CCAlq/J7dJmjvuCydcpTEPjxHWmw1LpjsM6sw9mHxmAMLVNE6QAHF1nxPAE/oG3IiWzDA+4NP7BH4wa7UTjx0WyX3GFVN4HCj8wqxRHZvszODsrFTBtXlnzSpQz0Lbrm/EGX/VE3Y8YHNjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WvqBgENG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C042C4CEF1;
+	Mon,  1 Dec 2025 10:23:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764584055;
-	bh=jbH32GfphK99V2xFL7pk3dVlmunWspL46P+bLaITSAk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LoCgp+dQTz1kUiasiV0fk3XCrCLAHz2QpTtnOrJYj3XqU1yDONA+FZGf4b/w9MgCB
-	 S+9hYNwmGcLu+c0T6KsY2NjpsZaMuYxxwdmiKJsPTg4l2apgtyb4fw+WXI3Vs/MTSr
-	 1YDiFjeI0xRpuEYriXU/2pD3FX61lztAjX1OUM6kvdVQizdl8dleaw5+iD6rkbKnNF
-	 HpC9gkUKcDwNDcbyludPUXDCowsrDrTi4/wp+jgJ99b1HJ92Az40+hUXvkiS9G7g9/
-	 oIuhmEvJjxL//hxS3FKZ0SkYy7oR7veieWSZPWNGPUnDEGLuemhQ1YunqI/zeONjho
-	 f/RaCiRhOnlUQ==
-Date: Mon, 1 Dec 2025 10:14:10 +0000
-From: Simon Horman <horms@kernel.org>
-To: Florian Fuchs <fuchsfl@gmail.com>
-Cc: Geoff Levand <geoff@infradead.org>, netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <chleroy@kernel.org>,
-	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: ps3_gelic_net: Use napi_alloc_skb() and
- napi_gro_receive()
-Message-ID: <aS1qciHDiLaK-c2f@horms.kernel.org>
-References: <20251130194155.1950980-1-fuchsfl@gmail.com>
+	s=k20201202; t=1764584588;
+	bh=kwh+Hg/LLxhbNL95rorHfY6ghNbojJFzs7vONsAbfOc=;
+	h=From:Date:Subject:To:Cc:From;
+	b=WvqBgENGEDXHC7flebeOx3Tz33HtLbC9uwdT2JsgzyIGVwXIh847fEcplLdSQaS/C
+	 s6KLUXw6WrBcXQVfrbKQat4D2mxMwg+Y/6rcTDdo5kAp5gImiVJCUh/WfvVw5PD6DQ
+	 kC2OZgcnfDVylKmfAUgCFpjkjOOPvXlqDof7JaY3zZHN6/+80FUl54f59BWoJ0j05Q
+	 Z2F5PrBuf/2NUtvpJjbtLenVm3ZAuBYY0b1LKXcmusKMZhraj3B6oWRr2RxgZU/yLf
+	 PrvzRWX0qBcjIz/1FFwId71Miq7lgaCK1oNwLKakOtAwCHvWM/HKqC5z2qr1/287j7
+	 88yZ5B8G4fysw==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Mon, 01 Dec 2025 11:22:45 +0100
+Subject: [PATCH nf-next] netfilter: Always set route tuple out ifindex
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251130194155.1950980-1-fuchsfl@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20251201-nft-flowtable-always-set-ifidx-v1-1-0aa6f08ffe4b@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x3NTQqEMAxA4atI1hNog104VxlcdGzqBEodmuIP4
+ t0tLr/NeycoF2GFd3dC4VVUltxgXx1MP59nRgnNQIacJWMxx4oxLVv138To0+YPReWKEiXsaIj
+ 7gZ0LQ0/QIv/CUfZn8Bmv6wYhy2igcAAAAA==
+X-Change-ID: 20251201-nft-flowtable-always-set-ifidx-02e49e55d942
+To: Pablo Neira Ayuso <pablo@netfilter.org>, 
+ Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>, 
+ Phil Sutter <phil@nwl.cc>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+ netdev@vger.kernel.org, Lorenzo Bianconi <lorenzo@kernel.org>
+X-Mailer: b4 0.14.2
 
-On Sun, Nov 30, 2025 at 08:41:55PM +0100, Florian Fuchs wrote:
-> Use the napi functions napi_alloc_skb() and napi_gro_receive() instead
-> of netdev_alloc_skb() and netif_receive_skb() for more efficient packet
-> receiving. The switch to napi aware functions increases the RX
-> throughput, reduces the occurrence of retransmissions and improves the
-> resilience against SKB allocation failures.
-> 
-> Signed-off-by: Florian Fuchs <fuchsfl@gmail.com>
-> ---
-> Note: This change has been tested on real hardware Sony PS3 (CECHL04 PAL),
-> the patch was tested for many hours, with continuous system load, high
-> network transfer load and injected failslab errors.
-> 
-> In my tests, the RX throughput increased up to 100% and reduced the
-> occurrence of retransmissions drastically, with GRO enabled:
-> 
-> iperf3 before and after the commit, where PS3 (with this driver) is on
-> the receiving side:
-> Before: [  5]   0.00-10.00  sec   551 MBytes   462 Mbits/sec receiver
-> After:  [  5]   0.00-10.00  sec  1.09 GBytes   939 Mbits/sec receiver
-> 
-> stats from the sending client to the PS3:
-> Before: [  5]   0.00-10.00  sec   552 MBytes   463 Mbits/sec  3151 sender
-> After:  [  5]   0.00-10.00  sec  1.09 GBytes   940 Mbits/sec   37  sender
+Always set nf_flow_route tuple out ifindex even if the indev is not one
+of the flowtable configured devices since otherwise the outdev lookup in
+nf_flow_offload_ip_hook() or nf_flow_offload_ipv6_hook() for
+FLOW_OFFLOAD_XMIT_NEIGH flowtable entries will fail.
+The above issue occurs in the following configuration since IP6IP6
+tunnel does not support flowtable acceleration yet:
 
-Hi Florian,
+$ip addr show
+5: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+    link/ether 00:11:22:33:22:55 brd ff:ff:ff:ff:ff:ff link-netns ns1
+    inet6 2001:db8:1::2/64 scope global nodad
+       valid_lft forever preferred_lft forever
+    inet6 fe80::211:22ff:fe33:2255/64 scope link tentative proto kernel_ll
+       valid_lft forever preferred_lft forever
+6: eth1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+    link/ether 00:22:22:33:22:55 brd ff:ff:ff:ff:ff:ff link-netns ns3
+    inet6 2001:db8:2::1/64 scope global nodad
+       valid_lft forever preferred_lft forever
+    inet6 fe80::222:22ff:fe33:2255/64 scope link tentative proto kernel_ll
+       valid_lft forever preferred_lft forever
+7: tun0@NONE: <POINTOPOINT,NOARP,UP,LOWER_UP> mtu 1452 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/tunnel6 2001:db8:2::1 peer 2001:db8:2::2 permaddr a85:e732:2c37::
+    inet6 2002:db8:1::1/64 scope global nodad
+       valid_lft forever preferred_lft forever
+    inet6 fe80::885:e7ff:fe32:2c37/64 scope link proto kernel_ll
+       valid_lft forever preferred_lft forever
 
-Thanks for the rest results and confirming this has
-been exercised on real HW.
+$ip -6 route show
+2001:db8:1::/64 dev eth0 proto kernel metric 256 pref medium
+2001:db8:2::/64 dev eth1 proto kernel metric 256 pref medium
+2002:db8:1::/64 dev tun0 proto kernel metric 256 pref medium
+default via 2002:db8:1::2 dev tun0 metric 1024 pref medium
 
-Thinking out loud:
+$nft list ruleset
+table inet filter {
+        flowtable ft {
+                hook ingress priority filter
+                devices = { eth0, eth1 }
+        }
 
-* I see that the napi_mode argument to gelic_descr_prepare_rx ensures
-  that napi_alloc_skb() is only called from softirq context.
+        chain forward {
+                type filter hook forward priority filter; policy accept;
+                meta l4proto { tcp, udp } flow add @ft
+        }
+}
 
-* I see that the driver already calls napi_complete_done() in
-  it's poll callback, a pre-requisite for using napi_alloc_skb().
+Fixes: b5964aac51e0 ("netfilter: flowtable: consolidate xmit path")
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+ net/netfilter/nf_flow_table_path.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-So as I understand things the use of the NAPI API by this patch is correct.
+diff --git a/net/netfilter/nf_flow_table_path.c b/net/netfilter/nf_flow_table_path.c
+index f0984cf69a09bbd8404caf67c2a774bf5833f572..eb24fe2715dcd5fcafa054309c91ccb2601249c1 100644
+--- a/net/netfilter/nf_flow_table_path.c
++++ b/net/netfilter/nf_flow_table_path.c
+@@ -250,6 +250,9 @@ static void nft_dev_forward_path(const struct nft_pktinfo *pkt,
+ 	if (nft_dev_fill_forward_path(route, dst, ct, dir, ha, &stack) >= 0)
+ 		nft_dev_path_info(&stack, &info, ha, &ft->data);
+ 
++	if (info.outdev)
++		route->tuple[dir].out.ifindex = info.outdev->ifindex;
++
+ 	if (!info.indev || !nft_flowtable_find_dev(info.indev, ft))
+ 		return;
+ 
+@@ -269,7 +272,6 @@ static void nft_dev_forward_path(const struct nft_pktinfo *pkt,
+ 
+ 	route->tuple[!dir].in.num_encaps = info.num_encaps;
+ 	route->tuple[!dir].in.ingress_vlans = info.ingress_vlans;
+-	route->tuple[dir].out.ifindex = info.outdev->ifindex;
+ 
+ 	if (info.xmit_type == FLOW_OFFLOAD_XMIT_DIRECT) {
+ 		memcpy(route->tuple[dir].out.h_source, info.h_source, ETH_ALEN);
 
-And this provides a nice example of the advantages of using this part
-of the API.
+---
+base-commit: 0177f0f07886e54e12c6f18fa58f63e63ddd3c58
+change-id: 20251201-nft-flowtable-always-set-ifidx-02e49e55d942
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
+
 
