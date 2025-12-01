@@ -1,98 +1,88 @@
-Return-Path: <netdev+bounces-242949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242950-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95A5EC96B92
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 11:50:33 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id DACC2C96BF5
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 11:52:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F55C3A2841
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 10:50:22 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C98BC342B09
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 10:52:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 433BE304980;
-	Mon,  1 Dec 2025 10:50:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F683307491;
+	Mon,  1 Dec 2025 10:51:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="x0H5Sflv"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="05CaYIxV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 127A53043CA
-	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 10:50:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CC20305062
+	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 10:51:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764586216; cv=none; b=G1XN2It5OPwSRTRptjGt/0dCoZ0vCkN3cUtHud+4WMF27x5JsustuDyU2kq+5m71yj+HdCi+FhWt7GOg5GIHzN5fqmskPvJcK/hy5++rCHOnBTSWtl+9zo2V8+okKR49wm7w91/RZICgAzcDOBEnL4gX/QN17Os3Ch3HNPibejw=
+	t=1764586264; cv=none; b=H0smaJt+5x5NCV6jvtgAKGAQWTTZBqR7sN6BvYl/3aTtAQ1+/cWVqiSpAS0GHXGhRi3o4NNuLNeXE5vA9d38H5+FefkWy0E/DlEud2BSxIPjf1Mp6Je7191TiqO1y7UI6j4v6I1hBtf8xjgv67e45ad16ICgq22O5jhxyh/H+oU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764586216; c=relaxed/simple;
-	bh=Vl5Pt6fbbWhiVMNLXXFQfg4zF9/xEjpl7rTTd1qmuhc=;
+	s=arc-20240116; t=1764586264; c=relaxed/simple;
+	bh=Fqr6qpy2QHYm2GjegQoamThXNI95Ygn9oib3niTm4oM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f/R58PP/MNBJ0Miu9XqZPWbphHHFVre1S74hco3aEKrJnpKqZR9EOQ4iZErSBrYhcuT4sJfCj0ApcxG4HpND2wKfasnFKTUnOC1YgElnlm1ZYMT6BaiWS3N7DmqQ0xizT0ZL86mkf9/XLIkCGoovJlclS/SA+usF/C37hbvChL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=x0H5Sflv; arc=none smtp.client-ip=209.85.128.41
+	 Content-Type:Content-Disposition:In-Reply-To; b=AY5Xq38UMaJ0Kv/l//iifw3u0pT+qHZ8GV0t39XzW8tFvjM/Hh1IAjTkGl5ma4JpQirCMUseMQdTamJ1TPbqAXaUIELw+q4CGpT33VnYoXRf71ktv68AZTpPF8GhPD9tRO388DJ/xGUYveImML/4UWiSy0urK3dk5BMLeP3HS+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=05CaYIxV; arc=none smtp.client-ip=209.85.128.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4779adb38d3so28477795e9.2
-        for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 02:50:13 -0800 (PST)
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4775ae5684fso18136285e9.1
+        for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 02:51:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1764586212; x=1765191012; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1764586261; x=1765191061; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vsBhiX0PVPZ+1c2Xkz/7qg2YuqZk4pwJLdnYaEMKyy4=;
-        b=x0H5SflvsYhHeVejbOzjFjA6IxemuZ+5XE0kEgoxSRNMgoLmme6pS0YKTpXhsCKumV
-         SWWrYbtAZqZQwqCkDtK3HePLav9G9ld614dc+jmCpOWPfv51eTLRgKlutWSVmSJqkzdx
-         VVTG5IGZAQ+cxj2sR0af8arQOyytwYBKAO8hZ/RFIh3v8+Kp0i/udQXKCB3yhfnkkUMf
-         RirGGb5O0S95DPE569OB4HsFg7WRlxbBd8buPYcGNdaYwAipotN7MDWRF+gHm8Z/4gaL
-         UkiyVG46MY+yzzJxHOYZjInitRclZ3H6J0j6C8eLIFScQhn5cNsfD3oHGQgoZZioC+gW
-         rUGg==
+        bh=Fqr6qpy2QHYm2GjegQoamThXNI95Ygn9oib3niTm4oM=;
+        b=05CaYIxVm6ACdnxmzpYIE14vvzHoql5xA57TIZ6LUeqBdjNUgyl5ZnHq3uEy8lAri3
+         n82gv7bTzBXax8eiMd+qbQ6FcYrGSsYFplM0WnagzUzkGVp4jkLRCjrudTumwWDxe78c
+         Q5kb6c3wQjhi9cGRuwkAVMgePbPXkvfHIv8ItDcgTCc1VJlf8izQ5hp8oj47vqjwsp1B
+         Kxe2MemxzYFLGX40ZHymnz0F/bKreHiixvX1+VUOeCNunW4G8Jpgj0BiNiZCU9Uc1sMn
+         Wj2vIiXa4ODqAvefhoj2B/1s+mZ2x0jmG3f9rKZlFm4JJnQld5JJN0EmZbNadVqbtQgi
+         YlKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764586212; x=1765191012;
+        d=1e100.net; s=20230601; t=1764586261; x=1765191061;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vsBhiX0PVPZ+1c2Xkz/7qg2YuqZk4pwJLdnYaEMKyy4=;
-        b=ouCjZBkp2+YQMAJgxhxzqINclzcCgLCHVDMlvwohsDVWfNY7fHbU+D9r/I8wyAAtrO
-         O30Cm5OyrnSCxQCFJb870PgcAKEGH0vFOQxCIU6QiRwNH++WxodbDbnX7D02zZqkJ5ic
-         N8iZQzqPDb/k5tVjVWAELjeMiB6FTBsfFGAGzRA3PjQBRm9MJeC8TW6WA5TInZldT6vL
-         N754ucdgm1U8LuzFA6JOc/TaCBgscVJD+QnvJurKDHJvhjCHOmsm76mUI4PH0qLL+oR6
-         nNPzpBdmBFs4Sk2x8kEPT/VCTqdELTP4heQCnUK0ICkJBBnuMcx7t3mCTuQqa52Arubt
-         FcxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWldMabO78AG1R+f0J29LeI5qSEFgjFKuwrkR1YUiDaOCR8yPXIH8KUD1tI4l6Ek+MwNQyGa/A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzIRAOF59RAt4wqtShee8gsYwWkQpzAy8Wl27I4FPqyaKGoj2dM
-	16XwbGpDNtdxHmha43FNEsU9IVEQVsjmrAvhQ/oNDo8XMZHNhcMFQ/u71myBAymglQQ=
-X-Gm-Gg: ASbGncsNn9cA1c53l3o6i5Xnm9CQ8cKsTTcmoE0YLt2RmkX95CUR6oKYS7coA91Mk7r
-	8m7i6LZv1PaPYEn8Ofk4rjnv2IYWlOtgF0+4LlyXsW8/Coipxw1f5XTlqhh1e3QClemIHSbZ2ku
-	TM817digBWT7sjTqLGhJoTayZkT7HpnbB/nVDro+LubtpA1rJCNqIYQhKysAhqEP8rm8P10wxvP
-	ZifX+7dEUNYDTA/8pzWmcByfmvhahZpjwdsUpzZG43dz/ys8a6kBUuW4HVyoiUdefED1Ve3dKww
-	ZIYA6oOaO+FcF1t34VTY1Bi9Ujep+rB1Y1E1fpJzdTS1IZjT1lGiqOtDdv/5QnrOqYh5l2g77wr
-	crET+KI4Xat1hNmoMSHi19dvpsI1HBHA6h2bUG7CjgYRTRDzERoFtit00nXWTobkJIPcYmxTBUz
-	6VDLOZJUGgLkjIdXd/PZPzJg==
-X-Google-Smtp-Source: AGHT+IF8Tu4veq+TqWb6qimoMPLbdTzxlzvlIjg1tAKG25deNHRi+KLPl07N+U3YsCQceTPRWYr3CA==
-X-Received: by 2002:a05:6000:2288:b0:429:c4bb:fbbb with SMTP id ffacd0b85a97d-42e0f2129cemr26950630f8f.13.1764586211765;
-        Mon, 01 Dec 2025 02:50:11 -0800 (PST)
+        bh=Fqr6qpy2QHYm2GjegQoamThXNI95Ygn9oib3niTm4oM=;
+        b=bmPDSd5uHVeo7ylS3l1n6BAPGjHGVnzwidfOWtQghINKcGnAZHIvi42pdyPBYnTH4B
+         2BKBD+OoY74qOhLd8brjbkJwApdqHfh/YJnu/eJKTGbColQhWtmavLuuLioDTnvlkuZT
+         lsRVVKnQobBalpwM4Hqw+Yhl1Ngju/kC3+kwjxle6WcwLRjx2EY6obZqpDLl+jfVJE1M
+         IZx8sIFhj/9F7cSJiDyB3pzUmN985cU2kxZdj9Tk1uBDN7vgWL2TT10FRfUHUNFaPxFQ
+         rDAen4PwYvANBw7ehbkXHr1x1GBwNk8VvYr1D77/Q6QIEmyttqYvJHTPw2K0ijxn2GnT
+         pBow==
+X-Forwarded-Encrypted: i=1; AJvYcCUTrg0jqvDBFDQfzDT0VDuToYoHWydVH9fZESwT2JPG6vvViSu01b5WzfZsO9rMMXRlysgpKT8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLLX3MiuYkcdzaPoQJt90DrvSTCX7OicItoOrlhqISwJjo8fLV
+	nz4Pct7H9cc96cIk1Jix7D5puHpotUyP3y+N87141fOaM95YMVNxinvG8XG5cssqTUQ=
+X-Gm-Gg: ASbGncs2S/ptl1WzNDOlNk+k/caZyOuYrJARFVFNEIIAHyt2d37taf/Z85oHZl0HXRx
+	AIgZkXlr6z8z7Sjt05+qFapge3LRTaQqMXRx8E61rmxdcSlpPEn8pTnC/yxCv2RNd+Lzv8SLQvR
+	nM7K+bcS8K64CFTk48mjJOSQhpcwpNdIOW0Z7+aQZpbcrjfQXohIUr3s50XAlI2vRLK22tPaTwa
+	eN5gG/PE1dj4Z9iRDm6elDPDf0NwhAqPX9XTv3sWIXUQid/2r6J8i7DiJ4G3+CKDQLELTlfgPx8
+	MT4HQW5pNu5ApQSJVIpvPKK4M3JwUm8tRKYGCy/lAKbQkCS8VwAfinX/eZ59Z3CixekoGFN7+pO
+	T9ObbxNYc1WHT6OrNzilk+h1Vjnfs123Y1151qS4ElM7aQvf1KUQSPfr/4O1m+bUW7zGBcSXOVN
+	2E4XaY1BAQV7sGFtbu1LA7w6swOaKbXTHp
+X-Google-Smtp-Source: AGHT+IHDMrqX/K8K+NlPhHfHYNqhShQOpD5sAr4CXR4vDEef6ED23rYcb//HGm9GwLyaFTWyCcDhFA==
+X-Received: by 2002:a05:600c:1c25:b0:46e:4586:57e4 with SMTP id 5b1f17b1804b1-477c114ed70mr523856105e9.24.1764586261487;
+        Mon, 01 Dec 2025 02:51:01 -0800 (PST)
 Received: from FV6GYCPJ69 ([140.209.217.211])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42e1caa5d02sm25827129f8f.36.2025.12.01.02.50.10
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4791163e3dasm234443755e9.11.2025.12.01.02.51.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Dec 2025 02:50:11 -0800 (PST)
-Date: Mon, 1 Dec 2025 11:50:08 +0100
+        Mon, 01 Dec 2025 02:51:01 -0800 (PST)
+Date: Mon, 1 Dec 2025 11:50:59 +0100
 From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Donald Hunter <donald.hunter@gmail.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	Gal Pressman <gal@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>, 
-	Carolina Jubran <cjubran@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>, 
-	Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [PATCH net-next V4 02/14] documentation: networking: add shared
- devlink documentation
-Message-ID: <n6mey5dbfpw7ykp3wozgtxo5grvac642tskcn4mqknrurhpwy7@ugolzkzzujba>
-References: <1764101173-1312171-1-git-send-email-tariqt@nvidia.com>
- <1764101173-1312171-3-git-send-email-tariqt@nvidia.com>
- <20251127201645.3d7a10f6@kernel.org>
- <hidhx467pn6pcisuoxdw3pykyvnlq7rdicmjksbozw4dtqysti@yd5lin3qft4q>
- <20251128191924.7c54c926@kernel.org>
+To: "Nikola Z. Ivanov" <zlatistiv@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, skhan@linuxfoundation.org, david.hunter.linux@gmail.com, 
+	khalid@kernel.org, linux-kernel-mentees@lists.linuxfoundation.org
+Subject: Re: [PATCH net-next] team: Add matching error label for failed action
+Message-ID: <wneutmbnj5ie265wee6lssijddfomagyrkckepjbeexei3nqng@as5icpm5f4km>
+References: <20251128072544.223645-1-zlatistiv@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,61 +91,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251128191924.7c54c926@kernel.org>
+In-Reply-To: <20251128072544.223645-1-zlatistiv@gmail.com>
 
-Sat, Nov 29, 2025 at 04:19:24AM +0100, kuba@kernel.org wrote:
->On Fri, 28 Nov 2025 12:00:13 +0100 Jiri Pirko wrote:
->> >> +Shared devlink instances allow multiple physical functions (PFs) on the same
->> >> +chip to share an additional devlink instance for chip-wide operations. This
->> >> +should be implemented within individual drivers alongside the individual PF
->> >> +devlink instances, not replacing them.
->> >> +
->> >> +The shared devlink instance should be backed by a faux device and should
->> >> +provide a common interface for operations that affect the entire chip
->> >> +rather than individual PFs.  
->> >
->> >If we go with this we must state very clearly that this is a crutch and
->> >_not_ the recommended configuration...  
->> 
->> Why "not recommented". If there is a usecase for this in a dirrerent
->> driver, it is probably good to utilize the shared instance, isn't it?
->> Perhaps I'm missing something.
+Fri, Nov 28, 2025 at 08:25:44AM +0100, zlatistiv@gmail.com wrote:
+>Follow the "action" - "err_action" pairing of labels
+>found across the source code of team net device.
 >
->Having a single instance seems preferable from user's point of view.
-
-Sure, if there is no need for sharing, correct.
-
-
+>Currently in team_port_add the err_set_slave_promisc
+>label is reused for exiting on error when setting
+>allmulti level of the new slave.
 >
->> >... because presumably we could use this infra to manage a single
->> >devlink instance? Which is what I asked for initially.  
->> 
->> I'm not sure I follow. If there is only one PF bound, there is 1:1
->> relationship. Depends on how many PFs of the same ASIC you have.
->
->I'm talking about multi-PF devices. mlx5 supports multi-PF setup for
->NUMA locality IIUC. In such configurations per-PF parameters can be
->configured on PCI PF ports.
+>Signed-off-by: Nikola Z. Ivanov <zlatistiv@gmail.com>
 
-Correct. IFAIK there is one PF devlink instance per NUMA node. The
-shared instance on top would make sense to me. That was one of
-motivations to introduce it. Then this shared instance would hold
-netdev, vf representors etc.
-
-
->
->> >Why can't this mutex live in the core?  
->> 
->> Well, the mutex protect the list of instances which are managed in the
->> driver. If you want to move the mutex, I don't see how to do it without
->> moving all the code related to shared devlink instances, including faux
->> probe etc. Is that what you suggest?
->
->Multiple ways you can solve it, but drivers should have to duplicate
->all the instance management and locking. BTW please don't use guard().
-
-I'm having troubles to undestand what you say, sorry :/ Do you prefer to
-move the code from driver to devlink core or not?
-Regarding guard(), sure. I wonder how much more time it's gonna take
-since this resistentance fades out :)
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
