@@ -1,317 +1,213 @@
-Return-Path: <netdev+bounces-242926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCECDC9679C
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 10:52:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F21C4C9688D
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 11:01:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 25AD3344AB5
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 09:51:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABA2F3A3DFA
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 10:01:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86CB2303A19;
-	Mon,  1 Dec 2025 09:49:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 063203043A1;
+	Mon,  1 Dec 2025 10:00:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SzhnaOjK";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="aKvfLeac"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE4B1302CCA
-	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 09:49:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2034F30217C
+	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 10:00:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764582592; cv=none; b=YCvCWDdPsKMJ7ps73Oheqb0+HVV+jNXaUZRWiobdjyLMWkLn5XF65ylysqSm88+Jq7M1fGopC36R02EUhjh2KZ3fHB2+/ZsNOoShtRMfB0+22UVY0dlrJxN9VLZOKYk+81EVOm+YyO+iIasO+VnmyR8jcz6yxVtdm8SBL0Qixzs=
+	t=1764583240; cv=none; b=qvZylMchi7y/m0pfypR8LtJRsCRAUBEq+6WcfQTK0Kofozi+OJ9a8OsDxjP+Z9XlAF84jh6iI+ndk9ywjcB9kRQvztZwKLQMHPRUK2Z9/LxlAWCI3+vP6fs+KkYjmGINPHHUewBpjzqipS9W8Ld5VnGoUoDFfDG4e554hysb6hI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764582592; c=relaxed/simple;
-	bh=SWP4Y1lfxQ7WaiF13/ljXOpCYYcLRhG2a4mRCJn1Z2I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AkKCL1VYvcrnJYjsoDaF+cFiJo33A2FLB5/eh9WGzWWVsfTcUHNx0RdiobjCGtZGUpGFoOo9Iiwh1Et4im++TSWxZYYeiLQs/MbsGGvOm2Lmf+jgDKobgNlUj9I4CgaAP8QIyQiWpV8E3XXKp4oLfsdP3WvXD1u6R6ErzowRmD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vQ0Ws-0001kw-4B; Mon, 01 Dec 2025 10:49:10 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vQ0Wp-003QCD-05;
-	Mon, 01 Dec 2025 10:49:07 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vQ0Wo-00HET6-2r;
-	Mon, 01 Dec 2025 10:49:06 +0100
-Date: Mon, 1 Dec 2025 10:49:06 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Rob Herring <robh@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jonathan Corbet <corbet@lwn.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Lukasz Majewski <lukma@denx.de>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Divya.Koppera@microchip.com,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org,
-	Sabrina Dubroca <sd@queasysnail.net>, linux-kernel@vger.kernel.org,
-	kernel@pengutronix.de, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [PATCH net-next v8 1/1] Documentation: net: add flow control
- guide and document ethtool API
-Message-ID: <aS1kkre1bOJCkk8M@pengutronix.de>
-References: <20251119140318.2035340-1-o.rempel@pengutronix.de>
- <20251125181957.5b61bdb3@kernel.org>
- <aSa8Gkl1AP1U2C9j@pengutronix.de>
- <aSj6gM_m-7ZXGchw@shell.armlinux.org.uk>
- <aSj_OxBzq_gJOb4q@shell.armlinux.org.uk>
- <aSljeggP5UHYhFaP@pengutronix.de>
- <20251128103259.258f6fa5@kernel.org>
- <63082064-44b1-42b0-b6c8-a7d9585c82f5@lunn.ch>
- <aSoIREdMWGeygnD_@shell.armlinux.org.uk>
- <20251128141710.4fa38296@kernel.org>
+	s=arc-20240116; t=1764583240; c=relaxed/simple;
+	bh=cOpEGymbvmQHpCvWIgZPpw4Gloz3bKUlw4mt8JqOdCY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=TvgKAzUO9gSx/EEH0nyAUvxbmvBdWXyEWzFPP1FOk5ke/es2xdVQ/jSow1Jffw8QVPrxJu5wrm30jdIRZcs6htXCztiyyeEDQVIx3gACPhWht53Q2pUyfIwFStvm7LIkBLRWI12zig2MJmb7ih1L2ZMH0GNphV7fB294iDTiEFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SzhnaOjK; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=aKvfLeac; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764583238;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=xPcAtXmqkcV2OwW35f2TUENlJezHZj6qDhp1D2vi8Cc=;
+	b=SzhnaOjK+GY8VAOXQ+zKas6Foq/eyiKPpUfrnQAlB7WiV+ZtgMpnW8AWyYIc4ekVNTTdNc
+	+aZURsE77oSUbG3BWANCMJMywL/z9cxxIV+sVjFeHr1GCK8BQ4R612PJcTLjRcOYFZjJLJ
+	ToAwSzDf4AaAyM5mXzSqeP5YOhYbZW4=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-252-aXffxzwnNteDQ-EUATLzSw-1; Mon, 01 Dec 2025 05:00:36 -0500
+X-MC-Unique: aXffxzwnNteDQ-EUATLzSw-1
+X-Mimecast-MFC-AGG-ID: aXffxzwnNteDQ-EUATLzSw_1764583235
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-b70caafad59so393862466b.0
+        for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 02:00:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1764583235; x=1765188035; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xPcAtXmqkcV2OwW35f2TUENlJezHZj6qDhp1D2vi8Cc=;
+        b=aKvfLeac3fHki0JNgv3QGUFwV9pdkM8tg9ElnIz8cqh7B9pBWUzYVJTTBEogLHOWKa
+         3Zxdgf1+WVTF89dQ1ZE45auL1WYirTRRKNWmB5J4fHasxp6JunXM9CHhEXMrzU0tP0qh
+         LkUYlwJJxG3S0Q9FZbJdu2yGc72zJC0NfwTSRmh30E/7wbdkkshLEw87VeWmTrz0DRbX
+         S/khHWnZ8krebOu3EObhb6zos1RsAC8RX5I5aV4A6UExJjyz7QyBNAnr8xeC+KzSuG4S
+         F9mMPqHc6zV4Zbpz+p02HKQ8maKDgNQqekbg0j9GawNDAxFvdGhU+5TOBFy9EJiGFiAw
+         ptXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764583235; x=1765188035;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xPcAtXmqkcV2OwW35f2TUENlJezHZj6qDhp1D2vi8Cc=;
+        b=B0lUanMoPZzbPFMKtHIaDbnHMBqGYcMz+kF1FuSmJFr6IM7J/oABZkeyi8pkbCBDlv
+         6WJ4u1xbaz/SuR9r7X2/QsdRpv8arz3eiLOc2k940zTX7JCxb6yMI1BNOlPW6xZbkS02
+         tkgRSoraGA+1O2ZGp9Z8Dtyq9A3WlL/bmmBJ9JnA4NWh37SmAK7qEtFxT1/QDFAP/Ptz
+         mHRS7mRkf1A2c60afwJFQn6BV+cMR4+0aTzkj3+qXDuETGHm4UKdWhF3qMVd5KXPBiBU
+         6PeCLLsqXzs3lg18NYa/5l15Cg+tx7IpiLGQe2Ngzf+A0lXtjKCQckGVeS3s8D0xWGui
+         zIQA==
+X-Forwarded-Encrypted: i=1; AJvYcCWsINJqAytB64yNVsumzzdduxdAODP1OGaF71aqAtVzn4VgMTZJL7lOLFcktf60oIktyHKynkk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2wyuFx6W6DwFxxtg/VJSbgVV6nfwk2sYKZlqGYpYp369OuVSH
+	L0G76xqpKVDxnDKxuHyi/tqOpS06QR3aV5agBrNdWF2M16T7uzupBEKjz8j0isxrPmzU/Lps6cl
+	czHUTAM7P3qqcqXF5XKiJJDv2yhRqlvO1ryeyW5rrgQBVeawo3OUGYcaSHQ==
+X-Gm-Gg: ASbGncub+lS9893EaF/6AU5zSmousLn//1gbs3lmHL85vAJ67BbPi4oyVXnsglC+i6k
+	RqUOhIsbMShreV53D2XzzEtiZO5t4VWddGUA8F953G7U8YqOMyfrgmy/JFSDTAwECL19oq22vHh
+	WKY0H83lx9hrzYxhozCG1SKdI0Qsgc9SSfST+fQkWLXCZYsQ1QFgJfivyA3IJpZxonUl4MUNg3L
+	lLYcdg8Ta9GjA/LNlnsZwbwxicDgv2T+AUcIKVvJVzccfn/X3UYOvivULL1oP6l1F9CRSh9kA6A
+	j/q2+kxMFZtHVX4JipyU0q/3FQ4E9xL3mmkUKobvpGQ9j8whbYqadQNvBeH+LPkjQszrJ/BN7Nh
+	FgXk2vpoxjWoerRJ3NRFJC6cY2SkaP6syrw==
+X-Received: by 2002:a17:907:948e:b0:b76:6aca:f1f3 with SMTP id a640c23a62f3a-b7671589e26mr4283871166b.19.1764583235292;
+        Mon, 01 Dec 2025 02:00:35 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEmT8/ucDX1Qh3CKdD8iaTBPlS1ARFHW2GBYJb7svm5iT+aEQnVTVZYTPPAQOJCRS6udU6r2g==
+X-Received: by 2002:a17:907:948e:b0:b76:6aca:f1f3 with SMTP id a640c23a62f3a-b7671589e26mr4283857766b.19.1764583233293;
+        Mon, 01 Dec 2025 02:00:33 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b76f5a25fcasm1175298266b.61.2025.12.01.02.00.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Dec 2025 02:00:29 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 99FD1395D51; Mon, 01 Dec 2025 11:00:28 +0100 (CET)
+From: =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+Subject: [PATCH net-next v4 0/5] Multi-queue aware sch_cake
+Date: Mon, 01 Dec 2025 11:00:18 +0100
+Message-Id: <20251201-mq-cake-sub-qdisc-v4-0-50dd3211a1c6@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20251128141710.4fa38296@kernel.org>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIADJnLWkC/3XNwUrEMBAG4FdZcnZkMk26rSdB8AG8ioc0M7Fh2
+ dZNallZ+u6GCrKy9fjzz//NRWVJUbJ62F1UkjnmOA4lmLud8r0b3gUil6wIyWKLBMcTeHcQyJ8
+ dnDhmD54DdrZlCmJV2X0kCfG8mq9qkAkGOU/qrTR9zNOYvtZnL89P68EPTGYDnjUgmMphjay1J
+ veYhHs33fvxuHqz/iVK/S/hKATNrjNNE24Iuib2WwQVggy34hjNvmtviOqKqHCLqAphQ117axr
+ x7P8Qy7J8AzxyU4GHAQAA
+X-Change-ID: 20250902-mq-cake-sub-qdisc-cdf0b59d2fe5
+To: =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>, 
+ Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+ Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: =?utf-8?q?Jonas_K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>, 
+ cake@lists.bufferbloat.net, netdev@vger.kernel.org, 
+ =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+X-Mailer: b4 0.14.3
 
-Hi Jakub, Russell, all,
+This series adds a multi-queue aware variant of the sch_cake scheduler,
+called 'cake_mq'. Using this makes it possible to scale the rate shaper
+of sch_cake across multiple CPUs, while still enforcing a single global
+rate on the interface.
 
-On Fri, Nov 28, 2025 at 02:17:10PM -0800, Jakub Kicinski wrote:
-> On Fri, 28 Nov 2025 20:38:28 +0000 Russell King (Oracle) wrote:
-> > On Fri, Nov 28, 2025 at 09:16:24PM +0100, Andrew Lunn wrote:
-> > > > Can you please tell me what is preventing us from deprecating pauseparam
-> > > > API *for autoneg* and using linkmodes which are completely unambiguous.  
-> > > 
-> > > Just to make sure i understand you here...
-> > > 
-> > > You mean make use of
-> > > 
-> > >         ETHTOOL_LINK_MODE_Pause_BIT             = 13,
-> > >         ETHTOOL_LINK_MODE_Asym_Pause_BIT        = 14,
-> > > 
-> > > So i would do a ksettings_set() with
-> > > 
-> > > __ETHTOOL_LINK_MODE_LEGACY_MASK(Pause) | __ETHTOOL_LINK_MODE_LEGACY_MASK(Asym_Pause)
-> > > 
-> > > to indicate both pause and asym pause should be advertised.
-> > > 
-> > > The man page for ethtool does not indicate you can do this. It does
-> > > have a list of link mode bits you can pass via the advertise option to
-> > > ethtool -s, bit they are all actual link modes, not features like TP,
-> > > AUI, BNC, Pause, Backplane, FEC none, FEC baser, etc.  
-> > 
-> > I see the latest ethtool now supports -s ethX advertise MODE on|off,
-> > but it doesn't describe that in the parameter entry for "advertise"
-> > and doesn't suggest what MODE should be, nor how to specify multiple
-> > modes that one may wish to turn on/off. I'm guessing this is what you're
-> > referring to.
-> > 
-> > The ports never get advertised, so I don't think they're relevant.
-> > 
-> > However, the lack of the pause bits means that one is forced to use
-> > the hex number, and I don't deem that to be a user interface. That's
-> > a programmers interface, or rather a nightmare, because even if you're
-> > a programmer, you still end up looking at include/uapi/linux/ethtool.h
-> > and doing the maths to work out the hex number to pass, and then you
-> > mistype it with the wrong number of zeros, so you try again, and
-> > eventually you get the advertisement you wanted.
-> > 
-> > So no, I don't accept Jakub's argument right now. Forcing people into
-> > the nightmare of working out a hex number isn't something for users.
-> 
-> I did some digging, too, just now. Looks like the options are indeed
-> not documented in the man page but ethtool uses the "forward compatible"
-> scheme with strings coming from the kernel. So this:
-> 
->   ethtool -s enp0s13f0u1u1 advertise Pause on Asym_Pause on
-> 
-> works just fine, with no changes in CLI.
-> 
-> We should probably document that it works in the ethtool help and man
-> page. And possibly add some synthetic options like Receive-Only /
-> Transmit-Only so that users don't have to be aware of the encoding
-> details? Let me know if it's impractical, otherwise I think we'll
-> agree that having ethtool that makes it obvious how to achieve the
-> desired configuration beats best long form docs in the kernel..
+The approach taken in this patch series is to implement a separate qdisc
+called 'cake_mq', which is based on the existing 'mq' qdisc, but differs
+in a couple of aspects:
 
-1. Reject vs Accept autoneg=1
+- It will always install a cake instance on each hardware queue (instead
+  of using the default qdisc for each queue like 'mq' does).
 
-I audited set_pauseparam implementations across the tree. We are seeing two
-valid but distinct models here, driven by different hardware realities:
+- The cake instances on the queues will share their configuration, which
+  can only be modified through the parent cake_mq instance.
 
-- Strict Hardware Model (Jakub's point): Mostly Enterprise/Server NICs (bnx2x,
-  bnxt, i40e, ice, cxgb4). These devices often rejects advertisement changes
-  if Link AN is off. They enforce a strict dependency for correctness.
+Doing things this way simplifies user configuration by centralising
+all configuration through the cake_mq qdisc (which also serves as an
+obvious way of opting into the multi-queue aware behaviour). The cake_mq
+qdisc takes all the same configuration parameters as the cake qdisc.
 
-- User Intent Model (Russell's point): Mostly embedded, older drivers, and
-  phylink users (e1000, igb, fec, mvneta, stmmac). These drivers handle the
-  state in software, accepting the config as a "wish" for when Link AN becomes
-  active.
+An earlier version of this work was presented at this year's Netdevconf:
+https://netdevconf.info/0x19/sessions/talk/mq-cake-scaling-software-rate-limiting-across-cpu-cores.html
 
-Plan for v9: Since this is not a discussion about which model will win, but
-rather documentation of the current reality, the text will support both
-realities. I will document "User Intent" (Accepting configuration) as the
-recommended behavior for flexible hardware to keep administrative state
-separate from operational state. However, I will explicitly note that drivers
-MAY enforce a strict dependency if their hardware/firmware model requires it,
-so users are aware that behavior varies.
+The patch series is structured as follows:
 
-2. Deprecating pauseparam in favor of ethtool -s ... advertise
+- Patch 1 exports the mq qdisc functions for reuse.
 
-Jakub suggested deprecating set_pauseparam for autoneg in favor of ethtool -s
-... advertise.
+- Patch 2 factors out the sch_cake configuration variables into a
+  separate struct that can be shared between instances.
 
-I agree with the technical merit: ethtool -s ... advertise is cleaner for
-negotiation because it targets the Advertiser (PHY/Autoneg logic) directly. It
-maps 1:1 to the hardware capability and avoids ambiguity.
+- Patch 3 adds the basic cake_mq qdisc, reusing the exported mq code
 
-However, ethtool -s cannot replace set_pauseparam entirely because it cannot
-handle Forced Mode (Manual MAC override). We would still need a separate
-interface for that.
+- Patch 4 adds configuration sharing across the cake instances installed
+  under cake_mq
 
-Therefore, I prefer to keep ethtool -A (Pause UAPI) as the unified Link-wide
-PAUSE Abstraction. It shields the user from knowing whether the underlying
-hardware is using an Advertiser (Resolution Mode) or a Manual Override (Forced
-Mode).
+- Patch 5 adds the shared shaper state that enables the multi-core rate
+  shaping
 
-Proposed Text: Documentation/networking/flow_control.rst
+A selftest, and a patch to iproute2 to make it aware of the cake_mq
+qdisc, will be submitted separately.
 
-Kernel Policy: User Intent & Resolution
-=======================================
+---
+Changes in v4:
+- A bunch of bot nits:
+ - Fix null pointer deref in cake_destroy()
+ - Unwind qdisc registration on failure
+ - Use rcu_dereference() instead of rtnl_dereference() in data path
+ - Use WRITE_ONCE() for q->last_active
+ - Store num_active_qs to stats value after computing it
+- Link to v3: https://lore.kernel.org/r/20251130-mq-cake-sub-qdisc-v3-0-5f66c548ecdc@redhat.com
 
-The ethtool pause API ('ethtool -A' or '--pause') configures the **User
-Intent** for **Link-wide PAUSE** (IEEE 802.3 Annex 31B). The
-**Operational State** (what actually happens on the wire) is derived
-from this intent, the active link mode, and the link partner.
+Changes in v3:
+- Export the functions from sch_mq and reuse them instead of copy-pasting
+- Dropped Jamal's reviewed-by on the patches that changed due to the above
+- Fixed a crash if cake_mq_init is called with a NULL opt parameter
+- Link to v2: https://lore.kernel.org/r/20251127-mq-cake-sub-qdisc-v2-0-24d9ead047b9@redhat.com
 
-**Disambiguation: Pause Autoneg vs. Link Autoneg**
-In this section, "autonegotiation" refers exclusively to the **Pause
-Autonegotiation** parameter ('ethtool -A / --pause ... autoneg <on|off>').
-This is distinct from, but interacts with, **Generic Link
-Autonegotiation** ('ethtool -s / --change ... autoneg <on|off>').
+Changes in v2:
+- Rebase on top of net-next, incorporating Eric's changes
+- Link to v1: https://lore.kernel.org/r/20251124-mq-cake-sub-qdisc-v1-0-a2ff1dab488f@redhat.com
 
-The semantics of the Pause API depend on the 'autoneg' parameter:
+Changes in v1 (since RFC):
+- Drop the sync_time parameter for now and always use the 200 us value.
+  We are planning to explore auto-configuration of the sync time, so
+  this is to avoid committing to a UAPI. If needed, a parameter can be
+  added back later.
+- Keep the tc yaml spec in sync with the new stats member
+- Rebase on net-next
+- Link to RFC: https://lore.kernel.org/r/20250924-mq-cake-sub-qdisc-v1-0-43a060d1112a@redhat.com
 
-1. **Resolution Mode** ('ethtool -A ... autoneg on')
-   The user intends for the device to **respect the negotiated result**.
+---
+Jonas Köppeler (1):
+      net/sched: sch_cake: share shaper state across sub-instances of cake_mq
 
-   - **Hardware Capability Check:** The driver must verify that the hardware
-     is capable of Autonegotiation. If the hardware is fixed-link or
-     lacks AN logic entirely, this request must be rejected (``-EOPNOTSUPP``).
-   - **Advertisement:** The system updates the PHY advertisement
-     (Symmetric/Asymmetric pause bits) to match the ``rx`` and ``tx`` parameters.
-   - **Resolution:** The system configures the MAC to follow the standard
-     IEEE 802.3 Resolution Truth Table based on the Local Advertisement
-     vs. Link Partner Advertisement.
-   - **Interaction with Link Autoneg:** If Generic Link Autonegotiation is
-     currently disabled, resolution cannot occur. The Operational State
-     effectively becomes **Disabled**.
-     
-     **Note on Implementation Variation:** Provided the hardware supports AN
-     in principle, the system **SHOULD** accept this configuration as a valid
-     stored intent for when Link Autonegotiation is re-enabled. However,
-     legacy or strict-hardware drivers **MAY** reject this request if Link
-     Autonegotiation is disabled, enforcing a strict dependency.
+Toke Høiland-Jørgensen (4):
+      net/sched: Export mq functions for reuse
+      net/sched: sch_cake: Factor out config variables into separate struct
+      net/sched: sch_cake: Add cake_mq qdisc for using cake on mq devices
+      net/sched: sch_cake: Share config across cake_mq sub-qdiscs
 
-2. **Forced Mode** ('ethtool -A ... autoneg off')
-   The user intends to **override negotiation** and force a specific
-   state.
+ Documentation/netlink/specs/tc.yaml |   3 +
+ include/net/sch_generic.h           |  19 ++
+ include/uapi/linux/pkt_sched.h      |   1 +
+ net/sched/sch_cake.c                | 485 ++++++++++++++++++++++++++----------
+ net/sched/sch_mq.c                  |  69 +++--
+ 5 files changed, 431 insertions(+), 146 deletions(-)
+---
+base-commit: 0177f0f07886e54e12c6f18fa58f63e63ddd3c58
+change-id: 20250902-mq-cake-sub-qdisc-cdf0b59d2fe5
 
-   - **Hardware Capability Check:** The driver must verify that the hardware
-     supports forced manual configuration. If the hardware is tightly coupled
-     to AN logic and cannot be forced, this request must be rejected.
-   - **Advertisement:** The system should update the PHY advertisement
-     to match the ``rx`` and ``tx`` parameters, ensuring the link partner
-     is aware of the forced configuration.
-   - **Resolution:** The system configures the MAC according to the
-     specified ``rx`` and ``tx`` parameters, ignoring the link partner's
-     advertisement.
-
-**Global Constraint: Full-Duplex Only**
-Link-wide PAUSE (Annex 31B) is strictly defined for **Full-Duplex** links.
-If the link mode is **Half-Duplex** (whether forced or negotiated),
-Link-wide PAUSE is operationally **disabled** regardless of the
-parameters set above.
-
-**Summary of "autoneg" Flag Meaning:**
-- true  -> **Delegate decision:** "Use the IEEE 802.3 logic to decide."
-- false -> **Force decision:** "Do exactly what I say (if the network device
-  supports it)."
-
-Proposed Text: include/linux/ethtool.h
-
-/**
- * @get_pauseparam: Report the configured administrative policy for
- *   link-wide PAUSE (IEEE 802.3 Annex 31B). Drivers must fill struct
- *   ethtool_pauseparam such that:
- * @autoneg:
- *   This refers to **Pause Autoneg** (IEEE 802.3 Annex 31B) only.
- *   true  -> the device follows the result of pause autonegotiation
- *     (Pause/Asym) when the link allows it;
- *   false -> the device uses a forced configuration.
- * @rx_pause/@tx_pause:
- *   Represent the desired policy (Administrative State).
- *   In autoneg mode they describe what is to be advertised;
- *   in forced mode they describe the MAC configuration to be forced.
- *
- * @set_pauseparam: Apply a policy for link-wide PAUSE (IEEE 802.3 Annex 31B).
- * @rx_pause/@tx_pause:
- *   Desired state. If @autoneg is true, these define the
- *   advertisement. If @autoneg is false, these define the
- *   forced MAC configuration (and preferably the advertisement too).
- * @autoneg:
- *   Select Resolution Mode (true) or Forced Mode (false).
- *
- * **Constraint Checking:**
- *   Drivers MUST validate that the hardware capabilities support the
- *   requested mode.
- * - If the hardware does not support Autonegotiation (e.g. fixed link),
- *   drivers MUST reject @autoneg=1 with -EOPNOTSUPP.
- * - If the hardware does not support Forced configuration (e.g. strict AN),
- *   drivers MUST reject @autoneg=0 with -EOPNOTSUPP.
- *
- * Provided the hardware capability exists, drivers SHOULD accept a setting
- * of @autoneg=1 even if generic link autonegotiation ('ethtool -s') is
- * currently disabled. This allows the user to pre-configure the desired
- * policy for future link modes. Users should be aware that some drivers
- * may strictly enforce the dependency and reject this configuration.
- *
- * New drivers are strongly encouraged to use phylink_ethtool_get_pauseparam()
- * and phylink_ethtool_set_pauseparam() which implement this logic
- * correctly.
- */
-
-Best Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
