@@ -1,252 +1,183 @@
-Return-Path: <netdev+bounces-243035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC757C988F8
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 18:41:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46A26C9891F
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 18:43:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85D143A3BBF
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 17:41:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 003D73A3BFD
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 17:43:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6088A338907;
-	Mon,  1 Dec 2025 17:41:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 865C7336EE2;
+	Mon,  1 Dec 2025 17:43:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="ZxyuzaXv";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="R3IFI0He"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="iaXlWHOw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AD31336EF4
-	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 17:41:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E09A6335062
+	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 17:43:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764610868; cv=none; b=OERqLIEC9wPKDZ3TK6QcBLvCJ54hJemp8pxgJoEYpHWCTNO/L9mgF0f2Hcf7+KGgjUJ+1q0gFU13Bi3I6M3iK5lxftzvOoiaHr/pQ093t5PpgQmXteU7w3EXv8kK1MX0R1SlzM/aznZHdAUEu1iaXJTYlE7OZeL0XzPD0zfSG6M=
+	t=1764611033; cv=none; b=G2X6zVoeCLOKtWgrTBTU3tvPVh+aJRLNfQYSabczdQZw/uG2IUmDkmxKE+6HjRRP5tnpufyJ99eIAdjl9u/T+Zil+SX5vHMatRSvenPGqxJQYoVwXlEUAHTktbDkK0W/VI3l5cELf2mPHUmg1f6R3hEIt6YfZPwwtFiKeFmLwqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764610868; c=relaxed/simple;
-	bh=kQ0Zplu74sroYykShKNsBr0haSMA+a+HAxKkzuexd9w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=N2Way0fABwgTYaVcpd6QRw6BRQctgcww1ysIUDFTCTpHknMxEGQfskgJNLbL7+BochAyslISajiq7BIxrKHXEi+7BEviiahdgAz0wXsjkqmPldtHJtrgRrUR7u3RmQ+Tjap45IHVBBznC1inQUsQUmlKVMEcfgpDRIVPd7FgdwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=ZxyuzaXv; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=R3IFI0He; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5B1CGBmj060617
-	for <netdev@vger.kernel.org>; Mon, 1 Dec 2025 17:41:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	exm+out2T1Pb1oWg34oExcEhVExwIO1gE6DHWlTI8qw=; b=ZxyuzaXv6A26qiRW
-	3ib+4vKjJnwB99Ulmz3+RRb3QOIt9IEjEBZ2SK904Gsv6nMU2UluCtxKVvgbRPW5
-	aXIV0VxAUSTF9gt+hZmetm/hPC3OkeqsVaPFydPZLYXkVi6jmR1m7IIpi7WMdh31
-	G1p/Mm5LYsJGCX7rhrWPgKhgo7vMYyzGcSbUtkJSFYm8z2SL/nbgk217ze6jfZvJ
-	eC0pkwM6QvoPRK63MsxQXNL1M+QTG01ljbQaMRJVju5uvMdOjxXBsAqaxu4C3s4H
-	/zjOeRaj09yH4rJo95lgrRbtjeRy5qN6DQvXd2C/tC2nj88agyNrKRoRmpFD/Fpd
-	eNuP+w==
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com [209.85.210.197])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4asavh8yme-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 17:41:04 +0000 (GMT)
-Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-7b8a12f0cb4so4088230b3a.3
-        for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 09:41:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1764610864; x=1765215664; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=exm+out2T1Pb1oWg34oExcEhVExwIO1gE6DHWlTI8qw=;
-        b=R3IFI0HeBkThA5/dEjl/SXdjufhQWzWrBEqdCZ6hX0XB8pkzY+WuHwq9oBx6ggMqIZ
-         iw4ZTPbRXAnc3Zwk3XGsv8Z0XRXyq+XIpmAVe+c+FtkaqWGVsqvm7FHOFTPYjIo+tc3a
-         96JJ0SuVzviwZSQyFK8/eCIheHJIAugRQsVunYjiqmVvOp+OdTjZDkmGPLqr4xQ6GSJp
-         0vkavj2mS9x0DiNYkr4Va/iFwVD5LUpRLms/OGgSCUPUPuDWtHF4d1dP+jxcx/rAXk5l
-         WvJTYpkGYBvEQ9HxWDluG29F3zk+zc2rTuQu+YUGkPkSAcKkF2weTij6kTpdFaLfaBDf
-         /jnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764610864; x=1765215664;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=exm+out2T1Pb1oWg34oExcEhVExwIO1gE6DHWlTI8qw=;
-        b=n0U0Kj3y5o1XFeMbzKHexHDsGqveSIGfsQEmeP61hURCeEQPc52iljPX3GaYejXnli
-         +d8b7QPydNbMJSyo41AwNoXgeSOCCw9VisnOOBp423pLFw/Sr8d6u2v/sq3t6r4xRUnZ
-         2hJrc5cAlmmkYfwoG0nwli+54XfU2RYcUbURSkNWB0zYutpon/dJRMMKIPd9hmM6Al/T
-         eJbg6MPEaoC/P+nKnKPQQbiITs1NEALM7m7Z1XqN36wtkE5cEKbVdwZudze7ua/aWN0p
-         dqy7vQh0IfNxRg2QPOouBe4d0OQs+E3A57QUwtC0gvSQ7fddh35a8paov653D7U7NM0N
-         qmKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVps/2nkXqemYHBjlRrFW+GIlbVYW3oJUC6MfEdyGDklTLhGfiIV5uEXifTO3klwnTS21qWXuo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz203+1Me/kdVdm8K+uFc76k3A++BC3aY2lP+AJixgkY3R1R3pX
-	BbW7opkyvLr+ABCf1bnRLEFOGeMmKzKUv45SZRj/IQ0VggKEDu//hsTjq2mhwaUylWFStmDurCF
-	CC7Mb43v9lCDpoP9eZavbCSTyM6Wi2S8H+vZ23nCSbfyMtd6qi7YDwx31yls=
-X-Gm-Gg: ASbGncvpKsAnRQ9iXnKxXbUloH0XiQYk/tMXqrN5CGdU8ZHn/R//kZTccoWRHFzzjeb
-	fC8hTYGxykvcWfeDhYXkZ9ijIryusB0IKLDeQ2AiQ1Z5mFL8i4a3Y6ZuOL+DOoiQDmRiqgWIp+9
-	EUJ+rbOLgBRroyj58NwSLWPGQjtM4uPDk5BCvSZn+WuZdxTI2H7fw419KbjjDiDYFLNIKA7Rb3x
-	Mv6gef8qFoGd+n4GomxN0IdDdAoBiauvorTKCQGC3g8eZcf71yypZXjo4gWR+jlesviuft1yxbf
-	rqPUK4ozMItKgdiKzqpZqWnBj/d2+sDWCUMVrO39sJ8WaZ9ynNRMpmBnUrjbCNeL7GJPkudn867
-	V6MK/zmDECr0h5SS8xnwXCrVoRdhWskQ/n5MjSiNq51w9NWsZ2vUvJq8B
-X-Received: by 2002:a05:6a20:3ca6:b0:361:2d0c:fd70 with SMTP id adf61e73a8af0-3637db29723mr30315555637.17.1764610863733;
-        Mon, 01 Dec 2025 09:41:03 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFuoKHcI6kog7ZiSeUimSTc1QQRfMcR0gyLQvIhQiA98rGJvDjNieYJ0dzMpSwyxYjBOD4K6Q==
-X-Received: by 2002:a05:6a20:3ca6:b0:361:2d0c:fd70 with SMTP id adf61e73a8af0-3637db29723mr30315517637.17.1764610863190;
-        Mon, 01 Dec 2025 09:41:03 -0800 (PST)
-Received: from [10.73.112.168] (pat_11.qualcomm.com. [192.35.156.11])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7d150c618e7sm14245014b3a.3.2025.12.01.09.41.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 Dec 2025 09:41:02 -0800 (PST)
-Message-ID: <ce68d28f-c737-402c-9f6d-f13fec4d2e82@oss.qualcomm.com>
-Date: Mon, 1 Dec 2025 09:41:01 -0800
+	s=arc-20240116; t=1764611033; c=relaxed/simple;
+	bh=vjOMJrWFQpr1l88g7CIRlvPS5Pmc7X/YX9VtAzCpaCQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WxJDvvITjNNixFvrgXQ5p8txhnpTsOf77fuqrbnjVHJGqTP5sff/92MO4+BZ6yPn+4O4VXMe+K0nGHxd86OE8ZlFZhEEZt+jHReXt9p4XvDbdOYM7XtiTO0pu6j4dKoeCMYtShyat8jA05a/IldwyLPdi4/kDp8UKgUneaN/1r0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=iaXlWHOw; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5B1GBLqR1785999
+	for <netdev@vger.kernel.org>; Mon, 1 Dec 2025 09:43:51 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
+	 bh=Nx2UlxPjAHEeAyLfVRPlU3Hm4xB6ZJ8PKySSxUXhnfs=; b=iaXlWHOwfkel
+	ZJyZWL/esQTbnTK2151OSIX+o4Ji9ep+FASbSPTccT4Y5mvR9IEpPZkeyzE3Ea+l
+	3ClIwG9JOppInwWJ8n2Bzmg3dLc0QfFtgalJY/MG0w+GgVMqkIgmrwZAzksKS9hk
+	RtXb5q8UeFodFCw3FIQskN/2L5TBfLrnVTZHJdpCsOEoo+etXKoe7KV4TMKbJGhl
+	TD5wN32YnjPfjuhSus+Q6hXqScQEMTzE3qij7fc0cjLeUMx+6IAA3G4fSX5kq7pI
+	hbUhkuYiUwirqYXiWMelCltG4y5F8yeNRtdPaMHU8DtCJtoHTTqgaGdvhx4ptxdF
+	odq9tbll5g==
+Received: from maileast.thefacebook.com ([163.114.135.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4aseargy05-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 09:43:50 -0800 (PST)
+Received: from twshared24723.01.snb1.facebook.com (2620:10d:c0a8:fe::f072) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.29; Mon, 1 Dec 2025 17:43:49 +0000
+Received: by devbig259.ftw1.facebook.com (Postfix, from userid 664516)
+	id 7C26BCBE0463; Mon,  1 Dec 2025 09:43:39 -0800 (PST)
+From: Zhiping Zhang <zhipingz@meta.com>
+To: Bjorn Helgaas <helgaas@kernel.org>
+CC: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+        Bjorn
+ Helgaas <bhelgaas@google.com>, <linux-rdma@vger.kernel.org>,
+        <linux-pci@vger.kernel.org>, <netdev@vger.kernel.org>,
+        Keith Busch
+	<kbusch@kernel.org>, Yochai Cohen <yochai@nvidia.com>,
+        Yishai Hadas
+	<yishaih@nvidia.com>
+Subject: Re: [RFC 1/2] Set steering-tag directly for PCIe P2P memory access
+Date: Mon, 1 Dec 2025 09:43:20 -0800
+Message-ID: <20251201174339.1852344-1-zhipingz@meta.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20251124212753.GA2714985@bhelgaas>
+References: <20251124212753.GA2714985@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/4] net: mhi_net: Implement runtime PM support
-To: Krishna Chaitanya Chundru <krishna.chundru@oss.qualcomm.com>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        Jeff Hugo <jeff.hugo@oss.qualcomm.com>,
-        Carl Vanderlip <carl.vanderlip@oss.qualcomm.com>,
-        Oded Gabbay <ogabbay@kernel.org>, Jeff Johnson <jjohnson@kernel.org>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
- <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Chris Lew <quic_clew@quicinc.com>
-Cc: mhi@lists.linux.dev, linux-arm-msm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
-        ath12k@lists.infradead.org, netdev@vger.kernel.org,
-        quic_vbadigan@quicinc.com, vivek.pernamitta@oss.qualcomm.com
-References: <20251201-mhi_runtimepm-v1-0-fab94399ca75@oss.qualcomm.com>
- <20251201-mhi_runtimepm-v1-3-fab94399ca75@oss.qualcomm.com>
-Content-Language: en-US
-From: Mayank Rana <mayank.rana@oss.qualcomm.com>
-In-Reply-To: <20251201-mhi_runtimepm-v1-3-fab94399ca75@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-ORIG-GUID: u_PbhQIxMe2Oj1kOO_22f16GaWRyKDZW
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjAxMDE0NCBTYWx0ZWRfXz986ehGXjzW1
- I/CADdoq8jg75B+z45sh0a9d2RJSUi7EnFdpDc7W22+h4Frvq5FMNblVSj73wtRtvmDVrtU7xR8
- Kzh1Z8Tj36EO/b64iaI5fEO+nEYvmphGCpKY5EATS8cAi8VIPuLlq0v98zXP+nig3iJkEJi+liB
- QqOW7CS6w10Ucjh9yipcTMJE9VLtRmU4M1SAJXRAmgs0Wtbtg4LFQBwi+gPvq5TIcopVE+e4LqZ
- PRKnDKGoSR9OMqdlIfpQSp7wqqJ+Gf3qknMy6zMG7W421gQJlANtSygSWvHhKYqqEwdqiS0yRPP
- p4SbHn6wgWFdiMhxa1E5r1zC5f3wOOE1MWM4HdEW/cmFme9GeEpZQrAISzD9hEw6r0gkY/o2GDc
- r4ycrEya60QaDMBqA1o5HUODf/1SUA==
-X-Authority-Analysis: v=2.4 cv=QutTHFyd c=1 sm=1 tr=0 ts=692dd330 cx=c_pps
- a=rEQLjTOiSrHUhVqRoksmgQ==:117 a=ZdW6uxA9NKXbfdqeeS2OGA==:17
- a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=EUspDBNiAAAA:8 a=vwh-6NgWTdBnnHhUpCYA:9
- a=QEXdDO2ut3YA:10 a=2VI0MkxyNR6bbpdq8BZq:22
-X-Proofpoint-GUID: u_PbhQIxMe2Oj1kOO_22f16GaWRyKDZW
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+X-Authority-Analysis: v=2.4 cv=Ja6xbEKV c=1 sm=1 tr=0 ts=692dd3d6 cx=c_pps
+ a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
+ a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=S7gPgYD2AAAA:8 a=VabnemYjAAAA:8 a=8hobeDgTnmXHB3sxjRwA:9 a=QEXdDO2ut3YA:10
+ a=1f8SinR9Uz0LDa1zYla5:22 a=gKebqoRLp9LExxC7YDUY:22
+X-Proofpoint-GUID: KqwCfvZIyxgjr4EpHLSV2cqIVbqWokKW
+X-Proofpoint-ORIG-GUID: KqwCfvZIyxgjr4EpHLSV2cqIVbqWokKW
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjAxMDE0NCBTYWx0ZWRfX1+xIrpK5Pw/k
+ sKhA9qysQZHBr6dMcfyWlvMFwWX7fPfyl+zsJaQ/1kk5hNLNPbKWDKhmHIQLxg501ueeUAFWtzo
+ 402JNRDr7QF3D130QinA/9D72yvnb0cGzGSUMyLj42YuHQWABeHtJT9sMgxmU54gQuctbLb6rzN
+ 7LYUZ9180Qqc8J/hzfWsv41DdU+D8OVN6JBgm0I+euYQfLr5Pg1bcfy8lTHDnqs2s538HycWieg
+ PugQu2BA6HxiNhCpvngN3WSvRKX6EMi3Ptuxh6qqMQ+ROcIivSRCM7sSweIji2CztuzieD6y25c
+ 1r+lN6Jp5bzNDZwq3DM2VA1hGRZVhojvohfvasNMIXQLfhza4EDccWWrOV5vXZUGlPMnh+EAYmr
+ 2aDBSGSCCNlWHvLlHJNq4siiVlj8ZQ==
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
  definitions=2025-11-28_08,2025-11-27_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 adultscore=0 suspectscore=0 phishscore=0 spamscore=0
- malwarescore=0 impostorscore=0 lowpriorityscore=0 clxscore=1011
- priorityscore=1501 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2510240001
- definitions=main-2512010144
 
-+ Chris
+> On Mon, 24 Nov 2025 15:27:53 -0600, Bjorn Helgaas wrote:
+> > PCIe: Add a memory type for P2P memory access
 
-Do we need to consider updating client driver (net/qrtr/mhi.c) ?
+> This should be in the Subject: line.
 
-Regards,
-Mayank
+> It should also start with "PCI/TPH: ..." (not "PCIe") to match
+> previous history.
 
-On 12/1/2025 4:43 AM, Krishna Chaitanya Chundru wrote:
-> Add runtime power management support to the mhi_net driver to align with
-> the updated MHI framework, which expects runtime PM to be enabled by client
-> drivers. This ensures the controller remains active during data transfers
-> and can autosuspend when idle.
-> 
-> The driver now uses pm_runtime_get() and pm_runtime_put() around
-> transmit, receive, and buffer refill operations. Runtime PM is initialized
-> during probe with autosuspend enabled and a 100ms delay. The device is
-> marked with pm_runtime_no_callbacks() to notify PM framework that there
-> are no callbacks for this driver.
-> 
-> Signed-off-by: Krishna Chaitanya Chundru <krishna.chundru@oss.qualcomm.com>
-> ---
->   drivers/net/mhi_net.c | 13 +++++++++++++
->   1 file changed, 13 insertions(+)
-> 
-> diff --git a/drivers/net/mhi_net.c b/drivers/net/mhi_net.c
-> index ae169929a9d8e449b5a427993abf68e8d032fae2..c5c697f29e69e9bc874b6cfff4699de12a4af114 100644
-> --- a/drivers/net/mhi_net.c
-> +++ b/drivers/net/mhi_net.c
-> @@ -9,6 +9,7 @@
->   #include <linux/mod_devicetable.h>
->   #include <linux/module.h>
->   #include <linux/netdevice.h>
-> +#include <linux/pm_runtime.h>
->   #include <linux/skbuff.h>
->   #include <linux/u64_stats_sync.h>
->   
-> @@ -76,6 +77,7 @@ static netdev_tx_t mhi_ndo_xmit(struct sk_buff *skb, struct net_device *ndev)
->   	struct mhi_device *mdev = mhi_netdev->mdev;
->   	int err;
->   
-> +	pm_runtime_get(&mdev->dev);
->   	err = mhi_queue_skb(mdev, DMA_TO_DEVICE, skb, skb->len, MHI_EOT);
->   	if (unlikely(err)) {
->   		net_err_ratelimited("%s: Failed to queue TX buf (%d)\n",
-> @@ -94,6 +96,7 @@ static netdev_tx_t mhi_ndo_xmit(struct sk_buff *skb, struct net_device *ndev)
->   	u64_stats_inc(&mhi_netdev->stats.tx_dropped);
->   	u64_stats_update_end(&mhi_netdev->stats.tx_syncp);
->   
-> +	pm_runtime_put_autosuspend(&mdev->dev);
->   	return NETDEV_TX_OK;
->   }
->   
-> @@ -261,6 +264,7 @@ static void mhi_net_ul_callback(struct mhi_device *mhi_dev,
->   	}
->   	u64_stats_update_end(&mhi_netdev->stats.tx_syncp);
->   
-> +	pm_runtime_put_autosuspend(&mdev->dev);
->   	if (netif_queue_stopped(ndev) && !mhi_queue_is_full(mdev, DMA_TO_DEVICE))
->   		netif_wake_queue(ndev);
->   }
-> @@ -277,6 +281,7 @@ static void mhi_net_rx_refill_work(struct work_struct *work)
->   
->   	size = mhi_netdev->mru ? mhi_netdev->mru : READ_ONCE(ndev->mtu);
->   
-> +	pm_runtime_get_sync(&mdev->dev);
->   	while (!mhi_queue_is_full(mdev, DMA_FROM_DEVICE)) {
->   		skb = netdev_alloc_skb(ndev, size);
->   		if (unlikely(!skb))
-> @@ -296,6 +301,7 @@ static void mhi_net_rx_refill_work(struct work_struct *work)
->   		cond_resched();
->   	}
->   
-> +	pm_runtime_put_autosuspend(&mdev->dev);
->   	/* If we're still starved of rx buffers, reschedule later */
->   	if (mhi_get_free_desc_count(mdev, DMA_FROM_DEVICE) == mhi_netdev->rx_queue_sz)
->   		schedule_delayed_work(&mhi_netdev->rx_refill, HZ / 2);
-> @@ -362,12 +368,19 @@ static int mhi_net_probe(struct mhi_device *mhi_dev,
->   
->   	SET_NETDEV_DEV(ndev, &mhi_dev->dev);
->   
-> +	pm_runtime_no_callbacks(&mhi_dev->dev);
-> +	devm_pm_runtime_set_active_enabled(&mhi_dev->dev);
-> +	pm_runtime_set_autosuspend_delay(&mhi_dev->dev, 100);
-> +	pm_runtime_use_autosuspend(&mhi_dev->dev);
-> +	pm_runtime_get(&mhi_dev->dev);
->   	err = mhi_net_newlink(mhi_dev, ndev);
->   	if (err) {
->   		free_netdev(ndev);
-> +		pm_runtime_put_autosuspend(&mhi_dev->dev);
->   		return err;
->   	}
->   
-> +	pm_runtime_put_autosuspend(&mhi_dev->dev);
->   	return 0;
->   }
->   
-> 
+Thanks, ack! I will update the subject line.
 
+> > The current tph memory type definition applies for CPU use cases. For=
+ device
+> > memory accessed in the peer-to-peer (P2P) manner, we need another mem=
+ory
+> > type.
+
+> s/tph/TPH/
+
+> Make this say what the patch does (not just that we *need* another
+> memory type, that we actually *add* one).
+
+> The subject line should also say what the patch does.  I don't think
+> this patch actually changes the *setting* of the steering tag (I could
+> be wrong, I haven't looked carefully).
+
+Sure, I=E2=80=99ll correct and revise the commit message to clearly state=
+ what the
+patch does.
+
+> > Signed-off-by: Zhiping Zhang <zhipingz@meta.com>
+> > ---
+> >  drivers/pci/tph.c       | 4 ++++
+> >  include/linux/pci-tph.h | 4 +++-
+> >  2 files changed, 7 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/drivers/pci/tph.c b/drivers/pci/tph.c
+> > index cc64f93709a4..d983c9778c72 100644
+> > --- a/drivers/pci/tph.c
+> > +++ b/drivers/pci/tph.c
+> > @@ -67,6 +67,8 @@ static u16 tph_extract_tag(enum tph_mem_type mem_ty=
+pe, u8 req_type,
+> > 			if (info->pm_st_valid)
+> > 				return info->pm_st;
+> > 			break;
+> > +		default:
+> > +			return 0;
+> > 		}
+> > 		break;
+> > 	case PCI_TPH_REQ_EXT_TPH: /* 16-bit tag */
+> > @@ -79,6 +81,8 @@ static u16 tph_extract_tag(enum tph_mem_type mem_ty=
+pe, u8 req_type,
+> > 			if (info->pm_xst_valid)
+> > 				return info->pm_xst;
+> > 			break;
+> > +		default:
+> > +			return 0;
+> > 		}
+> >  		break;
+> >  	default:
+> > diff --git a/include/linux/pci-tph.h b/include/linux/pci-tph.h
+> > index 9e4e331b1603..b989302b6755 100644
+> > --- a/include/linux/pci-tph.h
+> > +++ b/include/linux/pci-tph.h
+> > @@ -14,10 +14,12 @@
+> >   * depending on the memory type: Volatile Memory or Persistent Memor=
+y. When a
+> >   * caller query about a target's Steering Tag, it must provide the t=
+arget's
+> >   * tph_mem_type. ECN link: https://members.pcisig.com/wg/PCI-SIG/doc=
+ument/15470.
+> > + * Add a new tph type for PCI peer-to-peer access use case.
+> >   */
+> >  enum tph_mem_type {
+> >  	TPH_MEM_TYPE_VM,	/* volatile memory */
+> > -	TPH_MEM_TYPE_PM		/* persistent memory */
+> > +	TPH_MEM_TYPE_PM,	/* persistent memory */
+> > +	TPH_MEM_TYPE_P2P	/* peer-to-peer accessable memory */
+> >  };
+> > =20
+> >  #ifdef CONFIG_PCIE_TPH
+> > --=20
+> > 2.47.3
+> >=20
 
