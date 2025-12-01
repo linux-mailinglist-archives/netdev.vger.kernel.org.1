@@ -1,86 +1,90 @@
-Return-Path: <netdev+bounces-243042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2114C98C8B
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 19:58:41 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E661C98C8E
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 19:58:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 70D1D4E1BD6
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 18:58:40 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1F7904E1B17
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 18:58:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90C302309BE;
-	Mon,  1 Dec 2025 18:58:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4D7C2309BE;
+	Mon,  1 Dec 2025 18:58:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="cOp8cmsj"
+	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="CzucEcIF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9AE32222AC
-	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 18:58:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3281E227E95
+	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 18:58:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764615518; cv=none; b=kmUhWSuFZ5jbxPYlscZa+H4kKALBgMqrHu2OcT/IyxboPmKO1iQKhQwMA6/CgpKR4jhJvyHDUYYmPOS/jKyBDt9SE023QEadwTVNmPQR0KIgWbwyrE0jMU/lW3pTAh5jzm+Qlv6UNf1xltsSHosL0/71OgkFlQUjPi2LdgAK9Qw=
+	t=1764615529; cv=none; b=E6X+ENSI80B+b4lr1fRCDjcqZpXxwQL+VhMTjJWVB/Paj2h2jovV3LsD5tVZbc4TjyzqbcnrCCxdCzvk6/fW69Qo0dGS7j0oxodI6+y2IcsnkZzHZI5QCjgv03G5pb3Bk4MqQyf4oqLo8UWbLIMpvYYzHjbtvUPtpae+RkE4vy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764615518; c=relaxed/simple;
-	bh=h/vw6doqfwu2LN3gevJzezu1ud5SOaKPjmul2GX4J9g=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=aVbBOqs9gqYgCLffl3TTQG2TZrhGo66G2XlFsWA+AUnQQu/vnuhJxs8qLBr6s6jwGI3KGvd0AdDCNP6Mu950eD5hlqKBqSdLA2Km21P0Ia3vPG+Ip134Id2IEFjI+BFiEaeefAjr6arcPCv5HVouOw2fxujWlohxTSHu2PCa/cA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=cOp8cmsj; arc=none smtp.client-ip=209.85.210.176
+	s=arc-20240116; t=1764615529; c=relaxed/simple;
+	bh=LxZe4y6NDesyT4ZuqZ49czKQuadwCOp+c6lFY8C4xnY=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Xv4uiWhpM5v/3Z6pSrmK65NG7LEArCpJlhi0h4x5Q48PyCXotoFfQedM6kSHn8TFahOPiW+F0HWVqd3j3dz8kphg8dBWtzvWL5H6CXxGYTRMWWZcLZzg/y0S0h1xj0Qb3BAzjMNhSa62hHBmUblvF4qeXJSY9cgk/53mPKEevfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=CzucEcIF; arc=none smtp.client-ip=209.85.210.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7b9a98b751eso3250230b3a.1
-        for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 10:58:36 -0800 (PST)
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7b8eff36e3bso7343042b3a.2
+        for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 10:58:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=herbertland.com; s=google; t=1764615514; x=1765220314; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JE6ju+09D4WtC5XpKr6GAfPhsraGaLT9IrlrOYPzRiA=;
-        b=cOp8cmsjZuv5U2MkzQ1Cr2mz0oEjGDQvXpmfhvHCE3thn1TuHrB3QgahG5iKIjPgN8
-         rVtcpNFC8ZEQca53y3AyE2fOP3Z/Cs4SOyovonzzCyKKw69XC0pL3PJTKsJu4XqLrN3i
-         aMXPEDjca7zCEgor1FzHbCKRekx2mYBEHOu0NOfA/eTYDVbWtuD2FIGuVomibNZp7piA
-         syQGEek2dZnfKcaksCJpL4PZ+eDwxkq4Q2ayrSYcv9m9+lwUnrJqT/xB6dYw4WFCWuOB
-         /7kwxG4k+nFnHXypRQ8IPUbXw4M0oO+vY32+jQrIm1+vixvpTw8HnMi3SclYHgepsTJ8
-         GMBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764615514; x=1765220314;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=herbertland.com; s=google; t=1764615527; x=1765220327; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=JE6ju+09D4WtC5XpKr6GAfPhsraGaLT9IrlrOYPzRiA=;
-        b=mhUhAODfXBLbbMP4c6waSiT3+hHIBPFLHztTl5BDvtsH3uc/ipT8wZ1cg9IxwCr1mx
-         l0woQxX8Wvw4KECGuTO5UHhMK/NhfYLMUyU7rBZ498n/83Q6LE3hP1X3r3XzdPJWWSCz
-         KUAhWGbrijQ+9yw3VUGk3ZI8pP2hXvE/x5jdz1QvABhdBHgKt8vWKkroNRQ1t4o02Ka8
-         siNhXhqlfSjCMu396h1GmrJZ7mExTrlFUVGb2wH3aUklI52p8QxHYedpSuL/ve4vLUlS
-         UCEvCvcxbNFLFCDKR8ROvY/onj/U7uGwzrjreIRQ+e3ROFuUu6pXqeyiDbgSfZnNw9l9
-         /LqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVJHctFrzTh+rqdLdUG4nmaQxBGBhzIW9bDvyAjwV3Qe4L9pptYQTXIH1p2XNp06n+8PtU7SxI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyi677+QCRjFdz0305qlEIzBssfQRzcbaKfdY2oxOYY7dkHrjEs
-	oB73uQbuvWY/CftNa5VVnHToaK8pbHvQAFFgtyNf9Rck1ZKnl+63dZehdW33wCYYZg==
-X-Gm-Gg: ASbGnctRDdmvUKtJGEAlHhJMh8JyuyJpDW+m1cZPwzEO2RNMatL2mPkP89zyOSK9v0H
-	L9ACE0OcSmJYwMWmWSQo/JKe1YpNWZTcXVLactZgMqs9IJX9bh8A+RgJVx6IHY56hScChsgr3lW
-	pU7c6Cv3MourXcM+FqfV/QM9MzDLY2ACNbYTNnrHiwEmIgaQs0ieEEpkdA84HdEuf2hamHOEp/n
-	Aw/xoh7lnj6dm/qNi9BX72wxFT9r/ERi670IpSKjzMbFq8ktc21SkuVdFvNXzW81UcIiIRAGMWy
-	IKn6EFKN33QGz+pql6lmj0A5Lz3Tdql4oiKvVICn1JCXO7HoNMJskpuwKDF/gb/E0qDu83m8UL/
-	JG1aTSiEduQ+m9bzv41cLYM69hzOoX5fd27NF8Na+UrOQZrVM2sgveQn0EOOC4sdOzWrxKS8/oT
-	K79x6aEWBJKlE27dA8s1D7OiGWObtC1u1rD83NiT66PAhnZSLmUmY2umJt
-X-Google-Smtp-Source: AGHT+IFzWftnrX8LBNKAXRWK7plG9n3JLmlq0o4KlN6gEPAsPokKNKetOBP5cByfBILo6+ry64M+zw==
-X-Received: by 2002:a05:6a00:4f91:b0:7ab:2fd6:5d42 with SMTP id d2e1a72fcca58-7ca8abe60e7mr28204850b3a.16.1764615513924;
-        Mon, 01 Dec 2025 10:58:33 -0800 (PST)
+        bh=URmII7jnQ1SfDlK8MhSSV9UZBr6hS55RZ9tRyGm/UDI=;
+        b=CzucEcIFYR/I8t960PDlXlGlC0z+STHgI9j3k2Js4jN1bn8f4S507EPLDK5SZIncM4
+         vOgut9JIN5AyNiUo8vVZi+llFFBlTX6dcvyUil+2Emd27ovBXEqcVxgan4Op7XllQo8c
+         OE1+GljLFCg8wzwhhMtcwcbjod317Ouft+yrhIAbxTT1KCAsrvLpdcMeldYeykP+TbHL
+         FNPkClmQvZjoQfgbch0M2/nlXOY5VWkcNKI84P7754H7ljnYRDzPd+8f9ZNeEGTl3NxW
+         zsRS0yCLI60e5hFQ1n5+7q2Bfd0SBpJNSM6BNgqnZM/fGqb5hbT6PNXRZ6MgmQWi7Rxm
+         57ZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764615527; x=1765220327;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=URmII7jnQ1SfDlK8MhSSV9UZBr6hS55RZ9tRyGm/UDI=;
+        b=skGZf9lTgGSOPZGn0UuamId6lNMejUq8neW7vlt/DJB0EssIY+IRLCitulHnB4ZHHD
+         OsWeLrAJ9sOdf5Qq0Q8XXHS5qj+4jSRAkbV4ZZAActUKZPEhv4fT6yT3viQgxNEJNC9i
+         EAa7LtaSfJnlw85F/p8CGVfFMZLUqZQ2N9m79n/Tj2NoBAAXraFfp3M3kezLN0/EL3gp
+         gg/Hhaen/yntkKaI8dPOgSeMFG905KTEsXvzGVDY1uCai3SQmTZ7/wWyxBbgCYt9hPy2
+         aiW1W40FKF9a0lACjT9bHvA9QHmOlVCIz6EL76lDRSgdwRx/ozBpc5e4JRJ4hNGM06TE
+         KjWA==
+X-Forwarded-Encrypted: i=1; AJvYcCWLg3LK8U1vdKlGs+wDn7XtqMDWNyFoSIaMtxSrtPG1+S6erz+G5bFbd99iX7Q5wLylG8dcoRM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6XEUIg6Z7DgLAXH3F0DP1KrSvHdgJiMCjRYZfWdWn3M5Rh/4f
+	nPR+wH0Tp7r4uAPI8784urUsAwIV7qqGXEHjW8xzpeSdZYCB5NzvmSmN0by3yMQeRQ==
+X-Gm-Gg: ASbGncs4WfrFvTy7dLRqdPSU9ckpKRuEgKQ1fZxD0+VhXwuSs9mqdBOH3I+mRfNOB5/
+	dMwy7XTMYAY8kPRJstNypDyuuI+2GSmMMxgmWVGLqhg8DxjsKF3Mc80lhsBJIEZ42DPbrnbv6lY
+	7jgDtGPm54xfdk3yi4FrvMMeoclqcWVpiCVAZECIUslivfEWxtwOqLLEKWFnmfGTDFdlHOrhedb
+	QiwFfXppYGDy7JqjyC0tpOTQCbLlKEIaD3To7hwepd/TxaPfrVk4bJCb+txxZj4nP7dEDnT23Ck
+	wzNnqNONSUZy2NvX112V6Ab+Dvi/wpitq6Si4GPBHIyKzn1GduABjqkrcrXjRSoohaSvvpFeB4S
+	nYxRfMDXXmCmIeU0OOd+pb2fI2YlbZqBXesIo3ViopF+7NEhlteCic0DrnhjdN78fkJev1SapNK
+	4rTkBJj+wipUzc8E1aw1wnqRKMnC11xVL+tQnu2HUrT1ZOObE50l1hdYfo
+X-Google-Smtp-Source: AGHT+IHzm8c0xGGjaeLIwA2BPXtY2jzZQRJI4K5aM6cm2P48XqyyxX+Ndvpf6Mh9o+5LH9YF8ZMgvg==
+X-Received: by 2002:a05:6a20:7485:b0:35d:5d40:6d7b with SMTP id adf61e73a8af0-3637deafc2amr31952778637.37.1764615527371;
+        Mon, 01 Dec 2025 10:58:47 -0800 (PST)
 Received: from pong.herbertland.com ([2601:646:8980:b330:14e3:ac6f:380c:fcf3])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7d1520a03a3sm14522852b3a.29.2025.12.01.10.58.32
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7d1520a03a3sm14522852b3a.29.2025.12.01.10.58.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Dec 2025 10:58:33 -0800 (PST)
+        Mon, 01 Dec 2025 10:58:46 -0800 (PST)
 From: Tom Herbert <tom@herbertland.com>
 To: tom@herbertland.com,
 	davem@davemloft.net,
 	kuba@kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH net-next 0/5] ipv6: Disable IPv6 Destination Options RX processing by default
-Date: Mon,  1 Dec 2025 10:55:29 -0800
-Message-ID: <20251201185817.1003392-1-tom@herbertland.com>
+Subject: [PATCH net-next 1/5] ipv6: Check if max HBH or DestOp sysctl is zero and drop if it is
+Date: Mon,  1 Dec 2025 10:55:30 -0800
+Message-ID: <20251201185817.1003392-2-tom@herbertland.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20251201185817.1003392-1-tom@herbertland.com>
+References: <20251201185817.1003392-1-tom@herbertland.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,66 +93,41 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patchset set changes the interpretation of the Destination Options
-and Hop-by-Hop Options sysctl limits, net.ipv6.max_dst_opts_number and
-net.ipv6.max_dst_opts_number to mean that when the sysctl is zero
-processing of the associated extension header is disabled such that
-packets received with the extension header are dropped.
+In IPv6 Destination options processing function check if
+net->ipv6.sysctl.max_dst_opts_cnt is zero up front. If is zero then
+drop the packet since Destination Options processing is disabled.
 
-This patch sets the default limit for Destination Options to zero
-meaning that packets with Destination Options are dropped by default.
-The rationale for this is that Destinations Options extension header
-can be used in an effective Denial of Service attack, and Destination
-Options have very little or possibly no deployed use cases anywhere
-on the planet.
+Similarly, in IPv6 hop-by-hop options processing function check if
+net->ipv6.sysctl.max_hbh_opts_cnt is zero up front. If is zero then
+drop the packet since Hop-by-Hop Options processing is disabled.
+---
+ net/ipv6/exthdrs.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-The Denial of Service attack goes like this: All an attacker needs to
-do is create and MTU size packet filled  with 8 bytes DestinationOptions
-Extension Headers. Each Destination EH simply contains a single padding
-option with six bytes of zeroes. In a 1500 byte MTU size packet, 182 of
-these dummy Destination Options headers can be placed in a packet. Per
-RFC8200, a host must accept and process a packet with any number of
-Destination Options extension headers. So when the stack processes such
-a packet is a lot of work and CPU cycles that yield zero benefit.
-The packet can be designed such that every byte after the IP header
-requires a conditional check and branch prediction can be rendered
-useless for that. This also may mean over twenty cache misses per
-packet. In other words, these packets filled with dummy Destination
-Options extension headers are the basis for what would be an effective
-DoS attack.
-    
-Disabling Destination Options is not a major issue for the following
-reasons:
-
-* Linux kernel only supports one Destination Option (Home Address
-  Option). There is no evidence this has seen any real world use
-
-* On the Internet packets with Destination Options are dropped with
-  a high enough rate such that use of Destination Options is not
-  feasible
-
-* It is unknown however quite possible that no one anywhere is using
-  Destination Options for anything but experiments, class projects,
-  or DoS. If someone is using them in their private network then
-  it's easy enough to configure a non-zero limit for their use case
-Additionally, this patch set sets the default limit of number of
-Hop-by-Hop options to one. The rationale is similar to disabling
-Destination options on RX however unlike Destination options
-Hop-by-Hop options have one common use case in the Router
-Alert option. 
-
-Tom Herbert (5):
-  ipv6: Check of max HBH or DestOp sysctl is zero and drop if it is
-  ipv6: Disable IPv6 Destination Options RX processing by default
-  ipv6: Set Hop-by-Hop options limit to 1
-  ipv6: Document default of zero for max_dst_opts_number
-  ipv6: Document default of one for max_hbh_opts_number
-
- Documentation/networking/ip-sysctl.rst | 38 ++++++++++++++++++--------
- include/net/ipv6.h                     |  9 ++++--
- net/ipv6/exthdrs.c                     |  6 ++--
- 3 files changed, 37 insertions(+), 16 deletions(-)
-
+diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
+index a23eb8734e15..11ff3d4df129 100644
+--- a/net/ipv6/exthdrs.c
++++ b/net/ipv6/exthdrs.c
+@@ -303,7 +303,8 @@ static int ipv6_destopt_rcv(struct sk_buff *skb)
+ 	struct net *net = dev_net(skb->dev);
+ 	int extlen;
+ 
+-	if (!pskb_may_pull(skb, skb_transport_offset(skb) + 8) ||
++	if (!net->ipv6.sysctl.max_dst_opts_cnt ||
++	    !pskb_may_pull(skb, skb_transport_offset(skb) + 8) ||
+ 	    !pskb_may_pull(skb, (skb_transport_offset(skb) +
+ 				 ((skb_transport_header(skb)[1] + 1) << 3)))) {
+ 		__IP6_INC_STATS(dev_net(dst_dev(dst)), idev,
+@@ -1040,7 +1041,8 @@ int ipv6_parse_hopopts(struct sk_buff *skb)
+ 	 * sizeof(struct ipv6hdr) by definition of
+ 	 * hop-by-hop options.
+ 	 */
+-	if (!pskb_may_pull(skb, sizeof(struct ipv6hdr) + 8) ||
++	if (!net->ipv6.sysctl.max_hbh_opts_cnt ||
++	    !pskb_may_pull(skb, sizeof(struct ipv6hdr) + 8) ||
+ 	    !pskb_may_pull(skb, (sizeof(struct ipv6hdr) +
+ 				 ((skb_transport_header(skb)[1] + 1) << 3)))) {
+ fail_and_free:
 -- 
 2.43.0
 
