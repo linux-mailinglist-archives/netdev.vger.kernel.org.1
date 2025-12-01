@@ -1,129 +1,95 @@
-Return-Path: <netdev+bounces-243050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34529C98D30
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 20:17:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DB4AC98E3A
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 20:40:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E5E1C3452B1
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 19:17:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 559E73A45BB
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 19:40:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 509E1238159;
-	Mon,  1 Dec 2025 19:17:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6308B23C39A;
+	Mon,  1 Dec 2025 19:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=exactco.de header.i=@exactco.de header.b="EfT69K6x"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sNQo27Z2"
 X-Original-To: netdev@vger.kernel.org
-Received: from exactco.de (exactco.de [176.9.10.151])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1D7810F1
-	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 19:17:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.10.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B2ED21ABBB;
+	Mon,  1 Dec 2025 19:40:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764616640; cv=none; b=CVH6Q98tqwj/U06JN76iAwG2WeABEYS30XZNVtuSYh9BRB9Y9xgR3wntUg3ypG+KzgHkQeICeKBdJ/iJi0n/Jh10jQdfpZ62iOV1sV2OlDhuR6AoaaKc36U3iH85jvYG/v09qcSDG+g5BW8bjGYCrOWXBE3D9NC0P39cICj7cjQ=
+	t=1764618027; cv=none; b=VYt7vphckqJTq0OLMtgoufl/0HH8MPgE6O0i0brnFyqsQqHBaR2NpvhFmbZCJJjpZGEXxbOK+l4zdnmlaGkxtjUFr8A31hFeOlp+/fkzErIT895hniAOQaikYHhYtRbe5HsFUBITXuJjsHqytn47VFjWRY/R1J6BJ5y7KqgKkdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764616640; c=relaxed/simple;
-	bh=WFfg5ENlIgueFyYoF7Jq12a/GCDmb1nnyBFfdsz07YI=;
-	h=Date:Message-Id:Cc:To:Subject:From:Mime-Version:Content-Type; b=jdQVAtmNVX0vFcnDudE7HJPrhKLSHdqpFQdiqByPfNnCHqszFALurby3DDLJ1GgJOzcF2A+yLSoPqs+CHSuruAGsXg6yv4QCSPt1vNjjIE0dvJQrPjXLUJ8iIk0ZXlDpQOtm8I08t+eD6SyZHJx25fr2AjmFcsquRcVh5OhvPMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exactco.de; spf=pass smtp.mailfrom=exactco.de; dkim=pass (2048-bit key) header.d=exactco.de header.i=@exactco.de header.b=EfT69K6x; arc=none smtp.client-ip=176.9.10.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exactco.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=exactco.de
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=exactco.de;
-	s=x; h=Content-Transfer-Encoding:Content-Type:Mime-Version:From:Subject:To:Cc
-	:Message-Id:Date:Sender:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:
-	References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:List-Post:
-	List-Owner:List-Archive; bh=/9zDcaGSR/6VDJwwXz1PNvhqsdPp6DrpVmlzaY49VAE=; b=E
-	fT69K6xgEKGs48xvOYew/wa9ErWibv6dPub26zzQaSN7K+YC+rVbWg90aJXTj36O03fQaZeLETn5i
-	1w9gvdek/rGTqJTa96vpMGMlSFQGOMNvYGZkKpEenhdd9Bp9FXVELvkBR+R9tWHB6Zjxd3WLzQU22
-	LOCkKpmsmC7vBj+FJyA/gM4KgChY2/H6FUrtJ+zj7G2QHQPKYFC3GHgkAW3RMwBVVObAeXUloHI8M
-	wtrsk4Cs2U1Erj8sJJcpfDtrHI6F4UDwiy0nbpUX0/B9OM9c7o9UUWDAht3cCYUyV98++ywvoeRzg
-	izhgz59elYDULtTQGzkGQyFV5I3azqi7w==;
-Date: Mon, 01 Dec 2025 20:17:06 +0100 (CET)
-Message-Id: <20251201.201706.660956838646693149.rene@exactco.de>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, nic_swsd@realtek.com
-To: netdev@vger.kernel.org
-Subject: [PATCH] r8169: fix RTL8117 Wake-on-Lan in DASH mode
-From: =?iso-8859-1?Q?Ren=E9?= Rebe <rene@exactco.de>
-X-Mailer: Mew version 6.10 on Emacs 30.2
+	s=arc-20240116; t=1764618027; c=relaxed/simple;
+	bh=zVz95mtlTf+lnr2HHQD8EEzZ+lP+6BtM3gXhZ0qSk10=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PTAMFjcvc6KL6BTQAWY2Ty/+MyFqVzoTvaVttyDFwPo+rQA9conSuJFbSTU6BA55gK9nAVPD7rpJuXxrghK+BMmu7LQBG067/a/US5u6mh2YNCOo0veAtbUDtVNX2dV1scZiiIo4QIXC9LuFdxVvpud+rOsSlPv8sXjtgl8hZy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sNQo27Z2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DD6BC4CEF1;
+	Mon,  1 Dec 2025 19:40:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764618026;
+	bh=zVz95mtlTf+lnr2HHQD8EEzZ+lP+6BtM3gXhZ0qSk10=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=sNQo27Z2mLyYmqj5PbDxQNcbqwFqpaidIE8Y+gI81zXHuccIRS0QBriMtDMBhV3rN
+	 zS5PsFawiJgrXi6kMy7NU1sJs8EpmOaTkELvKalVG3Wj42AnbZH/D9tRdtXYhNbtfF
+	 Iq2c2LM+KbecTAq+sdr77tgaKFHGScjPPxVRWo/nLIXy89bhdMWKxLcle4R7f2UQec
+	 j4FQeb73fo698YHGFp/4tvWT535zAyyzE25+LeJrkclbAAhX7YfbcDsTAhNE2TV/7T
+	 CVcw20lJOD3mjKTOWoXrJXNt2IRtUnmackTaAYSB5Ql1DPl7zRddhh0zVtAHhes4bQ
+	 FPd1T2iWe1FBQ==
+Date: Mon, 1 Dec 2025 11:40:25 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Clara Engler <cve@cve.cx>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org
+Subject: Re: [PATCH] ipv4: Fix log message for martian source
+Message-ID: <20251201114025.1e6aa795@kernel.org>
+In-Reply-To: <aS3kX7DApnSfJtT9@3f40c99ffb840b3b>
+References: <aSd4Xj8rHrh-krjy@4944566b5c925f79>
+	<20251127181743.2bdf214b@kernel.org>
+	<aSnSJZpC8ddH7ZN0@c83cfd0f4f41d48a>
+	<20251128104712.28f8fa7c@kernel.org>
+	<aS3kX7DApnSfJtT9@3f40c99ffb840b3b>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Wake-on-Lan does currently not work in DASH mode, e.g. the ASUS Pro WS
-X570-ACE with RTL8168fp/RTL8117.
+On Mon, 1 Dec 2025 19:54:23 +0100 Clara Engler wrote:
+> On Fri, Nov 28, 2025 at 10:47:12AM -0800, Jakub Kicinski wrote:
+> > Could you explain how you discovered the issue?  (it should ideally be
+> > part of the commit msg TBH)  
+> 
+> In the past few days, I toyed around with TUN interfaces and using them
+> as a tunnel (receiving packets via a TUN and sending them over a TCP
+> stream; receiving packets from a TCP stream and writing them to a
+> TUN).[^1]
+> 
+> When these IP addresses contained local IPs (i.e. 10.0.0.0/8 in source
+> and destination), everything worked fine.  However, sending them to a
+> real routeable IP address on the internet led to them being treated as a
+> martian packet, obviously.  I was able to fix this with some sysctl's
+> and iptables settings, but while debugging I found the log message
+> rather confusing, as I was unsure on whether the packet that gets
+> dropped was the packet originating from me, or the response from the
+> endpoint, as "martian source <ROUTEABLE IP>" could also be falsely
+> interpreted as the response packet being martian, due to the word
+> "source" followed by the routeable IP address, implying the source
+> address of that packet is set to this IP.
+> 
+> [^1]: https://backreference.org/2010/03/26/tuntap-interface-tutorial
 
-Fix by not returning early in rtl_prepare_power_down when dash_enabled.
-While this fixes WOL, it still kills the OOB RTL8117 remote management
-BMC connection. Fix by not calling rtl8168_driver_stop if wol is enabled.
-
-While at it, enable wake on magic packet by default, like most other
-Linux drivers do.
-
-Signed-off-by: René Rebe <rene@exactco.de>
----
-
-There is still another issue that should be fixed: the dirver init
-kills the OOB BMC connection until if up, too. We also should probaly
-not even conditionalize rtl8168_driver_stop on wol_enabled as the BMC
-should always be accessible. IMHO even on module unload.
-
----
- drivers/net/ethernet/realtek/r8169_main.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 853aabedb128..e2f9b9027fe2 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -2669,9 +2669,6 @@ static void rtl_wol_enable_rx(struct rtl8169_private *tp)
- 
- static void rtl_prepare_power_down(struct rtl8169_private *tp)
- {
--	if (tp->dash_enabled)
--		return;
--
- 	if (tp->mac_version == RTL_GIGA_MAC_VER_32 ||
- 	    tp->mac_version == RTL_GIGA_MAC_VER_33)
- 		rtl_ephy_write(tp, 0x19, 0xff64);
-@@ -4807,7 +4804,7 @@ static void rtl8169_down(struct rtl8169_private *tp)
- 	rtl_disable_exit_l1(tp);
- 	rtl_prepare_power_down(tp);
- 
--	if (tp->dash_type != RTL_DASH_NONE)
-+	if (tp->dash_type != RTL_DASH_NONE && !tp->saved_wolopts)
- 		rtl8168_driver_stop(tp);
- }
- 
-@@ -5406,6 +5403,7 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	tp->pci_dev = pdev;
- 	tp->supports_gmii = ent->driver_data == RTL_CFG_NO_GBIT ? 0 : 1;
- 	tp->ocp_base = OCP_STD_PHY_BASE;
-+	tp->saved_wolopts = WAKE_MAGIC;
- 
- 	raw_spin_lock_init(&tp->mac_ocp_lock);
- 	mutex_init(&tp->led_lock);
-@@ -5565,6 +5563,9 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	if (rc)
- 		return rc;
- 
-+	if (tp->saved_wolopts)
-+		__rtl8169_set_wol(tp, tp->saved_wolopts);
-+
- 	rc = register_netdev(dev);
- 	if (rc)
- 		return rc;
--- 
-2.46.0
-
--- 
-René Rebe, ExactCODE GmbH, Berlin, Germany
-https://exactco.de • https://t2linux.com • https://patreon.com/renerebe
+I see. Sounds legit, we can adjust the error msg per you suggestion.
+Unfortunately, we just entered a merge window and then there will be 
+an end-of-year shutdown period so you'll need to post v2 in around a
+month :(
 
