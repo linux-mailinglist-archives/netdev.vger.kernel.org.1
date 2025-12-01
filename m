@@ -1,123 +1,100 @@
-Return-Path: <netdev+bounces-242946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242947-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F4ABC96B31
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 11:45:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BA114C96B6E
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 11:48:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB21B3A252A
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 10:45:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 077D23A40FA
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 10:47:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F9B024677F;
-	Mon,  1 Dec 2025 10:45:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DD55303CAA;
+	Mon,  1 Dec 2025 10:46:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="j2v/iz/K"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="walNuAjj"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26FBB199FB2;
-	Mon,  1 Dec 2025 10:45:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DF48303A2D;
+	Mon,  1 Dec 2025 10:46:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764585940; cv=none; b=ssFdkMN5RQFxcZG3IXunhpc+EsO07XxjI6t0RDHmS8TqKjmQOPn0iFDF0zC3WOKyZmpG4ihiFDSn1NfspCjAcnEummX0/A2/2VQZiZofG9sFGtFKZkyPt+LadaSfiC7m1jWL/D4T+MwNXZx0a6p+mXT3jhBVYPPu6nDQ28IuBhg=
+	t=1764586002; cv=none; b=FZi6w9UV3se5fmMEQ7VDVuwQBRhATNRKKpRJFGvtFFI1x+CLg/wUjKOE8Nweb5oNgftVxc4JvwQux3fd29imo+R3Pdx7h6X40pg7YVXDeyRk2cSpuzGozfBOy2Wv1BwGEaYGoMh9AXRljFwncvSsSOK6+RGgF7aKmBwM9+nSVI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764585940; c=relaxed/simple;
-	bh=HdV25LTBzWvZl1MrrYUgXkpqVFbqlcA7CRuNJdKtVno=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=i6USU1gS3nWnw4aqnPNpVlHdmMiUInf1Gmf6ki25NseoBxthUtpbkGhj4qiRQbvRmHvaat9K5Io00DWCwfOUf+zbRm+MFpyrsJuoGmVVROW4UsOZNDfEwaU/aX8ZT7tahXmYkGK55W1UCGomNVc5gtIY1gVk3X6iVzRoAUTxHCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=j2v/iz/K; arc=none smtp.client-ip=115.124.30.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1764585933; h=From:To:Subject:Date:Message-ID:MIME-Version;
-	bh=pkuz+Ls9ZF0BuUEcJSv2QOVKeuzEGxllzrj8HobbTdc=;
-	b=j2v/iz/K0NMzUHGSjHuv5BqpaMmmjB0SmB80ieK15d1l9U+2hz4OiTB2lQmaJWmuXa71zt3MhgdzuoH8PrUAnTaVwEGvyMU1VRlzeVPnJTDCQmbVUDSUJ15Z2WWsIH4Yyt9nwJMaYRlilGmWeBnhXkQT9/GXJa2RS60gdFmTul4=
-Received: from localhost(mailfrom:yang.lee@linux.alibaba.com fp:SMTPD_---0WtpwTGM_1764585932 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 01 Dec 2025 18:45:33 +0800
-From: Evan Li <evan.li@linux.alibaba.com>
-To: edumazet@google.com,
-	ncardwell@google.com,
-	kuniyu@google.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Evan Li <evan.li@linux.alibaba.com>,
-	kitta <kitta@linux.alibaba.com>
-Subject: [PATCH] net: tcp: avoid division by zero in __tcp_select_window
-Date: Mon,  1 Dec 2025 18:45:26 +0800
-Message-ID: <20251201104526.2711505-1-evan.li@linux.alibaba.com>
-X-Mailer: git-send-email 2.43.7
+	s=arc-20240116; t=1764586002; c=relaxed/simple;
+	bh=SPtVYLN6pr0/GK26TSby27WfxPjzX7yoGAZOETTxBuk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A0zEr12b1KH2lUam2LG5C/Ne1jHGdNhUGlHKd8rdfy4+Ko1nodInvXl/JKIa6jrhNyCLrGcm69FQ7sxfKLcGea4YH98aadlXXrfPGqgLwLBkvl7kBBg4iALChC4/4E5tNmhdCNkutEwDLFSeW0klOXoNrS2k2SSP1Pu22f5935k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=walNuAjj; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Reply-To:Content-ID:Content-Description;
+	bh=prSP2R4LrGQbPcGBJUcBFxh7pV4LinvyasSth50C79w=; b=walNuAjjcZPZpAajNR0M5w8zmO
+	IGRiHofwwxVdJHSp9QWhCYNnvdCjYgWRAZJQIQ9c7kk5CZfstSdqSDQboPvmsncxwxLEwTF4IakMP
+	GGkO8fWTv3BDfdI7rHz0CeV0yvcS1wH5huBSwWs6/6MCzMSdarzyX/a39jUquEiEYa5YurC2hSnik
+	mWZlMCNelBuXq5fYpAqCr+dwWUSkyU8jnf6yXE+Qg98dlnv8qet1Wj4EzwAQayujUvMEAVLpvuIl1
+	1tjfjkrePH4ZLF0Vvk0Y7sDqqY0t66B9L5syY4muNvTxyKw6UF8EJ5glmfR5KVS7EAQBdvIXyKAJ1
+	h0oL2wCg==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.94.2)
+	(envelope-from <leitao@debian.org>)
+	id 1vQ1QN-000aAP-DP; Mon, 01 Dec 2025 10:46:31 +0000
+Date: Mon, 1 Dec 2025 02:46:25 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Andre Carvalho <asantostc@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v8 0/5] netconsole: support automatic target
+ recovery
+Message-ID: <q4l6chqvikl4zgypqysdd5ri2vt6p4qdq2f4l66nxfbm7q5wo2@qwvwkilyzzoh>
+References: <20251128-netcons-retrigger-v8-0-0bccbf4c6385@gmail.com>
+ <20251128161133.3397b20c@kernel.org>
+ <htqwtsgxsffbjbccd62kzcdaa2uxezdtywudcrfghydym7axad@4j46eyxzvhte>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <htqwtsgxsffbjbccd62kzcdaa2uxezdtywudcrfghydym7axad@4j46eyxzvhte>
+X-Debian-User: leitao
 
-We discovered a division-by-zero bug in __tcp_select_window() since
-commit ae155060247b ("mptcp: fix duplicate reset on fastclose").
+On Sat, Nov 29, 2025 at 12:29:22AM +0000, Andre Carvalho wrote:
+> On Fri, Nov 28, 2025 at 04:11:33PM -0800, Jakub Kicinski wrote:
+> > On Fri, 28 Nov 2025 22:07:59 +0000 Andre Carvalho wrote:
+> > > This patchset introduces target resume capability to netconsole allowing
+> > > it to recover targets when underlying low-level interface comes back
+> > > online.
+> > 
+> > config hiding a build failure somewhere:
+> > 
+> > drivers/net/netconsole.c: In function ‘send_msg_store’:
+> > drivers/net/netconsole.c:1304:16: error: ‘struct netconsole_target’ has no member named ‘enabled’
+> >  1304 |         if (!nt->enabled)
+> >       |                ^~
+> > -- 
+> > pw-bot: cr
+> 
+> Hi Jakub,
+> 
+> Looks like it comes from Breno's patch [1] which was also part of the same testing branch.
+> Not sure how to proceed here, I suppose we would need to pick one of the series to apply
+> first and then respind the other one.
 
-Under certain conditions during MPTCP fastclose, the mss value passed to
-__tcp_select_window can be zero. The existing logic attempts to perform
-rounddown(free_space, mss) without validating mss, leading to a division
-operation in the helper (via do_div() or inline assembly) that triggers a
-UBSAN overflow and kernel oops:
+I would like to have this patchset intergrated first, and I will rebase
+mine on top of yours.
 
-UBSAN: division-overflow in net/ipv4/tcp_output.c:3333:13
-division by zero
-RIP: __tcp_select_window+0x58a/0x1240
-Call Trace:
- __tcp_transmit_skb+0xca3/0x38b0
- tcp_send_active_reset+0x422/0x7e0
- mptcp_do_fastclose+0x158/0x1e0
- ...
-
-The issue occurs when tcp_send_active_reset() is called on a subflow with
-an unset or zero mss, which can happen during fastclose teardown due to
-earlier state transitions.
-
-This patch adds a guard to return 0 immediately if mss == 0, preventing
-the unsafe rounding operation. This is safe because a zero MSS implies
-invalid or uninitialized state, and returning zero window reflects that no
-reliable data transmission can proceed.
-
-Fixes: ae155060247b ("mptcp: fix duplicate reset on fastclose")
-Reported-by: kitta <kitta@linux.alibaba.com>
-Closes: https://bugzilla.kernel.org/show_bug.cgi?id=220820
-Co-developed-by: kitta <kitta@linux.alibaba.com>
-Signed-off-by: Evan Li <evan.li@linux.alibaba.com>
----
- net/ipv4/tcp_output.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index b94efb3050d2..e6d2851a0ae9 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -3329,9 +3329,11 @@ u32 __tcp_select_window(struct sock *sk)
- 		 * We also don't do any window rounding when the free space
- 		 * is too small.
- 		 */
--		if (window <= free_space - mss || window > free_space)
-+		if (window <= free_space - mss || window > free_space) {
-+			if (unlikely(mss == 0))
-+				return 0;  /* Prevent division by zero */
- 			window = rounddown(free_space, mss);
--		else if (mss == full_space &&
-+		} else if (mss == full_space &&
- 			 free_space > window + (full_space >> 1))
- 			window = free_space;
- 	}
--- 
-2.43.7
-
+--breno
 
