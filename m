@@ -1,217 +1,136 @@
-Return-Path: <netdev+bounces-243025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1FF5C9850C
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 17:40:59 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B2F8C984E4
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 17:40:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D7023A3E4B
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 16:40:06 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 78E6B4E284C
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 16:39:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 462FA337B96;
-	Mon,  1 Dec 2025 16:38:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D21F0336ECB;
+	Mon,  1 Dec 2025 16:38:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="YbWCrDfH"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="bSjgtfRi"
 X-Original-To: netdev@vger.kernel.org
-Received: from AM0PR02CU008.outbound.protection.outlook.com (mail-westeuropeazon11013071.outbound.protection.outlook.com [52.101.72.71])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB22335558;
-	Mon,  1 Dec 2025 16:38:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.72.71
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764607129; cv=fail; b=OjJ6K+IyLk4QTN25u9NVFotyACejJEhx7TclGz4R+PDB8iZTqbA+gFR4Qj5XedoaQ77fLytJAgobTMERqIeBRK9bn5fZLMlPFvZQp08TfMUgmFKyJLVhoN/WFh/t/Nh1nJ5BGl/px8T0I6141vqbw1e2UnOIN3+oy1ITGbDtt60=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764607129; c=relaxed/simple;
-	bh=K9sp/cKFhO2N1xPzkjJWGMSrD6M/VgnZ8iPjal4WcLM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Wz7Qp9tKi4yNNGhmYz1VIRugWZF6H9ysiZvzPPqXOkLjEFHlDl0FS8cXyFFw9X4FE6Wct+goX4Ta5h8+qhYvfceR1GPvycMhkj2DdW4fF9jpsQO2iLdPMMyQCysX8J4CEIDF1fuo6sim0MedyzCwFXh68yHYn1L7w/rrGG8n2qA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=YbWCrDfH; arc=fail smtp.client-ip=52.101.72.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gFsLFTvQW4lABRA14W8XmPvR+9K+D0ekie7AkZpNx5gOKv7l3ibEYs2Tk2bmlw0eas/Ec2K1V8FoNZ3MfPWKw5sQm0QOBhKxaqQDshX3rA7jbyJb1Rba6FkjpuBQhNzSPuLOZqfIStxtuNyErifk1KBdC9mC13fHOcq2hhKxQwbn5cYRCrmczgEpbB+DiisJ4ROggndgdsxsjj9hsC6H1y98SdpyRHl+B3HDY3xmPMtl7YCr7H8fXJx7ODu9P+kVwxagkL3lk2R32hZfV6Og2YGr/Wq5eXqGzRw89ZMcRVbSoCSC/m9eqCjAwvVp+8B/WvsSHRzPfjv6Kq8eFPet0g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=utpWZB31jtldMqB4ZA8NQqghWs8Hn3X9j6pkTLcicYI=;
- b=W0M5AaFSwdzDRXzEfQeAvtUfMfW0LCBkRHmjM1ondZoOswJoBQ+FYN2nBTpjGTeK5XjR1FQtsCpUytSCqOOVamDUxIbsOJpyQyZXxEyjT6/oo8ebOeWDTbw7QuKXzjqiLacxQNaiqc9j5gvI5WncTwzdYArkpliQz8Xti7igj/MGc8KApOfMp7LC1YSWU2JDnrFc5Eym5jfaz4/LwWqNsw2Flp0R2eB+8QskTT+yoIuP5qIb7Ng/P080qQapSmvkb/83DFXvcsCFPXIfJ4/pf2JFDnmBJnXwP+Qb+odi8jfpN54iNixANxkHX9Lk+Kp2nAVsX37p5Lvc1A0Rt/rD6A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 131.228.6.100) smtp.rcpttodomain=apple.com smtp.mailfrom=nokia-bell-labs.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none
- header.from=nokia-bell-labs.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=utpWZB31jtldMqB4ZA8NQqghWs8Hn3X9j6pkTLcicYI=;
- b=YbWCrDfH9dFwuFEo2DiSEGN6k7iIoFAbIgzgDX5YoWaeFe5wBJlr5e25wNNZ91JFX/PoJOb8Eq342C40Vf4YTyNFaYWPvZTNW5emofxBktXLeZgAz4ehw0s0WgKbOKbRpQTC+cSVOgAg6ApTPqFc44G6bcogruD1AVI3vCe5YwJjRbkkPzVKyBseyS5gBu+i+SQ4jOF0JHNjkkJvxHRkEQFXYtiwaZ6eiH11eaFX6fWdui74CXMvhXQcv8fUyqqzlg/7nCVN57sjPJAoQvqXg5g/xkM2czoqf3sdaa8jMvc1lLPjUk7PKQVY+oVG1pCaexTaLZ1SGp3KUDEsbcd+vw==
-Received: from DB9PR05CA0015.eurprd05.prod.outlook.com (2603:10a6:10:1da::20)
- by VI1PR07MB6621.eurprd07.prod.outlook.com (2603:10a6:800:18b::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.17; Mon, 1 Dec
- 2025 16:38:40 +0000
-Received: from DB1PEPF000509FA.eurprd03.prod.outlook.com
- (2603:10a6:10:1da:cafe::c9) by DB9PR05CA0015.outlook.office365.com
- (2603:10a6:10:1da::20) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9366.17 via Frontend Transport; Mon,
- 1 Dec 2025 16:38:30 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 131.228.6.100)
- smtp.mailfrom=nokia-bell-labs.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nokia-bell-labs.com;
-Received-SPF: Pass (protection.outlook.com: domain of nokia-bell-labs.com
- designates 131.228.6.100 as permitted sender)
- receiver=protection.outlook.com; client-ip=131.228.6.100;
- helo=fr711usmtp2.zeu.alcatel-lucent.com; pr=C
-Received: from fr711usmtp2.zeu.alcatel-lucent.com (131.228.6.100) by
- DB1PEPF000509FA.mail.protection.outlook.com (10.167.242.36) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.9366.7
- via Frontend Transport; Mon, 1 Dec 2025 16:38:40 +0000
-Received: from sarah.nbl.nsn-rdnet.net (sarah.nbl.nsn-rdnet.net [10.0.73.150])
-	by fr711usmtp2.zeu.alcatel-lucent.com (Postfix) with ESMTP id A24A668003C;
-	Mon,  1 Dec 2025 18:38:38 +0200 (EET)
-From: chia-yu.chang@nokia-bell-labs.com
-To: pabeni@redhat.com,
-	edumazet@google.com,
-	parav@nvidia.com,
-	linux-doc@vger.kernel.org,
-	corbet@lwn.net,
-	horms@kernel.org,
-	dsahern@kernel.org,
-	kuniyu@google.com,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	dave.taht@gmail.com,
-	jhs@mojatatu.com,
-	kuba@kernel.org,
-	stephen@networkplumber.org,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	andrew+netdev@lunn.ch,
-	donald.hunter@gmail.com,
-	ast@fiberby.net,
-	liuhangbin@gmail.com,
-	shuah@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	ij@kernel.org,
-	ncardwell@google.com,
-	koen.de_schepper@nokia-bell-labs.com,
-	g.white@cablelabs.com,
-	ingemar.s.johansson@ericsson.com,
-	mirja.kuehlewind@ericsson.com,
-	cheshire@apple.com,
-	rs.ietf@gmx.at,
-	Jason_Livingood@comcast.com,
-	vidhi_goel@apple.com
-Cc: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-Subject: [PATCH v7 net-next 13/13] tcp: accecn: enable AccECN
-Date: Mon,  1 Dec 2025 17:38:00 +0100
-Message-Id: <20251201163800.3965-14-chia-yu.chang@nokia-bell-labs.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20251201163800.3965-1-chia-yu.chang@nokia-bell-labs.com>
-References: <20251201163800.3965-1-chia-yu.chang@nokia-bell-labs.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FDB73358D1
+	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 16:38:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764607118; cv=none; b=l/TrS7lpMMdBLX06jnnBeefG6Jx+9GtccjFAIVBlHi/WdFoXdjC6/V258H0XMDb6dbolkqpS7NiUMBSiv/tJHfaf0D49JkJIjtMQZreEMOb8Q8OnyoHVzUq+Yp02rFkdaCsEVGmqUfzmYtBMbEqNLgc9cCjhZTpVS1+Sa8SZev4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764607118; c=relaxed/simple;
+	bh=mAC0YZyitBsZeGGDTbwOudrYWr2Ek14k9InI/n+9Kr8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ewpPAeN1/S4UCnwZ2YQ5swwJ7eYcUYga0Fk2m62pZcrT/zDN216pHwPLbWSFLcEqT1zhawto0zfc1+AdMdNWavBl1wkjPRZchXXpa7TPHoIygoTm/2QktetFfWib1nHaCzXa53CA8lqILaWf5xJwMBQKjnBr7K1eSGSLk79C8Lk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=bSjgtfRi; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=kGl7SM2seAnZb0MwfSY+i9t4y1zT3BYhdFJfFDtJktw=; b=bSjgtfRiEoSeXqz5HE779+QRoV
+	MgpQsNPROlusFGq9HSqlAQXT0zvARqbLusTkXBhgPONL7nuUA1UT2d6LrQBTYrNO9rOypoGXtpPTJ
+	8XsDYxgkOrV7g+OpGYymsoHIY2uEFKj9fHc6UYs4mHUGfTmLqxeh1GUl1C7CsP2IpLaRrRbrwzFru
+	RCXc4BKcri3pV1hEWttMzdzMcbxpmlCA/Ul/Rm0U7Kr2JIlTAnOXRYy3FR8MCH+PvawcjdhCS95Bv
+	m+VEBkb8B/6yh71ijhfUDnhZFKSeAeDnly7BlxHcF7QRvJ4jdpqFrlSt376vlvkdCfEuDfd1Yctmt
+	Ndj2yauQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:52260)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vQ6uw-000000000pK-01R0;
+	Mon, 01 Dec 2025 16:38:26 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vQ6us-000000006bg-1DIa;
+	Mon, 01 Dec 2025 16:38:22 +0000
+Date: Mon, 1 Dec 2025 16:38:22 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Heiko Stuebner <heiko@sntech.de>, Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-rockchip@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH RFC net-next 00/15] net: stmmac: rk: cleanups galore
+Message-ID: <aS3EfuypsaGK6Ww_@shell.armlinux.org.uk>
+References: <aS2rFBlz1jdwXaS8@shell.armlinux.org.uk>
+ <05db9d3e-88fa-42db-8731-b77039c60efa@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DB1PEPF000509FA:EE_|VI1PR07MB6621:EE_
-Content-Type: text/plain
-X-MS-Office365-Filtering-Correlation-Id: 19c6b623-d8cb-44a4-e0ad-08de30f81579
-X-LD-Processed: 5d471751-9675-428d-917b-70f44f9630b0,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
- BCL:0;ARA:13230040|376014|7416014|82310400026|36860700013|1800799024|921020;
-X-Microsoft-Antispam-Message-Info:
- =?us-ascii?Q?IsNrfhraAhoe+D4UvEVPCWk6EE+iOok55ZXNnqXGpe8lKhGEozQVyO6jQvkv?=
- =?us-ascii?Q?B2t6J3W+BbPj4f8/ZLul5wc5yAkzblB03eitk7kFnFHAmZGQJX5htAeCyyhG?=
- =?us-ascii?Q?v8oQFXDpV+bE+W3GF567GluXDqopzujZdVBKlz91dOHI1V3dmf/0Sjq8O2DY?=
- =?us-ascii?Q?UsLBdCKHTq+Pa91EBV8dhQ2fLGPHWCFA/9htZCFeeiBZ+L2HHtMk6XQL+nqB?=
- =?us-ascii?Q?T2E939Y2oVr/FWDbGOjFFOd3pV+NVOxX32BSG0TuIDs7fyhC4yuEkSQdMr4X?=
- =?us-ascii?Q?xqAmEBLwi38WwDXNKYIFQsZl9Dp4M4FDdi9cJNu4W4o1tdbgXAJGqF6gRt0f?=
- =?us-ascii?Q?w3Hb9eHFPBk53Bmj3m8G70PS9QRvetbIXh7GWCG0XqYFSWl6VvEsXTIwQ5Tg?=
- =?us-ascii?Q?bTEEDozaI58BvhqH8oEVWw9JWAUuuU0QKjXR9SzF2y1OSK59iQ+/f1Qrk6Fw?=
- =?us-ascii?Q?r8FELKf8mvqlK8qP/a9otetVlVh5wFSVBMh7pb8ttUeuqjAY+JadQnxOdULE?=
- =?us-ascii?Q?NyccgJF/aPVzD7psmiMQ1pJxCKTJ5YsALa4R6Degs+tcH7S41MY9VpnOJjzH?=
- =?us-ascii?Q?/cZV6QAiGGyTeuwWktNMneF2tHQclquh0QQPRI/f2E3Fjd+DVljWR5xYF7Xd?=
- =?us-ascii?Q?fxMxlTPtwB7wM84LwUTb0ZRTIR1qLCOafzDEb9/YITb9HievScvn5xNuX2Ap?=
- =?us-ascii?Q?LuQyBdrM0KTgBXznPKqmKXpZU26n9YHkQLi6bBIwhfkAbUJCOYk8dwK0hhG5?=
- =?us-ascii?Q?JyNqZTgplCBkPOFm5Q6Jc/UtOnIHAOt53j5dUCHhD8sZhHtfPJG/cJb1x3Jo?=
- =?us-ascii?Q?HPwq0HogawDulRORq2rpQlZfF2KY9P2vFGA+obduF/QVcyfDQgqA0DT3l7im?=
- =?us-ascii?Q?1ZmObJnnZh/iGZho/aEQsaXldjWBseuERy/PVYGkV58pdeqnafOmtPrKCERJ?=
- =?us-ascii?Q?M96YKld1bgZImbr4osELYECRWmeAV+Mjm320p4EvuG+LNDiwV/O6lRSZg/+G?=
- =?us-ascii?Q?L2G0dxKED9Xj8mZUgfJLGDk9T6fmUmTYkLq0L4Y8w0ltAoEDtpL+ASQOnZ/z?=
- =?us-ascii?Q?nt7Q/U5EXOP6PY58Tj10hT9GllSniCfric/MwCgVlpiM1Dqc6Kgi0TCAB14/?=
- =?us-ascii?Q?NyJAVRsojT+WKLVK0ZJLdISohjD9U6q1zhASDuD/B6tfrX4vU0289PmuH1Rj?=
- =?us-ascii?Q?td0VVtg7zrHGc7GEejOhtxHB4zesDuKFm6Whl94kRNIn1NIbj8kGUIbZN6Hm?=
- =?us-ascii?Q?cHYhLkY2b5ajRA9wrp6sDfaLNPyqDNsl60h1ndAoMAEhOO/0q89RppZdHb5Z?=
- =?us-ascii?Q?XqrEdDfWzsNQBX65VesxhEEzD3WaIqIy2rsiLPSpGSVCgv6tXXyTU0dcuge1?=
- =?us-ascii?Q?4md3sFCJR0r/rDBg3dNhIo8rUSOgpwcrCmN+94IfVQTaMgmvDwvPDoXm8s+c?=
- =?us-ascii?Q?6OkcSKEbKP2uHz4aUkcq/KuAxwI0uC/on7yEpSQIY3E3QnA6xj/CbspSljSY?=
- =?us-ascii?Q?YLlUnxGYvqtJ2x6zS80ms8niNwptaLhUgnJtIYe5JByw4AJT9gD7Bog7/BY1?=
- =?us-ascii?Q?LYbhsIji4PIaFISX+wn3cATDYPFxNGdw0gKLg1DN?=
-X-Forefront-Antispam-Report:
- CIP:131.228.6.100;CTRY:FI;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:fr711usmtp2.zeu.alcatel-lucent.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(82310400026)(36860700013)(1800799024)(921020);DIR:OUT;SFP:1101;
-X-OriginatorOrg: nokia-bell-labs.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2025 16:38:40.2708
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 19c6b623-d8cb-44a4-e0ad-08de30f81579
-X-MS-Exchange-CrossTenant-Id: 5d471751-9675-428d-917b-70f44f9630b0
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=5d471751-9675-428d-917b-70f44f9630b0;Ip=[131.228.6.100];Helo=[fr711usmtp2.zeu.alcatel-lucent.com]
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TreatMessagesAsInternal-DB1PEPF000509FA.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR07MB6621
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <05db9d3e-88fa-42db-8731-b77039c60efa@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+On Mon, Dec 01, 2025 at 04:55:21PM +0100, Andrew Lunn wrote:
+> > One of the interesting things is that this appears to deal with RGMII
+> > delays at the MAC end of the link, but there's no way to tell phylib
+> > that's the case. I've not looked deeply into what is going on there,
+> > but it is surprising that the driver insists that the delays (in
+> > register values?) are provided, but then ignores them depending on the
+> > exact RGMII mode selected.
+> 
+> Yes, many Rockchip .dts files use phy-mode = 'rgmii', and then do the
+> delays in the MAC. I've been pushing back on this for a while now, and
+> in most cases, it is possible to set the delays to 0, and use
+> 'rgmii-id'.
+> 
+> Unfortunately, the vendor version of the driver comes with a debugfs
+> interface which puts the PHY into loopback, and then steps through the
+> different delay values to find the range of values which result in no
+> packet loss. The vendor documentation then recommends
+> phy-mode='rgmii', and set the delays to the middle value for this
+> range. So the vendor is leading developers up the garden path.
+> 
+> These delay values also appear to be magical. There has been at least
+> one attempt to reverse engineer the values back to ns, but it was not
+> possible to get consistent results across a collection of boards.
 
-Enable Accurate ECN negotiation and request for incoming and
-outgoing connection by setting sysctl_tcp_ecn:
+Oh yes, I remember that. I also remember that I had asked for the
+re-use of "phy_power_on()" to be fixed:
 
-+==============+===========================================+
-|              |  Highest ECN variant (Accurate ECN, ECN,  |
-|   tcp_ecn    |  or no ECN) to be negotiated & requested  |
-|              +---------------------+---------------------+
-|              | Incoming connection | Outgoing connection |
-+==============+=====================+=====================+
-|      0       |        No ECN       |        No ECN       |
-|      1       |         ECN         |         ECN         |
-|      2       |         ECN         |        No ECN       |
-+--------------+---------------------+---------------------+
-|      3       |     Accurate ECN    |     Accurate ECN    |
-|      4       |     Accurate ECN    |         ECN         |
-|      5       |     Accurate ECN    |        No ECN       |
-+==============+=====================+=====================+
+https://lore.kernel.org/netdev/aDne1Ybuvbk0AwG0@shell.armlinux.org.uk/
 
-Refer Documentation/networking/ip-sysctl.rst for more details.
+but that never happened... which makes me wonder whether we *shouldn't*
+have applied "sensor101"'s patch until such a requested patch was
+available. In my experience, this is the standard behaviour - as a
+reviewer, you ask a contributor to do something as part of their
+patch submission, and as long as their patch gets merged, they
+couldn't give a monkeys about your request.
 
-Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-Acked-by: Paolo Abeni <pabeni@redhat.com>
----
- net/ipv4/sysctl_net_ipv4.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+So, in future, I'm going to take the attitude that I will NAK
+contributions if I think there's a side issue that the contributor
+should also be addressing until that side issue is addressed.
 
-diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
-index 385b5b986d23..643763bc2142 100644
---- a/net/ipv4/sysctl_net_ipv4.c
-+++ b/net/ipv4/sysctl_net_ipv4.c
-@@ -47,7 +47,7 @@ static unsigned int udp_child_hash_entries_max = UDP_HTABLE_SIZE_MAX;
- static int tcp_plb_max_rounds = 31;
- static int tcp_plb_max_cong_thresh = 256;
- static unsigned int tcp_tw_reuse_delay_max = TCP_PAWS_MSL * MSEC_PER_SEC;
--static int tcp_ecn_mode_max = 2;
-+static int tcp_ecn_mode_max = 5;
- static u32 icmp_errors_extension_mask_all =
- 	GENMASK_U8(ICMP_ERR_EXT_COUNT - 1, 0);
- 
+This shouldn't be necessary, I wish this weren't necessary, and I wish
+people could be relied upon to do the right thing, but apparently it is
+going to take a stick (not merging their patches) to get them to co-
+operate. More fool me for trusting someone to do something.
+
+I now have a couple of extra patches addressing my point raised in
+that email... which I myself shouldn't have had to write.
+
 -- 
-2.34.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
