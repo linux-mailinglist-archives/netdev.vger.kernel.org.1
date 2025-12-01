@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-242907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 098B5C960D5
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 08:49:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F32B0C960D8
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 08:50:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7C8EC4E11C9
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 07:49:01 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BAF294E04D9
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 07:50:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D64012C08D5;
-	Mon,  1 Dec 2025 07:48:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A73E02C0F89;
+	Mon,  1 Dec 2025 07:50:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eR7qheCD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IGaOaA7N"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABEC07E110;
-	Mon,  1 Dec 2025 07:48:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C6767E110;
+	Mon,  1 Dec 2025 07:50:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764575337; cv=none; b=r6TG20AcooFHe9uhnhDJ77+s9D5jt7DP1uSdijwe5C5ayxFov5kRsIJQE+5GeR83y46j3ZBbXNqstMUTpznL5SyVWkt4YNaXi6DGcA7jaQlHbAPIOhszaL5afixK+dFQiEQEXVDuJc1YS9nynn5atoqTQD7AduJA9XUZucIkfMc=
+	t=1764575420; cv=none; b=BTwuKJRK7PlaPVIzFHTHs47p5XefS7R/yHqEZa6rLx3+AIYGOxrI4XrjGzM0j4vvb2USOw0lkv9XfIaT/6fVNrPOKylCMtQzxeJYKUNm2XdxdtJhmGIoSwF40VObGhz3lsN3N5uoICWvQ7O8h2z7zsuuHvcYdb1PmF/OxKjv9Zs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764575337; c=relaxed/simple;
-	bh=ApiKeWk7l2n9AEHF0GepRCqj/I+yFEZRN/cLigpZgjI=;
+	s=arc-20240116; t=1764575420; c=relaxed/simple;
+	bh=INY7q4Pn4Mmpzwb4yWPpL5We9LC3VdX6yH4lheqK310=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DXPLQrFBhSjnPbBy54hTSBxZRSUeTWiFM/3WxVvolmmcKVTscBwO4qrchff2iJH6RJQqyQRoKY5Fnv7V1VMu9Qg//wocW+3XWP0D5Nao0nipzzS1Nazf0XHFi6tl560i0JUpIx9gWqwba4DQjr8Kx5RRMh94LxsTV+B/cPfqw4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eR7qheCD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3CEFC4CEF1;
-	Mon,  1 Dec 2025 07:48:53 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=cVr4jX0c9myCDqXsntoKHBdiGUkI1/QJQFDYQr1ZaJDorSYAxZjl/37JjC7H3PZMmTqkOku1rEnmhzvONAQTh4FYnP2ZtQ2r8846FvMkwd14xwj+HXozLgkdgptvgSQ0wkKksTe+r8kj5uomSn+VlJsugjpIMW9zP2GGJHrWY9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IGaOaA7N; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BFECC4CEF1;
+	Mon,  1 Dec 2025 07:50:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764575337;
-	bh=ApiKeWk7l2n9AEHF0GepRCqj/I+yFEZRN/cLigpZgjI=;
+	s=k20201202; t=1764575420;
+	bh=INY7q4Pn4Mmpzwb4yWPpL5We9LC3VdX6yH4lheqK310=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=eR7qheCDq9My39TYxbj6tuTkMQfC5dOQ2sj31W2q8yKvXbwgs8Ob9i8HdISFujFgy
-	 qawRngLCFL/cnnR0HisS3tRWhRMEUM6BVqfkXZufpFnwjRl8oR6+l4Ri72cRaYRFle
-	 81JsjrCl/NSb4xsu0M6xsuaGd3uj7gotmOsDkTcTwtqFW/jGz0HG3i5/YTgTYM/BUj
-	 VoGVOaxDseG3kmZNTVUv0uYpO+RG7FSeGym5ojFcaRd/2h5pkk+60J6G2R3RbjAL52
-	 LWgdDlzIfT8cjGi6kDEY6xtGosui4GfP6nCMenfvV9xvg+F66TemoVkPFClVCTCpf2
-	 C3o2DxtvS0oQg==
-Message-ID: <0d85e1e6-ea75-4f20-aef1-90d446b4bfa1@kernel.org>
-Date: Mon, 1 Dec 2025 08:48:51 +0100
+	b=IGaOaA7NnR747m2EUDz76udIk1n0FNjHmoFeU8j2uRaecSn/mGvS9vYV1T+TBCj1X
+	 QMTYtJ27rc1Ua4y9n+lQe8OhNlb8/T3ZuQ7LCKUXStZzcxOUoYBivwOQPv74yFQ84Q
+	 AChv6sup6G4zBAuwMgJSK6WzyKkqn8jLPPVRL5dwn9GTWge4Or38hu57PN62sQDLQ/
+	 6hAapRYoaQqV371NYzGK0rGw0FFOGFgLWopQbB6kTeHh/D2LRjeZtnsKd3Izn9FHOc
+	 6/XJCZLAAXpOnTTTApIIyiT+7Nobo3+Yt6jIrzLUUbVYh0nE5yW2iDThfYm++/+AaA
+	 c+fSeB+yqtjjg==
+Message-ID: <0070f2ca-551d-4c55-9ff7-2ef6d93d4cb9@kernel.org>
+Date: Mon, 1 Dec 2025 08:50:15 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,21 +52,17 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v3 2/2] net: dsa: mt7530: Use GPIO polarity to generate
  correct reset sequence
-To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>
-Cc: Chen Minqiang <ptpt52@gmail.com>, Rob Herring <robh@kernel.org>,
+To: Chen Minqiang <ptpt52@gmail.com>, Rob Herring <robh@kernel.org>,
  Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
  <conor+dt@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
  AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
  "Chester A. Unal" <chester.a.unal@arinc9.com>,
  Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- netdev@vger.kernel.org
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
 References: <20251129234603.2544-1-ptpt52@gmail.com>
  <20251129234603.2544-2-ptpt52@gmail.com>
- <0675b35f-217d-4261-9e3f-2eb24753d43c@lunn.ch>
- <20251130080731.ty2dlxaypxvodxiw@skbuf>
- <3fbc4e67-b931-421c-9d83-2214aaa2f6ed@lunn.ch>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -112,47 +108,49 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <3fbc4e67-b931-421c-9d83-2214aaa2f6ed@lunn.ch>
+In-Reply-To: <20251129234603.2544-2-ptpt52@gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 30/11/2025 21:17, Andrew Lunn wrote:
-> On Sun, Nov 30, 2025 at 10:07:31AM +0200, Vladimir Oltean wrote:
->> On Sun, Nov 30, 2025 at 02:11:05AM +0100, Andrew Lunn wrote:
->>>> -		gpiod_set_value_cansleep(priv->reset, 0);
->>>> +		int is_active_low = !!gpiod_is_active_low(priv->reset);
->>>> +		gpiod_set_value_cansleep(priv->reset, is_active_low);
->>>
->>> I think you did not correctly understand what Russell said. You pass
->>> the logical value to gpiod_set_value(). If the GPIO has been marked as
->>> active LOW, the GPIO core will invert the logical values to the raw
->>> value. You should not be using gpiod_is_active_low().
->>>
->>> But as i said to the previous patch, i would just leave everything as
->>> it is, except document the issue.
->>>
->>> 	Andrew
->>>
->>
->> It was my suggestion to do it like this (but I don't understand why I'm
->> again not in CC).
->>
->> We _know_ that the reset pin of the switch should be active low. So by
->> using gpiod_is_active_low(), we can determine whether the device tree is
->> wrong or not, and we can work with a wrong device tree too (just invert
->> the logical values).
+On 30/11/2025 00:46, Chen Minqiang wrote:
+> The MT7530/MT7531 reset pin is active-low in hardware, but the driver
+> historically hardcoded a high-active reset sequence by toggling the GPIO
+> as 0 → 1. This only worked because several DTS files incorrectly marked
+> the reset GPIO as active-high, making both DTS and driver wrong in the
+> same way.
 > 
-> Assuming there is not a NOT gate placed between the GPIO and the reset
-> pin, because the board designer decided to do that for some reason?
+> This patch changes the driver to respect the GPIO polarity using
+> gpiod_is_active_low(), and generates the reset sequence as:
+> 
+>     assert   = drive logical active level
+>     deassert = drive logical inactive level
+> 
+> As a result, both cases now correctly produce the required
+> high → low → high transition on the actual reset pin.
+> 
+> Compatibility
+> -------------
+> 
+> This change makes the driver fully backward-compatible with older,
+> incorrect DTS files that marked the reset line as GPIO_ACTIVE_HIGH:
+> 
 
-Yeah, I cannot imagine how this could possibly support old and new DTS
-without breaking some users, unless people over-simplified and discarded
-some cases. But then this should clearly mark these broken cases instead
-of falsely claim that impossible task of rewriting the flag is done
-correctly.
+You must describe all cases, so old DTS using inverter, thus described
+as active-low. This is perfectly possible setup.
 
-BTW, the code clearly does not handle such cases, so "we can determine
-whether the device tree is wrong or not" statement is obviously not true.
+>  * Old DTS marked active-high:
+>        is_active_low = 0
+>        driver drives 0 → 1
+>        actual levels: high → low → high  (correct)
+> 
+>  * New DTS marked active-low:
+>        is_active_low = 1
+>        driver drives 1 → 0
+>        actual levels: high → low → high  (correct)
+> 
+
+And new DTS working with inverter, so described with active-high.
+
 
 Best regards,
 Krzysztof
