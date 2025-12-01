@@ -1,125 +1,97 @@
-Return-Path: <netdev+bounces-243082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id A206BC994C1
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 23:06:44 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4BECC9956C
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 23:11:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5781E342A40
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 22:06:43 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9824B4E2D71
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 22:11:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19EEA2848BE;
-	Mon,  1 Dec 2025 22:06:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="awW4FuAi"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1E17286897;
+	Mon,  1 Dec 2025 22:09:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com [209.85.167.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DEF425F988
-	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 22:06:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23D84286410
+	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 22:09:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764626795; cv=none; b=N/Naqalfl2SgatX1IIjqrsxDR7xgOYe7kpfILV/zXKZTUlFOpdT7U6yFB+soIswCTSoajX2Ch03sW9PIYeBDMYpi/YW1OmJw38l2xZBCPWzCT+SzPiRRgN7XxTrCQXFKGnCsf0b5KesopJ6wriZtoTGOJQshb7ztaM0eWOS8l2I=
+	t=1764626944; cv=none; b=Jgnen6m4nV/NIUgtLlspqM1HfL9PS7JmGJzOmMPqI+OUsZ2Jox3i6S+Irtz/glD3Fb7YaGr7YDixHXFq2sQdbWykLz8WUx0ICfrOBppBudZQzz9Xa/7R/eQAsUnqEAo0fVvdtnNmC3CSB1KEYrzehsk1r4WNpxZY9v3DIN8Rouc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764626795; c=relaxed/simple;
-	bh=a+/3Ja2D/pQZL1X0Dhkaimbdc5lxjQT2Xnvsi0l8mf8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W7KslACnnuDqz/Bjid+z62bEvX39ncJB+BCTT6ihggUB2mwiXiObEUdl+6lj/coEiZaiymXSj7HTm3JwfFyTxwxcIvxGJkCw0HBa61sW5n7l9bPwyPvdxw20pAGBuuFK5xcybQuD80YpOFNWfke91hzOYNPAi3YV2RnLq6Lm9nM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=awW4FuAi; arc=none smtp.client-ip=209.85.215.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-bde0f62468cso4849648a12.2
-        for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 14:06:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764626793; x=1765231593; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bzBsG4oWJXV6B7jpmlKeQ9wP6eF71jAwh85HbHOqniI=;
-        b=awW4FuAi/RtjVS0xcsfdV4j+6Molx9MNsVRFq9YrhbctvqJJii0nQNzzovsyGD97pH
-         XniicBI9J/ibOWuaJ9HczsVnYMvV4vvrt9U8GyvndxTypPgMwdKuvMgC+9BPh9POmB3z
-         1oNVS1Vcji40EcYnuLbxNJALzIxL2DM7cHJdJ5YMuBZGdbIt0sHQwe9p5VHJzIOV2vmq
-         xS2nZLBE0RaATbcOLUw8fxPnqzxUk/lQcEkNmpHjM3mbEINxz2916DPEq6kPyHAmXYMg
-         XUm6ev9YzNFrI7aN0yyA42nAJYXgKwsNysUBZZF5PQkxcFnt99BEZk3Y72c9V/6wD2G6
-         UfFA==
+	s=arc-20240116; t=1764626944; c=relaxed/simple;
+	bh=Uw9kUV9EdAkxOYByN1jtz7gLbs5Uy6OVyl/gd7NOE5s=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=Q0ecVGbZeVqbCpc0go+BZVUnxgwYXWyQRn734bu5q+kr5JiBM0axjSDNCbbX/3VFa+928BJR5epokvf9fvmC3cDsBagikqjm4rPpkrC48cvGPxAIrjHMHaKB+lNuhlBZprXqE4Y5+tmdV+AKQfOw/3RwWg2f4tY5TjfitjTDsvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-4510650aea0so5321937b6e.3
+        for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 14:09:02 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764626793; x=1765231593;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bzBsG4oWJXV6B7jpmlKeQ9wP6eF71jAwh85HbHOqniI=;
-        b=LCQQeBpA/rFzhIh7c2eNZPuJh0GDHzfYh8x8KMkVNTYZh1icFeCKcwpNScEeLiYRJf
-         pISYJCPJqVFDAaPF/dbQOK4RYDnZxgmAA1ToLHrc82Yv5WUsDZj8pgyWGjrzrAGU4qSi
-         StROaJgWrY3rhGrjl9HZzCAdjLws26S2Tt7dIE9ofJt1mToL0p792IW2HOBNOg22VgJR
-         jYutG23FqSDyw7XQxBjh8ZynSApJnjKfWMHuGXdQRkvskUdHWEzyuAiwE4EFKooCGbb1
-         /N2PMtL3RhV2PkVW8nziMUEgS5iszM9Yj5h+d2EEOWemgPmQSDdvoPk1o5BbM5mB1tmf
-         Za9A==
-X-Forwarded-Encrypted: i=1; AJvYcCVDgcB/REXiWdqsxvPgDviaRTeLzIBs0OdMGsQRuUOS7jKyLBa+0aZ2emWqRncAOdoxb2bj3Zc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9s83fxWO6bvXV0nq5nL9fIpcDIIiWC6Vtqn/uDhzrkouSssQh
-	HXiZ7pB8cnF1/PpBkrmjInCG8AXNpUyL/KD7O8Gnn/ivYicyV2g2CRLT
-X-Gm-Gg: ASbGncvc4gL4DffO61CmlgWZSsC8kAxQOHH9+S+hRLa24h1rSM4RYRstnQCnGoKUBCl
-	LCyW89G3mNhXl9RNzOWHRM7mMOFlZyZA6s5EBf6PSLrhzLBo7jAciLfyqfjLy7ewp0XOS/2+c+o
-	VGkl8GcMIGvPKwpTbRhuvejGZzNsH7VLPo9ix5XGDlJDTbaT6LfUEyX4YlDbMSFdmboLi+utUqr
-	zAw38xoqUfu7oTs32CVAVtAkkBe+DpFWDVJBuMbl4OQ30Enm3sjW2jltqJMAmWCi+PjPZT2HFe5
-	4BGexf5EF9JYsg5SE3jb2fGCVJbdgIE2s4ogiwXspYM99IlDOJu2NRzdeXjNJPJNtmhABFYRRa3
-	arWEZolPJ+iucP79fMxnW6brx2PYSJcLfQqzK5LntVo4OnB32M6+nbSV+REeGavNIvyZiTNBD2z
-	Lu+nrlYrJJqQ==
-X-Google-Smtp-Source: AGHT+IGhmMxPsgaoPXnzgSVj6wNtw4Ah5MXEyylsvvZXtki7UPfq2bXLwFkO2O3wbGKc+QoBFG6+CQ==
-X-Received: by 2002:a05:7301:b16:b0:2a4:3592:cf6d with SMTP id 5a478bee46e88-2a9415cd90emr11088569eec.17.1764626792802;
-        Mon, 01 Dec 2025 14:06:32 -0800 (PST)
-Received: from archlinux ([2804:7f1:ebc3:d24b:12e1:8eff:fe46:88b8])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2a965b47caasm50506902eec.6.2025.12.01.14.06.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Dec 2025 14:06:32 -0800 (PST)
-Date: Mon, 1 Dec 2025 22:06:24 +0000
-From: Andre Carvalho <asantostc@gmail.com>
-To: Breno Leitao <leitao@debian.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v8 4/5] netconsole: resume previously
- deactivated target
-Message-ID: <2sqyjsod2s6kdukgipgcpjqdoysaw6trpgymxci36lmi3gykvx@tvg4qh3veuiq>
-References: <20251128-netcons-retrigger-v8-0-0bccbf4c6385@gmail.com>
- <20251128-netcons-retrigger-v8-4-0bccbf4c6385@gmail.com>
- <65vs7a63onl37a7q7vjxo7wgmgkdcixkittcrirdje2e6qmkkj@syujqrygyvcd>
+        d=1e100.net; s=20230601; t=1764626942; x=1765231742;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/vkKw1aMFMsjt7cPjue/zTtcAVsiSrnVVB8Q6f0BvOw=;
+        b=mKtXYuBeKvhDfT5dj+CDqixs5kjLjxcofOJl5eHmUq4S7tpUd/A6FZJxF0JKbl3hzF
+         WR4blXPaZw6NZy9skWisp/olax1BjeTA5UrvXf5Wqah3VquEc2Niw3HC2A53AqgjKlES
+         +qQBw6X9gD7f+EHw2ZPS82tjGvaRaDGkniHX5BIU/BxTzKVennF7GuOJjAnfskXXncZH
+         Q4G5FCNsE0m1oOkPyhdlm/cH+uJfA8DXaTw6vVwnTYTUCIfahc3RUdixfkKKpA/sAll6
+         gd77i19vPBl/buACZGjPyBNM73msSAOBobkOd1QsiK0IrctAnPzJXIXVLqWR/ckVt/xE
+         1VAw==
+X-Forwarded-Encrypted: i=1; AJvYcCX9CExrDFtHSf8+dW6X22/iYWLqv9r9ECmpWTgQS0rWQQb3rJUtKtLXwv8JpsUMBlwF+TBvfT4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKzkkxzFHVXvlC7KPIbrMhdoT5FoInoG2EXd5JUyGZ7NVfNJ1G
+	oJRtMwB8hyvKCw+ABlC7bsYsdenzwchU6YHsd7AiC59p8aRbbWfwcWrdr14fJdhHY9aHSpIe7LQ
+	YQWPtmcwU4ZpnkIuZ2uz4VPqbJHQbk1DWLXldrVjP+YybbgT+Y0i7bbhX/kc=
+X-Google-Smtp-Source: AGHT+IFCVn9SmBjyBhDsZVB9FNp97B50jkWsVXck4orrLX/hYWor8khmXtZ+VRasjlQ64ebDCoYjuVDiltI/XEWnqYdManqfsXti
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <65vs7a63onl37a7q7vjxo7wgmgkdcixkittcrirdje2e6qmkkj@syujqrygyvcd>
+X-Received: by 2002:a05:6808:210c:b0:450:a9d0:b799 with SMTP id
+ 5614622812f47-45115a10e29mr18815486b6e.17.1764626942248; Mon, 01 Dec 2025
+ 14:09:02 -0800 (PST)
+Date: Mon, 01 Dec 2025 14:09:02 -0800
+In-Reply-To: <692d66d3.a70a0220.2ea503.00b2.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <692e11fe.a70a0220.d98e3.018e.GAE@google.com>
+Subject: Re: [syzbot] [fs?] kernel BUG in sctp_getsockopt_peeloff_common
+From: syzbot <syzbot+984a5c208d87765b2ee7@syzkaller.appspotmail.com>
+To: brauner@kernel.org, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, jack@suse.cz, kuba@kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-sctp@vger.kernel.org, lucien.xin@gmail.com, marcelo.leitner@gmail.com, 
+	mjguzik@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com, torvalds@linux-foundation.org, 
+	viro@zeniv.linux.org.uk
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Dec 01, 2025 at 03:35:04AM -0800, Breno Leitao wrote:
-> might hit a similar problem to the one fixed by e5235eb6cfe0  ("net:
-> netpoll: initialize work queue before error checks")
-> 
-> The code path would be:
->   * alloc_param_target()
-> 	  * alloc_and_init()
-> 		  * kzalloc() fails and return NULL.
-> 		  * resume_wq() is still not initialized
->   fail:
-> 	* free_param_target()
-> 		* cancel_work_sync(&nt->resume_wq); and resume_wq is not
-> 		  initialized
+syzbot has bisected this issue to:
 
-Checking this a bit now and I'm not sure if we have the same problem. On 
-alloc_param_target() the cleanup is simply kfree(nt).
+commit 457528eb27c3a3053181939ca65998477cc39c49
+Author: Christian Brauner <brauner@kernel.org>
+Date:   Sun Nov 23 16:33:47 2025 +0000
 
-free_param_target() is only called as part of netconsole module setup/cleanup but
-only for targets that were succesfully added to the target list (so are guaranteed
-to have resume_wq initialised) before we hit the error.
+    net/sctp: convert sctp_getsockopt_peeloff_common() to FD_PREPARE()
 
-Let me know if I'm missing something!
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1136a512580000
+start commit:   7d31f578f323 Add linux-next specific files for 20251128
+git tree:       linux-next
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=1336a512580000
+console output: https://syzkaller.appspot.com/x/log.txt?x=1536a512580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6336d8e94a7c517d
+dashboard link: https://syzkaller.appspot.com/bug?extid=984a5c208d87765b2ee7
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16a2322c580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12a3c512580000
 
--- 
-Andre Carvalho
+Reported-by: syzbot+984a5c208d87765b2ee7@syzkaller.appspotmail.com
+Fixes: 457528eb27c3 ("net/sctp: convert sctp_getsockopt_peeloff_common() to FD_PREPARE()")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
