@@ -1,127 +1,223 @@
-Return-Path: <netdev+bounces-242886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 201F3C95AFB
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 05:08:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20F40C95B1D
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 05:18:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id ECA074E0540
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 04:08:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAAE93A1E28
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 04:18:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 455281E47C5;
-	Mon,  1 Dec 2025 04:08:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48F211E7660;
+	Mon,  1 Dec 2025 04:18:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PKX24BN1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HW7umWsD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f65.google.com (mail-pj1-f65.google.com [209.85.216.65])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C291413A88C
-	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 04:08:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4570528F5
+	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 04:18:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764562082; cv=none; b=fi9eUtWGrhXUMmGQbdt/0XSm8elwLMEeavSWVdq75ylpkEYEuveY54XBaj/1oW7p9dY5ahCtC4Gjm+bWY2uEaViUkSPQFNZ7uomIKzBmaaNblhoy82WGzC+exC5xvMMCrRYiTd+1l+iUFd6xYQUL1AbUQ55gHJqtCQHsOEi6pMY=
+	t=1764562719; cv=none; b=MRsD/DRYczjlaq+cbCYgnE6a8qJXWbPkwxTJeQuuVk8bgEkqn42ELSC3l58f9rQLBstvM+hVux2QHyZGdXgXT2p8Fjg7/JDCSXJwuv20ZSWTohs5VCDnc6iCLP8bjFf/qepaTDCYSU702baIm20sRvw990KvoKXk7CsvpzAtmM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764562082; c=relaxed/simple;
-	bh=I5WnbEMYMvxMMyC0dGDFfkJkD1UwMDR1rRygcGxyK70=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E86Il+mFKzqAzgL20HdKvfAl8tjLPk4OkUGO49GyV1B12ip+BXXbWHMQIaI6tlXrazidy4hmZu0YOR8bi9GO9iOYO7MqIwyANAsGTCQxcWOzpwTgPnBbeRhnvBe9TErzOWY/XeQsPKxSVszupaFQS19H1vgMhRMyTigGUtx4kos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PKX24BN1; arc=none smtp.client-ip=209.85.216.65
+	s=arc-20240116; t=1764562719; c=relaxed/simple;
+	bh=jkPMD6GHsCXWpn7rUP9jQrqa/c4UKeSxDfKF/9lJTB0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pkg2Pbz3/H/vVaVUq4OA/BrZxdEq0e8nk0CpP1VgFKVnxsr0UYtf8TT9MzaoEVDvIvQ1REtMiwKDRohBCFBJAvGmTLGMjEK/r+073bgzkNjGQxwUR89WLQbyiY8su8UPE4isUIMEuy5sP/8C+Ml28QPasVlx7Nht00U8DHWT4DU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HW7umWsD; arc=none smtp.client-ip=209.85.218.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f65.google.com with SMTP id 98e67ed59e1d1-343ff854297so4899697a91.1
-        for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 20:08:00 -0800 (PST)
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-b739b3fc2a0so537693966b.3
+        for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 20:18:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764562080; x=1765166880; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xHYB6uxWCS1cMIYtl4torJ0Vkz15tXZo+qs17i5jW2c=;
-        b=PKX24BN1VHfnGnfG0wJANp/3qY8+b9GPJ+0AcBC1Fe1R3x4daGkWoKtcDjEe7UN376
-         l0pxh9HFeafIYzxMot56Iorg+NhxGv6svrxCFpmHahOdE/2uw7ugRDbYpL3pwVtn989o
-         aTNOB3RlhDCmfTq5D4oNMFN46oN/adtnu963Mk+WDAIkI2XboVyWHkZsAPVmM1unqzrL
-         sdVZHsmgRrhd0K6MtCRf3l08cgDC+mvkSMhGCATkgChLFKCq1+AIudQiq5AC5naKwAcx
-         CxRVutgH6i1TX9oZMWO6dEG1bXCCwqpk4GbjPScr3hAANWvyU+w1hGhQeeLsNOaY+fXu
-         W5ow==
+        d=gmail.com; s=20230601; t=1764562716; x=1765167516; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AMVbFQJwrtDT4Z0LvdOkvQwxkH7n3jhJLvQGPrvBilI=;
+        b=HW7umWsDoQvFygQJn2ifKK+ER+KuG3/4+pLxghHhhVVEiUUpV3izkIMU4Ee4Dp3L7Y
+         QBEQr3a7sFOfY28BeuI8lyj21SAXN3IM2q8KdAyO/xPViQ4I1A2md9KWXfccyXqOx03n
+         Toz7D1e35ghYZZGpP4NP20E8pNZXDqoF3Y03LahoQQbzgrHXQeMQZUapV+p9fs3kboWo
+         NyjB7IYjSl2/1ENe3LH05P02250DCkkFpEPEwRSwHoLdVO9kugrx8+ifPWi6Qrk48Vg8
+         utZGTXzyFL+gpSpr9D4h/yt2UOMvKcnM0oTBwrkWv/EE62ioMe0cG1V779u7dz2YN/qC
+         Gy3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764562080; x=1765166880;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xHYB6uxWCS1cMIYtl4torJ0Vkz15tXZo+qs17i5jW2c=;
-        b=c9s1uyGEYsmealdMzLGvil3iN3WNGNQn6AU5kIruP0fa7Vy7nUMbIXQEoFlD4YFB1q
-         pgUnL1pJEfTi2Q+K7dtgDqtXjvXWjKr4fcbZu9JTC9IByb5H8P0UPL/ZeQlWVU6m241g
-         ve4TSrR7Z9xaScwB30S4yXk1C7jYiduINS94tGq635CmNfdLNJLvbqPVYv56TPp4VTa8
-         EGzoh8YdAAVx/qrbgc5JPk6TPDrOLihYuy5cjZ3gbrsHPjKsLhTOR5JYUplsaaHmVnna
-         sczGXUHlep3vkvZ8npEEnyUqTIy4T46QkueRQ5kXXB4g7UjLuRKqUdTRNYpvbJHCEWBY
-         kYuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXWxKw2850K1eJyF//KV5fzgB7bttxeBhNINdfPEZyjd9mz15H+kWIpX5TTJyL6fi+dOltR+gA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6y5Ab/T/gyye9BUXR3Ve2aJ8qu7DqBCCtKyav+5UzFkQ6flMf
-	CD04fWb0p6nLe/hyI+aSPXEOeJi9X0lr0MO0f2EOCuBmqKmu8zJvc07N
-X-Gm-Gg: ASbGnctnCQoUGrjap1w19oMa56pRuEXVeobodmJ+ZtZ0396UqqGZhnfOQwnhXuZqWzW
-	/g5IKqTd6HTlBZ5H9SYEfUEAlPSmaLHHIX4bfo7cytlTfIBmxwwlrjUVJ98oe8Zq2VsxD2cZsvg
-	MS0L5hoHnx2rYDx1k3t3NoGrH3eHd0gxTnNfIn6WN3Th8eanHlJiBThEiLcGAUhaqKtkGiS4EZX
-	hlMvUOWO74ZJtVnWiGmxkbGRSBSKPDN/IWnAixC9gkAvqSiTu9ftLxUr9iXrRFVAymjS4U9rfyT
-	vhT+J7Z3fiQ5pEr4iWkm/dU4viYoswwAT/tqVR6fJf9+4h390yneo3e4eyNx5t303yRSB8kMdBP
-	EwvQUWmkZ4u0WVM3EjP6no3X7vfkdWWrUfvMHS/xSePyB0N9djgXfSthDpwkXrJ4VKC01j4YWgH
-	LTKglKIgBtINEedNeXlF8Z+6JhZgCucSyjNl83go5U
-X-Google-Smtp-Source: AGHT+IGPl5jq66QKAxKuT1zbMmX7cVCg83U7Ow4OS33Os0vlctAPTudYRAxHElLQlJEOckDjjbES5A==
-X-Received: by 2002:a17:90b:48c5:b0:345:badf:f1b7 with SMTP id 98e67ed59e1d1-34733f3eb64mr33856675a91.28.1764562079912;
-        Sun, 30 Nov 2025 20:07:59 -0800 (PST)
-Received: from fedora ([103.120.31.122])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3477aeb88a1sm11486769a91.0.2025.11.30.20.07.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 30 Nov 2025 20:07:59 -0800 (PST)
-Date: Mon, 1 Dec 2025 09:37:50 +0530
-From: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	netdev@vger.kernel.org, mptcp@lists.linux.dev,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2] selftests: mptcp: Mark xerror __noreturn
-Message-ID: <aS0UlhHP5aEzDZlv@fedora>
-References: <20251129043808.16714-1-ankitkhushwaha.linux@gmail.com>
- <632d57cf-becd-4d09-bb21-0e3db6776c49@kernel.org>
- <20251129174133.0e369f80@kernel.org>
- <d4656eca-3c65-407b-a487-0a1816c38036@kernel.org>
+        d=1e100.net; s=20230601; t=1764562716; x=1765167516;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=AMVbFQJwrtDT4Z0LvdOkvQwxkH7n3jhJLvQGPrvBilI=;
+        b=J0Nsj2qfE820nVyzDjbbtsyLpp2zMVQhvcOOUsN4xFmWlIvlihowL+CXt6DD41I+cE
+         Xohz6t60oyp+yYl6bOXFacIvhIfvxtuMbr78EGOOKOIrknBhq2qdQiZKWmN1dYbCS5Jo
+         ikqa2RCoo15HoQZ7YsLy9aRjmQ9i5Tb0kl0pE5qsCenkJKXC4iCImSk4kVe+NKvmQGDy
+         MojynOhtxuWN5fVSrfIRow3CXBOsrv9iCePMk8+gWpiWVJaMSosPz7vq8RPOl8BzJ7Sm
+         ZkKaj7ILlU83O806h/crEPrRTbuv4UkMwFuwdObdi17OxKF6XfncAvfqSAuZtL5aLqyl
+         4hdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUXtyFTRFfLALJqJLFAnZ4FI/Lf2yUqgJXW74VPYDseFImLvUFF5srqiELh/aVypD9E/EALHCY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzepVCW/d+1EzWRwmKto73oD6iGbwZ1Cpw7qcRdO+R/C2Oy+Ojv
+	Rw/bJVjfw+gyekxprssuFNikmsHuVPNeX/7HkPFutrlvljUfQCMlJ/itrYhss8jzZ/r+A4rvQ7p
+	8qjnGoe5QKOHKu7ZQWXQGic4CBkScHjg=
+X-Gm-Gg: ASbGncswkloYqi3TY2giWZhvN5+GUOuWNf/YvMJ1A7quxWJA/sDFlmDRpnOYmA3WYIx
+	SJ5Jvc/MIFW4of9BdHS5I3FWXhvmbc70Qk8N7qyb2lDvP64TCDUxhUhFHvMZ8Lskv8WfIbyWuyR
+	md93R9btPfIxjGt/f2dEw3eRbJ/824M3Au2MMarzdCKfIPlA5VoHiAqEGg18YeDryVfBlbbgOel
+	chB6GANLfSj16MANjA3KsdmDDmbRdmWXAQw4j6bPqmPk75we5ZG8egMXv1nLSMUqEXqDL+NYRJx
+	3PpYHF9eVo6iChRZnzP4+inYvMnBvpA5wyjE
+X-Google-Smtp-Source: AGHT+IEeTiNhj2dkL9zHMBWy2MWadxfl3ORIHTFpBD3euUzlvLmeTWg5W0jv/zpi7B8w/lH1Tab+xDdjnzwufYN3YuM=
+X-Received: by 2002:a17:907:3c96:b0:b73:9368:ad5e with SMTP id
+ a640c23a62f3a-b76c5515082mr2667474566b.34.1764562715362; Sun, 30 Nov 2025
+ 20:18:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d4656eca-3c65-407b-a487-0a1816c38036@kernel.org>
+References: <20251112042720.3695972-1-alistair.francis@wdc.com>
+ <20251112042720.3695972-6-alistair.francis@wdc.com> <f7a91a49-9f82-492a-8bf9-520ee1c832ba@suse.de>
+In-Reply-To: <f7a91a49-9f82-492a-8bf9-520ee1c832ba@suse.de>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 1 Dec 2025 14:18:08 +1000
+X-Gm-Features: AWmQ_bnRvWBaRf_AYOX9GVK2GmdKNpGnJ5WeFBVDhtY-flit1CL2pb-FbNx9lsA
+Message-ID: <CAKmqyKPU2w2GrzdMtMn1rO8auOpDCTovQH04P8RxptA45Oy6XQ@mail.gmail.com>
+Subject: Re: [PATCH v5 5/6] nvme-tcp: Support KeyUpdate
+To: Hannes Reinecke <hare@suse.de>
+Cc: chuck.lever@oracle.com, hare@kernel.org, 
+	kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org, kbusch@kernel.org, 
+	axboe@kernel.dk, hch@lst.de, sagi@grimberg.me, kch@nvidia.com, 
+	Alistair Francis <alistair.francis@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Matthieu, Jakub,
+On Thu, Nov 27, 2025 at 11:31=E2=80=AFPM Hannes Reinecke <hare@suse.de> wro=
+te:
+>
+> On 11/12/25 05:27, alistair23@gmail.com wrote:
+> > From: Alistair Francis <alistair.francis@wdc.com>
+> >
+> > If the nvme_tcp_try_send() or nvme_tcp_try_recv() functions return
+> > EKEYEXPIRED then the underlying TLS keys need to be updated. This occur=
+s
+> > on an KeyUpdate event as described in RFC8446
+> > https://datatracker.ietf.org/doc/html/rfc8446#section-4.6.3.
+> >
+> > If the NVMe Target (TLS server) initiates a KeyUpdate this patch will
+> > allow the NVMe layer to process the KeyUpdate request and forward the
+> > request to userspace. Userspace must then update the key to keep the
+> > connection alive.
+> >
+> > This patch allows us to handle the NVMe target sending a KeyUpdate
+> > request without aborting the connection. At this time we don't support
+> > initiating a KeyUpdate.
+> >
+> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> > ---
+> > v5:
+> >   - Cleanup code flow
+> >   - Check for MSG_CTRUNC in the msg_flags return from recvmsg
+> >     and use that to determine if it's a control message
+> > v4:
+> >   - Remove all support for initiating KeyUpdate
+> >   - Don't call cancel_work() when updating keys
+> > v3:
+> >   - Don't cancel existing handshake requests
+> > v2:
+> >   - Don't change the state
+> >   - Use a helper function for KeyUpdates
+> >   - Continue sending in nvme_tcp_send_all() after a KeyUpdate
+> >   - Remove command message using recvmsg
+> >
+> >   drivers/nvme/host/tcp.c | 85 +++++++++++++++++++++++++++++++++-------=
+-
+> >   1 file changed, 70 insertions(+), 15 deletions(-)
+> >
+> > diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
+> > index 4797a4532b0d..5cec5a974bbf 100644
+> > --- a/drivers/nvme/host/tcp.c
+> > +++ b/drivers/nvme/host/tcp.c
+> > @@ -172,6 +172,7 @@ struct nvme_tcp_queue {
+> >       bool                    tls_enabled;
+> >       u32                     rcv_crc;
+> >       u32                     snd_crc;
+> > +     key_serial_t            handshake_session_id;
+> >       __le32                  exp_ddgst;
+> >       __le32                  recv_ddgst;
+> >       struct completion       tls_complete;
+> > @@ -858,7 +859,10 @@ static void nvme_tcp_handle_c2h_term(struct nvme_t=
+cp_queue *queue,
+> >   static int nvme_tcp_recvmsg_pdu(struct nvme_tcp_queue *queue)
+> >   {
+> >       char *pdu =3D queue->pdu;
+> > +     char cbuf[CMSG_LEN(sizeof(char))] =3D {};
+> >       struct msghdr msg =3D {
+> > +             .msg_control =3D cbuf,
+> > +             .msg_controllen =3D sizeof(cbuf),
+> >               .msg_flags =3D MSG_DONTWAIT,
+> >       };
+> >       struct kvec iov =3D {
+> > @@ -873,12 +877,17 @@ static int nvme_tcp_recvmsg_pdu(struct nvme_tcp_q=
+ueue *queue)
+> >       if (ret <=3D 0)
+> >               return ret;
+> >
+> > +     hdr =3D queue->pdu;
+> > +     if (hdr->type =3D=3D TLS_HANDSHAKE_KEYUPDATE) {
+> > +             dev_err(queue->ctrl->ctrl.device, "KeyUpdate message\n");
+> > +             return 1;
+> > +     }
+> > +
+>
+> Errm. 'hdr' is of type 'struct nvme_tcp_hdr', and that most certainly
+> does not define TLS_HANDSHAKE_KEYUPDATE. I think you should evaluate the
+> cmsg type here.
+>
+> >       queue->pdu_remaining -=3D ret;
+> >       queue->pdu_offset +=3D ret;
+> >       if (queue->pdu_remaining)
+> >               return 0;
+> >
+> > -     hdr =3D queue->pdu;
+> >       if (unlikely(hdr->hlen !=3D sizeof(struct nvme_tcp_rsp_pdu))) {
+> >               if (!nvme_tcp_recv_pdu_supported(hdr->type))
+> >                       goto unsupported_pdu;
+> > @@ -944,6 +953,7 @@ static int nvme_tcp_recvmsg_data(struct nvme_tcp_qu=
+eue *queue)
+> >       struct request *rq =3D
+> >               nvme_cid_to_rq(nvme_tcp_tagset(queue), pdu->command_id);
+> >       struct nvme_tcp_request *req =3D blk_mq_rq_to_pdu(rq);
+> > +     char cbuf[CMSG_LEN(sizeof(char))] =3D {};
+> >
+> >       if (nvme_tcp_recv_state(queue) !=3D NVME_TCP_RECV_DATA)
+> >               return 0;
+> > @@ -976,10 +986,26 @@ static int nvme_tcp_recvmsg_data(struct nvme_tcp_=
+queue *queue)
+> >
+> >               ret =3D sock_recvmsg(queue->sock, &msg, msg.msg_flags);
+> >               if (ret < 0) {
+> > -                     dev_err(queue->ctrl->ctrl.device,
+> > -                             "queue %d failed to receive request %#x d=
+ata",
+> > -                             nvme_tcp_queue_id(queue), rq->tag);
+> > -                     return ret;
+> > +                     /* If MSG_CTRUNC is set, it's a control message,
+> > +                      * so let's read the control message.
+> > +                      */
+> > +                     if (msg.msg_flags & MSG_CTRUNC) {
+> > +                             memset(&msg, 0, sizeof(msg));
+> > +                             msg.msg_flags =3D MSG_DONTWAIT;
+> > +                             msg.msg_control =3D cbuf;
+> > +                             msg.msg_controllen =3D sizeof(cbuf);
+> > +
+> This is not correct; reading the control message implies a kernel
+> memory allocation as message buffer, not an interator (as it's the
+> case here).
 
-On Sun, Nov 30, 2025 at 06:09:18PM +0100, Matthieu Baerts wrote:
-> Hi Jakub, Ankit,
-> 
-> On 30/11/2025 02:41, Jakub Kicinski wrote:
-> > On Sat, 29 Nov 2025 19:13:08 +0100 Matthieu Baerts wrote:
-> >>> +$(OUTPUT)/mptcp_connect: CFLAGS += -I$(top_srcdir)/tools/include
-> >>> +$(OUTPUT)/mptcp_sockopt: CFLAGS += -I$(top_srcdir)/tools/include
-> >>> +$(OUTPUT)/mptcp_inq: CFLAGS += -I$(top_srcdir)/tools/include  
-> > 
-> > I believe this is being added via MM or kselftest tree at level of the
-> > main ksft makefile. Since this is a false positive, maybe let's defer
-> > fixing the issue until after the merge window? When the -I.. flag
-> > will be implicitly in place?
-> 
-> @Ankit: do you mind sending a v3 without the modifications of the
-> Makefile, and supporting die_perror() in a bit more than 2 weeks or
-> later, please?
+I don't follow what you mean
 
-I will surely send v3 patch after merge window with the requested
-changes.
-
-Thanks,
--- Ankit
+Alistair
 
