@@ -1,86 +1,209 @@
-Return-Path: <netdev+bounces-242859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24768C9570B
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 01:06:45 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F694C957E8
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 02:27:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B99B23A21EE
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 00:06:43 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 66785341BBD
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 01:27:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D48D21FDA;
-	Mon,  1 Dec 2025 00:06:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 110D87261D;
+	Mon,  1 Dec 2025 01:27:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0RXuOGqp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ryyy4KeX"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D72A310F1;
-	Mon,  1 Dec 2025 00:06:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 169B033985
+	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 01:27:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764547599; cv=none; b=MmTLs4cnoH2nXh8xcU0uhJCXKSqL8KiHTkYQJ+hDFTLaji1lzX92uGaAaL3LOm8r2swqn+YoaRItAWKSRK04i5ssl5piDIzFrAOkPQmnDOSQk2EcSBIR6iT2ZbSrXzAETGpxBagWD32El2toZLt4kHovAS7datCXx/RbCuxzmCI=
+	t=1764552464; cv=none; b=HK8JEcL66aL96T+wrVHM5cUlkr6RUhJP/Ta5PWsztx+9qjlL2I/IRz06caeBnJP4nLOc1vcGn9dMUvHDs33eq12CbX6ouQ3zdEwdTxrqySr2qY6pabyXegJMJ+7u2WSe+R7kqRZPUZywKVlr1hv5fPCnFCqIgZqiKEi0dghaqVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764547599; c=relaxed/simple;
-	bh=NI9teLAjFoPuBFUYANFwFkzTUz0foYqxJz+WhM4MGj0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L2/KFKZuJEW5u1gIvgnED6iMr9wu6cY6P7ZjPWN+bydIUVz88Tovw3V2aChJ8NrkY0WnvOtict48Gm2J5FZNQ3QK97/sepeYr2IhCY+E8Aeotafm0HpcWlFAVLzQluTSwZY/IoH0AnG47EFNq5xrhgMuRaRGHmaenZqrc1UUyxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0RXuOGqp; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=wVyLMlsax2BhUE1HQIxnChRCm21thhaGU63AnDvjfMk=; b=0RXuOGqpmyPR0/yGX+kwUTnAzo
-	FH8MlYJtuG40oef4Cq1g/k4ebcDYEuD0YEcTWK8r5kWpkxs6XVJisGxn2Bb8AWXT+n9kcVqDphNDL
-	cBR3AdHdfdrIl5pBB9IOr0L8bY8lH7WeseWAvuNGdM4gmAbdsGlKzMc0TYmjuAFLUlaA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vPrQr-00FToD-R0; Mon, 01 Dec 2025 01:06:21 +0100
-Date: Mon, 1 Dec 2025 01:06:21 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Yeounsu Moon <yyyynoom@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dlink: fix several spelling mistakes in
- comments
-Message-ID: <2fac78b6-d60b-4d86-8342-3cd097a96037@lunn.ch>
-References: <20251130220652.5425-2-yyyynoom@gmail.com>
+	s=arc-20240116; t=1764552464; c=relaxed/simple;
+	bh=hRqTviMO1FHidgSeW5rEOVfdL+47yZuaWT+X/2K/q7U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Y9Gl15yUpZv1r88Ui26jGkbpZouj0Kns9PKz/SpELjgojH63K9wYXaophREwZ+q6ZOxxGUgnJ6v619KgDhpSe/2z/moYFdjA54Ga61YmfITHSItzlABh8IttBlHMFKzCf3RwPUaoebjKGAJBkBGAK0MfOTQwQdEGXDtSL8TddYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ryyy4KeX; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-59434b28624so22299e87.1
+        for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 17:27:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1764552460; x=1765157260; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ehYGc97IwrLDHQvpTuRv7v/3RImO4vhIDaHvlIMcxcE=;
+        b=Ryyy4KeXIVT/HzvtUjPS6FXGUxflVTNArEFZmNby8QcP/Q547xVBdlnzcI7NFVfjVJ
+         yVcT1mfpWFU2/ovf8lXvR6EEnZN/VogTDHoaCmu0KxdD17xDXcoLswmqkAfHhYk0ufUQ
+         FpernAN9xi+8RGw6rMD48ZvETKIbEDp3z3HUdBK3NPcDeQ5k35NFQev3ZAaa3UfofGGu
+         1t3Lvx9kuolUqWPjvRLGJnHCzu7Hluft4J9WtvCzK0Sv6M4MHgCU/9CYmVVdY+S5GGFU
+         OdC3rFJUF6/dJxTnRBs+j1HK/OYB6xUZKDSYwkfLnzCrta1C1GgErETJilMWuBgGZdbF
+         HXEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764552460; x=1765157260;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ehYGc97IwrLDHQvpTuRv7v/3RImO4vhIDaHvlIMcxcE=;
+        b=b9tfeGUgWD3ZM8HCQjrw3dFtlwOu+D6xubbSLrjujKi1G1VTU+pguW+1am3UXBOu7V
+         jNl2L4Y1OQUWhEM8RYQ4/sbmc9DiMx3R60ZOXAvm6NBfP/rfO1+ZPy2j2fa/wvVoDB4Y
+         PKfa6dWKBhsSWWJSRFp8xa+1Es/spoVfwkt+jYmI94yVMcTGqnzurTh1d/WhJqDtFU8E
+         mBTw87vjbX0i9BuSPUuJ0dP7s18DXCGrSo3Umu29pmNYBqY71/hpoNafz6mlveokjl51
+         MNLTbbG2wbyyjEiXv8tP4UZDPbxotkChQnjFK0AJJs/O9zP94DKRUt3IpGFBx5rkBHZS
+         rvHA==
+X-Gm-Message-State: AOJu0YwkePNvSksMP1ZnUyOD3h8sWoIEwUBsuV7dEKU23QklB7py0NHo
+	ex+fxqA6JjrH4wT+yi1Ttw7LVZrDPoiiEkvLE+4TObBUukTj0iYm39DJcYCVOE3v8Z2yNF/85WF
+	FJUk9pCIGLCno1DKBOlXVuzIDKYDGdWBe9seNiNW9
+X-Gm-Gg: ASbGncsWdQmrjIlY4umR1ju7GDs90/WbhQBvDtE3EWIUUsddAXagMNbD3mx6RLvKl6M
+	MyREkKLaOZNXzrsMwVyJKutFvCqJIEPCGvhNWtbULyMkMXfOf/qE5drW6psfTB0d7kzCc3G9Mtk
+	ntENw2xq+7JgdkCAaX3zl/HKcXg/582NgJS7pnkk2d59POPADwmDWOGlhhUl2eBQg7U9nITPAjP
+	uQJuH5JPk6cGxl3t20/f8NAmkTvLolc9IXUkJ7ByL+WhImm/7ZE7wnXxeZsY0snYzc91Pw=
+X-Google-Smtp-Source: AGHT+IGUtxtVROoFL9XWjzu7VOF6oLjMb/cN+4biEc3EnHVPC3Y1fSDYFJip1ZsrUhL2CHurERDtTpPY0GeOtj8Rxik=
+X-Received: by 2002:a05:6512:1343:b0:596:9b1c:95da with SMTP id
+ 2adb3069b0e04-596bdce2767mr186845e87.17.1764552460026; Sun, 30 Nov 2025
+ 17:27:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251130220652.5425-2-yyyynoom@gmail.com>
+References: <20251122140839.3922015-1-almasrymina@google.com> <DS4PPF7551E6552ECCF95AE9C177DEF07F8E5D0A@DS4PPF7551E6552.namprd11.prod.outlook.com>
+In-Reply-To: <DS4PPF7551E6552ECCF95AE9C177DEF07F8E5D0A@DS4PPF7551E6552.namprd11.prod.outlook.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Sun, 30 Nov 2025 19:27:26 -0600
+X-Gm-Features: AWmQ_bntuE3GnpzJMZaG9Cr3R1vpsBmf3PJosTlld9e_VcSuzfSnUowwDbN3jGY
+Message-ID: <CAHS8izOjZxEgBmYEhZanp57ukCYU5i5FdWfx5HO5+Ua2V3Owsg@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH net-next v1] idpf: export RX hardware
+ timestamping information to XDP
+To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, YiFei Zhu <zhuyifei@google.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Stanislav Fomichev <sdf@fomichev.me>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, 
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	"Lobakin, Aleksander" <aleksander.lobakin@intel.com>, Richard Cochran <richardcochran@gmail.com>, 
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 01, 2025 at 07:06:53AM +0900, Yeounsu Moon wrote:
-> This patch fixes multiple spelling mistakes in dl2k driver comments:
-> 
-> - "deivices" -> "devices"
-> - "Ttransmit" -> "Transmit"
-> - "catastronphic" -> "catastrophic"
-> - "Extened" -> "Extended"
-> 
-> Also fix incorrect unit description: `rx_timeout` uses 640ns increments,
-> not 64ns.
-> - "64ns" -> "640ns"
-> 
-> These are comment-only changes and do not affect runtime behavior.
-> 
-> Signed-off-by: Yeounsu Moon <yyyynoom@gmail.com>
+On Mon, Nov 24, 2025 at 2:33=E2=80=AFAM Loktionov, Aleksandr
+<aleksandr.loktionov@intel.com> wrote:
+>
+>
+>
+> > -----Original Message-----
+> > From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> > Of Mina Almasry
+> > Sent: Saturday, November 22, 2025 3:09 PM
+> > To: netdev@vger.kernel.org; bpf@vger.kernel.org; linux-
+> > kernel@vger.kernel.org
+> > Cc: YiFei Zhu <zhuyifei@google.com>; Alexei Starovoitov
+> > <ast@kernel.org>; Daniel Borkmann <daniel@iogearbox.net>; David S.
+> > Miller <davem@davemloft.net>; Jakub Kicinski <kuba@kernel.org>; Jesper
+> > Dangaard Brouer <hawk@kernel.org>; John Fastabend
+> > <john.fastabend@gmail.com>; Stanislav Fomichev <sdf@fomichev.me>;
+> > Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
+> > <przemyslaw.kitszel@intel.com>; Andrew Lunn <andrew+netdev@lunn.ch>;
+> > Eric Dumazet <edumazet@google.com>; Paolo Abeni <pabeni@redhat.com>;
+> > Lobakin, Aleksander <aleksander.lobakin@intel.com>; Richard Cochran
+> > <richardcochran@gmail.com>; intel-wired-lan@lists.osuosl.org; Mina
+> > Almasry <almasrymina@google.com>
+> > Subject: [Intel-wired-lan] [PATCH net-next v1] idpf: export RX
+> > hardware timestamping information to XDP
+> >
+> > From: YiFei Zhu <zhuyifei@google.com>
+> >
+> > The logic is similar to idpf_rx_hwtstamp, but the data is exported as
+> > a BPF kfunc instead of appended to an skb.
+> >
+> > A idpf_queue_has(PTP, rxq) condition is added to check the queue
+> > supports PTP similar to idpf_rx_process_skb_fields.
+> >
+> > Cc: intel-wired-lan@lists.osuosl.org
+> >
+> > Signed-off-by: YiFei Zhu <zhuyifei@google.com>
+> > Signed-off-by: Mina Almasry <almasrymina@google.com>
+> > ---
+> >  drivers/net/ethernet/intel/idpf/xdp.c | 27
+> > +++++++++++++++++++++++++++
+> >  1 file changed, 27 insertions(+)
+> >
+> > diff --git a/drivers/net/ethernet/intel/idpf/xdp.c
+> > b/drivers/net/ethernet/intel/idpf/xdp.c
+> > index 21ce25b0567f..850389ca66b6 100644
+> > --- a/drivers/net/ethernet/intel/idpf/xdp.c
+> > +++ b/drivers/net/ethernet/intel/idpf/xdp.c
+> > @@ -2,6 +2,7 @@
+> >  /* Copyright (C) 2025 Intel Corporation */
+> >
+> >  #include "idpf.h"
+> > +#include "idpf_ptp.h"
+> >  #include "idpf_virtchnl.h"
+> >  #include "xdp.h"
+> >  #include "xsk.h"
+> > @@ -369,6 +370,31 @@ int idpf_xdp_xmit(struct net_device *dev, int n,
+> > struct xdp_frame **frames,
+> >                                      idpf_xdp_tx_finalize);
+> >  }
+> >
+> > +static int idpf_xdpmo_rx_timestamp(const struct xdp_md *ctx, u64
+> > +*timestamp) {
+> > +     const struct virtchnl2_rx_flex_desc_adv_nic_3 *rx_desc;
+> > +     const struct libeth_xdp_buff *xdp =3D (typeof(xdp))ctx;
+> > +     const struct idpf_rx_queue *rxq;
+> > +     u64 cached_time, ts_ns;
+> > +     u32 ts_high;
+> > +
+> > +     rx_desc =3D xdp->desc;
+> > +     rxq =3D libeth_xdp_buff_to_rq(xdp, typeof(*rxq), xdp_rxq);
+> > +
+> > +     if (!idpf_queue_has(PTP, rxq))
+> > +             return -ENODATA;
+> > +     if (!(rx_desc->ts_low & VIRTCHNL2_RX_FLEX_TSTAMP_VALID))
+> > +             return -ENODATA;
+> RX flex desc fields are little=E2=80=91endian.
+> You already convert ts_high with le32_to_cpu(), but test ts_low directly =
+against the mask.
+> On big=E2=80=91endian this can misdetect the bit and spuriously return -E=
+NODATA.
+> Please convert ts_low to host order before the bit test.
+> See existing IDPF/ICE patterns where descriptor words are leXX_to_cpu()=
+=E2=80=91converted prior to FIELD_GET() / bit checks.
+> Also, per the XDP RX metadata kfunc docs, -ENODATA must reflect true abse=
+nce of per=E2=80=91packet metadata; endianness=E2=80=91correct testing is r=
+equired to uphold the semantic.
+>
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Hey, sorry for the late reply. Initially when I read the reply, I
+thought: "why not, lets add a leXX_to_cpu".
 
-    Andrew
+But now that I look closer to implement the change and submit v2, it
+looks correct as written. ts_low is defined as a u8:
+
+```
+struct virtchnl2_rx_flex_desc_adv_nic_3 {
+...
+u8 ts_low;
+```
+
+So it should not be fed into any leXX_to_cpu() functions, no?
+
+I also looked at other u8 members in this struct like `u8
+status_err0_qw0` and `u8 status_err0_qw1`, and both are used in
+existing code without a conversion. So it seems correct as written.
+Can you reconsdirer?
+
+If you insist some change is required, can you elaborate more on what
+needs to be changed? There is no le8_to_cpu, unless a trivial one that
+does nothing (one byte struct cannot be little or big endian).
 
