@@ -1,76 +1,95 @@
-Return-Path: <netdev+bounces-242882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-242884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37BFCC95A4A
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 04:24:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81FA7C95A83
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 04:41:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2B163A198A
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 03:24:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33D1E3A1B69
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 03:41:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C22B51E008B;
-	Mon,  1 Dec 2025 03:24:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A42FD19E7F7;
+	Mon,  1 Dec 2025 03:41:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="EbR9201B"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PPUrpxgY"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3974719C542;
-	Mon,  1 Dec 2025 03:24:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B24313FEE
+	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 03:41:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764559460; cv=none; b=bxuWXyCPR2kWxMPyIWYMj5XoyGEBbqKHoiyanfp8IwRDzZLQGO6oZTWucGO2eQBJQPkjPrDYkld/Dvncb/l0swD0cZyjUtiVqhfLMZXpDPq+uGcjxvxxFMT8iO6dMEE8Mc0vsHuQhGbR06DeC809atu6yQ8aiOHk5uTWfpJmoSA=
+	t=1764560480; cv=none; b=SLzgvvnjppFsq56SFohPZXBfMHlv3kElZA72ZYOKMzCe0rGJ46w2RgqTgb1+3jAD5/bondyVA9TwsRdCnV2Zq/bufpoDn/DpOie7L7deyIeStfORmGUClslGNdcNmk2JQhCpeQXIwt9onsrur2NiSlnNC54V1qlhCqCLoaH5CGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764559460; c=relaxed/simple;
-	bh=9u6G1uRxPermdv4TCk/mWsUbTEfeHI/uhloFW7LMPPQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=clsICol1y6pLU7MlVAfZRNGrUDcDewDYmM46/EG6jl2c7m1AWd9GN8IE1/ghWILLrIGytX4rGQ7MkBrKjo6BowEFWyO/5Kb16jmB8CLS3HwwiQwgxXPeSgNi4atLsFbgZxZ+NzEdrUy6y+eoOvDNhcAlrB7RRqXtSuJwqGvIAj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=EbR9201B; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1764559458; x=1796095458;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=9u6G1uRxPermdv4TCk/mWsUbTEfeHI/uhloFW7LMPPQ=;
-  b=EbR9201BzZTHeLq8fz+5ZeYROertE4DXOzb0fA7RJ/NiEygskJw0wrak
-   nx50J8U63MCGhHWH64mCLDDb1qATp5vhSk4BcvftgPaXV1TSrvtUIPIzg
-   LaAeU8ZV0/YlAz71yPi6L5cgbYw2CnIHLxfHc5D2UUJkeWsrXVtfmGUJe
-   +VbgurofmOrhOUqKyv81INQ100maPIuchbcNXLmZtY7NSJSnsgfMmIPy8
-   1Z/4o59RDbF6bygZIiU1xeiSbBBTkilOKjh2ede6wzwfIbEiX1V3kI7pa
-   NJS9QWq8Y1duAHWTOhOQlDjJbGG9ofPzWlF/Q1qw5iI5NWTyrATJsBwsN
-   A==;
-X-CSE-ConnectionGUID: 1XGbcUZ+QfelIecK6MTplQ==
-X-CSE-MsgGUID: 3D7Uo0clSd28zOu8RZf/Hw==
-X-IronPort-AV: E=Sophos;i="6.20,240,1758610800"; 
-   d="scan'208";a="217188630"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2025 20:24:09 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.87.71) by
- chn-vm-ex1.mchp-main.com (10.10.87.30) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.29; Sun, 30 Nov 2025 20:24:01 -0700
-Received: from che-ll-i17164.microchip.com (10.10.85.11) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Sun, 30 Nov 2025 20:23:57 -0700
-From: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
-To: <Parthiban.Veerasooran@microchip.com>, <piergiorgio.beruto@gmail.com>,
-	<andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "Parthiban
- Veerasooran" <parthiban.veerasooran@microchip.com>
-Subject: [PATCH net-next v4 2/2] net: phy: microchip_t1s: add SQI support for LAN867x Rev.D0 PHYs
-Date: Mon, 1 Dec 2025 08:53:46 +0530
-Message-ID: <20251201032346.6699-3-parthiban.veerasooran@microchip.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20251201032346.6699-1-parthiban.veerasooran@microchip.com>
-References: <20251201032346.6699-1-parthiban.veerasooran@microchip.com>
+	s=arc-20240116; t=1764560480; c=relaxed/simple;
+	bh=RavPoON2AtHEgnR4R9qerJUek3jo4iZpBSvZeJXyzvE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FfvQXUScwtk2297af/tnUHxtnD883VtTKL3f0MzPMGs3twWmKqiRB3Ru6xkEO5cB/oAU91ZsfmFSgcLD05wMpSSivmkMy12ZoCG+eA8ADNymTKU3HPKfMsMlF2tvIy2gyKqOgXIGQf3I6CFvJS151FUp2tGh/gKivLbrCOFmXNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PPUrpxgY; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-341988c720aso3153018a91.3
+        for <netdev@vger.kernel.org>; Sun, 30 Nov 2025 19:41:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764560478; x=1765165278; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=TlbI/qoSd0f2lsToeVKQSag9wuEwJhaMlP4r36cW0BM=;
+        b=PPUrpxgYrpaX90LD48YuM6xotaZEmHqwXMMt1hwTLHFQ7x61brAaWHOzL11BzJnlb8
+         N3+VbrmvqXKgdKlmJiyZavG92//rD0agmRySD8PD88LhoYJdFR+MEgH8u2QsN323/Q2q
+         twuZXAT1NngguFy0ZBgwBlDIREwlybBW/GnSEahEscj2ZctidtOY997cVi8hbEpJTKSE
+         3QEfVB7kl2/WjfRNAfJ0sWKtgBnnvmriAAARhxCPvCQ/MDl1JVwOM+LvBHZEm96YeVmI
+         j2vXpfQdXjVXXWxDKW9tBe6RRklH3pKjq7c38d+BcutTXEjHCmQ9vOFvYfWQEyqhkdpN
+         LLaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764560478; x=1765165278;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TlbI/qoSd0f2lsToeVKQSag9wuEwJhaMlP4r36cW0BM=;
+        b=oUCgvCmfvou5MVcbskQs08NdajpYjqvZYHTZijY7PKfRoM3PBryVwuCaeRX2Xkp6PO
+         tvCQvPOtuQm5JT+IjuHwWpL8a8FvoygbD7fgx4Hm1rZqOvokp0iWrWrlnwFfnDKAOoxz
+         9fylrP9Pb7g+TH6eHqFKAZQA01YbGEnlzcmy/60c0hkB67b+vJvPbM12eT4Kz9bToyou
+         pwCGVn7BxLgTZfqQyTJYnI7Zp0Wl/jqiWEh1XpA5f8+I+8lnBM/4pJpR9LiXh4Rd8QB9
+         FlJqKxLlQ0cW4vO4yQEdSfsVELiIWLsZwBsTD0cCdmSQc/s2DH9CB6QVwVJoVvU6AL3m
+         omxA==
+X-Forwarded-Encrypted: i=1; AJvYcCU3hUwkqw8RyJ+QW/In/TFMFhuOWfzqzMu+RKDMDoO1IL3vNksHz7hDsvtayO5YR50sXnOuqAo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPYDGmj/saTLij3qKj0HPOFQTA7u/Zb9aEl/cZbZeoJMJouckG
+	MBf7JbLuPCAJJxgsFjbarx4/tVIMwASPAp6ozTrheHpwEAKftBlGJaei
+X-Gm-Gg: ASbGncvmc4e2LZDtBZh0w70FYaNQDLfQuzK0bv5bxAjAjb1CQbDY0OyiPlyAtqGpU32
+	aLF5bQSECs/aywvo1CFNz3uhrFJWPGX7GQtmjkOiHMXQ5y6KonjdYf9gD11FDKYqab1WPzOLOET
+	+5yuKEJu+S0xVfOduR8+XvIaffd6T8rGiroJT9AbxkwGceuSmwLjZWy853KKuCJV5MoAS4ey68h
+	jrK8kPpLHeNXd3F54vLujb2gF5yDwce55ngQbTQXqfzVpVqDCjD6NP++IV5Np7R9wStgzevgv7v
+	RfRn7uDkBazlBEZSxdjSjyOvGE8LH6GhdVnndVEjaepbXNxDBzBC32GLVChZCNcdCT+P+w5zNx7
+	iYrtef9rh0LZUsqfp24fIV+JS+eufPQ5SDNK8+5CJ3m0DnCL3LacJ2rAlszkmlrd4JtpHAhgpSa
+	+Kts1tg+/VEQ==
+X-Google-Smtp-Source: AGHT+IGjCSLiARwPj8LvgAmdlmw2aNw3T8jAZxFgCchMsS69HaOtffJUKXMOBrtZkx6OdtgHTwqqnw==
+X-Received: by 2002:a17:90b:1f88:b0:343:5f43:9359 with SMTP id 98e67ed59e1d1-34733f4d280mr36959812a91.31.1764560478201;
+        Sun, 30 Nov 2025 19:41:18 -0800 (PST)
+Received: from lgs.. ([101.76.246.176])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3476a55ed00sm15065740a91.5.2025.11.30.19.41.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 30 Nov 2025 19:41:17 -0800 (PST)
+From: Guangshuo Li <lgs201920130244@gmail.com>
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Florian Westphal <fw@strlen.de>,
+	Jeff Kirsher <jeffrey.t.kirsher@intel.com>,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Guangshuo Li <lgs201920130244@gmail.com>,
+	stable@vger.kernel.org,
+	Tony Nguyen <tony.nguyen@intel.com>
+Subject: [PATCH v2] e1000: fix OOB in e1000_tbi_should_accept()
+Date: Mon,  1 Dec 2025 11:40:58 +0800
+Message-ID: <20251201034058.263839-1-lgs201920130244@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,38 +97,125 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 
-Add support for Signal Quality Index (SQI) reporting in the
-Microchip T1S PHY driver for LAN867x Rev.D0 (OATC14-compliant) PHYs.
+In e1000_tbi_should_accept() we read the last byte of the frame via
+'data[length - 1]' to evaluate the TBI workaround. If the descriptor-
+reported length is zero or larger than the actual RX buffer size, this
+read goes out of bounds and can hit unrelated slab objects. The issue
+is observed from the NAPI receive path (e1000_clean_rx_irq):
 
-This patch registers the following callbacks in the microchip_t1s driver
-structure:
+==================================================================
+BUG: KASAN: slab-out-of-bounds in e1000_tbi_should_accept+0x610/0x790
+Read of size 1 at addr ffff888014114e54 by task sshd/363
 
-- .get_sqi      - returns the current SQI value
-- .get_sqi_max  - returns the maximum SQI value
+CPU: 0 PID: 363 Comm: sshd Not tainted 5.18.0-rc1 #1
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
+Call Trace:
+ <IRQ>
+ dump_stack_lvl+0x5a/0x74
+ print_address_description+0x7b/0x440
+ print_report+0x101/0x200
+ kasan_report+0xc1/0xf0
+ e1000_tbi_should_accept+0x610/0x790
+ e1000_clean_rx_irq+0xa8c/0x1110
+ e1000_clean+0xde2/0x3c10
+ __napi_poll+0x98/0x380
+ net_rx_action+0x491/0xa20
+ __do_softirq+0x2c9/0x61d
+ do_softirq+0xd1/0x120
+ </IRQ>
+ <TASK>
+ __local_bh_enable_ip+0xfe/0x130
+ ip_finish_output2+0x7d5/0xb00
+ __ip_queue_xmit+0xe24/0x1ab0
+ __tcp_transmit_skb+0x1bcb/0x3340
+ tcp_write_xmit+0x175d/0x6bd0
+ __tcp_push_pending_frames+0x7b/0x280
+ tcp_sendmsg_locked+0x2e4f/0x32d0
+ tcp_sendmsg+0x24/0x40
+ sock_write_iter+0x322/0x430
+ vfs_write+0x56c/0xa60
+ ksys_write+0xd1/0x190
+ do_syscall_64+0x43/0x90
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7f511b476b10
+Code: 73 01 c3 48 8b 0d 88 d3 2b 00 f7 d8 64 89 01 48 83 c8 ff c3 66 0f 1f 44 00 00 83 3d f9 2b 2c 00 00 75 10 b8 01 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 31 c3 48 83 ec 08 e8 8e 9b 01 00 48 89 04 24
+RSP: 002b:00007ffc9211d4e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 0000000000004024 RCX: 00007f511b476b10
+RDX: 0000000000004024 RSI: 0000559a9385962c RDI: 0000000000000003
+RBP: 0000559a9383a400 R08: fffffffffffffff0 R09: 0000000000004f00
+R10: 0000000000000070 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffc9211d57f R14: 0000559a9347bde7 R15: 0000000000000003
+ </TASK>
+Allocated by task 1:
+ __kasan_krealloc+0x131/0x1c0
+ krealloc+0x90/0xc0
+ add_sysfs_param+0xcb/0x8a0
+ kernel_add_sysfs_param+0x81/0xd4
+ param_sysfs_builtin+0x138/0x1a6
+ param_sysfs_init+0x57/0x5b
+ do_one_initcall+0x104/0x250
+ do_initcall_level+0x102/0x132
+ do_initcalls+0x46/0x74
+ kernel_init_freeable+0x28f/0x393
+ kernel_init+0x14/0x1a0
+ ret_from_fork+0x22/0x30
+The buggy address belongs to the object at ffff888014114000
+ which belongs to the cache kmalloc-2k of size 2048
+The buggy address is located 1620 bytes to the right of
+ 2048-byte region [ffff888014114000, ffff888014114800]
+The buggy address belongs to the physical page:
+page:ffffea0000504400 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x14110
+head:ffffea0000504400 order:3 compound_mapcount:0 compound_pincount:0
+flags: 0x100000000010200(slab|head|node=0|zone=1)
+raw: 0100000000010200 0000000000000000 dead000000000001 ffff888013442000
+raw: 0000000000000000 0000000000080008 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+==================================================================
 
-This enables ethtool to report the SQI value for LAN867x Rev.D0 PHYs.
+This happens because the TBI check unconditionally dereferences the last
+byte without validating the reported length first:
 
-Signed-off-by: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
+	u8 last_byte = *(data + length - 1);
+
+Fix by rejecting the frame early if the length is zero, or if it exceeds
+adapter->rx_buffer_len. This preserves the TBI workaround semantics for
+valid frames and prevents touching memory beyond the RX buffer.
+
+Fixes: 2037110c96d5 ("e1000: move tbi workaround code into helper function")
+Cc: stable@vger.kernel.org
+Suggested-by: Tony Nguyen <tony.nguyen@intel.com>
+Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
 ---
- drivers/net/phy/microchip_t1s.c | 2 ++
- 1 file changed, 2 insertions(+)
+changelog:
+v2:
+- Keep declarations at the beginning of e1000_tbi_should_accept().
+- Move the last_byte assignment after the length bounds checks (suggested by Tony Nguyen)
+---
+ drivers/net/ethernet/intel/e1000/e1000_main.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/phy/microchip_t1s.c b/drivers/net/phy/microchip_t1s.c
-index 5a0a66778977..e601d56b2507 100644
---- a/drivers/net/phy/microchip_t1s.c
-+++ b/drivers/net/phy/microchip_t1s.c
-@@ -575,6 +575,8 @@ static struct phy_driver microchip_t1s_driver[] = {
- 		.get_plca_status    = genphy_c45_plca_get_status,
- 		.cable_test_start   = genphy_c45_oatc14_cable_test_start,
- 		.cable_test_get_status = genphy_c45_oatc14_cable_test_get_status,
-+		.get_sqi            = genphy_c45_oatc14_get_sqi,
-+		.get_sqi_max        = genphy_c45_oatc14_get_sqi_max,
- 	},
- 	{
- 		PHY_ID_MATCH_EXACT(PHY_ID_LAN865X_REVB),
+diff --git a/drivers/net/ethernet/intel/e1000/e1000_main.c b/drivers/net/ethernet/intel/e1000/e1000_main.c
+index 3f5feb55cfba..cb49ec49f836 100644
+--- a/drivers/net/ethernet/intel/e1000/e1000_main.c
++++ b/drivers/net/ethernet/intel/e1000/e1000_main.c
+@@ -4091,7 +4091,14 @@ static bool e1000_tbi_should_accept(struct e1000_adapter *adapter,
+ 				    u32 length, const u8 *data)
+ {
+ 	struct e1000_hw *hw = &adapter->hw;
+-	u8 last_byte = *(data + length - 1);
++	u8 last_byte;
++	/* Guard against OOB on data[length - 1] */
++	if (unlikely(!length))
++		return false;
++	/* Upper bound: length must not exceed rx_buffer_len */
++	if (unlikely(length > adapter->rx_buffer_len))
++		return false;
++	last_byte = *(data + length - 1);
+ 
+ 	if (TBI_ACCEPT(hw, status, errors, length, last_byte)) {
+ 		unsigned long irq_flags;
 -- 
-2.34.1
+2.43.0
 
 
