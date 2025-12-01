@@ -1,105 +1,129 @@
-Return-Path: <netdev+bounces-243049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B939C98D19
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 20:16:04 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34529C98D30
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 20:17:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0BCA54E02E5
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 19:16:03 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E5E1C3452B1
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 19:17:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 072451ACEDE;
-	Mon,  1 Dec 2025 19:16:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 509E1238159;
+	Mon,  1 Dec 2025 19:17:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HlJ3KRjP"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=exactco.de header.i=@exactco.de header.b="EfT69K6x"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from exactco.de (exactco.de [176.9.10.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C78BA10F1;
-	Mon,  1 Dec 2025 19:15:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1D7810F1
+	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 19:17:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.10.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764616559; cv=none; b=jWEQTdkhwNlMazxnf1TtpGTHsOLipymqBKFCnZnLG05Tc16fiin3zzNqt6ihKoW1rIH2rU6yQcvMs4Hr4Y7sl9EpJ2TbNdkbuswsoPz7QaWNbh0lI8U5JmGMb8qKoREuoWep3Iu8xC1iDxTf64jXTYcZo30rZBE760JUkRtcKKE=
+	t=1764616640; cv=none; b=CVH6Q98tqwj/U06JN76iAwG2WeABEYS30XZNVtuSYh9BRB9Y9xgR3wntUg3ypG+KzgHkQeICeKBdJ/iJi0n/Jh10jQdfpZ62iOV1sV2OlDhuR6AoaaKc36U3iH85jvYG/v09qcSDG+g5BW8bjGYCrOWXBE3D9NC0P39cICj7cjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764616559; c=relaxed/simple;
-	bh=4XgmDLSCEg6VsFoBcwzl521M4IJOdgdZ7BMmz88L2/M=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jidf7kkmulpSrfhbT6zLqFmXgfHJagYGJg34YvG2MUQEA5Fdgw68yCn+hlvbatALSZgr2x5lb+gBpabT2CtTFungxTawB+NIZ9wucYdNkfjlGJ8UsCufGADFhp+p99feHtLssJI83InaSd36ojlY5uNOqZAH8Yd+PBpilgthsXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HlJ3KRjP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CD9BC4CEF1;
-	Mon,  1 Dec 2025 19:15:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764616559;
-	bh=4XgmDLSCEg6VsFoBcwzl521M4IJOdgdZ7BMmz88L2/M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HlJ3KRjP7xZ4T9ko7eFxV7P6PoXSWyCu3HrexUTNs8fV3q+nABoR50xZLZKAzpGNa
-	 ADyv8W1zgjFaujFUmt88AkFSgo2NDY7bT1mmvqKppbdXFiBm7yNvoVFcbZoOhHFKXj
-	 ZZlSoYYVw+0jbvdRNqzJLmN1JxyjhH/KsEKWI2z27KIarFfW9BcXFPoPejMDxnUuyt
-	 WHT4zqZu1fr3xCQNnE8UkS9fWmat3w/7+wlNQuRe1MAEFQW7SUwSZWx2kYcTzahhz7
-	 fk3vdyF7i7BFoNI67EtyLp2penSN5GgpwofhL5VPA1TiZcHr6gLcyXvEtyz6Rtcaww
-	 b7z6WXVZjzQkg==
-Date: Mon, 1 Dec 2025 11:15:57 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Edward Adam Davis <eadavis@qq.com>
-Cc: davem@davemloft.net, edumazet@google.com, eperezma@redhat.com,
- horms@kernel.org, jasowang@redhat.com, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, mst@redhat.com, netdev@vger.kernel.org,
- pabeni@redhat.com, sgarzare@redhat.com, stefanha@redhat.com,
- syzbot+ci3edb9412aeb2e703@syzkaller.appspotmail.com,
- syzbot@lists.linux.dev, syzbot@syzkaller.appspotmail.com,
- syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev,
- xuanzhuo@linux.alibaba.com
-Subject: Re: [PATCH Next V2] net: restore the iterator to its original state
- when an error occurs
-Message-ID: <20251201111557.15cb9415@kernel.org>
-In-Reply-To: <tencent_7B73E6D013636363696CC3A34444F77AF705@qq.com>
-References: <20251128093946.18c645c6@kernel.org>
-	<tencent_7B73E6D013636363696CC3A34444F77AF705@qq.com>
+	s=arc-20240116; t=1764616640; c=relaxed/simple;
+	bh=WFfg5ENlIgueFyYoF7Jq12a/GCDmb1nnyBFfdsz07YI=;
+	h=Date:Message-Id:Cc:To:Subject:From:Mime-Version:Content-Type; b=jdQVAtmNVX0vFcnDudE7HJPrhKLSHdqpFQdiqByPfNnCHqszFALurby3DDLJ1GgJOzcF2A+yLSoPqs+CHSuruAGsXg6yv4QCSPt1vNjjIE0dvJQrPjXLUJ8iIk0ZXlDpQOtm8I08t+eD6SyZHJx25fr2AjmFcsquRcVh5OhvPMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exactco.de; spf=pass smtp.mailfrom=exactco.de; dkim=pass (2048-bit key) header.d=exactco.de header.i=@exactco.de header.b=EfT69K6x; arc=none smtp.client-ip=176.9.10.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exactco.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=exactco.de
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=exactco.de;
+	s=x; h=Content-Transfer-Encoding:Content-Type:Mime-Version:From:Subject:To:Cc
+	:Message-Id:Date:Sender:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:
+	References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:List-Post:
+	List-Owner:List-Archive; bh=/9zDcaGSR/6VDJwwXz1PNvhqsdPp6DrpVmlzaY49VAE=; b=E
+	fT69K6xgEKGs48xvOYew/wa9ErWibv6dPub26zzQaSN7K+YC+rVbWg90aJXTj36O03fQaZeLETn5i
+	1w9gvdek/rGTqJTa96vpMGMlSFQGOMNvYGZkKpEenhdd9Bp9FXVELvkBR+R9tWHB6Zjxd3WLzQU22
+	LOCkKpmsmC7vBj+FJyA/gM4KgChY2/H6FUrtJ+zj7G2QHQPKYFC3GHgkAW3RMwBVVObAeXUloHI8M
+	wtrsk4Cs2U1Erj8sJJcpfDtrHI6F4UDwiy0nbpUX0/B9OM9c7o9UUWDAht3cCYUyV98++ywvoeRzg
+	izhgz59elYDULtTQGzkGQyFV5I3azqi7w==;
+Date: Mon, 01 Dec 2025 20:17:06 +0100 (CET)
+Message-Id: <20251201.201706.660956838646693149.rene@exactco.de>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, nic_swsd@realtek.com
+To: netdev@vger.kernel.org
+Subject: [PATCH] r8169: fix RTL8117 Wake-on-Lan in DASH mode
+From: =?iso-8859-1?Q?Ren=E9?= Rebe <rene@exactco.de>
+X-Mailer: Mew version 6.10 on Emacs 30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 
-On Mon,  1 Dec 2025 11:41:07 +0800 Edward Adam Davis wrote:
-> On Fri, 28 Nov 2025 09:39:46 -0800, Jakub Kicinski wrote:
-> > > In zerocopy_fill_skb_from_iter(), if two copy operations are performed
-> > > and the first one succeeds while the second one fails, it returns a
-> > > failure but the count in iterator has already been decremented due to
-> > > the first successful copy. This ultimately affects the local variable
-> > > rest_len in virtio_transport_send_pkt_info(), causing the remaining
-> > > count in rest_len to be greater than the actual iterator count. As a
-> > > result, packet sending operations continue even when the iterator count
-> > > is zero, which further leads to skb->len being 0 and triggers the warning
-> > > reported by syzbot [1].  
-> > 
-> > Please follow the subsystem guidelines for posting patches:
-> > https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
-> > Your patch breaks zerocopy tests.  
-> I see that they all timed out. I'm not familiar with this test, how can
-> I get more details about it?
+Wake-on-Lan does currently not work in DASH mode, e.g. the ASUS Pro WS
+X570-ACE with RTL8168fp/RTL8117.
 
-IIRC its was the packetdrill tests:
+Fix by not returning early in rtl_prepare_power_down when dash_enabled.
+While this fixes WOL, it still kills the OOB RTL8117 remote management
+BMC connection. Fix by not calling rtl8168_driver_stop if wol is enabled.
 
-tools/testing/selftests/net/packetdrill/tcp_fastopen_server_basic-zero-payload.pkt
-tools/testing/selftests/net/packetdrill/tcp_zerocopy_basic.pkt
-tools/testing/selftests/net/packetdrill/tcp_zerocopy_batch.pkt
-tools/testing/selftests/net/packetdrill/tcp_zerocopy_client.pkt
-tools/testing/selftests/net/packetdrill/tcp_zerocopy_closed.pkt
-tools/testing/selftests/net/packetdrill/tcp_zerocopy_epoll_edge.pkt
-tools/testing/selftests/net/packetdrill/tcp_zerocopy_epoll_exclusive.pkt
-tools/testing/selftests/net/packetdrill/tcp_zerocopy_epoll_oneshot.pkt
-tools/testing/selftests/net/packetdrill/tcp_zerocopy_fastopen-client.pkt
-tools/testing/selftests/net/packetdrill/tcp_zerocopy_fastopen-server.pkt
-tools/testing/selftests/net/packetdrill/tcp_zerocopy_maxfrags.pkt
-tools/testing/selftests/net/packetdrill/tcp_zerocopy_small.pkt
+While at it, enable wake on magic packet by default, like most other
+Linux drivers do.
 
-If you have the packetdrill command installed those _should_ be
-relatively easy to run via standard kselftest commands
+Signed-off-by: René Rebe <rene@exactco.de>
+---
+
+There is still another issue that should be fixed: the dirver init
+kills the OOB BMC connection until if up, too. We also should probaly
+not even conditionalize rtl8168_driver_stop on wol_enabled as the BMC
+should always be accessible. IMHO even on module unload.
+
+---
+ drivers/net/ethernet/realtek/r8169_main.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 853aabedb128..e2f9b9027fe2 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -2669,9 +2669,6 @@ static void rtl_wol_enable_rx(struct rtl8169_private *tp)
+ 
+ static void rtl_prepare_power_down(struct rtl8169_private *tp)
+ {
+-	if (tp->dash_enabled)
+-		return;
+-
+ 	if (tp->mac_version == RTL_GIGA_MAC_VER_32 ||
+ 	    tp->mac_version == RTL_GIGA_MAC_VER_33)
+ 		rtl_ephy_write(tp, 0x19, 0xff64);
+@@ -4807,7 +4804,7 @@ static void rtl8169_down(struct rtl8169_private *tp)
+ 	rtl_disable_exit_l1(tp);
+ 	rtl_prepare_power_down(tp);
+ 
+-	if (tp->dash_type != RTL_DASH_NONE)
++	if (tp->dash_type != RTL_DASH_NONE && !tp->saved_wolopts)
+ 		rtl8168_driver_stop(tp);
+ }
+ 
+@@ -5406,6 +5403,7 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	tp->pci_dev = pdev;
+ 	tp->supports_gmii = ent->driver_data == RTL_CFG_NO_GBIT ? 0 : 1;
+ 	tp->ocp_base = OCP_STD_PHY_BASE;
++	tp->saved_wolopts = WAKE_MAGIC;
+ 
+ 	raw_spin_lock_init(&tp->mac_ocp_lock);
+ 	mutex_init(&tp->led_lock);
+@@ -5565,6 +5563,9 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	if (rc)
+ 		return rc;
+ 
++	if (tp->saved_wolopts)
++		__rtl8169_set_wol(tp, tp->saved_wolopts);
++
+ 	rc = register_netdev(dev);
+ 	if (rc)
+ 		return rc;
+-- 
+2.46.0
+
+-- 
+René Rebe, ExactCODE GmbH, Berlin, Germany
+https://exactco.de • https://t2linux.com • https://patreon.com/renerebe
 
