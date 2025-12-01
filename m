@@ -1,115 +1,152 @@
-Return-Path: <netdev+bounces-243076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71A58C99414
-	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 22:50:02 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE37AC99425
+	for <lists+netdev@lfdr.de>; Mon, 01 Dec 2025 22:51:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F04B3A19BE
-	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 21:50:00 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 97B2F4E21A7
+	for <lists+netdev@lfdr.de>; Mon,  1 Dec 2025 21:51:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6791D2749C9;
-	Mon,  1 Dec 2025 21:49:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0569E279DC9;
+	Mon,  1 Dec 2025 21:51:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kFqHOOIb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="epKXQEpb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 361A242AA9;
-	Mon,  1 Dec 2025 21:49:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F37F271A9D
+	for <netdev@vger.kernel.org>; Mon,  1 Dec 2025 21:51:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764625797; cv=none; b=IwNzEbO2JsfuvqjSqwY3zVhuHGokC/jItF0WBo1X8uch8fcVw9h/owJ92Rm20ftryLJHGKzUI+b8puiCUtpFuc1mMw7TC93NshpMPolT3wkAfFJp40OT26nkFn1eahvX4UWiuPJB4f1ksMbodt3ALi//5JKvZ60ibGS4cvqtouQ=
+	t=1764625863; cv=none; b=DQyil+JbaLbamBPYyMmrhaGl1M258QdmRfJuw1WJdSBVrAvvTj077ppNHRvpd+jzW9hdaCdPWR8PuevxIDKFrZw8rnPRWW+cEYKe+EaWi0Sm6sBYHP4dWeSWcn9ixHRqET7/824KcfiDa5XNtF8Gj7v4zkDeV5WXw/WosHCA8j4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764625797; c=relaxed/simple;
-	bh=Q9XtxSLd1rGac+cMYRtu+RfRV0V9DsrRe1YEZEWkg7Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hZIQggAHGrNWeC4pYuCc/P8Ixa1KcU2w9T6SnRFJTktgDqNhtjSKib9REqu0ZPbm0GPqi1B/iS7H1kjSoysX3ntitrOMvtQJgOERUgpoxxHeHk9kLqFRZp28zyBKjqHm4r+V6G5A01oDLHeOgkUuYiEpI90AMTBq5OucGVawuXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kFqHOOIb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3957C4CEF1;
-	Mon,  1 Dec 2025 21:49:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764625796;
-	bh=Q9XtxSLd1rGac+cMYRtu+RfRV0V9DsrRe1YEZEWkg7Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kFqHOOIb5o6yJOFl7lHQmbj6GnpI0itWZmYPfKoZ/b/zUawWr8ATXpz5yEPvh05iG
-	 8J3TpYGeHSJHncImg5AjGFSm/HApLKPF/a0YWVg4RfAjI7kts6B0pgIBDZfnfl1Tx8
-	 /N8WdFjzII0IDjcSXpGB9MpMJ5l9ZUkz8eKQn7yQbrXfirFcWuXtrsyN2dN6bJo+Df
-	 WSrt+9fgEabudvQp2mIdRbpUtUQTQZoRDiIbXl4Cn32xdstZIEoHG/PH3tJenmpAlt
-	 5iu8L1XWfGxhKCxtPG7yKr3nZPeUdTk8N0At6u4p4pLCTP1b9yffRJLluvkPe00FE1
-	 jyiAG9Rwe3Yvg==
-Date: Mon, 1 Dec 2025 13:49:54 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Donald Hunter
- <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Saeed Mahameed
- <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Mark Bloch
- <mbloch@nvidia.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org, Gal Pressman
- <gal@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>, Carolina Jubran
- <cjubran@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>, Jiri Pirko
- <jiri@nvidia.com>, Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [PATCH net-next V4 02/14] documentation: networking: add shared
- devlink documentation
-Message-ID: <20251201134954.6b8a8d48@kernel.org>
-In-Reply-To: <n6mey5dbfpw7ykp3wozgtxo5grvac642tskcn4mqknrurhpwy7@ugolzkzzujba>
-References: <1764101173-1312171-1-git-send-email-tariqt@nvidia.com>
-	<1764101173-1312171-3-git-send-email-tariqt@nvidia.com>
-	<20251127201645.3d7a10f6@kernel.org>
-	<hidhx467pn6pcisuoxdw3pykyvnlq7rdicmjksbozw4dtqysti@yd5lin3qft4q>
-	<20251128191924.7c54c926@kernel.org>
-	<n6mey5dbfpw7ykp3wozgtxo5grvac642tskcn4mqknrurhpwy7@ugolzkzzujba>
+	s=arc-20240116; t=1764625863; c=relaxed/simple;
+	bh=lBhsm34b8HRtF0qiK5+BYRFUpoqzlRFpLa0qPZI45N4=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=aL7hrCzj0QrC7EHlMae/ExAivw37FeLgDMMjkv4eiyPb2/sAtFCw7It//yuwn+4N7d8LvmjF+8Tz6RZL0Gs4vrb7LAEbKNA8UBnmSyx0OHc1WXq5Dx4TDgXQvB72j7vY+cKfoq8rbJTb5WNDZfTvnHlYG9VeMFD5YzHbpeF3Ov8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=epKXQEpb; arc=none smtp.client-ip=209.85.128.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-78aa49cde3dso47431467b3.1
+        for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 13:51:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764625860; x=1765230660; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=B/Ft14pK70CD4rBElRNDZPQO4FwJE1Kwzd6HfV1lFTo=;
+        b=epKXQEpbQKe5Pr8+6xHHxOOUl5Df/RkGjelbvsAKw4TxRWcpjyZukJtNKgljHifIrS
+         +akmnUa9m4qq/pQTslTRaxp+nT2HIatfU8ExTAFJydhch2HvwIvANk5WyxxFGcqXs/Ay
+         PQpZC23QuOs/Uk3el/+POPoMqYZa1voGIVqL0NC1ejEAh/Ziw7Np3VZFkTuLGSShBjwj
+         gPXgG8dIEhKy47OCh+BCafNH0ipPz1LjeTDVitwLsLtEggjlqfosz5TOwiCStXSw0OC2
+         721Tncf5KruokxKDUZolTyM/Z/r4boNO6aJWwLg6z/t1IonSpskaAL7WOzl4vx4V26Zk
+         LLCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764625860; x=1765230660;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=B/Ft14pK70CD4rBElRNDZPQO4FwJE1Kwzd6HfV1lFTo=;
+        b=WDbOwWwWpz+6A7av01JVT5HO0U/Wm3d/1iaHrRYlU3zK3Y+wq99YQaDdhBNS2SBUA+
+         fFb7WfmZk9gzxiJnO+iSrKHfsb3Gn+I26Vg7PzyGEo5AeNuwbVTKqooyhN/1y6TTPBwQ
+         JQgS5XG4MUwoKkE+LJ5nQnnquOpVLCagkmlzmJUo6EcKgaq+J+DhIhx447h0Vq6HW4ie
+         qWmpG3y5lv99gzEqkkabDpzL8oeVVpTuiAWSK5HpIYH/yqIL6QiNqF9Y7Bhy5QY1zW1d
+         BFPcLWmdxD+0WmUirzLPYK+jBibLIVrTB87fr9oA1r7zpf9BXXgRDd28C9V6bFyDvVlN
+         DwgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV1s3a9oIhzSWZXHRv2/FYvFQVirjh/eP89wShBV+rh+i4D7FWx6/jC7IsLgaYnHjGZA9fyB1E=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy95+jxVoyqYbbOHKbgAWvpqB4euSwLw6HDMWYxjuC0ovr4IaXK
+	1PDVA+7eZ4jN4PfyPcHLhHZYmO2+smOxAf0ERAyvzJ9NeHuknFrhrJv9
+X-Gm-Gg: ASbGncvOD9u7NSqWaOF9tsDa8OPQo3QYgZhLNkPDfP1CYCVBqbwx3iIPWZIQyvKLdhg
+	XmRJe2ISgpFNdwFdyVZZEawPsHHJXRRNFHNgw7D5Y8V+9ndv0fhlu2fC8zFf1TOS6XvRFw9H2ws
+	hMzgZwcUPP0WKLf4opSyIBk67mrhu04F4wZCFO1FGADlBkKlegWwIi4aKJTSCG45el9SO4a0OOC
+	HqQHLERBYdeQ2rsytyOD/ECi8SF6rESTloHzQc5RDmqFdqYVzgx7dcDlKwZdCQdCGkgSqcgx7vT
+	agfW66uCoUbrqDHJOyamPJiPnS3YgDwGSLkkDViYHXxqM+fg9qq/BOkGjLT5u9HNsF6E0mt47H1
+	avlPGkp5pbY7MfhGP9+XwfSUfVe9eoLvCmGKWr9XpsxtV54g1Z8C2bsLNCmyq4mv+4CvPktdbTm
+	d1bdU18zHBK0Hqqc6mL21Q/NjhLXJWJdwge69TtQa5RyBbDoBjOp7TMfdiRbRv5rwyaos=
+X-Google-Smtp-Source: AGHT+IFEirLemOCPBYW5SY+npyALCUTmcHk0zsceyQ+TZxHYOB6eir6q3oSUr2MGTHxgxQ7INoy8Fg==
+X-Received: by 2002:a05:690c:74c7:b0:786:5499:634f with SMTP id 00721157ae682-78a8b525dcemr320353247b3.41.1764625860331;
+        Mon, 01 Dec 2025 13:51:00 -0800 (PST)
+Received: from gmail.com (116.235.236.35.bc.googleusercontent.com. [35.236.235.116])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-78ad100e94fsm55276807b3.32.2025.12.01.13.50.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Dec 2025 13:50:59 -0800 (PST)
+Date: Mon, 01 Dec 2025 16:50:59 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, 
+ netdev@vger.kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ andrew+netdev@lunn.ch, 
+ horms@kernel.org, 
+ shuah@kernel.org, 
+ sdf@fomichev.me, 
+ linux-kselftest@vger.kernel.org
+Message-ID: <willemdebruijn.kernel.18907bed3c8c6@gmail.com>
+In-Reply-To: <20251201115041.5aa4c986@kernel.org>
+References: <20251128005242.2604732-1-kuba@kernel.org>
+ <20251128005242.2604732-2-kuba@kernel.org>
+ <willemdebruijn.kernel.468ae2cb7a74@gmail.com>
+ <20251129173851.56cf3b18@kernel.org>
+ <willemdebruijn.kernel.3877052beef72@gmail.com>
+ <20251201115041.5aa4c986@kernel.org>
+Subject: Re: [PATCH net-next 2/2] selftests: drv-net: gro: run the test
+ against HW GRO and LRO
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-On Mon, 1 Dec 2025 11:50:08 +0100 Jiri Pirko wrote:
-> >> I'm not sure I follow. If there is only one PF bound, there is 1:1
-> >> relationship. Depends on how many PFs of the same ASIC you have.  
-> >
-> >I'm talking about multi-PF devices. mlx5 supports multi-PF setup for
-> >NUMA locality IIUC. In such configurations per-PF parameters can be
-> >configured on PCI PF ports.  
+Jakub Kicinski wrote:
+> On Sun, 30 Nov 2025 09:56:24 -0500 Willem de Bruijn wrote:
+> > Jakub Kicinski wrote:
+> > > On Fri, 28 Nov 2025 15:42:40 -0500 Willem de Bruijn wrote:  
+> > > > So GRO off disables HW_GRO, but not LRO? That difference is behavior
+> > > > is confusing. Could we still see this as a regression and make the
+> > > > ethtool HW_GRO feature equally independent from SW_GRO?  
+> > > 
+> > > I couldn't convince myself that it's justified. Of course it would have
+> > > made testing a lot easier. But apart from that - what's your reading of
+> > > the status quo? Working backwards from were we ended up (and I
+> > > haven't dug into the git history) I'm guessing that LRO disable is used
+> > > to prevent changing geometry of the packets. GRO would presumably be
+> > > disabled when user knows that it will be ineffective, to save the cost.
+> > > Or when some portion of the stack (XDP?) can't deal with super frames.
+> > > 
+> > > If those are the reasons, practically, I don't see why user would want
+> > > HW GRO without SW. Ever since we allowed SW GRO to re-GRO HW GRO'ed
+> > > frames it's always better to leave SW enabled. HW leaves a lot of
+> > > aggregation opportunities on the table.
+> > > 
+> > > I concluded that changing the current behavior would not help any real
+> > > life scenario, just testing. LMK if you see one or the inconsistency
+> > > is a big enough reason.  
+> > 
+> > I think that's fair.
+> > 
+> > But from reading the code I don't see how disabling NETIF_F_GRO also
+> > disables NETIF_F_GRO_HW. And indeed I just tested on one (admittedly
+> > not latest upstream) IDPF driver and it does not.
 > 
-> Correct. IFAIK there is one PF devlink instance per NUMA node.
-
-You say "correct" and then disagree with what I'm saying. I said
-ports because a port is a devlink object. Not a devlink instance.
-
-> The shared instance on top would make sense to me. That was one of
-> motivations to introduce it. Then this shared instance would hold
-> netdev, vf representors etc.
-
-I don't understand what the shared instance is representing and how
-user is expect to find their way thru the maze of devlink instanced,
-for real bus, aux bus, and now shared instanced.
-
-> >> Well, the mutex protect the list of instances which are managed in the
-> >> driver. If you want to move the mutex, I don't see how to do it without
-> >> moving all the code related to shared devlink instances, including faux
-> >> probe etc. Is that what you suggest?  
-> >
-> >Multiple ways you can solve it, but drivers should have to duplicate
-> >all the instance management and locking. BTW please don't use guard().  
+> Looks like you're right. Broadcom drivers where GRO_HW originates do it
+> locally, so does qede. I guess somewhere along the way drives started
+> treating GRO_HW as a separate feature rather than a GRO offload. 
 > 
-> I'm having troubles to undestand what you say, sorry :/ Do you prefer to
-> move the code from driver to devlink core or not?
+> I don't think it changes the reasoning in any major way? 
 
-I missed a "not".. drivers should _not_ have to duplicate, sorry.
+Agreed. If respinning, maybe change the wording a bit:
 
-> Regarding guard(), sure. I wonder how much more time it's gonna take
-> since this resistentance fades out :)
-
-guard() locks code instead of data accesses. We used to make fun of
-Java in this community, you know.
++        # a dummy XDP generic program. Disabling SW GRO as a feature
+-+        # would also disable HW GRO.
+++	  # may also disable HW GRO on some devices.
 
