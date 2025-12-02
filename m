@@ -1,452 +1,180 @@
-Return-Path: <netdev+bounces-243214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7175EC9BAD5
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 14:54:47 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 089F8C9BB01
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 15:00:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 38E624E037A
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 13:54:46 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 768F0348215
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 14:00:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FAC131B836;
-	Tue,  2 Dec 2025 13:54:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54CEF31578E;
+	Tue,  2 Dec 2025 14:00:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YQBGdz6x"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="holVvdBa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 110E414D29B;
-	Tue,  2 Dec 2025 13:54:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764683683; cv=fail; b=fC7WWVr6otlfOxxqfcST+cl3Fy8Atc8MiOeYnkUKY70icejUE6DRbR6zB/HaHrIvsosPyrpPzDzkaqHEJMz1Nu49EOP3ORJN3pyK1PAQX2qAUICTZTBKg/Mo+GOZIcvIGSdDKjMUVA6x6O7Hkm749jR1zegOp4eLV85hXe10OhA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764683683; c=relaxed/simple;
-	bh=OprtAKL5BNlImmB3CG16wgjSnKUdEW6KIC6OO1NUYS8=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=mMOFWVx5KCs6aTbTlnqIKW6c2ahS5Z37CaLBL9EdsC5GBxcc8VVFNTEHTJMNJzMYGunHe8Z/cmmJwv3L0eD7J9J7jVv40cGkGAmCgUNkrlA+DskWtQi5JyXdFsbsLNQfiz3YBE2Eq0VAR6IExk2VlU5NmxqSJwU5j+9Wt63fMN8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YQBGdz6x; arc=fail smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764683682; x=1796219682;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=OprtAKL5BNlImmB3CG16wgjSnKUdEW6KIC6OO1NUYS8=;
-  b=YQBGdz6xj2hKrpy/Vaka8I9ATbejPqVCYbXcNw7NlMwFtQiASNs+cc13
-   LS3gtm0eNmnBPRhqV0AnN62eAQoAmycMDA6BdFVebhmL2f+A/ocDU7b28
-   0bfhyTwaRvawIs1nLqCsjzEpehXZk99WKZiUZOeerJOnXJlsWa5Z4n+hn
-   ojLfhqngG18J7BN4DI53Qky/KUhvv5bT4NOh2IjkqfD3J8VPeKt41v5ZG
-   /ZpRx3ljAauPQNMtuMTn6o6a1vsGmRBzjjR9f/DHdd35vKKbUis4s4LTs
-   HSg9CfjqYTAfMAR+lXd6ztDrMqxFV4TPzaRwDJWoBxFkXsefdF1IcxPAS
-   A==;
-X-CSE-ConnectionGUID: dEizII0ORuWI457nK3xQ7Q==
-X-CSE-MsgGUID: TgImge3zRTm8RcpCXPAx2A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11630"; a="84045112"
-X-IronPort-AV: E=Sophos;i="6.20,243,1758610800"; 
-   d="scan'208";a="84045112"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2025 05:54:41 -0800
-X-CSE-ConnectionGUID: Ywa++8kESGadqOq3o4oxKQ==
-X-CSE-MsgGUID: nYaNLJ0ASCOaG2XVisnX5A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,243,1758610800"; 
-   d="scan'208";a="198580053"
-Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
-  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2025 05:54:42 -0800
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Tue, 2 Dec 2025 05:54:40 -0800
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29 via Frontend Transport; Tue, 2 Dec 2025 05:54:40 -0800
-Received: from PH8PR06CU001.outbound.protection.outlook.com (40.107.209.35) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Tue, 2 Dec 2025 05:54:40 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=BW4iLB137L6ML0aKuViIWweJUqwK3UmIIANKY9DueQtWFmM26vUFNf7+jwmU43vvv4UB2Nf696oE04B2KJFVwjMbA9IwNGDFNsA5CHq+zcHLCjqTd3+wvx4bVA6LXAvjvEiIIzjXqWBSn383PVZGSBqUEthwCkrs7CaVczoJEwgnRtiUKR+mYWd85GHWfR5RsiKddQ+zYskY7C99DQz5mkgK8dxiVuZTEIMQy2llagm7Bh2Ctsfios6iVcj7GDqQJkAMOSCjRV1poQVMqelM89r8TSsWevM9dGG70nck0bONv8wWRYmcbL0anAmduw4aMWjv2awvyodXEH2qfaaysA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hy++HNpzaT3Kq86Y7oy5q2aQHMMq8RvNJu3uJEzNWzU=;
- b=sFLiX7+TGsNN1wQ0L4is/V8C1X4V3wlw1GNTHfIN+Dr9zq5zTDCKmfGP/XyLZ5vvRtyXAE5GSyvMEQuf9wU6JpvtI7KAXx2PYk7oQpYoG76C+5XfAKqn3Iycn69+fiwP38YixwecilEpWJAJdme4ErfjARtnrmdwfOp2IJg9WkYdcpkhGz/jCOF37M6MykheJy+/PNANjJ8bGaXeDBeLz5jCANs5zH5xjKRR2ZBGUBic3dsNZwk02e/7SgS7tdRI4l+X7qrHEHjRlMEgvLC+P8XEBXafsdWSw6vETRoSwV4bEPzzfpi6zbohMH3KewvPj+voaA0KD9/AE3SSNImYwQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CYYPR11MB8308.namprd11.prod.outlook.com (2603:10b6:930:b9::19)
- by BY1PR11MB8079.namprd11.prod.outlook.com (2603:10b6:a03:52e::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.17; Tue, 2 Dec
- 2025 13:54:37 +0000
-Received: from CYYPR11MB8308.namprd11.prod.outlook.com
- ([fe80::68e1:d6c5:d11d:4858]) by CYYPR11MB8308.namprd11.prod.outlook.com
- ([fe80::68e1:d6c5:d11d:4858%7]) with mapi id 15.20.9388.003; Tue, 2 Dec 2025
- 13:54:37 +0000
-Message-ID: <27edba00-5d5e-46e4-b51c-9a69ef11e9a8@intel.com>
-Date: Tue, 2 Dec 2025 14:54:30 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next v2 4/8] ice: allow overriding lan_en, lb_en in
- switch
-To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "michal.swiatkowski@linux.intel.com"
-	<michal.swiatkowski@linux.intel.com>
-References: <20251125083456.28822-1-jakub.slepecki@intel.com>
- <20251125083456.28822-5-jakub.slepecki@intel.com>
- <IA3PR11MB8986E6C10E42C5DD6DC717B9E5D1A@IA3PR11MB8986.namprd11.prod.outlook.com>
- <32fd9c75-e133-4f53-b839-101a579fd79f@intel.com>
- <IA3PR11MB8986430837663B174A8AFDA9E5DBA@IA3PR11MB8986.namprd11.prod.outlook.com>
-Content-Language: en-US
-From: Jakub Slepecki <jakub.slepecki@intel.com>
-Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298
- Gdansk - KRS 101882 - NIP 957-07-52-316
-In-Reply-To: <IA3PR11MB8986430837663B174A8AFDA9E5DBA@IA3PR11MB8986.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: VI1P195CA0081.EURP195.PROD.OUTLOOK.COM
- (2603:10a6:802:59::34) To CYYPR11MB8308.namprd11.prod.outlook.com
- (2603:10b6:930:b9::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 250CC214228;
+	Tue,  2 Dec 2025 14:00:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764684051; cv=none; b=j14jQEHXp5DAtfi72eTQestreE0sG4z2B0bAP8atpI7Djwke7RxwefALg9ZMMaL2kyNelSFD/iv0X3KYjHxc221KFoCpGLAiSgN2raSQHYgDBCOsYErYQWGSEKufqBXBLS6NLKnKuaKEWWPchoZ7UJkmlgE+4R6gl/MC2HxFGLU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764684051; c=relaxed/simple;
+	bh=BCmyooWFB1Onrmk3rzggEaz2JopyodojzKz/ahsp6bM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=udMrMthuagDcgE8+CB9X7+zVVP9z7Rnt3DmE65ghL/M7WcT1ybODxg/iwA+gyx3GrkzR44hsHGCWUZ7nHjIhUK8ipH9hU8+Yu2l6z+186BIMjfENYbpCYNx1MmXWXXAn0pTUXrs1g7uIPO5tA1noGjBIzV65CcchyGylmB9dcIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=holVvdBa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07E39C4CEF1;
+	Tue,  2 Dec 2025 14:00:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764684048;
+	bh=BCmyooWFB1Onrmk3rzggEaz2JopyodojzKz/ahsp6bM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=holVvdBafg2LNLuu6NFrMBIbSwkdQT0MkXb61FPS6B5SeFoYHf3X6rlzQf8NOYfIR
+	 tmxI5AaiAlQwoH6v6Wt7grVdLa8ktM2McaahHyE/MhMlK5wOYrTS+IvuLnAwV3YhCF
+	 wyDz16p7uzBw3/VwH3N+Ir1sow0rb/DkAnhh+CqSaPxURgVLM6yb5nDL/U+CfmQAgk
+	 Ow6JrkK7foB5fhvesTQbtwGqPdaNs08CTkIRDYTen9PynzRpd/Z5nqZVgojliwiwZS
+	 dB6CUB2ad30FAJw6ksnw9pje0Lhn4C5Sa7G7UYstMD1V78emfa93bKFngjCQXeMpwm
+	 P6ZfAjN+j6d2A==
+Message-ID: <cfc0a5b0-f906-4b23-a47e-dbf56291915b@kernel.org>
+Date: Tue, 2 Dec 2025 15:00:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CYYPR11MB8308:EE_|BY1PR11MB8079:EE_
-X-MS-Office365-Filtering-Correlation-Id: e64c42f9-d33e-43bc-3100-08de31aa54f1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?VVVvaHFtb256cGwzMzh4TlFtdHpwVEpkR2VZSFlvZ0tPNlVhZEJLK09yUWQ2?=
- =?utf-8?B?QXk1M0wrR083Qmg4bDNJS1RWTUdhNUttbzRTenJqaGEvUVJ5YzVFcGRudVk1?=
- =?utf-8?B?TG54UTR0dFhKWEp0bzZvT1RhTXJLZ2hIbUZZYTZOUjNUZ1UreU9mZUxRNVRO?=
- =?utf-8?B?QUFadVl5MENKOWhGemNVNWFnUEJMSU82RTljU3pTZHp6Q0lFNjVKNWlmOXlN?=
- =?utf-8?B?eXM1M0dhcTV5bGo5NzFwa3ZML2tLbGpEOUliandFRWxCdVpkVWg3a050TFlI?=
- =?utf-8?B?eUs1S0ZBUk9yZWtHczIwcWNzdnNxTkdCSHpYcHc1c1o4SUl3dHZJRUY2RlZs?=
- =?utf-8?B?Z3FmMlU2TVMzU2txU1lQd25YVXNjZTVHOS9TMU8wNEFOdmtPRUZzV0JMUDN2?=
- =?utf-8?B?enJzUWJ5dXNhVllZSkZCcWMvbGlHSGlRV29LaXVoZFJtcGhobW5iYzB2YUdG?=
- =?utf-8?B?K09sV0dVem0wUEJnTzcwMCs3ZDFUODcwajQ5eDIreUtZWFRzWkpRN1RjTnVv?=
- =?utf-8?B?ZUw0ZjRTNVkzcGNRZkd5OWx2YVRwWStqbzFxSWttRDRrZVR0Q29YR3lieTR1?=
- =?utf-8?B?MDNCL282TXpCVTBwemNwd1pCTEhXd0ZDYldlYmo1RjJ1dExZVjVuVU9hSzB0?=
- =?utf-8?B?aDl1dXBVRllNTkk1NXFKS3ZqUENIZEtidmxoUTVHWWtDZlVLQzV6dXJrM0xy?=
- =?utf-8?B?bmNwM2x5SnBqWUZrc0I1SHJUVWFSNmhQY2tvZzRITm5BWitqWnZWbk5Yb01j?=
- =?utf-8?B?SGNTbWNOMUd0T0FCUWJGMVFmVEM0Zk9YN1NTTjdMb3VVb2E1YWNwbFgwWjcw?=
- =?utf-8?B?TjRJQWl4QlpmT0JpQkZPb3ROSHJrK3FweE42RTFkODVSVWpEQndMZ05jZ3dU?=
- =?utf-8?B?WnU4c3FETFNoNGo1WElyd3djQ3lIaWFoQmI4N1BFT2tJREJYTCtFQWp0a1NH?=
- =?utf-8?B?bGRjUThMQkh3cDMwNy94ZGlhMDM4NTVReVFsNTdwRzFZRUdXYmczM1FQSnI0?=
- =?utf-8?B?ckgwc2JjQ09UazRXcXptNFlQSmtBNlE4VERZZGtqeGc5L2k0OVNDY3JWNS83?=
- =?utf-8?B?Rm8wREcyYmV4VzJDWnV6QXNCOE5nZnExeThacEVhYmJXV2ZIcjNrenJ3RUZy?=
- =?utf-8?B?Rm5LK2phT2cyaVY3NnNuMnhOVXpKZ0JoTTB5SC9yNWszR3FDM2hteGszTytC?=
- =?utf-8?B?L2ltcnpLWWNsd2IvaXhuNjdiL3ovVlUvSVk1MHg5REFPckszMTdZSHJrczIv?=
- =?utf-8?B?R05kbkpxMy9YM3Zjb2VCZ0wwVDdLSS9UbG9MMllZeGhnTXNPcFJBOCtiZ1do?=
- =?utf-8?B?emdDdkpFUkg1M216b29wRUFNc3pLMXhDYVB2K21wcGZQaDA4WlV2clFpdTdx?=
- =?utf-8?B?QkpEbTVXVnBMTW5JSGdueWltYWVPYlI2WFAzVFhHTXExWTFwakdMdnVJUWw2?=
- =?utf-8?B?cjBBb1BScHpwcGlHWTRnWHBLUXVOUUdPZTQwODlhTmRRQ2FVVWtmY0Q5MWFi?=
- =?utf-8?B?bWhXNkFUR2xLZ3IrWFFpblhSZUEzSzVUUHh3NTFiOEtPVkkweGFucjFyT3dU?=
- =?utf-8?B?aVMzcnVUNmNIOHhTV2Q4R3BvbzVTemxnQ1pZUTNUc0JBdk9rQ3Z6cGVWbVFG?=
- =?utf-8?B?YTg5RGdkck1ERS9BOXR4OE1XM2JWdTB3MHVFOW50dmhtdndIQUVkR2hpenFP?=
- =?utf-8?B?cUkzekNvRjRUVjM5eGZQT3kzR0pqdUZSUnpJSm50OHJqSDg0MU5hUkZqZUxG?=
- =?utf-8?B?VUc0T2RJL0RZOTduMktTT08wcHJhK054THl5ZmtTT25aRkVBTzZ1L2dDc1dI?=
- =?utf-8?B?Qlp4OUNYOExyakNlNkRtM2xWaGt1R1N6b1pkMHJKek55MHFLc1JwVHN1VElB?=
- =?utf-8?B?YkdQS2t3dk0vakY3RThnR3gxNnlyTzhLY1lzd3JtS2d3YVFXT0VrcTIzMC9u?=
- =?utf-8?Q?VoNtLRZaMuByWSt4cg4zGC4ZC07ViLqJ?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR11MB8308.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dURXY2UwWnJseGlzZE8xYy9JTEliS1g1ZDEzNFM0UnhnTE5Hei9rcG9sMEM5?=
- =?utf-8?B?Yk9zR1dDNjN2U0NHcjBaaGxMVVFLcHpFMEhmMnBwbk16UTlTZEYxbTdNeDRh?=
- =?utf-8?B?Z3Y5bXp5b05ROGlYUGN4MUI1TDd1QjBoUHh0NjZZWU1aQ2t4MDhUb1cwYkJj?=
- =?utf-8?B?NHMzMExMMDdjRlFmdnJDUW1LNVhFa2pvVXg4anE2dXk5a2gxczdKeWpzT0xj?=
- =?utf-8?B?bm1nNnVPbnMzK3ZkT3dqclVNcFFLZHpJTlk2QVlTOVMxK2Q5N0UxTEVjWlM4?=
- =?utf-8?B?a2ZXcE9yYUFRR29FZXFtTG1HSm9JRlVESHN1QkhnajBUQlo2Yk9mWXFqTEQ5?=
- =?utf-8?B?d0dlblRRS1FlMVJCL2I1anN3ZmszLzFlZDNLR2ZvUE5paXhNdzR4YVFONmFL?=
- =?utf-8?B?ZkxaUTlIakdtZ3BReWlMS1p1ajZocDBQcHJKQzFSVExoYW5pNjJ4OGhZSTJt?=
- =?utf-8?B?Qmk5MmIwSFoxOThKUHJSUm1LbExlVHNnRUwydFRaYy9LTk5RYVBrcktSWEI4?=
- =?utf-8?B?NHlyc0srSTdYNWQwVjVxVmJaeUZyVm90Z0s0OUFqSmpza2lMSHFXcUNtbUhv?=
- =?utf-8?B?V0Q0a2EvTGRtNjVCS2ZoTXBtS251amwxYnE0WjFvV1ErNXJVNTlMTGlHUFR6?=
- =?utf-8?B?WkEyd1B1TDNUVis0ZndqU05lU3cwMzRCNEpQM0p3ZitWSytGeXVuM2Z6RUJZ?=
- =?utf-8?B?SCtRRXRyYWNRUS9JWWdGMDNmUzV3NEhMNms3aUJQaXV0VVBTeGhrbDN0UWFp?=
- =?utf-8?B?aW1OZ3BUMFA2NDZYRU11dThYckV6Ni9xcURLOFh0Vm9JSEtkdDZObHVrVDVR?=
- =?utf-8?B?MXJ0L1FUNklPSE1NSzlRN3B2VUlGSVBoc1JMQ3puaEJORjJIT2l6ZjBhbUZG?=
- =?utf-8?B?eG1Rb1IxOWNIUVJEaWtLdmZzb1BVSmJqdnlUWWc4UnQyNHlzU2hLd2I3NGRV?=
- =?utf-8?B?ejZFbzBaQVpsQW1BNVo0d2ZON0ZWVlhtTHZBcjZibTdweFYxY0pUVzZsL2E0?=
- =?utf-8?B?RUVsN0gxWmJnNnkxa3FpT2dSQkNiS29QaXJEU0RsdjFWNEU1ZWx4VVZpeTha?=
- =?utf-8?B?S2tWc0xVVE1Zd3pjOURnNGZWc0w0ZUgvT2FTb0ltVmQ0c3pUTUFhdHo5Z1dD?=
- =?utf-8?B?RU9WOENLQ0RWTTR2UDVSQUxBYk1yeGRsWEN6cGFwanlRVE04T1pHZGxTSCtO?=
- =?utf-8?B?ZzVJUEdDbXRTNnRoVFhuR3dTaUNjczZzbTM0SGs2dXpPaDcwQldjeTdzQjhY?=
- =?utf-8?B?Z2Y0NnNQWkc0aFp3SEo0VTRSRmszMElmdnJvaTIrb3pKSExxSUExQ2pCV0xQ?=
- =?utf-8?B?eGxUcUV2SjBicnRvZDVuVTMzbEVmVnZHNVF3VnlOYU4rS2lSTXFSa3dkRnds?=
- =?utf-8?B?d3owUFg2K1ZIcm5IWVRCbmJQaWlNaDhwbzlubi8zcHpoY3pyMlBadVVDMWhT?=
- =?utf-8?B?WWZwN01XMWJDa1pzbUFPMGpqTWJUVURyK3MwWTBrN3NDYXp4WEtzeUxBN3Nx?=
- =?utf-8?B?bm5VNldlNTVQYURneHZxVXdEYnk4R2tWN1ZQcU1JbExOQmNZVzNXZ2hOY200?=
- =?utf-8?B?NkhOTkV1NUpSSUlPaHF2MGIyQ25FM0s0NGNoYTc2V3NicTNndG1nUk92NTE1?=
- =?utf-8?B?S0lFeXlGanRMQUNhdllsdWYrSk5XRkZiOFU2K2pURVdidVJZRXhoTXZ1ZGNz?=
- =?utf-8?B?ckYxVndQcjdqMG45M0x2OTVSVEhzanJLUDhpUXh2M3R3UkZSdld0TmtyUnk4?=
- =?utf-8?B?SlVWdEtmZytuVkR5SXJDOUoxSUlkbkxxQmt1dHJ3bHk4emVQc05FTWV0c2gr?=
- =?utf-8?B?ZGZyRDJnZUxZaHlWZ1Z5aXJGWEUzZXh1cXd5b1p2V0wxTmVkSWVpN204ekNC?=
- =?utf-8?B?aUtjQXg4U1kxbGFjV09leVQwU2tCOXRzc3lNUW1WckV5czJRZkZsN0k2K3N0?=
- =?utf-8?B?WXdlQ2ZzWDRiWjF5RmZvVjdOUElRTGFGYU45Qk1oUHVXS282VGhFV3JQM2hw?=
- =?utf-8?B?RTROUWkzNUh6YWlDZnhKVk5lb3Q0MTM5eWZiQjFLNm9Md3phTU9PSkxodElM?=
- =?utf-8?B?Vmk4Z3RtTTVWbEJJY01HU3NYOFFHcDQvZFN0bytmSFAzL09qdHdRc1BKQThV?=
- =?utf-8?Q?PyWyzkWuRh+JIY7mWTJb/K5xk?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: e64c42f9-d33e-43bc-3100-08de31aa54f1
-X-MS-Exchange-CrossTenant-AuthSource: CYYPR11MB8308.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2025 13:54:37.3769
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8j1KUCpqnastiIPiE2UwgikHfCruwQdjk2ISKMxxDngkNkFLjB41+FkptMI4Liq0dLDI4aFqG36mqzOl/MLGDqXFCB3YR5/yZvOjDZQSNDk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY1PR11MB8079
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 2/2] xdp: Delegate fast path return decision to page_pool
+To: Dragos Tatulea <dtatulea@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Simon Horman <horms@kernel.org>,
+ Toshiaki Makita <toshiaki.makita1@gmail.com>,
+ David Ahern <dsahern@kernel.org>, Toke Hoiland Jorgensen <toke@redhat.com>
+Cc: Tariq Toukan <tariqt@nvidia.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ Martin KaFai Lau <martin.lau@linux.dev>, KP Singh <kpsingh@kernel.org>,
+ kernel-team <kernel-team@cloudflare.com>
+References: <20251107102853.1082118-2-dtatulea@nvidia.com>
+ <20251107102853.1082118-5-dtatulea@nvidia.com>
+ <d0fc4c6a-c4d7-4d62-9e6f-6c05c96a51de@kernel.org>
+ <4eusyirzvomxwkzib5tqfyrcgjcxoplrsf7jctytvyvrfvi5fr@f3lvd5h2kb2p>
+ <58b50903-7969-46bd-bd73-60629c00f057@kernel.org>
+ <wrhhvaolxu275zw3fxgvykg7tndzp4pl4u3mnw3z4t5yfbkpix@i2abs45et7tr>
+ <ad6c4448-8fb3-4a5c-91b0-8739f95cf65b@nvidia.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <ad6c4448-8fb3-4a5c-91b0-8739f95cf65b@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 2025-12-01 8:37, Loktionov, Aleksandr wrote:
-> For u8 fields if they are used as u8 value (not bit fields) using FIELD_ macros not good.
-> What about compromise:
->   - Keep lan_en and lb_en as bool or u8 with clear comments.
->   - Do NOT use FIELD macros unless these fields are truly packed bitfields.
 
-After patch, lan_en and lb_en are always dealt with via FIELD_ macros.
-The confusing part could be in ice_fill_sw_info():
 
-+	bool lan_en = false;
-+	bool lb_en = false;
 
-Where throughout the function we decide on VALUE for each (stored as bool
-lan_en and bool lb_en), and only then we apply it:
-
-+	if (!FIELD_GET(ICE_FLTR_INFO_LB_LAN_FORCE_M, fi->lb_en))
-+		FIELD_MODIFY(ICE_FLTR_INFO_LB_LAN_VALUE_M, &fi->lb_en, lb_en);
-+	if (!FIELD_GET(ICE_FLTR_INFO_LB_LAN_FORCE_M, fi->lan_en))
-+		FIELD_MODIFY(ICE_FLTR_INFO_LB_LAN_VALUE_M, &fi->lan_en, lan_en);
-
-I could tweak names of the variables or maybe hold them as u8:
-
-static void ice_fill_sw_info(struct ice_hw *hw, struct ice_fltr_info *fi)
-{
-	u8 lan_en = fi->lan_en;
-	u8 lb_en = fi->lb_en;
-	...
-		FIELD_MODIFY(ICE_FLTR_INFO_LB_LAN_VALUE_M, &lb_en, true);
-	...
-	if (!FIELD_GET(ICE_FLTR_INFO_LB_LAN_FORCE_M, lb_en))
-		fi->lb_en = lb_en;
-}
-
-Or s/true/1/g per previous discussion.
-
-This seems better at expressing the "tmp -> decide -> commit" than the
-current version.  See draft patch at the bottom.
-
->   - If FORCE/ VALUE semantics are needed, either:
->     +Introduce a dedicated flags field with proper bitmask macros, OR
-
-I addressed this option in my previous response.  Let's not exclude
-it yet, but since there are still some alternatives I would prefer to
-avoid it.
-
->     +Keep separate fields and handle FORCE logic explicitly in code without FIELD macros.
+On 01/12/2025 11.12, Dragos Tatulea wrote:
 > 
-> And handle FORCE logic explicitly:
 > 
-> if (!force_lb)
->      fi->lb_en = lb_en;
-> if (!force_lan)
->      fi->lan_en = lan_en;
+> [...]
+>>> And then you can run thus command:
+>>>   sudo ./xdp-bench redirect-map --load-egress mlx5p1 mlx5p1
+>>>
+>> Ah, yes! I was ignorant about the egress part of the program.
+>> That did the trick. The drop happens before reaching the tx
+>> queue of the second netdev and the mentioned code in devmem.c
+>> is reached.
+>>
+>> Sender is xdp-trafficgen with 3 threads pushing enough on one RX queue
+>> to saturate the CPU.
+>>
+>> Here's what I got:
+>>
+>> * before:
+>>
+>> eth2->eth3             16,153,328 rx/s         16,153,329 err,drop/s            0 xmit/s
+>>    xmit eth2->eth3               0 xmit/s       16,153,329 drop/s                0 drv_err/s         16.00 bulk-avg
+>> eth2->eth3             16,152,538 rx/s         16,152,546 err,drop/s            0 xmit/s
+>>    xmit eth2->eth3               0 xmit/s       16,152,546 drop/s                0 drv_err/s         16.00 bulk-avg
+>> eth2->eth3             16,156,331 rx/s         16,156,337 err,drop/s            0 xmit/s
+>>    xmit eth2->eth3               0 xmit/s       16,156,337 drop/s                0 drv_err/s         16.00 bulk-avg
+>>
+>> * after:
+>>
+>> eth2->eth3             16,105,461 rx/s         16,105,469 err,drop/s            0 xmit/s
+>>    xmit eth2->eth3               0 xmit/s       16,105,469 drop/s                0 drv_err/s         16.00 bulk-avg
+>> eth2->eth3             16,119,550 rx/s         16,119,541 err,drop/s            0 xmit/s
+>>    xmit eth2->eth3               0 xmit/s       16,119,541 drop/s                0 drv_err/s         16.00 bulk-avg
+>> eth2->eth3             16,092,145 rx/s         16,092,154 err,drop/s            0 xmit/s
+>>    xmit eth2->eth3               0 xmit/s       16,092,154 drop/s                0 drv_err/s         16.00 bulk-avg
+>>
+>> So slightly worse... I don't fully trust the measurements though as I
+>> saw the inverse situation in other tests as well: higher rate after the
+>> patch.
+
+Remember that you are also removing some code (the
+xdp_set_return_frame_no_direct and xdp_clear_return_frame_no_direct).
+Thus, I was actually hoping we would see a higher rate after the patch.
+This is why I wanted to see this XDP-redirect test, instead of the
+page_pool micro-benchmark.
+
+
+> I had a chance to re-run this on a more stable system and the conclusion
+> is the same. Performance is ~2 % worse:
 > 
-> ?
+> * before:
+> eth2->eth3        13,746,431 rx/s   13,746,471 err,drop/s 0 xmit/s
+>    xmit eth2->eth3          0 xmit/s 13,746,471 drop/s     0 drv_err/s 16.00 bulk-avg
+> 
+> * after:
+> eth2->eth3        13,437,277 rx/s   13,437,259 err,drop/s 0 xmit/s
+>    xmit eth2->eth3          0 xmit/s 13,437,259 drop/s     0 drv_err/s 16.00 bulk-avg
+> 
+> After this experiment it doesn't seem like this direction is worth
+> proceeding with... I was more optimistic at the start.
 
-I intend to force values in 8/8 in ice_fltr.c in
-ice_fltr_add_macs_to_list().  Decision is made based on:
+I do think it is worth proceeding.  I will claim that your PPS results
+are basically the same. Converting PPS number to nanosec per packet:
 
-1. whether MAC is multicast or unicast,
-2. whether VSI has PVID, and
-3. whether VSI has VLAN 0.
+  13,746,471 = (1/13746471*10^9) = 72.74 nanosec
+  13,437,259 = (1/13437259*10^9) = 74.42 nanosec
+  Difference is  = (74.42-72.75) =  1.67 nanosec
 
-There are also implicit conditions, because ice_fltr_add_macs_to_list()
-is only called in particular cases after some expected changes in overall
-driver state; compared to ice_fill_sw_info():
+In my experience it is very hard to find a system stable enough to
+measure a 2 nanosec difference. As you also note you had to spend effort
+finding a stable system.  Thus, I claim your results show no noticeable
+performance impact.
 
-4. filter is being created,
-5. filter is MAC or MAC,VLAN,
-6. target is guaranteed to be a single VSI, and
-7. VLAN filters are guaranteed to be already created.
-
-I'm reluctant to move decision-making to ice_fill_sw_info(), because
-of these implicit conditions (and possibly more; each would need to
-be proven).  Overall, I see two meaningful options (with some variants):
-
-a. In ice_fill_sw_info(), reconstruct all needed information (1-3 from
-    *hw + *fi) and make the decision,
-b. Before ice_fill_sw_info(), make the decision and store it, then use
-    the result in ice_fill_sw_info().
-
-FORCE is (b).  I chose it because it seemed to be overall cheapest
-(LOC, memory use, number of operations) and (subjective) semantically
-correct (ice_fltr.c is responsible for requesting filters for a VSI;
-ice_fill_sw_info() is responsible for populating defaults).
-
-We could also go all the way in the other direction:
-
-struct ice_fltr_info {
-	...
-	bool lan_en;
-	bool force_lan_en;
-	bool lb_en;
-	bool force_lb_en;
-};
-
-? (or s/bool/u8/)
-
-Current working draft:
--- >8 --
-Subject: [PATCH iwl-next v2 4/8] ice: allow overriding lan_en, lb_en in switch
-
-Currently, lan_en and lb_en are determined based on switching mode,
-destination MAC, and the lookup type, action type and flags of the rule
-in question.  This gives little to no options for the user (such as
-ice_fltr.c) to enforce rules to behave in a specific way.
-
-Such functionality is needed to work with pairs of rules, for example,
-when handling MAC forward to LAN together with MAC,VLAN forward to
-loopback rules pair.  This case could not be easily deduced in a context
-of a single filter without adding a specialized flag.
-
-Instead of adding a specialized flag to mark special scenario rules,
-we add a slightly more generic flag to the lan_en and lb_en themselves
-for the ice_fltr.c to request specific destination flags later on, for
-example, to override value:
-
-     struct ice_fltr_info fi;
-     fi.lb_en = ICE_FLTR_INFO_LB_LAN_FORCE_ENABLED;
-     fi.lan_en = ICE_FLTR_INFO_LB_LAN_FORCE_DISABLED;
-
-Signed-off-by: Jakub Slepecki <jakub.slepecki@intel.com>
----
-  drivers/net/ethernet/intel/ice/ice_switch.c | 27 ++++++++++++++-------
-  drivers/net/ethernet/intel/ice/ice_switch.h | 19 ++++++++++++---
-  2 files changed, 34 insertions(+), 12 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c b/drivers/net/ethernet/intel/ice/ice_switch.c
-index 04e5d653efce..3896edaa8652 100644
---- a/drivers/net/ethernet/intel/ice/ice_switch.c
-+++ b/drivers/net/ethernet/intel/ice/ice_switch.c
-@@ -2534,12 +2534,14 @@ int ice_get_initial_sw_cfg(struct ice_hw *hw)
-   *
-   * This helper function populates the lb_en and lan_en elements of the provided
-   * ice_fltr_info struct using the switch's type and characteristics of the
-- * switch rule being configured.
-+ * switch rule being configured.  Elements are updated only if their FORCE bit
-+ * is not set.
-   */
-  static void ice_fill_sw_info(struct ice_hw *hw, struct ice_fltr_info *fi)
-  {
--	fi->lb_en = false;
--	fi->lan_en = false;
-+	u8 lan_en = fi->lan_en;
-+	u8 lb_en = fi->lb_en;
-+
-  	if ((fi->flag & ICE_FLTR_TX) &&
-  	    (fi->fltr_act == ICE_FWD_TO_VSI ||
-  	     fi->fltr_act == ICE_FWD_TO_VSI_LIST ||
-@@ -2549,7 +2551,8 @@ static void ice_fill_sw_info(struct ice_hw *hw, struct ice_fltr_info *fi)
-  		 * packets to the internal switch that will be dropped.
-  		 */
-  		if (fi->lkup_type != ICE_SW_LKUP_VLAN)
--			fi->lb_en = true;
-+			FIELD_MODIFY(ICE_FLTR_INFO_LB_LAN_VALUE_M, &lb_en,
-+				     true);
-  
-  		/* Set lan_en to TRUE if
-  		 * 1. The switch is a VEB AND
-@@ -2578,14 +2581,20 @@ static void ice_fill_sw_info(struct ice_hw *hw, struct ice_fltr_info *fi)
-  			     !is_unicast_ether_addr(fi->l_data.mac.mac_addr)) ||
-  			    (fi->lkup_type == ICE_SW_LKUP_MAC_VLAN &&
-  			     !is_unicast_ether_addr(fi->l_data.mac.mac_addr)))
--				fi->lan_en = true;
-+				FIELD_MODIFY(ICE_FLTR_INFO_LB_LAN_VALUE_M,
-+					     &lan_en, true);
-  		} else {
--			fi->lan_en = true;
-+			FIELD_MODIFY(ICE_FLTR_INFO_LB_LAN_VALUE_M, &lan_en,
-+				     true);
-  		}
-  	}
-  
-  	if (fi->flag & ICE_FLTR_TX_ONLY)
--		fi->lan_en = false;
-+		FIELD_MODIFY(ICE_FLTR_INFO_LB_LAN_VALUE_M, &lan_en, false);
-+	if (!FIELD_GET(ICE_FLTR_INFO_LB_LAN_FORCE_M, lb_en))
-+		fi->lb_en = lb_en;
-+	if (!FIELD_GET(ICE_FLTR_INFO_LB_LAN_FORCE_M, lan_en))
-+		fi->lan_en = lan_en;
-  }
-  
-  /**
-@@ -2669,9 +2678,9 @@ ice_fill_sw_rule(struct ice_hw *hw, struct ice_fltr_info *f_info,
-  		return;
-  	}
-  
--	if (f_info->lb_en)
-+	if (FIELD_GET(ICE_FLTR_INFO_LB_LAN_VALUE_M, f_info->lb_en))
-  		act |= ICE_SINGLE_ACT_LB_ENABLE;
--	if (f_info->lan_en)
-+	if (FIELD_GET(ICE_FLTR_INFO_LB_LAN_VALUE_M, f_info->lan_en))
-  		act |= ICE_SINGLE_ACT_LAN_ENABLE;
-  
-  	switch (f_info->lkup_type) {
-diff --git a/drivers/net/ethernet/intel/ice/ice_switch.h b/drivers/net/ethernet/intel/ice/ice_switch.h
-index 671d7a5f359f..e421c562626c 100644
---- a/drivers/net/ethernet/intel/ice/ice_switch.h
-+++ b/drivers/net/ethernet/intel/ice/ice_switch.h
-@@ -72,6 +72,14 @@ enum ice_src_id {
-  	ICE_SRC_ID_LPORT,
-  };
-  
-+#define ICE_FLTR_INFO_LB_LAN_VALUE_M BIT(0)
-+#define ICE_FLTR_INFO_LB_LAN_FORCE_M BIT(1)
-+#define ICE_FLTR_INFO_LB_LAN_FORCE_ENABLED			 \
-+	(FIELD_PREP_CONST(ICE_FLTR_INFO_LB_LAN_VALUE_M, true) |  \
-+	 FIELD_PREP_CONST(ICE_FLTR_INFO_LB_LAN_FORCE_M, true))
-+#define ICE_FLTR_INFO_LB_LAN_FORCE_DISABLED			 \
-+	(FIELD_PREP_CONST(ICE_FLTR_INFO_LB_LAN_FORCE_M, true))
-+
-  struct ice_fltr_info {
-  	/* Look up information: how to look up packet */
-  	enum ice_sw_lkup_type lkup_type;
-@@ -131,9 +139,14 @@ struct ice_fltr_info {
-  	 */
-  	u8 qgrp_size;
-  
--	/* Rule creations populate these indicators basing on the switch type */
--	u8 lb_en;	/* Indicate if packet can be looped back */
--	u8 lan_en;	/* Indicate if packet can be forwarded to the uplink */
-+	/* Following members have two bits: VALUE and FORCE.  Rule creation will
-+	 * populate VALUE bit of these members based on switch type, but only if
-+	 * their FORCE bit is not set.
-+	 *
-+	 * See ICE_FLTR_INFO_LB_LAN_VALUE_M and ICE_FLTR_INFO_LB_LAN_FORCE_M.
-+	 */
-+	u8 lb_en;	/* VALUE bit: packet can be looped back */
-+	u8 lan_en;	/* VALUE bit: packet can be forwarded to the uplink */
-  };
-  
-  struct ice_update_recipe_lkup_idx_params {
--- 
-2.43.0
+My only concern (based on your perf symbols) is that you might not be
+testing the right/expected code path.  If mlx5 is running with a
+page_pool memory mode that have elevated refcnf on the page, then we
+will not be exercising the slower page_pool ptr_ring return path as much
+as expected.  I guess, I have to do this experiment in my own testlab on
+other NIC drivers that doesn't use elevated refcnt as default.
 
 
+>>>> Toke (and I) will appreciate if you added code for this to xdp-bench.
+>>> Supporting a --program-mode like 'redirect-cpu' does.
+>>>
+>>>
+>> Ok. I will add it.
+>>
+> Added it here:
+> https://github.com/xdp-project/xdp-tools/pull/532
+>
+
+Thanks, I'll take a look, and I'm sure Toke have opinions on the cmdline
+options and the missing man-page update.
+
+--Jesper
 
