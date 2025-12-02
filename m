@@ -1,184 +1,687 @@
-Return-Path: <netdev+bounces-243188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42059C9B18F
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 11:21:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27C24C9B2F9
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 11:37:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4E573A73B8
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 10:20:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7D253A6272
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 10:35:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E24CF30F93D;
-	Tue,  2 Dec 2025 10:19:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 219BF28853E;
+	Tue,  2 Dec 2025 10:35:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="DZIUy2Iu"
+	dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b="och9ENZG"
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from dilbert.mork.no (dilbert.mork.no [65.108.154.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F064030E0E7;
-	Tue,  2 Dec 2025 10:19:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F23F301714
+	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 10:35:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.108.154.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764670755; cv=none; b=ICS0AIqkWD1EJ0ui//+SKHy6Ljsf17sDB5FC+SXRP0xXsxpHOmNbHF0TyPz660vyQmCeA021Zu7rQ0xfuPi1OFY2hDQegYVCY4v75VCDNa2g6SxrzvaaIY3SAJ/lO0qvuH4Hsyy3deNOWmInEWIqED0VUkdtZklt6fUkhJdKAL0=
+	t=1764671722; cv=none; b=CWxBC+gxg4xP69RcLCm+5eG8xnwKfiaYIZKC6ptH9SUBmyqkYzMLpnSnWNpszkJc5hiMDgyUkGbbCyM7TXs+FZfHr1wBkC0FTZPCGaiY7LUG6snmMArewWIjQJV7OH3sdRUrHOvwd+Uf3IwpBOj0sZOIqrNqWZypUOVEEgV5A2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764670755; c=relaxed/simple;
-	bh=WW7ulNSqOQJ4VbgVrP/uSoBS4yhn1mOMMBbkZgzXOoI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q5L3aSsuQfAzRSS2/mvbyVFeQnUQ6gSzLZCLYgVLuz3hYHTKPDrJ3vsbOm5We0Z93Xd49dbf+/eorE9X2QoSeLOIPMkr1rlkkj+kdr7nq1ftELZ/dsbE7LxBuncW76SWrSTUNt2H3cawcsOnoAgX8sUmZgNy+vgvVfn9Z0TITKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=DZIUy2Iu; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=pg7arLvqaoUi1FEUGhQwxZl9BaIYhsi4GY1RbOJM6g0=; b=DZIUy2IuIH9DBnH4CLx46z9+1P
-	VSnmY7iU1sfbTy1yDu4YkYmEU2gVA4xNxjUZT4IUvfPUFkXBxXryojYZ8zfwLXJzKfkP3Kbq04HqO
-	EMx69hDo3iU+mRj2rBfwkq60sTKb0Fy/ACnAuXNLZ1NdmNkqTDjQ7/qP0i/y7w+2ZZVMgbLkYGQJy
-	AcEHVHtFafYxlti1jpIxD8kknyIgq+CsWgPpHPEe5SJeF0g/Hsg4bxaQ3tya39yks0GFAAEzBz02u
-	IYU/dilkiVglnbPC2HA4k/+y2eyZwnphzdD+W/OiNH6ixHHlG0Qhh6y4/4L/qTrkrXqnnCLfUpjKT
-	474VetYA==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.94.2)
-	(envelope-from <leitao@debian.org>)
-	id 1vQNT9-001Mwy-6t; Tue, 02 Dec 2025 10:18:51 +0000
-Date: Tue, 2 Dec 2025 02:18:44 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org, gustavold@gmail.com, 
-	asantostc@gmail.com, calvin@wbinvd.org, kernel-team@meta.com, 
-	Petr Mladek <pmladek@suse.com>
-Subject: Re: [PATCH net-next 0/4] (no cover subject)
-Message-ID: <4oybtunobxtemenpg2lg7jv4cyl3xoaxrjlqivbhs6zo72hxpu@fqp6estf5mpc>
-References: <20251128-netconsole_send_msg-v1-0-8cca4bbce9bc@debian.org>
- <20251201163622.4e50bf53@kernel.org>
+	s=arc-20240116; t=1764671722; c=relaxed/simple;
+	bh=ii2+WtBXojxJJQ5VLoSw/fbDnrW80eNQiwDtF4c5lAM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mprR3lqORTuAxd8fMQI7ETlfovPLm1G8bTNjK0PqcE8Hkeq/Ssl8g3sttZv2AovhphDHuXp86OyP5MtvW9qQPSjw2MOJrgzcOvit7S0RQDvlyw8rZPV2m0B27uuMb1njKrNcTl6268c8ZRZlYC2cI2hiEos/jDhdntRwy1eXIuk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no; spf=pass smtp.mailfrom=miraculix.mork.no; dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b=och9ENZG; arc=none smtp.client-ip=65.108.154.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=miraculix.mork.no
+Authentication-Results: dilbert.mork.no;
+	dkim=pass (1024-bit key; secure) header.d=mork.no header.i=@mork.no header.a=rsa-sha256 header.s=b header.b=och9ENZG;
+	dkim-atps=neutral
+Received: from canardo.dyn.mork.no ([IPv6:2a01:799:10e2:d900:0:0:0:1])
+	(authenticated bits=0)
+	by dilbert.mork.no (8.18.1/8.18.1) with ESMTPSA id 5B2AMWJI2341656
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
+	Tue, 2 Dec 2025 10:22:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mork.no; s=b;
+	t=1764670951; bh=b7+PtiVGY7ZsuMRe6KMXqn5dYSvfYOUB0llRxgoMcTA=;
+	h=From:To:Cc:Subject:Date:Message-ID:From;
+	b=och9ENZG1ZGN3DchJvsEQcWdHsXde+Lxg6oZBiY+Df5CHYG4fIwiDgB5ATPl36CVN
+	 bXbZIZ0Qwy/x3+Fe+N/ri3Mz/zq3FCScQgjmX+/oUcN0fmYrY7FSTD51HY5ziKZ1cA
+	 Q5Mv+rcs6rGeheCo77GmMoOrpsO6mXf2JAlJsWtM=
+Received: from miraculix.mork.no ([IPv6:2a01:799:10e2:d90a:6f50:7559:681d:630c])
+	(authenticated bits=0)
+	by canardo.dyn.mork.no (8.18.1/8.18.1) with ESMTPSA id 5B2AMVCk2719902
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
+	Tue, 2 Dec 2025 11:22:31 +0100
+Received: (nullmailer pid 1681547 invoked by uid 1000);
+	Tue, 02 Dec 2025 10:22:31 -0000
+From: =?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>
+To: netdev@vger.kernel.org
+Cc: =?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>,
+        "Lucien.Jheng" <lucienzx159@gmail.com>,
+        Daniel Golle <daniel@makrotopia.org>,
+        Vladimir Oltean <vladimir.oltean@nxp.com>
+Subject: [RFC] net: phy: air_en8811h: add Airoha AN8811HB support
+Date: Tue,  2 Dec 2025 11:22:22 +0100
+Message-ID: <20251202102222.1681522-1-bjorn@mork.no>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251201163622.4e50bf53@kernel.org>
-X-Debian-User: leitao
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 1.4.3 at canardo.mork.no
+X-Virus-Status: Clean
 
-Hello Jakub,
+The Airoha AN8811HB is mostly compatible with the EN8811H, adding 10Base-T
+support and reducing power consumption.
 
-On Mon, Dec 01, 2025 at 04:36:22PM -0800, Jakub Kicinski wrote:
-> On Fri, 28 Nov 2025 06:20:45 -0800 Breno Leitao wrote:
-> > This patch series introduces a new configfs attribute that enables sending
-> > messages directly through netconsole without going through the kernel's logging
-> > infrastructure.
-> > 
-> > This feature allows users to send custom messages, alerts, or status updates
-> > directly to netconsole receivers by writing to
-> > /sys/kernel/config/netconsole/<target>/send_msg, without poluting kernel
-> > buffers, and sending msgs to the serial, which could be slow.
-> > 
-> > At Meta this is currently used in two cases right now (through printk by
-> > now):
-> > 
-> >   a) When a new workload enters or leave the machine.
-> >   b) From time to time, as a "ping" to make sure the netconsole/machine
-> >   is alive.
-> > 
-> > The implementation reuses the existing message transmission functions
-> > (send_msg_udp() and send_ext_msg_udp()) to handle both basic and extended
-> > message formats.
-> > 
-> > Regarding code organization, this version uses forward declarations for
-> > send_msg_udp() and send_ext_msg_udp() functions rather than relocating them
-> > within the file. While forward declarations do add a small amount of
-> > redundancy, they avoid the larger churn that would result from moving entire
-> > function definitions.
-> 
-> The two questions we need to address here are :
->  - why is the message important in the off-host message stream but not
->    important in local dmesg stream. You mention "serial, which could be
->    slow" - we need more details here.
+Based on the vendor driver written by "Lucien.Jheng <lucien.jheng@airoha.com>"
 
-Thanks for the questions, and I would like to share my view of the world. The
-way I see and use netconsole at my company (Meta) is a "kernel message"
-on steroids, where it provides more information about the system than
-what is available in kernel log buffers (dmesg)
+The required firmware is not yet available in linux-firmware, but can be
+downloaded from
+https://git01.mediatek.com/plugins/gitiles/openwrt/feeds/mtk-openwrt-feeds/+/HEAD/21.02/files/target/linux/mediatek/base-files/lib/firmware/airoha/an8811hb
 
-These netconsole messages already have extra data, which provides
-information to each message, such as:
+The driver has been tested with two firmware versions:
 
- * scheduler configuration (for sched_ext contenxt)
- * THP memory configuration
- * Job/workload running
- * CPU id
- * task->curr name
- * etc
+ Airoha AN8811HB mdio-bus:0d: MD32 firmware version: 25092412
+ Airoha AN8811HB mdio-bus:0d: MD32 firmware version: 25110702
+
+Cc: Lucien.Jheng <lucienzx159@gmail.com>
+Cc: Daniel Golle <daniel@makrotopia.org>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>
+Signed-off-by: Bjørn Mork <bjorn@mork.no>
+---
+Hello!
+
+I am currently testing a couple of consumer routers with AN8811HB phys
+and neeeded a driver. Sending this as an RFC for now, for several
+reasons:
+ - maybe some of you already had other plans for this?
+ - firmware is not yet available in linux-firmware
+ - I have no device with EN8811H so I can't verify that I didn't break
+   it
+ - not sure everyone agrees about merging this into the EN8811H driver?
+ - there are probably missing parts here - EEE support for example
+
+This patch should be applied on top of Vladimir's serdes polarity
+series.
+
+The AN8811HB changes are based solely on the vendor driver at
+https://git01.mediatek.com/plugins/gitiles/openwrt/feeds/mtk-openwrt-feeds/+/HEAD/21.02/files/target/linux/mediatek/files-5.4/drivers/net/phy/air_an8811hb.c
+
+The vendor driver is nice and clean, and could probably be used
+as-is. But most of it appear to be a copy of the mainline
+air_en8811h.c driver.  Such copying makes sense for a vendor who don't
+care much about maintaining software for obsolete hardware. But it
+creates problems for us. Maintaining duplicated code does not work
+over time. IMHO it is easier to merge it from the start when that's
+possible.
+
+Appreciating any comments, including "stop this nonsense and wait for
+my submission" :-)
+
+And if someone is able to test on a EN8811H then I would be extremely
+grateful.  That's obviously a requirement before I can upgrade this
+from RFC
+
+
+Bjørn
+
+
+ drivers/net/phy/air_en8811h.c | 371 ++++++++++++++++++++++++++++++----
+ 1 file changed, 328 insertions(+), 43 deletions(-)
+
+diff --git a/drivers/net/phy/air_en8811h.c b/drivers/net/phy/air_en8811h.c
+index 4171fecb1def..2dd16e21d1ad 100644
+--- a/drivers/net/phy/air_en8811h.c
++++ b/drivers/net/phy/air_en8811h.c
+@@ -1,14 +1,15 @@
+ // SPDX-License-Identifier: GPL-2.0+
+ /*
+- * Driver for the Airoha EN8811H 2.5 Gigabit PHY.
++ * Driver for the Airoha EN8811H and AN8811HB 2.5 Gigabit PHYs.
+  *
+- * Limitations of the EN8811H:
++ * Limitations:
+  * - Only full duplex supported
+  * - Forced speed (AN off) is not supported by hardware (100Mbps)
+  *
+  * Source originated from airoha's en8811h.c and en8811h.h v1.2.1
+- *
+- * Copyright (C) 2023 Airoha Technology Corp.
++ * with AN8811HB bits from air_an8811hb.c v0.0.4
++ #
++ * Copyright (C) 2023, 2025 Airoha Technology Corp.
+  */
  
-So, netconsole already sends extra information today that is not visible
-on kernel console (dmesg), and this has proved to be super useful, so
-useful that 16 entries are not enough and Gustavo need to do a dynamic
-allocation instead of limiting it to 16.
+ #include <linux/clk.h>
+@@ -21,9 +22,12 @@
+ #include <linux/unaligned.h>
+ 
+ #define EN8811H_PHY_ID		0x03a2a411
++#define AN8811HB_PHY_ID		0xc0ff04a0
+ 
+ #define EN8811H_MD32_DM		"airoha/EthMD32.dm.bin"
+ #define EN8811H_MD32_DSP	"airoha/EthMD32.DSP.bin"
++#define AN8811HB_MD32_DM	"airoha/an8811hb/EthMD32_CRC.DM.bin"
++#define AN8811HB_MD32_DSP	"airoha/an8811hb/EthMD32_CRC.DSP.bin"
+ 
+ #define AIR_FW_ADDR_DM	0x00000000
+ #define AIR_FW_ADDR_DSP	0x00100000
+@@ -31,6 +35,7 @@
+ /* MII Registers */
+ #define AIR_AUX_CTRL_STATUS		0x1d
+ #define   AIR_AUX_CTRL_STATUS_SPEED_MASK	GENMASK(4, 2)
++#define   AIR_AUX_CTRL_STATUS_SPEED_10		0x0
+ #define   AIR_AUX_CTRL_STATUS_SPEED_100		0x4
+ #define   AIR_AUX_CTRL_STATUS_SPEED_1000	0x8
+ #define   AIR_AUX_CTRL_STATUS_SPEED_2500	0xc
+@@ -56,6 +61,7 @@
+ #define EN8811H_PHY_FW_STATUS		0x8009
+ #define   EN8811H_PHY_READY			0x02
+ 
++#define AIR_PHY_MCU_CMD_0		0x800b
+ #define AIR_PHY_MCU_CMD_1		0x800c
+ #define AIR_PHY_MCU_CMD_1_MODE1			0x0
+ #define AIR_PHY_MCU_CMD_2		0x800d
+@@ -65,6 +71,10 @@
+ #define AIR_PHY_MCU_CMD_3_DOCMD			0x1100
+ #define AIR_PHY_MCU_CMD_4		0x800f
+ #define AIR_PHY_MCU_CMD_4_MODE1			0x0002
++#define AIR_PHY_MCU_CMD_4_CABLE_PAIR_A		0x00d7
++#define AIR_PHY_MCU_CMD_4_CABLE_PAIR_B		0x00d8
++#define AIR_PHY_MCU_CMD_4_CABLE_PAIR_C		0x00d9
++#define AIR_PHY_MCU_CMD_4_CABLE_PAIR_D		0x00da
+ #define AIR_PHY_MCU_CMD_4_INTCLR		0x00e4
+ 
+ /* Registers on MDIO_MMD_VEND2 */
+@@ -106,6 +116,9 @@
+ #define   AIR_PHY_LED_BLINK_2500RX		BIT(11)
+ 
+ /* Registers on BUCKPBUS */
++#define AIR_PHY_CONTROL			0x3a9c
++#define   AIR_PHY_CONTROL_INTERNAL		BIT(11)
++
+ #define EN8811H_2P5G_LPA		0x3b30
+ #define   EN8811H_2P5G_LPA_2P5G			BIT(0)
+ 
+@@ -129,6 +142,34 @@
+ #define EN8811H_FW_CTRL_2		0x800000
+ #define EN8811H_FW_CTRL_2_LOADING		BIT(11)
+ 
++#define AN8811HB_CRC_PM_SET1		0xf020c
++#define AN8811HB_CRC_PM_MON2		0xf0218
++#define AN8811HB_CRC_PM_MON3		0xf021c
++#define AN8811HB_CRC_DM_SET1		0xf0224
++#define AN8811HB_CRC_DM_MON2		0xf0230
++#define AN8811HB_CRC_DM_MON3		0xf0234
++#define   AN8811HB_CRC_RD_EN			BIT(0)
++#define   AN8811HB_CRC_ST			(BIT(0) | BIT(1))
++#define   AN8811HB_CRC_CHECK_PASS		BIT(0)
++
++#define AN8811HB_TX_POLARITY		0x5ce004
++#define   AN8811HB_TX_POLARITY_NORMAL		BIT(7)
++#define AN8811HB_RX_POLARITY		0x5ce61c
++#define   AN8811HB_RX_POLARITY_NORMAL		BIT(7)
++
++#define AN8811HB_GPIO_OUTPUT		0x5cf8b8
++#define   AN8811HB_GPIO_OUTPUT_345		(BIT(3) | BIT(4) | BIT(5))
++
++#define AN8811HB_HWTRAP1		0x5cf910
++#define AN8811HB_HWTRAP2		0x5cf914
++#define   AN8811HB_HWTRAP2_CKO			BIT(28)
++
++#define AN8811HB_CLK_DRV		0x5cf9e4
++#define AN8811HB_CLK_DRV_CKO_MASK		GENMASK(14, 12)
++#define   AN8811HB_CLK_DRV_CKOPWD		BIT(12)
++#define   AN8811HB_CLK_DRV_CKO_LDPWD		BIT(13)
++#define   AN8811HB_CLK_DRV_CKO_LPPWD		BIT(14)
++
+ /* Led definitions */
+ #define EN8811H_LED_COUNT	3
+ 
+@@ -461,33 +502,92 @@ static int en8811h_wait_mcu_ready(struct phy_device *phydev)
+ 	return 0;
+ }
+ 
++static int an8811hb_check_crc(struct phy_device *phydev, u32 set1,
++			      u32 mon2, u32 mon3)
++{
++	u32 pbus_value;
++	int retry = 25;
++	int ret;
++
++	/* Configure CRC */
++	ret = air_buckpbus_reg_modify(phydev, set1,
++				      AN8811HB_CRC_RD_EN,
++				      AN8811HB_CRC_RD_EN);
++	if (ret < 0)
++		return ret;
++	air_buckpbus_reg_read(phydev, set1, &pbus_value);
++
++	do {
++		mdelay(300);
++		air_buckpbus_reg_read(phydev, mon2, &pbus_value);
++
++		if (pbus_value & AN8811HB_CRC_ST) {
++			air_buckpbus_reg_read(phydev, mon3, &pbus_value);
++			phydev_info(phydev, "CRC Check %s!\n",
++				    pbus_value & AN8811HB_CRC_CHECK_PASS ? "PASS" : "FAIL");
++			break;
++		}
++
++		if (!retry) {
++			phydev_err(phydev, "CRC Check is not ready (%u)\n", pbus_value);
++			return -ENODEV;
++		}
++	} while (--retry);
++
++	return air_buckpbus_reg_modify(phydev, set1, AN8811HB_CRC_RD_EN, 0);
++}
++
+ static int en8811h_load_firmware(struct phy_device *phydev)
+ {
+ 	struct en8811h_priv *priv = phydev->priv;
+ 	struct device *dev = &phydev->mdio.dev;
+ 	const struct firmware *fw1, *fw2;
++	bool en8811h;
+ 	int ret;
+ 
+-	ret = request_firmware_direct(&fw1, EN8811H_MD32_DM, dev);
+-	if (ret < 0)
+-		return ret;
++	switch (phydev->phy_id & PHY_ID_MATCH_MODEL_MASK) {
++	case EN8811H_PHY_ID & PHY_ID_MATCH_MODEL_MASK:
++		ret = request_firmware_direct(&fw1, EN8811H_MD32_DM, dev);
++		if (ret < 0)
++			return ret;
+ 
+-	ret = request_firmware_direct(&fw2, EN8811H_MD32_DSP, dev);
+-	if (ret < 0)
+-		goto en8811h_load_firmware_rel1;
++		ret = request_firmware_direct(&fw2, EN8811H_MD32_DSP, dev);
++		if (ret < 0)
++			goto en8811h_load_firmware_rel1;
++
++		en8811h = true;
++		break;
++
++	case AN8811HB_PHY_ID & PHY_ID_MATCH_MODEL_MASK:
++		ret = request_firmware_direct(&fw1, AN8811HB_MD32_DM, dev);
++		if (ret < 0)
++			return ret;
++
++		ret = request_firmware_direct(&fw2, AN8811HB_MD32_DSP, dev);
++		if (ret < 0)
++			goto en8811h_load_firmware_rel1;
++		break;
++	default:
++		return -ENODEV;
++	}
+ 
+ 	ret = air_buckpbus_reg_write(phydev, EN8811H_FW_CTRL_1,
+ 				     EN8811H_FW_CTRL_1_START);
++	if (ret == 0 && en8811h)
++		ret = air_buckpbus_reg_modify(phydev, EN8811H_FW_CTRL_2,
++					      EN8811H_FW_CTRL_2_LOADING,
++					      EN8811H_FW_CTRL_2_LOADING);
+ 	if (ret < 0)
+ 		goto en8811h_load_firmware_out;
+ 
+-	ret = air_buckpbus_reg_modify(phydev, EN8811H_FW_CTRL_2,
+-				      EN8811H_FW_CTRL_2_LOADING,
+-				      EN8811H_FW_CTRL_2_LOADING);
++	ret = air_write_buf(phydev, AIR_FW_ADDR_DM,  fw1);
+ 	if (ret < 0)
+ 		goto en8811h_load_firmware_out;
+ 
+-	ret = air_write_buf(phydev, AIR_FW_ADDR_DM,  fw1);
++	if (ret == 0 && !en8811h)
++		ret = an8811hb_check_crc(phydev, AN8811HB_CRC_DM_SET1,
++					 AN8811HB_CRC_DM_MON2,
++					 AN8811HB_CRC_DM_MON3);
+ 	if (ret < 0)
+ 		goto en8811h_load_firmware_out;
+ 
+@@ -495,8 +595,13 @@ static int en8811h_load_firmware(struct phy_device *phydev)
+ 	if (ret < 0)
+ 		goto en8811h_load_firmware_out;
+ 
+-	ret = air_buckpbus_reg_modify(phydev, EN8811H_FW_CTRL_2,
+-				      EN8811H_FW_CTRL_2_LOADING, 0);
++	if (en8811h)
++		ret = air_buckpbus_reg_modify(phydev, EN8811H_FW_CTRL_2,
++					      EN8811H_FW_CTRL_2_LOADING, 0);
++	else
++		ret = an8811hb_check_crc(phydev, AN8811HB_CRC_PM_SET1,
++					 AN8811HB_CRC_PM_MON2,
++					 AN8811HB_CRC_PM_MON3);
+ 	if (ret < 0)
+ 		goto en8811h_load_firmware_out;
+ 
+@@ -820,6 +925,80 @@ static int en8811h_led_hw_is_supported(struct phy_device *phydev, u8 index,
+ 	return 0;
+ };
+ 
++static unsigned long an8811hb_clk_recalc_rate(struct clk_hw *hw,
++					      unsigned long parent)
++{
++	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
++	struct phy_device *phydev = priv->phydev;
++	u32 pbus_value;
++	int ret;
++
++	ret = air_buckpbus_reg_read(phydev, AN8811HB_HWTRAP2, &pbus_value);
++	if (ret < 0)
++		return ret;
++
++	return (pbus_value & AN8811HB_HWTRAP2_CKO) ? 50000000 : 25000000;
++}
++
++static int an8811hb_clk_enable(struct clk_hw *hw)
++{
++	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
++	struct phy_device *phydev = priv->phydev;
++
++	return air_buckpbus_reg_modify(phydev, AN8811HB_CLK_DRV,
++				       AN8811HB_CLK_DRV_CKO_MASK,
++				       AN8811HB_CLK_DRV_CKO_MASK);
++}
++
++static void an8811hb_clk_disable(struct clk_hw *hw)
++{
++	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
++	struct phy_device *phydev = priv->phydev;
++
++	air_buckpbus_reg_modify(phydev, AN8811HB_CLK_DRV,
++				AN8811HB_CLK_DRV_CKO_MASK, 0);
++}
++
++static int an8811hb_clk_is_enabled(struct clk_hw *hw)
++{
++	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
++	struct phy_device *phydev = priv->phydev;
++	u32 pbus_value;
++	int ret;
++
++	ret = air_buckpbus_reg_read(phydev, AN8811HB_CLK_DRV, &pbus_value);
++	if (ret < 0)
++		return ret;
++
++	return (pbus_value & AN8811HB_CLK_DRV_CKO_MASK);
++}
++
++static int an8811hb_clk_save_context(struct clk_hw *hw)
++{
++	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
++
++	priv->cko_is_enabled = an8811hb_clk_is_enabled(hw);
++
++	return 0;
++}
++
++static void an8811hb_clk_restore_context(struct clk_hw *hw)
++{
++	struct en8811h_priv *priv = clk_hw_to_en8811h_priv(hw);
++
++	if (!priv->cko_is_enabled)
++		an8811hb_clk_disable(hw);
++}
++
++static const struct clk_ops an8811hb_clk_ops = {
++	.recalc_rate		= an8811hb_clk_recalc_rate,
++	.enable			= an8811hb_clk_enable,
++	.disable		= an8811hb_clk_disable,
++	.is_enabled		= an8811hb_clk_is_enabled,
++	.save_context		= an8811hb_clk_save_context,
++	.restore_context	= an8811hb_clk_restore_context,
++};
++
+ static unsigned long en8811h_clk_recalc_rate(struct clk_hw *hw,
+ 					     unsigned long parent)
+ {
+@@ -894,8 +1073,9 @@ static const struct clk_ops en8811h_clk_ops = {
+ 	.restore_context	= en8811h_clk_restore_context,
+ };
+ 
+-static int en8811h_clk_provider_setup(struct device *dev, struct clk_hw *hw)
++static int en8811h_clk_provider_setup(struct phy_device *phydev, struct clk_hw *hw)
+ {
++	struct device *dev = &phydev->mdio.dev;
+ 	struct clk_init_data init;
+ 	int ret;
+ 
+@@ -907,7 +1087,16 @@ static int en8811h_clk_provider_setup(struct device *dev, struct clk_hw *hw)
+ 	if (!init.name)
+ 		return -ENOMEM;
+ 
+-	init.ops = &en8811h_clk_ops;
++	switch (phydev->phy_id & PHY_ID_MATCH_MODEL_MASK) {
++	case EN8811H_PHY_ID & PHY_ID_MATCH_MODEL_MASK:
++		init.ops = &en8811h_clk_ops;
++		break;
++	case AN8811HB_PHY_ID & PHY_ID_MATCH_MODEL_MASK:
++		init.ops = &an8811hb_clk_ops;
++		break;
++	default:
++		return -ENODEV;
++	}
+ 	init.flags = 0;
+ 	init.num_parents = 0;
+ 	hw->init = &init;
+@@ -952,8 +1141,9 @@ static int en8811h_probe(struct phy_device *phydev)
+ 	}
+ 
+ 	priv->phydev = phydev;
++
+ 	/* Co-Clock Output */
+-	ret = en8811h_clk_provider_setup(&phydev->mdio.dev, &priv->hw);
++	ret = en8811h_clk_provider_setup(phydev, &priv->hw);
+ 	if (ret)
+ 		return ret;
+ 
+@@ -967,32 +1157,61 @@ static int en8811h_probe(struct phy_device *phydev)
+ 	return 0;
+ }
+ 
+-static int en8811h_config_serdes_polarity(struct phy_device *phydev)
++static bool airphy_invert_rx(struct phy_device *phydev)
+ {
+ 	struct device *dev = &phydev->mdio.dev;
+-	int pol, default_pol;
+-	u32 pbus_value = 0;
++	int default_pol  = PHY_POL_NORMAL;
+ 
+-	default_pol = PHY_POL_NORMAL;
+ 	if (device_property_read_bool(dev, "airoha,pnswap-rx"))
+ 		default_pol = PHY_POL_INVERT;
+ 
+-	pol = phy_get_rx_polarity(dev_fwnode(dev), phy_modes(phydev->interface),
+-				  PHY_POL_NORMAL | PHY_POL_INVERT, default_pol);
+-	if (pol < 0)
+-		return pol;
+-	if (pol == PHY_POL_INVERT)
+-		pbus_value |= EN8811H_POLARITY_RX_REVERSE;
++	return phy_get_rx_polarity(dev_fwnode(dev), phy_modes(phydev->interface),
++				   PHY_POL_NORMAL | PHY_POL_INVERT, default_pol)
++		== PHY_POL_INVERT;
++}
++
++static bool airphy_invert_tx(struct phy_device *phydev)
++{
++	struct device *dev = &phydev->mdio.dev;
++	int default_pol  = PHY_POL_NORMAL;
+ 
+-	default_pol = PHY_POL_NORMAL;
+ 	if (device_property_read_bool(dev, "airoha,pnswap-tx"))
+ 		default_pol = PHY_POL_INVERT;
+ 
+-	pol = phy_get_tx_polarity(dev_fwnode(dev), phy_modes(phydev->interface),
+-				  PHY_POL_NORMAL | PHY_POL_INVERT, default_pol);
+-	if (pol < 0)
+-		return pol;
+-	if (pol == PHY_POL_NORMAL)
++	return phy_get_tx_polarity(dev_fwnode(dev), phy_modes(phydev->interface),
++				   PHY_POL_NORMAL | PHY_POL_INVERT, default_pol)
++		== PHY_POL_INVERT;
++}
++
++static int an8811hb_config_serdes_polarity(struct phy_device *phydev)
++{
++	u32 pbus_value = 0;
++	int ret;
++
++	if (!airphy_invert_rx(phydev))
++		pbus_value |=  AN8811HB_RX_POLARITY_NORMAL;
++	ret = air_buckpbus_reg_modify(phydev, AN8811HB_RX_POLARITY,
++				      AN8811HB_RX_POLARITY_NORMAL,
++				      pbus_value);
++	if (ret < 0)
++		return ret;
++
++	pbus_value = 0;
++	if (!airphy_invert_tx(phydev))
++		pbus_value |=  AN8811HB_TX_POLARITY_NORMAL;
++	return air_buckpbus_reg_modify(phydev, AN8811HB_TX_POLARITY,
++				       AN8811HB_TX_POLARITY_NORMAL,
++				       pbus_value);
++}
++
++static int en8811h_config_serdes_polarity(struct phy_device *phydev)
++{
++	u32 pbus_value = 0;
++
++	if (airphy_invert_rx(phydev))
++		pbus_value |= EN8811H_POLARITY_RX_REVERSE;
++
++	if (!airphy_invert_tx(phydev))
+ 		pbus_value |= EN8811H_POLARITY_TX_NORMAL;
+ 
+ 	return air_buckpbus_reg_modify(phydev, EN8811H_POLARITY,
+@@ -1000,6 +1219,33 @@ static int en8811h_config_serdes_polarity(struct phy_device *phydev)
+ 				       EN8811H_POLARITY_TX_NORMAL, pbus_value);
+ }
+ 
++static int an8811hb_config_init(struct phy_device *phydev)
++{
++	struct en8811h_priv *priv = phydev->priv;
++	int ret;
++
++	/* If restart happened in .probe(), no need to restart now */
++	if (priv->mcu_needs_restart) {
++		ret = en8811h_restart_mcu(phydev);
++		if (ret < 0)
++			return ret;
++	} else {
++		/* Next calls to .config_init() mcu needs to restart */
++		priv->mcu_needs_restart = true;
++	}
++
++	ret = an8811hb_config_serdes_polarity(phydev);
++	if (ret < 0)
++		return ret;
++
++	ret = air_leds_init(phydev, EN8811H_LED_COUNT, AIR_PHY_LED_DUR,
++			    AIR_LED_MODE_USER_DEFINE);
++	if (ret < 0)
++		phydev_err(phydev, "Failed to initialize leds: %d\n", ret);
++
++	return ret;
++}
++
+ static int en8811h_config_init(struct phy_device *phydev)
+ {
+ 	struct en8811h_priv *priv = phydev->priv;
+@@ -1113,13 +1359,25 @@ static int en8811h_read_status(struct phy_device *phydev)
+ 	if (ret < 0)
+ 		return ret;
+ 
+-	/* Get link partner 2.5GBASE-T ability from vendor register */
+-	ret = air_buckpbus_reg_read(phydev, EN8811H_2P5G_LPA, &pbus_value);
+-	if (ret < 0)
+-		return ret;
+-	linkmode_mod_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
+-			 phydev->lp_advertising,
+-			 pbus_value & EN8811H_2P5G_LPA_2P5G);
++	switch (phydev->phy_id & PHY_ID_MATCH_MODEL_MASK) {
++	case EN8811H_PHY_ID & PHY_ID_MATCH_MODEL_MASK:
++		/* Get link partner 2.5GBASE-T ability from vendor register */
++		ret = air_buckpbus_reg_read(phydev, EN8811H_2P5G_LPA, &pbus_value);
++		if (ret < 0)
++			return ret;
++
++		linkmode_mod_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
++				 phydev->lp_advertising,
++				 pbus_value & EN8811H_2P5G_LPA_2P5G);
++		break;
++	case AN8811HB_PHY_ID & PHY_ID_MATCH_MODEL_MASK:
++		val = phy_read_mmd(phydev, MDIO_MMD_AN, MDIO_AN_10GBT_STAT);
++		if (val < 0)
++			return val;
++		linkmode_mod_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
++				 phydev->lp_advertising,
++				 val & MDIO_AN_10GBT_STAT_LP2_5G);
++	}
+ 
+ 	if (phydev->autoneg_complete)
+ 		phy_resolve_aneg_pause(phydev);
+@@ -1141,6 +1399,9 @@ static int en8811h_read_status(struct phy_device *phydev)
+ 	case AIR_AUX_CTRL_STATUS_SPEED_100:
+ 		phydev->speed = SPEED_100;
+ 		break;
++	case AIR_AUX_CTRL_STATUS_SPEED_10:
++		phydev->speed = SPEED_10;
++		break;
+ 	}
+ 
+ 	/* Firmware before version 24011202 has no vendor register 2P5G_LPA.
+@@ -1225,20 +1486,44 @@ static struct phy_driver en8811h_driver[] = {
+ 	.led_brightness_set	= air_led_brightness_set,
+ 	.led_hw_control_set	= air_led_hw_control_set,
+ 	.led_hw_control_get	= air_led_hw_control_get,
++},
++{
++	PHY_ID_MATCH_MODEL(AN8811HB_PHY_ID),
++	.name			= "Airoha AN8811HB",
++	.probe			= en8811h_probe,
++	.get_features		= en8811h_get_features,
++	.config_init		= an8811hb_config_init,
++	.get_rate_matching	= en8811h_get_rate_matching,
++	.config_aneg		= en8811h_config_aneg,
++	.read_status		= en8811h_read_status,
++	.resume			= en8811h_resume,
++	.suspend		= en8811h_suspend,
++	.config_intr		= en8811h_clear_intr,
++	.handle_interrupt	= en8811h_handle_interrupt,
++	.led_hw_is_supported	= en8811h_led_hw_is_supported,
++	.read_page		= air_phy_read_page,
++	.write_page		= air_phy_write_page,
++	.led_blink_set		= air_led_blink_set,
++	.led_brightness_set	= air_led_brightness_set,
++	.led_hw_control_set	= air_led_hw_control_set,
++	.led_hw_control_get	= air_led_hw_control_get,
+ } };
+ 
+ module_phy_driver(en8811h_driver);
+ 
+ static const struct mdio_device_id __maybe_unused en8811h_tbl[] = {
+ 	{ PHY_ID_MATCH_MODEL(EN8811H_PHY_ID) },
++	{ PHY_ID_MATCH_MODEL(AN8811HB_PHY_ID) },
+ 	{ }
+ };
+ 
+ MODULE_DEVICE_TABLE(mdio, en8811h_tbl);
+ MODULE_FIRMWARE(EN8811H_MD32_DM);
+ MODULE_FIRMWARE(EN8811H_MD32_DSP);
++MODULE_FIRMWARE(AN8811HB_MD32_DM);
++MODULE_FIRMWARE(AN8811HB_MD32_DSP);
+ 
+-MODULE_DESCRIPTION("Airoha EN8811H PHY drivers");
++MODULE_DESCRIPTION("Airoha EN8811H and AN8811HB PHY drivers");
+ MODULE_AUTHOR("Airoha");
+ MODULE_AUTHOR("Eric Woudstra <ericwouds@gmail.com>");
+ MODULE_LICENSE("GPL");
+-- 
+2.47.3
 
-On top of that, printk() has a similar mechanism where extra data is not
-printed to the console. printk buffers has a dictionary of structured
-data attached to the message that is not printed to the screen, but,
-sent through netconsole.
-
-This feature (in this patchset) is just one step ahead, giving some more
-power to netconsole, where extra information could be sent beyond what
-is in dmesg.
-
->  - why do we need the kernel API, netcons is just a UDP message, which
->    is easy enough to send from user space. A little bit more detail
->    about the advantages would be good to have.
-
-The primary advantage is leveraging the existing configured netconsole
-infrastructure. At Meta, for example, we have a "continuous ping"
-mechanism configured by our Configuration Management software that
-simply runs 'echo "ping" > /dev/kmsg'.
-
-A userspace solution would require deploying a binary to millons of
-machines,  parsing /sys/kernel/configfs/netconsole/cmdline0/configs
-and sends packets directly.
-
-While certainly feasible, it's less convenient than using the
-existing infrastructure (though I may just be looking for the easier
-path here).
-
-> The 2nd point is trivial, the first one is what really gives me pause.
-> Why do we not care about the logs on host? If the serial is very slow
-> presumably it impacts a lot of things, certainly boot speed, so...
-
-This is spot-on - slow serial definitely impacts things like boot speed.
-
-See my constant complains here, about slow boot
-
-	https://lore.kernel.org/all/aGVn%2FSnOvwWewkOW@gmail.com/
-
-And the something similar in reboot/kexec path:
-
-	https://lore.kernel.org/all/sqwajvt7utnt463tzxgwu2yctyn5m6bjwrslsnupfexeml6hkd@v6sqmpbu3vvu/
-
-> perhaps it should be configured to only log messages at a high level?
-
-Chris is actually working on per-console log levels to solve exactly
-this problem, so we could filter serial console messages while keeping
-everything in other consoles (aka netconsole):
-
-	https://lore.kernel.org/all/cover.1764272407.git.chris@chrisdown.name/
-
-That work has been in progress for years though, and I'm not sure
-when/if it'll land upstream. But if it does, we'd be able to have
-different log levels per console and then use your suggested approach.
-
-Thanks for the review, and feel free to yell at me if I am missing the
-point,
---breno
 
