@@ -1,82 +1,96 @@
-Return-Path: <netdev+bounces-243229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53F82C9BF3A
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 16:31:02 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1CDFC9BF85
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 16:34:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 970B14E4725
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 15:30:17 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9ADE04E1221
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 15:34:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24C66266568;
-	Tue,  2 Dec 2025 15:29:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EFB925D546;
+	Tue,  2 Dec 2025 15:34:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D/DrpocK"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="EE7v91of";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="r/LgDe3s";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="W5XJk3j5";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="hQPOlI+G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 928BD264A92
-	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 15:29:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 265A924DCE5
+	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 15:34:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764689383; cv=none; b=cLvpwwIqAIa6gEwj43KO5Miga6x7n+w+3/cu23eW5U0bjq/aqaDIzBO07BVZ5kyMVxUWcRfsf8+BPGNo+HyiETJLbOT+2EHCvm9k0+80p/5U1vis3AmInJTPm7am8ZpExUIQnu9uEVGTW24f70ZDk/LnVmRhzceqL7jpDEXvjvo=
+	t=1764689664; cv=none; b=MGYJ88AhmLDwvIvKjfjP2GehjKIoHYSmLVwBuD1Z8H/qljOcKgD/dt4ridNRvoY7qHYRmw5MtwSeH0sow9eMAveHn0b0xaIs+GiPnMknSqlc4hjhesDXsu4FxpzSOMLwP0D+P+kZwPOLbBVgXpHgWHJyVqUNM+kJRpcHefx45y0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764689383; c=relaxed/simple;
-	bh=BZtIuSYzo4X0vi8zHGDRh1sL+AQ42TCB+JFZn40EQnk=;
+	s=arc-20240116; t=1764689664; c=relaxed/simple;
+	bh=OTgI1At8eTdZ2KqWaaFwyuZ+zxr42zo9QL45J2c1fyg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NTwhnU7IxvV0VW+75XVuYUDuk07Owyo4tYVMCw4lZviRpL/HiVdUAyMpKHybu5ouwdU/TNCI3fYZ+z0Qe0rhaE/Rpj3JWsXFoqUD3KOqQ13anLVouqo7lLSJuok2J3eNVQx0u+eCCYEUps/+7WVnqDOZqwJxlA8EAA4qoSx4+eM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D/DrpocK; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2981f9ce15cso64712775ad.1
-        for <netdev@vger.kernel.org>; Tue, 02 Dec 2025 07:29:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764689381; x=1765294181; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Pm04M8J4HumgMBH0ZuXZAiRY8Gdv9LOi293f7C71dv8=;
-        b=D/DrpocKM7R3+UI5XzGY+e7wsnIjOBh41K6MGTdDpZuqjUQY52jAWsybQO/XVerCgz
-         fd7lTDHFLLwKvkS0Sg1QUVjiG5wt1XqnF52idr/taYJhPTN2mpzE5V9UMTUh15f5dZJe
-         r4g90Sk8ke+YbfBljPn1WOXi5Cs99c51T/flI6/JcTUBaFJP45zcxkcsQw8LJYkZAq1P
-         djgloHzXZ/U4mqggjKzzUXft7z26Vm89WlcjjG6rHNmYusR7IW6AXcmYIT2AvrEVeabp
-         g/lAF+X9BrsPoSOIRMRrP+DBja/eFZBEBUW0tXuQzLF40fiJ7M/hOvvI8P1RzNOSoFuA
-         Dt4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764689381; x=1765294181;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Pm04M8J4HumgMBH0ZuXZAiRY8Gdv9LOi293f7C71dv8=;
-        b=W0QptEqYe2vDhqvPg4Tva+6g/1XUWGnwrIylXB/yJrpIljYxMwBSQNBhlW4mETrQ2W
-         eEgtZgSCSSdS9tIv/zPcgd6L4Y1b/rv7UKBsAg28XEjqVMXrVhRYx345bFV+H9pUXHWS
-         3yYwuYiHdG304gIt/PXajF7vZLlf0gbfnteMdGe35nX665yoiztdwf39zzgj6yJje6Q7
-         E1eRxiy5VRHDixqFHSK7dtIcEQlM/Nc67cTra4HeLIBm5tzaKka8wurBJJZy7OKJVoP/
-         0RnE8BvkHaU0n8reGmRLyMG7aylqJ4cksgGoId3/h+pocaBnWS/ai058EWzf5BmC3bOV
-         lNNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCViiW6dCveHNNjBpXedrnwdoUU9YBBt7kLnT+AvkQxqB9VLQ/ewWYl9KgKanCXOvobXvmgfQK4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwX4P1jvBhcynM+qRzMp8nnRy8UITf4nZmXj3xOghUivf1O/YN7
-	JB6K1bw25wGhzgD7nbHqwk2mtkX6QbQH/7Du8wueNSS8HTu690R9ASqa
-X-Gm-Gg: ASbGncv/2Sc4MUfUCX23KrcnrugA355J8NkPxYmUB74pxYwESPLTeMrHse2g1XPVCoC
-	i93cA+bG2/2CCkX2qUjHbqSIdBd19HxD6j2kg3i1m0GxXQfCWqJUS22R2IRfiR6fY//GfMZPeVZ
-	c93P0xuGSUMxlhm+4//Wm7tBe/LfBSnLv0k3dCicU0L3nN/7DunQ/r/WwNKQs/zsM+gacKlyMSS
-	vi4UBPY4RxRXrFywplD3hoknEbGPbPcdOkdzVYEYYPvW1SSp3DKxcYujUtsUaQTeWaQKPOLuczh
-	Xlvu2g36KQHHpjbZ3DQ5bfyhfBAoC/uih6DJJwioyJ2eSoVpxGLbfYRy1LeRsxuYGXc3flCUsqf
-	L62Ct0zXWannuOLRbIvHvFWmVUi0DItOkp89ZHMdO/8ua57RMlW29WmnNeQtmwLzVPUhJzhu8PV
-	+CPEmSevhKNWdmymKgboVvqOtghwfGtpQ7MHIzML6Guz6Dc57zEnNyUHxJR6E=
-X-Google-Smtp-Source: AGHT+IFXvcfWnNHx250mT23ggaMtDNXUs/Vb5yUhRUZMPaS6sYLlPPubZ17O0Xp1IrUFreHe7V613g==
-X-Received: by 2002:a17:903:320a:b0:29a:5ce:b467 with SMTP id d9443c01a7336-29b6bf9e98amr470449935ad.54.1764689380670;
-        Tue, 02 Dec 2025 07:29:40 -0800 (PST)
-Received: from ?IPV6:2001:ee0:4f4c:210:48c5:4372:8d4:ac0b? ([2001:ee0:4f4c:210:48c5:4372:8d4:ac0b])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29bce40ab6bsm157212555ad.21.2025.12.02.07.29.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Dec 2025 07:29:40 -0800 (PST)
-Message-ID: <faad67c7-8b25-4516-ab37-3b154ee4d0cf@gmail.com>
-Date: Tue, 2 Dec 2025 22:29:32 +0700
+	 In-Reply-To:Content-Type; b=ov5GnBF5C+j0dcVAS7osXbt08p5qXMcSvPW9BKqnKpNJazqYWEeXCCW1DPDH0N/xs/D5GTpXedNzJs9n62QZZtuLq7eGVCBGivJThO+jP+Zj67h+6pKIzHULZ4Wwg2IL/enr0+UPQBoXr0OAFm36ne1sZP14KlCJRRxcAt2560o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=EE7v91of; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=r/LgDe3s; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=W5XJk3j5; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=hQPOlI+G; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 2609F5BD4D;
+	Tue,  2 Dec 2025 15:34:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1764689660; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LNeLGy/zjpql2kXCkFr8XeMTEV3ES+WnHxQAyPKOG9k=;
+	b=EE7v91ofMqIJjZw6P7uIQw3P0TzAgu57QzOsutslnBOavY4QhpjhPk005WRWFKKfYoDHYL
+	wigkQ2mw7yJ7oZlrgSmFlxtykJZbdM3pyFVgcQGo3NLTkFXxFWTIGFOldg3Q8vN3P90NGF
+	bpc+pQVSjDljvRrcNJcw7IALIt7Th3o=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1764689660;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LNeLGy/zjpql2kXCkFr8XeMTEV3ES+WnHxQAyPKOG9k=;
+	b=r/LgDe3sQvGySTYKr44DkBTtHn4ahnkbF+/7mQ5JGLbY2aLkbntrELovOBI2eJTGGfPoqY
+	ZCJCpq2iTVPwKKAQ==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=W5XJk3j5;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=hQPOlI+G
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1764689659; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LNeLGy/zjpql2kXCkFr8XeMTEV3ES+WnHxQAyPKOG9k=;
+	b=W5XJk3j5wGIdemV+j/85yZIf2d2VHDrFEVmz6+9j7P02YIl/d92vcwpyYX6ZWMXu1cz3WB
+	7BSmqco9ui7hRpPivBDXeAmwqAFyQ7qSBF5m6r5pCJVnlSlWMRruevlrPRh/P9r+3eMQ9g
+	AkteitjkzV6LJpdV49Q2n0RT9aGff+8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1764689659;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LNeLGy/zjpql2kXCkFr8XeMTEV3ES+WnHxQAyPKOG9k=;
+	b=hQPOlI+GC9fTYPgcevMNmI5InxIIJhYfrf2tCBpfv9xTnPhiJeyG/hdBR6scTRdsMCXTv8
+	o44fr9T/ntbuxxCw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C1E773EA63;
+	Tue,  2 Dec 2025 15:34:18 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id shUrLvoGL2k8MwAAD6G6ig
+	(envelope-from <hare@suse.de>); Tue, 02 Dec 2025 15:34:18 +0000
+Message-ID: <4b5a6010-3404-43ab-8964-d704dbeac6d9@suse.de>
+Date: Tue, 2 Dec 2025 16:34:18 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,73 +98,88 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC] virtio_net: gate delayed refill scheduling
-To: Jason Wang <jasowang@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, virtualization@lists.linux.dev,
- netdev@vger.kernel.org, bpf@vger.kernel.org
-References: <40af2b73239850e7bf1a81abb71ee99f1b563b9c.1764226734.git.mst@redhat.com>
- <a61dc7ee-d00b-41b4-b6fd-8a5152c3eae3@gmail.com>
- <CACGkMEuJFVUDQ7SKt93mCVkbDHxK+A74Bs9URpdGR+0mtjxmAg@mail.gmail.com>
- <a9718b11-76d5-4228-9256-6a4dee90c302@gmail.com>
- <CACGkMEvFzYiRNxMdJ9xNPcZmotY-9pD+bfF4BD5z+HnaAt1zug@mail.gmail.com>
+Subject: Re: [PATCH v6 2/5] net/handshake: Define handshake_req_keyupdate
+To: alistair23@gmail.com, chuck.lever@oracle.com, hare@kernel.org,
+ kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org
+Cc: kbusch@kernel.org, axboe@kernel.dk, hch@lst.de, sagi@grimberg.me,
+ kch@nvidia.com, Alistair Francis <alistair.francis@wdc.com>
+References: <20251202013429.1199659-1-alistair.francis@wdc.com>
+ <20251202013429.1199659-3-alistair.francis@wdc.com>
 Content-Language: en-US
-From: Bui Quang Minh <minhquangbui99@gmail.com>
-In-Reply-To: <CACGkMEvFzYiRNxMdJ9xNPcZmotY-9pD+bfF4BD5z+HnaAt1zug@mail.gmail.com>
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20251202013429.1199659-3-alistair.francis@wdc.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Spam-Flag: NO
+X-Spam-Score: -4.51
+X-Rspamd-Queue-Id: 2609F5BD4D
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	FREEMAIL_TO(0.00)[gmail.com,oracle.com,kernel.org,lists.linux.dev,vger.kernel.org,lists.infradead.org];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	MIME_TRACE(0.00)[0:+];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	RCVD_TLS_ALL(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:mid,suse.de:dkim,suse.de:email,wdc.com:email];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Level: 
 
-On 12/2/25 13:03, Jason Wang wrote:
-> On Mon, Dec 1, 2025 at 11:04 PM Bui Quang Minh <minhquangbui99@gmail.com> wrote:
->> On 11/28/25 09:20, Jason Wang wrote:
->>> On Fri, Nov 28, 2025 at 1:47 AM Bui Quang Minh <minhquangbui99@gmail.com> wrote:
->>>> I think the the requeue in refill_work is not the problem here. In
->>>> virtnet_rx_pause[_all](), we use cancel_work_sync() which is safe to
->>>> use "even if the work re-queues itself". AFAICS, cancel_work_sync()
->>>> will disable work -> flush work -> enable again. So if the work requeue
->>>> itself in flush work, the requeue will fail because the work is already
->>>> disabled.
->>> Right.
->>>
->>>> I think what triggers the deadlock here is a bug in
->>>> virtnet_rx_resume_all(). virtnet_rx_resume_all() calls to
->>>> __virtnet_rx_resume() which calls napi_enable() and may schedule
->>>> refill. It schedules the refill work right after napi_enable the first
->>>> receive queue. The correct way must be napi_enable all receive queues
->>>> before scheduling refill work.
->>> So what you meant is that the napi_disable() is called for a queue
->>> whose NAPI has been disabled?
->>>
->>> cpu0] enable_delayed_refill()
->>> cpu0] napi_enable(queue0)
->>> cpu0] schedule_delayed_work(&vi->refill)
->>> cpu1] napi_disable(queue0)
->>> cpu1] napi_enable(queue0)
->>> cpu1] napi_disable(queue1)
->>>
->>> In this case cpu1 waits forever while holding the netdev lock. This
->>> looks like a bug since the netdev_lock 413f0271f3966 ("net: protect
->>> NAPI enablement with netdev_lock()")?
->> Yes, I've tried to fix it in 4bc12818b363 ("virtio-net: disable delayed
->> refill when pausing rx"), but it has flaws.
-> I wonder if a simplified version is just restoring the behaviour
-> before 413f0271f3966 by using napi_enable_locked() but maybe I miss
-> something.
+On 12/2/25 02:34, alistair23@gmail.com wrote:
+> From: Alistair Francis <alistair.francis@wdc.com>
+> 
+> Add a new handshake_req_keyupdate() function which is similar to the
+> existing handshake_req_submit().
+> 
+> The new handshake_req_keyupdate() does not add the request to the hash
+> table (unlike handshake_req_submit()) but instead uses the existing
+> request from the initial handshake.
+> 
+> During the initial handshake handshake_req_submit() will add the request
+> to the hash table. The request will not be removed from the hash table
+> unless the socket is closed (reference count hits zero).
+> 
+> After the initial handshake handshake_req_keyupdate() can be used to re-use
+> the existing request in the hash table to trigger a KeyUpdate with
+> userspace.
+> 
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+> v6:
+>   - New patch
+> 
+>   net/handshake/handshake.h |  2 +
+>   net/handshake/request.c   | 95 +++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 97 insertions(+)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-As far as I understand, before 413f0271f3966 ("net: protect NAPI 
-enablement with netdev_lock()"), the napi is protected by the 
-rtnl_lock(). But in the refill_work, we don't acquire the rtnl_lock(), 
-so it seems like we will have race condition before 413f0271f3966 ("net: 
-protect NAPI enablement with netdev_lock()").
+Cheers,
 
-Thanks,
-Quang Minh.
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
