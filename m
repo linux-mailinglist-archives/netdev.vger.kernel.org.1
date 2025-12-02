@@ -1,115 +1,179 @@
-Return-Path: <netdev+bounces-243288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4ADF5C9C91C
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 19:15:20 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 936EDC9C947
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 19:17:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0B520344EE1
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 18:15:06 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 58AEA4E3B27
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 18:17:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ECED2C3265;
-	Tue,  2 Dec 2025 18:14:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B65732C11E3;
+	Tue,  2 Dec 2025 18:17:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GUaxHgL4"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OxkbmKEO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D26442C237E;
-	Tue,  2 Dec 2025 18:14:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29FB21C9E5
+	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 18:17:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764699286; cv=none; b=Mz3rFuGcl/pjaGZzkCb7WmzX2JlYCHgmmpy1aK6Y//wSsfK/fOCf36WEIx1D4xPTXWIKz7Yz3KaF9KTv8OO5LIkU8enc6YqiSJfKhGT3yAhQOHVWdZ2G7yLX3XyOc6bb7khi2mRtKDSQJ449mA1nap9woW3yfGJTuGxwszxoOV4=
+	t=1764699431; cv=none; b=CaUxs8IHLAABctYV/Uc/A1guhNQW47ZijdAK9vvkj7BuDk08OJ4ZoXu6EKNDfYy9ji5kuYDIysWN2Fruo6A0nK+2G1dwCwRdAW0pof1AAManHv9yWKH62/HFgWVms5Rpb3p3IKPKGcpL5U4ZUMurI8j04/xQc3BF+TtVRbQlplM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764699286; c=relaxed/simple;
-	bh=jRSbQ9Ne/+OOJgP0Z0DxW9fXwOZ0hOe2Zw0P1wm7xhQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=adgyFn1XZ5Gn/Cu6kvSve3NaRPbKUhXfciIPGKJO89avxHl4tc7IefFQyqg5aeMXoafddLCkdYBvridPKXQVso20e1i8HUtGdDl8DzuKiXKO0uVMO655LXQD2KzOCtwOK+8+D8bbB9TsqfHDhi7GBK5wAiKcgzxQpHdiIvwTOXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GUaxHgL4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80409C4CEF1;
-	Tue,  2 Dec 2025 18:14:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764699286;
-	bh=jRSbQ9Ne/+OOJgP0Z0DxW9fXwOZ0hOe2Zw0P1wm7xhQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GUaxHgL4GY9fsqv8UmFGFWvYCTWtR5oAqKkY5DK6pcwDe9jAbJ2UB4/0V+u1bZS4P
-	 zZ9Zgr1LxfvIs2gl1X+s0odz0wic1by62hkmzEyTrh7G1s/0JKW/8573fnlAoKahot
-	 dR/NyjKNt9g6NgOYWQ8Sgs7/3Y1te65t1tWpFF7wqhsmKhwE+sfNCaiRPJRokrw7Ri
-	 RqEU7zTiSrmOygOG60RIU5clxN3qwwdoHm1DcSAGjBnj5ShxGTUMgSvU2NAphVtVkX
-	 taDq1uRV/mtBvHlAjjaaHFnHXx0uzrKhRW0DcAAZDTWZWBevB1AJiIo29QBzyq8P3e
-	 fNoQPRtiMpmpA==
-Date: Tue, 2 Dec 2025 10:14:44 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Donald Hunter
- <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Saeed Mahameed
- <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Mark Bloch
- <mbloch@nvidia.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org, Gal Pressman
- <gal@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>, Carolina Jubran
- <cjubran@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>, Jiri Pirko
- <jiri@nvidia.com>, Randy Dunlap <rdunlap@infradead.org>
-Subject: Re: [PATCH net-next V4 02/14] documentation: networking: add shared
- devlink documentation
-Message-ID: <20251202101444.7f6d14a8@kernel.org>
-In-Reply-To: <2lnqrb3fu7dukdkgfculj53q2vwb36nrz5copjfg3khlqnbmix@jbfmhnks7svq>
-References: <1764101173-1312171-1-git-send-email-tariqt@nvidia.com>
-	<1764101173-1312171-3-git-send-email-tariqt@nvidia.com>
-	<20251127201645.3d7a10f6@kernel.org>
-	<hidhx467pn6pcisuoxdw3pykyvnlq7rdicmjksbozw4dtqysti@yd5lin3qft4q>
-	<20251128191924.7c54c926@kernel.org>
-	<n6mey5dbfpw7ykp3wozgtxo5grvac642tskcn4mqknrurhpwy7@ugolzkzzujba>
-	<20251201134954.6b8a8d48@kernel.org>
-	<2lnqrb3fu7dukdkgfculj53q2vwb36nrz5copjfg3khlqnbmix@jbfmhnks7svq>
+	s=arc-20240116; t=1764699431; c=relaxed/simple;
+	bh=kIIxpDCzAiF+wx/yf+gGzLt+4Ot/8vUkQHd1YvCPew4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UDsohyGVQNHH72It/6aqfqrDFGFh1fBfdkAoRMbT0fQwkM1VWhviKng5Yakrr3rwevu9Qm+nTNKDV2D8FE+zdPs2MLazdDMLQ0YKjJgWBxYtQEfhUVvJUt+omcnPMJQ2FlmdMjPKr6ttkMN3iKNOd2SxoG7t5KhRYzD1NkCcmCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=OxkbmKEO; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-42e2e671521so1886928f8f.1
+        for <netdev@vger.kernel.org>; Tue, 02 Dec 2025 10:17:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1764699428; x=1765304228; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6b74+PpIp4g7MMqPdYt95ZSBDMLgOHp379BS/AlUf30=;
+        b=OxkbmKEOMdfd70iV7tGDNb9WXTKw1sTd8BB1DOId+NBwS9j/1vy1iAKdt79//w3ZP3
+         yxERnDroP1lgnNwCj8PM39gkFhS8W1TIiJ7dDXVRLc7hDHbf6ERPFImXiDNuCL7V31fg
+         3ANBYk/gduGOMi/B/Vu/wgWq7Sx5XCCNS+mT7s2FuCCSvojFwGciaNjx0dP7nmINCny2
+         qesuMsrdpnyNGF6SdBUKwvoaJk6C1yuetzKv7NyQBHrc9DvjFs42DykJTjWhNHWqExFp
+         C/KeVLN+Xr+LeLJMVaHfyVwbPDNk8p299gWM/EtSw+uDakgq8M0UtNW9jFexzqKtH34b
+         9g9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764699428; x=1765304228;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6b74+PpIp4g7MMqPdYt95ZSBDMLgOHp379BS/AlUf30=;
+        b=mVzLYcjX/glVPKnuUYDGJ89AJJeoQ9YwdkvsWlUBfeeOY44DRaAcRf7NyYp7VrUD8H
+         tEobtxLmTYyvhetEEEgEMLNPggkYoKOtcYt85aY9YCzZw/OifvFD5ZDz4X4ITTdkazYO
+         ONa83p/QF7OkqqJa6UfYv9EgvZUbPGZZwR3Y4I6CA4AV+wS1sGnTkH5ygl7LazMl+LjE
+         IA+bAzuMUGQNtsh/KHkT4m2j3tANJbYXjcFDGqi9Us54OvUpiSgjBGoREoVoUhmgGRNF
+         ZG7CzCLxR/yh7JDXT3sntGx8lMFEkACJ5Jtv0o5ZCfmS1UCfDuPCr5j4jur2aAaBOhow
+         uOQw==
+X-Forwarded-Encrypted: i=1; AJvYcCWlfF+hra3g02YWdfXGnvxYS+QpgBBbFqrLkayxCpl/++Lv9FPg3ELq4hOynLAJ0Z5f4rjnx9o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxzI63jlryCvtMUumuFaX8Q4bYR8HMHufFuwsyPHGQXZZHTmxUv
+	HIl1WdbzYzXPu86UavX2KKLcR8jjjmiP9BZYZo718CYxDM8bYpOaFPYtRm6GxEl34p4=
+X-Gm-Gg: ASbGnctn5RutiwCPI1Zy9plLlCu2d1HDwkgFMpKqVqoa+FKiFOD6RB5BsxbR9ARm7vr
+	0Y/rgvmBZsa36Mwkknh44TVazZLRE9898L82gvjcqUpIiBu+lzdbsUMUTORcvffGNjJmB3VlCq4
+	1UUcGfH1mRiUhM/MkGEcvKWsaXcKnMf7tQvBhKvckMlwY+SUec4zvlqEmIi4VeqN4JD5hKDMc4+
+	GKfs0vOwmV03ixLAdiFG0Rh9WbG19mZ28twHrajTnIARhvOKNLUekmi++0R8fHMb8AA2FmKHfg0
+	hl9KvlfTrlAoS8IGeWnLJHqfi+yayezt96cbp9QjA/rPyfH7tUherWrFs5/4Y5SQWhK2k+CrGT1
+	83uZLmqA/QT+asl/PjFNWJVnOqrRNnCsBG6uUBcWiRaSgZ7W1jAEDAX8elx2wKUbXdKXIXPGEPy
+	b4iDGT68SldqW9bXx/
+X-Google-Smtp-Source: AGHT+IGdPY6yqrBKJkkOOYWF6CM+7Jwdu1H0nVTCpwkcVSguUh9pxxkKdepb4CrjpvgK1/jyWOMffg==
+X-Received: by 2002:a5d:5f82:0:b0:42b:3220:9412 with SMTP id ffacd0b85a97d-42e0f3491e2mr34996565f8f.28.1764699428016;
+        Tue, 02 Dec 2025 10:17:08 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-42e1ca1a3f1sm34529299f8f.28.2025.12.02.10.17.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Dec 2025 10:17:07 -0800 (PST)
+Date: Tue, 2 Dec 2025 21:17:03 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Frank Li <Frank.li@nxp.com>
+Cc: Jan Petrous <jan.petrous@oss.nxp.com>, s32@nxp.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linaro-s32@linaro.org
+Subject: Re: [PATCH 1/4] net: stmmac: s32: use the syscon interface
+ PHY_INTF_SEL_RGMII
+Message-ID: <aS8tH3VD9uxl56ah@stanley.mountain>
+References: <cover.1764592300.git.dan.carpenter@linaro.org>
+ <6275e666a7ef78bd4c758d3f7f6fb6f30407393e.1764592300.git.dan.carpenter@linaro.org>
+ <aS4W0M+ZkQzuUjtT@lizhi-Precision-Tower-5810>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aS4W0M+ZkQzuUjtT@lizhi-Precision-Tower-5810>
 
-On Tue, 2 Dec 2025 08:43:49 +0100 Jiri Pirko wrote:
-> Mon, Dec 01, 2025 at 10:49:54PM +0100, kuba@kernel.org wrote:
-> >On Mon, 1 Dec 2025 11:50:08 +0100 Jiri Pirko wrote:  
-> >> Correct. IFAIK there is one PF devlink instance per NUMA node.  
-> >
-> >You say "correct" and then disagree with what I'm saying. I said
-> >ports because a port is a devlink object. Not a devlink instance.  
+On Mon, Dec 01, 2025 at 05:29:36PM -0500, Frank Li wrote:
+> On Mon, Dec 01, 2025 at 04:08:20PM +0300, Dan Carpenter wrote:
+> > On the s32 chipset the GMAC_0_CTRL_STS register is in GPR region.
+> > Originally, accessing this register was done in a sort of ad-hoc way,
+> > but we want to use the syscon interface to do it.
 > 
-> Okay, you mean devlink_port. You would like to see NUMA node leg as
-> devlink_port? Having troubles to undestand exactly what you mean, lot of
-> guessing on my side. Probably I'm slow, sorry.
+> What's benefit by use syscon interface here? syscon have not much
+> well consided funcitonal abstraction.
 > 
-> But there is a PCI device per NUMA node leg. Not sure how to model it.
-> Devink instances have 1:1 relationship with bus devices.
-> 
-> Care to draw a picture perhaps?
-> 
-> >> The shared instance on top would make sense to me. That was one of
-> >> motivations to introduce it. Then this shared instance would hold
-> >> netdev, vf representors etc.  
-> >
-> >I don't understand what the shared instance is representing and how
-> >user is expect to find their way thru the maze of devlink instanced,
-> >for real bus, aux bus, and now shared instanced.  
-> 
-> Well, I tried to desrtibe it in the documentation path, Not sure what is
-> not clear :/
-> 
-> Nested devlinks expose the connections between devlink instances.
 
-To be clear -- I understand how you're laying things out. My point is
-not about that. My question is how can user make intuitive sense of this
-mess of random object floating around. Every SW engineering problem can
-be solved by another layer of abstraction, that's not the challenge. 
-The challenge is to design those layers so that they make intuitive
-sense (to people who don't spend their life programming against mlx FW
-interfaces).
+The GPR has a bunch of random registers that aren't really related.
+On these chips they're just regular MMIO registers, but in other
+configurations you can only access them using SCMI.
+
+It's better to group them together that's how they are in the hardware.
+Otherwise we'd end up randomly adding a register address to the
+ethernet device tree entry, but it's nicer to use a phandle to
+reference the GPR.
+
+The only register we're using now is the GMAC_0_CTRL_STS but here
+is the list of registers in the GPR.
+
+From 0x4007C000
+
+0  Software-Triggered Faults (SW_NCF)
+4  GMAC Control (GMAC_0_CTRL_STS)
+28 CMU Status 1 (CMU_STATUS_REG1)
+2C CMUs Status 2 (CMU_STATUS_REG2)
+30 FCCU EOUT Override Clear (FCCU_EOUT_OVERRIDE_CLEAR_REG)
+38 SRC POR Control (SRC_POR_CTRL_REG)
+54 GPR21 (GPR21)
+5C GPR23 (GPR23)
+60 GPR24 Register (GPR24)
+CC Debug Control (DEBUG_CONTROL)
+F0 Timestamp Control (TIMESTAMP_CONTROL_REGISTER)
+F4 FlexRay OS Tick Input Select (FLEXRAY_OS_TICK_INPUT_SELECT_REG)
+FC GPR63 Register (GPR63)
+
+Then from 0x4007CA00
+
+0  Coherency Enable for PFE Ports (PFE_COH_EN)
+4  PFE EMAC Interface Mode (PFE_EMACX_INTF_SEL)
+20 PFE EMACX Power Control (PFE_PWR_CTRL)
+28 Error Injection on Cortex-M7 AHB and AXI Pipe (CM7_TCM_AHB_SLICE)
+2C Error Injection AHBP Gasket Cortex-M7 (ERROR_INJECTION_AHBP_GASKET_CM7)
+40 LLCE Subsystem Status (LLCE_STAT)
+44 LLCE Power Control (LLCE_CTRL)
+48 DDR Urgent Control (DDR_URGENT_CTRL)
+4C FTM Global Load Control (FLXTIM_CTRL)
+50 FTM LDOK Status (FLXTIM_STAT)
+54 Top CMU Status (CMU_STAT)
+58 Accelerator NoC No Pending Trans Status (NOC_NOPEND_TRANS)
+90 SerDes RD/WD Toggle Control (PCIE_TOGGLE)
+94 SerDes Toggle Done Status (PCIE_TOGGLEDONE_STAT)
+E0 Generic Control 0 (GENCTRL0)
+E4 Generic Control 1 (GENCTRL1)
+F0 Generic Status 0 (GENSTAT0)
+FC Cortex-M7 AXI Parity Error and AHBP Gasket Error Alarm (CM7_AXI_AHBP_GASKET_ERROR_ALARM)
+
+From 4007C800
+
+4  GPR01 Register (GPR01)
+30 GPR12 Register (GPR12)
+58 GPR22 Register (GPR22)
+70 GPR28 Register (GPR28)
+74 GPR29 Register (GPR29)
+
+From 4007CB00
+
+4 WKUP Pad Pullup/Pulldown Select (WKUP_PUS)
+
+regards,
+dan carpenter
+
 
