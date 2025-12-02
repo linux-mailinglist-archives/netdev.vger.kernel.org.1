@@ -1,152 +1,128 @@
-Return-Path: <netdev+bounces-243134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243127-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC020C99CDE
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 02:52:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBEC8C99BCD
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 02:27:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 31EF34E2C5D
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 01:52:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0A2C3A4D8E
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 01:26:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F8121DE2C9;
-	Tue,  2 Dec 2025 01:51:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FE951CDFD5;
+	Tue,  2 Dec 2025 01:26:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="L2RL8h/0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail03.siengine.com (mail03.siengine.com [43.240.192.165])
+Received: from out203-205-221-192.mail.qq.com (out203-205-221-192.mail.qq.com [203.205.221.192])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8562B1EB5CE
-	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 01:51:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.240.192.165
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 525AC147C9B
+	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 01:26:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.192
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764640280; cv=none; b=KFaaE+glSpY+9YdgjVTVoaFgeWHKZcluBZLHz1DKpXkTnxt9HlTu9DFgltbwkMvX/ofVCp3MIVUrWV4VuFn7ORyy6fO9BlJsr/SAKhXaPS1GyBTTdC094rGZucN6DgE0T8Tlc//01H9UNgWKBxlkYIq200x25Z9JDDYj0qNhuDU=
+	t=1764638817; cv=none; b=gb3M+HfvyvCD9HsDD+etMt/98hfcd0L+r77Z/ayRJIEh5LSMe6knWaw8pQtINfryFQ5xgsW2d76wtcMyhgejSSm5AscEsfRRApyePaTsXclqL236b4vllpCXkGKeP4iKSIRvhj1n8UjdxH9vmrSiT+/hei/ZJ0GB9cOKs1N4pDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764640280; c=relaxed/simple;
-	bh=VIfGqIfpXLoJAz7hvPPvJWHOonux85R6g8kYnsR9WDE=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=HZO0qlwo+0Xn15aHKZbB7Uxpjr7OVreQyf12tJ6IfeFS17itxZQOWhzm8PKt+63CkAh/aAd+b3t+4qAymyBXuNxn1/3LKZLr6q8QSUmNGMwG1uTA7vNqoKN1b6zTtdcO2XqGE8RDCTiolejpIThyckYtI5KUimNHXyK6/pUXiLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=siengine.com; spf=pass smtp.mailfrom=siengine.com; arc=none smtp.client-ip=43.240.192.165
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=siengine.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=siengine.com
-Received: from mail03.siengine.com (localhost [127.0.0.2] (may be forged))
-	by mail03.siengine.com with ESMTP id 5B21Puq3029461
-	for <netdev@vger.kernel.org>; Tue, 2 Dec 2025 09:25:56 +0800 (+08)
-	(envelope-from hailong.fan@siengine.com)
-Received: from dsgsiengine01.siengine.com ([10.8.1.61])
-	by mail03.siengine.com with ESMTPS id 5B21OaiF029191
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-	Tue, 2 Dec 2025 09:24:36 +0800 (+08)
-	(envelope-from hailong.fan@siengine.com)
-Received: from SEEXMB03-2019.siengine.com (SEEXMB03-2019.siengine.com [10.8.1.33])
-	by dsgsiengine01.siengine.com (SkyGuard) with ESMTPS id 4dL31G0TrJz5pX1;
-	Tue,  2 Dec 2025 09:22:58 +0800 (CST)
-Received: from SEEXMB03-2019.siengine.com (10.8.1.33) by
- SEEXMB03-2019.siengine.com (10.8.1.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.2.1748.39; Tue, 2 Dec 2025 09:24:35 +0800
-Received: from SEEXMB03-2019.siengine.com ([fe80::23e0:1bbb:3ec9:73fe]) by
- SEEXMB03-2019.siengine.com ([fe80::23e0:1bbb:3ec9:73fe%16]) with mapi id
- 15.02.1748.039; Tue, 2 Dec 2025 09:24:35 +0800
-From: =?utf-8?B?RmFuIEhhaWxvbmcv6IyD5rW36b6Z?= <hailong.fan@siengine.com>
-To: Eric Dumazet <edumazet@google.com>,
-        "2694439648@qq.com"
-	<2694439648@qq.com>
-CC: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "mcoquelin.stm32@gmail.com"
-	<mcoquelin.stm32@gmail.com>,
-        "alexandre.torgue@foss.st.com"
-	<alexandre.torgue@foss.st.com>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        "linux-stm32@st-md-mailman.stormreply.com"
-	<linux-stm32@st-md-mailman.stormreply.com>,
-        "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-        "inux-kernel@vger.kernel.org"
-	<inux-kernel@vger.kernel.org>
-Subject: =?utf-8?B?5Zue5aSNOiBbUEFUQ0hdIG5ldDogc3RtbWFjOiBNb2RpZnkgdGhlIGp1ZGdt?=
- =?utf-8?Q?ent_condition_of_"tx=5Favail"_from_1_to_2?=
-Thread-Topic: [PATCH] net: stmmac: Modify the judgment condition of "tx_avail"
- from 1 to 2
-Thread-Index: AQHcYm4w5U5uVlzf+UqD24zBtjcj6LUMLvyAgAFf1+A=
-Date: Tue, 2 Dec 2025 01:24:35 +0000
-Message-ID: <addd14c84f164e4e90e35e8dc4121dd4@siengine.com>
-References: <tencent_22959DC8315158E23D77C14B9B33C97EA60A@qq.com>
- <CANn89iLW+68YE9s9dChEcQYbmwXSBzWRPzFH50+--Kw3XNZXEQ@mail.gmail.com>
-In-Reply-To: <CANn89iLW+68YE9s9dChEcQYbmwXSBzWRPzFH50+--Kw3XNZXEQ@mail.gmail.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1764638817; c=relaxed/simple;
+	bh=jtZSYvYvxHMQ42/AgIoOO5SoV9XaVZjPWtOcpJAia2E=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=aWl0hgegWLM9niHFYQrS9B1aWV5qhJyUsDi9aAwZKB8REbIaNQTy+RSmKHcoHbTgsSEDmZSCOMDGQPXiMwmim7inMboJqV1nmwtL5RDXwjdDlovnDMWjhh8/VhBB0EW6PG+0IYEC0KccF4qfum3DMq5vuHyfpKBpivN/3LxO7nU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=L2RL8h/0; arc=none smtp.client-ip=203.205.221.192
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1764638812; bh=CaYtSrdTuY3LdNTkqnJne197fCiBenWiXbiINPfbnG0=;
+	h=From:To:Cc:Subject:Date;
+	b=L2RL8h/05ordF0lbp4JtfCJ3T68yJkG73bXzxH8s85dsnAE1JNcafMte68HSeDUzB
+	 w0QPGGqZ1gsS1wpvieMslgoP0kIM51dY77oHPERYeKuvoRXh+q/tP/oGT81nk2c2mN
+	 iE2eDkwfap+xXaD8LnRykf0iJcBJQR0vRoLUpDFA=
+Received: from localhost ([58.246.87.66])
+	by newxmesmtplogicsvrszc50-0.qq.com (NewEsmtp) with SMTP
+	id 66917EC1; Tue, 02 Dec 2025 09:25:41 +0800
+X-QQ-mid: xmsmtpt1764638741tk6h6a860
+Message-ID: <tencent_A2BE4EE4983E2DD19E67E0D5CC6564D1D309@qq.com>
+X-QQ-XMAILINFO: MCBrDuJrLGvm96QTQNCSgt319yUPHNDEBL/hOoPTn9fw3IHsad4deE7X/dXCDq
+	 rMPe/We7COAK9awPn+nMofPiTvd5ovxyZGYoImBFw/uzZPqMbzDAqXKt0crK1ux6UsLLRt8kPhtm
+	 CEJaNt6D5+uu8R3EcPb6ak//tiNaw+4VwREa0jpKiT01sIFRhIL+CZKZsePnn5LoeAm0lK40w4Ff
+	 XTV6EP/Lqzt5kJeNjLj9zl2S0xGA+l+mRFg6kXo1PwVm/bYZJuEfEDYXhBK5YXaiSo7HYwkvXjfN
+	 sQk5LHimThmfUwnqm8N5IvPkdoUHet5nm3PNXTBi8HCNm2T48y/92lyV2lzMJeVCD/r4ANk2SXoE
+	 xtazQaCuMrCjj1Yho77mSnZKZh1O/FTqW7ogGZK6VJVRPG/YzL2v1US5TIOAkcHxDH9kUJ9wFqTF
+	 qjV5tAEtpwjEp4Wrh87e2mWLTcXkVechEIvmpbnfOPxFpWUShO2Jt0zTEi7y2gXZjLW2WJbb+OuO
+	 SUxo7AEF25rYaotyNjsS3ouh9MUAgj7sZ7dT16FVkEKHqcj0n3b3QMrsVftxC5tAv+GQt5Hn2FIR
+	 Br6Av3r0rYyG2Q3z5Hk43McSy27deBWAdhUd0Ur2owEuOnJ3aH9MempwI69CH2IGYtwBVjwcfoyr
+	 jzIkYahOCn4EmqE+J5Gn936g07QsDsX0o7+zNrxSEb4XwHM63DHjk/Eqygaehl3QQN/Dp+/ddGPo
+	 VIf2V+yKxXiEr94Dn+0kj5aCh95K8/VNeUN8xMeNF/6TQTRrbf8KZpRxBuUFnFDMZLTjgiSyy7u2
+	 ttd+KHu3O1a6PJ3N7f0XvXTzWpjqzgVoe7jX1M9GbMa/oElFFGo5z0wnzGGsdnxR0DuwMftixUNM
+	 /NfXcesW+FYhcNVlhRdPetDqlr3dEZRWxxWxDvbAiZwLphpwcC19DX96SHMubuz7KbfBt5R1TQBh
+	 hnP5y8h4oUkLcZnEGueqxUVVCbyczZ
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
+From: 2694439648@qq.com
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com,
+	hailong.fan@siengine.com
+Cc: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	inux-kernel@vger.kernel.org
+Subject: [PATCH v1] net: stmmac: Modify the judgment condition of "tx_avail" from 1 to 2
+Date: Tue,  2 Dec 2025 09:25:39 +0800
+X-OQ-MSGID: <84d25646b6651dd52fcecd9036a877b0069b806e.1764638311.git.hailong.fan@siengine.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-DKIM-Results: [10.8.1.61]; dkim=none;
-X-DNSRBL: 
-X-SPAM-SOURCE-CHECK: pass
-X-MAIL:mail03.siengine.com 5B21Puq3029461
+Content-Transfer-Encoding: 8bit
 
-SGkgRXJpYw0KDQpZb3UgYXJlIHJpZ2h0LCBJIHdpbGwgZm9sbG93IHlvdXIgYWR2aWNlIHRvIG1v
-ZGlmeSB0aGUgcmVsZXZhbnQgY29kZS4NCg0KUmVnYXJkcw0KSGFpbG9uZw0KDQoNCi0tLS0t6YKu
-5Lu25Y6f5Lu2LS0tLS0NCuWPkeS7tuS6ujogRXJpYyBEdW1hemV0IDxlZHVtYXpldEBnb29nbGUu
-Y29tPiANCuWPkemAgeaXtumXtDogMjAyNeW5tDEy5pyIMeaXpSAyMDoyMQ0K5pS25Lu25Lq6OiAy
-Njk0NDM5NjQ4QHFxLmNvbQ0K5oqE6YCBOiBhbmRyZXcrbmV0ZGV2QGx1bm4uY2g7IGRhdmVtQGRh
-dmVtbG9mdC5uZXQ7IGt1YmFAa2VybmVsLm9yZzsgcGFiZW5pQHJlZGhhdC5jb207IG1jb3F1ZWxp
-bi5zdG0zMkBnbWFpbC5jb207IGFsZXhhbmRyZS50b3JndWVAZm9zcy5zdC5jb207IEZhbiBIYWls
-b25nL+iMg+a1t+m+mSA8aGFpbG9uZy5mYW5Ac2llbmdpbmUuY29tPjsgbmV0ZGV2QHZnZXIua2Vy
-bmVsLm9yZzsgbGludXgtc3RtMzJAc3QtbWQtbWFpbG1hbi5zdG9ybXJlcGx5LmNvbTsgbGludXgt
-YXJtLWtlcm5lbEBsaXN0cy5pbmZyYWRlYWQub3JnOyBpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5v
-cmcNCuS4u+mimDogUmU6IFtQQVRDSF0gbmV0OiBzdG1tYWM6IE1vZGlmeSB0aGUganVkZ21lbnQg
-Y29uZGl0aW9uIG9mICJ0eF9hdmFpbCIgZnJvbSAxIHRvIDINCg0KT24gU3VuLCBOb3YgMzAsIDIw
-MjUgYXQgNjo1N+KAr1BNIDwyNjk0NDM5NjQ4QHFxLmNvbT4gd3JvdGU6DQo+DQo+IEZyb206ICJo
-YWlsb25nLmZhbiIgPGhhaWxvbmcuZmFuQHNpZW5naW5lLmNvbT4NCj4NCj4gICAgIFVuZGVyIGNl
-cnRhaW4gY29uZGl0aW9ucywgYSBXQVJOX09OIHdpbGwgYmUgdHJpZ2dlcmVkDQo+ICAgICBpZiBh
-dmFpbCBlcXVhbHMgMS4NCj4NCj4gICAgIEZvciBleGFtcGxlLCB3aGVuIGEgVkxBTiBwYWNrZXQg
-aXMgdG8gc2VuZCwNCj4gICAgIHN0bW1hY192bGFuX2luc2VydCBjb25zdW1lcyBvbmUgdW5pdCBv
-ZiBzcGFjZSwNCj4gICAgIGFuZCB0aGUgZGF0YSBpdHNlbGYgY29uc3VtZXMgYW5vdGhlci4NCj4g
-ICAgIGFjdHVhbGx5IHJlcXVpcmluZyAyIHVuaXRzIG9mIHNwYWNlIGluIHRvdGFsLg0KPg0KPiBT
-aWduZWQtb2ZmLWJ5OiBoYWlsb25nLmZhbiA8aGFpbG9uZy5mYW5Ac2llbmdpbmUuY29tPg0KPiAt
-LS0NCj4gIGRyaXZlcnMvbmV0L2V0aGVybmV0L3N0bWljcm8vc3RtbWFjL3N0bW1hY19tYWluLmMg
-fCAyICstDQo+ICAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKyksIDEgZGVsZXRpb24oLSkN
-Cj4NCj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvbmV0L2V0aGVybmV0L3N0bWljcm8vc3RtbWFjL3N0
-bW1hY19tYWluLmMgDQo+IGIvZHJpdmVycy9uZXQvZXRoZXJuZXQvc3RtaWNyby9zdG1tYWMvc3Rt
-bWFjX21haW4uYw0KPiBpbmRleCA3YjkwZWNkM2EuLmI1NzUzODRjZCAxMDA2NDQNCj4gLS0tIGEv
-ZHJpdmVycy9uZXQvZXRoZXJuZXQvc3RtaWNyby9zdG1tYWMvc3RtbWFjX21haW4uYw0KPiArKysg
-Yi9kcml2ZXJzL25ldC9ldGhlcm5ldC9zdG1pY3JvL3N0bW1hYy9zdG1tYWNfbWFpbi5jDQo+IEBA
-IC00NTI5LDcgKzQ1MjksNyBAQCBzdGF0aWMgbmV0ZGV2X3R4X3Qgc3RtbWFjX3htaXQoc3RydWN0
-IHNrX2J1ZmYgKnNrYiwgc3RydWN0IG5ldF9kZXZpY2UgKmRldikNCj4gICAgICAgICAgICAgICAg
-IH0NCj4gICAgICAgICB9DQo+DQo+IC0gICAgICAgaWYgKHVubGlrZWx5KHN0bW1hY190eF9hdmFp
-bChwcml2LCBxdWV1ZSkgPCBuZnJhZ3MgKyAxKSkgew0KPiArICAgICAgIGlmICh1bmxpa2VseShz
-dG1tYWNfdHhfYXZhaWwocHJpdiwgcXVldWUpIDwgbmZyYWdzICsgMikpIHsNCj4gICAgICAgICAg
-ICAgICAgIGlmICghbmV0aWZfdHhfcXVldWVfc3RvcHBlZChuZXRkZXZfZ2V0X3R4X3F1ZXVlKGRl
-diwgcXVldWUpKSkgew0KPiAgICAgICAgICAgICAgICAgICAgICAgICBuZXRpZl90eF9zdG9wX3F1
-ZXVlKG5ldGRldl9nZXRfdHhfcXVldWUocHJpdi0+ZGV2LA0KPiAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgDQo+IHF1ZXVlKSk7
-DQoNCkRyaXZlcnMgc2hvdWxkIHN0b3AgdGhlaXIgcXVldWVzIGVhcmxpZXIuDQoNCk5FVERFVl9U
-WF9CVVNZIGlzIGFsbW9zdCBhbHdheXMgd3JvbmcuDQoNCmRpZmYgLS1naXQgYS9kcml2ZXJzL25l
-dC9ldGhlcm5ldC9zdG1pY3JvL3N0bW1hYy9zdG1tYWNfbWFpbi5jDQpiL2RyaXZlcnMvbmV0L2V0
-aGVybmV0L3N0bWljcm8vc3RtbWFjL3N0bW1hY19tYWluLmMNCmluZGV4IDdiOTBlY2QzYTU1ZTYw
-MDQ1OGIwYzg3ZDYxMjU4MzE2MjZmNDY4M2QuLjZkY2M3Yjg0YTg3NTk3NjNiNjQ3MWE0OGE2Yzgw
-YjFmMTdjZDkzN2MNCjEwMDY0NA0KLS0tIGEvZHJpdmVycy9uZXQvZXRoZXJuZXQvc3RtaWNyby9z
-dG1tYWMvc3RtbWFjX21haW4uYw0KKysrIGIvZHJpdmVycy9uZXQvZXRoZXJuZXQvc3RtaWNyby9z
-dG1tYWMvc3RtbWFjX21haW4uYw0KQEAgLTQ2NzUsNyArNDY3NSw3IEBAIHN0YXRpYyBuZXRkZXZf
-dHhfdCBzdG1tYWNfeG1pdChzdHJ1Y3Qgc2tfYnVmZiAqc2tiLCBzdHJ1Y3QgbmV0X2RldmljZSAq
-ZGV2KQ0KICAgICAgICAgICAgICAgIHByaW50X3BrdChza2ItPmRhdGEsIHNrYi0+bGVuKTsNCiAg
-ICAgICAgfQ0KDQotICAgICAgIGlmICh1bmxpa2VseShzdG1tYWNfdHhfYXZhaWwocHJpdiwgcXVl
-dWUpIDw9IChNQVhfU0tCX0ZSQUdTICsgMSkpKSB7DQorICAgICAgIGlmICh1bmxpa2VseShzdG1t
-YWNfdHhfYXZhaWwocHJpdiwgcXVldWUpIDw9IChNQVhfU0tCX0ZSQUdTICsgDQorIDIpKSkgew0K
-ICAgICAgICAgICAgICAgIG5ldGlmX2RiZyhwcml2LCBodywgcHJpdi0+ZGV2LCAiJXM6IHN0b3Ag
-dHJhbnNtaXR0ZWQgcGFja2V0c1xuIiwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgX19mdW5j
-X18pOw0KICAgICAgICAgICAgICAgIG5ldGlmX3R4X3N0b3BfcXVldWUobmV0ZGV2X2dldF90eF9x
-dWV1ZShwcml2LT5kZXYsIHF1ZXVlKSk7DQo=
+From: "hailong.fan" <hailong.fan@siengine.com>
+
+    Under certain conditions, a WARN_ON will be triggered
+    if avail equals 1.
+
+    For example, when a VLAN packet is to send,
+    stmmac_vlan_insert consumes one unit of space,
+    and the data itself consumes another.
+    actually requiring 2 units of space in total.
+
+    ---
+    V0-V1:
+       1. Stop their queues earlier
+
+Signed-off-by: hailong.fan <hailong.fan@siengine.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 7b90ecd3a..738a0c94d 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -4529,7 +4529,7 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		}
+ 	}
+ 
+-	if (unlikely(stmmac_tx_avail(priv, queue) < nfrags + 1)) {
++	if (unlikely(stmmac_tx_avail(priv, queue) < nfrags + 2)) {
+ 		if (!netif_tx_queue_stopped(netdev_get_tx_queue(dev, queue))) {
+ 			netif_tx_stop_queue(netdev_get_tx_queue(priv->dev,
+ 								queue));
+@@ -4675,7 +4675,7 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		print_pkt(skb->data, skb->len);
+ 	}
+ 
+-	if (unlikely(stmmac_tx_avail(priv, queue) <= (MAX_SKB_FRAGS + 1))) {
++	if (unlikely(stmmac_tx_avail(priv, queue) <= (MAX_SKB_FRAGS + 2))) {
+ 		netif_dbg(priv, hw, priv->dev, "%s: stop transmitted packets\n",
+ 			  __func__);
+ 		netif_tx_stop_queue(netdev_get_tx_queue(priv->dev, queue));
+-- 
+2.34.1
+
 
