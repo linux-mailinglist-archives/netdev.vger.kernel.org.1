@@ -1,284 +1,232 @@
-Return-Path: <netdev+bounces-243139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07F29C99EB7
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 03:53:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB7D5C99EC3
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 03:54:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCF953A5029
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 02:53:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93C793A502B
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 02:54:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A376276046;
-	Tue,  2 Dec 2025 02:52:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A966244685;
+	Tue,  2 Dec 2025 02:54:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dYoZ5Kro"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e8oxVEEw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E81921D3C5;
-	Tue,  2 Dec 2025 02:52:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764643976; cv=fail; b=ubeQ7EjuzfLm/ms9Xn050xnbjVQB/Rc7a1wTtKw2ACYT7SlTMp3tcvukVrbC0vlNZpKL3nYxbDnW89RffscW/6zT0h7LGDJrxD7sKfMSKgSxV33iMZLbdQcD4diaU6cyJTXY5HcqYLKZ0uVfrJXmK/PhvwXI1REeDRcke2VlniE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764643976; c=relaxed/simple;
-	bh=jg1l0ebHecXqfktTzT+o/EpG/KPwMnIE0OFXRy3sTus=;
-	h=From:Date:To:CC:Message-ID:In-Reply-To:References:Subject:
-	 Content-Type:MIME-Version; b=jDpoHJjd55ibF6mDci36NGHbaaBYMV13w6hqr190rquQdURmDF1p6zGL7LzLj3r+SBk5SFy8+uQhOIu2LwC6n47yg4vJa4vBqVMz9d52pjXvqxib/Sa+54SpR/zHpM+LxevHsMPeoVhV/ZaqLcX0W4YTbe2/KSOU83jaRd6OTPM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dYoZ5Kro; arc=fail smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764643973; x=1796179973;
-  h=from:date:to:cc:message-id:in-reply-to:references:
-   subject:content-transfer-encoding:mime-version;
-  bh=jg1l0ebHecXqfktTzT+o/EpG/KPwMnIE0OFXRy3sTus=;
-  b=dYoZ5KroZFrcpmUHnFQmAFjxZT4fwZAsYwLGBFvzZJWAH2t4/E4SJSGT
-   N8LEwGT4vFj3yhoxo7xyEHbCoTOaMEk3+/fsxvQPEne6uQ7fEPveDAMYE
-   xqDsE44AyMT3ImDm++/20F4dfiE4F/1lTx6PDX5/VTaXdGSZkTs0i9suv
-   mWIOtdamWzOBF5imIx+f/veNVQCQ4aiZAaLeQtL8xquzWTCHjEM9qORO1
-   Od4XdjtDdPCGBFiuaMVWzhY0a+wnmjP2IFG2HQ4Xn4eXl0cl+o9JAJdnp
-   pdOd8p4P/bUNaigIWvtzA5KLX7WbM71GXxe+Qh10abWNqqsvSIayRh9Ya
-   g==;
-X-CSE-ConnectionGUID: T7l8ZYIzRhSyT2Q6P1ltJA==
-X-CSE-MsgGUID: cSOMBwkFTXWnVBJXWjs34A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11630"; a="66766906"
-X-IronPort-AV: E=Sophos;i="6.20,241,1758610800"; 
-   d="scan'208";a="66766906"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2025 18:52:53 -0800
-X-CSE-ConnectionGUID: zfWkbpQ2RCqJ68p4rp9J4Q==
-X-CSE-MsgGUID: BWWi0bTRRCGJqRrvVCdoXw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,241,1758610800"; 
-   d="scan'208";a="198450036"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2025 18:52:53 -0800
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Mon, 1 Dec 2025 18:52:52 -0800
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29 via Frontend Transport; Mon, 1 Dec 2025 18:52:52 -0800
-Received: from SJ2PR03CU001.outbound.protection.outlook.com (52.101.43.47) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Mon, 1 Dec 2025 18:52:51 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Uk9IJ4vo++ntth1Ag5FZGqOHTUSt/wmK+bN8TX2vBFu2MvoOOisVpmx7c+Jorh+YW7QRN5wZRq8SE4fnmdbvvlYFMi7pn4Z0YwG6cQxnVY0yyqLZ6X/PgSbW4l8u8VcKFmxTGfFYnmA3u0xPcan3xXw/6I2qcA+rGD9vrWjBR9hEg49yl2vijLI5+wj5ACtH6cpVxddaUNFq9uX+viZRf88a2BDfD84Uy7DyYyrUEO/hDYO8rwOgcGXAKcvSn3dgCYZLkE9V0YjMSUYcAzdiFYJ17fy6H4PKhz6mjix9CrRrRqaUxemO/HQU6/ANFv0WtPWAwOs2sDazazHT46+xTQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pDjCX5dmRQ/qoZQxCNOPlFc96+0oBT4o6Bsn7lKKz5k=;
- b=E144vNr1BQkZa0Fyg+hWkNP7wxzu5LEPpcLuA0O8A1y/wRhUE8GvK9svS6NvSYAoLtTkp/kWpMjAppLNIGwUwXCstNcvePMZQMOrnW1vlqKdeUjp5eLVNCKG2zoRnEeKWq4Bl+E4eegBls9RCQtl8FiZjblygP+OqKnv9yJbz9Q/pCE2M7/r7ww75rkn9lNl+c2PGJTgWMBZiCfcX+tDHop83ImH7PfvEOzgu4KnZTEdJffOUI6TgADMQhQoK9RqOOZCb7Ar97awGhKZVkDDxstPdV1J8Wmc6bRsJCc5vSQ1ckaeeGgu8QyKp+BT6NeM6sHs0LjsZp9sTAvLJxwipQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
- by DM3PR11MB8670.namprd11.prod.outlook.com (2603:10b6:0:3d::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9366.17; Tue, 2 Dec 2025 02:52:50 +0000
-Received: from PH8PR11MB8107.namprd11.prod.outlook.com
- ([fe80::1ff:1e09:994b:21ff]) by PH8PR11MB8107.namprd11.prod.outlook.com
- ([fe80::1ff:1e09:994b:21ff%4]) with mapi id 15.20.9366.012; Tue, 2 Dec 2025
- 02:52:50 +0000
-From: <dan.j.williams@intel.com>
-Date: Mon, 1 Dec 2025 18:52:48 -0800
-To: <alejandro.lucero-palau@amd.com>, <linux-cxl@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <dan.j.williams@intel.com>, <edward.cree@amd.com>,
-	<davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <dave.jiang@intel.com>
-CC: Alejandro Lucero <alucerop@amd.com>
-Message-ID: <692e54808af8d_261c11001@dwillia2-mobl4.notmuch>
-In-Reply-To: <20251119192236.2527305-2-alejandro.lucero-palau@amd.com>
-References: <20251119192236.2527305-1-alejandro.lucero-palau@amd.com>
- <20251119192236.2527305-2-alejandro.lucero-palau@amd.com>
-Subject: Re: [PATCH v21 01/23] cxl/mem: refactor memdev allocation
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BY1P220CA0003.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:a03:59d::10) To PH8PR11MB8107.namprd11.prod.outlook.com
- (2603:10b6:510:256::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA5B718A6DB
+	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 02:54:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764644070; cv=none; b=pDyoGaFS1yoOi4gVYCb2thrif6iarnZ2nHL7/tp6Y3zvF8ViTv3H7fgEHlHmn4usHQ9MqVEItOh7j+gOGcVv1dwYxWlyyh7dNCSBhXyRk4lComkuwgwyvH2psJxbemYnxplXmKufM7E2goq8xN9L9sVmIN3+sp9wkytIgv9hqjw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764644070; c=relaxed/simple;
+	bh=SjsHcrcR84GXyUGn6wceuAOJ+tCgCTDc0Nyf9HRtDx0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=L0R9dJqm5nFC15EnIjy+IN1BIb549Bf2Eo1/CZ1r2YtethDf1o7yxTI9bm5jzHU0fUeO2g67n4LXy3euvCpAkwoUbdLkfI4hdgsxNORmVt4MOrmyZVSITRANvjk6qTCbzqQU3Z7wc8o0fjm/XCIOqkHxdj+qzfeEod+IjdKjWZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e8oxVEEw; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4edf1be4434so33037811cf.1
+        for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 18:54:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764644067; x=1765248867; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=U3FBb66LhC69xzR90g1eNdryay2txh0Eg4xYtWgJK8o=;
+        b=e8oxVEEwWI5aKluYLjZW5LSCb0D+5qunTiiP4N//ZbCnzMVR10bP5h1LD4986AfyhU
+         8t0VBXsSTKgFNEYxzov72MzF06FJ3nZXdZ1s5VvFWOjIfRJY5DaRjjbwaawSJ/Kbog69
+         jlj8Y2yVKMMEXg6yjyemBtcmXpz7cErlhRFi1+f+9VvXotCNU9+xYj5vkk9VMAXU2vE+
+         Lh08u0acyXKeQZNtg25slQZR0AQ4ctcHEYtzejRdQErDRPj9mrugTK8Fdgh4N9QT2OwH
+         ihaIxsFOcVyb55CHPWIVYdmVWWNoo2bKKLpkkNVETDDoJTExAsuLG21NLf9vauvG0RsD
+         wF+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764644067; x=1765248867;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=U3FBb66LhC69xzR90g1eNdryay2txh0Eg4xYtWgJK8o=;
+        b=XJofDxUhstotUMlsNsr8mASKyE2swVXNq9uXQJw7wdRhiZFnaXZG4M4vV8Hmdt53f0
+         EeSiXSCaAgMFNqojiyI3dKNpxBuZaReX/ufFH+QFHxaXlMmJL80qvRE3KXDRBR17lgwK
+         OJsKi/Pykciq+b7FBtmr0fyhv1QA8xQhY+/BZiE1E/M8eWnupWuYYH/aY0Vgq3XpKn4t
+         eaI9bVBnoTL4FUv6Tt9MrUhFbnzx+oOwUPiGVUlnMNEnxgbpzqnXv8fFY8yGMwQPDRj6
+         SD3oP56DkeG/X40jE0ehG4uhf5spXg79R+YdgkYf1me831TXf0L6MMKxIcg9qWoc7Zzs
+         oBuQ==
+X-Gm-Message-State: AOJu0YwWWDj/z/APd2KNIKTgF+2WpmSMq/4+qMwU60LqB64bDr8hMFZ1
+	1GdKSXt4SgJBP6zmAPgzUo3oDGytVqNWscJller9T9SRL89YbS/B7sxp+bm9z2m2
+X-Gm-Gg: ASbGncu4FQLsL/8feCwIeZFFIzp4J4/1Iu4zgh02mzJba/AIijsMe60csFUkQ2+C55+
+	9hn63ETi1nSh3cM0NNGz9pmXgYhXZ53MsePp9scS6O+3tQSwWhU+KqS/hTsrzQ9wXyiUYfHeNVr
+	LdCs5Z6N8Uwn+n3ci1pB6qjEHxl8a8GDs68+MoJoY6RfFm73Fq/uk/fpHZrhpXts9MGh8Cpu6Ce
+	ZzaFaMCYNdskg0rxM7y/2yP9YrsM+kGDU8iQc68k9gYnvXlSRh2+EymMH22J8WLbuTPvU4ZlPxb
+	FPW3+Pc9C1OE4TH3pu1bpKimmiLI86lm/y0YsKHSrMchQf+qKFVE1eruvqXJmDeNM86ddfvFFXs
+	6POTjE9524H3xTPypen+3BOktVsMFwvTIrZGTgs3J0TdUzMBlyXyGqr6PFoYQsfJxwElDNGC14D
+	n6saAcGnyj7ZE+pNZT0VyLHEaCd/DXIcDklzIZXrqL7hiUc+abr1/Dd5R2oWFZh6Ljok923spe/
+	RM=
+X-Google-Smtp-Source: AGHT+IF1Y26tarkgHugZ4zAMvf/99cbk/6HuQ3PbtQTRf5s5WQrWhUrkganAuIBkyYpvOL7fPVmVdQ==
+X-Received: by 2002:a05:622a:295:b0:4ed:b448:b19f with SMTP id d75a77b69052e-4efbdad012amr355218281cf.51.1764644067186;
+        Mon, 01 Dec 2025 18:54:27 -0800 (PST)
+Received: from localhost.localdomain (h69-131-24-92.cntcnh.broadband.dynamic.tds.net. [69.131.24.92])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4efd344a188sm88508641cf.33.2025.12.01.18.54.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Dec 2025 18:54:26 -0800 (PST)
+From: Jie Zhang <jzhang918@gmail.com>
+X-Google-Original-From: Jie Zhang <jie.zhang@analog.com>
+To: netdev@vger.kernel.org
+Cc: Jie Zhang <jzhang918@gmail.com>,
+	Jie Zhang <jie.zhang@analog.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Furong Xu <0x1207@gmail.com>,
+	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] net: stmmac: fix oops when split header is enabled
+Date: Mon,  1 Dec 2025 21:54:16 -0500
+Message-ID: <20251202025421.4560-1-jie.zhang@analog.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|DM3PR11MB8670:EE_
-X-MS-Office365-Filtering-Correlation-Id: 88f21efc-10e9-4b53-57f8-08de314de18d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024|921020;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?Q3dkM01iT0U4WkZCbWhqRGh6VTB2Tlk0d1ZwdGYwamhNelJ0djg1djFuaXdp?=
- =?utf-8?B?K3FNNWUyeFFYNnE3SGdTSjVRK2pSUFgvVmdSNFBWcVdianRscUhmdm9tWUFy?=
- =?utf-8?B?RW9LTTZrZlRoVWFReGlxRXhKcVpJNGpCOTY4bkc2RE15eXFFZDIvNGZjT1Fk?=
- =?utf-8?B?OHp2d2F1N0xGYmYxYS9vNWxMeHRkOGgxT25RODVSZC9OcHdpUEY5MFFRQ1hU?=
- =?utf-8?B?aEo2MmR1TTZoSHNKWFVoYWFyYnh5MFJpeE45T01YSVZKQU5XMlVHeXRSVGtt?=
- =?utf-8?B?YjZuVENhNEx4Q2U3dE9hb1lObW9KSTlrV2VpTE5XS0gwV2ttcWUrdU85amt1?=
- =?utf-8?B?UW9yYnNsdUJwbTZOejBlU1VRSEpJQWxjUjhzZkFZNzErUTJ6TVBFRkFVRUJs?=
- =?utf-8?B?YTBXbG03TnFja1cvdWh5T09zcWYvYkxCLzgybTVPNEdzY25QRWI4K2FBT1ZD?=
- =?utf-8?B?engxaU9oT2Q5RFBKN0MwendyZGJVTzFNSzhjajQ4YzBsaXFrTldjaHpMdE9a?=
- =?utf-8?B?Qmx6dU1kQnJFVkNOU2ljZ05saXR0WUYwSDZLekN1Z243QTFZY2cyQjdsZ3Iv?=
- =?utf-8?B?M0xWV1N2K0JCZWhSZmJITlhwUHRrRVZLSFZOZlpqdDFkc1VpcEh0UVY3L1Zt?=
- =?utf-8?B?M2trdk5xaWg2QVJEVlEzQ3E0LzNwaUlMM3BnMXVsZytnMUVJZ2RhMnM1Zk5s?=
- =?utf-8?B?WVAwajV3QklDbHk2Sy82Q3VzRHplSU14REovZkRmdnc4L0g1dXEzSHBjWE1X?=
- =?utf-8?B?N0l5OTBqK3BOUTB1VzR5dWVodm9tbG5EQnh2YVFjVGRMQlAvRFBWVGhQM0ov?=
- =?utf-8?B?OGhlRWl5UXFsRzVUOVMyTjI0Y1J5N0xJS2ZWb2tnSFlCMUo3S3NPcXpQN3Jq?=
- =?utf-8?B?QTVjQnpnQ0MwdW1qbU1aUWtZazFKUy8rQmJVQUhQU1A3Wnc0SGZqVzNYbDNl?=
- =?utf-8?B?NHJhR3ZGSXQzSUdFNjZTY3RHdlJrQmIrU1RvQW9nWUVJWExRcmdBTkFCaXVG?=
- =?utf-8?B?bklJQ1gwdmJ2TnZPaWU4c3ZjRFBPSWUzVlk5MVVUUjBKYzlxV0FRMWhTY3NY?=
- =?utf-8?B?eVcvVldrRzBHU2xkVjgzWWpZS21Ca1BwUGRUZlFuUXdGbklhdGkzRUwvRG9U?=
- =?utf-8?B?ZFFWbnZaRG85UXB1Y2JVTlVGOGl1OVJ4UmRGVm8wdkxuM0tCbXpKOU9aZjA3?=
- =?utf-8?B?N2ZZOVRZZlR2REF1ZmQ3eHpwajhTV0VDaGg4bUNnL3NoK0hKck9lMEM2aWhx?=
- =?utf-8?B?bWlMUEFySE14enZybm9wa2QvL2lWOTAxL1RzRXdTVUx6ZFo0NHRMZHVoc1hN?=
- =?utf-8?B?QkhrYXdKSGpsMkJoRE5ZcHN2bjV0S2xhUUV1U21wSDBrUmYvbnFUQjdLdnJD?=
- =?utf-8?B?ejV3TVRxVS8yS3A4UVlIVXhpUUxaTC8wMkM1YW1VM1NFODBWcHljYmFSZW9z?=
- =?utf-8?B?THJNWGNRYU5hQ2RzRlRhY1FkNC85Q2dhellGNFpLWVpxaGRpRnp3dTZLczI4?=
- =?utf-8?B?ekxGaVhjU3JZYjdFd2hOTlpZbFgzRkgrbkl1UC9UQVF6aStXMXRacDJtanho?=
- =?utf-8?B?KzdXZVFOK1g2WndUMVd6WnJyWTk0YnVXa1B2VEduaWJxT2FWUkswd1RMWWdw?=
- =?utf-8?B?azVBUXdrZFN0ZHRWd2RkSjNiYlk0QXZuYWNmK1lwUksvQmZzNWFFMk8xU3Fy?=
- =?utf-8?B?SHhWTVlQRDcwaTdaamRUdzhnUmszbXpNUEUwN2xrMjJXaVIzVC9kVlBQaGU1?=
- =?utf-8?B?dWZIT2ZJbUNuVjltK3F3cDJGTVJLbnB3M1RqYjd1c0dsck1vZnVySm5YUDdt?=
- =?utf-8?B?SnBpWUtqb3NuK0dESitDRS9QdlhmYlpTOW9Kem1wUnRPNWhlbkxYQmhJSzAr?=
- =?utf-8?B?WFZ3aUZGdTlXWGZTN1duNno5aUtkVXNZM09nYVF6YWdiTkZPRkZ6b1RpTTlm?=
- =?utf-8?B?eHhVZTdMcEhuTzV0RGsrZkhtYXpPcGJzS0dTMjRCSE5rOUdwY0NVbCtPcG1a?=
- =?utf-8?B?MDFmbDhuNWlMcWx3cmhUZjhRUUVGQlZ6YWhoTk8rVDVqK3lxdXNkLzhZTm5E?=
- =?utf-8?Q?dOLyhY?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?M0Mrekk5VDVFWWE0SDZNZzNndnk1aEZ1dklWY3gyandveUZ5eW5FYXdkUktv?=
- =?utf-8?B?SnZvNTZIL0x1Y1U0aFBpbDNoTWI1VjNvQ1BzbWR5OHhpbjVPUGZvRkxEOWU3?=
- =?utf-8?B?eHk1OTMxU2RoWmROQkorcGVIZld5MlNvdEQ0aGJLT2duazZ0bHh3bUxWZDdj?=
- =?utf-8?B?b0VMeW1xek1vNkxyT2owa0ZidkkwTGcwOUF4S3pGai81bkVHMFM0dnRJTC9q?=
- =?utf-8?B?dERGbW1IUnpKdC9TMStDSGJ6TkFybzh3ZU96UndURzY4SzBEYzcvSmdjVVhy?=
- =?utf-8?B?ZzJlOXdVellJdWdDb2VVM1M0TE44N2hRQlVveDBJVFB0T2JIdHpzZGlZV0VB?=
- =?utf-8?B?Yk1tckR5UGxOcUpPQnQ0WkVGdVZJeTd2bFV3cE5vcW9SQjlwamJVNTN4MmxI?=
- =?utf-8?B?dFgyeWV4OXB0Mzk1cmxWalNFV2Via0R3YTcxTTRKUGxOdy9hMGdZNGNzWnNG?=
- =?utf-8?B?Q3pXcFZlSW5uVG5XR1N0NjJFbk1ZMmFuWFBzajNBNzYvZzdkMUpPbUxtRDVS?=
- =?utf-8?B?Si9VWGN5UXNxL2tNSGtIRFBzWDJUS3d5TmNHbGJwZVZCWm1ENEZtWTVoaFZO?=
- =?utf-8?B?dFFiRWJ4aXhDZ1FrOEtHcXY4ajRuWGNyNmUyYitlSjloMithbjJodzdvRm92?=
- =?utf-8?B?WWNEa1VtRjVKSzF4OFpNSjZNWkRJRlZBa3ovTGpPWGJIa0VWQzZDU0cwSTV1?=
- =?utf-8?B?ZGU4bklSdnRpaENwc1lPVHo2RSsyUGkveXpDaDEzK2tvS1lZVVh6SlVVRDJC?=
- =?utf-8?B?VTFWZjZWZ2xLSkVwNzNZZm53VkM5UFljYmNIcktnNG85NW9wMWIvaGNDaitZ?=
- =?utf-8?B?QXNoNktvcEhGSlFXbElIRy9pZ3ZTci9DVVVGR1Y2Mlh1eE1wUE4rTnJzR0Fn?=
- =?utf-8?B?WjJNemJDU1g4eXZ4aE9GTm1sMUxRNWVGKzc2ditWZFVCcWl1WSt4ZHRYZmRV?=
- =?utf-8?B?SlB5Q212OWk3YzhXSDVoWTdOREp1UXVtQUpJMW5UbnpoYVlwM1JHYUJ6VFky?=
- =?utf-8?B?ODdudHY1ckJTazBIQ1lkK0pWZFhlcVFwRFdXQTdRNXo2RjJud3IwWHFzdmdK?=
- =?utf-8?B?S1lTSlNyYjRDcTdtRWhITGh6RmhtUVhLNzJMbE05bjIwWGxrb0s4WTkrSmpm?=
- =?utf-8?B?VjJLbmdySTdRN2VOTXgzVnI5RjJBSVJnMStWNnRxYVBCQnFnckRlMVJabTll?=
- =?utf-8?B?elFaaW9UQ2dLNnJ3MEVGLyticzlkTGpCbkpaNzFveGFGQldWZzR4WWtOSDNj?=
- =?utf-8?B?M3hkWGJ6dm1IMzUwUWhORnI1K2xKL2tyZmV6ZGQwS3RGZTBnUUdXL1FadHdo?=
- =?utf-8?B?WGxaNExOaWg5SDZ5UnlsSlhBQ0QvRVd5RmZlQ2NJQTBFY1hGVHBnUjBGVCtO?=
- =?utf-8?B?NllBNnIvQWdINmhEZXdJUi9HZXAwSjZZMEdTSEVJVW0rNEIzTytSWGtqZUF5?=
- =?utf-8?B?dlJZRDB0bG5NLzFzaVdvSG91cndIL0Y3emsxNlA4NmlicUhFTXJBenZMaVFQ?=
- =?utf-8?B?dFBlM3Y3b0xtbU5FcVNkVHVnSW9aSHVvYWtyMGdFVklwR1NNb0N3VUFDZHlF?=
- =?utf-8?B?Y1NxazJlSFVzODlGMEhyaTBJd1FEcG1xMzdzKzIwUllGbWZjSVQ1UFZGemVQ?=
- =?utf-8?B?QjlrbU40RW4vdi9BM1Y0RnowZ1NVMCtkV2ZZakJnMHo4eEltQkV1bkQ5Qlgv?=
- =?utf-8?B?MUEvQkJXSXlaVERKQVNuenhpZTJodWZIa3owT2o1dWdtQ2p3NnBrdjZ6K0NC?=
- =?utf-8?B?dmZLWGxiNHFxM0lSV1VtUUNmeTVuMnRJVU5ESW10MkhPYjRoanVPbW8xb0FC?=
- =?utf-8?B?b3o3VlVwcHRlNU1MVUJpU3g5K0RpVTF6SlJ6Mm9XMzF6NUhaeUp1aGQwS0kz?=
- =?utf-8?B?SFVDQTlXS3BZaVp3QjltYytzd1FaZFc2VUJ4Q1g4Z28vRGNXTmZmZm9hWXI3?=
- =?utf-8?B?VEQ0QzZCR0d4NmhGS3hGc3h5Ujd2SWViRDlzM1RVMy8zYVE2OVdjWHUrT3pI?=
- =?utf-8?B?cDdnSkdWZU5ZcVZNTDRQNUREQjFjS2dYdCtrMjBqSVVBbDJiakpRVTI3b2xW?=
- =?utf-8?B?K2VVOE4rbXMrYUtqWDdIYXZJZkpLd0ptSXgwRjhTWHdSd1RzQ0kwanNBc21a?=
- =?utf-8?B?YjAyMlp3THRadEErdThTc3JYKzlBUlBGNk1aTCs1ZHRpekJvd21WRktWaTZJ?=
- =?utf-8?B?QUE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 88f21efc-10e9-4b53-57f8-08de314de18d
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2025 02:52:50.1675
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: AecN6m6ZIrkWQtVxOpBUQ1XubBwV3U6Lxxj/2kaDh5hOgY5WNuWQzCZFkLIO+IYkMdrGCWv68FZVoLO0icbBVIR3NtPA5Sil/gX3oWNcG6c=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR11MB8670
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 
-alejandro.lucero-palau@ wrote:
-> From: Alejandro Lucero <alucerop@amd.com>
-> 
-> In preparation for always-synchronous memdev attach, refactor memdev
-> allocation and fix release bug in devm_cxl_add_memdev() when error after
-> a successful allocation.
+For GMAC4, when split header is enabled, in some rare cases, the
+hardware does not fill buf2 of the first descriptor with payload.
+Thus we cannot assume buf2 is always fully filled if it is not
+the last descriptor. Otherwise, the length of buf2 of the second
+descriptor will be calculated wrong and cause an oops:
 
-Never do "refactor and fix". Always do "fix" then "refactor" separately.
-In this case though I wonder what release bug you are referring to?
+Unable to handle kernel paging request at virtual address ffff00019246bfc0
+Mem abort info:
+  ESR = 0x0000000096000145
+  EC = 0x25: DABT (current EL), IL = 32 bits
+  SET = 0, FnV = 0
+  EA = 0, S1PTW = 0
+  FSC = 0x05: level 1 translation fault
+Data abort info:
+  ISV = 0, ISS = 0x00000145, ISS2 = 0x00000000
+  CM = 1, WnR = 1, TnD = 0, TagAccess = 0
+  GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+swapper pgtable: 4k pages, 48-bit VAs, pgdp=0000000090d8b000
+[ffff00019246bfc0] pgd=180000009dfff403, p4d=180000009dfff403, pud=0000000000000000
+Internal error: Oops: 0000000096000145 [#1]  SMP
+Modules linked in:
+CPU: 0 UID: 0 PID: 157 Comm: iperf3 Not tainted 6.18.0-rc6 #1 PREEMPT
+Hardware name: ADI 64-bit SC598 SOM EZ Kit (DT)
+pstate: 00400009 (nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+pc : dcache_inval_poc+0x28/0x58
+lr : arch_sync_dma_for_cpu+0x28/0x34
+sp : ffff800080dcbc40
+x29: ffff800080dcbc40 x28: 0000000000000008 x27: ffff000091c50980
+x26: ffff000091c50980 x25: 0000000000000000 x24: ffff000092a5fb00
+x23: ffff000092768f28 x22: 000000009246c000 x21: 0000000000000002
+x20: 00000000ffffffdc x19: ffff000091844c10 x18: 0000000000000000
+x17: ffff80001d308000 x16: ffff800080dc8000 x15: ffff0000929fb034
+x14: 70f709157374dd21 x13: ffff000092812ec0 x12: 0000000000000000
+x11: 000000000000dd86 x10: 0000000000000040 x9 : 0000000000000600
+x8 : ffff000092a5fbac x7 : 0000000000000001 x6 : 0000000000004240
+x5 : 000000009246c000 x4 : ffff000091844c10 x3 : 000000000000003f
+x2 : 0000000000000040 x1 : ffff00019246bfc0 x0 : ffff00009246c000
+Call trace:
+ dcache_inval_poc+0x28/0x58 (P)
+ dma_direct_sync_single_for_cpu+0x38/0x6c
+ __dma_sync_single_for_cpu+0x34/0x6c
+ stmmac_napi_poll_rx+0x8f0/0xb60
+ __napi_poll.constprop.0+0x30/0x144
+ net_rx_action+0x160/0x274
+ handle_softirqs+0x1b8/0x1fc
+ __do_softirq+0x10/0x18
+ ____do_softirq+0xc/0x14
+ call_on_irq_stack+0x30/0x48
+ do_softirq_own_stack+0x18/0x20
+ __irq_exit_rcu+0x64/0xe8
+ irq_exit_rcu+0xc/0x14
+ el1_interrupt+0x3c/0x58
+ el1h_64_irq_handler+0x14/0x1c
+ el1h_64_irq+0x6c/0x70
+ __arch_copy_to_user+0xbc/0x240 (P)
+ simple_copy_to_iter+0x28/0x30
+ __skb_datagram_iter+0x1bc/0x268
+ skb_copy_datagram_iter+0x1c/0x24
+ tcp_recvmsg_locked+0x3ec/0x778
+ tcp_recvmsg+0x10c/0x194
+ inet_recvmsg+0x64/0xa0
+ sock_recvmsg_nosec+0x1c/0x24
+ sock_read_iter+0x8c/0xdc
+ vfs_read+0x144/0x1a0
+ ksys_read+0x74/0xdc
+ __arm64_sys_read+0x14/0x1c
+ invoke_syscall+0x60/0xe4
+ el0_svc_common.constprop.0+0xb0/0xcc
+ do_el0_svc+0x18/0x20
+ el0_svc+0x80/0xc8
+ el0t_64_sync_handler+0x58/0x134
+ el0t_64_sync+0x170/0x174
+Code: d1000443 ea03003f 8a230021 54000040 (d50b7e21)
+---[ end trace 0000000000000000 ]---
+Kernel panic - not syncing: Oops: Fatal exception in interrupt
+Kernel Offset: disabled
+CPU features: 0x080000,00008000,08006281,0400520b
+Memory Limit: none
+---[ end Kernel panic - not syncing: Oops: Fatal exception in interrupt ]---
 
-If cxl_memdev_alloc() fails, nothing to free.
+To fix this, the PL bit-field in RDES3 register is used for all
+descriptors, whether it is the last descriptor or not.
 
-If dev_set_name() fails, it puts the device which calls
-cxl_memdev_release() which undoes cxl_memdev_alloc().  (Now, that weird
-and busted devm_cxl_memdev_edac_release() somehow snuck into
-cxl_memdev_release() when I was not looking. I will fix that separately,
-but no leak there that I can see.)
+Signed-off-by: Jie Zhang <jie.zhang@analog.com>
+---
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 20 ++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
 
-If cdev_device_add() fails we need to shutdown the ioctl path, but
-otherwise put_device() cleans everything up.
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 7b90ecd3a55e..848b1769c573 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -4878,13 +4878,27 @@ static unsigned int stmmac_rx_buf2_len(struct stmmac_priv *priv,
+ 	if (!priv->sph)
+ 		return 0;
+ 
+-	/* Not last descriptor */
+-	if (status & rx_not_ls)
++	/* For GMAC4, when split header is enabled, in some rare cases, the
++	 * hardware does not fill buf2 of the first descriptor with payload.
++	 * Thus we cannot assume buf2 is always fully filled if it is not
++	 * the last descriptor. Otherwise, the length of buf2 of the second
++	 * descriptor will be calculated wrong and cause an oops.
++	 *
++	 * If this is the last descriptor, 'plen' is the length of the
++	 * received packet that was transferred to system memory.
++	 * Otherwise, it is the accumulated number of bytes that have been
++	 * transferred for the current packet.
++	 *
++	 * Thus 'plen - len' always gives the correct length of buf2.
++	 */
++
++	/* Not GMAC4 and not last descriptor */
++	if (!priv->plat->has_gmac4 && (status & rx_not_ls))
+ 		return priv->dma_conf.dma_buf_sz;
+ 
++	/* GMAC4 or last descriptor */
+ 	plen = stmmac_get_rx_frame_len(priv, p, coe);
+ 
+-	/* Last descriptor */
+ 	return plen - len;
+ }
+ 
+-- 
+2.47.3
 
-If the devm_add_action_or_reset() fails the device needs to be both
-unregistered and final put. It does not use device_unregister() because
-the cdev also needs to be deleted. So cdev_device_del() handles the
-device_del() and the caller is responsible for the final put_device().
-
-What bug are you referring to?
-
-> The diff is busy as this moves cxl_memdev_alloc() down below the definition
-> of cxl_memdev_fops and introduces devm_cxl_memdev_add_or_reset() to
-> preclude needing to export more symbols from the cxl_core.
-
-Will need to read the code to figure out what this patch is trying to do
-because this changelog is not orienting me to the problem that is being
-solved.
-
-> Fixes: 1c3333a28d45 ("cxl/mem: Do not rely on device_add() side effects for dev_set_name() failures")
-
-Maybe this Fixes: tag is wrong and this is instead a bug introduced by
-my probe order RFC? At least Jonathan pinged me about a bug there that I
-will go look at next.
-
-> Signed-off-by: Dan Williams <dan.j.williams@intel.com>
-
-Why does this have my Sign-off?
-
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> ---
->  drivers/cxl/core/memdev.c | 134 +++++++++++++++++++++-----------------
->  drivers/cxl/private.h     |  10 +++
->  2 files changed, 86 insertions(+), 58 deletions(-)
->  create mode 100644 drivers/cxl/private.h
-> 
-> diff --git a/drivers/cxl/core/memdev.c b/drivers/cxl/core/memdev.c
-> index e370d733e440..8de19807ac7b 100644
-> --- a/drivers/cxl/core/memdev.c
-> +++ b/drivers/cxl/core/memdev.c
-> @@ -8,6 +8,7 @@
->  #include <linux/idr.h>
->  #include <linux/pci.h>
->  #include <cxlmem.h>
-> +#include "private.h"
->  #include "trace.h"
->  #include "core.h"
->  
-> @@ -648,42 +649,25 @@ static void detach_memdev(struct work_struct *work)
->  
->  static struct lock_class_key cxl_memdev_key;
->  
-> -static struct cxl_memdev *cxl_memdev_alloc(struct cxl_dev_state *cxlds,
-> -					   const struct file_operations *fops)
-> +int devm_cxl_memdev_add_or_reset(struct device *host, struct cxl_memdev *cxlmd)
-
-Can you say more why Type-2 drivers need an "_or_reset()" export? If a
-Type-2 driver is calling devm_cxl_add_memdev() from its ->probe()
-routine, then just return on failure. Confused.
 
