@@ -1,77 +1,125 @@
-Return-Path: <netdev+bounces-243118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243119-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65DFEC99ADE
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 01:53:42 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9346C99B15
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 02:03:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 029AE3A22AC
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 00:53:41 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A92C94E1AD0
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 01:03:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7320319A2A3;
-	Tue,  2 Dec 2025 00:53:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC0893F9D2;
+	Tue,  2 Dec 2025 01:03:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="khgpbfO1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KFN+JuxP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DD7817DFE7
-	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 00:53:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90CED36D50A;
+	Tue,  2 Dec 2025 01:03:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764636819; cv=none; b=kidrfSc3k+pfWWrqQZo2W7JkEdLdm06sZA8GlySLx9/R0T/M3lMnJKu7BRXxuaMHMrGVYrGF+5uTn243GxoMsmR3vP1lCeu8xwTzYEuSYf1IUD6l6YpPkt5L10TxLoeG2xQNl9AIuiKf8TBu9otP6/GK89fUlQTmmNNDZL7rk7Y=
+	t=1764637405; cv=none; b=GZTJY1e8PlzynGdW/vL+5I6bSjvWruNtCCQ7jEp3K04lBwR0ka2Ga5J6kgRhKZm2wd7Yl5OZ9iVhFOTuXP7qZq1iJgdRrn2uiXaQC8MVW75ZOm/pEykvUj7oMz/sVy6pjoe4wSqPKaG3TIyaMLiSX8SbQIfw70ai06OUU6axpKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764636819; c=relaxed/simple;
-	bh=zIrCqiOxp+GNYPXoSgtf9LRSllxeva23FOnOckQGaN0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sPW95IT7nhmiwjn9OKg74tSrHIVnKOWFyM35EUsae3f0nRbSQGcV+ewJG7GRAZ+VCQZFOiOIS2+kP/Zppmo/4RaPIaG3R/FIYjAkCxoj0UvjcMrtx4foVlhkZLEq/LzWoonl9IhIws13v/n6jDMmc0ODh0G2/fPD15AgnvjWmzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=khgpbfO1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A44EDC4CEF1;
-	Tue,  2 Dec 2025 00:53:38 +0000 (UTC)
+	s=arc-20240116; t=1764637405; c=relaxed/simple;
+	bh=Y2oJi7Xgfz6iY/Jpadn6SRhwl9o7wLyu7pJoH0HejGo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=QF5aK6VTA3pfOfzZbkv7nnf8fCTMlzWas1tMgM8oheQlbGW2k8Q4HUqmgd+A04zakkTztz+2ed8E7teEU/C0ANKJC5wkcPLQdwzNZw269s5MgVFbyMlLj0TDj6GVrm8785tHdaxK8SfNMXPobVq2jyXXyvsu2NSCqpsbQt5We20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KFN+JuxP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32A53C4CEF1;
+	Tue,  2 Dec 2025 01:03:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764636818;
-	bh=zIrCqiOxp+GNYPXoSgtf9LRSllxeva23FOnOckQGaN0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=khgpbfO1uGAdERAlF+VricqGng8eHsVZKmQohwV4oDefmPZ/MC2vNgF74bcZgGbTA
-	 WKLne5V13LsYSBgqG7EgA6X1iFaUezZQDN226REj5p9y4dBExYYi0vYqkmRrpysCzN
-	 RBCiMjvRkmOTuu/az6kpQZVer4M8Vx9oB6SjScL3A0o0lQTLTv/IDSZYN279EHlMnn
-	 wFkrz2ysfU84bD7XCaQgbSRBZSVa6I57YST5BEW3j1+YY2WrNLAE8ApMXvm/zPvgFz
-	 /UysMW7TRLNXB8X4YCjRqvuH8Zrq0aLMWf/7Us5HJ1n3gywEERp3fT7dfkMlPa5vpI
-	 pYnI8IsvEgfMg==
-Date: Mon, 1 Dec 2025 16:53:37 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>
-Subject: Re: [PATCH net-next 14/15] Documentation: net: dsa: mention
- availability of RedBox
-Message-ID: <20251201165337.538d88d1@kernel.org>
-In-Reply-To: <20251130131657.65080-15-vladimir.oltean@nxp.com>
-References: <20251130131657.65080-1-vladimir.oltean@nxp.com>
-	<20251130131657.65080-15-vladimir.oltean@nxp.com>
+	s=k20201202; t=1764637405;
+	bh=Y2oJi7Xgfz6iY/Jpadn6SRhwl9o7wLyu7pJoH0HejGo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=KFN+JuxP5jkPOpE5F0O5bmS0OFNL2V5VibFwniiu9mPJxmaFNnZ0zEli3G24AjUF1
+	 42FZ7f1Sm2dQJrKIbd5UtlQCudSmjmwJWhDqIF2UlSKyQYbimfd67PfdAxNZUKcq8e
+	 lV5/8foJ2+ENx2Ao5fRlMUgtw8OTxI8Wm80yHkw2WwEFzXrhRnkwlOseJna0FmU1cY
+	 /pxrzsE/jmGhM/BOI4oMHP+ceVbEUP8mG5/2Uw4l+m3N5YCd+0HRPf793BtGGVMu77
+	 JjIPFD+/C0nH14HLZRKj2i50bSI3vcfod49DQXeHSst/EccbrzlqspUGetmjkBIRIB
+	 Zg4BTskT9EutA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3B95F381196B;
+	Tue,  2 Dec 2025 01:00:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 00/15] DSA simple HSR offload
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176463722504.2619157.15424289331686189739.git-patchwork-notify@kernel.org>
+Date: Tue, 02 Dec 2025 01:00:25 +0000
+References: <20251130131657.65080-1-vladimir.oltean@nxp.com>
+In-Reply-To: <20251130131657.65080-1-vladimir.oltean@nxp.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, alsi@bang-olufsen.dk,
+ clement.leger@bootlin.com, chester.a.unal@arinc9.com, daniel@makrotopia.org,
+ mmyangfl@gmail.com, dqfext@gmail.com, florian.fainelli@broadcom.com,
+ george.mccollister@gmail.com, hauke@hauke-m.de, jonas.gorski@gmail.com,
+ kurt@linutronix.de, linus.walleij@linaro.org, lukma@denx.de,
+ sean.wang@mediatek.com, bigeasy@linutronix.de, woojung.huh@microchip.com,
+ xiaoliang.yang_1@nxp.com, linux-renesas-soc@vger.kernel.org,
+ UNGLinuxDriver@microchip.com
 
-On Sun, 30 Nov 2025 15:16:56 +0200 Vladimir Oltean wrote:
-> -A driver which is able of offloading certain functions of a DANP or DANH should
-> -declare the corresponding netdev features as indicated by the documentation at
-> +A driver which is able of offloading certain functions of should declare the
-                                                            ^
-AI code review points out there's an object missing between "of" and
-"should". I removed the "of" when applying, given the context it should
-be somewhat obvious we're talking about functions of the ``hsr`` driver.
-But please follow up if you prefer to add an explicit object to that
-clause.
+Hello:
 
-> +corresponding netdev features as indicated by the documentation at
->  ``Documentation/networking/netdev-features.rst``. Additionally, the following
->  methods must be implemented:
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Sun, 30 Nov 2025 15:16:42 +0200 you wrote:
+> Provide a "simple" form of HSR offload for 8 DSA drivers (just the
+> NETIF_F_HW_HSR_DUP feature) based on the fact that their taggers use the
+> dsa_xmit_port_mask() function. This is in patches 6-13/15.
+> 
+> The helpers per se are introduced in patch 5/15, and documented in patch
+> 15/15. Patch 14/15 is another small (and related) documentation update.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,01/15] net: dsa: mt7530: unexport mt7530_switch_ops
+    https://git.kernel.org/netdev/net-next/c/3b87e60d2131
+  - [net-next,02/15] net: hsr: create an API to get hsr port type
+    https://git.kernel.org/netdev/net-next/c/a0244e762139
+  - [net-next,03/15] net: dsa: avoid calling ds->ops->port_hsr_leave() when unoffloaded
+    https://git.kernel.org/netdev/net-next/c/bed59a86e91a
+  - [net-next,04/15] net: dsa: xrs700x: reject unsupported HSR configurations
+    https://git.kernel.org/netdev/net-next/c/30296ac76426
+  - [net-next,05/15] net: dsa: add simple HSR offload helpers
+    https://git.kernel.org/netdev/net-next/c/0e75bfe340bf
+  - [net-next,06/15] net: dsa: yt921x: use simple HSR offloading helpers
+    https://git.kernel.org/netdev/net-next/c/42e63b1373a3
+  - [net-next,07/15] net: dsa: ocelot: use simple HSR offload helpers
+    https://git.kernel.org/netdev/net-next/c/4b65d445556d
+  - [net-next,08/15] net: dsa: realtek: use simple HSR offload helpers
+    https://git.kernel.org/netdev/net-next/c/6db31942e347
+  - [net-next,09/15] net: dsa: lantiq_gswip: use simple HSR offload helpers
+    https://git.kernel.org/netdev/net-next/c/b6ad21ef286a
+  - [net-next,10/15] net: dsa: mv88e6060: use simple HSR offload helpers
+    https://git.kernel.org/netdev/net-next/c/4af9fa2ba65a
+  - [net-next,11/15] net: dsa: hellcreek: use simple HSR offload helpers
+    https://git.kernel.org/netdev/net-next/c/017bcff7321a
+  - [net-next,12/15] net: dsa: mt7530: use simple HSR offload helpers
+    https://git.kernel.org/netdev/net-next/c/585943b7ad30
+  - [net-next,13/15] net: dsa: a5psw: use simple HSR offload helpers
+    https://git.kernel.org/netdev/net-next/c/7271d4a08c39
+  - [net-next,14/15] Documentation: net: dsa: mention availability of RedBox
+    https://git.kernel.org/netdev/net-next/c/977839161f26
+  - [net-next,15/15] Documentation: net: dsa: mention simple HSR offload helpers
+    https://git.kernel.org/netdev/net-next/c/4e4c00f34d5d
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
