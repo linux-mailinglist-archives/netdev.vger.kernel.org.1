@@ -1,109 +1,123 @@
-Return-Path: <netdev+bounces-243331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99C4CC9D365
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 23:30:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C6B2C9D389
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 23:36:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A8903A5184
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 22:30:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34CEA3A5966
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 22:35:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 300512F7AAD;
-	Tue,  2 Dec 2025 22:30:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95C0D2F7AB1;
+	Tue,  2 Dec 2025 22:35:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i22wqEQW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OI4yO3Ah"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 009FA280330;
-	Tue,  2 Dec 2025 22:30:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F12D2D6E7C
+	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 22:35:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764714648; cv=none; b=Bd2rElwqDGQovRD6RPQYi+CegjItT0Alo+5Uew2xKvbuHNRaaHoR1luu5+uMPZ3eGeosdpkpmAuv6LEKz0sSkZeEX2cP+XsW7BcGXTsrrdB8i7cM016SRdDwzVoFpckqV8pHlpWSalgsbTDJSmMyxYica6M3q6Wdv0zYWr+B6n8=
+	t=1764714956; cv=none; b=iHP02E1IqGoQLWAXpcjWT0o6zjfxHTRlk4pZtreRSwa/5aVy4zKqCZAIkAGmH5UFGpOVDdj6TMgaZ5mBcGx2IvnVzKJFzOCWPEo57TCD78c0W+Zca/HW93KmIu7GDcEpcL+9/LThYyjCHRoQLVuGXV25FtOtK3JLMsFlpq/GG5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764714648; c=relaxed/simple;
-	bh=R0VK8aPrj64/tkCwd23+5g2mL/Tww0AKUYcg/GPMiEk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jqTtbobMNTdJ6K6HQ6volMAHZnFuTR0EcNYTY4dKP6W5+f/HtRwTQWgVoG+Bp/i7zASnJ4nEjJFW0N2JHOOesL2kDyaCVpGzknkLiCYlcXBozz7uc1ICjjiT2a1F8PXsAbrtZrrXkkTI6zaCUXjnU3qDR8/tDG6eJrkVEdpdewA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i22wqEQW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AF2AC4CEF1;
-	Tue,  2 Dec 2025 22:30:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764714646;
-	bh=R0VK8aPrj64/tkCwd23+5g2mL/Tww0AKUYcg/GPMiEk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=i22wqEQW6MoMp51k3D57gcGWRlW8ACTNCTd7HbyzjAy7OCUQF2SyKnUXRHoWqJZnZ
-	 Gh3liP6FnmeYt9+QBJ9Iy2amAxeByEVRSTF22L/FAY1zQlMjXLrEG+Kjxk2lIUT1b6
-	 XRICCrAbYnOUeqx+dt3PX6EQu1zwjXUvIQYCzlQTHci+FDQ5FqMR1JvfHdoiDuQ31T
-	 1EFHNFNUpSyYyK1z8FYeAy4FHMgYBiJ0CwK/eKAPtZ+JANGK0WKdrZrpBF5u2Dy2l+
-	 Du5ljA6kGpe5iR57NjS0J0RjwFbE6W402AKzne0B2H0L6PSZfIqghFIL5zKNG1P0ZS
-	 kVlqgRykgsZsg==
-Message-ID: <8acb6a32-bc4a-4f9f-adb2-f8b20dd0d5c9@kernel.org>
-Date: Tue, 2 Dec 2025 23:30:41 +0100
+	s=arc-20240116; t=1764714956; c=relaxed/simple;
+	bh=c3mR6BZuY4hFSjct5BypWPJ9sGu6XgpedPKKtBghZxE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cVAGg2QNrfRspCytAbxq9inK6L5zE8X45Lox7GBjV/M+8EoMVykQvckNjLwiZNRaWW7VZngKf57KB8uzwnCtEx/8rwAX8W5tvqUhSyDT8/d7plK4ZlK0tNICdTfxykSBMMurW5Xe6XabSSbxLZX7kQGgrMf6+MOHCWiYAc89NWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OI4yO3Ah; arc=none smtp.client-ip=209.85.128.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-787da30c50fso58507887b3.3
+        for <netdev@vger.kernel.org>; Tue, 02 Dec 2025 14:35:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764714954; x=1765319754; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ylVM1ZycKfOUhBo0Kx2tN3N0OsyBVhTCMjf7buZNaFc=;
+        b=OI4yO3AhmyVxghNkFizjVzQBNIY46wJYyY1teyjvpBjDIsAzqtHIlTzo0patci59bj
+         7rDyfHrte1GjbXUm/3Yyc7sbqDQlUfod6tnD4iHNf83sNRqOHAkLA+8t30du4C0jcaaS
+         c/MJFtA/WhfmCtITNbphFknSTUA5cDQd/lIt+IUB0b4uHWtn/VwhvY39M+tl9tgD48jJ
+         UZobYKCYkzOIng2AWsr6YtoA2aSuFbWvQqg4y3i4MbrnuWluaytaXNjnFosuGkp/8zN9
+         Tp+VpstjmwJH+dv1NqWl1TZPsQ3BIxN6cYk88QRRbIsFm69/US5kVyKpieGC09ywVq0N
+         h4vQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764714954; x=1765319754;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ylVM1ZycKfOUhBo0Kx2tN3N0OsyBVhTCMjf7buZNaFc=;
+        b=GYlWxa8HFzZ5Oh9m2kW0GiTVidX6edMJ0+a8iShVLW+ueLo978+1o3RgwnljPBruW/
+         O4Uj16plUF4zcaNhWCiZsOTA9ldtwg9G5lGBa7QUpwNhMKZId7F9+w4iVcloy+1dkpjT
+         74EgyQsKrMbHX3us3MlAoBlschz9aetzH9gwiroMAaYCQWe2HFn+cmjEc6x/e9149RUz
+         k38aqPBid6d5mM+cgTL1edoooqq4GZNjN0DQzGGbyAqcYqPJRO3LcnYA3YjCNICZCt2v
+         O/B9HEhzZ8dz5AWM1BCqCRIhluPoxp5yhZ6kNcZuiCYwEIST2p/+VZFCA400jih6M5Ef
+         6B9g==
+X-Gm-Message-State: AOJu0YzVgH/KnSXWjt6lIHHyqAgLwZwImY+9NiE3fUMQjFTDk94sHFBQ
+	eCOjw9uZptkwuD+fguNZNs0B80lEwEx+o7KdgE8JStr65E4ddiC7NHIa
+X-Gm-Gg: ASbGncu6nmeQQ7o3nvnbmv9onEGz635HoX94aQ3wSPCamrXkk3c+sv1wItCk7whTpJm
+	lwvaSAXcDF6kW5TyuQkBMcH5IAst13SFHsGCiiKcIkDHM06irV30ypL17B2zwnmS9z/F3Ao9U8A
+	PRtV1ot3VTMmpujf4LVPstmjgHJzdzVbQbxccYaBcIhdDvMAHoyeIKR3FZYQ9Pv2K0fwoRucLZL
+	1FSwhndv5AaStIsHHJEJrteqB9aSF0ydMesgPkFLESb3lYaAVEFBWM47j+SzNlydNMNjDia/4X4
+	p5p+6DfqR2+expAv3KuQ9fVzRMlW9u+yMcMN8UAm7VkZUQ7AoHT/33HUKXAnh6whrP2JuYKPjy/
+	MvkGWGwwAECS2P517uJbyCjaPrnGy87OqNuQHDoky3Hdh5JlOF4BqcTo6Cc9M1hWO4Lo6VJ/yvN
+	1fjbukhiyrqACWRLVtvcYHLuqeAVyawYA4BDVYKmXm5jAvl+TvkRUaqDK/
+X-Google-Smtp-Source: AGHT+IEWLac7ShLnOCEKilr1QZDB3R81AMdSAdYpR3XnPeC/KGg5zW4Lsd43s3UjQ6DQjFnauKwvkA==
+X-Received: by 2002:a05:690c:2784:b0:78a:722f:a7c9 with SMTP id 00721157ae682-78c0c1e75c2mr3231817b3.47.1764714953844;
+        Tue, 02 Dec 2025 14:35:53 -0800 (PST)
+Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:2::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-78ad102d25csm67836137b3.44.2025.12.02.14.35.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Dec 2025 14:35:52 -0800 (PST)
+Date: Tue, 2 Dec 2025 14:35:51 -0800
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Mina Almasry <almasrymina@google.com>,
+	Stanislav Fomichev <sdf@fomichev.me>, asml.silence@gmail.com,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v2] net: devmem: convert binding refcount to
+ percpu_ref
+Message-ID: <aS9px07mgnNjSu8e@devvm11784.nha0.facebook.com>
+References: <20251202-upstream-percpu-ref-v2-1-4accb717da40@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iproute2-next v2 5/7] iplink_can: add initial CAN XL
- interface
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org, Marc Kleine-Budde <mkl@pengutronix.de>,
- Oliver Hartkopp <socketcan@hartkopp.net>, David Ahern <dsahern@kernel.org>,
- Rakuram Eswaran <rakuram.e96@gmail.com>,
- =?UTF-8?Q?St=C3=A9phane_Grosjean?= <stephane.grosjean@free.fr>,
- linux-kernel@vger.kernel.org, linux-can@vger.kernel.org
-References: <20251201-canxl-netlink-v2-0-dadfac811872@kernel.org>
- <20251201-canxl-netlink-v2-5-dadfac811872@kernel.org>
- <20251201163810.3246dc49@phoenix.local>
-Content-Language: en-US
-From: Vincent Mailhol <mailhol@kernel.org>
-Autocrypt: addr=mailhol@kernel.org; keydata=
- xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
- JFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbEBrZXJuZWwub3JnPsKZBBMWCgBBFiEE7Y9wBXTm
- fyDldOjiq1/riG27mcIFAmdfB/kCGwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcC
- F4AACgkQq1/riG27mcKBHgEAygbvORJOfMHGlq5lQhZkDnaUXbpZhxirxkAHwTypHr4A/joI
- 2wLjgTCm5I2Z3zB8hqJu+OeFPXZFWGTuk0e2wT4JzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrb
- YZzu0JG5w8gxE6EtQe6LmxKMqP6EyR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDl
- dOjiq1/riG27mcIFAmceMvMCGwwFCQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8V
- zsZwr/S44HCzcz5+jkxnVVQ5LZ4BANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
-In-Reply-To: <20251201163810.3246dc49@phoenix.local>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251202-upstream-percpu-ref-v2-1-4accb717da40@meta.com>
 
-On 02/12/2025 at 01:38, Stephen Hemminger wrote:
-> On Mon, 01 Dec 2025 23:55:13 +0100
-> Vincent Mailhol <mailhol@kernel.org> wrote:
+On Tue, Dec 02, 2025 at 11:34:17AM -0800, Bobby Eshleman wrote:
+> From: Bobby Eshleman <bobbyeshleman@meta.com>
 > 
->>  
->> -static void can_print_tdc_opt(struct rtattr *tdc_attr)
->> +static void can_print_tdc_opt(struct rtattr *tdc_attr, bool is_xl)
->>  {
->>  	struct rtattr *tb[IFLA_CAN_TDC_MAX + 1];
->>  
->>  	parse_rtattr_nested(tb, IFLA_CAN_TDC_MAX, tdc_attr);
->>  	if (tb[IFLA_CAN_TDC_TDCV] || tb[IFLA_CAN_TDC_TDCO] ||
->>  	    tb[IFLA_CAN_TDC_TDCF]) {
->> -		open_json_object("tdc");
->> +		const char *tdc = is_xl ? "xtdc" : "tdc";
->> +
->> +		open_json_object(tdc);
->>  		can_print_nl_indent();
->>  		if (tb[IFLA_CAN_TDC_TDCV]) {
->> +			const char *tdcv_fmt = is_xl ? " xtdcv %u" : " tdcv %u";
+> Convert net_devmem_dmabuf_binding refcount from refcount_t to percpu_ref
+> to optimize common-case reference counting on the hot path.
 > 
-> Having a format string as variable can break (future) format checking and some compiler flags.
+> The typical devmem workflow involves binding a dmabuf to a queue
+> (acquiring the initial reference on binding->ref), followed by
+> high-volume traffic where every skb fragment acquires a reference.
+> Eventually traffic stops and the unbind operation releases the initial
+> reference. Additionally, the high traffic hot path is often multi-core.
+> This access pattern is ideal for percpu_ref as the first and last
+> reference during bind/unbind normally book-ends activity in the hot
+> path.
+> 
+> __net_devmem_dmabuf_binding_free becomes the percpu_ref callback invoked
+> when the last reference is dropped.
+> 
 
-Ack. I now see that this would raise some -Wformat-nonliteral warnings. I was
-not aware of that flag before reading your comment. This will be addressed in v3.
+My apologies for sending this out after net-next closed. Won't happen
+again.
 
-
-Yours sincerely,
-Vincent Mailhol
-
+Best,
+Bobby
 
