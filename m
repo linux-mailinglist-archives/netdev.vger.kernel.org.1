@@ -1,62 +1,164 @@
-Return-Path: <netdev+bounces-243164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19679C9A2C9
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 07:03:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37E0CC9A2D5
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 07:04:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5A3C84E30FC
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 06:02:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F9493A4743
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 06:04:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAC292FD699;
-	Tue,  2 Dec 2025 06:02:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62FC72FF170;
+	Tue,  2 Dec 2025 06:04:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IsF8+MBR";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="sDXbrG88"
 X-Original-To: netdev@vger.kernel.org
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 260472FB601;
-	Tue,  2 Dec 2025 06:02:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5F262FE57F
+	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 06:03:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764655374; cv=none; b=A5Xf591ojFYzQyKyUXymowkw9jF+6L9BBiFje5/UesISaNLh/WDwVlIIcxaUTkLTDmLpKhqYU0lvBK9KdoG2hCJXQ2oy/MpR7+lQ4Y3xmExK/TnKQuzfEbnQIfpw3N6BepfvHwJzxJzks7d06QdBMzatuXzeIKkg/PXhmfPlKCw=
+	t=1764655440; cv=none; b=G+E5rS4OV/AVJUK3UndfxnxLC+g8Vska0NisyPEZXblE1n2CXEOgJehlL5Td2h0kGwv1I8VAOgXZRzhg6rMzEBcJXsVoPdv8BWOROAttYot1NlkrFQFwoJf8napnvjCa47fpsp8pIPTBtAyVREmYROcuD6o3t45ytsSTT5yVxNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764655374; c=relaxed/simple;
-	bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L+F9h0uuZdqxSCG+JhDW3dSa4fYwZQqW7YXFROeWIOBJELk6NdFjRrJIXxBfxtmnbO5GcJXgKp/rLcTCKBpGs9DkIboMstxGwqhV7l73a82L7Cq+t67W8NlR+/Bc9upoZ+v7i25Tu7S7Cj9M4BXlRY93tEZhiaO31ST/KRm3xTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 8045868BEB; Tue,  2 Dec 2025 07:02:49 +0100 (CET)
-Date: Tue, 2 Dec 2025 07:02:48 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: alistair23@gmail.com
-Cc: chuck.lever@oracle.com, hare@kernel.org,
-	kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org,
-	kbusch@kernel.org, axboe@kernel.dk, hch@lst.de, sagi@grimberg.me,
-	kch@nvidia.com, hare@suse.de,
-	Alistair Francis <alistair.francis@wdc.com>
-Subject: Re: [PATCH v6 5/5] nvmet-tcp: Support KeyUpdate
-Message-ID: <20251202060248.GB16055@lst.de>
-References: <20251202013429.1199659-1-alistair.francis@wdc.com> <20251202013429.1199659-6-alistair.francis@wdc.com>
+	s=arc-20240116; t=1764655440; c=relaxed/simple;
+	bh=9yZtKrMIr+oRDcDzNymlk5LC69nAsOOxWz1MSteFcvk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pNzTnYZpthbShtyiSt20PajJ6p5p2nQkTQfa/wyNV6WQzpucFmNEZ+TDcTGw9gPONZRnmiKh9Guz0HKS6/itnoeViaighw/POcqGHEyEB7/fNq0NCGt5P4+AWtryzdSoQJtWAFQ8QdOhGiY1nQAdCKcPmq0Vty1PviRopSRhUag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IsF8+MBR; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=sDXbrG88; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764655435;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9yZtKrMIr+oRDcDzNymlk5LC69nAsOOxWz1MSteFcvk=;
+	b=IsF8+MBRu6EcOt7q+OVy/lq6KhBVbbkFhGHDnWH77voz0aIvxCkJXHKYqgoV2CEXiT9J/q
+	7VnMhWo9vovWWnYtYmJx3JZb6Tyo4IPQyxCB4SN9CIeUWbcrefvC6gBSUslDETGxMVbtVB
+	jp0JH1crv796JuO1G3beepVyCHoyjmo=
+Received: from mail-vs1-f71.google.com (mail-vs1-f71.google.com
+ [209.85.217.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-66-VZ0_8BaZOoCLf3kJ2J9Vlw-1; Tue, 02 Dec 2025 01:03:51 -0500
+X-MC-Unique: VZ0_8BaZOoCLf3kJ2J9Vlw-1
+X-Mimecast-MFC-AGG-ID: VZ0_8BaZOoCLf3kJ2J9Vlw_1764655431
+Received: by mail-vs1-f71.google.com with SMTP id ada2fe7eead31-5dd89f3557bso1599695137.2
+        for <netdev@vger.kernel.org>; Mon, 01 Dec 2025 22:03:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1764655431; x=1765260231; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9yZtKrMIr+oRDcDzNymlk5LC69nAsOOxWz1MSteFcvk=;
+        b=sDXbrG88V4C9LQomRHNf9PjDcb1jy0bE83igTOG7WIJl+xFC9mt8L6dhG6kpDmO+ba
+         /3NDAe21G5VPqIAVVu4XK9L+zE3ERME818bEoxcnsOIil9jmPiZa1upqLKJx97XjxcOo
+         uN/IX1rfxHYSDFZDmyN44gN2IRlxMaBhH1zW1e5aFGGOfJGWcjyDrdBeGQsElB2siv7/
+         y0pXuWXCwtAJZvRsTlAFmycgDq7P7fxsG9WJMuoyRPYAt2XS3bDG/cY8NLYGYLLKno3Y
+         geZwKmluk+XJYPuy6duEvV4pDv+K3mcMFPxJ3I/ZquYqMHc1OBw7PSrnvjwbAaar4b5p
+         1ATQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764655431; x=1765260231;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=9yZtKrMIr+oRDcDzNymlk5LC69nAsOOxWz1MSteFcvk=;
+        b=ll7jssnqf5a9XRGyvgWprWSEQ6duBz8B1f0iE/iyTr3loQMF+jRCIT0ihc2qMPePRL
+         VbZmVQu1krq63mdfeijarvgZueB2a9+4UBsgaYZaDhqUcW0+xvFb+hBw+Ls3LHodtVSQ
+         fG2OCQOa2ozhaYO6bgP7JMD4fJ3nBLH3RGL9u64k4SngEO1OUU17yJxbB4LkaPCDvSvl
+         80BEV4kOQD0rJcDzc8nU47NFuYj7b2coFA1Hbd1U7PNKtZ93TZxjAfaVYPa2TXvpD8bw
+         YS6/nIERL0j3B02/JW/B+waW21zHXGQbNuZjFpQzlnVgzQCJFE2UjjLQUdW+pI6F+aGi
+         5xMg==
+X-Forwarded-Encrypted: i=1; AJvYcCWJ0vWbLfxByW1oYToO10Vpwztj6zUif9WOv1nQNGnZrc65VYi98evwVbGsqJhUUBcyJJVw7S4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwR9DIwg2I/xxp7uFtpc3c6B6WoXXSZMU51pXgkQuun6LGwnOLY
+	NSj6EfFkjQRxAYn6Wl4g+AaTG2ph1yW6IBmq6km0JNrCYDgVw5n9HLT3NwRQpjvTzvG+81n3+wT
+	EY4Jkscc0Hzz1lWmtoPllM2lJ5bUfZUJ18kN+Fdtj9mGwUgc6Y8OmugM7CQKyTPJjVC9mCiYOA8
+	9ta5QFmFlxi95SrQEqDeI3satD4L7WmSxl
+X-Gm-Gg: ASbGnctUsWOoWSnvvGNsOR7MbbtxsX9XR36XwAQcrp/ZClmeR7kbfHfj9Zhmh7uKgAZ
+	ot/N5KmmQFbkkjy9zR4WycVyrvY90j3ccuIKFSFt2cfSA5KvwdanTrMZSfAuhC+fiXZVg5fMDuo
+	IfVdw62XQUFPetSOaRoMWIqMmlCgVPieqB2G28Me5d9JCTjw66UtSOEcgOzCXEy0/d6GM=
+X-Received: by 2002:a05:6102:943:b0:5e1:ef48:271f with SMTP id ada2fe7eead31-5e2243b0ae6mr10533777137.24.1764655431115;
+        Mon, 01 Dec 2025 22:03:51 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHwP5aHgNd3I5TiBLGyqEh9KU4ibLdE1nzCHwWBtB5W9yqrcXhSdXjvk1r3jTbN6h8btYD3Zn35q6xLUh9X/dc=
+X-Received: by 2002:a05:6102:943:b0:5e1:ef48:271f with SMTP id
+ ada2fe7eead31-5e2243b0ae6mr10533766137.24.1764655430705; Mon, 01 Dec 2025
+ 22:03:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251202013429.1199659-6-alistair.francis@wdc.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+References: <40af2b73239850e7bf1a81abb71ee99f1b563b9c.1764226734.git.mst@redhat.com>
+ <a61dc7ee-d00b-41b4-b6fd-8a5152c3eae3@gmail.com> <CACGkMEuJFVUDQ7SKt93mCVkbDHxK+A74Bs9URpdGR+0mtjxmAg@mail.gmail.com>
+ <a9718b11-76d5-4228-9256-6a4dee90c302@gmail.com>
+In-Reply-To: <a9718b11-76d5-4228-9256-6a4dee90c302@gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 2 Dec 2025 14:03:32 +0800
+X-Gm-Features: AWmQ_blpD6OfG3aBJ7E21a-JAzhs-ua7-f4l8pJe0A5pP3XukKz4YUOSlliVbTY
+Message-ID: <CACGkMEvFzYiRNxMdJ9xNPcZmotY-9pD+bfF4BD5z+HnaAt1zug@mail.gmail.com>
+Subject: Re: [PATCH RFC] virtio_net: gate delayed refill scheduling
+To: Bui Quang Minh <minhquangbui99@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org, 
+	Paolo Abeni <pabeni@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Stanislav Fomichev <sdf@fomichev.me>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Looks good:
+On Mon, Dec 1, 2025 at 11:04=E2=80=AFPM Bui Quang Minh <minhquangbui99@gmai=
+l.com> wrote:
+>
+> On 11/28/25 09:20, Jason Wang wrote:
+> > On Fri, Nov 28, 2025 at 1:47=E2=80=AFAM Bui Quang Minh <minhquangbui99@=
+gmail.com> wrote:
+> >> I think the the requeue in refill_work is not the problem here. In
+> >> virtnet_rx_pause[_all](), we use cancel_work_sync() which is safe to
+> >> use "even if the work re-queues itself". AFAICS, cancel_work_sync()
+> >> will disable work -> flush work -> enable again. So if the work requeu=
+e
+> >> itself in flush work, the requeue will fail because the work is alread=
+y
+> >> disabled.
+> > Right.
+> >
+> >> I think what triggers the deadlock here is a bug in
+> >> virtnet_rx_resume_all(). virtnet_rx_resume_all() calls to
+> >> __virtnet_rx_resume() which calls napi_enable() and may schedule
+> >> refill. It schedules the refill work right after napi_enable the first
+> >> receive queue. The correct way must be napi_enable all receive queues
+> >> before scheduling refill work.
+> > So what you meant is that the napi_disable() is called for a queue
+> > whose NAPI has been disabled?
+> >
+> > cpu0] enable_delayed_refill()
+> > cpu0] napi_enable(queue0)
+> > cpu0] schedule_delayed_work(&vi->refill)
+> > cpu1] napi_disable(queue0)
+> > cpu1] napi_enable(queue0)
+> > cpu1] napi_disable(queue1)
+> >
+> > In this case cpu1 waits forever while holding the netdev lock. This
+> > looks like a bug since the netdev_lock 413f0271f3966 ("net: protect
+> > NAPI enablement with netdev_lock()")?
+>
+> Yes, I've tried to fix it in 4bc12818b363 ("virtio-net: disable delayed
+> refill when pausing rx"), but it has flaws.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+I wonder if a simplified version is just restoring the behaviour
+before 413f0271f3966 by using napi_enable_locked() but maybe I miss
+something.
+
+Thanks
 
 
