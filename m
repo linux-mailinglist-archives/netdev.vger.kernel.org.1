@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-243154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAA53C9A24B
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 06:53:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 061CDC9A248
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 06:53:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id ABE84344C7B
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 05:53:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E15323A550D
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 05:53:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C6A52FC895;
-	Tue,  2 Dec 2025 05:53:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1322E2FD1A5;
+	Tue,  2 Dec 2025 05:53:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Uzr0URF1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ixNjysfa"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 081B12FD1CB
-	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 05:53:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 490AF2FD684
+	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 05:53:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764654817; cv=none; b=R7J0RlnL37/L3Hj4a4P9tTqOB7SVpbnLGbHwetSfJ4vxtMqLpw3Q7y9u3rHdmCBitUOrrdaoclxBxBPmJdFj7BYExOM4an4NZl9byvNKcBzPANgUYsBJUP5CoutXbfOrn5BdlkBQ5D+NUziZPqt4lHcVP3hAyXPE73lwPfhJh68=
+	t=1764654820; cv=none; b=qyRtSqhB9qOEwvgDnDNBaSxo2uqj6PJltWztDkvf/WPjj0UOzmtA25RM7Ny8pNp75AxQSn7bCjf72di8mM2XYeaxZiJoXT57gcJ8EcAZDZIuZRCl2JRG0Gbyyup/m2H5HfTAKtMmXBjnoo3/XOcbr6qU6hM/F8DToKcaNGLTg7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764654817; c=relaxed/simple;
-	bh=wRZqt5X3Ni5lzvIpWE95YGYIRK+24Mf/eXpdH4gszw4=;
+	s=arc-20240116; t=1764654820; c=relaxed/simple;
+	bh=MArT0WZcCNUlkE4LHYHExUAoJVmOQGV3XZUSe5IITs4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JOVC6w4+OOmkb3GgHbqolFY27SqmuT8wzx64VMfNIYK6gh6+FL/oqaygGN2YTTqtC3h2lY9qSQPUIk3fQhKWjj563868Bj8R7bqYePs+F/lKBcSHgWrM+0hx/SZAw88sd864KVk8t3xV5N4jTb7d5DL5O5sn/kxdy1kbB2PrPag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Uzr0URF1; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=pvd4ZEv2JRIQGHg2JqgKM4PXy0gea1qZd9h5OvLIATKIJaw4ZFiNNigJuVOWoGOqBARE9kTQtMu94BinQ2g6B0FeiNs3gvplBRyaNI8TNV2nWCz8IxYoCquZXJIV9hNwujG3bD3OnN6jVxGVUipxN2BqqMjqXTt3lpgz9K3Qd6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ixNjysfa; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764654813;
+	s=mimecast20190719; t=1764654817;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=jxQK/xgiBTy/Pw785zpGdGnyspKOEnaEfBb8HZ+bfFs=;
-	b=Uzr0URF1rHk+ZcIlM+yhcfuEmbvWZry2Y4Hm3vKvIBLcIGm6KEf2UbQTrsU5F31vr49p+u
-	4j1O1dJZCwiYjyx1r3yuvpWX11eyqiRsGuCKViY+yI2CQSum7laKYY3sujEZ/s+b86FCbh
-	m9SPuNRgPqI2yqpytge9XNeDXLMcLhY=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+	bh=Jmv21TVxnSJ31M3zk6ee/o5jW/F7IMGUM0oXO0AolW8=;
+	b=ixNjysfaVSFEpaas0UxqE51ORoumm04zaQnPdGN/HFfu2aYcPNLMEkur/oMaM+x6uEJW/x
+	qqRQyAQ/rnLaFDdWJb/Bele4KWYimbnfrrrIFDv7Ca5Tqj15TLJDG1GJnxhy3VutzQnFbE
+	nJnZzBjsdpoZtvP/EjPgzaG1qqmlaio=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-370-2qExmJmsOk-ICKoCtMsScw-1; Tue,
- 02 Dec 2025 00:53:29 -0500
-X-MC-Unique: 2qExmJmsOk-ICKoCtMsScw-1
-X-Mimecast-MFC-AGG-ID: 2qExmJmsOk-ICKoCtMsScw_1764654808
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-118-hWvHPZnhNj-lV3p9gUAgYQ-1; Tue,
+ 02 Dec 2025 00:53:34 -0500
+X-MC-Unique: hWvHPZnhNj-lV3p9gUAgYQ-1
+X-Mimecast-MFC-AGG-ID: hWvHPZnhNj-lV3p9gUAgYQ_1764654812
 Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4CE921800473;
-	Tue,  2 Dec 2025 05:53:28 +0000 (UTC)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8EE191956051;
+	Tue,  2 Dec 2025 05:53:32 +0000 (UTC)
 Received: from xudu-thinkpadx1carbongen9.nay.csb (unknown [10.66.60.72])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B4F5B30001A4;
-	Tue,  2 Dec 2025 05:53:24 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 01AA930001A4;
+	Tue,  2 Dec 2025 05:53:28 +0000 (UTC)
 From: Xu Xu <xudu@redhat.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -66,9 +66,9 @@ To: davem@davemloft.net,
 	shuah@kernel.org
 Cc: netdev@vger.kernel.org,
 	Xu Du <xudu@redhat.com>
-Subject: [RFC net-next 2/8] selftest: tun: Introduce tuntap_helpers.h header for TUN/TAP testing
-Date: Tue,  2 Dec 2025 13:53:05 +0800
-Message-ID: <9bf43fb7d8d7878d90d54daf9843caca312bcd2f.1764640939.git.xudu@redhat.com>
+Subject: [RFC net-next 3/8] selftest: tun: Refactor tun_delete to use tuntap_helpers
+Date: Tue,  2 Dec 2025 13:53:06 +0800
+Message-ID: <5e7fed355f37b299db65dfb0f0d87be591439f02.1764640939.git.xudu@redhat.com>
 In-Reply-To: <cover.1764640939.git.xudu@redhat.com>
 References: <cover.1764640939.git.xudu@redhat.com>
 Precedence: bulk
@@ -82,639 +82,77 @@ X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
 From: Xu Du <xudu@redhat.com>
 
-Introduce netlink manipulation and packet construction helpers that will
-simplify the later creation of more related test cases. This avoids
-duplicating logic across different test cases.
-
-This new header will contain:
- - Netlink socket management utilities.
- - Helpers for net device, ip address, ip neighbor and ip route operations.
- - Packet construction and manipulation helpers.
+The previous patch introduced common tuntap helpers to simplify
+tuntap test code. This patch refactors the tun_delete function
+to use these new helpers.
 
 Signed-off-by: Xu Du <xudu@redhat.com>
 ---
-v1 -> RFC:
-  - Add support for route manipulation operations.
-  - Add support for querying individual entries.
+ tools/testing/selftests/net/tun.c | 39 ++-----------------------------
+ 1 file changed, 2 insertions(+), 37 deletions(-)
 
- tools/testing/selftests/net/tuntap_helpers.h | 608 +++++++++++++++++++
- 1 file changed, 608 insertions(+)
- create mode 100644 tools/testing/selftests/net/tuntap_helpers.h
-
-diff --git a/tools/testing/selftests/net/tuntap_helpers.h b/tools/testing/selftests/net/tuntap_helpers.h
-new file mode 100644
-index 000000000000..70e8fe750871
---- /dev/null
-+++ b/tools/testing/selftests/net/tuntap_helpers.h
-@@ -0,0 +1,608 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+
-+#ifndef _TUNTAP_HELPERS_H
-+#define _TUNTAP_HELPERS_H
-+
-+#include <errno.h>
-+#include <linux/if_packet.h>
-+#include <linux/ipv6.h>
-+#include <linux/netlink.h>
-+#include <linux/rtnetlink.h>
-+#include <linux/virtio_net.h>
-+#include <net/if.h>
-+#include <netinet/if_ether.h>
-+#include <netinet/ip.h>
-+#include <netinet/udp.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/socket.h>
-+#include <unistd.h>
-+
-+#define MAX_RTNL_PAYLOAD 4096
-+#define VXLAN_HLEN 8
-+#define PKT_DATA 0xCB
-+
-+enum nl_op {
-+	NL_NEW,
-+	NL_DEL,
-+	NL_GET,
-+	NL_OP_MAX,
-+};
-+
-+enum nl_type {
-+	NL_ADDR,
-+	NL_NEIGH,
-+	NL_ROUTE,
-+	NL_DEV,
-+};
-+
-+struct nl_req_msg {
-+	struct nlmsghdr nh;
-+	union {
-+		struct ifaddrmsg addr_info;
-+		struct ndmsg neigh_info;
-+		struct rtmsg route_info;
-+		struct ifinfomsg dev_info;
-+	};
-+	unsigned char data[MAX_RTNL_PAYLOAD];
-+};
-+
-+struct nl_req_cb {
-+	int (*fill_rtattr)(struct nlmsghdr *nh, void *data);
-+	void *cb_data;
-+};
-+
-+struct nl_req_entry {
-+	int type[NL_OP_MAX];
-+	size_t msgsize;
-+	int (*fill_req)(int nl_op, void *params, struct nl_req_msg *req,
-+			struct nl_req_cb *cb);
-+	int (*check_answer)(void *params, struct nlmsghdr *nh);
-+};
-+
-+struct nl_addr {
-+	const char *intf;
-+	int family;
-+	void *addr;
-+	uint8_t prefix;
-+};
-+
-+struct nl_neigh {
-+	const char *intf;
-+	int family;
-+	void *addr;
-+	unsigned char *lladdr;
-+};
-+
-+struct nl_route {
-+	const char *intf;
-+	int family;
-+	int type;
-+	int table;
-+	void *dst;
-+	uint8_t dst_len;
-+	void *gateway;
-+};
-+
-+struct nl_dev {
-+	const char *intf;
-+	char *link_type;
-+	int (*fill_rtattr)(struct nlmsghdr *nh, void *cb_data);
-+	int (*fill_info_data)(struct nlmsghdr *nh, void *cb_data);
-+	void *cb_data;
-+};
-+
-+static inline size_t ip_addr_len(int family)
-+{
-+	return (family == AF_INET) ? sizeof(struct in_addr) :
-+				     sizeof(struct in6_addr);
-+}
-+
-+static inline struct rtattr *rtattr_add(struct nlmsghdr *nh,
-+					unsigned short type, unsigned short len)
-+{
-+	struct rtattr *rta =
-+		(struct rtattr *)((uint8_t *)nh + RTA_ALIGN(nh->nlmsg_len));
-+
-+	rta->rta_type = type;
-+	rta->rta_len = RTA_LENGTH(len);
-+	nh->nlmsg_len = RTA_ALIGN(nh->nlmsg_len) + RTA_ALIGN(rta->rta_len);
-+	return rta;
-+}
-+
-+static inline struct rtattr *rtattr_begin(struct nlmsghdr *nh,
-+					  unsigned short type)
-+{
-+	return rtattr_add(nh, type, 0);
-+}
-+
-+static inline void rtattr_end(struct nlmsghdr *nh, struct rtattr *attr)
-+{
-+	uint8_t *end = (uint8_t *)nh + nh->nlmsg_len;
-+
-+	attr->rta_len = end - (uint8_t *)attr;
-+}
-+
-+static inline struct rtattr *rtattr_add_str(struct nlmsghdr *nh,
-+					    unsigned short type, const char *s)
-+{
-+	struct rtattr *rta = rtattr_add(nh, type, strlen(s));
-+
-+	memcpy(RTA_DATA(rta), s, strlen(s));
-+	return rta;
-+}
-+
-+static inline struct rtattr *
-+rtattr_add_strsz(struct nlmsghdr *nh, unsigned short type, const char *s)
-+{
-+	struct rtattr *rta = rtattr_add(nh, type, strlen(s) + 1);
-+
-+	strcpy(RTA_DATA(rta), s);
-+	return rta;
-+}
-+
-+static inline struct rtattr *rtattr_add_any(struct nlmsghdr *nh,
-+					    unsigned short type,
-+					    const void *arr, size_t len)
-+{
-+	struct rtattr *rta = rtattr_add(nh, type, len);
-+
-+	memcpy(RTA_DATA(rta), arr, len);
-+	return rta;
-+}
-+
-+static inline int fill_addr_req(int nl_op, void *params, struct nl_req_msg *req,
-+				struct nl_req_cb *cb)
-+{
-+	struct nl_addr *addrp = params;
-+	size_t ipalen;
-+
-+	ipalen = ip_addr_len(addrp->family);
-+	req->addr_info.ifa_family = addrp->family;
-+	req->addr_info.ifa_index = if_nametoindex(addrp->intf);
-+	req->addr_info.ifa_flags = (nl_op == NL_NEW) ? IFA_F_NODAD : 0;
-+	req->nh.nlmsg_flags |= (nl_op == NL_GET) ? NLM_F_DUMP : 0;
-+
-+	if (nl_op != NL_GET) {
-+		req->addr_info.ifa_prefixlen = addrp->prefix;
-+		rtattr_add_any(&req->nh, IFA_LOCAL, addrp->addr, ipalen);
-+	}
-+	return 0;
-+}
-+
-+static inline int check_addr_answer(void *params, struct nlmsghdr *nh)
-+{
-+	struct rtattr *rta = (struct rtattr *)IFA_RTA(NLMSG_DATA(nh));
-+	struct nl_addr *addrp = params;
-+	size_t ipalen;
-+	int rtlen;
-+
-+	ipalen = ip_addr_len(addrp->family);
-+	rtlen = nh->nlmsg_len - NLMSG_LENGTH(sizeof(struct ifaddrmsg));
-+
-+	while (RTA_OK(rta, rtlen)) {
-+		if (rta->rta_type == IFA_ADDRESS &&
-+		    memcmp(RTA_DATA(rta), addrp->addr, ipalen) == 0)
-+			return 1;
-+		rta = RTA_NEXT(rta, rtlen);
-+	}
-+	return 0;
-+}
-+
-+static inline int fill_neigh_req(int nl_op, void *params,
-+				 struct nl_req_msg *req, struct nl_req_cb *cb)
-+{
-+	struct nl_neigh *neighp = params;
-+	size_t ipalen;
-+
-+	ipalen = ip_addr_len(neighp->family);
-+	req->neigh_info.ndm_family = neighp->family;
-+	req->neigh_info.ndm_ifindex = if_nametoindex(neighp->intf);
-+	req->neigh_info.ndm_state = (nl_op == NL_NEW) ? NUD_PERMANENT : 0;
-+
-+	rtattr_add_any(&req->nh, NDA_DST, neighp->addr, ipalen);
-+	if (nl_op == NL_NEW)
-+		rtattr_add_any(&req->nh, NDA_LLADDR, neighp->lladdr, ETH_ALEN);
-+	return 0;
-+}
-+
-+static inline int fill_route_req(int nl_op, void *params,
-+				 struct nl_req_msg *req, struct nl_req_cb *cb)
-+{
-+	struct nl_route *routep = params;
-+	size_t ipalen;
-+	int oif;
-+
-+	ipalen = ip_addr_len(routep->family);
-+	oif = if_nametoindex(routep->intf);
-+	req->route_info.rtm_family = routep->family;
-+	req->route_info.rtm_dst_len = routep->dst_len;
-+	req->route_info.rtm_table = routep->table;
-+	req->route_info.rtm_type = routep->type;
-+	req->route_info.rtm_protocol = RTPROT_BOOT;
-+	req->route_info.rtm_scope = RT_SCOPE_UNIVERSE;
-+
-+	rtattr_add_any(&req->nh, RTA_DST, routep->dst, ipalen);
-+
-+	if (nl_op != NL_GET) {
-+		rtattr_add_any(&req->nh, RTA_GATEWAY, routep->gateway, ipalen);
-+		rtattr_add_any(&req->nh, RTA_OIF, &oif, sizeof(int));
-+	}
-+	return 0;
-+}
-+
-+static inline int check_route_answer(void *params, struct nlmsghdr *nh)
-+{
-+	struct rtmsg *rtm = NLMSG_DATA(nh);
-+	struct nl_route *routep = params;
-+
-+	return (rtm->rtm_type == routep->type) ? 1 : 0;
-+}
-+
-+static inline int fill_dev_req(int nl_op, void *params, struct nl_req_msg *req,
-+			       struct nl_req_cb *cb)
-+{
-+	struct rtattr *link_info, *info_data;
-+	struct nl_dev *devp = params;
-+	int ret;
-+
-+	cb->fill_rtattr = devp->fill_rtattr;
-+	cb->cb_data = devp->cb_data;
-+
-+	req->dev_info.ifi_family = AF_UNSPEC;
-+	req->dev_info.ifi_type = 1;
-+	req->dev_info.ifi_index = 0;
-+	req->dev_info.ifi_flags = (nl_op == NL_NEW) ? (IFF_BROADCAST | IFF_UP) :
-+						      0;
-+	req->dev_info.ifi_change = 0xffffffff;
-+
-+	rtattr_add_str(&req->nh, IFLA_IFNAME, devp->intf);
-+
-+	if (nl_op == NL_NEW) {
-+		link_info = rtattr_begin(&req->nh, IFLA_LINKINFO);
-+		rtattr_add_strsz(&req->nh, IFLA_INFO_KIND, devp->link_type);
-+
-+		if (devp->fill_info_data) {
-+			info_data = rtattr_begin(&req->nh, IFLA_INFO_DATA);
-+			ret = devp->fill_info_data(&req->nh, devp->cb_data);
-+			if (ret < 0)
-+				return ret;
-+			rtattr_end(&req->nh, info_data);
-+		}
-+		rtattr_end(&req->nh, link_info);
-+	}
-+	return 0;
-+}
-+
-+static const struct nl_req_entry nl_req_tbl[] = {
-+	[NL_ADDR] = { { RTM_NEWADDR, RTM_DELADDR, RTM_GETADDR },
-+		      sizeof(struct ifaddrmsg),
-+		      fill_addr_req,
-+		      check_addr_answer },
-+	[NL_NEIGH] = { { RTM_NEWNEIGH, RTM_DELNEIGH, RTM_GETNEIGH },
-+		       sizeof(struct ndmsg),
-+		       fill_neigh_req,
-+		       NULL },
-+	[NL_ROUTE] = { { RTM_NEWROUTE, RTM_DELROUTE, RTM_GETROUTE },
-+		       sizeof(struct rtmsg),
-+		       fill_route_req,
-+		       check_route_answer },
-+	[NL_DEV] = { { RTM_NEWLINK, RTM_DELLINK, RTM_GETLINK },
-+		     sizeof(struct ifinfomsg),
-+		     fill_dev_req,
-+		     NULL },
-+};
-+
-+static inline int fill_nl_req_msg(int nl_op, int nl_type, void *params,
-+				  struct nl_req_msg *req, struct nl_req_cb *cb)
-+{
-+	int ret;
-+
-+	req->nh.nlmsg_type = nl_req_tbl[nl_type].type[nl_op];
-+	req->nh.nlmsg_flags = NLM_F_REQUEST | NLM_F_ACK;
-+	req->nh.nlmsg_flags |= nl_op == NL_NEW ? (NLM_F_CREATE | NLM_F_EXCL) :
-+						 0;
-+	req->nh.nlmsg_len = NLMSG_LENGTH(nl_req_tbl[nl_type].msgsize);
-+
-+	ret = nl_req_tbl[nl_type].fill_req(nl_op, params, req, cb);
-+	if (ret < 0)
-+		return ret;
-+
-+	if (cb->fill_rtattr) {
-+		ret = cb->fill_rtattr(&req->nh, cb->cb_data);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static inline int check_nl_resp_msg(int rtnl, int nl_op, int nl_type,
-+				    void *params, struct nl_req_msg *req)
-+{
-+	int (*check_answer)(void *, struct nlmsghdr *) =
-+		nl_req_tbl[nl_type].check_answer;
-+	char answer[MAX_RTNL_PAYLOAD];
-+	int len, done, ret = 0;
-+	struct nlmsgerr *err;
-+	struct nlmsghdr *nh;
-+
-+	do {
-+		len = recv(rtnl, answer, sizeof(answer), 0);
-+		if (len < 0)
-+			return -1;
-+
-+		for (nh = (struct nlmsghdr *)answer; NLMSG_OK(nh, len);
-+		     nh = NLMSG_NEXT(nh, len)) {
-+			done = !(nh->nlmsg_flags & NLM_F_MULTI);
-+
-+			if (nh->nlmsg_type == NLMSG_DONE)
-+				goto out;
-+
-+			if (nh->nlmsg_type == NLMSG_ERROR) {
-+				err = (struct nlmsgerr *)NLMSG_DATA(nh);
-+				ret = err->error;
-+				goto out;
-+			}
-+
-+			if (nl_op != NL_GET || !check_answer) {
-+				/* treat new/del non-error msg as error */
-+				ret = -1;
-+				goto out;
-+			}
-+
-+			if (check_answer(params, nh)) {
-+				ret = 1;
-+				goto out;
-+			}
-+		}
-+	} while (!done);
-+
-+out:
-+	return ret;
-+}
-+
-+static inline int netlink_op(int nl_op, int nl_type, void *params)
-+{
-+	struct nl_req_cb cb = { 0 };
-+	struct nl_req_msg req;
-+	int rtnl, ret;
-+
-+	rtnl = socket(AF_NETLINK, SOCK_DGRAM, NETLINK_ROUTE);
-+	if (rtnl < 0)
-+		return -1;
-+
-+	ret = fill_nl_req_msg(nl_op, nl_type, params, &req, &cb);
-+	if (ret < 0)
-+		goto out;
-+
-+	ret = send(rtnl, &req, req.nh.nlmsg_len, 0);
-+	if (ret < 0)
-+		goto out;
-+
-+	/* return 1 if found, 0 if request msg successful, < 0 if error */
-+	ret = check_nl_resp_msg(rtnl, nl_op, nl_type, params, &req);
-+out:
-+	close(rtnl);
-+	return ret;
-+}
-+
-+static inline int ip_addr_add(const char *intf, int family, void *addr,
-+			      uint8_t prefix)
-+{
-+	struct nl_addr param = { intf, family, addr, prefix };
-+
-+	return netlink_op(NL_NEW, NL_ADDR, &param);
-+}
-+
-+static inline int ip_neigh_add(const char *intf, int family, void *addr,
-+			       unsigned char *lladdr)
-+{
-+	struct nl_neigh param = { intf, family, addr, lladdr };
-+
-+	return netlink_op(NL_NEW, NL_NEIGH, &param);
-+}
-+
-+static inline int ip_route_get(const char *intf, int family, void *dst,
-+			       uint8_t dst_len, int type, int table)
-+{
-+	struct nl_route param = {
-+		intf, family, type, table, dst, dst_len, NULL
-+	};
-+
-+	return netlink_op(NL_GET, NL_ROUTE, &param);
-+}
-+
-+static inline int
-+dev_create(const char *dev, char *link_type,
-+	   int (*fill_rtattr)(struct nlmsghdr *nh, void *cb_data),
-+	   int (*fill_info_data)(struct nlmsghdr *nh, void *cb_data),
-+	   void *cb_data)
-+{
-+	struct nl_dev param = { dev, link_type, fill_rtattr, fill_info_data,
-+				cb_data };
-+
-+	return netlink_op(NL_NEW, NL_DEV, &param);
-+}
-+
-+static inline int dev_delete(const char *dev)
-+{
-+	struct nl_dev param = { dev, NULL, NULL, NULL, NULL };
-+
-+	return netlink_op(NL_DEL, NL_DEV, &param);
-+}
-+
-+static inline size_t build_eth(uint8_t *buf, uint16_t proto, unsigned char *src,
-+			       unsigned char *dest)
-+{
-+	struct ethhdr *eth = (struct ethhdr *)buf;
-+
-+	eth->h_proto = htons(proto);
-+	memcpy(eth->h_source, src, ETH_ALEN);
-+	memcpy(eth->h_dest, dest, ETH_ALEN);
-+
-+	return ETH_HLEN;
-+}
-+
-+static inline uint32_t add_csum(const uint8_t *buf, int len)
-+{
-+	uint16_t *sbuf = (uint16_t *)buf;
-+	uint32_t sum = 0;
-+
-+	while (len > 1) {
-+		sum += *sbuf++;
-+		len -= 2;
-+	}
-+
-+	if (len)
-+		sum += *(uint8_t *)sbuf;
-+
-+	return sum;
-+}
-+
-+static inline uint16_t finish_ip_csum(uint32_t sum)
-+{
-+	while (sum >> 16)
-+		sum = (sum & 0xffff) + (sum >> 16);
-+	return ~((uint16_t)sum);
-+}
-+
-+static inline uint16_t build_ip_csum(const uint8_t *buf, int len, uint32_t sum)
-+{
-+	sum += add_csum(buf, len);
-+	return finish_ip_csum(sum);
-+}
-+
-+static inline int build_ipv4_header(uint8_t *buf, uint8_t proto,
-+				    int payload_len, struct in_addr *src,
-+				    struct in_addr *dst)
-+{
-+	struct iphdr *iph = (struct iphdr *)buf;
-+
-+	iph->ihl = 5;
-+	iph->version = 4;
-+	iph->ttl = 8;
-+	iph->tot_len = htons(sizeof(*iph) + payload_len);
-+	iph->id = htons(1337);
-+	iph->protocol = proto;
-+	iph->saddr = src->s_addr;
-+	iph->daddr = dst->s_addr;
-+	iph->check = build_ip_csum(buf, iph->ihl << 2, 0);
-+
-+	return iph->ihl << 2;
-+}
-+
-+static inline void ipv6_set_dsfield(struct ipv6hdr *ip6h, uint8_t dsfield)
-+{
-+	uint16_t val, *ptr = (uint16_t *)ip6h;
-+
-+	val = ntohs(*ptr);
-+	val &= 0xF00F;
-+	val |= ((uint16_t)dsfield) << 4;
-+	*ptr = htons(val);
-+}
-+
-+static inline int build_ipv6_header(uint8_t *buf, uint8_t proto,
-+				    uint8_t dsfield, int payload_len,
-+				    struct in6_addr *src, struct in6_addr *dst)
-+{
-+	struct ipv6hdr *ip6h = (struct ipv6hdr *)buf;
-+
-+	ip6h->version = 6;
-+	ip6h->payload_len = htons(payload_len);
-+	ip6h->nexthdr = proto;
-+	ip6h->hop_limit = 8;
-+	ipv6_set_dsfield(ip6h, dsfield);
-+	memcpy(&ip6h->saddr, src, sizeof(ip6h->saddr));
-+	memcpy(&ip6h->daddr, dst, sizeof(ip6h->daddr));
-+
-+	return sizeof(struct ipv6hdr);
-+}
-+
-+static inline int build_vxlan_header(uint8_t *buf, uint32_t vni)
-+{
-+	uint32_t vx_vni = htonl((vni << 8) & 0xffffff00);
-+	uint32_t vx_flags = htonl(0x08000000);
-+
-+	memcpy(buf, &vx_flags, 4);
-+	memcpy(buf + 4, &vx_vni, 4);
-+	return VXLAN_HLEN;
-+}
-+
-+static inline int build_udp_header(uint8_t *buf, uint16_t sport, uint16_t dport,
-+				   int payload_len)
-+{
-+	struct udphdr *udph = (struct udphdr *)buf;
-+
-+	udph->source = htons(sport);
-+	udph->dest = htons(dport);
-+	udph->len = htons(sizeof(*udph) + payload_len);
-+	return sizeof(*udph);
-+}
-+
-+static inline void build_udp_packet_csum(uint8_t *buf, int family,
-+					 bool csum_off)
-+{
-+	struct udphdr *udph = (struct udphdr *)buf;
-+	size_t ipalen = ip_addr_len(family);
-+	uint32_t sum;
-+
-+	/* No extension IPv4 and IPv6 headers addresses are the last fields */
-+	sum = add_csum(buf - 2 * ipalen, 2 * ipalen);
-+	sum += htons(IPPROTO_UDP) + udph->len;
-+
-+	if (!csum_off)
-+		sum += add_csum(buf, udph->len);
-+
-+	udph->check = finish_ip_csum(sum);
-+}
-+
-+static inline int build_udp_packet(uint8_t *buf, uint16_t sport, uint16_t dport,
-+				   int payload_len, int family, bool csum_off)
-+{
-+	struct udphdr *udph = (struct udphdr *)buf;
-+
-+	build_udp_header(buf, sport, dport, payload_len);
-+	memset(buf + sizeof(*udph), PKT_DATA, payload_len);
-+	build_udp_packet_csum(buf, family, csum_off);
-+
-+	return sizeof(*udph) + payload_len;
-+}
-+
-+static inline int build_virtio_net_hdr_v1_hash_tunnel(uint8_t *buf, bool is_tap,
-+						      int hdr_len, int gso_size,
-+						      int outer_family,
-+						      int inner_family)
-+{
-+	struct virtio_net_hdr_v1_hash_tunnel *vh_tunnel = (void *)buf;
-+	struct virtio_net_hdr_v1 *vh = &vh_tunnel->hash_hdr.hdr;
-+	int outer_iphlen, inner_iphlen, eth_hlen, gso_type;
-+
-+	eth_hlen = is_tap ? ETH_HLEN : 0;
-+	outer_iphlen = (outer_family == AF_INET) ? sizeof(struct iphdr) :
-+						   sizeof(struct ipv6hdr);
-+	inner_iphlen = (inner_family == AF_INET) ? sizeof(struct iphdr) :
-+						   sizeof(struct ipv6hdr);
-+
-+	vh_tunnel->outer_th_offset = eth_hlen + outer_iphlen;
-+	vh_tunnel->inner_nh_offset = vh_tunnel->outer_th_offset + ETH_HLEN +
-+				     VXLAN_HLEN + sizeof(struct udphdr);
-+
-+	vh->csum_start = vh_tunnel->inner_nh_offset + inner_iphlen;
-+	vh->csum_offset = __builtin_offsetof(struct udphdr, check);
-+	vh->flags = VIRTIO_NET_HDR_F_NEEDS_CSUM;
-+	vh->hdr_len = hdr_len;
-+	vh->gso_size = gso_size;
-+
-+	if (gso_size) {
-+		gso_type = outer_family == AF_INET ?
-+				   VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IPV4 :
-+				   VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IPV6;
-+		vh->gso_type = VIRTIO_NET_HDR_GSO_UDP_L4 | gso_type;
-+	}
-+
-+	return sizeof(struct virtio_net_hdr_v1_hash_tunnel);
-+}
-+
-+#endif /* _TUNTAP_HELPERS_H */
+diff --git a/tools/testing/selftests/net/tun.c b/tools/testing/selftests/net/tun.c
+index 038051346714..2ed439cce423 100644
+--- a/tools/testing/selftests/net/tun.c
++++ b/tools/testing/selftests/net/tun.c
+@@ -8,14 +8,12 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
+-#include <linux/if.h>
+ #include <linux/if_tun.h>
+-#include <linux/netlink.h>
+-#include <linux/rtnetlink.h>
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
+ 
+ #include "../kselftest_harness.h"
++#include "tuntap_helpers.h"
+ 
+ static int tun_attach(int fd, char *dev)
+ {
+@@ -66,40 +64,7 @@ static int tun_alloc(char *dev)
+ 
+ static int tun_delete(char *dev)
+ {
+-	struct {
+-		struct nlmsghdr nh;
+-		struct ifinfomsg ifm;
+-		unsigned char data[64];
+-	} req;
+-	struct rtattr *rta;
+-	int ret, rtnl;
+-
+-	rtnl = socket(AF_NETLINK, SOCK_DGRAM, NETLINK_ROUTE);
+-	if (rtnl < 0) {
+-		fprintf(stderr, "can't open rtnl: %s\n", strerror(errno));
+-		return 1;
+-	}
+-
+-	memset(&req, 0, sizeof(req));
+-	req.nh.nlmsg_len = NLMSG_ALIGN(NLMSG_LENGTH(sizeof(req.ifm)));
+-	req.nh.nlmsg_flags = NLM_F_REQUEST;
+-	req.nh.nlmsg_type = RTM_DELLINK;
+-
+-	req.ifm.ifi_family = AF_UNSPEC;
+-
+-	rta = (struct rtattr *)(((char *)&req) + NLMSG_ALIGN(req.nh.nlmsg_len));
+-	rta->rta_type = IFLA_IFNAME;
+-	rta->rta_len = RTA_LENGTH(IFNAMSIZ);
+-	req.nh.nlmsg_len += rta->rta_len;
+-	memcpy(RTA_DATA(rta), dev, IFNAMSIZ);
+-
+-	ret = send(rtnl, &req, req.nh.nlmsg_len, 0);
+-	if (ret < 0)
+-		fprintf(stderr, "can't send: %s\n", strerror(errno));
+-	ret = (unsigned int)ret != req.nh.nlmsg_len;
+-
+-	close(rtnl);
+-	return ret;
++	return dev_delete(dev);
+ }
+ 
+ FIXTURE(tun)
 -- 
 2.49.0
 
