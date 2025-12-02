@@ -1,99 +1,185 @@
-Return-Path: <netdev+bounces-243220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D9FDC9BCA6
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 15:33:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F165AC9BD4F
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 15:44:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 67D194E3816
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 14:33:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A79653A7C87
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 14:44:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F98520F08C;
-	Tue,  2 Dec 2025 14:33:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04B2723D2B2;
+	Tue,  2 Dec 2025 14:44:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MzGRScc/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DvLpU6P1";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="LYDfZlca"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C19618BC3D;
-	Tue,  2 Dec 2025 14:33:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C72BE221F1C
+	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 14:44:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764685990; cv=none; b=os9kUu04yxFY5HNcQB1ZkgMGMgmTzAFyH9wZoXoVtQe31J6/xi/wMe711nPEySCkZT6xGUnHOGq52l/yB8R8rHFiI38H6Lf59zEbCk/T5VGDcvmYtzyn2fXfYHwaWCgZLIqF6jo/L0imV+oXyBefZI5SafLNahYOawo4IdEpFeo=
+	t=1764686654; cv=none; b=CR/8k4lWZcMF1K77kwTt6HUycrvb9Phno5HJUc9GtvIrQhuV2HR8TDKEYch4MR2PydgVb14KZxdP92nrz+cYQzBtEuicay7tkVZAhmOo1txR4d84xUJsSk1h/mbHkXBxq2riB5zCVjHOx1shBp3Qz09CBErefeEWyN8Ueb5yvXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764685990; c=relaxed/simple;
-	bh=Ly/4cWuHRE5Ksuv+Yo/Z1qdg0Fg7JiBJoCRjb1P4hcI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=OTztHJCpxIfTSUFAmn/o6Q2Y5T2POAyE2zD/xKVCAExvZCasB1rUNZRbgGgnYv6I4vSMnBbuCgOyR2hILZYstjCZdPBTv7RJWF3FoyM8omSH/tUF3i3rWO4IYQjc0u9msjKfntWr0jHi7ZeaKkPIXUAioPXO5o1fcODRisl2q8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MzGRScc/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8046EC4CEF1;
-	Tue,  2 Dec 2025 14:33:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764685989;
-	bh=Ly/4cWuHRE5Ksuv+Yo/Z1qdg0Fg7JiBJoCRjb1P4hcI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MzGRScc/IvXrcvO07PgdzuZMI416Qfgaa7Lm/majdXSijKvkGq6aQwnFdUrUXDAX9
-	 lb3CNPW9+4V781IzXL+iQnOh0eUXggIp31aaCg75dbm8VI309F+/sCyqL5mSoh0Rid
-	 ViVaYBiAyMjOiCpaIEwAjqk1JY90Glc9dQCCc+ulcAIjanFDr78aQB5aZUpEPrJz3b
-	 DX/dDYB3JH60KzTOHOIdgxshShBrRAUg2F+PKUqTxdfkcZwgHR03iE0KsZKZJfDWkM
-	 RUcefJPNN/nTnqoyF7h9olevuzwKbt70zVQM1vSzzrVKRktgrq5d69E+pc/ZT1gylt
-	 DpNgK+E/8hrhA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 32EA03A54A16;
-	Tue,  2 Dec 2025 14:30:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1764686654; c=relaxed/simple;
+	bh=NZj4/NW55RYoRrLPZhkJUjtKoD9IgR8bd7QKEau5f4w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bAoUmYD6+NOCEeZmG/RePTTAIGrQflRXcFChCV3acE0oil7mWj8R7FKvzlfqkQq9b9D2lyDmnBHQYCLgm/nEnlFRna5phqO6GsiYEX56Cb538m4Fj3ZKSkG9FLRqiLO8F1i1V6u+oqSs+fzEBBHB2Q5O36ao4IWfqTUxFK537Ho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DvLpU6P1; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=LYDfZlca; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764686651;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mjNiAor2TkYqFzHs2B3P/P9B9Xp/a4exT6Ioq6XTaKs=;
+	b=DvLpU6P1nB2YqddbZfs2RpJvChucfKB5cwlOp/PtSX1mZ0BiEAWT2oe6E51UYseTQZI8ds
+	MXfwrqCHYnLVwi+EdjfwGeWMTXWIILvHHOyPUKq0YY8nrV+KrTGka97riJYhCkhS2effnD
+	IATPjEfOz6WKvGD32RqS3q9UHonLGpE=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-86-Pbh7p94_PmeR6k0h6ENLcg-1; Tue, 02 Dec 2025 09:44:10 -0500
+X-MC-Unique: Pbh7p94_PmeR6k0h6ENLcg-1
+X-Mimecast-MFC-AGG-ID: Pbh7p94_PmeR6k0h6ENLcg_1764686649
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-42e1e1ca008so3118708f8f.0
+        for <netdev@vger.kernel.org>; Tue, 02 Dec 2025 06:44:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1764686649; x=1765291449; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mjNiAor2TkYqFzHs2B3P/P9B9Xp/a4exT6Ioq6XTaKs=;
+        b=LYDfZlca5UbF4aaOnf0jOqD4gg9ZQkqctRFArK/5FouFONoeAo94rbHM1t/OU2KwY+
+         hycZiTPSTurfPFte4blWcmr/f+kZy1z3SKrxrO17YnGeCJebx+Vem03AA+Vh5RlNoJze
+         WU1sqqQUX4lH4Ohexgr2nYhWCEznqHj21dk+RrNUhGy/ou5Y1zXJVOvw9XRwdminCHfn
+         CoeFHkSpVpahVaFfyR0g//mTg4ztJ39XLUVP9Pvv4d4OBKQm35kQgkHHlwFzowdRE2TU
+         xwIguekhSVyyqLtJic+Sp5CI631PEDcIFsdO9tzkTpQHohXMkUgc3zD1rGhK2H3Lmofe
+         U4DQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764686649; x=1765291449;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mjNiAor2TkYqFzHs2B3P/P9B9Xp/a4exT6Ioq6XTaKs=;
+        b=hkv5QZ2jzu84M6fhnYSLzvKmEeQckwFmFY0GmJWPzWTMTa9OwuE37N34IsK5AJKwV7
+         my7y+mxOVG2Vzgj+Q+cigJkPvuLnZRyySoGoUwbY6f2C9nwpHk/9OPwsXT8Vxj2YtJx8
+         tJBXNVtupEnoazpP7O9uKeFPPbQ67KDAy83TwD2PnfgYG4h63LEXx7d7t/k6rPMHP35F
+         gUEY1da0MFtPGq7jmsR9u6VbHY5pUIGoPZf+n+FTsYI3BphmEprNqSNdMhAUf+b9jvFw
+         /UKVKusb3dxmDk2JQ/RqGLkzWZqV6BECdOjsvDAiVfZ1ZXDGvma580tFc0z0mVJdrHz0
+         kL0w==
+X-Forwarded-Encrypted: i=1; AJvYcCU1z3Sse78UT/kYYXgsewtQ/v/v/sIVii3URAVuxDJruwOIPvY4J+v/Oade5Sj6zNyysKbgja0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLJFsAfvfJNudQr6T1Xp+Xrjyo1snaWp7Io5utvwRif7LXv7Ru
+	QD6v2rjIZIddT96VbCMg8FQX+OFj/aFGwKnnYZ6WjJJWJLzZV+GrvGYLr7Z5GdIYMad5v0Xb6nG
+	HI/EglyeBVGOouULvYEDEHjigwD24c3IjiIcqQT5MXE4+kpRqX9x0WPSRkw==
+X-Gm-Gg: ASbGncuSpMAAUyKuiZmIx79GqacbuuqlGt/UA4ZIdy080DFm4JsV2QHpjXiopVLREqs
+	SyZbZvL/fY2OB9e/wYYv244iJ8A7yhFtzz3lTWL8COsf7LZU7DLWMV6jNmahatuzlVBSkoOWGf1
+	LlbsTOEvqgv5467X2gBjlG90uUBkMvQVKrMw3ie2aEJ1Kq48kgKe+vlHcX06vrOOrFkV0NR+tpj
+	Rw7gKNMy5Hnau0kJ0MuXpt7CuxLMzh9MzDdzNEAJe+Lb2QYNCX1icXAZ0TLRQiiguAgRQeN/jIo
+	N5Di3wJJSNnNRRXYITph43IXwO9QC5G/Emtkt8ID9Cjig9xTlS+zBcW+R4AiaYKRFCM/BZdh0y6
+	v92PNxZDb5E5TBA==
+X-Received: by 2002:a05:600c:190b:b0:46e:2815:8568 with SMTP id 5b1f17b1804b1-47926f99134mr29820005e9.10.1764686649249;
+        Tue, 02 Dec 2025 06:44:09 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG1rSpvcyj7MIWwm/bcqJ3Gqt/h4Kwl1pmES70ih45QAJCy1rFgmux40sFPF3KzuExq8RZOQg==
+X-Received: by 2002:a05:600c:190b:b0:46e:2815:8568 with SMTP id 5b1f17b1804b1-47926f99134mr29819585e9.10.1764686648788;
+        Tue, 02 Dec 2025 06:44:08 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.136])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4790b0c3a1dsm380823035e9.10.2025.12.02.06.44.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Dec 2025 06:44:08 -0800 (PST)
+Message-ID: <743e8c49-8683-46b7-8a8f-38b5ec36906a@redhat.com>
+Date: Tue, 2 Dec 2025 15:44:06 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next V2 0/2] net/mlx5e: Disable egress xdp-redirect in
- default
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176468580905.3250289.13105138318084701594.git-patchwork-notify@kernel.org>
-Date: Tue, 02 Dec 2025 14:30:09 +0000
-References: <1764497617-1326331-1-git-send-email-tariqt@nvidia.com>
-In-Reply-To: <1764497617-1326331-1-git-send-email-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
- leon@kernel.org, mbloch@nvidia.com, ast@kernel.org, daniel@iogearbox.net,
- hawk@kernel.org, john.fastabend@gmail.com, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, gal@nvidia.com, moshe@nvidia.com, dtatulea@nvidia.com,
- witu@nvidia.com, toke@redhat.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 0/9] Add support for providers with large rx
+ buffer
+To: Pavel Begunkov <asml.silence@gmail.com>, netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Michael Chan <michael.chan@broadcom.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>, Shuah Khan
+ <shuah@kernel.org>, Mina Almasry <almasrymina@google.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Yue Haibing <yuehaibing@huawei.com>,
+ David Wei <dw@davidwei.uk>, Haiyue Wang <haiyuewa@163.com>,
+ Jens Axboe <axboe@kernel.dk>, Joe Damato <jdamato@fastly.com>,
+ Simon Horman <horms@kernel.org>, Vishwanath Seshagiri <vishs@fb.com>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ io-uring@vger.kernel.org, dtatulea@nvidia.com
+References: <cover.1764542851.git.asml.silence@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <cover.1764542851.git.asml.silence@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Sun, 30 Nov 2025 12:13:35 +0200 you wrote:
-> Hi,
+On 12/1/25 12:35 AM, Pavel Begunkov wrote:
+> Note: it's net/ only bits and doesn't include changes, which shoulf be
+> merged separately and are posted separately. The full branch for
+> convenience is at [1], and the patch is here:
 > 
-> This small series disables the egress xdp-redirect feature in default.
-> It can still be enabled by loading a dummy XDP program.
+> https://lore.kernel.org/io-uring/7486ab32e99be1f614b3ef8d0e9bc77015b173f7.1764265323.git.asml.silence@gmail.com
 > 
-> Patches were previously submitted as part of [1].
+> Many modern NICs support configurable receive buffer lengths, and zcrx and
+> memory providers can use buffers larger than 4K/PAGE_SIZE on x86 to improve
+> performance. When paired with hw-gro larger rx buffer sizes can drastically
+> reduce the number of buffers traversing the stack and save a lot of processing
+> time. It also allows to give to users larger contiguous chunks of data. The
+> idea was first floated around by Saeed during netdev conf 2024 and was
+> asked about by a few folks.
 > 
-> [...]
+> Single stream benchmarks showed up to ~30% CPU util improvement.
+> E.g. comparison for 4K vs 32K buffers using a 200Gbit NIC:
+> 
+> packets=23987040 (MB=2745098), rps=199559 (MB/s=22837)
+> CPU    %usr   %nice    %sys %iowait    %irq   %soft   %idle
+>   0    1.53    0.00   27.78    2.72    1.31   66.45    0.22
+> packets=24078368 (MB=2755550), rps=200319 (MB/s=22924)
+> CPU    %usr   %nice    %sys %iowait    %irq   %soft   %idle
+>   0    0.69    0.00    8.26   31.65    1.83   57.00    0.57
+> 
+> This series adds net infrastructure for memory providers configuring
+> the size and implements it for bnxt. It's an opt-in feature for drivers,
+> they should advertise support for the parameter in the qops and must check
+> if the hardware supports the given size. It's limited to memory providers
+> as it drastically simplifies implementation. It doesn't affect the fast
+> path zcrx uAPI, and the sizes is defined in zcrx terms, which allows it
+> to be flexible and adjusted in the future, see Patch 8 for details.
+> 
+> A liburing example can be found at [2]
+> 
+> full branch:
+> [1] https://github.com/isilence/linux.git zcrx/large-buffers-v7
+> Liburing example:
+> [2] https://github.com/isilence/liburing.git zcrx/rx-buf-len
 
-Here is the summary with links:
-  - [net-next,V2,1/2] net/mlx5e: Update XDP features in switch channels
-    https://git.kernel.org/netdev/net-next/c/96a839506135
-  - [net-next,V2,2/2] net/mlx5e: Support XDP target xmit with dummy program
-    https://git.kernel.org/netdev/net-next/c/d4aa0cc9bd31
+Dump question, hoping someone could answer in a very short time...
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Differently from previous revisions, this is not a PR, just a plain
+patch series - that in turn may cause duplicate commits when applied on
+different trees.
 
+Is the above intentional? why?
+
+Thanks,
+
+Paolo
 
 
