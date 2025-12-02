@@ -1,150 +1,118 @@
-Return-Path: <netdev+bounces-243241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E52BDC9C2C9
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 17:21:07 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D6DDC9C2D5
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 17:21:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81A913AB0DC
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 16:16:55 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 664F34E2724
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 16:21:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92F90263F52;
-	Tue,  2 Dec 2025 16:16:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A00D276046;
+	Tue,  2 Dec 2025 16:21:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MokDP01/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kjnrp4TP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6541428373;
-	Tue,  2 Dec 2025 16:16:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3927279DA2;
+	Tue,  2 Dec 2025 16:21:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764692212; cv=none; b=ZphnEh7pg0WVghssxGaJKJU1nRwLrMLZMBJqm00NWljj5o1fqaegPQ/y421hWOnYhQQrLJdoXcR8yKtJ65Zava/RROtvZxl59hb2TK5aHwVn6eKaidh2cuE5XGWW5igegcvxr6GfBiSZTq1738yOSRZ6t9pTkTBKRf18JWgGgfY=
+	t=1764692505; cv=none; b=uxX9G7GzXOHLs0mfN0dQLT72S2GvFQIvLGj1IO7qtFVCWkZpTkoo9Ae7hE7rZWonrU+9uNZ/ArDn6NVK/BaM3Lg/V/1vd9CgWQa7PzddRbwW/ubhVmSxZcMgGlkk/CLaqliRreI5JgN3Z1fQyF1hfo66EHq7/jRCO1rQhD343sw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764692212; c=relaxed/simple;
-	bh=PVARMYIL5iKuFDPs7ScHjrzq7cOp+Ln4nZRlGCcro7U=;
+	s=arc-20240116; t=1764692505; c=relaxed/simple;
+	bh=Sjbo92kQLt3c10t++zLRzbEDhdqfU1f3PTdpZLveEDo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cO3lYXL7EI270WozAaZ6p+lWfJTL0NRty8OrRvrmgY9HIkvqdOncLrEUU60rdM3D/eyTGfk+fVoOXqODlde/u5OZeEjlBmypmxl/0ZZnc7UgbslKZbyUMals+B8ECZ1xtGJFcD+jzdhxGcB3ff/C3hJATjKAvuI7JskNa2kPcRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MokDP01/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 458C4C4CEF1;
-	Tue,  2 Dec 2025 16:16:49 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=A6pqpjVAL7fLViviia/AtXNd3xTruXe0JJqLTB2/p5/MsgoFwPdIMQhYS52GNulJCZbAd3vjegZC+eMgog1k6XzKTgD2ItCX/zOE9PSjvMHEMG/698RWdKDk9sjJd1HzQTK2kX/odayo37wTz56VKHkMT8CSqUDWhB3OlOVfBmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kjnrp4TP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70111C116B1;
+	Tue,  2 Dec 2025 16:21:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764692212;
-	bh=PVARMYIL5iKuFDPs7ScHjrzq7cOp+Ln4nZRlGCcro7U=;
+	s=k20201202; t=1764692504;
+	bh=Sjbo92kQLt3c10t++zLRzbEDhdqfU1f3PTdpZLveEDo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MokDP01/56WXAAh+8PEEtoCe8UOTGEiGK13/4SGlm4JRKGeuY2MX8nENhIaBnenKy
-	 4xp2CykeqPMLqOJG8y87/ufmWk6Kl4cCf2keBBxIzsK3PCTqjGo3PLbPmMKlTgTE12
-	 R0pqEwyZbMkbkBzNLc7iK/vMx/jJesaCiblgozIE65p4QrXd3IojOQxy5DzPvp9hMh
-	 eOZFneaLw7mmH0NSQ6Mtb0p1JtDSHqHxlu31jvTwk4Chn2RnCQbI+gQfL/VaH4c3TE
-	 aKH2v/4qOrh6GFsqnmBVwIBAsg0MHvE3qZgi0YRVAtVCjXtJ7sD2DkvWOUJ1GO3hRy
-	 zLADVZkO4BXVA==
-Date: Tue, 2 Dec 2025 16:16:47 +0000
+	b=kjnrp4TP8Rd10mxGzKqCWm8MWz5NKLxiAe1ahCNBnF8OYrVL6tPcWWlabfpQpqbon
+	 6o9LIDT8u8ptSLJSQJ+rC6utj9OaRAMmyUr/WY9eYlX+oU0K5BlZHzBONIWzLzFsB1
+	 3CFBor/WZ6WwqWDTzKPco89CgLdDciX7Ii6TqMb8cce2yR9rD5kyCo+nShN5AQ0Y7w
+	 0hQnnvZeYrT4059HtNoJCiVnIIoQbSGv+RaFbNhsEfAcqP9nhsYEzBqD9mlVcgUvpk
+	 36o/NwzbOGJs53CePvg09TLh6TKiHiTD42OqfIQtZA0S7nfNziyYFsE8E3syeoTzom
+	 fIo+kxpAO2KEA==
+Date: Tue, 2 Dec 2025 16:21:40 +0000
 From: Simon Horman <horms@kernel.org>
-To: Chris Mason <clm@meta.com>
-Cc: Jonas Gorski <jonas.gorski@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH RFC/RFT net-next v2 1/5] net: dsa: deny bridge VLAN with
- existing 8021q upper on any port
-Message-ID: <aS8Q7yCvvhXn5iYu@horms.kernel.org>
-References: <CAOiHx=mog+8Grm1QTnqU_F3=BnWmJqTj+ko-nZiRMAb4-hvSqw@mail.gmail.com>
- <20251201224855.4102774-1-clm@meta.com>
+To: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
+Cc: piergiorgio.beruto@gmail.com, andrew@lunn.ch, hkallweit1@gmail.com,
+	linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v4 1/2] net: phy: phy-c45: add SQI and SQI+
+ support for OATC14 10Base-T1S PHYs
+Message-ID: <aS8SFIN_LZsoyAKW@horms.kernel.org>
+References: <20251201032346.6699-1-parthiban.veerasooran@microchip.com>
+ <20251201032346.6699-2-parthiban.veerasooran@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251201224855.4102774-1-clm@meta.com>
+In-Reply-To: <20251201032346.6699-2-parthiban.veerasooran@microchip.com>
 
-On Mon, Dec 01, 2025 at 02:48:48PM -0800, Chris Mason wrote:
-> On Mon, 1 Dec 2025 20:52:34 +0100 Jonas Gorski <jonas.gorski@gmail.com> wrote:
-> 
-> > Hi,
-> > 
-> > On Mon, Dec 1, 2025 at 3:48 PM Simon Horman <horms@kernel.org> wrote:
-> > >
-> > > On Mon, Dec 01, 2025 at 11:28:13AM +0100, Jonas Gorski wrote:
-> > >
-> > > ...
-> > >
-> > > > diff --git a/net/dsa/user.c b/net/dsa/user.c
-> > > > index f59d66f0975d..fa1fe0f1493a 100644
-> > > > --- a/net/dsa/user.c
-> > > > +++ b/net/dsa/user.c
-> > > > @@ -653,21 +653,30 @@ static int dsa_user_port_attr_set(struct net_device *dev, const void *ctx,
-> > > >
-> > > >  /* Must be called under rcu_read_lock() */
-> > > >  static int
-> > > > -dsa_user_vlan_check_for_8021q_uppers(struct net_device *user,
-> > > > +dsa_user_vlan_check_for_8021q_uppers(struct dsa_port *dp,
-> > > >                                    const struct switchdev_obj_port_vlan *vlan)
-> > > >  {
-> > > > -     struct net_device *upper_dev;
-> > > > -     struct list_head *iter;
-> > > > +     struct dsa_switch *ds = dp->ds;
-> > > > +     struct dsa_port *other_dp;
-> > > >
-> > > > -     netdev_for_each_upper_dev_rcu(user, upper_dev, iter) {
-> > > > -             u16 vid;
-> > > > +     dsa_switch_for_each_user_port(other_dp, ds) {
-> > > > +             struct net_device *user = other_dp->user;
-> > >
-> > > Hi Jonas,
-> > >
-> > > The AI robot is concerned that user may be NULL here.
-> > > And I can't convince myself that cannot be the case.
-> > >
-> > > Could you take a look?
-> > >
-> > > https://netdev-ai.bots.linux.dev/ai-review.html?id=47057e-e740-4b66-9d60-9ec2a7ee92a1#patch-0
-> > 
-> > At this point it can be NULL. But it being NULL is not an issue, as ...
-> > >
-> > > > +             struct net_device *upper_dev;
-> > > > +             struct list_head *iter;
-> > > >
-> > > > -             if (!is_vlan_dev(upper_dev))
-> > > > +             if (!dsa_port_bridge_same(dp, other_dp))
-> > > >                       continue;
-> > 
-> > ... this condition will filter all cases where it is NULL. For
-> > dsa_port_bridge_same() to return true both ports need to be attached
-> > to a bridge (and to the same bridge), and to be attached to a bridge a
-> > net_device is required, so other_dp->user cannot be NULL. And we only
-> > access user after here.
+On Mon, Dec 01, 2025 at 08:53:45AM +0530, Parthiban Veerasooran wrote:
 
-Thanks for the explanation Jonas.
+...
 
-I wasn't very confident with this report.
-And I was too focused on working out if user could be NULL rather
-than if it matters. Still, I may not have worked it out.
+> +int genphy_c45_oatc14_get_sqi_max(struct phy_device *phydev)
+> +{
+> +	int ret;
+> +
+> +	if (!phydev->oatc14_sqi_capability.updated) {
+> +		ret = oatc14_update_sqi_capability(phydev);
+> +		if (ret)
+> +			return ret;
+> +	}
 
-> 
-> I reproduced this false positive here, thanks for the explanation.  This is an
-> example of a class of review mistakes I've wanted to fix, so I used it to
-> improve the prompts around NULL pointers that are protected via other checks.
-> 
-> I'll test this on some more commits and push it out.
+Hi Parthiban,
 
-Thanks for following-up on this Chris.
+I think the check for phydev->oatc14_sqi_capability.updated can be folded
+into oatc14_update_sqi_capability(), avoiding duplicating it here and in
+genphy_c45_oatc14_get_sqi().
 
-I guess everyone has their own opinion on AI.
-And, in a similar vein, many have opinions on the review-prompts.
-But, FTR, I've been impressed by the output I've seen,
-having used them for a few weeks now. And I look forward
-to that improving further.
+If you agree, could you consider posting a follow-up once net-next has
+re-opened?
 
+> +
+> +	return phydev->oatc14_sqi_capability.sqi_max;
+> +}
+> +EXPORT_SYMBOL(genphy_c45_oatc14_get_sqi_max);
+> +
+> +/**
+> + * genphy_c45_oatc14_get_sqi - Get Signal Quality Indicator (SQI) from an OATC14
+> + *			       10Base-T1S PHY
+> + * @phydev: pointer to the PHY device structure
+> + *
+> + * This function reads the SQI+ or SQI value from an OATC14-compatible
+> + * 10Base-T1S PHY. If SQI+ capability is supported, the function returns the
+> + * extended SQI+ value; otherwise, it returns the basic SQI value. The SQI
+> + * capability is updated on first invocation if it has not already been updated.
+> + *
+> + * Return:
+> + * * SQI/SQI+ value on success
+> + * * Negative errno on read failure
+> + */
+> +int genphy_c45_oatc14_get_sqi(struct phy_device *phydev)
+> +{
+> +	u8 shift;
+> +	int ret;
+> +
+> +	if (!phydev->oatc14_sqi_capability.updated) {
+> +		ret = oatc14_update_sqi_capability(phydev);
+> +		if (ret)
+> +			return ret;
+> +	}
 
