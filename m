@@ -1,192 +1,91 @@
-Return-Path: <netdev+bounces-243235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6432C9C057
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 16:49:57 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80593C9C085
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 16:52:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3C5074E38B1
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 15:48:57 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 08763347C4F
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 15:52:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D73BF31ED9D;
-	Tue,  2 Dec 2025 15:48:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 971843168FB;
+	Tue,  2 Dec 2025 15:52:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="0DIW3mVp"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rOIL1eOT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCB683164AB
-	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 15:48:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFAD5320CD9
+	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 15:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764690534; cv=none; b=K76B/B2WH6ngpaBwicM2hxJMVgOnB+A04WTztRcz+3LNfcDWLrX3pgKcN94AOx92YnJIqt3NGoD5sfVBBH/PsdQasYBUBEj8tzY63z/EvCdOy6xzNFOSuHpCYlj1uI72beMHdhfKiGgWhAlRbNVvD7DMQuWKHCJCvAZ2uoCqZiM=
+	t=1764690767; cv=none; b=SEuZRHxIbnCpw3qwxbOdyyPo+ecohN24M7LKsWWidlEl/UOUxDVJgI2obCwyCcC/w03LPK84U1F4oHGRtOxcKCWTnPbVpDBwCfW8XHBLK0ZBzRKMRouz+cixHguAT8jaLp74uBvzPFJPFe1UQ2fniLxq/9a/1Qx8BcVGFtRGBl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764690534; c=relaxed/simple;
-	bh=K1tR2iuSOs6vNvplJ2wKOeNyl3VhtwG9KecCIqkktbk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PSef3GKYO9qQmjRFDEv72vbQoxOLi53CikBNG124xnOG48vYBx9PmmAryS7ZjxqXYIcX934KmIj0g5W74AW6rNWiFUr+EJBF+Z8wLMVCFmpKmljQpY/sti5k5qGYSOBBu+1Ts2nfv5TrFytLMHFqwsfxJpMiHPBnVp+6AmgZ8lk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=0DIW3mVp; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 8BF62C17B7E;
-	Tue,  2 Dec 2025 15:48:26 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id AB9EE606D6;
-	Tue,  2 Dec 2025 15:48:49 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9088811919C22;
-	Tue,  2 Dec 2025 16:48:40 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1764690528; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=rMIFzfxad91ubA6fyH1uZaF1Zu4vkX1bopp9UAEB1ok=;
-	b=0DIW3mVpRWiI2wPcbqGnJN+i3obaZkrmas/VrjGd8XMI25WcIAJG9yk2nxOGGumtlKjaml
-	cQQZyCjT2C66qpCtLoyAQCeUCWxBb/KV2J6FpEMYCVV5vLmZ1tVg3oOxsJX61uVgiJeDXF
-	O1HzokU48HCHr8r6SCbeCwT/5OB9xo6XmuFgvpZEj+VfvbHDOSuTjpZLc9FGN3LFtip1+2
-	4o2gNvUWlmaS8TTC3Basjl6KnwfV9a3fYLCniuGvpyRO/Vwrpf0LGzeHdVeMV4NoffY8m7
-	Kf5bBhs8qOCODQqGcWFMhQpF6+P5omRFiyPjLF3sGh3HhyUz27FIMEYQqYTSqA==
-Message-ID: <49709595-5012-4fa3-9616-839dcdbf6b09@bootlin.com>
-Date: Tue, 2 Dec 2025 16:48:39 +0100
+	s=arc-20240116; t=1764690767; c=relaxed/simple;
+	bh=zJUxyA0Hd+UFWmoIl95swG12On91cxFdVDwEpnSWMNo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Pd6VvBNlWr27A16J4IC6G8nYp97pESqOA5HrFFuENT1ScnB0E8hum+RiCPE9QT6nz398pKqdFCyieUd4XPh5szvoYBEbwsWlQZtL5UhsA80VqdKrQu7kXZL0VAY+dzCHyavDRY5zE4XwjekB6IUfpkMsex8mxQlx1LUmLjwWSt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rOIL1eOT; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=uMEdNSp2pHXWmIKyFSArTZaOESA0rARPTf5xfOdp2+Y=; b=rO
+	IL1eOTIVAwy/zIQl4p9PlSF9B9mlpZHJiSaU87p+BYWrDzf2Zyu0fJL+Mo+z/UBcMVBqn2mFvE+JT
+	hEwIlDMA2elBxwYYzuCC599GzgmNMfYA8vCH8K5jaxIP1uwpb/IE1X6GvpSDEuaRKBzlxk1uojEqq
+	UASIJPwZ1sXbx/0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vQSgE-00FiJa-VI; Tue, 02 Dec 2025 16:52:42 +0100
+Date: Tue, 2 Dec 2025 16:52:42 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?iso-8859-1?Q?Ren=E9?= Rebe <rene@exactco.de>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	nic_swsd@realtek.com
+Subject: Re: [PATCH] r8169: fix RTL8117 Wake-on-Lan in DASH mode
+Message-ID: <2d6a68c7-cad7-4a0d-9c73-03d3c217bfce@lunn.ch>
+References: <20251201.201706.660956838646693149.rene@exactco.de>
+ <8bee22b7-ed4c-43d1-9bf2-d8397b5e01e5@gmail.com>
+ <B31500F7-12DF-4460-B3D5-063436A215E4@exactco.de>
+ <76d62393-0ec5-44c9-9f5c-9ab872053e95@gmail.com>
+ <9F5C55F0-84EC-48C2-94E2-7729A569C8CA@exactco.de>
+ <679e6016-64f7-4a50-8497-936db038467e@gmail.com>
+ <89595AAE-8A92-4D8B-A40C-E5437B750B42@exactco.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v21 02/14] net: ethtool: Introduce
- ETHTOOL_LINK_MEDIUM_* values
-To: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, thomas.petazzoni@bootlin.com,
- Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Russell King <linux@armlinux.org.uk>,
- linux-arm-kernel@lists.infradead.org,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
- =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
- Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
- Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
- Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
- Romain Gantois <romain.gantois@bootlin.com>,
- Daniel Golle <daniel@makrotopia.org>,
- Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
- Tariq Toukan <tariqt@nvidia.com>
-References: <20251129082228.454678-1-maxime.chevallier@bootlin.com>
- <20251129082228.454678-3-maxime.chevallier@bootlin.com>
- <298e982d-7796-4e46-ad1d-a7f57c573f35@redhat.com>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <298e982d-7796-4e46-ad1d-a7f57c573f35@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <89595AAE-8A92-4D8B-A40C-E5437B750B42@exactco.de>
 
-Hi Paolo
+> Well, the argument is for wakeup to “just work”. There also
+> should be some consistency in Linux. Either all drivers should
+> enable it or disable it by default. That is why I have thrown in
+> the idea of a new kconfig options for downstream distros to
+> make a conscious global choice. E.g. we would ship it it
+> enabled.
 
-On 02/12/2025 14:03, Paolo Abeni wrote:
-> On 11/29/25 9:22 AM, Maxime Chevallier wrote:
->> @@ -298,138 +321,149 @@ static_assert(ARRAY_SIZE(link_mode_names) == __ETHTOOL_LINK_MODE_MASK_NBITS);
->>  		.speed	= SPEED_UNKNOWN, \
->>  		.lanes	= 0, \
->>  		.duplex	= DUPLEX_UNKNOWN, \
->> +		.mediums = BIT(ETHTOOL_LINK_MEDIUM_NONE), \
->>  	}
->>  
->>  const struct link_mode_info link_mode_params[] = {
->> -	__DEFINE_LINK_MODE_PARAMS(10, T, Half),
->> -	__DEFINE_LINK_MODE_PARAMS(10, T, Full),
->> -	__DEFINE_LINK_MODE_PARAMS(100, T, Half),
->> -	__DEFINE_LINK_MODE_PARAMS(100, T, Full),
->> -	__DEFINE_LINK_MODE_PARAMS(1000, T, Half),
->> -	__DEFINE_LINK_MODE_PARAMS(1000, T, Full),
->> +	__DEFINE_LINK_MODE_PARAMS_PAIRS(10, T, 2, 4, Half, T),
->> +	__DEFINE_LINK_MODE_PARAMS_PAIRS(10, T, 2, 4, Full, T),
->> +	__DEFINE_LINK_MODE_PARAMS_PAIRS(100, T, 2, 4, Half, T),
->> +	__DEFINE_LINK_MODE_PARAMS_PAIRS(100, T, 2, 4, Full, T),
->> +	__DEFINE_LINK_MODE_PARAMS_PAIRS(1000, T, 4, 4, Half, T),
->> +	__DEFINE_LINK_MODE_PARAMS_PAIRS(1000, T, 4, 4, Full, T),
->>  	__DEFINE_SPECIAL_MODE_PARAMS(Autoneg),
->>  	__DEFINE_SPECIAL_MODE_PARAMS(TP),
->>  	__DEFINE_SPECIAL_MODE_PARAMS(AUI),
->>  	__DEFINE_SPECIAL_MODE_PARAMS(MII),
->>  	__DEFINE_SPECIAL_MODE_PARAMS(FIBRE),
->>  	__DEFINE_SPECIAL_MODE_PARAMS(BNC),
->> -	__DEFINE_LINK_MODE_PARAMS(10000, T, Full),
->> +	__DEFINE_LINK_MODE_PARAMS_PAIRS(10000, T, 4, 4, Full, T),
->>  	__DEFINE_SPECIAL_MODE_PARAMS(Pause),
->>  	__DEFINE_SPECIAL_MODE_PARAMS(Asym_Pause),
->> -	__DEFINE_LINK_MODE_PARAMS(2500, X, Full),
->> +	__DEFINE_LINK_MODE_PARAMS_MEDIUMS(2500, X, Full,
->> +					  __MED(C) | __MED(S) | __MED(L)),
->>  	__DEFINE_SPECIAL_MODE_PARAMS(Backplane),
->> -	__DEFINE_LINK_MODE_PARAMS(1000, KX, Full),
->> -	__DEFINE_LINK_MODE_PARAMS(10000, KX4, Full),
->> -	__DEFINE_LINK_MODE_PARAMS(10000, KR, Full),
->> +	__DEFINE_LINK_MODE_PARAMS(1000, KX, Full, K),
->> +	__DEFINE_LINK_MODE_PARAMS(10000, KX4, Full, K),
->> +	__DEFINE_LINK_MODE_PARAMS(10000, KR, Full, K),
->>  	[ETHTOOL_LINK_MODE_10000baseR_FEC_BIT] = {
->>  		.speed	= SPEED_10000,
->>  		.lanes	= 1,
->>  		.duplex = DUPLEX_FULL,
-> 
-> The AI review points that medium is not initialized here:
-> 
-> https://netdev-ai.bots.linux.dev/ai-review.html?id=437cd013-c6a6-49e1-bec1-de4869930c7a#patch-1
-> 
-> Is that intentional? It should deserve at least an explanation in the
-> commit message.
+You might need to separate out, what is Linux doing, and what is the
+bootloader doing before Linux takes over the machine.
 
-Yes it is OK, however I don't really know how to answer AI on that. I'm
-sorry it's still a bit blurry to me what's the right way to proceed with
-these reviews.
+Linux drivers sometimes don't reset WoL back to nothing enabled. They
+just take over how the hardware was configured. So if the bootloader
+has enabled Magic packet, Linux might inherit that.
 
-Should I paste the AI report, then reply to it ?
+I _think_ Linux enabling Magic packet by default does not
+happen. Which is why it would be good if you give links to 5 to 10
+drivers, from the over 200 in the kernel, which do enable WoL by
+default.
 
-I'd rather add more comments to the code than say in my commit log "AI
-says xxx, it's wrong because blabla" though.
-
-> 
-> Somewhat related, AI raised on the first patch the same question raised
-> on a previous iteration, and I assumed you considered that valid,
-> according to:
-> 
-> https://lore.kernel.org/netdev/f753719e-2370-401d-a001-821bdd5ee838@bootlin.com/
-
-So I don't know either how to proceed with this. dt_binding_check is
-fine with the current state, and Rob acked the patch. I am not sure how
-it's going to be received if I reach out to DT maintainers saying "the
-netdev LLM said XXX, is this correct or hallucination ?", but it may
-very well have a good point. I did try to dive into the yaml and then
-json schema specs, but I wasn't able to go far enough to reach a proper
-conclusion on wether we must remove "contains" for scalar :(
-
-All of that would be a bit clearer if the AI review was on the ML, but I
-also understand the risk for pollution with that, especially at an early
-stage of adoption.
-
-> 
-> Otherwise I think some wording in the commit message explaining why the
-> AI feedback is incorrect would be useful.
-> 
-> /P
-> 
-
-I'll update the commits and add comments anyways. I guess in a month
-though, with net-next closed then the end of year.
-
-Thanks,
-
-Maxime
+	Andrew
 
