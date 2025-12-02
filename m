@@ -1,169 +1,110 @@
-Return-Path: <netdev+bounces-243297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id C64C8C9CA9D
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 19:37:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CECAFC9CABB
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 19:41:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A839E4E35E5
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 18:37:57 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 92B9F4E37DF
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 18:41:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD43E2BEFEB;
-	Tue,  2 Dec 2025 18:37:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBA372C21E6;
+	Tue,  2 Dec 2025 18:41:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bIbzuMBe"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=exactco.de header.i=@exactco.de header.b="HR26SpDx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from exactco.de (exactco.de [176.9.10.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36A24255248
-	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 18:37:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A78B28C00C;
+	Tue,  2 Dec 2025 18:41:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.10.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764700674; cv=none; b=IDiC8+4P+JmjvnDyPXCG96HSiYs7vVokwh5VkNcIfnEppCxjjORu5gpP2WXhdwb6Aj2d4nhh4PPKTTdzpeNBnM/3MfnfXMDgxFDaZAkHv/uxjzIUol2H45DXmAPe0iHBjHtx4TjzujqzSuw4T4Z3Lqy33yGeoxDZxLL8dltP9hw=
+	t=1764700903; cv=none; b=Qz5f+MLe8fIWIbFYkt5ReOs3adcK8wV3P1ErIBRAq6XB3C0+2wfwxj1cwDCAf05JWqIjaS1tcYD1s2zK6VPObFndBhrnn7+6kRDoBlIyzYZ/v41YCLnJ7IJYEq+/IsCB+Kp3zXzV3wL4kgkhaiKbv54Tmp+lacYWHl8f2+Cnjic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764700674; c=relaxed/simple;
-	bh=GnlE4BUxEgEszX3Rd8HFrIVxrRs/MgEFgw9SVZ+Y29A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ht5g/fo9p9ZnoHhp6mU+WO+LWEiko6cfyOaihVsCGr5HPR8R67RmjL2ZZhjjJvmkUjM6bKHSw5S4V29GWvhaT7PIsfK98quuIPAfItCaTqSVLVncUsFLQijCviNBYRChxt8gotsmuVJletb0nyrGxqqRvKPbJU9vmmTw7SGcRTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bIbzuMBe; arc=none smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-787ff3f462bso1903497b3.0
-        for <netdev@vger.kernel.org>; Tue, 02 Dec 2025 10:37:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764700672; x=1765305472; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=013H9LWKQxOenYGa2r/1ESrD1I2f7WW6c9h6ClwsUZo=;
-        b=bIbzuMBepGB9gTuGxfb49vzuqm1Ae4MQL0OHleKXHRORgqM4UD8xbRSweJPbpxkOlp
-         7/dH4k+Lpm26+QeHp1LteQjxlCZJ2CYVpvYhung912Sh58qb5RcDybCNMNlpJ8dromek
-         Ak/akMvTGB7z3tE5dd5Hppk/FEBAaeUuqqRvLZOnaeLaYbidHuue+JOU0OZaFL/09cuP
-         2cvuT/vbIN0BnbQglU8W2vhV0fyGIIlqhPpPT//36FctDVeCpwpTTw+vfx9yOJyLz+lN
-         yZ82lyQ967SFy9+w3KLl3jnILFZ6gVD8Nm6OYynBZe0SwYYm1RGTBftMXMPQLi5j+/vm
-         aJSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764700672; x=1765305472;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=013H9LWKQxOenYGa2r/1ESrD1I2f7WW6c9h6ClwsUZo=;
-        b=gI1nLsyA6uSM0JhdgaT7JHCI/K2k1k4gyyWO9CNrHh+tQVFXNpGM2gjQVJtp2bjB8l
-         yxoukxpFipyyfbAts54S3UFham9D2R3kV4cx7G7Ios/tu5/rPU9O7OmSSFlKRokqOnB1
-         wd5tHQk4KfI7thq7eW0GnloKXfMESMOF2OIXcb0zDnioDj9DkuhcG01zQ0X9l9afFPO8
-         sRJo8fUhuI/IeevXQlMRwmLa7sMu56TJvUB/8ecsCbfQpr0laOs8vSwit3k6FFMCeutA
-         sXyY08sGYNqN1K9tHcddPM8+cz7YyNnTrV7BSOaZs9cl44HeqO371oZW/ywrK5uJp0V1
-         YgiA==
-X-Forwarded-Encrypted: i=1; AJvYcCWsd5NGm+iy1J/QyfVDYWnczc1N7GBcnX06kfjGMMORIdLYDtrutWhW8Gi4z9/a8p7HYxrs8Y0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTJ8skhowhCgIhFMfFfDS9pjWc2WspqNKJc927pZ6DKjnY1lip
-	VFqkdlxeh7uCqnDgtHpUS7wlDyoyLwc+5J6KR4BFOM+WWvIHnqBP4/Vj7ZtM1OO0GUFZ6DJNTpv
-	gYfTcBNJIgWUN7SP88EyHawpIzegMIVQ=
-X-Gm-Gg: ASbGncuy4KCtQZj8+jqk8pgubqxSo1Q3qO+DhehOndM+wkmvTP7ibqVIZpDFsSwphku
-	y4cgvuoWkphQ53O7EeEjmr2Xq3IKmBlhOuuShpgsWgnyJJIxRcAyBxyFUWKcCUlWHMS1AWAIkUb
-	VD1YmnsCuLrPfXw0AOPxyB0cqeV168Zi1+/Nm29uE/NW02Qb9xIuQMzCR81ADR+9BUjoai3oIhr
-	RidjziRpGaxKzL2HzWnnkrL7Rzd/R+t2/1IB3iFqpJBcCRShWVwGSB9T2gPkYxHzB2HqFbH0MgU
-	FURvmwlgc7s=
-X-Google-Smtp-Source: AGHT+IGxQUGJcsowxZp15tmwe0+PAQoOg6ajEAefLY24giso4wnRkk38jhbCVDDhKMXGevpjzv/Cv8rRbpV8wrCzypU=
-X-Received: by 2002:a05:690e:418f:b0:63f:c019:23b2 with SMTP id
- 956f58d0204a3-6442f1af4camr3358088d50.28.1764700672147; Tue, 02 Dec 2025
- 10:37:52 -0800 (PST)
+	s=arc-20240116; t=1764700903; c=relaxed/simple;
+	bh=xe8+SCG9fbE0rTY/KZIU4S7K3W0qhSWTO1m1+a1bRrg=;
+	h=Date:Message-Id:To:Cc:Subject:From:Mime-Version:Content-Type; b=DXtUGf5uLtztDWZvM07baRV20HcInMnsIhZ04wkCr1UCcQD52PeHe0TFNd9Zaaye6ZKMSSmp5mO+HQafzzjyAGs5vat57RSxqf5eST/eVL80+Z8KsAR4jiImqJxQKHGi/mxr4JKgbve3xXJw2ro/wxKYJILxUnPNSo//20dvRx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exactco.de; spf=pass smtp.mailfrom=exactco.de; dkim=pass (2048-bit key) header.d=exactco.de header.i=@exactco.de header.b=HR26SpDx; arc=none smtp.client-ip=176.9.10.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exactco.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=exactco.de
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=exactco.de;
+	s=x; h=Content-Transfer-Encoding:Content-Type:Mime-Version:From:Subject:Cc:To
+	:Message-Id:Date:Sender:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:
+	References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:List-Post:
+	List-Owner:List-Archive; bh=6wN6lAbzhC54/AW8Afd+o3YWEQ45Do1ZW8p89JEmqoo=; b=H
+	R26SpDxJCjMyrxeBbS7cIhUHcJ7XCgqwvTk2ITmZ72Y5piQJbnFHLbvKQ6T+QcgcDnVjDJ86DsGXJ
+	ZFYXyzNKVUyW5ibh5fU5b61WqC+5p259/TWk5Cy5pbJkx1an1S5fc6ePCgLmAfAurdW0pb1ahI1LD
+	6Vz38ueOBRhFHhNbGak6a5yTDTDd11nf//JCZYJ0IIvoIko9pa+ETUbpkBdTC3/gcjDpdBCU8dS0W
+	lBrvc0/uZmOwv9rJ075Hbo9IwgYHcK94RTXntKlEKc5XvxdoXTjXnnWygoRZA3YZooxHBkdwo7xFk
+	yi1Lcr1A59hoLVhrrexnXxp+cLwqpgjXA==;
+Date: Tue, 02 Dec 2025 19:41:37 +0100 (CET)
+Message-Id: <20251202.194137.1647877804487085954.rene@exactco.de>
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, nic_swsd@realtek.com, Andrew
+ Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, =?iso-8859-1?Q?fran=E7ois?= romieu
+ <romieu@fr.zoreil.com>
+Subject: [PATCH net V2] r8169: fix RTL8117 Wake-on-Lan in DASH mode
+From: =?iso-8859-1?Q?Ren=E9?= Rebe <rene@exactco.de>
+X-Mailer: Mew version 6.10 on Emacs 30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251202171615.1027536-1-ameryhung@gmail.com> <CAP01T75C+Zj12g08q3XE2X+TV8Qwx_dua=s489w71or2bu64gg@mail.gmail.com>
-In-Reply-To: <CAP01T75C+Zj12g08q3XE2X+TV8Qwx_dua=s489w71or2bu64gg@mail.gmail.com>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Tue, 2 Dec 2025 10:37:39 -0800
-X-Gm-Features: AWmQ_bkgITNbuXnGNW37tpgOdmT6IZiYZShj5hFi_14YXOZX6TE3EYnqKz6vjMo
-Message-ID: <CAMB2axOQDKrobzTVZhdafPks4fqYAN2HUrm_Asq3FG_GPSVw8A@mail.gmail.com>
-Subject: Re: [PATCH bpf v2 1/2] bpf: Disallow tail call to programs that use
- cgroup storage
-To: Kumar Kartikeya Dwivedi <memxor@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
-	andrii@kernel.org, daniel@iogearbox.net, martin.lau@kernel.org, 
-	eddyz87@gmail.com, kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Dec 2, 2025 at 9:27=E2=80=AFAM Kumar Kartikeya Dwivedi <memxor@gmai=
-l.com> wrote:
->
-> On Tue, 2 Dec 2025 at 18:16, Amery Hung <ameryhung@gmail.com> wrote:
-> >
-> > Mitigate a possible NULL pointer dereference in bpf_get_local_storage()
-> > by disallowing tail call to programs that use cgroup storage. Cgroup
-> > storage is allocated lazily when attaching a cgroup bpf program. With
-> > tail call, it is possible for a callee BPF program to see a NULL
-> > storage pointer if the caller prorgam does not use cgroup storage.
-> >
-> > Reported-by: Yinhao Hu <dddddd@hust.edu.cn>
-> > Reported-by: Kaiyan Mei <M202472210@hust.edu.cn>
-> > Reported-by: Dongliang Mu <dzm91@hust.edu.cn>
-> > Closes: https://lore.kernel.org/bpf/c9ac63d7-73be-49c5-a4ac-eb07f7521ad=
-b@hust.edu.cn/
-> > Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> > ---
-> >  kernel/bpf/arraymap.c | 11 ++++++++++-
-> >  1 file changed, 10 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/kernel/bpf/arraymap.c b/kernel/bpf/arraymap.c
-> > index 1eeb31c5b317..9c3f86ef9d16 100644
-> > --- a/kernel/bpf/arraymap.c
-> > +++ b/kernel/bpf/arraymap.c
-> > @@ -884,8 +884,9 @@ int bpf_fd_array_map_update_elem(struct bpf_map *ma=
-p, struct file *map_file,
-> >                                  void *key, void *value, u64 map_flags)
-> >  {
-> >         struct bpf_array *array =3D container_of(map, struct bpf_array,=
- map);
-> > +       u32 i, index =3D *(u32 *)key, ufd;
-> >         void *new_ptr, *old_ptr;
-> > -       u32 index =3D *(u32 *)key, ufd;
-> > +       struct bpf_prog *prog;
-> >
-> >         if (map_flags !=3D BPF_ANY)
-> >                 return -EINVAL;
-> > @@ -898,6 +899,14 @@ int bpf_fd_array_map_update_elem(struct bpf_map *m=
-ap, struct file *map_file,
-> >         if (IS_ERR(new_ptr))
-> >                 return PTR_ERR(new_ptr);
-> >
-> > +       if (map->map_type =3D=3D BPF_MAP_TYPE_PROG_ARRAY) {
-> > +               prog =3D (struct bpf_prog *)new_ptr;
-> > +
-> > +               for_each_cgroup_storage_type(i)
-> > +                       if (prog->aux->cgroup_storage[i])
-> > +                               return -EINVAL;
-> > +       }
->
-> Would a similar check be needed for extension programs (BPF_PROG_TYPE_EXT=
-)?
+Wake-on-Lan does currently not work for r8169 in DASH mode, e.g. the
+ASUS Pro WS X570-ACE with RTL8168fp/RTL8117.
 
-I think BPF_PROG_TYPE_EXT should be free from this NULL pointer
-dereference bug. Since tail callee cannot be extended and extended
-program cannot be tailcalled, an extension program calling
-bpf_get_local_storage() must be directly called from a cgroup program
-with a valid storage pointer.
+Fix by not returning early in rtl_prepare_power_down when dash_enabled.
+While this fixes WoL, it still kills the OOB RTL8117 remote management
+BMC connection. Fix by not calling rtl8168_driver_stop if WoL is enabled.
 
-However, I guess we also need to do something similar to [0] to
-extension programs as well.
+Fixes: 065c27c184d6 ("r8169: phy power ops")
+Signed-off-by: René Rebe <rene@exactco.de>
+Cc: stable@vger.kernel.org
+---
+V2; DASH WoL fix only
+Tested on ASUS Pro WS X570-ACE with RTL8168fp/RTL8117 running T2/Linux.
+---
+ drivers/net/ethernet/realtek/r8169_main.c | 5 +----
+ 1 file changed, 1 insertions(+), 4 deletions(-)
 
-[0] https://lore.kernel.org/all/20250730234733.530041-4-daniel@iogearbox.ne=
-t/
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 853aabedb128..e2f9b9027fe2 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -2669,9 +2669,6 @@ static void rtl_wol_enable_rx(struct rtl8169_private *tp)
+ 
+ static void rtl_prepare_power_down(struct rtl8169_private *tp)
+ {
+-	if (tp->dash_enabled)
+-		return;
+-
+ 	if (tp->mac_version == RTL_GIGA_MAC_VER_32 ||
+ 	    tp->mac_version == RTL_GIGA_MAC_VER_33)
+ 		rtl_ephy_write(tp, 0x19, 0xff64);
+@@ -4807,7 +4804,7 @@ static void rtl8169_down(struct rtl8169_private *tp)
+ 	rtl_disable_exit_l1(tp);
+ 	rtl_prepare_power_down(tp);
+ 
+-	if (tp->dash_type != RTL_DASH_NONE)
++	if (tp->dash_type != RTL_DASH_NONE && !tp->saved_wolopts)
+ 		rtl8168_driver_stop(tp);
+ }
+ 
+-- 
+2.46.0
 
->
-> > +
-> >         if (map->ops->map_poke_run) {
-> >                 mutex_lock(&array->aux->poke_mutex);
-> >                 old_ptr =3D xchg(array->ptrs + index, new_ptr);
-> > --
-> > 2.47.3
-> >
-> >
+-- 
+René Rebe, ExactCODE GmbH, Berlin, Germany
+https://exactco.de • https://t2linux.com • https://patreon.com/renerebe
 
