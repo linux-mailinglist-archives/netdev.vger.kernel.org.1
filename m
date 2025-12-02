@@ -1,116 +1,106 @@
-Return-Path: <netdev+bounces-243115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243116-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3C32C99A7B
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 01:35:20 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D322C99A87
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 01:36:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 92FF44E176D
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 00:35:19 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id BC86634596B
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 00:36:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4D241A5B8B;
-	Tue,  2 Dec 2025 00:35:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D21371519AC;
+	Tue,  2 Dec 2025 00:36:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nadifQ4S"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q25IqU2k"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA4C722097;
-	Tue,  2 Dec 2025 00:35:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A03DD22097;
+	Tue,  2 Dec 2025 00:36:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764635712; cv=none; b=mD4W+rU8DwjT4ujUHryW5CbqZ8UgqgrrDOUUx6C4FwylHCRIdy2LAxn/YFpYSxS2Za6NKggbAdyCpt6jpOu2oAMsMCPe2HuY/ALAnhtK7u7HGDFRbSDmdu3M7DTNMoKP2G+QPrMrmYKDBvENKgN4y+kcsSRyW2ZJCjHfIkK85mA=
+	t=1764635784; cv=none; b=pvwxzjlVnRlDMd0XBI9luypJnFbfkW5lRLb5iH85b1x9eT+XRGhRvy9WwK3faed/N4d+cAXx7k/I/ATilQSwkwpSGziexUOZbtBUgCF0qhpBMDn2tWMTBDvojYB9bg3KrUYQ8eOs0fHu9tCEZcgqzCJIMXI4HBa87Sy54EfFFZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764635712; c=relaxed/simple;
-	bh=O4w7N084akAQFurfUT9nM82LZSfaroRXplwKY1DpchM=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=IGwI4M4n0ii160ITX9Bi24qUhTkRzHMFmtJRL0Ga2NpGKYerir/NVgyFf/NmWk4W6EfmbLbNcqJfHYNv7F9z0xeol1vl53EQ/wwPfrdaw7EDLgtXAzgHEdONp0iSN2CYKhZo9Vk3NpYNzFAo9pHoscdebhaRNNtdtbG2vg/JPI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nadifQ4S; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 217F9C4CEF1;
-	Tue,  2 Dec 2025 00:35:11 +0000 (UTC)
+	s=arc-20240116; t=1764635784; c=relaxed/simple;
+	bh=rNqSKIEZABAD5RykiDYsun+nHDAK0efshJ2S5T5lf1s=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=A7q6KWF5K0vDSRh+yIxHCd4gkzVRm18aRuCNSVHCCXxOiqQpQAqQ+H9J7tdSRn6worK1w2+wC4Re7uHN5XFmL6kqeVo8jeJxirflREs1mLNOfHq5XkHrjAqDp8O/XP/KtZVoan7m6lSiV8xzxVMyuZwBBC7kdhwfKpYy1mwlFXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q25IqU2k; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 725A4C116C6;
+	Tue,  2 Dec 2025 00:36:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764635712;
-	bh=O4w7N084akAQFurfUT9nM82LZSfaroRXplwKY1DpchM=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=nadifQ4Sg0P+3E50RqwOP/lfCwCbMPyEERMqMppOxhQWJjt+F2/8e+QO+36Ku+3g2
-	 wWoEFjp8MHwumRjqUtlN0Vpwst6CS5CIb8Ys0geDqV5SJMCFDiu7qWC/MWt6NO2xj/
-	 IF8FXpd7JQA5NW0l++xtlYBnVTX+jbUkWfnhry4MeJwyqO72e6ORe+WgTuXwg2BXbS
-	 bNB2TVTBTbt/jI2ydUYv24l2i4IC2Ju0pwXKhhdxz5JGAFbPc79fiizAkxGex8BCAy
-	 fBvUABIkAHNZOEKvq3PawEUSsTTYHs2HdElhiH80mOpYoFm6762NSPG+y2/DmEEXmo
-	 TNshJiziKswTg==
-Content-Type: multipart/mixed; boundary="===============3680049882100623108=="
+	s=k20201202; t=1764635784;
+	bh=rNqSKIEZABAD5RykiDYsun+nHDAK0efshJ2S5T5lf1s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Q25IqU2kwF1u+ntUzsmQ79EXXO6KQvcCgtyqX2BiNMFbpMORcMvwBRUN45jSmM5T0
+	 7UIjWINuTpUond5Mfe58Fo714YxvBrcPcsSVN6RyMrzYl4gbYg7gZgXA+oh3fM36JG
+	 GGojawkFetKeSnb1c3M3p10S6WTiElkRco582NTRvnyP8DuQ4gKaX022XIsYwT1vCg
+	 zzf4nffOERMuZnuhiayvn3dfDGpZcr+kPF2DJjQWFBJQm2X2KsFwHaEFDLkbTqY75R
+	 u5krqRsacwmnpbGjlNIBY4ysMszUohssA3x7whUYsTRZjMY0AnJ1EQ3j1i0lmoL2Fe
+	 jPpslayzGfQwQ==
+Date: Mon, 1 Dec 2025 16:36:22 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Simon Horman
+ <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org,
+ gustavold@gmail.com, asantostc@gmail.com, calvin@wbinvd.org,
+ kernel-team@meta.com, Petr Mladek <pmladek@suse.com>
+Subject: Re: [PATCH net-next 0/4] (no cover subject)
+Message-ID: <20251201163622.4e50bf53@kernel.org>
+In-Reply-To: <20251128-netconsole_send_msg-v1-0-8cca4bbce9bc@debian.org>
+References: <20251128-netconsole_send_msg-v1-0-8cca4bbce9bc@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <36f21335518bc4f4046736fa044bbbbc381053c47e3a2856acc4a24e8fb90427@mail.kernel.org>
-In-Reply-To: <20251202001822.2769330-1-ameryhung@gmail.com>
-References: <20251202001822.2769330-1-ameryhung@gmail.com>
-Subject: Re: [PATCH bpf v1 1/2] bpf: Disallow tail call to programs that use cgroup storage
-From: bot+bpf-ci@kernel.org
-To: ameryhung@gmail.com,bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,alexei.starovoitov@gmail.com,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,ameryhung@gmail.com,kernel-team@meta.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Tue,  2 Dec 2025 00:35:11 +0000 (UTC)
-
---===============3680049882100623108==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-> diff --git a/kernel/bpf/arraymap.c b/kernel/bpf/arraymap.c
-> index 80b1765a3..fbfc45ed9 100644
-> --- a/kernel/bpf/arraymap.c
-> +++ b/kernel/bpf/arraymap.c
-> @@ -892,8 +892,9 @@ int bpf_fd_array_map_update_elem(struct bpf_map *map, struct file *map_file,
->  				 void *key, void *value, u64 map_flags)
->  {
->  	struct bpf_array *array = container_of(map, struct bpf_array, map);
-> +	u32 i, index = *(u32 *)key, ufd;
->  	void *new_ptr, *old_ptr;
-> -	u32 index = *(u32 *)key, ufd;
-> +	struct bpf_prog *prog;
->
->  	if (map_flags != BPF_ANY)
->  		return -EINVAL;
-> @@ -906,6 +907,14 @@ int bpf_fd_array_map_update_elem(struct bpf_map *map, struct file *map_file,
->  	if (IS_ERR(new_ptr))
->  		return PTR_ERR(new_ptr);
->
-> +	if (map->map_type == BPF_MAP_TYPE_PROG_ARRAY) {
-> +		prog = (struct bpf_prog *)new_ptr;
-> +
-> +		for_each_cgroup_storage_type(i)
-> +			if (prog->aux->cgroup_storage[i])
-> +				return -EINVAL;
-                               ^^^^^^
+On Fri, 28 Nov 2025 06:20:45 -0800 Breno Leitao wrote:
+> This patch series introduces a new configfs attribute that enables sending
+> messages directly through netconsole without going through the kernel's logging
+> infrastructure.
+> 
+> This feature allows users to send custom messages, alerts, or status updates
+> directly to netconsole receivers by writing to
+> /sys/kernel/config/netconsole/<target>/send_msg, without poluting kernel
+> buffers, and sending msgs to the serial, which could be slow.
+> 
+> At Meta this is currently used in two cases right now (through printk by
+> now):
+> 
+>   a) When a new workload enters or leave the machine.
+>   b) From time to time, as a "ping" to make sure the netconsole/machine
+>   is alive.
+> 
+> The implementation reuses the existing message transmission functions
+> (send_msg_udp() and send_ext_msg_udp()) to handle both basic and extended
+> message formats.
+> 
+> Regarding code organization, this version uses forward declarations for
+> send_msg_udp() and send_ext_msg_udp() functions rather than relocating them
+> within the file. While forward declarations do add a small amount of
+> redundancy, they avoid the larger churn that would result from moving entire
+> function definitions.
 
-Does this leak prog's refcount? In bpf_fd_array_map_update_elem(), the
-call to map->ops->map_fd_get_ptr() acquires a reference by calling
-bpf_prog_get() in prog_fd_array_get_ptr(), which increments both the
-prog refcount and prog->aux->prog_array_member_cnt. When the new
-validation check returns -EINVAL, the error path never calls
-map->ops->map_fd_put_ptr() to release these references.
-
-The normal path releases old_ptr at the end of the function, but the
-early return here leaks new_ptr.
-
-> +	}
-> +
->  	if (map->ops->map_poke_run) {
->  		mutex_lock(&array->aux->poke_mutex);
->  		old_ptr = xchg(array->ptrs + index, new_ptr);
-
-
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
-
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/19842130628
-
---===============3680049882100623108==--
+The two questions we need to address here are :
+ - why is the message important in the off-host message stream but not
+   important in local dmesg stream. You mention "serial, which could be
+   slow" - we need more details here.
+ - why do we need the kernel API, netcons is just a UDP message, which
+   is easy enough to send from user space. A little bit more detail
+   about the advantages would be good to have.
+The 2nd point is trivial, the first one is what really gives me pause.
+Why do we not care about the logs on host? If the serial is very slow
+presumably it impacts a lot of things, certainly boot speed, so...
+perhaps it should be configured to only log messages at a high level?
 
