@@ -1,90 +1,90 @@
-Return-Path: <netdev+bounces-243279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243282-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46A13C9C724
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 18:45:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA038C9C739
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 18:46:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 25CE84E4852
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 17:45:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52B5E3AA437
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 17:45:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D99A2C3244;
-	Tue,  2 Dec 2025 17:45:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 188FD2C3258;
+	Tue,  2 Dec 2025 17:45:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="dD6dxpwE"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="RZZAn/Hv"
 X-Original-To: netdev@vger.kernel.org
-Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012061.outbound.protection.outlook.com [40.107.209.61])
+Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010028.outbound.protection.outlook.com [40.93.198.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 616752C237F
-	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 17:45:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.209.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19DBB2D0615
+	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 17:45:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.28
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764697506; cv=fail; b=FW//zZYbq4D57xg9ZWLV6Rjli2x56o+rPzGk/hlh34Xd+ARNrb9X3kWtQhXmVB7IcnqMuGwbSjUdoM3MwnWXFEgnPgaDQWh8014mV4BOfsO34AXtcCJ/P43nv4nVQY5YMzFtZ5sCVYxie0vqHPias3fipZIc4sxc+At0/8INeYo=
+	t=1764697522; cv=fail; b=YNSZQuobKWpqdhHQzL+P654MyK5/X9HD2XXrjQri/6zjkMqrettmA7K+ME+asA0xpfDns9pveU4mPHfBCKzSJNgdVlhXy+w87HneNs/HHJSUVKuCiVqZfsgbSqds/CA1l0CsldmGlYo+HhGWSAPgbgsfZEf/q2wg3dGACZlbKU8=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764697506; c=relaxed/simple;
-	bh=VH78SciMuqKI3r+3QYnwl0weC5TsLZAwD6Vifs00OFQ=;
+	s=arc-20240116; t=1764697522; c=relaxed/simple;
+	bh=DOKU26vAhCTv4JiTrz8cIR7cFG7Z0KulkvPu/LqhA2M=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=o40q7vukj3gZBrQKwRbAs/EiyEOOPTQHJLWsC4idE1YxF2tacEvuyylxj+L+3LzjdskwhNmrm/cbcS+dDJGs4n8LY+maTMeopxkWdZRy4h9GpDLHHucTl4AloiUoMnLjVwZs3Obs3b1uQOXj/B+JpSiTtXRw7YXDLQa9VbbXO/w=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=dD6dxpwE; arc=fail smtp.client-ip=40.107.209.61
+	 MIME-Version:Content-Type; b=C9gsnHwtTmrwBKYsNeRQg3A42VHiqK5Ggj8BgEpdg5DLpvcQvDZkvy951VlBsBxWY4mUUApOikbXp5N8m6N/qAB51tOU0TZyULNIhUfiAKHqU/0unEpvQnXJ6UyNgtya0Kzwpyb1PE0ngaSTt1c+DYVoX2LmWE9A/BWjVOtyqM8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=RZZAn/Hv; arc=fail smtp.client-ip=40.93.198.28
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LqqvAM6e66m/0k3p6yVuLNFcncU5u/dxEndB3WgSYU8I7V7R7w1BNA25FW3wQa516r2OYyfwBoq23pXWdSdEPbisZH8km5oHo7p8sqy2kfVA4c138yK5wO17Vwca7zyBR1OXdTxOMdqbByYLgNTmnDxSCSJ2YFEANQWriligU6M25cgYgZ1fLznpZKDSEhQi9Lrk+WbcIWp1jdMg5rJHd7QQ8Fxr0GDnoR/YrGz5g7+GQ7fmu+YMDpOkfPVubqLEN7UpkNhtZfgm/3qSAg3d2lKMKXQ7DFLQ4hWGKKx4RPn2OtD5Yr7ZiaI3VCY+DWJSoLDNuc1jqbpkAxEl5FqigQ==
+ b=LuOAcRYPpAgKhTAwlBo8j4REW7nozyZWH1ztdjwwWQCkG+9uwM6MpyeiTR4vAHeWy61sv6Ff4xc+Gp3E/MDj72uMQ5sY4i+UgRv8Q7TUMV/RBGDT1skFdlDt8SPh6MsiTApHxjdPKm6OJD17tcZBrWRFPf4erAi3U1WgNFV7NU5zFrjcrodCXGa3oQ8EysWclOnSDDQLQQBqcfhBuav6CuR2NxXwHvNmpyrT7RdjKnkWb6ImjdnJ/kzFv+i7tbm5/GFkwNHO+KYHDtgKPfEkhZWjtPtHAMiOpapGlIcGuReYqg/r2aVqt5vs+UfONkRCSqPfUGPA3xy1bP56iQM6HA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ux6L95bOwYZZGXjYrZoBqJ3hA1F5RWqiS/U9lZRJbGE=;
- b=owM1tKSvXkSfgrD1atGj8Fy4vhTEwhX1T2Y9AsE8XNRSnE9yym2U4AXeYdcuYaDIEaVG5VSTHyWFXEm63pREYzRn74zilCemtnQ/7NvJQRqLEAoogNn6ATofU603LYhgQxBdAIc2Z6/d1Gjvsvq2caIdBD1l5ZrKV10FQzUZrIPYYWGuZe7QYcBbGXakABbhLNxb3wl3vFnENhjeNMLMFRI469ECAh050w/pLpIAUWcrE7J1irvdVVj9+yCmHoINleyD/+Zwr+FnF1WQ6nTGj8dsCs23QoyCInTzQqBw34eJxzaudrlKJrax7dC0vZMb/ntOlB0C3qmdM1w1c7gDIw==
+ bh=KaYDom6uYMh9UqRHW43E48HA4V596/4BxhZwynV+PAo=;
+ b=a8oCIj6E2b+acfuaiuPw73Xg2p4TpTdIsqD49j2+OB3nwd69jiLdL3F1ns4EfwYRuIbk7VUzUNue/79c9sYSSo4wPwU0t2K7jJ0MvOHc6OVf17yDNdg1fYXpw143j1gnw7WMcfw6B6WxC0nRnLoO5Rb+K/1BxzTzLdajF+2dRFl5nLrt2t07lQ8w5VhpTH0KP6NCBC2LobuJg4fXXZ9ficrPMr6KwY2c5VqG6mSceeTwvMi7KuRZDKfVCCxu+lkhPD2z/k+20CbpcU6fQ1AfFU8qq3UKiyFr1a/7jQ7+HvmeaziraUCDwK/Ky5nInA6XBCF74rdUDaMOo3uXdLQrTg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ux6L95bOwYZZGXjYrZoBqJ3hA1F5RWqiS/U9lZRJbGE=;
- b=dD6dxpwEySmMN2J9Smci60QyqKdcCPi75aT85ruWZviqi45qcqtK6j7G5GV0AhcZM6SehvebEKIwX5oNPxzKuZBydah1Cc1afRz/5ydl3AnPoDsh8hG8puQ0DhikTqXZ/ScgwT3gpL8ieV36YCnZSm+DxQv2nWpAzr5sP5pYbwLLRjUBGzHj2Ny3boTzn2AucdMmOHGGd0dJJ1WxcTJiwfe94on3SpIIL4kFGOIw4WCxqgBUvrU/BA5NtcHkvPyNG2n5kziJ5ZjsCTTgQm7v/7EnCwK7wrtKUWYxGvJ0GNd0ZJg4noYnuSKUZ4GFGkKTPtmdIs+V5R8W0atEjq94Nw==
-Received: from SJ0PR03CA0198.namprd03.prod.outlook.com (2603:10b6:a03:2ef::23)
- by DS7PR12MB6141.namprd12.prod.outlook.com (2603:10b6:8:9b::15) with
+ bh=KaYDom6uYMh9UqRHW43E48HA4V596/4BxhZwynV+PAo=;
+ b=RZZAn/HvlCpLhZP3IGud4BpEyCnTaKOUAH+RiwMVgLWg2VLaOSpMDXco6c9pM8/b9RVIBS0QeJiKmzJSUPz7VtkFlALbeYBnD+9ML2Piu8YHdhsItr+iSWxUsXzknFlqeuvQ6FYFRLV03VmXabXe/SVZosJ2hzRu7zkoXro/8Ar+R+6++ervkS8UHo3w+rmpATn+lNbo4+zAAgGXvYHOvU9prL95YdEJVNiih6c7ZJPCPvJMT+b2kMUC1IFAjGzXRsqTfD040AuW3cIcn7lAHuSSrwJY0PJ3Hz60LyVYO4SH3w6hrFkttf26m6CN7AjwuoOPgl5gmKdhuMvcw0LzOg==
+Received: from PH8PR07CA0037.namprd07.prod.outlook.com (2603:10b6:510:2cf::17)
+ by MW4PR12MB6826.namprd12.prod.outlook.com (2603:10b6:303:20c::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.17; Tue, 2 Dec
- 2025 17:45:01 +0000
-Received: from SJ1PEPF000026C3.namprd04.prod.outlook.com
- (2603:10b6:a03:2ef:cafe::ac) by SJ0PR03CA0198.outlook.office365.com
- (2603:10b6:a03:2ef::23) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9388.9; Tue, 2 Dec
+ 2025 17:45:09 +0000
+Received: from CY4PEPF0000FCBF.namprd03.prod.outlook.com
+ (2603:10b6:510:2cf:cafe::4d) by PH8PR07CA0037.outlook.office365.com
+ (2603:10b6:510:2cf::17) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.9366.17 via Frontend Transport; Tue,
- 2 Dec 2025 17:45:00 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ 2 Dec 2025 17:45:02 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SJ1PEPF000026C3.mail.protection.outlook.com (10.167.244.100) with Microsoft
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CY4PEPF0000FCBF.mail.protection.outlook.com (10.167.242.101) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9388.8 via Frontend Transport; Tue, 2 Dec 2025 17:45:00 +0000
+ 15.20.9388.8 via Frontend Transport; Tue, 2 Dec 2025 17:45:08 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 2 Dec
- 2025 09:44:39 -0800
+ 2025 09:44:44 -0800
 Received: from fedora.mtl.com (10.126.231.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 2 Dec
- 2025 09:44:34 -0800
+ 2025 09:44:39 -0800
 From: Petr Machata <petrm@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
 	<netdev@vger.kernel.org>
 CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
-	<mlxsw@nvidia.com>, Simon Horman <horms@kernel.org>
-Subject: [PATCH net 1/3] mlxsw: spectrum_router: Fix possible neighbour reference count leak
-Date: Tue, 2 Dec 2025 18:44:11 +0100
-Message-ID: <ec2934ae4aca187a8d8c9329a08ce93cca411378.1764695650.git.petrm@nvidia.com>
+	<mlxsw@nvidia.com>, Jiri Pirko <jiri@resnulli.us>
+Subject: [PATCH net 2/3] mlxsw: spectrum_router: Fix neighbour use-after-free
+Date: Tue, 2 Dec 2025 18:44:12 +0100
+Message-ID: <92d75e21d95d163a41b5cea67a15cd33f547cba6.1764695650.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <cover.1764695650.git.petrm@nvidia.com>
 References: <cover.1764695650.git.petrm@nvidia.com>
@@ -100,108 +100,243 @@ X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF000026C3:EE_|DS7PR12MB6141:EE_
-X-MS-Office365-Filtering-Correlation-Id: f255a77f-b8eb-40e3-337d-08de31ca843a
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000FCBF:EE_|MW4PR12MB6826:EE_
+X-MS-Office365-Filtering-Correlation-Id: 551bfbc8-82cd-4041-7861-08de31ca891a
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700013|376014|1800799024;
+	BCL:0;ARA:13230040|36860700013|376014|82310400026|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?DUOfynsfeSqMmnDwTiTS2JznvfOiM6+Xr4c+YC2W0ch43b77sW3dc6FH4Kzx?=
- =?us-ascii?Q?rcraOg6fThcsItBujjvYDNT/YBAz3j3TjhETVroMXCFO2OC3L1K5+DboZDYw?=
- =?us-ascii?Q?RAKsEflfhIpBlAPDLHthojR9+F4SVUip5jzmALeZPQcFLp3acMbiVZWsAlBb?=
- =?us-ascii?Q?CyoAr4GVh0iLHxWVGHJASM0hZEhp15NYyvlatHUbG1HZHmMH1rwX878MdfoH?=
- =?us-ascii?Q?IetWxEW9fpAg1px/CPIgb4+QTNSraoxsUdhoDVpbKcCZyJJeszVqdLBQU6kH?=
- =?us-ascii?Q?2racuErrp76jRE9UJBeBHUolp8eT7Pc/IH90TRWrmxooa1iePb365ASxSWNg?=
- =?us-ascii?Q?1YpKLgxKX2ZTPMjJirGMon8RlJRnx72NEyD0UBXQARqECBsGFKep5ZEHQdVY?=
- =?us-ascii?Q?5uOPr/+G1IQ+rxA21WQos/RTMyKIvKqeZsD/zKYpfC7FMWLLitXMflChe9Ze?=
- =?us-ascii?Q?0j1zeawmh4rvf9MVT4W3OWtGF7mH0GOKxoFXVMeqnzHMVOM4iGtHiWbWSxzr?=
- =?us-ascii?Q?T1WwuZPWVAhN5ZUqzPakF08hcq5pgc2qxI60NPkyrBgtGVoPD6JSDDZILW5I?=
- =?us-ascii?Q?UB4QPAXChS3VaUzsaFOw7ZyxcmGq45MOdfz896CpIb1RRAj1CelOaXw7VpSZ?=
- =?us-ascii?Q?f+C+t0v6C1vzt8FpJ9k+abLqlb3Vt7Fdo25YGKhan0fK7g29m6r4DxNmd7/L?=
- =?us-ascii?Q?Ii4fGmA6Sh3Xz/2knnQJ9tO6bJVRCsFx0ez7JCVDFifwj4nKL4XK+ZqmCScV?=
- =?us-ascii?Q?C5v75CPYafrdkfvF3qwHlRNJpMJcu9WCndReEVTs5BuhKygFqJZCnz77q4Rz?=
- =?us-ascii?Q?rrY0XCUcs5kBsKxTs7Bj7hM4T2bsEmETDI6EHXBZ6li5kr2ap/vphCSp0reD?=
- =?us-ascii?Q?OVN2FEaU3Sw6W2VLTka+k9e2feHKm6MWfyf5FCWwnagIuni0qWQpmhFgWCVC?=
- =?us-ascii?Q?Q+JD70X4s2LmRiKG6Fipel4ycai/PR7h6RqWErfMpX3PgZEIQx8hy/ewO/zU?=
- =?us-ascii?Q?0c0miiquBEqoI8KLsDbZD5SV+oN2HVL6WLfcK/+LFFVTM+WN1e/8DHSXUwAT?=
- =?us-ascii?Q?1Ey/O3YzwNGsLQPZDdIVsxcsJhNHO+PKGUHseRUB6sxDJ5y6tll8C9EbQnhQ?=
- =?us-ascii?Q?6IAKCz9xWg81CXPgVEV8Rv8MUdIhmf7gWLDH10QYn4LUIve2ypn/KWiMT/LJ?=
- =?us-ascii?Q?nklE2V3XuGWEf8e2XQlDOzZ7Mj5+ZZ9PMfi5ReBXvpbS80gTDd24ub0/GzDa?=
- =?us-ascii?Q?5ipxwnf7mydgW+BvGob5AYs6AZi7ixZW/djPUM8OongeQQmlmKwxo13bbQ8r?=
- =?us-ascii?Q?GNXxDCEM1Rpf41/fJHzVKydAzX91aIFZXnZnD40gFZs6spHpEvntKqCi6gfN?=
- =?us-ascii?Q?LZaJoe2UMZQ/+RSdWwUT/3Ul+a4+oD7K7SQkB46bE/Gyi2ETHi2H92bEJHO6?=
- =?us-ascii?Q?+pwJ7jbeB1CEZ/2KVEsGgd+SBJgsNiFl1I3LjIw4gKvLYzJn69yhZ9SoLwRn?=
- =?us-ascii?Q?E6pK5tvxhRExOf9nIfK/enAP8+EZUmHCXPmX41ZJM1HGEeDyNY7XQ9lmOmwM?=
- =?us-ascii?Q?/k5ICCxvKWgp7PzR04o=3D?=
+	=?us-ascii?Q?2g3isxw0McFaHWwwIrwQifi9ttzbGypXUi4/L6IuHYRE0JdecAWy8g3jIeXq?=
+ =?us-ascii?Q?rLcfYDSoxHvItjCeTtFjYAUmY+hYofXZFpi/+s+yTKNOy/D4P+Ue13PXTI9Z?=
+ =?us-ascii?Q?biT3znX+4/uwccjgGwJ++Oel2QP8OR+zmK8MPRYqQVXzR2kfeiRtSfCzR9BL?=
+ =?us-ascii?Q?dCy3RbpBgstaWyN++ukhqwncZ4gji7Icaj5rBdA0/OdoAHBB8XG/BjpBdpjz?=
+ =?us-ascii?Q?nBo4SIKGrlu0eCXfSJ7qe9lKuKamFsmCbjLAnIYkCyKqgfFUd6BWC0js5laT?=
+ =?us-ascii?Q?oI26gr+MnYFrNBU+in3EQiqgWgty320eBHsojviin08Xv9s4ZfnY3aPt5+Ro?=
+ =?us-ascii?Q?CiVY69fQTAkGF1oR4OSovR+zgXr7M4/hc/JAdOpyZyR977jsFPZjkzXyunh2?=
+ =?us-ascii?Q?Y0U3iQogthar01rZcfDtTqSydGSkFl6cXLFbacltenl/s9qTebTxiqUdJ24Z?=
+ =?us-ascii?Q?zO5hCzH/FLsFDBpzfKefzDa5WZ3I+a98W792Aj/NH/OMcer+LI76N4AVkaXa?=
+ =?us-ascii?Q?mD70l/weFtJgo/X3Lxg8Fq3zCursJMv9yUqzf1JE3czoPnODVvvUqJLlv69C?=
+ =?us-ascii?Q?eSWtHLVFRMXS0p2+ryC2RFDphBIsbNfpxuJYz2ueG/MExFasoZUQQalKhtUv?=
+ =?us-ascii?Q?KrMd0S73xXKYMs+NLuV3Equ5uo9rgZ0Oe/JGSTmKQ8IlwLl73v5Eb6Rw83NZ?=
+ =?us-ascii?Q?hcUd+pG9ASuGZPMAGelV8tv9KjSVLLeqlixcN3Md/rm3z4Xq6LU5Cp+0wn1D?=
+ =?us-ascii?Q?27cK9ZRB8WewHyD4rHfWzaUF4VJWoPC2VjC81HiocxFJ+KbCnTbt7yqSV7/o?=
+ =?us-ascii?Q?1Cgkn/GXq2v+oQsZD5ZYip+4Rf+IPAil/6mOZMxU5UmQ3QZ6Rc70NfNOojP3?=
+ =?us-ascii?Q?hdVEFNF4Htkl44+yFOO5i/+QaoYfMump8n1Hd4IUQGyNgIbtAPAN6aXUGxCQ?=
+ =?us-ascii?Q?SvyATEniZ5oN1Y6qX/2IAz8qXfYhI2T5li+LylPyMZG4u9Qyp/T9RSUaZHVF?=
+ =?us-ascii?Q?QB+Zu6RVCszbK2HAuAPRyVV7CHMFlxqSPGteinMMp+TjMsIFJrlmV4B75RcE?=
+ =?us-ascii?Q?qONCE733PKjGYyuk4ABhzIjCUaD3Uv77oc8gMWz9L4Eh2KJzPawXuvH46nxm?=
+ =?us-ascii?Q?1JO6CCHpYYA4PHf15sz7s3RG5lsuSZr0UQq7ruPKuWkoLTd7pPME4UVK0pM/?=
+ =?us-ascii?Q?TQr4B14Ni9Ir7F/g4fhlahNOWa7jFnJM2a290JbPr2QdGsdz6/jNhWAxpDJK?=
+ =?us-ascii?Q?mnBOoGeNXiXsnNDhGFpxRJV9INAlINs19nl7fSYEpLWZtwmDrhjtnRMFTVR1?=
+ =?us-ascii?Q?LzGX1TL7myJWRk02CgiiczJlrkZN3tzFbuaVHph7B5QEtDnlvzpOt0GuP7MY?=
+ =?us-ascii?Q?Awtrzvn5XFN+wo6DGvDdp5Kr9SDjgvge4u//tOYXOcuWzYDw9Wtdy3IQCo/u?=
+ =?us-ascii?Q?4paXZHt2OWnizCtsUL+XTCeXBgK3zjwdjMYGu3yWJS1Pjui2iXkECPJxVioI?=
+ =?us-ascii?Q?g1+BLe13ixdx5tQVUpNNT6s3C/MIUK+w/5Tuz4sOmJTHlEfpTS/QJZaUdrq2?=
+ =?us-ascii?Q?vh0g6Uy/Ggl9czvBRDQ=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(376014)(1800799024);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(376014)(82310400026)(1800799024);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2025 17:45:00.4406
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2025 17:45:08.5262
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f255a77f-b8eb-40e3-337d-08de31ca843a
+X-MS-Exchange-CrossTenant-Network-Message-Id: 551bfbc8-82cd-4041-7861-08de31ca891a
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF000026C3.namprd04.prod.outlook.com
+	CY4PEPF0000FCBF.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6141
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6826
 
 From: Ido Schimmel <idosch@nvidia.com>
 
-mlxsw_sp_router_schedule_work() takes a reference on a neighbour,
-expecting a work item to release it later on. However, we might fail to
-schedule the work item, in which case the neighbour reference count will
-be leaked.
+We sometimes observe use-after-free when dereferencing a neighbour [1].
+The problem seems to be that the driver stores a pointer to the
+neighbour, but without holding a reference on it. A reference is only
+taken when the neighbour is used by a nexthop.
 
-Fix by taking the reference just before scheduling the work item. Note
-that mlxsw_sp_router_schedule_work() can receive a NULL neighbour
-pointer, but neigh_clone() handles that correctly.
+Fix by simplifying the reference counting scheme. Always take a
+reference when storing a neighbour pointer in a neighbour entry. Avoid
+taking a referencing when the neighbour is used by a nexthop as the
+neighbour entry associated with the nexthop already holds a reference.
 
-Spotted during code review, did not actually observe the reference count
-leak.
+Tested by running the test that uncovered the problem over 300 times.
+Without this patch the problem was reproduced after a handful of
+iterations.
 
-Fixes: 151b89f6025a ("mlxsw: spectrum_router: Reuse work neighbor initialization in work scheduler")
-Reviewed-by: Petr Machata <petrm@nvidia.com>
+[1]
+BUG: KASAN: slab-use-after-free in mlxsw_sp_neigh_entry_update+0x2d4/0x310
+Read of size 8 at addr ffff88817f8e3420 by task ip/3929
+
+CPU: 3 UID: 0 PID: 3929 Comm: ip Not tainted 6.18.0-rc4-virtme-g36b21a067510 #3 PREEMPT(full)
+Hardware name: Nvidia SN5600/VMOD0013, BIOS 5.13 05/31/2023
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x6f/0xa0
+ print_address_description.constprop.0+0x6e/0x300
+ print_report+0xfc/0x1fb
+ kasan_report+0xe4/0x110
+ mlxsw_sp_neigh_entry_update+0x2d4/0x310
+ mlxsw_sp_router_rif_gone_sync+0x35f/0x510
+ mlxsw_sp_rif_destroy+0x1ea/0x730
+ mlxsw_sp_inetaddr_port_vlan_event+0xa1/0x1b0
+ __mlxsw_sp_inetaddr_lag_event+0xcc/0x130
+ __mlxsw_sp_inetaddr_event+0xf5/0x3c0
+ mlxsw_sp_router_netdevice_event+0x1015/0x1580
+ notifier_call_chain+0xcc/0x150
+ call_netdevice_notifiers_info+0x7e/0x100
+ __netdev_upper_dev_unlink+0x10b/0x210
+ netdev_upper_dev_unlink+0x79/0xa0
+ vrf_del_slave+0x18/0x50
+ do_set_master+0x146/0x7d0
+ do_setlink.isra.0+0x9a0/0x2880
+ rtnl_newlink+0x637/0xb20
+ rtnetlink_rcv_msg+0x6fe/0xb90
+ netlink_rcv_skb+0x123/0x380
+ netlink_unicast+0x4a3/0x770
+ netlink_sendmsg+0x75b/0xc90
+ __sock_sendmsg+0xbe/0x160
+ ____sys_sendmsg+0x5b2/0x7d0
+ ___sys_sendmsg+0xfd/0x180
+ __sys_sendmsg+0x124/0x1c0
+ do_syscall_64+0xbb/0xfd0
+ entry_SYSCALL_64_after_hwframe+0x4b/0x53
+[...]
+
+Allocated by task 109:
+ kasan_save_stack+0x30/0x50
+ kasan_save_track+0x14/0x30
+ __kasan_kmalloc+0x7b/0x90
+ __kmalloc_noprof+0x2c1/0x790
+ neigh_alloc+0x6af/0x8f0
+ ___neigh_create+0x63/0xe90
+ mlxsw_sp_nexthop_neigh_init+0x430/0x7e0
+ mlxsw_sp_nexthop_type_init+0x212/0x960
+ mlxsw_sp_nexthop6_group_info_init.constprop.0+0x81f/0x1280
+ mlxsw_sp_nexthop6_group_get+0x392/0x6a0
+ mlxsw_sp_fib6_entry_create+0x46a/0xfd0
+ mlxsw_sp_router_fib6_replace+0x1ed/0x5f0
+ mlxsw_sp_router_fib6_event_work+0x10a/0x2a0
+ process_one_work+0xd57/0x1390
+ worker_thread+0x4d6/0xd40
+ kthread+0x355/0x5b0
+ ret_from_fork+0x1d4/0x270
+ ret_from_fork_asm+0x11/0x20
+
+Freed by task 154:
+ kasan_save_stack+0x30/0x50
+ kasan_save_track+0x14/0x30
+ __kasan_save_free_info+0x3b/0x60
+ __kasan_slab_free+0x43/0x70
+ kmem_cache_free_bulk.part.0+0x1eb/0x5e0
+ kvfree_rcu_bulk+0x1f2/0x260
+ kfree_rcu_work+0x130/0x1b0
+ process_one_work+0xd57/0x1390
+ worker_thread+0x4d6/0xd40
+ kthread+0x355/0x5b0
+ ret_from_fork+0x1d4/0x270
+ ret_from_fork_asm+0x11/0x20
+
+Last potentially related work creation:
+ kasan_save_stack+0x30/0x50
+ kasan_record_aux_stack+0x8c/0xa0
+ kvfree_call_rcu+0x93/0x5b0
+ mlxsw_sp_router_neigh_event_work+0x67d/0x860
+ process_one_work+0xd57/0x1390
+ worker_thread+0x4d6/0xd40
+ kthread+0x355/0x5b0
+ ret_from_fork+0x1d4/0x270
+ ret_from_fork_asm+0x11/0x20
+
+Fixes: 6cf3c971dc84 ("mlxsw: spectrum_router: Add private neigh table")
 Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+Reviewed-by: Petr Machata <petrm@nvidia.com>
 Signed-off-by: Petr Machata <petrm@nvidia.com>
 ---
 
-CC: Simon Horman <horms@kernel.org>
+CC: Jiri Pirko <jiri@resnulli.us>
 
 ---
- drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ .../ethernet/mellanox/mlxsw/spectrum_router.c   | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
 
 diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c
-index a2033837182e..f4e9ecaeb104 100644
+index f4e9ecaeb104..2d0e89bd2fb9 100644
 --- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c
 +++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c
-@@ -2858,6 +2858,11 @@ static int mlxsw_sp_router_schedule_work(struct net *net,
- 	if (!net_work)
- 		return NOTIFY_BAD;
+@@ -2265,6 +2265,7 @@ mlxsw_sp_neigh_entry_alloc(struct mlxsw_sp *mlxsw_sp, struct neighbour *n,
+ 	if (!neigh_entry)
+ 		return NULL;
  
-+	/* Take a reference to ensure the neighbour won't be destructed until
-+	 * we drop the reference in the work item.
-+	 */
-+	neigh_clone(n);
-+
- 	INIT_WORK(&net_work->work, cb);
- 	net_work->mlxsw_sp = router->mlxsw_sp;
- 	net_work->n = n;
-@@ -2881,11 +2886,6 @@ static int mlxsw_sp_router_schedule_neigh_work(struct mlxsw_sp_router *router,
- 	struct net *net;
++	neigh_hold(n);
+ 	neigh_entry->key.n = n;
+ 	neigh_entry->rif = rif;
+ 	INIT_LIST_HEAD(&neigh_entry->nexthop_list);
+@@ -2274,6 +2275,7 @@ mlxsw_sp_neigh_entry_alloc(struct mlxsw_sp *mlxsw_sp, struct neighbour *n,
  
- 	net = neigh_parms_net(n->parms);
--
--	/* Take a reference to ensure the neighbour won't be destructed until we
--	 * drop the reference in delayed work.
--	 */
--	neigh_clone(n);
- 	return mlxsw_sp_router_schedule_work(net, router, n,
- 					     mlxsw_sp_router_neigh_event_work);
+ static void mlxsw_sp_neigh_entry_free(struct mlxsw_sp_neigh_entry *neigh_entry)
+ {
++	neigh_release(neigh_entry->key.n);
+ 	kfree(neigh_entry);
  }
+ 
+@@ -4320,6 +4322,8 @@ mlxsw_sp_nexthop_dead_neigh_replace(struct mlxsw_sp *mlxsw_sp,
+ 	if (err)
+ 		goto err_neigh_entry_insert;
+ 
++	neigh_release(old_n);
++
+ 	read_lock_bh(&n->lock);
+ 	nud_state = n->nud_state;
+ 	dead = n->dead;
+@@ -4328,14 +4332,10 @@ mlxsw_sp_nexthop_dead_neigh_replace(struct mlxsw_sp *mlxsw_sp,
+ 
+ 	list_for_each_entry(nh, &neigh_entry->nexthop_list,
+ 			    neigh_list_node) {
+-		neigh_release(old_n);
+-		neigh_clone(n);
+ 		__mlxsw_sp_nexthop_neigh_update(nh, !entry_connected);
+ 		mlxsw_sp_nexthop_group_refresh(mlxsw_sp, nh->nhgi->nh_grp);
+ 	}
+ 
+-	neigh_release(n);
+-
+ 	return 0;
+ 
+ err_neigh_entry_insert:
+@@ -4428,6 +4428,11 @@ static int mlxsw_sp_nexthop_neigh_init(struct mlxsw_sp *mlxsw_sp,
+ 		}
+ 	}
+ 
++	/* Release the reference taken by neigh_lookup() / neigh_create() since
++	 * neigh_entry already holds one.
++	 */
++	neigh_release(n);
++
+ 	/* If that is the first nexthop connected to that neigh, add to
+ 	 * nexthop_neighs_list
+ 	 */
+@@ -4454,11 +4459,9 @@ static void mlxsw_sp_nexthop_neigh_fini(struct mlxsw_sp *mlxsw_sp,
+ 					struct mlxsw_sp_nexthop *nh)
+ {
+ 	struct mlxsw_sp_neigh_entry *neigh_entry = nh->neigh_entry;
+-	struct neighbour *n;
+ 
+ 	if (!neigh_entry)
+ 		return;
+-	n = neigh_entry->key.n;
+ 
+ 	__mlxsw_sp_nexthop_neigh_update(nh, true);
+ 	list_del(&nh->neigh_list_node);
+@@ -4472,8 +4475,6 @@ static void mlxsw_sp_nexthop_neigh_fini(struct mlxsw_sp *mlxsw_sp,
+ 
+ 	if (!neigh_entry->connected && list_empty(&neigh_entry->nexthop_list))
+ 		mlxsw_sp_neigh_entry_destroy(mlxsw_sp, neigh_entry);
+-
+-	neigh_release(n);
+ }
+ 
+ static bool mlxsw_sp_ipip_netdev_ul_up(struct net_device *ol_dev)
 -- 
 2.51.1
 
