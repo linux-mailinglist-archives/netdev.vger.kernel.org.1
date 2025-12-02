@@ -1,236 +1,330 @@
-Return-Path: <netdev+bounces-243271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE2EDC9C673
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 18:32:46 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CC43C9C67C
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 18:33:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27CAA3A9470
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 17:32:30 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1C6A234A2D0
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 17:32:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 706232BEFEB;
-	Tue,  2 Dec 2025 17:32:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A35B2BFC85;
+	Tue,  2 Dec 2025 17:32:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D+SqlccW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eVMml/AN";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="oobmBo3A"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4355E201004;
-	Tue,  2 Dec 2025 17:32:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE40F2940B
+	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 17:32:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764696749; cv=none; b=BWHME5SdfZJjHP4WtP7/K+O8pQ6e1eU8FpiYaldZvLZC8pHx1rf0RQi4Ldwe6qZ00ui4FSykVlEGZPOTSC78Jo3kunIZwWEIv6KEpGKecO+f9CarDjeo02+ijveV3iq7V1l1Musur45nrfpyU67P7XFgJwx5YCcSYetSLcvoOYY=
+	t=1764696768; cv=none; b=GhxLePLh0EqXGEE9wHaQjPG1F5Ea78qizhaMdsLE503aNlEyArPN7Y0/EhuQND2HFurlaj+szwXltKrOAJtoEw/bl7kNDD/9xZfnDcnZ+Term5dFNSdCFTEIyZfazxmsaBl/nMyFq0LCSAZ/WcX9y7Q/m2uoBenbiq2TWRzE220=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764696749; c=relaxed/simple;
-	bh=EQlF8JKvmA+R/ZoGQgMxtrT9hlH3Gx80adCz2Z/N7Es=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=n48vRYm72rjKbKVb9zH8DzdszQW4MKRZxbwq6P0QMQh1dJbmT5pUr9E1TM/rYDsetErl3javLBfnen2ndaj/A7z7c4KOEm0q7mHogUV4dchHYgS1ZoshpPEJ3NcVv1OTPJSlwDLVkF2e835T49s2D2OKuaxWOY+EMTUxEOR5HME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D+SqlccW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A2B7C4CEF1;
-	Tue,  2 Dec 2025 17:32:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764696748;
-	bh=EQlF8JKvmA+R/ZoGQgMxtrT9hlH3Gx80adCz2Z/N7Es=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=D+SqlccWWbwYbb3alct9SwSGdx7ey2TIdqVcHS+53TLh9RQWAvYxfsNAICuhfJnO/
-	 G2zqHeWCj2S8euNKW08k2cPgej2S7+8zbkRV2HcBJCWywBsKhxd10LKOeWLcUaNkaa
-	 0Z6IZNg1WQBetpjOhAMJ78otOZyPGz3rp9cuIritiuP+FSEblIVi+/YCsMajkUKb+B
-	 rweJhgq2ZDwGNPSVPTsF3qdzng5ic3dZqYElCq4J4ckba/XsgyRpjXjiUj8JfZzlvY
-	 i+n5RvAIZHftaGFBzlWtHPQzGLNcNHDnwdFWzi4/M4shSMQaw8adjfg5lIeWiPTp/R
-	 IC6+yWPtxJU1w==
-Message-ID: <c04b51c6-bc03-410e-af41-64f318b8960f@kernel.org>
-Date: Tue, 2 Dec 2025 18:32:23 +0100
+	s=arc-20240116; t=1764696768; c=relaxed/simple;
+	bh=cFSsCGz+4TKMd1YTPxeI4zP29xhTCQKjsZF1NZ1/gHo=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=soWfjoefwlHReJAmCbPhimKLg0iaCRKFQgUmfYaFxlJlW5Um9vQeK2yQEKVSIeO54wbYgr+rSPepQrzv2t/xgxQTuA9tp9S4jOui7sOCkBDC+IXF8MXGshoEzxo8bIW7pl9vObFJjoUAAmtEreJ0L1A7cfHLi3e5Bv+TZm7tXbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eVMml/AN; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=oobmBo3A; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764696765;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=E+HDJVvJl4bMj4d4ziuOQIqm2WL1j0kM9Q0KPsbSWGI=;
+	b=eVMml/ANiYjUQ/dENhwEY4UjBg68tezQfdVbNyMza/wAnKbQvskuxpSv6a5Tfz9idm+wL9
+	22axYbHf+7SIMMQoyo2T4iTRX4oNzonIrIbKAj2dFsNbRMQOg4581AYepK3LWfFBK252Ul
+	aIEdRov7itTzgd4WugJYo09UVHID/sw=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-152-xR4cDTUJO3u_nQs95JUHJA-1; Tue, 02 Dec 2025 12:32:44 -0500
+X-MC-Unique: xR4cDTUJO3u_nQs95JUHJA-1
+X-Mimecast-MFC-AGG-ID: xR4cDTUJO3u_nQs95JUHJA_1764696763
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-42b2ad2a58cso2627643f8f.0
+        for <netdev@vger.kernel.org>; Tue, 02 Dec 2025 09:32:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1764696763; x=1765301563; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=E+HDJVvJl4bMj4d4ziuOQIqm2WL1j0kM9Q0KPsbSWGI=;
+        b=oobmBo3ACbecGM2zAsNEQbzTua289d/zUsiE4f/oBkEpmqJ3/nXMIrnDlectuOHoNM
+         cQi9ESLTls2yqBbSq3IGu9y+ov19oUq6misriMpLnfrGtf9pmJ5eCJI8OyDj4tGylV/M
+         ztIw/2HhahEQtH9tOElQth941AkITEo3kcE3IAIs0MY58WWQaYsXKwyqYBT3FOU4Ycf8
+         vmgugVRwqGfiTzE+a+d27ou7KAF/LeVNcVwqNtcotJtOmBDbL6R51O/rQgzVTHjRDMNp
+         jkrVP/NY6/3I3nsMFq7ofHb4iAZB1FeuU8SsCWF30BW5aRZMTZNWrNHDTVRGdNOb8Bll
+         qpBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764696763; x=1765301563;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=E+HDJVvJl4bMj4d4ziuOQIqm2WL1j0kM9Q0KPsbSWGI=;
+        b=kYjWMpK3dvUHeXa/g2WpPhz8jGj/TipyT1WzCW/P1k7oG1z04Gk4iVlV02E+pPwOPG
+         zfNhzoKcVrd252LAm5R3SjUhUlIMDm3t4Po0+AZgB6BYyC2YY9JHeoPD0i76FLWVPcoS
+         C2lw5qE1/D5q//wCgSufzOlnnG/com2l1m80JL4M7gH9JhnHhpQfTtn1LecDuaONRm3d
+         v1Ib7E08oZFiYHL8QPVbSrMmqHgyHFMheO6BAe1PQLEaGqcMgIF8b5Wj8md5dfz/LlRo
+         D3oxUgaTEwUQqjxjTP/1SBiUuoPVeGKSM3tc02f5PCvulerSCOdW2t0qDeeWMK1CUuJD
+         dYqA==
+X-Forwarded-Encrypted: i=1; AJvYcCV2WS6WKS1WioLh9KFkmqfOx52Ay/JOAqVCgtFquMpnCkD6IwpW3sg+cPnhZ9V+IHRloyxJbAI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzg6cOKJI4CI1dZGp4a+atZqPtk6QPOrMOC7hQgFYxrZrmXRkSi
+	4z0/gxVOAabFcQP8dSmpqRr7ckoSIYyPtBJfNCQhnXoPVdkqw4/2O5jfM33MYtK/Ifr7EOLiPs2
+	pd3d2TaHNpbe7AlQfMXc44Ug1Z+YKB2ZLgR6+IyHS9hxMCpW/Ot7g2bDksA==
+X-Gm-Gg: ASbGncs4hVFQEsg3DGenmnvUwK6Uf39O48/MIOcAv4wL8XaX+1U88+S1q+m5UAG2sZ7
+	b8RBW5nysnQIgNMRhEyR6YStTJ+z0cc5If2nBCYaIgU6NhroXm5q0szuib5A95Gr85M5YeK5FJZ
+	lkAuWlkGJQ9bKig1W05/fFbNOZRaCvRpOR+DrBZi+dWGAbYPPYrVoygwgX8qeQd889FTMtCIYG2
+	pIGz3H0jjY2tidrW9yJFqBuFpOqJc8E28DSafoNxcHAs0z1AlmQOTN1vBaVVp8masMePDUOfdcF
+	9bS9sNlWrYYb7kxFg+XdICOrMeivfLdpk7dGIjCibOn/1LDirYT2b2CTJCtldFaMVviXdgRbjfJ
+	Npk8QP3qqETrCWDulvTMkHk7oCo81o20UyRl3zNTdVfT4
+X-Received: by 2002:a05:6000:2484:b0:42b:4061:23f3 with SMTP id ffacd0b85a97d-42cc1d0cfb8mr45412951f8f.44.1764696763108;
+        Tue, 02 Dec 2025 09:32:43 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHF1p78x5oVSl8J1K0hLdN33xdjQtXcOiVKx3z5y/DnKU9Es5F72q9mjudjOUjvHHxTW/iWDA==
+X-Received: by 2002:a05:6000:2484:b0:42b:4061:23f3 with SMTP id ffacd0b85a97d-42cc1d0cfb8mr45412903f8f.44.1764696762602;
+        Tue, 02 Dec 2025 09:32:42 -0800 (PST)
+Received: from localhost (net-5-89-201-160.cust.vodafonedsl.it. [5.89.201.160])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42e1ca40945sm34929004f8f.30.2025.12.02.09.32.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Dec 2025 09:32:42 -0800 (PST)
+From: Paolo Valerio <pvalerio@redhat.com>
+To: =?utf-8?Q?Th=C3=A9o?= Lebrun <theo.lebrun@bootlin.com>,
+ netdev@vger.kernel.org
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea
+ <claudiu.beznea@tuxon.dev>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Lorenzo
+ Bianconi <lorenzo@kernel.org>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, =?utf-8?Q?Gr=C3=A9gory?= Clement
+ <gregory.clement@bootlin.com>, =?utf-8?Q?Beno=C3=AEt?= Monin
+ <benoit.monin@bootlin.com>
+Subject: Re: [PATCH RFC net-next 4/6] cadence: macb/gem: add XDP support for
+ gem
+In-Reply-To: <DEJK1461002Y.TQON2T91OS6B@bootlin.com>
+References: <20251119135330.551835-1-pvalerio@redhat.com>
+ <20251119135330.551835-5-pvalerio@redhat.com>
+ <DEJK1461002Y.TQON2T91OS6B@bootlin.com>
+Date: Tue, 02 Dec 2025 18:32:41 +0100
+Message-ID: <87bjkgzt52.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 5/9] tun: use bulk NAPI cache allocation in
- tun_xdp_one
-To: Jon Kohler <jon@nutanix.com>, Jason Wang <jasowang@redhat.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>,
- open list <linux-kernel@vger.kernel.org>,
- "open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)"
- <bpf@vger.kernel.org>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Alexander Lobakin <aleksander.lobakin@intel.com>
-References: <20251125200041.1565663-1-jon@nutanix.com>
- <20251125200041.1565663-6-jon@nutanix.com>
- <CACGkMEsDCVKSzHSKACAPp3Wsd8LscUE0GO4Ko9GPGfTR0vapyg@mail.gmail.com>
- <CF8FF91A-2197-47F7-882B-33967C9C6089@nutanix.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <CF8FF91A-2197-47F7-882B-33967C9C6089@nutanix.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+On 27 Nov 2025 at 03:41:56 PM, Th=C3=A9o Lebrun <theo.lebrun@bootlin.com> w=
+rote:
 
+> On Wed Nov 19, 2025 at 2:53 PM CET, Paolo Valerio wrote:
+>> @@ -1273,6 +1275,7 @@ struct macb_queue {
+>>  	struct queue_stats stats;
+>>  	struct page_pool	*page_pool;
+>>  	struct sk_buff		*skb;
+>> +	struct xdp_rxq_info	xdp_q;
+>>  };
+>
+> Those are always named `xdp_rxq` inside the kernel, we should stick with
+> the calling convention no?
+>
 
-On 02/12/2025 17.49, Jon Kohler wrote:
-> 
-> 
->> On Nov 27, 2025, at 10:02 PM, Jason Wang <jasowang@redhat.com> wrote:
->>
->> On Wed, Nov 26, 2025 at 3:19 AM Jon Kohler <jon@nutanix.com> wrote:
->>>
->>> Optimize TUN_MSG_PTR batch processing by allocating sk_buff structures
->>> in bulk from the per-CPU NAPI cache using napi_skb_cache_get_bulk.
->>> This reduces allocation overhead and improves efficiency, especially
->>> when IFF_NAPI is enabled and GRO is feeding entries back to the cache.
->>
->> Does this mean we should only enable this when NAPI is used?
-> 
-> No, it does not mean that at all, but I see what that would be confusing.
-> I can clean up the commit msg on the next go around
-> 
->>>
->>> If bulk allocation cannot fully satisfy the batch, gracefully drop only
->>> the uncovered portion, allowing the rest of the batch to proceed, which
->>> is what already happens in the previous case where build_skb() would
->>> fail and return -ENOMEM.
->>>
->>> Signed-off-by: Jon Kohler <jon@nutanix.com>
->>
->> Do we have any benchmark result for this?
-> 
-> Yes, it is in the cover letter:
-> https://patchwork.kernel.org/project/netdevbpf/cover/20251125200041.1565663-1-jon@nutanix.com/
-> 
->>> ---
->>> drivers/net/tun.c | 30 ++++++++++++++++++++++++------
->>> 1 file changed, 24 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
->>> index 97f130bc5fed..64f944cce517 100644
->>> --- a/drivers/net/tun.c
->>> +++ b/drivers/net/tun.c
-[...]
->>> @@ -2454,6 +2455,7 @@ static int tun_xdp_one(struct tun_struct *tun,
->>>                 ret = tun_xdp_act(tun, xdp_prog, xdp, act);
->>>                 if (ret < 0) {
->>>                         /* tun_xdp_act already handles drop statistics */
->>> +                       kfree_skb_reason(skb, SKB_DROP_REASON_XDP);
->>
->> This should belong to previous patches?
-> 
-> Well, not really, as we did not even have an SKB to free at this point
-> in the previous code
->>
->>>                         put_page(virt_to_head_page(xdp->data));
+sure
 
-This calling put_page() directly also looks dubious.
+>> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethe=
+rnet/cadence/macb_main.c
+>> index 5829c1f773dd..53ea1958b8e4 100644
+>> --- a/drivers/net/ethernet/cadence/macb_main.c
+>> +++ b/drivers/net/ethernet/cadence/macb_main.c
+>> @@ -1344,10 +1344,51 @@ static void discard_partial_frame(struct macb_qu=
+eue *queue, unsigned int begin,
+>>  	 */
+>>  }
+>>=20=20
+>> +static u32 gem_xdp_run(struct macb_queue *queue, struct xdp_buff *xdp,
+>> +		       struct net_device *dev)
+>
+> Why pass `struct net_device` explicitly? It is in queue->bp->dev.
+>
 
->>>                         return ret;
->>>                 }
->>> @@ -2463,6 +2465,7 @@ static int tun_xdp_one(struct tun_struct *tun,
->>>                         *flush = true;
->>>                         fallthrough;
->>>                 case XDP_TX:
->>> +                       napi_consume_skb(skb, 1);
->>>                         return 0;
->>>                 case XDP_PASS:
->>>                         break;
->>> @@ -2475,13 +2478,15 @@ static int tun_xdp_one(struct tun_struct *tun,
->>>                                 tpage->page = page;
->>>                                 tpage->count = 1;
->>>                         }
->>> +                       napi_consume_skb(skb, 1);
->>
->> I wonder if this would have any side effects since tun_xdp_one() is
->> not called by a NAPI.
-> 
-> As far as I can tell, this napi_consume_skb is really just an artifact of
-> how it was named and how it was traditionally used.
-> 
-> Now this is really just a napi_consume_skb within a bh disable/enable
-> section, which should meet the requirements of how that interface
-> should be used (again, AFAICT)
-> 
+let's avoid this
 
-Yicks - this sounds super ugly.  Just wrapping napi_consume_skb() in bh
-disable/enable section and then assuming you get the same protection as
-NAPI is really dubious.
+>> +{
+>> +	struct bpf_prog *prog;
+>> +	u32 act =3D XDP_PASS;
+>> +
+>> +	rcu_read_lock();
+>> +
+>> +	prog =3D rcu_dereference(queue->bp->prog);
+>> +	if (!prog)
+>> +		goto out;
+>> +
+>> +	act =3D bpf_prog_run_xdp(prog, xdp);
+>> +	switch (act) {
+>> +	case XDP_PASS:
+>> +		goto out;
+>> +	case XDP_REDIRECT:
+>> +		if (unlikely(xdp_do_redirect(dev, xdp, prog))) {
+>> +			act =3D XDP_DROP;
+>> +			break;
+>> +		}
+>> +		goto out;
+>
+> Why the `unlikely()`?
+>
 
-Cc Sebastian as he is trying to cleanup these kind of use-case, to make
-kernel preemption work.
+just expecting the err path to be the exception, although this is not
+consistend with the XDP_TX path.
+Do you prefer to remove it?
 
+>> +	default:
+>> +		bpf_warn_invalid_xdp_action(dev, prog, act);
+>> +		fallthrough;
+>> +	case XDP_ABORTED:
+>> +		trace_xdp_exception(dev, prog, act);
+>> +		fallthrough;
+>> +	case XDP_DROP:
+>> +		break;
+>> +	}
+>> +
+>> +	page_pool_put_full_page(queue->page_pool,
+>> +				virt_to_head_page(xdp->data), true);
+>
+> Maybe move that to the XDP_DROP, it is the only `break` in the above
+> switch statement. It will be used by the default and XDP_ABORTED cases
+> through fallthrough. We can avoid the out label and its two gotos that
+> way.
+>
 
->>
->>>                         return 0;
->>>                 }
->>>         }
->>>
->>> build:
->>> -       skb = build_skb(xdp->data_hard_start, buflen);
->>> +       skb = build_skb_around(skb, xdp->data_hard_start, buflen);
->>>         if (!skb) {
->>> +               kfree_skb_reason(skb, SKB_DROP_REASON_NOMEM);
-> 
-> Though to your point, I dont think this actually does anything given
-> that if the skb was somehow nuked as part of build_skb_around, there
-> would not be an skb to free. Doesn’t hurt though, from a self documenting
-> code perspective tho?
-> 
->>>                 dev_core_stats_rx_dropped_inc(tun->dev);
->>>                 return -ENOMEM;
->>>         }
->>> @@ -2566,9 +2571,11 @@ static int tun_sendmsg(struct socket *sock, struct msghdr *m, size_t total_len)
->>>         if (m->msg_controllen == sizeof(struct tun_msg_ctl) &&
->>>             ctl && ctl->type == TUN_MSG_PTR) {
->>>                 struct bpf_net_context __bpf_net_ctx, *bpf_net_ctx;
->>> +               int flush = 0, queued = 0, num_skbs = 0;
->>>                 struct tun_page tpage;
->>>                 int n = ctl->num;
->>> -               int flush = 0, queued = 0;
->>> +               /* Max size of VHOST_NET_BATCH */
->>> +               void *skbs[64];
->>
->> I think we need some tweaks
->>
->> 1) TUN is decoupled from vhost, so it should have its own value (a
->> macro is better)
-> 
-> Sure, I can make another constant that does a similar thing
-> 
->> 2) Provide a way to fail or handle the case when more than 64
-> 
-> What if we simply assert that the maximum here is 64, which I think
-> is what it actually is in practice?
-> 
->>
->>>
->>>                 memset(&tpage, 0, sizeof(tpage));
->>>
->>> @@ -2576,13 +2583,24 @@ static int tun_sendmsg(struct socket *sock, struct msghdr *m, size_t total_len)
->>>                 rcu_read_lock();
->>>                 bpf_net_ctx = bpf_net_ctx_set(&__bpf_net_ctx);
->>>
->>> -               for (i = 0; i < n; i++) {
->>> +               num_skbs = napi_skb_cache_get_bulk(skbs, n);
->>
->> Its document said:
->>
->> """
->> * Must be called *only* from the BH context.
->> “"”
-> We’re in a bh_disable section here, is that not good enough?
+We'd not put to page pool in case the redirect fails or am I missing
+something?
 
-Again this feels very ugly and prone to painting ourselves into a
-corner, assuming BH-disabled sections have same protection as NAPI.
+>>  static int gem_rx(struct macb_queue *queue, struct napi_struct *napi,
+>>  		  int budget)
+>>  {
+>>  	struct macb *bp =3D queue->bp;
+>> +	bool			xdp_flush =3D false;
+>>  	unsigned int		len;
+>>  	unsigned int		entry;
+>>  	void			*data;
+>> @@ -1356,9 +1397,11 @@ static int gem_rx(struct macb_queue *queue, struc=
+t napi_struct *napi,
+>>  	int			count =3D 0;
+>>=20=20
+>>  	while (count < budget) {
+>> -		u32 ctrl;
+>> -		dma_addr_t addr;
+>>  		bool rxused, first_frame;
+>> +		struct xdp_buff xdp;
+>> +		dma_addr_t addr;
+>> +		u32 ctrl;
+>> +		u32 ret;
+>>=20=20
+>>  		entry =3D macb_rx_ring_wrap(bp, queue->rx_tail);
+>>  		desc =3D macb_rx_desc(queue, entry);
+>> @@ -1403,6 +1446,22 @@ static int gem_rx(struct macb_queue *queue, struc=
+t napi_struct *napi,
+>>  			data_len =3D SKB_WITH_OVERHEAD(bp->rx_buffer_size) - bp->rx_offset;
+>>  		}
+>>=20=20
+>> +		if (!(ctrl & MACB_BIT(RX_SOF) && ctrl & MACB_BIT(RX_EOF)))
+>> +			goto skip_xdp;
+>> +
+>> +		xdp_init_buff(&xdp, bp->rx_buffer_size, &queue->xdp_q);
+>> +		xdp_prepare_buff(&xdp, data, bp->rx_offset, len,
+>> +				 false);
+>> +		xdp_buff_clear_frags_flag(&xdp);
+>
+> You prepare the XDP buffer before checking an XDP program is attached.
+> Could we avoid this work? We'd move the xdp_buff preparation into
+> gem_xdp_run(), after the RCU pointer dereference.
+>
 
-(The napi_skb_cache_get/put function are operating on per CPU arrays
-without any locking.)
+ack, makes sense
 
---Jesper
+>> -static void gem_create_page_pool(struct macb_queue *queue)
+>> +static void gem_create_page_pool(struct macb_queue *queue, int qid)
+>>  {
+>>  	struct page_pool_params pp_params =3D {
+>>  		.order =3D 0,
+>>  		.flags =3D PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV,
+>>  		.pool_size =3D queue->bp->rx_ring_size,
+>>  		.nid =3D NUMA_NO_NODE,
+>> -		.dma_dir =3D DMA_FROM_DEVICE,
+>> +		.dma_dir =3D rcu_access_pointer(queue->bp->prog)
+>> +				? DMA_BIDIRECTIONAL
+>> +				: DMA_FROM_DEVICE,
+>
+> Ah, that is the reason for page_pool_get_dma_dir() calls!
+>
+
+:)
+
+>>  static int macb_change_mtu(struct net_device *dev, int new_mtu)
+>>  {
+>> +	int frame_size =3D new_mtu + ETH_HLEN + ETH_FCS_LEN + MACB_MAX_PAD;
+>> +	struct macb *bp =3D netdev_priv(dev);
+>> +	struct bpf_prog *prog =3D bp->prog;
+>
+> No fancy RCU macro?
+>
+
+right, guess an rcu_access_pointer() call is needed here
+
+>> +static int macb_xdp(struct net_device *dev, struct netdev_bpf *xdp)
+>> +{
+>> +	struct macb *bp =3D netdev_priv(dev);
+>> +
+>> +	if (!macb_is_gem(bp))
+>> +		return 0;
+>
+> Returning 0 sounds like a mistake, -EOPNOTSUPP sounds more appropriate.
+>
+
+agreed
+
+>> +	switch (xdp->command) {
+>> +	case XDP_SETUP_PROG:
+>> +		return gem_xdp_setup(dev, xdp->prog, xdp->extack);
+>> +	default:
+>> +		return -EINVAL;
+>
+> Same here: we want -EOPNOTSUPP. Otherwise caller cannot dissociate an
+> unsupported call from one that is supported but failed.
+>
+
+ack
+
+>> +	}
+>> +}
+>> +
+>>  static void gem_update_stats(struct macb *bp)
+>>  {
+>>  	struct macb_queue *queue;
+>> @@ -4390,6 +4529,7 @@ static const struct net_device_ops macb_netdev_ops=
+ =3D {
+>>  	.ndo_hwtstamp_set	=3D macb_hwtstamp_set,
+>>  	.ndo_hwtstamp_get	=3D macb_hwtstamp_get,
+>>  	.ndo_setup_tc		=3D macb_setup_tc,
+>> +	.ndo_bpf		=3D macb_xdp,
+>
+> We want it to be "gem_" prefixed as it does not support MACB.
+>
+
+ack
+
+> Thanks,
+>
+> --
+> Th=C3=A9o Lebrun, Bootlin
+> Embedded Linux and Kernel engineering
+> https://bootlin.com
+
 
