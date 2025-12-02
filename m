@@ -1,248 +1,322 @@
-Return-Path: <netdev+bounces-243160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243161-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19589C9A25A
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 06:55:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 91E96C9A27E
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 06:58:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 29EAA346AA4
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 05:54:15 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id CB3C93466DC
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 05:58:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DACA2FD1BB;
-	Tue,  2 Dec 2025 05:54:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D10EF2FD660;
+	Tue,  2 Dec 2025 05:58:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HILDmzB2"
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="uSWR5UTf";
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="QWYtH+zR"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from bkemail.birger-koblitz.de (bkemail.birger-koblitz.de [23.88.97.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D0E2FD667
-	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 05:53:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85FA22FD66A;
+	Tue,  2 Dec 2025 05:58:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.97.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764654842; cv=none; b=OzfOhCxmZF6T9YOublH80jFP+LbEQSgsg7bVa5PCEb6log8TrMFXmKVcGBBrEUZsq6nKTbN0vNgXwJsmHmbICJNwg3OQskVmjPIbeTEie5zGNhbxecALm/qAAizoO2DeZPuAPYvtA2h09VFw8bqSEWYNtv8cnjipVmA9UwfVUqM=
+	t=1764655083; cv=none; b=dOP+ZSSjSQxjdUJr2/jTyKDa5nC/Z2b29dK8itbwnhSQ0QiHeG/AUngCxB5Qh4qzQ7XZ90UF3bqx8+YhPy9NBLap7H/Gp7AA2HroSR2CK2pebSlNKVvU2MmT/NU8gchMJSbkWkauANY46pAJQqYNj8rBlLO4uWSP7kvT+OPra5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764654842; c=relaxed/simple;
-	bh=buJPMbgz/BZOScd3RnGWfzNlsIfLb+N0mzpafANBz7Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bPJFIEXozluRo385GYZUhaaLTg6JYkEujj7+xJ/kwKFa+JXmM1pF3yyfI1fPjJkrb1oAKB13VUBaARTtyZnTlRgpv3+CZOnjby5tY0NB/R6d/6CJbGrlszv4cQMnyhRIq45fCKvXCLw+SB5AqFeSryBmRQvOtyvFKxuEeHt/QIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HILDmzB2; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764654838;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=78a1kFPFl2JdNIGam4nTkS9CF59lIsoLCux9uUyfhPQ=;
-	b=HILDmzB2ARxNYEIoM9QtzHdl6zWWRUncsGhOhKuzSmnYXtSLtzSpoTqbkTMyC0cSf183yi
-	/s4bvYbzo/2YjBZuiiz/mCXkEa4Ouf+NOVF64w0OPD+rFV6AEg/ApIm9TgmRQRI3G+0YyX
-	/9OpRgfm+ccLT/NZ5FOhZ5/Oylx4WY4=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-127-6z2sU3lZOyeyzI7xTGnY7g-1; Tue,
- 02 Dec 2025 00:53:55 -0500
-X-MC-Unique: 6z2sU3lZOyeyzI7xTGnY7g-1
-X-Mimecast-MFC-AGG-ID: 6z2sU3lZOyeyzI7xTGnY7g_1764654834
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 334BC195608F;
-	Tue,  2 Dec 2025 05:53:54 +0000 (UTC)
-Received: from xudu-thinkpadx1carbongen9.nay.csb (unknown [10.66.60.72])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9C4FF3002D0C;
-	Tue,  2 Dec 2025 05:53:50 +0000 (UTC)
-From: Xu Xu <xudu@redhat.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	shuah@kernel.org
-Cc: netdev@vger.kernel.org,
-	Xu Du <xudu@redhat.com>
-Subject: [RFC net-next 8/8] selftest: tun: Add test data for success and failure paths
-Date: Tue,  2 Dec 2025 13:53:11 +0800
-Message-ID: <d1d0232f344008d5c2ba4ec03d9e039f844dd5ce.1764640939.git.xudu@redhat.com>
-In-Reply-To: <cover.1764640939.git.xudu@redhat.com>
-References: <cover.1764640939.git.xudu@redhat.com>
+	s=arc-20240116; t=1764655083; c=relaxed/simple;
+	bh=PHaz/sOzh9D5lWWBtb0WGJsCAi0opo4umag/aUgkwbM=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=YnNkOJgxatUf4L/WI+m2OjHfAC7m398Jq9GKDTKAt47KK7IQnBKM+oSNfBtUzQJczvpb2Okc/V8WqmW1MFHWI2h8om3UWpsy45Qns6H27IX4jrHATRfEeDrn0aFTWDl/xEKAYGimE6Rr5BPpGD/7Yo4lBMyceVq8Zk6hjySUEPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=uSWR5UTf; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=QWYtH+zR; arc=none smtp.client-ip=23.88.97.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=birger-koblitz.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
+	s=default; t=1764655073;
+	bh=PHaz/sOzh9D5lWWBtb0WGJsCAi0opo4umag/aUgkwbM=;
+	h=From:Date:Subject:To:Cc:From;
+	b=uSWR5UTfytXyJHRqLD0Nqt6/H3rGecyo+rktT+Dsal2i4lZWiIBHHBgGFiO1/txtz
+	 mG2ebYxSj7M5FUZKUquQWiahI+CQBk8ASZ1FxsF/HO37rDHQygXnUpcAgUNsBsVZjD
+	 /jmz6jmZZdOx2JU0BZ7fnnM+abcAb0XLoO6BJR6+sLVNWhm/mXTOpOCS1NhxkCWMhC
+	 2Y8aQdkD9rLKmnytGc0ap6RGW940EJcdbQ3Op4ffzmjdiyhQtN5GuJgBDYkAHfnw0P
+	 Q3zMEilD4OIlX+HYulpl4UWJyXSLw8yxcwywOGMgAZM+Y3a7Xbi9GtbDKmXFHTCZ7W
+	 OnA+rjxEsZ/Qg==
+Received: by bkemail.birger-koblitz.de (Postfix, from userid 109)
+	id 034C63EC67; Tue,  2 Dec 2025 05:57:52 +0000 (UTC)
+X-Spam-Level: 
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
+	s=default; t=1764655071;
+	bh=PHaz/sOzh9D5lWWBtb0WGJsCAi0opo4umag/aUgkwbM=;
+	h=From:Date:Subject:To:Cc:From;
+	b=QWYtH+zRjCfffl6p1FBDois9MAM1pfGJSONXUwkO7MwHx+ZGngbvO23zM8T0NH7T7
+	 jBdA63EX1LeHWlHXJ6VHJwreGU6bhG4ZKssjMNUTcv6nuM3bNAPDCtVJeACOgSwnBC
+	 O01Zgw+U3Ix8BOZuJn9Sil+hf8aTBNomU989CZgbt0Qdx7eMWTS4iw8d2kTMPqxAxc
+	 jyLbrqaC3kSfIWjYHEjVekzwT6n3CW8OYAgld6c9Y4Mb0MaUf2ffGHryW8Opx6toPf
+	 ThB3cvX7rY6KZAWIfYT8ulSq97bGI+ly/ID27STyYLLTgmwr+zeB7rjRj6pPr3lD58
+	 Du4LkX+j99lFg==
+Received: from AMDDesktop.lan (unknown [IPv6:2a00:6020:47a3:e800:94d3:d213:724a:4e07])
+	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id 2DA163EC67;
+	Tue,  2 Dec 2025 05:57:51 +0000 (UTC)
+From: Birger Koblitz <mail@birger-koblitz.de>
+Date: Tue, 02 Dec 2025 06:57:48 +0100
+Subject: [PATCH net-next v6] ixgbe: Add 10G-BX support
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20251202-10gbx-v6-1-e7acbd3dff69@birger-koblitz.de>
+X-B4-Tracking: v=1; b=H4sIANx/LmkC/3WQy27CMBBFfwV5XSOP4zEOK/6jYuHHJFitCHKQR
+ UH59w6ooSzI8o7mnBndmxipZBrFdnUThWoe83DkYD9WIh78sSeZE2ehlUZQoCWoPlykD8bpiAQ
+ JjeDdU6EuXx6ezz3nQx7PQ/l5aCvcp7Oh+TNUkMCa1rXWd01Ctwu59FTk1xC+8/m6TiTupqpfa
+ TPT/IhsnYqoDQDQZolu3tL8hEQVk3dWb6BdvG1eaTvTrJHKRx6HDq2PSzT+0/BsriLToCM3qKw
+ K8e3taZp+AV28hTiaAQAA
+X-Change-ID: 20251012-10gbx-ab482c5e1d54
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Birger Koblitz <mail@birger-koblitz.de>, 
+ Andrew Lunn <andrew@lunn.ch>, Paul Menzel <pmenzel@molgen.mpg.de>, 
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
+ Rinitha S <sx.rinitha@intel.com>
+X-Mailer: b4 0.14.2
 
-From: Xu Du <xudu@redhat.com>
+Add support for 10G-BX modules, i.e. 10GBit Ethernet over a single strand
+Single-Mode fiber.
+The initialization of a 10G-BX SFP+ is the same as for a 10G SX/LX module,
+and is identified according to SFF-8472 table 5-3, footnote 3 by the
+10G Ethernet Compliance Codes field being empty, the Nominal Bit
+Rate being compatible with 12.5GBit, and the module being a fiber module
+with a Single Mode fiber link length.
 
-To improve the robustness and coverage of the TUN selftests, this
-patch expands the set of test data.
+This was tested using a Lightron WSPXG-HS3LC-IEA 1270/1330nm 10km
+transceiver:
+$ sudo ethtool -m enp1s0f1
+   Identifier                          : 0x03 (SFP)
+   Extended identifier                 : 0x04 (GBIC/SFP defined by 2-wire interface ID)
+   Connector                           : 0x07 (LC)
+   Transceiver codes                   : 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+   Encoding                            : 0x01 (8B/10B)
+   BR Nominal                          : 10300MBd
+   Rate identifier                     : 0x00 (unspecified)
+   Length (SMF)                        : 10km
+   Length (OM2)                        : 0m
+   Length (OM1)                        : 0m
+   Length (Copper or Active cable)     : 0m
+   Length (OM3)                        : 0m
+   Laser wavelength                    : 1330nm
+   Vendor name                         : Lightron Inc.
+   Vendor OUI                          : 00:13:c5
+   Vendor PN                           : WSPXG-HS3LC-IEA
+   Vendor rev                          : 0000
+   Option values                       : 0x00 0x1a
+   Option                              : TX_DISABLE implemented
+   BR margin max                       : 0%
+   BR margin min                       : 0%
+   Vendor SN                           : S142228617
+   Date code                           : 140611
+   Optical diagnostics support         : Yes
 
-Signed-off-by: Xu Du <xudu@redhat.com>
+Signed-off-by: Birger Koblitz <mail@birger-koblitz.de>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Tested-by: Rinitha S <sx.rinitha@intel.com>
 ---
- tools/testing/selftests/net/tun.c | 115 +++++++++++++++++++++++++++++-
- 1 file changed, 113 insertions(+), 2 deletions(-)
+Changes in v6:
+  Added else statement to explicitly set sfp_type to unknown if the length-check fails 
+- Link to v5: https://lore.kernel.org/r/20251112-10gbx-v5-1-12cab4060bc8@birger-koblitz.de
 
-diff --git a/tools/testing/selftests/net/tun.c b/tools/testing/selftests/net/tun.c
-index 02c26a21b363..c4f29885f6ef 100644
---- a/tools/testing/selftests/net/tun.c
-+++ b/tools/testing/selftests/net/tun.c
-@@ -57,6 +57,10 @@ static struct in6_addr param_ipaddr6_inner_src = {
- 	{ { 0x20, 0x02, 0x0d, 0xb8, 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2 } },
- };
- 
-+#ifndef BIT
-+#define BIT(nr) (1UL << (nr))
-+#endif
-+
- #define VN_ID 1
- #define VN_PORT 4789
- #define UDP_SRC_PORT 22
-@@ -72,6 +76,8 @@ static struct in6_addr param_ipaddr6_inner_src = {
- #define UDP_TUNNEL_VXLAN_4IN6 0x04
- #define UDP_TUNNEL_VXLAN_6IN6 0x08
- 
-+#define UDP_TUNNEL_MAX_SEGMENTS BIT(7)
-+
- #define UDP_TUNNEL_OUTER_IPV4 (UDP_TUNNEL_VXLAN_4IN4 | UDP_TUNNEL_VXLAN_6IN4)
- #define UDP_TUNNEL_INNER_IPV4 (UDP_TUNNEL_VXLAN_4IN4 | UDP_TUNNEL_VXLAN_4IN6)
- 
-@@ -545,6 +551,39 @@ FIXTURE_VARIANT(tun_vnet_udptnl)
- 
- /* clang-format off */
- #define TUN_VNET_UDPTNL_VARIANT_ADD(type, desc)                              \
-+	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_nogsosz_1byte) {         \
-+		/* no GSO: send a single byte */                             \
-+		.tunnel_type = type,                                         \
-+		.data_size = 1,                                              \
-+		.r_num_mss = 1,                                              \
-+		.is_tap = true,                                              \
-+		.no_gso = true,                                              \
-+	};                                                                   \
-+	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_nogsosz_1mss) {          \
-+		/* no GSO: send a single MSS, fall back to no GSO */         \
-+		.tunnel_type = type,                                         \
-+		.data_size = UDP_TUNNEL_MSS(type),                           \
-+		.r_num_mss = 1,                                              \
-+		.is_tap = true,                                              \
-+		.no_gso = true,                                              \
-+	};                                                                   \
-+	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_nogsosz_gtmss) {         \
-+		/* no GSO: send a single MSS + 1B: fail */                   \
-+		.tunnel_type = type,                                         \
-+		.data_size = UDP_TUNNEL_MSS(type) + 1,                       \
-+		.r_num_mss = 1,                                              \
-+		.is_tap = true,                                              \
-+		.no_gso = true,                                              \
-+	};                                                                   \
-+	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_1byte) {                 \
-+		/* GSO: send 1 byte, gso 1 byte, fall back to no GSO */      \
-+		.tunnel_type = type,                                         \
-+		.gso_size = 1,                                               \
-+		.data_size = 1,                                              \
-+		.r_num_mss = 1,                                              \
-+		.is_tap = true,                                              \
-+		.no_gso = true,                                              \
-+	};                                                                   \
- 	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_1mss) {                  \
- 		/* send a single MSS: fall back to no GSO */                 \
- 		.tunnel_type = type,                                         \
-@@ -553,8 +592,65 @@ FIXTURE_VARIANT(tun_vnet_udptnl)
- 		.r_num_mss = 1,                                              \
- 		.is_tap = true,                                              \
- 		.no_gso = true,                                              \
--	};
--/* clang-format on */
-+	};                                                                   \
-+	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_ltgso) {                 \
-+		/* data <= MSS < gso: will fall back to no GSO */            \
-+		.tunnel_type = type,                                         \
-+		.gso_size = UDP_TUNNEL_MSS(type) + 1,                        \
-+		.data_size = UDP_TUNNEL_MSS(type),                           \
-+		.r_num_mss = 1,                                              \
-+		.is_tap = true,                                              \
-+		.no_gso = true,                                              \
-+	};                                                                   \
-+	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_gtgso) {                 \
-+		/* GSO: a single MSS + 1B */                                 \
-+		.tunnel_type = type,                                         \
-+		.gso_size = UDP_TUNNEL_MSS(type),                            \
-+		.data_size = UDP_TUNNEL_MSS(type) + 1,                       \
-+		.r_num_mss = 2,                                              \
-+		.is_tap = true,                                              \
-+	};                                                                   \
-+	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_2mss) {                  \
-+		/* no GSO: send exactly 2 MSS */                             \
-+		.tunnel_type = type,                                         \
-+		.gso_size = UDP_TUNNEL_MSS(type),                            \
-+		.data_size = UDP_TUNNEL_MSS(type) * 2,                       \
-+		.r_num_mss = 2,                                              \
-+		.is_tap = true,                                              \
-+	};                                                                   \
-+	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_maxbytes) {              \
-+		/* GSO: send max bytes */                                    \
-+		.tunnel_type = type,                                         \
-+		.gso_size = UDP_TUNNEL_MSS(type),                            \
-+		.data_size = UDP_TUNNEL_MAX(type, true),                     \
-+		.r_num_mss = UDP_TUNNEL_MAX(type, true) /                    \
-+			     UDP_TUNNEL_MSS(type) + 1,                       \
-+		.is_tap = true,                                              \
-+	};                                                                   \
-+	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_over_maxbytes) {         \
-+		/* GSO: send oversize max bytes: fail */                     \
-+		.tunnel_type = type,                                         \
-+		.gso_size = UDP_TUNNEL_MSS(type),                            \
-+		.data_size = ETH_MAX_MTU,                                    \
-+		.r_num_mss = ETH_MAX_MTU / UDP_TUNNEL_MSS(type) + 1,         \
-+		.is_tap = true,                                              \
-+	};                                                                   \
-+	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_maxsegs) {               \
-+		/* GSO: send max number of min sized segments */             \
-+		.tunnel_type = type,                                         \
-+		.gso_size = 1,                                               \
-+		.data_size = UDP_TUNNEL_MAX_SEGMENTS,                        \
-+		.r_num_mss = UDP_TUNNEL_MAX_SEGMENTS,                        \
-+		.is_tap = true,                                              \
-+	};                                                                   \
-+	FIXTURE_VARIANT_ADD(tun_vnet_udptnl, desc##_5byte) {                 \
-+		/* GSO: send 5 bytes, gso 2 bytes */                         \
-+		.tunnel_type = type,                                         \
-+		.gso_size = 2,                                               \
-+		.data_size = 5,                                              \
-+		.r_num_mss = 3,                                              \
-+		.is_tap = true,                                              \
-+	} /* clang-format on */
- 
- TUN_VNET_UDPTNL_VARIANT_ADD(UDP_TUNNEL_VXLAN_4IN4, 4in4);
- TUN_VNET_UDPTNL_VARIANT_ADD(UDP_TUNNEL_VXLAN_6IN4, 6in4);
-@@ -891,4 +987,19 @@ TEST_F(tun_vnet_udptnl, recv_gso_packet)
+Changes in v5:
+  Added "Tested-by" 
+- Link to v4: https://lore.kernel.org/r/20251016-10gbx-v4-1-0ac202bf56ac@birger-koblitz.de
+
+Changes in v4:
+  Added "Reviewed-bys".
+  Slight rewording of commit message.
+- Link to v3: https://lore.kernel.org/r/20251014-10gbx-v3-1-50cda8627198@birger-koblitz.de
+
+Changes in v3:
+  Added "Reviewed-by". There also was a possible mailserver DKIM misconfiguration
+  that may have prevented recipients to recieve the previous mails 
+- Link to v2: https://lore.kernel.org/r/20251014-10gbx-v2-1-980c524111e7@birger-koblitz.de
+
+Changes in v2:
+  Allow also modules with only Byte 15 (100m SM link length) set to
+  be identified as BX
+---
+ drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c   |  7 ++++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c |  2 ++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c     | 45 +++++++++++++++++++++---
+ drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h     |  2 ++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_type.h    |  2 ++
+ 5 files changed, 53 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c
+index d5b1b974b4a33e7dd51b7cfe5ea211ff038a36f0..892a73a4bc6b0bb1c976ca95bf874059b987054f 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c
+@@ -342,6 +342,13 @@ static int ixgbe_get_link_capabilities_82599(struct ixgbe_hw *hw,
+ 		return 0;
  	}
- }
  
-+XFAIL_ADD(tun_vnet_udptnl, 4in4_nogsosz_gtmss, recv_gso_packet);
-+XFAIL_ADD(tun_vnet_udptnl, 6in4_nogsosz_gtmss, recv_gso_packet);
-+XFAIL_ADD(tun_vnet_udptnl, 4in6_nogsosz_gtmss, recv_gso_packet);
-+XFAIL_ADD(tun_vnet_udptnl, 6in6_nogsosz_gtmss, recv_gso_packet);
++	if (hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core0 ||
++	    hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core1) {
++		*speed = IXGBE_LINK_SPEED_10GB_FULL;
++		*autoneg = false;
++		return 0;
++	}
 +
-+XFAIL_ADD(tun_vnet_udptnl, 4in4_over_maxbytes, send_gso_packet);
-+XFAIL_ADD(tun_vnet_udptnl, 6in4_over_maxbytes, send_gso_packet);
-+XFAIL_ADD(tun_vnet_udptnl, 4in6_over_maxbytes, send_gso_packet);
-+XFAIL_ADD(tun_vnet_udptnl, 6in6_over_maxbytes, send_gso_packet);
-+
-+XFAIL_ADD(tun_vnet_udptnl, 4in4_over_maxbytes, recv_gso_packet);
-+XFAIL_ADD(tun_vnet_udptnl, 6in4_over_maxbytes, recv_gso_packet);
-+XFAIL_ADD(tun_vnet_udptnl, 4in6_over_maxbytes, recv_gso_packet);
-+XFAIL_ADD(tun_vnet_udptnl, 6in6_over_maxbytes, recv_gso_packet);
-+
- TEST_HARNESS_MAIN
+ 	/*
+ 	 * Determine link capabilities based on the stored value of AUTOC,
+ 	 * which represents EEPROM defaults.  If AUTOC value has not been
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+index 2d660e9edb80af8fc834e097703dfd6a82b8c45b..76edf02bc47e5dd24bb0936f730f036181f6dc2a 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+@@ -351,6 +351,8 @@ static int ixgbe_get_link_ksettings(struct net_device *netdev,
+ 		case ixgbe_sfp_type_1g_lx_core1:
+ 		case ixgbe_sfp_type_1g_bx_core0:
+ 		case ixgbe_sfp_type_1g_bx_core1:
++		case ixgbe_sfp_type_10g_bx_core0:
++		case ixgbe_sfp_type_10g_bx_core1:
+ 			ethtool_link_ksettings_add_link_mode(cmd, supported,
+ 							     FIBRE);
+ 			ethtool_link_ksettings_add_link_mode(cmd, advertising,
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
+index 2449e4cf2679ddf3277f4ada7619303eb618d393..5cdf2503610d26d66ce5b0f28901fcad14803662 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
+@@ -1541,6 +1541,8 @@ int ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
+ 	u8 identifier = 0;
+ 	u8 cable_tech = 0;
+ 	u8 cable_spec = 0;
++	u8 sm_length_km = 0;
++	u8 sm_length_100m = 0;
+ 	int status;
+ 
+ 	if (hw->mac.ops.get_media_type(hw) != ixgbe_media_type_fiber) {
+@@ -1678,6 +1680,33 @@ int ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
+ 			else
+ 				hw->phy.sfp_type =
+ 					ixgbe_sfp_type_1g_bx_core1;
++		/* Support Ethernet 10G-BX, checking the Bit Rate
++		 * Nominal Value as per SFF-8472 to be 12.5 Gb/s (67h) and
++		 * Single Mode fibre with at least 1km link length
++		 */
++		} else if ((!comp_codes_10g) && (bitrate_nominal == 0x67) &&
++			   (!(cable_tech & IXGBE_SFF_DA_PASSIVE_CABLE)) &&
++			   (!(cable_tech & IXGBE_SFF_DA_ACTIVE_CABLE))) {
++			status = hw->phy.ops.read_i2c_eeprom(hw,
++					    IXGBE_SFF_SM_LENGTH_KM,
++					    &sm_length_km);
++			if (status != 0)
++				goto err_read_i2c_eeprom;
++			status = hw->phy.ops.read_i2c_eeprom(hw,
++					    IXGBE_SFF_SM_LENGTH_100M,
++					    &sm_length_100m);
++			if (status != 0)
++				goto err_read_i2c_eeprom;
++			if (sm_length_km > 0 || sm_length_100m >= 10) {
++				if (hw->bus.lan_id == 0)
++					hw->phy.sfp_type =
++						ixgbe_sfp_type_10g_bx_core0;
++				else
++					hw->phy.sfp_type =
++						ixgbe_sfp_type_10g_bx_core1;
++			} else {
++				hw->phy.sfp_type = ixgbe_sfp_type_unknown;
++			}
+ 		} else {
+ 			hw->phy.sfp_type = ixgbe_sfp_type_unknown;
+ 		}
+@@ -1768,7 +1797,9 @@ int ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
+ 	      hw->phy.sfp_type == ixgbe_sfp_type_1g_sx_core0 ||
+ 	      hw->phy.sfp_type == ixgbe_sfp_type_1g_sx_core1 ||
+ 	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core0 ||
+-	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core1)) {
++	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core1 ||
++	      hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core0 ||
++	      hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core1)) {
+ 		hw->phy.type = ixgbe_phy_sfp_unsupported;
+ 		return -EOPNOTSUPP;
+ 	}
+@@ -1786,7 +1817,9 @@ int ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
+ 	      hw->phy.sfp_type == ixgbe_sfp_type_1g_sx_core0 ||
+ 	      hw->phy.sfp_type == ixgbe_sfp_type_1g_sx_core1 ||
+ 	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core0 ||
+-	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core1)) {
++	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core1 ||
++	      hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core0 ||
++	      hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core1)) {
+ 		/* Make sure we're a supported PHY type */
+ 		if (hw->phy.type == ixgbe_phy_sfp_intel)
+ 			return 0;
+@@ -2016,20 +2049,22 @@ int ixgbe_get_sfp_init_sequence_offsets(struct ixgbe_hw *hw,
+ 		return -EOPNOTSUPP;
+ 
+ 	/*
+-	 * Limiting active cables and 1G Phys must be initialized as
++	 * Limiting active cables, 10G BX and 1G Phys must be initialized as
+ 	 * SR modules
+ 	 */
+ 	if (sfp_type == ixgbe_sfp_type_da_act_lmt_core0 ||
+ 	    sfp_type == ixgbe_sfp_type_1g_lx_core0 ||
+ 	    sfp_type == ixgbe_sfp_type_1g_cu_core0 ||
+ 	    sfp_type == ixgbe_sfp_type_1g_sx_core0 ||
+-	    sfp_type == ixgbe_sfp_type_1g_bx_core0)
++	    sfp_type == ixgbe_sfp_type_1g_bx_core0 ||
++	    sfp_type == ixgbe_sfp_type_10g_bx_core0)
+ 		sfp_type = ixgbe_sfp_type_srlr_core0;
+ 	else if (sfp_type == ixgbe_sfp_type_da_act_lmt_core1 ||
+ 		 sfp_type == ixgbe_sfp_type_1g_lx_core1 ||
+ 		 sfp_type == ixgbe_sfp_type_1g_cu_core1 ||
+ 		 sfp_type == ixgbe_sfp_type_1g_sx_core1 ||
+-		 sfp_type == ixgbe_sfp_type_1g_bx_core1)
++		 sfp_type == ixgbe_sfp_type_1g_bx_core1 ||
++		 sfp_type == ixgbe_sfp_type_10g_bx_core1)
+ 		sfp_type = ixgbe_sfp_type_srlr_core1;
+ 
+ 	/* Read offset to PHY init contents */
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h
+index 81179c60af4e0199a8b9d0fcdf34654b02eedfac..039ba4b6c120f3e824c93cb00fdd9483e7cf9cba 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h
+@@ -32,6 +32,8 @@
+ #define IXGBE_SFF_QSFP_1GBE_COMP	0x86
+ #define IXGBE_SFF_QSFP_CABLE_LENGTH	0x92
+ #define IXGBE_SFF_QSFP_DEVICE_TECH	0x93
++#define IXGBE_SFF_SM_LENGTH_KM		0xE
++#define IXGBE_SFF_SM_LENGTH_100M	0xF
+ 
+ /* Bitmasks */
+ #define IXGBE_SFF_DA_PASSIVE_CABLE		0x4
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
+index b1bfeb21537acc44c31aedcb0584374e8f6ecd45..61f2ef67defddeab9ff4aa83c8f017819594996b 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
+@@ -3286,6 +3286,8 @@ enum ixgbe_sfp_type {
+ 	ixgbe_sfp_type_1g_lx_core1 = 14,
+ 	ixgbe_sfp_type_1g_bx_core0 = 15,
+ 	ixgbe_sfp_type_1g_bx_core1 = 16,
++	ixgbe_sfp_type_10g_bx_core0 = 17,
++	ixgbe_sfp_type_10g_bx_core1 = 18,
+ 
+ 	ixgbe_sfp_type_not_present = 0xFFFE,
+ 	ixgbe_sfp_type_unknown = 0xFFFF
+
+---
+base-commit: 67029a49db6c1f21106a1b5fcdd0ea234a6e0711
+change-id: 20251012-10gbx-ab482c5e1d54
+
+Best regards,
 -- 
-2.49.0
+Birger Koblitz <mail@birger-koblitz.de>
 
 
