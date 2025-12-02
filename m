@@ -1,96 +1,97 @@
-Return-Path: <netdev+bounces-243120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B44DC99B18
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 02:03:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 875CFC99B2A
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 02:05:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 34A623455CB
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 01:03:32 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 317643410C3
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 01:05:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 011711ACEDA;
-	Tue,  2 Dec 2025 01:03:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20095136672;
+	Tue,  2 Dec 2025 01:05:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O6q/LtSw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tRpsp/xD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE07119DF8D;
-	Tue,  2 Dec 2025 01:03:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFD293F9D2
+	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 01:05:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764637406; cv=none; b=s0P9mlwIAyrbYSH9QY5wVhd4aHHTrwNvfJuIzxxO+g1NsoTcgbpZR19wptZIxRK01DeEU05AX+cK4E7dxIOcsXoET57lrzzS4yiaOD3h995KqsvudKzm73xeoIiMifQbL5mHpLirJU4eJLULNkhPwM9ptT0eQxc2OpgtX1MKxxQ=
+	t=1764637508; cv=none; b=Wb+xcyhjAeKPr7P1zstfxJ6DIzm56faI8DHnFiPt3x1VhUfTev6wdR8XabxQMS4R6K5IgVwtmRcCHd01mGBTnQznWhtxeW4HBDZrUd4stfFsCoh4JvHLgvkswS0OLVVdv+d7KBU1nwdiQ3TUKQP5kROlL7j+3Qjwv3LYm0ikzhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764637406; c=relaxed/simple;
-	bh=bDUyO/8pwGPWgnqf9TEf/6/As5sSaALRjTm2IoGnL+U=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=GICvwXelxUoHCV4ttTeRe0SAZRLfX+QRcpxmO07OEWK1qriUkHmK1PTB36t/53JaL1I/EqLnbskonMjXm+DtJ3Wv0wMfcp6uyu6LdVzvxg4xhW7cczcSOM3ZbzonLNaMwSrjhPC1YIOIRmlxRt/VWQ6U5yYgapIYV7o1HdGER9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O6q/LtSw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6E7FC4CEF1;
-	Tue,  2 Dec 2025 01:03:26 +0000 (UTC)
+	s=arc-20240116; t=1764637508; c=relaxed/simple;
+	bh=cXQH/ctkDiDQh3xBDL7BFKJAorODKba2HS8mZ4TuzXI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RkaCTPAfnGgRX2d69xoVtQ78qIdiBfETJ8U57Bh3n5pH6jLCi/qgtom4R6v3AJto/vF2uao96E03GuyM1g0FqHFccT5iUJZbRq07nr1ZUqe3yhEAItvpkxYq5lA6fJb0OIbwO7uu9ZPlUWnEPVD0dX0oW5b3NhN46qAly+i/y5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tRpsp/xD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C1D2C4CEF1;
+	Tue,  2 Dec 2025 01:05:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764637406;
-	bh=bDUyO/8pwGPWgnqf9TEf/6/As5sSaALRjTm2IoGnL+U=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=O6q/LtSwmyMowyRrOlHRD+XK4tslIK0Nv9ZI9OrhWeCRqKt/ptBO55pqlaTKUYJJB
-	 ry+OOAs+60ZNBUXURm56TiQqL+D7PSR5aeXuwuUPBy1EFCQ/7QYlmEhtQFy7aRl5IP
-	 Q8bVanK8ef3Jk0CjIzgipXfnzltfHTKYaH/erOByZNJYrywk0lhWLRYxaQbV6wQAxi
-	 HOvWixVP0UqhYK3xKPtVvsciYvz0qrwKgKgTo2eFK3dtQmUcOXIIWttxijF9PqP4vd
-	 yI2JXlq6IZYLzbc+Z6JuF4UK/ZQOwJ3Q1znuvgni51fdzekbRADw4KW7yTsrzY992N
-	 2KSlUg8B4Nc2A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B5816381196B;
-	Tue,  2 Dec 2025 01:00:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1764637507;
+	bh=cXQH/ctkDiDQh3xBDL7BFKJAorODKba2HS8mZ4TuzXI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tRpsp/xDtkTz6aG6kBRfmltmu2fAzwNxRqSyqckjvzM4TCMU3ouyT9CHm0lK7LUIl
+	 FP9TkxRPv68STofYQo+zp3odCi8Q4FPbZrfOLyD2hFTQlORBw9+uUOXJC8jMH6iX/Z
+	 EVNuuzW1qFhiz/82Ng0IEjeKpHferc9Bu/urkI2fAu1NvROgkrdgzXjAUz/IVHh4+g
+	 cYRP7d8cXPWwv3diWp5ShRkrkyTCxdg4Njfq4adqOPTEDjoosG1bCus7vQlLMVduUl
+	 V6vqoO+zukMfhIcy8eoyXwaeOgo0YYWC5bBg+xHUUeei9xBE2h7bda5Xk2XTS82ckn
+	 Mak082Ki0vByg==
+Date: Mon, 1 Dec 2025 17:05:05 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@toke.dk>
+Cc: Xiang Mei <xmei5@asu.edu>, security@kernel.org, netdev@vger.kernel.org,
+ xiyou.wangcong@gmail.com, cake@lists.bufferbloat.net, bestswngs@gmail.com
+Subject: Re: [PATCH net v8 1/2] net/sched: sch_cake: Fix incorrect qlen
+ reduction in cake_drop
+Message-ID: <20251201170505.6e74c1e4@kernel.org>
+In-Reply-To: <87ikeubjqu.fsf@toke.dk>
+References: <20251128001415.377823-1-xmei5@asu.edu>
+	<87ikeubjqu.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: ps3_gelic_net: Use napi_alloc_skb() and
- napi_gro_receive()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176463722628.2619157.40495973344298966.git-patchwork-notify@kernel.org>
-Date: Tue, 02 Dec 2025 01:00:26 +0000
-References: <20251130194155.1950980-1-fuchsfl@gmail.com>
-In-Reply-To: <20251130194155.1950980-1-fuchsfl@gmail.com>
-To: Florian Fuchs <fuchsfl@gmail.com>
-Cc: geoff@infradead.org, netdev@vger.kernel.org, kuba@kernel.org,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, maddy@linux.ibm.com, mpe@ellerman.id.au,
- npiggin@gmail.com, chleroy@kernel.org, linuxppc-dev@lists.ozlabs.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Fri, 28 Nov 2025 10:15:53 +0100 Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+> Xiang Mei <xmei5@asu.edu> writes:
+>=20
+> > In cake_drop(), qdisc_tree_reduce_backlog() is used to update the qlen
+> > and backlog of the qdisc hierarchy. Its caller, cake_enqueue(), assumes
+> > that the parent qdisc will enqueue the current packet. However, this
+> > assumption breaks when cake_enqueue() returns NET_XMIT_CN: the parent
+> > qdisc stops enqueuing current packet, leaving the tree qlen/backlog
+> > accounting inconsistent. This mismatch can lead to a NULL dereference
+> > (e.g., when the parent Qdisc is qfq_qdisc).
+> >
+> > This patch computes the qlen/backlog delta in a more robust way by
+> > observing the difference before and after the series of cake_drop()
+> > calls, and then compensates the qdisc tree accounting if cake_enqueue()
+> > returns NET_XMIT_CN.
+> >
+> > To ensure correct compensation when ACK thinning is enabled, a new
+> > variable is introduced to keep qlen unchanged.
+> >
+> > Fixes: 15de71d06a40 ("net/sched: Make cake_enqueue return NET_XMIT_CN w=
+hen past buffer_limit")
+> > Signed-off-by: Xiang Mei <xmei5@asu.edu> =20
+>=20
+> Please retain tags when reposting...
+>=20
+> Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@toke.dk>
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+AI code review asks:
 
-On Sun, 30 Nov 2025 20:41:55 +0100 you wrote:
-> Use the napi functions napi_alloc_skb() and napi_gro_receive() instead
-> of netdev_alloc_skb() and netif_receive_skb() for more efficient packet
-> receiving. The switch to napi aware functions increases the RX
-> throughput, reduces the occurrence of retransmissions and improves the
-> resilience against SKB allocation failures.
-> 
-> Signed-off-by: Florian Fuchs <fuchsfl@gmail.com>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next] net: ps3_gelic_net: Use napi_alloc_skb() and napi_gro_receive()
-    https://git.kernel.org/netdev/net-next/c/d8e08149a5ed
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+When ACK thinning occurs, the incoming packet contributes len -
+ack_pkt_len bytes to sch->qstats.backlog, but this compensation uses
+the full len value. Should this be prev_backlog - (len - ack_pkt_len)
+to match what was actually added to the backlog?
 
