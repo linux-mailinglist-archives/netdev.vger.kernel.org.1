@@ -1,242 +1,378 @@
-Return-Path: <netdev+bounces-243285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88D79C9C84A
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 19:02:09 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3738C9C8EC
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 19:13:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B08184E3AD3
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 18:02:05 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6A54E345624
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 18:13:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 506142D592E;
-	Tue,  2 Dec 2025 17:56:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B79102C3271;
+	Tue,  2 Dec 2025 18:12:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X5xvNIWf"
+	dkim=pass (1024-bit key) header.d=rosa.ru header.i=@rosa.ru header.b="UsDFfGCw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com [74.125.224.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from forward205a.mail.yandex.net (forward205a.mail.yandex.net [178.154.239.88])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 759542D1F5E
-	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 17:56:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5E0429BDBF;
+	Tue,  2 Dec 2025 18:12:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.88
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764698197; cv=none; b=cyxFjL18DwcWEmV1v4a8/wl20dR0PR09PzM97/FMCS2GfltNFVPosegdx3z8M5GrxX2OpXYlBv+s9gfpuBz8X5HmORxfDR/jV5hbkeNVd5GfsaUN2gbCM9vZ1oTCbPfAMBMC51BiWzKAflz5L4yq9PsNJZPqKB5nWNC/hihgWgM=
+	t=1764699171; cv=none; b=RYpnPRBOFHAAtOASFkfbVR7HQPLp4tvWyOKKrU2yg2MxxnK2bofUcMIfsvAUaAkLdDlLz7HlNV06nPgYLFKuvw/GTO9NhTtMKP3qM9Pnjaw4KIr69SkwczJ+Ls8kj4f1iZ2ESXZqLbVqpmwhIkHQI4MNJ3p7Z8Nk8tRQmIoMKM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764698197; c=relaxed/simple;
-	bh=gZ+Brvw6pzH0M1d3K6QDW4DtiuRy/OTyA5sJrBWC8Us=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=INzTqQqi/jGC01MnU7eAIi+YYVqbvHZH0JdZqWnQcfkMMICNZYXGrEuP4URPcaLYp+9jfvfkqQDSPaVt2P662zND0gDkg7q61Qm139J0vaPSe6V+qmtOcUqSbiAUQUkwnDid4MR9wh8+qJbG0YjAkwQYRfwc5MU+r9/Vir9oKZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X5xvNIWf; arc=none smtp.client-ip=74.125.224.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-63fc72db706so4783660d50.2
-        for <netdev@vger.kernel.org>; Tue, 02 Dec 2025 09:56:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764698194; x=1765302994; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ithlbIiEq/FI2LL3XrBJ6TyWmZcusp7vhJwcVLoEBM4=;
-        b=X5xvNIWfNBOCVFJCKsuYEJN4nNf/MlBDcJVdBqv6Up8TVZDv9XL0iYnjeA1kFLK+xR
-         R/Mmnmf8P00bjaqpGT3KAhH8b0DPW3HOHhlXfhcIuhHXpdOyXM8faMrD017YntwrZOws
-         Lilbxx7j6JIKph5H4KZB0cOcS6e+uRRf97YimaRFXt1EELH9AJSGTS9fXGGOXGH8cUbm
-         Wkg5y8C06xp/FikszPTntzzvw+jbRW/KtxkbI1Ru41Rfau79B0987B/dUYVHITg/wt5i
-         3VbX4qQqgjb7BTH0LhguXF/X/kaJlxU/TzlNdWHudzZLdwznuAXBUpXO3K9gSurUkuXt
-         FiIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764698194; x=1765302994;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ithlbIiEq/FI2LL3XrBJ6TyWmZcusp7vhJwcVLoEBM4=;
-        b=EjyMGoMDxadwrc/jl0FjSzJmGBTB9rD5lZN2SKuIeY+G3pTOIrQt3vnjGFuWwJ6lHm
-         bixPGjyHcFtdLI6M4ONcf7CvnLmlsUFu8WfGXvhUWySrsFZlSKP7QiNZbN2ohjA5f2ll
-         nJNvtsRBJSwLyfMdHQMP/geLlW4fsiDOnsb4Trt7eCuRCAQPl7pk7ZSAGki28X1Qi7Y/
-         gpPSK7JlvbUdJRuz6FCkbeIPLXYbvOy3SAQFDp9BSz5LDsFZPDP6GxEzDPV56s8q3L9l
-         Bf4wmc6k3b4U7rbf/WEDGr5sOWdUV/i1q11TUhqCRCNOi6FfEwCak6C1ZGPxdOoBpyIO
-         22iw==
-X-Forwarded-Encrypted: i=1; AJvYcCUjTeIpgf5DZ9JVovphvhXgHByrNtIrr+wFjt03A8Z+k5yH/vQBQ20C/VJTFsvg3QsnJSqVVeg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yww5C97OXqkduTe1Tv+BGbRV0+QoV1yU8ywQa+JTrdza1xiQbdl
-	VchssjCk/ilGgrvRIYWBf8oYB0tIu640BttlaoPrTl7wC5R3bxRsOiW8
-X-Gm-Gg: ASbGncthVfKjsNE9bMTiK8Z2RNnvxUCxwIqPDQKX8/vxwgjodlKUsuhpY1A1hdVKvtP
-	ODDqAoUbS2d5LOsSQtUJOyy9dhlgVllmoidKfRB8f6AOOASg1r09DxgkZsu7STYGhGUvZh62C6i
-	Zq90X6WhatibDirQig96GPnMNh1elpod5hm3E/aih20AWhk+s9tYnJcnbzajt41SsnOPrtMKo9S
-	MSMIY1bXHrOGiKQAThs8Uuk2PnMpp1jo/KnBxmJbwrc7cyKCPnx8DFVlKgXseW87EllZCNk83Cw
-	FFBMrefee7DGD8X8EjS0w9FPFU+QfBAtTDzaFiN/9NiBvxKlUq+Pn/g4q21DioGk/7tVNswozI7
-	CQ4qayY4psA+DLeVJJ6V18VUIQjMKG+ywG0CPBSUMFCtxEssq+zh4hPcCfoWG9jQrxGozKQnLhW
-	AOrOGuh2JCUMnO67yUQm3dv9Xn5yLxbpC+9+0ueiPrUxkRE+w=
-X-Google-Smtp-Source: AGHT+IHvQT1QI9TdiXKfZ68wlKamcPDrfQTrBswbbjSU6kRBe9Kysk7H9AxfecqUja0yhfUS62M5lQ==
-X-Received: by 2002:a05:690e:191d:b0:640:d119:d339 with SMTP id 956f58d0204a3-6432926b302mr21611358d50.33.1764698194211;
-        Tue, 02 Dec 2025 09:56:34 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:40::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-78ad100e94fsm65771557b3.32.2025.12.02.09.56.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Dec 2025 09:56:33 -0800 (PST)
-Date: Tue, 2 Dec 2025 09:56:32 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Stanislav Fomichev <stfomichev@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1764699171; c=relaxed/simple;
+	bh=JJ1aQdfQPoubiPmaIj2sSrPZuDPqYSJGAYXt9HxIeBo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tQeLvEMOSzkqUt68rL4Be9poGnS0CimKVK+juSNdqPIim8zGqIgItm+hsgQmdx5H/RRexYWllRxA7NMBY9qVCih3gpcC2rhcCOnCi2ckldxp2P/b4X8BgjvBtdoPQvVPSq1yaMhXvxDlJuHkL4IYU6cigIy5tBmiuYQZ4ahVAlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rosa.ru; spf=pass smtp.mailfrom=rosa.ru; dkim=pass (1024-bit key) header.d=rosa.ru header.i=@rosa.ru header.b=UsDFfGCw; arc=none smtp.client-ip=178.154.239.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rosa.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rosa.ru
+Received: from forward103a.mail.yandex.net (forward103a.mail.yandex.net [IPv6:2a02:6b8:c0e:500:1:45:d181:d103])
+	by forward205a.mail.yandex.net (Yandex) with ESMTPS id CC490C5380;
+	Tue, 02 Dec 2025 21:06:09 +0300 (MSK)
+Received: from mail-nwsmtp-smtp-production-main-68.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-68.vla.yp-c.yandex.net [IPv6:2a02:6b8:c18:3e07:0:640:a874:0])
+	by forward103a.mail.yandex.net (Yandex) with ESMTPS id 081F880774;
+	Tue, 02 Dec 2025 21:06:02 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-68.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id x5ok4W1LrSw0-dzQ4bwjW;
+	Tue, 02 Dec 2025 21:06:01 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rosa.ru; s=mail;
+	t=1764698761; bh=+DqUuCu/vxDA7g/LhSGs7AwyEqlXkrcHPbZLlq6rB/c=;
+	h=Message-ID:Date:Cc:Subject:To:From;
+	b=UsDFfGCw6g7lzF4Emyu8EyRJPUEKgktd2yzrQ49GJl5LorhTepSb8Pf9rhlxPZjJP
+	 giuxmOJV+45PjpRQVW+3QYYulXDy5+iF6+gIl7L+aVP4xVHc7KdLcBaLYq6nFBNV3x
+	 IN8LBBEdT5NsldqWt6m5aYdkem7V/vyh1pfikoiA=
+Authentication-Results: mail-nwsmtp-smtp-production-main-68.vla.yp-c.yandex.net; dkim=pass header.i=@rosa.ru
+From: Mikhail Lobanov <m.lobanov@rosa.ru>
+To: "David S. Miller" <davem@davemloft.net>
+Cc: Mikhail Lobanov <m.lobanov@rosa.ru>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Mina Almasry <almasrymina@google.com>,
-	Stanislav Fomichev <sdf@fomichev.me>, asml.silence@gmail.com,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next] net: devmem: convert binding refcount to
- percpu_ref
-Message-ID: <aS8oUIPqOsLun0mU@devvm11784.nha0.facebook.com>
-References: <20251126-upstream-percpu-ref-v1-1-cea20a92b1dd@meta.com>
- <aS3Md9EuAGIl8Bd0@mini-arch>
- <871f34ca-e417-4e46-8593-b3e10b64b8b9@redhat.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	David Bauer <mail@david-bauer.net>,
+	James Chapman <jchapman@katalix.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org
+Subject: [PATCH net-next v6] l2tp: fix double dst_release() on sk_dst_cache race
+Date: Tue,  2 Dec 2025 21:05:43 +0300
+Message-ID: <20251202180545.18974-1-m.lobanov@rosa.ru>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <871f34ca-e417-4e46-8593-b3e10b64b8b9@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Dec 02, 2025 at 11:52:06AM +0100, Paolo Abeni wrote:
-> On 12/1/25 6:12 PM, Stanislav Fomichev wrote:
-> > On 11/26, Bobby Eshleman wrote:
-> >> From: Bobby Eshleman <bobbyeshleman@meta.com>
-> >>
-> >> Convert net_devmem_dmabuf_binding refcount from refcount_t to percpu_ref
-> >> to optimize common-case reference counting on the hot path.
-> >>
-> >> The typical devmem workflow involves binding a dmabuf to a queue
-> >> (acquiring the initial reference on binding->ref), followed by
-> >> high-volume traffic where every skb fragment acquires a reference.
-> >> Eventually traffic stops and the unbind operation releases the initial
-> >> reference. Additionally, the high traffic hot path is often multi-core.
-> >> This access pattern is ideal for percpu_ref as the first and last
-> >> reference during bind/unbind and normally book-ends activity in the hot
-> >> path.
-> >>
-> >> __net_devmem_dmabuf_binding_free becomes the percpu_ref callback invoked
-> >> when the last reference is dropped.
-> >>
-> >> kperf test:
-> >> - 4MB message sizes
-> >> - 60s of workload each run
-> >> - 5 runs
-> >> - 4 flows
-> >>
-> >> Throughput:
-> >> 	Before: 45.31 GB/s (+/- 3.17 GB/s)
-> >> 	After: 48.67 GB/s (+/- 0.01 GB/s)
-> >>
-> >> Picking throughput-matched kperf runs (both before and after matched at
-> >> ~48 GB/s) for apples-to-apples comparison:
-> >>
-> >> Summary (averaged across 4 workers):
-> >>
-> >>   TX worker CPU idle %:
-> >>     Before: 34.44%
-> >>     After: 87.13%
-> >>
-> >>   RX worker CPU idle %:
-> >>     Before: 5.38%
-> >>     After: 9.73%
-> >>
-> >> kperf before:
-> >>
-> >> client: == Source
-> >> client:   Tx 98.100 Gbps (735764807680 bytes in 60001149 usec)
-> >> client:   Tx102.798 Gbps (770996961280 bytes in 60001149 usec)
-> >> client:   Tx101.534 Gbps (761517834240 bytes in 60001149 usec)
-> >> client:   Tx 82.794 Gbps (620966707200 bytes in 60001149 usec)
-> >> client:   net CPU 56: usr: 0.01% sys: 0.12% idle:17.06% iow: 0.00% irq: 9.89% sirq:72.91%
-> >> client:   app CPU 60: usr: 0.08% sys:63.30% idle:36.24% iow: 0.00% irq: 0.30% sirq: 0.06%
-> >> client:   net CPU 57: usr: 0.03% sys: 0.08% idle:75.68% iow: 0.00% irq: 2.96% sirq:21.23%
-> >> client:   app CPU 61: usr: 0.06% sys:67.67% idle:31.94% iow: 0.00% irq: 0.28% sirq: 0.03%
-> >> client:   net CPU 58: usr: 0.01% sys: 0.06% idle:76.87% iow: 0.00% irq: 2.84% sirq:20.19%
-> >> client:   app CPU 62: usr: 0.06% sys:69.78% idle:29.79% iow: 0.00% irq: 0.30% sirq: 0.05%
-> >> client:   net CPU 59: usr: 0.06% sys: 0.16% idle:74.97% iow: 0.00% irq: 3.76% sirq:21.03%
-> >> client:   app CPU 63: usr: 0.06% sys:59.82% idle:39.80% iow: 0.00% irq: 0.25% sirq: 0.05%
-> >> client: == Target
-> >> client:   Rx 98.092 Gbps (735764807680 bytes in 60006084 usec)
-> >> client:   Rx102.785 Gbps (770962161664 bytes in 60006084 usec)
-> >> client:   Rx101.523 Gbps (761499566080 bytes in 60006084 usec)
-> >> client:   Rx 82.783 Gbps (620933136384 bytes in 60006084 usec)
-> >> client:   net CPU  2: usr: 0.00% sys: 0.01% idle:24.51% iow: 0.00% irq: 1.67% sirq:73.79%
-> >> client:   app CPU  6: usr: 1.51% sys:96.43% idle: 1.13% iow: 0.00% irq: 0.36% sirq: 0.55%
-> >> client:   net CPU  1: usr: 0.00% sys: 0.01% idle:25.18% iow: 0.00% irq: 1.99% sirq:72.80%
-> >> client:   app CPU  5: usr: 2.21% sys:94.54% idle: 2.54% iow: 0.00% irq: 0.38% sirq: 0.30%
-> >> client:   net CPU  3: usr: 0.00% sys: 0.01% idle:26.34% iow: 0.00% irq: 2.12% sirq:71.51%
-> >> client:   app CPU  7: usr: 2.22% sys:94.28% idle: 2.52% iow: 0.00% irq: 0.59% sirq: 0.37%
-> >> client:   net CPU  0: usr: 0.00% sys: 0.03% idle: 0.00% iow: 0.00% irq:10.44% sirq:89.51%
-> >> client:   app CPU  4: usr: 2.39% sys:81.46% idle:15.33% iow: 0.00% irq: 0.50% sirq: 0.30%
-> >>
-> >> kperf after:
-> >>
-> >> client: == Source
-> >> client:   Tx 99.257 Gbps (744447016960 bytes in 60001303 usec)
-> >> client:   Tx101.013 Gbps (757617131520 bytes in 60001303 usec)
-> >> client:   Tx 88.179 Gbps (661357854720 bytes in 60001303 usec)
-> >> client:   Tx101.002 Gbps (757533245440 bytes in 60001303 usec)
-> >> client:   net CPU 56: usr: 0.00% sys: 0.01% idle: 6.22% iow: 0.00% irq: 8.68% sirq:85.06%
-> >> client:   app CPU 60: usr: 0.08% sys:12.56% idle:87.21% iow: 0.00% irq: 0.08% sirq: 0.05%
-> >> client:   net CPU 57: usr: 0.00% sys: 0.05% idle:69.53% iow: 0.00% irq: 2.02% sirq:28.38%
-> >> client:   app CPU 61: usr: 0.11% sys:13.40% idle:86.36% iow: 0.00% irq: 0.08% sirq: 0.03%
-> >> client:   net CPU 58: usr: 0.00% sys: 0.03% idle:70.04% iow: 0.00% irq: 3.38% sirq:26.53%
-> >> client:   app CPU 62: usr: 0.10% sys:11.46% idle:88.31% iow: 0.00% irq: 0.08% sirq: 0.03%
-> >> client:   net CPU 59: usr: 0.01% sys: 0.06% idle:71.18% iow: 0.00% irq: 1.97% sirq:26.75%
-> >> client:   app CPU 63: usr: 0.10% sys:13.10% idle:86.64% iow: 0.00% irq: 0.10% sirq: 0.05%
-> >> client: == Target
-> >> client:   Rx 99.250 Gbps (744415182848 bytes in 60003297 usec)
-> >> client:   Rx101.006 Gbps (757589737472 bytes in 60003297 usec)
-> >> client:   Rx 88.171 Gbps (661319475200 bytes in 60003297 usec)
-> >> client:   Rx100.996 Gbps (757514792960 bytes in 60003297 usec)
-> >> client:   net CPU  2: usr: 0.00% sys: 0.01% idle:28.02% iow: 0.00% irq: 1.95% sirq:70.00%
-> >> client:   app CPU  6: usr: 2.03% sys:87.20% idle:10.04% iow: 0.00% irq: 0.37% sirq: 0.33%
-> >> client:   net CPU  3: usr: 0.00% sys: 0.00% idle:27.63% iow: 0.00% irq: 1.90% sirq:70.45%
-> >> client:   app CPU  7: usr: 1.78% sys:89.70% idle: 7.79% iow: 0.00% irq: 0.37% sirq: 0.34%
-> >> client:   net CPU  0: usr: 0.00% sys: 0.01% idle: 0.00% iow: 0.00% irq: 9.96% sirq:90.01%
-> >> client:   app CPU  4: usr: 2.33% sys:83.51% idle:13.24% iow: 0.00% irq: 0.64% sirq: 0.26%
-> >> client:   net CPU  1: usr: 0.00% sys: 0.01% idle:27.60% iow: 0.00% irq: 1.94% sirq:70.43%
-> >> client:   app CPU  5: usr: 1.88% sys:89.61% idle: 7.86% iow: 0.00% irq: 0.35% sirq: 0.27%
-> >>
-> >> Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
-> >> ---
-> >>  net/core/devmem.c | 38 +++++++++++++++++++++++++++++++++-----
-> >>  net/core/devmem.h | 18 ++++++++++--------
-> >>  2 files changed, 43 insertions(+), 13 deletions(-)
-> >>
-> >> diff --git a/net/core/devmem.c b/net/core/devmem.c
-> >> index 1d04754bc756..83989cf4a987 100644
-> >> --- a/net/core/devmem.c
-> >> +++ b/net/core/devmem.c
-> >> @@ -54,10 +54,26 @@ static dma_addr_t net_devmem_get_dma_addr(const struct net_iov *niov)
-> >>  	       ((dma_addr_t)net_iov_idx(niov) << PAGE_SHIFT);
-> >>  }
-> >>  
-> >> -void __net_devmem_dmabuf_binding_free(struct work_struct *wq)
-> >> +/*
-> >> + * percpu_ref release callback invoked when the last reference to the binding
-> >> + * is dropped. Schedules the actual cleanup in a workqueue because
-> >> + * ref->release() cb is not allowed to sleep as it may be called in RCU
-> >> + * callback context.
-> >> + */
-> > 
-> > Can we drop this and the rest of the comments? I feel like they mostly
-> > explain how percpu_ref works, nothing devmem specific.
-> 
-> I agree with Stan, the code looks good, but the comments are a bit
-> distracting. It should be assumed that people touching this code has
-> read/studied percpu_ref documentation.
-> 
-> Please strip them, thanks!
-> 
-> Paolo
-> 
+A reproducible rcuref - imbalanced put() warning is observed under
+IPv6 L2TP (pppol2tp) traffic with blackhole routes, indicating an
+imbalance in dst reference counting for routes cached in
+sk->sk_dst_cache and pointing to a subtle lifetime/synchronization
+issue between the helpers that validate and drop cached dst entries.
 
-Sounds good!
+rcuref - imbalanced put()
+WARNING: CPU: 0 PID: 899 at lib/rcuref.c:266 rcuref_put_slowpath+0x1ce/0x240 lib/rcuref.>
+Modules linked in:
+CPSocket connected tcp:127.0.0.1:48148,server=on <-> 127.0.0.1:33750
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01>
+RIP: 0010:rcuref_put_slowpath+0x1ce/0x240 lib/rcuref.c:266
 
-Best,
-Bobby
+Call Trace:
+ <TASK>
+ __rcuref_put include/linux/rcuref.h:97 [inline]
+ rcuref_put include/linux/rcuref.h:153 [inline]
+ dst_release+0x291/0x310 net/core/dst.c:167
+ __sk_dst_check+0x2d4/0x350 net/core/sock.c:604
+ __inet6_csk_dst_check net/ipv6/inet6_connection_sock.c:76 [inline]
+ inet6_csk_route_socket+0x6ed/0x10c0 net/ipv6/inet6_connection_sock.c:104
+ inet6_csk_xmit+0x12f/0x740 net/ipv6/inet6_connection_sock.c:121
+ l2tp_xmit_queue net/l2tp/l2tp_core.c:1214 [inline]
+ l2tp_xmit_core net/l2tp/l2tp_core.c:1309 [inline]
+ l2tp_xmit_skb+0x1404/0x1910 net/l2tp/l2tp_core.c:1325
+ pppol2tp_sendmsg+0x3ca/0x550 net/l2tp/l2tp_ppp.c:302
+ sock_sendmsg_nosec net/socket.c:729 [inline]
+ __sock_sendmsg net/socket.c:744 [inline]
+ ____sys_sendmsg+0xab2/0xc70 net/socket.c:2609
+ ___sys_sendmsg+0x11d/0x1c0 net/socket.c:2663
+ __sys_sendmmsg+0x188/0x450 net/socket.c:2749
+ __do_sys_sendmmsg net/socket.c:2778 [inline]
+ __se_sys_sendmmsg net/socket.c:2775 [inline]
+ __x64_sys_sendmmsg+0x98/0x100 net/socket.c:2775
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x64/0x140 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
+RIP: 0033:0x7fe6960ec719
+ </TASK>
+
+The race occurs between the lockless UDPv6 transmit path
+(udpv6_sendmsg() -> sk_dst_check()) and the locked L2TP/pppol2tp
+transmit path (pppol2tp_sendmsg() -> l2tp_xmit_skb() ->
+... -> inet6_csk_xmit() → __sk_dst_check()), when both handle
+the same obsolete dst from sk->sk_dst_cache: the UDPv6 side takes
+an extra reference and atomically steals and releases the cached
+dst, while the L2TP side, using a stale cached pointer, still
+calls dst_release() on it, and together these updates produce
+an extra final dst_release() on that dst, triggering
+rcuref - imbalanced put().
+
+The Race Condition:
+
+Initial:
+  sk->sk_dst_cache = dst
+  ref(dst) = 1   
+
+Thread 1: sk_dst_check()                Thread 2: __sk_dst_check()
+------------------------               ----------------------------
+sk_dst_get(sk):
+  rcu_read_lock()
+  dst = rcu_dereference(sk->sk_dst_cache)
+  rcuref_get(dst) succeeds
+  rcu_read_unlock()
+  // ref = 2  
+
+                                            dst = __sk_dst_get(sk)
+                                    // reads same dst from sk_dst_cache
+                                    // ref still = 2 (no extra get)
+
+[both see dst obsolete & check() == NULL]
+
+sk_dst_reset(sk):
+  old = xchg(&sk->sk_dst_cache, NULL)
+    // old = dst
+  dst_release(old)
+    // drop cached ref
+    // ref: 2 -> 1 
+
+                                  RCU_INIT_POINTER(sk->sk_dst_cache, NULL)
+                                  // cache already NULL after xchg
+                                            dst_release(dst)
+                                              // ref: 1 -> 0
+
+  dst_release(dst)
+  // tries to drop its own ref after final put
+  // rcuref_put_slowpath() -> "rcuref - imbalanced put()"
+
+Make L2TP’s IPv6 transmit path stop using inet6_csk_xmit()
+(and thus __sk_dst_check()) and instead open-code the same
+routing and transmit sequence using ip6_sk_dst_lookup_flow()
+and ip6_xmit(). The new code builds a flowi6 from the socket
+fields in the same way as inet6_csk_route_socket(), then calls
+ip6_sk_dst_lookup_flow(), which internally relies on the lockless
+sk_dst_check()/sk_dst_reset() pattern shared with UDPv6, and
+attaches the resulting dst to the skb before invoking ip6_xmit().
+This makes both the UDPv6 and L2TP IPv6 paths use the same
+dst-cache handling logic for a given socket and removes the
+possibility that sk_dst_check() and __sk_dst_check() concurrently
+drop the same cached dst and trigger the rcuref - imbalanced put()
+warning under concurrent traffic.
+
+Replace ip_queue_xmit() in the IPv4 L2TP transmit path with an open-coded
+helper that mirrors __ip_queue_xmit() but uses sk_dst_check() on the
+socket dst cache instead of __sk_dst_check(). This makes IPv4 L2TP use the
+same lockless dst-cache helper as UDPv4 for a given socket, avoiding mixed
+sk_dst_check()/__sk_dst_check() users on the same sk->sk_dst_cache and
+closing the same class of double dst_release() race on IPv4.
+
+Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
+
+Fixes: b0270e91014d ("ipv4: add a sock pointer to ip_queue_xmit()")
+Signed-off-by: Mikhail Lobanov <m.lobanov@rosa.ru>
+---
+v2: move fix to L2TP as suggested by Eric Dumazet.
+v3: dropped the lockless sk_dst_check() pre-validation
+and the extra sk_dst_get() reference; instead, under
+the socket lock, mirror __sk_dst_check()’s condition
+and invalidate the cached dst via sk_dst_reset(sk) so
+the cache-owned ref is released exactly once via the 
+xchg-based helper.
+v4: switch L2TP IPv6 xmit to open-coded (using sk_dst_check()) 
+and test with tools/testing/selftests/net/l2tp.sh.
+https://lore.kernel.org/netdev/a601c049-0926-418b-aa54-31686eea0a78@redhat.com/T/#t
+v5: use sk_uid(sk) and add READ_ONCE() for sk_mark and
+sk_bound_dev_if as suggested by Eric Dumazet.
+v6: move IPv6 L2TP xmit into an open-coded helper using
+ip6_sk_dst_lookup_flow() and sk_dst_check(), and add an
+analogous open-coded IPv4 helper mirroring __ip_queue_xmit()
+but using sk_dst_check() so both IPv4 and IPv6 L2TP paths
+stop calling __sk_dst_check() and share the UDP-style dst
+cache handling.
+
+ net/l2tp/l2tp_core.c | 143 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 140 insertions(+), 3 deletions(-)
+
+diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
+index 0710281dd95a..26a255e4bad5 100644
+--- a/net/l2tp/l2tp_core.c
++++ b/net/l2tp/l2tp_core.c
+@@ -1202,19 +1202,157 @@ static int l2tp_build_l2tpv3_header(struct l2tp_session *session, void *buf)
+ 	return bufp - optr;
+ }
+ 
++#if IS_ENABLED(CONFIG_IPV6)
++static int l2tp_xmit_ipv6(struct sock *sk, struct sk_buff *skb)
++{
++	struct ipv6_pinfo *np = inet6_sk(sk);
++	struct inet_sock *inet = inet_sk(sk);
++	struct in6_addr *final_p, final;
++	struct ipv6_txoptions *opt;
++	struct dst_entry *dst;
++	struct flowi6 fl6;
++	int err;
++
++	memset(&fl6, 0, sizeof(fl6));
++	fl6.flowi6_proto = sk->sk_protocol;
++	fl6.daddr        = sk->sk_v6_daddr;
++	fl6.saddr        = np->saddr;
++	fl6.flowlabel    = np->flow_label;
++	IP6_ECN_flow_xmit(sk, fl6.flowlabel);
++
++	fl6.flowi6_oif   = READ_ONCE(sk->sk_bound_dev_if);
++	fl6.flowi6_mark  = READ_ONCE(sk->sk_mark);
++	fl6.fl6_sport    = inet->inet_sport;
++	fl6.fl6_dport    = inet->inet_dport;
++	fl6.flowi6_uid   = sk_uid(sk);
++
++	security_sk_classify_flow(sk, flowi6_to_flowi_common(&fl6));
++
++	rcu_read_lock();
++	opt = rcu_dereference(np->opt);
++	final_p = fl6_update_dst(&fl6, opt, &final);
++
++	dst = ip6_sk_dst_lookup_flow(sk, &fl6, final_p, true);
++	if (IS_ERR(dst)) {
++		rcu_read_unlock();
++		kfree_skb(skb);
++		return NET_XMIT_DROP;
++	}
++
++	skb_dst_set(skb, dst);
++	fl6.daddr = sk->sk_v6_daddr;
++
++	err = ip6_xmit(sk, skb, &fl6, READ_ONCE(sk->sk_mark),
++		       opt, np->tclass,
++		       READ_ONCE(sk->sk_priority));
++	rcu_read_unlock();
++	return err;
++}
++#endif
++
++static int l2tp_xmit_ipv4(struct sock *sk, struct sk_buff *skb, struct flowi *fl)
++{
++	struct inet_sock *inet = inet_sk(sk);
++	struct net *net = sock_net(sk);
++	struct ip_options_rcu *inet_opt;
++	struct flowi4 *fl4;
++	struct rtable *rt;
++	struct iphdr *iph;
++	__u8 tos;
++	int err;
++
++	rcu_read_lock();
++	inet_opt = rcu_dereference(inet->inet_opt);
++	fl4 = &fl->u.ip4;
++	rt = skb_rtable(skb);
++	tos = READ_ONCE(inet->tos);
++
++	if (rt)
++		goto packet_routed;
++
++	rt = dst_rtable(sk_dst_check(sk, 0));
++	if (!rt) {
++		__be32 daddr = inet->inet_daddr;
++
++		if (inet_opt && inet_opt->opt.srr)
++			daddr = inet_opt->opt.faddr;
++
++		rt = ip_route_output_ports(net, fl4, sk,
++					   daddr, inet->inet_saddr,
++					   inet->inet_dport,
++					   inet->inet_sport,
++					   sk->sk_protocol,
++					   tos & INET_DSCP_MASK,
++					   READ_ONCE(sk->sk_bound_dev_if));
++		if (IS_ERR(rt))
++			goto no_route;
++
++		sk_setup_caps(sk, &rt->dst);
++	}
++
++	skb_dst_set_noref(skb, &rt->dst);
++
++packet_routed:
++		if (inet_opt && inet_opt->opt.is_strictroute && rt->rt_uses_gateway)
++			goto no_route;
++
++		skb_push(skb, sizeof(struct iphdr) +
++			 (inet_opt ? inet_opt->opt.optlen : 0));
++		skb_reset_network_header(skb);
++		iph = ip_hdr(skb);
++		*((__be16 *)iph) = htons((4 << 12) | (5 << 8) | (tos & 0xff));
++
++		if (ip_dont_fragment(sk, &rt->dst) && !skb->ignore_df)
++			iph->frag_off = htons(IP_DF);
++		else
++			iph->frag_off = 0;
++
++		int ttl = READ_ONCE(inet->uc_ttl);
++
++		if (ttl < 0)
++			ttl = ip4_dst_hoplimit(&rt->dst);
++
++		iph->ttl      = ttl;
++		iph->protocol = sk->sk_protocol;
++		iph->saddr = fl4->saddr;
++		iph->daddr = fl4->daddr;
++
++		if (inet_opt && inet_opt->opt.optlen) {
++			iph->ihl += inet_opt->opt.optlen >> 2;
++			ip_options_build(skb, &inet_opt->opt, inet->inet_daddr, rt);
++		}
++
++		ip_select_ident_segs(net, skb, sk,
++				     skb_shinfo(skb)->gso_segs ?: 1);
++
++		skb->priority = READ_ONCE(sk->sk_priority);
++		skb->mark     = READ_ONCE(sk->sk_mark);
++
++		err = ip_local_out(net, sk, skb);
++		rcu_read_unlock();
++		return err;
++
++no_route:
++		rcu_read_unlock();
++		IP_INC_STATS(net, IPSTATS_MIB_OUTNOROUTES);
++		kfree_skb_reason(skb, SKB_DROP_REASON_IP_OUTNOROUTES);
++		return -EHOSTUNREACH;
++}
++
+ /* Queue the packet to IP for output: tunnel socket lock must be held */
+ static int l2tp_xmit_queue(struct l2tp_tunnel *tunnel, struct sk_buff *skb, struct flowi *fl)
+ {
+ 	int err;
++	struct sock *sk = tunnel->sock;
+ 
+ 	skb->ignore_df = 1;
+ 	skb_dst_drop(skb);
+ #if IS_ENABLED(CONFIG_IPV6)
+-	if (l2tp_sk_is_v6(tunnel->sock))
+-		err = inet6_csk_xmit(tunnel->sock, skb, NULL);
++	if (l2tp_sk_is_v6(sk))
++		err = l2tp_xmit_ipv6(sk, skb);
+ 	else
+ #endif
+-		err = ip_queue_xmit(tunnel->sock, skb, fl);
++		err = l2tp_xmit_ipv4(sk, skb, fl);
+ 
+ 	return err >= 0 ? NET_XMIT_SUCCESS : NET_XMIT_DROP;
+ }
+-- 
+2.47.2
+
 
