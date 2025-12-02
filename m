@@ -1,58 +1,50 @@
-Return-Path: <netdev+bounces-243218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43056C9BBBE
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 15:13:57 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D9FDC9BCA6
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 15:33:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8344B3A8474
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 14:12:35 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 67D194E3816
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 14:33:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18346322551;
-	Tue,  2 Dec 2025 14:12:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F98520F08C;
+	Tue,  2 Dec 2025 14:33:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MzGRScc/"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04CFF3242D0;
-	Tue,  2 Dec 2025 14:12:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C19618BC3D;
+	Tue,  2 Dec 2025 14:33:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764684749; cv=none; b=t19Bt69b5tH7i6nGDL+oXZNwkgnyl0qNvbgm6zLb0MSUgMHJ96wl5//3oL40R4esh7MoH8lCG/LA71ycJH8e26X+EpoDwE++d52PrybsSfgh8ttKRTNNjajAcgZWNSkQ2VBs9CUnssKJnufD7FPG1yoVkQtaE01rYsxFihe5c10=
+	t=1764685990; cv=none; b=os9kUu04yxFY5HNcQB1ZkgMGMgmTzAFyH9wZoXoVtQe31J6/xi/wMe711nPEySCkZT6xGUnHOGq52l/yB8R8rHFiI38H6Lf59zEbCk/T5VGDcvmYtzyn2fXfYHwaWCgZLIqF6jo/L0imV+oXyBefZI5SafLNahYOawo4IdEpFeo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764684749; c=relaxed/simple;
-	bh=Opau1lbwtXaKHB0UFeBhFz3Jn34wsDPxA+9RsH25iaY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BgKjvKzBx+YOD5mp3127oLV10ysxOumSlYAvM5CskdS5exCBeyP/XPRtPnPpJcuB61zQnuClrijreDkOowmsOMqXgsV9jqXKBk7+LSo03n+l/EAuorAqXzUNzdCQI+RvdgxoQEuxchm3ybKNuVN3C5ri4+RUZlUPIJ5SjcacMFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.224.150])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dLN4z5XZVzJ46bZ;
-	Tue,  2 Dec 2025 22:12:19 +0800 (CST)
-Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
-	by mail.maildlp.com (Postfix) with ESMTPS id C2B8040565;
-	Tue,  2 Dec 2025 22:12:24 +0800 (CST)
-Received: from huawei-ThinkCentre-M920t.huawei.com (10.123.122.223) by
- mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 2 Dec 2025 17:12:24 +0300
-From: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
-To: <netdev@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>, Kuniyuki
- Iwashima <kuniyu@google.com>, Xiao Liang <shaw.leon@gmail.com>, Stanislav
- Fomichev <sdf@fomichev.me>, Dmitry Skorodumov <skorodumov.dmitry@huawei.com>,
-	Etienne Champetier <champetier.etienne@gmail.com>, "David S. Miller"
-	<davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
-	<linux-kernel@vger.kernel.org>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>
-Subject: [PATCH net 2/2] ipvlan: Take addr_lock in ipvlan_open()
-Date: Tue, 2 Dec 2025 17:11:49 +0300
-Message-ID: <20251202141149.4144248-3-skorodumov.dmitry@huawei.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20251202141149.4144248-1-skorodumov.dmitry@huawei.com>
-References: <20251202141149.4144248-1-skorodumov.dmitry@huawei.com>
+	s=arc-20240116; t=1764685990; c=relaxed/simple;
+	bh=Ly/4cWuHRE5Ksuv+Yo/Z1qdg0Fg7JiBJoCRjb1P4hcI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=OTztHJCpxIfTSUFAmn/o6Q2Y5T2POAyE2zD/xKVCAExvZCasB1rUNZRbgGgnYv6I4vSMnBbuCgOyR2hILZYstjCZdPBTv7RJWF3FoyM8omSH/tUF3i3rWO4IYQjc0u9msjKfntWr0jHi7ZeaKkPIXUAioPXO5o1fcODRisl2q8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MzGRScc/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8046EC4CEF1;
+	Tue,  2 Dec 2025 14:33:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764685989;
+	bh=Ly/4cWuHRE5Ksuv+Yo/Z1qdg0Fg7JiBJoCRjb1P4hcI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=MzGRScc/IvXrcvO07PgdzuZMI416Qfgaa7Lm/majdXSijKvkGq6aQwnFdUrUXDAX9
+	 lb3CNPW9+4V781IzXL+iQnOh0eUXggIp31aaCg75dbm8VI309F+/sCyqL5mSoh0Rid
+	 ViVaYBiAyMjOiCpaIEwAjqk1JY90Glc9dQCCc+ulcAIjanFDr78aQB5aZUpEPrJz3b
+	 DX/dDYB3JH60KzTOHOIdgxshShBrRAUg2F+PKUqTxdfkcZwgHR03iE0KsZKZJfDWkM
+	 RUcefJPNN/nTnqoyF7h9olevuzwKbt70zVQM1vSzzrVKRktgrq5d69E+pc/ZT1gylt
+	 DpNgK+E/8hrhA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 32EA03A54A16;
+	Tue,  2 Dec 2025 14:30:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,76 +52,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: mscpeml100003.china.huawei.com (10.199.174.67) To
- mscpeml500004.china.huawei.com (7.188.26.250)
+Subject: Re: [PATCH net-next V2 0/2] net/mlx5e: Disable egress xdp-redirect in
+ default
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176468580905.3250289.13105138318084701594.git-patchwork-notify@kernel.org>
+Date: Tue, 02 Dec 2025 14:30:09 +0000
+References: <1764497617-1326331-1-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <1764497617-1326331-1-git-send-email-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
+ leon@kernel.org, mbloch@nvidia.com, ast@kernel.org, daniel@iogearbox.net,
+ hawk@kernel.org, john.fastabend@gmail.com, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org, gal@nvidia.com, moshe@nvidia.com, dtatulea@nvidia.com,
+ witu@nvidia.com, toke@redhat.com
 
-It was forgotten to lock addrs in ipvlan_open().
+Hello:
 
-Seems that code was initially written in assumption
-that any address change occurs under rtnl_lock(). But
-it's not true for the ipv6 case. So, we have to
-take addr_lock in ipvlan_open().
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Also, take the addrs_lock in ipvlan_close()
+On Sun, 30 Nov 2025 12:13:35 +0200 you wrote:
+> Hi,
+> 
+> This small series disables the egress xdp-redirect feature in default.
+> It can still be enabled by loading a dummy XDP program.
+> 
+> Patches were previously submitted as part of [1].
+> 
+> [...]
 
-Fixes: 8230819494b3 ("ipvlan: use per device spinlock to protect addrs list updates")
-Signed-off-by: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
-CC: Paolo Abeni <pabeni@redhat.com>
----
- drivers/net/ipvlan/ipvlan_main.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+Here is the summary with links:
+  - [net-next,V2,1/2] net/mlx5e: Update XDP features in switch channels
+    https://git.kernel.org/netdev/net-next/c/96a839506135
+  - [net-next,V2,2/2] net/mlx5e: Support XDP target xmit with dummy program
+    https://git.kernel.org/netdev/net-next/c/d4aa0cc9bd31
 
-diff --git a/drivers/net/ipvlan/ipvlan_main.c b/drivers/net/ipvlan/ipvlan_main.c
-index c390f4241621..53d311af2f44 100644
---- a/drivers/net/ipvlan/ipvlan_main.c
-+++ b/drivers/net/ipvlan/ipvlan_main.c
-@@ -182,18 +182,18 @@ static void ipvlan_uninit(struct net_device *dev)
- static int ipvlan_open(struct net_device *dev)
- {
- 	struct ipvl_dev *ipvlan = netdev_priv(dev);
-+	struct ipvl_port *port = ipvlan->port;
- 	struct ipvl_addr *addr;
- 
--	if (ipvlan->port->mode == IPVLAN_MODE_L3 ||
--	    ipvlan->port->mode == IPVLAN_MODE_L3S)
-+	if (port->mode == IPVLAN_MODE_L3 || port->mode == IPVLAN_MODE_L3S)
- 		dev->flags |= IFF_NOARP;
- 	else
- 		dev->flags &= ~IFF_NOARP;
- 
--	rcu_read_lock();
-+	spin_lock_bh(&port->addrs_lock);
- 	list_for_each_entry_rcu(addr, &ipvlan->addrs, anode)
- 		ipvlan_ht_addr_add(ipvlan, addr);
--	rcu_read_unlock();
-+	spin_unlock_bh(&port->addrs_lock);
- 
- 	return 0;
- }
-@@ -207,10 +207,10 @@ static int ipvlan_stop(struct net_device *dev)
- 	dev_uc_unsync(phy_dev, dev);
- 	dev_mc_unsync(phy_dev, dev);
- 
--	rcu_read_lock();
-+	spin_lock_bh(&ipvlan->port->addrs_lock);
- 	list_for_each_entry_rcu(addr, &ipvlan->addrs, anode)
- 		ipvlan_ht_addr_del(addr);
--	rcu_read_unlock();
-+	spin_unlock_bh(&ipvlan->port->addrs_lock);
- 
- 	return 0;
- }
-@@ -817,6 +817,8 @@ static int ipvlan_add_addr(struct ipvl_dev *ipvlan, void *iaddr, bool is_v6)
- {
- 	struct ipvl_addr *addr;
- 
-+	assert_spin_locked(&ipvlan->port->addrs_lock);
-+
- 	addr = kzalloc(sizeof(struct ipvl_addr), GFP_ATOMIC);
- 	if (!addr)
- 		return -ENOMEM;
+You are awesome, thank you!
 -- 
-2.25.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
