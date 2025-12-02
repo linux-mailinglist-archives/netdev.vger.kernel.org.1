@@ -1,127 +1,116 @@
-Return-Path: <netdev+bounces-243204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5F19C9B77F
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 13:21:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D801DC9A06A
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 05:43:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 02F3E345451
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 12:21:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FB963A3C98
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 04:43:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 453A83126C1;
-	Tue,  2 Dec 2025 12:20:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DED052DE6F1;
+	Tue,  2 Dec 2025 04:43:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OBbPvA1V"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C64F3115AE;
-	Tue,  2 Dec 2025 12:20:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4684F29E0E6;
+	Tue,  2 Dec 2025 04:43:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764678046; cv=none; b=UITR4z2FSjeMbaUcFD2tIYrPu/u3Jfvl6GJzba7cPmqmZwycO1U5ylEJqsH6mNMbiaWCR3+lIVlwakqG1yM9zplB048fKoJRsJ6c8VhRgZCPRIheejj6Nf7t7l7EwPrKsI2TOKVukIcbUzVNDYM4BuAi7H45PNeVYKv32btME9o=
+	t=1764650614; cv=none; b=oBaK5JttkPc/Um9BBz0d0L4FPAtCqI3BU6jqs0eeNS+u3EQYqMVTb6HQ3m91RHfrL8GxqWKT3vZMhcfchOJKaiq0BMfoQZZVu0GuheDj2EX0UrMFKm+6BTJSWNAUimjmSImuB3J9mnybmw2dGuCoaBKzQ5TpJ7LgQnPVs1GE0uc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764678046; c=relaxed/simple;
-	bh=OYfRnc2di6Z+Dw8sV99ux4ggwX+NZchU2DuAjPn1uHw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gq0VzxbW/YGJbNybKAUG7sUQUKGjdjqcgeRZZv3fzIUze0yB8LyXqwWxb+MxyveY4JUkdMjtC6sqok7XojQyswnvBMjKSKwyiPULPGttFebk15xmlVDWoQSx5GgcUGJYqjWnUzPczHM7n0AySERt8Fss2vjDVocEs3fnonmppwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vQPMx-000000003vh-2FsH;
-	Tue, 02 Dec 2025 12:20:35 +0000
-Date: Tue, 2 Dec 2025 12:20:31 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Frank Wunderlich <frankwu@gmx.de>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Chen Minqiang <ptpt52@gmail.com>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	"Chester A. Unal" <chester.a.unal@arinc9.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v3 2/2] net: dsa: mt7530: Use GPIO polarity to generate
- correct reset sequence
-Message-ID: <aS7Zj3AFsSp2CTNv@makrotopia.org>
-References: <20251129234603.2544-1-ptpt52@gmail.com>
- <20251129234603.2544-2-ptpt52@gmail.com>
- <0675b35f-217d-4261-9e3f-2eb24753d43c@lunn.ch>
- <20251130080731.ty2dlxaypxvodxiw@skbuf>
- <3fbc4e67-b931-421c-9d83-2214aaa2f6ed@lunn.ch>
- <0d85e1e6-ea75-4f20-aef1-90d446b4bfa1@kernel.org>
- <00f308a1-a4b1-4f20-8d8e-459ddf4c39b1@gmx.de>
+	s=arc-20240116; t=1764650614; c=relaxed/simple;
+	bh=YHuykW3BY2bKlagS0Shm67CUfpc2QWoDRQovzkp6umk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YI1TCdfcxZHO0FXlGvZgTNt/XobkYMv7qT5zpRfoo1FhbgVepziVJUIpdiu1PKHsJ/36yQeHaaMGjzbq0aXjPbrhHhdZ5lZNMjSxC9REKIzkc2m+W6GjJuVdbKMmeeh6XpDA2jq+YbPUwkWBK+p0Sudg7EsLyfIS2qm9kPChf/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OBbPvA1V; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1764650613; x=1796186613;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=YHuykW3BY2bKlagS0Shm67CUfpc2QWoDRQovzkp6umk=;
+  b=OBbPvA1VSW8e0Tukn7tzjbqGmz+Qrp48vucAE5iAh/OwvAHq2YfdFsAb
+   1oGjBRraTjkoQRJ8YV8hUv5sElE8kl3s+x8PIy7TKz4QOa4My6caaV7+j
+   EtE8Z4VjRdveZRCd5MNazRQRkQFaSkMi0NUfrzUGF/rSPZY7TpgWbjUAI
+   StXE7A/xH9P4pUDt5Vol1Bj0bGWunyZrqpk5Ew1X79kMT7fyv5aFszCFx
+   RE2IB6tVe9N+IhLqCIdInCJqgv4K9y+MuWL5MpDGQMYiKRgcYAL0oX7DV
+   3Q/jPIR81uOtrr+lEu81j0kWQqZtxdUXhz8QlfyLWlE7CaC7+uBUq03nl
+   w==;
+X-CSE-ConnectionGUID: laEbvlArTqWTGjgX+ieTjw==
+X-CSE-MsgGUID: aS4dTyxCQ0mUoRX94jjdnA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11630"; a="78071879"
+X-IronPort-AV: E=Sophos;i="6.20,242,1758610800"; 
+   d="scan'208";a="78071879"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2025 20:43:33 -0800
+X-CSE-ConnectionGUID: JNZIT0lsRZCYkNQ9r7s52w==
+X-CSE-MsgGUID: /K6JqyLSTxmDi1MrzGeTjg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,242,1758610800"; 
+   d="scan'208";a="194363908"
+Received: from p2dy149cchoong.png.intel.com ([10.107.243.50])
+  by orviesa008.jf.intel.com with ESMTP; 01 Dec 2025 20:43:30 -0800
+From: Chwee-Lin Choong <chwee.lin.choong@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Bouska@web.codeaurora.org,
+	Zdenek <zdenek.bouska@siemens.com>,
+	Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+Subject: [PATCH iwl-net v1] igc: Use 5KB TX packet buffer per queue for TSN mode
+Date: Tue,  2 Dec 2025 20:23:51 +0800
+Message-ID: <20251202122351.11915-1-chwee.lin.choong@intel.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <00f308a1-a4b1-4f20-8d8e-459ddf4c39b1@gmx.de>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Dec 02, 2025 at 12:52:44PM +0100, Frank Wunderlich wrote:
-> Hi,
-> 
-> Am 01.12.25 um 08:48 schrieb Krzysztof Kozlowski:
-> > On 30/11/2025 21:17, Andrew Lunn wrote:
-> > > On Sun, Nov 30, 2025 at 10:07:31AM +0200, Vladimir Oltean wrote:
-> > > > On Sun, Nov 30, 2025 at 02:11:05AM +0100, Andrew Lunn wrote:
-> > > > > > -		gpiod_set_value_cansleep(priv->reset, 0);
-> > > > > > +		int is_active_low = !!gpiod_is_active_low(priv->reset);
-> > > > > > +		gpiod_set_value_cansleep(priv->reset, is_active_low);
-> > > > > I think you did not correctly understand what Russell said. You pass
-> > > > > the logical value to gpiod_set_value(). If the GPIO has been marked as
-> > > > > active LOW, the GPIO core will invert the logical values to the raw
-> > > > > value. You should not be using gpiod_is_active_low().
-> > > > > 
-> > > > > But as i said to the previous patch, i would just leave everything as
-> > > > > it is, except document the issue.
-> > > > > 
-> > > > > 	Andrew
-> > > > > 
-> > > > It was my suggestion to do it like this (but I don't understand why I'm
-> > > > again not in CC).
-> > > > 
-> > > > We _know_ that the reset pin of the switch should be active low. So by
-> > > > using gpiod_is_active_low(), we can determine whether the device tree is
-> > > > wrong or not, and we can work with a wrong device tree too (just invert
-> > > > the logical values).
-> > > Assuming there is not a NOT gate placed between the GPIO and the reset
-> > > pin, because the board designer decided to do that for some reason?
-> jumping in because i prepare mt7987 / BPI-R4Lite dts for upstreaming when
-> driver-changes are in.
-> With current driver i need to define the reset-gpio for mt7531 again wrong
-> to get it
-> working. So to have future dts correct, imho this (or similar) change to
-> driver is needed.
-> 
-> Of course we cannot simply say that current value is wrong and just invert
-> it because of
-> possible "external" inversion of reset signal between SoC and switch.
-> I have to look on schematics for the boards i have (BPI-R64, BPI-R3,
-> BPI-R2Pro) if there is such circuit.
+Update IGC_TXPBSIZE_TSN to allocate 5KB per TX queue (TXQ0-TXQ3)
+as recommended in I225/I226 SW User Manual Section 7.5.4 for TSN
+operation.
 
-I'm also not aware of any board which doesn't directly connect the
-reset of the MT7530 to a GPIO pin of the SoC. For MediaTek's designs
-there is often even a specific pin desginated for this purpose and
-most vendors do follow this. If they deviate at all, then it's just
-that a different pin is used for the switch reset, but I've never
-seen any logic between the SoC's GPIO pin and the switch reset.
+Fixes: 0d58cdc902da ("igc: optimize TX packet buffer utilization for TSN mode")
+Reported-by: Bouska, Zdenek <zdenek.bouska@siemens.com>
+Closes: https://lore.kernel.org/netdev/AS1PR10MB5675DBFE7CE5F2A9336ABFA4EBEAA@AS1PR10MB5675.EURPRD10.PROD.OUTLOOK.COM/
+Signed-off-by: Chwee-Lin Choong <chwee.lin.choong@intel.com>
+---
+ drivers/net/ethernet/intel/igc/igc_defines.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-> Maybe the mt7988 (mt7530-mmio) based boards also affected?
+diff --git a/drivers/net/ethernet/intel/igc/igc_defines.h b/drivers/net/ethernet/intel/igc/igc_defines.h
+index 498ba1522ca4..9482ab11f050 100644
+--- a/drivers/net/ethernet/intel/igc/igc_defines.h
++++ b/drivers/net/ethernet/intel/igc/igc_defines.h
+@@ -443,9 +443,10 @@
+ #define IGC_TXPBSIZE_DEFAULT ( \
+ 	IGC_TXPB0SIZE(20) | IGC_TXPB1SIZE(0) | IGC_TXPB2SIZE(0) | \
+ 	IGC_TXPB3SIZE(0) | IGC_OS2BMCPBSIZE(4))
++/* TSN value following I225/I226 SW User Manual Section 7.5.4 */
+ #define IGC_TXPBSIZE_TSN ( \
+-	IGC_TXPB0SIZE(7) | IGC_TXPB1SIZE(7) | IGC_TXPB2SIZE(7) | \
+-	IGC_TXPB3SIZE(7) | IGC_OS2BMCPBSIZE(4))
++	IGC_TXPB0SIZE(5) | IGC_TXPB1SIZE(5) | IGC_TXPB2SIZE(5) | \
++	IGC_TXPB3SIZE(5) | IGC_OS2BMCPBSIZE(4))
+ 
+ #define IGC_DTXMXPKTSZ_TSN	0x19 /* 1600 bytes of max TX DMA packet size */
+ #define IGC_DTXMXPKTSZ_DEFAULT	0x98 /* 9728-byte Jumbo frames */
+-- 
+2.43.0
 
-There is no GPIO reset for switches which are integrated in the SoC,
-so this only matters for external MT7530 and MT7531 ICs for which an
-actual GPIO line connected to the SoC is used to reset the switch.
 
