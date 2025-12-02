@@ -1,99 +1,176 @@
-Return-Path: <netdev+bounces-243190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63079C9B314
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 11:39:39 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9183EC9B329
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 11:41:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF7EB3A311D
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 10:39:33 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3CDF43466C2
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 10:41:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E25830CD81;
-	Tue,  2 Dec 2025 10:39:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61F53309EF4;
+	Tue,  2 Dec 2025 10:41:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b="ECameLAC"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from mail.toke.dk (mail.toke.dk [45.145.95.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CD0530F7E8;
-	Tue,  2 Dec 2025 10:39:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 756752F6184
+	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 10:41:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.145.95.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764671969; cv=none; b=iVLj0AaoJmv7NcO/9thoJ9+2r18FoWe1N9EJuZ3hD7VdfLUbpczb0qgbOeTkSSy+Z0vsGU5JDuCV12M0noefRte4pYSG6BssoFeduUt65wmtIb990wUPgvFJw6/cB5OujeDguZy1d2ZnINDD4BKTChHzcKESxGMAKaOlWS7zgzE=
+	t=1764672087; cv=none; b=JOS/H14nuaaKLhuIlbir5D7anAz4GXdZFuA3HYMFw7kbGdmYnJB+NgCEpRd0oxbFdLE1v3Qg18/hCjKwyvfCBxCfxBU6KUlEmzWV6DkqHknK7Gvap6PHJg4skx2/y4IPgF7sxyiDzFtAdiMDxuEyj/Zj4u3pmPeDpZucXHcc2kA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764671969; c=relaxed/simple;
-	bh=19O7az7jw4QZupwE/TAjo55Y+GD0Qu5E2kLLz5+oxRc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DJWf7l7op/OfAS4/nk9SOaZmSuUuWZXrYUEbHn5H2zEKF4vgUszVxaBwfWFMEDRU6dZmd+y3P0NArJs+H1Y+Vg6H0yqyzfk2X1/dpMFZA5joiWYU+e0dbeuN/1VMaLgaHaIelqHsDRLpft1oZPUVkzk/mDeHpqX14gUlwAofuxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.224.107])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dLHLB2fspzHnHBd;
-	Tue,  2 Dec 2025 18:38:26 +0800 (CST)
-Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
-	by mail.maildlp.com (Postfix) with ESMTPS id 858374056B;
-	Tue,  2 Dec 2025 18:39:24 +0800 (CST)
-Received: from huawei-ThinkCentre-M920t.huawei.com (10.123.122.223) by
- mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 2 Dec 2025 13:39:24 +0300
-From: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
-To: <netdev@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>, Dmitry
- Skorodumov <skorodumov.dmitry@huawei.com>, Julian Vetter
-	<julian@outer-limits.org>, Guillaume Nault <gnault@redhat.com>, Eric Dumazet
-	<edumazet@google.com>, Mahesh Bandewar <maheshb@google.com>, "David S.
- Miller" <davem@davemloft.net>, <linux-kernel@vger.kernel.org>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net] ipvlan: Ignore PACKET_LOOPBACK in handle_mode_l2()
-Date: Tue, 2 Dec 2025 13:39:03 +0300
-Message-ID: <20251202103906.4087675-1-skorodumov.dmitry@huawei.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1764672087; c=relaxed/simple;
+	bh=AB/YV5FgeN7iiVMR16ByeM4aMGMDjBYkKLdys2MDF4w=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=jlKH7Naxng/L2/hDzYUSdKOIwS9VoiHiP0Rnmz8fKg10Xxp80hx90eYtCiW/s/6MdH5E5P6RL10G6BxO1V58XLTdjlETh1NXL9/+qIl9trKU5XCaAgqDb6vX/E6zQOeqh15Vj1HW+zoirTawp93y5bB04OpR1SDSmdAbnKdtDzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk; spf=pass smtp.mailfrom=toke.dk; dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b=ECameLAC; arc=none smtp.client-ip=45.145.95.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=toke.dk
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=toke.dk; s=20161023;
+	t=1764672082; bh=AB/YV5FgeN7iiVMR16ByeM4aMGMDjBYkKLdys2MDF4w=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=ECameLACubzq7uw8LYTKmDrujVAzjZXphpHiQXk8+ht8wMQCSjwj+CoL6lrcWvm/4
+	 4GgRsHvbt94d03UCDIQwc3fSBgj7PFJYHazD7jmESSEeoVz4PhaXhH+CBfVHUxbPNP
+	 wcTGcfs2UO5uakbFYOV8aa7cpsvBGBUsw6uOyoBfXIexVHrXLuSruXe7riOkhy2yOX
+	 9uS31u6hEIl6AcbUIt5vvq8DD9xdr0vIsDyL5ipC+WggmpKe2EL0jXjp1UbzUE0vc0
+	 BJz0zblUqq6CCt4j4qgbID5ly91PjRZceZRabn+jVU8kPQQBied1ShMcV9ixDa0OAr
+	 CRYibzFUMkQIw==
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jamal Hadi Salim
+ <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko
+ <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: Jonas =?utf-8?Q?K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>,
+ cake@lists.bufferbloat.net,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v3 1/5] net/sched: Export mq functions for reuse
+In-Reply-To: <willemdebruijn.kernel.1b99d2d13dcba@gmail.com>
+References: <20251130-mq-cake-sub-qdisc-v3-0-5f66c548ecdc@redhat.com>
+ <20251130-mq-cake-sub-qdisc-v3-1-5f66c548ecdc@redhat.com>
+ <willemdebruijn.kernel.1b99d2d13dcba@gmail.com>
+Date: Tue, 02 Dec 2025 11:41:20 +0100
+X-Clacks-Overhead: GNU Terry Pratchett
+Message-ID: <87345t9ne7.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: mscpeml100003.china.huawei.com (10.199.174.67) To
- mscpeml500004.china.huawei.com (7.188.26.250)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Packets with pkt_type == PACKET_LOOPBACK are captured by
-handle_frame() function, but they don't have L2 header.
-We should not process them in handle_mode_l2().
+Willem de Bruijn <willemdebruijn.kernel@gmail.com> writes:
 
-This doesn't affect old L2 functionality, since handling
-was anyway incorrect.
+> Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>> To enable the cake_mq qdisc to reuse code from the mq qdisc, export a
+>> bunch of functions from sch_mq. Split common functionality out from some
+>> functions so it can be composed with other code, and export other
+>> functions wholesale.
+>>=20
+>> No functional change intended.
+>>=20
+>> Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+>> ---
+>>  include/net/sch_generic.h | 19 +++++++++++++
+>>  net/sched/sch_mq.c        | 69 ++++++++++++++++++++++++++++++++--------=
+-------
+>>  2 files changed, 67 insertions(+), 21 deletions(-)
+>>=20
+>> diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+>> index c3a7268b567e..f2281914d962 100644
+>> --- a/include/net/sch_generic.h
+>> +++ b/include/net/sch_generic.h
+>
+> We probably want to avoid random users. This may be better suited to a
+> local header, similar to net/core/devmem.h.
 
-Handle them the same way as in br_handle_frame():
-just pass the skb.
+Hmm, right; I just put them in sch_generic.h because that's where the
+existing mq_change_real_num_tx() was. I can move them, though, don't
+feel strongly about it either way :)
 
-To observe invalid behaviour, just start "ping -b" on bcast address
-of port-interface.
+> I don't mean to derail this feature if these are the only concerns.
+> This can be revised later in -rcX too.
 
-Fixes: 2ad7bf363841 ("ipvlan: Initial check-in of the IPVLAN driver.")
-Signed-off-by: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
----
- drivers/net/ipvlan/ipvlan_core.c | 3 +++
- 1 file changed, 3 insertions(+)
+Sure, let's see if our benevolent maintainers decide to merge this
+before or after the merge window; I'll follow up as appropriate.
 
-diff --git a/drivers/net/ipvlan/ipvlan_core.c b/drivers/net/ipvlan/ipvlan_core.c
-index dea411e132db..2efa3ba148aa 100644
---- a/drivers/net/ipvlan/ipvlan_core.c
-+++ b/drivers/net/ipvlan/ipvlan_core.c
-@@ -737,6 +737,9 @@ static rx_handler_result_t ipvlan_handle_mode_l2(struct sk_buff **pskb,
- 	struct ethhdr *eth = eth_hdr(skb);
- 	rx_handler_result_t ret = RX_HANDLER_PASS;
- 
-+	if (unlikely(skb->pkt_type == PACKET_LOOPBACK))
-+		return RX_HANDLER_PASS;
-+
- 	if (is_multicast_ether_addr(eth->h_dest)) {
- 		if (ipvlan_external_frame(skb, port)) {
- 			struct sk_buff *nskb = skb_clone(skb, GFP_ATOMIC);
--- 
-2.25.1
+>> @@ -1419,7 +1419,26 @@ void mini_qdisc_pair_init(struct mini_Qdisc_pair =
+*miniqp, struct Qdisc *qdisc,
+>>  void mini_qdisc_pair_block_init(struct mini_Qdisc_pair *miniqp,
+>>  				struct tcf_block *block);
+>>=20=20
+>> +struct mq_sched {
+>> +	struct Qdisc		**qdiscs;
+>> +};
+>> +
+>> +int mq_init_common(struct Qdisc *sch, struct nlattr *opt,
+>> +		   struct netlink_ext_ack *extack,
+>> +		   const struct Qdisc_ops *qdisc_ops);
+>> +void mq_destroy_common(struct Qdisc *sch);
+>> +void mq_attach(struct Qdisc *sch);
+>>  void mq_change_real_num_tx(struct Qdisc *sch, unsigned int new_real_tx);
+>> +void mq_dump_common(struct Qdisc *sch, struct sk_buff *skb);
+>> +struct netdev_queue *mq_select_queue(struct Qdisc *sch,
+>> +				     struct tcmsg *tcm);
+>> +struct Qdisc *mq_leaf(struct Qdisc *sch, unsigned long cl);
+>> +unsigned long mq_find(struct Qdisc *sch, u32 classid);
+>> +int mq_dump_class(struct Qdisc *sch, unsigned long cl,
+>> +		  struct sk_buff *skb, struct tcmsg *tcm);
+>> +int mq_dump_class_stats(struct Qdisc *sch, unsigned long cl,
+>> +			struct gnet_dump *d);
+>> +void mq_walk(struct Qdisc *sch, struct qdisc_walker *arg);
+>>=20=20
+>>  int sch_frag_xmit_hook(struct sk_buff *skb, int (*xmit)(struct sk_buff =
+*skb));
+>>=20=20
+>> diff --git a/net/sched/sch_mq.c b/net/sched/sch_mq.c
+>> index c860119a8f09..0bcabdcd1f44 100644
+>> --- a/net/sched/sch_mq.c
+>> +++ b/net/sched/sch_mq.c
+>> @@ -17,10 +17,6 @@
+>>  #include <net/pkt_sched.h>
+>>  #include <net/sch_generic.h>
+>>=20=20
+>> -struct mq_sched {
+>> -	struct Qdisc		**qdiscs;
+>> -};
+>> -
+>>  static int mq_offload(struct Qdisc *sch, enum tc_mq_command cmd)
+>>  {
+>>  	struct net_device *dev =3D qdisc_dev(sch);
+>> @@ -49,23 +45,29 @@ static int mq_offload_stats(struct Qdisc *sch)
+>>  	return qdisc_offload_dump_helper(sch, TC_SETUP_QDISC_MQ, &opt);
+>>  }
+>>=20=20
+>> -static void mq_destroy(struct Qdisc *sch)
+>> +void mq_destroy_common(struct Qdisc *sch)
+>>  {
+>>  	struct net_device *dev =3D qdisc_dev(sch);
+>>  	struct mq_sched *priv =3D qdisc_priv(sch);
+>>  	unsigned int ntx;
+>>=20=20
+>> -	mq_offload(sch, TC_MQ_DESTROY);
+>> -
+>>  	if (!priv->qdiscs)
+>>  		return;
+>>  	for (ntx =3D 0; ntx < dev->num_tx_queues && priv->qdiscs[ntx]; ntx++)
+>>  		qdisc_put(priv->qdiscs[ntx]);
+>>  	kfree(priv->qdiscs);
+>>  }
+>> +EXPORT_SYMBOL(mq_destroy_common);
+>
+> On a similar note, this would be a good use of EXPORT_SYMBOL_NS_GPL.
+>
+> Maybe not even NETDEV_INTERNAL but a dedicated NET_SCHED_MQ.
 
+Huh, didn't know about namespaced exports, neat. Can do that too :)
+
+-Toke
 
