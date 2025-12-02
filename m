@@ -1,156 +1,150 @@
-Return-Path: <netdev+bounces-243240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08D90C9C2B4
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 17:18:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E52BDC9C2C9
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 17:21:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4B2A3A58EA
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 16:12:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81A913AB0DC
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 16:16:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51787283FC5;
-	Tue,  2 Dec 2025 16:12:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92F90263F52;
+	Tue,  2 Dec 2025 16:16:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="JafeZQ57"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MokDP01/"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4916E274641
-	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 16:12:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6541428373;
+	Tue,  2 Dec 2025 16:16:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764691969; cv=none; b=KmaHmlRSEG9D1DMhWy5uNg3c86lGgcXXbEzlFyRoN117PCz9CP35PaW58Jn1wqx7x71tYrIQPYK2Y28x4VQ0p50yO/1zxZJoVa0bQc/ebEBiOF+xcG+XyxWcojcttB62JB63yS6FtsNkZgUx5791i9jyxGnvOybW3yVQw/ZYoL0=
+	t=1764692212; cv=none; b=ZphnEh7pg0WVghssxGaJKJU1nRwLrMLZMBJqm00NWljj5o1fqaegPQ/y421hWOnYhQQrLJdoXcR8yKtJ65Zava/RROtvZxl59hb2TK5aHwVn6eKaidh2cuE5XGWW5igegcvxr6GfBiSZTq1738yOSRZ6t9pTkTBKRf18JWgGgfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764691969; c=relaxed/simple;
-	bh=rSkZyYoevwSedvSfNlK4TZnGRdkWJ2yxJp4QR/m1B8o=;
+	s=arc-20240116; t=1764692212; c=relaxed/simple;
+	bh=PVARMYIL5iKuFDPs7ScHjrzq7cOp+Ln4nZRlGCcro7U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pWZWGJOCNohm1wxr9YHsjVfoDu1IjnLeFRusCO3ZpsDEWPUxLp0R9aQUMZBnwOd91Mbfw6BrqUgE8rtmxkvij5YZoYSk2b7aaUWPQgY4wdiIek772tVkQR05Fv5zWQ79uHLe0NRBheOOqpqQfAxqadrq0QNkgh8WIrE5MqVhD0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=JafeZQ57; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=T4IBIZ4B5njtMyQ4rzAExR29qYvdP+JGz6jzKn8rSGc=; b=JafeZQ57CWrWyilfwi9NUSnIMc
-	17T3RiJnCQZOLKLQpFw5SjgBL1eFdX60ocO/EvFqPpV5+Ud2Xw0AQRXMfhvx6kiBlGd7sBXOGjpYQ
-	rZPYL18jB3zGqmuZFrddL9EAPn25EuQckxSJxS17Y0QuP+Y1jvxnGnkJxTJVuYdHn5k8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vQSzb-00FiQp-Qe; Tue, 02 Dec 2025 17:12:43 +0100
-Date: Tue, 2 Dec 2025 17:12:43 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: =?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>
-Cc: netdev@vger.kernel.org, "Lucien.Jheng" <lucienzx159@gmail.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>
-Subject: Re: [RFC] net: phy: air_en8811h: add Airoha AN8811HB support
-Message-ID: <497ad08d-2603-4159-a4ce-52bdc5361aed@lunn.ch>
-References: <20251202102222.1681522-1-bjorn@mork.no>
+	 Content-Type:Content-Disposition:In-Reply-To; b=cO3lYXL7EI270WozAaZ6p+lWfJTL0NRty8OrRvrmgY9HIkvqdOncLrEUU60rdM3D/eyTGfk+fVoOXqODlde/u5OZeEjlBmypmxl/0ZZnc7UgbslKZbyUMals+B8ECZ1xtGJFcD+jzdhxGcB3ff/C3hJATjKAvuI7JskNa2kPcRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MokDP01/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 458C4C4CEF1;
+	Tue,  2 Dec 2025 16:16:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764692212;
+	bh=PVARMYIL5iKuFDPs7ScHjrzq7cOp+Ln4nZRlGCcro7U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MokDP01/56WXAAh+8PEEtoCe8UOTGEiGK13/4SGlm4JRKGeuY2MX8nENhIaBnenKy
+	 4xp2CykeqPMLqOJG8y87/ufmWk6Kl4cCf2keBBxIzsK3PCTqjGo3PLbPmMKlTgTE12
+	 R0pqEwyZbMkbkBzNLc7iK/vMx/jJesaCiblgozIE65p4QrXd3IojOQxy5DzPvp9hMh
+	 eOZFneaLw7mmH0NSQ6Mtb0p1JtDSHqHxlu31jvTwk4Chn2RnCQbI+gQfL/VaH4c3TE
+	 aKH2v/4qOrh6GFsqnmBVwIBAsg0MHvE3qZgi0YRVAtVCjXtJ7sD2DkvWOUJ1GO3hRy
+	 zLADVZkO4BXVA==
+Date: Tue, 2 Dec 2025 16:16:47 +0000
+From: Simon Horman <horms@kernel.org>
+To: Chris Mason <clm@meta.com>
+Cc: Jonas Gorski <jonas.gorski@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH RFC/RFT net-next v2 1/5] net: dsa: deny bridge VLAN with
+ existing 8021q upper on any port
+Message-ID: <aS8Q7yCvvhXn5iYu@horms.kernel.org>
+References: <CAOiHx=mog+8Grm1QTnqU_F3=BnWmJqTj+ko-nZiRMAb4-hvSqw@mail.gmail.com>
+ <20251201224855.4102774-1-clm@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251202102222.1681522-1-bjorn@mork.no>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251201224855.4102774-1-clm@meta.com>
 
->  static int en8811h_load_firmware(struct phy_device *phydev)
->  {
->  	struct en8811h_priv *priv = phydev->priv;
->  	struct device *dev = &phydev->mdio.dev;
->  	const struct firmware *fw1, *fw2;
-> +	bool en8811h;
->  	int ret;
->  
-> -	ret = request_firmware_direct(&fw1, EN8811H_MD32_DM, dev);
-> -	if (ret < 0)
-> -		return ret;
-> +	switch (phydev->phy_id & PHY_ID_MATCH_MODEL_MASK) {
-> +	case EN8811H_PHY_ID & PHY_ID_MATCH_MODEL_MASK:
-> +		ret = request_firmware_direct(&fw1, EN8811H_MD32_DM, dev);
-> +		if (ret < 0)
-> +			return ret;
->  
-> -	ret = request_firmware_direct(&fw2, EN8811H_MD32_DSP, dev);
-> -	if (ret < 0)
-> -		goto en8811h_load_firmware_rel1;
-> +		ret = request_firmware_direct(&fw2, EN8811H_MD32_DSP, dev);
-> +		if (ret < 0)
-> +			goto en8811h_load_firmware_rel1;
-> +
-> +		en8811h = true;
-> +		break;
-> +
-> +	case AN8811HB_PHY_ID & PHY_ID_MATCH_MODEL_MASK:
-> +		ret = request_firmware_direct(&fw1, AN8811HB_MD32_DM, dev);
-> +		if (ret < 0)
-> +			return ret;
-> +
-> +		ret = request_firmware_direct(&fw2, AN8811HB_MD32_DSP, dev);
-> +		if (ret < 0)
-> +			goto en8811h_load_firmware_rel1;
-> +		break;
-> +	default:
-> +		return -ENODEV;
-> +	}
->  
->  	ret = air_buckpbus_reg_write(phydev, EN8811H_FW_CTRL_1,
->  				     EN8811H_FW_CTRL_1_START);
-> +	if (ret == 0 && en8811h)
+On Mon, Dec 01, 2025 at 02:48:48PM -0800, Chris Mason wrote:
+> On Mon, 1 Dec 2025 20:52:34 +0100 Jonas Gorski <jonas.gorski@gmail.com> wrote:
+> 
+> > Hi,
+> > 
+> > On Mon, Dec 1, 2025 at 3:48 PM Simon Horman <horms@kernel.org> wrote:
+> > >
+> > > On Mon, Dec 01, 2025 at 11:28:13AM +0100, Jonas Gorski wrote:
+> > >
+> > > ...
+> > >
+> > > > diff --git a/net/dsa/user.c b/net/dsa/user.c
+> > > > index f59d66f0975d..fa1fe0f1493a 100644
+> > > > --- a/net/dsa/user.c
+> > > > +++ b/net/dsa/user.c
+> > > > @@ -653,21 +653,30 @@ static int dsa_user_port_attr_set(struct net_device *dev, const void *ctx,
+> > > >
+> > > >  /* Must be called under rcu_read_lock() */
+> > > >  static int
+> > > > -dsa_user_vlan_check_for_8021q_uppers(struct net_device *user,
+> > > > +dsa_user_vlan_check_for_8021q_uppers(struct dsa_port *dp,
+> > > >                                    const struct switchdev_obj_port_vlan *vlan)
+> > > >  {
+> > > > -     struct net_device *upper_dev;
+> > > > -     struct list_head *iter;
+> > > > +     struct dsa_switch *ds = dp->ds;
+> > > > +     struct dsa_port *other_dp;
+> > > >
+> > > > -     netdev_for_each_upper_dev_rcu(user, upper_dev, iter) {
+> > > > -             u16 vid;
+> > > > +     dsa_switch_for_each_user_port(other_dp, ds) {
+> > > > +             struct net_device *user = other_dp->user;
+> > >
+> > > Hi Jonas,
+> > >
+> > > The AI robot is concerned that user may be NULL here.
+> > > And I can't convince myself that cannot be the case.
+> > >
+> > > Could you take a look?
+> > >
+> > > https://netdev-ai.bots.linux.dev/ai-review.html?id=47057e-e740-4b66-9d60-9ec2a7ee92a1#patch-0
+> > 
+> > At this point it can be NULL. But it being NULL is not an issue, as ...
+> > >
+> > > > +             struct net_device *upper_dev;
+> > > > +             struct list_head *iter;
+> > > >
+> > > > -             if (!is_vlan_dev(upper_dev))
+> > > > +             if (!dsa_port_bridge_same(dp, other_dp))
+> > > >                       continue;
+> > 
+> > ... this condition will filter all cases where it is NULL. For
+> > dsa_port_bridge_same() to return true both ports need to be attached
+> > to a bridge (and to the same bridge), and to be attached to a bridge a
+> > net_device is required, so other_dp->user cannot be NULL. And we only
+> > access user after here.
 
-Generally, you don't test for 0. If there is an error you return
-it. Does this need to be special?
+Thanks for the explanation Jonas.
 
-> +		ret = air_buckpbus_reg_modify(phydev, EN8811H_FW_CTRL_2,
-> +					      EN8811H_FW_CTRL_2_LOADING,
-> +					      EN8811H_FW_CTRL_2_LOADING);
->  	if (ret < 0)
->  		goto en8811h_load_firmware_out;
->  
-> -	ret = air_buckpbus_reg_modify(phydev, EN8811H_FW_CTRL_2,
-> -				      EN8811H_FW_CTRL_2_LOADING,
-> -				      EN8811H_FW_CTRL_2_LOADING);
-> +	ret = air_write_buf(phydev, AIR_FW_ADDR_DM,  fw1);
->  	if (ret < 0)
->  		goto en8811h_load_firmware_out;
->  
-> -	ret = air_write_buf(phydev, AIR_FW_ADDR_DM,  fw1);
-> +	if (ret == 0 && !en8811h)
-> +		ret = an8811hb_check_crc(phydev, AN8811HB_CRC_DM_SET1,
-> +					 AN8811HB_CRC_DM_MON2,
-> +					 AN8811HB_CRC_DM_MON3);
+I wasn't very confident with this report.
+And I was too focused on working out if user could be NULL rather
+than if it matters. Still, I may not have worked it out.
 
-This !en881h and en881h looks a bit ugly. Maybe see if you can
-refactor this code into helpers for the two cases? 
+> 
+> I reproduced this false positive here, thanks for the explanation.  This is an
+> example of a class of review mistakes I've wanted to fix, so I used it to
+> improve the prompts around NULL pointers that are protected via other checks.
+> 
+> I'll test this on some more commits and push it out.
 
-> @@ -952,8 +1141,9 @@ static int en8811h_probe(struct phy_device *phydev)
->  	}
->  
->  	priv->phydev = phydev;
-> +
->  	/* Co-Clock Output */
-> -	ret = en8811h_clk_provider_setup(&phydev->mdio.dev, &priv->hw);
-> +	ret = en8811h_clk_provider_setup(phydev, &priv->hw);
->  	if (ret)
->  		return ret;
+Thanks for following-up on this Chris.
 
-Maybe look at having two different probe functions, with a helper for
-any common code? That might mean you don't need as many switch
-statements. And this is a common pattern when dealing with variants of
-hardware. You have a collection of helpers which are generic, and then
-version specific functions which make use of the helpers are
-appropriate.
+I guess everyone has their own opinion on AI.
+And, in a similar vein, many have opinions on the review-prompts.
+But, FTR, I've been impressed by the output I've seen,
+having used them for a few weeks now. And I look forward
+to that improving further.
 
-This patch is also quite large. See if you can break it
-up. Refactoring the existing code into helpers can be a patch of its
-own.
-
-	Andrew
 
