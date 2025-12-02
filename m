@@ -1,146 +1,97 @@
-Return-Path: <netdev+bounces-243266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5F9BC9C61C
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 18:27:17 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3F0BC9C652
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 18:29:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4E7C0344093
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 17:27:17 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9FDF5342FFC
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 17:29:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4029B2C032C;
-	Tue,  2 Dec 2025 17:27:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A3D32C21C6;
+	Tue,  2 Dec 2025 17:29:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PB39evq4"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rzSt+A/n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com [209.85.128.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E42D299931
-	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 17:27:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 496F02C0F78
+	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 17:29:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764696434; cv=none; b=a/NZ0+w8fO+3ochVca1rlMMue22g14+JdbafIxnL5yYQaCJQt/BFHTNIoNnx8juE/+8VXQzYK9H2DDCgb+71BsDqEMyWRtzaPaw5fxxgUconaXEpAVhBeVlcz+2u7VSUER+qZPmUCD8JSPBnlzqOsPomEoQ9yQo851ivVtvILHc=
+	t=1764696548; cv=none; b=SRnv0ruA9TH7x57oetGXbmmN8DB/Z29SdIsoFqscfa/ou2/1y6RDOrA5pLtGmpC9KnntLaJKEvn1U+gRZ8yRLgE/oEqsI2gkdczLkBpjsUOfkCtt3T1Lr8vjmm1d2TJjmwAiZ8oQtL2PvGjGDD8ahUDD/Ml0YUBkt1h4heaVRf8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764696434; c=relaxed/simple;
-	bh=lbprACJXOsDs9quCd1cHPcC8LxjPjXJX4lofHSs/8P0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ix/POXquRXrPK++ufc4yC8frfs/VLy7cpfgBQ3fo7q16OMgF3HTh8xioIzpFl7ayGnJl9RC7GaNRJQCV4d4B2P0iAn5PU8KmbjUf6eMGJHFxs9kNuC1aIo19fDJijO32Rl/p0Q6koVqxOE0IcqumpOoUohzXxbngbsk0qQnaX1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PB39evq4; arc=none smtp.client-ip=209.85.128.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f65.google.com with SMTP id 5b1f17b1804b1-4775ae77516so56167795e9.1
-        for <netdev@vger.kernel.org>; Tue, 02 Dec 2025 09:27:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764696431; x=1765301231; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=L830+//zOm25WYXSXk+Iz08LvtsPyToF3gamuliHtQM=;
-        b=PB39evq4Ke3G9HYkxIDdAnJ4yBL5c4FchOPRmH+TP6cZagRbMfpemiwiaq5Zttpaas
-         4QErHrD8VeBo6opPKgW5k1fWPwGewanbSYIdk+WfPzjkpXxFamUrFF4sCA/bpSew9RSz
-         4dHJN/J/lXC7hpGXw289dIl7/mfSqeD/ZzPCRCDi9QRQFfc+MKvEuCkPFfL/LrqR6zWv
-         YJrnJGJZC1U4cQSutVB5S4FhCgbXtdKPWxfloR/pCDqVT/d5h5zAhJ2xSxXSpoiUXFhF
-         E30597g70Gi4iVM+ASk0x3Fj8Knh/64nLqKmS5ng94YbixT6GpaAa4ut/lfcFqVtV03D
-         ljcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764696431; x=1765301231;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=L830+//zOm25WYXSXk+Iz08LvtsPyToF3gamuliHtQM=;
-        b=PdZb4lIkDyQBMrdBfE5UHgTQfxqeeWiagGjWvTYkX8DOONfybNwk57Mkncb3biSFnK
-         zUcioVjqO6R3XMLe0HegETgy1n60OrBSfeHBpZT10u7ZCotFM1lMopnZtJlQMSXhy2Eh
-         0sgNpc8VFoS0C2SZYoc1R4gz7Y780GJ84/wyVwktG/URdW4XeqgiAq+kNAZf1A57sh5S
-         eegKqtCPQUqfcgEVCfln0FfDoqmzBWn7tcgmltd3jR3RuZAo1huhscra2TpmstmhruEG
-         cEYxlahjXTi2F20AGuIUeEdekUrt5FDsgxi7yJVUDgk/fjlSpCuKC4YDF0q2La6F0vQc
-         R8oA==
-X-Forwarded-Encrypted: i=1; AJvYcCWb1s7fXIJi8YLxl2Glqv98fYEXwUpVNbS+ObjcvyPvuUV8LKdc8rlrJ/3FmbyfbaQyXWaMAwo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySktskck393sclszBdC3bu7+PCYJFM31rcjoMenUChh7aY6O48
-	MWUOsNw5iLpZNOOdEJ2AHHQVy6EQvQhlgRpL5Z7aXOJrFx1vVmsSiuNw8RWEAUzvlDJHXP8QTdb
-	MxRpOaZ/ij39bhqxDRw3tu1wuwQNQTTw=
-X-Gm-Gg: ASbGncuzoyS6FmI6wYCzX+pH8SQbVuszxTnLNQqHDYyUSmPXbTavH8V/cdFY3MEDRiE
-	kTv6DysEYCaQKyfNJtxvduaXcHoRpEg3rCky4OGb70vU42Zs9daNN1HOqwPkgwFWkojruDamRmX
-	oLki+slOB0XqKgmTOEi1rFckcxu6oSGBXt+laHc5s9MoSw5zhtQ8l08OYluVGV+sKh+SziJyqyF
-	iSaMMS//TA21DmW2O/Mr2IOR2Mb/kc6ftWfoXB4UQ+KB9on49MgmnEGo7h967Hm0EKAA/8nIcfe
-	+hwcDvs2DnWI8F8pgUrJ72o+WZtp
-X-Google-Smtp-Source: AGHT+IGLJ+nbQjGFp53SgBuaj7GBJvlo5YLxoq4TlZ1krH5g2A3cvjCUKTQbkdSGyvDEqtgNp6MX3X0+AiCB9ZfW9eU=
-X-Received: by 2002:a05:600c:4583:b0:471:14f5:126f with SMTP id
- 5b1f17b1804b1-4792a4b0848mr3473515e9.33.1764696430746; Tue, 02 Dec 2025
- 09:27:10 -0800 (PST)
+	s=arc-20240116; t=1764696548; c=relaxed/simple;
+	bh=bbyXr8Rsfc1UFlXiWJBghoTTRdZXqJHgATkSXcF1OKs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JE3C8y7DGyglFmTSHUKM+msM+w7/6fhQUJybd+s7bFyQs4hU98/lFziW8OdW7CoJrtet/uAEAzaXtw0E//QDx4w5ef8eIDqCigqa165dTHuRFDgjQy/BAGD7iA5YRF1xgZXxSAOBsZ7BWCgC5kvYjKnp+eTNbbx/81JjO/BUcBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rzSt+A/n; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1764696530;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=mXbJh4w+pouSRV49yhKkyT8jZ3EhfqR8F6nsdHsJ00Y=;
+	b=rzSt+A/n2n/+AjP46vDOkkmHHALSfqeRG9IehgD7Cys7nHIW99RvlnXTndA27Jbi5WYp9Z
+	deE0u43bXMt0Tl1udxFofkZ+FgVHLpGbtWeOILRU/mu4rbh9V8wXtWK4JqnTTK/xlmK6Mp
+	cFdBLWBPsTQxBnP+Hj9dx64lk2+CpcQ=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Dimitri Fedrau <dima.fedrau@gmail.com>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	stable@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] net: phy: marvell-88q2xxx: Fix clamped value in mv88q2xxx_hwmon_write
+Date: Tue,  2 Dec 2025 18:27:44 +0100
+Message-ID: <20251202172743.453055-3-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251202171615.1027536-1-ameryhung@gmail.com>
-In-Reply-To: <20251202171615.1027536-1-ameryhung@gmail.com>
-From: Kumar Kartikeya Dwivedi <memxor@gmail.com>
-Date: Tue, 2 Dec 2025 18:26:33 +0100
-X-Gm-Features: AWmQ_bl2lk2cCWi9ldDTVZI-Wy6MPjSccB7QvC-nW1ieyYidfYW3YZiamy3Jsiw
-Message-ID: <CAP01T75C+Zj12g08q3XE2X+TV8Qwx_dua=s489w71or2bu64gg@mail.gmail.com>
-Subject: Re: [PATCH bpf v2 1/2] bpf: Disallow tail call to programs that use
- cgroup storage
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
-	andrii@kernel.org, daniel@iogearbox.net, martin.lau@kernel.org, 
-	eddyz87@gmail.com, kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, 2 Dec 2025 at 18:16, Amery Hung <ameryhung@gmail.com> wrote:
->
-> Mitigate a possible NULL pointer dereference in bpf_get_local_storage()
-> by disallowing tail call to programs that use cgroup storage. Cgroup
-> storage is allocated lazily when attaching a cgroup bpf program. With
-> tail call, it is possible for a callee BPF program to see a NULL
-> storage pointer if the caller prorgam does not use cgroup storage.
->
-> Reported-by: Yinhao Hu <dddddd@hust.edu.cn>
-> Reported-by: Kaiyan Mei <M202472210@hust.edu.cn>
-> Reported-by: Dongliang Mu <dzm91@hust.edu.cn>
-> Closes: https://lore.kernel.org/bpf/c9ac63d7-73be-49c5-a4ac-eb07f7521adb@hust.edu.cn/
-> Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> ---
->  kernel/bpf/arraymap.c | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
->
-> diff --git a/kernel/bpf/arraymap.c b/kernel/bpf/arraymap.c
-> index 1eeb31c5b317..9c3f86ef9d16 100644
-> --- a/kernel/bpf/arraymap.c
-> +++ b/kernel/bpf/arraymap.c
-> @@ -884,8 +884,9 @@ int bpf_fd_array_map_update_elem(struct bpf_map *map, struct file *map_file,
->                                  void *key, void *value, u64 map_flags)
->  {
->         struct bpf_array *array = container_of(map, struct bpf_array, map);
-> +       u32 i, index = *(u32 *)key, ufd;
->         void *new_ptr, *old_ptr;
-> -       u32 index = *(u32 *)key, ufd;
-> +       struct bpf_prog *prog;
->
->         if (map_flags != BPF_ANY)
->                 return -EINVAL;
-> @@ -898,6 +899,14 @@ int bpf_fd_array_map_update_elem(struct bpf_map *map, struct file *map_file,
->         if (IS_ERR(new_ptr))
->                 return PTR_ERR(new_ptr);
->
-> +       if (map->map_type == BPF_MAP_TYPE_PROG_ARRAY) {
-> +               prog = (struct bpf_prog *)new_ptr;
-> +
-> +               for_each_cgroup_storage_type(i)
-> +                       if (prog->aux->cgroup_storage[i])
-> +                               return -EINVAL;
-> +       }
+The local variable 'val' was never clamped to -75000 or 180000 because
+the return value of clamp_val() was not used. Fix this by assigning the
+clamped value back to 'val', and use clamp() instead of clamp_val().
 
-Would a similar check be needed for extension programs (BPF_PROG_TYPE_EXT)?
+Cc: stable@vger.kernel.org
+Fixes: a557a92e6881 ("net: phy: marvell-88q2xxx: add support for temperature sensor")
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+ drivers/net/phy/marvell-88q2xxx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> +
->         if (map->ops->map_poke_run) {
->                 mutex_lock(&array->aux->poke_mutex);
->                 old_ptr = xchg(array->ptrs + index, new_ptr);
-> --
-> 2.47.3
->
->
+diff --git a/drivers/net/phy/marvell-88q2xxx.c b/drivers/net/phy/marvell-88q2xxx.c
+index f3d83b04c953..201dee1a1698 100644
+--- a/drivers/net/phy/marvell-88q2xxx.c
++++ b/drivers/net/phy/marvell-88q2xxx.c
+@@ -698,7 +698,7 @@ static int mv88q2xxx_hwmon_write(struct device *dev,
+ 
+ 	switch (attr) {
+ 	case hwmon_temp_max:
+-		clamp_val(val, -75000, 180000);
++		val = clamp(val, -75000, 180000);
+ 		val = (val / 1000) + 75;
+ 		val = FIELD_PREP(MDIO_MMD_PCS_MV_TEMP_SENSOR3_INT_THRESH_MASK,
+ 				 val);
+-- 
+Thorsten Blum <thorsten.blum@linux.dev>
+GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
+
 
