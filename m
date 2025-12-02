@@ -1,269 +1,176 @@
-Return-Path: <netdev+bounces-243322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CC72C9D123
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 22:23:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BFEFC9D196
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 22:34:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3B0B44E3F71
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 21:23:24 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 48BD34E395C
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 21:34:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BB7D2F90CA;
-	Tue,  2 Dec 2025 21:23:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31DF92356BE;
+	Tue,  2 Dec 2025 21:34:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l1ppoxtk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C6EVjm4C"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f50.google.com (mail-yx1-f50.google.com [74.125.224.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F41CF2D47E1;
-	Tue,  2 Dec 2025 21:23:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94F0D2E40E
+	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 21:34:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764710603; cv=none; b=ly0R0LDWZ9rt/hg0nwCdyDH/z/aaYtRrjq0Gdjq88ig/m3bIe/fHNmLXTXUKNGr0aUemHuK4H9SER+r5awmPz8Y1S0Wm/hbO6CVNe+VivGnMwfMXgF+qC+4tEmpLo/KbLZ3dbpoWRUE+2FdcOIx1S1B9t4KaryDxFQfVb60h86E=
+	t=1764711258; cv=none; b=pUis4j6fXYosSDm37yT6Pqliffke7JXz0Nezh8cK30XvaFjO1wMCZIWcCieOVCcjtCN9iBwnyEmfC3pK+hdwWbSJlEpXLnuWqUjLhPlVPLlcLKqBbPkXcUFmH0EGlyftQuukXrj/b3FkHHtZgEpxTE//mpLnH7NTR1pYQbjugYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764710603; c=relaxed/simple;
-	bh=3H3i5EY0vUpCRBByCy+K0P1cbdkkSno7+PnmdSTaJIo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IKj4vRnBG2iJDw0/TDFld0t0oq7ncTi6Y7pPkK/9fP/mglgIrlqgrKsCMLk+/V5SHOtDnkt6+5SA2KGbghAnKb9ZDv9q76CUUElZOabT7/L+AUDYpKO9GgKYqokdo8ck7CtI4tRdp57YVAuEu+QiVFiIce1KxkIzAHtgaouZIfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l1ppoxtk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6513EC113D0;
-	Tue,  2 Dec 2025 21:23:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764710602;
-	bh=3H3i5EY0vUpCRBByCy+K0P1cbdkkSno7+PnmdSTaJIo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=l1ppoxtkItiuZr/6lqw+M7aNm5wTd86jaWhsJDU/SN+RZRyM7MZ8fvibjRhL06u32
-	 qgpFCM2GqrxGy+r9v4veRsSNV1v9mmzyxrLiqNhhyZ98dBst6l7i689AvieEpoPgEd
-	 IF047R0qiecT85HnvDHRPL2T+wYoT7RMzjgpi/3qN4N2lN/HyWdB5syihuifHnUKVe
-	 2jTDuJeVoGsphO2aKKWfQp63CaS/3HWRPnJH6m7hLjgh/FZMmeD5bkWZ912QdQWT57
-	 jMufoUGr5ivuWg2E2THXGXc9BafhL+/WJHTX9kK4gto29jY+S/ivSb65zYTq+3Mv/i
-	 TGfoXYra/q0BQ==
-Date: Tue, 2 Dec 2025 15:29:24 -0600
-From: Bjorn Andersson <andersson@kernel.org>
-To: Krishna Chaitanya Chundru <krishna.chundru@oss.qualcomm.com>
-Cc: Manivannan Sadhasivam <mani@kernel.org>, 
-	Jeff Hugo <jeff.hugo@oss.qualcomm.com>, Carl Vanderlip <carl.vanderlip@oss.qualcomm.com>, 
-	Oded Gabbay <ogabbay@kernel.org>, Jeff Johnson <jjohnson@kernel.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, mhi@lists.linux.dev, linux-arm-msm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org, linux-wireless@vger.kernel.org, 
-	ath11k@lists.infradead.org, ath12k@lists.infradead.org, netdev@vger.kernel.org, 
-	mayank.rana@oss.qualcomm.com, quic_vbadigan@quicinc.com, vivek.pernamitta@oss.qualcomm.com
-Subject: Re: [PATCH 2/4] bus: mhi: Remove runtime PM callback ops from
- controller interface
-Message-ID: <pqe2gpbjbqgb42ioebrd6spodovi52x4rkbox5ptavrclwjkf4@rvli6wklilrj>
-References: <20251201-mhi_runtimepm-v1-0-fab94399ca75@oss.qualcomm.com>
- <20251201-mhi_runtimepm-v1-2-fab94399ca75@oss.qualcomm.com>
+	s=arc-20240116; t=1764711258; c=relaxed/simple;
+	bh=EmsEwczpiaola5ElXtwfAQVzqSInkvOEzVpRacRlODU=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=W6jA8BvflnZmXaeaF7Bn9AKRG8QlmYYC1HiPD4Bx+79QJm9AQggm+M+25GjIDSklgdeZE4+RMWk+EkmIbzZlUsKsRIeuNFoO+Ja/N2sFvcoOxqey0seXzOhkUCFsB9kpXaCDbcR4JCIbRHVsRNqvDi/4ZtVNmuUQ6+pGXdqvpFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C6EVjm4C; arc=none smtp.client-ip=74.125.224.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f50.google.com with SMTP id 956f58d0204a3-6432842cafdso5479761d50.2
+        for <netdev@vger.kernel.org>; Tue, 02 Dec 2025 13:34:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764711255; x=1765316055; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=g6hK9g+p/96n31OO0B26q4tuOLGZA8/pIAPxrIeRCzA=;
+        b=C6EVjm4C+u+NzFg06wkBmy1KyggR4/SAhzSIPth28RiWlELyWI7qTZGD5NooCpRcrc
+         jnmwPptH84aVuMIESKdGpuXfpxb5JQeAho0z//qeqVURrx4Q60t8+x6is70NX5AI+bqM
+         rmKo4ld/vKr6LI2YhOqPkHXcP02VfISUXE2SRXYv+6+5+ZTdI2Bh7QY3pAe93s1iVgln
+         F5VgAnoW4UFK7IhaF56tDcWG5SQf7AT6RLGxGoxzQhsEXxiOZkTeNi/HBpzv7ZgRaRvI
+         xLOlqqPNruGDZ4KBOwx5yGR/RZJEpQBWO/qmqdq+5QL0AztjfrIO0luXfkKHIm61yGZi
+         Brsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764711255; x=1765316055;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=g6hK9g+p/96n31OO0B26q4tuOLGZA8/pIAPxrIeRCzA=;
+        b=VwMfkmMpQ8VITuCkEDmHFHQkR0dILPAj/JubOodPkrT5VTmFvwu9xFdiD5UlgV7Wh4
+         UmRRdrU0YYLXokQB4PkoGF0CfuAh4na5gEuMXEvotOp8+iJ8VYNk0Oj3lNw+gRaud90u
+         JNwJiW8CWR/jZ+DnzVjZRGg3YxAEvAigM6CWfSqcCGFC8QBy8qRsa4H4UuhM2NwtjlUU
+         whIGCfLy7ukgp7wtrH97XgstBgm9rpTM3QStuUPmOW/gVquAzDiZtN2FKmSQIhZq35Jm
+         ursxR/cE8ZQJQVzdzJj9CMS1Zg879TIs1MjGxqL1jjvJTFC+84y5BXFY+28ZVmFB/SnW
+         GVVA==
+X-Gm-Message-State: AOJu0Yz31Y1V3jyAZJDsheggH6uPgRKlkeCA8dEbZn7Rb7QYPLLFfnFD
+	obC8vrzrlsIB+DVXitJSyFdwuHNFmNDDxkP6iHN1bCzO2JOLbXn0jPO5
+X-Gm-Gg: ASbGncthiBK9EPtA0KUsqfz2lO3vSZU1GyyBsfsSFEWEJoWJEzz0UUall0ifrqDRRiv
+	Bmsn/KmkKaST5HTVXS7vE39IGLSFpnTh8JW+Tq4A32V1P5A/DwDM0q1MsEu/iqZBiouhQTLe0CV
+	MlnA357ymq+ARCfL1Er0lHqMPrj8peGyzXgLbFvVe+65qCtTw73w7Jmh0U8nyeHv1ci/v7pjz3p
+	mKcBSox2gTOWmjrxLgMyCd3OOfp9sIazcOJt1ud5rLrBjy27VwdAUU4Maox/WXyUYNZ1dsYiYZG
+	URex4TRzkX2o8NVtIc8uEZ/egdj5H/13mbIED9feLZHyIotMC00OIUTBFjVEj+T0SWH8Ul21fDm
+	0JrioGM+sKtDAUWszVold7/B9Y1u7SrpbMi/8QwJv/OmsZXlfV0RzooYEwPFmfqKfKMm3TC5pio
+	6yP49sCKn1ETXjZxPFiMX1qusndNjASkyb5AFEN9FUTIy4XcRqN9FAh+fPuRBsA0Dei74=
+X-Google-Smtp-Source: AGHT+IHPXxH0QF+SOImMEvLWKUCEjNm+rj/AdZon1NUTUlPU12GKLqZILkKfyLi49mbAqJ0CdLkdXA==
+X-Received: by 2002:a05:690e:1387:b0:63f:bb1b:b617 with SMTP id 956f58d0204a3-64436faf39bmr162816d50.8.1764711255492;
+        Tue, 02 Dec 2025 13:34:15 -0800 (PST)
+Received: from gmail.com (116.235.236.35.bc.googleusercontent.com. [35.236.235.116])
+        by smtp.gmail.com with UTF8SMTPSA id 956f58d0204a3-6433c4692a2sm6541931d50.17.2025.12.02.13.34.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Dec 2025 13:34:14 -0800 (PST)
+Date: Tue, 02 Dec 2025 16:34:13 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jon Kohler <jon@nutanix.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+ Jason Wang <jasowang@redhat.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ open list <linux-kernel@vger.kernel.org>
+Message-ID: <willemdebruijn.kernel.42db6f47db6d@gmail.com>
+In-Reply-To: <F48BA9F9-7E15-49B3-896A-5AE367DAD060@nutanix.com>
+References: <20251125200041.1565663-1-jon@nutanix.com>
+ <20251125200041.1565663-4-jon@nutanix.com>
+ <willemdebruijn.kernel.1c90f25a9b9a9@gmail.com>
+ <F48BA9F9-7E15-49B3-896A-5AE367DAD060@nutanix.com>
+Subject: Re: [PATCH net-next v2 3/9] tun: correct drop statistics in
+ tun_put_user
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251201-mhi_runtimepm-v1-2-fab94399ca75@oss.qualcomm.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 01, 2025 at 06:13:18PM +0530, Krishna Chaitanya Chundru wrote:
-> Remove the runtime_get and runtime_put function pointers from the
-> struct mhi_controller interface and all associated usage across the
-> MHI host stack. These callbacks were previously required by MHI drivers
-> to abstract runtime PM handling, but are now redundant.
-> 
-> The MHI core has been updated to directly use standard pm_runtime_*
-> APIs, eliminating the need for driver-specific indirection.
+Jon Kohler wrote:
+> =
 
-Please write your commit messages according to
-https://docs.kernel.org/process/submitting-patches.html#describe-your-changes
+> =
 
-Start by establishing the purpose of the patch/the problem you're
-solving. Then once that's clear you can provide details about the
-change.
+> > On Nov 28, 2025, at 10:07=E2=80=AFPM, Willem de Bruijn <willemdebruij=
+n.kernel@gmail.com> wrote:
+> > =
 
-Regards,
-Bjorn
+> > Jon Kohler wrote:
+> >> Fold kfree_skb and consume_skb for tun_put_user into tun_put_user an=
+d
+> >> rework kfree_skb to take a drop reason. Add drop reason to all drop
+> >> sites and ensure that all failing paths properly increment drop
+> >> counter.
+> >> =
 
-> 
-> Signed-off-by: Krishna Chaitanya Chundru <krishna.chundru@oss.qualcomm.com>
-> ---
->  drivers/accel/qaic/mhi_controller.c   | 11 -----------
->  drivers/bus/mhi/host/pci_generic.c    | 24 +++---------------------
->  drivers/net/wireless/ath/ath11k/mhi.c | 10 ----------
->  drivers/net/wireless/ath/ath12k/mhi.c | 11 -----------
->  include/linux/mhi.h                   |  4 ----
->  5 files changed, 3 insertions(+), 57 deletions(-)
-> 
-> diff --git a/drivers/accel/qaic/mhi_controller.c b/drivers/accel/qaic/mhi_controller.c
-> index 13a14c6c61689fa4af47dade6d62b3cb1a148354..319344be658b38656f6e85e92be4b5473f43c897 100644
-> --- a/drivers/accel/qaic/mhi_controller.c
-> +++ b/drivers/accel/qaic/mhi_controller.c
-> @@ -820,15 +820,6 @@ static void mhi_write_reg(struct mhi_controller *mhi_cntrl, void __iomem *addr,
->  	writel_relaxed(val, addr);
->  }
->  
-> -static int mhi_runtime_get(struct mhi_controller *mhi_cntrl)
-> -{
-> -	return 0;
-> -}
-> -
-> -static void mhi_runtime_put(struct mhi_controller *mhi_cntrl)
-> -{
-> -}
-> -
->  static void mhi_status_cb(struct mhi_controller *mhi_cntrl, enum mhi_callback reason)
->  {
->  	struct qaic_device *qdev = pci_get_drvdata(to_pci_dev(mhi_cntrl->cntrl_dev));
-> @@ -889,8 +880,6 @@ struct mhi_controller *qaic_mhi_register_controller(struct pci_dev *pci_dev, voi
->  	mhi_cntrl->iova_start = 0;
->  	mhi_cntrl->iova_stop = PHYS_ADDR_MAX - 1;
->  	mhi_cntrl->status_cb = mhi_status_cb;
-> -	mhi_cntrl->runtime_get = mhi_runtime_get;
-> -	mhi_cntrl->runtime_put = mhi_runtime_put;
->  	mhi_cntrl->read_reg = mhi_read_reg;
->  	mhi_cntrl->write_reg = mhi_write_reg;
->  	mhi_cntrl->regs = mhi_bar;
-> diff --git a/drivers/bus/mhi/host/pci_generic.c b/drivers/bus/mhi/host/pci_generic.c
-> index b188bbf7de042d8b9aa0dde1217d2c86558c3caf..7036b1654c550a79e53fb449b944d67b68aad677 100644
-> --- a/drivers/bus/mhi/host/pci_generic.c
-> +++ b/drivers/bus/mhi/host/pci_generic.c
-> @@ -1173,23 +1173,6 @@ static int mhi_pci_get_irqs(struct mhi_controller *mhi_cntrl,
->  	return 0;
->  }
->  
-> -static int mhi_pci_runtime_get(struct mhi_controller *mhi_cntrl)
-> -{
-> -	/* The runtime_get() MHI callback means:
-> -	 *    Do whatever is requested to leave M3.
-> -	 */
-> -	return pm_runtime_get(mhi_cntrl->cntrl_dev);
-> -}
-> -
-> -static void mhi_pci_runtime_put(struct mhi_controller *mhi_cntrl)
-> -{
-> -	/* The runtime_put() MHI callback means:
-> -	 *    Device can be moved in M3 state.
-> -	 */
-> -	pm_runtime_mark_last_busy(mhi_cntrl->cntrl_dev);
-> -	pm_runtime_put(mhi_cntrl->cntrl_dev);
-> -}
-> -
->  static void mhi_pci_recovery_work(struct work_struct *work)
->  {
->  	struct mhi_pci_device *mhi_pdev = container_of(work, struct mhi_pci_device,
-> @@ -1277,7 +1260,7 @@ static int mhi_pci_generic_edl_trigger(struct mhi_controller *mhi_cntrl)
->  	}
->  
->  	pm_wakeup_event(&mhi_cntrl->mhi_dev->dev, 0);
-> -	mhi_cntrl->runtime_get(mhi_cntrl);
-> +	pm_runtime_get(mhi_cntrl->cntrl_dev);
->  
->  	ret = mhi_get_channel_doorbell_offset(mhi_cntrl, &val);
->  	if (ret)
-> @@ -1291,7 +1274,8 @@ static int mhi_pci_generic_edl_trigger(struct mhi_controller *mhi_cntrl)
->  	mhi_soc_reset(mhi_cntrl);
->  
->  err_get_chdb:
-> -	mhi_cntrl->runtime_put(mhi_cntrl);
-> +	pm_runtime_mark_last_busy(mhi_cntrl->cntrl_dev);
-> +	pm_runtime_put(mhi_cntrl->cntrl_dev);
->  	mhi_device_put(mhi_cntrl->mhi_dev);
->  
->  	return ret;
-> @@ -1338,8 +1322,6 @@ static int mhi_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->  	mhi_cntrl->read_reg = mhi_pci_read_reg;
->  	mhi_cntrl->write_reg = mhi_pci_write_reg;
->  	mhi_cntrl->status_cb = mhi_pci_status_cb;
-> -	mhi_cntrl->runtime_get = mhi_pci_runtime_get;
-> -	mhi_cntrl->runtime_put = mhi_pci_runtime_put;
->  	mhi_cntrl->mru = info->mru_default;
->  	mhi_cntrl->name = info->name;
->  
-> diff --git a/drivers/net/wireless/ath/ath11k/mhi.c b/drivers/net/wireless/ath/ath11k/mhi.c
-> index acd76e9392d31192aca6776319ef0829a1c69628..18bac9e4bc35bffabef05171b88bd5515e7df925 100644
-> --- a/drivers/net/wireless/ath/ath11k/mhi.c
-> +++ b/drivers/net/wireless/ath/ath11k/mhi.c
-> @@ -230,14 +230,6 @@ static int ath11k_mhi_get_msi(struct ath11k_pci *ab_pci)
->  	return 0;
->  }
->  
-> -static int ath11k_mhi_op_runtime_get(struct mhi_controller *mhi_cntrl)
-> -{
-> -	return 0;
-> -}
-> -
-> -static void ath11k_mhi_op_runtime_put(struct mhi_controller *mhi_cntrl)
-> -{
-> -}
->  
->  static char *ath11k_mhi_op_callback_to_str(enum mhi_callback reason)
->  {
-> @@ -384,8 +376,6 @@ int ath11k_mhi_register(struct ath11k_pci *ab_pci)
->  	mhi_ctrl->sbl_size = SZ_512K;
->  	mhi_ctrl->seg_len = SZ_512K;
->  	mhi_ctrl->fbc_download = true;
-> -	mhi_ctrl->runtime_get = ath11k_mhi_op_runtime_get;
-> -	mhi_ctrl->runtime_put = ath11k_mhi_op_runtime_put;
->  	mhi_ctrl->status_cb = ath11k_mhi_op_status_cb;
->  	mhi_ctrl->read_reg = ath11k_mhi_op_read_reg;
->  	mhi_ctrl->write_reg = ath11k_mhi_op_write_reg;
-> diff --git a/drivers/net/wireless/ath/ath12k/mhi.c b/drivers/net/wireless/ath/ath12k/mhi.c
-> index 08f44baf182a5e34651e8c117fe279942f8ad8f4..99d8d9a8944cefa2561cd47d83bbeb53ef13044d 100644
-> --- a/drivers/net/wireless/ath/ath12k/mhi.c
-> +++ b/drivers/net/wireless/ath/ath12k/mhi.c
-> @@ -230,15 +230,6 @@ static int ath12k_mhi_get_msi(struct ath12k_pci *ab_pci)
->  	return 0;
->  }
->  
-> -static int ath12k_mhi_op_runtime_get(struct mhi_controller *mhi_cntrl)
-> -{
-> -	return 0;
-> -}
-> -
-> -static void ath12k_mhi_op_runtime_put(struct mhi_controller *mhi_cntrl)
-> -{
-> -}
-> -
->  static char *ath12k_mhi_op_callback_to_str(enum mhi_callback reason)
->  {
->  	switch (reason) {
-> @@ -386,8 +377,6 @@ int ath12k_mhi_register(struct ath12k_pci *ab_pci)
->  	mhi_ctrl->sbl_size = SZ_512K;
->  	mhi_ctrl->seg_len = SZ_512K;
->  	mhi_ctrl->fbc_download = true;
-> -	mhi_ctrl->runtime_get = ath12k_mhi_op_runtime_get;
-> -	mhi_ctrl->runtime_put = ath12k_mhi_op_runtime_put;
->  	mhi_ctrl->status_cb = ath12k_mhi_op_status_cb;
->  	mhi_ctrl->read_reg = ath12k_mhi_op_read_reg;
->  	mhi_ctrl->write_reg = ath12k_mhi_op_write_reg;
-> diff --git a/include/linux/mhi.h b/include/linux/mhi.h
-> index dd372b0123a6da5107b807ff8fe940c567eb2030..312e5c4b9cf8a46ffb20e2afc70441a11ecf659c 100644
-> --- a/include/linux/mhi.h
-> +++ b/include/linux/mhi.h
-> @@ -347,8 +347,6 @@ struct mhi_controller_config {
->   * @wake_get: CB function to assert device wake (optional)
->   * @wake_put: CB function to de-assert device wake (optional)
->   * @wake_toggle: CB function to assert and de-assert device wake (optional)
-> - * @runtime_get: CB function to controller runtime resume (required)
-> - * @runtime_put: CB function to decrement pm usage (required)
->   * @map_single: CB function to create TRE buffer
->   * @unmap_single: CB function to destroy TRE buffer
->   * @read_reg: Read a MHI register via the physical link (required)
-> @@ -427,8 +425,6 @@ struct mhi_controller {
->  	void (*wake_get)(struct mhi_controller *mhi_cntrl, bool override);
->  	void (*wake_put)(struct mhi_controller *mhi_cntrl, bool override);
->  	void (*wake_toggle)(struct mhi_controller *mhi_cntrl);
-> -	int (*runtime_get)(struct mhi_controller *mhi_cntrl);
-> -	void (*runtime_put)(struct mhi_controller *mhi_cntrl);
->  	int (*map_single)(struct mhi_controller *mhi_cntrl,
->  			  struct mhi_buf_info *buf);
->  	void (*unmap_single)(struct mhi_controller *mhi_cntrl,
-> 
-> -- 
-> 2.34.1
-> 
-> 
+> >> Signed-off-by: Jon Kohler <jon@nutanix.com>
+> >> ---
+> >> drivers/net/tun.c | 51 +++++++++++++++++++++++++++++++--------------=
+--
+> >> 1 file changed, 34 insertions(+), 17 deletions(-)
+> >> =
+
+> >> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> >> index 68ad46ab04a4..e0f5e1fe4bd0 100644
+> >> --- a/drivers/net/tun.c
+> >> +++ b/drivers/net/tun.c
+> >> @@ -2035,6 +2035,7 @@ static ssize_t tun_put_user(struct tun_struct =
+*tun,
+> >>     struct sk_buff *skb,
+> >>     struct iov_iter *iter)
+> >> {
+> >> + enum skb_drop_reason drop_reason =3D SKB_DROP_REASON_NOT_SPECIFIED=
+;
+> >> struct tun_pi pi =3D { 0, skb->protocol };
+> >> ssize_t total;
+> >> int vlan_offset =3D 0;
+> >> @@ -2051,8 +2052,11 @@ static ssize_t tun_put_user(struct tun_struct=
+ *tun,
+> >> total =3D skb->len + vlan_hlen + vnet_hdr_sz;
+> >> =
+
+> >> if (!(tun->flags & IFF_NO_PI)) {
+> >> - if (iov_iter_count(iter) < sizeof(pi))
+> >> - return -EINVAL;
+> >> + if (iov_iter_count(iter) < sizeof(pi)) {
+> >> + ret =3D -EINVAL;
+> >> + drop_reason =3D SKB_DROP_REASON_PKT_TOO_SMALL;
+> > =
+
+> > PI counts as SKB_DROP_REASON_DEV_HDR?
+> =
+
+> Are you saying I should change this use case to DEV_HDR?
+> =
+
+> This one seemed like a pretty straight forward =E2=80=9CIt=E2=80=99s to=
+o small=E2=80=9D case,
+> no? Or am I misreading into what you=E2=80=99re saying here?
+> =
+
+> Happy to take a suggestion if I=E2=80=99ve got the drop reason wired
+> wrong (or if we need to cook up a brand new drop reason for any of
+> these)
+
+I agree that it's a clear case of the buffer being too small. But I
+consider PI not part of the packet itself, but bad device headers.
+It's borderline nitpicking. With that context, pick which you see fits
+best.=
 
