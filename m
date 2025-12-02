@@ -1,82 +1,72 @@
-Return-Path: <netdev+bounces-243295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243296-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 642EFC9CA7F
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 19:35:46 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 465DBC9CA91
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 19:36:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0CB5B341817
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 18:35:46 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1EAC64E392B
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 18:36:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDD4428C00C;
-	Tue,  2 Dec 2025 18:35:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8A411EB5CE;
+	Tue,  2 Dec 2025 18:36:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GcwsvPGv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vBhdLZyU"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 069A1125D0;
-	Tue,  2 Dec 2025 18:35:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A435D1FDA
+	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 18:36:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764700541; cv=none; b=VYWoE2qcjGDRp40gwYBlqt5ufR2A03cmtuj1/We981Hngyq0f4kuk6Z2yjko+s3JJpXJRslMcsNPjXe/xagWazYJ6HKXaVDxUn2JbEOH1Ff+KgPNshlNCV7WAwYjBiRrKZ3S7YnZE6COuoUM35Fv6qcfV74yn6d0d/MGguzcMtE=
+	t=1764700576; cv=none; b=HOPzOYT4LtPBNsaeaIuT7Q0lNQxkdyQysT8UzGKZcMQ0aZwN8DnirYcquP7hNwQIUCf40eenNgJlAeoRidN/36IdOCh0dkyIM9VUXA2f7yuU3Nfv+ng9T2TErKXD3m9CGGF+/bMgAP+cVuvRMbVyPZrUkhbW3ONF/TD//9pUOR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764700541; c=relaxed/simple;
-	bh=aPc/ZoofQvuYgqSIpXHBG+acWQi/JLSpX5bw5fEmdV4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ODs6dnrqW4SI0Uz1H3si/1pEjao4IXl9HF3lzNcAkF/IKNlCjnRveFDsaJZ9G5btxzWflytsyxd0W14Vj4N/wpTC9g7ft5G+i8XtiPMhRkvqgt8QSsvq6mK1Shw9bg1oYfy9GZPduO7sDRyVwkX1kzImMnkUMg+aUkAcxZ0VTyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GcwsvPGv; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Un+nGjWShWaSygwAYN5k2vwmsItzcO4zzrq1NudXsbg=; b=GcwsvPGvVEqp5fwUVrgdsmiAU9
-	PBgT6ZUaBqAA2WWDq7wRkLJgGL3nh67FOcVhzEV9/hURDCz70P3/IuqzMyzizPH+v3/Yg44+l0PGb
-	jTPDNHACm8SiEw5DZphTXAKo2c4pG9ogbaa+Op+vETeUn9sr5eH/SPZLoI4AQdmSwZc8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vQVDe-00Fj9V-JH; Tue, 02 Dec 2025 19:35:22 +0100
-Date: Tue, 2 Dec 2025 19:35:22 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Dimitri Fedrau <dima.fedrau@gmail.com>, stable@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: phy: marvell-88q2xxx: Fix clamped value in
- mv88q2xxx_hwmon_write
-Message-ID: <03da7783-ec16-4a3d-aa48-f5f73bc8b6f3@lunn.ch>
-References: <20251202172743.453055-3-thorsten.blum@linux.dev>
+	s=arc-20240116; t=1764700576; c=relaxed/simple;
+	bh=yQgqsiygSaMJpkmvOUK9aemziX5h+9PzpA/FfdGF87g=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ngdIpYCSFGr3+UWjKFH4pp4ZUsYrsvO0B/bLKid/2ofNCYV/YbDOduMcDwKg2eu0VimRlQpk6zj3zAchHIuyiPjK/txZLGNzxugY6W2y9LTUxXIaWs0UdND2wgAEtTinbC6ghtxB+de7etY15zKRlpH9X3pzK4KIpx4PqdOHIO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vBhdLZyU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A84B6C4CEF1;
+	Tue,  2 Dec 2025 18:36:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764700576;
+	bh=yQgqsiygSaMJpkmvOUK9aemziX5h+9PzpA/FfdGF87g=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=vBhdLZyUIJxX3qFGn+1p1zfpDXi4JrkXnRLoyId49gMS1/SXmjPkJ4Nnf57igtPaH
+	 I/olXQCHfoPjw5pbnNrA0Fond5qVj9DcisoZwGzX7EsvBR8Vh5gGq6Ho2AC9equBid
+	 LhdQXl6tKAGIM5bORYZl57dWUqhhXKRymnNSD7T7yvnMdJmX+LhWzAeq5UAeoJJpd9
+	 hpN7EA8ftOaRejC1KTKy4Dh9ICoj3AbTlIeReLheXhBiS6ZDoRaRPJwkVft/SvrfjX
+	 xQBeel4PJQezO/vuZcR276e3+jk/bKwCT8NMXWTVDTCOHRAKiQsExMuXbpjY/M2+XX
+	 Hn+rvqc6JI4pQ==
+Date: Tue, 2 Dec 2025 10:36:14 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: 2694439648@qq.com
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+ hailong.fan@siengine.com, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, inux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] net: stmmac: Modify the judgment condition of
+ "tx_avail" from 1 to 2
+Message-ID: <20251202103614.6a185bf6@kernel.org>
+In-Reply-To: <tencent_4A0CBC92B9B22C699AC2890E139565FCB306@qq.com>
+References: <tencent_4A0CBC92B9B22C699AC2890E139565FCB306@qq.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251202172743.453055-3-thorsten.blum@linux.dev>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Dec 02, 2025 at 06:27:44PM +0100, Thorsten Blum wrote:
-> The local variable 'val' was never clamped to -75000 or 180000 because
-> the return value of clamp_val() was not used. Fix this by assigning the
-> clamped value back to 'val', and use clamp() instead of clamp_val().
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: a557a92e6881 ("net: phy: marvell-88q2xxx: add support for temperature sensor")
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+On Tue,  2 Dec 2025 15:43:59 +0800 2694439648@qq.com wrote:
+> -	if (unlikely(stmmac_tx_avail(priv, queue) <= (MAX_SKB_FRAGS + 1))) {
+> +	if (unlikely(stmmac_tx_avail(priv, queue) <= (MAX_SKB_FRAGS + 2))) {
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-    Andrew
+Also, if there isn't a comment already somewhere - it's worth
+documenting what the + 2 stands for. head buffer + vlan + frags ?
 
