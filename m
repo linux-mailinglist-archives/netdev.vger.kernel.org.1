@@ -1,175 +1,79 @@
-Return-Path: <netdev+bounces-243232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEA31C9BFA9
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 16:36:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 107A6C9BFF4
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 16:42:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E4894348F9F
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 15:36:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B90993A12F8
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 15:41:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7E4D27146B;
-	Tue,  2 Dec 2025 15:36:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB418288530;
+	Tue,  2 Dec 2025 15:41:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EUjJGrVq"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="fjiviGxS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5120E265630
-	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 15:36:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF9823AB95
+	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 15:41:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764689808; cv=none; b=dTMNlQrgkeInJAhIgWepMGp6ChsSI2NX8RAlwR61QwWvHseBxzosLv/akrVw+naTaruFSNmbXgn/35eM0SvKF19dEUYgsiHnxAzlN4irdl0jWUViSNjaFMmgrJ+pA7AR9KoJxlB3Jew74p9Lw6D6/5TrU3sQCG5nIgfb4LkSIKk=
+	t=1764690116; cv=none; b=N5psOQNTs8Z7uqDAcHM7FnkM4lR/iZ+cyd0mjTSGU9bjorad669p3//14zt46QGnuUsMZOrjtpvzAVUqxdOc5xpLpL3AV6d5cR/S9P6oHtmb1GRpA1ZAo4UMQo8BtZQ4BLy7zBhSOkl6YP5cGNJG1dHSsJV8k43e7t7Y5mi7FBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764689808; c=relaxed/simple;
-	bh=Db+OBahDEdS2FWtuRKdcfD0E3xT8MskdpMGxiZaWAN4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PJ9mrRUA4wXzEiRpM3dAZuDDYopc8Pxqlzji/TIekoy/dh1dmanP6NRGg3Cr2WEmRfJ/JWksF0caXesUgjIP5NZdLJzs88En7jTVuS5sUygU32sASwx+oR6FockNnFVKDxos1JliFdKrVmuPEeXI1BtHrsf4W9q0jr/bWa8aXuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EUjJGrVq; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7aa9be9f03aso4805222b3a.2
-        for <netdev@vger.kernel.org>; Tue, 02 Dec 2025 07:36:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764689805; x=1765294605; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=y5I8W9mCKKh4ntYi6nw19VUMXjIpYmpQtM91U31imtE=;
-        b=EUjJGrVqqUAA8XrB78BW77prLUhGARskIj14+xP8ONvYeAu5udfSqREZlvsOhzxJXr
-         hE1zkIC1UjsHIKDyrckOvczoZH0OZD7MiGkmZtXbjZ5b+1fxfAZKdey1+pXJPkTTuC8z
-         JxTEEoD90zZ7c/HPUpWZ8E86bgib3NMnLmce+4WsK+Fbn2UgTFi8Kg2CSNK0T7acShlJ
-         V8KF9jBUPp8V1IO4GcUL6BGD5tAPghCHn8OBUTyeUvHiOxzY90pT+xv3ocTRf4pVlpU0
-         RPqFQlYo2sv+om0+OMQYussUdBlqcCor0mQYS6ZA+v/GRumVWJUwr5NpTeKf2DE3cUGx
-         qLdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764689805; x=1765294605;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=y5I8W9mCKKh4ntYi6nw19VUMXjIpYmpQtM91U31imtE=;
-        b=Kv+E3dHw/UIGPd1D0tqkzI0uiv4jh219X/uDpj0mQ4LRDs1Y6WYZH/8NcDU3D8DvAv
-         NxvRqxouiRBLPN2vUim7ICkCfEZleWe3fKDMVNBT9Xr8aKYNwkFqQBdaDp0pwtlKPSyj
-         weSQOsvHzsoJMGQdDsUgQDqZE2k+sV9XgqisO+M9jvcuHbam4UUr1fLHurk1kDF/9dDo
-         eBBi1YlYK5GYdV8wZzxgcn+4QoLu5Yha9u3Hdmh0rHPZQBL1bhhDCun1wAHlZH0NBTzl
-         lX/Uej4r0f0hItmKnB4PSJXL8joePSvnqyKrNtQM9D8gqdj3bW6Z0UPBd2q1v/fSlry1
-         jBGw==
-X-Forwarded-Encrypted: i=1; AJvYcCVBhnqBpEmZnk4o9tF8zddawSYPPRp0ZGu8Kbs1jTednvOc3IVLtVzx+xhEJ2PTLJB8ZgfmFgs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHtqyVUV3tyn8WSsVsl9Jr3p7jAt76ptiWSLnlxt86F1y1BCHn
-	4efH2wHLrUPQ6pp4N7ElkKviKipk5ga8qlz2MYA98ksLhkXnyIkavbV6
-X-Gm-Gg: ASbGncvd5fS3TB1Noc9Nc7T53syfcVyM9cNc74VOaC2nP8/o/1xQwwunQM5PE+4DVCt
-	nf0cgSnEtK3ZP8wAKAdk+Om6gcAe5jQZWeC6Kne5k7SvkMRGIR7d4Fd5/hR5L86eh4HbKFTy2Km
-	PIM+86mitKp6FGipBF5Oi9BVCyX1ZIkfarjyu0dhV5ZFqAvcibMJ0t+aZIaI0bgjB97ViMzVs0Q
-	F8k6G68lXwtJoEnwP+giwNJa0z/KOsEjClRPcjTQJybLcYgLXpwUNn2EeYdWjfTpyIe+rXSNl+X
-	D9KVm9xXBF55NrBR//Awxzoc78fH32Pa2ZvLXVSCm5nYTnCx2RaRwJi7QPIfQPNuvH/Ccgj7Ww6
-	XTLP0vfaHcbwZjJpxS0qw0JP4Sme/U5RP3N7QoiVpB5saFrrm8J6yNnYjB+3WvVvXgyA6DKC5Wm
-	R1QX9TyfyESICwj81caoB40fIS2kCUMIrBW5ZN0Ezm0CDI6qJM8I+u8yc6pamYicLIUnmxQ0YDc
-	O6R5/vwQUPH+vEsqQ2hWIzBQksTUomTz59D5E1VCXHZ6507xSPoxgNQ2g==
-X-Google-Smtp-Source: AGHT+IGO0QrCd54Wl9B5liFX1HiSQC6tv9OYtUHS1BvuOAQRQdtSamONXdsxZaJpelkWSRGSbiFnog==
-X-Received: by 2002:a05:6a20:939d:b0:342:9cb7:64a3 with SMTP id adf61e73a8af0-36150ef868fmr43973180637.34.1764689805255;
-        Tue, 02 Dec 2025 07:36:45 -0800 (PST)
-Received: from [192.168.1.133] (50.2.111.219.st.bbexcite.jp. [219.111.2.50])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7d15fb1486asm17290721b3a.61.2025.12.02.07.36.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Dec 2025 07:36:44 -0800 (PST)
-Message-ID: <939d12e3-550d-44b7-8968-b09755b61bab@gmail.com>
-Date: Tue, 2 Dec 2025 15:36:39 +0000
+	s=arc-20240116; t=1764690116; c=relaxed/simple;
+	bh=wvY1L8zYkyr9nSF3OWDfGXWvbfdGQHsF5YwL/Kljws8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i3xvq3Xo5miFDyVx03mT6h0aEjksq2yQ6T6SJPVnEsXrHEe+Dd1SWqjUX3eXkixgHcPa7wnyco4mHSEw980FknraQlJcTeUXGLI16pAGeOxGVqkc5rsxZLKX1Q1Z5sEKFhok1FHg+OLyIuYJYy78cuShAkX1j5TQxXtsxvlsmTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=fjiviGxS; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=zGJgb05jkPrXibYMPvxj+6+xMRK2J7E1glNDjEhvY4Y=; b=fjiviGxSD7cQHcbrFhLqGenhOh
+	vrAZOI0MGYo/Udi/zXn3Gj4qEGBRGTnbmA8+DS2Ii75W+AwjYfrTyyuOAT/6QmsxnkRHuzbNfoeCd
+	LLvb/TPwty1owlBbGK4vy+hfrNIEp09UhjYB3i5Zj1hmvNdG60i+IaEpsWXtOzZ5DUfk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vQSVh-00FiFH-OJ; Tue, 02 Dec 2025 16:41:49 +0100
+Date: Tue, 2 Dec 2025 16:41:49 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?iso-8859-1?Q?Ren=E9?= Rebe <rene@exactco.de>
+Cc: netdev@vger.kernel.org, Heiner Kallweit <hkallweit1@gmail.com>,
+	nic_swsd@realtek.com
+Subject: Re: [PATCH] r8169: fix RTL8117 Wake-on-Lan in DASH mode
+Message-ID: <f14f1078-311e-47ff-ad5f-01d2fd9ea40d@lunn.ch>
+References: <20251201.201706.660956838646693149.rene@exactco.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 0/9] Add support for providers with large rx
- buffer
-To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Michael Chan <michael.chan@broadcom.com>,
- Pavan Chebbi <pavan.chebbi@broadcom.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>, Shuah Khan
- <shuah@kernel.org>, Mina Almasry <almasrymina@google.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Yue Haibing <yuehaibing@huawei.com>,
- David Wei <dw@davidwei.uk>, Haiyue Wang <haiyuewa@163.com>,
- Jens Axboe <axboe@kernel.dk>, Joe Damato <jdamato@fastly.com>,
- Simon Horman <horms@kernel.org>, Vishwanath Seshagiri <vishs@fb.com>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- io-uring@vger.kernel.org, dtatulea@nvidia.com
-References: <cover.1764542851.git.asml.silence@gmail.com>
- <743e8c49-8683-46b7-8a8f-38b5ec36906a@redhat.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <743e8c49-8683-46b7-8a8f-38b5ec36906a@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251201.201706.660956838646693149.rene@exactco.de>
 
-On 12/2/25 14:44, Paolo Abeni wrote:
-> On 12/1/25 12:35 AM, Pavel Begunkov wrote:
->> Note: it's net/ only bits and doesn't include changes, which shoulf be
->> merged separately and are posted separately. The full branch for
->> convenience is at [1], and the patch is here:
->>
->> https://lore.kernel.org/io-uring/7486ab32e99be1f614b3ef8d0e9bc77015b173f7.1764265323.git.asml.silence@gmail.com
->>
->> Many modern NICs support configurable receive buffer lengths, and zcrx and
->> memory providers can use buffers larger than 4K/PAGE_SIZE on x86 to improve
->> performance. When paired with hw-gro larger rx buffer sizes can drastically
->> reduce the number of buffers traversing the stack and save a lot of processing
->> time. It also allows to give to users larger contiguous chunks of data. The
->> idea was first floated around by Saeed during netdev conf 2024 and was
->> asked about by a few folks.
->>
->> Single stream benchmarks showed up to ~30% CPU util improvement.
->> E.g. comparison for 4K vs 32K buffers using a 200Gbit NIC:
->>
->> packets=23987040 (MB=2745098), rps=199559 (MB/s=22837)
->> CPU    %usr   %nice    %sys %iowait    %irq   %soft   %idle
->>    0    1.53    0.00   27.78    2.72    1.31   66.45    0.22
->> packets=24078368 (MB=2755550), rps=200319 (MB/s=22924)
->> CPU    %usr   %nice    %sys %iowait    %irq   %soft   %idle
->>    0    0.69    0.00    8.26   31.65    1.83   57.00    0.57
->>
->> This series adds net infrastructure for memory providers configuring
->> the size and implements it for bnxt. It's an opt-in feature for drivers,
->> they should advertise support for the parameter in the qops and must check
->> if the hardware supports the given size. It's limited to memory providers
->> as it drastically simplifies implementation. It doesn't affect the fast
->> path zcrx uAPI, and the sizes is defined in zcrx terms, which allows it
->> to be flexible and adjusted in the future, see Patch 8 for details.
->>
->> A liburing example can be found at [2]
->>
->> full branch:
->> [1] https://github.com/isilence/linux.git zcrx/large-buffers-v7
->> Liburing example:
->> [2] https://github.com/isilence/liburing.git zcrx/rx-buf-len
-> 
-> Dump question, hoping someone could answer in a very short time...
-> 
-> Differently from previous revisions, this is not a PR, just a plain
-> patch series - that in turn may cause duplicate commits when applied on
-> different trees.
-> 
-> Is the above intentional? why?
+> While at it, enable wake on magic packet by default, like most other
+> Linux drivers do.
 
-It was based on linus-rc* before and getting merged nice and clean,
-now there is a small conflict. In my view, it should either be a
-separate pull to Linus that depends on the net+io_uring trees if
-Jens would be willing to orchestrate that, or I'll just merge the
-leftover io_uring patch for-6.20. In either case, this set shouldn't
-get applied to any other tree directly.
+Please give examples, because i think that is false.
 
--- 
-Pavel Begunkov
+You should have the option to enable any WoL mode the hardware
+supports, but none should be enabled by default.
 
+> There is still another issue that should be fixed: the dirver init
+> kills the OOB BMC connection until if up, too. We also should probaly
+> not even conditionalize rtl8168_driver_stop on wol_enabled as the BMC
+> should always be accessible. IMHO even on module unload.
+
+Is there any way to know there is a BMC connected?
+
+   Andrew
 
