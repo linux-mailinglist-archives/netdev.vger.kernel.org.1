@@ -1,126 +1,123 @@
-Return-Path: <netdev+bounces-243275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id B30AAC9C691
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 18:35:26 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7608CC9C697
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 18:35:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EB87D345320
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 17:35:23 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DB5E14E2F88
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 17:35:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF75F2C0F97;
-	Tue,  2 Dec 2025 17:35:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 314952C0F93;
+	Tue,  2 Dec 2025 17:35:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jFoARJmx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50F832BEFEB;
-	Tue,  2 Dec 2025 17:35:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A66257AD1;
+	Tue,  2 Dec 2025 17:35:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764696913; cv=none; b=Ik0gUge1ODKkSaStCADzz9skRT1UtSXKbaZnfaSCzq9id436xoZUvqn+pyBA6K+NdJX+wxbmyU6QeglvAjj9PYQqasniot2d0mCpi0sr//cQQ+uDSy3eJVZtxpDH8+dAQW110CF1Pus2mzdunz9B5jFNJERO46dRbILyyGy7mGo=
+	t=1764696937; cv=none; b=cmCkcHQjciENNG+v6Zm679YnxjeTit3sP9EANYfX3ClT+x4Ezk+P3q9i6F8WRiT9NxmwGjGVpbgZ8iw0s2kkWUIWIOWL08ZU3Buzf7/npCPnQwF2pbo73WoLlhrViaydhu1mMnOlh9ZGG4xMDO35/GnuDcKGLU7NmHnsWKxbg28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764696913; c=relaxed/simple;
-	bh=x4o9HIWheh9sz5INWZqpUCNN1YHDEOJZHw96pD53mwU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VKK1nPWR2tuDmPJ7tM8ZeTAzNtb6ulDBmIlfwk5XYGFmVvLmUXLUJh0bSHoTShJQpcYLkPFOQFKpSIISaTY9j8AlzmdfuxQUzewGBSCKV0U5jROYFjO6K1oYJueLQO6re24XqoenDwfdtLxszz3pQaFDeK6EOx9wbjOXhj07/R8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id AFCF961CC3FF3;
-	Tue, 02 Dec 2025 18:34:17 +0100 (CET)
-Message-ID: <a5c2ee3c-6643-4e67-acba-44384706e971@molgen.mpg.de>
-Date: Tue, 2 Dec 2025 18:34:17 +0100
+	s=arc-20240116; t=1764696937; c=relaxed/simple;
+	bh=sMJyCKb0Kki65z+BAhXWZmxiCaqZb6FZukt4DZH8U3s=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=BQVhXF/8+nFbqu5C6R1/b4OzgbcJlPMYSE/4qFWH/CXnKL7RJG59eSLpK4fRsTJehuXeLriFdYy4g8y4PnhMYRP5lMpLeqLgbs/aGxpSjiHA64W19tK7CxooeLzoO6PvHpVEQ2xVrCLhEeX3YUexfUbm9in0K73TZbqBF6Lmavk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jFoARJmx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9569BC4CEF1;
+	Tue,  2 Dec 2025 17:35:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764696936;
+	bh=sMJyCKb0Kki65z+BAhXWZmxiCaqZb6FZukt4DZH8U3s=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
+	b=jFoARJmxI/c5l9oTgHrmTwfj9acs0AH092KG5/6yiSCvsLVLnLPul3grZh2bq1PL5
+	 wemBfLi8+bqNKua/g36qj2TJOvrxpOBJOmsTGszBRHtiCJxKr5cOwduNPQyxpzpTHh
+	 Q3Lrwr7rTq69ZBGMP1LYuEPZh2rrzVuWKTcsrbS3WZPnbIx8Ds3ItvJrLKy/4iMAhf
+	 iP1X8w3I4NtdhTwMkt5dowBaO3KTyn6jhJSD/R9483tGnnechELt/Fjcq33rqLza2a
+	 goKwSh5hklq+8sztgykrC3E1o+TQplMFb/txU9nHvu35RFa5fTL93YJVsohUS8ddjA
+	 Y2OJ0U4FaWmFg==
+Content-Type: multipart/mixed; boundary="===============2761046317332136558=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net v1] igc: Use 5KB TX packet
- buffer per queue for TSN mode
-To: Chwee-Lin Choong <chwee.lin.choong@intel.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Zdenek Bouska <zdenek.bouska@siemens.com>,
- Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-References: <20251202122351.11915-1-chwee.lin.choong@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20251202122351.11915-1-chwee.lin.choong@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Message-Id: <b52396ff5028256639d3e9721b0976e28be6b721cec0e36cfe190e30884e189f@mail.kernel.org>
+In-Reply-To: <20251202171615.1027536-1-ameryhung@gmail.com>
+References: <20251202171615.1027536-1-ameryhung@gmail.com>
+Subject: Re: [PATCH bpf v2 1/2] bpf: Disallow tail call to programs that use cgroup storage
+From: bot+bpf-ci@kernel.org
+To: ameryhung@gmail.com,bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,alexei.starovoitov@gmail.com,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,ameryhung@gmail.com,kernel-team@meta.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Tue,  2 Dec 2025 17:35:35 +0000 (UTC)
 
-Dear Chwee-Lin,
+--===============2761046317332136558==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
+> diff --git a/kernel/bpf/arraymap.c b/kernel/bpf/arraymap.c
+> index 80b1765a3..fbfc45ed9 100644
+> --- a/kernel/bpf/arraymap.c
+> +++ b/kernel/bpf/arraymap.c
+> @@ -892,8 +892,9 @@ int bpf_fd_array_map_update_elem(struct bpf_map *map, struct file *map_file,
+>  				 void *key, void *value, u64 map_flags)
+>  {
+>  	struct bpf_array *array = container_of(map, struct bpf_array, map);
+> +	u32 i, index = *(u32 *)key, ufd;
+>  	void *new_ptr, *old_ptr;
+> -	u32 index = *(u32 *)key, ufd;
+> +	struct bpf_prog *prog;
+>
+>  	if (map_flags != BPF_ANY)
+>  		return -EINVAL;
+> @@ -906,6 +907,14 @@ int bpf_fd_array_map_update_elem(struct bpf_map *map, struct file *map_file,
+>  	if (IS_ERR(new_ptr))
+>  		return PTR_ERR(new_ptr);
+>
+> +	if (map->map_type == BPF_MAP_TYPE_PROG_ARRAY) {
+> +		prog = (struct bpf_prog *)new_ptr;
+> +
+> +		for_each_cgroup_storage_type(i)
+> +			if (prog->aux->cgroup_storage[i])
+> +				return -EINVAL;
+> +	}
+> +
 
-Thank you for your patch.
+Does this leak the program reference acquired from map_fd_get_ptr()?
 
-(Just a heads-up, that Zdenek’s email address was not properly quoted in 
-the Cc: list.)
+In bpf_fd_array_map_update_elem(), the call to map->ops->map_fd_get_ptr()
+at line 906 acquires a reference to the program. Looking at
+prog_fd_array_get_ptr(), this increments both the program refcount via
+bpf_prog_get() and prog->aux->prog_array_member_cnt.
 
-In the summary you could be more specific to say, that you *decrease* 
-the size.
+When returning -EINVAL after the cgroup storage check, shouldn't the code
+call map->ops->map_fd_put_ptr(map, new_ptr, true) to properly release
+these resources? The normal cleanup path at the end of the function calls
+map_fd_put_ptr() for old_ptr, and prog_fd_array_put_ptr() decrements
+both prog_array_member_cnt and calls bpf_prog_put().
 
-Am 02.12.25 um 13:23 schrieb Chwee-Lin Choong:
-> Update IGC_TXPBSIZE_TSN to allocate 5KB per TX queue (TXQ0-TXQ3)
-> as recommended in I225/I226 SW User Manual Section 7.5.4 for TSN
-> operation.
+Without this cleanup, the program would have a leaked reference and an
+incorrect prog_array_member_cnt value.
 
-Please elaborate on the problem (mention the 7 KB size and hangs), and 
-maybe Faizal remembers why they chose 7 KB.
+>  	if (map->ops->map_poke_run) {
+>  		mutex_lock(&array->aux->poke_mutex);
+>  		old_ptr = xchg(array->ptrs + index, new_ptr);
 
-Also, are there any performance drawbacks. (I know that avoiding hangs 
-tops that, but it would be good to know.)
-
-> Fixes: 0d58cdc902da ("igc: optimize TX packet buffer utilization for TSN mode")
-> Reported-by: Zdenek Bouska <zdenek.bouska@siemens.com>
-> Closes: https://lore.kernel.org/netdev/AS1PR10MB5675DBFE7CE5F2A9336ABFA4EBEAA@AS1PR10MB5675.EURPRD10.PROD.OUTLOOK.COM/
-> Signed-off-by: Chwee-Lin Choong <chwee.lin.choong@intel.com>
-> ---
->   drivers/net/ethernet/intel/igc/igc_defines.h | 5 +++--
->   1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/igc/igc_defines.h b/drivers/net/ethernet/intel/igc/igc_defines.h
-> index 498ba1522ca4..9482ab11f050 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_defines.h
-> +++ b/drivers/net/ethernet/intel/igc/igc_defines.h
-> @@ -443,9 +443,10 @@
->   #define IGC_TXPBSIZE_DEFAULT ( \
->   	IGC_TXPB0SIZE(20) | IGC_TXPB1SIZE(0) | IGC_TXPB2SIZE(0) | \
->   	IGC_TXPB3SIZE(0) | IGC_OS2BMCPBSIZE(4))
-> +/* TSN value following I225/I226 SW User Manual Section 7.5.4 */
->   #define IGC_TXPBSIZE_TSN ( \
-> -	IGC_TXPB0SIZE(7) | IGC_TXPB1SIZE(7) | IGC_TXPB2SIZE(7) | \
-> -	IGC_TXPB3SIZE(7) | IGC_OS2BMCPBSIZE(4))
-> +	IGC_TXPB0SIZE(5) | IGC_TXPB1SIZE(5) | IGC_TXPB2SIZE(5) | \
-> +	IGC_TXPB3SIZE(5) | IGC_OS2BMCPBSIZE(4))
-
-Reading the commit message of commit 0d58cdc902da ("igc: optimize TX 
-packet buffer utilization for TSN mode"), it says, that the goal is to 
-split up 32 KB. What is happening to the 8 KB that are freed up now?
-
->   #define IGC_DTXMXPKTSZ_TSN	0x19 /* 1600 bytes of max TX DMA packet size */
->   #define IGC_DTXMXPKTSZ_DEFAULT	0x98 /* 9728-byte Jumbo frames */
-
-With a more elaborate commit message, feel free to add:
-
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+[ ... ]
 
 
-Kind regards,
+---
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 
-Paul
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/19867449786
+
+--===============2761046317332136558==--
 
