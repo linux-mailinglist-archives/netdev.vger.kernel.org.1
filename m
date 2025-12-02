@@ -1,102 +1,172 @@
-Return-Path: <netdev+bounces-243225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF3C9C9BEF0
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 16:24:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 78671C9BF16
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 16:29:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D60884E13DC
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 15:24:29 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A584E4E3558
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 15:29:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D57AE24BBEE;
-	Tue,  2 Dec 2025 15:24:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ifZRCRUx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C55FA261B77;
+	Tue,  2 Dec 2025 15:29:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA43213D891;
-	Tue,  2 Dec 2025 15:24:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 215E22561A2
+	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 15:29:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764689066; cv=none; b=s27xNZbjtYJ4W5b3odJEfoQftv18y05ZgyuywRG99JgDnpzvZ5FXnLGTjx7DOvLUGUq4Uu1pV+QKe5yL/lQjB469OmBVFaFPzQm4Mjgnm94bMc3KlJwY1SZ+KuI6azod3r5y2D/sYjhpUHc+/u9FK4o7khpxGJ/ylQM1apKUzj8=
+	t=1764689363; cv=none; b=GzhLLEUKvAG82dMxQPiWLtkGhdpH0rQIMy26WxQkY4jo0OdI15iX52iWtXdo3fEngcrD6l9JsaekoFVlaTIKVCu10sTKUk4OHbVdGHIcEPiLYLf1RhDP6UZiWKiGyToQoiQASxDbxh4CYz8v9h8UrH3GQXCy8yPoFaow0e2xNMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764689066; c=relaxed/simple;
-	bh=v2RVGAjLwEszDVgjudJDCI9J7LHEnzEKmt1lYJDEido=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Eh5bs1y3owwqCqV4m7ZaGf78Q8SeGw1No1VkIsMK00FzzoOzUztJjb7AX3kDXg0IdoDEklz9bHBbuesJTWGd0X1aMfXqvCAcmXIb98S4bTdeBz3/kmkSLmZBDnevx9K5jnTCO8V20OkNeyZGQakmMLbqxiuOGGlSLMESHMhuu/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ifZRCRUx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FF90C4CEF1;
-	Tue,  2 Dec 2025 15:24:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764689066;
-	bh=v2RVGAjLwEszDVgjudJDCI9J7LHEnzEKmt1lYJDEido=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ifZRCRUxM+X9CeSmrhoX7a7JxoBC0wCimXvtvqqcoqTJJosA7wl25cpDfuXk5S5vm
-	 Cbv+k/O0iu5i1Gs57n/R6uK9gXozOq7URieS8Whbjwo4tAu1jWJ4w/jeA9k2ec+0PS
-	 5NYsAoRf1mXzWot+GXUmk2IHV+6tPBoocdlUCYW1tHXu/7SqQEHPJwmrQaNzaYT55H
-	 khcE7gQpsXLSyPR1rgHdckyd2k7u4eDo3KnETmp6EY8zX8Ja7pYJZoMeubHQsXJMhz
-	 iOatb3XJpTnKtpGokWX8As78PvrnIrG3WpfsVFlmRlNQSNFC2MJpokgIlyQzyLkG9R
-	 IiuTaCd69iWsA==
-Date: Tue, 2 Dec 2025 15:24:21 +0000
-From: Simon Horman <horms@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Saeed Mahameed <saeedm@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Gal Pressman <gal@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
-	Cosmin Ratiu <cratiu@nvidia.com>
-Subject: Re: [PATCH net 2/2] net/mlx5e: Avoid unregistering PSP twice
-Message-ID: <aS8EpZ3UYkfwpCyH@horms.kernel.org>
-References: <1764602008-1334866-1-git-send-email-tariqt@nvidia.com>
- <1764602008-1334866-3-git-send-email-tariqt@nvidia.com>
+	s=arc-20240116; t=1764689363; c=relaxed/simple;
+	bh=2uFsDpqq/ViHlXDJHGHyC0YbbbBA4cCaUec80Nl1zC4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=AR83GRbC76eYLGJLGc19IbyXRxDEI7DSTDYcgXWrfkDmHHlQdP9gVdaEmL7bW3THFJ99oLc22O2tXAp8orfs89uBn4VkXb53z3zFBtlt262l5tEUzc/8KdgNrkZbZB9mhUumarJYpp2MPJwHwhqr9okObkPG6LlvkmGuUmoIz6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.161.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-6574ace76dbso2386812eaf.3
+        for <netdev@vger.kernel.org>; Tue, 02 Dec 2025 07:29:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764689361; x=1765294161;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AZI0glXaDFhF3YfXt3h99EbqIxzmy1eUUZ0Jtger038=;
+        b=WsftozcuxrrqdAwiopRo4l987n5/yI0JyJv7GJ7JFNTJbjtphQ16poahFKHE1qJSNs
+         ixbvbU2iK3s/J7ntXhOBvJZKijPBhyUpaPQrRKki0C8LAxt597fCkXUV/pf8M2sRZ3cR
+         kBFCZ0je+g4xFshZgWIAoFDEvaXU1oaxysjQ+ai/vHv9rsk6xkbLj+140IRbEEvj+nuQ
+         1zEJBqjQrcpjxqIxjTWvaT2aI8USw/aOkwQmodKARRjnmkykxi6DKSTHU9lRMIqtVOHI
+         SRR+E6aVGR5xEhKK/HmhlqlnqC1ghiMvyCtUHVo6mlr0V4PFi2wXykgmwYKTo0AJSA+V
+         SqLg==
+X-Forwarded-Encrypted: i=1; AJvYcCUnN+y+7NSSUkEorczmTG1H2BI2WjMo6mo1nbwo2WtCUmKD/XWWxDEgwmH/N6sc9tjoowyx92E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgnU7q4ux6dYN0FvZjyndQ9KrnWOyYyZzhphvEoMBdTWuQQYef
+	Pqzpj+FMFVlDynxIdag/gO5jLA7by2pBfh8OUKI2NRatIE89CTl5PhjF
+X-Gm-Gg: ASbGncuUWQ9AMG0jc/Gy02z5ertETFPiemRylexLk5oJgCmv2uclb/RcgOmZwWXxuOr
+	G+IphGtz+DbCujzzB00zbLXX1vanbGVXAd8ZIR0VGSguyStgdPBmZd3iItnz8RM4+TDB6kV6ifW
+	oJGxRfds+gbhkaQr0sWFWosueiERTGp+1YzN/hYu0nTCHeBCsyVQgKAfn/jOq5ABJGl39Xw4FR9
+	qDu+qfM+ytsd5LHJdoVgz8rEMd+h0XfSPiX9zJpX78GsAHfhffsMIOZMtewQ9BY8KSGWKP4LeVs
+	CJ8KAkuZq5YXWUbMW2Y94Gdfj/+CjsUbHMnQXg1hwb45jXZZYpVC3r0h3Af8K6kYCwRPpqf9xNT
+	K8yaHk8lV7xjqe/3ZFd/uk+dh4immPztN1Hd6IXCN5D3bb2q1dmdjkjE8kLq4d5f13q7p7wQAlD
+	A926cjNhzSVum/nLt0a/2rwmc=
+X-Google-Smtp-Source: AGHT+IHXixNv/yN+x/Lx+X46K72SZQcXiBxyGUgFYi/XwH8Xby5TuuCM6SuGiGG4V7QchUrXtunl7g==
+X-Received: by 2002:a05:6820:4c09:b0:657:61da:5089 with SMTP id 006d021491bc7-65790b6080fmr16132011eaf.7.1764689361229;
+        Tue, 02 Dec 2025 07:29:21 -0800 (PST)
+Received: from localhost ([2a03:2880:10ff:9::])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-65933ced474sm4196314eaf.13.2025.12.02.07.29.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Dec 2025 07:29:20 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH RFC 0/2] configfs: enable kernel-space item registration
+Date: Tue, 02 Dec 2025 07:29:00 -0800
+Message-Id: <20251202-configfs_netcon-v1-0-b4738ead8ee8@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1764602008-1334866-3-git-send-email-tariqt@nvidia.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIALwFL2kC/x3MQQqDMBAF0KsMf22gSbSUbAs9QLciRcaJnc2kJ
+ FIK4t0LvgO8HU2qSkOiHVW+2rQYEvmOwO/ZVnG6IBHCJQzeh5vjYlnX3F4mGxdzeYjCPc8xXiM
+ 6wqdK1t85jng+7piO4w/2NA0/ZgAAAA==
+X-Change-ID: 20251128-configfs_netcon-f53ec4ca3363
+To: Andreas Hindborg <a.hindborg@kernel.org>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Breno Leitao <leitao@debian.org>, linux-kernel@vger.kernel.org, 
+ hch@infradead.org, jlbec@evilplan.org, linux-fsdevel@vger.kernel.org, 
+ netdev@vger.kernel.org, gustavold@gmail.com, asantostc@gmail.com, 
+ calvin@wbinvd.org, kernel-team@meta.com
+X-Mailer: b4 0.15-dev-a6db3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3144; i=leitao@debian.org;
+ h=from:subject:message-id; bh=2uFsDpqq/ViHlXDJHGHyC0YbbbBA4cCaUec80Nl1zC4=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpLwXPBwLDYFRqGfALbzB4YsNM8kRJ26UiZeM9g
+ GzfXqM9ZOyJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaS8FzwAKCRA1o5Of/Hh3
+ bZLMD/9uS5ZOI4Agzmiqw4QXONXb3cxWJhxwFsWcr5Nyg9e6zi1LS0Ktidxq5LBXvf7OvHya6/E
+ VvjHwTVw3AcRJjH5HVIiAohZRDbabDi8/gJORFGLndrocK1g/h8CNrWB1MQxWjBaWkfbKMOTQId
+ t2tN8u7DZHsef+AVpvlIgV+WGN/n8nKgc19CqWZ2WJ7EXwQfC80gC9NVVd2mkiHl9dC//YTvsHR
+ 4AIgITsWv793JfGhiXqbaTHP2+HqmxT9nvmpLNZF8jfF8UdHxe97kjeYz8RBNBN8o2j3KzihPb3
+ UDA5KW7GHyfg3/HcDzjVzoZ628C1GXXDvEhd1QVo6QiTOPcEwVDd2hI0xCTPoFIjDamCWP0DLU2
+ ES9w72+t5AGT3K+2z80QwkYr2c5l2tkJwd9UTJkPit6mG3wEBwnX5ohFBzCo0tT7NTse9i89WyR
+ p4337I2NiF8eAHb1kFbq/gpcJuDeL47BDKOO/Oj92+K6gFSKN3XGQ88FRB20k65A7dyszxWvQvF
+ fJfh1ZLn+o1Xg93+FqIgSf/dbzNWcOW0r00m9sUf9PYswZrO9JkvoqUvVAtAVRDG6Xo+5MsjXZd
+ ghPFJtnmVr/3bJdQUooWDlXQrrfoTbf0vSZX5Q1hzYeO17AedboxQpLn58YtUMv29aVQ1xlgcKO
+ Sdx3i0EnZrYGy8A==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-On Mon, Dec 01, 2025 at 05:13:28PM +0200, Tariq Toukan wrote:
-> From: Cosmin Ratiu <cratiu@nvidia.com>
-> 
-> PSP is unregistered twice in:
-> _mlx5e_remove -> mlx5e_psp_unregister
-> mlx5e_nic_cleanup -> mlx5e_psp_unregister
-> 
-> This leads to a refcount underflow in some conditions:
-> ------------[ cut here ]------------
-> refcount_t: underflow; use-after-free.
-> WARNING: CPU: 2 PID: 1694 at lib/refcount.c:28 refcount_warn_saturate+0xd8/0xe0
-> [...]
->  mlx5e_psp_unregister+0x26/0x50 [mlx5_core]
->  mlx5e_nic_cleanup+0x26/0x90 [mlx5_core]
->  mlx5e_remove+0xe6/0x1f0 [mlx5_core]
->  auxiliary_bus_remove+0x18/0x30
->  device_release_driver_internal+0x194/0x1f0
->  bus_remove_device+0xc6/0x130
->  device_del+0x159/0x3c0
->  mlx5_rescan_drivers_locked+0xbc/0x2a0 [mlx5_core]
-> [...]
-> 
-> Do not directly remove psp from the _mlx5e_remove path, the PSP cleanup
-> happens as part of profile cleanup.
-> 
-> Fixes: 89ee2d92f66c ("net/mlx5e: Support PSP offload functionality")
-> Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
-> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+This series introduces a new kernel-space item registration API for configfs
+to enable subsystems to programmatically create configfs items whose lifecycle
+is controlled by the kernel rather than userspace.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Currently, configfs items can only be created via userspace mkdir operations,
+which limits their utility for kernel-driven configuration scenarios such as
+boot parameters or hardware auto-detection.
+
+This discussion about this feature started 2 years ago[1], when netconsole needed to have
+an configfs target that maps to what was passed by cmdline (something as
+netconsole=+6666@192.168.1.1....)
+
+The suggestion was to workaround configfs limitation by asking users to create
+some pre-defined configfs entries specially named (such as "cmdlineX", where X
+is the entry index in the list of targets), that would match entries coming from
+cmdline.
+
+That proved to be confusing in many ways, such as:
+
+ 1) if cmdline is not properly passed or parsed, then cmdline0 becomes a new
+    and unrelated target
+ 2) If netconsole becomes a module, then cmdline0 is not populated, so, the
+    creation of cmdline0 is something unrelated to what we have in cmdline.
+ 3) The admin needs to create X items properly matching the iterms from cmdline,
+    which is error prone.
+
+The solution proposed in this patchset is to manage the life cycle of an item by the
+kernel (if the cmdline entry exists, it will populate the cofingfs
+automatically), instead of by the user (mkdir-ing special names).
+
+The new configfs_register_item() and configfs_unregister_item() functions fill
+this gap by allowing kernel modules to register items that appear in configfs
+but are protected from userspace removal. These items are marked with the
+CONFIGFS_USET_DEFAULT flag, making them behave similarly to default groups that
+are automatically created but cannot be removed via rmdir.
+
+The primary motivation for this work is to support dynamic netconsole target
+registration from boot parameters.
+
+Currently, netconsole can be configured either statically at boot time
+(cmdline) or dynamically via userspace manipulation of configfs directories.
+
+However, there is no way to create netconsole targets from kernel command line
+parameters that persist in configfs for runtime inspection and modification.
+
+This series addresses that limitation by providing the necessary configfs
+infrastructure, making netconsole management easier, and simplifying the
+code.
+
+Link: https://lore.kernel.org/all/ZRWRal5bW93px4km@gmail.com/ [1]
+
+---
+Breno Leitao (2):
+      configfs: add kernel-space item registration API
+      netconsole: Plug to dynamic configfs item
+
+ drivers/net/netconsole.c |  63 +++++++++++++++-----------------------------
+ fs/configfs/dir.c        | 134 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/configfs.h |   4 +++
+ 3 files changed, 159 insertions(+), 42 deletions(-)
+---
+base-commit: e538109ac71d801d26776af5f3c54f548296c29c
+change-id: 20251128-configfs_netcon-f53ec4ca3363
+
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
 
 
