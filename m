@@ -1,135 +1,193 @@
-Return-Path: <netdev+bounces-243291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8F25C9C96E
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 19:18:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DBB1C9C9F2
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 19:25:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 601E6346F61
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 18:18:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA5263A4DB7
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 18:25:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B7A92D0611;
-	Tue,  2 Dec 2025 18:18:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DEC82C3268;
+	Tue,  2 Dec 2025 18:24:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QU/W9I2C"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VKjuJtle"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C0EC2BDC27
-	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 18:18:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3025C2BDC27;
+	Tue,  2 Dec 2025 18:24:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764699525; cv=none; b=pMS5D6lyAImHRMN38zZ6a5XASHfls96F+fX78OpL7MzA798vi3W0V2GW5U+CzcryvppdETzhg01hIzdVKLmuDE+q2dNrh/mLJiUfaCMxfX5ksZw9uCY8BNYATbXFFwuF9Uc1RTP7cNSyYM4IYPsG9J4Y69gutQt2+MQhnow827o=
+	t=1764699884; cv=none; b=IsLE4uEos7Lj7kJEeuL7ETdCCdI667V4KM34RhdvLzV0tvwVVMkjwL6vHDW6DeyJeuQTyxfYh/mJYe1WzlFRDchwAxYFVFTTTm22CNkdnuMLyiwdQYql5ov28NUYBDPpPAdhKfqU8z2Lekkydx9L/hjZ+ZTCvFvbbzmA6i4qsQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764699525; c=relaxed/simple;
-	bh=tzmtCptD7yAtacgQMx8Kaqwh1eETLR40s0EYMNAoub8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZWtyh6MQimRaBrRrAS1fYEyDhlM28Csqkt2Wi2cMwLe6f2868AtcpFksoEd5C38KFiuL14fBTY/cm/8LvxLULnoJXRMokXlrHyN4tr2J5DF/7maZ9fPQpoM5uqylvLex2r3eip6t9cCruzWsbf7MPWbkaQKHzW33rfrQ48VtoA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QU/W9I2C; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4779a4fc95aso702515e9.1
-        for <netdev@vger.kernel.org>; Tue, 02 Dec 2025 10:18:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764699521; x=1765304321; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oMaGaxh0YRUd9QK48pCWqjlS6PxlgAD8GrQ1+JyqkxA=;
-        b=QU/W9I2Czbb7kqUEJ5YG0CXEMRA8Xx1l9cECbQDVB2htLmhpEKCg5YlJ4w0KA2yCDc
-         k+MOxFX2AO3qglnLmxyykFvtgKkXiXB718eVlf89bLNuA02NDsJ6db5pr5tC/20Y+Vt9
-         945QrCtDcejweCtMLra9oG1Kb89N1y2+6AFBh8Y85OZlBrteK/rD2A+YBc+Kr4i3jZll
-         kNFeOpjbSG7bq72ELcDBf4xkv3UOw05nmh3zTCdfMHNxL/au5vx9XGRe44xksZftQbx1
-         B5bKFHIbR7gYZZfy1aY6C3e1yvtNJ0PQ7edD6DjDGe+Cxd9ss4oWTwJYoRgxZl+ljMFj
-         2+Vw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764699521; x=1765304321;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oMaGaxh0YRUd9QK48pCWqjlS6PxlgAD8GrQ1+JyqkxA=;
-        b=BxyyjmNTAd7P6nKO0nvLvcuW6HQJv0nrnmAvYs01WFXFwWeSTbKuJbJ2/G5XLfw3f5
-         jjw+NTFuhaZy8leNaCCe+/XcCAP9wCDGMaid2WAKtpko072+25RrTUWqUHegCBNjTo6z
-         jClC52DVfwqSMkYSbWbkxYMFdAAAQnRrWNyCnZwCJqvnkxGQpKsz6aoUCIaXLxAnmnbW
-         RRuR9PwgOIIqptJmzeb++Vf0kecRvMz8XgvXwAs/HXCYbXJruNpaZu31zkJSEOwCNtzE
-         Wi3AItGJntUhPV60E7NJgxzJoQhpnxsexZ2WWlCbCjlmvAEEAADHK8fEDGp39sTKAPlZ
-         FY3A==
-X-Forwarded-Encrypted: i=1; AJvYcCWb5NYWaT1u4j9k3HziEwDWSEda/PmkVSZJ1FxHKEBLd9nS4NcZ8h1quCXJk3Bx6BEOWUKJqQ0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywy/iKlrGGNp5fW4vFp40k3hBAi3XEj6AHBrNShvse/3h13VSgd
-	4saNEzVE4mrYj8BKYZKBgtJ+HOvMeP0YbDKAhcA0r4fYV8662h0GiXnd
-X-Gm-Gg: ASbGncvcN45PTlwWsVQX/9rZ6USC0HK8sWxCRv0s6EDdkpazSMJ5QYPc1DewRvfhp6S
-	2ozt0QE6eiE+juPxbH+SZqd4fKDQZlBFE6DvB0/ZuI+caWjmro+1wT/j1RigMuK9ze8WuhLyRjD
-	F8/EBwu3fmBONma2bTpeCQtf5+hT2l0fkgv2valaKAQva1uq/FQpVEU5W1SwsfJePfwhr/91rjn
-	G+RBqOfrKlQWKhHSpUoKKwWsoi14QYmhIni2coCavk6qd08tAz0X2LDwHczWva5gmTYQb/wshN4
-	kPXjWJp9xubR9pMcQXcS7pRXRzeOcRYBLoI2ShpFnY6LpnCf47F+3VG21fZ3iWNYgaRfRjTjvkC
-	c/ENnoBSmYUzjdowvBgwY7TZfUICQIVZx9nOeB9MLQGNwWzn189iEDc/vxrEi1+9ROWq3cfTurj
-	symmu6ZWT+
-X-Google-Smtp-Source: AGHT+IFpqsraLWCCHwhEXFKi4e3WsR3FPFZwmAKdbIMf3+2pgCt4nyGOLKosPrFEDzC4HROyjCVXIA==
-X-Received: by 2002:a05:600c:5614:b0:475:de06:dbaf with SMTP id 5b1f17b1804b1-47926fdf387mr26345085e9.17.1764699520620;
-        Tue, 02 Dec 2025 10:18:40 -0800 (PST)
-Received: from legfed1 ([2a00:79c0:6fc:d500:22ea:3d6a:5919:85f8])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4792a79ec06sm3224615e9.5.2025.12.02.10.18.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Dec 2025 10:18:40 -0800 (PST)
-Date: Tue, 2 Dec 2025 19:18:38 +0100
-From: Dimitri Fedrau <dima.fedrau@gmail.com>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Guenter Roeck <linux@roeck-us.net>, stable@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: phy: marvell-88q2xxx: Fix clamped value in
- mv88q2xxx_hwmon_write
-Message-ID: <20251202181838.GA3355779@legfed1>
-References: <20251202172743.453055-3-thorsten.blum@linux.dev>
+	s=arc-20240116; t=1764699884; c=relaxed/simple;
+	bh=k3V28RTPY5VT9Tip6bfIi7nFwEC9oVqpNiX9i4oiutg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=r4vXEZkXOwwLvrfqUMJU/3X2CZurqmowmLwRH3g5g2AYthd6DPlJXi1tH3Wu1szcYoV69n+SDAOntDN0O1jIUErGqTebQ6Qjkhc9t1a2NsZ5IBuBx/kGkgRaEd8wKN1ZpVJvNg4WRlsr6zLNFVIomKlOBopipn1WETSwIsizgt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VKjuJtle; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 030D4C4CEF1;
+	Tue,  2 Dec 2025 18:24:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764699883;
+	bh=k3V28RTPY5VT9Tip6bfIi7nFwEC9oVqpNiX9i4oiutg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=VKjuJtlebsqU1wxAFrfYexPIfAcvTXXtBEqBPW8ssRyVDr0fSTiJya5iBDIKEc7dR
+	 xwjeqRgHYetaMUxQNd6XlvXadXjqH9Tqa1RunEOfbGvppKupqWHt/qWKwJ+wXLk8v2
+	 bqvi853QckYiI2324evqJMguxknwU11O8a0Cyh4PMFNIxVUv8bj93gb72uasIox7QC
+	 vDU6HGAEZtWe5WqXO1qa2ked15He5cI5W8YiGhrkXZ4HY+9+VD1/sxPt2gmuEEnctx
+	 XNS4K7CYNFri/flfg65EY4HwAY0bRQhX7MZNfXUAsKaromXc0ClKy8RejhEQwNh0NO
+	 pi1v1fGedEELQ==
+Date: Tue, 2 Dec 2025 10:24:42 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Simon Horman
+ <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org,
+ gustavold@gmail.com, asantostc@gmail.com, calvin@wbinvd.org,
+ kernel-team@meta.com, Petr Mladek <pmladek@suse.com>
+Subject: Re: [PATCH net-next 0/4] (no cover subject)
+Message-ID: <20251202102442.568f91a7@kernel.org>
+In-Reply-To: <4oybtunobxtemenpg2lg7jv4cyl3xoaxrjlqivbhs6zo72hxpu@fqp6estf5mpc>
+References: <20251128-netconsole_send_msg-v1-0-8cca4bbce9bc@debian.org>
+	<20251201163622.4e50bf53@kernel.org>
+	<4oybtunobxtemenpg2lg7jv4cyl3xoaxrjlqivbhs6zo72hxpu@fqp6estf5mpc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251202172743.453055-3-thorsten.blum@linux.dev>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Thorsten,
-
-thanks for the fix.
-
-Reviewed-by: Dimitri Fedrau <dima.fedrau@gmail.com>
-
-Am Tue, Dec 02, 2025 at 06:27:44PM +0100 schrieb Thorsten Blum:
-> The local variable 'val' was never clamped to -75000 or 180000 because
-> the return value of clamp_val() was not used. Fix this by assigning the
-> clamped value back to 'val', and use clamp() instead of clamp_val().
+On Tue, 2 Dec 2025 02:18:44 -0800 Breno Leitao wrote:
+> On Mon, Dec 01, 2025 at 04:36:22PM -0800, Jakub Kicinski wrote:
+> > On Fri, 28 Nov 2025 06:20:45 -0800 Breno Leitao wrote:  
+> > > This patch series introduces a new configfs attribute that enables sending
+> > > messages directly through netconsole without going through the kernel's logging
+> > > infrastructure.
+> > > 
+> > > This feature allows users to send custom messages, alerts, or status updates
+> > > directly to netconsole receivers by writing to
+> > > /sys/kernel/config/netconsole/<target>/send_msg, without poluting kernel
+> > > buffers, and sending msgs to the serial, which could be slow.
+> > > 
+> > > At Meta this is currently used in two cases right now (through printk by
+> > > now):
+> > > 
+> > >   a) When a new workload enters or leave the machine.
+> > >   b) From time to time, as a "ping" to make sure the netconsole/machine
+> > >   is alive.
+> > > 
+> > > The implementation reuses the existing message transmission functions
+> > > (send_msg_udp() and send_ext_msg_udp()) to handle both basic and extended
+> > > message formats.
+> > > 
+> > > Regarding code organization, this version uses forward declarations for
+> > > send_msg_udp() and send_ext_msg_udp() functions rather than relocating them
+> > > within the file. While forward declarations do add a small amount of
+> > > redundancy, they avoid the larger churn that would result from moving entire
+> > > function definitions.  
+> > 
+> > The two questions we need to address here are :
+> >  - why is the message important in the off-host message stream but not
+> >    important in local dmesg stream. You mention "serial, which could be
+> >    slow" - we need more details here.  
 > 
-> Cc: stable@vger.kernel.org
-> Fixes: a557a92e6881 ("net: phy: marvell-88q2xxx: add support for temperature sensor")
-> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
-> ---
->  drivers/net/phy/marvell-88q2xxx.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Thanks for the questions, and I would like to share my view of the world. The
+> way I see and use netconsole at my company (Meta) is a "kernel message"
+> on steroids, where it provides more information about the system than
+> what is available in kernel log buffers (dmesg)
 > 
-> diff --git a/drivers/net/phy/marvell-88q2xxx.c b/drivers/net/phy/marvell-88q2xxx.c
-> index f3d83b04c953..201dee1a1698 100644
-> --- a/drivers/net/phy/marvell-88q2xxx.c
-> +++ b/drivers/net/phy/marvell-88q2xxx.c
-> @@ -698,7 +698,7 @@ static int mv88q2xxx_hwmon_write(struct device *dev,
+> These netconsole messages already have extra data, which provides
+> information to each message, such as:
+> 
+>  * scheduler configuration (for sched_ext contenxt)
+>  * THP memory configuration
+>  * Job/workload running
+>  * CPU id
+>  * task->curr name
+>  * etc
 >  
->  	switch (attr) {
->  	case hwmon_temp_max:
-> -		clamp_val(val, -75000, 180000);
-> +		val = clamp(val, -75000, 180000);
->  		val = (val / 1000) + 75;
->  		val = FIELD_PREP(MDIO_MMD_PCS_MV_TEMP_SENSOR3_INT_THRESH_MASK,
->  				 val);
-> -- 
-> Thorsten Blum <thorsten.blum@linux.dev>
-> GPG: 1D60 735E 8AEF 3BE4 73B6  9D84 7336 78FD 8DFE EAD4
+> So, netconsole already sends extra information today that is not visible
+> on kernel console (dmesg), and this has proved to be super useful, so
+> useful that 16 entries are not enough and Gustavo need to do a dynamic
+> allocation instead of limiting it to 16.
 > 
+> On top of that, printk() has a similar mechanism where extra data is not
+> printed to the console. printk buffers has a dictionary of structured
+> data attached to the message that is not printed to the screen, but,
+> sent through netconsole.
+> 
+> This feature (in this patchset) is just one step ahead, giving some more
+> power to netconsole, where extra information could be sent beyond what
+> is in dmesg.
+
+Having extra metadata makes sense, since the interpretation happens in
+a different environment. But here we're talking about having extra
+messages, not extra metadata.
+
+> >  - why do we need the kernel API, netcons is just a UDP message, which
+> >    is easy enough to send from user space. A little bit more detail
+> >    about the advantages would be good to have.  
+> 
+> The primary advantage is leveraging the existing configured netconsole
+> infrastructure. At Meta, for example, we have a "continuous ping"
+> mechanism configured by our Configuration Management software that
+> simply runs 'echo "ping" > /dev/kmsg'.
+> 
+> A userspace solution would require deploying a binary to millons of
+> machines,  parsing /sys/kernel/configfs/netconsole/cmdline0/configs
+> and sends packets directly.
+> 
+> While certainly feasible, it's less convenient than using the
+> existing infrastructure (though I may just be looking for the easier
+> path here).
+
+If this was your objective, instead of having a uAPI for sending
+arbitrary message you should be adding some "keepalive" timer / empty
+message sender... With the patches are posted you still need something
+to run the echo.
+
+> > The 2nd point is trivial, the first one is what really gives me pause.
+> > Why do we not care about the logs on host? If the serial is very slow
+> > presumably it impacts a lot of things, certainly boot speed, so...  
+> 
+> This is spot-on - slow serial definitely impacts things like boot speed.
+> 
+> See my constant complains here, about slow boot
+> 
+> 	https://lore.kernel.org/all/aGVn%2FSnOvwWewkOW@gmail.com/
+> 
+> And the something similar in reboot/kexec path:
+> 
+> 	https://lore.kernel.org/all/sqwajvt7utnt463tzxgwu2yctyn5m6bjwrslsnupfexeml6hkd@v6sqmpbu3vvu/
+> 
+> > perhaps it should be configured to only log messages at a high level?  
+> 
+> Chris is actually working on per-console log levels to solve exactly
+> this problem, so we could filter serial console messages while keeping
+> everything in other consoles (aka netconsole):
+> 
+> 	https://lore.kernel.org/all/cover.1764272407.git.chris@chrisdown.name/
+
+Excellent! Unless I'm missing more context Chris does seem to be
+attacking the problem at a more suitable layer.
+
+> That work has been in progress for years though, and I'm not sure
+> when/if it'll land upstream. But if it does, we'd be able to have
+> different log levels per console and then use your suggested approach.
+> 
+> Thanks for the review, and feel free to yell at me if I am missing the
+> point,
+> --breno
+> 
+
 
