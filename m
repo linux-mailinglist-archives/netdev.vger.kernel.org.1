@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-243340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA627C9D5BC
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 00:43:43 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D499C9D5C8
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 00:45:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9BF5E346EE7
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 23:43:42 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 34FCA4E0F68
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 23:45:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0E88302149;
-	Tue,  2 Dec 2025 23:43:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3895630AD00;
+	Tue,  2 Dec 2025 23:45:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="maoJT5NU"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qeG8HK/x"
 X-Original-To: netdev@vger.kernel.org
 Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 373EA2D46B3;
-	Tue,  2 Dec 2025 23:43:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66373309F1D;
+	Tue,  2 Dec 2025 23:45:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764719019; cv=none; b=eR7C5076fjPXVv5Njlnjb1ACB4ablBBwyU+13fydBiE4/lpKS+ZkxlJnJdvHBcLG8Z8qcp0suAhrtEg+Q0Cup07pfoHGFap8WJZXJwSClhtKfdA4W4E84cRplsK9q7onoudJ5uFO9uLxw0HwRbHW7XWdFZ8aAXBv8VT0xpeSMiY=
+	t=1764719140; cv=none; b=MhOCbGgakuErcoAMCZEWu2iXNWZsidgu6j+T+lTaFBY4MhmJV+nePU2XbHxAdCkenExh48cliAkaHKWbyCGZoG55UEsI8/HiyEu/mS0Z253E7xmLnGKMNJd6zE9yab4yvwu8aBc7rQkHRQzL7nSPqZNXVd2vWBTEZa9irSqJf8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764719019; c=relaxed/simple;
-	bh=jRhwCD0JjRg6S460aFMWoDG5xH0nzmdfj7rzXvQG5FQ=;
+	s=arc-20240116; t=1764719140; c=relaxed/simple;
+	bh=gKKuk+YPbPcnNWP9cQOaPVQ4P+zYRWNaE4ioGpv2PkA=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=dqdTKmQjioBAideJdOQeXrSqgIyuXTZNOjQvdN485VlXD9FPFHJKLp2jcezjM2Uy15DbLpjO7aXq2tzwb1l/K1d5gmixWfG2MhRiQ/LQ9ALJIq0OcCbm2RZAdDwLDCkKHpxhyUQtPD3wdgSJ1qFQ8M9esinsW3mqRGEfHDjI46M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=maoJT5NU; arc=none smtp.client-ip=90.155.92.199
+	 Content-Type:MIME-Version; b=gZbBA/fNwrxUxq8Aigyn4Dpg3Lcy+5TFN1mJq67ZBh8GKVPIdSlYwYZvHj/82tug+bB3DQ42x1W2oblZj9KGgiolY0XTaZBgEs86kMwdzNlMEi+o6+V6/QhQsxcMv72ahYWJUmyvd/ZDFQ71m1EGATupocFJ+UJ17nyguDo02hQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=qeG8HK/x; arc=none smtp.client-ip=90.155.92.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=desiato.20200630; h=MIME-Version:Content-Type:References:
 	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=RG54uj8nbJRKngg2+/MeecGe4FplmGb4q9xCMfAGABo=; b=maoJT5NUpesr305ILRFW7YWoAu
-	I9d5hJOPir5ZaQZ1f4sNbYC6gao+hLhlp4R/svE5sfE3MzGf2er1/nBLlFH8VmHlc3DW11uMdPPe3
-	btryT055UbitQ9T/HrLRCt+xIzoiJLetbYgLbdoy3jiBrbVFD2Eb4bPNTEGECY9Roe0lB0xAewPMH
-	iL22BxLtN6TJqmt4D+YEPN18t4QjOVFov8AGAXqUDh4VolRt+TtOlpNH76qTIO2lwrEkK+AqMalJ7
-	Ucmb/IvhYOkZWfhnfk8IAi1y12b8QdyRb/JBF5V4qPAW+0yjO6KQ2LtycPHvwAadIRiJzclHH1DS+
-	gkXL3G2A==;
+	bh=KzFcSlsNxm6aK59XUyJm402XrkR487vTMm6zYjRQanw=; b=qeG8HK/xd5crLrflQvju03pjNW
+	b5kz3lIYSs9QnKR3NL8wa65ts/rvXMXJO3bKtTYpFkFA+tzYLHep0YaQKuU0IPxdNrTutR9xarzsp
+	aFQMIkw6o4LwsuKJChcKIzx7xuxbE3Eks7NS4i+SQkFWrTUQtHd9y31EXahC6rjlNP50Lk0swU8aq
+	VCHJYpqfBouejhBNZ5OjwczzVV46pMux84ffn9dgnkuPafAGraqVoQY+gkgXVAi8PFsiEbkUeR4Zj
+	BVfdamSdbgRFQUUT/TrWHJltyxWOFU1fR9SEPPfIp/zikIcCILAUEoNRImQJdoWY+CPAdKQqkbgEx
+	jVL5WsQw==;
 Received: from [172.31.31.148] (helo=u09cd745991455d.ant.amazon.com)
 	by desiato.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vQZAG-00000001Im1-2vCS;
-	Tue, 02 Dec 2025 22:48:09 +0000
-Message-ID: <d5b28017aad83771052d4387bfec45dac289d737.camel@infradead.org>
-Subject: Re: [PATCH v2 4/4] ptp: ptp_vmclock: Add device tree support
+	id 1vQZCG-00000001IwD-41tA;
+	Tue, 02 Dec 2025 22:50:13 +0000
+Message-ID: <5315574130a7091d338fc2d7132fc4873f2186c6.camel@infradead.org>
+Subject: Re: [PATCH v2 2/4] ptp: vmclock: support device notifications
 From: David Woodhouse <dwmw2@infradead.org>
 To: "Chalios, Babis" <bchalios@amazon.es>, "richardcochran@gmail.com"
  <richardcochran@gmail.com>, "andrew+netdev@lunn.ch"
@@ -57,12 +57,12 @@ To: "Chalios, Babis" <bchalios@amazon.es>, "richardcochran@gmail.com"
  "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Cc: "Graf (AWS), Alexander" <graf@amazon.de>, "mzxreary@0pointer.de"
 	 <mzxreary@0pointer.de>
-Date: Tue, 02 Dec 2025 23:43:27 +0000
-In-Reply-To: <20251202201118.20209-5-bchalios@amazon.es>
+Date: Tue, 02 Dec 2025 23:45:33 +0000
+In-Reply-To: <20251202201118.20209-3-bchalios@amazon.es>
 References: <20251202201118.20209-1-bchalios@amazon.es>
-	 <20251202201118.20209-5-bchalios@amazon.es>
+	 <20251202201118.20209-3-bchalios@amazon.es>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-tsrbZajGrw0rcu7LHYGu"
+	boundary="=-KpMWm8/Xw+B2zBofORsi"
 User-Agent: Evolution 3.52.3-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,51 +73,39 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-tsrbZajGrw0rcu7LHYGu
+--=-KpMWm8/Xw+B2zBofORsi
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2025-12-02 at 20:12 +0000, Chalios, Babis wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
+On Tue, 2025-12-02 at 20:11 +0000, Chalios, Babis wrote:
 >=20
-> Add device tree support to the ptp_vmclock driver, allowing it to probe
-> via device tree in addition to ACPI.
->=20
-> Handle optional interrupt for clock disruption notifications, mirroring
-> the ACPI notification behavior.
->=20
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> Signed-off-by: Babis Chalios <bchalios@amazon.es>
-> ---
-> =C2=A0drivers/ptp/ptp_vmclock.c | 69 +++++++++++++++++++++++++++++++++++-=
----
-> =C2=A01 file changed, 63 insertions(+), 6 deletions(-)
->=20
-> diff --git a/drivers/ptp/ptp_vmclock.c b/drivers/ptp/ptp_vmclock.c
-> index 49a17435bd35..1af50e06e212 100644
-> --- a/drivers/ptp/ptp_vmclock.c
-> +++ b/drivers/ptp/ptp_vmclock.c
-> @@ -18,6 +18,7 @@
-> =C2=A0#include <linux/miscdevice.h>
-> =C2=A0#include <linux/mm.h>
-> =C2=A0#include <linux/module.h>
-> +#include <linux/of.h>
-> =C2=A0#include <linux/platform_device.h>
-> =C2=A0#include <linux/slab.h>
+> @@ -402,8 +413,16 @@ static ssize_t vmclock_miscdev_read(struct file *fp,=
+ char __user *buf,
+> =C2=A0
+> =C2=A0		/* Pairs with hypervisor wmb */
+> =C2=A0		virt_rmb();
+> -		if (seq =3D=3D le32_to_cpu(st->clk->seq_count))
+> -			break;
+> +		if (seq =3D=3D le32_to_cpu(st->clk->seq_count)) {
+> +			/*
+> +			 * Either we updated fst->seq to seq (the latest version we observed)
+> +			 * or someone else did (old_seq =3D=3D seq), so we can break.
+> +			 */
+> +			if (atomic_try_cmpxchg(&fst->seq, &old_seq, seq) ||
+> +			=C2=A0=C2=A0=C2=A0 old_seq =3D=3D seq) {
+> +				break;
+> +			}
+> +		}
+> =C2=A0
+> =C2=A0		if (ktime_after(ktime_get(), deadline))
+> =C2=A0			return -ETIMEDOUT;
 
-Needs <linux/interrupt.h> (a few lines up) too.
+I'm slightly confused that that compiles cleanly (as it does here).
+Isn't the second argument to atomic_try_cmpxchg() an (int *), and isn't
+old_seq a uint32_t? It's doing the right thing; I just didn't think it
+would do the right thing *quietly*... ?
 
-...
-> +static int vmclock_probe_dt(struct device *dev, struct vmclock_state *st=
-)
-> +{
-> +	struct platform_device *pdev =3D to_platform_device(dev);
-> +	struct resource *res;
-> +	int irq, ret;
-
-Those are unused now.
-
---=-tsrbZajGrw0rcu7LHYGu
+--=-KpMWm8/Xw+B2zBofORsi
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -196,22 +184,22 @@ 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
-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
+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
-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
+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
 
 
---=-tsrbZajGrw0rcu7LHYGu--
+--=-KpMWm8/Xw+B2zBofORsi--
 
