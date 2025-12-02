@@ -1,218 +1,350 @@
-Return-Path: <netdev+bounces-243326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8602DC9D211
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 23:01:12 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38C7DC9D26E
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 23:09:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F47A3A7393
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 22:01:11 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2116F4E06B5
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 22:09:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7C842F8BCA;
-	Tue,  2 Dec 2025 22:01:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18C3A2F8BDC;
+	Tue,  2 Dec 2025 22:08:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OZdwtHGo"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G8KlcB6l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDCC82D063A
-	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 22:01:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764712869; cv=none; b=FPXs6UbIOnflmvGqZAg6okD8N/EjCdAQd3Ps84CeBbzhMZS5l61K7keKmaQtXfLWpFuzbo1IfqWhvo60t4fpNtKoEG/zOCRxM25trhqHQfGiicxrdjVbZv5FJiFBUOvcd7WChu9dSb6ZjbfsDN4PEHcIfojKcTm2BuNMipACOP0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764712869; c=relaxed/simple;
-	bh=Mqnyzq/dHBpiYdG/Xt/TKvJXJMP8zWCEKc3fUG6Hw0E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M0hiEtSttwnCMn6rzeEBN06xUE+3a3qEtDPKd8ltNWoN2BQBJEoiPtCa8uh9LSiYvRLfD3qV+y94gDj1mCDVrGB0/9HbIfJnA8lETc1dvHivqr5md0XLxfDeqDxdytQSz+uZ3yAlTszbHAO26XK98VOMH8N7BDLLttYFsrEtlCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OZdwtHGo; arc=none smtp.client-ip=209.85.128.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-78ac9f30833so49567237b3.0
-        for <netdev@vger.kernel.org>; Tue, 02 Dec 2025 14:01:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764712867; x=1765317667; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xNqIfgM/6Ycxql9GvTaW4xpHm2HTdtIqMIBvJdvraLU=;
-        b=OZdwtHGonB3nfffkr6VAZVqTIoL0VKHhfYC1cJqS0rCeHHRluRmORfZVjQF/E0Bl8B
-         juTo9aHbJQD6Z6xYYDtXvIrZ1KnlWq+hwurM/QVZXIwILYNpOJ+RnjyUQPZ9pKT2VG8j
-         q3i1E6ktebX+xrSHYTvMS8kiIXOjRBmOfrAsVoyRy4Uoz/Gcf+HV4+pv5WGZb7w/rIZh
-         Z7WhLAzWkGHmsY+zruBZ3j23y8vxHGrsKrz5C9z5I5sjtlWzZRXIDXqUKsurQftDMKMo
-         wRufIxC/i/+ldxbYSsAv9iyUCNXvLjDXXN12gqkqHSnnA6tbI8z6kFBr8ctD5V7bleYF
-         BUXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764712867; x=1765317667;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xNqIfgM/6Ycxql9GvTaW4xpHm2HTdtIqMIBvJdvraLU=;
-        b=jzEp6yF+f5R89+eB1kIMJruv12Xjl3zkaQOksPrX6/x3AzFPPuHBLqWW+F+rYBhUjL
-         Ylp0qUcFxtjpQtkyFgKm4k4HZok5eqBK23IVG+AFX0T9bBIGikeg0c285DbopdgIMdgY
-         axO2tMuyPVQuo0BPoLff1xQOHlCVpE8hXiPTH7s4iS8pfa1Fk01VxL1BWqosM7JiyVuy
-         sdXKiJ3UZbHOLTOZ6j/ujAZx8kJfD2H+Hi160QM4U5ioEJpQKbJydoDRpaGnOhrFfKcI
-         UCsYZ48RLg1D6p5nOdAoIGX6QBfvprbOe5XYbmEnnQJAs5T59P4p1dHEHImp4Iqo4siF
-         en2w==
-X-Forwarded-Encrypted: i=1; AJvYcCXkcTkhexANFMWY4imO0sv/auG5C7/7LbbR5If2NBcZkRyYhdsrcNklDUoXxsRbqQ3Ki1zvBso=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/Oxq1Mn1IPGzXkp+5FjLvgLwyRN/Fidva3ohtSJSR7fIokmeu
-	+z9mPA/A4bh3+Zr8yThYuqMa3Pp72yUrdqGBb9hGjWBBO6ALasc7T37G
-X-Gm-Gg: ASbGncsmjJf+xcq6ngT9+lml708/LuNIylRyVbrXdaz6t2rkeGSwaLngydKBsyKtByK
-	21xPAMmOaQanfqoesfy1WyhqgQC2GeFQYVKEKL0DWYssbXGGUUK/3xERT3WMj7YnixdqSPfiGP9
-	NTEM83WwNqljL5Chte7yzJuyR4ADHsHoz/vMq9k6J75LoxLexwjLH3EQBh7SDrTAhe6uvVdGOWQ
-	Jj7AlWE0eGHWwUWqDWVea0ggbwr+sIGomBTNTvSM3E10Yvh+Prwl0jo6SiFpZNHFBp8BUIi5Sc6
-	hwL6xxD0y7OrG5lw98t0l/bIZu4AHchPRKSc4SyK8ZGW61N7O5WCFRPvtuAdChG23+Krlqs5rRI
-	wktlScMIui8yvDQBb66Y9LoaLGszUMeSjGRddJyA5VeCu9+XLD7X/qq3Omg1sspEzdN5xLsPIUg
-	oIAinrQ4GXy5BVOHcj73iivwe9ROAzPJ84xjRXnHgXvXBWftk=
-X-Google-Smtp-Source: AGHT+IFKkR9nJxuAswYbUkRmscuBgN9zjQIp6HaO2rufMd5Ab/1ylKT04Hn5ts4J77BDYWjQzLjRWg==
-X-Received: by 2002:a05:690c:6206:b0:788:e74:b281 with SMTP id 00721157ae682-78c0beafabamr1238977b3.13.1764712866608;
-        Tue, 02 Dec 2025 14:01:06 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:5d::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-78ad0d3f5a1sm67446487b3.12.2025.12.02.14.01.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Dec 2025 14:01:06 -0800 (PST)
-Date: Tue, 2 Dec 2025 14:01:04 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, berrange@redhat.com,
-	Sargun Dhillon <sargun@sargun.me>,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v12 04/12] vsock: add netns support to virtio
- transports
-Message-ID: <aS9hoOKb7yA5Qgod@devvm11784.nha0.facebook.com>
-References: <20251126-vsock-vmtest-v12-0-257ee21cd5de@meta.com>
- <20251126-vsock-vmtest-v12-4-257ee21cd5de@meta.com>
- <6cef5a68-375a-4bb6-84f8-fccc00cf7162@redhat.com>
- <aS8oMqafpJxkRKW5@devvm11784.nha0.facebook.com>
- <06b7cfea-d366-44f7-943e-087ead2f25c2@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2671E2F8BCD
+	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 22:08:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764713327; cv=fail; b=FGBuyWQIDeSLIGiBAek4mX8R7MnzDLnS2Ys+T6uq9NLzkCIuH0/fx2cALnxl7imdZGNQzyfiQr8YsrAy8XTPWCBKMNyfDa/WM/T0lCbqLdiomYrFbiQYU4QGjXJ++ji6I88Ol7vZkc8R7Xtg1I8SXlWguUpAyE/3VWl8H4mbJzU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764713327; c=relaxed/simple;
+	bh=Pd8fs19wduCR/hOHVZoW85fW5ng8m05ZVNNtQoaMzQc=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=MftIJvj9QG1zakg9gCcnkY7unVzuHODZ716Vk/ybbrbxvCOpnSDhSNmMFj25fpgqbMFzd0hiMfctdDKPV7TsZHivWBSC76E2fP7L0/KywdkUxusyME36s3qNtGIIIk3Mv6bcNB8ufV2l0K4aTmCTtSZs7e7B/EBCxCCUDRggRfg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G8KlcB6l; arc=fail smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1764713325; x=1796249325;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:mime-version;
+  bh=Pd8fs19wduCR/hOHVZoW85fW5ng8m05ZVNNtQoaMzQc=;
+  b=G8KlcB6lUuPGAeH9imt3gBPZ40kQb936A/vS60qbNJeriVm2raF53Ihe
+   HMGKebtiTljMx0KOGE4Bb2I/mqSnpfoKekb/GBG5k5a8u65p4DxLdnqY+
+   UmFKKYcuTTAbz7nGbBwzreMLedtstaWPA4QmHvaAO+HEFsblbu9eYC4+/
+   N3BZkllJGU70NhdgMsHzQSeo8K67l8LtW/PzdWC4HGzedO3aYbKpahFQg
+   cNAMh7PALNRi13Bt/GeqfOhwUFB76lm6aKDV8aqWUGVCm4k2Ic/Rz64aY
+   /wMrVbFu0wcU+1oNju39B5g5siGDfyuvOru0b1jHcRZ6Jv2R3R0RH2wid
+   Q==;
+X-CSE-ConnectionGUID: MmqF6KYmSu67mUW2RoCQPA==
+X-CSE-MsgGUID: IzFTjC1KSLSsiArjU9tLHQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11631"; a="70555583"
+X-IronPort-AV: E=Sophos;i="6.20,244,1758610800"; 
+   d="asc'?scan'208";a="70555583"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2025 14:08:45 -0800
+X-CSE-ConnectionGUID: 8IDvZkMASxSNzb0H2nVaTg==
+X-CSE-MsgGUID: OU3jqCI3SCqHpRfd8VsHBg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,244,1758610800"; 
+   d="asc'?scan'208";a="193785304"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2025 14:08:44 -0800
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Tue, 2 Dec 2025 14:08:44 -0800
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29 via Frontend Transport; Tue, 2 Dec 2025 14:08:44 -0800
+Received: from BL2PR02CU003.outbound.protection.outlook.com (52.101.52.35) by
+ edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Tue, 2 Dec 2025 14:08:43 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=nbROZWiHGFWiwbh50Eki5KrxPBwAz+u8AjsnT78/Q8PWjhkx8gHPrnTzBb5yXcUzLl/PTc5JNQ8zXvMBxP7NKnX2Vfp+EIJ8MZDbufkvnOMkA053mXZYoW0FHD/0igxoUJMO5rL7f2kRiXADF5R4D1BknvCqsNga8MNrhCwwWV+oocMbsNIFPGcB9DXX1ko1wlomtKihWtMOgvogf76r5iGnJ7FFB+sCubd34QlAABpTUi3g9m89m18VyuVY73/EQ+VihIQc97a+O36WkEAPgXC6Rjfa2mo2zcbfFPT0WJxIUpkebKTGc+O8wIo4BgkKk6SzQe1uVjXtlTskIEQljQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fAPt3f39fQUMmDQcEHzIjLRXAli8juf8oxgSQJJ6AB0=;
+ b=sHG5E0O+Ri0Gx5E43h9jFxf2+wUKxmhtvMxUZ+O/wnf0y9EYXhfJPZJH4AzrE2pDkzL1CH5wSh8yY25Fi8CLbqPXqFKHzdDBuA843zmBH42cOW38SH9rwpSh55Hbn3dgAPwtFyUBjM6LO7KevNoPWoSw3ZsmgPwaKcTx3NVAfHGJ5y8BWGssM95NQ2jy2QQbc7gBxh9uxCzD/QsczoGxXN68Vo3jgTa4vAucOixj1eUSKdfXLR42vBZhPm3zd0D17SdE6+RifyEg4ROyo2bhyBFZ3NOMJ4ZDCRiHURHbRpmJBRNDOivAYf1F+GV+vkz5TcoDgs8tnQ7PU4+GIEi1Ig==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by DM4PR11MB7760.namprd11.prod.outlook.com (2603:10b6:8:100::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.17; Tue, 2 Dec
+ 2025 22:08:38 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::81f7:c6c0:ca43:11c3]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::81f7:c6c0:ca43:11c3%3]) with mapi id 15.20.9366.012; Tue, 2 Dec 2025
+ 22:08:38 +0000
+Message-ID: <85edbf2d-f1f7-4286-8c11-a0c8ce715696@intel.com>
+Date: Tue, 2 Dec 2025 14:08:36 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v1] ice: stop counting UDP csum mismatch as rx_errors
+To: Jesse Brandeburg <jbrandeb@kernel.org>, <netdev@vger.kernel.org>
+CC: Jesse Brandeburg <jbrandeburg@cloudflare.com>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, IWL <intel-wired-lan@lists.osuosl.org>,
+	"Przemek Kitszel" <przemyslaw.kitszel@intel.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, "Brett Creeley" <brett.creeley@intel.com>
+References: <20251201233853.15579-1-jbrandeb@kernel.org>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+Autocrypt: addr=jacob.e.keller@intel.com; keydata=
+ xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
+ J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
+ qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
+ CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
+ UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
+ MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
+ apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
+ cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
+In-Reply-To: <20251201233853.15579-1-jbrandeb@kernel.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="------------j00NNtrhp74Kt27riJj0T86v"
+X-ClientProxiedBy: MW4PR04CA0047.namprd04.prod.outlook.com
+ (2603:10b6:303:6a::22) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <06b7cfea-d366-44f7-943e-087ead2f25c2@redhat.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|DM4PR11MB7760:EE_
+X-MS-Office365-Filtering-Correlation-Id: d560d785-64cb-4261-a676-08de31ef5817
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?SEIwQVZUaklDanBvaUhUdFlqTTRzKzh1ejNwWlFIZWVWc01jTHpWMDJuNm5t?=
+ =?utf-8?B?U3Rib25VY0dDbmIrT1VrWlA0OHorcGYwZVF4cTlTZng2TlEyVlUyOG1hdE5Y?=
+ =?utf-8?B?aGd2TUxyRFkxZ1BkQ0w5cUs0b1ByNm9TdktETWg0Zk9CS0hqaFppSTZFMjdx?=
+ =?utf-8?B?dkpaSEE3UFpYREhBNVRhcHN1S0w0TlFaN1d4YU1hUzFFOEUreVYzS21Xemh3?=
+ =?utf-8?B?YnRIUWp6d1NZeTZvSmVPU3A1OFpiRkFvNjZISHNPWEZONWNGOU9lQjZlc2hu?=
+ =?utf-8?B?MytxN1VTMWRkdFpnRS9wNGF4L0dBKzJPRGhqYjRxdFlMYXVBNElLazZjWXBV?=
+ =?utf-8?B?djl4SnBmT1B4N2FnN3dZNTJYOElGZG1mZ0UxcndqVTJzcUUyem5hcHpSZmVI?=
+ =?utf-8?B?UUpXaldzckp6NG5QMHlOczRWRVo3cjZOdXBNZHgxcmQvb1pudmNjc3Zaajlm?=
+ =?utf-8?B?WkgxZW5aOTVzcWhmbyt6OUp3emFLWUR0dWlEWjJ6cm9ISTVCak9DM2l2NEZp?=
+ =?utf-8?B?b1Q4eGR2cUZzVmNCKzZKNzJ5eXRoNkxmcXJQN0Y2am9BcDJCMnBvWTU5K095?=
+ =?utf-8?B?ZmtNcEQ1RGVHdEVxY1pmRVM5TFpRYmlqSjFlRysvbVVMa3V6TlZWUytKejVw?=
+ =?utf-8?B?SFZzQ3A4NWhIMEdCOThDSml4SGFaWHRtOVFsUWtMczNLVDE2TXpwNWF6dkVI?=
+ =?utf-8?B?b3A4TjZpQ3VTcmd3YU9Sdi9NZEZxZUxnYVphVE1KOGRta2tuRVM1MitZYUhC?=
+ =?utf-8?B?QThPL1dxbC8wcFZ6eUZreFg0cFB2dlFZcnB3ZFg4ZGZRdzkwSkFXREtMRGgv?=
+ =?utf-8?B?dXlZU2VxV3cyb0NieHVBek1XaUdqdXhkZEhQV0hkMTMzMEJjUkRzcjBjbERK?=
+ =?utf-8?B?RFMvZWVST0JZbFZhMnZvSlZVSjBiaklmTEZGbWYrMkpBY1ovTSt1THhHTE9m?=
+ =?utf-8?B?ckVFam1oaTZrOVVvZnNFdVc3cFZNWlRwTzVFVVJUSmhDWlc4TnpWOFltNHZv?=
+ =?utf-8?B?VU0yUjVOUkJFOUVIRFBrVGhTSXozMHp6OS9xWjlSNUNmWURZa0FOTzdoc253?=
+ =?utf-8?B?V1R5UDFyUk1PQVhBR1NnMHZNaVZZWkxFendsRmJReHJ2MVhOaUpsQmZBKzVm?=
+ =?utf-8?B?MnNuMzk0QlR0THBWQ2tIVUtlajJNRE9ielA2YWFaTFdBY0FPZWluaWszcTk5?=
+ =?utf-8?B?YXhUK29lRHJHZFJpQlduVHpjbCs2emtQK1FVTVBZM1FSdEExc3V2UUJnK0dC?=
+ =?utf-8?B?RzlrQVoyRnYveStNOVN3OGpDcFE3d3FtTnVXbmZvSG15b3FZMDBGR3N1Zk12?=
+ =?utf-8?B?VmlHcG1nM0J3MFQwa3VzdEJOb2swTGxISXJ5OVdmdTJ5ZGM4WjhhNjNyWllT?=
+ =?utf-8?B?ZXYxNXhTQ0xwWFFLSm5JY2U2MjdOZGd3dnFsVXRHQVRmVG1Yck4rNWl5aHc3?=
+ =?utf-8?B?ZXBpOWZoTmVZanRKOUwyWUFnM2phM3hRVktvK3Q3U3Y1U1gwMkZVbVpvTXdw?=
+ =?utf-8?B?RVlIdWx3TEY5eWdKcHd4bnN3OHJONUNQUnJraXNjOHcySHhCTWQzSDlySFM3?=
+ =?utf-8?B?Vi9nRjZISEh0V000Mm02ZkMrTEd0UjNlV05TU1BYRFhlbWZRL1BLQkh6azVV?=
+ =?utf-8?B?MUtSZlpPV1hDV3ByRFRXRGc4Q1BaeVBmREhCVko5VDc4SWJMNnM1S0k2c0Vv?=
+ =?utf-8?B?WWJxNkgxem9kWUNRcFg4TElkdXV0ZllCVG1UcUFiaE9sQUlRQWxWbzN6YTl1?=
+ =?utf-8?B?d0c4cDBWVnhsU3V0RVN0ckZSL3FYL3p3MHhzay9KbVRvS0xMdW1YMTVXM0o2?=
+ =?utf-8?B?NDlpcnM3TlRCQks2NHFCNEdxZVE4ZjlXNVBobkFrUWVSbGxtYlFvNzk4WmZw?=
+ =?utf-8?B?bzYxZ0lmZW9KVTVSSWd0VDRVeGY4eFdWbU9aSGZ6MGh5QzQxTGY0ZHgyeFFQ?=
+ =?utf-8?B?TkJ1TFFYKzh2NlBWSlFoQyswQkcvcHhPeEZCTytuN1FoTWcrc1ZOc25SWHla?=
+ =?utf-8?B?MDhtSEdwSFlnPT0=?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dXNMNFMvS0pJaUZaQzI1MDRFNjJiYlFRbURUYng2VDJTaHVFcTBZZ2owSEp2?=
+ =?utf-8?B?MEcrNm1QNXdkekQ0NncvWmRPYjcxUFdlWm1SVzlYdFl5TmlDemg5YjlubXM3?=
+ =?utf-8?B?OFIrSjRoN1krOXQyL1o4NnlBQ0RTelZYTkRWK0RNQ1ZlUWdtL3J1bldManFL?=
+ =?utf-8?B?N0pXNmQ5R1ZBRER3VU1uTWd6bE5JTkczL2hnUUdaeElVUm5XS25hRGV2dU8x?=
+ =?utf-8?B?Zi84Ylg2dWplUzFmOFZTTm0xTGJCOFVod0tJWkFpUkNDS1B2ejI5K2F3V2pZ?=
+ =?utf-8?B?S2lVeWtPcVdKSUVzK1JUTlBMb0JzaTUzM2Z2dkFWN3BZWFFYTmlZK2hldE80?=
+ =?utf-8?B?M1RhNXdpTVo3REJzdElqN1VxM1VaZWJYUnZNdWFSald3RnRLK1NoNlEzVEYw?=
+ =?utf-8?B?TlBjVVo1c085Y2hsNWJQeTJGY3kxdHozblF6blhlaE9Ta294RDRjSzhTWmR6?=
+ =?utf-8?B?S0lOMEJJSHV4RXFwaU8rd2t3L0xtQlQ4TG9kUEp1aGpPTWgxUEZxV3lqRy9o?=
+ =?utf-8?B?ZW5vRVdTU3JBc2p3RjFyUFFWTHFxZ21KOTFhSnpiNXgwRUpweSs0YXg4czBm?=
+ =?utf-8?B?Q3g5SVBEY3h1bExBYkNWQm5ESi9nUGhBWTdhM0xSYTV6VUQvZ3d2YU9KR0Vm?=
+ =?utf-8?B?Z09HUEtIQWxMQ2h1THJYMTRxSDlPUVVUaENUdlpRcCtrQzRXNitVNTVLYWlS?=
+ =?utf-8?B?bjh0TXZHQnR0MHlERVRqdXFkOG1xSDE0dWQ3OTVJay9BR25saTlqd2Rmd0xx?=
+ =?utf-8?B?bGJYdW1mR0UzMlo3Qlp4RmdTblI5aVVLTFE4aCtIL0xzTDI0U0w4bkgzaXBQ?=
+ =?utf-8?B?ckhWd0VldmJJSVZucjgrSmg1RnJnQitld2wzRm5TNUlRQzBsaGJIamRQTXVo?=
+ =?utf-8?B?anVIL1NYc013a01WZlpGYkRYSmVQMjVsRFN0U0hIQWFCc016RGdMemRRNXpO?=
+ =?utf-8?B?dFBQQWtzVHZoSWltQ3dYbUg1WmtIbW8wR3BQNlRHNFo2NG9rQnVGMDBoNjBM?=
+ =?utf-8?B?STBtbWg5UVhnZEV0UjRra0hnWDAwZTBXb2EvMWdzcnExYXEzbjZTUjJ5QUcv?=
+ =?utf-8?B?Y3NzWkF0d0ZwM254a3NrQWEyWkZjMjlJZnFhSFFUMHIzU2U2ZE1YK09USXRq?=
+ =?utf-8?B?N2ZVbzNaeHlVcUZiYzVWS1pDaVZWSjhaT2VqTHZ0M2NZMjhsamJBNUVXYjQ4?=
+ =?utf-8?B?M2wvR1dIMjZvY2UzR0toQzlPcUQ4RlBveXhBb2ZLeTNOZFljNU1TU00rOTVv?=
+ =?utf-8?B?VHozTlU4N3RtbFByZ1NNZER5dzIzeFNxOW50N3d3aXR3UG1IR0hEemcvUHZv?=
+ =?utf-8?B?SEhCenp6WXpBdjBicFFQZTFMQ3RHS2plbWVubDZnRklYSU9ZU0FTSHg2eWVK?=
+ =?utf-8?B?ZkRUTnhvSUgxZlgxaVVObFZTRVJDK3ZBVC9wdmpuZ2dXb3h2OEVmSnZBbk9j?=
+ =?utf-8?B?UEcvVXpxczdZTUlIUFdDZkdmT3VyZHdJSkFYNkhGUkZueDg4R2tpMHJUZFdW?=
+ =?utf-8?B?TllEbGRQTE1vdkZxRWplQ0draUNJb0JWVFFHdkVmNythWERzTTFsVm9oZVlN?=
+ =?utf-8?B?WExzenlrR2RRYTIxc2pYU0gyWWxPb2wzbnR3WWFMbXc5NmpuM0ZML294MVll?=
+ =?utf-8?B?NVprSE1wRE5xSzZ6WmJNckpUQjYxa1JpVTBGMW93cktqVGE2VUZKT2M3Vk85?=
+ =?utf-8?B?MzRYYjd0OGd3Q210NlVQMTlYRk1KVXo2RXNYd0dWU0Y3S3l6UzkvRDVwaU1P?=
+ =?utf-8?B?WVFOK05WRnlWb3pWODlVM2pDNUFCKzVOeXNFWnBkYXg1enlPMnpqKzJsRWZZ?=
+ =?utf-8?B?eWVBQkdzdm0vcUF5NkZ5YUQ1Z3dmb2FiMUVOY3VjUmFXZUViK1o1QUliZDVU?=
+ =?utf-8?B?WTFUTitMb3dpdEFWb3I4SklwOGszVktWeDNWcGhTUnU3dlBNUVVuSmZGanZO?=
+ =?utf-8?B?Mk5YMlplS0VrS0tQanhyM201Vk40cUFRUlovMGZ4cDJZNUNjOWxmeFhJYlE4?=
+ =?utf-8?B?Z0twS0hPWEZDZy93WThhU3lPeStpUnBkOGkzY1RWczdINnovT3JFZHdpbWRY?=
+ =?utf-8?B?ek1TblFQdDRET01YRUZSYWU2WlZKSFhlWE9RK0NaYy95OGZWZjlxUnVCdmhh?=
+ =?utf-8?Q?xDPWtk1ziAiwxkQJzqwZhZOfK?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: d560d785-64cb-4261-a676-08de31ef5817
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2025 22:08:38.2791
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ReYeUqMtnOkqp8QkgVyAqQ1D7/XBzwRGOi+ulr1S/bpq5kflBR4LXOdcrpKMTUUiSEQvkEQqjJWgcQWc3sIPFE8joXDjDQ4btkLvqcvviFY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB7760
+X-OriginatorOrg: intel.com
 
-On Tue, Dec 02, 2025 at 09:47:19PM +0100, Paolo Abeni wrote:
-> On 12/2/25 6:56 PM, Bobby Eshleman wrote:
-> > On Tue, Dec 02, 2025 at 11:18:14AM +0100, Paolo Abeni wrote:
-> >> On 11/27/25 8:47 AM, Bobby Eshleman wrote:
-> >>> @@ -674,6 +689,17 @@ static int vhost_vsock_dev_open(struct inode *inode, struct file *file)
-> >>>  		goto out;
-> >>>  	}
-> >>>  
-> >>> +	net = current->nsproxy->net_ns;
-> >>> +	vsock->net = get_net_track(net, &vsock->ns_tracker, GFP_KERNEL);
-> >>> +
-> >>> +	/* Store the mode of the namespace at the time of creation. If this
-> >>> +	 * namespace later changes from "global" to "local", we want this vsock
-> >>> +	 * to continue operating normally and not suddenly break. For that
-> >>> +	 * reason, we save the mode here and later use it when performing
-> >>> +	 * socket lookups with vsock_net_check_mode() (see vhost_vsock_get()).
-> >>> +	 */
-> >>> +	vsock->net_mode = vsock_net_mode(net);
-> >>
-> >> I'm sorry for the very late feedback. I think that at very least the
-> >> user-space needs a way to query if the given transport is in local or
-> >> global mode, as AFAICS there is no way to tell that when socket creation
-> >> races with mode change.
-> > 
-> > Are you thinking something along the lines of sockopt?
-> 
-> I'd like to see a way for the user-space to query the socket 'namespace
-> mode'.
-> 
-> sockopt could be an option; a possibly better one could be sock_diag. Or
-> you could do both using dumping the info with a shared helper invoked by
-> both code paths, alike what TCP is doing.
-> >> Also I'm a bit uneasy with the model implemented here, as 'local' socket
-> >> may cross netns boundaris and connect to 'local' socket in other netns
-> >> (if I read correctly patch 2/12). That in turns AFAICS break the netns
-> >> isolation.
-> > 
-> > Local mode sockets are unable to communicate with local mode (and global
-> > mode too) sockets that are in other namespaces. The key piece of code
-> > for that is vsock_net_check_mode(), where if either modes is local the
-> > namespaces must be the same.
-> 
-> Sorry, I likely misread the large comment in patch 2:
-> 
-> https://lore.kernel.org/netdev/20251126-vsock-vmtest-v12-2-257ee21cd5de@meta.com/
-> 
-> >> Have you considered instead a slightly different model, where the
-> >> local/global model is set in stone at netns creation time - alike what
-> >> /proc/sys/net/ipv4/tcp_child_ehash_entries is doing[1] - and
-> >> inter-netns connectivity is explicitly granted by the admin (I guess
-> >> you will need new transport operations for that)?
-> >>
-> >> /P
-> >>
-> >> [1] tcp allows using per-netns established socket lookup tables - as
-> >> opposed to the default global lookup table (even if match always takes
-> >> in account the netns obviously). The mentioned sysctl specify such
-> >> configuration for the children namespaces, if any.
-> > 
-> > I'll save this discussion if the above doesn't resolve your concerns.
-> I still have some concern WRT the dynamic mode change after netns
-> creation. I fear some 'unsolvable' (or very hard to solve) race I can't
-> see now. A tcp_child_ehash_entries-like model will avoid completely the
-> issue, but I understand it would be a significant change over the
-> current status.
-> 
-> "Luckily" the merge window is on us and we have some time to discuss. Do
-> you have a specific use-case for the ability to change the netns mode
-> after creation?
-> 
-> /P
+--------------j00NNtrhp74Kt27riJj0T86v
+Content-Type: multipart/mixed; boundary="------------NyuOvcGTQ1bjBYqS1gT27p2V";
+ protected-headers="v1"
+Message-ID: <85edbf2d-f1f7-4286-8c11-a0c8ce715696@intel.com>
+Date: Tue, 2 Dec 2025 14:08:36 -0800
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v1] ice: stop counting UDP csum mismatch as rx_errors
+To: Jesse Brandeburg <jbrandeb@kernel.org>, netdev@vger.kernel.org
+Cc: Jesse Brandeburg <jbrandeburg@cloudflare.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ IWL <intel-wired-lan@lists.osuosl.org>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Brett Creeley <brett.creeley@intel.com>
+References: <20251201233853.15579-1-jbrandeb@kernel.org>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+Autocrypt: addr=jacob.e.keller@intel.com; keydata=
+ xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
+ J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
+ qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
+ CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
+ UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
+ MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
+ apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
+ cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
+In-Reply-To: <20251201233853.15579-1-jbrandeb@kernel.org>
 
-I don't think there is a hard requirement that the mode be change-able
-after creation. Though I'd love to avoid such a big change... or at
-least leave unchanged as much of what we've already reviewed as
-possible.
+--------------NyuOvcGTQ1bjBYqS1gT27p2V
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-In the scheme of defining the mode at creation and following the
-tcp_child_ehash_entries-ish model, what I'm imagining is:
-- /proc/sys/net/vsock/child_ns_mode can be set to "local" or "global"
-- /proc/sys/net/vsock/child_ns_mode is not immutable, can change any
-  number of times
 
-- when a netns is created, the new netns mode is inherited from
-  child_ns_mode, being assigned using something like:
 
-	  net->vsock.ns_mode =
-		get_net_ns_by_pid(current->pid)->child_ns_mode
+On 12/1/2025 3:38 PM, Jesse Brandeburg wrote:
+> From: Jesse Brandeburg <jbrandeburg@cloudflare.com>
+>=20
+> Since the beginning, the Intel ice driver has counted receive checksum
+> offload mismatches into the rx_errors member of the rtnl_link_stats64
+> struct. In ethtool -S these show up as rx_csum_bad.nic.
+>=20
+> I believe counting these in rx_errors is fundamentally wrong, as it's
+> pretty clear from the comments in if_link.h and from every other statis=
+tic
+> the driver is summing into rx_errors, that all of them would cause a
+> "hardware drop" except for the UDP checksum mismatch, as well as the fa=
+ct
+> that all the other causes for rx_errors are L2 reasons, and this L4 UDP=
 
-- /proc/sys/net/vsock/ns_mode queries the current mode, returning
-  "local" or "global", returning value of net->vsock.ns_mode
-- /proc/sys/net/vsock/ns_mode and net->vsock.ns_mode are immutable and
-  reject writes
+> "mismatch" is an outlier.
+>=20
+> A last nail in the coffin is that rx_errors is monitored in production =
+and
+> can indicate a bad NIC/cable/Switch port, but instead some random serie=
+s of
+> UDP packets with bad checksums will now trigger this alert. This false
+> positive makes the alert useless and affects us as well as other compan=
+ies.
+>=20
+> This packet with presumably a bad UDP checksum is *already* passed to t=
+he
+> stack, just not marked as offloaded by the hardware/driver. If it is
+> dropped by the stack it will show up as UDP_MIB_CSUMERRORS.
+>=20
+> And one more thing, none of the other Intel drivers, and at least bnxt_=
+en
+> and mlx5 both don't appear to count UDP offload mismatches as rx_errors=
+=2E
+>=20
+> Here is a related customer complaint:
+> https://community.intel.com/t5/Ethernet-Products/ice-rx-errros-is-too-s=
+ensitive-to-IP-TCP-attack-packets-Intel/td-p/1662125
+>=20
+> Fixes: 4f1fe43c920b ("ice: Add more Rx errors to netdev's rx_error coun=
+ter")
+> Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+> Cc: Jake Keller <jacob.e.keller@intel.com>
+> Cc: IWL <intel-wired-lan@lists.osuosl.org>
+> Signed-off-by: Jesse Brandeburg <jbrandeburg@cloudflare.com>
+> --
+> I am sending this to net as I consider it a bug, and it will backport
+> cleanly.
+> ---
 
-Does that align with what you have in mind?
+Its fine with me. I can't find anything explaining why we originally
+chose to put these in rx_errors, and I think its better to align with
+other drivers and vendors. I suspect its just as "this is an error, it
+obviously goes in rx_errors" even though its of a completely different ki=
+nd.
 
-Stefano, what are your thoughts?
+Acked-by: Jacob Keller <jacob.e.keller@intel.com>
 
-Best,
-Bobby
+>  drivers/net/ethernet/intel/ice/ice_main.c | 1 -
+>  1 file changed, 1 deletion(-)
+>=20
+> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/et=
+hernet/intel/ice/ice_main.c
+> index 86f5859e88ef..d004acfa0f36 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_main.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
+> @@ -6995,7 +6995,6 @@ void ice_update_vsi_stats(struct ice_vsi *vsi)
+>  		cur_ns->rx_errors =3D pf->stats.crc_errors +
+>  				    pf->stats.illegal_bytes +
+>  				    pf->stats.rx_undersize +
+> -				    pf->hw_csum_rx_error +
+>  				    pf->stats.rx_jabber +
+>  				    pf->stats.rx_fragments +
+>  				    pf->stats.rx_oversize;
+
+
+--------------NyuOvcGTQ1bjBYqS1gT27p2V--
+
+--------------j00NNtrhp74Kt27riJj0T86v
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wnsEABYIACMWIQQgQFSp1zOQVirsQx5qll0+bw8o6AUCaS9jZAUDAAAAAAAKCRBqll0+bw8o6NWD
+AP97/wvmG4W0WQZPXbOF2zPXKZtt7TvLUf9DUwbvprdReQEAt8nOex8DibVRezM9TwsdqMWW0SSA
+hYW2Dhb4qNhdSQI=
+=n5lF
+-----END PGP SIGNATURE-----
+
+--------------j00NNtrhp74Kt27riJj0T86v--
 
