@@ -1,110 +1,192 @@
-Return-Path: <netdev+bounces-243234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDF43C9C033
-	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 16:47:59 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6432C9C057
+	for <lists+netdev@lfdr.de>; Tue, 02 Dec 2025 16:49:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 687CE3490C3
-	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 15:47:59 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3C5074E38B1
+	for <lists+netdev@lfdr.de>; Tue,  2 Dec 2025 15:48:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64669324B2C;
-	Tue,  2 Dec 2025 15:47:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D73BF31ED9D;
+	Tue,  2 Dec 2025 15:48:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=exactco.de header.i=@exactco.de header.b="uOdzu5AQ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="0DIW3mVp"
 X-Original-To: netdev@vger.kernel.org
-Received: from exactco.de (exactco.de [176.9.10.151])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2ED13168FB
-	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 15:47:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.10.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCB683164AB
+	for <netdev@vger.kernel.org>; Tue,  2 Dec 2025 15:48:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764690463; cv=none; b=OeA7G0j6qQYTqe0d8lGl+vYB259TfNCcz3LkYpDLzWSmyLpSwx6C+VzzszHnLd16YLAUr8OJ9qnFVegqV1dVdLXEA1LhQNV64PHnlGsprdlngk8/vt1JqMTIEmYAyBJEgi6diHAb2ElqYKN0lcDsQrIUxrfVKtDyJr5Rrdla1E8=
+	t=1764690534; cv=none; b=K76B/B2WH6ngpaBwicM2hxJMVgOnB+A04WTztRcz+3LNfcDWLrX3pgKcN94AOx92YnJIqt3NGoD5sfVBBH/PsdQasYBUBEj8tzY63z/EvCdOy6xzNFOSuHpCYlj1uI72beMHdhfKiGgWhAlRbNVvD7DMQuWKHCJCvAZ2uoCqZiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764690463; c=relaxed/simple;
-	bh=qkwjFnrK5hLRNxCLPcLy6ihRaGeDx6SD0+LCXlVVuRM=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=cQTjdDKsR2F5UGkJxj0CEVpCzJUuJWeGcJp6nexW2qC1H9MA5Zh67JuyWoRxLdP6ed4rY161GOqmNuS/Gr/xFheoVu4X3ctEP82lne/TEiIR9e2247bcPc0OVLA0hDwkNknwrJBKpltXqDcdp5lKQnOAuQHqO+e3BYbWR3BTbAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exactco.de; spf=pass smtp.mailfrom=exactco.de; dkim=pass (2048-bit key) header.d=exactco.de header.i=@exactco.de header.b=uOdzu5AQ; arc=none smtp.client-ip=176.9.10.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=exactco.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=exactco.de
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=exactco.de;
-	s=x; h=Content-Transfer-Encoding:Content-Type:Mime-Version:References:
-	In-Reply-To:From:Subject:Cc:To:Message-Id:Date:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=yttXHC44416RR3sDrPk2p2RoPtu+dtQDyd/+QMi5iKY=; b=uOdzu5AQc0gEWg35YXjD1rFbLb
-	CTFVZx9rm6pfLyWc0//luF0ZeAeu0gETtzBNOU+PXqF7H9l3nHc7FhkE2alG0gLYuSjzHiHJrZr/e
-	knNnv1z7WIXCQpv0Gc/s+aeYRy7ilVzWCtoxjIeBQD/Xon1rtVDZRrwgQTWBh9Xu8SblZGZ2QhN8t
-	GvudewnVBn8+jLN+YshMo2L0OAoGM5+a2eD+Zn3BzbtRt6pFlnZ8FlbYunT+esJVYIhjKMHhCTW9c
-	G7hnBCgVPg8m+nvNihWG48KsdLNO/95OYV3AKAIWlRz6klkDVK/Hx1hjKB3tS3Pjygw50bcIAMfCO
-	+hGVBZ1A==;
-Date: Tue, 02 Dec 2025 16:47:38 +0100 (CET)
-Message-Id: <20251202.164738.1343792086968703812.rene@exactco.de>
-To: andrew@lunn.ch
-Cc: netdev@vger.kernel.org, hkallweit1@gmail.com, nic_swsd@realtek.com
-Subject: Re: [PATCH] r8169: fix RTL8117 Wake-on-Lan in DASH mode
-From: =?iso-8859-1?Q?Ren=E9?= Rebe <rene@exactco.de>
-In-Reply-To: <f14f1078-311e-47ff-ad5f-01d2fd9ea40d@lunn.ch>
-References: <20251201.201706.660956838646693149.rene@exactco.de>
-	<f14f1078-311e-47ff-ad5f-01d2fd9ea40d@lunn.ch>
-X-Mailer: Mew version 6.10 on Emacs 30.2
+	s=arc-20240116; t=1764690534; c=relaxed/simple;
+	bh=K1tR2iuSOs6vNvplJ2wKOeNyl3VhtwG9KecCIqkktbk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PSef3GKYO9qQmjRFDEv72vbQoxOLi53CikBNG124xnOG48vYBx9PmmAryS7ZjxqXYIcX934KmIj0g5W74AW6rNWiFUr+EJBF+Z8wLMVCFmpKmljQpY/sti5k5qGYSOBBu+1Ts2nfv5TrFytLMHFqwsfxJpMiHPBnVp+6AmgZ8lk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=0DIW3mVp; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 8BF62C17B7E;
+	Tue,  2 Dec 2025 15:48:26 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id AB9EE606D6;
+	Tue,  2 Dec 2025 15:48:49 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9088811919C22;
+	Tue,  2 Dec 2025 16:48:40 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1764690528; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=rMIFzfxad91ubA6fyH1uZaF1Zu4vkX1bopp9UAEB1ok=;
+	b=0DIW3mVpRWiI2wPcbqGnJN+i3obaZkrmas/VrjGd8XMI25WcIAJG9yk2nxOGGumtlKjaml
+	cQQZyCjT2C66qpCtLoyAQCeUCWxBb/KV2J6FpEMYCVV5vLmZ1tVg3oOxsJX61uVgiJeDXF
+	O1HzokU48HCHr8r6SCbeCwT/5OB9xo6XmuFgvpZEj+VfvbHDOSuTjpZLc9FGN3LFtip1+2
+	4o2gNvUWlmaS8TTC3Basjl6KnwfV9a3fYLCniuGvpyRO/Vwrpf0LGzeHdVeMV4NoffY8m7
+	Kf5bBhs8qOCODQqGcWFMhQpF6+P5omRFiyPjLF3sGh3HhyUz27FIMEYQqYTSqA==
+Message-ID: <49709595-5012-4fa3-9616-839dcdbf6b09@bootlin.com>
+Date: Tue, 2 Dec 2025 16:48:39 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v21 02/14] net: ethtool: Introduce
+ ETHTOOL_LINK_MEDIUM_* values
+To: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, thomas.petazzoni@bootlin.com,
+ Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Russell King <linux@armlinux.org.uk>,
+ linux-arm-kernel@lists.infradead.org,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
+ =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
+ Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+ Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
+ Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
+ Romain Gantois <romain.gantois@bootlin.com>,
+ Daniel Golle <daniel@makrotopia.org>,
+ Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
+ Tariq Toukan <tariqt@nvidia.com>
+References: <20251129082228.454678-1-maxime.chevallier@bootlin.com>
+ <20251129082228.454678-3-maxime.chevallier@bootlin.com>
+ <298e982d-7796-4e46-ad1d-a7f57c573f35@redhat.com>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <298e982d-7796-4e46-ad1d-a7f57c573f35@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-Hi,
+Hi Paolo
 
-On Tue, 2 Dec 2025 16:41:49 +0100, Andrew Lunn <andrew@lunn.ch> wrote:
-
-> > While at it, enable wake on magic packet by default, like most other
-> > Linux drivers do.
+On 02/12/2025 14:03, Paolo Abeni wrote:
+> On 11/29/25 9:22 AM, Maxime Chevallier wrote:
+>> @@ -298,138 +321,149 @@ static_assert(ARRAY_SIZE(link_mode_names) == __ETHTOOL_LINK_MODE_MASK_NBITS);
+>>  		.speed	= SPEED_UNKNOWN, \
+>>  		.lanes	= 0, \
+>>  		.duplex	= DUPLEX_UNKNOWN, \
+>> +		.mediums = BIT(ETHTOOL_LINK_MEDIUM_NONE), \
+>>  	}
+>>  
+>>  const struct link_mode_info link_mode_params[] = {
+>> -	__DEFINE_LINK_MODE_PARAMS(10, T, Half),
+>> -	__DEFINE_LINK_MODE_PARAMS(10, T, Full),
+>> -	__DEFINE_LINK_MODE_PARAMS(100, T, Half),
+>> -	__DEFINE_LINK_MODE_PARAMS(100, T, Full),
+>> -	__DEFINE_LINK_MODE_PARAMS(1000, T, Half),
+>> -	__DEFINE_LINK_MODE_PARAMS(1000, T, Full),
+>> +	__DEFINE_LINK_MODE_PARAMS_PAIRS(10, T, 2, 4, Half, T),
+>> +	__DEFINE_LINK_MODE_PARAMS_PAIRS(10, T, 2, 4, Full, T),
+>> +	__DEFINE_LINK_MODE_PARAMS_PAIRS(100, T, 2, 4, Half, T),
+>> +	__DEFINE_LINK_MODE_PARAMS_PAIRS(100, T, 2, 4, Full, T),
+>> +	__DEFINE_LINK_MODE_PARAMS_PAIRS(1000, T, 4, 4, Half, T),
+>> +	__DEFINE_LINK_MODE_PARAMS_PAIRS(1000, T, 4, 4, Full, T),
+>>  	__DEFINE_SPECIAL_MODE_PARAMS(Autoneg),
+>>  	__DEFINE_SPECIAL_MODE_PARAMS(TP),
+>>  	__DEFINE_SPECIAL_MODE_PARAMS(AUI),
+>>  	__DEFINE_SPECIAL_MODE_PARAMS(MII),
+>>  	__DEFINE_SPECIAL_MODE_PARAMS(FIBRE),
+>>  	__DEFINE_SPECIAL_MODE_PARAMS(BNC),
+>> -	__DEFINE_LINK_MODE_PARAMS(10000, T, Full),
+>> +	__DEFINE_LINK_MODE_PARAMS_PAIRS(10000, T, 4, 4, Full, T),
+>>  	__DEFINE_SPECIAL_MODE_PARAMS(Pause),
+>>  	__DEFINE_SPECIAL_MODE_PARAMS(Asym_Pause),
+>> -	__DEFINE_LINK_MODE_PARAMS(2500, X, Full),
+>> +	__DEFINE_LINK_MODE_PARAMS_MEDIUMS(2500, X, Full,
+>> +					  __MED(C) | __MED(S) | __MED(L)),
+>>  	__DEFINE_SPECIAL_MODE_PARAMS(Backplane),
+>> -	__DEFINE_LINK_MODE_PARAMS(1000, KX, Full),
+>> -	__DEFINE_LINK_MODE_PARAMS(10000, KX4, Full),
+>> -	__DEFINE_LINK_MODE_PARAMS(10000, KR, Full),
+>> +	__DEFINE_LINK_MODE_PARAMS(1000, KX, Full, K),
+>> +	__DEFINE_LINK_MODE_PARAMS(10000, KX4, Full, K),
+>> +	__DEFINE_LINK_MODE_PARAMS(10000, KR, Full, K),
+>>  	[ETHTOOL_LINK_MODE_10000baseR_FEC_BIT] = {
+>>  		.speed	= SPEED_10000,
+>>  		.lanes	= 1,
+>>  		.duplex = DUPLEX_FULL,
 > 
-> Please give examples, because i think that is false.
+> The AI review points that medium is not initialized here:
 > 
-> You should have the option to enable any WoL mode the hardware
-> supports, but none should be enabled by default.
-
-All my other 42 computer systems in the company come up with WoL g
-enabled. Here is an Intel example:
-
-root@7950x:/srv/upstream/linux# ethtool -i eth0
-driver: igc
-version: 6.17.9-t2
-firmware-version: 1068:8754
-expansion-rom-version:
-bus-info: 0000:0c:00.0
-supports-statistics: yes
-supports-test: yes
-supports-eeprom-access: yes
-supports-register-dump: yes
-supports-priv-flags: yes
-
-# ethtool  eth0 | grep wake -i
-        Supports Wake-on: pumbg
-        Wake-on: g
-
-You could git grep the linux kernel for more data.
-
-> > There is still another issue that should be fixed: the dirver init
-> > kills the OOB BMC connection until if up, too. We also should probaly
-> > not even conditionalize rtl8168_driver_stop on wol_enabled as the BMC
-> > should always be accessible. IMHO even on module unload.
+> https://netdev-ai.bots.linux.dev/ai-review.html?id=437cd013-c6a6-49e1-bec1-de4869930c7a#patch-1
 > 
-> Is there any way to know there is a BMC connected?
+> Is that intentional? It should deserve at least an explanation in the
+> commit message.
 
-In general that is what this dash mode in the driver is about.
+Yes it is OK, however I don't really know how to answer AI on that. I'm
+sorry it's still a bit blurry to me what's the right way to proceed with
+these reviews.
 
--- 
-René Rebe, ExactCODE GmbH, Berlin, Germany
-https://exactco.de • https://t2linux.com • https://patreon.com/renerebe
+Should I paste the AI report, then reply to it ?
+
+I'd rather add more comments to the code than say in my commit log "AI
+says xxx, it's wrong because blabla" though.
+
+> 
+> Somewhat related, AI raised on the first patch the same question raised
+> on a previous iteration, and I assumed you considered that valid,
+> according to:
+> 
+> https://lore.kernel.org/netdev/f753719e-2370-401d-a001-821bdd5ee838@bootlin.com/
+
+So I don't know either how to proceed with this. dt_binding_check is
+fine with the current state, and Rob acked the patch. I am not sure how
+it's going to be received if I reach out to DT maintainers saying "the
+netdev LLM said XXX, is this correct or hallucination ?", but it may
+very well have a good point. I did try to dive into the yaml and then
+json schema specs, but I wasn't able to go far enough to reach a proper
+conclusion on wether we must remove "contains" for scalar :(
+
+All of that would be a bit clearer if the AI review was on the ML, but I
+also understand the risk for pollution with that, especially at an early
+stage of adoption.
+
+> 
+> Otherwise I think some wording in the commit message explaining why the
+> AI feedback is incorrect would be useful.
+> 
+> /P
+> 
+
+I'll update the commits and add comments anyways. I guess in a month
+though, with net-next closed then the end of year.
+
+Thanks,
+
+Maxime
 
