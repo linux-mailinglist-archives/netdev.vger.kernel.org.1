@@ -1,94 +1,83 @@
-Return-Path: <netdev+bounces-243346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E36FC9D7BA
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 02:15:47 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98974C9D7C9
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 02:16:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AFB33A6AA9
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 01:15:46 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 55E3E4E4C7D
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 01:16:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19FE815A86D;
-	Wed,  3 Dec 2025 01:15:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C68D022068F;
+	Wed,  3 Dec 2025 01:16:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qxRrmZXz"
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="JkH6seBa"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from outbound.st.icloud.com (p-east2-cluster5-host8-snip4-10.eps.apple.com [57.103.79.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4D103594F;
-	Wed,  3 Dec 2025 01:15:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A2BD215075
+	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 01:16:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.79.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764724543; cv=none; b=PVqTjBauqmIJb5clxRGah8S93aPOAn9cXnpRsLlQ7SXmgqbYThrcb+AETWEGQoj+R4snsJRfUFsOgR0wc+Jy6ObHXEDGIx+0CTEmQKVkg2Ob2NByC14WZUDV5Q10IbpsY71XJQXdgC+Ku+HB7j19wHGKQGw7Th8u0lU8GCvrSJA=
+	t=1764724563; cv=none; b=ceAm+zVFIHsCkIiYrReOmSWvRkG7g7Uhrx5mulelund4DuR+dNOu3hm5AoQCKMoQTUVta5kNhpJsHs6p+Sgc+idI08EQGX6KzZu7v6DpWJ1nvspS+W/KmA0cSEhtBXYoXY3LtN/14tAWLLczhC0XLZBQuohop9z//Bf2HuvTink=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764724543; c=relaxed/simple;
-	bh=1aAHF8PDajZXLxUp/Jk0DAZDk0VR0NNi1mMok6QLT3c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X97uqO1IcFlW9sIrScPcejFk3UJwZkscP7AiUAJePsD2lGjH6Cr0EF7JnkT4Bj058p2o5OiTgJZH40k0cbV0wQzOrgxZwm5/SDX7MhO3bFRbS3TOn3orwKpyNiMnebA5a7WMnKni32sHjv0s3s/jOEi8bVAI2cvKemG8ekYaa0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qxRrmZXz; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=pBJVd1jAB+0hdiBgrOpaANhgGukfvnPGmFszbdpJle8=; b=qxRrmZXzaycc530UVpgXAf5tfE
-	B1zFI5sC+gzwnIO29o/rmFewuf/QZVWbCUkB+V6c4QfmWeFkAsfnF9Bfi50n+l5qo1AFCsXbKPEu/
-	kEj4kqYJqzAxollglZKVEGRlfr3cfL6WguvR+0gGEIktGEMYkr4HnkGu5lY7/DkeJPB8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vQbSn-00FkpN-9W; Wed, 03 Dec 2025 02:15:25 +0100
-Date: Wed, 3 Dec 2025 02:15:25 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Frank Wunderlich <frankwu@gmx.de>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH RFC net-next 2/3] net: dsa: add tag formats for MxL862xx
- switches
-Message-ID: <531cd8e9-2b15-495d-ae77-927011dfa54d@lunn.ch>
-References: <cover.1764717476.git.daniel@makrotopia.org>
- <9ada9140d9afdf491fb2851375106ba8bc5acd8f.1764717476.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1764724563; c=relaxed/simple;
+	bh=5tWJUJG6SnYBuBZeZZq8cJ7glHx18gRawtEfzjWMsRI=;
+	h=Content-Type:From:Mime-Version:Date:Subject:Message-Id:Cc:To; b=ZCoHpZXDo2stdbKh4MjueUPe4xmOOlDuQTphemiAtN1k/zF9IJhZh61Tg7Wl/FDzWFsWIgg382/BI0DSDb+v0fpNc9hY2GSDqgO7c5hPoqmvHQpSPRXji6ziHysWP3oSwFNQDp3t+8xk2ftkwa1xIuqvjOw6MHwkhKiWfMnIKOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=JkH6seBa; arc=none smtp.client-ip=57.103.79.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+Received: from outbound.st.icloud.com (unknown [127.0.0.2])
+	by p00-icloudmta-asmtp-us-east-1a-100-percent-15 (Postfix) with ESMTPS id 3818218001BD;
+	Wed,  3 Dec 2025 01:16:00 +0000 (UTC)
+Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com; s=1a1hai; bh=5tWJUJG6SnYBuBZeZZq8cJ7glHx18gRawtEfzjWMsRI=; h=Content-Type:From:Mime-Version:Date:Subject:Message-Id:To:x-icloud-hme; b=JkH6seBafZxmRVUdqc3Y+w/lZStjRgzre3CmqC5FHW7oU2xRXWeyjA7HZd6I0qd6Ewa+kwC6VjyH0rOEXwZ9HihSzTRDDCb0o0ox53/njNu3gwO1drb8Xk3WysoxUNfRzwIORbMru9cAUTAi/VuQHez/h4xji/rsLsuLC6YYzjtB7PqKCZIMcjkt2bvoHpkHhRkioVBXKgCy+Hv0kqs72RSk383rBZyckO1OOBZB6i5c9NBTaC2nf3IjxBQrO6on7dBfoV6hEmWaJrfLW9nHQZzw/5A4JVjE289m/OkoAPZEkP42w1b4Y5lm/ycr9cIew7iu8CPLRBvj4/vIR6WrPQ==
+Received: from smtpclient.apple (unknown [17.42.251.67])
+	by p00-icloudmta-asmtp-us-east-1a-100-percent-15 (Postfix) with ESMTPSA id 742FF18002A2;
+	Wed,  3 Dec 2025 01:15:59 +0000 (UTC)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: base64
+From: Abdullah Alamri <alboodalamri13@icloud.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9ada9140d9afdf491fb2851375106ba8bc5acd8f.1764717476.git.daniel@makrotopia.org>
+Mime-Version: 1.0 (1.0)
+Date: Wed, 3 Dec 2025 04:15:46 +0300
+Subject: Re: Maintainers / Kernel Summit 2021 planning kick-off
+Message-Id: <FE7FB0D0-6CD8-4D1A-90B5-DE5487E378B3@icloud.com>
+Cc: James.Bottomley@hansenpartnership.com, cl@gentwo.de, david@redhat.com,
+ greg@kroah.com, jikos@kernel.org, ksummit@lists.linux.dev,
+ linux-api@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org, lkml@metux.net,
+ netdev@vger.kernel.org, tytso@mit.edu
+To: torvalds@linux-foundation.org
+X-Mailer: iPhone Mail (22G100)
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjAzMDAwNyBTYWx0ZWRfX0CBsIh7m/AhI
+ FhNy9OzFBRQ6lTdilYWlw4niVyHgZMB7p7sqUjhg7sYgMXFbCpcuXUkxXQP7bUNVhQT5A4mVhGL
+ aTDsXoMI94SJ3kbKufVDAQSNfd29YBw1+3dDV72x2UvvDWI7Ii+VvoDbwpi3/xF9TvBId2l4+Rc
+ 32t58DeXW9SSJ/VpkJSZ9cWKen7G0nJ/b0JoTZmImWFe+ITLPO5d3CRz/3zcAlEc2e6DJvOhwl5
+ MaIfAqOUxAn65qV7sN9zyYXhUDARNcdYdedPQSS8PGC5F7HKkc9GAaXBjcYDRN2IumQS9Dvdnb4
+ Enc7JD+t8mfq2shPGrT
+X-Proofpoint-GUID: es_qhwUAhhCMzL-D7iYTN7TCo308goSO
+X-Proofpoint-ORIG-GUID: es_qhwUAhhCMzL-D7iYTN7TCo308goSO
+X-Authority-Info: v=2.4 cv=J5ynLQnS c=1 sm=1 tr=0 ts=692f8f50 cx=c_apl:c_pps
+ a=YrL12D//S6tul8v/L+6tKg==:117 a=YrL12D//S6tul8v/L+6tKg==:17
+ a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=x7bEGLp0ZPQA:10 a=-KdL-90ardkA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=HyzYxv5D6p1NO4_E8OwA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-12-01_01,2025-11-27_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
+ adultscore=0 mlxlogscore=666 spamscore=0 bulkscore=0 malwarescore=0
+ phishscore=0 suspectscore=0 clxscore=1011 classifier=spam authscore=0
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2510240001
+ definitions=main-2512030007
+X-JNJ: AAAAAAABcBUMmKYEjepPQWO9oz0fKF0xJR4oEUJJJhwb5ynuO3cAT5TqKmi5gvBxr6b+Pia+G2rXYHxNYB3vI9ZpznaL1pqVzmaGJF23x5psdUMBBcAWXvbSTGq/VJOIzbNDcy8vftXrsq5zR0BUygpb0/6VN3p871Ph1ut7tgYelUYZQbdXnFdO25/QKR20Quhjct26nmPnzwIIBPH1w/WgvRsl8hpGxnZu2szp3h9brZwli5v/9Il4K80B/3AtevYJChN/GIgKGNHAwMG1f9THHkrw2Y4+BIofgjwEtO46FHwMqkKmnmOyzHlJZIH/3WTRw5IjXHu9sGIClaXy0ViVT7lKpO2qytvQ9oRNaL4nwfFlRyS4jJOXayBnbv4WOizprxRrfZRg38cFMgKpEpdv/Vy7radCRRgdmGUcT3/tK3QDaf/H3CretHZ8k6yzLy3nhe20SzqVdzLDgSbwGeNN1JXJEJyC6uy/mQZ8xUOHGyWCnotv0w+abcoO8WMeTx8UJcl7HVhlxcqVwqpFcQqOzf66fBBzfoljzvrzMMlGk40i0bfOaU+xJgUZUvcgZ39/Bdq/rgCqzDsX+cNteNdYu8GASjdLKYaWgQ7HGzuP4BT/BwYgsyCAKh5eBgaALzV4CWUO2Fq/fu41Ha/Un+hrqWh9uETR7L5XM7++iFVl/jqr6WBvVXgbpEgzltgVgUeUxkmmb4cnFuz3BIaFNao4OoW9Fvuyu+tw9rHyb8qCGWmrNuPdEr8jmBn1wDyexpk4Lbo7ENAdhWx9phpMfvTyBpIgW4WFtso=
 
-> +	/* special tag ingress */
-> +	mxl862_tag = dsa_etype_header_pos_tx(skb);
-> +	mxl862_tag[0] = htons(ETH_P_MXLGSW);
-> +	mxl862_tag[2] = htons(usr_port + 16 - cpu_port);
-> +	mxl862_tag[3] = htons(FIELD_PREP(MXL862_IGP_EGP, cpu_port));
-
-You appear to be leaving mxl862_tag[1] uninitialised. Is that
-intentional?
-
-This is a pretty odd tag format. The destination port is relative to
-the CPU port? You need to include the CPU port in the tag itself? Is
-this publicly documented somewhere?
-
-	Andrew
+DQrigKvYo9mP2LHYs9mE2Kog2YXZhiDYp9mE2YAgaVBob25l4oCs
 
