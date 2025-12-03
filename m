@@ -1,292 +1,140 @@
-Return-Path: <netdev+bounces-243442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44A5DCA1498
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 20:10:15 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6CC3CA12C6
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 19:53:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B77F2329A4F5
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 18:35:49 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1C4673001E17
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 18:53:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83C63330337;
-	Wed,  3 Dec 2025 18:26:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2088B346E73;
+	Wed,  3 Dec 2025 18:30:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C/ZNrSUH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NOwJHr7F";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="B/7cAnJB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FCB933030E;
-	Wed,  3 Dec 2025 18:26:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64E0D346E71
+	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 18:30:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764786375; cv=none; b=liqqUf5V+QVQIr0z+F8Ed7Mi6kIz0VPj1t6JzGfX6mrGIqGZIWi9cLamwQl2ece1ro6Glu9Md3dM9jrtYcss5jzJO+7wXu/scXB8aLSV81pXZraTJ8FKaSLhDS8pNjzPKl+UmihkTo7gZsj30jeqZEu+Bc3n/I7++JJU7ubPWpo=
+	t=1764786649; cv=none; b=SePtCkhXHmLrI+O2+6CyK4oacJyCEFMLaoq11iigFg8D9vxU5Yg5sXyuaU82CDgHrq1zLYHN1ejgY20PsPpf5UTLxYylsu6ereL43KBMycS6OS5B6fPljF1e6l5uZF5CB228lgy8z9RGBjmnm+WbQl/kKURjINjKbTy02KI1ry4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764786375; c=relaxed/simple;
-	bh=hTv9qkjAOM2JGYQGnsmIZMfkj1CbyeyxYjvHdQeDrQc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=FVNb1SDNvW3d5NfK1fD810zPogKG+D00nustg9t1Ey/snjlTBz7ju5P7t75WrRnyHWaRXRyb2L+maaUZGTshEwD//k7oIp2t42LdPU3zqcjS9tPP0Bw3wK1LK+z8CMbFyc30LEfGDXVpHe8HGpP/+iO7PHoRmTkCoSAkrBvBmCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C/ZNrSUH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B4FBC116C6;
-	Wed,  3 Dec 2025 18:26:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764786374;
-	bh=hTv9qkjAOM2JGYQGnsmIZMfkj1CbyeyxYjvHdQeDrQc=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=C/ZNrSUH70F2KrHvIYTu5cILl45iGh1tym97XGjjqJYmiqIiTzuQnQ3295rtxF8ju
-	 0C08yjiIJoxn4y0jhyDp7S5InNgB3I3TAOxIP//z9EwMSQwDxh+djlFwKqW+u3UWxJ
-	 sk1f4g1qr5qzVWujqfqEG2IUTSbDyr43VlTOty46xWBvdIzHuFCb02EnVO4ZQmsmWH
-	 FU5omC0m5l0Uqk8lso9hqzOFui4vX/oBNhhXRc8IuaLPfp/e1klc3tMVo9T0/27AIw
-	 Q6to4N6kSsPWtqOyIc2uAAlcaCPRL82QINWdSVEjnTNmYf++1DFXaM3LYK6O39/cff
-	 poyqqJfUzi1Uw==
-From: Vincent Mailhol <mailhol@kernel.org>
-Date: Wed, 03 Dec 2025 19:24:34 +0100
-Subject: [PATCH iproute2-next v3 7/7] iplink_can: add CAN XL TMS PWM
- configuration support
+	s=arc-20240116; t=1764786649; c=relaxed/simple;
+	bh=VYxKNEwJsGoFLMu4mlLGH1jje4jvanpQMbiJbSZ292s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rIDblOdEYcwxp/cy5X9wslL3OFWjKhY7tj4CpdNHecKi27nuVja7JKor0tMlGY/V5rn2CJFT+nPRhxYCR+WAmddMbtpFjgDGTJJcu1lsWdUiCaNMIOYB5D+qfg699V5kooS7F3/4RxVwbFIPQQcyd9DINvdqRa4lzO1i4x3NfA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NOwJHr7F; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=B/7cAnJB; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764786636;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=acsQVvxxVABEXpMRsDvrWebO8JH8k6+nAs9EDdDvZVY=;
+	b=NOwJHr7FNQx7wD/ioSjmw8fHB2M7HSmYni/EUP5nhhL9gjbfhTV7f/Qt5ogXNiVLjTJ7Da
+	lIalYLLfYH7/htTHDf6guD0eGnG/3kb//r353WGYOQgdaIXm+l5CtpQPoOLm5kBNinOr1U
+	fgH2yoYO/pZtWq7+69WGwQ5t760L2tM=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-500-p3lbJKAHMTuKaKSOToSzIg-1; Wed, 03 Dec 2025 13:30:33 -0500
+X-MC-Unique: p3lbJKAHMTuKaKSOToSzIg-1
+X-Mimecast-MFC-AGG-ID: p3lbJKAHMTuKaKSOToSzIg_1764786633
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-42e29783a15so48154f8f.1
+        for <netdev@vger.kernel.org>; Wed, 03 Dec 2025 10:30:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1764786633; x=1765391433; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=acsQVvxxVABEXpMRsDvrWebO8JH8k6+nAs9EDdDvZVY=;
+        b=B/7cAnJBunq48vfQqivwQbeUWgRSgBEs/qcrMtDOmnHF0SiiwZVYbq4/X2H9RlVaML
+         1d81wrV6jdg1QgPfVcir8woZKGf50W2uvghyob5LTQBW2RzAgucpBnnr7ZPZwNa2vtn5
+         URE+Heu1Pibi5yZfDTpL2DHQUzP8bMya6NG6bu42Yw20VSazMflfAVhE8y5A3TiDUATx
+         Vj4n7mIznlETtkN+OTgvRPL7rGksWZ9LoUJfNQvxbuEA20bZuPlZ3NxH9/vut0XSsShh
+         Zedgy2pHmzltG1U4jNM/aeSqgDOrq5e1fQGm/9NWyFzjS2lASe2IVbzpeu8ZfWXIXzPl
+         yuRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764786633; x=1765391433;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=acsQVvxxVABEXpMRsDvrWebO8JH8k6+nAs9EDdDvZVY=;
+        b=RjI521557dKvdzmV5kjsapojxh4jS6tn0KPgwYnbXbsbqpty/aqSM3ABQPEumVGAnd
+         tnM9ALh9BLr0dWvx1PHRFN4yWyDxEGFiuYf8h44BKftGErFY+qOaL/e8xOPCypRsp7+/
+         dqFe5NkYXKVmiRk1NfacbO85MlqEUnmW3sSaQ0FMGZXy4MUdVI8IUS/+tWwwUE49tm6s
+         NARNsdGAr9+nJo32Da3Y20v30/PkdGsMDl7AyxDL6YDyU1q96a3VFwY9OUwR6Ic6nyie
+         s0e8O/3UOuqVlHCAvX0KC3IlJEW3XW8tzdsUVkaqSMlb6Th2x3S+tPCz3OvxMDLGFDZI
+         Nrxw==
+X-Gm-Message-State: AOJu0YzmkWNjNXAuRhXnmylE4oJAL1gUhHyEPVWd77H6vW/X+v3eo2Dq
+	Uat0ZEO2jQIE5mT2P5m7SX+XoczLsrUWC2US61Uu9bjAoQZely3EWuXJHI8HWiQb6z0E4iXs4lR
+	GZhawnpuPG1xlcaLvxEZ5KDga4FISt+EW6xZOLrAA2D7hRDJft9wQHFd7rQ==
+X-Gm-Gg: ASbGncsdhtOBUL9b9rd7IpQaXKtUGdoMY9qcTgRQH9BB7iKUq3UQsUBYT7YA6ap8Ihu
+	9EW9NCJCX4lhjOdpCTsDtbh3+s9zwxcgXS53kCTr0xXqOrAY7m8wHFvkLF98jbDSZY0EHLQ3Ajt
+	+5BJsXUMZVk9BLD3iRFZg4of2GvuLPZ4AMwMc9wG90p4ekd+CBi/MtwO8SH7wCtQ5igxXGbjRQj
+	WyfnAkblVRPSmhriwJnEdxKXz5/bNzw1O3LzE7Hzk7AJpj6oIqg4CNo7bLQzj7SzvZhfoKoINZh
+	W3UTshcbErAzvVnikLchFVce5Mk8N7iJ/6N9K0eeVrs5OFNjU81VCyvZcxR6kmITwpbnBQUY8ZE
+	D6BpRtnCuDF6/
+X-Received: by 2002:a5d:568d:0:b0:429:d59e:d097 with SMTP id ffacd0b85a97d-42f7876a1d2mr357485f8f.9.1764786632624;
+        Wed, 03 Dec 2025 10:30:32 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGDHBFTVB7DGoAI6E1BlomKo2N3EamH9l3ucvy9/gps2BsQhYjdlYa5fv7c+yQ+euCbCalrcw==
+X-Received: by 2002:a5d:568d:0:b0:429:d59e:d097 with SMTP id ffacd0b85a97d-42f7876a1d2mr357464f8f.9.1764786632253;
+        Wed, 03 Dec 2025 10:30:32 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.153.24])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42e1ca1a38bsm41628603f8f.24.2025.12.03.10.30.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 03 Dec 2025 10:30:31 -0800 (PST)
+Message-ID: <89b15d8b-f145-40f5-a56a-07b73b3ea899@redhat.com>
+Date: Wed, 3 Dec 2025 19:30:30 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: MPTCP deadlocks
+To: Matthieu Baerts <matttbe@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <20251203073555.1f39300c@kernel.org>
+ <b0b6878a-9410-4ee6-a8c1-c54ae258dc40@kernel.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <b0b6878a-9410-4ee6-a8c1-c54ae258dc40@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251203-canxl-netlink-v3-7-999f38fae8c2@kernel.org>
-References: <20251203-canxl-netlink-v3-0-999f38fae8c2@kernel.org>
-In-Reply-To: <20251203-canxl-netlink-v3-0-999f38fae8c2@kernel.org>
-To: netdev@vger.kernel.org, Stephen Hemminger <stephen@networkplumber.org>, 
- Marc Kleine-Budde <mkl@pengutronix.de>, 
- Oliver Hartkopp <socketcan@hartkopp.net>, David Ahern <dsahern@kernel.org>
-Cc: Rakuram Eswaran <rakuram.e96@gmail.com>, 
- =?utf-8?q?St=C3=A9phane_Grosjean?= <stephane.grosjean@free.fr>, 
- linux-kernel@vger.kernel.org, linux-can@vger.kernel.org, 
- Vincent Mailhol <mailhol@kernel.org>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=7655; i=mailhol@kernel.org;
- h=from:subject:message-id; bh=hTv9qkjAOM2JGYQGnsmIZMfkj1CbyeyxYjvHdQeDrQc=;
- b=owGbwMvMwCV2McXO4Xp97WbG02pJDJkGDavl7Toem13cN+Wuv87la423qpvPv9pofenyppxoM
- 42969rLO0pZGMS4GGTFFFmWlXNyK3QUeocd+msJM4eVCWQIAxenAEwkejbDX+nEnLNP1jfKXGBK
- XBYpyWLWVlCes9Xysb6DZH3OotP7jzEyfFSa+LoxPn3HXOMVFz1P/v8kO6Ha6Utz2BP3m9x7m96
- LMwAA
-X-Developer-Key: i=mailhol@kernel.org; a=openpgp;
- fpr=ED8F700574E67F20E574E8E2AB5FEB886DBB99C2
 
-This is the iproute2 counterpart of Linux kernel's commit 46552323fa67
-("can: netlink: add PWM netlink interface").
+On 12/3/25 6:37 PM, Matthieu Baerts wrote:
+> On 03/12/2025 16:35, Jakub Kicinski wrote:
+>> Not sure if its the new machines or some of the recent work in MPTCP
+>> but we hit a deadlock in the tests a couple of times:
+> 
+> Thank you for the message, I didn't notice that, and I didn't see this
+> issue in our CI. So maybe due to both the new machines and the recent work.
+> 
+> I will check if one of my syzkaller instances didn't find the same bug,
+> hopefully with a reproducer.
 
-When the TMS is switched on, the node uses PWM (Pulse Width Modulation)
-during the data phase instead of the classic NRZ (Non Return to Zero)
-encoding.
+caused by:
 
-PWM is configured by three parameters:
+ommit f8a1d9b18c5efc76784f5a326e905f641f839894
+Author: Paolo Abeni <pabeni@redhat.com>
+Date:   Mon Jul 14 18:41:44 2025 +0200
 
-  - PWMS: Pulse Width Modulation Short phase
-  - PWML: Pulse Width Modulation Long phase
-  - PWMO: Pulse Width Modulation Offset time
+    mptcp: make fallback action and fallback decision atomic
 
-For each of these parameters, the CAN netlink interface defines three IFLA
-symbols:
+I think it's just quite unlikely to hit the relevant code path with the
+suitable status to trigger the bug.
 
-  - IFLA_CAN_PWM_PWM*_MIN: the minimum allowed value.
-  - IFLA_CAN_PWM_PWM*_MAX: the maximum allowed value.
-  - IFLA_CAN_PWM_PWM*: the runtime value.
+@Matttbe: if it's ok I'll send a patch directly to net
 
-This results in a total of nine IFLA symbols which are all nested in a
-parent IFLA_CAN_XL_PWM symbol.
-
-Add the "pwms", "pwml" and "pwmo" options to iplink_can which controls the
-IFLA_CAN_PWM_PWM* runtime values.
-
-Add the logic to query and print all those IFLA values. Update
-print_usage() accordingly.
-
-Example using the dummy_can driver:
-
-  # modprobe dummy_can
-  # ip link set can0 type can bitrate 1000000 xl on xbitrate 20000000 tms on
-  $ ip --details link show can0
-  5: can0: <NOARP> mtu 2060 qdisc noop state DOWN mode DEFAULT group default qlen 10
-      link/can  promiscuity 0 allmulti 0 minmtu 76 maxmtu 2060
-      can <XL,TMS> state STOPPED restart-ms 0
-  	  bitrate 1000000 sample-point 0.750
-  	  tq 6 prop-seg 59 phase-seg1 60 phase-seg2 40 sjw 20 brp 1
-  	  dummy_can CC: tseg1 2..256 tseg2 2..128 sjw 1..128 brp 1..512 brp_inc 1
-  	  dummy_can FD: dtseg1 2..256 dtseg2 2..128 dsjw 1..128 dbrp 1..512 dbrp_inc 1
-  	  tdco 0..127 tdcf 0..127
-  	  xbitrate 20000000 xsample-point 0.625
-  	  xtq 6 xprop-seg 2 xphase-seg1 2 xphase-seg2 3 xsjw 1 xbrp 1
-  	  pwms 2 pwml 6 pwmo 0
-  	  dummy_can XL: xtseg1 2..256 xtseg2 2..128 xsjw 1..128 xbrp 1..512 xbrp_inc 1
-  	  xtdco 0..127 xtdcf 0..127
-  	  pwms 1..8 pwml 2..24 pwmo 0..16
-  	  clock 160000000 numtxqueues 1 numrxqueues 1 gso_max_size 65536 gso_max_segs 65535 tso_max_size 65536 tso_max_segs 65535 gro_max_size 65536 gso_ipv4_max_size 65536 gro_ipv4_max_size 65536
-
-Signed-off-by: Vincent Mailhol <mailhol@kernel.org>
----
-Changelog:
-
-v1 -> v2:
-
-  - Remove a double space in patch description
-  - s/matches/strcmp/g in can_parse_opt()
----
- ip/iplink_can.c | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 91 insertions(+), 1 deletion(-)
-
-diff --git a/ip/iplink_can.c b/ip/iplink_can.c
-index 1cc943bb..f631aab8 100644
---- a/ip/iplink_can.c
-+++ b/ip/iplink_can.c
-@@ -34,7 +34,7 @@ static void print_usage(FILE *f)
- 		"\n"
- 		"\t[ xbitrate BITRATE [ xsample-point SAMPLE-POINT] ] |\n"
- 		"\t[ xtq TQ xprop-seg PROP_SEG xphase-seg1 PHASE-SEG1\n \t  xphase-seg2 PHASE-SEG2 [ xsjw SJW ] ]\n"
--		"\t[ xtdcv TDCV xtdco TDCO xtdcf TDCF ]\n"
-+		"\t[ xtdcv TDCV xtdco TDCO xtdcf TDCF pwms PWMS pwml PWML pwmo PWMO]\n"
- 		"\n"
- 		"\t[ loopback { on | off } ]\n"
- 		"\t[ listen-only { on | off } ]\n"
-@@ -67,6 +67,9 @@ static void print_usage(FILE *f)
- 		"\t	TDCV		:= { NUMBER in mtq }\n"
- 		"\t	TDCO		:= { NUMBER in mtq }\n"
- 		"\t	TDCF		:= { NUMBER in mtq }\n"
-+		"\t	PWMS		:= { NUMBER in mtq }\n"
-+		"\t	PWML		:= { NUMBER in mtq }\n"
-+		"\t	PWMO		:= { NUMBER in mtq }\n"
- 		"\t	RESTART-MS	:= { 0 | NUMBER in ms }\n"
- 		"\n"
- 		"\tUnits:\n"
-@@ -143,6 +146,7 @@ static int can_parse_opt(struct link_util *lu, int argc, char **argv,
- 	struct can_ctrlmode cm = { 0 };
- 	struct can_tdc fd = { .tdcv = -1, .tdco = -1, .tdcf = -1 };
- 	struct can_tdc xl = { .tdcv = -1, .tdco = -1, .tdcf = -1 };
-+	__u32 pwms = -1, pwml = -1, pwmo = -1;
- 
- 	while (argc > 0) {
- 		if (matches(*argv, "bitrate") == 0) {
-@@ -266,6 +270,18 @@ static int can_parse_opt(struct link_util *lu, int argc, char **argv,
- 			NEXT_ARG();
- 			if (get_u32(&xl.tdcf, *argv, 0))
- 				invarg("invalid \"xtdcf\" value", *argv);
-+		} else if (strcmp(*argv, "pwms") == 0) {
-+			NEXT_ARG();
-+			if (get_u32(&pwms, *argv, 0))
-+				invarg("invalid \"pwms\" value", *argv);
-+		} else if (strcmp(*argv, "pwml") == 0) {
-+			NEXT_ARG();
-+			if (get_u32(&pwml, *argv, 0))
-+				invarg("invalid \"pwml\" value", *argv);
-+		} else if (strcmp(*argv, "pwmo") == 0) {
-+			NEXT_ARG();
-+			if (get_u32(&pwmo, *argv, 0))
-+				invarg("invalid \"pwmo\" value", *argv);
- 		} else if (matches(*argv, "loopback") == 0) {
- 			NEXT_ARG();
- 			set_ctrlmode("loopback", *argv, &cm,
-@@ -401,6 +417,18 @@ static int can_parse_opt(struct link_util *lu, int argc, char **argv,
- 			addattr32(n, 1024, IFLA_CAN_TDC_TDCF, xl.tdcf);
- 		addattr_nest_end(n, tdc);
- 	}
-+	if (pwms != -1 || pwml != -1 || pwmo != -1) {
-+		struct rtattr *pwm = addattr_nest(n, 1024,
-+						  IFLA_CAN_XL_PWM | NLA_F_NESTED);
-+
-+		if (pwms != -1)
-+			addattr32(n, 1024, IFLA_CAN_PWM_PWMS, pwms);
-+		if (pwml != -1)
-+			addattr32(n, 1024, IFLA_CAN_PWM_PWML, pwml);
-+		if (pwmo != -1)
-+			addattr32(n, 1024, IFLA_CAN_PWM_PWMO, pwmo);
-+		addattr_nest_end(n, pwm);
-+	}
- 
- 	return 0;
- }
-@@ -519,6 +547,62 @@ static void can_print_tdc_const_opt(struct rtattr *tdc_attr, bool is_xl)
- 	close_json_object();
- }
- 
-+static void can_print_pwm_opt(struct rtattr *pwm_attr)
-+{
-+	struct rtattr *tb[IFLA_CAN_PWM_MAX + 1];
-+
-+	parse_rtattr_nested(tb, IFLA_CAN_PWM_MAX, pwm_attr);
-+	if (tb[IFLA_CAN_PWM_PWMS] || tb[IFLA_CAN_PWM_PWML] ||
-+	    tb[IFLA_CAN_PWM_PWMO]) {
-+		open_json_object("pwm");
-+		can_print_nl_indent();
-+		if (tb[IFLA_CAN_PWM_PWMS]) {
-+			__u32 *pwms = RTA_DATA(tb[IFLA_CAN_PWM_PWMS]);
-+
-+			print_uint(PRINT_ANY, " pwms", " pwms %u", *pwms);
-+		}
-+		if (tb[IFLA_CAN_PWM_PWML]) {
-+			__u32 *pwml = RTA_DATA(tb[IFLA_CAN_PWM_PWML]);
-+
-+			print_uint(PRINT_ANY, " pwml", " pwml %u", *pwml);
-+		}
-+		if (tb[IFLA_CAN_PWM_PWMO]) {
-+			__u32 *pwmo = RTA_DATA(tb[IFLA_CAN_PWM_PWMO]);
-+
-+			print_uint(PRINT_ANY, " pwmo", " pwmo %u", *pwmo);
-+		}
-+		close_json_object();
-+	}
-+}
-+
-+static void can_print_pwm_const_opt(struct rtattr *pwm_attr)
-+{
-+	struct rtattr *tb[IFLA_CAN_PWM_MAX + 1];
-+
-+	parse_rtattr_nested(tb, IFLA_CAN_PWM_MAX, pwm_attr);
-+	open_json_object("pwm");
-+	can_print_nl_indent();
-+	if (tb[IFLA_CAN_PWM_PWMS_MAX]) {
-+		__u32 *pwms_min = RTA_DATA(tb[IFLA_CAN_PWM_PWMS_MIN]);
-+		__u32 *pwms_max = RTA_DATA(tb[IFLA_CAN_PWM_PWMS_MAX]);
-+
-+		can_print_timing_min_max("pwms", " pwms", *pwms_min, *pwms_max);
-+	}
-+	if (tb[IFLA_CAN_PWM_PWML_MAX]) {
-+		__u32 *pwml_min = RTA_DATA(tb[IFLA_CAN_PWM_PWML_MIN]);
-+		__u32 *pwml_max = RTA_DATA(tb[IFLA_CAN_PWM_PWML_MAX]);
-+
-+		can_print_timing_min_max("pwml", " pwml", *pwml_min, *pwml_max);
-+	}
-+	if (tb[IFLA_CAN_PWM_PWMO_MAX]) {
-+		__u32 *pwmo_min = RTA_DATA(tb[IFLA_CAN_PWM_PWMO_MIN]);
-+		__u32 *pwmo_max = RTA_DATA(tb[IFLA_CAN_PWM_PWMO_MAX]);
-+
-+		can_print_timing_min_max("pwmo", " pwmo", *pwmo_min, *pwmo_max);
-+	}
-+	close_json_object();
-+}
-+
- static void can_print_ctrlmode_ext(struct rtattr *ctrlmode_ext_attr,
- 				   __u32 cm_flags)
- {
-@@ -758,6 +842,9 @@ static void can_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- 		if (tb[IFLA_CAN_XL_TDC])
- 			can_print_xtdc_opt(tb[IFLA_CAN_XL_TDC]);
- 
-+		if (tb[IFLA_CAN_XL_PWM])
-+			can_print_pwm_opt(tb[IFLA_CAN_XL_PWM]);
-+
- 		close_json_object();
- 	}
- 
-@@ -782,6 +869,9 @@ static void can_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- 		if (tb[IFLA_CAN_XL_TDC])
- 			can_print_tdc_const_opt(tb[IFLA_CAN_XL_TDC], true);
- 
-+		if (tb[IFLA_CAN_XL_PWM])
-+			can_print_pwm_const_opt(tb[IFLA_CAN_XL_PWM]);
-+
- 		close_json_object();
- 	}
- 
-
--- 
-2.51.2
+/P
 
 
