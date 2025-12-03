@@ -1,135 +1,110 @@
-Return-Path: <netdev+bounces-243458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BFB4CA19FE
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 22:08:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BF36CA1A04
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 22:09:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 37A833034614
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 21:07:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A00993038F53
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 21:07:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D89602D320E;
-	Wed,  3 Dec 2025 21:07:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 257FD2D3225;
+	Wed,  3 Dec 2025 21:07:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="R4qHAUnw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FeFtVoLw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-103.mailbox.org (mout-p-103.mailbox.org [80.241.56.161])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com [209.85.217.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0106E2C237F;
-	Wed,  3 Dec 2025 21:07:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.161
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F7082BD001
+	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 21:07:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764796043; cv=none; b=TdGpcjYfVa9EiMXnWJ4Qis14P3i7L5aYcJX3YsTCJcU+5K03HfOlR+PNpbybxJEplJofOawmv+FoDBlfEpZTwprZahxljakolEBPxm6aLWe27QeFAdSwj3Fvmq2+03VaByBWYXNAJAMupZDKxhcPhyen5iCW4bp9hnaJzfgLsFA=
+	t=1764796064; cv=none; b=uZPHRpDnD/MF6XMIY0mc+qZ7TLyv1rzWic3XR45sxjmO0myF7K1SYwxGpaQGhs9BZvWO75GPmHZx/rYdwOClO8QgPdmqcjy2b7StfmBEhlEQumhnLAMZOM9x9Yzie4M4C+RXPrgwSGz6kUuOMsp+xdFCkcIvB4suKw01JjNc4Ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764796043; c=relaxed/simple;
-	bh=9BmTXWiZ1udHlq5DwURTvetbWMe+t3AVUOLj8EXf90s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SY/lJjSD//hHAjk1e48TFezQhc03tDdpUdAYtUA161zXjfFjs+ShU1jebbeWjN59mDnEVrmawPY7Aye+WCkxWMjBAqCtBOYQJzq1Q6XxNabgqxmUJfnCBdt1yr08Aq0w24IJncxk1V8Ubkk1545wNqSf10+xnC2eg0um1MxM0fo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=R4qHAUnw; arc=none smtp.client-ip=80.241.56.161
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [IPv6:2001:67c:2050:b231:465::2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-103.mailbox.org (Postfix) with ESMTPS id 4dM9FL3bsvz9t9P;
-	Wed,  3 Dec 2025 22:07:18 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1764796038;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nfOtELLqqxmDgjFZ9XKy3M43MP9qpjtLAwMQiXCOFGw=;
-	b=R4qHAUnwkxNVHJm7HKjsCbKqzMyyQgwTZHlEFBS0dHpuhvvP8WzyMgs3rbqVtUmT5mI8f6
-	1o1cununJ4sTsTSrJ38Wd4SbBNicUDDCbfPPwKI7qAX8p/pI8WFNRfx2Tj3EmS7fnbZH2L
-	laE3yHcUcfwA/w0Wc88PH0g4FkQb7pQbu3eoE+AnkYzvZpH3bmxQb1Qvm/FlEB4zuQZPbg
-	jBi5q7uCBQEactkF/RRiHb4SMusUd7GNljta2GHH8ZtiAqCu2LQAAMUA7K15CyroVgB2Lt
-	sItKxigKHvmkU/6U4Uz8q6agEUAbrukeKOzkzEcRo5fZ70uZhT4zGANnHLyAKw==
-Message-ID: <75fb955d-ef53-4e59-8a9c-d9792f6e6466@mailbox.org>
-Date: Wed, 3 Dec 2025 21:56:40 +0100
+	s=arc-20240116; t=1764796064; c=relaxed/simple;
+	bh=3d9aGC6njWAs8y8BO9Q+if9lLi5u+CBRThmGFWSqsLE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nPls4A+WZRYMroyIGPCMgXjZ6O/cDSnUxPaYQOCzfxpnvYbY7TGpSLsrotLkPK1AQBBix0HH3OEO9GSzFVZVLHRwUolt8/lKRSOr/RPeX7iu62n2TzmZjW1/YimTXYC/IC3j8keJcOYBdjUvFacR7XijOiK48vpsnyaI5ANkkeY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FeFtVoLw; arc=none smtp.client-ip=209.85.217.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f54.google.com with SMTP id ada2fe7eead31-5e18598b9b1so200187137.0
+        for <netdev@vger.kernel.org>; Wed, 03 Dec 2025 13:07:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764796058; x=1765400858; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3d9aGC6njWAs8y8BO9Q+if9lLi5u+CBRThmGFWSqsLE=;
+        b=FeFtVoLwIernLHUcn2tQqHiCCMCChIRDz/sHWZexupT27i5LLMWRsNV3AwTcwXotNC
+         5WD2yOsJGCfBuzAHZmDzkwm8mV6+dFWjnjhjSv2dPXilOHLmQ1ZpUL1giYXRtOsEQsLv
+         Ep2TL3Ce2aHB4K6URlCb0enJ1cYp1jTjkOq/Pa5CgYxNOHzLgJQGyl70yLsqnv07h3dV
+         zG8YiWzWOxeqnDmBHLzsDoK+GUloMQ/eRQptHhOsTDp5lp9e0kepjTKaQOGAdmCCoLCQ
+         3nftLqeRAdEglN6ILLaN2O3qtebSebp5XGLT0SDfLsd2DOWrSDJj05mSh4vN5cj2H/pN
+         UvzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764796058; x=1765400858;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=3d9aGC6njWAs8y8BO9Q+if9lLi5u+CBRThmGFWSqsLE=;
+        b=eCqe7MZum+sE6IuUeMdkl9uGc/hy9eFXD8nT1BOvJkunNMg1/NgDYECf815eKI3Bsc
+         vTp9a6fG4XBv6cte4BlfLAK6lO0SOE1H/ENW6VWnU3XRwIe5yDFcENsl3b4i44kekfS9
+         RMs9Zxzpu8uqu/0Oa22b7Bx4YuZcbZU1Cm+NMy51BZLofmg+aL2MrrBKyIqDXxNeBhbM
+         y/uzLZ/MoMDCrHic0sESWsFVnwo2YwqLIR5Hy/2aPaY+StGNYeGgOZ3HO8zY8cUSSbMx
+         9cdrKvYf1Fqo4s0kJipju61hSZs8dSvprbAQSEgbG0lo6lOW1xIcqrmY2McXQMqw7Tem
+         wJzw==
+X-Forwarded-Encrypted: i=1; AJvYcCW/NM7J0y9t3Aq0tcqrE7071/qLuV9xQvNEVLw4SrppknyXV7bZdZHQIcoQSkV61TyDTBTQAMw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyKII1PrgwKN2NHeVMn/DTFjZV/lk6dGM/LMxQt1x/lTVT4rK4Y
+	GhN8ZXOZxXLdnKDpwnbAIqfO5U2/oq55X2+7WM5WDLGLnPA1qZzkGnptGRetwe1FT7dkhczDwRC
+	ZG/htImlO2MPiX+IfiVj+Pny9TQkvlAY=
+X-Gm-Gg: ASbGnctCzplwQA2h4xh3bC62t3FsGmxyij7YE0WrLJr566HfIoR1chj0L4Kur2SfYAo
+	ceYnMRSN69lxY+ok0NWWQhDdKa2hwKnqWmyT7c7bMmv4qqIPKUYyR6u6qdRk7FiQt6Ciw/B4uBV
+	3d+m11xVcMbUV4qg9hoAulVK4ni5xQNb+jofWo1NlKETRdb+JWCRL7pAgWTU+jNFXFb6BKVIYQG
+	tglutx86vjnKuNsgCVEke9K5Zx1mS6z2vMuldVLHSExvM5Zl7lGULvJin5BRFz2oAlj+72kn21Y
+	HkKQUqP0YLfZE7mgoncED3I=
+X-Google-Smtp-Source: AGHT+IHdAfimol68DLumAqunidsHIT0rEt6ihzkJKjfjB1Fpx4xO6ifuhvmA045Unpi4oj8UbhPgZh3GuuMpgILmXeQ=
+X-Received: by 2002:a05:6102:4193:b0:5dd:c568:d30d with SMTP id
+ ada2fe7eead31-5e48e36caafmr1498913137.30.1764796058300; Wed, 03 Dec 2025
+ 13:07:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [net-next,PATCH 3/3] net: phy: realtek: Add property to enable
- SSC
-To: Ivan Galkin <Ivan.Galkin@axis.com>,
- "vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>
-Cc: "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- "andrew@lunn.ch" <andrew@lunn.ch>, "davem@davemloft.net"
- <davem@davemloft.net>, "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
- "michael@fossekall.de" <michael@fossekall.de>,
- "pabeni@redhat.com" <pabeni@redhat.com>, "robh@kernel.org"
- <robh@kernel.org>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
- "olek2@wp.pl" <olek2@wp.pl>, "f.fainelli@gmail.com" <f.fainelli@gmail.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "edumazet@google.com" <edumazet@google.com>,
- "conor+dt@kernel.org" <conor+dt@kernel.org>,
- "krzk+dt@kernel.org" <krzk+dt@kernel.org>, "kuba@kernel.org"
- <kuba@kernel.org>
-References: <20251130005843.234656-1-marek.vasut@mailbox.org>
- <20251130005843.234656-3-marek.vasut@mailbox.org>
- <20251203094224.jelvaizfq7h6jzke@skbuf>
- <43bfe44a0c10af86548d8080d0f83fdbf8070808.camel@axis.com>
-Content-Language: en-US
-From: Marek Vasut <marek.vasut@mailbox.org>
-In-Reply-To: <43bfe44a0c10af86548d8080d0f83fdbf8070808.camel@axis.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-MBO-RS-META: onzktd4bbsuxspeiyknt9m5khdpd7o18
-X-MBO-RS-ID: 9433dfc616d90f1025a
+References: <20251122003720.16724-1-scott_mitchell@apple.com>
+ <CAFn2buA9UxAcfrjKk6ty=suHhC3Nr_uGbrD+jb4ZUG2vhWw4NA@mail.gmail.com> <aTCEOnaJvbc2H_Ei@strlen.de>
+In-Reply-To: <aTCEOnaJvbc2H_Ei@strlen.de>
+From: Scott Mitchell <scott.k.mitch1@gmail.com>
+Date: Wed, 3 Dec 2025 13:07:26 -0800
+X-Gm-Features: AWmQ_bn6jvlgEQX1iRcPAlpxmFuQ2XesxYMt5bijkTTCvXVOrAoKa4yW5JnmoQE
+Message-ID: <CAFn2buD9PZsahDwH25n3kxoVtkk1G_dCErCZViqxeC7jnbO06Q@mail.gmail.com>
+Subject: Re: [PATCH v5] netfilter: nfnetlink_queue: optimize verdict lookup
+ with hash table
+To: Florian Westphal <fw@strlen.de>
+Cc: pablo@netfilter.org, kadlec@netfilter.org, phil@nwl.cc, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	horms@kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzbot@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/3/25 3:18 PM, Ivan Galkin wrote:
+Thanks for the timely response! If you are satisfied I'm happy to have
+it placed in nf-next:testing whenever convenient.
 
-> - Regarding RTL8211F(D)(I)-VD-CG
-> 
-> As I mentioned before, saying that PHYCR2 doesn't exist is incorrect.
-> However, the SSC settings have indeed been moved away from PHYCR2 as
-> well.
-> 
-> The procedure for enabling of RXC SSC and CLKOUT SSC is described in
-> EMI Improvement Application Note v1.0 for RTL8211F(D)(I)-VD-CG.
-
-I have EMI improvement application note v1.2 for RTL8211F(D)(I)-CG .
-
-> Enable RXC SSC: Page 0x0d15, register 0x16, Bit 13.
-> '1' enables default Main Tone Degrade option (aka "middle").
-
-Page 0xc44 register 0x13 = 0x5f00
-
-> Enable CLK_OUT SSC: This depends on the CLKOUT frequency and the Main
-> Tone Degrade option.
-> The sequence is complicated and involves several pages and registers.
-> The application suggests setting those registers to predefined 16-bit
-> values, which I struggle to interpret.
-> I would redirect you to the application note instead. All I can say is
-> that PHYCR2 (page 0xa43, address 0x19) is not involved.
-
-Page 0xd09 register 0x10 = 0xcf00
-Page 0xa43 register 0x19 = 0x38c3
-... and, I also suspect this needs to be done, but is missing in the 
-appnote ...
-PHYCR2 |= BIT(7) // and maybe also bits 13:12 ?
-
-> - Regarding other RTL8211F PHYs.
-> I compared datasheets for RTL8211F(I)/RTL8211FD(I) and RTL8211FS(I)(-
-> VS). They both use the following bits:
-> 
-> PHYCR2 (page 0xa43, address 0x19)
-> bit 3: enables SSC on RXC clock output
-> bit 7: enables SSC on CLKOUT output clock
-> 
-> Both SSCs are controlled over PHYCR2, which, as far as I can see,
-> contradicts this patch.
-
-The bit 7 part is missing from the EMI appnote for RTL8211F(D)(I)-CG , I 
-will add it in V2.
-
--- 
-Best regards,
-Marek Vasut
+On Wed, Dec 3, 2025 at 10:41=E2=80=AFAM Florian Westphal <fw@strlen.de> wro=
+te:
+>
+> Scott Mitchell <scott.k.mitch1@gmail.com> wrote:
+> > Hello folks, friendly ping :) Please let me know if any other changes
+> > are required before merging.
+>
+> net-next is closed and I don't think that it will re-open before new
+> year, so this patch (like all others) has to wait.
+>
+> I could place it in nf-next:testing but it won't speed up the
+> required pull request.
 
