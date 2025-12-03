@@ -1,236 +1,280 @@
-Return-Path: <netdev+bounces-243415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51741C9F6C5
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 16:24:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A5E7C9F752
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 16:30:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7C1553005EB8
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 15:22:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5CF91300C6D1
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 15:23:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDF9131A7E3;
-	Wed,  3 Dec 2025 15:05:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F70E328B65;
+	Wed,  3 Dec 2025 15:15:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="u6RIUMv2"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="JghMureU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012059.outbound.protection.outlook.com [52.101.43.59])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CCEF3195FB
-	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 15:05:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764774350; cv=none; b=hKCOH2M1Y+uMZsyckGglPmci3+ymb1Vcnw/2bWLbTT14y4SYZ/Bd3yFEGU+3REQ3v+e8NmXRWOQpv9Epv/QyWyM1/tbygtb/+enOrjnOYJfBSNdGU2iiUH+Z14ECGzFZShY25vy4NKJ2SsGvlEvNG2P2Ucbmwm3RsHPhOhYPAsk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764774350; c=relaxed/simple;
-	bh=L0cb+9i5v+3GiAZ5BQARuLKEP9otp6BXByk8By2HQR8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Uwxc5nHGMajyuO+sRgIpyb8Sh45tXPz+mkB9vmhhEfwwBwRieH3WL3w8DDGw6XoftfGwdZppEqTZ0piIOAgzSiF+euWZwDQCG+VJcYhVbZ/MSGpJVbvYPvh5PZSpZ0FgV99Mxqkmjmhv0HVrx/U6bv8ShNAggMTAxVPp6ke+UW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=u6RIUMv2; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-47795f6f5c0so42456915e9.1
-        for <netdev@vger.kernel.org>; Wed, 03 Dec 2025 07:05:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1764774347; x=1765379147; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E6iWmKC0lOsZfWlN/58nC5AzxgSiimJUPQw+Dk8XwBM=;
-        b=u6RIUMv24C8rDWl7E2uXPs4b92o+FmHT52rwoqRoxe051FNi3AF7ssI7SpVzu/s5lV
-         3TardUCtPsSqb1LK4uBZZc2ICPGZoAulbrowa7XnVVaH+DP7l85fphgSOmgAM8QEVfRo
-         Q534LW8JYbzBVrwadSgFqkBWovrGNseOeRTiUOheorlBuG9Lgzfc71e2HAgd/mlohZWN
-         PHbD7/P4afl2UFfNGnwHoY77eo9potSvseSBf4n+QsuJJnJ42L3AL1npglnwU2Hx45jT
-         52M8qUWMd5jrm5DcF0XDyD6vQVo7I1+Q8TUSNeGET/iH0xSaqENRgUqeAk7bdcc2TELc
-         gIVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764774347; x=1765379147;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=E6iWmKC0lOsZfWlN/58nC5AzxgSiimJUPQw+Dk8XwBM=;
-        b=pQPMO9IdozIVMI1PMun5cXiDG2IaUTwYxD35/xxtr6xjz2Q4cFOhzPfvptAtmgfMwP
-         CS9xccNxKgvElF3AbLtlISJR2QWk4DjRxO/PqSTviChkAnV6XvhJLQwN7jrfcrnLtGEj
-         N03M3hboDPU4Ed5mbQ42emBBbqU9rC+mPU1Zv3jgFEjLSKhwyJXTCMJJ392EJYRAf9L0
-         IfQeW6vZVYjtPdxsFq6gIkegldl0VDCpsCDuvn83BpokTMcdjpS8XdgKDEw7FCXF5RDI
-         qn9cy3Ud8rR4q0gUs9QtGATOdmWDrGMlTnmDT7r2/YE4jN3hau9ykwOwO3ZTd8fTWJFV
-         BzwQ==
-X-Gm-Message-State: AOJu0YyzecijIa8P/ufvQvCvMWJGEd91jdtIq/rQEXp78+k9nWh8tlO9
-	pkdGKVox7LIpb+OjVz53h+DKPGL73hQJxUjDQ+ruroqrKOYfdlxn461DDGCb00scWdM=
-X-Gm-Gg: ASbGncuF/DetpGduLpzgraqL5Siid6KK70P3VAcBnH6ryB71w9KsO24q5k97j3JD932
-	BGnrruRq6H7nb/OZtK/biiwHAu29GLQGJu+8i7VmczzFYR83hX+UHyOhYxc1H2xH4c60+2Bf9OI
-	wvdHh+nYPxo+zpHxC9RX6Y6iBcsvlFz924SJftWHDzofsNuZFTAF1FdHSA7aJppIvn8wto3mSXo
-	5Zy9gTd2+Yw8LQfVUjmVPF8l/mL/xX3OaEq4DVk+n6G4F1b1sHDTOMD2tkVT5gFDMRDN5NMipAF
-	rXfqdFnjHOLisdV4aO8jV4A6VjpcBwdzRyKwNxT6OCtO7ZduQh+Msu6L78dBtleeEyzTJFmoLs8
-	/lUHUP5tnfiiRdSZNpZIv3zsemFQDR4gtIL8ZBNpJ+v4URzOayj3mq8eoOr+1SK4KiqiCppBbUI
-	KgfQGOS8l32kJVTVyAZdBxdTRskndtufYvLHQtNeqa39qbIaQuBCOqjizDw4Rh+xg=
-X-Google-Smtp-Source: AGHT+IEOChvHNGmw33LwSomY/L4iFYoCzGmM1ANZWCum+qJdThlErEVOylia1WyTzZx3VATgl1y2QA==
-X-Received: by 2002:a05:600c:45ca:b0:46f:b32e:5094 with SMTP id 5b1f17b1804b1-4792af5e38emr28816635e9.32.1764774346516;
-        Wed, 03 Dec 2025 07:05:46 -0800 (PST)
-Received: from phoenix.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4792a79ed9asm51727095e9.6.2025.12.03.07.05.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Dec 2025 07:05:45 -0800 (PST)
-Date: Wed, 3 Dec 2025 07:05:40 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, William Liu
- <will@willsroot.io>, Savino Dicanosa <savy@syst3mfailure.io>
-Subject: Re: [Patch net v5 3/9] net_sched: Implement the right netem
- duplication behavior
-Message-ID: <20251203070540.6ea53471@phoenix.local>
-In-Reply-To: <20251126195244.88124-4-xiyou.wangcong@gmail.com>
-References: <20251126195244.88124-1-xiyou.wangcong@gmail.com>
-	<20251126195244.88124-4-xiyou.wangcong@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD915186E40;
+	Wed,  3 Dec 2025 15:15:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.59
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764774917; cv=fail; b=fT2nV8v6+4NsS1ZwkZXnRiU8uMDsdsvoikJ52L5titMqVqfXzWP9W60piYKbCmH9a7q6yXhfXLQDjXkC4N36e+VBKiyZSQaMkdc9MPD2BPKAWjSRRRTTrXMBpoWaahpJ5QZznsyK6APS+CqjGRjIk0DvX7KNRS7KuGJk3gmWuHU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764774917; c=relaxed/simple;
+	bh=DjqqyoD4D65cpIFYU7bW878Oa6zII0lT1xADulPHCbg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=n+KHh7VQeMCltHu7t0NcirDbP4GMwhWSJpFZNbgvUD1NDvbsoWsFZ8QJPCBC1SNC+j6Xijt3RkyEIsCVA+B0t5wwm/ufDJJLCBfesyBG3rmLr2hnWcGN/dnOMkVhyGssnmPIz7e2eh7LvBN7e9Iv0JJ8e79fzX9xLWk7K7JfEW8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=JghMureU; arc=fail smtp.client-ip=52.101.43.59
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=xi7Bmc4jKPDdGJlxvqfryY2DNt5c/UnUcBCSX/aG+J9VYBBrZb1e7B3yZvjJlDLzHj2dPe42Wsn10M4RIxl5TdqiovcLsRFMh2g4coVQTJ1mNnZ7Yn3n3q5thtLNrdtgRVvouwAfLzs0RXSi5+OAVcoFgsfaLxGM/PKCma/7HeFDInFEMehdlSOpaSZtLWegm6KihSiUSev1+N+/w4RIvGob5W+VM6feQermNznFCVzePUMaJp3ZWgMQLAcasn+ywIXcDBJX0tYafb3mLo2lYkEEDqDYJ/8y/jClfbZK+O2ujIQoHBOU3xKELYPWhB9W9p0Fscc5Lx1VUFftYBzxhQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9jIMCnE0wLc8PmLuUzpvMZEGoV8UBPctCqq4B+QiwA0=;
+ b=X732Qa20jj3uDlJyClhTQMnNZM4vPDxC2rTXLboktdYut9502S01KpJTsRDmAz1L0floRUcLctMnKNz7kpsf387Vmc2CXD37/xqD9WnbRH+HHBN8GxjvjDCmqztuA2VhPet/iHJVYcT3LEordk3Y6vMDePEJkF4/RpbvCW08g4yN6KUsVPLGB2HIGLfVOH2AS9lW2kdym0Am+5y/Jo9Ncu65SXVVbLC0508mTEAlWhWeU/owg9M76vL+/K5MNz4FnAi2K3B4OZSk0HJXWBYC63PS2mqpiq6UYjqfVz2P1m+26csKO4dxrC+NGt9sWGR5CKmH8ml1tWb26WDfv3S/ow==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=linux.ibm.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9jIMCnE0wLc8PmLuUzpvMZEGoV8UBPctCqq4B+QiwA0=;
+ b=JghMureU5GmLILUEkIpW1KVK428WT9AbMxJN1zsjPkhXC1CUBzK/h2XsydhF76s5gWzKo8XRYsstleHCl0nMHYyjoNwoDXon4WqDfYx3L/Zl585oznikidnTKYtyBoKODfWlGzXH2F2YYjMiGtPQRLlLb5qt1FNqBGiagp/dzG/HqnvuY5GmGDhTW8tKq/wVc8OFBq5Yy5jZyY1aHTkZRPCBa0BDbofqv70MBzNnVRD/oeayPomFYhvIZTdAT4SrQotTyz4VsGu9NAoFG/vrZEgwwVp1kntzH9xTDAfj6RGXUTt0TtCddu5jSnPjcMi3Y954rLTHO91mGXhnblcR/Q==
+Received: from SA9PR13CA0148.namprd13.prod.outlook.com (2603:10b6:806:27::33)
+ by SA1PR12MB7101.namprd12.prod.outlook.com (2603:10b6:806:29d::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9388.9; Wed, 3 Dec
+ 2025 15:15:08 +0000
+Received: from SN1PEPF0002529D.namprd05.prod.outlook.com
+ (2603:10b6:806:27:cafe::4e) by SA9PR13CA0148.outlook.office365.com
+ (2603:10b6:806:27::33) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9388.9 via Frontend Transport; Wed, 3
+ Dec 2025 15:15:08 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SN1PEPF0002529D.mail.protection.outlook.com (10.167.242.4) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9388.8 via Frontend Transport; Wed, 3 Dec 2025 15:15:08 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 3 Dec
+ 2025 07:14:47 -0800
+Received: from [10.242.1.82] (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 3 Dec
+ 2025 07:14:41 -0800
+Message-ID: <7ae1ae03-b62d-4c49-9718-f01ac8713872@nvidia.com>
+Date: Wed, 3 Dec 2025 17:14:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/mlx5: Fix double unregister of HCA_PORTS
+ component
+To: Gerd Bayer <gbayer@linux.ibm.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, "Mark
+ Bloch" <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shay Drory
+	<shayd@nvidia.com>, Simon Horman <horms@kernel.org>
+CC: Lukas Wunner <lukas@wunner.de>, Bjorn Helgaas <helgaas@kernel.org>,
+	"Niklas Schnelle" <schnelle@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>,
+	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-s390@vger.kernel.org>,
+	<linux-pci@vger.kernel.org>
+References: <20251202-fix_lag-v1-1-59e8177ffce0@linux.ibm.com>
+Content-Language: en-US
+From: Moshe Shemesh <moshe@nvidia.com>
+In-Reply-To: <20251202-fix_lag-v1-1-59e8177ffce0@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF0002529D:EE_|SA1PR12MB7101:EE_
+X-MS-Office365-Filtering-Correlation-Id: ae0c957e-7e21-4277-d64c-08de327ebf40
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700013|376014|7416014|82310400026|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?UXRmL0E3cXEwSEtRTlNZdVdneXgxWVRWb2l0WUd6am9ocTlLNWw2THRJMHRu?=
+ =?utf-8?B?MVJnMHhVS1dNdGlzUXVqeThQQmNYUUFmTGxLeERBTkpBUmlJaGs2dnM1dlZv?=
+ =?utf-8?B?VlM4YVBEUmFtaklNcVBsWGJPSVFNVUd4WmduajF1bEJlQ21hZjQrcVV0WmZO?=
+ =?utf-8?B?TUhHamFKc3hvRHFES0lYWlI2b3Y5bWJQZWtVV2dBbWM0UC9RL2JndU14Tm5t?=
+ =?utf-8?B?aFBhU0RuNm56NURnbHBrVHpUT2hGdHNGaFY1TFJ0dWM3RmVyZ05xZzNYTjhh?=
+ =?utf-8?B?YmJZRnpwNnRxL1hJemR1SGRid0I2MHF6eU1MdnVWVjJKdnU5eXJQR1E2NVM3?=
+ =?utf-8?B?Rjc4RE5iZGZtY0lNZm4ySkdNYkJWRjJwNy9aaUdlKzBxN0Z3THVjNUxuNk0y?=
+ =?utf-8?B?LzlLSnlwQ2NBd215cTlJdmsrSXl1SGFqZENucTlHaWFTRmF1MkxOZFBtSStq?=
+ =?utf-8?B?di9qN3A5eXNTSGhkRHY3LytSLzVNdDQwVEwwa1ZVUU52RUV5VVdPcStZSWZY?=
+ =?utf-8?B?UGVub0lhR0VGcjVienlvQWxrV0FtWEhwRHVpZE04dnRocmo3UlJmcXZlL25M?=
+ =?utf-8?B?cHdqUXM2Ym9qN3Vaa3FoQ0N2dXNud2Z4bThJdC9aSnRUOEw4SG4vamtUSExo?=
+ =?utf-8?B?dWtoakdBczdGTFlQVmdLcjA2bEo0NmVWL3RlaW56em9NNnRscEN0WXlSeENm?=
+ =?utf-8?B?ZWNmdlFlUlJRb0VyTVNuWXhPdkw4VWcvaDVjeUpSVUNUc1lwa1FHMU9jWkg3?=
+ =?utf-8?B?dW82c1dGV3Q1WnpaeXNoNjRZOFlPTFBmc1ppZG84aHpLQi9reUwwOU1SL1dr?=
+ =?utf-8?B?L09pZTJPeHFpTHVaTi9kcDJuU0E5TWZKcG00eWI0L0Izei8xSmpTZG1SbVJI?=
+ =?utf-8?B?eFZmOFNWQlB6RXQyLyt1SFFDbkdkRGNKWXB2dG5aM2xnTTF3dWhxai9OYjdm?=
+ =?utf-8?B?TVhvZFVwaTVHVFg3azhwWkJqQlQvRHo5b1UrcW1wMnd1WjdBNi8wUjNtZlBZ?=
+ =?utf-8?B?Qk4vTk5hYityaWREb2pwN3VhalQ3WnNUQ094ekFqdUI0WFNZeVZVeVZydW0z?=
+ =?utf-8?B?ZkU5aXRYUU9VRCtiVGRNUnBBdDVKM1c1M0dNRDNmTy95K3hRRmdQcTVjM3p4?=
+ =?utf-8?B?SVBtS2dQNDZQSURPeElCVDF0KzU0YnZTQXdHUGpVT1dzNTZxNGNtamhnMlM5?=
+ =?utf-8?B?dlpLWnkxM1BxWHVrR2RJeHpHa1VFVmh5bU5FTUVvWlVuZGNLVHMyZWZrblQv?=
+ =?utf-8?B?V0U1dHdEWGk0cTlYUDVNaDBVMy94MnZGaWdDRDBYV2xpQjVyZWMxYW1QMVNi?=
+ =?utf-8?B?c25lakhPT2REMTRFbEl0QUQvajNGeEhQZnBtTThrUktBcm1OM0l3ZE9KZVBC?=
+ =?utf-8?B?SzQvdmNocjN2eTcvQ29tQWFacHhzcmtZL2dwWkI3RFJrMFNMZ3NmZVVhMGp1?=
+ =?utf-8?B?RXpnK21SSlVwL2s3Q0lUek13dDFuMDZOazlmM3FGMEw3MVJJQ0FYWSs5QjRq?=
+ =?utf-8?B?aDdHR29qWVFRNTJRYzZxY2UwTXhBZDlPTFVoSndCVXhYcjV6bDgvWVFZWWJU?=
+ =?utf-8?B?VVZCUCtIOVV2bXRaOEpBbzJubThNSEpVc05Dcmg0YVdRbk5DZWJKeVdtVkF3?=
+ =?utf-8?B?bHJiODJVQmN0dVlVazBHYmQ4clFZM3NVZERvNWNHTXdWMitSMFZCclE5RUJZ?=
+ =?utf-8?B?RFZMQU1SRmpTSnIzcG1PdVhqTkF0VnpFbytQdmhYRjlFSElHSWxONjErQWll?=
+ =?utf-8?B?U016bkdIYXYySFlFZ0cvcDdLVUthN1o2dWxYQ3RMdFVpQ1hmbzdOaDZTbWtk?=
+ =?utf-8?B?OTd1Q0RQV3dpaWlvQ01PejFBbzd5UGxkbllQNXNHWnozOXVkSUtGays3MzJV?=
+ =?utf-8?B?Y3RlaDJ4NDdSaGN0VlJYa1o5OGxsRE9nZUVOMjFOMkx0MUxEUlB3cWltejEr?=
+ =?utf-8?B?NGZOMll3VDBxVGU4UXJzbnVyOEJKVXNvODVDdGdMemV1YVJ4M2lZN24yZzBx?=
+ =?utf-8?B?Sno3cExhS05vdys4eFVhZWZtSGNtR2ZTSzN3WTNFVXJidnFzdnEveGlrbDJW?=
+ =?utf-8?B?K1haMlpqTFJFc0ZJNmh0R3lBUlFPYnlwaURkY1N4U3JLakdHRlNUaEpvWXhO?=
+ =?utf-8?B?cXdvQ0xaNmFFWG1Vc21WWDZuWFY1cG03ZjZ1TXE4TDFGbE5BeUpiQ055R0Rn?=
+ =?utf-8?B?RGc9PQ==?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(376014)(7416014)(82310400026)(921020);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Dec 2025 15:15:08.7171
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: ae0c957e-7e21-4277-d64c-08de327ebf40
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF0002529D.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7101
 
-On Wed, 26 Nov 2025 11:52:38 -0800
-Cong Wang <xiyou.wangcong@gmail.com> wrote:
 
-> In the old behavior, duplicated packets were sent back to the root qdisc,
-> which could create dangerous infinite loops in hierarchical setups -
-> imagine a scenario where each level of a multi-stage netem hierarchy kept
-> feeding duplicates back to the top, potentially causing system instability
-> or resource exhaustion.
->=20
-> The new behavior elegantly solves this by enqueueing duplicates to the sa=
-me
-> qdisc that created them, ensuring that packet duplication occurs exactly
-> once per netem stage in a controlled, predictable manner. This change
-> enables users to safely construct complex network emulation scenarios usi=
-ng
-> netem hierarchies (like the 4x multiplication demonstrated in testing)
-> without worrying about runaway packet generation, while still preserving
-> the intended duplication effects.
->=20
-> Another advantage of this approach is that it eliminates the enqueue reen=
-trant
-> behaviour which triggered many vulnerabilities. See the last patch in this
-> patchset which updates the test cases for such vulnerabilities.
->=20
-> Now users can confidently chain multiple netem qdiscs together to achieve
-> sophisticated network impairment combinations, knowing that each stage wi=
-ll
-> apply its effects exactly once to the packet flow, making network testing
-> scenarios more reliable and results more deterministic.
->=20
-> I tested netem packet duplication in two configurations:
-> 1. Nest netem-to-netem hierarchy using parent/child attachment
-> 2. Single netem using prio qdisc with netem leaf
->=20
-> Setup commands and results:
->=20
-> Single netem hierarchy (prio + netem):
->   tc qdisc add dev lo root handle 1: prio bands 3 priomap 0 0 0 0 0 0 0 0=
- 0 0 0 0 0 0 0 0
->   tc filter add dev lo parent 1:0 protocol ip matchall classid 1:1
->   tc qdisc add dev lo parent 1:1 handle 10: netem limit 4 duplicate 100%
->=20
-> Result: 2x packet multiplication (1=E2=86=922 packets)
->   2 echo requests + 4 echo replies =3D 6 total packets
->=20
-> Expected behavior: Only one netem stage exists in this hierarchy, so
-> 1 ping becomes 2 packets (100% duplication). The 2 echo requests generate
-> 2 echo replies, which also get duplicated to 4 replies, yielding the
-> predictable total of 6 packets (2 requests + 4 replies).
->=20
-> Nest netem hierarchy (netem + netem):
->   tc qdisc add dev lo root handle 1: netem limit 1000 duplicate 100%
->   tc qdisc add dev lo parent 1: handle 2: netem limit 1000 duplicate 100%
->=20
-> Result: 4x packet multiplication (1=E2=86=922=E2=86=924 packets)
->   4 echo requests + 16 echo replies =3D 20 total packets
->=20
-> Expected behavior: Root netem duplicates 1 ping to 2 packets, child netem
-> receives 2 packets and duplicates each to create 4 total packets. Since
-> ping operates bidirectionally, 4 echo requests generate 4 echo replies,
-> which also get duplicated through the same hierarchy (4=E2=86=928=E2=86=
-=9216), resulting
-> in the predictable total of 20 packets (4 requests + 16 replies).
->=20
-> The new netem duplication behavior does not break the documented
-> semantics of "creates a copy of the packet before queuing." The man page
-> description remains true since duplication occurs before the queuing
-> process, creating both original and duplicate packets that are then
-> enqueued. The documentation does not specify which qdisc should receive
-> the duplicates, only that copying happens before queuing. The implementat=
-ion
-> choice to enqueue duplicates to the same qdisc (rather than root) is an
-> internal detail that maintains the documented behavior while preventing
-> infinite loops in hierarchical configurations.
->=20
-> Fixes: 0afb51e72855 ("[PKT_SCHED]: netem: reinsert for duplication")
-> Reported-by: William Liu <will@willsroot.io>
-> Reported-by: Savino Dicanosa <savy@syst3mfailure.io>
-> Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
+
+On 12/2/2025 1:12 PM, Gerd Bayer wrote:
+> Clear hca_devcom_comp in device's private data after unregistering it in
+> LAG teardown. Otherwise a slightly lagging second pass through
+> mlx5_unload_one() might try to unregister it again and trip over
+> use-after-free.
+> 
+> On s390 almost all PCI level recovery events trigger two passes through
+> mxl5_unload_one() - one through the poll_health() method and one through
+> mlx5_pci_err_detected() as callback from generic PCI error recovery.
+> While testing PCI error recovery paths with more kernel debug features
+> enabled, this issue reproducibly led to kernel panics with the following
+> call chain:
+> 
+>   Unable to handle kernel pointer dereference in virtual kernel address space
+>   Failing address: 6b6b6b6b6b6b6000 TEID: 6b6b6b6b6b6b6803 ESOP-2 FSI
+>   Fault in home space mode while using kernel ASCE.
+>   AS:00000000705c4007 R3:0000000000000024
+>   Oops: 0038 ilc:3 [#1]SMP
+> 
+>   CPU: 14 UID: 0 PID: 156 Comm: kmcheck Kdump: loaded Not tainted
+>        6.18.0-20251130.rc7.git0.16131a59cab1.300.fc43.s390x+debug #1 PREEMPT
+> 
+>   Krnl PSW : 0404e00180000000 0000020fc86aa1dc (__lock_acquire+0x5c/0x15f0)
+>              R:0 T:1 IO:0 EX:0 Key:0 M:1 W:0 P:0 AS:3 CC:2 PM:0 RI:0 EA:3
+>   Krnl GPRS: 0000000000000000 0000020f00000001 6b6b6b6b6b6b6c33 0000000000000000
+>              0000000000000000 0000000000000000 0000000000000001 0000000000000000
+>              0000000000000000 0000020fca28b820 0000000000000000 0000010a1ced8100
+>              0000010a1ced8100 0000020fc9775068 0000018fce14f8b8 0000018fce14f7f8
+>   Krnl Code: 0000020fc86aa1cc: e3b003400004        lg      %r11,832
+>              0000020fc86aa1d2: a7840211           brc     8,0000020fc86aa5f4
+>             *0000020fc86aa1d6: c09000df0b25       larl    %r9,0000020fca28b820
+>             >0000020fc86aa1dc: d50790002000       clc     0(8,%r9),0(%r2)
+>              0000020fc86aa1e2: a7840209           brc     8,0000020fc86aa5f4
+>              0000020fc86aa1e6: c0e001100401       larl    %r14,0000020fca8aa9e8
+>              0000020fc86aa1ec: c01000e25a00       larl    %r1,0000020fca2f55ec
+>              0000020fc86aa1f2: a7eb00e8           aghi    %r14,232
+> 
+>   Call Trace:
+>    __lock_acquire+0x5c/0x15f0
+>    lock_acquire.part.0+0xf8/0x270
+>    lock_acquire+0xb0/0x1b0
+>    down_write+0x5a/0x250
+>    mlx5_detach_device+0x42/0x110 [mlx5_core]
+>    mlx5_unload_one_devl_locked+0x50/0xc0 [mlx5_core]
+>    mlx5_unload_one+0x42/0x60 [mlx5_core]
+>    mlx5_pci_err_detected+0x94/0x150 [mlx5_core]
+>    zpci_event_attempt_error_recovery+0xcc/0x388
+> 
+> Fixes: 5a977b5833b7 ("net/mlx5: Lag, move devcom registration to LAG layer")
+> Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
+
+Reviewed-by: Moshe Shemesh <moshe@nvidia.com>> ---
+> Hi Shay et al,
+> 
+> while checking for potential regressions by Lukas Wunner's recent work
+> on pci_save/restore_state() for the recoverability of mlx5 functions I
+> consistently hit this bug. (Bjorn has queued this up for 6.19, according
+> to [0] and [1])
+> 
+> Apparently, the issue is unrelated to Lukas' work but can be reproduced
+> with master. It appears to be timing-sensitive, since it shows up only
+> when I use s390's debug_defconfig, but I think needs fixing anyhow, as
+> timing can change for other reasons, too.
+
+Hi Gerd,
+  I stepped on this bug recently too, without s390 and was about to 
+submit same fix :) So as you wrote it is unrelated to Lukas' patches and 
+this fix is correct.
+
+> 
+> I've spotted two additional places where the devcom reference is not
+> cleared after calling mlx5_devcom_unregister_component() in
+> drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c that I have not
+> addressed with a patch, since I'm unclear about how to test these
+> paths.
+
+As for the other cases, we had the patch 664f76be38a1 ("net/mlx5: Fix 
+IPsec cleanup over MPV device") and two other cases on shared clock and 
+SD but I don't see any flow the shared clock or SD can fail, 
+specifically mlx5_sd_cleanup() checks sd pointer at beginning of the 
+function and nullify it right after sd_unregister() that free devcom.
+
+Thanks,
+Moshe.>
+> Thanks,
+> Gerd
+> 
+> [0] https://lore.kernel.org/all/cover.1760274044.git.lukas@wunner.de/
+> [1] https://lore.kernel.org/linux-pci/cover.1763483367.git.lukas@wunner.de/
 > ---
->  net/sched/sch_netem.c | 26 +++++++++++++++-----------
->  1 file changed, 15 insertions(+), 11 deletions(-)
->=20
-> diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-> index fdd79d3ccd8c..191f64bd68ff 100644
-> --- a/net/sched/sch_netem.c
-> +++ b/net/sched/sch_netem.c
-> @@ -165,6 +165,7 @@ struct netem_sched_data {
->   */
->  struct netem_skb_cb {
->  	u64	        time_to_send;
-> +	u8		duplicate : 1;
->  };
-> =20
->  static inline struct netem_skb_cb *netem_skb_cb(struct sk_buff *skb)
-> @@ -460,8 +461,16 @@ static int netem_enqueue(struct sk_buff *skb, struct=
- Qdisc *sch,
->  	skb->prev =3D NULL;
-> =20
->  	/* Random duplication */
-> -	if (q->duplicate && q->duplicate >=3D get_crandom(&q->dup_cor, &q->prng=
-))
-> -		++count;
-> +	if (q->duplicate) {
-> +		bool dup =3D true;
-> +
-> +		if (netem_skb_cb(skb)->duplicate) {
-> +			netem_skb_cb(skb)->duplicate =3D 0;
-> +			dup =3D false;
-> +		}
-> +		if (dup && q->duplicate >=3D get_crandom(&q->dup_cor, &q->prng))
-> +			++count;
-> +	}
-> =20
->  	/* Drop packet? */
->  	if (loss_event(q)) {
-> @@ -532,17 +541,12 @@ static int netem_enqueue(struct sk_buff *skb, struc=
-t Qdisc *sch,
->  	}
-> =20
->  	/*
-> -	 * If doing duplication then re-insert at top of the
-> -	 * qdisc tree, since parent queuer expects that only one
-> -	 * skb will be queued.
-> +	 * If doing duplication then re-insert at the same qdisc,
-> +	 * as going back to the root would induce loops.
->  	 */
->  	if (skb2) {
-> -		struct Qdisc *rootq =3D qdisc_root_bh(sch);
-> -		u32 dupsave =3D q->duplicate; /* prevent duplicating a dup... */
-> -
-> -		q->duplicate =3D 0;
-> -		rootq->enqueue(skb2, rootq, to_free);
-> -		q->duplicate =3D dupsave;
-> +		netem_skb_cb(skb2)->duplicate =3D 1;
-> +		qdisc_enqueue(skb2, sch, to_free);
->  		skb2 =3D NULL;
->  	}
-> =20
+>   drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
+> index 3db0387bf6dcb727a65df9d0253f242554af06db..8ec04a5f434dd4f717d6d556649fcc2a584db847 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
+> @@ -1413,6 +1413,7 @@ static int __mlx5_lag_dev_add_mdev(struct mlx5_core_dev *dev)
+>   static void mlx5_lag_unregister_hca_devcom_comp(struct mlx5_core_dev *dev)
+>   {
+>   	mlx5_devcom_unregister_component(dev->priv.hca_devcom_comp);
+> +	dev->priv.hca_devcom_comp = NULL;
+>   }
+>   
+>   static int mlx5_lag_register_hca_devcom_comp(struct mlx5_core_dev *dev)
+> 
+> ---
+> base-commit: 4a26e7032d7d57c998598c08a034872d6f0d3945
+> change-id: 20251202-fix_lag-6a59b39a0b3c
+> 
+> Best regards,
 
-I wonder if a lot of the issues would go away if netem used a workqueue
-to do the duplication. It would avoid nested calls etc.
 
