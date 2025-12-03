@@ -1,56 +1,102 @@
-Return-Path: <netdev+bounces-243389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A6B1C9EB4E
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 11:31:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19ECAC9EBBD
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 11:36:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4C6D14E06FA
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 10:31:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6BE63A6908
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 10:36:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 724CF2E8E09;
-	Wed,  3 Dec 2025 10:31:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34B032EDD7E;
+	Wed,  3 Dec 2025 10:36:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="0gT/UOWB"
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32AE42DE713;
-	Wed,  3 Dec 2025 10:31:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EFB22E1EE0
+	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 10:36:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764757873; cv=none; b=EF3ZFVgp5iu9abjCIpA9SXlO765sB/J0EtheoymxKx9veqMV4C+ov2xiN0aGYXhYxuaXiizXufPh+pIc1Sxz18ALUTBnEVbSvDaE5yviZx/4M/Lc5j0qBrEFIrBRv8K1iZobHGYjmxzQCj2mMBiL5R7fGHWkISFhhHiKAYbtQWQ=
+	t=1764758180; cv=none; b=CyyNWxJDO/v8NmyjJk/zOrW4MOCzKC4nHGHQf5uG/B7vcmiUweiD0kivWl+nYcwPu3c0aKKKk1QnQvVQ18yaLGZx5lB+9QxU4HQseuQpw7S42GrFdkhdEN/1lrsTpJaGsYT05C5K5M7+/DoHWm55TSOX7o1aWneRBPJnlaObB58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764757873; c=relaxed/simple;
-	bh=adiUeHbx7VhdWlQ0C0Jch11UxeOeUglougUJe9snoKk=;
+	s=arc-20240116; t=1764758180; c=relaxed/simple;
+	bh=GiLdBM8LvjD5dwdrVWkmdwmePN8KQT/Hw6JieAVZlLA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TuW+FeF81jcmF/WwqTb2QE1PTyJqftyms/XUq6fPZZv6TRkxs1azxjPz170orLYPYYv0guMtkRUF0pCwYGdvBbYV+ptelyCh8DMo5aBlrmt9L9MzLL+eWfTlq2k9lRK4iKmxXui6Wb4jWH0NOs4PF8kLARWy4xSqvM1T1B00GUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com; spf=none smtp.mailfrom=foss.arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=foss.arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5CA5F339;
-	Wed,  3 Dec 2025 02:31:04 -0800 (PST)
-Received: from bogus (e133711.arm.com [10.1.196.55])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 817E73F73B;
-	Wed,  3 Dec 2025 02:31:10 -0800 (PST)
-Date: Wed, 3 Dec 2025 10:31:07 +0000
-From: Sudeep Holla <sudeep.holla@arm.com>
-To: Adam Young <admiyo@amperemail.onmicrosoft.com>
-Cc: Jassi Brar <jassisinghbrar@gmail.com>,
-	Adam Young <admiyo@os.amperecomputing.com>,
-	Sudeep Holla <sudeep.holla@arm.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] Revert "mailbox/pcc: support mailbox management of the
- shared buffer"
-Message-ID: <20251203-romantic-tricky-llama-76c4cb@sudeepholla>
-References: <20250926153311.2202648-1-sudeep.holla@arm.com>
- <2ef6360e-834f-474d-ac4d-540b8f0c0f79@amperemail.onmicrosoft.com>
- <CABb+yY2Uap0ePDmsy7x14mBJO9BnTcCKZ7EXFPdwigt5SO1LwQ@mail.gmail.com>
- <0f48a2b3-50c4-4f67-a8f6-853ad545bb00@amperemail.onmicrosoft.com>
- <CABb+yY1w-e3+s6WT2b7Ro9x9mUbtMajQOL0-Q+EHvAYAttmyaA@mail.gmail.com>
- <3c3d61f2-a754-4a44-a04d-54167b313aec@amperemail.onmicrosoft.com>
- <CABb+yY2-CQj=S6FYaOq=78EuQCnpKFUqFSJV+NHdLBjS-txnAw@mail.gmail.com>
- <ebf95db6-432e-4912-958b-d90f92c635f5@amperemail.onmicrosoft.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=jetFiex9udTJ9c91XU0VHktjx7EplWpB6uwbETcwHqG0FfUiZ3e5PJ7x7BgMWDNI6XoKbRtkE6JYDDAXL/FLwE0FejYGgl+CleaGmnvd9l3JhcSyh4FLzr31OSVHOyWlutiff0c1MTb2c3jjT6yfp3a/KX6AJ2tqMLxBGyeV8Eo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=0gT/UOWB; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-42b3c965cc4so398228f8f.0
+        for <netdev@vger.kernel.org>; Wed, 03 Dec 2025 02:36:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1764758176; x=1765362976; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IyIaF1ZZoiI5thM+pEUZh3TPbJ3eEVBLKOsqp828xqk=;
+        b=0gT/UOWBqGmTcjAf2oc73S0ITvzz5n/9CiOkyjOiT1UAYrfS1YlT9r3OR7STXTARUU
+         nVd6C3n+5dAiRGNivxPJz4dlRqwUF1aYu+mOZD86GIhezw1SpV2iGYyNZGIW6kODKve9
+         3GpkXtPKON3SU9dpWwfETnSahqeLpuHW2jMVTYkL3QknLvEKxcnYWlUJa5aFAsr/BGMI
+         9zYEMcZ082+C/9fs1k8BWIzcLSmjoJalf2j2i1ud/p2dDhONBwwmuN0RGXJJAfMdJQ6P
+         E6px6M4ib7IY86gVjzZDNa7nmyRQ2blA4DDYyXnepuEdyhIdkVggoc0m+KhgIkVzs0KU
+         Ij0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764758176; x=1765362976;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IyIaF1ZZoiI5thM+pEUZh3TPbJ3eEVBLKOsqp828xqk=;
+        b=gRJdvfgh/XP0zRnId050oeh3H/lW48yCrSfm8xRaev1yhuA3iYKjpI8qZGriH08SYS
+         +OCb0dWGENI0z+hp+2h6d6nHH8j2IdlAB2OgOgcw5Em2kdQUqfErM+y3/+Zel269fdre
+         pxmlt+1VkLLzC8msPJAzi760i4Z2XyKXge0Ni0A1j6EIogvuB1i/AO4MWx7FGJovoHC/
+         gt7MihIi+nGRnuseP09a2xHoqxg2KCceImHcyMt1dywy5qOXraWYSiJuVS/h369yCF6e
+         dbPGTAd6WSTCfG2U4GWinmFEZn9TWE09/ykMy+2mPHyDfp3KUV6cGChukgGaX5jWVnNL
+         RYcg==
+X-Forwarded-Encrypted: i=1; AJvYcCU+jVGRIrbN6nW5Y6GMv5Ra2s+fWPWMeT3msv7hAjP3jIBguUnJ1SPdpPm9cIRz1aKQejLz3hk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOTxzEam9yG7PwIbdPIca8LLitO+HoePQqenG3L9YPHuWdm40q
+	w8ehNoQVucM00X50d8Z9PhfED1HIXMaGTj/crrepgb/CknO8dVc63GlCbu2FORUSD4s=
+X-Gm-Gg: ASbGnctvEXo7WeUcXoDbkHytWYJkb5GSFX8VbhnwF+mE5uSlhSkmIAREJIK7iWrRAhl
+	hBFp1rcoDFw9Ag+J1dmjg37EeOzJNrfDbdGnJT1/xvE9X/X7CieyWSS6nNTO7fpFeUC4jVZE7q7
+	J40kYXDexMDvvLDHK/cJ6EfBW8kd6w6gPxbgmfTR+55JXtHNcnwpidC4qtE64rLNOAQcB+G1H8P
+	g6PVzVF2GEO0SXycR4A1LpWdmBnSmB25NKRRIcCHX/HCFB+R9/UbRpeZ05B4W+YH7nutZ79AsjR
+	4MFeSl1PZIpRLWvzeIZs40xyeEAEDCvCmgTn0OjwT3wao6iP5/4s9S7jJrt/jv2pz+BAn/VN+Wg
+	BtiEE73x3yiWgPhI88RbSkfRAGXwJTU3NHsCXE5DLn4F7KXhwjM7ejI6o7A/cZEmsKNPAk2w/kr
+	Qg8nPPSupUQ0y9CfmHTs4=
+X-Google-Smtp-Source: AGHT+IH1dq7fxDRNIhcm0BrW7rgm1HV8GPjTBEz9+0SlOEhGSmCdlKYZ60LdcNFAgyTCThBCp5KxCw==
+X-Received: by 2002:a05:6000:2084:b0:429:d59e:d097 with SMTP id ffacd0b85a97d-42f72d722famr2252853f8f.9.1764758175805;
+        Wed, 03 Dec 2025 02:36:15 -0800 (PST)
+Received: from FV6GYCPJ69 ([85.163.81.98])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42e1c5c3022sm39020547f8f.4.2025.12.03.02.36.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Dec 2025 02:36:15 -0800 (PST)
+Date: Wed, 3 Dec 2025 11:36:13 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Donald Hunter <donald.hunter@gmail.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	Gal Pressman <gal@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>, 
+	Carolina Jubran <cjubran@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>, Jiri Pirko <jiri@nvidia.com>, 
+	Randy Dunlap <rdunlap@infradead.org>
+Subject: Re: [PATCH net-next V4 02/14] documentation: networking: add shared
+ devlink documentation
+Message-ID: <vwdbowwy3eivqwwypwo2klexhu47qpvb6nevjg3st7a43ucmxl@tllljudder3l>
+References: <1764101173-1312171-1-git-send-email-tariqt@nvidia.com>
+ <1764101173-1312171-3-git-send-email-tariqt@nvidia.com>
+ <20251127201645.3d7a10f6@kernel.org>
+ <hidhx467pn6pcisuoxdw3pykyvnlq7rdicmjksbozw4dtqysti@yd5lin3qft4q>
+ <20251128191924.7c54c926@kernel.org>
+ <n6mey5dbfpw7ykp3wozgtxo5grvac642tskcn4mqknrurhpwy7@ugolzkzzujba>
+ <20251201134954.6b8a8d48@kernel.org>
+ <2lnqrb3fu7dukdkgfculj53q2vwb36nrz5copjfg3khlqnbmix@jbfmhnks7svq>
+ <20251202101444.7f6d14a8@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,19 +105,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ebf95db6-432e-4912-958b-d90f92c635f5@amperemail.onmicrosoft.com>
+In-Reply-To: <20251202101444.7f6d14a8@kernel.org>
 
-On Tue, Dec 02, 2025 at 02:19:41PM -0500, Adam Young wrote:
-> Can we get this and the corresponding follow on changes by Sudeep merged?
-> 
+Tue, Dec 02, 2025 at 07:14:44PM +0100, kuba@kernel.org wrote:
+>On Tue, 2 Dec 2025 08:43:49 +0100 Jiri Pirko wrote:
+>> Mon, Dec 01, 2025 at 10:49:54PM +0100, kuba@kernel.org wrote:
+>> >On Mon, 1 Dec 2025 11:50:08 +0100 Jiri Pirko wrote:  
+>> >> Correct. IFAIK there is one PF devlink instance per NUMA node.  
+>> >
+>> >You say "correct" and then disagree with what I'm saying. I said
+>> >ports because a port is a devlink object. Not a devlink instance.  
+>> 
+>> Okay, you mean devlink_port. You would like to see NUMA node leg as
+>> devlink_port? Having troubles to undestand exactly what you mean, lot of
+>> guessing on my side. Probably I'm slow, sorry.
+>> 
+>> But there is a PCI device per NUMA node leg. Not sure how to model it.
+>> Devink instances have 1:1 relationship with bus devices.
+>> 
+>> Care to draw a picture perhaps?
+>> 
+>> >> The shared instance on top would make sense to me. That was one of
+>> >> motivations to introduce it. Then this shared instance would hold
+>> >> netdev, vf representors etc.  
+>> >
+>> >I don't understand what the shared instance is representing and how
+>> >user is expect to find their way thru the maze of devlink instanced,
+>> >for real bus, aux bus, and now shared instanced.  
+>> 
+>> Well, I tried to desrtibe it in the documentation path, Not sure what is
+>> not clear :/
+>> 
+>> Nested devlinks expose the connections between devlink instances.
+>
+>To be clear -- I understand how you're laying things out. My point is
+>not about that. My question is how can user make intuitive sense of this
+>mess of random object floating around. Every SW engineering problem can
+>be solved by another layer of abstraction, that's not the challenge. 
+>The challenge is to design those layers so that they make intuitive
+>sense (to people who don't spend their life programming against mlx FW
+>interfaces).
 
-You have responded on a old thread which might cause confusion.
-For your reference, the right thread is [1] and I just pinged Jassi
-asking the same few days back. Thanks for following it up.
-
--- 
-Regards,
-Sudeep
-
-[1] https://lore.kernel.org/all/20251016-pcc_mb_updates-v1-0-0fba69616f69@arm.com/
+Well, this really has no relation to mlx FW interfaces. It is a generic
+issue of having multiple PFs backed by 1 physical device sharing
+resources. How to make things more intuitive, I don't know :/ Any
+suggestion?
 
