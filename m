@@ -1,172 +1,139 @@
-Return-Path: <netdev+bounces-243353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FB5AC9D94D
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 03:35:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0E8CC9DAB4
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 04:42:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14A853A7063
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 02:35:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF8BC3A6AD2
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 03:42:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8B25204583;
-	Wed,  3 Dec 2025 02:35:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="N69gnGij"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F78D23770A;
+	Wed,  3 Dec 2025 03:42:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from r9220.ps.combzmail.jp (r9220.ps.combzmail.jp [160.16.65.223])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B8D536D507;
-	Wed,  3 Dec 2025 02:35:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B7512AD00
+	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 03:42:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.16.65.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764729326; cv=none; b=N32vfik+v6HPSlPRDM+XHg0Q/kD+n8rmLbcw9gLTjryTo3QQ0ZM4X1LrL/aLEWw/+hrjR3UE2VFkauPu4pc4Khgg/9Pe9pMmSNLfzJHRGJ/o9HPuxgtH29itYIn138ty/8oD1/eVJCR2DZSx+9gqoXayVL9r0ju8h7AJ3L4oP4Y=
+	t=1764733338; cv=none; b=enMsLd9Pf6ahD8iNQknWkeWzb4IPIpy3Pr6ul5X8DO3APEenCQ8ihioWOZCHnDMP9EZsCg7SvcwIlfV9ZgfSArNvraeBVaY7RDs7f7jrJfhmol+PkJUh5EiVEoFg/4vyeYWPKz/Qlb04HB+qTujIlg/JkbtrtI1C01Xr8NLVgAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764729326; c=relaxed/simple;
-	bh=/N1sTSZh/utQqpEOjiTWHdbbwwhYCdldlFmtNCTihxc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WEsP2k1yZK8+/He/o80TV0t7dm1Nyf/DnDT+hLJyQ1sthvz3mmu1KtxEdtV5egg46Z3cejHJSmNWS2lqhrXRE8M29R+PI5QMlIOVfuOIPV66VeVC3njeegh9WXfS+Zx8jbVkpvV/bOuKbRq44XyvTSek8aqWYoHJB2IozOXVaUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=N69gnGij; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=202503; t=1764729322;
-	bh=OpcxfvipuC6qAL1Z7PjgPVvorNrlmLKd5wXNYLxG5/E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=N69gnGijybexVWhdYAVW7ERecKg0lybsqUk9hDId8/hrk9AYdHnmOGv+rd1wAsQnc
-	 Ff1gF0wopYShIOuIOJylcr/7K+bpGEctlJFcvyIt2G9D40LpOXcScaRBXZLqOgyRql
-	 6RN8uSj963MXomI35k3r39nBoPpDLYDQXLmC6Melt0vClsqpgjUXHvCJjGFrJs09pX
-	 VXsqudvmSUJGGQxc6SC4kn6blz+509sSHxengLFhPMXHOVtuMDurx9cz3k4rCKcJDv
-	 WJVRF7yrKsOEC+gNc+6m31Ku2LXe+AAOxE0l0A/hcWwSMViQRxWhQi1Qp7fpOJgI5g
-	 PCORtiQ6alCXA==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4dLhZJ6RVnz4w23;
-	Wed, 03 Dec 2025 13:35:20 +1100 (AEDT)
-Date: Wed, 3 Dec 2025 13:35:20 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
- <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>,
- "H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>,
- Arnaud Lecomte <contact@arnaud-lcm.com>, bpf <bpf@vger.kernel.org>,
- Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: Re: linux-next: manual merge of the tip tree with the bpf-next tree
-Message-ID: <20251203133520.10ba2705@canb.auug.org.au>
-In-Reply-To: <20251105133159.6303b1ee@canb.auug.org.au>
-References: <20251105133159.6303b1ee@canb.auug.org.au>
+	s=arc-20240116; t=1764733338; c=relaxed/simple;
+	bh=NemV5MLxz9x+nSpLR1t4dXuC068uPIEtAKK2/hGnSvw=;
+	h=To:From:Subject:Mime-Version:Content-Type:Message-Id:Date; b=JrBEd38UM6ue2+60KwV+Wfzv5lnj8KXcOXrwUNPHaGK+QYwYfY/DshVwYsGZBX9IgNwHv1LbJb0ayY67747GPc5n7qCx8B261/pcrtngp4cksaF4oAz+x08UXIaaK8ipAICcMFTnuGuHhKAFO5BJUZvT0eqVhy+dgTn9MmcUX7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fc-tocotoco.jp; spf=pass smtp.mailfrom=magerr.combzmail.jp; arc=none smtp.client-ip=160.16.65.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fc-tocotoco.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=magerr.combzmail.jp
+Received: by r9220.ps.combzmail.jp (Postfix, from userid 99)
+	id AE0D0C0E3F; Wed,  3 Dec 2025 12:29:36 +0900 (JST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 r9220.ps.combzmail.jp AE0D0C0E3F
+To: netdev@vger.kernel.org
+From: =?ISO-2022-JP?B?GyRCSiE7YyVVJWklcyVBJWMlJCU6S1xJdBsoQg==?= <info@fc-tocotoco.jp>
+X-Ip: 855817874988838
+X-Ip-source: k85gj73348dnsaq6u0p6gd
+Precedence: bulk
+List-Unsubscribe-Post: List-Unsubscribe=One-Click
+Subject: =?ISO-2022-JP?B?GyRCJF4kayRKJDJKITtjO3Y2SBsoQg==?=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/N/lm28FJl68ZE/B3Wqf=kUv";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-2022-jp
+Content-Transfer-Encoding: 7bit
+X-MagazineId: 33q6
+X-uId: 6763334140485968564233531043
+X-Sender: CombzMailSender
+X-Url: http://www.combzmail.jp/
+Message-Id: <20251203033017.AE0D0C0E3F@r9220.ps.combzmail.jp>
+Date: Wed,  3 Dec 2025 12:29:36 +0900 (JST)
 
---Sig_/N/lm28FJl68ZE/B3Wqf=kUv
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+　
+　新規事業をご検討中の経営者様へ
 
-Hi all,
+　いつもお世話になっております。
 
-On Wed, 5 Nov 2025 13:31:59 +1100 Stephen Rothwell <sfr@canb.auug.org.au> w=
-rote:
->
-> Today's linux-next merge of the tip tree got a conflict in:
->=20
->   kernel/bpf/stackmap.c
->=20
-> between commit:
->=20
->   e17d62fedd10 ("bpf: Refactor stack map trace depth calculation into hel=
-per function")
->=20
-> from the bpf-next tree and commit:
->=20
->   c69993ecdd4d ("perf: Support deferred user unwind")
->=20
-> from the tip tree.
->=20
-> I fixed it up (see below) and can carry the fix as necessary. This
-> is now fixed as far as linux-next is concerned, but any non trivial
-> conflicts should be mentioned to your upstream maintainer when your tree
-> is submitted for merging.  You may also want to consider cooperating
-> with the maintainer of the conflicting tree to minimise any particularly
-> complex conflicts.
->=20
-> --=20
-> Cheers,
-> Stephen Rothwell
->=20
-> diff --cc kernel/bpf/stackmap.c
-> index 2365541c81dd,8f1dacaf01fe..000000000000
-> --- a/kernel/bpf/stackmap.c
-> +++ b/kernel/bpf/stackmap.c
-> @@@ -333,9 -310,12 +333,9 @@@ BPF_CALL_3(bpf_get_stackid, struct pt_r
->   			       BPF_F_FAST_STACK_CMP | BPF_F_REUSE_STACKID)))
->   		return -EINVAL;
->  =20
->  -	max_depth +=3D skip;
->  -	if (max_depth > sysctl_perf_event_max_stack)
->  -		max_depth =3D sysctl_perf_event_max_stack;
->  -
->  +	max_depth =3D stack_map_calculate_max_depth(map->value_size, elem_size=
-, flags);
->   	trace =3D get_perf_callchain(regs, kernel, user, max_depth,
-> - 				   false, false);
-> + 				   false, false, 0);
->  =20
->   	if (unlikely(!trace))
->   		/* couldn't fetch the stack trace */
-> @@@ -463,15 -446,13 +463,15 @@@ static long __bpf_get_stack(struct pt_r
->   	if (may_fault)
->   		rcu_read_lock(); /* need RCU for perf's callchain below */
->  =20
->  -	if (trace_in)
->  +	if (trace_in) {
->   		trace =3D trace_in;
->  -	else if (kernel && task)
->  +		trace->nr =3D min_t(u32, trace->nr, max_depth);
->  +	} else if (kernel && task) {
->   		trace =3D get_callchain_entry_for_task(task, max_depth);
->  -	else
->  +	} else {
->   		trace =3D get_perf_callchain(regs, kernel, user, max_depth,
-> - 					   crosstask, false);
-> + 					   crosstask, false, 0);
->  +	}
->  =20
->   	if (unlikely(!trace) || trace->nr < skip) {
->   		if (may_fault)
+　「社会貢献性の高い事業で、確実な収益を上げたい」
 
-This is now a conflict between the bpf-next tree and Linus' tree.
+　そう考え、成長著しい福祉市場にご関心をお持ちのことと存じます。
+　しかし、同時にこうも考えていませんか？
+　
+　「市場は魅力的だが、専門的な法規制や複雑な運営、人材採用は荷が重すぎる…」
+　「もし失敗したら、多額の投資が無駄になってしまうのでは…」
 
---=20
-Cheers,
-Stephen Rothwell
+　ご安心ください。その不安こそ、私たちが解決したい最大の課題でした。
 
---Sig_/N/lm28FJl68ZE/B3Wqf=kUv
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+　この障壁を根本から取り除くのが、私たちtocotocoだけの
+　【運営本部代行プラン】です。
 
------BEGIN PGP SIGNATURE-----
+　煩雑な運営業務は全て本部がプロフェッショナルとして代行します。
+　オーナー様には、「投資家」として市場の確実な成長という
+　最大の果実のみを受け取っていただきます。
+―――――――――――
 
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmkvoegACgkQAVBC80lX
-0GwfRwf/SAPdxaT7GmlH18AOpAfzDihf1b2G8frMgXyvHR9TrI4PObUHgTUcz4IU
-gTrQJWxr0fxxGAXbPGflg7Ki+vyMSIkivrGCwny4MTs07nlUM8sNyYUR6XbmMLDY
-RyMEsMRvysfKXULcPtVtxaCzhAfTPkmdcrrnCByXWm3A6GHt95Mpaiq0j6LaNbv/
-tHiL09L0LKr93WZ2GMA5KWNfl7OoTSvCgEe0oAcikCZJMYt2/mT9w7AS7JzmrbYs
-cGMFaiQ0dZgP7rxYuvJ1pJt7HHlRJPvG72/90tx/oOK+523odRNpl21csMDhIavY
-XmV/ra8wz0WRjGYmzDbj1C03wN3YqQ==
-=Ge3i
------END PGP SIGNATURE-----
+　廃業率0.055％　業態を選べる
+　 　障がい福祉フランチャイズ
 
---Sig_/N/lm28FJl68ZE/B3Wqf=kUv--
+　　 <ご視聴予約はこちら>
+　https://fc-tocotoco.work/25/
+
+〇オンラインで開催中
+　12月9日（火）13:00〜14:00
+　12月17日（水）15:00〜16:00
+
+ご都合の良い日程をお選びいただけます。
+―――――――――――
+
+　■ 失敗の不安を解消。本部代行プランの3大メリット
+　１．専門知識、一切不要
+　　複雑な行政への請求や法改正対応、専門スタッフの採用・管理まで、全て本部が代行します。
+　　異業種出身であることを気にする必要は一切ありません。
+
+　２．早期の投資回収を実現
+　　煩雑な運営業務から解放され、オーナー様は事業拡大、
+　　そして投資利回り50%以上、6ヶ月&#12316;での投資回収実績を持つ、
+　　確実な収益構造の構築に専念できます。
+
+　３．廃業率0.055％の安定性を最大限享受
+　　業界トップクラスの実績とノウハウを持つ本部が現場を担うため、
+　　「運営不安による失敗」というリスクが限りなくゼロに近づきます。
+
+
+　■ 市場の確実性を数字で証明
+　　・市場規模：4兆円超え
+　　・需要：障がい者数 毎月4万人増加
+　　・安定性：廃業率0.055％（行政による総量規制で事業が守られています）
+
+　この巨大かつ安定した市場で、本部が代行することで、
+　より確実性の高い事業運営が実現します。
+
+
+　【運営代行プラン】は説明会でのみ詳細を公開
+　
+　投資したいが運営までは荷が重い、という経営者様のために開発されたこの特別プランと、
+　5つの高収益業態（訪問看護、グループホームなど）の具体的な収益モデルは、
+　下記の説明会でのみ公開しております。
+
+　新規事業のリスクを最小化し、確実な収益源を確保したい方は、
+　ぜひこの機会にご参加ください。
+
+
+　▼ 詳細はこちら
+　https://fc-tocotoco.work/25/
+
+―――
+　tocotoco株式会社　セミナー事務局
+　東京都千代田区九段南2丁目3−25
+ 　03-5256-7578
+‥‥‥‥
+　本メールのご不要な方には大変ご迷惑をおかけいたしました。
+　メール停止ご希望の方は、お手数ですが下記URLにて、
+　お手続きをお願いいたします。
+　https://fc-tocotoco.work/mail/
+―――
 
