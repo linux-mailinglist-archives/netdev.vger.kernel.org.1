@@ -1,110 +1,150 @@
-Return-Path: <netdev+bounces-243459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BF36CA1A04
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 22:09:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 45610CA1A0D
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 22:09:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A00993038F53
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 21:07:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8D481301A714
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 21:09:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 257FD2D3225;
-	Wed,  3 Dec 2025 21:07:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACE742D063C;
+	Wed,  3 Dec 2025 21:09:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FeFtVoLw"
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="wggsSFBx";
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="VfU5lGeu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f54.google.com (mail-vs1-f54.google.com [209.85.217.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F7082BD001
-	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 21:07:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E41D924DD15;
+	Wed,  3 Dec 2025 21:09:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764796064; cv=none; b=uZPHRpDnD/MF6XMIY0mc+qZ7TLyv1rzWic3XR45sxjmO0myF7K1SYwxGpaQGhs9BZvWO75GPmHZx/rYdwOClO8QgPdmqcjy2b7StfmBEhlEQumhnLAMZOM9x9Yzie4M4C+RXPrgwSGz6kUuOMsp+xdFCkcIvB4suKw01JjNc4Ns=
+	t=1764796151; cv=none; b=k6CCCJjLnJ7Sq5jTWdBtvARZaRm4TfWd4u+EkQf2s2Kw9UvW7KqqnLkAUTWo9DfCxqBNX/yx44aDonVguuF0TBPpZ35hIOo5z402ynpCfEDV7E8wafNV1//3JMJ4nnj8AL1u/b/xxVatfqJqbuiaqomGNG+OgH2i0chVoteTr+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764796064; c=relaxed/simple;
-	bh=3d9aGC6njWAs8y8BO9Q+if9lLi5u+CBRThmGFWSqsLE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nPls4A+WZRYMroyIGPCMgXjZ6O/cDSnUxPaYQOCzfxpnvYbY7TGpSLsrotLkPK1AQBBix0HH3OEO9GSzFVZVLHRwUolt8/lKRSOr/RPeX7iu62n2TzmZjW1/YimTXYC/IC3j8keJcOYBdjUvFacR7XijOiK48vpsnyaI5ANkkeY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FeFtVoLw; arc=none smtp.client-ip=209.85.217.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f54.google.com with SMTP id ada2fe7eead31-5e18598b9b1so200187137.0
-        for <netdev@vger.kernel.org>; Wed, 03 Dec 2025 13:07:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764796058; x=1765400858; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3d9aGC6njWAs8y8BO9Q+if9lLi5u+CBRThmGFWSqsLE=;
-        b=FeFtVoLwIernLHUcn2tQqHiCCMCChIRDz/sHWZexupT27i5LLMWRsNV3AwTcwXotNC
-         5WD2yOsJGCfBuzAHZmDzkwm8mV6+dFWjnjhjSv2dPXilOHLmQ1ZpUL1giYXRtOsEQsLv
-         Ep2TL3Ce2aHB4K6URlCb0enJ1cYp1jTjkOq/Pa5CgYxNOHzLgJQGyl70yLsqnv07h3dV
-         zG8YiWzWOxeqnDmBHLzsDoK+GUloMQ/eRQptHhOsTDp5lp9e0kepjTKaQOGAdmCCoLCQ
-         3nftLqeRAdEglN6ILLaN2O3qtebSebp5XGLT0SDfLsd2DOWrSDJj05mSh4vN5cj2H/pN
-         UvzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764796058; x=1765400858;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=3d9aGC6njWAs8y8BO9Q+if9lLi5u+CBRThmGFWSqsLE=;
-        b=eCqe7MZum+sE6IuUeMdkl9uGc/hy9eFXD8nT1BOvJkunNMg1/NgDYECf815eKI3Bsc
-         vTp9a6fG4XBv6cte4BlfLAK6lO0SOE1H/ENW6VWnU3XRwIe5yDFcENsl3b4i44kekfS9
-         RMs9Zxzpu8uqu/0Oa22b7Bx4YuZcbZU1Cm+NMy51BZLofmg+aL2MrrBKyIqDXxNeBhbM
-         y/uzLZ/MoMDCrHic0sESWsFVnwo2YwqLIR5Hy/2aPaY+StGNYeGgOZ3HO8zY8cUSSbMx
-         9cdrKvYf1Fqo4s0kJipju61hSZs8dSvprbAQSEgbG0lo6lOW1xIcqrmY2McXQMqw7Tem
-         wJzw==
-X-Forwarded-Encrypted: i=1; AJvYcCW/NM7J0y9t3Aq0tcqrE7071/qLuV9xQvNEVLw4SrppknyXV7bZdZHQIcoQSkV61TyDTBTQAMw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKII1PrgwKN2NHeVMn/DTFjZV/lk6dGM/LMxQt1x/lTVT4rK4Y
-	GhN8ZXOZxXLdnKDpwnbAIqfO5U2/oq55X2+7WM5WDLGLnPA1qZzkGnptGRetwe1FT7dkhczDwRC
-	ZG/htImlO2MPiX+IfiVj+Pny9TQkvlAY=
-X-Gm-Gg: ASbGnctCzplwQA2h4xh3bC62t3FsGmxyij7YE0WrLJr566HfIoR1chj0L4Kur2SfYAo
-	ceYnMRSN69lxY+ok0NWWQhDdKa2hwKnqWmyT7c7bMmv4qqIPKUYyR6u6qdRk7FiQt6Ciw/B4uBV
-	3d+m11xVcMbUV4qg9hoAulVK4ni5xQNb+jofWo1NlKETRdb+JWCRL7pAgWTU+jNFXFb6BKVIYQG
-	tglutx86vjnKuNsgCVEke9K5Zx1mS6z2vMuldVLHSExvM5Zl7lGULvJin5BRFz2oAlj+72kn21Y
-	HkKQUqP0YLfZE7mgoncED3I=
-X-Google-Smtp-Source: AGHT+IHdAfimol68DLumAqunidsHIT0rEt6ihzkJKjfjB1Fpx4xO6ifuhvmA045Unpi4oj8UbhPgZh3GuuMpgILmXeQ=
-X-Received: by 2002:a05:6102:4193:b0:5dd:c568:d30d with SMTP id
- ada2fe7eead31-5e48e36caafmr1498913137.30.1764796058300; Wed, 03 Dec 2025
- 13:07:38 -0800 (PST)
+	s=arc-20240116; t=1764796151; c=relaxed/simple;
+	bh=rPqG2kR2xua/OZ3PxuiVmscoQv7tQ7iP3eBYF5aoQ3A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YoZF89u6ZYRIETwocZxsPs4L5ll48hVAadPqh0L7yR07acncwNE/snFRhNeC6FGbiZ75wRtB7c+ZbVZZvcYxi+mTt1Dk5hxnCCs2O4Qxfyqzl+4tTDMATZ255mKk0RhzHtuEWEKj4dX0cZzQHk0C5FXsOoPjt3OChu2jMXKr4Cg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=wggsSFBx; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=VfU5lGeu; arc=none smtp.client-ip=80.241.56.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [IPv6:2001:67c:2050:b231:465::2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4dM9HQ64jkz9sWL;
+	Wed,  3 Dec 2025 22:09:06 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1764796146;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=AAF973vn28TqQ3uC+RgqK8Xw/VghUqC4XDR067oeP04=;
+	b=wggsSFBxvO8MpRRfq1RwvL8s/Otm+t4D/6DlfU7wwRS6TFTJ6atysA8gsuCgpWGRJNjmvy
+	kpf52NlTzbhhtUNZwwlUgW3hazu4d6xsEeuVUorZ/FgaNg534T8AW1RpFmXLEVleUaI7lS
+	yKG7VnxrO7zZmhvWwrAZmrSQ3vNetcmv1s7wR/knaSw8Gzh6yL6NcTsUbn86+wkUaGP+4f
+	eGHrT6iQhCjWwlWggWi9OnOimPyNA8QDUF96WylnyrxSVtPdahJEvsHYI2UWSRzvmsBV3Z
+	KC/rTCwPmd9rFDPFShSMdaNhp/xwSGMsArMLc3ojVPmpPgCL/+bYxC4eFYh9RA==
+Authentication-Results: outgoing_mbo_mout;
+	dkim=pass header.d=mailbox.org header.s=mail20150812 header.b=VfU5lGeu;
+	spf=pass (outgoing_mbo_mout: domain of marek.vasut@mailbox.org designates 2001:67c:2050:b231:465::2 as permitted sender) smtp.mailfrom=marek.vasut@mailbox.org
+From: Marek Vasut <marek.vasut@mailbox.org>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1764796145;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=AAF973vn28TqQ3uC+RgqK8Xw/VghUqC4XDR067oeP04=;
+	b=VfU5lGeuBnGUSoLMjKGHzjhmK/E+p7I9IuBuuxJYKM3ctc/is/BY290vgXJIq+e1YwFgi0
+	y/Hbu1TGUSykTEHVSPrjd9q2Ck8KyxjMreCK20mQ3BrrsWZe9LIoLm4UTkMHXfiMPw3rwq
+	kRRjzkkwwtx4pAdSveE7u0Ms+9qJZCmQDsGZ9rsSE5SYs4bJbZUV2zioGOwZhycMGBcQDM
+	TNTY5dVtwv4zgGmepPphsX9TW4fLDkDBH8i4VQ3kDTg7UZFklptqQ4nDxzgF4pgZaWJSnx
+	IkZJNlH/z4075LibCk7pGrTA4kbx4eVOtCNVk2LTjfVaCARNclSAV24hZIcQxw==
+To: netdev@vger.kernel.org
+Cc: Marek Vasut <marek.vasut@mailbox.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Aleksander Jan Bajkowski <olek2@wp.pl>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Ivan Galkin <ivan.galkin@axis.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Michael Klein <michael@fossekall.de>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	devicetree@vger.kernel.org
+Subject: [net-next,PATCH v2 1/3] dt-bindings: net: realtek,rtl82xx: Keep property list sorted
+Date: Wed,  3 Dec 2025 22:08:04 +0100
+Message-ID: <20251203210857.113328-1-marek.vasut@mailbox.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251122003720.16724-1-scott_mitchell@apple.com>
- <CAFn2buA9UxAcfrjKk6ty=suHhC3Nr_uGbrD+jb4ZUG2vhWw4NA@mail.gmail.com> <aTCEOnaJvbc2H_Ei@strlen.de>
-In-Reply-To: <aTCEOnaJvbc2H_Ei@strlen.de>
-From: Scott Mitchell <scott.k.mitch1@gmail.com>
-Date: Wed, 3 Dec 2025 13:07:26 -0800
-X-Gm-Features: AWmQ_bn6jvlgEQX1iRcPAlpxmFuQ2XesxYMt5bijkTTCvXVOrAoKa4yW5JnmoQE
-Message-ID: <CAFn2buD9PZsahDwH25n3kxoVtkk1G_dCErCZViqxeC7jnbO06Q@mail.gmail.com>
-Subject: Re: [PATCH v5] netfilter: nfnetlink_queue: optimize verdict lookup
- with hash table
-To: Florian Westphal <fw@strlen.de>
-Cc: pablo@netfilter.org, kadlec@netfilter.org, phil@nwl.cc, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	horms@kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzbot@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-MBO-RS-ID: cb5fcb4ceaa1a6d2f6e
+X-MBO-RS-META: o56k8bpp3oyfn87kuxonkzungk539fbo
+X-Rspamd-Queue-Id: 4dM9HQ64jkz9sWL
 
-Thanks for the timely response! If you are satisfied I'm happy to have
-it placed in nf-next:testing whenever convenient.
+Sort the documented properties alphabetically, no functional change.
 
-On Wed, Dec 3, 2025 at 10:41=E2=80=AFAM Florian Westphal <fw@strlen.de> wro=
-te:
->
-> Scott Mitchell <scott.k.mitch1@gmail.com> wrote:
-> > Hello folks, friendly ping :) Please let me know if any other changes
-> > are required before merging.
->
-> net-next is closed and I don't think that it will re-open before new
-> year, so this patch (like all others) has to wait.
->
-> I could place it in nf-next:testing but it won't speed up the
-> required pull request.
+Signed-off-by: Marek Vasut <marek.vasut@mailbox.org>
+---
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
+Cc: Andrew Lunn <andrew@lunn.ch>
+Cc: Conor Dooley <conor+dt@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Ivan Galkin <ivan.galkin@axis.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>
+Cc: Michael Klein <michael@fossekall.de>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Rob Herring <robh@kernel.org>
+Cc: Russell King <linux@armlinux.org.uk>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: devicetree@vger.kernel.org
+Cc: netdev@vger.kernel.org
+---
+V2: No change
+---
+ .../devicetree/bindings/net/realtek,rtl82xx.yaml          | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
+index 2b5697bd7c5df..eafcc2f3e3d66 100644
+--- a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
++++ b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
+@@ -40,15 +40,15 @@ properties:
+ 
+   leds: true
+ 
+-  realtek,clkout-disable:
++  realtek,aldps-enable:
+     type: boolean
+     description:
+-      Disable CLKOUT clock, CLKOUT clock default is enabled after hardware reset.
++      Enable ALDPS mode, ALDPS mode default is disabled after hardware reset.
+ 
+-  realtek,aldps-enable:
++  realtek,clkout-disable:
+     type: boolean
+     description:
+-      Enable ALDPS mode, ALDPS mode default is disabled after hardware reset.
++      Disable CLKOUT clock, CLKOUT clock default is enabled after hardware reset.
+ 
+   wakeup-source:
+     type: boolean
+-- 
+2.51.0
+
 
