@@ -1,207 +1,170 @@
-Return-Path: <netdev+bounces-243420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77644CA068E
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 18:25:11 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF398CA0458
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 18:09:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5B35730069BC
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 17:25:10 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4D78430006FC
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 17:09:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81D9C33F8AC;
-	Wed,  3 Dec 2025 15:55:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31F5432FA07;
+	Wed,  3 Dec 2025 15:59:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="MOhshlP2"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="RxRfiM+l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F775304BB3
-	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 15:55:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B5C632F740;
+	Wed,  3 Dec 2025 15:59:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764777318; cv=none; b=qiLxQPKx83DcKRW2l7ZdZX/mMfI0MG2SHm/JO3vlfqPId5HY1G+qYkp2OFvz3UH4CP7xKXYUdbxQeHIRNfLAhj939fqUSMtwbwsGhsufY7nvV2QCBxhlGMcsPaOcezBv1CHECXKt7lh37ECwryVbKzJE4bnObeIV/9A6ktYK0SI=
+	t=1764777583; cv=none; b=VW3YvNzDsOk6hRvagRhVwGCrjJko8O6LkP53fMpGnz8CcTrXOVGtN3Q6QvBjKpfUoEMQkPW2KCNltQU4dlYThPvrTYnxcxRebTjrv89gQr0IvhNVzoJJmKndj9LkDHmSH9QvJ+FS5/lBg8FSvNyVp3Obk+GSICh29bgBQLNOl4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764777318; c=relaxed/simple;
-	bh=u3Dy2G3WRTyFesbvCVKYgejnMDOxq7tkjLs3uSapkfQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=I9Gy33mbND2l75EJQKs1hnue7a5f2QauSaSnfUn9s9KK6ACd4lLoGMoQ4b0K/ba2ru5kQdlANQd9vG7o2nvuTXE8qt+WR4ToBzk5RDIGFFyKKqAkWu9okNPczY0PNd9D+S5SzTX6ED+o9NiFCEZGMYtAeRZKxwYbDnvPR1RNfUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=MOhshlP2; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7c66822dd6dso709101b3a.0
-        for <netdev@vger.kernel.org>; Wed, 03 Dec 2025 07:55:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1764777316; x=1765382116; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/p/Pi5AWZHYDPsiAr+hwgDoJDjponKbr9dQ4aVc/nMQ=;
-        b=MOhshlP2iwKgV6mqQ9uU1z08WtQGIGmY554H3UBMXEUdWqoYheVwV+Cu7HFMW+P6PD
-         FPBoR+sDs7FUTlo22RmQut8CEtXCVBf6za6xlFmhAbYjPKZ1qpXixUMfoEnnpKV4LkTe
-         H2SniOzX7L04ifLK+PB+p+U61BN5yWxZjQKBALxwpy/8PkpKb6XooXUQILaD8TJhvf96
-         GQgsZMrx6WDOEVbiP+4L56uVTVWe4Mq6KaLM6J/x4FB/RvJkDl4icuAn7Fus2cvN+IUP
-         MDOb+S5ANpQLb7ptx/wpOJasjusw1dMCx4mkV56a5nRSBgqq4QDiZcIMZheNVorQqZKS
-         WvBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764777316; x=1765382116;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=/p/Pi5AWZHYDPsiAr+hwgDoJDjponKbr9dQ4aVc/nMQ=;
-        b=EuzmQwz1iJkTD5l2zBhksXbS2nV/qZeDuAeEzfnzDwVcaO4fW0FOSbKn5XdBPkfZtw
-         V9+er2blu9xyP4ZUt9F2+4y6NJ8dfhInIY6i4OqnrjDMLQlLkiufOBTDQSNN3uiNJhsP
-         N6qx1dBmHEifxFqQSr2bG+qRyydQ46Zh/o3dNyQF4wNW4+2c9rasIeqT534uwlmF1SWN
-         QRO/PsbEkeBH/0kWGevWBVbYm/q6aSzGftny6pOqv2m5qrHykzf8dkw4+3zvNKj0rzd2
-         7ETyRohXwatKiVxFkKH/ep/0+VLg5uNcUKyOFIKrF5chbvUrrYwuo296Q7KKIhSCY46e
-         uN5A==
-X-Forwarded-Encrypted: i=1; AJvYcCW7vFWJDkoW47M4Tn4EqYoakHDLR78+/8Sk9AfgrZ5V5GnIO9yXOTUKoV2sKPpDddD85R5zneo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3UoFe/z9v9ZNIUxJRMK8ZIKMdYF4lSDBQMJjvqHrcWCnPNJw8
-	R2oszbuA07YKca4Iy/71FyaWszrpjaA7ZI53UZU/CzabNz/RBFV+6uH9KNczgV3PpkRZl/fumBk
-	bQKrIGthNIwoxMBc8oD4WZ0pXvM6hwevWDM3VhUCx
-X-Gm-Gg: ASbGncuF5uJ/XJ7haz3LM42lsSwdbnfBVE5KeUq46fnnn+hDjchnAsjVd5izfhQpd6N
-	k2gL37XHaRV3ZH/tNr0l4b9/fJW9FA/Hcm6xG5kB4Nu2B+KEG43Hd8p0hbLxpzPcxgNvUQ+tGQI
-	FVLqsD2A6s+vaGsxkhe/I01vJNNV/OQDasHryheE4Rr7+Vst2y/fRqusAEDFxnTAMG3zhIyzjPz
-	+7Eqw29ItbW96YdEUAks/V6/L2k/X+OVvNEXxxrtigE6lhXv0/cBJfmGHaHDv8UZjUcpTc=
-X-Google-Smtp-Source: AGHT+IFqrCGVBw0W6skiqMchfp9P0aCB9lQB6KewuBkAjCizkiC6upTGzicvdWl58VewJl0Dw2tgBc6JaUZoagFsGFM=
-X-Received: by 2002:a17:90b:5610:b0:349:162d:ae0c with SMTP id
- 98e67ed59e1d1-349162daf89mr2486825a91.4.1764777315815; Wed, 03 Dec 2025
- 07:55:15 -0800 (PST)
+	s=arc-20240116; t=1764777583; c=relaxed/simple;
+	bh=B36oONp39GILfEjUDrc8cwOGYq7/3VDI4lJqgOUo/wo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VrLO5GydSuf9iTgmOhwIZDtcy9no/543EIyUfTihjqDD7Ca1NgT7OnKEpVjr/eLfMGLzolitV9k2h227YIn4GhVXDVYZtymtcjhhjaoIC6y/wsLUpX/xgAd4DNOPI+6HgvdmOt98hmW+XqRtt1gzWa+WR11mgFfDn6SiYgCcH44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=RxRfiM+l; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=BNrEYDusoPa2vxOXWr4+YH72hzHIHGHZr3/9V5K71zA=; b=RxRfiM+lTeAys3fOXt5OoysDpH
+	9ZMEtXQ3T4m+ypoByBoNGmLIUCadTXiUafGbNPX6gtNXPWLd+iNsqX0lT+Mk6CT1hLlmwRygJ17I1
+	3hgxUPaEcHvoi+v7RlUzp7y/+S2b4dp/4TzAfWW1B1p22jIalYck3OlK/UFuq1KH9VlQmBUz5cYJN
+	cxBd1vB950ZTP2x2N91yI4JQ4EXGyWt3xJlMObs8pqwJXoyxco2Y9V6dmz+Uo2G7mAgutDKmv7zCH
+	bN7q6WVHyRK8YCoVSgKKEeOtJN0ouZ/NkTxEeDFS7OgQt4DiW09coueoDEBiC3gBET5fZXQG5RV1r
+	sxw9SC+g==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33336)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vQpGE-000000002hx-414A;
+	Wed, 03 Dec 2025 15:59:23 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vQpG9-0000000008C-3Psp;
+	Wed, 03 Dec 2025 15:59:17 +0000
+Date: Wed, 3 Dec 2025 15:59:17 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Buday Csaba <buday.csaba@prolan.hu>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/1] net: mdio: reset PHY before attempting
+ to access ID register
+Message-ID: <aTBeVTlsElGXUCSN@shell.armlinux.org.uk>
+References: <5701a9faafd1769b650b79c2d0c72cc10b5bdbc8.1764337894.git.buday.csaba@prolan.hu>
+ <79c050e9-83e7-4cc5-979e-457f098024bf@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250428195022.24587-2-stephen.smalley.work@gmail.com>
- <CAHC9VhQfrMe7EY3_bvW6PcLdaW7tPMgv6WZuePxd1RrbhyZv-g@mail.gmail.com>
- <CAHC9VhQyDX+NgWipgm5DGMewfVTBe3DkLbe_AANRiuAj40bA1w@mail.gmail.com>
- <6797b694-6c40-4806-9541-05ce6a0b07fc@oracle.com> <CAHC9VhQsK_XpJ-bbt6AXM4fk30huhrPvvMSEuHHTPb=eJZwoUA@mail.gmail.com>
- <CAHC9VhQnR6TKzzzpE9XQqiFivV0ECbVx7GH+1fQmz917-MAhsw@mail.gmail.com> <CAEjxPJ7_7_Uru3dwXzNLSj5GdBTzdPDQr5RwXtdjvDv9GjmVAQ@mail.gmail.com>
-In-Reply-To: <CAEjxPJ7_7_Uru3dwXzNLSj5GdBTzdPDQr5RwXtdjvDv9GjmVAQ@mail.gmail.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Wed, 3 Dec 2025 10:55:01 -0500
-X-Gm-Features: AWmQ_bmh5eHBqsgQJybJ_-JtI6h64GzWSkh4DPBnzoJo8LXqkNENNTHyNoV6hjI
-Message-ID: <CAHC9VhQDHTNkrB4YuNoafM0bhAav=CP5Ux6ZZGY9+WF0+0_9ww@mail.gmail.com>
-Subject: Re: [PATCH v2] security,fs,nfs,net: update security_inode_listsecurity()
- interface
-To: Stephen Smalley <stephen.smalley.work@gmail.com>
-Cc: Anna Schumaker <anna.schumaker@oracle.com>, Trond Myklebust <trondmy@kernel.org>, 
-	Anna Schumaker <anna@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Casey Schaufler <casey@schaufler-ca.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, James Morris <jmorris@namei.org>, 
-	"Serge E. Hallyn" <serge@hallyn.com>, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Simon Horman <horms@kernel.org>, Ondrej Mosnacek <omosnace@redhat.com>, linux-nfs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
-	selinux@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <79c050e9-83e7-4cc5-979e-457f098024bf@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Wed, Dec 3, 2025 at 10:35=E2=80=AFAM Stephen Smalley
-<stephen.smalley.work@gmail.com> wrote:
-> On Wed, Jul 23, 2025 at 10:10=E2=80=AFPM Paul Moore <paul@paul-moore.com>=
- wrote:
-> > On Thu, Jun 19, 2025 at 5:18=E2=80=AFPM Paul Moore <paul@paul-moore.com=
-> wrote:
-> > > On Tue, May 27, 2025 at 5:03=E2=80=AFPM Anna Schumaker
-> > > <anna.schumaker@oracle.com> wrote:
-> > > > On 5/20/25 5:31 PM, Paul Moore wrote:
-> > > > > On Tue, Apr 29, 2025 at 7:34=E2=80=AFPM Paul Moore <paul@paul-moo=
-re.com> wrote:
-> > > > >> On Mon, Apr 28, 2025 at 4:15=E2=80=AFPM Stephen Smalley
-> > > > >> <stephen.smalley.work@gmail.com> wrote:
-> > > > >>>
-> > > > >>> Update the security_inode_listsecurity() interface to allow
-> > > > >>> use of the xattr_list_one() helper and update the hook
-> > > > >>> implementations.
-> > > > >>>
-> > > > >>> Link: https://lore.kernel.org/selinux/20250424152822.2719-1-ste=
-phen.smalley.work@gmail.com/
-> > > > >>>
-> > > > >>> Signed-off-by: Stephen Smalley <stephen.smalley.work@gmail.com>
-> > > > >>> ---
-> > > > >>> This patch is relative to the one linked above, which in theory=
- is on
-> > > > >>> vfs.fixes but doesn't appear to have been pushed when I looked.
-> > > > >>>
-> > > > >>>  fs/nfs/nfs4proc.c             | 10 ++++++----
-> > > > >>>  fs/xattr.c                    | 19 +++++++------------
-> > > > >>>  include/linux/lsm_hook_defs.h |  4 ++--
-> > > > >>>  include/linux/security.h      |  5 +++--
-> > > > >>>  net/socket.c                  | 17 +++++++----------
-> > > > >>>  security/security.c           | 16 ++++++++--------
-> > > > >>>  security/selinux/hooks.c      | 10 +++-------
-> > > > >>>  security/smack/smack_lsm.c    | 13 ++++---------
-> > > > >>>  8 files changed, 40 insertions(+), 54 deletions(-)
-> > > > >>
-> > > > >> Thanks Stephen.  Once we get ACKs from the NFS, netdev, and Smac=
-k
-> > > > >> folks I can pull this into the LSM tree.
-> > > > >
-> > > > > Gentle ping for Trond, Anna, Jakub, and Casey ... can I get some =
-ACKs
-> > > > > on this patch?  It's a little late for the upcoming merge window,=
- but
-> > > > > I'd like to merge this via the LSM tree after the merge window cl=
-oses.
-> > > >
-> > > > For the NFS change:
-> > > >     Acked-by: Anna Schumaker <anna.schumaker@oracle.com>
-> > >
-> > > Hi Anna,
-> > >
-> > > Thanks for reviewing the patch.  Unfortunately when merging the patch
-> > > today and fixing up some merge conflicts I bumped into an odd case in
-> > > the NFS space and I wanted to check with you on how you would like to
-> > > resolve it.
-> > >
-> > > Commit 243fea134633 ("NFSv4.2: fix listxattr to return selinux
-> > > security label")[1] adds a direct call to
-> > > security_inode_listsecurity() in nfs4_listxattr(), despite the
-> > > existing nfs4_listxattr_nfs4_label() call which calls into the same
-> > > LSM hook, although that call is conditional on the server supporting
-> > > NFS_CAP_SECURITY_LABEL.  Based on a quick search, it appears the only
-> > > caller for nfs4_listxattr_nfs4_label() is nfs4_listxattr() so I'm
-> > > wondering if there isn't some room for improvement here.
-> > >
-> > > I think there are two obvious options, and I'm curious about your
-> > > thoughts on which of these you would prefer, or if there is another
-> > > third option that you would like to see merged.
-> > >
-> > > Option #1:
-> > > Essentially back out commit 243fea134633, removing the direct LSM cal=
-l
-> > > in nfs4_listxattr() and relying on the nfs4_listxattr_nfs4_label() fo=
-r
-> > > the LSM/SELinux xattrs.  I think we would want to remove the
-> > > NFS_CAP_SECURITY_LABEL check and build nfs4_listxattr_nfs4_label()
-> > > regardless of CONFIG_NFS_V4_SECURITY_LABEL.
-> > >
-> > > Option #2:
-> > > Remove nfs4_listxattr_nfs4_label() entirely and keep the direct LSM
-> > > call in nfs4_listxattr(), with the required changes for this patch.
-> > >
-> > > Thoughts?
-> > >
-> > > [1] https://lore.kernel.org/all/20250425180921.86702-1-okorniev@redha=
-t.com/
-> >
-> > A gentle ping on the question above for the NFS folks.  If I don't
-> > hear anything I'll hack up something and send it out for review, but I
-> > thought it would nice if we could sort out the proper fix first.
->
-> Raising this thread back up again to see if the NFS folks have a
-> preference on option #1 or #2 above, or
-> something else altogether. Should returning of the security.selinux
-> xattr name from listxattr() be dependent on
-> NFS_CAP_SECURITY_LABEL being set by the server and should it be
-> dependent on CONFIG_NFS_V4_SECURITY_LABEL?
+On Tue, Dec 02, 2025 at 02:46:42PM +0100, Andrew Lunn wrote:
+> > @@ -13,9 +13,12 @@
+> >  #include <linux/phy.h>
+> >  #include <linux/pse-pd/pse.h>
+> >  
+> > +#include "../phy/mdio-private.h"
+> 
+> Relative imports are generally not allowed. It sometimes suggests
+> layering violations.
+> 
+> I'm not convinced the complexity and ugliness of partially registering
+> a device in order to be able to reset it, is worth the effort when we
+> have a simpler solution of just using the ID values in DT.
+> 
+> Give the merge window, i will mark this as change request for the
+> moment.
 
-Thanks for bringing this back up Stephen, it would be good to get this reso=
-lved.
+It seems to me that PHY clocks and resets are a never-ending source of
+problems, so I'm wondering whether we need to consider a radically
+different solution, rather than keeping trying to put sticky plasters
+over this in various different forms.
 
---=20
-paul-moore.com
+__mdiobus_register() is a path where deferred probing is possible,
+and this is responsible for doing the bus scan, which is one source
+of the problems.
+
+If we add a new ops structure for firmware methods:
+
+struct mii_bus_fw_ops {
+	int (*init)(struct mii_bus *bus);
+	int (*prescan)(struct mii_bus *bus);
+	void (*postscan)(struct mii_bus *bus);
+	void (*release)(struct mii_bus *bus);
+};
+
+This would be provided when we have e.g. a MII bus described in DT.
+
+The init() method would be called by __mdiobus_register() before:
+
+        err = device_register(&bus->dev);
+
+and this method would:
+- walk the sub-nodes of the bus, looking for reset and clock resources.
+- it gets the reset and clock resources that are found.
+- any that return deferred probe can safely propagate that error code.
+
+__mdiobus_register() would then do its reset stuff, and then before
+doing the scans, call the prescan() method. This will:
+
+- walk the resources found in the init() method, noting the initial
+  state of resets, then enabling clocks and finally releasing any
+  resets.
+
+During the scan, if a device is probed, then we need to consider how
+to handle a potential updated reset state. Unlike clocks, which are
+nestable, resets aren't. We don't want to re-assert a reset signal
+if the PHY driver has specifically asked for it to be deasserted in
+its probe() method.
+
+After the bus scans have completed, then the postscan() op would be
+called, and this will:
+
+- walk the resources again, restoring the reset state (note the
+  comment above concerning PHY driver probe()) and disabling
+  any clocks (if the clock has already been "got" by something, e.g.
+  a driver that probed as a result of successful scan, this doesn't
+  affect it.)
+
+The release() method would be called whenever we are unregistering
+the bus (after device_del(&bus->dev) in __mdiobus_register() and
+mdiobus_unregister()).
+
+Maybe we should also consider whether phylib should have functions
+for PHY drivers to call to control these resources that it has
+obtained for each PHY device too?
+
+Yes, this is a bigger change, but I think it should put a stop to
+the dribble of problems that seem to be cropping up around the bus
+scanning. It can be easily extended for other resources (e.g.
+regulators) that are needed to scan and probe, and should also
+avoid the need for relative-path includes.
+
+If there are buses that we need to actively assert the reset, then
+I feel that this should itself be a firmware property of the device,
+as there are likely platforms that come up with the PHY already
+released from reset and in a functional state, and causing their
+link to drop by forcing a reset of the PHY could be undesirable.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
