@@ -1,139 +1,181 @@
-Return-Path: <netdev+bounces-243407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A301EC9F2CB
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 14:46:48 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2D53C9F304
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 14:53:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DC34F4E2989
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 13:46:36 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 04DA63481C0
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 13:53:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C95AE2EA752;
-	Wed,  3 Dec 2025 13:46:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C64B2FB987;
+	Wed,  3 Dec 2025 13:52:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r5r5qt31"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BLayJuEn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CF752CCC0;
-	Wed,  3 Dec 2025 13:46:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFAC32F7AC8
+	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 13:52:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764769586; cv=none; b=PvQ/atm7PHJq1WkowRojd6MAmO1YHOudwKnldPiR3RmLxYAFAAJdNuOKU9gQjp2sBdccIarY4kYAcrvVlr0b7+jYNwRGz+hTlx+S3C0lXqJwaoQ9edP4wg842Niu6lvoLzM0CUzwBYORj5BtwgQnv0dUiZBnfJhAIf300qEXgEI=
+	t=1764769978; cv=none; b=TR65T3J0sxmJz7FOsL043j+KvO3JzFqQ1mgsN8UniaS51cHw1/6dDC4DKlweyGLjyniC/WiKGtQ2qb7aQfxBLAUHCIDyOZlBOn11xX68zniHCPJ5ERyKQMXGnoka2zG3YjcibTOMFD+g4YQ0k/MXuWvsFwu8GKAenLkcM/+oAPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764769586; c=relaxed/simple;
-	bh=nr8UUyPHNXiTvGlLoNZyVhhzmjWaJayBhryag4J75Ig=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jOIbBu1baOgl+NV811lvEerJ4+NGBIF7XdNfo8f27paO6XLXKhkTU4wr4tERBZVvhofPPicVkj/B0c0eX/CbZhwL5JafCZp4UMHKHlZjdct3MhKpIxEFEQLjzgNEhoYAqYmm72r6fDM7oeCK4X505mgTJPdAG2tZ9urTk2g10X8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r5r5qt31; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D577C4CEFB;
-	Wed,  3 Dec 2025 13:46:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764769586;
-	bh=nr8UUyPHNXiTvGlLoNZyVhhzmjWaJayBhryag4J75Ig=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=r5r5qt31M29GZDgO/yzOFCFe/rC7mWqEkvt8rAHgQPYU9KUKmzL4fXHnw6Bm5G7TQ
-	 usCk3yissceInxeqTpnb4ekL60F8C8C30FIOCSjFHf4+jFI4nnNTzeo2sEQcKFwXwG
-	 nAgCTck65aXBOTxjgdUwr0ZRr0oB5GoxXutY+REZaF2QrejvYLgnUqlRRqQCJEybGI
-	 Ag+YRpfTU4IZ93o9wqebrzs+pNzdhkVZVkoUzQYfoE5w41/MFFzwBLIoQWqTJB0VWf
-	 KnrCDFH7S/LtoPmrzv+ErSzUc/49vXEr5J831EWc5mMO4xpWcQvFwhKj0+CtE9m/bN
-	 1OuAlJl4riJAA==
-Message-ID: <104b744f-b411-46d0-bdc5-bada83743f4e@kernel.org>
-Date: Wed, 3 Dec 2025 14:46:20 +0100
+	s=arc-20240116; t=1764769978; c=relaxed/simple;
+	bh=iJbMxEQ9KJpTvPN+2PQqEYTSPK3xO4X8CyvtwKXMehw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hawQ5OGZx9etLbFfnugTMfITidOIt7WA6+vBlUOcTIrZbxRu2UOFo7Lv9pRs23NL1xXlij9orRdhsN1f6cDTjr2nuTDvyUdivSvxQNBVNCGRNJc8Dlr38HtIiH73mOj19n42f2QWs2uydAwOvTgpfAVp4dhvADMoJ8PKJvhjehc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BLayJuEn; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764769975;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=J4fKd3XETzmPiJvqAM1yYm/oyS3lsGvYrwgCa3QS6rc=;
+	b=BLayJuEnZn9TzWCM3OMCNgDy39wItRfmMoZpC6HZHb1IQKMbUUIlVo2JKqqvarB3m8joB4
+	C7fZEZLRS7a18judgaXwmTGze1goSMNE/BxpNf0e2PRTsirNCCzQane/32g5T0k64LPyD5
+	EfkJ4eSetG1lYCY3IZ/A+Z8cgbl8kuE=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-678-91EOFT0ZOZi4GHrpEfqSeA-1; Wed,
+ 03 Dec 2025 08:52:52 -0500
+X-MC-Unique: 91EOFT0ZOZi4GHrpEfqSeA-1
+X-Mimecast-MFC-AGG-ID: 91EOFT0ZOZi4GHrpEfqSeA_1764769970
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DC67E195605B;
+	Wed,  3 Dec 2025 13:52:49 +0000 (UTC)
+Received: from thinkpad (unknown [10.44.32.234])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DA0C119560A7;
+	Wed,  3 Dec 2025 13:52:43 +0000 (UTC)
+Date: Wed, 3 Dec 2025 14:52:39 +0100
+From: Felix Maurer <fmaurer@redhat.com>
+To: Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jaakko Karrenpalo <jkarrenpalo@gmail.com>,
+	Arvid Brodin <arvid.brodin@alten.se>, skhan@linuxfoundation.org,
+	linux-kernel-mentees@lists.linux.dev, david.hunter.linux@gmail.com,
+	khalid@kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	syzbot+2fa344348a579b779e05@syzkaller.appspotmail.com,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net v3] net/hsr: fix NULL pointer dereference in
+ prp_get_untagged_frame()
+Message-ID: <aTBAp3axHXSkrYKO@thinkpad>
+References: <20251129093718.25320-1-ssrane_b23@ee.vjti.ac.in>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 3/4] dt-bindings: ptp: Add amazon,vmclock
-To: "Chalios, Babis" <bchalios@amazon.es>, "robh@kernel.org"
- <robh@kernel.org>, "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
- "conor+dt@kernel.org" <conor+dt@kernel.org>,
- "richardcochran@gmail.com" <richardcochran@gmail.com>,
- "dwmw2@infradead.org" <dwmw2@infradead.org>,
- "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
-Cc: "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "Graf (AWS), Alexander" <graf@amazon.de>,
- "mzxreary@0pointer.de" <mzxreary@0pointer.de>,
- "Cali, Marco" <xmarcalx@amazon.co.uk>, "Woodhouse, David" <dwmw@amazon.co.uk>
-References: <20251203123539.7292-1-bchalios@amazon.es>
- <20251203123539.7292-4-bchalios@amazon.es>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20251203123539.7292-4-bchalios@amazon.es>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251129093718.25320-1-ssrane_b23@ee.vjti.ac.in>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On 03/12/2025 13:36, Chalios, Babis wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
-> 
-> The vmclock device provides a PTP clock source and precise timekeeping
-> across live migration and snapshot/restore operations.
-> 
-> The binding has a required memory region containing the vmclock_abi
-> structure and an optional interrupt for clock disruption notifications.
-> 
-> The full specification is at https://david.woodhou.se/VMClock.pdf
-> 
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> Signed-off-by: Babis Chalios <bchalios@amazon.es>
+On Sat, Nov 29, 2025 at 03:07:18PM +0530, Shaurya Rane wrote:
+> prp_get_untagged_frame() calls __pskb_copy() to create frame->skb_std
+> but doesn't check if the allocation failed. If __pskb_copy() returns
+> NULL, skb_clone() is called with a NULL pointer, causing a crash:
+> Oops: general protection fault, probably for non-canonical address 0xdffffc000000000f: 0000 [#1] SMP KASAN NOPTI
+> KASAN: null-ptr-deref in range [0x0000000000000078-0x000000000000007f]
+> CPU: 0 UID: 0 PID: 5625 Comm: syz.1.18 Not tainted syzkaller #0 PREEMPT(full)
+> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+> RIP: 0010:skb_clone+0xd7/0x3a0 net/core/skbuff.c:2041
+> Code: 03 42 80 3c 20 00 74 08 4c 89 f7 e8 23 29 05 f9 49 83 3e 00 0f 85 a0 01 00 00 e8 94 dd 9d f8 48 8d 6b 7e 49 89 ee 49 c1 ee 03 <43> 0f b6 04 26 84 c0 0f 85 d1 01 00 00 44 0f b6 7d 00 41 83 e7 0c
+> RSP: 0018:ffffc9000d00f200 EFLAGS: 00010207
+> RAX: ffffffff892235a1 RBX: 0000000000000000 RCX: ffff88803372a480
+> RDX: 0000000000000000 RSI: 0000000000000820 RDI: 0000000000000000
+> RBP: 000000000000007e R08: ffffffff8f7d0f77 R09: 1ffffffff1efa1ee
+> R10: dffffc0000000000 R11: fffffbfff1efa1ef R12: dffffc0000000000
+> R13: 0000000000000820 R14: 000000000000000f R15: ffff88805144cc00
+> FS:  0000555557f6d500(0000) GS:ffff88808d72f000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000555581d35808 CR3: 000000005040e000 CR4: 0000000000352ef0
+> Call Trace:
+>  <TASK>
+>  hsr_forward_do net/hsr/hsr_forward.c:-1 [inline]
+>  hsr_forward_skb+0x1013/0x2860 net/hsr/hsr_forward.c:741
+>  hsr_handle_frame+0x6ce/0xa70 net/hsr/hsr_slave.c:84
+>  __netif_receive_skb_core+0x10b9/0x4380 net/core/dev.c:5966
+>  __netif_receive_skb_one_core net/core/dev.c:6077 [inline]
+>  __netif_receive_skb+0x72/0x380 net/core/dev.c:6192
+>  netif_receive_skb_internal net/core/dev.c:6278 [inline]
+>  netif_receive_skb+0x1cb/0x790 net/core/dev.c:6337
+>  tun_rx_batched+0x1b9/0x730 drivers/net/tun.c:1485
+>  tun_get_user+0x2b65/0x3e90 drivers/net/tun.c:1953
+>  tun_chr_write_iter+0x113/0x200 drivers/net/tun.c:1999
+>  new_sync_write fs/read_write.c:593 [inline]
+>  vfs_write+0x5c9/0xb30 fs/read_write.c:686
+>  ksys_write+0x145/0x250 fs/read_write.c:738
+>  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>  do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> RIP: 0033:0x7f0449f8e1ff
+> Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 f9 92 02 00 48 8b 54 24 18 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 31 44 89 c7 48 89 44 24 08 e8 4c 93 02 00 48
+> RSP: 002b:00007ffd7ad94c90 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
+> RAX: ffffffffffffffda RBX: 00007f044a1e5fa0 RCX: 00007f0449f8e1ff
+> RDX: 000000000000003e RSI: 0000200000000500 RDI: 00000000000000c8
+> RBP: 00007ffd7ad94d20 R08: 0000000000000000 R09: 0000000000000000
+> R10: 000000000000003e R11: 0000000000000293 R12: 0000000000000001
+> R13: 00007f044a1e5fa0 R14: 00007f044a1e5fa0 R15: 0000000000000003
+>  </TASK>
+> Add a NULL check immediately after __pskb_copy() to handle allocation
+> failures gracefully.
 
+Thank you, the fix looks good to me. Just a small nit pick (this can
+probably be done when applying): please add the empty lines around the
+trace again. Other than that:
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+Reviewed-by: Felix Maurer <fmaurer@redhat.com>
+Tested-by: Felix Maurer <fmaurer@redhat.com>
 
-Best regards,
-Krzysztof
+> Reported-by: syzbot+2fa344348a579b779e05@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=2fa344348a579b779e05
+> Fixes: f266a683a480 ("net/hsr: Better frame dispatch")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
+> ---
+> v3:
+>   - Keep only prp_get_untagged_frame() fix as the other two
+>     NETIF_F_HW_HSR_TAG_INS checks are not needed for this bug
+>   - Move NULL check immediately after __pskb_copy() call
+>
+> v2:
+>   - Add stack trace to commit message
+>   - Target net tree with [PATCH net]
+>   - Add Cc: stable@vger.kernel.org
+> ---
+>  net/hsr/hsr_forward.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/net/hsr/hsr_forward.c b/net/hsr/hsr_forward.c
+> index 339f0d220212..aefc9b6936ba 100644
+> --- a/net/hsr/hsr_forward.c
+> +++ b/net/hsr/hsr_forward.c
+> @@ -205,6 +205,8 @@ struct sk_buff *prp_get_untagged_frame(struct hsr_frame_info *frame,
+>  				__pskb_copy(frame->skb_prp,
+>  					    skb_headroom(frame->skb_prp),
+>  					    GFP_ATOMIC);
+> +			if (!frame->skb_std)
+> +				return NULL;
+>  		} else {
+>  			/* Unexpected */
+>  			WARN_ONCE(1, "%s:%d: Unexpected frame received (port_src %s)\n",
+> --
+> 2.34.1
+>
+
 
