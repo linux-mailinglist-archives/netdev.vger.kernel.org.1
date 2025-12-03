@@ -1,83 +1,126 @@
-Return-Path: <netdev+bounces-243347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98974C9D7C9
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 02:16:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70C8DC9D806
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 02:30:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 55E3E4E4C7D
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 01:16:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24E423A9029
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 01:30:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C68D022068F;
-	Wed,  3 Dec 2025 01:16:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F03F1DEFE9;
+	Wed,  3 Dec 2025 01:30:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="JkH6seBa"
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="sLoW5Xpg"
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound.st.icloud.com (p-east2-cluster5-host8-snip4-10.eps.apple.com [57.103.79.43])
+Received: from mout-p-103.mailbox.org (mout-p-103.mailbox.org [80.241.56.161])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A2BD215075
-	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 01:16:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=57.103.79.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2B011B4138;
+	Wed,  3 Dec 2025 01:30:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.161
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764724563; cv=none; b=ceAm+zVFIHsCkIiYrReOmSWvRkG7g7Uhrx5mulelund4DuR+dNOu3hm5AoQCKMoQTUVta5kNhpJsHs6p+Sgc+idI08EQGX6KzZu7v6DpWJ1nvspS+W/KmA0cSEhtBXYoXY3LtN/14tAWLLczhC0XLZBQuohop9z//Bf2HuvTink=
+	t=1764725446; cv=none; b=u3CZ7UGPMUsC/svCLO0nvsuJSfX0kD75c6O3MiI1VXjnm89e2omudAqh57/y1lLH4jeX5q8t1Gb3tgvX8JVSdec0TrgrNvJ/KdmcjiIcvwiw3c6pPGdkDI0dXxlHJITbU1++E2aJ5RWKZ79lnDuTDt+EvSj/egM2SFOQiqCH1QM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764724563; c=relaxed/simple;
-	bh=5tWJUJG6SnYBuBZeZZq8cJ7glHx18gRawtEfzjWMsRI=;
-	h=Content-Type:From:Mime-Version:Date:Subject:Message-Id:Cc:To; b=ZCoHpZXDo2stdbKh4MjueUPe4xmOOlDuQTphemiAtN1k/zF9IJhZh61Tg7Wl/FDzWFsWIgg382/BI0DSDb+v0fpNc9hY2GSDqgO7c5hPoqmvHQpSPRXji6ziHysWP3oSwFNQDp3t+8xk2ftkwa1xIuqvjOw6MHwkhKiWfMnIKOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=JkH6seBa; arc=none smtp.client-ip=57.103.79.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
-Received: from outbound.st.icloud.com (unknown [127.0.0.2])
-	by p00-icloudmta-asmtp-us-east-1a-100-percent-15 (Postfix) with ESMTPS id 3818218001BD;
-	Wed,  3 Dec 2025 01:16:00 +0000 (UTC)
-Dkim-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com; s=1a1hai; bh=5tWJUJG6SnYBuBZeZZq8cJ7glHx18gRawtEfzjWMsRI=; h=Content-Type:From:Mime-Version:Date:Subject:Message-Id:To:x-icloud-hme; b=JkH6seBafZxmRVUdqc3Y+w/lZStjRgzre3CmqC5FHW7oU2xRXWeyjA7HZd6I0qd6Ewa+kwC6VjyH0rOEXwZ9HihSzTRDDCb0o0ox53/njNu3gwO1drb8Xk3WysoxUNfRzwIORbMru9cAUTAi/VuQHez/h4xji/rsLsuLC6YYzjtB7PqKCZIMcjkt2bvoHpkHhRkioVBXKgCy+Hv0kqs72RSk383rBZyckO1OOBZB6i5c9NBTaC2nf3IjxBQrO6on7dBfoV6hEmWaJrfLW9nHQZzw/5A4JVjE289m/OkoAPZEkP42w1b4Y5lm/ycr9cIew7iu8CPLRBvj4/vIR6WrPQ==
-Received: from smtpclient.apple (unknown [17.42.251.67])
-	by p00-icloudmta-asmtp-us-east-1a-100-percent-15 (Postfix) with ESMTPSA id 742FF18002A2;
-	Wed,  3 Dec 2025 01:15:59 +0000 (UTC)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: base64
-From: Abdullah Alamri <alboodalamri13@icloud.com>
+	s=arc-20240116; t=1764725446; c=relaxed/simple;
+	bh=ovfLwLsXkBB0u4yjDJk3NJc8uW/6cuJBVErz9Kr3oP8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=prFXMVJvhlTRxMxoGuL4glC+aTSXIHSx894e7uVZ4w10x0jz1SkGBhbf0vt4KND1Go//D17Uj1g0AVScBQvIbjF1mhKgmc7hQmDg2IN8ztAbI7BpQzWj+gwjug1N/Mo87PaWTJwJOIeIgZfDf5lCtD6OXsZ4xHtvTGa4iwrJ4Do=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=sLoW5Xpg; arc=none smtp.client-ip=80.241.56.161
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-103.mailbox.org (Postfix) with ESMTPS id 4dLg7b3YqLz9tkk;
+	Wed,  3 Dec 2025 02:30:35 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1764725435;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9wXh5W9jMqRcOXCsJjM2PP5pnAUQs9VOMsyI3J7suNk=;
+	b=sLoW5XpgIMCojc3bBGANOJsyPV4QPHF36vxsd8zfEuXrDC8JKHVI3pS59kZFSg+X99sk8w
+	WR/BGs7aR2CxuWqpbvvl3eSShcv/+2WAXCWin4PE8ejULTsPMz2SpO8P7918Mxi5Lxa1ru
+	NAQLWGC5TAyTzg8ws+cRithP2teg6j0uSPOtzvKhnlRznNuN+rRVoPFxuc/jkjYsSjkPa0
+	tS2HyOIVLj15Vtqs9pBIf61UPh93d4EpM4I7Vfytyz8OIbhdXtK6tXKjM+YrygmKyVcDfj
+	CaswTSUh7U1ho8LLDXTTW2n7y3qBVMUcJ2p+A0ImEz5iEKtLG1fHz04uQZH24w==
+Message-ID: <4aaa73b4-3a2a-44f6-ad81-74c30be13431@mailbox.org>
+Date: Wed, 3 Dec 2025 02:30:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (1.0)
-Date: Wed, 3 Dec 2025 04:15:46 +0300
-Subject: Re: Maintainers / Kernel Summit 2021 planning kick-off
-Message-Id: <FE7FB0D0-6CD8-4D1A-90B5-DE5487E378B3@icloud.com>
-Cc: James.Bottomley@hansenpartnership.com, cl@gentwo.de, david@redhat.com,
- greg@kroah.com, jikos@kernel.org, ksummit@lists.linux.dev,
- linux-api@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org, lkml@metux.net,
- netdev@vger.kernel.org, tytso@mit.edu
-To: torvalds@linux-foundation.org
-X-Mailer: iPhone Mail (22G100)
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjAzMDAwNyBTYWx0ZWRfX0CBsIh7m/AhI
- FhNy9OzFBRQ6lTdilYWlw4niVyHgZMB7p7sqUjhg7sYgMXFbCpcuXUkxXQP7bUNVhQT5A4mVhGL
- aTDsXoMI94SJ3kbKufVDAQSNfd29YBw1+3dDV72x2UvvDWI7Ii+VvoDbwpi3/xF9TvBId2l4+Rc
- 32t58DeXW9SSJ/VpkJSZ9cWKen7G0nJ/b0JoTZmImWFe+ITLPO5d3CRz/3zcAlEc2e6DJvOhwl5
- MaIfAqOUxAn65qV7sN9zyYXhUDARNcdYdedPQSS8PGC5F7HKkc9GAaXBjcYDRN2IumQS9Dvdnb4
- Enc7JD+t8mfq2shPGrT
-X-Proofpoint-GUID: es_qhwUAhhCMzL-D7iYTN7TCo308goSO
-X-Proofpoint-ORIG-GUID: es_qhwUAhhCMzL-D7iYTN7TCo308goSO
-X-Authority-Info: v=2.4 cv=J5ynLQnS c=1 sm=1 tr=0 ts=692f8f50 cx=c_apl:c_pps
- a=YrL12D//S6tul8v/L+6tKg==:117 a=YrL12D//S6tul8v/L+6tKg==:17
- a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=x7bEGLp0ZPQA:10 a=-KdL-90ardkA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=HyzYxv5D6p1NO4_E8OwA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-01_01,2025-11-27_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
- adultscore=0 mlxlogscore=666 spamscore=0 bulkscore=0 malwarescore=0
- phishscore=0 suspectscore=0 clxscore=1011 classifier=spam authscore=0
- adjust=0 reason=mlx scancount=1 engine=8.22.0-2510240001
- definitions=main-2512030007
-X-JNJ: AAAAAAABcBUMmKYEjepPQWO9oz0fKF0xJR4oEUJJJhwb5ynuO3cAT5TqKmi5gvBxr6b+Pia+G2rXYHxNYB3vI9ZpznaL1pqVzmaGJF23x5psdUMBBcAWXvbSTGq/VJOIzbNDcy8vftXrsq5zR0BUygpb0/6VN3p871Ph1ut7tgYelUYZQbdXnFdO25/QKR20Quhjct26nmPnzwIIBPH1w/WgvRsl8hpGxnZu2szp3h9brZwli5v/9Il4K80B/3AtevYJChN/GIgKGNHAwMG1f9THHkrw2Y4+BIofgjwEtO46FHwMqkKmnmOyzHlJZIH/3WTRw5IjXHu9sGIClaXy0ViVT7lKpO2qytvQ9oRNaL4nwfFlRyS4jJOXayBnbv4WOizprxRrfZRg38cFMgKpEpdv/Vy7radCRRgdmGUcT3/tK3QDaf/H3CretHZ8k6yzLy3nhe20SzqVdzLDgSbwGeNN1JXJEJyC6uy/mQZ8xUOHGyWCnotv0w+abcoO8WMeTx8UJcl7HVhlxcqVwqpFcQqOzf66fBBzfoljzvrzMMlGk40i0bfOaU+xJgUZUvcgZ39/Bdq/rgCqzDsX+cNteNdYu8GASjdLKYaWgQ7HGzuP4BT/BwYgsyCAKh5eBgaALzV4CWUO2Fq/fu41Ha/Un+hrqWh9uETR7L5XM7++iFVl/jqr6WBvVXgbpEgzltgVgUeUxkmmb4cnFuz3BIaFNao4OoW9Fvuyu+tw9rHyb8qCGWmrNuPdEr8jmBn1wDyexpk4Lbo7ENAdhWx9phpMfvTyBpIgW4WFtso=
+MIME-Version: 1.0
+Subject: Re: [net-next,PATCH 2/3] dt-bindings: net: realtek,rtl82xx: Document
+ realtek,ssc-enable property
+To: Krzysztof Kozlowski <krzk@kernel.org>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Aleksander Jan Bajkowski <olek2@wp.pl>, Andrew Lunn <andrew@lunn.ch>,
+ Conor Dooley <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Michael Klein <michael@fossekall.de>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Russell King <linux@armlinux.org.uk>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, devicetree@vger.kernel.org
+References: <20251130005843.234656-1-marek.vasut@mailbox.org>
+ <20251130005843.234656-2-marek.vasut@mailbox.org>
+ <f3046826-a44c-4aa9-8a94-351e7fe83f06@kernel.org>
+ <a861aa24-e350-4955-be5a-f6d2f4bc058f@mailbox.org>
+ <043053ec-0f57-45e9-9767-be9b518dea4d@kernel.org>
+Content-Language: en-US
+From: Marek Vasut <marek.vasut@mailbox.org>
+In-Reply-To: <043053ec-0f57-45e9-9767-be9b518dea4d@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-MBO-RS-ID: 382a994154142a10bf5
+X-MBO-RS-META: dbtpdimpw6urkcfsebudhdca9e5ayr75
 
-DQrigKvYo9mP2LHYs9mE2Kog2YXZhiDYp9mE2YAgaVBob25l4oCs
+On 12/1/25 8:20 AM, Krzysztof Kozlowski wrote:
+> On 30/11/2025 14:41, Marek Vasut wrote:
+>> On 11/30/25 9:20 AM, Krzysztof Kozlowski wrote:
+>>
+>> Hello Krzysztof,
+>>
+>>>> diff --git a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
+>>>> index eafcc2f3e3d66..f1bd0095026be 100644
+>>>> --- a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
+>>>> +++ b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
+>>>> @@ -50,6 +50,11 @@ properties:
+>>>>        description:
+>>>>          Disable CLKOUT clock, CLKOUT clock default is enabled after hardware reset.
+>>>>    
+>>>> +  realtek,ssc-enable:
+>>>> +    type: boolean
+>>>> +    description:
+>>>> +      Enable SSC mode, SSC mode default is disabled after hardware reset.
+>>>
+>>> I don't want more SSC properties. We already had a big discussions about
+>>> it - one person pushing vendor property and only shortly after we learnt
+>>> that more vendors want it and they are actually working on this.
+>> What kind of a property would you propose I use for this ?
+> 
+> I don't know, please look at existing work around SSC from Peng. If
+> nothing is applicable, this should be explained somewhere.
+
+The work from Peng you refer to (I guess) is this "assigned-clock-sscs" 
+property ? This is not applicable, because this is a boolean property of 
+the PHY here, the clock does not expose those clock via the clock API.
+
+However, I can call the property "ssc-enable" without the realtek, 
+vendor prefix ?
+
+The remaining question is, should I have one property "ssc-enable" to 
+control all SSC in the PHY or one for each bit "realtek,ssc-enable-rxc" 
+/ "realtek,ssc-enable-clkout" ?
+
+-- 
+Best regards,
+Marek Vasut
 
