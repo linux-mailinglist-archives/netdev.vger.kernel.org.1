@@ -1,227 +1,236 @@
-Return-Path: <netdev+bounces-243463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A8B1CA1A2B
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 22:11:33 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C2B0CA1ADD
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 22:28:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7B3BB301A1D8
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 21:11:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3459530194F1
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 21:28:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0D61398F97;
-	Wed,  3 Dec 2025 21:11:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="kB3tUIJJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1F182D6E59;
+	Wed,  3 Dec 2025 21:28:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f79.google.com (mail-oo1-f79.google.com [209.85.161.79])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BD072BEFF8;
-	Wed,  3 Dec 2025 21:11:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9C282C21FC
+	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 21:28:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.79
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764796264; cv=none; b=do5K38jPvJsJwAoR0tUeVUG4C/89MlYsRUhNbKKleSok3V08YhC63fjFgioKANEEATvG3cZturcpRfRyCaLUO6TReIJ6PQ3NlLQEm3fQeknhWHyy7JbMnY7KWaAAGWVoHe3iISbYPrFk+B0p1/vzi6zeUrNFP47BnLy/44ZUgnI=
+	t=1764797306; cv=none; b=I8NMDv0lhjcO8kj4/nB3wezmbSW/u2sGAqGUxbT4Kpg0dly5m6q0O1er3jRPp3t3Mwvy0sONEa5xNzaZO1JAowBmIQApCLFbPq2dYV2NG+D8HibYOpybMjkZHkaCR0fb0dUvCkpcUJphF3wzuoiNxuxWH4qT08AkY/UQo55FYvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764796264; c=relaxed/simple;
-	bh=Q6sWGYGkcwYts/hsIwMe2M/sMlNUfkl6KmWW3KtmlRc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BdVNX+VZUaLorJX8LN7KVv4eSkwm1sc6+uzM+KqyxtNpcE4gF0TZhGq422383uzydXHcFwkxk2pn08PXXgcqU3hEZXyEwqSfk5o4RynCQiyU0y9YMBoYQyqzVqCWjve270e4c6Iv3Xg5hwliXisl6XnPK0NVsip4Be87y/Tw3Qo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=kB3tUIJJ; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5B3BQdUE027938;
-	Wed, 3 Dec 2025 21:10:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=Kd2jnT
-	FMo7gN7FkcM0/S9BS/yQRj1i3TA3o6LPb130Q=; b=kB3tUIJJ8kZIkh96/IhFuo
-	iqC4wJ5KKAJGiaH+VwcNr00PHhxO8rhrxNBx7Kkk7gCRPPND03dKGF+NEdhMl9ws
-	BM/kNmQKNPjZBi3F1R7X0r2YCdC8JwTZd9HTE4k4r8rA3mGMb7fBJ/QjEKoa316d
-	N+LwY2gcWYTIH79u5T/2274R3aF7f7M5NMEiDURkXDPB5aGGGx58FnBCE9MbgtG9
-	yU9WdhdZC+uCDEvxPx+ugLiWF3jI1D5+LeVYbnDeYLIQdBivU8mb7OHQt0C8ONyf
-	BTBfY8Jr2j5Q8VaoZ35MhRnCUGUyea5pDaC4QOWgbp1DZeb0EaW6R0RKCGwS0HDQ
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aqrj9w2tk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 03 Dec 2025 21:10:47 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5B3L2OU4001364;
-	Wed, 3 Dec 2025 21:10:47 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aqrj9w2tf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 03 Dec 2025 21:10:47 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5B3Kgo9Q003891;
-	Wed, 3 Dec 2025 21:10:46 GMT
-Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4ardcjv64m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 03 Dec 2025 21:10:46 +0000
-Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
-	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5B3LAiXH29688386
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 3 Dec 2025 21:10:45 GMT
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CF36758054;
-	Wed,  3 Dec 2025 21:10:44 +0000 (GMT)
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D8B2A5803F;
-	Wed,  3 Dec 2025 21:10:42 +0000 (GMT)
-Received: from [9.61.253.252] (unknown [9.61.253.252])
-	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  3 Dec 2025 21:10:42 +0000 (GMT)
-Message-ID: <99db437a-be91-4e85-a201-ec3a890900c8@linux.ibm.com>
-Date: Wed, 3 Dec 2025 13:10:40 -0800
+	s=arc-20240116; t=1764797306; c=relaxed/simple;
+	bh=f+K+aX/mNBZb+LG8JROmAZQAidoAsW+ASV4BgI9gvbo=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=evDpugToYEFM1uPs8tndM9eMVi0f+QRk1wyxSbdMmK5ddshyYlKUEZvUmMY0snh3Baq/9nOVtmh+Kfv40i448is9FaFZSRXTModVNwQyxkxRCtozdp9rUVirSanluuRV5s296XIIxXnSQCUEJ2W/xMRfXSiSkXtbr1BjwkfIh+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f79.google.com with SMTP id 006d021491bc7-6577e29de71so272867eaf.0
+        for <netdev@vger.kernel.org>; Wed, 03 Dec 2025 13:28:23 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764797303; x=1765402103;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1dZlUS5HZ27P8V3O7na3VnTbdQVdrVSsz2kOKYSMpJM=;
+        b=oxXYgUHoSbCpvLgwmy+819x3OPe+FZmSC+Prx4qFdozIXR1exVTdok6W7bnMpR5//V
+         gwZrBnS6JEAfQsgusvwBLgZNnbJCQ4vQgd3oNybJFuwxhKGThljQG4+T78JL3wG/SpZU
+         BdDHuJQhigALLc68F9vpw9sItQRoYPICR/piPwULqRoeEH84cmjIkie17JgawHbzeR8j
+         /7PIyVcEJRAax2QCqzl5NyH9eXTUMvyY6epYlyTHGtjtJOfgJTjbAGf2NkWL2WPtaVsB
+         9E4RBRyriRc5OFcwZhEZ62jwwyLpSNL5C3qY8j9pEexP3362kIym6A3GRkIzNVcw55mQ
+         Wecg==
+X-Forwarded-Encrypted: i=1; AJvYcCWdF3VhoLSad48TScRPuhVC2z3bEMItxKBB8BtlZwAxSv9lTZ/ddFqp8ybmIKZmcpfoFfHC6sI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6G8sFhLmFo9LKPn1lH1cabC6iQQKZw1G8IKmWcITEHTc4oJUX
+	QTbh+FcB/Fzo2kEtqYTWbkgZeLXcGQn3NU1gdvJ5HKcrgS8NM9XK36yuOKhusnFzdf6txKhPoB6
+	D+c2PFbUbUvvfOmG3jGbsDfiRs6oGGr1eCmtQ9123rSkE0oQNUEkXt03utcY=
+X-Google-Smtp-Source: AGHT+IHuuOng1zmi6ftbhBwdcHCse0fRadUnYIQlAovoDUEWD84+PjonPKDcCUKMhrWrnj2/hSVLJJoqxG1c7GeCCDOII2xr74Ye
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/mlx5: Fix double unregister of HCA_PORTS
- component
-To: Gerd Bayer <gbayer@linux.ibm.com>, Saeed Mahameed <saeedm@nvidia.com>,
-        Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
-        Mark Bloch <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Shay Drory <shayd@nvidia.com>,
-        Simon Horman <horms@kernel.org>
-Cc: Lukas Wunner <lukas@wunner.de>, Bjorn Helgaas <helgaas@kernel.org>,
-        Niklas Schnelle <schnelle@linux.ibm.com>, netdev@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-pci@vger.kernel.org
-References: <20251202-fix_lag-v1-1-59e8177ffce0@linux.ibm.com>
-Content-Language: en-US
-From: Farhan Ali <alifm@linux.ibm.com>
-In-Reply-To: <20251202-fix_lag-v1-1-59e8177ffce0@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: B65ZY5li7B7M1GisuSwfk7z_iWSEgMeX
-X-Proofpoint-ORIG-GUID: _-Zpt6WH2RjJJs55qScsek2unczQ750f
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTI5MDAyMCBTYWx0ZWRfX77omxQPAvsuX
- IZJtox3l76hxwbzTk2KE8Q26LIokZZ67/c/iPk9Mxz9JiisDdC4qQrgQ7RG6IaqrRDbdGanNb6C
- rrYQ3P2eJBRWWX2CtkRe1ztNIbY4vWwB6vUf85AG6fJK/7j5qb7w4vpBUbchf3b1GEgPfg2dEyn
- jIzqwga+oDaa9W48j3RwqtXi2AU4R1CbjVu87wgkjyKcCFfNdZwpCeZwnAROAdTqpTn8sgaLusC
- VokCKTm0IHE6fJT4ydAiFPLhxXybJDo66Xetbner4STzoLgeUCKZANPUx9PWow7bugPEQW2Ckvm
- CUjbzbm78e5Fsjm4zVxfISETLjrn9cYC+iKAduGYsecE/MTKmVgp7bIZAlvN2yx0lV9nO38LBnE
- Jw14iBxLqQKfyX7ab+zwoWRg9U6GeA==
-X-Authority-Analysis: v=2.4 cv=dYGNHHXe c=1 sm=1 tr=0 ts=6930a757 cx=c_pps
- a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
- a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=4VxT3ec_VtVgvZ1WTZIA:9 a=QEXdDO2ut3YA:10
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-03_02,2025-12-03_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 spamscore=0 suspectscore=0 clxscore=1011 adultscore=0
- lowpriorityscore=0 bulkscore=0 phishscore=0 priorityscore=1501
- impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2510240000
- definitions=main-2511290020
+X-Received: by 2002:a05:6808:2216:b0:450:275c:87d8 with SMTP id
+ 5614622812f47-45379e492demr300558b6e.32.1764797302965; Wed, 03 Dec 2025
+ 13:28:22 -0800 (PST)
+Date: Wed, 03 Dec 2025 13:28:22 -0800
+In-Reply-To: <000000000000cf2c4c061ee07a3d@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6930ab76.a70a0220.d98e3.01ba.GAE@google.com>
+Subject: Re: [syzbot] [block?] INFO: task hung in read_part_sector (2)
+From: syzbot <syzbot+82de77d3f217960f087d@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+
+syzbot has found a reproducer for the following issue on:
+
+HEAD commit:    4de44542991e Merge git://git.kernel.org/pub/scm/linux/kern..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=1525f512580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6d0b6a854526a37e
+dashboard link: https://syzkaller.appspot.com/bug?extid=82de77d3f217960f087d
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1764d4c2580000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/780f42d09193/disk-4de44542.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/953583251b3f/vmlinux-4de44542.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/0cbf55634459/bzImage-4de44542.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+82de77d3f217960f087d@syzkaller.appspotmail.com
+
+INFO: task udevd:5881 blocked for more than 143 seconds.
+      Not tainted syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:udevd           state:D stack:21736 pid:5881  tgid:5881  ppid:5195   task_flags:0x400140 flags:0x00080003
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5325 [inline]
+ __schedule+0x1798/0x4cc0 kernel/sched/core.c:6929
+ __schedule_loop kernel/sched/core.c:7011 [inline]
+ schedule+0x165/0x360 kernel/sched/core.c:7026
+ io_schedule+0x80/0xd0 kernel/sched/core.c:7871
+ folio_wait_bit_common+0x6b0/0xb80 mm/filemap.c:1330
+ folio_put_wait_locked mm/filemap.c:1494 [inline]
+ do_read_cache_folio+0x1aa/0x590 mm/filemap.c:4019
+ read_mapping_folio include/linux/pagemap.h:999 [inline]
+ read_part_sector+0xb6/0x2b0 block/partitions/core.c:722
+ adfspart_check_POWERTEC+0x8c/0xf30 block/partitions/acorn.c:454
+ check_partition block/partitions/core.c:141 [inline]
+ blk_add_partitions block/partitions/core.c:589 [inline]
+ bdev_disk_changed+0x75f/0x14b0 block/partitions/core.c:693
+ blkdev_get_whole+0x380/0x510 block/bdev.c:748
+ bdev_open+0x31e/0xd30 block/bdev.c:957
+ blkdev_open+0x457/0x600 block/fops.c:701
+ do_dentry_open+0x953/0x13f0 fs/open.c:965
+ vfs_open+0x3b/0x340 fs/open.c:1097
+ do_open fs/namei.c:3975 [inline]
+ path_openat+0x2ee5/0x3830 fs/namei.c:4134
+ do_filp_open+0x1fa/0x410 fs/namei.c:4161
+ do_sys_openat2+0x121/0x1c0 fs/open.c:1437
+ do_sys_open fs/open.c:1452 [inline]
+ __do_sys_openat fs/open.c:1468 [inline]
+ __se_sys_openat fs/open.c:1463 [inline]
+ __x64_sys_openat+0x138/0x170 fs/open.c:1463
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f4c282a7407
+RSP: 002b:00007ffdb4725950 EFLAGS: 00000202 ORIG_RAX: 0000000000000101
+RAX: ffffffffffffffda RBX: 00007f4c2895a880 RCX: 00007f4c282a7407
+RDX: 00000000000a0800 RSI: 00005636cc3d6810 RDI: ffffffffffffff9c
+RBP: 00005636cc376910 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000202 R12: 00005636cc38b830
+R13: 00005636cc384190 R14: 0000000000000000 R15: 00005636cc38b830
+ </TASK>
+
+Showing all locks held in the system:
+1 lock held by khungtaskd/31:
+ #0: ffffffff8df3d6e0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+ #0: ffffffff8df3d6e0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:867 [inline]
+ #0: ffffffff8df3d6e0 (rcu_read_lock){....}-{1:3}, at: debug_show_all_locks+0x2e/0x180 kernel/locking/lockdep.c:6775
+1 lock held by klogd/5184:
+ #0: ffff8880b883a218 (&rq->__lock){-.-.}-{2:2}, at: raw_spin_rq_lock_nested+0x2a/0x140 kernel/sched/core.c:638
+2 locks held by getty/5586:
+ #0: ffff88803332b0a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:243
+ #1: ffffc9000332b2f0 (&ldata->atomic_read_lock){+.+.}-{4:4}, at: n_tty_read+0x43e/0x1400 drivers/tty/n_tty.c:2222
+1 lock held by udevd/5881:
+ #0: ffff888144370358 (&disk->open_mutex){+.+.}-{4:4}, at: bdev_open+0xe0/0xd30 block/bdev.c:945
+2 locks held by dhcpcd/28194:
+ #0: ffff88807a754260 (sk_lock-AF_PACKET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1700 [inline]
+ #0: ffff88807a754260 (sk_lock-AF_PACKET){+.+.}-{0:0}, at: packet_do_bind+0x32/0xcd0 net/packet/af_packet.c:3197
+ #1: ffffffff8df43178 (rcu_state.exp_mutex){+.+.}-{4:4}, at: exp_funnel_lock kernel/rcu/tree_exp.h:311 [inline]
+ #1: ffffffff8df43178 (rcu_state.exp_mutex){+.+.}-{4:4}, at: synchronize_rcu_expedited+0x2f6/0x730 kernel/rcu/tree_exp.h:957
+2 locks held by syz.0.10501/28195:
+ #0: ffff888060739908 (&sb->s_type->i_mutex_key#11){+.+.}-{4:4}, at: inode_lock include/linux/fs.h:980 [inline]
+ #0: ffff888060739908 (&sb->s_type->i_mutex_key#11){+.+.}-{4:4}, at: __sock_release net/socket.c:661 [inline]
+ #0: ffff888060739908 (&sb->s_type->i_mutex_key#11){+.+.}-{4:4}, at: sock_close+0x9b/0x240 net/socket.c:1455
+ #1: ffffffff8df43178 (rcu_state.exp_mutex){+.+.}-{4:4}, at: exp_funnel_lock kernel/rcu/tree_exp.h:343 [inline]
+ #1: ffffffff8df43178 (rcu_state.exp_mutex){+.+.}-{4:4}, at: synchronize_rcu_expedited+0x3b9/0x730 kernel/rcu/tree_exp.h:957
+
+=============================================
+
+NMI backtrace for cpu 1
+CPU: 1 UID: 0 PID: 31 Comm: khungtaskd Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ nmi_cpu_backtrace+0x39e/0x3d0 lib/nmi_backtrace.c:113
+ nmi_trigger_cpumask_backtrace+0x17a/0x300 lib/nmi_backtrace.c:62
+ trigger_all_cpu_backtrace include/linux/nmi.h:160 [inline]
+ check_hung_uninterruptible_tasks kernel/hung_task.c:332 [inline]
+ watchdog+0xf60/0xfa0 kernel/hung_task.c:495
+ kthread+0x711/0x8a0 kernel/kthread.c:463
+ ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
+Sending NMI from CPU 1 to CPUs 0:
+NMI backtrace for cpu 0
+CPU: 0 UID: 0 PID: 28198 Comm: syz.0.10502 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+RIP: 0010:io_serial_in+0x77/0xc0 drivers/tty/serial/8250/8250_port.c:400
+Code: e8 3e 09 ab fc 44 89 f9 d3 e3 49 83 c6 40 4c 89 f0 48 c1 e8 03 42 80 3c 20 00 74 08 4c 89 f7 e8 cf cc 10 fd 41 03 1e 89 da ec <0f> b6 c0 5b 41 5c 41 5e 41 5f c3 cc cc cc cc cc 44 89 f9 80 e1 07
+RSP: 0018:ffffc9000dc5eb70 EFLAGS: 00000002
+RAX: 1ffffffff335f300 RBX: 00000000000003fd RCX: 0000000000000000
+RDX: 00000000000003fd RSI: 0000000000000000 RDI: 0000000000000020
+RBP: ffffffff99afa1d0 R08: ffff888143300237 R09: 1ffff11028660046
+R10: dffffc0000000000 R11: ffffffff8514fa20 R12: dffffc0000000000
+R13: 0000000000000000 R14: ffffffff99af9f40 R15: 0000000000000000
+FS:  00007f3e13a0b6c0(0000) GS:ffff88812612e000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000200000001ac0 CR3: 000000001b6d8000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ serial_in drivers/tty/serial/8250/8250.h:137 [inline]
+ serial_lsr_in drivers/tty/serial/8250/8250.h:159 [inline]
+ wait_for_lsr+0x1a1/0x2f0 drivers/tty/serial/8250/8250_port.c:1961
+ fifo_wait_for_lsr drivers/tty/serial/8250/8250_port.c:3234 [inline]
+ serial8250_console_fifo_write drivers/tty/serial/8250/8250_port.c:3257 [inline]
+ serial8250_console_write+0x134c/0x1ba0 drivers/tty/serial/8250/8250_port.c:3342
+ console_emit_next_record kernel/printk/printk.c:3111 [inline]
+ console_flush_all+0x6f3/0xb10 kernel/printk/printk.c:3199
+ __console_flush_and_unlock kernel/printk/printk.c:3258 [inline]
+ console_unlock+0xbb/0x190 kernel/printk/printk.c:3298
+ vprintk_emit+0x4c5/0x590 kernel/printk/printk.c:2423
+ _printk+0xcf/0x120 kernel/printk/printk.c:2448
+ nbd_genl_connect+0x9b0/0x18f0 drivers/block/nbd.c:2141
+ genl_family_rcv_msg_doit+0x215/0x300 net/netlink/genetlink.c:1115
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0x60e/0x790 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2550
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+ netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1344
+ netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1894
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg+0x21c/0x270 net/socket.c:742
+ ____sys_sendmsg+0x505/0x830 net/socket.c:2630
+ ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2684
+ __sys_sendmsg net/socket.c:2716 [inline]
+ __do_sys_sendmsg net/socket.c:2721 [inline]
+ __se_sys_sendmsg net/socket.c:2719 [inline]
+ __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2719
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f3e12b8f749
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f3e13a0b038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f3e12de5fa0 RCX: 00007f3e12b8f749
+RDX: 0000000020000000 RSI: 0000200000001ac0 RDI: 0000000000000005
+RBP: 00007f3e12c13f91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f3e12de6038 R14: 00007f3e12de5fa0 R15: 00007fff079ed2f8
+ </TASK>
 
 
-On 12/2/2025 3:12 AM, Gerd Bayer wrote:
-> Clear hca_devcom_comp in device's private data after unregistering it in
-> LAG teardown. Otherwise a slightly lagging second pass through
-> mlx5_unload_one() might try to unregister it again and trip over
-> use-after-free.
->
-> On s390 almost all PCI level recovery events trigger two passes through
-> mxl5_unload_one() - one through the poll_health() method and one through
-> mlx5_pci_err_detected() as callback from generic PCI error recovery.
-> While testing PCI error recovery paths with more kernel debug features
-> enabled, this issue reproducibly led to kernel panics with the following
-> call chain:
->
->   Unable to handle kernel pointer dereference in virtual kernel address space
->   Failing address: 6b6b6b6b6b6b6000 TEID: 6b6b6b6b6b6b6803 ESOP-2 FSI
->   Fault in home space mode while using kernel ASCE.
->   AS:00000000705c4007 R3:0000000000000024
->   Oops: 0038 ilc:3 [#1]SMP
->
->   CPU: 14 UID: 0 PID: 156 Comm: kmcheck Kdump: loaded Not tainted
->        6.18.0-20251130.rc7.git0.16131a59cab1.300.fc43.s390x+debug #1 PREEMPT
->
->   Krnl PSW : 0404e00180000000 0000020fc86aa1dc (__lock_acquire+0x5c/0x15f0)
->              R:0 T:1 IO:0 EX:0 Key:0 M:1 W:0 P:0 AS:3 CC:2 PM:0 RI:0 EA:3
->   Krnl GPRS: 0000000000000000 0000020f00000001 6b6b6b6b6b6b6c33 0000000000000000
->              0000000000000000 0000000000000000 0000000000000001 0000000000000000
->              0000000000000000 0000020fca28b820 0000000000000000 0000010a1ced8100
->              0000010a1ced8100 0000020fc9775068 0000018fce14f8b8 0000018fce14f7f8
->   Krnl Code: 0000020fc86aa1cc: e3b003400004        lg      %r11,832
->              0000020fc86aa1d2: a7840211           brc     8,0000020fc86aa5f4
->             *0000020fc86aa1d6: c09000df0b25       larl    %r9,0000020fca28b820
->             >0000020fc86aa1dc: d50790002000       clc     0(8,%r9),0(%r2)
->              0000020fc86aa1e2: a7840209           brc     8,0000020fc86aa5f4
->              0000020fc86aa1e6: c0e001100401       larl    %r14,0000020fca8aa9e8
->              0000020fc86aa1ec: c01000e25a00       larl    %r1,0000020fca2f55ec
->              0000020fc86aa1f2: a7eb00e8           aghi    %r14,232
->
->   Call Trace:
->    __lock_acquire+0x5c/0x15f0
->    lock_acquire.part.0+0xf8/0x270
->    lock_acquire+0xb0/0x1b0
->    down_write+0x5a/0x250
->    mlx5_detach_device+0x42/0x110 [mlx5_core]
->    mlx5_unload_one_devl_locked+0x50/0xc0 [mlx5_core]
->    mlx5_unload_one+0x42/0x60 [mlx5_core]
->    mlx5_pci_err_detected+0x94/0x150 [mlx5_core]
->    zpci_event_attempt_error_recovery+0xcc/0x388
->
-> Fixes: 5a977b5833b7 ("net/mlx5: Lag, move devcom registration to LAG layer")
-> Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
-> ---
-> Hi Shay et al,
->
-> while checking for potential regressions by Lukas Wunner's recent work
-> on pci_save/restore_state() for the recoverability of mlx5 functions I
-> consistently hit this bug. (Bjorn has queued this up for 6.19, according
-> to [0] and [1])
->
-> Apparently, the issue is unrelated to Lukas' work but can be reproduced
-> with master. It appears to be timing-sensitive, since it shows up only
-> when I use s390's debug_defconfig, but I think needs fixing anyhow, as
-> timing can change for other reasons, too.
->
-> I've spotted two additional places where the devcom reference is not
-> cleared after calling mlx5_devcom_unregister_component() in
-> drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c that I have not
-> addressed with a patch, since I'm unclear about how to test these
-> paths.
->
-> Thanks,
-> Gerd
->
-> [0] https://lore.kernel.org/all/cover.1760274044.git.lukas@wunner.de/
-> [1] https://lore.kernel.org/linux-pci/cover.1763483367.git.lukas@wunner.de/
-> ---
->   drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c | 1 +
->   1 file changed, 1 insertion(+)
->
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
-> index 3db0387bf6dcb727a65df9d0253f242554af06db..8ec04a5f434dd4f717d6d556649fcc2a584db847 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
-> @@ -1413,6 +1413,7 @@ static int __mlx5_lag_dev_add_mdev(struct mlx5_core_dev *dev)
->   static void mlx5_lag_unregister_hca_devcom_comp(struct mlx5_core_dev *dev)
->   {
->   	mlx5_devcom_unregister_component(dev->priv.hca_devcom_comp);
-> +	dev->priv.hca_devcom_comp = NULL;
->   }
-
-Though this fix looks correct to me in freeing hca_devcom_comp (not too 
-familiar with mlx5 internals), I wonder if it would be better to just 
-set devcom = NULL in devcom_free_comp_dev() after the kfree? This would 
-also take care of other places where devcom is not set to NULL?
-
-Thanks
-
-Farhan
-
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
