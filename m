@@ -1,194 +1,397 @@
-Return-Path: <netdev+bounces-243350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A2EFC9D8A8
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 02:55:54 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id A06B9C9D8DF
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 03:07:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 13DEF342127
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 01:55:54 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 12877349A78
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 02:07:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6982B22B5A5;
-	Wed,  3 Dec 2025 01:55:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8133422A4FC;
+	Wed,  3 Dec 2025 02:07:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZknaABqN"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KZYxUsUv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44E612BD11
-	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 01:55:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB8972628;
+	Wed,  3 Dec 2025 02:07:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764726950; cv=none; b=ri5BlMGz6JjDYcWJ+brH2lY0KhMNsOT2kJiGS4BVO6s7iIOOFMaq4zgawyczq5qb0d2bYr+EVostQG7RflkzZ/FLDsdwKO9eEGFoOT9s6eSGTNDuZOsntOWTLLZb9WOyjkE7EMcGRE6MY1fyF1cgfPWiCfi+ZQQwnZekwcUDhfA=
+	t=1764727654; cv=none; b=okpb6XHedBRZdkdg2V0wwoGgd6hb2cPxvapCgaqzTzDkvQtdLOT1ZA8LTG9w6CrcKzntiSrznUqxUut5ZCLDJK0DoxTXZOGRKOWQDLuJMzzqryrR19+4uDvneTFD5or8AcMg/biFTP7Yj+CDnFW9xDL3octQHD0p3RcVj5wAKcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764726950; c=relaxed/simple;
-	bh=gybRkugXkej6YS+1H2tR0eLMheeQXzL97oE0Mvw3C0Y=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=TYSY3T5YQ64IE9mR8ugeJMgQWr589KKhdPXYAq66GE6lj+vNvd3w1f2TystjP8afoOrQ2+ae9RgfMJe6DEJnfg64j8nCSH6eBkGTnekY90K04CIc3zak9uvzSJ54mem3lLeHLAsOoYlXiTB1jIQPKj6agql3v2i1S73OoBQbZao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZknaABqN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0C2AC4CEF1
-	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 01:55:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764726949;
-	bh=gybRkugXkej6YS+1H2tR0eLMheeQXzL97oE0Mvw3C0Y=;
-	h=Date:From:To:Subject:From;
-	b=ZknaABqN0SU5Y/lLJ3yxDx1Z9AzfGUq7oYNykVWW8HBVinfzZIesfn72dDOPqwsYg
-	 fO75L5QSx8ddiI3zEWXEz+vcPP+qV2G45oVZxk899V7pOJZKfzw8gokZb6KJY9x6UZ
-	 qChT/LPmRdqHu8Kw0rIFtUBFz1oNNofNyFvLnDaoyXOxPByfTnbbcqvWksbh04uuAi
-	 NZ7PpzO3/4jw9VGljlC3CMa8bxKiYAvDtKoSM3ZRaLMq2Ara/Xwm0eycM75i7ey7z5
-	 zHNl21BA47r+DD2oCjpe1Du5w54R9hwY4XVbwbmsRW0RGiJ7jFlGTov/+mI1uX795n
-	 0HteGTRmcnCQg==
-Date: Tue, 2 Dec 2025 17:55:48 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: netdev@vger.kernel.org
-Subject: [ANN] netdev development stats for 6.19
-Message-ID: <20251202175548.6b5eb80e@kernel.org>
+	s=arc-20240116; t=1764727654; c=relaxed/simple;
+	bh=r6nWALuEkJZL/0Gh33Kk6EjfQ7O8FWoU7y9lb21zgYY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jxVl0KW/nUNaAS4P/+6aHt8aqIFlfTz9HkU1lS6gAo9Wg7ajW2YUakk2KUlbgbRjnVY90TMehoMFTc3eldDer9lOzi/WFSa4c8rIMDZU9fhSjAg4V1oc9I3p7olUYNKrCxjzDG2p9cJUq5fc4eeSBRvnEw5v73amkZSs1Fqy84w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=KZYxUsUv; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=HDX8/VSDKMO86crZNm//TsHiEGek8Ev3KkwK+mxZc5M=; b=KZYxUsUvELzAwVuofy7goMtGsY
+	MLjfYGUtvBuLQMw9uetYvXG2f4DIprbJTuxP0eSp+XkUfn349bxU3cJK1q3LiO4pL34AKaS7+TmSD
+	5bP32GHck9F+g8xKBUvcrRkNrId6IiP1chuhMR5Zh6wUC6imlLoDd9YmTDcsBz2DV3ak=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vQcH2-00Fl3Z-W2; Wed, 03 Dec 2025 03:07:21 +0100
+Date: Wed, 3 Dec 2025 03:07:20 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Frank Wunderlich <frankwu@gmx.de>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
+	Juraj Povazanec <jpovazanec@maxlinear.com>,
+	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	"Livia M. Rosu" <lrosu@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: Re: [PATCH RFC net-next 3/3] net: dsa: add basic initial driver for
+ MxL862xx switches
+Message-ID: <c6525467-2229-4941-803d-1be5efb431c3@lunn.ch>
+References: <cover.1764717476.git.daniel@makrotopia.org>
+ <d92766bc84e409e6fafdc5e3505573662dc19d08.1764717476.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d92766bc84e409e6fafdc5e3505573662dc19d08.1764717476.git.daniel@makrotopia.org>
 
-Hi!
+> +/**
+> + * struct mxl862xx_ss_sp_tag
+> + * @pid: port ID (1~16)
+> + * @mask: bit value 1 to indicate valid field
+> + *	0 - rx
+> + *	1 - tx
+> + *	2 - rx_pen
+> + *	3 - tx_pen
+> + * @rx: RX special tag mode
+> + *	0 - packet does NOT have special tag and special tag is NOT inserted
+> + *	1 - packet does NOT have special tag and special tag is inserted
+> + *	2 - packet has special tag and special tag is NOT inserted
+> + * @tx: TX special tag mode
+> + *	0 - packet does NOT have special tag and special tag is NOT removed
+> + *	1 - packet has special tag and special tag is replaced
+> + *	2 - packet has special tag and special tag is NOT removed
+> + *	3 - packet has special tag and special tag is removed
+> + * @rx_pen: RX special tag info over preamble
+> + *	0 - special tag info inserted from byte 2 to 7 are all 0
+> + *	1 - special tag byte 5 is 16, other bytes from 2 to 7 are 0
+> + *	2 - special tag byte 5 is from preamble field, others are 0
+> + *	3 - special tag byte 2 to 7 are from preabmle field
+> + * @tx_pen: TX special tag info over preamble
+> + *	0 - disabled
+> + *	1 - enabled
+> + */
+> +struct mxl862xx_ss_sp_tag {
+> +	u8 pid;
+> +	u8 mask;
+> +	u8 rx;
+> +	u8 tx;
+> +	u8 rx_pen;
+> +	u8 tx_pen;
+> +} __packed;
+> +
+> +/**
+> + * enum mxl862xx_logical_port_mode - Logical port mode
+> + * @MXL862XX_LOGICAL_PORT_8BIT_WLAN: WLAN with 8-bit station ID
+> + * @MXL862XX_LOGICAL_PORT_9BIT_WLAN: WLAN with 9-bit station ID
+> + * @MXL862XX_LOGICAL_PORT_GPON: GPON OMCI context
+> + * @MXL862XX_LOGICAL_PORT_EPON: EPON context
+> + * @MXL862XX_LOGICAL_PORT_GINT: G.INT context
+> + * @MXL862XX_LOGICAL_PORT_OTHER: Others
+> + */
+> +enum mxl862xx_logical_port_mode {
+> +	MXL862XX_LOGICAL_PORT_8BIT_WLAN = 0,
+> +	MXL862XX_LOGICAL_PORT_9BIT_WLAN,
+> +	MXL862XX_LOGICAL_PORT_GPON,
+> +	MXL862XX_LOGICAL_PORT_EPON,
+> +	MXL862XX_LOGICAL_PORT_GINT,
+> +	MXL862XX_LOGICAL_PORT_OTHER = 0xFF,
+> +};
+> +
+> +/**
+> + * struct mxl862xx_ctp_port_assignment - CTP Port Assignment/association with logical port
+> + * @logical_port_id: Logical Port Id. The valid range is hardware dependent
+> + * @first_ctp_port_id: First CTP Port ID mapped to above logical port ID
+> + * @number_of_ctp_port: Total number of CTP Ports mapped above logical port ID
+> + * @mode: See &enum mxl862xx_logical_port_mode
+> + * @bridge_port_id: Bridge ID (FID)
+> + */
+> +struct mxl862xx_ctp_port_assignment {
+> +	u8 logical_port_id;
+> +	__le16 first_ctp_port_id;
+> +	__le16 number_of_ctp_port;
+> +	enum mxl862xx_logical_port_mode mode;
+> +	__le16 bridge_port_id;
+> +} __packed;
 
-Intro
------
-
-As is tradition here are the development statistics based on mailing
-list traffic on netdev@vger.
-
-These stats are somewhat like LWN stats: https://lwn.net/Articles/1004998/
-but more focused on mailing list participation. And by participation
-we mean reviewing code more than producing patches.
-
-In particular "review score" tries to capture the balance between
-reviewing other people's code vs posting patches. It's roughly
-number of patches reviewed minus number of patches posted.=20
-Those who post more than they review will have a negative score.
-
-Previous 3 reports:
- - for 6.16: https://lore.kernel.org/20250529144354.4ca86c77@kernel.org
- - for 6.17: https://lore.kernel.org/20250728160647.6d0bb258@kernel.org
- - for 6.18: https://lore.kernel.org/20251002171032.75263b18@kernel.org=20
-
-General stats
--------------
-
-This release cycle was 6% smaller in terms of postings and 15% smaller=20
-in terms of merged commits than 6.18. We have also regressed in terms
-of review coverage.=20
-
-Personally, this cycle felt quite busy for me. netdev foundation
-received its first batch of servers, and the infrastructure has been
-mostly migrated over to those (the UI still runs on the old setup but
-builds and kselftests run on the shiny new machines). "We" have also
-spent some time integrating the AI code review built by Chris Mason.=20
-
-Looking ahead we are expecting more server deliveries, including some
-400GE NICs for the community to experiment with. The netdev foundation
-still has a good chunk of money left so please do not hesitate to
-suggest how we can spend it to improve the project and help developers.
-
-Developer rankings
-------------------
-
-Contributions to selftests:
-   1 [ 30] Jakub Kicinski
-   2 [ 24] Matthieu Baerts
-   3 [ 13] Bobby Eshleman
-   4 [  6] Carolina Jubran
-   5 [  4] Kuniyuki Iwashima
-   6 [  3] Eric Dumazet
-   7 [  3] Breno Leitao
-
-Top reviewers (cs):                  Top reviewers (msg):               =20
-   1 (   ) [28] Jakub Kicinski          1 (   ) [61] Jakub Kicinski     =20
-   2 (   ) [21] Simon Horman            2 (   ) [41] Andrew Lunn        =20
-   3 (   ) [14] Andrew Lunn             3 (   ) [38] Simon Horman       =20
-   4 (   ) [ 9] Paolo Abeni             4 (   ) [21] Paolo Abeni        =20
-   5 (+27) [ 5] Maxime Chevallier       5 (***) [13] Maxime Chevallier  =20
-   6 ( -1) [ 5] Eric Dumazet            6 ( +1) [13] Russell King       =20
-   7 ( -1) [ 5] Russell King            7 ( +6) [12] Aleksandr Loktionov=20
-   8 ( +1) [ 5] Aleksandr Loktionov     8 ( -3) [12] Eric Dumazet       =20
-   9 ( +3) [ 4] Jacob Keller            9 ( +3) [10] Michael S. Tsirkin =20
-  10 ( -2) [ 4] Kuniyuki Iwashima      10 (+35) [10] Stefano Garzarella =20
-  11 (+30) [ 3] Sabrina Dubroca        11 ( +5) [ 9] Jacob Keller       =20
-  12 ( -5) [ 3] Vadim Fedorenko        12 (+14) [ 8] Sabrina Dubroca    =20
-  13 (+24) [ 2] Alexander Lobakin      13 ( -5) [ 7] Kuniyuki Iwashima  =20
-  14 ( +1) [ 2] Vladimir Oltean        14 (+44) [ 7] Kory Maincent (Dent Pr=
-oject)
-  15 ( -5) [ 2] Paul Menzel            15 (***) [ 6] Toke H=C3=B8iland-J=C3=
-=B8rgensen
-
-Lots of familiar names in top reviewer ranking. Let me focus on those
-with most significant gains. Maxime has helped with various embedded
-(stmmac and PHY) reviews (sorry that we didn't manage to merge the
-phy_port series in time for 6.19!). Sabrina helped with TLS, IPsec,
-OVPN as well as a few core changes. Stefano had his hands full with
-vsock changes. Kory reviewed PSE and timestamp NDO conversion patches.
-Aleksandr reviewed mostly Intel NIC patches, but occasionally also
-patches for other NICs. Alexander (with an e) reviewed some of Eric's
-skb optimizations.
-
-Once again, huge thanks to those who help with patch reviews!
-
-Top authors (cs):                    Top authors (msg):                 =20
-   1 ( +1) [5] Eric Dumazet             1 (+12) [35] Christian Brauner  =20
-   2 ( +1) [3] Russell King             2 (   ) [27] Russell King       =20
-   3 ( -2) [3] Jakub Kicinski           3 ( +5) [19] Tariq Toukan       =20
-   4 ( +2) [3] Tariq Toukan             4 (+43) [19] Bobby Eshleman     =20
-   5 ( +2) [3] Heiner Kallweit          5 (+34) [18] Vadim Fedorenko    =20
-   6 ( -1) [2] Alok Tiwari              6 (+27) [16] Maxime Chevallier  =20
-   7 ( +8) [2] Breno Leitao             7 ( +8) [16] Daniel Golle       =20
-   8 (   ) [2] Kuniyuki Iwashima        8 ( -2) [15] Eric Dumazet       =20
-   9 (***) [2] Randy Dunlap             9 (+49) [14] Daniel Jurgens     =20
-  10 (+29) [2] Vadim Fedorenko         10 ( -9) [13] Jakub Kicinski     =20
+Does the C standard define the size of an enum? Do you assume this is
+a byte?
 
 
-Top scores (positive):               Top scores (negative):             =20
-   1 (   ) [412] Jakub Kicinski         1 ( +8) [135] Christian Brauner =20
-   2 (   ) [306] Simon Horman           2 (+33) [ 74] Bobby Eshleman    =20
-   3 (   ) [256] Andrew Lunn            3 ( +4) [ 67] Tariq Toukan      =20
-   4 (   ) [144] Paolo Abeni            4 (+37) [ 58] Daniel Jurgens    =20
-   5 ( +6) [ 79] Aleksandr Loktionov    5 ( +7) [ 56] Daniel Golle      =20
-   6 (+32) [ 45] Sabrina Dubroca        6 (***) [ 44] Jeff Layton       =20
-   7 (+12) [ 37] Michael S. Tsirkin     7 ( +9) [ 40] Eliav Farber      =20
+> +
+> +/**
+> + * struct mxl862xx_sys_fw_image_version - VLAN counter mapping configuration
 
-Company rankings
-----------------
+The text seems wrong, probably cut/paste error?
 
-Top reviewers (cs):                  Top reviewers (msg):               =20
-   1 ( +1) [34] RedHat                  1 ( +1) [102] RedHat            =20
-   2 ( -1) [30] Meta                    2 ( -1) [ 76] Meta              =20
-   3 (   ) [17] Intel                   3 ( +2) [ 44] Intel             =20
-   4 (   ) [14] Andrew Lunn             4 (   ) [ 41] Andrew Lunn       =20
-   5 (   ) [11] Google                  5 ( -2) [ 27] Google            =20
-   6 ( +1) [ 9] nVidia                  6 ( +1) [ 20] nVidia            =20
-   7 ( -1) [ 7] Oracle                  7 ( -1) [ 18] Oracle            =20
+> +#define MXL862XX_MMD_DEV 30
 
-Top authors (cs):                    Top authors (msg):                 =20
-   1 (   ) [12] Meta                    1 (   ) [95] Meta               =20
-   2 (   ) [10] RedHat                  2 (   ) [52] RedHat             =20
-   3 (   ) [10] Google                  3 ( +2) [48] nVidia             =20
-   4 (   ) [ 7] Intel                   4 (   ) [47] Intel              =20
-   5 ( +1) [ 7] Oracle                  5 ( +9) [41] Microsoft          =20
-   6 ( -1) [ 7] nVidia                  6 ( -3) [38] Google             =20
-   7 ( +1) [ 3] Huawei                  7 ( -1) [34] Oracle             =20
-      =20
-Top scores (positive):               Top scores (negative):             =20
-   1 ( +1) [438] RedHat                 1 (+14) [137] Microsoft         =20
-   2 ( +1) [256] Andrew Lunn            2 ( +9) [ 56] Daniel Golle      =20
-   3 ( -2) [141] Meta                   3 ( +1) [ 50] nVidia            =20
-   4 (   ) [107] Intel                  4 ( +1) [ 47] Huawei            =20
-   5 ( +2) [ 38] ARM                    5 ( +7) [ 44] Amazon            =20
-   6 ( +6) [ 33] Linux Foundation       6 (+23) [ 40] AMD               =20
-   7 ( -1) [ 31] Google                 7 ( -4) [ 40] Pengutronix       =20
---=20
-Code: https://github.com/kuba-moo/ml-stat
-Raw output: https://netdev.bots.linux.dev/static/nipa/stats-6.19/stdout
+Please use MDIO_MMD_VEND1
+
+> +#define MXL862XX_MMD_REG_CTRL 0
+> +#define MXL862XX_MMD_REG_LEN_RET 1
+> +#define MXL862XX_MMD_REG_DATA_FIRST 2
+> +#define MXL862XX_MMD_REG_DATA_LAST 95
+> +#define MXL862XX_MMD_REG_DATA_MAX_SIZE \
+> +		(MXL862XX_MMD_REG_DATA_LAST - MXL862XX_MMD_REG_DATA_FIRST + 1)
+> +
+> +#define MMD_API_SET_DATA_0 (0x0 + 0x2)
+> +#define MMD_API_GET_DATA_0 (0x0 + 0x5)
+> +#define MMD_API_RST_DATA (0x0 + 0x8)
+
+What is the significant of these numbers? Can you use #defines to make
+it clearer?
+
+> +
+> +static int mxl862xx_busy_wait(struct mxl862xx_priv *dev)
+> +{
+> +	int ret, i;
+> +
+> +	for (i = 0; i < MAX_BUSY_LOOP; i++) {
+> +		ret = __mdiobus_c45_read(dev->bus, dev->sw_addr,
+> +					 MXL862XX_MMD_DEV,
+> +					 MXL862XX_MMD_REG_CTRL);
+> +		if (ret < 0)
+> +			return ret;
+> +
+> +		if (ret & CTRL_BUSY_MASK)
+> +			usleep_range(10, 15);
+> +		else
+> +			return 0;
+> +	}
+> +
+> +	return -ETIMEDOUT;
+
+We already have phy_read_mmd_poll_timeout(). Maybe you should add a
+__mdiobus_c45_read_poll_timeout()?
+
+Also, as far as i can see, __mdiobus_c45_read() is always called with
+the same first three parameters. Maybe add a mxl862xx_reg_read()?  and
+a mxl862xx_reg_write()?
+
+> +static int mxl862xx_send_cmd(struct mxl862xx_priv *dev, u16 cmd, u16 size,
+> +			     s16 *presult)
+> +{
+> +	int ret;
+> +
+> +	ret = __mdiobus_c45_write(dev->bus, dev->sw_addr, MXL862XX_MMD_DEV,
+> +				  MXL862XX_MMD_REG_LEN_RET, size);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = __mdiobus_c45_write(dev->bus, dev->sw_addr, MXL862XX_MMD_DEV,
+> +				  MXL862XX_MMD_REG_CTRL, cmd | CTRL_BUSY_MASK);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = mxl862xx_busy_wait(dev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = __mdiobus_c45_read(dev->bus, dev->sw_addr, MXL862XX_MMD_DEV,
+> +				 MXL862XX_MMD_REG_LEN_RET);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	*presult = ret;
+> +	return 0;
+> +}
+> +
+> +int mxl862xx_api_wrap(struct mxl862xx_priv *priv, u16 cmd, void *_data,
+> +		      u16 size, bool read)
+> +{
+> +	u16 *data = _data;
+> +	s16 result = 0;
+> +	u16 max, i;
+> +	int ret;
+> +
+> +	mutex_lock_nested(&priv->bus->mdio_lock, MDIO_MUTEX_NESTED);
+> +
+> +	max = (size + 1) / 2;
+> +
+> +	ret = mxl862xx_busy_wait(priv);
+> +	if (ret < 0)
+> +		goto out;
+> +
+> +	for (i = 0; i < max; i++) {
+> +		u16 off = i % MXL862XX_MMD_REG_DATA_MAX_SIZE;
+> +
+> +		if (i && off == 0) {
+> +			/* Send command to set data when every
+> +			 * MXL862XX_MMD_REG_DATA_MAX_SIZE of WORDs are written.
+> +			 */
+> +			ret = mxl862xx_set_data(priv, i);
+> +			if (ret < 0)
+> +				goto out;
+> +		}
+> +
+> +		__mdiobus_c45_write(priv->bus, priv->sw_addr,
+> +				    MXL862XX_MMD_DEV,
+> +				    MXL862XX_MMD_REG_DATA_FIRST + off,
+> +				    le16_to_cpu(data[i]));
+> +	}
+> +
+> +	ret = mxl862xx_send_cmd(priv, cmd, size, &result);
+> +	if (ret < 0)
+> +		goto out;
+> +
+> +	if (result < 0) {
+> +		ret = result;
+> +		goto out;
+> +	}
+
+If i'm reading mxl862xx_send_cmd() correct, result is the value of a
+register. It seems unlikely this is a Linux error code?
+
+> +
+> +	for (i = 0; i < max && read; i++) {
+
+That is an unusual way to use read.
+
+> +		u16 off = i % MXL862XX_MMD_REG_DATA_MAX_SIZE;
+> +
+> +		if (i && off == 0) {
+> +			/* Send command to fetch next batch of data
+> +			 * when every MXL862XX_MMD_REG_DATA_MAX_SIZE of WORDs
+> +			 * are read.
+> +			 */
+> +			ret = mxl862xx_get_data(priv, i);
+> +			if (ret < 0)
+> +				goto out;
+> +		}
+> +
+> +		ret = __mdiobus_c45_read(priv->bus, priv->sw_addr,
+> +					 MXL862XX_MMD_DEV,
+> +					 MXL862XX_MMD_REG_DATA_FIRST + off);
+> +		if (ret < 0)
+> +			goto out;
+> +
+> +		if ((i * 2 + 1) == size) {
+> +			/* Special handling for last BYTE
+> +			 * if it's not WORD aligned.
+> +			 */
+> +			*(uint8_t *)&data[i] = ret & 0xFF;
+> +		} else {
+> +			data[i] = cpu_to_le16((u16)ret);
+> +		}
+> +	}
+> +	ret = result;
+> +
+> +out:
+> +	mutex_unlock(&priv->bus->mdio_lock);
+> +	return ret;
+> +}
+> +#define MXL862XX_API_WRITE(dev, cmd, data) \
+> +	mxl862xx_api_wrap(dev, cmd, &(data), sizeof((data)), false)
+> +#define MXL862XX_API_READ(dev, cmd, data) \
+> +	mxl862xx_api_wrap(dev, cmd, &(data), sizeof((data)), true)
+
+> +/* PHY access via firmware relay */
+> +static int mxl862xx_phy_read_mmd(struct mxl862xx_priv *priv, int port,
+> +				 int devadd, int reg)
+> +{
+> +	struct mdio_relay_data param = {
+> +		.phy = port,
+> +		.mmd = devadd,
+> +		.reg = reg & 0xffff,
+> +	};
+> +	int ret;
+> +
+> +	ret = MXL862XX_API_READ(priv, INT_GPHY_READ, param);
+
+That looks a bit ugly, using a macro as a function name. I would
+suggest tiny functions rather than macros. The compiler should do the
+right thing.
+
+> +/* Configure CPU tagging */
+> +static int mxl862xx_configure_tag_proto(struct dsa_switch *ds, int port,
+> +					bool enable)
+> +{
+> +	struct mxl862xx_ss_sp_tag tag = {
+> +		.pid = DSA_MXL_PORT(port),
+> +		.mask = BIT(0) | BIT(1),
+> +		.rx = enable ? 2 : 1,
+> +		.tx = enable ? 2 : 3,
+> +	};
+
+There is a bit comment at the beginning of the patch about these, but
+it does not help much here. Please could you add some #defines for
+these magic numbers.
+
+> +/* Reset switch via MMD write */
+> +static int mxl862xx_mmd_write(struct dsa_switch *ds, int reg, u16 data)
+
+The comment does not fit what the function does.
+
+> +{
+> +	struct mxl862xx_priv *priv = ds->priv;
+> +	int ret;
+> +
+> +	mutex_lock(&priv->bus->mdio_lock);
+> +	ret = __mdiobus_c45_write(priv->bus, priv->sw_addr, MXL862XX_MMD_DEV,
+> +				  reg, data);
+> +	mutex_unlock(&priv->bus->mdio_lock);
+
+There is no point using the unlocked version if you wrap it in
+lock/unlock...
+
+> +/* Setup */
+> +static int mxl862xx_setup(struct dsa_switch *ds)
+> +{
+> +	struct mxl862xx_priv *priv = ds->priv;
+> +	int ret, i;
+> +
+> +	for (i = 0; i < ds->num_ports; i++) {
+> +		if (dsa_is_cpu_port(ds, i)) {
+> +			priv->cpu_port = i;
+> +			break;
+> +		}
+> +	}
+> +
+> +	ret = mxl862xx_setup_mdio(ds);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Software reset */
+> +	ret = mxl862xx_mmd_write(ds, 1, 0);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = mxl862xx_mmd_write(ds, 0, 0x9907);
+
+More magic numbers.
+
+	Andrew
 
