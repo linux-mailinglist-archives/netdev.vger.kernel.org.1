@@ -1,127 +1,172 @@
-Return-Path: <netdev+bounces-243352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D763DC9D8EC
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 03:11:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FB5AC9D94D
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 03:35:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9037C3A896D
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 02:11:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14A853A7063
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 02:35:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAA7322FE0E;
-	Wed,  3 Dec 2025 02:11:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8B25204583;
+	Wed,  3 Dec 2025 02:35:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RKwmJMTB"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="N69gnGij"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6079B22A4FC
-	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 02:11:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B8D536D507;
+	Wed,  3 Dec 2025 02:35:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764727891; cv=none; b=gcwWiArfW+5RnrrcIpAeEVUpNAFCxi7Kacsw1ZdcX2RxIg8EKdwdj7D0XjRsMbS4hk4PpzqbdN3/Vx3TRn5Oxx59AiRPGZfoI7PNpRdrEi6Ntos05JQVUda2th5K4q7ngSkFD5YDkxi6SSSdmnxCB/zWjXuApBetRhVP47v3xcI=
+	t=1764729326; cv=none; b=N32vfik+v6HPSlPRDM+XHg0Q/kD+n8rmLbcw9gLTjryTo3QQ0ZM4X1LrL/aLEWw/+hrjR3UE2VFkauPu4pc4Khgg/9Pe9pMmSNLfzJHRGJ/o9HPuxgtH29itYIn138ty/8oD1/eVJCR2DZSx+9gqoXayVL9r0ju8h7AJ3L4oP4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764727891; c=relaxed/simple;
-	bh=RT+BDj15EQHdd3M1qICzSCuoLzYhQ2rx+LzW6G7jhjg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=J5iZNhRYZX2ADlNF5AwlSyBWRZaSIcDVflSl29x6F4rVEaVbYVA7Fmsw+09Fs5aEEeaTmAPwJ3PC2oStsuXWTiQ9wpIWI50omhojJvEIPQl1BY7nznE2E1TNlTEVFf2PblHXMGt/UrxpjBjJ6cVoilttshgbHNxMBltHW1s4bt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RKwmJMTB; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-bdb6f9561f9so5584687a12.3
-        for <netdev@vger.kernel.org>; Tue, 02 Dec 2025 18:11:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764727889; x=1765332689; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=SrshDHaC0MNLolr0re5e//KpT3feCFpyouwfUOnJ0fk=;
-        b=RKwmJMTB8mssqNc0kS3mTPbWVr8u1v4XZ+Hz0YeKkknI+x+bzcdA/vfVjZSk+PwciI
-         caM3zUNeJaWQ7majHmfEbiYzMK774dL1Qmhk6EApatrEEN4WVLmI7tA/a9xzHozp+weU
-         NAEm76GnrnOlIKDEKGX2OLLbcPrQlKZVzdYtfncbf96+PxMUjtiTewnLDFBDTTaIakyK
-         5ZGuKFOApq3XhtbLO+kpeWv0cML/KLryHuBzqIn3jINUDmjfLakkvKY/Ad7iq2ABiXqf
-         qJM1WGX/8lA5LuoS957t/PpV8B6BMucKrhIUHuG0wCPR4MU6Mo/LLG0VFbnn60vWkcDR
-         Vn2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764727889; x=1765332689;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SrshDHaC0MNLolr0re5e//KpT3feCFpyouwfUOnJ0fk=;
-        b=hITcePdmn5thk+2eid92QjvwNuCpXulIRTljYEeLOY4Jd4XiHj87DNkqW5D/TiDIqi
-         BZiMcTxX6dFtdZ5JtZTDX6OfiyKhVRiJ2g7Azz6gKncTEg0CWBntHdfk8R84CQm6JY6C
-         UR8NdnsKOjsW85xpYfLtUJAW5XXP24thJXS+WEeXasLx6GV2GVCEQBcmsaL8OyhUHjh/
-         IMoBhbPTDGio1uC+KcHkr+T9Dmsx1zOJQpZrOkPjraARCl2PiFkpwKc+Gb+phYTmBpnX
-         9EqOjdF8c9A9u7HqdX/wAFf191g4cdXk9ABQKtgCGDkyxvQ3y3ucNmozwAybAkXVu/VZ
-         WN1w==
-X-Gm-Message-State: AOJu0Yxkbu3uTY7ASMh081h1p2iHaWc2WK6cWFN16GyRWTAgBeLdN2Vl
-	8es1SoOXnbFPbLL27mIcmZfDTPiZ8g5qj46r+/l/TRhNAczm5Vo5EFb4+ajNgA==
-X-Gm-Gg: ASbGncsBJjHQ97CFL9nkewHjE7nmhTkFWFpnT0fU31YQTtni1MGoLpZ/dlOvQDzwh/v
-	ibPVri46GalQMV3/G8cIgvuXHXEWp/xWhuEsO3ps5C+DEktKyRRCgiR6q6rY6JcZDJ4bsjta1CF
-	gk366GO1v0QzSMvGFIqFQbIATHPArAyvMA36dFYMYFuCCBxW/KpygVOJ2wCYixbiGvptPhELZCN
-	5SH3O0iTc/Ml6jiUOKqrCJfa+/4xc98lCgvcTfZNnJRcAyyOU1v6qb2sePEb27j+VcAXYIODaMo
-	+43TBxzeiIJyHx5r4KOlTArWz9ZvpFV+jRde9JoZC1RHjRAC0R601bIU0JlPRDO1uxeTJpFv8If
-	4Cs1K2z+WYHm5rPjGRdSZvDUvG1oEsJ3a9BFqOLT1G/89HuZiIJ0cPRXubsq7ieppVaIQhsVyvB
-	/AC+0IAgDegjYajMuGLYC/A/F/Jr+ap280b/NX0NmRv93CFIPYoK2N34yuBdn6/I8BhyCdaYmFB
-	qcB1rscF9colKmEmiC7a6cHOu0cJw==
-X-Google-Smtp-Source: AGHT+IHrDhdqPrcTTPMS016c0PoyhnyaRNq/OscPs8JcF7CqzUwsu6nSob+K1zCB2vo0lPY69SA3EA==
-X-Received: by 2002:a05:7300:7a8e:b0:2a4:3593:9695 with SMTP id 5a478bee46e88-2ab92e099afmr383225eec.18.1764727889285;
-        Tue, 02 Dec 2025 18:11:29 -0800 (PST)
-Received: from localhost.localdomain (ip72-203-121-181.oc.oc.cox.net. [72.203.121.181])
-        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2a9653ca11esm59543997eec.0.2025.12.02.18.11.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Dec 2025 18:11:28 -0800 (PST)
-From: Akhilesh Nema <nemaakhilesh@gmail.com>
-To: netdev@vger.kernel.org
-Cc: stephen@networkplumber.org,
-	Akhilesh Nema <nemaakhilesh@gmail.com>
-Subject: [PATCH iproute2 1/1] lib,tc: Fix 'UINT_MAX' undeclared error observed during the build with musl libc
-Date: Tue,  2 Dec 2025 18:11:24 -0800
-Message-Id: <20251203021124.17535-1-nemaakhilesh@gmail.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1764729326; c=relaxed/simple;
+	bh=/N1sTSZh/utQqpEOjiTWHdbbwwhYCdldlFmtNCTihxc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WEsP2k1yZK8+/He/o80TV0t7dm1Nyf/DnDT+hLJyQ1sthvz3mmu1KtxEdtV5egg46Z3cejHJSmNWS2lqhrXRE8M29R+PI5QMlIOVfuOIPV66VeVC3njeegh9WXfS+Zx8jbVkpvV/bOuKbRq44XyvTSek8aqWYoHJB2IozOXVaUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=N69gnGij; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1764729322;
+	bh=OpcxfvipuC6qAL1Z7PjgPVvorNrlmLKd5wXNYLxG5/E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=N69gnGijybexVWhdYAVW7ERecKg0lybsqUk9hDId8/hrk9AYdHnmOGv+rd1wAsQnc
+	 Ff1gF0wopYShIOuIOJylcr/7K+bpGEctlJFcvyIt2G9D40LpOXcScaRBXZLqOgyRql
+	 6RN8uSj963MXomI35k3r39nBoPpDLYDQXLmC6Melt0vClsqpgjUXHvCJjGFrJs09pX
+	 VXsqudvmSUJGGQxc6SC4kn6blz+509sSHxengLFhPMXHOVtuMDurx9cz3k4rCKcJDv
+	 WJVRF7yrKsOEC+gNc+6m31Ku2LXe+AAOxE0l0A/hcWwSMViQRxWhQi1Qp7fpOJgI5g
+	 PCORtiQ6alCXA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4dLhZJ6RVnz4w23;
+	Wed, 03 Dec 2025 13:35:20 +1100 (AEDT)
+Date: Wed, 3 Dec 2025 13:35:20 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
+ <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>,
+ "H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>,
+ Arnaud Lecomte <contact@arnaud-lcm.com>, bpf <bpf@vger.kernel.org>,
+ Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: Re: linux-next: manual merge of the tip tree with the bpf-next tree
+Message-ID: <20251203133520.10ba2705@canb.auug.org.au>
+In-Reply-To: <20251105133159.6303b1ee@canb.auug.org.au>
+References: <20251105133159.6303b1ee@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="Sig_/N/lm28FJl68ZE/B3Wqf=kUv";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-- utils_math.c:136:20: error: 'UINT_MAX' undeclared (first use in this function)
-- tc_core.c:51:22: error: 'UINT_MAX' undeclared (first use in this function)
+--Sig_/N/lm28FJl68ZE/B3Wqf=kUv
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Akhilesh Nema <nemaakhilesh@gmail.com>
----
- lib/utils_math.c | 1 +
- tc/tc_core.c     | 1 +
- 2 files changed, 2 insertions(+)
+Hi all,
 
-diff --git a/lib/utils_math.c b/lib/utils_math.c
-index a7e74744..fd2ddc7c 100644
---- a/lib/utils_math.c
-+++ b/lib/utils_math.c
-@@ -4,6 +4,7 @@
- #include <stdlib.h>
- #include <string.h>
- #include <math.h>
-+#include <limits.h>
- #include <asm/types.h>
- 
- #include "utils.h"
-diff --git a/tc/tc_core.c b/tc/tc_core.c
-index a422e02c..b13b7d78 100644
---- a/tc/tc_core.c
-+++ b/tc/tc_core.c
-@@ -11,6 +11,7 @@
- #include <unistd.h>
- #include <fcntl.h>
- #include <math.h>
-+#include <limits.h>
- #include <sys/socket.h>
- #include <netinet/in.h>
- #include <arpa/inet.h>
--- 
-2.25.1
+On Wed, 5 Nov 2025 13:31:59 +1100 Stephen Rothwell <sfr@canb.auug.org.au> w=
+rote:
+>
+> Today's linux-next merge of the tip tree got a conflict in:
+>=20
+>   kernel/bpf/stackmap.c
+>=20
+> between commit:
+>=20
+>   e17d62fedd10 ("bpf: Refactor stack map trace depth calculation into hel=
+per function")
+>=20
+> from the bpf-next tree and commit:
+>=20
+>   c69993ecdd4d ("perf: Support deferred user unwind")
+>=20
+> from the tip tree.
+>=20
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
+>=20
+> --=20
+> Cheers,
+> Stephen Rothwell
+>=20
+> diff --cc kernel/bpf/stackmap.c
+> index 2365541c81dd,8f1dacaf01fe..000000000000
+> --- a/kernel/bpf/stackmap.c
+> +++ b/kernel/bpf/stackmap.c
+> @@@ -333,9 -310,12 +333,9 @@@ BPF_CALL_3(bpf_get_stackid, struct pt_r
+>   			       BPF_F_FAST_STACK_CMP | BPF_F_REUSE_STACKID)))
+>   		return -EINVAL;
+>  =20
+>  -	max_depth +=3D skip;
+>  -	if (max_depth > sysctl_perf_event_max_stack)
+>  -		max_depth =3D sysctl_perf_event_max_stack;
+>  -
+>  +	max_depth =3D stack_map_calculate_max_depth(map->value_size, elem_size=
+, flags);
+>   	trace =3D get_perf_callchain(regs, kernel, user, max_depth,
+> - 				   false, false);
+> + 				   false, false, 0);
+>  =20
+>   	if (unlikely(!trace))
+>   		/* couldn't fetch the stack trace */
+> @@@ -463,15 -446,13 +463,15 @@@ static long __bpf_get_stack(struct pt_r
+>   	if (may_fault)
+>   		rcu_read_lock(); /* need RCU for perf's callchain below */
+>  =20
+>  -	if (trace_in)
+>  +	if (trace_in) {
+>   		trace =3D trace_in;
+>  -	else if (kernel && task)
+>  +		trace->nr =3D min_t(u32, trace->nr, max_depth);
+>  +	} else if (kernel && task) {
+>   		trace =3D get_callchain_entry_for_task(task, max_depth);
+>  -	else
+>  +	} else {
+>   		trace =3D get_perf_callchain(regs, kernel, user, max_depth,
+> - 					   crosstask, false);
+> + 					   crosstask, false, 0);
+>  +	}
+>  =20
+>   	if (unlikely(!trace) || trace->nr < skip) {
+>   		if (may_fault)
 
+This is now a conflict between the bpf-next tree and Linus' tree.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/N/lm28FJl68ZE/B3Wqf=kUv
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmkvoegACgkQAVBC80lX
+0GwfRwf/SAPdxaT7GmlH18AOpAfzDihf1b2G8frMgXyvHR9TrI4PObUHgTUcz4IU
+gTrQJWxr0fxxGAXbPGflg7Ki+vyMSIkivrGCwny4MTs07nlUM8sNyYUR6XbmMLDY
+RyMEsMRvysfKXULcPtVtxaCzhAfTPkmdcrrnCByXWm3A6GHt95Mpaiq0j6LaNbv/
+tHiL09L0LKr93WZ2GMA5KWNfl7OoTSvCgEe0oAcikCZJMYt2/mT9w7AS7JzmrbYs
+cGMFaiQ0dZgP7rxYuvJ1pJt7HHlRJPvG72/90tx/oOK+523odRNpl21csMDhIavY
+XmV/ra8wz0WRjGYmzDbj1C03wN3YqQ==
+=Ge3i
+-----END PGP SIGNATURE-----
+
+--Sig_/N/lm28FJl68ZE/B3Wqf=kUv--
 
