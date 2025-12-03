@@ -1,73 +1,139 @@
-Return-Path: <netdev+bounces-243406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70674C9F28C
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 14:40:40 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A301EC9F2CB
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 14:46:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DA313A65D5
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 13:40:39 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DC34F4E2989
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 13:46:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B48E2F746C;
-	Wed,  3 Dec 2025 13:40:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C95AE2EA752;
+	Wed,  3 Dec 2025 13:46:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r5r5qt31"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A776736D4E2;
-	Wed,  3 Dec 2025 13:40:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CF752CCC0;
+	Wed,  3 Dec 2025 13:46:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764769237; cv=none; b=t1zOEpEKKhB7pTWeG/wDlAI8AG4E42ys8UUDK31FylNGHmcst71i0QAIjAGAZBgJ/keHxc4gL++TWtZrsRPdju3IK3Jm4DE4L9agsW0IAdK1t0oI3Pn0gcz3u/7+zqJlQJCGiUcde5h/WwuE5KR/Sbqfkax0wtUwvX90QMzb250=
+	t=1764769586; cv=none; b=PvQ/atm7PHJq1WkowRojd6MAmO1YHOudwKnldPiR3RmLxYAFAAJdNuOKU9gQjp2sBdccIarY4kYAcrvVlr0b7+jYNwRGz+hTlx+S3C0lXqJwaoQ9edP4wg842Niu6lvoLzM0CUzwBYORj5BtwgQnv0dUiZBnfJhAIf300qEXgEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764769237; c=relaxed/simple;
-	bh=51qF0axHPXjm/0LgCS9Lcv3DcnCyoG5lvC9duxY87K0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DKrVlXGYbDugL7TyXchJg+jPIyuZ1EikcL0gLQJ5fKViPKcsOnP3C2W9QE6xWZNGxitAeuA9iRtuxG/IKL6vEaRcyM84Hhbneantv/ntfZzy7PGh5ugRvr7LyWDYmst3x+AXTn3CFMEvmZijFJphsHRXK70S8ABgJ6og3I60JgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 76ACA605DD; Wed, 03 Dec 2025 14:40:32 +0100 (CET)
-Date: Wed, 3 Dec 2025 14:40:27 +0100
-From: Florian Westphal <fw@strlen.de>
-To: Melbin K Mathew <mlbnkm1@gmail.com>
-Cc: pablo@netfilter.org, kadlec@netfilter.org, phil@nwl.cc,
-	netfilter-devel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH] netfilter: nft_set_hash: fix potential NULL deref in
- nft_rhash_deactivate
-Message-ID: <aTA9y3iH1JjMPwQ1@strlen.de>
-References: <20251203132044.57242-1-mlbnkm1@gmail.com>
+	s=arc-20240116; t=1764769586; c=relaxed/simple;
+	bh=nr8UUyPHNXiTvGlLoNZyVhhzmjWaJayBhryag4J75Ig=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jOIbBu1baOgl+NV811lvEerJ4+NGBIF7XdNfo8f27paO6XLXKhkTU4wr4tERBZVvhofPPicVkj/B0c0eX/CbZhwL5JafCZp4UMHKHlZjdct3MhKpIxEFEQLjzgNEhoYAqYmm72r6fDM7oeCK4X505mgTJPdAG2tZ9urTk2g10X8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r5r5qt31; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D577C4CEFB;
+	Wed,  3 Dec 2025 13:46:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764769586;
+	bh=nr8UUyPHNXiTvGlLoNZyVhhzmjWaJayBhryag4J75Ig=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=r5r5qt31M29GZDgO/yzOFCFe/rC7mWqEkvt8rAHgQPYU9KUKmzL4fXHnw6Bm5G7TQ
+	 usCk3yissceInxeqTpnb4ekL60F8C8C30FIOCSjFHf4+jFI4nnNTzeo2sEQcKFwXwG
+	 nAgCTck65aXBOTxjgdUwr0ZRr0oB5GoxXutY+REZaF2QrejvYLgnUqlRRqQCJEybGI
+	 Ag+YRpfTU4IZ93o9wqebrzs+pNzdhkVZVkoUzQYfoE5w41/MFFzwBLIoQWqTJB0VWf
+	 KnrCDFH7S/LtoPmrzv+ErSzUc/49vXEr5J831EWc5mMO4xpWcQvFwhKj0+CtE9m/bN
+	 1OuAlJl4riJAA==
+Message-ID: <104b744f-b411-46d0-bdc5-bada83743f4e@kernel.org>
+Date: Wed, 3 Dec 2025 14:46:20 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251203132044.57242-1-mlbnkm1@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 3/4] dt-bindings: ptp: Add amazon,vmclock
+To: "Chalios, Babis" <bchalios@amazon.es>, "robh@kernel.org"
+ <robh@kernel.org>, "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
+ "conor+dt@kernel.org" <conor+dt@kernel.org>,
+ "richardcochran@gmail.com" <richardcochran@gmail.com>,
+ "dwmw2@infradead.org" <dwmw2@infradead.org>,
+ "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
+Cc: "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "Graf (AWS), Alexander" <graf@amazon.de>,
+ "mzxreary@0pointer.de" <mzxreary@0pointer.de>,
+ "Cali, Marco" <xmarcalx@amazon.co.uk>, "Woodhouse, David" <dwmw@amazon.co.uk>
+References: <20251203123539.7292-1-bchalios@amazon.es>
+ <20251203123539.7292-4-bchalios@amazon.es>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20251203123539.7292-4-bchalios@amazon.es>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Melbin K Mathew <mlbnkm1@gmail.com> wrote:
-> In nft_rhash_deactivate(), rhashtable_lookup() may return NULL when the
-> set element is not found, but the function unconditionally returns
-> &he->priv.
+On 03/12/2025 13:36, Chalios, Babis wrote:
+> From: David Woodhouse <dwmw@amazon.co.uk>
+> 
+> The vmclock device provides a PTP clock source and precise timekeeping
+> across live migration and snapshot/restore operations.
+> 
+> The binding has a required memory region containing the vmclock_abi
+> structure and an optional interrupt for clock disruption notifications.
+> 
+> The full specification is at https://david.woodhou.se/VMClock.pdf
+> 
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> Signed-off-by: Babis Chalios <bchalios@amazon.es>
 
-Which is equal to 'return NULL' in that case.
 
-> Dereferencing a member of a NULL pointer is undefined behavior in C.
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
 
-&he->priv doesn't dereference he, it returns the address of the member.
-
-> Although the current struct layout places 'priv' at offset 0 (making
-> this behave like returning NULL), this is fragile and relies on
-> implementation details.
-
-Its not fragile, this file has:
-
-        BUILD_BUG_ON(offsetof(struct nft_rhash_elem, priv) != 0);
-
-to ensure 'priv is first member' requirement.
+Best regards,
+Krzysztof
 
