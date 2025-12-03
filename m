@@ -1,181 +1,237 @@
-Return-Path: <netdev+bounces-243408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2D53C9F304
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 14:53:05 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18E83C9F415
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 15:16:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 04DA63481C0
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 13:53:05 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 104E4346E3D
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 14:16:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C64B2FB987;
-	Wed,  3 Dec 2025 13:52:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E615B2FB98D;
+	Wed,  3 Dec 2025 14:16:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BLayJuEn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B29BLsml";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="BXafHmFO"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFAC32F7AC8
-	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 13:52:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1325222D7B1
+	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 14:16:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764769978; cv=none; b=TR65T3J0sxmJz7FOsL043j+KvO3JzFqQ1mgsN8UniaS51cHw1/6dDC4DKlweyGLjyniC/WiKGtQ2qb7aQfxBLAUHCIDyOZlBOn11xX68zniHCPJ5ERyKQMXGnoka2zG3YjcibTOMFD+g4YQ0k/MXuWvsFwu8GKAenLkcM/+oAPs=
+	t=1764771384; cv=none; b=pyea45Mp8kFuXlHVsEmU4g/6a5yWOkeMTnaJ4fWz07qD+E9xvtUWOOH8q6zMDdhtKZjCf7QK4bvbr7qRuzd3MDG9W8zDa705WBVUsXioQrExVNYU5JVsJ7r/i31/dw+Wh4zTJmw8D4DyKf75qSrVhkLAya2rBjBqDHafgzLhXrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764769978; c=relaxed/simple;
-	bh=iJbMxEQ9KJpTvPN+2PQqEYTSPK3xO4X8CyvtwKXMehw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hawQ5OGZx9etLbFfnugTMfITidOIt7WA6+vBlUOcTIrZbxRu2UOFo7Lv9pRs23NL1xXlij9orRdhsN1f6cDTjr2nuTDvyUdivSvxQNBVNCGRNJc8Dlr38HtIiH73mOj19n42f2QWs2uydAwOvTgpfAVp4dhvADMoJ8PKJvhjehc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BLayJuEn; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1764771384; c=relaxed/simple;
+	bh=S/P/cNG8N0lBHrNlEfCWLS5Dg2sft4fFl6BKjXwHzq0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=duVBbKSb3ApxeA8bkDIj753oBUop7HCCBq9rEsk9klaP48vynOxMmQGM9m5LqV5I+V6YcQVXA3p5SmyoNxRhzgU4Vp03duslUzf0u/tj3V/DSQilHHqxLVT3D2knBxTNsqo0jUJ7/ORi7uhj9t8ZpkTyQDu7XR3+nndsCpXkCHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B29BLsml; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=BXafHmFO; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764769975;
+	s=mimecast20190719; t=1764771382;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=J4fKd3XETzmPiJvqAM1yYm/oyS3lsGvYrwgCa3QS6rc=;
-	b=BLayJuEnZn9TzWCM3OMCNgDy39wItRfmMoZpC6HZHb1IQKMbUUIlVo2JKqqvarB3m8joB4
-	C7fZEZLRS7a18judgaXwmTGze1goSMNE/BxpNf0e2PRTsirNCCzQane/32g5T0k64LPyD5
-	EfkJ4eSetG1lYCY3IZ/A+Z8cgbl8kuE=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-678-91EOFT0ZOZi4GHrpEfqSeA-1; Wed,
- 03 Dec 2025 08:52:52 -0500
-X-MC-Unique: 91EOFT0ZOZi4GHrpEfqSeA-1
-X-Mimecast-MFC-AGG-ID: 91EOFT0ZOZi4GHrpEfqSeA_1764769970
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DC67E195605B;
-	Wed,  3 Dec 2025 13:52:49 +0000 (UTC)
-Received: from thinkpad (unknown [10.44.32.234])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DA0C119560A7;
-	Wed,  3 Dec 2025 13:52:43 +0000 (UTC)
-Date: Wed, 3 Dec 2025 14:52:39 +0100
-From: Felix Maurer <fmaurer@redhat.com>
-To: Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jaakko Karrenpalo <jkarrenpalo@gmail.com>,
-	Arvid Brodin <arvid.brodin@alten.se>, skhan@linuxfoundation.org,
-	linux-kernel-mentees@lists.linux.dev, david.hunter.linux@gmail.com,
-	khalid@kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+2fa344348a579b779e05@syzkaller.appspotmail.com,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net v3] net/hsr: fix NULL pointer dereference in
- prp_get_untagged_frame()
-Message-ID: <aTBAp3axHXSkrYKO@thinkpad>
-References: <20251129093718.25320-1-ssrane_b23@ee.vjti.ac.in>
+	bh=m6MmnBAj0sXBLiUH9SOIpXTvoEYpfaN7w1YH+RlAfVY=;
+	b=B29BLsml9UJQsoZkej5ouuzY1OhtZpbqecd//wNjd9jlIhPeFe1A5Z7quVgFPUM7HqetYb
+	YUAvfAsc1GEX4wMdPGGPpudqI2zvkeQMFfFBBA8URXh/p3rDVD8+rChUfiU20vNHKoQ+iB
+	OQfV986lA0njgZorTndFRqfLFFk6BGE=
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
+ [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-477-Lz0POv4zPIatLjpPFM7rRg-1; Wed, 03 Dec 2025 09:16:19 -0500
+X-MC-Unique: Lz0POv4zPIatLjpPFM7rRg-1
+X-Mimecast-MFC-AGG-ID: Lz0POv4zPIatLjpPFM7rRg_1764771379
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-299ddb0269eso82074985ad.0
+        for <netdev@vger.kernel.org>; Wed, 03 Dec 2025 06:16:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1764771379; x=1765376179; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=m6MmnBAj0sXBLiUH9SOIpXTvoEYpfaN7w1YH+RlAfVY=;
+        b=BXafHmFOWt1C/DfTYYpBQJTMBpC6Sx35eVlewCJSZOkUbAgTjDhL4+tAzMt88zTyRc
+         ppCok3BiAGxlBBOGhxy7ZR7caHr8YlyvWRXipJAhyHVGnhj26gVgSsz/6Pn9A2BvcZuq
+         KYHm0oZnRauAkNgGg/zoDhoc4UNZZLsJkH0SFu3t8tB72ltay0+cgGzJ9TDxjW7Wzk+n
+         2Jg0KD3Lle1R4fTDzanLY3RAft1B4EQ2DSLPCU5vY2swLJfshYn6QXMkw287U5H0Q4E4
+         zl3nNZiQakO5RiKGjQWRX57AjzRHlMIrvP1x4mfJjAQtlMf+cIc0mte7Zp46kyf7go5z
+         CETQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764771379; x=1765376179;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=m6MmnBAj0sXBLiUH9SOIpXTvoEYpfaN7w1YH+RlAfVY=;
+        b=ePAWthBpEDgXx8ODKzAW2HtwUngKiL9YbLHYAABURBx9l2mCllrAA5EN4XYHcfnabD
+         27f6IcThH3hr0Kc5GcG9iGFJo0yHwMtp4LTVD6pzlr54EXc3783IgHyiX67rcZ7rY2nf
+         G9YOHIE4A8BNaLciye+9J8KDEbSqjWhDJJCgWHsnhFalR9QxxDIamMbc+NocyO7NN0Cd
+         UHM5+roSX80eUklH82O21uYNanrvs3H0HGkQfUPbnlgILEwYJa10HpKhtFgS6ofq+yUA
+         1UPwp7yABi2aIuCUFfsyhApfOyalkKuc2wQytgM/jvbf1boBmevSxCZUdgM7soCsVnvu
+         qEMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWJYI9xP/ATNI5fvVSE7HcMHs4wuyYa5x1phlLofZr0aV26lOOro0C6dI080jwjkyj0GVpS4cc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKR6ZsLx5TIze6CLacpmjOhNbban/HNJr1ImYLb8Tylckxl38C
+	WbyLf4Y2ESAy++PmLUS7p1Ycepq6AV0qd0BiWupnujpf4QVVxyTiRniJCBZKnLjkOnRfbJAluE3
+	iWAFJ4CJk6Daai5ZsHsY35DSn7/tpv/KaF7bKmyYuMiR8TUAj6q8Pti2zf8xskfmv5MbAUa3t1v
+	JVHTYX0c9qasl2hfOMwWhthORovwVcYGRn
+X-Gm-Gg: ASbGncsbgLUEJZer6riUNoIvytlz1KqMJPwQ5qX7bvI2rA8WMQEV6y1xuT/zDdGUTug
+	fUPEpRP5Hrom42dJtFDOggCuuiPPqx1MXysDmXTVDaVLt7owvXB88OtTsZWSNBwG30NAPfBX8rl
+	4y08Q8vsSwG4aU3+W2PPNyzHg4VAqmBqKruV9XcGKeuJv3aeX+fvX9BdgQkm8+3Xcz
+X-Received: by 2002:a17:902:c94f:b0:297:f0a8:e84c with SMTP id d9443c01a7336-29d684115bdmr32639995ad.52.1764771378481;
+        Wed, 03 Dec 2025 06:16:18 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFrf4N37GhQAQz44/2vwe63Ab5H+6VDgov2x0HTUYas2MPFLA+zHDJSMoG1KnWS0PCZs11D1TbOfUh6IETwAs4=
+X-Received: by 2002:a17:902:c94f:b0:297:f0a8:e84c with SMTP id
+ d9443c01a7336-29d684115bdmr32639565ad.52.1764771377945; Wed, 03 Dec 2025
+ 06:16:17 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251129093718.25320-1-ssrane_b23@ee.vjti.ac.in>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+References: <20251126-vsock-vmtest-v12-0-257ee21cd5de@meta.com>
+ <20251126-vsock-vmtest-v12-4-257ee21cd5de@meta.com> <6cef5a68-375a-4bb6-84f8-fccc00cf7162@redhat.com>
+ <aS8oMqafpJxkRKW5@devvm11784.nha0.facebook.com> <06b7cfea-d366-44f7-943e-087ead2f25c2@redhat.com>
+ <aS9hoOKb7yA5Qgod@devvm11784.nha0.facebook.com>
+In-Reply-To: <aS9hoOKb7yA5Qgod@devvm11784.nha0.facebook.com>
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Wed, 3 Dec 2025 15:16:06 +0100
+X-Gm-Features: AWmQ_bmkUIFoQHWLakcGQ6CqBOgVjHz_GT5mK5TsKMjW9_hXYBmzRcS2k1f0tSo
+Message-ID: <CAGxU2F55uUPb7s9NwxRgU62Kxp8CS7YFkr_wXDHsE1Qd0-OJKw@mail.gmail.com>
+Subject: Re: [PATCH net-next v12 04/12] vsock: add netns support to virtio transports
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
+	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
+	Dexuan Cui <decui@microsoft.com>, Bryan Tan <bryan-bt.tan@broadcom.com>, 
+	Vishnu Dasa <vishnu.dasa@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Shuah Khan <shuah@kernel.org>, 
+	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, kvm@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, berrange@redhat.com, 
+	Sargun Dhillon <sargun@sargun.me>, Bobby Eshleman <bobbyeshleman@meta.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, Nov 29, 2025 at 03:07:18PM +0530, Shaurya Rane wrote:
-> prp_get_untagged_frame() calls __pskb_copy() to create frame->skb_std
-> but doesn't check if the allocation failed. If __pskb_copy() returns
-> NULL, skb_clone() is called with a NULL pointer, causing a crash:
-> Oops: general protection fault, probably for non-canonical address 0xdffffc000000000f: 0000 [#1] SMP KASAN NOPTI
-> KASAN: null-ptr-deref in range [0x0000000000000078-0x000000000000007f]
-> CPU: 0 UID: 0 PID: 5625 Comm: syz.1.18 Not tainted syzkaller #0 PREEMPT(full)
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-> RIP: 0010:skb_clone+0xd7/0x3a0 net/core/skbuff.c:2041
-> Code: 03 42 80 3c 20 00 74 08 4c 89 f7 e8 23 29 05 f9 49 83 3e 00 0f 85 a0 01 00 00 e8 94 dd 9d f8 48 8d 6b 7e 49 89 ee 49 c1 ee 03 <43> 0f b6 04 26 84 c0 0f 85 d1 01 00 00 44 0f b6 7d 00 41 83 e7 0c
-> RSP: 0018:ffffc9000d00f200 EFLAGS: 00010207
-> RAX: ffffffff892235a1 RBX: 0000000000000000 RCX: ffff88803372a480
-> RDX: 0000000000000000 RSI: 0000000000000820 RDI: 0000000000000000
-> RBP: 000000000000007e R08: ffffffff8f7d0f77 R09: 1ffffffff1efa1ee
-> R10: dffffc0000000000 R11: fffffbfff1efa1ef R12: dffffc0000000000
-> R13: 0000000000000820 R14: 000000000000000f R15: ffff88805144cc00
-> FS:  0000555557f6d500(0000) GS:ffff88808d72f000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000555581d35808 CR3: 000000005040e000 CR4: 0000000000352ef0
-> Call Trace:
->  <TASK>
->  hsr_forward_do net/hsr/hsr_forward.c:-1 [inline]
->  hsr_forward_skb+0x1013/0x2860 net/hsr/hsr_forward.c:741
->  hsr_handle_frame+0x6ce/0xa70 net/hsr/hsr_slave.c:84
->  __netif_receive_skb_core+0x10b9/0x4380 net/core/dev.c:5966
->  __netif_receive_skb_one_core net/core/dev.c:6077 [inline]
->  __netif_receive_skb+0x72/0x380 net/core/dev.c:6192
->  netif_receive_skb_internal net/core/dev.c:6278 [inline]
->  netif_receive_skb+0x1cb/0x790 net/core/dev.c:6337
->  tun_rx_batched+0x1b9/0x730 drivers/net/tun.c:1485
->  tun_get_user+0x2b65/0x3e90 drivers/net/tun.c:1953
->  tun_chr_write_iter+0x113/0x200 drivers/net/tun.c:1999
->  new_sync_write fs/read_write.c:593 [inline]
->  vfs_write+0x5c9/0xb30 fs/read_write.c:686
->  ksys_write+0x145/0x250 fs/read_write.c:738
->  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->  do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7f0449f8e1ff
-> Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 f9 92 02 00 48 8b 54 24 18 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 31 44 89 c7 48 89 44 24 08 e8 4c 93 02 00 48
-> RSP: 002b:00007ffd7ad94c90 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
-> RAX: ffffffffffffffda RBX: 00007f044a1e5fa0 RCX: 00007f0449f8e1ff
-> RDX: 000000000000003e RSI: 0000200000000500 RDI: 00000000000000c8
-> RBP: 00007ffd7ad94d20 R08: 0000000000000000 R09: 0000000000000000
-> R10: 000000000000003e R11: 0000000000000293 R12: 0000000000000001
-> R13: 00007f044a1e5fa0 R14: 00007f044a1e5fa0 R15: 0000000000000003
->  </TASK>
-> Add a NULL check immediately after __pskb_copy() to handle allocation
-> failures gracefully.
-
-Thank you, the fix looks good to me. Just a small nit pick (this can
-probably be done when applying): please add the empty lines around the
-trace again. Other than that:
-
-Reviewed-by: Felix Maurer <fmaurer@redhat.com>
-Tested-by: Felix Maurer <fmaurer@redhat.com>
-
-> Reported-by: syzbot+2fa344348a579b779e05@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=2fa344348a579b779e05
-> Fixes: f266a683a480 ("net/hsr: Better frame dispatch")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
-> ---
-> v3:
->   - Keep only prp_get_untagged_frame() fix as the other two
->     NETIF_F_HW_HSR_TAG_INS checks are not needed for this bug
->   - Move NULL check immediately after __pskb_copy() call
+On Tue, 2 Dec 2025 at 23:01, Bobby Eshleman <bobbyeshleman@gmail.com> wrote:
 >
-> v2:
->   - Add stack trace to commit message
->   - Target net tree with [PATCH net]
->   - Add Cc: stable@vger.kernel.org
-> ---
->  net/hsr/hsr_forward.c | 2 ++
->  1 file changed, 2 insertions(+)
+> On Tue, Dec 02, 2025 at 09:47:19PM +0100, Paolo Abeni wrote:
+> > On 12/2/25 6:56 PM, Bobby Eshleman wrote:
+> > > On Tue, Dec 02, 2025 at 11:18:14AM +0100, Paolo Abeni wrote:
+> > >> On 11/27/25 8:47 AM, Bobby Eshleman wrote:
+> > >>> @@ -674,6 +689,17 @@ static int vhost_vsock_dev_open(struct inode *inode, struct file *file)
+> > >>>           goto out;
+> > >>>   }
+> > >>>
+> > >>> + net = current->nsproxy->net_ns;
+> > >>> + vsock->net = get_net_track(net, &vsock->ns_tracker, GFP_KERNEL);
+> > >>> +
+> > >>> + /* Store the mode of the namespace at the time of creation. If this
+> > >>> +  * namespace later changes from "global" to "local", we want this vsock
+> > >>> +  * to continue operating normally and not suddenly break. For that
+> > >>> +  * reason, we save the mode here and later use it when performing
+> > >>> +  * socket lookups with vsock_net_check_mode() (see vhost_vsock_get()).
+> > >>> +  */
+> > >>> + vsock->net_mode = vsock_net_mode(net);
+> > >>
+> > >> I'm sorry for the very late feedback. I think that at very least the
+> > >> user-space needs a way to query if the given transport is in local or
+> > >> global mode, as AFAICS there is no way to tell that when socket creation
+> > >> races with mode change.
+> > >
+> > > Are you thinking something along the lines of sockopt?
+> >
+> > I'd like to see a way for the user-space to query the socket 'namespace
+> > mode'.
+> >
+> > sockopt could be an option; a possibly better one could be sock_diag. Or
+> > you could do both using dumping the info with a shared helper invoked by
+> > both code paths, alike what TCP is doing.
+> > >> Also I'm a bit uneasy with the model implemented here, as 'local' socket
+> > >> may cross netns boundaris and connect to 'local' socket in other netns
+> > >> (if I read correctly patch 2/12). That in turns AFAICS break the netns
+> > >> isolation.
+> > >
+> > > Local mode sockets are unable to communicate with local mode (and global
+> > > mode too) sockets that are in other namespaces. The key piece of code
+> > > for that is vsock_net_check_mode(), where if either modes is local the
+> > > namespaces must be the same.
+> >
+> > Sorry, I likely misread the large comment in patch 2:
+> >
+> > https://lore.kernel.org/netdev/20251126-vsock-vmtest-v12-2-257ee21cd5de@meta.com/
+> >
+> > >> Have you considered instead a slightly different model, where the
+> > >> local/global model is set in stone at netns creation time - alike what
+> > >> /proc/sys/net/ipv4/tcp_child_ehash_entries is doing[1] - and
+> > >> inter-netns connectivity is explicitly granted by the admin (I guess
+> > >> you will need new transport operations for that)?
+> > >>
+> > >> /P
+> > >>
+> > >> [1] tcp allows using per-netns established socket lookup tables - as
+> > >> opposed to the default global lookup table (even if match always takes
+> > >> in account the netns obviously). The mentioned sysctl specify such
+> > >> configuration for the children namespaces, if any.
+> > >
+> > > I'll save this discussion if the above doesn't resolve your concerns.
+> > I still have some concern WRT the dynamic mode change after netns
+> > creation. I fear some 'unsolvable' (or very hard to solve) race I can't
+> > see now. A tcp_child_ehash_entries-like model will avoid completely the
+> > issue, but I understand it would be a significant change over the
+> > current status.
+> >
+> > "Luckily" the merge window is on us and we have some time to discuss. Do
+> > you have a specific use-case for the ability to change the netns mode
+> > after creation?
+> >
+> > /P
 >
-> diff --git a/net/hsr/hsr_forward.c b/net/hsr/hsr_forward.c
-> index 339f0d220212..aefc9b6936ba 100644
-> --- a/net/hsr/hsr_forward.c
-> +++ b/net/hsr/hsr_forward.c
-> @@ -205,6 +205,8 @@ struct sk_buff *prp_get_untagged_frame(struct hsr_frame_info *frame,
->  				__pskb_copy(frame->skb_prp,
->  					    skb_headroom(frame->skb_prp),
->  					    GFP_ATOMIC);
-> +			if (!frame->skb_std)
-> +				return NULL;
->  		} else {
->  			/* Unexpected */
->  			WARN_ONCE(1, "%s:%d: Unexpected frame received (port_src %s)\n",
-> --
-> 2.34.1
+> I don't think there is a hard requirement that the mode be change-able
+> after creation. Though I'd love to avoid such a big change... or at
+> least leave unchanged as much of what we've already reviewed as
+> possible.
+
+I think the big part is done, IIUC this should just be a change to the
+uAPI and maybe simplify what we have a little (e.g., avoid saving the
+mode each socket had when it was created).
+
 >
+> In the scheme of defining the mode at creation and following the
+> tcp_child_ehash_entries-ish model, what I'm imagining is:
+> - /proc/sys/net/vsock/child_ns_mode can be set to "local" or "global"
+> - /proc/sys/net/vsock/child_ns_mode is not immutable, can change any
+>   number of times
+>
+> - when a netns is created, the new netns mode is inherited from
+>   child_ns_mode, being assigned using something like:
+>
+>           net->vsock.ns_mode =
+>                 get_net_ns_by_pid(current->pid)->child_ns_mode
+>
+> - /proc/sys/net/vsock/ns_mode queries the current mode, returning
+>   "local" or "global", returning value of net->vsock.ns_mode
+> - /proc/sys/net/vsock/ns_mode and net->vsock.ns_mode are immutable and
+>   reject writes
+>
+> Does that align with what you have in mind?
+>
+> Stefano, what are your thoughts?
+
+If we can avoid having sockets in a namespace that can be both global
+and local, perhaps it makes a lot of sense to make this change.
+
+My only concern is that there is still a small window where the mode
+can change, but we are sure that only one is picked during creation
+and then within the namespace this can be easily checked and give us
+the assurance that all sockets comply with it, right?
+
+Thanks,
+Stefano
 
 
