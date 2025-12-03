@@ -1,397 +1,127 @@
-Return-Path: <netdev+bounces-243351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243352-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id A06B9C9D8DF
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 03:07:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D763DC9D8EC
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 03:11:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 12877349A78
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 02:07:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9037C3A896D
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 02:11:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8133422A4FC;
-	Wed,  3 Dec 2025 02:07:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAA7322FE0E;
+	Wed,  3 Dec 2025 02:11:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KZYxUsUv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RKwmJMTB"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB8972628;
-	Wed,  3 Dec 2025 02:07:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6079B22A4FC
+	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 02:11:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764727654; cv=none; b=okpb6XHedBRZdkdg2V0wwoGgd6hb2cPxvapCgaqzTzDkvQtdLOT1ZA8LTG9w6CrcKzntiSrznUqxUut5ZCLDJK0DoxTXZOGRKOWQDLuJMzzqryrR19+4uDvneTFD5or8AcMg/biFTP7Yj+CDnFW9xDL3octQHD0p3RcVj5wAKcU=
+	t=1764727891; cv=none; b=gcwWiArfW+5RnrrcIpAeEVUpNAFCxi7Kacsw1ZdcX2RxIg8EKdwdj7D0XjRsMbS4hk4PpzqbdN3/Vx3TRn5Oxx59AiRPGZfoI7PNpRdrEi6Ntos05JQVUda2th5K4q7ngSkFD5YDkxi6SSSdmnxCB/zWjXuApBetRhVP47v3xcI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764727654; c=relaxed/simple;
-	bh=r6nWALuEkJZL/0Gh33Kk6EjfQ7O8FWoU7y9lb21zgYY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jxVl0KW/nUNaAS4P/+6aHt8aqIFlfTz9HkU1lS6gAo9Wg7ajW2YUakk2KUlbgbRjnVY90TMehoMFTc3eldDer9lOzi/WFSa4c8rIMDZU9fhSjAg4V1oc9I3p7olUYNKrCxjzDG2p9cJUq5fc4eeSBRvnEw5v73amkZSs1Fqy84w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=KZYxUsUv; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=HDX8/VSDKMO86crZNm//TsHiEGek8Ev3KkwK+mxZc5M=; b=KZYxUsUvELzAwVuofy7goMtGsY
-	MLjfYGUtvBuLQMw9uetYvXG2f4DIprbJTuxP0eSp+XkUfn349bxU3cJK1q3LiO4pL34AKaS7+TmSD
-	5bP32GHck9F+g8xKBUvcrRkNrId6IiP1chuhMR5Zh6wUC6imlLoDd9YmTDcsBz2DV3ak=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vQcH2-00Fl3Z-W2; Wed, 03 Dec 2025 03:07:21 +0100
-Date: Wed, 3 Dec 2025 03:07:20 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Frank Wunderlich <frankwu@gmx.de>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH RFC net-next 3/3] net: dsa: add basic initial driver for
- MxL862xx switches
-Message-ID: <c6525467-2229-4941-803d-1be5efb431c3@lunn.ch>
-References: <cover.1764717476.git.daniel@makrotopia.org>
- <d92766bc84e409e6fafdc5e3505573662dc19d08.1764717476.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1764727891; c=relaxed/simple;
+	bh=RT+BDj15EQHdd3M1qICzSCuoLzYhQ2rx+LzW6G7jhjg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=J5iZNhRYZX2ADlNF5AwlSyBWRZaSIcDVflSl29x6F4rVEaVbYVA7Fmsw+09Fs5aEEeaTmAPwJ3PC2oStsuXWTiQ9wpIWI50omhojJvEIPQl1BY7nznE2E1TNlTEVFf2PblHXMGt/UrxpjBjJ6cVoilttshgbHNxMBltHW1s4bt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RKwmJMTB; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-bdb6f9561f9so5584687a12.3
+        for <netdev@vger.kernel.org>; Tue, 02 Dec 2025 18:11:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764727889; x=1765332689; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=SrshDHaC0MNLolr0re5e//KpT3feCFpyouwfUOnJ0fk=;
+        b=RKwmJMTB8mssqNc0kS3mTPbWVr8u1v4XZ+Hz0YeKkknI+x+bzcdA/vfVjZSk+PwciI
+         caM3zUNeJaWQ7majHmfEbiYzMK774dL1Qmhk6EApatrEEN4WVLmI7tA/a9xzHozp+weU
+         NAEm76GnrnOlIKDEKGX2OLLbcPrQlKZVzdYtfncbf96+PxMUjtiTewnLDFBDTTaIakyK
+         5ZGuKFOApq3XhtbLO+kpeWv0cML/KLryHuBzqIn3jINUDmjfLakkvKY/Ad7iq2ABiXqf
+         qJM1WGX/8lA5LuoS957t/PpV8B6BMucKrhIUHuG0wCPR4MU6Mo/LLG0VFbnn60vWkcDR
+         Vn2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764727889; x=1765332689;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SrshDHaC0MNLolr0re5e//KpT3feCFpyouwfUOnJ0fk=;
+        b=hITcePdmn5thk+2eid92QjvwNuCpXulIRTljYEeLOY4Jd4XiHj87DNkqW5D/TiDIqi
+         BZiMcTxX6dFtdZ5JtZTDX6OfiyKhVRiJ2g7Azz6gKncTEg0CWBntHdfk8R84CQm6JY6C
+         UR8NdnsKOjsW85xpYfLtUJAW5XXP24thJXS+WEeXasLx6GV2GVCEQBcmsaL8OyhUHjh/
+         IMoBhbPTDGio1uC+KcHkr+T9Dmsx1zOJQpZrOkPjraARCl2PiFkpwKc+Gb+phYTmBpnX
+         9EqOjdF8c9A9u7HqdX/wAFf191g4cdXk9ABQKtgCGDkyxvQ3y3ucNmozwAybAkXVu/VZ
+         WN1w==
+X-Gm-Message-State: AOJu0Yxkbu3uTY7ASMh081h1p2iHaWc2WK6cWFN16GyRWTAgBeLdN2Vl
+	8es1SoOXnbFPbLL27mIcmZfDTPiZ8g5qj46r+/l/TRhNAczm5Vo5EFb4+ajNgA==
+X-Gm-Gg: ASbGncsBJjHQ97CFL9nkewHjE7nmhTkFWFpnT0fU31YQTtni1MGoLpZ/dlOvQDzwh/v
+	ibPVri46GalQMV3/G8cIgvuXHXEWp/xWhuEsO3ps5C+DEktKyRRCgiR6q6rY6JcZDJ4bsjta1CF
+	gk366GO1v0QzSMvGFIqFQbIATHPArAyvMA36dFYMYFuCCBxW/KpygVOJ2wCYixbiGvptPhELZCN
+	5SH3O0iTc/Ml6jiUOKqrCJfa+/4xc98lCgvcTfZNnJRcAyyOU1v6qb2sePEb27j+VcAXYIODaMo
+	+43TBxzeiIJyHx5r4KOlTArWz9ZvpFV+jRde9JoZC1RHjRAC0R601bIU0JlPRDO1uxeTJpFv8If
+	4Cs1K2z+WYHm5rPjGRdSZvDUvG1oEsJ3a9BFqOLT1G/89HuZiIJ0cPRXubsq7ieppVaIQhsVyvB
+	/AC+0IAgDegjYajMuGLYC/A/F/Jr+ap280b/NX0NmRv93CFIPYoK2N34yuBdn6/I8BhyCdaYmFB
+	qcB1rscF9colKmEmiC7a6cHOu0cJw==
+X-Google-Smtp-Source: AGHT+IHrDhdqPrcTTPMS016c0PoyhnyaRNq/OscPs8JcF7CqzUwsu6nSob+K1zCB2vo0lPY69SA3EA==
+X-Received: by 2002:a05:7300:7a8e:b0:2a4:3593:9695 with SMTP id 5a478bee46e88-2ab92e099afmr383225eec.18.1764727889285;
+        Tue, 02 Dec 2025 18:11:29 -0800 (PST)
+Received: from localhost.localdomain (ip72-203-121-181.oc.oc.cox.net. [72.203.121.181])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2a9653ca11esm59543997eec.0.2025.12.02.18.11.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Dec 2025 18:11:28 -0800 (PST)
+From: Akhilesh Nema <nemaakhilesh@gmail.com>
+To: netdev@vger.kernel.org
+Cc: stephen@networkplumber.org,
+	Akhilesh Nema <nemaakhilesh@gmail.com>
+Subject: [PATCH iproute2 1/1] lib,tc: Fix 'UINT_MAX' undeclared error observed during the build with musl libc
+Date: Tue,  2 Dec 2025 18:11:24 -0800
+Message-Id: <20251203021124.17535-1-nemaakhilesh@gmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d92766bc84e409e6fafdc5e3505573662dc19d08.1764717476.git.daniel@makrotopia.org>
+Content-Transfer-Encoding: 8bit
 
-> +/**
-> + * struct mxl862xx_ss_sp_tag
-> + * @pid: port ID (1~16)
-> + * @mask: bit value 1 to indicate valid field
-> + *	0 - rx
-> + *	1 - tx
-> + *	2 - rx_pen
-> + *	3 - tx_pen
-> + * @rx: RX special tag mode
-> + *	0 - packet does NOT have special tag and special tag is NOT inserted
-> + *	1 - packet does NOT have special tag and special tag is inserted
-> + *	2 - packet has special tag and special tag is NOT inserted
-> + * @tx: TX special tag mode
-> + *	0 - packet does NOT have special tag and special tag is NOT removed
-> + *	1 - packet has special tag and special tag is replaced
-> + *	2 - packet has special tag and special tag is NOT removed
-> + *	3 - packet has special tag and special tag is removed
-> + * @rx_pen: RX special tag info over preamble
-> + *	0 - special tag info inserted from byte 2 to 7 are all 0
-> + *	1 - special tag byte 5 is 16, other bytes from 2 to 7 are 0
-> + *	2 - special tag byte 5 is from preamble field, others are 0
-> + *	3 - special tag byte 2 to 7 are from preabmle field
-> + * @tx_pen: TX special tag info over preamble
-> + *	0 - disabled
-> + *	1 - enabled
-> + */
-> +struct mxl862xx_ss_sp_tag {
-> +	u8 pid;
-> +	u8 mask;
-> +	u8 rx;
-> +	u8 tx;
-> +	u8 rx_pen;
-> +	u8 tx_pen;
-> +} __packed;
-> +
-> +/**
-> + * enum mxl862xx_logical_port_mode - Logical port mode
-> + * @MXL862XX_LOGICAL_PORT_8BIT_WLAN: WLAN with 8-bit station ID
-> + * @MXL862XX_LOGICAL_PORT_9BIT_WLAN: WLAN with 9-bit station ID
-> + * @MXL862XX_LOGICAL_PORT_GPON: GPON OMCI context
-> + * @MXL862XX_LOGICAL_PORT_EPON: EPON context
-> + * @MXL862XX_LOGICAL_PORT_GINT: G.INT context
-> + * @MXL862XX_LOGICAL_PORT_OTHER: Others
-> + */
-> +enum mxl862xx_logical_port_mode {
-> +	MXL862XX_LOGICAL_PORT_8BIT_WLAN = 0,
-> +	MXL862XX_LOGICAL_PORT_9BIT_WLAN,
-> +	MXL862XX_LOGICAL_PORT_GPON,
-> +	MXL862XX_LOGICAL_PORT_EPON,
-> +	MXL862XX_LOGICAL_PORT_GINT,
-> +	MXL862XX_LOGICAL_PORT_OTHER = 0xFF,
-> +};
-> +
-> +/**
-> + * struct mxl862xx_ctp_port_assignment - CTP Port Assignment/association with logical port
-> + * @logical_port_id: Logical Port Id. The valid range is hardware dependent
-> + * @first_ctp_port_id: First CTP Port ID mapped to above logical port ID
-> + * @number_of_ctp_port: Total number of CTP Ports mapped above logical port ID
-> + * @mode: See &enum mxl862xx_logical_port_mode
-> + * @bridge_port_id: Bridge ID (FID)
-> + */
-> +struct mxl862xx_ctp_port_assignment {
-> +	u8 logical_port_id;
-> +	__le16 first_ctp_port_id;
-> +	__le16 number_of_ctp_port;
-> +	enum mxl862xx_logical_port_mode mode;
-> +	__le16 bridge_port_id;
-> +} __packed;
+- utils_math.c:136:20: error: 'UINT_MAX' undeclared (first use in this function)
+- tc_core.c:51:22: error: 'UINT_MAX' undeclared (first use in this function)
 
-Does the C standard define the size of an enum? Do you assume this is
-a byte?
+Signed-off-by: Akhilesh Nema <nemaakhilesh@gmail.com>
+---
+ lib/utils_math.c | 1 +
+ tc/tc_core.c     | 1 +
+ 2 files changed, 2 insertions(+)
 
+diff --git a/lib/utils_math.c b/lib/utils_math.c
+index a7e74744..fd2ddc7c 100644
+--- a/lib/utils_math.c
++++ b/lib/utils_math.c
+@@ -4,6 +4,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <math.h>
++#include <limits.h>
+ #include <asm/types.h>
+ 
+ #include "utils.h"
+diff --git a/tc/tc_core.c b/tc/tc_core.c
+index a422e02c..b13b7d78 100644
+--- a/tc/tc_core.c
++++ b/tc/tc_core.c
+@@ -11,6 +11,7 @@
+ #include <unistd.h>
+ #include <fcntl.h>
+ #include <math.h>
++#include <limits.h>
+ #include <sys/socket.h>
+ #include <netinet/in.h>
+ #include <arpa/inet.h>
+-- 
+2.25.1
 
-> +
-> +/**
-> + * struct mxl862xx_sys_fw_image_version - VLAN counter mapping configuration
-
-The text seems wrong, probably cut/paste error?
-
-> +#define MXL862XX_MMD_DEV 30
-
-Please use MDIO_MMD_VEND1
-
-> +#define MXL862XX_MMD_REG_CTRL 0
-> +#define MXL862XX_MMD_REG_LEN_RET 1
-> +#define MXL862XX_MMD_REG_DATA_FIRST 2
-> +#define MXL862XX_MMD_REG_DATA_LAST 95
-> +#define MXL862XX_MMD_REG_DATA_MAX_SIZE \
-> +		(MXL862XX_MMD_REG_DATA_LAST - MXL862XX_MMD_REG_DATA_FIRST + 1)
-> +
-> +#define MMD_API_SET_DATA_0 (0x0 + 0x2)
-> +#define MMD_API_GET_DATA_0 (0x0 + 0x5)
-> +#define MMD_API_RST_DATA (0x0 + 0x8)
-
-What is the significant of these numbers? Can you use #defines to make
-it clearer?
-
-> +
-> +static int mxl862xx_busy_wait(struct mxl862xx_priv *dev)
-> +{
-> +	int ret, i;
-> +
-> +	for (i = 0; i < MAX_BUSY_LOOP; i++) {
-> +		ret = __mdiobus_c45_read(dev->bus, dev->sw_addr,
-> +					 MXL862XX_MMD_DEV,
-> +					 MXL862XX_MMD_REG_CTRL);
-> +		if (ret < 0)
-> +			return ret;
-> +
-> +		if (ret & CTRL_BUSY_MASK)
-> +			usleep_range(10, 15);
-> +		else
-> +			return 0;
-> +	}
-> +
-> +	return -ETIMEDOUT;
-
-We already have phy_read_mmd_poll_timeout(). Maybe you should add a
-__mdiobus_c45_read_poll_timeout()?
-
-Also, as far as i can see, __mdiobus_c45_read() is always called with
-the same first three parameters. Maybe add a mxl862xx_reg_read()?  and
-a mxl862xx_reg_write()?
-
-> +static int mxl862xx_send_cmd(struct mxl862xx_priv *dev, u16 cmd, u16 size,
-> +			     s16 *presult)
-> +{
-> +	int ret;
-> +
-> +	ret = __mdiobus_c45_write(dev->bus, dev->sw_addr, MXL862XX_MMD_DEV,
-> +				  MXL862XX_MMD_REG_LEN_RET, size);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = __mdiobus_c45_write(dev->bus, dev->sw_addr, MXL862XX_MMD_DEV,
-> +				  MXL862XX_MMD_REG_CTRL, cmd | CTRL_BUSY_MASK);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = mxl862xx_busy_wait(dev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = __mdiobus_c45_read(dev->bus, dev->sw_addr, MXL862XX_MMD_DEV,
-> +				 MXL862XX_MMD_REG_LEN_RET);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	*presult = ret;
-> +	return 0;
-> +}
-> +
-> +int mxl862xx_api_wrap(struct mxl862xx_priv *priv, u16 cmd, void *_data,
-> +		      u16 size, bool read)
-> +{
-> +	u16 *data = _data;
-> +	s16 result = 0;
-> +	u16 max, i;
-> +	int ret;
-> +
-> +	mutex_lock_nested(&priv->bus->mdio_lock, MDIO_MUTEX_NESTED);
-> +
-> +	max = (size + 1) / 2;
-> +
-> +	ret = mxl862xx_busy_wait(priv);
-> +	if (ret < 0)
-> +		goto out;
-> +
-> +	for (i = 0; i < max; i++) {
-> +		u16 off = i % MXL862XX_MMD_REG_DATA_MAX_SIZE;
-> +
-> +		if (i && off == 0) {
-> +			/* Send command to set data when every
-> +			 * MXL862XX_MMD_REG_DATA_MAX_SIZE of WORDs are written.
-> +			 */
-> +			ret = mxl862xx_set_data(priv, i);
-> +			if (ret < 0)
-> +				goto out;
-> +		}
-> +
-> +		__mdiobus_c45_write(priv->bus, priv->sw_addr,
-> +				    MXL862XX_MMD_DEV,
-> +				    MXL862XX_MMD_REG_DATA_FIRST + off,
-> +				    le16_to_cpu(data[i]));
-> +	}
-> +
-> +	ret = mxl862xx_send_cmd(priv, cmd, size, &result);
-> +	if (ret < 0)
-> +		goto out;
-> +
-> +	if (result < 0) {
-> +		ret = result;
-> +		goto out;
-> +	}
-
-If i'm reading mxl862xx_send_cmd() correct, result is the value of a
-register. It seems unlikely this is a Linux error code?
-
-> +
-> +	for (i = 0; i < max && read; i++) {
-
-That is an unusual way to use read.
-
-> +		u16 off = i % MXL862XX_MMD_REG_DATA_MAX_SIZE;
-> +
-> +		if (i && off == 0) {
-> +			/* Send command to fetch next batch of data
-> +			 * when every MXL862XX_MMD_REG_DATA_MAX_SIZE of WORDs
-> +			 * are read.
-> +			 */
-> +			ret = mxl862xx_get_data(priv, i);
-> +			if (ret < 0)
-> +				goto out;
-> +		}
-> +
-> +		ret = __mdiobus_c45_read(priv->bus, priv->sw_addr,
-> +					 MXL862XX_MMD_DEV,
-> +					 MXL862XX_MMD_REG_DATA_FIRST + off);
-> +		if (ret < 0)
-> +			goto out;
-> +
-> +		if ((i * 2 + 1) == size) {
-> +			/* Special handling for last BYTE
-> +			 * if it's not WORD aligned.
-> +			 */
-> +			*(uint8_t *)&data[i] = ret & 0xFF;
-> +		} else {
-> +			data[i] = cpu_to_le16((u16)ret);
-> +		}
-> +	}
-> +	ret = result;
-> +
-> +out:
-> +	mutex_unlock(&priv->bus->mdio_lock);
-> +	return ret;
-> +}
-> +#define MXL862XX_API_WRITE(dev, cmd, data) \
-> +	mxl862xx_api_wrap(dev, cmd, &(data), sizeof((data)), false)
-> +#define MXL862XX_API_READ(dev, cmd, data) \
-> +	mxl862xx_api_wrap(dev, cmd, &(data), sizeof((data)), true)
-
-> +/* PHY access via firmware relay */
-> +static int mxl862xx_phy_read_mmd(struct mxl862xx_priv *priv, int port,
-> +				 int devadd, int reg)
-> +{
-> +	struct mdio_relay_data param = {
-> +		.phy = port,
-> +		.mmd = devadd,
-> +		.reg = reg & 0xffff,
-> +	};
-> +	int ret;
-> +
-> +	ret = MXL862XX_API_READ(priv, INT_GPHY_READ, param);
-
-That looks a bit ugly, using a macro as a function name. I would
-suggest tiny functions rather than macros. The compiler should do the
-right thing.
-
-> +/* Configure CPU tagging */
-> +static int mxl862xx_configure_tag_proto(struct dsa_switch *ds, int port,
-> +					bool enable)
-> +{
-> +	struct mxl862xx_ss_sp_tag tag = {
-> +		.pid = DSA_MXL_PORT(port),
-> +		.mask = BIT(0) | BIT(1),
-> +		.rx = enable ? 2 : 1,
-> +		.tx = enable ? 2 : 3,
-> +	};
-
-There is a bit comment at the beginning of the patch about these, but
-it does not help much here. Please could you add some #defines for
-these magic numbers.
-
-> +/* Reset switch via MMD write */
-> +static int mxl862xx_mmd_write(struct dsa_switch *ds, int reg, u16 data)
-
-The comment does not fit what the function does.
-
-> +{
-> +	struct mxl862xx_priv *priv = ds->priv;
-> +	int ret;
-> +
-> +	mutex_lock(&priv->bus->mdio_lock);
-> +	ret = __mdiobus_c45_write(priv->bus, priv->sw_addr, MXL862XX_MMD_DEV,
-> +				  reg, data);
-> +	mutex_unlock(&priv->bus->mdio_lock);
-
-There is no point using the unlocked version if you wrap it in
-lock/unlock...
-
-> +/* Setup */
-> +static int mxl862xx_setup(struct dsa_switch *ds)
-> +{
-> +	struct mxl862xx_priv *priv = ds->priv;
-> +	int ret, i;
-> +
-> +	for (i = 0; i < ds->num_ports; i++) {
-> +		if (dsa_is_cpu_port(ds, i)) {
-> +			priv->cpu_port = i;
-> +			break;
-> +		}
-> +	}
-> +
-> +	ret = mxl862xx_setup_mdio(ds);
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* Software reset */
-> +	ret = mxl862xx_mmd_write(ds, 1, 0);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = mxl862xx_mmd_write(ds, 0, 0x9907);
-
-More magic numbers.
-
-	Andrew
 
