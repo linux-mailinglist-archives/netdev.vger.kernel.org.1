@@ -1,115 +1,191 @@
-Return-Path: <netdev+bounces-243454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DACDCA19E0
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 22:07:17 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0610CA1777
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 20:49:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 038E13004416
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 21:07:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CDFD7301FC3E
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 19:44:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC8B92C21CD;
-	Wed,  3 Dec 2025 21:07:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C926136351;
+	Wed,  3 Dec 2025 19:44:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="KYuv9aX5"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=infradead.org header.i=@infradead.org header.b="h5YH1vSU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A482D0636;
-	Wed,  3 Dec 2025 21:07:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E99682641CA;
+	Wed,  3 Dec 2025 19:44:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764796034; cv=none; b=pQpOSKBW8dnsgTZtJV0D0wi4hCN42dy8zs3U5pesTI8Ak3WEfiK22XZO3pX4e8ORMSu8fGaioM5A3GDyxcEEHVKhQVMeso9GcMDc64ZUo4FQ+qDOEAna1e8KiUJl2YFv9Jya9jPiL0yFHV9CUOQC+NP3GnTspaNaC6dG7+xcN/4=
+	t=1764791058; cv=none; b=F7hligciqngPFx9usbmYXCJLZnc2EUDao2X+ABa9xnghEtBRNwjovaTzKDhR41kl7/F0K/el674V8gMqJw46McXcPo+dR4oC5wtAya3owoY3HPwGPpEc0TprOQpWzRGVl1LKzOjnL28n1NlM8+IypIG/dw1b7WC796cOg5ER4gk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764796034; c=relaxed/simple;
-	bh=qVDJVAb7m8LhZF55QvKoiTvZ29MfCyKYtS45an5OrSc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UIsdWrrf2buBrbjl9YdMBNw8+LvtGN36gAZh1nyFKdwvTeOUipSQNxEJGEPkms/DXchOYP0g/YT9KxF9GOcP3qDXTmXXJp/GHjWYEN8qwi/nEDTT4dy8yo1wlwpUZZVN4Pp4jfX1byj7KDVMZuhZToQRh3aYWy7IHBPDmKRzqoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=KYuv9aX5; arc=none smtp.client-ip=80.241.56.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [IPv6:2001:67c:2050:b231:465::2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4dM9F24YD6z9tyH;
-	Wed,  3 Dec 2025 22:07:02 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1764796022;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eAh1SlQBuHPbEjaVW+h37YQVPv85RZ8746aPTiKpCV0=;
-	b=KYuv9aX5XxgxY4N92efD75JwR8wamPSYFb7hskD2qwoCt7XgyHZJtHTUnPIoMZE2A3ElPo
-	xpGmn5fxjYc06h327VzMb8Slv82Y13gOiirLboMtOUUyAgEg33cei36SpHHbd6NjydeNr3
-	aVnqKeSWAyRq6vOtCusemZ7eSmMz5/6ZW5mfg+SJN6ARCmUbh6OcDO9Nvu+atf7SS0ltgk
-	Y1DcAMyJmR5A62x6eQRGuuff1o/nU790BJgGB34moaQG62D4zgb1NhDPCjfZnDDy/qlpKu
-	rnjg0I5DeB1A47O7otMCcOXgIm0q3lj/kBgjw+dvJCrhOUq4fKh1/uhksi8TOw==
-Message-ID: <c52624fb-9d5f-4eb7-af3f-e2cef872a2ba@mailbox.org>
-Date: Wed, 3 Dec 2025 20:21:00 +0100
+	s=arc-20240116; t=1764791058; c=relaxed/simple;
+	bh=+GteTJITDJWUPgxSb5K+cQRISKDwdQ2z7K0PjUokVNU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZAWod02aNPZMwtxP4RAG9rw/u32BrvGGTGbPGP0rDURH6cy/HXbiAnRBdZvK1ycSTcaskkXAa7yxLAVZBQy3X7hAWdVwoHJweBdYLwyxKCqCBsrty/gk/Sj9mMmG7Hd/0nhFE0rh+X/5jv1IaDNFG6CbU1Ql5QNxw/IfKGWq6Pk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=evilplan.org; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=fail (0-bit key) header.d=infradead.org header.i=@infradead.org header.b=h5YH1vSU reason="key not found in DNS"; arc=none smtp.client-ip=62.89.141.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=evilplan.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=66RqrQBWZlK0e+Y9teUD6nm1X7l+MEUOdypfNKGmHo8=; b=h5YH1vSU2vK7HFcW72fd0Nj0b3
+	tUDNsQjmAhPRqj+CsmtRTkjRPA/U1lCf4S4y+veK4YEbTLPchnNFpFw3QvmlKtguKmzDnvq/qx1Op
+	jm8SrNi1jM7ie0r7wp8cqVoYMwjQi5BWS3lK0a3nyIzAfc7z9quS6ErK2yxM/g14oAdfP4EAxP9YW
+	wqXjJlzThUj//30/8uKH3h0eJCJ68SpZyuIbseeQEPSyfimlw3jXjWIp8yyI+vA3ztx4HXJCipGRB
+	SDUjxbeFCZH0ZI25JNdh3zNI8vAGSq51y13tV66xwJfuFJb0zeKb1ymnCKSrjhjJNSwLoKF6taEvN
+	1yrGdqmQ==;
+Received: from jlbec by zeniv.linux.org.uk with local (Exim 4.99 #2 (Red Hat Linux))
+	id 1vQslz-0000000Ds9R-10IH;
+	Wed, 03 Dec 2025 19:44:23 +0000
+Date: Wed, 3 Dec 2025 11:44:02 -0800
+From: Joel Becker <jlbec@evilplan.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: Andreas Hindborg <a.hindborg@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org, hch@infradead.org,
+	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+	gustavold@gmail.com, asantostc@gmail.com, calvin@wbinvd.org,
+	kernel-team@meta.com
+Subject: Re: [PATCH RFC 1/2] configfs: add kernel-space item registration API
+Message-ID: <aTCTAqEh0qppzVPn@google.com>
+Mail-Followup-To: Breno Leitao <leitao@debian.org>,
+	Andreas Hindborg <a.hindborg@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org, hch@infradead.org,
+	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+	gustavold@gmail.com, asantostc@gmail.com, calvin@wbinvd.org,
+	kernel-team@meta.com
+References: <20251202-configfs_netcon-v1-0-b4738ead8ee8@debian.org>
+ <20251202-configfs_netcon-v1-1-b4738ead8ee8@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [net-next,PATCH 3/3] net: phy: realtek: Add property to enable
- SSC
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Aleksander Jan Bajkowski <olek2@wp.pl>, Andrew Lunn <andrew@lunn.ch>,
- Conor Dooley <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Florian Fainelli <f.fainelli@gmail.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Michael Klein <michael@fossekall.de>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org
-References: <20251130005843.234656-1-marek.vasut@mailbox.org>
- <20251130005843.234656-3-marek.vasut@mailbox.org>
- <aTAOe4c48zyIjVcb@shell.armlinux.org.uk>
- <20251203123430.zq7sjxfwb5kkff7q@skbuf>
- <aTB0x6JGcGUM04UX@shell.armlinux.org.uk>
-Content-Language: en-US
-From: Marek Vasut <marek.vasut@mailbox.org>
-In-Reply-To: <aTB0x6JGcGUM04UX@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-MBO-RS-ID: c43c75a9ce634b39c52
-X-MBO-RS-META: sj3uknpc7hwyhgtqrd79d6rqrmm4d475
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251202-configfs_netcon-v1-1-b4738ead8ee8@debian.org>
+X-Burt-Line: Trees are cool.
+X-Red-Smith: Ninety feet between bases is perhaps as close as man has ever
+ come to perfection.
+Sender: Joel Becker <jlbec@ftp.linux.org.uk>
 
-On 12/3/25 6:35 PM, Russell King (Oracle) wrote:
-> On Wed, Dec 03, 2025 at 02:34:30PM +0200, Vladimir Oltean wrote:
->> On Wed, Dec 03, 2025 at 10:18:35AM +0000, Russell King (Oracle) wrote:
->>> On Sun, Nov 30, 2025 at 01:58:34AM +0100, Marek Vasut wrote:
->>>> Add support for spread spectrum clocking (SSC) on RTL8211F(D)(I)-CG,
->>>> RTL8211FS(I)(-VS)-CG, RTL8211FG(I)(-VS)-CG PHYs. The implementation
->>>> follows EMI improvement application note Rev. 1.2 for these PHYs.
->>>>
->>>> The current implementation enables SSC for both RXC and SYSCLK clock
->>>> signals. Introduce new DT property 'realtek,ssc-enable' to enable the
->>>> SSC mode.
->>>
->>> Should there be separate properties for CLKOUT SSC enable and RXC SSC
->>> enable?
->>
->> That's what we're trying to work out. I was going to try and give an
->> example (based on stmmac) why you wouldn't want RXC SSC but you'd still
->> want CLKOUT SSC, but it doesn't seem to hold water based on your feedback.
->> Having one device tree property to control both clocks is a bit simpler.
+On Tue, Dec 02, 2025 at 07:29:01AM -0800, Breno Leitao wrote:
+> Add configfs_register_item() and configfs_unregister_item() functions
+> to allow kernel modules to register configfs items whose lifecycle is
+> controlled by kernel space rather than userspace.
 > 
-> The problem I see is that if we introduce a single property for both,
-> we then need to maintain this single property ad infinitum. If we
-> later find that we need separate control, we could end up with three
-> properties - the combined one, and two for individual controls.
+> This is useful for subsystems that need to expose configuration items
+> that are created based on kernel events (like boot parameters) rather
+> than explicit userspace mkdir operations. The items registered this
+> way are marked as default items (CONFIGFS_USET_DEFAULT) and cannot be
+> removed via rmdir.
 > 
-> If we are to go with a single property, then I think we should have at
-> least discussed what we would do if we need separate control.
+> The API follows the same pattern as configfs_register_group() but for
+> individual items:
+> - configfs_register_item() links the item into the parent group's
+>   hierarchy and creates the filesystem representation
+> - configfs_unregister_item() reverses the registration, removing the
+>   item from configfs
 > 
-> If we go with two properties now, then we don't have to consider this,
-> and we will only ever have the two properties rather than three.
-It seems the CLKOUT and RXC SSC can be enabled entirely separately, so I 
-think two properties are the way to go ?
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> ---
+>  fs/configfs/dir.c        | 134 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  include/linux/configfs.h |   4 +++
+>  2 files changed, 138 insertions(+)
+> 
+> diff --git a/fs/configfs/dir.c b/fs/configfs/dir.c
+> index 81f4f06bc87e..f7224bc51826 100644
+> --- a/fs/configfs/dir.c
+> +++ b/fs/configfs/dir.c
+> @@ -1866,6 +1866,140 @@ void configfs_unregister_default_group(struct config_group *group)
+>  }
+>  EXPORT_SYMBOL(configfs_unregister_default_group);
+>  
+> +/**
+> + * configfs_register_item() - registers a kernel-created item with a parent group
+> + * @parent_group: parent group for the new item
+> + * @item: item to be registered
+> + *
+> + * This function allows kernel code to register configfs items whose lifecycle
+> + * is controlled by kernel space rather than userspace (via mkdir/rmdir).
+> + * The item must be already initialized with config_item_init_type_name().
+> + *
+> + * Return: 0 on success, negative errno on failure
+> + */
+> +int configfs_register_item(struct config_group *parent_group,
+> +			   struct config_item *item)
+> +{
+> +	struct configfs_subsystem *subsys = parent_group->cg_subsys;
+> +	struct configfs_fragment *frag;
+> +	struct dentry *parent, *child;
+> +	struct configfs_dirent *sd;
+> +	int ret;
+> +
+> +	if (!subsys || !item->ci_name)
+> +		return -EINVAL;
+> +
+> +	frag = new_fragment();
+> +	if (!frag)
+> +		return -ENOMEM;
+> +
+> +	parent = parent_group->cg_item.ci_dentry;
+> +	/* Allocate dentry for the item */
+> +	child = d_alloc_name(parent, item->ci_name);
+> +	if (!child) {
+> +		put_fragment(frag);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	mutex_lock(&subsys->su_mutex);
+> +	link_obj(&parent_group->cg_item, item);
+> +	mutex_unlock(&subsys->su_mutex);
+> +
+> +	inode_lock_nested(d_inode(parent), I_MUTEX_PARENT);
+> +	d_add(child, NULL);
+> +
+> +	/* Attach the item to the filesystem */
+> +	ret = configfs_attach_item(&parent_group->cg_item, item, child, frag);
+> +	if (ret)
+> +		goto err_out;
+
+The behavior here is significantly different than the flow in
+configfs_mkdir().  How do we a) ensure we're getting the right outcome
+b) make sure that commensurate changes in one are propagated to the
+other?
+
+For example, we take pains to get module pinning right in
+configfs_mkdir(), both for the parent_item and the child item.  I see no
+pinning here.  I see no handling of races with unregister (like the
+teardown races with rmdir).
+
+Some of these things are just different with kernel-registered items.  I
+presume you are declaring the child item must be fully created, which is
+why this code doesn't call ->make_item().  But there is no documentation
+of that requirement.
+
+Thanks,
+Joel
+
+-- 
+
+"Baby, even the losers
+ Get luck sometimes.
+ Even the losers
+ Keep a little bit of pride."
+
+			http://www.jlbec.org/
+			jlbec@evilplan.org
 
