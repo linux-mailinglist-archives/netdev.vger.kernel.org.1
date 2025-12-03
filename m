@@ -1,286 +1,153 @@
-Return-Path: <netdev+bounces-243364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20D95C9DFD8
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 07:57:24 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19CF4C9E082
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 08:22:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 134F54E0732
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 06:57:23 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8F9C334B030
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 07:22:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62D6A298CD5;
-	Wed,  3 Dec 2025 06:57:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E992628C00C;
+	Wed,  3 Dec 2025 07:22:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KZ44NscF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sMnCW3n5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0D5E287245
-	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 06:57:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C128E8405C;
+	Wed,  3 Dec 2025 07:22:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764745041; cv=none; b=eT5hUbOlYDTEN5h+N5RJ6ajnU2VjC+QHYUPs8t3yr9ATXEVQQ9gto7gJ/Q4DNwS+f/n9YzJc3MkqKJc0eDZLMa845qI5Ev1DCLufnFjrZ6sUsbfII50gElvR4hACmAGt48l2uO/XQ/uJGKwQr9LGgSGLOZQDrs8v85wGeKS25/s=
+	t=1764746534; cv=none; b=jCoh5AQgEF5V8Okj90/sZbN/o3TVqxLCMxHezm4EVgeMBdBiBZ/zHcGhhxFlNiWSuex1/7uiFFj5CJHwTUZeFuEadhfgprZMyfgbfCs2pwtAeG7TIo+cjN79ulJbvxIwbDcsd2q3u4/JoCHOKSmKCdqtdehi3+G/eQlFE9/3UNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764745041; c=relaxed/simple;
-	bh=XoirmMsIbUrnKVY219fDurnSiihr2y22Pj2lChd1308=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cjB/KNGmtX+HPKDUyH+4ETxRUFAxT242BGMG0dnhOQpX8aOcq8oey2xTCmCD63SLEVKS5tXI+ytf/hJCgV4NK8p2Kq+w6M+MeNHKtVbrZT2oeuwLp82/BYK1xsMGvLRiaivLOJ/yS0cT+Q3FwAcLaA55awEWdLZZ9TVMBfyycqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KZ44NscF; arc=none smtp.client-ip=209.85.167.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-4511f736011so447483b6e.0
-        for <netdev@vger.kernel.org>; Tue, 02 Dec 2025 22:57:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764745039; x=1765349839; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+3ZaO7ityhgj467PTqGix8dihueLNbeOXZ/q7xCtxgk=;
-        b=KZ44NscFv/WpVGaokybEg94XL0dEurcdBS0zwYnX36Kt21k88UHl6FzznHgydmtdHi
-         WnLpsT+n5mFvNTsLcIancJaB6AX2dWiU3PDvWNpUQAONbrmlakB4ylEDv5fcZa2WpFdI
-         oqSBEbxfdq57lMYFbMLdd06wUUxnuWkZ9sEektQ6+yfa1jS+4CG0iF1Hrrd/MYRwClpM
-         qmok/gvZ0DaXjVrDFMqdvavrExvcpQ+9+/Gm6lsCpap6F5ukde1OImIov97mOYLJRjF7
-         a3S0M0fAj3KEfliFg1EFCImFo8+vZgWoIkLQxse0tzcRRAVZ1yD43tsOACC52sI0lv3K
-         M5PA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764745039; x=1765349839;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=+3ZaO7ityhgj467PTqGix8dihueLNbeOXZ/q7xCtxgk=;
-        b=Egc36Inuoo/1l8A4YApKlVAX7/OatcJEAO2cBFf73SLIx/w4Ag1gFhCBJOtCdyWcob
-         qkIEp17CDm3ZWonTo+BUHCqYxGOHQnp6+Kw4xj54GoMIjMKYZ+demeLotvRUSFxnrElS
-         sViWnXfuoU5s4QFdZQVt/WeJs/hbqSh0k+Es5wHGn3veLvcDoqMY+g/RKotAUfE4/P7B
-         /NX7PedMI3ZOGfLd9s0/0UvNT2ejc64QNAVr6RmrntIL15yiYYMygO1XjnSETl3DCWH+
-         eS1ZiAV9AmmmSRoA/bPxhRWBtsHbBUqhH6DWUaguOK1UKAKYO3F0dCFccJxT8TaX3+yW
-         EhQg==
-X-Forwarded-Encrypted: i=1; AJvYcCWad4vV0Gjtg6mOHhNoRbmIzn3Ch0Jih/6gccEQx4jUmLxqVGe+SzGXRwkD+Lt2lJ5k/JL50FM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwfKgfXFXX8+n8kJtxGHET4WTFiEgMOV7UkMBu2NZWvA22WagZA
-	H3lVTLV4zn3R6+ALIm2XRJ1Al4YGhw9+nMHMjazfcsExBPWhsnxxp42LVBc4ivZmquLb8jhNQQz
-	4FRRgDgjT7P10CZvkmyKutIz41jpfysM=
-X-Gm-Gg: ASbGncvVD3W/OpQfrxkJGB+S6emfFjIMdHbV8jiIvTxpCT3Wt7ZjL/D6c2ktExrnGt+
-	5VJ4W3HN8UrgBH4qpvwF8Ha90acCmPCABBqDhTz0HiOBnuo8gJrStDGfH2iZl9o2dwy1zQFQ9ZR
-	/TOoj+BEFuFmzeG+wtNmJ0bdT73w+ZYnYExbs2wyq9LDJfZt4thobBGhPQouMMvvIZdYkxKDDzx
-	Ij5FwhBEP2C9yMIOYMSZlzIhETlOuaB6yBT5ROtW1fzLPRCwFdRwZDzH03Sg6Sh5Z6yyADMAx/d
-	COST
-X-Google-Smtp-Source: AGHT+IF3IfvypgUYGurMUCaHCYmA1wnqVLE+RKKdBUhWPmOdQLu/7KjC7A+Ywh7iqoKtRPMWrxltCg9QQ1Sb4HUoROg=
-X-Received: by 2002:a05:6808:1393:b0:450:bc8e:cfcd with SMTP id
- 5614622812f47-4535d2bab08mr3425962b6e.4.1764745038563; Tue, 02 Dec 2025
- 22:57:18 -0800 (PST)
+	s=arc-20240116; t=1764746534; c=relaxed/simple;
+	bh=iRKIZ/UVj8DgrMSiGZAJAYyCb/PzlMsqo2aJSitCVtw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZwzHhfWUWqQQBpwRQuoi/gGWnWZm9gqeS+iMpqi7+gMiMfvK/l2sbaOqUSTCqFUcFkQdVhNW70oL5/xtcW/4ssqnLRIYu7LeerbAuySUROikiXAgVGIO5Rgh8sGegu0W3i9mzdLoPrcfMEGSzUFAk6+9IO0SerJ/1aTrc3i6mss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sMnCW3n5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 506CCC4CEFB;
+	Wed,  3 Dec 2025 07:22:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764746534;
+	bh=iRKIZ/UVj8DgrMSiGZAJAYyCb/PzlMsqo2aJSitCVtw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=sMnCW3n521KTEUO+y+vtNh2JBb73mkJIXwA0E59BgKhPQLM1w7s++0HbUVv3EU13v
+	 7I1IkevI1WtDp6RnERBg+ERG1T5aG17x5FFCXAwgcPJwi5rbxuobxa6z9swnf+/oJN
+	 CPcgF7LThesMtYJpC9Sz8rk3wgnHuMJ9zPQkV2puBpSje+Jcv3PaflFRmNIARxtP1r
+	 N5MzPi2wXeOgWjsJQXfuf9SEMLPxZ/7DLNyp+X/9rk+QmRSEYIVDfhMBJu/7pWx00x
+	 wqHLGe14agjCeTJCYxbGD6zxgkVXU7tHIkhuTsfOmRGPi0a4QC3cpFMER5jFbQLYBN
+	 4GBauTr+hbgzg==
+Message-ID: <4c1ca544-9f5d-48e1-bd54-4e84f0234cf4@kernel.org>
+Date: Wed, 3 Dec 2025 08:22:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251128134601.54678-1-kerneljasonxing@gmail.com>
- <20251128134601.54678-3-kerneljasonxing@gmail.com> <8fa70565-0f4a-4a73-a464-5530b2e29fa5@redhat.com>
- <CAL+tcoDk0f+p2mRV=2auuYfTLA-cPPe-1az7NfEnw+FFaPR5kA@mail.gmail.com>
-In-Reply-To: <CAL+tcoDk0f+p2mRV=2auuYfTLA-cPPe-1az7NfEnw+FFaPR5kA@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 3 Dec 2025 14:56:42 +0800
-X-Gm-Features: AWmQ_bmz_RmDu8NKfFourl8O0AeCenJ_Jlz81wp6nL9V0Inc5hsglqP6YpwY3x0
-Message-ID: <CAL+tcoBMRdMevWCS1puVD4zEDt+69S6t2r6Ov8tw7zhgq_n=PA@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 2/3] xsk: use atomic operations around
- cached_prod for copy mode
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	bjorn@kernel.org, magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
-	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org, 
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, 
-	horms@kernel.org, andrew+netdev@lunn.ch, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/4] dt-bindings: clock: Add device tree bindings for
+ vmclock
+To: "Chalios, Babis" <bchalios@amazon.es>,
+ "richardcochran@gmail.com" <richardcochran@gmail.com>,
+ "dwmw2@infradead.org" <dwmw2@infradead.org>,
+ "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Cc: "Graf (AWS), Alexander" <graf@amazon.de>,
+ "mzxreary@0pointer.de" <mzxreary@0pointer.de>,
+ "Woodhouse, David" <dwmw@amazon.co.uk>
+References: <20251202201118.20209-1-bchalios@amazon.es>
+ <20251202201118.20209-4-bchalios@amazon.es>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20251202201118.20209-4-bchalios@amazon.es>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Paolo,
+On 02/12/2025 21:11, Chalios, Babis wrote:
+> From: David Woodhouse <dwmw@amazon.co.uk>
+> 
+> Add device tree bindings for the vmclock device, similar to the existing
+> vmgenid bindings. The vmclock device provides a PTP clock source and
+> precise timekeeping across live migration and snapshot/restore operations.
+> 
+> The bindings specify a required memory region containing the vmclock_abi
+> structure and an optional interrupt for clock disruption notifications.
+> 
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> Signed-off-by: Babis Chalios <bchalios@amazon.es>
 
-On Sat, Nov 29, 2025 at 8:55=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> On Fri, Nov 28, 2025 at 10:20=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> =
-wrote:
-> >
-> > On 11/28/25 2:46 PM, Jason Xing wrote:
-> > > From: Jason Xing <kernelxing@tencent.com>
-> > >
-> > > Use atomic_try_cmpxchg operations to replace spin lock. Technically
-> > > CAS (Compare And Swap) is better than a coarse way like spin-lock
-> > > especially when we only need to perform a few simple operations.
-> > > Similar idea can also be found in the recent commit 100dfa74cad9
-> > > ("net: dev_queue_xmit() llist adoption") that implements the lockless
-> > > logic with the help of try_cmpxchg.
-> > >
-> > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > > ---
-> > > Paolo, sorry that I didn't try to move the lock to struct xsk_queue
-> > > because after investigation I reckon try_cmpxchg can add less overhea=
-d
-> > > when multiple xsks contend at this point. So I hope this approach
-> > > can be adopted.
-> >
-> > I still think that moving the lock would be preferable, because it make=
-s
-> > sense also from a maintenance perspective.
->
-> I can see your point here. Sure, moving the lock is relatively easier
-> to understand. But my take is that atomic changes here are not that
-> hard to read :) It has the same effect as spin lock because it will
-> atomically check, compare and set in try_cmpxchg().
->
-> > Can you report the difference
-> > you measure atomics vs moving the spin lock?
->
-> No problem, hopefully I will give a detailed report next week because
-> I'm going to apply it directly in production where we have multiple
-> xsk sharing the same umem.
 
-I'm done with the test in production where a few applications rely on
-multiple xsks sharing the same pool to send UDP packets. Here are
-significant numbers from bcc tool that recorded the latency caused by
-these particular functions:
+Please use scripts/get_maintainers.pl to get a list of necessary people
+and lists to CC. It might happen, that command when run on an older
+kernel, gives you outdated entries. Therefore please be sure you base
+your patches on recent Linux kernel.
 
-1. use spin lock
-$ sudo ./funclatency xsk_cq_reserve_locked
-Tracing 1 functions for "xsk_cq_reserve_locked"... Hit Ctrl-C to end.
-^C
-     nsecs               : count     distribution
-         0 -> 1          : 0        |                                      =
-  |
-         2 -> 3          : 0        |                                      =
-  |
-         4 -> 7          : 0        |                                      =
-  |
-         8 -> 15         : 0        |                                      =
-  |
-        16 -> 31         : 0        |                                      =
-  |
-        32 -> 63         : 0        |                                      =
-  |
-        64 -> 127        : 0        |                                      =
-  |
-       128 -> 255        : 25308114 |**                                    =
-  |
-       256 -> 511        : 283924647 |**********************               =
-   |
-       512 -> 1023       : 501589652 |*************************************=
-***|
-      1024 -> 2047       : 93045664 |*******                               =
-  |
-      2048 -> 4095       : 746395   |                                      =
-  |
-      4096 -> 8191       : 424053   |                                      =
-  |
-      8192 -> 16383      : 1041     |                                      =
-  |
-     16384 -> 32767      : 0        |                                      =
-  |
-     32768 -> 65535      : 0        |                                      =
-  |
-     65536 -> 131071     : 0        |                                      =
-  |
-    131072 -> 262143     : 0        |                                      =
-  |
-    262144 -> 524287     : 0        |                                      =
-  |
-    524288 -> 1048575    : 6        |                                      =
-  |
-   1048576 -> 2097151    : 2        |                                      =
-  |
+Tools like b4 or scripts/get_maintainer.pl provide you proper list of
+people, so fix your workflow. Tools might also fail if you work on some
+ancient tree (don't, instead use mainline) or work on fork of kernel
+(don't, instead use mainline). Just use b4 and everything should be
+fine, although remember about `b4 prep --auto-to-cc` if you added new
+patches to the patchset.
 
-avg =3D 664 nsecs, total: 601186432273 nsecs, count: 905039574
+You missed at least devicetree list (maybe more), so this won't be
+tested by automated tooling. Performing review on untested code might be
+a waste of time.
 
-2. use atomic
-$ sudo ./funclatency xsk_cq_cached_prod_reserve
-Tracing 1 functions for "xsk_cq_cached_prod_reserve"... Hit Ctrl-C to end.
-^C
-     nsecs               : count     distribution
-         0 -> 1          : 0        |                                      =
-  |
-         2 -> 3          : 0        |                                      =
-  |
-         4 -> 7          : 0        |                                      =
-  |
-         8 -> 15         : 0        |                                      =
-  |
-        16 -> 31         : 0        |                                      =
-  |
-        32 -> 63         : 0        |                                      =
-  |
-        64 -> 127        : 0        |                                      =
-  |
-       128 -> 255        : 109815401 |*********                            =
-   |
-       256 -> 511        : 485028947 |*************************************=
-***|
-       512 -> 1023       : 320121627 |**************************           =
-   |
-      1024 -> 2047       : 38538584 |***                                   =
-  |
-      2048 -> 4095       : 377026   |                                      =
-  |
-      4096 -> 8191       : 340961   |                                      =
-  |
-      8192 -> 16383      : 549      |                                      =
-  |
-     16384 -> 32767      : 0        |                                      =
-  |
-     32768 -> 65535      : 0        |                                      =
-  |
-     65536 -> 131071     : 0        |                                      =
-  |
-    131072 -> 262143     : 0        |                                      =
-  |
-    262144 -> 524287     : 0        |                                      =
-  |
-    524288 -> 1048575    : 10       |                                      =
-  |
+Please kindly resend and include all necessary To/Cc entries.
 
-avg =3D 496 nsecs, total: 473682265261 nsecs, count: 954223105
 
-And those numbers were verified over and over again which means they
-are quite stable.
-
-You can see that when using atomic, the avg is smaller and the count
-of [128 -> 255] is larger, which shows better performance.
-
-I will add the above numbers in the commit log after the merge window is op=
-en.
-
->
-> IMHO, in theory, atomics is way better than spin lock in contended
-> cases since the protected area is small and fast.
-
-I also spent time investigating the details of both approaches. Spin
-lock uses something like atomic_try_cmpxchg first and then fallbacks
-to slow path. That is more complicated than atomic. And the protected
-area is small enough and simple calculations don't bother asking one
-thread to set a few things and then wait.
-
->
-> >
-> > Have you tried moving cq_prod_lock, too?
->
-> Not yet, thanks for reminding me. It should not affect the sending
-> rate but the tx completion time, I think.
-
-I also tried moving this lock, but sadly I noticed that in completion
-time the lock was set which led to invalidation of the cache line of
-another thread sending packets. It can be obviously proved by perf
-cycles:ppp:
-1. before
-8.70% xsk_cq_cached_prod_reserve
-
-2. after
-12.31% xsk_cq_cached_prod_reserve
-
-So I decided not to bring such a modification. Anyway, thanks for your
-valuable suggestions and I learnt a lot from those interesting
-experiments.
-
-Thanks,
-Jason
+Best regards,
+Krzysztof
 
