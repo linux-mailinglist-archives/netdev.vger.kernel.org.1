@@ -1,72 +1,85 @@
-Return-Path: <netdev+bounces-243423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0B91C9FE64
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 17:20:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DF2DCCA059E
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 18:20:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6F85E30062D5
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 16:14:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 003DF3189261
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 17:06:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E9D5343D7D;
-	Wed,  3 Dec 2025 16:04:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1ACE342536;
+	Wed,  3 Dec 2025 16:03:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="q41PqCVO"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="QbyG//lT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from out162-62-57-252.mail.qq.com (out162-62-57-252.mail.qq.com [162.62.57.252])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D503342146
-	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 16:04:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55A85342146;
+	Wed,  3 Dec 2025 16:03:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.252
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764777845; cv=none; b=C7aK5yM/7+aMvG+HNA7KbZFp+j1F7vhrW+gmDQQ/Y0hDNBBPZbvQ9MUl40XDFt25ng5OzjZItYFkhus5D4PHh2sYX6zNgf6nmanPOFlpYOKRRFR4Mq129ir8MqyvUhsGyCH2zQht+I5qA7ECSLlQJbOAKr/8K02ZaY9cVjuyf7U=
+	t=1764777838; cv=none; b=TPt5IbLRSEhyE18tBa4y1+px6tUo5CDsvnfELxHNffhjALEG8WCnKESTyD1lbkm3Vs39msFVMCm0CBXhblPaSv8i07uh6rw5LceZV/4qu1JOgml/krvygkdsW6V/uJl4EkJRxVo00mN8/0SSGTNbpFi3A8KrZtwQrm+9HdxhEtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764777845; c=relaxed/simple;
-	bh=7KkKG378b9JRT4tvDmQ33QUe8ZhTeAld66ZSp25iBfE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HhbGs0Fc0LS3rpgaFvoHk7dkU+Ht51pXebudXfnkzl2HqU3RKVycCZ6F0uZncLhyrJNCACT6puy9Yy/XG2S8XQpCSLR+it/8wt5Nn9CpeE5+4UclKmT9aOulWGHsiQ3sKm9eLTJW9rDx2fwauzgaDdNasIay85LargKgKwNvs5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=q41PqCVO; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5B3FX3gP3744841;
-	Wed, 3 Dec 2025 08:03:46 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=775/ur+2F/qbl+aiP52Hbr40OQpK7M+56CdVzCXg/yo=; b=q41PqCVO1SiG
-	8d3DnVo/hMi5MIumHoLfWugBsYDTUDF5P+aArAcuzqP4G9cepuFLcFYm3tk+kg3M
-	gGgRGk6X4lrD9gurd+Smefo9KJRGC5HOm8udItpbh7RCetqzPb5XiXQkGzL2a/oJ
-	7lUhvq7xqmcc4BLOIj/DR85cQWq4OkIBEGrQvnpA/mwbr4ceOaxhW6Yl8SuICSrp
-	WnS3/XxDfl7qJotmR+IzjbBlLWwyF8XNBwtybukG5DZ1kE4mO3/QPkDJobRrdGCV
-	R0rArpdyAsOzyo1Z5kxJFox7N4oFSalcRWKRmwatTUItxe/9aBphOoXq/YWBvhnL
-	1UiEbNO3hQ==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 4atf69un7q-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Wed, 03 Dec 2025 08:03:46 -0800 (PST)
-Received: from devbig003.atn7.facebook.com (2620:10d:c0a8:1b::30) by
- mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.29; Wed, 3 Dec 2025 16:03:44 +0000
-From: Chris Mason <clm@meta.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-CC: Chris Mason <clm@meta.com>, Simon Horman <horms@kernel.org>,
-        "Daniel
- Jurgens" <danielj@nvidia.com>, <netdev@vger.kernel.org>,
-        <jasowang@redhat.com>, <pabeni@redhat.com>,
-        <virtualization@lists.linux.dev>, <parav@nvidia.com>,
-        <shshitrit@nvidia.com>, <yohadt@nvidia.com>,
-        <xuanzhuo@linux.alibaba.com>, <eperezma@redhat.com>, <jgg@ziepe.ca>,
-        <kevin.tian@intel.com>, <kuba@kernel.org>, <andrew+netdev@lunn.ch>,
-        <edumazet@google.com>
-Subject: Re: [PATCH net-next v13 11/12] virtio_net: Add support for TCP and UDP ethtool rules
-Date: Wed, 3 Dec 2025 08:02:48 -0800
-Message-ID: <20251203160252.516141-1-clm@meta.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251203083305-mutt-send-email-mst@kernel.org>
-References:
+	s=arc-20240116; t=1764777838; c=relaxed/simple;
+	bh=44aWoO0xgrbCYwAvNjJ2HHKTl5rnXStHKGkAwNTZeOE=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=RmoVYI5qjg6+QA0uoA29qi5lGL3ZpGpFk46K2PDFhKkife5+piXELcBpLRQl7WHunnRuguqC12ieXEe97yDiq5ydyBLOjosAZUUIV4gn2kcr1fzPwh9wV1ZoQzrngNLrah9P/xr/xBc0so++CTJXav7wX76ZEwWpGorECEYd8zo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=QbyG//lT; arc=none smtp.client-ip=162.62.57.252
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1764777825; bh=e1cr7cB9gHoKGVQYhIC4CvFypTqIWDD1zmvqi8c+6Rc=;
+	h=From:To:Cc:Subject:Date;
+	b=QbyG//lTMa/9UlMzl/F1rT2VpRekrhDi140zrwXsEFxSKLzxa82XPIV0xdSy1JvuV
+	 bO5FZCFlHkFc9agzjEY451ZKMoNH3jguHqx6tQpBDlF0SaZg+fFDzz43GdFxpasXEX
+	 pr8ot8bgWs+Vjuy0jUeOXEqaABpgHX7sV7wKiFX4=
+Received: from lxu-ped-host.. ([111.201.7.117])
+	by newxmesmtplogicsvrszc43-0.qq.com (NewEsmtp) with SMTP
+	id E81C8F7; Thu, 04 Dec 2025 00:03:40 +0800
+X-QQ-mid: xmsmtpt1764777820t4qo7i2do
+Message-ID: <tencent_3C86DFD37A0374496263BE24483777D76305@qq.com>
+X-QQ-XMAILINFO: Mm3lGEhJcF5GES4dJXmrXXeRjVFRK9xLrz1OHc0rxpoLA+afC7a9iXoooZhjj4
+	 toWUN1AVx0njlGItEE030M4WPQN5zD05g7mji1EtYEXqIvgYiceXGF7lBPga5KuJop7VY/csunpw
+	 n2LJ/6GtcJRCEpr823xHzkTC6Q5RgZC1XWtWOS6H0jtRkvL3ay52VuS+u4wJ1S435fLZVVv/7Mu/
+	 cVhsURbGNz7iuExHYBBmYMG25EpCXsjX2UpzDnxXWEOLJTOtIEEULHxbFD+H7pu4fhzAoUop9GUH
+	 yDkzV3exGXX3+LiywTimz3dNggCqva4d87NBkzSVKBgWR8LP3n4SoOjBLEYU6omP1gYGBmyl0Kvz
+	 NLVhxD5q0/3u71Xezsrzc0XJXTvv+dtLfMayITb+kDdRQkr/fS8ZTHh8QqrG34Pcbae0IuyYwmpS
+	 08HRuFluYAN2RXO0pBFXowJAU34Jil1EICUaAXnJwQi080+5duxZgAkamoW4WHevkyLr6rsSZSnL
+	 lc+SvJdMxm5DPavd5Pf2N6MoZX1zneLIggVimp2Gomd3CM+liSpm4muW8dkIwFe3u4e3B4ePg12A
+	 gE/6BZ96kh7bLL3UVSZwsIRDHg+RpQVcaijqYDUnK4bxwXxLPXhwWKS/YCscJnrG21XjLv4fIS8i
+	 EBA94xZpH6iX590So0Y8/Mnoj2GJAmNQ+b+z68xoheAu8OfCEA7daMTs/iQsEdeRtI3xtaUF1dBF
+	 aQmpYmLNBLFUqmeh1JOd5joAXAY+oJfOZqIN4lO/bFQtOotbtKa+gUYdm6HEg5okqsNs6IZflCSN
+	 Jq2E7ATchHPTHBPck3p//zYnyrK2cTommDsZ+jZq60vDXSxpaWTesZ04UouE5JNA5fjMfivzJo1a
+	 aGwIl6CAvj4v2Rz0MP0F97iZRP13Id7lZpkJg3CVlZlQLHpqWceqXuECwPiap7kKbWUeE8HSqdNu
+	 53Uud1bGVJ0H7r3jI9zBhdEG7Nkvv3WmQrwMfJ+D8Ru1LJMeI/Xo65X7eiXSinrZSKl+tdfAazZ8
+	 KPIbRkZQ==
+X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
+From: Edward Adam Davis <eadavis@qq.com>
+To: kuba@kernel.org
+Cc: davem@davemloft.net,
+	eadavis@qq.com,
+	edumazet@google.com,
+	eperezma@redhat.com,
+	horms@kernel.org,
+	jasowang@redhat.com,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	mst@redhat.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	sgarzare@redhat.com,
+	stefanha@redhat.com,
+	syzbot+ci3edb9412aeb2e703@syzkaller.appspotmail.com,
+	syzbot@lists.linux.dev,
+	syzbot@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com,
+	virtualization@lists.linux.dev,
+	xuanzhuo@linux.alibaba.com
+Subject: [PATCH net-next V3] net: restore the iterator to its original state when an error occurs
+Date: Thu,  4 Dec 2025 00:03:39 +0800
+X-OQ-MSGID: <20251203160339.303720-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,77 +87,89 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjAzMDEyNyBTYWx0ZWRfX/wRHnxwjtw0/
- pJx0R2uGJAylMH7GIJ9/s860XWCwysrp5A547tHfUecO2eYJWd/S+fp6YOKHKUX+tt7dbHWOIWf
- 2CFTz1Z32bR6BL/9uaO+jWdmaFDft6aOiuBxd7iGrb+NInQJ8wEmvJ0rZA0lJAdlF3e2a0CBqgm
- cH0+6EZQeJRxs6rVkzb2+pn6EQUmpg+Nqoq4LAHvCJc1LBp/BiEdAgD8ArIHpOZ+who0Lipwc04
- mOZXVWpXMyb+766AjGx0L2a4/VIAw7xEkG+tSMDb+qVdxQWRRfaG2yK2NuTvfpg6GXuj6o08Ncl
- 3VwP3USbN+4TgT6wGXpzDohmX78CEFqYFt1BQZXl/dyQ9AbNBa7XBS5kQ8WP4rjya+TGtpMwUpz
- 0MoL5qatpvwafx061uQWp+j4bUCAvA==
-X-Proofpoint-GUID: DHimFOAyM1mpklZCE5b7PZFA_n2XuQNQ
-X-Authority-Analysis: v=2.4 cv=IrYTsb/g c=1 sm=1 tr=0 ts=69305f62 cx=c_pps
- a=MfjaFnPeirRr97d5FC5oHw==:117 a=MfjaFnPeirRr97d5FC5oHw==:17
- a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=9R54UkLUAAAA:8 a=NEAV23lmAAAA:8
- a=20KFwNOVAAAA:8 a=NvQyTCM08Br6FijgrkcA:9 a=5hNPEnYuNAgA:10
- a=YTcpBFlVQWkNscrzJ_Dz:22
-X-Proofpoint-ORIG-GUID: DHimFOAyM1mpklZCE5b7PZFA_n2XuQNQ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-03_02,2025-11-27_02,2025-10-01_01
 
-On Wed, 3 Dec 2025 08:33:53 -0500 "Michael S. Tsirkin" <mst@redhat.com> wrote:
+In zerocopy_fill_skb_from_iter(), if two copy operations are performed
+and the first one succeeds while the second one fails, it returns a
+failure but the count in iterator has already been decremented due to
+the first successful copy. This ultimately affects the local variable
+rest_len in virtio_transport_send_pkt_info(), causing the remaining
+count in rest_len to be greater than the actual iterator count. As a
+result, packet sending operations continue even when the iterator count
+is zero, which further leads to skb->len being 0 and triggers the warning
+reported by syzbot [1].
 
-> On Tue, Dec 02, 2025 at 03:55:39PM +0000, Simon Horman wrote:
-> > On Wed, Nov 26, 2025 at 01:35:38PM -0600, Daniel Jurgens wrote:
-> > 
-> > ...
-> > 
-> > > @@ -6005,6 +6085,11 @@ static void parse_ip4(struct iphdr *mask, struct iphdr *key,
-> > >  		mask->tos = l3_mask->tos;
-> > >  		key->tos = l3_val->tos;
-> > >  	}
-> > > +
-> > > +	if (l3_mask->proto) {
-> > > +		mask->protocol = l3_mask->proto;
-> > > +		key->protocol = l3_val->proto;
-> > > +	}
-> > >  }
-> > 
-> > Hi Daniel,
-> > 
-> > Claude Code with review-prompts flags an issue here,
-> > which I can't convince myself is not the case.
-> > 
-> > If parse_ip4() is called for a IP_USER_FLOW, which use ethtool_usrip4_spec,
-> > as does this function, then all is well.
-> > 
-> > However, it seems that it may also be called for TCP_V4_FLOW and UDP_V4_FLOW
-> > flows, in which case accessing .proto will overrun the mask and key which
-> > are actually struct ethtool_tcpip4_spec.
-> > 
-> > https://netdev-ai.bots.linux.dev/ai-review.html?id=51d97b85-5ca3-4cb8-a96a-0d6eab5e7196#patch-10
-> 
-> 
-> Oh I didn't know about this one. Is there any data on how does it work?
-> Which model/prompt/etc?
+Therefore, if the zerocopy operation fails, we should revert the iterator
+to its original state.
 
-I'm not actually sure if the netdev usage is written up somewhere?
+The iov_iter_revert() in skb_zerocopy_iter_stream() is no longer needed
+and has been removed.
 
-The automation is running claude, but (hopefully) there's nothing specific to
-claude in the prompts, it's just what I've been developing against.
+[1]
+'send_pkt()' returns 0, but 4096 expected
+WARNING: net/vmw_vsock/virtio_transport_common.c:430 at virtio_transport_send_pkt_info+0xd1e/0xef0 net/vmw_vsock/virtio_transport_common.c:428, CPU#1: syz.0.17/5986
+Call Trace:
+ virtio_transport_stream_enqueue net/vmw_vsock/virtio_transport_common.c:1113 [inline]
+ virtio_transport_seqpacket_enqueue+0x143/0x1c0 net/vmw_vsock/virtio_transport_common.c:841
+ vsock_connectible_sendmsg+0xabf/0x1040 net/vmw_vsock/af_vsock.c:2158
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg+0x21c/0x270 net/socket.c:746
 
-The prompts are:
+Reported-by: syzbot+28e5f3d207b14bae122a@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=28e5f3d207b14bae122a
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+v3:
+  - fix test tcp_zerocopy_maxfrags timeout
+v2: https://lore.kernel.org/all/tencent_BA768766163C533724966E36344AAE754709@qq.com/
+  - Remove iov_iter_revert() in skb_zerocopy_iter_stream()
+v1: https://lore.kernel.org/all/tencent_387517772566B03DBD365896C036264AA809@qq.com/
 
-https://github.com/masoncl/review-prompts
+ net/core/datagram.c | 9 ++++++++-
+ net/core/skbuff.c   | 1 -
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
-Jakub also wired up semcode indexing, which isn't required but does
-make it easier for claude to find code:
+diff --git a/net/core/datagram.c b/net/core/datagram.c
+index c285c6465923..3a612ebbbe80 100644
+--- a/net/core/datagram.c
++++ b/net/core/datagram.c
+@@ -748,9 +748,13 @@ int __zerocopy_sg_from_iter(struct msghdr *msg, struct sock *sk,
+ 			    size_t length,
+ 			    struct net_devmem_dmabuf_binding *binding)
+ {
++	struct iov_iter_state state;
+ 	unsigned long orig_size = skb->truesize;
+ 	unsigned long truesize;
+-	int ret;
++	int ret, orig_len;
++
++	iov_iter_save_state(from, &state);
++	orig_len = skb->len;
+ 
+ 	if (msg && msg->msg_ubuf && msg->sg_from_iter)
+ 		ret = msg->sg_from_iter(skb, from, length);
+@@ -759,6 +763,9 @@ int __zerocopy_sg_from_iter(struct msghdr *msg, struct sock *sk,
+ 	else
+ 		ret = zerocopy_fill_skb_from_iter(skb, from, length);
+ 
++	if (ret == -EFAULT || (ret == -EMSGSIZE && skb->len == orig_len))
++		iov_iter_restore(from, &state);
++
+ 	truesize = skb->truesize - orig_size;
+ 	if (sk && sk->sk_type == SOCK_STREAM) {
+ 		sk_wmem_queued_add(sk, truesize);
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index a00808f7be6a..7b8836f668b7 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -1908,7 +1908,6 @@ int skb_zerocopy_iter_stream(struct sock *sk, struct sk_buff *skb,
+ 		struct sock *save_sk = skb->sk;
+ 
+ 		/* Streams do not free skb on error. Reset to prev state. */
+-		iov_iter_revert(&msg->msg_iter, skb->len - orig_len);
+ 		skb->sk = sk;
+ 		___pskb_trim(skb, orig_len);
+ 		skb->sk = save_sk;
+-- 
+2.43.0
 
-https://github.com/facebookexperimental/semcode
-
-I'm still working on docs and easy setup for semcode and the review prompts,
-but please feel free to send questions.
-
--chris
 
