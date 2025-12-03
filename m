@@ -1,128 +1,83 @@
-Return-Path: <netdev+bounces-243391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 511B7C9EBFF
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 11:40:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F5FBC9EC38
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 11:49:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10F9F3A6ED9
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 10:40:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DF483A891F
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 10:49:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9F662EF652;
-	Wed,  3 Dec 2025 10:40:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E036B2F360A;
+	Wed,  3 Dec 2025 10:49:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="WnmC0VPe"
+	dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b="tsDYJQ1K"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-006.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-006.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.26.1.71])
+Received: from mail.toke.dk (mail.toke.dk [45.145.95.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E95A2ED860;
-	Wed,  3 Dec 2025 10:40:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.26.1.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E4CC2F2909
+	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 10:48:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.145.95.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764758454; cv=none; b=kkvKFpuT5jG5rjbRUhkohb/H37TkuWdoQ17kjzDncjuHC59JHr+luSdwBYjORpCRaa1SMLkeRvsJpFsjuLbrEXy+4aRtmPsb7ZZUwzbngPHM/UcGWa8Qj8eSGqh6z4GLNL9x8fUiF1BVrkaKIGRV4xPWbNY32jBY4YyozHuej7Q=
+	t=1764758943; cv=none; b=pzq0Pxs/5PTESyh39XD7+FfYejNmRFZ6Hl0iRZ3RyM+9JVyNS6dX9xF/1C9EDJGIJ4p5+oU5tPjWyEB09HK8mxNV57+y5RpIR0Vys2udVtKgiMeJb3mufuIEkGTVDON1WKREEvqE0/YirpAtEBd7/VYFRY62hj2vFZ6CAb1UvE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764758454; c=relaxed/simple;
-	bh=6teEcSTtrJgnszeTAzsbDyQDdZwMlpmbiBo5m8ykxrI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kTto22kKdhu0BSG4dd26U2zZ6NP3RgzataqMfjSoPu7t8G3FIafrcAwPOIBDNofNiajTT/z37cLfJ+eC9l3Am87Mm1CTLI860LgEqFBNS6JmaPLM57a4rEiUv216l+WlfjhCrVINqA5QKNnBwIk+sElTOSPIvMuTTK6iXSoQyDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=WnmC0VPe; arc=none smtp.client-ip=52.26.1.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1764758453; x=1796294453;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=jXsVFWbj35rMKMy+vwDkpwi9rIVDzao0SnxFiNJEYic=;
-  b=WnmC0VPeXivWBHgx7glRQtTnB+LimAfJyGWmqWOylKWJvrMvIXSpEmxR
-   qvmfs6pl1Hz5pC///vweGjX0vDd8DnSq/Z2gru5idlhxgD4FCCCR9ZPFJ
-   VAbDFJ3N/Xy2Brb9OeZY5UbCNakPeG2Wd2wZxGT7Sby2HfZ7lje0QCcWP
-   F9BZM3gh7eRfpgDTCJ13TvRQgsMKI53netcyWgPuF0kmWZjG0HOltmiMf
-   7B4KAjm37094Rh+hUJbxaw6fa/ypki5Zu7YNAvJsyHvsIi9YzR23KDUwm
-   Bue2RXMj2KD8Nn8gR/Qde25LJDzVDIgQTw4cprhzjs6ZqfnfqXaVTTL/E
-   A==;
-X-CSE-ConnectionGUID: N8Xm2/fSRySWr23rjtng3Q==
-X-CSE-MsgGUID: KQwY1GezQp2wB8EYIe9gxA==
-X-IronPort-AV: E=Sophos;i="6.20,245,1758585600"; 
-   d="scan'208";a="8324630"
-Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
-  by internal-pdx-out-006.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2025 10:40:50 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [205.251.233.111:24081]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.25.237:2525] with esmtp (Farcaster)
- id 07a0754c-ba91-4c24-8dc7-78f50d138f6e; Wed, 3 Dec 2025 10:40:50 +0000 (UTC)
-X-Farcaster-Flow-ID: 07a0754c-ba91-4c24-8dc7-78f50d138f6e
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
- Wed, 3 Dec 2025 10:40:50 +0000
-Received: from b0be8375a521.amazon.com (10.37.245.10) by
- EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
- Wed, 3 Dec 2025 10:40:46 +0000
-From: Kohei Enju <enjuk@amazon.com>
-To: <alexei.starovoitov@gmail.com>
-CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
-	<daniel@iogearbox.net>, <davem@davemloft.net>, <eddyz87@gmail.com>,
-	<enjuk@amazon.com>, <haoluo@google.com>, <hawk@kernel.org>,
-	<john.fastabend@gmail.com>, <jolsa@kernel.org>, <kohei.enju@gmail.com>,
-	<kpsingh@kernel.org>, <kuba@kernel.org>, <lorenzo@kernel.org>,
-	<martin.lau@linux.dev>, <netdev@vger.kernel.org>, <sdf@fomichev.me>,
-	<shuah@kernel.org>, <song@kernel.org>, <yonghong.song@linux.dev>
-Subject: Re: [PATCH bpf v1 1/2] bpf: cpumap: propagate underlying error in cpu_map_update_elem()
-Date: Wed, 3 Dec 2025 19:40:34 +0900
-Message-ID: <20251203104037.40660-1-enjuk@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <CAADnVQLjw=iv3tDb8UadT_ahm_xuAFSQ6soG-W=eVPEjO_jGZw@mail.gmail.com>
-References: <CAADnVQLjw=iv3tDb8UadT_ahm_xuAFSQ6soG-W=eVPEjO_jGZw@mail.gmail.com>
+	s=arc-20240116; t=1764758943; c=relaxed/simple;
+	bh=Z1D04chXBYJFwwNAJuYTORWw41cHBHStJVr7oBf+7vA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=OrCuQwAzQH7NW+/3Wu+rCee1ZgCR4vHfpUDUdOKyWgaasCXaJcmbQxV8qn9S2vRL4VtPNPLwNMEMKNzkkukoF8TQPk2um4vuRpLqTQPfcBLXvFLKAQ5JcOlUmxLeMJaw80YohGpva6XLtzGLs5eGn9LLOx35A356QjQqLyFa4Zo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk; spf=pass smtp.mailfrom=toke.dk; dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b=tsDYJQ1K; arc=none smtp.client-ip=45.145.95.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=toke.dk
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=toke.dk; s=20161023;
+	t=1764758931; bh=Z1D04chXBYJFwwNAJuYTORWw41cHBHStJVr7oBf+7vA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=tsDYJQ1K0iglRE14nGbybI33DvZiEHJDpwLf7+4qzlWDw7YnnivsiBkY+wZTomsI7
+	 NZTO3hjhp32nCXa5TLoR/Y6vhPtVC5jjNel3kUPPfAjmx++XOFv/RJlgS4lAJIHPML
+	 hXHhChUFYTv8SmVB+eFps0lZUjzWr/AIR1WwqQ8JfBusqE2CbubqblW0X+uwswU/Vq
+	 4Xh4TTIXlPdRswkjRgGVLEJzGqB3GwdESbuCoLprKigFlDIvncn4Pplxsi3QGsYwYo
+	 ziA1GY7C515CMMOQy0WrDC9zx79Ts4GdranAKgjPIk8be3aVpsgZQlvibyEYio5KWv
+	 XeA9DuF4QVw3A==
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
+ <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonas
+ =?utf-8?Q?K=C3=B6ppeler?=
+ <j.koeppeler@tu-berlin.de>, cake@lists.bufferbloat.net,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v4 0/5] Multi-queue aware sch_cake
+In-Reply-To: <20251202111036.07964fdd@kernel.org>
+References: <20251201-mq-cake-sub-qdisc-v4-0-50dd3211a1c6@redhat.com>
+ <20251202111036.07964fdd@kernel.org>
+Date: Wed, 03 Dec 2025 11:48:50 +0100
+X-Clacks-Overhead: GNU Terry Pratchett
+Message-ID: <87tsy796y5.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D043UWA004.ant.amazon.com (10.13.139.41) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2 Dec 2025 17:08:32 -0800, Alexei Starovoitov wrote:
+Jakub Kicinski <kuba@kernel.org> writes:
 
->On Fri, Nov 28, 2025 at 8:05 AM Kohei Enju <enjuk@amazon.com> wrote:
->>
->> After commit 9216477449f3 ("bpf: cpumap: Add the possibility to attach
->> an eBPF program to cpumap"), __cpu_map_entry_alloc() may fail with
->> errors other than -ENOMEM, such as -EBADF or -EINVAL.
->>
->> However, __cpu_map_entry_alloc() returns NULL on all failures, and
->> cpu_map_update_elem() unconditionally converts this NULL into -ENOMEM.
->> As a result, user space always receives -ENOMEM regardless of the actual
->> underlying error.
->>
->> Examples of unexpected behavior:
->>   - Nonexistent fd  : -ENOMEM (should be -EBADF)
->>   - Non-BPF fd      : -ENOMEM (should be -EINVAL)
->>   - Bad attach type : -ENOMEM (should be -EINVAL)
->>
->> Change __cpu_map_entry_alloc() to return ERR_PTR(err) instead of NULL
->> and have cpu_map_update_elem() propagate this error.
->>
->> Fixes: 9216477449f3 ("bpf: cpumap: Add the possibility to attach an eBPF program to cpumap")
+> On Mon, 01 Dec 2025 11:00:18 +0100 Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>> This series adds a multi-queue aware variant of the sch_cake scheduler,
+>> called 'cake_mq'. Using this makes it possible to scale the rate shaper
+>> of sch_cake across multiple CPUs, while still enforcing a single global
+>> rate on the interface.
 >
->The current behavior is what it is. It's not a bug and
->this patch is not a fix. It's probably an ok improvement,
->but since it changes user visible behavior we have to be careful.
+> Let's push this out to v6.20 (or lucky v7.1).
 
-Oops, got it.
-When I resend, I'll remove the tag and send to bpf-next, not to bpf.
+Alright :(
 
-Thank you for taking a look.
+I'll resubmit after the merge window with the header changes Will suggested.
 
->
->I'd like Jesper and/or other cpumap experts to confirm that it's ok.
->
-
-Sure, I'd like to wait for reactions from cpumap experts.
+-Toke
 
