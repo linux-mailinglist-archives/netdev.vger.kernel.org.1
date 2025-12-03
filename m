@@ -1,137 +1,140 @@
-Return-Path: <netdev+bounces-243386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86645C9EA9F
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 11:13:54 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F01AC9EABD
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 11:16:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9CA164E04A1
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 10:13:41 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 09DEE348B25
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 10:16:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E57D92E7F14;
-	Wed,  3 Dec 2025 10:13:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F2A12DE707;
+	Wed,  3 Dec 2025 10:16:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="VwLlUnkP"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="fYyximEM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C18E52E888C;
-	Wed,  3 Dec 2025 10:13:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.92
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 197B7213254;
+	Wed,  3 Dec 2025 10:16:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764756820; cv=none; b=XfROR2a2L6CQ20j4st2DjKxhtH+zwTe+GqgUKlabjJJh2AQjSl9hn3lo7BBjFlm/I6rNEQfKzWPBSDvIWeYmauW5pMG59PpSbpnW3IqrHj+esGXzx3pMC8krgJ5JFdon+gVEeofA3gaLef1qQAsyTedJFQk94Nq8AYKhVtt629s=
+	t=1764756977; cv=none; b=C0Mln1jk47ID28GrDnlHYEKDyS/BTjyZPG7ZMzMX+5bazrXMeA9PVBG0Y442lqit1ns47UNaUtX7jUVmb3jRD3tKt2zLs51+lXlJgBdH/2EmQ99IIvipj7xnU7djniylj6mXAplHlmkRQaHvGNk0GTOhmEZrIYU8r2x5tzt321w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764756820; c=relaxed/simple;
-	bh=NTM1KmWbQdARk4K5AKsKvddVwmZZIFFrjw78YXGgnqM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IE9kY9ROzoY0jN+5n7JK6IuEgKI18KUJb/RW8cid3yEI0Ktj+BctF5Q3DAuZIzbLM3nNOzedExxivHdeL172WBv884YqZuTdhrWCWNtqu8Nmj8YR02d2pU+T7EFrLUXqzXIM8fECwPkYst7sVksq8FZ6MYfE5R6RPx5+ZtXOs5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=VwLlUnkP; arc=none smtp.client-ip=54.254.200.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1764756777;
-	bh=5VfsePXfK/pS5Ytd8Ld+IYlJCYn/zYPgRIqaDjm44iM=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=VwLlUnkPZaSh7FUBg4+FeXamLgy7MIPGXmOvtWXSDDfd2KzXtEFbyS0OizVl4W8uK
-	 ZfcsV6RcKh4FebU3bLRhnXzG45zg0MZgmnBon1mgnlO1ivy+euSf+GLADvHwsal1PD
-	 6P7EqJ6NVO3jYBhD6jTnMrsk29Y+5cGVEYoM++bU=
-X-QQ-mid: zesmtpgz8t1764756771taa55a6ec
-X-QQ-Originating-IP: Mv4Rdtrjlzh+bSyWSRT5cms7a5Dr17o1KqrZ630EHys=
-Received: from aosc-cryolitia ( [61.242.135.10])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 03 Dec 2025 18:12:49 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 18005684337878457378
-EX-QQ-RecipientCnt: 7
-From: Cryolitia PukNgae <cryolitia@uniontech.com>
-To: rtl8821cerfe2@gmail.com
-Cc: he.zhenang@bedmex.com,
-	johannes@sipsolutions.net,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	yt@radxa.com,
-	Cryolitia PukNgae <cryolitia@uniontech.com>
-Subject: Re: [PATCH v1 6.14] wireless: aic8800: add support for AIC8800 WiFi chipset
-Date: Wed,  3 Dec 2025 18:12:29 +0800
-Message-ID: <1B7E52A5DC7D1CFE+20251203101229.91783-1-cryolitia@uniontech.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <0d807f54-7579-43a2-99c7-2a19cf715ec3@gmail.com>
-References: <0d807f54-7579-43a2-99c7-2a19cf715ec3@gmail.com>
+	s=arc-20240116; t=1764756977; c=relaxed/simple;
+	bh=TU7vM4OokVzQEkasMSQu8fbtSIlHHTnXL87GLSDV4KQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GjaVjz/TgM8gZJshVLsjt4tAA3M6JgcjSwk3C52ttqlgJeSmXlxu65pRAVb2jmoSR71eMaDBbCzY05ngT7FRHR85FTG7R3iJ3ai99GxeHeZ1ZSW7w1wliX973epuraEADeRfMdSVmC5ljjM6J1T3y6+e4TDqXPEiFzk25TtEfnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=fYyximEM; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=UPORv42reuuhu1DhxnhFSCa05PXnIEqlhFt69DhjJUE=; b=fYyximEMHMACRwivXvRICIR8c6
+	xJtncZQYU0KG7QV/b3W/mWUPaTove4NwNVCy1Ps7wK3ySprb0g2jXRKD+q7OSq5NNgBWv03lIolA2
+	NtSjphWJmvvDmy1w6lG9aUvlLk9809dkHyfPufZtiC4rQxj0G3ZYAlPAfjzTy3MOiFsJZlfuSKIva
+	Jk9/UeimyH8CiZv3LF2aDQCdWSbgr2b8NRxY3H3NSICWEfz3cFKUsYelWLO3qoGXmdxtxKB78Dhe+
+	YmVKTK10E+yMD8fLiz+xTWfFjkwhI83s+BA1meSCH0qWOMUuSaYYyHI8wFExXvcVqf2/UstTaT5QS
+	hxo53fxg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:32770)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vQju5-000000002Rg-2VB5;
+	Wed, 03 Dec 2025 10:16:09 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vQju2-000000008NC-2vSo;
+	Wed, 03 Dec 2025 10:16:06 +0000
+Date: Wed, 3 Dec 2025 10:16:06 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Marek Vasut <marek.vasut@mailbox.org>,
+	Ivan Galkin <ivan.galkin@axis.com>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Aleksander Jan Bajkowski <olek2@wp.pl>,
+	Andrew Lunn <andrew@lunn.ch>, Conor Dooley <conor+dt@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Michael Klein <michael@fossekall.de>,
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+	devicetree@vger.kernel.org
+Subject: Re: [net-next,PATCH 3/3] net: phy: realtek: Add property to enable
+ SSC
+Message-ID: <aTAN5lX_OgwQh7E8@shell.armlinux.org.uk>
+References: <20251130005843.234656-1-marek.vasut@mailbox.org>
+ <20251130005843.234656-3-marek.vasut@mailbox.org>
+ <20251203094224.jelvaizfq7h6jzke@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz3a-1
-X-QQ-XMAILINFO: OKKvvo6f47/bsgkYmdYt3XTxuRUNnjfH3Y9mGaydEfeu68gnhU4LViBb
-	HP8EvxGGJQEeZ8pTNTxlbKMuT+tLlizp4rTPhEEAE6p3kAeMFtUHONdlpwDwFMLSFy7ysJc
-	IpZ/wJoPqyDuyiKDN60DLwL9QPa8gDqLtbcfqC9r/McHZmmqEHize4K7vTtzfyQVaTSwtc5
-	OJe/nMXif+ebkj7mdxvxUv6/A0HYcFpmcB/qMYlL/EreHGFcGTPMyJHoh+ZZCDbxC6e1Ojg
-	ZKpsqUuU81PopEu+kv/hLE0IAuqemwmvEbR6VCtar3xVprxnLzaAqMoSNUM9i7gcreDxh/b
-	ilOC7ojXxxWKQYMqDaAxlprsVKcdy76i5ctQyhcc6jS73YAL/GbiGPA3XV/3jGlGe2jkspE
-	+mwtwSYcF6YQBfC2YkwboNYePuIoxpfCiFMKmBmIy0Q/rMc8AMkpKXoQOULgjpKqh4JrXd9
-	SdLguEDWmhS9zRLjIa/Rv3Dr+6YA7rhJ1UyPPw+/7kmT1ZIq9WmSRap1nEb/TkXnz6auQkJ
-	n3qmrOOyxNWI/zb/NBMRoqCK+HRdre1MiID3JXdc+VRqoqsVqp+UMNn82JUcnNQObDho7F0
-	RfUBF1dPN6alMFWsWsUl3M9m8GsrWVNnPlXwoRjqbdP8t3XOpEtLoKs3Tkdn6gXLQUiFro+
-	xVrAPtX9/jYv7TYH+O75pDElWzhyvTh+1oKVaXOeO948YgV7F6G4ZVlIzfTyqxDHXF7RS90
-	vTwoYNtE+iW0vUZCNluPV7/a+JZjYFCX6XovPi7pWQwllskLH4AzYmY7vmue7/udjTLCdQ+
-	wgxip/vNYXh/VORUPzMPS9Acc8/rq52HXSbQXyz15qX15BiNp/T5n6rMMh1iRU+IL6Mz5G7
-	OTI72gI6JIU3U2wcdQ6/mESYLAZnnrvGAxoHLLbN5jLD0s6tQkIzbm9yEjEdFfhi0nMENpO
-	feT128Ckzi5bUQLL/a0n7lSRqjtr/DfRwnKPZtdH6qSqmya4mxFGHGKPd2c3jrff7vsKsOE
-	F6MwZjDgwXQ0F3HyCO3xTJ4UTrinTRiVLKAITYpmUpATiKZia/
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251203094224.jelvaizfq7h6jzke@skbuf>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, 21 Oct 2025 00:27:21 +0300, Bitterblue Smith wrote:
->On 20/10/2025 12:21, he.zhenang wrote:
->> Add driver support for the AIC8800 WiFi chipset family.
->> 
->> Driver features:
->> - Supports 802.11ax (Wi-Fi 6) and backward compatible modes
->> - PCIe/USB/SDIO interface support
->>- Hardware encryption offload (WPA3 support)
->>- Enhanced power management for mobile devices
->>- Integrated Bluetooth coexistence (if applicable)
->> 
->> Signed-off-by: he.zhenang <he.zhenang@bedmex.com>
->
->I have two USB adapters from Brostrend with AIC chips. It's
->nice to see someone try to add support. However, there are some
->problems with this patch.
->
->1) Where did the source code come from? The driver provided by
->Brostrend doesn't have any license information in it. Only the
->files aic_br_ext.{c,h} have a license header, and that's because
->they were copied from a Realtek driver. Presumably Brostrend got
->the code from AIC. So then I wonder who added the license headers
->we can see in this patch, and did AIC agree to that? They did
->write MODULE_LICENSE("GPL"); but is that enough? Also, a good
->chunk of the code published by Brostrend is actually Copyright
->(C) RivieraWaves, not AIC.
+On Wed, Dec 03, 2025 at 11:42:24AM +0200, Vladimir Oltean wrote:
+> > +
+> > +       ret = phy_write_paged(phydev, RTL8211F_SSC_PAGE, RTL8211F_SSC_RXC, 0x5f00);
+> > +       if (ret < 0) {
+> > +               dev_err(dev, "RXC SCC configuration failed: %pe\n", ERR_PTR(ret));
+> > +               return ret;
+> > +       }
+> 
+> I'm going to show a bit of lack of knowledge, but I'm thinking in the context
+> of stmmac (user of phylink_config :: mac_requires_rxc), which I don't exactly
+> know what it requires it for.
 
-Leaving aside Realtek's involvement, Radxa, one of AIC's downstream
-vendors, claims that AIC clarified to them that the entire AIC8800
-driver is licensed under GPLv2.[1]
+stmmac requires _all_ clocks to be running in order to complete reset,
+as the core is made up of multiple modules, all of which are
+synchronously clocked by their respective clocks. So, e.g. for the
+receive sections to complete their reset activity, clk_rx_i must be
+running. In RGMII mode, this means that the RGMII RXC from the PHY must
+be running when either the stmmac core is subject to hardware or
+software reset.
 
-We (deepin) and several downstream vendors are working to clarify the
-redistribution license for the AIC8800 firmware, and this remains
-unclear to date.
+> Does it use the RGMII RXC as a system clock?
+> If so, I guess intentionally introducing jitter (via the spread spectrum
+> feature) would be disastrous for it. In that case we should seriously consider
+> separating the "spread spectrum for CLKOUT" and "spread spectrum for RGMII"
+> device tree control properties.
 
-1. https://github.com/radxa-pkg/aic8800/issues/54
+I don't think it will affect stmmac - as long as the clock is toggling
+so that the synchronous components in stmmac can change state, that's
+all that the stmmac reset issue cares about.
 
->https://linux.brostrend.com/aic8800-dkms.deb
->
->2) Who will maintain this new driver?
->
->3) AIC has several chips. Which ones did you test?
+However, looking at the RTL8211FS(I)(-VS) datasheet, CLKOUT and RXC
+are two different clocks.
 
-Best regards,
-Cryolitia PukNgae
+CLKOUT can be:
+- reference clock generated from internal PLL.
+- UTP recovery receive clock (for SyncE)
+- Fibre recovery receive clock (for SyncE)
+- PTP synchronised clock output
+
+This can't be used for clocking the RGMII data, because it won't be
+guaranteed to have the clock edges at the correct point, nor does it
+switch clock speed according to the negotiated data rate. In SyncE
+modes, the recovered clock is either 125MHz or 25MHz, whereas RXC
+is 125, 25 or 2.5MHz.
+
+There is a separate bit for enabling SSC on RXC - PHYCR2 bit 3 vs
+CLKOUT SSC in bit 7.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
