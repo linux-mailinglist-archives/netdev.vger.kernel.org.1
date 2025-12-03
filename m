@@ -1,258 +1,241 @@
-Return-Path: <netdev+bounces-243411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA8EBC9F468
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 15:23:42 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F685C9F49E
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 15:28:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FC583A5EE2
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 14:23:33 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 011104E2140
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 14:28:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C6A42FB62A;
-	Wed,  3 Dec 2025 14:23:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA5DE2FC874;
+	Wed,  3 Dec 2025 14:27:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="qdNUg1yC"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="JCP4E7Dr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 788B4226CFE
-	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 14:23:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 592902FC862
+	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 14:27:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764771811; cv=none; b=FRL//sQqsE6ReEA56i7/vdtXZubgDvDcGF4MMOjVQoSg7kCh7RZG5GR297+uzhJo/QjhGRiM6/u8nt3Pga/0YWfRN/44N5jezSDV4/GO2d7a6nlL7Ontu3JLNSNNkgRTpf69BRi+9bWt/gB7aX/ATrC1AAv183PGpajxi2uKtY4=
+	t=1764772063; cv=none; b=HVmaD6zLULnAWNuJeOiAbZ4sEBA51IkLpSJWXT/5Ht8/Xaw2mILKsN0/Am0rwZtzi7fsJUPVjvqPe0wjud0Rpf+xxLPcniimOSP54uAEnodqZ69o+M77BrvlXO8S7smyDRj98KKPtywWvFscg3bwQKoO7KjE2oGtGW6kDVhyciM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764771811; c=relaxed/simple;
-	bh=SqQ7gL6+iQAXqHpFjwjzI0tlqPyV6DtImcU6SWYKhC8=;
+	s=arc-20240116; t=1764772063; c=relaxed/simple;
+	bh=wWTzrUpzTX4SJk//X3ZRdnOiElAdok9TiYFwDIDS0ZE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UsezhsXj2Gvhn3/3Zsa36RCYwNWze1pc0fyVxXrnSatLLIjhRYChTlKCdbde6O2DNDBcvFFzp/xcbRaDfSADc03nCJ4uXcc39vOtfu46cNMI8EekkPqKTXokwYPr4whXqH44ebqd5JgkTRQqIep9u8XsLJIf18bsBFNhgUWdEh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=qdNUg1yC; arc=none smtp.client-ip=209.85.210.174
+	 To:Cc:Content-Type; b=GU9KIgkVIWe8IqvhowcjlPrQ/qByhJfR+j0eecPiSLR7/s8QnXIFIEd3wlwUvi1zjel2QfA/2thwEGHdYDPMu1cUE1XDY3kabKVcTi7twhhrRU+iZfLefKd9L+lia4BUi601O0OcLDYqmPS64B9Vx1HHh4a4x6t6N3mDv/d5vZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=JCP4E7Dr; arc=none smtp.client-ip=209.85.210.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-7b7828bf7bcso7819099b3a.2
-        for <netdev@vger.kernel.org>; Wed, 03 Dec 2025 06:23:29 -0800 (PST)
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7ba55660769so5804911b3a.1
+        for <netdev@vger.kernel.org>; Wed, 03 Dec 2025 06:27:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1764771809; x=1765376609; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1764772062; x=1765376862; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6HeQEoCjuAQ7jItRf9nQvnwSP0XvjQjVOvUue26JfYQ=;
-        b=qdNUg1yCmaygyTYh6ZeA241L0+KYPVge+GZoxoUUrFhPW+QvKucg2WlNCRHy7kSbsp
-         WHCbDXiznZyynPnWlgHs+ZJ02j/zrzp2eL22bAmJ88vxH2Psf2ARU/HF+Z58M3LO00Xq
-         zf2U1O+Anu8PodOTrDnwsQZZd+dtr8tVzVDU++o6b1p2/o7bO0ndZvEu+GU4Vh4I22+2
-         GausuwAFHIjOznhWxG3Mgi1wLOZ5i9awRmyWqIP7D13T1STqCq45bs+MhrrBXSoajPCM
-         Q7Sj9liK18jBSJ/PlODEsnBwLFU866XRw0nmHRergDNH3TMtduulrNAFQE9C5WQ1mXAn
-         FcMg==
+        bh=Igppe6+ES5Wn2eFg/jj8SRWMr9cSJfS1jo6G4ZsA7iU=;
+        b=JCP4E7DrPCYAmBYVksrq9P+kwFfYAslRWnwyuAAkedIwp8R+qQXVi3AMnzS76dpYEN
+         KwZr1qW1BPf5Gkc/PWPmGK2YqkGnkWrxsrzdFFIJsXYILtbZUxe3uDyq4FegNL+gY53m
+         qSuPdykAuxgupUqlHqkMUATVcwexUTo8FYhwG3scB/ZynMzlfJmhDOY76cZZZANRnpX+
+         suChqMC8YWGdtDwn0GOXRHdvGkyUWtb0T0GmQkNiXeGR2UMTv1dUW+9u3Zg+EJpjdLut
+         Ul9xZx1X3V6HTWbmsKud/iUEVoyLOZ9LoAQBkAj6MChytXNtEhV2LpiYsDJxRN+Vee0T
+         BQZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764771809; x=1765376609;
+        d=1e100.net; s=20230601; t=1764772062; x=1765376862;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=6HeQEoCjuAQ7jItRf9nQvnwSP0XvjQjVOvUue26JfYQ=;
-        b=cdImZVooBCeG4x+Vk4GYv8KIhyIHvQ4DxMI+aTyWJar+wLwdkfe3a5HA5nq4YwB+X6
-         zURloGpfkQNuEXfBaVKJYr013mQYl4IKkDx7n28IrtrDMJmUjTdCOjifVRXghWbSV/WP
-         VNzEa6DPrK+Q+27CiFDijnrs+eXbKosblsyvgclilDT/fE4wncYM09WF9JuLNzbAwdF4
-         Q2QeFYqfKE4pWoNxVR6sizE3YsWk+WPkE4TLGCR5iQtjJbBawwmSwjAc1sHLR9XVvAds
-         Bt33m7xhDfSf7Hi0wKfMmP5yo2Zg4SsBUq96BFC9H/khlah3qXKylXyP7G2QWKuoo6Zi
-         ow3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXg1OzPcSo7PiTn7HTy0+DY/NwqsgAMNuKPbdDTHxjxhcs4nShWGJQyaTx+zGZdUw2RGdkgziQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvzeIJDvNH6SagCVBbwwHYvp+kLKXHWOYFf86HXXuhR+8qH2S0
-	1bxU0Yqa5lXllwnKBnS/KDvPtu07uq/+fFX2vkLxXGXXTJNgLeaUj/7wsfCzu0DYO4Kc5+D99F/
-	AMNDaXdzqWMITjuufFxD/EEY6q1sro/ZEdzsrZ7CbJxNmsC5gjgx+xQ==
-X-Gm-Gg: ASbGncsHF+KyEKjOJYIQHSrZjf+xalZuoYl3sgjpEcTkn790GKUZDNh+/pTo2alOiw3
-	ewc4nEqxCKFzWeaXfumAG4mKJ9csKWJhA9WQJkE5F70JFJT8E1Xv5VoJ8nz2AxR0PAxRNGV0IqI
-	KqDawbVEh8iQWNVLRl8mE2+/zoYXHMO+wFFu98Us8AyAhz3mx1Ao7MYb2BYPYydMnkz8jCRH1yz
-	KtguRXpQ8twoQ608qEHvIwvwBNkHk22J0caDj0bVr84Kf8u4bPzPCKTJ838ZUtKmJUceXsKSfh1
-	LVU=
-X-Google-Smtp-Source: AGHT+IG2swXIqpbbJlHz2BG4nFcxsTpyYyADhPnGdPvYEQjhpj7aMe7r9YFgBidfm1iSLqpzrK4ziH6DDHuSCH1cAmo=
-X-Received: by 2002:a05:6a00:1142:b0:7a2:1b8a:ca22 with SMTP id
- d2e1a72fcca58-7e00f322872mr2653829b3a.25.1764771808692; Wed, 03 Dec 2025
- 06:23:28 -0800 (PST)
+        bh=Igppe6+ES5Wn2eFg/jj8SRWMr9cSJfS1jo6G4ZsA7iU=;
+        b=URQAYskRw/DIgQfkq7AyOzs0oNZ7NUepwrZOnOjJtnrjrc1LWrQH0V3CUk5JR+c1Ra
+         xSGn4QzQc0ytYESifO6VIa3lNkBT9XNPP6O5XKLkT7lEgb+YF+6n4XJY4ep6hnD+xSMy
+         lNGf96B/WLqAWHNReh620xHDn8g2pD1dGdVrdiQJcytB+J9jxC2N+ITG4arrefmgPHs1
+         BI9vaBgPZmLT2xqKtc+qGS/b8v0VsFn9rV1ph3hw4PFacvotTn/n0KQBpYUeGS9zgrvk
+         PciIm0vT8YFsDwQ1FyzgTUhrMq8zJZjzkz6xQpnefr58WlNwOKzjoQG6+L4nJMk2IXSO
+         ETMg==
+X-Forwarded-Encrypted: i=1; AJvYcCXLiSt3NTSGNOfhOY0JSStM9IBWMg5a5sTljIr1CpslwAL0p2vM27KkyQyKxxNFsEnEkWy/DhI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWrTlndQ6lxy/1l8eOz+6BpuoPJ4H17XsjGukKySj89yoU9/ZX
+	caXrgCJs9sK+LSxHpKIkNulpq9rnov3n3K3FcIkVAgT/Mjn9B5cdZ6pxbyP04yNudxbue3NOEO3
+	7qDmcKvEw9qrFnh5HB5iRmY3k8zSBHof+g+oUiqvP
+X-Gm-Gg: ASbGnctAixOpDuI9dCwbmkkiS2fYUoHjDNCh25l9OTe5UhQHnWEfuJu21jRBmRZ+3Ia
+	E2pOdnqe3QzkhK88Vnl5o7czLHRRWnALwrYOWUmzbYlFw+tZxwv19ol4lajMFPBSKtMZbVvVxLY
+	XffAogRSzgnAHJCexwLBH0yEH+zUeQl2z+fNqZ4xCENosv90Ey2pT7tcfPlV31iAKI9R+kIQO7F
+	cUkes3oo/WsF84nm+ArfVp5gCp6cAXGmvXzHS4qLXeqsKLgw5IT6jRL8jYrJOmMk+8vuhWOxyLD
+	S8eT2Ly8goUbvg==
+X-Google-Smtp-Source: AGHT+IGDCuUpNjdUshvN4Tp/jEk+5A9P4cK43AazL9l7Zg5oXNqVDQkPyC+GxmEEtLaHN2cWZiQO9OsJhEiV09Ry/l4=
+X-Received: by 2002:a05:6a00:13a5:b0:7b9:a27:3516 with SMTP id
+ d2e1a72fcca58-7e00dbe640dmr2898888b3a.21.1764772061469; Wed, 03 Dec 2025
+ 06:27:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251128151919.576920-1-jhs@mojatatu.com> <aSna9hYKaG7xvYSn@dcaratti.users.ipa.redhat.com>
- <CAM0EoMmtqe_09jpG8-HzTVKNs2gfi_qNNCDq4Y4CayRVuDF4Jg@mail.gmail.com> <aS630uTBI26gLBTZ@dcaratti.users.ipa.redhat.com>
-In-Reply-To: <aS630uTBI26gLBTZ@dcaratti.users.ipa.redhat.com>
+References: <20251124200825.241037-1-jhs@mojatatu.com> <20251124145115.30c01882@kernel.org>
+ <CAM0EoM=jDt_CeCop82aH=Fch+4M9QawX4aQdKdiUCsdFzuC2rQ@mail.gmail.com>
+ <CAM0EoM=Rci1sfLFzenP9KyGhWNuLsprRZu0jS5pg2Wh35--4wg@mail.gmail.com>
+ <CANn89iJiapfb3OULLv8FxQET4e-c7Kei_wyx2EYb7Wt_0qaAtw@mail.gmail.com>
+ <CAM0EoMm4UZ9cM6zOTH+uT1kwyMdgEsP2BPR3C+d_-nmbXfrYyQ@mail.gmail.com>
+ <CANn89i+_4Hj2WApgy_UBFhsDy+FEM8M1HhutrUcUHKmqbMR1-A@mail.gmail.com>
+ <CAM0EoMmoMUtrBHyYUWNeBnFFj8kDFYPyQB+O1fdGB4xk_bMWZA@mail.gmail.com>
+ <CANn89i+zDW5ttPZ7fw2gDbVQqXj2uFoeEeTRSU6gzFLM3zGCeA@mail.gmail.com>
+ <CAM0EoMmzt1tDpoqK=mMZoj1=6UU2Ytim2aqJWOBAZmPfNyZSfQ@mail.gmail.com>
+ <CANn89iKKKwj33WgSbGKDa7JB=qRBXSH6VbiAV=umwOgwYsbmTQ@mail.gmail.com>
+ <CAM0EoMngngPdwCqFrbEQAFgu+cMe0eVfBs1XKD4zTUCTpYYHOw@mail.gmail.com> <CAM0EoMn4rW3VOmEaxz2VBxGeywoQ_TBDSz7qKsS6AHjo0HNJWA@mail.gmail.com>
+In-Reply-To: <CAM0EoMn4rW3VOmEaxz2VBxGeywoQ_TBDSz7qKsS6AHjo0HNJWA@mail.gmail.com>
 From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Wed, 3 Dec 2025 09:23:17 -0500
-X-Gm-Features: AWmQ_bn4jKrZuo_ODJVaHq-0zPpM8Ft7OUFDcr2_k_TVawOVYTk1mT9eYbuv_Vw
-Message-ID: <CAM0EoMnEU1gLNn4XNbq=rG14iVh_XqU32P3y_8K8+fvRbmWrvA@mail.gmail.com>
-Subject: Re: [PATCH net] net/sched: ets: Always remove class from active list
- before deleting in ets_qdisc_change
-To: Davide Caratti <dcaratti@redhat.com>
-Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
-	netdev@vger.kernel.org, horms@kernel.org, zdi-disclosures@trendmicro.com, 
-	w@1wt.eu, security@kernel.org, tglx@linutronix.de, victor@mojatatu.com, 
-	Petr Machata <petrm@nvidia.com>
+Date: Wed, 3 Dec 2025 09:27:30 -0500
+X-Gm-Features: AWmQ_bnTd-6jsGdPjljxejJyqBLqaaRv4yz1lhlE4dA27F3s_V7x3Pvrx9aDs2E
+Message-ID: <CAM0EoMmiTRqKaXK7Y7LQpm6yfkz6Q-pGn9e_bMo-t8++pqHZSQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] net/sched: act_mirred: Fix infinite loop
+To: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, pabeni@redhat.com, 
+	jiri@resnulli.us, xiyou.wangcong@gmail.com, netdev@vger.kernel.org, 
+	dcaratti@redhat.com, Victor Nogueira <victor@mojatatu.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Sorry, I totally forgot to add Petr in the original post, he's on Cc now..
-
-On Tue, Dec 2, 2025 at 4:56=E2=80=AFAM Davide Caratti <dcaratti@redhat.com>=
- wrote:
+On Thu, Nov 27, 2025 at 11:21=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com=
+> wrote:
 >
-> On Fri, Nov 28, 2025 at 03:52:53PM -0500, Jamal Hadi Salim wrote:
-> > Hi Davide,
+> On Thu, Nov 27, 2025 at 10:23=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.c=
+om> wrote:
 > >
-> > On Fri, Nov 28, 2025 at 12:25=E2=80=AFPM Davide Caratti <dcaratti@redha=
-t.com> wrote:
->
-> hello Jamal, thanks for your patience!
->
-> [...]
->
-> > > > diff --git a/net/sched/sch_ets.c b/net/sched/sch_ets.c
-> > > > index 82635dd2cfa5..ae46643e596d 100644
-> > > > --- a/net/sched/sch_ets.c
-> > > > +++ b/net/sched/sch_ets.c
-> > > > @@ -652,7 +652,7 @@ static int ets_qdisc_change(struct Qdisc *sch, =
-struct nlattr *opt,
-> > > >       sch_tree_lock(sch);
+> > On Thu, Nov 27, 2025 at 10:11=E2=80=AFAM Eric Dumazet <edumazet@google.=
+com> wrote:
+> > >
+> > > On Thu, Nov 27, 2025 at 6:45=E2=80=AFAM Jamal Hadi Salim <jhs@mojatat=
+u.com> wrote:
 > > > >
-> > > >       for (i =3D nbands; i < oldbands; i++) {
-> > > > -             if (i >=3D q->nstrict && q->classes[i].qdisc->q.qlen)
-> > > > +             if (cl_is_active(&q->classes[i]))
-> > > >                       list_del_init(&q->classes[i].alist);
-> > > >               qdisc_purge_queue(q->classes[i].qdisc);
-> > > >       }
+> > > > On Wed, Nov 26, 2025 at 3:30=E2=80=AFPM Eric Dumazet <edumazet@goog=
+le.com> wrote:
+> > > > >
+> > > > > On Wed, Nov 26, 2025 at 12:20=E2=80=AFPM Jamal Hadi Salim <jhs@mo=
+jatatu.com> wrote:
+> > > > > >
+> > > > > > On Wed, Nov 26, 2025 at 1:20=E2=80=AFPM Eric Dumazet <edumazet@=
+google.com> wrote:
+> > > > > > >
+> > > > > > > On Wed, Nov 26, 2025 at 10:14=E2=80=AFAM Jamal Hadi Salim <jh=
+s@mojatatu.com> wrote:
+> > > > > > >
+> > > > > > > > It's the multiport redirection, particularly to ingress. Wh=
+en it get
+> > > > > > > > redirected to ingress it will get queued and then transitio=
+ned back.
+> > > > > > > > xmit struct wont catch this as a recursion, so MIRRED_NEST_=
+LIMIT will
+> > > > > > > > not help you.
+> > > > > > > > Example (see the first accompanying tdc test):
+> > > > > > > > packet showing up on port0:ingress mirred redirect --> port=
+1:egress
+> > > > > > > > packet showing up on port1:egress mirred redirect --> port0=
+:ingress
+> > > > > > >
+> > > > > > > Have you tried recording both devices ?
+> > > > > > >
+> > > > > > > diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+> > > > > > > index f27b583def78e4afecc7112854b93d59c2520201..711fc2e31cb04=
+51c07a39f9c94226357d5faec09
+> > > > > > > 100644
+> > > > > > > --- a/net/sched/act_mirred.c
+> > > > > > > +++ b/net/sched/act_mirred.c
+> > > > > > > @@ -445,15 +445,17 @@ TC_INDIRECT_SCOPE int tcf_mirred_act(st=
+ruct sk_buff *skb,
+> > > > > > >                 return retval;
+> > > > > > >         }
+> > > > > > >         for (i =3D 0; i < xmit->sched_mirred_nest; i++) {
+> > > > > > > -               if (xmit->sched_mirred_dev[i] !=3D dev)
+> > > > > > > +               if (xmit->sched_mirred_dev[i] !=3D dev &&
+> > > > > > > +                   xmit->sched_mirred_dev[i] !=3D skb->dev)
+> > > > > > >                         continue;
+> > > > > > > -               pr_notice_once("tc mirred: loop on device %s\=
+n",
+> > > > > > > -                              netdev_name(dev));
+> > > > > > > +               pr_notice_once("tc mirred: loop on device %s/=
+%s\n",
+> > > > > > > +                              netdev_name(dev), netdev_name(=
+skb->dev));
+> > > > > > >                 tcf_action_inc_overlimit_qstats(&m->common);
+> > > > > > >                 return retval;
+> > > > > > >         }
+> > > > > > >
+> > > > > > >         xmit->sched_mirred_dev[xmit->sched_mirred_nest++] =3D=
+ dev;
+> > > > > > > +       xmit->sched_mirred_dev[xmit->sched_mirred_nest++] =3D=
+ skb->dev;
+> > > > > > >
+> > > > > > >         m_mac_header_xmit =3D READ_ONCE(m->tcfm_mac_header_xm=
+it);
+> > > > > > >         m_eaction =3D READ_ONCE(m->tcfm_eaction);
+> > > > > >
+> > > > > > Did you mean not to decrement sched_mirred_nest twice?
+> > > > >
+> > > > > No, sorry, we should decrement twice of course.
+> > > > >
+> > > >
+> > > > Ok, I tested.
+> > > > While it "fixes" it - it's not really a fix. It works by ignoring d=
+irection.
+> > > > Example, this is not a loop but currently would be claimed to be a
+> > > > loop because port0 appears twice:
+> > > > port0 ingress --> port1 ingress --> port1 egress
+> > > > Note: port0 ingress and port0 egress cannot create a loop.
 > > >
-> > > (nit)
+> > > I am not familiar with this stuff, can the direction be known and
+> > > taken into account ?
 > > >
-> > > the reported problem is NULL dereference of q->classes[i].qdisc, then
-> > > probably the 'Fixes' tag is an hash precedent to de6d25924c2a ("net/s=
-ched: sch_ets: don't
-> > > peek at classes beyond 'nbands'"). My understanding is: the test on '=
-q->classes[i].qdisc'
-> > > is no more NULL-safe after 103406b38c60 ("net/sched: Always pass noti=
-fications when
-> > > child class becomes empty"). So we might help our friends  planning b=
-ackports with something like:
-> > >
-> > > Fixes: de6d25924c2a ("net/sched: sch_ets: don't peek at classes beyon=
-d 'nbands'")
-> > > Fixes: c062f2a0b04d ("net/sched: sch_ets: don't remove idle classes f=
-rom the round-robin list")
-> > >
-> > > WDYT?
 > >
-> > I may be misreading your thought process, seems you are thinking the
-> > null ptr deref is in change()?
-> > The null ptr deref (and the uaf if you add a delay) is in dequeue
-> > (ets_qdisc_dequeue()) i.e not in change.
+> > Yes, it can.
+> > To figure the target direction see tcf_mirred_act_wants_ingress() and
+> > to get what the current direction see code like:
+> > at_ingress =3D skb_at_tc_ingress(skb);
+> >
+> > > Really, anything but adding new bits in sk_buff.
+> >
+> > If we can fix it without restoring those two bits i will be happy.
+> > To repeat something i said earlier:
+> > The bigger challenge is somewhere along the way (after removing those
+> > two bits) we ended sending the egress->ingress to netif_rx() (see
+> > tcf_mirred_forward()), so any flow with that kind of setup will
+> > nullify your xmit count i.e when we come back for the next leg the
+> > xmit counter will be 0.
+> >
 >
-> I understand this - it happens to DRR classes that are beyond 'nbands'
-> after the call to ets_qdisc_change(). Since those queues can have some pa=
-ckets
-> stored, in ets_qdisc_dequeue() you might have observed:
+> BTW, I have the attached patch but was waiting to see how this
+> discussion is heading.
+> It's when you have something like port0 egress --> port0 egress and
+> you use something like drr as root qdisc.
 >
-> 480                 cl =3D list_first_entry(&q->active, struct ets_class,=
- alist);
-> 481                 skb =3D cl->qdisc->ops->peek(cl->qdisc);
+> -- a/net/sched/act_mirred.c
+> +++ b/net/sched/act_mirred.c
+> @@ -281,6 +281,14 @@ static int tcf_mirred_to_dev(struct sk_buff *skb,
+> struct tcf_mirred *m,
 >
-> with a "problematic" value in cl->qdisc. That's why I suggest to add
+>         want_ingress =3D tcf_mirred_act_wants_ingress(m_eaction);
 >
-> [1] Fixes: de6d25924c2a ("net/sched: sch_ets: don't peek at classes beyon=
-d 'nbands'")
->
-
-Ok, so that was the initial attempt to fix this issue?
-
-> in the metadata.
->
-> > If that makes sense, what would be a more appropriate Fixes?
->
-> the line you are changing in the patch above was added with:
->
-> c062f2a0b04d ("net/sched: sch_ets: don't remove idle classes from the rou=
-nd-robin list")
->
-> and the commit message said:
->
-
-> << we can remove 'q->classes[i].alist' only if DRR class 'i' was part of =
-the active
->    list. In the ETS scheduler DRR classes belong to that list only if the=
- queue length
->    is greater than zero >>
->
-> this assumption on the queue length is no more valid, maybe it has never =
-been valid :),
-> hence my suggestion to add also
->
-> [2] Fixes: c062f2a0b04d ("net/sched: sch_ets: don't remove idle classes f=
-rom the round-robin list")
+> +       if (dev =3D=3D skb->dev && want_ingress =3D=3D at_ingress) {
+> +               pr_notice_once("tc mirred: Loop (%s:%s --> %s:%s)\n",
+> +                              netdev_name(skb->dev),
+> +                              at_ingress?"ingress":"egress",
+> +                              netdev_name(dev),
+> +                              want_ingress?"ingress":"egress");
+> +               goto err_cant_do;
+> +       }
+>         /* All mirred/redirected skbs should clear previous ct info */
+>         nf_reset_ct(skb_to_send);
+>         if (want_ingress && !at_ingress) /* drop dst for egress -> ingres=
+s */
 >
 
-ok, so this seems to be a followup attempt to the first one.
-I have a question: Shouldnt we be listing all the commits in Fixes if
-subsequent patches are fixing a previous one? Example, this one has a
-Fixes: de6d25924c2a - which is the previous one? IOW, would it not be
-fine to only mention c062f2a0b04d and not de6d25924c2a?
-
-> > BTW, is that q->classes[i].qdisc =3D NULL even needed after this?
-> > It was not clear whether it guards against something else that was not
-> > obvious from inspection.
->
-> That NULL assignment is done in ets_qdisc_change() since the beginning: f=
-or classes
-> beyond 'nbands' we had
->
->         for (i =3D q->nbands; i < oldbands; i++) {
->                 qdisc_put(q->classes[i].qdisc);
->                 memset(&q->classes[i], 0, sizeof(q->classes[i]));
->
-> in the very first implementation of sch_ets that memset() was wrongly ove=
-rwriting 'alist'.
-
-Ok. makes sense - i see it in the original patch from Petr.
-
-> The NULL assignment is not strictly necessary, but any value of 'q->class=
-es[i].qdisc'
-> is either a UAF or a NULL dereference when 'i' is greater or equal to 'q-=
->nbands'.
-
-I agree - before this one liner fix. I do think it is not necessary
-any longer, but wont touch it for now in case there are other
-dependencies
-
-> I see that ETS sometimes assigns the noop qdisc there: maybe we can assig=
-n that to
-> 'q->classes[i].qdisc' when 'i' is greater or equal to 'q->nbands', instea=
-d of NULL ?
-
-I wouldnt go that far. What i can tell you is removing it didnt matter
-in both what i and Victor tested.
-
-> so the value of 'q->classes[i].qdisc' is a valid pointer all the times?
-
-Well, I don't think the nstrict classes should have gone into that
-alist to begin with (looking at the trick test that  made you issue
-the first commit - that is what the test was achieving) and since that
-doesnt happen anymore we dont need to worry about it.
-
-> In case it makes some
-> sense, that would be a follow-up patch targeting net-next that I can test=
- and send. Any
-> feedback appreciated!
->
-
-We'll see if it is worth it. Some more testing is needed.
+Eric,
+Are you still looking at this?
 
 cheers,
 jamal
-
-
-> thanks,
-> --
-> davide
->
->
 
