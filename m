@@ -1,88 +1,88 @@
-Return-Path: <netdev+bounces-243360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 671F1C9DCF8
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 06:41:46 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C10CAC9DCFE
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 06:42:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 387BA4E026F
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 05:41:45 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 92A654E029F
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 05:42:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7D072765C0;
-	Wed,  3 Dec 2025 05:41:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A06627B50F;
+	Wed,  3 Dec 2025 05:42:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xy0SKz86"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XvPwAgja"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79F863207
-	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 05:41:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 130B91427A
+	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 05:42:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764740502; cv=none; b=O/8jwOSMJxMHCv4qWHqXtrioVzWwG1sOImiPxOcgdnTqxKmJ5ExmhaAn6f1nC4jUSW8HuksZugTrHsfzDciaw9tWGkA742s1zDBSvNnVpED++UCjeC+kKHq2ENYImEsEXQ9WLm48gdXnqVNS38iSu+donqUmnbXN7+3OLOl4qGU=
+	t=1764740566; cv=none; b=KkwDMH5YbCqA/kzoFpwPvbNgrcMoA1zIPxtWIIr68ugKd2ZtMnZmQ2Z1KyGTkdeW0wzxzhAgygVYDaZKAmtGZadPMSrTqPsDhdHpfiaG8vp2qaJ+mdjJOy3uq/2mlboJW3t3ptvCWNliNA6U40eS93LHxGJ4KkdHeasrnqUpfAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764740502; c=relaxed/simple;
-	bh=lODd6SPDg82uM/ojCYk58w5xD+1peoKtDFekLLwAJ0c=;
+	s=arc-20240116; t=1764740566; c=relaxed/simple;
+	bh=Otq3WCfk1rUw1D/rmmFfkk46OFFvNyrLVDqDUGiQrbQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IhMBGeObMeB2NcL4zN0RsRDTaRicRMl7cfcq7NR22BMDkqWzztZ5u5PoO3WCjFWDucDZCBD7BYbdGRsDvNWYWtd1u8++credOIklAt27EtAOaSjwPvRfnmfIKqfyGeRDcby4GcM7114/wxANC0EIPwYF3Yzf+L1hkQBGYxKH5jk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xy0SKz86; arc=none smtp.client-ip=209.85.210.180
+	 Content-Type:Content-Disposition:In-Reply-To; b=IQOH7JLYfAgWBXL3+2J+QM2wEiAkKZAcb8RnTKxpXhDs4MlBmlAcEPKX1NYSGI0K0ORhfjQYdY2iD80YXXKPlyuPrkTztJ56jzseJrv2P/oumnpZMPQzO3vNw9rFYjxCEO170Ca4r4vXDo2vrnBFhov4hPLb3QPvfGMsXX49U04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XvPwAgja; arc=none smtp.client-ip=209.85.215.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7b80fed1505so7362751b3a.3
-        for <netdev@vger.kernel.org>; Tue, 02 Dec 2025 21:41:41 -0800 (PST)
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-b553412a19bso5393327a12.1
+        for <netdev@vger.kernel.org>; Tue, 02 Dec 2025 21:42:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764740501; x=1765345301; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1764740564; x=1765345364; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gXgJ8TpxYNHJJGDVFjS636CK2/HtL1akqVfOdjohTk8=;
-        b=Xy0SKz86bSKvA4h+QO4+NC2zMOj87FFIa81IFjHJkuCRGRdVUeEQy0TtB0Jl6Gc2LJ
-         Ne0f+H662pniCwOOR3YNGqhWuBV/Bz1mbxPdatdx2F6FojiE0/dXoTIurST9Wl9UPzeO
-         MiWtIoQo5TiyF5pgGedQUGRGn1NQN+siRdlfP/YTbP150ZszttMPvo5VsfPIOOryjRXX
-         1Nnh7QOuHFhfkp5v00a7/B1ov5Q5HStn/318Pd+uqMAGqZIkaTStf45WG/FwlwIKgdKL
-         6XI4hkazE9a/nJ9FTWlb308IlzdIKTwEpCC+yXMeMfLH41Y9WyR8CuJ5+zrMo/ddkqUI
-         pcXw==
+        bh=oF79V0ubYln3hWTBA8d7rTQHZtvnHeNi3kk7XwgxLjc=;
+        b=XvPwAgja7idD5Y0nyXajWlHgWwfpQebKUq2jmVclKZFVqZAY49ZSYLwZeAjQXVpbcc
+         Dn3Ns7mXqnWdijCr0/8OWjwnb+vKF+7nMju8+XOhNY7Tfq3vfU/P8E32xTAqD9tRfSLH
+         EJp0wz4+HJlrq3U5lTrs0qAE1iWDcF/ekbzNjdjhDPHaEo1aJqMeIoUEttl4I1BoZdNv
+         3cU8q3lD4aFVCDWCF5uKJ/1r1orM5jv8KjcN0ok2g177LBONKsFv3e3yIoLYsa0SQkEN
+         bT3nljEwyrmWNoL/jKBJ96lWPgw2Yvho+wRHjq2TYU5AFMqb/TKiHJtb3gvquEGeSjOM
+         uj5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764740501; x=1765345301;
+        d=1e100.net; s=20230601; t=1764740564; x=1765345364;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gXgJ8TpxYNHJJGDVFjS636CK2/HtL1akqVfOdjohTk8=;
-        b=ShJt6rCRXmjctJo6YRmQDeVhNln6p/7gmSML6uG81Sa6ztLFPaRppfuAYEEMavPzs+
-         8/nlQrNo6QJZ+PmunE5h/J0nwPtzl3/Odz1YDeXt9t47ZB++/YxiLI7E+2uWKYgMTpQN
-         SuRTMY+bYuADh+N1E8oqs+F6Zg4/g3sd3+1QTUMjE+UCNs3lmri49jk63DKgZLsN01BQ
-         QfFO8U+22J5AuA0rZ8et2Cioci2okGf2aKmh+lzTg0MynOu+nzQnjcNffRmGUL5/lAqo
-         k86nI3rrufmB+5g+aNqcIEXVewi4wpoHGlFeQ3M3gXWjovzOWIGckoar9V9N20Z5512+
-         2bZw==
-X-Gm-Message-State: AOJu0YxwGe2KEE6a7g/SGyE/+zRSZeVehh2E9vryaSrfne4x74zn50d1
-	OzYiT7SjcZM34s6eNJkj6dbTexD7fH2M+ImlCKO7YAJ6KupqO38Srqj0ZwsTLrRf
-X-Gm-Gg: ASbGnctXM3D48GjE24ksJbyWEgd6WmS052BH6yR1ZBIySbo5yHibBnl8YxXIKv+KNI/
-	0RrntgQnMnvLSOIX9jCS9UcX+io/a8KKLp5bktz28W9AguC+wZcdul6Rw6dZNCX3wfof703wPxT
-	HPT97LP5K8qKPTg+HW2YLJVZ6BhMBO7qulmd7CKF5pY9gFViUk5AGJhgI0oelhDZkeW94xqe7m/
-	bGqkY6nNCwd6tPAhVcqJxeEYCN5KFJ/DMJ0tySrRK2CXUVhX1DuqSWCCKVfgAxjnxdbfCU65zW5
-	u8g3lCZyFpgsOOrR0cSHzvpJluyBcIKK5jBMCy2dvuMDB3LVM+mOH/OgazIvlkyPGIBj2BCgs5P
-	ZMGOexnOqC7/ZTPhGjVkVi1T9RSqK9BqmqkdJqUvPrdSUbFeZAHbXiJDP4PDE9y12yH2+Sz208y
-	5LQrY12mscV0oRnWBD0A==
-X-Google-Smtp-Source: AGHT+IGdsnmmXGhkIatqiSwSVRp8q/ynzlbmd0UfmylC7SKQ5tugjniqH1DTapLX+TyhIFgBNCe2kg==
-X-Received: by 2002:a05:7022:2391:b0:11b:f056:a1b3 with SMTP id a92af1059eb24-11df0c5e51dmr1246571c88.11.1764740500594;
-        Tue, 02 Dec 2025 21:41:40 -0800 (PST)
+        bh=oF79V0ubYln3hWTBA8d7rTQHZtvnHeNi3kk7XwgxLjc=;
+        b=BKGSf+zefRdMbZkblNUJiNlNh3BqNdE27kyf0yL3xbSnIp03Z7OS0hl4PD65OD7c8k
+         RN3d0leg9VraJX0ACuVP15t6CleqdpSq2tsRXTu59+qV0iJs9VjNshoH4vBdL/TwwPM/
+         07E+ZvxqOihCFHi8onhXZ8tmE0w60DKOPuYotOqQV/o6KnMmmV6n+SQrB7amQZNCV620
+         LjcIuXlmuT6CFSjPjzut2+DDCK23a7ZjAgKi3hCoZAwCH1d7po7H2IrKBOjCTO8JZEWI
+         pbqFsS7cNlOpDv52dGTjQ+uWW3cI4Nsbc5agvQgt6RGTzmf90p7AJfLk/XKVfmZkhKG1
+         KDmg==
+X-Gm-Message-State: AOJu0YwZNG0hWpEivvlFxIWUikPAE1aqWMZsgy0RE24s1a94y0E4LsiC
+	deolPZPZiJLKoWNqAIyX61hDx44zP4dB/cyPsPeB38iJOoUjOMS5WRFY
+X-Gm-Gg: ASbGncsDvWI2haguk4LBVaVPQx/Kk5knXqtLOOtlQ47+z6U+rAB9fVzF14gCm+EkD1v
+	27d8ygIPf0b6ONBzFhoF/VKMb3VCuykLE7cWXUxNAnxijTnCOSf5nAC/aNoio266w5aF0vNBOvA
+	tsiswktAg8/wi8Fo5kw/Ro5ZKgjcNPWwayx4BF81y+GzRazSVOk+t3ymNLXDVjBIOJJSDg0q+oS
+	XWhbXpYkePt+DwVyA1ppXPpOyGt2fGUzMPhfyxKWTxdrnlHBTC4N8n3NGF6im1n9f+yYl8duaYq
+	XLd51rm5rNlY9XQQOGYv08014MPTP4ttEucH2nJw4sDhze03O5Lgf2shW2841JetCP0dsLeNTdj
+	SPiQbCxcvO3nRjUdNyl/DVSwSoUuLhLCJ6By4yCpPSM0q25IlKGd23JJ6gbOzY7bjn/XpqKScKJ
+	OWSJEr28QLbgvZedebfA==
+X-Google-Smtp-Source: AGHT+IFjqQr/R2Hchi4orSNb74EHa+HuoxKRcGtIIaDBcKDRC3v01CZnSsuYRiGk1saoDRvbP7fnuA==
+X-Received: by 2002:a05:7300:f3c2:b0:2a4:3593:6466 with SMTP id 5a478bee46e88-2ab92e52c79mr632220eec.22.1764740564164;
+        Tue, 02 Dec 2025 21:42:44 -0800 (PST)
 Received: from localhost ([2601:647:6802:dbc0:57e5:a934:7b10:c032])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11dcaed5fcasm94157671c88.2.2025.12.02.21.41.39
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2a965b47caasm64357808eec.6.2025.12.02.21.42.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Dec 2025 21:41:40 -0800 (PST)
-Date: Tue, 2 Dec 2025 21:41:39 -0800
+        Tue, 02 Dec 2025 21:42:43 -0800 (PST)
+Date: Tue, 2 Dec 2025 21:42:42 -0800
 From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, stephen@networkplumber.org,
-	Cong Wang <cwang@multikernel.io>
-Subject: Re: [Patch net v5 4/9] net_sched: Prevent using netem duplication in
- non-initial user namespace
-Message-ID: <aS/Nk8ujLJttzKNo@pop-os.localdomain>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, stephen@networkplumber.org, kuba@kernel.org,
+	Xiang Mei <xmei5@asu.edu>
+Subject: Re: [Patch net v5 5/9] net_sched: Check the return value of
+ qfq_choose_next_agg()
+Message-ID: <aS/N0s3A4xeJqMvZ@pop-os.localdomain>
 References: <20251126195244.88124-1-xiyou.wangcong@gmail.com>
- <20251126195244.88124-5-xiyou.wangcong@gmail.com>
- <20251201162524.18c919fd@kernel.org>
+ <20251126195244.88124-6-xiyou.wangcong@gmail.com>
+ <278eb8cc-0564-4883-918e-0aaa62dfa851@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,29 +91,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251201162524.18c919fd@kernel.org>
+In-Reply-To: <278eb8cc-0564-4883-918e-0aaa62dfa851@redhat.com>
 
-On Mon, Dec 01, 2025 at 04:25:24PM -0800, Jakub Kicinski wrote:
-> On Wed, 26 Nov 2025 11:52:39 -0800 Cong Wang wrote:
-> > The netem qdisc has a known security issue with packet duplication
-> > that makes it unsafe to use in unprivileged contexts. While netem
-> > typically requires CAP_NET_ADMIN to load, users with "root" privileges
-> > inside a user namespace also have CAP_NET_ADMIN within that namespace,
-> > allowing them to potentially exploit this feature.
+On Tue, Dec 02, 2025 at 10:20:20AM +0100, Paolo Abeni wrote:
+> On 11/26/25 8:52 PM, Cong Wang wrote:
+> > qfq_choose_next_agg() could return NULL so its return value should be
+> > properly checked unless NULL is acceptable.
 > > 
-> > To address this, we need to restrict the netem duplication to only the
-> > initial user namespace.
+> > There are two cases we need to deal with:
+> > 
+> > 1) q->in_serv_agg, which is okay with NULL since it is either checked or
+> >    just compared with other pointer without dereferencing. In fact, it
+> >    is even intentionally set to NULL in one of the cases.
+> > 
+> > 2) in_serv_agg, which is a temporary local variable, which is not okay
+> >    with NULL, since it is dereferenced immediately, hence must be checked.
+> > 
+> > This fix corrects one of the 2nd cases, and leaving the 1st case as they are.
+> > 
+> > Although this bug is triggered with the netem duplicate change, the root
+> > cause is still within qfq qdisc.
 > 
-> What gives us the confidence that this won't break existing setups?
-> Pretty sure we use user ns at Meta, tho not sure if any of our
-> workloads uses both those and netem dup.
+> Given the above, I think this patch should come first in the series WRT
+> "net_sched: Implement the right netem duplication behavior"
 
-All the reports (https://bugzilla.kernel.org/show_bug.cgi?id=220774) we
-had so far didn't mention user namespace. This is the only data point I
-have.
-
-I can drop this patch, but I am not sure if patch 3/9 is sufficient to
-convince Will on user namespace security.
+Will do.
 
 Regards,
 Cong
