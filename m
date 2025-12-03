@@ -1,221 +1,135 @@
-Return-Path: <netdev+bounces-243380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id F08BCC9E7BA
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 10:30:10 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8457CC9E7D7
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 10:33:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2C05E348FBC
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 09:30:00 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 848F84E049E
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 09:33:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF5202DE1E6;
-	Wed,  3 Dec 2025 09:29:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ED352D8779;
+	Wed,  3 Dec 2025 09:33:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="JwIC1pYJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QA9mr1MG"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B4EC2DCF4D;
-	Wed,  3 Dec 2025 09:29:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7420021CFF6
+	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 09:33:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764754196; cv=none; b=alMB8YITK+rsYT8H3rB/4hzZvT8M8pptw+usOrnqfOtRcmuxiuv+uUAppqo6WPXjqJiis3lv4t7mU8iIg0UD15EHi0do+6gm7nRebFtgDsGo0zTVDXoIDYhFTIJmUJqDstbrKcI0dd4KgdI4hoIpwJiZzDXX9gnNmaE9NGj62hw=
+	t=1764754384; cv=none; b=hBwWVEB+ccU2xfoJLo4XOO8pQF5UxyT64tAOY5S5mlGpOUGS+akF2ZXP/UxRUUisaJepHTT5MyELG5QlIkdsbef1msOD8xCIF9iHqGhJ/lrp7j1edoBB1B/uKVRTe5yZlR1n/dDPz7UpkYo2ydID5cLCy2lgJEzjHf3kva6G/jY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764754196; c=relaxed/simple;
-	bh=ded+QBGC6xLs3khUezFdO4xx+eh/BxqZQHkKWcfOLs8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ueQgn+5pumLKr8UKW2BCwMxI8cugO/fQlw5XYdSlDq4UYEcz8bm++2FIl1Bfr14KZG7Xv1DCNJrSrqKDXVu4ZGjY9dCu3Yhv2c0KBNpzbx0tM+eaGKHWFGBqYmYDOLjaADPVtlc48bOqW4xeb0XfrOrltpJnbvDatGCVuWJTJlw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=JwIC1pYJ; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=++x36++AQYMYArARypVUnlYPyOBV4DEhIySU5+Og1zY=; b=JwIC1pYJ+kdsaD+CGxDPI7j5sw
-	BXlULWrb7ZSbl4nvGLcVtbK0LSCmgVkgj0xxnriKIzMh0OEOdFju1lo1yi64Dx5ABROZsBHvbTa0r
-	aw63/h/wYHm0d6s7244BN3sYs2OJ9oYU6ZQprlVOM7CSEnMokY7hjcYe2hgzNKs0OmXaRxQpjC5Kf
-	TqeMYHYkY4tjCXEiEerc9o53UadzUXapiRlRnzVoLPdsFuTdf0jMNLetqVfwefSwwk+vEwznb8ajq
-	Lpxg0DHgBz5Z9hDdPwENwpP0NpFM4tBBTalU0SC9t8dx1wSNyzBt3KuVLnnBim1/5LAKVBhq658+M
-	elAMzHbQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54368)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vQjB6-000000002PY-1BLE;
-	Wed, 03 Dec 2025 09:29:40 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vQjB2-000000008LC-04oA;
-	Wed, 03 Dec 2025 09:29:36 +0000
-Date: Wed, 3 Dec 2025 09:29:35 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Daniel Golle <daniel@makrotopia.org>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Frank Wunderlich <frankwu@gmx.de>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH RFC net-next 3/3] net: dsa: add basic initial driver for
- MxL862xx switches
-Message-ID: <aTAC_xLUztl9ZHqT@shell.armlinux.org.uk>
-References: <cover.1764717476.git.daniel@makrotopia.org>
- <d92766bc84e409e6fafdc5e3505573662dc19d08.1764717476.git.daniel@makrotopia.org>
- <c6525467-2229-4941-803d-1be5efb431c3@lunn.ch>
+	s=arc-20240116; t=1764754384; c=relaxed/simple;
+	bh=2DYv1agfJ9n9VkMlSI73M4Hj1+2Hc+Ie0drsSYly99A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CkjZZdJLQG2xuf5fnvc1bGoRTPxYM6uoWce/8O5sf21rT/upJ0HiFnI8RR0Qqr8rb3dpeVTk3gEai2d4rSrdicKON0aFagD/g+QEAm6c/NtAK6q4m5JAm9MWwiIBnfKWCwMwLDeRzOYO672PZUDm9YdqLM9Lq3ddJB2eI//WMLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QA9mr1MG; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4ed82e82f0fso50767631cf.1
+        for <netdev@vger.kernel.org>; Wed, 03 Dec 2025 01:33:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1764754382; x=1765359182; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VRC3rnLtuEd2lfCxmjxDFYLmH8sArIj9NispACXVl1w=;
+        b=QA9mr1MGohrOXc5L0WiPLt1zW3CE3bFjxtV2QwvIqwSqLJ2IdHkKTDEVQwbXTatHyi
+         vOw/VIbOgf0CUDFEGtsKMp2XpGIweeq/02RxLT9K4Df70B+xB25+BUYUZCSbUwUQ1BQt
+         ay7C4Il3jLheTX7z63DMoq/HkmWm+jNIvGEfgQ+3Rv1zN7kONShSrld6wErWWIyc/wAz
+         CKIq3m76M+xk4wc1d4VaqRKswOBTCkCbfjVS3rvooq5AL3oyZ0xnYp4SevM/lcEnQHn2
+         wTWXDBKEVOLjFVlcoBgWOf4+KNcFoih8cFdZD73N3KWyQnOTvqKq4GrLxIxqVrQqBBhi
+         E+wA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764754382; x=1765359182;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=VRC3rnLtuEd2lfCxmjxDFYLmH8sArIj9NispACXVl1w=;
+        b=LuVwxJwl0n56t9wmd/YCPuIfphvNGhVMFyBrfwU68NeCag5KQrVJiq1cRwvyB/bijK
+         o6NiPvyKfK0Tz6Uxn7ikd+0xYRRoe0aJxNeYsvgaVwsJOK8hCQ+La0svJVAuR1KTGs+k
+         kMc8Qjz2sphJTm2glJLIZR/Bhdgu/gEQYWvx8JsgPXOeqZ8hlL20qC5IFLSL9+/Jpkcm
+         rvIpt+6GD+yRWgtPoL5G5z3aQQQRbhapZ1mOpjDG1D3vHNOE2LN6E8Ri3/27yLigQtKN
+         +xVWGEREeo3LJxkEARcQ9dwr3Bm3P4ax3febGK/TDMYJkgG/ZhQSOawIu7JKpB8B9CdO
+         tuFQ==
+X-Gm-Message-State: AOJu0YxYkCFgRmV/rMAB8kW7k1d7+OEqYns9Be0O/5qVb2ovgldMhyiX
+	O4v6Qx7M1QYzqOlsPPh+0GmHkbZQOxvHVU+uN3hUP5uExWTvmk3zGHmb3hos8lJBnkkXY2UntWQ
+	wRPv+4WH8LLjhEtaeTfOTV8C7p5vhkGrW5cuCeGZR
+X-Gm-Gg: ASbGncsqkww5dUgS0kOstYs0HeTiRr6M5tCDwx8Z5xutQgBXEkC2fWhEA489TEuqvQm
+	b4qA0y86o5vyD8lPJbPAOUHpv98294Zuc5dF0dke1HS68IZtKkig6iP9LEneRbC+VibgOC2Tfkj
+	pQCOj+Yc/ivKLiOU0NLISInILKxTGnPT/H8u7HaSf4xX6fPohwUJkk9gwO7tYE7PgDwN1xozlFW
+	yOqlXhbF42ZxQ3r+AuQvvdhv8U9GkpljNh1JhLZFsgEU9ucDGWRRSHA8tZu+UimBObEG/E=
+X-Google-Smtp-Source: AGHT+IG9Q6pBViYhFWM/lqWF1UIHccIroB3GviAPLH4oj7ED4doZDLxHNZ7l61rAybvudv1AAVfY8oahZzoFPp+HqRM=
+X-Received: by 2002:ac8:5952:0:b0:4ed:6e70:1ac4 with SMTP id
+ d75a77b69052e-4f01760340fmr20016111cf.42.1764754381945; Wed, 03 Dec 2025
+ 01:33:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c6525467-2229-4941-803d-1be5efb431c3@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <CAKrymDR1X3XTX_1ZW3XXXnuYH+kzsnv7Av5uivzR1sto+5BFQg@mail.gmail.com>
+In-Reply-To: <CAKrymDR1X3XTX_1ZW3XXXnuYH+kzsnv7Av5uivzR1sto+5BFQg@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 3 Dec 2025 01:32:51 -0800
+X-Gm-Features: AWmQ_blkdfwgIvsjfItsYshwc_eABXQWA83bk8bwk4zEZ83IVLlfJGBJ8jXyprM
+Message-ID: <CANn89iLb-0kDwYerdbhHRH_LN1B3_gSKYOgu8KENQsk7akX-WQ@mail.gmail.com>
+Subject: Re: [PATCH net] atm: mpoa: Fix UAF on qos_head list in procfs
+To: Minseong Kim <ii4gsp@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 03, 2025 at 03:07:20AM +0100, Andrew Lunn wrote:
-> > +/**
-> > + * struct mxl862xx_ss_sp_tag
-> > + * @pid: port ID (1~16)
-> > + * @mask: bit value 1 to indicate valid field
-> > + *	0 - rx
-> > + *	1 - tx
-> > + *	2 - rx_pen
-> > + *	3 - tx_pen
-> > + * @rx: RX special tag mode
-> > + *	0 - packet does NOT have special tag and special tag is NOT inserted
-> > + *	1 - packet does NOT have special tag and special tag is inserted
-> > + *	2 - packet has special tag and special tag is NOT inserted
-> > + * @tx: TX special tag mode
-> > + *	0 - packet does NOT have special tag and special tag is NOT removed
-> > + *	1 - packet has special tag and special tag is replaced
-> > + *	2 - packet has special tag and special tag is NOT removed
-> > + *	3 - packet has special tag and special tag is removed
-> > + * @rx_pen: RX special tag info over preamble
-> > + *	0 - special tag info inserted from byte 2 to 7 are all 0
-> > + *	1 - special tag byte 5 is 16, other bytes from 2 to 7 are 0
-> > + *	2 - special tag byte 5 is from preamble field, others are 0
-> > + *	3 - special tag byte 2 to 7 are from preabmle field
-> > + * @tx_pen: TX special tag info over preamble
-> > + *	0 - disabled
-> > + *	1 - enabled
-> > + */
-> > +struct mxl862xx_ss_sp_tag {
-> > +	u8 pid;
-> > +	u8 mask;
-> > +	u8 rx;
-> > +	u8 tx;
-> > +	u8 rx_pen;
-> > +	u8 tx_pen;
-> > +} __packed;
-> > +
-> > +/**
-> > + * enum mxl862xx_logical_port_mode - Logical port mode
-> > + * @MXL862XX_LOGICAL_PORT_8BIT_WLAN: WLAN with 8-bit station ID
-> > + * @MXL862XX_LOGICAL_PORT_9BIT_WLAN: WLAN with 9-bit station ID
-> > + * @MXL862XX_LOGICAL_PORT_GPON: GPON OMCI context
-> > + * @MXL862XX_LOGICAL_PORT_EPON: EPON context
-> > + * @MXL862XX_LOGICAL_PORT_GINT: G.INT context
-> > + * @MXL862XX_LOGICAL_PORT_OTHER: Others
-> > + */
-> > +enum mxl862xx_logical_port_mode {
-> > +	MXL862XX_LOGICAL_PORT_8BIT_WLAN = 0,
-> > +	MXL862XX_LOGICAL_PORT_9BIT_WLAN,
-> > +	MXL862XX_LOGICAL_PORT_GPON,
-> > +	MXL862XX_LOGICAL_PORT_EPON,
-> > +	MXL862XX_LOGICAL_PORT_GINT,
-> > +	MXL862XX_LOGICAL_PORT_OTHER = 0xFF,
-> > +};
-> > +
-> > +/**
-> > + * struct mxl862xx_ctp_port_assignment - CTP Port Assignment/association with logical port
-> > + * @logical_port_id: Logical Port Id. The valid range is hardware dependent
-> > + * @first_ctp_port_id: First CTP Port ID mapped to above logical port ID
-> > + * @number_of_ctp_port: Total number of CTP Ports mapped above logical port ID
-> > + * @mode: See &enum mxl862xx_logical_port_mode
-> > + * @bridge_port_id: Bridge ID (FID)
-> > + */
-> > +struct mxl862xx_ctp_port_assignment {
-> > +	u8 logical_port_id;
-> > +	__le16 first_ctp_port_id;
-> > +	__le16 number_of_ctp_port;
-> > +	enum mxl862xx_logical_port_mode mode;
-> > +	__le16 bridge_port_id;
-> > +} __packed;
-> 
-> Does the C standard define the size of an enum? Do you assume this is
-> a byte?
+On Wed, Dec 3, 2025 at 12:57=E2=80=AFAM Minseong Kim <ii4gsp@gmail.com> wro=
+te:
+>
+> The global QoS list 'qos_head' in net/atm/mpc.c is accessed from the
+> /proc/net/atm/mpc procfs interface without proper synchronization. The
+> read-side seq_file show path (mpc_show() -> atm_mpoa_disp_qos()) walks
+> qos_head without any lock, while the write-side path
+> (proc_mpc_write() -> parse_qos() -> atm_mpoa_delete_qos()) can unlink and
+> kfree() entries immediately. Concurrent read/write therefore leads to a
+> use-after-free.
+>
+> This risk is already called out in-tree:
+>   /* this is buggered - we need locking for qos_head */
+>
+> Fix this by adding a mutex to protect all qos_head list operations.
+> A mutex is used (instead of a spinlock) because atm_mpoa_disp_qos()
+> invokes seq_printf(), which may sleep.
+>
+> The fix:
+>   - Adds qos_mutex protecting qos_head
+>   - Introduces __atm_mpoa_search_qos() requiring the mutex
+>   - Serializes add/search/delete/show/cleanup on qos_head
+>   - Re-checks qos_head under lock in add path to avoid duplicates under
+>     concurrent additions
+>   - Uses a single-exit pattern in delete for clarity
+>
+> Note: atm_mpoa_search_qos() still returns an unprotected pointer; callers
+> must ensure the entry is not freed while using it, or hold qos_mutex.
+>
+> Reported-by: Minseong Kim <ii4gsp@gmail.com>
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Minseong Kim <ii4gsp@gmail.com>
+> ---
 
-It does not. Some architectures are allowed to choose the storage size
-of enum depending on the range of values.
+Thanks for the patch.
 
-> > +static int mxl862xx_send_cmd(struct mxl862xx_priv *dev, u16 cmd, u16 size,
-> > +			     s16 *presult)
-> > +{
-> > +	int ret;
-> > +
-> > +	ret = __mdiobus_c45_write(dev->bus, dev->sw_addr, MXL862XX_MMD_DEV,
-> > +				  MXL862XX_MMD_REG_LEN_RET, size);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	ret = __mdiobus_c45_write(dev->bus, dev->sw_addr, MXL862XX_MMD_DEV,
-> > +				  MXL862XX_MMD_REG_CTRL, cmd | CTRL_BUSY_MASK);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	ret = mxl862xx_busy_wait(dev);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	ret = __mdiobus_c45_read(dev->bus, dev->sw_addr, MXL862XX_MMD_DEV,
-> > +				 MXL862XX_MMD_REG_LEN_RET);
-> > +	if (ret < 0)
-> > +		return ret;
+Unfortunately it got mangled when you mailed it :
+https://patchwork.kernel.org/project/netdevbpf/patch/CAKrymDR1X3XTX_1ZW3XXX=
+nuYH+kzsnv7Av5uivzR1sto+5BFQg@mail.gmail.com/
 
-Error codes go via this path.
+Documentation/process/submitting-patches.rst might be helpful,
+especially the part about git send-email.
 
-> > +
-> > +	*presult = ret;
-
-Register values via this, and if the sign bit is set, *presult is
-negative.
-
-> > +	ret = mxl862xx_send_cmd(priv, cmd, size, &result);
-> > +	if (ret < 0)
-> > +		goto out;
-> > +
-> > +	if (result < 0) {
-> > +		ret = result;
-> > +		goto out;
-> > +	}
-> 
-> If i'm reading mxl862xx_send_cmd() correct, result is the value of a
-> register. It seems unlikely this is a Linux error code?
-
-result here is the register value, and a negative value is the value
-from the register. So I agree - this assigns a register value to
-"ret" which gets promoted from s16 to int (sign extension) and thus
-gets returned as a Linux error code. So yes, this doesn't seem right.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thanks.
 
