@@ -1,307 +1,227 @@
-Return-Path: <netdev+bounces-243462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7484CA1A13
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 22:10:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A8B1CA1A2B
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 22:11:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E3D46302A978
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 21:09:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7B3BB301A1D8
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 21:11:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94D442D3EE5;
-	Wed,  3 Dec 2025 21:09:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0D61398F97;
+	Wed,  3 Dec 2025 21:11:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="FJqlX9es";
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="BhLbtJKy"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="kB3tUIJJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698322D190C;
-	Wed,  3 Dec 2025 21:09:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BD072BEFF8;
+	Wed,  3 Dec 2025 21:11:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764796156; cv=none; b=DSfXekMusr7T/81qKpfBmJ/HLdR+WS3WI+Da0gOMvwYz3xqlgKYMg8kFqfTwIb1vfsE+4DB0yq8T1SPl5fKk2nktWGuzIUORaLcx5NIfd+U5S8U1uxRHc/CMXMGpOM7gu9n7N9cU1/I5i4AS5/ul4BTeSyFxFSzREb3I6D32NbQ=
+	t=1764796264; cv=none; b=do5K38jPvJsJwAoR0tUeVUG4C/89MlYsRUhNbKKleSok3V08YhC63fjFgioKANEEATvG3cZturcpRfRyCaLUO6TReIJ6PQ3NlLQEm3fQeknhWHyy7JbMnY7KWaAAGWVoHe3iISbYPrFk+B0p1/vzi6zeUrNFP47BnLy/44ZUgnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764796156; c=relaxed/simple;
-	bh=cHT6RTEBO5sXEurDk/gl6mvx2DgwJV5WjP5regct73k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HBaEgNWAOp4dS9HxvGbAbTH1RQcpIWK7yWiowtMkk29C2yM88Tv0X4zd0fzH4fauw/LSpKZNUyms3qwM1XKlocVaAYUoDYA/sNz+wFSh8leRwAFAX+g/6xbqm49HywXr8WOBU4kTI7fjqcx91RDcCgQvrT4t9ZiVYmITo63GvaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=FJqlX9es; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=BhLbtJKy; arc=none smtp.client-ip=80.241.56.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [IPv6:2001:67c:2050:b231:465::2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4dM9HX4f3Gz9tKq;
-	Wed,  3 Dec 2025 22:09:12 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1764796152;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GKLLEyUCa1M/5zRwIJjRbz/UBMTbUidINBB9hmj/IK8=;
-	b=FJqlX9esyl/BeBW+OyZnfrwbQTU9NcSQsYZkpk8lzYBLGjykO9mx7APhkgBrbWNUXbFveg
-	pn9VS8/5iu2BUCsDFyayjRTKHdGOI2oFpjNOtq7fLnHwTu+UtJoTu1tdXpH/q1npJ//Rdz
-	UGilNI6O0ebS6wNlvRkWy1LuTGXDItEWrrj7W+se20SHkHZnpnyMw7WHofiXoWUUsexfWE
-	MU4j/xr/TB3UbmF6dVdjc3cEaG4e17qmcYuO59P+xIdyiPmUiZIlaHPO1YdxabY8qx/xcB
-	Gmeo6X0aUvZ5CWSA55VHjFfQft+6RAjBYtPLjJkbvM5+CTj6Q0ZstDFwJUW9Vw==
-Authentication-Results: outgoing_mbo_mout;
-	dkim=pass header.d=mailbox.org header.s=mail20150812 header.b=BhLbtJKy;
-	spf=pass (outgoing_mbo_mout: domain of marek.vasut@mailbox.org designates 2001:67c:2050:b231:465::2 as permitted sender) smtp.mailfrom=marek.vasut@mailbox.org
-From: Marek Vasut <marek.vasut@mailbox.org>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1764796150;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GKLLEyUCa1M/5zRwIJjRbz/UBMTbUidINBB9hmj/IK8=;
-	b=BhLbtJKyEdyGyG9eoUXGlEntGPS63k+lsMkfQ2mCwScocg7+/p84Qh8TXRCIqWFq23p36J
-	VbFNGq6Y9eql9qrYoBQ4yz+FtGlx+EWdysFy20tq5NDxLYhDh9A4pTLNHBfhlDFqYlgmgX
-	oPmIjWFZl6AyJY//vQMHZ3kHsvRXiqqOL868rLt5vJZutWNmuAm0KZ9dhB25hWMEerLUuk
-	utdMFKB5ZUbBBYqIYxPgXx67PhaPMc7vlokQdFfGkGIskiB+sX9pvAtwQWoQuJj0bO1xjG
-	CyFTDBgv/hRbBpqbiOAFyTL9NaJj9egYr390Z8BEoo4A07g7enetp80yw7vxRQ==
-To: netdev@vger.kernel.org
-Cc: Marek Vasut <marek.vasut@mailbox.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Aleksander Jan Bajkowski <olek2@wp.pl>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Ivan Galkin <ivan.galkin@axis.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Michael Klein <michael@fossekall.de>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	devicetree@vger.kernel.org
-Subject: [net-next,PATCH v2 3/3] net: phy: realtek: Add property to enable SSC
-Date: Wed,  3 Dec 2025 22:08:06 +0100
-Message-ID: <20251203210857.113328-3-marek.vasut@mailbox.org>
-In-Reply-To: <20251203210857.113328-1-marek.vasut@mailbox.org>
-References: <20251203210857.113328-1-marek.vasut@mailbox.org>
+	s=arc-20240116; t=1764796264; c=relaxed/simple;
+	bh=Q6sWGYGkcwYts/hsIwMe2M/sMlNUfkl6KmWW3KtmlRc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BdVNX+VZUaLorJX8LN7KVv4eSkwm1sc6+uzM+KqyxtNpcE4gF0TZhGq422383uzydXHcFwkxk2pn08PXXgcqU3hEZXyEwqSfk5o4RynCQiyU0y9YMBoYQyqzVqCWjve270e4c6Iv3Xg5hwliXisl6XnPK0NVsip4Be87y/Tw3Qo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=kB3tUIJJ; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5B3BQdUE027938;
+	Wed, 3 Dec 2025 21:10:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=Kd2jnT
+	FMo7gN7FkcM0/S9BS/yQRj1i3TA3o6LPb130Q=; b=kB3tUIJJ8kZIkh96/IhFuo
+	iqC4wJ5KKAJGiaH+VwcNr00PHhxO8rhrxNBx7Kkk7gCRPPND03dKGF+NEdhMl9ws
+	BM/kNmQKNPjZBi3F1R7X0r2YCdC8JwTZd9HTE4k4r8rA3mGMb7fBJ/QjEKoa316d
+	N+LwY2gcWYTIH79u5T/2274R3aF7f7M5NMEiDURkXDPB5aGGGx58FnBCE9MbgtG9
+	yU9WdhdZC+uCDEvxPx+ugLiWF3jI1D5+LeVYbnDeYLIQdBivU8mb7OHQt0C8ONyf
+	BTBfY8Jr2j5Q8VaoZ35MhRnCUGUyea5pDaC4QOWgbp1DZeb0EaW6R0RKCGwS0HDQ
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aqrj9w2tk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 03 Dec 2025 21:10:47 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5B3L2OU4001364;
+	Wed, 3 Dec 2025 21:10:47 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aqrj9w2tf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 03 Dec 2025 21:10:47 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5B3Kgo9Q003891;
+	Wed, 3 Dec 2025 21:10:46 GMT
+Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4ardcjv64m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 03 Dec 2025 21:10:46 +0000
+Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
+	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5B3LAiXH29688386
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 3 Dec 2025 21:10:45 GMT
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CF36758054;
+	Wed,  3 Dec 2025 21:10:44 +0000 (GMT)
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D8B2A5803F;
+	Wed,  3 Dec 2025 21:10:42 +0000 (GMT)
+Received: from [9.61.253.252] (unknown [9.61.253.252])
+	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  3 Dec 2025 21:10:42 +0000 (GMT)
+Message-ID: <99db437a-be91-4e85-a201-ec3a890900c8@linux.ibm.com>
+Date: Wed, 3 Dec 2025 13:10:40 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-MBO-RS-ID: d82f0e1cebd25e7e4fb
-X-MBO-RS-META: qp9c1ydh4sh7err115rzwtak1m4nq56w
-X-Rspamd-Queue-Id: 4dM9HX4f3Gz9tKq
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/mlx5: Fix double unregister of HCA_PORTS
+ component
+To: Gerd Bayer <gbayer@linux.ibm.com>, Saeed Mahameed <saeedm@nvidia.com>,
+        Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+        Mark Bloch <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Shay Drory <shayd@nvidia.com>,
+        Simon Horman <horms@kernel.org>
+Cc: Lukas Wunner <lukas@wunner.de>, Bjorn Helgaas <helgaas@kernel.org>,
+        Niklas Schnelle <schnelle@linux.ibm.com>, netdev@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-pci@vger.kernel.org
+References: <20251202-fix_lag-v1-1-59e8177ffce0@linux.ibm.com>
+Content-Language: en-US
+From: Farhan Ali <alifm@linux.ibm.com>
+In-Reply-To: <20251202-fix_lag-v1-1-59e8177ffce0@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: B65ZY5li7B7M1GisuSwfk7z_iWSEgMeX
+X-Proofpoint-ORIG-GUID: _-Zpt6WH2RjJJs55qScsek2unczQ750f
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTI5MDAyMCBTYWx0ZWRfX77omxQPAvsuX
+ IZJtox3l76hxwbzTk2KE8Q26LIokZZ67/c/iPk9Mxz9JiisDdC4qQrgQ7RG6IaqrRDbdGanNb6C
+ rrYQ3P2eJBRWWX2CtkRe1ztNIbY4vWwB6vUf85AG6fJK/7j5qb7w4vpBUbchf3b1GEgPfg2dEyn
+ jIzqwga+oDaa9W48j3RwqtXi2AU4R1CbjVu87wgkjyKcCFfNdZwpCeZwnAROAdTqpTn8sgaLusC
+ VokCKTm0IHE6fJT4ydAiFPLhxXybJDo66Xetbner4STzoLgeUCKZANPUx9PWow7bugPEQW2Ckvm
+ CUjbzbm78e5Fsjm4zVxfISETLjrn9cYC+iKAduGYsecE/MTKmVgp7bIZAlvN2yx0lV9nO38LBnE
+ Jw14iBxLqQKfyX7ab+zwoWRg9U6GeA==
+X-Authority-Analysis: v=2.4 cv=dYGNHHXe c=1 sm=1 tr=0 ts=6930a757 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=4VxT3ec_VtVgvZ1WTZIA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-12-03_02,2025-12-03_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 spamscore=0 suspectscore=0 clxscore=1011 adultscore=0
+ lowpriorityscore=0 bulkscore=0 phishscore=0 priorityscore=1501
+ impostorscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2510240000
+ definitions=main-2511290020
 
-Add support for spread spectrum clocking (SSC) on RTL8211F(D)(I)-CG,
-RTL8211FS(I)(-VS)-CG, RTL8211FG(I)(-VS)-CG PHYs. The implementation
-follows EMI improvement application note Rev. 1.2 for these PHYs.
 
-The current implementation enables SSC for both RXC and SYSCLK clock
-signals. Introduce DT properties 'realtek,clkout-ssc-enable',
-'realtek,rxc-ssc-enable' and 'realtek,sysclk-ssc-enable' which control
-CLKOUT, RXC and SYSCLK SSC spread spectrum clocking enablement on these
-signals.
+On 12/2/2025 3:12 AM, Gerd Bayer wrote:
+> Clear hca_devcom_comp in device's private data after unregistering it in
+> LAG teardown. Otherwise a slightly lagging second pass through
+> mlx5_unload_one() might try to unregister it again and trip over
+> use-after-free.
+>
+> On s390 almost all PCI level recovery events trigger two passes through
+> mxl5_unload_one() - one through the poll_health() method and one through
+> mlx5_pci_err_detected() as callback from generic PCI error recovery.
+> While testing PCI error recovery paths with more kernel debug features
+> enabled, this issue reproducibly led to kernel panics with the following
+> call chain:
+>
+>   Unable to handle kernel pointer dereference in virtual kernel address space
+>   Failing address: 6b6b6b6b6b6b6000 TEID: 6b6b6b6b6b6b6803 ESOP-2 FSI
+>   Fault in home space mode while using kernel ASCE.
+>   AS:00000000705c4007 R3:0000000000000024
+>   Oops: 0038 ilc:3 [#1]SMP
+>
+>   CPU: 14 UID: 0 PID: 156 Comm: kmcheck Kdump: loaded Not tainted
+>        6.18.0-20251130.rc7.git0.16131a59cab1.300.fc43.s390x+debug #1 PREEMPT
+>
+>   Krnl PSW : 0404e00180000000 0000020fc86aa1dc (__lock_acquire+0x5c/0x15f0)
+>              R:0 T:1 IO:0 EX:0 Key:0 M:1 W:0 P:0 AS:3 CC:2 PM:0 RI:0 EA:3
+>   Krnl GPRS: 0000000000000000 0000020f00000001 6b6b6b6b6b6b6c33 0000000000000000
+>              0000000000000000 0000000000000000 0000000000000001 0000000000000000
+>              0000000000000000 0000020fca28b820 0000000000000000 0000010a1ced8100
+>              0000010a1ced8100 0000020fc9775068 0000018fce14f8b8 0000018fce14f7f8
+>   Krnl Code: 0000020fc86aa1cc: e3b003400004        lg      %r11,832
+>              0000020fc86aa1d2: a7840211           brc     8,0000020fc86aa5f4
+>             *0000020fc86aa1d6: c09000df0b25       larl    %r9,0000020fca28b820
+>             >0000020fc86aa1dc: d50790002000       clc     0(8,%r9),0(%r2)
+>              0000020fc86aa1e2: a7840209           brc     8,0000020fc86aa5f4
+>              0000020fc86aa1e6: c0e001100401       larl    %r14,0000020fca8aa9e8
+>              0000020fc86aa1ec: c01000e25a00       larl    %r1,0000020fca2f55ec
+>              0000020fc86aa1f2: a7eb00e8           aghi    %r14,232
+>
+>   Call Trace:
+>    __lock_acquire+0x5c/0x15f0
+>    lock_acquire.part.0+0xf8/0x270
+>    lock_acquire+0xb0/0x1b0
+>    down_write+0x5a/0x250
+>    mlx5_detach_device+0x42/0x110 [mlx5_core]
+>    mlx5_unload_one_devl_locked+0x50/0xc0 [mlx5_core]
+>    mlx5_unload_one+0x42/0x60 [mlx5_core]
+>    mlx5_pci_err_detected+0x94/0x150 [mlx5_core]
+>    zpci_event_attempt_error_recovery+0xcc/0x388
+>
+> Fixes: 5a977b5833b7 ("net/mlx5: Lag, move devcom registration to LAG layer")
+> Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
+> ---
+> Hi Shay et al,
+>
+> while checking for potential regressions by Lukas Wunner's recent work
+> on pci_save/restore_state() for the recoverability of mlx5 functions I
+> consistently hit this bug. (Bjorn has queued this up for 6.19, according
+> to [0] and [1])
+>
+> Apparently, the issue is unrelated to Lukas' work but can be reproduced
+> with master. It appears to be timing-sensitive, since it shows up only
+> when I use s390's debug_defconfig, but I think needs fixing anyhow, as
+> timing can change for other reasons, too.
+>
+> I've spotted two additional places where the devcom reference is not
+> cleared after calling mlx5_devcom_unregister_component() in
+> drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c that I have not
+> addressed with a patch, since I'm unclear about how to test these
+> paths.
+>
+> Thanks,
+> Gerd
+>
+> [0] https://lore.kernel.org/all/cover.1760274044.git.lukas@wunner.de/
+> [1] https://lore.kernel.org/linux-pci/cover.1763483367.git.lukas@wunner.de/
+> ---
+>   drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c | 1 +
+>   1 file changed, 1 insertion(+)
+>
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
+> index 3db0387bf6dcb727a65df9d0253f242554af06db..8ec04a5f434dd4f717d6d556649fcc2a584db847 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
+> @@ -1413,6 +1413,7 @@ static int __mlx5_lag_dev_add_mdev(struct mlx5_core_dev *dev)
+>   static void mlx5_lag_unregister_hca_devcom_comp(struct mlx5_core_dev *dev)
+>   {
+>   	mlx5_devcom_unregister_component(dev->priv.hca_devcom_comp);
+> +	dev->priv.hca_devcom_comp = NULL;
+>   }
 
-Signed-off-by: Marek Vasut <marek.vasut@mailbox.org>
----
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
-Cc: Andrew Lunn <andrew@lunn.ch>
-Cc: Conor Dooley <conor+dt@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Ivan Galkin <ivan.galkin@axis.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>
-Cc: Michael Klein <michael@fossekall.de>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Rob Herring <robh@kernel.org>
-Cc: Russell King <linux@armlinux.org.uk>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: devicetree@vger.kernel.org
-Cc: netdev@vger.kernel.org
----
-V2: Split SSC clock control for each CLKOUT, RXC, SYSCLK signal
----
- drivers/net/phy/realtek/realtek_main.c | 124 +++++++++++++++++++++++++
- 1 file changed, 124 insertions(+)
+Though this fix looks correct to me in freeing hca_devcom_comp (not too 
+familiar with mlx5 internals), I wonder if it would be better to just 
+set devcom = NULL in devcom_free_comp_dev() after the kfree? This would 
+also take care of other places where devcom is not set to NULL?
 
-diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
-index 67ecf3d4af2b1..ac80653cdbe28 100644
---- a/drivers/net/phy/realtek/realtek_main.c
-+++ b/drivers/net/phy/realtek/realtek_main.c
-@@ -74,11 +74,19 @@
- 
- #define RTL8211F_PHYCR2				0x19
- #define RTL8211F_CLKOUT_EN			BIT(0)
-+#define RTL8211F_SYSCLK_SSC_EN			BIT(3)
- #define RTL8211F_PHYCR2_PHY_EEE_ENABLE		BIT(5)
-+#define RTL8211F_CLKOUT_SSC_EN			BIT(7)
- 
- #define RTL8211F_INSR_PAGE			0xa43
- #define RTL8211F_INSR				0x1d
- 
-+/* RTL8211F SSC settings */
-+#define RTL8211F_SSC_PAGE			0xc44
-+#define RTL8211F_SSC_RXC			0x13
-+#define RTL8211F_SSC_SYSCLK			0x17
-+#define RTL8211F_SSC_CLKOUT			0x19
-+
- /* RTL8211F LED configuration */
- #define RTL8211F_LEDCR_PAGE			0xd04
- #define RTL8211F_LEDCR				0x10
-@@ -203,6 +211,9 @@ MODULE_LICENSE("GPL");
- struct rtl821x_priv {
- 	bool enable_aldps;
- 	bool disable_clk_out;
-+	bool enable_clkout_ssc;
-+	bool enable_rxc_ssc;
-+	bool enable_sysclk_ssc;
- 	struct clk *clk;
- 	/* rtl8211f */
- 	u16 iner;
-@@ -266,6 +277,12 @@ static int rtl821x_probe(struct phy_device *phydev)
- 						   "realtek,aldps-enable");
- 	priv->disable_clk_out = of_property_read_bool(dev->of_node,
- 						      "realtek,clkout-disable");
-+	priv->enable_clkout_ssc = of_property_read_bool(dev->of_node,
-+							"realtek,clkout-ssc-enable");
-+	priv->enable_rxc_ssc = of_property_read_bool(dev->of_node,
-+						     "realtek,rxc-ssc-enable");
-+	priv->enable_sysclk_ssc = of_property_read_bool(dev->of_node,
-+							"realtek,sysclk-ssc-enable");
- 
- 	phydev->priv = priv;
- 
-@@ -700,6 +717,101 @@ static int rtl8211f_config_phy_eee(struct phy_device *phydev)
- 				RTL8211F_PHYCR2_PHY_EEE_ENABLE, 0);
- }
- 
-+static int rtl8211f_config_clkout_ssc(struct phy_device *phydev)
-+{
-+	struct rtl821x_priv *priv = phydev->priv;
-+	struct device *dev = &phydev->mdio.dev;
-+	int ret;
-+
-+	/* The value is preserved if the device tree property is absent */
-+	if (!priv->enable_clkout_ssc)
-+		return 0;
-+
-+	/* RTL8211FVD has no PHYCR2 register */
-+	if (phydev->drv->phy_id == RTL_8211FVD_PHYID)
-+		return 0;
-+
-+	/* Unnamed registers from EMI improvement parameters application note 1.2 */
-+	ret = phy_write_paged(phydev, 0xd09, 0x10, 0xcf00);
-+	if (ret < 0) {
-+		dev_err(dev, "CLKOUT SCC initialization failed: %pe\n", ERR_PTR(ret));
-+		return ret;
-+	}
-+
-+	ret = phy_write_paged(phydev, RTL8211F_SSC_PAGE, RTL8211F_SSC_CLKOUT, 0x38c3);
-+	if (ret < 0) {
-+		dev_err(dev, "CLKOUT SCC configuration failed: %pe\n", ERR_PTR(ret));
-+		return ret;
-+	}
-+
-+	/*
-+	 * Enable CLKOUT SSC using PHYCR2 bit 7 , this step is missing from the
-+	 * EMI improvement parameters application note 1.2 section 2.3
-+	 */
-+	ret = phy_modify_paged(phydev, RTL8211F_PHYCR_PAGE, RTL8211F_PHYCR2,
-+			       RTL8211F_CLKOUT_SSC_EN, RTL8211F_CLKOUT_SSC_EN);
-+	if (ret < 0) {
-+		dev_err(dev, "CLKOUT SCC enable failed: %pe\n", ERR_PTR(ret));
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static int rtl8211f_config_rxc_ssc(struct phy_device *phydev)
-+{
-+	struct rtl821x_priv *priv = phydev->priv;
-+	struct device *dev = &phydev->mdio.dev;
-+	int ret;
-+
-+	/* The value is preserved if the device tree property is absent */
-+	if (!priv->enable_rxc_ssc)
-+		return 0;
-+
-+	/* RTL8211FVD has no PHYCR2 register */
-+	if (phydev->drv->phy_id == RTL_8211FVD_PHYID)
-+		return 0;
-+
-+	ret = phy_write_paged(phydev, RTL8211F_SSC_PAGE, RTL8211F_SSC_RXC, 0x5f00);
-+	if (ret < 0) {
-+		dev_err(dev, "RXC SCC configuration failed: %pe\n", ERR_PTR(ret));
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static int rtl8211f_config_sysclk_ssc(struct phy_device *phydev)
-+{
-+	struct rtl821x_priv *priv = phydev->priv;
-+	struct device *dev = &phydev->mdio.dev;
-+	int ret;
-+
-+	/* The value is preserved if the device tree property is absent */
-+	if (!priv->enable_sysclk_ssc)
-+		return 0;
-+
-+	/* RTL8211FVD has no PHYCR2 register */
-+	if (phydev->drv->phy_id == RTL_8211FVD_PHYID)
-+		return 0;
-+
-+	ret = phy_write_paged(phydev, RTL8211F_SSC_PAGE, RTL8211F_SSC_SYSCLK, 0x4f00);
-+	if (ret < 0) {
-+		dev_err(dev, "SYSCLK SCC configuration failed: %pe\n", ERR_PTR(ret));
-+		return ret;
-+	}
-+
-+	/* Enable SSC */
-+	ret = phy_modify_paged(phydev, RTL8211F_PHYCR_PAGE, RTL8211F_PHYCR2,
-+			       RTL8211F_SYSCLK_SSC_EN, RTL8211F_SYSCLK_SSC_EN);
-+	if (ret < 0) {
-+		dev_err(dev, "SYSCLK SCC enable failed: %pe\n", ERR_PTR(ret));
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
- static int rtl8211f_config_init(struct phy_device *phydev)
- {
- 	struct device *dev = &phydev->mdio.dev;
-@@ -723,6 +835,18 @@ static int rtl8211f_config_init(struct phy_device *phydev)
- 		return ret;
- 	}
- 
-+	ret = rtl8211f_config_clkout_ssc(phydev);
-+	if (ret)
-+		return ret;
-+
-+	ret = rtl8211f_config_rxc_ssc(phydev);
-+	if (ret)
-+		return ret;
-+
-+	ret = rtl8211f_config_sysclk_ssc(phydev);
-+	if (ret)
-+		return ret;
-+
- 	return rtl8211f_config_phy_eee(phydev);
- }
- 
--- 
-2.51.0
+Thanks
+
+Farhan
 
 
