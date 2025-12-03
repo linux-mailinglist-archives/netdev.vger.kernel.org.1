@@ -1,150 +1,194 @@
-Return-Path: <netdev+bounces-243349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB2BCC9D80C
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 02:32:14 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A2EFC9D8A8
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 02:55:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B80DA4E0115
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 01:32:13 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 13DEF342127
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 01:55:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07F731F4181;
-	Wed,  3 Dec 2025 01:32:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6982B22B5A5;
+	Wed,  3 Dec 2025 01:55:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="YkOWFUDg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZknaABqN"
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-57-210.mail.qq.com (out162-62-57-210.mail.qq.com [162.62.57.210])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53AB1E3DF2
-	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 01:32:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.210
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44E612BD11
+	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 01:55:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764725531; cv=none; b=BbQf3P0dHgzkKZkGWP6zktrPTfS4JOCu05Pjodh5pHjVKIcXPXAsuChtLA1lrDjzVGfZnwH77nBgBW0er67uGmo4f0kGlZ+D+CZOYPD4N/FOcYW0cu7lugzAI+sALL2E//46amMvyAi6pUmhryozLtcCbSAvWeEt1ZStJY9X/us=
+	t=1764726950; cv=none; b=ri5BlMGz6JjDYcWJ+brH2lY0KhMNsOT2kJiGS4BVO6s7iIOOFMaq4zgawyczq5qb0d2bYr+EVostQG7RflkzZ/FLDsdwKO9eEGFoOT9s6eSGTNDuZOsntOWTLLZb9WOyjkE7EMcGRE6MY1fyF1cgfPWiCfi+ZQQwnZekwcUDhfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764725531; c=relaxed/simple;
-	bh=ifTG2EWkHu8F7pe0skh6hT195ZLD9h+pqfEjF3OKTj4=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=XJX+1rreML+H2e9cxBTM52eXlovUMukMdU04MBz7bhHXsbgZT/UvG9wEPSw+fBfKi3Dkl3Wga3bU6JUt5ZlOoiUvAhXSJQiNTsPqd4M+yI5xNP3jZmSBY70xiT57/q+IArDYgvvQzpfZ2NDFyxrbCOIwQjuTnjfRbqCuIP8MpHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=YkOWFUDg; arc=none smtp.client-ip=162.62.57.210
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1764725517; bh=FgD4FVBsIZc/lJgWx44TSx1/rV+CY/xX0o1zBduphyg=;
-	h=From:To:Cc:Subject:Date;
-	b=YkOWFUDgoY329RdApQMaJfZissAdj/pwiDYdy5eM31fjtKOn6hcMGilwu3Fzi3RnB
-	 rFOALpCZOYJEpPLWW2hSsWhnCUvrz18E86yvB87Uhgb8S7wL1YRub6wJfiuhWvy8DL
-	 CP3iaSL5czzKH9Y19ODiIQoKKaKkPxBI2a/10Xd4=
-Received: from localhost ([58.246.87.66])
-	by newxmesmtplogicsvrszc50-0.qq.com (NewEsmtp) with SMTP
-	id 7F7B4684; Wed, 03 Dec 2025 09:31:55 +0800
-X-QQ-mid: xmsmtpt1764725515tevgm4er9
-Message-ID: <tencent_639FC431D959DA3E8FC007985FC88EA5A90A@qq.com>
-X-QQ-XMAILINFO: M07Ulnfy3VHKVnABMxCOZ4Vj1SFpQK+ANJvNR9/RsY3dnBXHnxT/POhN78hogO
-	 /MMywCcjYH3yAIEjAwzwA81HZaP9GrnFzp1bqdb9Wgs8y5S1rRchqkbzRMFDqfu/bPmsE7yK1QKy
-	 3heICWirMQ+63WnqaJMBlDs7tsaJWgZ7ke6KcSm3+kkAZEbCSLEZKaDLXfg+kctph1WgNYdVocWJ
-	 d+URF5SNp7WDk5+4ewcALjulP+mneOqRv0NTtBo0iG3TFQTo2/OwczD/03tb7C49E9azwCwCO8ta
-	 zTh88G+HnCHfKGcCvspNlF6IRss5E0OA6Po4ynJHU3buEH51ZkASzm3lKV9LEcQe+Zb01qpuwfHn
-	 +2z8W+mpaPJfZe45AbE2ofhhEy4Dc+blrPooQyH0d9DajoKjUAnuWPi5+fhzfjoAzVkZ4uIZuBo1
-	 ys/OwjTXsaIy+RJ1rT26/B6EofTfIfSd/+x0PLOeiyPaZ0g2KyGqB3KjAn7k+zVJnviIoOCO+b4W
-	 9/6prNXmraM5HvPcWRtRkCHnRbpSkYhcCtQPJ4ZUOVA1QAu4Vh4WWNPkrYfhXjcJJHdb/K5kuwkr
-	 CjeV+EES5jW3WNWQ2OWO3/Nm/iK1jUjezyJR4UbZpXw2dFtjxo+Rr6t1hKJ3sNynLLLPNaJOkPog
-	 tCmbUclzH0I12lWiqVPMYTSvQ6Hp5YE02arlWNcMyd2oPx6EahFiSxBjCJG1G5RsjqSHSXw1r8NA
-	 Y3DmS6GLsPAh+XvGL3cyDjIsEzUEKE7dO1QgZkwxXHNqsLcxDRDgqXrUy2PJ173INXa50JWUz4Hn
-	 BDlR7w8MA/fh43QcoOEabD52JtciPPIwaxKDLltAxqag5Y5G2P6HMzpF1io7wfWiQey5ilyHB3oW
-	 hjYwRCIiBFAtTCmHnyN1f9sqzPVjPBnu4qnKSqL63eR861Mw/ITdnZJETLMpaEZ4YO0rYVq4QTi5
-	 QwEw7thDoOTA0f9Qqw+e+9Pfb69qC+
-X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
-From: 2694439648@qq.com
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com,
-	hailong.fan@siengine.com
-Cc: netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	inux-kernel@vger.kernel.org
-Subject: [PATCH v3] net: stmmac: Modify the judgment condition of "tx_avail" from 1 to 2
-Date: Wed,  3 Dec 2025 09:31:52 +0800
-X-OQ-MSGID: <1f65707a427512e7b549809ec40286fb12b4c114.1764725087.git.hailong.fan@siengine.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1764726950; c=relaxed/simple;
+	bh=gybRkugXkej6YS+1H2tR0eLMheeQXzL97oE0Mvw3C0Y=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=TYSY3T5YQ64IE9mR8ugeJMgQWr589KKhdPXYAq66GE6lj+vNvd3w1f2TystjP8afoOrQ2+ae9RgfMJe6DEJnfg64j8nCSH6eBkGTnekY90K04CIc3zak9uvzSJ54mem3lLeHLAsOoYlXiTB1jIQPKj6agql3v2i1S73OoBQbZao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZknaABqN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0C2AC4CEF1
+	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 01:55:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764726949;
+	bh=gybRkugXkej6YS+1H2tR0eLMheeQXzL97oE0Mvw3C0Y=;
+	h=Date:From:To:Subject:From;
+	b=ZknaABqN0SU5Y/lLJ3yxDx1Z9AzfGUq7oYNykVWW8HBVinfzZIesfn72dDOPqwsYg
+	 fO75L5QSx8ddiI3zEWXEz+vcPP+qV2G45oVZxk899V7pOJZKfzw8gokZb6KJY9x6UZ
+	 qChT/LPmRdqHu8Kw0rIFtUBFz1oNNofNyFvLnDaoyXOxPByfTnbbcqvWksbh04uuAi
+	 NZ7PpzO3/4jw9VGljlC3CMa8bxKiYAvDtKoSM3ZRaLMq2Ara/Xwm0eycM75i7ey7z5
+	 zHNl21BA47r+DD2oCjpe1Du5w54R9hwY4XVbwbmsRW0RGiJ7jFlGTov/+mI1uX795n
+	 0HteGTRmcnCQg==
+Date: Tue, 2 Dec 2025 17:55:48 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: netdev@vger.kernel.org
+Subject: [ANN] netdev development stats for 6.19
+Message-ID: <20251202175548.6b5eb80e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-From: "hailong.fan" <hailong.fan@siengine.com>
+Hi!
 
-Under certain conditions, a WARN_ON will be triggered
-if avail equals 1.
+Intro
+-----
 
-For example, when a VLAN packet is to send,
-stmmac_vlan_insert consumes one unit of space,
-and the data itself consumes another.
-actually requiring 2 units of space in total.
+As is tradition here are the development statistics based on mailing
+list traffic on netdev@vger.
 
-Changes from v3:
-        - format commit message
-Changes from v2:
-        - add fixes tag
-        - Add stmmac_extra_space to count the additional required space
-Changes from v1:
-        - Stop their queues earlier
+These stats are somewhat like LWN stats: https://lwn.net/Articles/1004998/
+but more focused on mailing list participation. And by participation
+we mean reviewing code more than producing patches.
 
-Fixes: 30d932279dc2 ("net: stmmac: Add support for VLAN Insertion Offload")
-Signed-off-by: hailong.fan <hailong.fan@siengine.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+In particular "review score" tries to capture the balance between
+reviewing other people's code vs posting patches. It's roughly
+number of patches reviewed minus number of patches posted.=20
+Those who post more than they review will have a negative score.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 7b90ecd3a..9a665a3b2 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -4476,6 +4476,15 @@ static bool stmmac_has_ip_ethertype(struct sk_buff *skb)
- 		(proto == htons(ETH_P_IP) || proto == htons(ETH_P_IPV6));
- }
- 
-+static inline int stmmac_extra_space(struct stmmac_priv *priv,
-+				     struct sk_buff *skb)
-+{
-+	if (!priv->dma_cap.vlins || !skb_vlan_tag_present(skb))
-+		return 0;
-+
-+	return 1;
-+}
-+
- /**
-  *  stmmac_xmit - Tx entry point of the driver
-  *  @skb : the socket buffer
-@@ -4529,7 +4538,8 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
- 		}
- 	}
- 
--	if (unlikely(stmmac_tx_avail(priv, queue) < nfrags + 1)) {
-+	if (unlikely(stmmac_tx_avail(priv, queue) <
-+		nfrags + 1 + stmmac_extra_space(priv, skb))) {
- 		if (!netif_tx_queue_stopped(netdev_get_tx_queue(dev, queue))) {
- 			netif_tx_stop_queue(netdev_get_tx_queue(priv->dev,
- 								queue));
-@@ -4675,7 +4685,7 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
- 		print_pkt(skb->data, skb->len);
- 	}
- 
--	if (unlikely(stmmac_tx_avail(priv, queue) <= (MAX_SKB_FRAGS + 1))) {
-+	if (unlikely(stmmac_tx_avail(priv, queue) <= (MAX_SKB_FRAGS + 2))) {
- 		netif_dbg(priv, hw, priv->dev, "%s: stop transmitted packets\n",
- 			  __func__);
- 		netif_tx_stop_queue(netdev_get_tx_queue(priv->dev, queue));
--- 
-2.34.1
+Previous 3 reports:
+ - for 6.16: https://lore.kernel.org/20250529144354.4ca86c77@kernel.org
+ - for 6.17: https://lore.kernel.org/20250728160647.6d0bb258@kernel.org
+ - for 6.18: https://lore.kernel.org/20251002171032.75263b18@kernel.org=20
 
+General stats
+-------------
+
+This release cycle was 6% smaller in terms of postings and 15% smaller=20
+in terms of merged commits than 6.18. We have also regressed in terms
+of review coverage.=20
+
+Personally, this cycle felt quite busy for me. netdev foundation
+received its first batch of servers, and the infrastructure has been
+mostly migrated over to those (the UI still runs on the old setup but
+builds and kselftests run on the shiny new machines). "We" have also
+spent some time integrating the AI code review built by Chris Mason.=20
+
+Looking ahead we are expecting more server deliveries, including some
+400GE NICs for the community to experiment with. The netdev foundation
+still has a good chunk of money left so please do not hesitate to
+suggest how we can spend it to improve the project and help developers.
+
+Developer rankings
+------------------
+
+Contributions to selftests:
+   1 [ 30] Jakub Kicinski
+   2 [ 24] Matthieu Baerts
+   3 [ 13] Bobby Eshleman
+   4 [  6] Carolina Jubran
+   5 [  4] Kuniyuki Iwashima
+   6 [  3] Eric Dumazet
+   7 [  3] Breno Leitao
+
+Top reviewers (cs):                  Top reviewers (msg):               =20
+   1 (   ) [28] Jakub Kicinski          1 (   ) [61] Jakub Kicinski     =20
+   2 (   ) [21] Simon Horman            2 (   ) [41] Andrew Lunn        =20
+   3 (   ) [14] Andrew Lunn             3 (   ) [38] Simon Horman       =20
+   4 (   ) [ 9] Paolo Abeni             4 (   ) [21] Paolo Abeni        =20
+   5 (+27) [ 5] Maxime Chevallier       5 (***) [13] Maxime Chevallier  =20
+   6 ( -1) [ 5] Eric Dumazet            6 ( +1) [13] Russell King       =20
+   7 ( -1) [ 5] Russell King            7 ( +6) [12] Aleksandr Loktionov=20
+   8 ( +1) [ 5] Aleksandr Loktionov     8 ( -3) [12] Eric Dumazet       =20
+   9 ( +3) [ 4] Jacob Keller            9 ( +3) [10] Michael S. Tsirkin =20
+  10 ( -2) [ 4] Kuniyuki Iwashima      10 (+35) [10] Stefano Garzarella =20
+  11 (+30) [ 3] Sabrina Dubroca        11 ( +5) [ 9] Jacob Keller       =20
+  12 ( -5) [ 3] Vadim Fedorenko        12 (+14) [ 8] Sabrina Dubroca    =20
+  13 (+24) [ 2] Alexander Lobakin      13 ( -5) [ 7] Kuniyuki Iwashima  =20
+  14 ( +1) [ 2] Vladimir Oltean        14 (+44) [ 7] Kory Maincent (Dent Pr=
+oject)
+  15 ( -5) [ 2] Paul Menzel            15 (***) [ 6] Toke H=C3=B8iland-J=C3=
+=B8rgensen
+
+Lots of familiar names in top reviewer ranking. Let me focus on those
+with most significant gains. Maxime has helped with various embedded
+(stmmac and PHY) reviews (sorry that we didn't manage to merge the
+phy_port series in time for 6.19!). Sabrina helped with TLS, IPsec,
+OVPN as well as a few core changes. Stefano had his hands full with
+vsock changes. Kory reviewed PSE and timestamp NDO conversion patches.
+Aleksandr reviewed mostly Intel NIC patches, but occasionally also
+patches for other NICs. Alexander (with an e) reviewed some of Eric's
+skb optimizations.
+
+Once again, huge thanks to those who help with patch reviews!
+
+Top authors (cs):                    Top authors (msg):                 =20
+   1 ( +1) [5] Eric Dumazet             1 (+12) [35] Christian Brauner  =20
+   2 ( +1) [3] Russell King             2 (   ) [27] Russell King       =20
+   3 ( -2) [3] Jakub Kicinski           3 ( +5) [19] Tariq Toukan       =20
+   4 ( +2) [3] Tariq Toukan             4 (+43) [19] Bobby Eshleman     =20
+   5 ( +2) [3] Heiner Kallweit          5 (+34) [18] Vadim Fedorenko    =20
+   6 ( -1) [2] Alok Tiwari              6 (+27) [16] Maxime Chevallier  =20
+   7 ( +8) [2] Breno Leitao             7 ( +8) [16] Daniel Golle       =20
+   8 (   ) [2] Kuniyuki Iwashima        8 ( -2) [15] Eric Dumazet       =20
+   9 (***) [2] Randy Dunlap             9 (+49) [14] Daniel Jurgens     =20
+  10 (+29) [2] Vadim Fedorenko         10 ( -9) [13] Jakub Kicinski     =20
+
+
+Top scores (positive):               Top scores (negative):             =20
+   1 (   ) [412] Jakub Kicinski         1 ( +8) [135] Christian Brauner =20
+   2 (   ) [306] Simon Horman           2 (+33) [ 74] Bobby Eshleman    =20
+   3 (   ) [256] Andrew Lunn            3 ( +4) [ 67] Tariq Toukan      =20
+   4 (   ) [144] Paolo Abeni            4 (+37) [ 58] Daniel Jurgens    =20
+   5 ( +6) [ 79] Aleksandr Loktionov    5 ( +7) [ 56] Daniel Golle      =20
+   6 (+32) [ 45] Sabrina Dubroca        6 (***) [ 44] Jeff Layton       =20
+   7 (+12) [ 37] Michael S. Tsirkin     7 ( +9) [ 40] Eliav Farber      =20
+
+Company rankings
+----------------
+
+Top reviewers (cs):                  Top reviewers (msg):               =20
+   1 ( +1) [34] RedHat                  1 ( +1) [102] RedHat            =20
+   2 ( -1) [30] Meta                    2 ( -1) [ 76] Meta              =20
+   3 (   ) [17] Intel                   3 ( +2) [ 44] Intel             =20
+   4 (   ) [14] Andrew Lunn             4 (   ) [ 41] Andrew Lunn       =20
+   5 (   ) [11] Google                  5 ( -2) [ 27] Google            =20
+   6 ( +1) [ 9] nVidia                  6 ( +1) [ 20] nVidia            =20
+   7 ( -1) [ 7] Oracle                  7 ( -1) [ 18] Oracle            =20
+
+Top authors (cs):                    Top authors (msg):                 =20
+   1 (   ) [12] Meta                    1 (   ) [95] Meta               =20
+   2 (   ) [10] RedHat                  2 (   ) [52] RedHat             =20
+   3 (   ) [10] Google                  3 ( +2) [48] nVidia             =20
+   4 (   ) [ 7] Intel                   4 (   ) [47] Intel              =20
+   5 ( +1) [ 7] Oracle                  5 ( +9) [41] Microsoft          =20
+   6 ( -1) [ 7] nVidia                  6 ( -3) [38] Google             =20
+   7 ( +1) [ 3] Huawei                  7 ( -1) [34] Oracle             =20
+      =20
+Top scores (positive):               Top scores (negative):             =20
+   1 ( +1) [438] RedHat                 1 (+14) [137] Microsoft         =20
+   2 ( +1) [256] Andrew Lunn            2 ( +9) [ 56] Daniel Golle      =20
+   3 ( -2) [141] Meta                   3 ( +1) [ 50] nVidia            =20
+   4 (   ) [107] Intel                  4 ( +1) [ 47] Huawei            =20
+   5 ( +2) [ 38] ARM                    5 ( +7) [ 44] Amazon            =20
+   6 ( +6) [ 33] Linux Foundation       6 (+23) [ 40] AMD               =20
+   7 ( -1) [ 31] Google                 7 ( -4) [ 40] Pengutronix       =20
+--=20
+Code: https://github.com/kuba-moo/ml-stat
+Raw output: https://netdev.bots.linux.dev/static/nipa/stats-6.19/stdout
 
