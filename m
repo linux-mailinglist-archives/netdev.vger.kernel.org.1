@@ -1,231 +1,133 @@
-Return-Path: <netdev+bounces-243433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA1DFCA0CC2
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 19:10:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DE9ACA14B3
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 20:11:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CC4CF300D66B
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 18:09:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6545331FE9DD
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 18:34:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6BE9313E2E;
-	Wed,  3 Dec 2025 18:08:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EE993161B7;
+	Wed,  3 Dec 2025 18:25:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="exOZFkqi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o/ue4qte"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5B97301471
-	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 18:08:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0124D314B8A;
+	Wed,  3 Dec 2025 18:25:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764785319; cv=none; b=q+K4s78byjc+Vf9BLO6wD6JBmu+WX9sC3Jekz6G5GofxlQ0jXDbG1fxhsPhf83sV1mlUUTtf9aGrWmr31g363sLxwIDAXKGj6xqyIWdolBBxNWZQXMwvhSP8CtBRimn5ssTd2MsvHfFPtW4s8R3VHMehb5MLQdgCeU/80tycywc=
+	t=1764786354; cv=none; b=FWKyv3G0MWBT1nmXPzQ6bNyi2rkj1d6TJQT1vs0/wPVlT5xPVHrL87AgroL0f3x6eMCDuAItbfeMg6bzAfHxB0kyPZx/J8la7uEPNzNyS0oTBdcjRa97xpXLbkQLcs7tcPy+eNhI1NY8qId9Kdc3eFnVuWBBNazOQ8mz6W2+ET4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764785319; c=relaxed/simple;
-	bh=5jRrBA6CAZndQPZV3Us9+ZC5wzxN9fOkcbS0Noz1Wo0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VI6bx/UD+VfDSNQ3jsEbxh+inkPE177UwA+Wy3YMCck+rgkYGQErsqiPrIVA2likQlxhBZ12G2Ji+uCFVUljjVw0udf88BN9MjuOsvMvQ2CUwGUzWBFsIWMUQ1dd0Fq2Buj2+/yx6spQ+BlWJqIRpMx6Rg01DQlk6w0q3n+qeeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=exOZFkqi; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-340e525487eso5830393a91.3
-        for <netdev@vger.kernel.org>; Wed, 03 Dec 2025 10:08:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764785317; x=1765390117; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GofhpDmA3kuMABKH76nE8pV99jzh1HFP7UqmhwVcaVc=;
-        b=exOZFkqiFRWcTXzfix5rHKnpg+SEnj4tlotLLzJtW81caMyBTiPdTK2TH+c9rLwt8i
-         27y9sO6ZDzle6LbCvrnz+K6m/hnTqFI3F/bgn29BiqtDzNwMytrTiRLWWydfeR7sMSbr
-         U5yXvhPV5+0qC60uLCJjIkN0Opyyl5zOmIOeMeMMrO1KQOWu4MoDqElRLzAsuBB4+GBV
-         0Kal2yFKsL/42Sw61/7+3hDR9zl+G/gnMQnEo0j/zHSy9/zJfQUu945ktlmLfUi3wpvR
-         zdmBs9OaMF2UhpYTW90YP8mzrzvXLiihYHT5ZeJtQcIpon+AFORb1ps0Ij07eUTUD7sK
-         ynZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764785317; x=1765390117;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=GofhpDmA3kuMABKH76nE8pV99jzh1HFP7UqmhwVcaVc=;
-        b=O0y+tZ7zJEJn1N+eQb01XZvs3uLGnXFJ2B2nFpz6uozPSvtpkkGETJnUt9kkvVOB0/
-         NAss/7wqlljML59QY4UsCBEUMRcinnFd3426RPhI8naln86OyHk57f9PEiHY7GWCrKkH
-         aD1c9l9IvKQLK7ya9/xYfFjgXXY4BZhWLVvmchjUUs6SyG6bLBgtGeaOKy8vB7Ym50YB
-         gjM20XkFadIlgMM55cZ9OpeYrfW7uHdAWAL1+DHdf/OAHBw6bhBOO1xYv1v6hFbNiNhK
-         bH7TgJMAKAEhitCUrTZMUQQvcO9xUG0wWxj0FLY0Ic0xGkMWSJHerN1LGCdXGG07uuyb
-         s15Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXTIbIASmXq9p9F8ZHOejm8NwCRJfa2otHg39Q3VIx4R9fD19JIdn91SrdaUe/V4ocyjzFGgxE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbyvCSuJ26hbf+WgSvAYHvWmQHHLJiTeV8hrlD5P/my+8VMz34
-	jN2u3XjqXlaFNGptxJ0E49mzseHerYxW6QMdy/JSV9dtjXFl8UFjEq6ajLW6K3wIJPigKb4znRO
-	Px2mpzmWacALD99jWJxhgXjoyhTwyRHA=
-X-Gm-Gg: ASbGnculY/MnWzQT09JparxNie59bhKKxo2NMKSYQ74DTFPAOjlvtep57Xm/gMvoT7D
-	xWmtWMKyGu9jaILVWwjRb6x6b1xXqvUy33+HkjSQhUfjPw0lwDGuub7IVLKjzh9ccSmh/UhKpbV
-	BkHCcMs5eJZkaSO9vLmdbleChnMbh6PdqcgzMxhLM+iObHJhhJbjJyBR1WGLQwYnmz3YonwwBZT
-	nIV2igaowqosshZCfn2l+01U0JxQLNZGIDRnCAiiwK+gXaqiJscMFG0hHbKFKhMGHBjdsY=
-X-Google-Smtp-Source: AGHT+IHGznhelPwKgdPOtpIE7u08vw3jm14atDXVn66Erhhaksa/6LYDtrqkXqGm7zWDplH+0e5xN6Ib8bNcjdNIzPk=
-X-Received: by 2002:a17:90b:53c4:b0:340:d1a1:af8e with SMTP id
- 98e67ed59e1d1-3491270ef84mr3755821a91.37.1764785316786; Wed, 03 Dec 2025
- 10:08:36 -0800 (PST)
+	s=arc-20240116; t=1764786354; c=relaxed/simple;
+	bh=k1XqMR/MfZi4V/PExqNXtDjOhZZ2W9JTvNV+qxbIOh4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=dulNCxr6nn4/r1xlOE1R0iRjYs2MxvIrbiSNLT1eocTlI02pj2K7oeAr6sHGFI6xlZDvQa8QHBnGgbunQHoYvuANs0CrOKWMJAOKiVDGRFnWPIg2wkVfmXkiE5Tvf72hX3AcWifjxDqGghxTmL1J0aUN5HeIhn1dsY8nfaZup5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o/ue4qte; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E401AC4CEF5;
+	Wed,  3 Dec 2025 18:25:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764786353;
+	bh=k1XqMR/MfZi4V/PExqNXtDjOhZZ2W9JTvNV+qxbIOh4=;
+	h=From:Subject:Date:To:Cc:From;
+	b=o/ue4qte235+FhH3o5nMWImZoWSw+TP8j/7mv//Q8tGA+Z+tgAN+AlOeTk01QNphx
+	 kQ0jObtPjU8HF7SmcgvI44Rzqpq+sNvB0VEorgmMqj62CFtXTWpiatqs+TfB/Bj4WR
+	 ldCbmOxRdKZbHXLf8GID43rX7cBT38IFO6B8eDs7AWMon4Q3ePS3aLjB5YnNqNDZqh
+	 mjz0i1fMWv0edRj3HrPXqklGLrZ6BwP0j89nWlULtB7UVFJoyilj95Hl1OxDo0oQF3
+	 CBsWbmfyf7QaZHXzjZgnt7KWkuUBvsMSp4tOrOAD9QBWa6jYraluKYiG6iWCMgl3GP
+	 B0pTcgjues6ug==
+From: Vincent Mailhol <mailhol@kernel.org>
+Subject: [PATCH iproute2-next v3 0/7] iplink_can: add CAN XL support
+Date: Wed, 03 Dec 2025 19:24:27 +0100
+Message-Id: <20251203-canxl-netlink-v3-0-999f38fae8c2@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250428195022.24587-2-stephen.smalley.work@gmail.com>
- <CAHC9VhQfrMe7EY3_bvW6PcLdaW7tPMgv6WZuePxd1RrbhyZv-g@mail.gmail.com>
- <CAHC9VhQyDX+NgWipgm5DGMewfVTBe3DkLbe_AANRiuAj40bA1w@mail.gmail.com>
- <6797b694-6c40-4806-9541-05ce6a0b07fc@oracle.com> <CAHC9VhQsK_XpJ-bbt6AXM4fk30huhrPvvMSEuHHTPb=eJZwoUA@mail.gmail.com>
- <CAHC9VhQnR6TKzzzpE9XQqiFivV0ECbVx7GH+1fQmz917-MAhsw@mail.gmail.com>
- <CAEjxPJ7_7_Uru3dwXzNLSj5GdBTzdPDQr5RwXtdjvDv9GjmVAQ@mail.gmail.com> <CAHC9VhQDHTNkrB4YuNoafM0bhAav=CP5Ux6ZZGY9+WF0+0_9ww@mail.gmail.com>
-In-Reply-To: <CAHC9VhQDHTNkrB4YuNoafM0bhAav=CP5Ux6ZZGY9+WF0+0_9ww@mail.gmail.com>
-From: Stephen Smalley <stephen.smalley.work@gmail.com>
-Date: Wed, 3 Dec 2025 13:08:24 -0500
-X-Gm-Features: AWmQ_bk8AJKB1D_utiPsmnzq48mAqxnxmRMWIq7jwXCZe5n9tvCfux9dhWFG1TQ
-Message-ID: <CAEjxPJ6e8z__=MP5NfdUxkOMQ=EnUFSjWFofP4YPwHqK=Ki5nw@mail.gmail.com>
-Subject: Re: [PATCH v2] security,fs,nfs,net: update security_inode_listsecurity()
- interface
-To: Paul Moore <paul@paul-moore.com>
-Cc: Anna Schumaker <anna.schumaker@oracle.com>, Trond Myklebust <trondmy@kernel.org>, 
-	Anna Schumaker <anna@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Casey Schaufler <casey@schaufler-ca.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, James Morris <jmorris@namei.org>, 
-	"Serge E. Hallyn" <serge@hallyn.com>, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Simon Horman <horms@kernel.org>, Ondrej Mosnacek <omosnace@redhat.com>, linux-nfs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
-	selinux@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAFuAMGkC/12OQQ6CMBBFr0K6tqYziIAr72FcNO0ADaSQtjYYw
+ t2t3RhZ/vz/3szGPDlDnt2KjTmKxpvZplCeCqYGaXviRqfMUGAlWgSupF0nbilMxo5ca6gllZD
+ ahiVmcdSZNfsezCxufgXCtF4De6Z6MD7M7p2vRcijrxgA24M4Ahe8vXaohKouAuA+krM0nWfXZ
+ 1XEH47i+FfEhGupO6kagKbGP3zf9w9N8ys5+QAAAA==
+X-Change-ID: 20250921-canxl-netlink-dd17ae310258
+To: netdev@vger.kernel.org, Stephen Hemminger <stephen@networkplumber.org>, 
+ Marc Kleine-Budde <mkl@pengutronix.de>, 
+ Oliver Hartkopp <socketcan@hartkopp.net>, David Ahern <dsahern@kernel.org>
+Cc: Rakuram Eswaran <rakuram.e96@gmail.com>, 
+ =?utf-8?q?St=C3=A9phane_Grosjean?= <stephane.grosjean@free.fr>, 
+ linux-kernel@vger.kernel.org, linux-can@vger.kernel.org, 
+ Vincent Mailhol <mailhol@kernel.org>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1941; i=mailhol@kernel.org;
+ h=from:subject:message-id; bh=k1XqMR/MfZi4V/PExqNXtDjOhZZ2W9JTvNV+qxbIOh4=;
+ b=owGbwMvMwCV2McXO4Xp97WbG02pJDJkGDZPFGW3ZtTVTV+ryfJl+/739s6qvaV1/nByz/23fu
+ C3yyvzyjlIWBjEuBlkxRZZl5ZzcCh2F3mGH/lrCzGFlAhnCwMUpABMxucfwz97Tcm9yo8jC3omm
+ X3fWrTv57FeMU+/+ZsbeaV2r3xTcm8Lwv+QSh82a01ODNlYV726aIyc9OXFCvKJEn6N3/AYOuW2
+ v+QE=
+X-Developer-Key: i=mailhol@kernel.org; a=openpgp;
+ fpr=ED8F700574E67F20E574E8E2AB5FEB886DBB99C2
 
-On Wed, Dec 3, 2025 at 10:55=E2=80=AFAM Paul Moore <paul@paul-moore.com> wr=
-ote:
->
-> On Wed, Dec 3, 2025 at 10:35=E2=80=AFAM Stephen Smalley
-> <stephen.smalley.work@gmail.com> wrote:
-> > On Wed, Jul 23, 2025 at 10:10=E2=80=AFPM Paul Moore <paul@paul-moore.co=
-m> wrote:
-> > > On Thu, Jun 19, 2025 at 5:18=E2=80=AFPM Paul Moore <paul@paul-moore.c=
-om> wrote:
-> > > > On Tue, May 27, 2025 at 5:03=E2=80=AFPM Anna Schumaker
-> > > > <anna.schumaker@oracle.com> wrote:
-> > > > > On 5/20/25 5:31 PM, Paul Moore wrote:
-> > > > > > On Tue, Apr 29, 2025 at 7:34=E2=80=AFPM Paul Moore <paul@paul-m=
-oore.com> wrote:
-> > > > > >> On Mon, Apr 28, 2025 at 4:15=E2=80=AFPM Stephen Smalley
-> > > > > >> <stephen.smalley.work@gmail.com> wrote:
-> > > > > >>>
-> > > > > >>> Update the security_inode_listsecurity() interface to allow
-> > > > > >>> use of the xattr_list_one() helper and update the hook
-> > > > > >>> implementations.
-> > > > > >>>
-> > > > > >>> Link: https://lore.kernel.org/selinux/20250424152822.2719-1-s=
-tephen.smalley.work@gmail.com/
-> > > > > >>>
-> > > > > >>> Signed-off-by: Stephen Smalley <stephen.smalley.work@gmail.co=
-m>
-> > > > > >>> ---
-> > > > > >>> This patch is relative to the one linked above, which in theo=
-ry is on
-> > > > > >>> vfs.fixes but doesn't appear to have been pushed when I looke=
-d.
-> > > > > >>>
-> > > > > >>>  fs/nfs/nfs4proc.c             | 10 ++++++----
-> > > > > >>>  fs/xattr.c                    | 19 +++++++------------
-> > > > > >>>  include/linux/lsm_hook_defs.h |  4 ++--
-> > > > > >>>  include/linux/security.h      |  5 +++--
-> > > > > >>>  net/socket.c                  | 17 +++++++----------
-> > > > > >>>  security/security.c           | 16 ++++++++--------
-> > > > > >>>  security/selinux/hooks.c      | 10 +++-------
-> > > > > >>>  security/smack/smack_lsm.c    | 13 ++++---------
-> > > > > >>>  8 files changed, 40 insertions(+), 54 deletions(-)
-> > > > > >>
-> > > > > >> Thanks Stephen.  Once we get ACKs from the NFS, netdev, and Sm=
-ack
-> > > > > >> folks I can pull this into the LSM tree.
-> > > > > >
-> > > > > > Gentle ping for Trond, Anna, Jakub, and Casey ... can I get som=
-e ACKs
-> > > > > > on this patch?  It's a little late for the upcoming merge windo=
-w, but
-> > > > > > I'd like to merge this via the LSM tree after the merge window =
-closes.
-> > > > >
-> > > > > For the NFS change:
-> > > > >     Acked-by: Anna Schumaker <anna.schumaker@oracle.com>
-> > > >
-> > > > Hi Anna,
-> > > >
-> > > > Thanks for reviewing the patch.  Unfortunately when merging the pat=
-ch
-> > > > today and fixing up some merge conflicts I bumped into an odd case =
-in
-> > > > the NFS space and I wanted to check with you on how you would like =
-to
-> > > > resolve it.
-> > > >
-> > > > Commit 243fea134633 ("NFSv4.2: fix listxattr to return selinux
-> > > > security label")[1] adds a direct call to
-> > > > security_inode_listsecurity() in nfs4_listxattr(), despite the
-> > > > existing nfs4_listxattr_nfs4_label() call which calls into the same
-> > > > LSM hook, although that call is conditional on the server supportin=
-g
-> > > > NFS_CAP_SECURITY_LABEL.  Based on a quick search, it appears the on=
-ly
-> > > > caller for nfs4_listxattr_nfs4_label() is nfs4_listxattr() so I'm
-> > > > wondering if there isn't some room for improvement here.
-> > > >
-> > > > I think there are two obvious options, and I'm curious about your
-> > > > thoughts on which of these you would prefer, or if there is another
-> > > > third option that you would like to see merged.
-> > > >
-> > > > Option #1:
-> > > > Essentially back out commit 243fea134633, removing the direct LSM c=
-all
-> > > > in nfs4_listxattr() and relying on the nfs4_listxattr_nfs4_label() =
-for
-> > > > the LSM/SELinux xattrs.  I think we would want to remove the
-> > > > NFS_CAP_SECURITY_LABEL check and build nfs4_listxattr_nfs4_label()
-> > > > regardless of CONFIG_NFS_V4_SECURITY_LABEL.
-> > > >
-> > > > Option #2:
-> > > > Remove nfs4_listxattr_nfs4_label() entirely and keep the direct LSM
-> > > > call in nfs4_listxattr(), with the required changes for this patch.
-> > > >
-> > > > Thoughts?
-> > > >
-> > > > [1] https://lore.kernel.org/all/20250425180921.86702-1-okorniev@red=
-hat.com/
-> > >
-> > > A gentle ping on the question above for the NFS folks.  If I don't
-> > > hear anything I'll hack up something and send it out for review, but =
-I
-> > > thought it would nice if we could sort out the proper fix first.
-> >
-> > Raising this thread back up again to see if the NFS folks have a
-> > preference on option #1 or #2 above, or
-> > something else altogether. Should returning of the security.selinux
-> > xattr name from listxattr() be dependent on
-> > NFS_CAP_SECURITY_LABEL being set by the server and should it be
-> > dependent on CONFIG_NFS_V4_SECURITY_LABEL?
->
-> Thanks for bringing this back up Stephen, it would be good to get this re=
-solved.
+Support for CAN XL was added to the kernel in [1]. This series is the
+iproute2 counterpart.
 
-On second look, I realized that commit 243fea134633 ("NFSv4.2: fix
-listxattr to return selinux security label") was likely motivated by
-the same issue as commit 8b0ba61df5a1c44e2b3cf6 ("fs/xattr.c: fix
-simple_xattr_list to always include security.* xattrs"), i.e. the
-coreutils change that switched ls -Z from unconditionally calling
-getxattr("security.selinux") (via libselinux getfilecon(3)) to only
-doing so if listxattr() returns the "security.selinux" xattr name.
-Hence, we want the call to security_inode_listsecurity() to be
-unconditional, which favors option #2. My only residual question
-though is that commit 243fea134633 put the call _after_ fetching the
-user.* xattr names, whereas the nfs4_listxattr_nfs4_label() returns it
-_before_ any user.* xattrs are appended. I'd be inclined to move up
-the security_inode_listsecurity() call to replace the
-nfs4_listxattr_nfs4_label() call along with option #2.
+Patches #1 to #3 are clean-ups. They refactor iplink_can's
+print_usage()'s function.
+
+Patches #4 to #7 add the CAN XL interface to iplink_can.
+
+[1] commit 113aa9101a91 ("Merge patch series "can: netlink: add CAN XL support")
+Link: https://git.kernel.org/netdev/net-next/c/113aa9101a91
+
+Signed-off-by: Vincent Mailhol <mailhol@kernel.org>
+
+---
+Changes in v3:
+
+  - Patch #5: only use string literals in print_uint(). To achieve
+    this, remove the "is_xl" parameter from can_print_xtdc_opt() and
+    instead add can_print_xtdc_opt().
+
+  - Reword patch #4 to #7 subjects.
+
+Link to v2: https://lore.kernel.org/r/20251201-canxl-netlink-v2-0-dadfac811872@kernel.org
+
+Changes in v2:
+
+  - add the "iproute2-next" prefix to the patches
+
+  - s/matches/strcmp/g in can_parse_opt()
+
+  - Patch #3: "s/milli second/millisecond/g" and "s/nano second/nanosecond/g"
+
+  - Patch #6: s/XL-TMS/TMS/g in print_ctrlmode()
+
+  - Patch #7: Remove a double space in patch description
+
+Link to v1: https://lore.kernel.org/r/20251129-canxl-netlink-v1-0-96f2c0c54011@kernel.org
+
+---
+Vincent Mailhol (7):
+      iplink_can: print_usage: fix the text indentation
+      iplink_can: print_usage: change unit for minimum time quanta to mtq
+      iplink_can: print_usage: describe the CAN bittiming units
+      iplink_can: add RESTRICTED operation mode support
+      iplink_can: add initial CAN XL support
+      iplink_can: add CAN XL transceiver mode setting (TMS) support
+      iplink_can: add CAN XL TMS PWM configuration support
+
+ ip/iplink_can.c | 349 +++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 331 insertions(+), 18 deletions(-)
+---
+base-commit: 1a909dbde03c3f53612cd16dc1c8cb8d58931364
+change-id: 20250921-canxl-netlink-dd17ae310258
+
+Best regards,
+-- 
+Vincent Mailhol <mailhol@kernel.org>
+
 
