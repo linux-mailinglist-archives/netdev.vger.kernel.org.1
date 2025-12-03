@@ -1,141 +1,120 @@
-Return-Path: <netdev+bounces-243425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1A8FCA0728
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 18:28:21 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDCE8CA0961
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 18:44:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 68A34331F4D4
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 17:11:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 423E9300441F
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 17:43:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72197398FBC;
-	Wed,  3 Dec 2025 16:59:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA36C345CD8;
+	Wed,  3 Dec 2025 17:35:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HeJ8XFDw"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="lewGYjsS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BCFB398FB0
-	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 16:58:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A41BC345CC8;
+	Wed,  3 Dec 2025 17:35:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764781139; cv=none; b=nxIJA2WSamoes1fQknfNZeC4pMQ62/0+2TaC45K78o86RwW5C+31JMTyRgx5zXqo8/WYHqD8US18tperkgzZ5SBn/HBPsjxkCADsk8ShjfJmKthwtjk7cSta2KwjMIGn2F4ME3Byg+E5dO/C9dS2+S48phItHABInxa+cz/4Wi0=
+	t=1764783316; cv=none; b=I5glpUEplbfOmM5TJuG4CTHmBrS8xz3rj9N/HPFshOI4qi1df9z584gQgHIgC+ptYNYE3QhgWktoYehQkXvjfW9wDH+jE4aSJnSl1RqP87gXg6Lx9KVgFN3vjtAmpPy4ivDs6AEFawe/im6X44ZUI8aFH8FjXBTjoey0lruSPZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764781139; c=relaxed/simple;
-	bh=+w1fh0CLrnEXL5kEY/A4dLuPSBwVUZezWvTx+H8HRaI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g+Kf54AEkgw4dHf7e3QenZ16n0uKL+owVj9Ib08NaZDLK6T3gcSwmQmOUntpn98p8ViKijyoHgQPRkVk/P3Uceos8DfcLNMq4tdCK3O1/JL4ABxJeZJPeu9tRnLxwEzs6Pj2e7VS9qgYmFhQEJrVrqbZUdNlq506jtnBB4YtXRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HeJ8XFDw; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4ee147baf7bso529871cf.1
-        for <netdev@vger.kernel.org>; Wed, 03 Dec 2025 08:58:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1764781131; x=1765385931; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aWXC9hyoBsRhxJFVF8r6pSxMVZV+OmkuKYv5ee8pQww=;
-        b=HeJ8XFDwdWekDq9V1b9WJsNTFib2PsBhNTiX2rmGrMIcmsVSCkVMDiqiuq9OlqQg9a
-         Ay7EDzHuaOQu3QWfs6/m7Q3KMm4YOTY7Q1RHirjo+KH3AjM+4I020XQpQqigcDGHeMA5
-         PmEoJtrAlSkb4bPPDYI2xhaMFa5a1Z5YCZmmaw3ge5rK/YsJOBM73EXxmtTsMDcTbWKj
-         GhPpH+p7RnOvYWP7fPkg+bOA9V4xqBf7JUrmaPLD9D/VnJExi/NMadW+EEKnZwG6UqP1
-         QzihSSd3ARliBhugxPMbyqOjwJ/r+6UaBuNwML+v7GS1ZWXmBv2jivFhYvOBCflqqwQ4
-         nOfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764781131; x=1765385931;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=aWXC9hyoBsRhxJFVF8r6pSxMVZV+OmkuKYv5ee8pQww=;
-        b=w9ns9NCJ+Yth+wTKbTzXJOJZ/AlLfg09NZXYVzTY3w3VzCA9KhVwsw5hoskkfEClqS
-         R1K3gO5OHaSgisz/saSVXDOBI9hMQ+Mi8v6TkFjbTR1Yxt+TIlehv10Dv1Nz74UvtQck
-         IKauxC22dm6LEJ4p0SiUTaYnp9TFw7vSiiAUQRFIxSbUJA4soE7UJwr0T2gRGbionHhF
-         IVKs3B0qu/UWf3o8RDZwNVhKNpZYPcuGMeF160CKgYQu+KYj86cl7WRDoiVfdtH7ULBL
-         Zz9kU9lRyQohfvIz/Yf9sxaae+mgDJ/ayEw5vWIRfb1aK+kR28V35b0L6meUxWXvyFkz
-         IOrA==
-X-Forwarded-Encrypted: i=1; AJvYcCVT0MaKF7/fihCamXf/T+o9GWa9gnUb3etNlN3ZjPOQB0C4+B2f1eMOKPEG09LL99tF4ZohVx0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzrbfj/MLwFtwk/37KksW5UCPlXQx9hqDffBlJeKlDaWkdJ24Dx
-	Or5FiGOJQnvlAy8CI9AMPn/bM7ZyRKRF4+ILvo1id0ZXrmI8dGwGTcVyK19UQN2+6bZidrSo7dB
-	m2SuXAxVu6fHq/5XCRIJNZseAz5qebJ3SVo4QxZIC
-X-Gm-Gg: ASbGncsZNoFyrdgE96vX5kkPrV984gexz53xBLFgNuaxm9GNhWQGM19MWIQiW/Vu+78
-	kCOWmGTGcjbDdBF6aVw3wRm99jOMiJaJuJ2gJAjfIW1LkIW3VgBLct5ru5UujGsPxi80NqS5MS4
-	iV/FBVlhP1Rr8TmOQTHCtGG8l5mksD3n9XTpxLrJ5ScPSZ7qdrzzYlzr/FZAc4NiiGUhUdGwEEh
-	z6tXx/IAkPGH6NHI9O5tQfyvFQVf1GsT6Hks6GauQ0Rb515vRJloiTVmNFr1Tjxq9bXn95kNyky
-	7RpXPW1ByOGqwc1+haQTmQesCn7bY94CvCAeVuCHXt1Fryki5XZ/0ejPgNaO
-X-Google-Smtp-Source: AGHT+IEwQDGOVT8Lgzi1wTqV6Us8oL3zoJ/xquBSspLWs/EEWhA+DJcMaq/DF7hunAbCMnNSctvo80o0agoxsFagOgY=
-X-Received: by 2002:a05:622a:15ce:b0:4ed:8103:8c37 with SMTP id
- d75a77b69052e-4f015798fffmr13757201cf.12.1764781131112; Wed, 03 Dec 2025
- 08:58:51 -0800 (PST)
+	s=arc-20240116; t=1764783316; c=relaxed/simple;
+	bh=JQu2b9NRJ42gK/PkDEGWkopCmcHjk7Ko53avW+LVta0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rZL7lr8j0JA9fzBHTYQRWC/PW/TuFOWo1IzgHcNaTGTBFSNlX2sidSE2qY2tDmBAsYGd8E4hmuxBY7DN0FvrwhTWKQpjsj1MLpk6UBIL1BKXfyCs75WA9H5sHnmgH8tELRGEElvroo6lP2BECgJxwjQrgr+XUlAGCYea0G/bjE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=lewGYjsS; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=hHpyxNIaNZfRKRMNY9ujvPysDB/fwgyutsqY/P0Voz0=; b=lewGYjsSaALyjLtDk/pb3BAqNH
+	bhlottucCkUAMeRvyc5Lz6sloZgbnmBWwwEDK5PiFeztiscWTAHsKiJNwsh3AjBL5mqkIotoy6ykH
+	4hTlRB8JFBDiCdR8w/UKZe63p7kuTn/C/0NGjwn3K6/r0jtJoChwoXud9DSdbGg76mX+1SzdJqPUH
+	RIrRnTGU17H+6kCJJqUQmsPASLA1j0hRIxlb1pdcyYHmjfWxjg0eNYQtAfKNfa7UiArf3jiOljYbv
+	/zrwEmWoEZ9UbTqiQAi48Lcfg3fRu/UdmcDRENluwuaeEWJehemGKfCg7K2or1FpedF6gWqttX6jl
+	nTHh71kA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54608)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vQqks-000000002lv-3ejX;
+	Wed, 03 Dec 2025 17:35:06 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vQqkp-000000000BX-1aLc;
+	Wed, 03 Dec 2025 17:35:03 +0000
+Date: Wed, 3 Dec 2025 17:35:03 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Marek Vasut <marek.vasut@mailbox.org>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Aleksander Jan Bajkowski <olek2@wp.pl>,
+	Andrew Lunn <andrew@lunn.ch>, Conor Dooley <conor+dt@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Michael Klein <michael@fossekall.de>,
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+	devicetree@vger.kernel.org
+Subject: Re: [net-next,PATCH 3/3] net: phy: realtek: Add property to enable
+ SSC
+Message-ID: <aTB0x6JGcGUM04UX@shell.armlinux.org.uk>
+References: <20251130005843.234656-1-marek.vasut@mailbox.org>
+ <20251130005843.234656-3-marek.vasut@mailbox.org>
+ <aTAOe4c48zyIjVcb@shell.armlinux.org.uk>
+ <20251203123430.zq7sjxfwb5kkff7q@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251201163800.3965-1-chia-yu.chang@nokia-bell-labs.com> <20251201150509.6cd9fefc@kernel.org>
-In-Reply-To: <20251201150509.6cd9fefc@kernel.org>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Wed, 3 Dec 2025 11:58:34 -0500
-X-Gm-Features: AWmQ_bmmK0qcQ0MMg8A5oddcgrqcwdNw6rP5OvhiWOfo_lx74r4d17hh5ndUNnw
-Message-ID: <CADVnQynFTrWf_waxGPH6VVPSZapSuxUb6LFdFUGj0NfiADAa7Q@mail.gmail.com>
-Subject: Re: [PATCH v7 net-next 00/13] AccECN protocol case handling series
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: chia-yu.chang@nokia-bell-labs.com, pabeni@redhat.com, edumazet@google.com, 
-	parav@nvidia.com, linux-doc@vger.kernel.org, corbet@lwn.net, horms@kernel.org, 
-	dsahern@kernel.org, kuniyu@google.com, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com, 
-	stephen@networkplumber.org, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
-	davem@davemloft.net, andrew+netdev@lunn.ch, donald.hunter@gmail.com, 
-	ast@fiberby.net, liuhangbin@gmail.com, shuah@kernel.org, 
-	linux-kselftest@vger.kernel.org, ij@kernel.org, 
-	koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com, 
-	ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com, 
-	cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com, 
-	vidhi_goel@apple.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251203123430.zq7sjxfwb5kkff7q@skbuf>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Mon, Dec 1, 2025 at 6:05=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Mon,  1 Dec 2025 17:37:47 +0100 chia-yu.chang@nokia-bell-labs.com
-> wrote:
-> > Plesae find the v7 AccECN case handling patch series, which covers
-> > several excpetional case handling of Accurate ECN spec (RFC9768),
-> > adds new identifiers to be used by CC modules, adds ecn_delta into
-> > rate_sample, and keeps the ACE counter for computation, etc.
-> >
-> > This patch series is part of the full AccECN patch series, which is ava=
-ilable at
-> > https://github.com/L4STeam/linux-net-next/commits/upstream_l4steam/
+On Wed, Dec 03, 2025 at 02:34:30PM +0200, Vladimir Oltean wrote:
+> On Wed, Dec 03, 2025 at 10:18:35AM +0000, Russell King (Oracle) wrote:
+> > On Sun, Nov 30, 2025 at 01:58:34AM +0100, Marek Vasut wrote:
+> > > Add support for spread spectrum clocking (SSC) on RTL8211F(D)(I)-CG,
+> > > RTL8211FS(I)(-VS)-CG, RTL8211FG(I)(-VS)-CG PHYs. The implementation
+> > > follows EMI improvement application note Rev. 1.2 for these PHYs.
+> > > 
+> > > The current implementation enables SSC for both RXC and SYSCLK clock
+> > > signals. Introduce new DT property 'realtek,ssc-enable' to enable the
+> > > SSC mode.
+> > 
+> > Should there be separate properties for CLKOUT SSC enable and RXC SSC
+> > enable?
+> 
+> That's what we're trying to work out. I was going to try and give an
+> example (based on stmmac) why you wouldn't want RXC SSC but you'd still
+> want CLKOUT SSC, but it doesn't seem to hold water based on your feedback.
+> Having one device tree property to control both clocks is a bit simpler.
 
-Hi Chia-Yu,
+The problem I see is that if we introduce a single property for both,
+we then need to maintain this single property ad infinitum. If we
+later find that we need separate control, we could end up with three
+properties - the combined one, and two for individual controls.
 
-My understanding is that you still have a set of packetdrill tests you
-have been using to test this AccECN patch series. For the Linux
-networking stack, the recent best practice for a significant patch
-series like this is to add packetdrill tests to the
-tools/testing/selftests/net/packetdrill/ directory as a separate
-commit in the patch series.
+If we are to go with a single property, then I think we should have at
+least discussed what we would do if we need separate control.
 
-For a recent example, see:
+If we go with two properties now, then we don't have to consider this,
+and we will only ever have the two properties rather than three.
 
-  selftest: packetdrill: Add max RTO test for SYN+ACK.
-  https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commi=
-t/?id=3Dffc56c90819e86d3a8c4eff6f831317d1c1476b6
-
-When you next post the AccECN patch series for review, can you please
-include a patch at the end of the series that posts your packetdrill
-tests in the tools/testing/selftests/net/packetdrill/ directory? In
-the commit description for that patch, please include a mention of the
-packetdrill SHA1 you are using and a link to the packetdrill branch
-you are using, somewhere on github or similar. Then I will look into
-merging any packetdrill tool changes that you are depending on, if
-there are packetdrill commits that you depend on that I have not
-merged into packetdrill yet.
-
-Thanks!
-neal
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
