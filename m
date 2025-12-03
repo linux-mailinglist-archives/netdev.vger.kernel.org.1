@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-243365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19CF4C9E082
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 08:22:20 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id D03B8C9E0A1
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 08:25:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8F9C334B030
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 07:22:19 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0F1873428A2
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 07:25:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E992628C00C;
-	Wed,  3 Dec 2025 07:22:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DDAA296BA4;
+	Wed,  3 Dec 2025 07:25:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sMnCW3n5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hg+z2Zcw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C128E8405C;
-	Wed,  3 Dec 2025 07:22:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75C6D1E1A17;
+	Wed,  3 Dec 2025 07:25:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764746534; cv=none; b=jCoh5AQgEF5V8Okj90/sZbN/o3TVqxLCMxHezm4EVgeMBdBiBZ/zHcGhhxFlNiWSuex1/7uiFFj5CJHwTUZeFuEadhfgprZMyfgbfCs2pwtAeG7TIo+cjN79ulJbvxIwbDcsd2q3u4/JoCHOKSmKCdqtdehi3+G/eQlFE9/3UNw=
+	t=1764746745; cv=none; b=EePpWmNBgcpSs61xOYBN1WECFrUQRJMJ5fHgYS5X0xKxbGysDDhOdlVesio9bi8tdaBBcCrD31CrUNFBaLpiII9Tpjk5qfeKg34XPXI/Mxz/GUfniHMJLHEvUnC1DMOj6Xcu1BAxVWcY7N/v1qvywElUDK+8B8slHXckJWvg+qI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764746534; c=relaxed/simple;
-	bh=iRKIZ/UVj8DgrMSiGZAJAYyCb/PzlMsqo2aJSitCVtw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZwzHhfWUWqQQBpwRQuoi/gGWnWZm9gqeS+iMpqi7+gMiMfvK/l2sbaOqUSTCqFUcFkQdVhNW70oL5/xtcW/4ssqnLRIYu7LeerbAuySUROikiXAgVGIO5Rgh8sGegu0W3i9mzdLoPrcfMEGSzUFAk6+9IO0SerJ/1aTrc3i6mss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sMnCW3n5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 506CCC4CEFB;
-	Wed,  3 Dec 2025 07:22:11 +0000 (UTC)
+	s=arc-20240116; t=1764746745; c=relaxed/simple;
+	bh=Fj3YDC+awPBH9AjzuAegmUIGe8qq8yGZMZZvCrI52nM=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Yc6f/+QV6yU5po0DGaRDCqqeRx3WfymN716AlLWL93kZhWfsxEXgqnmR5+ORsCQ5HPBOTGcqoDUZesb37XV5dHeGqA+v6L7kKJwcllR2ZIReyAzBaOzgu5RUoTf4exaQr4lT96HR4xYiCNfxY7NFI8ZTCYJd+WSWbHe6OJgkZBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hg+z2Zcw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31AC4C4CEFB;
+	Wed,  3 Dec 2025 07:25:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764746534;
-	bh=iRKIZ/UVj8DgrMSiGZAJAYyCb/PzlMsqo2aJSitCVtw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=sMnCW3n521KTEUO+y+vtNh2JBb73mkJIXwA0E59BgKhPQLM1w7s++0HbUVv3EU13v
-	 7I1IkevI1WtDp6RnERBg+ERG1T5aG17x5FFCXAwgcPJwi5rbxuobxa6z9swnf+/oJN
-	 CPcgF7LThesMtYJpC9Sz8rk3wgnHuMJ9zPQkV2puBpSje+Jcv3PaflFRmNIARxtP1r
-	 N5MzPi2wXeOgWjsJQXfuf9SEMLPxZ/7DLNyp+X/9rk+QmRSEYIVDfhMBJu/7pWx00x
-	 wqHLGe14agjCeTJCYxbGD6zxgkVXU7tHIkhuTsfOmRGPi0a4QC3cpFMER5jFbQLYBN
-	 4GBauTr+hbgzg==
-Message-ID: <4c1ca544-9f5d-48e1-bd54-4e84f0234cf4@kernel.org>
-Date: Wed, 3 Dec 2025 08:22:09 +0100
+	s=k20201202; t=1764746744;
+	bh=Fj3YDC+awPBH9AjzuAegmUIGe8qq8yGZMZZvCrI52nM=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=Hg+z2Zcwu9q5vKwFDd0H6mJFjM5/09ydkFG5iKBEORV0A7cBSdaX/u/1RD8dOtv99
+	 07NH/hm3UkbuXqkyLYA2A9cwUYUIKt8PCA7GiDvUyoTm3VfsarQBANKnUtZjibA3xD
+	 qK/F3SI3Hz+6zo3+7k8sh4jH8ILNKT451BhqmDeISnAcTCsXLNa256sb464/pJ6Ird
+	 XvcDoQ4OML/r+5fayi9SB+iR+JJ6D/bGgMb1eTATa+z+edEcv3+nr7rUCG17q8D64v
+	 /RQK7jS9YQV8kxxTJqUT7g6G6Rhq7i7s4nfJn/AvBy3Dp4xCsf1m36pVGiYsh7bGbO
+	 iC28x3j1SAtpQ==
+Message-ID: <36d33acb-7436-4f86-848e-ea280efc05a9@kernel.org>
+Date: Wed, 3 Dec 2025 08:25:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,6 +52,7 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v2 3/4] dt-bindings: clock: Add device tree bindings for
  vmclock
+From: Krzysztof Kozlowski <krzk@kernel.org>
 To: "Chalios, Babis" <bchalios@amazon.es>,
  "richardcochran@gmail.com" <richardcochran@gmail.com>,
  "dwmw2@infradead.org" <dwmw2@infradead.org>,
@@ -66,7 +67,7 @@ Cc: "Graf (AWS), Alexander" <graf@amazon.de>,
  "Woodhouse, David" <dwmw@amazon.co.uk>
 References: <20251202201118.20209-1-bchalios@amazon.es>
  <20251202201118.20209-4-bchalios@amazon.es>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+ <4c1ca544-9f5d-48e1-bd54-4e84f0234cf4@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -111,41 +112,58 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <20251202201118.20209-4-bchalios@amazon.es>
+In-Reply-To: <4c1ca544-9f5d-48e1-bd54-4e84f0234cf4@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 02/12/2025 21:11, Chalios, Babis wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
+On 03/12/2025 08:22, Krzysztof Kozlowski wrote:
+> On 02/12/2025 21:11, Chalios, Babis wrote:
+>> From: David Woodhouse <dwmw@amazon.co.uk>
+>>
+>> Add device tree bindings for the vmclock device, similar to the existing
+>> vmgenid bindings. The vmclock device provides a PTP clock source and
+>> precise timekeeping across live migration and snapshot/restore operations.
+>>
+>> The bindings specify a required memory region containing the vmclock_abi
+>> structure and an optional interrupt for clock disruption notifications.
+>>
+>> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+>> Signed-off-by: Babis Chalios <bchalios@amazon.es>
 > 
-> Add device tree bindings for the vmclock device, similar to the existing
-> vmgenid bindings. The vmclock device provides a PTP clock source and
-> precise timekeeping across live migration and snapshot/restore operations.
 > 
-> The bindings specify a required memory region containing the vmclock_abi
-> structure and an optional interrupt for clock disruption notifications.
+> Please use scripts/get_maintainers.pl to get a list of necessary people
+> and lists to CC. It might happen, that command when run on an older
+> kernel, gives you outdated entries. Therefore please be sure you base
+> your patches on recent Linux kernel.
 > 
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> Signed-off-by: Babis Chalios <bchalios@amazon.es>
+> Tools like b4 or scripts/get_maintainer.pl provide you proper list of
+> people, so fix your workflow. Tools might also fail if you work on some
+> ancient tree (don't, instead use mainline) or work on fork of kernel
+> (don't, instead use mainline). Just use b4 and everything should be
+> fine, although remember about `b4 prep --auto-to-cc` if you added new
+> patches to the patchset.
+> 
+> You missed at least devicetree list (maybe more), so this won't be
+> tested by automated tooling. Performing review on untested code might be
+> a waste of time.
+> 
+> Please kindly resend and include all necessary To/Cc entries.
 
+I am not reviewing patches not bothering to cc maintainers, but to spare
+you from obvious resubmits of v4:
 
-Please use scripts/get_maintainers.pl to get a list of necessary people
-and lists to CC. It might happen, that command when run on an older
-kernel, gives you outdated entries. Therefore please be sure you base
-your patches on recent Linux kernel.
+A nit, subject: drop second/last, redundant "device tree bindings". The
+"dt-bindings" prefix is already stating that these are bindings.
+See also:
+https://elixir.bootlin.com/linux/v6.17-rc3/source/Documentation/devicetree/bindings/submitting-patches.rst#L18
+(you could not make more redundant subject...)
 
-Tools like b4 or scripts/get_maintainer.pl provide you proper list of
-people, so fix your workflow. Tools might also fail if you work on some
-ancient tree (don't, instead use mainline) or work on fork of kernel
-(don't, instead use mainline). Just use b4 and everything should be
-fine, although remember about `b4 prep --auto-to-cc` if you added new
-patches to the patchset.
-
-You missed at least devicetree list (maybe more), so this won't be
-tested by automated tooling. Performing review on untested code might be
-a waste of time.
-
-Please kindly resend and include all necessary To/Cc entries.
+Node names should be generic. See also an explanation and list of
+examples (not exhaustive) in DT specification:
+https://devicetree-specification.readthedocs.io/en/latest/chapter2-devicetree-basics.html#generic-names-recommendation
+If you cannot find a name matching your device, please check in kernel
+sources for similar cases or you can grow the spec (via pull request to
+DT spec repo).
 
 
 Best regards,
