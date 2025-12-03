@@ -1,126 +1,150 @@
-Return-Path: <netdev+bounces-243348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70C8DC9D806
-	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 02:30:50 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB2BCC9D80C
+	for <lists+netdev@lfdr.de>; Wed, 03 Dec 2025 02:32:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24E423A9029
-	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 01:30:49 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B80DA4E0115
+	for <lists+netdev@lfdr.de>; Wed,  3 Dec 2025 01:32:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F03F1DEFE9;
-	Wed,  3 Dec 2025 01:30:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07F731F4181;
+	Wed,  3 Dec 2025 01:32:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="sLoW5Xpg"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="YkOWFUDg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-103.mailbox.org (mout-p-103.mailbox.org [80.241.56.161])
+Received: from out162-62-57-210.mail.qq.com (out162-62-57-210.mail.qq.com [162.62.57.210])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2B011B4138;
-	Wed,  3 Dec 2025 01:30:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.161
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53AB1E3DF2
+	for <netdev@vger.kernel.org>; Wed,  3 Dec 2025 01:32:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764725446; cv=none; b=u3CZ7UGPMUsC/svCLO0nvsuJSfX0kD75c6O3MiI1VXjnm89e2omudAqh57/y1lLH4jeX5q8t1Gb3tgvX8JVSdec0TrgrNvJ/KdmcjiIcvwiw3c6pPGdkDI0dXxlHJITbU1++E2aJ5RWKZ79lnDuTDt+EvSj/egM2SFOQiqCH1QM=
+	t=1764725531; cv=none; b=BbQf3P0dHgzkKZkGWP6zktrPTfS4JOCu05Pjodh5pHjVKIcXPXAsuChtLA1lrDjzVGfZnwH77nBgBW0er67uGmo4f0kGlZ+D+CZOYPD4N/FOcYW0cu7lugzAI+sALL2E//46amMvyAi6pUmhryozLtcCbSAvWeEt1ZStJY9X/us=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764725446; c=relaxed/simple;
-	bh=ovfLwLsXkBB0u4yjDJk3NJc8uW/6cuJBVErz9Kr3oP8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=prFXMVJvhlTRxMxoGuL4glC+aTSXIHSx894e7uVZ4w10x0jz1SkGBhbf0vt4KND1Go//D17Uj1g0AVScBQvIbjF1mhKgmc7hQmDg2IN8ztAbI7BpQzWj+gwjug1N/Mo87PaWTJwJOIeIgZfDf5lCtD6OXsZ4xHtvTGa4iwrJ4Do=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=sLoW5Xpg; arc=none smtp.client-ip=80.241.56.161
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-103.mailbox.org (Postfix) with ESMTPS id 4dLg7b3YqLz9tkk;
-	Wed,  3 Dec 2025 02:30:35 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1764725435;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9wXh5W9jMqRcOXCsJjM2PP5pnAUQs9VOMsyI3J7suNk=;
-	b=sLoW5XpgIMCojc3bBGANOJsyPV4QPHF36vxsd8zfEuXrDC8JKHVI3pS59kZFSg+X99sk8w
-	WR/BGs7aR2CxuWqpbvvl3eSShcv/+2WAXCWin4PE8ejULTsPMz2SpO8P7918Mxi5Lxa1ru
-	NAQLWGC5TAyTzg8ws+cRithP2teg6j0uSPOtzvKhnlRznNuN+rRVoPFxuc/jkjYsSjkPa0
-	tS2HyOIVLj15Vtqs9pBIf61UPh93d4EpM4I7Vfytyz8OIbhdXtK6tXKjM+YrygmKyVcDfj
-	CaswTSUh7U1ho8LLDXTTW2n7y3qBVMUcJ2p+A0ImEz5iEKtLG1fHz04uQZH24w==
-Message-ID: <4aaa73b4-3a2a-44f6-ad81-74c30be13431@mailbox.org>
-Date: Wed, 3 Dec 2025 02:30:31 +0100
+	s=arc-20240116; t=1764725531; c=relaxed/simple;
+	bh=ifTG2EWkHu8F7pe0skh6hT195ZLD9h+pqfEjF3OKTj4=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=XJX+1rreML+H2e9cxBTM52eXlovUMukMdU04MBz7bhHXsbgZT/UvG9wEPSw+fBfKi3Dkl3Wga3bU6JUt5ZlOoiUvAhXSJQiNTsPqd4M+yI5xNP3jZmSBY70xiT57/q+IArDYgvvQzpfZ2NDFyxrbCOIwQjuTnjfRbqCuIP8MpHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=YkOWFUDg; arc=none smtp.client-ip=162.62.57.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1764725517; bh=FgD4FVBsIZc/lJgWx44TSx1/rV+CY/xX0o1zBduphyg=;
+	h=From:To:Cc:Subject:Date;
+	b=YkOWFUDgoY329RdApQMaJfZissAdj/pwiDYdy5eM31fjtKOn6hcMGilwu3Fzi3RnB
+	 rFOALpCZOYJEpPLWW2hSsWhnCUvrz18E86yvB87Uhgb8S7wL1YRub6wJfiuhWvy8DL
+	 CP3iaSL5czzKH9Y19ODiIQoKKaKkPxBI2a/10Xd4=
+Received: from localhost ([58.246.87.66])
+	by newxmesmtplogicsvrszc50-0.qq.com (NewEsmtp) with SMTP
+	id 7F7B4684; Wed, 03 Dec 2025 09:31:55 +0800
+X-QQ-mid: xmsmtpt1764725515tevgm4er9
+Message-ID: <tencent_639FC431D959DA3E8FC007985FC88EA5A90A@qq.com>
+X-QQ-XMAILINFO: M07Ulnfy3VHKVnABMxCOZ4Vj1SFpQK+ANJvNR9/RsY3dnBXHnxT/POhN78hogO
+	 /MMywCcjYH3yAIEjAwzwA81HZaP9GrnFzp1bqdb9Wgs8y5S1rRchqkbzRMFDqfu/bPmsE7yK1QKy
+	 3heICWirMQ+63WnqaJMBlDs7tsaJWgZ7ke6KcSm3+kkAZEbCSLEZKaDLXfg+kctph1WgNYdVocWJ
+	 d+URF5SNp7WDk5+4ewcALjulP+mneOqRv0NTtBo0iG3TFQTo2/OwczD/03tb7C49E9azwCwCO8ta
+	 zTh88G+HnCHfKGcCvspNlF6IRss5E0OA6Po4ynJHU3buEH51ZkASzm3lKV9LEcQe+Zb01qpuwfHn
+	 +2z8W+mpaPJfZe45AbE2ofhhEy4Dc+blrPooQyH0d9DajoKjUAnuWPi5+fhzfjoAzVkZ4uIZuBo1
+	 ys/OwjTXsaIy+RJ1rT26/B6EofTfIfSd/+x0PLOeiyPaZ0g2KyGqB3KjAn7k+zVJnviIoOCO+b4W
+	 9/6prNXmraM5HvPcWRtRkCHnRbpSkYhcCtQPJ4ZUOVA1QAu4Vh4WWNPkrYfhXjcJJHdb/K5kuwkr
+	 CjeV+EES5jW3WNWQ2OWO3/Nm/iK1jUjezyJR4UbZpXw2dFtjxo+Rr6t1hKJ3sNynLLLPNaJOkPog
+	 tCmbUclzH0I12lWiqVPMYTSvQ6Hp5YE02arlWNcMyd2oPx6EahFiSxBjCJG1G5RsjqSHSXw1r8NA
+	 Y3DmS6GLsPAh+XvGL3cyDjIsEzUEKE7dO1QgZkwxXHNqsLcxDRDgqXrUy2PJ173INXa50JWUz4Hn
+	 BDlR7w8MA/fh43QcoOEabD52JtciPPIwaxKDLltAxqag5Y5G2P6HMzpF1io7wfWiQey5ilyHB3oW
+	 hjYwRCIiBFAtTCmHnyN1f9sqzPVjPBnu4qnKSqL63eR861Mw/ITdnZJETLMpaEZ4YO0rYVq4QTi5
+	 QwEw7thDoOTA0f9Qqw+e+9Pfb69qC+
+X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
+From: 2694439648@qq.com
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com,
+	hailong.fan@siengine.com
+Cc: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	inux-kernel@vger.kernel.org
+Subject: [PATCH v3] net: stmmac: Modify the judgment condition of "tx_avail" from 1 to 2
+Date: Wed,  3 Dec 2025 09:31:52 +0800
+X-OQ-MSGID: <1f65707a427512e7b549809ec40286fb12b4c114.1764725087.git.hailong.fan@siengine.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [net-next,PATCH 2/3] dt-bindings: net: realtek,rtl82xx: Document
- realtek,ssc-enable property
-To: Krzysztof Kozlowski <krzk@kernel.org>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Aleksander Jan Bajkowski <olek2@wp.pl>, Andrew Lunn <andrew@lunn.ch>,
- Conor Dooley <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Florian Fainelli <f.fainelli@gmail.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Michael Klein <michael@fossekall.de>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Russell King <linux@armlinux.org.uk>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, devicetree@vger.kernel.org
-References: <20251130005843.234656-1-marek.vasut@mailbox.org>
- <20251130005843.234656-2-marek.vasut@mailbox.org>
- <f3046826-a44c-4aa9-8a94-351e7fe83f06@kernel.org>
- <a861aa24-e350-4955-be5a-f6d2f4bc058f@mailbox.org>
- <043053ec-0f57-45e9-9767-be9b518dea4d@kernel.org>
-Content-Language: en-US
-From: Marek Vasut <marek.vasut@mailbox.org>
-In-Reply-To: <043053ec-0f57-45e9-9767-be9b518dea4d@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-MBO-RS-ID: 382a994154142a10bf5
-X-MBO-RS-META: dbtpdimpw6urkcfsebudhdca9e5ayr75
+Content-Transfer-Encoding: 8bit
 
-On 12/1/25 8:20 AM, Krzysztof Kozlowski wrote:
-> On 30/11/2025 14:41, Marek Vasut wrote:
->> On 11/30/25 9:20 AM, Krzysztof Kozlowski wrote:
->>
->> Hello Krzysztof,
->>
->>>> diff --git a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
->>>> index eafcc2f3e3d66..f1bd0095026be 100644
->>>> --- a/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
->>>> +++ b/Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml
->>>> @@ -50,6 +50,11 @@ properties:
->>>>        description:
->>>>          Disable CLKOUT clock, CLKOUT clock default is enabled after hardware reset.
->>>>    
->>>> +  realtek,ssc-enable:
->>>> +    type: boolean
->>>> +    description:
->>>> +      Enable SSC mode, SSC mode default is disabled after hardware reset.
->>>
->>> I don't want more SSC properties. We already had a big discussions about
->>> it - one person pushing vendor property and only shortly after we learnt
->>> that more vendors want it and they are actually working on this.
->> What kind of a property would you propose I use for this ?
-> 
-> I don't know, please look at existing work around SSC from Peng. If
-> nothing is applicable, this should be explained somewhere.
+From: "hailong.fan" <hailong.fan@siengine.com>
 
-The work from Peng you refer to (I guess) is this "assigned-clock-sscs" 
-property ? This is not applicable, because this is a boolean property of 
-the PHY here, the clock does not expose those clock via the clock API.
+Under certain conditions, a WARN_ON will be triggered
+if avail equals 1.
 
-However, I can call the property "ssc-enable" without the realtek, 
-vendor prefix ?
+For example, when a VLAN packet is to send,
+stmmac_vlan_insert consumes one unit of space,
+and the data itself consumes another.
+actually requiring 2 units of space in total.
 
-The remaining question is, should I have one property "ssc-enable" to 
-control all SSC in the PHY or one for each bit "realtek,ssc-enable-rxc" 
-/ "realtek,ssc-enable-clkout" ?
+Changes from v3:
+        - format commit message
+Changes from v2:
+        - add fixes tag
+        - Add stmmac_extra_space to count the additional required space
+Changes from v1:
+        - Stop their queues earlier
 
+Fixes: 30d932279dc2 ("net: stmmac: Add support for VLAN Insertion Offload")
+Signed-off-by: hailong.fan <hailong.fan@siengine.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 7b90ecd3a..9a665a3b2 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -4476,6 +4476,15 @@ static bool stmmac_has_ip_ethertype(struct sk_buff *skb)
+ 		(proto == htons(ETH_P_IP) || proto == htons(ETH_P_IPV6));
+ }
+ 
++static inline int stmmac_extra_space(struct stmmac_priv *priv,
++				     struct sk_buff *skb)
++{
++	if (!priv->dma_cap.vlins || !skb_vlan_tag_present(skb))
++		return 0;
++
++	return 1;
++}
++
+ /**
+  *  stmmac_xmit - Tx entry point of the driver
+  *  @skb : the socket buffer
+@@ -4529,7 +4538,8 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		}
+ 	}
+ 
+-	if (unlikely(stmmac_tx_avail(priv, queue) < nfrags + 1)) {
++	if (unlikely(stmmac_tx_avail(priv, queue) <
++		nfrags + 1 + stmmac_extra_space(priv, skb))) {
+ 		if (!netif_tx_queue_stopped(netdev_get_tx_queue(dev, queue))) {
+ 			netif_tx_stop_queue(netdev_get_tx_queue(priv->dev,
+ 								queue));
+@@ -4675,7 +4685,7 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		print_pkt(skb->data, skb->len);
+ 	}
+ 
+-	if (unlikely(stmmac_tx_avail(priv, queue) <= (MAX_SKB_FRAGS + 1))) {
++	if (unlikely(stmmac_tx_avail(priv, queue) <= (MAX_SKB_FRAGS + 2))) {
+ 		netif_dbg(priv, hw, priv->dev, "%s: stop transmitted packets\n",
+ 			  __func__);
+ 		netif_tx_stop_queue(netdev_get_tx_queue(priv->dev, queue));
 -- 
-Best regards,
-Marek Vasut
+2.34.1
+
 
