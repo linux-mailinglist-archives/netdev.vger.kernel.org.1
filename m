@@ -1,148 +1,251 @@
-Return-Path: <netdev+bounces-243576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 199ECCA3EDF
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 15:01:25 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74D5FCA3E52
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 14:51:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C5A513151B6D
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 13:51:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 600BE301D63B
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 13:51:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD19533FE23;
-	Thu,  4 Dec 2025 13:51:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B80D23EAA0;
+	Thu,  4 Dec 2025 13:51:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f65.google.com (mail-ej1-f65.google.com [209.85.218.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9143D3358D4;
-	Thu,  4 Dec 2025 13:51:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EAAC22D4C3
+	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 13:51:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764856266; cv=none; b=JNbeIZslbfpvZru+ywJdTfpHDkZlMv7BXBEfEQAxVmrvIPBMsCYVWgZBv05I3TSZvtLGuBVQZUYlgzUmAmPVojLMUhyPdW6HxFCVsIi6V3ihhGKpbeMDdmjH9LL1jibUTF8W+lMWjEc6TkTnpRGY5nX+qYU4qQtYGsZ3MyQZu7I=
+	t=1764856263; cv=none; b=toFX4Kh8gBcuD7/HlOO3Yc6DfRW452m9ZbfjyghAukUcMJILSCtTfj8r87izLkEAL7f1KpccWlnfoYXHsyAkhgsWZtfhhheUC+KhtrCQeMQaTSWvhhuUjBHfBIx1dm2OY4xbR5hgYkIau8Q32RB7Vv10ttgGwjK4cTnLT7SxAKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764856266; c=relaxed/simple;
-	bh=3e0inD5HwH7j1HVF/h1BOz6qgLWuSqiGo+wrLDWXA9s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k0cH1HQY7JObr5E2QmyMaxObmzuaRujN78UI9UIJwXmNFwCvR5ubce0X0+Kfhgr7YrOxe928R4bWuoxYxaXUOHWUI2clzYfaK263T58evz+AY0NqwQcC61Ej60XNd3VAYQmhIrV00xyWElLbmnNbb8gdFsAYuiBzNxOmGQk0EdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vR9jU-000000007EO-0W0z;
-	Thu, 04 Dec 2025 13:50:56 +0000
-Date: Thu, 4 Dec 2025 13:50:52 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Frank Wunderlich <frankwu@gmx.de>,
-	Krzysztof Kozlowski <krzk@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Chen Minqiang <ptpt52@gmail.com>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	"Chester A. Unal" <chester.a.unal@arinc9.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v3 2/2] net: dsa: mt7530: Use GPIO polarity to generate
- correct reset sequence
-Message-ID: <aTGRvADkT-1kAQgA@makrotopia.org>
-References: <20251129234603.2544-1-ptpt52@gmail.com>
- <20251129234603.2544-2-ptpt52@gmail.com>
- <0675b35f-217d-4261-9e3f-2eb24753d43c@lunn.ch>
- <20251130080731.ty2dlxaypxvodxiw@skbuf>
- <3fbc4e67-b931-421c-9d83-2214aaa2f6ed@lunn.ch>
- <0d85e1e6-ea75-4f20-aef1-90d446b4bfa1@kernel.org>
- <00f308a1-a4b1-4f20-8d8e-459ddf4c39b1@gmx.de>
- <aS7Zj3AFsSp2CTNv@makrotopia.org>
- <20251204131626.upw77jncqfwxydww@skbuf>
+	s=arc-20240116; t=1764856263; c=relaxed/simple;
+	bh=PkVV9wu01UP40lRAtGhDR/JJ+Wc/tlKZ8AlaXIRvVUk=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=OZ4T5vOkINg+WB+KpsZ3nAQpe/WyhDgFRmvv23CSlgbuvQstvcmO0PDB9PV63PdsLM/zngphJ8ielg3hhO/q9FCyUXhEZfaZKOjNTfVZLoeOQMImBt8L13irrrvirPJDIeN1VfCII4zL9CqVPPhbmq7+vVX1jNjPNtNNXa4ARUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f65.google.com with SMTP id a640c23a62f3a-b73161849e1so197174766b.2
+        for <netdev@vger.kernel.org>; Thu, 04 Dec 2025 05:51:01 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764856260; x=1765461060;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:cc:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TpmUjqa5xR6L6WkySHJlFlvY8Lnq4a+kBI6eqWNSasA=;
+        b=wMs3Z4Ljgxd53nx6zDaLnR+hDdD2nza/EvzMCt190mspCqAS6neU8RhgHmqVjS9OfB
+         LObFYKfLf+4EQrN35e4XiFjiITZSQRhaPH8PT4hBliIxRYmIAKwgXLJGQslfQtHE4vya
+         PPZRgxwODjJFqjQY0QR4PWMy80tInw1d+Ft8OgBwIcnIcxYXqrDqepI0lZfHjg/W+YhK
+         lqOT86tWX88wIfk/fxvTAebqPYReB5oZpWQeRnvjpT4jTeww0jgNKo3cjLm++wd0eyaV
+         fwezLTAARVUhCc/GV2cgONdWDX+bqx2ag0K+ajm3ZdgVylqYz2u4yPA2PIoyrsCetL+a
+         STvg==
+X-Forwarded-Encrypted: i=1; AJvYcCUMyWb0t0Og+6Qs24Iucc/179XpXekCST/xP1FiwYlwcMEHZ/0Mjj05f7/XtBQyZXC3PopV2l8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxr/4hhiZy+oSMYmgcKKb3gbcvFtjt5Qvz4hwIdEphGABvGxfnf
+	Dn2T5AFHXnifY/c/kxWpKcY6+z4JO6+lR8mZEtzx8PGqtr0SebvOgUhj
+X-Gm-Gg: ASbGnctxxtaeizrMA1bjl3Xz+3GeburU19DzmLuJMT/Y8PQ6fTYa4vmdXKTo0e17fhO
+	xAV++MKizDCu4VvXEhVR1V/7MzpCoQO3JubR2mepQm9JiXHqPi6s2aYa1zA60pr8meKMRFNJtTu
+	ncF9qJ6cJ8zw/CRrl5u1jpOmykOZ+ZduBIifmzDafM8CT1rmJb45LGowHpnY8jCbF/Y/CNjL0Lr
+	3w+T1KdjozgXEqH8m61pmnaLldSgWddhbFCmUlHCzLx5wxzMqTpEM/7tAitpXxp04sKwa7auIag
+	NKrmhSUTcLF5dd2GhRuE0BuoAsLevqva6w6CPYIst2M+fxSX44gLHnaT+gv+NYP1Qa7E4aFUTnH
+	VDBXZxmt+YbwiF1T4TGgnx45uZCKV0XOwTfTB6KDslh+GMhk43C4/hGLAG19l1W4+oK3pxqGbSj
+	hZCcgM08s2amZbSUWdwJUSFff9C/TCjuO+lz8No86DM6/0NOnQSwQ=
+X-Google-Smtp-Source: AGHT+IH47rbvK5jYhFTjS03o4kQSZuWLQGRUkJ5Uk+DPYGytQ5Arm6ROT06NY8i4IrKQuG63aon0Hg==
+X-Received: by 2002:a17:907:1c17:b0:b49:5103:c0b4 with SMTP id a640c23a62f3a-b79dc777e0cmr657700466b.56.1764856259519;
+        Thu, 04 Dec 2025 05:50:59 -0800 (PST)
+Received: from [192.168.88.248] (89-24-32-14.nat.epc.tmcz.cz. [89.24.32.14])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b79f4498947sm134677266b.15.2025.12.04.05.50.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Dec 2025 05:50:59 -0800 (PST)
+Message-ID: <71ec6168-f3ca-4454-8bfb-a8ae43a09159@ovn.org>
+Date: Thu, 4 Dec 2025 14:50:57 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251204131626.upw77jncqfwxydww@skbuf>
+User-Agent: Mozilla Thunderbird
+Cc: i.maximets@ovn.org, netdev@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ dev@openvswitch.org, Aaron Conole <aconole@redhat.com>,
+ Willy Tarreau <w@1wt.eu>, LePremierHomme <kwqcheii@proton.me>,
+ Junvy Yang <zhuque@tencent.com>
+Subject: Re: [PATCH net] net: openvswitch: fix middle attribute validation in
+ push_nsh() action
+To: Eelco Chaudron <echaudro@redhat.com>
+References: <20251204105334.900379-1-i.maximets@ovn.org>
+ <9A785713-3692-43A7-BD08-652DC1248955@redhat.com>
+ <eac68895-5450-41ca-a30e-2273b9787e86@ovn.org>
+ <65A94C49-E5B2-46FC-92CC-7BAA4F0B3E7E@redhat.com>
+Content-Language: en-US
+From: Ilya Maximets <i.maximets@ovn.org>
+Autocrypt: addr=i.maximets@ovn.org; keydata=
+ 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
+In-Reply-To: <65A94C49-E5B2-46FC-92CC-7BAA4F0B3E7E@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Dec 04, 2025 at 03:16:26PM +0200, Vladimir Oltean wrote:
-> On Tue, Dec 02, 2025 at 12:20:31PM +0000, Daniel Golle wrote:
-> > On Tue, Dec 02, 2025 at 12:52:44PM +0100, Frank Wunderlich wrote:
-> > > Hi,
-> > > 
-> > > Am 01.12.25 um 08:48 schrieb Krzysztof Kozlowski:
-> > > > On 30/11/2025 21:17, Andrew Lunn wrote:
-> > > > > On Sun, Nov 30, 2025 at 10:07:31AM +0200, Vladimir Oltean wrote:
-> > > > > > On Sun, Nov 30, 2025 at 02:11:05AM +0100, Andrew Lunn wrote:
-> > > > > > > > -		gpiod_set_value_cansleep(priv->reset, 0);
-> > > > > > > > +		int is_active_low = !!gpiod_is_active_low(priv->reset);
-> > > > > > > > +		gpiod_set_value_cansleep(priv->reset, is_active_low);
-> > > > > > > I think you did not correctly understand what Russell said. You pass
-> > > > > > > the logical value to gpiod_set_value(). If the GPIO has been marked as
-> > > > > > > active LOW, the GPIO core will invert the logical values to the raw
-> > > > > > > value. You should not be using gpiod_is_active_low().
-> > > > > > > 
-> > > > > > > But as i said to the previous patch, i would just leave everything as
-> > > > > > > it is, except document the issue.
-> > > > > > > 
-> > > > > > > 	Andrew
-> > > > > > > 
-> > > > > > It was my suggestion to do it like this (but I don't understand why I'm
-> > > > > > again not in CC).
-> > > > > > 
-> > > > > > We _know_ that the reset pin of the switch should be active low. So by
-> > > > > > using gpiod_is_active_low(), we can determine whether the device tree is
-> > > > > > wrong or not, and we can work with a wrong device tree too (just invert
-> > > > > > the logical values).
-> > > > > Assuming there is not a NOT gate placed between the GPIO and the reset
-> > > > > pin, because the board designer decided to do that for some reason?
-> > > jumping in because i prepare mt7987 / BPI-R4Lite dts for upstreaming when
-> > > driver-changes are in.
-> > > With current driver i need to define the reset-gpio for mt7531 again wrong
-> > > to get it
-> > > working. So to have future dts correct, imho this (or similar) change to
-> > > driver is needed.
-> > > 
-> > > Of course we cannot simply say that current value is wrong and just invert
-> > > it because of
-> > > possible "external" inversion of reset signal between SoC and switch.
-> > > I have to look on schematics for the boards i have (BPI-R64, BPI-R3,
-> > > BPI-R2Pro) if there is such circuit.
-> > 
-> > I'm also not aware of any board which doesn't directly connect the
-> > reset of the MT7530 to a GPIO pin of the SoC. For MediaTek's designs
-> > there is often even a specific pin desginated for this purpose and
-> > most vendors do follow this. If they deviate at all, then it's just
-> > that a different pin is used for the switch reset, but I've never
-> > seen any logic between the SoC's GPIO pin and the switch reset.
-> > 
-> > > Maybe the mt7988 (mt7530-mmio) based boards also affected?
-> > 
-> > There is no GPIO reset for switches which are integrated in the SoC,
-> > so this only matters for external MT7530 and MT7531 ICs for which an
-> > actual GPIO line connected to the SoC is used to reset the switch.
+On 12/4/25 2:22 PM, Eelco Chaudron wrote:
 > 
-> I get the feeling that we're complicating a simple solution because of a
-> theoretical "what if" scenario. The "NOT" gate is somewhat contrived
-> given the fact that most GPIOs can already be active high or low, but OK.
 > 
-> If this is blocking progress for new device trees, can we just construct,
-> using of_machine_is_compatible(), a list of all boards where the device
-> tree defines incorrect reset polarity that shouldn't be trusted by the
-> driver when driving the reset GPIO? If we do this, we can also leave
-> those existing device trees alone.
+> On 4 Dec 2025, at 12:36, Ilya Maximets wrote:
+> 
+>> On 12/4/25 12:03 PM, Eelco Chaudron wrote:
+>>>
+>>>
+>>> On 4 Dec 2025, at 11:53, Ilya Maximets wrote:
+>>>
+>>>> The push_nsh() action structure looks like this:
+>>>>
+>>>>  OVS_ACTION_ATTR_PUSH_NSH(OVS_KEY_ATTR_NSH(OVS_NSH_KEY_ATTR_BASE,...))
+>>>>
+>>>> The outermost OVS_ACTION_ATTR_PUSH_NSH attribute is OK'ed by the
+>>>> nla_for_each_nested() inside __ovs_nla_copy_actions().  The innermost
+>>>> OVS_NSH_KEY_ATTR_BASE/MD1/MD2 are OK'ed by the nla_for_each_nested()
+>>>> inside nsh_key_put_from_nlattr().  But nothing checks if the attribute
+>>>> in the middle is OK.  We don't even check that this attribute is the
+>>>> OVS_KEY_ATTR_NSH.  We just do a double unwrap with a pair of nla_data()
+>>>> calls - first time directly while calling validate_push_nsh() and the
+>>>> second time as part of the nla_for_each_nested() macro, which isn't
+>>>> safe, potentially causing invalid memory access if the size of this
+>>>> attribute is incorrect.  The failure may not be noticed during
+>>>> validation due to larger netlink buffer, but cause trouble later during
+>>>> action execution where the buffer is allocated exactly to the size:
+>>>>
+>>>>  BUG: KASAN: slab-out-of-bounds in nsh_hdr_from_nlattr+0x1dd/0x6a0 [openvswitch]
+>>>>  Read of size 184 at addr ffff88816459a634 by task a.out/22624
+>>>>
+>>>>  CPU: 8 UID: 0 PID: 22624 6.18.0-rc7+ #115 PREEMPT(voluntary)
+>>>>  Call Trace:
+>>>>   <TASK>
+>>>>   dump_stack_lvl+0x51/0x70
+>>>>   print_address_description.constprop.0+0x2c/0x390
+>>>>   kasan_report+0xdd/0x110
+>>>>   kasan_check_range+0x35/0x1b0
+>>>>   __asan_memcpy+0x20/0x60
+>>>>   nsh_hdr_from_nlattr+0x1dd/0x6a0 [openvswitch]
+>>>>   push_nsh+0x82/0x120 [openvswitch]
+>>>>   do_execute_actions+0x1405/0x2840 [openvswitch]
+>>>>   ovs_execute_actions+0xd5/0x3b0 [openvswitch]
+>>>>   ovs_packet_cmd_execute+0x949/0xdb0 [openvswitch]
+>>>>   genl_family_rcv_msg_doit+0x1d6/0x2b0
+>>>>   genl_family_rcv_msg+0x336/0x580
+>>>>   genl_rcv_msg+0x9f/0x130
+>>>>   netlink_rcv_skb+0x11f/0x370
+>>>>   genl_rcv+0x24/0x40
+>>>>   netlink_unicast+0x73e/0xaa0
+>>>>   netlink_sendmsg+0x744/0xbf0
+>>>>   __sys_sendto+0x3d6/0x450
+>>>>   do_syscall_64+0x79/0x2c0
+>>>>   entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>>>>   </TASK>
+>>>>
+>>>> Let's add some checks that the attribute is properly sized and it's
+>>>> the only one attribute inside the action.  Technically, there is no
+>>>> real reason for OVS_KEY_ATTR_NSH to be there, as we know that we're
+>>>> pushing an NSH header already, it just creates extra nesting, but
+>>>> that's how uAPI works today.  So, keeping as it is.
+>>>>
+>>>> Fixes: b2d0f5d5dc53 ("openvswitch: enable NSH support")
+>>>> Reported-by: Junvy Yang <zhuque@tencent.com>
+>>>> Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
+>>>
+>>> Thanks, Ilya, for fixing this. One small nit about logging, but overall it looks good to me.
+>>>
+>>> Acked-by: Eelco Chaudron echaudro@redhat.com
+>>>
+>>>> ---
+>>>>  net/openvswitch/flow_netlink.c | 13 ++++++++++---
+>>>>  1 file changed, 10 insertions(+), 3 deletions(-)
+>>>>
+>>>> diff --git a/net/openvswitch/flow_netlink.c b/net/openvswitch/flow_netlink.c
+>>>> index 1cb4f97335d8..2d536901309e 100644
+>>>> --- a/net/openvswitch/flow_netlink.c
+>>>> +++ b/net/openvswitch/flow_netlink.c
+>>>> @@ -2802,13 +2802,20 @@ static int validate_and_copy_set_tun(const struct nlattr *attr,
+>>>>  	return err;
+>>>>  }
+>>>>
+>>>> -static bool validate_push_nsh(const struct nlattr *attr, bool log)
+>>>> +static bool validate_push_nsh(const struct nlattr *a, bool log)
+>>>>  {
+>>>> +	struct nlattr *nsh_key = nla_data(a);
+>>>>  	struct sw_flow_match match;
+>>>>  	struct sw_flow_key key;
+>>>>
+>>>> +	/* There must be one and only one NSH header. */
+>>>> +	if (!nla_ok(nsh_key, nla_len(a)) ||
+>>>> +	    nla_total_size(nla_len(nsh_key)) != nla_len(a) ||
+>>>> +	    nla_type(nsh_key) != OVS_KEY_ATTR_NSH)
+>>>
+>>> Should we consider adding some logging based on the log flag here? Not a blocker,
+>>> just noticed that nsh_key_put_from_nlattr() logs similar validation cases and
+>>> wondered if we want the same consistency.
+>>
+>> Our logging is not really consistent, we do not log in the same case for the
+>> validate_set(), for example.  And I'm not sure if the log here would be useful
+>> as it is very unlikely we can hit this condition without manually crafting the
+>> attribute to be wrong.  We'll have a log later about garbage trailing data,
+>> which should prompt a user to look at what they are sending down.
+>>
+>> In general, we should convert all the logging here into extack, as logs are
+>> very inconvenient and not specific enough in most cases.
+>>
+>> But I can add something like this, if needed:
+>>
+>>   OVS_NLERR(log, "push_nsh: Expected a single NSH header");
+>>
+>> What do you think?
+> 
+> Reading your feedback, I’m fine with leaving it as is.
 
-From OpenWrt's point of view this would be kind of ugly as we would either
-have to extend the list of affected boards downstream, or fix the polarity
-in some but not all of our downstream DTS files. I'd prefer to rather
-have the option to force the "wrong" GPIO polarity for theoretical future
-boards with that (very unlikely to ever exist) NOT gate between the SoC
-GPIO and switch reset line. That would allow to gradually update boards
-to reflect the physical reality and yet the driver would not break if the
-GPIO polarity is stated wrongly.
+OK.  I will not send a v2 for this then, unless there will be some other feedback.
+
+Best regards, Ilya Maximets.
 
