@@ -1,140 +1,111 @@
-Return-Path: <netdev+bounces-243493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1868CA2486
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 04:54:41 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58BB2CA25EF
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 06:01:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 021FD3024997
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 03:54:41 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C5A0530095F3
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 05:01:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B7FD824BD;
-	Thu,  4 Dec 2025 03:54:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C772930101F;
+	Thu,  4 Dec 2025 05:01:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A21DHbVp"
 X-Original-To: netdev@vger.kernel.org
-Received: from r9110.ps.combzmail.jp (r9110.ps.combzmail.jp [49.212.36.116])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A621EACD
-	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 03:54:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.212.36.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E6762D3750
+	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 05:01:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764820480; cv=none; b=shZBK5QtgsddD/KPmD+JcLUjj6QmICTCDvEJrgD/yqLSzEarmiGRmv+a98Q17QMQv0oDoTBKmjJElK3UUTrGnPLO2XTilkdm92ITfefiwkj7b/Fnk3SeAmg6zbATvgi03CwC7PMGxZJqAUCxyxO+Pz2VJzXDGq8C7iL2d1CA1a8=
+	t=1764824468; cv=none; b=qxnFjucnyZ359KgiMiUCQI6KXC0iz6lBJsuh65KPAmfuRiQSEHIVrlEWcRiwylXmonWEO89Yu/AfRFepKrArOTvCE4pA8If8zUpxQG7CCDDdw+eE1GT7EPd2ePPa40DN4NgqdyD8yTL7abgj3Mi4Tu6QrbaQiFby6Dwkv9cXGe4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764820480; c=relaxed/simple;
-	bh=Vu5PrLD4RQ5eWFvr+angYeZXt2Je9sHjY5obgTHQDJE=;
-	h=To:From:Subject:Mime-Version:Content-Type:Message-Id:Date; b=my5ACAk8CyXiXJka2Qq2C94AT53loCTQQ+kkWpXpxbn4EKryD98CzA/9XoxumQut9NzJeOxu/JkaPJc+OZRlCJbUtZwXtPt4q01rW+bwf9esCyfjG1GqQaMmADNEmvhunNH7iGZelcXPR7DQg2CAi9hkfBOm7BpwOgf46x9soi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=k-villageinc.jp; spf=pass smtp.mailfrom=magerr.combzmail.jp; arc=none smtp.client-ip=49.212.36.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=k-villageinc.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=magerr.combzmail.jp
-Received: by r9110.ps.combzmail.jp (Postfix, from userid 99)
-	id A38B3188793; Thu,  4 Dec 2025 12:40:24 +0900 (JST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 r9110.ps.combzmail.jp A38B3188793
-To: netdev@vger.kernel.org
-From: =?ISO-2022-JP?B?GyRCM3Q8MDJxPFIbKEI=?= K Village<info@k-villageinc.jp>
-X-Ip: 218975311502309
-X-Ip-source: k85gj7ri48dnsax5u0p6gd
-Precedence: bulk
-List-Unsubscribe-Post: List-Unsubscribe=One-Click
-Subject: =?ISO-2022-JP?B?GyRCMk4hJiVAJXMlOUV5JE4lOSUvITwlazt2GyhC?=
- =?ISO-2022-JP?B?GyRCNkgbKEIgRkMbJEJAYkxAMnEbKEI=?=
+	s=arc-20240116; t=1764824468; c=relaxed/simple;
+	bh=6BM8cMAU7MDhGZrkIWgKdkSh/o44JljU5wOjAzLD0RI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QWGH8S+uDPo3aah7iExOCVcA30rzKjtLPKvzrzXvgfau/6+FK3LuYeN2Yiu+iWvV11PO2Pgecd/2nELJyV08qe79q3KLp40WbbT5uF59/Ihn9krq2FSL7TvPAWDLfU8+fMRQjSdzr3XhXKVruNTpfGBSuP6nW7C8hGFqkq9XldA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A21DHbVp; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7aa2170adf9so403604b3a.0
+        for <netdev@vger.kernel.org>; Wed, 03 Dec 2025 21:01:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764824467; x=1765429267; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vpoC0gDWQUM6OfoTGp5yRLJ6yIkO8unpnEQeTBxH3Ls=;
+        b=A21DHbVpg58IfnlkUdx7+Cb9FtxWEkkai/TYLFfYgugVMyAk8v6ipXAbLCjwHF2ySv
+         KicpwK+YBcMoCNjk1H/pgne8pvnotURxgp+CYqqAJ65JgpDQTgbjqEva8J4tVxhn9oAD
+         bMCC1KFyW9HJDyBA3n65qZTy66g2BqYKOVNCddo75FQw9gUf8barpmDVK4netnljHa8M
+         /attjOc4FnmAcAHOgMreoJIJlHOZeXc1eO99IlsFES3G+6dLDw/aizEjPnjwE2oyl2cf
+         VDDIfS57L/uQE5HUhVRpVDPT3dtF/GH+ncTm4w3j5bN2mdb2XivHpWhSWUCy1G69fdWA
+         4MPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764824467; x=1765429267;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vpoC0gDWQUM6OfoTGp5yRLJ6yIkO8unpnEQeTBxH3Ls=;
+        b=Xl2vy7+Jv6qKF8pthVsakXbw1XYaFAFK7cILmwuDdeAOIs1aB06yFPxzy7Ua85AYl1
+         IO6XkvtQ5CZqsi3Tb6XJhpyszu7CU2A3W0U4RzdAVBrCZG8Y+oWuMPYU7wbJcKeTO60W
+         fBX8oM/YGxv9aOrHpDWeFqBhJmKVqBnGn3q4+8OFzpyDFwX3jSz10BkufOXyTlTr+uuO
+         PY1dRmzS0qv/AojpdhAGlo6YjX9PkoBbVjntr3Xe3D40Vcwtu7W4hR4xlzGQGbAgqEkS
+         Wzccvl7lWFYkV/1w9Ws9Yyn0A5C7jAPR28Jr9eUl1qAgwXOT9qSXEZNQKuZ2CPYayMQY
+         ofMw==
+X-Forwarded-Encrypted: i=1; AJvYcCVJTv7TVDUuyHfByuSDuBGcD7pKx6x1XqHD0zkTXH3heEOPNnetm7dmDekB71Y5EynOldAs5tw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXCz1RDI4n3uewLejsIPIOStttGJwOf5QI5xH5vBDuoSKsoZPb
+	wcs7kBYNCSXYzPD/ISmoYVUkHZWZT7aNmvMt+ZJKKhpefrKLqfSpEbgb
+X-Gm-Gg: ASbGnctj+Sa5R3DkCNi+keFSNOH3rZ1ns7oDPdjK80bF6DukfcgrGPxcHyyoEi6PNHe
+	Cde/oWGvZaPTAliYErGnHf6ZetXh6RJbUrNgJ5ouISgnWn5FILVSPMIxOeEVqSYGuaQbxH3myx4
+	K7/A60HTR2xaKA/3gy41ELR0JZZq+gV66XEyWyYyry3TDW93dwk1iywkfkQX/+gGjuJVtq6T2+N
+	mT2/xAumpQIzZrsE1XcXtfUppPLw8XOdvtXIWQ1F0rIqzUpAjac4aDvMGEyrZAcAKqopbhTub9q
+	srNe6LaCQVxBM4xDlCNQ1I9u69uqAt5qjrpkaEK4Htr7HCwWJRAx4tp0pSSo93x/p/5mRAgC609
+	CCFPotYaOARKoBRWVBK02W5vUVPPFieYeuvHfTG3NU/XqPVgglfSIgFEszpqzl74yfiTKzir8gr
+	11Qn4lUWtBzQLZp4278i9+xMd7HQE0Nw==
+X-Google-Smtp-Source: AGHT+IFOb/dtmngvWJT+TrkNmu1/17WRg6lkKaYKP9pKleJ6P1s+XSJUpq95mc5+UwEiQ2ZrJZdDeA==
+X-Received: by 2002:a05:6a20:3d0b:b0:361:3bdc:916b with SMTP id adf61e73a8af0-3640375e456mr2045822637.7.1764824466518;
+        Wed, 03 Dec 2025 21:01:06 -0800 (PST)
+Received: from localhost.localdomain ([121.190.139.95])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-bf681738a34sm419440a12.4.2025.12.03.21.01.04
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Wed, 03 Dec 2025 21:01:06 -0800 (PST)
+From: Minseong Kim <ii4gsp@gmail.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Minseong Kim <ii4gsp@gmail.com>
+Subject: [PATCH net v2 0/1] atm: mpoa: Fix UAF on qos_head list in procfs
+Date: Thu,  4 Dec 2025 14:00:38 +0900
+Message-Id: <20251204050039.93278-1-ii4gsp@gmail.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-2022-jp
-Content-Transfer-Encoding: 7bit
-X-MagazineId: rix5
-X-uId: 6763334240485968574188171034
-X-Sender: CombzMailSender
-X-Url: http://www.combzmail.jp/
-Message-Id: <20251204034040.A38B3188793@r9110.ps.combzmail.jp>
-Date: Thu,  4 Dec 2025 12:40:24 +0900 (JST)
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-　
-　お世話になります。
-　
-　新たな事業展開をお考えの経営者様へ、
-　幼児から学生、社会人、シニアまで
-　幅広い世代を対象にしたボイトレ・ダンススクール事業の
-　フランチャイズシステム説明会をご案内申し上げます。
+This series fixes a use-after-free on qos_head list in net/atm/mpc.c by
+serializing add/search/delete/show paths with a mutex.
 
-━━━━━━━━━━━━━━━━━━━━━━━━
-　　　
-　　　12月6日（土）13:00〜14:00
-　　　12月10日（水）13:00〜14:00
-　　　12月17日（水）13:00〜14:00
+Changes since v1:
+- resend using git send-email (previous patch got mangled)
+- add Closes tag to satisfy checkpatch
+- include trimmed KASAN report in commit message
 
-　◆　フランチャイズ説明会
-　　　幼児から学生、社会人、シニアまで！
+Minseong Kim (1):
+  atm: mpoa: Fix UAF on qos_head list in procfs
 
-　　　ボイトレ・ダンスのマンツーマン制スクール事業
-　　　“　NAYUTAS（ナユタス）　”
+ net/atm/mpc.c | 117 ++++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 85 insertions(+), 32 deletions(-)
 
-　※　オーナー様にボイトレや業界知識などは不要で、
-　　　未経験から開業することができます。
+-- 
+2.39.5 (Apple Git-154)
 
-　◆　詳細＆申込はこちら
-　　　https://nayutas-voice.biz/2500/
-
-━━━━━━━━━━━━━━━━━━━━━━━━
-
-------------------------------------------------
-
-　NAYUTAS（ナユタス）はボイトレをはじめ、
-　楽器やダンス、プログラミング、動画編集など、
-　好きなこと・興味があることを本格的に学べる
-　完全マンツーマン制レッスンのスクール事業です。
-
-------------------------------------------------
-
-　学習塾のように子どもや学生のみが対象になるのではなく、
-　社会人やシニアも含め、3歳〜80歳の方が生徒として通われています。
-
-　収益モデルは「生徒数×月額授業料」が売上になるサブスク型で、
-　生徒数が増えることによって、売上・利益が拡大していきます。
-
-　講師の採用や、開校後の生徒集客の確かなノウハウもあるため、オーナー様に
-　ボイトレや業界知識が無くとも、未経験から開業することが可能です。
-
-　フランチャイズ説明会を開催いたしますので、
-　ご興味がありましたらご参加くださいませ。
-
-━━━━━━━━━━━━━━━━━━━
-
-　■　開催日程
-　　　12月6日（土）13:00〜14:00
-　　　12月10日（水）13:00〜14:00
-　　　12月17日（水）13:00〜14:00
-
-　■　開催方式
-　　　・オンライン開催
-
-　■　コンテンツ
-　　　・入会者数の推移
-　　　・ナユタスの特徴と選ばれる3つの理由
-　　　・フランチャイズシステム詳細
-　　　・開業費用例／収益例
-
-　■　主催
-　　　・株式会社 K Village（ナユタス運営本部）
-
-　■　定員
-　　　・5社／各回
-
-　■　参加費
-　　　・不要です
-
-　■　詳細＆申込はこちら
-　　　https://nayutas-voice.biz/2500/
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-本メールが不要の方には大変失礼しました。
-今後ご案内が不要な際は、下記URLにて配信停止を承っています。
-https://nayutas-voice.biz/mail/
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-株式会社 K Village（ナユタス運営本部）
-東京都新宿区西新宿2-4-1 新宿NSビル7F
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
