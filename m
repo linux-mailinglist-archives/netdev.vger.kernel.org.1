@@ -1,185 +1,116 @@
-Return-Path: <netdev+bounces-243525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243529-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E341CCA3181
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 10:52:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C33E3CA32EF
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 11:16:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 14F25303D9F2
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 09:48:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 21B243119123
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 10:12:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD58730AABE;
-	Thu,  4 Dec 2025 09:48:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A8CD3358C6;
+	Thu,  4 Dec 2025 10:12:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="g+hjvLbk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TGUgG6yF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D995823EA8B;
-	Thu,  4 Dec 2025 09:48:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77CB132572B;
+	Thu,  4 Dec 2025 10:12:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764841716; cv=none; b=G/WzGi3sjI0oKToCjRYeP6VMtUod19kjKveNhVk26dQWQCDLIN+YE3PP4Zkz5NEGVMsvXRA82kaVaKV9wdMVqvhvFIciR4Nmu5CUsAmivP7Y3aFAkZgUMUtzOly0kNR70uEcY4A1ANvhcjca88bKdIFgWKGn6U7e8bYu7CBLDO8=
+	t=1764843122; cv=none; b=oUduyiL80iGndIUsy8UKukV5Wzt66dTFpfGCby+kWAbP2urS5UULG/QxgqytjtZkI07UGEO47ecGMRJCU7IEHhCk2UqLPQ4EaE/U/kw4rdoqmKPVwec3p7XOCL4IBgrThE67SYzYbG1gsZk0C6a4lAB897q6uMAtbRoABiumvkw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764841716; c=relaxed/simple;
-	bh=iV9twZbY3TkcSLCeoHXIgzu/v5cRoaIRH64xXhx5gnM=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Bf7ttytADC2nJ4Xvk4p6cA/mlYp+FiTmC1c6Ox+at5ImE6UJ+WtwtuVJ7cGRJEaIWxbAR9rln1obABVRZ+Lmv2AMiHlK0gy7rgQhCEP5T9bR4qifWp2y/COtxQEj/cG+Lb5Ydx9eQBmTl2knE7e146l3s7VG5Nct7XpKTYMHddM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=g+hjvLbk; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5B43gdRW012481;
-	Thu, 4 Dec 2025 09:48:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=XOM4sv
-	zLMvisUsoB3nUABMFovFe+7g2COBGqy+Qh/GA=; b=g+hjvLbkjdZaXSNlffG/vR
-	BsY63Va+T5bXVupLwVO0PHmahnmyI6dk7fURxmSguC2mKe5Hakmuo+ojTp1f+yYo
-	Kb4qerLbovogkOxsEG4KkvIgNiA3Y1hH2/y4e5pnazwcQECm0lL8Hk4BV6XZEd1R
-	ACWOq7WSB+P3rZDCIBs2ErQNOZsHdmie78zAcBEy3rzXwyFidSusl0ZoebSFImE7
-	uXh1VMQnBERZBgeu0YJgpco3DmYHQFgY00Vq/oCqstMZGtWD4yJW2hLCYZEy16MD
-	uimYOC/3DdrMLc2qmuqp5eWzHjkw1KJOOzmls7qngSpitgrRu+WhxaLyxiPBCsyw
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aqrg5q0nn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 04 Dec 2025 09:48:22 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5B49XlEZ013734;
-	Thu, 4 Dec 2025 09:48:21 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aqrg5q0nh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 04 Dec 2025 09:48:21 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5B47VCBj019133;
-	Thu, 4 Dec 2025 09:48:21 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4arbhy73kk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 04 Dec 2025 09:48:21 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5B49mHMg20185402
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 4 Dec 2025 09:48:17 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F310B20043;
-	Thu,  4 Dec 2025 09:48:16 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7D36F20040;
-	Thu,  4 Dec 2025 09:48:16 +0000 (GMT)
-Received: from [9.155.208.229] (unknown [9.155.208.229])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  4 Dec 2025 09:48:16 +0000 (GMT)
-Message-ID: <502727b0ad4a9bc34afb421d465646248c69f7d4.camel@linux.ibm.com>
-Subject: Re: [PATCH net] net/mlx5: Fix double unregister of HCA_PORTS
- component
-From: Gerd Bayer <gbayer@linux.ibm.com>
-To: Moshe Shemesh <moshe@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
-        Leon Romanovsky	 <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
-        Mark
- Bloch	 <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S.
- Miller"	 <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski	 <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Shay Drory
- <shayd@nvidia.com>,
-        Simon Horman <horms@kernel.org>
-Cc: Lukas Wunner <lukas@wunner.de>, Bjorn Helgaas <helgaas@kernel.org>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Farhan Ali <alifm@linux.ibm.com>, netdev@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-pci@vger.kernel.org
-Date: Thu, 04 Dec 2025 10:48:16 +0100
-In-Reply-To: <7ae1ae03-b62d-4c49-9718-f01ac8713872@nvidia.com>
-References: <20251202-fix_lag-v1-1-59e8177ffce0@linux.ibm.com>
-	 <7ae1ae03-b62d-4c49-9718-f01ac8713872@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.2 (3.58.2-1.fc43) 
+	s=arc-20240116; t=1764843122; c=relaxed/simple;
+	bh=zJENULdxlhI8gfPr4TEwrhirO/FILicaVKggLKcIUFM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZxtGeZKY14tQ6rXnKHuz2DGYGaBK9j6Pd8/feMUeu9iyXclO2UbRi+fWhjgnq07BJv+Lyk2LDPeqNawi7qKtinhuu+0lkAF4eZPG9VZ934QzM7GzCJgqbFkBCZ45GaZIFv2bkm4eOVFgnb7JXY2hzzuSbBXhYSIohZLTYXc5m2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TGUgG6yF; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1764843120; x=1796379120;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=zJENULdxlhI8gfPr4TEwrhirO/FILicaVKggLKcIUFM=;
+  b=TGUgG6yFVQ4elSwoopR8EmtLeswCgwH0DPJWbpXcKSuS/jctV0u16PBt
+   0eWn4k/nw4mOmoizzhSSnA8T+gnc3UprvjB9x5s0hldNscqFLCipbTBvI
+   1dqH+INFMGn1HbXaqkCFj+z/k9n5lhuRrDglpkpqLO7ylKqld+TB0BlVF
+   /Ao7ghuFmG2LltppQPcJsIWnjGJmNy1Crkrwss6F+Nh89Tl+KsPzPm/ze
+   kmGtG+397IAyAbgi3ee15q+4SC+o0sY2IuNpTrFbRCnnLLs6/SH9gp1i0
+   dV747pc65NespdYTusmj9b8APk+2bc9ot4nNppxYsRYSsDRQIDRTfIzVL
+   Q==;
+X-CSE-ConnectionGUID: SytZhw1aSMe0Avt3/cvcSg==
+X-CSE-MsgGUID: /FBs17KqSLCFjHqvEsiH6A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11631"; a="66744379"
+X-IronPort-AV: E=Sophos;i="6.20,248,1758610800"; 
+   d="scan'208";a="66744379"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2025 02:12:00 -0800
+X-CSE-ConnectionGUID: eTBcSIe6Q7yNpiqqYezRxA==
+X-CSE-MsgGUID: lzwrxaFmS7OxcM0Z/aOQ1g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,248,1758610800"; 
+   d="scan'208";a="232274531"
+Received: from os-delivery.igk.intel.com ([10.102.18.218])
+  by orviesa001.jf.intel.com with ESMTP; 04 Dec 2025 02:11:59 -0800
+From: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org,
+	stable@vger.kernel.org,
+	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+Subject: [PATCH iwl-net v1] ixgbevf: fix link setup issue
+Date: Thu,  4 Dec 2025 10:53:23 +0100
+Message-Id: <20251204095323.149902-1-jedrzej.jagielski@intel.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: JJSND5uVGuc-Yy0807UaM-DeeUylZ_QY
-X-Authority-Analysis: v=2.4 cv=Ir0Tsb/g c=1 sm=1 tr=0 ts=693158e6 cx=c_pps
- a=5BHTudwdYE3Te8bg5FgnPg==:117 a=5BHTudwdYE3Te8bg5FgnPg==:17
- a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=P-IC7800AAAA:8 a=VnNF1IyMAAAA:8 a=Ikd4Dj_1AAAA:8 a=OJPCkwSMBkLYAhJ8JKsA:9
- a=QEXdDO2ut3YA:10 a=d3PnA9EDa4IxuAV0gXij:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTI5MDAyMCBTYWx0ZWRfX41ZGyV7J5+Wa
- yw50YFUfl08xts+vRD7keIZwd5ly4a22CjXsuCBVslm6S6DHmiOvk3Wrt01ldNKZkZ+YkEVsEPO
- H6EJnVy288wsG85cnW956xgqN0OfyFUFTVDCtLgQmpQwTqSjoT3sTYIIi/U5mpE/xkAs4Vs/XUz
- X+wCF56x0Io+mXBsHHbLVo6HoetQWXPV9SafYH1PtZlAA3yB7BY6p0ljkDqbMNIESfP5G+KNzPa
- 4yUBS5imfmvQ2qJi/E09twb7lHeu4sga/eK/bvnlKzO2WPpk93Z4kZ7kk5zTEwtNxIWX89f0fb1
- O9iLEieMmq6M0BATM6QjjWvp28McGhTDTFTGUTh/y/pmeKicWr8oh930BtC+aQRET7wErAvip8/
- rVMhPXdG1Pc1HLxzM30E1Q6VXBjZSg==
-X-Proofpoint-GUID: HcopXBNN5_rUn80shxyC5RXmAxRB7BIN
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-04_02,2025-12-03_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 adultscore=0 impostorscore=0 clxscore=1011 priorityscore=1501
- bulkscore=0 spamscore=0 lowpriorityscore=0 suspectscore=0 phishscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511290020
+Content-Transfer-Encoding: 8bit
 
-On Wed, 2025-12-03 at 17:14 +0200, Moshe Shemesh wrote:
->=20
-> On 12/2/2025 1:12 PM, Gerd Bayer wrote:
-> >=20
+It may happen that VF spawned for E610 adapter has problem with setting
+link up. This happens when ixgbevf supporting mailbox API 1.6 coopearates
+with PF driver which doesn't support this version of API, and hence
+doesn't support new approach for getting PF link data.
 
-  [ ... snip ... ]
+In that case VF asks PF to provide link data but as PF doesn't support
+it, returns -EOPNOTSUPP what leads to early bail from link configuration
+sequence.
 
-> >=20
-> > Fixes: 5a977b5833b7 ("net/mlx5: Lag, move devcom registration to LAG la=
-yer")
-> > Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
->=20
-> Reviewed-by: Moshe Shemesh <moshe@nvidia.com>> ---
-> > Hi Shay et al,
-> >=20
->=20
-> Hi Gerd,
->   I stepped on this bug recently too, without s390 and was about to=20
-> submit same fix :) So as you wrote it is unrelated to Lukas' patches and=
-=20
-> this fix is correct.
+Avoid such situation by using legacy VFLINKS approach whenever negotiated
+API version is less than 1.6.
 
-Good to hear. I wonder if you could share how you got to run into this?
+Fixes: 53f0eb62b4d2 ("ixgbevf: fix getting link speed data for E610 devices")
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Reviewed-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+---
+ drivers/net/ethernet/intel/ixgbevf/vf.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
->=20
-> >=20
-> > I've spotted two additional places where the devcom reference is not
-> > cleared after calling mlx5_devcom_unregister_component() in
-> > drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c that I have not
-> > addressed with a patch, since I'm unclear about how to test these
-> > paths.
->=20
-> As for the other cases, we had the patch 664f76be38a1 ("net/mlx5: Fix=20
-> IPsec cleanup over MPV device") and two other cases on shared clock and=
-=20
-> SD but I don't see any flow the shared clock or SD can fail,=20
-> specifically mlx5_sd_cleanup() checks sd pointer at beginning of the=20
-> function and nullify it right after sd_unregister() that free devcom.
+diff --git a/drivers/net/ethernet/intel/ixgbevf/vf.c b/drivers/net/ethernet/intel/ixgbevf/vf.c
+index 29c5ce967938..8af88f615776 100644
+--- a/drivers/net/ethernet/intel/ixgbevf/vf.c
++++ b/drivers/net/ethernet/intel/ixgbevf/vf.c
+@@ -846,7 +846,8 @@ static s32 ixgbevf_check_mac_link_vf(struct ixgbe_hw *hw,
+ 	if (!mac->get_link_status)
+ 		goto out;
+ 
+-	if (hw->mac.type == ixgbe_mac_e610_vf) {
++	if (hw->mac.type == ixgbe_mac_e610_vf &&
++	    hw->api_version >= ixgbe_mbox_api_16) {
+ 		ret_val = ixgbevf_get_pf_link_state(hw, speed, link_up);
+ 		if (ret_val)
+ 			goto out;
+-- 
+2.31.1
 
-I didn't locate any calls to mxl5_devcom_unregister_component() in
-"shared clock" - is that not yet upstream?
-
-Regarding SD, I follow that sd_cleanup() is followed immediately after
-sd_unregister() and does the clean-up. One path remains uncovered
-though: The error exit at
-https://elixir.bootlin.com/linux/v6.18/source/drivers/net/ethernet/mellanox=
-/mlx5/core/lib/sd.c#L265
-
-Not sure, how likely that is...
-
-Thanks,
-Gerd
 
