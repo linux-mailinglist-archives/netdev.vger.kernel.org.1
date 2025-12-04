@@ -1,96 +1,145 @@
-Return-Path: <netdev+bounces-243655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BB63CA4CB1
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 18:43:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03C50CA55CD
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 21:42:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0D598309878E
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 17:41:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5F03430FF005
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 20:41:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0C2834F47D;
-	Thu,  4 Dec 2025 17:40:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B95D346792;
+	Thu,  4 Dec 2025 17:42:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Aaxeh+yv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YpTw5AUI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C340C34F46F;
-	Thu,  4 Dec 2025 17:40:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 715843451B0
+	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 17:42:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764870055; cv=none; b=A8RpjsYd+sQAbfgU2670bc1yiKBwlImsDr8VuOTXHWrMRCcVmRYZgktumcURyQXdE1pFCNCF+JcSsoOwJhWtxo5bnAmIE1uo9MitNHBWMcsY8w80Q64bxhyVztEfLQJd7DxntH6Xp9QEcp/vcg/o0qwK0H3eEb91AozojKRdezs=
+	t=1764870126; cv=none; b=YgoD8uF14F+7ctZa4dcJYrNwT6EKQ5PWbW/ZYRMED6i6SX+ZNIiCjIe3APFGyNIpxULQoHFLLd47xMSVCFWQElnt6Tc6nYxhcDYUQT4bBf2ZkwQCJpyUMi1JHNynl4EHKpHvywjsiSoqbcHGVabW6bhqT6ZeEXQmrw4B3cdg4Sc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764870055; c=relaxed/simple;
-	bh=SHLURkCQA5LDGPwldqVRxNVG4mULPP3GUZqavXAzURY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=snQCk3teqx+9T8rnii86PQHhQV3Rh3XSnvJGdzuaff31PNT83IrH8/OhLmJ3Zgv+aH8+bc+LhOo8NHjzA5slKX36j8HMhV8N8uH08uSlzu1PWoMZ4omTlpANK2WCplYtaIxJWt54E9Ra7sqP1cxd6pZNMRgVI9K004rJ3jMB6dk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Aaxeh+yv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E8FEC116B1;
-	Thu,  4 Dec 2025 17:40:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764870055;
-	bh=SHLURkCQA5LDGPwldqVRxNVG4mULPP3GUZqavXAzURY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Aaxeh+yvpDLK/23YxWSFxLfvI2ivEtFe4M9t3VSR8sJRm1uf04sWmylcO/C8cPlRk
-	 E7Cud+paQaf/O2rZ8PgDUYUbrpSRzzI1K+Bn0wvNs9TV/8mXVJXXeg6bVV4dwwXoBL
-	 buXYiEQjyoBlxC5V5ZGU4M35Ekqv55TumwlWlMjt+iWI2IgulR8gpBX8hPySIH0YHo
-	 amQdGaqF7P0YCTeWGbuNhWVafG0j0qvnta6IPS1ZQcJPhfURba9Lfa/ECoC8Ave+qc
-	 Kn3uJooz5VwnU/SYiVN3HHKbQCc/NFH8HI7B6E6I3jwD/Jmuwom9hpi+BMEzbAtq5T
-	 +/ANllDhIaA0A==
-Date: Thu, 4 Dec 2025 09:40:54 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Guenter Roeck <linux@roeck-us.net>
-Cc: Shuah Khan <shuah@kernel.org>, Christian Brauner <brauner@kernel.org>,
- Elizabeth Figura <zfigura@codeweavers.com>, Thomas Gleixner
- <tglx@linutronix.de>, Eric Dumazet <edumazet@google.com>, Kees Cook
- <kees@kernel.org>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, wine-devel@winehq.org,
- netdev@vger.kernel.org, bpf@vger.kernel.org, Kuniyuki Iwashima
- <kuniyu@google.com>
-Subject: Re: [PATCH 06/13] selftest: af_unix: Support compilers without
- flex-array-member-not-at-end support
-Message-ID: <20251204094054.01c15d1e@kernel.org>
-In-Reply-To: <20251204161729.2448052-7-linux@roeck-us.net>
-References: <20251204161729.2448052-1-linux@roeck-us.net>
-	<20251204161729.2448052-7-linux@roeck-us.net>
+	s=arc-20240116; t=1764870126; c=relaxed/simple;
+	bh=YA1zVtYoHoQFO6p4Cvq9dMcyaOWkB6No/GRyROO3B0U=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=pMTm63r5GQxd6Zt4nGDxL1YQkfPLxDRZt520CTtnh63flGfXyUS6qq4tmyeyWmt+PmCIAScn8jKjpVEJb6lw2TXYpG+VXbC9+IhJKBKndm2YHJj+80lxCRG4j9Bdr0OvT/9PuU2Z2NA31y94QQtZnBns/2yPX8M5EqN/wbSvx+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YpTw5AUI; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764870123;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ri00rxjoOFGWjAtyncp0oYw/MKV8HGO39TvOr0ZEjCA=;
+	b=YpTw5AUI2nzhTGTWS4CbKeVtElvd/B0LX5dn3HFIrIue/3SDxQVcECcCySXCrQg8IarrgB
+	j2842pSg05i42aq4k8t/YOZ23OJlkfEpH9NU75wAzjZdd4xdiHz6lMUG4ZDCoYIF6DPscw
+	6sU6xvi6GQ0aKh3WU20jcDb8oWsvPdU=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-664-xALFqEBrMwezUVSuSa71Ug-1; Thu,
+ 04 Dec 2025 12:41:59 -0500
+X-MC-Unique: xALFqEBrMwezUVSuSa71Ug-1
+X-Mimecast-MFC-AGG-ID: xALFqEBrMwezUVSuSa71Ug_1764870117
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C26291956095;
+	Thu,  4 Dec 2025 17:41:56 +0000 (UTC)
+Received: from RHTRH0061144 (unknown [10.22.88.134])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A6A0C19560B4;
+	Thu,  4 Dec 2025 17:41:53 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: Ilya Maximets <i.maximets@ovn.org>
+Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
+ Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
+ Abeni <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,
+  linux-kernel@vger.kernel.org,  dev@openvswitch.org,  Eelco Chaudron
+ <echaudro@redhat.com>,  Willy Tarreau <w@1wt.eu>,  LePremierHomme
+ <kwqcheii@proton.me>,  Junvy Yang <zhuque@tencent.com>
+Subject: Re: [PATCH net] net: openvswitch: fix middle attribute validation
+ in push_nsh() action
+In-Reply-To: <20251204105334.900379-1-i.maximets@ovn.org> (Ilya Maximets's
+	message of "Thu, 4 Dec 2025 11:53:32 +0100")
+References: <20251204105334.900379-1-i.maximets@ovn.org>
+Date: Thu, 04 Dec 2025 12:41:51 -0500
+Message-ID: <f7ttsy6cffk.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Thu,  4 Dec 2025 08:17:20 -0800 Guenter Roeck wrote:
-> -CFLAGS += $(KHDR_INCLUDES) -Wall -Wflex-array-member-not-at-end
-> +CFLAGS += $(KHDR_INCLUDES) -Wall $(call cc-option,-Wflex-array-member-not-at-end)
+Ilya Maximets <i.maximets@ovn.org> writes:
 
-Hm, the Claude code review we have hooked up to patchwork says:
+> The push_nsh() action structure looks like this:
+>
+>  OVS_ACTION_ATTR_PUSH_NSH(OVS_KEY_ATTR_NSH(OVS_NSH_KEY_ATTR_BASE,...))
+>
+> The outermost OVS_ACTION_ATTR_PUSH_NSH attribute is OK'ed by the
+> nla_for_each_nested() inside __ovs_nla_copy_actions().  The innermost
+> OVS_NSH_KEY_ATTR_BASE/MD1/MD2 are OK'ed by the nla_for_each_nested()
+> inside nsh_key_put_from_nlattr().  But nothing checks if the attribute
+> in the middle is OK.  We don't even check that this attribute is the
+> OVS_KEY_ATTR_NSH.  We just do a double unwrap with a pair of nla_data()
+> calls - first time directly while calling validate_push_nsh() and the
+> second time as part of the nla_for_each_nested() macro, which isn't
+> safe, potentially causing invalid memory access if the size of this
+> attribute is incorrect.  The failure may not be noticed during
+> validation due to larger netlink buffer, but cause trouble later during
+> action execution where the buffer is allocated exactly to the size:
+>
+>  BUG: KASAN: slab-out-of-bounds in nsh_hdr_from_nlattr+0x1dd/0x6a0 [openvswitch]
+>  Read of size 184 at addr ffff88816459a634 by task a.out/22624
+>
+>  CPU: 8 UID: 0 PID: 22624 6.18.0-rc7+ #115 PREEMPT(voluntary)
+>  Call Trace:
+>   <TASK>
+>   dump_stack_lvl+0x51/0x70
+>   print_address_description.constprop.0+0x2c/0x390
+>   kasan_report+0xdd/0x110
+>   kasan_check_range+0x35/0x1b0
+>   __asan_memcpy+0x20/0x60
+>   nsh_hdr_from_nlattr+0x1dd/0x6a0 [openvswitch]
+>   push_nsh+0x82/0x120 [openvswitch]
+>   do_execute_actions+0x1405/0x2840 [openvswitch]
+>   ovs_execute_actions+0xd5/0x3b0 [openvswitch]
+>   ovs_packet_cmd_execute+0x949/0xdb0 [openvswitch]
+>   genl_family_rcv_msg_doit+0x1d6/0x2b0
+>   genl_family_rcv_msg+0x336/0x580
+>   genl_rcv_msg+0x9f/0x130
+>   netlink_rcv_skb+0x11f/0x370
+>   genl_rcv+0x24/0x40
+>   netlink_unicast+0x73e/0xaa0
+>   netlink_sendmsg+0x744/0xbf0
+>   __sys_sendto+0x3d6/0x450
+>   do_syscall_64+0x79/0x2c0
+>   entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>   </TASK>
+>
+> Let's add some checks that the attribute is properly sized and it's
+> the only one attribute inside the action.  Technically, there is no
+> real reason for OVS_KEY_ATTR_NSH to be there, as we know that we're
+> pushing an NSH header already, it just creates extra nesting, but
+> that's how uAPI works today.  So, keeping as it is.
+>
+> Fixes: b2d0f5d5dc53 ("openvswitch: enable NSH support")
+> Reported-by: Junvy Yang <zhuque@tencent.com>
+> Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
+> ---
 
-  Is cc-option available in the selftest build environment? Looking at
-  tools/testing/selftests/lib.mk (included at line 14), it doesn't include
-  scripts/Makefile.compiler where cc-option is defined. When cc-option is
-  undefined, $(call cc-option,...) expands to an empty string, which means
-  the -Wflex-array-member-not-at-end flag won't be added even on compilers
-  that support it.
+Checked it out using also the userspace kmod test suite, and the
+kernel selftest scripts.  Change makes sense to me.
 
-  This defeats the purpose of commit 1838731f1072c which added the warning
-  flag to catch flexible array issues.
+Reviewed-by: Aaron Conole <aconole@redhat.com>
 
-  For comparison, tools/testing/selftests/nolibc/Makefile explicitly
-  includes scripts/Makefile.compiler before using cc-option.
-
-Testing it:
-
-$ make -C tools/testing/selftests/ TARGETS=net/af_unix Q= V=1
-make: Entering directory '/home/kicinski/devel/linux/tools/testing/selftests'
-make[1]: Entering directory '/home/kicinski/devel/linux/tools/testing/selftests/net/af_unix'
-gcc -isystem /home/kicinski/devel/linux/usr/include -Wall  -D_GNU_SOURCE=     diag_uid.c  -o /home/kicinski/devel/linux/tools/testing/selftests/net/af_unix/diag_uid
-
-looks like the flag just disappears. Even tho:
-
-gcc version 15.2.1 
 
