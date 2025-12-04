@@ -1,117 +1,95 @@
-Return-Path: <netdev+bounces-243543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85EF4CA355A
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 11:58:03 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09218CA3606
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 12:04:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id E27113007665
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 10:57:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D86EE30DD962
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 11:03:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81069296BC9;
-	Thu,  4 Dec 2025 10:57:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F0ED335BCC;
+	Thu,  4 Dec 2025 11:03:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nVLUdq0A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A79731A803;
-	Thu,  4 Dec 2025 10:57:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62AB62E282B;
+	Thu,  4 Dec 2025 11:03:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764845875; cv=none; b=ledf9T3fl7bX0FqeiJTHt+ayD603AxMWi3gcBtHRnPG+ElX5+MiLfkxYQlNYP4H6jd1EmwsWF3rr2H+rmxNcqgnYPshmHKdaps91ph32VfVcHe65Ah2VMrQTjPzihIbgBKPDKj3v8sIVRy5G/5DHjOR+gEMfcyn0Y+N9WTGgsg8=
+	t=1764846192; cv=none; b=ZfKIiRy0qFXPbWvJhradSNGqH49K682lHNJq8nKjHmQPqg7yd+J3xZvSQXXkkfGUgV1gyUFLhymbiopU8PSPX7B75XUWkzlyX8N79aDebU0CzrPMk5VBIav7L23J4v3x3FmlG2hNoQfVMEKh/9X6TA++b9ZNN1ndpMSL5/EdF1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764845875; c=relaxed/simple;
-	bh=Vt7YQc8U9exwpsDf9DXdMehfBmTuxlx9T0rEPB3gbGw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mNuo/OadHkcaWThuctMd3Og0h1SPDKs2GzR3Y2ID4hrA/+pzMKFEVF0EQqWIfkNlHlO+hFvI7oOcIaQzJ28wgKwRJ9AAobKCBAwElqcPhgnM6d9cub6qCZ/80PoHXSxsMZGaNiGPHCN7biVUnK0xR222/i5oN3uFdiEOGjhsD8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.192] (ip5f5af11d.dynamic.kabel-deutschland.de [95.90.241.29])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 206AC61E647AB;
-	Thu, 04 Dec 2025 11:57:27 +0100 (CET)
-Message-ID: <3dda7b74-b90e-42b6-ace5-9b0f1d976353@molgen.mpg.de>
-Date: Thu, 4 Dec 2025 11:57:26 +0100
+	s=arc-20240116; t=1764846192; c=relaxed/simple;
+	bh=n7ah62zk8gPH6xb1BH5GqmZb4VSNoiADEseLCPrjvDc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=RUawEjoXreIu9A3Rafyh29fa3Atm7m6ID0qFOmfiVk+PoqHQH94aYeXThC2hUTaN82/G9GIT43w1ZfU2xFGyF5R+ggDcIRzpDnQRJwaFPoukpiGj5w9PW5F/VizqkC0WZYF4zb1jmCBOCfIOl4hlDRq5MbIcme5byS1WYVmR8hA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nVLUdq0A; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF255C4CEFB;
+	Thu,  4 Dec 2025 11:03:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764846191;
+	bh=n7ah62zk8gPH6xb1BH5GqmZb4VSNoiADEseLCPrjvDc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=nVLUdq0A7gpAjBUBbcpehJO63bxf3hy7Z+5KDj9G6QWSefLLMUQh3H+Vh6Yqnoyy0
+	 P1fIMLX/YKuX74uDw9IGs96Id5H1cgHxXQpRXWrD3SFheoqsRKasPGdG4L+0lvolvD
+	 p6Jv/yGmUUb5xqtpaFZCbvmFNzjqEj/xE+5BqXiqWdICMxlxpi/wBePdIo73lN/SLp
+	 jPW6C0e6yt20UpVuFqqm6bJuFE/8Op4/6WHEyQ4mFKO1CrJXUpzOVkxfBOGWoLCd6j
+	 axSoF1gO1W88pvBJ9JmJnH5Ey7VWWpSUi4I4OimpBvzC3gK1+hRghxpcKls55nsX3+
+	 e0s61YQViUP6g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 78F7B3AA9A9C;
+	Thu,  4 Dec 2025 11:00:11 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net v1] ixgbevf: fix link setup
- issue
-To: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
- netdev@vger.kernel.org, stable@vger.kernel.org,
- Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
- Piotr Kwapulinski <piotr.kwapulinski@intel.com>
-References: <20251204095323.149902-1-jedrzej.jagielski@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20251204095323.149902-1-jedrzej.jagielski@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/2] mlx5 misc fixes 2025-12-01
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176484601029.732369.14722259255665486033.git-patchwork-notify@kernel.org>
+Date: Thu, 04 Dec 2025 11:00:10 +0000
+References: <1764602008-1334866-1-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <1764602008-1334866-1-git-send-email-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
+ mbloch@nvidia.com, leon@kernel.org, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, gal@nvidia.com,
+ moshe@nvidia.com
 
-Dear Jedrzej,
+Hello:
 
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Thank you for your patch.
-
-Am 04.12.25 um 10:53 schrieb Jedrzej Jagielski:
-> It may happen that VF spawned for E610 adapter has problem with setting
-> link up. This happens when ixgbevf supporting mailbox API 1.6 coopearates
-
-cooperates
-
-> with PF driver which doesn't support this version of API, and hence
-> doesn't support new approach for getting PF link data.
-
-Which commit introduced the support for this API version?
-
-> In that case VF asks PF to provide link data but as PF doesn't support
-> it, returns -EOPNOTSUPP what leads to early bail from link configuration
-> sequence.
+On Mon, 1 Dec 2025 17:13:26 +0200 you wrote:
+> Hi,
 > 
-> Avoid such situation by using legacy VFLINKS approach whenever negotiated
-> API version is less than 1.6.
-
-It’d be great, if you added how to exactly reproduce the issue.
-
-> Fixes: 53f0eb62b4d2 ("ixgbevf: fix getting link speed data for E610 devices")
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> Reviewed-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-> ---
->   drivers/net/ethernet/intel/ixgbevf/vf.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
+> This small patchset provides misc bug fixes from the team to the mlx5
+> core and Eth drivers.
 > 
-> diff --git a/drivers/net/ethernet/intel/ixgbevf/vf.c b/drivers/net/ethernet/intel/ixgbevf/vf.c
-> index 29c5ce967938..8af88f615776 100644
-> --- a/drivers/net/ethernet/intel/ixgbevf/vf.c
-> +++ b/drivers/net/ethernet/intel/ixgbevf/vf.c
-> @@ -846,7 +846,8 @@ static s32 ixgbevf_check_mac_link_vf(struct ixgbe_hw *hw,
->   	if (!mac->get_link_status)
->   		goto out;
->   
-> -	if (hw->mac.type == ixgbe_mac_e610_vf) {
-> +	if (hw->mac.type == ixgbe_mac_e610_vf &&
-> +	    hw->api_version >= ixgbe_mbox_api_16) {
->   		ret_val = ixgbevf_get_pf_link_state(hw, speed, link_up);
->   		if (ret_val)
->   			goto out;
+> Thanks,
+> Tariq.
+> 
+> [...]
 
-The diff looks good. With the improved commit message, feel free to add:
+Here is the summary with links:
+  - [net,1/2] net/mlx5: make enable_mpesw idempotent
+    https://git.kernel.org/netdev/net/c/cd7671ef4cf2
+  - [net,2/2] net/mlx5e: Avoid unregistering PSP twice
+    https://git.kernel.org/netdev/net/c/35e93736f699
 
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Kind regards,
-
-Paul
 
