@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-243617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1380CA4717
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 17:20:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 28DC3CA4732
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 17:21:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2C86930836DE
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 16:18:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6F64730A7A61
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 16:19:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABF7B346E4F;
-	Thu,  4 Dec 2025 16:17:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E17C7347BA1;
+	Thu,  4 Dec 2025 16:17:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kpNaN9N/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IlHZozYa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C3BB346780
-	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 16:17:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62A1A346E41
+	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 16:17:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764865071; cv=none; b=GRhVJEaTKk/X0o5PhQmsl8J8PSGqnbrKFXHvz3eV1pXO+aEhpc7qtA+IxuCQM2xlGNTfmauzNLLTmeOiwTEj21XvPLi9HPBKBxXf4jCrRSBNgS7R69BAtXpwLPNXrDzv0mPP87ztVleNFJZhTQKNxCs5/95VDoAndBPp+YA3pX8=
+	t=1764865072; cv=none; b=Gg8B91f4t4WYr6DylCxqo3kM7ZXWJuKv66TkZE1Yj4QQb9kZsfCXITG9FTGr8QKyd9URFMQz1CEFk5jABrdaN2iVmIEJMCNigj3aIMfJQtZElX2HlwrNSvYlDUYTcABZcPlir/B31FXTioZWB9YtNHzI8FvRrjW6d6RXaZupZvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764865071; c=relaxed/simple;
-	bh=W/OQe5SBE/hGcbbtQ1DcT8TO1Zhva6jnYh6vp52AP/w=;
+	s=arc-20240116; t=1764865072; c=relaxed/simple;
+	bh=Hqm19qhEtyyB+awO2JFc4zCVn6kCUyIwQGxa8Cui5Ms=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aowSF6uVnGP4tlIYMFNfpiv00XVLX/H15eSaxtLQdk8B+LR0Ji7L7HaAvAUSt63wiMeKwXdMCWHkCpBVRWMxMsIfFtQ3+C766RZohC2XqM+6EyAvMKCEPn70N8/Ty+Z7yLvngPTw/LEI1MjG0EnnYHUFJAB232cqDcx9mgz91Ug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kpNaN9N/; arc=none smtp.client-ip=209.85.210.175
+	 MIME-Version:Content-Type; b=l7etMWRH8J5a4hLi8WlLIQ/kt71xw+4QNNHO2c3pupbHVMea5LxjTQ4wtDv9C6J6TURuFhMQjrKzKmRbALPzcfqXwQ04mnvTGSiQTTo8LNw/BXlACsdh30rHGFxrXOhjaN3nH3I2Xwm0lMfR1ue6Uxy4QKdTNWOrBOP+hUhGy3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IlHZozYa; arc=none smtp.client-ip=209.85.210.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7b89c1ce9easo1283850b3a.2
-        for <netdev@vger.kernel.org>; Thu, 04 Dec 2025 08:17:48 -0800 (PST)
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7acd9a03ba9so1235384b3a.1
+        for <netdev@vger.kernel.org>; Thu, 04 Dec 2025 08:17:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764865068; x=1765469868; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1764865070; x=1765469870; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vqotmNbVaSZDa6RHeR/dZGNbL7atfR/Dwuv0KZcoFLg=;
-        b=kpNaN9N/eED3awn5YgAFGIbIBjH6BCEe1ugH6xbjeGnxYPWFTeGm3F/l0EEiL7LRhf
-         TkqrvGjrzeAyES8YAIn1YZ7TWcsdD2APybxkrjRUOzG21VrbTHlP0+LuHNPuJnAT7XbN
-         d0urJX3LiRN+K4JvOGmr6NwQQLlFf5tHZ/5YwszAlb/261tH9D+Zg+tw93YiMBc43XEv
-         ViwDQSJNryP46AJpply7vowXa5KqIWNxnzoHC4LCfGcpb4qMUcnsQRFT2OqdhEp+aP3W
-         gHV0Op5fn+tf3xVkrjefB01CWEJ324QGKzrBXILs9/Vdan1a8jLWznDUvbll0sG1xPYZ
-         kzuA==
+        bh=uJNy8994Pot6m22uiY8XadZYdXX9qQFe2i2P88ejpmQ=;
+        b=IlHZozYaQzIXfAT4fe4NAmbMeMxptjewtfv9zT5w5petHD1ZrLYnCDMoqGtYgThCK5
+         sx1nBvUEemy6Z6XPw4RZXUiX0lhbIfxb0uQlivuW8AVNmTBNBx4odDMhc98ejrFbDvPp
+         eyKqney08aEEVr7CuXV/mjgP9VDrGWw0+XucjH4v5tkraHIMnQRlX2Rc66rTDXxZhNOw
+         tyJWk+7A4buA8RuKjVkzYL277tWJIqn3qbx+U03764hhj9bX5WSB+OQASrYR6CBbaXnB
+         2Irl/EfviE+ACia9RqQKLVbjsIjehzOWT5hgI7b3DEa+8LzW/dpAG/P5OYGdPWKLYxDD
+         Ziig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764865068; x=1765469868;
+        d=1e100.net; s=20230601; t=1764865070; x=1765469870;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:sender:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vqotmNbVaSZDa6RHeR/dZGNbL7atfR/Dwuv0KZcoFLg=;
-        b=WHYA5VEB9Dp95rj2PcqU3RumLc/qgkLbNKZbeDD48Ep73dQKa6qJj3H1ygOfNyliSy
-         AwFstHmnnBXfBmgwSDsjPAhccjXvV6lVUsNRn7SaeQYwBAj86ahow2//mTsgZj8BdAUw
-         Uup+fMtkoj7eREfGZA0J+56ZJE3PiHCc5zE+Xu1HA211tTHL5WGrl6mjMk4RtjL30JOm
-         3/xXa7OVnPvgimdMPHDW+rWYW4wACSYhZ0+qJn7drjF76IXox76eSWreB5yb+REv+oQK
-         fJfgiP6RQptOgbYY8/5xsQ4+1wzZWQd5I5Kc7yndGsuNwzB3uZHZpcG90AdGUn9NJHFq
-         kf/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVuXRuv8wM3RHqVaQ1a9FjoqCAYEu+qLxuanzeGo1DmpdJSD/abTy3bjiwAiUc9cFs8eZ9GOXE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx0KusW9uGBaCaY5kOuIlv9+vo+2ZPaDvtxeWLGaWRfaHRXdpxO
-	kDfu+JlaMPqWCkuLGswzeWXARuUrwmsFNiacPK7NnwXDJ97p0c9TNyvu
-X-Gm-Gg: ASbGncthe84oQBw01uik0P3XhbFZgOZ5JPKML+zK/AvKtK1w6BJ1KWM8JIWe81GzLYq
-	RbR0EE4EMxo7yIIvsUf3OiFEcv3FPjnPFgslidbBDZzpP0Ve9nSziyM0U+odCqEfPtZMhu4IGTi
-	+FM1So9eTu2TRNtNIuQ1l8nemNrwsv0NCzdlq0c56tJvm2PN+WWKQnQx5B5AqKx3UXicwqQZJDu
-	eCeABE8DJse2d17szrR11jD8jWG/zAqWwtRYcmCOtYmSewPvkts2PKO2BnTYxjKTsrM4kP4oP56
-	ft5TlrGX8vLNZwq1T/SabiHooFQvsaRSVUhnh9nr/ikZee+e3WpILJLX1GHJYf+FTZP8fmfEJSZ
-	zJfAVOQwZ5xMLYMOMSbTJEm0+StQpa98zBz5xpv6lZrqABxfAjxBtjN5v4eWs8FSC55dLhZ1+uz
-	/jDvnm84pvj2nFkJtDD+lD9As=
-X-Google-Smtp-Source: AGHT+IHVpqKaMcm1FDJ5yjab03bifOuUjE2BJB72SixSC6x+ndj2E9PzKZDdx0HSGekHKIlUwqYNWg==
-X-Received: by 2002:a05:6a21:33a3:b0:350:fa56:3f45 with SMTP id adf61e73a8af0-363f5e029bdmr7709680637.35.1764865068434;
-        Thu, 04 Dec 2025 08:17:48 -0800 (PST)
+        bh=uJNy8994Pot6m22uiY8XadZYdXX9qQFe2i2P88ejpmQ=;
+        b=CrnZ2Wb2ryhVieVF7D2cijuwHNX/Nj5l7rdy/m5Dowyr1KJUeMcosPQX/wixWFWIH0
+         /w80YomvUwGU0FybsPJIZfmRbBgAhO3zFBPv3u9ItGLij5kJUvL/535SJhguAeEeG1/M
+         suwT3eVYAUGtH8TEhM60Ru3v3eBJyDoZ9U4/LPBXAlANFiccyVnd2AuS4NgKibVRH3rl
+         40zF87bLF7dt9LR+Pb4XjfF+I5VDmiDIIkZ1/xmJfzeuvklS1KvmXrAlAf4tE0H4sT4s
+         IrVYQUyd6XmknkP9CcBXzUibpAmpdHTG0aXTFFrevq5fNRj8Db85NPrXV/RMiYQeRM/b
+         xcgg==
+X-Forwarded-Encrypted: i=1; AJvYcCVvZMcn0J4SA47bqZ8nzQIgkRYWY0LkWngJvj+S5iZ1VQTuNCCRQNY/M1IKjuLIC/2eWsI+oGA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxyl0plgZcdIPd9a2b7cdYtmImyoimdTYa1ZzEs1gWCScHvOUmt
+	uYJLaLbr+snbHXhu3xIk4e6KWnomiRCEvZCIt5iPiHCstfuYfEF1e2HZ
+X-Gm-Gg: ASbGncuNpWGZ20EqdvmqGc37QkcfMl3ki94BGpPIaL9ZdUhF0ks2RC5Eyvll32gH2RX
+	7zDmNIgXOjobAfPNcKFl/PKpMnLHqhMOPuHVIrrmphmUNozhJ4W5kqoveegf0L9XsmEeD7X0Hsb
+	ck4efEYac+Q9N7dcxRHFrv7TcytWnOhdJot2SvaZYgM8wPDFrlNJBTaVp/0T7rHPUF5JyX2I7Fo
+	GxzSeiIxdHa906bQ9Us1N/WNmmnk3aaZk7ZHpkatddnOmdZCY7Bk57wQZq9p9eS4BN/YRwApRWs
+	orMWhe10ujKjapuiCkiljullFGXhNPXS+Q/x4RBObkIw1gI+P5ikYQ6ZXjyltl+ZF0Uy6vuVbMp
+	UI0D+eGKaSjBREp+PMalj5v0k331NBEyt7beAlOTlMWOns/FN5lx1teTBnIbKgbEFZXwfD75QMc
+	5pXoQ5rQX+tQ8UK6aJxbFaujfptVRvgoLzKQ==
+X-Google-Smtp-Source: AGHT+IFWkduyk9szNluelpZfGaJjNW90s6UE/NY8hC2k8APw+laM8wvICtCdvTbCpRk3ULmedtT53Q==
+X-Received: by 2002:a05:6a20:939f:b0:35e:1a80:464 with SMTP id adf61e73a8af0-363f5e9dd6bmr8075142637.46.1764865069640;
+        Thu, 04 Dec 2025 08:17:49 -0800 (PST)
 Received: from server.roeck-us.net ([2600:1700:e321:62f0:da43:aeff:fecc:bfd5])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7e29f2ed2fesm2637768b3a.14.2025.12.04.08.17.47
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-bf681550446sm2310053a12.2.2025.12.04.08.17.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Dec 2025 08:17:47 -0800 (PST)
+        Thu, 04 Dec 2025 08:17:49 -0800 (PST)
 Sender: Guenter Roeck <groeck7@gmail.com>
 From: Guenter Roeck <linux@roeck-us.net>
 To: Shuah Khan <shuah@kernel.org>
@@ -87,10 +87,10 @@ Cc: Christian Brauner <brauner@kernel.org>,
 	netdev@vger.kernel.org,
 	bpf@vger.kernel.org,
 	Guenter Roeck <linux@roeck-us.net>,
-	Miklos Szeredi <mszeredi@redhat.com>
-Subject: [PATCH 11/13] selftests/fs/mount-notify: Fix build failure seen with -Werror
-Date: Thu,  4 Dec 2025 08:17:25 -0800
-Message-ID: <20251204161729.2448052-12-linux@roeck-us.net>
+	Amir Goldstein <amir73il@gmail.com>
+Subject: [PATCH 12/13] selftests/fs/mount-notify-ns: Fix build failures seen with -Werror
+Date: Thu,  4 Dec 2025 08:17:26 -0800
+Message-ID: <20251204161729.2448052-13-linux@roeck-us.net>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20251204161729.2448052-1-linux@roeck-us.net>
 References: <20251204161729.2448052-1-linux@roeck-us.net>
@@ -105,24 +105,24 @@ Content-Transfer-Encoding: 8bit
 
 Fix
 
-mount-notify_test.c: In function ‘fanotify_rmdir’:
-mount-notify_test.c:467:17: error:
+mount-notify_test_ns.c: In function ‘fanotify_rmdir’:
+mount-notify_test_ns.c:494:17: error:
 	ignoring return value of ‘chdir’ declared with attribute ‘warn_unused_result’
 
 by checking and then ignoring the return value of chdir().
 
-Fixes: e1c24b52adb22 ("selftests: add tests for mount notification")
-Cc: Miklos Szeredi <mszeredi@redhat.com>
+Fixes: 781091f3f5945 ("selftests/fs/mount-notify: add a test variant running inside userns")
+Cc: Amir Goldstein <amir73il@gmail.com>
 Signed-off-by: Guenter Roeck <linux@roeck-us.net>
 ---
- .../selftests/filesystems/mount-notify/mount-notify_test.c     | 3 ++-
+ .../selftests/filesystems/mount-notify/mount-notify_test_ns.c  | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/filesystems/mount-notify/mount-notify_test.c b/tools/testing/selftests/filesystems/mount-notify/mount-notify_test.c
-index e4b7c2b457ee..c53383d4167c 100644
---- a/tools/testing/selftests/filesystems/mount-notify/mount-notify_test.c
-+++ b/tools/testing/selftests/filesystems/mount-notify/mount-notify_test.c
-@@ -464,7 +464,8 @@ TEST_F(fanotify, rmdir)
+diff --git a/tools/testing/selftests/filesystems/mount-notify/mount-notify_test_ns.c b/tools/testing/selftests/filesystems/mount-notify/mount-notify_test_ns.c
+index 9f57ca46e3af..949c76797f92 100644
+--- a/tools/testing/selftests/filesystems/mount-notify/mount-notify_test_ns.c
++++ b/tools/testing/selftests/filesystems/mount-notify/mount-notify_test_ns.c
+@@ -491,7 +491,8 @@ TEST_F(fanotify, rmdir)
  	ASSERT_GE(ret, 0);
  
  	if (ret == 0) {
