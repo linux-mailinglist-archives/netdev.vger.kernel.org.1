@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-243633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA610CA4A85
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 18:03:58 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45FEECA4A05
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 17:58:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E9EA530380E5
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 16:58:03 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5B7FD302008A
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 16:57:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9921346E63;
-	Thu,  4 Dec 2025 16:48:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C86E134844F;
+	Thu,  4 Dec 2025 16:49:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a10rYX0x"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ftGKXrNe"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE2EC335BB4;
-	Thu,  4 Dec 2025 16:48:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99255347FEE;
+	Thu,  4 Dec 2025 16:49:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764866893; cv=none; b=Dwiifx87+gKPOQorZFp5F2zVvDL/vQ88LJ5lTDeaQFJYH8E8HjWJS6jUSzfEtHzRoDo6dSgz9LJzh+jKSZE/kMbDiYBjfqWhVETomCxEQiks12NMOk3eb94jNymaIFfGV9RUWdHj7fH14svzHDcZ7WkXw6GZ/LhAOftn50yCHWU=
+	t=1764866946; cv=none; b=pB5Kb+FHQPYeTP4ChPAg/YeXKaP7BykVqHt5fd+rMiWTxsLJX3hJQZUy9n2ILBGBZo2t9InvnsmS8wxQc9Vk65iOlti82J/UqFO38eMkn3Ga0YiEdGmx0YPEw1htW+UG85VFxNI5/QR6YJtv8CIZImmGMzgWuNCZjTJJIUpjkI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764866893; c=relaxed/simple;
-	bh=UkC+QMQ4k9lCMANWG3quk95RKaYDeofbdrxNz9Jdz/M=;
+	s=arc-20240116; t=1764866946; c=relaxed/simple;
+	bh=s/jCJ2FpUP11SPYO8fzMlmRQfnOVawPPT6/iEbGbJgI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sUYmupTFABAnPGNCSeoFyoMjeldHGvH18hP9vMs13j+akvLPe4w4MBFymanWJU/IPBcO4lPQFmV8MMXJaVdeq3e05l7WdF7/2tVF6OR0wlDVHvdnX7TFxwjxGERPX3IvFCFu4A6h1IBvzsF4ufIhg3FL8xm84y/XthYLWcjea+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a10rYX0x; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C59AEC116B1;
-	Thu,  4 Dec 2025 16:48:09 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=BdqOzp1r1ERWJsxN4ibCQluhWirz63F1juoqzer1OM6bSEMZPW1V627/DrP3hHbSkBE3Cg18ZBfddQjT5S3MzWU/P99wb9VqZChG5gFeyLQo9fZdUbIod9WWuwmFJLveqMsQr3LcRTZnschThqbTZWLWdowjXjfezV4I9jmzSG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ftGKXrNe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0A99C4CEFB;
+	Thu,  4 Dec 2025 16:48:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764866893;
-	bh=UkC+QMQ4k9lCMANWG3quk95RKaYDeofbdrxNz9Jdz/M=;
+	s=k20201202; t=1764866944;
+	bh=s/jCJ2FpUP11SPYO8fzMlmRQfnOVawPPT6/iEbGbJgI=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=a10rYX0xwCL5ATxmQuGOKfiv0qz690sWMLTqCrGvIcebZOvyRvBHwg2VH22vaet03
-	 QGl4P+7uvAuCbk/SI4IctgZTbmm55y2uDb+9Y8vPuOW96LDra9PB2Ml0hPDWdpqa56
-	 6Wpgu2DyYI9t5gdU/tk0QgNJKlj810pUK7Qcn4RpWs6m5UuZ786A5o26M4sph8vp7K
-	 j8Wac6zwZjPpqG0I+oTf+mZ5xXKDGUWIs6ype/4nc5vq7ghHK/hx75mzSN1XMbqOr2
-	 Vh0URcOOa9ewEbEx0r/uMU6d9lrUR7ytU+4AFNBM6KlkVHssjOAn01WtqoA3WoEbDH
-	 8Og2CEFf1Yf2w==
-Message-ID: <66d080f1-e989-451f-9d5e-34460e5eb1b0@kernel.org>
-Date: Thu, 4 Dec 2025 17:48:07 +0100
+	b=ftGKXrNeYQ1po2piaPKUeDZLuQnVyRpTPq6K+3sZBQXbxanU6cohAuPxppl3YF6be
+	 74WjFWEFuqAf6m8ukmUuAKAUfjosXj1p/I/cL2DXvV4YpvZNnPnzoIxZMZ3F4iUpcR
+	 ZQ+w5Fc959ptz8BoYeoe7mM/t1ds4JR1/NfJhwMttDPIClXQtiAk76cr7GTn1HhZW+
+	 afDxEKUmf8Te0PUCMFK6NiIE9P9kbIYUCQZTpMbyMtlGN5muEV6SGlJ20GOnEESW2i
+	 bVtRWNuchIk6g3xwwpJ9XxoIjNEfsluUc+hk/HDi3v9GoaWCKPXyCIAmzj9bS3O843
+	 wjdy5KCVy6BEg==
+Message-ID: <c7cbdaaa-e786-4842-9346-e2fde998fde5@kernel.org>
+Date: Thu, 4 Dec 2025 17:48:57 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,29 +48,31 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/2] net: dsa: mt7530: Use GPIO polarity to generate
- correct reset sequence
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Daniel Golle <daniel@makrotopia.org>, Frank Wunderlich <frankwu@gmx.de>,
- Andrew Lunn <andrew@lunn.ch>, Chen Minqiang <ptpt52@gmail.com>,
+Subject: Re: [PATCH net-next 5/9] phy: add phy_get_rx_polarity() and
+ phy_get_tx_polarity()
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, Vinod Koul <vkoul@kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-phy@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ Daniel Golle <daniel@makrotopia.org>,
+ Horatiu Vultur <horatiu.vultur@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
  Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
- <matthias.bgg@gmail.com>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Kishon Vijay Abraham I <kishon@kernel.org>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
  AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- "Chester A. Unal" <chester.a.unal@arinc9.com>,
- DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-References: <20251129234603.2544-1-ptpt52@gmail.com>
- <20251129234603.2544-2-ptpt52@gmail.com>
- <0675b35f-217d-4261-9e3f-2eb24753d43c@lunn.ch>
- <20251130080731.ty2dlxaypxvodxiw@skbuf>
- <3fbc4e67-b931-421c-9d83-2214aaa2f6ed@lunn.ch>
- <0d85e1e6-ea75-4f20-aef1-90d446b4bfa1@kernel.org>
- <00f308a1-a4b1-4f20-8d8e-459ddf4c39b1@gmx.de>
- <aS7Zj3AFsSp2CTNv@makrotopia.org> <20251204131626.upw77jncqfwxydww@skbuf>
- <4170c560-1edd-4ff8-96af-a479063be4a5@kernel.org>
- <20251204160247.yz42mnxvzhxas5jc@skbuf>
+ Eric Woudstra <ericwouds@gmail.com>, =?UTF-8?B?TWFyZWsgQmVo4oia4oirbg==?=
+ <kabel@kernel.org>, Lee Jones <lee@kernel.org>,
+ Patrice Chotard <patrice.chotard@foss.st.com>
+References: <20251122193341.332324-1-vladimir.oltean@nxp.com>
+ <20251122193341.332324-6-vladimir.oltean@nxp.com>
+ <20251124200121.5b82f09e@kernel.org> <aS1T5i3pCHsNVql6@vaman>
+ <69ac21ea-eed2-449a-b231-c43e3cd0bdc0@kernel.org>
+ <20251204153401.tinrt57ifjthw55r@skbuf>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -116,76 +118,78 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <20251204160247.yz42mnxvzhxas5jc@skbuf>
+In-Reply-To: <20251204153401.tinrt57ifjthw55r@skbuf>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 04/12/2025 17:02, Vladimir Oltean wrote:
-> On Thu, Dec 04, 2025 at 03:49:52PM +0100, Krzysztof Kozlowski wrote:
->> On 04/12/2025 14:16, Vladimir Oltean wrote:
->>> I get the feeling that we're complicating a simple solution because of a
->>> theoretical "what if" scenario. The "NOT" gate is somewhat contrived
+On 04/12/2025 16:34, Vladimir Oltean wrote:
+> On Mon, Dec 01, 2025 at 09:41:21AM +0100, Krzysztof Kozlowski wrote:
+>> On 01/12/2025 09:37, Vinod Koul wrote:
+>>> On 24-11-25, 20:01, Jakub Kicinski wrote:
+>>>> On Sat, 22 Nov 2025 21:33:37 +0200 Vladimir Oltean wrote:
+>>>>> Add helpers in the generic PHY folder which can be used using 'select
+>>>>> GENERIC_PHY_COMMON_PROPS' from Kconfig, without otherwise needing to
+>>>>> enable GENERIC_PHY.
+>>>>>
+>>>>> These helpers need to deal with the slight messiness of the fact that
+>>>>> the polarity properties are arrays per protocol, and with the fact that
+>>>>> there is no default value mandated by the standard properties, all
+>>>>> default values depend on driver and protocol (PHY_POL_NORMAL may be a
+>>>>> good default for SGMII, whereas PHY_POL_AUTO may be a good default for
+>>>>> PCIe).
+>>>>>
+>>>>> Push the supported mask of polarities to these helpers, to simplify
+>>>>> drivers such that they don't need to validate what's in the device tree
+>>>>> (or other firmware description).
+>>>>>
+>>>>> The proposed maintainership model is joint custody between netdev and
+>>>>> linux-phy, because of the fact that these properties can be applied to
+>>>>> Ethernet PCS blocks just as well as Generic PHY devices. I've added as
+>>>>> maintainers those from "ETHERNET PHY LIBRARY", "NETWORKING DRIVERS" and
+>>>>> "GENERIC PHY FRAMEWORK".
+>>>>
+>>>> I dunno.. ain't no such thing as "joint custody" maintainership.
+>>>> We have to pick one tree. Given the set of Ms here, I suspect 
+>>>> the best course of action may be to bubble this up to its own tree.
+>>>> Ask Konstantin for a tree in k.org, then you can "co-post" the patches
+>>>> for review + PR link in the cover letter (e.g. how Tony from Intel
+>>>> submits their patches). This way not networking and PHY can pull
+>>>> the shared changes with stable commit IDs.
+>>>
+>>> How much is the volume of the changes that we are talking about, we can
+>>> always ack and pull into each other trees..?
 >>
->> You downplay this case and suggest (if I get it right) that NOT gate is
->> something unusual.
->>
->>  I mentioned "line inverter" but it's not about NOT gate. There is no
->> need for NOT gate at all, like some magical component which no one puts
->> to the board. The only thing needed is just to pull the GPIO up or down,
->> that's it. It's completely normal design thus it CAN happen.
->>
->> Of course "can" does not mean it actually does, because certain
->> configurations like powerdown-fail-safe are more likely and I am not an
->> electric circuit designer to tell which one is better, but that
->> downplaying does not help here.
+>> That's just one C file, isn't it? Having dedicated tree for one file
+>> feels like huge overhead.
 > 
-> I don't want to dismiss this comment, but I don't really understand it.
-> What do you mean by "line inverter", is it the component inside the GPIO
-> pin which makes it active low?
-
-I mentioned much earlier "line inverter" and here the "NOT gate"
-appeared and both suggest you need some dedicated component.
-
-What I want to say that it is not true. You do not need dedicated
-component to have different polarity, because it is as simple as
-connecting the wire to ground or to voltage and moving a resistor from
-one place to another.
-
+> I have to admit, no matter how we define what pertains to this presumed
+> new git tree, the fact is that the volume of patches will be quite low.
 > 
-> I thought that the premise of this patch set is that old device trees
-> are all (incorrectly) defined as GPIO_ACTIVE_HIGH, but someone familiar
-> with the matter needs to fact-check this statement.
-
-Yes, that's most likely true.
-
+> Since the API provider always sits in drivers/phy/ in every case that I
+> can think about, technically all situations can be resolved by linux-phy
+> providing these stable PR branches to netdev. In turn, to netdev it
+> makes no difference whether the branches are coming from linux-phy or a
+> third git tree. Whereas to linux-phy, things would even maybe a bit
+> simpler, due to already having the patches vs needing to pull them from
+> the 3rd tree.
 > 
-> Anyway, you and Andrew are talking about different things, you haven't
-> made it clear (or at least it wasn't clear to me) that the inverter you
-> are talking about isn't his NOT gate (that isn't described in the device
-> tree at all, as opposed to your inverter which would make the GPIO line
-> GPIO_ACTIVE_LOW - that's something verifiable).
-
-Both are the same - inverter or NOT gate, same stuff. It is just
-connecting wire to pull up, not actual component on the board (although
-one could make and buy such component as well...). We never describe
-these inverters in the DTS, these are just too trivial circuits, thus
-the final GPIO_ACTIVE_XXX should already include whatever is on the wire
-between SoC and device.
-
+> From my perspective, if I'm perfectly honest, the idea was attractive
+> because of the phenomenal difference in turnaround times between netdev
+> and linux-phy review&merge processes (very fast in netdev, very slow and
+> patchy in linux-phy). If there's a set like this, where all API consumers
+> are in netdev for now but the API itself is in linux-phy, you'd have to
+> introduce 1000 NOP cycles just to wait for the PR branch.
 > 
->> Just to clarify: I expect clear communication that some users will be
->> broken with as good as you can provide analysis of the impact (which
->> users). I only object the clame here "no one can ever pull down a GPIO
->> line thus I handled all possible cases and made it backward compatible".
->>
->> And that claim to quote was:
->> "Therefore, regardless of whether a DTS is old or new, correct or
->> incorrect, the driver now generates the correct electrical reset pulse."
->>
->> which is 100% false and I am surprised how one could claim that.
+> In that sense, having more people into the mix would help just because
+> there's more people (i.e. fewer points of failure), even though overall
+> there's more overhead.
 > 
-> Agree, the communication should be better.
+> IDK, these are my 2 cents, I can resubmit this set in 2 weeks with the
+> maintainership of the PHY common properties exclusive to linux-phy.
 
+
+Jakub supported the idea, so I also do not oppose, and if that helps you
+folks, then go ahead.
 
 Best regards,
 Krzysztof
