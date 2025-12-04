@@ -1,126 +1,131 @@
-Return-Path: <netdev+bounces-243674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C954DCA5562
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 21:32:38 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3554ACA55F4
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 21:47:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 360C6320D601
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 20:27:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E9EAB306B51B
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 20:47:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8596431ED7A;
-	Thu,  4 Dec 2025 20:19:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B58926B741;
+	Thu,  4 Dec 2025 20:47:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JRXAcEVk"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="T/SIfiqD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D55E431ED77
-	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 20:19:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 561E91F5E6;
+	Thu,  4 Dec 2025 20:47:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764879544; cv=none; b=Q8xoUqN2nc5nrQdl8AUg686F+V/qsvTB+A94hj3u5493fT3vVip2KaoncHxf1R41Z+kaZxt+8KiA4fkB18wkw1AEST+eGJwTNV7E60wlpuhT741x/ehodpe1kkHqSn/3LxLmWB+a5v4Suq0K5QpSqkTtumGLvfTseraMoYcrgg4=
+	t=1764881270; cv=none; b=cPdbtLlbEfJwiNWnK268JEEOxz/MJi39pTo6Yq9oo6cXMWXY+S1kJ74mQ5lx2B/xSR6tN/024lkeEkA0KivrX9kpdMl3EuNfV0dtnuaKbZaJS1FJBX2miXYcAx+/df21aAA3FCQSf6bTMVwrHRBd8owipa7WC/xw7DY4bmSlCYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764879544; c=relaxed/simple;
-	bh=FqECIFzimQFLDo553Kuio3LnpAOxlwgFBuOe37zk2r0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=MmM94PiRXkBu/fRdWBRIFgOYk6FGJ/pdpj8NgohlADX5VZH+l0VRlncTvIKFZRW4vw+AqDw0x1aGo0RSLSOkHJW5QnTyu18/AViBzHKxLUiMm2d5TxgxX5r4sBkxiv/JfG8i/sF3/eyPtu9uHnO7SszhK4Y2FlfWz3IlkBHOhfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JRXAcEVk; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-477632b0621so9653045e9.2
-        for <netdev@vger.kernel.org>; Thu, 04 Dec 2025 12:19:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764879541; x=1765484341; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=LpCDQ/db8LJcYR39Q7NPIwmJrDQEsN3xPH9fje0B20g=;
-        b=JRXAcEVkSUtNSVDYDhYuZhqCje8ROMg0CeS3X2xE+XSE6ATPW/1+ehinWYgE1/abTW
-         WqdS76IczL4Cw2fBRVZMmbjMKNgeZspMn7F8AX/yxI+8KH7uolEjK8KwXiYjlyQhdmMT
-         aHGXQdrl/VuS5fhFfYralrWL2/KW9zp+pkYZi365ACUH9B5oDA013gf2jWp6z4NQRl2a
-         HND6cxXfLPvFcEeno1pEsGSYYl4bMNcwlt4iK5aWvd3XyiQqcPg4+M8/fjl0oHPNgBdg
-         eDSJTbhHi3G9asKzOqMDmj5SeLlP7Zsapn1QV5K9wk0U7xndOBFuvAIZeGcFnBPX5KfK
-         sj+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764879541; x=1765484341;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LpCDQ/db8LJcYR39Q7NPIwmJrDQEsN3xPH9fje0B20g=;
-        b=SmRI1BE5ELjqVyvQ/r8s+6Cl1vR2UpnWSiK+gl/wHmR87nm/ydtqrkqOK29qI2kIJf
-         /kXFZ3AMdVWDcIQpOJIzsahPIRFzdbHt99jlOVR/q5WJoEwK7N4OgzTxmysBKSAhclQy
-         F2e7AWz+QPnmodE2dHgbnkAtXEKfXWkGgswFqzszGPr5SViMQwoOgYA3phzLALf36vIx
-         QX/rsfW1tHsh/P190WIl9Q+H+Nd1utJqIx87Wy3mRjBZxWeCpQ2cW5C3PY7lTLVwniDc
-         2ItH89HCog4zw+45agP47lGSr1cE2EpaAfkZsr/IcgMieAoi3LPobmZrnD0OyBpT+vPb
-         7Ubg==
-X-Forwarded-Encrypted: i=1; AJvYcCU39pT8GjFMuIo2k5qT/W4pFJYZsdVa8cw3tXI6UPzWpLHc5vLZ9JPDB8KP9DXjp4XrHe4DIB4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbxUCHkaUPJGRI5XfujG89mgnUaUwMsluAkUeaqq3vTu0Rs9fk
-	W33pbGfS2PjxHkADrIXakkE8JQKNKu0kBW6aCa+chku9lZvAaGB6xaBB
-X-Gm-Gg: ASbGncsO+Rb7jY16W4gSTQcPuQpbZ/PD9jmqLa3oipwdVqGLq07xWhLC3JlfzaueXgw
-	cgWlDF5fOTVfcRQMeOgHE9xnJU3hvf7nV3g21k3Iyp54OCi0VII9EzaWR2fzQ66NeYwWJ/Ki3YS
-	C611cUzkKajm4pqI+HwHbZk9E551/N4htQiSBB68In3baz0yghFtYCcrPtp/UQEglIuGHkDLoK3
-	+rZ1wEVvdxxrrvVqSQu4AO2mMsDZdoo+Stq/WucWxq6iU9K/OpuOu5Ze3Afhy9Vui8iiPk7kXvc
-	KYXOWddtSn2Q9uNrbr+gdrn2RXONv6JFosc//hJwzOwyHg7HXROcCMhZHtPrRBnbq7mHg5ooODY
-	lf2i3LGRXCOfZxCxy2GwA29sQiPeshMzH7KnnK/ckg4T07IYBLEHLfnecfWC0LdFrpjLBSVZnpQ
-	bLt4zJ6wiJDdbQ7bkcokfMmXDyiQbJDBuZxaN1lQ9Kx85Nsw2pgNUoAy1bx1UlKj8gUWaj7RwvA
-	uIndP5WE1U8ESVS7dBmVsnoSWqFiJONkiCPTj+A76qAQIxBGp/Vvw==
-X-Google-Smtp-Source: AGHT+IHrNC9OdUQrhQ8nBiv9qzQ+KjxxeXpPSuxWRiF6f+odXex6LxY097hRNZmDyfbc9xuawp6mSg==
-X-Received: by 2002:a05:6000:26cd:b0:42b:3ded:298d with SMTP id ffacd0b85a97d-42f7319b321mr8106325f8f.32.1764879540953;
-        Thu, 04 Dec 2025 12:19:00 -0800 (PST)
-Received: from ?IPV6:2003:ea:8f3b:8b00:ac52:b5ce:438d:dc86? (p200300ea8f3b8b00ac52b5ce438ddc86.dip0.t-ipconnect.de. [2003:ea:8f3b:8b00:ac52:b5ce:438d:dc86])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42f7cbe90f0sm4938840f8f.9.2025.12.04.12.19.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Dec 2025 12:19:00 -0800 (PST)
-Message-ID: <b9e48b10-6654-4239-a170-8cd7bf77fe0b@gmail.com>
-Date: Thu, 4 Dec 2025 21:18:59 +0100
+	s=arc-20240116; t=1764881270; c=relaxed/simple;
+	bh=DZNGbBIFwdBhALOb0N5Gy3FQ7YOyC1fjB7NsyJoZj7U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LZ39PNUxvPHGzDPDYXlQOL/ZjbNXVcsyBw06cgK0sxLPLQpNXkJqtgRm1+IxOuTut+P8wu5uY3qctsSAE1VHfUpdgzoyeBLJxcy0zjZELmBtJdUBHB3e7vkHHKFZkmZa5VLlFK0I3Bo3kevnqtA1viEBRd+nmfOv/beJTvjIId0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=T/SIfiqD; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=90lPoCGIeZvibFvI+Jj7Aj4Z4grOEkzE4KDDgVz3fS8=; b=T/SIfiqDXVikO9O0tu4uZBNlLW
+	6PMOsEibq8S9h3DE3ovp9EN5cl/7WTTpDdxenrHdNtAeCsqlo1hH8k3dnhCJenq/VnizEzAHbCv6s
+	crE4bj22iCna436g2Iqoqwd8IKtACPqvPCtv1jAF2/vjBryDOi2SU3fbdHxccoBbjOluy3utx/Xhr
+	WLzi/hGK0ayRycPwbfh1gsKYrrfEUwJelwKQGGbKTdnPgalqsgXxV6zwFLfmnn50PPjzzzpceDqKh
+	KkZX+cS2QzNka7NhIIcEV6VS232P7EO2438bRCGz1z+PS7rKgOvELaLHLkm1INShBT18CE1oSEfdU
+	Y71n0DPQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56322)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vRGEh-000000003wd-1CNC;
+	Thu, 04 Dec 2025 20:47:35 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vRGEc-000000001L6-1Grf;
+	Thu, 04 Dec 2025 20:47:30 +0000
+Date: Thu, 4 Dec 2025 20:47:30 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Vladimir Oltean <olteanv@gmail.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Frank Wunderlich <frankwu@gmx.de>, Andrew Lunn <andrew@lunn.ch>,
+	Chen Minqiang <ptpt52@gmail.com>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	"Chester A. Unal" <chester.a.unal@arinc9.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v3 2/2] net: dsa: mt7530: Use GPIO polarity to generate
+ correct reset sequence
+Message-ID: <aTHzYq5L7kvAPrjQ@shell.armlinux.org.uk>
+References: <0d85e1e6-ea75-4f20-aef1-90d446b4bfa1@kernel.org>
+ <00f308a1-a4b1-4f20-8d8e-459ddf4c39b1@gmx.de>
+ <aS7Zj3AFsSp2CTNv@makrotopia.org>
+ <20251204131626.upw77jncqfwxydww@skbuf>
+ <4170c560-1edd-4ff8-96af-a479063be4a5@kernel.org>
+ <20251204160247.yz42mnxvzhxas5jc@skbuf>
+ <66d080f1-e989-451f-9d5e-34460e5eb1b0@kernel.org>
+ <20251204171159.yy3nkvzttxecmhfo@skbuf>
+ <178afbeb-168f-4765-bb0b-fad0bcd29382@kernel.org>
+ <9f7da6ae-9e3e-442f-a203-28a8881dbe0f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V2] r8169: fix RTL8117 Wake-on-Lan in DASH mode
-To: Phil Sutter <phil@nwl.cc>, =?UTF-8?Q?Ren=C3=A9_Rebe?= <rene@exactco.de>,
- netdev@vger.kernel.org, nic_swsd@realtek.com
-References: <20251202.161642.99138760036999555.rene@exactco.de>
- <8b3098e0-8908-46cc-8565-a28e071d77eb@gmail.com>
- <20251202.184507.229081049189704462.rene@exactco.de>
- <b25d0f31-94ef-4baa-9cbb-a949494ac9a7@gmail.com>
- <aTGpceAK0CRgKDPG@orbyte.nwl.cc>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-In-Reply-To: <aTGpceAK0CRgKDPG@orbyte.nwl.cc>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9f7da6ae-9e3e-442f-a203-28a8881dbe0f@kernel.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 12/4/2025 4:32 PM, Phil Sutter wrote:
-> On Tue, Dec 02, 2025 at 07:06:02PM +0100, Heiner Kallweit wrote:
->> On 12/2/2025 6:45 PM, René Rebe wrote:
->>> On Tue, 2 Dec 2025 18:19:02 +0100, Heiner Kallweit <hkallweit1@gmail.com> wrote:
-> [...]
->>>> - cc stable
->>>
->>> I was under the impression this is automatic when patches are merged
->>> with Fixes:, no? Do I need to manually cc stable? Nobody ever asked me
->>> for that before.
->>>
->> https://docs.kernel.org/process/maintainer-netdev.html
->> See 1.5.7
+On Thu, Dec 04, 2025 at 06:32:23PM +0100, Krzysztof Kozlowski wrote:
+> On 04/12/2025 18:23, Krzysztof Kozlowski wrote:
+> > On 04/12/2025 18:11, Vladimir Oltean wrote:
+> >> On Thu, Dec 04, 2025 at 05:48:07PM +0100, Krzysztof Kozlowski wrote:
+> >>> Both are the same - inverter or NOT gate, same stuff. It is just
+> >>> connecting wire to pull up, not actual component on the board (although
+> >>> one could make and buy such component as well...). We never describe
+> >>> these inverters in the DTS, these are just too trivial circuits, thus
+> >>> the final GPIO_ACTIVE_XXX should already include whatever is on the wire
+> >>> between SoC and device.
+> >>
+> >> Please read what Andrew said:
+> >> https://lore.kernel.org/netdev/3fbc4e67-b931-421c-9d83-2214aaa2f6ed@lunn.ch/
+> >>
+> >>   Assuming there is not a NOT gate placed between the GPIO and the reset
+> >>   pin, because the board designer decided to do that for some reason?
+> >>                    ~~~~~~~~~~~~~~
+> >>
+> >> You two are *not* talking about the same thing. I dismissed the
+> > 
+> > 
+> > It's the same thing. NOT gate is just pulling some pin down or up.
 > 
-> Which points to
-> https://docs.kernel.org/process/stable-kernel-rules.html#stable-kernel-rules
-> and the Option 1 instructions read: "Note, such tagging is unnecessary
-> if the stable team can derive the appropriate versions from Fixes:
-> tags."
+> Although transistor would be still needed, so indeed that's still a bit
+> more than a wire and resistor as I implied.
 > 
-This is about something different. "such tagging" refers to providing
-applicable kernel versions like in the example:
-Cc: <stable@vger.kernel.org> # 3.3.x
+> It looks like:
+> https://www.electronics-tutorials.ws/wp-content/uploads/2018/05/logic-log47.gif
 
-> Cheers, Phil
+A bit more than even that... I do hope folk don't use exactly that,
+that's the kind of thing that would be used in "learning about
+electronics" projects! That's a recipe to drive a transistor into
+full saturation, which makes it comparitively very slow to turn off.
 
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
