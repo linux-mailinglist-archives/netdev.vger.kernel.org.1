@@ -1,234 +1,165 @@
-Return-Path: <netdev+bounces-243539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3130CA3467
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 11:45:48 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A8DFCA34C4
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 11:49:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1DD5B3007765
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 10:45:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B72A931342ED
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 10:46:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB4E62E88AE;
-	Thu,  4 Dec 2025 10:45:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7603336EF6;
+	Thu,  4 Dec 2025 10:46:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cg2dYBdJ"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="E9ncN5L6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 948012D47EF
-	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 10:45:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764845146; cv=fail; b=mbiE7axl4WCBPGKVbG00rjuFaoz4qJzbMYmGAWgcHFsf0o2ODzx9FeacVp3ld46m0prKUY4hxYpA2Nf2BFJ7/8nL+rCE4NE6E6hb1ypvftdbz7wGWcJ10LCGrwm8dE9sCgLwdjjE8pS2MIsKBaZ1w1z/Q1Ssie3i1lkIfCQWDeo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764845146; c=relaxed/simple;
-	bh=O/c8K9HdqWuaP3zs15caSZtvLRaHyqGAJ4uxVhwc8e0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=m9W0vINIli0zLJHkrgsJWp/jVLipX7isqK1IliY1LA0F5iYSJeGgFbOEq4LA3kfWYyvKC7Vuaf59oROraOdB5mqQEkWcTVY1hDACQtM+Xk/l8Xf4USZt/jV80e7ET3EEM26v3EXUmyv8WLLYmBLj5QnpJWFWdpQrdhBsUQS8LxA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cg2dYBdJ; arc=fail smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1764845144; x=1796381144;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=O/c8K9HdqWuaP3zs15caSZtvLRaHyqGAJ4uxVhwc8e0=;
-  b=cg2dYBdJPhGEddcUemhJb8Ed6DCTd7XEOfQO2GikqNrDyMU+p3BIG/qQ
-   Lm2lPMp31ypjCbSFEndABKoN1WWc0l2b/2/SZUGD6ZXkqEHGQOydkj6lA
-   IAAmMD7nOpGqBnOBwK/57Sw9rqH4eLwiuIPnvh1HuRcCIGWgQ3JpXUraT
-   WPBffImbWOnP+r8gndbWmjzNEZJD4ZjKJm6u5f5f427mu8TRv4LpbilRo
-   HZeN/6GgqV/5RxNXUcn8E8Q5WRNq9ATrw7OmAN80fWzS/IiuK93YXNvUO
-   35Bq2vVHZDK725L7lzwrNSCIG9R3RYwXmYdn7oYLoW5b7U93mRacZ9d5B
-   w==;
-X-CSE-ConnectionGUID: cNcndSg5QNaF01Zyiu4a4Q==
-X-CSE-MsgGUID: uCrnOZQpSsOPIPDq2VnBsw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11631"; a="66932982"
-X-IronPort-AV: E=Sophos;i="6.20,248,1758610800"; 
-   d="scan'208";a="66932982"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2025 02:45:44 -0800
-X-CSE-ConnectionGUID: kyhyJvCaQOCCfj4UzZFshA==
-X-CSE-MsgGUID: T2mb53HPQluIp3ndleeUhA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,248,1758610800"; 
-   d="scan'208";a="194765178"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2025 02:45:44 -0800
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Thu, 4 Dec 2025 02:45:43 -0800
-Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29 via Frontend Transport; Thu, 4 Dec 2025 02:45:43 -0800
-Received: from SA9PR02CU001.outbound.protection.outlook.com (40.93.196.20) by
- edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Thu, 4 Dec 2025 02:45:40 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XpftGREfuN7K2lth2+ABEvZ1FACH5xMUxREDlDLybEy9EOzje1QZaBLVIBuOs+uoeH+jfNGN/5uAEnVhbNzECXZ7D+nrtSFiuuOmAduxQvHL4iOXcbu4so2Yi1WMa7M7RQMMgH6LUr4jVizD2f5jwc+zdVlvqE3eW/Bf8lael1GZ49bCBpksJwKge9A73ETGeVT285N2czsEq1MEnqtZpAEFWhh1BlwS7ZMYWgvLA5bYphBPYzHh5zG7Xfcl0K5KPqmIAe/uNM3iDNOZn+8KX2YEkDebcVpRtyRvAGbDWSPAtZI+sShFZ1/6Q0b5+CQpLJqKpCEby0wZyNIdRS6u8A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=O/c8K9HdqWuaP3zs15caSZtvLRaHyqGAJ4uxVhwc8e0=;
- b=aS79/qeEbvqIVE8EQMdJS4/oCIBF+qDgGeVEUP+s+KvDPxL4y0Nr4Mb4y0P8AcNtayHsy5bzA8X5bRa4zWNtc3iXcBuyQed2Ur0Y1dSHNu2XCovAnfHPOisKdxyW+fUQNio1hu0LhUxVZU26Ay8b8GXtuRIr+KcVNmN7neEBZl8gm0kRPuKso+KACZAHjnuW/VVdKVUJCU8iboNz4Y70voKUHy/dJd6a2lWXiPv6haycPX/zlPdsUhMki/7NqN5ShQ7iSMpfTq3EG0gtW7FCk0HnLBFWjWhrVQW04tc0xtj3IZNIs9nfXeZR82nBa1wSYqgiVXz/T8j8pMIaTJME7g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA1PR11MB6241.namprd11.prod.outlook.com (2603:10b6:208:3e9::5)
- by CO1PR11MB4819.namprd11.prod.outlook.com (2603:10b6:303:91::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9388.11; Thu, 4 Dec
- 2025 10:45:35 +0000
-Received: from IA1PR11MB6241.namprd11.prod.outlook.com
- ([fe80::7ac8:884c:5d56:9919]) by IA1PR11MB6241.namprd11.prod.outlook.com
- ([fe80::7ac8:884c:5d56:9919%4]) with mapi id 15.20.9366.012; Thu, 4 Dec 2025
- 10:45:35 +0000
-From: "Rinitha, SX" <sx.rinitha@intel.com>
-To: "Korba, Przemyslaw" <przemyslaw.korba@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Korba, Przemyslaw"
-	<przemyslaw.korba@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "Keller, Jacob E" <jacob.e.keller@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-net] i40e: fix scheduling in
- set_rx_mode
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-net] i40e: fix scheduling in
- set_rx_mode
-Thread-Index: AQHcWhaI1xImEpawsU6Swtx6Ts2T0rURYH7w
-Date: Thu, 4 Dec 2025 10:45:35 +0000
-Message-ID: <IA1PR11MB6241405E6A2409EB1490BE2B8BA6A@IA1PR11MB6241.namprd11.prod.outlook.com>
-References: <20251120120750.400715-2-przemyslaw.korba@intel.com>
-In-Reply-To: <20251120120750.400715-2-przemyslaw.korba@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA1PR11MB6241:EE_|CO1PR11MB4819:EE_
-x-ms-office365-filtering-correlation-id: 8ee8d712-06be-406b-428d-08de33224179
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|7053199007|38070700021;
-x-microsoft-antispam-message-info: =?us-ascii?Q?Ko3P0IezE4C09ntVkI09UlDrdXB9yPD+GXo0I6Ada7iLTa9nLV/Mj5s4V1WV?=
- =?us-ascii?Q?GlYkwD1QMNC+lPHzMBdSl/d5wmlSFj5MliV2v2FG7V3CmnPnhSgcaxfazOfX?=
- =?us-ascii?Q?vtipYHQqPFyCkJQ0bXcRvREGxkzAUkMvV+w9GRekABuF/wjexWI6SCS443Tc?=
- =?us-ascii?Q?503JCY7Yn5dMvtSTrgIAPmY3XG9HWsNKEx62eVk+el+1y+KClbnpdHES9wKQ?=
- =?us-ascii?Q?nC/JJkZ/kPHMiP2D0g61Jzm8+EWCjLP5bGAqXCRenlYCh08TRyFepUGpODRR?=
- =?us-ascii?Q?SzE6t7WWXRp2xSSrq3wtVwSSy8ml27+MaTu/nTumC4UzbiJW5TcHiayWpJq8?=
- =?us-ascii?Q?kwL08PW/7gdDepNBxAxHAGc2QFXvzkx/BMYg3E6Ij9elSUUG/ikn8oAXWKKQ?=
- =?us-ascii?Q?GbyxFwfSHHRbVoNuAmUJi4NLU8/ibMwKCKAcgU0oXBNyHpldFzl1BQ+43jPH?=
- =?us-ascii?Q?PmwZ5jpr1H4lI6pt+uRpkZAF+Lxmaesvhs4AwHW2zZ5r3AqQ3tlC9ZDf/t4G?=
- =?us-ascii?Q?xt2lRnvm9lXgN6/2sCbF4YopQJyqJPdkxp5TRrgfE11NkMy32oLGfJSvrTGR?=
- =?us-ascii?Q?94O1lmaOUzF9Vg7b7hfhKeNm1v7iq86YelJS+tzs7tSKS5PMYI462a9JOEuu?=
- =?us-ascii?Q?5MgCFCKOEgubObooG68er/slsOOxEwtdWwvtGUVD56cI0ljyUFUZhAshMAXX?=
- =?us-ascii?Q?ksHjN71eWaOkzYoMMerrwQ/zs1fuTtQDOpfdoEQpPEOI1gxrSMo9RvcYJ0lE?=
- =?us-ascii?Q?OWB2URyNTctDlgziYbB+Khl2RK9lI7acfHUoJy7UA0NcZen0POgQyOpZsMOu?=
- =?us-ascii?Q?nf7PRNDNpwtTT54WbbXQLg8yb0UPeI713+eQ1uR3lCNCMbgTrMFQFyoSoR8e?=
- =?us-ascii?Q?8twABZInDOR/ygJiwIJuBzrpgOeOTRrH5YieubW6rEyOHE94QL9gmv0wzWcv?=
- =?us-ascii?Q?T9S5JLLOWKjPrcNltwvLQCHE1L91JEdIIyGAIJH8hAn3xxaTePC95EFdlz/j?=
- =?us-ascii?Q?Fu9rNVK1yPeFv+w36BFjDNQYsA8EUSwIMl+2iqWakN8IFjWe7jh2WlK38UBb?=
- =?us-ascii?Q?fNz81HpwD4QXPnoMq7kZ0xbGxlEt+zWeOGI5E+mXyKzeuzwdfXks8WOaLNPE?=
- =?us-ascii?Q?3cV5eHm0ID36LqEEuUemb4cuAy9p5+OdKpyj+Fhn+hja6iSRf0dsypJaabgT?=
- =?us-ascii?Q?+mMONl2Rk1o1RF2b8zrKcUzD4QDk+d2L96rvfGHMy8mJ0X3QiadXGhY7FgXI?=
- =?us-ascii?Q?u3WiU9/yOFPOYx0jYsnAHW49MLbRylHVpAeA8dJ0EHqDO7+QlECOm2Tf58xb?=
- =?us-ascii?Q?wXO7PK60t6N4DFIKZluPGx+EzPD3XebGszBC/2NdIJ8kBdf5mRMr2sirvzpy?=
- =?us-ascii?Q?cbmLSr1qNZQQ8ILXSVDY3dfZ4kD7MtpXdxeW5LYommecllEiIg4XWp1DO+Ks?=
- =?us-ascii?Q?DK2q4M9r2sl2+0QWoohvDhRQISC4LAhipXfBntysLiRyR6MlFcECCHdMDIAn?=
- =?us-ascii?Q?Fi86BjyNmkQJQPc/6fFp0yiUsDIC1IEiy9nq?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6241.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7053199007)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?gte5yATnxTYe7Se0TziNO2cN03RznWRSRQJlmeLrRWClgNJQsqvrB6S+Fwyc?=
- =?us-ascii?Q?fO/GBt+ndd8oAHHyzuNGXmPtyS5b7NEXAQOJCMiQErZYH8CB9/nBiSXK00e5?=
- =?us-ascii?Q?hawUQ8ZzKgmdX3rMIQT61XWbYm6i7QNL9njc17ajNW5kERN2RN9epUZK5nLK?=
- =?us-ascii?Q?Mb9QDIS01v76YXHviwB0vfgFcM73tg54PoUz7PqEd3Ly0jsxSxwNxZKDwCJB?=
- =?us-ascii?Q?wKffoo7lBypxaPCdzgOMTmqFNg9psOaT+IQYSaOd1w4+MsrCOLMLLpGeXkJh?=
- =?us-ascii?Q?uCXTIS5O9gggJd+pdS3paMovDzgQHqn5v/4GfP2lWYe8XNcfR3Q3dev9gISe?=
- =?us-ascii?Q?J8WNOJ4M0HSFaujvA62l/95IKvq8ufNceXOFv/yhG6JWsheOB//Wk9EtWcts?=
- =?us-ascii?Q?l0DSKYwJiAJ+Mc8ECrKwdRKZVE7k0BDAt0kpwXAYxY1FRQgY4VhMG62OK19h?=
- =?us-ascii?Q?tc9cpZXu7rezxpqTuZd7a5b/mHIoRjJFUvILb2XeVEKOl2cICTxgXFwTvcQK?=
- =?us-ascii?Q?SimMX578vPjKbGnhlAI/T71m+iqhV20wNMOG6FdRpHvVW+6Nt80lbl+nDvM2?=
- =?us-ascii?Q?WJn00ZKZHVfuth+kp8heD3HHsxPrpvaQnd2JDNv3XakjBSEK8yGkG7VyMSvA?=
- =?us-ascii?Q?Cbb4IBnjaw3RO5eGdUd6lTW2TfUOz1X4SV+rlXRsyZhVOtvIHMVRWoiubGew?=
- =?us-ascii?Q?nRWsz9CkbmyRTXY9ag+hpDPozA2f6QQp1mol2sBP+rswkadMhvqLFD3GIC6Y?=
- =?us-ascii?Q?hB4f4HPNbj38Ih2eJ77bxsoLmyCHnVOQM66W+dsNOFlDOcLyPfUWTz7MqojR?=
- =?us-ascii?Q?fW/ZV8WtAT9VZJY3CrjMGGOWA6goDB2QStGEx1Bkwb8xdny89vYsIteVa1qM?=
- =?us-ascii?Q?8Xm5QP106UJIBpcuiByNBk6I+iRMrUtoLhXXF83v6QQPYdmSG7l4u2zTQKlM?=
- =?us-ascii?Q?kwPdLwT9/G3Hy+4XAygNLxHgquNc21Mrc+O6GoYNR3SQoHm2ZNEFfGlU1hLM?=
- =?us-ascii?Q?JvtDh+eqKeEnBFJUL3i7117aRz/sBkXsKLTX7GC/Ax0K57Bbf8sckK/SBLh4?=
- =?us-ascii?Q?JELI0AtggdVS1r09oLXqFgX3XtMs+QhMlVNVA+cy1RTAj/5Y0/wm6AorNm9a?=
- =?us-ascii?Q?EdtzsL8Ekm8Cij7Z0n/iGNfeZxUIlsNeKxsumUl6EO591KfOe+ukLU8Y3Xc/?=
- =?us-ascii?Q?gz6VwJBzdVf963yPvN19PFkZbxy8HY4OzodO6aKnkBwlUCx7s1iX/oSl6z9w?=
- =?us-ascii?Q?uNyEoAR1lL+KbviCapsQjPd95ppW+LgjfCR7pLvyI+ax5RIIJibeWoR/bG1R?=
- =?us-ascii?Q?POFRn146EqXL37xQZ+umrXkdlQ6O0H9auXnd4MFS6bH39XItpKkvlBxY6a/q?=
- =?us-ascii?Q?o6mItzGS5Or3vXsMUQoPROmaYBb3NSCg+ZU8rtwaLL1zBZRxn4Y9FFsv4e68?=
- =?us-ascii?Q?vRTkv6QiZwbYY111DwA31/gEuS3hyjpQnfrIUOvc83VxTt4wcRhEAsFjqrfd?=
- =?us-ascii?Q?KU25bkb5qHMfRlb4P+kgE7csgRIJClZhL5azdo6YF1xwzILKsVuUO+ciIZ3O?=
- =?us-ascii?Q?hxKFTC1E2zoDu6F5ZFHvI//VV26SKlGt9C20R/8m?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE473321DC
+	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 10:46:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764845185; cv=none; b=JE8a7MawIVMCuc4cJfzj7ZdIJ0RByNpUYBstHe1DSKk8Ib8KedtortSsLOLmjNl95VKVwxk+9PXKmdSIRb+FHX2sQ+8hbt4N1DUFuVL8bz3WAn0tv0h8zdHnh9BP/mJFQVSxUItQDfJCB2d73oNnyjyoEPWomgSh6AY4lwJRcGk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764845185; c=relaxed/simple;
+	bh=FrbGLv+F0gzsFKrnZ3OWHoRncChf1UxHba8noKPDClE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dNSNd9JUvFar1sBtpqI4j0UtEH1SE6NOcRkwYEMy5wl3vsPhpru1kMPeqEp8FB0epF/5e66wA813/i8/ZCdK2GAfVYcmoUdjKPoviwdwH8RjeWRYADlQ8Hd7SNa3x6Ll1PdGw38LdzPVSsFZY/Gqn8UVrvpqiH+6A/tQOsohYvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=E9ncN5L6; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-42e2e6aa22fso379516f8f.2
+        for <netdev@vger.kernel.org>; Thu, 04 Dec 2025 02:46:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1764845182; x=1765449982; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=I25txm5sVJExHNkl83s3lOJ0pwVYA1Itpf3THdriA+I=;
+        b=E9ncN5L6Y6P9bkyoeGwqP7NHYghUwSy7tLeLMzOK/3WmAJYMAp2L5ORUa0v1/05htI
+         9/eML7QzVbh7zjgAHSO52VHcd3yRcl7d70fGUYxPGyDS7cm2pmMqbSC/h3IFa0ej6fOa
+         U3z6Sk30ybDjSgQ8HHIgwksAJourwglXKUSJE/OjNyLC50fbvCjtQse7Ju6gaM5KCo/E
+         KXpxR3zd5lKsvek7AgS1nFYgsPPp1PgeH2ZU/3DaFXx/uQD63UW8BwYa3h4iG2fbQ7AL
+         +bHKSt1jDhE/S2t84+A7fOgipoFBYqSDb/SH062OZX+WTziyYMrK94/fLLXWDPwK8MeC
+         rMaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764845182; x=1765449982;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=I25txm5sVJExHNkl83s3lOJ0pwVYA1Itpf3THdriA+I=;
+        b=uoot6Bevn3tU4ycGVJkJdow6kqR/rxjjvHHGnd20rpqqrLcKf12yqcCdvg5Ti7s9BM
+         n42I74e2JDdSz5Lnp/hLb7PRITmIHfnEfVlzg6cW3EfrI+OD0fARI4Mqvr+NTP9o6JIL
+         QZIRAjifq2nO/jNQCNIE1Tj4yWUNWmjsibEN55PlD/0RrVJ35xMKAlII5dXYhPOySVeJ
+         TtgfFI7S/qd6ix2y0tnNT1by66i367tZMBSlakDo9VVK53i8BTfTnj2WoRVaeUVdye3i
+         0n5ARvlg9aH71Nn19oOnbRRUFgub1vt4UqY7QsXm7HlFjTcYh8GwGM+eExRdpBIvQs9D
+         ENNA==
+X-Forwarded-Encrypted: i=1; AJvYcCWqmks29HkEkRpnW47NesMMItF7xvK2POHvz5ce37aNmvqUe5RQIv2EQhKl6FrhtlF2S2nfi7U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkZTGufVX1OW9sF6O9EZ0aWush/We47bLIzuB8DTE/t6RvAF+f
+	LoSIoyt5Q4+G6f/aSfwic2FwOjLYn5Yg1Y3YS3RPLbvbslNtnYiHNTUeOZlN/b1ae0o=
+X-Gm-Gg: ASbGncvTcKbTgIz/fWCkmiRaHafZASF8Oo8AhyeQZhEvBCCDRLBeN+qicTTZdHq6zS1
+	QNG3a5VhwGGuKmLMTML8lF5BxIQUdAfy8EOLX5r+ElOJHrAf6y5GNJ8aWjm7In4vdHGAWo2LE9x
+	dr5VsE1QtKoVLQjdsFKBNVTquggDhItTh39kB1GAVk0oDaI6mMUjvWEvvS/cUbENLg4GcYbMOro
+	m4m//8adD4GtzJbDiEKEHtetwzatNDW15GylL9Dx8y+ToXibfvurmOrL7AA4Y6yQ4hJAHwpLbuq
+	akwI4uDPDvTHETtUU659bPkfQjrf18wxfiDdpzu3CL1weGMAnZ6X5j9DgpUzTooMGeYXymN4V/r
+	Uh6ED/lBT+Ajbh2yKXCB1Aic+2gCWqglRBnWW7FBljBaxYW5uYzFgDL+PUxDC6/9QDDiFxzhaT8
+	lvRdaQLePn+fWo0LSrxFyzWhmN
+X-Google-Smtp-Source: AGHT+IHsO7lvt5Ss20b5pix2R/jr/E2Ef5Zq97My82ARiw2BH/h2CLSdatJZT3/30ySC6bVyoLOZHA==
+X-Received: by 2002:a05:6000:144c:b0:42b:3bc4:16dc with SMTP id ffacd0b85a97d-42f7980cc8dmr2648512f8f.21.1764845181638;
+        Thu, 04 Dec 2025 02:46:21 -0800 (PST)
+Received: from pathway.suse.cz ([176.114.240.130])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42f7cbfee50sm2565501f8f.14.2025.12.04.02.46.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Dec 2025 02:46:21 -0800 (PST)
+Date: Thu, 4 Dec 2025 11:46:19 +0100
+From: Petr Mladek <pmladek@suse.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-doc@vger.kernel.org, gustavold@gmail.com, asantostc@gmail.com,
+	calvin@wbinvd.org, kernel-team@meta.com
+Subject: Re: [PATCH net-next 0/4] (no cover subject)
+Message-ID: <aTFmew5trILX3RpO@pathway.suse.cz>
+References: <20251128-netconsole_send_msg-v1-0-8cca4bbce9bc@debian.org>
+ <20251201163622.4e50bf53@kernel.org>
+ <4oybtunobxtemenpg2lg7jv4cyl3xoaxrjlqivbhs6zo72hxpu@fqp6estf5mpc>
+ <20251202102442.568f91a7@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6241.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8ee8d712-06be-406b-428d-08de33224179
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Dec 2025 10:45:35.2900
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: OE95QLbLLAVDOsWBq1aH1DcyeAlUJSkEv+6D10ZlDTU5BjhANz7W0XHxHM5y2U/sZ8Hy66vipaT95qqfnrXZGg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB4819
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251202102442.568f91a7@kernel.org>
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of K=
-orba, Przemyslaw
-> Sent: 20 November 2025 17:37
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: Loktionov, Aleksandr <aleksandr.loktionov@intel.com>; netdev@vger.ker=
-nel.org; Korba, Przemyslaw <przemyslaw.korba@intel.com>; Nguyen, Anthony L =
-<anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw <przemyslaw.kitszel@intel=
-.com>; Keller, Jacob E <jacob.e.keller@intel.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-net] i40e: fix scheduling in set_rx=
-_mode
->
-> Add service task schedule to set_rx_mode.
-> In some cases there are error messages printed out in PTP application
-> (ptp4l):
->
-> ptp4l[13848.762]: port 1 (ens2f3np3): received SYNC without timestamp
-> ptp4l[13848.825]: port 1 (ens2f3np3): received SYNC without timestamp
-> ptp4l[13848.887]: port 1 (ens2f3np3): received SYNC without timestamp
->
-> This happens when service task would not run immediately after set_rx_mod=
-e, and we need it for setup tasks. This service task checks, if PTP RX pack=
-ets are hung in firmware, and propagate correct settings such as multicast =
-address for IEEE 1588 Precision Time Protocol.
-> RX timestamping depends on some of these filters set. Bug happens only wi=
-th high PTP packets frequency incoming, and not every run since sometimes s=
-ervice task is being ran from a different place immediately after starting =
-ptp4l.
->
-> Fixes: 0e4425ed641f ("i40e: fix: do not sleep in netdev_ops")
-> Reviewed-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
-> ---
-> drivers/net/ethernet/intel/i40e/i40e_main.c | 1 +
-> 1 file changed, 1 insertion(+)
->
+On Tue 2025-12-02 10:24:42, Jakub Kicinski wrote:
+> On Tue, 2 Dec 2025 02:18:44 -0800 Breno Leitao wrote:
+> > On Mon, Dec 01, 2025 at 04:36:22PM -0800, Jakub Kicinski wrote:
+> > > On Fri, 28 Nov 2025 06:20:45 -0800 Breno Leitao wrote:  
+> > > > This patch series introduces a new configfs attribute that enables sending
+> > > > messages directly through netconsole without going through the kernel's logging
+> > > > infrastructure.
+> > > > 
+> > > > This feature allows users to send custom messages, alerts, or status updates
+> > > > directly to netconsole receivers by writing to
+> > > > /sys/kernel/config/netconsole/<target>/send_msg, without poluting kernel
+> > > > buffers, and sending msgs to the serial, which could be slow.
+> > > > 
+> > > > At Meta this is currently used in two cases right now (through printk by
+> > > > now):
+> > > > 
+> > > >   a) When a new workload enters or leave the machine.
+> > > >   b) From time to time, as a "ping" to make sure the netconsole/machine
+> > > >   is alive.
+> > > > 
+> > > > The implementation reuses the existing message transmission functions
+> > > > (send_msg_udp() and send_ext_msg_udp()) to handle both basic and extended
+> > > > message formats.
+> > > > 
+> > This feature (in this patchset) is just one step ahead, giving some more
+> > power to netconsole, where extra information could be sent beyond what
+> > is in dmesg.
+> 
+> Having extra metadata makes sense, since the interpretation happens in
+> a different environment. But here we're talking about having extra
+> messages, not extra metadata.
+> 
+> > > The 2nd point is trivial, the first one is what really gives me pause.
+> > > Why do we not care about the logs on host? If the serial is very slow
+> > > presumably it impacts a lot of things, certainly boot speed, so...  
+> > 
+> > This is spot-on - slow serial definitely impacts things like boot speed.
+> > 
+> > See my constant complains here, about slow boot
+> > 
+> > 	https://lore.kernel.org/all/aGVn%2FSnOvwWewkOW@gmail.com/
+> > 
+> > And the something similar in reboot/kexec path:
+> > 
+> > 	https://lore.kernel.org/all/sqwajvt7utnt463tzxgwu2yctyn5m6bjwrslsnupfexeml6hkd@v6sqmpbu3vvu/
+> > 
+> > > perhaps it should be configured to only log messages at a high level?  
+> > 
+> > Chris is actually working on per-console log levels to solve exactly
+> > this problem, so we could filter serial console messages while keeping
+> > everything in other consoles (aka netconsole):
+> > 
+> > 	https://lore.kernel.org/all/cover.1764272407.git.chris@chrisdown.name/
+> 
+> Excellent! Unless I'm missing more context Chris does seem to be
+> attacking the problem at a more suitable layer.
 
-Tested-by: Rinitha S <sx.rinitha@intel.com> (A Contingent worker at Intel)
+This would help to bypass slow serial consoles. But the extra messages
+would still get stored into the kernel ring buffer and passed back
+to user space logs, for example journalctl.
+
+I do not have strong opinion whether adding the
+/sys/kernel/config/netconsole/<target>/send_msg is a good idea or not.
+
 
