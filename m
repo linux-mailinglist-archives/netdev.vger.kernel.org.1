@@ -1,159 +1,237 @@
-Return-Path: <netdev+bounces-243508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF80BCA2CE2
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 09:26:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D4BB5CA2D00
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 09:29:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1600530F03CA
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 08:22:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A5AFA3058E51
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 08:27:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D6DA33372D;
-	Thu,  4 Dec 2025 08:22:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D83E33509E;
+	Thu,  4 Dec 2025 08:27:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b="eebi5r8t"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CDwPM5S0"
 X-Original-To: netdev@vger.kernel.org
-Received: from dilbert.mork.no (dilbert.mork.no [65.108.154.246])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C11B03321B0
-	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 08:21:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.108.154.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F9E330D3B
+	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 08:27:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764836523; cv=none; b=CAqEWEQT4oQ/kTrd1hkKZvMsFAasdtDNNXyiQWkXhyhlDMgYiJLQ5OsbPpMELg8nmi7a3fUDYGmGs+/xJaLrVG3IsJ/CnKOyo3ufbRA3Zj2324LIzwpkQ27Mf62g4u+u5BMpJGLU7LhBu8EljGyAlFqCyjNIW1A+KZ90caolpCw=
+	t=1764836849; cv=none; b=Bi3pgCySdTigfidvxYxqnWVtefwJJH5bf2wxMwE6TbL1K1PipTwlqaBu2sEnFmmVIfj8f6T3HdcjowI6UeO6WvMMmzjZ6Kor3emMvCk2bEeP3apcm3pWDtHs7KY4T1C/GTC4kGbcCnUTAEkKSkv92gGH6rx2YkM0uv3UaKau+RQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764836523; c=relaxed/simple;
-	bh=2X6lw2n+LbAnJzEAELTikYXi0+ET+Y+lUnw5yNaBnI8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=g0HYfu7r6ohf23EDZEfF1hcldpj42+s8UeHuUfBswg/9T4CfqoBfYGVHVaGf+UdmSaMkSQoP0mR3XFOQEML6Uvy2yWK85MoaLOobnbwdO/m/l4CKErQupqgjrOO/dc7WVflcRPBea+/oTT6gWtF/UgZ5wQgtidAvrZXea1vT+k0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no; spf=pass smtp.mailfrom=miraculix.mork.no; dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b=eebi5r8t; arc=none smtp.client-ip=65.108.154.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=miraculix.mork.no
-Authentication-Results: dilbert.mork.no;
-	dkim=pass (1024-bit key; secure) header.d=mork.no header.i=@mork.no header.a=rsa-sha256 header.s=b header.b=eebi5r8t;
-	dkim-atps=neutral
-Received: from canardo.dyn.mork.no ([IPv6:2a01:799:10e2:d900:0:0:0:1])
-	(authenticated bits=0)
-	by dilbert.mork.no (8.18.1/8.18.1) with ESMTPSA id 5B48Le232613890
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Thu, 4 Dec 2025 08:21:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mork.no; s=b;
-	t=1764836500; bh=/HjBbQNs/+0N2sNMVYre5zf3eSKB8FE/w+r++Jr3mvw=;
-	h=From:To:Cc:Subject:References:Date:Message-ID:From;
-	b=eebi5r8tdGSWg2dgJwxKfaiIxq8lFy1HmwFUArRQuzNBxLinZ/CHwI5t3OMT6WQGp
-	 HeZCXN8hASfMtmspanu1cdxLqunSus1QM5Hx83WH1j3B9XnPK4EdU0vx9pCPyiS0l4
-	 NrscPy7ciLMjlU370NEhAA3Q9jlBAZ9Y4VY+PBZk=
-Received: from miraculix.mork.no ([IPv6:2a01:799:10e2:d90a:6f50:7559:681d:630c])
-	(authenticated bits=0)
-	by canardo.dyn.mork.no (8.18.1/8.18.1) with ESMTPSA id 5B48LefO851748
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Thu, 4 Dec 2025 09:21:40 +0100
-Received: (nullmailer pid 1797309 invoked by uid 1000);
-	Thu, 04 Dec 2025 08:21:40 -0000
-From: =?utf-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, "Lucien.Jheng" <lucienzx159@gmail.com>,
-        Daniel Golle <daniel@makrotopia.org>
-Subject: Re: [RFC] net: phy: air_en8811h: add Airoha AN8811HB support
-In-Reply-To: <20251203232402.oy4pbphj4vsqp5lb@skbuf> (Vladimir Oltean's
-	message of "Thu, 4 Dec 2025 01:24:02 +0200")
-Organization: m
-References: <20251202102222.1681522-1-bjorn@mork.no>
-	<20251202102222.1681522-1-bjorn@mork.no>
-	<20251203232402.oy4pbphj4vsqp5lb@skbuf>
-Date: Thu, 04 Dec 2025 09:21:39 +0100
-Message-ID: <87sedq4pyk.fsf@miraculix.mork.no>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1764836849; c=relaxed/simple;
+	bh=+mJapQUcgIG/gMfIXcsKANm2CElCwdjZuVxCtHLEwxY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dvOFQGBNDLfuRO3gqvHcSXDkEz2uYodpoAsxCZYJzPzXzP1zi/p8+ASGWrw8edvvAnG9ClN/Hcy7G7LdqaVtC5fER/aqDFV9+3rzDnySRodsHv84bd71ciywOoULzMA5gy56nbRkK/XvrMXg1yXPBj3/Wk0GXTE23ldVl6r/HnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CDwPM5S0; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-42f762198cbso408584f8f.3
+        for <netdev@vger.kernel.org>; Thu, 04 Dec 2025 00:27:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1764836846; x=1765441646; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kk4Me8kGllHr/VDwvtsYkc5klFKItoxmBTnZhaBfwbM=;
+        b=CDwPM5S08fh9JhPXyvVPbvm2Pw9U39wGIKSNwVHgCsQAXg9PMLSSZuqMYQvvNSC3I8
+         UBgFCo12qkaz9VnC4HsBIcqfXy7KpXGvFMg+AyLWTXS3pmr5LTF7oJ1t+2AfaybgjiGK
+         n7HBboT9VvquQlMaSxJyN04HtIi3LaG8wf/ubSYSzrS3mqJjzKa0rtrRNKxVtgePjKnf
+         Ub3cECCfVs7KvxyNhf+MXV8rFFUpOGzLyd6SDAxy8HMR2hOk3fMN+9mUqlWtOkFipTIk
+         QtkPp9+NRsy34tSog+hGmJupf/fUSr97qPtNoYPSzcQEz9uvkXiHdvjUeqrgLK8gnL+X
+         i77A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764836846; x=1765441646;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kk4Me8kGllHr/VDwvtsYkc5klFKItoxmBTnZhaBfwbM=;
+        b=D9MNsw7qTatBHYB1yErPtrwwFwae4pQWXulfkth5VVRpcuPLauLG4nXhJX1ymxtUkG
+         8Ult63iw3ncHnf5q+jvbqkxf0Ag4zrIYyT+wBmQnc8k8UPjcqvvpqvYZG0DPqWxc0IDV
+         7afXJ5tq6ztBcW6nHNBIaC2hIqmbxKctafaK47Y0uUlfUZpUfpoTeSnHYhz7n21Jqd47
+         e22o28pXsLuDKZWDNUDflNPEMbRfDNYD2DJ7ysvYwuWjRLu/Bzygvz1y7eoNWg8CHCTw
+         LNtfMQjzuBPkkGuwuhg+nWLFJa6Ug2qoIyAnfn9aN0jnwFDh7qflhc8lzCLWe8hP/HXf
+         lYQA==
+X-Forwarded-Encrypted: i=1; AJvYcCWgGR/Me2WE7ME3eHQP1sjKK7Gy3tes3FWBTV2k0Ydodq2VSISPvwO7k2l+m5KyFdu9T78wbDM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrYtW7s4uCQRd45knU43ZAmOmGyu2jJ+kgfuftw/MDvN/RWOcA
+	aQj3k0osPUegllizDAF6bI8O5U+i+oUIU31imtTVQWpFoxvt74rk2C7q
+X-Gm-Gg: ASbGncuL9+e8jydQqY/xZDynIY1xylE9WA1ePJmrnO+nyrRs29aLlnpAH8EEwZ+F7Pl
+	fkMLIVSAy0lOJz23X5Phbba7r4HDUSCGPb8bIQU5L5tUszSTbHp2M2XgS4ib6CYNQVdzbf6WgLv
+	61CZT2rZ+yj0W3yNaSLDal1lFFRUVrnK+hpLOu+d4hIq27/oPfZ9OigNk9f7ntwG2Qp8tHEhHxK
+	mYKLM9UdwbrXJhtPDpu3B0ay1H+0vezvM48C+r8nDwcsbGvXHLDk9BXJfBb5XzedLrhG94rUKSh
+	9vE+WIA/xKuWURcP/a1nWmBYZJSjaiopUy2oxFZBOn34uXUUr8f1jU/hLdbiznpcDkLk/CqW1Rx
+	D2fkR9QuRQzMGXBK/sCD1bqy6Dr+SdY6XTui7upWq1gSlg+3uQhhFfxk7mXBEt4hGos4N8mpOHK
+	DU8WBYFwEZI/SujjU1hc9GAmV0Qt/SJzs4hSw=
+X-Google-Smtp-Source: AGHT+IH0YMI90ZQb6ct+nat8DtXdZsUN3AYv/eA+GemdRzLIQywet3ITexoNTtRP65Z6ow9GuR0Ipw==
+X-Received: by 2002:a05:6000:24c6:b0:42b:394a:9b1 with SMTP id ffacd0b85a97d-42f79841510mr1872635f8f.37.1764836845435;
+        Thu, 04 Dec 2025 00:27:25 -0800 (PST)
+Received: from [10.221.198.188] ([165.85.126.46])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42f7cbe90f0sm1864164f8f.9.2025.12.04.00.27.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Dec 2025 00:27:24 -0800 (PST)
+Message-ID: <825efa1d-363a-4e82-8dc1-d7520c413414@gmail.com>
+Date: Thu, 4 Dec 2025 10:27:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Virus-Scanned: clamav-milter 1.4.3 at canardo.mork.no
-X-Virus-Status: Clean
-
-Vladimir Oltean <vladimir.oltean@nxp.com> writes:
-> On Tue, Dec 02, 2025 at 11:22:22AM +0100, Bj=C3=B8rn Mork wrote:
->> @@ -967,32 +1157,61 @@ static int en8811h_probe(struct phy_device *phyde=
-v)
->>         return 0;
->>  }
->>=20
->> -static int en8811h_config_serdes_polarity(struct phy_device *phydev)
->> +static bool airphy_invert_rx(struct phy_device *phydev)
->>  {
->>         struct device *dev =3D &phydev->mdio.dev;
->> -       int pol, default_pol;
->> -       u32 pbus_value =3D 0;
->> +       int default_pol  =3D PHY_POL_NORMAL;
->>=20
->> -       default_pol =3D PHY_POL_NORMAL;
->>         if (device_property_read_bool(dev, "airoha,pnswap-rx"))
->>                 default_pol =3D PHY_POL_INVERT;
->
-> I think we can discuss whether a newly added piece of hardware (at least
-> from the perspective of mainline Linux) should gain compatibility with
-> deprecated device tree properties or not. My concern is that if I'm soft
-> on grandfathered deprecated properties, their replacements are never
-> going to be used.
-
-Wasn't sure about this.  Now I am :-)
-
-I'll drop the deprecated properties.
-
->> -       pol =3D phy_get_rx_polarity(dev_fwnode(dev), phy_modes(phydev->i=
-nterface),
->> -                                 PHY_POL_NORMAL | PHY_POL_INVERT, defau=
-lt_pol);
->> -       if (pol < 0)
->> -               return pol;
->> -       if (pol =3D=3D PHY_POL_INVERT)
->> -               pbus_value |=3D EN8811H_POLARITY_RX_REVERSE;
->> +       return phy_get_rx_polarity(dev_fwnode(dev), phy_modes(phydev->in=
-terface),
->> +                                  PHY_POL_NORMAL | PHY_POL_INVERT, defa=
-ult_pol)
->> +               =3D=3D PHY_POL_INVERT;
->
-> The idea in my patches was that phy_get_rx_polarity() can return a
-> negative error code (memory allocation failure, unsupported device tree
-> property value like PHY_POL_AUTO, etc), which was propagated as such,
-> and failed the .config_init().
->
-> In your interpretation, no matter which of the above error cases took
-> place, for all you care, they all mean "don't invert the polarity", and
-> the show must go on. The error path that I was envisioning to bubble up
-> towards the topmost caller, to attract attention that something is
-> wrong, is gone.
-
-Right.  Sorry about that.  Tried too hard to factor out the common
-parts.
-
-Will drop the refactoring. and implement error handling for the new chip
-as well. Will be cleaner anyway without the deprecated properties.
-
-> It's a bit unfortunate that in C we can't just throw an exception and
-> whoever handles it handles it, but since the phy_get_rx_polarity() API
-> isn't yet merged, I'd like to raise the awkwardness of error handling as
-> a potential concern.
->
-> You could argue that phy_get_rx_polarity() is doing too much - what's
-> its business in getting the supported polarities and default polarity
-> from you - can't you test by yourself if you support the value that's in
-> the device tree, or fall back to a default value if nothing's there?
-> Maybe, but even with these things moved out of phy_get_rx_polarity(), I
-> still couldn't hide the fact that there's memory allocation inside,
-> which can fail and return an error code. So I decided that if there's an
-> error to handle anyway, I'd rather push the handling of unsupported
-> polarities to the helper too, such that the only error that you need to
-> handle is in one place. But you _do_ need to handle it.
-
-True. Much, much better to return an error from driver probe than having
-to debug arbitrary polarity mismatches..
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/mlx5: Fix double unregister of HCA_PORTS
+ component
+To: Farhan Ali <alifm@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Shay Drory <shayd@nvidia.com>, Simon Horman <horms@kernel.org>
+Cc: Lukas Wunner <lukas@wunner.de>, Bjorn Helgaas <helgaas@kernel.org>,
+ Niklas Schnelle <schnelle@linux.ibm.com>, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-pci@vger.kernel.org
+References: <20251202-fix_lag-v1-1-59e8177ffce0@linux.ibm.com>
+ <99db437a-be91-4e85-a201-ec3a890900c8@linux.ibm.com>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <99db437a-be91-4e85-a201-ec3a890900c8@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
 
-Bj=C3=B8rn
+
+On 03/12/2025 23:10, Farhan Ali wrote:
+> 
+> On 12/2/2025 3:12 AM, Gerd Bayer wrote:
+>> Clear hca_devcom_comp in device's private data after unregistering it in
+>> LAG teardown. Otherwise a slightly lagging second pass through
+>> mlx5_unload_one() might try to unregister it again and trip over
+>> use-after-free.
+>>
+>> On s390 almost all PCI level recovery events trigger two passes through
+>> mxl5_unload_one() - one through the poll_health() method and one through
+>> mlx5_pci_err_detected() as callback from generic PCI error recovery.
+>> While testing PCI error recovery paths with more kernel debug features
+>> enabled, this issue reproducibly led to kernel panics with the following
+>> call chain:
+>>
+>>   Unable to handle kernel pointer dereference in virtual kernel 
+>> address space
+>>   Failing address: 6b6b6b6b6b6b6000 TEID: 6b6b6b6b6b6b6803 ESOP-2 FSI
+>>   Fault in home space mode while using kernel ASCE.
+>>   AS:00000000705c4007 R3:0000000000000024
+>>   Oops: 0038 ilc:3 [#1]SMP
+>>
+>>   CPU: 14 UID: 0 PID: 156 Comm: kmcheck Kdump: loaded Not tainted
+>>        6.18.0-20251130.rc7.git0.16131a59cab1.300.fc43.s390x+debug #1 
+>> PREEMPT
+>>
+>>   Krnl PSW : 0404e00180000000 0000020fc86aa1dc 
+>> (__lock_acquire+0x5c/0x15f0)
+>>              R:0 T:1 IO:0 EX:0 Key:0 M:1 W:0 P:0 AS:3 CC:2 PM:0 RI:0 EA:3
+>>   Krnl GPRS: 0000000000000000 0000020f00000001 6b6b6b6b6b6b6c33 
+>> 0000000000000000
+>>              0000000000000000 0000000000000000 0000000000000001 
+>> 0000000000000000
+>>              0000000000000000 0000020fca28b820 0000000000000000 
+>> 0000010a1ced8100
+>>              0000010a1ced8100 0000020fc9775068 0000018fce14f8b8 
+>> 0000018fce14f7f8
+>>   Krnl Code: 0000020fc86aa1cc: e3b003400004        lg      %r11,832
+>>              0000020fc86aa1d2: a7840211           brc     
+>> 8,0000020fc86aa5f4
+>>             *0000020fc86aa1d6: c09000df0b25       larl    
+>> %r9,0000020fca28b820
+>>             >0000020fc86aa1dc: d50790002000       clc     0(8,%r9),0(%r2)
+>>              0000020fc86aa1e2: a7840209           brc     
+>> 8,0000020fc86aa5f4
+>>              0000020fc86aa1e6: c0e001100401       larl    
+>> %r14,0000020fca8aa9e8
+>>              0000020fc86aa1ec: c01000e25a00       larl    
+>> %r1,0000020fca2f55ec
+>>              0000020fc86aa1f2: a7eb00e8           aghi    %r14,232
+>>
+>>   Call Trace:
+>>    __lock_acquire+0x5c/0x15f0
+>>    lock_acquire.part.0+0xf8/0x270
+>>    lock_acquire+0xb0/0x1b0
+>>    down_write+0x5a/0x250
+>>    mlx5_detach_device+0x42/0x110 [mlx5_core]
+>>    mlx5_unload_one_devl_locked+0x50/0xc0 [mlx5_core]
+>>    mlx5_unload_one+0x42/0x60 [mlx5_core]
+>>    mlx5_pci_err_detected+0x94/0x150 [mlx5_core]
+>>    zpci_event_attempt_error_recovery+0xcc/0x388
+>>
+>> Fixes: 5a977b5833b7 ("net/mlx5: Lag, move devcom registration to LAG 
+>> layer")
+>> Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
+>> ---
+>> Hi Shay et al,
+>>
+>> while checking for potential regressions by Lukas Wunner's recent work
+>> on pci_save/restore_state() for the recoverability of mlx5 functions I
+>> consistently hit this bug. (Bjorn has queued this up for 6.19, according
+>> to [0] and [1])
+>>
+>> Apparently, the issue is unrelated to Lukas' work but can be reproduced
+>> with master. It appears to be timing-sensitive, since it shows up only
+>> when I use s390's debug_defconfig, but I think needs fixing anyhow, as
+>> timing can change for other reasons, too.
+>>
+>> I've spotted two additional places where the devcom reference is not
+>> cleared after calling mlx5_devcom_unregister_component() in
+>> drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c that I have not
+>> addressed with a patch, since I'm unclear about how to test these
+>> paths.
+>>
+>> Thanks,
+>> Gerd
+>>
+>> [0] https://lore.kernel.org/all/cover.1760274044.git.lukas@wunner.de/
+>> [1] https://lore.kernel.org/linux-pci/ 
+>> cover.1763483367.git.lukas@wunner.de/
+>> ---
+>>   drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c | 1 +
+>>   1 file changed, 1 insertion(+)
+>>
+>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c b/ 
+>> drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
+>> index 
+>> 3db0387bf6dcb727a65df9d0253f242554af06db..8ec04a5f434dd4f717d6d556649fcc2a584db847 100644
+>> --- a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
+>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
+>> @@ -1413,6 +1413,7 @@ static int __mlx5_lag_dev_add_mdev(struct 
+>> mlx5_core_dev *dev)
+>>   static void mlx5_lag_unregister_hca_devcom_comp(struct mlx5_core_dev 
+>> *dev)
+>>   {
+>>       mlx5_devcom_unregister_component(dev->priv.hca_devcom_comp);
+>> +    dev->priv.hca_devcom_comp = NULL;
+>>   }
+> 
+> Though this fix looks correct to me in freeing hca_devcom_comp (not too 
+> familiar with mlx5 internals), I wonder if it would be better to just 
+> set devcom = NULL in devcom_free_comp_dev() after the kfree? This would 
+> also take care of other places where devcom is not set to NULL?
+> 
+
+Setting NULL after the kfree will have no impact, it won't nullify the 
+original field, but the function parameter copy (by-value).
+
+devcom_free_comp_dev() and mlx5_devcom_unregister_component() get struct 
+mlx5_devcom_comp_dev *devcom to work with, they can't nullify it for the 
+caller context.
+
+
+
+> Thanks
+> 
+> Farhan
+> 
+
 
