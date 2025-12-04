@@ -1,225 +1,208 @@
-Return-Path: <netdev+bounces-243505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDF1CCA2BC1
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 09:03:01 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C87CECA2C3C
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 09:11:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5A8B430495CF
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 08:01:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 56D0E305DCCE
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 08:11:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D596D324B2F;
-	Thu,  4 Dec 2025 08:01:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 926B62FF142;
+	Thu,  4 Dec 2025 08:11:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="CUlxQ6Xq"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="fyRCOBpy"
 X-Original-To: netdev@vger.kernel.org
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010049.outbound.protection.outlook.com [52.101.85.49])
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECAE5322A1C
-	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 08:01:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764835298; cv=fail; b=KrVsB6vMzqMb5vfFJEKh0N07sKqUcASIrs2P2z2u7a1F/g3KUq8AhDl3CAS8gPqFqlQRuMUw4XBCC+8tyuyvHlaV8R7sYawMInam3M/cxQH7LHWQ0LJEv6/o0WDwGfXaHUQ/iotKKezVQ+c63pjt+H8KTRdJlwWFU+kMHmbkQjk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764835298; c=relaxed/simple;
-	bh=GzLMFRFay+aoAZtjOU46yp0leasB06u7TVUP8gvHwgk=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5C9A279DC0
+	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 08:11:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764835893; cv=none; b=bmPU9txC/47ApEnT92GYdSmelPFE49fdyNP96v0NzjFkCgeuRRDIZewnEQ4lPzBdcM09/hYESxClZKJXspVmNeDi8pInzo9VATCEZ4gcOSC2Ge+sCtz5wZo+CMYn5dp5ZyGGb8WeasipxSwJuZiAGUPl+1wSGqSfjP5T8Ch3MWc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764835893; c=relaxed/simple;
+	bh=DGXIKSWSyIMgUWpRteBTNa/XMA2SaRhyxSPqWU/ROVE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=baTAw+cO16VUlWLK7q7IwDTD0hIzo1PiXumzjfUTUmNPVzjVotbXw0YExQCgF5Xwu/X5Fb54gxbcil2UPLalMtVaOE98HrSBkcwT0OXtFIcCj9O81KHqyWmypSJMCxwLaqGLTLos7DdBLQL3szr5NAlsVNvnLYu8HBFLd8Uy4bg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=CUlxQ6Xq; arc=fail smtp.client-ip=52.101.85.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=vQuwOaObe3C2xvy54nVjciRFEz52PslXf4dWmegYsozm3NkEog/FSNc9Jn+J73cE0iyKxKzDmX/w6gtTGcUBl5RadFuxUOLS3nt2Seg0V+kU70tcRij7yAFLpqKCsOruMB897Dvu1ZzFkdJ1U0wBau1w2W+AHcSgddQ9cuL4iAdSTVLxVQ5UxTlrJSfWt0zqqPrcOzl2naWU19OUn447mae0Ud26LxfHphvjwd5SIcDhW2a4UEUw/Po+s0HXGJ8KowlH+RqK6XvxBu/OPhuFLk2aYrYgvTpoRTA/MOgWE1c3kXzLQS7Wx+DXU2anhxGj6bny/LpiCc49UzBMj/EP3g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3Oa8Q6bsv58zo/Og0m2mimEeXqwFSKTNTrj7dpFjEzo=;
- b=CfRlHU+NeiMdIj+JEB+UNkKGiXrakY6ZrsF5aRNJv3U1GO1EU4VRHmMH+hYJlTZUMndhrrwmrZjLHy13GtkPGevsCI7Ss3RjjHF28xZhryYIpJYz1LWvQf+R3u4occoMdltHtcfehkE9KeNBvGvitAtKwHPRe4J6+qBeHlb2mEWUiMH2tCIqO2gnDW+3vJ/uzeJEu8rPuE7QcLH1Uz9yrOpgB/Gtjm+dr49uuHcq23WzZF6elU2DJ93N1kE4heR1cSc05VK+BSXvyPwYgHYBIx2aCnrmb3+rzOpbbjrBYzTcFrbgt0dx/BKMlvGJxRRpvZTijzHktlHJAvj8cZ3I9Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=suse.cz smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3Oa8Q6bsv58zo/Og0m2mimEeXqwFSKTNTrj7dpFjEzo=;
- b=CUlxQ6XqjuT43WpGzFZfvIz6WkGBI7+cGI1E74Qj85S7b5vke6tsvp5KT2nK5buKsj53Xs8q+Bz1j6tcUU7IgJqCmNUaldeOHPhSGOK8NEj5TD1wkHw50BVixZv39No/6CEAlZ7nh2gg1mcuchJP04Dy4CufbElkp555GmTCCER4HU+xHLwmuoKiHDRDSj+ARlr4U43OP/NPLY7kmwVKob5j/t0kqz/IS/XS9XUBSG4sHWVjwCSNlNDuX76k8OgFQzxshlBad6VkjnyMDtveCI69UhUogMuR+3F/rKOu45Ve1iH6O4oZu/BztSlTkDK/GNWIe6zedAhhXe7rixu5gA==
-Received: from DM6PR11CA0003.namprd11.prod.outlook.com (2603:10b6:5:190::16)
- by CH3PR12MB7763.namprd12.prod.outlook.com (2603:10b6:610:145::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9388.9; Thu, 4 Dec
- 2025 08:01:22 +0000
-Received: from DS2PEPF00003439.namprd02.prod.outlook.com
- (2603:10b6:5:190:cafe::24) by DM6PR11CA0003.outlook.office365.com
- (2603:10b6:5:190::16) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9388.11 via Frontend Transport; Thu,
- 4 Dec 2025 08:01:23 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- DS2PEPF00003439.mail.protection.outlook.com (10.167.18.36) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9388.8 via Frontend Transport; Thu, 4 Dec 2025 08:01:21 +0000
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 4 Dec
- 2025 00:01:05 -0800
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail202.nvidia.com
- (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 4 Dec
- 2025 00:01:04 -0800
-Received: from fedora.mtl.labs.mlnx (10.127.8.11) by mail.nvidia.com
- (10.129.68.9) with Microsoft SMTP Server id 15.2.2562.20 via Frontend
- Transport; Thu, 4 Dec 2025 00:01:03 -0800
-From: Carolina Jubran <cjubran@nvidia.com>
-To: Michal Kubecek <mkubecek@suse.cz>, "John W . Linville"
-	<linville@tuxdriver.com>
-CC: <netdev@vger.kernel.org>, Yael Chemla <ychemla@nvidia.com>, "Carolina
- Jubran" <cjubran@nvidia.com>
-Subject: [PATCH ethtool 2/2] ethtool: add new 1600G modes to link mode tables
-Date: Thu, 4 Dec 2025 09:59:30 +0200
-Message-ID: <20251204075930.979564-3-cjubran@nvidia.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20251204075930.979564-1-cjubran@nvidia.com>
-References: <20251204075930.979564-1-cjubran@nvidia.com>
+	 MIME-Version:Content-Type; b=ru659an7BCuzwKQtVf8hr8REJOYzqtlGDBE38rx/RvK1h5ZbD7lUsYy56EW0oxSo6kUs4eUbZiNK8jYUGV04aN3dD4QJ7MshtIj+eRRjd6MfH3LApz2cXGLZD80ETvf20fUVFoaIlilBu8I53bw4LNufQRoWfEFuMc/v//HSeik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=fyRCOBpy; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
+	by m0089730.ppops.net (8.18.1.11/8.18.1.11) with ESMTP id 5B3LdC0f1273862
+	for <netdev@vger.kernel.org>; Thu, 4 Dec 2025 00:11:30 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
+	 bh=7MPRysJOVUlQ0qt4ZjKDZkV1oM9qOCbvfSMlkApW+X8=; b=fyRCOBpyWqyP
+	pBDCaTOxrpCvnqqVqsTqLm+lxA45vIOZYKgRCWBS/Wf5OlRNCU9IEfgYQkyNMKeY
+	itnmuci3XZV2jOLoDMcLfz9oWj3VRNgh/pGnMTffdyrhWYlDyCe6Cj7Cr93T5QKa
+	EaXOVlFVrXszqd/W4M0BjJLk0mah5bwjDHDB9GO4lPHROwNBcIMCsQ+ONNmn+dJe
+	s2uoO5Cm8AljACqgArqfZxPC2g69ERpwNDcpk2UC2WJ9C2wKUOQkGsxRivU4Ge7r
+	LPVi9b2N0xgSA2NFqECiLQn9l2Un+Ud2GyOIPg6MpOfZszhqHE5GZ7yI88dpGIj/
+	DB3uPNj4nQ==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by m0089730.ppops.net (PPS) with ESMTPS id 4atwadb8c4-6
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Thu, 04 Dec 2025 00:11:30 -0800 (PST)
+Received: from twshared13861.04.snb2.facebook.com (2620:10d:c085:208::7cb7) by
+ mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.29; Thu, 4 Dec 2025 08:11:26 +0000
+Received: by devbig259.ftw1.facebook.com (Postfix, from userid 664516)
+	id 9A8A4CD93C85; Thu,  4 Dec 2025 00:11:17 -0800 (PST)
+From: Zhiping Zhang <zhipingz@meta.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+CC: Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+        <linux-rdma@vger.kernel.org>, <linux-pci@vger.kernel.org>,
+        <netdev@vger.kernel.org>, Keith Busch <kbusch@kernel.org>,
+        Yochai Cohen
+	<yochai@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>
+Subject: Re: [RFC 2/2] Set steering-tag directly for PCIe P2P memory access
+Date: Thu, 4 Dec 2025 00:10:58 -0800
+Message-ID: <20251204081117.1987227-1-zhipingz@meta.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20251120131140.GT17968@ziepe.ca>
+References: <20251120131140.GT17968@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS2PEPF00003439:EE_|CH3PR12MB7763:EE_
-X-MS-Office365-Filtering-Correlation-Id: baeb0ce5-9733-4862-c274-08de330b5065
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|36860700013|82310400026|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?rRKOK1uQtyr0WcbELABxTNe+lPn1BBF/4wfaz/xPqualb31C+pM3tVmQiCnA?=
- =?us-ascii?Q?OX2cF+cT8lZ2qvHFliaJWe+8I00+NhwHbOyg1/8ezLz2gnrNr+1RLrY6tgpb?=
- =?us-ascii?Q?aXpzMKMvoK0ezwfGF5twoPieq9AolBtwqGDoUBYxpldLscJlpCv/Dx5EBLn2?=
- =?us-ascii?Q?fNzz23+tx/teO6PMrVuBqB9Pkd719dtFtqmG0BcwRgKyryk2NYmbyBmUV/L8?=
- =?us-ascii?Q?bkwtddUS7zq2opIZoN5REAibbELnz7NS4p0A4AivYEX93z+Zt5ZZEomepppR?=
- =?us-ascii?Q?H5BATeCP3LPI7W8UQ7Hq7dI65IRSob3Qhn2E9YoNh9pg0w/YYVvlUPyf5yQ5?=
- =?us-ascii?Q?wcLkyxsbSMKI6rtfENBl80r3elEYbNMruKVEMfb6aRzLZuUFr0x5WdLkM0Yc?=
- =?us-ascii?Q?I/cY+hg8BZdZVJ8Vb0pR+sacXlMflsqFFFy7V7jxe5nLUm5XtI2s6MAvynUu?=
- =?us-ascii?Q?0ee+j567+Q9mMynFDb3gWdxoJzO1yZ399I6FdtGCrt6OWAxloaJDBGvkjTUN?=
- =?us-ascii?Q?3UByg+lftI0JHrsP6dfWHZXvGziYom7P2LvieDYrgAgePjvg9nc+xryFXkSX?=
- =?us-ascii?Q?vs/ioFwntCpHVmom+ZnusuWkTFdmYcej1IJBFilA4zGR7WFeikHoT+DEDA5+?=
- =?us-ascii?Q?0XRdSC1faQYlCzq4po6pOvsDnh5NWGPihVQA+1MlbQ5+Wd/ay9zOP17JlrLS?=
- =?us-ascii?Q?SG0HAQLLkv039D5NY0j+nl1rVYsHfv/R84kvTP+ZtnSA8+UI37aOvuD4NHLx?=
- =?us-ascii?Q?d72eLkkcCQf1HQTHNsaZ2l24jHDRPzvbtYF72I3tY+W2LUFBjNJdnaH3rg6j?=
- =?us-ascii?Q?p+/bXgCNeSxfeiToPsd0pjw8tZ5y9+QIFdpm1i3YKhyXnjYXkx8KaCwUhuLU?=
- =?us-ascii?Q?7OceBRcqAPim4dQWn+kFw+1+G8y/+PU0FzNuf/rroDaSCzlKkypyjEsKYqnz?=
- =?us-ascii?Q?mJCihcScncremtkC2MxMYAwZ8mpiSsSis7dPvb4mKFn6efXGuBHHV8Y2gqrw?=
- =?us-ascii?Q?9ZRrXy/hBxQzfPdTizf7NmBhslID7tDou6hU5UEI9BtLf1g1zJP2i/5gwe3y?=
- =?us-ascii?Q?iPTVpAd26k0ueMNI1U01N0cVqQlFfrgns7OMAmoAQ9LJuaIMri18HUzf3OzF?=
- =?us-ascii?Q?FQ35zhdJj+r9d/22EqVcsaHrQ37uzEVPYHZag4iX08NvxYTVLIM0jiSK3JB6?=
- =?us-ascii?Q?Px9TIg52ub0n3SqCXRAw84MbourPAtFGI8W5BJU5HEh9DmAE426AwS4B5//t?=
- =?us-ascii?Q?5p6auqKy1RSe0G/jPosauRZLyo9OTiR1HSVcSmoEHAa4uxhhhhhQ4JUaNp+x?=
- =?us-ascii?Q?fKfFDFRHGU2aoy93grvw9ZVss9CmFQdbowKnhUjd+oZe6Q9g0WBsfOPXbpRy?=
- =?us-ascii?Q?uYlUNpoKFCHuH2zeAwImUlA/ZQlCzNkoSe8pn/1+Qi8xaOcfNnbNsk9+Jh3t?=
- =?us-ascii?Q?fH9j/jAk9nwXEmt76GBpBCYEb82uzitGLjUBrVwKH911c+LJMRVgeY8+QgIa?=
- =?us-ascii?Q?7hV5l08zhwPIBYHgr/gZNPTwOq6Gw/VBQsAmsG9W3OmN9XGn2nNXz/3c2Ee0?=
- =?us-ascii?Q?n90pVjlKw6CzezfGAEo=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(36860700013)(82310400026)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Dec 2025 08:01:21.8268
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: baeb0ce5-9733-4862-c274-08de330b5065
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS2PEPF00003439.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7763
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+X-Proofpoint-ORIG-GUID: 5yipLAZsQBQN58kG92mZTP7NZyW0NI3d
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjA0MDA2NSBTYWx0ZWRfX+Iss1upPDpH+
+ l4EHPFCV4w7M/sQTRc3ZKDcXPorbZNQy/qsKZBtm3ZIrVgq9fs0pNskOVIxniOq7F/44ePGBXiH
+ 0AFnwl3GWgMJPn68q2GIxig4tzdB2alfe5j82kgMQr8hjtuq/HCFrZcUfJ0RUiDCqV6TjRQJ/TZ
+ jRZo3m7i9/yKPHMxJ5wF6qB+rwuVSL95AizS5H1N6C/9+qRjkFGpdpuLAguTlq2Zg/gR08HjCVx
+ 4TQ5fOReCKmsh/s+rsqmyuD7pK6fY+jAKht220ptS27dBs679J8sZGiaRv2BUEuN4Rku4opnyWV
+ mp3++AWpQ0RiOyLs+rIKrGAHoUklmj8dDXZmYZPiJu8R6CCWemzOM33TyyrLva9OYGxYq7imEFa
+ Yr+Nvcw9tQ5TiBVPQnYtWsY3QV3wEg==
+X-Authority-Analysis: v=2.4 cv=K6Yv3iWI c=1 sm=1 tr=0 ts=69314232 cx=c_pps
+ a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
+ a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=Ikd4Dj_1AAAA:8 a=VabnemYjAAAA:8 a=buVF335sMQSAnXPDUfMA:9
+ a=QEXdDO2ut3YA:10 a=gKebqoRLp9LExxC7YDUY:22
+X-Proofpoint-GUID: 5yipLAZsQBQN58kG92mZTP7NZyW0NI3d
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-12-04_02,2025-12-03_02,2025-10-01_01
 
-From: Yael Chemla <ychemla@nvidia.com>
+On Monday 2025-11-20 13:11 UTC, Jason Gunthorpe wrote:
+>
+> Re: [RFC 2/2] Set steering-tag directly for PCIe P2P memory access
+>
+> On Wed, Nov 19, 2025 at 11:24:40PM -0800, Zhiping Zhang wrote:
+> > On Monday, November 17, 2025 at 8:00=E2=80=AFAM, Jason Gunthorpe wrot=
+e:
+> > > Re: [RFC 2/2] Set steering-tag directly for PCIe P2P memory access
+> > >
+> > > On Thu, Nov 13, 2025 at 01:37:12PM -0800, Zhiping Zhang wrote:
+> > > > RDMA: Set steering-tag value directly in DMAH struct for DMABUF M=
+R
+> > > >
+> > > > This patch enables construction of a dma handler (DMAH) with the =
+P2P memory type
+> > > > and a direct steering-tag value. It can be used to register a RDM=
+A memory
+> > > > region with DMABUF for the RDMA NIC to access the other device's =
+memory via P2P.
+> > > >
+> > > > Signed-off-by: Zhiping Zhang <zhipingz@meta.com>
+> > > > ---
+> > > > .../infiniband/core/uverbs_std_types_dmah.c   | 28 ++++++++++++++=
++++++
+> > > > drivers/infiniband/core/uverbs_std_types_mr.c |  3 ++
+> > > > drivers/infiniband/hw/mlx5/dmah.c             |  5 ++--
+> > > > .../net/ethernet/mellanox/mlx5/core/lib/st.c  | 12 +++++---
+> > > > include/linux/mlx5/driver.h                   |  4 +--
+> > > > include/rdma/ib_verbs.h                       |  2 ++
+> > > > include/uapi/rdma/ib_user_ioctl_cmds.h        |  1 +
+> > > > 7 files changed, 46 insertions(+), 9 deletions(-)
+> > > >
+> > > > diff --git a/drivers/infiniband/core/uverbs_std_types_dmah.c b/dr=
+ivers/infiniband/core/uverbs_std_types_dmah.c
+> > > > index 453ce656c6f2..1ef400f96965 100644
+> > > > --- a/drivers/infiniband/core/uverbs_std_types_dmah.c
+> > > > +++ b/drivers/infiniband/core/uverbs_std_types_dmah.c
+> > > > @@ -61,6 +61,27 @@ static int UVERBS_HANDLER(UVERBS_METHOD_DMAH_A=
+LLOC)(
+> > > >               dmah->valid_fields |=3D BIT(IB_DMAH_MEM_TYPE_EXISTS=
+);
+> > > >       }
+> > > >
+> > > > +     if (uverbs_attr_is_valid(attrs, UVERBS_ATTR_ALLOC_DMAH_DIRE=
+CT_ST_VAL)) {
+> > > > +             ret =3D uverbs_copy_from(&dmah->direct_st_val, attr=
+s,
+> > > > +                                    UVERBS_ATTR_ALLOC_DMAH_DIREC=
+T_ST_VAL);
+> > > > +             if (ret)
+> > > > +                     goto err;
+> > >
+> > > This should not come from userspace, the dmabuf exporter should
+> > > provide any TPH hints as part of the attachment process.
+> > >=20
+> > > We are trying not to allow userspace raw access to the TPH values, =
+so
+> > > this is not a desirable UAPI here.
+> > >=20
+> > Thanks for your feedback!
+> >=20
+> > I understand the concern about not exposing raw TPH values to
+> > userspace.  To clarify, would it be acceptable to use an index-based
+> > mapping table, where userspace provides an index and the kernel
+> > translates it to the appropriate TPH value? Given that the PCIe spec
+> > allows up to 16-bit TPH values, this could require a mapping table
+> > of up to 128KB. Do you see this as a reasonable approach, or is
+> > there a preferred alternative?
+>
+> ?
+>
+> The issue here is to secure the TPH. The kernel driver that owns the
+> exporting device should control what TPH values an importing driver
+> will use.
+>
+> I don't see how an indirection table helps anything, you need to add
+> an API to DMABUF to retrieve the tph.
 
-Add the 1600G link mode bits, include them in capability dumps and
-ioctl fallback, and update the man page.
+I see, thanks for the clarification. Yes we can add and use another new
+API(s) for this purpose.
 
-Signed-off-by: Yael Chemla <ychemla@nvidia.com>
-Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
----
- ethtool.8.in       |  4 ++++
- ethtool.c          | 12 ++++++++++++
- netlink/settings.c |  4 ++++
- 3 files changed, 20 insertions(+)
+Sorry for the delay: I was waiting for the final version of Leon's
+vfio-dmabuf patch series and plan to follow that for implementing the new
+API(s) needed.
+(https://lore.kernel.org/all/20251120-dmabuf-vfio-v9-6-d7f71607f371@nvidi=
+a.com/).
 
-diff --git a/ethtool.8.in b/ethtool.8.in
-index 553592b..2a3fc14 100644
---- a/ethtool.8.in
-+++ b/ethtool.8.in
-@@ -1013,6 +1013,10 @@ lB	l	lB.
- 0x400000000000000000000000000000	800000baseDR4_2 Full
- 0x800000000000000000000000000000	800000baseSR4 Full
- 0x1000000000000000000000000000000	800000baseVR4 Full
-+0x2000000000000000000000000000000	1600000baseCR8 Full
-+0x4000000000000000000000000000000	1600000baseKR8 Full
-+0x8000000000000000000000000000000	1600000baseDR8 Full
-+0x10000000000000000000000000000000	1600000baseDR8_2 Full
- .TE
- .TP
- .BI phyad \ N
-diff --git a/ethtool.c b/ethtool.c
-index 948d551..21dea0b 100644
---- a/ethtool.c
-+++ b/ethtool.c
-@@ -538,6 +538,10 @@ static void init_global_link_mode_masks(void)
- 		ETHTOOL_LINK_MODE_800000baseDR4_2_Full_BIT,
- 		ETHTOOL_LINK_MODE_800000baseSR4_Full_BIT,
- 		ETHTOOL_LINK_MODE_800000baseVR4_Full_BIT,
-+		ETHTOOL_LINK_MODE_1600000baseCR8_Full_BIT,
-+		ETHTOOL_LINK_MODE_1600000baseKR8_Full_BIT,
-+		ETHTOOL_LINK_MODE_1600000baseDR8_Full_BIT,
-+		ETHTOOL_LINK_MODE_1600000baseDR8_2_Full_BIT,
- 	};
- 	static const enum ethtool_link_mode_bit_indices
- 		additional_advertised_flags_bits[] = {
-@@ -836,6 +840,14 @@ static void dump_link_caps(const char *prefix, const char *an_prefix,
- 		  "800000baseSR4/Full" },
- 		{ 0, ETHTOOL_LINK_MODE_800000baseVR4_Full_BIT,
- 		  "800000baseVR4/Full" },
-+		{ 0, ETHTOOL_LINK_MODE_1600000baseCR8_Full_BIT,
-+		  "1600000baseCR8/Full" },
-+		{ 0, ETHTOOL_LINK_MODE_1600000baseKR8_Full_BIT,
-+		  "1600000baseKR8/Full" },
-+		{ 0, ETHTOOL_LINK_MODE_1600000baseDR8_Full_BIT,
-+		  "1600000baseDR8/Full" },
-+		{ 0, ETHTOOL_LINK_MODE_1600000baseDR8_2_Full_BIT,
-+		  "1600000baseDR8_2/Full" },
- 	};
- 	int indent;
- 	int did1, new_line_pend;
-diff --git a/netlink/settings.c b/netlink/settings.c
-index 84b2da8..05d215e 100644
---- a/netlink/settings.c
-+++ b/netlink/settings.c
-@@ -196,6 +196,10 @@ static const struct link_mode_info link_modes[] = {
- 	[ETHTOOL_LINK_MODE_800000baseDR4_2_Full_BIT]	= __REAL(800000),
- 	[ETHTOOL_LINK_MODE_800000baseSR4_Full_BIT]	= __REAL(800000),
- 	[ETHTOOL_LINK_MODE_800000baseVR4_Full_BIT]	= __REAL(800000),
-+	[ETHTOOL_LINK_MODE_1600000baseCR8_Full_BIT]	= __REAL(1600000),
-+	[ETHTOOL_LINK_MODE_1600000baseKR8_Full_BIT]	= __REAL(1600000),
-+	[ETHTOOL_LINK_MODE_1600000baseDR8_Full_BIT]	= __REAL(1600000),
-+	[ETHTOOL_LINK_MODE_1600000baseDR8_2_Full_BIT]	= __REAL(1600000),
- };
- const unsigned int link_modes_count = ARRAY_SIZE(link_modes);
- 
--- 
-2.38.1
+>
+> > Additionally, in cases where the dmabuf exporter device can handle al=
+l possible 16-bit
+> > TPH values  (i.e., it has its own internal mapping logic or table), s=
+hould this still be
+> > entirely abstracted away from userspace?
+>
+> I imagine the exporting device provides the raw on the wire TPH value
+> it wants the importing device to use and the importing device is
+> responsible to program it using whatever scheme it has.
+>
+> Jason
+
+Can you suggest or elaborate a bit on the schmes you see feasible?
+
+When the exporting device supports all or multiple TPH values, it is
+desirable to have userspace processes select which TPH values to use
+for the dmabuf at runtime. Actually that is the main use case of this
+patch: the user can select the TPH values to associate desired P2P
+operations on the dmabuf. The difficulty is how we can provide this
+flexibility while still aligning with kernel and security best
+practices.
+
+Zhiping
+
 
 
