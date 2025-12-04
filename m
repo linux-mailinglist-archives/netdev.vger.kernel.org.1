@@ -1,73 +1,119 @@
-Return-Path: <netdev+bounces-243623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6282CA47FE
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 17:30:41 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 046A7CA4C3F
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 18:28:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D9889301A727
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 16:30:32 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 21345305FA91
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 17:22:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C7CA2ED151;
-	Thu,  4 Dec 2025 16:30:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aBMtB/3p"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74C513451CC;
+	Thu,  4 Dec 2025 16:39:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 9.mo584.mail-out.ovh.net (9.mo584.mail-out.ovh.net [46.105.40.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1932F3C25;
-	Thu,  4 Dec 2025 16:30:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 447C83446BC
+	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 16:39:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.105.40.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764865832; cv=none; b=FpamFgYZYt/GwTrxmZk3Pl6XIoXMySfu4hlEmlBqvuZd/0OvzIqf/6Z7AYpq9Rgi7tg2BZkcypiNDL7pYuZxXOa52muGCWDZXvfnUhVUqdxBVz1m9c6K2atcP6qLPlW1xa0SDhgqEOdtwfflrxVNcFMySe4eidJWXg4pkMDiaIg=
+	t=1764866358; cv=none; b=BcAud7+1XrNdzBgnRFFBntJTrv/7sZBjGdIzCwAUiaRZz1gNiBXyaHr2vDRWYX+QMxxnhgtFy+bbD/RIXoaWFpRHTNaSV2MYRck7f8mHixOfEIpj5SEBugRMEn2GPdp4cD8Bm8ZgXeqxz+5Mj2rzdp29qB9dQmBwQ6puM/rQS4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764865832; c=relaxed/simple;
-	bh=SE2HTB4lJ6g7toD2TuLecngAbh7hMHZEgFCorTLRzOk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ftLbhRx9sBUQs9pP2e+Mn4u8ybAjvky6Ck4vV9lU8h2DtCUoCAgwqu6FJtQcQ6J/rXNcUepLLM7rp+apOgpc54tj145fkju27VZKYoydbpwQJVVSKflQ/ZNX9Y0lEBxh+knS4RwceVfkEZAJ5TYqlPb9Xw3rkH6pfu57ysYNhVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aBMtB/3p; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7C55C4CEFB;
-	Thu,  4 Dec 2025 16:30:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764865831;
-	bh=SE2HTB4lJ6g7toD2TuLecngAbh7hMHZEgFCorTLRzOk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aBMtB/3pZ4ZCLQuV2U80QyCkJ5AX55vAIOFBqxCZOVeUQROWTaqalVjaa5g+ty0Gf
-	 s+ghJjP+xph8kp/lq+BeLnzWw9PULu+aWd9NQ0MRF+PN2ZzZxsBQD++25E+piPjlGH
-	 DIqsk4+rr3vsygr0sChjsql4E/MA42s2CHpd8J5Y7dEP8uCHLL+HamUlm9D0aLfV1J
-	 k9VawOvqhpDb4g+yGyBAs7vEwOuE1yKpCuymU4+/pUXYs5B6x9p98fih7Z+nkrLA87
-	 e/ViWMveH0A3JTsUrdkIyjn6/g6+zszQip4OhAb4Ge32eGoq+46AVw/Gp8oZ0Ltc5X
-	 jUnRwV+guBuHQ==
-Date: Thu, 4 Dec 2025 08:30:29 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Guenter Roeck <linux@roeck-us.net>
-Cc: Shuah Khan <shuah@kernel.org>, Christian Brauner <brauner@kernel.org>,
- Elizabeth Figura <zfigura@codeweavers.com>, Thomas Gleixner
- <tglx@linutronix.de>, Eric Dumazet <edumazet@google.com>, Kees Cook
- <kees@kernel.org>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, wine-devel@winehq.org,
- netdev@vger.kernel.org, bpf@vger.kernel.org, Joe Damato
- <jdamato@fastly.com>
-Subject: Re: [PATCH 10/13] selftests: net: Work around build error seen with
- -Werror
-Message-ID: <20251204083029.188cd7a0@kernel.org>
-In-Reply-To: <20251204161729.2448052-11-linux@roeck-us.net>
-References: <20251204161729.2448052-1-linux@roeck-us.net>
-	<20251204161729.2448052-11-linux@roeck-us.net>
+	s=arc-20240116; t=1764866358; c=relaxed/simple;
+	bh=WpIiSH4GxU7onEE+2ezX9gvDAfdCzI+wz8TInd5GTu0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=F/mpQWgXhVV5NTqDe3Y915jfg3zbKoh3rdK8uick1osXY08e+xe4xnoNgA8Rc4N9cEhJulvxjrEBK9beMKWpL1FTV7+HAqkIbZkJTEYCDSCj6fZm+FaufbuqyH2Kf6huWCnDiRz8nUp44XnL+5rhs1FP3CF7Bi35ICDJeTQtuxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=bp.renesas.com; spf=fail smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=46.105.40.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=bp.renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=bp.renesas.com
+Received: from director6.ghost.mail-out.ovh.net (unknown [10.110.37.191])
+	by mo584.mail-out.ovh.net (Postfix) with ESMTP id 4dMg4j5sB6z8QPn
+	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 16:31:33 +0000 (UTC)
+Received: from ghost-submission-7d8d68f679-mkpf7 (unknown [10.111.182.250])
+	by director6.ghost.mail-out.ovh.net (Postfix) with ESMTPS id B198E802DF;
+	Thu,  4 Dec 2025 16:31:31 +0000 (UTC)
+Received: from labcsmart.com ([37.59.142.99])
+	by ghost-submission-7d8d68f679-mkpf7 with ESMTPSA
+	id GduLDmO3MWnQjQQATXHgnQ
+	(envelope-from <john.madieu.xa@bp.renesas.com>); Thu, 04 Dec 2025 16:31:31 +0000
+Authentication-Results:garm.ovh; auth=pass (GARM-99G003ce1f1467-d897-4cfe-b3a4-acac0f5cccc0,
+                    E90FA267686E4F2ED65044873A5FD8D85CF2A6B0) smtp.auth=john.madieu@labcsmart.com
+X-OVh-ClientIp:141.94.163.193
+From: John Madieu <john.madieu.xa@bp.renesas.com>
+To: prabhakar.mahadev-lad.rj@bp.renesas.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	geert+renesas@glider.be
+Cc: biju.das.jz@bp.renesas.com,
+	claudiu.beznea@tuxon.dev,
+	linux@armlinux.org.uk,
+	magnus.damm@gmail.com,
+	mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com,
+	netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	John Madieu <john.madieu.xa@bp.renesas.com>
+Subject: [PATCH net-next 0/3]  net: stmmac: add physical port identification support
+Date: Thu,  4 Dec 2025 16:31:19 +0000
+Message-Id: <20251204163122.3032995-1-john.madieu.xa@bp.renesas.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Ovh-Tracer-Id: 13214968683322836357
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 0
+X-VR-SPAMCAUSE: dmFkZTFOYzd0u1tNIc5d1riAAD2SoA/rdbCRt2LqIsB4pVCHc9rrIYG6guZEVgyAXXl5qDEbDm5DIpC0OrCuxFdfXi0y49xplqCwDslxZfmG8AsZNeX+aPUxcaNxfHrUme5Ifwd7HskEkA5JpoPc3SYZyku6YrH4qiWo0bhMuvhkFiMsKV/q0vWmA7rgdl6EEEm+16ZrRiPZN0AwgkeBQlkc7/obc+uSAZg5JJolwLZSrXcfBUW6gc5R+pVGtyHvalKubb3uEDI10AY1883y3oDkXlAQLG3vlc3e/xhtkSHPKHNAsHH90Su1rXzwwdYA4vpLWfceOUXdT96WXrg9Ekt+rK1eC6WOqeN859LsEOWPI15XARa597p04BUF6Ik7oDNv2uz4w5quka4hU62FXvGpRrhjhTuYTdWR2SysrgwAyzrn0IBjvrZQWKMg2cKS0L4NW0EQPNdJ8oi5oQ2jvVq4mN4AvdjPIFmMrLWxObSGO1dUqRc5qsvodkor6H3ZfoPAge20RQnBHD0CVHUuc9UJn515vZ5DibS7im1tEKnpCti10n9SXH+lmm4448lApnJOE6RVwUfPKugCPWKU3Hg8ioNhaO9KbHqowdCEzo10ZlikrJemuAc2nDE6BxftvTqg+NHDfssRJn9H1EJDY6xDHESuvMGN6HVdx50QTQkE6EzGtQ
 
-On Thu,  4 Dec 2025 08:17:24 -0800 Guenter Roeck wrote:
-> -	write(fd, msg, sizeof(msg));
-> +	if (write(fd, msg, sizeof(msg)))
-> +		;
+This series adds physical port identification support to the stmmac driver,
+enabling userspace to query hardware-stable identifiers for network interfaces
+via ndo_get_phys_port_id() and ndo_get_phys_port_name().
 
-At least add an perror here ?
+On systems with multiple ethernet controllers sharing the same driver,
+physical port identification provides stable identifiers that persist
+across reboots and are independent of interface enumeration order.
+This is particularly useful for predictable network interface naming
+and for correlating interfaces with physical connectors.
+
+The implementation follows a two-tier approach:
+
+1. Generic stmmac support: Default implementations use the permanent MAC
+   address as port ID and bus_id for port naming. This provides immediate
+   benefit for all stmmac-based platforms.
+
+2. Glue driver override: Platform drivers can provide custom callbacks
+   for hardware-specific identification schemes. The Renesas GBETH driver
+   implements this to support device tree-based port identification,
+   addressing cases where hardware lacks unique identification registers.
+
+The Renesas implementation constructs an 8-byte port identifier from:
+- Permanent MAC address (if available) or Renesas OUI (74:90:50) as fallback
+- Port index from device tree property or ethernet alias
+
+
+John Madieu (3):
+  net: stmmac: add physical port identification support
+  dt-bindings: net: renesas-gbeth: Add port-id property
+  net: stmmac: dwmac-renesas-gbeth: add physical port identification
+
+ .../bindings/net/renesas,rzv2h-gbeth.yaml     | 19 +++++++
+ .../stmicro/stmmac/dwmac-renesas-gbeth.c      | 56 +++++++++++++++++++
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 54 ++++++++++++++++++
+ include/linux/stmmac.h                        |  5 ++
+ 4 files changed, 134 insertions(+)
+
+-- 
+2.25.1
+
 
