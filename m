@@ -1,98 +1,94 @@
-Return-Path: <netdev+bounces-243586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 453B7CA4413
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 16:28:32 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 808B6CA4446
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 16:32:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CE47C301E934
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 15:22:33 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id EC5C53005A61
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 15:32:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76FC22D3A6A;
-	Thu,  4 Dec 2025 15:22:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D454228C84A;
+	Thu,  4 Dec 2025 15:32:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Aup0I71G"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b="AIh2KbB3"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from orbyte.nwl.cc (orbyte.nwl.cc [151.80.46.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE00F2652AF;
-	Thu,  4 Dec 2025 15:22:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B41FC246778
+	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 15:32:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=151.80.46.58
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764861752; cv=none; b=urmZECTj4+Cd9ToAk3iVtYRqLBJcWr4KwZbG/QhnhslodNFJoR3tntBWcSk6pPvTssTMbVC9rmjje8wuLRPIVf/i0FL4DfO+a+ZQySdMaplZtVqoWURY0LZGsTIFlQfRjVQbkr3Sjp3jtEZd+80QxzbalJqoDKZeyY70CN3ZJLA=
+	t=1764862338; cv=none; b=RCpj9aR9na44/tsQwfC1xElDw2hfvOfXLBHiLXZXVAlHMBgLL9ebPj5JTvWXI8T7Qt+y+rp8c+6pvq2gstaMIhYJ5b2WcOLfAf6gsEeiTy18O6Ro0HhfYMDIGP9zrTNK5xGp6wsiWVE+7g45fW/2A9p4oP2zHjku0WM3oekEAEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764861752; c=relaxed/simple;
-	bh=7uY3CtvGSpV81jCkvMVTOqi2Jjg0nG4tbj9cDtteuMg=;
+	s=arc-20240116; t=1764862338; c=relaxed/simple;
+	bh=8m+i5nUV7pTtuEdFNdnyYvVweDs0gkoPeTcIYTmvlf0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N2C9ChmnhuhittK/dPkSkQClJVwQB/Y9E8MVSTJR7+OJhwtCR7ShGAD8JxJ2NBbS9AK4VZJi112wTF3Wr2oAFcPOvIavA8cmdk+3y9X88BBkgNQXrLctVrwfJrDb1FAD/UtMdNNN74JxV6zaxGRFmlh5fb2DJg9FLgcpWKekeUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Aup0I71G; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=CSXwppmi/1KlyaunSxcGPfEGwrM8gH9Rv/W1n4Do2uY=; b=Aup0I71GV6QggM+CaxB8OpiuFo
-	tYkm3eMrKXTK9w2z5uiG17StE3nApVL8+dGEQIWkYGIJ41IkErJU033NPYFfto9IId4oMoDEL6YcT
-	eH39NIoKYicYV9vnYDWSBgTiZkjwpzoTGFuTezstBvenDyRnXFDvs6z0VvRV2edtZrO4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vRB9m-00Fytb-Hm; Thu, 04 Dec 2025 16:22:10 +0100
-Date: Thu, 4 Dec 2025 16:22:10 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Daniel Golle <daniel@makrotopia.org>, Frank Wunderlich <frankwu@gmx.de>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Chen Minqiang <ptpt52@gmail.com>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	"Chester A. Unal" <chester.a.unal@arinc9.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v3 2/2] net: dsa: mt7530: Use GPIO polarity to generate
- correct reset sequence
-Message-ID: <7aacc2c2-50d0-4a08-9800-dc4a572dffcb@lunn.ch>
-References: <20251129234603.2544-1-ptpt52@gmail.com>
- <20251129234603.2544-2-ptpt52@gmail.com>
- <0675b35f-217d-4261-9e3f-2eb24753d43c@lunn.ch>
- <20251130080731.ty2dlxaypxvodxiw@skbuf>
- <3fbc4e67-b931-421c-9d83-2214aaa2f6ed@lunn.ch>
- <0d85e1e6-ea75-4f20-aef1-90d446b4bfa1@kernel.org>
- <00f308a1-a4b1-4f20-8d8e-459ddf4c39b1@gmx.de>
- <aS7Zj3AFsSp2CTNv@makrotopia.org>
- <20251204131626.upw77jncqfwxydww@skbuf>
+	 Content-Type:Content-Disposition:In-Reply-To; b=j+Nq1Wodkr+XAirbWda7DtQIDGFhG92V5GYfOlGdrfBPxremRIDhRTWHiqeJGn/a6fRd5ljtQS9sH5vAPpQ1KvP7fSzD+LC7gG1IwejaEBcXNSD2S+L+ktbx/stpX1xr2Fxq7wxwyZ+UW3roBU+0b8RQOdEhFe8HvL/0Arh2Jv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc; spf=pass smtp.mailfrom=nwl.cc; dkim=pass (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b=AIh2KbB3; arc=none smtp.client-ip=151.80.46.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nwl.cc
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nwl.cc;
+	s=mail2022; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=wC8GBR1ROFC0xqThxULmLQu5cGeg43agkD8VDUUF9CI=; b=AIh2KbB3xtAC6Dy/36rCEv1Jyc
+	zCpMMV9wGdvAI4Hcb5qq/n6BT6jGpVqtfqv2TV19pe1gNDTXcdvtL/PcP4dq07oqQ9lXi66FW5GFz
+	/o7fJj908lBGvYNVQ5cDAJn9x8HM4dBwtQ3txq+P/gQzsq6dPOafXZt2X674RRXng/7BjsprmQS4p
+	54Pdrrf/QmaJ9/UR8m0m1fi/Nbft60s3aGqGCnLnIOWssd8ijDzVdeY+/H80fiYjBHlVvwHpGoS+G
+	Do7uxNTH/bfmMgkgy+jUejGLDVX51wl6cuEdb3alTmqyvyg2MJGi6SZ5AzQrH7rYOJZoroHM0oMyR
+	Z3qfI8ow==;
+Received: from n0-1 by orbyte.nwl.cc with local (Exim 4.97.1)
+	(envelope-from <phil@nwl.cc>)
+	id 1vRBJJ-000000000FE-49uB;
+	Thu, 04 Dec 2025 16:32:02 +0100
+Date: Thu, 4 Dec 2025 16:32:01 +0100
+From: Phil Sutter <phil@nwl.cc>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: =?utf-8?B?UmVuw6k=?= Rebe <rene@exactco.de>, netdev@vger.kernel.org,
+	nic_swsd@realtek.com
+Subject: Re: [PATCH V2] r8169: fix RTL8117 Wake-on-Lan in DASH mode
+Message-ID: <aTGpceAK0CRgKDPG@orbyte.nwl.cc>
+Mail-Followup-To: Phil Sutter <phil@nwl.cc>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	=?utf-8?B?UmVuw6k=?= Rebe <rene@exactco.de>, netdev@vger.kernel.org,
+	nic_swsd@realtek.com
+References: <20251202.161642.99138760036999555.rene@exactco.de>
+ <8b3098e0-8908-46cc-8565-a28e071d77eb@gmail.com>
+ <20251202.184507.229081049189704462.rene@exactco.de>
+ <b25d0f31-94ef-4baa-9cbb-a949494ac9a7@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251204131626.upw77jncqfwxydww@skbuf>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b25d0f31-94ef-4baa-9cbb-a949494ac9a7@gmail.com>
 
-> If this is blocking progress for new device trees, can we just construct,
-> using of_machine_is_compatible(), a list of all boards where the device
-> tree defines incorrect reset polarity that shouldn't be trusted by the
-> driver when driving the reset GPIO? If we do this, we can also leave
-> those existing device trees alone.
+On Tue, Dec 02, 2025 at 07:06:02PM +0100, Heiner Kallweit wrote:
+> On 12/2/2025 6:45 PM, René Rebe wrote:
+> > On Tue, 2 Dec 2025 18:19:02 +0100, Heiner Kallweit <hkallweit1@gmail.com> wrote:
+[...]
+> >> - cc stable
+> > 
+> > I was under the impression this is automatic when patches are merged
+> > with Fixes:, no? Do I need to manually cc stable? Nobody ever asked me
+> > for that before.
+> > 
+> https://docs.kernel.org/process/maintainer-netdev.html
+> See 1.5.7
 
-I've still not seen a good answer to my question, why not just leave
-it 'broken', and document the fact.
+Which points to
+https://docs.kernel.org/process/stable-kernel-rules.html#stable-kernel-rules
+and the Option 1 instructions read: "Note, such tagging is unnecessary
+if the stable team can derive the appropriate versions from Fixes:
+tags."
 
-Does the fact it is inverted in both DT and the driver prevent us from
-making some board work?
-
-Why do we need to fix this?
-
-Sometimes it is better to just leave it alone, if it is not hurting
-anybody.
-
-	Andrew
+Cheers, Phil
 
