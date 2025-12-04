@@ -1,208 +1,159 @@
-Return-Path: <netdev+bounces-243507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243508-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C87CECA2C3C
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 09:11:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF80BCA2CE2
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 09:26:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 56D0E305DCCE
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 08:11:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1600530F03CA
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 08:22:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 926B62FF142;
-	Thu,  4 Dec 2025 08:11:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D6DA33372D;
+	Thu,  4 Dec 2025 08:22:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="fyRCOBpy"
+	dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b="eebi5r8t"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from dilbert.mork.no (dilbert.mork.no [65.108.154.246])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5C9A279DC0
-	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 08:11:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C11B03321B0
+	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 08:21:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.108.154.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764835893; cv=none; b=bmPU9txC/47ApEnT92GYdSmelPFE49fdyNP96v0NzjFkCgeuRRDIZewnEQ4lPzBdcM09/hYESxClZKJXspVmNeDi8pInzo9VATCEZ4gcOSC2Ge+sCtz5wZo+CMYn5dp5ZyGGb8WeasipxSwJuZiAGUPl+1wSGqSfjP5T8Ch3MWc=
+	t=1764836523; cv=none; b=CAqEWEQT4oQ/kTrd1hkKZvMsFAasdtDNNXyiQWkXhyhlDMgYiJLQ5OsbPpMELg8nmi7a3fUDYGmGs+/xJaLrVG3IsJ/CnKOyo3ufbRA3Zj2324LIzwpkQ27Mf62g4u+u5BMpJGLU7LhBu8EljGyAlFqCyjNIW1A+KZ90caolpCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764835893; c=relaxed/simple;
-	bh=DGXIKSWSyIMgUWpRteBTNa/XMA2SaRhyxSPqWU/ROVE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ru659an7BCuzwKQtVf8hr8REJOYzqtlGDBE38rx/RvK1h5ZbD7lUsYy56EW0oxSo6kUs4eUbZiNK8jYUGV04aN3dD4QJ7MshtIj+eRRjd6MfH3LApz2cXGLZD80ETvf20fUVFoaIlilBu8I53bw4LNufQRoWfEFuMc/v//HSeik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=fyRCOBpy; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
-	by m0089730.ppops.net (8.18.1.11/8.18.1.11) with ESMTP id 5B3LdC0f1273862
-	for <netdev@vger.kernel.org>; Thu, 4 Dec 2025 00:11:30 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2025-q2;
-	 bh=7MPRysJOVUlQ0qt4ZjKDZkV1oM9qOCbvfSMlkApW+X8=; b=fyRCOBpyWqyP
-	pBDCaTOxrpCvnqqVqsTqLm+lxA45vIOZYKgRCWBS/Wf5OlRNCU9IEfgYQkyNMKeY
-	itnmuci3XZV2jOLoDMcLfz9oWj3VRNgh/pGnMTffdyrhWYlDyCe6Cj7Cr93T5QKa
-	EaXOVlFVrXszqd/W4M0BjJLk0mah5bwjDHDB9GO4lPHROwNBcIMCsQ+ONNmn+dJe
-	s2uoO5Cm8AljACqgArqfZxPC2g69ERpwNDcpk2UC2WJ9C2wKUOQkGsxRivU4Ge7r
-	LPVi9b2N0xgSA2NFqECiLQn9l2Un+Ud2GyOIPg6MpOfZszhqHE5GZ7yI88dpGIj/
-	DB3uPNj4nQ==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by m0089730.ppops.net (PPS) with ESMTPS id 4atwadb8c4-6
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Thu, 04 Dec 2025 00:11:30 -0800 (PST)
-Received: from twshared13861.04.snb2.facebook.com (2620:10d:c085:208::7cb7) by
- mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.29; Thu, 4 Dec 2025 08:11:26 +0000
-Received: by devbig259.ftw1.facebook.com (Postfix, from userid 664516)
-	id 9A8A4CD93C85; Thu,  4 Dec 2025 00:11:17 -0800 (PST)
-From: Zhiping Zhang <zhipingz@meta.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-CC: Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-        <linux-rdma@vger.kernel.org>, <linux-pci@vger.kernel.org>,
-        <netdev@vger.kernel.org>, Keith Busch <kbusch@kernel.org>,
-        Yochai Cohen
-	<yochai@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [RFC 2/2] Set steering-tag directly for PCIe P2P memory access
-Date: Thu, 4 Dec 2025 00:10:58 -0800
-Message-ID: <20251204081117.1987227-1-zhipingz@meta.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251120131140.GT17968@ziepe.ca>
-References: <20251120131140.GT17968@ziepe.ca>
+	s=arc-20240116; t=1764836523; c=relaxed/simple;
+	bh=2X6lw2n+LbAnJzEAELTikYXi0+ET+Y+lUnw5yNaBnI8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=g0HYfu7r6ohf23EDZEfF1hcldpj42+s8UeHuUfBswg/9T4CfqoBfYGVHVaGf+UdmSaMkSQoP0mR3XFOQEML6Uvy2yWK85MoaLOobnbwdO/m/l4CKErQupqgjrOO/dc7WVflcRPBea+/oTT6gWtF/UgZ5wQgtidAvrZXea1vT+k0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no; spf=pass smtp.mailfrom=miraculix.mork.no; dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b=eebi5r8t; arc=none smtp.client-ip=65.108.154.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mork.no
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=miraculix.mork.no
+Authentication-Results: dilbert.mork.no;
+	dkim=pass (1024-bit key; secure) header.d=mork.no header.i=@mork.no header.a=rsa-sha256 header.s=b header.b=eebi5r8t;
+	dkim-atps=neutral
+Received: from canardo.dyn.mork.no ([IPv6:2a01:799:10e2:d900:0:0:0:1])
+	(authenticated bits=0)
+	by dilbert.mork.no (8.18.1/8.18.1) with ESMTPSA id 5B48Le232613890
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
+	Thu, 4 Dec 2025 08:21:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mork.no; s=b;
+	t=1764836500; bh=/HjBbQNs/+0N2sNMVYre5zf3eSKB8FE/w+r++Jr3mvw=;
+	h=From:To:Cc:Subject:References:Date:Message-ID:From;
+	b=eebi5r8tdGSWg2dgJwxKfaiIxq8lFy1HmwFUArRQuzNBxLinZ/CHwI5t3OMT6WQGp
+	 HeZCXN8hASfMtmspanu1cdxLqunSus1QM5Hx83WH1j3B9XnPK4EdU0vx9pCPyiS0l4
+	 NrscPy7ciLMjlU370NEhAA3Q9jlBAZ9Y4VY+PBZk=
+Received: from miraculix.mork.no ([IPv6:2a01:799:10e2:d90a:6f50:7559:681d:630c])
+	(authenticated bits=0)
+	by canardo.dyn.mork.no (8.18.1/8.18.1) with ESMTPSA id 5B48LefO851748
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
+	Thu, 4 Dec 2025 09:21:40 +0100
+Received: (nullmailer pid 1797309 invoked by uid 1000);
+	Thu, 04 Dec 2025 08:21:40 -0000
+From: =?utf-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, "Lucien.Jheng" <lucienzx159@gmail.com>,
+        Daniel Golle <daniel@makrotopia.org>
+Subject: Re: [RFC] net: phy: air_en8811h: add Airoha AN8811HB support
+In-Reply-To: <20251203232402.oy4pbphj4vsqp5lb@skbuf> (Vladimir Oltean's
+	message of "Thu, 4 Dec 2025 01:24:02 +0200")
+Organization: m
+References: <20251202102222.1681522-1-bjorn@mork.no>
+	<20251202102222.1681522-1-bjorn@mork.no>
+	<20251203232402.oy4pbphj4vsqp5lb@skbuf>
+Date: Thu, 04 Dec 2025 09:21:39 +0100
+Message-ID: <87sedq4pyk.fsf@miraculix.mork.no>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-X-Proofpoint-ORIG-GUID: 5yipLAZsQBQN58kG92mZTP7NZyW0NI3d
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjA0MDA2NSBTYWx0ZWRfX+Iss1upPDpH+
- l4EHPFCV4w7M/sQTRc3ZKDcXPorbZNQy/qsKZBtm3ZIrVgq9fs0pNskOVIxniOq7F/44ePGBXiH
- 0AFnwl3GWgMJPn68q2GIxig4tzdB2alfe5j82kgMQr8hjtuq/HCFrZcUfJ0RUiDCqV6TjRQJ/TZ
- jRZo3m7i9/yKPHMxJ5wF6qB+rwuVSL95AizS5H1N6C/9+qRjkFGpdpuLAguTlq2Zg/gR08HjCVx
- 4TQ5fOReCKmsh/s+rsqmyuD7pK6fY+jAKht220ptS27dBs679J8sZGiaRv2BUEuN4Rku4opnyWV
- mp3++AWpQ0RiOyLs+rIKrGAHoUklmj8dDXZmYZPiJu8R6CCWemzOM33TyyrLva9OYGxYq7imEFa
- Yr+Nvcw9tQ5TiBVPQnYtWsY3QV3wEg==
-X-Authority-Analysis: v=2.4 cv=K6Yv3iWI c=1 sm=1 tr=0 ts=69314232 cx=c_pps
- a=CB4LiSf2rd0gKozIdrpkBw==:117 a=CB4LiSf2rd0gKozIdrpkBw==:17
- a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VwQbUJbxAAAA:8 a=Ikd4Dj_1AAAA:8 a=VabnemYjAAAA:8 a=buVF335sMQSAnXPDUfMA:9
- a=QEXdDO2ut3YA:10 a=gKebqoRLp9LExxC7YDUY:22
-X-Proofpoint-GUID: 5yipLAZsQBQN58kG92mZTP7NZyW0NI3d
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-04_02,2025-12-03_02,2025-10-01_01
+X-Virus-Scanned: clamav-milter 1.4.3 at canardo.mork.no
+X-Virus-Status: Clean
 
-On Monday 2025-11-20 13:11 UTC, Jason Gunthorpe wrote:
+Vladimir Oltean <vladimir.oltean@nxp.com> writes:
+> On Tue, Dec 02, 2025 at 11:22:22AM +0100, Bj=C3=B8rn Mork wrote:
+>> @@ -967,32 +1157,61 @@ static int en8811h_probe(struct phy_device *phyde=
+v)
+>>         return 0;
+>>  }
+>>=20
+>> -static int en8811h_config_serdes_polarity(struct phy_device *phydev)
+>> +static bool airphy_invert_rx(struct phy_device *phydev)
+>>  {
+>>         struct device *dev =3D &phydev->mdio.dev;
+>> -       int pol, default_pol;
+>> -       u32 pbus_value =3D 0;
+>> +       int default_pol  =3D PHY_POL_NORMAL;
+>>=20
+>> -       default_pol =3D PHY_POL_NORMAL;
+>>         if (device_property_read_bool(dev, "airoha,pnswap-rx"))
+>>                 default_pol =3D PHY_POL_INVERT;
 >
-> Re: [RFC 2/2] Set steering-tag directly for PCIe P2P memory access
+> I think we can discuss whether a newly added piece of hardware (at least
+> from the perspective of mainline Linux) should gain compatibility with
+> deprecated device tree properties or not. My concern is that if I'm soft
+> on grandfathered deprecated properties, their replacements are never
+> going to be used.
+
+Wasn't sure about this.  Now I am :-)
+
+I'll drop the deprecated properties.
+
+>> -       pol =3D phy_get_rx_polarity(dev_fwnode(dev), phy_modes(phydev->i=
+nterface),
+>> -                                 PHY_POL_NORMAL | PHY_POL_INVERT, defau=
+lt_pol);
+>> -       if (pol < 0)
+>> -               return pol;
+>> -       if (pol =3D=3D PHY_POL_INVERT)
+>> -               pbus_value |=3D EN8811H_POLARITY_RX_REVERSE;
+>> +       return phy_get_rx_polarity(dev_fwnode(dev), phy_modes(phydev->in=
+terface),
+>> +                                  PHY_POL_NORMAL | PHY_POL_INVERT, defa=
+ult_pol)
+>> +               =3D=3D PHY_POL_INVERT;
 >
-> On Wed, Nov 19, 2025 at 11:24:40PM -0800, Zhiping Zhang wrote:
-> > On Monday, November 17, 2025 at 8:00=E2=80=AFAM, Jason Gunthorpe wrot=
-e:
-> > > Re: [RFC 2/2] Set steering-tag directly for PCIe P2P memory access
-> > >
-> > > On Thu, Nov 13, 2025 at 01:37:12PM -0800, Zhiping Zhang wrote:
-> > > > RDMA: Set steering-tag value directly in DMAH struct for DMABUF M=
-R
-> > > >
-> > > > This patch enables construction of a dma handler (DMAH) with the =
-P2P memory type
-> > > > and a direct steering-tag value. It can be used to register a RDM=
-A memory
-> > > > region with DMABUF for the RDMA NIC to access the other device's =
-memory via P2P.
-> > > >
-> > > > Signed-off-by: Zhiping Zhang <zhipingz@meta.com>
-> > > > ---
-> > > > .../infiniband/core/uverbs_std_types_dmah.c   | 28 ++++++++++++++=
-+++++
-> > > > drivers/infiniband/core/uverbs_std_types_mr.c |  3 ++
-> > > > drivers/infiniband/hw/mlx5/dmah.c             |  5 ++--
-> > > > .../net/ethernet/mellanox/mlx5/core/lib/st.c  | 12 +++++---
-> > > > include/linux/mlx5/driver.h                   |  4 +--
-> > > > include/rdma/ib_verbs.h                       |  2 ++
-> > > > include/uapi/rdma/ib_user_ioctl_cmds.h        |  1 +
-> > > > 7 files changed, 46 insertions(+), 9 deletions(-)
-> > > >
-> > > > diff --git a/drivers/infiniband/core/uverbs_std_types_dmah.c b/dr=
-ivers/infiniband/core/uverbs_std_types_dmah.c
-> > > > index 453ce656c6f2..1ef400f96965 100644
-> > > > --- a/drivers/infiniband/core/uverbs_std_types_dmah.c
-> > > > +++ b/drivers/infiniband/core/uverbs_std_types_dmah.c
-> > > > @@ -61,6 +61,27 @@ static int UVERBS_HANDLER(UVERBS_METHOD_DMAH_A=
-LLOC)(
-> > > >               dmah->valid_fields |=3D BIT(IB_DMAH_MEM_TYPE_EXISTS=
-);
-> > > >       }
-> > > >
-> > > > +     if (uverbs_attr_is_valid(attrs, UVERBS_ATTR_ALLOC_DMAH_DIRE=
-CT_ST_VAL)) {
-> > > > +             ret =3D uverbs_copy_from(&dmah->direct_st_val, attr=
-s,
-> > > > +                                    UVERBS_ATTR_ALLOC_DMAH_DIREC=
-T_ST_VAL);
-> > > > +             if (ret)
-> > > > +                     goto err;
-> > >
-> > > This should not come from userspace, the dmabuf exporter should
-> > > provide any TPH hints as part of the attachment process.
-> > >=20
-> > > We are trying not to allow userspace raw access to the TPH values, =
-so
-> > > this is not a desirable UAPI here.
-> > >=20
-> > Thanks for your feedback!
-> >=20
-> > I understand the concern about not exposing raw TPH values to
-> > userspace.  To clarify, would it be acceptable to use an index-based
-> > mapping table, where userspace provides an index and the kernel
-> > translates it to the appropriate TPH value? Given that the PCIe spec
-> > allows up to 16-bit TPH values, this could require a mapping table
-> > of up to 128KB. Do you see this as a reasonable approach, or is
-> > there a preferred alternative?
+> The idea in my patches was that phy_get_rx_polarity() can return a
+> negative error code (memory allocation failure, unsupported device tree
+> property value like PHY_POL_AUTO, etc), which was propagated as such,
+> and failed the .config_init().
 >
-> ?
+> In your interpretation, no matter which of the above error cases took
+> place, for all you care, they all mean "don't invert the polarity", and
+> the show must go on. The error path that I was envisioning to bubble up
+> towards the topmost caller, to attract attention that something is
+> wrong, is gone.
+
+Right.  Sorry about that.  Tried too hard to factor out the common
+parts.
+
+Will drop the refactoring. and implement error handling for the new chip
+as well. Will be cleaner anyway without the deprecated properties.
+
+> It's a bit unfortunate that in C we can't just throw an exception and
+> whoever handles it handles it, but since the phy_get_rx_polarity() API
+> isn't yet merged, I'd like to raise the awkwardness of error handling as
+> a potential concern.
 >
-> The issue here is to secure the TPH. The kernel driver that owns the
-> exporting device should control what TPH values an importing driver
-> will use.
->
-> I don't see how an indirection table helps anything, you need to add
-> an API to DMABUF to retrieve the tph.
+> You could argue that phy_get_rx_polarity() is doing too much - what's
+> its business in getting the supported polarities and default polarity
+> from you - can't you test by yourself if you support the value that's in
+> the device tree, or fall back to a default value if nothing's there?
+> Maybe, but even with these things moved out of phy_get_rx_polarity(), I
+> still couldn't hide the fact that there's memory allocation inside,
+> which can fail and return an error code. So I decided that if there's an
+> error to handle anyway, I'd rather push the handling of unsupported
+> polarities to the helper too, such that the only error that you need to
+> handle is in one place. But you _do_ need to handle it.
 
-I see, thanks for the clarification. Yes we can add and use another new
-API(s) for this purpose.
-
-Sorry for the delay: I was waiting for the final version of Leon's
-vfio-dmabuf patch series and plan to follow that for implementing the new
-API(s) needed.
-(https://lore.kernel.org/all/20251120-dmabuf-vfio-v9-6-d7f71607f371@nvidi=
-a.com/).
-
->
-> > Additionally, in cases where the dmabuf exporter device can handle al=
-l possible 16-bit
-> > TPH values  (i.e., it has its own internal mapping logic or table), s=
-hould this still be
-> > entirely abstracted away from userspace?
->
-> I imagine the exporting device provides the raw on the wire TPH value
-> it wants the importing device to use and the importing device is
-> responsible to program it using whatever scheme it has.
->
-> Jason
-
-Can you suggest or elaborate a bit on the schmes you see feasible?
-
-When the exporting device supports all or multiple TPH values, it is
-desirable to have userspace processes select which TPH values to use
-for the dmabuf at runtime. Actually that is the main use case of this
-patch: the user can select the TPH values to associate desired P2P
-operations on the dmabuf. The difficulty is how we can provide this
-flexibility while still aligning with kernel and security best
-practices.
-
-Zhiping
+True. Much, much better to return an error from driver probe than having
+to debug arbitrary polarity mismatches..
 
 
+Bj=C3=B8rn
 
