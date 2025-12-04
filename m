@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-243610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB773CA4813
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 17:31:52 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87F1DCA485B
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 17:34:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 479D630FCCDF
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 16:26:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 620C3315A1B0
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 16:27:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E1A6314D2A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D91E314B70;
 	Thu,  4 Dec 2025 16:17:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i4h3z6VE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R5v2143l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F1A130FC1E
-	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 16:17:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7496C313290
+	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 16:17:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764865061; cv=none; b=DJda+v9XkpvNEsTR3zuXEQ/V2cHkYCbb0d0E9yEnU3P8J5F5s9cU6BBi8YMubblROAy2y0LWY8rPjahuUDxGzGTGKnCgW9hwmkT8MT6tEzNkPnZSw9lMBKSjhjPrdAcKRDiRGJ5dOmODaSFzLB7TCvtVX/+pANYNCRxS72/xRxk=
+	t=1764865061; cv=none; b=bUEeSNr/rcdid7gH5XchsPgGWGDp9KaPgm/dObt6UfJaC/TDjDVe27Na3iSWcTxr6gDHU6KKd5ViKub6nrP/geU3Mjg+Cmk8tzeTN/97ALIAMXrO1ELWL0K8BcPv5vBZWv6TTFSv/jqKvlHa3PeDwsNtHcESWRsxwJYpN4FCtLM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1764865061; c=relaxed/simple;
-	bh=cHyNnZ8pozRIM6qgLhLXjRDWgdbwcNGV7Hft7Uz1QEs=;
+	bh=uojvQcHou5oXqNNEnLZdn5nZm+d1gWRdW3OC5Z/daso=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MJv7r6WI0PSCB/2WDfU+Nn/5E2sTogycKvsT4OxPtrS6WLdLt5cwNIZJISdxz9V9unxB3HyFc9Mga1C2dWUPUFe4JxTVHGUbVhY9uik8OEYz4xR5/wNcyjCJJ70bNkU0o+FXgewOwBvtM5yWkDK+aoB21OM1Fe0JEWjBEGxsDhA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i4h3z6VE; arc=none smtp.client-ip=209.85.214.174
+	 MIME-Version; b=a4SrsDC3cP7evNc2awDUg/5c03ng+CKbiAKubN3U1yIxQmSN/C4ZqhchS8a8lgCeoynytZtgNME7OfMblEY+WxL640s1MBXKlbe6rdM8ECmwT2wjzVBQ1LNmaKZbMVj0w7+3YSCntD4tHLtx28hshu1xVVS3IoKH+hTxgg45uIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R5v2143l; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2953ad5517dso11599395ad.0
-        for <netdev@vger.kernel.org>; Thu, 04 Dec 2025 08:17:38 -0800 (PST)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-29555415c5fso14917145ad.1
+        for <netdev@vger.kernel.org>; Thu, 04 Dec 2025 08:17:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764865058; x=1765469858; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1764865059; x=1765469859; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DCNiBdsJRsPUkxld6fkb0mcknawF6lug5Wbao5E0n/E=;
-        b=i4h3z6VEd5ahU0ffmehm8MLpVUQu0erDYZo5houI3W2rZG7x1LU4Twa5YgmEPtg0Kp
-         FCeLWpL2f7aS2UNWjmdBkNTihxUljqudvbnEFxfNuv/bkAnIFsqnk6O76n31Uk7hCNCL
-         UiZj5c8KSkn49qcRh8khR9CQP9HRWT+c49k272E3Dw81fvt5k7rQL6HkNEw14a80GjpK
-         brAjfsEE+/Yl+Su0sAROXqkAE4YcYgYcImrv9IZLq0eE9Y+mEZgXSurEcmrpnD+k2rka
-         nTnwsr6GuKsHEwJOE1bvzXOFnwkX8wWmQwLNF4FxdLh/3HDtnqTjrZzMyg49DIrTJGy/
-         mypg==
+        bh=bOzZfIH9Lo6vEdAA49vWqjJXfX2W8pQl4mAmhvon218=;
+        b=R5v2143lgd8e48JQqvoXR8DoQj9CWMt1B7SZVQ2YY4soQMeaNeafYH4NkvCtuZLVvI
+         inn7nPPGC9nnu0dD0mg1b7pxXofWCMu4631B24LEAk/iHQQsfzOXtZRpsnHgOwregXSe
+         haKnwQyPGz3RU/9Mi0+QY9oKM9P+pZu7Cq5ZAM9KoTyb05udMISW+cazO/G3n2Zx60Rd
+         9A4rcYXaZLDjfxRUEpHhQz2cdXhFzf274gZ6fl5Mr+MD1FMFU6i2cZsgAOXFkGSNwiKo
+         2n1QUt2eaxh9f3LDvsW1oizDoyx0Evv4+J7NUtFt21Ta7C1how4kOlY+WZDayVinOPrc
+         5+Dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764865058; x=1765469858;
+        d=1e100.net; s=20230601; t=1764865059; x=1765469859;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:sender:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DCNiBdsJRsPUkxld6fkb0mcknawF6lug5Wbao5E0n/E=;
-        b=osGA7vy/KsXMa/Kt9nfHv2wxVHrRCFsZh91+hUK2caXEXJez1zz2gGf/LymrgsS6da
-         hAlDqkfJ0AP6rIX/iG6wYJll4CRHOerOrfyaDCcorCRtGEVzYfPf3OsSckpl/ddHsTJD
-         ZuZ7cCtBGPhl5cqCHxSXYEgJW3vWGCGN0BcqNGoqwNyzOfasBRMGfDKwdkOQf+YNuxCE
-         f2ghrCO9bL2xVJGuhqQ4JxgMaIMpR9yee14PBOBbbJ6qt/zmvhmaScyqtw5Z3HLmzWVx
-         BiSWjM1lyb8DkrkCGf2Eh6e0SZFiRnr9nxe2ZCk+7K/cqlWc5w3FnBS6rluikZbdsLCZ
-         1JJA==
-X-Forwarded-Encrypted: i=1; AJvYcCV7ng5Qitj6imUspQ199PNGxyyUOiXa4JU6ULqWw/qYP2H3Owt8wXN04+4/tv3ECtJgtyVrFVs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWNUNZH0WDpJHUzZN4IlqVhhcghtzaHfixtVKRf4CC5wVEn3lD
-	Z55Y+PgrkANcEgH1eldSzJJADWn8WxUeiKJfG/bEta8Hc6i/yTX/CYaO
-X-Gm-Gg: ASbGncs7k63QrWuX9DR0h7xJFYo4KCLOGQeir43skzj9naDFyZybXv5b65A/AKcuSof
-	nKACV+fKNgxLpvRXw1EHl2AMbNu1cLVh+fzCDzJE9h24/R/wyPl3dKvFRDEJA9mq/UJ5Qy58p/i
-	bhkqc/bWarwFamdM5k7QCnUQK2+BysmTxGTkGGqdrkGl4Z3uUhgYdAX/xa5vN3qdN6g2+l4JXiU
-	tILpNu/kcX8XThJDgaztNP0TWniSWafvVpr6UPRoX0lEOiaCfyepn3IhsefaZIb2aY/s566/6Ca
-	XBoPhQN7SJECp8iwTMZnPb3w/f0rAmTWJhLYP7I1Cphiz9OMs4QlR96lT8Y6xbz1vRN2S+sQZ4u
-	nRmQlv5yV/f0JntfB0AoBn8S0agdScrouCH5nRMMOGkn6nDUcu0DmJHNvBOEfxJldC7sqClXraY
-	D/VC35N5RU/nTefrrH3yM+hGE=
-X-Google-Smtp-Source: AGHT+IF/JV1VOB9h/rEMuCA0EjCehTUVdpJ/24AVQVMYynuhx2I5E1sWEb56yqefP+YuFLCzMcT4rA==
-X-Received: by 2002:a17:902:f543:b0:27d:69cc:9a6 with SMTP id d9443c01a7336-29da1eeb31amr41046105ad.53.1764865057641;
-        Thu, 04 Dec 2025 08:17:37 -0800 (PST)
+        bh=bOzZfIH9Lo6vEdAA49vWqjJXfX2W8pQl4mAmhvon218=;
+        b=QQqCPILG1QQL0BJNRiGO1ZlPrHa79xg24+oXOEqrX0Ip9IlDsY3YAfQduXymCjZktD
+         YjxJFwwZa4MxDJsNHdaGkr+GpgMLjprfPKkt6MGRvKZkfdZITV9InhdqiHYMV4NTEGR3
+         RQkmnm9VN61/IcOsHK9blZaSKz221w9eCzpxx8GTcxJpYDrCsd0phUIkOq3CT6dNhtDz
+         x2BnvMy0l0QRJZRkeKdZ1h4Gltjkuw90uYB19fUZTS+cDeGG+KoumsRhEXXmvaXi7CXc
+         de9HWQdOYBsftBSnjxpBsApDDgkSymwOZymxeoGSbfA/0mpWXdXcRyugOlnga9fWACW7
+         EabQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXCDd5OxI76iBYlii7en+/pYAbUf9NBKo8eErPuLH8uDaGKfQeLftFi7+EuQajNk7hO7kO/i74=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZvYKaLu25X3vRklWEs7E8yxUdetM4rm1QDYmO+nrqU5dtLnh3
+	PFi70c20W7hjwrXugoYJmsi3vRIuwxqqXz6is4024c2V79Dcgu5JE5U2dSfiIg==
+X-Gm-Gg: ASbGnctyBgjnksSLtW17LbQyu/jrTLg+QfM9JLGz6hAFoB9eHbiZtnPX4ggqnl6Xse8
+	fXWdJ5dK1oNnhb4E2MR4zqH+1IY5HGkUjwXhLT/HVMlMAjt+HY2doQ4NS/5jux0Y4rWDFSxo3mI
+	siCooZONafplapotROEctWqqvQYvBsKfFM3K/DsBZH+3crAtWDUssDtaq9A0ZQQIZMP3woFRzeQ
+	sTPwiby3gKaVBtdtS9mgRlugjtKIzUmWu5XXz8TM1i9LEY+6g4e1HwX7m6isCWmhZ4ploaTR4oK
+	pG+h1SPlpnZ+fBe+7TnUm5yJrw7xMZ5PibSbxex6abJR4JJnzdft0uYROZpEWTys3VZ04ta0h9z
+	WdKQEoEwRx8IllXKp+VDs5DCeJ8cqGMA096OLxcAIxr2EI9VC2hkZ5NyPKlQHChPCArVFz5Vyb+
+	DEkQCSUdFnNdUN0YMTroflYdU=
+X-Google-Smtp-Source: AGHT+IEhqjbEuXaysSF/wkAXhEmzAlPFdTVX3OMfc8S/rfmItTqonwqGE1/z5t8WZPXeAov5Rk8BdA==
+X-Received: by 2002:a17:903:3504:b0:24e:3cf2:2453 with SMTP id d9443c01a7336-29d683eb3a8mr83132745ad.61.1764865058842;
+        Thu, 04 Dec 2025 08:17:38 -0800 (PST)
 Received: from server.roeck-us.net ([2600:1700:e321:62f0:da43:aeff:fecc:bfd5])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29daeaabf8asm23548875ad.85.2025.12.04.08.17.37
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29dae99f1cfsm24139315ad.55.2025.12.04.08.17.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Dec 2025 08:17:37 -0800 (PST)
+        Thu, 04 Dec 2025 08:17:38 -0800 (PST)
 Sender: Guenter Roeck <groeck7@gmail.com>
 From: Guenter Roeck <linux@roeck-us.net>
 To: Shuah Khan <shuah@kernel.org>
@@ -86,11 +86,10 @@ Cc: Christian Brauner <brauner@kernel.org>,
 	wine-devel@winehq.org,
 	netdev@vger.kernel.org,
 	bpf@vger.kernel.org,
-	Guenter Roeck <linux@roeck-us.net>,
-	Aleksa Sarai <cyphar@cyphar.com>
-Subject: [PATCH 03/13] selftests/filesystems: fclog: Fix build errors seen with -Werror
-Date: Thu,  4 Dec 2025 08:17:17 -0800
-Message-ID: <20251204161729.2448052-4-linux@roeck-us.net>
+	Guenter Roeck <linux@roeck-us.net>
+Subject: [PATCH 04/13] selftests/filesystems: file_stressor: Fix build error seen with -Werror
+Date: Thu,  4 Dec 2025 08:17:18 -0800
+Message-ID: <20251204161729.2448052-5-linux@roeck-us.net>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20251204161729.2448052-1-linux@roeck-us.net>
 References: <20251204161729.2448052-1-linux@roeck-us.net>
@@ -104,31 +103,30 @@ Content-Transfer-Encoding: 8bit
 
 Fix
 
-fclog.c:37:21: error: call to undeclared function 'open'
-fclog.c:37:47: error: use of undeclared identifier 'O_RDONLY'; did you mean 'MS_RDONLY'?
-fclog.c:37:56: error: use of undeclared identifier 'O_CLOEXEC'
+file_stressor.c:112:9: error: unused variable 'pid_self'
 
-by adding the missing include file.
+by dropping the unused variable.
 
-Fixes: df579e471111b ("selftests/filesystems: add basic fscontext log tests")
-Cc: Aleksa Sarai <cyphar@cyphar.com>
+Fixes: aab154a442f9b ("selftests: add file SLAB_TYPESAFE_BY_RCU recycling stressor")
+Cc: Christian Brauner <brauner@kernel.org>
 Signed-off-by: Guenter Roeck <linux@roeck-us.net>
 ---
- tools/testing/selftests/filesystems/fclog.c | 1 +
- 1 file changed, 1 insertion(+)
+ tools/testing/selftests/filesystems/file_stressor.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/tools/testing/selftests/filesystems/fclog.c b/tools/testing/selftests/filesystems/fclog.c
-index 912a8b755c3b..d7cc3aaa8672 100644
---- a/tools/testing/selftests/filesystems/fclog.c
-+++ b/tools/testing/selftests/filesystems/fclog.c
-@@ -6,6 +6,7 @@
+diff --git a/tools/testing/selftests/filesystems/file_stressor.c b/tools/testing/selftests/filesystems/file_stressor.c
+index 01dd89f8e52f..4f314270298d 100644
+--- a/tools/testing/selftests/filesystems/file_stressor.c
++++ b/tools/testing/selftests/filesystems/file_stressor.c
+@@ -109,8 +109,6 @@ FIXTURE_TEARDOWN(file_stressor)
+ TEST_F_TIMEOUT(file_stressor, slab_typesafe_by_rcu, 900 * 2)
+ {
+ 	for (int i = 0; i < self->nr_procs; i++) {
+-		pid_t pid_self;
+-
+ 		self->pids_openers[i] = fork();
+ 		ASSERT_GE(self->pids_openers[i], 0);
  
- #include <assert.h>
- #include <errno.h>
-+#include <fcntl.h>
- #include <sched.h>
- #include <stdio.h>
- #include <stdlib.h>
 -- 
 2.43.0
 
