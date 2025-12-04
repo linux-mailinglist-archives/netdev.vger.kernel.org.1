@@ -1,599 +1,227 @@
-Return-Path: <netdev+bounces-243643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73B2ECA4AC1
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 18:08:11 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C7DDCA4AB2
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 18:07:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6208530214C6
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 17:07:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B736E308D007
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 17:02:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67ADA2D130B;
-	Thu,  4 Dec 2025 17:07:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA0782F657F;
+	Thu,  4 Dec 2025 17:02:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="sASpcA0a"
+	dkim=pass (1024-bit key) header.d=bp.renesas.com header.i=@bp.renesas.com header.b="idt25HLp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxout3.routing.net (mxout3.routing.net [134.0.28.8])
+Received: from TYVP286CU001.outbound.protection.outlook.com (mail-japaneastazon11011011.outbound.protection.outlook.com [52.101.125.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A691324468B;
-	Thu,  4 Dec 2025 17:07:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.8
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764868037; cv=none; b=qvxBu8ak0J7Etj2ZOCBBmD4LOxB+UUrGLwEWbW9ZWWlYxiu48/LTLMdHBEkdfI9tKNOTufjTw+vUdq6mbIvFR4/zShOP+UMuxhcfWCjK+rGpu8PAUbMqpnzxRaiWL+pPlrAwqzzDNXMzR8EJVB6r4WQYDaQ6TSQV9XqBLhe7QSk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764868037; c=relaxed/simple;
-	bh=ULxt92GDTUFMu0KmERbuGRRvh0vxpHKUvmguLr/dqPU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=grfwgvcxiz4JC77X5wb0baZz3RB3cbmwtB/3npkpuj7yH0rrbJQagwTvekDhpdiuvqbzeQ6tX5z0JXHNHOuKVoI+OuFZf16jOR2qPa8ZHMoFj2cIHhyMFHWrin9ebJg4TVirCh1Ocz4YUX9HeUlvRfGJZzw55SOB5zbH0yCSa44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=sASpcA0a; arc=none smtp.client-ip=134.0.28.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
-Received: from mxbulk.masterlogin.de (unknown [192.168.10.85])
-	by mxout3.routing.net (Postfix) with ESMTP id 701E0606B8;
-	Thu,  4 Dec 2025 16:59:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
-	s=routing; t=1764867543;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sRms69zflbVStYWw9Rh7QzF/WS7IHRIFU+kuAsBIc0c=;
-	b=sASpcA0awR7vPiGmInfmfJuIbDl5a5f9jgemSheKsjhKp5dkkrhu9Woxj+eUd2bZvUCSHK
-	k+pZ6cjBoRB2jZOnKL0g5YW8wzN/HuxxtmjBU6rUQD/um9r1k3hxGgOwcLA0DDYMp7wETp
-	jCZBwktZ9h9FaA+V/VSLrbANRcQxMLo=
-Received: from frank-u24.. (fttx-pool-157.180.225.155.bambit.de [157.180.225.155])
-	by mxbulk.masterlogin.de (Postfix) with ESMTPSA id 26BF81226EB;
-	Thu,  4 Dec 2025 16:59:03 +0000 (UTC)
-From: Frank Wunderlich <linux@fw-web.de>
-To: Felix Fietkau <nbd@nbd.name>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Russell King <linux@armlinux.org.uk>
-Cc: Frank Wunderlich <frank-w@public-files.de>,
-	Daniel Golle <daniel@makrotopia.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Mason Chang <mason-cw.chang@mediatek.com>
-Subject: [RFC v2 3/3] net: ethernet: mtk_eth_soc: Add LRO support
-Date: Thu,  4 Dec 2025 17:58:45 +0100
-Message-ID: <20251204165849.8214-4-linux@fw-web.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251204165849.8214-1-linux@fw-web.de>
-References: <20251204165849.8214-1-linux@fw-web.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 828F529D293;
+	Thu,  4 Dec 2025 17:02:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.125.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764867765; cv=fail; b=rcvhGW2zCDjm4gSJNnjqoYILNQb1CVi8e4tC9V6Ewm8Yg+bwswzZIwrY3zbFRd4smRZq7vCUx3kyghYAKfklVhGRE9jSPp//keyLhGRY+1xOvI6KOMK3ZTF20vXYdDWbPYNHybcCFGokT4+oU5IW7zmM6umWQgJmJMH9wNRDYaM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764867765; c=relaxed/simple;
+	bh=IJ4FUMsE1aOSrPaYistFnqjke5EJoqG4HkcEdnCN9o4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=h2aXxeCHNDxGLcU6NqoX3osHdUxFtQ3hSdnFCJ4fowewuAME2sed96/kBYtafhpjHZwR/eZFH+cuUskhPQIsBnJzTrRrYpm6Qq6xtzfKa9TisvrhDXCGg+eXq14/jBy9xkxYhHr5CHn0K2XhVhJJd6eT8vmVj4zU3QGn/nMVjvw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; dkim=pass (1024-bit key) header.d=bp.renesas.com header.i=@bp.renesas.com header.b=idt25HLp; arc=fail smtp.client-ip=52.101.125.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=yQcNoAcQSqRDltVHcep16WakF12jY8Pyd9IMQWeW9XtHnNvftWry0KQQxUpM6EABB9aEjk1UtlRiRNXFyI7FsYiiloF9vQ85lRV6ptubEznK0t6izIQDc4sqNk3xTj9dA2SNLTv5JB4iZxM5XXr2aeDlklms+VTLthmTwZ8fSxQ9SkNgmj5CBdgAos00D5R4NpM9s2RIsjSffmi7GN49rVvZd8vONGcenGBkiKqFau0g2VX0ZaNdiQ1oJwb1LNFFF7R/JKq2MdnwSwB3t+QRRol6b9u7XAb8WoWSBOWOvImLXutaK0jD0iKXiJZYZYb2A15wFJFQ/LfV6ymUYrXoCA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=IJ4FUMsE1aOSrPaYistFnqjke5EJoqG4HkcEdnCN9o4=;
+ b=F4c8C6BkAFPm+KahV6HBpLrHY2dc8kSJlxGsBEOyeluAE4jtfrXEBN5cqqBDPNAGjxz/6zyw0NaEPj5+AVj5dGa5EuoIO+FXZjcDHlKcNIJnqJPfTnndOezkp9AvwCchEo2rAzdIgP0TTLGCQBEDNxQSkCC4zIPWljjikBwaGLzcal3iZSi1R8qRgLWB2UFMtynl2VB6sNCdXN9mns66jkBVKSBf4CrO2XW1t7oaQ70v5fkon7kOy5dq+4VMkylNzaVJu9H6i5N5D1fSbqu/lYgObnULGM05O1P/CdL/H3SGkTMSHMLgF4dF/QwDjrbTJoQm9bHgAqTtCklc8XfcnQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=bp.renesas.com; dmarc=pass action=none
+ header.from=bp.renesas.com; dkim=pass header.d=bp.renesas.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bp.renesas.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IJ4FUMsE1aOSrPaYistFnqjke5EJoqG4HkcEdnCN9o4=;
+ b=idt25HLpOp6WXb7LaGan0hG+x+enO6RUGsRR+xQxgTWMI54HNF5ETH6LynbsJqLI8J3shQ3ZvIPiYOLGtEIgr2tWEG+EEZVKfcR+EsUF3MjTLatvCkEPKJKqnIMhOgypWO8Hu5mMVgCW3/94m26i4AxXS/+9oNZlH515lWKuwV0=
+Received: from TY6PR01MB17377.jpnprd01.prod.outlook.com (2603:1096:405:35b::6)
+ by TYWPR01MB10854.jpnprd01.prod.outlook.com (2603:1096:400:2a8::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9388.11; Thu, 4 Dec
+ 2025 17:02:39 +0000
+Received: from TY6PR01MB17377.jpnprd01.prod.outlook.com
+ ([fe80::aa7e:1460:f303:3fd8]) by TY6PR01MB17377.jpnprd01.prod.outlook.com
+ ([fe80::aa7e:1460:f303:3fd8%6]) with mapi id 15.20.9388.009; Thu, 4 Dec 2025
+ 17:02:38 +0000
+From: John Madieu <john.madieu.xa@bp.renesas.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>, Prabhakar Mahadev Lad
+	<prabhakar.mahadev-lad.rj@bp.renesas.com>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, "robh@kernel.org"
+	<robh@kernel.org>, "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>, "geert+renesas@glider.be"
+	<geert+renesas@glider.be>
+CC: Biju Das <biju.das.jz@bp.renesas.com>, Claudiu.Beznea
+	<claudiu.beznea@tuxon.dev>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+	magnus.damm <magnus.damm@gmail.com>, "mcoquelin.stm32@gmail.com"
+	<mcoquelin.stm32@gmail.com>, "alexandre.torgue@foss.st.com"
+	<alexandre.torgue@foss.st.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-renesas-soc@vger.kernel.org"
+	<linux-renesas-soc@vger.kernel.org>, "devicetree@vger.kernel.org"
+	<devicetree@vger.kernel.org>
+Subject: RE: [PATCH net-next 0/3] net: stmmac: add physical port
+ identification support
+Thread-Topic: [PATCH net-next 0/3] net: stmmac: add physical port
+ identification support
+Thread-Index: AQHcZT7MFzRRA71rTESfd5g0Q5Hcp7URszqw
+Date: Thu, 4 Dec 2025 17:02:38 +0000
+Message-ID:
+ <TY6PR01MB173777655F56FEDC8AAE308FCFFA6A@TY6PR01MB17377.jpnprd01.prod.outlook.com>
+References: <20251204164028.7321-1-john.madieu.xa@bp.renesas.com>
+ <f169f89b-3694-41b0-a431-cc845ad659da@kernel.org>
+In-Reply-To: <f169f89b-3694-41b0-a431-cc845ad659da@kernel.org>
+Accept-Language: en-US, en-GB
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=bp.renesas.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: TY6PR01MB17377:EE_|TYWPR01MB10854:EE_
+x-ms-office365-filtering-correlation-id: 728dc637-70ac-4745-a2a5-08de3356edf7
+x-ld-processed: 53d82571-da19-47e4-9cb4-625a166a4a2a,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|7416014|376014|366016|921020|38070700021;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?d3Z0aGcrZHRzMmZKcUVYd3liRWdBQUhDKzJJS1F1bFdzVCt5UW9yMVQ2TzlG?=
+ =?utf-8?B?M2VvcDFtakJGVk1vSHRmYmZGV3pSL2J6bDdjN2kvclgyNUk1YVNtT093aXBa?=
+ =?utf-8?B?NVRxeU9nVTNLdzNmTjBKQ1BZUnU3ZEtZZDV3Q002Qmt5RklYSm9JNjd1Y0lw?=
+ =?utf-8?B?MStWb2tUcjZFcUJnb1dENFZWQ3pZRVBsSGVzRXhWUE1rV25XZWlYd1FKa2xV?=
+ =?utf-8?B?S0ozOEdkbGlTUVFTbFJTejNRK0tndkVKVEdOTW9wVG1WdXRIRndKQkEzSzRh?=
+ =?utf-8?B?WmNUSEVGVXBQZmVva1JhRmhHeW5wbDd5WUdLTkJ2eVBYNURRQVV2dldrdXBm?=
+ =?utf-8?B?eUVXaE53QVlKR095WVNyek9zU3k4cFNJWXNBU1RIQmM2OFhqbGpkVkEwVDQr?=
+ =?utf-8?B?VGFWUU9CejV6cEJhS1NvQk5oNm5QUnhoMFdFLysxWnlENkk5U1R2b2RyN1lQ?=
+ =?utf-8?B?RHJPOG5XRWZzeE8waDUvVnVFbXJ2YVd6Njk1OEpLbGRzMnlHQkoxK0VvdCt6?=
+ =?utf-8?B?c2VpSE1NbVJ5alhCd05qUXJIL1FOMzhMMGNpZkdOeWx4TFNwYWt1RmRKanJ6?=
+ =?utf-8?B?ZXRzVFk2UzJzMFF5eERiczZ0eEdXbUYzWExCZGpabkdpKzd3OWVWQ2JXL0VC?=
+ =?utf-8?B?NmFrUUVKVkhpay9sMGxOYUg4VlR5SnFsT1pHUlFRa04wOWNaUXcwdWRzUUdV?=
+ =?utf-8?B?TFlzNTNaWUEram9ta2Y1STNKOFpVU2RQeWQwTkw4aFFQUmlQNUw1U3N0eU13?=
+ =?utf-8?B?RUM5MWdDOFlScE01UVJsYnFZWG5mRWhqRzVKLzJtdzgraFFmNnRPWm40UG9H?=
+ =?utf-8?B?RU5DVDE4RTI1Mnpvd2Nvb0o4QXVQYlpEa0ZEY3BWRmYrZ1YzME9GWGVONVJY?=
+ =?utf-8?B?MUlaTGJYMDNJSmFhQnlKSTJLckxqR3RxT2hsYUJzWjlLQWtZMkFNYTM4ajU0?=
+ =?utf-8?B?OFY2b2hMbVV1K0d6VmhtbEdHclg5akZienF0a0NwUjFkWGdFL2QyVnRwS3lr?=
+ =?utf-8?B?L05BY3JzVzVZbExQRXIvSXdDS3dibTVmZW45RkI1SDEzNFcxLzhXOGd0RmE2?=
+ =?utf-8?B?NktkVUtBak84ekd1Qm55OVNLR05sZ0ZyS1VSUzRhaXFWR2xwME9lVGlTZmsx?=
+ =?utf-8?B?MW8zSEk2TlNDOHJ2M2VUeUpndzdMeUNRT3Z0a1N6VStKL2lBemRpbXBUYkhE?=
+ =?utf-8?B?RUZOY0NRMHNKcjY0Z0E3MkIvZ2h5TkVEbWQ3VDJoWVg3OTU2ZGRrcWZpOVNm?=
+ =?utf-8?B?MEJUWW1VeXFqRTExNk9jalZRdnBONHNBZUlRWXF1bk10Wmd5SWhMbjA3V1Fx?=
+ =?utf-8?B?RXRHSzgrcDhrdUZzTzVKeFhuSDNOdUw5QWN6U3Nnbmx6L1JzV0ZFcTNJM0dB?=
+ =?utf-8?B?eVRpNHV5bVVCMy9ianpMYzA5NEY1UkJNejJTVWdRQ29tdmoycHREb2c3cThl?=
+ =?utf-8?B?M21WVUorQ21tOUpRTmJKcG94ZzlRL1ZPWGhSUENqaVoreVZvMU5uakhVTjFw?=
+ =?utf-8?B?RkdRSCt3VmFLT0VEUFQ2MHNmcUQ0Vkxxalk3MDdnS0ZqbXA5bS9EaDJWanli?=
+ =?utf-8?B?aEVjbWZiQkFIek4xNnlHT1NxNGdjMzFvb1lya1l6OU9vK1ppcmlESkVpTnps?=
+ =?utf-8?B?M2lsbWpKR3p0bTE3djF4dWpLRmZ5dEc4U1BsSG8zTFlFU2YzUUFpam85MHQz?=
+ =?utf-8?B?RkNVZ2pUNXNpbnZwSVVoZXY2RjFQT2RxbG5VTkpPQkx4eU5VVVdCMzd2ZnQ5?=
+ =?utf-8?B?RmpvQ3NhTWFLUVVPdUFwVVJyMG1sUGpBLzlRNTM4TzBxZmtqSHc4REc5Mlhu?=
+ =?utf-8?B?MWtTeUNrMkZzWEl6UFBEZTNTRm44d2tXNzlhbVp0SURCM1YvSFBleW01TnM0?=
+ =?utf-8?B?WWlpS0JEanN4aDFybTRvKzR2b0QvNitNRUZaUGoyWHpjMXZqN0JrZFRqbFFI?=
+ =?utf-8?B?S2c1c2toOXQ2R2RtOS9mZzJldCtvSW5iait0Lys1L0w4TjZlUTI5ZVZBZE9P?=
+ =?utf-8?B?U1hhbm01Rlo1cDI3eDIwNWczNkZ5L2xPTVMrSUsvUTNzWjNSZWp4Wi9ZeGhN?=
+ =?utf-8?B?ZTlUdUY3Rmw3YXFrd1grY09yRnUxVi9JclV1QT09?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY6PR01MB17377.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(921020)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?ZGduQnNWVTRuS0hDVVJWOUhYY1VLVlBqTmZzQVA0UUViVlBCWDhWT0d2Q2hJ?=
+ =?utf-8?B?VnN1TS9kVHFLRFVWSmtJa1lLeU9Yc3pjL1R1aDFGaERDQXBXMUgyNDhjSXla?=
+ =?utf-8?B?SUJvQU1kZ0lHTHZxM3lscFlrelJJT1dXSzBIdWFRZGxWR3lXaU9oVGpiQnYy?=
+ =?utf-8?B?aTl3NkxFVm1oNnQ4K0lpV1dCME5pMmxYdm5RbGxIM05DYVBockVyamtscGVG?=
+ =?utf-8?B?bVN0WkdhSEl2VVRranBOaDJLSDZuL2VFME9QNmJBWnJLUnN1QzZRT3dhQm9F?=
+ =?utf-8?B?TDhvdzFlY0oybUpHV0NTRmtYOXNIRmUvM0FKaG9wcFlTSXdWWWRjY1V0TWtO?=
+ =?utf-8?B?eDRUUEIvQi84aGNrOENzd3pDY2lJSkNmbGxZWjFqUkpSQWZCaGZxdEhXdUdC?=
+ =?utf-8?B?ZloweFZuTzB5eXNmRlF0ZUUzVGdlT3lnRUFad1NlS1E0aWl6dWd0OWRMNzFo?=
+ =?utf-8?B?Z3NaWjBNdlg4MWsvZXJ0aVRFL212clN0TmpPTGJWNkZDY00wNTVjdjBBQmpu?=
+ =?utf-8?B?TlI5ZXJRdmRoelZhZ3RFbzB3eGVwemgweDl3Qlh1ZFZKdy9PTTY3cy9uQ3A5?=
+ =?utf-8?B?T095d0xxNEprejZ2amdNUFkvV3lIUFIwbUR0NElrZ0FBcUpmUEs0d0NSb09a?=
+ =?utf-8?B?dHFxekNTTmxaYkMzZmxCUWFoNmdKUnpPZWg2WFdLbUc2YktvVzlnaW5mTUND?=
+ =?utf-8?B?UlNsTktLSEc1YUJCTXlISmllNWQ4dWU4b0NpVnJmUWlMUU5lNTU1TjcrVVMy?=
+ =?utf-8?B?Vm53elBKL3crVGpaTkk0cU5KU2JFWEtEQlU4NUV3bTZoTGg0c29IakZHZSt4?=
+ =?utf-8?B?dlZ2Nnc4anpreWtBWDE4Znh4SmJZQnJ4aEtzLzIwTElxK2ZOOFNBa0JNdExV?=
+ =?utf-8?B?eE1mR2JGdnF1RFEwMmY2MHVaNk9XbUkvUUNYY1l6aUQvTEdGSFlYUXBjejFk?=
+ =?utf-8?B?dGZrLzVtNWZvb2hNa3lhekFVdEM1S0lwZFJHK0VuRXpJTGZ5MDhnaGFpSWd0?=
+ =?utf-8?B?ZjNHOVlzRlNQUWtDQW1RbGVMV1kybFVmeHJvekdWUVBSWkd5TmFTTldwUWtF?=
+ =?utf-8?B?eEx0a1VWV2svQmRaaGZvQXdJYkZOdXA5L2pQcmNKaXFUMWNJRFJhU2hWdmJK?=
+ =?utf-8?B?WTJ3cFNNS2h0SXFEUnZMQmhtWTgxU2dvRmlJQ29tVHlJd3J3V3hMUWxyRk1T?=
+ =?utf-8?B?N2xYZHdtT3JTazYybFAwRHpSOEZuQmpvaUJZN0grcWtoclBxYVRvYnhsK3VY?=
+ =?utf-8?B?U2Q0TU03UFNIK3AwSUw4MlBGWDB6RGlJVDZmaTYrcWlOSXMzSzN3dDM1TG84?=
+ =?utf-8?B?RUVKTjZ2RTZaZUozaCtHdlk2V2IzcmhnRVhRbnRwYXN1VytLTWkwckVDL05v?=
+ =?utf-8?B?VmJmVGxPamllQ0dRZm51MXJBNnN5Q1lydklXdFZxU2hSZ2RjNHZ3WEtINGdZ?=
+ =?utf-8?B?K2FENGlXenpmT2pFbGZMU1RIcXdva3ZOYnVVM3NzRm93SnpDdzdSVEZMUW1D?=
+ =?utf-8?B?SFJjRXNMMU9ReVBZZWJUamxWTE5kODRVMWcrYWQ2Z2IrYStZUGtSVW1vSktI?=
+ =?utf-8?B?WGRobkgySnVHSlBHUm9YMW1mU0x6djFNRy9qeVhkeFRMVWNxNml3czVpRVlm?=
+ =?utf-8?B?MHJPTitLaTBmK282Z0hndzB5VENoS1NDRDNKNWRLY3lEUTdkT2s4RXBJakw1?=
+ =?utf-8?B?RmFXMVN0Sk84L3VvSGpwdzcrRDI0djNUc05wSkFIdUdXdmVsajJwTHY2SDR3?=
+ =?utf-8?B?QTdjN2FOOCtES3NOR2NIaHBkR04ySm1nSkNtV1ZXTDZmbTJhTjV5TXdWaWcy?=
+ =?utf-8?B?emhaMDliTzRyMnBNcExLTjduUDl0cHRXZnljY1VCL2ZuUm9EaS9YcExqYklh?=
+ =?utf-8?B?UnRsK0ErOTQ5RE91RHlxMDAvU3VPWms3d0k1bEwvRjhVb0pZc1N0VVlUTEFK?=
+ =?utf-8?B?ZlI2MzFwVGdrSlpqbUhzV1ZTSk5RVlRIb2V4aUZVVndqc1RkMFp1S25MNVhG?=
+ =?utf-8?B?ejF5c1RLaVUxd2lnOElJUllnaTFIQ0o3OHc1bVoxUzlFVEJZbW1ab2xHb1hH?=
+ =?utf-8?B?V2Z4QWh2NTNYUDR3Qmx4azJqZFhYSlA3cll3RGpyYS9mamNuRmw5RlBRTXcz?=
+ =?utf-8?B?RS9XdjhMbm16ckZJT2tFSVk0dGFoYXB5QytnUTNLZkJBejFCNEl2L1h4L2xl?=
+ =?utf-8?B?V2c9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: bp.renesas.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: TY6PR01MB17377.jpnprd01.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 728dc637-70ac-4745-a2a5-08de3356edf7
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Dec 2025 17:02:38.5739
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: XhCmMnq4lrrXqKnmnRpNWjK/5IG9Du+8d72sY9j/U0557fkgoPKrCctUSPubxKFsELv9Tk1Spa3eW93llGTNtbwL8JtQVlVtsD7B9CP6BPk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYWPR01MB10854
 
-From: Mason Chang <mason-cw.chang@mediatek.com>
-
-Add Large Receive Offload support to mediatek ethernet driver and
-activate it for MT7988.
-
-Signed-off-by: Mason Chang <mason-cw.chang@mediatek.com>
-Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
----
-v2:
-- drop link to commit for 6.6 patch
----
- drivers/net/ethernet/mediatek/mtk_eth_soc.c | 213 ++++++++++++++++++--
- drivers/net/ethernet/mediatek/mtk_eth_soc.h |  48 +++--
- 2 files changed, 221 insertions(+), 40 deletions(-)
-
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index 56fc9e4f23c6..e7206a0ec5cd 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-@@ -2785,7 +2785,7 @@ static int mtk_rx_alloc(struct mtk_eth *eth, int ring_no, int rx_flag)
- 	if (!ring->data)
- 		return -ENOMEM;
- 
--	if (mtk_page_pool_enabled(eth)) {
-+	if (mtk_page_pool_enabled(eth) && rcu_access_pointer(eth->prog))  {
- 		struct page_pool *pp;
- 
- 		pp = mtk_create_page_pool(eth, &ring->xdp_q, ring_no,
-@@ -2932,7 +2932,8 @@ static void mtk_rx_clean(struct mtk_eth *eth, struct mtk_rx_ring *ring, bool in_
- static int mtk_hwlro_rx_init(struct mtk_eth *eth)
- {
- 	const struct mtk_reg_map *reg_map = eth->soc->reg_map;
--	int i;
-+	const struct mtk_soc_data *soc = eth->soc;
-+	int i, val;
- 	u32 ring_ctrl_dw1 = 0, ring_ctrl_dw2 = 0, ring_ctrl_dw3 = 0;
- 	u32 lro_ctrl_dw0 = 0, lro_ctrl_dw3 = 0;
- 
-@@ -2953,7 +2954,7 @@ static int mtk_hwlro_rx_init(struct mtk_eth *eth)
- 	ring_ctrl_dw2 |= MTK_RING_MAX_AGG_CNT_L;
- 	ring_ctrl_dw3 |= MTK_RING_MAX_AGG_CNT_H;
- 
--	for (i = 1; i < MTK_MAX_RX_RING_NUM; i++) {
-+	for (i = 1; i <= MTK_HW_LRO_RING_NUM; i++) {
- 		mtk_w32(eth, ring_ctrl_dw1, MTK_LRO_CTRL_DW1_CFG(i));
- 		mtk_w32(eth, ring_ctrl_dw2, MTK_LRO_CTRL_DW2_CFG(i));
- 		mtk_w32(eth, ring_ctrl_dw3, MTK_LRO_CTRL_DW3_CFG(i));
-@@ -2975,8 +2976,22 @@ static int mtk_hwlro_rx_init(struct mtk_eth *eth)
- 	mtk_w32(eth, (MTK_HW_LRO_TIMER_UNIT << 16) | MTK_HW_LRO_REFRESH_TIME,
- 		MTK_PDMA_LRO_ALT_REFRESH_TIMER);
- 
--	/* set HW LRO mode & the max aggregation count for rx packets */
--	lro_ctrl_dw3 |= MTK_ADMA_MODE | (MTK_HW_LRO_MAX_AGG_CNT & 0xff);
-+	if (mtk_is_netsys_v3_or_greater(eth)) {
-+		val = mtk_r32(eth, reg_map->pdma.rx_cfg);
-+		mtk_w32(eth, val | ((MTK_PDMA_LRO_SDL + MTK_MAX_RX_LENGTH) <<
-+			MTK_RX_CFG_SDL_OFFSET), reg_map->pdma.rx_cfg);
-+
-+		lro_ctrl_dw0 |= MTK_PDMA_LRO_SDL << MTK_CTRL_DW0_SDL_OFFSET;
-+
-+		/* enable cpu reason black list */
-+		lro_ctrl_dw0 |= MTK_LRO_CRSN_BNW;
-+
-+		/* no use PPE cpu reason */
-+		mtk_w32(eth, 0xffffffff, MTK_PDMA_LRO_CTRL_DW1);
-+	} else {
-+		/* set HW LRO mode & the max aggregation count for rx packets */
-+		lro_ctrl_dw3 |= MTK_ADMA_MODE | (MTK_HW_LRO_MAX_AGG_CNT & 0xff);
-+	}
- 
- 	/* the minimal remaining room of SDL0 in RXD for lro aggregation */
- 	lro_ctrl_dw3 |= MTK_LRO_MIN_RXD_SDL;
-@@ -2987,6 +3002,16 @@ static int mtk_hwlro_rx_init(struct mtk_eth *eth)
- 	mtk_w32(eth, lro_ctrl_dw3, MTK_PDMA_LRO_CTRL_DW3);
- 	mtk_w32(eth, lro_ctrl_dw0, MTK_PDMA_LRO_CTRL_DW0);
- 
-+	if (mtk_is_netsys_v2_or_greater(eth)) {
-+		i = (soc->rx.desc_size == sizeof(struct mtk_rx_dma_v2)) ? 1 : 0;
-+		mtk_m32(eth, MTK_RX_DONE_INT(MTK_HW_LRO_RING(i)),
-+			MTK_RX_DONE_INT(MTK_HW_LRO_RING(i)), reg_map->pdma.int_grp);
-+		mtk_m32(eth, MTK_RX_DONE_INT(MTK_HW_LRO_RING(i + 1)),
-+			MTK_RX_DONE_INT(MTK_HW_LRO_RING(i + 1)), reg_map->pdma.int_grp + 0x4);
-+		mtk_m32(eth, MTK_RX_DONE_INT(MTK_HW_LRO_RING(i + 2)),
-+			MTK_RX_DONE_INT(MTK_HW_LRO_RING(i + 2)), reg_map->pdma.int_grp3);
-+	}
-+
- 	return 0;
- }
- 
-@@ -3010,7 +3035,7 @@ static void mtk_hwlro_rx_uninit(struct mtk_eth *eth)
- 	}
- 
- 	/* invalidate lro rings */
--	for (i = 1; i < MTK_MAX_RX_RING_NUM; i++)
-+	for (i = 1; i <= MTK_HW_LRO_RING_NUM; i++)
- 		mtk_w32(eth, 0, MTK_LRO_CTRL_DW2_CFG(i));
- 
- 	/* disable HW LRO */
-@@ -3059,6 +3084,64 @@ static int mtk_hwlro_get_ip_cnt(struct mtk_mac *mac)
- 	return cnt;
- }
- 
-+static int mtk_hwlro_add_ipaddr_idx(struct net_device *dev, u32 ip4dst)
-+{
-+	struct mtk_mac *mac = netdev_priv(dev);
-+	struct mtk_eth *eth = mac->hw;
-+	const struct mtk_reg_map *reg_map = eth->soc->reg_map;
-+	u32 reg_val;
-+	int i;
-+
-+	/* check for duplicate IP address in the current DIP list */
-+	for (i = 1; i <= MTK_HW_LRO_DIP_NUM; i++) {
-+		reg_val = mtk_r32(eth, MTK_LRO_DIP_DW0_CFG(i));
-+		if (reg_val == ip4dst)
-+			break;
-+	}
-+
-+	if (i < MTK_HW_LRO_DIP_NUM + 1) {
-+		netdev_warn(dev, "Duplicate IP address at DIP(%d)!\n", i);
-+		return -EEXIST;
-+	}
-+
-+	/* find out available DIP index */
-+	for (i = 1; i <= MTK_HW_LRO_DIP_NUM; i++) {
-+		reg_val = mtk_r32(eth, MTK_LRO_DIP_DW0_CFG(i));
-+		if (reg_val == 0UL)
-+			break;
-+	}
-+
-+	if (i >= MTK_HW_LRO_DIP_NUM + 1) {
-+		netdev_warn(dev, "DIP index is currently out of resource!\n");
-+		return -EBUSY;
-+	}
-+
-+	return i;
-+}
-+
-+static int mtk_hwlro_get_ipaddr_idx(struct net_device *dev, u32 ip4dst)
-+{
-+	struct mtk_mac *mac = netdev_priv(dev);
-+	struct mtk_eth *eth = mac->hw;
-+	const struct mtk_reg_map *reg_map = eth->soc->reg_map;
-+	u32 reg_val;
-+	int i;
-+
-+	/* find out DIP index that matches the given IP address */
-+	for (i = 1; i <= MTK_HW_LRO_DIP_NUM; i++) {
-+		reg_val = mtk_r32(eth, MTK_LRO_DIP_DW0_CFG(i));
-+		if (reg_val == ip4dst)
-+			break;
-+	}
-+
-+	if (i >= MTK_HW_LRO_DIP_NUM + 1) {
-+		netdev_warn(dev, "DIP address is not exist!\n");
-+		return -ENOENT;
-+	}
-+
-+	return i;
-+}
-+
- static int mtk_hwlro_add_ipaddr(struct net_device *dev,
- 				struct ethtool_rxnfc *cmd)
- {
-@@ -3067,15 +3150,19 @@ static int mtk_hwlro_add_ipaddr(struct net_device *dev,
- 	struct mtk_mac *mac = netdev_priv(dev);
- 	struct mtk_eth *eth = mac->hw;
- 	int hwlro_idx;
-+	u32 ip4dst;
- 
- 	if ((fsp->flow_type != TCP_V4_FLOW) ||
- 	    (!fsp->h_u.tcp_ip4_spec.ip4dst) ||
- 	    (fsp->location > 1))
- 		return -EINVAL;
- 
--	mac->hwlro_ip[fsp->location] = htonl(fsp->h_u.tcp_ip4_spec.ip4dst);
--	hwlro_idx = (mac->id * MTK_MAX_LRO_IP_CNT) + fsp->location;
-+	ip4dst = htonl(fsp->h_u.tcp_ip4_spec.ip4dst);
-+	hwlro_idx = mtk_hwlro_add_ipaddr_idx(dev, ip4dst);
-+	if (hwlro_idx < 0)
-+		return hwlro_idx;
- 
-+	mac->hwlro_ip[fsp->location] = ip4dst;
- 	mac->hwlro_ip_cnt = mtk_hwlro_get_ip_cnt(mac);
- 
- 	mtk_hwlro_val_ipaddr(eth, hwlro_idx, mac->hwlro_ip[fsp->location]);
-@@ -3091,13 +3178,17 @@ static int mtk_hwlro_del_ipaddr(struct net_device *dev,
- 	struct mtk_mac *mac = netdev_priv(dev);
- 	struct mtk_eth *eth = mac->hw;
- 	int hwlro_idx;
-+	u32 ip4dst;
- 
- 	if (fsp->location > 1)
- 		return -EINVAL;
- 
--	mac->hwlro_ip[fsp->location] = 0;
--	hwlro_idx = (mac->id * MTK_MAX_LRO_IP_CNT) + fsp->location;
-+	ip4dst = mac->hwlro_ip[fsp->location];
-+	hwlro_idx = mtk_hwlro_get_ipaddr_idx(dev, ip4dst);
-+	if (hwlro_idx < 0)
-+		return hwlro_idx;
- 
-+	mac->hwlro_ip[fsp->location] = 0;
- 	mac->hwlro_ip_cnt = mtk_hwlro_get_ip_cnt(mac);
- 
- 	mtk_hwlro_inval_ipaddr(eth, hwlro_idx);
-@@ -3105,6 +3196,24 @@ static int mtk_hwlro_del_ipaddr(struct net_device *dev,
- 	return 0;
- }
- 
-+static void mtk_hwlro_netdev_enable(struct net_device *dev)
-+{
-+	struct mtk_mac *mac = netdev_priv(dev);
-+	struct mtk_eth *eth = mac->hw;
-+	int i, hwlro_idx;
-+
-+	for (i = 0; i < MTK_MAX_LRO_IP_CNT; i++) {
-+		if (mac->hwlro_ip[i] == 0)
-+			continue;
-+
-+		hwlro_idx = mtk_hwlro_get_ipaddr_idx(dev, mac->hwlro_ip[i]);
-+		if (hwlro_idx < 0)
-+			continue;
-+
-+		mtk_hwlro_val_ipaddr(eth, hwlro_idx, mac->hwlro_ip[i]);
-+	}
-+}
-+
- static void mtk_hwlro_netdev_disable(struct net_device *dev)
- {
- 	struct mtk_mac *mac = netdev_priv(dev);
-@@ -3112,8 +3221,14 @@ static void mtk_hwlro_netdev_disable(struct net_device *dev)
- 	int i, hwlro_idx;
- 
- 	for (i = 0; i < MTK_MAX_LRO_IP_CNT; i++) {
-+		if (mac->hwlro_ip[i] == 0)
-+			continue;
-+
-+		hwlro_idx = mtk_hwlro_get_ipaddr_idx(dev, mac->hwlro_ip[i]);
-+		if (hwlro_idx < 0)
-+			continue;
-+
- 		mac->hwlro_ip[i] = 0;
--		hwlro_idx = (mac->id * MTK_MAX_LRO_IP_CNT) + i;
- 
- 		mtk_hwlro_inval_ipaddr(eth, hwlro_idx);
- 	}
-@@ -3299,6 +3414,8 @@ static int mtk_set_features(struct net_device *dev, netdev_features_t features)
- 
- 	if ((diff & NETIF_F_LRO) && !(features & NETIF_F_LRO))
- 		mtk_hwlro_netdev_disable(dev);
-+	else if ((diff & NETIF_F_LRO) && (features & NETIF_F_LRO))
-+		mtk_hwlro_netdev_enable(dev);
- 
- 	return 0;
- }
-@@ -3356,8 +3473,8 @@ static int mtk_dma_init(struct mtk_eth *eth)
- 		return err;
- 
- 	if (eth->hwlro) {
--		for (i = 1; i < MTK_MAX_RX_RING_NUM; i++) {
--			err = mtk_rx_alloc(eth, i, MTK_RX_FLAGS_HWLRO);
-+		for (i = 0; i < MTK_HW_LRO_RING_NUM; i++) {
-+			err = mtk_rx_alloc(eth, MTK_HW_LRO_RING(i), MTK_RX_FLAGS_HWLRO);
- 			if (err)
- 				return err;
- 		}
-@@ -3419,8 +3536,8 @@ static void mtk_dma_free(struct mtk_eth *eth)
- 
- 	if (eth->hwlro) {
- 		mtk_hwlro_rx_uninit(eth);
--		for (i = 1; i < MTK_MAX_RX_RING_NUM; i++)
--			mtk_rx_clean(eth, &eth->rx_ring[i], false);
-+		for (i = 0; i < MTK_HW_LRO_RING_NUM; i++)
-+			mtk_rx_clean(eth, &eth->rx_ring[MTK_HW_LRO_RING(i)], false);
- 	}
- 
- 	if (MTK_HAS_CAPS(eth->soc->caps, MTK_RSS)) {
-@@ -3615,16 +3732,21 @@ static int mtk_start_dma(struct mtk_eth *eth)
- 			val |= MTK_RX_BT_32DWORDS;
- 		mtk_w32(eth, val, reg_map->qdma.glo_cfg);
- 
--		mtk_w32(eth,
--			MTK_RX_DMA_EN | rx_2b_offset |
--			MTK_RX_BT_32DWORDS | MTK_MULTI_EN,
--			reg_map->pdma.glo_cfg);
-+		val = mtk_r32(eth, reg_map->pdma.glo_cfg);
-+		val |= MTK_RX_DMA_EN | rx_2b_offset |
-+		       MTK_RX_BT_32DWORDS | MTK_MULTI_EN;
-+		mtk_w32(eth, val, reg_map->pdma.glo_cfg);
- 	} else {
- 		mtk_w32(eth, MTK_TX_WB_DDONE | MTK_TX_DMA_EN | MTK_RX_DMA_EN |
- 			MTK_MULTI_EN | MTK_PDMA_SIZE_8DWORDS,
- 			reg_map->pdma.glo_cfg);
- 	}
- 
-+	if (eth->hwlro && mtk_is_netsys_v3_or_greater(eth)) {
-+		val = mtk_r32(eth, reg_map->pdma.glo_cfg);
-+		mtk_w32(eth, val | MTK_RX_DMA_LRO_EN, reg_map->pdma.glo_cfg);
-+	}
-+
- 	return 0;
- }
- 
-@@ -3768,6 +3890,13 @@ static int mtk_open(struct net_device *dev)
- 			}
- 		}
- 
-+		if (eth->hwlro) {
-+			for (i = 0; i < MTK_HW_LRO_RING_NUM; i++) {
-+				napi_enable(&eth->rx_napi[MTK_HW_LRO_RING(i)].napi);
-+				mtk_rx_irq_enable(eth, MTK_RX_DONE_INT(MTK_HW_LRO_RING(i)));
-+			}
-+		}
-+
- 		refcount_set(&eth->dma_refcnt, 1);
- 	} else {
- 		refcount_inc(&eth->dma_refcnt);
-@@ -3863,6 +3992,14 @@ static int mtk_stop(struct net_device *dev)
- 		}
- 	}
- 
-+	if (eth->hwlro) {
-+		for (i = 0; i < MTK_HW_LRO_RING_NUM; i++) {
-+			mtk_rx_irq_disable(eth, MTK_RX_DONE_INT(MTK_HW_LRO_RING(i)));
-+			napi_synchronize(&eth->rx_napi[MTK_HW_LRO_RING(i)].napi);
-+			napi_disable(&eth->rx_napi[MTK_HW_LRO_RING(i)].napi);
-+		}
-+	}
-+
- 	cancel_work_sync(&eth->rx_dim.work);
- 	cancel_work_sync(&eth->tx_dim.work);
- 
-@@ -4262,6 +4399,14 @@ static int mtk_napi_init(struct mtk_eth *eth)
- 		}
- 	}
- 
-+	if (eth->hwlro) {
-+		for (i = 0; i < MTK_HW_LRO_RING_NUM; i++) {
-+			rx_napi = &eth->rx_napi[MTK_HW_LRO_RING(i)];
-+			rx_napi->eth = eth;
-+			rx_napi->rx_ring = &eth->rx_ring[MTK_HW_LRO_RING(i)];
-+		}
-+	}
-+
- 	return 0;
- }
- 
-@@ -4825,7 +4970,7 @@ static int mtk_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd,
- 	switch (cmd->cmd) {
- 	case ETHTOOL_GRXRINGS:
- 		if (dev->hw_features & NETIF_F_LRO) {
--			cmd->data = MTK_MAX_RX_RING_NUM;
-+			cmd->data = MTK_HW_LRO_RING_NUM;
- 			ret = 0;
- 		} else if (MTK_HAS_CAPS(eth->soc->caps, MTK_RSS)) {
- 			cmd->data = MTK_RX_RSS_NUM;
-@@ -5531,6 +5676,21 @@ static int mtk_probe(struct platform_device *pdev)
- 						goto err_free_dev;
- 				}
- 			}
-+
-+			if (eth->hwlro) {
-+				for (i = 0; i < MTK_HW_LRO_RING_NUM; i++) {
-+					irqname = devm_kasprintf(eth->dev, GFP_KERNEL,
-+								 "%s LRO RX %d",
-+								 dev_name(eth->dev), i);
-+					err = devm_request_irq(eth->dev,
-+							       eth->irq_pdma[MTK_HW_LRO_IRQ(i)],
-+							       mtk_handle_irq_rx, IRQF_SHARED,
-+							       irqname,
-+							       &eth->rx_napi[MTK_HW_LRO_RING(i)]);
-+					if (err)
-+						goto err_free_dev;
-+				}
-+			}
- 		} else {
- 			irqname = devm_kasprintf(eth->dev, GFP_KERNEL, "%s RX",
- 						 dev_name(eth->dev));
-@@ -5602,6 +5762,13 @@ static int mtk_probe(struct platform_device *pdev)
- 				       mtk_napi_rx);
- 	}
- 
-+	if (eth->hwlro) {
-+		for (i = 0; i < MTK_HW_LRO_RING_NUM; i++) {
-+			netif_napi_add(eth->dummy_dev, &eth->rx_napi[MTK_HW_LRO_RING(i)].napi,
-+				       mtk_napi_rx);
-+		}
-+	}
-+
- 	platform_set_drvdata(pdev, eth);
- 	schedule_delayed_work(&eth->reset.monitor_work,
- 			      MTK_DMA_MONITOR_TIMEOUT);
-@@ -5650,6 +5817,12 @@ static void mtk_remove(struct platform_device *pdev)
- 		for (i = 1; i < MTK_RX_RSS_NUM; i++)
- 			netif_napi_del(&eth->rx_napi[MTK_RSS_RING(i)].napi);
- 	}
-+
-+	if (eth->hwlro) {
-+		for (i = 0; i < MTK_HW_LRO_RING_NUM; i++)
-+			netif_napi_del(&eth->rx_napi[MTK_HW_LRO_RING(i)].napi);
-+	}
-+
- 	mtk_cleanup(eth);
- 	free_netdev(eth->dummy_dev);
- 	mtk_mdio_cleanup(eth);
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.h b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-index db72337e9fd4..a8f54ea17f1c 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-@@ -35,7 +35,7 @@
- #define MTK_DMA_SIZE(x)		(SZ_##x)
- #define MTK_FQ_DMA_HEAD		32
- #define MTK_FQ_DMA_LENGTH	2048
--#define MTK_RX_ETH_HLEN		(ETH_HLEN + ETH_FCS_LEN)
-+#define MTK_RX_ETH_HLEN		(VLAN_ETH_HLEN + VLAN_HLEN + ETH_FCS_LEN)
- #define MTK_RX_HLEN		(NET_SKB_PAD + MTK_RX_ETH_HLEN + NET_IP_ALIGN)
- #define MTK_DMA_DUMMY_DESC	0xffffffff
- #define MTK_DEFAULT_MSG_ENABLE	(NETIF_MSG_DRV | \
-@@ -63,10 +63,13 @@
- 
- #define MTK_QRX_OFFSET		0x10
- 
--#define MTK_MAX_RX_RING_NUM	4
--#define MTK_HW_LRO_DMA_SIZE	8
-+#define MTK_MAX_RX_RING_NUM	(8)
-+#define MTK_HW_LRO_DMA_SIZE	(mtk_is_netsys_v3_or_greater(eth) ? 64 : 8)
-+#define IS_HW_LRO_RING(ring_no)	(mtk_is_netsys_v3_or_greater(eth) ?		\
-+				 (((ring_no) > 3) && ((ring_no) < 8)) :		\
-+				 (((ring_no) > 0) && ((ring_no) < 4)))
- 
--#define	MTK_MAX_LRO_RX_LENGTH		(4096 * 3)
-+#define	MTK_MAX_LRO_RX_LENGTH		(4096 * 3 + MTK_MAX_RX_LENGTH)
- #define	MTK_MAX_LRO_IP_CNT		2
- #define	MTK_HW_LRO_TIMER_UNIT		1	/* 20 us */
- #define	MTK_HW_LRO_REFRESH_TIME		50000	/* 1 sec. */
-@@ -182,31 +185,35 @@
- #define MTK_CDMM_THRES		0x165c
- 
- /* PDMA HW LRO Control Registers */
--#define MTK_PDMA_LRO_CTRL_DW0	0x980
-+#define MTK_HW_LRO_DIP_NUM		(mtk_is_netsys_v3_or_greater(eth) ? 4 : 3)
- #define MTK_HW_LRO_RING_NUM		(mtk_is_netsys_v3_or_greater(eth) ? 4 : 3)
-+#define MTK_HW_LRO_RING(x)		((x) + (mtk_is_netsys_v3_or_greater(eth) ? 4 : 1))
-+#define MTK_HW_LRO_IRQ(x)		((x) + (mtk_is_netsys_v3_or_greater(eth) ? 0 : 1))
-+#define MTK_LRO_CRSN_BNW		BIT((mtk_is_netsys_v3_or_greater(eth) ? 22 : 6))
- #define MTK_LRO_EN			BIT(0)
- #define MTK_NON_LRO_MULTI_EN		BIT(2)
- #define MTK_LRO_DLY_INT_EN		BIT(5)
--#define MTK_L3_CKS_UPD_EN		BIT(7)
--#define MTK_L3_CKS_UPD_EN_V2		BIT(19)
-+#define MTK_L3_CKS_UPD_EN		BIT(mtk_is_netsys_v3_or_greater(eth) ? 19 : 7)
- #define MTK_LRO_ALT_PKT_CNT_MODE	BIT(21)
--#define MTK_LRO_RING_RELINQUISH_REQ	(0x7 << 26)
--#define MTK_LRO_RING_RELINQUISH_REQ_V2	(0xf << 24)
--#define MTK_LRO_RING_RELINQUISH_DONE	(0x7 << 29)
--#define MTK_LRO_RING_RELINQUISH_DONE_V2	(0xf << 28)
--
--#define MTK_PDMA_LRO_CTRL_DW1	0x984
--#define MTK_PDMA_LRO_CTRL_DW2	0x988
--#define MTK_PDMA_LRO_CTRL_DW3	0x98c
-+#define MTK_LRO_RING_RELINQUISH_REQ	(mtk_is_netsys_v3_or_greater(eth) ? 0xf << 24 : 0x7 << 26)
-+#define MTK_LRO_RING_RELINQUISH_DONE	(mtk_is_netsys_v3_or_greater(eth) ? 0xf << 28 : 0x7 << 29)
-+
-+#define MTK_PDMA_LRO_CTRL_DW0	(reg_map->pdma.lro_ctrl_dw0)
-+#define MTK_PDMA_LRO_CTRL_DW1	(reg_map->pdma.lro_ctrl_dw0 + 0x04)
-+#define MTK_PDMA_LRO_CTRL_DW2	(reg_map->pdma.lro_ctrl_dw0 + 0x08)
-+#define MTK_PDMA_LRO_CTRL_DW3	(reg_map->pdma.lro_ctrl_dw0 + 0x0c)
- #define MTK_ADMA_MODE		BIT(15)
- #define MTK_LRO_MIN_RXD_SDL	(MTK_HW_LRO_SDL_REMAIN_ROOM << 16)
- 
-+#define MTK_CTRL_DW0_SDL_OFFSET	(3)
-+#define MTK_CTRL_DW0_SDL_MASK	BITS(3, 18)
-+
- #define MTK_RX_DMA_LRO_EN	BIT(8)
- #define MTK_MULTI_EN		BIT(10)
- #define MTK_PDMA_SIZE_8DWORDS	(1 << 4)
- 
- /* PDMA RSS Control Registers */
--#define MTK_RX_NAPI_NUM			(4)
-+#define MTK_RX_NAPI_NUM			(8)
- #define MTK_RX_RSS_NUM			(eth->soc->rss_num)
- #define MTK_RSS_RING(x)			(x)
- #define MTK_RSS_EN			BIT(0)
-@@ -242,11 +249,10 @@
- #define MTK_PDMA_DELAY_PTIME_MASK	0xff
- 
- /* PDMA HW LRO Alter Flow Delta Register */
--#define MTK_PDMA_LRO_ALT_SCORE_DELTA	0xa4c
-+#define MTK_PDMA_LRO_ALT_SCORE_DELTA	(reg_map->pdma.lro_alt_score_delta)
- 
- /* PDMA HW LRO IP Setting Registers */
--#define MTK_LRO_RX_RING0_DIP_DW0	0xb04
--#define MTK_LRO_DIP_DW0_CFG(x)		(MTK_LRO_RX_RING0_DIP_DW0 + (x * 0x40))
-+#define MTK_LRO_DIP_DW0_CFG(x)		(reg_map->pdma.lro_ring_dip_dw0 + ((x) * 0x40))
- #define MTK_RING_MYIP_VLD		BIT(9)
- 
- /* PDMA HW LRO Ring Control Registers */
-@@ -1184,7 +1190,8 @@ enum mkt_eth_capabilities {
- 
- #define MT7988_CAPS  (MTK_36BIT_DMA | MTK_GDM1_ESW | MTK_GMAC2_2P5GPHY | \
- 		      MTK_MUX_GMAC2_TO_2P5GPHY | MTK_QDMA | MTK_RSTCTRL_PPE1 | \
--		      MTK_RSTCTRL_PPE2 | MTK_SRAM | MTK_PDMA_INT | MTK_RSS)
-+		      MTK_RSTCTRL_PPE2 | MTK_SRAM | MTK_PDMA_INT | MTK_RSS | \
-+		      MTK_HWLRO)
- 
- struct mtk_tx_dma_desc_info {
- 	dma_addr_t	addr;
-@@ -1459,6 +1466,7 @@ struct mtk_mac {
- 
- /* the struct describing the SoC. these are declared in the soc_xyz.c files */
- extern const struct of_device_id of_mtk_match[];
-+extern u32 mtk_hwlro_stats_ebl;
- 
- static inline bool mtk_is_netsys_v1(struct mtk_eth *eth)
- {
--- 
-2.43.0
-
+SGkgS3J5c3RvZiwNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBLcnp5
+c3p0b2YgS296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+DQo+IFNlbnQ6IFRodXJzZGF5LCBEZWNl
+bWJlciA0LCAyMDI1IDU6NTUgUE0NCj4gVG86IEpvaG4gTWFkaWV1IDxqb2huLm1hZGlldS54YUBi
+cC5yZW5lc2FzLmNvbT47IFByYWJoYWthciBNYWhhZGV2IExhZA0KPiA8cHJhYmhha2FyLm1haGFk
+ZXYtbGFkLnJqQGJwLnJlbmVzYXMuY29tPjsgYW5kcmV3K25ldGRldkBsdW5uLmNoOw0KPiBkYXZl
+bUBkYXZlbWxvZnQubmV0OyBlZHVtYXpldEBnb29nbGUuY29tOyBrdWJhQGtlcm5lbC5vcmc7DQo+
+IHBhYmVuaUByZWRoYXQuY29tOyByb2JoQGtlcm5lbC5vcmc7IGtyemsrZHRAa2VybmVsLm9yZzsN
+Cj4gY29ub3IrZHRAa2VybmVsLm9yZzsgZ2VlcnQrcmVuZXNhc0BnbGlkZXIuYmUNCj4gQ2M6IEJp
+anUgRGFzIDxiaWp1LmRhcy5qekBicC5yZW5lc2FzLmNvbT47IENsYXVkaXUuQmV6bmVhDQo+IDxj
+bGF1ZGl1LmJlem5lYUB0dXhvbi5kZXY+OyBsaW51eEBhcm1saW51eC5vcmcudWs7IG1hZ251cy5k
+YW1tDQo+IDxtYWdudXMuZGFtbUBnbWFpbC5jb20+OyBtY29xdWVsaW4uc3RtMzJAZ21haWwuY29t
+Ow0KPiBhbGV4YW5kcmUudG9yZ3VlQGZvc3Muc3QuY29tOyBuZXRkZXZAdmdlci5rZXJuZWwub3Jn
+OyBsaW51eC1yZW5lc2FzLQ0KPiBzb2NAdmdlci5rZXJuZWwub3JnOyBkZXZpY2V0cmVlQHZnZXIu
+a2VybmVsLm9yZw0KPiBTdWJqZWN0OiBSZTogW1BBVENIIG5ldC1uZXh0IDAvM10gbmV0OiBzdG1t
+YWM6IGFkZCBwaHlzaWNhbCBwb3J0DQo+IGlkZW50aWZpY2F0aW9uIHN1cHBvcnQNCj4gDQo+IE9u
+IDA0LzEyLzIwMjUgMTc6NDAsIEpvaG4gTWFkaWV1IHdyb3RlOg0KPiA+IFRoaXMgc2VyaWVzIGFk
+ZHMgcGh5c2ljYWwgcG9ydCBpZGVudGlmaWNhdGlvbiBzdXBwb3J0IHRvIHRoZSBzdG1tYWMNCj4g
+PiBkcml2ZXIsIGVuYWJsaW5nIHVzZXJzcGFjZSB0byBxdWVyeSBoYXJkd2FyZS1zdGFibGUgaWRl
+bnRpZmllcnMgZm9yDQo+ID4gbmV0d29yayBpbnRlcmZhY2VzIHZpYSBuZG9fZ2V0X3BoeXNfcG9y
+dF9pZCgpIGFuZA0KPiBuZG9fZ2V0X3BoeXNfcG9ydF9uYW1lKCkuDQo+ID4NCj4gPiBPbiBzeXN0
+ZW1zIHdpdGggbXVsdGlwbGUgZXRoZXJuZXQgY29udHJvbGxlcnMgc2hhcmluZyB0aGUgc2FtZSBk
+cml2ZXIsDQo+ID4gcGh5c2ljYWwgcG9ydCBpZGVudGlmaWNhdGlvbiBwcm92aWRlcyBzdGFibGUg
+aWRlbnRpZmllcnMgdGhhdCBwZXJzaXN0DQo+ID4gYWNyb3NzIHJlYm9vdHMgYW5kIGFyZSBpbmRl
+cGVuZGVudCBvZiBpbnRlcmZhY2UgZW51bWVyYXRpb24gb3JkZXIuDQo+ID4gVGhpcyBpcyBwYXJ0
+aWN1bGFybHkgdXNlZnVsIGZvciBwcmVkaWN0YWJsZSBuZXR3b3JrIGludGVyZmFjZSBuYW1pbmcN
+Cj4gPiBhbmQgZm9yIGNvcnJlbGF0aW5nIGludGVyZmFjZXMgd2l0aCBwaHlzaWNhbCBjb25uZWN0
+b3JzLg0KPiA+DQo+ID4gVGhlIGltcGxlbWVudGF0aW9uIGZvbGxvd3MgYSB0d28tdGllciBhcHBy
+b2FjaDoNCj4gPg0KPiANCj4gDQo+IFBsZWFzZSBzbG93IGRvd24uIFlvdSBzZW50IHRocmVlIGNv
+cGllcyBvZiB0aGUgc2FtZS4NCg0KSSdtIHNvcnJ5IGZvciB0aGUgbm9pc2UuIFNvbWV0aGluZyB3
+cm9uZyBoYXBwZW5lZCB3aGlsZSBzZW5kaW5nDQp0aGUgcGF0Y2ggc2VyaWVzIG91dC4gV2lsbCB0
+YWtlIGNhcmUgbmV4dCB0aW1lLg0KDQpSZWdhcmQsDQpKb2huDQoNCj4gDQo+IEJlc3QgcmVnYXJk
+cywNCj4gS3J6eXN6dG9mDQo=
 
