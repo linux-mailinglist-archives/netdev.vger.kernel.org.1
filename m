@@ -1,65 +1,48 @@
-Return-Path: <netdev+bounces-243558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243559-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69ADCCA39DC
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 13:33:05 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 496FECA3A42
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 13:43:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7E388300766C
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 12:33:02 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D52AB3037502
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 12:43:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DBC83321C3;
-	Thu,  4 Dec 2025 12:33:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92FA533FE36;
+	Thu,  4 Dec 2025 12:43:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="Rt19lVIy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pyti1Zb1"
 X-Original-To: netdev@vger.kernel.org
-Received: from layka.disroot.org (layka.disroot.org [178.21.23.139])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DF0F35898;
-	Thu,  4 Dec 2025 12:32:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.21.23.139
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6893033FE18;
+	Thu,  4 Dec 2025 12:43:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764851580; cv=none; b=FUAr7nJlL/W9skR07DzFlxgZwk+0ylzgA5Z9E3LKd+EN4vsoHuiCd1DWp6B2KQQIJZtHyV/sC9rZgsacKQd/7/qarpInMDlYeeu7Ux4ixhrcMW+sctbWZtz3bmk1Pv1L5b7+NNToVzJrrsmxwcc11jKsiJpAPtrGWs7I50lQwXg=
+	t=1764852191; cv=none; b=B2LX+8c+wmM3mfhmiJMX2839WGcPlwmKcbl3DQYuYhWwz14rI6H1oDw5DFvGXH/a188/Z89STQ3lTs/8HXVXLyfDV9LwnJcMxMWdzFrAVxv24l10d3TBhfi0+YJxf3OY779p/8+G07NqycuS+sMOdBfka4GUeR1oEpS9gDiw8CI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764851580; c=relaxed/simple;
-	bh=nzGviWTowbFDvg9CkLQGTjeKNGLFA8NodFvqRXZKc18=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=j0vlC+72fbQ9T60k+rra4tnDv2U2D6+zrWB892fHsY3T5BKiDtfFY9ZhYPpwZ36QgHvWYTtYVM0rMHLa3luNZuO4PTOP7WZQgCYsg9eFO71++7gQwtYYgcRVTU7akPE65/6miUMf4VsCQr20UO1Fw4eOKWO0+FI2wtZKRYpKstk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=Rt19lVIy; arc=none smtp.client-ip=178.21.23.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=disroot.org
-Received: from mail01.disroot.lan (localhost [127.0.0.1])
-	by disroot.org (Postfix) with ESMTP id CC953265D7;
-	Thu,  4 Dec 2025 13:32:49 +0100 (CET)
-X-Virus-Scanned: SPAM Filter at disroot.org
-Received: from layka.disroot.org ([127.0.0.1])
- by localhost (disroot.org [127.0.0.1]) (amavis, port 10024) with ESMTP
- id dSzCFe4Mlnug; Thu,  4 Dec 2025 13:32:49 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=disroot.org; s=mail;
-	t=1764851569; bh=nzGviWTowbFDvg9CkLQGTjeKNGLFA8NodFvqRXZKc18=;
-	h=From:To:Cc:Subject:Date;
-	b=Rt19lVIyfW3kp5P/XWUOixuLx7wqH3cjMi9Zz5zGL2y2+Jy2phaNSCqH697MiQg+l
-	 MTL7lUu2iHf3xLJjgvM5M9qV7i8o2TSU+n0kxUZLpX++5J1B9TJudUcEpyjgfTt/0q
-	 H0SHULImyiyelmKyJgPopbEZ6LuWGoJn14xXP3c7C4o2UOb0BJMpgsLUnrmysMINHa
-	 SwE7Lfr02y/xzrgWHxSqMEnw7QaP8yfkoZd8wglsEsKuck23Lt3wHl0ZNt5NcHmb6S
-	 a1UkijaEMaODqHJvZtvkVYkwTIrUqShgNVS4eqypR4OsFAuZEh5GmZOx/Z59TXiv/1
-	 v1VKeHDHzeLYw==
-From: Yao Zi <ziyao@disroot.org>
-To: Miri Korenblit <miriam.rachel.korenblit@intel.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Anjaneyulu <pagadala.yesu.anjaneyulu@intel.com>,
-	Daniel Gabay <daniel.gabay@intel.com>
-Cc: linux-wireless@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Mingcong Bai <jeffbai@aosc.io>,
-	Kexy Biscuit <kexybiscuit@aosc.io>,
-	Yao Zi <ziyao@disroot.org>,
-	Nathan Chancellor <nathan@kernel.org>
-Subject: [PATCH iwlwifi-fixes] wifi: iwlwifi: Implement settime64 as stub for MVM/MLD PTP
-Date: Thu,  4 Dec 2025 12:32:04 +0000
-Message-ID: <20251204123204.9316-1-ziyao@disroot.org>
+	s=arc-20240116; t=1764852191; c=relaxed/simple;
+	bh=xFAqxUBVtgTOQCz9eEs01OaphGbuaHF4gkHguZnUyBU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=CEqr95MoGuZY466vM5NdSEaLZ4w+beY7AVAE8D9Aj0xswIoVMwtzJXYnEOT6Y60WR1Uo5xWl3ggknuJDf3hL6OwHDWxKqtjz86NzU7Ja55SDSIUgiS8y5bXtxQiPfnf1WJHwiKSb4du8py7V0I8kfWJMSmy031b1LTIGYFUmU1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pyti1Zb1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2DEDC4CEFB;
+	Thu,  4 Dec 2025 12:43:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764852187;
+	bh=xFAqxUBVtgTOQCz9eEs01OaphGbuaHF4gkHguZnUyBU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Pyti1Zb1vtwwJqf5sENztIFqw8y48+ncYS/H4P93AzVKI0wVKOXoEz16oGSd0lqyO
+	 0cdylY16jzmTg/lVpv9epYNA/WDMBYEiVy1d8x5saIf5XMdDljRLEhM0/47/qok0Io
+	 N0rbI0ewTdh0otIvtqXWw7RSdVXyTG6JpMNAuekE2yQmyH6gWkuJBBD7gkTY/l+KnY
+	 8R/9sD1bXw5HQnHSw4S8qpEhSCW3l6+6RTA3ztjxfOK/ZOYNoEZD2uX9t5zjtoMH0L
+	 F7M0UkNRoOFTA+x3996TTyEpIE9Bjb2iZU7yhO+xpn2FDB5NOs00XsCM1MXHYPRi6x
+	 XpHR9DqP8epuw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 787D63AA9A9D;
+	Thu,  4 Dec 2025 12:40:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,83 +50,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: dsa: mxl-gsw1xx: fix SerDes RX polarity
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176485200629.763406.7216085356112092216.git-patchwork-notify@kernel.org>
+Date: Thu, 04 Dec 2025 12:40:06 +0000
+References: 
+ <ca10e9f780c0152ecf9ae8cbac5bf975802e8f99.1764668951.git.daniel@makrotopia.org>
+In-Reply-To: 
+ <ca10e9f780c0152ecf9ae8cbac5bf975802e8f99.1764668951.git.daniel@makrotopia.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: hauke@hauke-m.de, andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, ravi@prevas.dk,
+ yweng@maxlinear.com
 
-Since commit dfb073d32cac ("ptp: Return -EINVAL on ptp_clock_register if
-required ops are NULL"), PTP clock registered through ptp_clock_register
-is required to have ptp_clock_info.settime64 set, however, neither MVM
-nor MLD's PTP clock implementation sets it, resulting in warnings when
-the interface starts up, like
+Hello:
 
-WARNING: drivers/ptp/ptp_clock.c:325 at ptp_clock_register+0x2c8/0x6b8, CPU#1: wpa_supplicant/469
-CPU: 1 UID: 0 PID: 469 Comm: wpa_supplicant Not tainted 6.18.0+ #101 PREEMPT(full)
-ra: ffff800002732cd4 iwl_mvm_ptp_init+0x114/0x188 [iwlmvm]
-ERA: 9000000002fdc468 ptp_clock_register+0x2c8/0x6b8
-iwlwifi 0000:01:00.0: Failed to register PHC clock (-22)
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-I don't find an appropriate firmware interface to implement settime64()
-for iwlwifi MLD/MVM, thus instead create a stub that returns
--EOPTNOTSUPP only, suppressing the warning and allowing the PTP clock to
-be registered.
+On Tue, 2 Dec 2025 09:57:21 +0000 you wrote:
+> According to MaxLinear engineer Benny Weng the RX lane of the SerDes
+> port of the GSW1xx switches is inverted in hardware, and the
+> SGMII_PHY_RX0_CFG2_INVERT bit is set by default in order to compensate
+> for that. Hence also set the SGMII_PHY_RX0_CFG2_INVERT bit by default in
+> gsw1xx_pcs_reset().
+> 
+> Fixes: 22335939ec90 ("net: dsa: add driver for MaxLinear GSW1xx switch family")
+> Reported-by: Rasmus Villemoes <ravi@prevas.dk>
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> 
+> [...]
 
-Reported-by: Nathan Chancellor <nathan@kernel.org>
-Closes: https://lore.kernel.org/all/20251108044822.GA3262936@ax162/
-Signed-off-by: Yao Zi <ziyao@disroot.org>
----
- drivers/net/wireless/intel/iwlwifi/mld/ptp.c | 7 +++++++
- drivers/net/wireless/intel/iwlwifi/mvm/ptp.c | 7 +++++++
- 2 files changed, 14 insertions(+)
+Here is the summary with links:
+  - [net-next] net: dsa: mxl-gsw1xx: fix SerDes RX polarity
+    https://git.kernel.org/netdev/net/c/5b48f49ee948
 
-diff --git a/drivers/net/wireless/intel/iwlwifi/mld/ptp.c b/drivers/net/wireless/intel/iwlwifi/mld/ptp.c
-index ffeb37a7f830..231920425c06 100644
---- a/drivers/net/wireless/intel/iwlwifi/mld/ptp.c
-+++ b/drivers/net/wireless/intel/iwlwifi/mld/ptp.c
-@@ -121,6 +121,12 @@ static int iwl_mld_ptp_gettime(struct ptp_clock_info *ptp,
- 	return 0;
- }
- 
-+static int iwl_mld_ptp_settime(struct ptp_clock_info *ptp,
-+			       const struct timespec64 *ts)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
- static int iwl_mld_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
- {
- 	struct iwl_mld *mld = container_of(ptp, struct iwl_mld,
-@@ -279,6 +285,7 @@ void iwl_mld_ptp_init(struct iwl_mld *mld)
- 
- 	mld->ptp_data.ptp_clock_info.owner = THIS_MODULE;
- 	mld->ptp_data.ptp_clock_info.gettime64 = iwl_mld_ptp_gettime;
-+	mld->ptp_data.ptp_clock_info.settime64 = iwl_mld_ptp_settime;
- 	mld->ptp_data.ptp_clock_info.max_adj = 0x7fffffff;
- 	mld->ptp_data.ptp_clock_info.adjtime = iwl_mld_ptp_adjtime;
- 	mld->ptp_data.ptp_clock_info.adjfine = iwl_mld_ptp_adjfine;
-diff --git a/drivers/net/wireless/intel/iwlwifi/mvm/ptp.c b/drivers/net/wireless/intel/iwlwifi/mvm/ptp.c
-index 06a4c9f74797..ad156b82eaa9 100644
---- a/drivers/net/wireless/intel/iwlwifi/mvm/ptp.c
-+++ b/drivers/net/wireless/intel/iwlwifi/mvm/ptp.c
-@@ -220,6 +220,12 @@ static int iwl_mvm_ptp_gettime(struct ptp_clock_info *ptp,
- 	return 0;
- }
- 
-+static int iwl_mvm_ptp_settime(struct ptp_clock_info *ptp,
-+			       const struct timespec64 *ts)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
- static int iwl_mvm_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
- {
- 	struct iwl_mvm *mvm = container_of(ptp, struct iwl_mvm,
-@@ -281,6 +287,7 @@ void iwl_mvm_ptp_init(struct iwl_mvm *mvm)
- 	mvm->ptp_data.ptp_clock_info.adjfine = iwl_mvm_ptp_adjfine;
- 	mvm->ptp_data.ptp_clock_info.adjtime = iwl_mvm_ptp_adjtime;
- 	mvm->ptp_data.ptp_clock_info.gettime64 = iwl_mvm_ptp_gettime;
-+	mvm->ptp_data.ptp_clock_info.settime64 = iwl_mvm_ptp_settime;
- 	mvm->ptp_data.scaled_freq = SCALE_FACTOR;
- 
- 	/* Give a short 'friendly name' to identify the PHC clock */
+You are awesome, thank you!
 -- 
-2.51.2
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
