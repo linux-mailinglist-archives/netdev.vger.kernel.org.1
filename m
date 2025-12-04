@@ -1,153 +1,212 @@
-Return-Path: <netdev+bounces-243549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C508CCA367C
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 12:17:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BD9CCA3688
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 12:19:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B163E30239CB
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 11:17:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 16EE6301767E
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 11:19:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39FF633C189;
-	Thu,  4 Dec 2025 11:17:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B93E2DC359;
+	Thu,  4 Dec 2025 11:19:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="RAn/QVcP"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="niif8Ri3"
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-57-49.mail.qq.com (out162-62-57-49.mail.qq.com [162.62.57.49])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DFBB3314A8;
-	Thu,  4 Dec 2025 11:17:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26C8D29D268;
+	Thu,  4 Dec 2025 11:19:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764847053; cv=none; b=chkAkdCxDsiwYnf/bqkZxB8cqAQJL6fkupE6EpyIcaPkYyjb4B452moZniK82E4pi/Jmjml1j/2NZ+DL1tpWE5fVzIx0/uugLFjBiRLECHsyFh/ZBL1h7nEFaFvVBKH63To1OWwZIcm4XkbLTLCLa2FscXzSKG7GFopu5m8cwSg=
+	t=1764847162; cv=none; b=HzgOGgZhKKjV9ztgA7VfEuCsGzhwc155wF50yO3upuFtA3SmvDfrkouQtkov35EdlOKzIBjeSUOknxcuWAJWJPjHkwxAXVJN3wXhG2Q0WljGtG3FHYBaTsPXsghx20GPPGoQXpAnp1w/ziyq3n1pUuGmULCji1hWjFNYIebab6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764847053; c=relaxed/simple;
-	bh=obpZcy8c5ZIhRY8/ruGUQpQEg851Br+FNMRq+cBGys4=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=YXHORO/9xq8vUCPB422NvM2P+YcpO9S5BxBSswzc7XjtmhXxqIZyrwbFCZ687HzpiK+rpCfdaj+HtSFFHk7sC21gLEXCAr7/hpbfKmU39gvVucKy6xs2AkjD9mMN0YTgzkbwn/GAKmfItPEpva2nhkUzGedwX+GQKL3NxEk+erk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=RAn/QVcP; arc=none smtp.client-ip=162.62.57.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1764847045; bh=vkec2dBL4iEa+ghPt34mvPpIcLrEp/CJKk6Ok1yJD5o=;
-	h=From:To:Cc:Subject:Date;
-	b=RAn/QVcPx4bleRHbRAJGSXV4+ZVN2wDDfIe70V4TqR5kqzq8HVbHmnEl6hwWSa811
-	 +B57Eji3PunTUdha4qAr6qLRgSrhn4b0LhhSl7i8q6S6pT+kyOOkPV141j/OOFKo5i
-	 qzLMX88FuDQAikDY8ELWJ/fs8tAGRD3mFafzykoA=
-Received: from lxu-ped-host.. ([111.201.7.117])
-	by newxmesmtplogicsvrszb51-0.qq.com (NewEsmtp) with SMTP
-	id 4560D250; Thu, 04 Dec 2025 19:17:22 +0800
-X-QQ-mid: xmsmtpt1764847042tmy69q9gz
-Message-ID: <tencent_4312C2065549BCEEF0EECACCA467F446F406@qq.com>
-X-QQ-XMAILINFO: OYTBn1rNHH7tL02hQweI2TVihFqLbfTQydV6JQ91XSfVOLrtILE9hpdXmIHwz6
-	 P0o+Mg5/aot+rAbDrlwovnAoSHA0qOXFmlYA6a+VPNEPsEK+l7yFiAmhaUthkQVEd72mUFEp3eyQ
-	 r8N9O4CjjgmKaGooip4zLCHkPbXzeuMkXTfLP3VZioeNSTVDl340wm6Rv9euUUlU3rhFQP/0SNqC
-	 tCINd4d0Mx9WSzDYQFoMKh93LQWWuXMWXANN0ZTdt6f4ZAUmXvnQuU8xCIRUUjioiRBy14Hrktye
-	 0ziBjEC1RnxxvlLLeavq4sNbCLGpTHATmDFkW2sCJyqQ5ha37wGncr7FSzNxsxV5DMAulcNYX6jj
-	 1NQvmeWHe8ZYXInlO6q3SdkqdgJ66FU6DSofzjcn91MQdVTFan8I8uZ9TGJoeIF3yg6prDu87HBu
-	 EajATJrAHUjLp3xTBm+I/66yk56HY3+9373NoWS2Pm5MHqZ3iG4fzQquMyKCHGaaRZ55wtBlZExm
-	 wKJ3zKPIxXELiHi3+9pCv5XnCfeBkMwb/z/PYNd+wphVYr/n7O5BJt1hb0GO87SLLvQRgMPDhhFy
-	 KVD1grk5LTO7ftTU4dpjgYwuu4JgMg1ozrBRpklu8c3qE8yzHfdrfWrYqEVsaza5znOsTCJ78lrA
-	 s7+oUVkplRL3KzUnp93H+g315ozO2zoNLJoviEKgDdAc1/gKuZ/ZQ10D871kKFA39pPkrHE0/b2A
-	 7DYop1c+JDq0FiLpwFJcSrJVFLJZtzYPJ/QENelRUNd/Z0TRuNtNIXiJZvo27P2yB8LOv3rllpqr
-	 q9mts4JX1TuQweAxPhDmiP5LtlYMLHxNlP9KWoNK8jbLzNJoFgnuZFqdouFMbeezYCaSFOXe58iN
-	 kT4VizqEyLDpojwdW1g7yj+7jWl9+ZhaCB0sI3idLJ4GGjtqWvAjrRS++E+M1nWzSwgKMDYiiq8A
-	 vb25ATjaCRYCyJPVDzx9qHZArmHZhMekAn8RK3MZG9FRIHQM8rteChMNDXj89wXulU6vzo1tNSNP
-	 WRv0OrJDl1blGpXaOmj0wRiytsREpV7qbSl3JBNg==
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-From: Edward Adam Davis <eadavis@qq.com>
-To: pabeni@redhat.com
-Cc: davem@davemloft.net,
-	eadavis@qq.com,
-	edumazet@google.com,
-	horms@kernel.org,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	syzbot+5dd615f890ddada54057@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: [PATCH net v3] net: atm: implement pre_send to check input before sending
-Date: Thu,  4 Dec 2025 19:17:22 +0800
-X-OQ-MSGID: <20251204111721.332235-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1764847162; c=relaxed/simple;
+	bh=U75He73sbdIlwlBnU4OhW9ZqZDbObFsYFNGFGm37Vyk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YhA0O3gVZ7d/Umrsl/V8GGlep4ypbsEQYmPVgv5hmcKqpzUKXCiewbqCUUkPRMlWRCCFntzQMg0kV9T4JyXxpf+ZSpfVZO+D06AyLWAfHSszCJuYvoTGuKBsZvviDUa/2hv5Z9fpbInC3XU425jPX36iwqStV9Z6vvihDYHHMV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=niif8Ri3; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=k3+IvcN5Cb0nJ6VY6yDksNa4bwyh6/su6R64NgY1qyg=; b=niif8Ri3Pr6EIrYqqNhb3vmNvQ
+	uOhFIpjmURLVVntX8gXkZYAcVnw4wwsFiHVnoGRbXtjLF55vzyiZVBC9YKVq88t+bg+/VC/LJog0+
+	YNFUP/WoCBH28h5O4qjhgx8r2eYtnY6+w/EMWRz400ttTS5TXBdXrWTT3+Hixf6mpLunEWCZSWH47
+	9nmzvATT2UfIb/JiZUlteOrMSeO8PV4uQGVsFXJA0za0BGOybVbaTVFyAtv1auWpYVs889xt3OKJc
+	MMFH2wROwaUTpOr/vt6Pbjppxbrh2MrTgqFg6GIGDJYy0YAACEDPtBbSx1h4u0swldFg9UxItkKBO
+	vGv85reg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40064)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vR7MY-000000003Sm-2E0E;
+	Thu, 04 Dec 2025 11:19:06 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vR7MT-000000000yA-3MBl;
+	Thu, 04 Dec 2025 11:19:01 +0000
+Date: Thu, 4 Dec 2025 11:19:01 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Rohan G Thomas <rohan.g.thomas@altera.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Jose Abreu <Jose.Abreu@synopsys.com>,
+	Fugang Duan <fugang.duan@nxp.com>,
+	Kurt Kanzenbach <kurt@linutronix.de>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2] net: stmmac: Fix E2E delay mechanism
+Message-ID: <aTFuJUiLMnHrnpW5@shell.armlinux.org.uk>
+References: <20251129-ext-ptp-2v-v2-1-d23aca3e694f@altera.com>
+ <26656845-d9d6-4fd2-bfff-99996cf03741@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <26656845-d9d6-4fd2-bfff-99996cf03741@redhat.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-syzbot found an uninitialized targetless variable. The user-provided
-data was only 28 bytes long, but initializing targetless requires at
-least 44 bytes. This discrepancy ultimately led to the uninitialized
-variable access issue reported by syzbot [1].
+On Thu, Dec 04, 2025 at 10:58:40AM +0100, Paolo Abeni wrote:
+> On 11/29/25 4:07 AM, Rohan G Thomas wrote:
+> > For E2E delay mechanism, "received DELAY_REQ without timestamp" error
+> > messages show up for dwmac v3.70+ and dwxgmac IPs.
+> > 
+> > This issue affects socfpga platforms, Agilex7 (dwmac 3.70) and
+> > Agilex5 (dwxgmac). According to the databook, to enable timestamping
+> > for all events, the SNAPTYPSEL bits in the MAC_Timestamp_Control
+> > register must be set to 2'b01, and the TSEVNTENA bit must be cleared
+> > to 0'b0.
+> > 
+> > Commit 3cb958027cb8 ("net: stmmac: Fix E2E delay mechanism") already
+> > addresses this problem for all dwmacs above version v4.10. However,
+> > same holds true for v3.70 and above, as well as for dwxgmac. Updates
+> > the check accordingly.
+> > 
+> > Fixes: 14f347334bf2 ("net: stmmac: Correctly take timestamp for PTPv2")
+> > Fixes: f2fb6b6275eb ("net: stmmac: enable timestamp snapshot for required PTP packets in dwmac v5.10a")
+> > Fixes: 3cb958027cb8 ("net: stmmac: Fix E2E delay mechanism")
+> > Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
+> > ---
+> > v1 -> v2:
+> >    - Rebased patch to net tree
+> >    - Replace core_type with has_xgmac
+> >    - Nit changes in the commit message
+> >    - Link: https://lore.kernel.org/all/20251125-ext-ptp-fix-v1-1-83f9f069cb36@altera.com/
+> 
+> Given there is some uncertain WRT the exact oldest version to be used,
+> it would be great to have some 3rd party testing/feedback on this. Let's
+> wait a little more.
 
-Besides the issues reported by syzbot regarding targetless messages
-[1], similar problems exist in other types of messages as well. We will
-uniformly add input data checks to pre_send to prevent uninitialized
-issues from recurring.
+As I said, in the v3.74 documentation, it is stated that the SNAPTYPSEL
+functions changed between v3.50 and v3.60, so I think it would be better
+to propose a patch to test for < v3.6.
 
-Additionally, for cases where sizeoftlvs is greater than 0, the skb
-requires more memory, and this will also be checked.
+Alternatively, if someone has the pre-v3.6 databook to check what the
+SNAPTYPSEL definition is and compare it with the v3.6+ definition, that
+would also be a good thing to do.
 
-[1]
-BUG: KMSAN: uninit-value in lec_arp_update net/atm/lec.c:1845 [inline]
- lec_arp_update net/atm/lec.c:1845 [inline]
- lec_atm_send+0x2b02/0x55b0 net/atm/lec.c:385
- vcc_sendmsg+0x1052/0x1190 net/atm/common.c:650
+From the 3.74:
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: syzbot+5dd615f890ddada54057@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=5dd615f890ddada54057
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
----
-v3:
-  - update coding style and practices
-v2: https://lore.kernel.org/all/tencent_E83074AB763967783C9D36949674363C4A09@qq.com/
-  - update subject and comments for pre_send
-v1: https://lore.kernel.org/all/tencent_B31D1B432549BA28BB5633CB9E2C1B124B08@qq.com
+SNAPTYPSEL
+00		?
+01		?
+10		Sync, Delay_Req
+11		Sync, PDelay_Req, PDelay_Resp
 
- net/atm/lec.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+TSEVNTENA
+0		All messages except Announce, Management and Signalling
+1		Sync, Delay_Req, PDelay_Req, PDelay_Resp
 
-diff --git a/net/atm/lec.c b/net/atm/lec.c
-index afb8d3eb2185..423503d2e7a7 100644
---- a/net/atm/lec.c
-+++ b/net/atm/lec.c
-@@ -340,6 +340,23 @@ static int lec_close(struct net_device *dev)
- 	return 0;
- }
- 
-+static int lec_atm_pre_send(struct atm_vcc *vcc, struct sk_buff *skb)
-+{
-+	u32 sizeoftlvs;
-+	struct atmlec_msg *mesg;
-+	int msg_size = sizeof(struct atmlec_msg);
-+
-+	if (skb->len < msg_size)
-+		return -EINVAL;
-+
-+	mesg = (struct atmlec_msg *)skb->data;
-+	sizeoftlvs = mesg->sizeoftlvs;
-+	if (sizeoftlvs && !pskb_may_pull(skb, msg_size + sizeoftlvs))
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
- static int lec_atm_send(struct atm_vcc *vcc, struct sk_buff *skb)
- {
- 	static const u8 zero_addr[ETH_ALEN] = {};
-@@ -491,6 +508,7 @@ static void lec_atm_close(struct atm_vcc *vcc)
- 
- static const struct atmdev_ops lecdev_ops = {
- 	.close = lec_atm_close,
-+	.pre_send = lec_atm_pre_send,
- 	.send = lec_atm_send
- };
- 
+No table is provided, so it's difficult to know what all the bit
+combinations do for v3.74.
+
+From STM32MP151 documentation (v4.2 according to GMAC4_VERSION
+register):
+
+SNAPTYPSEL	TSMSTRENA	TSEVNTENA
+00		x		0		Sync, Delay_Req
+00		0		1		Delay_Req
+00		1		1		Sync
+01		x		0		Sync, PDelay_Req, PDelay_Resp
+01		0		1		Sync, Delay_Req, PDelay_Req,
+						PDelay_Resp
+01		1		1		Sync, PDelay_Req, PDelay_Resp
+10		x		x		Sync, Delay_Req
+11		x		x		Sync, PDelay_Req, PDelay_Resp
+
+For iMX8MP (v5.1) and STM32MP23/25xx (v5.3) documentatiion:
+
+SNAPTYPSEL	TSMSTRENA	TSEVNTENA
+00		x		0		Sync, Follow_Up, Delay_Req,
+						Delay_Resp
+00		0		1		Sync
+00		1		1		Delay_Req
+01		x		0		Sync, Follow_Up, Delay_Req,
+						Delay_Resp, PDelay_Req,
+						PDelay_Resp
+01		0		1		Sync, PDelay_Req, PDelay_Resp
+01		1		1		Delay_Req, PDelay_Req,
+						PDelay_Resp
+10		x		x		Sync, Delay_Req
+11		x		x		PDelay_Req, PDelay_Resp
+
+Differences:
+00 x 0 - adds Follow_Up
+00 X 1 - TSMSTRENA bit inverted
+01 x 0 - adds Follow_Up, Delay_Req, Delay_Resp
+01 0 1 - removes Delay_Req
+01 1 1 - removes Sync, adds Delay_Req
+11 x x - removes Sync
+
+So, it looks like there's another difference between v4.2 and v5.1.
+
+If the STM32MP151 (v4.2) documentation is correct, then from what I see
+in the driver, if HWTSTAMP_FILTER_PTP_V1_L4_SYNC is requested, we set
+SNAPTYPSEL=00 TSMSTRENA=0 TSEVNTENA=1, which semects Delay_Req messages
+only, but on iMX8MP this selects Sync messages.
+
+HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ is the opposite (due to the
+inversion of TSMSTRENA) for SNAPTYPSEL=00.
+
+For HWTSTAMP_FILTER_PTP_V2_EVENT, we currently set SNAPTYPSEL=01
+TSMSTRENA=0 and TSEVNTENA=1 for cores < v4.1:
+- For STM32MP151 (v4.2) we get Sync, PDelay_Req, PDelay_Resp but
+  _not_ Delay_Req. Seems broken.
+- For iMX8MP (v5.1) and STM32MP23/25xx (v5.3), we get
+  Sync, Follow_Up, Delay_Req, Delay_Resp, PDelay_Req, PDelay_Resp
+
+Basically, the conclusion I am coming to is that Synopsys's idea
+of "lets tell the hardware what _kind_ of PTP clock we want to be,
+whether we're master, etc" is subject to multiple revisions in
+terms of which messages each mode selects, and it would have been
+_far_ simpler and easier to understand had they just provided a
+16-bit bitfield of message types to accept.
+
+So, I'm wary about this change - I think there's more "mess"
+here than just that single version check in
+HWTSTAMP_FILTER_PTP_V2_EVENT, I think it's a lot more complicated.
+I'm not sure what the best solution is right now, because I don't
+have the full information, but it looks to me like the current
+approach does not result in the expected configuration for each
+of the dwmac core versions, and there are multiple issues here.
+
 -- 
-2.43.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
