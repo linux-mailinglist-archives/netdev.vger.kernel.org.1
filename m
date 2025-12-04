@@ -1,89 +1,125 @@
-Return-Path: <netdev+bounces-243573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12460CA3E19
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 14:48:48 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 660CECA3EAC
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 14:55:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 301313126484
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 13:42:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 78EBC304EFEC
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 13:45:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA34A34251D;
-	Thu,  4 Dec 2025 13:42:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 748FC33FE16;
+	Thu,  4 Dec 2025 13:44:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="MnqPnWcL"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="HKvNJFcj"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DEFB33ADB2;
-	Thu,  4 Dec 2025 13:42:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E9AF341678;
+	Thu,  4 Dec 2025 13:44:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764855745; cv=none; b=L1y6eqcyCzrdgU9+GnOHCaxCZFLHGAvT1T5bAwChnflpXQRqaxyYPpcx876MM13E3AhyhXJ0nfFMxFocrGQ4khkMUX3P6aTHNG20qlAM50oRUR/Q7FVGNBGS5WF1fawEL4Scoch5I5ILUnGjcRCymoVMOjYw7wgB4o+2bU87qgk=
+	t=1764855876; cv=none; b=fa9MN89pTDeChKTZkBcZXZzPb9rVkd/pnj99I2vKXdPYU1zfhm7CqltqaZ6WQeOTo7kapmoDnPC1AD0AM3szyvQlVVdhaBKmdII6pn+I1qSghQYqlopbMMi9ZQfOlLXGSejYLbfmjK8f5AnrN6pXqjG5fMerKyj1sqIHL8+vulE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764855745; c=relaxed/simple;
-	bh=0QBIxkornRAYl1QNH+6I9sOdWSDJjkgjCRwRR8R3Ins=;
+	s=arc-20240116; t=1764855876; c=relaxed/simple;
+	bh=9Ogr3JDeOqxGNUKGzHBlBtlsu8R6M/Fv3fz4YQgTjSs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TMM5OT+QEKVsKTkhMQaNtHs3TmO0fPz9Vwf9R6WKO2Ee/vMaKpuhbkzU7D8RmUYAoAcfLzhl8xJa+dvYYMWXIzrj9q6fuFAWgILbINwTxlvgQuv++qkXdGTv8AWtwnQIulOU55gCtQvyPButWO99T0sejf5OnKhngUiILEb9Ofw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=MnqPnWcL; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=GxyximWtzVRSV0MiEQri65zT5T31mjqG9SdGu/HuZGs=; b=MnqPnWcLRdXTqSJtfPfW/Tsq0n
-	cx+gGlKkAMJA5bCbH0Sc2quPHtfAfmjCR3/vhuYfmsV0q/5jxO7ulYTHQaIxnLjwG8w/fgTouEEYU
-	VbiWEclAqzpHlAbA04dsPede3qQmeOvR4VITOFad7ERzpSmUtk2A98lPvnNmfb6JGxPU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vR9b5-00FyQJ-4W; Thu, 04 Dec 2025 14:42:15 +0100
-Date: Thu, 4 Dec 2025 14:42:15 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jonas Gorski <jonas.gorski@gmail.com>
-Cc: Alexey Simakov <bigalex934@gmail.com>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Michael Buesch <mb@bu3sch.de>,
-	"John W. Linville" <linville@tuxdriver.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
-Subject: Re: [PATCH net] broadcom: b44: prevent uninitialized value usage
-Message-ID: <fddbad2c-8274-43c7-9b9f-e4b304a1b77b@lunn.ch>
-References: <20251204052243.5824-1-bigalex934@gmail.com>
- <a5236fe2-4e9b-49ef-9734-f3b60746896d@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=kcFSVgTNKZ0724MJ2tC5h8FS5iMPRCKUa33Qfh6m0M5W2CZPvttV6q0lnrjYMXIGM0/wB/tW7II11IWdBhhRSJdElNhFBYSE80wDImfbsd8kat737HMU4+6wMJ7btt7C/a6UdRBodJkts+he5SKaar/sv1NJGo9L1Jt6xQaj05Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=HKvNJFcj; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Reply-To:Content-ID:Content-Description;
+	bh=7NuXqo3aSvpmuekAC2C1oe2uL7mQ1FsOsgMv4C/bFqU=; b=HKvNJFcjb1ZHB9prvVO2vn88xZ
+	UeGWDDHCt2CH+GY9Kp9ev6bl6EjsdNHV4RmsDaO+Z0M9CN0m/NBvc2cqhSk5NT2bWuXbv1/SX6t78
+	5vIsJKavBekBSG3W83crDBNgJJzS8Qr9kWmJpS0JBZqoury5CV/L+k6TaoZmIa8vvzW5/2OLqYFRC
+	eH+o65SAhuUBBa1Ippoy8GBzC9vXVRywqLytQA2p8eo5vpmCgwMu+A3zA37zdUn97WCXRHsbiMgO3
+	Jfnue9Xvqbd7RA0hWS87bYJfZoGzz5WXc2td4OhERYMSgXFWuur9N773Why8NfsXyF7LO3vcRSv7p
+	nMrBhwHQ==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.94.2)
+	(envelope-from <leitao@debian.org>)
+	id 1vR9cz-0036dm-K6; Thu, 04 Dec 2025 13:44:14 +0000
+Date: Thu, 4 Dec 2025 05:44:09 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Fabian =?utf-8?Q?Gr=C3=BCnbichler?= <f.gruenbichler@proxmox.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, leit@meta.com, open list <linux-kernel@vger.kernel.org>, 
+	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: veth: Disable netpoll support
+Message-ID: <fjv5oojsuazpdofdrgggwfcafw5vheus3wwzccq22aeztrbyew@yguz7qsd6djk>
+References: <20240805094012.1843247-1-leitao@debian.org>
+ <1764839728.p54aio6507.astroid@yuna.none>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <a5236fe2-4e9b-49ef-9734-f3b60746896d@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1764839728.p54aio6507.astroid@yuna.none>
+X-Debian-User: leitao
 
-> > +++ b/drivers/net/ethernet/broadcom/b44.c
-> > @@ -1789,6 +1789,9 @@ static int b44_nway_reset(struct net_device *dev)
-> >  	u32 bmcr;
-> >  	int r;
-> >  
-> > +	if (bp->flags & B44_FLAG_EXTERNAL_PHY)
-> > +		return 0;
+hello Fabian,
+
+On Thu, Dec 04, 2025 at 10:20:06AM +0100, Fabian Grünbichler wrote:
+> On August 5, 2024 11:40 am, Breno Leitao wrote:
+> > The current implementation of netpoll in veth devices leads to
+> > suboptimal behavior, as it triggers warnings due to the invocation of
+> > __netif_rx() within a softirq context. This is not compliant with
+> > expected practices, as __netif_rx() has the following statement:
+> > 
+> > 	lockdep_assert_once(hardirq_count() | softirq_count());
+> > 
+> > Given that veth devices typically do not benefit from the
+> > functionalities provided by netpoll, Disable netpoll for veth
+> > interfaces.
 > 
-> Wouldn't the right fix here to call phy_ethtool_nway_reset(dev->phydev); instead
-> of just returning 0? That way it properly restarts auto-negotiation even in this
-> case.
+> this patch seems to have broken combining netconsole and bridges with
+> veth ports:
 
-Actually, yes. ksettings_set() etc do exactly that. Let me change my
-Reviewed by into a Change Request.
+Sorry about it, but, veth ends up calling __netif_rx() from a process
+context, which kicks the lockdep above.
 
-Thanks
-    Andrew
+__netif_rx() should be only called from soft or hard IRQ, which is not
+how netpoll operates. A printk message can be printed for any context.
 
----
-pw-bot: cr
+> https://bugzilla.proxmox.com/show_bug.cgi?id=6873
+> 
+> any chance this is solvable?
+
+I don't see a clear way to solve it from a netpoll point of view,
+honestly.
+
+From a veth perspective, I am wonderig if veth_forward_skb() can call
+netif_rx(), which seems to be safe in any context. Something as:
+
+	diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+	index cc502bf022d5..cf6443e5d7bc 100644
+	--- a/drivers/net/veth.c
+	+++ b/drivers/net/veth.c
+	@@ -318,7 +318,7 @@ static int veth_forward_skb(struct net_device *dev, struct sk_buff *skb,
+	{
+		return __dev_forward_skb(dev, skb) ?: xdp ?
+			veth_xdp_rx(rq, skb) :
+	-               __netif_rx(skb);
+	+               netif_rx(skb);
+	}
+
+	/* return true if the specified skb has chances of GRO aggregation
+	@@ -1734,7 +1734,6 @@ static void veth_setup(struct net_device *dev)
+		dev->priv_flags |= IFF_LIVE_ADDR_CHANGE;
+		dev->priv_flags |= IFF_NO_QUEUE;
+		dev->priv_flags |= IFF_PHONY_HEADROOM;
+	-       dev->priv_flags |= IFF_DISABLE_NETPOLL;
+		dev->lltx = true;
+
+		dev->netdev_ops = &veth_netdev_ops;
 
