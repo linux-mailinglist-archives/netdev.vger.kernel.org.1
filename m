@@ -1,154 +1,181 @@
-Return-Path: <netdev+bounces-243510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9415CA2D64
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 09:37:43 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8B6ECA2DAD
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 09:46:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EA7E9301C89A
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 08:37:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CB3F430161B4
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 08:46:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3A06327C03;
-	Thu,  4 Dec 2025 08:37:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 766843112D2;
+	Thu,  4 Dec 2025 08:46:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZpQFNzAe";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="nRGqH40E"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BLm/MtBQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4801431D72D
-	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 08:37:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91E72296BC9
+	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 08:46:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764837461; cv=none; b=eRjq/iI0R3NBdLG90bN+MTNgfQ4/N8xY8O26hRNb5/k2iiK28VUulyuszE2xZNBY5wqMsvhg/eyOI9B6O7DyzeMDRHKox27PE3IZPvakRN7WwS90gD4BpHh0r7jJzQy1d7XekzJNmCBUim6uMifGpsJQLaAqEkI9EukSBaA8eqc=
+	t=1764838009; cv=none; b=ROWHbH6asB/2S3mxqeBrd0fR6dRwRc114/sf1n890dtUrrlqTecbHQXwy+XfyQXZpCq+iMkic/RVnRzd90uH8s1EWCuz4t+u6teoFb85WZCRVRC1oSgABR+5PXiiyPsV4yyD67AkpyBEkhrPCDFdHOftTTsOLEMPWzuIra2/tkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764837461; c=relaxed/simple;
-	bh=Fgti3Yp68+r1SXdHjNvigqNpTieQfP3rIFRvqwDgXVI=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Cc:Content-Type; b=ObkTvFBIKSi9fY7YJpM+Cf7mXxiNkngaRTDpSCC9Ffxzpd8E5xm9r5HLBfSOvcKsiMEn/+oREsroYc7Gx15/1Ac/qyRq4Dv4f9mu7eojsocz6a5S9GgbqSJBqfnhJo2JV8aDXowChDr2noiwfrjFWaHwLjORY3uobbiXqIDDHbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZpQFNzAe; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=nRGqH40E; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764837459;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Fgti3Yp68+r1SXdHjNvigqNpTieQfP3rIFRvqwDgXVI=;
-	b=ZpQFNzAeVEUSBeymrYARs3asayHbvEII9+G4r1uEZnc5FW5fYhOlaaaD2RvhNLax/Ehy5N
-	SvtePppkfmYVgR6tlFfKd5RY+oXhriCS1xsXBqU3Mkk/QI8AHj+CkdBc0+XS+HBg2P8Z3s
-	Zhrpe81G2pg6o4BjZekHMXC/0jkzWtI=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-639-dZGeNhQnN-CXIIWeGJRR9g-1; Thu, 04 Dec 2025 03:37:38 -0500
-X-MC-Unique: dZGeNhQnN-CXIIWeGJRR9g-1
-X-Mimecast-MFC-AGG-ID: dZGeNhQnN-CXIIWeGJRR9g_1764837457
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-477563a0c75so3413155e9.1
-        for <netdev@vger.kernel.org>; Thu, 04 Dec 2025 00:37:37 -0800 (PST)
+	s=arc-20240116; t=1764838009; c=relaxed/simple;
+	bh=5MsyoJKTr4eF88k1DWmG9hWB82ikFU21rjVWJP2KK98=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tL7T27BniqYtboq1QDecHe5ch2KkDasgQqxnpAXsLnR4xFpfzm94n1EdA1hnh89DVekQf9hVOreXr9k6vBftBv8Cw/iTRU/XNSEuIMHXjqj0uWZYddloH/zCdPXC5lb193JrbXi4OWjMKRAXyf/Ysiv3z90/mKA61CKYNl2CReM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BLm/MtBQ; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-42b2dd19681so18217f8f.3
+        for <netdev@vger.kernel.org>; Thu, 04 Dec 2025 00:46:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764837456; x=1765442256; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:subject:from:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Fgti3Yp68+r1SXdHjNvigqNpTieQfP3rIFRvqwDgXVI=;
-        b=nRGqH40Eb8jPlEqLKyctp5JX+jgbcBrCLcW5eNJGsrb0WLK+aRsYrSLip/KCyGA1DS
-         CQHnbDmDWR7WOGZ65oRG8yBcflYV47Ft2yDKRE+7gWvB+EzVOXFpqNbp3aHUAY8yBdL1
-         K51BgV3HT+L7Uy6HI/Mhnu0pmcMM3v3plD23xvSCYxS5kh3GTnIr2eNCMuVG+g04dzIR
-         WWxiNixQqVzinaKaU2DJ86Fo/1F1aDVHoq3iL/OffZ6yEFy4k5jav41dDxacMk1H2Rqv
-         3O1tiOYx0pvCTK9+uM04dwmHuQ7utOKkydby6N6FiBg5nOaskqvTRTAej+vWUMlrgkcn
-         WhEA==
+        d=gmail.com; s=20230601; t=1764838006; x=1765442806; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=gWkHWPtGsg+Xm2BeS7xJzUOT5NNUY3njkadNQnGgQus=;
+        b=BLm/MtBQGTNRwRJRFyRi5jVzfmwabYWe7ze/aX0XawQwmTs2pbl6/Agw3K4FaCFZ5A
+         dUVraczCDXpr5qmSGRFX6XFvKfCwrucKb5agcLsbOKMhN5lRRUjxorKuZ2c9Chbd0HPT
+         91/CcV7cPGw9hNS4FKURR5tbWLZxArGEPC1xnJ/QERxtZOgDc10SGWiA5f+evL9iC7VB
+         fmZMhKysrnoyYuOue76usX4b4OVjr5nRSOyZNhm/Cd/c3stdkQnawYFSF5nMgqlmFKjC
+         VwSYoz+sSyxOSx8xmWhR7Atep90L2LViUrMadS9XtGo6xzOPaFZYLLqKinDD1273XV/0
+         fdLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764837456; x=1765442256;
-        h=content-transfer-encoding:cc:subject:from:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Fgti3Yp68+r1SXdHjNvigqNpTieQfP3rIFRvqwDgXVI=;
-        b=MhGoSA+J4YfU5Hww4aJjw8uWI7bIP/8/RZCuiy0oSqlHasTxHsWM3AXrF3ZPw7c2lc
-         bvsA+HzvOyWti3eL3jNu1Y2Mke6KAH+S9TRu1Y0ajCAZouEKgtwliMiH91F3si50DEMC
-         I1jEkT7SNDLiKSd//P9Xtwe2YYrkuxomtY68jrpJOmZrmOya1n12E0d/AkGEVowME/cY
-         2zoqlZ8FjrVS3ZWfvwlOQAg+FrdG6PPbpCWxqRVmsY5ZjCJ/4v2D1I8oD9PdDeOWEXGV
-         5vABHg36cNgcwul6nvt9cGNtY3ZtHUHisrnRYU7g7Qdr0wAonQLfOrflsScXEbIffbmx
-         npwA==
-X-Gm-Message-State: AOJu0YzJFuA0iAbi/lao0ErrNT1fBKKYRK4tiAiaSf1j9fZMJunfBmZs
-	p+eupXsSJiqSJ0umzzlxrgwkufcfRC1Bb4t0++3WsNsC4jlXN15HHo/Ty6VtlMjs1sBVVqOBE+J
-	EWYHJSXDXuUzxJhWk25ntjX+xnS+jTbe8xxTJdXNugg8kBqusG07MXNsP6WbfULtoAp1ypFaEIZ
-	bOtZPDW5WMfOi539gWeguyrvrcXK8meKXLLchGScg=
-X-Gm-Gg: ASbGncsu5CZcDZibstN1dWeCDuAbvmpQwMNGfLJ1iJdYPVHyH05Qm2ZH0vroGo22oqL
-	irtVcleD3b8xN9+LLV1yvdkMELdhHhRQn/VpRysfu5V0Z0SlSFihjJpA4eYV6onFPAPB+mSQ7/C
-	AaHoG5X6jg0UEdo3IsZLPSZODyF4adqrro9qTe1EATr7N9iIAURYoRAk+eNGU0jeZiHwsa10YCW
-	L6BkdYA+J/7aB3TjZtpeRYIF+Gy03SUQeRgNnAUacZ0Z0RE2k//Dhjax/N6//mqdaS2Xv6fpLPb
-	gTwy+69ppokoW54jvuC7vKdSuGfMGh4zhLsjr9/bwVhCjHMltiBnGB0bNU5s1xw4NZNvfr2G++p
-	ZpBvMG/qbJsEL
-X-Received: by 2002:a05:600c:3b1f:b0:477:fcb:226b with SMTP id 5b1f17b1804b1-4792f24413emr20684355e9.2.1764837456609;
-        Thu, 04 Dec 2025 00:37:36 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFOFiaycmUpSi4NFw0Dx9Owuk3m9GKbQxWbEzhOFEEvLDFewzTh2sfwX63tPD9WFtnBq5V4Cw==
-X-Received: by 2002:a05:600c:3b1f:b0:477:fcb:226b with SMTP id 5b1f17b1804b1-4792f24413emr20683335e9.2.1764837455818;
-        Thu, 04 Dec 2025 00:37:35 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.153.24])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42f7d352a52sm1925339f8f.38.2025.12.04.00.37.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Dec 2025 00:37:35 -0800 (PST)
-Message-ID: <3a2cf402-cba2-49d1-a87e-a4d3f35107d0@redhat.com>
-Date: Thu, 4 Dec 2025 09:37:32 +0100
+        d=1e100.net; s=20230601; t=1764838006; x=1765442806;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gWkHWPtGsg+Xm2BeS7xJzUOT5NNUY3njkadNQnGgQus=;
+        b=gbCYW/hHee47ANfgbL+sbMDq6VRWtuxXd/4t89EAD9MUqkIZ7b+aMs2o7R4z0HbYmu
+         F8wDbQIQxPH4vBL1g07WxkzJ9h/8dUuMLQ3yZwFXhMwM0UJVxjhGdGBChyyXk0Nz01aJ
+         UOWDf+zmquqPF01SxN/iZxEYuBZ0XT9hPa0pHjEABB5xhKdMmhc8nsMYJ2M0SM7P+owP
+         SGWGSag7CY8AFe11wXgYxXB9cO0QkU7a0Rqh1cm56q3JP7qAfyPdi/tcYqv04izHXP/V
+         isqK3Srr6rhUzEvlUJ10cVBm/b408Al1c3cIINZ7+yKmz+2ar+2xyW1O35HCNnKTQkHb
+         IGxg==
+X-Forwarded-Encrypted: i=1; AJvYcCXW159fRRSZ5g5kWySHFbLzGnOoyCH6B/Ffc5C7o9BdAD5FFVIqrPENeEGV7cFOb81tJn4F/J8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyR+6AAWlBvUCJrDo3eL0r/+/1K7ZZwtLAtrRvk8mr1shgDabYT
+	xh6jdJ4DajCD8XhtLKRYmRw3KJkJDoZQV6NLf2trZQDEnBLRtqw5tT+n
+X-Gm-Gg: ASbGnct928MUqzaJys5VoDDfZjMTwjV5puzSJWm7oMXWC1FDCXZO4HjjGOaDZfLKk+T
+	cKNsoXfq34UxD3kaNlbnuaFa34B7HKbdNDJBxwW3ejtQwz+HNAD/nb9uCOM41FEdE5/sqeqJYkc
+	vL0wIEgyjJgkfK92BCFs5BzNI6kNrHpf2YBPZmdZSgf3f3WIFaRdZ3LOYVq0fe1fBX2T/dDdIfb
+	B2X7AZ/3TGks57TcTfhNDGqENzTg+ejogyps923tkcRkv1ZORxfYd9mgujvVHxj9TLCB6J2Iu16
+	ZVIYSMZNwDYehynJ/Le4/f4gBuA47SzQ4TLlJbMMrYFWzqiYiZKR2GF4fD76dxUoei8erWc9ihS
+	5+SaNwrvNCeJ8ZLk0dyUXBBjyORZCb+d2KX7RNCgsrlpKDPyMhjtDxWJIynPK5FumIcQewcp8ym
+	lJKIY=
+X-Google-Smtp-Source: AGHT+IFVTKZwo4vPlKApACc3OUpSIbjv0D99Exxz+P0II6Wh2U2WWgrCkhuhzseDjkfyaPOAoYhevA==
+X-Received: by 2002:a5d:5f95:0:b0:42b:2c53:3ab9 with SMTP id ffacd0b85a97d-42f755890bamr2616039f8f.1.1764838005553;
+        Thu, 04 Dec 2025 00:46:45 -0800 (PST)
+Received: from skbuf ([2a02:2f04:d106:d600:dbb2:245d:2cf5:21d3])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42f7d2226d0sm1950044f8f.21.2025.12.04.00.46.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Dec 2025 00:46:44 -0800 (PST)
+Date: Thu, 4 Dec 2025 10:46:41 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Frank Wunderlich <frankwu@gmx.de>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
+	Juraj Povazanec <jpovazanec@maxlinear.com>,
+	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	"Livia M. Rosu" <lrosu@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: Re: [PATCH RFC net-next 0/3] net: dsa: initial support for MaxLinear
+ MxL862xx switches
+Message-ID: <20251204084641.fmha6irlfgkazsuw@skbuf>
+References: <cover.1764717476.git.daniel@makrotopia.org>
+ <20251203202605.t4bwihwscc4vkdzz@skbuf>
+ <cover.1764717476.git.daniel@makrotopia.org>
+ <20251203202605.t4bwihwscc4vkdzz@skbuf>
+ <aTDGX5sUjaXzqRRn@makrotopia.org>
+ <aTDGX5sUjaXzqRRn@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-From: Paolo Abeni <pabeni@redhat.com>
-Subject: [ANN] poll on EoY break
-Cc: Johannes Berg <johannes@sipsolutions.net>,
- Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>,
- Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- linux-bluetooth@vger.kernel.org,
- "netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
- Oliver Hartkopp <socketcan@hartkopp.net>,
- Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org,
- Dust Li <dust.li@linux.alibaba.com>, Sidraya Jayagond
- <sidraya@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
- "D. Wythe" <alibuda@linux.alibaba.com>, Matthieu Baerts
- <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>,
- MPTCP Linux <mptcp@lists.linux.dev>,
- "open list:BPF [NETWORKING] (tcx & tc BPF, sock_addr)"
- <bpf@vger.kernel.org>, Magnus Karlsson <magnus.karlsson@intel.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- "Jason A. Donenfeld" <Jason@zx2c4.com>, wireguard@lists.zx2c4.com,
- Tony Nguyen <anthony.l.nguyen@intel.com>, Tariq Toukan <tariqt@nvidia.com>,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Aaron Conole <aconole@redhat.com>,
- Eelco Chaudron <echaudro@redhat.com>, Ilya Maximets <i.maximets@ovn.org>,
- dev@openvswitch.org, Steffen Klassert <steffen.klassert@secunet.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, devel@lists.linux-ipsec.org,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aTDGX5sUjaXzqRRn@makrotopia.org>
+ <aTDGX5sUjaXzqRRn@makrotopia.org>
 
-Hi all,
+On Wed, Dec 03, 2025 at 11:23:11PM +0000, Daniel Golle wrote:
+> On Wed, Dec 03, 2025 at 10:26:05PM +0200, Vladimir Oltean wrote:
+> > How does this switch architecture deal with SFP cages? I see the I2C
+> > controllers aren't accessible through the MDIO relay protocol
+> > implemented by the microcontroller. So I guess using the sfp-bus code
+> > isn't going to be possible. The firmware manages the SFP cage and you
+> > "just" have to read the USXGMII Status Register (reg 30.19) from the
+> > host? How does that work out in practice?
+> 
+> In practise the I2C bus provided by the switch IC isn't used to connect
+> an SFP cage when using the chip with DSA. Vendors (Adtran,
+> BananaPi/Sinovoip) rather use an I2C bus of the SoC for that.
+> I suppose it is useful when using the chip as standalone switch.
+> 
+> The firmware does provide some kind of limited access to the PCS, ie.
+> status can be polled, interface mode can be set, autonegotiation can be
+> enabled or disabled, and so on (but not as nice as we would like it to
+> be). In that way, most SFP modules and external PHYs can be supported.
+> 
+> See
+> 
+> https://github.com/frank-w/BPI-Router-Linux/commit/c5f7a68e82fe20b9b37a60afd033b2364a8763d8
+> 
+> In general I don't get why all those layers of abstraction are actually
+> needed when using a full-featured OS on the host -- it'd be much better
+> to just have direct access to the register space of the switch than
+> having to deal with that firmware API (the firmware can also provide a
+> full web UI, SNMP, a CLI interface, ... -- imho more of an obstacle than
+> a desirable feature when using this thing with DSA).
 
-Due to some unfortunate calendar, conference and personal schedule
-circumstances we (the netdev maintainers) are strongly considering an
-end-of-year break similar to 2024'one, but for a longer period:
-effectively re-opening net-next after Jan 2.
+I'm not sure I understand either, but is it possible that since the base
+Ethernet switch IP was already MDIO-based, Maxlinear wanted to offer a
+single programming interface for the entire SoC as visible from an
+external host, so that's why they continued exposing the other stuff
+that they did in MMD 30 (temperature sensor, LEDs, etc) using this North
+Korean guided tour kind of approach.
 
-Since this comes out-of-the blue and with a very strict timing, please
-express your opinion using the poll below:
+I am noting that there also seems no way to control the 'GPIO' pins as
+GPIO from the external host. No way to set a direction or a value on
+them. They seem to be "GPIO" only for the microcontroller.
 
-http://poll-maker.com/poll5664619x19774f43-166
+It also seems possible that Maxlinear studied what other MDIO-based DSA
+drivers offer, and they wanted to keep things in line with that,
+(over)simplifying access to resources to keep things tidy when they are
+all driven from DSA.
 
-The poll will be open for the next 24H.
+Although for other switches like the NXP SJA1110 (which has a SPI-to-AHB
+bridge to gain direct access into sub-devices that are also mapped in the
+microcontroller's address space) I try to push for the MFD model to be
+used, for better scalability outside of drivers/net/dsa/, I think that
+trying to horseshoe MFD on top of the MxL86252, at least in the way exposed
+by the MDIO slave API implemented by its microcontroller, would be
+overkill and a big a mistake.
 
-Thanks,
+But before I give my OK on your driver design choice, could you:
+- confirm that the Zephyr-based MDIO slave firmware is the single
+  external register access method for these chips in production? No
+  register access or other special communication protocol with the
+  microcontroller over Ethernet, no secret SPI-to-AHB bridge that can be
+  used when there is no firmware running? The firmware image is maintained
+  by Maxlinear, and their customers can't customize it, right?
+- make a list of all the subsystems you foresee this chip will register
+  itself with? Essentially how will it drive the sub-devices that the
+  firmware does give it access to.
 
-Paolo
-
+So what I'm trying to gauge is how complex this driver will be in its
+fully developed form, to make sure it won't suffer from early underdesign
+issues.
 
