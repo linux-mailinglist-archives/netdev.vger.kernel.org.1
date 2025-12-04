@@ -1,122 +1,122 @@
-Return-Path: <netdev+bounces-243490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFC15CA2142
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 02:02:32 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C43BCA2162
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 02:12:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A92103002B1C
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 01:02:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 08EF6301AF5D
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 01:12:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8CCF1E32CF;
-	Thu,  4 Dec 2025 01:02:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="hULWwiei"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AB471B4F1F;
+	Thu,  4 Dec 2025 01:12:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DB5D1465B4;
-	Thu,  4 Dec 2025 01:02:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86BDE182D0;
+	Thu,  4 Dec 2025 01:12:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764810148; cv=none; b=oNgHuc0x/I9TqRXyfhKsaO6yfa0a1YA3j4UVTs3Qbd9U0UcJOQaSfCn5kA2OhP0ywSrDIE1/1TVcigzNoNDjUeuFfAeFXXD0sOItuouApzwBPRg36S2I4iwH9z3ZlHcwMYbbeNp+1wATwAEUshgxw630nsVXPfZbgD4lc+9asdI=
+	t=1764810769; cv=none; b=OHeMTU2YEH2pc1A2/tN1goI3Qd+jr7FshnlMm9eLfYLhyqPzoUAV8YM10iLxlkisTiIoxu5KYH8d5BEHcCftg2CG87tVsSSQ5TWdkwnB57gtxMgVRIFsr6zZ4l4G3tJtYKwPYJEVFHMghNrYTRSL+/wsFZTyOx3rAZisQAjuQ4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764810148; c=relaxed/simple;
-	bh=bg88pLMr9CMYzkHaGdi+LhvOj97+QHA/B2ATzDj7aGI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IZbctjlCJ9NDpoWc7TmqhLPiMGy6VAGYdKZgTW1NeaEKwQfyhwvD1sPw4DJaFNR7HFf97SDfbBEkLRqZ0EmM+y/XE/0Y/Hhucm+JIhFzWkmMkNaJx9w1R8l6DZHoWNYCFVNMo17OD5Qn7RWVYs2BunPelFsgP9K/8rZx17aT7tM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=hULWwiei; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=wAIbeQSPfCT7r8tmW2D+4WrIu0ifhLWF/0TXZLA3tpI=; b=hULWwieiAhju9D/LhlU3sKTreh
-	zktUwShzm0/KTWJ8HljfJq1hS2EfH5T+jeayJAbkRNUUMtWdxqSKsSHdOHiN9MfayukeWlJpP+CfE
-	ca9+Lc0k/RDtbEdEr2Z+nM7XlaKAsKsiEP1FZWdiH2JJCxI2XdW7K0T6GuEU2C6Ikb8HdB+PzyE6b
-	C5KFsJLJ641Uiabe3l7eUfpv+ZaO9iwz+NUdfq9H4CYbz5iGfTiQI421SVkamZQQxzadhG1HY5bSR
-	f4feuGf0wNhh3arFTE0XDG/u7ZXV55HxxF5qoSl/jwC1uSy4YcjMSMAckgINay2Ai2MTlfY6dE2Mo
-	FErjGqWQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55206)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vQxjc-0000000031r-3auy;
-	Thu, 04 Dec 2025 01:02:16 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vQxja-000000000WL-41JF;
-	Thu, 04 Dec 2025 01:02:15 +0000
-Date: Thu, 4 Dec 2025 01:02:14 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	s=arc-20240116; t=1764810769; c=relaxed/simple;
+	bh=zPeVun2lXFp3lUxpiMBe+ba5hiR+qBkiq2MyrQzJhII=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ESpqzvt8hMqF4LPWtl66MqsmN00LJMY89BIWOKB8oBPuSCSNlbK2rrXQuCtzhuxuHz9Cl4xp1DrCFyfYLU2NwEQYHagi/hy4494w18HHeHGfs1hb5YlsSZz3mIxTKlkS+OJt5FlsqPL5w9r9R8SmpXaOcJAglVM2GaAW5m1L6x0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 5256496ad0ae11f0a38c85956e01ac42-20251204
+X-CTIC-Tags:
+	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
+	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
+	HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM, HR_SJ_PHRASE
+	HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT, HR_TO_NAME
+	IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_TRUSTED, SA_EXISTED
+	SN_TRUSTED, SN_EXISTED, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS
+	CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS, GTI_RG_INFO, GTI_C_BU
+	AMN_GOOD, ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.6,REQID:3a5e45e1-666d-4a4d-95e9-0818e75db6ec,IP:10,U
+	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:0
+X-CID-INFO: VERSION:1.3.6,REQID:3a5e45e1-666d-4a4d-95e9-0818e75db6ec,IP:10,URL
+	:0,TC:0,Content:-5,EDM:0,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:a9d874c,CLOUDID:1da5b09dffecb786ce1fede61200d24b,BulkI
+	D:2512011054219RRSEZPR,BulkQuantity:1,Recheck:0,SF:17|19|38|66|78|102|127|
+	850|898,TC:nil,Content:0|15|50,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:41,
+	QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+	,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 5256496ad0ae11f0a38c85956e01ac42-20251204
+X-User: zhaochenguang@kylinos.cn
+Received: from localhost.localdomain [(223.70.160.239)] by mailgw.kylinos.cn
+	(envelope-from <zhaochenguang@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 831413987; Thu, 04 Dec 2025 09:12:37 +0800
+From: Chenguang Zhao <zhaochenguang@kylinos.cn>
+To: Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	NeilBrown <neil@brown.name>,
+	Olga Kornievskaia <okorniev@redhat.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Frank Wunderlich <frankwu@gmx.de>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH RFC net-next 0/3] net: dsa: initial support for MaxLinear
- MxL862xx switches
-Message-ID: <aTDdlibA99YLVSKV@shell.armlinux.org.uk>
-References: <cover.1764717476.git.daniel@makrotopia.org>
- <20251203202605.t4bwihwscc4vkdzz@skbuf>
- <aTDGX5sUjaXzqRRn@makrotopia.org>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: Chenguang Zhao <zhaochenguang@kylinos.cn>,
+	linux-nfs@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH RESEND linux-next] SUNRPC: Optimize list definition method
+Date: Thu,  4 Dec 2025 09:12:32 +0800
+Message-Id: <20251204011232.41487-1-zhaochenguang@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aTDGX5sUjaXzqRRn@makrotopia.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Dec 03, 2025 at 11:23:11PM +0000, Daniel Golle wrote:
-> On Wed, Dec 03, 2025 at 10:26:05PM +0200, Vladimir Oltean wrote:
-> > Hi Daniel,
-> > 
-> > On Tue, Dec 02, 2025 at 11:37:13PM +0000, Daniel Golle wrote:
-> > > Hi,
-> > > 
-> > > This series adds very basic DSA support for the MaxLinear MxL86252
-> > > (5 PHY ports) and MxL86282 (8 PHY ports) switches. The intent is to
-> > > validate and get feedback on the overall approach and driver structure,
-> > > especially the firmware-mediated host interface.
-> > > 
-> > > MxL862xx integrates a firmware running on an embedded processor (Zephyr
-> > > RTOS). Host interaction uses a simple API transported over MDIO/MMD.
-> > > This series includes only what's needed to pass traffic between user
-> > > ports and the CPU port: relayed MDIO to internal PHYs, basic port
-> > > enable/disable, and CPU-port special tagging.
-> > > 
-> > > Thanks for taking a look.
-> > 
-> > I see no phylink_mac_ops in your patches.
-> 
+Integrate list definition and initialization into LIST_HEAD macro
 
-As you didn't respond to Vladimir's statement here, I will also echo
-this. Why do you have no phylink_mac_ops ?
+Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
+---
+ net/sunrpc/backchannel_rqst.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-New DSA drivers are expected to always have phylink_mac_ops, and not
-rely on the legacy fallback in net/dsa/port.c
-
+diff --git a/net/sunrpc/backchannel_rqst.c b/net/sunrpc/backchannel_rqst.c
+index caa94cf57123..949022c5574c 100644
+--- a/net/sunrpc/backchannel_rqst.c
++++ b/net/sunrpc/backchannel_rqst.c
+@@ -131,7 +131,7 @@ EXPORT_SYMBOL_GPL(xprt_setup_backchannel);
+ int xprt_setup_bc(struct rpc_xprt *xprt, unsigned int min_reqs)
+ {
+ 	struct rpc_rqst *req;
+-	struct list_head tmp_list;
++	LIST_HEAD(tmp_list);
+ 	int i;
+ 
+ 	dprintk("RPC:       setup backchannel transport\n");
+@@ -147,7 +147,6 @@ int xprt_setup_bc(struct rpc_xprt *xprt, unsigned int min_reqs)
+ 	 * lock is held on the rpc_xprt struct.  It also makes cleanup
+ 	 * easier in case of memory allocation errors.
+ 	 */
+-	INIT_LIST_HEAD(&tmp_list);
+ 	for (i = 0; i < min_reqs; i++) {
+ 		/* Pre-allocate one backchannel rpc_rqst */
+ 		req = xprt_alloc_bc_req(xprt);
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.25.1
+
 
