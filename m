@@ -1,80 +1,96 @@
-Return-Path: <netdev+bounces-243509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4BB5CA2D00
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 09:29:21 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9415CA2D64
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 09:37:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A5AFA3058E51
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 08:27:30 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EA7E9301C89A
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 08:37:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D83E33509E;
-	Thu,  4 Dec 2025 08:27:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3A06327C03;
+	Thu,  4 Dec 2025 08:37:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CDwPM5S0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZpQFNzAe";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="nRGqH40E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F9E330D3B
-	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 08:27:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4801431D72D
+	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 08:37:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764836849; cv=none; b=Bi3pgCySdTigfidvxYxqnWVtefwJJH5bf2wxMwE6TbL1K1PipTwlqaBu2sEnFmmVIfj8f6T3HdcjowI6UeO6WvMMmzjZ6Kor3emMvCk2bEeP3apcm3pWDtHs7KY4T1C/GTC4kGbcCnUTAEkKSkv92gGH6rx2YkM0uv3UaKau+RQ=
+	t=1764837461; cv=none; b=eRjq/iI0R3NBdLG90bN+MTNgfQ4/N8xY8O26hRNb5/k2iiK28VUulyuszE2xZNBY5wqMsvhg/eyOI9B6O7DyzeMDRHKox27PE3IZPvakRN7WwS90gD4BpHh0r7jJzQy1d7XekzJNmCBUim6uMifGpsJQLaAqEkI9EukSBaA8eqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764836849; c=relaxed/simple;
-	bh=+mJapQUcgIG/gMfIXcsKANm2CElCwdjZuVxCtHLEwxY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dvOFQGBNDLfuRO3gqvHcSXDkEz2uYodpoAsxCZYJzPzXzP1zi/p8+ASGWrw8edvvAnG9ClN/Hcy7G7LdqaVtC5fER/aqDFV9+3rzDnySRodsHv84bd71ciywOoULzMA5gy56nbRkK/XvrMXg1yXPBj3/Wk0GXTE23ldVl6r/HnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CDwPM5S0; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-42f762198cbso408584f8f.3
-        for <netdev@vger.kernel.org>; Thu, 04 Dec 2025 00:27:27 -0800 (PST)
+	s=arc-20240116; t=1764837461; c=relaxed/simple;
+	bh=Fgti3Yp68+r1SXdHjNvigqNpTieQfP3rIFRvqwDgXVI=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Cc:Content-Type; b=ObkTvFBIKSi9fY7YJpM+Cf7mXxiNkngaRTDpSCC9Ffxzpd8E5xm9r5HLBfSOvcKsiMEn/+oREsroYc7Gx15/1Ac/qyRq4Dv4f9mu7eojsocz6a5S9GgbqSJBqfnhJo2JV8aDXowChDr2noiwfrjFWaHwLjORY3uobbiXqIDDHbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZpQFNzAe; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=nRGqH40E; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764837459;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Fgti3Yp68+r1SXdHjNvigqNpTieQfP3rIFRvqwDgXVI=;
+	b=ZpQFNzAeVEUSBeymrYARs3asayHbvEII9+G4r1uEZnc5FW5fYhOlaaaD2RvhNLax/Ehy5N
+	SvtePppkfmYVgR6tlFfKd5RY+oXhriCS1xsXBqU3Mkk/QI8AHj+CkdBc0+XS+HBg2P8Z3s
+	Zhrpe81G2pg6o4BjZekHMXC/0jkzWtI=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-639-dZGeNhQnN-CXIIWeGJRR9g-1; Thu, 04 Dec 2025 03:37:38 -0500
+X-MC-Unique: dZGeNhQnN-CXIIWeGJRR9g-1
+X-Mimecast-MFC-AGG-ID: dZGeNhQnN-CXIIWeGJRR9g_1764837457
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-477563a0c75so3413155e9.1
+        for <netdev@vger.kernel.org>; Thu, 04 Dec 2025 00:37:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764836846; x=1765441646; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=kk4Me8kGllHr/VDwvtsYkc5klFKItoxmBTnZhaBfwbM=;
-        b=CDwPM5S08fh9JhPXyvVPbvm2Pw9U39wGIKSNwVHgCsQAXg9PMLSSZuqMYQvvNSC3I8
-         UBgFCo12qkaz9VnC4HsBIcqfXy7KpXGvFMg+AyLWTXS3pmr5LTF7oJ1t+2AfaybgjiGK
-         n7HBboT9VvquQlMaSxJyN04HtIi3LaG8wf/ubSYSzrS3mqJjzKa0rtrRNKxVtgePjKnf
-         Ub3cECCfVs7KvxyNhf+MXV8rFFUpOGzLyd6SDAxy8HMR2hOk3fMN+9mUqlWtOkFipTIk
-         QtkPp9+NRsy34tSog+hGmJupf/fUSr97qPtNoYPSzcQEz9uvkXiHdvjUeqrgLK8gnL+X
-         i77A==
+        d=redhat.com; s=google; t=1764837456; x=1765442256; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Fgti3Yp68+r1SXdHjNvigqNpTieQfP3rIFRvqwDgXVI=;
+        b=nRGqH40Eb8jPlEqLKyctp5JX+jgbcBrCLcW5eNJGsrb0WLK+aRsYrSLip/KCyGA1DS
+         CQHnbDmDWR7WOGZ65oRG8yBcflYV47Ft2yDKRE+7gWvB+EzVOXFpqNbp3aHUAY8yBdL1
+         K51BgV3HT+L7Uy6HI/Mhnu0pmcMM3v3plD23xvSCYxS5kh3GTnIr2eNCMuVG+g04dzIR
+         WWxiNixQqVzinaKaU2DJ86Fo/1F1aDVHoq3iL/OffZ6yEFy4k5jav41dDxacMk1H2Rqv
+         3O1tiOYx0pvCTK9+uM04dwmHuQ7utOKkydby6N6FiBg5nOaskqvTRTAej+vWUMlrgkcn
+         WhEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764836846; x=1765441646;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kk4Me8kGllHr/VDwvtsYkc5klFKItoxmBTnZhaBfwbM=;
-        b=D9MNsw7qTatBHYB1yErPtrwwFwae4pQWXulfkth5VVRpcuPLauLG4nXhJX1ymxtUkG
-         8Ult63iw3ncHnf5q+jvbqkxf0Ag4zrIYyT+wBmQnc8k8UPjcqvvpqvYZG0DPqWxc0IDV
-         7afXJ5tq6ztBcW6nHNBIaC2hIqmbxKctafaK47Y0uUlfUZpUfpoTeSnHYhz7n21Jqd47
-         e22o28pXsLuDKZWDNUDflNPEMbRfDNYD2DJ7ysvYwuWjRLu/Bzygvz1y7eoNWg8CHCTw
-         LNtfMQjzuBPkkGuwuhg+nWLFJa6Ug2qoIyAnfn9aN0jnwFDh7qflhc8lzCLWe8hP/HXf
-         lYQA==
-X-Forwarded-Encrypted: i=1; AJvYcCWgGR/Me2WE7ME3eHQP1sjKK7Gy3tes3FWBTV2k0Ydodq2VSISPvwO7k2l+m5KyFdu9T78wbDM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxrYtW7s4uCQRd45knU43ZAmOmGyu2jJ+kgfuftw/MDvN/RWOcA
-	aQj3k0osPUegllizDAF6bI8O5U+i+oUIU31imtTVQWpFoxvt74rk2C7q
-X-Gm-Gg: ASbGncuL9+e8jydQqY/xZDynIY1xylE9WA1ePJmrnO+nyrRs29aLlnpAH8EEwZ+F7Pl
-	fkMLIVSAy0lOJz23X5Phbba7r4HDUSCGPb8bIQU5L5tUszSTbHp2M2XgS4ib6CYNQVdzbf6WgLv
-	61CZT2rZ+yj0W3yNaSLDal1lFFRUVrnK+hpLOu+d4hIq27/oPfZ9OigNk9f7ntwG2Qp8tHEhHxK
-	mYKLM9UdwbrXJhtPDpu3B0ay1H+0vezvM48C+r8nDwcsbGvXHLDk9BXJfBb5XzedLrhG94rUKSh
-	9vE+WIA/xKuWURcP/a1nWmBYZJSjaiopUy2oxFZBOn34uXUUr8f1jU/hLdbiznpcDkLk/CqW1Rx
-	D2fkR9QuRQzMGXBK/sCD1bqy6Dr+SdY6XTui7upWq1gSlg+3uQhhFfxk7mXBEt4hGos4N8mpOHK
-	DU8WBYFwEZI/SujjU1hc9GAmV0Qt/SJzs4hSw=
-X-Google-Smtp-Source: AGHT+IH0YMI90ZQb6ct+nat8DtXdZsUN3AYv/eA+GemdRzLIQywet3ITexoNTtRP65Z6ow9GuR0Ipw==
-X-Received: by 2002:a05:6000:24c6:b0:42b:394a:9b1 with SMTP id ffacd0b85a97d-42f79841510mr1872635f8f.37.1764836845435;
-        Thu, 04 Dec 2025 00:27:25 -0800 (PST)
-Received: from [10.221.198.188] ([165.85.126.46])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42f7cbe90f0sm1864164f8f.9.2025.12.04.00.27.23
+        d=1e100.net; s=20230601; t=1764837456; x=1765442256;
+        h=content-transfer-encoding:cc:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Fgti3Yp68+r1SXdHjNvigqNpTieQfP3rIFRvqwDgXVI=;
+        b=MhGoSA+J4YfU5Hww4aJjw8uWI7bIP/8/RZCuiy0oSqlHasTxHsWM3AXrF3ZPw7c2lc
+         bvsA+HzvOyWti3eL3jNu1Y2Mke6KAH+S9TRu1Y0ajCAZouEKgtwliMiH91F3si50DEMC
+         I1jEkT7SNDLiKSd//P9Xtwe2YYrkuxomtY68jrpJOmZrmOya1n12E0d/AkGEVowME/cY
+         2zoqlZ8FjrVS3ZWfvwlOQAg+FrdG6PPbpCWxqRVmsY5ZjCJ/4v2D1I8oD9PdDeOWEXGV
+         5vABHg36cNgcwul6nvt9cGNtY3ZtHUHisrnRYU7g7Qdr0wAonQLfOrflsScXEbIffbmx
+         npwA==
+X-Gm-Message-State: AOJu0YzJFuA0iAbi/lao0ErrNT1fBKKYRK4tiAiaSf1j9fZMJunfBmZs
+	p+eupXsSJiqSJ0umzzlxrgwkufcfRC1Bb4t0++3WsNsC4jlXN15HHo/Ty6VtlMjs1sBVVqOBE+J
+	EWYHJSXDXuUzxJhWk25ntjX+xnS+jTbe8xxTJdXNugg8kBqusG07MXNsP6WbfULtoAp1ypFaEIZ
+	bOtZPDW5WMfOi539gWeguyrvrcXK8meKXLLchGScg=
+X-Gm-Gg: ASbGncsu5CZcDZibstN1dWeCDuAbvmpQwMNGfLJ1iJdYPVHyH05Qm2ZH0vroGo22oqL
+	irtVcleD3b8xN9+LLV1yvdkMELdhHhRQn/VpRysfu5V0Z0SlSFihjJpA4eYV6onFPAPB+mSQ7/C
+	AaHoG5X6jg0UEdo3IsZLPSZODyF4adqrro9qTe1EATr7N9iIAURYoRAk+eNGU0jeZiHwsa10YCW
+	L6BkdYA+J/7aB3TjZtpeRYIF+Gy03SUQeRgNnAUacZ0Z0RE2k//Dhjax/N6//mqdaS2Xv6fpLPb
+	gTwy+69ppokoW54jvuC7vKdSuGfMGh4zhLsjr9/bwVhCjHMltiBnGB0bNU5s1xw4NZNvfr2G++p
+	ZpBvMG/qbJsEL
+X-Received: by 2002:a05:600c:3b1f:b0:477:fcb:226b with SMTP id 5b1f17b1804b1-4792f24413emr20684355e9.2.1764837456609;
+        Thu, 04 Dec 2025 00:37:36 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFOFiaycmUpSi4NFw0Dx9Owuk3m9GKbQxWbEzhOFEEvLDFewzTh2sfwX63tPD9WFtnBq5V4Cw==
+X-Received: by 2002:a05:600c:3b1f:b0:477:fcb:226b with SMTP id 5b1f17b1804b1-4792f24413emr20683335e9.2.1764837455818;
+        Thu, 04 Dec 2025 00:37:35 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.153.24])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42f7d352a52sm1925339f8f.38.2025.12.04.00.37.33
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Dec 2025 00:27:24 -0800 (PST)
-Message-ID: <825efa1d-363a-4e82-8dc1-d7520c413414@gmail.com>
-Date: Thu, 4 Dec 2025 10:27:24 +0200
+        Thu, 04 Dec 2025 00:37:35 -0800 (PST)
+Message-ID: <3a2cf402-cba2-49d1-a87e-a4d3f35107d0@redhat.com>
+Date: Thu, 4 Dec 2025 09:37:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,156 +98,57 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/mlx5: Fix double unregister of HCA_PORTS
- component
-To: Farhan Ali <alifm@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
- Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Shay Drory <shayd@nvidia.com>, Simon Horman <horms@kernel.org>
-Cc: Lukas Wunner <lukas@wunner.de>, Bjorn Helgaas <helgaas@kernel.org>,
- Niklas Schnelle <schnelle@linux.ibm.com>, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-pci@vger.kernel.org
-References: <20251202-fix_lag-v1-1-59e8177ffce0@linux.ibm.com>
- <99db437a-be91-4e85-a201-ec3a890900c8@linux.ibm.com>
 Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <99db437a-be91-4e85-a201-ec3a890900c8@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+From: Paolo Abeni <pabeni@redhat.com>
+Subject: [ANN] poll on EoY break
+Cc: Johannes Berg <johannes@sipsolutions.net>,
+ Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ linux-bluetooth@vger.kernel.org,
+ "netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
+ Oliver Hartkopp <socketcan@hartkopp.net>,
+ Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org,
+ Dust Li <dust.li@linux.alibaba.com>, Sidraya Jayagond
+ <sidraya@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
+ "D. Wythe" <alibuda@linux.alibaba.com>, Matthieu Baerts
+ <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>,
+ MPTCP Linux <mptcp@lists.linux.dev>,
+ "open list:BPF [NETWORKING] (tcx & tc BPF, sock_addr)"
+ <bpf@vger.kernel.org>, Magnus Karlsson <magnus.karlsson@intel.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ "Jason A. Donenfeld" <Jason@zx2c4.com>, wireguard@lists.zx2c4.com,
+ Tony Nguyen <anthony.l.nguyen@intel.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Aaron Conole <aconole@redhat.com>,
+ Eelco Chaudron <echaudro@redhat.com>, Ilya Maximets <i.maximets@ovn.org>,
+ dev@openvswitch.org, Steffen Klassert <steffen.klassert@secunet.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, devel@lists.linux-ipsec.org,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+Hi all,
 
+Due to some unfortunate calendar, conference and personal schedule
+circumstances we (the netdev maintainers) are strongly considering an
+end-of-year break similar to 2024'one, but for a longer period:
+effectively re-opening net-next after Jan 2.
 
-On 03/12/2025 23:10, Farhan Ali wrote:
-> 
-> On 12/2/2025 3:12 AM, Gerd Bayer wrote:
->> Clear hca_devcom_comp in device's private data after unregistering it in
->> LAG teardown. Otherwise a slightly lagging second pass through
->> mlx5_unload_one() might try to unregister it again and trip over
->> use-after-free.
->>
->> On s390 almost all PCI level recovery events trigger two passes through
->> mxl5_unload_one() - one through the poll_health() method and one through
->> mlx5_pci_err_detected() as callback from generic PCI error recovery.
->> While testing PCI error recovery paths with more kernel debug features
->> enabled, this issue reproducibly led to kernel panics with the following
->> call chain:
->>
->>   Unable to handle kernel pointer dereference in virtual kernel 
->> address space
->>   Failing address: 6b6b6b6b6b6b6000 TEID: 6b6b6b6b6b6b6803 ESOP-2 FSI
->>   Fault in home space mode while using kernel ASCE.
->>   AS:00000000705c4007 R3:0000000000000024
->>   Oops: 0038 ilc:3 [#1]SMP
->>
->>   CPU: 14 UID: 0 PID: 156 Comm: kmcheck Kdump: loaded Not tainted
->>        6.18.0-20251130.rc7.git0.16131a59cab1.300.fc43.s390x+debug #1 
->> PREEMPT
->>
->>   Krnl PSW : 0404e00180000000 0000020fc86aa1dc 
->> (__lock_acquire+0x5c/0x15f0)
->>              R:0 T:1 IO:0 EX:0 Key:0 M:1 W:0 P:0 AS:3 CC:2 PM:0 RI:0 EA:3
->>   Krnl GPRS: 0000000000000000 0000020f00000001 6b6b6b6b6b6b6c33 
->> 0000000000000000
->>              0000000000000000 0000000000000000 0000000000000001 
->> 0000000000000000
->>              0000000000000000 0000020fca28b820 0000000000000000 
->> 0000010a1ced8100
->>              0000010a1ced8100 0000020fc9775068 0000018fce14f8b8 
->> 0000018fce14f7f8
->>   Krnl Code: 0000020fc86aa1cc: e3b003400004        lg      %r11,832
->>              0000020fc86aa1d2: a7840211           brc     
->> 8,0000020fc86aa5f4
->>             *0000020fc86aa1d6: c09000df0b25       larl    
->> %r9,0000020fca28b820
->>             >0000020fc86aa1dc: d50790002000       clc     0(8,%r9),0(%r2)
->>              0000020fc86aa1e2: a7840209           brc     
->> 8,0000020fc86aa5f4
->>              0000020fc86aa1e6: c0e001100401       larl    
->> %r14,0000020fca8aa9e8
->>              0000020fc86aa1ec: c01000e25a00       larl    
->> %r1,0000020fca2f55ec
->>              0000020fc86aa1f2: a7eb00e8           aghi    %r14,232
->>
->>   Call Trace:
->>    __lock_acquire+0x5c/0x15f0
->>    lock_acquire.part.0+0xf8/0x270
->>    lock_acquire+0xb0/0x1b0
->>    down_write+0x5a/0x250
->>    mlx5_detach_device+0x42/0x110 [mlx5_core]
->>    mlx5_unload_one_devl_locked+0x50/0xc0 [mlx5_core]
->>    mlx5_unload_one+0x42/0x60 [mlx5_core]
->>    mlx5_pci_err_detected+0x94/0x150 [mlx5_core]
->>    zpci_event_attempt_error_recovery+0xcc/0x388
->>
->> Fixes: 5a977b5833b7 ("net/mlx5: Lag, move devcom registration to LAG 
->> layer")
->> Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
->> ---
->> Hi Shay et al,
->>
->> while checking for potential regressions by Lukas Wunner's recent work
->> on pci_save/restore_state() for the recoverability of mlx5 functions I
->> consistently hit this bug. (Bjorn has queued this up for 6.19, according
->> to [0] and [1])
->>
->> Apparently, the issue is unrelated to Lukas' work but can be reproduced
->> with master. It appears to be timing-sensitive, since it shows up only
->> when I use s390's debug_defconfig, but I think needs fixing anyhow, as
->> timing can change for other reasons, too.
->>
->> I've spotted two additional places where the devcom reference is not
->> cleared after calling mlx5_devcom_unregister_component() in
->> drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c that I have not
->> addressed with a patch, since I'm unclear about how to test these
->> paths.
->>
->> Thanks,
->> Gerd
->>
->> [0] https://lore.kernel.org/all/cover.1760274044.git.lukas@wunner.de/
->> [1] https://lore.kernel.org/linux-pci/ 
->> cover.1763483367.git.lukas@wunner.de/
->> ---
->>   drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c | 1 +
->>   1 file changed, 1 insertion(+)
->>
->> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c b/ 
->> drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
->> index 
->> 3db0387bf6dcb727a65df9d0253f242554af06db..8ec04a5f434dd4f717d6d556649fcc2a584db847 100644
->> --- a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
->> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
->> @@ -1413,6 +1413,7 @@ static int __mlx5_lag_dev_add_mdev(struct 
->> mlx5_core_dev *dev)
->>   static void mlx5_lag_unregister_hca_devcom_comp(struct mlx5_core_dev 
->> *dev)
->>   {
->>       mlx5_devcom_unregister_component(dev->priv.hca_devcom_comp);
->> +    dev->priv.hca_devcom_comp = NULL;
->>   }
-> 
-> Though this fix looks correct to me in freeing hca_devcom_comp (not too 
-> familiar with mlx5 internals), I wonder if it would be better to just 
-> set devcom = NULL in devcom_free_comp_dev() after the kfree? This would 
-> also take care of other places where devcom is not set to NULL?
-> 
+Since this comes out-of-the blue and with a very strict timing, please
+express your opinion using the poll below:
 
-Setting NULL after the kfree will have no impact, it won't nullify the 
-original field, but the function parameter copy (by-value).
+http://poll-maker.com/poll5664619x19774f43-166
 
-devcom_free_comp_dev() and mlx5_devcom_unregister_component() get struct 
-mlx5_devcom_comp_dev *devcom to work with, they can't nullify it for the 
-caller context.
+The poll will be open for the next 24H.
 
+Thanks,
 
-
-> Thanks
-> 
-> Farhan
-> 
+Paolo
 
 
