@@ -1,136 +1,168 @@
-Return-Path: <netdev+bounces-243533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A74EECA334D
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 11:24:04 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AC1ACA3369
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 11:27:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E5ABB304393C
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 10:23:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6EA49303AFF9
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 10:27:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F37252D593E;
-	Thu,  4 Dec 2025 10:23:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DB133321AB;
+	Thu,  4 Dec 2025 10:27:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ftMwOJ3K"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c+jd3fiO";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y1YwhcYH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4C4A1C28E;
-	Thu,  4 Dec 2025 10:23:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33B41322C97
+	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 10:27:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764843787; cv=none; b=CvgCeEO5JNo+Ll0cp+WO1MxT0nZPvLgbHSQSRemNWrsu7pV9A5V46i7hH/5cWHlUwOb4AI7qtsmlZL+zrz8k4w++7Gdn5/CovElPcI09kRDonBTYCFliUbef6KC0wCQIVUFo8iZjGU03tacF1aLlk9tyw3+ADfQ28MtUgzpnpc8=
+	t=1764844023; cv=none; b=lhstr/5tkSthlPNRsshOzc84EN5c5BcRGoLXmfyIZprbFGxLGln9t5hs6tCt9mFZA2SQ1ymKXm59AscM37g6Zjs/KT9PtvFehOYsNWf6Y0oBmZVbJmmLoOhu1LSUvyA9og7dRiSYmBcU5lb4h42EprVLgawk+GsqPMDLTMS6ATE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764843787; c=relaxed/simple;
-	bh=3iWgpvWwBbytpY9cQwdNWXJ+A62+Nlt6nuF09p4zyBY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PmPiYqRDs0nArUc3Hvd9AMZKKHZhw0zTKBIF3xKPr1csUmD/EM6PeEdp4jQew7yuhjTy+IRRyJh1OVo2kDWzyCAuuW4QIwXbXZJmrYtmU7yBR1/aFbuTUTUEcvqgyWyDJos+aE+zLEzZGOGJEftS4B1ICrEqew4rAXIdwxMoX/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ftMwOJ3K; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F4B6C4CEFB;
-	Thu,  4 Dec 2025 10:23:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764843787;
-	bh=3iWgpvWwBbytpY9cQwdNWXJ+A62+Nlt6nuF09p4zyBY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ftMwOJ3Ka+ViFJHX2Qa31FBZ1yqjDGmECs17+He0c4dn49b4ONHxrQoLiWfmLxCUj
-	 wZ74PRVm/G/d6tU/7j6rRVUTkPsjbmDM1iMd/b02zmmMNzM5kLzJa3wTcXqPgUlPrz
-	 Nzvenb3GBwrgYof4LFRsz38vTto37AaG+ucrxqqm92x4k4BAcuU302PvLBfrmxg0Tg
-	 LbOnNqZyqgaLzcMryjvE5y3JmwEaaKkFuIe+RgwvknJFEYbiVos4YVLSrm144NZ8Eo
-	 gASIjFH0A1lh98CtBQK+zJKfXEdMQw22TzJfqsJ2YJyZcydxawVm5CBiTYKdOgleha
-	 nJpFI/LriJ+KQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F2A3D3AA9A9C;
-	Thu,  4 Dec 2025 10:20:06 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1764844023; c=relaxed/simple;
+	bh=GDj0XOYw2INWgHhiZR3umk9UDMv5NvYwCIBslnkmAUE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YHmRWt6q+sLDIsaAiWdkuaq+0b+yumUTtK5p7vpMdNfkYWGHTD1VfcabDYFR/oASKP5rf06Bv86DRemOidweBCS1inw1loEriR2uUNFB1bBh6u7FLbIqMr1PJ94TB572SoysQc/K/j8bejQ11CwUNg+WH413S8OZCNOK03MIFHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c+jd3fiO; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y1YwhcYH; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764844020;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uvAgSuUIrE6mvYqIUbctn9fgbUe7c3R89eVWBs+ABmI=;
+	b=c+jd3fiOTmCGgWGB3sm+PbSWM5DQAoBma3AG7avBet1pvugg6U5aZvXHbCRm40hWR/xRQS
+	cZq76ZSWqTKPXeWlXtJWN0iVz/aBBtYnsxviERtkoAilOpubOJ9tHyxZtGJoDEdSlTrOAn
+	YTI1EUXmIrnuGJr9u8GxM9P5k4VkqWI=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-146-qKgsBWB0M1OBoqoOr69O5Q-1; Thu, 04 Dec 2025 05:26:57 -0500
+X-MC-Unique: qKgsBWB0M1OBoqoOr69O5Q-1
+X-Mimecast-MFC-AGG-ID: qKgsBWB0M1OBoqoOr69O5Q_1764844016
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-42b3b5ed793so482370f8f.2
+        for <netdev@vger.kernel.org>; Thu, 04 Dec 2025 02:26:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1764844016; x=1765448816; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uvAgSuUIrE6mvYqIUbctn9fgbUe7c3R89eVWBs+ABmI=;
+        b=Y1YwhcYH3R2t7cHwbILSQMB3GkYdgotM9jU+0WRwmsf3w9iPieJv43FWos1jTUaRtT
+         cbD8i2/EG9SJZelbGNZ25CqF2SUwJVHZO8NIC3TNJN3LUarErsAjWAgLf5Ld/SfWjg5o
+         rf7sv5yTtrhLtgZpk0gU73E7T+eLWEmXVCib0VZpRLsM2/mNwr9GnjL40s8yiZRkxZd7
+         oW112HjZ2QHkDy5QWv5OE30MfHYvWnbg0yDn/1c8FMbkdC0E0Tc53az7tJaEMA6ISXru
+         FgM6qhNygeg6nU5Fj+uD2b7Zq0nsYOlz/oi5+sHLx+bNEUAdEWSXMgmYkSMWoSQXAL6p
+         dNWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764844016; x=1765448816;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uvAgSuUIrE6mvYqIUbctn9fgbUe7c3R89eVWBs+ABmI=;
+        b=RBXYn5vKZooh8OJ6JpdOVW2HmckTdmHRu07ArBl/PrjOiif1dfL/WuungajS5HLB5V
+         oAbgyySaR2ymHt7RdX7jpka0iddKCTdoOIH7KdoIttU+bvNag4HR3cTLx4OJT1ZIkbsu
+         KHewNHdgSrSyFDWVuSFVRdXzJB1qUPNaDAeE1dyYpsQeZhx7Ey1up+5YPxQmOnfP1Jss
+         QFQYHbIo447zo0RotiZETrSBVL2cvImMd1wd3lsR+X2tglsRNYx6DgkfGU6oTJBTexgh
+         Tq8mnrFQWF1Dzdmo50MOOaCBs9NnT/wGh+rOhtVpdsfDcwiGsH/iaOg4x9erbBlTbSNE
+         EvYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUD2B4tL3ky/2WiqanwfokJ7BxAhXrJxs+WIIBlMoSBiOVSxRHe5We4WWrzqtN6uGInC2KhZpM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKRrCHD348JycOSdB3nWzoMn3ftf+OKWifRjU0IF15RWBEcVl0
+	4YRj/nPlXu7LhYMeYb0wGbLaH2u8HKHGrYNu2Ld1OcplbpOZB6T1vxWj6s9ejUgxd+fdhVb1H9g
+	vx8LkptUNvLWiXuH3jYInr8EV2p0ydV9cr7yantydQK+Cb9c1uPOFp/oWVQ==
+X-Gm-Gg: ASbGncuoml+U+H0kxXfD67GqkQk4AhP24KbVgqpaUvYQOXdXyHsH1EnkvC8diCKiVYT
+	jti6afCgU4qPOsPWiNVh+e9EtyLXCKtuDxAf+tP5EVtNHWWkktF9uwix9lqPQGxWM+1PMJVCpUc
+	a7yGt09mN7xAwZoXJ7WUmkoddOmpmkkcwMNaAdfdFco4PuZ1GRMV2x94i2RCsqO2XlrQ9n+lntV
+	fLgxJV16KixuB7YwuFM4dB+1T+zJmD39zjLHeb4/2jy/PuJHnGXtQIWewACnT41ryzr0ZYxYbHp
+	i0h7OuTVB2TpidiPBRdDrrivNwpAckLRK95kedK1qW92ja5OOAnSpNaGGUzalN1/5vZDmZOLpTr
+	R0LutvceC+sAf
+X-Received: by 2002:a05:600c:1393:b0:477:7a87:48d1 with SMTP id 5b1f17b1804b1-4792af43957mr54762275e9.30.1764844016139;
+        Thu, 04 Dec 2025 02:26:56 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFe2VYdkOW4g2chRFIty06a+I10kiBp0/8HHsTFNbQNcY2Gfnm64HqRkjy1wllbisNEXQJWeg==
+X-Received: by 2002:a05:600c:1393:b0:477:7a87:48d1 with SMTP id 5b1f17b1804b1-4792af43957mr54761915e9.30.1764844015694;
+        Thu, 04 Dec 2025 02:26:55 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.153.24])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47930f286f4sm23316675e9.0.2025.12.04.02.26.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Dec 2025 02:26:55 -0800 (PST)
+Message-ID: <e3c1117c-144e-4f4e-ad43-d0a11bc2ecaa@redhat.com>
+Date: Thu, 4 Dec 2025 11:26:53 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3] net/hsr: fix NULL pointer dereference in
- prp_get_untagged_frame()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176484360579.718719.17275039273482574777.git-patchwork-notify@kernel.org>
-Date: Thu, 04 Dec 2025 10:20:05 +0000
-References: <20251129093718.25320-1-ssrane_b23@ee.vjti.ac.in>
-In-Reply-To: <20251129093718.25320-1-ssrane_b23@ee.vjti.ac.in>
-To: SHAURYA RANE <ssrane_b23@ee.vjti.ac.in>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, jkarrenpalo@gmail.com,
- fmaurer@redhat.com, arvid.brodin@alten.se, skhan@linuxfoundation.org,
- linux-kernel-mentees@lists.linux.dev, david.hunter.linux@gmail.com,
- khalid@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzbot+2fa344348a579b779e05@syzkaller.appspotmail.com, stable@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: atm: targetless need more input msg
+To: Edward Adam Davis <eadavis@qq.com>,
+ syzbot+5dd615f890ddada54057@syzkaller.appspotmail.com
+Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+ kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com
+References: <69298e9d.a70a0220.d98e3.013a.GAE@google.com>
+ <tencent_B31D1B432549BA28BB5633CB9E2C1B124B08@qq.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <tencent_B31D1B432549BA28BB5633CB9E2C1B124B08@qq.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Sat, 29 Nov 2025 15:07:18 +0530 you wrote:
-> prp_get_untagged_frame() calls __pskb_copy() to create frame->skb_std
-> but doesn't check if the allocation failed. If __pskb_copy() returns
-> NULL, skb_clone() is called with a NULL pointer, causing a crash:
-> Oops: general protection fault, probably for non-canonical address 0xdffffc000000000f: 0000 [#1] SMP KASAN NOPTI
-> KASAN: null-ptr-deref in range [0x0000000000000078-0x000000000000007f]
-> CPU: 0 UID: 0 PID: 5625 Comm: syz.1.18 Not tainted syzkaller #0 PREEMPT(full)
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-> RIP: 0010:skb_clone+0xd7/0x3a0 net/core/skbuff.c:2041
-> Code: 03 42 80 3c 20 00 74 08 4c 89 f7 e8 23 29 05 f9 49 83 3e 00 0f 85 a0 01 00 00 e8 94 dd 9d f8 48 8d 6b 7e 49 89 ee 49 c1 ee 03 <43> 0f b6 04 26 84 c0 0f 85 d1 01 00 00 44 0f b6 7d 00 41 83 e7 0c
-> RSP: 0018:ffffc9000d00f200 EFLAGS: 00010207
-> RAX: ffffffff892235a1 RBX: 0000000000000000 RCX: ffff88803372a480
-> RDX: 0000000000000000 RSI: 0000000000000820 RDI: 0000000000000000
-> RBP: 000000000000007e R08: ffffffff8f7d0f77 R09: 1ffffffff1efa1ee
-> R10: dffffc0000000000 R11: fffffbfff1efa1ef R12: dffffc0000000000
-> R13: 0000000000000820 R14: 000000000000000f R15: ffff88805144cc00
-> FS:  0000555557f6d500(0000) GS:ffff88808d72f000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000555581d35808 CR3: 000000005040e000 CR4: 0000000000352ef0
-> Call Trace:
->  <TASK>
->  hsr_forward_do net/hsr/hsr_forward.c:-1 [inline]
->  hsr_forward_skb+0x1013/0x2860 net/hsr/hsr_forward.c:741
->  hsr_handle_frame+0x6ce/0xa70 net/hsr/hsr_slave.c:84
->  __netif_receive_skb_core+0x10b9/0x4380 net/core/dev.c:5966
->  __netif_receive_skb_one_core net/core/dev.c:6077 [inline]
->  __netif_receive_skb+0x72/0x380 net/core/dev.c:6192
->  netif_receive_skb_internal net/core/dev.c:6278 [inline]
->  netif_receive_skb+0x1cb/0x790 net/core/dev.c:6337
->  tun_rx_batched+0x1b9/0x730 drivers/net/tun.c:1485
->  tun_get_user+0x2b65/0x3e90 drivers/net/tun.c:1953
->  tun_chr_write_iter+0x113/0x200 drivers/net/tun.c:1999
->  new_sync_write fs/read_write.c:593 [inline]
->  vfs_write+0x5c9/0xb30 fs/read_write.c:686
->  ksys_write+0x145/0x250 fs/read_write.c:738
->  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->  do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7f0449f8e1ff
-> Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 f9 92 02 00 48 8b 54 24 18 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 31 44 89 c7 48 89 44 24 08 e8 4c 93 02 00 48
-> RSP: 002b:00007ffd7ad94c90 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
-> RAX: ffffffffffffffda RBX: 00007f044a1e5fa0 RCX: 00007f0449f8e1ff
-> RDX: 000000000000003e RSI: 0000200000000500 RDI: 00000000000000c8
-> RBP: 00007ffd7ad94d20 R08: 0000000000000000 R09: 0000000000000000
-> R10: 000000000000003e R11: 0000000000000293 R12: 0000000000000001
-> R13: 00007f044a1e5fa0 R14: 00007f044a1e5fa0 R15: 0000000000000003
->  </TASK>
-> Add a NULL check immediately after __pskb_copy() to handle allocation
-> failures gracefully.
+On 11/28/25 4:56 PM, Edward Adam Davis wrote:
+> syzbot found an uninitialized targetless variable. The user-provided
+> data was only 28 bytes long, but initializing targetless requires at
+> least 44 bytes. This discrepancy ultimately led to the uninitialized
+> variable access issue reported by syzbot [1].
 > 
-> [...]
+> Adding a message length check to the arp update process eliminates
+> the uninitialized issue in [1].
+> 
+> [1]
+> BUG: KMSAN: uninit-value in lec_arp_update net/atm/lec.c:1845 [inline]
+>  lec_arp_update net/atm/lec.c:1845 [inline]
+>  lec_atm_send+0x2b02/0x55b0 net/atm/lec.c:385
+>  vcc_sendmsg+0x1052/0x1190 net/atm/common.c:650
+> 
+> Reported-by: syzbot+5dd615f890ddada54057@syzkaller.appspotmail.com
+> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
 
-Here is the summary with links:
-  - [net,v3] net/hsr: fix NULL pointer dereference in prp_get_untagged_frame()
-    https://git.kernel.org/netdev/net/c/188e0fa5a679
+This needs a suitable fixes tag, and you should specify the target tree
+into the subj prefix, see:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+https://elixir.bootlin.com/linux/v6.18/source/Documentation/process/maintainer-netdev.rst#L61
 
+> ---
+>  net/atm/lec.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+> 
+> diff --git a/net/atm/lec.c b/net/atm/lec.c
+> index afb8d3eb2185..178132b2771a 100644
+> --- a/net/atm/lec.c
+> +++ b/net/atm/lec.c
+> @@ -382,6 +382,15 @@ static int lec_atm_send(struct atm_vcc *vcc, struct sk_buff *skb)
+>  			break;
+>  		fallthrough;
+>  	case l_arp_update:
+> +	{
+> +		int need_size = offsetofend(struct atmlec_msg,
+> +				content.normal.targetless_le_arp);
+> +		if (skb->len < need_size) {
+> +			pr_info("Input msg size too small, need %d got %u\n",
+> +				 need_size, skb->len);
+> +			dev_kfree_skb(skb);
+> +			return -EINVAL;
+> +		}
+
+Can this be reached by pppoatm_send?
+Are you sure that the data will always be available in the linear part?
+
+/P
 
 
