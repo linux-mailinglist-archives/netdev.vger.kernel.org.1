@@ -1,57 +1,48 @@
-Return-Path: <netdev+bounces-243521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07BC6CA2F3B
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 10:20:55 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9132ECA2F62
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 10:23:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8DCF630E92CA
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 09:17:01 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 05F5F3008045
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 09:23:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBCEF33B6E3;
-	Thu,  4 Dec 2025 09:11:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7DED336EEC;
+	Thu,  4 Dec 2025 09:23:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VFV+2Xw5"
 X-Original-To: netdev@vger.kernel.org
-Received: from cmccmta2.chinamobile.com (cmccmta6.chinamobile.com [111.22.67.139])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 342B433B6D8;
-	Thu,  4 Dec 2025 09:11:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.22.67.139
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0998B3358CE;
+	Thu,  4 Dec 2025 09:23:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764839502; cv=none; b=ELM83qaM8naDaULkYfQGLG+796fi/euYKhz0fkwtR93qxFhfY7Gu9WLZg4j3hAU8RNVI/HODPszUUceDBLsaiDSEN+6GCzMpdg0cHz1fpOOn8ueZypNiUVozMtmsAfpj5tsdlza2qdgPNB3xag6VfdpW9azntYW/ot+qaRpuY/Q=
+	t=1764840188; cv=none; b=LjVNV6sREZvUHSxWf+dwNtvhXg7Sbr3lCRv8G2tmd4n1v4KYIsX5y9V0Suo8GJPIjdm5TMmVcXqvagp+M/2A4493SKebeXgRF9uj/4fO/s/a1ZMg8sAN+6VJuLJfKKJG9V2/UTofUws027X3PSPqcbDB90y6aIlAFemTF9AuxgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764839502; c=relaxed/simple;
-	bh=viIUBCUxUrQIU+KRE+rcobyjD9sts35NOjZEYvyj3fA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BtdMiKD2mvhQ5/Xt5qtPQhqXvR7Q1Ifl+iHp+yzo5Rn6Anl2U+iwtRAulxVd08NlKeaFAdcSJsSU9POlY7Jt7vYWDDFFd+7KLnAxGg+GJl1KqrUW4qTlfR87HP6OtigBOHkJmaN2V5ErpRujhUY8Gyte2gimBtwHmzncJ3zvOlk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmss.chinamobile.com; spf=pass smtp.mailfrom=cmss.chinamobile.com; arc=none smtp.client-ip=111.22.67.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmss.chinamobile.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cmss.chinamobile.com
-X-RM-TagInfo: emlType=0                                       
-X-RM-SPAM-FLAG:00000000
-Received:from spf.mail.chinamobile.com (unknown[10.188.0.87])
-	by rmmx-syy-dmz-app05-12005 (RichMail) with SMTP id 2ee569315049525-ac64e;
-	Thu, 04 Dec 2025 17:11:37 +0800 (CST)
-X-RM-TRANSID:2ee569315049525-ac64e
-X-RM-TagInfo: emlType=0                                       
-X-RM-SPAM-FLAG:00000000
-Received:from localhost.localdomain (unknown[10.55.1.72])
-	by rmsmtp-syy-appsvr01-12001 (RichMail) with SMTP id 2ee169315046302-d1b52;
-	Thu, 04 Dec 2025 17:11:37 +0800 (CST)
-X-RM-TRANSID:2ee169315046302-d1b52
-From: caoping <caoping@cmss.chinamobile.com>
-To: chuck.lever@oracle.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	kernel-tls-handshake@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	caoping <caoping@cmss.chinamobile.com>
-Subject: [PATCH v3] net/handshake: restore destructor on submit failure
-Date: Thu,  4 Dec 2025 01:10:58 -0800
-Message-ID: <20251204091058.1545151-1-caoping@cmss.chinamobile.com>
-X-Mailer: git-send-email 2.47.3
+	s=arc-20240116; t=1764840188; c=relaxed/simple;
+	bh=zrassZRzu3WEQ+CdPKrKcm54ODNgoyYq6Vay4FDoMlQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Bhu1EkoPLND7sgisYqnzrh8xI6vd1X0X6yjF3k1yVhdRUfkr1NxBtajl5b2GCPvZCx/Wqs1726fUjW056RonhM++beNVvrBFhI1KnV6XIvcDLP0B9QZmhjKCEwkOzKS2CLsw+dInoDawu1uDq/RJ4k19qKD6p0jNem5jgZnt2mY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VFV+2Xw5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A5B0C113D0;
+	Thu,  4 Dec 2025 09:23:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764840187;
+	bh=zrassZRzu3WEQ+CdPKrKcm54ODNgoyYq6Vay4FDoMlQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=VFV+2Xw5lnqZONkoTx+89z9mdkgvRq6zsb6eJ7Gi9OUcwi5r6LDlklsX6LVWqHydR
+	 Cc/ZIemkolXHcoYEEuDZ7f/iZGVvu6EP4tBgIogGUom+OOGkEClAm7EfGpt8kIBSd7
+	 7UhfoRF3wMoD101tvbKPWtNgwtLbFl9EZXZSDkZiTmkbdHj1ysatlBANHHuPu7FkXh
+	 Oh4NDBMXTTDiAUm1xALJqnCZguTWMwI3Y/4T33t3XJyL/wxRUToThgopjdaB//F6aw
+	 sAfcInKhlPtADjBPIt0DsdQtB8huj9PfgbDvb7V7YBWooSpd4o5VkN50nZDL9WFRTo
+	 UcfMVpdq46A5w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F2AA13AA9A97;
+	Thu,  4 Dec 2025 09:20:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,38 +50,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: fec: ERR007885 Workaround for XDP TX path
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176484000579.696826.16588311505988091159.git-patchwork-notify@kernel.org>
+Date: Thu, 04 Dec 2025 09:20:05 +0000
+References: <20251128025915.2486943-1-wei.fang@nxp.com>
+In-Reply-To: <20251128025915.2486943-1-wei.fang@nxp.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: shenwei.wang@nxp.com, xiaoning.wang@nxp.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ imx@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-handshake_req_submit() replaces sk->sk_destruct but never restores it when
-submission fails before the request is hashed. handshake_sk_destruct() then
-returns early and the original destructor never runs, leaking the socket.
-Restore sk_destruct on the error path.
+Hello:
 
-Fixes: 3b3009ea8abb ("net/handshake: Create a NETLINK service for handling handshake requests")
-Reviewed-by: Chuck Lever <chuck.lever@oracle.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: caoping <caoping@cmss.chinamobile.com>
----
- net/handshake/request.c | 2 ++
- 1 file changed, 2 insertions(+)
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-diff --git a/net/handshake/request.c b/net/handshake/request.c
-index 274d2c89b6b2..89435ed755cd 100644
---- a/net/handshake/request.c
-+++ b/net/handshake/request.c
-@@ -276,6 +276,8 @@ int handshake_req_submit(struct socket *sock, struct handshake_req *req,
- out_unlock:
- 	spin_unlock(&hn->hn_lock);
- out_err:
-+	/* Restore original destructor so socket teardown still runs on failure */
-+	req->hr_sk->sk_destruct = req->hr_odestruct;
- 	trace_handshake_submit_err(net, req, req->hr_sk, ret);
- 	handshake_req_destroy(req);
- 	return ret;
+On Fri, 28 Nov 2025 10:59:15 +0800 you wrote:
+> The ERR007885 will lead to a TDAR race condition for mutliQ when the
+> driver sets TDAR and the UDMA clears TDAR simultaneously or in a small
+> window (2-4 cycles). And it will cause the udma_tx and udma_tx_arbiter
+> state machines to hang. Therefore, the commit 53bb20d1faba ("net: fec:
+> add variable reg_desc_active to speed things up") and the commit
+> a179aad12bad ("net: fec: ERR007885 Workaround for conventional TX") have
+> added the workaround to fix the potential issue for the conventional TX
+> path. Similarly, the XDP TX path should also have the potential hang
+> issue, so add the workaround for XDP TX path.
+> 
+> [...]
 
-base-commit: 4a26e7032d7d57c998598c08a034872d6f0d3945
+Here is the summary with links:
+  - [net] net: fec: ERR007885 Workaround for XDP TX path
+    https://git.kernel.org/netdev/net/c/e8e032cd24dd
+
+You are awesome, thank you!
 -- 
-2.47.3
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
