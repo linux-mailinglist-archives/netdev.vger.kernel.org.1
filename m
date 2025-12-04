@@ -1,142 +1,118 @@
-Return-Path: <netdev+bounces-243528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 906F0CA3274
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 11:08:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 32BACCA3308
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 11:18:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 257303132948
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 10:04:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1AA1B314B5EE
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 10:13:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EB7933122B;
-	Thu,  4 Dec 2025 10:04:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90A9C3358DB;
+	Thu,  4 Dec 2025 10:13:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M+AMVUJw";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Eg/kfJ0A"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T7Lug+Ex"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E386333420
-	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 10:04:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64CE0335574;
+	Thu,  4 Dec 2025 10:13:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764842666; cv=none; b=iWC9WIkDlvD6jK7w6ITt7eNF4J8EaS6iAO0BBE2fHANYEDw/zlpMS9L3wVnrphYTVnZqotb3IPVMa4Am36x9mCPYBLdiPchYK6c1+iTsS6Gb5N8SgyvU5qrSFMyPQ7jbWa++UaLxvuuNnuiXaQ505eaYc6b7Bpa1LA0csi0uJtU=
+	t=1764843188; cv=none; b=TtIOSuFVtm4pl52JOke9wlvcZs7J/eFANoAdM/QJd1ToblSyM+p0EBDSjIWDlC50HAYhmQ1koHdU9bhuZ3VAYn5TEGWYR74rWOCjrfRHyhVXqIYCtUi+MlHXbKHtc6jlZy/OYC6RbjluF26/AFAb3i8z1wsZt6Feryvpzz5DBm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764842666; c=relaxed/simple;
-	bh=NkGy5Yxav+hxu5WxRgjThmTZ5m0bK0FqnEpQGAWdXWE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MH7NTXuZnjjk0+fOpji+/je4od9oR7zN4PlEGGZWWp3UHqUU7+IxjM0PlLei3JnQOwRWGRbcz6Z3aqUH6wY3+nVKEK2Btk0QLaDL0Q8fJ0FId0B9xUw9dKh07s7ZiBOR53cW0sFUut/8HN1c3Nrcsq7sZwkaV5bfmfHxlwYRINc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M+AMVUJw; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Eg/kfJ0A; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764842663;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jYJIwmIzAHmgYcwAHqAyW0oXzjS8vsesR3EEDMcroX8=;
-	b=M+AMVUJwwnn0MKy5C5ipE7/VqA78EtA4u/Wk2e31fgDnyyNyyA6gJ+ZKX5agLHZHAUIlZJ
-	n28WGpxBLdnA/Bs3egE0qz1gDJcdGhCcZr+pfN3CXQwVWSMRuz5JzErrRtYdiv5FDNS6Th
-	770AMl8kZd1jnMTAMiPGCxxchS6hHik=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-413-FJ6qqVpmPh64mkQfGQMaAQ-1; Thu, 04 Dec 2025 05:04:22 -0500
-X-MC-Unique: FJ6qqVpmPh64mkQfGQMaAQ-1
-X-Mimecast-MFC-AGG-ID: FJ6qqVpmPh64mkQfGQMaAQ_1764842661
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4779ecc3cc8so3868005e9.3
-        for <netdev@vger.kernel.org>; Thu, 04 Dec 2025 02:04:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1764842661; x=1765447461; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jYJIwmIzAHmgYcwAHqAyW0oXzjS8vsesR3EEDMcroX8=;
-        b=Eg/kfJ0ALXJT/PXWpmHyLdK3n13XQ4cMgMCzjWcG7f7wYXua3Wm2Y3tB5hXu+Oub1L
-         xopAsZUysi2IwFWePLtNOeCQ/wRyJGo0eNAO+10emZ9i3VxKGouN6STizy3RvBKa3oHl
-         C4fP3m9DPjmmGvtYzvAfNVTRzSknVOqAjsxdRCkPnzi7ook6xWGHNoUWrjQYWQDoazcY
-         gVdE2vz0XZmFbakCwydGXPdrHfFB7ciLYwelZs7AV9WAhb7CqOG7Q7zFDtSHlFJ7JR1K
-         6gUPsaYQ2/ruGTJQuqTRgwnryUh3nKF2PLDD/To1RuvJSWcRHaLvVUdNlm6EsbMvdkKf
-         0SzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764842661; x=1765447461;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jYJIwmIzAHmgYcwAHqAyW0oXzjS8vsesR3EEDMcroX8=;
-        b=hFxP5iUtDGhYLl5oW6bAqh9NY1hZgcnlc2x9qqnKBldEDViUVHm1E5gt+eXLGHmG10
-         61b3o+IpYYaNJgvFQnotQsn3MNXt+PV2PMF1KxVOAtGDoStfqd6mFtYC9jQtnTi51HF2
-         wv7d3Zc4GrqNHLeob2qkTOdNBmw5nYJ33uj1O2DccTNQ8hdg5DN1bJN7SOBWS8YBqa+B
-         qT7quP8fM55fRAqYGxwdf3ibmn/6Ge56IMEO/y8P/TVClKMDCNfqwjvHGgusLFjWMBT5
-         oDrDktfuwOf3GjByNrnIX6X2DsJERRZJaq/1L0mH5ARk4LHTsYolZaunfBrsrmVduyvQ
-         DkPw==
-X-Forwarded-Encrypted: i=1; AJvYcCVHxgWpCMITH+Yk1XCZLlkuVz6Iak+uhXu/q36NbnNIP1G1wd485g26uCDrpW4CFEmgF8Qgh2A=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7ilycGaLosjH+wlXijBlPTPNRmB6UgdWwhG/d1QL4pPUbOhA1
-	G/BDl4K0JhUhPl0F/ReJTEJ17fspO4flA1XtEJAkIvW2Bc5BFj2mY7fxh8zY3OcavasxEjl9PYy
-	9P+Dyjx7mmJLEPxg9jtkd4eVPXxGRwOzGjBHVAKO2hW56Wwoy4jk/rfcl0w==
-X-Gm-Gg: ASbGncuvQtAPu9jGqNEwd6g0FGUyO2wnAPdRr/9wK0OWZ3YfD0xc+Q+U10b4sZkPlG0
-	Ztyg1zeFscAWtcnFi5EueECQdMLUTUqxc+5F62vseue3iIlXzbaatJ9Gdf2TcrtnDTLDfV71nUb
-	Uzcf7PTVickxEJMsQPoSrhRkucDNOeyfGzQ1V9nm+I7eUnZgUE4Lg/r65JJHI5grdIVnB+A67F3
-	NoNrGuKOywo/su6DVO4xLo1o6atFNu12Tlo4AArQfqgi0UVpmSYTGK2mpqhGdOd8tQ7fkJFqlny
-	rkJIuVe+SYMH/GQjjD7kCITTT7NVZOuozovwAIlF4W83cct0TFG2EpY7uhsnp7xbQLk19KuMk/N
-	czjU/fUIJ2DBj
-X-Received: by 2002:a05:600c:3b1f:b0:477:b642:9dc1 with SMTP id 5b1f17b1804b1-4792f386f92mr20088145e9.20.1764842661074;
-        Thu, 04 Dec 2025 02:04:21 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHtlgpbU3wPzpHckIiNG7MkxJnSSWwzko1ByQE61szhPF3nugo4abw7JPrLtUp1XhZD817+Jg==
-X-Received: by 2002:a05:600c:3b1f:b0:477:b642:9dc1 with SMTP id 5b1f17b1804b1-4792f386f92mr20087785e9.20.1764842660674;
-        Thu, 04 Dec 2025 02:04:20 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.153.24])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4792b12411fsm42744815e9.3.2025.12.04.02.04.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Dec 2025 02:04:20 -0800 (PST)
-Message-ID: <7bea2244-dc28-4c67-b515-739b8b7d7901@redhat.com>
-Date: Thu, 4 Dec 2025 11:04:18 +0100
+	s=arc-20240116; t=1764843188; c=relaxed/simple;
+	bh=PJtYn+wfEO54GKOyH+nLn8yJzebo8sY3af1DHLU07no=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=GTVua0LC0qR0CzVEnmHZRTvbF+ArJUyf7WrDpx3gZBi3OyJzVYZttH6OQkOILTbvVkQU2eOoGgiPlAWayawIhb3p2blYOupiyuf4tH25/XpAx8EizK6jQwYG032xUti7eAGU8qliOza/2vWEwNytcrRcIStgacBlpConGC7WSG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T7Lug+Ex; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5788C4CEFB;
+	Thu,  4 Dec 2025 10:13:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764843187;
+	bh=PJtYn+wfEO54GKOyH+nLn8yJzebo8sY3af1DHLU07no=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=T7Lug+Ex6TpWLnO1AkmYT+4MLAPE+7giJKRrK3/ra6ki4b6mRH7BDtz7GEBLC9bed
+	 4wavgxy+kJAAhchlLovSXV3V3etYu8DXOksJqAG1R4/nyRH8xmyXBBYoXB4R6HMifb
+	 iZSVQY+NJ5zssVPFSZ1xW5uE+TcGTZ+SRZKuVDy5dimNWUApJCaONnkVxOcx1eiCIp
+	 gWj9lkLCuD/f+gQliEMwDP3kIfXED1P67YmSgsC6y+wbwMjk0yEtI/+7SqAyVryci3
+	 +1+IBWMBnNQwFDg0thXbbt8mzvoyyp8U3kNUV8W/bsMpWNkuLuv0U1ZvCxX+QnUiPh
+	 VaTeQoKV566rw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 788AA3AA9A97;
+	Thu,  4 Dec 2025 10:10:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: netrom: fix memory leak in nr_output()
-To: Wang Liang <wangliang74@huawei.com>,
- Deepanshu Kartikey <kartikey406@gmail.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, horms@kernel.org
-Cc: linux-hams@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- syzbot+d7abc36bbbb6d7d40b58@syzkaller.appspotmail.com
-References: <20251129034232.405203-1-kartikey406@gmail.com>
- <17e41b73-3497-4ea0-b91c-4710514f7b14@huawei.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <17e41b73-3497-4ea0-b91c-4710514f7b14@huawei.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] netrom: Fix memory leak in nr_sendmsg()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176484300630.715175.16155719972689096623.git-patchwork-notify@kernel.org>
+Date: Thu, 04 Dec 2025 10:10:06 +0000
+References: <20251129041315.1550766-1-wangliang74@huawei.com>
+In-Reply-To: <20251129041315.1550766-1-wangliang74@huawei.com>
+To: Wang Liang <wangliang74@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, linux-hams@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, yuehaibing@huawei.com,
+ zhangchangzhong@huawei.com
 
-On 11/29/25 5:01 AM, Wang Liang wrote:
-> 在 2025/11/29 11:42, Deepanshu Kartikey 写道:
->> When nr_output() fragments a large packet, it calls sock_alloc_send_skb()
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Sat, 29 Nov 2025 12:13:15 +0800 you wrote:
+> syzbot reported a memory leak [1].
 > 
-> Hi!
+> When function sock_alloc_send_skb() return NULL in nr_output(), the
+> original skb is not freed, which was allocated in nr_sendmsg(). Fix this
+> by freeing it before return.
 > 
-> Coincidentally, we both are working on this issue simultaneously.
+> [1]
+> BUG: memory leak
+> unreferenced object 0xffff888129f35500 (size 240):
+>   comm "syz.0.17", pid 6119, jiffies 4294944652
+>   hex dump (first 32 bytes):
+>     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>     00 00 00 00 00 00 00 00 00 10 52 28 81 88 ff ff  ..........R(....
+>   backtrace (crc 1456a3e4):
+>     kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+>     slab_post_alloc_hook mm/slub.c:4983 [inline]
+>     slab_alloc_node mm/slub.c:5288 [inline]
+>     kmem_cache_alloc_node_noprof+0x36f/0x5e0 mm/slub.c:5340
+>     __alloc_skb+0x203/0x240 net/core/skbuff.c:660
+>     alloc_skb include/linux/skbuff.h:1383 [inline]
+>     alloc_skb_with_frags+0x69/0x3f0 net/core/skbuff.c:6671
+>     sock_alloc_send_pskb+0x379/0x3e0 net/core/sock.c:2965
+>     sock_alloc_send_skb include/net/sock.h:1859 [inline]
+>     nr_sendmsg+0x287/0x450 net/netrom/af_netrom.c:1105
+>     sock_sendmsg_nosec net/socket.c:727 [inline]
+>     __sock_sendmsg net/socket.c:742 [inline]
+>     sock_write_iter+0x293/0x2a0 net/socket.c:1195
+>     new_sync_write fs/read_write.c:593 [inline]
+>     vfs_write+0x45d/0x710 fs/read_write.c:686
+>     ksys_write+0x143/0x170 fs/read_write.c:738
+>     do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>     do_syscall_64+0xa4/0xfa0 arch/x86/entry/syscall_64.c:94
+>     entry_SYSCALL_64_after_hwframe+0x77/0x7f
 > 
->  From the syz test requests:
-> https://syzkaller.appspot.com/bug?extid=d7abc36bbbb6d7d40b58
-> 
-> I sended the test patch earlier, only a dozen seconds...
+> [...]
 
-FTR and future similar cases, we don't have the send time information
-handy. Instead we use the timestamp as available on patchwork.
+Here is the summary with links:
+  - [net] netrom: Fix memory leak in nr_sendmsg()
+    https://git.kernel.org/netdev/net/c/613d12dd794e
 
-In this specific case Deepanshu's patch landed first, but does not apply
-cleanly, so I'll apply Wang's one.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Cheers,
-
-Paolo
 
 
