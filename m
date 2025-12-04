@@ -1,236 +1,138 @@
-Return-Path: <netdev+bounces-243645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A937CA4B5A
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 18:14:33 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2871FCA4B1C
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 18:11:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 46D8F309A411
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 17:08:01 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 971533038767
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 17:09:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89937285050;
-	Thu,  4 Dec 2025 17:07:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FD642F12A3;
+	Thu,  4 Dec 2025 17:09:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ECGHlJhc"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="iWcApV5M"
 X-Original-To: netdev@vger.kernel.org
-Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013006.outbound.protection.outlook.com [40.107.201.6])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE0D026B08F;
-	Thu,  4 Dec 2025 17:07:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.6
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764868079; cv=fail; b=fEwnvZzkQ/5trp14UZyiPKtSp1c0k4vjBOzFwgbtLJYhXmamtWlkvp9iGViJmmWGmlQTRexXxC2yblzqUlOxNgFKQuOGRRA6jFqZH4HyKmKNwvjdGOhbGG+nTPTT2futUsOKrySL9q2PMLzoget+NKgTB+B8HbneiXUt9CzXeWo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764868079; c=relaxed/simple;
-	bh=EKXs/uBoZpyEYgRxgtij2sf5wzJ3iaAcgtB1gw0BZd8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=TISbASTFc8e9PPMrLQwHDEvFbU5woSklTvWek2sD92LxudU/vh77YeIPb+n/KMs5gupxCL7k6sfRctiWuqdNQvXqGZchlj00da7vDp2ZzKoQuokt9cY/5Hd6XMNT26IkTdQQMY/I3droQorEh70sMALn3BKfh/oz6lF9m33tDOI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=fail (0-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ECGHlJhc reason="key not found in DNS"; arc=fail smtp.client-ip=40.107.201.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=krKkE0zlONkioTmQmZkyEPnD+Eeuth5mrUD7wjLQhChMQkFQcVrY056o/gSbxXeEqWxzMRoLU3l7qfo/zeSfOwUoa1CEEDOhPeRvnqEVB6r1OvEqiIydxOMVdml8DQfLqZOduKyAvXnSGjj+Us6Qidic7gXHvedzWIvTVbALfUzTcSDpbjBgkMcb3jiRVjHnw1QqVzV19s0fCWfGMgO9eseigcWgZjFKRqX5fouGjCTf3J7JYo9PJok9M3loUygR+RSbCp2Zlyn5KQ7aJkjAbCSLkNF8tkD+vB1pimEU3RNMHHUuUb/e8KQdrLW9+to7xDl9k7h9URT6Q4/gW8Jz3w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+7pzPPpfPmvX8qNgcKjyNwv7k8BMB4uSLn9JhU8buXs=;
- b=SAtxnbNi9IY0+soOaJCcs8R5quktfm941OxpSs2TQVYVhbDCZuj55e31oTI8hqwbg+eTR4z0oFzXZV2FJnCi+ev0may4OY9PxMGTdxL8XYtaMRa7tlzYAiWxBZuAbPN7+WgkNhrQmCS9MF4TKpxsac+vBzZw3DiBHK79keHljg2kKZ5gF364QEdkZ9jq+cmRr42wH01B823FGPXdJbMPEwAtmvr9oGRQ78YMBlNVOOhorlFwCb8YYD8SGYrjetBzD3454Rr3vpRYumRpfPcRPG1XAxeMqKIutcBhbU5eG9rTFxHBgOTrLlvzKkpc/1749R6Nr/Jn1WUeaWXkfyHMVA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=linux.ibm.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+7pzPPpfPmvX8qNgcKjyNwv7k8BMB4uSLn9JhU8buXs=;
- b=ECGHlJhcrckfC798JDU2Hsf1VFLUA3Kp38g92zYR58F9jfCmzhx+izPHQhqqtRHbdP0FNXPpCy5IdlRPllk69vikzOtDX5ZuP/JnDPMUD/xzwIN55b+dFXGsaiz1kKFqu0/U/h8qc419RCm7zwP+1a7k6DLWDu1AB8+OGE6ob/DXz6NVJYlmB7TI1CsTHcaYriD2QKjDANrYNuSWXM1e+TeUBacls/qbUFJGj2iQayIjWkD7K8xOE8TH0LpgMV7K8YET511RRWZjUPksa6q4MvbwvMvYruS/Pr06o8ikPn+r5z3G8u0hCU3gg2LYkUAFkSOq45UqKd1lkwNftiSkgw==
-Received: from MW4PR04CA0178.namprd04.prod.outlook.com (2603:10b6:303:85::33)
- by BL1PR12MB5873.namprd12.prod.outlook.com (2603:10b6:208:395::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9388.9; Thu, 4 Dec
- 2025 17:07:53 +0000
-Received: from CO1PEPF000044F0.namprd05.prod.outlook.com
- (2603:10b6:303:85:cafe::81) by MW4PR04CA0178.outlook.office365.com
- (2603:10b6:303:85::33) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9366.17 via Frontend Transport; Thu,
- 4 Dec 2025 17:07:53 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CO1PEPF000044F0.mail.protection.outlook.com (10.167.241.70) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9388.8 via Frontend Transport; Thu, 4 Dec 2025 17:07:52 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 4 Dec
- 2025 09:07:28 -0800
-Received: from [10.242.158.240] (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 4 Dec
- 2025 09:07:22 -0800
-Message-ID: <1bef8fd9-e9b8-4184-98be-98d016df20d0@nvidia.com>
-Date: Thu, 4 Dec 2025 19:07:20 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6189E2ED85D;
+	Thu,  4 Dec 2025 17:09:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764868197; cv=none; b=JjCTQy2UJOJh/YrX3RrBQjCJznjZSslc4lQ74BAbI30lkWaldoE7cWHdxkaAIFeo5FgfUfEE/XxJSgE/0SJEafAePAPTcQW5xQjb6zL82ZmlPvRJOEDOJJaRidX4QWs3a0bStI1ka/fXGDYQ+ww+HeSNqArbh1bN01RZ69yXwTo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764868197; c=relaxed/simple;
+	bh=BNdqFoChM4Dg1gXgtTdOSxkekvylSf4HlVcI2srGEg8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pOd50GPZAkqoZZlyQ0j85OZyuvyRmGfQ+6PjIuGo5QwtouogIQwsqrFm73piGGqZadtawQWCu4X/baQ0NmJteyC0nO7HmZiYIVPSMapwLXDCFuUnmKxTe8ZSe4pWB8BX76+e62Thjrt1bu5EWKSWpypX9anY01Y+t9NIEU8BlYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=iWcApV5M; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=UL1o65RZF394mtenVHi6rNznonj7OEHTfj3BoGUFlN8=; b=iWcApV5M0WBXsDuxeeItZNns/S
+	02v7uWaUbmSJyTk0DdMg6ODCLjJKb2P+feKaKXBVV9MO3smiOL5zqp2JAp+fgG1NC95mHjBn+uINr
+	6jk+2b3yJprhJiHhUMOOJ2bYbaAz3lelCdgE3n86agoiTN2e21fbMBNBj6zQqe/3h45d1F/gNXFtF
+	oEFvdiRVdnObly3IUpUfRAHfbau2PcoHZ+c4NnSgvz/rOkaDZBgjuJEeGd6uG3kOdaqBcLCDYepBJ
+	dEBAeAe3eo0e19kpZIfxEJEKRAVv/GXQsgBpEfFaeZA/sX+K9+A1AXf8VcPDTvWUFNBWC1HnuKVav
+	YG8aKJ5Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44150)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vRCpp-000000003oF-49tr;
+	Thu, 04 Dec 2025 17:09:42 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vRCpn-000000001BO-2O36;
+	Thu, 04 Dec 2025 17:09:39 +0000
+Date: Thu, 4 Dec 2025 17:09:39 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: John Madieu <john.madieu.xa@bp.renesas.com>
+Cc: prabhakar.mahadev-lad.rj@bp.renesas.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, geert+renesas@glider.be,
+	biju.das.jz@bp.renesas.com, claudiu.beznea@tuxon.dev,
+	magnus.damm@gmail.com, mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com, netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next 0/3]  net: stmmac: add physical port
+ identification support
+Message-ID: <aTHAU2i4chYpQPSY@shell.armlinux.org.uk>
+References: <20251204164028.7321-1-john.madieu.xa@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/mlx5: Fix double unregister of HCA_PORTS
- component
-To: Gerd Bayer <gbayer@linux.ibm.com>, Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, "Mark
- Bloch" <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shay Drory
-	<shayd@nvidia.com>, Simon Horman <horms@kernel.org>
-CC: Lukas Wunner <lukas@wunner.de>, Bjorn Helgaas <helgaas@kernel.org>,
-	"Niklas Schnelle" <schnelle@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>,
-	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-s390@vger.kernel.org>,
-	<linux-pci@vger.kernel.org>
-References: <20251202-fix_lag-v1-1-59e8177ffce0@linux.ibm.com>
- <7ae1ae03-b62d-4c49-9718-f01ac8713872@nvidia.com>
- <502727b0ad4a9bc34afb421d465646248c69f7d4.camel@linux.ibm.com>
-Content-Language: en-US
-From: Moshe Shemesh <moshe@nvidia.com>
-In-Reply-To: <502727b0ad4a9bc34afb421d465646248c69f7d4.camel@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000044F0:EE_|BL1PR12MB5873:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5a4c8bd8-16d8-4f73-1e4d-08de3357a96c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700013|1800799024|376014|7416014|7053199007|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?dmNQRFJ4WEpGaW53Wngwd21JTzQ5ZFZQYktwUStGRUFMTi85ekdkby9pUVlX?=
- =?utf-8?B?TG5WcGdPc2Z1bWtpV3hPK2o1TVZyVTVsTVA0VXRjMkxodGdqM3F6WmltbktQ?=
- =?utf-8?B?VUk3WmFRQi95ZmRJcGNCUUN3RTVodmd4RUcxME5XSHhCVmlRZFZQK2lkaXJC?=
- =?utf-8?B?ZFBXZmkxV1lNWUhGdG91MG9jRzlUMkExYnFTLzNUUEN3bTNDWFhHT21NaWlW?=
- =?utf-8?B?aENpcnd5VmlRUnFSazNRZ1ZCNW1TMmgzS3hCRVpJaUhuSHJHaEw1WWsvSHZZ?=
- =?utf-8?B?cHFpRWVNWDVpU3FJcW8rU21uR01JWU5ZeUZyRUp0MkZpSnQvdW10d0U1STd1?=
- =?utf-8?B?djJlR002TWtuTW9IMExoVjRlZ2VIMUJaWDNZYjF2aTZyU3JXZldzYUc1aDg0?=
- =?utf-8?B?Ymwxb3EwblNqRUtMS09SVHU1c3pZQWt3NzNwbkN1WTg1Si9iNmVxZmZFZ3Vj?=
- =?utf-8?B?RFYxL0xFUkFsUnNZdkRsdnRUZ2lhTXM1QnZLMlVrZ0tVV1prN2JTb2FDZkZE?=
- =?utf-8?B?TzZGS3BuSXlhWVpQdVBaaGt4emtVbk9Pd2hna1RoUW5NdjB3QWFINTdyWmNi?=
- =?utf-8?B?bkNDT1h4MTBnL1hNQTYxTHdtbk5TUTJkUzExRFVrK0RsSVYxRDlxVENuUzB5?=
- =?utf-8?B?bW5jb3ZhZm5hUnhSR0VQUVhJTG56SU4xdDZscXZjRXlZQnVmSTBCQjJueUVq?=
- =?utf-8?B?Si8vU1RIVkQySXZmdXk1Nk16d2puSEtsZ1Rha3VRQW5jdHpNczZ1emkyRkFI?=
- =?utf-8?B?VGFVb0tGU0wxK1FQMkRuQjQ5TDU1SDNGZWJBTmhHYW5DMTRjSExmbjNLejJJ?=
- =?utf-8?B?aHlqRHVaSmJBVTJFaHJNMElBakJzQU9QeVVUellMQ2Rob0dTTk5CeFoxZ0E3?=
- =?utf-8?B?UGh6QXFKd1ZoN21rSXBWMlVlNVFlTEM4aERRSDkvUVQvczBCSXZGd0s2NURl?=
- =?utf-8?B?cFo3Mis1bHAyS1VYTStQZzdoWGRPcS9iMW0wWGFGZWg1MHhkNThOSXAzWGkw?=
- =?utf-8?B?eVBoWUpiTmZ2ZytpOUluVlJQYm00dkxuTk1MMVMxazM5eEpiWStVUitsbU1s?=
- =?utf-8?B?eG9wcUFVVEJQNXVaUTc1cWhBYTQ2VndteTM4WGwxdk9HaFZnWllxYktKa1Bu?=
- =?utf-8?B?TzI1OWpEckU5Rm5sbTBKdm9kMC9wdnE3aWVmM1JhdTBrV2xYcC80bWh5M1Fr?=
- =?utf-8?B?SDBvdEl6Y2VKTHpEZXJMMTlqa2FDNHduKzR4T3N4N3BJQ21aR21iemt0T0dF?=
- =?utf-8?B?QjlXV0lDR214VDBjbDNDRjZrUW5wMUcvUDdEZGRZK2l0NENTdU03TWFZNEFl?=
- =?utf-8?B?NllDSlhCaHhCNDg1Z0x4ZGZwOXVQSVYrMDMzWUVUOFlUZ3R3dzVMODNYOW52?=
- =?utf-8?B?ZVN2UHlvTmVWWG80SXYzN0VkUUo4cDRmWUtMZytjMlRFM0FTL0ZSdzJLYkxQ?=
- =?utf-8?B?YlZJTExGR0k4U0drSFNCRXhYWHBJRnpSb3k0T2Q2V1RKeGs5a3R4QlVPY24w?=
- =?utf-8?B?bHFIM3Baa2tKcmE1UW5yVGwxVjJiUGFXSmxsM3ZkeFFOaFYxdXYrVWxqT0pF?=
- =?utf-8?B?VXgxbEEzN3BqRzAvU005L2QxcDAva1dFZW5XMlhxV0NtRlN1aDBFd08rTDds?=
- =?utf-8?B?TFFaQkFUNGx0ckFSMi9tSXgyNXI2dWZtNEl4clUzempiZU5SakcvL1JiR1Rj?=
- =?utf-8?B?MUI5SFV1d2xJZDNFWS9KbXE0QlJISWFISDVZaFdVSFBHeTAvV3hwWDVSV05q?=
- =?utf-8?B?c3FrTml3ZXY3M1FtTXdsSk54d0M1d0phK05mVXl2bHc3ZDVsWDdINVd3TUYz?=
- =?utf-8?B?RTZzZE9NcHlFcHBUZFFSZldacUJlNGhwaXo5VmlOWWkvWmJzeDhGL0lOeVJ1?=
- =?utf-8?B?dzk0VmRmU29obWFFRkdCMjUvZ3Bhbk4zbVZxRCtOYmlIZ3g2UStkcHRFMkJT?=
- =?utf-8?B?QkZOWjFITytTNU5pRGFpdzc4NitXV1VPdnpLZzc5eStlenNYaFZ0L1JaLzJS?=
- =?utf-8?B?VXVqbkduTXNMTU94NUdtK2J6UDl6eGh4VGtLVWFmeUE1S1NSVk50YUhYcURx?=
- =?utf-8?B?dnlJUlEwZ3lWK01GbE4vaWZGdGNzLzUwMUE2TXc0c0c1Y1NwR0VST2E5bXBa?=
- =?utf-8?Q?pujpQsdWMWqclZ87M4G3fzK7U?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(1800799024)(376014)(7416014)(7053199007)(921020);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Dec 2025 17:07:52.9842
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5a4c8bd8-16d8-4f73-1e4d-08de3357a96c
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000044F0.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5873
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251204164028.7321-1-john.madieu.xa@bp.renesas.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
+Not another bloody posting of this.
 
+Stop it right now. Just stop.
 
-On 12/4/2025 11:48 AM, Gerd Bayer wrote:
+I've reviewed your first series. You are diluting the potential reviews
+of your code, making it harder for people to review and track what
+people have said.
+
+So just stop this stupid behaviour right away. Do not re-post until
+after the merge window is over. Read the networking maintainence
+documentation. Documentation/process/maintainer-netdev.rst
+
+On Thu, Dec 04, 2025 at 05:40:25PM +0100, John Madieu wrote:
+> This series adds physical port identification support to the stmmac driver,
+> enabling userspace to query hardware-stable identifiers for network interfaces
+> via ndo_get_phys_port_id() and ndo_get_phys_port_name().
 > 
-> On Wed, 2025-12-03 at 17:14 +0200, Moshe Shemesh wrote:
->>
->> On 12/2/2025 1:12 PM, Gerd Bayer wrote:
->>>
+> On systems with multiple ethernet controllers sharing the same driver,
+> physical port identification provides stable identifiers that persist
+> across reboots and are independent of interface enumeration order.
+> This is particularly useful for predictable network interface naming
+> and for correlating interfaces with physical connectors.
 > 
->    [ ... snip ... ]
+> The implementation follows a two-tier approach:
 > 
->>>
->>> Fixes: 5a977b5833b7 ("net/mlx5: Lag, move devcom registration to LAG layer")
->>> Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
->>
->> Reviewed-by: Moshe Shemesh <moshe@nvidia.com>> ---
->>> Hi Shay et al,
->>>
->>
->> Hi Gerd,
->>    I stepped on this bug recently too, without s390 and was about to
->> submit same fix :) So as you wrote it is unrelated to Lukas' patches and
->> this fix is correct.
+> 1. Generic stmmac support: Default implementations use the permanent MAC
+>    address as port ID and bus_id for port naming. This provides immediate
+>    benefit for all stmmac-based platforms.
 > 
-> Good to hear. I wonder if you could share how you got to run into this?
+> 2. Glue driver override: Platform drivers can provide custom callbacks
+>    for hardware-specific identification schemes. The Renesas GBETH driver
+>    implements this to support device tree-based port identification,
+>    addressing cases where hardware lacks unique identification registers.
+> 
+> The Renesas implementation constructs an 8-byte port identifier from:
+> - Permanent MAC address (if available) or Renesas OUI (74:90:50) as fallback
+> - Port index from device tree property or ethernet alias
+> 
+> 
+> John Madieu (3):
+>   net: stmmac: add physical port identification support
+>   dt-bindings: net: renesas-gbeth: Add port-id property
+>   net: stmmac: dwmac-renesas-gbeth: add physical port identification
+> 
+>  .../bindings/net/renesas,rzv2h-gbeth.yaml     | 19 +++++++
+>  .../stmicro/stmmac/dwmac-renesas-gbeth.c      | 56 +++++++++++++++++++
+>  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 54 ++++++++++++++++++
+>  include/linux/stmmac.h                        |  5 ++
+>  4 files changed, 134 insertions(+)
+> 
+> -- 
+> 2.25.1
+> 
 > 
 
-mlx5_unload_one() can be called from few flows.
-Even that it is always called with devlink lock, serial of 
-mlx5_unload_one() twice caused it. I got it on fw_reset and shutdown. I 
-I will submit also a patch for calling mlx5_drain_fw_reset() on shutdown 
-soon.
-
->>
->>>
->>> I've spotted two additional places where the devcom reference is not
->>> cleared after calling mlx5_devcom_unregister_component() in
->>> drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c that I have not
->>> addressed with a patch, since I'm unclear about how to test these
->>> paths.
->>
->> As for the other cases, we had the patch 664f76be38a1 ("net/mlx5: Fix
->> IPsec cleanup over MPV device") and two other cases on shared clock and
->> SD but I don't see any flow the shared clock or SD can fail,
->> specifically mlx5_sd_cleanup() checks sd pointer at beginning of the
->> function and nullify it right after sd_unregister() that free devcom.
-> 
-> I didn't locate any calls to mxl5_devcom_unregister_component() in
-> "shared clock" - is that not yet upstream?
-
-mlx5_shared_clock_unregister() in 
-drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
-
-> 
-> Regarding SD, I follow that sd_cleanup() is followed immediately after
-> sd_unregister() and does the clean-up. One path remains uncovered
-> though: The error exit at
-> https://elixir.bootlin.com/linux/v6.18/source/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c#L265
-> 
-> Not sure, how likely that is...
-
-It comes on error flow but after successful 
-mlx5_devcom_register_component() in sd_register(), and that error leads 
-to error flow in mlx5_sd_init(), which calls sd_cleanup() too.
-
-> 
-> Thanks,
-> Gerd
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
