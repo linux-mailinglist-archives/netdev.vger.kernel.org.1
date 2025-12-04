@@ -1,104 +1,92 @@
-Return-Path: <netdev+bounces-243649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8382ACA4B60
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 18:14:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA838CA4BAC
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 18:21:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1CAA6303D605
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 17:12:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C6E1D302B123
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 17:16:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F9A02F3C3F;
-	Thu,  4 Dec 2025 17:12:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E30B155C82;
+	Thu,  4 Dec 2025 17:16:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mon+il9C"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BiA+oq9p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CD3B2ECE83
-	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 17:12:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 408F22FF67C
+	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 17:16:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764868330; cv=none; b=qLAl0HIg29e0As0MTIAAqGqsmaPuy5gO3EgLwefYcqFXMqt/G24ijQEsQzHd2ZNzqrK+oAbktIhHbD6D4ghH5XOBy2B4eSE4CTlCPOF7c8rCR5hsy1cjlBd2DWI+Ja464yI2IqPYZ+2mJPAE4UEmkWiP6T2QLhZ+mAKCpIOrhB0=
+	t=1764868583; cv=none; b=o8Hq7QW1tvOu/wR4EBEHURG5PjT9zrX2iwGLnSKEM0zWZwC10Eh0PfRbxLXgyXKlPNXCbnQTvFiDekgDDrEXi5472mafo7GYqM7Y40AtZSGe/VK2gcw4+qEvmQEcetbTYwsDqyHDTGRen/hM0CakQDnUnTnxNQ6qyv+oo/Z9ZUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764868330; c=relaxed/simple;
-	bh=H0npc7pt+fWzWwL2KKJ68bLEJsgHQoGWt8OwzE015tw=;
+	s=arc-20240116; t=1764868583; c=relaxed/simple;
+	bh=km4Dh9hQxInKzZx/6CVtSmfiE01GeOx+hzC3RItzZCI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JOrAxrQHqxR6RwUzmlvul6eHjJ8eKbdUbbjvKz29Bn6ckY+rCuSDJzehXUsnyEN78NNxPFZcI0RRqwtPUCl8DEFFbo+O+DdrWzXVlecOVsZIskyUSvdxK0oTmOvPQGtFY30uf0Z2gBoZRLBwEKBGDhG2hUT51iZmWIR4x5CG4TM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mon+il9C; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=BZ0+qhbHZqNLaS/wHNpEUTcc/ZDHeGlwkzeSM1caTpX72W8+lV+DZ9vV+tU0yFhzcJoUe3gbXMdTowPHKOEjPPueOA2fRj+5e3k/o0Zok6k5t443WFiyjT0f5D+4iqe0Aie8FIKgWtvU3+/4YSLOVPeIwE+Rz625n0oQCwypBls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BiA+oq9p; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-42b2de74838so71487f8f.2
-        for <netdev@vger.kernel.org>; Thu, 04 Dec 2025 09:12:05 -0800 (PST)
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7b6dd81e2d4so1224724b3a.0
+        for <netdev@vger.kernel.org>; Thu, 04 Dec 2025 09:16:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764868323; x=1765473123; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1764868579; x=1765473379; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uGUWJRfLEGG5MQjirrXoFGblqtB6v7zhyuKgj/1LsZ8=;
-        b=mon+il9ClZyaXPsE4GzldZaDECYDFr5jnsCHFpbCNnhfOH8r4UDm2MsD9eP8OCNzDt
-         zqRj7p21tEDHAc7pwulNnBaqFDnV6/RwURG4T4K8+o7X3uw5XYb647CTvBoQf0tDOQ/m
-         lJukzY3TQSd6DiEpgmv/uyLnsEvHXzCtJTWfyavCk/OBGRaOer+7oggOAln/0QD2sNIm
-         5j+NNMArPCrhqS5PY0LkBNiz6xk9T1tyhzM0YNbm6W+QvWiYZ7iVHexQ46SekJGnb+OZ
-         pc7rkqt22KsaCC5jFWpECm1t9jd27gFBQZtI74EPdKcb5GxPyyD+wlp0QxyXMiQPcbFk
-         ie3w==
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9as9K2dHITRu6IU+yIjl4J9GL6vgxblmI/uo3LDmiDA=;
+        b=BiA+oq9pF4b6fLwzzpFCXc3BWr2q7jmMqSh7Y1G3BALUyBhaEmta8HkkX3qUHa4H9Y
+         oI1s5FC66uKaW3k42HXLHdqG46JyjGZunzg2oLW/K+bPSuzy8xapjecNrnPBs36TocvU
+         Dda+FuY7i5Ti6TinHUN95K2A27UkuBy6HBtwflNYQDyeAzzvh3PyqakZRmjx7jsUWKv/
+         OhCy7DGnm92V1HCzfcRyas5gImTgQkXm8t1iFW4TcZTHcJLWRzwn2u+GerHMs5QaCHsW
+         PNr3lCrasUwnrxNv43Fr3223E3yh55PFoxRmR+hkl/1T6QS8yMqm2ham5i+fXwetIaIy
+         CUFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764868323; x=1765473123;
+        d=1e100.net; s=20230601; t=1764868579; x=1765473379;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uGUWJRfLEGG5MQjirrXoFGblqtB6v7zhyuKgj/1LsZ8=;
-        b=gIbK5wvmKOdzpn6tAyB8z1oE5SW7/V2SK0k9PmAO9WO8TrLCImoz+tN++sc+V/OlHh
-         Xa2mEMePepb0nnc/vlQ96x68DzBiRiuRnfnmQK/z+MIQfvKnsYew0iR+kdp4vrTI6jYd
-         31Igw8afDISNao6eo+2lHy+ce60CimKjR9IlhHdwU43yRC4X0Az3w6Z2rs6bYYtuo6q1
-         TiRrtHZ0L1NYR5JVIEc70r/Nfem1oLsFhS3Y7l5crxgAap+QAWUgBJ/PD3ijmz1WB0qT
-         GbPdu2MjWRm/p4cuX4oiPXaC7+GucB4xf1REJUWTdtgututZooP0G39BVHw/TtLajgqb
-         +5qQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVFw3rjBz4qeTkPimp98VvivBs6lUnyM07RAQOTX9eXxt+5H6fvpKkcI0RrkeQQVgQ5YTo6NoE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwX0NMAgrD/YPjtaWaDL2LTYWSrNHJFEDgd4KE9GVNl3ij/i1/T
-	L8khfWBYBfmkiU4JvbBcyeJpaIptfb2wlCMTn8Y05gmqxPGpp1draoEI
-X-Gm-Gg: ASbGncvzkxz7ZCaKwS/qL758kzE6MibzoSiq5K898mCFeUbmYaIQcy5ufzRD53feq8b
-	sgj85LOkLhW0uCvroNaOYtXgIS8CT5GQyTZWDGsFnBG/LEjzgZS3yWTw2RG1gl5fIFguF9OYQdr
-	YX8yqZNuB2qXCZ64LOPrCVofjF4oXH2MaVTwKLGtbRcuJiyE8q4qeNUO4gwhY3VRk9oVOMcHktQ
-	yekesqQnlmThpQcYfdwLgLcfpiHK0IgpTpXD6z3tr80ZTloo5WHvIUKfR8hFq+qQDWgkg+wJ9eM
-	DWPclNtg9LjhUX4357t8uiTC/vCCv9YtOMR9Ej/TwQO8HRcElXIvfYSNRezp/n+CUKktgJjLf99
-	LWc6NITNbTYjlzXt+jxNCvLe0wx+ITMQ4R+chBnszkzzrQNqO09WLEEMGrOdZaQ2OuFOe0GIsol
-	tBp4w=
-X-Google-Smtp-Source: AGHT+IGxkkIvEqrKzXYEjrd610hQ5Joilqojfn2sZR57wWJ4rYVFOquGZdhrsExO4Zfqp1zUdehCbA==
-X-Received: by 2002:a05:6000:2f83:b0:42b:2dff:d394 with SMTP id ffacd0b85a97d-42f731e6940mr4153566f8f.8.1764868322949;
-        Thu, 04 Dec 2025 09:12:02 -0800 (PST)
-Received: from skbuf ([2a02:2f04:d106:d600:dbb2:245d:2cf5:21d3])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42f7cbe9065sm4190267f8f.8.2025.12.04.09.12.01
+         :subject:cc:to:from:date:sender:x-gm-gg:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=9as9K2dHITRu6IU+yIjl4J9GL6vgxblmI/uo3LDmiDA=;
+        b=NR546jPnbRqgi6K7SmzVCZLlrJQzzqSPXD/6Ev5HDQJ95CwgIA3DbynoWxXFMQGYga
+         KO/rh24nYGELVEEBP7iqfbLSFNcDKhBEsT+74QahatiGL0euGJi85NAUaCmL3MUQfAMY
+         uIWoCJ1aj+jOCDg7fYYaYCBYHuAVK/iUvcf7gkuUTo5B7i6JyWw6Yj82/KUfonvLYTOX
+         St2wV8EniUCWx590CHnDlr3scxrmI3MnAFIWR+CHjR0QOJBaY+GXOFMsdn5N3Tjf490i
+         kJnj0C2SVlY3teLwxu0PIBD9v5g8jj3b7O3bk3YO9Izi8gxQkmW6TCdVK43PkcGSCTUc
+         G/ow==
+X-Forwarded-Encrypted: i=1; AJvYcCVEorg/Kw4FGO/MI5no8hlbz5XdtPubuSozI0279yXQfckCmMr9NSIgtvV+XLagwjFeaKfJfZ0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzcE3yCMknKM/HN2055SkEobG8iYasPbbIRBJSibeZzyjZ3x583
+	pOQYqGsCdx5QaJEsfYsvr4149FBwT2cfnYALoChHgtCs5ksUE+UoND3t
+X-Gm-Gg: ASbGncvNZqTs/M0mJzL7KpplPeE5BtPjvsDwZ1kqfwLALBRs8XftHdP64XFkNv8UV5j
+	XKDOeurIMlfeZ/6taWXRPavnOfQnWkUmRJGNSKRtLQuf7WvWSqCrej8SxHjRnkVY8XiHzuXborx
+	ZRhgSRMuSH7OCl5QEQ6DUxabzawQvgNlC+oRboPwBpCvbugbTM/a3fcOaxD3wo95bg1YNyuN2lF
+	20PqzmV76tUyIx1YTHKD8cfDDzyOTr/IZgg7514TOIDpsRRLAFj4+ONo/Xjr/se/TV0/5mJOSlA
+	Po3emdpD9lj51mRE5k5bkJeivbi2y66x8/l++t/4b5J8jY0BU882lhMTImD05LSaIiEAVnI+moU
+	2P/VTvaftS9RLihaOzs1XLvlq5ChWrtJmIejt1u0IIiLYIAF7I4sOtNPhAvW81A2R6B8gy68lf2
+	ThDDxlx9T2d/98CbHQ/d7iTB0=
+X-Google-Smtp-Source: AGHT+IHAXVYFQ4q367vSeW5sz0uxGvn2ZjIkZaA1NzUcPpPtZ5Mf5JbmRDgnfViVXo5wuRHDOwdH8g==
+X-Received: by 2002:a05:6a20:958e:b0:350:1a0e:7fc5 with SMTP id adf61e73a8af0-363f5ed53c9mr8451647637.60.1764868578709;
+        Thu, 04 Dec 2025 09:16:18 -0800 (PST)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:da43:aeff:fecc:bfd5])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-bf686b3bad4sm2375297a12.10.2025.12.04.09.16.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Dec 2025 09:12:02 -0800 (PST)
-Date: Thu, 4 Dec 2025 19:11:59 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Daniel Golle <daniel@makrotopia.org>, Frank Wunderlich <frankwu@gmx.de>,
-	Andrew Lunn <andrew@lunn.ch>, Chen Minqiang <ptpt52@gmail.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	"Chester A. Unal" <chester.a.unal@arinc9.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v3 2/2] net: dsa: mt7530: Use GPIO polarity to generate
- correct reset sequence
-Message-ID: <20251204171159.yy3nkvzttxecmhfo@skbuf>
-References: <0675b35f-217d-4261-9e3f-2eb24753d43c@lunn.ch>
- <20251130080731.ty2dlxaypxvodxiw@skbuf>
- <3fbc4e67-b931-421c-9d83-2214aaa2f6ed@lunn.ch>
- <0d85e1e6-ea75-4f20-aef1-90d446b4bfa1@kernel.org>
- <00f308a1-a4b1-4f20-8d8e-459ddf4c39b1@gmx.de>
- <aS7Zj3AFsSp2CTNv@makrotopia.org>
- <20251204131626.upw77jncqfwxydww@skbuf>
- <4170c560-1edd-4ff8-96af-a479063be4a5@kernel.org>
- <20251204160247.yz42mnxvzhxas5jc@skbuf>
- <66d080f1-e989-451f-9d5e-34460e5eb1b0@kernel.org>
+        Thu, 04 Dec 2025 09:16:18 -0800 (PST)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date: Thu, 4 Dec 2025 09:16:16 -0800
+From: Guenter Roeck <linux@roeck-us.net>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Shuah Khan <shuah@kernel.org>, Christian Brauner <brauner@kernel.org>,
+	Elizabeth Figura <zfigura@codeweavers.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Eric Dumazet <edumazet@google.com>, Kees Cook <kees@kernel.org>,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	wine-devel@winehq.org, netdev@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH 00/13] selftests: Fix problems seen when building with
+ -Werror
+Message-ID: <536d47f4-25b1-430a-820d-c22eb8a92c80@roeck-us.net>
+References: <20251204161729.2448052-1-linux@roeck-us.net>
+ <20251204082754.66daa1c3@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -107,25 +95,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <66d080f1-e989-451f-9d5e-34460e5eb1b0@kernel.org>
+In-Reply-To: <20251204082754.66daa1c3@kernel.org>
 
-On Thu, Dec 04, 2025 at 05:48:07PM +0100, Krzysztof Kozlowski wrote:
-> Both are the same - inverter or NOT gate, same stuff. It is just
-> connecting wire to pull up, not actual component on the board (although
-> one could make and buy such component as well...). We never describe
-> these inverters in the DTS, these are just too trivial circuits, thus
-> the final GPIO_ACTIVE_XXX should already include whatever is on the wire
-> between SoC and device.
+On Thu, Dec 04, 2025 at 08:27:54AM -0800, Jakub Kicinski wrote:
+> On Thu,  4 Dec 2025 08:17:14 -0800 Guenter Roeck wrote:
+> > This series fixes build errors observed when trying to build selftests
+> > with -Werror.
+> 
+> If your intention is to make -Werror the default please stop.
+> Defaulting WERROR to enabled is one of the silliest things we have done
+> in recent past.
+> 
 
-Please read what Andrew said:
-https://lore.kernel.org/netdev/3fbc4e67-b931-421c-9d83-2214aaa2f6ed@lunn.ch/
+No, that is not the idea, and not the intention.
 
-  Assuming there is not a NOT gate placed between the GPIO and the reset
-  pin, because the board designer decided to do that for some reason?
-                   ~~~~~~~~~~~~~~
+The Google infrastructure builds the kernel, including selftests, with
+-Werror enabled. This triggers a number of build errors when trying to
+build selftests with the 6.18 kernel. That means I have three options:
+1) Disable -Werror in selftest builds and accept that some real problems
+   will slip through. Not really a good option, and not acceptable.
+2) Fix the problems in the upstream kernel and backport.
+3) Fix the problems downstream only. Not really a good option but I guess
+   we'll have to do it if this series (and/or follow-up patches needed to
+   support glibc older than 2.36) is rejected.
 
-You two are *not* talking about the same thing. I dismissed the
-probability of there being a NOT gate in the form of a discrete chip on
-the PCB, *exactly because* you can most likely invert the signal in the
-GPIO pin itself.
+We'll have to carry the patches downstream if 2) is rejected, but at
+the very least I wanted to give it a try.
+
+Guenter
 
