@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-243608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8FC4CA4804
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 17:30:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AB773CA4813
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 17:31:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B31CD30AD6B7
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 16:26:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 479D630FCCDF
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 16:26:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B66793101A9;
-	Thu,  4 Dec 2025 16:17:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E1A6314D2A;
+	Thu,  4 Dec 2025 16:17:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m76CdsSk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i4h3z6VE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2522A30B524
-	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 16:17:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F1A130FC1E
+	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 16:17:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764865058; cv=none; b=dxOvLQXZSgqvBJMMjhbTBUBTDXd2BiixgTezSpkcj9agyZOWg0eXU9eDRhOQNDb3KJ1K2cQppSH9AeP3Z69Jqm2okn/9t3zSpCAndo/096QA26F0YJDS/ZXq67wQYise20yrMiLFr8eQhPTRByDcMSWkBL1UMzmYEX1A1It0cdU=
+	t=1764865061; cv=none; b=DJda+v9XkpvNEsTR3zuXEQ/V2cHkYCbb0d0E9yEnU3P8J5F5s9cU6BBi8YMubblROAy2y0LWY8rPjahuUDxGzGTGKnCgW9hwmkT8MT6tEzNkPnZSw9lMBKSjhjPrdAcKRDiRGJ5dOmODaSFzLB7TCvtVX/+pANYNCRxS72/xRxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764865058; c=relaxed/simple;
-	bh=AAfc1FTHUg7pFDTfmSnmLRJtRMoPx8CAYPklnRgrY6c=;
+	s=arc-20240116; t=1764865061; c=relaxed/simple;
+	bh=cHyNnZ8pozRIM6qgLhLXjRDWgdbwcNGV7Hft7Uz1QEs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EQWYF6UJ8OKPfMgUDSusTxqPKAhf9I37mfEuC/iki9RiKgAt7tgtLOhMKVsMhCW6VG962El2mUHsHQ6p2xVeI8i6ETxGIuoNvka2xW5Ok2JhBbv5siBRzKk+Bt2mhwCMEtI8jXVGK1bgoNKpyO3U573qY5b6knJ9FBu894MV8RQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m76CdsSk; arc=none smtp.client-ip=209.85.214.176
+	 MIME-Version; b=MJv7r6WI0PSCB/2WDfU+Nn/5E2sTogycKvsT4OxPtrS6WLdLt5cwNIZJISdxz9V9unxB3HyFc9Mga1C2dWUPUFe4JxTVHGUbVhY9uik8OEYz4xR5/wNcyjCJJ70bNkU0o+FXgewOwBvtM5yWkDK+aoB21OM1Fe0JEWjBEGxsDhA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i4h3z6VE; arc=none smtp.client-ip=209.85.214.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-298287a26c3so14393845ad.0
-        for <netdev@vger.kernel.org>; Thu, 04 Dec 2025 08:17:37 -0800 (PST)
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2953ad5517dso11599395ad.0
+        for <netdev@vger.kernel.org>; Thu, 04 Dec 2025 08:17:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764865056; x=1765469856; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1764865058; x=1765469858; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EPSXK4QWZvrY6PEEMm54/MaPBa83AbH2NH2bvzL1wMY=;
-        b=m76CdsSkhyAcC5hScfGv7GkTJ34TrqHYjYTq/A/9eCu1OraPqLKtEaMhS/nK/d1VeI
-         AqBbDytbj4WsWWsXyqxfz9I4Jv8fssaBi2GzdjLCQMQEcdjvDy9i13HJ9rG10FpT3WeW
-         Awvs5A2PAThTQk5LuePgitWjOw7lDeCpO7k0WfdF6o0w6WIz1ktyUgRJs+hoiOdC0FSE
-         b/qRoQ35w1mGQfRwPd1T02TQk3hsI/tr92LDxoeK+zfUu54ylbi5NRUES2GmaUmkmC54
-         Zaf+N3KOnG5Vyu3Lh7zP3F7xxF87V1pfkfXfly42rKGlLXQpmxtzfIQ4pj06r2nLZa95
-         XFhg==
+        bh=DCNiBdsJRsPUkxld6fkb0mcknawF6lug5Wbao5E0n/E=;
+        b=i4h3z6VEd5ahU0ffmehm8MLpVUQu0erDYZo5houI3W2rZG7x1LU4Twa5YgmEPtg0Kp
+         FCeLWpL2f7aS2UNWjmdBkNTihxUljqudvbnEFxfNuv/bkAnIFsqnk6O76n31Uk7hCNCL
+         UiZj5c8KSkn49qcRh8khR9CQP9HRWT+c49k272E3Dw81fvt5k7rQL6HkNEw14a80GjpK
+         brAjfsEE+/Yl+Su0sAROXqkAE4YcYgYcImrv9IZLq0eE9Y+mEZgXSurEcmrpnD+k2rka
+         nTnwsr6GuKsHEwJOE1bvzXOFnwkX8wWmQwLNF4FxdLh/3HDtnqTjrZzMyg49DIrTJGy/
+         mypg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764865056; x=1765469856;
+        d=1e100.net; s=20230601; t=1764865058; x=1765469858;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:sender:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EPSXK4QWZvrY6PEEMm54/MaPBa83AbH2NH2bvzL1wMY=;
-        b=lW7RxJYILJe7tGKA9PN4UrfNgyzXSU5N2Mjx7VLki4Npeg7Hf5IS2nhB8hloGwS3Qk
-         luFVuEptHnZP3013B1rMPO5J95CTpkdzsvEjADY/U3uJI3U7ib3bkUP+9Y3LttY55/mu
-         nK6/lWYTroect4BgrXMx6ewyvcBbB506QDN/ICRVFX7yGafPiuRFr08CLM3B6I9jXdvN
-         3NP94+kumX1Sr4r3BZR6/iyTTpj1SRxnrHtzFK1O6oRDYnS5rp3l7i99k62XHbyj0AwL
-         kPsPHDJNAO1eq+FSvrPLJuw5q4fJJJkru589QWB5cng4Ysd2CzQcHuqhu16cPzJwKD7p
-         hlGA==
-X-Forwarded-Encrypted: i=1; AJvYcCUbiZ9zZO+W3yTuQkvfWM3Ni9zsrpE9FuNLWbgqcM+cYaKw7LhcClsG4jb+PS3aBpdHShdGijA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDWbqMO8LcQpXORybEgG2Zhv8a6Yn7fRJomNzRjs6h5vS4A60T
-	rV5hDlOXRiD30Sl9L16/op+Bn7U5KNxEQPl6n0vikheB4XKLgr5QXZt3
-X-Gm-Gg: ASbGncvn52ntL/fqZJUIOeCel45BjM9ASW4QOF3F8XbdSUE9vAvZEmVQHOrr8OAy3Uk
-	Yx4n8U8Y3n6s9OJZ5Z70aNcamwi2HTNIOLW7Tlx+bvrl0r85w0+ou76aQwPtEbWKr9AGOTsHUEl
-	tc7/T2qkyqe2y4b9nSdrx4hvosad916PhSRY9G2950A2RzLg2iCJeNM3WjYd3y7gmT4MzFZHXIP
-	ZNbL/h+8EnqtMlpO5BtjF5WWIwdqmXS4QOJXO2tSO5eY1FBCzRmBw2Bn5zJYd/MG8fhFUaed3NR
-	C8tZ45iuZMHJzWlGSMus35s2NLSJXep3akzeK9eY7Jo7nKYzAQU0XAajKo/WrSxyTvMrs9igzw5
-	eQWQsG5YY+Tb5xm/UYe2j88YlJ4FxOczTtRjM3X6BFrcJ/HdgoBdrx+UeT/x92DGsLw3RlK/uwW
-	XcIzj/V4VDj6eCCs7lyklBp+g=
-X-Google-Smtp-Source: AGHT+IF+E9CdNRVWiFV1Q082ZOrNiQdxmoZOMYs4fBD6jDUJHOWOaJ88Yx5928q27lnrpgUR2cVtHw==
-X-Received: by 2002:a17:902:f712:b0:295:4d62:61a9 with SMTP id d9443c01a7336-29d68413f5amr90437015ad.38.1764865056469;
-        Thu, 04 Dec 2025 08:17:36 -0800 (PST)
+        bh=DCNiBdsJRsPUkxld6fkb0mcknawF6lug5Wbao5E0n/E=;
+        b=osGA7vy/KsXMa/Kt9nfHv2wxVHrRCFsZh91+hUK2caXEXJez1zz2gGf/LymrgsS6da
+         hAlDqkfJ0AP6rIX/iG6wYJll4CRHOerOrfyaDCcorCRtGEVzYfPf3OsSckpl/ddHsTJD
+         ZuZ7cCtBGPhl5cqCHxSXYEgJW3vWGCGN0BcqNGoqwNyzOfasBRMGfDKwdkOQf+YNuxCE
+         f2ghrCO9bL2xVJGuhqQ4JxgMaIMpR9yee14PBOBbbJ6qt/zmvhmaScyqtw5Z3HLmzWVx
+         BiSWjM1lyb8DkrkCGf2Eh6e0SZFiRnr9nxe2ZCk+7K/cqlWc5w3FnBS6rluikZbdsLCZ
+         1JJA==
+X-Forwarded-Encrypted: i=1; AJvYcCV7ng5Qitj6imUspQ199PNGxyyUOiXa4JU6ULqWw/qYP2H3Owt8wXN04+4/tv3ECtJgtyVrFVs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWNUNZH0WDpJHUzZN4IlqVhhcghtzaHfixtVKRf4CC5wVEn3lD
+	Z55Y+PgrkANcEgH1eldSzJJADWn8WxUeiKJfG/bEta8Hc6i/yTX/CYaO
+X-Gm-Gg: ASbGncs7k63QrWuX9DR0h7xJFYo4KCLOGQeir43skzj9naDFyZybXv5b65A/AKcuSof
+	nKACV+fKNgxLpvRXw1EHl2AMbNu1cLVh+fzCDzJE9h24/R/wyPl3dKvFRDEJA9mq/UJ5Qy58p/i
+	bhkqc/bWarwFamdM5k7QCnUQK2+BysmTxGTkGGqdrkGl4Z3uUhgYdAX/xa5vN3qdN6g2+l4JXiU
+	tILpNu/kcX8XThJDgaztNP0TWniSWafvVpr6UPRoX0lEOiaCfyepn3IhsefaZIb2aY/s566/6Ca
+	XBoPhQN7SJECp8iwTMZnPb3w/f0rAmTWJhLYP7I1Cphiz9OMs4QlR96lT8Y6xbz1vRN2S+sQZ4u
+	nRmQlv5yV/f0JntfB0AoBn8S0agdScrouCH5nRMMOGkn6nDUcu0DmJHNvBOEfxJldC7sqClXraY
+	D/VC35N5RU/nTefrrH3yM+hGE=
+X-Google-Smtp-Source: AGHT+IF/JV1VOB9h/rEMuCA0EjCehTUVdpJ/24AVQVMYynuhx2I5E1sWEb56yqefP+YuFLCzMcT4rA==
+X-Received: by 2002:a17:902:f543:b0:27d:69cc:9a6 with SMTP id d9443c01a7336-29da1eeb31amr41046105ad.53.1764865057641;
+        Thu, 04 Dec 2025 08:17:37 -0800 (PST)
 Received: from server.roeck-us.net ([2600:1700:e321:62f0:da43:aeff:fecc:bfd5])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29dae99f223sm24183665ad.62.2025.12.04.08.17.35
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29daeaabf8asm23548875ad.85.2025.12.04.08.17.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Dec 2025 08:17:36 -0800 (PST)
+        Thu, 04 Dec 2025 08:17:37 -0800 (PST)
 Sender: Guenter Roeck <groeck7@gmail.com>
 From: Guenter Roeck <linux@roeck-us.net>
 To: Shuah Khan <shuah@kernel.org>
@@ -86,10 +86,11 @@ Cc: Christian Brauner <brauner@kernel.org>,
 	wine-devel@winehq.org,
 	netdev@vger.kernel.org,
 	bpf@vger.kernel.org,
-	Guenter Roeck <linux@roeck-us.net>
-Subject: [PATCH 02/13] selftests: ntsync: Fix build errors -seen with -Werror
-Date: Thu,  4 Dec 2025 08:17:16 -0800
-Message-ID: <20251204161729.2448052-3-linux@roeck-us.net>
+	Guenter Roeck <linux@roeck-us.net>,
+	Aleksa Sarai <cyphar@cyphar.com>
+Subject: [PATCH 03/13] selftests/filesystems: fclog: Fix build errors seen with -Werror
+Date: Thu,  4 Dec 2025 08:17:17 -0800
+Message-ID: <20251204161729.2448052-4-linux@roeck-us.net>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20251204161729.2448052-1-linux@roeck-us.net>
 References: <20251204161729.2448052-1-linux@roeck-us.net>
@@ -103,47 +104,31 @@ Content-Transfer-Encoding: 8bit
 
 Fix
 
-ntsync.c:1286:20: error: call to undeclared function 'gettid';
-	ISO C99 and later do not support implicit function declarations
- 1286 |         wait_args.owner = gettid();
-      |                           ^
-ntsync.c:1280:8: error: unused variable 'index'
- 1280 |         __u32 index, count, i;
-      |               ^~~~~
-ntsync.c:1281:6: error: unused variable 'ret'
- 1281 |         int ret;
+fclog.c:37:21: error: call to undeclared function 'open'
+fclog.c:37:47: error: use of undeclared identifier 'O_RDONLY'; did you mean 'MS_RDONLY'?
+fclog.c:37:56: error: use of undeclared identifier 'O_CLOEXEC'
 
-by adding the missing include file and removing the unused variables.
+by adding the missing include file.
 
-Fixes: a22860e57b54 ("selftests: ntsync: Add a stress test for contended waits.")
-Cc: Elizabeth Figura <zfigura@codeweavers.com>
+Fixes: df579e471111b ("selftests/filesystems: add basic fscontext log tests")
+Cc: Aleksa Sarai <cyphar@cyphar.com>
 Signed-off-by: Guenter Roeck <linux@roeck-us.net>
 ---
- tools/testing/selftests/drivers/ntsync/ntsync.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tools/testing/selftests/filesystems/fclog.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tools/testing/selftests/drivers/ntsync/ntsync.c b/tools/testing/selftests/drivers/ntsync/ntsync.c
-index 3aad311574c4..d3df94047e4d 100644
---- a/tools/testing/selftests/drivers/ntsync/ntsync.c
-+++ b/tools/testing/selftests/drivers/ntsync/ntsync.c
-@@ -11,6 +11,7 @@
- #include <fcntl.h>
- #include <time.h>
- #include <pthread.h>
-+#include <unistd.h>
- #include <linux/ntsync.h>
- #include "../../kselftest_harness.h"
+diff --git a/tools/testing/selftests/filesystems/fclog.c b/tools/testing/selftests/filesystems/fclog.c
+index 912a8b755c3b..d7cc3aaa8672 100644
+--- a/tools/testing/selftests/filesystems/fclog.c
++++ b/tools/testing/selftests/filesystems/fclog.c
+@@ -6,6 +6,7 @@
  
-@@ -1277,8 +1278,7 @@ static int stress_device, stress_start_event, stress_mutex;
- static void *stress_thread(void *arg)
- {
- 	struct ntsync_wait_args wait_args = {0};
--	__u32 index, count, i;
--	int ret;
-+	__u32 count, i;
- 
- 	wait_args.timeout = UINT64_MAX;
- 	wait_args.count = 1;
+ #include <assert.h>
+ #include <errno.h>
++#include <fcntl.h>
+ #include <sched.h>
+ #include <stdio.h>
+ #include <stdlib.h>
 -- 
 2.43.0
 
