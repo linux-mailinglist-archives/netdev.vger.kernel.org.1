@@ -1,99 +1,94 @@
-Return-Path: <netdev+bounces-243670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2B21CA51C2
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 20:23:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1208DCA5331
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 21:03:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6CCE3302D92D
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 19:23:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8AA7830A6004
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 20:03:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 847782FE048;
-	Thu,  4 Dec 2025 19:23:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5E7F344020;
+	Thu,  4 Dec 2025 20:03:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E064wMQF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="An3rPEtR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D9C52777F3;
-	Thu,  4 Dec 2025 19:23:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7518C299937;
+	Thu,  4 Dec 2025 20:03:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764876188; cv=none; b=XYFzdi1xemNvpuW1wJV/Y0kfsR7JSK+dWZgkhlwW2K2LoCClAYcVCEXZgChtPwG7JSG/k/yV89tljBt1PUIg+DvN9XguWKlwskej+BTADgrcn/UFEhzjZ3M7Ru9dSJa07346J8kKbbyZxTM6Mrux5pcvNxmGHpdVnv+suGB0t+E=
+	t=1764878610; cv=none; b=MYmCGOaXIUU85BLPUpFCVeZd5JHE7tNe2jOk4pNYNx8NwVUeAUU7aDDk+7voWHf01VV/NcJaIg1kF6evBt2w0vJwxxCPnm3VYlqvI+JtiTm4oueQMqy7LpRoRrH7xMEtD909M2aD8UDsAGk2jRPiJvVNuiQvOj8nvoq6hCIFbBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764876188; c=relaxed/simple;
-	bh=H+6vKkQlR+H9nBX7nMyb0WD8+vU1U+IUd1j9QYRXQ4g=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FY6Tyb70uwWBugTB72OhxDu3MX82AshmlT6QygpjELxVmLknYn07IMvYRfYaYyGZJOxHSFqsiKUAWVipG0JMKnYFqYRyfqg2b2pzRXOJbljaHuKl8ehyQUHWfE6cjQEykUZv0wbB/siG6X5b9TFkd4qd1q3BuGFY+RLu47T8FhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E064wMQF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 214F8C4CEFB;
-	Thu,  4 Dec 2025 19:23:08 +0000 (UTC)
+	s=arc-20240116; t=1764878610; c=relaxed/simple;
+	bh=F/tuPHzaviurzJ8050yVZnILe2Za/hpOx98W5eohkaI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rCkwqewD025sgQc4xL5HUQXY4/2GnafnT5wKKddfGSiA6jFI0nOikmn9S0jmOcpZYzH0xeR3SgocgMRNIN/fuOE/bvacaBrLojmDfiRxJznC2etfXkqDT4JsXolqzh4gX9IDg2XS1E10LtIdo80FJ7ayy3+QwTrtxWYNZdQdUeo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=An3rPEtR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3D7FC4CEFB;
+	Thu,  4 Dec 2025 20:03:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764876188;
-	bh=H+6vKkQlR+H9nBX7nMyb0WD8+vU1U+IUd1j9QYRXQ4g=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=E064wMQFuS60Odu0hSm+JFYbkh9bsawGe0h/bNiczluRcr7ZTZt0Nk7dK4kLWhYiz
-	 EC25x3lfUM3u97Cvqn29RMimXyPlWZ7mo7s9rXIvYExp07ylYwDIOp761SZUYwT3ih
-	 oPS3C/ZYm1N6o5SAJuRN2VA8XGFZWZbVER2iaPRccYCqPWjlxUI/j6BDB3wbW6eO+E
-	 COHdQG/nyHCBdd+OvKnafedyVTOoEI+1koKxAuT+rrkGSqGL753FWKCmqcqVrbklsn
-	 TLpGXYadVspRtU02arDW4+MXFMHK2vsj6PM/EKgrTnSUq9iy9ATbJIFRLIcIj8Pp4U
-	 1sUYZdQs2mNXw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7892C380048B;
-	Thu,  4 Dec 2025 19:20:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1764878610;
+	bh=F/tuPHzaviurzJ8050yVZnILe2Za/hpOx98W5eohkaI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=An3rPEtRX7Jyz4iMxIs8MluEIB64ILjOZ/wuqdkJvSK1R1bjUz/odGewTfaQ4LgmW
+	 Lgh3ePmU0/+JTMo/X8gDdVelcjdBrZ8iP9k2qhr7AxDJg+RYLEDixMXuAibxeI12QI
+	 2pF1w088rtRx1kfpuT0LprSV6pznqjQAk6YDZvKNi/yeefyx7ZrkSa0ID2XPDVMGc6
+	 ITeX3NpX0g2zD7798Pn38MEqq6QLRSWEEthbMFQKgaofQiUqHVKGeJKOMEK1/p2ymA
+	 zYRLJ7gx1dlXzUDHFWeMgKRviTduUn1Erbn+g9ZK0hWzVk93jYc175tjYWCysl/m/n
+	 Vd+ZM1Tm7tmZA==
+Date: Thu, 4 Dec 2025 12:03:29 -0800
+From: Kees Cook <kees@kernel.org>
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: Jakub Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Elizabeth Figura <zfigura@codeweavers.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Eric Dumazet <edumazet@google.com>, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, wine-devel@winehq.org,
+	netdev@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH 00/13] selftests: Fix problems seen when building with
+ -Werror
+Message-ID: <202512041201.EBE3BF03F5@keescook>
+References: <20251204161729.2448052-1-linux@roeck-us.net>
+ <20251204082754.66daa1c3@kernel.org>
+ <536d47f4-25b1-430a-820d-c22eb8a92c80@roeck-us.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 0/2] bpf, net: Fix smc for CONFIG_BPF_JIT=n
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176487600628.940161.471761997237181377.git-patchwork-notify@kernel.org>
-Date: Thu, 04 Dec 2025 19:20:06 +0000
-References: <cover.1764843476.git.geert@linux-m68k.org>
-In-Reply-To: <cover.1764843476.git.geert@linux-m68k.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: thinker.li@gmail.com, martin.lau@linux.dev, alibuda@linux.alibaba.com,
- dust.li@linux.alibaba.com, ast@kernel.org, daniel@iogearbox.net,
- john.fastabend@gmail.com, sidraya@linux.ibm.com, wenjia@linux.ibm.com,
- mjambigi@linux.ibm.com, tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <536d47f4-25b1-430a-820d-c22eb8a92c80@roeck-us.net>
 
-Hello:
-
-This series was applied to bpf/bpf.git (master)
-by Martin KaFai Lau <martin.lau@kernel.org>:
-
-On Thu,  4 Dec 2025 11:29:14 +0100 you wrote:
-> Hi all,
+On Thu, Dec 04, 2025 at 09:16:16AM -0800, Guenter Roeck wrote:
+> On Thu, Dec 04, 2025 at 08:27:54AM -0800, Jakub Kicinski wrote:
+> > On Thu,  4 Dec 2025 08:17:14 -0800 Guenter Roeck wrote:
+> > > This series fixes build errors observed when trying to build selftests
+> > > with -Werror.
+> > 
+> > If your intention is to make -Werror the default please stop.
+> > Defaulting WERROR to enabled is one of the silliest things we have done
+> > in recent past.
+> > 
 > 
-> If CONFIG_BPF_SYSCALL=y, but CONFIG_BPF_JIT=n (e.g. m68k/allmodconfig),
-> net/smc/smc_hs_bpf.c fails to build.
+> No, that is not the idea, and not the intention.
 > 
-> This patch series fix the issue in two ways, by:
->   1. fixing the dummy variant of register_bpf_struct_ops(),
->   2. making SMC_HS_CTRL_BPF depend on BPF_JIT.
-> 
-> [...]
+> The Google infrastructure builds the kernel, including selftests, with
+> -Werror enabled. This triggers a number of build errors when trying to
+> build selftests with the 6.18 kernel. That means I have three options:
+> 1) Disable -Werror in selftest builds and accept that some real problems
+>    will slip through. Not really a good option, and not acceptable.
+> 2) Fix the problems in the upstream kernel and backport.
 
-Here is the summary with links:
-  - [1/2] bpf: Fix register_bpf_struct_ops() dummy
-    (no matching commit)
-  - [2/2] net: smc: SMC_HS_CTRL_BPF should depend on BPF_JIT
-    https://git.kernel.org/bpf/bpf/c/861111b69896
+The series fixes build warnings that appear regardless of -Werror,
+yes? That on its face is an improvement, so maybe just adjust the
+Subject/changelogs?
 
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Kees Cook
 
