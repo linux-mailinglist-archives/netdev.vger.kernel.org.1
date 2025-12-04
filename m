@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-243628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB783CA4BB5
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 18:21:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DB79CA4C1E
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 18:26:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D360430552E1
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 17:16:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4B92B30CE573
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 17:21:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08372346A10;
-	Thu,  4 Dec 2025 16:39:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E0823469FD;
+	Thu,  4 Dec 2025 16:39:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from 9.mo561.mail-out.ovh.net (9.mo561.mail-out.ovh.net [87.98.184.141])
+Received: from 12.mo561.mail-out.ovh.net (12.mo561.mail-out.ovh.net [188.165.41.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8093426E6F3
-	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 16:39:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=87.98.184.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F93F346772
+	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 16:39:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.165.41.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764866393; cv=none; b=tLhHatUghCWK6/2Z1XL2nV1O2HmnHkILZ111wp4vm2cS+w8LGHUYJDr7kfc9U5HJFMSlifaqgiStCmfxHPK0cRO7V9SqXDz46qmAVwpovNJHYSRB8dJCLp7DcpRpwsZw7/EWm9uIZtZ5Md87XWvAWdhpZIn0vE585D/28KjyREs=
+	t=1764866377; cv=none; b=LEiUGpVpVSoRCaaN8U4TyQT6Or+BxjX49Gep82pJpu4i8VVjl3gzr+fo59Mtrq2Xca1qwMNmGKuWLv8VinWbWQuFuWyqyzwPtavhr2X6HxdUZnUajFy/tlKqSC6PWlOcyIUjgO9CviEbCwG0XyvZ/3eidCUzrIrHzNwvrbdCFpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764866393; c=relaxed/simple;
-	bh=YgsFnZuDSq0GL2hrNLtRnqJd46AcXwGsEsQYq7gDQkc=;
+	s=arc-20240116; t=1764866377; c=relaxed/simple;
+	bh=pPNTClRoW9JRdOtd8rJh2TJKkXQUOFrmBQwQDVGQKyE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=PKCk6hxPiuQHWM4e9LqbqK8ac0UvvVv6k35Im2aueVV7ukPIMfq9qDZjPwKDfa56LaHlmgWGapj0JXggsRZnOBigm1yZQWdidTd7CDaDxBxgr2FdxzlRuB2ZfbJshyV6ZjBWr1TTHYDEQCGjiFznDNjk4wO0D5JbK3cJ0yekMyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=bp.renesas.com; spf=fail smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=87.98.184.141
+	 MIME-Version; b=TRIAJfGkODxLtXb6Eki3h/fGSlNrP9BC1jmlcFsjyY97H0RzfbLZb074KrDGuJCmCtdUgN/jzOQ+acg6OVeph88NiFLM9mB3RHovkGCKgHBGVAaxwn43Q2/9ca6M5EmHyrorArHVhdYA3YQl8vZ3vHi0T67Ue3giZe/uevYjK2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=bp.renesas.com; spf=fail smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=188.165.41.191
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=bp.renesas.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=bp.renesas.com
 Received: from director6.ghost.mail-out.ovh.net (unknown [10.110.0.68])
-	by mo561.mail-out.ovh.net (Postfix) with ESMTP id 4dMg4l5jLbz6VGD
-	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 16:31:35 +0000 (UTC)
+	by mo561.mail-out.ovh.net (Postfix) with ESMTP id 4dMg4m6ksGz6PnP
+	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 16:31:36 +0000 (UTC)
 Received: from ghost-submission-7d8d68f679-mkpf7 (unknown [10.111.182.250])
-	by director6.ghost.mail-out.ovh.net (Postfix) with ESMTPS id 965B3802FB;
-	Thu,  4 Dec 2025 16:31:34 +0000 (UTC)
+	by director6.ghost.mail-out.ovh.net (Postfix) with ESMTPS id C7C88802DC;
+	Thu,  4 Dec 2025 16:31:35 +0000 (UTC)
 Received: from labcsmart.com ([37.59.142.99])
 	by ghost-submission-7d8d68f679-mkpf7 with ESMTPSA
-	id GduLDmO3MWnQjQQATXHgnQ:T3
-	(envelope-from <john.madieu.xa@bp.renesas.com>); Thu, 04 Dec 2025 16:31:34 +0000
-Authentication-Results:garm.ovh; auth=pass (GARM-99G003460cefc4-7799-47b2-966c-ddc2d12940b4,
+	id GduLDmO3MWnQjQQATXHgnQ:T4
+	(envelope-from <john.madieu.xa@bp.renesas.com>); Thu, 04 Dec 2025 16:31:35 +0000
+Authentication-Results:garm.ovh; auth=pass (GARM-99G00337fdc783-60eb-4b1b-b5f2-08529535221d,
                     E90FA267686E4F2ED65044873A5FD8D85CF2A6B0) smtp.auth=john.madieu@labcsmart.com
 X-OVh-ClientIp:141.94.163.193
 From: John Madieu <john.madieu.xa@bp.renesas.com>
@@ -61,9 +61,9 @@ Cc: biju.das.jz@bp.renesas.com,
 	linux-renesas-soc@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	John Madieu <john.madieu.xa@bp.renesas.com>
-Subject: [PATCH net-next 2/3] dt-bindings: net: renesas-gbeth: Add port-id property
-Date: Thu,  4 Dec 2025 16:31:21 +0000
-Message-Id: <20251204163122.3032995-3-john.madieu.xa@bp.renesas.com>
+Subject: [PATCH net-next 3/3] net: stmmac: dwmac-renesas-gbeth: add physical port identification
+Date: Thu,  4 Dec 2025 16:31:22 +0000
+Message-Id: <20251204163122.3032995-4-john.madieu.xa@bp.renesas.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20251204163122.3032995-1-john.madieu.xa@bp.renesas.com>
 References: <20251204163122.3032995-1-john.madieu.xa@bp.renesas.com>
@@ -74,58 +74,111 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Ovh-Tracer-Id: 13215531634329355653
+X-Ovh-Tracer-Id: 13215813106605196677
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: dmFkZTGTG1S+3Oe5+8Q7M5Xj6P3TY9ZSd28daoqwJLfe4PAzxlZip2ovKqHAZR0UEgCCF584RfnTnm80GuzRzUgxrdRG/nU8CQ35rlXvkCLxVojFBBYDzeRh2XlZwewCG6Sh+IhIXNlqqye8HH6vGv+5xuoLyoXf5eKj5tfXOTcMgYnHKKznzQd/71usWeslfg2b77GUiupjYLNkgufd/jyA42aCrWkhDsfDOjF2UtRx6s+IRt7iEWIy8E0dtI4cvw5d0O8hGPjuMBtOifeyTXEqNtTujffvjjlMY6LUU1br14Ia1rr+ibexdAS4IBukdxwB+yZ+kTJbCrtNA5vh9kt19x5YAUsyCQwnlyDDdeA5aGO69LqAzCY2sUk6FXaduIKbl5xSKheidUOtNZ1hOuLzORIR8a1Tpt+9K1X5aIsBMxydKo1RhdDay8fRLXtDbsg4d8XH4ZNBPiij6mZG3x3L1qJZGZ6vrbZV0zvLytVkvAOMkUSQV01U6f8qV0NDtIrFZjVOvYsTu/gE9MWYGOhJtCMmrLgqJaWKTZme2WC9hLfQCycpcYIqruuLBuf6L4vj0qKvw+Gw77BWwQUwrqbgLGblGM4C9koUCN+9CByslBOzyjxOBHZIPd7em5kl25Ikth84sSLKsd32jM6tLIy6dMIeotH2MF+YC1dw9Stx5BQuIw
+X-VR-SPAMCAUSE: dmFkZTGTG1S+3Oe5+8Q7M5Xj6P3TY9ZSd28daoqwJLfe4PAzxlZip2ovKqHAZR0UEgCCF584RfnTnm80GuzRzUgxrdRG/nU8CQ35rlXvkCLxVojFBBYDzeRh2XlZwewCG6Sh+IhIXNlqqye8HH6vGv+5xuoLyoXf5eKj5tfXOTcMgYnHKKznzQd/71usWeslfg2b77GUiupjYLNkgufd/jyA42aCrWkhDsfDOjF2UtRx6s+IRt7iEWIy8E0dtI4cvw5d0O8hGPjuMBtOifeyTXEqNtTujffvjjlMY6LUU1br14Ia1rr+ibexdAS4IBukdxwB+yZ+kTJbCrtNA5vh9kt19x5YLzka9fT39ON4Tu92GnjikMGaDH4rbaghM80dE2defwQHQsBswXjRAfyKu9BNR6PdGZDh5WL4u3YDh2Ml5kQl5xWYyKNpTrqsBTWvvXwKIi0rs4nSCmAOpUmVrGhzS8CKVc71HdKD7UZ2aHvLrE+cVzyPv9c6ksJZ0xJhS6YQOftH0DF9tPOmmMH8z5GDTH6eySbMCcKoHZcsWq/SsJzbDDew4/LnWB49ZK23qVwp272erLDnL9/qxeR59T2zJ/LM0FDNX31s6XSAGLz5mvlzQw3MpbdNQawr3cq97+Lp6QvtZBIqfXloNkeve6OAdiwTF+wtW3hlXKNZdZ2BCqoJVA
 
-Add optional port-id property to identify ethernet ports on RZ/V2H
-SoCs. The hardware doesn't provide unique identification registers
-for multiple ethernet instances, so this property allows explicit
-port identification from the device tree.
+Implement ndo_get_phys_port_id() and ndo_get_phys_port_name() callbacks
+for the Renesas RZ/G3E GBETH driver.
+
+The port ID is an 8-byte identifier constructed from:
+- Permanent MAC address if available (addr_assign_type == NET_ADDR_PERM)
+- Renesas OUI (74:90:50) as fallback for random/generated MACs
+- Port index from 'port-id' DT property or ethernet alias
+
+The port name resolution follows this hierarchy:
+- 'port-name' DT property if specified (allows custom names like "mgmt")
+- "p<N>" format using 'port-id' DT property
+- "p<N>" format using ethernet alias index as fallback
 
 Signed-off-by: John Madieu <john.madieu.xa@bp.renesas.com>
 ---
- .../bindings/net/renesas,rzv2h-gbeth.yaml     | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ .../stmicro/stmmac/dwmac-renesas-gbeth.c      | 56 +++++++++++++++++++
+ 1 file changed, 56 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/renesas,rzv2h-gbeth.yaml b/Documentation/devicetree/bindings/net/renesas,rzv2h-gbeth.yaml
-index bd53ab300f500..bb59c6a925d3f 100644
---- a/Documentation/devicetree/bindings/net/renesas,rzv2h-gbeth.yaml
-+++ b/Documentation/devicetree/bindings/net/renesas,rzv2h-gbeth.yaml
-@@ -117,6 +117,23 @@ properties:
-           - description: AXI power-on system reset
-           - description: AHB reset
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
+index bc7bb975803ca..5acb65b0e4f06 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
+@@ -16,7 +16,9 @@
+ #include <linux/clk.h>
+ #include <linux/device.h>
+ #include <linux/module.h>
++#include <linux/netdevice.h>
+ #include <linux/of.h>
++#include <linux/of_net.h>
+ #include <linux/pcs-rzn1-miic.h>
+ #include <linux/platform_device.h>
+ #include <linux/reset.h>
+@@ -91,6 +93,57 @@ static struct phylink_pcs *renesas_gmac_select_pcs(struct stmmac_priv *priv,
+ 	return priv->hw->phylink_pcs;
+ }
  
-+  renesas,port-id:
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+    description:
-+      Optional unique port identifier for this ethernet interface.
-+      Used for physical port identification (phys_port_id, phys_port_name).
-+      If not specified, the ethernet alias index is used as fallback.
-+    minimum: 0
-+    maximum: 255
++static int renesas_gbeth_get_port_id(struct device *dev)
++{
++	int port_id;
 +
-+  renesas,port-name:
-+    $ref: /schemas/types.yaml#/definitions/string
-+    description:
-+      Optional custom name for the physical port. Used by
-+      ndo_get_phys_port_name() for interface naming.
-+      If not specified, "p<N>" format is used where N is the port-id
-+      or ethernet alias index.
++	if (!device_property_read_u32(dev, "renesas,port-id", &port_id))
++		return port_id;
 +
-   pcs-handle:
-     description:
-       phandle pointing to a PCS sub-node compatible with
-@@ -230,6 +247,8 @@ examples:
-         snps,txpbl = <32>;
-         snps,rxpbl = <32>;
-         phy-handle = <&phy0>;
-+        renesas,port-id = <0>;
-+        renesas,port-name = "mgmt";
++	port_id = of_alias_get_id(dev_of_node(dev), "ethernet");
++
++	return port_id < 0 ? 0 : port_id;
++}
++
++static int renesas_gbeth_get_phys_port_name(struct net_device *ndev,
++					    char *name, size_t len)
++{
++	struct stmmac_priv *priv = netdev_priv(ndev);
++	struct renesas_gbeth *gbeth = priv->plat->bsp_priv;
++	const char *port_name;
++
++	if (!device_property_read_string(gbeth->dev, "renesas,port-name", &port_name))
++		return snprintf(name, len, "%s", port_name) >= len ? -EINVAL : 0;
++
++	return snprintf(name, len, "p%d", renesas_gbeth_get_port_id(gbeth->dev)) >= len ? -EINVAL : 0;
++}
++
++static int renesas_gbeth_get_phys_port_id(struct net_device *ndev,
++					  struct netdev_phys_item_id *ppid)
++{
++	struct stmmac_priv *priv = netdev_priv(ndev);
++	struct renesas_gbeth *gbeth = priv->plat->bsp_priv;
++	u8 *id = ppid->id;
++
++	if (ndev->addr_assign_type == NET_ADDR_PERM) {
++		memcpy(id, ndev->perm_addr, ETH_ALEN);
++	} else {
++		/* Fallback: Renesas OUI prefix (74:90:50) */
++		id[0] = 0x74;
++		id[1] = 0x90;
++		id[2] = 0x50;
++		id[3] = 0x00;
++		id[4] = 0x00;
++		id[5] = 0x00;
++	}
++
++	id[6] = renesas_gbeth_get_port_id(gbeth->dev) & 0xff;
++	id[7] = 0x00;
++	ppid->id_len = 8;
++
++	return 0;
++}
++
+ static int renesas_gbeth_init(struct platform_device *pdev, void *priv)
+ {
+ 	struct plat_stmmacenet_data *plat_dat;
+@@ -194,6 +247,9 @@ static int renesas_gbeth_probe(struct platform_device *pdev)
+ 		plat_dat->select_pcs = renesas_gmac_select_pcs;
+ 	}
  
-         stmmac_axi_setup: stmmac-axi-config {
-             snps,lpi_en;
++	plat_dat->get_phys_port_id = renesas_gbeth_get_phys_port_id;
++	plat_dat->get_phys_port_name = renesas_gbeth_get_phys_port_name;
++
+ 	return devm_stmmac_pltfr_probe(pdev, plat_dat, &stmmac_res);
+ }
+ 
 -- 
 2.25.1
 
