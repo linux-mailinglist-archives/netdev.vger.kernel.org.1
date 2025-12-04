@@ -1,89 +1,139 @@
-Return-Path: <netdev+bounces-243591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EB2BCA456E
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 16:50:38 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57C9ACA4580
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 16:51:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 37890302A136
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 15:50:29 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C5A51300578B
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 15:51:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28601220F21;
-	Thu,  4 Dec 2025 15:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D3452DF701;
+	Thu,  4 Dec 2025 15:51:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="3LfED9MB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M9CBe9C3"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F429165F1A;
-	Thu,  4 Dec 2025 15:50:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3BF12DBF76;
+	Thu,  4 Dec 2025 15:51:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764863428; cv=none; b=LmJG9K7KLaP/vuwhRzsiyY/q4wrKyeQVbxYUA+DG0j/TVe56RykiJvSYjUU4oW/2GEqpG4zic8vrJkRn64RCOB0gPqVHGTkOF4D9FbbaeeqGKyTRNTp7JbmTfxMMaIfpb9xeyiKx6vMNCJy8CFgBh+u3342OyHFZEyyQA7rXlTQ=
+	t=1764863510; cv=none; b=CNuBF5oSUOmfgoNzQeOyT7xgsZNEulXytRdKEPKKaUqCJrHDwf02E35yxsVBlj+LHHkwtyoUYrrOUMBf0Z1PEFztjEeHlSZAKFp5DOTvwBZYgYyv2mUF8M2bktm1UY37hLOs5R0enV6w8q5TyBoQd/StcAoohKh6AFZnA6wGrG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764863428; c=relaxed/simple;
-	bh=izJb++fclm+O1RyxSOCpKLGhbHfwFzuu8JEZtxkRF+M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XjGjEKeGENyPaaeKFmxRivqkMnwAYLlWCt94iKbZU+wbEHWT7HamoCvea3CZwBjv424GMCBXmaWyct+lhgJnTmw96AjTNqgu562NX8/uKnDDj1fZXZX/laodEJbEizg/Q+FdBNNJnZ03EoOuRCFVqBR6jYNok2EGa5xrskcDruM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=3LfED9MB; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=JmHDN9+FyKNF3nnMHF6majqVZS/gMkdAchuPv+k0xHU=; b=3LfED9MBH0dJRu7fQSVVplD8hy
-	Lv5De7HAy35OaF0KkYOQFpAoHNhJvhvSelH6Ii6tLyHPlIuB9fXP+fxND1y/ESkBfRaoEkKNPpjzn
-	id5bQQcfraNL/ZvFwbcosE8lbT+J00hj0Ba19bmW+Rh9fzSjk3ToNhFX9sQI7FsWXHgU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vRBau-00Fz8U-9Q; Thu, 04 Dec 2025 16:50:12 +0100
-Date: Thu, 4 Dec 2025 16:50:12 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Daniel Golle <daniel@makrotopia.org>, Frank Wunderlich <frankwu@gmx.de>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Chen Minqiang <ptpt52@gmail.com>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	"Chester A. Unal" <chester.a.unal@arinc9.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v3 2/2] net: dsa: mt7530: Use GPIO polarity to generate
- correct reset sequence
-Message-ID: <16038b9d-11f4-4995-b0c2-7e7d55bb494a@lunn.ch>
-References: <20251129234603.2544-2-ptpt52@gmail.com>
- <0675b35f-217d-4261-9e3f-2eb24753d43c@lunn.ch>
- <20251130080731.ty2dlxaypxvodxiw@skbuf>
- <3fbc4e67-b931-421c-9d83-2214aaa2f6ed@lunn.ch>
- <0d85e1e6-ea75-4f20-aef1-90d446b4bfa1@kernel.org>
- <00f308a1-a4b1-4f20-8d8e-459ddf4c39b1@gmx.de>
- <aS7Zj3AFsSp2CTNv@makrotopia.org>
- <20251204131626.upw77jncqfwxydww@skbuf>
- <7aacc2c2-50d0-4a08-9800-dc4a572dffcb@lunn.ch>
- <20251204153721.ubmxifrev4cre6ab@skbuf>
+	s=arc-20240116; t=1764863510; c=relaxed/simple;
+	bh=wntylzoSwqmqZ14w+vlx65T2d8TULoY/29mRPs1sjMw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eiACl9BURxH4lEjA5e7oCdLERFo+1plDfssjDjFvfygHHcS2tOVhj1tclnPLw+cvedAh09EHQ1IKJ6xYIFFTcy7ncN8JDeR2p4/bgHvKsX5eMNlGhbkvXuCCZtwhfLTeURzl4t+fnc/pNzwRIU05wPHBF0zbT2WvbIRySoqiQ/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=M9CBe9C3; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1764863508; x=1796399508;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=wntylzoSwqmqZ14w+vlx65T2d8TULoY/29mRPs1sjMw=;
+  b=M9CBe9C36pocicQJZAIJLZd9ae21r2t/XgWzfnmYtcpwoJrqyPdjLFXN
+   MpNatS9KwzpE51Yo44oQ4C2sCF9WQqD0ia11u4d+GpO/lK+blVDdm7mfv
+   T8f283Y7+WYUqQNS7f6RsFGqPkQ1K6RbI+CjhTJVRiwsWGCgS2AyKFRBd
+   8wpiDD3gPK+crv/nxKfJKwWBWkTXfKdlZNIn6EImrAwTzjHayUBmWXXs5
+   8avpdM3gaqKp1PREbz1hAi0EzWwwq3So3D/dipyZyWCVdxtbNaraWFTuR
+   Qw+xf2jlbpAGs4ZAcJGtCnjB+rivZetzh5blZJwNqhKiXDrD/4ePsKqdf
+   Q==;
+X-CSE-ConnectionGUID: pJE6gA+RTBKNEuiXza+Rfg==
+X-CSE-MsgGUID: B5ZTuFyaTEymPIHOQW1Qfg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11632"; a="92365099"
+X-IronPort-AV: E=Sophos;i="6.20,249,1758610800"; 
+   d="scan'208";a="92365099"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2025 07:51:47 -0800
+X-CSE-ConnectionGUID: A7oCzQsbRBqTMzFfx1Tgnw==
+X-CSE-MsgGUID: pZFFhipwRT2AvJY4bZ85ug==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,249,1758610800"; 
+   d="scan'208";a="194677256"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by fmviesa007.fm.intel.com with ESMTP; 04 Dec 2025 07:51:44 -0800
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	nxne.cnse.osdt.itp.upstreaming@intel.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH iwl-next v2 0/5] ice: add support for devmem/io_uring Rx and Tx
+Date: Thu,  4 Dec 2025 16:51:28 +0100
+Message-ID: <20251204155133.2437621-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251204153721.ubmxifrev4cre6ab@skbuf>
+Content-Transfer-Encoding: 8bit
 
-> Frank said that the fact the driver expecting a wrong device tree is
-> forcing him to keep introducing even more wrong device trees for new
-> boards.
+Now that ice uses libeth for managing Rx buffers and supports
+configurable header split, it's ready to get support for sending
+and receiving packets with unreadable (to the kernel) frags.
 
-So it sounds like there is no technical reason to fix this, it is just
-aesthetics?
+Extend libeth just a little bit to allow creating PPs with custom
+memory providers and make sure ice works correctly with the netdev
+ops locking. Then add the full set of queue_mgmt_ops and don't
+unmap unreadable frags on Tx completion.
+No perf regressions for the regular flows and no code duplication
+implied.
 
-	Andrew
+Credits to the fbnic developers, which's code helped me understand
+the memory providers and queue_mgmt_ops logics and served as
+a reference.
+
+Alexander Lobakin (5):
+  libeth: pass Rx queue index to PP when creating a fill queue
+  libeth: handle creating pools with unreadable buffers
+  ice: migrate to netdev ops lock
+  ice: implement Rx queue management ops
+  ice: add support for transmitting unreadable frags
+
+ drivers/net/ethernet/intel/ice/ice_lib.h    |  11 +-
+ drivers/net/ethernet/intel/ice/ice_txrx.h   |   2 +
+ drivers/net/ethernet/intel/idpf/idpf_txrx.h |   2 +
+ include/net/libeth/rx.h                     |   2 +
+ include/net/libeth/tx.h                     |   2 +-
+ drivers/net/ethernet/intel/iavf/iavf_txrx.c |   1 +
+ drivers/net/ethernet/intel/ice/ice_base.c   | 194 ++++++++++++++------
+ drivers/net/ethernet/intel/ice/ice_lib.c    |  56 +++++-
+ drivers/net/ethernet/intel/ice/ice_main.c   |  50 ++---
+ drivers/net/ethernet/intel/ice/ice_sf_eth.c |   2 +
+ drivers/net/ethernet/intel/ice/ice_txrx.c   |  43 +++--
+ drivers/net/ethernet/intel/ice/ice_xsk.c    |   4 +-
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c |  13 ++
+ drivers/net/ethernet/intel/libeth/rx.c      |  46 +++++
+ 14 files changed, 325 insertions(+), 103 deletions(-)
+
+---
+From v1[0]:
+* rebase on top of the latest next-queue;
+* fix a typo 'rxq_ixd' -> 'rxq_idx' (Tony).
+
+Testing hints:
+* regular Rx and Tx for regressions;
+* <kernel root>/tools/testing/selftests/drivers/net/hw/ contains
+  scripts for testing netmem Rx and Tx, namely devmem.py and
+  iou-zcrx.py (read the documentation first).
+
+[0] https://lore.kernel.org/intel-wired-lan/20251125173603.3834486-1-aleksander.lobakin@intel.com
+-- 
+2.52.0
+
 
