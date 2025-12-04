@@ -1,93 +1,92 @@
-Return-Path: <netdev+bounces-243496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EF0DCA2604
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 06:01:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D14ACA266A
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 06:23:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 527A9303C882
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 05:01:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 438823034A05
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 05:23:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8694C3019A7;
-	Thu,  4 Dec 2025 05:01:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FBC523D7DD;
+	Thu,  4 Dec 2025 05:22:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ibqba481"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aXODxq9N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDA2430597F
-	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 05:01:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90AF818AFD
+	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 05:22:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764824474; cv=none; b=R7SXbYTNeWK9Xrmjfq84JxyE86M47J+76yGdTbZH92nvfyOCikDeGwLt5WO5oN44YCNbHKDSvCYDgBrV3L50yjqLpL9WTlbslZINtWtRFPmOObuQJVF9nCtTDnS5wHookjiUO/krNUeD53EOE6QnRk00vRN/0LDpDQPsPYf2aas=
+	t=1764825779; cv=none; b=UMbVO0G5HPNogdEeewpxfeeXO1vadwABVtLzsw9OlhTlGWydJX1XkS0MAqiwGkNOf4hrWlSzGXAZLWqYKIQvAgB6R2bBBVFt+fRE8o9fgDXrQ4euwHhUpce2IgYVs1LZP4CV7pfh1cmd9nbfR+p9llq+E/qo+iCdGg68EmeCm5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764824474; c=relaxed/simple;
-	bh=h+SsofwZUC6HHHUEGGsDwWbigfLFJlyhD5zXfZWg7WU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=lkVPXeG4P+BreClyWIv1LMh8sF2HMhivjLfs8WmWVfboSJbOJZmNN4bBwHIsEVVRXz+sWMH4MZIAmamzp1WwLNAQrLcZWJsJN/AE8NfXbNP67EEMKOc2vXjsSHdoxj/6NGgUfBxqkEh4V5c5Datmm6yqBVv/XNazPEugcYpBt3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ibqba481; arc=none smtp.client-ip=209.85.216.45
+	s=arc-20240116; t=1764825779; c=relaxed/simple;
+	bh=jpCd0OHBUEzCSY1ml7HUrOeU5mgCQ8eJQx72dE+bCVU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tEC0w5vuF2THJdZ9sQcwifXCTvfosAb3gWByX4ayM7hbUeXrqEXXoqqacuAqIVpymxw2MxJ6k3jaZh5h4QTzYBOgZhC32C27zoSmm0ZCA3X2UxCD8bIkFo2qshSWltQExAafSDeszxHE/VdJa6uBICf0Q90CmenzXAfJy6MRgUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aXODxq9N; arc=none smtp.client-ip=209.85.167.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-34585428e33so507607a91.3
-        for <netdev@vger.kernel.org>; Wed, 03 Dec 2025 21:01:11 -0800 (PST)
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-59584301f0cso551083e87.0
+        for <netdev@vger.kernel.org>; Wed, 03 Dec 2025 21:22:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764824471; x=1765429271; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kzubs5IauHk/nAj1ysw/i0kR+ISPkcjNfWdKzDf2z5U=;
-        b=Ibqba4816Pl5xrZ2ULx/j8rOYP0jTMs3LrlLH2xMVnairWjwdJTV9InGDCcdc7zHAK
-         4HAMFz14mbyUfIACe+EJw9hkBiwiV17xdpgehSlJDkEhLH/qcH5cXhKGSxzneqmF3i5B
-         /+Xk6+IHKkPEzYJfFVOgPeyIixoOXWMlP5rGf3yhAuosE/7d08CDQRAKYnwPp3OqXbSA
-         c2H/sJsJ8pH7d4e7l4TPUkzZFRQUFLfrcDiWmsgZNF/3PHLtRQaDGD48hmBaUfK+9NOR
-         8TW/2311eSPyGyBOUNI4jxWyrKgHhGAx5+wZsVAU5uzMXXlu4oUFCEQYFcsgdRuBlUVy
-         btvg==
+        d=gmail.com; s=20230601; t=1764825776; x=1765430576; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8SQv1SiIIssZ012oxMaXo7fT2SF8X3Lengkaz4PLfkc=;
+        b=aXODxq9NbGQQzujLq7p6spbL+18sz8dJzrDI4zX2wsYgg1hbARSUQo5xSsaUulPSAe
+         LdHBLHhNEYEdbVyiu5xKIgxSp/+NW/ZJqyWX2Xmlfj78fFcRWh89oGiWD9p9p6CADu7Q
+         ibP1HDRy8+j1N3sEYr9LN5PL7eYOkN3pfipautBcyTAAhAqD5bUur0fsQpJT5RSjbVXi
+         /MFQt2TREnNIrGMmKf43bNYeZmv5GAC2Xh+lJ8RxYbCJBXnCAmR86OZtdVz6T7XId8GV
+         4dFKoqwZJEA3fyWyBcqXkOeUYN+xKcdCW5u9D10WAXFxGa/OTb/oNCKizN0MdMQVA9V2
+         UAEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764824471; x=1765429271;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=kzubs5IauHk/nAj1ysw/i0kR+ISPkcjNfWdKzDf2z5U=;
-        b=m1C2gqgUkP8Vr4X6E3esYkmBDk1LoTpyMwNkieIzM9GiRkBtiIk6hJ5nFsqywtEaBF
-         GM8BqMBldqTHrWW7Cf6HfUftZldA/iCkEtwgiEaMyBLRSpD0I5gqwc4ljti6dTesPDJd
-         n7jucsmQZvm/kkJGpXBQ90wzIEdbwl/kQ7C0e63lnNwBn6i/Dk6OTqufHPlW4IHmhZsI
-         Sy8V48RMonPcQ/V36uKHbUHoDahPrkyd9alr0msW9lHQxdR7hmTnhFQtfy320yHQuBwd
-         1oyRNSb/VcpIj/OrYmJt0hoGyLd1hYbZnf1WBu7P1kzAO7lDeMbkoaBpuGnY+oPGhF8E
-         qRXg==
-X-Forwarded-Encrypted: i=1; AJvYcCUXoSUxHBUBbtIS7fsho1sG1UaXbwpzEsR7tjkAeh0POgv9YSn9TSPXT20uaFlXCeTvhSQANcI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwwUqX2pZIeMnvOT6kfGZfZ+kERYxSp89Sj4B8VTUAtUV/8Jnfi
-	cU+fgOd8dcg+ZDkc6G9XIyZV89AQGzsYNn75eDsY2TmYY8x+PCnU/GLL
-X-Gm-Gg: ASbGncsbtDvjznqR5pIPFl4Gf2uk5keBS9uHm+/TIhBykbAWGjJVkp0aBkVu9Gfkfxc
-	GOCtxxMbWDASl9NcBnpyuUMsGfg3chF3T28tVvUFecJmFSOUhd2sOH5OOH0zXfAQPrcrtpaTc+1
-	jmxyRnDyBnXMfqWnFA9iKftQ4qMtJpVqv1lzlAQmTFNKcH7ckL621BdOiN8yVXwH1mKurmnRKvd
-	f5fzynVn29UH7ovKEl6y03PrIXOmhAKNqq33SpzFZvLSQoTg0+uUHxgwqOovwLDVDE8vFAoP6t4
-	MF9sXLXXCFuKxIotq/fRNScRyExNBcOxTjJ6NnmTneIQ+F7FPsvOn1KrW5iXCDcMRi3V/1+zWjs
-	c50beJ9Jtxae0QSvqUTAyTsEX6vzadlcsd5UlODVlCGFNtgEYPhABHihlxLVTMRi2YbbyLPJ+JU
-	ZBGiQCG/TCjsM4J58dIlOieck6ZD1NNA==
-X-Google-Smtp-Source: AGHT+IHvVa2gOEpNGRYSdHAlmeic8g/wSjxYvPRnhd0qjegdQdGaQ4vVcVURP/2X1RJ9nm+or3BF0w==
-X-Received: by 2002:a17:90b:2f03:b0:343:6108:1706 with SMTP id 98e67ed59e1d1-349126895a7mr5846558a91.17.1764824470864;
-        Wed, 03 Dec 2025 21:01:10 -0800 (PST)
-Received: from localhost.localdomain ([121.190.139.95])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-bf681738a34sm419440a12.4.2025.12.03.21.01.08
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 03 Dec 2025 21:01:10 -0800 (PST)
-From: Minseong Kim <ii4gsp@gmail.com>
-To: "David S . Miller" <davem@davemloft.net>,
+        d=1e100.net; s=20230601; t=1764825776; x=1765430576;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8SQv1SiIIssZ012oxMaXo7fT2SF8X3Lengkaz4PLfkc=;
+        b=BVAm1pkDgKAEMRVZ76nMkyozbyq+qBLfAON4wUAGv6F0r+b2rT2K58OXAafJW5TXej
+         pD77zltC1CXwwcXtS+ae8ZoaSZVeMH73jrsKW/mvO0oopfE6Z5Ws9y5ckat2vCKvQDc9
+         L5YLswXhsYOorh07smJbOD5WOGmd1WHMJ3S6u6y+wguloSewRJkaD6fIxykCPSv6kwHc
+         G4E9//Whli5/Bg6jMUJgwU8uCoxhXtmOw0A+KADTvN5mYD4igWS6WVj5bPV9GWsbvUvl
+         Cbym/9vs9cSm5JUzYkkLN+Xmt2aUsEn7lf0NLOFzDHvbmqNdYm13ZLgcncbKTxTOj8Ay
+         NerQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV/WefxNh2Z20Dh5mLKuWi1pJLYGZ9UKG587En8kYPwLQPgtKrnOPrtCMnUTtU2eEkRiG71TU0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzy7bMoYC2fFbgMU1o5BBFc/P5jzUkzOcLS5exfGxB5aKgATmBG
+	4Hfg9QFYWVx0sJIblZ0N7ZNuHmAzPfxHIHseoXpkIhM3KDBeQbVIDPoNc1VNk4hKZvo=
+X-Gm-Gg: ASbGncuHJs34B3gDoM+//ZRx7DAcrPOWFvtryMio9sxPiQ7gVDHpAzIJCp9LmKbbxHY
+	ruZRLJUwmYLuQOAP9uKkjHQH7t1xkMiiEqE2K/4p/fvuvVYvzMTGeRNQHE5cptsRD/Pnw+1Rtz3
+	7rH1M8kXi49qYz7TzwKJuIV2cWVaV/U3OQRb3LhKG7OFJc/1yed3BB55btnz5YqnKcfpBOH0SPv
+	YEevXgjuiF6aJe3m1688SCbTIXotOGTtrpjuh9zmY97n8U2OwnqRUZMBpCkGyhj1k3MYYv1p0ae
+	0MIKbYESbj+bhahlKhKmEhXeNhw6aaIrX8PqlH/dGwWfCXxS+jT/oLZyrgxtlVJsooFXRqDB7JQ
+	ZxeYDdVy6rC7FaVgY5uOjXoiBl3MIBkcqoQMwv++bebE75Fjr9eG9mjrsnUq1vztP7hIwZfURyO
+	7+sBr22smOoqeklxOdEQZsYaTwQ0VJWsXAFxDGNxX8nzLmI/P6
+X-Google-Smtp-Source: AGHT+IFwSLqkgHS+SZtUf7B8kZwkS4UQ5FyGPpaYdKBViOr7E5L4BTTmWpLiHu5Mh93G5lsuy/i/MA==
+X-Received: by 2002:a05:6512:23aa:b0:595:82ed:ff28 with SMTP id 2adb3069b0e04-597d66cdb3dmr518386e87.32.1764825775443;
+        Wed, 03 Dec 2025 21:22:55 -0800 (PST)
+Received: from home-server.lan (89-109-48-215.dynamic.mts-nn.ru. [89.109.48.215])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-597d7c1e3fasm117445e87.65.2025.12.03.21.22.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Dec 2025 21:22:55 -0800 (PST)
+From: Alexey Simakov <bigalex934@gmail.com>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: Alexey Simakov <bigalex934@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Michael Buesch <mb@bu3sch.de>,
+	"John W. Linville" <linville@tuxdriver.com>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Minseong Kim <ii4gsp@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net v2 1/1] atm: mpoa: Fix UAF on qos_head list in procfs
-Date: Thu,  4 Dec 2025 14:00:39 +0900
-Message-Id: <20251204050039.93278-2-ii4gsp@gmail.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20251204050039.93278-1-ii4gsp@gmail.com>
-References: <20251204050039.93278-1-ii4gsp@gmail.com>
+	lvc-project@linuxtesting.org
+Subject: [PATCH net] broadcom: b44: prevent uninitialized value usage
+Date: Thu,  4 Dec 2025 08:22:43 +0300
+Message-Id: <20251204052243.5824-1-bigalex934@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,336 +95,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The global QoS list 'qos_head' in net/atm/mpc.c is accessed from the
-/proc/net/atm/mpc procfs interface without proper synchronization.
-The read-side seq_file show path (mpc_show() -> atm_mpoa_disp_qos())
-walks qos_head without any lock, while the write-side path
-(proc_mpc_write() -> parse_qos() -> atm_mpoa_delete_qos()) can unlink
-and kfree() entries immediately. Concurrent read/write therefore
-leads to a use-after-free.
+On execution path with raised B44_FLAG_EXTERNAL_PHY, b44_readphy()
+leaves bmcr value uninitialized and it is used later in the code.
 
-This risk is already called out in-tree:
-  /* this is buggered - we need locking for qos_head */
+Add check of this flag at the beginning of the b44_nway_reset() and
+exit early of the function if an external PHY is used, that would
+also correspond to other b44_readphy() call sites.
 
-Fix this by adding a mutex to protect all qos_head list operations.
-A mutex is used (instead of a spinlock) because atm_mpoa_disp_qos()
-invokes seq_printf(), which may sleep.
+Found by Linux Verification Center (linuxtesting.org) with Svace.
 
-KASAN report:
-
-==================================================================
-[   15.911538] BUG: KASAN: slab-use-after-free in atm_mpoa_disp_qos+0x202/0x380
-[   15.911988] Read of size 8 at addr ffff888007517380 by task mpoa_uaf_poc/89
-[   15.912123]
-[   15.912717] CPU: 0 UID: 0 PID: 89 Comm: mpoa_uaf_poc Not tainted 6.17.8 #1 PREEMPT(voluntary)
-[   15.912950] Hardware name: QEMU Ubuntu 25.04 PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-[   15.913110] Call Trace:
-[   15.913167]  <TASK>
-[   15.913247]  dump_stack_lvl+0x4e/0x70
-[   15.913343]  ? atm_mpoa_disp_qos+0x202/0x380
-[   15.913364]  print_report+0x174/0x4f6
-[   15.913386]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
-[   15.913412]  ? atm_mpoa_disp_qos+0x202/0x380
-[   15.913430]  kasan_report+0xce/0x100
-[   15.913453]  ? atm_mpoa_disp_qos+0x202/0x380
-[   15.913475]  atm_mpoa_disp_qos+0x202/0x380
-[   15.913496]  mpc_show+0x575/0x700
-[   15.913515]  ? kasan_save_track+0x14/0x30
-[   15.913532]  ? __pfx_mpc_show+0x10/0x10
-[   15.913550]  ? __pfx_mutex_lock+0x10/0x10
-[   15.913565]  ? seq_read_iter+0x697/0x1110
-[   15.913584]  seq_read_iter+0x2bc/0x1110
-[   15.913607]  seq_read+0x267/0x3d0
-[   15.913623]  ? __pfx_seq_read+0x10/0x10
-[   15.913650]  proc_reg_read+0x1ab/0x270
-[   15.913669]  vfs_read+0x175/0xa10
-[   15.913687]  ? do_sys_openat2+0x103/0x170
-[   15.913701]  ? kmem_cache_free+0xc4/0x360
-[   15.913718]  ? getname_flags.part.0+0xf3/0x470
-[   15.913734]  ? __pfx_vfs_read+0x10/0x10
-[   15.913751]  ? mutex_lock+0x81/0xe0
-[   15.913766]  ? __pfx_mutex_lock+0x10/0x10
-[   15.913782]  ? __rseq_handle_notify_resume+0x4c4/0xac0
-[   15.913802]  ? fdget_pos+0x24d/0x4b0
-[   15.913829]  ksys_read+0xf7/0x1c0
-[   15.913850]  ? __pfx_ksys_read+0x10/0x10
-[   15.913877]  do_syscall_64+0xa4/0x290
-[   15.913917]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-[   15.913981] RIP: 0033:0x45c982
-[   15.914171] Code: 08 0f 85 71 ea ff ff 49 89 fb 48 89 f0 48 89 d7 48 89 ce 4c 89 c2 4d 89 ca 4c 8b 44 24 08 4c 8b 4c 24 10 4c 89 5c 24 08 0f 05 <c3> 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 f3 0f 1e fa 55 48 89 e5
-[   15.914239] RSP: 002b:00007f4b2b2cb0d8 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
-[   15.914315] RAX: ffffffffffffffda RBX: 00007f4b2b2cc6c0 RCX: 000000000045c982
-[   15.914352] RDX: 0000000000000fff RSI: 00007f4b2b2cb220 RDI: 0000000000000014
-[   15.914382] RBP: 00007f4b2b2cb100 R08: 0000000000000000 R09: 0000000000000000
-[   15.914413] R10: 0000000000000000 R11: 0000000000000246 R12: 000000000000000a
-[   15.914445] R13: ffffffffffffffd0 R14: 0000000000000000 R15: 00007ffd386450c0
-[   15.914483]  </TASK>
-[   15.914533]
-[   15.916812] Allocated by task 78:
-[   15.916975]  kasan_save_stack+0x30/0x50
-[   15.917047]  kasan_save_track+0x14/0x30
-[   15.917105]  __kasan_kmalloc+0x8f/0xa0
-[   15.917162]  atm_mpoa_add_qos+0x1bb/0x3c0
-[   15.917220]  parse_qos.cold+0x73/0x7d
-[   15.917276]  proc_mpc_write+0xf4/0x150
-[   15.917331]  proc_reg_write+0x1ab/0x270
-[   15.917379]  vfs_write+0x1ce/0xd30
-[   15.917431]  ksys_write+0xf7/0x1c0
-[   15.917476]  do_syscall_64+0xa4/0x290
-[   15.917523]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-[   15.917586]
-[   15.917628] Freed by task 78:
-[   15.917665]  kasan_save_stack+0x30/0x50
-[   15.917714]  kasan_save_track+0x14/0x30
-[   15.917762]  kasan_save_free_info+0x3b/0x70
-[   15.917811]  __kasan_slab_free+0x3e/0x50
-[   15.918058]  kfree+0x121/0x340
-[   15.918135]  atm_mpoa_delete_qos+0xad/0xd0
-[   15.918196]  parse_qos+0x1e5/0x1f0
-[   15.918339]  proc_mpc_write+0xf4/0x150
-[   15.918438]  proc_reg_write+0x1ab/0x270
-[   15.918494]  vfs_write+0x1ce/0xd30
-[   15.918538]  ksys_write+0xf7/0x1c0
-[   15.918589]  do_syscall_64+0xa4/0x290
-[   15.918634]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-[   15.918694]
-[   15.918751] The buggy address belongs to the object at ffff888007517380
-[   15.918751]  which belongs to the cache kmalloc-96 of size 96
-[   15.918911] The buggy address is located 0 bytes inside of
-[   15.918911]  freed 96-byte region [ffff888007517380, ffff8880075173e0)
-[   15.919027]
-[   15.919101] The buggy address belongs to the physical page:
-[   15.919416] page: refcount:0 mapcount:0 mapping:0000000000000000 index:0xffff888007517300 pfn:0x7517
-[   15.919679] anon flags: 0x100000000000000(node=0|zone=1)
-[   15.920064] page_type: f5(slab)
-[   15.920361] raw: 0100000000000000 ffff888006c41280 0000000000000000 dead000000000001
-[   15.920460] raw: ffff888007517300 0000000080200007 00000000f5000000 0000000000000000
-[   15.920577] page dumped because: kasan: bad access detected
-[   15.920634]
-[   15.920663] Memory state around the buggy address:
-[   15.920860]  ffff888007517280: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
-[   15.920944]  ffff888007517300: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
-[   15.921017] >ffff888007517380: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
-[   15.921088]                    ^
-[   15.921163]  ffff888007517400: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
-[   15.921222]  ffff888007517480: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
-[   15.921313] ==================================================================
-
-Reported-by: Minseong Kim <ii4gsp@gmail.com>
-Closes: https://lore.kernel.org/netdev/CAKrymDR1X3XTX_1ZW3XXXnuYH+kzsnv7Av5uivzR1sto+5BFQg@mail.gmail.com/
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Cc: stable@vger.kernel.org
-Signed-off-by: Minseong Kim <ii4gsp@gmail.com>
+Fixes: 753f492093da ("[B44]: port to native ssb support")
+Signed-off-by: Alexey Simakov <bigalex934@gmail.com>
 ---
- net/atm/mpc.c | 117 ++++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 85 insertions(+), 32 deletions(-)
+ drivers/net/ethernet/broadcom/b44.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/net/atm/mpc.c b/net/atm/mpc.c
-index f6b447bba329..c268b5f4a266 100644
---- a/net/atm/mpc.c
-+++ b/net/atm/mpc.c
-@@ -9,6 +9,7 @@
- #include <linux/bitops.h>
- #include <linux/capability.h>
- #include <linux/seq_file.h>
-+#include <linux/mutex.h>
+diff --git a/drivers/net/ethernet/broadcom/b44.c b/drivers/net/ethernet/broadcom/b44.c
+index 0353359c3fe9..cbfd65881326 100644
+--- a/drivers/net/ethernet/broadcom/b44.c
++++ b/drivers/net/ethernet/broadcom/b44.c
+@@ -1789,6 +1789,9 @@ static int b44_nway_reset(struct net_device *dev)
+ 	u32 bmcr;
+ 	int r;
  
- /* We are an ethernet device */
- #include <linux/if_ether.h>
-@@ -122,6 +123,7 @@ static struct notifier_block mpoa_notifier = {
- 
- struct mpoa_client *mpcs = NULL; /* FIXME */
- static struct atm_mpoa_qos *qos_head = NULL;
-+static DEFINE_MUTEX(qos_mutex); /* Protect qos_head list */
- static DEFINE_TIMER(mpc_timer, mpc_cache_check);
- 
- 
-@@ -171,74 +173,120 @@ static struct mpoa_client *find_mpc_by_lec(struct net_device *dev)
-  * Functions for managing QoS list
-  */
- 
-+/*
-+ * Search for a QoS entry. Caller must hold qos_mutex.
-+ * Returns pointer to entry if found, NULL otherwise.
-+ */
-+static struct atm_mpoa_qos *__atm_mpoa_search_qos(__be32 dst_ip)
-+{
-+	struct atm_mpoa_qos *qos = qos_head;
++	if (bp->flags & B44_FLAG_EXTERNAL_PHY)
++		return 0;
 +
-+	while (qos) {
-+		if (qos->ipaddr == dst_ip)
-+			return qos;
-+		qos = qos->next;
-+	}
-+	return NULL;
-+}
-+
-+/*
-+ * Search for a QoS entry.
-+ * WARNING: The returned pointer is not protected. The caller must ensure
-+ * that the entry is not freed while using it, or hold qos_mutex during use.
-+ */
-+struct atm_mpoa_qos *atm_mpoa_search_qos(__be32 dst_ip)
-+{
-+	struct atm_mpoa_qos *qos;
-+
-+	mutex_lock(&qos_mutex);
-+	qos = __atm_mpoa_search_qos(dst_ip);
-+	mutex_unlock(&qos_mutex);
-+
-+	return qos;
-+}
-+
- /*
-  * Overwrites the old entry or makes a new one.
-  */
- struct atm_mpoa_qos *atm_mpoa_add_qos(__be32 dst_ip, struct atm_qos *qos)
- {
- 	struct atm_mpoa_qos *entry;
-+	struct atm_mpoa_qos *new;
- 
--	entry = atm_mpoa_search_qos(dst_ip);
--	if (entry != NULL) {
-+	/* Fast path: update existing entry */
-+	mutex_lock(&qos_mutex);
-+	entry = __atm_mpoa_search_qos(dst_ip);
-+	if (entry) {
- 		entry->qos = *qos;
-+		mutex_unlock(&qos_mutex);
- 		return entry;
- 	}
-+	mutex_unlock(&qos_mutex);
- 
--	entry = kmalloc(sizeof(struct atm_mpoa_qos), GFP_KERNEL);
--	if (entry == NULL) {
-+	/* Allocate outside lock */
-+	new = kmalloc(sizeof(*new), GFP_KERNEL);
-+	if (!new) {
- 		pr_info("mpoa: out of memory\n");
--		return entry;
-+		return NULL;
- 	}
- 
--	entry->ipaddr = dst_ip;
--	entry->qos = *qos;
-+	new->ipaddr = dst_ip;
-+	new->qos = *qos;
- 
--	entry->next = qos_head;
--	qos_head = entry;
--
--	return entry;
--}
--
--struct atm_mpoa_qos *atm_mpoa_search_qos(__be32 dst_ip)
--{
--	struct atm_mpoa_qos *qos;
--
--	qos = qos_head;
--	while (qos) {
--		if (qos->ipaddr == dst_ip)
--			break;
--		qos = qos->next;
-+	/* Re-check under lock to avoid duplicates */
-+	mutex_lock(&qos_mutex);
-+	entry = __atm_mpoa_search_qos(dst_ip);
-+	if (entry) {
-+		entry->qos = *qos;
-+		mutex_unlock(&qos_mutex);
-+		kfree(new);
-+		return entry;
- 	}
- 
--	return qos;
-+	new->next = qos_head;
-+	qos_head = new;
-+	mutex_unlock(&qos_mutex);
-+
-+	return new;
- }
- 
- /*
-- * Returns 0 for failure
-+ * Returns 0 for failure, 1 for success
-  */
- int atm_mpoa_delete_qos(struct atm_mpoa_qos *entry)
- {
- 	struct atm_mpoa_qos *curr;
-+	int ret = 0;
- 
- 	if (entry == NULL)
- 		return 0;
-+
-+	mutex_lock(&qos_mutex);
-+
- 	if (entry == qos_head) {
- 		qos_head = qos_head->next;
--		kfree(entry);
--		return 1;
-+		ret = 1;
-+		goto out_free;
- 	}
- 
- 	curr = qos_head;
--	while (curr != NULL) {
-+	while (curr) {
- 		if (curr->next == entry) {
- 			curr->next = entry->next;
--			kfree(entry);
--			return 1;
-+			ret = 1;
-+			goto out_free;
- 		}
- 		curr = curr->next;
- 	}
- 
--	return 0;
-+out:
-+	mutex_unlock(&qos_mutex);
-+	return ret;
-+
-+out_free:
-+	mutex_unlock(&qos_mutex);
-+	kfree(entry);
-+	return ret;
- }
- 
- /* this is buggered - we need locking for qos_head */
-@@ -246,10 +294,12 @@ void atm_mpoa_disp_qos(struct seq_file *m)
- {
- 	struct atm_mpoa_qos *qos;
- 
--	qos = qos_head;
- 	seq_printf(m, "QoS entries for shortcuts:\n");
--	seq_printf(m, "IP address\n  TX:max_pcr pcr     min_pcr max_cdv max_sdu\n  RX:max_pcr pcr     min_pcr max_cdv max_sdu\n");
-+	seq_printf(m, "IP address\n  TX:max_pcr pcr     min_pcr max_cdv max_sdu\n"
-+		   "  RX:max_pcr pcr     min_pcr max_cdv max_sdu\n");
- 
-+	mutex_lock(&qos_mutex);
-+	qos = qos_head;
- 	while (qos != NULL) {
- 		seq_printf(m, "%pI4\n     %-7d %-7d %-7d %-7d %-7d\n     %-7d %-7d %-7d %-7d %-7d\n",
- 			   &qos->ipaddr,
-@@ -265,6 +315,7 @@ void atm_mpoa_disp_qos(struct seq_file *m)
- 			   qos->qos.rxtp.max_sdu);
- 		qos = qos->next;
- 	}
-+	mutex_unlock(&qos_mutex);
- }
- 
- static struct net_device *find_lec_by_itfnum(int itf)
-@@ -1521,8 +1572,10 @@ static void __exit atm_mpoa_cleanup(void)
- 		mpc = tmp;
- 	}
- 
-+	mutex_lock(&qos_mutex);
- 	qos = qos_head;
- 	qos_head = NULL;
-+	mutex_unlock(&qos_mutex);
- 	while (qos != NULL) {
- 		nextqos = qos->next;
- 		dprintk("freeing qos entry %p\n", qos);
+ 	spin_lock_irq(&bp->lock);
+ 	b44_readphy(bp, MII_BMCR, &bmcr);
+ 	b44_readphy(bp, MII_BMCR, &bmcr);
 -- 
-2.39.5 (Apple Git-154)
+2.34.1
 
 
