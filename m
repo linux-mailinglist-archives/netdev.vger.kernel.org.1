@@ -1,156 +1,157 @@
-Return-Path: <netdev+bounces-243600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A923CA4670
-	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 17:06:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F31CBCA46B0
+	for <lists+netdev@lfdr.de>; Thu, 04 Dec 2025 17:12:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F1E8D300EE5F
-	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 16:02:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0DB98303E66F
+	for <lists+netdev@lfdr.de>; Thu,  4 Dec 2025 16:11:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CBEB264617;
-	Thu,  4 Dec 2025 16:02:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CE582DE6E9;
+	Thu,  4 Dec 2025 16:11:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WnBbGtRl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CeeilhjL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA9321DF273
-	for <netdev@vger.kernel.org>; Thu,  4 Dec 2025 16:02:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 517C42DC78C;
+	Thu,  4 Dec 2025 16:11:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764864176; cv=none; b=kkZ6zwy6SvpBtvKvbkqYROPEUdHuzAK8K2KXlnpAL3BoT9f8+6Z5ZSDE7yRDJCdo+EOfkGB1da3bYp33hXbtfmItKIzyovtFmxuVzc8HMLOK4Q/cT1a39yzhu8CSzx5j0K4M2uavkDntIZSNmTVOUIp14BmvTZoOiMSOQaxZuqQ=
+	t=1764864697; cv=none; b=pH4e1KvZ66gKI+zsWZ6y9OMscdeVZJEgIGKdymptf8Jcb4gWTp2UjtIU7vqDcmSFEZeU13vWxgTEIZ/aJqo7teUWRppTDkvGwcyPP/DKzd3KIYh0N+PnBIgWk54wYC8MsLlYNVF08W2H652UsSccDy2tWJ6TW5JB/cd4Ek/aC28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764864176; c=relaxed/simple;
-	bh=m1ocXgSnpSBmxlKPIuVU08twZDtwLmgIjzhzzvF6m3w=;
+	s=arc-20240116; t=1764864697; c=relaxed/simple;
+	bh=CVuOLrbFf23as2x6m7jdts/Xxbl0EPPcIHwQ3xEZ3e4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RX+H9P6IYAdI/9Pwmah+OH/vhTQ/uJlF76sDBq8fuAW7joGvdcgzR+PcV8MyAJmY/bfkurJWxdJWuA6KtY8chA1c7vemLPZSsX8jDEpIguGTIdEQQXuovUHFY3nxisMVkRDEQ8KqobD+Jls2FALUpVsUVcq/UAH6x1e2JAeIVDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WnBbGtRl; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4779ebfa91aso953015e9.3
-        for <netdev@vger.kernel.org>; Thu, 04 Dec 2025 08:02:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764864173; x=1765468973; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jhOkEme3R2b0z1JToTf4scmIbojsMBoLPZmWVqYRzNs=;
-        b=WnBbGtRlV3M5C2ZHIe2yYH/+1eo90Egqsn8KwYoUetlAoGGTieZHl2Spl8y9Cp4d07
-         y8biJtETszAG1XmCcy4f5tnBa6ILpMAWs1HF009N/cE0sgT/D6kOVxWkzKssOkcKvXdx
-         nAw0mUKUV7GVJwevgPjEXHPQG4RC/57GeaVU674kd71XLA4AMn79/gfZxW1mkAAnCzV9
-         OFbeg7nHO/JQny+5gjNYbgTN+P5mqDNFFoVeZM/R+XMaMvVQtjSQITjVE+uwL7iE2FUq
-         cuYAX2adgRWLYFbQk4MsLEgQnJ7aSfO0EwbCpOqz7tcUHjetYimH5HVtkPQN4p/SM9aN
-         8XtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764864173; x=1765468973;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jhOkEme3R2b0z1JToTf4scmIbojsMBoLPZmWVqYRzNs=;
-        b=NmOSbQ4kLYN0urgFGEz+7Lqyej2xqkyzUzHIrBAMMLUDNQitBNGO/Jy5hGhn9jFbas
-         woncqJmqwtwa2G5vyPFeKZACyiSP431N2exKO8MzJ2vi3ADeG1xcmKiXa4SUlfMb471D
-         rvCIifdRxkLQajPnJ/N5aaslpW77QPvtlxOtnfRQ2WhgVubwMrvqbtqa/o5c/RZ4rmpb
-         s9Is6ARO6Px89iGgJtdx/Td4vt5uYXXIGibpfTFoDjuC2fyHYkwAWmyYARPTcfP2Lsdg
-         sm0N654azjcqP5EP4hCl7ZcQkr5Mcvg1x/6PjqdvRtrLpAcxzu40Z3R9glZJrwoxr+V/
-         4ZKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXUm89tImKdLh0a4LUnLxQCROSmhTHDi7vdXcFUrJFDI4UUNP81ZLIvvF8H5eO35GfwrFxMVIE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7BmTtCXjCTLupvITxH88Ic+4mIGgyKvr9jk9hsRk9eu72M16R
-	qkYSTNsPg5CganP8ivwTPAPzyEA370ADTk7IVlQC2Hu0jSKUnBTo8TJa
-X-Gm-Gg: ASbGnctrTp54Xv6LumQAmLGuFmlDpslGSftxjvgc1jioMAan9WoblLwzlHzl2sEVYJ3
-	yS3KFxwIJRgmiZh0ulh73qoAiMZpwJomkeRMf6lbdwzMkwdSegpgLKxvNb3L2A44Tb8LDBGpMF3
-	Dfw+gY3YZAWQcmToS6axt8HOvCcUWd52VvQWhOfT10D8d1SrCn8crgLsHKiTaQ1z59ZS+MIFE0h
-	x4njLZG4SFFH0/9gzuEgDLe7eloLu1NCBGZg++gibidQlffcCdAq+HXauhUPG6FM1UF6oXM61pj
-	pRNdnbGJq6zTZqODPDHLnljzMb9MNOT6HmHvxnFRtYz+AvBpBhv3dBPLAbRLUvorTSELOfgKeSx
-	u1fC2Pj0Q5Hn/i9g7SCIsePHrCqb8CQs7xJwZ36cViyXSibWAX/PW7FWmQvLRzWDbzjwlWixP9I
-	bfpnXY4w8/UPyPBQ==
-X-Google-Smtp-Source: AGHT+IHk5B99duQzZVP/Wufl2tAKzpvxK3UuoYOHJ/wpcMeiblvQQD75UaOGAiMjZDyGGJIQCl5ZZw==
-X-Received: by 2002:a05:600c:45cd:b0:477:5b01:7d49 with SMTP id 5b1f17b1804b1-4792c909a62mr31833775e9.4.1764864172487;
-        Thu, 04 Dec 2025 08:02:52 -0800 (PST)
-Received: from skbuf ([2a02:2f04:d106:d600:dbb2:245d:2cf5:21d3])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-479308cd87csm40499885e9.0.2025.12.04.08.02.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Dec 2025 08:02:51 -0800 (PST)
-Date: Thu, 4 Dec 2025 18:02:47 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Daniel Golle <daniel@makrotopia.org>, Frank Wunderlich <frankwu@gmx.de>,
-	Andrew Lunn <andrew@lunn.ch>, Chen Minqiang <ptpt52@gmail.com>,
-	Rob Herring <robh@kernel.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=qLNHS/WPyyk7KZ7DUn9ltSv+LvdfqGg3bwKDnbAlI/yf7aCNaoudbArmD6RHYFzp7G2+A25niXgoARIvYocxhDc/+BPW0asn/ZanVUdxD6cEScBbGHumce/exrdhnOVv6V48e9DIhllXjWU3FeSFbo6g2DcTqTCibqTyXUC0Ggk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CeeilhjL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D08CC4CEFB;
+	Thu,  4 Dec 2025 16:11:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764864696;
+	bh=CVuOLrbFf23as2x6m7jdts/Xxbl0EPPcIHwQ3xEZ3e4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CeeilhjLemmcxt8wXOkDzoU5/QELoEaVxtMC9rzpvBPvNuXoZt0zdcOtxJWmiLGPr
+	 u2FT/8IAyKS6fxsE3aBu+6mmr4BV/oLKqFjqV8uegQH35Yq4yYLlVAF1RHT7Eaflzj
+	 RFK0K5GdQrGGD6EUaAq0IN6DfkwzMWUyDna8i9FI21CybLYF4y8nB8kb9WPLsR4CIQ
+	 I44R7Ptda9pKB/TuZkiTYSLFccS+qcLbb34xebQ92ZXT9/CDWMnv3GNTzK2YF+wHu3
+	 5cDWPOuEYvdMM54laVGdauVzrMnp3w2Aqf/+kfbrUX6vwBxKaDKc+7b8eQ0qoGKbwm
+	 DmGFB0eI/chaw==
+Date: Thu, 4 Dec 2025 10:11:33 -0600
+From: Rob Herring <robh@kernel.org>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-phy@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Daniel Golle <daniel@makrotopia.org>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
 	Matthias Brugger <matthias.bgg@gmail.com>,
 	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	"Chester A. Unal" <chester.a.unal@arinc9.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v3 2/2] net: dsa: mt7530: Use GPIO polarity to generate
- correct reset sequence
-Message-ID: <20251204160247.yz42mnxvzhxas5jc@skbuf>
-References: <20251129234603.2544-1-ptpt52@gmail.com>
- <20251129234603.2544-2-ptpt52@gmail.com>
- <0675b35f-217d-4261-9e3f-2eb24753d43c@lunn.ch>
- <20251130080731.ty2dlxaypxvodxiw@skbuf>
- <3fbc4e67-b931-421c-9d83-2214aaa2f6ed@lunn.ch>
- <0d85e1e6-ea75-4f20-aef1-90d446b4bfa1@kernel.org>
- <00f308a1-a4b1-4f20-8d8e-459ddf4c39b1@gmx.de>
- <aS7Zj3AFsSp2CTNv@makrotopia.org>
- <20251204131626.upw77jncqfwxydww@skbuf>
- <4170c560-1edd-4ff8-96af-a479063be4a5@kernel.org>
+	Eric Woudstra <ericwouds@gmail.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Lee Jones <lee@kernel.org>,
+	Patrice Chotard <patrice.chotard@foss.st.com>
+Subject: Re: [PATCH net-next 2/9] dt-bindings: phy-common-props: create a
+ reusable "protocol-names" definition
+Message-ID: <20251204161133.GA1574692-robh@kernel.org>
+References: <20251122193341.332324-1-vladimir.oltean@nxp.com>
+ <20251122193341.332324-3-vladimir.oltean@nxp.com>
+ <20251204155219.GA1533839-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <4170c560-1edd-4ff8-96af-a479063be4a5@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251204155219.GA1533839-robh@kernel.org>
 
-On Thu, Dec 04, 2025 at 03:49:52PM +0100, Krzysztof Kozlowski wrote:
-> On 04/12/2025 14:16, Vladimir Oltean wrote:
-> > I get the feeling that we're complicating a simple solution because of a
-> > theoretical "what if" scenario. The "NOT" gate is somewhat contrived
+On Thu, Dec 04, 2025 at 09:52:19AM -0600, Rob Herring wrote:
+> On Sat, Nov 22, 2025 at 09:33:34PM +0200, Vladimir Oltean wrote:
+> > Other properties also need to be defined per protocol than just
+> > tx-p2p-microvolt-names. Create a common definition to avoid copying a 55
+> > line property.
+> > 
+> > Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> > ---
+> >  .../bindings/phy/phy-common-props.yaml        | 34 +++++++++++--------
+> >  1 file changed, 19 insertions(+), 15 deletions(-)
+> > 
+> > diff --git a/Documentation/devicetree/bindings/phy/phy-common-props.yaml b/Documentation/devicetree/bindings/phy/phy-common-props.yaml
+> > index 255205ac09cd..775f4dfe3cc3 100644
+> > --- a/Documentation/devicetree/bindings/phy/phy-common-props.yaml
+> > +++ b/Documentation/devicetree/bindings/phy/phy-common-props.yaml
+> > @@ -13,22 +13,12 @@ description:
+> >  maintainers:
+> >    - Marek Behún <kabel@kernel.org>
+> >  
+> > -properties:
+> > -  tx-p2p-microvolt:
+> > +$defs:
+> > +  protocol-names:
+> >      description:
+> > -      Transmit amplitude voltages in microvolts, peak-to-peak. If this property
+> > -      contains multiple values for various PHY modes, the
+> > -      'tx-p2p-microvolt-names' property must be provided and contain
+> > -      corresponding mode names.
+> > -
+> > -  tx-p2p-microvolt-names:
+> > -    description: |
+> > -      Names of the modes corresponding to voltages in the 'tx-p2p-microvolt'
+> > -      property. Required only if multiple voltages are provided.
+> > -
+> > -      If a value of 'default' is provided, the system should use it for any PHY
+> > -      mode that is otherwise not defined here. If 'default' is not provided, the
+> > -      system should use manufacturer default value.
+> > +      Names of the PHY modes. If a value of 'default' is provided, the system
+> > +      should use it for any PHY mode that is otherwise not defined here. If
+> > +      'default' is not provided, the system should use manufacturer default value.
+> >      minItems: 1
+> >      maxItems: 16
+> >      items:
+> > @@ -89,6 +79,20 @@ properties:
+> >          - mipi-dphy-univ
+> >          - mipi-dphy-v2.5-univ
+> >  
+> > +properties:
+> > +  tx-p2p-microvolt:
+> > +    description:
+> > +      Transmit amplitude voltages in microvolts, peak-to-peak. If this property
+> > +      contains multiple values for various PHY modes, the
+> > +      'tx-p2p-microvolt-names' property must be provided and contain
+> > +      corresponding mode names.
+> > +
+> > +  tx-p2p-microvolt-names:
+> > +    description:
+> > +      Names of the modes corresponding to voltages in the 'tx-p2p-microvolt'
+> > +      property. Required only if multiple voltages are provided.
+> > +    $ref: "#/$defs/protocol-names"
 > 
-> You downplay this case and suggest (if I get it right) that NOT gate is
-> something unusual.
+> The default for .*-names is the entries don't have to be unique. That's 
+> for the exception, but unfortunately everyone else has to define the 
+> type (type.yaml#/definitons/string).
 > 
->  I mentioned "line inverter" but it's not about NOT gate. There is no
-> need for NOT gate at all, like some magical component which no one puts
-> to the board. The only thing needed is just to pull the GPIO up or down,
-> that's it. It's completely normal design thus it CAN happen.
-> 
-> Of course "can" does not mean it actually does, because certain
-> configurations like powerdown-fail-safe are more likely and I am not an
-> electric circuit designer to tell which one is better, but that
-> downplaying does not help here.
+> Each user needs to define the names of the entries which will enforce 
+> the length. So defining the length 1-16 here doesn't do much. So I think 
+> you can drop that and then the $defs is not needed either.
 
-I don't want to dismiss this comment, but I don't really understand it.
-What do you mean by "line inverter", is it the component inside the GPIO
-pin which makes it active low?
+I missed that all the names are defined here. Nevermind on the 2nd 
+point. We probably still need either a $ref or 'uniqueItems: true'. 
+Either way should work.
 
-I thought that the premise of this patch set is that old device trees
-are all (incorrectly) defined as GPIO_ACTIVE_HIGH, but someone familiar
-with the matter needs to fact-check this statement.
-
-Anyway, you and Andrew are talking about different things, you haven't
-made it clear (or at least it wasn't clear to me) that the inverter you
-are talking about isn't his NOT gate (that isn't described in the device
-tree at all, as opposed to your inverter which would make the GPIO line
-GPIO_ACTIVE_LOW - that's something verifiable).
-
-> Just to clarify: I expect clear communication that some users will be
-> broken with as good as you can provide analysis of the impact (which
-> users). I only object the clame here "no one can ever pull down a GPIO
-> line thus I handled all possible cases and made it backward compatible".
-> 
-> And that claim to quote was:
-> "Therefore, regardless of whether a DTS is old or new, correct or
-> incorrect, the driver now generates the correct electrical reset pulse."
-> 
-> which is 100% false and I am surprised how one could claim that.
-
-Agree, the communication should be better.
+Rob
 
