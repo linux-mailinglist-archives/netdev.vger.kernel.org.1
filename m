@@ -1,95 +1,72 @@
-Return-Path: <netdev+bounces-243698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED408CA616B
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 05:16:58 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E2C5CA6285
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 06:38:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1992430AE0AE
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 04:16:54 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EA687307CB34
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 05:38:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 328622D8DD4;
-	Fri,  5 Dec 2025 04:16:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21A862EB85E;
+	Fri,  5 Dec 2025 05:38:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NOhgHku+"
+	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="AoWgq5bL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+Received: from layka.disroot.org (layka.disroot.org [178.21.23.139])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6D3D19C566
-	for <netdev@vger.kernel.org>; Fri,  5 Dec 2025 04:16:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C18122BE7A7;
+	Fri,  5 Dec 2025 05:38:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.21.23.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764908213; cv=none; b=geLcjFTNQlie7X22jl2CVNyMJr7w1wD1yn6ABbUSfzuvcr/QucJzmlXkfaggEmyZN+WAdB0tTsJd/C8AGHgWTrug/txFwX7hmTgGI1Z8blv2W0ebx01MwRcN3o4wzQ7oPE3+9RofEzrXmLjWKWkOwuRJt+1O7SiJTVFdBw5RauM=
+	t=1764913107; cv=none; b=QB9hxih65xUcYu+2mY9lCgZJestJFHg1O+AqlCDZwUZVHf46+iU2h+Za02AzPIh5yuGuyJy0Y+RVEBFObcWQOx3w8JNE2WNZZcepZ5WiB6+2IMgwvh+hV3SuhFvJIIx4x9+mXyQTUWvvWVi03ygu7UI5fh75fUbSvOxTqOolZ0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764908213; c=relaxed/simple;
-	bh=dxw02qcsWeoZgD1xFo+JtEl1GOxPVpGiPAPAeQW4TsY=;
+	s=arc-20240116; t=1764913107; c=relaxed/simple;
+	bh=LTqdQcIw0CyyS+hNWi/YRC5a7hw6Ig/qdpkgBxzJvhw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ldQwsW9vfE1AFJ4003ypx6d6Uank7HVbiXNQLqvOMtIymEzv10a5B7oOhgvMHf32X0wvIHL1s9Rg3+JGeDF201uot0W4saBHVU7r75qXDNAjbVzMSAtLPEQPItv7+il7zkgzoGH7sPXGKX46cJ5XanJefJVJVTQTOR3OlGyw8Qs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NOhgHku+; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-3436d6bdce8so1696731a91.3
-        for <netdev@vger.kernel.org>; Thu, 04 Dec 2025 20:16:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764908210; x=1765513010; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gBW4yg5h+y5NyBTEUuEzw2xT+B6nf8gmsqhkGkk4wrw=;
-        b=NOhgHku+RZC//0KMej6BeCTj4zPow1M1PGbMGhdoJ4WpbWoKBKLqgiXzi6Edu5WBxi
-         tUWG+34GrGfqpsonlKCIipcOvz+IS5yV9eXmhCLMn35ovooy9wNp6RO3wQUAHVBspXQL
-         s/oITyhU/r4yDkJCOUnmDWuIMwYsRfGjlU7T5bss1R3m5JHke+S1Kw1HX+hOd07qczRW
-         6xm8CgLhUhLdmKxhPaAtaqOpZeoCTVBhoaR9+MoxskMyeyKfQppQ4Vei6onoO3hHBiqO
-         gWj3sjKH+ro+yn99Odgs8ppsudmHT2ueWy2RrK3qXagKpRNFgkVUkK2xRF4Vq2GmZhkN
-         klXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764908210; x=1765513010;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=gBW4yg5h+y5NyBTEUuEzw2xT+B6nf8gmsqhkGkk4wrw=;
-        b=arAUFvHS6cbA1zr+MnWUVauUnynGQBtf8Bu5cN/SaQj63X0rlk3iuIngU66qe7lW4X
-         OoAFndebmSI94QbqDYeUCqfL19gd8Wic5XYfMCspliw9ulVZe/MwHG1Dk3q8rd2/hOOf
-         N5KRK/0xL9rPqXONKy3ID0XkpvHqT1SwwpIbTX5mG8ON0zGOP4EprVIDAmE2GQjA4Hb8
-         OQhSCMDcYjD1NAFoPsN54rYDpEDzMpmgEkWHLCk13DRp3v3QRJgab6TLxZvhCfJR7+dD
-         1nhSEeOP2rQCHEWDLgpvx75tKVdIN9hpoI88BhLLodrojW14hS9/Cxi7zekksh96wsU7
-         AJDA==
-X-Forwarded-Encrypted: i=1; AJvYcCW/ancWRUaIzlteJJrQk9MtlBPaCgjW4EM1Z6xLltNtDvSsE55IoJAQaAZAeDr2j0PmYYiXco8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDhJjCCmvQrBzfvf3usD6Yduw9YjNr6QTA7Mr7921aorthICqF
-	HfZFweIunQF2Af6piE9BjIBfi2jvFDlmytUx+V8mizOWuaOpOpgATepn
-X-Gm-Gg: ASbGncupSf7Rlg9CcazCJqfPV4vOZeBkyjslAG4Tc30WQz1W72r3LEnDNXSnB+EmDhz
-	8FpniPb63PZErJprM6DAY+Fw/rw58MI840OQHR/+8VgfyfxYXCKc2fb2Rar9oVjxC4sILUqzzZ3
-	QHE40/FzadbXoLHhVGYJJvFsKRM6TJR4I3dmyTR01bMCUiTsnTFCnSUkghPsMRROqrFC9wnv/BO
-	PR8EtpZwjpZtkn3vI5qU+xP4bcfvCVI4SqAiOvrkBP5y+zYg1fRUIXiKo/2aZ3ToBSnOI/N3OGw
-	yymX8I7akBDPzGiAkJNpjBkmPO10cQFiMhD79wgkWXryiFX21uWmmOiyu0u3R8KsdrXvIoUHYN+
-	a4g/q3uTlr4K4CewljZ//u44JWrkmNzD8Rj+LLGcpE8IDKsWYQErdugkTDplmTZgqCUcnACcuFb
-	kfO0YUm1t6wvRFwWnmBKE+T3pwolAyrQ+SGQ==
-X-Google-Smtp-Source: AGHT+IFPM4tJWEJo1KtUYT7trSAyUM/sJov0oTxTpBLUgPdWMcAI1975L261q4edEQkelnqT7yTjbQ==
-X-Received: by 2002:a17:90b:48c4:b0:341:8ac7:39b7 with SMTP id 98e67ed59e1d1-349127fd714mr7851540a91.25.1764908209939;
-        Thu, 04 Dec 2025 20:16:49 -0800 (PST)
-Received: from server.roeck-us.net ([2600:1700:e321:62f0:da43:aeff:fecc:bfd5])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-349128be266sm3818595a91.0.2025.12.04.20.16.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Dec 2025 20:16:49 -0800 (PST)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Date: Thu, 4 Dec 2025 20:16:46 -0800
-From: Guenter Roeck <linux@roeck-us.net>
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
-	martin.lau@linux.dev, pabeni@redhat.com, song@kernel.org,
-	sdf@google.com, haoluo@google.com, yhs@fb.com, edumazet@google.com,
-	john.fastabend@gmail.com, kpsingh@kernel.org, jolsa@kernel.org,
-	mjambigi@linux.ibm.com, wenjia@linux.ibm.com, wintera@linux.ibm.com,
-	dust.li@linux.alibaba.com, tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com, bpf@vger.kernel.org, davem@davemloft.net,
-	kuba@kernel.org, netdev@vger.kernel.org, sidraya@linux.ibm.com,
-	jaka@linux.ibm.com
-Subject: Re: [PATCH bpf-next v5 2/3] net/smc: bpf: Introduce generic hook for
- handshake flow
-Message-ID: <3a0d2f44-6f1c-4f79-b8cb-f57387933a5a@roeck-us.net>
-References: <20251107035632.115950-1-alibuda@linux.alibaba.com>
- <20251107035632.115950-3-alibuda@linux.alibaba.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=DuDx6TLgWfNDncmXbTebncsiFIB/O7w+gKf9p3IQKPItoeOoQI2MSeV13H5c0GHNRIvlAmWFeyR3ryxZfeCwkqpNrKYWspf5JxubHWz7FlyvrWANpKJOnsbdglrw53P9lAt+NSLRCTGzN6VzbH/CU0qrBogO0eSOa5L6sALnl4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=AoWgq5bL; arc=none smtp.client-ip=178.21.23.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=disroot.org
+Received: from mail01.disroot.lan (localhost [127.0.0.1])
+	by disroot.org (Postfix) with ESMTP id 3ACF326704;
+	Fri,  5 Dec 2025 06:32:08 +0100 (CET)
+X-Virus-Scanned: SPAM Filter at disroot.org
+Received: from layka.disroot.org ([127.0.0.1])
+ by localhost (disroot.org [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id YAoeXpJ_KLyK; Fri,  5 Dec 2025 06:32:07 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=disroot.org; s=mail;
+	t=1764912727; bh=LTqdQcIw0CyyS+hNWi/YRC5a7hw6Ig/qdpkgBxzJvhw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=AoWgq5bLk6SRn6UD7TZAkLZVKJB7DN+m0cKoxIqJ0d/ipCVtf56SMQjPor1HME1p0
+	 2llN3hO3HtmojZclQzOq6R1CI5k9mxkPX//8/j4HeRwaptfLVPp9Lo0B9V83hMUPSw
+	 FuT7k3Hljv72lZubAy9Z0OpUhWzAULHhDwbsAP93xyowbr8vndKmGvx2AmhFuYUFEP
+	 xUh+BUSSngfL1LDhjIQ814REnHWzuGTiBtd2nerM6okLO7UMhw16qfO8kgrr0mumep
+	 zB8Gc/b5E7etHusGbKSDg3Xxoq0cIdkw1duKBOzEIdb2aeqO9lFNTkRHa43SpH85mk
+	 8mIgLxPiiPOxA==
+Date: Fri, 5 Dec 2025 05:31:34 +0000
+From: Yao Zi <ziyao@disroot.org>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Frank <Frank.Sae@motor-comm.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Chen-Yu Tsai <wens@csie.org>, Jisheng Zhang <jszhang@kernel.org>,
+	Furong Xu <0x1207@gmail.com>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Mingcong Bai <jeffbai@aosc.io>,
+	Kexy Biscuit <kexybiscuit@aosc.io>, Runhua He <hua@aosc.io>,
+	Xi Ruoyao <xry111@xry111.site>
+Subject: Re: [PATCH net-next v3 2/3] net: stmmac: Add glue driver for
+ Motorcomm YT6801 ethernet controller
+Message-ID: <aTJuNk4zF8CLtt9S@pie>
+References: <20251124163211.54994-1-ziyao@disroot.org>
+ <20251124163211.54994-3-ziyao@disroot.org>
+ <aSSspDCPM_5-l24a@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,57 +75,123 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251107035632.115950-3-alibuda@linux.alibaba.com>
+In-Reply-To: <aSSspDCPM_5-l24a@shell.armlinux.org.uk>
 
-On Fri, Nov 07, 2025 at 11:56:31AM +0800, D. Wythe wrote:
-> The introduction of IPPROTO_SMC enables eBPF programs to determine
-> whether to use SMC based on the context of socket creation, such as
-> network namespaces, PID and comm name, etc.
+Hi Russell,
+
+Sorry for the late reply,
+
+On Mon, Nov 24, 2025 at 07:06:12PM +0000, Russell King (Oracle) wrote:
+> On Mon, Nov 24, 2025 at 04:32:10PM +0000, Yao Zi wrote:
+> > +static int motorcomm_setup_irq(struct pci_dev *pdev,
+> > +			       struct stmmac_resources *res,
+> > +			       struct plat_stmmacenet_data *plat)
+> > +{
+> > +	int ret;
+> > +
+> > +	ret = pci_alloc_irq_vectors(pdev, 6, 6, PCI_IRQ_MSIX);
+> > +	if (ret > 0) {
+> > +		res->rx_irq[0]	= pci_irq_vector(pdev, 0);
+> > +		res->tx_irq[0]	= pci_irq_vector(pdev, 4);
+> > +		res->irq	= pci_irq_vector(pdev, 5);
+> > +
+> > +		plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
+> > +
+> > +		return 0;
+> > +	}
+> > +
+> > +	dev_info(&pdev->dev, "failed to allocate MSI-X vector: %d\n", ret);
+> > +	dev_info(&pdev->dev, "try MSI instead\n");
+> > +
+> > +	ret = pci_alloc_irq_vectors(pdev, 1, 1, PCI_IRQ_MSI);
+> > +	if (ret < 0)
+> > +		return dev_err_probe(&pdev->dev, ret,
+> > +				     "failed to allocate MSI\n");
+> > +
+> > +	res->irq = pci_irq_vector(pdev, 0);
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +static int motorcomm_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+> > +{
+> ...
+> > +	ret = motorcomm_setup_irq(pdev, &res, plat);
+> > +	if (ret)
+> > +		return dev_err_probe(&pdev->dev, ret, "failed to setup IRQ\n");
+> > +
+> > +	motorcomm_init(priv);
+> > +
+> > +	res.addr = priv->base + GMAC_OFFSET;
+> > +
+> > +	return stmmac_dvr_probe(&pdev->dev, plat, &res);
 > 
-> As a subsequent enhancement, to introduce a new generic hook that
-> allows decisions on whether to use SMC or not at runtime, including
-> but not limited to local/remote IP address or ports.
+> If stmmac_dvr_probe() fails, then it will return an error code. This
+> leaves the PCI MSI interrupt allocated...
+
+This isn't true. MSI API is a little magical: when the device is enabled
+through pcim_enable_device(), the device becomes devres-managed, and
+a plain call to pci_alloc_irq_vectors() becomes managed, too, even if
+its name doesn't indicate it's a devres-managed API.
+
+pci_free_irq_vectors() will be automatically called on driver deattach.
+See pcim_setup_msi_release() in drivers/pci/msi/msi.c, which is invoked
+by pci_alloc_irq_vectors() internally.
+
+> > +}
+> > +
+> > +static void motorcomm_remove(struct pci_dev *pdev)
+> > +{
+> > +	stmmac_dvr_remove(&pdev->dev);
+> > +	pci_free_irq_vectors(pdev);
 > 
-> User can write their own implememtion via bpf_struct_ops now to choose
-> whether to use SMC or not before TCP 3rd handshake to be comleted.
+> ... which stood out because of the presence of this function doing
+> stuff after the call to stmmac_dvr_remove().
+
+But yes, this call to pci_free_irq_vectors() is redundant, since
+pci_free_irq_vectors() will be automatically invoked. I'll remove it in
+the next version.
+
+> So... reviewing the other stmmac PCI drivers:
 > 
-> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
-> Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
-> ---
-...
-> +static struct bpf_struct_ops bpf_smc_hs_ctrl_ops = {
-> +	.name		= "smc_hs_ctrl",
-> +	.init		= smc_bpf_hs_ctrl_init,
-> +	.reg		= smc_bpf_hs_ctrl_reg,
-> +	.unreg		= smc_bpf_hs_ctrl_unreg,
-> +	.cfi_stubs	= &__smc_bpf_hs_ctrl,
-> +	.verifier_ops	= &smc_bpf_verifier_ops,
-> +	.init_member	= smc_bpf_hs_ctrl_init_member,
-> +	.owner		= THIS_MODULE,
-> +};
-> +
-> +int bpf_smc_hs_ctrl_init(void)
-> +{
-> +	return register_bpf_struct_ops(&bpf_smc_hs_ctrl_ops, smc_hs_ctrl);
-> +}
+> - dwmac-intel calls pci_alloc_irq_vectors() but does not call
+>   pci_free_irq_vectors(). This looks like a bug.
 
-Building csky:allmodconfig ... failed
---------------
-Error log:
-In file included from include/linux/bpf_verifier.h:7,
-                 from net/smc/smc_hs_bpf.c:13:
-net/smc/smc_hs_bpf.c: In function 'bpf_smc_hs_ctrl_init':
-include/linux/bpf.h:2068:50: error: statement with no effect [-Werror=unused-value]
- 2068 | #define register_bpf_struct_ops(st_ops, type) ({ (void *)(st_ops); 0; })
-      |                                                  ^~~~~~~~~~~~~~~~
-net/smc/smc_hs_bpf.c:139:16: note: in expansion of macro 'register_bpf_struct_ops'
-  139 |         return register_bpf_struct_ops(&bpf_smc_hs_ctrl_ops, smc_hs_ctrl);
+The driver does call pcim_enable_device() thus enables devres for the
+PCI device, in which case manually calling pci_free_irq_vectors() is
+unnecessary. I don't think there's a bug.
 
-Should this have been
+> - dwmac-intel calls pcim_enable_device() in its probe function, and
+>   also its intel_eth_pci_resume() - pcim_enable_device() is the devres
+>   managed function, so we end up adding more and more devres entries
+>   each time intel_eth_pci_resume() is resumed. Note that
+>   intel_eth_pci_suspend() doesn't disable the device. So, this should
+>   probably be the non-devres version.
 
-	return register_bpf_struct_ops(&bpf_smc_hs_ctrl_ops, smc_hs_ctrl_ops);
-									^^^^
-?
+Agree.
 
-Guenter
+> - dwmac-loongson looks sane, but the checks for ld->multichan before
+>   calling loongson_dwmac_msi_clear() look unnecessary, as
+>   pci_free_irq_vectors() can be safely called even if MSI/MSI-X have
+>   not been (successfully) allocated.
+
+loongson-dwmac doesn't enable devres for the PCI device (it calls
+pci_enable_device() instead), so manually freeing the interrupts is
+indeed necessary. However, I'd suggest moving to the devres variant and
+simplify the error handling (and clean up) path.
+
+> So, I wonder whether there is scope to have a common way to clean up
+> PCI drivers. Could you look into this please?
+
+In short, enabling the device with pcim_enable_device() to make it
+devres-managed should be the best solution, in which case
+pci_alloc_irq_vectors() is devres-managed, too, and at least we don't
+need to worry about interrupts anymore on error handling/removal path.
+
+Regards,
+Yao Zi
+
+> -- 
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
