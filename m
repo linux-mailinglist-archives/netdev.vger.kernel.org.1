@@ -1,113 +1,133 @@
-Return-Path: <netdev+bounces-243684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCA6BCA5D8F
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 02:37:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAE6ECA5DA7
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 02:49:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8CE2E303E65C
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 01:37:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3A5643016349
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 01:49:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 306C5224234;
-	Fri,  5 Dec 2025 01:37:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9878B18027;
+	Fri,  5 Dec 2025 01:49:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="ISEVtaMJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from TWMBX01.aspeed.com (mail.aspeedtech.com [211.20.114.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 136A91684B4;
-	Fri,  5 Dec 2025 01:37:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.20.114.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED401398FB7
+	for <netdev@vger.kernel.org>; Fri,  5 Dec 2025 01:49:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764898658; cv=none; b=O4ffIj0mG0U23cAV2WWme2iyukoDzC8my2dNnLA8XAiYV/1+/fL2CWHcW54NaOiS7OjI6nbTLebODvhyFK7Wxo9NQpgouhOYJnaECIQAgK0y1pALNU1r2H/ndBpkRiKTvedpMruwl0CU9wSxtzHkzZx6alIEUdrVU7v5OeUBcFY=
+	t=1764899360; cv=none; b=R8pzGLEoJ7l0LBkpwaAyNGze6tXLvjnRHw9W8gNfFPH+klP3zUXmJL58HBN5HXtWOpW4fk1JB4oRXSrOzmlzFlsilpxBiNYMTMOhMYQCcoxdi8/QkMLymLY3WzXUJyyOFJS4vDtkT7Mf9SGpClyM6zMiBeOk8M9cl/apfY6Dva8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764898658; c=relaxed/simple;
-	bh=S7YMglq8xDZ86NvHllMwMpita0VXT5NdJ+3b28QfTZA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=qbsNswfEWEsl2ZzjUXXEX8Z6prsxFlLRpyK+sOOycnif4iW9+bFcRjgi/myVUE3TNfEnnE9RdtSD0wTbFNiLEi6r/jghNWodXoFku0HD+BgC4Ag3XdeyGZWC+cI0h2jsh6bwykIIBPWKeGBNlrdTe3dfyZX/ifZITBNYZzmsgPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; arc=none smtp.client-ip=211.20.114.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
-Received: from TWMBX01.aspeed.com (192.168.0.62) by TWMBX01.aspeed.com
- (192.168.0.62) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.10; Fri, 5 Dec
- 2025 09:37:27 +0800
-Received: from [127.0.1.1] (192.168.10.13) by TWMBX01.aspeed.com
- (192.168.0.62) with Microsoft SMTP Server id 15.2.1748.10 via Frontend
- Transport; Fri, 5 Dec 2025 09:37:27 +0800
-From: Jacky Chou <jacky_chou@aspeedtech.com>
-Date: Fri, 5 Dec 2025 09:37:22 +0800
-Subject: [PATCH net-next] net: mdio: aspeed: add dummy read to avoid
- read-after-write issue
+	s=arc-20240116; t=1764899360; c=relaxed/simple;
+	bh=GCCe3SdP+LRBLU/9RTGCSz08sJUxl3nAwl+5lkmQqsY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XobRUCSHRpHysWLGMH3qPe5mz/eMDMcvV1yWf/uxc7U8XP6GzYEqc3xRg8OYPF0ed6dJ5e4NuZYDdOGBtcZXtFzwblWMqGLw6C9/DpqDNrO1fTiz6A4VO9/yQ2JmuC4m7a+bVA2JQrEL/8H8KJifmd0MOIyLNtbld9qp44kQ/DY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=ISEVtaMJ; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7df022360aeso1302730b3a.1
+        for <netdev@vger.kernel.org>; Thu, 04 Dec 2025 17:49:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=asu.edu; s=google; t=1764899358; x=1765504158; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=V77VUVuEufZsqTPrUMnObz13hW2gnHmuo64kCdt8C2c=;
+        b=ISEVtaMJa5d5XYF0ijqFqdZwhC0coCkwKa4excjz81WmAXYHBK+WFcEh1xn2RN6r1z
+         PXdeNohcgJ8vJsKPeAEIoPqf+vtOqp0useBRj739Ae+pN/QMIJtCxeRB7x/0Dwa6+l6P
+         IUB08qOqMNxqIAzPjZ/A0CXL4I9l6yWXyGE1Xng4pQioceDl36KA66UL64RW1qDaYyVp
+         vblrIIN2BfzPsVqwt/KlIrkVlR8oQz6bP1jsliVynlsJq9jhSzJkw+CWpKWx35sXDsxh
+         NaOlpi0AN7NN4vn/VjUhtJK3iv++jsg+DzEoSVCFh5+ZcVMnrmvxjYSK/tsj8LZldfOM
+         leag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764899358; x=1765504158;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V77VUVuEufZsqTPrUMnObz13hW2gnHmuo64kCdt8C2c=;
+        b=cIJalC1+WykDVS9lZZgxopCZgJRUA+4qsq+vwOSiH6SPaoVQL989mHnoPf6i20b27K
+         1vUN5+NSP/sfpY3bKdrN31PTX7G98yz35jSGufV9BwKmS1/0lICrtd42AnwbaoPPpuMY
+         6JtqyCha6/i2TM7TaNe0YoE/jnJp9UNNjoyVfQwrrL18YVo+tv3KpLrlQcMolsNFXuJS
+         YjtWk5yN/64WzJmdPE3JBIj6jJSSsUFatmJJIZbhTILAxWy5JUVEtPtRRf3qjxQvUnaw
+         YM9HgEr/thRayk2wfRRMq/2LRYsDAyZnAJgbPwrIQosGAhdEkgrW+MpdHjCpJOk6RvbC
+         J/zA==
+X-Gm-Message-State: AOJu0YznDq1SplTVmwH2txErsivLBLhMZNapZHTDM4oNZO954e/SGyNd
+	J7tnZmLKIrlh/JvoGXhYfmWCAs4I/8hHt2UirpeCOgD2aAR27W3ae2xxcG8qfCKyJyiE4I0JZSP
+	3Y+I=
+X-Gm-Gg: ASbGncv5PXyhI/Fed2aMkwlCNJjPkWtzgTojox4lx5iFM5efNchPMS83x+ena4BaNQE
+	chi1cIIMq6OMqXqSv1IFhS88948iaOKvqOHldMVvAXMbaFIWWzNCOOClrPOFSYmZwjTdgsGhEA+
+	HQtFxmL9pGnOkXBhOhv/DrVfzuSfzPBNb6g8dS9Plr2an8MVpMWo+wKf4PaP/660WCLzl2fG4hF
+	oezjGSiX3Fca93Cs4UH/xazPpZvxxSLfiLkI6EKSgyRIv+l3/Qr0QdmIMCoZBL/7GEZwRIns1kC
+	A6gQsgTRik7hcXylvVWDRFTydlD2IVTaz+2h7A6PCjpiVgnXsTTh1g/ttGOi7R/6GuJTZSgM4wh
+	NUmX91eHloZlAMOHy8Kg6JF+3EJbO7qrydoMUQA4hAT6JK+LzExfPRrXORvDLJ/KxywD4xvqG1V
+	plGLEaNfhT96abHpdlieYipmZI7/jS45Z5PviLyi0a3uR9
+X-Google-Smtp-Source: AGHT+IHb0WWg5OrRtAsNkF9VYtOnLnC0gOnwjuwT58PYtAnyxv84xUVAbKbMTVawQalvzx3EDxsZZA==
+X-Received: by 2002:a05:6a21:993:b0:2cf:afc1:cc3c with SMTP id adf61e73a8af0-36403304a44mr4600114637.16.1764899358154;
+        Thu, 04 Dec 2025 17:49:18 -0800 (PST)
+Received: from p1.dhcp.asu.edu (209-147-139-51.nat.asu.edu. [209.147.139.51])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7e29f3e52c8sm3436094b3a.10.2025.12.04.17.49.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Dec 2025 17:49:17 -0800 (PST)
+From: Xiang Mei <xmei5@asu.edu>
+To: security@kernel.org
+Cc: netdev@vger.kernel.org,
+	jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	Xiang Mei <xmei5@asu.edu>
+Subject: [PATCH net] net/sched: sch_qfq: Fix NULL deref when deactivating
+Date: Thu,  4 Dec 2025 18:48:55 -0700
+Message-ID: <20251205014855.736723-1-xmei5@asu.edu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20251205-aspeed_mdio_add_dummy_read-v1-1-60145ae20ea7@aspeedtech.com>
-X-B4-Tracking: v=1; b=H4sIAFE3MmkC/x3MQQqDMBAF0KvIrBswwUDbq5QSQv9vO4tESaxYx
- LsbXL7N26SyKKvcu00KF6065gZ76eT1jflDo2gW1ztvXe9NrBOJkKBjiEDAL6V/KIww8FdYDrf
- BOkgLpsK3rmf+kMzZZK6zPPf9AIb4G/R2AAAA
-X-Change-ID: 20251205-aspeed_mdio_add_dummy_read-d58d1e49412d
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Joel Stanley
-	<joel@jms.id.au>, Andrew Jeffery <andrew@codeconstruct.com.au>
-CC: <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-aspeed@lists.ozlabs.org>, <linux-kernel@vger.kernel.org>, Jacky Chou
-	<jacky_chou@aspeedtech.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1764898647; l=1685;
- i=jacky_chou@aspeedtech.com; s=20251031; h=from:subject:message-id;
- bh=S7YMglq8xDZ86NvHllMwMpita0VXT5NdJ+3b28QfTZA=;
- b=Ps7Hi70frz0jQRXPVvsI7ldWRC/vUIB2+MlTS0A8qMwi2htDxw+IuUKtQFWJ/D4fb+S5YT/WU
- +6J+70lg37kB2/KkYTcqTd2EYPL6bmdnjhSrYXB//9EmSRmeEb1bkfX
-X-Developer-Key: i=jacky_chou@aspeedtech.com; a=ed25519;
- pk=8XBx7KFM1drEsfCXTH9QC2lbMlGU4XwJTA6Jt9Mabdo=
+Content-Transfer-Encoding: 8bit
 
-The Aspeed MDIO controller may return incorrect data when a read operation
-follows immediately after a write. Due to a controller bug, the subsequent
-read can latch stale data, causing the polling logic to terminate earlier
-than expected.
+`qfq_class->leaf_qdisc->q.qlen > 0` does not imply that the class
+itself is active.
 
-To work around this hardware issue, insert a dummy read after each write
-operation. This ensures that the next actual read returns the correct
-data and prevents premature polling exit.
+Two qfq_class objects may point to the same leaf_qdisc. This happens
+when:
 
-This workaround has been verified to stabilize MDIO transactions on
-affected Aspeed platforms.
+1. one QFQ qdisc is attached to the dev as the root qdisc, and
 
-Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
+2. another QFQ qdisc is temporarily referenced (e.g., via qdisc_get()
+/ qdisc_put()) and is pending to be destroyed, as in function
+tc_new_tfilter.
+
+When packets are enqueued through the root QFQ qdisc, the shared
+leaf_qdisc->q.qlen increases. At the same time, the second QFQ
+qdisc triggers qdisc_put and qdisc_destroy: the qdisc enters
+qfq_reset() with its own q->q.qlen == 0, but its class's leaf
+qdisc->q.qlen > 0. Therefore, the qfq_reset would wrongly deactivate
+an inactive aggregate and trigger a null-deref in qfq_deactivate_agg.
+
+Fixes: 0545a3037773 ("pkt_sched: QFQ - quick fair queue scheduler")
+Signed-off-by: Xiang Mei <xmei5@asu.edu>
 ---
- drivers/net/mdio/mdio-aspeed.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ net/sched/sch_qfq.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/mdio/mdio-aspeed.c b/drivers/net/mdio/mdio-aspeed.c
-index e55be6dc9ae7..00e61b922876 100644
---- a/drivers/net/mdio/mdio-aspeed.c
-+++ b/drivers/net/mdio/mdio-aspeed.c
-@@ -62,6 +62,12 @@ static int aspeed_mdio_op(struct mii_bus *bus, u8 st, u8 op, u8 phyad, u8 regad,
- 		| FIELD_PREP(ASPEED_MDIO_DATA_MIIRDATA, data);
+diff --git a/net/sched/sch_qfq.c b/net/sched/sch_qfq.c
+index d920f57dc6d7..f4013b547438 100644
+--- a/net/sched/sch_qfq.c
++++ b/net/sched/sch_qfq.c
+@@ -1481,7 +1481,7 @@ static void qfq_reset_qdisc(struct Qdisc *sch)
  
- 	iowrite32(ctrl, ctx->base + ASPEED_MDIO_CTRL);
-+	/* Workaround for read-after-write issue.
-+	 * The controller may return stale data if a read follows immediately
-+	 * after a write. A dummy read forces the hardware to update its
-+	 * internal state, ensuring that the next real read returns correct data.
-+	 */
-+	(void)ioread32(ctx->base + ASPEED_MDIO_CTRL);
+ 	for (i = 0; i < q->clhash.hashsize; i++) {
+ 		hlist_for_each_entry(cl, &q->clhash.hash[i], common.hnode) {
+-			if (cl->qdisc->q.qlen > 0)
++			if (cl_is_active(cl))
+ 				qfq_deactivate_class(q, cl);
  
- 	return readl_poll_timeout(ctx->base + ASPEED_MDIO_CTRL, ctrl,
- 				!(ctrl & ASPEED_MDIO_CTRL_FIRE),
-
----
-base-commit: 8f7aa3d3c7323f4ca2768a9e74ebbe359c4f8f88
-change-id: 20251205-aspeed_mdio_add_dummy_read-d58d1e49412d
-
-Best regards,
+ 			qdisc_reset(cl->qdisc);
 -- 
-Jacky Chou <jacky_chou@aspeedtech.com>
+2.43.0
 
 
