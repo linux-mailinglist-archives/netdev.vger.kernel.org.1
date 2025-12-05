@@ -1,61 +1,53 @@
-Return-Path: <netdev+bounces-243812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04B14CA7D6A
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 14:52:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 76558CA7DA8
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 14:57:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 93C55301C4A0
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 13:52:43 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C271C3020076
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 13:57:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 325D7331A5C;
-	Fri,  5 Dec 2025 13:52:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dlqjxq1o"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 550FF32E735;
+	Fri,  5 Dec 2025 13:57:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9037331A78;
-	Fri,  5 Dec 2025 13:52:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EDE32D0615;
+	Fri,  5 Dec 2025 13:56:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764942761; cv=none; b=tj+xh9zZBG9Afwa1w12Um1AMwtkG05Z1LfRxliiCXCiNbVeNsKVi9VbteCNToYHcQjqTVouuX98JzP64KgHI8uPpYDGoLQIMlnAV4L0eDl/AxdJXWpudmdsdlRhrDTFL675uRtw1aXLOnIVB/dWNiOBWudJrvxRQHsSdG6lFCy0=
+	t=1764943020; cv=none; b=CguMsaGxsBXknVX5I3Kx0gW6XZmY1+9TqngiX03AbzgL6k2OOACwyKvZ64N1/7H0L5ubeUb78qotzIayn4uXHkNdC1iOBbPl1EeRNvjvTx2l1gCBqYwppfThSKGStM+0ikiPekVH7V++EEOyJ+Cd3lDUFC0hFASmTa9OYuaRABQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764942761; c=relaxed/simple;
-	bh=iZ+UHCI1S0q19BIbsV/450wftS7aT7Q9oKxHP8vIzfY=;
+	s=arc-20240116; t=1764943020; c=relaxed/simple;
+	bh=4vK8RvSUu+HXFJGIIiwMijQir3CuNO9sYtLER/WeW9A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Oa4zZjR5IDKcBX5c980VPMJqg/zHV3++VV+cIk9vixBNAsJak8hECkp8YthphwJunNAnMsfO86PTY4VtHDrmbEY/6d1qySBvn03rGFFOZ68QRsVKJ3i/wHiG7oZMCYa+nXZjyQT+rHhNNJlHNbRn6XHpKzAPV1CEC48PvaLiu5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dlqjxq1o; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=45fevIuzzwdxiIaiuDVXIFaxf4ZsoS1h5rOMT7+v7qs=; b=dlqjxq1oVt9Er6eo9vth9vX0gR
-	eztKjUHcbALGVrKoPeu0Vvd/09R/aNtIbQtbYNm9rPcjYBV68HyB0YxkIGbjpEoMqNbls4/tE3p8y
-	ifODQ2BErblRzyYv9e/ZaWvhI6CnU/FWJBZWquJc0kvSq9VWaRwl2eUEBXudw8IYLYh0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vRWEG-00G5sa-09; Fri, 05 Dec 2025 14:52:12 +0100
-Date: Fri, 5 Dec 2025 14:52:11 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jacky Chou <jacky_chou@aspeedtech.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=bUae6Q2uSkTCEovd6wGeSAPcO+hwWkdqMYqyoM91rx3S4uvCFbdzC0YFQzu9cm8E02UoInr3AERWhAWea5QQrpn6tz/7X2NfCYjSgIY+s8RO6AT5DRaNT4hVN/ElJ12fwtCoc21UFX0zgXjC1s5J3dct1jlsjNT7sCGN0ZiN+jU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1vRWIg-000000005gG-3xQH;
+	Fri, 05 Dec 2025 13:56:47 +0000
+Date: Fri, 5 Dec 2025 13:56:39 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Hauke Mehrtens <hauke@hauke-m.de>, Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Joel Stanley <joel@jms.id.au>,
-	Andrew Jeffery <andrew@codeconstruct.com.au>,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-aspeed@lists.ozlabs.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: mdio: aspeed: add dummy read to avoid
- read-after-write issue
-Message-ID: <230147e8-e27b-48e1-9a62-7aa8abc3f492@lunn.ch>
-References: <20251205-aspeed_mdio_add_dummy_read-v1-1-60145ae20ea7@aspeedtech.com>
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Rasmus Villemoes <ravi@prevas.dk>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: Re: [PATCH net] net: dsa: mxl-gsw1xx: manually clear RANEG bit
+Message-ID: <aTLkl0Zey4u4P8x6@makrotopia.org>
+References: <ab836f5d36e3f00cd8e2fb3e647b7204b5b6c990.1764898074.git.daniel@makrotopia.org>
+ <97389f24-d900-4ff0-8a80-f75e44163499@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,46 +56,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251205-aspeed_mdio_add_dummy_read-v1-1-60145ae20ea7@aspeedtech.com>
+In-Reply-To: <97389f24-d900-4ff0-8a80-f75e44163499@lunn.ch>
 
-On Fri, Dec 05, 2025 at 09:37:22AM +0800, Jacky Chou wrote:
-> The Aspeed MDIO controller may return incorrect data when a read operation
-> follows immediately after a write. Due to a controller bug, the subsequent
-> read can latch stale data, causing the polling logic to terminate earlier
-> than expected.
+On Fri, Dec 05, 2025 at 02:45:35PM +0100, Andrew Lunn wrote:
+> On Fri, Dec 05, 2025 at 01:32:20AM +0000, Daniel Golle wrote:
+> > Despite being documented as self-clearing, the RANEG bit sometimes
+> > remains set, preventing auto-negotiation from happening.
+> > 
+> > Manually clear the RANEG bit after 10ms as advised by MaxLinear, using
+> > delayed_work emulating the asynchronous self-clearing behavior.
 > 
-> To work around this hardware issue, insert a dummy read after each write
-> operation. This ensures that the next actual read returns the correct
-> data and prevents premature polling exit.
+> Maybe add some text why the complexity of delayed work is used, rather
+> than just a msleep(10)?
 > 
-> This workaround has been verified to stabilize MDIO transactions on
-> affected Aspeed platforms.
-> 
-> Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
+> Calling regmap_read_poll_timeout() to see if it clears itself could
+> optimise this, and still be simpler.
 
-This seems like a bug fix. Please add a Fixes: tag, for base it on
-net, not net-next.
-
-> ---
->  drivers/net/mdio/mdio-aspeed.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/drivers/net/mdio/mdio-aspeed.c b/drivers/net/mdio/mdio-aspeed.c
-> index e55be6dc9ae7..00e61b922876 100644
-> --- a/drivers/net/mdio/mdio-aspeed.c
-> +++ b/drivers/net/mdio/mdio-aspeed.c
-> @@ -62,6 +62,12 @@ static int aspeed_mdio_op(struct mii_bus *bus, u8 st, u8 op, u8 phyad, u8 regad,
->  		| FIELD_PREP(ASPEED_MDIO_DATA_MIIRDATA, data);
->  
->  	iowrite32(ctrl, ctx->base + ASPEED_MDIO_CTRL);
-> +	/* Workaround for read-after-write issue.
-
-Blank line before the comment please.
-
-    Andrew
-
----
-pw-bot: cr
-
-
+Is the restart_an() operation allowed to sleep? Looking at other
+drivers I only ever see that it sets a self-clearing AN RESTART bit,
+never waiting for that bit to clear. Hence I wanted to immitate
+that behavior by clearing the bit asynchronously. If that's not needed
+and msleep(10) or usleep_range(10000, 20000) can be used instead that'd
+be much easier, of course.
 
