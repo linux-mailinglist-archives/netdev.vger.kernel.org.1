@@ -1,315 +1,147 @@
-Return-Path: <netdev+bounces-243820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89F02CA7E6B
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 15:12:04 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15021CA7EAB
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 15:20:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E96C13017EEC
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 14:11:19 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 22DB7300C2AA
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 14:20:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 756DB3164D4;
-	Fri,  5 Dec 2025 14:11:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="ZvMeTDQI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88E4A2EBDE0;
+	Fri,  5 Dec 2025 14:20:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB5E3019C0;
-	Fri,  5 Dec 2025 14:11:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C93D2745C;
+	Fri,  5 Dec 2025 14:20:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764943878; cv=none; b=OQ1FE9HYFlanMcs92W/rvAjxLSTb3GXKOONtLYMj1oYHBwWsiBam2FP1TFKSUkBhdEMRJoQrpVO2HiJMwlNHg0InrLfglnhfwbBt7Y2RbYIUh69nl1BXIi4t3a05hm9COwZQOUOgxgMCpsQyr6RUkJ8wqw+rf5Udbzl06YYMhkY=
+	t=1764944438; cv=none; b=cOoVvALkqmtGNz25bMzvtQyOoEPF9PX/9dOefNb1UGU9iM0CPMXycVD1aEffcG60WLTOstZglSxVn7Ff+NSBzhqpboDxqli2tnW1Oj8efscgCYXzA7LlEl626TgSLLKjNaVscOX1nJi+M2rwQySASTD3DKAo62nLgFCI+FkSRNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764943878; c=relaxed/simple;
-	bh=9UFO7eLpw8bigL8daczZuSlb/8NtC8KMi7AhTrkMb6I=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=rnv/SDI7UtX5/xJ91/45aR/lcsKMec01rF/GkjMVG+SCh1GR1VTK/JJ8XhVr26t+EALgqXO6YMZCWloMeHayDBfH1dzIKzQ0M9Bk6vBt/vmH4PHaVYUS40HolOR9WZAQk63/nDG5s8aeErixTR424dqdEHh0iPn7lRaXU5kqaJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=ZvMeTDQI; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 689136059D;
-	Fri,  5 Dec 2025 15:11:03 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1764943863;
-	bh=KnDNmXS7aQQAXCmf1CuquJ+3p3MpgXRkWi//YCtczCc=;
-	h=Date:From:To:Cc:Subject:From;
-	b=ZvMeTDQIXxOQg0w8igW1VLRSEJbdJX2UW1VQ8+U41IrEQ3U1FB1fmsQiBaTyNbipY
-	 Ne8oB5wH9exUwoD2HqMt8dpmStiTahB8i3TMAOaxwctggc2Lp1I5d56oEFHb8NHfSq
-	 VN1r/nEP4Z+5zxHNuePRQLSmPzQrv8p5i9cPxOLS+VtpUW/iAeQ5PbbXBz5Gf3GY+t
-	 7Y+/nSBxavisETqB8eOrle7JsD2nwpY6AKeJxo8IOh6qy4/+f5nmkY2JtvRIMo9WUh
-	 jffve9J7OZ1F5EvB9Rh5l8P4uTG2BALzdyvNfGBYaWaPOw8zoX5GxdKpR+LaIjE7Go
-	 LXQBQutfC9gQQ==
-Date: Fri, 5 Dec 2025 15:11:00 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org, netfilter@vger.kernel.org
-Cc: netfilter-announce@lists.netfilter.org, lwn@lwn.net,
-	netdev@vger.kernel.org
-Subject: [ANNOUNCE] nftables 1.1.6 release
-Message-ID: <aTLn9DVZSFeGN3IP@chamomile>
+	s=arc-20240116; t=1764944438; c=relaxed/simple;
+	bh=6qWcomkKsDORhle21oPalA9U/qkT+YrO0YTpij/7ts8=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
+	 In-Reply-To:Content-Type; b=MeK7PownhtORQYzsyWaEpi88FAYb2KQqJxW7lnuuXIKCFl4ry3cfM+pbly3WlTGkwDlBYjAtjtxWbmjOtKxxBD3FF0xQp/BOqBORvRUdylmjW68dYHU+YrfwMNr3nQU8xRSIXBUHA0hahnarOJQiT1U6M+HnswtH5nntVtBK/B8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 5B5EKDgk082831;
+	Fri, 5 Dec 2025 23:20:13 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 5B5EKDr9082828
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Fri, 5 Dec 2025 23:20:13 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <8f90fba8-60b9-46e2-8990-45311c7b1540@I-love.SAKURA.ne.jp>
+Date: Fri, 5 Dec 2025 23:20:11 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="hXluNPoobgnnRiTf"
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [rdma/siw] unregister_netdevice: waiting for bond0 to become
+ free. Usage count = 3
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+To: Bernard Metzler <bernard.metzler@linux.dev>,
+        OFED mailing list <linux-rdma@vger.kernel.org>,
+        Network Development <netdev@vger.kernel.org>
+References: <30ec01df-6c32-490c-aa26-c41653f5a257@I-love.SAKURA.ne.jp>
+Content-Language: en-US
+In-Reply-To: <30ec01df-6c32-490c-aa26-c41653f5a257@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Virus-Status: clean
+X-Anti-Virus-Server: fsav404.rs.sakura.ne.jp
+
+On 2025/11/25 23:31, Tetsuo Handa wrote:
+> The output from the debug printk() patch is attached (because it has 2500 lines).
+> You can see that there is one alloc_gid_entry() call in bond0[74] but there is
+> no corresponding put_gid_ndev() call. I suspect that there is a refcount leak in
+> "struct ib_gid_table_entry" handling. Where should we check next?
+
+Another debug printk() patch in next-20251204 reported that there is a refcount
+leak in "struct ib_gid_table_entry" handling.
+
+Is serialization between creating a new ib_gid_table_entry and deleting existing
+ib_gid_table_entry properly implemented (like a similar case explained in
+https://lkml.kernel.org/r/85b701a9-511d-4cf2-8c9c-5fade945f187@I-love.SAKURA.ne.jp ) ?
+Don't we need to check ndev->reg_state when creating a new ib_gid_table_entry (like
+https://lkml.kernel.org/r/b9653191-d479-4c8b-8536-1326d028db5c@I-love.SAKURA.ne.jp does) ?
+
+Regards.
 
 
---hXluNPoobgnnRiTf
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 
-Hi!
+unregister_netdevice: waiting for ������ to become free. Usage count = 3
+ref_tracker: netdev@ffff88805e01c628 has 1/1 users at
+     __netdev_tracker_alloc include/linux/netdevice.h:4415 [inline]
+     netdev_hold include/linux/netdevice.h:4444 [inline]
+     ib_device_set_netdev+0x2e1/0x6d0 drivers/infiniband/core/device.c:2253
+     rxe_register_device+0x1bb/0x350 drivers/infiniband/sw/rxe/rxe_verbs.c:1552
+     rxe_net_add+0x81/0x110 drivers/infiniband/sw/rxe/rxe_net.c:586
+     rxe_newlink+0xdd/0x190 drivers/infiniband/sw/rxe/rxe.c:234
+     nldev_newlink+0x4a5/0x5a0 drivers/infiniband/core/nldev.c:1797
+     rdma_nl_rcv_msg drivers/infiniband/core/netlink.c:-1 [inline]
+     rdma_nl_rcv_skb drivers/infiniband/core/netlink.c:239 [inline]
+     rdma_nl_rcv+0x6ae/0x980 drivers/infiniband/core/netlink.c:259
+     netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+     netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1344
+     netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1894
+     sock_sendmsg_nosec+0x18f/0x1d0 net/socket.c:728
+     __sock_sendmsg net/socket.c:743 [inline]
+     ____sys_sendmsg+0x577/0x880 net/socket.c:2601
+     ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2655
+     __sys_sendmsg net/socket.c:2687 [inline]
+     __do_sys_sendmsg net/socket.c:2692 [inline]
+     __se_sys_sendmsg net/socket.c:2690 [inline]
+     __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2690
+     do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+     do_syscall_64+0xfa/0xf80 arch/x86/entry/syscall_64.c:94
+     entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-The Netfilter project proudly presents:
+Call trace for ������@ffff8880254b5f00 +1 at
+     alloc_gid_entry drivers/infiniband/core/cache.c:410 [inline]
+     add_modify_gid+0x317/0xcc0 drivers/infiniband/core/cache.c:550
+     __ib_cache_gid_add+0x230/0x370 drivers/infiniband/core/cache.c:681
+     ib_cache_gid_set_default_gid+0x5f9/0x710 drivers/infiniband/core/cache.c:960
+     add_default_gids drivers/infiniband/core/roce_gid_mgmt.c:469 [inline]
+     enum_all_gids_of_dev_cb+0x17d/0x270 drivers/infiniband/core/roce_gid_mgmt.c:495
+     ib_enum_roce_netdev+0x1ab/0x2e0 drivers/infiniband/core/device.c:2419
+     gid_table_setup_one drivers/infiniband/core/cache.c:1033 [inline]
+     ib_cache_setup_one+0x428/0x5e0 drivers/infiniband/core/cache.c:1711
+     ib_register_device+0xfbe/0x1400 drivers/infiniband/core/device.c:1454
+     rxe_register_device+0x1e3/0x350 drivers/infiniband/sw/rxe/rxe_verbs.c:1556
+     rxe_net_add+0x81/0x110 drivers/infiniband/sw/rxe/rxe_net.c:586
+     rxe_newlink+0xdd/0x190 drivers/infiniband/sw/rxe/rxe.c:234
+     nldev_newlink+0x4a5/0x5a0 drivers/infiniband/core/nldev.c:1797
+     rdma_nl_rcv_msg drivers/infiniband/core/netlink.c:-1 [inline]
+     rdma_nl_rcv_skb drivers/infiniband/core/netlink.c:239 [inline]
+     rdma_nl_rcv+0x6ae/0x980 drivers/infiniband/core/netlink.c:259
+     netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+     netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1344
+     netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1894
+     sock_sendmsg_nosec+0x18f/0x1d0 net/socket.c:728
+Call trace for ������@ffff8880254b5f00 +4 at
+     get_gid_entry drivers/infiniband/core/cache.c:435 [inline]
+     rdma_get_gid_attr+0x2ee/0x3f0 drivers/infiniband/core/cache.c:1300
+     smc_ib_fill_mac net/smc/smc_ib.c:160 [inline]
+     smc_ib_remember_port_attr net/smc/smc_ib.c:369 [inline]
+     smc_ib_port_event_work+0x196/0x940 net/smc/smc_ib.c:388
+     process_one_work+0x93a/0x15a0 kernel/workqueue.c:3261
+Call trace for ������@ffff8880254b5f00 -4 at
+     put_gid_entry drivers/infiniband/core/cache.c:441 [inline]
+     rdma_put_gid_attr+0x7c/0x130 drivers/infiniband/core/cache.c:1381
+     smc_ib_fill_mac net/smc/smc_ib.c:165 [inline]
+     smc_ib_remember_port_attr net/smc/smc_ib.c:369 [inline]
+     smc_ib_port_event_work+0x1d4/0x940 net/smc/smc_ib.c:388
+     process_one_work+0x93a/0x15a0 kernel/workqueue.c:3261
+balance for ������@ib_gid_table_entry is 1
 
-        nftables 1.1.6
-
-This release contains fixes:
-
-- Complete lightweight tunnel template support, including vxlan, geneve
-  and erspan, eg.
-
-       table netdev global {
-              tunnel t1 {
-                      id 10
-                      ip saddr 192.168.2.10
-                      ip daddr 192.168.2.11
-                      sport 1025
-                      dport 20020
-                      ttl 1
-                      erspan {
-                              version 1
-                              index 2
-                      }
-              }
- 
-              tunnel t2 {
-                      id 10
-                      ip saddr 192.168.3.10
-                      ip daddr 192.168.3.11
-                      sport 1025
-                      dport 21021
-                      ttl 1
-                      erspan {
-                              version 1
-                              index 2
-                      }
-              }
-   
-              chain in {
-                      type filter hook ingress device veth0 priority 0;
-    
-                      tunnel name ip saddr map { 10.141.10.12 : "t1", 10.141.10.13 : "t2" } fwd to erspan1
-              }
-       }
-
-   You have to create the erspan1 interface before loading your ruleset.
-
-       ip link add dev erspan1 type erspan external
-
-- Support for wildcard in netdev hooks, eg. add a basechain to filter
-  ingress traffic for all existing vlan devices:
-
-       table netdev t {
-              chain c {
-                      type filter hook ingress devices = { "vlan*", "veth0" } priority filter; policy accept;
-              }
-       }
-
-- Support to pass up bridge frame to the bridge device for local
-  processing, eg. pass up all bridge frames for de:ad:00:00:be:ef
-  to the IP stack:
-
-    table bridge global {
-            chain pre {
-                    type filter hook prerouting priority 0; policy accept;
-                    ether daddr de:ad:00:00:be:ef meta pkttype set host ether daddr set meta ibrhwaddr accept
-            }
-    }
-
-  The new meta ibrhwaddr provides the bridge hardware address which
-  can be used to mangle the destination address.
-
-  This requires a Linux kernel >= 6.18.
-
-- New afl++ (american fuzzy lop++) fuzzer infrastructure, enable it with:
-
-        ./configure --with-fuzzer
-
-  and read tests/afl++/README to build and run tools/nft-afl.
-
-- fib expression incorrect bytecode for Big Endian.
-
-  Instead of:
-
-       [ fib saddr . iif oif present => reg 1 ]
-       [ cmp eq reg 1 0x01000000 ]
-
-  generate:
-
-       [ fib saddr . iif oif present => reg 1 ]
-       [ cmp eq reg 1 0x00000001 ]
-
-  among other Big Endian fixes.
-
-... and man nft(8) documentation updates and more small fixes.
-
-See changelog for more details (attached to this email).
-
-You can download this new release from:
-
-https://www.netfilter.org/projects/nftables/downloads.html
-https://www.netfilter.org/pub/nftables/
-
-To build the code, libnftnl >= 1.3.1 and libmnl >= 1.0.4 are required:
-
-* https://netfilter.org/projects/libnftnl/index.html
-* https://netfilter.org/projects/libmnl/index.html
-
-Visit our wikipage for user documentation at:
-
-* https://wiki.nftables.org
-
-For the manpage reference, check man(8) nft.
-
-In case of bugs and feature requests, file them via:
-
-* https://bugzilla.netfilter.org
-
-Happy firewalling.
-
---hXluNPoobgnnRiTf
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: attachment; filename="changes-nftables-1.1.6.txt"
-Content-Transfer-Encoding: 8bit
-
-Christoph Anton Mitterer (8):
-      doc: clarify evaluation of chains
-      doc: minor improvements with respect to the term “ruleset”
-      doc: describe include’s collation order to be that of the C locale
-      doc: fix/improve documentation of jump/goto/return
-      doc: add more documentation on bitmasks and sets
-      doc: add overall description of the ruleset evaluation
-      doc: fix/improve documentation of verdicts
-      doc: minor improvements the `reject` statement
-
-Fernando Fernandez Mancera (7):
-      tunnel: add vxlan support
-      tunnel: add tunnel object and statement json support
-      tests: add tunnel shell and python tests
-      meta: introduce meta ibrhwaddr support
-      tests: shell: add packetpath test for meta ibrhwaddr
-      rule: add missing documentation for cmd_obj enum
-      tunnel: add missing tunnel object list support
-
-Florian Westphal (19):
-      tests: shell: skip two bitwise tests if multi-register support isn't available
-      tests: py: objects.t: must use input, not output
-      src: tunnel: handle tunnel delete command
-      tests: shell: add regression tests for set flush+add bugs
-      tests: shell: fix name based checks with CONFIG_MODULES=n
-      tests: shell: type_route_chain: use in-tree nftables, not system-wide one
-      tests: shell: add packetpath test for reject statement
-      evaluate: tunnel: don't assume src is set
-      src: tunnel src/dst must be a symbolic expression
-      src: parser_bison: prevent multiple ip daddr/saddr definitions
-      evaluate: reject tunnel section if another one is already present
-      src: fix fmt string warnings
-      src: parser_json: fix format string bugs
-      evaluate: follow prefix expression recursively if needed
-      doc: remove queue from verdict list
-      src: add refcount asserts
-      support for afl++ (american fuzzy lop++) fuzzer
-      src: move fuzzer functionality to separate tool
-      build: unbreak 'make distcheck'
-
-Georg Pfuetzenreuter (1):
-      doc: fix tcpdump example
-
-Gyorgy Sarvari (1):
-      tests: shell: fix typo in vmap_timeout test script
-
-Jeremy Sowden (2):
-      doc: fix some man-page mistakes
-      build: don't install ancillary files without systemd service file
-
-Pablo Neira Ayuso (23):
-      src: add tunnel template support
-      tunnel: add erspan support
-      src: add tunnel statement and expression support
-      tunnel: add geneve support
-      src: add expr_type_catchall() helper and use it
-      src: replace compound_expr_add() by type safe set_expr_add()
-      src: replace compound_expr_add() by type safe concat_expr_add()
-      src: replace compound_expr_add() by type safe list_expr_add()
-      segtree: rename set_compound_expr_add() to set_expr_add_splice()
-      expression: replace compound_expr_clone() by type safe function
-      expression: remove compound_expr_add()
-      expression: replace compound_expr_remove() by type safe function
-      expression: replace compound_expr_destroy() by type safe funtion
-      expression: replace compound_expr_print() by type safe function
-      src: replace compound_expr_alloc() by type safe function
-      evaluate: simplify set to list normalisation for device expressions
-      tests: shell: combine flowtable devices with variable expression
-      parser_bison: remove leftover utf-8 character in error
-      libnftables: do not re-add default include directory in include search path
-      rule: skip CMD_OBJ_SETELEMS with no elements after set flush
-      tests: shell: add device to sets/0075tunnel_0 to support older kernels
-      tests: shell: refer to python3 in json prettify script
-      build: Bump version to 1.1.6
-
-Phil Sutter (38):
-      table: Embed creating nft version into userdata
-      tools: gitignore nftables.service file
-      monitor: Quote device names in chain declarations, too
-      tests: monitor: Label diffs to help users
-      tests: monitor: Fix regex collecting expected echo output
-      tests: monitor: Test JSON echo mode as well
-      tests: monitor: Extend debug output a bit
-      Makefile: Fix for 'make CFLAGS=...'
-      mnl: Allow for updating devices on existing inet ingress hook chains
-      monitor: Inform JSON printer when reporting an object delete event
-      tests: monitor: Extend testcases a bit
-      tests: monitor: Excercise all syntaxes and variants by default
-      tests: py: Enable JSON and JSON schema by default
-      tests: Prepare exit codes for automake
-      tests: json_echo: Skip if run as non-root
-      tests: shell: Skip packetpath/nat_ftp in fake root env
-      tests: build: Do not assume caller's CWD
-      tests: build: Avoid a recursive 'make check' run
-      Makefile: Enable support for 'make check'
-      fib: Fix for existence check on Big Endian
-      mnl: Support simple wildcards in netdev hooks
-      parser_bison: Accept ASTERISK_STRING in flowtable_expr_member
-      tests: shell: Test ifname-based hooks
-      mnl: Drop asterisk from end of NFTA_DEVICE_PREFIX strings
-      datatype: Fix boolean type on Big Endian
-      optimize: Fix verdict expression comparison
-      tests: py: any/tcpopt.t.json: Fix JSON equivalent
-      tests: py: any/ct.t.json.output: Drop leftover entry
-      tests: py: inet/osf.t: Fix element ordering in JSON equivalents
-      tests: py: Fix for using wrong payload path
-      tests: py: Implement payload_record()
-      tests: py: Do not rely upon '[end]' marker
-      netlink: No need to reference array when passing as pointer
-      datatype: Increase symbolic constant printer robustness
-      tests: py: ip6/vmap.t: Drop double whitespace in rule
-      netlink: Zero nft_data_linearize objects when populating
-      utils: Cover for missing newline after BUG() messages
-      doc: libnftables-json: Describe RULESET object
-
-Ronan Pigott (1):
-      doc: don't suggest to disable GSO
-
-Yi Chen (1):
-      tests: shell: add packetpath test for meta time expression.
-
-
---hXluNPoobgnnRiTf--
 
