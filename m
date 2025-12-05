@@ -1,414 +1,304 @@
-Return-Path: <netdev+bounces-243691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BD43CA5FD8
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 04:21:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EE0BDCA608A
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 04:49:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 493AF314C7C1
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 03:21:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8BCFA31A145A
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 03:49:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EEA7231A41;
-	Fri,  5 Dec 2025 03:21:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC4B122126D;
+	Fri,  5 Dec 2025 03:49:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hylp3x8p"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XWhAvi2E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 738C5398FAE
-	for <netdev@vger.kernel.org>; Fri,  5 Dec 2025 03:21:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E0918DB35
+	for <netdev@vger.kernel.org>; Fri,  5 Dec 2025 03:49:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764904899; cv=none; b=HGwd0zDMLC5JC0CVWwBnbz1EY0sdq+lItIJMKFmd0WsQO9tdO4eKGE7qt743zotawDd5kSN1rkhGasKqMpvEUuKwI47at7RupCZgzx5cA8mys5S/RXKZydMfZouKyx4z7beiutOW9FEZ6gmVkDs19/AssIFSfc681Qb0FfIEkok=
+	t=1764906542; cv=none; b=XqDo4yKpvq1xBk8n6nmAwgQst4joc7LDxube8YqWywZHuZF2JUqvyROiJ2tkNO6nM/7/w+qqz05lxq3wVJOaGV1L+fI38LFGmuVLjdNBAFBNUxadoG1ktQLPKkV5joFQZPl3P8/FSo0FDRYLKfszUENwHkurlikm/9mANS9QlrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764904899; c=relaxed/simple;
-	bh=tdQpq8KtsAhifFBJ5EUINCYXegPYICdtiyTs4DNjNGw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=K1IZFvo1BHUjlR+vzOzcgTt3Az8cb5cHlsMs+1zcC+m6Tk3tAINIC8HQcUt+5IOrSK9CE6ur5Wl/E/G2KUKJtHYFoo70VAJtWUAJgdx2hKcPrUn6nMs+phAsJlGLKyFYIPHFYkqmA7EQWHCKHfQV7pKZK/WYIEdGAeps4amoQYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hylp3x8p; arc=none smtp.client-ip=74.125.224.41
+	s=arc-20240116; t=1764906542; c=relaxed/simple;
+	bh=3STjZMvZGruhTg8FZAxnCcajn5vkV5nAjjwgv99KJIs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BgpxCZ4JvnXQy+MEnhRn6X2IAV4oMcLibx1xTgzYpnD3L8tYVuHbWdXEPeqlndgneU4utOql7ZMQAcu47bszNaj4kvcox1rFxZhbjGjOFpB6+nSqvNZOgBznHJqPQZrpaidpqW2ZWdCA7crUkznJa4Vbm8ya3TmV677tPs2bAMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XWhAvi2E; arc=none smtp.client-ip=209.85.210.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-640daf41b19so2479695d50.0
-        for <netdev@vger.kernel.org>; Thu, 04 Dec 2025 19:21:37 -0800 (PST)
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7b80fed1505so1863023b3a.3
+        for <netdev@vger.kernel.org>; Thu, 04 Dec 2025 19:49:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764904896; x=1765509696; darn=vger.kernel.org;
-        h=in-reply-to:autocrypt:from:content-language:references:cc:to
-         :subject:user-agent:mime-version:date:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=3Gfb+G4Xqn8iVthS3zH39ymyQ0QKD6SdgqRFKPDJvqg=;
-        b=Hylp3x8pFCaU73/zSs241iZWnruTdCb/WgIUXe0MnK9JwYsWP+C3AUSwkBQ9vFJHgR
-         Nf/YVCZmomGYHE/usBWA5lBzhxbr2n501gO97QH8UMqIbw+UjNZO/bFgGA1EMATfUkSg
-         7iJeaMy+9T1HamCn5OfH4rhTbHdryWRBlHjZhONiYyCV00yrLTdxkT3edgW+3DJOkQi3
-         rrZvSSJVr6qHPIoc27H4OEvYDVqdrkaJS+EI5KAy/9X24HgQpFoG8162TZFDjenIwrHg
-         WTf8Q4rQDCFfFVe2+GSdNuqlhfLOceS+5skCm4mO17HOqjomJK6cOWo3vNjOJp042pyH
-         vjlg==
+        d=gmail.com; s=20230601; t=1764906540; x=1765511340; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HfGYu8tlT+v5FKtpKu3jG09y1CFNCQI1JR5ty/+MzwQ=;
+        b=XWhAvi2EYQfrTm/zbfD57NrjqyXDzIon3j16U65PTzmnh6G34O+fwfQ1aVwcjpevLq
+         Ly9/6v0SCjbA/99EPC1KRQvIPxznLUylqFY1+JMs9DAWxo8ELKyhiuxKsN+fV+nEAApI
+         iSDU8Xjy8pG9v5lKO+H/XIakaIHAE6cE6hR6GfK2DCytcnvPkUZH5ui/FMH1B/pHHS2w
+         /Yusrxrz1xt0Xsy7fa0lm18pr9UFILkSVtvZX0DKCtlCh4F9OQyUbteQgIokVjnrqtzG
+         hcv2nJpit2+0MdMx/R+h0o5SC+ynhJ6ApxdsneURmmuD9x9szNaqC+ly8UjXE3V4NGP6
+         cihA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764904896; x=1765509696;
-        h=in-reply-to:autocrypt:from:content-language:references:cc:to
-         :subject:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3Gfb+G4Xqn8iVthS3zH39ymyQ0QKD6SdgqRFKPDJvqg=;
-        b=ToQFJV535rvt32/eILDSPSRFgXx50m/W72USxUPgEnQ9Wf5mQP0YGq8coJSnr0HqlU
-         +A2pJgRzcdRotpYSAzA6HTvZ8dHqFYe37nGx8VbszgS1ZBmMIsDFfRa4/7O5YDaxVqEb
-         GYmK3szRZztDwmZCKpvaZluoG2asiOkuts9YbxfR1ZVHPXpD2YMxcCb2va1AOc+PFECa
-         A426wE7Z93LlVXvwIj57TlpUASY661EkufLxa8ZLVwuJfrlBbOJ0yDx8SY9ONhzkEqQZ
-         gZ9JNVHwxbYPLVUxb/fixxGJ7zqvbt01FdMAKX5wJxK1lL2ZwPe10XZlfaosq1RU1vJA
-         bAkA==
-X-Forwarded-Encrypted: i=1; AJvYcCUzwLTjkepBxduVHBQbvIvFja5bbQeKxUGuhIE+GNmcK6tDbCPK99VK6FLV2gvKR3d4R+GMTWQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwREMu/9XI2AyztasgdiIdack4iqsmGfrDxPMPPtLdKIh6tLa3M
-	zw/hQaQZayyYxiVptgH+3JJm2KNpeLUFjj3ObJjwuziJgVrAuF8QOukjOvReXw==
-X-Gm-Gg: ASbGncv8Y2fcrs81xoTX90SXZ7NiZBvkl9Hz0orZDn4NYJl5WLnvNUstWVV8CdVe+fy
-	Sv49rDOufPq0BXSqRdo2183wglCv927s1hW7NoyWeZiOb4Bs8PoEiXdCvExx6HDwsFzMw/iX5+z
-	un5XRiHamPGmwweuQ7PkIYgI7nm82Tb9aDuLL9l4fY5B6cKqHdxguFyuCUVASY/G5xu+MaxkrNy
-	wz+fOnf1OwbR/LoG9Cxn6LYUVxiQH1s1P/eROcqS+p/nh1WTSZBiIVV/RnIZdkpE5t7zZbOy3Dm
-	uTsNBsRdmNFUsaPWZTqvLOk86ad2yDAGDbZFIPDGjYXXFSX4oFT+e/EhSmL7WbqvzYd3XSwWB81
-	CPdw8nRS4zQYcOfmQ94L1swt4F5z4M+H6qFISVh24RkkL6WdkC4iS18WVHWagHiMAl4gjM0n/WP
-	9CKgjIfphehDG9Nc7MZHMpITmXkb9E9meNQ2jdV1wYUoJ3ipRfZJ7ZSegxKizWf3KNA0D6jVnfj
-	gkuENDGLQ7P8JGXixNUftXjH48=
-X-Google-Smtp-Source: AGHT+IEYSuxU0PtRMVeYQ3r6fJe2/khNATozZUlGJ2CmRRy6XTKm8WabDDTiWpEpMJuZP5TEdj8r3A==
-X-Received: by 2002:a05:690e:1697:b0:641:f5bc:692c with SMTP id 956f58d0204a3-6443d759149mr4594711d50.37.1764904896124;
-        Thu, 04 Dec 2025 19:21:36 -0800 (PST)
-Received: from [10.138.34.110] (h96-60-249-169.cncrtn.broadband.dynamic.tds.net. [96.60.249.169])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-78c1b779437sm12500447b3.33.2025.12.04.19.21.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Dec 2025 19:21:35 -0800 (PST)
-Message-ID: <2af9d46e-647c-44a7-8c19-32a749408130@gmail.com>
-Date: Thu, 4 Dec 2025 22:21:29 -0500
+        d=1e100.net; s=20230601; t=1764906540; x=1765511340;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HfGYu8tlT+v5FKtpKu3jG09y1CFNCQI1JR5ty/+MzwQ=;
+        b=n+KokmA4D7+K/VdAF0sOFXFfGsKnmzBS/TKEhsjRexUCgdlVdObjPT1vmTHQKjfv8E
+         MLpwSnsySsk2KoLzC4fVy0MJkO/vw/l1V92LEfY4xQx2Oto4nooHC0O7AIDdOWYd3Y7j
+         paBEQvAM8ZAvuKVHu9Cbb7Ispi2fI+z92fUoUcyHGySS9c/jgyhmncIe4lUvjKiwoJGo
+         47G7RqnvkSHz8M7xMUX9URgxiYH3NVtcXIfB6HNviARi06FuOddL4zSWomwEam9yPRx4
+         SeLXK5lKJVY1Z4wC6sgX0jxsB8z6fe63V0Uek6b5UOef9lkCSSeNEEvVCOXgDQhHbsO4
+         +Xig==
+X-Gm-Message-State: AOJu0Ywp2z1B7JEksBjsNyE1L6Nyg1PXTcdwXno6v5ghAEeQFDA/K1Qi
+	mBoLciDHGYo3YGxSFqr2zDlJtJZGBKbXeDhbAp3TU+3Azfp+3BMN9mcu
+X-Gm-Gg: ASbGncsXWm+wzREL+WJlqBVt8nJ4/zBn9AuhPhwS4pNov1UBRqZGjLiV5Tsu1D6Xp5C
+	Tib4gFVHAkmV4LuR4PAh+frTYd04NWJ++dM0hsxNCogpiSve6kltHremsX91kc2t5aypkk3lQoy
+	SWXWEhD16Cr8NjCcjTDBsBQA/UNSwbeRkhEPBUNhxorixj8VJor/NYLHbUe2FYtdKMFxVwwWKb0
+	uA5HJlrw8LdVdv4cdLzoacn7tlggV9blniNfeE2Kr0j93s+n3/kf6M2OlipipXcgCWDZnf4i5nY
+	hOBYak/2oVfI3wvFqHWNHZEl2Rm1yNTwKcLbMtYeGy/58gd1TegeNxE5Gfvmu2+9jb5kPqtg2Vh
+	ycXc3/9wlq02KD7Ry5ovUN9MrXFk5H/ogVeRNGikI3dKEHy66Jr+MdVq48VZ5lTpIV/fQlPfmVG
+	FfGw2Rp2q3Ixh/O+LAOoTB+PtWUw==
+X-Google-Smtp-Source: AGHT+IE5ldraQtVD4/voId+uJgq9SKeon1ya3DDXPsDMWnI4D2jTS8G0L+Jj2b6KQXPSJIMRKNYQLw==
+X-Received: by 2002:a05:6a00:1788:b0:7ae:8821:96c7 with SMTP id d2e1a72fcca58-7e00dfd1453mr10992782b3a.17.1764906539974;
+        Thu, 04 Dec 2025 19:48:59 -0800 (PST)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7e2a062ac40sm3575520b3a.25.2025.12.04.19.48.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Dec 2025 19:48:59 -0800 (PST)
+Date: Fri, 5 Dec 2025 03:48:51 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Cosmin Ratiu <cratiu@nvidia.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Taehee Yoo <ap420073@gmail.com>,
+	Jianbo Liu <jianbol@nvidia.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Leon Romanovsky <leonro@nvidia.com>
+Subject: Re: [RFC PATCH ipsec 2/2] bonding: Maintain offloaded xfrm on all
+ devices
+Message-ID: <aTJWI3aybYO-NHg5@fedora>
+References: <20251121151644.1797728-1-cratiu@nvidia.com>
+ <20251121151644.1797728-3-cratiu@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [REGRESSION]: mlx5_core does not autoload in Linux 6.18
-To: Thorsten Leemhuis <regressions@leemhuis.info>,
- Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
- Mark Bloch <mbloch@nvidia.com>, netdev <netdev@vger.kernel.org>
-Cc: regressions@lists.linux.dev
-References: <a939e5fc-c5ea-4a9e-8566-54dfa54bb0da@gmail.com>
- <418484c3-e65b-414d-ad2c-71e832ae7af2@leemhuis.info>
-Content-Language: en-US
-From: Demi Marie Obenour <demiobenour@gmail.com>
-Autocrypt: addr=demiobenour@gmail.com; keydata=
- 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
- +MYSfkEjBz0E8CLOcAw7JIwAaeBT
-In-Reply-To: <418484c3-e65b-414d-ad2c-71e832ae7af2@leemhuis.info>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------L68yR30TSOS8fJa0rPHkctpt"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251121151644.1797728-3-cratiu@nvidia.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------L68yR30TSOS8fJa0rPHkctpt
-Content-Type: multipart/mixed; boundary="------------nY4kwI9JvLSrVgxnIaLmCo0X";
- protected-headers="v1"
-Message-ID: <2af9d46e-647c-44a7-8c19-32a749408130@gmail.com>
-Date: Thu, 4 Dec 2025 22:21:29 -0500
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [REGRESSION]: mlx5_core does not autoload in Linux 6.18
-To: Thorsten Leemhuis <regressions@leemhuis.info>,
- Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
- Mark Bloch <mbloch@nvidia.com>, netdev <netdev@vger.kernel.org>
-Cc: regressions@lists.linux.dev
-References: <a939e5fc-c5ea-4a9e-8566-54dfa54bb0da@gmail.com>
- <418484c3-e65b-414d-ad2c-71e832ae7af2@leemhuis.info>
-Content-Language: en-US
-From: Demi Marie Obenour <demiobenour@gmail.com>
-Autocrypt: addr=demiobenour@gmail.com; keydata=
- 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
- +MYSfkEjBz0E8CLOcAw7JIwAaeBT
-In-Reply-To: <418484c3-e65b-414d-ad2c-71e832ae7af2@leemhuis.info>
+On Fri, Nov 21, 2025 at 05:16:44PM +0200, Cosmin Ratiu wrote:
+> The bonding driver manages offloaded SAs using the following strategy:
+> 
+> An xfrm_state offloaded on the bond device with bond_ipsec_add_sa() uses
+> 'real_dev' on the xfrm_state xs to redirect the offload to the current
+> active slave. The corresponding bond_ipsec_del_sa() (called with the xs
+> spinlock held) redirects the unoffload call to real_dev. Finally,
+> cleanup happens in bond_ipsec_free_sa(), which removes the offload from
+> the device. Since the last call happens without the xs spinlock held,
+> that is where the real work to unoffload actually happens.
+> 
+> When the active slave changes to a new device a 3-step process is used
+> to migrate all xfrm states to the new device:
+> 1. bond_ipsec_del_sa_all() unoffloads all states in bond->ipsec_list
+>    from the previously active device.
+> 2. The active slave is flipped to the new device.
+> 3. bond_ipsec_add_sa_all() offloads all states in bond->ipsec_list to
+>    the new device.
+> 
+> There can be two races which result in unencrypted IPSec packets being
+> transmitted on the wire:
+> 
+> 1. Unencrypted IPSec packet on old_dev:
+> CPU1 (xfrm_output)                   CPU2 (bond_change_active_slave)
+> bond_ipsec_offload_ok -> true
+>                                      bond_ipsec_del_sa_all
+> bond_xmit_activebackup
+> bond_dev_queue_xmit
+> dev_queue_xmit on old_dev
+> 				     bond->curr_active_slave = new_dev
+> 				     bond_ipsec_add_sa_all
+> 
+> 2. Unencrypted IPSec packet on new_dev:
+> CPU1 (xfrm_output)                   CPU2 (bond_change_active_slave)
+> bond_ipsec_offload_ok -> true
+>                                      bond->curr_active_slave = new_dev
+>                                      bond_ipsec_migrate_sa_all
+> bond_xmit_activebackup
+> bond_dev_queue_xmit
+> dev_queue_xmit on new_dev
+> 				     bond_ipsec_migrate_sa_all finishes
+> 
+> This patch fixes both these issues. Bonding now maintain SAs on all
+> devices by making use of the previous patch that allows the same xfrm
+> state to be offloaded on multiple devices. This consists of:
+> 
+> 1. Maintaining two linked lists:
+> - bond->ipsec_list is the list of xfrm states offloaded to the bonding
+>   device.
+> - Each slave has its own bond->ipsec_offloads list holding offloads of
+>   bond->ipsec_list on that slave.
+> These lists are protected by the existing bond->ipsec_lock mutex.
+> 
+> 2. When a slave is added (bond_enslave), bond_ipsec_add_sa_all now
+>    offloads all xfrm states to the new device.
+> 
+> 3. When a slave is removed (__bond_release_one), bond_ipsec_del_sa_all
+>    now removes all xfrm state offloads from that device.
+> 
+> 4. When the active slave is changed (bond_change_active_slave), a new
+>    bond_ipsec_migrate_sa_all function switches xs->xso.real_dev and
+>    xs->xso.offload handle for all offloaded xfrm states.
+>    xdo_dev_state_advance_esn is also called on the new device to update
+>    the esn state.
+> 
+> 5. Adding an offloaded xfrm state to the bond device must now iterate
+>    through active slaves. To make that nice, RTNL is grabbed there. The
+>    alternative is repeatedly grabbing each slave under the RCU lock,
+>    holding it, releasing the lock to be able to offload a state, then
+>    re-grabbing the RCU lock and releasing the slave. RTNL seems cleaner.
+> 
+> 6. bond_ipsec_del_sa (.xdo_dev_state_delete for bond) is unchanged, it
+>    now only deletes the state from the active device and leaves the rest
+>    for the xdo_dev_state_free callback, which can grab the required
+>    locks.
+> 
+> Fixes: 9a5605505d9c ("bonding: Add struct bond_ipesc to manage SA")
+> Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
+> ---
+>  drivers/net/bonding/bond_main.c | 283 +++++++++++++++++---------------
+>  include/net/bonding.h           |  22 ++-
+>  2 files changed, 164 insertions(+), 141 deletions(-)
+> 
+> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+> index 4c5b73786877..979e5aabf8d2 100644
+> --- a/drivers/net/bonding/bond_main.c
+> +++ b/drivers/net/bonding/bond_main.c
+> @@ -452,6 +452,61 @@ static struct net_device *bond_ipsec_dev(struct xfrm_state *xs)
+>  	return slave->dev;
+>  }
+>  
+> +static struct bond_ipsec_offload*
+> +bond_ipsec_dev_add_sa(struct net_device *dev, struct bond_ipsec *ipsec,
+> +		      struct netlink_ext_ack *extack)
+> +{
+> +	struct bond_ipsec_offload *offload;
+> +	int err;
+> +
+> +	if (!dev->xfrmdev_ops ||
+> +	    !dev->xfrmdev_ops->xdo_dev_state_add ||
+> +	    netif_is_bond_master(dev)) {
+> +		NL_SET_ERR_MSG_MOD(extack,
+> +				   "Slave does not support ipsec offload");
+> +		return ERR_PTR(-EINVAL);
+> +	}
+> +
+> +	offload = kzalloc(sizeof(*offload), GFP_KERNEL);
+> +	if (!offload)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	offload->ipsec = ipsec;
+> +	offload->dev = dev;
+> +	err = dev->xfrmdev_ops->xdo_dev_state_add(dev, ipsec->xs,
+> +						   &offload->handle, extack);
+> +	if (err)
 
---------------nY4kwI9JvLSrVgxnIaLmCo0X
-Content-Type: multipart/mixed; boundary="------------8ZriYezK9901VJYUPssZXlLF"
+Here we need to free the offload.
 
---------------8ZriYezK9901VJYUPssZXlLF
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+> +		return ERR_PTR(err);
+> +	return offload;
+> +}
+> +
+> +static void bond_ipsec_dev_del_sa(struct bond_ipsec_offload *offload)
+> +{
+> +	struct xfrm_state *xs = offload->ipsec->xs;
+> +	struct net_device *dev = offload->dev;
+> +
+> +	if (dev->xfrmdev_ops->xdo_dev_state_delete) {
+> +		spin_lock_bh(&xs->lock);
+> +		/* Don't double delete states killed by the user
+> +		 * from xs->xso.real_dev.
+> +		 */
+> +		if (dev != xs->xso.real_dev ||
+> +		    xs->km.state != XFRM_STATE_DEAD)
+> +			dev->xfrmdev_ops->xdo_dev_state_delete(dev, xs,
+> +							       offload->handle);
+> +		if (xs->xso.real_dev == dev)
+> +			xs->xso.real_dev = NULL;
+> +		spin_unlock_bh(&xs->lock);
+> +	}
+> +
+> +	if (dev->xfrmdev_ops->xdo_dev_state_free)
+> +		dev->xfrmdev_ops->xdo_dev_state_free(dev, xs, offload->handle);
+> +
+> +	list_del(&offload->list);
+> +	list_del(&offload->ipsec_list);
+> +	kfree(offload);
+> +}
+> +
+[...]
 
-On 12/4/25 06:53, Thorsten Leemhuis wrote:
-> Lo! Thx for the report.
->=20
-> Let me CC the maintainers of said driver, maybe they have an idea or
-> even head about the problem already. If not, you might need to bisect t=
-his.
+> -static void bond_ipsec_add_sa_all(struct bonding *bond)
+> +static void bond_ipsec_add_sa_all(struct bonding *bond, struct slave *new_slave,
+> +				  struct netlink_ext_ack *extack)
+>  {
+> +	struct net_device *real_dev = new_slave->dev;
+>  	struct net_device *bond_dev = bond->dev;
+> -	struct net_device *real_dev;
+>  	struct bond_ipsec *ipsec;
+>  	struct slave *slave;
+>  
+> -	slave = rtnl_dereference(bond->curr_active_slave);
+> -	real_dev = slave ? slave->dev : NULL;
+> -	if (!real_dev)
+> -		return;
+> +	INIT_LIST_HEAD(&new_slave->ipsec_offloads);
+>  
+>  	mutex_lock(&bond->ipsec_lock);
+> -	if (!real_dev->xfrmdev_ops ||
+> -	    !real_dev->xfrmdev_ops->xdo_dev_state_add ||
+> -	    netif_is_bond_master(real_dev)) {
+> -		if (!list_empty(&bond->ipsec_list))
+> -			slave_warn(bond_dev, real_dev,
+> -				   "%s: no slave xdo_dev_state_add\n",
+> -				   __func__);
+> -		goto out;
+> -	}
+> -
+>  	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
+> +		struct bond_ipsec_offload *offload;
+>  		struct xfrm_state *xs = ipsec->xs;
+>  
+> -		/* If new state is added before ipsec_lock acquired */
+> -		if (xs->xso.real_dev == real_dev)
+> -			continue;
+> -
+> -		if (real_dev->xfrmdev_ops->xdo_dev_state_add(real_dev, xs,
+> -							     &xs->xso.offload_handle,
+> -							     NULL)) {
+> +		offload = bond_ipsec_dev_add_sa(slave->dev, ipsec, extack);
 
-Interestingly, the problem does not reproduce after a reboot and
-a further Nixpkgs upgrade.  This either means that NixOS failed to
-regenerate the initramfs, or that the problem is not reproducible
-reliably.
+Here should be real_dev.
 
-> On 12/4/25 08:54, Demi Marie Obenour wrote:
->> In Linux 6.18, mlx5_core does not load automatically.  This causes
->> my server to not be accessible from the network.  Manually loading
->> the module in the initramfs fixes the problem.  Everything worked
->> with Linux 6.17.x.
->>
->> I'm using the linuxPackages_latest package from Nixpkgs.
->=20
-> Mentioning it like that might scare kernel developers, as they have no
-> idea what this is and thus might suspect that it's a vendor kernel with=
+> +		if (IS_ERR(offload)) {
+>  			slave_warn(bond_dev, real_dev, "%s: failed to add SA\n", __func__);
+>  			continue;
+>  		}
 
-> lots of patches applied. Is that the case? Or is that vanilla or at
-> least close to vanilla?
+If we add offload failed on the slave, what would happen during migrate?
 
-https://github.com/NixOS/nixpkgs/tree/7905606cfa51a1815787377b9cb04291e87=
-ebcb4/pkgs/os-specific/linux/kernel
-shows that there are very few patches.  The only ones I see are:
-
-- Change the RANDSTRUCT seed to one provided by NixOS.
-- Replace hard-coded paths with ones that are present in NixOS.
-- Make Kconfig print ### after every question.
-- Change two EXPORT_SYMBOL_GPL to EXPORT_SYMBOL
-  so that ZFS works with PREEMPT_RT.
-
-Of those, the first one is needed for reproducible builds with
-RANDSTRUCT.  The second is needed because of NixOS's filesystem
-structure, which isn't FHS-conforming.  The third is used by
-NixOS-specific automation, and the last one is clearly not upstreamable
-but also will not break anything.
-
->>  The server is a RISE-7 OVH dedicated server with an AMD Epyc 7402 CPU=
-=2E
->=20
-> Ciao, Thorsten
->=20
-> #regzbot ^introduced: v6.17..v6.18
-> #regzbot title: net: mlx5_core: module does not autoload anymore Linux =
-6.18
-I wonder if this is even a kernel bug.  It could be that NixOS
-generated a broken userspace that couldn't load the module.
-The problem going away after nixos-rebuild supports this.
---=20
-Sincerely,
-Demi Marie Obenour (she/her/hers)
---------------8ZriYezK9901VJYUPssZXlLF
-Content-Type: application/pgp-keys; name="OpenPGP_0xB288B55FFF9C22C1.asc"
-Content-Disposition: attachment; filename="OpenPGP_0xB288B55FFF9C22C1.asc"
-Content-Description: OpenPGP public key
-Content-Transfer-Encoding: quoted-printable
-
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-xsFNBFp+A0oBEADffj6anl9/BHhUSxGTICeVl2tob7hPDdhHNgPR4C8xlYt5q49y
-B+l2nipdaq+4Gk6FZfqC825TKl7eRpUjMriwle4r3R0ydSIGcy4M6eb0IcxmuPYf
-bWpr/si88QKgyGSVZ7GeNW1UnzTdhYHuFlk8dBSmB1fzhEYEk0RcJqg4AKoq6/3/
-UorR+FaSuVwT7rqzGrTlscnTDlPWgRzrQ3jssesI7sZLm82E3pJSgaUoCdCOlL7M
-MPCJwI8JpPlBedRpe9tfVyfu3euTPLPxwcV3L/cfWPGSL4PofBtB8NUU6QwYiQ9H
-zx4xOyn67zW73/G0Q2vPPRst8LBDqlxLjbtx/WLR6h3nBc3eyuZ+q62HS1pJ5EvU
-T1vjyJ1ySrqtUXWQ4XlZyoEFUfpJxJoN0A9HCxmHGVckzTRl5FMWo8TCniHynNXs
-BtDQbabt7aNEOaAJdE7to0AH3T/Bvwzcp0ZJtBk0EM6YeMLtotUut7h2Bkg1b//r
-6bTBswMBXVJ5H44Qf0+eKeUg7whSC9qpYOzzrm7+0r9F5u3qF8ZTx55TJc2g656C
-9a1P1MYVysLvkLvS4H+crmxA/i08Tc1h+x9RRvqba4lSzZ6/Tmt60DPM5Sc4R0nS
-m9BBff0Nm0bSNRS8InXdO1Aq3362QKX2NOwcL5YaStwODNyZUqF7izjK4QARAQAB
-zTxEZW1pIE9iZW5vdXIgKElUTCBFbWFpbCBLZXkpIDxhdGhlbmFAaW52aXNpYmxl
-dGhpbmdzbGFiLmNvbT7CwY4EEwEIADgWIQR2h02fEza6IlkHHHGyiLVf/5wiwQUC
-X6YJvQIbAwULCQgHAgYVCgkICwIEFgIDAQIeAQIXgAAKCRCyiLVf/5wiwWRhD/0Y
-R+YYC5Kduv/2LBgQJIygMsFiRHbR4+tWXuTFqgrxxFSlMktZ6gQrQCWe38WnOXkB
-oY6n/5lSJdfnuGd2UagZ/9dkaGMUkqt+5WshLFly4BnP7pSsWReKgMP7etRTwn3S
-zk1OwFx2lzY1EnnconPLfPBc6rWG2moA6l0WX+3WNR1B1ndqpl2hPSjT2jUCBWDV
-rGOUSX7r5f1WgtBeNYnEXPBCUUM51pFGESmfHIXQrqFDA7nBNiIVFDJTmQzuEqIy
-Jl67pKNgooij5mKzRhFKHfjLRAH4mmWZlB9UjDStAfFBAoDFHwd1HL5VQCNQdqEc
-/9lZDApqWuCPadZN+pGouqLysesIYsNxUhJ7dtWOWHl0vs7/3qkWmWun/2uOJMQh
-ra2u8nA9g91FbOobWqjrDd6x3ZJoGQf4zLqjmn/P514gb697788e573WN/MpQ5XI
-Fl7aM2d6/GJiq6LC9T2gSUW4rbPBiqOCeiUx7Kd/sVm41p9TOA7fEG4bYddCfDsN
-xaQJH6VRK3NOuBUGeL+iQEVF5Xs6Yp+U+jwvv2M5Lel3EqAYo5xXTx4ls0xaxDCu
-fudcAh8CMMqx3fguSb7Mi31WlnZpk0fDuWQVNKyDP7lYpwc4nCCGNKCj622ZSocH
-AcQmX28L8pJdLYacv9pU3jPy4fHcQYvmTavTqowGnM08RGVtaSBNYXJpZSBPYmVu
-b3VyIChsb3ZlciBvZiBjb2RpbmcpIDxkZW1pb2Jlbm91ckBnbWFpbC5jb20+wsF4
-BBMBAgAiBQJafgNKAhsDBgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIXgAAKCRCyiLVf
-/5wiwYa/EACv8a2+MMou9cSCNoZBQaU+fTmyzft9hUE+0d5W2UY1RY3OsjFIzm9R
-/4SVccfsqOYLEo+S0vQMIIIqFEq3FCpXXwPzyimotps05VA8U3Bd7yseojFygOgK
-sAMOAee2RCaDDOnoJue01dfZMzzHPO/TVdp3OvnpWipfv5G1Xg96rwbhMLE3tg6N
-xwAHa31Bv4/Xq8CJOoIWvx6fcmZQpz01/lSvsYn0KrfEbTKkuUf0vM9JrCTCP2oz
-VNN5BYzqaq2M4r+jmSyeXLim922VOWqGkUEQ85BSEemqrRS06IU6NtEMsF8EWt/b
-hWjk/9GDKTcnpdJHTrMxTspExBiNrvpI2t+YPU5B/dJJAUxvmhFrbSIbdB8umBZs
-I3AMYrEmpAbh5x7jEjoskUC7uN3o9vpg1oCLS2ePDLtAtyBtbHnkA4xGD7ar8mem
-xpH9lY/i+sC6CyyIUWcUDnnagKyJP0m9ks0GLsTeOCA0bft2XA6rD6aaCnMUsndT
-ctrab42CV5XypjmC4U1rPJ8JQJUh1/3P48/8sMH+3krxpJ06KNWNFaUbaMTGiltZ
-7x9DngklSYrX0T+2G4kVXNmjaljwkoLahwLla2gUWwBSyofXdqyhQdwZsp01KXNQ
-UCyT/Pg+aDcm/E7OMV3d4lf7g/CSxiX2GSEe6BlhSz+Lmd7ZJ3g32M1ARGVtaSBN
-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
-EtJuZYM5blWncBOJCoWMnBEcTEo/viU3GgcVRw=3D=3D
-=3Dx94R
------END PGP PUBLIC KEY BLOCK-----
-
---------------8ZriYezK9901VJYUPssZXlLF--
-
---------------nY4kwI9JvLSrVgxnIaLmCo0X--
-
---------------L68yR30TSOS8fJa0rPHkctpt
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEopQtqVJW1aeuo9/sszaHOrMp8lMFAmkyT7oACgkQszaHOrMp
-8lMDDg//YGPBGe4ni7pNWZUz5iHGOeyoXWvmcjrZJbzZuiDP6GAF6HaIJK7/NJZl
-1gwZqkQ4d4frZHNvXXl1CRtCWEaDpQ1c+SddBPRG4Bm0fuuSPrlaCR6a/O/pJslc
-in8vGrAycLgcjMpPA6Pa5OC60Ic4l1dsTwV0DK9VWqHiUCyW4A+PBTXnxeJnAz+y
-haD3GlAJPJcXH8H+zpvbqk2JeTVuQrcUViqkKlwVBrc7g4dBoniYRsZuKKAhvayQ
-XLd/BPV7kY2PvHg4725WKXRNyI+LWP/iYq1/Uces0/tvtHzdyjhyVmid+RaHYRFa
-ZOyD4I8fTkCtVTcWtJvi6HlDcZ5p6u7cqd54jl/ayHjeLZPzYUSvS1jCYUsqP59f
-ENnvEOTMtGS8v6YJUfOHxJ98AskAu2YscxVOYsRJ6kuFDmew3qi1Ah1Z7wKZedpG
-BmhAvfvzHn7CsbRKh+H+SLGX7pSckXQIWK7v6cj4Ud1VkW2vkoluMQyBo/i9/ckS
-BArEND1q8X5oBSc5LwklpbX89AFUA+MOG09qcuuhmWO0MNAzohvE6u6qGlDhH8C0
-zkjQyEvMc2fzfNINnAjRvPGb41efaemzv6YKNboOLf5R4kgPL/jeKJtJdgIbfpDr
-QAAukaWeM8DFR6gvOWf9lVpJgMGQmewxG3MMzj6A+4uB4FsgAec=
-=iiNT
------END PGP SIGNATURE-----
-
---------------L68yR30TSOS8fJa0rPHkctpt--
+Thanks
+Hangbin
 
