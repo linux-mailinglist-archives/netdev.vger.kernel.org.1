@@ -1,84 +1,151 @@
-Return-Path: <netdev+bounces-243883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B720CA97C9
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 23:25:12 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EACF1CA97CF
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 23:26:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 419E5303894E
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 22:21:36 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 77899301FA9E
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 22:26:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4334E2BCF4A;
-	Fri,  5 Dec 2025 22:21:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB451273D84;
+	Fri,  5 Dec 2025 22:26:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WgRjFJXF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PIC7kgTU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 156161917ED;
-	Fri,  5 Dec 2025 22:21:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F2A92264CD;
+	Fri,  5 Dec 2025 22:26:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764973295; cv=none; b=YZTKjqctk1GsPZ1uV5kZAhMyV8hTzL4Ss0Sn+QH0C3qQUMT3QvB7N1DWzvL4dzPrzaAGxEOICz59BG4gfAPuiu9LaeIvHbQO58OH46HmOPvAmgLTNIG006w5uuVgcj4zV4lzvfKsCKfmGyP/epCmeoKzszjB0ikQoIjENCadvLE=
+	t=1764973580; cv=none; b=fw6sf1WxS7XieHVhhm4+lT0MzIoB1etXmE12L/xfLbO/cYW6VoNWidVPvBUUVRy56kHNJetwwCTHAW8xeKtt0+QUXf29IW08+BREeiO7Z+LEVT2Yh93lhLetopMRsJaO+GFB1nt/cIgsorJvnUGMHhyui3xKHSKuPIAUdltiTuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764973295; c=relaxed/simple;
-	bh=PlYPjSe/WtTei2KOWQ2XY7wXUNPiqzN2chnzfwHdaT8=;
+	s=arc-20240116; t=1764973580; c=relaxed/simple;
+	bh=rCTYHSMm90mTJ3vZMsmmAyRtbfxR3k0G09lklrdDD+A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gU3adBp0wTAc93ZAinDBqs05ux4ZBolGmtg3S00AUlS14dq5y1DC+YsOqgJ+KvaMfjiNy+b8OYjo0RroxvXFhabDeREPiE6CYVUSNrTZOrMPIi2WqdIJE3tjiH87ZgnLOurlf5FiXFEO/sOlo+ozQrVwexYwA77+EyVXhdtmjMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WgRjFJXF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D57C8C4CEF1;
-	Fri,  5 Dec 2025 22:21:34 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=XOoMqA80gbD+4+IB2Yn+fwfoRsskIRQiHhiBx7jG437GxHU3h8E+QjdI0w+tgdvbWA1AItk9oN0ClyuB8B0LdrDQXqkymrTejqZMGMt1ctOtXWzK4kG3c2oNenOBgn64qMhNQl3YpKjWTFdeQHOCDckMWauNlmF1X3zvkgTmUwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PIC7kgTU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07AFDC4CEF1;
+	Fri,  5 Dec 2025 22:26:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764973294;
-	bh=PlYPjSe/WtTei2KOWQ2XY7wXUNPiqzN2chnzfwHdaT8=;
+	s=k20201202; t=1764973580;
+	bh=rCTYHSMm90mTJ3vZMsmmAyRtbfxR3k0G09lklrdDD+A=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WgRjFJXFeifPSSzBXQmA2uLG1aRvj0vvNAxd6XBuUSPqtOTjGHq8rNl2azU8a+tuf
-	 zOG5hhYXzy/ksKNwVHpJKpg/rLLIuyt2ULhwr6A50iWUnMD4uC/XgJpsHMPgnK768p
-	 Sk+XFxLw3M0edioED9nzLHM0d+prJC2vJGnjYkXSG1yZL21MW0E3GkK+ey4TO5ybJg
-	 9GNqODY/GpEkly+lvom5Kizm4w+Lv2GXwdTiRQ9xTPvq3c9Mqe6xo1WlimbHWM1Mm/
-	 /32yu+F8MiN5FiLcI4wc4Lohuq3mJQTRWiO2cCI2hSmEfeyemX963MsUYYEIK0jkJL
-	 OQFATWW71Y/KA==
-Date: Fri, 5 Dec 2025 14:21:34 -0800
-From: Kees Cook <kees@kernel.org>
-To: Guenter Roeck <linux@roeck-us.net>
-Cc: Shuah Khan <shuah@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	wine-devel@winehq.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
-	Jiri Olsa <jolsa@kernel.org>, Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH v2 09/13] selftests/seccomp: Fix build warning
-Message-ID: <202512051421.DCD77D0561@keescook>
-References: <20251205171010.515236-1-linux@roeck-us.net>
- <20251205171010.515236-10-linux@roeck-us.net>
+	b=PIC7kgTUbVl2nrHi1jhu4KGtKVD+F2J57b1oo0HemRRp3es5S6z8oIS4tUZeqqBIt
+	 rPkvrx0DU3XECM/RKXN0GzMLBeRKygJ36GKhabwVveWgR+RSRjo+cpzqDp65Qa5ud4
+	 9K80/15lNWX+opUK69/oiQaMPQOUFPACi6s9CDeICktemtxA8ZHT8SXcGxlh/Biq2E
+	 A+s2oqbFF9a44ONYBwZExwMiO+pATCHVCT1dVR83mkbRKkusU7D6uJMcdu3Np7YNN9
+	 BToQfezYWEr0CK9YL0OCb2ul0LkMRCdZtw92x9QZ7GlfHXzJqTix2aam5XS1XEplAb
+	 mXzak2OKik1ew==
+Date: Fri, 5 Dec 2025 15:26:15 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Yao Zi <ziyao@disroot.org>
+Cc: Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Anjaneyulu <pagadala.yesu.anjaneyulu@intel.com>,
+	Daniel Gabay <daniel.gabay@intel.com>,
+	linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Mingcong Bai <jeffbai@aosc.io>,
+	Kexy Biscuit <kexybiscuit@aosc.io>
+Subject: Re: [PATCH iwlwifi-fixes] wifi: iwlwifi: Implement settime64 as stub
+ for MVM/MLD PTP
+Message-ID: <20251205222615.GA3738427@ax162>
+References: <20251204123204.9316-1-ziyao@disroot.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251205171010.515236-10-linux@roeck-us.net>
+In-Reply-To: <20251204123204.9316-1-ziyao@disroot.org>
 
-On Fri, Dec 05, 2025 at 09:10:03AM -0800, Guenter Roeck wrote:
-> Fix:
+On Thu, Dec 04, 2025 at 12:32:04PM +0000, Yao Zi wrote:
+> Since commit dfb073d32cac ("ptp: Return -EINVAL on ptp_clock_register if
+> required ops are NULL"), PTP clock registered through ptp_clock_register
+> is required to have ptp_clock_info.settime64 set, however, neither MVM
+> nor MLD's PTP clock implementation sets it, resulting in warnings when
+> the interface starts up, like
 > 
-> seccomp_bpf.c: In function ‘UPROBE_setup’:
-> seccomp_bpf.c:5175:74: warning: pointer type mismatch in conditional expression
+> WARNING: drivers/ptp/ptp_clock.c:325 at ptp_clock_register+0x2c8/0x6b8, CPU#1: wpa_supplicant/469
+> CPU: 1 UID: 0 PID: 469 Comm: wpa_supplicant Not tainted 6.18.0+ #101 PREEMPT(full)
+> ra: ffff800002732cd4 iwl_mvm_ptp_init+0x114/0x188 [iwlmvm]
+> ERA: 9000000002fdc468 ptp_clock_register+0x2c8/0x6b8
+> iwlwifi 0000:01:00.0: Failed to register PHC clock (-22)
 > 
-> by type casting the argument to get_uprobe_offset().
+> I don't find an appropriate firmware interface to implement settime64()
+> for iwlwifi MLD/MVM, thus instead create a stub that returns
+> -EOPTNOTSUPP only, suppressing the warning and allowing the PTP clock to
+> be registered.
 > 
-> Fixes: 9ffc7a635c35a ("selftests/seccomp: validate uprobe syscall passes through seccomp")
-> Cc: Jiri Olsa <jolsa@kernel.org>
-> Cc: Peter Zijlstra (Intel) <peterz@infradead.org>
-> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+> Reported-by: Nathan Chancellor <nathan@kernel.org>
+> Closes: https://lore.kernel.org/all/20251108044822.GA3262936@ax162/
+> Signed-off-by: Yao Zi <ziyao@disroot.org>
+> ---
 
-Reviewed-by: Kees Cook <kees@kernel.org>
+Thanks, I can confirm this clears up the warning.
 
--- 
-Kees Cook
+Tested-by: Nathan Chancellor <nathan@kernel.org>
+
+>  drivers/net/wireless/intel/iwlwifi/mld/ptp.c | 7 +++++++
+>  drivers/net/wireless/intel/iwlwifi/mvm/ptp.c | 7 +++++++
+>  2 files changed, 14 insertions(+)
+> 
+> diff --git a/drivers/net/wireless/intel/iwlwifi/mld/ptp.c b/drivers/net/wireless/intel/iwlwifi/mld/ptp.c
+> index ffeb37a7f830..231920425c06 100644
+> --- a/drivers/net/wireless/intel/iwlwifi/mld/ptp.c
+> +++ b/drivers/net/wireless/intel/iwlwifi/mld/ptp.c
+> @@ -121,6 +121,12 @@ static int iwl_mld_ptp_gettime(struct ptp_clock_info *ptp,
+>  	return 0;
+>  }
+>  
+> +static int iwl_mld_ptp_settime(struct ptp_clock_info *ptp,
+> +			       const struct timespec64 *ts)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +
+>  static int iwl_mld_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
+>  {
+>  	struct iwl_mld *mld = container_of(ptp, struct iwl_mld,
+> @@ -279,6 +285,7 @@ void iwl_mld_ptp_init(struct iwl_mld *mld)
+>  
+>  	mld->ptp_data.ptp_clock_info.owner = THIS_MODULE;
+>  	mld->ptp_data.ptp_clock_info.gettime64 = iwl_mld_ptp_gettime;
+> +	mld->ptp_data.ptp_clock_info.settime64 = iwl_mld_ptp_settime;
+>  	mld->ptp_data.ptp_clock_info.max_adj = 0x7fffffff;
+>  	mld->ptp_data.ptp_clock_info.adjtime = iwl_mld_ptp_adjtime;
+>  	mld->ptp_data.ptp_clock_info.adjfine = iwl_mld_ptp_adjfine;
+> diff --git a/drivers/net/wireless/intel/iwlwifi/mvm/ptp.c b/drivers/net/wireless/intel/iwlwifi/mvm/ptp.c
+> index 06a4c9f74797..ad156b82eaa9 100644
+> --- a/drivers/net/wireless/intel/iwlwifi/mvm/ptp.c
+> +++ b/drivers/net/wireless/intel/iwlwifi/mvm/ptp.c
+> @@ -220,6 +220,12 @@ static int iwl_mvm_ptp_gettime(struct ptp_clock_info *ptp,
+>  	return 0;
+>  }
+>  
+> +static int iwl_mvm_ptp_settime(struct ptp_clock_info *ptp,
+> +			       const struct timespec64 *ts)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +
+>  static int iwl_mvm_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
+>  {
+>  	struct iwl_mvm *mvm = container_of(ptp, struct iwl_mvm,
+> @@ -281,6 +287,7 @@ void iwl_mvm_ptp_init(struct iwl_mvm *mvm)
+>  	mvm->ptp_data.ptp_clock_info.adjfine = iwl_mvm_ptp_adjfine;
+>  	mvm->ptp_data.ptp_clock_info.adjtime = iwl_mvm_ptp_adjtime;
+>  	mvm->ptp_data.ptp_clock_info.gettime64 = iwl_mvm_ptp_gettime;
+> +	mvm->ptp_data.ptp_clock_info.settime64 = iwl_mvm_ptp_settime;
+>  	mvm->ptp_data.scaled_freq = SCALE_FACTOR;
+>  
+>  	/* Give a short 'friendly name' to identify the PHC clock */
+> -- 
+> 2.51.2
+> 
 
