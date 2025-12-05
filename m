@@ -1,111 +1,191 @@
-Return-Path: <netdev+bounces-243827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01BB4CA8363
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 16:35:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 334CECA8411
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 16:49:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6463D32CCE1A
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 15:30:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B62533251F4E
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 15:40:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E49BC357735;
-	Fri,  5 Dec 2025 15:18:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85C0A3176E7;
+	Fri,  5 Dec 2025 15:23:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="I/au80bu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h4Z3wYGc";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gmy/H3IK"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A30435771D;
-	Fri,  5 Dec 2025 15:17:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A2C3081C2
+	for <netdev@vger.kernel.org>; Fri,  5 Dec 2025 15:23:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764947882; cv=none; b=oOql9pxnkP2VcVtu10j/db0kygHEeogqJSkBV/teB026Z3xTFG7P+LX0V6Nb6vQToy7eGXFcWQzoXxsTjSvd5DSr3mEohVDT8z7pY9SyWajCsCMzr4PDDzUTOzaxhzmLLpXd47YVI9sfcmzbbla9JEyn7TarfceIVffRp4NM2KM=
+	t=1764948184; cv=none; b=Js/QP2UJZSTsIcooR45qWJtkITmED6OTxHNgg3iTzlFiH9b9Lxln4ULaA3J1DTkGcd2GeLQhmc3CJbooWblTdcp8YcIhRhfhk2brfYRb7bCGeI69pj2fYOyfE7yKziDaVcebynps38DrS7yJIt5s/815rHOI88u2+LsV0b7THLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764947882; c=relaxed/simple;
-	bh=NpVU/zKKDmD1Y1Sgo8F2AIDoFxcRIYui67Wsv1F9Zxw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VvoBv2a0174r3WkxpJh6FjDS5Ko5s6i8yV/NetsDQfdg/jheiYLdixaanapChD0cEYErztO0oxmTQGlW9kCMbC8k0DuaDVkrRDngHR5jRVckK0P7OW/MpoaFtJAJGrpAr69u7i5gOw/PjJzfvWZyEXCUg4ashqvP/x5VxVY1CfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=I/au80bu; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=aZPGFcTfZwX3shaY+dtgLFmmWoU9zYhXbIJG4r/K8so=; b=I/au80buY2RKqRSbvVGoiL/FwG
-	sYlcah6QZwC77C2Wq7EAuLaWUjg4g+zyGGMFEi54Y3fDV4lxnE3iIUzpFFNzU1jyhMW+mQVdG+KqK
-	GiW+/X9ytY7e0v+BIIWVaGG9yUutOOVcf6RfaiXI13CXQnyZ/xBaEUMmdZkX1RTTuq0E4DPlU4JYr
-	cAtcVVryXchL+khDZK3yT9G9Es87RVmSYI7BxFSXEwvcYRdl/JI36hp/84n9Avi3I7OoK7l6rlKP4
-	4vj0YvmEuzCIkf2oQNAPPxNzXONRz74Pn1vfAvODq3D1xL5+EdARoUAXR9/dGuVp7u51KiEGxa+y2
-	BKj1Jkgg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39618)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vRXZ1-000000004m5-0WDS;
-	Fri, 05 Dec 2025 15:17:43 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vRXYv-000000002DA-1ink;
-	Fri, 05 Dec 2025 15:17:37 +0000
-Date: Fri, 5 Dec 2025 15:17:37 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Hauke Mehrtens <hauke@hauke-m.de>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Rasmus Villemoes <ravi@prevas.dk>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH net] net: dsa: mxl-gsw1xx: manually clear RANEG bit
-Message-ID: <aTL3kc1spFf3bIzf@shell.armlinux.org.uk>
-References: <ab836f5d36e3f00cd8e2fb3e647b7204b5b6c990.1764898074.git.daniel@makrotopia.org>
- <97389f24-d900-4ff0-8a80-f75e44163499@lunn.ch>
- <aTLkl0Zey4u4P8x6@makrotopia.org>
+	s=arc-20240116; t=1764948184; c=relaxed/simple;
+	bh=+3D6ev1MJ2IsOJ/SUeGWoDuJog7WRUni4Gm6Z/yOR/s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=C5D4iEanYCcl88ekBDsowLnc5kzlLc53jujm5E47SdYTDhxgSXiIwpe1eTREd2sqsuHc5j5N2QYOITtXcjRzmRCpbh2L2pgm69KtRpgJ4buPLISG4SRcFUBlFRKV73NCSxUpAXyn0H/GoDmYOngTsZui6ewqfB8ci30qUyrsuRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h4Z3wYGc; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Gmy/H3IK; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1764948180;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=j7uMfSGh3fxRB0AoRdr8ecqtqXqJiHlbsjb4C7/a5Mk=;
+	b=h4Z3wYGceMB8zcg9NJZQ1k3ID4jctw7vw5T2dInwgtmdFJyhvOltWkEX7xM9R28ej1EzNX
+	8i/X5bJBquUV9Z4VPVCzim8q7ZuYKN3+sp3DQ6MJcHI+xx19FWIOxaeejRsfPCGRdHCaOF
+	NABc4bGfUS+POssKwdDLdhoFODQveCo=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-77-w1w9YLWOOXqSWdVDaAwhow-1; Fri, 05 Dec 2025 10:22:59 -0500
+X-MC-Unique: w1w9YLWOOXqSWdVDaAwhow-1
+X-Mimecast-MFC-AGG-ID: w1w9YLWOOXqSWdVDaAwhow_1764948178
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-42e2e3c3e1aso1188049f8f.1
+        for <netdev@vger.kernel.org>; Fri, 05 Dec 2025 07:22:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1764948177; x=1765552977; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=j7uMfSGh3fxRB0AoRdr8ecqtqXqJiHlbsjb4C7/a5Mk=;
+        b=Gmy/H3IKQePvVnCsmkWNMKk/r4XkLarLjoBDdqHvSiBUbiC0oVv5kZBWAd7In0YqC0
+         EGlbf4FrPh/zn5bs2aUrms/EhgfPA+tF2BsiHqrBgA+isaS69sQukqu2MV+Xb92/gfyK
+         U86obsil/MOOsQ3iyZft9+XNIQbVyxVJ9ZIkMzvUi+aQBoW6GTzdJ/87iSH1Ypb9Rb2f
+         ad8Y+dZstG2luPDNy6u2R/THBwiilYvHnxRursKYYB/OOE5NdxBbhddMoZ0xcPjacJkK
+         xlXJmRVd4QyyjRhB2S29+OYXoWjXZLMkdl/hgn/G4mesMKX4y5xpmo/wDgogLeZoWwrP
+         0wbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764948177; x=1765552977;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=j7uMfSGh3fxRB0AoRdr8ecqtqXqJiHlbsjb4C7/a5Mk=;
+        b=Lq0ur/w1oi35sgwWDY9elk08qz7qV9FB2DIjMVU1I4z6O3477Eup6mqTwaJYBu3SrM
+         0Gr5DLstbt9aWcWEMP8D21eqDzhnLy0Y0bS4GgV1cI8DTKSjvNvhUJC/U6+zJBB/Fef8
+         qTV+djwy1HvxwQyTPmPl16zUq2miga0bUsZryWZKIRB4Vd+Vs5vKjpafIhqmBs/n76Rj
+         zaV7rhCocmQTlvcJCuA7fyGdlkWyYDCVDQn67dVCRt4jxqSWaMuZzfBGZeV1SkClxZbx
+         2urJu19dzv7LNJzw7C6diVFDDk9AnToQBcCwf+ujBg+lN3BSKh1qhMCDT79izx7kPOfb
+         mYfw==
+X-Gm-Message-State: AOJu0YxBYzqFWVmbPCRoAxLq0JmZ+VVILTo+3jLWfz4h5kZhSdx1ld5H
+	rauvTJaJkgeu5N5lkP2KwJzQLSDGg3kg/BLzT+/l3NrxOvJLs4Dz7RNkQN+sW/SYtNviDcDRdiy
+	dvBiUPqRbAYQlxd/EqThMa29fagm8vaTaqJJShqES4v9RDyF/0IRBKPAyGPFoX3jGeg==
+X-Gm-Gg: ASbGncu7qMj8Ed6m7Ez2l4k8cX1HkOZ2wtgGln4Y2/V0hKxKvu9kOmgnRFXEIBhKWzf
+	jeod72n2EBK0yekYyHPOOAvOGVdjYzKR3jV7ScVz6tm1iht3XeI4xhb/oNH1BI2NobpScFfm9j/
+	h5E+zZ92oQoiUAlRzHWmEszxDJajM3FQdwlA3MmOaQx2DPe6GQ/0I8Arx1TpddoejRTJiKzJuF6
+	kxG8yE+PAW9H3eOOlUbCesUPFvQsXsugbgdSJo4vWcUNVlV1NO2wObQlRaWJdKTsnTmftsbffKp
+	xTsecitkQD1/gDeLmFKckVbX+ceeear6u/nF0fperYxZ56u6xEhqF5wlLbz1Pd05rOcV9zf7IKk
+	nZe6QzBe0vZnkUA==
+X-Received: by 2002:a05:6000:2306:b0:42b:43cc:982e with SMTP id ffacd0b85a97d-42f731a303fmr10179826f8f.36.1764948177581;
+        Fri, 05 Dec 2025 07:22:57 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGj9diORAq7XZHLatehhfzj1xvhd0abr+mYPS6g19g9qoe+WM2petSDHTC+zF1I/KenhhBTSw==
+X-Received: by 2002:a05:6000:2306:b0:42b:43cc:982e with SMTP id ffacd0b85a97d-42f731a303fmr10179805f8f.36.1764948177178;
+        Fri, 05 Dec 2025 07:22:57 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.199])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42f7cbfee71sm9139629f8f.15.2025.12.05.07.22.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Dec 2025 07:22:56 -0800 (PST)
+Message-ID: <bb866d37-6e89-460f-a411-e9f26b0fa4e4@redhat.com>
+Date: Fri, 5 Dec 2025 16:22:55 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aTLkl0Zey4u4P8x6@makrotopia.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 1/2] net: gro: avoid relaying on skb->transport_header
+ at receive time
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+ Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
+ David Ahern <dsahern@kernel.org>
+References: <cover.1764943231.git.pabeni@redhat.com>
+ <98a7e20010265e3ebf9d7e6d6dfb7339d5db7b99.1764943231.git.pabeni@redhat.com>
+ <CANn89iL3hp4Of_U+Yc34OrwVnTwn5j4j=WTq-yckGVcpptxcUg@mail.gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <CANn89iL3hp4Of_U+Yc34OrwVnTwn5j4j=WTq-yckGVcpptxcUg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Dec 05, 2025 at 01:56:39PM +0000, Daniel Golle wrote:
-> On Fri, Dec 05, 2025 at 02:45:35PM +0100, Andrew Lunn wrote:
-> > On Fri, Dec 05, 2025 at 01:32:20AM +0000, Daniel Golle wrote:
-> > > Despite being documented as self-clearing, the RANEG bit sometimes
-> > > remains set, preventing auto-negotiation from happening.
-> > > 
-> > > Manually clear the RANEG bit after 10ms as advised by MaxLinear, using
-> > > delayed_work emulating the asynchronous self-clearing behavior.
-> > 
-> > Maybe add some text why the complexity of delayed work is used, rather
-> > than just a msleep(10)?
-> > 
-> > Calling regmap_read_poll_timeout() to see if it clears itself could
-> > optimise this, and still be simpler.
+On 12/5/25 3:37 PM, Eric Dumazet wrote:
+> On Fri, Dec 5, 2025 at 6:04 AM Paolo Abeni <pabeni@redhat.com> wrote:
+>>
+>> Currently {tcp,udp}_gro_receive relay on the gro network stage setting
 > 
-> Is the restart_an() operation allowed to sleep? Looking at other
-> drivers I only ever see that it sets a self-clearing AN RESTART bit,
-> never waiting for that bit to clear. Hence I wanted to immitate
-> that behavior by clearing the bit asynchronously. If that's not needed
-> and msleep(10) or usleep_range(10000, 20000) can be used instead that'd
-> be much easier, of course.
+> rely :)
+> 
+>> the correct transport header offset for all the skbs held by the GRO
+>> engine.
+>>
+>> Such assumption is not necessary, as the code can instead leverage the
+>> offset already available for the currently processed skb. Add a couple
+>> of helpers to for readabilty' sake.
+>>
+>> As skb->transport_header lays on a different cacheline wrt skb->data,
+>> this should save a cacheline access for each packet aggregation.
+>> Additionally this will make the next patch possible.
+>>
+>> Note that the compiler (gcc 15.2.1) does inline the tcp_gro_lookup()
+>> call in tcp_gro_receive(), so the additional argument is only relevant
+>> for the fraglist case.
+>>
+>> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+>> ---
+>>  include/net/gro.h        | 26 ++++++++++++++++++++++++++
+>>  include/net/tcp.h        |  3 ++-
+>>  net/ipv4/tcp_offload.c   | 15 ++++++++-------
+>>  net/ipv4/udp_offload.c   |  4 ++--
+>>  net/ipv6/tcpv6_offload.c |  2 +-
+>>  5 files changed, 39 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/include/net/gro.h b/include/net/gro.h
+>> index b65f631c521d..fdb9285ab117 100644
+>> --- a/include/net/gro.h
+>> +++ b/include/net/gro.h
+>> @@ -420,6 +420,18 @@ struct sk_buff *udp_gro_receive(struct list_head *head, struct sk_buff *skb,
+>>                                 struct udphdr *uh, struct sock *sk);
+>>  int udp_gro_complete(struct sk_buff *skb, int nhoff, udp_lookup_t lookup);
+>>
+>> +/* Return the skb hdr corresponding to the specified skb2 hdr.
+>> + * skb2 is held in the gro engine, i.e. its headers are in the linear part.
+>> + */
+>> +static inline const void *
+>> +skb_gro_header_from(const struct sk_buff *skb, const struct sk_buff *skb2,
+>> +                   const void *hdr2)
+>> +{
+>> +       size_t offset = (unsigned char *)hdr2 - skb2->data;
+>> +
+>> +       return skb->data + offset;
+>> +}
+> 
+> I would rather switch gro to pass an @offset instead of a header pointer ?
+> 
+> Rebuilding one header pointer from offset is fast : skb->data + offset
+> ( offset : network header, transport header, ...)
 
-Sleeping is permitted in this code path, but bear in mind that it
-will be called from ethtool ops, and thus the RTNL will be held,
-please keep sleep durations to a minimum.
+I considered such option and opted for the above for a very small
+reason: it produces a little more compact (C) code in the caller.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+I'll switch to offset in next revisions.
+> As a matter of fact, some GRO state variables could be onstack, instead
+> of being stored in NAPI_GRO_CB()
+Do you mean the network offsets? In any case, I hope we can keep such
+work separate from this one?
+> This would avoid some stalls because skb->cb[] has been cleared with
+> memset() with long words, while GRO is using smaller fields.Whoops, I never considered store forwarding induced stalls. Something to
+ponder about for me.
+
+Many thanks!
+
+Paolo
+
 
