@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-243695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89DC1CA5FED
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 04:23:38 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BBACCA6002
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 04:24:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 02FE230C48F8
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 03:23:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CFB0131D61F5
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 03:23:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99AE52BD5A1;
-	Fri,  5 Dec 2025 03:23:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42F5D2C1586;
+	Fri,  5 Dec 2025 03:23:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lEYAknZK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XvDcl2bN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EFAC29E113;
-	Fri,  5 Dec 2025 03:23:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE6882C11E5;
+	Fri,  5 Dec 2025 03:23:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764905000; cv=none; b=iobkEcpegTdGL4XNBu4mtPpzrZgBfb5ZAaBtrDj1Iuny1ikFis5MxH9gyhScQTdkMHmeM2U0g0KK7WRiQoPuz6sPWYWCKwsekqO/WJ7JRzfaL079n7QFGZl9u4p3sl4mC3ncrSp7wa65OdYMH8zB/uV4f6K/wABy7O2EB/qiYfo=
+	t=1764905002; cv=none; b=W1uDFaD0lIuRxVDleFwTblyeQ5Exn9fCfvcXbKIWkmvJuRFZyM78K3Lm5s7bo4vm9R7+kpjuexUEpMwUp7g5Guk6vVtuBcr/1F9qpmw04PzsCMZYPAuTQCDZ8dfYgtukZa5K2x87kfQRXYs1+2RkZGWjQtHY8hNiLkGw+bTd6PU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764905000; c=relaxed/simple;
-	bh=d4/ZDFQyRlkt1RU41iBWWaqBDRFgPFWAm3GzxfH2Whk=;
+	s=arc-20240116; t=1764905002; c=relaxed/simple;
+	bh=or9yP6M1EmYLSR6Zpjjpmw84zohg9WpXWhR4V9Shztw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gk2pMGBb1KTIkfpM1JXsjOUggAupfSiUk/T+FlOI7yww5hqqdfcMPpvui4zIspOiXZuAfAhcjp3U7baMWoVsN4QY/oBpsmhS91LAhpP/N0Q8ZJ04AxlMWjHFz3hfuUyMpf2OwCPLedbkIYtPrJqSJizWYq6R0rFI3+EHnxskxgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lEYAknZK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4579FC4CEFB;
-	Fri,  5 Dec 2025 03:23:20 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=AOoxIKuVaOhfrMdDgZ7tw1Yl8Pmzf7BdMGW/Q+WQKkIqqFRzt010ekhB1vP9lmde+nILJiBJ8XJKvHytHYNQqM1F/TVe2Mo8qqHLFnHd9VGoMpleS+/KOCQKQ+ohSo5zVJwzNEt1DkW/qBKaWo3MS4NWxA3+3+ttlI+2xLQ476E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XvDcl2bN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2B79C116B1;
+	Fri,  5 Dec 2025 03:23:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764905000;
-	bh=d4/ZDFQyRlkt1RU41iBWWaqBDRFgPFWAm3GzxfH2Whk=;
+	s=k20201202; t=1764905001;
+	bh=or9yP6M1EmYLSR6Zpjjpmw84zohg9WpXWhR4V9Shztw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=lEYAknZKyBf7UO2RmW3Fz7zY7YW22Je9ZQ76Fbon0ZKyhChC2w2sLNJVshX/ftqdW
-	 YMhxzrLpzMXFrXGRu9Tw/gjhj9LY5uytzkO0x2e/e9q0O5GjLBGnvNqihyh0Ey/Vx5
-	 qP4Gn8SMnx1BjuH7TFDNZy6w9jkJ2O63Cd3Dsup+dNi0xyE/6yTTMW8hrJWNuDRxIp
-	 j3ivJwwDUtlkZUPSvDVILcXhlJjZDMX9iHwRIOqNoWRB0AgeqaJUOTvBa13MSFeXnB
-	 y+JeJClRVLraua/IjRxJ2yyCk2IfkvfibcK4e0WO+v7WRRQ5WH5+sGR7+ATPKKYv4l
-	 LfkcgfKh/1XQA==
+	b=XvDcl2bNkuHldDNmt4I6SeqJtyGyFbLhIsLywOyGmeTC0RXJJunGsV3wUiM2ARK9V
+	 Ab+lsXgkWiq4imgRTgtn15cLQM0c1jqazpI9iYmS3U+4nQJWLzO+6T0VnMekumb1J2
+	 MQuYbQaSTXd5gymuiTOCT4qzBN0MqzSHyRv0G2ITmHsiDPtJr+d2msUwFYOma8TgdQ
+	 6TZnR7SFa8kyM/Bu9PjIURJbzDHi7shSV1dU00xe2uUGmaATIV+T1X4DIhoyP/zXVb
+	 ez0FixPox2kcZbYc0FHNNZCJw36eSJ2XFwQPhwmkTL4sxuBSlYDYTnwN75OBW6ZVYr
+	 E6Nq7B5Qjagig==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 789283AA9A89;
-	Fri,  5 Dec 2025 03:20:19 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F2A2F3AA9A89;
+	Fri,  5 Dec 2025 03:20:20 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,37 +50,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net V2] r8169: fix RTL8117 Wake-on-Lan in DASH mode
+Subject: Re: [PATCH net] net: phy: marvell-88q2xxx: Fix clamped value in
+ mv88q2xxx_hwmon_write
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176490481827.1084773.16829863307342043595.git-patchwork-notify@kernel.org>
-Date: Fri, 05 Dec 2025 03:20:18 +0000
-References: <20251202.194137.1647877804487085954.rene@exactco.de>
-In-Reply-To: <20251202.194137.1647877804487085954.rene@exactco.de>
-To: =?utf-8?q?Ren=C3=A9_Rebe_=3Crene=40exactco=2Ede=3E?=@codeaurora.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- hkallweit1@gmail.com, nic_swsd@realtek.com, andrew+netdev@lunn.ch,
+ <176490481952.1084773.3572547538634420670.git-patchwork-notify@kernel.org>
+Date: Fri, 05 Dec 2025 03:20:19 +0000
+References: <20251202172743.453055-3-thorsten.blum@linux.dev>
+In-Reply-To: <20251202172743.453055-3-thorsten.blum@linux.dev>
+To: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
  davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- romieu@fr.zoreil.com
+ linux@roeck-us.net, dima.fedrau@gmail.com, stable@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 02 Dec 2025 19:41:37 +0100 (CET) you wrote:
-> Wake-on-Lan does currently not work for r8169 in DASH mode, e.g. the
-> ASUS Pro WS X570-ACE with RTL8168fp/RTL8117.
+On Tue,  2 Dec 2025 18:27:44 +0100 you wrote:
+> The local variable 'val' was never clamped to -75000 or 180000 because
+> the return value of clamp_val() was not used. Fix this by assigning the
+> clamped value back to 'val', and use clamp() instead of clamp_val().
 > 
-> Fix by not returning early in rtl_prepare_power_down when dash_enabled.
-> While this fixes WoL, it still kills the OOB RTL8117 remote management
-> BMC connection. Fix by not calling rtl8168_driver_stop if WoL is enabled.
+> Cc: stable@vger.kernel.org
+> Fixes: a557a92e6881 ("net: phy: marvell-88q2xxx: add support for temperature sensor")
+> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,V2] r8169: fix RTL8117 Wake-on-Lan in DASH mode
-    https://git.kernel.org/netdev/net/c/dd75c723ef56
+  - [net] net: phy: marvell-88q2xxx: Fix clamped value in mv88q2xxx_hwmon_write
+    https://git.kernel.org/netdev/net/c/c4cdf7376271
 
 You are awesome, thank you!
 -- 
