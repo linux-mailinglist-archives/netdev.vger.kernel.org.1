@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-243844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEBFBCA87E4
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 18:12:34 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 468A1CA87FE
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 18:12:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 823DD300351A
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 17:12:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 33B573003FB9
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 17:12:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25B9434574D;
-	Fri,  5 Dec 2025 17:12:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15F27346E4F;
+	Fri,  5 Dec 2025 17:12:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YWSqwp06"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ShpiucD5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 747A2338599
-	for <netdev@vger.kernel.org>; Fri,  5 Dec 2025 17:12:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FDB7345CC5
+	for <netdev@vger.kernel.org>; Fri,  5 Dec 2025 17:12:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764954740; cv=none; b=Emzr6qdfLHMng7qGg579QsIDytjodJU2eMLrfnmf1lzRHwll2TbOyi7VJ5npy2PTwf+WoPk3yTGmMi/TfvNcrlXx0awNZ5eb/clPQ0U0PIkPqpsgRl8pUzW3jN3zZBr7h8FWL6LpPJEjwBIJVvAvJR/3XM27lav/8Z3OBqd1c1s=
+	t=1764954742; cv=none; b=OT84JXovUfUsHprrsh4SoygF60x2POc8osJAPWliXrliXrpo/dgQTK08z+wnxRXnO1/aTdB8Bst8PUSCXU1bDRlVxFNhW0GAI7zqQEpxvA+7zbg0GMGyQUwOLZui/85D0etxsWt7SapEe5inqFxI6jYxDg4edSOvXOv2Rld2p4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764954740; c=relaxed/simple;
-	bh=3D8Jia7maxjOED0qB92SCnhCwD5om9jZB2vyXsShxiA=;
+	s=arc-20240116; t=1764954742; c=relaxed/simple;
+	bh=zQXdANrAyobWWcUFn+j7Tv5/akEdbk709MOA4NwiFNo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VyLg8bsJr8g6XFyl7ypRo5Ux7BAv4jzNDAGqd+r/W0ku3OdvvWI3Gh33Bhg0rHDhgzF4gbSvsT5vea2G0nJ0bZgeE7nBDNJMQfVV6v8SxdUw42t86TfgKOioFT1MlUP/HT4DeDuWy4bnwuY4XRJxUJJ/VOaXVdGv21Bb0ZZBqg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YWSqwp06; arc=none smtp.client-ip=209.85.214.171
+	 MIME-Version; b=dFmmgQOJbOZrg0YP0imUg7JjFk10YPFHKFiropkpWcxWEgG/IfsmH3Mkzm6I0Uv1Crr/a+SMpJ51ELYfbLz3reR1pG72gqbSfShXrnfZFN66FGuiLjzBUS7YryDBLM0hQfpwpPeQkgjlLhXa/hEUkllN6kl3Pm89x24tebFixNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ShpiucD5; arc=none smtp.client-ip=209.85.210.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-29ba9249e9dso33026965ad.3
-        for <netdev@vger.kernel.org>; Fri, 05 Dec 2025 09:12:12 -0800 (PST)
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7aab7623f42so2792629b3a.2
+        for <netdev@vger.kernel.org>; Fri, 05 Dec 2025 09:12:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764954731; x=1765559531; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1764954732; x=1765559532; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LKtvRnZXXEkJadMcjlPO6UUmkCEVjlrlMZ1C1H0q9gg=;
-        b=YWSqwp065wKnTjm7HpRnT2LAKeyuYHkp/dbEYH5qZZ2npmBtm8avAHLL64BZ/BlXnA
-         kwKDJKwzntNGiGaiMVUWvaIxzFZboyFrm4jRvSRzgL5lWza83orLX+OX+N4RCNTiEat1
-         14SHyYKQHJxOYqpIbfRMGiUFgWIh4blNZwhfDjWEMSUHPVd7n4EkgdaDrQT5uz7QqSZN
-         pDVcv5kmWG24GPvoaFUgg1pokpZaY0mcaIhgdfbqg0ZCbZB3iThpW9bLqoXFUx4pAvzO
-         SRWbSUGjgW5OuXB8libbn2jwx1903F6KcSFW7BSJBPjkcrYro6FO8negxTW69RMrX/cS
-         q9Yw==
+        bh=pGP855q8P483/tvMYnKD3q8c0QVPBAHakO/1UvcTEb8=;
+        b=ShpiucD5CfH6RxTe1uOiHmjhJxOqvhW2w1po4HFvFUfjGI/pAp6RVV3JA5fOIig3C+
+         agqJZ4DMGXun3iJpTMtrmfX9w5ohDBDvrOuThC4NKa/E5OlbkEI8tu+6Gnl5byhCNLHP
+         bWD4KFNvutkrwaaXaCkSGxgH6uLWtiKOvj/3Qp3IGL/jk6+LFJDDKJFm9oaClJe0YgjB
+         UGVj3I/kkh8krwY/v9yTYcZNOzWQdFXJyTOUvoOGjQYhvDawnVO+/J+qORctn7HWXxrP
+         RANvACI+0+CUGHodyK3CWSL2/CvDWnRoL0oq7sdvW6zwOmilrpXdf7IMMQUdDCVsUMJ7
+         qlNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764954731; x=1765559531;
+        d=1e100.net; s=20230601; t=1764954732; x=1765559532;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:sender:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LKtvRnZXXEkJadMcjlPO6UUmkCEVjlrlMZ1C1H0q9gg=;
-        b=Il6VEIG8w7eYpJQ7hEWSCgqyoVC0zbj99n5w/+9/McsffztetixiLLG0UIONoeIgs2
-         uOWMWWTFDiREhSfSXWX0Ns0BOojZv2KgwvuJK5Vq56LVahA1BdOlJZDZRhbpeZ4A6jjk
-         aOQjQZ3PQawff0xyavgnnlA3CMB8be579/4/3qz/8XCCRmU6FNUZFSe6uQjbpeNSyErT
-         LkAZcJVmyibTgOe1MB2FzegoVfNBw2CV1Ex6PtnZq5IUSY0MbOkQYHdbQk6ABIQoB3iL
-         UPb4BKatwSZdFAqJIzd74Yt+17rVWI7K9JHPzUmtzp/43F1wOt2HY9a7aVmvD0883Rut
-         J6fQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVymhFobDOCOhABXJzkIRtalNqhiA5X4fvcUtPR73cSs31MOU4kkFuN5s6ejEwBfyWQNuJ4ifQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8DWJlnhiFSpRf6F8iLM/x79tp6KzGOaJOskqiWXT84n9LVyCp
-	cdl4GUAH59oxmKabH4UNgh9vWQFzjocgYyHCrrZ35g59zCbo0segndvf
-X-Gm-Gg: ASbGnctOjMQey8JZqEVDZaGtLdj7MVyC8AWS19JKm60Cvuf6OS7Xbykrb9Dw4JQxBNP
-	o0+NRN0oszb6IaIkTkdYT58HUnW41nxQBV5h8Vah79Y2V7d0lLKo8KUzUNpsRKLgWeyN6lGxtnQ
-	SFGNFQLKkE0Qo1fQuqNVjStz4zRUSMwzxQsbQn0U79MtNhcos37/mmkP9uTWLHRQK+Ed12LPc0f
-	fbrBdu2LJxcxNutJYfrDdFsxUVNDz2Wd79PgZu4HpF6tkkOm4RRD91TFirC+hI56k+KvY4UTQL/
-	bRC4ChJloll91cNumG+VV07pgVkGSIVQVKS4p4mOcyycGMEUubXg0LLLNNnq3FDokmUaLB+EPud
-	rra2xnbMzx7YWOlucDglLZgQMDu80r23/pgaggDRWnigkEnY3vC1sNpnUxiKdRPc2JhwnMjsp2z
-	Wlkeh1UtjbRIhR5dssmAOrqsg=
-X-Google-Smtp-Source: AGHT+IEr1nY1dhYbPFblTm+sfB+BT05pWYr0So+DnBf2OW6AgkQWCY6GZ40JgzwGeLxSF5IGH5l44w==
-X-Received: by 2002:a05:7022:2218:b0:11b:9386:a3c0 with SMTP id a92af1059eb24-11df0c505admr7292285c88.43.1764954730772;
-        Fri, 05 Dec 2025 09:12:10 -0800 (PST)
+        bh=pGP855q8P483/tvMYnKD3q8c0QVPBAHakO/1UvcTEb8=;
+        b=hmKSMSCxBbGgJnu9EH9dskEeARjXDBdpgyQYGP+2AZXmKd+J0XCRr2m/TlKfjLC56x
+         OH2/7DBemxKP1iGHO7ThErwcBOkO1H7+PtMze9mP7mbpsxFE1nCmHEaIMpnip5vahTjY
+         pIrfBblO2VZwbTUKzswfOe25OWp69dDNHDAJc6aLF/mOZqA5H9HTdu7QlSsx6PoEw2wu
+         gnM9D9XHPPmFnKzr7m0VoRW/4ZAK26XO1Lmc4RwxBoXJ6KbEapm3iUJ/NztWVJ+BP8nV
+         Be1OZz8hQUuuoNddBPzEs6pPfrBHiscCM5pWsVAFfutUSsgsR0W1C4lRJNxZxdfBqpDp
+         vBTA==
+X-Forwarded-Encrypted: i=1; AJvYcCWX7cWRUjBjUjXfQ9E6dK8lcan5MUXU3oqdg/a8Fb3CNHNrtNbIN/sTc92Au15vSx0BDe3Tb7o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWSCs8Kw3ldNi4TE3ZilROFUi9gpvPB1Qr7ap7IB6c9lw0U/lB
+	GrVxgIvnc+ZRuzwmWL2wNevfgkGnjr9iyre0Yango2KU3T8K7QlY09La
+X-Gm-Gg: ASbGncv4sC4QHF/5+FFE4iQg729LBGzy1aO+u2iQ2mTKnLODim8zILpzV60l0cCjv5g
+	CE0+eyj+CbSF4LVK4EQRP8gnFzl8iG3UjKE+m9cQ3S1+JbrdJqb0DqDhCjU/tMO2gPCrjKuSYzF
+	piFCZvhd8RauNbXuPNMLgEAxFI38LJ8w8mcMDfZ9Tt4MFHJaa2xB9cg96SryrEC2RFhpJq7gWKX
+	t5PTtHR1koLtonl/3E7ytInn/+qEwNDNg8u4paqPoNQnVsubFvPvn1l7dvIz9RFNc583k2ROZej
+	ZDwmX6Ec9Vb0Mew+E7SOLEPvrpX9ZDfQZqtoLO9S49K6+rY1SqrDvENo61D9Qmz2t10Cic6huKt
+	uqWsZ2P03Fa/QJdtuQYiYqN58YMcqu5p3K8BCWI+/bce0QclGmbk+yWomq2EsrLXk5JRt72KkkO
+	6KNE6dgp5fJ/jcoV/J5EmqVD0=
+X-Google-Smtp-Source: AGHT+IHdTvay/STs3LNZkpmmMt8IstasmpTYD+N4EpMd1XG2nuq4zcxaDuN9vSlvYoOBreCnQRf4EQ==
+X-Received: by 2002:a05:7022:258b:b0:119:e56c:189f with SMTP id a92af1059eb24-11df0c3bbe6mr8274625c88.7.1764954732270;
+        Fri, 05 Dec 2025 09:12:12 -0800 (PST)
 Received: from server.roeck-us.net ([2600:1700:e321:62f0:da43:aeff:fecc:bfd5])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11df76e2eefsm19408192c88.6.2025.12.05.09.12.10
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11df76ff44asm20697582c88.9.2025.12.05.09.12.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Dec 2025 09:12:10 -0800 (PST)
+        Fri, 05 Dec 2025 09:12:11 -0800 (PST)
 Sender: Guenter Roeck <groeck7@gmail.com>
 From: Guenter Roeck <linux@roeck-us.net>
 To: Shuah Khan <shuah@kernel.org>
@@ -87,10 +87,10 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	netdev@vger.kernel.org,
 	bpf@vger.kernel.org,
 	Guenter Roeck <linux@roeck-us.net>,
-	Adrian Reber <areber@redhat.com>
-Subject: [PATCH v2 01/13] clone3: clone3_cap_checkpoint_restore: Fix build warnings
-Date: Fri,  5 Dec 2025 09:09:55 -0800
-Message-ID: <20251205171010.515236-2-linux@roeck-us.net>
+	Elizabeth Figura <zfigura@codeweavers.com>
+Subject: [PATCH v2 02/13] selftests: ntsync: Fix build warnings
+Date: Fri,  5 Dec 2025 09:09:56 -0800
+Message-ID: <20251205171010.515236-3-linux@roeck-us.net>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20251205171010.515236-1-linux@roeck-us.net>
 References: <20251205171010.515236-1-linux@roeck-us.net>
@@ -102,51 +102,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Fix:
+Fix
 
-clone3_cap_checkpoint_restore.c:56:7: warning: unused variable 'ret'
-   56 |                 int ret;
-      |                     ^~~
-clone3_cap_checkpoint_restore.c:57:8: warning: unused variable 'tmp'
-   57 |                 char tmp = 0;
-      |                      ^~~
-clone3_cap_checkpoint_restore.c:138:6: warning: unused variable 'ret'
-  138 |         int ret = 0;
+ntsync.c:1286:20: warning: call to undeclared function 'gettid';
+	ISO C99 and later do not support implicit function declarations
+ 1286 |         wait_args.owner = gettid();
+      |                           ^
+ntsync.c:1280:8: warning: unused variable 'index'
+ 1280 |         __u32 index, count, i;
+      |               ^~~~~
+ntsync.c:1281:6: warning: unused variable 'ret'
+ 1281 |         int ret;
 
-by removing the unused variables.
+by adding the missing include file and removing the unused variables.
 
-Fixes: 1d27a0be16d6 ("selftests: add clone3() CAP_CHECKPOINT_RESTORE test")
-Cc: Adrian Reber <areber@redhat.com>
+Fixes: a22860e57b54 ("selftests: ntsync: Add a stress test for contended waits.")
+Cc: Elizabeth Figura <zfigura@codeweavers.com>
 Signed-off-by: Guenter Roeck <linux@roeck-us.net>
 ---
 v2: Update subject and description to reflect that the patch fixes build
     warnings 
 
- .../testing/selftests/clone3/clone3_cap_checkpoint_restore.c  | 4 ----
- 1 file changed, 4 deletions(-)
+ tools/testing/selftests/drivers/ntsync/ntsync.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/clone3/clone3_cap_checkpoint_restore.c b/tools/testing/selftests/clone3/clone3_cap_checkpoint_restore.c
-index 3c196fa86c99..976e92c259fc 100644
---- a/tools/testing/selftests/clone3/clone3_cap_checkpoint_restore.c
-+++ b/tools/testing/selftests/clone3/clone3_cap_checkpoint_restore.c
-@@ -53,9 +53,6 @@ static int call_clone3_set_tid(struct __test_metadata *_metadata,
- 	}
+diff --git a/tools/testing/selftests/drivers/ntsync/ntsync.c b/tools/testing/selftests/drivers/ntsync/ntsync.c
+index 3aad311574c4..d3df94047e4d 100644
+--- a/tools/testing/selftests/drivers/ntsync/ntsync.c
++++ b/tools/testing/selftests/drivers/ntsync/ntsync.c
+@@ -11,6 +11,7 @@
+ #include <fcntl.h>
+ #include <time.h>
+ #include <pthread.h>
++#include <unistd.h>
+ #include <linux/ntsync.h>
+ #include "../../kselftest_harness.h"
  
- 	if (pid == 0) {
--		int ret;
--		char tmp = 0;
--
- 		TH_LOG("I am the child, my PID is %d (expected %d)", getpid(), set_tid[0]);
- 
- 		if (set_tid[0] != getpid())
-@@ -135,7 +132,6 @@ TEST(clone3_cap_checkpoint_restore)
+@@ -1277,8 +1278,7 @@ static int stress_device, stress_start_event, stress_mutex;
+ static void *stress_thread(void *arg)
  {
- 	pid_t pid;
- 	int status;
--	int ret = 0;
- 	pid_t set_tid[1];
+ 	struct ntsync_wait_args wait_args = {0};
+-	__u32 index, count, i;
+-	int ret;
++	__u32 count, i;
  
- 	test_clone3_supported();
+ 	wait_args.timeout = UINT64_MAX;
+ 	wait_args.count = 1;
 -- 
 2.45.2
 
