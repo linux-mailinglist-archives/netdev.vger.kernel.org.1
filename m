@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-243800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C760CCA7F23
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 15:27:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D913CA7F20
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 15:27:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C639B33609DF
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 11:55:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 431673340F8B
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 11:55:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D28C2330D3B;
-	Fri,  5 Dec 2025 11:53:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB39F330B3C;
+	Fri,  5 Dec 2025 11:53:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="M4KDmm2s"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="J6orrdf8"
 X-Original-To: netdev@vger.kernel.org
-Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010038.outbound.protection.outlook.com [40.93.198.38])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011069.outbound.protection.outlook.com [40.93.194.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 325BF32ED46;
-	Fri,  5 Dec 2025 11:53:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B375232D433;
+	Fri,  5 Dec 2025 11:53:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.69
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764935622; cv=fail; b=a5fKp/AZB7UhTPma5/dqDYNDbK5ToXGAs3Lyc2IethKvJVj1pf2XlTz9OBpnYIqiHChKCB/nOvn6BoyxcNZ+ZBou3iHhy+dhTQDYqxR7NZ1UaHUQAVdayRs93hMwm6piXzhzs3/xclUrarGlynHl5xudNf7GFIkLc/XsYGcmElk=
+	t=1764935621; cv=fail; b=fjXPcw8MfRzE22A1AoYM+S72PZYRhWmv/RvdfW5Zj/0jC8GJlrdnCpUtYSrcewJKxQgdGU1PhnkYNZrOe5m/ndDnXt3MiiTjceq3vsNlgc5gmIwYVyyIwWkvZU+eB/cy0vo6TVHLz96TD/WK7IDHqGZNUCyUazwUkWqSnjYaOsU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764935622; c=relaxed/simple;
-	bh=p21u4Qz5y+JpHGhvQ9AtgCD5u1X/3q/huIWlVGLm3ws=;
+	s=arc-20240116; t=1764935621; c=relaxed/simple;
+	bh=D073/s/FPAXsrdW3jk9Lxbu9TY+umbG/go4n2yFUpvU=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RdEOfF3Axr1TdoVo4eUIXEuKVpmr9eYQmQuzD+4qScnx/VjlGqnCaVRpE3cX94RgjipTnymtVshDGogfwS+gAecLLFiuI/nEX6eCzRh2AXCRuFdddfLPt2cOHnccwKxbnqmQZ60Uvumnx5k4h3TXQIK/PIuLhdCbd3rkwVTp70s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=M4KDmm2s; arc=fail smtp.client-ip=40.93.198.38
+	 MIME-Version:Content-Type; b=ONAZ7N4veI3xhDrbco3kI20getfePu0Jnp5VLB9gN3yY+TVfa3v7Sx1ljrfSyYb2mOHGjPUj6BO4AkxTPiiZle8jX0YSVImmkLS7KqotvffZn4Zb9zTaxZZvZs/5o/cWLZvR8HOxn5T+FTBvk00mY7dTTcU7EeS2kPCyCSm46VU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=J6orrdf8; arc=fail smtp.client-ip=40.93.194.69
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=yGgS1t7PE497SAbZa7zD/p4cPY6OnDKQhEf0tw9ZVFEh6ZwaNd3KJWhuwO551ruV6ZKSCrGoUu3Ada6IWEsHo/zMNOqWtVc9PS1K/RbXw7IO1o7BEcKPHPJUwt2KPShmW/UvxBaG/kQBFCvl0pij8kiEbl+uowhsX5bHxbdM7dD/+vLa7w4wogP8H71Bd1w3y9OJSI9MHhWA/lAufWV2GQ19aOI/0imQrDMgQXCSdEZ4A89UFrWvRBn93oBMchva8mBklogZOBITVthRNaibt7apMgU+/qe89+lB3ZlCXPmEybyf6cfMIFY9HCK4RvIKK1xbmlrZlz4sq3VTH+NGDA==
+ b=jViQzWDUTcP345W6S4iw7Bs26X2vTtvWqvWcuNv0Gq7C2scpbmDffX7dDVRf3IK/SaCxipy+y6dpvRfNwic0EFCRc/a7iv95oqJD4vKrYNs9plXHZhjGRkeYK+PXFnO/Ez5JAHSRjbB9cGe+NruOGTKVsA2A772UB8gKeZ30/V27UE9VsZqmM4g0LqmkMOQdgO/3B5GvZmrjOFM47Qd3aDRQz5Yv0QQkIj2mfXjvzR6/Nmza2Cw9urvWZR45capHgnSJLiVYGX1s6U4JVgN99vVIp4Ufup3S1Zmt2yYzRZGpZ06PCmAQ2ETFgDFw6/e21Xosvzpk4EL05r12/4syzQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hE8+OjksNVknGWDSF4RGj5HecrMVVoQ7EnTPxs3vzyw=;
- b=ybBAvAkoZ0laFSutK6j6cHBPOJCaWgr1wgqMIDT0QS+0Sh6S9XwCsoAWWVwEcbqvTPzT7TSF4S38qHXEBdUbdxh0ZFiq/iE03kpro6KnHDPcVPlu7yCcD+BOhJm4BJDSXNkUgzbzeEiquUNHoikYGmOqztwwI09Y5UM8NBNkbt0vPpd7zfN0053A3qsusoqm5jiQGmtgIwNzxuU9U0ImrpAK4pbKEZaYO4luaS/qDRoM6yHQiYi2M2X13HK9FJ5PETRP1vl5zxG1qFjMVjFbqYk5Cev3bt+ho0x3HP3bmH6Sw2bs5K6jyv3zHB2xTuzSn2T0ZsLrRLer/KB1ktzTcw==
+ bh=1sP1amu7XF9PRSEhA6i1mZjnW1dSVbQ4Hh9ECW6Tvx4=;
+ b=PacDJZYrOkIO8h0bXWNg56pTjsWNx11keJlA7FcBNBsAMBaqhYg+NRnk7oNxgZogmXk/ERsO7por9BdcGj+WvrjgC5ka1jXjlzeBbQSkenlDdyLq/HP3CgDyL0hMdyjeStWzZPoK0kiIm8G81smDido3PI0tUen53GsxI5Fj5tNWLUgzaQcpWMgcTntd5V7Ct0O9bSgiTnPzZ9BONjT1JomhtmBh7+XRvqo9KE2L7XLPBS58NxP7aUKo++qnN9H66kkjwOMrOyxTBhimU/oK4UdbfG2BKjX8vGcoOSUd7ODSf9h/iz7f7HMZz39niw+cbyo3+i9J+UjibwYP6dHViQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hE8+OjksNVknGWDSF4RGj5HecrMVVoQ7EnTPxs3vzyw=;
- b=M4KDmm2sRx7zZos8G+K9XI25NlKEdgv01dH/LeiCh+taiJAqUarm11hwFaDc076UB6dbcthUDXOmP4VeQzRxoamkZq7a4yjqJV72ATmvdfkv4cBNcTOK6bV5iMSiQkmFBD9PFnzxRkuamd5/eeDiYjwT4ghgf2qpkUJC7rnhVeU=
-Received: from PH7PR13CA0010.namprd13.prod.outlook.com (2603:10b6:510:174::20)
- by DS2PR12MB9661.namprd12.prod.outlook.com (2603:10b6:8:27b::17) with
+ bh=1sP1amu7XF9PRSEhA6i1mZjnW1dSVbQ4Hh9ECW6Tvx4=;
+ b=J6orrdf88uy8VnD7NgZ9Ry0gKlrtXbSVG28zzGsZOPeBzK2piWgn6fPtdQCLOupdvOogcbhHB4Wgf17u9kupYEXCWKVHK6/bGbHSA4YuAXDWEdub/gFmOcAOZjaOU9FjC5YiEfB0y5uour1LTqQZfrhsjJZvXv4Ercj9kuaxJ0w=
+Received: from SN7PR04CA0151.namprd04.prod.outlook.com (2603:10b6:806:125::6)
+ by PH7PR12MB7209.namprd12.prod.outlook.com (2603:10b6:510:204::20) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9388.9; Fri, 5 Dec
- 2025 11:53:29 +0000
-Received: from SA2PEPF000015C7.namprd03.prod.outlook.com
- (2603:10b6:510:174:cafe::44) by PH7PR13CA0010.outlook.office365.com
- (2603:10b6:510:174::20) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9412.3 via Frontend Transport; Fri, 5
- Dec 2025 11:53:26 +0000
+ 2025 11:53:30 +0000
+Received: from SA2PEPF000015CD.namprd03.prod.outlook.com
+ (2603:10b6:806:125:cafe::f8) by SN7PR04CA0151.outlook.office365.com
+ (2603:10b6:806:125::6) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9388.11 via Frontend Transport; Fri,
+ 5 Dec 2025 11:53:30 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -61,17 +61,17 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=satlexmb08.amd.com; pr=C
 Received: from satlexmb08.amd.com (165.204.84.17) by
- SA2PEPF000015C7.mail.protection.outlook.com (10.167.241.197) with Microsoft
+ SA2PEPF000015CD.mail.protection.outlook.com (10.167.241.203) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9388.8 via Frontend Transport; Fri, 5 Dec 2025 11:53:28 +0000
+ 15.20.9388.8 via Frontend Transport; Fri, 5 Dec 2025 11:53:30 +0000
 Received: from satlexmb08.amd.com (10.181.42.217) by satlexmb08.amd.com
  (10.181.42.217) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Fri, 5 Dec
- 2025 05:53:28 -0600
+ 2025 05:53:29 -0600
 Received: from xcbalucerop40x.xilinx.com (10.180.168.240) by
  satlexmb08.amd.com (10.181.42.217) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Fri, 5 Dec 2025 03:53:26 -0800
+ 15.2.2562.17 via Frontend Transport; Fri, 5 Dec 2025 03:53:28 -0800
 From: <alejandro.lucero-palau@amd.com>
 To: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
 	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
@@ -80,9 +80,9 @@ To: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
 CC: Alejandro Lucero <alucerop@amd.com>, Zhi Wang <zhiw@nvidia.com>, "Jonathan
  Cameron" <Jonathan.Cameron@huawei.com>, Ben Cheatham
 	<benjamin.cheatham@amd.com>, Alison Schofield <alison.schofield@intel.com>
-Subject: [PATCH v22 20/25] cxl/region: Factor out interleave ways setup
-Date: Fri, 5 Dec 2025 11:52:43 +0000
-Message-ID: <20251205115248.772945-21-alejandro.lucero-palau@amd.com>
+Subject: [PATCH v22 21/25] cxl/region: Factor out interleave granularity setup
+Date: Fri, 5 Dec 2025 11:52:44 +0000
+Message-ID: <20251205115248.772945-22-alejandro.lucero-palau@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20251205115248.772945-1-alejandro.lucero-palau@amd.com>
 References: <20251205115248.772945-1-alejandro.lucero-palau@amd.com>
@@ -96,53 +96,53 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF000015C7:EE_|DS2PR12MB9661:EE_
-X-MS-Office365-Filtering-Correlation-Id: e3ff2704-28ef-4e10-f24d-08de33f4e7bc
+X-MS-TrafficTypeDiagnostic: SA2PEPF000015CD:EE_|PH7PR12MB7209:EE_
+X-MS-Office365-Filtering-Correlation-Id: 12fe8908-0d76-4a0e-82d3-08de33f4e8c4
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|7416014|376014;
+	BCL:0;ARA:13230040|376014|7416014|36860700013|1800799024|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?LCzT3g8hLM6axR51rIriZNGZ0tex3aa3uBiRMCf+l+iGFhrh9dnqcYxq+t+6?=
- =?us-ascii?Q?vz1NBh8ghkriBps8uGjRATIzVQ8GKIBBNz0GdfoHi22MSjcDlbaZVipYunHk?=
- =?us-ascii?Q?JtHNpuoxZv8voFCBbJziw4mR8xA0tzFX6m9PWr7Dahh+v9DGDGMrPMIY5r1V?=
- =?us-ascii?Q?IvGrtQeidhTY/bEkEvlLqIiWludJ1uZckVz53pKljBF+u2FIQd9zox+TbcuM?=
- =?us-ascii?Q?OcL/ktjiy2noIZZkYrPmNIEUiBbSZaSNH5w68K8bClbdoIkLFJzI1gZmo4us?=
- =?us-ascii?Q?nGOI8G0WswR7MJGyFwv25nuFljtYTutGdVi1MBvMYGzwDsjw0HOis+o+Pc43?=
- =?us-ascii?Q?usknjIDpGIJ6FA3+zKm+33T49FrrfxL/XzD6fFcw9L+QpmxsHNmXiIQNE5l6?=
- =?us-ascii?Q?qnlzIbWR0sP4hApoLxG2QPZd92KitNExKSgajyJ4Crc5i9XNwyiwyQlkUXRL?=
- =?us-ascii?Q?O6xEmJMCh4H2PP7mRJb4tAMNK1vTokr73eEyJamlAar00uTMXnJ+mUNyGt6Y?=
- =?us-ascii?Q?I9MN1X8CKqpNe6wSlcv9WHGNyhiaw+Z8uLqfabHTOa817oziqgZhGY3uWrPY?=
- =?us-ascii?Q?GcxYT48iZrzb4CzNtataz7JbnoS1SYuJ0ixDONh+W0xNdbwMSr2Q/xaySV4G?=
- =?us-ascii?Q?lwZLvpmpjxDWOVd6i1RZxhq25zPoe6oWIVScBaX1hi/Iu7CvGz1pV+rMbD09?=
- =?us-ascii?Q?bOYgCWbJA3ymJHfehe4TqJhM/XQa2IW5eD2TNTZha62gjxsReNBo0YmqJhdR?=
- =?us-ascii?Q?RD5ygnqXaE9zi4W2dAiloqxsWwLsznUEWfQIMjaGID3TtsHb38x1jsWIiiJL?=
- =?us-ascii?Q?DnJQGrbVSt2C+ZT55Dzuql0r4lVzK1g/X8x83dFWgB8n6712ddX9ZkD5s+j4?=
- =?us-ascii?Q?SAFJORIsfOfoiGg/faCfl1IRI6MEF8pKJb+8lSCQmibGEI3245+6J6eaJOr3?=
- =?us-ascii?Q?souJmDiFUF0kCRfpMKFCww3Ant+u+qLSsMzfRWGJL/9M2UiNNqSnMqMv+ZTo?=
- =?us-ascii?Q?1a6MY5eDy75lE8E9YBcxWc85TNpgYHXJ6Yuk0NkdjCgrFhBaerz9IkhefQ3Y?=
- =?us-ascii?Q?CPbIit3LjjSq6cYXqrBeWmOOqQYOdbqw/RMRi/MicXsAIh9/HdNAv1hyhaSl?=
- =?us-ascii?Q?wgu19Wv4pRYdtDr9+8GMlEuTJyctnZ7ljFtRuMcryWnIVnUfwP3Fq4Frv4KI?=
- =?us-ascii?Q?LB2kuIesnrxMl81DaEn5myjTZ7qyx+oYMfnKpeRX3JUqjD9QYdEdP2ECv1t1?=
- =?us-ascii?Q?iiQueQe59aICkskwJ4Vo3GCKD9OZg/r29t5ZVsf+vnTW/6s4+GDHz7wWqaSD?=
- =?us-ascii?Q?ZTaVk5FShiEVYU4Aw21DqDnepE+zoqL0oV23a94YpHVE/LCTDiHJVJgCrt/t?=
- =?us-ascii?Q?gCAjgYfVKJu5e2WSMf70pBko9V/caBLRY21CDOhzEqjIV9SKgt4/UCpU2kyd?=
- =?us-ascii?Q?g1CNE+KOfc/C9tgK2NpeT9bqyPdNafuPh8XZ5NXKi6Yfh3ddSR6wjU/eXuU2?=
- =?us-ascii?Q?SP9NRGU+7CqKrTy3hM58SwW6LeHJKkb8AJdqeSIuoBM3uK6BblxRKjrSwSjR?=
- =?us-ascii?Q?V7ZcE+6WJTzcBbEzxLA=3D?=
+	=?us-ascii?Q?/AQgpNBN5ee1wAD7E03VV2cCns1W6mY5TE+tlkNSHuLB56udbVzQBor9ieur?=
+ =?us-ascii?Q?n5v4u9S0PJ9xBVjEB0NX03jEIze3tMKlSXXgGkoxFOoysVkImDBdn8RR/sOW?=
+ =?us-ascii?Q?r0322bjiVlVXCe7vazK345mZ4bqHkpHWXHcbvXOdzi3ivW97BOWaKnTixMYz?=
+ =?us-ascii?Q?Rd8d3buCnmW6V3BNdmhtj9UDtGOmoKTXPR6Ui1hK7iQ/9tFF75FlSS7mQ9dZ?=
+ =?us-ascii?Q?UchZnRWHnOLxuwdnpV/cmp5Ll2qMzNA0eRF7egkDpLs8uXr/QeV/tc6VcGL+?=
+ =?us-ascii?Q?NZXsMZ82+FB2c098dJ7E2ezQY4anxnHVNJBXsSqoYx5+b/n5tbhAy6jaViHc?=
+ =?us-ascii?Q?UiCBnpjREmWiw5NQWcqJbElppeyoIOOzam/OjriFij+x/19uBZs6VkU9abwi?=
+ =?us-ascii?Q?qqVfXZMiaiUO/1d/IahPlEskyyV//tz5S7T2ygtNsqUEhpvfxjySx8HcFSyq?=
+ =?us-ascii?Q?MvbBNatbRVtQ9xVbd2sF9nR6BznOf0cwdYywFEcdNb0o/9jjrvbNLQtgwiG/?=
+ =?us-ascii?Q?tmM9+ucuYUvcUbd2gMmRNycPvyayxdaV8Bvq8ho9p0/3jryCRwdQQ2pROY+F?=
+ =?us-ascii?Q?Ecx9ZWaHkbkBonYBrqA1kz4mbwNGtJz1oiEjqXnMVucfFGJBi2Yx3Wucqs4A?=
+ =?us-ascii?Q?HtA4zTtINoyNSGyha0xj3nXQXj3Q2aQNU7X8cZyqjH/TDU1BDkitSWyliQu6?=
+ =?us-ascii?Q?cSneiOM5CEnRYAVSYtxLHyGVsWaxSPRpPflvZ25gjkN/sMgNrvMKuzl5mTRy?=
+ =?us-ascii?Q?lLSSdqTiOYIKnTiKp5zMFcxRvS++q9pu/Wgabr8QYu3aWilTQX0oOLHX4pzw?=
+ =?us-ascii?Q?LpoCgqqYXVNzVqIL2E9ULHPh7uYt0nLzOpdzkgJQaggYH3Kg3221WbpYzis6?=
+ =?us-ascii?Q?H6dRoxYhx2+47AfnQfgtfsXqUdU/Vcr+CV5cyfU1kLJoYyw947+ht0MdsbTp?=
+ =?us-ascii?Q?U2RR23Y8gO0mwozwV5kQUbH6QDcICXT/4Xxjmrre1h+3VnTpES+8MRll9dYk?=
+ =?us-ascii?Q?bn7zjCu0LP3dqfXK0AL/HgcTkTUb+VyQL3LPdtOpPjsCQPC7eFWrjHDCrDrG?=
+ =?us-ascii?Q?RLuPe+y8rN2PR5+/viERF24SBybD0Wa5OS1G1jXmc63k0+zlQTElGJdLc1IS?=
+ =?us-ascii?Q?8fzB16pDV9fZcCTs5Atqiif+fhrX3ISIjeUOyHJIRnNSAzfxwzBU8/Fe4jis?=
+ =?us-ascii?Q?VMBZDYzDf8WEueS4P+cVGlplNQxwbWsUouQ5WHV8bHoB2R1kf36Md1FfVB7w?=
+ =?us-ascii?Q?DF3QFgRuun3fu2bWCF0ZQDG/d4VLTvn4yY9hLy0daQqtIQR2QmPGodgAcZ0z?=
+ =?us-ascii?Q?uG78fX663ue9OP6/KN71cz7lTv7R3MFJW/IIh/FUg/UHD5yTSmM2lsbqYp74?=
+ =?us-ascii?Q?Ajqcrbud6Lwir2wPGZHQe8wchSe4ZSTJK74WUGfHJILy0MBqn7xtLD3qfVj+?=
+ =?us-ascii?Q?Kfh6tUBXy5MMS7JWEkqSe2wuQjsi2eqoGNIarYOTNRHPhNJDEspIQKwOs8hs?=
+ =?us-ascii?Q?3d+Ip7sqcRxM+ssvsE4WMLhfF5kRPA21WzJWu6+y2JpNKiH8/0XCBMsxXEb1?=
+ =?us-ascii?Q?T4XFVWA+UNToe0Y7QBQ=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb08.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb08.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(36860700013)(1800799024)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2025 11:53:28.5499
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2025 11:53:30.2763
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e3ff2704-28ef-4e10-f24d-08de33f4e7bc
+X-MS-Exchange-CrossTenant-Network-Message-Id: 12fe8908-0d76-4a0e-82d3-08de33f4e8c4
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb08.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF000015C7.namprd03.prod.outlook.com
+	SA2PEPF000015CD.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS2PR12MB9661
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7209
 
 From: Alejandro Lucero <alucerop@amd.com>
 
@@ -151,7 +151,8 @@ allowing memory combination through interleaving.
 
 In preparation for kernel driven region creation, that is Type2 drivers
 triggering region creation backed with its advertised CXL memory, factor
-out a common helper from the user-sysfs region setup for interleave ways.
+out a common helper from the user-sysfs region setup forinterleave
+granularity.
 
 Signed-off-by: Alejandro Lucero <alucerop@amd.com>
 Reviewed-by: Zhi Wang <zhiw@nvidia.com>
@@ -160,70 +161,62 @@ Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 Reviewed-by: Ben Cheatham <benjamin.cheatham@amd.com>
 Reviewed-by: Alison Schofield <alison.schofield@intel.com>
 ---
- drivers/cxl/core/region.c | 43 ++++++++++++++++++++++++---------------
- 1 file changed, 27 insertions(+), 16 deletions(-)
+ drivers/cxl/core/region.c | 39 +++++++++++++++++++++++++--------------
+ 1 file changed, 25 insertions(+), 14 deletions(-)
 
 diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
-index 9aeee87e647e..157deee726a9 100644
+index 157deee726a9..21063f7a9468 100644
 --- a/drivers/cxl/core/region.c
 +++ b/drivers/cxl/core/region.c
-@@ -491,22 +491,14 @@ static ssize_t interleave_ways_show(struct device *dev,
+@@ -565,21 +565,14 @@ static ssize_t interleave_granularity_show(struct device *dev,
+ 	return sysfs_emit(buf, "%d\n", p->interleave_granularity);
+ }
  
- static const struct attribute_group *get_cxl_region_target_group(void);
- 
--static ssize_t interleave_ways_store(struct device *dev,
--				     struct device_attribute *attr,
--				     const char *buf, size_t len)
-+static int set_interleave_ways(struct cxl_region *cxlr, int val)
+-static ssize_t interleave_granularity_store(struct device *dev,
+-					    struct device_attribute *attr,
+-					    const char *buf, size_t len)
++static int set_interleave_granularity(struct cxl_region *cxlr, int val)
  {
 -	struct cxl_root_decoder *cxlrd = to_cxl_root_decoder(dev->parent);
 +	struct cxl_root_decoder *cxlrd = to_cxl_root_decoder(cxlr->dev.parent);
  	struct cxl_decoder *cxld = &cxlrd->cxlsd.cxld;
 -	struct cxl_region *cxlr = to_cxl_region(dev);
  	struct cxl_region_params *p = &cxlr->params;
--	unsigned int val, save;
--	int rc;
-+	int save, rc;
- 	u8 iw;
+-	int rc, val;
++	int rc;
+ 	u16 ig;
  
--	rc = kstrtouint(buf, 0, &val);
+-	rc = kstrtoint(buf, 0, &val);
 -	if (rc)
 -		return rc;
 -
- 	rc = ways_to_eiw(val, &iw);
+ 	rc = granularity_to_eig(val, &ig);
  	if (rc)
  		return rc;
-@@ -521,9 +513,7 @@ static ssize_t interleave_ways_store(struct device *dev,
+@@ -595,14 +588,32 @@ static ssize_t interleave_granularity_store(struct device *dev,
+ 	if (cxld->interleave_ways > 1 && val != cxld->interleave_granularity)
  		return -EINVAL;
- 	}
  
 -	ACQUIRE(rwsem_write_kill, rwsem)(&cxl_rwsem.region);
 -	if ((rc = ACQUIRE_ERR(rwsem_write_kill, &rwsem)))
 -		return rc;
+-
 +	lockdep_assert_held_write(&cxl_rwsem.region);
- 
  	if (p->state >= CXL_CONFIG_INTERLEAVE_ACTIVE)
  		return -EBUSY;
-@@ -531,10 +521,31 @@ static ssize_t interleave_ways_store(struct device *dev,
- 	save = p->interleave_ways;
- 	p->interleave_ways = val;
- 	rc = sysfs_update_group(&cxlr->dev.kobj, get_cxl_region_target_group());
--	if (rc) {
-+	if (rc)
- 		p->interleave_ways = save;
-+
-+	return rc;
+ 
+ 	p->interleave_granularity = val;
++	return 0;
 +}
 +
-+static ssize_t interleave_ways_store(struct device *dev,
-+				     struct device_attribute *attr,
-+				     const char *buf, size_t len)
++static ssize_t interleave_granularity_store(struct device *dev,
++					    struct device_attribute *attr,
++					    const char *buf, size_t len)
 +{
 +	struct cxl_region *cxlr = to_cxl_region(dev);
-+	unsigned int val;
-+	int rc;
++	int rc, val;
 +
-+	rc = kstrtouint(buf, 0, &val);
++	rc = kstrtoint(buf, 0, &val);
 +	if (rc)
 +		return rc;
 +
@@ -231,10 +224,9 @@ index 9aeee87e647e..157deee726a9 100644
 +	if ((rc = ACQUIRE_ERR(rwsem_write_kill, &rwsem)))
 +		return rc;
 +
-+	rc = set_interleave_ways(cxlr, val);
++	rc = set_interleave_granularity(cxlr, val);
 +	if (rc)
- 		return rc;
--	}
++		return rc;
  
  	return len;
  }
