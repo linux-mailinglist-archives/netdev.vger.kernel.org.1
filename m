@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-243816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6431CCA7E44
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 15:07:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E70ECA7E39
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 15:06:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 742AC307CA33
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 14:05:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 41218302EA1B
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 14:04:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 600F730E85C;
-	Fri,  5 Dec 2025 14:05:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71F8C32F749;
+	Fri,  5 Dec 2025 14:04:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UThSoObJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T27nJw5H"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3AD33191D2
-	for <netdev@vger.kernel.org>; Fri,  5 Dec 2025 14:05:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 067B62BE043
+	for <netdev@vger.kernel.org>; Fri,  5 Dec 2025 14:04:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764943553; cv=none; b=lLQ25TG18o9lpuaZDAcwB3qCWngGOaaK5V//uuhu8B7fEkYzvZc7ZVZaIr7dfCjQKX/oRTfpGFdjzuT2jQ+VzjO4ZvVHA8kphRjYcCKCo98/Ot1airf9mKCKmRQLfIJ4hb2OVhillXTuJ7a4aiYpt97hIF++gZvDUYzgdKp4iL0=
+	t=1764943477; cv=none; b=HKl9d8+Kf2kxkaSpOcy/c8KdPaHVSUv4y+WSbxrDUGmzQVUGSNyGt0hjEHiBEc3Ldq3p6hSfMeFTRX5W3g+aLS2xNNQMTtnLnVRd4xdxeZu7IdwazGB2xxo3LZUBiwmdsR7WXP1O/OHSvAF7/Jxr9mjPTW3trIrfMAnlKTZaJMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764943553; c=relaxed/simple;
-	bh=1ebN/mub/XGHQpA6c9xS82G7qUSI+5BmVC6EoVhV5yE=;
+	s=arc-20240116; t=1764943477; c=relaxed/simple;
+	bh=/ljQ92TLHpsZQfBNisebIAoTdj+4EzYaHQ9rzh9u1MQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=N6Mo1i+kQvPXcFiUEsf8oXiHrrne8xfE2OkkilGKPrykPikS8cCfXaDtAFv/FuvglpZBnvgAfr6AAcsHoonHJD6maGgHDZR5q7v7EsO1ALI7ZMloDZbLPKy8OfmtzKvvS1LfBaC4Y8duIBkdjHgueqtPZRV7ZN1VIvGMJxF9WQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UThSoObJ; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=ljhyVDDWP1sfOPfOiLuFOGZaTTftbUt29sAC1GuV5zwhTM0EQhsv7a5YUOVhqXAILQuCs2lI6Ddl/xpubOd9O6RN9lbpuhfh7jCf+IIOxAhOsbWEMoEJoo46JtScjaL2A0uPvzOiOIOq9CoSMCp8Jv4KoRBrrxUbaR8YbeGRuEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T27nJw5H; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1764943548;
+	s=mimecast20190719; t=1764943473;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=jd2csdLvIN741lGvpo5iBtdxkbN3obvlSf8w+gqrvi4=;
-	b=UThSoObJdnt0wA9px/Uv34Vs9L6Azs/Tu6yTIqcgw0hvqQOvJH+4s5C5uytzU1LqP4YDJJ
-	V7bjsYLKjnzZ5l9aKMlLCHTvKcfCvrSzf0ifM9/T7NUVqcTM5LMXzSh0ZaQEyyS80PwAX9
-	zzar1QNxMdR3EjC6uEj7Ios9feVfplw=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=oTfx7M0Cqvpio+BwrKPWXWxCd+SC8G4PfJtHCL4mML4=;
+	b=T27nJw5H7c9ejApC9FkkAJrtQjLW00AhoRPp6dymCxbWFuORlnIqzAMMRiUb7aYPmWmclb
+	1UxPsTpxPcJvjx8CZU2aFEN247fGPAgb4j55dwJC4YAOKkG0YEBTAH4xIh9FIE9smpGUTH
+	c71/V+eeSUWdd7oFZ+DkfrFhVbTBF3w=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-359-JChz4epgNR-aY9guZX2D9A-1; Fri,
- 05 Dec 2025 09:04:28 -0500
-X-MC-Unique: JChz4epgNR-aY9guZX2D9A-1
-X-Mimecast-MFC-AGG-ID: JChz4epgNR-aY9guZX2D9A_1764943466
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-510-Q9oXp5wnNSubtDJpI9Kwuw-1; Fri,
+ 05 Dec 2025 09:04:32 -0500
+X-MC-Unique: Q9oXp5wnNSubtDJpI9Kwuw-1
+X-Mimecast-MFC-AGG-ID: Q9oXp5wnNSubtDJpI9Kwuw_1764943470
 Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8B520195606F;
-	Fri,  5 Dec 2025 14:04:26 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EFC5A18005A4;
+	Fri,  5 Dec 2025 14:04:29 +0000 (UTC)
 Received: from gerbillo.redhat.com (unknown [10.45.224.159])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8B00A19560BE;
-	Fri,  5 Dec 2025 14:04:23 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1B84319560B4;
+	Fri,  5 Dec 2025 14:04:26 +0000 (UTC)
 From: Paolo Abeni <pabeni@redhat.com>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -64,9 +64,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Neal Cardwell <ncardwell@google.com>,
 	Kuniyuki Iwashima <kuniyu@google.com>,
 	David Ahern <dsahern@kernel.org>
-Subject: [RFC PATCH 1/2] net: gro: avoid relaying on skb->transport_header at receive time
-Date: Fri,  5 Dec 2025 15:03:30 +0100
-Message-ID: <98a7e20010265e3ebf9d7e6d6dfb7339d5db7b99.1764943231.git.pabeni@redhat.com>
+Subject: [RFC PATCH 2/2] net: gro: set the transport header later
+Date: Fri,  5 Dec 2025 15:03:31 +0100
+Message-ID: <27e2c981fb7ac08d9e9dd000a0e284a073571bde.1764943231.git.pabeni@redhat.com>
 In-Reply-To: <cover.1764943231.git.pabeni@redhat.com>
 References: <cover.1764943231.git.pabeni@redhat.com>
 Precedence: bulk
@@ -78,187 +78,101 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Currently {tcp,udp}_gro_receive relay on the gro network stage setting
-the correct transport header offset for all the skbs held by the GRO
-engine.
+After the previous patch, the GRO engine receive callbacks don't relay
+anymore on the skb transport header being set.
 
-Such assumption is not necessary, as the code can instead leverage the
-offset already available for the currently processed skb. Add a couple
-of helpers to for readabilty' sake.
+Move such operation at GRO complete time, with one notable exception:
+SKB_GSO_FRAGLIST offload need the headers to be set on each skb in
+the list prior to segmentation.
 
-As skb->transport_header lays on a different cacheline wrt skb->data,
-this should save a cacheline access for each packet aggregation.
-Additionally this will make the next patch possible.
-
-Note that the compiler (gcc 15.2.1) does inline the tcp_gro_lookup()
-call in tcp_gro_receive(), so the additional argument is only relevant
-for the fraglist case.
+This prevents the NAPI gro_cell instance on top of a geneve tunnel
+with GRO hints enabled from corrupting the GRO-hint-aggregated packet
+setting the (innermost) transport header to the middle-one before
+stopping the GRO process due to the encap mark.
 
 Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 ---
- include/net/gro.h        | 26 ++++++++++++++++++++++++++
- include/net/tcp.h        |  3 ++-
- net/ipv4/tcp_offload.c   | 15 ++++++++-------
- net/ipv4/udp_offload.c   |  4 ++--
- net/ipv6/tcpv6_offload.c |  2 +-
- 5 files changed, 39 insertions(+), 11 deletions(-)
+ net/ipv4/af_inet.c     | 2 +-
+ net/ipv4/tcp_offload.c | 1 +
+ net/ipv4/udp_offload.c | 4 ++++
+ net/ipv6/ip6_offload.c | 3 +--
+ 4 files changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/include/net/gro.h b/include/net/gro.h
-index b65f631c521d..fdb9285ab117 100644
---- a/include/net/gro.h
-+++ b/include/net/gro.h
-@@ -420,6 +420,18 @@ struct sk_buff *udp_gro_receive(struct list_head *head, struct sk_buff *skb,
- 				struct udphdr *uh, struct sock *sk);
- int udp_gro_complete(struct sk_buff *skb, int nhoff, udp_lookup_t lookup);
+diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+index 08d811f11896..f954ab78481a 100644
+--- a/net/ipv4/af_inet.c
++++ b/net/ipv4/af_inet.c
+@@ -1527,7 +1527,6 @@ struct sk_buff *inet_gro_receive(struct list_head *head, struct sk_buff *skb)
+ 	 * as we already checked checksum over ipv4 header was 0
+ 	 */
+ 	skb_gro_pull(skb, sizeof(*iph));
+-	skb_set_transport_header(skb, skb_gro_offset(skb));
  
-+/* Return the skb hdr corresponding to the specified skb2 hdr.
-+ * skb2 is held in the gro engine, i.e. its headers are in the linear part.
-+ */
-+static inline const void *
-+skb_gro_header_from(const struct sk_buff *skb, const struct sk_buff *skb2,
-+		    const void *hdr2)
-+{
-+	size_t offset = (unsigned char *)hdr2 - skb2->data;
-+
-+	return skb->data + offset;
-+}
-+
- static inline struct udphdr *udp_gro_udphdr(struct sk_buff *skb)
- {
- 	struct udphdr *uh;
-@@ -432,6 +444,13 @@ static inline struct udphdr *udp_gro_udphdr(struct sk_buff *skb)
- 	return uh;
- }
+ 	pp = indirect_call_gro_receive(tcp4_gro_receive, udp4_gro_receive,
+ 				       ops->callbacks.gro_receive, head, skb);
+@@ -1611,6 +1610,7 @@ int inet_gro_complete(struct sk_buff *skb, int nhoff)
+ 	if (WARN_ON(!ops || !ops->callbacks.gro_complete))
+ 		goto out;
  
-+static inline const struct udphdr *
-+udp_gro_udphdr_from(const struct sk_buff *skb, const struct sk_buff *skb2,
-+		    const struct udphdr *uh)
-+{
-+	return (const struct udphdr *)skb_gro_header_from(skb, skb2, uh);
-+}
-+
- static inline __wsum ip6_gro_compute_pseudo(const struct sk_buff *skb,
- 					    int proto)
- {
-@@ -620,4 +639,11 @@ static inline struct tcphdr *tcp_gro_pull_header(struct sk_buff *skb)
- 	return th;
- }
- 
-+static inline const struct tcphdr *
-+tcp_gro_header_from(const struct sk_buff *skb, const struct sk_buff *skb2,
-+		    const struct tcphdr *th)
-+{
-+	return (const struct tcphdr *)skb_gro_header_from(skb, skb2, th);
-+}
-+
- #endif /* _NET_GRO_H */
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 0deb5e9dd911..a4c239daf2ea 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -2313,7 +2313,8 @@ void tcp_v4_destroy_sock(struct sock *sk);
- 
- struct sk_buff *tcp_gso_segment(struct sk_buff *skb,
- 				netdev_features_t features);
--struct sk_buff *tcp_gro_lookup(struct list_head *head, struct tcphdr *th);
-+struct sk_buff *tcp_gro_lookup(struct list_head *head, struct sk_buff *skb,
-+			       struct tcphdr *th);
- struct sk_buff *tcp_gro_receive(struct list_head *head, struct sk_buff *skb,
- 				struct tcphdr *th);
- INDIRECT_CALLABLE_DECLARE(int tcp4_gro_complete(struct sk_buff *skb, int thoff));
++	skb_set_transport_header(skb, nhoff + sizeof(*iph));
+ 	/* Only need to add sizeof(*iph) to get to the next hdr below
+ 	 * because any hdr with option will have been flushed in
+ 	 * inet_gro_receive().
 diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
-index fdda18b1abda..fa36686df6d7 100644
+index fa36686df6d7..a78d9b15de06 100644
 --- a/net/ipv4/tcp_offload.c
 +++ b/net/ipv4/tcp_offload.c
-@@ -261,16 +261,17 @@ struct sk_buff *tcp_gso_segment(struct sk_buff *skb,
- 	return segs;
- }
+@@ -334,6 +334,7 @@ struct sk_buff *tcp_gro_receive(struct list_head *head, struct sk_buff *skb,
+ 		flush |= skb->csum_level != p->csum_level;
+ 		flush |= NAPI_GRO_CB(p)->count >= 64;
+ 		skb_set_network_header(skb, skb_gro_receive_network_offset(skb));
++		skb_set_transport_header(skb, (unsigned char *)th - skb->data);
  
--struct sk_buff *tcp_gro_lookup(struct list_head *head, struct tcphdr *th)
-+struct sk_buff *tcp_gro_lookup(struct list_head *head, struct sk_buff *skb,
-+			       struct tcphdr *th)
- {
--	struct tcphdr *th2;
-+	const struct tcphdr *th2;
- 	struct sk_buff *p;
- 
- 	list_for_each_entry(p, head, list) {
- 		if (!NAPI_GRO_CB(p)->same_flow)
- 			continue;
- 
--		th2 = tcp_hdr(p);
-+		th2 = tcp_gro_header_from(p, skb, th);
- 		if (*(u32 *)&th->source ^ *(u32 *)&th2->source) {
- 			NAPI_GRO_CB(p)->same_flow = 0;
- 			continue;
-@@ -287,8 +288,8 @@ struct sk_buff *tcp_gro_receive(struct list_head *head, struct sk_buff *skb,
- {
- 	unsigned int thlen = th->doff * 4;
- 	struct sk_buff *pp = NULL;
-+	const struct tcphdr *th2;
- 	struct sk_buff *p;
--	struct tcphdr *th2;
- 	unsigned int len;
- 	__be32 flags;
- 	unsigned int mss = 1;
-@@ -298,11 +299,11 @@ struct sk_buff *tcp_gro_receive(struct list_head *head, struct sk_buff *skb,
- 	len = skb_gro_len(skb);
- 	flags = tcp_flag_word(th);
- 
--	p = tcp_gro_lookup(head, th);
-+	p = tcp_gro_lookup(head, skb, th);
- 	if (!p)
- 		goto out_check_final;
- 
--	th2 = tcp_hdr(p);
-+	th2 = tcp_gro_header_from(p, skb, th);
- 	flush = (__force int)(flags & TCP_FLAG_CWR);
- 	flush |= (__force int)((flags ^ tcp_flag_word(th2)) &
- 		  ~(TCP_FLAG_FIN | TCP_FLAG_PSH));
-@@ -398,7 +399,7 @@ static void tcp4_check_fraglist_gro(struct list_head *head, struct sk_buff *skb,
- 	if (likely(!(skb->dev->features & NETIF_F_GRO_FRAGLIST)))
- 		return;
- 
--	p = tcp_gro_lookup(head, th);
-+	p = tcp_gro_lookup(head, skb, th);
- 	if (p) {
- 		NAPI_GRO_CB(skb)->is_flist = NAPI_GRO_CB(p)->is_flist;
- 		return;
+ 		if (flush || skb_gro_receive_list(p, skb))
+ 			mss = 1;
 diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-index 19d0b5b09ffa..7048cb2a28a2 100644
+index 7048cb2a28a2..73edbc154cfa 100644
 --- a/net/ipv4/udp_offload.c
 +++ b/net/ipv4/udp_offload.c
-@@ -701,7 +701,7 @@ static struct sk_buff *udp_gro_receive_segment(struct list_head *head,
- {
- 	struct udphdr *uh = udp_gro_udphdr(skb);
- 	struct sk_buff *pp = NULL;
--	struct udphdr *uh2;
-+	const struct udphdr *uh2;
- 	struct sk_buff *p;
- 	unsigned int ulen;
- 	int ret = 0;
-@@ -726,7 +726,7 @@ static struct sk_buff *udp_gro_receive_segment(struct list_head *head,
- 		if (!NAPI_GRO_CB(p)->same_flow)
- 			continue;
+@@ -751,6 +751,8 @@ static struct sk_buff *udp_gro_receive_segment(struct list_head *head,
+ 			pp = p;
+ 		} else {
+ 			if (NAPI_GRO_CB(skb)->is_flist) {
++				int offset;
++
+ 				if (!pskb_may_pull(skb, skb_gro_offset(skb))) {
+ 					NAPI_GRO_CB(skb)->flush = 1;
+ 					return NULL;
+@@ -761,6 +763,8 @@ static struct sk_buff *udp_gro_receive_segment(struct list_head *head,
+ 					return NULL;
+ 				}
+ 				skb_set_network_header(skb, skb_gro_receive_network_offset(skb));
++				offset = (unsigned char *)uh - skb->data;
++				skb_set_transport_header(skb, offset);
+ 				ret = skb_gro_receive_list(p, skb);
+ 			} else {
+ 				skb_gro_postpull_rcsum(skb, uh,
+diff --git a/net/ipv6/ip6_offload.c b/net/ipv6/ip6_offload.c
+index fce91183797a..ed71cbd45690 100644
+--- a/net/ipv6/ip6_offload.c
++++ b/net/ipv6/ip6_offload.c
+@@ -256,8 +256,6 @@ INDIRECT_CALLABLE_SCOPE struct sk_buff *ipv6_gro_receive(struct list_head *head,
+ 		skb_gro_pull(skb, sizeof(*iph));
+ 	}
  
--		uh2 = udp_hdr(p);
-+		uh2 = udp_gro_udphdr_from(p, skb, uh);
+-	skb_set_transport_header(skb, skb_gro_offset(skb));
+-
+ 	NAPI_GRO_CB(skb)->proto = proto;
  
- 		/* Match ports only, as csum is always non zero */
- 		if ((*(u32 *)&uh->source != *(u32 *)&uh2->source)) {
-diff --git a/net/ipv6/tcpv6_offload.c b/net/ipv6/tcpv6_offload.c
-index effeba58630b..ae481bf95651 100644
---- a/net/ipv6/tcpv6_offload.c
-+++ b/net/ipv6/tcpv6_offload.c
-@@ -27,7 +27,7 @@ static void tcp6_check_fraglist_gro(struct list_head *head, struct sk_buff *skb,
- 	if (likely(!(skb->dev->features & NETIF_F_GRO_FRAGLIST)))
- 		return;
+ 	flush--;
+@@ -382,6 +380,7 @@ INDIRECT_CALLABLE_SCOPE int ipv6_gro_complete(struct sk_buff *skb, int nhoff)
+ 	if (WARN_ON(!ops || !ops->callbacks.gro_complete))
+ 		goto out;
  
--	p = tcp_gro_lookup(head, th);
-+	p = tcp_gro_lookup(head, skb, th);
- 	if (p) {
- 		NAPI_GRO_CB(skb)->is_flist = NAPI_GRO_CB(p)->is_flist;
- 		return;
++	skb_set_transport_header(skb, nhoff);
+ 	err = INDIRECT_CALL_L4(ops->callbacks.gro_complete, tcp6_gro_complete,
+ 			       udp6_gro_complete, skb, nhoff);
+ 
 -- 
 2.52.0
 
