@@ -1,162 +1,81 @@
-Return-Path: <netdev+bounces-243862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFBEACA8AF2
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 18:52:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 60446CA8B4F
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 18:56:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 67FEE30AC691
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 17:48:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B7834300C0F0
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 17:50:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3C9B34C9A7;
-	Fri,  5 Dec 2025 17:41:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B5102FF656;
+	Fri,  5 Dec 2025 17:50:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oviwmDWC"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="UaczHTgE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C69534C98A
-	for <netdev@vger.kernel.org>; Fri,  5 Dec 2025 17:41:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E5542EFD91;
+	Fri,  5 Dec 2025 17:50:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764956505; cv=none; b=AUUaFp+FknIgNxQW1BP+9V/7G0KcIR00q2A9XgUR++W0doTxgvk+3s/kDs/0yLqQmQ+vWlu9Lwdv7fhdPqUrP3yIOhEY/fCd31YJNr0vSIvYHw2Ey9FwXeV/w343lOrHtN8emy/IhirS/C9g268wDvEOMpwsamkYRnM3pmyUayE=
+	t=1764957055; cv=none; b=lfyGK45C03Gpocs0LKgVW6Vhl4UKkrj20h76PaCzcjKzo5EmZHJduamxSdJpBcqKpoAstz2C22IOJG+XlGaLII4Y6uElPiob7sMH1nzR67A1HaEGp85VtVwPLbLyeM8HsAycYY0R1ko9NjM56DZfV2x7dASXA9IHAAqmwwTTSV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764956505; c=relaxed/simple;
-	bh=9P+oUCNrHqQr6TTse4VstKkT/97+r6l55NAKHEhSJ9s=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=Tbl4rB6BjgDFuhGSp5e+V/GKaycAEmCjgMCu1DEMwO7DE0prLTLBm/IYc8Ul1CRaXeGWyeX1PyVxmJC+hH9JPlCjWLe7bq2TzVpdItmkMqyeDM8pron4jIeGi+i7AIV0GlTBYLZ4w4pqxymjdSTacVzTAZ+x1Sz8TIjBC5U6bYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oviwmDWC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8ED2C4AF0B;
-	Fri,  5 Dec 2025 17:41:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764956505;
-	bh=9P+oUCNrHqQr6TTse4VstKkT/97+r6l55NAKHEhSJ9s=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=oviwmDWCzYHpDX4wfzofBRm9GQZKAOShMHLidMh2k622DxLjwkFlIM7xaUH3scOSl
-	 HGKqbb8km99rlq3YhJdBITxZUVpuzRWNcJUPi/8CDuqg2tewxk1AVtiuy3FrtKuasz
-	 F2dWGAQIB8nyBhVm2LOsz2w+qav4DPSd602h59UgGLrrC7Suxfz4ne01rVRBuaRtId
-	 X64UkjS1FTgRyNUPlBvaRhf3mfmBaXYE6B+jzs/GigOClyx0phyG58qSRUoLhMQY34
-	 Ft4qC7vTIOwmqFGb/nREezZfPgBulqCFU0du0pZj1j9/b6iMKFf6sX+vI3REBLMCvU
-	 BCFVnYOc2uAyQ==
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfauth.phl.internal (Postfix) with ESMTP id F0FEEF4006C;
-	Fri,  5 Dec 2025 12:41:43 -0500 (EST)
-Received: from phl-imap-15 ([10.202.2.104])
-  by phl-compute-10.internal (MEProxy); Fri, 05 Dec 2025 12:41:43 -0500
-X-ME-Sender: <xms:VxkzaVllaefO6Cr-V0OcyG5qCs6STHAyg-nt-DpYBYUNeqOeinx6YA>
-    <xme:VxkzabrwiLD7QKwWSn2KA1g48uuUUoYYWy9P2IxCo0gqCaX8f01TV8ED19vLsrE_V
-    8yJCg0TRNGBaqPC9v7k7ZBSxt5sj0ENsX82BOtzIcefWh34s_XHfrI>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdeltddtucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceurghi
-    lhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurh
-    epofggfffhvfevkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedfvehhuhgtkhcu
-    nfgvvhgvrhdfuceotggvlheskhgvrhhnvghlrdhorhhgqeenucggtffrrghtthgvrhhnpe
-    fhffekffeftdfgheeiveekudeuhfdvjedvfedvueduvdegleekgeetgfduhfefleenucev
-    lhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegthhhutghklh
-    gvvhgvrhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqudeifeegleelleeh
-    ledqfedvleekgeegvdefqdgtvghlpeepkhgvrhhnvghlrdhorhhgsehfrghsthhmrghilh
-    drtghomhdpnhgspghrtghpthhtohepudejpdhmohguvgepshhmthhpohhuthdprhgtphht
-    thhopehnvghilhessghrohifnhdrnhgrmhgvpdhrtghpthhtohepuggrvhgvmhesuggrvh
-    gvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgt
-    ohhmpdhrtghpthhtoheprghnnhgrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehhoh
-    hrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehjlhgrhihtohhnsehkvghrnhgv
-    lhdrohhrghdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
-    epthhrohhnughmhieskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepiihhrghotghhvghn
-    ghhurghngheskhihlhhinhhoshdrtghn
-X-ME-Proxy: <xmx:VxkzaaEGclyb4xuLsHEaPlshe4WnaPIsTSjuADqvbaSRSRrIfZavWw>
-    <xmx:VxkzaXpCbzZAMmHvlwWEp_G0rVc6pClaXFCCWt0pt_PhZ9S30VT_GA>
-    <xmx:VxkzaVyMhvEEKux-F80P-ZzcEpWbBuFWPB3Qswr802E4FVRbtNU_ZQ>
-    <xmx:VxkzaRMqeS6rnLxCPla-GgyvjCy9rpvnPGao3f5FpsNx7A3nSUWM9w>
-    <xmx:VxkzaVeYyat1uHtS1X1SBryztmo_OSLSaCGhdljt_2U7Q5cS2sx_hCTF>
-Feedback-ID: ifa6e4810:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id C9429780054; Fri,  5 Dec 2025 12:41:43 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1764957055; c=relaxed/simple;
+	bh=G/i8x+2YdM0OZZ6L46Ly2GysVZdFJPleHoSQxr8pW7k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UmV8mr92nc3d1uCdgu0QGnIpTOmFmCkZ9Vu9wa7V1sD6tkcvrC6OCOK7KCbYzjIDXZBFf8d0jZbEXdWBC+dh6y/fOtQcI0TvBMoI67Jx61P8QQB31i+LiDyCgcWDD9G2AfGnDCFHF1jH882QXSbtIcAAPE3m7A7cvVMLPyOdxnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=UaczHTgE; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=MQ8dIiuQ1RvZuq3a+6+laYHtH9uSksOb5IgdNEId5a8=; b=UaczHTgEvBqI3zGutLf3vi8pOs
+	7PRxwedzvPMC4H+Zl5aDoyIPFnmA3LBVi+mB7wKtWDxUUyidjoeXQ3n7SdCxX2HqZaAHIe62bUmOX
+	qYQKxwbiCvK29+lIALcWUGlU3wYw3AQrhEQXL8zW5boPXRZgIfekXTQSp5xXQ6y0YO3U=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vRZwx-00G7Pi-MM; Fri, 05 Dec 2025 18:50:35 +0100
+Date: Fri, 5 Dec 2025 18:50:35 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Pantelis Antoniou <pantelis.antoniou@gmail.com>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH RFC] powerpc: switch two fixed phy links to full duplex
+Message-ID: <5d302153-c7f6-48dc-95cc-0dc4f25045c6@lunn.ch>
+References: <64533952-1299-4ae2-860d-b34b97a24d98@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AyOyYelYpCes
-Date: Fri, 05 Dec 2025 12:41:21 -0500
-From: "Chuck Lever" <cel@kernel.org>
-To: "Chenguang Zhao" <zhaochenguang@kylinos.cn>,
- "Trond Myklebust" <trondmy@kernel.org>, "Anna Schumaker" <anna@kernel.org>,
- "Chuck Lever" <chuck.lever@oracle.com>, "Jeff Layton" <jlayton@kernel.org>,
- NeilBrown <neil@brown.name>, "Olga Kornievskaia" <okorniev@redhat.com>,
- "Dai Ngo" <Dai.Ngo@oracle.com>, "Tom Talpey" <tom@talpey.com>,
- "David S. Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>
-Cc: linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Message-Id: <dd196d82-6c38-4aa3-bdb5-228fe66f4e5b@app.fastmail.com>
-In-Reply-To: <20251204011232.41487-1-zhaochenguang@kylinos.cn>
-References: <20251204011232.41487-1-zhaochenguang@kylinos.cn>
-Subject: Re: [PATCH RESEND linux-next] SUNRPC: Optimize list definition method
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <64533952-1299-4ae2-860d-b34b97a24d98@gmail.com>
 
-
-On Wed, Dec 3, 2025, at 8:12 PM, Chenguang Zhao wrote:
-> Integrate list definition and initialization into LIST_HEAD macro
->
-> Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
-> ---
->  net/sunrpc/backchannel_rqst.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/net/sunrpc/backchannel_rqst.c b/net/sunrpc/backchannel_rqst.c
-> index caa94cf57123..949022c5574c 100644
-> --- a/net/sunrpc/backchannel_rqst.c
-> +++ b/net/sunrpc/backchannel_rqst.c
-> @@ -131,7 +131,7 @@ EXPORT_SYMBOL_GPL(xprt_setup_backchannel);
->  int xprt_setup_bc(struct rpc_xprt *xprt, unsigned int min_reqs)
->  {
->  	struct rpc_rqst *req;
-> -	struct list_head tmp_list;
-> +	LIST_HEAD(tmp_list);
->  	int i;
+On Fri, Dec 05, 2025 at 06:21:50PM +0100, Heiner Kallweit wrote:
+> These two fixed links are the only ones in-kernel specifying half duplex.
+> If these could be switched to full duplex, then half duplex handling
+> could be removed from phylib fixed phy, phylink, swphy.
 > 
->  	dprintk("RPC:       setup backchannel transport\n");
-> @@ -147,7 +147,6 @@ int xprt_setup_bc(struct rpc_xprt *xprt, unsigned 
-> int min_reqs)
->  	 * lock is held on the rpc_xprt struct.  It also makes cleanup
->  	 * easier in case of memory allocation errors.
->  	 */
-> -	INIT_LIST_HEAD(&tmp_list);
->  	for (i = 0; i < min_reqs; i++) {
->  		/* Pre-allocate one backchannel rpc_rqst */
->  		req = xprt_alloc_bc_req(xprt);
-> -- 
-> 2.25.1
+> The SoC MAC's are capable of full duplex, fs_enet MAC driver is as well.
+> Anything that would keep us from switching to full duplex?
 
-The commit message:
+What do we know about the device on the other end of the link? Maybe
+that is what is limiting it to 10Half?
 
-> SUNRPC: Optimize list definition method
-> 
-> Integrate list definition and initialization into LIST_HEAD macro
-
-Only describes what the change does, not why it's needed. The body
-just restates the diff in English.
-
-A commit message should justify the change. For this patch, there's
-no justification. Moreover the word "Optimize" in the subject is
-misleading - it implies a benefit that doesn't exist.
-
-If this change were genuinely needed, the commit message should
-explain something like:
-
-- "...to match the pattern used elsewhere in this file" (if applicable)
-- "...as a prerequisite for X"
-- "...to fix Y"
-
-For example, is this patch part of a kernel-wide audit driven by a
-code safety concern?
-
-
--- 
-Chuck Lever
+	Andrew
 
