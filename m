@@ -1,149 +1,202 @@
-Return-Path: <netdev+bounces-243774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03914CA709B
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 10:59:38 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87C6ACA7237
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 11:24:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 833A831DE074
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 09:55:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6AD593019B8F
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 10:21:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91DCC309EEA;
-	Fri,  5 Dec 2025 09:54:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AAC431ED70;
+	Fri,  5 Dec 2025 10:21:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="GGKeHxIv"
 X-Original-To: netdev@vger.kernel.org
-Received: from TWMBX01.aspeed.com (mail.aspeedtech.com [211.20.114.72])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A10B531AF1D;
-	Fri,  5 Dec 2025 09:53:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.20.114.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1B392F5465;
+	Fri,  5 Dec 2025 10:21:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764928449; cv=none; b=efskCkMWpm41l3uWcoS2aDxfjg2q2qxeH7EJYPRFh3tYNcHyonk+6DIlIU0wzz9/D2BHfvDj32+0klIQE+oHaKAldLOxAeL1s2L55/2W+CuXxXEsAPKSu8l7u6v1IYt5febIPnOtS99da1bP+okeWgx6G9ruOABl78Iqg/baE1M=
+	t=1764930097; cv=none; b=WcoY9Cgfumttn81f8pPwXWaa2J9L96TXP0VhJbaeaGWtoiU/g9pwvNtbR5YABO3rmc80puJqmVPKHeYItSaSIBq7xWvLCaH1XtOn4MynnHwFUiuF3rMxI8dEQP1R83F86fecLE31yF3U6GAw8oTXY6yjgh1DaN8fIn3zEH0cfeE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764928449; c=relaxed/simple;
-	bh=YdhWtldgK+x4gz0hMpUXUNmL81whKPQJ/baoTpGSTTk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=Vu2WTpOJKmkT18303YLBNoq7oJsrG9ZxsKpzUA41ViulfCKui1cy0bnSZ3xAzBFJT+zpzJnLq0Muosn8HcQtSvuJxX3V07qe7QhzOl26/oo3xM0W2vrhCHdUIu8nx+mlzMZnND1LjlUfebLcEUxGpCmhbCMGzBh12xJiMV84f+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; arc=none smtp.client-ip=211.20.114.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
-Received: from TWMBX01.aspeed.com (192.168.0.62) by TWMBX01.aspeed.com
- (192.168.0.62) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.10; Fri, 5 Dec
- 2025 17:53:16 +0800
-Received: from [127.0.1.1] (192.168.10.13) by TWMBX01.aspeed.com
- (192.168.0.62) with Microsoft SMTP Server id 15.2.1748.10 via Frontend
- Transport; Fri, 5 Dec 2025 17:53:16 +0800
-From: Jacky Chou <jacky_chou@aspeedtech.com>
-Date: Fri, 5 Dec 2025 17:53:18 +0800
-Subject: [PATCH net-next v5 4/4] ARM: dts: aspeed: ast2600-evb: Configure
- RGMII delay for MAC
+	s=arc-20240116; t=1764930097; c=relaxed/simple;
+	bh=IEq8a1wGJT7PXJ9siZWiyjc+/nCUkcF8DvozFo9xKp0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Cc2AhrNn12CslVaukuk/aIAK+3eSMJrIyrMgW1H5vuVC3M+vjsXFiw/2YSCdfgG9ym/elwr71hLtkB+doHM8sbFu1t0ONFdSx0otmf4VzHUQ0A17YaB4FUqVsN0pUn/REY3TDJK/7eKRfICMB4tHOxnk3hhqWJc1KY1l8ZfQdPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=GGKeHxIv; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=/la2xG/I5LkMkMDU+d9jR1D+BzTOllha9e9tATdRyn8=; b=GGKeHxIvV3Up/TsRRM8jaDdoxB
+	W1Pb1G7beYzNgvdwipruGyqzSGd1HLk7LzraJUDP1TEc50ljf6bKXe1VJwMjxHBeusDJHav7dLfrB
+	9YJYxROShzOqnuYJ2nIatxFORlIbpCoRuWgjQitST/3hXD6GvvU13m0fyq4PzeiOF8Q2xlynjrQdO
+	QD5iEM7mXqNsEK8sWmCY462X0mhgkows/oEbWs53b18t3+MAOBtKovPlXJNuUbeVNjs1b7D/zmgSW
+	S2pHzCtMkkfof0t9w91KNhIv9TiGJphbWbeBbAKmhlqApMJAeZHb34f0melKQv4vu6ZUj6fqyUg5o
+	Ew+3Nhcg==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.94.2)
+	(envelope-from <leitao@debian.org>)
+	id 1vRSw6-003nq0-MV; Fri, 05 Dec 2025 10:21:15 +0000
+Date: Fri, 5 Dec 2025 02:21:08 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Petr Mladek <pmladek@suse.com>, kuba@kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org, gustavold@gmail.com, 
+	asantostc@gmail.com, calvin@wbinvd.org, kernel-team@meta.com, davej@codemonkey.org.uk
+Subject: Re: [PATCH net-next 0/4] (no cover subject)
+Message-ID: <7jdruzcpkeyhuudwi6uzg2vsc5mhgpq7qz4ym7vqqmgs7j3524@cvtnzneddg2d>
+References: <20251128-netconsole_send_msg-v1-0-8cca4bbce9bc@debian.org>
+ <20251201163622.4e50bf53@kernel.org>
+ <4oybtunobxtemenpg2lg7jv4cyl3xoaxrjlqivbhs6zo72hxpu@fqp6estf5mpc>
+ <20251202102442.568f91a7@kernel.org>
+ <aTFmew5trILX3RpO@pathway.suse.cz>
+ <aTFnzmc0ZtBvGg4y@pathway.suse.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-ID: <20251205-rgmii_delay_2600-v5-4-bd2820ad3da7@aspeedtech.com>
-References: <20251205-rgmii_delay_2600-v5-0-bd2820ad3da7@aspeedtech.com>
-In-Reply-To: <20251205-rgmii_delay_2600-v5-0-bd2820ad3da7@aspeedtech.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
-	<conor+dt@kernel.org>, Po-Yu Chuang <ratbert@faraday-tech.com>, Joel Stanley
-	<joel@jms.id.au>, Andrew Jeffery <andrew@codeconstruct.com.au>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-aspeed@lists.ozlabs.org>, <taoren@meta.com>, Jacky Chou
-	<jacky_chou@aspeedtech.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1764928395; l=1846;
- i=jacky_chou@aspeedtech.com; s=20251031; h=from:subject:message-id;
- bh=YdhWtldgK+x4gz0hMpUXUNmL81whKPQJ/baoTpGSTTk=;
- b=sCc+O2uTD/qznlMODSf1TxSgDtU9PjhpDifIJ7Q88EGK7dkP2gvjivROwE/oZFNjuUtHbscBm
- pUOBS2ZQhXqASYAqoWbBUj94QfeAKh5A+cvqnMGAxv0RCVdqBiUIk3y
-X-Developer-Key: i=jacky_chou@aspeedtech.com; a=ed25519;
- pk=8XBx7KFM1drEsfCXTH9QC2lbMlGU4XwJTA6Jt9Mabdo=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aTFnzmc0ZtBvGg4y@pathway.suse.cz>
+X-Debian-User: leitao
 
-This change sets the rx-internal-delay-ps and tx-internal-delay-ps
-properties to control the RGMII signal delay.
-The phy-mode for MAC0–MAC3 is updated to "rgmii-id" to enable TX/RX
-internal delay on the PHY and disable the corresponding delay
-on the MAC.
+On Thu, Dec 04, 2025 at 11:51:58AM +0100, Petr Mladek wrote:
+> > > > > perhaps it should be configured to only log messages at a high level?  
+> > > > 
+> > > > Chris is actually working on per-console log levels to solve exactly
+> > > > this problem, so we could filter serial console messages while keeping
+> > > > everything in other consoles (aka netconsole):
+> > > > 
+> > > > 	https://lore.kernel.org/all/cover.1764272407.git.chris@chrisdown.name/
+> > > 
+> > > Excellent! Unless I'm missing more context Chris does seem to be
+> > > attacking the problem at a more suitable layer.
+> > 
+> > This would help to bypass slow serial consoles. But the extra messages
+> > would still get stored into the kernel ring buffer and passed back
+> > to user space logs, for example journalctl.
+> 
+> It might actually make sense for the "workload enters or leaves" messages.
+> But I am not sure about the "ping" messages.
 
-Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
----
- arch/arm/boot/dts/aspeed/aspeed-ast2600-evb.dts | 20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
+Agree. Let me back up and explain my "ping" messages better, which
+I think might add more information about this topic.
 
-diff --git a/arch/arm/boot/dts/aspeed/aspeed-ast2600-evb.dts b/arch/arm/boot/dts/aspeed/aspeed-ast2600-evb.dts
-index de83c0eb1d6e..f8f0d5c98514 100644
---- a/arch/arm/boot/dts/aspeed/aspeed-ast2600-evb.dts
-+++ b/arch/arm/boot/dts/aspeed/aspeed-ast2600-evb.dts
-@@ -123,42 +123,54 @@ ethphy3: ethernet-phy@0 {
- &mac0 {
- 	status = "okay";
- 
--	phy-mode = "rgmii-rxid";
-+	phy-mode = "rgmii-id";
- 	phy-handle = <&ethphy0>;
- 
- 	pinctrl-names = "default";
- 	pinctrl-0 = <&pinctrl_rgmii1_default>;
-+
-+	rx-internal-delay-ps = <0>;
-+	tx-internal-delay-ps = <0>;
- };
- 
- 
- &mac1 {
- 	status = "okay";
- 
--	phy-mode = "rgmii-rxid";
-+	phy-mode = "rgmii-id";
- 	phy-handle = <&ethphy1>;
- 
- 	pinctrl-names = "default";
- 	pinctrl-0 = <&pinctrl_rgmii2_default>;
-+
-+	rx-internal-delay-ps = <0>;
-+	tx-internal-delay-ps = <0>;
- };
- 
- &mac2 {
- 	status = "okay";
- 
--	phy-mode = "rgmii";
-+	phy-mode = "rgmii-id";
- 	phy-handle = <&ethphy2>;
- 
- 	pinctrl-names = "default";
- 	pinctrl-0 = <&pinctrl_rgmii3_default>;
-+
-+	rx-internal-delay-ps = <0>;
-+	tx-internal-delay-ps = <0>;
- };
- 
- &mac3 {
- 	status = "okay";
- 
--	phy-mode = "rgmii";
-+	phy-mode = "rgmii-id";
- 	phy-handle = <&ethphy3>;
- 
- 	pinctrl-names = "default";
- 	pinctrl-0 = <&pinctrl_rgmii4_default>;
-+
-+	rx-internal-delay-ps = <0>;
-+	tx-internal-delay-ps = <0>;
- };
- 
- &emmc_controller {
+Meta has millions of servers, and all of them must have netconsole
+running 100% of the time.
 
--- 
-2.34.1
+Of course that this is not reality, and problems happen for different
+reasons, the ones that interest me here are:
 
+1) Top of the rack switch MAC address changes (mostly associated with
+   network hardware (top of the rack switches and gateway) replacement)
+    a) Keep in mind that netconsole target has the destination MAC as
+       part of its configuration.
+
+2) Netconsole got associated with the wrong network port, which comes in
+   two different flavors.
+   a) The machine got provisioned wrongly since day one (Most common
+      case)
+   b) The machine NIC changed and: 
+      i) The target doesn't bind correctly anymore (if netconsole
+         target is bound by mac address)
+      	   * This is easier to detect, given the target will never be
+	     enabled.
+
+3) Netconsd (the daemon that listen to netconsole packets) is buggy or
+   dead
+
+4) Network failures across the route
+
+
+Possible Solutions
+==================
+
+In order to detect those issues above, I think the best (or only) way is
+to send messages from the host, and check if they got received. If not,
+raise an alarm (in the common distributed way).
+
+This could be done in very different ways, tho. Such as:
+
+1) Have a binary in each machine:
+	a) This binary reads the netconsole target that is configured,
+	   and mimics "ping" UDP netconsole packet.
+
+	Pro: 
+	     * It doesn't need any kernel change
+	Cons:
+	     * It needs to reimplement the netconsole logic in userspace
+	     * This needs also a widely distributed binary on all
+	       machines
+
+2) Send a ping directly to the console
+	a) Something as 'echo ping from $hostname" > /dev/kmsg')
+
+	Pro:
+		* No kernel changes
+	Cons:
+		* These debug messages will be sent to journalctl and to
+		  the console, polluting both
+
+3) Using per-loglevel patchset.
+	a) Same as above, but, setting netconsole loglevel to DEBUG, while
+	   all other consoles to INFO.
+
+	Pro:
+		* No changes on netconsole
+		* Netconsole "buffers" continues to be synchronized with
+		  kernel buffers. Everything in the same page, but,
+		  netconsole data has one loglevel higher.
+		* Sending a message to netconsole-only message is not
+		  special at all. It uses the same workflow we have
+		  today, through `/dev/kmsg'
+	Cons:
+		* Needs to change printk/console code (Chris' patch)
+		  that is on review for years now. Will it ever get
+		  accepted?
+		* These "ping" message will be in kernel buffers and
+		  journalctl, and are useless in there (!?)
+		* It is not possible to send a message to a single
+		  netconsole target.
+
+4) send messages only to netconsole (this patchset)
+	Pro:
+		* It is easy to test netconsole connective (problem above),
+		  without kernel buffers/journal pollution
+		* It doesn't depend on the per-loglevel patchset
+		* Adds flexibility to netconsole targets.
+			- only certain netconsole targets receive
+			  certain messages
+	Cons:
+		* Messages sent to netconsole is a superset of messages in the
+		  kernel buffer. In other words, "dmesg" and machine
+		  logs/journal will not be able to see messages that
+		  were sent directly to netconsole.
+			- It might be seen as a back channel (!?)
+		* Different netconsole targets may receive different
+		  messages. Too much flexibility might be bad (!?)
+
+Anyway, options 1 and 2 are available today. In order to make the
+problem easier to solve, we are deciding between approach 3) and 4),
+which will require kernel changes, either in printk/console or
+netconsole.
+
+Sorry for the long email, I just wanted to do the brain dump about my
+view of the world, so, we can decide it from a community perspective in
+the open.
+
+Thanks for the discussion,
+--breno
 
