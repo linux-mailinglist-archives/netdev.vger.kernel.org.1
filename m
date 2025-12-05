@@ -1,109 +1,113 @@
-Return-Path: <netdev+bounces-243833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 435CDCA85E0
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 17:27:06 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE3C5CA8555
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 17:16:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BC2813264B89
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 16:07:59 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5DF9E3011B11
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 16:16:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3E58336ED6;
-	Fri,  5 Dec 2025 16:07:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9558631D38F;
+	Fri,  5 Dec 2025 16:16:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="WKAepucB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QCCv/XhL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63B6E2FD1C5
-	for <netdev@vger.kernel.org>; Fri,  5 Dec 2025 16:07:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D211A32B998;
+	Fri,  5 Dec 2025 16:16:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764950876; cv=none; b=XAbgHYKuW/P6NhKlxqyCfULZ5+Aw9jxuurBQ6BfyxLq0/QHZTfCp3/KNWYTRJLB8kZ6gLg+seEvJfG6L5aeLdqENu4v13Q7fIDpdAGh3tveEb84l3z0hMLvstvSSS5QDjU++UoW55qeXpVHvv4hmV2Yrwwj+gbcTUeG/lVYwfDI=
+	t=1764951373; cv=none; b=XVjYQK4ACMSm/YylBk8kFUtkHaSxf/yf3RguzLX7VtIsRbhvtHvWxLaFNs2KtUUp2LQKdKop2Wl1RcDKZGwMAGGBvkT8DwPhY3IyqFaMgqAOJOstJWGHF5zyHaHbrjRkS/iIQJmTIUt3GuNgoDEXERUZT3HIljpyR+dXmv9/qvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764950876; c=relaxed/simple;
-	bh=MynNtNJgtnnzbcoXkUDn4jNURoAbq5WcACoFTQrlNOM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bZda3JXqsajwYrDGhoOejh4Z9KdCiWZVwKpp6gdEVrxW4F1MtHwMK/qVB+7BcgULIDsFctLVuRcQmmwdjvcY5ZKPLbJ5Z3hL+wxYaJw9Z+WRSaf4dghpWeG3fxzVjdWfr1jwLL4qqEG/Ds73aJOup+4aj1sqsOVODr34cluYwsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=WKAepucB; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b79d6a70fc8so364789266b.0
-        for <netdev@vger.kernel.org>; Fri, 05 Dec 2025 08:07:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=herbertland.com; s=google; t=1764950866; x=1765555666; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9Y9LxxRSAb/4U+NvNgfVaz9K7EtTPAjQ1rfgaORSEfA=;
-        b=WKAepucBq2/gqmlviEbP+dksemsLvqln1Eam+bqEyJ5e/fhncw9nO1PcOafd0Pm1bz
-         wy5Xne1QkfGOru8AQOJOuYuIphhVi2v+UKn3s+m6mBoK2VoVWTOhCL2jwzHQ8REnjgj3
-         1FjAObamEQ2MlpFDWoCZ6ekLqzj3YughSc8BGqbUAsHUzL3qLLkPPnddOAS+Pzfi1hoh
-         zJY9I1Z7/zMA5ZHNWlCy2ApYrNOZUcJ93yGP2SjH5CHnL2XKAfqE7vGGYacKqGtjr1NS
-         0lc9aS2TT6kRkpEH3I/RNg9Tjtk2diaKc9wAaM8wxADkf8iF4gAwIEKOqqkp8eG5Acva
-         8bXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764950866; x=1765555666;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=9Y9LxxRSAb/4U+NvNgfVaz9K7EtTPAjQ1rfgaORSEfA=;
-        b=lScxFQqPps2o7Rz72o2AAF1fWzrvOX0lLVHbGW7rT3Vulqf5whGCfWAMkDOav62PeO
-         jcotUDGYmbGGprUo9oxjf+cmMY9SE0dTUzZ3TI6y79I0XKsUTFIYdr1HcK6p+8OKaD4d
-         QdFVaSuPvOpuqdZtD7j82zI4wqdRmNCrSdAaGzVWdB+UEhnkXvsM5oetvD9zjHLteXIB
-         vBlk6mjVbftNkS63gZMIM+63HVYJv9KO7uTJxTNjjMPkc4TQ0VHTDd4s+8ZhzqV2rdxC
-         NvoQ83YUBar828Dh4Wr2kpPRF/7+E4bud4k+h2KJATcFL6MVigU5UjEzObEKvQOorwXE
-         YDZw==
-X-Forwarded-Encrypted: i=1; AJvYcCW2u5f0DaDb0kDzzGex+Fyd+NOp0iRxhErncZWmXvj/KRpL88Omfybk/Fny82sFX0WdReSkGl8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/K/SYVkY1TwIpZuL/5ssXkAHNYupXeOdl+BvM3YKgX/qsjzJn
-	rqZ6vDXFg7i5kHl69/3NMvtNPQAeLsKdY1IeT9Gw4yddEnZv2RklzShB1X7mciffry6sWX1SAV6
-	wMV9LV76Y82+D42628ZLFftukOmktKNLV3v70oEWqWqM+DBXNSpvLFw==
-X-Gm-Gg: ASbGnctFRrJqoEcXlM9/IgjkE4DQHd5OrKwr/Aur7rtEJ47BFgbkj5PY54sudfGmAYT
-	D+MrSKThnn9/2ejbb7WW4Tv1LfwneTOKugrX0L2XvVnnQP3bC42Y9YmojdlOq/OlbfELc8pdlJb
-	WDCWTqrnAhDqoXZT2EFcMFsjPiLP1VNbCs+fFgxSxHx1EMPOfW3kuYmN4KmH2NyZtHzoqwuT1Ch
-	gCgZTsZ2nE+TbbPdzAXDLASt4EjREQwD0JMt6DBnMotL3dGbA99pO6EjyJwU0MUY5JYi+50l7uh
-	39G7FoL/n8DlgVoxlDcDjjS+ph6KfC2YxKYHJD+2CYojc83auppjr11wx0nz
-X-Google-Smtp-Source: AGHT+IFi0Xzp2bAdmBQuvBKFYwHHgU6sC9jICuhfw4YwcGm6mPW34kekN4hQTNQg7vjxfJD4Q8LjJ1sF3mGomap68j8=
-X-Received: by 2002:a17:907:9816:b0:b7a:1bdc:aab5 with SMTP id
- a640c23a62f3a-b7a1bdcb0e7mr67804866b.62.1764950866162; Fri, 05 Dec 2025
- 08:07:46 -0800 (PST)
+	s=arc-20240116; t=1764951373; c=relaxed/simple;
+	bh=ZdEQEkqkc+Ag6znUyPweT6q9aTx5i6UmppHhWOoNMvs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jYd5yW1mT8x8b8hvanaXMJ+e9UM8+7qs+Re8MfTkZ7yOV1bBBvvrBRyIRRP/aIzIZugJ9UpoOpwUPIowKB0WwxniTmNrRMBHDHXNxKm1Kq77PTlOIU9gmm6sXvibqVuDGPhMj42o4e480nQvJg4KUbiGCN3jtG07kugpY0Tr3TA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QCCv/XhL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EDCBC4CEF1;
+	Fri,  5 Dec 2025 16:16:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764951371;
+	bh=ZdEQEkqkc+Ag6znUyPweT6q9aTx5i6UmppHhWOoNMvs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QCCv/XhLhrC/32IZLIuYyb2e7GttsSUPQxwa2w4kQKU5LhieM/N2c40m6gb/f1RJJ
+	 WGxJOerIHFub+uiFtiWuFTQJb9eMKwa2qkTfYd/bVNap6A9Hk4vFHZI6NL96IIehdC
+	 nRSoXQZMBLivop+cZ2pF7vWZOgnSMliVjcoXn4m8cr7cfF2AsEEWlixHJAFFJiuu7/
+	 Wx/sOwI8kpUQU6DsupW/BWZ32uOSrhzq0ZPZGhbM4U3L7+KlwtJjdREoAlqjsuhVQh
+	 W0+kCbKgjVCy4j/op51yfc6l19Vx554ZsZ+xWBY4Wat+ukSuWjfoTVedCJT7mguobh
+	 oLgDJ7BWjEXag==
+Date: Fri, 5 Dec 2025 16:16:06 +0000
+From: Simon Horman <horms@kernel.org>
+To: Ding Hui <dinghui@sangfor.com.cn>
+Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, jacob.e.keller@intel.com,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] ice: Fix incorrect timeout in ice_release_res()
+Message-ID: <aTMFRkYZGtk3a_EP@horms.kernel.org>
+References: <20251205081609.23091-1-dinghui@sangfor.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251201185817.1003392-1-tom@herbertland.com> <20251204160841.70fafdba@kernel.org>
-In-Reply-To: <20251204160841.70fafdba@kernel.org>
-From: Tom Herbert <tom@herbertland.com>
-Date: Fri, 5 Dec 2025 08:07:34 -0800
-X-Gm-Features: AQt7F2oTVUFPHXDiCpBLtPgNwvG6qwHrwsqzlJ0NAcaFM0KpmcbkdAQ9egeZIwU
-Message-ID: <CALx6S369WYsHP2cWw6gv-B9P8ATE32+rJm9AFwvo=mPS=Xxx+Q@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/5] ipv6: Disable IPv6 Destination Options RX
- processing by default
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251205081609.23091-1-dinghui@sangfor.com.cn>
 
-On Thu, Dec 4, 2025 at 4:08=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Mon,  1 Dec 2025 10:55:29 -0800 Tom Herbert wrote:
-> > Tom Herbert (5):
-> >   ipv6: Check of max HBH or DestOp sysctl is zero and drop if it is
-> >   ipv6: Disable IPv6 Destination Options RX processing by default
-> >   ipv6: Set Hop-by-Hop options limit to 1
-> >   ipv6: Document default of zero for max_dst_opts_number
-> >   ipv6: Document default of one for max_hbh_opts_number
->
-> Hi Tom, the patches got marked as Changes Requested by someone,
-> not sure who. FWIW they are all missing our S-o-B.
-> net-next is now technically closed but I suppose you may want
-> to argue these are okay for net (if at all).
+On Fri, Dec 05, 2025 at 04:16:08PM +0800, Ding Hui wrote:
+> The commit 5f6df173f92e ("ice: implement and use rd32_poll_timeout for
+> ice_sq_done timeout") converted ICE_CTL_Q_SQ_CMD_TIMEOUT from jiffies
+> to microseconds.
+> 
+> But the ice_release_res() function was missed, and its logic still
+> treats ICE_CTL_Q_SQ_CMD_TIMEOUT as a jiffies value.
+> 
+> So correct the issue by usecs_to_jiffies().
+> 
+> Fixes: 5f6df173f92e ("ice: implement and use rd32_poll_timeout for ice_sq_done timeout")
+> Signed-off-by: Ding Hui <dinghui@sangfor.com.cn>
 
-Thanks, Jakub. I'll resubmit when net-next opens.
+Thanks,
 
-Tom
+I agree with the analysis above and that the problem was introduced
+by the cited commit.
+
+As a fix for code present in net this should probably be targeted
+at net (or iwl-net?) rather than net-next. But perhaps there is
+no need to repost just to address that.
+
+> ---
+>  drivers/net/ethernet/intel/ice/ice_common.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+> index 6fb0c1e8ae7c..5005c299deb1 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_common.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_common.c
+> @@ -1885,7 +1885,7 @@ void ice_release_res(struct ice_hw *hw, enum ice_aq_res_ids res)
+>  	/* there are some rare cases when trying to release the resource
+>  	 * results in an admin queue timeout, so handle them correctly
+>  	 */
+> -	timeout = jiffies + 10 * ICE_CTL_Q_SQ_CMD_TIMEOUT;
+> +	timeout = jiffies + 10 * usecs_to_jiffies(ICE_CTL_Q_SQ_CMD_TIMEOUT);
+>  	do {
+>  		status = ice_aq_release_res(hw, res, 0, NULL);
+>  		if (status != -EIO)
+
+I agree this minimal change is appropriate as a bug fix.
+
+But I think that it would be good to provide a follow-up
+that reworks this code a bit to to use read_poll_timeout().
+As per the aim of the cited commit.
+
+This should be targeted at net-next (or iwl-next?).
+Once this bug fix propagates to in net-next.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
 
