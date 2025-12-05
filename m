@@ -1,278 +1,214 @@
-Return-Path: <netdev+bounces-243745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70A5BCA6A15
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 09:12:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 29D1ACA6B3A
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 09:30:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C35DA3232C1D
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 07:57:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 84D6E35F3725
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 08:06:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B0D0341642;
-	Fri,  5 Dec 2025 07:21:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F4AC345743;
+	Fri,  5 Dec 2025 07:35:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YN4U+8QL"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEDDE337BB1;
-	Fri,  5 Dec 2025 07:21:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C66613446BE;
+	Fri,  5 Dec 2025 07:35:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764919305; cv=none; b=NWWDsFNACr9Sc5cINI/k4wOuq4gzWalqbt+YHV0b8rAlK9TLtyMJLOoZZFUkNaxNPgv/Q0XbqjLU6IXApiCZnk6N8yqVP8NRcs2Zxz+xY4PCgsufm08F1UNJxaiQPOvVc2vXNsloEsfCcrXjd8Ye4qkA/SIucwscT/yBV522U2I=
+	t=1764920155; cv=none; b=JBKbhknB+GgwWFIzk3Nh5BpTJdvLmWjmoLzToCkhc4I2UwuQpzREo0VzVCjKhz2djpYRadem75A/hPnUXPY4qYu5XROSqbrvinoAlP9W9XuJ2UO/6qJYzlINC4jOWHtweV1tvsUgtLhzpqA9dQG4svxD/8xR9EnRH449Xo9d6cE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764919305; c=relaxed/simple;
-	bh=IVs7UrTREahv4P4gaL8VNCv4Y1x1l3V8HrPMnx32xWM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=qziJMEPLhOl6+7HirP10fqpjBOS75WWWxFZLIG1fJ1PJYsg2kam3WF4EDXWYolUZ7ynpI3ozcrH0UTIzaIG++/yio7SZ9vZPAIOZBFjnMfyiA3/152bjh8qnwna9tPtR7UQGeL/nX82HVmRRpNeuVfRSj950tb15oy7i+Qy1cl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=fail smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-c45ff70000001609-fb-69328776f97a
-From: Byungchul Park <byungchul@sk.com>
-To: linux-kernel@vger.kernel.org
-Cc: kernel_team@skhynix.com,
-	torvalds@linux-foundation.org,
-	damien.lemoal@opensource.wdc.com,
-	linux-ide@vger.kernel.org,
-	adilger.kernel@dilger.ca,
-	linux-ext4@vger.kernel.org,
-	mingo@redhat.com,
-	peterz@infradead.org,
-	will@kernel.org,
-	tglx@linutronix.de,
-	rostedt@goodmis.org,
-	joel@joelfernandes.org,
-	sashal@kernel.org,
-	daniel.vetter@ffwll.ch,
-	duyuyang@gmail.com,
-	johannes.berg@intel.com,
-	tj@kernel.org,
-	tytso@mit.edu,
-	willy@infradead.org,
-	david@fromorbit.com,
-	amir73il@gmail.com,
-	gregkh@linuxfoundation.org,
-	kernel-team@lge.com,
-	linux-mm@kvack.org,
-	akpm@linux-foundation.org,
-	mhocko@kernel.org,
-	minchan@kernel.org,
-	hannes@cmpxchg.org,
-	vdavydov.dev@gmail.com,
-	sj@kernel.org,
-	jglisse@redhat.com,
-	dennis@kernel.org,
-	cl@linux.com,
-	penberg@kernel.org,
-	rientjes@google.com,
-	vbabka@suse.cz,
-	ngupta@vflare.org,
-	linux-block@vger.kernel.org,
-	josef@toxicpanda.com,
-	linux-fsdevel@vger.kernel.org,
-	jack@suse.cz,
-	jlayton@kernel.org,
-	dan.j.williams@intel.com,
-	hch@infradead.org,
-	djwong@kernel.org,
-	dri-devel@lists.freedesktop.org,
-	rodrigosiqueiramelo@gmail.com,
-	melissa.srw@gmail.com,
-	hamohammed.sa@gmail.com,
-	harry.yoo@oracle.com,
-	chris.p.wilson@intel.com,
-	gwan-gyeong.mun@intel.com,
-	max.byungchul.park@gmail.com,
-	boqun.feng@gmail.com,
-	longman@redhat.com,
-	yunseong.kim@ericsson.com,
-	ysk@kzalloc.com,
-	yeoreum.yun@arm.com,
-	netdev@vger.kernel.org,
-	matthew.brost@intel.com,
-	her0gyugyu@gmail.com,
-	corbet@lwn.net,
-	catalin.marinas@arm.com,
-	bp@alien8.de,
-	x86@kernel.org,
-	hpa@zytor.com,
-	luto@kernel.org,
-	sumit.semwal@linaro.org,
-	gustavo@padovan.org,
-	christian.koenig@amd.com,
-	andi.shyti@kernel.org,
-	arnd@arndb.de,
-	lorenzo.stoakes@oracle.com,
-	Liam.Howlett@oracle.com,
-	rppt@kernel.org,
-	surenb@google.com,
-	mcgrof@kernel.org,
-	petr.pavlu@suse.com,
-	da.gomez@kernel.org,
-	samitolvanen@google.com,
-	paulmck@kernel.org,
-	frederic@kernel.org,
-	neeraj.upadhyay@kernel.org,
-	joelagnelf@nvidia.com,
-	josh@joshtriplett.org,
-	urezki@gmail.com,
-	mathieu.desnoyers@efficios.com,
-	jiangshanlai@gmail.com,
-	qiang.zhang@linux.dev,
-	juri.lelli@redhat.com,
-	vincent.guittot@linaro.org,
-	dietmar.eggemann@arm.com,
-	bsegall@google.com,
-	mgorman@suse.de,
-	vschneid@redhat.com,
-	chuck.lever@oracle.com,
-	neil@brown.name,
-	okorniev@redhat.com,
-	Dai.Ngo@oracle.com,
-	tom@talpey.com,
-	trondmy@kernel.org,
-	anna@kernel.org,
-	kees@kernel.org,
-	bigeasy@linutronix.de,
-	clrkwllms@kernel.org,
-	mark.rutland@arm.com,
-	ada.coupriediaz@arm.com,
-	kristina.martsenko@arm.com,
-	wangkefeng.wang@huawei.com,
-	broonie@kernel.org,
-	kevin.brodsky@arm.com,
-	dwmw@amazon.co.uk,
-	shakeel.butt@linux.dev,
-	ast@kernel.org,
-	ziy@nvidia.com,
-	yuzhao@google.com,
-	baolin.wang@linux.alibaba.com,
-	usamaarif642@gmail.com,
-	joel.granados@kernel.org,
-	richard.weiyang@gmail.com,
-	geert+renesas@glider.be,
-	tim.c.chen@linux.intel.com,
-	linux@treblig.org,
-	alexander.shishkin@linux.intel.com,
-	lillian@star-ark.net,
-	chenhuacai@kernel.org,
-	francesco@valla.it,
-	guoweikang.kernel@gmail.com,
-	link@vivo.com,
-	jpoimboe@kernel.org,
-	masahiroy@kernel.org,
-	brauner@kernel.org,
-	thomas.weissschuh@linutronix.de,
-	oleg@redhat.com,
-	mjguzik@gmail.com,
-	andrii@kernel.org,
-	wangfushuai@baidu.com,
-	linux-doc@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-media@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org,
-	linux-i2c@vger.kernel.org,
-	linux-arch@vger.kernel.org,
-	linux-modules@vger.kernel.org,
-	rcu@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	linux-rt-devel@lists.linux.dev,
-	2407018371@qq.com,
-	dakr@kernel.org,
-	miguel.ojeda.sandonis@gmail.com,
-	neilb@ownmail.net,
-	bagasdotme@gmail.com,
-	wsa+renesas@sang-engineering.com,
-	dave.hansen@intel.com,
-	geert@linux-m68k.org,
-	ojeda@kernel.org,
-	alex.gaynor@gmail.com,
-	gary@garyguo.net,
-	bjorn3_gh@protonmail.com,
-	lossin@kernel.org,
-	a.hindborg@kernel.org,
-	aliceryhl@google.com,
-	tmgross@umich.edu,
-	rust-for-linux@vger.kernel.org
-Subject: [PATCH v18 42/42] mm: percpu: increase PERCPU_DYNAMIC_SIZE_SHIFT on DEPT and large PAGE_SIZE
-Date: Fri,  5 Dec 2025 16:18:55 +0900
-Message-Id: <20251205071855.72743-43-byungchul@sk.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20251205071855.72743-1-byungchul@sk.com>
-References: <20251205071855.72743-1-byungchul@sk.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSbUxTdxTG/d/7v/97Wym5qSZcXxKXJpsJURSj5sRsuGRbcvdhyZJ9cHEf
-	ZpUb21iKaZHKlmW1QqiICpi2kSIWHE1Dy1sr42XWVWCMhhGLKO2QqrwEcUJIHIUAug5q/HLy
-	y3nO8zxfDkcr48x2TqsvkAx6tU5F5Fg+n1a311R6QLvf0bsTrCU/w+iFEIbEohVDTYuPwFtn
-	BwtW/w0GBqIWDJFmL4JnCSuC5TUnDYsrT1iwD1fREIv8ToPvzgUK/m39j4BtYprAgrscQTL+
-	goLo0hyC6VApglv1AQJrQw9ocNgiCOom4jQEPRYCI9Pp8CixQCBsu0xgfriGApclyMBNZxWC
-	mbEgBeP2Kgq8/q/gmXsGw2BFPQX2tgxwOi5S62OWAlvTbxT8dXscg3NohIFJTzULSVc+xK/Z
-	MISfjjLwaqaKQIf5OQv+v/9AYO1OYPBPrQs3ascJ3A2GMfR3TlIw0l1DoLy1nYGnviQDkdAg
-	Aw+9kfXW/gEMT4ausfCgu4mBhugwBRPPY8ynueJyyVUsNgZ+pURfrQ+Jiw0XabF3boEWiwMm
-	sWFwjoiricdEDC65sFg5tFfsqo6zYvG9MVZ0+c+JxX3zjBjwZIq3776kvt5zXP5xrqTTFkqG
-	fTkn5JpYX4w52y4732FNsmY0yZYhGSfwB4WBvivkPffXO/AGE363EIut0Bu8lf9ACFyZYcqQ
-	nKP5kV1C6crVlLCFl4RZuzllxvyHQlN5OGVW8IcF28tJ9C50l+BtDaXuZRv76GqKlfwh4VbZ
-	cipU4J0yYba8hH5n2Cbc98RwBVK40KZGpNTqC/PUWt3BLE2RXns+61R+nh+tP537pzffdaLX
-	kW96EM8hVZoiZMrWKhl1obEorwcJHK3aqpjT7dcqFbnqoh8kQ/73hnM6ydiDdnBYlaE4sGTK
-	VfKn1QXSGUk6KxneqxQn225G7potwyVjGhC8GTms55d9n3Vpej9J78xyN/dMOSrc1WnZqjbT
-	yYKjdZUn9B+lWwQCx/484iGXfBa1S3XY3XI0Th0/FD0SzuHunPyn6HTbjkROx+iXjaXXN08t
-	X+6yD67KpNrmH1vGVZWZyUdGs2J14Fv//fb0S19cn/h8bU93lwobNersTNpgVP8Pisz1+XAD
-	AAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAAzWSa2yLcRTG/d9rVyqvGnszH9CwicxtMTlxJ2FvJERCIi4LxctqbdHabBLs
-	olkNSzXa2boxZSW728VsNGZY3LWG1WXK1Gg2m0y3pe266Sa+nPzOeZ7n5Hw4Alx8mwwXyJRH
-	eJVSKpdQQkK4YUnGnKTMaNn8CnsoaDUn4ZPTRcK7tEYC+jxaAvIrSikImOpo0FblkvC4NZ0A
-	W3kJAmefFsGA34SDpn6YgIC+mQaP9yMNhjQEw9ZmBEa7HgeH7R4OpTVpGPypHKKg80EvAsNX
-	FwU57jQCeixnEeR1mGhwP4qFX847JAy3/cCgtb8LgcU1hIGrMRNBwJgAl83VwbjxNwX+F69w
-	yDHYEFz52oZDr/sLgprmzwisN9Ip+K6rxaHFNR7e9PVQ8MRwhoJf9nwMuispKEy3kmB/3omg
-	wKRH0PHBikHG1QoKjAVVBNR/aaDB3jmIwSejHoOSqvXgtHQQ8ExnxoLnBl03w8CUk4EFy08M
-	DGV3MPBaiumVRYgb0GQTXHH1LYzTvA5QXOmlUsT5fXrEeYoycE6jC7YPunpw7lT1Ua7oWRfF
-	+freUpy1v5DgnppZ7tppH8adfzGHq89rozeu2iZcupeXy5J41bzlu4TxjocO8lBtSHKddphO
-	Re10FgoRsMxCttmcQ4wwxUSyDocXH+FQZhpbfa6DzEJCAc60TGUzvdmjwkSGZ38aU6kRJpiZ
-	bNnZJ6NhEbOINbjb0b+lU9mSysZRf8jIvNU3ymImhr2cNUDqkLAQjSlGoTJlkkIqk8fMVSfE
-	pyhlyXP3HFRUoeA/WY4Pnr+NPC2xTYgRIMk4UePRBTIxKU1SpyiaECvAJaGiLvl8mVi0V5py
-	jFcd3KlKlPPqJjRFQEjCROu28LvEzH7pET6B5w/xqv8qJggJT0WTFIH77pjV3rjT7mX73m+d
-	3ss1dK/1r4xesSb5W/a4qN7N/gNXdksvSmyxm8oPM4P32/s9WkVuuG7D7O113f7oGWz4btOJ
-	6/aauO4hItJ71//YnFtg8/AlLy+caytq3aFR7kkMy4xQRhCzJvgaFua9ipoxdrLhuPremkQn
-	u1hdliAh1PHSBbNxlVr6F6fDGrJLAwAA
-X-CFilter-Loop: Reflected
+	s=arc-20240116; t=1764920155; c=relaxed/simple;
+	bh=B9QRLerKUZuioET/eoNvwh5XUQQ87E4QpHl1AODiIe0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Zi91plmW9UTdc6GJCBkeiYHmNAjQHikZqGUH366Ru28ffwR2VlG0gsd+70pGNjW5Yoft8e60Z5+yEtoWipKSrlSA/FqNGoTMRsaioypfECgE+ueFWbjvUjNBLloAxBFnhOBwPSWKHIsukChSOforBYQAzqEurxeJpLKgdXZzjVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YN4U+8QL; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1764920146; x=1796456146;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=B9QRLerKUZuioET/eoNvwh5XUQQ87E4QpHl1AODiIe0=;
+  b=YN4U+8QLrx8LPZzvTXWQP/cQ5hLvS9vuzKzPGGpPsMQgW5SZk1J/vkW0
+   //X1Wqv0KsqmgQrH/AecjkSmWzn42KaIdSppXltwr4WANmmBOk4pTnGeN
+   D2/jMyRIpkiz8NOmBg3wh6cIs3ne7r7FfdYFaK9JDDgfTHYlayShuabJt
+   S0Imp3yUxpoLP2e+x7KUP44EF5YMIgFKx1kH5OCOukWDfLlKB9ah/TcFq
+   lertyFsxxjwN46iOPpbQezI3FwwzPYtgAPc2KZVavqp9Rg/WoKUPqmrQX
+   mLD6DXPCC/z6vxQ3EQXJz1dkFFZCr7GAnDvOHgBOPrzn0AWgDTU2PAfyR
+   g==;
+X-CSE-ConnectionGUID: WUfFP73PT7OgAteh0TjPUQ==
+X-CSE-MsgGUID: qO9At1EURFiTs0/wL82ExQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11632"; a="67115979"
+X-IronPort-AV: E=Sophos;i="6.20,251,1758610800"; 
+   d="scan'208";a="67115979"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Dec 2025 23:35:38 -0800
+X-CSE-ConnectionGUID: 36lLXBZ8Sle57DGmoYz7cA==
+X-CSE-MsgGUID: xBDUVo0SSMaMwUFy8sQe8A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,251,1758610800"; 
+   d="scan'208";a="199707840"
+Received: from lkp-server01.sh.intel.com (HELO 4664bbef4914) ([10.239.97.150])
+  by orviesa004.jf.intel.com with ESMTP; 04 Dec 2025 23:35:33 -0800
+Received: from kbuild by 4664bbef4914 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vRQLi-00000000EkP-2ss7;
+	Fri, 05 Dec 2025 07:35:30 +0000
+Date: Fri, 5 Dec 2025 15:34:32 +0800
+From: kernel test robot <lkp@intel.com>
+To: John Madieu <john.madieu.xa@bp.renesas.com>,
+	prabhakar.mahadev-lad.rj@bp.renesas.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, geert+renesas@glider.be
+Cc: oe-kbuild-all@lists.linux.dev, biju.das.jz@bp.renesas.com,
+	claudiu.beznea@tuxon.dev, linux@armlinux.org.uk,
+	magnus.damm@gmail.com, mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com, netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org,
+	John Madieu <john.madieu.xa@bp.renesas.com>
+Subject: Re: [PATCH net-next 1/3] net: stmmac: add physical port
+ identification support
+Message-ID: <202512051514.VMlIccSV-lkp@intel.com>
+References: <20251204163729.3036329-2-john.madieu.xa@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251204163729.3036329-2-john.madieu.xa@bp.renesas.com>
 
-Yunseong reported a build failure due to the BUILD_BUG_ON() statement in
-alloc_kmem_cache_cpus().  In the following test:
+Hi John,
 
-  PERCPU_DYNAMIC_EARLY_SIZE < NR_KMALLOC_TYPES * KMALLOC_SHIFT_HIGH * sizeof(struct kmem_cache_cpu)
+kernel test robot noticed the following build warnings:
 
-The following factors increase the right side of the equation:
+[auto build test WARNING on robh/for-next]
+[also build test WARNING on net/main linus/master v6.18 next-20251204]
+[cannot apply to net-next/main]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-  1. PAGE_SIZE > 4KiB increases KMALLOC_SHIFT_HIGH.
-  2. DEPT increases the size of the local_lock_t in kmem_cache_cpu.
+url:    https://github.com/intel-lab-lkp/linux/commits/John-Madieu/dt-bindings-net-renesas-gbeth-Add-port-id-property/20251205-013825
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git for-next
+patch link:    https://lore.kernel.org/r/20251204163729.3036329-2-john.madieu.xa%40bp.renesas.com
+patch subject: [PATCH net-next 1/3] net: stmmac: add physical port identification support
+config: parisc-randconfig-001-20251205 (https://download.01.org/0day-ci/archive/20251205/202512051514.VMlIccSV-lkp@intel.com/config)
+compiler: hppa-linux-gcc (GCC) 8.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251205/202512051514.VMlIccSV-lkp@intel.com/reproduce)
 
-Increase PERCPU_DYNAMIC_SIZE_SHIFT to 11 on configs with PAGE_SIZE
-larger than 4KiB and DEPT enabled.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202512051514.VMlIccSV-lkp@intel.com/
 
-Reported-by: Yunseong Kim <ysk@kzalloc.com>
-Signed-off-by: Byungchul Park <byungchul@sk.com>
----
- include/linux/percpu.h | 4 ++++
- 1 file changed, 4 insertions(+)
+All warnings (new ones prefixed by >>):
 
-diff --git a/include/linux/percpu.h b/include/linux/percpu.h
-index 85bf8dd9f087..dd74321d4bbd 100644
---- a/include/linux/percpu.h
-+++ b/include/linux/percpu.h
-@@ -43,7 +43,11 @@
- # define PERCPU_DYNAMIC_SIZE_SHIFT      12
- #endif /* LOCKDEP and PAGE_SIZE > 4KiB */
- #else
-+#if defined(CONFIG_DEPT) && !defined(CONFIG_PAGE_SIZE_4KB)
-+#define PERCPU_DYNAMIC_SIZE_SHIFT      11
-+#else
- #define PERCPU_DYNAMIC_SIZE_SHIFT      10
-+#endif /* DEPT and PAGE_SIZE > 4KiB */
- #endif
- 
- /*
+   In file included from drivers/net/ethernet/stmicro/stmmac/norm_desc.c:11:
+>> include/linux/stmmac.h:273:12: warning: 'struct netdev_phys_item_id' declared inside parameter list will not be visible outside of this definition or declaration
+        struct netdev_phys_item_id *ppid);
+               ^~~~~~~~~~~~~~~~~~~
+
+
+vim +273 include/linux/stmmac.h
+
+   188	
+   189	struct plat_stmmacenet_data {
+   190		int bus_id;
+   191		int phy_addr;
+   192		/* MAC ----- optional PCS ----- SerDes ----- optional PHY ----- Media
+   193		 *                                       ^
+   194		 *                                  phy_interface
+   195		 *
+   196		 * The Synopsys dwmac core only covers the MAC and an optional
+   197		 * integrated PCS. Where the integrated PCS is used with a SerDes,
+   198		 * e.g. for 1000base-X or Cisco SGMII, the connection between the
+   199		 * PCS and SerDes will be TBI.
+   200		 *
+   201		 * Where the Synopsys dwmac core has been instantiated with multiple
+   202		 * interface modes, these are selected via core-external configuration
+   203		 * which is sampled when the dwmac core is reset. How this is done is
+   204		 * platform glue specific, but this defines the interface used from
+   205		 * the Synopsys dwmac core to the rest of the SoC.
+   206		 *
+   207		 * Where PCS other than the optional integrated Synopsys dwmac PCS
+   208		 * is used, this counts as "the rest of the SoC" in the above
+   209		 * paragraph.
+   210		 *
+   211		 * phy_interface is the PHY-side interface - the interface used by
+   212		 * an attached PHY or SFP etc. This is equivalent to the interface
+   213		 * that phylink uses.
+   214		 */
+   215		phy_interface_t phy_interface;
+   216		struct stmmac_mdio_bus_data *mdio_bus_data;
+   217		struct device_node *phy_node;
+   218		struct fwnode_handle *port_node;
+   219		struct device_node *mdio_node;
+   220		struct stmmac_dma_cfg *dma_cfg;
+   221		struct stmmac_safety_feature_cfg *safety_feat_cfg;
+   222		int clk_csr;
+   223		int has_gmac;
+   224		int enh_desc;
+   225		int tx_coe;
+   226		int rx_coe;
+   227		int bugged_jumbo;
+   228		int pmt;
+   229		int force_sf_dma_mode;
+   230		int force_thresh_dma_mode;
+   231		int riwt_off;
+   232		int max_speed;
+   233		int maxmtu;
+   234		int multicast_filter_bins;
+   235		int unicast_filter_entries;
+   236		int tx_fifo_size;
+   237		int rx_fifo_size;
+   238		u32 host_dma_width;
+   239		u32 rx_queues_to_use;
+   240		u32 tx_queues_to_use;
+   241		u8 rx_sched_algorithm;
+   242		u8 tx_sched_algorithm;
+   243		struct stmmac_rxq_cfg rx_queues_cfg[MTL_MAX_RX_QUEUES];
+   244		struct stmmac_txq_cfg tx_queues_cfg[MTL_MAX_TX_QUEUES];
+   245		void (*get_interfaces)(struct stmmac_priv *priv, void *bsp_priv,
+   246				       unsigned long *interfaces);
+   247		int (*set_clk_tx_rate)(void *priv, struct clk *clk_tx_i,
+   248				       phy_interface_t interface, int speed);
+   249		void (*fix_mac_speed)(void *priv, int speed, unsigned int mode);
+   250		int (*fix_soc_reset)(struct stmmac_priv *priv, void __iomem *ioaddr);
+   251		int (*serdes_powerup)(struct net_device *ndev, void *priv);
+   252		void (*serdes_powerdown)(struct net_device *ndev, void *priv);
+   253		int (*mac_finish)(struct net_device *ndev,
+   254				  void *priv,
+   255				  unsigned int mode,
+   256				  phy_interface_t interface);
+   257		void (*ptp_clk_freq_config)(struct stmmac_priv *priv);
+   258		int (*init)(struct platform_device *pdev, void *priv);
+   259		void (*exit)(struct platform_device *pdev, void *priv);
+   260		int (*suspend)(struct device *dev, void *priv);
+   261		int (*resume)(struct device *dev, void *priv);
+   262		struct mac_device_info *(*setup)(void *priv);
+   263		int (*clks_config)(void *priv, bool enabled);
+   264		int (*crosststamp)(ktime_t *device, struct system_counterval_t *system,
+   265				   void *ctx);
+   266		void (*dump_debug_regs)(void *priv);
+   267		int (*pcs_init)(struct stmmac_priv *priv);
+   268		void (*pcs_exit)(struct stmmac_priv *priv);
+   269		struct phylink_pcs *(*select_pcs)(struct stmmac_priv *priv,
+   270						  phy_interface_t interface);
+   271		/* Physical port identification callbacks (optional, for glue driver override) */
+   272		int (*get_phys_port_id)(struct net_device *ndev,
+ > 273					struct netdev_phys_item_id *ppid);
+
 -- 
-2.17.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
