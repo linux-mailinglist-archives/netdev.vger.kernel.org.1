@@ -1,117 +1,159 @@
-Return-Path: <netdev+bounces-243679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD647CA5BB9
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 01:13:05 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC89CCA5D48
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 02:28:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DCF683010973
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 00:12:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 74974302488D
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 01:28:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07A9B3770B;
-	Fri,  5 Dec 2025 00:12:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A51D2236FA;
+	Fri,  5 Dec 2025 01:28:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VD5WOk6O"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="B01xcjM2"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5EB01F19A
-	for <netdev@vger.kernel.org>; Fri,  5 Dec 2025 00:12:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 449F11397;
+	Fri,  5 Dec 2025 01:28:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764893568; cv=none; b=O0bTecm7wi7hvZhnc9vTtdwndCSYlNhjoL7CXT/mAs9WbBez+SlwQ7PKnB1OcgPTg9hk1ov9YyAy6rrjbUzv3tOgXu499ORvt3dQ/2i4NaB9BohKyFZdrj9ahMwms11Rqp9z8eH6ZO5au+8g9LsFNEZ+5jKeNY8vX7kr+gKnVig=
+	t=1764898114; cv=none; b=SgiOMXSQSfrIAbqxqqZ1jxyAZw2248EUCzP73Ag6LWu4u4kSfM1ZFLchwiQzFbSSJGgsNt+O5xiNlCcrvedZqPbNPtMxap5sHeo0dMLhDeK4k0YL872OHpYWd0ovjTLSeqVsidjlaITjBkXdjjj+atJZmQZ96NJ4ftRxhT52X80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764893568; c=relaxed/simple;
-	bh=4LsnmxMeYoPnM0nGNCKxP2EzUnn38VfGBZhTK9C7oC4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jpAIBhVlrk7kGYxVFt4kpxwCz/Ake06CNPX9bSsZqdRXJjxeh4r/pg1erBfmXUSIPRlSKXilrlzPjK+Soy99+0ph38G9RRP+JnAYqvFu32Ac7/K0S8LVgnRje8Q40PFgrL1SOo0zWyfhDw7leCeHYw9sh3JtVVITxDT0twBXaMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VD5WOk6O; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <ea427664-d7a9-4bf8-86e7-47dc8fc84ba4@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1764893554;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=l1JGu9+HlOFuxrbQp1L4DjUhuEjjOrAZT3J7k/6lVbo=;
-	b=VD5WOk6Oxsz+AP5rZKxUhc1gjV3xq74BGMi7Gw1E3b7PMAGF1hw3pwAL+3uaALKfI0c1XC
-	eIgN060e2fMi1NJmTl3OjrWPLkJN+H4mbSgO10YVH9LmZaxEgBSwsHG6ZNB113GADsQUaW
-	vVMDLPgJLgpWYYhF1z6WEhLyB5x3+y8=
-Date: Fri, 5 Dec 2025 00:12:30 +0000
+	s=arc-20240116; t=1764898114; c=relaxed/simple;
+	bh=iVY4oNxiYnceiJnvFXEQ/fR7tfRcncNw7xLRPVWk/5Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JgB9KCLHet5k0nz976oSMNhFkTXTAmTMm64FY5WVB9ecMfV2FmHojngEQzrYP5kquwdtHsDsIIDMfwAPAQYkRdIjCgMTkDBCCrqVRnyoT6sCh6/jTqSotWU9QLx6DPN+m7LpZZICmFYf4VB6EwSFXRuBCJJDpQORq8T3Va0zzmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=B01xcjM2; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1764898108;
+	bh=hj/jRVwyXOS4WNBlc4eYIYNc21KIOKBVrMqF60LCpvE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=B01xcjM2TTj/hXp2LOpm5DCRM4Uohi/NAGBWy9ggqdkPQlQmaQ/4rPZius2iXO+L1
+	 N3Ii4Y1eM5LniQcacrWYr1m7bc5XLgG1Ckab+osCUknDaXtsVmJCMmmjvkhMsZzUzd
+	 E2GZ9TjosNcSuEPAQgt7ZRFwfXg8Vdb8/qiGWvwb2jdkfeISuQJm/mZDSBv69ieXfp
+	 dFNCeZmV0EFzD0sJlAX7mPCR6Xe90i+aFmL+9gEgOU2tMXZp/xbqaYZEf1+cE03orm
+	 jqEfG4ssrxrsCUjvXAtoxWwhges10LFw7xqSDdeEwImyLTIMon4XmPU4pBG1x6WK0E
+	 TlAN+VZgl/a5w==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4dMv0C5m1gz4w23;
+	Fri, 05 Dec 2025 12:28:27 +1100 (AEDT)
+Date: Fri, 5 Dec 2025 12:28:26 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Networking <netdev@vger.kernel.org>,
+ Bala-Vignesh-Reddy <reddybalavignesh9979@gmail.com>, Linux Kernel Mailing
+ List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: Re: linux-next: manual merge of the net-next tree with the
+ mm-nonmm-unstable tree
+Message-ID: <20251205122826.090fd398@canb.auug.org.au>
+In-Reply-To: <20251124125006.3953f1d5@canb.auug.org.au>
+References: <20251124125006.3953f1d5@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] net: ti: icssg-prueth: add PTP_1588_CLOCK_OPTIONAL
- dependency
-To: Arnd Bergmann <arnd@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Richard Cochran <richardcochran@gmail.com>,
- MD Danish Anwar <danishanwar@ti.com>, Diogo Ivo <diogo.ivo@siemens.com>,
- Jan Kiszka <jan.kiszka@siemens.com>, Roger Quadros <rogerq@ti.com>,
- Basharath Hussain Khaja <basharath@couthit.com>, "Andrew F. Davis"
- <afd@ti.com>, Parvathi Pudi <parvathi@couthit.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Meghana Malladi <m-malladi@ti.com>,
- Sascha Hauer <s.hauer@pengutronix.de>,
- Mohan Reddy Putluru <pmohan@couthit.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20251204100138.1034175-1-arnd@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20251204100138.1034175-1-arnd@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: multipart/signed; boundary="Sig_//NxgHZW0cth4HJ1pxNtT72U";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On 04/12/2025 10:01, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> The new icssg-prueth driver needs the same dependency as the other parts
-> that use the ptp-1588:
-> 
-> WARNING: unmet direct dependencies detected for TI_ICSS_IEP
->    Depends on [m]: NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_TI [=y] && PTP_1588_CLOCK_OPTIONAL [=m] && TI_PRUSS [=y]
->    Selected by [y]:
->    - TI_PRUETH [=y] && NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_TI [=y] && PRU_REMOTEPROC [=y] && NET_SWITCHDEV [=y]
-> 
-> Add the correct dependency on the two drivers missing it, and remove
-> the pointless 'imply' in the process.
-> 
-> Fixes: e654b85a693e ("net: ti: icssg-prueth: Add ICSSG Ethernet driver for AM65x SR1.0 platforms")
-> Fixes: 511f6c1ae093 ("net: ti: icssm-prueth: Adds ICSSM Ethernet driver")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->   drivers/net/ethernet/ti/Kconfig | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/ti/Kconfig b/drivers/net/ethernet/ti/Kconfig
-> index a54d71155263..fe5b2926d8ab 100644
-> --- a/drivers/net/ethernet/ti/Kconfig
-> +++ b/drivers/net/ethernet/ti/Kconfig
-> @@ -209,6 +209,7 @@ config TI_ICSSG_PRUETH_SR1
->   	depends on PRU_REMOTEPROC
->   	depends on NET_SWITCHDEV
->   	depends on ARCH_K3 && OF && TI_K3_UDMA_GLUE_LAYER
-> +	depends on PTP_1588_CLOCK_OPTIONAL
->   	help
->   	  Support dual Gigabit Ethernet ports over the ICSSG PRU Subsystem.
->   	  This subsystem is available on the AM65 SR1.0 platform.
-> @@ -234,7 +235,7 @@ config TI_PRUETH
->   	depends on PRU_REMOTEPROC
->   	depends on NET_SWITCHDEV
->   	select TI_ICSS_IEP
-> -	imply PTP_1588_CLOCK
-> +	depends on PTP_1588_CLOCK_OPTIONAL
->   	help
->   	  Some TI SoCs has Programmable Realtime Unit (PRU) cores which can
->   	  support Single or Dual Ethernet ports with the help of firmware code
+--Sig_//NxgHZW0cth4HJ1pxNtT72U
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Hi all,
+
+On Mon, 24 Nov 2025 12:50:06 +1100 Stephen Rothwell <sfr@canb.auug.org.au> =
+wrote:
+>
+> Today's linux-next merge of the net-next tree got conflicts in:
+>=20
+>   tools/testing/selftests/drivers/net/gro.c
+>   tools/testing/selftests/drivers/net/hw/toeplitz.c
+>=20
+> between commit:
+>=20
+>   7edd42093cb0 ("selftests: complete kselftest include centralization")
+>=20
+> from the mm-nonmm-unstable tree and commits:
+>=20
+>   89268f7dbca1 ("selftests: net: relocate gro and toeplitz tests to drive=
+rs/net")
+>   fdb0267d565a ("selftests: drv-net: add a Python version of the GRO test=
+")
+>   9cf9aa77a1f6 ("selftests: drv-net: hw: convert the Toeplitz test to Pyt=
+hon")
+>=20
+> from the net-next tree.
+>=20
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
+>=20
+>=20
+> diff --cc tools/testing/selftests/drivers/net/gro.c
+> index 76aa75469a8c,995b492f5bcb..000000000000
+> --- a/tools/testing/selftests/drivers/net/gro.c
+> +++ b/tools/testing/selftests/drivers/net/gro.c
+> @@@ -57,7 -57,8 +57,8 @@@
+>   #include <string.h>
+>   #include <unistd.h>
+>  =20
+>  -#include "../../kselftest.h"
+>  +#include "kselftest.h"
+> + #include "../../net/lib/ksft.h"
+>  =20
+>   #define DPORT 8000
+>   #define SPORT 1500
+> diff --cc tools/testing/selftests/drivers/net/hw/toeplitz.c
+> index 4b58152d5a49,afc5f910b006..000000000000
+> --- a/tools/testing/selftests/drivers/net/hw/toeplitz.c
+> +++ b/tools/testing/selftests/drivers/net/hw/toeplitz.c
+> @@@ -52,7 -52,8 +52,8 @@@
+>   #include <sys/types.h>
+>   #include <unistd.h>
+>  =20
+>  -#include "../../../kselftest.h"
+>  +#include "kselftest.h"
+> + #include "../../../net/lib/ksft.h"
+>  =20
+>   #define TOEPLITZ_KEY_MIN_LEN	40
+>   #define TOEPLITZ_KEY_MAX_LEN	60
+
+This is now a conflict between the mm-nonmm-stable tree and Linus' tree.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_//NxgHZW0cth4HJ1pxNtT72U
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmkyNToACgkQAVBC80lX
+0GxYQgf9Hac1CaArptDfml3tmlh1RyIdGUwgijrUqElpIbv4EoV2d5BO/p9cEy8x
+/dSv2c8qSfuYdMMKn6UDCoN8QJH8LCc/RfbU+UhBmfNlpvcuafsFh08rWP9bSaRv
+yeo9TRw2nD40DKn4Irzs52VKvSeiERWql8R3SdpWVq+BL2mhHQ/3zMcf7utpFGdZ
+IQ56fymBcBNslOa+X2OUdo6xCfbkrmFS8hkqGiTKOBceXvUAfM0GHkXCuxt4PX+B
+z3OGCw3ytHzKDJuz8cBBgwY30Z7aToZQaQtEjSo51iUk0HloTPZpd+S/fnjagzeA
+7k6cO5+NixjmY0GNE9Ng9TMjboQIjQ==
+=Hanv
+-----END PGP SIGNATURE-----
+
+--Sig_//NxgHZW0cth4HJ1pxNtT72U--
 
