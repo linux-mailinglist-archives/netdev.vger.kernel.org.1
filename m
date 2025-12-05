@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-243848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5A4FCA8986
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 18:28:39 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4165ECA8925
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 18:24:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B6165301B4A6
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 17:14:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8928231E661D
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 17:14:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10A763491DB;
-	Fri,  5 Dec 2025 17:12:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED3C734B1B8;
+	Fri,  5 Dec 2025 17:12:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b5YTeIx5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UuK7fuQN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD61B345741
-	for <netdev@vger.kernel.org>; Fri,  5 Dec 2025 17:12:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A615932E738
+	for <netdev@vger.kernel.org>; Fri,  5 Dec 2025 17:12:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764954749; cv=none; b=J/q4prabhE1f+7yhRJiMfg8kyiyfJ1kfqz+nP6ckES6suvUqfvYjBs226TwXYixQaOUKwlMMsLLb59MTNVlXY7F77VNVEoZyON8rQb712qZRk0QCwuJ04y0WzjffOKb6PJs3POOIIRFIA8yyEG/awVo+pgjQVS73tgaL5D4MPgk=
+	t=1764954753; cv=none; b=cT92ybQ3RVG1sn/7r3zg7yZzzrUi1vqC3LdKULrxnNb1aXuMOgEH9DlfYdV2YHF+33j+YF5cGUWxRISeTunJt2P74wZO2NtCLro0bcMqEu9vhlQ66XUI2C2YaHvAGhenTQJrpN/8d3jjNYIF7FlO7QSVyO0FgRrCMjcwaQ5QnYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764954749; c=relaxed/simple;
-	bh=M2vFDyyUfG7JkznxChmdBB4qNaHZV2aWYVJ2i7s0Hfk=;
+	s=arc-20240116; t=1764954753; c=relaxed/simple;
+	bh=TVRX6OVXaN6/F8l3SopsYHbh+ST+dk2HGsZrDg1QD84=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YLkq1GTseskIsDkt5ETC9s3JTHq2z5fhhpIc3a9x19xjeZk+kDSLWKqktpbM7JvBxo9Lx/PXpVUIG/8dCLvIr3latK7FhpjRJcGFnvvpIOYvH4FlKSMvWk33+Y0SycW2ieEAJtyKaZCDlrRm38dwMHou0cFFsmlmHVIwKDIdPR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b5YTeIx5; arc=none smtp.client-ip=209.85.215.178
+	 MIME-Version:Content-Type; b=Bi1rG2+n5CD3wElQivICcMRxkaeue8DD6GCOqHMWrRVoRqP4bAoM3PWupNxVK15AAZn/YYWnvtHHMQRrzlLnBF0eTqtMb6sAADDl6KZIsvzFODNTT5iPdXTcctnBFlp05fbkw2EST9nZgtHllaLuHkMELB0mG+l+cvoBZDOZZaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UuK7fuQN; arc=none smtp.client-ip=209.85.215.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-bf1b402fa3cso2162342a12.3
-        for <netdev@vger.kernel.org>; Fri, 05 Dec 2025 09:12:20 -0800 (PST)
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-bd1ce1b35e7so1611259a12.0
+        for <netdev@vger.kernel.org>; Fri, 05 Dec 2025 09:12:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764954738; x=1765559538; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1764954740; x=1765559540; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/vBZwIvLvx6D7o9yPmhW2hQH1LVZ8ZbPnLZnaPeYgfI=;
-        b=b5YTeIx5tQetKP0xsFxE6Xqgr9WAqiYEYngVQjIgoDX2C4ZRKp7GYZSP7ZtcQZr2er
-         R4Cz2RAbfV9iq/ksTAFCv+o4JpURo0vMtLMSORnEHm+OCO3z2z3mfZivv/64YEHqZj9h
-         GcVU9Dza2wZwaiRxEGtE2TpZuZpUatV+A1yudGhDm19BYNlaU+TBw1csq/jK6kfqM7UJ
-         thgHXCzMba1QflmatWQwucm8GjeeDPYR6Iph7yrZszQJ4GzsybIoLz7qYWMc8iK7p9iE
-         8sMPlpWsdq2ZOJO8bh/+cPiK8sv7oeCFB6ktM/IRHzhwsqcY/3IRmpcxHUI5o+eEANZM
-         v+BA==
+        bh=BIl/aawA4xeGwYCaPG7Uh3j0tRW+jDxmmUaf9p3hcUE=;
+        b=UuK7fuQNuI0rtnsf7Nc33GBdx6dzAfSUeKBvuz7tojI5LL5uZh4PrtvpuiYSBRBeSM
+         ALQc4EF1zFTgEOJdSA9/Azvs02cgC57UADu8nM8X/hUYv8e5LBzzofRDfuScv1lfbmqU
+         ZZaUKJQBjM5BcLmAbfVdaofY6/tVaNo3OhT+Qk2VokG9/i0l/pBjCPFxlX+yz5lJxMvu
+         uGlJDWWBFhfLoUj5DLdlaMMwW48YvUmSAgySVa3+mFNnnWqQl0cpQgFRxLN3aVeJPF7a
+         wHwwCt/+MFb8XFzLUn73PPQHYSIPOSIQna7daHzGmE4udWc9O8LjdtN9ZcKkXEEtEg8U
+         u7sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764954738; x=1765559538;
+        d=1e100.net; s=20230601; t=1764954740; x=1765559540;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:sender:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/vBZwIvLvx6D7o9yPmhW2hQH1LVZ8ZbPnLZnaPeYgfI=;
-        b=cIN/QDMqTi5mmbMKr1QjXdM916yPsDxKYMsvgqawcw4IYDcpXGya5BOEDJbPIF9115
-         Dh131K3GztssgQB/IvuwXomM/GReyndy1aEwjM0jV02CejBI8viEUF+xuZ2cd8iQB34d
-         02Z3Aid39EUnakLHgd9D0C8gKDnihSmpWOkTBcUFjSud9c8buF+C8W+iTchNL+2T13qW
-         m5RDbwlRCl3nJ5JwR8GYhFe19OgHLTc0BuVQHcyUdJOHM304FqrPSVhUcnZp+Q6udQdN
-         yTCNEVcZmyUwN2ghde6a2Hj2rWnWxvHXR9e7Yta4JEyVpIfEXqJCpuezz6AB8kEsdU2f
-         6LKA==
-X-Forwarded-Encrypted: i=1; AJvYcCVFbDFO1teBR7mLM9YjTOR3qkti4D+Xyr1JcJMl3TRn6jIiUR5mzg0XmU4LSVegCuEdITn/qCg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhpUlNs2toQrZ/eea1fzpOGHrZlZ8+jZ+dm1JuqFD+Q58hTfrL
-	5liSKIMvN8E4SBCJ9F8Pe7WBMFc71a2UBbT8ZLC5KIxUpsOy5YJf16tk
-X-Gm-Gg: ASbGncvFRbTg+q8OYwYvwsIsSuTdZ4oJehISTcFvOwIqrZg+i1X6NR9zbWIiWTa9ArE
-	jZbenQiukjoj8PPqxB8mEuTAogBFh3+tZ+zyU2MptpGqRtkycEgnndfFOjBuYtkYwTTgSgqr5R8
-	2j6sdasNaHJNJpXJQOaVBPAMKFSo7qCcFyaafIi39Wula/cR+KMK5KfLA4/u9u3p4SAUTs6eAPR
-	wv2TSBz23HpDcx3KFPN/eGq6BImOZL2OulJS11wNzBCUwuQmi/S7rAKge/kqOITS9TPzkd8upI/
-	OB4VRnrYmnkqu9NzKdjyQUViGPlaGbVrYSy4t2ttnF+XAsJzGe4XP/fCL2PPusJbFWkA9HhvLoY
-	QpGUz/8c/miUj4gXR1s55CvdVpRKuR4pUpb8GpFuZ/591+mRv7ryiaO3UHVl7/zy9+9OHIETEsh
-	qTuH+meebFVO75H97z0IXOZ3OTzgwLSntXew==
-X-Google-Smtp-Source: AGHT+IHedJC93D+L43aGh0gHVYz0R+imftKPymAfmBV+49IIc8qNl+K0a9+Ao52i2Vy/p8ADlA4ahA==
-X-Received: by 2002:a05:7022:6722:b0:11b:d561:bc10 with SMTP id a92af1059eb24-11df0cae991mr7658546c88.41.1764954737734;
-        Fri, 05 Dec 2025 09:12:17 -0800 (PST)
+        bh=BIl/aawA4xeGwYCaPG7Uh3j0tRW+jDxmmUaf9p3hcUE=;
+        b=fhyuqmYvAKI3FGbtzuKg3XSgrjTmp3IaZt+xXHwcLBMkNrbkYVXo164CGjy9rDFaQd
+         oTYz2qEsmJINLcHflHmC75hUXZG60gdljO4xzVCOXNvIgOKOcdKjdSsQOXV8ZeXSiozK
+         hupTBHEOr3ulazI23eUmuBnhzCSqc7Sd0SRc7iIPWidSypA88W5TDc/V5X11P1Nn7JTY
+         cjU2WoC9fppUx0DWUKh4v4DEvTtRue+RzNRCLyoSXlVUXRAPWHxyP/Z5ZnFalxjLvUvW
+         /jF1DjLtDVbRwG/UtFuRSVMHJXbfpL2aDo5t0sDRudQNZ+Dyue+cq4Ib3usXDGjg9sVU
+         Loug==
+X-Forwarded-Encrypted: i=1; AJvYcCWYH8ttY0H3PNPL2uksos0WKtGlfUge9lUlaPxtarb5VlQdqV3ug2y6CFAP6Fp+g5mF5CUFKNA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2GvJVpAzInT/SLfqFOzUHLR3lRCTyOaaWzV4MleM6dCseX5+d
+	DoN4n84gm885/fR0Ne68/DZnJQ5VavsLTZW4RanFYwq4PIXr/J/Sm7qD
+X-Gm-Gg: ASbGncvljTLjVWSKgzaBb79GWcZEqyqtGxA6EJFgVlrjen9K1JLMC3DJCR6Ap/RRWNd
+	jJh+f9BmOGCPoaJW7v0xPbpFK7bU4OVg0FyF4xcVVWewMMGg/sIuljWyqE6LPsNHqV7WnV0M3x4
+	VKgxgamnHmKZE9W19X6xPXBgfqBYX3rk6qxcPAMLJNqDlyuc7qTvKY9dh164ageRdPHdg6G5hNq
+	PAbtlsaiCFa0MnAnigW2aruR8rOo0054orJV53vt1GKDEABX7Sb7lzR9uqP/iM6yOayjFGOKp9H
+	8xNHbYhM99bvIeRUTZQmUeXll2m8kZ1Tfnrp13oiRufVDvjeffIe3QUJhWiUJq+JqC/sHq7zOF8
+	FngSy2wCkuOz0Vkqz7W/qfcSR60pfFnBCnbORZrQv4VnkGNYxIK1fjoPvemjJMxadXGI1e9Ahvp
+	wgKxQ/X6SFv8UaAiUmX8kjvjc=
+X-Google-Smtp-Source: AGHT+IGLmu//P31DCy/RNC7sTNOq4cvelmghY7u/vM6nTRJiFEDfwjbdinP/0y5Z7o1g/QEtoGFjOg==
+X-Received: by 2002:a05:7301:4616:b0:2a4:3594:72e7 with SMTP id 5a478bee46e88-2ab92e2da45mr5744996eec.22.1764954739092;
+        Fri, 05 Dec 2025 09:12:19 -0800 (PST)
 Received: from server.roeck-us.net ([2600:1700:e321:62f0:da43:aeff:fecc:bfd5])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11df7576932sm20209499c88.4.2025.12.05.09.12.17
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2aba87d7b9dsm20594306eec.4.2025.12.05.09.12.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Dec 2025 09:12:17 -0800 (PST)
+        Fri, 05 Dec 2025 09:12:18 -0800 (PST)
 Sender: Guenter Roeck <groeck7@gmail.com>
 From: Guenter Roeck <linux@roeck-us.net>
 To: Shuah Khan <shuah@kernel.org>
@@ -87,10 +87,10 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	netdev@vger.kernel.org,
 	bpf@vger.kernel.org,
 	Guenter Roeck <linux@roeck-us.net>,
-	Kuniyuki Iwashima <kuniyu@google.com>
-Subject: [PATCH v2 06/13] selftest: af_unix: Support compilers without flex-array-member-not-at-end support
-Date: Fri,  5 Dec 2025 09:10:00 -0800
-Message-ID: <20251205171010.515236-7-linux@roeck-us.net>
+	=?UTF-8?q?Andr=C3=A9=20Almeida?= <andrealmeid@igalia.com>
+Subject: [PATCH v2 07/13] selftest/futex: Comment out test_futex_mpol
+Date: Fri,  5 Dec 2025 09:10:01 -0800
+Message-ID: <20251205171010.515236-8-linux@roeck-us.net>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20251205171010.515236-1-linux@roeck-us.net>
 References: <20251205171010.515236-1-linux@roeck-us.net>
@@ -103,39 +103,39 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Fix:
+test_futex_mpol() is not called, resulting in the following build warning.
 
-gcc: error: unrecognized command-line option ‘-Wflex-array-member-not-at-end’
+futex_numa_mpol.c:134:13: warning: ‘test_futex_mpol’ defined but not used
 
-by making the compiler option dependent on its support.
+Disable the function but keep it in case it was supposed to be used.
 
-Fixes: 1838731f1072c ("selftest: af_unix: Add -Wall and -Wflex-array-member-not-at-end to CFLAGS.")
-Cc: Kuniyuki Iwashima <kuniyu@google.com>
+Fixes: d35ca2f64272 ("selftests/futex: Refactor futex_numa_mpol with kselftest_harness.h")
+Cc: André Almeida <andrealmeid@igalia.com>
 Signed-off-by: Guenter Roeck <linux@roeck-us.net>
 ---
-v2: Just using cc-option is insufficient since it is not defined,
-    and if it is not defined it just disables the option entirely.
-    Include Makefile.compiler and declare the function locally
-    to solve the problem.
+v2: Update subject and description to reflect that the patch fixes a build
+    warning. 
 
- tools/testing/selftests/net/af_unix/Makefile | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ tools/testing/selftests/futex/functional/futex_numa_mpol.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/tools/testing/selftests/net/af_unix/Makefile b/tools/testing/selftests/net/af_unix/Makefile
-index 3cd677b72072..4c0375e28bbe 100644
---- a/tools/testing/selftests/net/af_unix/Makefile
-+++ b/tools/testing/selftests/net/af_unix/Makefile
-@@ -1,4 +1,9 @@
--CFLAGS += $(KHDR_INCLUDES) -Wall -Wflex-array-member-not-at-end
-+top_srcdir := ../../../../..
-+include $(top_srcdir)/scripts/Makefile.compiler
-+
-+cc-option = $(call __cc-option, $(CC),,$(1),$(2))
-+
-+CFLAGS += $(KHDR_INCLUDES) -Wall $(call cc-option,-Wflex-array-member-not-at-end)
+diff --git a/tools/testing/selftests/futex/functional/futex_numa_mpol.c b/tools/testing/selftests/futex/functional/futex_numa_mpol.c
+index d037a3f10ee8..8e3d17d66684 100644
+--- a/tools/testing/selftests/futex/functional/futex_numa_mpol.c
++++ b/tools/testing/selftests/futex/functional/futex_numa_mpol.c
+@@ -131,10 +131,12 @@ static void test_futex(void *futex_ptr, int err_value)
+ 	__test_futex(futex_ptr, err_value, FUTEX2_SIZE_U32 | FUTEX_PRIVATE_FLAG | FUTEX2_NUMA);
+ }
  
- TEST_GEN_PROGS := \
- 	diag_uid \
++#ifdef NOTUSED
+ static void test_futex_mpol(void *futex_ptr, int err_value)
+ {
+ 	__test_futex(futex_ptr, err_value, FUTEX2_SIZE_U32 | FUTEX_PRIVATE_FLAG | FUTEX2_NUMA | FUTEX2_MPOL);
+ }
++#endif
+ 
+ TEST(futex_numa_mpol)
+ {
 -- 
 2.45.2
 
