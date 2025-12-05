@@ -1,119 +1,110 @@
-Return-Path: <netdev+bounces-243864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0542CA8B85
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 19:01:30 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C9C6CA8B88
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 19:03:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6E2C830053DD
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 17:56:11 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CD75F301B3D6
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 18:03:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2382A23C516;
-	Fri,  5 Dec 2025 17:56:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD661273D73;
+	Fri,  5 Dec 2025 18:03:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W9aV+sGc"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="txTUEIoK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B063E1D9A5F
-	for <netdev@vger.kernel.org>; Fri,  5 Dec 2025 17:56:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19D682D7DD9;
+	Fri,  5 Dec 2025 18:03:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764957369; cv=none; b=cfx43UEgB3lLnBcgpFonoATlATzEpkgMFZJpfo13tgFwe3sSaeBQltMXL+6KdHvucTG3IsCGChGu3hnsZFr8aszOiz5kwN1sVySXbkpIUJCtLsD1RDW8AMeIPalYccEg90B8WOZPPraxIDMeRFhoJ6JhjL+cvdy8vnP4sDEH7kQ=
+	t=1764957810; cv=none; b=IbQLNhp+tX6umEw7p1PCdu09iquqVeR2PsdmV0jUqHTO5rJjb9OwbT2mIZGixImKdVObfsB0D248Z/umPuEPR7WmuixcXIMUGwGzOb6sjvkF+nRwgC3GssuTQqtkRgdmWNPxcdv38tc3hU0EcEWQUwwBls/HocqJwZE/399H5DE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764957369; c=relaxed/simple;
-	bh=cT+okyoUrHTXA45Is0Pw9F6TxfbUti+FzziBF41Y2dc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TTZd9Bda9vkGx9i8yanA308GpgsEOxfCwJvpUAxtSqRNGH02U3bKkRcQDKiFG1dCFFib/VPx5ZmCG9sZGx56PVJDJmwtyK1ZRkDeyX/AKw41qacoX3FJWuh8ZxBZK90vax9pZrfqicFxCd+qHV0S/bnVBY/3xTExhqhwx7mSW64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W9aV+sGc; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2953e415b27so27485485ad.2
-        for <netdev@vger.kernel.org>; Fri, 05 Dec 2025 09:56:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764957367; x=1765562167; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=1ZlkRLK2kR7jmdSrjUTkpoX3kF+r/9UBuu/w/fSD0EY=;
-        b=W9aV+sGczy519i1x2Pwh62V+43tJ1dPNrr0llLdd8N2KFtACMUBmtfjrvhqw/F/5be
-         l3PczTqWnkxVvE21OjNXE3GqjeNgNm4fryvqdlyxQsnXmh91vfJxiZ0+Ogz8q4W2fWTC
-         iINph9TUWa6QExTgIMDd8AO9oLDjwE5hU0Mk0WZoI7o9revZO6MBWkz+mjSTm5jyT+yf
-         DTPA6jtiNwHPyqBX7kVvLqO6ezSIQE58VBMHu8r97OQxyuJH503MkYvEAF5PDUicQz+y
-         Q5tCp0eyDGjTUdoTpVIFMWCY1NYyljUVBi9r0qVGTW+MEpg11n1p1QGA0MnnUFn/nM5Y
-         T/AA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764957367; x=1765562167;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1ZlkRLK2kR7jmdSrjUTkpoX3kF+r/9UBuu/w/fSD0EY=;
-        b=ojoHPAxoKMidririsFZ2kPAzxdYL3wb/O0E2ioTF1MHwMMv65W6RP+TXph7GbHuHwD
-         3epeu4yymnSU/3ag6u298EHqFyaiiBhtJ0OwBY7RS5mit7GZDganOWXing8zdOptfKOb
-         +ABKeqaYjFCmDTdmc8tUYPXnyngk1es+uDiIQZ40qUIihf0LZNArO9BtseinMTk/mjhK
-         iZfAqkm4SwOoWDae4sL3gWsDbF+s0rDTNhVCQWVbSwfgvnLXdgqGyPbWsLIVJsw9EnsV
-         73e+8Aqt5U7YzMHkLNldz7nT/7FsJi7NrbT31/vqlxEq9k0TRSMwJNrFXmw4FCosCsue
-         jzDA==
-X-Forwarded-Encrypted: i=1; AJvYcCWUifyJeOPFdTtfoN1eh9/vYWxTpTZWtHRqaAddmacu/j9eyzkVm+GZMtpQwP1aGOZGl5mzU3g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYtU0GLoSKFlCIjUgSamB2TnuliVWM1X7JZfNo0o9R7KhgtiCC
-	v0gmmrVsKLIrQiF5QUEg+K5aVgog0LoUrOFKVlSCd7Py6Pc8HdOCg5Gs
-X-Gm-Gg: ASbGncuKEyD0Bo8kEaS9K3nVT3Yt7d5KGy1wf1Yjx0RQhu7k2xV8lQPzEYEDPUg7H+/
-	KsX0L2LozVOUBN+EBgcYXjSD3GVGA8Qr9znk+7I+E9bQjgDn59Bwocj/fPAdToqLGWvTnJN/uRC
-	51e8lfSECK2VNX8fHCKJng4e0HBzeP/TWFMpqsLOskg0xzW1nVLxiPgFJMEql5hkh5w+BBhWAA1
-	2U76XMlzGVbdSQQpFUUB0xLUe2BeluxKw8Z8nR/Ox7jN39OyiXHG+23xbvZh/7d4kX3FPyVmTuD
-	Z+Q/5qlP1h7MN4PCHzZIN+McrkFlSFwQVDYPtadn3TrGPvQYPKPgKJRx8DSHOCynKtvBxTs2SjH
-	phjZRiow6nSaqBFBYPXzx5Pr0qSD6+C+NlNAjn8kdtllwBI7mHs8E58DPFG/8tnE4Z+D0LXw3if
-	l6sD+z6wncO4Bfn47GjHh6ZITuKUOqh5haFtNKauKBmA==
-X-Google-Smtp-Source: AGHT+IEMZtS5OhVis+tAJNWxbgTpnD1LDhwjU9539YkWmdypSP2a1B96Klyjr09ref54U4oS9Qg8wA==
-X-Received: by 2002:a17:902:f790:b0:295:596f:8507 with SMTP id d9443c01a7336-29d9f51abe1mr89758185ad.0.1764957367074;
-        Fri, 05 Dec 2025 09:56:07 -0800 (PST)
-Received: from localhost.localdomain ([2401:4900:8839:f626:f539:b6d1:1913:1426])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29dae4d3b5dsm54459245ad.40.2025.12.05.09.55.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Dec 2025 09:56:06 -0800 (PST)
-Received: (nullmailer pid 619889 invoked by uid 1000);
-	Fri, 05 Dec 2025 17:53:27 -0000
-From: Kathara Sasikumar <katharasasikumar007@gmail.com>
-To: alex.aring@gmail.com
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, david.hunter.linux@gmail.com, linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, shuah@kernel.org, skhan@linuxfoundation.org, katharasasikumar007@gmail.com
-Subject: [PATCH] net: 6lowpan: replace sprintf() with scnprintf() in debugfs
-Date: Fri,  5 Dec 2025 17:53:24 +0000
-Message-ID: <20251205175324.619870-1-katharasasikumar007@gmail.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1764957810; c=relaxed/simple;
+	bh=jgCApnTkM7k4n6TMLMltsF4RDnzj2I11zNvWmgI18/E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sMSuqKQmB9wRR8M/L4h63cvN4bvybwJOi/xFXpzthodyirzPU5uKz9F1Ns8g5JJ1jB0rTtmHSGCzr4an3UZ5s7y9sWS6mZPRUKURK0ZH46SS76GlNrRAVLEQPBbdPm826OCFOpOmHhdwk5Tut4AuuO+dZ0BfZuN6oL6258BmjRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=txTUEIoK; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=79IAJNFJK8wa9HZ2yHoT9SQH5NbzklvqWMvm7XJcJvc=; b=txTUEIoKkv3GjwjwJSHvDGbUZV
+	KSDX3maaIPvCXrOlv+rcMeUaJvvyDQcSDdM60Qxd0QUhg4OsBLssQ6fXBXmtyBsIvVmubyeZeQyeo
+	dwED+euf+PNrkim2TW4PygwuwNbwmvYYT3yvinxx4NcpBWf6Z4Jr6YRX+pm/0b8+c7Uk+tZaexIG9
+	RODE1eWSJeUAnl2M/3KKycyUeQvoOP18s6k23cAW5PYaOptDSs3U4BSxAQE6JfEVDxJTit1h8otC+
+	RDMdGnLA3oAq+twUMQSfQZFqPFyOdfexIly2xsrEC7LJ+8jM4Soru9B9YUUwA4hyGQvK0iTpTXxUX
+	g68qO5bA==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.94.2)
+	(envelope-from <leitao@debian.org>)
+	id 1vRa9G-00440g-Ch; Fri, 05 Dec 2025 18:03:18 +0000
+Date: Fri, 5 Dec 2025 10:03:12 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Andreas Hindborg <a.hindborg@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, 
+	hch@infradead.org, jlbec@evilplan.org, linux-fsdevel@vger.kernel.org, 
+	netdev@vger.kernel.org, gustavold@gmail.com, asantostc@gmail.com, calvin@wbinvd.org, 
+	kernel-team@meta.com
+Subject: Re: [PATCH RFC 0/2] configfs: enable kernel-space item registration
+Message-ID: <ineirxyguevlbqe7j4qpkcooqstpl5ogvzhg2bqutkic4lxwu5@vgtygbngs242>
+References: <fdieWSRrkaRJDRuUJYwp6EBe1NodHTz3PpVgkS662Ja0JcX3vfDbNo_bs1BM7zIkVsHmxHjeDi6jmq4sPKOCIw==@protonmail.internalid>
+ <20251202-configfs_netcon-v1-0-b4738ead8ee8@debian.org>
+ <878qfgx25r.fsf@t14s.mail-host-address-is-not-set>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <878qfgx25r.fsf@t14s.mail-host-address-is-not-set>
+X-Debian-User: leitao
 
-sprintf() does not perform bounds checking on the destination buffer and
-is deprecated in the kernel as documented in
-Documentation/process/deprecated.rst.
+Hello Andreas,
 
-Replace it with scnprintf() to ensure the write stays within bounds.
+On Fri, Dec 05, 2025 at 06:35:12PM +0100, Andreas Hindborg wrote:
+> "Breno Leitao" <leitao@debian.org> writes:
+> 
+> > This series introduces a new kernel-space item registration API for configfs
+> > to enable subsystems to programmatically create configfs items whose lifecycle
+> > is controlled by the kernel rather than userspace.
+> >
+> > Currently, configfs items can only be created via userspace mkdir operations,
+> > which limits their utility for kernel-driven configuration scenarios such as
+> > boot parameters or hardware auto-detection.
+> 
+> I thought sysfs would handle this kind of scenarios?
 
-No functional change intended.
+sysfs has gaps as well, to manage user-create items.
 
-Signed-off-by: Kathara Sasikumar <katharasasikumar007@gmail.com>
----
- net/6lowpan/debugfs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Netconsole has two types of "targets". Those created dynamically
+(CONFIG_NETCONSOLE_DYNAMIC), where user can create and remove as many
+targets as it needs, and netconsole would send to it. This fits very
+well in configfs.
 
-diff --git a/net/6lowpan/debugfs.c b/net/6lowpan/debugfs.c
-index 600b9563bfc5..d45ace484143 100644
---- a/net/6lowpan/debugfs.c
-+++ b/net/6lowpan/debugfs.c
-@@ -173,7 +173,7 @@ static void lowpan_dev_debugfs_ctx_init(struct net_device *dev,
- 	if (WARN_ON_ONCE(id >= LOWPAN_IPHC_CTX_TABLE_SIZE))
- 		return;
- 
--	sprintf(buf, "%d", id);
-+	scnprintf(buf, sizeof(buf), "%d", id);
- 
- 	root = debugfs_create_dir(buf, ctx);
- 
--- 
-2.51.0
+  mkdir /sys/kernel/config/netconsole/mytarget
+  .. manage the target using configfs items/files
+  rmdir /sys/kernel/config/netconsole/mytarget
 
+This is a perfect fit for configfs, and I don't see how it would work
+with sysfs.
+
+On top of that, there are netconsole targets that are coming from
+cmdline (basically to cover while userspace is not initialized). These
+are coming from cmdline and its life-cycle is managed by the kernel.
+I.e, the kernel knows about them, and wants to expose it to the user
+(which can even disable them later). This is the problem I this patch
+addresses (exposing them easily).
+
+It is kind of a mix of kernel and user-managed configuration items in
+coexisting.
 
