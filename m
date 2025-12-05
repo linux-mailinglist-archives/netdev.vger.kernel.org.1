@@ -1,197 +1,97 @@
-Return-Path: <netdev+bounces-243699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243700-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E2C5CA6285
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 06:38:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB180CA637A
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 07:19:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EA687307CB34
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 05:38:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 934D83030399
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 06:19:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21A862EB85E;
-	Fri,  5 Dec 2025 05:38:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6BF7296BC9;
+	Fri,  5 Dec 2025 06:19:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="AoWgq5bL"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="PgCxpvLX"
 X-Original-To: netdev@vger.kernel.org
-Received: from layka.disroot.org (layka.disroot.org [178.21.23.139])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C18122BE7A7;
-	Fri,  5 Dec 2025 05:38:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.21.23.139
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06AA91F78E6
+	for <netdev@vger.kernel.org>; Fri,  5 Dec 2025 06:19:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764913107; cv=none; b=QB9hxih65xUcYu+2mY9lCgZJestJFHg1O+AqlCDZwUZVHf46+iU2h+Za02AzPIh5yuGuyJy0Y+RVEBFObcWQOx3w8JNE2WNZZcepZ5WiB6+2IMgwvh+hV3SuhFvJIIx4x9+mXyQTUWvvWVi03ygu7UI5fh75fUbSvOxTqOolZ0w=
+	t=1764915551; cv=none; b=YPLjXxIus2a7yUuc/J7IX04UvDhC1UogI3Yzpg3HhXxZfw7Adx/BATRbnUozj1lL/hbwMYUyRmdJoooRodCSFlHgDh0+axZjFLOjhljymyQednzRTuLYBa4RAGntFO7MXuvz6QCP/97kDlliRP/zbkfYRPU/TWKzSnaelxpU+fM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764913107; c=relaxed/simple;
-	bh=LTqdQcIw0CyyS+hNWi/YRC5a7hw6Ig/qdpkgBxzJvhw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DuDx6TLgWfNDncmXbTebncsiFIB/O7w+gKf9p3IQKPItoeOoQI2MSeV13H5c0GHNRIvlAmWFeyR3ryxZfeCwkqpNrKYWspf5JxubHWz7FlyvrWANpKJOnsbdglrw53P9lAt+NSLRCTGzN6VzbH/CU0qrBogO0eSOa5L6sALnl4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=AoWgq5bL; arc=none smtp.client-ip=178.21.23.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=disroot.org
-Received: from mail01.disroot.lan (localhost [127.0.0.1])
-	by disroot.org (Postfix) with ESMTP id 3ACF326704;
-	Fri,  5 Dec 2025 06:32:08 +0100 (CET)
-X-Virus-Scanned: SPAM Filter at disroot.org
-Received: from layka.disroot.org ([127.0.0.1])
- by localhost (disroot.org [127.0.0.1]) (amavis, port 10024) with ESMTP
- id YAoeXpJ_KLyK; Fri,  5 Dec 2025 06:32:07 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=disroot.org; s=mail;
-	t=1764912727; bh=LTqdQcIw0CyyS+hNWi/YRC5a7hw6Ig/qdpkgBxzJvhw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=AoWgq5bLk6SRn6UD7TZAkLZVKJB7DN+m0cKoxIqJ0d/ipCVtf56SMQjPor1HME1p0
-	 2llN3hO3HtmojZclQzOq6R1CI5k9mxkPX//8/j4HeRwaptfLVPp9Lo0B9V83hMUPSw
-	 FuT7k3Hljv72lZubAy9Z0OpUhWzAULHhDwbsAP93xyowbr8vndKmGvx2AmhFuYUFEP
-	 xUh+BUSSngfL1LDhjIQ814REnHWzuGTiBtd2nerM6okLO7UMhw16qfO8kgrr0mumep
-	 zB8Gc/b5E7etHusGbKSDg3Xxoq0cIdkw1duKBOzEIdb2aeqO9lFNTkRHa43SpH85mk
-	 8mIgLxPiiPOxA==
-Date: Fri, 5 Dec 2025 05:31:34 +0000
-From: Yao Zi <ziyao@disroot.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Frank <Frank.Sae@motor-comm.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
-	Chen-Yu Tsai <wens@csie.org>, Jisheng Zhang <jszhang@kernel.org>,
-	Furong Xu <0x1207@gmail.com>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Mingcong Bai <jeffbai@aosc.io>,
-	Kexy Biscuit <kexybiscuit@aosc.io>, Runhua He <hua@aosc.io>,
-	Xi Ruoyao <xry111@xry111.site>
-Subject: Re: [PATCH net-next v3 2/3] net: stmmac: Add glue driver for
- Motorcomm YT6801 ethernet controller
-Message-ID: <aTJuNk4zF8CLtt9S@pie>
-References: <20251124163211.54994-1-ziyao@disroot.org>
- <20251124163211.54994-3-ziyao@disroot.org>
- <aSSspDCPM_5-l24a@shell.armlinux.org.uk>
+	s=arc-20240116; t=1764915551; c=relaxed/simple;
+	bh=KTK0RlPXSasoSa/nN0nuLr1awIsKUayEm1STFPTrg0U=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iIEMDvWdgEunLmotz+2Pdx+tVITtEAAa6tsEZHfLsu6Hf2S25MD4oob3k9EdDt2YDqvdOtTN+7veicvyOvBNunKfbOnV3t7Ofnvnxg/B1sC/U5YGfPibJKKRRUuyntBKfgB6izUoIRyUZIDNNS4Tv24CYTEeJG9WyQZRo7x9eZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=PgCxpvLX; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id BC6A920842;
+	Fri,  5 Dec 2025 07:19:00 +0100 (CET)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 8GIjTnr3u6mk; Fri,  5 Dec 2025 07:19:00 +0100 (CET)
+Received: from EXCH-01.secunet.de (rl1.secunet.de [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id 061A520839;
+	Fri,  5 Dec 2025 07:19:00 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 061A520839
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1764915540;
+	bh=TpIl10NHPzwEqE7ZO2S01Tq+IahBNURxoHVLrdL4i4E=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=PgCxpvLXHdZmEuovtAAXQeJEDnAaLSi4F+Sa+jP0Gv6cJPhy03yLB8chKu3E7bZnZ
+	 78V2PwQBWeP+naDj8t8JVFAgqdHR4L94mXshfI3Wi1Nfs9HMDjzww+7VDmIhtXwO78
+	 PGBdySWMtlBtDFDbQllvf7mNnvgVlipxp/34IGhQlN+YLtbUWC/RHKnaxNet05dK86
+	 Zkga49022S08hZtv7XOPVM1z0MCOfZE9qOtl6eWNUkAB+t79axn07Yiu6jtEePSIEz
+	 2RLYyfGCnHK2mRas3//6/9HeCauwc5+kKDOE3dPFizUhb3QoLyKJNYS/WQKwCGQkL8
+	 WhfYvXYGD3I8w==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Fri, 5 Dec
+ 2025 07:18:59 +0100
+Received: (nullmailer pid 3420591 invoked by uid 1000);
+	Fri, 05 Dec 2025 06:18:58 -0000
+Date: Fri, 5 Dec 2025 07:18:58 +0100
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Antony Antony <antony.antony@secunet.com>
+CC: Herbert Xu <herbert@gondor.apana.org.au>, <netdev@vger.kernel.org>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>
+Subject: Re: [PATCH ipsec] xfrm: set ipv4 no_pmtu_disc flag only on output sa
+ when direction is set
+Message-ID: <aTJ5UrS_3xPrbtSm@secunet.com>
+References: <17a716f13124491528d5ee4ff15019f785755d50.1764249526.git.antony.antony@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <aSSspDCPM_5-l24a@shell.armlinux.org.uk>
+In-Reply-To: <17a716f13124491528d5ee4ff15019f785755d50.1764249526.git.antony.antony@secunet.com>
+X-ClientProxiedBy: EXCH-01.secunet.de (10.32.0.171) To EXCH-01.secunet.de
+ (10.32.0.171)
 
-Hi Russell,
-
-Sorry for the late reply,
-
-On Mon, Nov 24, 2025 at 07:06:12PM +0000, Russell King (Oracle) wrote:
-> On Mon, Nov 24, 2025 at 04:32:10PM +0000, Yao Zi wrote:
-> > +static int motorcomm_setup_irq(struct pci_dev *pdev,
-> > +			       struct stmmac_resources *res,
-> > +			       struct plat_stmmacenet_data *plat)
-> > +{
-> > +	int ret;
-> > +
-> > +	ret = pci_alloc_irq_vectors(pdev, 6, 6, PCI_IRQ_MSIX);
-> > +	if (ret > 0) {
-> > +		res->rx_irq[0]	= pci_irq_vector(pdev, 0);
-> > +		res->tx_irq[0]	= pci_irq_vector(pdev, 4);
-> > +		res->irq	= pci_irq_vector(pdev, 5);
-> > +
-> > +		plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
-> > +
-> > +		return 0;
-> > +	}
-> > +
-> > +	dev_info(&pdev->dev, "failed to allocate MSI-X vector: %d\n", ret);
-> > +	dev_info(&pdev->dev, "try MSI instead\n");
-> > +
-> > +	ret = pci_alloc_irq_vectors(pdev, 1, 1, PCI_IRQ_MSI);
-> > +	if (ret < 0)
-> > +		return dev_err_probe(&pdev->dev, ret,
-> > +				     "failed to allocate MSI\n");
-> > +
-> > +	res->irq = pci_irq_vector(pdev, 0);
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static int motorcomm_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-> > +{
-> ...
-> > +	ret = motorcomm_setup_irq(pdev, &res, plat);
-> > +	if (ret)
-> > +		return dev_err_probe(&pdev->dev, ret, "failed to setup IRQ\n");
-> > +
-> > +	motorcomm_init(priv);
-> > +
-> > +	res.addr = priv->base + GMAC_OFFSET;
-> > +
-> > +	return stmmac_dvr_probe(&pdev->dev, plat, &res);
+On Thu, Nov 27, 2025 at 03:05:55PM +0100, Antony Antony wrote:
+> The XFRM_STATE_NOPMTUDISC flag is only meaningful for output SAs, but
+> it was being applied regardless of the SA direction when the sysctl
+> ip_no_pmtu_disc is enabled. This can unintentionally affect input SAs.
 > 
-> If stmmac_dvr_probe() fails, then it will return an error code. This
-> leaves the PCI MSI interrupt allocated...
-
-This isn't true. MSI API is a little magical: when the device is enabled
-through pcim_enable_device(), the device becomes devres-managed, and
-a plain call to pci_alloc_irq_vectors() becomes managed, too, even if
-its name doesn't indicate it's a devres-managed API.
-
-pci_free_irq_vectors() will be automatically called on driver deattach.
-See pcim_setup_msi_release() in drivers/pci/msi/msi.c, which is invoked
-by pci_alloc_irq_vectors() internally.
-
-> > +}
-> > +
-> > +static void motorcomm_remove(struct pci_dev *pdev)
-> > +{
-> > +	stmmac_dvr_remove(&pdev->dev);
-> > +	pci_free_irq_vectors(pdev);
+> Limit setting XFRM_STATE_NOPMTUDISC to output SAs when the SA direction
+> is configured.
 > 
-> ... which stood out because of the presence of this function doing
-> stuff after the call to stmmac_dvr_remove().
+> Reported-by: https://github.com/roth-m
 
-But yes, this call to pci_free_irq_vectors() is redundant, since
-pci_free_irq_vectors() will be automatically invoked. I'll remove it in
-the next version.
+This tag does not make much sense IMO. We neither have a
+real name nor an email address to contact.
 
-> So... reviewing the other stmmac PCI drivers:
-> 
-> - dwmac-intel calls pci_alloc_irq_vectors() but does not call
->   pci_free_irq_vectors(). This looks like a bug.
-
-The driver does call pcim_enable_device() thus enables devres for the
-PCI device, in which case manually calling pci_free_irq_vectors() is
-unnecessary. I don't think there's a bug.
-
-> - dwmac-intel calls pcim_enable_device() in its probe function, and
->   also its intel_eth_pci_resume() - pcim_enable_device() is the devres
->   managed function, so we end up adding more and more devres entries
->   each time intel_eth_pci_resume() is resumed. Note that
->   intel_eth_pci_suspend() doesn't disable the device. So, this should
->   probably be the non-devres version.
-
-Agree.
-
-> - dwmac-loongson looks sane, but the checks for ld->multichan before
->   calling loongson_dwmac_msi_clear() look unnecessary, as
->   pci_free_irq_vectors() can be safely called even if MSI/MSI-X have
->   not been (successfully) allocated.
-
-loongson-dwmac doesn't enable devres for the PCI device (it calls
-pci_enable_device() instead), so manually freeing the interrupts is
-indeed necessary. However, I'd suggest moving to the devres variant and
-simplify the error handling (and clean up) path.
-
-> So, I wonder whether there is scope to have a common way to clean up
-> PCI drivers. Could you look into this please?
-
-In short, enabling the device with pcim_enable_device() to make it
-devres-managed should be the best solution, in which case
-pci_alloc_irq_vectors() is devres-managed, too, and at least we don't
-need to worry about interrupts anymore on error handling/removal path.
-
-Regards,
-Yao Zi
-
-> -- 
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
