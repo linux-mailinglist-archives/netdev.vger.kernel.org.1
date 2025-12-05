@@ -1,1265 +1,912 @@
-Return-Path: <netdev+bounces-243807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCA65CA7939
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 13:34:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 23732CA798A
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 13:42:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D84E2318726F
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 12:33:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 779F2307DC5B
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 12:40:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E9C732ED4E;
-	Fri,  5 Dec 2025 12:33:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5178F32D43F;
+	Fri,  5 Dec 2025 12:40:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="2UvH9G/X"
+	dkim=pass (2048-bit key) header.d=siemens.com header.i=@siemens.com header.b="WeCUEB6Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from server.couthit.com (server.couthit.com [162.240.164.96])
+Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011001.outbound.protection.outlook.com [40.107.130.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7596731D367;
-	Fri,  5 Dec 2025 12:33:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764938014; cv=none; b=ueLty9l0oaxKtqEjXJaEsbBtXWC8Msxc5Mf17bPoq49ZhyNVJY6QyB+ee3nUH5r7sLDmI4tCwsuoCEtH+2IObCq/yuCwL+QLPBzUvtEgZ0rK9DVQKwMQt52LAjbDXp8W0T6Kh2Tzagu6pupfY/hndqubIvv1GfNOdoSM89XIuBg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764938014; c=relaxed/simple;
-	bh=2jpPZ8c7X8XUaHXObmIfUsAlUk8XScTeQRdXAPUw1FE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cuhM4Q1qvPTG8OvO2AOXc/vKc/5lgKfMZ03NQkD9L8ZIte8rqVP75o6ZMpmpWoM2aNnUJ4Cg+rTm+kNSdFb0jVe/0t2jlJRIRJt6T58lYfuX+Ayn8zeC+qvFx3UcArjgZYSP/DileTw55Xejl3gSfQXMURcRK6ObLzlHjutVub0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=2UvH9G/X; arc=none smtp.client-ip=162.240.164.96
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
-	; s=default; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
-	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=kTvNS5b2iC2l1z82ESH2dwXjWRZjdTnst7tjpoE5L/8=; b=2UvH9G/XLJBwUzk9kN3nlzaDEf
-	t0No7r2P2aCqRmaiLr0tKEWdmy9epWf5TICTHilh/kVuSL2XDbvBGzA164fuqItuIA1H8C3lhdTNm
-	fbDYxGlmiZLjGqAn+Xa7SbK/hQ+3jz37pRoAwU+EclsUXXEFxhptgMuEPZ+vyPkpYIpKzs1qFJmzp
-	OCsDZJrgQhvaYXS1dxA1zf8FGYwz8u7uq86yKxCFOhZnq43ssadExnJOpPcIs2rnp14N4yp4A3ghI
-	7Zxeqpg/1Xpgof4faroF+x4K8m3xr/+e0LzrNLm8yEcXNFxOw18Z/EnQBKLas+WdZBHY+OGxL5wQs
-	kcpoEgVw==;
-Received: from [122.175.9.182] (port=9516 helo=cypher.couthit.local)
-	by server.couthit.com with esmtpa (Exim 4.98.1)
-	(envelope-from <parvathi@couthit.com>)
-	id 1vRV02-00000003o4B-2DXk;
-	Fri, 05 Dec 2025 07:33:26 -0500
-From: Parvathi Pudi <parvathi@couthit.com>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	danishanwar@ti.com,
-	parvathi@couthit.com,
-	rogerq@kernel.org,
-	pmohan@couthit.com,
-	basharath@couthit.com,
-	afd@ti.com
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	alok.a.tiwari@oracle.com,
-	horms@kernel.org,
-	pratheesh@ti.com,
-	j-rameshbabu@ti.com,
-	vigneshr@ti.com,
-	praneeth@ti.com,
-	srk@ti.com,
-	rogerq@ti.com,
-	krishna@couthit.com,
-	mohan@couthit.com
-Subject: [RFC PATCH net-next v9 3/3] net: ti: icssm-prueth: Add support for ICSSM RSTP switch
-Date: Fri,  5 Dec 2025 17:59:13 +0530
-Message-ID: <20251205123146.462397-4-parvathi@couthit.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251205123146.462397-1-parvathi@couthit.com>
-References: <20251205123146.462397-1-parvathi@couthit.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BE1426F46F;
+	Fri,  5 Dec 2025 12:40:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.1
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764938412; cv=fail; b=A5Yc4HapXen9Taaop/kmOfi4I+sw1EtsF57yuGXQ1WnW4ZxLCkNCT93Gvx7y7luIVJBKi3SUhAPUYiHYhwm+z15kHW89Of998gzFa5kx9BE9hzJKqAiJQ9EMgCGQ0DPqJQkaS1vYVFBj5xL9/89TbtHASHspkzdQzh20Eq7AKcI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764938412; c=relaxed/simple;
+	bh=XYBkJWsR47HAJl6C2r4HCLofHQGcwzuWzd+6Y3l4m4A=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=sOGvAt8RWNCGeGJpn/ZyH51HcaOXOf6y/PxvMkeIrS3THSuBIEMoctC5gDin1VdXGKcarCRv1WoTq3PRyTQihnr5k7KsmA0sGDTlT9nRgKe5GNEPDAYvJxcK6YPKYFxcjOUlRjJTnssa7SnoPw9kJ/EgzMrS9XZX+vxwky/vGVI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=@siemens.com header.b=WeCUEB6Q; arc=fail smtp.client-ip=40.107.130.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=siemens.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=A1vZynaykY5+HO0bBhst4BRoGMHceoxY53Dit76moAr9gK9eMsAfLly+gtuy4vjKmrr+VkQSOQnFcqw8lyamt2o31nTrSsAae/767yZi0Nf/gz0hJbvWjrUcrnrwBl6hzYIuDUVYiS9Z8VCfyOOvIUVwrQ6d0PK5EPHydP9XAGL1BsDTZJE3TzuSyRDe31PT9PX3l2s/yLmIF48uLDP78nCGR5vEpbHD45OtPPK9yjl2w4B1tSIJGxXeMfQpL5NxXgIkGO4Zha7TALMWNArEVxPHRKdEJMlgtr0tDNArPaRhgv2SA9TaHJwUOcgFHJzRyCdCaOnHJbsC76Q9SdS2xw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=k4Ftta1vA2zG9MnrDQVVUyiiZ1NwTeOK+1uRe1xJAR0=;
+ b=wCwRzj+hC17aWHurB3mQn3ejFBnR9TQ95Xu62V4Trwjv+jQ6OZztMLwTbHONA7c5IMmlr/3Dk/CekKC2LbkypylSu5EFkFczWHcGKsWYfDkzpSywG7Lsq8KcE/fMqfI+epjU1QNxQ3KUcmwfWlRi7Trt1ofYbAmsEF4Rv9cno7ATKwwEksEWs3f8h743HNprmuY9KWis1/wDp5m001RAw2CesjZttgTYueeHUzJ7jo09V6UYkgvhgwkElqBgcrLpQ67WHqrv91dNeHdXtC+98rNBRJS08bWsaGwMlaUc3cumdz2HDH0FvtucL2Uf0Tbly50pO5OBILzNYhfVBk62SQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=siemens.com; dmarc=pass action=none header.from=siemens.com;
+ dkim=pass header.d=siemens.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=siemens.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=k4Ftta1vA2zG9MnrDQVVUyiiZ1NwTeOK+1uRe1xJAR0=;
+ b=WeCUEB6Qg29HgMvdwSCgwDQ1l8Gk6ymwf2xa1T7bbaPCkl2jdO3fS5OJeC3IELv1v1QkI4/s+OSGqHZD2sSMIsKs4a6xWZQJ8MtbRmLlvSK0mIx5zm2jAOO2fotKpl9Vh66iZdQfPMWbnaQuGmvgAKcPWtwXn/lpzRJLjxW7+PjPQwzCMW21fRLyszcRXXv5Gyvb237qwQ/o0LmEugb2JGBPv9croLtUbysCY0nfr03ZJQEiSwBOiZ113irfge2vCj6UKz3bBKlO/5fVI4NOjaSe46foY2o8/SRcsHf9E5q5sDceRR0iYTRZPGcCO5acCLJEkkp+2J5Sebf1L7tntQ==
+Received: from AS1PR10MB5392.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:48d::20)
+ by PA2PR10MB9040.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:102:41d::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9388.12; Fri, 5 Dec
+ 2025 12:39:59 +0000
+Received: from AS1PR10MB5392.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::456e:d0d0:15:f4e]) by AS1PR10MB5392.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::456e:d0d0:15:f4e%6]) with mapi id 15.20.9388.003; Fri, 5 Dec 2025
+ 12:39:59 +0000
+From: "Behera, VIVEK" <vivek.behera@siemens.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "\"David
+ S. Miller\"" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Behera,
+ VIVEK" <vivek.behera@siemens.com>
+Subject: [PATCH] igc: Fix trigger of incorrect irq in igc_xsk_wakeup function
+Thread-Topic: [PATCH] igc: Fix trigger of incorrect irq in igc_xsk_wakeup
+ function
+Thread-Index: Adxl4xN/bKAnSLoOQiOSWfX7JfGLpg==
+Date: Fri, 5 Dec 2025 12:39:59 +0000
+Message-ID:
+ <AS1PR10MB5392B7268416DB8A1624FDB88FA7A@AS1PR10MB5392.EURPRD10.PROD.OUTLOOK.COM>
+Accept-Language: de-DE, en-US
+Content-Language: de-DE
+X-MS-Has-Attach: yes
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_9d258917-277f-42cd-a3cd-14c4e9ee58bc_ActionId=feb46790-5d5e-41b9-916e-56dde80d5ae3;MSIP_Label_9d258917-277f-42cd-a3cd-14c4e9ee58bc_ContentBits=0;MSIP_Label_9d258917-277f-42cd-a3cd-14c4e9ee58bc_Enabled=true;MSIP_Label_9d258917-277f-42cd-a3cd-14c4e9ee58bc_Method=Standard;MSIP_Label_9d258917-277f-42cd-a3cd-14c4e9ee58bc_Name=restricted;MSIP_Label_9d258917-277f-42cd-a3cd-14c4e9ee58bc_SetDate=2025-12-05T12:16:38Z;MSIP_Label_9d258917-277f-42cd-a3cd-14c4e9ee58bc_SiteId=38ae3bcd-9579-4fd4-adda-b42e1495d55a;MSIP_Label_9d258917-277f-42cd-a3cd-14c4e9ee58bc_Tag=10,
+ 3, 0, 1;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=siemens.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AS1PR10MB5392:EE_|PA2PR10MB9040:EE_
+x-ms-office365-filtering-correlation-id: b5d3df39-6bf9-4a91-5770-08de33fb6713
+x-ms-exchange-atpmessageproperties: SA
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|7416014|376014|366016|8096899003|4053099003|38070700021;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?oCveQxsQWJLnFsY+iwKinuetnYpQ9DcUWrZ4oxVJ9sZl/SpKUNYViJZDsTZJ?=
+ =?us-ascii?Q?6CFtbfIETWlOiBKyLQv7OSHsYg9QtcQV/8FZA1waGcAMV/Ce0Se8MjcSmGA9?=
+ =?us-ascii?Q?zB8ml5yyKVOz0mgbw8K86YfK0yv4/Lg8rTX0MpN4Wdyp9niOIFD9oBkp5zm/?=
+ =?us-ascii?Q?pTlGKAKE/06IkBcgdX1WI6recYCCX6N0rrK+WHDL1jnjTaUHk1n8od2ZnKoI?=
+ =?us-ascii?Q?Gb+43fBJcKg/iSTazqMxOdZOJCdhbeLOYSkn1wMd374zpHwLCt++Un0cbIH4?=
+ =?us-ascii?Q?eztGB0qdQdfbwAHIjiRj9/YYjHRABdgNLhZTdQIMM4S9C1me6u2ezoZUEID7?=
+ =?us-ascii?Q?j8gkE6kvU0xa50rGB57itC7dZYb3XiKfb/EYt9LJfRrVKS1ELUGpmWwmzG9r?=
+ =?us-ascii?Q?BKatjA+vqrv+KMhC2O4p69R6tDdMFJlayeU2VPjP5VX8DAbCrwUk3s71Fl4q?=
+ =?us-ascii?Q?VRzHViLGrbyYy9BzY94nA02FMDDYkmn3mnELr9WaaJ1/K5zd5MCu0gW7BMtu?=
+ =?us-ascii?Q?UL+1pmHZOopl1JA1DfVrapec+ztC0EkXPtMINX1Zpj2HS93IOBxxr/LkWRlZ?=
+ =?us-ascii?Q?UYyfAPuPsdK+fnwM6yIhd0WicxznZAbXVfVhcsnogbNvURzv4u/p94ODV4xK?=
+ =?us-ascii?Q?uIa2MChP35Y9ChVWIWp6RQ+yXVJHi1jotoKNgXwTrd7F6Jj/nWQiPY0aEhVN?=
+ =?us-ascii?Q?blPH7n03MFStcS8LV3SaLgUkxdtdaUhGg2fQlTB5FERHXHHnW0PLOdDgqXDR?=
+ =?us-ascii?Q?xu7B0KtY8GFPd7nuN054g9/HfkPa6radyQTLpI+CcuxTydu0sLJOzMxsfRp9?=
+ =?us-ascii?Q?+OyZayUECf9O8WQbwQOD9igAEAxmf+I8IbR3zcy1rfoIRGx8xKjhG4K/AE62?=
+ =?us-ascii?Q?NGmpgIIlP5/IFVj9cikQRaBFu5gfIY3KK7dXY4ZviYPeazPIYOCXhhr/2nt9?=
+ =?us-ascii?Q?6WTsVPtSIW5qIYtB4RieHHFo/wVQcCJWN7SDUHGDxUr7WRlFNFeVGLWlrfZk?=
+ =?us-ascii?Q?xxTWJv6oSZSS7P52rVF8HUs/ZNd+fJRXXu5i+NtGNM9YT4+gcYYK5KnLd/tl?=
+ =?us-ascii?Q?4jkwM16PvngU+Ew1OZtpsblbkVcjmcEMD4Mmb79aeMzkxj8s7R8ok+XowV72?=
+ =?us-ascii?Q?ooSClSb4caBalYePSvwG+EmQB+dDzHI9dtv1QWzgE7L3Q3eri8beBWpE8v1e?=
+ =?us-ascii?Q?yZrwMP3ZzDd7U6cngkmqvHoC0BZdjAAH1OZuw/XFWQAGlMWNLOHY2KODNint?=
+ =?us-ascii?Q?+J+tLjiVn2FHFl4ZCbb5qHwqVSVOgO/VqaA+s1XU51ROWZ5zFiy6CQJvKRD4?=
+ =?us-ascii?Q?UUdgqM1vihFnHJ2PgAV4GpAguFOriaKgK1h8z8J/JlTJl7c+nbfCfAP97qfx?=
+ =?us-ascii?Q?erqI//TtemraESig1WIRMiVTyLsCvRn0KXkHoaqniIiAvXdmCutFkcOirz/W?=
+ =?us-ascii?Q?RzVcm8UAmoM8FGp1NPBb21U84ezxpWRjRZ1G0dlaP+4MKJRAtkjiCLj88KM4?=
+ =?us-ascii?Q?tzd12onc8oQ6ZUYNieXMihrM990BuzRlhQL/?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS1PR10MB5392.EURPRD10.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(8096899003)(4053099003)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?Kj9xgy+GCMlily4oRy0fEl+wgts7QMuaqvXDrv1v1qsAamSJQjXgbWdbFVuH?=
+ =?us-ascii?Q?xVeY5FE/O6h0d9j3Tv63nB6/+iHOrbY7ilNMGAp5KO+WFnCVrDHwZu2RVB75?=
+ =?us-ascii?Q?LvFYloao8ozUgeVbERbg14AN9VI7D3go4d9T+UUR8a7qkvYm7JM2bet4yF2e?=
+ =?us-ascii?Q?mxqQVfz0cp5d+nxWMq91edbnSp+O2wezrDaCKlcR64wqMbSkFLCRRvRIB+/1?=
+ =?us-ascii?Q?GHEVDxZxLBa96m6Mz0aZJBHpOo1HvKUoaRIuXzb/SlpnE6/jkHxiYiE9bz+C?=
+ =?us-ascii?Q?AxkWh43S/GfdDDQgiO7L5xRwAbKO/lMV0/yvGxdJrfwU2Q0rkkrJaX4YT+OF?=
+ =?us-ascii?Q?vK0kT/3je6qGW/slGMGO85wpiTLTwbRPXQ2Q7wlkJrkom1ZC7fMhP701IehT?=
+ =?us-ascii?Q?6iYl1wi9iqxRxYLtscuZBdRfB4l6izhODsV98dKjxRTrOqPnJMX9l0OqHI0f?=
+ =?us-ascii?Q?8BolXhyg9UB/dCCE/THPXqyjIps2LoO5Nx1lVqlgf4aHl2eSJfcHCb0Y24ue?=
+ =?us-ascii?Q?/K9g+YFhVK4VZcrLrWdcDxkb2MXtiewT9OCJ1m+J8wI8dmnF1ooIFAQYi/Ss?=
+ =?us-ascii?Q?pYOUsx5wsIYvlLbqrt2hfAzT/zSGVr/f3dPa3jBXRetXjSutmQjKR1B6aa3C?=
+ =?us-ascii?Q?cRVo1h/7U3inwKSKgSVCFx05DR73THBIK1s8GEapadwG9+wCznzYmGeeeK3/?=
+ =?us-ascii?Q?gVXCHRHt789SPTfrWP3trcpdxLsdmEyLCXgewOqIKwu0FR4Q3Rr8dnvs93ev?=
+ =?us-ascii?Q?esu1orzgANzmDwjDWsv50Br12ZZOvrz1kNd/WwSsV2hlcMg+dt2JLRxGyI/+?=
+ =?us-ascii?Q?vmgoo/OHTLG8hPSTjlFeeFT6KzPGxGx20VoaoDEaPNWIrBbyv5Yta1QvmvMv?=
+ =?us-ascii?Q?Dy7DM49yyBzA7J6F3Fn7pGbTpwE+MI9bUXuezHWT+IFjuiXetZDxcfyNsv9Y?=
+ =?us-ascii?Q?R4FeidNBsIiBPm55dNsBvH9YSZ69DeH57xRMVAnwC6zyN1ez/IYwLvQE4Yq2?=
+ =?us-ascii?Q?/N11d8Pcs7o0gWKp7OcrYdriQ/13bHtDnNfabZJttMzRFWwBRoO0RvtPiv+R?=
+ =?us-ascii?Q?m/oKYkUtLCf0pWmj5+duKgHTf09/ZhtJ+sGncvP1lSq5hGVx8bIn8NWrIDTX?=
+ =?us-ascii?Q?yLTjlwqOg9jzQaGts/sFmlQyWtPLt2gFWnKg4rcFn1y1jG5YqAb9WtMHwTXW?=
+ =?us-ascii?Q?x+nFbnLukFn7OV9BVGxb4PO3wiHpDiZXj0ln11tu3OdNJNtcf7T5tgfcp3Q+?=
+ =?us-ascii?Q?sdmU4kZGVtsA8TZ8fR2Wr/UeALKoYZWFniINRVBpUyM6zF+pZhAoP01mpsDk?=
+ =?us-ascii?Q?VGFyBa2TgLvE8qiDrlDH9sEyICk+FiQ4jQ+5RulSzAEpjSZ/zXVIFLz1EpgW?=
+ =?us-ascii?Q?x8otxklUjbo9FCGZuUy2eK8qDuIcuFsFmd45YJ3GosXIuzly3R9+BpPH9Fb+?=
+ =?us-ascii?Q?LazjfPl4w3EIq8efl0ivA7s0OJpqtJsSZnR5rgBgmuev+aLJd76YHUD/u7na?=
+ =?us-ascii?Q?Sf/0n8VV1asok8YMADvIarvtIsUk++YGH8V2so6CtL6scNpfDjbWe2IiqfRV?=
+ =?us-ascii?Q?bu0heADchIC50MP0ZSJ/ov0G1fWbUTIPwyll/D/a?=
+Content-Type: multipart/mixed;
+	boundary="_004_AS1PR10MB5392B7268416DB8A1624FDB88FA7AAS1PR10MB5392EURP_"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - server.couthit.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - couthit.com
-X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: parvathi@couthit.com
-X-Authenticated-Sender: server.couthit.com: parvathi@couthit.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+X-OriginatorOrg: siemens.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AS1PR10MB5392.EURPRD10.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: b5d3df39-6bf9-4a91-5770-08de33fb6713
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Dec 2025 12:39:59.1753
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 38ae3bcd-9579-4fd4-adda-b42e1495d55a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 8TKjUZPmVU7yzUPyWhLs8g0OlPuzbWx2ZhD7iZqicx7S35fAKxxumGeRIaEgOTS7ASo2YYa9N8Cy24EsFl7CfgzZtuePlRZpY4C+NHGgsmc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA2PR10MB9040
 
-From: Roger Quadros <rogerq@ti.com>
+--_004_AS1PR10MB5392B7268416DB8A1624FDB88FA7AAS1PR10MB5392EURP_
+Content-Type: multipart/alternative;
+	boundary="_000_AS1PR10MB5392B7268416DB8A1624FDB88FA7AAS1PR10MB5392EURP_"
 
-Add support for RSTP switch mode by enhancing the existing ICSSM dual EMAC
-driver with switchdev support.
+--_000_AS1PR10MB5392B7268416DB8A1624FDB88FA7AAS1PR10MB5392EURP_
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-Enable the PRU-ICSSM to operate in switch mode, with the 2 PRU ports acting
-as external ports and the host acting as an internal port. Packets received
-from the PRU ports will be forwarded to the host (store and forward mode)
-and also to the other PRU port (either using store and forward mode or via
-cut-through mode). Packets coming from the host will be transmitted either
-from one or both of the PRU ports (depending on the FDB decision).
+From 4e3ebdc0af6baa83ccfc17c61c1eb61408095ffd Mon Sep 17 00:00:00 2001
+From: Vivek Behera <vivek.behera@siemens.com>
+Date: Fri, 5 Dec 2025 10:26:05 +0100
+Subject: [PATCH] igc: Fix trigger of incorrect irq in igc_xsk_wakeup functi=
+on
 
-By default, the dual EMAC firmware will be loaded in the PRU-ICSS
-subsystem. To configure the PRU-ICSS to operate as a switch, a different
-firmware must to be loaded.
+When the i226 is configured to use only 2 combined queues using ethtool
+or in an environment with only 2 active CPU cores the 4 irq lines
+are used in a split configuration with one irq
+assigned to each of the two rx and tx queues
+(see console output below)
 
-Signed-off-by: Roger Quadros <rogerq@ti.com>
-Signed-off-by: Andrew F. Davis <afd@ti.com>
-Signed-off-by: Basharath Hussain Khaja <basharath@couthit.com>
-Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
+sudo ethtool -l enp1s0
+Channel parameters for enp1s0:
+Pre-set maximums:
+RX:                        n/a
+TX:                         n/a
+Other:                  1
+Combined:        4
+Current hardware settings:
+RX:                        n/a
+TX:                         n/a
+Other:                  1
+Combined:        2
+eddx@mvs:~$ cat /proc/interrupts | grep enp1s0
+147:          1          0  IR-PCI-MSIX-0000:01:00.0   0-edge      enp1s0
+148:          8          0  IR-PCI-MSIX-0000:01:00.0   1-edge      enp1s0-r=
+x-0
+149:          0          0  IR-PCI-MSIX-0000:01:00.0   2-edge      enp1s0-r=
+x-1
+150:         26          0  IR-PCI-MSIX-0000:01:00.0   3-edge      enp1s0-t=
+x-0
+151:          0          0  IR-PCI-MSIX-0000:01:00.0   4-edge      enp1s0-t=
+x-1
+
+While testing with the RTC Testbench it was noticed
+using the bpftrace that the
+igc_xsk_wakeup when triggered by xsk_sendmsg
+was triggering the incorrect irq for
+tx-0(see trace below)
+
+TIMESTAMP: 456992309829 | FUNCTION: igc_xsk_wakeup | ENTRY: RtcTxThread (PI=
+D: 945) - queue_id: 0
+TIMESTAMP: 456992317157 | FUNCTION: igc_poll | ENTRY: irq/148-enp1s0- (PID:=
+ 948)
+TIMESTAMP: 456993309408 | FUNCTION: igc_xsk_wakeup | ENTRY: RtcTxThread (PI=
+D: 945) - queue_id: 0
+TIMESTAMP: 456993316591 | FUNCTION: igc_poll | ENTRY: irq/148-enp1s0- (PID:=
+ 948)
+TIMESTAMP: 456994309630 | FUNCTION: igc_xsk_wakeup | ENTRY: RtcTxThread (PI=
+D: 945) - queue_id: 0
+TIMESTAMP: 456994316674 | FUNCTION: igc_poll | ENTRY: irq/148-enp1s0- (PID:=
+ 948)
+TIMESTAMP: 456995309493 | FUNCTION: igc_xsk_wakeup | ENTRY: RtcTxThread (PI=
+D: 945) - queue_id: 0
+TIMESTAMP: 456995316593 | FUNCTION: igc_poll | ENTRY: irq/148-enp1s0- (PID:=
+ 948)
+
+Due to this bug no XDP Zc send is possible in this split irq configuration.
+This patch implements the correct logic of extracting the q_vectors saved
+duirng the rx and tx ring allocation.
+Furthermore the patch includes usage of flags provided by the ndo_xsk_wakeu=
+p
+api to trigger the required irq. With this patch correct irqs are triggered
+
+cat /proc/interrupts | grep enp1s0
+161:          1          0          0          0 IR-PCI-MSIX-0000:01:00.0  =
+  0-edge      enp1s0
+162:          2          0          0          0 IR-PCI-MSIX-0000:01:00.0  =
+  1-edge      enp1s0-rx-0
+163:        359          0          0          0 IR-PCI-MSIX-0000:01:00.0  =
+  2-edge      enp1s0-rx-1
+164:     872005          0          0          0 IR-PCI-MSIX-0000:01:00.0  =
+  3-edge      enp1s0-tx-0
+165:         71          0          0          0 IR-PCI-MSIX-0000:01:00.0  =
+  4-edge      enp1s0-tx-1
+
+TIMESTAMP: 149658589239205 | FUNCTION: igc_xsk_wakeup | ENTRY: RtcTxThread =
+(PID: 10633) - queue_id: 0
+TIMESTAMP: 149658589244662 | FUNCTION: igc_poll | ENTRY: irq/164-enp1s0- (P=
+ID: 10593)
+TIMESTAMP: 149658589293396 | FUNCTION: igc_poll | ENTRY: irq/164-enp1s0- (P=
+ID: 10593)
+TIMESTAMP: 149658589295357 | FUNCTION: xsk_tx_completed | ENTRY: irq/164-en=
+p1s0- (PID: 10593) - num_entries: 61
+TIMESTAMP: 149658589342151 | FUNCTION: igc_poll | ENTRY: irq/164-enp1s0- (P=
+ID: 10593)
+TIMESTAMP: 149658589343881 | FUNCTION: xsk_tx_completed | ENTRY: irq/164-en=
+p1s0- (PID: 10593) - num_entries: 3
+TIMESTAMP: 149658589391394 | FUNCTION: igc_poll | ENTRY: irq/164-enp1s0- (P=
+ID: 10593)
+TIMESTAMP: 149658590239215 | FUNCTION: igc_xsk_wakeup | ENTRY: RtcTxThread =
+(PID: 10633) - queue_id: 0
+
+Signed-off-by: Vivek Behera <vivek.behera@siemens.com>
 ---
- drivers/net/ethernet/ti/icssm/icssm_prueth.c  | 337 ++++++++++++++-
- drivers/net/ethernet/ti/icssm/icssm_prueth.h  |   6 +
- .../ethernet/ti/icssm/icssm_prueth_switch.c   | 385 ++++++++++++++++++
- .../ethernet/ti/icssm/icssm_prueth_switch.h   |   8 +
- drivers/net/ethernet/ti/icssm/icssm_switch.h  |  77 ++++
- 5 files changed, 792 insertions(+), 21 deletions(-)
+drivers/net/ethernet/intel/igc/igc_main.c | 31 +++++++++++++++++++----
+1 file changed, 26 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth.c b/drivers/net/ethernet/ti/icssm/icssm_prueth.c
-index b779096c09e8..b89fe71cf4a6 100644
---- a/drivers/net/ethernet/ti/icssm/icssm_prueth.c
-+++ b/drivers/net/ethernet/ti/icssm/icssm_prueth.c
-@@ -147,7 +147,7 @@ static const struct prueth_queue_info queue_infos[][NUM_QUEUES] = {
- 	},
- };
- 
--static const struct prueth_queue_desc queue_descs[][NUM_QUEUES] = {
-+const struct prueth_queue_desc queue_descs[][NUM_QUEUES] = {
- 	[PRUETH_PORT_QUEUE_HOST] = {
- 		{ .rd_ptr = P0_Q1_BD_OFFSET, .wr_ptr = P0_Q1_BD_OFFSET, },
- 		{ .rd_ptr = P0_Q2_BD_OFFSET, .wr_ptr = P0_Q2_BD_OFFSET, },
-@@ -207,9 +207,9 @@ static void icssm_prueth_hostconfig(struct prueth *prueth)
- 
- static void icssm_prueth_mii_init(struct prueth *prueth)
- {
-+	u32 txcfg_reg, txcfg, txcfg2;
- 	struct regmap *mii_rt;
- 	u32 rxcfg_reg, rxcfg;
--	u32 txcfg_reg, txcfg;
- 
- 	mii_rt = prueth->mii_rt;
- 
-@@ -237,17 +237,23 @@ static void icssm_prueth_mii_init(struct prueth *prueth)
- 		(TX_START_DELAY << PRUSS_MII_RT_TXCFG_TX_START_DELAY_SHIFT) |
- 		(TX_CLK_DELAY_100M << PRUSS_MII_RT_TXCFG_TX_CLK_DELAY_SHIFT);
- 
-+	txcfg2 = txcfg;
-+	if (!PRUETH_IS_EMAC(prueth))
-+		txcfg2 |= PRUSS_MII_RT_TXCFG_TX_MUX_SEL;
-+
- 	/* Configuration of Port 0 Tx */
- 	txcfg_reg = PRUSS_MII_RT_TXCFG0;
- 
--	regmap_write(mii_rt, txcfg_reg, txcfg);
-+	regmap_write(mii_rt, txcfg_reg, txcfg2);
- 
--	txcfg |= PRUSS_MII_RT_TXCFG_TX_MUX_SEL;
-+	txcfg2 = txcfg;
-+	if (PRUETH_IS_EMAC(prueth))
-+		txcfg2 |= PRUSS_MII_RT_TXCFG_TX_MUX_SEL;
- 
- 	/* Configuration of Port 1 Tx */
- 	txcfg_reg = PRUSS_MII_RT_TXCFG1;
- 
--	regmap_write(mii_rt, txcfg_reg, txcfg);
-+	regmap_write(mii_rt, txcfg_reg, txcfg2);
- 
- 	txcfg_reg = PRUSS_MII_RT_RX_FRMS0;
- 
-@@ -294,7 +300,10 @@ static void icssm_prueth_hostinit(struct prueth *prueth)
- 		icssm_prueth_clearmem(prueth, PRUETH_MEM_DRAM1);
- 
- 	/* Initialize host queues in shared RAM */
--	icssm_prueth_hostconfig(prueth);
-+	if (!PRUETH_IS_EMAC(prueth))
-+		icssm_prueth_sw_hostconfig(prueth);
-+	else
-+		icssm_prueth_hostconfig(prueth);
- 
- 	/* Configure MII_RT */
- 	icssm_prueth_mii_init(prueth);
-@@ -501,19 +510,24 @@ static int icssm_prueth_tx_enqueue(struct prueth_emac *emac,
- 	struct prueth_queue_desc __iomem *queue_desc;
- 	const struct prueth_queue_info *txqueue;
- 	struct net_device *ndev = emac->ndev;
-+	struct prueth *prueth = emac->prueth;
- 	unsigned int buffer_desc_count;
- 	int free_blocks, update_block;
- 	bool buffer_wrapped = false;
- 	int write_block, read_block;
- 	void *src_addr, *dst_addr;
- 	int pkt_block_size;
-+	void __iomem *sram;
- 	void __iomem *dram;
- 	int txport, pktlen;
- 	u16 update_wr_ptr;
- 	u32 wr_buf_desc;
- 	void *ocmc_ram;
- 
--	dram = emac->prueth->mem[emac->dram].va;
-+	if (!PRUETH_IS_EMAC(prueth))
-+		dram = prueth->mem[PRUETH_MEM_DRAM1].va;
-+	else
-+		dram = emac->prueth->mem[emac->dram].va;
- 	if (eth_skb_pad(skb)) {
- 		if (netif_msg_tx_err(emac) && net_ratelimit())
- 			netdev_err(ndev, "packet pad failed\n");
-@@ -526,7 +540,10 @@ static int icssm_prueth_tx_enqueue(struct prueth_emac *emac,
- 	pktlen = skb->len;
- 	/* Get the tx queue */
- 	queue_desc = emac->tx_queue_descs + queue_id;
--	txqueue = &queue_infos[txport][queue_id];
-+	if (!PRUETH_IS_EMAC(prueth))
-+		txqueue = &sw_queue_infos[txport][queue_id];
-+	else
-+		txqueue = &queue_infos[txport][queue_id];
- 
- 	buffer_desc_count = icssm_get_buff_desc_count(txqueue);
- 
-@@ -592,7 +609,11 @@ static int icssm_prueth_tx_enqueue(struct prueth_emac *emac,
-        /* update first buffer descriptor */
- 	wr_buf_desc = (pktlen << PRUETH_BD_LENGTH_SHIFT) &
- 		       PRUETH_BD_LENGTH_MASK;
--	writel(wr_buf_desc, dram + readw(&queue_desc->wr_ptr));
-+	sram = prueth->mem[PRUETH_MEM_SHARED_RAM].va;
-+	if (!PRUETH_IS_EMAC(prueth))
-+		writel(wr_buf_desc, sram + readw(&queue_desc->wr_ptr));
-+	else
-+		writel(wr_buf_desc, dram + readw(&queue_desc->wr_ptr));
- 
- 	/* update the write pointer in this queue descriptor, the firmware
- 	 * polls for this change so this will signal the start of transmission
-@@ -606,7 +627,6 @@ static int icssm_prueth_tx_enqueue(struct prueth_emac *emac,
- void icssm_parse_packet_info(struct prueth *prueth, u32 buffer_descriptor,
- 			     struct prueth_packet_info *pkt_info)
- {
--	pkt_info->shadow = !!(buffer_descriptor & PRUETH_BD_SHADOW_MASK);
- 	pkt_info->port = (buffer_descriptor & PRUETH_BD_PORT_MASK) >>
- 			 PRUETH_BD_PORT_SHIFT;
- 	pkt_info->length = (buffer_descriptor & PRUETH_BD_LENGTH_MASK) >>
-@@ -715,11 +735,19 @@ int icssm_emac_rx_packet(struct prueth_emac *emac, u16 *bd_rd_ptr,
- 		src_addr += actual_pkt_len;
- 	}
- 
-+	if (PRUETH_IS_SWITCH(emac->prueth)) {
-+		skb->offload_fwd_mark = emac->offload_fwd_mark;
-+		if (!pkt_info->lookup_success)
-+			icssm_prueth_sw_learn_fdb(emac, skb->data + ETH_ALEN);
-+	}
-+
- 	skb_put(skb, actual_pkt_len);
- 
- 	/* send packet up the stack */
- 	skb->protocol = eth_type_trans(skb, ndev);
-+	local_bh_disable();
- 	netif_receive_skb(skb);
-+	local_bh_enable();
- 
- 	/* update stats */
- 	emac->stats.rx_bytes += actual_pkt_len;
-@@ -745,6 +773,7 @@ static int icssm_emac_rx_packets(struct prueth_emac *emac, int budget)
- 
- 	shared_ram = emac->prueth->mem[PRUETH_MEM_SHARED_RAM].va;
- 
-+	/* Start and end queue is made common for EMAC, RSTP */
- 	start_queue = emac->rx_queue_start;
- 	end_queue = emac->rx_queue_end;
- 
-@@ -755,8 +784,10 @@ static int icssm_emac_rx_packets(struct prueth_emac *emac, int budget)
- 	/* search host queues for packets */
- 	for (i = start_queue; i <= end_queue; i++) {
- 		queue_desc = emac->rx_queue_descs + i;
--		rxqueue = &queue_infos[PRUETH_PORT_HOST][i];
+diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethern=
+et/intel/igc/igc_main.c
+index 7aafa60ba0c8..0cfcd20a2536 100644
+--- a/drivers/net/ethernet/intel/igc/igc_main.c
++++ b/drivers/net/ethernet/intel/igc/igc_main.c
+@@ -6930,21 +6930,42 @@ int igc_xsk_wakeup(struct net_device *dev, u32 queu=
+e_id, u32 flags)
+           if (!igc_xdp_is_enabled(adapter))
+                       return -ENXIO;
+-           if (queue_id >=3D adapter->num_rx_queues)
++          if ((flags & XDP_WAKEUP_RX) && (flags & XDP_WAKEUP_TX)) {
++                      /* If both TX and RX need to be woken up queue pair =
+per IRQ is needed */
++                      if (!(adapter->flags & IGC_FLAG_QUEUE_PAIRS))
++                                  return -EINVAL; /* igc queue pairs are n=
+ot activated.
++                                                          * Can't trigger =
+irq
++                                                          */
++                      /* Just get the ring params from Rx */
++                      if (queue_id >=3D adapter->num_rx_queues)
++                                  return -EINVAL;
++                      ring =3D adapter->rx_ring[queue_id];
++          } else if (flags & XDP_WAKEUP_TX) {
++                      if (queue_id >=3D adapter->num_tx_queues)
++                                  return -EINVAL;
++                      /* Get the ring params from Tx */
++                      ring =3D adapter->tx_ring[queue_id];
++          } else if (flags & XDP_WAKEUP_RX) {
++                      if (queue_id >=3D adapter->num_rx_queues)
++                                  return -EINVAL;
++                      /* Get the ring params from Rx */
++                      ring =3D adapter->rx_ring[queue_id];
++          } else {
++                      /* Invalid Flags */
+                       return -EINVAL;
 -
-+		if (PRUETH_IS_SWITCH(emac->prueth))
-+			rxqueue = &sw_queue_infos[PRUETH_PORT_HOST][i];
-+		else
-+			rxqueue = &queue_infos[PRUETH_PORT_HOST][i];
- 		overflow_cnt = readb(&queue_desc->overflow_cnt);
- 		if (overflow_cnt > 0) {
- 			emac->stats.rx_over_errors += overflow_cnt;
-@@ -881,6 +912,13 @@ static int icssm_emac_request_irqs(struct prueth_emac *emac)
- 	return ret;
- }
- 
-+/* Function to free memory related to sw */
-+static void icssm_prueth_free_memory(struct prueth *prueth)
-+{
-+	if (PRUETH_IS_SWITCH(prueth))
-+		icssm_prueth_sw_free_fdb_table(prueth);
-+}
-+
- static void icssm_ptp_dram_init(struct prueth_emac *emac)
- {
- 	void __iomem *sram = emac->prueth->mem[PRUETH_MEM_SHARED_RAM].va;
-@@ -943,20 +981,38 @@ static int icssm_emac_ndo_open(struct net_device *ndev)
- 	if (!prueth->emac_configured)
- 		icssm_prueth_init_ethernet_mode(prueth);
- 
--	icssm_prueth_emac_config(emac);
-+	/* reset and start PRU firmware */
-+	if (PRUETH_IS_SWITCH(prueth)) {
-+		ret = icssm_prueth_sw_emac_config(emac);
-+		if (ret)
-+			return ret;
-+
-+		ret = icssm_prueth_sw_init_fdb_table(prueth);
-+		if (ret)
-+			return ret;
-+	} else {
-+		icssm_prueth_emac_config(emac);
-+	}
- 
- 	if (!prueth->emac_configured) {
- 		icssm_ptp_dram_init(emac);
- 		ret = icss_iep_init(prueth->iep, NULL, NULL, 0);
- 		if (ret) {
- 			netdev_err(ndev, "Failed to initialize iep: %d\n", ret);
--			goto iep_exit;
-+			goto free_mem;
- 		}
- 	}
- 
--	ret = icssm_emac_set_boot_pru(emac, ndev);
--	if (ret)
--		goto iep_exit;
-+	if (!PRUETH_IS_EMAC(prueth)) {
-+		ret = icssm_prueth_sw_boot_prus(prueth, ndev);
-+		if (ret)
-+			goto iep_exit;
-+	} else {
-+		/* boot the PRU */
-+		ret = icssm_emac_set_boot_pru(emac, ndev);
-+		if (ret)
-+			goto iep_exit;
-+	}
- 
- 	ret = icssm_emac_request_irqs(emac);
- 	if (ret)
-@@ -971,19 +1027,25 @@ static int icssm_emac_ndo_open(struct net_device *ndev)
- 	icssm_prueth_port_enable(emac, true);
- 
- 	prueth->emac_configured |= BIT(emac->port_id);
+-           ring =3D adapter->rx_ring[queue_id];
++          }
+            if (!ring->xsk_pool)
+                       return -ENXIO;
 -
-+	if (PRUETH_IS_SWITCH(prueth))
-+		icssm_prueth_sw_set_stp_state(prueth, emac->port_id,
-+					      BR_STATE_LEARNING);
- 	if (netif_msg_drv(emac))
- 		dev_notice(&ndev->dev, "started\n");
- 
- 	return 0;
- 
- rproc_shutdown:
--	rproc_shutdown(emac->pru);
-+	if (!PRUETH_IS_EMAC(prueth))
-+		icssm_prueth_sw_shutdown_prus(emac, ndev);
-+	else
-+		rproc_shutdown(emac->pru);
- 
- iep_exit:
- 	if (!prueth->emac_configured)
- 		icss_iep_exit(prueth->iep);
--
-+free_mem:
-+	icssm_prueth_free_memory(emac->prueth);
- 	return ret;
- }
- 
-@@ -1012,17 +1074,73 @@ static int icssm_emac_ndo_stop(struct net_device *ndev)
- 	hrtimer_cancel(&emac->tx_hrtimer);
- 
- 	/* stop the PRU */
--	rproc_shutdown(emac->pru);
-+	if (!PRUETH_IS_EMAC(prueth))
-+		icssm_prueth_sw_shutdown_prus(emac, ndev);
-+	else
-+		rproc_shutdown(emac->pru);
- 
- 	/* free rx interrupts */
- 	free_irq(emac->rx_irq, ndev);
- 
-+	/* free memory related to sw */
-+	icssm_prueth_free_memory(emac->prueth);
-+
-+	if (!prueth->emac_configured)
-+		icss_iep_exit(prueth->iep);
-+
- 	if (netif_msg_drv(emac))
- 		dev_notice(&ndev->dev, "stopped\n");
- 
- 	return 0;
- }
- 
-+static int icssm_prueth_change_mode(struct prueth *prueth,
-+				    enum pruss_ethtype mode)
-+{
-+	bool portstatus[PRUETH_NUM_MACS];
-+	struct prueth_emac *emac;
-+	struct net_device *ndev;
-+	int i, ret;
-+
-+	for (i = 0; i < PRUETH_NUM_MACS; i++) {
-+		emac = prueth->emac[i];
-+		ndev = emac->ndev;
-+
-+		portstatus[i] = netif_running(ndev);
-+		if (!portstatus[i])
-+			continue;
-+
-+		ret = ndev->netdev_ops->ndo_stop(ndev);
-+		if (ret < 0) {
-+			netdev_err(ndev, "failed to stop: %d", ret);
-+			return ret;
-+		}
-+	}
-+
-+	if (mode == PRUSS_ETHTYPE_EMAC || mode == PRUSS_ETHTYPE_SWITCH) {
-+		prueth->eth_type = mode;
-+	} else {
-+		dev_err(prueth->dev, "unknown mode\n");
-+		return -EINVAL;
-+	}
-+
-+	for (i = 0; i < PRUETH_NUM_MACS; i++) {
-+		emac = prueth->emac[i];
-+		ndev = emac->ndev;
-+
-+		if (!portstatus[i])
-+			continue;
-+
-+		ret = ndev->netdev_ops->ndo_open(ndev);
-+		if (ret < 0) {
-+			netdev_err(ndev, "failed to start: %d", ret);
-+			return ret;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- /* VLAN-tag PCP to priority queue map for EMAC/Switch/HSR/PRP used by driver
-  * Index is PCP val / 2.
-  *   low  - pcp 0..3 maps to Q4 for Host
-@@ -1291,6 +1409,15 @@ static void icssm_emac_ndo_set_rx_mode(struct net_device *ndev)
- 		icssm_emac_mc_filter_bin_allow(emac, hash);
- 	}
- 
-+	/* Add bridge device's MC addresses as well */
-+	if (prueth->hw_bridge_dev) {
-+		netdev_for_each_mc_addr(ha, prueth->hw_bridge_dev) {
-+			hash = icssm_emac_get_mc_hash(ha->addr,
-+						      emac->mc_filter_mask);
-+			icssm_emac_mc_filter_bin_allow(emac, hash);
-+		}
-+	}
-+
- unlock:
- 	spin_unlock_irqrestore(&emac->addr_lock, flags);
- }
-@@ -1353,6 +1480,7 @@ static enum hrtimer_restart icssm_emac_tx_timer_callback(struct hrtimer *timer)
- static int icssm_prueth_netdev_init(struct prueth *prueth,
- 				    struct device_node *eth_node)
- {
-+	const struct prueth_private_data *fw_data = prueth->fw_data;
- 	struct prueth_emac *emac;
- 	struct net_device *ndev;
- 	enum prueth_port port;
-@@ -1443,6 +1571,14 @@ static int icssm_prueth_netdev_init(struct prueth *prueth,
- 	phy_remove_link_mode(emac->phydev, ETHTOOL_LINK_MODE_Pause_BIT);
- 	phy_remove_link_mode(emac->phydev, ETHTOOL_LINK_MODE_Asym_Pause_BIT);
- 
-+	/* Protocol switching
-+	 * Enabling L2 Firmware offloading
-+	 */
-+	if (fw_data->support_switch) {
-+		ndev->features |= NETIF_F_HW_L2FW_DOFFLOAD;
-+		ndev->hw_features |= NETIF_F_HW_L2FW_DOFFLOAD;
-+	}
-+
- 	ndev->dev.of_node = eth_node;
- 	ndev->netdev_ops = &emac_netdev_ops;
- 
-@@ -1490,6 +1626,140 @@ bool icssm_prueth_sw_port_dev_check(const struct net_device *ndev)
- 	return false;
- }
- 
-+static int icssm_prueth_port_offload_fwd_mark_update(struct prueth *prueth)
-+{
-+	int set_val = 0;
-+	int i, ret = 0;
-+	u8 all_slaves;
-+
-+	all_slaves = BIT(PRUETH_PORT_MII0) | BIT(PRUETH_PORT_MII1);
-+
-+	if (prueth->br_members == all_slaves)
-+		set_val = 1;
-+
-+	dev_dbg(prueth->dev, "set offload_fwd_mark %d, mbrs=0x%x\n",
-+		set_val, prueth->br_members);
-+
-+	for (i = 0; i < PRUETH_NUM_MACS; i++)
-+		prueth->emac[i]->offload_fwd_mark = set_val;
-+
-+	/* Bridge is created, load switch firmware,
-+	 * if not already in that mode
-+	 */
-+	if (set_val && !PRUETH_IS_SWITCH(prueth)) {
-+		ret = icssm_prueth_change_mode(prueth, PRUSS_ETHTYPE_SWITCH);
-+		if (ret < 0)
-+			dev_err(prueth->dev, "Failed to enable Switch mode\n");
-+		else
-+			dev_info(prueth->dev,
-+				 "TI PRU ethernet now in Switch mode\n");
-+	}
-+
-+	/* Bridge is deleted, switch to Dual EMAC mode */
-+	if (!prueth->br_members && !PRUETH_IS_EMAC(prueth)) {
-+		ret = icssm_prueth_change_mode(prueth, PRUSS_ETHTYPE_EMAC);
-+		if (ret < 0)
-+			dev_err(prueth->dev, "Failed to enable Dual EMAC mode\n");
-+		else
-+			dev_info(prueth->dev,
-+				 "TI PRU ethernet now in Dual EMAC mode\n");
-+	}
-+
-+	return ret;
-+}
-+
-+static int icssm_prueth_ndev_port_link(struct net_device *ndev,
-+				       struct net_device *br_ndev)
-+{
-+	struct prueth_emac *emac = netdev_priv(ndev);
-+	struct prueth *prueth = emac->prueth;
-+	int ret = 0;
-+
-+	dev_dbg(prueth->dev, "%s: br_mbrs=0x%x %s\n",
-+		__func__, prueth->br_members, ndev->name);
-+
-+	if (!prueth->br_members) {
-+		prueth->hw_bridge_dev = br_ndev;
-+	} else {
-+		/* This is adding the port to a second bridge,
-+		 * this is unsupported
-+		 */
-+		if (prueth->hw_bridge_dev != br_ndev)
-+			return -EOPNOTSUPP;
-+	}
-+
-+	prueth->br_members |= BIT(emac->port_id);
-+
-+	ret = icssm_prueth_port_offload_fwd_mark_update(prueth);
-+
-+	return ret;
-+}
-+
-+static int icssm_prueth_ndev_port_unlink(struct net_device *ndev)
-+{
-+	struct prueth_emac *emac = netdev_priv(ndev);
-+	struct prueth *prueth = emac->prueth;
-+	int ret = 0;
-+
-+	dev_dbg(prueth->dev, "emac_sw_ndev_port_unlink\n");
-+
-+	prueth->br_members &= ~BIT(emac->port_id);
-+
-+	ret = icssm_prueth_port_offload_fwd_mark_update(prueth);
-+
-+	if (!prueth->br_members)
-+		prueth->hw_bridge_dev = NULL;
-+
-+	return ret;
-+}
-+
-+static int icssm_prueth_ndev_event(struct notifier_block *unused,
-+				   unsigned long event, void *ptr)
-+{
-+	struct net_device *ndev = netdev_notifier_info_to_dev(ptr);
-+	struct netdev_notifier_changeupper_info *info;
-+	int ret = NOTIFY_DONE;
-+
-+	if (!icssm_prueth_sw_port_dev_check(ndev))
-+		return NOTIFY_DONE;
-+
-+	switch (event) {
-+	case NETDEV_CHANGEUPPER:
-+		info = ptr;
-+		if (netif_is_bridge_master(info->upper_dev)) {
-+			if (info->linking)
-+				ret = icssm_prueth_ndev_port_link
-+					(ndev, info->upper_dev);
-+			else
-+				ret = icssm_prueth_ndev_port_unlink(ndev);
-+		}
-+		break;
-+	default:
-+		return NOTIFY_DONE;
-+	}
-+
-+	return notifier_from_errno(ret);
-+}
-+
-+static int icssm_prueth_register_notifiers(struct prueth *prueth)
-+{
-+	int ret = 0;
-+
-+	prueth->prueth_netdevice_nb.notifier_call = icssm_prueth_ndev_event;
-+	ret = register_netdevice_notifier(&prueth->prueth_netdevice_nb);
-+	if (ret) {
-+		dev_err(prueth->dev,
-+			"register netdevice notifier failed ret: %d\n", ret);
-+		return ret;
-+	}
-+
-+	ret = icssm_prueth_sw_register_notifiers(prueth);
-+	if (ret)
-+		unregister_netdevice_notifier(&prueth->prueth_netdevice_nb);
-+
-+	return ret;
-+}
-+
- static int icssm_prueth_probe(struct platform_device *pdev)
- {
- 	struct device_node *eth0_node = NULL, *eth1_node = NULL;
-@@ -1709,6 +1979,12 @@ static int icssm_prueth_probe(struct platform_device *pdev)
- 			prueth->emac[PRUETH_MAC1]->ndev;
- 	}
- 
-+	ret = icssm_prueth_register_notifiers(prueth);
-+	if (ret) {
-+		dev_err(dev, "can't register switchdev notifiers");
-+		goto netdev_unregister;
-+	}
-+
- 	dev_info(dev, "TI PRU ethernet driver initialized: %s EMAC mode\n",
- 		 (!eth0_node || !eth1_node) ? "single" : "dual");
- 
-@@ -1769,6 +2045,9 @@ static void icssm_prueth_remove(struct platform_device *pdev)
- 	struct device_node *eth_node;
- 	int i;
- 
-+	unregister_netdevice_notifier(&prueth->prueth_netdevice_nb);
-+	icssm_prueth_sw_unregister_notifiers(prueth);
-+
- 	for (i = 0; i < PRUETH_NUM_MACS; i++) {
- 		if (!prueth->registered_netdevs[i])
- 			continue;
-@@ -1868,11 +2147,16 @@ static struct prueth_private_data am335x_prueth_pdata = {
- 	.fw_pru[PRUSS_PRU0] = {
- 		.fw_name[PRUSS_ETHTYPE_EMAC] =
- 			"ti-pruss/am335x-pru0-prueth-fw.elf",
-+		.fw_name[PRUSS_ETHTYPE_SWITCH] =
-+			"ti-pruss/am335x-pru0-prusw-fw.elf",
- 	},
- 	.fw_pru[PRUSS_PRU1] = {
- 		.fw_name[PRUSS_ETHTYPE_EMAC] =
- 			"ti-pruss/am335x-pru1-prueth-fw.elf",
-+		.fw_name[PRUSS_ETHTYPE_SWITCH] =
-+			"ti-pruss/am335x-pru1-prusw-fw.elf",
- 	},
-+	.support_switch = true,
- };
- 
- /* AM437x SoC-specific firmware data */
-@@ -1881,11 +2165,16 @@ static struct prueth_private_data am437x_prueth_pdata = {
- 	.fw_pru[PRUSS_PRU0] = {
- 		.fw_name[PRUSS_ETHTYPE_EMAC] =
- 			"ti-pruss/am437x-pru0-prueth-fw.elf",
-+		.fw_name[PRUSS_ETHTYPE_SWITCH] =
-+			"ti-pruss/am437x-pru0-prusw-fw.elf",
- 	},
- 	.fw_pru[PRUSS_PRU1] = {
- 		.fw_name[PRUSS_ETHTYPE_EMAC] =
- 			"ti-pruss/am437x-pru1-prueth-fw.elf",
-+		.fw_name[PRUSS_ETHTYPE_SWITCH] =
-+			"ti-pruss/am437x-pru1-prusw-fw.elf",
- 	},
-+	.support_switch = true,
- };
- 
- /* AM57xx SoC-specific firmware data */
-@@ -1894,11 +2183,17 @@ static struct prueth_private_data am57xx_prueth_pdata = {
- 	.fw_pru[PRUSS_PRU0] = {
- 		.fw_name[PRUSS_ETHTYPE_EMAC] =
- 			"ti-pruss/am57xx-pru0-prueth-fw.elf",
-+	.fw_name[PRUSS_ETHTYPE_SWITCH] =
-+			"ti-pruss/am57xx-pru0-prusw-fw.elf",
- 	},
- 	.fw_pru[PRUSS_PRU1] = {
- 		.fw_name[PRUSS_ETHTYPE_EMAC] =
- 			"ti-pruss/am57xx-pru1-prueth-fw.elf",
-+		.fw_name[PRUSS_ETHTYPE_SWITCH] =
-+			"ti-pruss/am57xx-pru1-prusw-fw.elf",
-+
- 	},
-+	.support_switch = true,
- };
- 
- static const struct of_device_id prueth_dt_match[] = {
-diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth.h b/drivers/net/ethernet/ti/icssm/icssm_prueth.h
-index f95c8c3a7ee5..d5b49b462c24 100644
---- a/drivers/net/ethernet/ti/icssm/icssm_prueth.h
-+++ b/drivers/net/ethernet/ti/icssm/icssm_prueth.h
-@@ -182,10 +182,12 @@ enum pruss_device {
-  * struct prueth_private_data - PRU Ethernet private data
-  * @driver_data: PRU Ethernet device name
-  * @fw_pru: firmware names to be used for PRUSS ethernet usecases
-+ * @support_switch: boolean to indicate if switch is enabled
-  */
- struct prueth_private_data {
- 	enum pruss_device driver_data;
- 	const struct prueth_firmware fw_pru[PRUSS_NUM_PRUS];
-+	bool support_switch;
- };
- 
- struct prueth_emac_stats {
-@@ -233,6 +235,7 @@ struct prueth_emac {
- 
- 	struct hrtimer tx_hrtimer;
- 	struct prueth_emac_stats stats;
-+	int offload_fwd_mark;
- };
- 
- struct prueth {
-@@ -261,8 +264,11 @@ struct prueth {
- 	unsigned int eth_type;
- 	size_t ocmc_ram_size;
- 	u8 emac_configured;
-+	u8 br_members;
- };
- 
-+extern const struct prueth_queue_desc queue_descs[][NUM_QUEUES];
-+
- void icssm_parse_packet_info(struct prueth *prueth, u32 buffer_descriptor,
- 			     struct prueth_packet_info *pkt_info);
- int icssm_emac_rx_packet(struct prueth_emac *emac, u16 *bd_rd_ptr,
-diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth_switch.c b/drivers/net/ethernet/ti/icssm/icssm_prueth_switch.c
-index dd7f24469ab2..a8819dbb2224 100644
---- a/drivers/net/ethernet/ti/icssm/icssm_prueth_switch.c
-+++ b/drivers/net/ethernet/ti/icssm/icssm_prueth_switch.c
-@@ -29,6 +29,176 @@ struct icssm_prueth_sw_fdb_work {
- 	int event;
- };
- 
-+const struct prueth_queue_info sw_queue_infos[][NUM_QUEUES] = {
-+	[PRUETH_PORT_QUEUE_HOST] = {
-+		[PRUETH_QUEUE1] = {
-+			P0_Q1_BUFFER_OFFSET,
-+			P0_QUEUE_DESC_OFFSET,
-+			P0_Q1_BD_OFFSET,
-+			P0_Q1_BD_OFFSET + ((HOST_QUEUE_1_SIZE - 1) * BD_SIZE),
-+		},
-+		[PRUETH_QUEUE2] = {
-+			P0_Q2_BUFFER_OFFSET,
-+			P0_QUEUE_DESC_OFFSET + 8,
-+			P0_Q2_BD_OFFSET,
-+			P0_Q2_BD_OFFSET + ((HOST_QUEUE_2_SIZE - 1) * BD_SIZE),
-+		},
-+		[PRUETH_QUEUE3] = {
-+			P0_Q3_BUFFER_OFFSET,
-+			P0_QUEUE_DESC_OFFSET + 16,
-+			P0_Q3_BD_OFFSET,
-+			P0_Q3_BD_OFFSET + ((HOST_QUEUE_3_SIZE - 1) * BD_SIZE),
-+		},
-+		[PRUETH_QUEUE4] = {
-+			P0_Q4_BUFFER_OFFSET,
-+			P0_QUEUE_DESC_OFFSET + 24,
-+			P0_Q4_BD_OFFSET,
-+			P0_Q4_BD_OFFSET + ((HOST_QUEUE_4_SIZE - 1) * BD_SIZE),
-+		},
-+	},
-+	[PRUETH_PORT_QUEUE_MII0] = {
-+		[PRUETH_QUEUE1] = {
-+			P1_Q1_BUFFER_OFFSET,
-+			P1_Q1_BUFFER_OFFSET +
-+				((QUEUE_1_SIZE - 1) * ICSS_BLOCK_SIZE),
-+			P1_Q1_BD_OFFSET,
-+			P1_Q1_BD_OFFSET + ((QUEUE_1_SIZE - 1) * BD_SIZE),
-+		},
-+		[PRUETH_QUEUE2] = {
-+			P1_Q2_BUFFER_OFFSET,
-+			P1_Q2_BUFFER_OFFSET +
-+				((QUEUE_2_SIZE - 1) * ICSS_BLOCK_SIZE),
-+			P1_Q2_BD_OFFSET,
-+			P1_Q2_BD_OFFSET + ((QUEUE_2_SIZE - 1) * BD_SIZE),
-+		},
-+		[PRUETH_QUEUE3] = {
-+			P1_Q3_BUFFER_OFFSET,
-+			P1_Q3_BUFFER_OFFSET +
-+				((QUEUE_3_SIZE - 1) * ICSS_BLOCK_SIZE),
-+			P1_Q3_BD_OFFSET,
-+			P1_Q3_BD_OFFSET + ((QUEUE_3_SIZE - 1) * BD_SIZE),
-+		},
-+		[PRUETH_QUEUE4] = {
-+			P1_Q4_BUFFER_OFFSET,
-+			P1_Q4_BUFFER_OFFSET +
-+				((QUEUE_4_SIZE - 1) * ICSS_BLOCK_SIZE),
-+			P1_Q4_BD_OFFSET,
-+			P1_Q4_BD_OFFSET + ((QUEUE_4_SIZE - 1) * BD_SIZE),
-+		},
-+	},
-+	[PRUETH_PORT_QUEUE_MII1] = {
-+		[PRUETH_QUEUE1] = {
-+			P2_Q1_BUFFER_OFFSET,
-+			P2_Q1_BUFFER_OFFSET +
-+				((QUEUE_1_SIZE - 1) * ICSS_BLOCK_SIZE),
-+			P2_Q1_BD_OFFSET,
-+			P2_Q1_BD_OFFSET + ((QUEUE_1_SIZE - 1) * BD_SIZE),
-+		},
-+		[PRUETH_QUEUE2] = {
-+			P2_Q2_BUFFER_OFFSET,
-+			P2_Q2_BUFFER_OFFSET +
-+				((QUEUE_2_SIZE - 1) * ICSS_BLOCK_SIZE),
-+			P2_Q2_BD_OFFSET,
-+			P2_Q2_BD_OFFSET + ((QUEUE_2_SIZE - 1) * BD_SIZE),
-+		},
-+		[PRUETH_QUEUE3] = {
-+			P2_Q3_BUFFER_OFFSET,
-+			P2_Q3_BUFFER_OFFSET +
-+				((QUEUE_3_SIZE - 1) * ICSS_BLOCK_SIZE),
-+			P2_Q3_BD_OFFSET,
-+			P2_Q3_BD_OFFSET + ((QUEUE_3_SIZE - 1) * BD_SIZE),
-+		},
-+		[PRUETH_QUEUE4] = {
-+			P2_Q4_BUFFER_OFFSET,
-+			P2_Q4_BUFFER_OFFSET +
-+				((QUEUE_4_SIZE - 1) * ICSS_BLOCK_SIZE),
-+			P2_Q4_BD_OFFSET,
-+			P2_Q4_BD_OFFSET + ((QUEUE_4_SIZE - 1) * BD_SIZE),
-+		},
-+	},
-+};
-+
-+static const struct prueth_queue_info rx_queue_infos[][NUM_QUEUES] = {
-+	[PRUETH_PORT_QUEUE_HOST] = {
-+		[PRUETH_QUEUE1] = {
-+			P0_Q1_BUFFER_OFFSET,
-+			HOST_QUEUE_DESC_OFFSET,
-+			P0_Q1_BD_OFFSET,
-+			P0_Q1_BD_OFFSET + ((HOST_QUEUE_1_SIZE - 1) * BD_SIZE),
-+		},
-+		[PRUETH_QUEUE2] = {
-+			P0_Q2_BUFFER_OFFSET,
-+			HOST_QUEUE_DESC_OFFSET + 8,
-+			P0_Q2_BD_OFFSET,
-+			P0_Q2_BD_OFFSET + ((HOST_QUEUE_2_SIZE - 1) * BD_SIZE),
-+		},
-+		[PRUETH_QUEUE3] = {
-+			P0_Q3_BUFFER_OFFSET,
-+			HOST_QUEUE_DESC_OFFSET + 16,
-+			P0_Q3_BD_OFFSET,
-+			P0_Q3_BD_OFFSET + ((HOST_QUEUE_3_SIZE - 1) * BD_SIZE),
-+		},
-+		[PRUETH_QUEUE4] = {
-+			P0_Q4_BUFFER_OFFSET,
-+			HOST_QUEUE_DESC_OFFSET + 24,
-+			P0_Q4_BD_OFFSET,
-+			P0_Q4_BD_OFFSET + ((HOST_QUEUE_4_SIZE - 1) * BD_SIZE),
-+		},
-+	},
-+	[PRUETH_PORT_QUEUE_MII0] = {
-+		[PRUETH_QUEUE1] = {
-+			P1_Q1_BUFFER_OFFSET,
-+			P1_QUEUE_DESC_OFFSET,
-+			P1_Q1_BD_OFFSET,
-+			P1_Q1_BD_OFFSET + ((QUEUE_1_SIZE - 1) * BD_SIZE),
-+		},
-+		[PRUETH_QUEUE2] = {
-+			P1_Q2_BUFFER_OFFSET,
-+			P1_QUEUE_DESC_OFFSET + 8,
-+			P1_Q2_BD_OFFSET,
-+			P1_Q2_BD_OFFSET + ((QUEUE_2_SIZE - 1) * BD_SIZE),
-+		},
-+		[PRUETH_QUEUE3] = {
-+			P1_Q3_BUFFER_OFFSET,
-+			P1_QUEUE_DESC_OFFSET + 16,
-+			P1_Q3_BD_OFFSET,
-+			P1_Q3_BD_OFFSET + ((QUEUE_3_SIZE - 1) * BD_SIZE),
-+		},
-+		[PRUETH_QUEUE4] = {
-+			P1_Q4_BUFFER_OFFSET,
-+			P1_QUEUE_DESC_OFFSET + 24,
-+			P1_Q4_BD_OFFSET,
-+			P1_Q4_BD_OFFSET + ((QUEUE_4_SIZE - 1) * BD_SIZE),
-+		},
-+	},
-+	[PRUETH_PORT_QUEUE_MII1] = {
-+		[PRUETH_QUEUE1] = {
-+			P2_Q1_BUFFER_OFFSET,
-+			P2_QUEUE_DESC_OFFSET,
-+			P2_Q1_BD_OFFSET,
-+			P2_Q1_BD_OFFSET + ((QUEUE_1_SIZE - 1) * BD_SIZE),
-+		},
-+		[PRUETH_QUEUE2] = {
-+			P2_Q2_BUFFER_OFFSET,
-+			P2_QUEUE_DESC_OFFSET + 8,
-+			P2_Q2_BD_OFFSET,
-+			P2_Q2_BD_OFFSET + ((QUEUE_2_SIZE - 1) * BD_SIZE),
-+		},
-+		[PRUETH_QUEUE3] = {
-+			P2_Q3_BUFFER_OFFSET,
-+			P2_QUEUE_DESC_OFFSET + 16,
-+			P2_Q3_BD_OFFSET,
-+			P2_Q3_BD_OFFSET + ((QUEUE_3_SIZE - 1) * BD_SIZE),
-+		},
-+		[PRUETH_QUEUE4] = {
-+			P2_Q4_BUFFER_OFFSET,
-+			P2_QUEUE_DESC_OFFSET + 24,
-+			P2_Q4_BD_OFFSET,
-+			P2_Q4_BD_OFFSET + ((QUEUE_4_SIZE - 1) * BD_SIZE),
-+		},
-+	},
-+};
-+
- void icssm_prueth_sw_free_fdb_table(struct prueth *prueth)
- {
- 	if (prueth->emac_configured)
-@@ -673,3 +843,218 @@ int icssm_prueth_sw_purge_fdb(struct prueth_emac *emac)
- 	queue_work(system_long_wq, &fdb_work->work);
- 	return 0;
- }
-+
-+void icssm_prueth_sw_hostconfig(struct prueth *prueth)
-+{
-+	void __iomem *dram1_base = prueth->mem[PRUETH_MEM_DRAM1].va;
-+	void __iomem *dram;
-+
-+	/* queue information table */
-+	dram = dram1_base + P0_Q1_RX_CONTEXT_OFFSET;
-+	memcpy_toio(dram, sw_queue_infos[PRUETH_PORT_QUEUE_HOST],
-+		    sizeof(sw_queue_infos[PRUETH_PORT_QUEUE_HOST]));
-+
-+	/* buffer descriptor offset table*/
-+	dram = dram1_base + QUEUE_DESCRIPTOR_OFFSET_ADDR;
-+	writew(P0_Q1_BD_OFFSET, dram);
-+	writew(P0_Q2_BD_OFFSET, dram + 2);
-+	writew(P0_Q3_BD_OFFSET, dram + 4);
-+	writew(P0_Q4_BD_OFFSET, dram + 6);
-+
-+	/* buffer offset table */
-+	dram = dram1_base + QUEUE_OFFSET_ADDR;
-+	writew(P0_Q1_BUFFER_OFFSET, dram);
-+	writew(P0_Q2_BUFFER_OFFSET, dram + 2);
-+	writew(P0_Q3_BUFFER_OFFSET, dram + 4);
-+	writew(P0_Q4_BUFFER_OFFSET, dram + 6);
-+
-+	/* queue size lookup table */
-+	dram = dram1_base + QUEUE_SIZE_ADDR;
-+	writew(HOST_QUEUE_1_SIZE, dram);
-+	writew(HOST_QUEUE_1_SIZE, dram + 2);
-+	writew(HOST_QUEUE_1_SIZE, dram + 4);
-+	writew(HOST_QUEUE_1_SIZE, dram + 6);
-+
-+	/* queue table */
-+	dram = dram1_base + P0_QUEUE_DESC_OFFSET;
-+	memcpy_toio(dram, queue_descs[PRUETH_PORT_QUEUE_HOST],
-+		    sizeof(queue_descs[PRUETH_PORT_QUEUE_HOST]));
-+}
-+
-+static int icssm_prueth_sw_port_config(struct prueth *prueth,
-+				       enum prueth_port port_id)
-+{
-+	unsigned int tx_context_ofs_addr, rx_context_ofs, queue_desc_ofs;
-+	void __iomem *dram, *dram_base, *dram_mac;
-+	struct prueth_emac *emac;
-+	void __iomem *dram1_base;
-+
-+	dram1_base = prueth->mem[PRUETH_MEM_DRAM1].va;
-+	emac = prueth->emac[port_id - 1];
-+	switch (port_id) {
-+	case PRUETH_PORT_MII0:
-+		tx_context_ofs_addr     = TX_CONTEXT_P1_Q1_OFFSET_ADDR;
-+		rx_context_ofs          = P1_Q1_RX_CONTEXT_OFFSET;
-+		queue_desc_ofs          = P1_QUEUE_DESC_OFFSET;
-+
-+		/* for switch PORT MII0 mac addr is in DRAM0. */
-+		dram_mac = prueth->mem[PRUETH_MEM_DRAM0].va;
-+		break;
-+	case PRUETH_PORT_MII1:
-+		tx_context_ofs_addr     = TX_CONTEXT_P2_Q1_OFFSET_ADDR;
-+		rx_context_ofs          = P2_Q1_RX_CONTEXT_OFFSET;
-+		queue_desc_ofs          = P2_QUEUE_DESC_OFFSET;
-+
-+		/* for switch PORT MII1 mac addr is in DRAM1. */
-+		dram_mac = prueth->mem[PRUETH_MEM_DRAM1].va;
-+		break;
-+	default:
-+		netdev_err(emac->ndev, "invalid port\n");
-+		return -EINVAL;
-+	}
-+
-+	/* setup mac address */
-+	memcpy_toio(dram_mac + PORT_MAC_ADDR, emac->mac_addr, 6);
-+
-+	/* Remaining switch port configs are in DRAM1 */
-+	dram_base = prueth->mem[PRUETH_MEM_DRAM1].va;
-+
-+	/* queue information table */
-+	memcpy_toio(dram_base + tx_context_ofs_addr,
-+		    sw_queue_infos[port_id],
-+		    sizeof(sw_queue_infos[port_id]));
-+
-+	memcpy_toio(dram_base + rx_context_ofs,
-+		    rx_queue_infos[port_id],
-+		    sizeof(rx_queue_infos[port_id]));
-+
-+	/* buffer descriptor offset table*/
-+	dram = dram_base + QUEUE_DESCRIPTOR_OFFSET_ADDR +
-+	       (port_id * NUM_QUEUES * sizeof(u16));
-+	writew(sw_queue_infos[port_id][PRUETH_QUEUE1].buffer_desc_offset, dram);
-+	writew(sw_queue_infos[port_id][PRUETH_QUEUE2].buffer_desc_offset,
-+	       dram + 2);
-+	writew(sw_queue_infos[port_id][PRUETH_QUEUE3].buffer_desc_offset,
-+	       dram + 4);
-+	writew(sw_queue_infos[port_id][PRUETH_QUEUE4].buffer_desc_offset,
-+	       dram + 6);
-+
-+	/* buffer offset table */
-+	dram = dram_base + QUEUE_OFFSET_ADDR +
-+	       port_id * NUM_QUEUES * sizeof(u16);
-+	writew(sw_queue_infos[port_id][PRUETH_QUEUE1].buffer_offset, dram);
-+	writew(sw_queue_infos[port_id][PRUETH_QUEUE2].buffer_offset,
-+	       dram + 2);
-+	writew(sw_queue_infos[port_id][PRUETH_QUEUE3].buffer_offset,
-+	       dram + 4);
-+	writew(sw_queue_infos[port_id][PRUETH_QUEUE4].buffer_offset,
-+	       dram + 6);
-+
-+	/* queue size lookup table */
-+	dram = dram_base + QUEUE_SIZE_ADDR +
-+	       port_id * NUM_QUEUES * sizeof(u16);
-+	writew(QUEUE_1_SIZE, dram);
-+	writew(QUEUE_2_SIZE, dram + 2);
-+	writew(QUEUE_3_SIZE, dram + 4);
-+	writew(QUEUE_4_SIZE, dram + 6);
-+
-+	/* queue table */
-+	memcpy_toio(dram_base + queue_desc_ofs,
-+		    &queue_descs[port_id][0],
-+		    4 * sizeof(queue_descs[port_id][0]));
-+
-+	emac->rx_queue_descs = dram1_base + P0_QUEUE_DESC_OFFSET;
-+	emac->tx_queue_descs = dram1_base +
-+		rx_queue_infos[port_id][PRUETH_QUEUE1].queue_desc_offset;
-+
-+	return 0;
-+}
-+
-+int icssm_prueth_sw_emac_config(struct prueth_emac *emac)
-+{
-+	struct prueth *prueth = emac->prueth;
-+	u32 sharedramaddr, ocmcaddr;
-+	int ret;
-+
-+	/* PRU needs local shared RAM address for C28 */
-+	sharedramaddr = ICSS_LOCAL_SHARED_RAM;
-+	/* PRU needs real global OCMC address for C30*/
-+	ocmcaddr = (u32)prueth->mem[PRUETH_MEM_OCMC].pa;
-+
-+	if (prueth->emac_configured & BIT(emac->port_id))
-+		return 0;
-+
-+	ret = icssm_prueth_sw_port_config(prueth, emac->port_id);
-+	if (ret)
-+		return ret;
-+
-+	if (!prueth->emac_configured) {
-+		/* Set in constant table C28 of PRUn to ICSS Shared memory */
-+		pru_rproc_set_ctable(prueth->pru0, PRU_C28, sharedramaddr);
-+		pru_rproc_set_ctable(prueth->pru1, PRU_C28, sharedramaddr);
-+
-+		/* Set in constant table C30 of PRUn to OCMC memory */
-+		pru_rproc_set_ctable(prueth->pru0, PRU_C30, ocmcaddr);
-+		pru_rproc_set_ctable(prueth->pru1, PRU_C30, ocmcaddr);
-+	}
-+	return 0;
-+}
-+
-+int icssm_prueth_sw_boot_prus(struct prueth *prueth, struct net_device *ndev)
-+{
-+	const struct prueth_firmware *pru_firmwares;
-+	const char *fw_name, *fw_name1;
-+	int ret;
-+
-+	if (prueth->emac_configured)
-+		return 0;
-+
-+	pru_firmwares = &prueth->fw_data->fw_pru[PRUSS_PRU0];
-+	fw_name = pru_firmwares->fw_name[prueth->eth_type];
-+	pru_firmwares = &prueth->fw_data->fw_pru[PRUSS_PRU1];
-+	fw_name1 = pru_firmwares->fw_name[prueth->eth_type];
-+
-+	ret = rproc_set_firmware(prueth->pru0, fw_name);
-+	if (ret) {
-+		netdev_err(ndev, "failed to set PRU0 firmware %s: %d\n",
-+			   fw_name, ret);
-+		return ret;
-+	}
-+	ret = rproc_boot(prueth->pru0);
-+	if (ret) {
-+		netdev_err(ndev, "failed to boot PRU0: %d\n", ret);
-+		return ret;
-+	}
-+
-+	ret = rproc_set_firmware(prueth->pru1, fw_name1);
-+	if (ret) {
-+		netdev_err(ndev, "failed to set PRU1 firmware %s: %d\n",
-+			   fw_name1, ret);
-+		goto rproc0_shutdown;
-+	}
-+	ret = rproc_boot(prueth->pru1);
-+	if (ret) {
-+		netdev_err(ndev, "failed to boot PRU1: %d\n", ret);
-+		goto rproc0_shutdown;
-+	}
-+
-+	return 0;
-+
-+rproc0_shutdown:
-+	rproc_shutdown(prueth->pru0);
-+	return ret;
-+}
-+
-+int icssm_prueth_sw_shutdown_prus(struct prueth_emac *emac,
-+				  struct net_device *ndev)
-+{
-+	struct prueth *prueth = emac->prueth;
-+
-+	if (prueth->emac_configured)
-+		return 0;
-+
-+	rproc_shutdown(prueth->pru0);
-+	rproc_shutdown(prueth->pru1);
-+
-+	return 0;
-+}
-diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth_switch.h b/drivers/net/ethernet/ti/icssm/icssm_prueth_switch.h
-index 218cbe1d3c50..e6111bba166e 100644
---- a/drivers/net/ethernet/ti/icssm/icssm_prueth_switch.h
-+++ b/drivers/net/ethernet/ti/icssm/icssm_prueth_switch.h
-@@ -16,6 +16,8 @@ void icssm_prueth_sw_set_stp_state(struct prueth *prueth,
- u8 icssm_prueth_sw_get_stp_state(struct prueth *prueth,
- 				 enum prueth_port port);
- 
-+extern const struct prueth_queue_info sw_queue_infos[][4];
-+
- void icssm_prueth_sw_fdb_tbl_init(struct prueth *prueth);
- int icssm_prueth_sw_init_fdb_table(struct prueth *prueth);
- void icssm_prueth_sw_free_fdb_table(struct prueth *prueth);
-@@ -26,4 +28,10 @@ void icssm_prueth_sw_fdb_del(struct prueth_emac *emac,
- 			     struct switchdev_notifier_fdb_info *fdb);
- int icssm_prueth_sw_learn_fdb(struct prueth_emac *emac, u8 *src_mac);
- int icssm_prueth_sw_purge_fdb(struct prueth_emac *emac);
-+void icssm_prueth_sw_hostconfig(struct prueth *prueth);
-+int icssm_prueth_sw_emac_config(struct prueth_emac *emac);
-+int icssm_prueth_sw_boot_prus(struct prueth *prueth, struct net_device *ndev);
-+int icssm_prueth_sw_shutdown_prus(struct prueth_emac *emac,
-+				  struct net_device *ndev);
-+
- #endif /* __NET_TI_PRUETH_SWITCH_H */
-diff --git a/drivers/net/ethernet/ti/icssm/icssm_switch.h b/drivers/net/ethernet/ti/icssm/icssm_switch.h
-index 4200ccb1b425..5ba9ce14da44 100644
---- a/drivers/net/ethernet/ti/icssm/icssm_switch.h
-+++ b/drivers/net/ethernet/ti/icssm/icssm_switch.h
-@@ -117,6 +117,15 @@
- #define STATISTICS_OFFSET	0x1F00
- #define STAT_SIZE		0x98
- 
-+/* The following offsets indicate which sections of the memory are used
-+ * for switch internal tasks
-+ */
-+#define SWITCH_SPECIFIC_DRAM0_START_SIZE		0x100
-+#define SWITCH_SPECIFIC_DRAM0_START_OFFSET		0x1F00
-+
-+#define SWITCH_SPECIFIC_DRAM1_START_SIZE		0x300
-+#define SWITCH_SPECIFIC_DRAM1_START_OFFSET		0x1D00
-+
- /* Offset for storing
-  * 1. Storm Prevention Params
-  * 2. PHY Speed Offset
-@@ -146,6 +155,74 @@
- /* 4 bytes ? */
- #define STP_INVALID_STATE_OFFSET	(STATISTICS_OFFSET + STAT_SIZE + 33)
- 
-+/* DRAM1 Offsets for Switch */
-+/* 4 queue descriptors for port 0 (host receive) */
-+#define P0_QUEUE_DESC_OFFSET		0x1E7C
-+#define P1_QUEUE_DESC_OFFSET		0x1E9C
-+#define P2_QUEUE_DESC_OFFSET		0x1EBC
-+/* collision descriptor of port 0 */
-+#define P0_COL_QUEUE_DESC_OFFSET	0x1E64
-+#define P1_COL_QUEUE_DESC_OFFSET	0x1E6C
-+#define P2_COL_QUEUE_DESC_OFFSET	0x1E74
-+/* Collision Status Register
-+ *    P0: bit 0 is pending flag, bit 1..2 indicates which queue,
-+ *    P1: bit 8 is pending flag, 9..10 is queue number
-+ *    P2: bit 16 is pending flag, 17..18 is queue number, remaining bits are 0.
-+ */
-+#define COLLISION_STATUS_ADDR		0x1E60
-+
-+#define INTERFACE_MAC_ADDR		0x1E58
-+#define P2_MAC_ADDR			0x1E50
-+#define P1_MAC_ADDR			0x1E48
-+
-+#define QUEUE_SIZE_ADDR			0x1E30
-+#define QUEUE_OFFSET_ADDR		0x1E18
-+#define QUEUE_DESCRIPTOR_OFFSET_ADDR	0x1E00
-+
-+#define COL_RX_CONTEXT_P2_OFFSET_ADDR	(COL_RX_CONTEXT_P1_OFFSET_ADDR + 12)
-+#define COL_RX_CONTEXT_P1_OFFSET_ADDR	(COL_RX_CONTEXT_P0_OFFSET_ADDR + 12)
-+#define COL_RX_CONTEXT_P0_OFFSET_ADDR	(P2_Q4_RX_CONTEXT_OFFSET + 8)
-+
-+/* Port 2 Rx Context */
-+#define P2_Q4_RX_CONTEXT_OFFSET		(P2_Q3_RX_CONTEXT_OFFSET + 8)
-+#define P2_Q3_RX_CONTEXT_OFFSET		(P2_Q2_RX_CONTEXT_OFFSET + 8)
-+#define P2_Q2_RX_CONTEXT_OFFSET		(P2_Q1_RX_CONTEXT_OFFSET + 8)
-+#define P2_Q1_RX_CONTEXT_OFFSET		RX_CONTEXT_P2_Q1_OFFSET_ADDR
-+#define RX_CONTEXT_P2_Q1_OFFSET_ADDR	(P1_Q4_RX_CONTEXT_OFFSET + 8)
-+
-+/* Port 1 Rx Context */
-+#define P1_Q4_RX_CONTEXT_OFFSET		(P1_Q3_RX_CONTEXT_OFFSET + 8)
-+#define P1_Q3_RX_CONTEXT_OFFSET		(P1_Q2_RX_CONTEXT_OFFSET + 8)
-+#define P1_Q2_RX_CONTEXT_OFFSET		(P1_Q1_RX_CONTEXT_OFFSET + 8)
-+#define P1_Q1_RX_CONTEXT_OFFSET		(RX_CONTEXT_P1_Q1_OFFSET_ADDR)
-+#define RX_CONTEXT_P1_Q1_OFFSET_ADDR	(P0_Q4_RX_CONTEXT_OFFSET + 8)
-+
-+/* Host Port Rx Context */
-+#define P0_Q4_RX_CONTEXT_OFFSET		(P0_Q3_RX_CONTEXT_OFFSET + 8)
-+#define P0_Q3_RX_CONTEXT_OFFSET		(P0_Q2_RX_CONTEXT_OFFSET + 8)
-+#define P0_Q2_RX_CONTEXT_OFFSET		(P0_Q1_RX_CONTEXT_OFFSET + 8)
-+#define P0_Q1_RX_CONTEXT_OFFSET		RX_CONTEXT_P0_Q1_OFFSET_ADDR
-+#define RX_CONTEXT_P0_Q1_OFFSET_ADDR	(COL_TX_CONTEXT_P2_Q1_OFFSET_ADDR + 8)
-+
-+/* Port 2 Tx Collision Context */
-+#define COL_TX_CONTEXT_P2_Q1_OFFSET_ADDR (COL_TX_CONTEXT_P1_Q1_OFFSET_ADDR + 8)
-+/* Port 1 Tx Collision Context */
-+#define COL_TX_CONTEXT_P1_Q1_OFFSET_ADDR (P2_Q4_TX_CONTEXT_OFFSET + 8)
-+
-+/* Port 2 */
-+#define P2_Q4_TX_CONTEXT_OFFSET		(P2_Q3_TX_CONTEXT_OFFSET + 8)
-+#define P2_Q3_TX_CONTEXT_OFFSET		(P2_Q2_TX_CONTEXT_OFFSET + 8)
-+#define P2_Q2_TX_CONTEXT_OFFSET		(P2_Q1_TX_CONTEXT_OFFSET + 8)
-+#define P2_Q1_TX_CONTEXT_OFFSET		TX_CONTEXT_P2_Q1_OFFSET_ADDR
-+#define TX_CONTEXT_P2_Q1_OFFSET_ADDR	(P1_Q4_TX_CONTEXT_OFFSET + 8)
-+
-+/* Port 1 */
-+#define P1_Q4_TX_CONTEXT_OFFSET		(P1_Q3_TX_CONTEXT_OFFSET + 8)
-+#define P1_Q3_TX_CONTEXT_OFFSET		(P1_Q2_TX_CONTEXT_OFFSET + 8)
-+#define P1_Q2_TX_CONTEXT_OFFSET		(P1_Q1_TX_CONTEXT_OFFSET + 8)
-+#define P1_Q1_TX_CONTEXT_OFFSET		TX_CONTEXT_P1_Q1_OFFSET_ADDR
-+#define TX_CONTEXT_P1_Q1_OFFSET_ADDR	SWITCH_SPECIFIC_DRAM1_START_OFFSET
-+
- /* DRAM Offsets for EMAC
-  * Present on Both DRAM0 and DRAM1
-  */
--- 
-2.43.0
+-           q_vector =3D adapter->q_vector[queue_id];
++          /* Retrieve the q_vector saved in the ring */
++          q_vector =3D ring->q_vector;
+           if (!napi_if_scheduled_mark_missed(&q_vector->napi))
+                       igc_trigger_rxtxq_interrupt(adapter, q_vector);
+            return 0;
+}
++
+static ktime_t igc_get_tstamp(struct net_device *dev,
+                                         const struct skb_shared_hwtstamps =
+*hwtstamps,
+                                         bool cycles)
+--
+2.34.1
 
+--_000_AS1PR10MB5392B7268416DB8A1624FDB88FA7AAS1PR10MB5392EURP_
+Content-Type: text/html; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+<html xmlns:o=3D"urn:schemas-microsoft-com:office:office" xmlns:w=3D"urn:sc=
+hemas-microsoft-com:office:word" xmlns:m=3D"http://schemas.microsoft.com/of=
+fice/2004/12/omml" xmlns=3D"http://www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dus-ascii"=
+>
+<meta name=3D"Generator" content=3D"Microsoft Word 15 (filtered medium)">
+<style><!--
+/* Font Definitions */
+@font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:Aptos;}
+/* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0cm;
+	font-size:12.0pt;
+	font-family:"Aptos",sans-serif;
+	mso-ligatures:standardcontextual;}
+.MsoChpDefault
+	{mso-style-type:export-only;}
+@page WordSection1
+	{size:612.0pt 792.0pt;
+	margin:72.0pt 72.0pt 72.0pt 72.0pt;}
+div.WordSection1
+	{page:WordSection1;}
+--></style>
+</head>
+<body lang=3D"EN-US" link=3D"#467886" vlink=3D"#96607D" style=3D"word-wrap:=
+break-word">
+<div class=3D"WordSection1">
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">From 4e3ebdc0af6baa83ccfc17c61c1eb61408095ffd Mon Sep=
+ 17 00:00:00 2001<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">From: Vivek Behera &lt;vivek.behera@siemens.com&gt;<o=
+:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">Date: Fri, 5 Dec 2025 10:26:05 +0100<o:p></o:p></span=
+></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">Subject: [PATCH] igc: Fix trigger of incorrect irq in=
+ igc_xsk_wakeup function<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">When the i226 is configured to use only 2 combined qu=
+eues using ethtool<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">or in an environment with only 2 active CPU cores the=
+ 4 irq lines<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">are used in a split configuration with one irq<o:p></=
+o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">assigned to each of the two rx and tx queues<o:p></o:=
+p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">(see console output below)<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">sudo ethtool -l enp1s0<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">Channel parameters for enp1s0:<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">Pre-set maximums:<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">RX:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp; n/a<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">TX:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp; n/a<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">Other:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1<o:p></o:p></span>=
+</p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">Combined:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4=
+<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">Current hardware settings:<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">RX:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp; n/a<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">TX:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp; n/a<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">Other:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 1<o:p></o:p></span>=
+</p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">Combined:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2=
+<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">eddx@mvs:~$ cat /proc/interrupts | grep enp1s0<o:p></=
+o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">147:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp; IR-PC=
+I-MSIX-0000:01:00.0&nbsp;&nbsp; 0-edge&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; enp1s0=
+<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">148:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp; 8&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp; IR-PC=
+I-MSIX-0000:01:00.0&nbsp;&nbsp; 1-edge&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; enp1s0=
+-rx-0<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">149:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp; 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp; IR-PC=
+I-MSIX-0000:01:00.0&nbsp;&nbsp; 2-edge&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; enp1s0=
+-rx-1<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">150:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+26&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp; IR-PCI-MSI=
+X-0000:01:00.0&nbsp;&nbsp; 3-edge&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; enp1s0-tx-0=
+<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">151:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp; 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp; IR-PC=
+I-MSIX-0000:01:00.0&nbsp;&nbsp; 4-edge&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; enp1s0=
+-tx-1<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">While testing with the RTC Testbench it was noticed<o=
+:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">using the bpftrace that the<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">igc_xsk_wakeup when triggered by xsk_sendmsg<o:p></o:=
+p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">was triggering the incorrect irq for<o:p></o:p></span=
+></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">tx-0(see trace below)<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">TIMESTAMP: 456992309829 | FUNCTION: igc_xsk_wakeup | =
+ENTRY: RtcTxThread (PID: 945) - queue_id: 0<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">TIMESTAMP: 456992317157 | FUNCTION: igc_poll | ENTRY:=
+ irq/148-enp1s0- (PID: 948)<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">TIMESTAMP: 456993309408 | FUNCTION: igc_xsk_wakeup | =
+ENTRY: RtcTxThread (PID: 945) - queue_id: 0<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">TIMESTAMP: 456993316591 | FUNCTION: igc_poll | ENTRY:=
+ irq/148-enp1s0- (PID: 948)<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">TIMESTAMP: 456994309630 | FUNCTION: igc_xsk_wakeup | =
+ENTRY: RtcTxThread (PID: 945) - queue_id: 0<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">TIMESTAMP: 456994316674 | FUNCTION: igc_poll | ENTRY:=
+ irq/148-enp1s0- (PID: 948)<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">TIMESTAMP: 456995309493 | FUNCTION: igc_xsk_wakeup | =
+ENTRY: RtcTxThread (PID: 945) - queue_id: 0<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">TIMESTAMP: 456995316593 | FUNCTION: igc_poll | ENTRY:=
+ irq/148-enp1s0- (PID: 948)<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">Due to this bug no XDP Zc send is possible in this sp=
+lit irq configuration.<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">This patch implements the correct logic of extracting=
+ the q_vectors saved<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">duirng the rx and tx ring allocation.<o:p></o:p></spa=
+n></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">Furthermore the patch includes usage of flags provide=
+d by the ndo_xsk_wakeup<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">api to trigger the required irq. With this patch corr=
+ect irqs are triggered<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">cat /proc/interrupts | grep enp1s0<o:p></o:p></span><=
+/p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">161:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp; 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp; 0 IR-PCI-MSIX-0000:01:00.0&nbsp;&nbsp;&nbsp; 0-edge=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; enp1s0<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">162:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp; 2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp; 0 IR-PCI-MSIX-0000:01:00.0&nbsp;&nbsp;&nbsp; 1-edge=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; enp1s0-rx-0<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">163:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 359&nb=
+sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp; 0 IR-PCI-MSIX-0000:01:00.0&nbsp;&nbsp;&nbsp; 2-edge&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp; enp1s0-rx-1<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">164:&nbsp;&nbsp;&nbsp;&nbsp; 872005&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0=
+ IR-PCI-MSIX-0000:01:00.0&nbsp;&nbsp;&nbsp; 3-edge&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp; enp1s0-tx-0<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">165:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+71&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp; 0 IR-PCI-MSIX-0000:01:00.0&nbsp;&nbsp;&nbsp; 4-edge&nbsp=
+;&nbsp;&nbsp;&nbsp;&nbsp; enp1s0-tx-1<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">TIMESTAMP: 149658589239205 | FUNCTION: igc_xsk_wakeup=
+ | ENTRY: RtcTxThread (PID: 10633) - queue_id: 0<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">TIMESTAMP: 149658589244662 | FUNCTION: igc_poll | ENT=
+RY: irq/164-enp1s0- (PID: 10593)<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">TIMESTAMP: 149658589293396 | FUNCTION: igc_poll | ENT=
+RY: irq/164-enp1s0- (PID: 10593)<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">TIMESTAMP: 149658589295357 | FUNCTION: xsk_tx_complet=
+ed | ENTRY: irq/164-enp1s0- (PID: 10593) - num_entries: 61<o:p></o:p></span=
+></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">TIMESTAMP: 149658589342151 | FUNCTION: igc_poll | ENT=
+RY: irq/164-enp1s0- (PID: 10593)<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">TIMESTAMP: 149658589343881 | FUNCTION: xsk_tx_complet=
+ed | ENTRY: irq/164-enp1s0- (PID: 10593) - num_entries: 3<o:p></o:p></span>=
+</p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">TIMESTAMP: 149658589391394 | FUNCTION: igc_poll | ENT=
+RY: irq/164-enp1s0- (PID: 10593)<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">TIMESTAMP: 149658590239215 | FUNCTION: igc_xsk_wakeup=
+ | ENTRY: RtcTxThread (PID: 10633) - queue_id: 0<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">Signed-off-by: Vivek Behera &lt;vivek.behera@siemens.=
+com&gt;<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">---<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">drivers/net/ethernet/intel/igc/igc_main.c | 31 ++++++=
++++++++++++++----<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">1 file changed, 26 insertions(+), 5 deletions(-)<o:p>=
+</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">diff --git a/drivers/net/ethernet/intel/igc/igc_main.=
+c b/drivers/net/ethernet/intel/igc/igc_main.c<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">index 7aafa60ba0c8..0cfcd20a2536 100644<o:p></o:p></s=
+pan></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">--- a/drivers/net/ethernet/intel/igc/igc_main.c<o:p><=
+/o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">+++ b/drivers/net/ethernet/intel/igc/igc_main.c<o:p><=
+/o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">@@ -6930,21 +6930,42 @@ int igc_xsk_wakeup(struct net=
+_device *dev, u32 queue_id, u32 flags)<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp; if (!igc_xdp_is_enabled(adapter))<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp; return -ENXIO;<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif"><o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp; if (queue_id &gt;=3D adapter-&gt;num_rx_queues)<o:p></o:p></span><=
+/p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p; if ((flags &amp; XDP_WAKEUP_RX) &amp;&amp; (flags &amp; XDP_WAKEUP_TX)) =
+{<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+/* If both TX and RX need to be woken up queue pair per IRQ is needed */<o:=
+p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+if (!(adapter-&gt;flags &amp; IGC_FLAG_QUEUE_PAIRS))<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret=
+urn -EINVAL; /* igc queue pairs are not activated.<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; * Can't t=
+rigger irq<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */<o:p></=
+o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+/* Just get the ring params from Rx */<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+if (queue_id &gt;=3D adapter-&gt;num_rx_queues)<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret=
+urn -EINVAL;<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+ring =3D adapter-&gt;rx_ring[queue_id];<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p; } else if (flags &amp; XDP_WAKEUP_TX) {<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+if (queue_id &gt;=3D adapter-&gt;num_tx_queues)<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret=
+urn -EINVAL;<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+/* Get the ring params from Tx */<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+ring =3D adapter-&gt;tx_ring[queue_id];<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p; } else if (flags &amp; XDP_WAKEUP_RX) {<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+if (queue_id &gt;=3D adapter-&gt;num_rx_queues)<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ret=
+urn -EINVAL;<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+/* Get the ring params from Rx */<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+ring =3D adapter-&gt;rx_ring[queue_id];<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p; } else {<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; =
+/* Invalid Flags */<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp; return -EINVAL;<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">-<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp; ring =3D adapter-&gt;rx_ring[queue_id];<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p; }<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif"><o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp; if (!ring-&gt;xsk_pool)<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp; return -ENXIO;<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">-<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp; q_vector =3D adapter-&gt;q_vector[queue_id];<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p; /* Retrieve the q_vector saved in the ring */<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p; q_vector =3D ring-&gt;q_vector;<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp; if (!napi_if_scheduled_mark_missed(&amp;q_vector-&gt;napi))<o:p></o=
+:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp; igc_trigger_rxtxq_interrupt(adapter, q_vector);<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif"><o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp; return 0;<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">}<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif"><o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">+<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">static ktime_t igc_get_tstamp(struct net_device *dev,=
+<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;const struct skb_shared_hwtstamps *hw=
+tstamps,<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bool cycles)<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">--
+<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span style=3D"font-size:10.0pt;font-family:&quot;Ar=
+ial&quot;,sans-serif">2.34.1<o:p></o:p></span></p>
+</div>
+</body>
+</html>
+
+--_000_AS1PR10MB5392B7268416DB8A1624FDB88FA7AAS1PR10MB5392EURP_--
+
+--_004_AS1PR10MB5392B7268416DB8A1624FDB88FA7AAS1PR10MB5392EURP_
+Content-Type: application/octet-stream;
+	name="0001-igc-Fix-trigger-of-incorrect-irq-in-igc_xsk_wakeup-f.patch"
+Content-Description:
+ 0001-igc-Fix-trigger-of-incorrect-irq-in-igc_xsk_wakeup-f.patch
+Content-Disposition: attachment;
+	filename="0001-igc-Fix-trigger-of-incorrect-irq-in-igc_xsk_wakeup-f.patch";
+	size=5711; creation-date="Fri, 05 Dec 2025 11:44:00 GMT";
+	modification-date="Fri, 05 Dec 2025 12:39:58 GMT"
+Content-Transfer-Encoding: base64
+
+RnJvbSA0ZTNlYmRjMGFmNmJhYTgzY2NmYzE3YzYxYzFlYjYxNDA4MDk1ZmZkIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBWaXZlayBCZWhlcmEgPHZpdmVrLmJlaGVyYUBzaWVtZW5zLmNv
+bT4KRGF0ZTogRnJpLCA1IERlYyAyMDI1IDEwOjI2OjA1ICswMTAwClN1YmplY3Q6IFtQQVRDSF0g
+aWdjOiBGaXggdHJpZ2dlciBvZiBpbmNvcnJlY3QgaXJxIGluIGlnY194c2tfd2FrZXVwIGZ1bmN0
+aW9uCgpXaGVuIHRoZSBpMjI2IGlzIGNvbmZpZ3VyZWQgdG8gdXNlIG9ubHkgMiBjb21pbmVkIHF1
+ZXVlcyB1c2luZyBldGh0b29sCm9yIGluIGFuIGVudmlyb25tZW50IHdpdGggb25seSAyIGFjdGl2
+ZSBDUFUgY29yZXMgdGhlIDQgaXJxIGxpbmVzCmFyZSB1c2VkIGluIGEgc3BsaXQgY29uZmlndXJh
+dGlvbiB3aXRoIG9uZSBpcnEKYXNzaWduZWQgdG8gZWFjaCBvZiB0aGUgdHdvIHJ4IGFuZCB0eCBx
+dWV1ZXMKKHNlZSBjb25zb2xlIG91dHB1dCBiZWxvdykKCnN1ZG8gZXRodG9vbCAtbCBlbnAxczAK
+Q2hhbm5lbCBwYXJhbWV0ZXJzIGZvciBlbnAxczA6ClByZS1zZXQgbWF4aW11bXM6ClJYOiAgICAg
+ICAgICAgICAgICAgICAgICAgIG4vYQpUWDogICAgICAgICAgICAgICAgICAgICAgICAgbi9hCk90
+aGVyOiAgICAgICAgICAgICAgICAgIDEKQ29tYmluZWQ6ICAgICAgICA0CkN1cnJlbnQgaGFyZHdh
+cmUgc2V0dGluZ3M6ClJYOiAgICAgICAgICAgICAgICAgICAgICAgIG4vYQpUWDogICAgICAgICAg
+ICAgICAgICAgICAgICAgbi9hCk90aGVyOiAgICAgICAgICAgICAgICAgIDEKQ29tYmluZWQ6ICAg
+ICAgICAyCmVkZHhAbXZzOn4kIGNhdCAvcHJvYy9pbnRlcnJ1cHRzIHwgZ3JlcCBlbnAxczAKMTQ3
+OiAgICAgICAgICAxICAgICAgICAgIDAgIElSLVBDSS1NU0lYLTAwMDA6MDE6MDAuMCAgIDAtZWRn
+ZSAgICAgIGVucDFzMAoxNDg6ICAgICAgICAgIDggICAgICAgICAgMCAgSVItUENJLU1TSVgtMDAw
+MDowMTowMC4wICAgMS1lZGdlICAgICAgZW5wMXMwLXJ4LTAKMTQ5OiAgICAgICAgICAwICAgICAg
+ICAgIDAgIElSLVBDSS1NU0lYLTAwMDA6MDE6MDAuMCAgIDItZWRnZSAgICAgIGVucDFzMC1yeC0x
+CjE1MDogICAgICAgICAyNiAgICAgICAgICAwICBJUi1QQ0ktTVNJWC0wMDAwOjAxOjAwLjAgICAz
+LWVkZ2UgICAgICBlbnAxczAtdHgtMAoxNTE6ICAgICAgICAgIDAgICAgICAgICAgMCAgSVItUENJ
+LU1TSVgtMDAwMDowMTowMC4wICAgNC1lZGdlICAgICAgZW5wMXMwLXR4LTEKCldoaWxlIHRlc3Rp
+bmcgd2l0aCB0aGUgUlRDIFRlc3RiZW5jaCBpdCB3YXMgbm90aWNlZAp1c2luZyB0aGUgYnBmdHJh
+Y2UgdGhhdCB0aGUKaWdjX3hza193YWtldXAgd2hlbiB0cmlnZ2VyZWQgYnkgeHNrX3NlbmRtc2cK
+d2FzIHRyaWdnZXJpbmcgdGhlIGluY29ycmVjdCBpcnEgZm9yCnR4LTAoc2VlIHRyYWNlIGJlbG93
+KQoKVElNRVNUQU1QOiA0NTY5OTIzMDk4MjkgfCBGVU5DVElPTjogaWdjX3hza193YWtldXAgfCBF
+TlRSWTogUnRjVHhUaHJlYWQgKFBJRDogOTQ1KSAtIHF1ZXVlX2lkOiAwClRJTUVTVEFNUDogNDU2
+OTkyMzE3MTU3IHwgRlVOQ1RJT046IGlnY19wb2xsIHwgRU5UUlk6IGlycS8xNDgtZW5wMXMwLSAo
+UElEOiA5NDgpClRJTUVTVEFNUDogNDU2OTkzMzA5NDA4IHwgRlVOQ1RJT046IGlnY194c2tfd2Fr
+ZXVwIHwgRU5UUlk6IFJ0Y1R4VGhyZWFkIChQSUQ6IDk0NSkgLSBxdWV1ZV9pZDogMApUSU1FU1RB
+TVA6IDQ1Njk5MzMxNjU5MSB8IEZVTkNUSU9OOiBpZ2NfcG9sbCB8IEVOVFJZOiBpcnEvMTQ4LWVu
+cDFzMC0gKFBJRDogOTQ4KQpUSU1FU1RBTVA6IDQ1Njk5NDMwOTYzMCB8IEZVTkNUSU9OOiBpZ2Nf
+eHNrX3dha2V1cCB8IEVOVFJZOiBSdGNUeFRocmVhZCAoUElEOiA5NDUpIC0gcXVldWVfaWQ6IDAK
+VElNRVNUQU1QOiA0NTY5OTQzMTY2NzQgfCBGVU5DVElPTjogaWdjX3BvbGwgfCBFTlRSWTogaXJx
+LzE0OC1lbnAxczAtIChQSUQ6IDk0OCkKVElNRVNUQU1QOiA0NTY5OTUzMDk0OTMgfCBGVU5DVElP
+TjogaWdjX3hza193YWtldXAgfCBFTlRSWTogUnRjVHhUaHJlYWQgKFBJRDogOTQ1KSAtIHF1ZXVl
+X2lkOiAwClRJTUVTVEFNUDogNDU2OTk1MzE2NTkzIHwgRlVOQ1RJT046IGlnY19wb2xsIHwgRU5U
+Ulk6IGlycS8xNDgtZW5wMXMwLSAoUElEOiA5NDgpCgpEdWUgdG8gdGhpcyBidWcgbm8gWERQIFpj
+IHNlbmQgaXMgcG9zc2libGUgaW4gdGhpcyBzcGxpdCBpcnEgY29uZmlndXJhdGlvbi4KVGhpcyBw
+YXRjaCBpbXBsZW1lbnRzIHRoZSBjb3JyZWN0IGxvZ2ljIG9mIGV4dHJhY3RpbmcgdGhlIHFfdmVj
+dG9ycyBzYXZlZApkdWlybmcgdGhlIHJ4IGFuZCB0eCByaW5nIGFsbG9jYXRpb24uCkZ1cnRoZXJt
+b3JlIHRoZSBwYXRjaCBpbmNsdWRlcyB1c2FnZSBvZiBmbGFncyBwcm92aWRlZCBieSB0aGUgbmRv
+X3hza193YWtldXAKYXBpIHRvIHRyaWdnZXIgdGhlIHJlcXVpcmVkIGlycS4gV2l0aCB0aGlzIHBh
+dGNoIGNvcnJlY3QgaXJxcyBhcmUgdHJpZ2dlcmVkCgpjYXQgL3Byb2MvaW50ZXJydXB0cyB8IGdy
+ZXAgZW5wMXMwCiAxNjE6ICAgICAgICAgIDEgICAgICAgICAgMCAgICAgICAgICAwICAgICAgICAg
+IDAgSVItUENJLU1TSVgtMDAwMDowMTowMC4wICAgIDAtZWRnZSAgICAgIGVucDFzMAogMTYyOiAg
+ICAgICAgICAyICAgICAgICAgIDAgICAgICAgICAgMCAgICAgICAgICAwIElSLVBDSS1NU0lYLTAw
+MDA6MDE6MDAuMCAgICAxLWVkZ2UgICAgICBlbnAxczAtcngtMAogMTYzOiAgICAgICAgMzU5ICAg
+ICAgICAgIDAgICAgICAgICAgMCAgICAgICAgICAwIElSLVBDSS1NU0lYLTAwMDA6MDE6MDAuMCAg
+ICAyLWVkZ2UgICAgICBlbnAxczAtcngtMQogMTY0OiAgICAgODcyMDA1ICAgICAgICAgIDAgICAg
+ICAgICAgMCAgICAgICAgICAwIElSLVBDSS1NU0lYLTAwMDA6MDE6MDAuMCAgICAzLWVkZ2UgICAg
+ICBlbnAxczAtdHgtMAogMTY1OiAgICAgICAgIDcxICAgICAgICAgIDAgICAgICAgICAgMCAgICAg
+ICAgICAwIElSLVBDSS1NU0lYLTAwMDA6MDE6MDAuMCAgICA0LWVkZ2UgICAgICBlbnAxczAtdHgt
+MQoKVElNRVNUQU1QOiAxNDk2NTg1ODkyMzkyMDUgfCBGVU5DVElPTjogaWdjX3hza193YWtldXAg
+fCBFTlRSWTogUnRjVHhUaHJlYWQgKFBJRDogMTA2MzMpIC0gcXVldWVfaWQ6IDAKVElNRVNUQU1Q
+OiAxNDk2NTg1ODkyNDQ2NjIgfCBGVU5DVElPTjogaWdjX3BvbGwgfCBFTlRSWTogaXJxLzE2NC1l
+bnAxczAtIChQSUQ6IDEwNTkzKQpUSU1FU1RBTVA6IDE0OTY1ODU4OTI5MzM5NiB8IEZVTkNUSU9O
+OiBpZ2NfcG9sbCB8IEVOVFJZOiBpcnEvMTY0LWVucDFzMC0gKFBJRDogMTA1OTMpClRJTUVTVEFN
+UDogMTQ5NjU4NTg5Mjk1MzU3IHwgRlVOQ1RJT046IHhza190eF9jb21wbGV0ZWQgfCBFTlRSWTog
+aXJxLzE2NC1lbnAxczAtIChQSUQ6IDEwNTkzKSAtIG51bV9lbnRyaWVzOiA2MQpUSU1FU1RBTVA6
+IDE0OTY1ODU4OTM0MjE1MSB8IEZVTkNUSU9OOiBpZ2NfcG9sbCB8IEVOVFJZOiBpcnEvMTY0LWVu
+cDFzMC0gKFBJRDogMTA1OTMpClRJTUVTVEFNUDogMTQ5NjU4NTg5MzQzODgxIHwgRlVOQ1RJT046
+IHhza190eF9jb21wbGV0ZWQgfCBFTlRSWTogaXJxLzE2NC1lbnAxczAtIChQSUQ6IDEwNTkzKSAt
+IG51bV9lbnRyaWVzOiAzClRJTUVTVEFNUDogMTQ5NjU4NTg5MzkxMzk0IHwgRlVOQ1RJT046IGln
+Y19wb2xsIHwgRU5UUlk6IGlycS8xNjQtZW5wMXMwLSAoUElEOiAxMDU5MykKVElNRVNUQU1QOiAx
+NDk2NTg1OTAyMzkyMTUgfCBGVU5DVElPTjogaWdjX3hza193YWtldXAgfCBFTlRSWTogUnRjVHhU
+aHJlYWQgKFBJRDogMTA2MzMpIC0gcXVldWVfaWQ6IDAKClNpZ25lZC1vZmYtYnk6IFZpdmVrIEJl
+aGVyYSA8dml2ZWsuYmVoZXJhQHNpZW1lbnMuY29tPgotLS0KIGRyaXZlcnMvbmV0L2V0aGVybmV0
+L2ludGVsL2lnYy9pZ2NfbWFpbi5jIHwgMzEgKysrKysrKysrKysrKysrKysrKy0tLS0KIDEgZmls
+ZSBjaGFuZ2VkLCAyNiBpbnNlcnRpb25zKCspLCA1IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBh
+L2RyaXZlcnMvbmV0L2V0aGVybmV0L2ludGVsL2lnYy9pZ2NfbWFpbi5jIGIvZHJpdmVycy9uZXQv
+ZXRoZXJuZXQvaW50ZWwvaWdjL2lnY19tYWluLmMKaW5kZXggN2FhZmE2MGJhMGM4Li4wY2ZjZDIw
+YTI1MzYgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvbmV0L2V0aGVybmV0L2ludGVsL2lnYy9pZ2NfbWFp
+bi5jCisrKyBiL2RyaXZlcnMvbmV0L2V0aGVybmV0L2ludGVsL2lnYy9pZ2NfbWFpbi5jCkBAIC02
+OTMwLDIxICs2OTMwLDQyIEBAIGludCBpZ2NfeHNrX3dha2V1cChzdHJ1Y3QgbmV0X2RldmljZSAq
+ZGV2LCB1MzIgcXVldWVfaWQsIHUzMiBmbGFncykKIAlpZiAoIWlnY194ZHBfaXNfZW5hYmxlZChh
+ZGFwdGVyKSkKIAkJcmV0dXJuIC1FTlhJTzsKIAotCWlmIChxdWV1ZV9pZCA+PSBhZGFwdGVyLT5u
+dW1fcnhfcXVldWVzKQorCWlmICgoZmxhZ3MgJiBYRFBfV0FLRVVQX1JYKSAmJiAoZmxhZ3MgJiBY
+RFBfV0FLRVVQX1RYKSkgeworCQkvKiBJZiBib3RoIFRYIGFuZCBSWCBuZWVkIHRvIGJlIHdva2Vu
+IHVwIHF1ZXVlIHBhaXIgcGVyIElSUSBpcyBuZWVkZWQgKi8KKwkJaWYgKCEoYWRhcHRlci0+Zmxh
+Z3MgJiBJR0NfRkxBR19RVUVVRV9QQUlSUykpCisJCQlyZXR1cm4gLUVJTlZBTDsgLyogaWdjIHF1
+ZXVlIHBhaXJzIGFyZSBub3QgYWN0aXZhdGVkLgorCQkJCQkgKiBDYW4ndCB0cmlnZ2VyIGlycQor
+CQkJCQkgKi8KKwkJLyogSnVzdCBnZXQgdGhlIHJpbmcgcGFyYW1zIGZyb20gUnggKi8KKwkJaWYg
+KHF1ZXVlX2lkID49IGFkYXB0ZXItPm51bV9yeF9xdWV1ZXMpCisJCQlyZXR1cm4gLUVJTlZBTDsK
+KwkJcmluZyA9IGFkYXB0ZXItPnJ4X3JpbmdbcXVldWVfaWRdOworCX0gZWxzZSBpZiAoZmxhZ3Mg
+JiBYRFBfV0FLRVVQX1RYKSB7CisJCWlmIChxdWV1ZV9pZCA+PSBhZGFwdGVyLT5udW1fdHhfcXVl
+dWVzKQorCQkJcmV0dXJuIC1FSU5WQUw7CisJCS8qIEdldCB0aGUgcmluZyBwYXJhbXMgZnJvbSBU
+eCAqLworCQlyaW5nID0gYWRhcHRlci0+dHhfcmluZ1txdWV1ZV9pZF07CisJfSBlbHNlIGlmIChm
+bGFncyAmIFhEUF9XQUtFVVBfUlgpIHsKKwkJaWYgKHF1ZXVlX2lkID49IGFkYXB0ZXItPm51bV9y
+eF9xdWV1ZXMpCisJCQlyZXR1cm4gLUVJTlZBTDsKKwkJLyogR2V0IHRoZSByaW5nIHBhcmFtcyBm
+cm9tIFJ4ICovCisJCXJpbmcgPSBhZGFwdGVyLT5yeF9yaW5nW3F1ZXVlX2lkXTsKKwl9IGVsc2Ug
+eworCQkvKiBJbnZhbGlkIEZsYWdzICovCiAJCXJldHVybiAtRUlOVkFMOwotCi0JcmluZyA9IGFk
+YXB0ZXItPnJ4X3JpbmdbcXVldWVfaWRdOworCX0KIAogCWlmICghcmluZy0+eHNrX3Bvb2wpCiAJ
+CXJldHVybiAtRU5YSU87Ci0KLQlxX3ZlY3RvciA9IGFkYXB0ZXItPnFfdmVjdG9yW3F1ZXVlX2lk
+XTsKKwkvKiBSZXRyaWV2ZSB0aGUgcV92ZWN0b3Igc2F2ZWQgaW4gdGhlIHJpbmcgKi8KKwlxX3Zl
+Y3RvciA9IHJpbmctPnFfdmVjdG9yOwogCWlmICghbmFwaV9pZl9zY2hlZHVsZWRfbWFya19taXNz
+ZWQoJnFfdmVjdG9yLT5uYXBpKSkKIAkJaWdjX3RyaWdnZXJfcnh0eHFfaW50ZXJydXB0KGFkYXB0
+ZXIsIHFfdmVjdG9yKTsKIAogCXJldHVybiAwOwogfQogCisKIHN0YXRpYyBrdGltZV90IGlnY19n
+ZXRfdHN0YW1wKHN0cnVjdCBuZXRfZGV2aWNlICpkZXYsCiAJCQkgICAgICBjb25zdCBzdHJ1Y3Qg
+c2tiX3NoYXJlZF9od3RzdGFtcHMgKmh3dHN0YW1wcywKIAkJCSAgICAgIGJvb2wgY3ljbGVzKQot
+LSAKMi4zNC4xCgo=
+
+--_004_AS1PR10MB5392B7268416DB8A1624FDB88FA7AAS1PR10MB5392EURP_--
 
