@@ -1,181 +1,138 @@
-Return-Path: <netdev+bounces-243871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08CA4CA8F65
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 20:01:39 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C559CCA9114
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 20:29:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9BC11305F658
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 18:57:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5638D31CA88D
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 19:21:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECF8738E5F5;
-	Fri,  5 Dec 2025 18:55:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B01134D91C;
+	Fri,  5 Dec 2025 19:05:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KACfQyHf"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="dUfStDec"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2AD838E5E7;
-	Fri,  5 Dec 2025 18:55:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D1E52D73B2
+	for <netdev@vger.kernel.org>; Fri,  5 Dec 2025 19:05:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764960942; cv=none; b=olNCERjfKGMAE6vljM3Jg92zPY28mUzH+wtazI0yjQKaSklBpP/3pBlHttheSwxXy8aFVdHAf5NHipA9YHDxScWLbxv9p3cOs2DKA2QIEvEuFmiUNXKg342AoqWN45DLBgIFOgk0q71zlA9k0gornwKFymWCgMzEV5C94P2vS10=
+	t=1764961514; cv=none; b=nrGTLe61Xm4TyV80CIWHFAbFZAshYaSOcOTZb8MdUfzcUk81o6AQ8Q8lsl9U/JjAlSRqFAxus9BL27UqwzWOSTLUCI0TijG29AFyEJ+XTetF7iCcDlaC4gsksbB7T5kvdNKy/ytG3MRafBwa5b2BpO+7fRkbPZADkMzoiln8Rxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764960942; c=relaxed/simple;
-	bh=gi2Av8q3in3QzwEL8x3SFmn1RHNiRmW/7BBWqhhGYtk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=HyHHwjBDFvlKheQOgs9S/6UCAR2eRPiuZIbrff36dxLLuhbOo6VxBAQ5oRCW89JaHXJGTelWGRMTfd/CfOoWfu2I2wba5LRQExCbaFV0jDh/2H/sAXGaHR/YRsX1W4g8ss9v6Ph/UGfJZCXsMIB5c6qdmTbDxPVr9uzHEF1MALM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KACfQyHf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C91EC116B1;
-	Fri,  5 Dec 2025 18:55:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764960942;
-	bh=gi2Av8q3in3QzwEL8x3SFmn1RHNiRmW/7BBWqhhGYtk=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=KACfQyHf7ghJMFg28DBHWF9/CKcMdubF5ZTiZT8DlfL2ws14WclLtta2K5ML0Ssxx
-	 LWhTTtfnMEilow1w7b0OOFfxwVZ4TfidSPk9e+2clUbdKXgyLcyAGk8l+vkb+fxeFe
-	 zLW+B3ng10Ywg/A7z6cjPlOZy/eTDf8FGKtdlzy6y4HLrYyn1sPowltXzdSKV3XEiu
-	 U1kem8PIYihFIZvoxEuzEJ95/JSsFhpZhoBTI8neasB6hap6l/Pwm82wF2dU1BHxuk
-	 DW0B0EfZ++gnZPYNHQiyoKDUfFIfIm9xhhuG7e+1c5Ye04Hb9q/6PSR7DKPZdTIgAU
-	 qsfV5lf6HrMWg==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Fri, 05 Dec 2025 19:55:17 +0100
-Subject: [PATCH net 4/4] mptcp: avoid deadlock on fallback while
- reinjecting
+	s=arc-20240116; t=1764961514; c=relaxed/simple;
+	bh=CLD1baVuz0aPlkZ9/npCREzBxjQuD75wSRnWmSzVU1c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Nhdye6SaWGzs5/x05PwD49507g4GjeC0h8n4VFYXYOQVbT3HuVK9bT2yHfNp2jEXVbj+P15NUrMPXBVF2MR1jMl1kY6FnFnEFCR9q5MSQ2olkjcss4EXu077k7I2Pxk8sRfNDR2cQ0VdZvwZQLsK2mv5wFHcLXWd4pILqivGKLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=dUfStDec; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7d26a7e5639so2979551b3a.1
+        for <netdev@vger.kernel.org>; Fri, 05 Dec 2025 11:05:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1764961511; x=1765566311; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=kfKtWFj0h7AG19WLVu+MIuy9f6wSoSxNprszwsHw4lE=;
+        b=dUfStDecnEgGIPHwwfCnVUKz97CHnULBEl/QXhZf9Ek7td/WfnbPZFezrdoo36fSi9
+         5BXvqY9KstC0CAlw0jR6x8bNW/Q5C6+Z3m+xGTtth12jSxDLanjgVp+bSE4/jcG9A89k
+         SHYAulBWa1FcnptiD7IMWILrR+pzqazxx4AgYEkoTDZFGnOuVthZ7Azt/+fajlstr0wP
+         +CCZGa+jg3pVaDQ+E4RxSEEDK3xwJ/PWmkpiv01g6UYIhrYE4dh6siqeeMveC+UcuYJ/
+         EX/mg9xowI6bwwxiywMd1BgDRVGw1SEBuU3S3ppWAwNxY2+bV/zWgpotpIIV/q01j1Wf
+         VS0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764961511; x=1765566311;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kfKtWFj0h7AG19WLVu+MIuy9f6wSoSxNprszwsHw4lE=;
+        b=Y17daVLCK2iNg9SB10PObP1mlF1ESTfVKBCwsd90nfuarxpY+wa+l5NdI3OC4nvB5l
+         ciBQxAjCXpevk6b/CJH7oDD0zxBGvhbj+4AZX38O1Jn0W6KXUUwPhGWDMd84LrRTTNIl
+         OvGGjqDTNxlR1P5sQatqi3VnrHYQemJWj2fjtNkKnVYG7qO0CCS/ndAEp0HlJJmdqTxh
+         R4UjdM0SNxV3DoPKdgWnX3Q/NUgyopcXIy5FID3QMEm+z7tlHl3jRVnu/o2dZZYKgMxC
+         eiBBGUa/awcwAuHPyBtMjH6qVBA4kQh9t1pnjdOc57wYPA0nmUFS+Gaj+YtlAoqFN7au
+         8Xvw==
+X-Forwarded-Encrypted: i=1; AJvYcCXlUCq5YWkv91UKXyFlbueksYwnAUwIEmQ5+LqPln11+NI08kTQ2B35794MWtEnHScl9CPOEZs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyo8HsHieQXla6WgUbSLsvrOl4VStFQ97brkKXPLVoSjIvB82gz
+	IowYwzXrt2MOSmjFTogTLu+t661+eSw+Pqa4Fmkn2NUz4BVmMQiPjWzq+jbRfx4RCYQ=
+X-Gm-Gg: ASbGnctbDMPA5dltBfY8Q5UNsSJKTWSLwJ4Egml4DBQj8JqitMzVHt0g/7duCYTtYNj
+	5Wu1iY4qdMHBU0W1sDV3hFVeCgp4Ed1jrSAWOfbqfT4d3knMKchFti35IAyfSwJYx4e2fZ8h+IM
+	Czp5NydF3AEAiojmB8KYFWPxmhhQdNvigq7bIJMCQs80+5WLbXGD1ZbMdYjIzV62inpkE3mD6wM
+	ugBY5mjW4f+I7Al4ffFaAE+EovKSeM8RRCpxH0kpB8ULSCXAEpa7V3Uyx1gGICBJQa8p3IxOdn3
+	euPIpRm42LeOHAnytBEqt6aMWMsMnlf8yItQodZaBwRXDaOU++r7/AhguAKADkM5Pg+6P1TeVSy
+	FGKrhuqrlQGw4kefj4CgINDmQIH8+gTv0eZAykMeEH+VsyeGZ1ucxQyzW8NNVY/dzvOLpUay+Of
+	MT2hDgjH0OXZshrjyvychoE/73
+X-Google-Smtp-Source: AGHT+IFfFzVs0sM1jEuOstiWTaR8h34ot20r+QUvf9mPWY8T0+Eh61GtJBFRPqo38eLmH0QVT7Pdig==
+X-Received: by 2002:a05:6a00:181f:b0:7a2:710d:43e7 with SMTP id d2e1a72fcca58-7e8c1a39444mr196640b3a.24.1764961511062;
+        Fri, 05 Dec 2025 11:05:11 -0800 (PST)
+Received: from [100.96.46.103] ([104.28.205.247])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7e2afa31e9fsm5970056b3a.68.2025.12.05.11.05.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Dec 2025 11:05:10 -0800 (PST)
+Message-ID: <d6dcd835-7564-481a-a854-25b187893e6c@cloudflare.com>
+Date: Fri, 5 Dec 2025 11:05:08 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net v1] ice: stop counting UDP csum
+ mismatch as rx_errors
+To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
+ Jesse Brandeburg <jbrandeb@kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Cc: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+ "Keller, Jacob E" <jacob.e.keller@intel.com>,
+ IWL <intel-wired-lan@lists.osuosl.org>,
+ "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <20251201233853.15579-1-jbrandeb@kernel.org>
+ <IA3PR11MB8986697A94FB36E893C7E87FE5A7A@IA3PR11MB8986.namprd11.prod.outlook.com>
+Content-Language: en-US
+From: Jesse Brandeburg <jbrandeburg@cloudflare.com>
+Autocrypt: addr=jbrandeburg@cloudflare.com; keydata=
+ xjMEZs5VGxYJKwYBBAHaRw8BAQdAUXN66Fq6fDRHlu6zZLTPwJ/h0HAPFdy8PYYCdZZ3wfjN
+ LUplc3NlIEJyYW5kZWJ1cmcgPGpicmFuZGVidXJnQGNsb3VkZmxhcmUuY29tPsKZBBMWCgBB
+ FiEEbDWZ8Owh8iVtmZ5hwWdFDvX9eL8FAmbOVRsCGwMFCQWjmoAFCwkIBwICIgIGFQoJCAsC
+ BBYCAwECHgcCF4AACgkQwWdFDvX9eL/S7QD7BVW5aabfPjCwaGfLU2si1OkRh2lOHeWx7cvG
+ fGUD3CUBAIYDDglURDpWnxWcN34nE2IHAnowjBpGnjG1ffX+h4UFzjgEZs5VGxIKKwYBBAGX
+ VQEFAQEHQBkrBJLpr10LX+sBL/etoqvy2ZsqJ1JO2yXv+q4nTKJWAwEIB8J+BBgWCgAmFiEE
+ bDWZ8Owh8iVtmZ5hwWdFDvX9eL8FAmbOVRsCGwwFCQWjmoAACgkQwWdFDvX9eL8blgEA4ZKn
+ npEoWmyR8uBK44T3f3D4sVs0Fmt3kFKp8m6qoocBANIyEYnUUfsJFtHh+5ItB/IUk67vuEXg
+ snWjdbYM6ZwN
+In-Reply-To: <IA3PR11MB8986697A94FB36E893C7E87FE5A7A@IA3PR11MB8986.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251205-net-mptcp-misc-fixes-6-19-rc1-v1-4-9e4781a6c1b8@kernel.org>
-References: <20251205-net-mptcp-misc-fixes-6-19-rc1-v1-0-9e4781a6c1b8@kernel.org>
-In-Reply-To: <20251205-net-mptcp-misc-fixes-6-19-rc1-v1-0-9e4781a6c1b8@kernel.org>
-To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, 
- Kuniyuki Iwashima <kuniyu@google.com>, Dmytro Shytyi <dmytro@shytyi.net>
-Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, stable@vger.kernel.org
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4072; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=zSolF7dynwE7ZM3RMnnQOzle4tFTXVJK06AkU0eCkGY=;
- b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDKNteb9dtvzUmOWzqLpv8/O+6QhtiTx/tKr++Vktvn/l
- zosL5F0uKOUhUGMi0FWTJFFui0yf+bzKt4SLz8LmDmsTCBDGLg4BWAijTKMDC8yb5z+paBepMj0
- 3/rAgoarU9dEuivsjZ+3uuf1n3dZexMY/mlxvHyav+L64cDUsAMLDmiV7sywOvb99fubjqvaz0y
- K1mcAAA==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-From: Paolo Abeni <pabeni@redhat.com>
+On 12/5/25 12:26 AM, Loktionov, Aleksandr wrote:
+>> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c
+>> b/drivers/net/ethernet/intel/ice/ice_main.c
+>> index 86f5859e88ef..d004acfa0f36 100644
+>> --- a/drivers/net/ethernet/intel/ice/ice_main.c
+>> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
+>> @@ -6995,7 +6995,6 @@ void ice_update_vsi_stats(struct ice_vsi *vsi)
+>>   		cur_ns->rx_errors = pf->stats.crc_errors +
+>>   				    pf->stats.illegal_bytes +
+>>   				    pf->stats.rx_undersize +
+>> -				    pf->hw_csum_rx_error +
+> 
+> Good day , Jesse
+> It looks like you remove the single place where the ' hw_csum_rx_error' var is being really used.
+> What about removing it's declaration and calculation then?
 
-Jakub reported an MPTCP deadlock at fallback time:
+Hi Aleks! That's not true, however, as the stat is incremented in 
+receive path and shown in ethtool -S. I think it is incredibly valuable 
+to have in the ethtool stats that the hardware is "not offloading" a 
+checksum. As well, all the other drivers in the high-speed Ethernet 
+category have a similar counter.
 
- WARNING: possible recursive locking detected
- 6.18.0-rc7-virtme #1 Not tainted
- --------------------------------------------
- mptcp_connect/20858 is trying to acquire lock:
- ff1100001da18b60 (&msk->fallback_lock){+.-.}-{3:3}, at: __mptcp_try_fallback+0xd8/0x280
-
- but task is already holding lock:
- ff1100001da18b60 (&msk->fallback_lock){+.-.}-{3:3}, at: __mptcp_retrans+0x352/0xaa0
-
- other info that might help us debug this:
-  Possible unsafe locking scenario:
-
-        CPU0
-        ----
-   lock(&msk->fallback_lock);
-   lock(&msk->fallback_lock);
-
-  *** DEADLOCK ***
-
-  May be due to missing lock nesting notation
-
- 3 locks held by mptcp_connect/20858:
-  #0: ff1100001da18290 (sk_lock-AF_INET){+.+.}-{0:0}, at: mptcp_sendmsg+0x114/0x1bc0
-  #1: ff1100001db40fd0 (k-sk_lock-AF_INET#2){+.+.}-{0:0}, at: __mptcp_retrans+0x2cb/0xaa0
-  #2: ff1100001da18b60 (&msk->fallback_lock){+.-.}-{3:3}, at: __mptcp_retrans+0x352/0xaa0
-
- stack backtrace:
- CPU: 0 UID: 0 PID: 20858 Comm: mptcp_connect Not tainted 6.18.0-rc7-virtme #1 PREEMPT(full)
- Hardware name: Bochs, BIOS Bochs 01/01/2011
- Call Trace:
-  <TASK>
-  dump_stack_lvl+0x6f/0xa0
-  print_deadlock_bug.cold+0xc0/0xcd
-  validate_chain+0x2ff/0x5f0
-  __lock_acquire+0x34c/0x740
-  lock_acquire.part.0+0xbc/0x260
-  _raw_spin_lock_bh+0x38/0x50
-  __mptcp_try_fallback+0xd8/0x280
-  mptcp_sendmsg_frag+0x16c2/0x3050
-  __mptcp_retrans+0x421/0xaa0
-  mptcp_release_cb+0x5aa/0xa70
-  release_sock+0xab/0x1d0
-  mptcp_sendmsg+0xd5b/0x1bc0
-  sock_write_iter+0x281/0x4d0
-  new_sync_write+0x3c5/0x6f0
-  vfs_write+0x65e/0xbb0
-  ksys_write+0x17e/0x200
-  do_syscall_64+0xbb/0xfd0
-  entry_SYSCALL_64_after_hwframe+0x4b/0x53
- RIP: 0033:0x7fa5627cbc5e
- Code: 4d 89 d8 e8 14 bd 00 00 4c 8b 5d f8 41 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 11 c9 c3 0f 1f 80 00 00 00 00 48 8b 45 10 0f 05 <c9> c3 83 e2 39 83 fa 08 75 e7 e8 13 ff ff ff 0f 1f 00 f3 0f 1e fa
- RSP: 002b:00007fff1fe14700 EFLAGS: 00000202 ORIG_RAX: 0000000000000001
- RAX: ffffffffffffffda RBX: 0000000000000005 RCX: 00007fa5627cbc5e
- RDX: 0000000000001f9c RSI: 00007fff1fe16984 RDI: 0000000000000005
- RBP: 00007fff1fe14710 R08: 0000000000000000 R09: 0000000000000000
- R10: 0000000000000000 R11: 0000000000000202 R12: 00007fff1fe16920
- R13: 0000000000002000 R14: 0000000000001f9c R15: 0000000000001f9c
-
-The packet scheduler could attempt a reinjection after receiving an
-MP_FAIL and before the infinite map has been transmitted, causing a
-deadlock since MPTCP needs to do the reinjection atomically from WRT
-fallback.
-
-Address the issue explicitly avoiding the reinjection in the critical
-scenario. Note that this is the only fallback critical section that
-could potentially send packets and hit the double-lock.
-
-Reported-by: Jakub Kicinski <kuba@kernel.org>
-Closes: https://netdev-ctrl.bots.linux.dev/logs/vmksft/mptcp-dbg/results/412720/1-mptcp-join-sh/stderr
-Fixes: f8a1d9b18c5e ("mptcp: make fallback action and fallback decision atomic")
-Cc: stable@vger.kernel.org
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- net/mptcp/protocol.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index d8a7f7029164..9b1fafd87cb9 100644
---- a/net/mptcp/protocol.c
-+++ b/net/mptcp/protocol.c
-@@ -2769,10 +2769,13 @@ static void __mptcp_retrans(struct sock *sk)
- 
- 			/*
- 			 * make the whole retrans decision, xmit, disallow
--			 * fallback atomic
-+			 * fallback atomic, note that we can't retrans even
-+			 * when an infinite fallback is in progress, i.e. new
-+			 * subflows are disallowed.
- 			 */
- 			spin_lock_bh(&msk->fallback_lock);
--			if (__mptcp_check_fallback(msk)) {
-+			if (__mptcp_check_fallback(msk) ||
-+			    !msk->allow_subflows) {
- 				spin_unlock_bh(&msk->fallback_lock);
- 				release_sock(ssk);
- 				goto clear_scheduled;
-
--- 
-2.51.0
-
+I hope you'll agree it's still useful?
 
