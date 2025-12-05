@@ -1,77 +1,97 @@
-Return-Path: <netdev+bounces-243690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243692-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB0DECA5F47
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 04:04:38 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF23ACA5FEA
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 04:23:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A131A314D01C
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 03:04:17 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id F3AD6300E763
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 03:23:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DB30296BC9;
-	Fri,  5 Dec 2025 03:04:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 371BA2727E3;
+	Fri,  5 Dec 2025 03:23:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e2sp4tge"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LMVysHs1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E47D18D658;
-	Fri,  5 Dec 2025 03:04:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E7A726CE2C
+	for <netdev@vger.kernel.org>; Fri,  5 Dec 2025 03:23:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764903855; cv=none; b=puUOyQYoPvR6tox0T7BWlhEPg2+9wwLooRgZxYxIUTfsDKlvwrvhQ2rlG6Ss56XgcqlCUwQ9f+B9aVcmnqrS5c3pvkVFOqMZy+KVZqvG2RpT9MVSs22x4sP03TPk5/3f/VcjZM+ZNFKbf6dEy8B+GbThF5u3xDqneOWLA45UPo8=
+	t=1764904997; cv=none; b=RS1bo9qHClBfHOc4msuKy9ZjEC+tCSMDErjHHviafbjWFLAB/3D6rzVNpAtWqhckkoZfg1ROmcWoJ8lNI2t9en7JNQBBYQko8x983AnijlnYnEKz6UTSQcp37+/XkYRewHuxDP2nnnm5zFTD6mELqOtOsqmrlqnAfQDTfrz3avU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764903855; c=relaxed/simple;
-	bh=/JQhc3V/qRD89UuPy9qhr18vhsDsM0Qv0lDC34gPhfA=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=MxF5zuq0gERheM5iTc/OWpCkMr5VikUvtCZ8Qx1xIYPT/lMMsfZuTeNxOnP0ZC2cRIh0weQK9bYh6EIym/yEu+AUkEmUDSVHDXBf2Mf/xmhLqUh+w83KcUddRaFBWD2DHR0HuydKF0XheIL/5ujnHp14fx3GKKTQ4pmRvcqNV5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e2sp4tge; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C6C6C4CEFB;
-	Fri,  5 Dec 2025 03:04:15 +0000 (UTC)
+	s=arc-20240116; t=1764904997; c=relaxed/simple;
+	bh=zDf+Jis4mfUaSsgB9MR+gX9omLkOdCM7LuR38a/LiLU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=QYfN5AaQCZDhAU+uoWYe6cJrORx0gIURUTJ7YjRo2WsYWZKVMB7LIUaDMgw5N8lyc1qGQqM2+1jnJcq/FSO2SFhVto1mLQ41qca5CWjPZCNDwvdLBa1x4GevaGtHDh0VUwT/d3Ympbq2rVjlpw1tb69AicLe01qkyG2rv5y2rGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LMVysHs1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F117C4CEFB;
+	Fri,  5 Dec 2025 03:23:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764903855;
-	bh=/JQhc3V/qRD89UuPy9qhr18vhsDsM0Qv0lDC34gPhfA=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=e2sp4tgeeJSkYr5EtF9YWosF6pstypUhquLr0xATJAoeMJypK13d62wtPyE/BuuF2
-	 bZaSzllReiPlqMfZZmouqsVIvKWlVpN1cL4vRQwzLDXi3xmuxYrKGhl8eAIoHvCDcu
-	 zmzzh73fg+2vjcuhHvW/xc3Dt5ikfOOnftACx5gd1w6pSUNtf5TQA6fGXV8ADClTSG
-	 NAW3lqtVtP9ZVI4qsNh5OMz9eGo/AYL2vkEFI0NzbiY2PgylwHiZHugcS6u5oKtYsi
-	 5Exje65zuax5F9jfiUdULVcy6LI15e57oknLU5rpo5aRXyU1E2CMm3JSAeZgnQB/tc
-	 IOkM0rBuyRj3Q==
+	s=k20201202; t=1764904996;
+	bh=zDf+Jis4mfUaSsgB9MR+gX9omLkOdCM7LuR38a/LiLU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=LMVysHs1XVqK0wIwvGeQOpR64fsCKiiHGXAVjZfnK205+xf4x7PUEbI76EWU2IIzM
+	 FlY8PbpKaIfryF3pfonaD2dUaASyGSLbQkAPrvA5kuw3KxadN5rAah421/5eJNw0tN
+	 WDlR4jxufi5WVZlB46hmc56zM8ajUWtFsgZ6XL04wWGzNP5/t8rei4SHxGfInI1joJ
+	 eHJgEc3N3Ew1PT2B4RTEpU6Uj414JrnOLgrFhKk+8vzUWokcbuOldFnRV2dyfzkNQD
+	 VLrFn5jxZI0Thypmi/CM6HtHI4mfyI1A53SYCX8kGFoKrBo4NJuWIW/79fbpqXjvGn
+	 V4plubGEWF6yw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 78B043AA9A89;
-	Fri,  5 Dec 2025 03:01:14 +0000 (UTC)
-Subject: Re: [GIT PULL] virtio,vhost: fixes, cleanups
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20251202150721-mutt-send-email-mst@kernel.org>
-References: <20251202150721-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-List-Id: <virtualization.lists.linux.dev>
-X-PR-Tracked-Message-Id: <20251202150721-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-X-PR-Tracked-Commit-Id: 205dd7a5d6ad6f4c8e8fcd3c3b95a7c0e7067fee
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: bc69ed975203c3ffe34f873531f3052914d4e497
-Message-Id: <176490367301.1073302.8927903391156784773.pr-tracker-bot@kernel.org>
-Date: Fri, 05 Dec 2025 03:01:13 +0000
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, alex.williamson@redhat.com, alok.a.tiwari@oracle.com, jasowang@redhat.com, kriish.sharma2006@gmail.com, linmq006@gmail.com, marco.crivellari@suse.com, michael.christie@oracle.com, mst@redhat.com, pabeni@redhat.com, stable@vger.kernel.org, yishaih@nvidia.com
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B5C293AA9A89;
+	Fri,  5 Dec 2025 03:20:15 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/3] mlxsw: Three (m)router fixes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176490481454.1084773.14919281827246452239.git-patchwork-notify@kernel.org>
+Date: Fri, 05 Dec 2025 03:20:14 +0000
+References: <cover.1764695650.git.petrm@nvidia.com>
+In-Reply-To: <cover.1764695650.git.petrm@nvidia.com>
+To: Petr Machata <petrm@nvidia.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
+ idosch@nvidia.com, mlxsw@nvidia.com
 
-The pull request you sent on Tue, 2 Dec 2025 15:07:21 -0500:
+Hello:
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/bc69ed975203c3ffe34f873531f3052914d4e497
+On Tue, 2 Dec 2025 18:44:10 +0100 you wrote:
+> This patchset contains two fixes in mlxsw Spectrum router code, and one for
+> the Spectrum multicast router code. Please see the individual patches for
+> more details.
+> 
+> Ido Schimmel (3):
+>   mlxsw: spectrum_router: Fix possible neighbour reference count leak
+>   mlxsw: spectrum_router: Fix neighbour use-after-free
+>   mlxsw: spectrum_mr: Fix use-after-free when updating multicast route
+>     stats
+> 
+> [...]
 
-Thank you!
+Here is the summary with links:
+  - [net,1/3] mlxsw: spectrum_router: Fix possible neighbour reference count leak
+    https://git.kernel.org/netdev/net/c/b6b638bda240
+  - [net,2/3] mlxsw: spectrum_router: Fix neighbour use-after-free
+    https://git.kernel.org/netdev/net/c/8b0e69763ef9
+  - [net,3/3] mlxsw: spectrum_mr: Fix use-after-free when updating multicast route stats
+    https://git.kernel.org/netdev/net/c/8ac1dacec458
 
+You are awesome, thank you!
 -- 
 Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
