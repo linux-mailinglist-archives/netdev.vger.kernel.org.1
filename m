@@ -1,78 +1,50 @@
-Return-Path: <netdev+bounces-243875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC97FCA917A
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 20:38:37 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AA07CA930F
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 21:02:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3996B30900B4
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 19:37:09 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6E79B3018AB4
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 20:02:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6E1F307AD8;
-	Fri,  5 Dec 2025 19:37:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87D58340A69;
+	Fri,  5 Dec 2025 20:02:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="c02m9Uz0"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UXqUMo42"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A1E62BD5A1
-	for <netdev@vger.kernel.org>; Fri,  5 Dec 2025 19:37:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97EB71C8611
+	for <netdev@vger.kernel.org>; Fri,  5 Dec 2025 20:02:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764963428; cv=none; b=idfNCjzN4aJ7y5DSw0kJ/4llcqyl3F6ZvoW+kufXynmZR/dwUahGymPQmxBWGK0i96qvJvPSU5NW2Y9hrjxTLrO7gKLskCy7ygyqmXzl+dx7eNCwMXlr1gtWOstZ72gECz3Ln23TXbmgXZCwg/SflGZ7rCzeBZoAZP8Nzei39AY=
+	t=1764964945; cv=none; b=ruQKy1xGGsudQb4CuSxcOOJ/P1tjnN0idL0qWQ/j0FWZzhEqVHs50ZpBy1Gho+pA8qvqDNGsdjG5HcRy94WBU9kJC3A//bb+YI6Z23k61e0klfyz4lBQbPj71tlfAqcWFBuMV+UavVUjtnrpHSD4jFsenx+J6FzVaXeLdfqSRrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764963428; c=relaxed/simple;
-	bh=bK3zAvBUxHnti/eNFOAZf6VNCTYPDWhIixrbSRhCCPc=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=nLVhGERkr5WWZSaln7mhUbEyPZ10l8n+7OThdQsUbg/lbhgbOLO0NT5zB6qpJOMBM6HwWBSInnI7g5b5CAy/HvNi022bM1C7X/90ArfHUgI3KYeYJVl+ZRqI+0tbcR+JkoLNab5glEGAomT3TZwbeViYEloUaysitiSbOZa05aQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=c02m9Uz0; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-7ba49f92362so1535801b3a.1
-        for <netdev@vger.kernel.org>; Fri, 05 Dec 2025 11:37:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1764963426; x=1765568226; darn=vger.kernel.org;
-        h=content-transfer-encoding:autocrypt:subject:from:to
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=X5FyjUIS9qgEZBxRsHEDHxccTlWb8j6jPm6tkMWDSnA=;
-        b=c02m9Uz0zX7At2kgtIXJJivYnPtEeLJiJ+f73+IEIc6hCu+an8zh1uf/0yZVhK+d5O
-         smG3KRlKX103r54a2xmf2C8jLE8H6/lV4h+gbGncUwU9UAeQaWqBZcp/65A7pztiMS0p
-         r9+2C9QGCOzmT1oc9ZKa13rRNJ1zlpo+KJ0zXc4Qc/8al77Yogy7ptfJE/nn7oCiYqK/
-         yCUhqXas7mSay6lFqzJ583ZBfGvkp7MveR83r6Hw9eQTun0xdaBV7uSmbkWaafCZ8hJq
-         4X91ib8m9qs3vmmu3nFZIdUKXYHaR32x9YoTeHINthKMCL0AZ65raWHVzZ6DTdCHlcRj
-         nA8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764963426; x=1765568226;
-        h=content-transfer-encoding:autocrypt:subject:from:to
-         :content-language:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=X5FyjUIS9qgEZBxRsHEDHxccTlWb8j6jPm6tkMWDSnA=;
-        b=mXG9HywNmm+7Y39/mwjynxo2LemWG4WuD5eeoApT93qMHWTR1XjAHlXT+SyAWDJpQR
-         MZ52IArtubJUyaQS+dpgbHg//rlz3XcLzJ8242iQMPQVuLI1fXNbWPF31NGhBWiFkCDV
-         AqLV8XfZlUkYwG8Sv1DnFk7wW6achP0yqydgiyAG0G1fV+BHsRnUTcN1URCCP77Dvvsa
-         eWANEA2xF3pBe8OpkgvFISmggTHAjES3uqB+2bWGO/Y4+tmTeuj1HcIqsp+ASzViM3GB
-         s/QYuQ2Jl6VzUXMK/ybZdxKedZfyWYXyM5xEfIgTHsvDDCv+woaYuremUpYCVRVZL3jj
-         t+TA==
-X-Gm-Message-State: AOJu0YwvfS4dPpgkaEWsdaZ2ahW8MjUttvWctp8cE0fAb0jqjbuu0zx2
-	5Yv+xuOCHbou/TXAJxIIcvNGWRSNjSKJPfuMI6VnIcNbIryQU/aYC5kWAHRWTK0qqFLLqIPmvm6
-	INpK/JU8=
-X-Gm-Gg: ASbGnctSs7BvBSsNksFLbWTFbmMZgHfs21n0qNefIvEAr+rxwb1Q7kod49iVMcvBKIf
-	8YyUHLuu2JsYDKwAeMpzfT3DbM5JAG+YLdCJydcf1NN/5j8ZovtxPY4j0G2wVwIQLGYoYlfPIaT
-	xdtMhbPHap5RICZi1rruF+TMnP4QPSLvew2nKrgUp6awX0qT7c5x1R9wDRKPX6DtrH0EpglRD//
-	sgctWUqwfMKZOzAKyXjDcLhWQ/FXHvFCLjSUeWNH3ohmkSNs6z0CO9QESLm7jthbR31rCyTVTx/
-	JqhqYmAfDL+M5Cq6dwVI90jb11vEzXcaXFJ2Bg534UP+4wife7H/Ql5PvlA9jZrs8ITfsKb+X2g
-	jloiVCijKWgeuk5OIk3585JUfik8Cs0j8NPLRUupnSQtEWFdmdZQXHnODU5RTKZmGZlRxS3y5YG
-	1YRquG+cSwgR/HZ5Jc/DcYdrF/
-X-Google-Smtp-Source: AGHT+IFmboq1cPOQFQUpt4igStKoNP93iAYzsyAct4m0Qo8ompK5hGA3Pp66tdfzJKk2IW+LJl9r8A==
-X-Received: by 2002:a05:6a21:338f:b0:366:14b0:4b18 with SMTP id adf61e73a8af0-366180292c6mr388534637.35.1764963425725;
-        Fri, 05 Dec 2025 11:37:05 -0800 (PST)
-Received: from [100.96.46.103] ([104.28.205.247])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-bf6a14f5d0fsm5358004a12.23.2025.12.05.11.37.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Dec 2025 11:37:05 -0800 (PST)
-Message-ID: <dddf6b9b-74f0-42cc-bf1d-5fc8b8d4df8b@cloudflare.com>
-Date: Fri, 5 Dec 2025 11:37:04 -0800
+	s=arc-20240116; t=1764964945; c=relaxed/simple;
+	bh=33NuVGjxUAu4dA6YjWBICF51tC00kHG2xVXcLXPXx5s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FqqTZgdMjDA8I3gCZTR8R9fcxuS5C7ZrwhnUTpjvTMX0nAWiYVmgceDdvCzc5jkooYWJoxUDtfSIsyvvG9QJ8/EyZHhb8X4EfkANLFxAsxZWpVfpDPpe9nIWP1/hZEQnHhQiyCXN9xRZ/R70PuankY0lKDyiFJ5u8SzlaD3DFao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=UXqUMo42; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=+JZ72in1SjMzKDvghfOAGf8o/tTjWDZ4WQ8m82tFo1U=; b=UXqUMo42WIEDsDJvCdUkk1dtRF
+	UoJLWi7t5qbP12T5A7DzL7xfeizNcyXqghe4kTNikJNai4O8RHeW8K941NOLrurvV+LrpobI4UZD2
+	RDFuuIUtvArfR4kSqzmWqs3sPRPS5hUFAjTUxfXCOPcDd5alu62k8hAL37SSfNi8Eu/pdO/xhL6jc
+	g4+Qt2jb3cpjNYaNxI/L1wWUW52eOsLdhg2ZQLs+yCCXP1ZNqElsNjlbbbg0soifv6SDnsjkpcWf4
+	wAZVIxQ175XmhxH9GXRHHOlIizOGRvAVcsR6JkBDqHw2TYRXynKTzJTIaTJDF76WWMWG0tZjDAT8N
+	thPU1Z7A==;
+Received: from [50.53.43.113] (helo=[192.168.254.34])
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vRc0Q-00000009zg1-34eJ;
+	Fri, 05 Dec 2025 20:02:18 +0000
+Message-ID: <ed1e07c5-0765-4868-9d39-2078c7c51e1f@infradead.org>
+Date: Fri, 5 Dec 2025 12:02:17 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,49 +52,123 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] sfc: correct kernel-doc complaints
+To: Edward Cree <ecree.xilinx@gmail.com>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, linux-net-drivers@amd.com
+References: <20251129220351.1980981-1-rdunlap@infradead.org>
+ <3f391457-d43c-4bd2-bd96-a5701a08e9eb@gmail.com>
 Content-Language: en-US
-To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- "Keller, Jacob E" <jacob.e.keller@intel.com>
-From: Jesse Brandeburg <jbrandeburg@cloudflare.com>
-Subject: BUG: ice: E830 fails RSS table adjustment with ethtool -X
-Autocrypt: addr=jbrandeburg@cloudflare.com; keydata=
- xjMEZs5VGxYJKwYBBAHaRw8BAQdAUXN66Fq6fDRHlu6zZLTPwJ/h0HAPFdy8PYYCdZZ3wfjN
- LUplc3NlIEJyYW5kZWJ1cmcgPGpicmFuZGVidXJnQGNsb3VkZmxhcmUuY29tPsKZBBMWCgBB
- FiEEbDWZ8Owh8iVtmZ5hwWdFDvX9eL8FAmbOVRsCGwMFCQWjmoAFCwkIBwICIgIGFQoJCAsC
- BBYCAwECHgcCF4AACgkQwWdFDvX9eL/S7QD7BVW5aabfPjCwaGfLU2si1OkRh2lOHeWx7cvG
- fGUD3CUBAIYDDglURDpWnxWcN34nE2IHAnowjBpGnjG1ffX+h4UFzjgEZs5VGxIKKwYBBAGX
- VQEFAQEHQBkrBJLpr10LX+sBL/etoqvy2ZsqJ1JO2yXv+q4nTKJWAwEIB8J+BBgWCgAmFiEE
- bDWZ8Owh8iVtmZ5hwWdFDvX9eL8FAmbOVRsCGwwFCQWjmoAACgkQwWdFDvX9eL8blgEA4ZKn
- npEoWmyR8uBK44T3f3D4sVs0Fmt3kFKp8m6qoocBANIyEYnUUfsJFtHh+5ItB/IUk67vuEXg
- snWjdbYM6ZwN
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <3f391457-d43c-4bd2-bd96-a5701a08e9eb@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Filed at:
-https://bugzilla.kernel.org/show_bug.cgi?id=220839
+Hi Edward,
 
-Kernel: stable-6.12.58
-NIC: E830 100G dual port
+On 12/5/25 9:19 AM, Edward Cree wrote:
+> On 29/11/2025 22:03, Randy Dunlap wrote:
+>> Fix kernel-doc warnings by adding 3 missing struct member descriptions
+>> in struct efx_ef10_nic_data and removing preprocessor directives (which
+>> are not handled by kernel-doc).
+>>
+>> Fixes these 5 warnings:
+>> Warning: drivers/net/ethernet/sfc/nic.h:158 bad line: #ifdef CONFIG_SFC_SRIOV
+>> Warning: drivers/net/ethernet/sfc/nic.h:160 bad line: #endif
+> 
+> Does kernel-doc not complain if a member is documented but the actual
+>  declaration is ifdefed out?  Normal practice seems to be to move the
+>  doc into another comment adjacent to the declaration so it's under
+>  the same ifdef; is that unnecessary?
 
-When trying to adjust RSS table # of queues on E830 with
+kernel-doc knows nothing about the kernel config (.config).
+Inside a struct/union, it strips away (ignores) preprocessor lines.
+So no, it does not complain.
 
-ethtool -X eth0 equal 8
+>> Warning: drivers/net/ethernet/sfc/nic.h:204 struct member 'port_id'
+>>  not described in 'efx_ef10_nic_data'
+>> Warning: drivers/net/ethernet/sfc/nic.h:204 struct member 'vf_index'
+>>  not described in 'efx_ef10_nic_data'
+>> Warning: drivers/net/ethernet/sfc/nic.h:204 struct member 'licensed_features'
+>>  not described in 'efx_ef10_nic_data'
+>>
+>> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+>> ---
+>> Cc: Edward Cree <ecree.xilinx@gmail.com>
+>> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+>> Cc: "David S. Miller" <davem@davemloft.net>
+>> Cc: Eric Dumazet <edumazet@google.com>
+>> Cc: Jakub Kicinski <kuba@kernel.org>
+>> Cc: Paolo Abeni <pabeni@redhat.com>
+>> Cc: Simon Horman <horms@kernel.org>
+>> Cc: linux-net-drivers@amd.com
+>> ---
+>>  drivers/net/ethernet/sfc/nic.h |    6 ++++--
+>>  1 file changed, 4 insertions(+), 2 deletions(-)
+>>
+>> --- linux-next-20251128.orig/drivers/net/ethernet/sfc/nic.h
+>> +++ linux-next-20251128/drivers/net/ethernet/sfc/nic.h
+>> @@ -156,9 +156,10 @@ enum {
+>>   * @tx_dpcpu_fw_id: Firmware ID of the TxDPCPU
+>>   * @must_probe_vswitching: Flag: vswitching has yet to be setup after MC reboot
+>>   * @pf_index: The number for this PF, or the parent PF if this is a VF
+>> -#ifdef CONFIG_SFC_SRIOV
+>> + * @port_id: port id (Ethernet address) if !CONFIG_SFC_SRIOV;
+>> + *   for CONFIG_SFC_SRIOV, the VF port id
+> 
+> I think this is always the PF's MAC address, and is used by
+>  ndo_get_phys_port_id.  On EF100 that method only exists for PFs
+>  (the vfrep's ndo_get_port_parent_id also shows the PF's port_id),
+>  whereas on EF10 VFs also have a phys_port_id with the PF's MAC
+>  address.
+> I guess the best way to summarise this for the kerneldoc comment
+>  would be:
+>  * @port_id: Ethernet address of owning PF, used for phys_port_id
+> In our local tree we just have "@port_id: Physical port identity".
+> 
+>> + * @vf_index: Index of particular VF in the VF data structure
+> 
+> This isn't quite right; this field is the index of this VF more
+>  generally within the PF's set of VFs; it's provided by firmware,
+>  and passed back to firmware in various requests.
+> And when it's used as an index into the VF data structure array,
+>  it's the _parent PF's_ nic_data->vf that is indexed by the VF's
+>  nic_data->vf_index.  (The VF's nic_data->vf is %NULL afaik.)
+> Not really sure how to summarise this, other than just following
+>  the pattern of @pf_index above:
+>  * @vf_index: The number for this VF, or 0xFFFF if this is a VF
+>  which isn't greatly informative, but we could add more to @vf:
+> 
+>>   * @vf: Pointer to VF data structure
+> 
+>  * @vf: for a PF, array of VF data structures indexed by VF's
+> 	@vf_index
+> 
+>> -#endif
+>>   * @vport_mac: The MAC address on the vport, only for PFs; VFs will be zero
+>>   * @vlan_list: List of VLANs added over the interface. Serialised by vlan_lock.
+>>   * @vlan_lock: Lock to serialize access to vlan_list.
+>> @@ -166,6 +167,7 @@ enum {
+>>   * @udp_tunnels_dirty: flag indicating a reboot occurred while pushing
+>>   *	@udp_tunnels to hardware and thus the push must be re-done.
+>>   * @udp_tunnels_lock: Serialises writes to @udp_tunnels and @udp_tunnels_dirty.
+>> + * @licensed_features: used to enable features if the adapter is licensed for it
+> 
+> In our local tree we have:
+>  * @licensed_features: Flags for licensed firmware features.
+>  which might be better as it doesn't give the impression that the
+>  driver can change this ('enable' things) — it's a bitmask that
+>  comes directly from firmware.
+> 
+> -ed
 
-we see this error in logs
+I can just use what's in your local tree (comments above), or
+would you prefer to send the patch?
 
-    [ 6112.110022] [ T303140] ice 0000:c1:00.1: Failed to configure RSS 
-hash for VSI 8, error -5
-     [ 6112.528002] [ T303170] ice 0000:c1:00.0: Failed to configure RSS 
-hash for VSI 6, error -5
-
-This command works fine on E810 nics with the same driver.
-
-Firmware/package, and NVM version info attached to bugzilla.
-
-We're already trying this on 6.18 but data not available yet, however 
-it's still a bug.
+Thanks for the info.
+-- 
+~Randy
 
 
