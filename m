@@ -1,166 +1,287 @@
-Return-Path: <netdev+bounces-243761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243762-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90B7ECA70CE
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 11:02:55 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8DF8CA70FE
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 11:04:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CC8953492701
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 08:45:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AA1CB3499740
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 08:46:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC37F336EEB;
-	Fri,  5 Dec 2025 08:25:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB2193128A3;
+	Fri,  5 Dec 2025 08:27:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="Bc5wxWf5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="k6vEX7ym"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 217313093A5
-	for <netdev@vger.kernel.org>; Fri,  5 Dec 2025 08:25:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764923130; cv=none; b=alxG8vzCB3tYyADrjOZvvMge6ME4Td2yiwnoVk4Vl2f32x3pC0mvEUIRTxqYj6W7c8yHBltPWQk1dqapbRJ9XfAHYRyCVejh9t9qgC7UlhO+PS7RTpmows0d2alOwchPWzoqGZGn0ge2dlzYYmm12l1streMrgcuID+kT8K54Ew=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764923130; c=relaxed/simple;
-	bh=K60gl9Mnhetq6W/Ntrnbmtt6jeMTyUUbXPtCpqDQ8LI=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ofson3LQBuAr5kDicNCI87HClB83PKA0r3EmvAkSntXVOVVcf1hWrkWxJm1TiysyX5gsgTYktdXh4YbONycPGEVRrVxU/r8l9NuHADPmqrrQwgO6zc+z2WRikDCmSk8R6h8Cecy6WJCrfLifItMXPSIe1t4w6b1R8bGfHGVcA2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=Bc5wxWf5; arc=none smtp.client-ip=185.125.188.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com [209.85.214.198])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id EAF80401CB
-	for <netdev@vger.kernel.org>; Fri,  5 Dec 2025 08:25:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1764923118;
-	bh=vPAIHokCAd7ibs1BxYRl6MfcOlaVrL938oA/Hg2FruU=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version;
-	b=Bc5wxWf5jPy2+mjSeev5A9CKbIEuRqndoremvwg0ePTkhpdu8XVKSUROpAOO9jRQW
-	 T4Up287A31+s0ub+4aSsZFJID3FicpOm2B4cZs24QwqhuVJHwPMEaOMfjWIrg97xCq
-	 xmXjJQ13p4Sm13GNeh/jJY3wWLN0YZqv3+QM1htpo2hRIfHZHkmynjEfTsbsv58kC4
-	 Mdv8G/B5SDf0+oXQb4xe/nJuHj0Htd4B/xdt+kMYKVQqoUqXe8AizI1Qq6ofPI4+Kq
-	 QnfTL2gOBbW3t9bfDKGIFuHnJ9bIJLvZwt2ifCSGA68NHOtXWU+V5ZqZd4CDr4ua6/
-	 0ArMlh2Ij/geYFzD2y47fKrDbN8Zcc6Ni8KoKLoSzAg596YnMlY+hqp3C+GOAeX16H
-	 aneS2h6AmnHaO/OEivJLPGY67ObkiWWgpRmmggPTHFkQ1qD1N5QQql1zMLnJqx98I4
-	 P33oIvlukL0d9l9OJ9q0mBQclWJYcde6n6+0VmpHBXTBn7G6P4+YN7XkCeN0Q7ZX0U
-	 byNxW4Qf7mYB05pJQgeEK0IiKJ+q0fpChWegtS/LY8W+CF3QaMgCI49oIeUXuk/kNj
-	 IMR83Z0mgvI2gR+RnlCT9jZYy6MFooK8NiWW79pX1k9tcILpXVrKORmer8gWyTVlCA
-	 KA1rs7JqpfUBvaVjqnPfK3b4=
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-297ddb3c707so17105215ad.2
-        for <netdev@vger.kernel.org>; Fri, 05 Dec 2025 00:25:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764923116; x=1765527916;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=vPAIHokCAd7ibs1BxYRl6MfcOlaVrL938oA/Hg2FruU=;
-        b=m6bzoa4XEe8adsE/HYwIkd4pETknUCxbCrBAMubppUTd1OHJf0RdjE099Yf59RkZ4y
-         2FR16fB9MUjlrsYkfV77Q/XqlZ6Tguobx7x8l1CsQUT/WeC5TZx7qP3IdSWMIykIyQE8
-         pp0xBg/bO481skLQ5dAdC+uSjEth2kFe/yACJcJwulnLHUINTBabL9KVsCPiMqupQHhE
-         YaidXmK2+IQtvXm4vQtyujzH4Ebb4kchgIbpgyA7K3Vsg+LO2b6HjTIKuJgdo75q3t+S
-         vJO5dabGFSTFHdTvplaauTlUXMOan3trdX9Ir336Wh/PGSrHNp3+kNIUgCQewtjdxMvt
-         fVzA==
-X-Forwarded-Encrypted: i=1; AJvYcCW8biCYaaxpyqwXO4LAj0jPEfCBWL/eXTIUVu4jWDvTigD7szzPzaevORxLujh5KlZ4+zKYeTY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCXSAKC0S81QMUjO3Ba5lIATUZB4GYJ4I4y++rhWyKQ0ydydI1
-	5wASHXyVdOXBNnW4/I7u1dnwlV4Kfw0kGaeVfdXCeEwNEwvTOI8ANj/dkL1ilYfWPY2/AywTRHU
-	EhjUJ2tl7Fvbu10ue4cieQ9Wwxi6Bs+XuEHl2dACytVf/2iJmn8RRUC69+hMtq5GQMQNJW5L+X4
-	u50JLG8pRf
-X-Gm-Gg: ASbGnctuTsB7E1Z+zBpye0G4vNUliQTGFhEidOq8MYnwd1hWk88QS2SPVQ5DffPL2nt
-	StL6yacwEav9M0E+UGBzR5vQJnr4Zc94O3G8q8GxEZz9bfYycO+jceQp3N8i7AU+4SUYtbTfko1
-	xSOQ7+D0xwl092xzWvM4jx0Ff2Ce0zS1GzugbQRELrz3TQs4bBYSl3Hwvp5jWWRi6UjGyODXjKf
-	1FJwjITEtK0ngYmncdIZFQ4fgGv6Erx+nSmPu2IN7O9EGy6RTcrUlj8UygCU7JjYXBv8oxZ13/M
-	fnWEaR+m0OAfdolkHvyyE83lA7nfrOXFq62apyzzmlC+N+EhUjBRskn5Ql2ZkstBlDTF1LLWV5N
-	880v1hvbPyzaBPbuzfU/VyuOn
-X-Received: by 2002:a17:903:41d1:b0:298:5fde:5a90 with SMTP id d9443c01a7336-29da1eea72amr76286035ad.58.1764923115920;
-        Fri, 05 Dec 2025 00:25:15 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG/emSI1vAJLDPvRoUuEvwKwrwhdDo47cnuu11gTK6CsB4P3+sbvvwIcQoU91SQafUrHCG18A==
-X-Received: by 2002:a17:903:41d1:b0:298:5fde:5a90 with SMTP id d9443c01a7336-29da1eea72amr76285705ad.58.1764923115542;
-        Fri, 05 Dec 2025 00:25:15 -0800 (PST)
-Received: from localhost.localdomain ([103.155.100.4])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29dae4cfaecsm40896875ad.27.2025.12.05.00.25.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Dec 2025 00:25:15 -0800 (PST)
-From: Aaron Ma <aaron.ma@canonical.com>
-To: anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/2] ice: Initialize RDMA after rebuild
-Date: Fri,  5 Dec 2025 16:24:59 +0800
-Message-ID: <20251205082459.1586143-2-aaron.ma@canonical.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251205082459.1586143-1-aaron.ma@canonical.com>
-References: <20251205082459.1586143-1-aaron.ma@canonical.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 323183002B4
+	for <netdev@vger.kernel.org>; Fri,  5 Dec 2025 08:27:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764923231; cv=fail; b=EKTyKyUeOhIMhyrtxB2FIyFDQCjmmBkTYM+5OmVX02Ablo+Eu0gzJcBwq6wXeMSTeQBT4SvorO0DleiD6xuICxUE7Rblur9GzVoQqj507V7sj5M8qwWwSu8t5SdHXRA+irMYXGH/I2RHqrbnO+0iIDaWW1amqp4dlgIdVvunY00=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764923231; c=relaxed/simple;
+	bh=QomYUnYcm7goUq3J82aSWgL4cu5V+vz85UWLW9Z0d1E=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=V3KhSC72v+fj10scvewXWVtOagUYgWDwwgK1t46IX8PgbmQRiBIyb551DkTYCG6R0fmvyMQZsoWHYljK7zBk1Gr5jNeOBlI41DIn/nSb+XrjjqZVWB8NaZaryK8XXIr384WtiibABk+YF8Tgil0NMaZMYGEb9+kzKY+jbCkjoAQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=k6vEX7ym; arc=fail smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1764923225; x=1796459225;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=QomYUnYcm7goUq3J82aSWgL4cu5V+vz85UWLW9Z0d1E=;
+  b=k6vEX7ymoPdwPM41lAGyQ6jqiujiWzHEwPeqzk3hQVpsRF1S2F+NYMF1
+   mHSPSGBK/KRynsF7uhKcKfvBFkTSjGqVd8dUQzIfFOr5ANCHwPu3kipp7
+   uBRBcl4Of/7KAAfF9H+/ZIMkDJwZQCGnW2GJUn8Z7ETNgax87Apcrq9sh
+   U/68Qukz9sLBvasdRGw27grVD7VHBGJKfp0fp+Lhts6c69lhoQxs6fDzg
+   A6E9nOjE1SRx7uBMOF71oBE5kB1a2/+oqqDk/h3dUmXmCgOSyCW606tET
+   H9RTAXp3GF9zq8S8pwP+cUpPH4LWQIn+A/H1Fs2ZZU5L4cg3SjsO1cXCn
+   A==;
+X-CSE-ConnectionGUID: Y0H6xAHaR42e/WWOMOhxGw==
+X-CSE-MsgGUID: wRM97wfJTsq1vFuIWYIByg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11632"; a="78420228"
+X-IronPort-AV: E=Sophos;i="6.20,251,1758610800"; 
+   d="scan'208";a="78420228"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2025 00:26:59 -0800
+X-CSE-ConnectionGUID: Rpokr9VYRHGo95v8z5iaog==
+X-CSE-MsgGUID: 5k5rlCCrQ7uE+oGy8lofyQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,251,1758610800"; 
+   d="scan'208";a="195475569"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2025 00:26:59 -0800
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Fri, 5 Dec 2025 00:26:58 -0800
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29 via Frontend Transport; Fri, 5 Dec 2025 00:26:58 -0800
+Received: from SA9PR02CU001.outbound.protection.outlook.com (40.93.196.27) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Fri, 5 Dec 2025 00:26:58 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=JHD03HEHS+xIg7E0peX1mpCbZ7HvEkyTrdWlucRroPTq0vrRphQM0i4G1djAD6ZGAtZUMmaDUMmxT60NrYrj4xudd0AEePvRQK3DqRhdNdgPcARxQNO7BDqob/jQ2oQslTE+IP3q8LpYroOzNU0PWjTzUlacap46Y5hYC89R67Pahv0pPgjy02/cy9sqMbEtZ4GGOEV114Rzr45/6lM3z6H2gS09oEyWkXlxInWNBAgjCHypLHiR1ZsQRVVRQYnKUMigo3jM1ZjpNLmAnTXvBJRKeVjDeg3Dy/FPn7UIZDeq5rXtl3HgmOdolfW9kAMj6znLy95Ljud6qK+bkl1tqQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5qXcL5P6u1yIJS//kWsZESgd+zhI10dtmmljbOrX0JA=;
+ b=TJC76WIVaiGyQcUqFWFkKvOcY94rimJuXqBrJ517xIXN0plvkJUDR3GJH0jOU2ltAWCDMWsoizxmsJW1HlCyt0s8LvDJ/Yd128PKvTF5vfnajw4s5+0lKp1T3KGlpb7nvPw1M7nkF/GDT3ZNGwCE5vFZtLBexkl5EE3MMKdRR9/DPgHnuhBoRvg9Vi6ZW8UytyzlLnjBX58QYKvc6R/7f20vjZMWrGb1hVoskc/q0Rlu9l9pNWt9voHpcdRHMeozIdUsM+7M0uG3pf9vc0VZZ56CvTDFBeUarSlcDJN/SkcDeE41E8zYkzoNrjBLn/0OP+7VwATfhroQ0snWAs1gAw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by SJ1PR11MB6274.namprd11.prod.outlook.com (2603:10b6:a03:457::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9388.12; Fri, 5 Dec
+ 2025 08:26:55 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408%3]) with mapi id 15.20.9388.011; Fri, 5 Dec 2025
+ 08:26:54 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: Jesse Brandeburg <jbrandeb@kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "Brandeburg, Jesse" <jbrandeburg@cloudflare.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Keller, Jacob E" <jacob.e.keller@intel.com>,
+	IWL <intel-wired-lan@lists.osuosl.org>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Brett Creeley
+	<brett.creeley@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH net v1] ice: stop counting UDP csum
+ mismatch as rx_errors
+Thread-Topic: [Intel-wired-lan] [PATCH net v1] ice: stop counting UDP csum
+ mismatch as rx_errors
+Thread-Index: AQHcYxu8BMnAWu0KtUmfnkpkfCM/cLUSuvdg
+Date: Fri, 5 Dec 2025 08:26:54 +0000
+Message-ID: <IA3PR11MB8986697A94FB36E893C7E87FE5A7A@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20251201233853.15579-1-jbrandeb@kernel.org>
+In-Reply-To: <20251201233853.15579-1-jbrandeb@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|SJ1PR11MB6274:EE_
+x-ms-office365-filtering-correlation-id: 3cfc7d12-cd1d-44b4-f3b7-08de33d80c89
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|38070700021;
+x-microsoft-antispam-message-info: =?us-ascii?Q?+/AUD/TLOQ85NL+SBC6dnIo4FD0peOxEPFS8X4gjpAow1O/NZNDqgYWUlrxQ?=
+ =?us-ascii?Q?p51WITN1lU3AJxwkCeU2tny5pRucyiA9Fo2VY0lIH2qggk70oc1ZKmCFSY/m?=
+ =?us-ascii?Q?YsnCZGCMQqFuwZWfMZ9pZPHNxJYTbHl+9kq88N+V7CAcb/oJDgSuh2bfltMx?=
+ =?us-ascii?Q?8GNcktvRGzOUyjIYClwgn/Ns/nSrJDy1UUExVpJJIgNqBaQoDNh9Ugqz21da?=
+ =?us-ascii?Q?+OAsf5UGkQk84PAjYwSUP22JoMURKiSsuAgiMvzR5yPV7We4v1wLri4m5F8n?=
+ =?us-ascii?Q?01SnPpFisRIspMVOXrVGip6CD+y2xIIAbUxWXWVfnowVzAdKlevHWm4FTkFV?=
+ =?us-ascii?Q?iTTf79JtTgxlVyCU/2hdAcy8Fjq8ETOooq+KdDP1WNJRPTj8Xu45A/o+SPNb?=
+ =?us-ascii?Q?Hm7xQamN3DKPt2dEDxGeTdJTsI5BdcnZzXGN2uJFJ6Cs3YAh/B9WnzDN7Dby?=
+ =?us-ascii?Q?j//sIqYGTnE20oXbKyNIty2Cg6j45RLJ0drISJjSDzDSJtp4YDX58hz+6BeD?=
+ =?us-ascii?Q?LxIt0Tv+cYLWyMvnt65sfYA7N+wN/w6TCvYcZzOWq3kc4ArbA7MZlzqnYtmQ?=
+ =?us-ascii?Q?rdP2f6xYVSBUQIYZAJHc/uohDcGc5zuSAJ64rxOvBu1TEWnOKNvbD+13Rnqh?=
+ =?us-ascii?Q?sAMeeWTFSgCRxN5xDJHnGsB11FofVf9ryeVPMtqUbQHRKh1lsYdcYTl/R/vO?=
+ =?us-ascii?Q?F28E96F2plCa+hgl4iXmO5UKGeNe+4zm1PPCJbxRa+AN+hSQjX+Bg7kBlfk3?=
+ =?us-ascii?Q?IV9z80CLghn/WnLvmWihmZi6BBTAv2aomY9ZAo0IioYWkvIgXLQ+LFR9ZceS?=
+ =?us-ascii?Q?mam5rmVB4WKbvwPLFE/KofRuB6mlNFrHF6xts8PmJbTNH+3wr9JCHsBh/jtU?=
+ =?us-ascii?Q?Cx5dPaFv60oBdY+4MS3zcpW/OgOfckrZ6sImOODU5FZ5DTYH2Rppe/t3wY3K?=
+ =?us-ascii?Q?mMaXztJ4yIjFh4hYV2q4UTLgcCEEJ546CLGTbEUDgsGFR5l9bRKWBzaUfg8R?=
+ =?us-ascii?Q?T0tHz11gTNuVIiFdTLz8zQNLD8pRBkFp5sm49C/wHVBMP+WWAVqyNeiqQuG9?=
+ =?us-ascii?Q?5oqjydFeu8XaV6bqpU8zdmuYMHcLj1f3SBnKu5yksuOF82E5bVxWE5XAo8+U?=
+ =?us-ascii?Q?nx7whVQc2F+wJoUT34Qt3jtiVGULuENLuRhOpdXh2FnQb2VeLsktX7JBZdqp?=
+ =?us-ascii?Q?xUSfKAoknR0gYaMnBuT4LCdUnrkStlGho6GvokqHAmBAY4u8AnhZdyhoNacY?=
+ =?us-ascii?Q?zPKWqunvBuHSGaoMkHSf14fgeGOOczzZMEvvC7KQgICXawt6GtAByMFTAzic?=
+ =?us-ascii?Q?ynlilx7+ZfV2dGqQw1tX2kINVVhV1HpcdIoCgEcmQ5ZsX9fdGHOeiSiQHBYE?=
+ =?us-ascii?Q?vmph+X2XBDUxDRnuPhiSZDrkz6g0VQM7ng4aaalB4Ugat01jCXuhCn5UIBHE?=
+ =?us-ascii?Q?lcpsGdUQPO/zpvwQettTA6HixwOC8pOhVAERopUkIoBjRBb8X7NIow=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700021);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?MdTJR+z0ch1unX307hP4QmfWAUpN2YpRewBkqlrxXe9uERqZmJAer3HASik/?=
+ =?us-ascii?Q?9PT988hYdUXxTw9P42FT/4BApO5c/ZIltjlGRciBorHsdysP4JaADK15XUY2?=
+ =?us-ascii?Q?2yXcsmDVCtaFSSRxsjPmRx5Wg6rKmCH3y0Dt4lglVsFkq+CAmEMyI80r4mtB?=
+ =?us-ascii?Q?+nzp2DhuVTYj0sQjJ3RmKnKwHjiQ6BZTfv0YFcaIphGdQo/M+CxYOM2FJhRM?=
+ =?us-ascii?Q?qzNhQxGsiCf8d2rNPoROXeR4tZGYI9CqP8zqU3VTHJC1fTS/tUr0nUI/Rtiw?=
+ =?us-ascii?Q?BkRFdjvHGrCYEqKJ+bbsP2sQj+psxmmETV13MBzAdUiEM54lOT21HHSZ4wn+?=
+ =?us-ascii?Q?AWKuKo3Y6SIZF8Ce2pke5SxKI7GgelSpSmOiqWAqnev0PGaPsurpUVk4k2b/?=
+ =?us-ascii?Q?k9qt1Ov5NbytiWaLJFO4enB43kCsYxzZgYCjzWmGKD6g566zQeQPXg332jUt?=
+ =?us-ascii?Q?ATuBigbH28nxgWiMfnMPN+WF0JABE/zt14VgJSwPfa8PCuwauM+05njyoG7E?=
+ =?us-ascii?Q?tzPun9vY+UsRbEWxnaObKlyJw3PhWWKVNOBNagz0uoD+J6B/shCVg7s6tdW3?=
+ =?us-ascii?Q?k6qHyH2EyX3FWh5EzWFwwjP4xFtLRvdWXaRUdZh+3yP1JXX3rSpU1WDfYFWp?=
+ =?us-ascii?Q?oyzI7O8RBH2NT+8WMdwEjrIK1rjuH6xmsj58kv8iXRDPDYAjJk18OUPBAp5r?=
+ =?us-ascii?Q?NosFR9+UYWZEuUtUIAs1VaEh0+nx9GxdgmYvci1qZqqLPBY0O4kx9Lxfn7Hi?=
+ =?us-ascii?Q?hbKE9E5inNAPVLh3SoEr4RcLYJbkXCxmEQ4TFbYSCUhEv23VdGMHiWRFMb1g?=
+ =?us-ascii?Q?qssPQwZHCIRkZDeEgowd0lEvdCSwfR4zLkxtg5LxWn0NUMlcVCNxBgnIOVZz?=
+ =?us-ascii?Q?hw9T8idIYvor5AGRYfUEfZKhqoWEnMX1+VLm0kZjJjNp8Revb7s+5lesOqHz?=
+ =?us-ascii?Q?TfG09Y/pq7+T6r7Glu/3BBHNNlyVw7imcaXgaUrqzKsv5w4eqfKQw2DKy4EZ?=
+ =?us-ascii?Q?9bW5wcFr4rS1JNr2Zl0/fVrLz4BbChWeGI8pbuufqZfmSB86gjn60tQetzip?=
+ =?us-ascii?Q?rsMJDQnbmCUkINCjVh9XMeX4KVB2EKb8RmFBlD53qZb6bV7DleJYki82QBPd?=
+ =?us-ascii?Q?P5iEE+X/6qTLcWo1vmM41bTlzWE7eAzWIsV3AFVGkjjwb9IPwpUArZfupJTc?=
+ =?us-ascii?Q?03H2RyitUkwGfaavhcWs2iY52e5LcYYQV+M4GYDFGSPFrRPRWFvUtIQbTDTN?=
+ =?us-ascii?Q?0REm78eUowS0N3G1eyFSEBCJH8w1/Y8i/M650d2xrYdqfVZ0MDaHpRPA5ESz?=
+ =?us-ascii?Q?8ZnIHjQFawzHh3ltihkKTvq/J4rizo+kr4masklhMgaX1j+F7xJmvj6U2Onr?=
+ =?us-ascii?Q?rHbD47L53I4SxbBcPKfDW7qhvWYW0AlxEwGp4zCruOslQ9A6pbAWKAy3Esqe?=
+ =?us-ascii?Q?rmEvqYGUpau33EwXrUM5qvxagmXHb4MbJcT+E3t4P1+h8FduMDw23pLaCrrm?=
+ =?us-ascii?Q?0J1HZu5hkvPVL/K1QvGhg/n+ZFX8k5tuZ6CxWFcK1/7gyLR4KF70auHHtO8R?=
+ =?us-ascii?Q?694DwcRMJKPPXfk0u+rlAMKJHkG3Ytu1JnEjIMzvA+Pw7wQQ6V9EJ1ihxZdo?=
+ =?us-ascii?Q?QQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3cfc7d12-cd1d-44b4-f3b7-08de33d80c89
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Dec 2025 08:26:54.9018
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: CqQ+KAQ+onvi8lqBJY2qDSuHo4WgDK2X/s+GPVjH5+6In62jmtACy++BEAtiOUKsbsmwCBM+sES2/WUgBNquYUvGqzmo8s5bpQJ1r8+sp9o=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR11MB6274
+X-OriginatorOrg: intel.com
 
-After wakeup from suspend, IRDMA is initialized with error:
 
-kernel: ice 0000:60:00.0: IRDMA hardware initialization FAILED init_state=4 status=-110
-kernel: ice 0000:60:00.1: IRDMA hardware initialization FAILED init_state=4 status=-110
-kernel: irdma.gen_2 ice.roce.1: probe with driver irdma.gen_2 failed with error -110
-kernel: irdma.gen_2 ice.roce.2: probe with driver irdma.gen_2 failed with error -110
 
-IRDMA times out because the initialization before the schedule reset.
-The ice_init_rdma() function already calls ice_plug_aux_dev() internally,
-ensuring proper initialization order.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> Of Jesse Brandeburg
+> Sent: Tuesday, December 2, 2025 12:39 AM
+> To: netdev@vger.kernel.org
+> Cc: Brandeburg, Jesse <jbrandeburg@cloudflare.com>; Nguyen, Anthony L
+> <anthony.l.nguyen@intel.com>; Keller, Jacob E
+> <jacob.e.keller@intel.com>; IWL <intel-wired-lan@lists.osuosl.org>;
+> Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>; Andrew Lunn
+> <andrew+netdev@lunn.ch>; David S. Miller <davem@davemloft.net>; Eric
+> Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo
+> Abeni <pabeni@redhat.com>; Brett Creeley <brett.creeley@intel.com>
+> Subject: [Intel-wired-lan] [PATCH net v1] ice: stop counting UDP csum
+> mismatch as rx_errors
+>=20
+> From: Jesse Brandeburg <jbrandeburg@cloudflare.com>
+>=20
+> Since the beginning, the Intel ice driver has counted receive checksum
+> offload mismatches into the rx_errors member of the rtnl_link_stats64
+> struct. In ethtool -S these show up as rx_csum_bad.nic.
+>=20
+> I believe counting these in rx_errors is fundamentally wrong, as it's
+> pretty clear from the comments in if_link.h and from every other
+> statistic
+> the driver is summing into rx_errors, that all of them would cause a
+> "hardware drop" except for the UDP checksum mismatch, as well as the
+> fact
+> that all the other causes for rx_errors are L2 reasons, and this L4
+> UDP
+> "mismatch" is an outlier.
+>=20
+> A last nail in the coffin is that rx_errors is monitored in production
+> and
+> can indicate a bad NIC/cable/Switch port, but instead some random
+> series of
+> UDP packets with bad checksums will now trigger this alert. This false
+> positive makes the alert useless and affects us as well as other
+> companies.
+>=20
+> This packet with presumably a bad UDP checksum is *already* passed to
+> the
+> stack, just not marked as offloaded by the hardware/driver. If it is
+> dropped by the stack it will show up as UDP_MIB_CSUMERRORS.
+>=20
+> And one more thing, none of the other Intel drivers, and at least
+> bnxt_en
+> and mlx5 both don't appear to count UDP offload mismatches as
+> rx_errors.
+>=20
+> Here is a related customer complaint:
+> https://community.intel.com/t5/Ethernet-Products/ice-rx-errros-is-too-
+> sensitive-to-IP-TCP-attack-packets-Intel/td-p/1662125
+>=20
+> Fixes: 4f1fe43c920b ("ice: Add more Rx errors to netdev's rx_error
+> counter")
+> Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+> Cc: Jake Keller <jacob.e.keller@intel.com>
+> Cc: IWL <intel-wired-lan@lists.osuosl.org>
+> Signed-off-by: Jesse Brandeburg <jbrandeburg@cloudflare.com>
+> --
+> I am sending this to net as I consider it a bug, and it will backport
+> cleanly.
+> ---
+>  drivers/net/ethernet/intel/ice/ice_main.c | 1 -
+>  1 file changed, 1 deletion(-)
+>=20
+> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c
+> b/drivers/net/ethernet/intel/ice/ice_main.c
+> index 86f5859e88ef..d004acfa0f36 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_main.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
+> @@ -6995,7 +6995,6 @@ void ice_update_vsi_stats(struct ice_vsi *vsi)
+>  		cur_ns->rx_errors =3D pf->stats.crc_errors +
+>  				    pf->stats.illegal_bytes +
+>  				    pf->stats.rx_undersize +
+> -				    pf->hw_csum_rx_error +
 
-Fixes: bc69ad74867db ("ice: avoid IRQ collision to fix init failure on ACPI S3 resume")
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Signed-off-by: Aaron Ma <aaron.ma@canonical.com>
----
-V1 -> V2: no changes.
+Good day , Jesse
+It looks like you remove the single place where the ' hw_csum_rx_error' var=
+ is being really used.
+What about removing it's declaration and calculation then?
 
- drivers/net/ethernet/intel/ice/ice_main.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 2533876f1a2fd..c6dd04d24ac09 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -5677,11 +5677,6 @@ static int ice_resume(struct device *dev)
- 	if (ret)
- 		dev_err(dev, "Cannot restore interrupt scheme: %d\n", ret);
- 
--	ret = ice_init_rdma(pf);
--	if (ret)
--		dev_err(dev, "Reinitialize RDMA during resume failed: %d\n",
--			ret);
--
- 	clear_bit(ICE_DOWN, pf->state);
- 	/* Now perform PF reset and rebuild */
- 	reset_type = ICE_RESET_PFR;
-@@ -7805,7 +7800,12 @@ static void ice_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
- 
- 	ice_health_clear(pf);
- 
--	ice_plug_aux_dev(pf);
-+	/* Initialize RDMA after control queues are ready */
-+	err = ice_init_rdma(pf);
-+	if (err)
-+		dev_err(dev, "Reinitialize RDMA after rebuild failed: %d\n",
-+			err);
-+
- 	if (ice_is_feature_supported(pf, ICE_F_SRIOV_LAG))
- 		ice_lag_rebuild(pf);
- 
--- 
-2.43.0
+>  				    pf->stats.rx_jabber +
+>  				    pf->stats.rx_fragments +
+>  				    pf->stats.rx_oversize;
+> --
+> 2.47.3
 
 
