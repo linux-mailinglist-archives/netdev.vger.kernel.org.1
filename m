@@ -1,222 +1,192 @@
-Return-Path: <netdev+bounces-243758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85C7CCA70B6
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 11:00:56 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F820CA76EB
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 12:37:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E38F73489802
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 08:44:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id E09BC39F0862
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 08:45:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D73D73016FB;
-	Fri,  5 Dec 2025 08:24:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC46D336EEC;
+	Fri,  5 Dec 2025 08:25:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="F0NiX5yV"
+	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="XX70AqPs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D641931AF1D;
-	Fri,  5 Dec 2025 08:24:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CE90336ECD
+	for <netdev@vger.kernel.org>; Fri,  5 Dec 2025 08:25:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764923061; cv=none; b=edyy3AkP2L+I4y4/1qvOHS21anetPIAn1tWqedBAenkTdaUnzMbc9pFs9bqcF6SzrMmZxeucvgHfjueistBa+HeEVgdYa4DOuK12pmqdYroE5+twaBTFJwtvG3NFsaXGQWnrc4B/uf7R7JyQqqCAkqftypY0X4Qq5zn+g6CBu0s=
+	t=1764923129; cv=none; b=cGkH2/9fvQ/vzLIO+BO4l4B/oIB3Zjew3uqTdlZ1xvd/H/3NDWLtlDkvn5fPuIb5/0Od8bggoEl8p2JwB4P15WdG1w7URZ14gJvcLTXBjguVUSYmxCzgJdomQ18gr+hH97iWER+jhRck1tq44EudkHP5X+6u/nHtLCyAh6N1lb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764923061; c=relaxed/simple;
-	bh=9vP47oLCw1RtzDds1FS7AFmXMKeCAIulIP1WYbkq2Oc=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=NM91RC3rVBYTyoXiFHdI2fyNiH5xrecGpmcpxL6JYAVpO6hh8sz694aAuD4oYL/HXEEnRnoj1nSRF/hkWKezZ1YXvvL2E2hs4OGoH+RvSzJLRs62Vudo00+mSVtLdIF+UjDZWF5BpyAAbc/LYEM59wma1W0BjxSJSx6g/wEM570=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=F0NiX5yV; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5B4N2E7S001393;
-	Fri, 5 Dec 2025 08:23:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=RhMstk
-	u0nqy7N1IclbBOGtkEPP4UWjRAtuZ8gpeiK1Y=; b=F0NiX5yVJnaHEJkKDA1zxl
-	XeYsR6oClxyG+pMD/gOBsS6mB+Wvx/DrJ/0/ZxtSGuz3860uWuwA8gjlfmEWyiQd
-	rF6FkKWTsoNYk8SJycAZNYhQKO7ZyUxafip51V/Dtcm1WhEyqvL3swtUq9gWHf3V
-	NZB/18DQxMAB5CIkV3YYoGkO3UD2Eg6ZW2o7E/WyDZbmTj2B5hL+OTvThxmxQm/s
-	4DhnrCb830S1JIP8JLP/2ZUrsK0kN/HitgC6YUniIURE1/UrB3SkLOUzbZog+2Z0
-	1SVZhlKr+dqzWn8AerY2XQziPIl3urBRonNP8r6UlgAHYWADOKhxd2IB4NXb9l7A
+	s=arc-20240116; t=1764923129; c=relaxed/simple;
+	bh=b7E6WBe+Fu0Qz9A8vGHqpx4aMMH5NUrSA7NG4EtSYDY=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=sFc3kPKfxS5WT91AKkgJf36fO5dkuvXakmanXJkAuUh3DEEDPZdKBRJ9Ss5xOVALEVVGSVgxd0gkgrm7tk/6i0bs/tx/mirb2MCO5J763PRwcY93V+FRUmrHkC64TU42QVr9Ayz80gs/lRX3cuV27m5DmymzPhGulCAoFW+FPqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=XX70AqPs; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com [209.85.214.198])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 6819440182
+	for <netdev@vger.kernel.org>; Fri,  5 Dec 2025 08:25:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20251003; t=1764923113;
+	bh=8T0UHhzai2fWCo6tRGyMn8d6SwcVbZ4Ka0x+SCnjr+g=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=XX70AqPsLmpe/c5+lwWPfSF/BvGnOKY8RH55z990CFqZrfiD6D2YPOPQ9D0rg88hj
+	 3rKJK/CYDtQ8oP12yBu3tXVCZ2C9IWFNRrI1CHD85tkxz9FZoqDSvN5QyffninvYtr
+	 Q+p8ZrSU6QV++PRKnwq3wvLobuuvYA4Q7FvzTLiHUmG2WQwHOiMarC3W1f8InIfSmK
+	 KE/eFPqSSVN2tIGnNEOumuWWBbI5VZIkdoVaj/PH7gROrIMcovz6G8P7EjcDvdnX9p
+	 El9LS6ay9bHypKrTXb+JpR+1oCaAVvKf1rEhrhahaD5budTomqDQffyb/JBbr+b49V
+	 bMPy9IZFDvc+fxugaylCqY712qAzB+/xKYcILRr+E4VlYPD8brNNK5eRrUc6D6kK08
+	 y1JpzYlT6KLRlnW9qfnBoQjl4Tgpf70EpdVWo7wKKEm+0aRZqKDCfFH5fZcDsx7+Uq
+	 955R5NUexA9heDiNyqeXWK1RjhWwPbsWE5jptm/TcCDfFGkFD2eqyEN5yCAFz1N1nD
+	 S730RHfT/Fnaflcly4qgDBiB6d9K9zQF1d5sqJJ7pDi1ZqOEBwCC5fuy0YMHNaUz0t
+	 3cBqJMImqa8y+TaqtAViofwnt/b2MUy5pttUDeGG9FUxjBpEwBZ7AaHlAfVN6Ffvem
+	 EQUAJo/B+FYKihHGc9yD//cY=
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2956cdcdc17so20371675ad.3
+        for <netdev@vger.kernel.org>; Fri, 05 Dec 2025 00:25:13 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1764923112; x=1765527912;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8T0UHhzai2fWCo6tRGyMn8d6SwcVbZ4Ka0x+SCnjr+g=;
+        b=cS9VnMv3qZrp+mJMK0JXMGvNKtaGbLshR4ildb9PLwSPUsn/mB2ImcSoO+YwDQ60Aj
+         YHNooniX3bWYBHQyX2iFOgZ2ekGWzVGGBpKCrligRE5Nq2ysoszWOrs4bKyOXD2IntxR
+         ZP78CzKG9Hz9L98NywUaaAUbK8kDxb5QqGquoHK2JJF4o44nQmdmCqXtE+HoLen53oXA
+         EuGrgfu0eX+ZhJe94BG7BGYcq72KQI0uZNz3lVZLnE5kaOUcaPcW9FWgyB7dI5FL4OIm
+         XXA/c8la28Z1l18nr8Ht7Wgua+B181iKbhm+ddJQDz7Jwg+QGuxBC0yHTjumMnerHzOU
+         eKkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVD3Bi4UDtyWW+kXozETD4YYy0INFpPF7P2Lzf7P6wl4ItsehbqibOCKTOHLTXolNZCmkc/N80=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDEijH4bVVIOXVRRs95/lEPqoTyiA0JmFwhcgHfQE0dBFsRKMK
+	6jigQe7fMkzyUXUdjkR75yEnMjfsmDLVBrLC/i9XxPsno2mUaQUr0opvvkZi5kxEMFTqWwJH0Z+
+	YU/DzE/h+dNGscyPBRBK5aIcC1PnCC+7/TZWDAz9kGTxLeAoRq1cO/neFlOKGfUlKLt4kBp4W1Q
 	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aqq8v404j-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 05 Dec 2025 08:23:50 +0000 (GMT)
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5B58GECL017907;
-	Fri, 5 Dec 2025 08:23:50 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aqq8v404g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 05 Dec 2025 08:23:50 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5B57X4f9010237;
-	Fri, 5 Dec 2025 08:23:49 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4arcnkm7q3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 05 Dec 2025 08:23:49 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5B58NjYO19792332
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 5 Dec 2025 08:23:45 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5EB8220043;
-	Fri,  5 Dec 2025 08:23:45 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 563D520040;
-	Fri,  5 Dec 2025 08:23:44 +0000 (GMT)
-Received: from [9.87.132.26] (unknown [9.87.132.26])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  5 Dec 2025 08:23:44 +0000 (GMT)
-Message-ID: <ee27de5e81e4545d697a8c78b88e3590e8849817.camel@linux.ibm.com>
-Subject: Re: [PATCH net] net/mlx5: Fix double unregister of HCA_PORTS
- component
-From: Gerd Bayer <gbayer@linux.ibm.com>
-To: Moshe Shemesh <moshe@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
-        Leon Romanovsky	 <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
-        Mark
- Bloch	 <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S.
- Miller"	 <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski	 <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Shay Drory
- <shayd@nvidia.com>,
-        Simon Horman <horms@kernel.org>
-Cc: Lukas Wunner <lukas@wunner.de>, Bjorn Helgaas <helgaas@kernel.org>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Farhan Ali <alifm@linux.ibm.com>, netdev@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-pci@vger.kernel.org
-Date: Fri, 05 Dec 2025 09:23:44 +0100
-In-Reply-To: <1bef8fd9-e9b8-4184-98be-98d016df20d0@nvidia.com>
-References: <20251202-fix_lag-v1-1-59e8177ffce0@linux.ibm.com>
-	 <7ae1ae03-b62d-4c49-9718-f01ac8713872@nvidia.com>
-	 <502727b0ad4a9bc34afb421d465646248c69f7d4.camel@linux.ibm.com>
-	 <1bef8fd9-e9b8-4184-98be-98d016df20d0@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.58.2 (3.58.2-1.fc43) 
+X-Gm-Gg: ASbGnctoBXuzzmNMmaX+q5YMydQLgeEZnBesWXQplZSUnlCA8Z7lXdFs81XofVzwViH
+	6EwvXqkcOzPvackph0RczjJyx5Pbj4oBjUQFtIT0FuphnuWZywsWOZo1SzuxUQRKOZ4a4licSkA
+	vGwEssflfSI2dFFlpO2ucO6fIB5hhVCyO2NXcgh0ek39QjFX1lBOPpZAwiMvtYGX8QiEubrIRqB
+	suW5BXicstCvC+uPJQUVT0zjhiGYYgoZhvBElQyOFhtKvJ2rarhFW+3hnhmKaSyvYS8FwjTUL4t
+	Aopz1/HxevLqNPukFkOVYcHIDZTkSlOQAvf2/Uptc9rB6EaTrhkJTYV55XxvgzGF2Ey0N095oPg
+	RSmUw+PBV7kxl5fMxyFDLVcj/
+X-Received: by 2002:a17:903:1a2d:b0:295:bedb:8d7 with SMTP id d9443c01a7336-29d683b103fmr119060465ad.48.1764923111849;
+        Fri, 05 Dec 2025 00:25:11 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IESNNepcAR75GX1HTpnznXPE60phc9h2xI6LaFnX+Dw43NLPltYKyx42/JGzBrUjBoHtNzU+Q==
+X-Received: by 2002:a17:903:1a2d:b0:295:bedb:8d7 with SMTP id d9443c01a7336-29d683b103fmr119060085ad.48.1764923111440;
+        Fri, 05 Dec 2025 00:25:11 -0800 (PST)
+Received: from localhost.localdomain ([103.155.100.4])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29dae4cfaecsm40896875ad.27.2025.12.05.00.25.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Dec 2025 00:25:11 -0800 (PST)
+From: Aaron Ma <aaron.ma@canonical.com>
+To: anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 1/2] ice: Fix NULL pointer dereference in ice_vsi_set_napi_queues
+Date: Fri,  5 Dec 2025 16:24:58 +0800
+Message-ID: <20251205082459.1586143-1-aaron.ma@canonical.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: ntzkUzJrCDLvH1vmukWEsCOlq0HNJf1l
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTI5MDAwOCBTYWx0ZWRfX2Q28eqZi4Xa6
- 6oSDXmNMvzheKPKgr7KrXjBrwzfp4Js2kzztjRGmBpKQou3ZEDDEzakBBGIYxLx55T+FyceWnDO
- hPUSJy/CfMeY8qKky6SaF52RnVGxdKPm/PqwlhTj5w6mHPAMqBJLSYvTpzybkHDH6Fay8cce7JF
- n45allhJKUs6N9lnZ48SErGexTRToV6IbklQ+AM8DSRQw6CLq32JWCYaT0br0Me2Nn94os4GPgO
- FCwTIBVzhhORKDz80cKQ67mR3heql5xVGIJtmGMFLh+8GwyyVLPxhYteEKh/rn/Ht/80QQHBhPC
- hwiDUtbes2hlVLI+Q/tEGhLKOOdHVVDh0oIwJtjkKl2cWWM7n9efkvxj3CQCrfRZOZnA17mSqXt
- 5nLm9Hm4dTImx5zklHqwPmNlpmZV0A==
-X-Authority-Analysis: v=2.4 cv=Scz6t/Ru c=1 sm=1 tr=0 ts=69329696 cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=P-IC7800AAAA:8 a=VnNF1IyMAAAA:8 a=Ikd4Dj_1AAAA:8 a=V3l9L5bX4ASNRFpQsxoA:9
- a=QEXdDO2ut3YA:10 a=d3PnA9EDa4IxuAV0gXij:22
-X-Proofpoint-GUID: hWJND_K9tjRBx8p2s4M8FXMy3ZhA2tU5
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-05_03,2025-12-04_04,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 phishscore=0 bulkscore=0 lowpriorityscore=0 adultscore=0
- clxscore=1015 spamscore=0 impostorscore=0 priorityscore=1501 malwarescore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511290008
+Content-Transfer-Encoding: 8bit
 
-On Thu, 2025-12-04 at 19:07 +0200, Moshe Shemesh wrote:
->=20
-> On 12/4/2025 11:48 AM, Gerd Bayer wrote:
-> >=20
-> > On Wed, 2025-12-03 at 17:14 +0200, Moshe Shemesh wrote:
-> > >=20
-> > > On 12/2/2025 1:12 PM, Gerd Bayer wrote:
-> > > >=20
-> >=20
-> >    [ ... snip ... ]
-> >=20
-> > > >=20
-> > > > Fixes: 5a977b5833b7 ("net/mlx5: Lag, move devcom registration to LA=
-G layer")
-> > > > Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
-> > >=20
-> > > Reviewed-by: Moshe Shemesh <moshe@nvidia.com>> ---
-> > > > Hi Shay et al,
-> > > >=20
-> > >=20
-> > > Hi Gerd,
-> > >    I stepped on this bug recently too, without s390 and was about to
-> > > submit same fix :) So as you wrote it is unrelated to Lukas' patches =
-and
-> > > this fix is correct.
-> >=20
-> > Good to hear. I wonder if you could share how you got to run into this?
-> >=20
->=20
-> mlx5_unload_one() can be called from few flows.
-> Even that it is always called with devlink lock, serial of=20
-> mlx5_unload_one() twice caused it. I got it on fw_reset and shutdown. I=
-=20
-> I will submit also a patch for calling mlx5_drain_fw_reset() on shutdown=
-=20
-> soon.
+Add NULL pointer checks in ice_vsi_set_napi_queues() to prevent crashes
+during resume from suspend when rings[q_idx]->q_vector is NULL.
 
-I agree, serialization through the devlink lock does not help if
-mlx5_unload_one() does not clean up all the references.
+Tested adaptor:
+60:00.0 Ethernet controller [0200]: Intel Corporation Ethernet Controller E810-XXV for SFP [8086:159b] (rev 02)
+        Subsystem: Intel Corporation Ethernet Network Adapter E810-XXV-2 [8086:4003]
 
->=20
-> > >=20
-> > > >=20
-> > > > I've spotted two additional places where the devcom reference is no=
-t
-> > > > cleared after calling mlx5_devcom_unregister_component() in
-> > > > drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c that I have not
-> > > > addressed with a patch, since I'm unclear about how to test these
-> > > > paths.
-> > >=20
-> > > As for the other cases, we had the patch 664f76be38a1 ("net/mlx5: Fix
-> > > IPsec cleanup over MPV device") and two other cases on shared clock a=
-nd
-> > > SD but I don't see any flow the shared clock or SD can fail,
-> > > specifically mlx5_sd_cleanup() checks sd pointer at beginning of the
-> > > function and nullify it right after sd_unregister() that free devcom.
-> >=20
-> > I didn't locate any calls to mxl5_devcom_unregister_component() in
-> > "shared clock" - is that not yet upstream?
->=20
-> mlx5_shared_clock_unregister() in=20
-> drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
+SR-IOV state: both disabled and enabled can reproduce this issue.
 
-Hah - my fault! I was searching through the indexer's parameterized
-cross-references, and w/o CONFIG_PTP_1588_CLOCK that file was excluded.
+kernel version: v6.18
 
->=20
-> >=20
-> > Regarding SD, I follow that sd_cleanup() is followed immediately after
-> > sd_unregister() and does the clean-up. One path remains uncovered
-> > though: The error exit at
-> > https://elixir.bootlin.com/linux/v6.18/source/drivers/net/ethernet/mell=
-anox/mlx5/core/lib/sd.c#L265
-> >=20
-> > Not sure, how likely that is...
->=20
-> It comes on error flow but after successful=20
-> mlx5_devcom_register_component() in sd_register(), and that error leads=
-=20
-> to error flow in mlx5_sd_init(), which calls sd_cleanup() too.
->=20
-> >=20
-> > Thanks,
-> > Gerd
+Reproduce steps:
+Bootup and execute suspend like systemctl suspend or rtcwake.
 
-Thanks for you explanations,
-Gerd
+Log:
+<1>[  231.443607] BUG: kernel NULL pointer dereference, address: 0000000000000040
+<1>[  231.444052] #PF: supervisor read access in kernel mode
+<1>[  231.444484] #PF: error_code(0x0000) - not-present page
+<6>[  231.444913] PGD 0 P4D 0
+<4>[  231.445342] Oops: Oops: 0000 [#1] SMP NOPTI
+<4>[  231.446635] RIP: 0010:netif_queue_set_napi+0xa/0x170
+<4>[  231.447067] Code: 31 f6 31 ff c3 cc cc cc cc 0f 1f 80 00 00 00 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44 00 00 48 85 c9 74 0b <48> 83 79 30 00 0f 84 39 01 00 00 55 41 89 d1 49 89 f8 89 f2 48 89
+<4>[  231.447513] RSP: 0018:ffffcc780fc078c0 EFLAGS: 00010202
+<4>[  231.447961] RAX: ffff8b848ca30400 RBX: ffff8b848caf2028 RCX: 0000000000000010
+<4>[  231.448443] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff8b848dbd4000
+<4>[  231.448896] RBP: ffffcc780fc078e8 R08: 0000000000000000 R09: 0000000000000000
+<4>[  231.449345] R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000001
+<4>[  231.449817] R13: ffff8b848dbd4000 R14: ffff8b84833390c8 R15: 0000000000000000
+<4>[  231.450265] FS:  00007c7b29e9d740(0000) GS:ffff8b8c068e2000(0000) knlGS:0000000000000000
+<4>[  231.450715] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+<4>[  231.451179] CR2: 0000000000000040 CR3: 000000030626f004 CR4: 0000000000f72ef0
+<4>[  231.451629] PKRU: 55555554
+<4>[  231.452076] Call Trace:
+<4>[  231.452549]  <TASK>
+<4>[  231.452996]  ? ice_vsi_set_napi_queues+0x4d/0x110 [ice]
+<4>[  231.453482]  ice_resume+0xfd/0x220 [ice]
+<4>[  231.453977]  ? __pfx_pci_pm_resume+0x10/0x10
+<4>[  231.454425]  pci_pm_resume+0x8c/0x140
+<4>[  231.454872]  ? __pfx_pci_pm_resume+0x10/0x10
+<4>[  231.455347]  dpm_run_callback+0x5f/0x160
+<4>[  231.455796]  ? dpm_wait_for_superior+0x107/0x170
+<4>[  231.456244]  device_resume+0x177/0x270
+<4>[  231.456708]  dpm_resume+0x209/0x2f0
+<4>[  231.457151]  dpm_resume_end+0x15/0x30
+<4>[  231.457596]  suspend_devices_and_enter+0x1da/0x2b0
+<4>[  231.458054]  enter_state+0x10e/0x570
+
+Add defensive checks for both the ring pointer and its q_vector
+before dereferencing, allowing the system to resume successfully even when
+q_vectors are unmapped.
+
+Fixes: 2a5dc090b92cf ("ice: move netif_queue_set_napi to rtnl-protected sections")
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Signed-off-by: Aaron Ma <aaron.ma@canonical.com>
+---
+V1 -> V2: add test device info.
+
+ drivers/net/ethernet/intel/ice/ice_lib.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+index 15621707fbf81..9d1178bde4495 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+@@ -2779,11 +2779,13 @@ void ice_vsi_set_napi_queues(struct ice_vsi *vsi)
+ 
+ 	ASSERT_RTNL();
+ 	ice_for_each_rxq(vsi, q_idx)
+-		netif_queue_set_napi(netdev, q_idx, NETDEV_QUEUE_TYPE_RX,
++		if (vsi->rx_rings[q_idx] && vsi->rx_rings[q_idx]->q_vector)
++			netif_queue_set_napi(netdev, q_idx, NETDEV_QUEUE_TYPE_RX,
+ 				     &vsi->rx_rings[q_idx]->q_vector->napi);
+ 
+ 	ice_for_each_txq(vsi, q_idx)
+-		netif_queue_set_napi(netdev, q_idx, NETDEV_QUEUE_TYPE_TX,
++		if (vsi->tx_rings[q_idx] && vsi->tx_rings[q_idx]->q_vector)
++			netif_queue_set_napi(netdev, q_idx, NETDEV_QUEUE_TYPE_TX,
+ 				     &vsi->tx_rings[q_idx]->q_vector->napi);
+ 	/* Also set the interrupt number for the NAPI */
+ 	ice_for_each_q_vector(vsi, v_idx) {
+-- 
+2.43.0
+
 
