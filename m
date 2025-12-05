@@ -1,147 +1,89 @@
-Return-Path: <netdev+bounces-243682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8EC9CA5D69
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 02:33:24 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE6DACA5D75
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 02:34:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 642B13179BD8
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 01:32:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CFD94303EB0D
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 01:34:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5698A224AEF;
-	Fri,  5 Dec 2025 01:32:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B75921DF75B;
+	Fri,  5 Dec 2025 01:34:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gZLvY7f2"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 180E7398FBA;
-	Fri,  5 Dec 2025 01:32:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D694F9C0;
+	Fri,  5 Dec 2025 01:34:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764898364; cv=none; b=OvNuGmxGiX9xRJOKd0F6TSZfKqGXeqCb8ctFBUS9c3FCRhBgApdRMzhYHDQI5szBua5XdJeXWrMCniqIHqg4eMsHcBtQRfvdzZR1mcagecwzSyyROrtjUAh73u9yuxSU2voRAL54SJJS5yF28j8SyoaysLTBlRSirI9/65AjLGg=
+	t=1764898463; cv=none; b=XlP6kkv+YigtG7ez5Mlw2oDKs3QsxE4X1ZMyNlBL5HA4Feeq5CbTGJgtS8sbQyDyv2BHQtmd03qc79m0RDCg6qLFHK1R2hKMukuEzUiQqe75BEgU7/oR05LTLCnnGAKnL2tSPmFKnrTm5wFOO0QtDFPIDPrm6+qXhzISVrgpYKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764898364; c=relaxed/simple;
-	bh=b4qQS5AcTfKL3/lKe6YUcIL5CvPrU7U5Es1YgOBf3XU=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=uCWsPhaw/PJhH7EB1jS44rAIAsRV29Fb7wIuBBR4bQ1BlmUGqWjgD6EjNrsFntjnjkL+4fa8nLeVUy1XbaTbJ+3UjH4+6S0Hfz4Fg+29JKzsQvlF5zIatlldcUET07U9CBxZ54VyIjmvftKN1oky3clR18tAw05NpPmRWg7khms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vRKgK-000000002S2-0swd;
-	Fri, 05 Dec 2025 01:32:24 +0000
-Date: Fri, 5 Dec 2025 01:32:20 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Rasmus Villemoes <ravi@prevas.dk>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: [PATCH net] net: dsa: mxl-gsw1xx: manually clear RANEG bit
-Message-ID: <ab836f5d36e3f00cd8e2fb3e647b7204b5b6c990.1764898074.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1764898463; c=relaxed/simple;
+	bh=PAm3rWbBHsuMSjk8J1QU/ctVHIcuEvdCj9SoTv2JAO8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TCtU/4TFx8106M9lVG5gQ3zoS3UzQT163fNjUUlD8O6en7YheA+xEEiH/tW/2CYj5bD6W+PXbqFqYqmHzJPfSY/kdmo8B4T3HEl2gzdpDpRsEDWyG7Zu6BeB2QHa3EhaQJ1azveUDpWTzkJtYf8hOzEHZ4pO24mjjdW1zC1QMQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gZLvY7f2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5AD5C4CEFB;
+	Fri,  5 Dec 2025 01:34:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764898463;
+	bh=PAm3rWbBHsuMSjk8J1QU/ctVHIcuEvdCj9SoTv2JAO8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gZLvY7f2alqbGYKqEWQjzB13WfZc754VBCnkNE8cS91DBXJuX2VU9v8pZt3M7vgM2
+	 sd9YlNVhPyT60JrQVzK/pLZogBj/Qz8A8ODo6ySVgaetstPXquI3yiOVSLWym2x+Zz
+	 XUPPMK+y/PfJv6qJnbZM4qkud69yZYGvEjkcBTPejHg3WSppqi1WQmcpQxqxFg+tHs
+	 Ipgn5hEO9AE/OfxfyMEesQj7EdNoeC1TpmKRX8ZyiSUmILvGSX4epWCxELrCoS0mza
+	 TNgBwiZ0wtau00lBqNuRfkhy903UFpQoVF8HQM6lD/XCk2yWbjkxBkcH2ow2axWooS
+	 OpK+huN5Dlg7g==
+Date: Thu, 4 Dec 2025 17:34:21 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Fabian =?UTF-8?B?R3LDvG5iaWNobGVy?= <f.gruenbichler@proxmox.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Breno Leitao <leitao@debian.org>, Paolo Abeni
+ <pabeni@redhat.com>, leit@meta.com, open list
+ <linux-kernel@vger.kernel.org>, "open list:NETWORKING DRIVERS"
+ <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: veth: Disable netpoll support
+Message-ID: <20251204173421.23841106@kernel.org>
+In-Reply-To: <1764839728.p54aio6507.astroid@yuna.none>
+References: <20240805094012.1843247-1-leitao@debian.org>
+	<1764839728.p54aio6507.astroid@yuna.none>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Despite being documented as self-clearing, the RANEG bit sometimes
-remains set, preventing auto-negotiation from happening.
+On Thu, 04 Dec 2025 10:20:06 +0100 Fabian Gr=C3=BCnbichler wrote:
+> On August 5, 2024 11:40 am, Breno Leitao wrote:
+> > The current implementation of netpoll in veth devices leads to
+> > suboptimal behavior, as it triggers warnings due to the invocation of
+> > __netif_rx() within a softirq context. This is not compliant with
+> > expected practices, as __netif_rx() has the following statement:
+> >=20
+> > 	lockdep_assert_once(hardirq_count() | softirq_count());
+> >=20
+> > Given that veth devices typically do not benefit from the
+> > functionalities provided by netpoll, Disable netpoll for veth
+> > interfaces. =20
+>=20
+> this patch seems to have broken combining netconsole and bridges with
+> veth ports:
+>=20
+> https://bugzilla.proxmox.com/show_bug.cgi?id=3D6873
+>=20
+> any chance this is solvable?
 
-Manually clear the RANEG bit after 10ms as advised by MaxLinear, using
-delayed_work emulating the asynchronous self-clearing behavior.
-
-Fixes: 22335939ec90 ("net: dsa: add driver for MaxLinear GSW1xx switch family")
-Reported-by: Rasmus Villemoes <ravi@prevas.dk>
-Suggested-by: "Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
- drivers/net/dsa/lantiq/mxl-gsw1xx.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
-
-diff --git a/drivers/net/dsa/lantiq/mxl-gsw1xx.c b/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-index cf33a16fd183b..91304d3c1ca9b 100644
---- a/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-+++ b/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-@@ -11,10 +11,12 @@
- 
- #include <linux/bits.h>
- #include <linux/delay.h>
-+#include <linux/jiffies.h>
- #include <linux/module.h>
- #include <linux/of_device.h>
- #include <linux/of_mdio.h>
- #include <linux/regmap.h>
-+#include <linux/workqueue.h>
- #include <net/dsa.h>
- 
- #include "lantiq_gswip.h"
-@@ -29,6 +31,7 @@ struct gsw1xx_priv {
- 	struct			regmap *clk;
- 	struct			regmap *shell;
- 	struct			phylink_pcs pcs;
-+	struct delayed_work	clear_raneg;
- 	phy_interface_t		tbi_interface;
- 	struct gswip_priv	gswip;
- };
-@@ -145,6 +148,8 @@ static void gsw1xx_pcs_disable(struct phylink_pcs *pcs)
- {
- 	struct gsw1xx_priv *priv = pcs_to_gsw1xx(pcs);
- 
-+	cancel_delayed_work_sync(&priv->clear_raneg);
-+
- 	/* Assert SGMII shell reset */
- 	regmap_set_bits(priv->shell, GSW1XX_SHELL_RST_REQ,
- 			GSW1XX_RST_REQ_SGMII_SHELL);
-@@ -428,12 +433,27 @@ static int gsw1xx_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
- 	return 0;
- }
- 
-+static void gsw1xx_pcs_clear_raneg(struct work_struct *work)
-+{
-+	struct gsw1xx_priv *priv =
-+		container_of(work, struct gsw1xx_priv, clear_raneg.work);
-+
-+	regmap_clear_bits(priv->sgmii, GSW1XX_SGMII_TBI_ANEGCTL,
-+			  GSW1XX_SGMII_TBI_ANEGCTL_RANEG);
-+}
-+
- static void gsw1xx_pcs_an_restart(struct phylink_pcs *pcs)
- {
- 	struct gsw1xx_priv *priv = pcs_to_gsw1xx(pcs);
- 
- 	regmap_set_bits(priv->sgmii, GSW1XX_SGMII_TBI_ANEGCTL,
- 			GSW1XX_SGMII_TBI_ANEGCTL_RANEG);
-+
-+	/* despite being documented as self-clearing, the RANEG bit
-+	 * sometimes remains set, preventing auto-negotiation from happening.
-+	 * MaxLinear advises to manually clear the bit after 10ms.
-+	 */
-+	schedule_delayed_work(&priv->clear_raneg, msecs_to_jiffies(10));
- }
- 
- static void gsw1xx_pcs_link_up(struct phylink_pcs *pcs,
-@@ -636,6 +656,8 @@ static int gsw1xx_probe(struct mdio_device *mdiodev)
- 	if (ret)
- 		return ret;
- 
-+	INIT_DELAYED_WORK(&priv->clear_raneg, gsw1xx_pcs_clear_raneg);
-+
- 	ret = gswip_probe_common(&priv->gswip, version);
- 	if (ret)
- 		return ret;
--- 
-2.52.0
+What's the reason to set up netcons over veth?
+Note that unlike normal IP traffic netcons just blindly pipes out fully
+baked skbs, it doesn't use the IP stack. So unlike normal IP traffic
+I think you can still point it at the physical netdev, even if that
+physical netdev is under a bridge.
 
