@@ -1,90 +1,79 @@
-Return-Path: <netdev+bounces-243804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243809-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id F16F5CA7815
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 13:03:48 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1D7ECA799F
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 13:45:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B68B13122592
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 12:03:29 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 3E0E43022838
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 12:45:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39E093314CD;
-	Fri,  5 Dec 2025 11:53:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB56632D44E;
+	Fri,  5 Dec 2025 12:45:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="NmjNWoB+"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="Qtm/3JgC"
 X-Original-To: netdev@vger.kernel.org
-Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013022.outbound.protection.outlook.com [40.107.201.22])
+Received: from server.couthit.com (server.couthit.com [162.240.164.96])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0286C32C936;
-	Fri,  5 Dec 2025 11:53:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.22
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764935631; cv=fail; b=ihbaqbMVtLQVwnvD9PA6ple6hhb1kemRugo+fk4CzlGLne7pMWJpOcvjhSgOAfnhDaT16V2dijn7Fyq9NScy5aezHMkGLDC5HpnjD9SG5gSXdMcDJTbXy0dJRS3U+VNQMPRyWjJNC8G4rOxQmg/IC8mys0QdnQ9Cu/rbf7EoLvY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764935631; c=relaxed/simple;
-	bh=LZt+FAn4lIFWBgXPL3ToS0bMB6gF5GFV8BjX1trDXUY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Pm8H8JvGivDJDuhSVtaWoHg6MDonVCyXGUT5paoO0BvJLfRhfFjDxigPBuk1Fei0XI9zjH6mA/yLL6UwGAOye7bdiS3huREHw6uqOV79HTDY6RRm7C0t960969OvzJznvOHqSsWyMzdVaOFdaUmmpu+il08Xl1PeOM216rTQgZg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=NmjNWoB+; arc=fail smtp.client-ip=40.107.201.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Oqw4BR+U/zYbAC4Wwab0jWkgeN+n5KWquiq/Rfl5x6qZoVTi3htUJMpVFWoqkyYUok4lbGL/GTWSmOQxfFh3XpRm+CSuUJasTjI/XTq5jfGvX6An9YXI2XJRPLlAhk901GNfk7nk6lOzrIHys9F5uozhz8IPcirJI28nVSypAWj5YbSZNNaZKhww9JdRbGP1YDD5CiDu9yenyhOSARBLRZU0RW+UQzngJt4N01AlVjUwcHD97CNb/DcQFyGDwEaAeOI/wgnydxRJbZceEsllfdStWmAiNo5qZ9zKrMbAJHzzWlxWlOdpoQCjbC6e5WNSK8f7K1tKKISafcZC0XMNOQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rD2GMa7asjD5eDACsvxutaMxsFeXGv7s58CX8RcGUGE=;
- b=UjbobaLddS4MEdytZaZYwEX9DqtVM+CtoPMPjg041uL8uRkuTHBvIUAyMzjvR/qGCsbAeFpOn9mjug1hk5rqNIW2ILGHAI98CdD/5+dcsQF3BvhMThuU7R0C0+E7heBEJYcVvxqRHdLmuxrdAS9jLYurLkDY2pVwg/D+iECwZRtLIbxme9l6ZjtB2qeFH60Xvsi5Ejh0EZOLul+2+LIG105NquXk9X7SbVZIArjx5SmgxJtXy5iZAm5XIuKBNKm5s2Y4PzzbPKqLNUsKIEnYv208d8YvAJ6sJ8xQvk/9va9/qKVO039r/k2m0G76G9DNW48I54OLdn//7MTQZJ9cxQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rD2GMa7asjD5eDACsvxutaMxsFeXGv7s58CX8RcGUGE=;
- b=NmjNWoB+VzxWjRdzZLiPQGEzyap8qIeAiXVG55YLZbbvwQmHyb9JQzC/4PAB3SnmVRwH7W5bQ7cyEmSk2wOmVUoTd/LwxVqbkoJPqUaVJoCDxXzMPqvx9Sf4EybYjN3Cd2qJgT11u0+3tDaBUqAcSCiUpvpU01/SJHtRlWP00s0=
-Received: from SA0PR12CA0011.namprd12.prod.outlook.com (2603:10b6:806:6f::16)
- by MW4PR12MB5628.namprd12.prod.outlook.com (2603:10b6:303:185::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9388.9; Fri, 5 Dec
- 2025 11:53:37 +0000
-Received: from SA2PEPF000015CC.namprd03.prod.outlook.com
- (2603:10b6:806:6f:cafe::eb) by SA0PR12CA0011.outlook.office365.com
- (2603:10b6:806:6f::16) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9388.11 via Frontend Transport; Fri,
- 5 Dec 2025 11:53:34 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=satlexmb08.amd.com; pr=C
-Received: from satlexmb08.amd.com (165.204.84.17) by
- SA2PEPF000015CC.mail.protection.outlook.com (10.167.241.202) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9388.8 via Frontend Transport; Fri, 5 Dec 2025 11:53:37 +0000
-Received: from satlexmb08.amd.com (10.181.42.217) by satlexmb08.amd.com
- (10.181.42.217) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Fri, 5 Dec
- 2025 05:53:35 -0600
-Received: from xcbalucerop40x.xilinx.com (10.180.168.240) by
- satlexmb08.amd.com (10.181.42.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.17 via Frontend Transport; Fri, 5 Dec 2025 03:53:34 -0800
-From: <alejandro.lucero-palau@amd.com>
-To: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
-	<dave.jiang@intel.com>
-CC: Alejandro Lucero <alucerop@amd.com>, Jonathan Cameron
-	<Jonathan.Cameron@huawei.com>
-Subject: [PATCH v22 25/25] sfc: support pio mapping based on cxl
-Date: Fri, 5 Dec 2025 11:52:48 +0000
-Message-ID: <20251205115248.772945-26-alejandro.lucero-palau@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20251205115248.772945-1-alejandro.lucero-palau@amd.com>
-References: <20251205115248.772945-1-alejandro.lucero-palau@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A8A5327C02;
+	Fri,  5 Dec 2025 12:45:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1764938709; cv=none; b=mR8VhWQO8bWXBi08K3/vFRn1YFjOj2t0xC/HWavf3HASfmff1oW1k18c0QO24XbfwiNDxRy+ZCL+5GIkPUVi+DNht7ij1yNqF18YVI6gG0WC1NeYqaQDYVlM96UaPEXJsuQViq+WbTdQrmZzxcdcfYwpEmjuHGhof3+73Qj+jic=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1764938709; c=relaxed/simple;
+	bh=qdQVx2AD6BXOPLogEc/qoTnI8fpvI+0OD8ivP1PBcSA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=llI/4uQd3oRWgamiH+WWxuqDRYgoJKygTW5+GXvh4l6JNbBNcBNR0yc63zVD3TytvT2hUker4lHzBRHVIqZ3uCIZrIYmPSDk0XeAR+c7Ns/jtmQA0SSVUMkH99T1e4LECav3Rlf1yLkL5cA22syY8hxnIw2jkEwrpXwzw1REZDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=Qtm/3JgC; arc=none smtp.client-ip=162.240.164.96
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject
+	:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=4Z3iKes0VYNH4cz5tQkWvyb4vz1NggDVhpBNY1BIFcc=; b=Qtm/3JgCcndHoSRTKrKxgTXKrI
+	YVLgWpCdiULTdTPiuS3ehGeJ52xG2FPBHBiREouoOV/MDxnAs7x5/vvb68vqb63dpbMns9V4bYVhN
+	8WeMxl39BBmH3r/pGm2M6dNR6vInDd8RtbBIv2GMSOJRh6cItUHUVmHle6W9AQD58XMe6Rr7Lddv0
+	OgBFeltbsE853Ft/lR1NO1yjSuxGg+/iTAPqa0jEVzJI5wjaUbs1qI0SnqkEK56vHF87hk1H7W1vi
+	NGBIe0pusLuBz9+ZRAvUfRVbV7rBPBXeBdfAm44VMtuAzzD67WmDZ+KFpfTtjzEczlQ0GVJRCd1do
+	bdNbYXHg==;
+Received: from [122.175.9.182] (port=9516 helo=cypher.couthit.local)
+	by server.couthit.com with esmtpa (Exim 4.98.1)
+	(envelope-from <parvathi@couthit.com>)
+	id 1vRUzI-00000003o4B-0xyR;
+	Fri, 05 Dec 2025 07:32:40 -0500
+From: Parvathi Pudi <parvathi@couthit.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	danishanwar@ti.com,
+	parvathi@couthit.com,
+	rogerq@kernel.org,
+	pmohan@couthit.com,
+	basharath@couthit.com,
+	afd@ti.com
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	alok.a.tiwari@oracle.com,
+	horms@kernel.org,
+	pratheesh@ti.com,
+	j-rameshbabu@ti.com,
+	vigneshr@ti.com,
+	praneeth@ti.com,
+	srk@ti.com,
+	rogerq@ti.com,
+	krishna@couthit.com,
+	mohan@couthit.com
+Subject: [RFC PATCH net-next v9 0/3] STP/RSTP SWITCH support for PRU-ICSSM Ethernet driver
+Date: Fri,  5 Dec 2025 17:59:10 +0530
+Message-ID: <20251205123146.462397-1-parvathi@couthit.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,306 +81,159 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF000015CC:EE_|MW4PR12MB5628:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9481d331-85f9-4244-8ece-08de33f4ece4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?vUqSMiNSHDxd3Z7mC9TyAerL3eengzac80ZU9k+cVGFJSFpXTOZe4ocg4apq?=
- =?us-ascii?Q?YVIOKOvhPcME3PXKjUang16rolLwNG50Gpypv+3sjtQ6+bQrNyCDBXssu9YX?=
- =?us-ascii?Q?UGEk/yOXTfBqBvZ+qT2rfHeMGmLnXehkZchrC2zU4YES3VCOi7ylESqgiRsj?=
- =?us-ascii?Q?XDNuLSg9w6CHgBKs29gocKX8ETD7G7MAgrWG4NmCP0u+8Ahz1BjmgBzS5IpZ?=
- =?us-ascii?Q?NZBidqmO9fieI6MOgdwiesPmzfveycT0tjo3/ibwhIbp64AtrF5MnwCCUhnr?=
- =?us-ascii?Q?rV0+BmfODPVfSrINxdfrQfHsk9h4CzYlGl+VqsMfuvg9MFGhJAgiia/+Y/tp?=
- =?us-ascii?Q?zvFAh1fncDaRYfzNTwf4BBAv5ynceOZM2wA3Bh8MlgDnIWb4ODP88lX4VHj9?=
- =?us-ascii?Q?ysJViza05Po3fFjJD+BhrBXqwrlFqe+OjaJ+AKvSeEVgwiP6yVEuLPvBc1oU?=
- =?us-ascii?Q?1c/JTLCG1zYm9YvdJUo/XhtDaumWHJA33Yemf2BhM3lWAphjlRajjic6TQ/S?=
- =?us-ascii?Q?Rao0buOX2fN+2FvPRh6h9q2HToiCaG58hr+7RICh21BD15dPxyNPoEni+tjr?=
- =?us-ascii?Q?UDo8V+3CmuniQmzjel6YgTLDEqhLZefMOKk7F7wDJIrwbu1gNEDLnBvdNbgz?=
- =?us-ascii?Q?Gsc5xt1HyJFfl+p2QW6V2pfD7os0NbwwFTOJaYeXjd240UCX1oqMyTp34XFS?=
- =?us-ascii?Q?MCoHWJ0i3LPnOd+jzqbtY+JO97RiTsbYpY2Nw3b7iyxLP2g+XlFH4PqGBhzc?=
- =?us-ascii?Q?2dTmFGKwG8CNhc+byc9BgzqPgTwePRnfn9/l+t1CtQ+bRQKpiAmn0HsCerOW?=
- =?us-ascii?Q?KDbGdpquvfMu1UUWrj/MZEJ7xiT0rtnWr7BrnBwkGwkoBqeNzijKYZDBXzaw?=
- =?us-ascii?Q?/iFVPjLu/iYWyXrn0EBhKKeSq6FomOrRUKw1JtklmTVsp8emM9Rmg+4u0dpC?=
- =?us-ascii?Q?egcuQui825zNehHgZQishSiBsMtpsImeWQQxB8J5K8Yy9O9qgsyb0nRdRdqo?=
- =?us-ascii?Q?CEhc8++nETJ6X1hM1g7dePk/lkql6KUx9R4SVH62h+SAS0hyokT7r8U1JD8M?=
- =?us-ascii?Q?Fwg9rkwSGmVWRQXIF8DCAEhizxB9JxaToyZe8w+5BAdVzt5xLdMVTmzqnAkv?=
- =?us-ascii?Q?ApnBDxLejkJjQLoQJl0VxqGmoXC0d/Gen6GR9/nJYAc8LbwU/T0c8aro8gPE?=
- =?us-ascii?Q?+Zye8AZAQJmvPY8QSig2UYlCrfa4b8iyUlGb2uEtzi0KRAXwSBi33AmVQ3GY?=
- =?us-ascii?Q?9JpMM52I7wtdAKksAleTSEktWYqbhkeNzjGbnw3kT5Ekg0uNIjYr3a56UOcA?=
- =?us-ascii?Q?OwoeWV5Qtgv+KCqj7RdgF1AHvnSKMlGhl7RnyaPP70MPd00E9oeZeqzkb9JF?=
- =?us-ascii?Q?cSmpevk3o82qKQAix68vI99AJ+lUVTu3fLjwbe+xULhU3pBH18CglFW3nR3w?=
- =?us-ascii?Q?3TXPGgh9jdyKL+UP0C+hzwJ1pXzryW8MDICs2kATFLhVsYIBVu0cmZ0MAePH?=
- =?us-ascii?Q?BLmmVTMZOHJ7JmFT94v6JF3lojOPAjb50qggSFE7GYkOlf+sMCSxgt3+VX7u?=
- =?us-ascii?Q?qp2+THUbaZ27hOEz8SA=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:satlexmb08.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Dec 2025 11:53:37.1979
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9481d331-85f9-4244-8ece-08de33f4ece4
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb08.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF000015CC.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB5628
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.couthit.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: parvathi@couthit.com
+X-Authenticated-Sender: server.couthit.com: parvathi@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-From: Alejandro Lucero <alucerop@amd.com>
+Hi,
 
-A PIO buffer is a region of device memory to which the driver can write a
-packet for TX, with the device handling the transmit doorbell without
-requiring a DMA for getting the packet data, which helps reducing latency
-in certain exchanges. With CXL mem protocol this latency can be lowered
-further.
+The DUAL-EMAC patch series for Megabit Industrial Communication Sub-system
+(ICSSM), which provides the foundational support for Ethernet functionality
+over PRU-ICSS on the TI SOCs (AM335x, AM437x, and AM57x), was merged into
+net-next recently [1].
 
-With a device supporting CXL and successfully initialised, use the cxl
-region to map the memory range and use this mapping for PIO buffers.
+This patch series enhances the PRU-ICSSM Ethernet driver to support bridge
+(STP/RSTP) SWITCH mode, which has been implemented using the "switchdev"
+framework and interacts with the "mstp daemon" for STP and RSTP management
+in userspace.
 
-Add the disabling of those CXL-based PIO buffers if the callback for
-potential cxl endpoint removal by the CXL code happens.
+When the  SWITCH mode is enabled, forwarding of Ethernet packets using
+either the traditional store-and-forward mechanism or via cut-through is
+offloaded to the two PRU based Ethernet interfaces available within the
+ICSSM. The firmware running on the PRU inspects the bridge port states and
+performs necessary checks before forwarding a packet. This improves the
+overall system performance and significantly reduces the packet forwarding
+latency.
 
-Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Reviewed-by: Dave Jiang <dave.jiang@intel.com>
----
- drivers/net/ethernet/sfc/ef10.c       | 50 +++++++++++++++++++++++----
- drivers/net/ethernet/sfc/efx_cxl.c    | 39 +++++++++++++++------
- drivers/net/ethernet/sfc/net_driver.h |  2 ++
- drivers/net/ethernet/sfc/nic.h        |  3 ++
- 4 files changed, 77 insertions(+), 17 deletions(-)
+Protocol switching from Dual-EMAC to bridge (STP/RSTP) SWITCH mode can be
+done as follows.
 
-diff --git a/drivers/net/ethernet/sfc/ef10.c b/drivers/net/ethernet/sfc/ef10.c
-index fcec81f862ec..2bb6d3136c7c 100644
---- a/drivers/net/ethernet/sfc/ef10.c
-+++ b/drivers/net/ethernet/sfc/ef10.c
-@@ -24,6 +24,7 @@
- #include <linux/wait.h>
- #include <linux/workqueue.h>
- #include <net/udp_tunnel.h>
-+#include "efx_cxl.h"
- 
- /* Hardware control for EF10 architecture including 'Huntington'. */
- 
-@@ -106,7 +107,7 @@ static int efx_ef10_get_vf_index(struct efx_nic *efx)
- 
- static int efx_ef10_init_datapath_caps(struct efx_nic *efx)
- {
--	MCDI_DECLARE_BUF(outbuf, MC_CMD_GET_CAPABILITIES_V4_OUT_LEN);
-+	MCDI_DECLARE_BUF(outbuf, MC_CMD_GET_CAPABILITIES_V7_OUT_LEN);
- 	struct efx_ef10_nic_data *nic_data = efx->nic_data;
- 	size_t outlen;
- 	int rc;
-@@ -177,6 +178,12 @@ static int efx_ef10_init_datapath_caps(struct efx_nic *efx)
- 			  efx->num_mac_stats);
- 	}
- 
-+	if (outlen < MC_CMD_GET_CAPABILITIES_V7_OUT_LEN)
-+		nic_data->datapath_caps3 = 0;
-+	else
-+		nic_data->datapath_caps3 = MCDI_DWORD(outbuf,
-+						      GET_CAPABILITIES_V7_OUT_FLAGS3);
-+
- 	return 0;
- }
- 
-@@ -919,6 +926,9 @@ static void efx_ef10_forget_old_piobufs(struct efx_nic *efx)
- static void efx_ef10_remove(struct efx_nic *efx)
- {
- 	struct efx_ef10_nic_data *nic_data = efx->nic_data;
-+#ifdef CONFIG_SFC_CXL
-+	struct efx_probe_data *probe_data;
-+#endif
- 	int rc;
- 
- #ifdef CONFIG_SFC_SRIOV
-@@ -949,7 +959,12 @@ static void efx_ef10_remove(struct efx_nic *efx)
- 
- 	efx_mcdi_rx_free_indir_table(efx);
- 
-+#ifdef CONFIG_SFC_CXL
-+	probe_data = container_of(efx, struct efx_probe_data, efx);
-+	if (nic_data->wc_membase && !probe_data->cxl_pio_in_use)
-+#else
- 	if (nic_data->wc_membase)
-+#endif
- 		iounmap(nic_data->wc_membase);
- 
- 	rc = efx_mcdi_free_vis(efx);
-@@ -1140,6 +1155,9 @@ static int efx_ef10_dimension_resources(struct efx_nic *efx)
- 	unsigned int channel_vis, pio_write_vi_base, max_vis;
- 	struct efx_ef10_nic_data *nic_data = efx->nic_data;
- 	unsigned int uc_mem_map_size, wc_mem_map_size;
-+#ifdef CONFIG_SFC_CXL
-+	struct efx_probe_data *probe_data;
-+#endif
- 	void __iomem *membase;
- 	int rc;
- 
-@@ -1263,8 +1281,25 @@ static int efx_ef10_dimension_resources(struct efx_nic *efx)
- 	iounmap(efx->membase);
- 	efx->membase = membase;
- 
--	/* Set up the WC mapping if needed */
--	if (wc_mem_map_size) {
-+	if (!wc_mem_map_size)
-+		goto skip_pio;
-+
-+	/* Set up the WC mapping */
-+
-+#ifdef CONFIG_SFC_CXL
-+	probe_data = container_of(efx, struct efx_probe_data, efx);
-+	if ((nic_data->datapath_caps3 &
-+	    (1 << MC_CMD_GET_CAPABILITIES_V7_OUT_CXL_CONFIG_ENABLE_LBN)) &&
-+	    probe_data->cxl_pio_initialised) {
-+		/* Using PIO through CXL mapping? */
-+		nic_data->pio_write_base = probe_data->cxl->ctpio_cxl +
-+					   (pio_write_vi_base * efx->vi_stride +
-+					    ER_DZ_TX_PIOBUF - uc_mem_map_size);
-+		probe_data->cxl_pio_in_use = true;
-+	} else
-+#endif
-+	{
-+		/* Using legacy PIO BAR mapping */
- 		nic_data->wc_membase = ioremap_wc(efx->membase_phys +
- 						  uc_mem_map_size,
- 						  wc_mem_map_size);
-@@ -1279,12 +1314,13 @@ static int efx_ef10_dimension_resources(struct efx_nic *efx)
- 			nic_data->wc_membase +
- 			(pio_write_vi_base * efx->vi_stride + ER_DZ_TX_PIOBUF -
- 			 uc_mem_map_size);
--
--		rc = efx_ef10_link_piobufs(efx);
--		if (rc)
--			efx_ef10_free_piobufs(efx);
- 	}
- 
-+	rc = efx_ef10_link_piobufs(efx);
-+	if (rc)
-+		efx_ef10_free_piobufs(efx);
-+
-+skip_pio:
- 	netif_dbg(efx, probe, efx->net_dev,
- 		  "memory BAR at %pa (virtual %p+%x UC, %p+%x WC)\n",
- 		  &efx->membase_phys, efx->membase, uc_mem_map_size,
-diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
-index 18b487d0cac3..024a92632c56 100644
---- a/drivers/net/ethernet/sfc/efx_cxl.c
-+++ b/drivers/net/ethernet/sfc/efx_cxl.c
-@@ -11,6 +11,7 @@
- #include <cxl/pci.h>
- #include "net_driver.h"
- #include "efx_cxl.h"
-+#include "efx.h"
- 
- #define EFX_CTPIO_BUFFER_SIZE	SZ_256M
- 
-@@ -140,15 +141,35 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
- 		cxl->efx_region = cxl_create_region(cxl->cxlrd, &cxl->cxled, 1);
- 		if (IS_ERR(cxl->efx_region)) {
- 			pci_err(pci_dev, "CXL accel create region failed");
--			cxl_put_root_decoder(cxl->cxlrd);
--			cxl_dpa_free(cxl->cxled);
--			return PTR_ERR(cxl->efx_region);
-+			rc = PTR_ERR(cxl->efx_region);
-+			goto err_dpa;
-+		}
-+
-+		rc = cxl_get_region_range(cxl->efx_region, &range);
-+		if (rc) {
-+			pci_err(pci_dev, "CXL getting regions params failed");
-+			goto err_detach;
-+		}
-+
-+		cxl->ctpio_cxl = ioremap(range.start, range.end - range.start + 1);
-+		if (!cxl->ctpio_cxl) {
-+			pci_err(pci_dev, "CXL ioremap region (%pra) failed", &range);
-+			rc = -ENOMEM;
-+			goto err_detach;
- 		}
- 	}
- 
- 	probe_data->cxl = cxl;
-+	probe_data->cxl_pio_initialised = true;
- 
- 	return 0;
-+
-+err_detach:
-+	cxl_decoder_detach(NULL, cxl->cxled, 0, DETACH_INVALIDATE);
-+err_dpa:
-+	cxl_put_root_decoder(cxl->cxlrd);
-+	cxl_dpa_free(cxl->cxled);
-+	return rc;
- }
- 
- void efx_cxl_exit(struct efx_probe_data *probe_data)
-@@ -156,13 +177,11 @@ void efx_cxl_exit(struct efx_probe_data *probe_data)
- 	if (!probe_data->cxl)
- 		return;
- 
--	if (probe_data->cxl->hdm_was_committed) {
--		iounmap(probe_data->cxl->ctpio_cxl);
--		cxl_decoder_detach(NULL, probe_data->cxl->cxled, 0,
--				   DETACH_INVALIDATE);
--	} else {
--		cxl_decoder_detach(NULL, probe_data->cxl->cxled, 0,
--				   DETACH_INVALIDATE);
-+	iounmap(probe_data->cxl->ctpio_cxl);
-+	cxl_decoder_detach(NULL, probe_data->cxl->cxled, 0,
-+			   DETACH_INVALIDATE);
-+
-+	if (!probe_data->cxl->hdm_was_committed) {
- 		cxl_dpa_free(probe_data->cxl->cxled);
- 		cxl_put_root_decoder(probe_data->cxl->cxlrd);
- 	}
-diff --git a/drivers/net/ethernet/sfc/net_driver.h b/drivers/net/ethernet/sfc/net_driver.h
-index 3964b2c56609..bea4eecdf842 100644
---- a/drivers/net/ethernet/sfc/net_driver.h
-+++ b/drivers/net/ethernet/sfc/net_driver.h
-@@ -1207,6 +1207,7 @@ struct efx_cxl;
-  * @efx: Efx NIC details
-  * @cxl: details of related cxl objects
-  * @cxl_pio_initialised: cxl initialization outcome.
-+ * @cxl_pio_in_use: PIO using CXL mapping
-  */
- struct efx_probe_data {
- 	struct pci_dev *pci_dev;
-@@ -1214,6 +1215,7 @@ struct efx_probe_data {
- #ifdef CONFIG_SFC_CXL
- 	struct efx_cxl *cxl;
- 	bool cxl_pio_initialised;
-+	bool cxl_pio_in_use;
- #endif
- };
- 
-diff --git a/drivers/net/ethernet/sfc/nic.h b/drivers/net/ethernet/sfc/nic.h
-index 9fa5c4c713ab..c87cc9214690 100644
---- a/drivers/net/ethernet/sfc/nic.h
-+++ b/drivers/net/ethernet/sfc/nic.h
-@@ -152,6 +152,8 @@ enum {
-  *	%MC_CMD_GET_CAPABILITIES response)
-  * @datapath_caps2: Further Capabilities of datapath firmware (FLAGS2 field of
-  * %MC_CMD_GET_CAPABILITIES response)
-+ * @datapath_caps3: Further Capabilities of datapath firmware (FLAGS3 field of
-+ * %MC_CMD_GET_CAPABILITIES response)
-  * @rx_dpcpu_fw_id: Firmware ID of the RxDPCPU
-  * @tx_dpcpu_fw_id: Firmware ID of the TxDPCPU
-  * @must_probe_vswitching: Flag: vswitching has yet to be setup after MC reboot
-@@ -186,6 +188,7 @@ struct efx_ef10_nic_data {
- 	bool must_check_datapath_caps;
- 	u32 datapath_caps;
- 	u32 datapath_caps2;
-+	u32 datapath_caps3;
- 	unsigned int rx_dpcpu_fw_id;
- 	unsigned int tx_dpcpu_fw_id;
- 	bool must_probe_vswitching;
+Assuming eth2 and eth3 are the two physical ports of the ICSS2 instance:
+
+>> brctl addbr br0
+>> ip maddr add 01:80:c2:00:00:00 dev br0
+>> ip link set dev br0 address $(cat /sys/class/net/eth2/address)
+>> brctl addif br0 eth2
+>> brctl addif br0 eth3
+>> mstpd
+>> brctl stp br0 on
+# STP to RSTP mode
+>> mstpctl setforcevers br0 rstp
+>> ip link set dev br0 up
+
+To revert back to the default dual EMAC mode, the steps are as follows:
+
+>> ip link set dev br0 down
+>> brctl delif br0 eth2
+>> brctl delif br0 eth3
+>> brctl delbr br0
+
+The patches presented in this series have gone through the patch verification
+tools and no warnings or errors are reported.
+
+Sample test logs obtained from AM33x, AM43x and AM57x verifying the
+functionality on Linux next kernel are available here:
+
+[Interface up Testing](https://gist.github.com/ParvathiPudi/dec8bd097ae1bc2670eae3018ecf2706)
+
+[Ping Testing](https://gist.github.com/ParvathiPudi/8ca7d7a6e58df812dd31cbd0bd51696d)
+
+[Iperf Testing](https://gist.github.com/ParvathiPudi/49687cb411f1459cf1ab7eb82b359e6f)
+
+[1] https://lore.kernel.org/all/20250912104741.528721-1-parvathi@couthit.com/
+
+This is the v9 of the patch series [v1]. This version of the patchset
+addresses the comments made on [v8] of the series.
+
+Changes from v8 to v9:
+
+*) Added RFC tag as net-next is closed now.
+*) Addressed  Jakub Kicinski comments on patch 1 and 2 of the series.
+*) Rebased the series on latest net-next.
+
+Changes from v7 to v8:
+
+*) Modified dev_hold/dev_put reference to netdev_hold/netdev_put in patch 2 of the series.
+*) Rebased the series on latest net-next.
+
+Changes from v6 to v7:
+
+*) Addressed Jakub Kicinski comments on patch 2 of the series.
+*) Rebased the series on latest net-next.
+
+Changes from v5 to v6:
+
+*) Addressed Simon Horman comments on patch 1, 2 and 3 of the series.
+*) Rebased the series on latest net-next.
+
+Changes from v4 to v5:
+
+*) Addressed ALOK TIWARI comments on patch 1 of the series.
+*) Rebased the series on latest net-next.
+
+Changes from v3 to v4:
+
+*) Addressed Andrew Lunn comments on patch 1 and 2 of the series.
+*) Rebased the series on latest net-next.
+
+Changes from v2 to v3:
+
+*) Dropped the RFC tag.
+*) Addressed  MD Danish Anwar comments on patch 3 of the series.
+*) Rebased the series on latest net-next.
+
+Changes from v1 to v2 :
+
+*) Added RFC tag as net-next is closed now.
+*) Updated the cover letter of the series to generalize and indicate support for
+both STP and RSTP along with subject change as per Andrew Lunn's suggestion.
+*) Addressed the Andrew Lunn's comments on patch 1 of the series.
+*) Rebased the series on latest net-next.
+
+[v1] https://lore.kernel.org/all/20250925141246.3433603-1-parvathi@couthit.com/
+[v2] https://lore.kernel.org/all/20251006104908.775891-1-parvathi@couthit.com/
+[v3] https://lore.kernel.org/all/20251014124018.1596900-1-parvathi@couthit.com/
+[v4] https://lore.kernel.org/all/20251110125539.31052-1-parvathi@couthit.com/
+[v5] https://lore.kernel.org/all/20251113101229.675141-1-parvathi@couthit.com/
+[v6] https://lore.kernel.org/all/20251124135800.2219431-1-parvathi@couthit.com/
+[v7] https://lore.kernel.org/all/20251126124602.2624264-1-parvathi@couthit.com/
+[v8] https://lore.kernel.org/all/20251126163056.2697668-1-parvathi@couthit.com/
+
+Thanks and Regards,
+Parvathi.
+
+Roger Quadros (3):
+  net: ti: icssm-prueth: Add helper functions to configure and maintain
+    FDB
+  net: ti: icssm-prueth: Add switchdev support for icssm_prueth driver
+  net: ti: icssm-prueth: Add support for ICSSM RSTP switch
+
+ drivers/net/ethernet/ti/Makefile              |    2 +-
+ drivers/net/ethernet/ti/icssm/icssm_prueth.c  |  517 +++++++-
+ drivers/net/ethernet/ti/icssm/icssm_prueth.h  |   20 +-
+ .../ethernet/ti/icssm/icssm_prueth_fdb_tbl.h  |   76 ++
+ .../ethernet/ti/icssm/icssm_prueth_switch.c   | 1060 +++++++++++++++++
+ .../ethernet/ti/icssm/icssm_prueth_switch.h   |   37 +
+ drivers/net/ethernet/ti/icssm/icssm_switch.h  |  103 ++
+ .../net/ethernet/ti/icssm/icssm_switchdev.c   |  333 ++++++
+ .../net/ethernet/ti/icssm/icssm_switchdev.h   |   13 +
+ .../ti/icssm/icssm_vlan_mcast_filter_mmap.h   |  120 ++
+ 10 files changed, 2258 insertions(+), 23 deletions(-)
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth_fdb_tbl.h
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth_switch.c
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth_switch.h
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_switchdev.c
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_switchdev.h
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_vlan_mcast_filter_mmap.h
+
 -- 
-2.34.1
+2.43.0
 
 
