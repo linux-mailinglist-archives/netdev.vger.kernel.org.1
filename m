@@ -1,120 +1,315 @@
-Return-Path: <netdev+bounces-243819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E582ECA7E59
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 15:09:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 89F02CA7E6B
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 15:12:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9C7883203A9E
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 14:07:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E96C13017EEC
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 14:11:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AEEA330B3E;
-	Fri,  5 Dec 2025 14:07:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 756DB3164D4;
+	Fri,  5 Dec 2025 14:11:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TI0qeUry"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="ZvMeTDQI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE6A329AB15
-	for <netdev@vger.kernel.org>; Fri,  5 Dec 2025 14:07:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB5E3019C0;
+	Fri,  5 Dec 2025 14:11:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764943627; cv=none; b=k2hXvzzNB/bP3d3XBLpDlaAbHQV7yy2bVzE7d6HMEVGOgF03kAI/mF2nGtlBVGwzlih89/lGKQ7JQ/G3LxazMF2fgE85SSCtyibjcqQTkJttBOOpsoRh6DyJ4gIKsCFq2yX2OHb+t5sOVMSrGVgru/2rS1+Sc1P7nUjzMcRCNmI=
+	t=1764943878; cv=none; b=OQ1FE9HYFlanMcs92W/rvAjxLSTb3GXKOONtLYMj1oYHBwWsiBam2FP1TFKSUkBhdEMRJoQrpVO2HiJMwlNHg0InrLfglnhfwbBt7Y2RbYIUh69nl1BXIi4t3a05hm9COwZQOUOgxgMCpsQyr6RUkJ8wqw+rf5Udbzl06YYMhkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764943627; c=relaxed/simple;
-	bh=v0aLSz6eztCCXc5Q60HoWtsEgndbijRcO8K/h9nqE18=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZrCX9gB/sgeoEUigG5/duMectzuUepQa5thchbAFXQJMBXj8nqBjROpuK1OZqoITzjrVj2H7WRt3iRei2iTa+G8UQUyr2STWpWsJh/+HkMgQoG1vNArBdgILKFCgRQ7Fz+ekvoMF2g39Z3maTMuxXjQcrUtxrSSR0bFKVoUAJ/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TI0qeUry; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4775dbde730so2875025e9.3
-        for <netdev@vger.kernel.org>; Fri, 05 Dec 2025 06:07:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764943621; x=1765548421; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=q9++XxvnUn686kk2ddDofJD+D0ZU/VRf4pIN8y4vJ3I=;
-        b=TI0qeUrypK/wyM0Fqaq91N5G4cxxF+ZjIB5JRJFIlGtmU21c5xWpjDtVb90bUPMVEs
-         u6CqwaXs+MKG5uW94Qpy59OI0ffkL1SV/fWT6oU9xaiKtQ4Gu1piS5df8LBw/YG85PuI
-         BPRgmgOdwvtXL07tXfIaADWXamxIurrr9skDhE8u4iRYZGVLmnQgyGkfFSo4NpQihOu2
-         RpyPlimWZwQRrGJ66pjSTBWSGed9bHJBPTHGa3ERL0lxwhZ0awqKPNOiw31VZhROXQQs
-         n7952aJwZqEOfV5SeyFJl/zylhXlM6COV4TgHnotxDCcvoScv28ZcXHHgLwv9cNrWFWU
-         uGsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764943621; x=1765548421;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=q9++XxvnUn686kk2ddDofJD+D0ZU/VRf4pIN8y4vJ3I=;
-        b=Kj78bKcFjDuKzzo/JIyjkHN6TFOCLGsbgfWub6rceA6bnnpXNr51WWrrj+d68fyYPU
-         bQKtgPfaYU8aK7xWs60xkTetnPVCqrJvfiMNBAjckgS0O6LbyAzAJuCAyHhxAG8wtpIx
-         Gtf2UfI8h2unR8Ng709pRoyP+bqGKM5l2Mw3elx0/VUyfGH/9tqufLEt6UEtCTCNbfAy
-         8ntJ5t6fV4It0q8OT47QbVHToUniHQjYjGJqkTG0ZO7SafMPq7blLYvQxLdSdCLQ4ZVk
-         CR1Rfn2mWFZCYPO+oKhzb/x2MzOi67TEcnkrgotnKP4naZBqu8HoLJMcilwaLBqlqdhj
-         GouQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWSyEAWkhUPi2lu2AlFXKXkM+v085sLuDtZZ2QYRPiu1BS4jYr6+NyqLuLwOeWpQJZBxMPueNM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzyImfKdH26U2wOtrrgVKqfbbGZNxKSXTaA1qDaTrxq58Mo9oBd
-	eBk4ipvsFX5hMzukTU8b+AomI7Cj0UF/voQLxB/VD5O2OgexdIEUT2qz
-X-Gm-Gg: ASbGncvGzbNPCoc0d+I+RdxOKL/ECG6hM3FD/OqOW/l9prJEXQqnIUZDO5QzCNrCTGa
-	SwL7zWAlwnWcITOGih2OHUMyoHMP2EmoQXNaL1lYUTt7a+G38aer2Nu+YBoEo5sEPn9IeRHJdQU
-	IOWZn4BdXmIz+ETESDjRvWZEiDO1L7247OS1jIKg7ahCIZYOL97aDKI8sq4DIyaRzlJpUaB8s/k
-	1OM800UClPAZaRgQ8q6hN0GA89YZammEyFI88sSrqsHtzC5HiKJUx+49JTQhucTsbcmP+RPW3Rp
-	xoUITNfCdVfGgPTHumjWGwihtW1vRnywcrdtgVZQHkdBBMWWknD3+smc4g79aAh5SFrtPAinLPZ
-	UnGUyCKi2pvmHaEI84YVdUAb7L7QLfdJ3H/PTN3gcOBi6bd5nboMfKHGgGnS4fYoRBqrSq/QpB+
-	32kw==
-X-Google-Smtp-Source: AGHT+IG0wT+8z7qTds8v5+fhOTpqMvzgVhp1qMAUU1xLhi0SRHqu+YGYMW+KXhxXqSyk0JI3SZhWpQ==
-X-Received: by 2002:a05:600c:630e:b0:477:9c40:2fa1 with SMTP id 5b1f17b1804b1-4792c8f9e58mr46567795e9.4.1764943621044;
-        Fri, 05 Dec 2025 06:07:01 -0800 (PST)
-Received: from skbuf ([2a02:2f04:d106:d600:456d:8d57:7a7:f1e7])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4792b17588asm60066835e9.17.2025.12.05.06.06.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Dec 2025 06:06:58 -0800 (PST)
-Date: Fri, 5 Dec 2025 16:06:55 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Hauke Mehrtens <hauke@hauke-m.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Rasmus Villemoes <ravi@prevas.dk>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH net] net: dsa: mxl-gsw1xx: manually clear RANEG bit
-Message-ID: <20251205140655.mxe32abnagpvjuri@skbuf>
-References: <ab836f5d36e3f00cd8e2fb3e647b7204b5b6c990.1764898074.git.daniel@makrotopia.org>
- <97389f24-d900-4ff0-8a80-f75e44163499@lunn.ch>
- <aTLkl0Zey4u4P8x6@makrotopia.org>
+	s=arc-20240116; t=1764943878; c=relaxed/simple;
+	bh=9UFO7eLpw8bigL8daczZuSlb/8NtC8KMi7AhTrkMb6I=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=rnv/SDI7UtX5/xJ91/45aR/lcsKMec01rF/GkjMVG+SCh1GR1VTK/JJ8XhVr26t+EALgqXO6YMZCWloMeHayDBfH1dzIKzQ0M9Bk6vBt/vmH4PHaVYUS40HolOR9WZAQk63/nDG5s8aeErixTR424dqdEHh0iPn7lRaXU5kqaJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=ZvMeTDQI; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 689136059D;
+	Fri,  5 Dec 2025 15:11:03 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1764943863;
+	bh=KnDNmXS7aQQAXCmf1CuquJ+3p3MpgXRkWi//YCtczCc=;
+	h=Date:From:To:Cc:Subject:From;
+	b=ZvMeTDQIXxOQg0w8igW1VLRSEJbdJX2UW1VQ8+U41IrEQ3U1FB1fmsQiBaTyNbipY
+	 Ne8oB5wH9exUwoD2HqMt8dpmStiTahB8i3TMAOaxwctggc2Lp1I5d56oEFHb8NHfSq
+	 VN1r/nEP4Z+5zxHNuePRQLSmPzQrv8p5i9cPxOLS+VtpUW/iAeQ5PbbXBz5Gf3GY+t
+	 7Y+/nSBxavisETqB8eOrle7JsD2nwpY6AKeJxo8IOh6qy4/+f5nmkY2JtvRIMo9WUh
+	 jffve9J7OZ1F5EvB9Rh5l8P4uTG2BALzdyvNfGBYaWaPOw8zoX5GxdKpR+LaIjE7Go
+	 LXQBQutfC9gQQ==
+Date: Fri, 5 Dec 2025 15:11:00 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org, netfilter@vger.kernel.org
+Cc: netfilter-announce@lists.netfilter.org, lwn@lwn.net,
+	netdev@vger.kernel.org
+Subject: [ANNOUNCE] nftables 1.1.6 release
+Message-ID: <aTLn9DVZSFeGN3IP@chamomile>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/mixed; boundary="hXluNPoobgnnRiTf"
 Content-Disposition: inline
-In-Reply-To: <aTLkl0Zey4u4P8x6@makrotopia.org>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Dec 05, 2025 at 01:56:39PM +0000, Daniel Golle wrote:
-> On Fri, Dec 05, 2025 at 02:45:35PM +0100, Andrew Lunn wrote:
-> > On Fri, Dec 05, 2025 at 01:32:20AM +0000, Daniel Golle wrote:
-> > > Despite being documented as self-clearing, the RANEG bit sometimes
-> > > remains set, preventing auto-negotiation from happening.
-> > > 
-> > > Manually clear the RANEG bit after 10ms as advised by MaxLinear, using
-> > > delayed_work emulating the asynchronous self-clearing behavior.
-> > 
-> > Maybe add some text why the complexity of delayed work is used, rather
-> > than just a msleep(10)?
-> > 
-> > Calling regmap_read_poll_timeout() to see if it clears itself could
-> > optimise this, and still be simpler.
-> 
-> Is the restart_an() operation allowed to sleep?
 
-Isn't regmap_set_bits() already sleeping? Your gsw1xx_regmap_bus
-accesses __mdiobus_write() and __mdiobus_read() which are sleepable
-operations and there's no problem with that.
+--hXluNPoobgnnRiTf
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+
+Hi!
+
+The Netfilter project proudly presents:
+
+        nftables 1.1.6
+
+This release contains fixes:
+
+- Complete lightweight tunnel template support, including vxlan, geneve
+  and erspan, eg.
+
+       table netdev global {
+              tunnel t1 {
+                      id 10
+                      ip saddr 192.168.2.10
+                      ip daddr 192.168.2.11
+                      sport 1025
+                      dport 20020
+                      ttl 1
+                      erspan {
+                              version 1
+                              index 2
+                      }
+              }
+ 
+              tunnel t2 {
+                      id 10
+                      ip saddr 192.168.3.10
+                      ip daddr 192.168.3.11
+                      sport 1025
+                      dport 21021
+                      ttl 1
+                      erspan {
+                              version 1
+                              index 2
+                      }
+              }
+   
+              chain in {
+                      type filter hook ingress device veth0 priority 0;
+    
+                      tunnel name ip saddr map { 10.141.10.12 : "t1", 10.141.10.13 : "t2" } fwd to erspan1
+              }
+       }
+
+   You have to create the erspan1 interface before loading your ruleset.
+
+       ip link add dev erspan1 type erspan external
+
+- Support for wildcard in netdev hooks, eg. add a basechain to filter
+  ingress traffic for all existing vlan devices:
+
+       table netdev t {
+              chain c {
+                      type filter hook ingress devices = { "vlan*", "veth0" } priority filter; policy accept;
+              }
+       }
+
+- Support to pass up bridge frame to the bridge device for local
+  processing, eg. pass up all bridge frames for de:ad:00:00:be:ef
+  to the IP stack:
+
+    table bridge global {
+            chain pre {
+                    type filter hook prerouting priority 0; policy accept;
+                    ether daddr de:ad:00:00:be:ef meta pkttype set host ether daddr set meta ibrhwaddr accept
+            }
+    }
+
+  The new meta ibrhwaddr provides the bridge hardware address which
+  can be used to mangle the destination address.
+
+  This requires a Linux kernel >= 6.18.
+
+- New afl++ (american fuzzy lop++) fuzzer infrastructure, enable it with:
+
+        ./configure --with-fuzzer
+
+  and read tests/afl++/README to build and run tools/nft-afl.
+
+- fib expression incorrect bytecode for Big Endian.
+
+  Instead of:
+
+       [ fib saddr . iif oif present => reg 1 ]
+       [ cmp eq reg 1 0x01000000 ]
+
+  generate:
+
+       [ fib saddr . iif oif present => reg 1 ]
+       [ cmp eq reg 1 0x00000001 ]
+
+  among other Big Endian fixes.
+
+... and man nft(8) documentation updates and more small fixes.
+
+See changelog for more details (attached to this email).
+
+You can download this new release from:
+
+https://www.netfilter.org/projects/nftables/downloads.html
+https://www.netfilter.org/pub/nftables/
+
+To build the code, libnftnl >= 1.3.1 and libmnl >= 1.0.4 are required:
+
+* https://netfilter.org/projects/libnftnl/index.html
+* https://netfilter.org/projects/libmnl/index.html
+
+Visit our wikipage for user documentation at:
+
+* https://wiki.nftables.org
+
+For the manpage reference, check man(8) nft.
+
+In case of bugs and feature requests, file them via:
+
+* https://bugzilla.netfilter.org
+
+Happy firewalling.
+
+--hXluNPoobgnnRiTf
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: attachment; filename="changes-nftables-1.1.6.txt"
+Content-Transfer-Encoding: 8bit
+
+Christoph Anton Mitterer (8):
+      doc: clarify evaluation of chains
+      doc: minor improvements with respect to the term “ruleset”
+      doc: describe include’s collation order to be that of the C locale
+      doc: fix/improve documentation of jump/goto/return
+      doc: add more documentation on bitmasks and sets
+      doc: add overall description of the ruleset evaluation
+      doc: fix/improve documentation of verdicts
+      doc: minor improvements the `reject` statement
+
+Fernando Fernandez Mancera (7):
+      tunnel: add vxlan support
+      tunnel: add tunnel object and statement json support
+      tests: add tunnel shell and python tests
+      meta: introduce meta ibrhwaddr support
+      tests: shell: add packetpath test for meta ibrhwaddr
+      rule: add missing documentation for cmd_obj enum
+      tunnel: add missing tunnel object list support
+
+Florian Westphal (19):
+      tests: shell: skip two bitwise tests if multi-register support isn't available
+      tests: py: objects.t: must use input, not output
+      src: tunnel: handle tunnel delete command
+      tests: shell: add regression tests for set flush+add bugs
+      tests: shell: fix name based checks with CONFIG_MODULES=n
+      tests: shell: type_route_chain: use in-tree nftables, not system-wide one
+      tests: shell: add packetpath test for reject statement
+      evaluate: tunnel: don't assume src is set
+      src: tunnel src/dst must be a symbolic expression
+      src: parser_bison: prevent multiple ip daddr/saddr definitions
+      evaluate: reject tunnel section if another one is already present
+      src: fix fmt string warnings
+      src: parser_json: fix format string bugs
+      evaluate: follow prefix expression recursively if needed
+      doc: remove queue from verdict list
+      src: add refcount asserts
+      support for afl++ (american fuzzy lop++) fuzzer
+      src: move fuzzer functionality to separate tool
+      build: unbreak 'make distcheck'
+
+Georg Pfuetzenreuter (1):
+      doc: fix tcpdump example
+
+Gyorgy Sarvari (1):
+      tests: shell: fix typo in vmap_timeout test script
+
+Jeremy Sowden (2):
+      doc: fix some man-page mistakes
+      build: don't install ancillary files without systemd service file
+
+Pablo Neira Ayuso (23):
+      src: add tunnel template support
+      tunnel: add erspan support
+      src: add tunnel statement and expression support
+      tunnel: add geneve support
+      src: add expr_type_catchall() helper and use it
+      src: replace compound_expr_add() by type safe set_expr_add()
+      src: replace compound_expr_add() by type safe concat_expr_add()
+      src: replace compound_expr_add() by type safe list_expr_add()
+      segtree: rename set_compound_expr_add() to set_expr_add_splice()
+      expression: replace compound_expr_clone() by type safe function
+      expression: remove compound_expr_add()
+      expression: replace compound_expr_remove() by type safe function
+      expression: replace compound_expr_destroy() by type safe funtion
+      expression: replace compound_expr_print() by type safe function
+      src: replace compound_expr_alloc() by type safe function
+      evaluate: simplify set to list normalisation for device expressions
+      tests: shell: combine flowtable devices with variable expression
+      parser_bison: remove leftover utf-8 character in error
+      libnftables: do not re-add default include directory in include search path
+      rule: skip CMD_OBJ_SETELEMS with no elements after set flush
+      tests: shell: add device to sets/0075tunnel_0 to support older kernels
+      tests: shell: refer to python3 in json prettify script
+      build: Bump version to 1.1.6
+
+Phil Sutter (38):
+      table: Embed creating nft version into userdata
+      tools: gitignore nftables.service file
+      monitor: Quote device names in chain declarations, too
+      tests: monitor: Label diffs to help users
+      tests: monitor: Fix regex collecting expected echo output
+      tests: monitor: Test JSON echo mode as well
+      tests: monitor: Extend debug output a bit
+      Makefile: Fix for 'make CFLAGS=...'
+      mnl: Allow for updating devices on existing inet ingress hook chains
+      monitor: Inform JSON printer when reporting an object delete event
+      tests: monitor: Extend testcases a bit
+      tests: monitor: Excercise all syntaxes and variants by default
+      tests: py: Enable JSON and JSON schema by default
+      tests: Prepare exit codes for automake
+      tests: json_echo: Skip if run as non-root
+      tests: shell: Skip packetpath/nat_ftp in fake root env
+      tests: build: Do not assume caller's CWD
+      tests: build: Avoid a recursive 'make check' run
+      Makefile: Enable support for 'make check'
+      fib: Fix for existence check on Big Endian
+      mnl: Support simple wildcards in netdev hooks
+      parser_bison: Accept ASTERISK_STRING in flowtable_expr_member
+      tests: shell: Test ifname-based hooks
+      mnl: Drop asterisk from end of NFTA_DEVICE_PREFIX strings
+      datatype: Fix boolean type on Big Endian
+      optimize: Fix verdict expression comparison
+      tests: py: any/tcpopt.t.json: Fix JSON equivalent
+      tests: py: any/ct.t.json.output: Drop leftover entry
+      tests: py: inet/osf.t: Fix element ordering in JSON equivalents
+      tests: py: Fix for using wrong payload path
+      tests: py: Implement payload_record()
+      tests: py: Do not rely upon '[end]' marker
+      netlink: No need to reference array when passing as pointer
+      datatype: Increase symbolic constant printer robustness
+      tests: py: ip6/vmap.t: Drop double whitespace in rule
+      netlink: Zero nft_data_linearize objects when populating
+      utils: Cover for missing newline after BUG() messages
+      doc: libnftables-json: Describe RULESET object
+
+Ronan Pigott (1):
+      doc: don't suggest to disable GSO
+
+Yi Chen (1):
+      tests: shell: add packetpath test for meta time expression.
+
+
+--hXluNPoobgnnRiTf--
 
