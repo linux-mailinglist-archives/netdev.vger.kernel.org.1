@@ -1,124 +1,147 @@
-Return-Path: <netdev+bounces-243881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA804CA95DB
-	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 22:16:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D632CA97C0
+	for <lists+netdev@lfdr.de>; Fri, 05 Dec 2025 23:21:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 08CE23028DAB
-	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 21:16:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C1C02328A74C
+	for <lists+netdev@lfdr.de>; Fri,  5 Dec 2025 22:16:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0F9C257459;
-	Fri,  5 Dec 2025 21:16:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 144C72EB5DC;
+	Fri,  5 Dec 2025 22:16:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NAS4QhMw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FxrTPDcE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ED871A317D
-	for <netdev@vger.kernel.org>; Fri,  5 Dec 2025 21:16:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E171513C918;
+	Fri,  5 Dec 2025 22:16:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764969408; cv=none; b=Jud8qyArbbDc66K06bZb6YqmmgJUu+8VOX4OF2mhLs9oWDKQRG39rw3SZpX+8/Lt2U95A277mWY5RLQ33gCxTCxPnal2XvM03r710qEfMd4HZ6gD9GkXLxGRY9o4Mxm7/c2kA/4kTr6UcpGI2/+t17F0aRCyDiHQK/ImDtbXxQI=
+	t=1764972991; cv=none; b=Wq0qsPDgwhoJVE3Vsx7tpG82X54HpDQ917PXSHXEHbt6orpGLtS72Al/x0EaRQSIGAdd6fUrke54ZLFVmdmvHiza75zC9q3QBymgYN7Fdagj2O3HkmKbGyYIXxAZpUG5uk5RQRsQQy2zECN5WXuXrr7pUjPIweS6C3F3ElbsSBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764969408; c=relaxed/simple;
-	bh=tcwMF1u7d3ohgpmS2mxHfc4wRFvpiyjj0O/l4GKooTY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ibyw+sAfyMkCy5+1cxQruTDuQ9uRshvCCdUS89qxnQcKhfcrKQQJXx12+APsrjfSykJ5eFzgaDpJxXhIvnZxH8OgIHU3SpDyXW1c1J23ISsyuIX6FcK+oYGWrEn3de3QVrKAAvBrt928uWK/QLHH0k1Cvl7MPtMMQVYoYJcmivw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NAS4QhMw; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-47774d3536dso25108695e9.0
-        for <netdev@vger.kernel.org>; Fri, 05 Dec 2025 13:16:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1764969405; x=1765574205; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6Nxf+UbxVML8lqm9dUwCL46TJXN3lpM/MynhhK+ht9M=;
-        b=NAS4QhMwzen90LiRI6lX/N6fRfB3dyCpOZ1dpTw19Ngw5VbLV4WzhPxCToPzpgVP/Q
-         swDRV5W4epy0JrsnkBr3XPitt4+aL3nn6nYy8ixG0OB0Yq+rv3JO/OF5E9tEP0AMnOO+
-         vT6KIq2XG6Z4oGWG8Q3WyikgHP/ooSUhCKFx+XHybYXHQPo3yg/qr7Un6/9kj1mWORZ2
-         8qU2cu33U1ipSJ8KECmAl/RZw+JWrx8H0Ex+ODVXRhc9G0fGR169U5JyaJ9umxM8s0h/
-         o/HAvwgpimLI9phexHWOAO2ESvmoQzarQegt4sbc7YHOj+rz+x66Fp8ovc/MtAmR5DHO
-         vuNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1764969405; x=1765574205;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6Nxf+UbxVML8lqm9dUwCL46TJXN3lpM/MynhhK+ht9M=;
-        b=c7x52A/EGV5shDlce0amnP7MCAVhqmd8uXHI64JSCoBoD7d/pD1Ha2hGKIX/J/AgB+
-         AhLwv8fyakPB4iCDKnMIVtuTJ400qp3PiunvFvulprQmWTofKCGpkMd0gIJ+6K3lxbZn
-         CKdAF/6rmfnAajL8TSA4v0Y5Pp/VtXdJrVO8EckBZb4kVr09pAoxqMZg5HirZ9dQyaRe
-         H067icJNdfSgJ7pQrcsxvH6sTtibOItvxeRRwNwZfUhaFWvPT/0VdbIC1Hk/X64DFiaf
-         y7htWgV3hZ8F+qhV/xSKI5C1RxgJ1c7F9MPFErq/yga96YegvzIM9bLVDHX/G5gyJ757
-         6/ow==
-X-Forwarded-Encrypted: i=1; AJvYcCW/IvUNbYlr0q6cZqYkg/O/YSB1RG4klWZTkJCqIoH3DcuDliVyxINYdnzLJRsrBaJwaHDMMxk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWux7ysKzCmFILE3VAzYrOM0kemeHo1vXXuy+I36OdSTzg+wAj
-	aQIP7VBbnTwjZYDE4SFqhV7VB+sZKzEqIpqWoeb2eMrJ4EtrMqAjZE/G
-X-Gm-Gg: ASbGnct/AkvrY6976r8xBZMvGBf8//Nuk5sR2lb8EAIokP/DKtGYE8rCElEVNcGt/te
-	S1ZUbDOnTrRc2kGr8BbzfsJCJwaKe8bBDAJ6imQbAx2y07Ggro2Sehy7dblvQ7n4MfiC6IHqcZv
-	NsqAUg7TH0Yn9NYCo9K1r4exw1Teu4mBLc6TybSGFUkCtaBClyTcm0/sk7zSOE+Otk3Z/IFa3mk
-	PPiJ5fdOrUtzEp4N4R9saFYEzTbotePoxFIHpojEWH9O6CuP10Y5oi+ai6Wh/KcVtVekfs6I2b/
-	ftz2ki+5Uv0nQURWjTaOogsOgfD3iLmfeFVGDv6EMpoGXOTxhZcXW7CLridnfqlwAKA50bMLo+2
-	zdgFDe4tfvPPxf4odUNpj4NTQe4IRoa/JjWm6CvlFj10M9ptdlaoDv+ydTifMUsPRpuFG4McEbt
-	PZtQwJhvRAqQDkWkdkALO/Mbn7i1Srs2QEQ+IRJukVxQbOUB+Thj5bp0hCeirOU9whSSQHj1w9s
-	POBDE7HJSXxekB7+Rt06CFj9oVyrfS2mQHX/gmPQcmzvn2aTU3e5g==
-X-Google-Smtp-Source: AGHT+IFZChau8OMeC1OLCqeCPNebVKaNk3vumCCd23Bu0iJLrPIjbfoD1uBKQKJb6ckkVpzXZJNNzw==
-X-Received: by 2002:a05:600c:5306:b0:46e:59bd:f7e2 with SMTP id 5b1f17b1804b1-47939e22a9emr7139775e9.11.1764969405296;
-        Fri, 05 Dec 2025 13:16:45 -0800 (PST)
-Received: from ?IPV6:2003:ea:8f47:b600:41b3:37ed:a502:9002? (p200300ea8f47b60041b337eda5029002.dip0.t-ipconnect.de. [2003:ea:8f47:b600:41b3:37ed:a502:9002])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42f7d222506sm11795875f8f.28.2025.12.05.13.16.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Dec 2025 13:16:44 -0800 (PST)
-Message-ID: <10441fbd-8022-402e-8551-e0f8ec0449f0@gmail.com>
-Date: Fri, 5 Dec 2025 22:16:42 +0100
+	s=arc-20240116; t=1764972991; c=relaxed/simple;
+	bh=EwMfZKLt4WHien9TB78OXU15926X49rO5k+7pKGyCl8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=W4kFY93i1tfEBvU0+sMZ0kaMBx8dkBsxHwouMCgM2r19Vbq4P7DjUd/n7GD2fyFot94DwftbCDhKSEb/oILWDBFcEmKLYpAJ9dv8YeU+h2A/4d9XoKZ7RbX/BF1rogkqRr8eOCKP9avhCR3GV1IOU1hI6Kk4YTQkzRq5PUZwfjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FxrTPDcE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5ED2C4CEF1;
+	Fri,  5 Dec 2025 22:16:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1764972990;
+	bh=EwMfZKLt4WHien9TB78OXU15926X49rO5k+7pKGyCl8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=FxrTPDcEJknCnWIpLFQFbbw/9DFUJE/14QUW5l8Y3sOfIkTBt+gnToFDx7tW2zcUQ
+	 KbQSgw7C97LTU/vs4L+7BuGCjtfVTlZoOEz9+Ixh22YLanviGIettV2sjAfWy74vEz
+	 zgiYNtcP19bPL9gT79S8lj+w9MlSbLCNKSFxCiGxLfdEFCy2PWbecVxOPszbOjDfl0
+	 tLXRIY0ablqnAFDn1rCAIzqvNxDeHsXHiwUnhu/VwVCixcTGUdUOphCuS0XelOa7yP
+	 uAFWU8DFva7141UEyV+s36EKoBKRu4khbsUktp9yj1Rt2bbajw5Qq3x/66Rcg63Zky
+	 V819GaJIKeSNQ==
+Date: Fri, 5 Dec 2025 16:16:29 -0600
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Philipp Stanner <phasta@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>
+Cc: Yao Zi <ziyao@disroot.org>, Bjorn Helgaas <bhelgaas@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Frank <Frank.Sae@motor-comm.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Chen-Yu Tsai <wens@csie.org>, Jisheng Zhang <jszhang@kernel.org>,
+	Furong Xu <0x1207@gmail.com>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Mingcong Bai <jeffbai@aosc.io>,
+	Kexy Biscuit <kexybiscuit@aosc.io>, Runhua He <hua@aosc.io>,
+	Xi Ruoyao <xry111@xry111.site>
+Subject: Re: [PATCH net-next v3 2/3] net: stmmac: Add glue driver for
+ Motorcomm YT6801 ethernet controller
+Message-ID: <20251205221629.GA3294018@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC] powerpc: switch two fixed phy links to full duplex
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Madhavan Srinivasan
- <maddy@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>,
- Nicholas Piggin <npiggin@gmail.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Pantelis Antoniou <pantelis.antoniou@gmail.com>,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <64533952-1299-4ae2-860d-b34b97a24d98@gmail.com>
- <5d302153-c7f6-48dc-95cc-0dc4f25045c6@lunn.ch>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-In-Reply-To: <5d302153-c7f6-48dc-95cc-0dc4f25045c6@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aTKnPvJUjGyyueH4@shell.armlinux.org.uk>
 
-On 12/5/2025 6:50 PM, Andrew Lunn wrote:
-> On Fri, Dec 05, 2025 at 06:21:50PM +0100, Heiner Kallweit wrote:
->> These two fixed links are the only ones in-kernel specifying half duplex.
->> If these could be switched to full duplex, then half duplex handling
->> could be removed from phylib fixed phy, phylink, swphy.
->>
->> The SoC MAC's are capable of full duplex, fs_enet MAC driver is as well.
->> Anything that would keep us from switching to full duplex?
+[+to Philipp, Thomas for MSI devres question]
+
+On Fri, Dec 05, 2025 at 09:34:54AM +0000, Russell King (Oracle) wrote:
+> On Fri, Dec 05, 2025 at 05:31:34AM +0000, Yao Zi wrote:
+> > On Mon, Nov 24, 2025 at 07:06:12PM +0000, Russell King (Oracle) wrote:
+> > > On Mon, Nov 24, 2025 at 04:32:10PM +0000, Yao Zi wrote:
+> > > > +static int motorcomm_setup_irq(struct pci_dev *pdev,
+> > > > +			       struct stmmac_resources *res,
+> > > > +			       struct plat_stmmacenet_data *plat)
+> > > > +{
+> > > > +	int ret;
+> > > > +
+> > > > +	ret = pci_alloc_irq_vectors(pdev, 6, 6, PCI_IRQ_MSIX);
+> > > > +	if (ret > 0) {
+> > > > +		res->rx_irq[0]	= pci_irq_vector(pdev, 0);
+> > > > +		res->tx_irq[0]	= pci_irq_vector(pdev, 4);
+> > > > +		res->irq	= pci_irq_vector(pdev, 5);
+> > > > +
+> > > > +		plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
+> > > > +
+> > > > +		return 0;
+> > > > +	}
+> > > > +
+> > > > +	dev_info(&pdev->dev, "failed to allocate MSI-X vector: %d\n", ret);
+> > > > +	dev_info(&pdev->dev, "try MSI instead\n");
+> > > > +
+> > > > +	ret = pci_alloc_irq_vectors(pdev, 1, 1, PCI_IRQ_MSI);
+> > > > +	if (ret < 0)
+> > > > +		return dev_err_probe(&pdev->dev, ret,
+> > > > +				     "failed to allocate MSI\n");
+> > > > +
+> > > > +	res->irq = pci_irq_vector(pdev, 0);
+> > > > +
+> > > > +	return 0;
+> > > > +}
+> > > > +
+> > > > +static int motorcomm_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+> > > > +{
+> > > ...
+> > > > +	ret = motorcomm_setup_irq(pdev, &res, plat);
+> > > > +	if (ret)
+> > > > +		return dev_err_probe(&pdev->dev, ret, "failed to setup IRQ\n");
+> > > > +
+> > > > +	motorcomm_init(priv);
+> > > > +
+> > > > +	res.addr = priv->base + GMAC_OFFSET;
+> > > > +
+> > > > +	return stmmac_dvr_probe(&pdev->dev, plat, &res);
+> > > 
+> > > If stmmac_dvr_probe() fails, then it will return an error code. This
+> > > leaves the PCI MSI interrupt allocated...
+> > 
+> > This isn't true. MSI API is a little magical: when the device is enabled
+> > through pcim_enable_device(), the device becomes devres-managed, and
+> > a plain call to pci_alloc_irq_vectors() becomes managed, too, even if
+> > its name doesn't indicate it's a devres-managed API.
+> > 
+> > pci_free_irq_vectors() will be automatically called on driver deattach.
+> > See pcim_setup_msi_release() in drivers/pci/msi/msi.c, which is invoked
+> > by pci_alloc_irq_vectors() internally.
 > 
-> What do we know about the device on the other end of the link? Maybe
-> that is what is limiting it to 10Half?
+> This looks very non-intuitive, and the documentation for
+> pci_alloc_irq_vectors() doesn't help:
 > 
-I found no hint that anything is connected to this ethernet port on
-the two boards. Hard to find any information because the boards are
->15yrs old. Seems this are dummy entries, just to let fs_enet load.
-
-> 	Andrew
-
-Heiner
+>  * Upon a successful allocation, the caller should use pci_irq_vector()
+>  * to get the Linux IRQ number to be passed to request_threaded_irq().
+>  * The driver must call pci_free_irq_vectors() on cleanup.
+>    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 
+> because if what you say is correct (and it looks like it is) then this
+> line is blatently incorrect.
+> 
+> Bjorn?
 
