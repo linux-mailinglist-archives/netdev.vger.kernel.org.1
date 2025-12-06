@@ -1,54 +1,83 @@
-Return-Path: <netdev+bounces-243916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81E1ECAAA26
-	for <lists+netdev@lfdr.de>; Sat, 06 Dec 2025 17:26:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F1A30CAAC1A
+	for <lists+netdev@lfdr.de>; Sat, 06 Dec 2025 19:26:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 087B4302DB65
-	for <lists+netdev@lfdr.de>; Sat,  6 Dec 2025 16:26:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 13859305CF29
+	for <lists+netdev@lfdr.de>; Sat,  6 Dec 2025 18:26:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 608322FFFA4;
-	Sat,  6 Dec 2025 16:26:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E00B2D3A70;
+	Sat,  6 Dec 2025 18:26:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=david-bauer.net header.i=@david-bauer.net header.b="wINfV37U"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DoDg/Ug0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgate01.uberspace.is (mailgate01.uberspace.is [95.143.172.20])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AA8F258CD0
-	for <netdev@vger.kernel.org>; Sat,  6 Dec 2025 16:26:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.143.172.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD2A3224891
+	for <netdev@vger.kernel.org>; Sat,  6 Dec 2025 18:26:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765038382; cv=none; b=fa0laqtRYUTM/DD1oTcnFFufPkHEhFlLLHm8WSDWhi9SHk5eU8dmHrj5Y5GDSWZ+mXoKeptqSoKGZ/jgs6IF2a9Sh2xkHHgK3n//HiIkuj6bup2m0pkKFJnR1R6QU+KpXspPGTlmUphONSFexH7loVTETf811qmIW5eZEOKFOVE=
+	t=1765045585; cv=none; b=NhcLBxxFFvh8ODWPwBukWU1Z1G+T+LH3iy/49Gpm3ODq7//EOZURLisH5Zp0qaXD6CB2Ut8mA7nY0RuBoSK34BGicAxFkqnAA5qekTF2rpD4oA6ZLEZaON+fQFhpy9w3IvEdmEENSHBLtmmo79UlC3NN+/FXjT05VAqIPa9tJPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765038382; c=relaxed/simple;
-	bh=oY2ka5lja8UpTFcpu2gZKgfaOGa68I0bntBzjHS9b8k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lLSz+YGG7YDlHH3wLqI2spyPTR3FqAGg3M3BF+Ms3QhBZWaXOcp1rS/QN1GALPrkK7Ch6vVNLI8WuQTwJvTgr1XEWlAyqdjK8RSpeZOQr27b1J2CiL1xcOd6pWB3k6ynvnft/iXDtpFBeLTrLZ6BF7W/04NeAMVNCiImxBAGrgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=david-bauer.net; spf=pass smtp.mailfrom=david-bauer.net; dkim=pass (4096-bit key) header.d=david-bauer.net header.i=@david-bauer.net header.b=wINfV37U; arc=none smtp.client-ip=95.143.172.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=david-bauer.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=david-bauer.net
-Received: from perseus.uberspace.de (perseus.uberspace.de [95.143.172.134])
-	by mailgate01.uberspace.is (Postfix) with ESMTPS id 5F8A660D10
-	for <netdev@vger.kernel.org>; Sat, 06 Dec 2025 17:26:10 +0100 (CET)
-Received: (qmail 16583 invoked by uid 988); 6 Dec 2025 16:26:10 -0000
-Authentication-Results: perseus.uberspace.de;
-	auth=pass (plain)
-Received: from unknown (HELO unkown) (::1)
-	by perseus.uberspace.de (Haraka/3.0.1) with ESMTPSA; Sat, 06 Dec 2025 17:26:10 +0100
-From: David Bauer <mail@david-bauer.net>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	"R. Parameswaran" <parameswaran.r7@gmail.com>
+	s=arc-20240116; t=1765045585; c=relaxed/simple;
+	bh=1IRpld83xMZ/drvhIoU9A9UdatZ3zIc0QHPBeO90PwU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dBkJfTyoMpLzdRUGlwod3KErH53KXNxgM2YOUovbjYT3Thce1h4a51AAIPhCIzmNq9THVOZrP4+aBzuj6YuGVKIN4Sy6PtbKqlHW8UxE76+4aIhKJ7HaJdSyDCZvuEqGndinbybB/vibLG3Cpo3yR1na3110LxciBdM54OGh96k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DoDg/Ug0; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-295548467c7so41213965ad.2
+        for <netdev@vger.kernel.org>; Sat, 06 Dec 2025 10:26:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765045583; x=1765650383; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QEfkkRUioZd9SWMtUtcnRsb5wthZOOn5MPiTu5OxMss=;
+        b=DoDg/Ug0Lt4U0JGQOLLqxSEJF8egCZV1QBo7piiZKny4RFvcyOJyTHIhTwerxmy5gA
+         WpBER1SjMPalu5HSjnJjyvhAdvX5JHjKubTUpQIVMlGyZBMg+aJup43XC0GNI3gMn3kk
+         z5rBndFX5mAa3KuD96FTR/uFIwL9cZycG0wN9ZGAmycxw4uQJJ7/TDrWr2A8xsEgHgdu
+         JImEK8peU88L31kygImlA3bfUPJwg6VjI7sJ2jOvbVGath0Vpu1TiaYiikSbWxn9pirh
+         /SHzreNysTU74B0YnlKeqXAhsSRgTZOnC+GQnxI8YvPt2m1UUnTjITLRaE0AGRFjOpG2
+         0pzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765045583; x=1765650383;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QEfkkRUioZd9SWMtUtcnRsb5wthZOOn5MPiTu5OxMss=;
+        b=aNtxZ0O1cBPtLuoz+YvUlJ+LgJDxtKnS3rCISXVlCK50N9apUHWSTIgkvS7w/FsXKs
+         AoKk2b8MbXHExPQL7REDnHAfvKTh0Iw+ZWkcOaWq+LBaavWYha6cdYMUcrmFmlf0KPhu
+         fSxaQ4Hw6lId26RhPKXJcXfv2Zjyw3qY6FaKqBDBLqEcsmEuyLJRFjFoVKFgp6r/Q6bd
+         RlImdCf1AA4fBqq3VkwAEO74g926yS8LMh1AHv5xTSSseJDOTtdWNHqmjZu0PNdPciRs
+         au1XuU1uc/PXld41aOLmHf2yDRofMFrmGZcm+AM4Y7fA+EGwM26aDYZNEa9hGD63dVoo
+         ytXA==
+X-Gm-Message-State: AOJu0YwiCq/sbk2l2ZJK7tLOG6tFEsnFDRfZ7O2XLsdUh3tZBR7sIBdi
+	qA99CFt1Se2EA4EhHJoGheAK7Ayzt1Def3LZXN47NYPtjOP2cUIPcBo8
+X-Gm-Gg: ASbGncuDbASwamNkNJ0I67w4nFtKoGlnbhD4r7+N5wtN4FjpSovAo4nmSDPwYeQQR6W
+	2j3z+N/CfuSpmiM3fjpxo/5aQRn/RpP1QtV/T+yKhXF7kQ12/usl8LXjE6P7jaaMCPJFQOVXGKY
+	D2DSE106URjThPiNqlLt7K/Jq1/rW7c7LdKtri52wVGrNK5fJtnuLTrsl7egjDq8UdEj/JdZEZG
+	/gCI43lZNsvBYdNKiAJ3Ccfmy/MVODiosQ/L3T2lO961H7P0X9vmiGgen1dDYkJgH+G3+6tDb08
+	L3piVqWxJ78+VDNubhXQ9HKndj/imk6m3Ja5lf+A6hXLSoTNuEMkyeTECXv/jcDepEms8bMkP0s
+	oPgjZGOMSmfC6Xx2dPMyiXW/giA1Xr0pbUadCykczXaHH3UW4AnVjo3Rb3XBE8eKdP6dTsEskbV
+	eERT2BZszrgyuciHdYd/qgtOR3d8Y1fDg=
+X-Google-Smtp-Source: AGHT+IH8EXv3HmShX3Wm2g3nJMA/0KBHJl1YeOTfruj4/5dzk1gF9j0LRym7UbCIarUtUcrQwWcDRw==
+X-Received: by 2002:a17:902:fc8f:b0:298:485d:556b with SMTP id d9443c01a7336-29df52771b1mr26094415ad.5.1765045582895;
+        Sat, 06 Dec 2025 10:26:22 -0800 (PST)
+Received: from localhost.localdomain ([103.98.63.195])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29daeae6ad1sm81824845ad.90.2025.12.06.10.26.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 06 Dec 2025 10:26:22 -0800 (PST)
+From: Dharanitharan R <dharanitharan725@gmail.com>
+To: syzbot+422806e5f4cce722a71f@syzkaller.appspotmail.com
 Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] l2tp: account for IP version in SKB headroom
-Date: Sat,  6 Dec 2025 17:26:01 +0100
-Message-ID: <20251206162603.24900-1-mail@david-bauer.net>
-X-Mailer: git-send-email 2.51.0
+	linux-kernel@vger.kernel.org,
+	dharanitharan725@gmail.com
+Subject: [PATCH] team: fix qom_list corruption by using list_del_init_rcu()
+Date: Sat,  6 Dec 2025 18:25:57 +0000
+Message-ID: <20251206182557.10090-1-dharanitharan725@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,105 +85,28 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Bar: /
-X-Rspamd-Report: SUSPICIOUS_RECIPS(1.5) BAYES_HAM(-3) MID_CONTAINS_FROM(1) MIME_GOOD(-0.1) R_MISSING_CHARSET(0.5)
-X-Rspamd-Score: -0.1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=david-bauer.net; s=uberspace;
-	h=from:to:cc:subject:date;
-	bh=oY2ka5lja8UpTFcpu2gZKgfaOGa68I0bntBzjHS9b8k=;
-	b=wINfV37UHZ4TMH/IR8ttaWc5wP9+Hyx2xTYANNdPHP2Fq3TCxj6aecY+07GCXj6BIdSiS9TyYD
-	+jZptlE1NwPSGoVzWmd4XCMNmYu5b7IM5GkjJ25bh5eNSf6m9Wys60Ba4nN2YMxMKy9QqvY2Zdnh
-	ptemAZ0rMEAcl56dAW15QLVmSa18Vz4XHYo1o5p/NrWs1hsVd3F4+3oPhix6vVEWlxgeEZ2Mx/Vd
-	gfMbEsylEs7I32WYe2z2Fm6TB30fz+kbBC7VHqLt/J9GrQONey6JabAjbRIpuXet8zx8IHyHbjDS
-	ee4gFubRTG/7dlq/tntAwyxGXow/9jxalbHvkxufsQMQkPIFyIOlvbPA4yItAXrajTnbGu5hlYrW
-	ZP9JepYLX7/wBEDMvxdVvORvn2jzVppSN9CUJyOBo4sAh28KI08YMXO09A9ktKJzzyDlp50MsxcA
-	zELbXyThO1ghMgzd15OhbIH349CmUpHvqBGien1KMR/O0xOFrglzN5AsmeTJDdCANWFXBHYmFRnr
-	hyfJRiNj8Vb9BZ1qn/Vi+3dnGSLakEa5+j5m1HX6a/OggiN6fjLSR397Xowu2QwwVQK61iGm9dNZ
-	XYIi1qKc+/jIvAvHOsXzB5VmxXYgSATKVPi4DaAqHgHKJ+1BojyecaqBlN9HirAv1mG5gFu2IqtX
-	I=
 
-Account for the IP version of the tunnel when accounting skb headroom on
-xmit. This avoids having to potentially copy the skb a second time down
-the stack due to allocating not enough space for IPv6 headers in case
-the tunnel uses IPv6.
-
-Fixes: b784e7ebfce8 ("L2TP:Adjust intf MTU, add underlay L3, L2 hdrs.")
-Signed-off-by: David Bauer <mail@david-bauer.net>
+Reported-by: syzbot+422806e5f4cce722a71f@syzkaller.appspotmail.com
+Signed-off-by: Dharanitharan R <dharanitharan725@gmail.com>
 ---
- net/l2tp/l2tp_core.c | 3 ++-
- net/l2tp/l2tp_core.h | 1 +
- net/l2tp/l2tp_eth.c  | 9 ++-------
- 3 files changed, 5 insertions(+), 8 deletions(-)
+ drivers/net/team/team_core.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
-index 687c1366a4d0f..b07b4861f2f59 100644
---- a/net/l2tp/l2tp_core.c
-+++ b/net/l2tp/l2tp_core.c
-@@ -1234,7 +1234,7 @@ static int l2tp_xmit_core(struct l2tp_session *session, struct sk_buff *skb, uns
- 	 * make room. Adjust truesize.
- 	 */
- 	uhlen = (tunnel->encap == L2TP_ENCAPTYPE_UDP) ? sizeof(*uh) : 0;
--	headroom = NET_SKB_PAD + sizeof(struct iphdr) + uhlen + session->hdr_len;
-+	headroom = NET_SKB_PAD + tunnel->l3_overhead + uhlen + session->hdr_len;
- 	if (skb_cow_head(skb, headroom)) {
- 		kfree_skb(skb);
- 		return NET_XMIT_DROP;
-@@ -1680,6 +1680,7 @@ int l2tp_tunnel_register(struct l2tp_tunnel *tunnel, struct net *net,
- 	}
- 
- 	sk->sk_allocation = GFP_ATOMIC;
-+	tunnel->l3_overhead = kernel_sock_ip_overhead(sk);
- 	release_sock(sk);
- 
- 	sock_hold(sk);
-diff --git a/net/l2tp/l2tp_core.h b/net/l2tp/l2tp_core.h
-index ffd8ced3a51ff..aab574376d95f 100644
---- a/net/l2tp/l2tp_core.h
-+++ b/net/l2tp/l2tp_core.h
-@@ -167,6 +167,7 @@ struct l2tp_tunnel {
- 	u32			tunnel_id;
- 	u32			peer_tunnel_id;
- 	int			version;	/* 2=>L2TPv2, 3=>L2TPv3 */
-+	int			l3_overhead;	/* IP header overhead */
- 
- 	char			name[L2TP_TUNNEL_NAME_MAX]; /* for logging */
- 	enum l2tp_encap_type	encap;
-diff --git a/net/l2tp/l2tp_eth.c b/net/l2tp/l2tp_eth.c
-index cf0b66f4fb29b..709e1fb1b2e3c 100644
---- a/net/l2tp/l2tp_eth.c
-+++ b/net/l2tp/l2tp_eth.c
-@@ -187,7 +187,6 @@ static void l2tp_eth_adjust_mtu(struct l2tp_tunnel *tunnel,
- 				struct net_device *dev)
+diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
+index 4d5c9ae8f221..d6d724b52dbf 100644
+--- a/drivers/net/team/team_core.c
++++ b/drivers/net/team/team_core.c
+@@ -823,7 +823,8 @@ static void __team_queue_override_port_del(struct team *team,
  {
- 	unsigned int overhead = 0;
--	u32 l3_overhead = 0;
- 	u32 mtu;
+ 	if (!port->queue_id)
+ 		return;
+-	list_del_rcu(&port->qom_list);
++	/* Ensure safe repeated deletion */
++	list_del_init_rcu(&port->qom_list);
+ }
  
- 	/* if the encap is UDP, account for UDP header size */
-@@ -196,11 +195,7 @@ static void l2tp_eth_adjust_mtu(struct l2tp_tunnel *tunnel,
- 		dev->needed_headroom += sizeof(struct udphdr);
- 	}
- 
--	lock_sock(tunnel->sock);
--	l3_overhead = kernel_sock_ip_overhead(tunnel->sock);
--	release_sock(tunnel->sock);
--
--	if (l3_overhead == 0) {
-+	if (tunnel->l3_overhead == 0) {
- 		/* L3 Overhead couldn't be identified, this could be
- 		 * because tunnel->sock was NULL or the socket's
- 		 * address family was not IPv4 or IPv6,
-@@ -211,7 +206,7 @@ static void l2tp_eth_adjust_mtu(struct l2tp_tunnel *tunnel,
- 	/* Adjust MTU, factor overhead - underlay L3, overlay L2 hdr
- 	 * UDP overhead, if any, was already factored in above.
- 	 */
--	overhead += session->hdr_len + ETH_HLEN + l3_overhead;
-+	overhead += session->hdr_len + ETH_HLEN + tunnel->l3_overhead;
- 
- 	mtu = l2tp_tunnel_dst_mtu(tunnel) - overhead;
- 	if (mtu < dev->min_mtu || mtu > dev->max_mtu)
+ static bool team_queue_override_port_has_gt_prio_than(struct team_port *port,
 -- 
-2.51.0
+2.43.0
 
 
