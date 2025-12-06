@@ -1,157 +1,187 @@
-Return-Path: <netdev+bounces-243920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E83D8CAADEA
-	for <lists+netdev@lfdr.de>; Sat, 06 Dec 2025 22:27:19 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BDCECAAEC2
+	for <lists+netdev@lfdr.de>; Sat, 06 Dec 2025 23:37:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 01687304FEAE
-	for <lists+netdev@lfdr.de>; Sat,  6 Dec 2025 21:26:51 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BA0E330088E0
+	for <lists+netdev@lfdr.de>; Sat,  6 Dec 2025 22:37:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0898D29C339;
-	Sat,  6 Dec 2025 21:26:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gUoF1fYJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C40A2264B0;
+	Sat,  6 Dec 2025 22:37:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f47.google.com (mail-yx1-f47.google.com [74.125.224.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6717B2222D2
-	for <netdev@vger.kernel.org>; Sat,  6 Dec 2025 21:26:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56C5421255A;
+	Sat,  6 Dec 2025 22:37:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765056409; cv=none; b=h6BiHt1Yyf+A2HbrBXsWsGSUSRqU4R25ej8iR4ikOY2wzM1SnRa2h3JlVlCQm2TNChH0Vp0QGu43svVtBx9CiPGMa89sGSk5n/WIUO/Y4BsbCqKWS3yIhSA3xZ2Bxfu45dgWIb5l37VBeZjpCggx0QiPtSuhrr7WxMYUmJYDoak=
+	t=1765060643; cv=none; b=j+ZziMpuN/foA1Ahd1s9mLQP5uW4TrFsf76zdHmXosdr3RpRNCUZz10Kv9F92Euzvtumj/x2wXxEqbZuLFfj0MDtk8+mEQyEkCNks214HdyG2XKBZiwg8kTkHk3up8Arccs19DVU+f/c+VriEVSaA7rY7eyKPjrfZb90DMox0C8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765056409; c=relaxed/simple;
-	bh=+AkkaljOphqLh2uo3jDJPVsDdFyxdZBQI/6nMBQQGTc=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=Ai+oFr1ywsPDbzXNUFDsYxpHE2+9ZbFYfvvYLL/q9LrfP5R13lGHqRbZmwnzxghXfGojlV3Z/qFGbU8yHUzXMO4QvkayCp6EstJUIkPE6fcV299YrdSopy9Krk3ZqTAjiTDSIOWGJOjQgzOsaW9jHO3+Z1Gl3aKhTYoWF2KzLqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gUoF1fYJ; arc=none smtp.client-ip=74.125.224.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f47.google.com with SMTP id 956f58d0204a3-63f996d4e1aso3647479d50.0
-        for <netdev@vger.kernel.org>; Sat, 06 Dec 2025 13:26:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765056407; x=1765661207; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=U56e9HYR/KD4xmjOdy4dmke3gmK4x3rtXLtXrPC8YJE=;
-        b=gUoF1fYJl2FlBxjpqtebelDFgfn3vOS3b6ulakilRB/gkkVcggiZ1Q63afj0VCTJ+b
-         PHjTk3Q6cCmNriBqb87HW9kwiyXzs9V6cSy71j4yJZzce8lVwoENU8tVYIjXG3l+huX6
-         1gu+VnUlLK5KW1wo7uK9jeVe6yrxOOkmKICi4X01BxpG+npTmp5gwj5IwiqhK39nO/DL
-         tMuZl4kO9v2SCTFFgq9xsOgQNeVlnNJUZZG6bIA/QkcgV1Xx883tmZdxBG8Gc4A8MjG+
-         4tA/36rlVR1O8+J+M8OLkIEDax2IJY90EV0485427ubDNwYF1ilyvs6wb23vG9SAfp+t
-         5Rvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765056407; x=1765661207;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=U56e9HYR/KD4xmjOdy4dmke3gmK4x3rtXLtXrPC8YJE=;
-        b=tT+vOQW8lcsvZZlLtQyTgsjVNnHGu53esYMHrOh0Hadck3MAjSVepO2oL65Qro2Deo
-         zaqhkYMlhOUp4uoa5VCoz1egM1lGRnpi1f4rG/Pc3LvhbGiO3b0nPO1S459YrASmw3fC
-         KSIht+ylhsv7GNWIsrcMW8pGOB4nbDdLCR36tAuuN44p++SJ3ec3xon0ShEMm5EPrtY2
-         yGzDtoCX5Ob9/fawjjx+jhVtDsOT+BnW7ivARc5flbTjCsYSH8PIfbGh0RS9CAtY+cIJ
-         SFUJ5y+BK0sn58CRre4qgCnAOT+DUQMWG0Q0Wc3RJQtFQg0aeQc6Uv7NibraL25X3h1E
-         sLbw==
-X-Forwarded-Encrypted: i=1; AJvYcCUkCeZkolPCxK15b6xIQ0iaDgl7/7TQEAcXqU5SL8nc1SpRqfEVqsNfUFB1StnATtt4olsXPYA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyAvjYrc/kMl7zYjWx4HHPf4cgDGFzRFK2S2EIVKUKzYYBy+kCw
-	Hr3JRZTFfemlo39JJzi5WbufITvjx6zDa/SgDfXc4uh0SUIw6FH+yZ4W
-X-Gm-Gg: ASbGncs7ZR3qleoBiHKqY0ZcLLqQTBR8+2yWB9jqf9lM9XUhHupzUgl6uMluEet+kQj
-	7enhTdoSmNtjrfwWWpnHiQ7j6TPMbniKNRlMSEu0uvaW7HUjVr/KQMThDX7USgQMQi1usDa6rl8
-	4cHxu1hFRKNNOCbkyQZKMpYfftAxRjHS4VPaka+5r2bQo3gxe9ugkA+mzvcDwW+cw8mkb4o0Bif
-	etebE1Oopaiq+oc0ZYt1RZ0y0Hgp24Y1TT7kb63ZqCEfMdWLTAXEYcZQhRJ2STy3VG6OJvVN7Nv
-	d6RBw7wzOPO/vHOnFWVcqYS2gK27YQlnx94gQXgyMhPrvo7OejB6RjDaocG34t/K/CZgtRp9V6g
-	ekETFh02dn0Kq8H5JOaLE2tr0duqddIJHidDK5BbmoC64F4FYWbRVsUzImAcNg3U5PhX5kYyPAZ
-	qS1/GGBpO16St4kkMI4F9lDeXFm/o/w5HoMcw8v1yJ7sY8Q4FiH2OpMY92h++VUDP/qn4=
-X-Google-Smtp-Source: AGHT+IHZ9iLV7APHz1+Nitn+ctuBF0Em5EdoPm6bSuzEr+AS+vfgayx2cP7pz53IExvIbMScehZU4Q==
-X-Received: by 2002:a05:690c:6913:b0:78c:2f4a:b6a8 with SMTP id 00721157ae682-78c33c76697mr32865897b3.58.1765056407352;
-        Sat, 06 Dec 2025 13:26:47 -0800 (PST)
-Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-78c1b4ac94dsm31353957b3.9.2025.12.06.13.26.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 06 Dec 2025 13:26:46 -0800 (PST)
-Date: Sat, 06 Dec 2025 16:26:45 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Simon Horman <horms@kernel.org>, 
- Neal Cardwell <ncardwell@google.com>, 
- Kuniyuki Iwashima <kuniyu@google.com>, 
- David Ahern <dsahern@kernel.org>
-Message-ID: <willemdebruijn.kernel.29a0666ba5355@gmail.com>
-In-Reply-To: <98a7e20010265e3ebf9d7e6d6dfb7339d5db7b99.1764943231.git.pabeni@redhat.com>
-References: <cover.1764943231.git.pabeni@redhat.com>
- <98a7e20010265e3ebf9d7e6d6dfb7339d5db7b99.1764943231.git.pabeni@redhat.com>
-Subject: Re: [RFC PATCH 1/2] net: gro: avoid relaying on skb->transport_header
- at receive time
+	s=arc-20240116; t=1765060643; c=relaxed/simple;
+	bh=xtvUGG1pLb4KRwlQsYtTdMvQLZWQdfVYD/O5TYfMvjo=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=qsQEYOp/peUAOiv1W67FCpxz5OuasxUrJQrbYFtSrw+c0Ll19hXQ5BHDf3DHdu9SPRRWAGU8MV7Pns35gMqS854uzTl5em6KfSrfoaHqPfhkuKg8Bt67ZID/j08WF7zD6iGVbdZSnISqDV+nezh4f72fXp5Y0bIZpogDKKZBLXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1vS0th-000000003B5-2e91;
+	Sat, 06 Dec 2025 22:37:01 +0000
+Date: Sat, 6 Dec 2025 22:36:58 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Rasmus Villemoes <ravi@prevas.dk>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: [PATCH net v2] net: dsa: mxl-gsw1xx: manually clear RANEG bit
+Message-ID: <a90b206e9fd8e4248fd639afd5ae296454ac99b9.1765060046.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Paolo Abeni wrote:
-> Currently {tcp,udp}_gro_receive relay on the gro network stage setting
-> the correct transport header offset for all the skbs held by the GRO
-> engine.
-> 
-> Such assumption is not necessary, as the code can instead leverage the
-> offset already available for the currently processed skb. Add a couple
-> of helpers to for readabilty' sake.
-> 
-> As skb->transport_header lays on a different cacheline wrt skb->data,
-> this should save a cacheline access for each packet aggregation.
-> Additionally this will make the next patch possible.
-> 
-> Note that the compiler (gcc 15.2.1) does inline the tcp_gro_lookup()
-> call in tcp_gro_receive(), so the additional argument is only relevant
-> for the fraglist case.
-> 
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> ---
->  include/net/gro.h        | 26 ++++++++++++++++++++++++++
->  include/net/tcp.h        |  3 ++-
->  net/ipv4/tcp_offload.c   | 15 ++++++++-------
->  net/ipv4/udp_offload.c   |  4 ++--
->  net/ipv6/tcpv6_offload.c |  2 +-
->  5 files changed, 39 insertions(+), 11 deletions(-)
-> 
-> diff --git a/include/net/gro.h b/include/net/gro.h
-> index b65f631c521d..fdb9285ab117 100644
-> --- a/include/net/gro.h
-> +++ b/include/net/gro.h
-> @@ -420,6 +420,18 @@ struct sk_buff *udp_gro_receive(struct list_head *head, struct sk_buff *skb,
->  				struct udphdr *uh, struct sock *sk);
->  int udp_gro_complete(struct sk_buff *skb, int nhoff, udp_lookup_t lookup);
->  
-> +/* Return the skb hdr corresponding to the specified skb2 hdr.
-> + * skb2 is held in the gro engine, i.e. its headers are in the linear part.
+Despite being documented as self-clearing, the RANEG bit sometimes
+remains set, preventing auto-negotiation from happening.
 
-I thought "being held in the gro engine" intended to mean behing held
-on the gro_list, i.e., p.
+Manually clear the RANEG bit after 10ms as advised by MaxLinear.
+In order to not hold RTNL during the 10ms of waiting schedule
+delayed work to take care of clearing the bit asynchronously, which
+is similar to the self-clearing behavior.
 
-But this is used inverse, where skb2 is the currently arriving packet
-and skb == p. Is this intentional and am I just misunderstanding the
-intent of this comment? Or is the comment intended to say
+Fixes: 22335939ec90 ("net: dsa: add driver for MaxLinear GSW1xx switch family")
+Reported-by: Rasmus Villemoes <ravi@prevas.dk>
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+---
+v2:
+ * cancel pending work before setting RANEG bit
+ * cancel pending work on remove and shutdown
+ * document that GSW1XX_RST_REQ_SGMII_SHELL also clears RANEG bit
+ * improve commit message
 
-"skb is held on the gro list, therefore [..]"
+ drivers/net/dsa/lantiq/mxl-gsw1xx.c | 32 +++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
-> + */
-> +static inline const void *
-> +skb_gro_header_from(const struct sk_buff *skb, const struct sk_buff *skb2,
-> +		    const void *hdr2)
-> +{
-> +	size_t offset = (unsigned char *)hdr2 - skb2->data;
-> +
-> +	return skb->data + offset;
-> +}
+diff --git a/drivers/net/dsa/lantiq/mxl-gsw1xx.c b/drivers/net/dsa/lantiq/mxl-gsw1xx.c
+index cf33a16fd183b..5232737778835 100644
+--- a/drivers/net/dsa/lantiq/mxl-gsw1xx.c
++++ b/drivers/net/dsa/lantiq/mxl-gsw1xx.c
+@@ -11,10 +11,12 @@
+ 
+ #include <linux/bits.h>
+ #include <linux/delay.h>
++#include <linux/jiffies.h>
+ #include <linux/module.h>
+ #include <linux/of_device.h>
+ #include <linux/of_mdio.h>
+ #include <linux/regmap.h>
++#include <linux/workqueue.h>
+ #include <net/dsa.h>
+ 
+ #include "lantiq_gswip.h"
+@@ -29,6 +31,7 @@ struct gsw1xx_priv {
+ 	struct			regmap *clk;
+ 	struct			regmap *shell;
+ 	struct			phylink_pcs pcs;
++	struct delayed_work	clear_raneg;
+ 	phy_interface_t		tbi_interface;
+ 	struct gswip_priv	gswip;
+ };
+@@ -145,6 +148,8 @@ static void gsw1xx_pcs_disable(struct phylink_pcs *pcs)
+ {
+ 	struct gsw1xx_priv *priv = pcs_to_gsw1xx(pcs);
+ 
++	cancel_delayed_work_sync(&priv->clear_raneg);
++
+-	/* Assert SGMII shell reset */
++	/* Assert SGMII shell reset (will also clear RANEG bit) */
+ 	regmap_set_bits(priv->shell, GSW1XX_SHELL_RST_REQ,
+ 			GSW1XX_RST_REQ_SGMII_SHELL);
+@@ -428,12 +433,29 @@ static int gsw1xx_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
+ 	return 0;
+ }
+ 
++static void gsw1xx_pcs_clear_raneg(struct work_struct *work)
++{
++	struct gsw1xx_priv *priv =
++		container_of(work, struct gsw1xx_priv, clear_raneg.work);
++
++	regmap_clear_bits(priv->sgmii, GSW1XX_SGMII_TBI_ANEGCTL,
++			  GSW1XX_SGMII_TBI_ANEGCTL_RANEG);
++}
++
+ static void gsw1xx_pcs_an_restart(struct phylink_pcs *pcs)
+ {
+ 	struct gsw1xx_priv *priv = pcs_to_gsw1xx(pcs);
+ 
++	cancel_delayed_work_sync(&gsw1xx_priv->clear_raneg);
++
+ 	regmap_set_bits(priv->sgmii, GSW1XX_SGMII_TBI_ANEGCTL,
+ 			GSW1XX_SGMII_TBI_ANEGCTL_RANEG);
++
++	/* despite being documented as self-clearing, the RANEG bit
++	 * sometimes remains set, preventing auto-negotiation from happening.
++	 * MaxLinear advises to manually clear the bit after 10ms.
++	 */
++	schedule_delayed_work(&priv->clear_raneg, msecs_to_jiffies(10));
+ }
+ 
+ static void gsw1xx_pcs_link_up(struct phylink_pcs *pcs,
+@@ -636,6 +658,8 @@ static int gsw1xx_probe(struct mdio_device *mdiodev)
+ 	if (ret)
+ 		return ret;
+ 
++	INIT_DELAYED_WORK(&priv->clear_raneg, gsw1xx_pcs_clear_raneg);
++
+ 	ret = gswip_probe_common(&priv->gswip, version);
+ 	if (ret)
+ 		return ret;
+@@ -648,10 +672,14 @@ static int gsw1xx_probe(struct mdio_device *mdiodev)
+ static void gsw1xx_remove(struct mdio_device *mdiodev)
+ {
+ 	struct gswip_priv *priv = dev_get_drvdata(&mdiodev->dev);
++	struct gsw1xx_priv *gsw1xx_priv;
+ 
+ 	if (!priv)
+ 		return;
+ 
++	gsw1xx_priv = container_of(priv, struct gsw1xx_priv, gswip);
++	cancel_delayed_work_sync(&gsw1xx_priv->clear_raneg);
++
+ 	gswip_disable_switch(priv);
+ 
+ 	dsa_unregister_switch(priv->ds);
+@@ -660,10 +688,14 @@ static void gsw1xx_remove(struct mdio_device *mdiodev)
+ static void gsw1xx_shutdown(struct mdio_device *mdiodev)
+ {
+ 	struct gswip_priv *priv = dev_get_drvdata(&mdiodev->dev);
++	struct gsw1xx_priv *gsw1xx_priv;
+ 
+ 	if (!priv)
+ 		return;
+ 
++	gsw1xx_priv = container_of(priv, struct gsw1xx_priv, gswip);
++	cancel_delayed_work_sync(&gsw1xx_priv->clear_raneg);
++
+ 	dev_set_drvdata(&mdiodev->dev, NULL);
+ 
+ 	gswip_disable_switch(priv);
+-- 
+2.52.0
 
