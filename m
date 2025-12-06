@@ -1,145 +1,152 @@
-Return-Path: <netdev+bounces-243896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B21DCAA34B
-	for <lists+netdev@lfdr.de>; Sat, 06 Dec 2025 10:12:37 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C120CAA373
+	for <lists+netdev@lfdr.de>; Sat, 06 Dec 2025 10:29:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7765F3016E17
-	for <lists+netdev@lfdr.de>; Sat,  6 Dec 2025 09:12:26 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 702DC300E812
+	for <lists+netdev@lfdr.de>; Sat,  6 Dec 2025 09:29:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8B4A2DF6E3;
-	Sat,  6 Dec 2025 09:12:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 352032E8DFA;
+	Sat,  6 Dec 2025 09:29:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K6FZsZ63"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f79.google.com (mail-oa1-f79.google.com [209.85.160.79])
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F079120B212
-	for <netdev@vger.kernel.org>; Sat,  6 Dec 2025 09:12:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 684D42E8B85
+	for <netdev@vger.kernel.org>; Sat,  6 Dec 2025 09:29:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765012345; cv=none; b=Jb5CR2i3ZjIJFHcGOdLnog6G0VrYvbnxV1p4TZE/CQPKUO5xHgH9kauh3Lm4d+paC1uX38lp3l9QT8wrZ5WBihR8IKu2iBewBX0JZtuq3g0W3HwEx3HOxgCPh2QgnuGRN2It6rkH0qPqzG2x4bcj/0jPGOKwZpANX0BBjW+s2UM=
+	t=1765013344; cv=none; b=i3gWg20fcvENOT2YIgcQoiKkA9zSQvvNFDv4EQSWVxXlxJV9qR8x5w3FApIQt8LVYF2Jm9pHPKdBTM7M8fpskeavbj1RY5Ibv9z2ioyYQ/+Clytp69NjUPp5klfDG99jaWQwy2omrcm0Artpb3VufAn3RZ2Y3bXeIP2etPMvASA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765012345; c=relaxed/simple;
-	bh=1ejLsKcsfZGQzZwlR1bIL/zMBH9XWVg8VfOImLm9acA=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=LseSdyI8jBxK+1EcDBhTkHDoVrE+GtV9WC1BKx+AQZBdItXXP/KWR4EvEFp9IYimATjrYM16gCN3TBwEdZeuYG9PFdoNNLEvaKHfbDFadOQyfZX+UmPiftWVt1LF5zx0Q4rVseT140cqIeWRGInd0wpjyzARwmrgcox7pZRIcDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oa1-f79.google.com with SMTP id 586e51a60fabf-3ec31d72794so7304674fac.0
-        for <netdev@vger.kernel.org>; Sat, 06 Dec 2025 01:12:22 -0800 (PST)
+	s=arc-20240116; t=1765013344; c=relaxed/simple;
+	bh=tEI0oNpRyE6qcr0IBduItDjyoXIQ5mQ3MWZTJAf8Z0Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ccV90Uncc3hpW/CnIeMGawRD6NrZAHu3KMay/T4Uuj4chcg2072Uq3fNiOpI75iyWZBuUbNF7O1dSgBU3sVkG2vfCenMuxWbxFJqTqWjaj18NLSGFvFq77JDszvJLBAyVSzsi1ndMukkE6DaLKGxTGTyACB7eDWDexOBzmy4UXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K6FZsZ63; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5957ac0efc2so3319179e87.1
+        for <netdev@vger.kernel.org>; Sat, 06 Dec 2025 01:29:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765013340; x=1765618140; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7mkL4mldJYKw7ojYdbxn9IiTrYaThkCUYNslYp30fxs=;
+        b=K6FZsZ63Mp1kWU9hYYi+aMMZXnS+n1P0ROYimyRDuzjzaHlruiRAd/tETtEcYlZX+4
+         vruBmYyT6O7pgqpNUMNTUWUQ7xk7ETF3RXCtfEd+fdEzHtDlGKeYXB1BWcHF6G2svt9x
+         viAPQkC1N2gb7NDFTuDfYJ4FjhmWQ9xSluwfENhpfZNMBOJCU3YpCC79ZCZofUIqrzHa
+         lMXrPB6V4BEqrBOqE3uD2IZz7gmFqNtCbsu2qndGIViGyDbW+u7UW5zk8w1x8qYagmbU
+         Ml5uaiNqvWNAOtW5oX3jUkYIUr8PKV8XsZpilSdygEDPpiJclnmNFXE3krJ8qUyK6S+8
+         T1lA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765012342; x=1765617142;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3/LVS9k18L2FkXaCDOM0Zk2vdrA1YNdhVcdFbxui8ZI=;
-        b=xDsW6h0CrFR8LnQvgRypELsHrFhVYP40hnVfBOG/a8zUc+TInsrCfDgb6UxkBVGmV7
-         yl0KWJciRaa3Q58nR97vw6Thyb6G+dCZNuTB9coUjQPMq7vPEHSXGs2uy1eEamjqVTaa
-         izN0JslepNe3NW9apPZNoG2sJHMO/ohAZ1l0mn5Vy8oTtguUDH7iUkJkyexvfXSXlqlc
-         wdZNLhBPW5nR7HlCZDAZ/BA/1SHFpLM3W2/s8E/sU1pwKpUCHkHLnNb2KT38XhaNWq5g
-         /9NkyboYXiKtJ0SMU4tC4nwERbX63zgsgPKWfk1kkZqmArn+VjSc+Lj8AlZFQO8IPawY
-         ckLg==
-X-Forwarded-Encrypted: i=1; AJvYcCUrVfi6Hd+iXEk0fZRMbevFS0Zk7yzFX5E6XOQslsWaC9quUmkkgwGEYQVqGDHoXfptxqZ+J3Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCW8PPRSVPGe3KVOLFQLu+W/xvKIKWi2jxIEhpJKWuz+YRkMRh
-	CuE+yPqmAWlk8CAh8y6vPrI2jqdjTr39QPkdkP96Z4IsjRZA6rZU0g8oW2Tgl3+9SXYwBPspYV1
-	Zpm5IIsF5LNTd+w24Jxfq8sOmiL0G4h1ST8R+i3trSzyAiU8Y+/R5MDqg5hM=
-X-Google-Smtp-Source: AGHT+IGdTTHnpabMUiM/Z6j0+k/XLLraXh9jAlM31yL7Tm+d00HG7ufxAtm9NiZhF6c9RHseDFpI7AeTg4VtrdZEKTBx5QwD6T0Q
+        d=1e100.net; s=20230601; t=1765013340; x=1765618140;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=7mkL4mldJYKw7ojYdbxn9IiTrYaThkCUYNslYp30fxs=;
+        b=XVDGCPQkylIuRoAuEgDUkXhuTQgL2U/Yh4qe1yAv5N3xa02VmxMbuAvfUx8zZgb0h6
+         qTb9WmrlHYEU/pA88qUspZW2Ffc/ZbTGOFY02o6fU6xYgb3qknFd9Gmw5spaZJwl9hAb
+         X6M/07BtN3UqYG2sHoppbFWU2Don73lIzg+fs40bOUI7PCC1O4FyIRIlwErCkh8m0VaB
+         0+KlSJgksOteBoEqgms/wWZ11ut9/Cbl/n6sAaVgbtoR8saDzhg672tNdaPeCLDaFHGQ
+         ShRMI80D9FtFi5MeQa+Tdx2DK31YZuOdq1Yxv4RfqcrIp88sniESzE1p7SGjhVkae9S9
+         zCnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV1yWYRY0y8T64iG0I1TrSXvC9FBreXZy2NHTB7kDA8L25CJvJJdmGNnj54pX2igjgRR1Z6kiM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmtkQJnnB3qiHnb92IN974NuaAvszkAsM1vq5q+3Yj+4a8Udib
+	a9jZEEd3dHKq52jZnbW8eehnnYO4kKfw5oy+Knm+lDb46W57k678csLx
+X-Gm-Gg: ASbGncsYfsa4U03TJOuuF+uzV3nblfrXtWY8R//XZxe0LpnuLcTYop/itCjhSd9CiE1
+	WpuGgjI49mTW5hxcc9joFK7SoBjXkBk9i4WHGi97CiGQGy+cmbm38hYOYYAFWy+l4C2fGSAIkGy
+	fr64akXxJJRhPIRVzv5NPXuV+oO2QDlwvUSwKJMRbLjnxfU1y1h1XXr03LkehfAAqbtySnTiNgY
+	QR24ZP9cxnLTuXDjNNOUDoJLAtlygbFel73pXlA1ylnQchiX84ZU9VUgZOcRsJ9r8bsfF8R0l8T
+	zIbylmBlx6lTVwWaCalz478YAZgppjwo55CUO/9CeB+oht87wXPQjrSFTTRffUsrj92Pv/PFdPW
+	ckx7G7EbuAlBja6tZJCAI36KFLAfpjcSZACCLhSDypHqpk5Ji4nhGhLqQUjhJ2CjZ4OJLN+C24A
+	1sTv8nPWMa+BNdLe5KsuTnSA==
+X-Google-Smtp-Source: AGHT+IFyOAyYsnU/+MuGqXG8LBM/n39WgfIL/eBystNfPUfaEn0B797BFJz5V0TDvy+Byv3w5CCKcg==
+X-Received: by 2002:a05:6512:2342:b0:594:2870:9774 with SMTP id 2adb3069b0e04-598853caadcmr561368e87.38.1765013340232;
+        Sat, 06 Dec 2025 01:29:00 -0800 (PST)
+Received: from localhost ([188.234.148.119])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-597dfc536e8sm662726e87.7.2025.12.06.01.28.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 06 Dec 2025 01:28:59 -0800 (PST)
+From: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
+To: bpf@vger.kernel.org
+Cc: andrii@kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	netdev@vger.kernel.org,
+	fweimer@redhat.com,
+	andrii.nakryiko@gmail.com,
+	Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
+Subject: [PATCH v3] tools/lib/bpf: fix -Wdiscarded-qualifiers under C23
+Date: Sat,  6 Dec 2025 14:28:25 +0500
+Message-ID: <20251206092825.1471385-1-mikhail.v.gavrilov@gmail.com>
+X-Mailer: git-send-email 2.52.0
+In-Reply-To: <CAEf4BzYOhiddakWzVGe1CYt2GZ+a57kT4EyujhoiTQN6Mc6uLg@mail.gmail.com>
+References: <CAEf4BzYOhiddakWzVGe1CYt2GZ+a57kT4EyujhoiTQN6Mc6uLg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:471a:b0:659:9a49:8e19 with SMTP id
- 006d021491bc7-6599a499c33mr771475eaf.11.1765012342157; Sat, 06 Dec 2025
- 01:12:22 -0800 (PST)
-Date: Sat, 06 Dec 2025 01:12:22 -0800
-In-Reply-To: <68a246ad.050a0220.e29e5.0077.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6933f376.a70a0220.38f243.001d.GAE@google.com>
-Subject: Re: [syzbot] [wireless?] WARNING in ieee80211_tx_skb_tid
-From: syzbot <syzbot+8bd4574e8c52c48c2595@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-syzbot has found a reproducer for the following issue on:
+glibc ≥ 2.42 (GCC 15) defaults to -std=gnu23, which promotes
+-Wdiscarded-qualifiers to an error.
 
-HEAD commit:    d1d36025a617 Merge tag 'probes-v6.19' of git://git.kernel...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=12b44992580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=eaa3e2adda258a7
-dashboard link: https://syzkaller.appspot.com/bug?extid=8bd4574e8c52c48c2595
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14ad46c2580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11d0bc1a580000
+In C23, strstr() and strchr() return "const char *".
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-d1d36025.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/8198d2c1f670/vmlinux-d1d36025.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/51df1359897b/bzImage-d1d36025.xz
+Change variable types to const char * where the pointers are never
+modified (res, sym_sfx, next_path).
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+8bd4574e8c52c48c2595@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-WARNING: net/mac80211/tx.c:6303 at ieee80211_tx_skb_tid+0x3b4/0x470 net/mac80211/tx.c:6303, CPU#0: syz.0.18/5530
-Modules linked in:
-CPU: 0 UID: 0 PID: 5530 Comm: syz.0.18 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-RIP: 0010:ieee80211_tx_skb_tid+0x3b4/0x470 net/mac80211/tx.c:6303
-Code: f6 ce f6 e9 b1 fe ff ff e8 b9 da f1 f6 90 0f 0b 90 e9 e2 fe ff ff e8 ab da f1 f6 90 0f 0b 90 e9 2a fe ff ff e8 9d da f1 f6 90 <0f> 0b 90 e8 c4 e1 fd ff 31 ff 48 8b 34 24 ba 02 00 00 00 48 83 c4
-RSP: 0018:ffffc90002a7f458 EFLAGS: 00010293
-RAX: ffffffff8acf8083 RBX: ffffffff8acf7cff RCX: ffff888000f54980
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
-RBP: 00000000ffffffff R08: ffffffff8acf7cff R09: ffffffff8df41cc0
-R10: dffffc0000000000 R11: ffffed10092eb486 R12: ffff88801c1b8d80
-R13: 0000000000000000 R14: 0000000000000001 R15: dffffc0000000000
-FS:  00005555853f1500(0000) GS:ffff88808d683000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000564770e69950 CR3: 0000000032ccf000 CR4: 0000000000352ef0
-Call Trace:
- <TASK>
- ieee80211_tx_skb net/mac80211/ieee80211_i.h:2418 [inline]
- mesh_plink_frame_tx+0x734/0xc10 net/mac80211/mesh_plink.c:354
- mesh_plink_deactivate+0x18e/0x2f0 net/mac80211/mesh_plink.c:410
- mesh_sta_cleanup+0x42/0x150 net/mac80211/mesh.c:171
- __cleanup_single_sta net/mac80211/sta_info.c:167 [inline]
- cleanup_single_sta+0x40f/0x660 net/mac80211/sta_info.c:192
- __sta_info_flush+0x5e4/0x710 net/mac80211/sta_info.c:1683
- sta_info_flush net/mac80211/sta_info.h:970 [inline]
- ieee80211_do_stop+0x397/0x1f70 net/mac80211/iface.c:526
- ieee80211_stop+0x1b1/0x240 net/mac80211/iface.c:828
- __dev_close_many+0x344/0x6b0 net/core/dev.c:1756
- __dev_close net/core/dev.c:1768 [inline]
- __dev_change_flags+0x2be/0x680 net/core/dev.c:9732
- netif_change_flags+0x88/0x1a0 net/core/dev.c:9797
- dev_change_flags+0x130/0x260 net/core/dev_api.c:68
- dev_ioctl+0x7b4/0x1150 net/core/dev_ioctl.c:842
- sock_do_ioctl+0x22c/0x300 net/socket.c:1259
- sock_ioctl+0x576/0x790 net/socket.c:1366
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:597 [inline]
- __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fba6778f7c9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fff8aa47b88 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007fba679e5fa0 RCX: 00007fba6778f7c9
-RDX: 0000200000000000 RSI: 0000000000008914 RDI: 0000000000000004
-RBP: 00007fba67813f91 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fba679e5fa0 R14: 00007fba679e5fa0 R15: 0000000000000003
- </TASK>
-
-
+Suggested-by: Florian Weimer <fweimer@redhat.com>
+Suggested-by: Andrii Nakryiko <andrii@kernel.org>
+Signed-off-by: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
 ---
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+v2: use const char * where possible
+v3: split declaration of sym_sfx — it is only read, never written
+---
+ tools/lib/bpf/libbpf.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
+index 3dc8a8078815..f4dfd23148a5 100644
+--- a/tools/lib/bpf/libbpf.c
++++ b/tools/lib/bpf/libbpf.c
+@@ -8484,7 +8484,7 @@ static int kallsyms_cb(unsigned long long sym_addr, char sym_type,
+ 	struct bpf_object *obj = ctx;
+ 	const struct btf_type *t;
+ 	struct extern_desc *ext;
+-	char *res;
++	const char *res;
+ 
+ 	res = strstr(sym_name, ".llvm.");
+ 	if (sym_type == 'd' && res)
+@@ -11818,7 +11818,8 @@ static int avail_kallsyms_cb(unsigned long long sym_addr, char sym_type,
+ 		 *
+ 		 *   [0] fb6a421fb615 ("kallsyms: Match symbols exactly with CONFIG_LTO_CLANG")
+ 		 */
+-		char sym_trim[256], *psym_trim = sym_trim, *sym_sfx;
++		char sym_trim[256], *psym_trim = sym_trim;
++		const char *sym_sfx;
+ 
+ 		if (!(sym_sfx = strstr(sym_name, ".llvm.")))
+ 			return 0;
+@@ -12401,7 +12402,7 @@ static int resolve_full_path(const char *file, char *result, size_t result_sz)
+ 		if (!search_paths[i])
+ 			continue;
+ 		for (s = search_paths[i]; s != NULL; s = strchr(s, ':')) {
+-			char *next_path;
++			const char *next_path;
+ 			int seg_len;
+ 
+ 			if (s[0] == ':')
+-- 
+2.52.0
+
 
