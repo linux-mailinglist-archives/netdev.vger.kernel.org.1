@@ -1,180 +1,145 @@
-Return-Path: <netdev+bounces-243895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3C7CCAA2F9
-	for <lists+netdev@lfdr.de>; Sat, 06 Dec 2025 09:41:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B21DCAA34B
+	for <lists+netdev@lfdr.de>; Sat, 06 Dec 2025 10:12:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 151223011310
-	for <lists+netdev@lfdr.de>; Sat,  6 Dec 2025 08:41:15 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 7765F3016E17
+	for <lists+netdev@lfdr.de>; Sat,  6 Dec 2025 09:12:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF4AC23EABF;
-	Sat,  6 Dec 2025 08:41:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="E/DonLWy"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8B4A2DF6E3;
+	Sat,  6 Dec 2025 09:12:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013007.outbound.protection.outlook.com [40.107.162.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f79.google.com (mail-oa1-f79.google.com [209.85.160.79])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6448D22127A
-	for <netdev@vger.kernel.org>; Sat,  6 Dec 2025 08:41:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.7
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765010473; cv=fail; b=YTNpjOfYNcZaz3rQLxBFI03FTF8J3fy9zShbpuPBzr6EAkFwjqshaVGcLycy1CV/p/Rw9s9dvD4+8T2LQn+RJGj7AscBdBPzZW9KYOtZxV65w37tgbMA5Ag0CorTMaCPIlXCN1Xz10LldMONcHpd2ZZiu7VveU96byrLHzBV9kY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765010473; c=relaxed/simple;
-	bh=VqFB344u7FtrMu6pe2hncHKbcqNMb4stTrtiB+hkDCQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=TKGA+pBXOQhuIQqwWR00D8BMco/vfjVRmrv6bu68CmT8TKeYzwwjlBe9KLcVgjin/SjEkTIjbnX8zh9t/YQAcTB7CZa/NXaouXeg1Ip8wKdQ3pWnnxAyK+lWbAJpStKrBFMOT1xeyDdlDceCxTFNGPykn6rWB0ppfR3P3fdAgAM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=fail (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=E/DonLWy reason="signature verification failed"; arc=fail smtp.client-ip=40.107.162.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rXZ0fTQdVJONiIq4hGLSELm/flIwX81gK/Jm4FhQaCMjiWnn9AG+D9FZXFWa3v/vKCjV4Gib6GWmF0hJTx1LX8QjI2jOUmonZQW3pbycjIvXJSkQbraiR22iAQwwJ+XisnvP4Gqthknvsb1tVVDjfhAedLVRLWte4IH6DG2Vypacu5O7pB1fW/Hk/0JXKqK9r8waLjFUgtWPZv4AVbOtSade6SoCKMFu9CSKpChQnM0IF4q/tpAa/hpEUMmj0OXip1F5qyXHvQjJPGgVGbFrzrN5ckMHXSWZq3ZMHvikDOBHKrOOEtPliKko8UEcko1aM1L++AvtmYZ955o3Rxw/xQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Z5rDqxHtMUWN7VfrZBvsblUXGOJg1OpWWA71p47ZOSc=;
- b=WdnniB/SpkAF46rHwZsBSfnImWGiSHFiajZcS6QuunbbLilcpUn5XKwdqjHXgxhm9636bntbkTSKpJlho23psTcJqt+IVtgZR/QJOksqpZLzhjSHNuzxKPKb079sIqCQeNcAG5bSvLwiPv/AZ42wkgF4Q9BVrLl4U4/kqisRVl7ZwsQrq87emX1ZUVtAgpadVGikoGkUsBdwsyXAr4WtQ558hbhWhanLNUpjzSbLUUqgJmwgroNC1zrvczQfKtH8WPyXmy/JrOa5bFlTpw1Wx2fEQb4jwisshtT0PYQh6ezJASALjorwZS0vp63nejzeHf8dGrFL46H5h2Bsmi0BGg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Z5rDqxHtMUWN7VfrZBvsblUXGOJg1OpWWA71p47ZOSc=;
- b=E/DonLWyHWn3zJsaBweFSelVATSt0InHkfR7I3FXV857w3gLsMg9nXzbkKwPSQCgj0zyjYdnFHbxotYA8gd5T0OCkKs47LOPV5a3n5BmCWjTV6hWMWb8rL8flnAE9GdMDDi7aVWmXq5fRWAe/26t/TxX8CY/mqdq56cW9H56mUlt5ubGXJgumzht8O2e3c3yJ7NBLGFcV26VKEQ1bbPSqfw8hiUCaGB4RnYVYYcDNc5vAXh9gjnkkQRLdnU515d/Xk4IZY/EbjdcNT43+EVdheheQQyw7PEerAMLsxshQFtxeJdztFpdsnTPmb2FMebAG2JrJj4mLER1YP/xtbOH9w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM9PR04MB8585.eurprd04.prod.outlook.com (2603:10a6:20b:438::13)
- by VI1PR04MB7088.eurprd04.prod.outlook.com (2603:10a6:800:11d::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9366.17; Sat, 6 Dec
- 2025 08:41:06 +0000
-Received: from AM9PR04MB8585.eurprd04.prod.outlook.com
- ([fe80::8063:666f:9a2e:1dab]) by AM9PR04MB8585.eurprd04.prod.outlook.com
- ([fe80::8063:666f:9a2e:1dab%5]) with mapi id 15.20.9388.009; Sat, 6 Dec 2025
- 08:41:06 +0000
-Date: Sat, 6 Dec 2025 10:41:04 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: =?utf-8?B?QmrDuHJu?= Mork <bjorn@mork.no>
-Cc: netdev@vger.kernel.org, "Lucien.Jheng" <lucienzx159@gmail.com>,
-	Daniel Golle <daniel@makrotopia.org>
-Subject: Re: [RFC] net: phy: air_en8811h: add Airoha AN8811HB support
-Message-ID: <20251206084104.prufjf2jbvtwctlg@skbuf>
-References: <20251202102222.1681522-1-bjorn@mork.no>
- <20251202102222.1681522-1-bjorn@mork.no>
- <20251203232402.oy4pbphj4vsqp5lb@skbuf>
- <87sedq4pyk.fsf@miraculix.mork.no>
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87sedq4pyk.fsf@miraculix.mork.no>
-X-ClientProxiedBy: BE1P281CA0157.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:67::16) To AM9PR04MB8585.eurprd04.prod.outlook.com
- (2603:10a6:20b:438::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F079120B212
+	for <netdev@vger.kernel.org>; Sat,  6 Dec 2025 09:12:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.79
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765012345; cv=none; b=Jb5CR2i3ZjIJFHcGOdLnog6G0VrYvbnxV1p4TZE/CQPKUO5xHgH9kauh3Lm4d+paC1uX38lp3l9QT8wrZ5WBihR8IKu2iBewBX0JZtuq3g0W3HwEx3HOxgCPh2QgnuGRN2It6rkH0qPqzG2x4bcj/0jPGOKwZpANX0BBjW+s2UM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765012345; c=relaxed/simple;
+	bh=1ejLsKcsfZGQzZwlR1bIL/zMBH9XWVg8VfOImLm9acA=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=LseSdyI8jBxK+1EcDBhTkHDoVrE+GtV9WC1BKx+AQZBdItXXP/KWR4EvEFp9IYimATjrYM16gCN3TBwEdZeuYG9PFdoNNLEvaKHfbDFadOQyfZX+UmPiftWVt1LF5zx0Q4rVseT140cqIeWRGInd0wpjyzARwmrgcox7pZRIcDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oa1-f79.google.com with SMTP id 586e51a60fabf-3ec31d72794so7304674fac.0
+        for <netdev@vger.kernel.org>; Sat, 06 Dec 2025 01:12:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765012342; x=1765617142;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3/LVS9k18L2FkXaCDOM0Zk2vdrA1YNdhVcdFbxui8ZI=;
+        b=xDsW6h0CrFR8LnQvgRypELsHrFhVYP40hnVfBOG/a8zUc+TInsrCfDgb6UxkBVGmV7
+         yl0KWJciRaa3Q58nR97vw6Thyb6G+dCZNuTB9coUjQPMq7vPEHSXGs2uy1eEamjqVTaa
+         izN0JslepNe3NW9apPZNoG2sJHMO/ohAZ1l0mn5Vy8oTtguUDH7iUkJkyexvfXSXlqlc
+         wdZNLhBPW5nR7HlCZDAZ/BA/1SHFpLM3W2/s8E/sU1pwKpUCHkHLnNb2KT38XhaNWq5g
+         /9NkyboYXiKtJ0SMU4tC4nwERbX63zgsgPKWfk1kkZqmArn+VjSc+Lj8AlZFQO8IPawY
+         ckLg==
+X-Forwarded-Encrypted: i=1; AJvYcCUrVfi6Hd+iXEk0fZRMbevFS0Zk7yzFX5E6XOQslsWaC9quUmkkgwGEYQVqGDHoXfptxqZ+J3Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyCW8PPRSVPGe3KVOLFQLu+W/xvKIKWi2jxIEhpJKWuz+YRkMRh
+	CuE+yPqmAWlk8CAh8y6vPrI2jqdjTr39QPkdkP96Z4IsjRZA6rZU0g8oW2Tgl3+9SXYwBPspYV1
+	Zpm5IIsF5LNTd+w24Jxfq8sOmiL0G4h1ST8R+i3trSzyAiU8Y+/R5MDqg5hM=
+X-Google-Smtp-Source: AGHT+IGdTTHnpabMUiM/Z6j0+k/XLLraXh9jAlM31yL7Tm+d00HG7ufxAtm9NiZhF6c9RHseDFpI7AeTg4VtrdZEKTBx5QwD6T0Q
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM9PR04MB8585:EE_|VI1PR04MB7088:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2b63f698-b0b1-4c94-2f8e-08de34a33278
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|19092799006|376014|1800799024|366016|10070799003;
-X-Microsoft-Antispam-Message-Info:
-	=?iso-8859-1?Q?q1MixSeKtV6RrBmiDlCQEf73l1A+5VUe3qK8YiF77V209e+XW5ZCNdr7sf?=
- =?iso-8859-1?Q?qIeDbDcpDCWMxGmhLd8xX4i9H3JHxj7eLuCh987/uO2fwpZ4z1bvQ6A+Bt?=
- =?iso-8859-1?Q?Y/Oze0Kf0NA5NNDSWPUyr2k8AWPII2/QJG0OOeDg8M6RvTamiUSL0SwOTM?=
- =?iso-8859-1?Q?Uu3NnJpTMFj0kJMydjhKkdW6Cyt+F9X68bdRHV4Kx1B3Nzpp9jNzKYgaHJ?=
- =?iso-8859-1?Q?+hLDjqfPiEhGHbEW5XrWz65yNVt1HnEEyliLlGvTsYCKVQmqx/h5eRVUjz?=
- =?iso-8859-1?Q?yAq8/bYH3zgNgNybjLMFxYBBmVorhzsQw1jkvtiPEw89Qz+pgtNgpRbtkz?=
- =?iso-8859-1?Q?yn8H0fcFBN3Dp9SWmpE4LWSc6Dj2ET3BmA2A2kdTJHv4qfFCBp+BYwiJiN?=
- =?iso-8859-1?Q?4QDsx4E/5Wz2lZ4TdEZPcGACtczt+rH4GRFfRpbToXjzAv36RKxf9m1rsF?=
- =?iso-8859-1?Q?nPkKAzKkR5Ih/NCfCcrnAn9OrmkgKyWtK6B1YBfdMjCtPsnwBW6q15UXws?=
- =?iso-8859-1?Q?/TZIhubi88LtJBt60vze5BXtGJUK09zHg/rAGNNwX9q3NoIRPNsikrHwkd?=
- =?iso-8859-1?Q?kTmESapnjWllDCqsyS6oqptra7AyjfbHkkOdGk/vW7aNqhs07PWKin/jiR?=
- =?iso-8859-1?Q?N67ZwVZqys3/1c4AKLIVqPlfzgUA/Lu4GeWn7Ly+7Aec6RrRdM6o7iqyTK?=
- =?iso-8859-1?Q?AM7A3TwUWRzFJdoYNnSCffy+jQwWpUVLJLUgw1Z3910xaL/DprmqXu3lkD?=
- =?iso-8859-1?Q?l/ndsRREubmvUF6H1KXRvPMVu3OTmr70+l4wrwvktN3peNB6dluZl3f/9/?=
- =?iso-8859-1?Q?cxR6GhAaQPFmsCJAABdfl/7czJtj+a3V+y1FLJyDbgOhWzuYfq2KkyayNt?=
- =?iso-8859-1?Q?zCItX3C/fRYvdohw4pqoFL3qQUI0yZ2QL6sJ7BDlTj04iT6DegrLOfGBzD?=
- =?iso-8859-1?Q?nhAEkWzHxZrtn6caLPtgvXWF0BkZFCzXVxl7Bdd4ZJ3OxcrV8LtYDzYN6W?=
- =?iso-8859-1?Q?TvKN4kJCo+7Rm1tOMZ2okwj8kbK9Vb1vnFtqAnbN6ZKgXKIGBjHqvSWxmu?=
- =?iso-8859-1?Q?QXHFC028rT1KLGKZBO3psa/wfEmAIF5djpvBLT++mxGokMY7bM7PmVc1J0?=
- =?iso-8859-1?Q?ZIVxWsq8tNCTC5C0WUHVpN494C3r+phujetBKgAOWCRx0PtOBZoIEm5YLR?=
- =?iso-8859-1?Q?M/mMiyokCL4r2VVeYusCrGZiXSR8ht7FS6ZXCeRVa7vZLOOuM/ze+IbcPQ?=
- =?iso-8859-1?Q?B4ogi7cRjYMoqs90ClY2lIMXu767AasnKUXdOXDKDbjtn3oSYo9Ebk6a+9?=
- =?iso-8859-1?Q?HEIwoApEBRXddYj4yD8xDN+iRsUZybsdth0owsFejWVq2jok7cjmEBp9X7?=
- =?iso-8859-1?Q?XA8RJTOUcn3PcYsQ1/ID2c+b1pJTKtfXmPzHza0YITQxKU2kftuk9FQg+r?=
- =?iso-8859-1?Q?yG9Ndf/6yJVeQ0rD1qtRiPjYVsTkkDweSzQM/wdxbjW8k+xELKztFO+YRy?=
- =?iso-8859-1?Q?abc0V5kHCHMEP8aY7LO4UX?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8585.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(19092799006)(376014)(1800799024)(366016)(10070799003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?iso-8859-1?Q?9vG8v2McPaq0Hi9/+9sTzbeymwELYV5cZHdOPK3hJZzkmJMKldicGrGYwH?=
- =?iso-8859-1?Q?AVRSe+yS/sgIZX/T/ASwhdXrVU71in+3vb3Q1FhtJL6cAtGbzEiMo9/itG?=
- =?iso-8859-1?Q?8aFYxZQD2NnYHtnMRPbINzx/ekmYG0erpJ5ocintrie5l87X8poK0O6fB5?=
- =?iso-8859-1?Q?FhtgwAxnv1+8adfVMs4zta3hQGJoXYJ/3lgXovHlp6VjxNf+j7tIMwWWfj?=
- =?iso-8859-1?Q?u7/OYCgOXiR55wt3dzzwiljDKC9qplO/jSoMmg6cluu9vHfnbWUsGs1Mdj?=
- =?iso-8859-1?Q?RScKs7KUrr4hwm4xiP14sNcEgNmC3ytI2SB6ZgPmccK/dBFZ0Hw/sxrmyt?=
- =?iso-8859-1?Q?eQkvjWmRABb2RiVd8M1H3UrfuHCr08OMWT5SuGn2naSEvCl1TI7nEwa+6p?=
- =?iso-8859-1?Q?UlvH1R/F65Zq/YySjFtwdL7wr+wklhZ/5UlPluU015a6SS6S+AW7t6SkD5?=
- =?iso-8859-1?Q?SQ7reiGzfWSmsZ7bhRiQRKIDkvjwWZcnZnALgzGuWUnILgsDiobMh1cZMg?=
- =?iso-8859-1?Q?GX2zUL17XMAWicuy6TKHsvYdCi3XC9+hLewaD1vEpy70Q4wYEX5gdx2w8g?=
- =?iso-8859-1?Q?wV0NcmBzYudJOgcYhDKf3OdUXAChzTjKysMFoGquU59hvn71ZQC6znBUvp?=
- =?iso-8859-1?Q?Xma5jGQ7j/yCbNridh7W/rVTfese1+TNQKAT1CdJbMPhZsbbS0kjpFc9/F?=
- =?iso-8859-1?Q?WGVkPUh4K1LA+MaAi2cSoGPzVTwXwlMiFPRIDN3YmC57FsTrujOxhLYNkD?=
- =?iso-8859-1?Q?iO6oonvy+0/RZLoGejPqVKQBKER21dJkwBJo3yC9zgHceH/4I0m0DPiEaP?=
- =?iso-8859-1?Q?vSmsYH0dHJx9AAu2QYY8F08iBm/YpkeQ5GAI/EizZ4WqkW7XIdUHZl59aq?=
- =?iso-8859-1?Q?H0VLvYxAYL3W4zH7gDD9zJnslHSsREnXctPbazhgMIoQ1unG0c3tfCFKk8?=
- =?iso-8859-1?Q?JKup3k1235uZxNtLHTMLQu2FUDPU3DTHFIndfQDWlBv1gVyC/Q5xX2xr6o?=
- =?iso-8859-1?Q?Q2tXahNGkUciDVK2ff9yURbzH/aKhx19gvByI8YylQhh8ASu3kV1a+B6fC?=
- =?iso-8859-1?Q?WIaJlcGLtzNY6Ugsx6VdIWpBaZgr2Sr01/KUDf0bXpIGkb8UJI4vi95eCS?=
- =?iso-8859-1?Q?um97LLSkOBvs070Ks68Eb54jZUG5s5FaquRJDHTQzjp1LJKcIkwFff/VWc?=
- =?iso-8859-1?Q?LwmcxeXM6FKPIdw8/ckDn+xK9m7vCD5oKLIRrVNMKkGfPISjPKxTX260fd?=
- =?iso-8859-1?Q?wA+J8yLTQqLcve0x3goLMHj82ujAglwN3TfxTKsztkS1Dkndp4u6dIgCMS?=
- =?iso-8859-1?Q?8hfowcWiPdrvgsCRKBvkc9nSZZZjj73Fj3Sz6u0hFVV1rf0GVr5pyfnFSu?=
- =?iso-8859-1?Q?/SyW/INGQ9zLcAMIKa7v4lFR06Zfe77kTz/bybMZ2av1h+4eT/Y9PaflzS?=
- =?iso-8859-1?Q?7WJVJqvAaLYP7x6Oh+2eW9LqAqOoXpyBEC6R2MJtMt2Sdls8FzBp6424a3?=
- =?iso-8859-1?Q?UtoD6RjmKMgyU6rngcqAzuMBGgRY5GNqdmS+Zr9y57g788apyFZykWF9kK?=
- =?iso-8859-1?Q?gSn6BDiLuwXrcLNXLwrRA2/VZWbBi5ETrvDHRjS6e3VwbEMWeiuk1cHZal?=
- =?iso-8859-1?Q?5jBGdHk+7l8+8WzMjAzcMae0ZMPvxKxeEpGbVW/yoVZXzf+y4a85drlor5?=
- =?iso-8859-1?Q?zUrrNokANOUJ7CfoWGE6VwvyWMECPMH2fTOyTO57DtW+Rgzl/hxZs5TlWg?=
- =?iso-8859-1?Q?2ESQ=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2b63f698-b0b1-4c94-2f8e-08de34a33278
-X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8585.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Dec 2025 08:41:06.5999
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: cvQyg/4U7h/2yCKSXKTz48oTP0nwdGeDJqr1v0KmVQMWmhQ1dODvzIYBMrOcOdq+JqvAHZvHz0TdZmR2GCIYAw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB7088
+X-Received: by 2002:a05:6820:471a:b0:659:9a49:8e19 with SMTP id
+ 006d021491bc7-6599a499c33mr771475eaf.11.1765012342157; Sat, 06 Dec 2025
+ 01:12:22 -0800 (PST)
+Date: Sat, 06 Dec 2025 01:12:22 -0800
+In-Reply-To: <68a246ad.050a0220.e29e5.0077.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6933f376.a70a0220.38f243.001d.GAE@google.com>
+Subject: Re: [syzbot] [wireless?] WARNING in ieee80211_tx_skb_tid
+From: syzbot <syzbot+8bd4574e8c52c48c2595@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Dec 04, 2025 at 09:21:39AM +0100, Bjørn Mork wrote:
-> >> -       pol = phy_get_rx_polarity(dev_fwnode(dev), phy_modes(phydev->interface),
-> >> -                                 PHY_POL_NORMAL | PHY_POL_INVERT, default_pol);
-> >> -       if (pol < 0)
-> >> -               return pol;
-> >> -       if (pol == PHY_POL_INVERT)
-> >> -               pbus_value |= EN8811H_POLARITY_RX_REVERSE;
-> >> +       return phy_get_rx_polarity(dev_fwnode(dev), phy_modes(phydev->interface),
-> >> +                                  PHY_POL_NORMAL | PHY_POL_INVERT, default_pol)
-> >> +               == PHY_POL_INVERT;
+syzbot has found a reproducer for the following issue on:
 
-As I was writing a KUnit test for this API, I found another bug in my
-submission which you also copied in yours, and I want to point it out
-for when you resend.
+HEAD commit:    d1d36025a617 Merge tag 'probes-v6.19' of git://git.kernel...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=12b44992580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=eaa3e2adda258a7
+dashboard link: https://syzkaller.appspot.com/bug?extid=8bd4574e8c52c48c2595
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14ad46c2580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11d0bc1a580000
 
-The "supported" mask of polarities should be
-	BIT(PHY_POL_NORMAL) | BIT(PHY_POL_INVERT)
-rather than
-	PHY_POL_NORMAL | PHY_POL_INVERT
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-d1d36025.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/8198d2c1f670/vmlinux-d1d36025.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/51df1359897b/bzImage-d1d36025.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+8bd4574e8c52c48c2595@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: net/mac80211/tx.c:6303 at ieee80211_tx_skb_tid+0x3b4/0x470 net/mac80211/tx.c:6303, CPU#0: syz.0.18/5530
+Modules linked in:
+CPU: 0 UID: 0 PID: 5530 Comm: syz.0.18 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+RIP: 0010:ieee80211_tx_skb_tid+0x3b4/0x470 net/mac80211/tx.c:6303
+Code: f6 ce f6 e9 b1 fe ff ff e8 b9 da f1 f6 90 0f 0b 90 e9 e2 fe ff ff e8 ab da f1 f6 90 0f 0b 90 e9 2a fe ff ff e8 9d da f1 f6 90 <0f> 0b 90 e8 c4 e1 fd ff 31 ff 48 8b 34 24 ba 02 00 00 00 48 83 c4
+RSP: 0018:ffffc90002a7f458 EFLAGS: 00010293
+RAX: ffffffff8acf8083 RBX: ffffffff8acf7cff RCX: ffff888000f54980
+RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
+RBP: 00000000ffffffff R08: ffffffff8acf7cff R09: ffffffff8df41cc0
+R10: dffffc0000000000 R11: ffffed10092eb486 R12: ffff88801c1b8d80
+R13: 0000000000000000 R14: 0000000000000001 R15: dffffc0000000000
+FS:  00005555853f1500(0000) GS:ffff88808d683000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000564770e69950 CR3: 0000000032ccf000 CR4: 0000000000352ef0
+Call Trace:
+ <TASK>
+ ieee80211_tx_skb net/mac80211/ieee80211_i.h:2418 [inline]
+ mesh_plink_frame_tx+0x734/0xc10 net/mac80211/mesh_plink.c:354
+ mesh_plink_deactivate+0x18e/0x2f0 net/mac80211/mesh_plink.c:410
+ mesh_sta_cleanup+0x42/0x150 net/mac80211/mesh.c:171
+ __cleanup_single_sta net/mac80211/sta_info.c:167 [inline]
+ cleanup_single_sta+0x40f/0x660 net/mac80211/sta_info.c:192
+ __sta_info_flush+0x5e4/0x710 net/mac80211/sta_info.c:1683
+ sta_info_flush net/mac80211/sta_info.h:970 [inline]
+ ieee80211_do_stop+0x397/0x1f70 net/mac80211/iface.c:526
+ ieee80211_stop+0x1b1/0x240 net/mac80211/iface.c:828
+ __dev_close_many+0x344/0x6b0 net/core/dev.c:1756
+ __dev_close net/core/dev.c:1768 [inline]
+ __dev_change_flags+0x2be/0x680 net/core/dev.c:9732
+ netif_change_flags+0x88/0x1a0 net/core/dev.c:9797
+ dev_change_flags+0x130/0x260 net/core/dev_api.c:68
+ dev_ioctl+0x7b4/0x1150 net/core/dev_ioctl.c:842
+ sock_do_ioctl+0x22c/0x300 net/socket.c:1259
+ sock_ioctl+0x576/0x790 net/socket.c:1366
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:597 [inline]
+ __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fba6778f7c9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fff8aa47b88 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007fba679e5fa0 RCX: 00007fba6778f7c9
+RDX: 0000200000000000 RSI: 0000000000008914 RDI: 0000000000000004
+RBP: 00007fba67813f91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fba679e5fa0 R14: 00007fba679e5fa0 R15: 0000000000000003
+ </TASK>
+
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
