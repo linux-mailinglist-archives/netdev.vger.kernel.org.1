@@ -1,176 +1,125 @@
-Return-Path: <netdev+bounces-243914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243915-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0F89CAA8F7
-	for <lists+netdev@lfdr.de>; Sat, 06 Dec 2025 16:12:53 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35D44CAA970
+	for <lists+netdev@lfdr.de>; Sat, 06 Dec 2025 16:52:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 41CC0305130B
-	for <lists+netdev@lfdr.de>; Sat,  6 Dec 2025 15:12:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DE8C93082366
+	for <lists+netdev@lfdr.de>; Sat,  6 Dec 2025 15:52:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 630F128468B;
-	Sat,  6 Dec 2025 15:12:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A697A29B781;
+	Sat,  6 Dec 2025 15:52:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DdNYSTZ4"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="ZzvAZ0HK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com [35.155.198.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3790D3B8D48;
-	Sat,  6 Dec 2025 15:12:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EE4E22D4D3
+	for <netdev@vger.kernel.org>; Sat,  6 Dec 2025 15:52:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.155.198.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765033945; cv=none; b=dRmiqO+6Gz5sXriafXWMPYDipdSyePjTm+IHWptZWNqZ/g2JoRPvpYvBgtV+yB25ow4CHmTH1cARmEg1R1VsQAFfxY4Q0A4qG8dcatJB186BI5YLqUSCmW8mjp5dd5XNRBaqg8r5S11JTY3e2o754SzPuYuTaCbKrJVcAI6Xo1Q=
+	t=1765036327; cv=none; b=pbJLoIz1S4VOblZ6Pts5J9xPjC7z118sQd5CInGDxeXszPYAAFTDYdtokyqtp6qKl77GaHKgZgIxgNNzNyJuW93Wa2/y7U80mbxG93sfM1gA/GKBHKKFlQ+r8GWOXGIxU1cxZ7zEFmGtO/3ciHE4t/PD7X9p7sVf29ehU3LAUxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765033945; c=relaxed/simple;
-	bh=heCjDJaK/8yYZnizxFi58MmiCDcbuYi5+RI8fl2EFZI=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=LwZv1rrALJKawJ6zkA8qPAJIiOs10TgoJXuI2uG0DdlRkq/U0ZK1FVChK1mIoZd9HgS6GPrroAH+WErhhwnVJ7MhihtdAfAlBKMDCF7Ww1ViZRQ6ExOPNrZ9porzpDRH3xtoM/wSHCCin5xlhs97NOcqDbb5ylbJPYmp4zxesY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DdNYSTZ4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BC4CC116B1;
-	Sat,  6 Dec 2025 15:12:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765033944;
-	bh=heCjDJaK/8yYZnizxFi58MmiCDcbuYi5+RI8fl2EFZI=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=DdNYSTZ4v7mpgljzBNgEfEDtUXrhurWzglRn/i7Wf3KE0vuWdJLvKBkmwgUPwHR4v
-	 ZUutk3vx0+kAU9XHW/7GGPEDMWiuMeeXYD4hm7VwDk4U4sfhXdjTe5JNqY1Zw6sV3Z
-	 EgjohB9H5OiwhZ6SdA5CxQ/RJNZVpP5art50WE867ioZHlkDMuOKPYtKjvSHxbM00L
-	 38rVXWFGa4mv9MEjE8JwuTtNbwODeeC7Lidyoio1JAGPpLJCKGw0MJv/6ApRSOTdRk
-	 aHSaa7A7Z3JpKYmngfZd4TRTe7H6IRk0hc4eXxOsqnI4+jOknOR81uhl8ahXkSvqYu
-	 T88nJcL1tjXzA==
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 9B282F4007A;
-	Sat,  6 Dec 2025 10:12:22 -0500 (EST)
-Received: from phl-imap-15 ([10.202.2.104])
-  by phl-compute-10.internal (MEProxy); Sat, 06 Dec 2025 10:12:22 -0500
-X-ME-Sender: <xms:1kc0aVJpCDyJK4iH90Nh2U0dQwXR5he14IlfZPP_qjB6CnpMpUT9Qg>
-    <xme:1kc0ab9XWy19bm8uCETN_BvvGFLh14ZtMcj6iCcTHUC8zHhjdWqZ9CryoDmuacBbs
-    4g0XO-aqTxRNCmCzi4IrFTVhQMVsyry1FTtN7FafyrZHsXy89tE2vRs>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduuddviecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefoggffhffvvefkjghfufgtgfesthejredtredttdenucfhrhhomhepfdevhhhutghk
-    ucfnvghvvghrfdcuoegtvghlsehkvghrnhgvlhdrohhrgheqnecuggftrfgrthhtvghrnh
-    ephfffkefffedtgfehieevkeduuefhvdejvdefvdeuuddvgeelkeegtefgudfhfeelnecu
-    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheptghhuhgtkh
-    hlvghvvghrodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduieefgeelleel
-    heelqdefvdelkeeggedvfedqtggvlheppehkvghrnhgvlhdrohhrghesfhgrshhtmhgrih
-    hlrdgtohhmpdhnsggprhgtphhtthhopeegpdhmohguvgepshhmthhpohhuthdprhgtphht
-    thhopehkvghrnhgvlhdqthhlshdqhhgrnhgushhhrghkvgeslhhishhtshdrlhhinhhugi
-    druggvvhdprhgtphhtthhopegthhhutghkrdhlvghvvghrsehorhgrtghlvgdrtghomhdp
-    rhgtphhtthhopehsmhgrhihhvgifsehrvgguhhgrthdrtghomhdprhgtphhtthhopehnvg
-    htuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:1kc0aRx8QT32xeVT1_X69bf6KvlgWR8ANXNdOLNV_BfnONWrmtdu9Q>
-    <xmx:1kc0actNyerePgSXQIs1akqJihrwYaivTwx0B6bfFD80no8kELtKkQ>
-    <xmx:1kc0ae2UqRxJOsBvyN610esArqklNPeC5GzHmBzgsXQh8VjnrArSGQ>
-    <xmx:1kc0aX89qnuzoo7JTio7yM02WaoC0YAyazIL53lKGVQQmH-588FdtQ>
-    <xmx:1kc0afPb4hAowOQIYPVbkzCxGRhOURpkg87lrqENxj1q6H6X0rKRv4Dc>
-Feedback-ID: ifa6e4810:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 7A617780054; Sat,  6 Dec 2025 10:12:22 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1765036327; c=relaxed/simple;
+	bh=iMaIl29TXT7E0qJaroDQ0owRti1/C/zRjihab5F9FTc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nrGPB2NGS6QDJEQ2rb7CMlbomWsGs/dqUHPnyad3KOdyhxRWj3uSGSAm2tSaDXMg1gQkYaj7xeoD+wAen7Ed3COKwxnudXbjl2Sq319/akEcDj6+Ln9HNC5bo6Y8LtYAH0cOYDyDDb8yiPELBp23/0EBWj1RBQzJXKLci+Yjsjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=ZzvAZ0HK; arc=none smtp.client-ip=35.155.198.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1765036326; x=1796572326;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=OqhJCLL3Pwz/+JDuot93iS7Im0pUDlagFH9IXq0WS5A=;
+  b=ZzvAZ0HKTbpo93N691f7VqhMIXk8uMAF748Aa4pCdKgnQd/RIEMSwRRU
+   jK92asP2IUaZ9/wLwxTkZZBcI3r41asUD1iyXKi7NCAn+Y3GsYn148STp
+   4PUNqvbLRxuQZrt3MJDIs4aSdXyDIjwzcutjtPL3/N3nV6q5j4L8+yWs2
+   79GQ1VxgwcV2ESDjq46h0BEbyc9ER1kQmOf/F2GW7lwEU+Zs/D9gFQm0y
+   cMlAj6ctimy3jNbZawDHqotUKV1M4sm8bQffsJydGBfz9OB+vVVo6DjdK
+   x76dyk+pIAzWAzhiMdAfoydzCLSv28sFkoCHViZOgu1bn3xt2sNhGILih
+   w==;
+X-CSE-ConnectionGUID: hrx9Wn57TyWis9ZAvPSEzQ==
+X-CSE-MsgGUID: Hku5RtYaSh2xWEo4Pcj7hA==
+X-IronPort-AV: E=Sophos;i="6.20,255,1758585600"; 
+   d="scan'208";a="8458722"
+Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
+  by internal-pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2025 15:52:03 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [205.251.233.111:30654]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.42.136:2525] with esmtp (Farcaster)
+ id 3bbfd3c3-423c-4d08-9481-cf73ea8af8cc; Sat, 6 Dec 2025 15:52:03 +0000 (UTC)
+X-Farcaster-Flow-ID: 3bbfd3c3-423c-4d08-9481-cf73ea8af8cc
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
+ Sat, 6 Dec 2025 15:51:58 +0000
+Received: from b0be8375a521.amazon.com (10.37.245.11) by
+ EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
+ Sat, 6 Dec 2025 15:51:55 +0000
+From: Kohei Enju <enjuk@amazon.com>
+To: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>
+CC: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Jedrzej
+ Jagielski" <jedrzej.jagielski@intel.com>, Mateusz Polchlopek
+	<mateusz.polchlopek@intel.com>, Stefan Wegrzyn <stefan.wegrzyn@intel.com>,
+	<kohei.enju@gmail.com>, Kohei Enju <enjuk@amazon.com>
+Subject: [PATCH iwl-net v1] ixgbe: fix memory leaks in ixgbe_recovery_probe()
+Date: Sun, 7 Dec 2025 00:51:27 +0900
+Message-ID: <20251206155146.95857-1-enjuk@amazon.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AKAJIIlgov-V
-Date: Sat, 06 Dec 2025 10:12:02 -0500
-From: "Chuck Lever" <cel@kernel.org>
-To: "Scott Mayhew" <smayhew@redhat.com>,
- "Chuck Lever" <chuck.lever@oracle.com>
-Cc: kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org
-Message-Id: <938c82cd-9760-42e5-b0ce-123c86710782@app.fastmail.com>
-In-Reply-To: <20251206143006.2493798-1-smayhew@redhat.com>
-References: <20251206143006.2493798-1-smayhew@redhat.com>
-Subject: Re: [PATCH] net/handshake: a handshake can only be cancelled once
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D046UWA004.ant.amazon.com (10.13.139.76) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
+ixgbe_recovery_probe() does not free the following resources in its
+error path, unlike ixgbe_probe():
+- adapter->io_addr
+- adapter->jump_tables[0]
+- adapter->mac_table
+- adapter->rss_key
+- adapter->af_xdp_zc_qps
 
+The leaked MMIO region can be observed in /proc/vmallocinfo, and the
+remaining leaks are reported by kmemleak.
 
-On Sat, Dec 6, 2025, at 9:30 AM, Scott Mayhew wrote:
-> When a handshake request is cancelled it is removed from the
-> handshake_net->hn_requests list, but it is still present in the
-> handshake_rhashtbl until it is destroyed.
->
-> If a second cancellation request arrives for the same handshake request,
-> then remove_pending() will return false... and assuming
-> HANDSHAKE_F_REQ_COMPLETED isn't set in req->hr_flags, we'll continue
-> processing through the out_true label, where we put another reference on
-> the sock and a refcount underflow occurs.
->
-> This can happen for example if a handshake times out - particularly if
-> the SUNRPC client sends the AUTH_TLS probe to the server but doesn't
-> follow it up with the ClientHello due to a problem with tlshd.  When the
-> timeout is hit on the server, the server will send a FIN, which triggers
-> a cancellation request via xs_reset_transport().  When the timeout is
-> hit on the client, another cancellation request happens via
-> xs_tls_handshake_sync().
->
-> Fixes: 3b3009ea8abb ("net/handshake: Create a NETLINK service for 
-> handling handshake requests")
-> Signed-off-by: Scott Mayhew <smayhew@redhat.com>
-> ---
->  net/handshake/request.c | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/net/handshake/request.c b/net/handshake/request.c
-> index 274d2c89b6b2..c7b20d167a55 100644
-> --- a/net/handshake/request.c
-> +++ b/net/handshake/request.c
-> @@ -333,6 +333,10 @@ bool handshake_req_cancel(struct sock *sk)
->  		return false;
->  	}
-> 
-> +	/* Duplicate cancellation request */
-> +	trace_handshake_cancel_none(net, req, sk);
-> +	return false;
-> +
->  out_true:
->  	trace_handshake_cancel(net, req, sk);
-> 
-> -- 
-> 2.51.0
+Free these allocations and unmap the MMIO region on failure to avoid the
+leaks.
 
-To help support engineers find this patch, I recommend using
-"net/handshake: duplicate handshake cancellations leak socket" as
-the short description.
+Fixes: 29cb3b8d95c7 ("ixgbe: add E610 implementation of FW recovery mode")
+Signed-off-by: Kohei Enju <enjuk@amazon.com>
+---
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-The proposed solution might introduce a socket reference leak:
-
-1. Request submitted: sock_hold() called (line 271)
-2. Request accepted by daemon via handshake_req_next()
-   (removes from pending list)
-3. Cancel called:
-  - remove_pending() returns FALSE (not in pending list)
-  - test_and_set_bit() returns FALSE (sets the bit now)
-  - With patch: returns FALSE, sock_put() NOT called
-4. handshake_complete() called: bit already set, skips sock_put()
-
-What if we use test_and_set_bit(HANDSHAKE_F_REQ_COMPLETED) in the
-pending cancel path so duplicate cancels can be detected?
-
-Instead of:
-
-        if (hn && remove_pending(hn, req)) {
-                /* Request hadn't been accepted */
-                goto out_true;
-        }
-
-go with this bit of untested code:
-
-        if (hn && remove_pending(hn, req)) {
-                /* Request hadn't been accepted - mark cancelled */
-                if (test_and_set_bit(HANDSHAKE_F_REQ_COMPLETED, &req->hr_flags)) {
-                        trace_handshake_cancel_busy(net, req, sk);
-                        return false;
-                }
-                goto out_true;
-        }
-
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+index 4af3b3e71ff1..1bfec3fffae0 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+@@ -11508,6 +11508,11 @@ static int ixgbe_recovery_probe(struct ixgbe_adapter *adapter)
+ 	mutex_destroy(&adapter->hw.aci.lock);
+ 	ixgbe_release_hw_control(adapter);
+ clean_up_probe:
++	iounmap(adapter->io_addr);
++	kfree(adapter->jump_tables[0]);
++	kfree(adapter->mac_table);
++	kfree(adapter->rss_key);
++	bitmap_free(adapter->af_xdp_zc_qps);
+ 	disable_dev = !test_and_set_bit(__IXGBE_DISABLED, &adapter->state);
+ 	free_netdev(netdev);
+ 	devlink_free(adapter->devlink);
 -- 
-Chuck Lever
+2.52.0
+
 
