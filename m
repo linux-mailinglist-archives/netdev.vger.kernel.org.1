@@ -1,112 +1,95 @@
-Return-Path: <netdev+bounces-243917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1A30CAAC1A
-	for <lists+netdev@lfdr.de>; Sat, 06 Dec 2025 19:26:28 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19423CAAC23
+	for <lists+netdev@lfdr.de>; Sat, 06 Dec 2025 19:31:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 13859305CF29
-	for <lists+netdev@lfdr.de>; Sat,  6 Dec 2025 18:26:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D9D8E30671CA
+	for <lists+netdev@lfdr.de>; Sat,  6 Dec 2025 18:31:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E00B2D3A70;
-	Sat,  6 Dec 2025 18:26:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 509112D6639;
+	Sat,  6 Dec 2025 18:31:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DoDg/Ug0"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="g2JY95hL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD2A3224891
-	for <netdev@vger.kernel.org>; Sat,  6 Dec 2025 18:26:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D8052D5C74;
+	Sat,  6 Dec 2025 18:30:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765045585; cv=none; b=NhcLBxxFFvh8ODWPwBukWU1Z1G+T+LH3iy/49Gpm3ODq7//EOZURLisH5Zp0qaXD6CB2Ut8mA7nY0RuBoSK34BGicAxFkqnAA5qekTF2rpD4oA6ZLEZaON+fQFhpy9w3IvEdmEENSHBLtmmo79UlC3NN+/FXjT05VAqIPa9tJPA=
+	t=1765045862; cv=none; b=SUYGDxRKp2ppXGWeCDneA+iHMdItdCaRDulzsL+0e/ccvBg681jiHGMqNFLzlILRyj93dYgXeuVkIDFgR6NCBcqg9KNw2AQwcJb1rsK35P66QCx8f1EOP7tPkYtw3NNG/nOrk24OvXEGMdKiHwsDto4VnVIYW/ds+FAgLGEM9Dg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765045585; c=relaxed/simple;
-	bh=1IRpld83xMZ/drvhIoU9A9UdatZ3zIc0QHPBeO90PwU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dBkJfTyoMpLzdRUGlwod3KErH53KXNxgM2YOUovbjYT3Thce1h4a51AAIPhCIzmNq9THVOZrP4+aBzuj6YuGVKIN4Sy6PtbKqlHW8UxE76+4aIhKJ7HaJdSyDCZvuEqGndinbybB/vibLG3Cpo3yR1na3110LxciBdM54OGh96k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DoDg/Ug0; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-295548467c7so41213965ad.2
-        for <netdev@vger.kernel.org>; Sat, 06 Dec 2025 10:26:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765045583; x=1765650383; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=QEfkkRUioZd9SWMtUtcnRsb5wthZOOn5MPiTu5OxMss=;
-        b=DoDg/Ug0Lt4U0JGQOLLqxSEJF8egCZV1QBo7piiZKny4RFvcyOJyTHIhTwerxmy5gA
-         WpBER1SjMPalu5HSjnJjyvhAdvX5JHjKubTUpQIVMlGyZBMg+aJup43XC0GNI3gMn3kk
-         z5rBndFX5mAa3KuD96FTR/uFIwL9cZycG0wN9ZGAmycxw4uQJJ7/TDrWr2A8xsEgHgdu
-         JImEK8peU88L31kygImlA3bfUPJwg6VjI7sJ2jOvbVGath0Vpu1TiaYiikSbWxn9pirh
-         /SHzreNysTU74B0YnlKeqXAhsSRgTZOnC+GQnxI8YvPt2m1UUnTjITLRaE0AGRFjOpG2
-         0pzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765045583; x=1765650383;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QEfkkRUioZd9SWMtUtcnRsb5wthZOOn5MPiTu5OxMss=;
-        b=aNtxZ0O1cBPtLuoz+YvUlJ+LgJDxtKnS3rCISXVlCK50N9apUHWSTIgkvS7w/FsXKs
-         AoKk2b8MbXHExPQL7REDnHAfvKTh0Iw+ZWkcOaWq+LBaavWYha6cdYMUcrmFmlf0KPhu
-         fSxaQ4Hw6lId26RhPKXJcXfv2Zjyw3qY6FaKqBDBLqEcsmEuyLJRFjFoVKFgp6r/Q6bd
-         RlImdCf1AA4fBqq3VkwAEO74g926yS8LMh1AHv5xTSSseJDOTtdWNHqmjZu0PNdPciRs
-         au1XuU1uc/PXld41aOLmHf2yDRofMFrmGZcm+AM4Y7fA+EGwM26aDYZNEa9hGD63dVoo
-         ytXA==
-X-Gm-Message-State: AOJu0YwiCq/sbk2l2ZJK7tLOG6tFEsnFDRfZ7O2XLsdUh3tZBR7sIBdi
-	qA99CFt1Se2EA4EhHJoGheAK7Ayzt1Def3LZXN47NYPtjOP2cUIPcBo8
-X-Gm-Gg: ASbGncuDbASwamNkNJ0I67w4nFtKoGlnbhD4r7+N5wtN4FjpSovAo4nmSDPwYeQQR6W
-	2j3z+N/CfuSpmiM3fjpxo/5aQRn/RpP1QtV/T+yKhXF7kQ12/usl8LXjE6P7jaaMCPJFQOVXGKY
-	D2DSE106URjThPiNqlLt7K/Jq1/rW7c7LdKtri52wVGrNK5fJtnuLTrsl7egjDq8UdEj/JdZEZG
-	/gCI43lZNsvBYdNKiAJ3Ccfmy/MVODiosQ/L3T2lO961H7P0X9vmiGgen1dDYkJgH+G3+6tDb08
-	L3piVqWxJ78+VDNubhXQ9HKndj/imk6m3Ja5lf+A6hXLSoTNuEMkyeTECXv/jcDepEms8bMkP0s
-	oPgjZGOMSmfC6Xx2dPMyiXW/giA1Xr0pbUadCykczXaHH3UW4AnVjo3Rb3XBE8eKdP6dTsEskbV
-	eERT2BZszrgyuciHdYd/qgtOR3d8Y1fDg=
-X-Google-Smtp-Source: AGHT+IH8EXv3HmShX3Wm2g3nJMA/0KBHJl1YeOTfruj4/5dzk1gF9j0LRym7UbCIarUtUcrQwWcDRw==
-X-Received: by 2002:a17:902:fc8f:b0:298:485d:556b with SMTP id d9443c01a7336-29df52771b1mr26094415ad.5.1765045582895;
-        Sat, 06 Dec 2025 10:26:22 -0800 (PST)
-Received: from localhost.localdomain ([103.98.63.195])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29daeae6ad1sm81824845ad.90.2025.12.06.10.26.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 06 Dec 2025 10:26:22 -0800 (PST)
-From: Dharanitharan R <dharanitharan725@gmail.com>
-To: syzbot+422806e5f4cce722a71f@syzkaller.appspotmail.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	dharanitharan725@gmail.com
-Subject: [PATCH] team: fix qom_list corruption by using list_del_init_rcu()
-Date: Sat,  6 Dec 2025 18:25:57 +0000
-Message-ID: <20251206182557.10090-1-dharanitharan725@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1765045862; c=relaxed/simple;
+	bh=6YFYBV5YPI3mKplLNxOUUXNwPPdTOdMInwKJddK0OaA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TB/u2X/FsYKc3PSgMy9eAENddpsqUrS7cBrfP02/R2dOo4prp1pk12X0ru0sYYiAYAgCbLRtHOHVJBMSKhyNLwrPxdFB+RITPHrVgEbmSN1OmKJREOZeFJiGPMbDNDk3YAPMqZQeX0fsxG4DfbB0eOlLz9tNt+E3Ddq77qmcl8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=g2JY95hL; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=eR0JCfMa1hihJEB4R5UGxkldICyGNBsZvCir+nP242w=; b=g2JY95hL/fpCt3IAxbHjjZze1g
+	NYe+DQdbIM+LqdtZJ6bhsSOOj1t9LK4k1orHdP9yjpElpPx0++/6dMKom7LZLW9UNbw4Rzh3NP6b7
+	A/QYdrmOsE3D0ZhKtsm1AoL0nyT+rWiR/cQDSMVRTBLQIz07X3f4Py/fvW6jYnGbtEHw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vRx38-00GDwx-L4; Sat, 06 Dec 2025 19:30:30 +0100
+Date: Sat, 6 Dec 2025 19:30:30 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jacky Chou <jacky_chou@aspeedtech.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Po-Yu Chuang <ratbert@faraday-tech.com>,
+	Joel Stanley <joel@jms.id.au>,
+	Andrew Jeffery <andrew@codeconstruct.com.au>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-aspeed@lists.ozlabs.org, taoren@meta.com
+Subject: Re: [PATCH net-next v5 3/4] net: ftgmac100: Add RGMII delay support
+ for AST2600
+Message-ID: <8a991b33-f653-4f0c-bbea-b5b3404cdfe6@lunn.ch>
+References: <20251205-rgmii_delay_2600-v5-0-bd2820ad3da7@aspeedtech.com>
+ <20251205-rgmii_delay_2600-v5-3-bd2820ad3da7@aspeedtech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251205-rgmii_delay_2600-v5-3-bd2820ad3da7@aspeedtech.com>
 
-Reported-by: syzbot+422806e5f4cce722a71f@syzkaller.appspotmail.com
-Signed-off-by: Dharanitharan R <dharanitharan725@gmail.com>
----
- drivers/net/team/team_core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+> @@ -1907,6 +2179,10 @@ static int ftgmac100_probe(struct platform_device *pdev)
+>  		priv->rxdes0_edorr_mask = BIT(30);
+>  		priv->txdes0_edotr_mask = BIT(30);
+>  		priv->is_aspeed = true;
+> +		/* Configure RGMII delay if there are the corresponding compatibles */
+> +		err = ftgmac100_set_internal_delay(priv, &phy_intf);
+> +		if (err)
+> +			goto err_phy_connect;
 
-diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
-index 4d5c9ae8f221..d6d724b52dbf 100644
---- a/drivers/net/team/team_core.c
-+++ b/drivers/net/team/team_core.c
-@@ -823,7 +823,8 @@ static void __team_queue_override_port_del(struct team *team,
- {
- 	if (!port->queue_id)
- 		return;
--	list_del_rcu(&port->qom_list);
-+	/* Ensure safe repeated deletion */
-+	list_del_init_rcu(&port->qom_list);
- }
- 
- static bool team_queue_override_port_has_gt_prio_than(struct team_port *port,
--- 
-2.43.0
+Thinking forward to when you add 2700 support, i really think you need
+to break the probe up into helpers for 2500 and before, 2600 and in
+the future 2700. You currently have a couple of tests on the
+compatible which you can reduce to one.
 
+In fact, this driver has 10 calls to of_device_is_compatible(). I
+think you should first refactor the code to list each compatible in
+ftgmac100_of_match[], and add a data structure which contains an enum
+of the MAC type. You can then transfer this to priv, and replace all
+the of_device_is_compatible() tests to just look at the enum value.
+
+	Andrew
 
