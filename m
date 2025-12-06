@@ -1,77 +1,54 @@
-Return-Path: <netdev+bounces-243915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35D44CAA970
-	for <lists+netdev@lfdr.de>; Sat, 06 Dec 2025 16:52:10 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81E1ECAAA26
+	for <lists+netdev@lfdr.de>; Sat, 06 Dec 2025 17:26:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DE8C93082366
-	for <lists+netdev@lfdr.de>; Sat,  6 Dec 2025 15:52:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 087B4302DB65
+	for <lists+netdev@lfdr.de>; Sat,  6 Dec 2025 16:26:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A697A29B781;
-	Sat,  6 Dec 2025 15:52:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 608322FFFA4;
+	Sat,  6 Dec 2025 16:26:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="ZzvAZ0HK"
+	dkim=pass (4096-bit key) header.d=david-bauer.net header.i=@david-bauer.net header.b="wINfV37U"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com [35.155.198.111])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mailgate01.uberspace.is (mailgate01.uberspace.is [95.143.172.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EE4E22D4D3
-	for <netdev@vger.kernel.org>; Sat,  6 Dec 2025 15:52:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.155.198.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AA8F258CD0
+	for <netdev@vger.kernel.org>; Sat,  6 Dec 2025 16:26:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.143.172.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765036327; cv=none; b=pbJLoIz1S4VOblZ6Pts5J9xPjC7z118sQd5CInGDxeXszPYAAFTDYdtokyqtp6qKl77GaHKgZgIxgNNzNyJuW93Wa2/y7U80mbxG93sfM1gA/GKBHKKFlQ+r8GWOXGIxU1cxZ7zEFmGtO/3ciHE4t/PD7X9p7sVf29ehU3LAUxE=
+	t=1765038382; cv=none; b=fa0laqtRYUTM/DD1oTcnFFufPkHEhFlLLHm8WSDWhi9SHk5eU8dmHrj5Y5GDSWZ+mXoKeptqSoKGZ/jgs6IF2a9Sh2xkHHgK3n//HiIkuj6bup2m0pkKFJnR1R6QU+KpXspPGTlmUphONSFexH7loVTETf811qmIW5eZEOKFOVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765036327; c=relaxed/simple;
-	bh=iMaIl29TXT7E0qJaroDQ0owRti1/C/zRjihab5F9FTc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nrGPB2NGS6QDJEQ2rb7CMlbomWsGs/dqUHPnyad3KOdyhxRWj3uSGSAm2tSaDXMg1gQkYaj7xeoD+wAen7Ed3COKwxnudXbjl2Sq319/akEcDj6+Ln9HNC5bo6Y8LtYAH0cOYDyDDb8yiPELBp23/0EBWj1RBQzJXKLci+Yjsjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=ZzvAZ0HK; arc=none smtp.client-ip=35.155.198.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1765036326; x=1796572326;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=OqhJCLL3Pwz/+JDuot93iS7Im0pUDlagFH9IXq0WS5A=;
-  b=ZzvAZ0HKTbpo93N691f7VqhMIXk8uMAF748Aa4pCdKgnQd/RIEMSwRRU
-   jK92asP2IUaZ9/wLwxTkZZBcI3r41asUD1iyXKi7NCAn+Y3GsYn148STp
-   4PUNqvbLRxuQZrt3MJDIs4aSdXyDIjwzcutjtPL3/N3nV6q5j4L8+yWs2
-   79GQ1VxgwcV2ESDjq46h0BEbyc9ER1kQmOf/F2GW7lwEU+Zs/D9gFQm0y
-   cMlAj6ctimy3jNbZawDHqotUKV1M4sm8bQffsJydGBfz9OB+vVVo6DjdK
-   x76dyk+pIAzWAzhiMdAfoydzCLSv28sFkoCHViZOgu1bn3xt2sNhGILih
-   w==;
-X-CSE-ConnectionGUID: hrx9Wn57TyWis9ZAvPSEzQ==
-X-CSE-MsgGUID: Hku5RtYaSh2xWEo4Pcj7hA==
-X-IronPort-AV: E=Sophos;i="6.20,255,1758585600"; 
-   d="scan'208";a="8458722"
-Received: from ip-10-5-6-203.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.6.203])
-  by internal-pdx-out-009.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2025 15:52:03 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [205.251.233.111:30654]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.42.136:2525] with esmtp (Farcaster)
- id 3bbfd3c3-423c-4d08-9481-cf73ea8af8cc; Sat, 6 Dec 2025 15:52:03 +0000 (UTC)
-X-Farcaster-Flow-ID: 3bbfd3c3-423c-4d08-9481-cf73ea8af8cc
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
- Sat, 6 Dec 2025 15:51:58 +0000
-Received: from b0be8375a521.amazon.com (10.37.245.11) by
- EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
- Sat, 6 Dec 2025 15:51:55 +0000
-From: Kohei Enju <enjuk@amazon.com>
-To: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>
-CC: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
-	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Jedrzej
- Jagielski" <jedrzej.jagielski@intel.com>, Mateusz Polchlopek
-	<mateusz.polchlopek@intel.com>, Stefan Wegrzyn <stefan.wegrzyn@intel.com>,
-	<kohei.enju@gmail.com>, Kohei Enju <enjuk@amazon.com>
-Subject: [PATCH iwl-net v1] ixgbe: fix memory leaks in ixgbe_recovery_probe()
-Date: Sun, 7 Dec 2025 00:51:27 +0900
-Message-ID: <20251206155146.95857-1-enjuk@amazon.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1765038382; c=relaxed/simple;
+	bh=oY2ka5lja8UpTFcpu2gZKgfaOGa68I0bntBzjHS9b8k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lLSz+YGG7YDlHH3wLqI2spyPTR3FqAGg3M3BF+Ms3QhBZWaXOcp1rS/QN1GALPrkK7Ch6vVNLI8WuQTwJvTgr1XEWlAyqdjK8RSpeZOQr27b1J2CiL1xcOd6pWB3k6ynvnft/iXDtpFBeLTrLZ6BF7W/04NeAMVNCiImxBAGrgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=david-bauer.net; spf=pass smtp.mailfrom=david-bauer.net; dkim=pass (4096-bit key) header.d=david-bauer.net header.i=@david-bauer.net header.b=wINfV37U; arc=none smtp.client-ip=95.143.172.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=david-bauer.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=david-bauer.net
+Received: from perseus.uberspace.de (perseus.uberspace.de [95.143.172.134])
+	by mailgate01.uberspace.is (Postfix) with ESMTPS id 5F8A660D10
+	for <netdev@vger.kernel.org>; Sat, 06 Dec 2025 17:26:10 +0100 (CET)
+Received: (qmail 16583 invoked by uid 988); 6 Dec 2025 16:26:10 -0000
+Authentication-Results: perseus.uberspace.de;
+	auth=pass (plain)
+Received: from unknown (HELO unkown) (::1)
+	by perseus.uberspace.de (Haraka/3.0.1) with ESMTPSA; Sat, 06 Dec 2025 17:26:10 +0100
+From: David Bauer <mail@david-bauer.net>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	"R. Parameswaran" <parameswaran.r7@gmail.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] l2tp: account for IP version in SKB headroom
+Date: Sat,  6 Dec 2025 17:26:01 +0100
+Message-ID: <20251206162603.24900-1-mail@david-bauer.net>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,47 +56,105 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWA004.ant.amazon.com (10.13.139.76) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
+X-Rspamd-Bar: /
+X-Rspamd-Report: SUSPICIOUS_RECIPS(1.5) BAYES_HAM(-3) MID_CONTAINS_FROM(1) MIME_GOOD(-0.1) R_MISSING_CHARSET(0.5)
+X-Rspamd-Score: -0.1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=david-bauer.net; s=uberspace;
+	h=from:to:cc:subject:date;
+	bh=oY2ka5lja8UpTFcpu2gZKgfaOGa68I0bntBzjHS9b8k=;
+	b=wINfV37UHZ4TMH/IR8ttaWc5wP9+Hyx2xTYANNdPHP2Fq3TCxj6aecY+07GCXj6BIdSiS9TyYD
+	+jZptlE1NwPSGoVzWmd4XCMNmYu5b7IM5GkjJ25bh5eNSf6m9Wys60Ba4nN2YMxMKy9QqvY2Zdnh
+	ptemAZ0rMEAcl56dAW15QLVmSa18Vz4XHYo1o5p/NrWs1hsVd3F4+3oPhix6vVEWlxgeEZ2Mx/Vd
+	gfMbEsylEs7I32WYe2z2Fm6TB30fz+kbBC7VHqLt/J9GrQONey6JabAjbRIpuXet8zx8IHyHbjDS
+	ee4gFubRTG/7dlq/tntAwyxGXow/9jxalbHvkxufsQMQkPIFyIOlvbPA4yItAXrajTnbGu5hlYrW
+	ZP9JepYLX7/wBEDMvxdVvORvn2jzVppSN9CUJyOBo4sAh28KI08YMXO09A9ktKJzzyDlp50MsxcA
+	zELbXyThO1ghMgzd15OhbIH349CmUpHvqBGien1KMR/O0xOFrglzN5AsmeTJDdCANWFXBHYmFRnr
+	hyfJRiNj8Vb9BZ1qn/Vi+3dnGSLakEa5+j5m1HX6a/OggiN6fjLSR397Xowu2QwwVQK61iGm9dNZ
+	XYIi1qKc+/jIvAvHOsXzB5VmxXYgSATKVPi4DaAqHgHKJ+1BojyecaqBlN9HirAv1mG5gFu2IqtX
+	I=
 
-ixgbe_recovery_probe() does not free the following resources in its
-error path, unlike ixgbe_probe():
-- adapter->io_addr
-- adapter->jump_tables[0]
-- adapter->mac_table
-- adapter->rss_key
-- adapter->af_xdp_zc_qps
+Account for the IP version of the tunnel when accounting skb headroom on
+xmit. This avoids having to potentially copy the skb a second time down
+the stack due to allocating not enough space for IPv6 headers in case
+the tunnel uses IPv6.
 
-The leaked MMIO region can be observed in /proc/vmallocinfo, and the
-remaining leaks are reported by kmemleak.
-
-Free these allocations and unmap the MMIO region on failure to avoid the
-leaks.
-
-Fixes: 29cb3b8d95c7 ("ixgbe: add E610 implementation of FW recovery mode")
-Signed-off-by: Kohei Enju <enjuk@amazon.com>
+Fixes: b784e7ebfce8 ("L2TP:Adjust intf MTU, add underlay L3, L2 hdrs.")
+Signed-off-by: David Bauer <mail@david-bauer.net>
 ---
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ net/l2tp/l2tp_core.c | 3 ++-
+ net/l2tp/l2tp_core.h | 1 +
+ net/l2tp/l2tp_eth.c  | 9 ++-------
+ 3 files changed, 5 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index 4af3b3e71ff1..1bfec3fffae0 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -11508,6 +11508,11 @@ static int ixgbe_recovery_probe(struct ixgbe_adapter *adapter)
- 	mutex_destroy(&adapter->hw.aci.lock);
- 	ixgbe_release_hw_control(adapter);
- clean_up_probe:
-+	iounmap(adapter->io_addr);
-+	kfree(adapter->jump_tables[0]);
-+	kfree(adapter->mac_table);
-+	kfree(adapter->rss_key);
-+	bitmap_free(adapter->af_xdp_zc_qps);
- 	disable_dev = !test_and_set_bit(__IXGBE_DISABLED, &adapter->state);
- 	free_netdev(netdev);
- 	devlink_free(adapter->devlink);
+diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
+index 687c1366a4d0f..b07b4861f2f59 100644
+--- a/net/l2tp/l2tp_core.c
++++ b/net/l2tp/l2tp_core.c
+@@ -1234,7 +1234,7 @@ static int l2tp_xmit_core(struct l2tp_session *session, struct sk_buff *skb, uns
+ 	 * make room. Adjust truesize.
+ 	 */
+ 	uhlen = (tunnel->encap == L2TP_ENCAPTYPE_UDP) ? sizeof(*uh) : 0;
+-	headroom = NET_SKB_PAD + sizeof(struct iphdr) + uhlen + session->hdr_len;
++	headroom = NET_SKB_PAD + tunnel->l3_overhead + uhlen + session->hdr_len;
+ 	if (skb_cow_head(skb, headroom)) {
+ 		kfree_skb(skb);
+ 		return NET_XMIT_DROP;
+@@ -1680,6 +1680,7 @@ int l2tp_tunnel_register(struct l2tp_tunnel *tunnel, struct net *net,
+ 	}
+ 
+ 	sk->sk_allocation = GFP_ATOMIC;
++	tunnel->l3_overhead = kernel_sock_ip_overhead(sk);
+ 	release_sock(sk);
+ 
+ 	sock_hold(sk);
+diff --git a/net/l2tp/l2tp_core.h b/net/l2tp/l2tp_core.h
+index ffd8ced3a51ff..aab574376d95f 100644
+--- a/net/l2tp/l2tp_core.h
++++ b/net/l2tp/l2tp_core.h
+@@ -167,6 +167,7 @@ struct l2tp_tunnel {
+ 	u32			tunnel_id;
+ 	u32			peer_tunnel_id;
+ 	int			version;	/* 2=>L2TPv2, 3=>L2TPv3 */
++	int			l3_overhead;	/* IP header overhead */
+ 
+ 	char			name[L2TP_TUNNEL_NAME_MAX]; /* for logging */
+ 	enum l2tp_encap_type	encap;
+diff --git a/net/l2tp/l2tp_eth.c b/net/l2tp/l2tp_eth.c
+index cf0b66f4fb29b..709e1fb1b2e3c 100644
+--- a/net/l2tp/l2tp_eth.c
++++ b/net/l2tp/l2tp_eth.c
+@@ -187,7 +187,6 @@ static void l2tp_eth_adjust_mtu(struct l2tp_tunnel *tunnel,
+ 				struct net_device *dev)
+ {
+ 	unsigned int overhead = 0;
+-	u32 l3_overhead = 0;
+ 	u32 mtu;
+ 
+ 	/* if the encap is UDP, account for UDP header size */
+@@ -196,11 +195,7 @@ static void l2tp_eth_adjust_mtu(struct l2tp_tunnel *tunnel,
+ 		dev->needed_headroom += sizeof(struct udphdr);
+ 	}
+ 
+-	lock_sock(tunnel->sock);
+-	l3_overhead = kernel_sock_ip_overhead(tunnel->sock);
+-	release_sock(tunnel->sock);
+-
+-	if (l3_overhead == 0) {
++	if (tunnel->l3_overhead == 0) {
+ 		/* L3 Overhead couldn't be identified, this could be
+ 		 * because tunnel->sock was NULL or the socket's
+ 		 * address family was not IPv4 or IPv6,
+@@ -211,7 +206,7 @@ static void l2tp_eth_adjust_mtu(struct l2tp_tunnel *tunnel,
+ 	/* Adjust MTU, factor overhead - underlay L3, overlay L2 hdr
+ 	 * UDP overhead, if any, was already factored in above.
+ 	 */
+-	overhead += session->hdr_len + ETH_HLEN + l3_overhead;
++	overhead += session->hdr_len + ETH_HLEN + tunnel->l3_overhead;
+ 
+ 	mtu = l2tp_tunnel_dst_mtu(tunnel) - overhead;
+ 	if (mtu < dev->min_mtu || mtu > dev->max_mtu)
 -- 
-2.52.0
+2.51.0
 
 
