@@ -1,80 +1,109 @@
-Return-Path: <netdev+bounces-243887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8266CA9B43
-	for <lists+netdev@lfdr.de>; Sat, 06 Dec 2025 01:26:21 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AA93CA9CB8
+	for <lists+netdev@lfdr.de>; Sat, 06 Dec 2025 02:02:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3CA353028FF4
-	for <lists+netdev@lfdr.de>; Sat,  6 Dec 2025 00:26:13 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 4B77E3021116
+	for <lists+netdev@lfdr.de>; Sat,  6 Dec 2025 01:02:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0536D320A32;
-	Sat,  6 Dec 2025 00:26:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 229BE212566;
+	Sat,  6 Dec 2025 01:02:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kX/0bYJ5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eBRTMXq3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB6F1862A
-	for <netdev@vger.kernel.org>; Sat,  6 Dec 2025 00:26:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0E77199931;
+	Sat,  6 Dec 2025 01:02:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1764980771; cv=none; b=DnFrhfyZZFRtDzu/slLAPKNmJN9v8gdbkznMJlPthYgVEBZkn0a1tvK0q1o0c3Aed3dAwjcJHrtz/KrbINQTA/06MQ4YEZfSCd8m8aMXiJiTLRmWpQNhLcBlB5DMqA/cRQ/F80D49Ri7STDglX3iFh7F9ZoVJ6qNxiBC0zQALEk=
+	t=1764982935; cv=none; b=UV8APKfRyETMz+jpSsA2FTM56UOQpKFtrlG5z3dniv8jzbrlz/JwajgpGwRgr0sBnoTr8KmFCi/9YYBhVyNYIS2sxOdsr3tMc7aMQ/XIbKvteyUGXDVRIaXfF+YFxYOnmvHxkmGvwvkXug5EaKftdn1EttYxQFQoTzKeQb9t/IU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1764980771; c=relaxed/simple;
-	bh=HDkiTTdDro/uCFMb2K1P+c50E6kkwAfNk4xh3BVByO8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HxdggvdCRhiQ0KGCUwq2lqTyFXCIXxTYGRhDWuCcVr1rdST/RehrwJos5PecqXTOh9BC+OmtYfpoL6QczaBzdyF8pM5iQ1jJwglcTAwlVnGiysXOI73KXes4US4qgi4LML7Ji++RxiwyNWaJe8kdVBxwKCgA7Qm9ojKgtHD1iKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kX/0bYJ5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7385FC4CEF1;
-	Sat,  6 Dec 2025 00:26:11 +0000 (UTC)
+	s=arc-20240116; t=1764982935; c=relaxed/simple;
+	bh=S/8MzApMJSD1wL3n0bJVecuce1ZAfZJl27a5E+cIE8U=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=G/ZoRi+GOvr09sT9mRjUtRFXzHQWrKIKRbTkHm5CxDr8kKQ3HOGHjeSwAkWgc4B+K6kLmFgXdYqwDkuxyStwAJwOJL+p3GjByDCP+PP5uYw51sobeYgcXpOUo9MP368JI6VT3nS8IDSpnP7yh4Tzkgvl2WBPZSnkPs5c4NRG/7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eBRTMXq3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C96B6C4CEF1;
+	Sat,  6 Dec 2025 01:02:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1764980771;
-	bh=HDkiTTdDro/uCFMb2K1P+c50E6kkwAfNk4xh3BVByO8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kX/0bYJ5YMMhwmVxWArRJSLco0YyjzurvzDlCzjpUKb/xtwIfE1kSWKLVBWlqD12y
-	 Ej/k3DKi2Y7dteVBQs6Ro2aLMReFrq38dLlwmJE/bhJabFKApfZOlBu9Izy4ChJVju
-	 mM23gp4rkK+J484T2lYyAiW9HZ++f5K5Vix1FHyesXv5WbKDbHD/96q/sVb0eAFdum
-	 DGgOgrJ5xIJE5aIxf9cy4YZiBWkBilf5uyLXcuWWbJhXRrdskJ5RQpTYfeH1lKFdWP
-	 dIDvBC4o+3hT4KyhsJi1+y9bvj/XP4yPYzsG8iMt8PfVDtUM1GKajF/3Fj1p01IGC6
-	 FVIKG/RfkiU4Q==
-Date: Fri, 5 Dec 2025 16:26:10 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Petr Machata <petrm@nvidia.com>
-Cc: <netdev@vger.kernel.org>
-Subject: Re: [TEST] vxlan brige test flakiness
-Message-ID: <20251205162610.40143536@kernel.org>
-In-Reply-To: <87345oyizz.fsf@nvidia.com>
-References: <20251203095055.3718f079@kernel.org>
-	<87bjkexhhr.fsf@nvidia.com>
-	<20251204104337.7edf0a31@kernel.org>
-	<87345oyizz.fsf@nvidia.com>
+	s=k20201202; t=1764982934;
+	bh=S/8MzApMJSD1wL3n0bJVecuce1ZAfZJl27a5E+cIE8U=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=eBRTMXq3ao//uDbXMj+4ey7ywykhC2xquecDqXaGDFN2auYSYjh2QPk40e9L22CRe
+	 aD9sbvyiE+arG6M7BnNUw1PBpl32c3v/i6oMxCbK1ze3LzzyLEwl7j+jsuXIMkDdVT
+	 M4UECRD4FNQG2jVWwNnrPIMk0jrDTCi8Oo7hgJVElWSHMxaNFEUjrqCSGlAf4xdkFL
+	 chU0qCvqfiHP8h0ZLhsC/go0od/MWI+fn0A2kTEQgZ13GZA00c+8Z0kDB5VcqwSBhN
+	 WyTi8W/kxH0ay1aj3fctCsXSG/1t4sd92YwMy2xsZ+Nd87OCCX0zjAxIGbBNCbCYxM
+	 DYx3SWRgYf29g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 78AFE3808200;
+	Sat,  6 Dec 2025 00:59:13 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next v8 0/6] Support associating BPF programs with
+ struct_ops
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176498275203.1878807.11776031951947151435.git-patchwork-notify@kernel.org>
+Date: Sat, 06 Dec 2025 00:59:12 +0000
+References: <20251203233748.668365-1-ameryhung@gmail.com>
+In-Reply-To: <20251203233748.668365-1-ameryhung@gmail.com>
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com,
+ andrii@kernel.org, daniel@iogearbox.net, tj@kernel.org,
+ martin.lau@kernel.org, kernel-team@meta.com
 
-On Fri, 5 Dec 2025 17:16:56 +0100 Petr Machata wrote:
-> OK, cool.
-> 
-> I think the following patch would fix the issue. But I think it should
-> be thematically split into two parts, the lib.sh fix needs its own
-> explanation. Then there is a third patch to get rid of the
-> now-unnecessary vx_wait() helper.
-> 
-> I think it makes sense to send it all as next material after you open it
-> in January. But if the issue is super annoying, I can send the two-part
-> fix now for net, and the cleanup in January for next.
-> 
-> Let me know what you prefer.
+Hello:
 
-I think both the fix and the cleanup would be acceptable at this stage
-of the merge window. But no strong preference, I queued up the diff you
-shared as a local NIPA patch so we can see how it fares over the
-weekend. And it will get auto-ejected when you post the real thing.
+This series was applied to bpf/bpf-next.git (master)
+by Andrii Nakryiko <andrii@kernel.org>:
+
+On Wed,  3 Dec 2025 15:37:42 -0800 you wrote:
+> Hi,
+> 
+> This patchset adds a new BPF command BPF_PROG_ASSOC_STRUCT_OPS to
+> the bpf() syscall to allow associating a BPF program with a struct_ops.
+> The command is introduced to address a emerging need from struct_ops
+> users. As the number of subsystems adopting struct_ops grows, more
+> users are building their struct_ops-based solution with some help from
+> other BPF programs. For example, scx_layer uses a syscall program as
+> a user space trigger to refresh layers [0]. It also uses tracing program
+> to infer whether a task is using GPU and needs to be prioritized [1]. In
+> these use cases, when there are multiple struct_ops instances, the
+> struct_ops kfuncs called from different BPF programs, whether struct_ops
+> or not needs to be able to refer to a specific one, which currently is
+> not possible.
+> 
+> [...]
+
+Here is the summary with links:
+  - [bpf-next,v8,1/6] bpf: Allow verifier to fixup kernel module kfuncs
+    https://git.kernel.org/bpf/bpf-next/c/1588c81b9f21
+  - [bpf-next,v8,2/6] bpf: Support associating BPF program with struct_ops
+    https://git.kernel.org/bpf/bpf-next/c/b5709f6d26d6
+  - [bpf-next,v8,3/6] libbpf: Add support for associating BPF program with struct_ops
+    https://git.kernel.org/bpf/bpf-next/c/87cd177b149a
+  - [bpf-next,v8,4/6] selftests/bpf: Test BPF_PROG_ASSOC_STRUCT_OPS command
+    https://git.kernel.org/bpf/bpf-next/c/33a165f9c2c1
+  - [bpf-next,v8,5/6] selftests/bpf: Test ambiguous associated struct_ops
+    https://git.kernel.org/bpf/bpf-next/c/04fd12df4e05
+  - [bpf-next,v8,6/6] selftests/bpf: Test getting associated struct_ops in timer callback
+    https://git.kernel.org/bpf/bpf-next/c/0e841d19263a
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
