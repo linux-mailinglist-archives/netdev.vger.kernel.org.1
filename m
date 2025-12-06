@@ -1,136 +1,176 @@
-Return-Path: <netdev+bounces-243913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A41A8CAA8F0
-	for <lists+netdev@lfdr.de>; Sat, 06 Dec 2025 16:07:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0F89CAA8F7
+	for <lists+netdev@lfdr.de>; Sat, 06 Dec 2025 16:12:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A8761307CA1D
-	for <lists+netdev@lfdr.de>; Sat,  6 Dec 2025 15:07:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 41CC0305130B
+	for <lists+netdev@lfdr.de>; Sat,  6 Dec 2025 15:12:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7499E284693;
-	Sat,  6 Dec 2025 15:07:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 630F128468B;
+	Sat,  6 Dec 2025 15:12:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oVfI4zv2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DdNYSTZ4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D4FB25B1DA;
-	Sat,  6 Dec 2025 15:07:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3790D3B8D48;
+	Sat,  6 Dec 2025 15:12:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765033651; cv=none; b=k9184d9UcvAhmejTKYAjMCVRtIHP1hkbPlqFfk5c0SsH0NtJS7PYWoBTCbt3sYU/Rf3zZ849YwuWT6gDFXPqo5W8DPJLLFtx2Muq9I2GKypxmEnU0ggwwHVK/YT2+k1n+Fi4mN1ZaSfGXHhZ3zVwZykPnTbTZhRgHwzu9jkNI5M=
+	t=1765033945; cv=none; b=dRmiqO+6Gz5sXriafXWMPYDipdSyePjTm+IHWptZWNqZ/g2JoRPvpYvBgtV+yB25ow4CHmTH1cARmEg1R1VsQAFfxY4Q0A4qG8dcatJB186BI5YLqUSCmW8mjp5dd5XNRBaqg8r5S11JTY3e2o754SzPuYuTaCbKrJVcAI6Xo1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765033651; c=relaxed/simple;
-	bh=efblxE7xjpWtBxnjSUVxVtm7YsEPsH4q6kw9ZHyIPm4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h8uSZjhot/HAE8irnR3e5cjpQ80gGDbG6xQUC0kpxhp8JDuKtz02CA1wqfGjYaUE4wmjEwDXieTRSP2e/H8TTtxEYxww0AEureg6F4Xw8NSpYBtq2AZhG+7/vmd3j9iI4wqx88KNcDc8RMY00UwYFHFGpq8UBqt/WFYnqnvLQFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oVfI4zv2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CB36C116B1;
-	Sat,  6 Dec 2025 15:07:28 +0000 (UTC)
+	s=arc-20240116; t=1765033945; c=relaxed/simple;
+	bh=heCjDJaK/8yYZnizxFi58MmiCDcbuYi5+RI8fl2EFZI=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=LwZv1rrALJKawJ6zkA8qPAJIiOs10TgoJXuI2uG0DdlRkq/U0ZK1FVChK1mIoZd9HgS6GPrroAH+WErhhwnVJ7MhihtdAfAlBKMDCF7Ww1ViZRQ6ExOPNrZ9porzpDRH3xtoM/wSHCCin5xlhs97NOcqDbb5ylbJPYmp4zxesY8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DdNYSTZ4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BC4CC116B1;
+	Sat,  6 Dec 2025 15:12:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765033650;
-	bh=efblxE7xjpWtBxnjSUVxVtm7YsEPsH4q6kw9ZHyIPm4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oVfI4zv2LUSWWATf9cPjCXQUrO1amIgvEpw9IDEjj3KOhVuvozGyRNPLayKxyH+/l
-	 C7NOuwKG7QQRg+232M2rFh4H4PdFuKxmbtMu2LiDpapvscmwttUsbkBQDK4nkyOb1V
-	 cDWpCRAq89KoPYyzQNuYFIYMOGXSlz5LA7kluYVNoSkLqpmCSwjpuRLzU6+LmG49zx
-	 N4GKHjgze4pwC8gFuSRPG7TkDJiJzBY6JpI8xXUKg3J1B1FzEwVXfKZ1yPOhOoC9zt
-	 E1V+lG7SchqoyRSR+QZB19977bsBdAyxYj6r5am2T6VuGhqMhLeP/gHcfmiMPsRb3D
-	 +a49+MqVi08Xg==
-Date: Sat, 6 Dec 2025 15:07:26 +0000
-From: Simon Horman <horms@kernel.org>
-To: Vimlesh Kumar <vimleshk@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	sedara@marvell.com, srasheed@marvell.com, hgani@marvell.com,
-	Veerasenareddy Burru <vburru@marvell.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v2] octeon_ep: reset firmware ready status
-Message-ID: <aTRGrorVdpRfmWtd@horms.kernel.org>
-References: <20251205091045.1655157-1-vimleshk@marvell.com>
+	s=k20201202; t=1765033944;
+	bh=heCjDJaK/8yYZnizxFi58MmiCDcbuYi5+RI8fl2EFZI=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=DdNYSTZ4v7mpgljzBNgEfEDtUXrhurWzglRn/i7Wf3KE0vuWdJLvKBkmwgUPwHR4v
+	 ZUutk3vx0+kAU9XHW/7GGPEDMWiuMeeXYD4hm7VwDk4U4sfhXdjTe5JNqY1Zw6sV3Z
+	 EgjohB9H5OiwhZ6SdA5CxQ/RJNZVpP5art50WE867ioZHlkDMuOKPYtKjvSHxbM00L
+	 38rVXWFGa4mv9MEjE8JwuTtNbwODeeC7Lidyoio1JAGPpLJCKGw0MJv/6ApRSOTdRk
+	 aHSaa7A7Z3JpKYmngfZd4TRTe7H6IRk0hc4eXxOsqnI4+jOknOR81uhl8ahXkSvqYu
+	 T88nJcL1tjXzA==
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 9B282F4007A;
+	Sat,  6 Dec 2025 10:12:22 -0500 (EST)
+Received: from phl-imap-15 ([10.202.2.104])
+  by phl-compute-10.internal (MEProxy); Sat, 06 Dec 2025 10:12:22 -0500
+X-ME-Sender: <xms:1kc0aVJpCDyJK4iH90Nh2U0dQwXR5he14IlfZPP_qjB6CnpMpUT9Qg>
+    <xme:1kc0ab9XWy19bm8uCETN_BvvGFLh14ZtMcj6iCcTHUC8zHhjdWqZ9CryoDmuacBbs
+    4g0XO-aqTxRNCmCzi4IrFTVhQMVsyry1FTtN7FafyrZHsXy89tE2vRs>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduuddviecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefoggffhffvvefkjghfufgtgfesthejredtredttdenucfhrhhomhepfdevhhhutghk
+    ucfnvghvvghrfdcuoegtvghlsehkvghrnhgvlhdrohhrgheqnecuggftrfgrthhtvghrnh
+    ephfffkefffedtgfehieevkeduuefhvdejvdefvdeuuddvgeelkeegtefgudfhfeelnecu
+    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheptghhuhgtkh
+    hlvghvvghrodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduieefgeelleel
+    heelqdefvdelkeeggedvfedqtggvlheppehkvghrnhgvlhdrohhrghesfhgrshhtmhgrih
+    hlrdgtohhmpdhnsggprhgtphhtthhopeegpdhmohguvgepshhmthhpohhuthdprhgtphht
+    thhopehkvghrnhgvlhdqthhlshdqhhgrnhgushhhrghkvgeslhhishhtshdrlhhinhhugi
+    druggvvhdprhgtphhtthhopegthhhutghkrdhlvghvvghrsehorhgrtghlvgdrtghomhdp
+    rhgtphhtthhopehsmhgrhihhvgifsehrvgguhhgrthdrtghomhdprhgtphhtthhopehnvg
+    htuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:1kc0aRx8QT32xeVT1_X69bf6KvlgWR8ANXNdOLNV_BfnONWrmtdu9Q>
+    <xmx:1kc0actNyerePgSXQIs1akqJihrwYaivTwx0B6bfFD80no8kELtKkQ>
+    <xmx:1kc0ae2UqRxJOsBvyN610esArqklNPeC5GzHmBzgsXQh8VjnrArSGQ>
+    <xmx:1kc0aX89qnuzoo7JTio7yM02WaoC0YAyazIL53lKGVQQmH-588FdtQ>
+    <xmx:1kc0afPb4hAowOQIYPVbkzCxGRhOURpkg87lrqENxj1q6H6X0rKRv4Dc>
+Feedback-ID: ifa6e4810:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 7A617780054; Sat,  6 Dec 2025 10:12:22 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251205091045.1655157-1-vimleshk@marvell.com>
+X-ThreadId: AKAJIIlgov-V
+Date: Sat, 06 Dec 2025 10:12:02 -0500
+From: "Chuck Lever" <cel@kernel.org>
+To: "Scott Mayhew" <smayhew@redhat.com>,
+ "Chuck Lever" <chuck.lever@oracle.com>
+Cc: kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org
+Message-Id: <938c82cd-9760-42e5-b0ce-123c86710782@app.fastmail.com>
+In-Reply-To: <20251206143006.2493798-1-smayhew@redhat.com>
+References: <20251206143006.2493798-1-smayhew@redhat.com>
+Subject: Re: [PATCH] net/handshake: a handshake can only be cancelled once
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Fri, Dec 05, 2025 at 09:10:44AM +0000, Vimlesh Kumar wrote:
-> Add support to reset firmware ready status
-> when the driver is removed(either in unload
-> or unbind)
-> 
-> Signed-off-by: Sathesh Edara <sedara@marvell.com>
-> Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
-> Signed-off-by: Vimlesh Kumar <vimleshk@marvell.com>
+
+
+On Sat, Dec 6, 2025, at 9:30 AM, Scott Mayhew wrote:
+> When a handshake request is cancelled it is removed from the
+> handshake_net->hn_requests list, but it is still present in the
+> handshake_rhashtbl until it is destroyed.
+>
+> If a second cancellation request arrives for the same handshake request,
+> then remove_pending() will return false... and assuming
+> HANDSHAKE_F_REQ_COMPLETED isn't set in req->hr_flags, we'll continue
+> processing through the out_true label, where we put another reference on
+> the sock and a refcount underflow occurs.
+>
+> This can happen for example if a handshake times out - particularly if
+> the SUNRPC client sends the AUTH_TLS probe to the server but doesn't
+> follow it up with the ClientHello due to a problem with tlshd.  When the
+> timeout is hit on the server, the server will send a FIN, which triggers
+> a cancellation request via xs_reset_transport().  When the timeout is
+> hit on the client, another cancellation request happens via
+> xs_tls_handshake_sync().
+>
+> Fixes: 3b3009ea8abb ("net/handshake: Create a NETLINK service for 
+> handling handshake requests")
+> Signed-off-by: Scott Mayhew <smayhew@redhat.com>
 > ---
-> V2: Use recommended bit manipulation macros.
-
-...
-
-> diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_regs_cn9k_pf.h b/drivers/net/ethernet/marvell/octeon_ep/octep_regs_cn9k_pf.h
-> index ca473502d7a0..284959d97ad1 100644
-> --- a/drivers/net/ethernet/marvell/octeon_ep/octep_regs_cn9k_pf.h
-> +++ b/drivers/net/ethernet/marvell/octeon_ep/octep_regs_cn9k_pf.h
-> @@ -383,6 +383,22 @@
->  /* bit 1 for firmware heartbeat interrupt */
->  #define CN93_SDP_EPF_OEI_RINT_DATA_BIT_HBEAT	BIT_ULL(1)
->  
-> +#define FW_STATUS_DOWNING      0ULL
-> +#define FW_STATUS_RUNNING      2ULL
+>  net/handshake/request.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/net/handshake/request.c b/net/handshake/request.c
+> index 274d2c89b6b2..c7b20d167a55 100644
+> --- a/net/handshake/request.c
+> +++ b/net/handshake/request.c
+> @@ -333,6 +333,10 @@ bool handshake_req_cancel(struct sock *sk)
+>  		return false;
+>  	}
+> 
+> +	/* Duplicate cancellation request */
+> +	trace_handshake_cancel_none(net, req, sk);
+> +	return false;
 > +
-> +#define CN9K_PEM_GENMASK BIT_ULL(36)
-> +#define CN9K_PF_GENMASK GENMASK_ULL(21, 18)
-> +#define PFX_CSX_PFCFGX_SHADOW_BIT BIT_ULL(16)
-> +#define CN9K_PEMX_PFX_CSX_PFCFGX(pem, pf, offset)   ((0x8e0000008000 | (uint64_t)\
-> +						      FIELD_PREP(CN9K_PEM_GENMASK, pem)\
-> +						      | FIELD_PREP(CN9K_PF_GENMASK, pf)\
-> +						      | (PFX_CSX_PFCFGX_SHADOW_BIT & (offset))\
-> +						      | (rounddown((offset), 8)))\
-> +						      + ((offset) & BIT_ULL(2)))
+>  out_true:
+>  	trace_handshake_cancel(net, req, sk);
+> 
+> -- 
+> 2.51.0
 
-Hi Vimlesh,
+To help support engineers find this patch, I recommend using
+"net/handshake: duplicate handshake cancellations leak socket" as
+the short description.
 
-Please use a #defines so that 0x8e0000008000 and for BIT_ULL(2) have names.
+The proposed solution might introduce a socket reference leak:
 
-And please reformat so this is less than 80 columns wide.
-I'd do something like this:
+1. Request submitted: sock_hold() called (line 271)
+2. Request accepted by daemon via handshake_req_next()
+   (removes from pending list)
+3. Cancel called:
+  - remove_pending() returns FALSE (not in pending list)
+  - test_and_set_bit() returns FALSE (sets the bit now)
+  - With patch: returns FALSE, sock_put() NOT called
+4. handshake_complete() called: bit already set, skips sock_put()
 
-define CN9K_PEMX_PFX_CSX_PFCFGX(pem, pf, offset) \
-	... \
-	...
+What if we use test_and_set_bit(HANDSHAKE_F_REQ_COMPLETED) in the
+pending cancel path so duplicate cancels can be detected?
 
-> +
-> +/* Register defines for use with CN9K_PEMX_PFX_CSX_PFCFGX */
-> +#define CN9K_PCIEEP_VSECST_CTL  0x4D0
-> +
->  #define CN93_PEM_BAR4_INDEX            7
->  #define CN93_PEM_BAR4_INDEX_SIZE       0x400000ULL
->  #define CN93_PEM_BAR4_INDEX_OFFSET     (CN93_PEM_BAR4_INDEX * CN93_PEM_BAR4_INDEX_SIZE)
+Instead of:
 
-## Form letter - net-next-closed
+        if (hn && remove_pending(hn, req)) {
+                /* Request hadn't been accepted */
+                goto out_true;
+        }
 
-The merge window for v6.19 has begun and therefore net-next has closed
-for new drivers, features, code refactoring and optimizations. We are
-currently accepting bug fixes only.
+go with this bit of untested code:
 
-Please repost when net-next reopens.
-
-Due to a combination of the merge-window, travel commitments of the
-maintainers, and the holiday season, net-next will re-open after
-2nd January.
-
-RFC patches sent for review only are welcome at any time.
-
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+        if (hn && remove_pending(hn, req)) {
+                /* Request hadn't been accepted - mark cancelled */
+                if (test_and_set_bit(HANDSHAKE_F_REQ_COMPLETED, &req->hr_flags)) {
+                        trace_handshake_cancel_busy(net, req, sk);
+                        return false;
+                }
+                goto out_true;
+        }
 
 -- 
-pw-bot: changes-requested
+Chuck Lever
 
