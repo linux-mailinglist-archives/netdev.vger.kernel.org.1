@@ -1,112 +1,117 @@
-Return-Path: <netdev+bounces-243909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23073CAA792
-	for <lists+netdev@lfdr.de>; Sat, 06 Dec 2025 14:57:29 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23361CAA87C
+	for <lists+netdev@lfdr.de>; Sat, 06 Dec 2025 15:30:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C8FD93085EF1
-	for <lists+netdev@lfdr.de>; Sat,  6 Dec 2025 13:57:27 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 11662301558B
+	for <lists+netdev@lfdr.de>; Sat,  6 Dec 2025 14:30:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 891712FD7C3;
-	Sat,  6 Dec 2025 13:57:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 168432FC89F;
+	Sat,  6 Dec 2025 14:30:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VkHlRLKM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qeu/TWd6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DB952673B0;
-	Sat,  6 Dec 2025 13:57:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA13D2EBDF2
+	for <netdev@vger.kernel.org>; Sat,  6 Dec 2025 14:30:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765029446; cv=none; b=EcoyLImq4XfVfGzebIQ2DvsIC6tuGn/Qp0c6FBR6q9LXuWKxLLBEVnSwfvSNbzPNdae8ojujk/64I6Sue6trcoVq7hFXYb66Of3EnBeMUQuZlj8SLtNkObPmDvf4/YwjqagHXiO36XjFadoMtT2JgXgBAiCZYuHWEiE4+K7te84=
+	t=1765031414; cv=none; b=ATVsDQOJrhv12p9RV+4/K2ofyA23pzTxEVU3TdkRbTM8PH5bBrXD5pzyR3e9fiIZEgqmBMZhLkzVhrjoTdj+p9iDQ7KSj9Dg31CT120vQoD3y2txyZKxut6G/tZuMLqbrLHg+Jt1OUjBCtw+2hDpAooCanfSj4meccPGMK+5b2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765029446; c=relaxed/simple;
-	bh=yikHQvLuW4fiLZzY8f2vWSQGxUDyJrhZHn3RzNeYKck=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H7jioNpMn4YE3p8G1D3dY4q+d4N1bT3W1P00F/egpSpEhPQ858FJwtfL6JNSxURwU4bfF0BPLvajOu5NIRFKl+8umwfLH0SziJ8AzaCeOFYjQxZ67E0GTnGqv/N4JnzsJciwljba9LRMmanvBRDCAjPpi/yOKDDSI9hwzkjK+x0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VkHlRLKM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 651F4C4CEF5;
-	Sat,  6 Dec 2025 13:57:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765029445;
-	bh=yikHQvLuW4fiLZzY8f2vWSQGxUDyJrhZHn3RzNeYKck=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VkHlRLKMHCion6tT5sDr9zYTpUcrAqIdCY3ddBe59Wns3icivmB7F1IzMAiDkWfH0
-	 G24hZip9QtnhUlMRr4+QuQhYIlXdXHs3wCZYrBnacosOzgiZ7FxbtpY16vWdaKzFC4
-	 ink63onse23d4gO+IR+Xi9QHuzheoy6AQcZq8YUGhFO7Czq5o/LAsyCwij7A544uBy
-	 KsZodGq7CHKZJd41RVXIZeGPZ1S05ahSGqv+sS2i8boXYyhYnJ/jXSU/+WyItQrCzw
-	 S8yzERkzB5nnXRm5/Xpnmgg8GNGQc4b6F8BdY4QM0zgoGnhKDQcoeg0wnvdcmyRHan
-	 +ec7pw4J49hrA==
-Date: Sat, 6 Dec 2025 13:57:21 +0000
-From: Simon Horman <horms@kernel.org>
-To: Kathara Sasikumar <katharasasikumar007@gmail.com>
-Cc: alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, david.hunter.linux@gmail.com,
-	linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	shuah@kernel.org, skhan@linuxfoundation.org
-Subject: Re: [PATCH] net: 6lowpan: replace sprintf() with scnprintf() in
- debugfs
-Message-ID: <aTQ2QQKfzekZEduc@horms.kernel.org>
-References: <20251205175324.619870-1-katharasasikumar007@gmail.com>
+	s=arc-20240116; t=1765031414; c=relaxed/simple;
+	bh=CviAuRWnny1vn3NljzsJQZkwWC3z4hT2cAWdZtBKdH4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=A3Lm+54+KqTQJk+nfEirq37zpaRkkj/KS6qL17XAa5jKYkpxuVQrO6rEGs0CD9PQUpF7nR/zOIpbJYOvqFKAGh/j5WcluE5++v0vjjN1ClEsKWtHeD88BEqlptkjIrJja6XvbLlqPvy0m1TY80Fizn5kGBz11H/dMV41qlXCY5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qeu/TWd6; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1765031411;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=XDVqngqwDB0/FBtWqUXffjv+ziMrCmRCEuO7EkSzOv8=;
+	b=Qeu/TWd6s45eBvtIyuhyy6WDCc3gD10gbBH9J0f0hTEkIudCU4sGRDj2Y5/CefYGdckvqF
+	H+yczYkyDZhsPtE9mGZviqJy/IamFof/JFp1UWcOjPAxWHMpGKfMjN6kWIip+D14/BYblJ
+	8uaEde0JNx0JHYE9cISQOLHIx9TGW/o=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-153-lj68S55VNkKO5um4hkRIUA-1; Sat,
+ 06 Dec 2025 09:30:10 -0500
+X-MC-Unique: lj68S55VNkKO5um4hkRIUA-1
+X-Mimecast-MFC-AGG-ID: lj68S55VNkKO5um4hkRIUA_1765031409
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B1D161955F27;
+	Sat,  6 Dec 2025 14:30:08 +0000 (UTC)
+Received: from aion.redhat.com (unknown [10.22.64.87])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6C738180029A;
+	Sat,  6 Dec 2025 14:30:08 +0000 (UTC)
+Received: from aion.redhat.com (localhost [IPv6:::1])
+	by aion.redhat.com (Postfix) with ESMTP id 4A47F549C9F;
+	Sat, 06 Dec 2025 09:30:06 -0500 (EST)
+From: Scott Mayhew <smayhew@redhat.com>
+To: chuck.lever@oracle.com
+Cc: kernel-tls-handshake@lists.linux.dev,
+	netdev@vger.kernel.org
+Subject: [PATCH] net/handshake: a handshake can only be cancelled once
+Date: Sat,  6 Dec 2025 09:30:06 -0500
+Message-ID: <20251206143006.2493798-1-smayhew@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251205175324.619870-1-katharasasikumar007@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Fri, Dec 05, 2025 at 05:53:24PM +0000, Kathara Sasikumar wrote:
-> sprintf() does not perform bounds checking on the destination buffer and
-> is deprecated in the kernel as documented in
-> Documentation/process/deprecated.rst.
+When a handshake request is cancelled it is removed from the
+handshake_net->hn_requests list, but it is still present in the
+handshake_rhashtbl until it is destroyed.
 
-Hi Kathara,
+If a second cancellation request arrives for the same handshake request,
+then remove_pending() will return false... and assuming
+HANDSHAKE_F_REQ_COMPLETED isn't set in req->hr_flags, we'll continue
+processing through the out_true label, where we put another reference on
+the sock and a refcount underflow occurs.
 
-Thanks for your patch.
+This can happen for example if a handshake times out - particularly if
+the SUNRPC client sends the AUTH_TLS probe to the server but doesn't
+follow it up with the ClientHello due to a problem with tlshd.  When the
+timeout is hit on the server, the server will send a FIN, which triggers
+a cancellation request via xs_reset_transport().  When the timeout is
+hit on the client, another cancellation request happens via
+xs_tls_handshake_sync().
 
-While I do see this mentioned at [1], and I do agree with the approach
-taken here, I don't see it mentioned in deprecated.rst in net-next or
-Linus' tree.
+Fixes: 3b3009ea8abb ("net/handshake: Create a NETLINK service for handling handshake requests")
+Signed-off-by: Scott Mayhew <smayhew@redhat.com>
+---
+ net/handshake/request.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-[1] https://lwn.net/Articles/69419/
-[2] https://lore.kernel.org/netdev/20251017094954.1402684-1-wintera@linux.ibm.com/
-
-> 
-> Replace it with scnprintf() to ensure the write stays within bounds.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Kathara Sasikumar <katharasasikumar007@gmail.com>
-
-This patch looks like it should be targeted at net-next,
-and that should be done like this.
-
-Subject: [PATCH net-next] ...
-
-But unfortunately net-next is currently closed.
-
-## Form letter - net-next-closed
-
-The merge window for v6.19 has begun and therefore net-next has closed
-for new drivers, features, code refactoring and optimizations. We are
-currently accepting bug fixes only.
-
-Please repost when net-next reopens.
-
-Due to a combination of the merge-window, travel commitments of the
-maintainers, and the holiday season, net-next will re-open after
-2nd January.
-
-RFC patches sent for review only are welcome at any time.
-
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
-
+diff --git a/net/handshake/request.c b/net/handshake/request.c
+index 274d2c89b6b2..c7b20d167a55 100644
+--- a/net/handshake/request.c
++++ b/net/handshake/request.c
+@@ -333,6 +333,10 @@ bool handshake_req_cancel(struct sock *sk)
+ 		return false;
+ 	}
+ 
++	/* Duplicate cancellation request */
++	trace_handshake_cancel_none(net, req, sk);
++	return false;
++
+ out_true:
+ 	trace_handshake_cancel(net, req, sk);
+ 
 -- 
-pw-bot: changes-requested
+2.51.0
+
 
