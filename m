@@ -1,139 +1,106 @@
-Return-Path: <netdev+bounces-243961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B2D4CAB9A0
-	for <lists+netdev@lfdr.de>; Sun, 07 Dec 2025 21:10:38 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3172CAB9EE
+	for <lists+netdev@lfdr.de>; Sun, 07 Dec 2025 22:05:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0352C3014DAD
-	for <lists+netdev@lfdr.de>; Sun,  7 Dec 2025 20:10:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 332F430102AD
+	for <lists+netdev@lfdr.de>; Sun,  7 Dec 2025 21:05:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12DD52D73A6;
-	Sun,  7 Dec 2025 20:10:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A504D2C0F8F;
+	Sun,  7 Dec 2025 21:05:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cxb5ea8H"
+	dkim=pass (1024-bit key) header.d=betterinternet.ltd header.i=marcus.hughes@betterinternet.ltd header.b="Wz3lRoj1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from sender2-of-o51.zoho.eu (sender2-of-o51.zoho.eu [136.143.171.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78ADF26ED29;
-	Sun,  7 Dec 2025 20:10:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765138234; cv=none; b=LlCvWJ3OsBi3vp1K+d9xw/t55qQY7y9L+3dWF6lZBwn2Yr9DxxX5ro+Z7LH64OSF0eNPZMYjLPiMvLBR0/xH18qfDN0doAIi/zr4TIeNxpCK+cl8TFFtbtLF+6lf3tOVm5yVVJyI+oMUKWYbr03O5BAug+5uckqrqS8MACFOUE0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765138234; c=relaxed/simple;
-	bh=35W/F/8VbdXLH7Az+KezY2EH8Ryxi2hMJrREwti5yPw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D5jLaxZ99RDDEJw/MphETC0NRTWSVczsi9QLsSJze0w+1PxaAQdD/LmmEOkGE4ZyS8cOq30XKwSbGBRO7VOvRANGOJ1tJ/SyPEV3qB77nJZ1E/e1+ZXp5v6wxBrl2spwuLBWAaYYpCh3dZP1nqitjG1TRyWLFhQTc7Q/gQwMsV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cxb5ea8H; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765138232; x=1796674232;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=35W/F/8VbdXLH7Az+KezY2EH8Ryxi2hMJrREwti5yPw=;
-  b=cxb5ea8H1xJJePdMrq4d45MbW7gDWynLQZBBpHeei1zZ8uy+QJwzcpSp
-   U5BpJKBK8MXKlBLYjsZ5Sqy0U8OPl/KJD3XRb8CSy4UZYZpYjySurWzju
-   ARZZn76xiI+woLA9nTDPGYr+yD+uoGXEqdCNkeVZdxc6qXF3E1L18pXNR
-   DePb3RoeVcVbKz4nxz3sJFlJ5gjiZfoU2JYiR1Iy//TOnZ5eY0ErJrFHz
-   CeFMCFcLT5UEjLOSFOeiGf+fA76wnKKOcDGYY3JORSAFCl+Qhl4o+v1DJ
-   vdr+sOqx5fufzTmavM1guuJBs5XFIcMAeccJKDAbIq02Z2AAvZgamaIJr
-   A==;
-X-CSE-ConnectionGUID: fJsYBgjNR7OS4KbgN7v+dA==
-X-CSE-MsgGUID: DvUZNM37R5qJ0+3Rv8SVoA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11635"; a="77412375"
-X-IronPort-AV: E=Sophos;i="6.20,257,1758610800"; 
-   d="scan'208";a="77412375"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2025 12:10:32 -0800
-X-CSE-ConnectionGUID: cl3n6xIRQ86sk6zfVr991A==
-X-CSE-MsgGUID: 5pnB7i6NTSmZgl3mLe+ALQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,257,1758610800"; 
-   d="scan'208";a="195040968"
-Received: from lkp-server01.sh.intel.com (HELO 4664bbef4914) ([10.239.97.150])
-  by orviesa010.jf.intel.com with ESMTP; 07 Dec 2025 12:10:29 -0800
-Received: from kbuild by 4664bbef4914 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vSL5O-00000000Jc9-0jJw;
-	Sun, 07 Dec 2025 20:10:26 +0000
-Date: Mon, 8 Dec 2025 04:09:39 +0800
-From: kernel test robot <lkp@intel.com>
-To: Daniel Golle <daniel@makrotopia.org>, Hauke Mehrtens <hauke@hauke-m.de>,
-	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Rasmus Villemoes <ravi@prevas.dk>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH net v2] net: dsa: mxl-gsw1xx: manually clear RANEG bit
-Message-ID: <202512080341.Vpa2e40b-lkp@intel.com>
-References: <a90b206e9fd8e4248fd639afd5ae296454ac99b9.1765060046.git.daniel@makrotopia.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D225A28D830
+	for <netdev@vger.kernel.org>; Sun,  7 Dec 2025 21:05:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.171.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765141519; cv=pass; b=WLDEla9vLhK8Xmu2hE0tinwV2PylJviIXfzSJ3t8ve97eM2coKyCqLy425tcrqHkvm430wMbE7wtWENAFuav4pJ9UE8NXvTq/Myhshe40n2T2sVumJ3b98isvALFgvaJXUCdEy39e4Z8lOBLL2vq1u29FuAWzmw0FvB3eYCQiyU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765141519; c=relaxed/simple;
+	bh=NC10/MFdlHQE+54qa7FQNjGqM3WyNqIa99ZL4ofLymo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a8l4bntRYC9aGKdfsrxh8wBFv3lgyt48NYB5rjOn1uhRnS/PqI95DO/rcrg6Ec+Yb3gaOBbacCRRcfGOzeJQYnY8tQKS3KSELnjhJ1574q3n3S7xFr0gu1W98bhnfFijFBRAabPxzQFy4iX2HlR1xEQuO5zXR1qP95D5Wqlgp1I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=betterinternet.ltd; spf=pass smtp.mailfrom=betterinternet.ltd; dkim=pass (1024-bit key) header.d=betterinternet.ltd header.i=marcus.hughes@betterinternet.ltd header.b=Wz3lRoj1; arc=pass smtp.client-ip=136.143.171.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=betterinternet.ltd
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=betterinternet.ltd
+ARC-Seal: i=1; a=rsa-sha256; t=1765141477; cv=none; 
+	d=zohomail.eu; s=zohoarc; 
+	b=RqU9W9nbBmwl1gQCb5iQLzIVLvEDWcC2VZipMnE7iCtuaXUAaS20uAQEUnro2ElFkKl/PMJ6Zr82M9WAwADHtoFgqAIhS9DqWiDYVROE3qdKI5z8T/E4go1US2bglIi8V/nGS32DMpwaPvdIbkpbKofYepm25UCAyoAkXnVI5uY=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
+	t=1765141477; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=V8jZQV/I0+Srd3girTzGkRW0T+l9urYiLGSkzJ1zlWU=; 
+	b=SxUQq6lrcVTqYj/cxrDF1oCS4PPVOKWvw4OchxO75ixxfh+8J/o0YhegaJ441y2jcPbn8qvGoikcbeNXO5lNb4pXnd02wisysm3x27gwltA1BOVMIlESP4vf+V7lWMOMvZPM7Xsymql1Dr/d1CcP3JG7en4KDtFzFyvdDtmuYLE=
+ARC-Authentication-Results: i=1; mx.zohomail.eu;
+	dkim=pass  header.i=betterinternet.ltd;
+	spf=pass  smtp.mailfrom=marcus.hughes@betterinternet.ltd;
+	dmarc=pass header.from=<marcus.hughes@betterinternet.ltd>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1765141477;
+	s=zmail; d=betterinternet.ltd; i=marcus.hughes@betterinternet.ltd;
+	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=V8jZQV/I0+Srd3girTzGkRW0T+l9urYiLGSkzJ1zlWU=;
+	b=Wz3lRoj1tweVm2n149Q50wGQBYRU1lMxDghkS4rZ3CPVANTvXBboDaU3DyFXMSON
+	PJV5dAKHXmMKIYxDsGPT6gfrO8K8dzvj6OSAk2pqjLWRVXO9+Ig55+3fRllBv99gEPK
+	/IsQ7j4NZy5YPHb19zwOoaXgNK/DvO45ipZG6C7Q=
+Received: by mx.zoho.eu with SMTPS id 1765141475937821.8787071069646;
+	Sun, 7 Dec 2025 22:04:35 +0100 (CET)
+From: Marcus Hughes <marcus.hughes@betterinternet.ltd>
+To: netdev@vger.kernel.org
+Cc: linux@armlinux.org.uk,
+	andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	Marcus Hughes <marcus.hughes@betterinternet.ltd>
+Subject: [PATCH] net: sfp: extend Potron XGSPON quirk to cover additional EEPROM variant
+Date: Sun,  7 Dec 2025 21:03:55 +0000
+Message-ID: <20251207210355.333451-1-marcus.hughes@betterinternet.ltd>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a90b206e9fd8e4248fd639afd5ae296454ac99b9.1765060046.git.daniel@makrotopia.org>
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
-Hi Daniel,
+Some Potron SFP+ XGSPON ONU sticks are shipped with different EEPROM
+vendor ID and vendor name strings, but are otherwise functionally
+identical to the existing "Potron SFP+ XGSPON ONU Stick" handled by
+sfp_quirk_potron().
 
-kernel test robot noticed the following build errors:
+These modules, including units distributed under the "Better Internet"
+branding, use the same UART pin assignment and require the same
+TX_FAULT/LOS behaviour and boot delay. Re-use the existing Potron
+quirk for this EEPROM variant.
 
-[auto build test ERROR on net/main]
+Signed-off-by: Marcus Hughes <marcus.hughes@betterinternet.ltd>
+---
+ drivers/net/phy/sfp.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Golle/net-dsa-mxl-gsw1xx-manually-clear-RANEG-bit/20251207-063852
-base:   net/main
-patch link:    https://lore.kernel.org/r/a90b206e9fd8e4248fd639afd5ae296454ac99b9.1765060046.git.daniel%40makrotopia.org
-patch subject: [PATCH net v2] net: dsa: mxl-gsw1xx: manually clear RANEG bit
-config: um-allyesconfig (https://download.01.org/0day-ci/archive/20251208/202512080341.Vpa2e40b-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251208/202512080341.Vpa2e40b-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202512080341.Vpa2e40b-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   drivers/net/dsa/lantiq/mxl-gsw1xx.c: In function 'gsw1xx_pcs_an_restart':
->> drivers/net/dsa/lantiq/mxl-gsw1xx.c:449:35: error: 'gsw1xx_priv' undeclared (first use in this function)
-     449 |         cancel_delayed_work_sync(&gsw1xx_priv->clear_raneg);
-         |                                   ^~~~~~~~~~~
-   drivers/net/dsa/lantiq/mxl-gsw1xx.c:449:35: note: each undeclared identifier is reported only once for each function it appears in
-
-
-vim +/gsw1xx_priv +449 drivers/net/dsa/lantiq/mxl-gsw1xx.c
-
-   444	
-   445	static void gsw1xx_pcs_an_restart(struct phylink_pcs *pcs)
-   446	{
-   447		struct gsw1xx_priv *priv = pcs_to_gsw1xx(pcs);
-   448	
- > 449		cancel_delayed_work_sync(&gsw1xx_priv->clear_raneg);
-   450	
-   451		regmap_set_bits(priv->sgmii, GSW1XX_SGMII_TBI_ANEGCTL,
-   452				GSW1XX_SGMII_TBI_ANEGCTL_RANEG);
-   453	
-   454		/* despite being documented as self-clearing, the RANEG bit
-   455		 * sometimes remains set, preventing auto-negotiation from happening.
-   456		 * MaxLinear advises to manually clear the bit after 10ms.
-   457		 */
-   458		schedule_delayed_work(&priv->clear_raneg, msecs_to_jiffies(10));
-   459	}
-   460	
-
+diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+index 0401fa6b24d2..6166e9196364 100644
+--- a/drivers/net/phy/sfp.c
++++ b/drivers/net/phy/sfp.c
+@@ -497,6 +497,8 @@ static const struct sfp_quirk sfp_quirks[] = {
+ 	SFP_QUIRK("ALCATELLUCENT", "3FE46541AA", sfp_quirk_2500basex,
+ 		  sfp_fixup_nokia),
+ 
++	SFP_QUIRK_F("BIDB", "X-ONU-SFPP", sfp_fixup_potron),
++
+ 	// FLYPRO SFP-10GT-CS-30M uses Rollball protocol to talk to the PHY.
+ 	SFP_QUIRK_F("FLYPRO", "SFP-10GT-CS-30M", sfp_fixup_rollball),
+ 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.52.0
+
 
