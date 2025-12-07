@@ -1,148 +1,107 @@
-Return-Path: <netdev+bounces-243964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E97A6CABA4B
-	for <lists+netdev@lfdr.de>; Sun, 07 Dec 2025 22:55:39 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5B80CABA88
+	for <lists+netdev@lfdr.de>; Sun, 07 Dec 2025 23:46:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4E5553002FE8
-	for <lists+netdev@lfdr.de>; Sun,  7 Dec 2025 21:55:11 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C077A3005002
+	for <lists+netdev@lfdr.de>; Sun,  7 Dec 2025 22:45:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 074B22E4247;
-	Sun,  7 Dec 2025 21:55:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 616D21EB5E3;
+	Sun,  7 Dec 2025 22:45:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kCIpBbu9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VezopdYz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F432D8DA4;
-	Sun,  7 Dec 2025 21:55:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42F782D3EEA
+	for <netdev@vger.kernel.org>; Sun,  7 Dec 2025 22:45:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765144509; cv=none; b=UqnJyFsm/L71sYSBm310yfHtJs+aXbvSz8/kPa3ueBRVI1E98EH20KNJ6Mtee1MI8tbh9hCe6NeYM8lo3H7AGSWOGMH+AcuD46yATAofb0nfK65pKvMHu/cUW2ishHQNX8shy4yUAKdaS9bvg56bhXSaabcBsGZfzK6BB49NXMU=
+	t=1765147547; cv=none; b=KrSvzun3lw147LQyRvXNMVi/J7wtD2xzIWypESbGnRI/BumcL4hJmq63G1IJbmE7cLWIeMFD6HRmwCcHu8zGV9sIem3Nj/IdRDFnhlm72MXczNLBIcjwD+49FZhAFKWYxqX9pNzhEKvlT/P4hoWcBFkCkDkqfv5l48mk99vH8hw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765144509; c=relaxed/simple;
-	bh=ifK/LaHPNtOnVBGvaz4T+mPIkp7m9v1XbXWTdT3KCKo=;
+	s=arc-20240116; t=1765147547; c=relaxed/simple;
+	bh=OsvqPV078tMZwdnt5ejSkIVUbA2GYD6axkEA2FMUkGs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BTQ+xeGqLvGHYqntizhSpDg6l3mOf6ehNw4zfrWvcw9XT/5Mpwihst6XRo5kx1d8WO0LBSbLtAKqWeeh1fb2zGUuRNjN3IxijvP7dn5fRkgC116dW9MFLZQz6R9TFUcTK7l+tzCtJKDrhXR3XEFp0GXpVhT4IDBlVVHdbmWiuK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kCIpBbu9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF8D1C4CEFB;
-	Sun,  7 Dec 2025 21:55:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765144505;
-	bh=ifK/LaHPNtOnVBGvaz4T+mPIkp7m9v1XbXWTdT3KCKo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kCIpBbu9Yoq/NmfnZma0dFQue1dQE+K4H4mnQl1IKPmsaLZhNRYGqIwLKCTeHMep7
-	 VOjui8/lhXaVBhdzMMaZvW7jt4OqP6a9EFiEl1mZaRgX+kcaDoGG1dzDZAjlSSbKwc
-	 V1DZXq+zfMs5I/yIhHoUPzWqH6xv1+cTQlV0UbKYhvRA0gny0w83ZIQ0+7dNxT/t3y
-	 Ek9gMaAl5ZGf2gM5QsPOv1oY8pg6yxe6RaQtxiZ0a3z2r5hnHCAwmDiBdXSeqdgrw2
-	 /Dk2eR5NnPk4nWSx1Tp7uzNEat9dkIQR4l9Mi183be4EPOJC6/D6khmT9MWkrusFo+
-	 i7z9rMnDp7IJg==
-Date: Sun, 7 Dec 2025 22:55:02 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
-	Shuah Khan <shuah@kernel.org>, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH nf-next 0/5] Add IP6IP6 flowtable SW acceleration
-Message-ID: <aTX3tncSC5GqW-ES@lore-desk>
-References: <20251207-b4-flowtable-offload-ip6ip6-v1-0-18e3ab7f748c@kernel.org>
- <20251207130654.698001f3@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=WFV4SJg91SgQ+oGcGKccHjwp9Z/eD/vN7NM7QDrZGahDgxNh7rj6sf1H5t6c4b/pGYebw67qfBdIL7Y2DwI9onnV8+DNRLhcOsfbTwe+5dDzvXUWbwzrQkYSFoFENqu+mORi19TInK4lWpRtkXI/qc/x7+HEZW5STVfrFEXXj9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VezopdYz; arc=none smtp.client-ip=209.85.215.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-c0224fd2a92so250571a12.2
+        for <netdev@vger.kernel.org>; Sun, 07 Dec 2025 14:45:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765147544; x=1765752344; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IfJuq0pWWMw1tReJy2Kq4nA9djFTsZDg14VFkq2GV+M=;
+        b=VezopdYzMp8EHLvoGTvPoJE9WjH3H676j3yhTajFPLNMIRTYyg+GgXNrepj95c3V5T
+         sSvv0w4ittzJiLrXERIAfVdCXkt2YMDh/FW6T9SqQqP3UJeP8NtcrQBv5gYuXfPMgB6I
+         I5t5JEHOIPGF9xSEtWFDyiSl/pOf4LBopx1UIjpE0KyCy7WBC/Cqr40+ltUeWgcz7DC+
+         bwNMoHTIHeizjAdjWouitAv85cc/P4ht4KzANYYD5fFLVyaAV9EKaNd5ZbAhbpiYw2U4
+         t+SnYlNHgHr66dxX77a/xi1wQhqedxA9FsPhMsD1aru2o8Fcbz+EKT1r27ubrKIYULvx
+         XHtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765147544; x=1765752344;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IfJuq0pWWMw1tReJy2Kq4nA9djFTsZDg14VFkq2GV+M=;
+        b=CI/hxsRQjgSU0coLqeSPU1sKeOkeNXRxpzaLLxVRG0XcpsV5e/TbpdgeVpesgw5qeN
+         eXjFMu5tEV+0TKTMjRxZbGnHp18UW/3XdIJrb3g9a16nGctTVMe22DWFBYY/PKAwrXsS
+         1gdMcEReN15fdsFloHcgtlDABHTmxz8N2uMYJGuevWAiDibL41aSnfzLwrxcGufcV4Fh
+         5Q4PwY44TNW17KY8EmiTCs/7ZtKKYr2yGOyixzGAc3a2TizOuD6YRxO06tylINBDLzjz
+         +gaFYZDWRHihCZUDk83xf1pQWniu3c1ySZXevsXWcCxE3ns0hoOZsYWxtJF1PN5l26Kw
+         4HIw==
+X-Forwarded-Encrypted: i=1; AJvYcCXspvcfwHAEIqgLyhPLmjxHIqJBrKMu3Xe1R/dexHnd//QsZICLOffnQOhg8jKEGfIFWGrEAqg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUuKR4H5Tugi5cnqJZs0pyo/a/6k/x5mgHR8AZHWntrUSQU0p5
+	cwHfWEvIMwVjHcTW89e0sInOjjo/SvFdefMI5Qv0AGJuZiVsS8dJb82r
+X-Gm-Gg: ASbGnct9cOHpkKBXYljd25+kSOVXXCEIQnQr3s6PqcI1804+/9cGpYJU/BnzM99lmSg
+	21lNHrFqye+0/jZq7IL1mx06IuHYBh0obJsj02cypmeP8X7ejnJ2lUulO46woqoREgFl6e7NIb5
+	20KOGjFAr6Bml+FC3MqgXiFLk1sHuTCNi1N3AfI8uMCyWDScciRub4kOy8nEcqwX18LAvXawF8D
+	aplx2LxZ/3P0ZAfhZg5H/6fXVpbNUm5GsqLNSEl3Ya1OMZhdr5eHTHd7f+p7LfMoSB3QZpu3H0y
+	KqHObB+6JjF6hne3hR/ru1k0Eerf6QzkXf6V299VX2lCPtIa6FOCsScaknpW8ncxXZVn3n/g29h
+	RTdXJW3V4Kbf9EUxTbpf6zMHWI/SI4wxIvRf2pHw62JLNYgOO0+F8OdDTqk9MDc8P3OqnQAQthz
+	bX4UVctj1vnAoa
+X-Google-Smtp-Source: AGHT+IFn4BeNP9GMXhA0H4yfE1QdXNgfJCl+9rlLJB6D5L0hoU+Gq2aXJugD7NeH0UGbfdId37/xpg==
+X-Received: by 2002:a05:7300:d58d:b0:2a4:6c43:b0c9 with SMTP id 5a478bee46e88-2abc720e99cmr2778852eec.30.1765147544129;
+        Sun, 07 Dec 2025 14:45:44 -0800 (PST)
+Received: from localhost ([216.9.110.14])
+        by smtp.gmail.com with ESMTPSA id 5a478bee46e88-2aba87d7b9dsm42136118eec.4.2025.12.07.14.45.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 07 Dec 2025 14:45:43 -0800 (PST)
+Date: Sun, 7 Dec 2025 14:45:41 -0800
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Xiang Mei <xmei5@asu.edu>
+Cc: security@kernel.org, netdev@vger.kernel.org, jhs@mojatatu.com,
+	jiri@resnulli.us
+Subject: Re: [PATCH net] net/sched: sch_qfq: Fix NULL deref when deactivating
+Message-ID: <aTYDlZ+uJfm7cQAn@pop-os.localdomain>
+References: <20251205014855.736723-1-xmei5@asu.edu>
+ <4mxbjdgdxufrv7rm7krt4j7nknqlwi6kcilpjg2tbcxzgrxif3@tdobbjya7euj>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="A86Dlecj8/P/xSwD"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251207130654.698001f3@kernel.org>
+In-Reply-To: <4mxbjdgdxufrv7rm7krt4j7nknqlwi6kcilpjg2tbcxzgrxif3@tdobbjya7euj>
 
+On Thu, Dec 04, 2025 at 07:11:12PM -0700, Xiang Mei wrote:
+> The PoC and intended crash are attached for your reference:
+> 
+> PoC:
+> ```c
 
---A86Dlecj8/P/xSwD
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I hate to ask every time, but is it possible to turn this C reproducer
+into a selftest? To save your time, use AI?
 
-> On Sun, 07 Dec 2025 17:06:40 +0100 Lorenzo Bianconi wrote:
-> > Introduce SW acceleration for IP6IP6 tunnels in the netfilter flowtable
-> > infrastructure.
->=20
-> tc-testing build fails with this:
->=20
-> net/netfilter/nf_flow_table_ip.c: In function =E2=80=98nf_flow_ip6_tunnel=
-_proto=E2=80=99:
-> net/netfilter/nf_flow_table_ip.c:370:42: error: =E2=80=98inet6_protos=E2=
-=80=99 undeclared (first use in this function); did you mean =E2=80=98inet_=
-protos=E2=80=99?
->   370 |                 ipprot =3D rcu_dereference(inet6_protos[nexthdr]);
->       |                                          ^~~~~~~~~~~~
-> ./include/linux/rcupdate.h:532:17: note: in definition of macro =E2=80=98=
-__rcu_dereference_check=E2=80=99
->   532 |         typeof(*p) *local =3D (typeof(*p) *__force)READ_ONCE(p); \
->       |                 ^
-> ./include/linux/rcupdate.h:770:28: note: in expansion of macro =E2=80=98r=
-cu_dereference_check=E2=80=99
->   770 | #define rcu_dereference(p) rcu_dereference_check(p, 0)
->       |                            ^~~~~~~~~~~~~~~~~~~~~
-> net/netfilter/nf_flow_table_ip.c:370:26: note: in expansion of macro =E2=
-=80=98rcu_dereference=E2=80=99
->   370 |                 ipprot =3D rcu_dereference(inet6_protos[nexthdr]);
->       |                          ^~~~~~~~~~~~~~~
-> net/netfilter/nf_flow_table_ip.c:370:42: note: each undeclared identifier=
- is reported only once for each function it appears in
->   370 |                 ipprot =3D rcu_dereference(inet6_protos[nexthdr]);
->       |                                          ^~~~~~~~~~~~
-> ./include/linux/rcupdate.h:532:17: note: in definition of macro =E2=80=98=
-__rcu_dereference_check=E2=80=99
->   532 |         typeof(*p) *local =3D (typeof(*p) *__force)READ_ONCE(p); \
->       |                 ^
-> ./include/linux/rcupdate.h:770:28: note: in expansion of macro =E2=80=98r=
-cu_dereference_check=E2=80=99
->   770 | #define rcu_dereference(p) rcu_dereference_check(p, 0)
->       |                            ^~~~~~~~~~~~~~~~~~~~~
-> net/netfilter/nf_flow_table_ip.c:370:26: note: in expansion of macro =E2=
-=80=98rcu_dereference=E2=80=99
->   370 |                 ipprot =3D rcu_dereference(inet6_protos[nexthdr]);
->       |                          ^~~~~~~~~~~~~~~
-> net/netfilter/nf_flow_table_ip.c:374:27: error: invalid use of undefined =
-type =E2=80=98const struct inet6_protocol=E2=80=99
->   374 |                 if (ipprot->flags & INET6_PROTO_FINAL) {
->       |                           ^~
-> net/netfilter/nf_flow_table_ip.c:374:37: error: =E2=80=98INET6_PROTO_FINA=
-L=E2=80=99 undeclared (first use in this function)
->   374 |                 if (ipprot->flags & INET6_PROTO_FINAL) {
->       |                                     ^~~~~~~~~~~~~~~~~
-> net/netfilter/nf_flow_table_ip.c:383:29: error: invalid use of undefined =
-type =E2=80=98const struct inet6_protocol=E2=80=99
->   383 |                 ret =3D ipprot->handler(skb);
->       |                             ^~
+Maybe I should add a warning in checkpatch.pl to catch net_sched fixes
+without selftests. :)
 
-Hi Jakub,
-
-I guess CONFIG_IPV6 is not enabled, right? I will fix it.
-
-Regards,
-Lorenzo
-
---A86Dlecj8/P/xSwD
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaTX3tgAKCRA6cBh0uS2t
-rKvBAQC3nSIcXG//ue7XnInEvT78oqm+x7qbcxw2kmR6dTRMXAEA5KpQfNU3bH1M
-+8Qf+cFSNh+JDtcJV42xrT3uHId16Qs=
-=RZle
------END PGP SIGNATURE-----
-
---A86Dlecj8/P/xSwD--
+Thanks,
+Cong
 
