@@ -1,42 +1,87 @@
-Return-Path: <netdev+bounces-243938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69D4FCAB3A5
-	for <lists+netdev@lfdr.de>; Sun, 07 Dec 2025 11:41:04 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C647CAB471
+	for <lists+netdev@lfdr.de>; Sun, 07 Dec 2025 13:38:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8B301300C5C2
-	for <lists+netdev@lfdr.de>; Sun,  7 Dec 2025 10:40:19 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id D73613007A05
+	for <lists+netdev@lfdr.de>; Sun,  7 Dec 2025 12:38:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0734E2EB85B;
-	Sun,  7 Dec 2025 10:40:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCE0C2ED15F;
+	Sun,  7 Dec 2025 12:38:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QxyBNCAu"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9D691B983F;
-	Sun,  7 Dec 2025 10:40:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4951B2D94B0
+	for <netdev@vger.kernel.org>; Sun,  7 Dec 2025 12:38:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765104017; cv=none; b=ffZV1tewg1/tg4qS2yxrCeWOHOzFTWn0PuSZFSuwJT7nk8kT6DoYPObrwLNjdWvQjQbAHcLNX+RhnTYVgl7s4GfK0NWYrkeeSCKAAUkEfO2rK2eNRSt3s+AHWe2t+buLDg3Oap6KnzMlylfJnPPHKzhfLTuFc73HnihOcEFT3QY=
+	t=1765111103; cv=none; b=fjkkcbbKpZsgL/cmqxqjRFg/RJ5m+QbXTeJ19ADWAM9gWN81w/im3V4yQBx9t6m4nJEur462nYnvyTdK3D1MmqOej3t4wVeZa8Nm+NeJ4UFgfM5PnTUrNKNoRbS6w5iHI/9pOnjCMw+Rg+uwXSQIUDbMmpyIRlzS0JIPwSZC23Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765104017; c=relaxed/simple;
-	bh=vVox+hlO9MS5Tuex3cugUV3uHv0+plT/3A1osRrQcPY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y1sxN2vY+AP48rhrzAi3Lpw373Nq7npjyIRkChE+RjzqgsHNk/v6iQPmsKlXjWCTuYhmV4iNtgzyT9b1YPAFviR5JgLSEkKelMgajfKX7jB1UqwNyDseSY78PLqJhC2WUfRLGKbWepNaT5LNROyjnk8FXaS7L1inQVhiMTw8u6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
-	id 78EDB6034B; Sun, 07 Dec 2025 11:40:13 +0100 (CET)
-Date: Sun, 7 Dec 2025 11:40:12 +0100
-From: Florian Westphal <fw@strlen.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netfilter-devel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [TEST] conntrack_reverse_clash.sh flakes
-Message-ID: <aTVZjCnkdQLKP9Mm@strlen.de>
-References: <20251206175135.4a56591b@kernel.org>
- <20251206175647.5c32f419@kernel.org>
+	s=arc-20240116; t=1765111103; c=relaxed/simple;
+	bh=F7zr8Cs75tSdtgrViCUFLoXfov1UXJTsuww8Bn3boPI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=QmJnJ2LxjY081VxZJZHl38z+d1v3g45O52TSKuW9LnQZylLXNAARs3pOZ8guflaNrly83Sv+HQ/opwbBu0MF4VLBhzGHI6lnrn7p3bNNd2C3d2odZG6uNvo+IMwjZlIjcZ1wdrEH/CXMQiTHyEiTHrmGVGNOZ8n2yr/HJPX6JCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QxyBNCAu; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1765111101;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=+SUXnBMjMPDW9AevCrJiO1mJpoSaewy40KTaeWq5vxk=;
+	b=QxyBNCAuw2lsSNYr8BQTJuq4J5zfG9nEzhq/CPGdJYvuHgbybe7l1TkpMHfgjFlgwQgzo1
+	g6zlPElhbjkZ4b26AX9lceBEaYvijXFo51wxblFXETRXEnLkiRUv9iCtGHLkppnm+aBX2x
+	yRao1Lb9cMTnJ/OS57Rqc/pR9MMOErE=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-328-vrxS2WXmOGKs8vXhE9as-g-1; Sun,
+ 07 Dec 2025 07:38:15 -0500
+X-MC-Unique: vrxS2WXmOGKs8vXhE9as-g-1
+X-Mimecast-MFC-AGG-ID: vrxS2WXmOGKs8vXhE9as-g_1765111092
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9956D1956088;
+	Sun,  7 Dec 2025 12:38:11 +0000 (UTC)
+Received: from fedora (unknown [10.44.32.50])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with SMTP id 2C14F1800357;
+	Sun,  7 Dec 2025 12:38:00 +0000 (UTC)
+Received: by fedora (nbSMTP-1.00) for uid 1000
+	oleg@redhat.com; Sun,  7 Dec 2025 13:38:13 +0100 (CET)
+Date: Sun, 7 Dec 2025 13:38:01 +0100
+From: Oleg Nesterov <oleg@redhat.com>
+To: Todd Kjos <tkjos@android.com>, Martijn Coenen <maco@android.com>,
+	Joel Fernandes <joelagnelf@nvidia.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Carlos Llamas <cmllamas@google.com>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Felix Kuehling <Felix.Kuehling@amd.com>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Boris Brezillon <boris.brezillon@collabora.com>,
+	Rob Herring <robh@kernel.org>, Steven Price <steven.price@arm.com>,
+	=?iso-8859-1?Q?Adri=E1n?= Larumbe <adrian.larumbe@collabora.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Liviu Dudau <liviu.dudau@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+	dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH 0/7] don't abuse task_struct.group_leader
+Message-ID: <aTV1KYdcDGvjXHos@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -45,18 +90,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251206175647.5c32f419@kernel.org>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Jakub Kicinski <kuba@kernel.org> wrote:
-> Ah, one more, the non-reverse conntrack-clash is SKIPping, occasionally:
-> https://netdev.bots.linux.dev/contest.html?pass=0&test=conntrack-clash-sh
-> 
-> If the event it's testing is probabilistic could we make it return XFAIL
-> when it doesn't trigger? We try to reserve SKIP for tests skipped
-> because tool is missing in env, something isn't built into the kernel
-> etc.
+Hello.
 
-Sure, I can switch this to xfail.  Its trying to trigger a conntrack
-race but there is no way to force this and I did not want the script
-to spin for long when trying to trigger the nat clash undo logic.
+Untested but hopefully trivial, please review.
+
+The patches do not depend on each other, this series just removes
+the usage of ->group_leader when it is "obviously unnecessary".
+
+I am going to move ->group_leader from task_struct to signal_struct
+or at least add the new task_group_leader() helper. So I will send
+more tree-wide changes on top of this series.
+
+If this series passes the review, can it be routed via mm tree?
+
+Oleg.
+---
+ drivers/android/binder.c                         |  9 ++++-----
+ drivers/android/binder_alloc.c                   |  2 +-
+ drivers/gpu/drm/amd/amdgpu/amdgpu_amdkfd_gpuvm.c |  2 +-
+ drivers/gpu/drm/amd/amdgpu/amdgpu_vm.c           |  5 +----
+ drivers/gpu/drm/amd/amdkfd/kfd_process.c         | 10 ----------
+ drivers/gpu/drm/panfrost/panfrost_gem.c          |  2 +-
+ drivers/gpu/drm/panthor/panthor_gem.c            |  2 +-
+ drivers/infiniband/core/umem_odp.c               |  4 ++--
+ net/core/netclassid_cgroup.c                     |  2 +-
+ 9 files changed, 12 insertions(+), 26 deletions(-)
+
 
