@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-243956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7218FCAB881
-	for <lists+netdev@lfdr.de>; Sun, 07 Dec 2025 18:43:50 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63E4DCAB884
+	for <lists+netdev@lfdr.de>; Sun, 07 Dec 2025 18:44:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2064530221B8
-	for <lists+netdev@lfdr.de>; Sun,  7 Dec 2025 17:43:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 77B02302EA0C
+	for <lists+netdev@lfdr.de>; Sun,  7 Dec 2025 17:43:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 182C02DA77F;
-	Sun,  7 Dec 2025 17:43:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 978D62DC764;
+	Sun,  7 Dec 2025 17:43:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nk27sf5v"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W0kWgjAZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E899B24677A
-	for <netdev@vger.kernel.org>; Sun,  7 Dec 2025 17:43:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68B9B2DC762;
+	Sun,  7 Dec 2025 17:43:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765129399; cv=none; b=Fw/ExiHCrSF6kzYqmD+Ttqao9K0TbXrVzcSDoXU7xcBpS8KmpOIlcigLKYF14s6pmIrWStFChtAQU3TmNNgyhDgyL4VlsH8uqs/WKewzabWqOgqhxub/xIG+zbry/FiTWpUY2jYhHkcv5ousXlFO/MxBLF6m6sJPylJesx2xzNE=
+	t=1765129400; cv=none; b=nd7gRpFgNbFW5Bo1o7m/N8So246EV2UYjxYmFJNZ631MjlPo1JyssyyKl+0G/PK81IfMSWfGuCyBevVWBUj6bLZzcfsgWiyQIehXdkkDfhnXIJFfAfsvIuCoLq12Ft+38w96X/n2xy+UhdJv41upT4TXiFfKOQcFbwafaXfviXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765129399; c=relaxed/simple;
-	bh=lyvGs2ZkCspr7EZvzOCRfUrjqP2BdxChSvemNjmnBtQ=;
+	s=arc-20240116; t=1765129400; c=relaxed/simple;
+	bh=MZ60y8MSntpkIDRHsxrqQzjEI81i2XjEURJL5nc2Jzw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=TkYTBRsIpbVKgrT2KdDZx6ua6givoekMnVUHHgpgqPMQTMjLZbaGcf5vurHyQkSsGtUYOhqXpsxCDWkFLFooSWvPz62dY4qFnCMVGSUZWJygEggFXQ9wnSND1X/gCuAkcpuBZg7lK6Jzx3TOaNn2SGy91E8fwUiiByylfYwFec4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nk27sf5v; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64F47C4CEFB;
-	Sun,  7 Dec 2025 17:43:18 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=ItuM6C8aLkxZfyAEjbJtx2bHWTH4NkYInZqkzzWPy0NAwzA4kbgRwyrz0Em+z2MC4ue9bKiaEMFGwJxNZ+I04IkwwIuN9F806lwqkIyJnuA/vIEOcFHyA1QzJtDw3DSggPVGKzN58rI4Yb3lF/ckrh6iHcZlgsMdcSeoMlpne9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W0kWgjAZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD505C4CEFB;
+	Sun,  7 Dec 2025 17:43:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765129398;
-	bh=lyvGs2ZkCspr7EZvzOCRfUrjqP2BdxChSvemNjmnBtQ=;
+	s=k20201202; t=1765129399;
+	bh=MZ60y8MSntpkIDRHsxrqQzjEI81i2XjEURJL5nc2Jzw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=nk27sf5vjwoM2C5LZoK2N8uMbC36h2Et0IMVOs5MfA+d7iFOO54J+aDwVBddKP6nE
-	 VJcUePNh4+g44kPgSRML+bmCTdJiSPz4jT6/rZkBQzSTBNrIaDS4GXIRfCxnN22W1v
-	 KzUSn1d0uGVB4jVoPRYBBoIuk1dbHHSmV7Wpa4IhXnZTenhptP985Aglu75emfTC31
-	 C9W7DX/xsGtEWeLeACl8b8ZlRNMnJlOwKHZ4B19rNM8nvkqZlsWB4PwM3S0Qr0uC1p
-	 f9iTBAFxcIHSO7uZ9/ZK3zwuKioPBNwPTtcxdt9REcdaF9mTC6HxhX4CO6uTgfG94t
-	 R/qMtvH5KHT6A==
+	b=W0kWgjAZYeFGLp1xCfzgCM53FomlFIyK2NVIwo8jbT0JCwT9gtbeHDzSjPGYsg5q4
+	 OQg9af/CjhcuWaa4YtKrCKEbSrNkWmv318lXlXwTeBvPp5DvPnt647KG3S/XEMcvlk
+	 yZQzzTaNKmWQMm7Qwq/hsm8j/OeJrSSv5EfE/zX7FCGc0hqqXaAzyk//k5rtImp3Z+
+	 r8OONHVqM6b/lAAUi0f/mc5XhghJmpClST0xRFJNiWhjCVwvqy3VNQcdgDCdGQPO0O
+	 SJXBxN7qSK3YnllZ/XdHCDTx1Str+MzLUnCElSzbKBmPnmjw7eWv41ZdzdsFf0i2+v
+	 VhcBWdwIHbl0A==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F2AE93808200;
-	Sun,  7 Dec 2025 17:40:15 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 789193808200;
+	Sun,  7 Dec 2025 17:40:17 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,36 +50,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2 1/1] lib,tc: Fix 'UINT_MAX' undeclared error
- observed
- during the build with musl libc
+Subject: Re: [PATCH iproute2-next v3 0/7] iplink_can: add CAN XL support
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176512921479.2492763.17730960894747579841.git-patchwork-notify@kernel.org>
-Date: Sun, 07 Dec 2025 17:40:14 +0000
-References: <20251203021124.17535-1-nemaakhilesh@gmail.com>
-In-Reply-To: <20251203021124.17535-1-nemaakhilesh@gmail.com>
-To: Akhilesh Nema <nemaakhilesh@gmail.com>
-Cc: netdev@vger.kernel.org, stephen@networkplumber.org
+ <176512921602.2492763.3355041482753934530.git-patchwork-notify@kernel.org>
+Date: Sun, 07 Dec 2025 17:40:16 +0000
+References: <20251203-canxl-netlink-v3-0-999f38fae8c2@kernel.org>
+In-Reply-To: <20251203-canxl-netlink-v3-0-999f38fae8c2@kernel.org>
+To: Vincent Mailhol <mailhol@kernel.org>
+Cc: netdev@vger.kernel.org, stephen@networkplumber.org, mkl@pengutronix.de,
+ socketcan@hartkopp.net, dsahern@kernel.org, rakuram.e96@gmail.com,
+ stephane.grosjean@free.fr, linux-kernel@vger.kernel.org,
+ linux-can@vger.kernel.org
 
 Hello:
 
-This patch was applied to iproute2/iproute2.git (main)
+This series was applied to iproute2/iproute2.git (main)
 by Stephen Hemminger <stephen@networkplumber.org>:
 
-On Tue,  2 Dec 2025 18:11:24 -0800 you wrote:
-> - utils_math.c:136:20: error: 'UINT_MAX' undeclared (first use in this function)
-> - tc_core.c:51:22: error: 'UINT_MAX' undeclared (first use in this function)
+On Wed, 03 Dec 2025 19:24:27 +0100 you wrote:
+> Support for CAN XL was added to the kernel in [1]. This series is the
+> iproute2 counterpart.
 > 
-> Signed-off-by: Akhilesh Nema <nemaakhilesh@gmail.com>
-> ---
->  lib/utils_math.c | 1 +
->  tc/tc_core.c     | 1 +
->  2 files changed, 2 insertions(+)
+> Patches #1 to #3 are clean-ups. They refactor iplink_can's
+> print_usage()'s function.
+> 
+> Patches #4 to #7 add the CAN XL interface to iplink_can.
+> 
+> [...]
 
 Here is the summary with links:
-  - [iproute2,1/1] lib,tc: Fix 'UINT_MAX' undeclared error observed during the build with musl libc
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=6c1113633fde
+  - [iproute2-next,v3,1/7] iplink_can: print_usage: fix the text indentation
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=cf9261af2303
+  - [iproute2-next,v3,2/7] iplink_can: print_usage: change unit for minimum time quanta to mtq
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=416cd0814482
+  - [iproute2-next,v3,3/7] iplink_can: print_usage: describe the CAN bittiming units
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=393dfbb456df
+  - [iproute2-next,v3,4/7] iplink_can: add RESTRICTED operation mode support
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=ab224334322c
+  - [iproute2-next,v3,5/7] iplink_can: add initial CAN XL support
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=a52858b06f1a
+  - [iproute2-next,v3,6/7] iplink_can: add CAN XL transceiver mode setting (TMS) support
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=fea1a11ec3ee
+  - [iproute2-next,v3,7/7] iplink_can: add CAN XL TMS PWM configuration support
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=24a5a424e3a0
 
 You are awesome, thank you!
 -- 
