@@ -1,135 +1,146 @@
-Return-Path: <netdev+bounces-243958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF51CCAB893
-	for <lists+netdev@lfdr.de>; Sun, 07 Dec 2025 18:54:59 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D68B8CAB8A3
+	for <lists+netdev@lfdr.de>; Sun, 07 Dec 2025 19:05:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 701B73000B42
-	for <lists+netdev@lfdr.de>; Sun,  7 Dec 2025 17:54:50 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id CEB7C3002E91
+	for <lists+netdev@lfdr.de>; Sun,  7 Dec 2025 18:05:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55FF729BD91;
-	Sun,  7 Dec 2025 17:54:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A64C2E091E;
+	Sun,  7 Dec 2025 18:05:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BljaGoi4"
+	dkim=permerror (0-bit key) header.d=sapience.com header.i=@sapience.com header.b="SeFbERYr";
+	dkim=pass (2048-bit key) header.d=sapience.com header.i=@sapience.com header.b="kzn0TRak"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from s1.sapience.com (s1.sapience.com [72.84.236.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A006226CE11
-	for <netdev@vger.kernel.org>; Sun,  7 Dec 2025 17:54:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765130088; cv=none; b=P5Dd9EANpwhlE4h9urQEFCi8l0YvlH84JSKoez3py9aL0Zxi3SKqll68IUGIyYGLi0gQzy59zVJUp1gXAQhx6EikO91dfo9/LdtC19yIn3eXmWURcfwAagoB3H0+7CLY1qjSfTsoz/KUIjVpCKqnPJBYhX/ImSLZ0vXTC/GFHeQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765130088; c=relaxed/simple;
-	bh=xEEJXAtJe9X78jWpOkYTohDMLvcrTYMEEta0VPdEvRg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OnKn1L+AwvT/IB/rguty0Eb3I0w8dUhGChGCR4L7G4XZJeIlkXt4ClFWGnt2Lar6QKvN+asN5sVEvBG7zoR5atMyryugTMlowZLtmBcC2pjcm5PfSV92ucd5faK6zeBZoAcRE0avHac/GrhhUe2gBA6vYezIcjUFS/++U27Z+rI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BljaGoi4; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4779ce2a624so47983485e9.2
-        for <netdev@vger.kernel.org>; Sun, 07 Dec 2025 09:54:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765130085; x=1765734885; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=K5IiwUn1lybKPFH6W/FiUkJ16zhV31T2po6Ml8pZU2I=;
-        b=BljaGoi4W9Ziqn7P+FY7IZO08qOiaQqQ9eLGil3TAEqYxP42PkSSSbl6+4SVm2/MmV
-         4mlsiGTeDJw0hPoo2KSGS9eXAO9rhVveHxeYFdCLuGhXY3Dtfc+1bhX3oubsLCgEWL2b
-         NxtTQAP3RPe5DXZljoB3GoinLOV+/NK4PaBWzPXQAyTAKVb/EvxVRx300uZUM4PVRB3F
-         MU4ZdJiRJTjdd2XP9J/jXO0qJDkXxjHtMA4RMlz72c1TXs4MKQ4vYFzGj274B+KD3y61
-         VnL6Hu9WjtRLKGzJ2X1Lny7hoXmHD780isGrRe/tzmcR+DtzWIhINoFlTij+9it2ncDB
-         U0eA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765130085; x=1765734885;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=K5IiwUn1lybKPFH6W/FiUkJ16zhV31T2po6Ml8pZU2I=;
-        b=PeHT7/KUeyV2LKpXe/4BqpiMLLMXrRP+vPbrQpkNcWh054QDiDeZUf61d2fO6wo0IB
-         DFkgXZp6BBRxL8DIaQrSNKoQ+L9PiPw9J4wJ1CZhLDyDacQV0Gc0dMlSeqCDBddlXko5
-         gy3xfU/wJWPuaZ66QrJCS4QyY5bfP7LcWKB87Nyn1FOojqLbbeebkxL9G8jR1hJXZnwH
-         mXW6qXfHBUXuBltAPU7NBaU7oZnd7EVJ6fwE0v84uwSsB0ZXjav661GU5IaYbTQOUiqS
-         1bwArBWAQDrXPBu3tu7CekGxmPWPDkY2XGM2qOu/PzhNpbCdlWMKfbjRQF4A5iCpnlAk
-         bNGg==
-X-Gm-Message-State: AOJu0Yy6kuSOddVM53eEyWF6LPaJKkPxutT9BbBQbicOFK5iyJoMhpWU
-	QnB+66a1R+FQ4UTcoLmSXogAuFzdp4zmmlW+NW4psrLyFPP3AixvSQjK
-X-Gm-Gg: ASbGncuIjH8FWsa24Y7LtKgcN7MoopqweRRDKQqrWJSP+AVoqYUenuzQSXU1p0SYjQm
-	4CmzdNMfnF1Q3XHcGgt8ItqtZ82IfDa6m8urFBXjNhQxlMC8UGnFNsnizwLTrZ5izsXS+2Wiz/n
-	ca3Z4XWQwSmFMjWAaZlDLJexHL2go1h3Nk4ET5Taed/jpUs05Nr9YAqBKG2y9ydTzTN70DxCgoO
-	bjyWyCXRnbCbahdnZb5f8mwfK4UyOYOH8bmOFcxY0PtV55RXfc1qjJw+CeSYA25sF423I6pJ6TK
-	mfibbmaEHlS6rfvkateynyrHxEb3bzGOnYthQr/DbAI8H4mWiiHgZas3oCpzIaT/5yOTKF2pPtV
-	C6L1oFGjY7VDAsQdBWlw0xjpL94rZpEeyiCYyHWSQHVuILdyayCMs8YX5dV4y3+EuUPlht3PaN1
-	YxmA2LZpS71u+kD7Bl/wUCKMJhgdLIKIrUHMJ6hSxhfJ5/Hq8jI8oq
-X-Google-Smtp-Source: AGHT+IHrv/hYUGxZMSSlurgo3lnaMNnCuyfLox3seq/JtZU3yrNnPnKqh/Rvzl2ya/Ag+0t1XekUDA==
-X-Received: by 2002:a05:6000:2287:b0:42b:32f5:ad18 with SMTP id ffacd0b85a97d-42f89f0944cmr5066391f8f.9.1765130084697;
-        Sun, 07 Dec 2025 09:54:44 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42f7d331a4fsm23321131f8f.33.2025.12.07.09.54.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Dec 2025 09:54:44 -0800 (PST)
-Date: Sun, 7 Dec 2025 17:54:42 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Syed Tayyab Farooq <syedtayyabfarooq08@gmail.com>
-Cc: netdev@vger.kernel.org,
- syzbot+0e665e4b99cb925286a0@syzkaller.appspotmail.com, Syed Tayyab Farooq
- <tayyabfarooq1997@outlook.com>
-Subject: Re: [PATCH] memset skb to zero to avoid uninit value error from
- KMSAN
-Message-ID: <20251207175442.7d5ea387@pumpkin>
-In-Reply-To: <20251207162109.113159-1-tayyabfarooq1997@outlook.com>
-References: <20251207162109.113159-1-tayyabfarooq1997@outlook.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B61A62E092E;
+	Sun,  7 Dec 2025 18:05:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=72.84.236.66
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765130745; cv=fail; b=lHR+9UHPGmTDPNTlVefIQn9txyJdjekvQjbnsp9Oq1u+WHklGmrsjApLC9G0YyCwGkxRZVWvwrLuOXRInSe7mObqDOJ97SoGld67hBoThaSmA1BurtBTQvNADOi42xWBaSWR95E5TK9pNwTeVLwavRDPIAJMqXg2eZ+CKWS/Z+I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765130745; c=relaxed/simple;
+	bh=Q++gC+3ioqzZHPSBkqfCwWrV7HrOUBqS/RobES8vUtw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=uALjX1B77Ep0xKoshFRNS+CUgQ7VJ5dz7EM5QYRUvZ4dVV2XRLzu1JdInynFwZ68lvNxlRuwLEJAggVRN+M1tMa4xxB6gLddscE4huUXfiI4HYgm7gfxMKUX/mKz4cqCH1QhB7RDcGL2Xax6GZxUZnOPWV4EbNHy8/ZeJkH6dl4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sapience.com; spf=pass smtp.mailfrom=sapience.com; dkim=permerror (0-bit key) header.d=sapience.com header.i=@sapience.com header.b=SeFbERYr; dkim=pass (2048-bit key) header.d=sapience.com header.i=@sapience.com header.b=kzn0TRak; arc=fail smtp.client-ip=72.84.236.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sapience.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sapience.com
+Authentication-Results: dkim-srvy7; dkim=pass (Good ed25519-sha256 
+   signature) header.d=sapience.com header.i=@sapience.com 
+   header.a=ed25519-sha256; dkim=pass (Good 2048 bit rsa-sha256 signature) 
+   header.d=sapience.com header.i=@sapience.com header.a=rsa-sha256
+Received: from smtp.sapience.com (srv8.prv.sapience.com [10.164.28.13])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature ECDSA (secp384r1) server-digest SHA384)
+	(No client certificate requested)
+	by s1.sapience.com (Postfix) with ESMTPS id 2F30B480A68;
+	Sun, 07 Dec 2025 12:58:21 -0500 (EST)
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=sapience.com;
+ i=@sapience.com; q=dns/txt; s=dk-ed25519-220413; t=1765130301;
+ h=message-id : subject : from : to : cc : date : in-reply-to :
+ references : content-type : mime-version : from;
+ bh=Q++gC+3ioqzZHPSBkqfCwWrV7HrOUBqS/RobES8vUtw=;
+ b=SeFbERYr2xyYSQpb2h+gTObRiInm7JYJEtctSO276cdreZn1+n134WiUYMxdiOJETKHPQ
+ wUUy/7sJzzo1fAMDw==
+ARC-Seal: i=1; a=rsa-sha256; d=sapience.com; s=arc6-rsa-220412; t=1765130301;
+	cv=none; b=ichWZYnPFBbjKFGDSk+edyXaBZLDvY/X4BZJh/lfA/3Gb1OLEs4cQrPRVqSL4gEJmAI7rQGscB1gJbIHgF8Dtdlr4WxqLWozi3eFyW/lcu2XAt/IDKG5o9P2IkDWyoSXQVrrDHqHZwMLRP/XRQCgS3s1FMMPsgXfG6OEXckypzZvbfbRXprVNwO/ue5ZFuXFI+Af0qqfeZRzH5Q6TuNEUBEpVIFeh3vyxaDDQas3ClHoyMOdXo9qMnWJ9h0DYQ6XD2NZzDo5SJPl4CL0k67qe+SNtxhfOdM5TfVfiQ7eLUdpa2pdYKhc0hU0qkyGqwvdErRhdWycc14htYPNtM7hmQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; d=sapience.com; s=arc6-rsa-220412;
+	t=1765130301; c=relaxed/simple;
+	bh=Q++gC+3ioqzZHPSBkqfCwWrV7HrOUBqS/RobES8vUtw=;
+	h=DKIM-Signature:DKIM-Signature:Message-ID:Subject:From:To:Cc:Date:
+	 In-Reply-To:References:Autocrypt:Content-Type:User-Agent:
+	 MIME-Version; b=N/TODJGFJr0hhKvJSL1CnyItQLGwkELJaIK97gzqYXyXJeKe+njoMS+SPjaHZufFgVhCjG/JHUaekGFHx5PCYu157KOFTSe2PuoHWkOncR/X+moLNrHdMsd0Y64hAU4xH+7bTIhyDbw78vV7OEWsjbhqnRB4BUIRDz1+jJ+FxFsTQAyhmNYszWTlwdesqZh88Zx1tHNoIkJ0qnaIYIIJC4qFTe2eZgJn0LQpVqdovT6RhdSO48CzIvA4u6Nxulhw1TeYOVPSA79qr1qLFhByfMzFFof3ABDfapB247WKDzKCwB9uHNv71lQxaE3y06ECbpw+Toj+L9eRXxiLcwlRWA==
+ARC-Authentication-Results: i=1; arc-srv8.sapience.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sapience.com;
+ i=@sapience.com; q=dns/txt; s=dk-rsa-220413; t=1765130301;
+ h=message-id : subject : from : to : cc : date : in-reply-to :
+ references : content-type : mime-version : from;
+ bh=Q++gC+3ioqzZHPSBkqfCwWrV7HrOUBqS/RobES8vUtw=;
+ b=kzn0TRakhac1V/51AOKNQHNv/0mM89YIuL2Wj4eJNn23PNzbO1f1g+KxS9FpT5PVXUDb3
+ LQ9hPI35RTsK7NhnnGOB51xy2ORqG+S+lzRwvBtkMcFLUSaau+pthZPZ7I0w5sH/buVraIN
+ guo1ykik7FpfAIfeBlqXo0rPAIDuKuXTsX26mad98Xh5psbb+FA+MVG0p8TtNqQMPdRXObl
+ HVqO83dmw6FZiljvCkNw6olrBSbCbzj/axMih0AB5Lxo7dDRT8CSbVqhRnP/vPWYdmz8NPt
+ Z+ZF9LdK2fdcfq/UMPaVJ2Rd/MUHYInTNSA3SFadksZYXYCH/lcEkmqSXntA==
+Received: by smtp.sapience.com (Postfix) id C1C732801F9;
+	Sun, 07 Dec 2025 12:58:21 -0500 (EST)
+Message-ID: <2cc00d49014047ec83df3d4d4815b240949ffffa.camel@sapience.com>
+Subject: Re: [PATCH iwlwifi-fixes] wifi: iwlwifi: Implement settime64 as
+ stub for MVM/MLD PTP
+From: Genes Lists <lists@sapience.com>
+To: Yao Zi <ziyao@disroot.org>, Miri Korenblit	
+ <miriam.rachel.korenblit@intel.com>, Richard Cochran
+ <richardcochran@gmail.com>,  Johannes Berg <johannes.berg@intel.com>,
+ Anjaneyulu <pagadala.yesu.anjaneyulu@intel.com>, Daniel Gabay	
+ <daniel.gabay@intel.com>
+Cc: linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, Mingcong Bai <jeffbai@aosc.io>, Kexy Biscuit
+	 <kexybiscuit@aosc.io>, Nathan Chancellor <nathan@kernel.org>
+Date: Sun, 07 Dec 2025 12:58:21 -0500
+In-Reply-To: <20251204123204.9316-1-ziyao@disroot.org>
+References: <20251204123204.9316-1-ziyao@disroot.org>
+Autocrypt: addr=lists@sapience.com; prefer-encrypt=mutual;
+ keydata=mDMEXSY9GRYJKwYBBAHaRw8BAQdAwzFfmp+m0ldl2vgmbtPC/XN7/k5vscpADq3BmRy5R
+ 7y0LU1haWwgTGlzdHMgKEwwIDIwMTkwNzEwKSA8bGlzdHNAc2FwaWVuY2UuY29tPoiWBBMWCAA+Ah
+ sBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAFiEE5YMoUxcbEgQOvOMKc+dlCv6PxQAFAmPJfooFCRl
+ vRHEACgkQc+dlCv6PxQAc/wEA/Dbmg91DOGXll0OW1GKaZQGQDl7fHibMOKRGC6X/emoA+wQR5FIz
+ BnV/PrXbao8LS/h0tSkeXgPsYxrzvfZInIAC
+Content-Type: multipart/signed; micalg="pgp-sha384";
+	protocol="application/pgp-signature"; boundary="=-YtdT4vGRfRO4/TJUbSKH"
+User-Agent: Evolution 3.58.2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-
-On Mon,  8 Dec 2025 00:20:52 +0800
-Syed Tayyab Farooq <syedtayyabfarooq08@gmail.com> wrote:
-
-> Signed-off-by: Syed Tayyab Farooq <tayyabfarooq1997@outlook.com>
-> ---
-> 
-> Hi syzbot,
-> 
-> Please test this patch.
-> 
-> #syz test: https://syzkaller.appspot.com/bug?extid=0e665e4b99cb925286a0
-> 
-> Thanks,
-> Tayyab
-> 
-> 
->  net/phonet/af_phonet.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/net/phonet/af_phonet.c b/net/phonet/af_phonet.c
-> index a27efa4faa4e..9279decd680b 100644
-> --- a/net/phonet/af_phonet.c
-> +++ b/net/phonet/af_phonet.c
-> @@ -208,6 +208,8 @@ static int pn_raw_send(const void *data, int len, struct net_device *dev,
->  	if (skb == NULL)
->  		return -ENOMEM;
->  
-> +	memset(skb, 0, MAX_PHONET_HEADER + len);
-
-That looks entirely broken.
-Did you try running it?
-
-	David
 
 
-> +
->  	if (phonet_address_lookup(dev_net(dev), pn_addr(dst)) == 0)
->  		skb->pkt_type = PACKET_LOOPBACK;
->  
+--=-YtdT4vGRfRO4/TJUbSKH
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, 2025-12-04 at 12:32 +0000, Yao Zi wrote:
+> Since commit dfb073d32cac ("ptp: Return -EINVAL on ptp_clock_register
+> if
+> required ops are NULL"), PTP clock registered through
+> ptp_clock_register
+> is required to have ptp_clock_info.settime64 set, however, neither
+> MVM
+> nor MLD's PTP clock implementation sets it, resulting in warnings
+> when
+> the interface starts up, like
+>=20
+> WARNING: drivers/ptp/ptp_clock.c:325 at
+> ptp_clock_register+0x2c8/0x6b8, CPU#1: wpa_supplicant/469
+
+I do see this warning at boot (mainline kernel), =C2=A0but you noted, it al=
+l
+works fine nonetheless.
+I didn't see this in next or mainline yet.
+
+Do you know when this might find it's way to mainline?
+
+thanks
+
+--=20
+Gene
+
+--=-YtdT4vGRfRO4/TJUbSKH
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYJAB0WIQRByXNdQO2KDRJ2iXo5BdB0L6Ze2wUCaTXAPQAKCRA5BdB0L6Ze
+279ZAP45H4PAf6etDK7xqIby8qcbWAhpzzeSzz/PT+xKlytXigD/T6IgKfuAYlUY
+O8iWd5ZVcmEN0I5iS8ZpSxWxwSYpsQk=
+=H1KP
+-----END PGP SIGNATURE-----
+
+--=-YtdT4vGRfRO4/TJUbSKH--
 
