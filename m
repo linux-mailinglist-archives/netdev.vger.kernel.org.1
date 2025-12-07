@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-243923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243925-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 866CFCAAFFB
-	for <lists+netdev@lfdr.de>; Sun, 07 Dec 2025 01:49:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A84C2CAB018
+	for <lists+netdev@lfdr.de>; Sun, 07 Dec 2025 02:10:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 118C93080AFA
-	for <lists+netdev@lfdr.de>; Sun,  7 Dec 2025 00:47:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 74D303060F00
+	for <lists+netdev@lfdr.de>; Sun,  7 Dec 2025 01:10:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4EB519D07E;
-	Sun,  7 Dec 2025 00:47:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 817A6226CF1;
+	Sun,  7 Dec 2025 01:10:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="coy/8GRZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e7Yw2E8A"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB9FC35965;
-	Sun,  7 Dec 2025 00:47:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 551EE2222C4;
+	Sun,  7 Dec 2025 01:10:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765068464; cv=none; b=ONaDBsv34mWBfF7hKqd7D4zDjHkgGlDAz2nqU4Y+89es/+xCT3tEgB+PXBJ/S/gDiPkWCsr5jv8pri3XSM3o1HueNtkPQ4vuL4jomUtc76tI+rajYwEBYnd3Kkp17e/74fryHLTgezBh729a05A4dc99W7jJnl6BDH5LesDq5YE=
+	t=1765069803; cv=none; b=Y4dvvafQJkdBjm17/9y3Mbfeua7TLE/hk2ixpT3jUG5Y15nGIZ5rgClwUsr4qdvflc2QxPDxmyEbmB6wgqWjF/HEfD+WldYdqnHk/W+J8+Rf2OXrQSHG/lf1i3NBsbLxbw/6iXmEyQW9JgEFcm43lukYSHOK1A95cSXtrljTreI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765068464; c=relaxed/simple;
-	bh=7fLftqxZw1yXBlTthiEFPzfncPEc9sSS3KOwUnxqTwM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=juv8iNfHcLcfD4FegEL7SGhiFPp5uTgy9mFt2LZr6hFMncIzencaIiM5Fc27IJo6P+BmZYz/U9Fj+Gs8vUbPQxtZVCsaWo/SvVG/I9pJpTHYC1XRN/369FW3TbufePLbDwkXw4Kbbmsvs2dDrGXcCL+eP7Sdwgr2tFZrxWkIxPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=coy/8GRZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC10FC4CEF5;
-	Sun,  7 Dec 2025 00:47:43 +0000 (UTC)
+	s=arc-20240116; t=1765069803; c=relaxed/simple;
+	bh=dS6JEZqy6xUdkt/KNxu/ZvPmvZy/gOCCl+3NNubDG8M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VrHCXc//HJz5S6cr08Pe1C9PrDqyLzDCXEjPCNijwS4MC3eeEMkIjrhjUsqPvdbPFHcOoHHry8b/7tOa/iFuVaq9S+rMhLSmPgIFjVu8pUlgQc5EnNBNvSko05e/Vlm+p46U18ZOrDe/WmGjG607E71ci4eXD3Gcr5SUlUC2uSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e7Yw2E8A; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D69BC4CEF5;
+	Sun,  7 Dec 2025 01:10:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765068464;
-	bh=7fLftqxZw1yXBlTthiEFPzfncPEc9sSS3KOwUnxqTwM=;
+	s=k20201202; t=1765069802;
+	bh=dS6JEZqy6xUdkt/KNxu/ZvPmvZy/gOCCl+3NNubDG8M=;
 	h=From:To:Cc:Subject:Date:From;
-	b=coy/8GRZuoMbr6M64r5eXBG6gA+bH+freCUXfZVK7mAIXq2OG4rphN+q1SjIQPodp
-	 HJoEu1k0rKCm50ZTozkQ3BB8eZYYD78sUD3CJGNFPpUOB1v940+1eHXeU/l8d9FFhe
-	 jcW4kHClrCaB9TozywOLsZBeTe+FsKfAfjVEA9zBHrhI1yzeiyvetZ+c1brm+5msst
-	 zVgo9uf6WnXzO8ih/IJJkDCCwnC3m2Zpifw2ERUfbtw0N50qv/z7pnx4k8uoQT/Nzg
-	 dk4C3majEPHfFkLItUJ17QgmSmWNAqLcCA1I+73OdrmivPmpoeV1PmXJId3nX2cId0
-	 9VnUtJmDKPqxA==
+	b=e7Yw2E8AxE6UBc1+C3B4yvf8XcVOsQBo90OoIKwWTWvzPnYfEDsBfWKCtfJTPubte
+	 ifd8CRZpofIx3pbCYRZRYDBMDociJYlKEk+Hp8yYkUzEYqMdzUPr2gG+G2TVV1X0wb
+	 qlIDTmlPIra8LOjr5xtFDbcaj/Isz1ZwaNfBnRsIL7GCI8FIhtJZRgNXrEBVI2Rt84
+	 xNb69fHvMf7tdjbaxqIvVCyFt7HrWw014R6/NqDqrq7Ftkulgis+HNXkAY78m3rOPK
+	 0YclI5Rg10Ax+U6OMO5sSYNWrmir0oezhQ7tCAwpHoeK+D+aWZMONbna9aHCK5VSkr
+	 x4rq9cA6vUfXQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -45,15 +45,15 @@ Cc: netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	andrew+netdev@lunn.ch,
 	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	lukasz.luba@arm.com,
-	rafael@kernel.org,
-	pavel@kernel.org,
-	lenb@kernel.org,
-	linux-pm@vger.kernel.org
-Subject: [PATCH net] ynl: add regen hint to new headers
-Date: Sat,  6 Dec 2025 16:47:40 -0800
-Message-ID: <20251207004740.1657799-1-kuba@kernel.org>
+	pablo@netfilter.org,
+	fw@strlen.de,
+	netfilter-devel@vger.kernel.org,
+	willemdebruijn.kernel@gmail.com,
+	kuniyu@google.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net 0/4] inet: frags: flush pending skbs in fqdir_pre_exit()
+Date: Sat,  6 Dec 2025 17:09:38 -0800
+Message-ID: <20251207010942.1672972-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -63,59 +63,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Recent commit 68e83f347266 ("tools: ynl-gen: add regeneration comment")
-added a hint how to regenerate the code to the headers. Update
-the new headers from this release cycle to also include it.
+Fix the issue reported by NIPA starting on Sep 18th [1], where
+pernet_ops_rwsem is constantly held by a reader, preventing writers
+from grabbing it (specifically driver modules from loading).
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: lukasz.luba@arm.com
-CC: rafael@kernel.org
-CC: pavel@kernel.org
-CC: lenb@kernel.org
-CC: linux-pm@vger.kernel.org
----
- include/uapi/linux/energy_model.h | 1 +
- kernel/power/em_netlink_autogen.h | 1 +
- kernel/power/em_netlink_autogen.c | 1 +
- 3 files changed, 3 insertions(+)
+The fact that reports started around that time seems coincidental.
+The issue seems to be skbs queued for defrag preventing conntrack
+from exiting.
 
-diff --git a/include/uapi/linux/energy_model.h b/include/uapi/linux/energy_model.h
-index 4ec4c0eabbbb..0bcad967854f 100644
---- a/include/uapi/linux/energy_model.h
-+++ b/include/uapi/linux/energy_model.h
-@@ -2,6 +2,7 @@
- /* Do not edit directly, auto-generated from: */
- /*	Documentation/netlink/specs/em.yaml */
- /* YNL-GEN uapi header */
-+/* To regenerate run: tools/net/ynl/ynl-regen.sh */
- 
- #ifndef _UAPI_LINUX_ENERGY_MODEL_H
- #define _UAPI_LINUX_ENERGY_MODEL_H
-diff --git a/kernel/power/em_netlink_autogen.h b/kernel/power/em_netlink_autogen.h
-index 78ce609641f1..140ab548103c 100644
---- a/kernel/power/em_netlink_autogen.h
-+++ b/kernel/power/em_netlink_autogen.h
-@@ -2,6 +2,7 @@
- /* Do not edit directly, auto-generated from: */
- /*	Documentation/netlink/specs/em.yaml */
- /* YNL-GEN kernel header */
-+/* To regenerate run: tools/net/ynl/ynl-regen.sh */
- 
- #ifndef _LINUX_EM_GEN_H
- #define _LINUX_EM_GEN_H
-diff --git a/kernel/power/em_netlink_autogen.c b/kernel/power/em_netlink_autogen.c
-index a7a09ab1d1c2..ceb3b2bb6ebe 100644
---- a/kernel/power/em_netlink_autogen.c
-+++ b/kernel/power/em_netlink_autogen.c
-@@ -2,6 +2,7 @@
- /* Do not edit directly, auto-generated from: */
- /*	Documentation/netlink/specs/em.yaml */
- /* YNL-GEN kernel source */
-+/* To regenerate run: tools/net/ynl/ynl-regen.sh */
- 
- #include <net/netlink.h>
- #include <net/genetlink.h>
+First patch fixes another theoretical issue, it's mostly a leftover
+from an attempt to get rid of the inet_frag_queue refcnt, which
+I gave up on (still think it's doable but a bit of a time sink).
+Second patch is a minor refactor.
+
+The real fix is in the third patch. It's the simplest fix I can
+think of which is to flush the frag queues. Perhaps someone has
+a better suggestion?
+
+Last patch adds an explicit warning for conntrack getting stuck,
+as this seems like something that can easily happen if bugs sneak in.
+The warning will hopefully save us the first 20% of the investigation
+effort.
+
+Link: https://lore.kernel.org/20251001082036.0fc51440@kernel.org # [1]
+
+Jakub Kicinski (4):
+  inet: frags: avoid theoretical race in ip_frag_reinit()
+  inet: frags: add inet_frag_queue_flush()
+  inet: frags: flush pending skbs in fqdir_pre_exit()
+  netfilter: conntrack: warn when cleanup is stuck
+
+ include/net/inet_frag.h           | 18 ++--------
+ include/net/ipv6_frag.h           |  9 +++--
+ net/ipv4/inet_fragment.c          | 55 ++++++++++++++++++++++++++++---
+ net/ipv4/ip_fragment.c            | 22 +++++--------
+ net/netfilter/nf_conntrack_core.c |  3 ++
+ 5 files changed, 72 insertions(+), 35 deletions(-)
+
 -- 
 2.52.0
 
