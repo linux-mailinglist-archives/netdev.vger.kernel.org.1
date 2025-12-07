@@ -1,104 +1,135 @@
-Return-Path: <netdev+bounces-243957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63E4DCAB884
-	for <lists+netdev@lfdr.de>; Sun, 07 Dec 2025 18:44:10 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF51CCAB893
+	for <lists+netdev@lfdr.de>; Sun, 07 Dec 2025 18:54:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 77B02302EA0C
-	for <lists+netdev@lfdr.de>; Sun,  7 Dec 2025 17:43:21 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 701B73000B42
+	for <lists+netdev@lfdr.de>; Sun,  7 Dec 2025 17:54:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 978D62DC764;
-	Sun,  7 Dec 2025 17:43:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55FF729BD91;
+	Sun,  7 Dec 2025 17:54:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W0kWgjAZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BljaGoi4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68B9B2DC762;
-	Sun,  7 Dec 2025 17:43:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A006226CE11
+	for <netdev@vger.kernel.org>; Sun,  7 Dec 2025 17:54:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765129400; cv=none; b=nd7gRpFgNbFW5Bo1o7m/N8So246EV2UYjxYmFJNZ631MjlPo1JyssyyKl+0G/PK81IfMSWfGuCyBevVWBUj6bLZzcfsgWiyQIehXdkkDfhnXIJFfAfsvIuCoLq12Ft+38w96X/n2xy+UhdJv41upT4TXiFfKOQcFbwafaXfviXQ=
+	t=1765130088; cv=none; b=P5Dd9EANpwhlE4h9urQEFCi8l0YvlH84JSKoez3py9aL0Zxi3SKqll68IUGIyYGLi0gQzy59zVJUp1gXAQhx6EikO91dfo9/LdtC19yIn3eXmWURcfwAagoB3H0+7CLY1qjSfTsoz/KUIjVpCKqnPJBYhX/ImSLZ0vXTC/GFHeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765129400; c=relaxed/simple;
-	bh=MZ60y8MSntpkIDRHsxrqQzjEI81i2XjEURJL5nc2Jzw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ItuM6C8aLkxZfyAEjbJtx2bHWTH4NkYInZqkzzWPy0NAwzA4kbgRwyrz0Em+z2MC4ue9bKiaEMFGwJxNZ+I04IkwwIuN9F806lwqkIyJnuA/vIEOcFHyA1QzJtDw3DSggPVGKzN58rI4Yb3lF/ckrh6iHcZlgsMdcSeoMlpne9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W0kWgjAZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD505C4CEFB;
-	Sun,  7 Dec 2025 17:43:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765129399;
-	bh=MZ60y8MSntpkIDRHsxrqQzjEI81i2XjEURJL5nc2Jzw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=W0kWgjAZYeFGLp1xCfzgCM53FomlFIyK2NVIwo8jbT0JCwT9gtbeHDzSjPGYsg5q4
-	 OQg9af/CjhcuWaa4YtKrCKEbSrNkWmv318lXlXwTeBvPp5DvPnt647KG3S/XEMcvlk
-	 yZQzzTaNKmWQMm7Qwq/hsm8j/OeJrSSv5EfE/zX7FCGc0hqqXaAzyk//k5rtImp3Z+
-	 r8OONHVqM6b/lAAUi0f/mc5XhghJmpClST0xRFJNiWhjCVwvqy3VNQcdgDCdGQPO0O
-	 SJXBxN7qSK3YnllZ/XdHCDTx1Str+MzLUnCElSzbKBmPnmjw7eWv41ZdzdsFf0i2+v
-	 VhcBWdwIHbl0A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 789193808200;
-	Sun,  7 Dec 2025 17:40:17 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1765130088; c=relaxed/simple;
+	bh=xEEJXAtJe9X78jWpOkYTohDMLvcrTYMEEta0VPdEvRg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OnKn1L+AwvT/IB/rguty0Eb3I0w8dUhGChGCR4L7G4XZJeIlkXt4ClFWGnt2Lar6QKvN+asN5sVEvBG7zoR5atMyryugTMlowZLtmBcC2pjcm5PfSV92ucd5faK6zeBZoAcRE0avHac/GrhhUe2gBA6vYezIcjUFS/++U27Z+rI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BljaGoi4; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4779ce2a624so47983485e9.2
+        for <netdev@vger.kernel.org>; Sun, 07 Dec 2025 09:54:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765130085; x=1765734885; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=K5IiwUn1lybKPFH6W/FiUkJ16zhV31T2po6Ml8pZU2I=;
+        b=BljaGoi4W9Ziqn7P+FY7IZO08qOiaQqQ9eLGil3TAEqYxP42PkSSSbl6+4SVm2/MmV
+         4mlsiGTeDJw0hPoo2KSGS9eXAO9rhVveHxeYFdCLuGhXY3Dtfc+1bhX3oubsLCgEWL2b
+         NxtTQAP3RPe5DXZljoB3GoinLOV+/NK4PaBWzPXQAyTAKVb/EvxVRx300uZUM4PVRB3F
+         MU4ZdJiRJTjdd2XP9J/jXO0qJDkXxjHtMA4RMlz72c1TXs4MKQ4vYFzGj274B+KD3y61
+         VnL6Hu9WjtRLKGzJ2X1Lny7hoXmHD780isGrRe/tzmcR+DtzWIhINoFlTij+9it2ncDB
+         U0eA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765130085; x=1765734885;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=K5IiwUn1lybKPFH6W/FiUkJ16zhV31T2po6Ml8pZU2I=;
+        b=PeHT7/KUeyV2LKpXe/4BqpiMLLMXrRP+vPbrQpkNcWh054QDiDeZUf61d2fO6wo0IB
+         DFkgXZp6BBRxL8DIaQrSNKoQ+L9PiPw9J4wJ1CZhLDyDacQV0Gc0dMlSeqCDBddlXko5
+         gy3xfU/wJWPuaZ66QrJCS4QyY5bfP7LcWKB87Nyn1FOojqLbbeebkxL9G8jR1hJXZnwH
+         mXW6qXfHBUXuBltAPU7NBaU7oZnd7EVJ6fwE0v84uwSsB0ZXjav661GU5IaYbTQOUiqS
+         1bwArBWAQDrXPBu3tu7CekGxmPWPDkY2XGM2qOu/PzhNpbCdlWMKfbjRQF4A5iCpnlAk
+         bNGg==
+X-Gm-Message-State: AOJu0Yy6kuSOddVM53eEyWF6LPaJKkPxutT9BbBQbicOFK5iyJoMhpWU
+	QnB+66a1R+FQ4UTcoLmSXogAuFzdp4zmmlW+NW4psrLyFPP3AixvSQjK
+X-Gm-Gg: ASbGncuIjH8FWsa24Y7LtKgcN7MoopqweRRDKQqrWJSP+AVoqYUenuzQSXU1p0SYjQm
+	4CmzdNMfnF1Q3XHcGgt8ItqtZ82IfDa6m8urFBXjNhQxlMC8UGnFNsnizwLTrZ5izsXS+2Wiz/n
+	ca3Z4XWQwSmFMjWAaZlDLJexHL2go1h3Nk4ET5Taed/jpUs05Nr9YAqBKG2y9ydTzTN70DxCgoO
+	bjyWyCXRnbCbahdnZb5f8mwfK4UyOYOH8bmOFcxY0PtV55RXfc1qjJw+CeSYA25sF423I6pJ6TK
+	mfibbmaEHlS6rfvkateynyrHxEb3bzGOnYthQr/DbAI8H4mWiiHgZas3oCpzIaT/5yOTKF2pPtV
+	C6L1oFGjY7VDAsQdBWlw0xjpL94rZpEeyiCYyHWSQHVuILdyayCMs8YX5dV4y3+EuUPlht3PaN1
+	YxmA2LZpS71u+kD7Bl/wUCKMJhgdLIKIrUHMJ6hSxhfJ5/Hq8jI8oq
+X-Google-Smtp-Source: AGHT+IHrv/hYUGxZMSSlurgo3lnaMNnCuyfLox3seq/JtZU3yrNnPnKqh/Rvzl2ya/Ag+0t1XekUDA==
+X-Received: by 2002:a05:6000:2287:b0:42b:32f5:ad18 with SMTP id ffacd0b85a97d-42f89f0944cmr5066391f8f.9.1765130084697;
+        Sun, 07 Dec 2025 09:54:44 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42f7d331a4fsm23321131f8f.33.2025.12.07.09.54.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 07 Dec 2025 09:54:44 -0800 (PST)
+Date: Sun, 7 Dec 2025 17:54:42 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Syed Tayyab Farooq <syedtayyabfarooq08@gmail.com>
+Cc: netdev@vger.kernel.org,
+ syzbot+0e665e4b99cb925286a0@syzkaller.appspotmail.com, Syed Tayyab Farooq
+ <tayyabfarooq1997@outlook.com>
+Subject: Re: [PATCH] memset skb to zero to avoid uninit value error from
+ KMSAN
+Message-ID: <20251207175442.7d5ea387@pumpkin>
+In-Reply-To: <20251207162109.113159-1-tayyabfarooq1997@outlook.com>
+References: <20251207162109.113159-1-tayyabfarooq1997@outlook.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2-next v3 0/7] iplink_can: add CAN XL support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176512921602.2492763.3355041482753934530.git-patchwork-notify@kernel.org>
-Date: Sun, 07 Dec 2025 17:40:16 +0000
-References: <20251203-canxl-netlink-v3-0-999f38fae8c2@kernel.org>
-In-Reply-To: <20251203-canxl-netlink-v3-0-999f38fae8c2@kernel.org>
-To: Vincent Mailhol <mailhol@kernel.org>
-Cc: netdev@vger.kernel.org, stephen@networkplumber.org, mkl@pengutronix.de,
- socketcan@hartkopp.net, dsahern@kernel.org, rakuram.e96@gmail.com,
- stephane.grosjean@free.fr, linux-kernel@vger.kernel.org,
- linux-can@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Mon,  8 Dec 2025 00:20:52 +0800
+Syed Tayyab Farooq <syedtayyabfarooq08@gmail.com> wrote:
 
-This series was applied to iproute2/iproute2.git (main)
-by Stephen Hemminger <stephen@networkplumber.org>:
-
-On Wed, 03 Dec 2025 19:24:27 +0100 you wrote:
-> Support for CAN XL was added to the kernel in [1]. This series is the
-> iproute2 counterpart.
+> Signed-off-by: Syed Tayyab Farooq <tayyabfarooq1997@outlook.com>
+> ---
 > 
-> Patches #1 to #3 are clean-ups. They refactor iplink_can's
-> print_usage()'s function.
+> Hi syzbot,
 > 
-> Patches #4 to #7 add the CAN XL interface to iplink_can.
+> Please test this patch.
 > 
-> [...]
+> #syz test: https://syzkaller.appspot.com/bug?extid=0e665e4b99cb925286a0
+> 
+> Thanks,
+> Tayyab
+> 
+> 
+>  net/phonet/af_phonet.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/net/phonet/af_phonet.c b/net/phonet/af_phonet.c
+> index a27efa4faa4e..9279decd680b 100644
+> --- a/net/phonet/af_phonet.c
+> +++ b/net/phonet/af_phonet.c
+> @@ -208,6 +208,8 @@ static int pn_raw_send(const void *data, int len, struct net_device *dev,
+>  	if (skb == NULL)
+>  		return -ENOMEM;
+>  
+> +	memset(skb, 0, MAX_PHONET_HEADER + len);
 
-Here is the summary with links:
-  - [iproute2-next,v3,1/7] iplink_can: print_usage: fix the text indentation
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=cf9261af2303
-  - [iproute2-next,v3,2/7] iplink_can: print_usage: change unit for minimum time quanta to mtq
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=416cd0814482
-  - [iproute2-next,v3,3/7] iplink_can: print_usage: describe the CAN bittiming units
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=393dfbb456df
-  - [iproute2-next,v3,4/7] iplink_can: add RESTRICTED operation mode support
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=ab224334322c
-  - [iproute2-next,v3,5/7] iplink_can: add initial CAN XL support
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=a52858b06f1a
-  - [iproute2-next,v3,6/7] iplink_can: add CAN XL transceiver mode setting (TMS) support
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=fea1a11ec3ee
-  - [iproute2-next,v3,7/7] iplink_can: add CAN XL TMS PWM configuration support
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=24a5a424e3a0
+That looks entirely broken.
+Did you try running it?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+	David
 
+
+> +
+>  	if (phonet_address_lookup(dev_net(dev), pn_addr(dst)) == 0)
+>  		skb->pkt_type = PACKET_LOOPBACK;
+>  
 
 
