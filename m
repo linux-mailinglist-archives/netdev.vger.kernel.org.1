@@ -1,179 +1,155 @@
-Return-Path: <netdev+bounces-243992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2953CACE66
-	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 11:39:06 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79E39CACE93
+	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 11:47:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 959D03047457
-	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 10:38:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A444F303DD14
+	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 10:47:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C3C02DF155;
-	Mon,  8 Dec 2025 10:38:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AC782D24B7;
+	Mon,  8 Dec 2025 10:47:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="Qx7NuJ69"
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="qUIvIm5W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51F2C2F6915
-	for <netdev@vger.kernel.org>; Mon,  8 Dec 2025 10:38:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1335F23183B;
+	Mon,  8 Dec 2025 10:47:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765190291; cv=none; b=IO00xwp3oYxfpGluZWdFQseZ/p8SnVU6AQg+w1Q4bhlponBr+YGCudlyjwtkG3bg7G38G/27mPxj8/OA6KVHB3PDr4/TB8Nu84q64DyqZZxZFx5w48UBeKERLJpYbxwEZmCOfIsXJ4siJUMyyf0E0KMDN4ZZOTXh7atvelUfybI=
+	t=1765190858; cv=none; b=SSwGNvo4k5qvQ25qkaoWZ+kPeiNo71/MpUw+vmr2875Yd+Y0+NxO10VqNZ/20QeY+zdvi29eacFPiAj2OneKx7+rMhqJWTUZUA+9E+UFGl1dIkzjds2KzjoYXTcwCwS3tGx9Oq/abmuDbQsPXPQE3pRNK3rIFK/hzGqmEcCst0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765190291; c=relaxed/simple;
-	bh=veqoeCg7pVkorIg9OECr4gZHueRPK5IwXUab5L1yh0s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UxAvNRjhfrgXjfs7cOmzmOm+Ut2ZniekRe+745/Q19dTugZQJ2Tl0aX3WosIhwZshM+aNmNxOCjPO6SfgMv8/gHeqaeV6KdldTrKgdXzwsSAe7oBdkJPf5sXDJxenHHtnSMNeyBv5Tic/SbBvUqOMabpYYmyXBbVPg8vlUQcgio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=Qx7NuJ69; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-6492e7891d2so1298413a12.2
-        for <netdev@vger.kernel.org>; Mon, 08 Dec 2025 02:38:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1765190286; x=1765795086; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=mji8B84md8nQtZ3oth8B3djhu6SmcjWH/vP4wK2iA2U=;
-        b=Qx7NuJ6972DL2ZAJWf+m1dWQKGDyHpgHf+h/RiTBcX0l/sw5bs0MsCJPo4dYj54oNQ
-         XLvhFLL7+iBx+EZgQTuVry9Dj8q0+OyEC76APg0QpQvMIuNdlI5M/1M5d8L/eudP8qXl
-         xzRQqH67kf/MHCR6uB9q1ontoChQXoXUWhiPCEIsbYlVD1EstwIkIfq8oW6k6mxkEkus
-         5ZhEQmfpAVgrpOzsbqfRmbua1ccFTF7inMjfTBuJ8B693DKxG9H3+JRBBALhoQfLmmSK
-         Si8tQpekRjNhkHIVio3cU+vkWto1cDvOkEuNA2GphXf2Idk+pkUTJscYT0zK5aP6lRdy
-         SJrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765190286; x=1765795086;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mji8B84md8nQtZ3oth8B3djhu6SmcjWH/vP4wK2iA2U=;
-        b=aquPnVI/End6uIYh0YtcY4gU5X+7qqs68OoLgB5LdmyDYvTMHTUqaig+JEqx93iAC6
-         joOY+miqsCMI9VBJ0wl6IQfqQMRqe3I5p7JpvIuxAYiNSuuehkeZCce0chVfggReWQsd
-         wzc8DTw5sYwRb4DWGg2NZSX7uxGCTgTz0HylacF+OJGThqIzvISD6rYbm0ZH3dnka69r
-         cJn14uZ0ad8fFOS9tSNag3dxdxJh3sME4Q+OYvO0kXHPU2U1pLv5lUtbz4zlF9sKMcLO
-         fmEwVvx0MnLw2QWcLTpzRUqPfn3r0uHNsemdZ9lCZqQTQWR1+FtuHqfORtX5PM4S3uYF
-         pcmg==
-X-Forwarded-Encrypted: i=1; AJvYcCX8/3GhU+bvYFNpSWErUIK0iuMJFkmB+7sDLujUN3aSKDDc/z7DzilYMBmYu1GXcQ4zDhXbc9Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yww1DVcB/SsCdXYkbbcYrubL9uYHMcJvuFUR8HeREy6J5cahojJ
-	vJndkWO0TtxZ7Sm46SNZxNs/Hz6zrpH7y3MqAxiHRQbeWch4pIXs7anKK89M5xLvu4IjCNR8BlC
-	Kw+GZGMcIZeyhoK1WP//H6OXW1HXbzB+0S59NcPuIFw==
-X-Gm-Gg: ASbGncspn+j2b5HY4RpSSeQKiu4Sb1qdepUScTIcE7dBkbE3ggKFcLXma4EpIxNRwXW
-	5JctDLA5jtCbbw+Dtkofoubu5o9kdERyQHvdoN+zgwtSf7dSsTh/m/lDu5ELk08JLJHZDcZNoKa
-	ykSPxyVBNwATR27cBTxIvRHVNDxkZFP9vlDIJjunFV0XlIbsZJEi67ZweOAqvJL8RzG+O+ObMog
-	k201CmdLfrpIE6PuuQuDc//lQTTjrnooMwM2HaqYEGcVQpRgdNsqoBq8Y5Qa0xjXMGK57fmPcv+
-	V4wMPDLsvABQBQ==
-X-Google-Smtp-Source: AGHT+IGxwvSUGmJHPUxT24x5fgUZGSwKKUkn5y3lOfJpm21ddF9v4ZhjA7/iaoybt5YY+uNYMcEqFB7V2eYmkQDhn0c=
-X-Received: by 2002:a05:6402:518b:b0:641:3492:723d with SMTP id
- 4fb4d7f45d1cf-6491a3f1ca9mr5638006a12.11.1765190284264; Mon, 08 Dec 2025
- 02:38:04 -0800 (PST)
+	s=arc-20240116; t=1765190858; c=relaxed/simple;
+	bh=WzbXPEAcQPTmLJy41cM0M99eeBpuSZa2bekf2ctOUAY=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=mam1GBRgFcCSVNTSwfh0YwgvGsl/HMt2C176eJwonNN69RUQuibvYX9jA1odpwNcXqnfwVW+oIVHE28b8r74B1lJh0w9DoGe/JjBUNb/2kIw5nywjDpYXWiiHI4xyDTv/2zNX8d0bu4ZW/gbrHs8xMjQ59Lgr8+ptvWfAVTM8t0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=qUIvIm5W; arc=none smtp.client-ip=80.241.56.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+Received: from smtp1.mailbox.org (smtp1.mailbox.org [10.196.197.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4dPzFv3jPyz9tS3;
+	Mon,  8 Dec 2025 11:47:31 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1765190851; h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ikrPw0q82LvUmD4VSYFk9Xq5eibrnKKXcb1J19zdzkY=;
+	b=qUIvIm5WcatFrSOOLbrNh831FMBEzblAlXdzV8nb9MumI3Hhy/e8UruBkoqUkQRmokRP50
+	21ZKojCz5pDpXqopDsdLwauWGgK2usp6ZWNPu2RWuexvmXVkoiNrI3ivxFj/KP+eie1hhE
+	ujyNVkV81coJiZHcCQ4RmuCGd95Ch2mxBFbcB1M+UsL0ZzLGEtjpArnlepmbUdAd4YdL8c
+	9JSjP5g4CYBDD/XlFd2tb7iKEpQIK1q8jKVxVERbmIG6h0VtuiXM2HVfedjFoQWdN2xPJ3
+	lAQ7NrHpyyL4fIM5L1oyh1UqF58vLQ8qhkWHJZ7yEcC4RSDGdX8G2xJiPtFzGA==
+Message-ID: <7e024db2557a4d5822a0dd409ae678d10d815d9c.camel@mailbox.org>
+Subject: Re: [PATCH net-next v3 2/3] net: stmmac: Add glue driver for
+ Motorcomm YT6801 ethernet controller
+From: Philipp Stanner <phasta@mailbox.org>
+Reply-To: phasta@kernel.org
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>, phasta@kernel.org
+Cc: Bjorn Helgaas <helgaas@kernel.org>, Thomas Gleixner
+ <tglx@linutronix.de>,  Yao Zi <ziyao@disroot.org>, Bjorn Helgaas
+ <bhelgaas@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Frank
+ <Frank.Sae@motor-comm.com>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, Choong Yong Liang
+ <yong.liang.choong@linux.intel.com>, Chen-Yu Tsai <wens@csie.org>, Jisheng
+ Zhang <jszhang@kernel.org>, Furong Xu <0x1207@gmail.com>, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Mingcong Bai
+ <jeffbai@aosc.io>, Kexy Biscuit <kexybiscuit@aosc.io>, Runhua He
+ <hua@aosc.io>,  Xi Ruoyao <xry111@xry111.site>
+Date: Mon, 08 Dec 2025 11:47:23 +0100
+In-Reply-To: <aTalXy_85pvLraIy@shell.armlinux.org.uk>
+References: <20251205221629.GA3294018@bhelgaas>
+	 <27fec7d0ed633218a7787be3edce63c3038c63e2.camel@mailbox.org>
+	 <aTalXy_85pvLraIy@shell.armlinux.org.uk>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <176424680115.194326.6611149743733067162.stgit@firesoul>
- <176424683595.194326.16910514346485415528.stgit@firesoul> <aShi608hEPxDLvsr@strlen.de>
- <c38966ab-4a3c-4a72-a3c1-5c0301408609@kernel.org>
-In-Reply-To: <c38966ab-4a3c-4a72-a3c1-5c0301408609@kernel.org>
-From: Nick Wood <nwood@cloudflare.com>
-Date: Mon, 8 Dec 2025 10:37:48 +0000
-X-Gm-Features: AQt7F2rlo4k5DLNhf8oqS3gglGN7Mr-5s6gZckXxXt0yQO5Qc7Cgj73Tf-EJfGI
-Message-ID: <CACrpuLQGj70xCi8wDH4HeKzkA=d-9+eOYkkQ47M2Tw8MA65kzQ@mail.gmail.com>
-Subject: Re: [PATCH nf-next RFC 1/3] xt_statistic: taking GRO/GSO into account
- for nth-match
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Florian Westphal <fw@strlen.de>, netfilter-devel@vger.kernel.org, 
-	Pablo Neira Ayuso <pablo@netfilter.org>, netdev@vger.kernel.org, phil@nwl.cc, 
-	Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, kernel-team@cloudflare.com, 
-	mfleming@cloudflare.com, matt@readmodwrite.com, aforster@cloudflare.com
-Content-Type: text/plain; charset="UTF-8"
+X-MBO-RS-ID: 1c50ea5d21e4466c377
+X-MBO-RS-META: jc8gdnan86sbupzmxwfst4jquqm7a3k7
 
-On Fri, 5 Dec 2025 at 16:23, Jesper Dangaard Brouer <hawk@kernel.org> wrote:
+On Mon, 2025-12-08 at 10:15 +0000, Russell King (Oracle) wrote:
+> On Mon, Dec 08, 2025 at 10:54:36AM +0100, Philipp Stanner wrote:
+> > The bad news is that it's not super trivial to remove. I looked into it
+> > about two times and decided I can't invest that time currently. You
+> > need to go over all drivers again to see who uses pcim_enable_device(),
+> > then add free_irq_vecs() for them all and so on=E2=80=A6
+>=20
+> So that I can confirm, you're saying that all drivers that call
+> pci_alloc_irq_vectors() should call pci_free_irq_vectors() in their
+> ->remove() method and not rely on the devres behaviour that
+> pcim_enable_device() will permit.
 
-> > So the existing algorithm works correctly even when considering
-> > aggregation because on average the correct amount of segments gets
-> > matched (logged).
-> >
->
-> No, this is where the "on average" assumption fails.  Packets with many
-> segments gets statistically under-represented. As far as I'm told people
-> noticed that the bandwidth estimate based on sampled packets were too
-> far off (from other correlating stats like interface stats).
+"permit" is kind of a generous word. This behavior is dangerous and
+there were bugs because of that in the past, because it confused
+programmers. See:
 
-On-average is technically correct here; the issue is more subtle than
-simple undercounting. To understand, consider a 50pps flow (without
-GRO/GSO) with a sampling rate of 1/100. With 1 in k sampling we take a
-sample every other second, and to estimate total flow we multiply by
-the sample rate so we get a sawtooth looking wave that alternates
-between 100pps and 0 every second. This is not 'correct', it's an
-estimate as we'd expect, the absolute error here alternates between
-+/-50 with the same frequency.
-
-Now let's encapsulate these 50pps in a single GSO packet every second,
-with 1-in-k is sampling on an all or nothing basis. For 99 seconds out
-of every hundred we sample no packets -this is the under-sampling
-you're referencing. But, for 1 second in 100 we sample the whole
-GRO/GSO, and capture 50 samples. Causing our pps estimate for that
-instant spikes to 5,000pps - so for an instant our absolute error
-spikes by 2 orders of magnitude ('true' pps is 50 remember).
-
-If you average the single spike into the 99 seconds of undersampling,
-the figures do 'average out', but for very short flows this
-amplification of error makes it impossible to accurately estimate the
-true packet rate.
->
-> I'm told (Cc Nick Wood) the statistically correct way with --probability
-> setting would be doing a Bernoulli trial[1] or a "binomial experiment".
->   This is how our userspace code (that gets all GRO/GSO packets) does
-> statistical sampling based on the number of segments (to get the correct
-> statistical probability):
->
-> The Rust code does this:
->   let probability = 1.0 / sample_interval as f64;
->   let adjusted_probability = nr_packets * probability * (1.0 -
-> probability).powf(nr_packets - 1.0);
->
->   [1] https://en.wikipedia.org/wiki/Bernoulli_trial
->
-> We could (also) update the kernel code for --probability to do this, but
-> as you can see the Rust code uses floating point calculations.
->
-> It was easier to change the nth code (and easier for me to reason about)
-> than dealing with converting the the formula to use an integer
-> approximation (given we don't have floating point calc in kernel).
-
-with s = integer sample rate (i.e s=100 if we're sampling 1/100)
-and n = nr_packets:
-
-sample_threshold = [ 2**32 //s //s ] * [n*(s - (n-1))] ;
-
-if get_random_u32 < sample_threshold {
-    sample_single_subpacket
-}*
-
-Is an equivalent integer calculation for a Bernoulli trial treatment.
-It undersamples by about 1 in 1/100k for s=100 and n=50 which is good
-enough for most purposes. Error is smaller for smaller n. For smaller
-s it may warrant an additional (cubic) term in n
-*I'm a mathematician, not a kernel developer
+f00059b4c1b0 drm/vboxvideo: fix mapping leaks
 
 
-> > With this proposed new algo, we can now match 100% of skbs / aggregated
-> > segments, even for something like '--every 10'.  And that seems fishy to
-> > me.
-> >
-> > As far as I understood its only 'more correct' in your case because the
-> > logging backend picks one individual segment out from the NFLOG'd
-> > superpacket.
-> >
-> > But if it would NOT do that, then you now sample (almost) all segments
-> > seen on wire.  Did I misunderstand something here?
->
-> See above explanation about Bernoulli trial[1].
->
-> --Jesper
->
+pcim_enable_device() used to switch all sorts of functions into managed
+mode. As far as I could figure out through git, back in 2009 it was
+intended that ALL pci functions are switched into managed mode that
+way. That's also how it was documented.
+
+The ecosystem then fractured, however. Some functions were always
+managed (pcim_), some never, and some sometimes.
+
+I removed all "sometimes managed" functions since 2024. The last
+remainder is MSI.
+
+If we want to remove that, we need to:
+   1. Find all drivers that rely on pci_free_irq_vectors() being run
+      automatically. IOW those that use pcim_enable_device() + wrappers
+      around pci_setup_msi_context().
+   2. Port those drivers to do the free_irq_vecs manually, if it's not
+      a problem if it's called twice. If that were a problem, those
+      drivers would also need to replace pcim_enable_device() with
+      pci_enable_device().
+   3. Once all drivers are ported, remove the devres code from msi.c
+   4. Do associated cleanup work in PCI.
+
+>=20
+> In terms of whether it's safe to call this twice, pci_free_irq_vectors()
+> calls pci_disable_msix() and pci_disable_msi().
+>=20
+> pci_disable_msix() checks:
+>=20
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!pci_msi_enabled() || !dev=
+ || !dev->msix_enabled)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 return;
+>=20
+> which will set dev->msix_enabled to 0 via pci_msix_shutdown().
+>=20
+> pci_disable_msi() does a similar check:
+>=20
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!pci_msi_enabled() || !dev=
+ || !dev->msi_enabled)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 return;
+>=20
+> and similarly pci_msi_shutdown() sets dev->msi_enabled to 0.
+>=20
+> So my conclusion is it's safe to call pci_free_irq_vectors() twice for
+> the same device.
+>=20
+
+Hm. Looks good.
+
+
+P.
 
