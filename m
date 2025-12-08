@@ -1,160 +1,199 @@
-Return-Path: <netdev+bounces-243999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F20FCACF60
-	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 12:11:43 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82B5BCACFA3
+	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 12:21:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5E5D33033681
-	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 11:11:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BC618304248F
+	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 11:21:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A9DC30FC26;
-	Mon,  8 Dec 2025 11:11:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="TpMAM5IR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13E1231327A;
+	Mon,  8 Dec 2025 11:21:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f205.google.com (mail-oi1-f205.google.com [209.85.167.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C49F829B8E0;
-	Mon,  8 Dec 2025 11:11:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3745886277
+	for <netdev@vger.kernel.org>; Mon,  8 Dec 2025 11:21:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765192299; cv=none; b=cw8mkvONWClc0JvqkIYmT2gg8kV3QJiNHs9eNmkBx1uuv4DGN1Nwa0J7s3SYZTUsBfKQIIuSiNNnAiuHm6A7Mg2cScSvV6zeEAsi6Xi9wiPn/xfrtNGgkNeRuENvkvQborqjaAp3xruZB9sTTKvt/DootcQFViC0MAwUHEEZjHc=
+	t=1765192887; cv=none; b=ohVtE6MgLGaf/bg4LyhLk+kIVUfJCe57TRsYuoVipN3Kzd8zfqyEWWc8VALuaRG2O9pHb5aQ/GStKR5Ua9iXaJsIN59F0D6GV1PzJPY6BxLdIs7TdsveARNXgoxccoyglZ1wIQhiHsgDUTUkCeyDwPmhuRbHc+4kxCOojv5vQWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765192299; c=relaxed/simple;
-	bh=cAOFMLZtlWzWNVHgoq9j0kKv5kLNN9Pud2AYSf1LPX0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VsXBaPM3gfa6f4cRW1LvSfhlc3O1Dmq1+amTUlrA8ssyiNxXM8JHLKozZxJNUT5ygRExrvclfV3k1nM562Z3XUMhJkiP8X9KqTXhVPXoxVxsUuIMaFRxOqG3zvEUxu/N4Pf+8WUMR7RfYMFtkGBYr5/Zyn9tcpVlMrHklHhDWrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=TpMAM5IR; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=axT8z7YgLiqlRNGL8DP15zzMN8+hVawuLiVTX/OxMiM=; b=TpMAM5IRCqW8oz5CIlMHHFPKf2
-	ebqn29dJEPwmk4p0EfzkL9SIKkKP6VKTGm7Gj0VWqhBD1r3LWMHM3oY3VObRZaZZ8ISmCea903Qb8
-	XdkTuLlCWFUNMUN9UCAy8VtMIWHtpMP06rznOVofuJI/iU2knGaUilUdnx89d053Xh9NeZYSf1FP+
-	ZXf0nPbo3umEQhDgDcNaLztKyAAn+vEd5Wm2uFvr3xjglBt9zEbPIosbGGsCI9ytjRBZCpB7Dl7zI
-	YUkFoGbxcW8nGH6VA0KTQ47iWIufMwGEM6ekYWj5WqCVAijUWp6Bg73q8TxZSp0oWuu7PUtz1nqz7
-	YcbIxh5g==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50284)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vSZ9J-000000007fl-1nD8;
-	Mon, 08 Dec 2025 11:11:25 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vSZ9E-000000004yv-3jQ9;
-	Mon, 08 Dec 2025 11:11:20 +0000
-Date: Mon, 8 Dec 2025 11:11:20 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Yao Zi <ziyao@disroot.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Frank <Frank.Sae@motor-comm.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
-	Chen-Yu Tsai <wens@csie.org>, Jisheng Zhang <jszhang@kernel.org>,
-	Furong Xu <0x1207@gmail.com>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Mingcong Bai <jeffbai@aosc.io>,
-	Kexy Biscuit <kexybiscuit@aosc.io>, Runhua He <hua@aosc.io>,
-	Xi Ruoyao <xry111@xry111.site>
-Subject: Re: [PATCH net-next v3 2/3] net: stmmac: Add glue driver for
- Motorcomm YT6801 ethernet controller
-Message-ID: <aTayWGy5LOOITFHH@shell.armlinux.org.uk>
-References: <20251124163211.54994-1-ziyao@disroot.org>
- <20251124163211.54994-3-ziyao@disroot.org>
- <aSSspDCPM_5-l24a@shell.armlinux.org.uk>
- <aTJuNk4zF8CLtt9S@pie>
+	s=arc-20240116; t=1765192887; c=relaxed/simple;
+	bh=/aFtt90Az4pmsZ8iGym0ES0kZyqG19+Un08bBTYx2e0=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=rS+qC5dhM0hHMnpK2dvxbfiHAXE+bm/xx5+ZeUTCjbPZNxtXZkI7OaEZ4oIMtHSrdgKnc/POlQIlu87pLQ6eUnp0fTXPMC8S8TS9X2b1HOzPtLJeRB9QZhSyeU3dzsAnEgax8jt7GjCOZ1vTgyF6+o65cNsgSThObJDNCOGKouo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oi1-f205.google.com with SMTP id 5614622812f47-450b5afd932so2740377b6e.2
+        for <netdev@vger.kernel.org>; Mon, 08 Dec 2025 03:21:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765192884; x=1765797684;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tEYM2xG6zvxNmktooPVFzI3lRUI4aVQvufBVk+XlwKY=;
+        b=TMm5XaR2rLQbXkx1BLtXrRsnN5/9n81R/09MdAbEZz8fNPO5xlnRahYfu/4ujaYzwQ
+         5itcHBAKkf+Vj4Pp9LO6Pf41ne9ewUDk/KvaiZUdhjwqTmhvbuZr2yJLF60Zq44PRzq6
+         FfQGfcJL6PqkjkhRAZwtAfno9lMlWyOt9wo3qWGcXamTCxnWyKGdiQowJ5yL0cGhXnY5
+         hwKVURvMX3f1Cwgat6+x1a8Kc2Lgm2uTBq33oEmrbezSU0yi4dqrbvit4dP6gbbpLaWe
+         67uP5dJu8TsVemP/1dVWBWtj9ldZm+4CFKjY6i65FfJp/2dqkZ3OoBMe4DJ+HKLiATtX
+         e7Sg==
+X-Forwarded-Encrypted: i=1; AJvYcCUV0AHejcGm8Lnqc5kh3r13hicjqrXuHNOt0+WQLqRUpFxXabAGJxwC7Lhukt7HK5HeT5cj0CU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyKMGsfseNPUXo1QARunVEhbHnWZgdmAgZRl0i/OYPMmicZeqjT
+	5FOlL9ZU55chorXzKV5BGJySJEVGwx3B5LOeUYVhWBSqn2XH767xjDjKQWeWyTYMOqvQLeUEjqt
+	NZD55mFyC2W4J+GXkf12GaW/T1kXiYbE0deC+WtWgM5EAe18RQWodBpgDuSA=
+X-Google-Smtp-Source: AGHT+IHRm3ejNmfcW4LHNiAooQdI9hhnzIDedTnijxOW9l7hRpYkRtK1l5LXbaM2iTGlLgIpVC9FznyzKCfC/E6RHGE87LKdtgil
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aTJuNk4zF8CLtt9S@pie>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Received: by 2002:a05:6820:823:b0:659:9a49:8ddb with SMTP id
+ 006d021491bc7-6599a8e9e58mr3333218eaf.29.1765192884397; Mon, 08 Dec 2025
+ 03:21:24 -0800 (PST)
+Date: Mon, 08 Dec 2025 03:21:24 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6936b4b4.a70a0220.38f243.00a2.GAE@google.com>
+Subject: [syzbot] [net?] [virt?] BUG: sleeping function called from invalid
+ context in __bpf_stream_push_str
+From: syzbot <syzbot+b1546ad4a95331b2101e@syzkaller.appspotmail.com>
+To: ast@kernel.org, bpf@vger.kernel.org, davem@davemloft.net, 
+	edumazet@google.com, horms@kernel.org, houtao1@huawei.com, jkangas@redhat.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, martin.lau@kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, sgarzare@redhat.com, 
+	syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev, 
+	wangfushuai@baidu.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Dec 05, 2025 at 05:31:34AM +0000, Yao Zi wrote:
-> Hi Russell,
-> 
-> Sorry for the late reply,
-> 
-> On Mon, Nov 24, 2025 at 07:06:12PM +0000, Russell King (Oracle) wrote:
-> > On Mon, Nov 24, 2025 at 04:32:10PM +0000, Yao Zi wrote:
-> > > +static int motorcomm_setup_irq(struct pci_dev *pdev,
-> > > +			       struct stmmac_resources *res,
-> > > +			       struct plat_stmmacenet_data *plat)
-> > > +{
-> > > +	int ret;
-> > > +
-> > > +	ret = pci_alloc_irq_vectors(pdev, 6, 6, PCI_IRQ_MSIX);
-> > > +	if (ret > 0) {
-> > > +		res->rx_irq[0]	= pci_irq_vector(pdev, 0);
-> > > +		res->tx_irq[0]	= pci_irq_vector(pdev, 4);
-> > > +		res->irq	= pci_irq_vector(pdev, 5);
-> > > +
-> > > +		plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
-> > > +
-> > > +		return 0;
-> > > +	}
-> > > +
-> > > +	dev_info(&pdev->dev, "failed to allocate MSI-X vector: %d\n", ret);
-> > > +	dev_info(&pdev->dev, "try MSI instead\n");
-> > > +
-> > > +	ret = pci_alloc_irq_vectors(pdev, 1, 1, PCI_IRQ_MSI);
-> > > +	if (ret < 0)
-> > > +		return dev_err_probe(&pdev->dev, ret,
-> > > +				     "failed to allocate MSI\n");
-> > > +
-> > > +	res->irq = pci_irq_vector(pdev, 0);
-> > > +
-> > > +	return 0;
-> > > +}
-> > > +
-> > > +static int motorcomm_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-> > > +{
-> > ...
-> > > +	ret = motorcomm_setup_irq(pdev, &res, plat);
-> > > +	if (ret)
-> > > +		return dev_err_probe(&pdev->dev, ret, "failed to setup IRQ\n");
-> > > +
-> > > +	motorcomm_init(priv);
-> > > +
-> > > +	res.addr = priv->base + GMAC_OFFSET;
-> > > +
-> > > +	return stmmac_dvr_probe(&pdev->dev, plat, &res);
-> > 
-> > If stmmac_dvr_probe() fails, then it will return an error code. This
-> > leaves the PCI MSI interrupt allocated...
-> 
-> This isn't true. MSI API is a little magical: when the device is enabled
-> through pcim_enable_device(), the device becomes devres-managed, and
-> a plain call to pci_alloc_irq_vectors() becomes managed, too, even if
-> its name doesn't indicate it's a devres-managed API.
-> 
-> pci_free_irq_vectors() will be automatically called on driver deattach.
-> See pcim_setup_msi_release() in drivers/pci/msi/msi.c, which is invoked
-> by pci_alloc_irq_vectors() internally.
+Hello,
 
-As discussed in the sub-thread with Philipp Stanner, please explicitly
-call pci_alloc_irq_vectors() in the cleanup path to avoid adding to
-the burden of drivers that need to be fixed allow this "magical"
-behaviour to be removed in the future.
+syzbot found the following issue on:
 
-Thanks.
+HEAD commit:    559e608c4655 Merge tag 'ntfs3_for_6.19' of https://github...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=164fdcc2580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=74c2ec4187efdce
+dashboard link: https://syzkaller.appspot.com/bug?extid=b1546ad4a95331b2101e
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1446301a580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=112c3f42580000
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/7d28798cb263/disk-559e608c.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/239e800627b8/vmlinux-559e608c.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/e89da2cc9887/bzImage-559e608c.xz
+
+The issue was bisected to:
+
+commit 0db4941d9dae159d887e7e2eac7e54e60c3aac87
+Author: Fushuai Wang <wangfushuai@baidu.com>
+Date:   Tue Oct 7 07:40:11 2025 +0000
+
+    bpf: Use rcu_read_lock_dont_migrate in bpf_sk_storage.c
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10cd3c1a580000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=12cd3c1a580000
+console output: https://syzkaller.appspot.com/x/log.txt?x=14cd3c1a580000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+b1546ad4a95331b2101e@syzkaller.appspotmail.com
+Fixes: 0db4941d9dae ("bpf: Use rcu_read_lock_dont_migrate in bpf_sk_storage.c")
+
+BUG: sleeping function called from invalid context at kernel/locking/spinlock_rt.c:48
+in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 6128, name: syz.3.73
+preempt_count: 2, expected: 0
+RCU nest depth: 1, expected: 1
+3 locks held by syz.3.73/6128:
+ #0: ffff8880493da398 (sk_lock-AF_VSOCK){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1700 [inline]
+ #0: ffff8880493da398 (sk_lock-AF_VSOCK){+.+.}-{0:0}, at: vsock_connect+0x152/0xd40 net/vmw_vsock/af_vsock.c:1546
+ #1: ffffffff8d5aeba0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
+ #1: ffffffff8d5aeba0 (rcu_read_lock){....}-{1:3}, at: rcu_read_lock include/linux/rcupdate.h:867 [inline]
+ #1: ffffffff8d5aeba0 (rcu_read_lock){....}-{1:3}, at: __bpf_trace_run kernel/trace/bpf_trace.c:2074 [inline]
+ #1: ffffffff8d5aeba0 (rcu_read_lock){....}-{1:3}, at: bpf_trace_run9+0x1ec/0x510 kernel/trace/bpf_trace.c:2123
+ #2: ffff8880b893fd48 (&s->lock_key#14){+.+.}-{3:3}, at: spin_lock include/linux/spinlock_rt.h:44 [inline]
+ #2: ffff8880b893fd48 (&s->lock_key#14){+.+.}-{3:3}, at: ___slab_alloc+0x12f/0x1400 mm/slub.c:4516
+Preemption disabled at:
+[<ffffffff82179f5a>] class_preempt_constructor include/linux/preempt.h:468 [inline]
+[<ffffffff82179f5a>] __migrate_enable include/linux/sched.h:2378 [inline]
+[<ffffffff82179f5a>] migrate_enable include/linux/sched.h:2429 [inline]
+[<ffffffff82179f5a>] __slab_alloc+0xea/0x1f0 mm/slub.c:4777
+CPU: 1 UID: 0 PID: 6128 Comm: syz.3.73 Not tainted syzkaller #0 PREEMPT_{RT,(full)} 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ __might_resched+0x44b/0x5d0 kernel/sched/core.c:8830
+ __rt_spin_lock kernel/locking/spinlock_rt.c:48 [inline]
+ rt_spin_lock+0xc7/0x3e0 kernel/locking/spinlock_rt.c:57
+ spin_lock include/linux/spinlock_rt.h:44 [inline]
+ ___slab_alloc+0x12f/0x1400 mm/slub.c:4516
+ __slab_alloc+0xc6/0x1f0 mm/slub.c:4774
+ __slab_alloc_node mm/slub.c:4850 [inline]
+ kmalloc_nolock_noprof+0x1be/0x440 mm/slub.c:5729
+ bpf_stream_elem_alloc kernel/bpf/stream.c:33 [inline]
+ __bpf_stream_push_str+0xa8/0x2b0 kernel/bpf/stream.c:50
+ bpf_stream_stage_printk+0x14e/0x1c0 kernel/bpf/stream.c:306
+ bpf_prog_report_may_goto_violation+0xc4/0x190 kernel/bpf/core.c:3203
+ bpf_check_timed_may_goto+0xaa/0xb0 kernel/bpf/core.c:3221
+ arch_bpf_timed_may_goto+0x21/0x40 arch/x86/net/bpf_timed_may_goto.S:40
+ bpf_prog_262a74d054ad2993+0x53/0x5f
+ bpf_dispatcher_nop_func include/linux/bpf.h:1376 [inline]
+ __bpf_prog_run include/linux/filter.h:723 [inline]
+ bpf_prog_run include/linux/filter.h:730 [inline]
+ __bpf_trace_run kernel/trace/bpf_trace.c:2075 [inline]
+ bpf_trace_run9+0x2de/0x510 kernel/trace/bpf_trace.c:2123
+ __bpf_trace_virtio_transport_alloc_pkt+0x2d7/0x340 include/trace/events/vsock_virtio_transport_common.h:39
+ __do_trace_virtio_transport_alloc_pkt include/trace/events/vsock_virtio_transport_common.h:39 [inline]
+ trace_virtio_transport_alloc_pkt include/trace/events/vsock_virtio_transport_common.h:39 [inline]
+ virtio_transport_alloc_skb+0x10af/0x1110 net/vmw_vsock/virtio_transport_common.c:311
+ virtio_transport_send_pkt_info+0x694/0x10b0 net/vmw_vsock/virtio_transport_common.c:390
+ virtio_transport_connect+0xa7/0x100 net/vmw_vsock/virtio_transport_common.c:1072
+ vsock_connect+0xaca/0xd40 net/vmw_vsock/af_vsock.c:1611
+ __sys_connect_file net/socket.c:2080 [inline]
+ __sys_connect+0x323/0x450 net/socket.c:2099
+ __do_sys_connect net/socket.c:2105 [inline]
+ __se_sys_connect net/socket.c:2102 [inline]
+ __x64_sys_connect+0x7a/0x90 net/socket.c:2102
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f0c4d91f749
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffd8ed26ac8 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
+RAX: ffffffffffffffda RBX: 00007f0c4db75fa0 RCX: 00007f0c4d91f749
+RDX: 0000000000000010 RSI: 0000200000000080 RDI: 0000000000000003
+RBP: 00007f0c4d9a3f91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f0c4db75fa0 R14: 00007f0c4db75fa0 R15: 0000000000000003
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
