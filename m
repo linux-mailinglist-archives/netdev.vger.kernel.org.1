@@ -1,183 +1,160 @@
-Return-Path: <netdev+bounces-243998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90C57CACF2D
-	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 12:04:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F20FCACF60
+	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 12:11:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 236B8300B90B
-	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 11:04:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5E5D33033681
+	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 11:11:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5352530F94A;
-	Mon,  8 Dec 2025 11:04:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A9DC30FC26;
+	Mon,  8 Dec 2025 11:11:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="JBiQ5VQ6";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="f4e7aeUL"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="TpMAM5IR"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBC7525CC74;
-	Mon,  8 Dec 2025 11:04:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C49F829B8E0;
+	Mon,  8 Dec 2025 11:11:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765191850; cv=none; b=s7ZklkAp/W1kTrKDwhVsuoHplJ8i4ffL8QThaK+ijdW/iSyjIKp69z4Mmdozxfp7BXdhdxkwW/iENBQQNXs+zMdXLm1zlvJwEG3GofTuzFv/ztoxQ9nlYI9PPgQl7hETSitA7+4mJZqt96YVcuMw6cuENxcdKaDnnsuV71IqrcY=
+	t=1765192299; cv=none; b=cw8mkvONWClc0JvqkIYmT2gg8kV3QJiNHs9eNmkBx1uuv4DGN1Nwa0J7s3SYZTUsBfKQIIuSiNNnAiuHm6A7Mg2cScSvV6zeEAsi6Xi9wiPn/xfrtNGgkNeRuENvkvQborqjaAp3xruZB9sTTKvt/DootcQFViC0MAwUHEEZjHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765191850; c=relaxed/simple;
-	bh=D5kYLDqBc2dd9O7LheA8XmkiaPED6gUkHyFQpbXrP3g=;
+	s=arc-20240116; t=1765192299; c=relaxed/simple;
+	bh=cAOFMLZtlWzWNVHgoq9j0kKv5kLNN9Pud2AYSf1LPX0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TFrAomnXvjOKZswwje70lXt+9Kzcje/lf4+e4bdtIBGfg8J6CM2bBolrBZtWzkAfuUO2HeEn1TnAVKtP2odKRJYmjKcJFak1CWjxzLrDIyIWlSmAMVusdaKBPGbBCdYVDRbDpIAGlwLReGG+6EJuxqcsEha90zbkdD9WSGry5KU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=JBiQ5VQ6; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=f4e7aeUL; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Mon, 8 Dec 2025 12:04:04 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1765191845;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=S865HUKaAnKR6N3b+ol6NvmkSfpRAwyGrtoPTmtdt88=;
-	b=JBiQ5VQ65R75TKR0Ye9HvGwfOKkU6loT3pVOOCcBJGjUoQ77/2Vz9GBWr0rkVc4NPby3Ep
-	SfDMNfZjiGcVm8UFOwLuzepLtyqFw9pnKYirCV7jLvWNXy23FoCISXHCSE7Ga+qfrl/PcQ
-	39NxqI7AQn7Rbs4xOApJxQk35qzm8pKuab512v0DGWiDx20bmztAZMGA+BoHMiRhk4SN0n
-	6y68UTaxxEcrweDcReZ8wL/ul16JwX7yA+ZwXThQXxEnMrwsK/E1QGS5PNIdCPCUa07qw3
-	udg7nGlqYO337nHGUJstv0DUa5B5W5ellkvJgAOcaAPVS5NXTHDNMUmScgVXVw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1765191845;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=S865HUKaAnKR6N3b+ol6NvmkSfpRAwyGrtoPTmtdt88=;
-	b=f4e7aeULGUe/jFNdRLl5Ui33OfLM0XPbKfN9U3nhP3ADEtLOmEQfIqz4agwzLYI2jZHGtL
-	IEagF3NTBYlUuIAg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Jon Kohler <jon@nutanix.com>, Jason Wang <jasowang@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=VsXBaPM3gfa6f4cRW1LvSfhlc3O1Dmq1+amTUlrA8ssyiNxXM8JHLKozZxJNUT5ygRExrvclfV3k1nM562Z3XUMhJkiP8X9KqTXhVPXoxVxsUuIMaFRxOqG3zvEUxu/N4Pf+8WUMR7RfYMFtkGBYr5/Zyn9tcpVlMrHklHhDWrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=TpMAM5IR; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=axT8z7YgLiqlRNGL8DP15zzMN8+hVawuLiVTX/OxMiM=; b=TpMAM5IRCqW8oz5CIlMHHFPKf2
+	ebqn29dJEPwmk4p0EfzkL9SIKkKP6VKTGm7Gj0VWqhBD1r3LWMHM3oY3VObRZaZZ8ISmCea903Qb8
+	XdkTuLlCWFUNMUN9UCAy8VtMIWHtpMP06rznOVofuJI/iU2knGaUilUdnx89d053Xh9NeZYSf1FP+
+	ZXf0nPbo3umEQhDgDcNaLztKyAAn+vEd5Wm2uFvr3xjglBt9zEbPIosbGGsCI9ytjRBZCpB7Dl7zI
+	YUkFoGbxcW8nGH6VA0KTQ47iWIufMwGEM6ekYWj5WqCVAijUWp6Bg73q8TxZSp0oWuu7PUtz1nqz7
+	YcbIxh5g==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50284)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vSZ9J-000000007fl-1nD8;
+	Mon, 08 Dec 2025 11:11:25 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vSZ9E-000000004yv-3jQ9;
+	Mon, 08 Dec 2025 11:11:20 +0000
+Date: Mon, 8 Dec 2025 11:11:20 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Yao Zi <ziyao@disroot.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	open list <linux-kernel@vger.kernel.org>, bpf@vger.kernel.org,
-	Alexander Lobakin <aleksander.lobakin@intel.com>
-Subject: Re: [PATCH net-next v2 5/9] tun: use bulk NAPI cache allocation in
- tun_xdp_one
-Message-ID: <20251208110404.qgMKQe77@linutronix.de>
-References: <20251125200041.1565663-1-jon@nutanix.com>
- <20251125200041.1565663-6-jon@nutanix.com>
- <CACGkMEsDCVKSzHSKACAPp3Wsd8LscUE0GO4Ko9GPGfTR0vapyg@mail.gmail.com>
- <CF8FF91A-2197-47F7-882B-33967C9C6089@nutanix.com>
- <c04b51c6-bc03-410e-af41-64f318b8960f@kernel.org>
- <20251203084708.FKvfWWxW@linutronix.de>
- <CA37D267-2A2F-47FD-8BAF-184891FE1B7E@nutanix.com>
- <20251205075805.vW4ShQvN@linutronix.de>
- <3c1dac33-424f-4eda-83a9-60fb7f4b6c52@kernel.org>
+	Frank <Frank.Sae@motor-comm.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Chen-Yu Tsai <wens@csie.org>, Jisheng Zhang <jszhang@kernel.org>,
+	Furong Xu <0x1207@gmail.com>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Mingcong Bai <jeffbai@aosc.io>,
+	Kexy Biscuit <kexybiscuit@aosc.io>, Runhua He <hua@aosc.io>,
+	Xi Ruoyao <xry111@xry111.site>
+Subject: Re: [PATCH net-next v3 2/3] net: stmmac: Add glue driver for
+ Motorcomm YT6801 ethernet controller
+Message-ID: <aTayWGy5LOOITFHH@shell.armlinux.org.uk>
+References: <20251124163211.54994-1-ziyao@disroot.org>
+ <20251124163211.54994-3-ziyao@disroot.org>
+ <aSSspDCPM_5-l24a@shell.armlinux.org.uk>
+ <aTJuNk4zF8CLtt9S@pie>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <3c1dac33-424f-4eda-83a9-60fb7f4b6c52@kernel.org>
+In-Reply-To: <aTJuNk4zF8CLtt9S@pie>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 2025-12-05 14:21:51 [+0100], Jesper Dangaard Brouer wrote:
->=20
->=20
-> On 05/12/2025 08.58, Sebastian Andrzej Siewior wrote:
-> > On 2025-12-03 15:35:24 [+0000], Jon Kohler wrote:
-> > > Thanks, Sebastian - so if I=E2=80=99m reading this correct, it *is* f=
-ine to do
-> > > the two following patterns, outside of NAPI:
-> > >=20
-> > >     local_bh_disable();
-> > >     skb =3D napi_build_skb(buf, len);
-> > >     local_bh_enable();
-> > >=20
-> > >     local_bh_disable();
-> > >     napi_consume_skb(skb, 1);
-> > >     local_bh_enable();
-> > >=20
-> > > If so, I wonder if it would be cleaner to have something like
-> > >     build_skb_bh(buf, len);
-> > >=20
-> > >     consume_skb_bh(skb, 1);
-> > >=20
-> > > Then have those methods handle the local_bh enable/disable, so that
-> > > the toggle was a property of a call, not a requirement of the call?
-> >=20
-> > Having budget =3D 0 would be for non-NAPI users. So passing the 1 is
-> > superfluous. You goal seems to be to re-use napi_alloc_cache. Right? And
-> > this is better than skb_pool?
-> >=20
-> > There is already napi_alloc_skb() which expects BH to be disabled and
-> > netdev_alloc_skb() (and friends) which do disable BH if needed. I don't
-> > see an equivalent for non-NAPI users. Haven't checked if any of these
-> > could replace your napi_build_skb().
-> >=20
-> > Historically non-NAPI users would be IRQ users and those can't do
-> > local_bh_disable(). Therefore there is dev_kfree_skb_irq_reason() for
-> > them. You need to delay the free for two reasons.
-> > It seems pure software implementations didn't bother so far.
-> >=20
-> > It might make sense to do napi_consume_skb() similar to
-> > __netdev_alloc_skb() so that also budget=3D0 users fill the pool if this
-> > is really a benefit.
->=20
-> I'm not convinced that this "optimization" will be an actual benefit on
-> a busy system.  Let me explain the side-effect of local_bh_enable().
+On Fri, Dec 05, 2025 at 05:31:34AM +0000, Yao Zi wrote:
+> Hi Russell,
+> 
+> Sorry for the late reply,
+> 
+> On Mon, Nov 24, 2025 at 07:06:12PM +0000, Russell King (Oracle) wrote:
+> > On Mon, Nov 24, 2025 at 04:32:10PM +0000, Yao Zi wrote:
+> > > +static int motorcomm_setup_irq(struct pci_dev *pdev,
+> > > +			       struct stmmac_resources *res,
+> > > +			       struct plat_stmmacenet_data *plat)
+> > > +{
+> > > +	int ret;
+> > > +
+> > > +	ret = pci_alloc_irq_vectors(pdev, 6, 6, PCI_IRQ_MSIX);
+> > > +	if (ret > 0) {
+> > > +		res->rx_irq[0]	= pci_irq_vector(pdev, 0);
+> > > +		res->tx_irq[0]	= pci_irq_vector(pdev, 4);
+> > > +		res->irq	= pci_irq_vector(pdev, 5);
+> > > +
+> > > +		plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
+> > > +
+> > > +		return 0;
+> > > +	}
+> > > +
+> > > +	dev_info(&pdev->dev, "failed to allocate MSI-X vector: %d\n", ret);
+> > > +	dev_info(&pdev->dev, "try MSI instead\n");
+> > > +
+> > > +	ret = pci_alloc_irq_vectors(pdev, 1, 1, PCI_IRQ_MSI);
+> > > +	if (ret < 0)
+> > > +		return dev_err_probe(&pdev->dev, ret,
+> > > +				     "failed to allocate MSI\n");
+> > > +
+> > > +	res->irq = pci_irq_vector(pdev, 0);
+> > > +
+> > > +	return 0;
+> > > +}
+> > > +
+> > > +static int motorcomm_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+> > > +{
+> > ...
+> > > +	ret = motorcomm_setup_irq(pdev, &res, plat);
+> > > +	if (ret)
+> > > +		return dev_err_probe(&pdev->dev, ret, "failed to setup IRQ\n");
+> > > +
+> > > +	motorcomm_init(priv);
+> > > +
+> > > +	res.addr = priv->base + GMAC_OFFSET;
+> > > +
+> > > +	return stmmac_dvr_probe(&pdev->dev, plat, &res);
+> > 
+> > If stmmac_dvr_probe() fails, then it will return an error code. This
+> > leaves the PCI MSI interrupt allocated...
+> 
+> This isn't true. MSI API is a little magical: when the device is enabled
+> through pcim_enable_device(), the device becomes devres-managed, and
+> a plain call to pci_alloc_irq_vectors() becomes managed, too, even if
+> its name doesn't indicate it's a devres-managed API.
+> 
+> pci_free_irq_vectors() will be automatically called on driver deattach.
+> See pcim_setup_msi_release() in drivers/pci/msi/msi.c, which is invoked
+> by pci_alloc_irq_vectors() internally.
 
-I'm arguing that this is the right thing to do, I am just saying that it
-will not break anything as far as I am aware.
+As discussed in the sub-thread with Philipp Stanner, please explicitly
+call pci_alloc_irq_vectors() in the cleanup path to avoid adding to
+the burden of drivers that need to be fixed allow this "magical"
+behaviour to be removed in the future.
 
-> Calling local_bh_enable() is adding a re-scheduling opportunity, e.g.
-> for processing softirq.  For a benchmark this might not be noticeable as
-> this is the main workload.  If there isn't any pending softirq this is
-> also not noticeable.  In a more mixed workload (or packet storm) this
-> re-scheduling will allow others to "steal" CPU cycles from you.
+Thanks.
 
-If there wouldn't be a bh/disable-enable then the context would be
-process context and the softirq will be handled immediately.
-Now it is "delayed" until the bh-enable.
-The only advantage I see here is that the caller participates in
-napi_alloc_cache.
-
-> Thus, you might not actually save any cycles via this short BH-disable
-> section.  I remember that I was saving around 19ns / 68cycles on a
-> 3.6GHz E5-1650 CPU, by using this SKB recycle cache.  The cost of a re-
-> scheduling event is like more.
-
-It might expensive because you need to branch out, save/ restore
-interrupts and check a few flags. This is something you wouldn't have to
-do if you return it back to the memory allocator.
-
-> My advice is to use the napi_* function when already running within a
->  BH-disabled section, as it makes sense to save those cycles
-> (essentially reducing the time spend with BH-disabled).  Wrapping these
-> napi_* function with BH-disabled just to use them outside NAPI feels
-> wrong in so many ways.
->=20
-> The another reason why these napi_* functions belongs with NAPI is that
-> netstack NIC drivers will (almost) always do TX completion first, that
-> will free/consume some SKBs, and afterwards do RX processing that need
-> to allocate SKBs for the incoming data frames.  Thus, keeping a cache of
-> SKBs just released/consumed makes sense.  (p.s. in the past we always
-> bulk free'ed all SKBs in the napi cache when exiting NAPI, as they would
-> not be cache hot for next round).
-
-Right. That is why I asked if using a skb-pool would be an advantage
-since you would have a fix pool of skb for TUN/XDP.
-
-> --Jesper
-
-Sebastian
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
