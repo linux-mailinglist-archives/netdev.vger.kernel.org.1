@@ -1,149 +1,178 @@
-Return-Path: <netdev+bounces-243973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94DDBCABEC9
-	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 04:08:32 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3666BCABF24
+	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 04:17:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 999F4302D5CC
-	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 03:05:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2985E301785C
+	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 03:17:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DE85274FE8;
-	Mon,  8 Dec 2025 03:04:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E5D52EC56E;
+	Mon,  8 Dec 2025 03:07:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iowg71T9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NFge7lBX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6263C257829;
-	Mon,  8 Dec 2025 03:04:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5A4721FF25
+	for <netdev@vger.kernel.org>; Mon,  8 Dec 2025 03:07:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765163092; cv=none; b=FMT9vvVBv+96QIISTbROMdtug4Z2oqWeiK7kqRFs764Or6/48d+lZGi0fWE5pv/AiUNLEeDcIyyoJ1op66td7uOvN4QHVDjh3S5Xlk3qNAFhHqbgi75Qa00ozOCLo5/0NansMpnff4ChFf0nvH0THDXSzTQ4l0tkSxH87L73514=
+	t=1765163253; cv=none; b=TI+5nl1S62aS6JpYmMRrQia2SMkgLUyOx7BXSg0EGxPuLHJGJpde4ObZoqkJ40C3DdazCMLf4AzmDer/Z31rHjL6dMDHxsYUz+VPGCyVPopY2NauW8zRd7YEKSR0vIV/+yGGX0kSjtffHwqAFKoMC38Fs6edNXDayY9tZaqlYpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765163092; c=relaxed/simple;
-	bh=VtOK1EBRkJsxGXnW4s7lGPtINpp/sA1eK4PYbFO1fwc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LTARnDVOycaShwUVSjAEBWhAHrr5yT2wvXWF7t1fnks0btotK8QQapv/tCkWIuTZCZ1vZCEO4iTxJai4fX8zHdZja6Oty9P1DaKbS1xewsFkDE1cBIeXRuuIyh7VYqir++885NzG0oisWgj6xJlpeyv7l8qMfuchS56lUGkaDpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iowg71T9; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765163090; x=1796699090;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=VtOK1EBRkJsxGXnW4s7lGPtINpp/sA1eK4PYbFO1fwc=;
-  b=iowg71T9YgBNYlp7bw4YTUk3oC8HoZdqgeefR/K7NDLc4lsedMrsbibC
-   LGFZg5SunjrX4SrN4CSRiRj5i27R9NQnMeLql63VKhGvH8vID6QvwVqju
-   B3Mdn/8V4yatys+zm8ePFcFRiSPStMCF6VTwynfEV7wnDwZVQQlaHoEuI
-   8ADRa0ur8wAs0cym9q4CuyJRfKxH804uFYtr1ykCPpYeQjcVkjvDyG5TW
-   fG5IQNQMwsvDvTRnbqgVxSD2OIWXPAS33hC6q2QCKoIL+xwOdPJ8x2rLx
-   rOqGNvCAeRfjdsPfueNe+ihA2ZdgoB8eXssR5H9onM2/PTBYpMuy2rFrv
-   A==;
-X-CSE-ConnectionGUID: 33sUWcpwTS6R3trTDDV9rA==
-X-CSE-MsgGUID: GccyFmZHS9OSWyyNfxhJYA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11635"; a="92581805"
-X-IronPort-AV: E=Sophos;i="6.20,258,1758610800"; 
-   d="scan'208";a="92581805"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2025 19:04:49 -0800
-X-CSE-ConnectionGUID: KDECnqanSV+libfVdYMICw==
-X-CSE-MsgGUID: 4YeACLpgS/WcCJF93mXHLw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,258,1758610800"; 
-   d="scan'208";a="196091344"
-Received: from lkp-server01.sh.intel.com (HELO 4664bbef4914) ([10.239.97.150])
-  by fmviesa008.fm.intel.com with ESMTP; 07 Dec 2025 19:04:47 -0800
-Received: from kbuild by 4664bbef4914 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vSRYK-00000000JsT-3nW5;
-	Mon, 08 Dec 2025 03:04:44 +0000
-Date: Mon, 8 Dec 2025 11:04:22 +0800
-From: kernel test robot <lkp@intel.com>
-To: Dharanitharan R <dharanitharan725@gmail.com>,
-	syzbot+5dd615f890ddada54057@syzkaller.appspotmail.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Dharanitharan R <dharanitharan725@gmail.com>
-Subject: Re: [PATCH] net: atm: lec: add pre_send validation to avoid
- uninitialized
-Message-ID: <202512081042.Zx4NasDJ-lkp@intel.com>
-References: <20251207041453.8302-1-dharanitharan725@gmail.com>
+	s=arc-20240116; t=1765163253; c=relaxed/simple;
+	bh=cWQlXLg2oAF75NLRYyi4rsXiifU/frpwJu+/Rp1ZA2k=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=b7ia0QhenX3agdnnVVU0FGdJPEfm7hMpZhuEvILgOiR179D4uMKOmxJh2gUSAEtZXD1q2nGgvzKk+UfJSURHQk5Kmo7uw+lKFtASXjd/Y/JlaFUlC9rEVhB4wPAa4sJFZRehMhwbhluTEoGjq3afiL7lPM56sMt8CA3DFiuv20s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NFge7lBX; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2984dfae0acso75233055ad.0
+        for <netdev@vger.kernel.org>; Sun, 07 Dec 2025 19:07:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765163251; x=1765768051; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=cWQlXLg2oAF75NLRYyi4rsXiifU/frpwJu+/Rp1ZA2k=;
+        b=NFge7lBXRkH4WqTxCxH3rkPJ44Zpu2Ec6lOdcIFmvEwq8S/nPkIDgJelFwewtVVBP4
+         kXPF0AejEiwaWEuS/la2dL1zGTb5Xx1Qopo2Pg4W10hF7S9bNj/H6vkaZmdLNH61VpTG
+         32bq4Sxg3lZ7AKCdA4ahjjTBdsE99G+diQwEY7jBo4+eBCgRX+i44mqcf6ijuLpXpBst
+         wATJ4qG5Y3jI6VtBDF/yzfCDtGyezrmFzpIs4khmY2zD38zSPyaSZLxu7Y57eYxW3A1K
+         hW6vZFJ6MdwiXLdwpNKf1iTAoUQIcnXY6meRwlM6dnA63KgM62+VDa0z9jjDZEEZWjpx
+         DzKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765163251; x=1765768051;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cWQlXLg2oAF75NLRYyi4rsXiifU/frpwJu+/Rp1ZA2k=;
+        b=lcabAGgTaEhKgxzPhYR6jr0n5lBnSoYDiWTm6ELMtlO8Fd7gg/zprLnjK2kpzAx8Rf
+         0IccZ7RSQT7jQlJOOLrptTV30mBN9K+uT9V4Cw/u44ywo9U6pPpvMqg+Pnkbn/qZ1Q78
+         Y1XFNp/NgngRxW5PGVVDIM8xozsjLxlh1XzgRALHSZc1Uqt9FAXxhn+BI6kPNXF3avOV
+         XNKSFrWMw1aQdd4Naqz/8nK456PCsIjSw3F4KJzJN2e3W75LXxA+kh4W2Yf30/4VHVPK
+         /Pq3CZ8SQRDM24pr4RmRyyXbanDMw9qmZs9rSU09KTJs0/A64J70W8k8ZW3QlFeBRwiE
+         kWiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUDuj5ph25/RJ/H8wcS+PqBaoYAciprzFwdKp6dHfjTyIMphil/vMNZFVdJYPMnSbkkmoj6xiA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzErswZdW5Xce0X1yvjYRWo7yF+aOsTh0IPeg4cNX2jbQcRjJoU
+	dT7Wq7uun/u/5A8jzmi7qfM8SwahDiBLTTJe7rTcglw/32jGwpMyxL+6
+X-Gm-Gg: ASbGnctdgBIG2QxR7H9DK1u3Qaj9AR/f9TUe2wIsTKYKv8zLTzg12wtIwG0HsmSZhWv
+	lTES4KasBJPd2QgUxDSKLRhCvdjoDKJCnGjhE1SvER49sedFgjtn+brs//FAhG+mATnZD+ntPGd
+	Dmv/LCHEBz1mVyBZg6YHWtwlaT/d1eKpxt3lEtpmSNhUBVWiDkIPUGfiYQdVDObaOr7D3UA/SI2
+	68SX6F4PxNaEAo9VYcudEh0aB3RLrmUC3Y4FndECD9EMucn2s/xTst8dG6FZBlIOxlWq9pW3A4V
+	owtrJ2xwod/yyoKgW5Wy9amy9+IqMbXIt4Yw7aDfVPdT4f/zwZFb9Qto+JNGJNe03bY52DvewBh
+	FA7COZ6GkLmcCIwCqqkCvlE9mBEzA27woV7gcQU4Sxp8X7qM2e/pwmyQsWIR0Fey7a6BsjaPZz+
+	2rJZnb6QRJIh39VECJj72FYINt5v+5FXGuHBZjnpZiSzA18FePWA==
+X-Google-Smtp-Source: AGHT+IGclfbgYDV+2PprDNhoMS/qASDyleKSKZkgks8aJAQqaFHDlkmA3RGKrzkqi7Tvl94BT/sCTA==
+X-Received: by 2002:a17:903:2287:b0:264:70da:7a3b with SMTP id d9443c01a7336-29df5dec918mr73703385ad.49.1765163250925;
+        Sun, 07 Dec 2025 19:07:30 -0800 (PST)
+Received: from ?IPv6:2401:4900:8fcc:9f:1de4:3838:6ac:e885? ([2401:4900:8fcc:9f:1de4:3838:6ac:e885])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29daeaabf7csm107759555ad.79.2025.12.07.19.07.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 07 Dec 2025 19:07:30 -0800 (PST)
+Message-ID: <a137d0a4f3479b6164307a49b9193746db95fba9.camel@gmail.com>
+Subject: Re: [Intel-wired-lan] [RFT net-next PATCH RESEND 0/2] ethernet:
+ intel: fix freeing uninitialized pointers with __free
+From: ally heev <allyheev@gmail.com>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>, Tony Nguyen	
+ <anthony.l.nguyen@intel.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	 <pabeni@redhat.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Dan Carpenter <dan.carpenter@linaro.org>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet	 <edumazet@google.com>, Alexander
+ Lobakin <aleksander.lobakin@intel.com>,  Simon Horman <horms@kernel.org>
+Date: Mon, 08 Dec 2025 08:37:24 +0530
+In-Reply-To: <df193ddb-4591-417d-8d62-42d99d6d468f@intel.com>
+References: 
+	<20251124-aheev-fix-free-uninitialized-ptrs-ethernet-intel-v1-0-a03fcd1937c0@gmail.com>
+	 <81053279-f2da-420c-b7a1-9a81615cd7ca@intel.com>
+	 <ec570c6f8c041f60f1de0b002e61e5a2971633c5.camel@gmail.com>
+	 <eaf30e67-ce1a-47ce-8207-b973ea260bf5@intel.com>
+	 <f34adbc99606c1f9157112123b7039d2a5bb589e.camel@gmail.com>
+	 <df193ddb-4591-417d-8d62-42d99d6d468f@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2-0+deb13u1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251207041453.8302-1-dharanitharan725@gmail.com>
 
-Hi Dharanitharan,
+On Wed, 2025-12-03 at 09:45 +0100, Przemek Kitszel wrote:
+> On 12/3/25 09:09, ally heev wrote:
+> > On Tue, 2025-12-02 at 10:17 -0800, Tony Nguyen wrote:
+> > >=20
+> > > On 12/2/2025 11:47 AM, ally heev wrote:
+> > > > On Mon, 2025-12-01 at 13:40 -0800, Tony Nguyen wrote:
+> > > > >=20
+> > > > > On 11/23/2025 11:40 PM, Ally Heev wrote:
+> > > > > > Uninitialized pointers with `__free` attribute can cause undefi=
+ned
+> > > > > > behavior as the memory assigned randomly to the pointer is free=
+d
+> > > > > > automatically when the pointer goes out of scope.
+> > > > > >=20
+> > > > > > We could just fix it by initializing the pointer to NULL, but, =
+as usage of
+> > > > > > cleanup attributes is discouraged in net [1], trying to achieve=
+ cleanup
+> > > > > > using goto
+> > > > >=20
+> > > > > These two drivers already have multiple other usages of this. All=
+ the
+> > > > > other instances initialize to NULL; I'd prefer to see this do the=
+ same
+> > > > > over changing this single instance.
+> > > > >=20
+> > > >=20
+> > > > Other usages are slightly complicated to be refactored and might ne=
+ed
+> > > > good testing. Do you want me to do it in a different series?
+> > >=20
+> > > Hi Ally,
+> > >=20
+> > > Sorry, I think I was unclear. I'd prefer these two initialized to NUL=
+L,
+> > > to match the other usages, over removing the __free() from them.
+> >=20
+> > I had a patch for that already, but, isn't using __free discouraged in
+> > networking drivers [1]? Simon was against it [2]
+>=20
+> you see, the construct is discouraged, so we don't use it everywhere,
+> but cleaning up just a little would not change the state of the matter
+> (IOW we will still be in "driver has some __free() usage" state).
+>=20
 
-kernel test robot noticed the following build warnings:
+But still we can just fix the uninitialized ones the right way [1]
+right? since we have to fix them anyway. There already a patch [2] for
+that
 
-[auto build test WARNING on net/main]
-[also build test WARNING on net-next/main linus/master horms-ipvs/master v6.18 next-20251205]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+[1]
+https://lore.kernel.org/lkml/CAHk-=3DwiCOTW5UftUrAnvJkr6769D29tF7Of79gUjdQH=
+S_TkF5A@mail.gmail.com/
+[2]
+https://lore.kernel.org/all/20251106-aheev-uninitialized-free-attr-net-ethe=
+rnet-v3-1-ef2220f4f476@gmail.com/
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Dharanitharan-R/net-atm-lec-add-pre_send-validation-to-avoid-uninitialized/20251207-121647
-base:   net/main
-patch link:    https://lore.kernel.org/r/20251207041453.8302-1-dharanitharan725%40gmail.com
-patch subject: [PATCH] net: atm: lec: add pre_send validation to avoid uninitialized
-config: arm64-randconfig-002-20251208 (https://download.01.org/0day-ci/archive/20251208/202512081042.Zx4NasDJ-lkp@intel.com/config)
-compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251208/202512081042.Zx4NasDJ-lkp@intel.com/reproduce)
+> TBH, I would not spent my time "undoing" all of the __free() that we
+> have already, especially the testing part sounds not fun.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202512081042.Zx4NasDJ-lkp@intel.com/
++1
 
-All warnings (new ones prefixed by >>):
-
->> net/atm/lec.c:506:2: warning: misleading indentation; statement is not part of the previous 'if' [-Wmisleading-indentation]
-     506 |         mesg = (struct atmlec_msg *)skb->data;
-         |         ^
-   net/atm/lec.c:503:4: note: previous statement is here
-     503 |    if (!pskb_may_pull(skb, msg_size))
-         |    ^
-   1 warning generated.
-
-
-vim +/if +506 net/atm/lec.c
-
-   491	
-   492	static int lec_atm_pre_send(struct atm_vcc *vcc, struct sk_buff *skb)
-   493	{
-   494		struct atmlec_msg *mesg;
-   495		u32 sizeoftlvs;
-   496		unsigned int msg_size = sizeof(struct atmlec_msg);
-   497	
-   498		/* Must contain the base message */
-   499		if (skb->len < msg_size)
-   500			return -EINVAL;
-   501	
-   502	   /* Must have at least msg_size bytes in linear data */
-   503	   if (!pskb_may_pull(skb, msg_size))
-   504	   	return -EINVAL;
-   505	
- > 506		mesg = (struct atmlec_msg *)skb->data;
-   507	   sizeoftlvs = mesg->sizeoftlvs;
-   508	
-   509	   /* Validate TLVs if present */
-   510	   if (sizeoftlvs && !pskb_may_pull(skb, msg_size + sizeoftlvs))
-   511	       return -EINVAL;
-   512	
-   513	   return 0;
-   514	}
-   515	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+>=20
+> Turning all usage points to "=3D NULL" is orthogonal, and would be great.
+>=20
+> >=20
+> > [2] https://lore.kernel.org/all/aQ9xp9pchMwml30P@horms.kernel.org/
+> > [1] https://docs.kernel.org/process/maintainer-netdev.html#using-device=
+-managed-and-cleanup-h-constructs
+> >=20
+> > Regards,
+> > Ally
+> >=20
 
