@@ -1,128 +1,115 @@
-Return-Path: <netdev+bounces-243979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DAD3CAC7CA
-	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 09:23:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BBA2CAC7D9
+	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 09:24:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 719F6302A97D
-	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 08:23:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 76B82303E012
+	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 08:24:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 665E1290D81;
-	Mon,  8 Dec 2025 08:23:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E7E22D9494;
+	Mon,  8 Dec 2025 08:24:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="ixQkjy7r"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AY5KgvWm"
 X-Original-To: netdev@vger.kernel.org
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31B532580DE;
-	Mon,  8 Dec 2025 08:23:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B18B2D63E8
+	for <netdev@vger.kernel.org>; Mon,  8 Dec 2025 08:24:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765182233; cv=none; b=ghgTgxuBf8KwAGdMupBym9vFiABUz1AaDBJqcXQYvBDu8m4XfMTXyGh0TUVobG+2JJBcs2my7LvJ/W90ekD9GiSfMFrADzywascdsqMr8bMPLURO9vBrX4DI71IWF/Nv7/3w158CvjpJtymb7nmBct8rg4XCClESO4Uk5ZC3bGQ=
+	t=1765182270; cv=none; b=nRQqaW5HFJXq8HVChZCSWTj5Ro0D5847VPGHyojhbe+h/4KayCmw7NNsSBfAMznGIlPK4BUT4QhwsAq77SfKuw3jB1fM1sKyrOQUc9N/gicbB9fDpSijf2kSh8UjIRL+lB7mcJxOOBNHVLSWvZFV/Z+/VCTRxMuhXCM/iJ+W6g0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765182233; c=relaxed/simple;
-	bh=HahwClOUPbY8lYOiDnAM6v1rk/QJWpGTlK1cCdtwK0E=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UNgKh38LsGGExaNW078B4i4Y0vL8y9OWHlSZY9+Pfgm/G8FMkDtKNKuGdC2WAKF7Hl8UriASomJi7rUEqUYeUyPfggI1zI7wcwI6MDuW3EC14bXNyoPtiHuADrAgG/qcEcgKpCgw5YQ6bWYHftaoYWAnLCxdNj3BXUsPHsbbiJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=ixQkjy7r; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1765182229;
-	bh=HahwClOUPbY8lYOiDnAM6v1rk/QJWpGTlK1cCdtwK0E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ixQkjy7rJibW29crRfhTQtaul/vOnLCOvAdfgkKV5rrYSpOijD+Sx7VeFnQT12TzM
-	 ezC1jZOAPUsDizd7ZeNCEJoZVoL/7yfmHTOAqLBrWCZOQovKxaWpP8R4WIZWPA9fwe
-	 5JVYhPylQIle5ukhirviQLjACzt2mwW3u7vovoJ2hYaPppC/yGr/8pzdHr1geXYShE
-	 /WN1ipP+MpVOKJkBFIAUXR5dNstvYk38jhvCBJ8d9k20Bd0YdaOAXCeVaXugKAnk64
-	 xCouvH8RDyY6nvIWoEHOwio+mo3HpmjNNyPIgfQIkz3Bo7Rh6VJdNLKnPGIcOSxzmm
-	 AYOnOT5jFe1Zw==
-Received: from fedora (unknown [IPv6:2a01:e0a:2c:6930:d919:a6e:5ea1:8a9f])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: bbrezillon)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id F3C0217E0E30;
-	Mon,  8 Dec 2025 09:23:47 +0100 (CET)
-Date: Mon, 8 Dec 2025 09:23:43 +0100
-From: Boris Brezillon <boris.brezillon@collabora.com>
-To: Oleg Nesterov <oleg@redhat.com>
-Cc: Todd Kjos <tkjos@android.com>, Martijn Coenen <maco@android.com>, Joel
- Fernandes <joelagnelf@nvidia.com>, Christian Brauner <brauner@kernel.org>,
- Carlos Llamas <cmllamas@google.com>, Suren Baghdasaryan
- <surenb@google.com>, Felix Kuehling <Felix.Kuehling@amd.com>, Alex Deucher
- <alexander.deucher@amd.com>, Christian =?UTF-8?B?S8O2bmln?=
- <christian.koenig@amd.com>, David Airlie <airlied@gmail.com>, Simona Vetter
- <simona@ffwll.ch>, Rob Herring <robh@kernel.org>, Steven Price
- <steven.price@arm.com>, =?UTF-8?B?QWRyacOhbg==?= Larumbe
- <adrian.larumbe@collabora.com>, Maarten Lankhorst
- <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>,
- Thomas Zimmermann <tzimmermann@suse.de>, Liviu Dudau <liviu.dudau@arm.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
- dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: [PATCH 5/7] drm/pan*: don't abuse current->group_leader
-Message-ID: <20251208092343.2cbca352@fedora>
-In-Reply-To: <aTV1maDfDvqgu1oT@redhat.com>
-References: <aTV1KYdcDGvjXHos@redhat.com>
-	<aTV1maDfDvqgu1oT@redhat.com>
-Organization: Collabora
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.51; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1765182270; c=relaxed/simple;
+	bh=CHBD7yB8dlgaTI09KlnjEFi5jT+V6RNYefkvghzsHBU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XdqMXSDrtF+xVpQtQazduEUwlTYFQL74iu6iWgyxlY7DdxtC0j2nAkta3BnSOmDLR9Vy5U5sSCxlItXrsuPJqs8+pEc4YRkQOrDWqqyi0n1eUyTQ1mI172wZka4f1n33PAKvb4cYmQaJ+KNNRNdHQ9vuAEfSaPCWdz4zI4kQUeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AY5KgvWm; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-29e1b8be48fso10987115ad.1
+        for <netdev@vger.kernel.org>; Mon, 08 Dec 2025 00:24:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1765182268; x=1765787068; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CHBD7yB8dlgaTI09KlnjEFi5jT+V6RNYefkvghzsHBU=;
+        b=AY5KgvWmsShpMRAM9vob15x+EAc+RkBYjV7v1Zc5ZKLC2HUQ5yrDlTW58GYQFmurEi
+         loUSrgM3LGlr95jdaULdhV2ctX3L4kn9VcF/sAfO2NH3hfGjI42XKISZbc+ZzlwRQVjN
+         wLn78b86YW25m6MwkuLBpdSlO4wHZQuE+ICroVEPDjWcDFkMfBiR8WNc2Nip02Rt3xYE
+         DUmJYBMxcaZB1OCWyttlT93bQ7uX+e9dTu+CtTfX8RfYqKe3/D7qSOPORWPU7kmCaCTP
+         iyPYJXytdCKAcIj6Cn6NmUHYx3I6N47QUn22ggTTvz8qFTbgEKmdR6z0seyKKGyYwqSI
+         vyeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765182268; x=1765787068;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=CHBD7yB8dlgaTI09KlnjEFi5jT+V6RNYefkvghzsHBU=;
+        b=fYHJ3rp2thz+WzeJFoZnohIqyD2g4uf3rQ8H7WPZuWCMYlh8jgPl50vGJNXdezFR5F
+         LmhHluQAX1lZwMjY8VLzxOPvtl02/lXrPMpaYG/VVj86MOcRmWA7BwITmb0RjHy41QV4
+         INsSBFSy5F551yBA236+avbPE2si+jWj2OHac1zSV+JzbvoTK0Q40Rl8lwK3p3yMk4G7
+         eJg0bqpOT6Nne3xUWMYS8yRBGyzeHI+BzY6ZqAuKwt7KJINFcbMzPTUZVEadOqU9bUef
+         vsawR3wfYdRT2xBYSWB2DFFrq0ih5nMw5PpklAhrqGUmftuHRqgj/LqEGzjUpCDsjBbH
+         Byzg==
+X-Forwarded-Encrypted: i=1; AJvYcCVYmoCEOrz+iVn9syWYQ9RaaGgGpfRX/ZT5tT6A3BBqoJDYro6hEpERBPR5laW8eYM4XiP2MQE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzxvdzT3eVmowz7TNWOK7/kwUOWXdJX/NP2czv8zXMrqCLO9BLq
+	FjIIHInU32rtdxidvwqiTmKrJN3Z0cGNnq3loAqqXbyvFrjiVtgeIoe55MGx6aeHr4ySot/lboN
+	f9b24wSIPsFQc/EgKYDoIHkuCODoZw2g9A87mN7g4
+X-Gm-Gg: ASbGncuSDD0T15eFio+efvO6c9uRlQBQOpGmuIFV05ObfNDjjX+fwgt2RwxWra5qF4Z
+	ZMnygJyNK8lMLtTe1mbAABvqdUVf7OM1+tBE3sFpca4kx748ZaM7dy1qFa3pJkx6ULlYNb30GpM
+	3Hf5w4rU+X8AD8rk0d0Aa3J/9eKTt8EeAwamBquTUXKZisvIsankGNgiMcXSmVrr6sZRaZ9qeof
+	lm/pAiZyoAhhP5ILq44clUvLZ/K5dyZrB75JHdEDXb5tN9nkjMyZpIAjLRTI1jBGErfLZMvxkzk
+	PzAo/i66ag6Av/kK/6tXztqbtaY=
+X-Google-Smtp-Source: AGHT+IFug6scu8is6Vq1B0qSWi36ekRlg8uEiZ+/bOj2oLLiPimGgyhhXlIqD2CbCMVUgD7nVGKWzPj6+tGqKWqoItk=
+X-Received: by 2002:a05:7022:693:b0:11b:9386:a389 with SMTP id
+ a92af1059eb24-11e032bd77fmr5420502c88.44.1765182267993; Mon, 08 Dec 2025
+ 00:24:27 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20251203100122.291550-1-mjguzik@gmail.com>
+In-Reply-To: <20251203100122.291550-1-mjguzik@gmail.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Mon, 8 Dec 2025 00:24:16 -0800
+X-Gm-Features: AQt7F2q7cOgDNVU8VbF7GPRaGxkQNfHUniZkwn7tMMPxBWDpWi75s2pDgGibwxM
+Message-ID: <CAAVpQUAfDxZfbeM8nSYH611oTfagnpbvK4FQ5H83h3vTd9NGfw@mail.gmail.com>
+Subject: Re: [PATCH] af_unix: annotate unix_gc_lock with __cacheline_aligned_in_smp
+To: Mateusz Guzik <mjguzik@gmail.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kuba@kernel.org, 
+	oliver.sang@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, 7 Dec 2025 13:39:53 +0100
-Oleg Nesterov <oleg@redhat.com> wrote:
+On Wed, Dec 3, 2025 at 2:01=E2=80=AFAM Mateusz Guzik <mjguzik@gmail.com> wr=
+ote:
+>
+> Otherwise the lock is susceptible to ever-changing false-sharing due to
+> unrelated changes. This in particular popped up here where an unrelated
+> change improved performance:
+> https://lore.kernel.org/oe-lkp/202511281306.51105b46-lkp@intel.com/
+>
+> Stabilize it with an explicit annotation which also has a side effect
+> of furher improving scalability:
+> > in our oiginal report, 284922f4c5 has a 6.1% performance improvement co=
+mparing
+> > to parent 17d85f33a8.
+> > we applied your patch directly upon 284922f4c5. as below, now by
+> > "284922f4c5 + your patch"
+> > we observe a 12.8% performance improvements (still comparing to 17d85f3=
+3a8).
+>
+> Note nothing was done for the other fields, so some fluctuation is still
+> possible.
+>
+> Tested-by: kernel test robot <oliver.sang@intel.com>
+> Signed-off-by: Mateusz Guzik <mjguzik@gmail.com>
 
-> Cleanup and preparation to simplify the next changes.
-> 
-> Use current->tgid instead of current->group_leader->pid.
-> 
-> Signed-off-by: Oleg Nesterov <oleg@redhat.com>
-> ---
->  drivers/gpu/drm/panfrost/panfrost_gem.c | 2 +-
->  drivers/gpu/drm/panthor/panthor_gem.c   | 2 +-
-
-Acked-by: Boris Brezillon <boris.brezillon@collabora.com>
-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/gpu/drm/panfrost/panfrost_gem.c b/drivers/gpu/drm/panfrost/panfrost_gem.c
-> index 8041b65c6609..1ff1f2c8b726 100644
-> --- a/drivers/gpu/drm/panfrost/panfrost_gem.c
-> +++ b/drivers/gpu/drm/panfrost/panfrost_gem.c
-> @@ -17,7 +17,7 @@
->  static void panfrost_gem_debugfs_bo_add(struct panfrost_device *pfdev,
->  					struct panfrost_gem_object *bo)
->  {
-> -	bo->debugfs.creator.tgid = current->group_leader->pid;
-> +	bo->debugfs.creator.tgid = current->tgid;
->  	get_task_comm(bo->debugfs.creator.process_name, current->group_leader);
->  
->  	mutex_lock(&pfdev->debugfs.gems_lock);
-> diff --git a/drivers/gpu/drm/panthor/panthor_gem.c b/drivers/gpu/drm/panthor/panthor_gem.c
-> index fbde78db270a..29cc57efc4b9 100644
-> --- a/drivers/gpu/drm/panthor/panthor_gem.c
-> +++ b/drivers/gpu/drm/panthor/panthor_gem.c
-> @@ -27,7 +27,7 @@ static void panthor_gem_debugfs_bo_add(struct panthor_gem_object *bo)
->  	struct panthor_device *ptdev = container_of(bo->base.base.dev,
->  						    struct panthor_device, base);
->  
-> -	bo->debugfs.creator.tgid = current->group_leader->pid;
-> +	bo->debugfs.creator.tgid = current->tgid;
->  	get_task_comm(bo->debugfs.creator.process_name, current->group_leader);
->  
->  	mutex_lock(&ptdev->gems.lock);
-
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
 
