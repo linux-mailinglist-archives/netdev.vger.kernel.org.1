@@ -1,32 +1,32 @@
-Return-Path: <netdev+bounces-244013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D093CAD4A2
-	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 14:38:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F48ACAD534
+	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 14:47:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D963F3008046
-	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 13:38:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1538C302819A
+	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 13:47:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E986F3115A2;
-	Mon,  8 Dec 2025 13:38:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01A3A178372;
+	Mon,  8 Dec 2025 13:47:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="uXmJwydk"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ko9nLS11"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11E9E2E9EA1;
-	Mon,  8 Dec 2025 13:38:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C89911CA9;
+	Mon,  8 Dec 2025 13:47:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765201096; cv=none; b=cxsG2Qx6BJKocMeIlCiIomLeJu3PXsRr6MP8Othpyu2d7k76bbvckAy4JscaeJJpLtrJFz2cy7F7GTBPv4x2XijtfFEhsWIIPsWfoXgrgNaVcnGFQEiMtfag4Avg0qwsQUpcZW9Y4c1u3//KJMwn205wrsk3n0LWcjaL2OY5Idk=
+	t=1765201640; cv=none; b=VQVN7NbtIbFg/CaHfZ9ko5js55lbSmWyc8umCS7twXxKP1KTQHZYYm36BX+KWBDbUd61cXznirvs/T762MgjB5828NVZ494j/haq/nQzvjw720g4T06vIt6dc1RQqsINkX2FYcvmE9izqJVT/puD95XRUSzJJ6MqqI0dl76VcmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765201096; c=relaxed/simple;
-	bh=yFY9to71CPFt/nq28a9y8pZQYlJVADl7WKsWnj7vnL4=;
+	s=arc-20240116; t=1765201640; c=relaxed/simple;
+	bh=BixCg0FwJGLbz+Ld0NlKlqiBPAQag+qVD1dy3b/ixzk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z7yRKVJ2lyR6N+IiZGb5W/NnyiRRQrh129LA4cJZ3OQlaHusHO2oEmC9RCvyvGfZZoceIWOpb7kG+FGxBhH1O1rkshp+UHfa9r58mm0K9f4fAOnfxH0V5Tb4x/EGZ9vGF8Y0HOcPkkxy3YFIW1s9KKkhtlWTjOOylF5N9Z5zREg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=uXmJwydk; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=kTuQljhgl9grAARb5seznEZY8j/gRZl2BhMfX143XernIRya4bTUje1h3XOIHMhqHwD4Z1bO+k42JrJlVtfyE4/eJzb0k6sDTJMPBvhkU6D7g9NSsxWeF4vTgOZ94xkoYBd4ABrSza86pdzJ1AMTSf/6iQfw+9Khm+XtsATE6M4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ko9nLS11; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -34,28 +34,29 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=97d03xXJcdYCispt3O0zsohG5XXYmOiyFrkqz4qQlBY=; b=uXmJwydk4LSjFMXAioq46UH9sG
-	zQCqHT1EI4jCt3444t5IWZmLb9/iPIkacel0ItNSyZFz6hSeVtv/MexxOggq6lc8vg09D3Z4JvKvN
-	LqiLGaS+cFCjqE6vSIETLUebLVu3al02BSzG97TSQz1+5FnFop4bVFQSPZRmOPt2ypFU=;
+	bh=A/sml+u6a8CEZsJFpF3d5AMtMazVBG0Mrdny6cktA2Q=; b=ko9nLS11fjpRJtP5ZP4Kif3Ed7
+	pWgzCrQ8dYO8fzp2in8a69Z7yuhGG0c7SMlpivS1hnC3oWaXuUR/tuVW5V3Ikbmu9SPJazlbMl4jb
+	Wt7nNgjpMPpM/7L8Irnqv8ubW3bdbxVwoIjVU0392LbCuhcWZFpq/OIxA0K00Tu8WG9o=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vSbQo-00GNSL-Ne; Mon, 08 Dec 2025 14:37:38 +0100
-Date: Mon, 8 Dec 2025 14:37:38 +0100
+	id 1vSbZf-00GNYB-T0; Mon, 08 Dec 2025 14:46:47 +0100
+Date: Mon, 8 Dec 2025 14:46:47 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Daniel Golle <daniel@makrotopia.org>, Hauke Mehrtens <hauke@hauke-m.de>,
-	Vladimir Oltean <olteanv@gmail.com>,
+To: Jacky Chou <jacky_chou@aspeedtech.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Rasmus Villemoes <ravi@prevas.dk>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH net v3] net: dsa: mxl-gsw1xx: manually clear RANEG bit
-Message-ID: <586e6fe2-60af-4a8f-9727-98ad7d6b9593@lunn.ch>
-References: <c28947688b5fc90abe1a5ead6cfd78e128027447.1765156305.git.daniel@makrotopia.org>
- <aTbI99uWvg08wgV9@shell.armlinux.org.uk>
+	Joel Stanley <joel@jms.id.au>,
+	Andrew Jeffery <andrew@codeconstruct.com.au>,
+	Potin Lai <potin.lai@quantatw.com>, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-aspeed@lists.ozlabs.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: mdio: aspeed: add dummy read to avoid
+ read-after-write issue
+Message-ID: <57860c7c-2294-4ea6-a998-8bc92dda2ed2@lunn.ch>
+References: <20251208-aspeed_mdio_add_dummy_read-v1-1-0a1861ad2161@aspeedtech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,53 +65,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aTbI99uWvg08wgV9@shell.armlinux.org.uk>
+In-Reply-To: <20251208-aspeed_mdio_add_dummy_read-v1-1-0a1861ad2161@aspeedtech.com>
 
-On Mon, Dec 08, 2025 at 12:47:51PM +0000, Russell King (Oracle) wrote:
-> On Mon, Dec 08, 2025 at 01:27:04AM +0000, Daniel Golle wrote:
-> >  static void gsw1xx_remove(struct mdio_device *mdiodev)
-> >  {
-> >  	struct gswip_priv *priv = dev_get_drvdata(&mdiodev->dev);
-> > +	struct gsw1xx_priv *gsw1xx_priv;
-> >  
-> >  	if (!priv)
-> >  		return;
-> >  
-> > +	gsw1xx_priv = container_of(priv, struct gsw1xx_priv, gswip);
-> > +	cancel_delayed_work_sync(&gsw1xx_priv->clear_raneg);
-> > +
-> >  	gswip_disable_switch(priv);
-> >  
-> >  	dsa_unregister_switch(priv->ds);
+On Mon, Dec 08, 2025 at 02:49:56PM +0800, Jacky Chou wrote:
+> The Aspeed MDIO controller may return incorrect data when a read operation
+> follows immediately after a write. Due to a controller bug, the subsequent
+> read can latch stale data, causing the polling logic to terminate earlier
+> than expected.
 > 
-> Can we please pay attention to ->remove methods, and code them properly
-> please?
+> To work around this hardware issue, insert a dummy read after each write
+> operation. This ensures that the next actual read returns the correct
+> data and prevents premature polling exit.
 > 
-> There are two golden rules of driver programming.
+> This workaround has been verified to stabilize MDIO transactions on
+> affected Aspeed platforms.
 > 
-> 1. Do not publish the device during probe until hardware setup is
->    complete. If you publish before hardware setup is complete, userspace
->    is free to race with the hardware setup and start using the device.
->    This is especially true of recent systems which use hotplug events
->    via udev and systemd to do stuff.
-> 
-> 2. Do not start tearing down a device until the user interfaces have
->    been unpublished. Similar to (1), while the user interface is
->    published, uesrspace is completely free to interact with the device
->    in any way it sees fit.
-> 
-> In this case, what I'm concerned with is the call above to
-> cancel_delayed_work_sync() before dsa_unregister_switch(). While
-> cancel_delayed_work_sync() will stop this work and wait for the handler
-> to finish running before returning (which is safe) there is a window
-> between this call and dsa_unregister_switch() where the user _could_
-> issue a badly timed ethtool command which invokes
-> gsw1xx_pcs_an_restart(), which would re-schedule the delayed work,
-> thus undoing the cancel_delayed_work_sync() effect in this path.
+> Fixes: 737ca352569e ("net: mdio: aspeed: move reg accessing part into separate functions")
 
-And this is why is was pushing for the much simpler msleep(10), or
-io_poll.h polling to see if it self clears. It is hard to get that
-wrong, where as delayed work is much easier to get wrong.
+That seems like an odd Fixes: tag. That is just moving code around,
+but the write followed by a read existed before that. Why not:
 
-	Andrew
+commit f160e99462c68ab5b9e2b9097a4867459730b49a
+Author: Andrew Jeffery <andrew@aj.id.au>
+Date:   Wed Jul 31 15:09:57 2019 +0930
+
+    net: phy: Add mdio-aspeed
+    
+    The AST2600 design separates the MDIO controllers from the MAC, which is
+    where they were placed in the AST2400 and AST2500. Further, the register
+    interface is reworked again, so now we have three possible different
+    interface implementations, however this driver only supports the
+    interface provided by the AST2600. The AST2400 and AST2500 will continue
+    to be supported by the MDIO support embedded in the FTGMAC100 driver.
+    
+    The hardware supports both C22 and C45 mode, but for the moment only C22
+    support is implemented.
+    
+    Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
+    Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+
+
+    Andrew
+
+---
+pw-bot: cr
 
