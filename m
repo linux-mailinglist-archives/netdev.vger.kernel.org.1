@@ -1,169 +1,234 @@
-Return-Path: <netdev+bounces-244008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88BC7CAD3F4
-	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 14:25:32 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07811CAD3F7
+	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 14:25:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C73253027E08
-	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 13:22:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B8D90303C9FE
+	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 13:22:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BFEB3148B6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 944D9314A9E;
 	Mon,  8 Dec 2025 13:22:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f78.google.com (mail-ot1-f78.google.com [209.85.210.78])
+Received: from mail-ot1-f77.google.com (mail-ot1-f77.google.com [209.85.210.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ACA21F75A6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47FC31064B
 	for <netdev@vger.kernel.org>; Mon,  8 Dec 2025 13:22:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.78
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765200149; cv=none; b=ExJMIo8D4jIA3sXaWksxhIZU1M9d/qqz3b5pCzqGamfpIZMbUZScr+WJE6HYFmq6XgY9HsFlJew072VJoDkv2KqODAzkR+zAMdc+NyvOUQlfK8Cul5zbm1d6wBjcfTacvYcDvj7CKFf+01vQD6No9XNQvKjIFhUrG/kO/27c4r4=
+	t=1765200149; cv=none; b=dlGPIQ8zhcaQeh3lxpZbm23BIo+XK+j5RS4EYPG9GeF+bd1q8/UROBYXxDJpkA76Zy66Y15LrCm2R0uziU1U5ma1vpedVfRcyau3xuS8DvhU4gQGa38E6jvzhxFS0b4KOOu94v6ZqRmsMmW2S+FwqPdY+6dtS5HkA7HH6JMv5s4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1765200149; c=relaxed/simple;
-	bh=mJKIlv7pwHQdgbWSJxLQBCyOYSGQFFmf+5ffStpuDjI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=IXWIhgsdQxZ0TwLaaCj4a+J753lLcMbgOCFWg/1Iln+2p1nJezeVzF/QDsnqZWmS47mK+9/zn4rE73MT8Evh9CR6+NRVmzuLWdKyLI9PSZ2jcLZMyUtpteYQOFNLoViA476HiHjVCEYEAHcHn2FdB6vZMTgXO8M9ch3QVCVTrsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.78
+	bh=LwvNHlEEbzly2jfsw9wvqvyYl9aUC9zjVNPd+NjuRjI=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=PdF52wcRAiFrrbxhGJwXSxeVXPSL2RBtzWogg/L0TGa5A3ungz4jH33fFpaIoYSSv1Q9bxxn4iJkjzAzP/CagwKRnBwCWKrsuTOLbNVNXlm2u5gMtzMoB3h8xdjcXNqIiF9a0Yiu4G9v9VxWS2c3qX3Lz/fwfFCr2Rmg7szwBZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.77
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f78.google.com with SMTP id 46e09a7af769-7cab970818eso1196786a34.1
+Received: by mail-ot1-f77.google.com with SMTP id 46e09a7af769-7c705ffd76fso4549835a34.3
         for <netdev@vger.kernel.org>; Mon, 08 Dec 2025 05:22:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765200146; x=1765804946;
+        d=1e100.net; s=20230601; t=1765200147; x=1765804947;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=fccV9RKqyfgst002uxpcAJoMOGcXBOw38BoM6RFgrRI=;
-        b=ZKc4rrXWSsNJyVwiVCjb2pLo11H/4a/n8CnrLLUPqIM2OM8Q4ld3l+fYzmBDQbDNxX
-         KwWofptjX9Yz+H4fnZzkr4ZnuuUPBPCo2Hn53hQ8rCjBUjdZPTApZuDvL9f3dKcReXCf
-         D1vyGDl+LfDF9PxbC9sLPLmvkAVtB8IYG5Z411SfN9mN0jDkcKdKpakrPp7X3Ye7E/+L
-         172ZlIlDyMEeMwlBQC9gAYzAWLyCD4E8P6Mn/Xf2hsazN+oTA1OzXv3quQrTWOxRcIM4
-         rZDTGef+GPWj67ogmB/Tj8bvlTkTX33ZgGWvKrMtAlEteDnCZP352NgyD8GF/NpNwQJ9
-         ezyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXFFJZHGA0/7uD8vkeR1bcxik26JdIlbvu3x13XLecS1Go8+D1z9+doO+UqONN/oC0Jaa7iezY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSfm8FrATaFMHb4hXkP4l1rV7cfZkt1ibLl3uk0S33KEipaYzl
-	QqGr7B5hObF9c+6IGE6efameqKuLIJTcnLm0O4ADTXqEuGy/XvBQLdSiRqDmH6lxiAtbFm4/bIA
-	ySeO7epELF4zgCDjTsTfM2dZkJjGZR0nerI66+tRTjqvj8BKwivLctCoXYs8=
-X-Google-Smtp-Source: AGHT+IGDVML1NYMfVqSYdhcdpc9xcQHWjloVEML4QXkiG+02PaSmZ13z3yTBKFuOzRP6MTtYDWTV8MJC6Ld9zv0JxfzazQFo08r6
+        bh=rqHx3EFjzs+QFhnUVxrsH5bfDA142Rrdc6lwfSdaLhI=;
+        b=ZjR6GZ1ajxFEtF6+PsbcVaAOQ3LTWyoJRd6bSbFFJVwSvaC22XbFXAbax/ZU/rCtWX
+         w/49/XHdE84fkviw9KV2kHfEMrCMmAqDL6TpXdXEFRD3tv5x/34LH927HgMnU3wS5rb2
+         3HEVK22Yat3tCPbLs2Kes1ntjyqhEAhMpgtdnNg9SYkBMDawnV/e8lB+aUTIVULbarGT
+         lmVq7zltqKaIq2Yevd5IhdvdXhV8j+MiCQPxhPeL8B+waUpOf3vJsAkvWZ1ojpWodSMu
+         Pkod27a6VrAkWLpx9944Gv/zTN72RKjuFjZs658NqT//L2xjx/4VIgUT2ZXaUNiNG+p9
+         vPzA==
+X-Forwarded-Encrypted: i=1; AJvYcCVeec+WRR1veO0OgbhV4XaUUksfy+MFW3d5kwvHkiWKzcM7p2I/AQj7NxkqBbwsj4DGXHVkAFA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzgv8iNE+U+Y0EJcYG7bBNuZvxoM/1ZQ9Ch/wfGrUoZ4fAssWBH
+	IKemsfp04ZIaV4Wcc/Q2tBBH9306m0j6r0z9oOEHUDhJvOcWIj9tdps3Rc2D+ZANh2BSb+EoMvH
+	0w5w/aIsJLAOlOYO8thzSj1Lcyw+V0HU7/RX7eKcvKtV+9IsCVnPrKyjYA3Y=
+X-Google-Smtp-Source: AGHT+IHHyUxNrk92oPa4wWF+2Sh28qaqJApED9KIhhjSTxHp7P6loeCFBfwEfhvqJQldaV+qE+E77rhjsEWkvbfAaBOMD0QRLf13
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:62a:b0:659:9a49:9069 with SMTP id
- 006d021491bc7-6599a95e8c6mr3041769eaf.52.1765200146611; Mon, 08 Dec 2025
+X-Received: by 2002:a05:6820:180f:b0:659:9a49:8de4 with SMTP id
+ 006d021491bc7-6599a95cc08mr2864268eaf.38.1765200146847; Mon, 08 Dec 2025
  05:22:26 -0800 (PST)
 Date: Mon, 08 Dec 2025 05:22:26 -0800
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6936d112.a70a0220.38f243.00a7.GAE@google.com>
-Subject: [syzbot] [net?] possible deadlock in ipv6_sock_mc_close (4)
-From: syzbot <syzbot+c59e6bb54e7620495725@syzkaller.appspotmail.com>
+Message-ID: <6936d112.a70a0220.38f243.00a8.GAE@google.com>
+Subject: [syzbot] [net?] KASAN: invalid-free in inet_sock_destruct
+From: syzbot <syzbot+ec33a1a006ed5abe7309@syzkaller.appspotmail.com>
 To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, kuniyu@google.com, 
-	linux-kernel@vger.kernel.org, lucien.xin@gmail.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 
 Hello,
 
 syzbot found the following issue on:
 
-HEAD commit:    8f7aa3d3c732 Merge tag 'net-next-6.19' of git://git.kernel..
+HEAD commit:    a0c3aefb08cd Merge branch '40GbE' of git://git.kernel.org/..
 git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1564201a580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=9e5198eaf003f1d1
-dashboard link: https://syzkaller.appspot.com/bug?extid=c59e6bb54e7620495725
+console output: https://syzkaller.appspot.com/x/log.txt?x=104c5a58580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=3c2e630e5d8a0109
+dashboard link: https://syzkaller.appspot.com/bug?extid=ec33a1a006ed5abe7309
 compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17a53192580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13f3301a580000
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=153eb412580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12fc317c580000
 
 Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/5fe312c4cf90/disk-8f7aa3d3.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/c7a1f54ef730/vmlinux-8f7aa3d3.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/64a3779458bb/bzImage-8f7aa3d3.xz
+disk image: https://storage.googleapis.com/syzbot-assets/0cc70b728a24/disk-a0c3aefb.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/566c56cd7834/vmlinux-a0c3aefb.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/a0c05f9d1386/bzImage-a0c3aefb.xz
 
-The issue was bisected to:
+Bisection is inconclusive: the first bad commit could be any of:
 
-commit b7ddb55f31279f4e59acde3395fc03c3d94b6e5f
-Author: Kuniyuki Iwashima <kuniyu@google.com>
-Date:   Thu Oct 23 23:16:56 2025 +0000
+151b98d10ef7 net: Add sk_clone().
+16942cf4d3e3 sctp: Use sk_clone() in sctp_accept().
 
-    sctp: Use sctp_clone_sock() in sctp_do_peeloff().
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=105db01a580000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=125db01a580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=145db01a580000
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=134067cd980000
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+c59e6bb54e7620495725@syzkaller.appspotmail.com
-Fixes: b7ddb55f3127 ("sctp: Use sctp_clone_sock() in sctp_do_peeloff().")
+Reported-by: syzbot+ec33a1a006ed5abe7309@syzkaller.appspotmail.com
 
-============================================
-WARNING: possible recursive locking detected
-syzkaller #0 Not tainted
---------------------------------------------
-syz.0.17/5997 is trying to acquire lock:
-ffff88803021dee0 (sk_lock-AF_INET6){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1700 [inline]
-ffff88803021dee0 (sk_lock-AF_INET6){+.+.}-{0:0}, at: ipv6_sock_mc_close+0xd3/0x140 net/ipv6/mcast.c:348
+==================================================================
+BUG: KASAN: double-free in inet_sock_destruct+0x538/0x740 net/ipv4/af_inet.c:159
+Free of addr ffff88801f3430c0 by task ksoftirqd/1/23
 
-but task is already holding lock:
-ffff88803021d5a0 (sk_lock-AF_INET6){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1700 [inline]
-ffff88803021d5a0 (sk_lock-AF_INET6){+.+.}-{0:0}, at: sctp_getsockopt+0x135/0xb60 net/sctp/socket.c:8131
-
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-       ----
-  lock(sk_lock-AF_INET6);
-  lock(sk_lock-AF_INET6);
-
- *** DEADLOCK ***
-
- May be due to missing lock nesting notation
-
-1 lock held by syz.0.17/5997:
- #0: ffff88803021d5a0 (sk_lock-AF_INET6){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1700 [inline]
- #0: ffff88803021d5a0 (sk_lock-AF_INET6){+.+.}-{0:0}, at: sctp_getsockopt+0x135/0xb60 net/sctp/socket.c:8131
-
-stack backtrace:
-CPU: 1 UID: 0 PID: 5997 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+CPU: 1 UID: 0 PID: 23 Comm: ksoftirqd/1 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/02/2025
 Call Trace:
  <TASK>
  dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- print_deadlock_bug+0x279/0x290 kernel/locking/lockdep.c:3041
- check_deadlock kernel/locking/lockdep.c:3093 [inline]
- validate_chain kernel/locking/lockdep.c:3895 [inline]
- __lock_acquire+0x2540/0x2cf0 kernel/locking/lockdep.c:5237
- lock_acquire+0x117/0x340 kernel/locking/lockdep.c:5868
- lock_sock_nested+0x48/0x100 net/core/sock.c:3780
- lock_sock include/net/sock.h:1700 [inline]
- ipv6_sock_mc_close+0xd3/0x140 net/ipv6/mcast.c:348
- inet6_release+0x47/0x70 net/ipv6/af_inet6.c:482
- __sock_release net/socket.c:653 [inline]
- sock_release+0x85/0x150 net/socket.c:681
- sctp_getsockopt_peeloff_common+0x56b/0x770 net/sctp/socket.c:5732
- sctp_getsockopt_peeloff_flags+0x13b/0x230 net/sctp/socket.c:5801
- sctp_getsockopt+0x3ab/0xb60 net/sctp/socket.c:8151
- do_sock_getsockopt+0x2b4/0x3d0 net/socket.c:2399
- __sys_getsockopt net/socket.c:2428 [inline]
- __do_sys_getsockopt net/socket.c:2435 [inline]
- __se_sys_getsockopt net/socket.c:2432 [inline]
- __x64_sys_getsockopt+0x1a5/0x250 net/socket.c:2432
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f8a4018f749
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffc8290fbe8 EFLAGS: 00000246 ORIG_RAX: 0000000000000037
-RAX: ffffffffffffffda RBX: 00007f8a403e5fa0 RCX: 00007f8a4018f749
-RDX: 000000000000007a RSI: 0000000000000084 RDI: 0000000000000003
-RBP: 00007f8a40213f91 R08: 0000200000000040 R09: 0000000000000000
-R10: 0000200000000340 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f8a403e5fa0 R14: 00007f8a403e5fa0 R15: 0000000000000005
+ print_address_description mm/kasan/report.c:378 [inline]
+ print_report+0xca/0x240 mm/kasan/report.c:482
+ kasan_report_invalid_free+0xea/0x110 mm/kasan/report.c:557
+ check_slab_allocation+0xe1/0x130 include/linux/page-flags.h:-1
+ kasan_slab_pre_free include/linux/kasan.h:198 [inline]
+ slab_free_hook mm/slub.c:2484 [inline]
+ slab_free mm/slub.c:6630 [inline]
+ kfree+0x148/0x6d0 mm/slub.c:6837
+ inet_sock_destruct+0x538/0x740 net/ipv4/af_inet.c:159
+ __sk_destruct+0x89/0x660 net/core/sock.c:2350
+ sock_put include/net/sock.h:1991 [inline]
+ sctp_endpoint_destroy_rcu+0xa1/0xf0 net/sctp/endpointola.c:197
+ rcu_do_batch kernel/rcu/tree.c:2605 [inline]
+ rcu_core+0xcab/0x1770 kernel/rcu/tree.c:2861
+ handle_softirqs+0x286/0x870 kernel/softirq.c:622
+ run_ksoftirqd+0x9b/0x100 kernel/softirq.c:1063
+ smpboot_thread_fn+0x542/0xa60 kernel/smpboot.c:160
+ kthread+0x711/0x8a0 kernel/kthread.c:463
+ ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
  </TASK>
+
+Allocated by task 6015:
+ kasan_save_stack mm/kasan/common.c:56 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:77
+ poison_kmalloc_redzone mm/kasan/common.c:400 [inline]
+ __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:417
+ kasan_kmalloc include/linux/kasan.h:262 [inline]
+ __do_kmalloc_node mm/slub.c:5642 [inline]
+ __kmalloc_noprof+0x411/0x7f0 mm/slub.c:5654
+ kmalloc_noprof include/linux/slab.h:961 [inline]
+ kzalloc_noprof include/linux/slab.h:1094 [inline]
+ ip_options_get+0x51/0x4c0 net/ipv4/ip_options.c:517
+ do_ip_setsockopt+0x1d9b/0x2d00 net/ipv4/ip_sockglue.c:1087
+ ip_setsockopt+0x66/0x110 net/ipv4/ip_sockglue.c:1417
+ do_sock_setsockopt+0x17c/0x1b0 net/socket.c:2360
+ __sys_setsockopt net/socket.c:2385 [inline]
+ __do_sys_setsockopt net/socket.c:2391 [inline]
+ __se_sys_setsockopt net/socket.c:2388 [inline]
+ __x64_sys_setsockopt+0x13f/0x1b0 net/socket.c:2388
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Freed by task 23:
+ kasan_save_stack mm/kasan/common.c:56 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:77
+ __kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:587
+ kasan_save_free_info mm/kasan/kasan.h:406 [inline]
+ poison_slab_object mm/kasan/common.c:252 [inline]
+ __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:284
+ kasan_slab_free include/linux/kasan.h:234 [inline]
+ slab_free_hook mm/slub.c:2539 [inline]
+ slab_free mm/slub.c:6630 [inline]
+ kfree+0x19a/0x6d0 mm/slub.c:6837
+ inet_sock_destruct+0x538/0x740 net/ipv4/af_inet.c:159
+ __sk_destruct+0x89/0x660 net/core/sock.c:2350
+ sock_put include/net/sock.h:1991 [inline]
+ sctp_endpoint_destroy_rcu+0xa1/0xf0 net/sctp/endpointola.c:197
+ rcu_do_batch kernel/rcu/tree.c:2605 [inline]
+ rcu_core+0xcab/0x1770 kernel/rcu/tree.c:2861
+ handle_softirqs+0x286/0x870 kernel/softirq.c:622
+ run_ksoftirqd+0x9b/0x100 kernel/softirq.c:1063
+ smpboot_thread_fn+0x542/0xa60 kernel/smpboot.c:160
+ kthread+0x711/0x8a0 kernel/kthread.c:463
+ ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+The buggy address belongs to the object at ffff88801f3430c0
+ which belongs to the cache kmalloc-32 of size 32
+The buggy address is located 0 bytes inside of
+ 32-byte region [ffff88801f3430c0, ffff88801f3430e0)
+
+The buggy address belongs to the physical page:
+page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1f343
+anon flags: 0xfff00000000000(node=0|zone=1|lastcpupid=0x7ff)
+page_type: f5(slab)
+raw: 00fff00000000000 ffff88801a026780 0000000000000000 dead000000000001
+raw: 0000000000000000 0000000000400040 00000000f5000000 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 0, migratetype Unmovable, gfp_mask 0x52800(GFP_NOWAIT|__GFP_NORETRY|__GFP_COMP), pid 184, tgid 184 (kworker/u8:6), ts 6625749703, free_ts 6600992626
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x240/0x2a0 mm/page_alloc.c:1850
+ prep_new_page mm/page_alloc.c:1858 [inline]
+ get_page_from_freelist+0x2365/0x2440 mm/page_alloc.c:3884
+ __alloc_frozen_pages_noprof+0x181/0x370 mm/page_alloc.c:5183
+ alloc_pages_mpol+0x232/0x4a0 mm/mempolicy.c:2416
+ alloc_slab_page mm/slub.c:3055 [inline]
+ allocate_slab+0x96/0x350 mm/slub.c:3228
+ new_slab mm/slub.c:3282 [inline]
+ ___slab_alloc+0xe94/0x18a0 mm/slub.c:4651
+ __slab_alloc+0x65/0x100 mm/slub.c:4770
+ __slab_alloc_node mm/slub.c:4846 [inline]
+ slab_alloc_node mm/slub.c:5268 [inline]
+ __kmalloc_cache_noprof+0x411/0x6f0 mm/slub.c:5758
+ kmalloc_noprof include/linux/slab.h:957 [inline]
+ slab_free_hook mm/slub.c:2491 [inline]
+ slab_free mm/slub.c:6630 [inline]
+ kmem_cache_free+0x16f/0x690 mm/slub.c:6740
+ __fput_deferred+0x227/0x390 fs/file_table.c:523
+ fput_close+0x119/0x200 fs/file_table.c:585
+ path_openat+0x313c/0x3830 fs/namei.c:4143
+ do_filp_open+0x1fa/0x410 fs/namei.c:4161
+ do_open_execat+0x135/0x560 fs/exec.c:783
+ alloc_bprm+0x28/0x5c0 fs/exec.c:1410
+ kernel_execve+0x9b/0x9f0 fs/exec.c:1885
+page last free pid 10 tgid 10 stack trace:
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ free_pages_prepare mm/page_alloc.c:1394 [inline]
+ __free_frozen_pages+0xbc4/0xd30 mm/page_alloc.c:2906
+ vfree+0x25a/0x400 mm/vmalloc.c:3440
+ delayed_vfree_work+0x55/0x80 mm/vmalloc.c:3359
+ process_one_work kernel/workqueue.c:3263 [inline]
+ process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3346
+ worker_thread+0x8a0/0xda0 kernel/workqueue.c:3427
+ kthread+0x711/0x8a0 kernel/kthread.c:463
+ ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
+Memory state around the buggy address:
+ ffff88801f342f80: 00 00 00 00 00 00 fc fc fc fc fc fc fc fc fc fc
+ ffff88801f343000: 00 00 00 fc fc fc fc fc 00 00 00 fc fc fc fc fc
+>ffff88801f343080: fa fb fb fb fc fc fc fc fa fb fb fb fc fc fc fc
+                                           ^
+ ffff88801f343100: fa fb fb fb fc fc fc fc fa fb fb fb fc fc fc fc
+ ffff88801f343180: fa fb fb fb fc fc fc fc fa fb fb fb fc fc fc fc
+==================================================================
 
 
 ---
