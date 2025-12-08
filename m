@@ -1,214 +1,194 @@
-Return-Path: <netdev+bounces-243985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B591CACCA0
-	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 11:04:56 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8639CACCA6
+	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 11:05:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 126523097BB9
-	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 10:02:28 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5C6AD3005526
+	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 10:05:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 244F8314B8C;
-	Mon,  8 Dec 2025 09:54:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98B572DF144;
+	Mon,  8 Dec 2025 10:05:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="aHKBJXNG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZdcTmJyG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2FE6314A7B;
-	Mon,  8 Dec 2025 09:54:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40E40265CC2
+	for <netdev@vger.kernel.org>; Mon,  8 Dec 2025 10:05:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765187698; cv=none; b=MhTShO7nVVOh2NGU/lImrseU9PL33trhIEVBL+WY3J+pmR4yuiBOm7MckrDas3/Up6XFifGfzi806erECTNFZNf9g4hEKDxxeVPAOZ2ZZD8Bbn1QWHwFFVfrruudF+I++X6huT4Om6ddPu+7gerAMpDrBOLJ+f5aN0/CpxkKTIU=
+	t=1765188331; cv=none; b=NMwu1nJQs/h46r+zD+sey5n1s2ttNms25pQxrLKTD+DVDSilHe82m/4j9WcQNyWw4j2XZzDGUuCfuYGO5D0kIJ2OILCAI9xQMyzY8xBEi72SBboHibXOasWMSp1NSqdrVu6sHA8uWxHSaxAjB/KxiQZPl3VyuOC31V+aAp753zQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765187698; c=relaxed/simple;
-	bh=TMzvKUjgodkMI/IZsdxWqJWx8tpCFtuFGx/wZEf0WMo=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=t04aAGLhzMYswjkIC7yIV/40jfFvOcbdEAO49sKG7J0mLInxgrmL7LHqxqGuPT6uSNvXvYAHuYMBuaPKv3C8+yxjpIQEf99fzJoFHiYR1c0NUc8nVDZWIJc3t3QrY5Hh9v1sx2K41742KH1//cqFKz8pVk0sGayeD5CiDmB5X4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=aHKBJXNG; arc=none smtp.client-ip=80.241.56.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4dPy506TPXz9tgH;
-	Mon,  8 Dec 2025 10:54:44 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1765187685; h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
+	s=arc-20240116; t=1765188331; c=relaxed/simple;
+	bh=uBffDVisZiuzB9gI9OLnpMb0BrZYxdobcZ1h3L9trY0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WznJZAF5A0KtqdOYxUIcyw066j9CFFvbAS0Ct7VS1s7vnICow+qrdPSg0BFSbljxHhN4RwVffpSUVLx/TEQV5MyaZPtmp8aJ98K8moArmDGKbhjLk1ouYBaUopRJjCr4rBRPze1dBnc+zQMqATMy1epUhdNrTMdRsfCbtUDH2mE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZdcTmJyG; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1765188328;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=y7G99GFEMW7DWtZHSnN3HRGF1QQf6WJ1ZrDBEDIVJp0=;
-	b=aHKBJXNGpYWOeiJgwFHbzfw7wUJbdv3VcMzmvLVrEK4gep2XlLpVg7yCd/90gwKZZ5n5RS
-	F+umOOat8SyOvxu21T33ZGo29sBJn4TXD3OHiGEJLKRBuUSaHtSsN1nc/4DWcwn0A2QjGg
-	vplng6abSSlkuPfe8VwsOR70FHeCoKpbuoSU/EmtGFIy6bpA8XluW5wp5I74BByCI4y+kT
-	r2RHA+Y6AZeBCdGseYUgkWNrZO0PUnfXA5qEtS4poUJiZ0Grgm2zZP4szVJGofC0Sla8mD
-	jWTWSPu02tNiPrpku4YbL7694v8+pBCFJUPOml27/JuV9vDrBl2rmM+40Ph5aw==
-Message-ID: <27fec7d0ed633218a7787be3edce63c3038c63e2.camel@mailbox.org>
-Subject: Re: [PATCH net-next v3 2/3] net: stmmac: Add glue driver for
- Motorcomm YT6801 ethernet controller
-From: Philipp Stanner <phasta@mailbox.org>
-Reply-To: phasta@kernel.org
-To: Bjorn Helgaas <helgaas@kernel.org>, "Russell King (Oracle)"
- <linux@armlinux.org.uk>, Philipp Stanner <phasta@kernel.org>, Thomas
- Gleixner <tglx@linutronix.de>
-Cc: Yao Zi <ziyao@disroot.org>, Bjorn Helgaas <bhelgaas@google.com>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Frank <Frank.Sae@motor-comm.com>, Heiner
- Kallweit <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- Choong Yong Liang <yong.liang.choong@linux.intel.com>, Chen-Yu Tsai
- <wens@csie.org>, Jisheng Zhang <jszhang@kernel.org>, Furong Xu
- <0x1207@gmail.com>,  linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- Mingcong Bai <jeffbai@aosc.io>, Kexy Biscuit <kexybiscuit@aosc.io>, Runhua
- He <hua@aosc.io>,  Xi Ruoyao <xry111@xry111.site>
-Date: Mon, 08 Dec 2025 10:54:36 +0100
-In-Reply-To: <20251205221629.GA3294018@bhelgaas>
-References: <20251205221629.GA3294018@bhelgaas>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	bh=+5DRB1WNuUEh9dw4lXaZHc8OhCgJ52BllgGJz6/xq6I=;
+	b=ZdcTmJyG8ks9BG2HYsHWWwlFAdhmMkqfU7IPA9w9dp7KQD4or8YkP991/HPF/c0JWNICbX
+	g1JcyBRSgr5eB7723JVBtUDx4d8UXfHw6ztajYKrqTLoebLttSkXH7HkndYSiZWSkYe2S5
+	RyNGNiNuJWmd/HY8XKkoUuiqsYkgl3s=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-518-a3Wu67K0PRGCb4fHriYFCg-1; Mon,
+ 08 Dec 2025 05:05:25 -0500
+X-MC-Unique: a3Wu67K0PRGCb4fHriYFCg-1
+X-Mimecast-MFC-AGG-ID: a3Wu67K0PRGCb4fHriYFCg_1765188322
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A154A19560AD;
+	Mon,  8 Dec 2025 10:05:21 +0000 (UTC)
+Received: from fedora (unknown [10.45.224.91])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with SMTP id 794571800357;
+	Mon,  8 Dec 2025 10:05:11 +0000 (UTC)
+Received: by fedora (nbSMTP-1.00) for uid 1000
+	oleg@redhat.com; Mon,  8 Dec 2025 11:05:21 +0100 (CET)
+Date: Mon, 8 Dec 2025 11:05:09 +0100
+From: Oleg Nesterov <oleg@redhat.com>
+To: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>
+Cc: Todd Kjos <tkjos@android.com>, Martijn Coenen <maco@android.com>,
+	Joel Fernandes <joelagnelf@nvidia.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Carlos Llamas <cmllamas@google.com>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Felix Kuehling <Felix.Kuehling@amd.com>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Boris Brezillon <boris.brezillon@collabora.com>,
+	Rob Herring <robh@kernel.org>, Steven Price <steven.price@arm.com>,
+	=?iso-8859-1?Q?Adri=E1n?= Larumbe <adrian.larumbe@collabora.com>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Liviu Dudau <liviu.dudau@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+	dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 4/7] drm/amd: kill the outdated "Only the pthreads
+ threading model is supported" checks
+Message-ID: <aTai1a2sFqTh7wv9@redhat.com>
+References: <aTV1jTmYK3Bjh4k6@redhat.com>
+ <e8846bef-2a6b-4552-8fb6-a33a00273aab@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MBO-RS-ID: 38cd42a6ba75c52707c
-X-MBO-RS-META: yigmkee8jr5ynr5ts8zd7ndt5ycufme3
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e8846bef-2a6b-4552-8fb6-a33a00273aab@amd.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Fri, 2025-12-05 at 16:16 -0600, Bjorn Helgaas wrote:
-> [+to Philipp, Thomas for MSI devres question]
->=20
-> On Fri, Dec 05, 2025 at 09:34:54AM +0000, Russell King (Oracle) wrote:
-> > On Fri, Dec 05, 2025 at 05:31:34AM +0000, Yao Zi wrote:
-> > > On Mon, Nov 24, 2025 at 07:06:12PM +0000, Russell King (Oracle) wrote=
-:
-> > > > On Mon, Nov 24, 2025 at 04:32:10PM +0000, Yao Zi wrote:
-> > > > > +static int motorcomm_setup_irq(struct pci_dev *pdev,
-> > > > > +			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct stmmac_resources =
-*res,
-> > > > > +			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct plat_stmmacenet_d=
-ata *plat)
-> > > > > +{
-> > > > > +	int ret;
-> > > > > +
-> > > > > +	ret =3D pci_alloc_irq_vectors(pdev, 6, 6, PCI_IRQ_MSIX);
-> > > > > +	if (ret > 0) {
-> > > > > +		res->rx_irq[0]	=3D pci_irq_vector(pdev, 0);
-> > > > > +		res->tx_irq[0]	=3D pci_irq_vector(pdev, 4);
-> > > > > +		res->irq	=3D pci_irq_vector(pdev, 5);
-> > > > > +
-> > > > > +		plat->flags |=3D STMMAC_FLAG_MULTI_MSI_EN;
-> > > > > +
-> > > > > +		return 0;
-> > > > > +	}
-> > > > > +
-> > > > > +	dev_info(&pdev->dev, "failed to allocate MSI-X vector: %d\n", r=
-et);
-> > > > > +	dev_info(&pdev->dev, "try MSI instead\n");
-> > > > > +
-> > > > > +	ret =3D pci_alloc_irq_vectors(pdev, 1, 1, PCI_IRQ_MSI);
-> > > > > +	if (ret < 0)
-> > > > > +		return dev_err_probe(&pdev->dev, ret,
-> > > > > +				=C2=A0=C2=A0=C2=A0=C2=A0 "failed to allocate MSI\n");
-> > > > > +
-> > > > > +	res->irq =3D pci_irq_vector(pdev, 0);
-> > > > > +
-> > > > > +	return 0;
-> > > > > +}
-> > > > > +
-> > > > > +static int motorcomm_probe(struct pci_dev *pdev, const struct pc=
-i_device_id *id)
-> > > > > +{
-> > > > ...
-> > > > > +	ret =3D motorcomm_setup_irq(pdev, &res, plat);
-> > > > > +	if (ret)
-> > > > > +		return dev_err_probe(&pdev->dev, ret, "failed to setup IRQ\n")=
-;
-> > > > > +
-> > > > > +	motorcomm_init(priv);
-> > > > > +
-> > > > > +	res.addr =3D priv->base + GMAC_OFFSET;
-> > > > > +
-> > > > > +	return stmmac_dvr_probe(&pdev->dev, plat, &res);
-> > > >=20
-> > > > If stmmac_dvr_probe() fails, then it will return an error code. Thi=
-s
-> > > > leaves the PCI MSI interrupt allocated...
-> > >=20
-> > > This isn't true. MSI API is a little magical: when the device is enab=
-led
+On 12/08, Christian König wrote:
+>
+> On 12/7/25 13:39, Oleg Nesterov wrote:
+> > Nowaday task->group_leader->mm != task->mm is only possible if
+> > a) task is not a group leader and b) task->group_leader->mm == NULL
+> > because task->group_leader has already exited using sys_exit().
+>
+> Just for my understanding: That is because CLONE_THREAD can only be
+> specified together with CLONE_SIGHAND and CLONE_VM, correct?
 
-s/magical/confusing and explosive
+Yes, copy copy_process() does
 
-;)
+	if ((clone_flags & CLONE_THREAD) && !(clone_flags & CLONE_SIGHAND))
+		return ERR_PTR(-EINVAL);
 
-> > > through pcim_enable_device(), the device becomes devres-managed, and
-> > > a plain call to pci_alloc_irq_vectors() becomes managed, too, even if
-> > > its name doesn't indicate it's a devres-managed API.
+	if ((clone_flags & CLONE_SIGHAND) && !(clone_flags & CLONE_VM))
+		return ERR_PTR(-EINVAL);
 
-Just to be clear: Callers of pci_setup_msi_context() are the last users
-in PCI which express this strange behavior. All the other APIs behave
-as one could expect from their name (pcim_ vs pci_).
+	...
 
-> > >=20
-> > > pci_free_irq_vectors() will be automatically called on driver deattac=
-h.
-> > > See pcim_setup_msi_release() in drivers/pci/msi/msi.c, which is invok=
-ed
-> > > by pci_alloc_irq_vectors() internally.
+	if (clone_flags & CLONE_THREAD) {
+		p->group_leader = current->group_leader;
+		p->tgid = current->tgid;
+	} else {
+		p->group_leader = p;
+		p->tgid = p->pid;
+	}
+> Reviewed-by: Christian König <christian.koenig@amd.com>
 
-Yes, this is correct.
+Thanks!
 
-> >=20
-> > This looks very non-intuitive, and the documentation for
-> > pci_alloc_irq_vectors() doesn't help:
-> >=20
-> > =C2=A0* Upon a successful allocation, the caller should use pci_irq_vec=
-tor()
-> > =C2=A0* to get the Linux IRQ number to be passed to request_threaded_ir=
-q().
-> > =C2=A0* The driver must call pci_free_irq_vectors() on cleanup.
-> > =C2=A0=C2=A0 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> >=20
-> > because if what you say is correct (and it looks like it is) then this
-> > line is blatently incorrect.
+> Should we pick that one up or do you want to merge it upstream somehow?
 
-True, this line is false. It should probably state "If you didn't
-enable your PCI device with pcim_enable_device(), you must call
-pci_free_irq_vectors() on cleanup."
+If you don't object, I would like to route this series via -mm tree.
 
-I don't know whether calling pci_free_irq_vectors() is a bug (once
-manually, once hidden by devres), though.
+See 0/7, I am going to send more (simple) tree-wide changes which depend
+on this series.
 
-If it's not a bug, one could keep the docu that way or at least phrase
-it in a way so that no additional users start relying on that hybrid
-mechanism.
+Oleg.
 
-There is actually no reason anymore to call pcim_enable_device() at
-all, other than that you get automatic device disablement.
+> Regards,
+> Christian.
+>
+> > ---
+> >  drivers/gpu/drm/amd/amdgpu/amdgpu_vm.c   |  3 ---
+> >  drivers/gpu/drm/amd/amdkfd/kfd_process.c | 10 ----------
+> >  2 files changed, 13 deletions(-)
+> >
+> > diff --git a/drivers/gpu/drm/amd/amdgpu/amdgpu_vm.c b/drivers/gpu/drm/amd/amdgpu/amdgpu_vm.c
+> > index a0f8ba382b9e..e44f158a11f0 100644
+> > --- a/drivers/gpu/drm/amd/amdgpu/amdgpu_vm.c
+> > +++ b/drivers/gpu/drm/amd/amdgpu/amdgpu_vm.c
+> > @@ -2551,9 +2551,6 @@ void amdgpu_vm_set_task_info(struct amdgpu_vm *vm)
+> >  	vm->task_info->task.pid = current->pid;
+> >  	get_task_comm(vm->task_info->task.comm, current);
+> >
+> > -	if (current->group_leader->mm != current->mm)
+> > -		return;
+> > -
+> >  	vm->task_info->tgid = current->tgid;
+> >  	get_task_comm(vm->task_info->process_name, current->group_leader);
+> >  }
+> > diff --git a/drivers/gpu/drm/amd/amdkfd/kfd_process.c b/drivers/gpu/drm/amd/amdkfd/kfd_process.c
+> > index a085faac9fe1..f8ef18a3aa71 100644
+> > --- a/drivers/gpu/drm/amd/amdkfd/kfd_process.c
+> > +++ b/drivers/gpu/drm/amd/amdkfd/kfd_process.c
+> > @@ -833,12 +833,6 @@ struct kfd_process *kfd_create_process(struct task_struct *thread)
+> >  	if (!(thread->mm && mmget_not_zero(thread->mm)))
+> >  		return ERR_PTR(-EINVAL);
+> >
+> > -	/* Only the pthreads threading model is supported. */
+> > -	if (thread->group_leader->mm != thread->mm) {
+> > -		mmput(thread->mm);
+> > -		return ERR_PTR(-EINVAL);
+> > -	}
+> > -
+> >  	/* If the process just called exec(3), it is possible that the
+> >  	 * cleanup of the kfd_process (following the release of the mm
+> >  	 * of the old process image) is still in the cleanup work queue.
+> > @@ -918,10 +912,6 @@ struct kfd_process *kfd_get_process(const struct task_struct *thread)
+> >  	if (!thread->mm)
+> >  		return ERR_PTR(-EINVAL);
+> >
+> > -	/* Only the pthreads threading model is supported. */
+> > -	if (thread->group_leader->mm != thread->mm)
+> > -		return ERR_PTR(-EINVAL);
+> > -
+> >  	process = find_process(thread, false);
+> >  	if (!process)
+> >  		return ERR_PTR(-EINVAL);
+>
 
-> >=20
-> > Bjorn?
-
-BTW, if PCI has a TODO list somewhere, removing that hybrid devres
-feature for MSI should be on it, for obvious reasons.
-
-The good news is that it's the last remainder of PCI hybrid devres and
-getting rid of it would allow for removal of some additional code, too
-(e.g., is_enabled bit and pcim_pin_device()).
-
-The bad news is that it's not super trivial to remove. I looked into it
-about two times and decided I can't invest that time currently. You
-need to go over all drivers again to see who uses pcim_enable_device(),
-then add free_irq_vecs() for them all and so on=E2=80=A6
-
-If you give me a pointer I can provide a TODO entry. In any case, feel
-free to set me as a reviewer!
-
-Regards
-Philipp
 
