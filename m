@@ -1,55 +1,54 @@
-Return-Path: <netdev+bounces-244030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4148CADDB9
-	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 18:17:20 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5884DCADED6
+	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 18:37:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2300C3064550
-	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 17:16:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0AEF13061EBF
+	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 17:34:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 682BC2FC03C;
-	Mon,  8 Dec 2025 17:16:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3859C19CD06;
+	Mon,  8 Dec 2025 17:33:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GMwS0y3S"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jzJ1Rihk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4247A2FBE05;
-	Mon,  8 Dec 2025 17:16:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10FDE3B8D74;
+	Mon,  8 Dec 2025 17:33:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765214173; cv=none; b=TnNkR6vAWyesJ/Sd+QC2nKNKMKb9huc6bthC57cGsmjvACZtGCtAZex304drsgejXPKw4bNrOOAkYqYjspwkenyAmJkgHQNeqHCuxAjlxHcQihgOv1cNI0qShhiQEnoWU5StZPxRLuPNotBxqWlcBzWIMdS9F6hd7c37XeZRQis=
+	t=1765215239; cv=none; b=c6Vjigbj2TL8Q/zqcUVVvajDzAdHu9w5F1AF4iECiL2Z4JwwuJcL9gPO/zcBAVBzcD5nlR71TYNlb6B+mMwD1uEfyv1q1aEPpUkdipjFV83g9grzOyawbuAhRtp41zVsqD19TEWrfLKDAxP1WcKS3+CeRItERQgmzR6L0hRuS+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765214173; c=relaxed/simple;
-	bh=Bbhttr7Ktx4MB0NrB9LJrMZ/YzjWNnMlRrwigv3NZEQ=;
+	s=arc-20240116; t=1765215239; c=relaxed/simple;
+	bh=eDlFYGx+u3XtO1I0xvY4YJpNfp8rUGZDXmbguhSDwg4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GUz78V7thLvpw5hiKih3LGZCa6LndrmjnBnvmgb44CzHbpOWTXLAHKJRtXg9TZo8R+SsmXYe+FDYmk2PdaWj33dP5ceWcyOPxPGxNfsSjwxlLRSF8znU6ni/PZADmJWMv6YQOHB5T0QWb5ibXEaOcXUGkd/SFiCBGapkBDKunjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GMwS0y3S; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87266C4CEF1;
-	Mon,  8 Dec 2025 17:16:11 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZgVPwTK7duFf5cZ+Ju5L27APu4EgdjRRedB5/4cbNFHceIkJfvmti9rMoYu3gW81p9EIc6piSFrCct9LBsZFHiwblmZnFYIJ+Y5YYd/bsZFZk/Pn988NXCxUA9J0/Q2UYWgrMABuY6Kk5vK7gw30V8287CNZ+tR0cm3yFfdad58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jzJ1Rihk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86B96C4CEF1;
+	Mon,  8 Dec 2025 17:33:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765214173;
-	bh=Bbhttr7Ktx4MB0NrB9LJrMZ/YzjWNnMlRrwigv3NZEQ=;
+	s=k20201202; t=1765215238;
+	bh=eDlFYGx+u3XtO1I0xvY4YJpNfp8rUGZDXmbguhSDwg4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GMwS0y3SN3SMUu8lLywAt0IkiUKBxC1bPaq8rEqhDxfwvpNFL9wWEob4h3Y9ld7Jq
-	 mDK/LOutsshLfG88QaDJrHvK7Zs13+it17UalGTrIBw8yWokHCosMY64J69hwhhfi1
-	 Qrlib8VF35WrLUMquXN3ITR7vZyHuLoA59PxwhMS+AswRxQ02DxWP04mwNzcVEpyWa
-	 JUNcWGzej+hlQuzOdGmRjizBKIVb7fy5YEBZoqH2rfIotpIufgYgKEr/kx440JEvdV
-	 rfEfz2fOkMbuSuJHJLOrLvlmeNg2azrj4Y7pGMhmbRnJepQfrvfXYq+a7Qk/eMXxlZ
-	 l+ORNlEhln5mw==
-Date: Mon, 8 Dec 2025 17:16:09 +0000
+	b=jzJ1RihkLHODbO8HKdyq7vqhVCNkN3Ej9UY+hw0E5qxQ9iJDxK8TA5ELLrlF0E7ex
+	 F1ZtdMBSaXYdq262NinE6NQIMzjee691zUgc9v4eN6L+8Jjlq/F3DOQ8KWxZqX3VOX
+	 BsADVoXrWRmH5GlrvkDJQaaQcna9A/3gXOnrcC6psiZF+9H9uBqQuTMAgkgZ4JAzX2
+	 CMt8y47Am+ex40bU4Z3i/K0TptvN8WQu+scEdDBIJdXqxyPARGj233lWe4rEkmuCJp
+	 skb0LuX/JmZK2AHi+R6HBW4O5mQCToadHbNd+E9dtgEu93LhSnJbnyTO0HIPs2aI7T
+	 UfgXt5vs96Lsw==
+Date: Mon, 8 Dec 2025 17:33:55 +0000
 From: Simon Horman <horms@kernel.org>
-To: David Bauer <mail@david-bauer.net>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"R. Parameswaran" <parameswaran.r7@gmail.com>,
+To: Dharanitharan R <dharanitharan725@gmail.com>
+Cc: syzbot+422806e5f4cce722a71f@syzkaller.appspotmail.com,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] l2tp: account for IP version in SKB headroom
-Message-ID: <aTcH2UjqAvd84l59@horms.kernel.org>
-References: <20251206162603.24900-1-mail@david-bauer.net>
+Subject: Re: [PATCH] team: fix qom_list corruption by using
+ list_del_init_rcu()
+Message-ID: <aTcMA29O_JC5Npdg@horms.kernel.org>
+References: <6903e344.050a0220.32483.022d.GAE@google.com>
+ <20251207025807.1674-2-dharanitharan725@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,31 +57,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251206162603.24900-1-mail@david-bauer.net>
+In-Reply-To: <20251207025807.1674-2-dharanitharan725@gmail.com>
 
-On Sat, Dec 06, 2025 at 05:26:01PM +0100, David Bauer wrote:
-> Account for the IP version of the tunnel when accounting skb headroom on
-> xmit. This avoids having to potentially copy the skb a second time down
-> the stack due to allocating not enough space for IPv6 headers in case
-> the tunnel uses IPv6.
+On Sun, Dec 07, 2025 at 02:58:08AM +0000, Dharanitharan R wrote:
+> #syz test: git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
 > 
-> Fixes: b784e7ebfce8 ("L2TP:Adjust intf MTU, add underlay L3, L2 hdrs.")
-> Signed-off-by: David Bauer <mail@david-bauer.net>
+> Reported-by: syzbot+422806e5f4cce722a71f@syzkaller.appspotmail.com
+> Signed-off-by: Dharanitharan R <dharanitharan725@gmail.com>
 
-Hi David,
+Hi Dharanitharan,
 
-This feels more like an enhancement for net-next than a fix for net.
+Please slow down!
 
-If so, please resubmit for net-next once it reopens, after 2nd January.
+It is not appropriate to send multiple versions of a patch CCed to
+netdev within in quick succession. Rather, 24h should elapse between
+versions. And moreover, I'd advise against CCing netdev on patches
+targeted at syzbot testing.
 
-In that case the fixes tag should be dropped.
-But you can cite a commit in free-form text in the commit message -
-above the tags - something like this.
+When you do post a fix, for a problem flagged by syzbot, to netdev please
+include:
 
-...
+* A description of the problem, and
+* How the approach taken fixes it
 
-Introduced by commit b784e7ebfce8 ("L2TP:Adjust intf MTU, add underlay L3,
-L2 hdrs.").
+Typically such a patch will be a bug fix for code present in the net tree.
+So it should be targeted at the net tree like this:
 
-Signed-off-by: ...
+Subject: [PATCH net] ...
+
+And it should probably include the following tags:
+
+Fixes:
+Reported-by:
+Closes:
+
+Especially the Fixes tag.
+
+For an example please see:
+
+https://lore.kernel.org/netdev/20251122002027.695151-1-zlatistiv@gmail.com/
+
+For more information on the Netdev development process please see:
+
+https://docs.kernel.org/process/maintainer-netdev.html
+
+Thanks.
+
+-- 
+pw-bot: changes-requested
 
