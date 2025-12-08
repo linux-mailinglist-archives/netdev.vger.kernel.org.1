@@ -1,61 +1,55 @@
-Return-Path: <netdev+bounces-244029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244030-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E41B4CADCE9
-	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 18:06:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E4148CADDB9
+	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 18:17:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D507C303B19A
-	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 17:06:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2300C3064550
+	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 17:16:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6732E266B6B;
-	Mon,  8 Dec 2025 17:06:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 682BC2FC03C;
+	Mon,  8 Dec 2025 17:16:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qcPHdJUf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GMwS0y3S"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 392C9EEBA
-	for <netdev@vger.kernel.org>; Mon,  8 Dec 2025 17:06:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4247A2FBE05;
+	Mon,  8 Dec 2025 17:16:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765213580; cv=none; b=bYz7x/2ayAPFWsWADRxCmQ72SSZaeH82AL+t0hy3r0r1M0HaGc833Wq94nxTtvsrrWnQdoPZCeTyiVKlYDHL4XTHXGIXdkOfjtVOK3V08ScafSrWNKQ32WQTc8lCLxH/02w7fuMV4xv6xbPLOhx5gLjMkCw+tN2azQw8Y6wbTWQ=
+	t=1765214173; cv=none; b=TnNkR6vAWyesJ/Sd+QC2nKNKMKb9huc6bthC57cGsmjvACZtGCtAZex304drsgejXPKw4bNrOOAkYqYjspwkenyAmJkgHQNeqHCuxAjlxHcQihgOv1cNI0qShhiQEnoWU5StZPxRLuPNotBxqWlcBzWIMdS9F6hd7c37XeZRQis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765213580; c=relaxed/simple;
-	bh=dWzchTxm0gXG4RlOi7Dhq5Q2vQ/4gedqC/TCr7AWiHk=;
+	s=arc-20240116; t=1765214173; c=relaxed/simple;
+	bh=Bbhttr7Ktx4MB0NrB9LJrMZ/YzjWNnMlRrwigv3NZEQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UBAA5KKdQhHAotOCIePEbBe8gBReD5OiyvU61d/AN9VBYi2Co6WlolIRY2cRXGnhlbSGc/UEvbag9wGJT2sqmnKCc4W3X0kAFLd/LXigPGTRkhM7hGg/nxIo/+M4igBs/duf2SXxneTpkff7tPluqXthdI4ukQ1FbOeOlbVQ4oM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qcPHdJUf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29736C4CEF1;
-	Mon,  8 Dec 2025 17:06:16 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=GUz78V7thLvpw5hiKih3LGZCa6LndrmjnBnvmgb44CzHbpOWTXLAHKJRtXg9TZo8R+SsmXYe+FDYmk2PdaWj33dP5ceWcyOPxPGxNfsSjwxlLRSF8znU6ni/PZADmJWMv6YQOHB5T0QWb5ibXEaOcXUGkd/SFiCBGapkBDKunjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GMwS0y3S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87266C4CEF1;
+	Mon,  8 Dec 2025 17:16:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765213579;
-	bh=dWzchTxm0gXG4RlOi7Dhq5Q2vQ/4gedqC/TCr7AWiHk=;
+	s=k20201202; t=1765214173;
+	bh=Bbhttr7Ktx4MB0NrB9LJrMZ/YzjWNnMlRrwigv3NZEQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qcPHdJUfQr7hJvkc5ghVSJDY6wK+5RSdqCPoSFVaLO8uJagVSyPL/nOHYwgABXAqc
-	 z0r9HW/cri9AFjN1p3jeR6ycPVt2MTqo4zbno+gOmqiDV+D9v8LfyWlUwCIpQY+EGX
-	 e3et9mw9g23EjlpkRLLB7ULidWgrxcrrAyxn+qDoIHxtgB9IugYO1xJAXa7hf6cXOP
-	 bbibPsqhsdCYJox/N2KFXlc6mKhqDuLcjKZBZN8Im3gbJ1FEUzQUSghzXweYW0jEMI
-	 QAiHeUi3uRzHman0AQNOxMXI5A4Sw8z2HMDdNVWh19PM6XoYa+CnEX610nHotcKvL3
-	 JER78OJO/QTHw==
-Date: Mon, 8 Dec 2025 17:06:14 +0000
+	b=GMwS0y3SN3SMUu8lLywAt0IkiUKBxC1bPaq8rEqhDxfwvpNFL9wWEob4h3Y9ld7Jq
+	 mDK/LOutsshLfG88QaDJrHvK7Zs13+it17UalGTrIBw8yWokHCosMY64J69hwhhfi1
+	 Qrlib8VF35WrLUMquXN3ITR7vZyHuLoA59PxwhMS+AswRxQ02DxWP04mwNzcVEpyWa
+	 JUNcWGzej+hlQuzOdGmRjizBKIVb7fy5YEBZoqH2rfIotpIufgYgKEr/kx440JEvdV
+	 rfEfz2fOkMbuSuJHJLOrLvlmeNg2azrj4Y7pGMhmbRnJepQfrvfXYq+a7Qk/eMXxlZ
+	 l+ORNlEhln5mw==
+Date: Mon, 8 Dec 2025 17:16:09 +0000
 From: Simon Horman <horms@kernel.org>
-To: Kohei Enju <enjuk@amazon.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+To: David Bauer <mail@david-bauer.net>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
-	Stefan Wegrzyn <stefan.wegrzyn@intel.com>, kohei.enju@gmail.com
-Subject: Re: [PATCH iwl-net v1] ixgbe: fix memory leaks in
- ixgbe_recovery_probe()
-Message-ID: <aTcFhoH-z2btEKT-@horms.kernel.org>
-References: <20251206155146.95857-1-enjuk@amazon.com>
+	"R. Parameswaran" <parameswaran.r7@gmail.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] l2tp: account for IP version in SKB headroom
+Message-ID: <aTcH2UjqAvd84l59@horms.kernel.org>
+References: <20251206162603.24900-1-mail@david-bauer.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,36 +58,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251206155146.95857-1-enjuk@amazon.com>
+In-Reply-To: <20251206162603.24900-1-mail@david-bauer.net>
 
-On Sun, Dec 07, 2025 at 12:51:27AM +0900, Kohei Enju wrote:
-> ixgbe_recovery_probe() does not free the following resources in its
-> error path, unlike ixgbe_probe():
-> - adapter->io_addr
-> - adapter->jump_tables[0]
-> - adapter->mac_table
-> - adapter->rss_key
-> - adapter->af_xdp_zc_qps
+On Sat, Dec 06, 2025 at 05:26:01PM +0100, David Bauer wrote:
+> Account for the IP version of the tunnel when accounting skb headroom on
+> xmit. This avoids having to potentially copy the skb a second time down
+> the stack due to allocating not enough space for IPv6 headers in case
+> the tunnel uses IPv6.
 > 
-> The leaked MMIO region can be observed in /proc/vmallocinfo, and the
-> remaining leaks are reported by kmemleak.
-> 
-> Free these allocations and unmap the MMIO region on failure to avoid the
-> leaks.
-> 
-> Fixes: 29cb3b8d95c7 ("ixgbe: add E610 implementation of FW recovery mode")
-> Signed-off-by: Kohei Enju <enjuk@amazon.com>
+> Fixes: b784e7ebfce8 ("L2TP:Adjust intf MTU, add underlay L3, L2 hdrs.")
+> Signed-off-by: David Bauer <mail@david-bauer.net>
 
-Hi,
+Hi David,
 
-It seems that ixgbe_recovery_probe()  is only called from ixgbe_probe().
-And that ixgbe_probe() already has an unwind ladder for these resources.
-So I would suggest using that rather than replicating it
-in ixgbe_recovery_probe. That is, have ixgbe_probe() unwind when
-ixgbe_recovery_probe returns an error.
+This feels more like an enhancement for net-next than a fix for net.
 
-Also, maybe I'm wrong, but it seems that hw->aci.lock
-is initialised more than once if ixgbe_recovery_probe() is called.
+If so, please resubmit for net-next once it reopens, after 2nd January.
+
+In that case the fixes tag should be dropped.
+But you can cite a commit in free-form text in the commit message -
+above the tags - something like this.
 
 ...
+
+Introduced by commit b784e7ebfce8 ("L2TP:Adjust intf MTU, add underlay L3,
+L2 hdrs.").
+
+Signed-off-by: ...
 
