@@ -1,178 +1,220 @@
-Return-Path: <netdev+bounces-243974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3666BCABF24
-	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 04:17:09 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26A5DCABEF9
+	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 04:13:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2985E301785C
-	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 03:17:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 064053009F45
+	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 03:13:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E5D52EC56E;
-	Mon,  8 Dec 2025 03:07:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49AB2262FC1;
+	Mon,  8 Dec 2025 03:13:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NFge7lBX"
+	dkim=pass (2048-bit key) header.d=aspeedtech.com header.i=@aspeedtech.com header.b="ptfsg8RL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SEYPR02CU001.outbound.protection.outlook.com (mail-koreacentralazon11023125.outbound.protection.outlook.com [40.107.44.125])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5A4721FF25
-	for <netdev@vger.kernel.org>; Mon,  8 Dec 2025 03:07:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765163253; cv=none; b=TI+5nl1S62aS6JpYmMRrQia2SMkgLUyOx7BXSg0EGxPuLHJGJpde4ObZoqkJ40C3DdazCMLf4AzmDer/Z31rHjL6dMDHxsYUz+VPGCyVPopY2NauW8zRd7YEKSR0vIV/+yGGX0kSjtffHwqAFKoMC38Fs6edNXDayY9tZaqlYpI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765163253; c=relaxed/simple;
-	bh=cWQlXLg2oAF75NLRYyi4rsXiifU/frpwJu+/Rp1ZA2k=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=b7ia0QhenX3agdnnVVU0FGdJPEfm7hMpZhuEvILgOiR179D4uMKOmxJh2gUSAEtZXD1q2nGgvzKk+UfJSURHQk5Kmo7uw+lKFtASXjd/Y/JlaFUlC9rEVhB4wPAa4sJFZRehMhwbhluTEoGjq3afiL7lPM56sMt8CA3DFiuv20s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NFge7lBX; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2984dfae0acso75233055ad.0
-        for <netdev@vger.kernel.org>; Sun, 07 Dec 2025 19:07:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765163251; x=1765768051; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=cWQlXLg2oAF75NLRYyi4rsXiifU/frpwJu+/Rp1ZA2k=;
-        b=NFge7lBXRkH4WqTxCxH3rkPJ44Zpu2Ec6lOdcIFmvEwq8S/nPkIDgJelFwewtVVBP4
-         kXPF0AejEiwaWEuS/la2dL1zGTb5Xx1Qopo2Pg4W10hF7S9bNj/H6vkaZmdLNH61VpTG
-         32bq4Sxg3lZ7AKCdA4ahjjTBdsE99G+diQwEY7jBo4+eBCgRX+i44mqcf6ijuLpXpBst
-         wATJ4qG5Y3jI6VtBDF/yzfCDtGyezrmFzpIs4khmY2zD38zSPyaSZLxu7Y57eYxW3A1K
-         hW6vZFJ6MdwiXLdwpNKf1iTAoUQIcnXY6meRwlM6dnA63KgM62+VDa0z9jjDZEEZWjpx
-         DzKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765163251; x=1765768051;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cWQlXLg2oAF75NLRYyi4rsXiifU/frpwJu+/Rp1ZA2k=;
-        b=lcabAGgTaEhKgxzPhYR6jr0n5lBnSoYDiWTm6ELMtlO8Fd7gg/zprLnjK2kpzAx8Rf
-         0IccZ7RSQT7jQlJOOLrptTV30mBN9K+uT9V4Cw/u44ywo9U6pPpvMqg+Pnkbn/qZ1Q78
-         Y1XFNp/NgngRxW5PGVVDIM8xozsjLxlh1XzgRALHSZc1Uqt9FAXxhn+BI6kPNXF3avOV
-         XNKSFrWMw1aQdd4Naqz/8nK456PCsIjSw3F4KJzJN2e3W75LXxA+kh4W2Yf30/4VHVPK
-         /Pq3CZ8SQRDM24pr4RmRyyXbanDMw9qmZs9rSU09KTJs0/A64J70W8k8ZW3QlFeBRwiE
-         kWiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUDuj5ph25/RJ/H8wcS+PqBaoYAciprzFwdKp6dHfjTyIMphil/vMNZFVdJYPMnSbkkmoj6xiA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzErswZdW5Xce0X1yvjYRWo7yF+aOsTh0IPeg4cNX2jbQcRjJoU
-	dT7Wq7uun/u/5A8jzmi7qfM8SwahDiBLTTJe7rTcglw/32jGwpMyxL+6
-X-Gm-Gg: ASbGnctdgBIG2QxR7H9DK1u3Qaj9AR/f9TUe2wIsTKYKv8zLTzg12wtIwG0HsmSZhWv
-	lTES4KasBJPd2QgUxDSKLRhCvdjoDKJCnGjhE1SvER49sedFgjtn+brs//FAhG+mATnZD+ntPGd
-	Dmv/LCHEBz1mVyBZg6YHWtwlaT/d1eKpxt3lEtpmSNhUBVWiDkIPUGfiYQdVDObaOr7D3UA/SI2
-	68SX6F4PxNaEAo9VYcudEh0aB3RLrmUC3Y4FndECD9EMucn2s/xTst8dG6FZBlIOxlWq9pW3A4V
-	owtrJ2xwod/yyoKgW5Wy9amy9+IqMbXIt4Yw7aDfVPdT4f/zwZFb9Qto+JNGJNe03bY52DvewBh
-	FA7COZ6GkLmcCIwCqqkCvlE9mBEzA27woV7gcQU4Sxp8X7qM2e/pwmyQsWIR0Fey7a6BsjaPZz+
-	2rJZnb6QRJIh39VECJj72FYINt5v+5FXGuHBZjnpZiSzA18FePWA==
-X-Google-Smtp-Source: AGHT+IGclfbgYDV+2PprDNhoMS/qASDyleKSKZkgks8aJAQqaFHDlkmA3RGKrzkqi7Tvl94BT/sCTA==
-X-Received: by 2002:a17:903:2287:b0:264:70da:7a3b with SMTP id d9443c01a7336-29df5dec918mr73703385ad.49.1765163250925;
-        Sun, 07 Dec 2025 19:07:30 -0800 (PST)
-Received: from ?IPv6:2401:4900:8fcc:9f:1de4:3838:6ac:e885? ([2401:4900:8fcc:9f:1de4:3838:6ac:e885])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29daeaabf7csm107759555ad.79.2025.12.07.19.07.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Dec 2025 19:07:30 -0800 (PST)
-Message-ID: <a137d0a4f3479b6164307a49b9193746db95fba9.camel@gmail.com>
-Subject: Re: [Intel-wired-lan] [RFT net-next PATCH RESEND 0/2] ethernet:
- intel: fix freeing uninitialized pointers with __free
-From: ally heev <allyheev@gmail.com>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>, Tony Nguyen	
- <anthony.l.nguyen@intel.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	 <pabeni@redhat.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Dan Carpenter <dan.carpenter@linaro.org>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet	 <edumazet@google.com>, Alexander
- Lobakin <aleksander.lobakin@intel.com>,  Simon Horman <horms@kernel.org>
-Date: Mon, 08 Dec 2025 08:37:24 +0530
-In-Reply-To: <df193ddb-4591-417d-8d62-42d99d6d468f@intel.com>
-References: 
-	<20251124-aheev-fix-free-uninitialized-ptrs-ethernet-intel-v1-0-a03fcd1937c0@gmail.com>
-	 <81053279-f2da-420c-b7a1-9a81615cd7ca@intel.com>
-	 <ec570c6f8c041f60f1de0b002e61e5a2971633c5.camel@gmail.com>
-	 <eaf30e67-ce1a-47ce-8207-b973ea260bf5@intel.com>
-	 <f34adbc99606c1f9157112123b7039d2a5bb589e.camel@gmail.com>
-	 <df193ddb-4591-417d-8d62-42d99d6d468f@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6877423B62C;
+	Mon,  8 Dec 2025 03:13:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.44.125
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765163610; cv=fail; b=s1fjAOly8XR/j/wfkmFzTPUq6yBeD9q9psPSssws/0Xr8Qn1GtC+kjLvPG0eOEMF4ftlVcxWNYkiVzbC5RUUa7BeaaXtqPAa8MAu88PAPStYZ5VfMZjmbQduxNsbul/NS15H7LmBq3NtKCEkqjzjX3OapPxe95Rh1GxKiLCNOjI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765163610; c=relaxed/simple;
+	bh=PLzBouP1a9WoeHSqLC+D++j7HYD4BgophOVzWalhGi0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=nsPlyHOuX108/cRBGwMFBwxxzTwEODkbq/asmod60E0hIPvl++hPglQ7y2gIxU1o5V6pN656sejasRElLyOmx5GeF/v+VKBJdAPq44v56AEs2Zs+hKhUMk4+Y23u4RrXzxWAHucd1DTNtex8ChMFd9SgTOdxoj/q/SgNJMion4E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; dkim=pass (2048-bit key) header.d=aspeedtech.com header.i=@aspeedtech.com header.b=ptfsg8RL; arc=fail smtp.client-ip=40.107.44.125
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ifBBkS9vpVOhc54T0qf57V7IGJIiujcK4vr5r5ynJfiNylt4IwoBOic7y5T3ah+J/XGgUo+4SGBxVbId4RyfJmdKEc9X8ISYx0rHjIZtuQFT/uOmj1oAnCDhkuQwaEBoHpLck052RA7d0nsf6bAbuHJMKnw0xvmAW+ZUqA5sXUYBKyeit1EudQbhBRZsYvDK4Q++wgw8zHVTP9Y5a71zz0qbKzCGR6dzne3hpT2l6RzBMfLVLixnkRf+p9uocr6vZ4wW6g4DT2+SA00OBdgoNSth1Rw6H/s8wAV+lgyCSy9qdPsf7poHwkJDtW/er/WnoG88eK9Mbr1FJlg/fzl8xg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=p+gI+CNj0ct7amTcfpmYsEe67RYoepPXmaoBnMx/XpU=;
+ b=pgJHzZ1ihR5GbiY2pA5GyzU3nQEt268NcBfGYpV5Pb16BndaHhAia+CRj83XqupVJKEybj5DR83v6dkJ5JwbiecLH8TPyNz/TveuZ92eumlX4O19LZ+yRtjZm8P1Op/C02n+t6UBNHM6PovgfcPsalFZx7n9Q1EwfSSNfj1ZL/E/IZjA8KTgdIpEttglGRm8RXeZ0dh6NxAdYT6d5aBMnGVUSR0dr9Dt/o+F0pfLGpow9qNajGcMRB0PKtxqaSX8b8SzXq2Qm65l+VimMLX7Gym2Wom05PzCIi+MY5MYCz7TtER08x4bci4f6i1wYAZc9c/4WQ8a/fHV1mZgK7bVfQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=aspeedtech.com; dmarc=pass action=none
+ header.from=aspeedtech.com; dkim=pass header.d=aspeedtech.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aspeedtech.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=p+gI+CNj0ct7amTcfpmYsEe67RYoepPXmaoBnMx/XpU=;
+ b=ptfsg8RLO7DDmTRCZs4qpbB9c2Oh2y21lTN8C2zzp5DtP6MySOAU0024JCK/jsz8V16q5qWe+h8mZGfcXzXFviODpLKi1lyEaqjT95air++FYrlK/OIQnySvLnOllDEXUePWY89DpmdJNRlnZR/ln07Vp5FatbzmDVg/OO7gAv2VOOLdGr6xiU29rR0ROqLHWdu1sQ4Y3Lz5JzxkFEqSMa9zPnovqnz2g39bwYszM0e+SzKrznx4LVmEpXFse9dbT5j4HQ24cIv/eX+FAkYpKAAgTe/DNpjIdDg19LNqjuHtQE2faiUKMwsYtG4xt7iVXKC8+1HShN+d3Yn9RaoaPw==
+Received: from SEYPR06MB5134.apcprd06.prod.outlook.com (2603:1096:101:5a::12)
+ by PUZPR06MB5721.apcprd06.prod.outlook.com (2603:1096:301:f7::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9388.14; Mon, 8 Dec
+ 2025 03:13:24 +0000
+Received: from SEYPR06MB5134.apcprd06.prod.outlook.com
+ ([fe80::6b58:6014:be6e:2f28]) by SEYPR06MB5134.apcprd06.prod.outlook.com
+ ([fe80::6b58:6014:be6e:2f28%6]) with mapi id 15.20.9388.009; Mon, 8 Dec 2025
+ 03:13:24 +0000
+From: Jacky Chou <jacky_chou@aspeedtech.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+	<linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Joel Stanley <joel@jms.id.au>, Andrew Jeffery
+	<andrew@codeconstruct.com.au>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-aspeed@lists.ozlabs.org"
+	<linux-aspeed@lists.ozlabs.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH net-next] net: mdio: aspeed: add dummy read to avoid
+ read-after-write issue
+Thread-Topic: [PATCH net-next] net: mdio: aspeed: add dummy read to avoid
+ read-after-write issue
+Thread-Index: AQHcZYe49RFyTPixR0iTb6WbCAs6pLUTEaWAgAQD4IA=
+Date: Mon, 8 Dec 2025 03:13:24 +0000
+Message-ID:
+ <SEYPR06MB5134571388AC51EEAC45AF739DA2A@SEYPR06MB5134.apcprd06.prod.outlook.com>
+References:
+ <20251205-aspeed_mdio_add_dummy_read-v1-1-60145ae20ea7@aspeedtech.com>
+ <230147e8-e27b-48e1-9a62-7aa8abc3f492@lunn.ch>
+In-Reply-To: <230147e8-e27b-48e1-9a62-7aa8abc3f492@lunn.ch>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=aspeedtech.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SEYPR06MB5134:EE_|PUZPR06MB5721:EE_
+x-ms-office365-filtering-correlation-id: 37ce0aca-f056-42a0-23a4-08de3607bfe9
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|7416014|366016|376014|38070700021;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?0xC/708BXOKZomL4R4BNsMZdRuOLi2nhQ+mvg1CNczGg7J3QJV4y9Hn7zOwB?=
+ =?us-ascii?Q?TNyMBdVs2xnXm1ZG2K1pwYqymhgt1B2nWjcvPw+QkUbenDxxlhxpavRIH8Wz?=
+ =?us-ascii?Q?T7R8fnYhVz+nY1XaruxRv1RE9Vk7Dhcl/CxsM0oUbN3BhfdSYpN799HRxseB?=
+ =?us-ascii?Q?V0SApyQrm19Jdb+JkuW3b6qjObTIEhJYpcFJ8vnPLP9BHVHXEF1s5bZFnbl2?=
+ =?us-ascii?Q?34DHza5XIfxr2lnmg8KNd+34LNihQD1MK1i5bDMd/BHv4ta2QYazEfvZ7nU0?=
+ =?us-ascii?Q?3l+fjmSVUGfnziGjfw6d/onppmLEXZJF4JUFIpB0hYqOXbhr0ofdscboMSWd?=
+ =?us-ascii?Q?J4gMgLnil3KylswqFJAoEct8gqeWyPXRBVv2Zz1KC6i1y7OS4YojOXdBBO7V?=
+ =?us-ascii?Q?bYUREymPOWk1EWncgmBvLByhOZLlB8mIgQvF9g1824wrKXpWO7dd8a8QmLlj?=
+ =?us-ascii?Q?fgEHRSFD3LCkDOykBL58jZMsyn4ZJPoOIo2L4RVQC8xYdfvy3T9sZF4gwerf?=
+ =?us-ascii?Q?kmsArohaQpTsRtrVkHVevlRN+F8FgoDdlIkpCZzF1ceClO8z76ZLJyjDWgda?=
+ =?us-ascii?Q?fRi+R4PbVFaS9SKBk6c6PWPMvArTusePBYucecgIIgGih9aaEMJR+RCNQvQU?=
+ =?us-ascii?Q?b7UYXz6CXXFKegB+A+90IRlkOG3CT4HOvcfQKrNewFLc7kLE+4z7bHOpIz+3?=
+ =?us-ascii?Q?uYfpF4STx0IRl8idTM84prclEsDriDc0/ly4QQJaneq+YQFkKSoUxwtTwJjR?=
+ =?us-ascii?Q?4G1uu2BL80ZsPiX6A1vEDqdk8U+jUaHlDO2akLDcEsARN6RAFiOVcwaJVRrX?=
+ =?us-ascii?Q?SBQt7s6hL/cXJP3hsH9gdRf3ThdP/UPrgUcrotPG52HoIpTZ8lylUA+Cpueb?=
+ =?us-ascii?Q?O7XLxhCEWeDuAlstBVZLQKDMH+7+MMyrCELDLdqqsgUROivlMrYdceSyxxRd?=
+ =?us-ascii?Q?hzV4n4cL5GGOQAc4Vb7IW/z5eovtUqQnKUAn87v5AT6ulqa/i/knCJuYiPJS?=
+ =?us-ascii?Q?WNqXG2Ilk69m4uSaOv0Xp2eb+X44l+ZieBk26UpU+xmxnhDeQZufqmDOBBlj?=
+ =?us-ascii?Q?Qnk1dqpKzJjCDQXblqr4syGZ95oVA3PqQxXlWH0Bk9D5T2tqF/K7O+wyAkiU?=
+ =?us-ascii?Q?JpivvdjxqCExqev0ZlaAl/aa8feuIcIlNmt0jWgq0+j9/UdkIFAIVewnn9kl?=
+ =?us-ascii?Q?K0vumnjoajO2Jn04yl79B84Pq7xuibAd+4FjbDByuH6QYeitQFb5DvoWnHel?=
+ =?us-ascii?Q?2dGuZvc0ZY+QTlJJ9d1/XPkfOT2yEzd1rfJL4xsynffgpM9XZr4/z3z5IWop?=
+ =?us-ascii?Q?FPblIBFXqcmDj4bGv+n9bnRMYjZZi6Jk9bMdd2MU+WdvgdES6C21ZaWuqfgu?=
+ =?us-ascii?Q?L5Zizp/Zs/7A7Y2Qusv1BWSxjagSEfnZHezMatGNqPGBNsAKq4IwRdD06bHc?=
+ =?us-ascii?Q?JSJaKotHZ0F6djxHjsdqMy4HKVOzG0IQbMHx9HUOX9eKpwAAbKCN9WsP1/7a?=
+ =?us-ascii?Q?DB8dyXCFPwdYSitv/QyLVQJJLr0C6x9UNhfE?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SEYPR06MB5134.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(366016)(376014)(38070700021);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?uIOfIXrFqgK3WKAoVv37/ibqVQKsQ5xNta+rvoKQfNV65rTEPfsdT7oMU3k8?=
+ =?us-ascii?Q?K4rYhBtTKFBLMZe+5Icix8R1kc0rq3AwfHENJOhxsw7vDUdKmtRhiwJcPcw7?=
+ =?us-ascii?Q?iGv1jOVrpFLMLEJ+Hc/xeKx9tsZhC6dVcTKPprFT23yuo5fCqbufRBjXHKmU?=
+ =?us-ascii?Q?333/QgU1/oJJvVcvR5nmpbVJGLz/EMpiDDMMSoKrEeRv8YlwdMlF4uEa/cpA?=
+ =?us-ascii?Q?WnsLh07pHKo2HTdof1wEdDZvh8YZszCM9Coo0IQDJn5jKUJ5fmXX424HPp5v?=
+ =?us-ascii?Q?d+AwO3YJwfjB9IR+WNY82BAshanklKQsYNx3kVWdjOPFHrYyxIpx+M/2B45A?=
+ =?us-ascii?Q?68Hz+eGLO+alkpVGqSONMgEvLLpO7VDyAy2vYaq8VRxKv3309MzvP6uSnMZA?=
+ =?us-ascii?Q?5Tej/1kH154XN1dKedLyYtCNt89fjP1UOJmR+t1hxbOnQe4YIK0aoy/MYQw2?=
+ =?us-ascii?Q?xfg8eaczs5V5SITKepznigZliF52tCgCVps5VqjJ17HlCbgsUzTrSHkNGoHQ?=
+ =?us-ascii?Q?Tnt/6wnYLYTa3uXLjh3QHoAiEVYNH6oLJsy9KK6CV5N6fTneCxkjtC3yG4z5?=
+ =?us-ascii?Q?WYbOt/++yzw93H46ll5o15BOS64kmDNh4XcXtNb/TvWAbarH9emA3r8mIZaM?=
+ =?us-ascii?Q?l7rNsN3/dO72a7Sg8U0QPPnXeSY9DQ3Hi2ZTGOunWeBqaGOahrZ4tC2VO3da?=
+ =?us-ascii?Q?mNeTCgspG0xjls1ZhLDQ+cAMbPEhjpvygikpDKgHt3btYadGNAW6UWDbZ+Xt?=
+ =?us-ascii?Q?8RdrbwGbpBZO9a2cUYGKwe0dzrVvLn/+5HQ1khPMfibqtz/9bnxVul1gimBz?=
+ =?us-ascii?Q?f5mKs9rmxlSf5uNYB4iWKnPyA36PTEtlKVcjjzZhpD52G+l48nUPh8ZDlakV?=
+ =?us-ascii?Q?8ki58LPjUx/CM8BiZ8xVcEI7p5uYMfJ/0SQnGipyDDfsGW5pZ/niwShIOd+d?=
+ =?us-ascii?Q?O+2nH3pBKTaPgSvEgHik/z/JN4CETzTKH2NwoyB+RegZRP1ZXXtnlbczkdic?=
+ =?us-ascii?Q?6IiHCONo3ti+jkHjX2mwk+DZqxqBw9qaU5XHaMDJG2/WbPXzqBm/mIwW5hPI?=
+ =?us-ascii?Q?QAicF2ZAMI9eGzdc0i30eltMJmkpYc+P4qR1xKTayRz66re479lhfENHAXRa?=
+ =?us-ascii?Q?qMAfHcGwF3sGe3uyyoGfFhoqNDPX1T7VMJ4Y/EuNCRbEGc+4ZF/DJikbU19b?=
+ =?us-ascii?Q?u0RlkKN/UOQwYElGyvpT0eIifY7M6CkoN2yLBLA+bk1DKTyZPdKIJ33oYn0s?=
+ =?us-ascii?Q?FRsgl5RCX10EeM3Z0MZgO+3Sa1BcVbMX1Zvhc7YmSYKMqJuphHSGg1EYlJn+?=
+ =?us-ascii?Q?KZRCpBeBLMVo+d0WVVnzsP/nNkXzqhjs6PFyQVI288qf5Q+QV1Y62mgWB1w4?=
+ =?us-ascii?Q?Reb6/2RMzrrmvT3WqVVQp36w14JcPBsVojAexW9FVbv+5rS3vl7dJ7KDlTlv?=
+ =?us-ascii?Q?Csop7BsAy9Eq4B2PJeocPHbrINcEXxCCuuyjZeP9ogBpIAf4oBBp2Q+jmXYL?=
+ =?us-ascii?Q?27WdIqP5o55/o9mMgLJnCGRVCWX8bm4NxZtJ+EX4M8Er7nkPKJmyU5srPh9f?=
+ =?us-ascii?Q?yRvSP5UB5ATLP7CODsHOptaugyrRFKgoET5z5iul?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2-0+deb13u1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-OriginatorOrg: aspeedtech.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SEYPR06MB5134.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 37ce0aca-f056-42a0-23a4-08de3607bfe9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Dec 2025 03:13:24.5181
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43d4aa98-e35b-4575-8939-080e90d5a249
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: UFMJn4UFijqFZC+0nl4ncrhYoM4/8ZVhltIjc+UvqgCVO0FKV1CMrxiRnqVszeP/h+7/9Sr5QvOT78lPM1OWl3w8GuOqJ30NzkRHGeA+DwU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PUZPR06MB5721
 
-On Wed, 2025-12-03 at 09:45 +0100, Przemek Kitszel wrote:
-> On 12/3/25 09:09, ally heev wrote:
-> > On Tue, 2025-12-02 at 10:17 -0800, Tony Nguyen wrote:
-> > >=20
-> > > On 12/2/2025 11:47 AM, ally heev wrote:
-> > > > On Mon, 2025-12-01 at 13:40 -0800, Tony Nguyen wrote:
-> > > > >=20
-> > > > > On 11/23/2025 11:40 PM, Ally Heev wrote:
-> > > > > > Uninitialized pointers with `__free` attribute can cause undefi=
-ned
-> > > > > > behavior as the memory assigned randomly to the pointer is free=
-d
-> > > > > > automatically when the pointer goes out of scope.
-> > > > > >=20
-> > > > > > We could just fix it by initializing the pointer to NULL, but, =
-as usage of
-> > > > > > cleanup attributes is discouraged in net [1], trying to achieve=
- cleanup
-> > > > > > using goto
-> > > > >=20
-> > > > > These two drivers already have multiple other usages of this. All=
- the
-> > > > > other instances initialize to NULL; I'd prefer to see this do the=
- same
-> > > > > over changing this single instance.
-> > > > >=20
-> > > >=20
-> > > > Other usages are slightly complicated to be refactored and might ne=
-ed
-> > > > good testing. Do you want me to do it in a different series?
-> > >=20
-> > > Hi Ally,
-> > >=20
-> > > Sorry, I think I was unclear. I'd prefer these two initialized to NUL=
-L,
-> > > to match the other usages, over removing the __free() from them.
-> >=20
-> > I had a patch for that already, but, isn't using __free discouraged in
-> > networking drivers [1]? Simon was against it [2]
+Hi Andrew,
+
+Thank you for your reply
+
+> > The Aspeed MDIO controller may return incorrect data when a read
+> > operation follows immediately after a write. Due to a controller bug,
+> > the subsequent read can latch stale data, causing the polling logic to
+> > terminate earlier than expected.
+> >
+> > To work around this hardware issue, insert a dummy read after each
+> > write operation. This ensures that the next actual read returns the
+> > correct data and prevents premature polling exit.
+> >
+> > This workaround has been verified to stabilize MDIO transactions on
+> > affected Aspeed platforms.
+> >
+> > Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
 >=20
-> you see, the construct is discouraged, so we don't use it everywhere,
-> but cleaning up just a little would not change the state of the matter
-> (IOW we will still be in "driver has some __free() usage" state).
+> This seems like a bug fix. Please add a Fixes: tag, for base it on net, n=
+ot
+> net-next.
 >=20
 
-But still we can just fix the uninitialized ones the right way [1]
-right? since we have to fix them anyway. There already a patch [2] for
-that
+Yes, it is a bug fix on HW design.
+I will send it to net again and add Fixes tag.
 
-[1]
-https://lore.kernel.org/lkml/CAHk-=3DwiCOTW5UftUrAnvJkr6769D29tF7Of79gUjdQH=
-S_TkF5A@mail.gmail.com/
-[2]
-https://lore.kernel.org/all/20251106-aheev-uninitialized-free-attr-net-ethe=
-rnet-v3-1-ef2220f4f476@gmail.com/
-
-> TBH, I would not spent my time "undoing" all of the __free() that we
-> have already, especially the testing part sounds not fun.
-
-+1
-
+> > ---
+> >  drivers/net/mdio/mdio-aspeed.c | 6 ++++++
+> >  1 file changed, 6 insertions(+)
+> >
+> > diff --git a/drivers/net/mdio/mdio-aspeed.c
+> > b/drivers/net/mdio/mdio-aspeed.c index e55be6dc9ae7..00e61b922876
+> > 100644
+> > --- a/drivers/net/mdio/mdio-aspeed.c
+> > +++ b/drivers/net/mdio/mdio-aspeed.c
+> > @@ -62,6 +62,12 @@ static int aspeed_mdio_op(struct mii_bus *bus, u8 st=
+,
+> u8 op, u8 phyad, u8 regad,
+> >  		| FIELD_PREP(ASPEED_MDIO_DATA_MIIRDATA, data);
+> >
+> >  	iowrite32(ctrl, ctx->base + ASPEED_MDIO_CTRL);
+> > +	/* Workaround for read-after-write issue.
 >=20
-> Turning all usage points to "=3D NULL" is orthogonal, and would be great.
+> Blank line before the comment please.
 >=20
-> >=20
-> > [2] https://lore.kernel.org/all/aQ9xp9pchMwml30P@horms.kernel.org/
-> > [1] https://docs.kernel.org/process/maintainer-netdev.html#using-device=
--managed-and-cleanup-h-constructs
-> >=20
-> > Regards,
-> > Ally
-> >=20
+
+Agreed.
+
+Thanks,
+Jacky
 
