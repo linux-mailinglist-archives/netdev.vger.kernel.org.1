@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-244011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EA3ACAD49C
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8296FCAD49D
 	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 14:37:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5B5E030341E3
-	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 13:37:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DB24D3004C86
+	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 13:37:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DDC4314A67;
-	Mon,  8 Dec 2025 13:37:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1A752D7DFF;
+	Mon,  8 Dec 2025 13:37:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kBmrhpKp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YGUE3Yjp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7279C2D7DFF
-	for <netdev@vger.kernel.org>; Mon,  8 Dec 2025 13:37:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 062262D238F
+	for <netdev@vger.kernel.org>; Mon,  8 Dec 2025 13:37:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765201055; cv=none; b=hoqI9XV61qrlusiQdmRciyz3YRcosbbRDehhCNxOw3F40aQS434v9x6GlViyRJBTt+5TASDCTLmvwAF+7IiQ16aQSsWqR4zLdK/d8o0aWRL92KJBK1ZLyENTyYmoIfoE3V8kD6x1AWnNr5qOT+jux3/36VmKJlP6IpPXIwWxR44=
+	t=1765201056; cv=none; b=BVIgbJ9W74TnYV4af5RWnmSU+lzs/Ssj5E91U/hiLEZuKT4RLSPm/bahqrrrfMg6MbXhs71UJFBaSJxohS2i/P5g8OHzHehDSy11+uPeY/QH5fWaxHh9fWJtkXM3C8UYwE7+gql/2DS1jY0tSbAx5/lxIzZgFhtqL5YTaa1F2Bg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765201055; c=relaxed/simple;
-	bh=9cmzsZYcWAE2ndQJXePZAuBPYwvFD0d2Yfp/smM05bw=;
+	s=arc-20240116; t=1765201056; c=relaxed/simple;
+	bh=lsmPXrbd9+W/SP01sUs9w5FHwoZy6/iftvWgrBj00rI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Hj5xmqpRvCtVjrv/t2uOVrEkguck6lx4BkwuQR9VD819IYyJ3FP7LNqvrTtHx1wI4OsEk80Ko7KzgrwdV0Xuvfuvri4Xjcbh0q/3tX4zt8BTO7J+D8bsz2x2c1kI14mML+cMIX2a627C9ab8v99KvwcpKtas8ml2awvyz+3PPCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kBmrhpKp; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=T7/P9vJ2w9qs6a2NmRSOEYrhpZr+JIb2wLk65mpWBrXSyyWeafwXWwrHQQmO90D/udyWwbC03RO5nF1gcZHHiiBLeo9G6MX20XhqwjTIXgg6JLdvbYp3dJdFG0NGgNQdAEDTa0hv5BDivhiQV7IeTDagyPr+LT7w2cko1Q54how=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YGUE3Yjp; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-29da1ea0b97so96349285ad.3
-        for <netdev@vger.kernel.org>; Mon, 08 Dec 2025 05:37:33 -0800 (PST)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-297e5a18652so52872065ad.1
+        for <netdev@vger.kernel.org>; Mon, 08 Dec 2025 05:37:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765201053; x=1765805853; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1765201054; x=1765805854; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TCqbwmcR9aCmDkktYtVemaRryHanfBZoxct2ELEL+3A=;
-        b=kBmrhpKpK0lacql+NvaNr0uUOzLMvkq6qajac9yiayopbQ9NfUUiEufRyQRWaI3L8w
-         iA6jQu2WegQGzB4hQiGe2XoPfl0jhW/5hZyickyhELvfQrwVDTn26VEPS/fs6+v+Qkpp
-         C9fWR85esY7HjFHMSopWOoxiZJRrAJWgH3dddiJDkIjevA2hCB4WqE0R09CFJDJ4hr1N
-         JS59gof/9Dbg1eRGzklYpBuM/JxaOrTYGio3Ll7C8h3e4cZTyaHNoCHaAn4/hlLBn+HF
-         9MSCvUTRnHPwrQR9qs+yuVXf6ZE8HdhITC+tDU5MgjxdovEqa55ghlH+vbc9sPCKOJ4G
-         vHrQ==
+        bh=nDVqQ5FBgbhpbi6FDWMgirH+scpjVk4YfaeF8G5tWcs=;
+        b=YGUE3YjpHBNWZ9Hoj9tXTqgSRq5LuaRY225Ktw299eSADZra7BbKuE9mVnev5CM4Dt
+         w31CND/GvlB5FwY6YKPAzugMjLeN6GO5ZjYsl3hGVJl9O4LViqr7eDb4BdMrhJ/DR3ad
+         g+gKzuys0rUTvsWyogkUDjJHT5xF49ZzvQWpoYtGpzYJOGzKLdzvACBwPLN95KSm5KKe
+         zYu3ek4Cl2HqoKJfbV8J6DtIei6M3RhyBFlCq2E29Fbit+sciZdSgnbgOE3Q9wfJjX5u
+         w6bJ8p1eqlXDG21kMbeiYZNhdnzW2B/mUqTZwyD1sWrj6LX4uOx9lN3xiSFt1eTCttu4
+         VksQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765201053; x=1765805853;
+        d=1e100.net; s=20230601; t=1765201054; x=1765805854;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TCqbwmcR9aCmDkktYtVemaRryHanfBZoxct2ELEL+3A=;
-        b=YOQ9njBCH1IRe/94dp8X0wHww55egyXWQcTYeTZo+1CgyYs8WvrodBL/KuEtkc4TSD
-         F0NtQUBeyS/HXbiltMp+U7NrZKm4ijBxCJOwND0+Ug8i1dRGAUL7ynDuhzazVwPIywlK
-         lBwzGcBve7S3hnHJWjSjcS3uzrl5AIQM0hPsCkXQ3yCtP/k7w3FgJ9hCg68zrzidjzPj
-         xFxKH4GzXCpAAAacXjWmob0JY0aKIQ3QyXL/isylsR3/lBx5Jj+t4WOzzWJfk1Oempqw
-         JKsyrpbLImcXNXJ9qwPLrqvKVS+TIcfGr1MnCfcemWagUOV8aaGlXn5p/XvdYHzl5NTC
-         cmuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXaCS3oZD6EIfHHEcBfh0jYnBweSldWebQhg65GhYqgOOQx5kO8RXTx/u9UA5HzgHg9uFDeeX8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwuHjjGPWjhGLbFQhr1ldfMh2IkL1EC2O8GpFJ4TsU+jMHcQz8T
-	Jzl41dh06B2Q1MqD0QuP0JxyMeWhhFxwM9sdSjrJXYXamc5XtMw5mZ7D++6ifQ1OwGB6zDLOupt
-	lYwBLLQ==
-X-Google-Smtp-Source: AGHT+IGQLmIgqY/i+u+tlRgwib/AC1LrP1e98oUE8Av3qljdEW26WSDotxkDQ7ZANI9ziDubhhV5EK7scg4=
-X-Received: from plhz13.prod.google.com ([2002:a17:902:d9cd:b0:295:6bd7:de0d])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:cf42:b0:290:c94b:8381
- with SMTP id d9443c01a7336-29df547183dmr57476645ad.7.1765201052641; Mon, 08
- Dec 2025 05:37:32 -0800 (PST)
-Date: Mon,  8 Dec 2025 13:36:56 +0000
+        bh=nDVqQ5FBgbhpbi6FDWMgirH+scpjVk4YfaeF8G5tWcs=;
+        b=wUQ8bZm4oFrja4x35nkJ0rTfRowcZDh4k19vqfxHjLBm0s/AqUpj64G/MxRnjlz+j5
+         eo57i1st+MW8Y2h3KjZuITsGSI5tRXQpibfK90t69gh1UQMMGPYCS2TrfBU63hwL1r45
+         o41gX/9TgjQkzpQMcHPjxUEDrTPZYjzYPfLJhv/jMEF29Tev3xsPrpTKUsjPjcGPAjfi
+         fwVdXBiG7/5FajP1V17N5//MfzwTogATGnLdfX/c5oKGM9nNVDdvnU4RoLkb+SV/Dg4i
+         VXWUXFP6qJu5H7nLWoSkHJMuN4n5VctxVy8z6MhunIcbUsGRi3zXMPf7XYXqpT72xDF2
+         S0MA==
+X-Forwarded-Encrypted: i=1; AJvYcCVCXzI+a45+xCpGdNYtKsTx8RLXbMB9+WcwlVn3kuqF2PeVZCLBcFqlA8rjAR2i2hNFmWsBokQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/Mcje4SV9CL4NMAvcSFOPzlGR3wDpjaITh+ltheCyXOAa2iXP
+	Sw1zLYMtj6y6clfGtd1olzq/xfGH9tm/zARDgil6aISC06yz5trgnINjwhAN0uMCeJ4xcoO5iTg
+	bmDxAhQ==
+X-Google-Smtp-Source: AGHT+IHZAvV2vaA17LxNQzZq8bd6pn3hmyB4c4YwwFKbanFHxDMj00ilwU88+DCRaUc9Q9RpEQTygIVclz4=
+X-Received: from plbkj11.prod.google.com ([2002:a17:903:6cb:b0:297:d802:955d])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:914c:b0:366:14b0:4b04
+ with SMTP id adf61e73a8af0-3661802f2c2mr7568293637.64.1765201054143; Mon, 08
+ Dec 2025 05:37:34 -0800 (PST)
+Date: Mon,  8 Dec 2025 13:36:57 +0000
 In-Reply-To: <20251208133728.157648-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -72,141 +72,126 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251208133728.157648-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.52.0.223.gf5cc29aaa4-goog
-Message-ID: <20251208133728.157648-2-kuniyu@google.com>
-Subject: [PATCH v1 net 1/2] sctp: Fetch inet6_sk() after setting ->pinet6 in sctp_clone_sock().
+Message-ID: <20251208133728.157648-3-kuniyu@google.com>
+Subject: [PATCH v1 net 2/2] sctp: Clear pktoptions and rxpmtu in sctp_v6_copy_ip_options().
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Xin Long <lucien.xin@gmail.com>, 
 	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
 Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
 	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	syzbot+c59e6bb54e7620495725@syzkaller.appspotmail.com
+	syzbot+ec33a1a006ed5abe7309@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
 
-syzbot reported the lockdep splat below. [0]
+syzbot reported the splat below. [0]
 
-sctp_clone_sock() sets the child socket's ipv6_mc_list to NULL,
-but somehow sock_release() in an error path finally acquires
-lock_sock() in ipv6_sock_mc_close().
+Since the cited commit, the child socket inherits all fields
+of its parent socket unless explicitly cleared.
 
-The root cause is that sctp_clone_sock() fetches inet6_sk(newsk)
-before setting newinet->pinet6, meaning that the parent's
-ipv6_mc_list was actually cleared.
+sctp_v6_copy_ip_options() only clones np->opt.
 
-Also, sctp_v6_copy_ip_options() uses inet6_sk() but is called
-before newinet->pinet6 is set.
+So, leaving pktoptions and rxpmtu results in double-free.
 
-Let's use inet6_sk() only after setting newinet->pinet6.
+Let's clear the two fields in sctp_v6_copy_ip_options().
 
 [0]:
-WARNING: possible recursive locking detected
-syzkaller #0 Not tainted
---------------------------------------------
-syz.0.17/5996 is trying to acquire lock:
-ffff888031af4c60 (sk_lock-AF_INET6){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1700 [inline]
-ffff888031af4c60 (sk_lock-AF_INET6){+.+.}-{0:0}, at: ipv6_sock_mc_close+0xd3/0x140 net/ipv6/mcast.c:348
+BUG: KASAN: double-free in inet_sock_destruct+0x538/0x740 net/ipv4/af_inet.c:159
+Free of addr ffff8880304b6d40 by task ksoftirqd/0/15
 
-but task is already holding lock:
-ffff888031af4320 (sk_lock-AF_INET6){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1700 [inline]
-ffff888031af4320 (sk_lock-AF_INET6){+.+.}-{0:0}, at: sctp_getsockopt+0x135/0xb60 net/sctp/socket.c:8131
-
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-       ----
-  lock(sk_lock-AF_INET6);
-  lock(sk_lock-AF_INET6);
-
- *** DEADLOCK ***
-
- May be due to missing lock nesting notation
-
-1 lock held by syz.0.17/5996:
- #0: ffff888031af4320 (sk_lock-AF_INET6){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1700 [inline]
- #0: ffff888031af4320 (sk_lock-AF_INET6){+.+.}-{0:0}, at: sctp_getsockopt+0x135/0xb60 net/sctp/socket.c:8131
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 5996 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full)
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+CPU: 0 UID: 0 PID: 15 Comm: ksoftirqd/0 Not tainted syzkaller #0 PREEMPT(full)
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/02/2025
 Call Trace:
  <TASK>
  dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- print_deadlock_bug+0x279/0x290 kernel/locking/lockdep.c:3041
- check_deadlock kernel/locking/lockdep.c:3093 [inline]
- validate_chain kernel/locking/lockdep.c:3895 [inline]
- __lock_acquire+0x2540/0x2cf0 kernel/locking/lockdep.c:5237
- lock_acquire+0x117/0x340 kernel/locking/lockdep.c:5868
- lock_sock_nested+0x48/0x100 net/core/sock.c:3780
- lock_sock include/net/sock.h:1700 [inline]
- ipv6_sock_mc_close+0xd3/0x140 net/ipv6/mcast.c:348
- inet6_release+0x47/0x70 net/ipv6/af_inet6.c:482
- __sock_release net/socket.c:653 [inline]
- sock_release+0x85/0x150 net/socket.c:681
- sctp_getsockopt_peeloff_common+0x56b/0x770 net/sctp/socket.c:5732
- sctp_getsockopt_peeloff_flags+0x13b/0x230 net/sctp/socket.c:5801
- sctp_getsockopt+0x3ab/0xb60 net/sctp/socket.c:8151
- do_sock_getsockopt+0x2b4/0x3d0 net/socket.c:2399
- __sys_getsockopt net/socket.c:2428 [inline]
- __do_sys_getsockopt net/socket.c:2435 [inline]
- __se_sys_getsockopt net/socket.c:2432 [inline]
- __x64_sys_getsockopt+0x1a5/0x250 net/socket.c:2432
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f8f8c38f749
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffcfdade018 EFLAGS: 00000246 ORIG_RAX: 0000000000000037
-RAX: ffffffffffffffda RBX: 00007f8f8c5e5fa0 RCX: 00007f8f8c38f749
-RDX: 000000000000007a RSI: 0000000000000084 RDI: 0000000000000003
-RBP: 00007f8f8c413f91 R08: 0000200000000040 R09: 0000000000000000
-R10: 0000200000000340 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f8f8c5e5fa0 R14: 00007f8f8c5e5fa0 R15: 0000000000000005
+ print_address_description mm/kasan/report.c:378 [inline]
+ print_report+0xca/0x240 mm/kasan/report.c:482
+ kasan_report_invalid_free+0xea/0x110 mm/kasan/report.c:557
+ check_slab_allocation+0xe1/0x130 include/linux/page-flags.h:-1
+ kasan_slab_pre_free include/linux/kasan.h:198 [inline]
+ slab_free_hook mm/slub.c:2484 [inline]
+ slab_free mm/slub.c:6630 [inline]
+ kfree+0x148/0x6d0 mm/slub.c:6837
+ inet_sock_destruct+0x538/0x740 net/ipv4/af_inet.c:159
+ __sk_destruct+0x89/0x660 net/core/sock.c:2350
+ sock_put include/net/sock.h:1991 [inline]
+ sctp_endpoint_destroy_rcu+0xa1/0xf0 net/sctp/endpointola.c:197
+ rcu_do_batch kernel/rcu/tree.c:2605 [inline]
+ rcu_core+0xcab/0x1770 kernel/rcu/tree.c:2861
+ handle_softirqs+0x286/0x870 kernel/softirq.c:622
+ run_ksoftirqd+0x9b/0x100 kernel/softirq.c:1063
+ smpboot_thread_fn+0x542/0xa60 kernel/smpboot.c:160
+ kthread+0x711/0x8a0 kernel/kthread.c:463
+ ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
  </TASK>
 
+Allocated by task 6003:
+ kasan_save_stack mm/kasan/common.c:56 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:77
+ poison_kmalloc_redzone mm/kasan/common.c:400 [inline]
+ __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:417
+ kasan_kmalloc include/linux/kasan.h:262 [inline]
+ __do_kmalloc_node mm/slub.c:5642 [inline]
+ __kmalloc_noprof+0x411/0x7f0 mm/slub.c:5654
+ kmalloc_noprof include/linux/slab.h:961 [inline]
+ kzalloc_noprof include/linux/slab.h:1094 [inline]
+ ip_options_get+0x51/0x4c0 net/ipv4/ip_options.c:517
+ do_ip_setsockopt+0x1d9b/0x2d00 net/ipv4/ip_sockglue.c:1087
+ ip_setsockopt+0x66/0x110 net/ipv4/ip_sockglue.c:1417
+ do_sock_setsockopt+0x17c/0x1b0 net/socket.c:2360
+ __sys_setsockopt net/socket.c:2385 [inline]
+ __do_sys_setsockopt net/socket.c:2391 [inline]
+ __se_sys_setsockopt net/socket.c:2388 [inline]
+ __x64_sys_setsockopt+0x13f/0x1b0 net/socket.c:2388
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Freed by task 15:
+ kasan_save_stack mm/kasan/common.c:56 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:77
+ __kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:587
+ kasan_save_free_info mm/kasan/kasan.h:406 [inline]
+ poison_slab_object mm/kasan/common.c:252 [inline]
+ __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:284
+ kasan_slab_free include/linux/kasan.h:234 [inline]
+ slab_free_hook mm/slub.c:2539 [inline]
+ slab_free mm/slub.c:6630 [inline]
+ kfree+0x19a/0x6d0 mm/slub.c:6837
+ inet_sock_destruct+0x538/0x740 net/ipv4/af_inet.c:159
+ __sk_destruct+0x89/0x660 net/core/sock.c:2350
+ sock_put include/net/sock.h:1991 [inline]
+ sctp_endpoint_destroy_rcu+0xa1/0xf0 net/sctp/endpointola.c:197
+ rcu_do_batch kernel/rcu/tree.c:2605 [inline]
+ rcu_core+0xcab/0x1770 kernel/rcu/tree.c:2861
+ handle_softirqs+0x286/0x870 kernel/softirq.c:622
+ run_ksoftirqd+0x9b/0x100 kernel/softirq.c:1063
+ smpboot_thread_fn+0x542/0xa60 kernel/smpboot.c:160
+ kthread+0x711/0x8a0 kernel/kthread.c:463
+ ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+
 Fixes: 16942cf4d3e31 ("sctp: Use sk_clone() in sctp_accept().")
-Reported-by: syzbot+c59e6bb54e7620495725@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/6936d112.a70a0220.38f243.00a7.GAE@google.com/
+Reported-by: syzbot+ec33a1a006ed5abe7309@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/6936d112.a70a0220.38f243.00a8.GAE@google.com/
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- net/sctp/socket.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ net/sctp/ipv6.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/net/sctp/socket.c b/net/sctp/socket.c
-index d808096f5ab17..2493a5b1fa3ca 100644
---- a/net/sctp/socket.c
-+++ b/net/sctp/socket.c
-@@ -4863,8 +4863,6 @@ static struct sock *sctp_clone_sock(struct sock *sk,
+diff --git a/net/sctp/ipv6.c b/net/sctp/ipv6.c
+index 069b7e45d8bda..32f877ccd1380 100644
+--- a/net/sctp/ipv6.c
++++ b/net/sctp/ipv6.c
+@@ -493,6 +493,8 @@ static void sctp_v6_copy_ip_options(struct sock *sk, struct sock *newsk)
+ 	struct ipv6_txoptions *opt;
  
- 	newsp->pf->to_sk_daddr(&asoc->peer.primary_addr, newsk);
- 	newinet->inet_dport = htons(asoc->peer.port);
--
--	newsp->pf->copy_ip_options(sk, newsk);
- 	atomic_set(&newinet->inet_id, get_random_u16());
+ 	newnp = inet6_sk(newsk);
++	newnp->pktoptions = NULL;
++	newnp->rxpmtu = NULL;
  
- 	inet_set_bit(MC_LOOP, newsk);
-@@ -4874,17 +4872,20 @@ static struct sock *sctp_clone_sock(struct sock *sk,
- 
- #if IS_ENABLED(CONFIG_IPV6)
- 	if (sk->sk_family == AF_INET6) {
--		struct ipv6_pinfo *newnp = inet6_sk(newsk);
-+		struct ipv6_pinfo *newnp;
- 
- 		newinet->pinet6 = &((struct sctp6_sock *)newsk)->inet6;
- 		newinet->ipv6_fl_list = NULL;
- 
-+		newnp = inet6_sk(newsk);
- 		memcpy(newnp, inet6_sk(sk), sizeof(struct ipv6_pinfo));
- 		newnp->ipv6_mc_list = NULL;
- 		newnp->ipv6_ac_list = NULL;
- 	}
- #endif
- 
-+	newsp->pf->copy_ip_options(sk, newsk);
-+
- 	newsp->do_auto_asconf = 0;
- 	skb_queue_head_init(&newsp->pd_lobby);
- 
+ 	rcu_read_lock();
+ 	opt = rcu_dereference(np->opt);
 -- 
 2.52.0.223.gf5cc29aaa4-goog
 
