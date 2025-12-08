@@ -1,123 +1,183 @@
-Return-Path: <netdev+bounces-243997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 037F6CACF06
-	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 12:01:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90C57CACF2D
+	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 12:04:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 423D2301596F
-	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 11:01:17 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 236B8300B90B
+	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 11:04:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B12C2E7F38;
-	Mon,  8 Dec 2025 11:01:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5352530F94A;
+	Mon,  8 Dec 2025 11:04:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="qETfT/hR"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="JBiQ5VQ6";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="f4e7aeUL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F83827FD6D
-	for <netdev@vger.kernel.org>; Mon,  8 Dec 2025 11:01:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBC7525CC74;
+	Mon,  8 Dec 2025 11:04:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765191676; cv=none; b=Jh8L1FMw429gJsQ4Ve69FUFwW90QgjREXO/7ydabh5QqzAlWVodhReDdMiq7FTeC6qlauQpuCiNIDeoN2/nByQq+8IqD+QKqzcx7yxp20HXUIfDhwsia8Wr4CHU/E2rNQSG4KfX32MVInB1fR3HbmCQc+Dm+ecXVGu2gLDL0/Co=
+	t=1765191850; cv=none; b=s7ZklkAp/W1kTrKDwhVsuoHplJ8i4ffL8QThaK+ijdW/iSyjIKp69z4Mmdozxfp7BXdhdxkwW/iENBQQNXs+zMdXLm1zlvJwEG3GofTuzFv/ztoxQ9nlYI9PPgQl7hETSitA7+4mJZqt96YVcuMw6cuENxcdKaDnnsuV71IqrcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765191676; c=relaxed/simple;
-	bh=EWvc/einq7wa+8KFcyYFG7vM0xXZ/r4YrcAcJeNuWXw=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
-	 References:In-Reply-To; b=qZ4KKMRmsM4aoRazULAI44jIo0OtqUZhbt1ncE2PX5Z3w+6kfZAvxJ/z6arA7tTdlE0hNS+ZR9zDZ+oLcuZBDvSUdqsXtNevjxyCQUky0wOfCvwpXv3hd1AA+uzIiqSzDuJEH99g+pTkyTInNKt7bwi6Otm+TP7LNkhY0UJ25Wc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=qETfT/hR; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 8A7F51A201C;
-	Mon,  8 Dec 2025 11:01:12 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 5FB8F60707;
-	Mon,  8 Dec 2025 11:01:12 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 13A5E102F2491;
-	Mon,  8 Dec 2025 12:01:09 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1765191671; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=1zSah42/+YBihZaesWiQlClaUtuFRhwxCPiH/P5SAPs=;
-	b=qETfT/hRZCegAxFoIyaCwbi6mvPDiMcRPtCo0j1YtbKqvmGT7MfIGuuugHfUllVwu5i0Lu
-	naggpITgksDRbigMPkixqw+6cwehSlZYE9cqJ9U07oh2XkTkA6d1QmUo08GwPdGErhVHov
-	lEEDfI6MVwm359wQJEeH42mUJJ43X24gNL283AVBqUUtLuzYcCsWfKxeC0iQvaK8npnuQ6
-	/6ptz26EeoDnhZW50/gdRhg47l788bihnV2Ik5d+mVNv0xXjwcOstsFkQSNwRO1CcvT8z1
-	lH2cuXPLrxtTBhJXk6YcgAAoUtRsFYKEqNZTjfDQbJIl58qKiC4tos1cwDwevg==
+	s=arc-20240116; t=1765191850; c=relaxed/simple;
+	bh=D5kYLDqBc2dd9O7LheA8XmkiaPED6gUkHyFQpbXrP3g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TFrAomnXvjOKZswwje70lXt+9Kzcje/lf4+e4bdtIBGfg8J6CM2bBolrBZtWzkAfuUO2HeEn1TnAVKtP2odKRJYmjKcJFak1CWjxzLrDIyIWlSmAMVusdaKBPGbBCdYVDRbDpIAGlwLReGG+6EJuxqcsEha90zbkdD9WSGry5KU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=JBiQ5VQ6; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=f4e7aeUL; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Mon, 8 Dec 2025 12:04:04 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1765191845;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=S865HUKaAnKR6N3b+ol6NvmkSfpRAwyGrtoPTmtdt88=;
+	b=JBiQ5VQ65R75TKR0Ye9HvGwfOKkU6loT3pVOOCcBJGjUoQ77/2Vz9GBWr0rkVc4NPby3Ep
+	SfDMNfZjiGcVm8UFOwLuzepLtyqFw9pnKYirCV7jLvWNXy23FoCISXHCSE7Ga+qfrl/PcQ
+	39NxqI7AQn7Rbs4xOApJxQk35qzm8pKuab512v0DGWiDx20bmztAZMGA+BoHMiRhk4SN0n
+	6y68UTaxxEcrweDcReZ8wL/ul16JwX7yA+ZwXThQXxEnMrwsK/E1QGS5PNIdCPCUa07qw3
+	udg7nGlqYO337nHGUJstv0DUa5B5W5ellkvJgAOcaAPVS5NXTHDNMUmScgVXVw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1765191845;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=S865HUKaAnKR6N3b+ol6NvmkSfpRAwyGrtoPTmtdt88=;
+	b=f4e7aeULGUe/jFNdRLl5Ui33OfLM0XPbKfN9U3nhP3ADEtLOmEQfIqz4agwzLYI2jZHGtL
+	IEagF3NTBYlUuIAg==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: Jon Kohler <jon@nutanix.com>, Jason Wang <jasowang@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	open list <linux-kernel@vger.kernel.org>, bpf@vger.kernel.org,
+	Alexander Lobakin <aleksander.lobakin@intel.com>
+Subject: Re: [PATCH net-next v2 5/9] tun: use bulk NAPI cache allocation in
+ tun_xdp_one
+Message-ID: <20251208110404.qgMKQe77@linutronix.de>
+References: <20251125200041.1565663-1-jon@nutanix.com>
+ <20251125200041.1565663-6-jon@nutanix.com>
+ <CACGkMEsDCVKSzHSKACAPp3Wsd8LscUE0GO4Ko9GPGfTR0vapyg@mail.gmail.com>
+ <CF8FF91A-2197-47F7-882B-33967C9C6089@nutanix.com>
+ <c04b51c6-bc03-410e-af41-64f318b8960f@kernel.org>
+ <20251203084708.FKvfWWxW@linutronix.de>
+ <CA37D267-2A2F-47FD-8BAF-184891FE1B7E@nutanix.com>
+ <20251205075805.vW4ShQvN@linutronix.de>
+ <3c1dac33-424f-4eda-83a9-60fb7f4b6c52@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 08 Dec 2025 12:01:09 +0100
-Message-Id: <DESS825O67J6.1XU39G8BM2YEJ@bootlin.com>
-Subject: Re: [PATCH RFC net-next 6/6] cadence: macb/gem: introduce xmit
- support
-Cc: "Nicolas Ferre" <nicolas.ferre@microchip.com>, "Claudiu Beznea"
- <claudiu.beznea@tuxon.dev>, "Andrew Lunn" <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- "Lorenzo Bianconi" <lorenzo@kernel.org>, "Thomas Petazzoni"
- <thomas.petazzoni@bootlin.com>, =?utf-8?q?Gr=C3=A9gory_Clement?=
- <gregory.clement@bootlin.com>
-To: "Paolo Valerio" <pvalerio@redhat.com>, =?utf-8?q?Th=C3=A9o_Lebrun?=
- <theo.lebrun@bootlin.com>, <netdev@vger.kernel.org>
-From: =?utf-8?q?Th=C3=A9o_Lebrun?= <theo.lebrun@bootlin.com>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20251119135330.551835-1-pvalerio@redhat.com>
- <20251119135330.551835-7-pvalerio@redhat.com>
- <DEJKKYXTM4TH.2MK2CNLW7L5D3@bootlin.com> <878qfkzt2h.fsf@redhat.com>
-In-Reply-To: <878qfkzt2h.fsf@redhat.com>
-X-Last-TLS-Session-Version: TLSv1.3
+In-Reply-To: <3c1dac33-424f-4eda-83a9-60fb7f4b6c52@kernel.org>
 
-On Tue Dec 2, 2025 at 6:34 PM CET, Paolo Valerio wrote:
-> On 27 Nov 2025 at 04:07:52 PM, Th=C3=A9o Lebrun <theo.lebrun@bootlin.com>=
- wrote:
->> On Wed Nov 19, 2025 at 2:53 PM CET, Paolo Valerio wrote:
->>> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/eth=
-ernet/cadence/macb_main.c
->>> index eeda1a3871a6..bd62d3febeb1 100644
->>> --- a/drivers/net/ethernet/cadence/macb_main.c
->>> +++ b/drivers/net/ethernet/cadence/macb_main.c
->>> +static int macb_xdp_submit_frame(struct macb *bp, struct xdp_frame *xd=
-pf,
->>> +				 struct net_device *dev, dma_addr_t addr)
->>> +{
->>> +	enum macb_tx_buff_type buff_type;
->>> +	struct macb_tx_buff *tx_buff;
->>> +	int cpu =3D smp_processor_id();
->>> +	struct macb_dma_desc *desc;
->>> +	struct macb_queue *queue;
->>> +	unsigned long flags;
->>> +	dma_addr_t mapping;
->>> +	u16 queue_index;
->>> +	int err =3D 0;
->>> +	u32 ctrl;
->>> +
->>> +	queue_index =3D cpu % bp->num_queues;
->>> +	queue =3D &bp->queues[queue_index];
->>> +	buff_type =3D !addr ? MACB_TYPE_XDP_NDO : MACB_TYPE_XDP_TX;
->>
->> I am not the biggest fan of piggy-backing on !!addr to know which
->> codepath called us. If the macb_xdp_submit_frame() call in gem_xdp_run()
->> ever gives an addr=3D0 coming from macb_get_addr(bp, desc), then we will
->> be submitting NDO typed frames and creating additional DMA mappings
->> which would be a really hard to debug bug.
->
-> I guess we can add a separate boolean, WDYT?
+On 2025-12-05 14:21:51 [+0100], Jesper Dangaard Brouer wrote:
+>=20
+>=20
+> On 05/12/2025 08.58, Sebastian Andrzej Siewior wrote:
+> > On 2025-12-03 15:35:24 [+0000], Jon Kohler wrote:
+> > > Thanks, Sebastian - so if I=E2=80=99m reading this correct, it *is* f=
+ine to do
+> > > the two following patterns, outside of NAPI:
+> > >=20
+> > >     local_bh_disable();
+> > >     skb =3D napi_build_skb(buf, len);
+> > >     local_bh_enable();
+> > >=20
+> > >     local_bh_disable();
+> > >     napi_consume_skb(skb, 1);
+> > >     local_bh_enable();
+> > >=20
+> > > If so, I wonder if it would be cleaner to have something like
+> > >     build_skb_bh(buf, len);
+> > >=20
+> > >     consume_skb_bh(skb, 1);
+> > >=20
+> > > Then have those methods handle the local_bh enable/disable, so that
+> > > the toggle was a property of a call, not a requirement of the call?
+> >=20
+> > Having budget =3D 0 would be for non-NAPI users. So passing the 1 is
+> > superfluous. You goal seems to be to re-use napi_alloc_cache. Right? And
+> > this is better than skb_pool?
+> >=20
+> > There is already napi_alloc_skb() which expects BH to be disabled and
+> > netdev_alloc_skb() (and friends) which do disable BH if needed. I don't
+> > see an equivalent for non-NAPI users. Haven't checked if any of these
+> > could replace your napi_build_skb().
+> >=20
+> > Historically non-NAPI users would be IRQ users and those can't do
+> > local_bh_disable(). Therefore there is dev_kfree_skb_irq_reason() for
+> > them. You need to delay the free for two reasons.
+> > It seems pure software implementations didn't bother so far.
+> >=20
+> > It might make sense to do napi_consume_skb() similar to
+> > __netdev_alloc_skb() so that also budget=3D0 users fill the pool if this
+> > is really a benefit.
+>=20
+> I'm not convinced that this "optimization" will be an actual benefit on
+> a busy system.  Let me explain the side-effect of local_bh_enable().
 
-I agree!
+I'm arguing that this is the right thing to do, I am just saying that it
+will not break anything as far as I am aware.
 
-Thanks,
+> Calling local_bh_enable() is adding a re-scheduling opportunity, e.g.
+> for processing softirq.  For a benchmark this might not be noticeable as
+> this is the main workload.  If there isn't any pending softirq this is
+> also not noticeable.  In a more mixed workload (or packet storm) this
+> re-scheduling will allow others to "steal" CPU cycles from you.
 
---
-Th=C3=A9o Lebrun, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+If there wouldn't be a bh/disable-enable then the context would be
+process context and the softirq will be handled immediately.
+Now it is "delayed" until the bh-enable.
+The only advantage I see here is that the caller participates in
+napi_alloc_cache.
 
+> Thus, you might not actually save any cycles via this short BH-disable
+> section.  I remember that I was saving around 19ns / 68cycles on a
+> 3.6GHz E5-1650 CPU, by using this SKB recycle cache.  The cost of a re-
+> scheduling event is like more.
+
+It might expensive because you need to branch out, save/ restore
+interrupts and check a few flags. This is something you wouldn't have to
+do if you return it back to the memory allocator.
+
+> My advice is to use the napi_* function when already running within a
+>  BH-disabled section, as it makes sense to save those cycles
+> (essentially reducing the time spend with BH-disabled).  Wrapping these
+> napi_* function with BH-disabled just to use them outside NAPI feels
+> wrong in so many ways.
+>=20
+> The another reason why these napi_* functions belongs with NAPI is that
+> netstack NIC drivers will (almost) always do TX completion first, that
+> will free/consume some SKBs, and afterwards do RX processing that need
+> to allocate SKBs for the incoming data frames.  Thus, keeping a cache of
+> SKBs just released/consumed makes sense.  (p.s. in the past we always
+> bulk free'ed all SKBs in the napi cache when exiting NAPI, as they would
+> not be cache hot for next round).
+
+Right. That is why I asked if using a skb-pool would be an advantage
+since you would have a fix pool of skb for TUN/XDP.
+
+> --Jesper
+
+Sebastian
 
