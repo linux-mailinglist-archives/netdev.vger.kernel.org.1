@@ -1,53 +1,80 @@
-Return-Path: <netdev+bounces-243968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B9E5CABB85
-	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 02:27:32 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1599CCABBAC
+	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 02:31:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 52A10300797A
-	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 01:27:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 73A663008EB8
+	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 01:31:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3339D1F12F8;
-	Mon,  8 Dec 2025 01:27:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 825791898F8;
+	Mon,  8 Dec 2025 01:31:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fmyrsQr3"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3990372634;
-	Mon,  8 Dec 2025 01:27:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96A94883F;
+	Mon,  8 Dec 2025 01:31:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765157250; cv=none; b=sysLQ0raGY8bugwPYAdhv/6be8W20k33+eAm2beC6JdLDDRiH/ZWltutfQ3+8wekLygqF2unlL5PQvRuMCcsCm+Sp28N66FC4ag/lFr8V1qDRjyT6pu44UBl2EfrxRvyNFMu+GSEtcUpRv7z3ape3qgeVu2EBwuF0/0ROD0929g=
+	t=1765157507; cv=none; b=AWyoi5PK38/aabKOnvLwgSYGzYkYc5EpCKxpEE3OWixlJ8/7cBBsQEavZ/DNhEMVe3X1t1MKWNxw+JrBXI6y6Wxiza5kiZlqH5V71pQQu4fpVhZFmEEXP4JfALbHxD5Mo9329klDyNAvYP5z4Wbaj/s7/2eF17pwsZwxId2ffA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765157250; c=relaxed/simple;
-	bh=Evn0j5l8D0gbamoLWseYGaDF2z2vwDBi66LJUJJZfIk=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=tsJRsBl0axmnOkNZy4ozYhrEmVcQAvMXWkV/3UhD443uhZvaUeeA0egIBoLqRme9JI7BiRuDlL+rzZqlZtm+wP3cYsR06CXqXKFratH4X+VD7tCfAHZvb3Omip0xUb1odwRPgbBcZSXCLbdeCElH8Pg9S56rhBKdi/WEfuvs6po=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vSQ1t-0000000089H-3TqY;
-	Mon, 08 Dec 2025 01:27:09 +0000
-Date: Mon, 8 Dec 2025 01:27:04 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
+	s=arc-20240116; t=1765157507; c=relaxed/simple;
+	bh=zvJRV6o6Wr9Me71mfIOZJP08UlIKewB4/Sn+iuvZKzk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M74mUkImlMMSOFdTvsqbbZ6Z5qg0njTbvFwJHc7Ub1xBq5FhkxqcPHQwLI8K3NGftG6ECHAeDYm6KoGe3oA0SKkXaxlPOrzYbmXj997l9izUtpc+jpIp9T75mErtOH5EeXezPIbQjUSfMGE1ak8p3n2r4tfrEbbdodmC7irvzqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fmyrsQr3; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1765157505; x=1796693505;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=zvJRV6o6Wr9Me71mfIOZJP08UlIKewB4/Sn+iuvZKzk=;
+  b=fmyrsQr3w1fW9RqiaURqFdQgY5RUdZX2yiwKf1Xv7jTzNIAvjPSHAa5F
+   zOqz+ceZD82ISVuR/yg5mXAYCFPlI6LjdXPfYjDGAY1AosPgQtg65qvIm
+   gmxPhAgMpBRjwaPKA9zc5TQaB5EkZrN4iCRGtLHsRthiuzeP8InCA8n0r
+   UHd8bqEcnr6g8jzmQDeOr6FTlnhps4UY0WYmlXCgeDpxNpJX/J5LhnXS1
+   K7EZRPf0rR+U70ctKqFhDVJyhgECp0JQ8htdMSO0cTBHKQNY5QYlhpkYN
+   ce1zNgJF5OQp6zWnlMdEDEoz5Iu9CtWw+VAtfEtUTzAT+mqSEfFnQJEL/
+   g==;
+X-CSE-ConnectionGUID: tBuJ7FHuSO+mz/9LOC+gyA==
+X-CSE-MsgGUID: MkwIWbVsRJOzaRDWrH8dNQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11635"; a="67135836"
+X-IronPort-AV: E=Sophos;i="6.20,258,1758610800"; 
+   d="scan'208";a="67135836"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2025 17:31:44 -0800
+X-CSE-ConnectionGUID: fynQ8TCeTsWNiPC88ojcfw==
+X-CSE-MsgGUID: ohJrw/MOSwauuXVqrsOGaA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,258,1758610800"; 
+   d="scan'208";a="200248349"
+Received: from lkp-server01.sh.intel.com (HELO 4664bbef4914) ([10.239.97.150])
+  by fmviesa005.fm.intel.com with ESMTP; 07 Dec 2025 17:31:40 -0800
+Received: from kbuild by 4664bbef4914 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vSQ6E-00000000Jmz-1fwz;
+	Mon, 08 Dec 2025 01:31:38 +0000
+Date: Mon, 8 Dec 2025 09:31:13 +0800
+From: kernel test robot <lkp@intel.com>
+To: Daniel Golle <daniel@makrotopia.org>, Hauke Mehrtens <hauke@hauke-m.de>,
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Rasmus Villemoes <ravi@prevas.dk>,
+	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, Rasmus Villemoes <ravi@prevas.dk>,
 	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
 	John Crispin <john@phrozen.org>
-Subject: [PATCH net v3] net: dsa: mxl-gsw1xx: manually clear RANEG bit
-Message-ID: <c28947688b5fc90abe1a5ead6cfd78e128027447.1765156305.git.daniel@makrotopia.org>
+Subject: Re: [PATCH net v2] net: dsa: mxl-gsw1xx: manually clear RANEG bit
+Message-ID: <202512080800.2VZCNFnY-lkp@intel.com>
+References: <a90b206e9fd8e4248fd639afd5ae296454ac99b9.1765060046.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,136 +83,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <a90b206e9fd8e4248fd639afd5ae296454ac99b9.1765060046.git.daniel@makrotopia.org>
 
-Despite being documented as self-clearing, the RANEG bit sometimes
-remains set, preventing auto-negotiation from happening.
+Hi Daniel,
 
-Manually clear the RANEG bit after 10ms as advised by MaxLinear.
-In order to not hold RTNL during the 10ms of waiting schedule
-delayed work to take care of clearing the bit asynchronously, which
-is similar to the self-clearing behavior.
+kernel test robot noticed the following build errors:
 
-Fixes: 22335939ec90 ("net: dsa: add driver for MaxLinear GSW1xx switch family")
-Reported-by: Rasmus Villemoes <ravi@prevas.dk>
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
-v3:
- * fix wrong parameter name in call of cancel_delayed_work_sync
+[auto build test ERROR on net/main]
 
-v2:
- * cancel pending work before setting RANEG bit
- * cancel pending work on remove and shutdown
- * document that GSW1XX_RST_REQ_SGMII_SHELL also clears RANEG bit
- * improve commit message
+url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Golle/net-dsa-mxl-gsw1xx-manually-clear-RANEG-bit/20251207-063852
+base:   net/main
+patch link:    https://lore.kernel.org/r/a90b206e9fd8e4248fd639afd5ae296454ac99b9.1765060046.git.daniel%40makrotopia.org
+patch subject: [PATCH net v2] net: dsa: mxl-gsw1xx: manually clear RANEG bit
+config: riscv-allyesconfig (https://download.01.org/0day-ci/archive/20251208/202512080800.2VZCNFnY-lkp@intel.com/config)
+compiler: clang version 16.0.6 (https://github.com/llvm/llvm-project 7cbf1a2591520c2491aa35339f227775f4d3adf6)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251208/202512080800.2VZCNFnY-lkp@intel.com/reproduce)
 
- drivers/net/dsa/lantiq/mxl-gsw1xx.c | 34 ++++++++++++++++++++++++++++-
- 1 file changed, 33 insertions(+), 1 deletion(-)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202512080800.2VZCNFnY-lkp@intel.com/
 
-diff --git a/drivers/net/dsa/lantiq/mxl-gsw1xx.c b/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-index cf33a16fd183b..7d332affe9ec8 100644
---- a/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-+++ b/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-@@ -11,10 +11,12 @@
- 
- #include <linux/bits.h>
- #include <linux/delay.h>
-+#include <linux/jiffies.h>
- #include <linux/module.h>
- #include <linux/of_device.h>
- #include <linux/of_mdio.h>
- #include <linux/regmap.h>
-+#include <linux/workqueue.h>
- #include <net/dsa.h>
- 
- #include "lantiq_gswip.h"
-@@ -29,6 +31,7 @@ struct gsw1xx_priv {
- 	struct			regmap *clk;
- 	struct			regmap *shell;
- 	struct			phylink_pcs pcs;
-+	struct delayed_work	clear_raneg;
- 	phy_interface_t		tbi_interface;
- 	struct gswip_priv	gswip;
- };
-@@ -145,7 +148,9 @@ static void gsw1xx_pcs_disable(struct phylink_pcs *pcs)
- {
- 	struct gsw1xx_priv *priv = pcs_to_gsw1xx(pcs);
- 
--	/* Assert SGMII shell reset */
-+	cancel_delayed_work_sync(&priv->clear_raneg);
-+
-+	/* Assert SGMII shell reset (will also clear RANEG bit) */
- 	regmap_set_bits(priv->shell, GSW1XX_SHELL_RST_REQ,
- 			GSW1XX_RST_REQ_SGMII_SHELL);
- 
-@@ -428,12 +433,29 @@ static int gsw1xx_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
- 	return 0;
- }
- 
-+static void gsw1xx_pcs_clear_raneg(struct work_struct *work)
-+{
-+	struct gsw1xx_priv *priv =
-+		container_of(work, struct gsw1xx_priv, clear_raneg.work);
-+
-+	regmap_clear_bits(priv->sgmii, GSW1XX_SGMII_TBI_ANEGCTL,
-+			  GSW1XX_SGMII_TBI_ANEGCTL_RANEG);
-+}
-+
- static void gsw1xx_pcs_an_restart(struct phylink_pcs *pcs)
- {
- 	struct gsw1xx_priv *priv = pcs_to_gsw1xx(pcs);
- 
-+	cancel_delayed_work_sync(&priv->clear_raneg);
-+
- 	regmap_set_bits(priv->sgmii, GSW1XX_SGMII_TBI_ANEGCTL,
- 			GSW1XX_SGMII_TBI_ANEGCTL_RANEG);
-+
-+	/* despite being documented as self-clearing, the RANEG bit
-+	 * sometimes remains set, preventing auto-negotiation from happening.
-+	 * MaxLinear advises to manually clear the bit after 10ms.
-+	 */
-+	schedule_delayed_work(&priv->clear_raneg, msecs_to_jiffies(10));
- }
- 
- static void gsw1xx_pcs_link_up(struct phylink_pcs *pcs,
-@@ -636,6 +658,8 @@ static int gsw1xx_probe(struct mdio_device *mdiodev)
- 	if (ret)
- 		return ret;
- 
-+	INIT_DELAYED_WORK(&priv->clear_raneg, gsw1xx_pcs_clear_raneg);
-+
- 	ret = gswip_probe_common(&priv->gswip, version);
- 	if (ret)
- 		return ret;
-@@ -648,10 +672,14 @@ static int gsw1xx_probe(struct mdio_device *mdiodev)
- static void gsw1xx_remove(struct mdio_device *mdiodev)
- {
- 	struct gswip_priv *priv = dev_get_drvdata(&mdiodev->dev);
-+	struct gsw1xx_priv *gsw1xx_priv;
- 
- 	if (!priv)
- 		return;
- 
-+	gsw1xx_priv = container_of(priv, struct gsw1xx_priv, gswip);
-+	cancel_delayed_work_sync(&gsw1xx_priv->clear_raneg);
-+
- 	gswip_disable_switch(priv);
- 
- 	dsa_unregister_switch(priv->ds);
-@@ -660,10 +688,14 @@ static void gsw1xx_remove(struct mdio_device *mdiodev)
- static void gsw1xx_shutdown(struct mdio_device *mdiodev)
- {
- 	struct gswip_priv *priv = dev_get_drvdata(&mdiodev->dev);
-+	struct gsw1xx_priv *gsw1xx_priv;
- 
- 	if (!priv)
- 		return;
- 
-+	gsw1xx_priv = container_of(priv, struct gsw1xx_priv, gswip);
-+	cancel_delayed_work_sync(&gsw1xx_priv->clear_raneg);
-+
- 	dev_set_drvdata(&mdiodev->dev, NULL);
- 
- 	gswip_disable_switch(priv);
+All errors (new ones prefixed by >>):
+
+>> drivers/net/dsa/lantiq/mxl-gsw1xx.c:449:28: error: use of undeclared identifier 'gsw1xx_priv'
+           cancel_delayed_work_sync(&gsw1xx_priv->clear_raneg);
+                                     ^
+   1 error generated.
+
+
+vim +/gsw1xx_priv +449 drivers/net/dsa/lantiq/mxl-gsw1xx.c
+
+   444	
+   445	static void gsw1xx_pcs_an_restart(struct phylink_pcs *pcs)
+   446	{
+   447		struct gsw1xx_priv *priv = pcs_to_gsw1xx(pcs);
+   448	
+ > 449		cancel_delayed_work_sync(&gsw1xx_priv->clear_raneg);
+   450	
+   451		regmap_set_bits(priv->sgmii, GSW1XX_SGMII_TBI_ANEGCTL,
+   452				GSW1XX_SGMII_TBI_ANEGCTL_RANEG);
+   453	
+   454		/* despite being documented as self-clearing, the RANEG bit
+   455		 * sometimes remains set, preventing auto-negotiation from happening.
+   456		 * MaxLinear advises to manually clear the bit after 10ms.
+   457		 */
+   458		schedule_delayed_work(&priv->clear_raneg, msecs_to_jiffies(10));
+   459	}
+   460	
+
 -- 
-2.52.0
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
