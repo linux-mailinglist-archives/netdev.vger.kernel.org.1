@@ -1,194 +1,124 @@
-Return-Path: <netdev+bounces-243986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8639CACCA6
-	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 11:05:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03494CACD66
+	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 11:16:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5C6AD3005526
-	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 10:05:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A843430111BF
+	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 10:16:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98B572DF144;
-	Mon,  8 Dec 2025 10:05:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E990A31062D;
+	Mon,  8 Dec 2025 10:16:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZdcTmJyG"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="mCYicAZS"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40E40265CC2
-	for <netdev@vger.kernel.org>; Mon,  8 Dec 2025 10:05:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 436222D9ECA;
+	Mon,  8 Dec 2025 10:16:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765188331; cv=none; b=NMwu1nJQs/h46r+zD+sey5n1s2ttNms25pQxrLKTD+DVDSilHe82m/4j9WcQNyWw4j2XZzDGUuCfuYGO5D0kIJ2OILCAI9xQMyzY8xBEi72SBboHibXOasWMSp1NSqdrVu6sHA8uWxHSaxAjB/KxiQZPl3VyuOC31V+aAp753zQ=
+	t=1765188996; cv=none; b=QcPQN4POTHYWa76u3LQ0C22qZ0Nk8rIw+T97MJ1OSbQl5+WMoFVpKavBCfbbhvTW+vARvMXsfnY+JBJEHXTUv3VjCqkP37Wqw+I11wBA0RJ8lhy5VNO0fF5x/O2M+rXCwmDBdSZeBW/pJsJ+4UUxJSN/Gps0uzmPPXj6hpAXk/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765188331; c=relaxed/simple;
-	bh=uBffDVisZiuzB9gI9OLnpMb0BrZYxdobcZ1h3L9trY0=;
+	s=arc-20240116; t=1765188996; c=relaxed/simple;
+	bh=sSYWE0plVcot7u1OFG1+iTrk3wemFOg/XOLqsK5k8wc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WznJZAF5A0KtqdOYxUIcyw066j9CFFvbAS0Ct7VS1s7vnICow+qrdPSg0BFSbljxHhN4RwVffpSUVLx/TEQV5MyaZPtmp8aJ98K8moArmDGKbhjLk1ouYBaUopRJjCr4rBRPze1dBnc+zQMqATMy1epUhdNrTMdRsfCbtUDH2mE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZdcTmJyG; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765188328;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+5DRB1WNuUEh9dw4lXaZHc8OhCgJ52BllgGJz6/xq6I=;
-	b=ZdcTmJyG8ks9BG2HYsHWWwlFAdhmMkqfU7IPA9w9dp7KQD4or8YkP991/HPF/c0JWNICbX
-	g1JcyBRSgr5eB7723JVBtUDx4d8UXfHw6ztajYKrqTLoebLttSkXH7HkndYSiZWSkYe2S5
-	RyNGNiNuJWmd/HY8XKkoUuiqsYkgl3s=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-518-a3Wu67K0PRGCb4fHriYFCg-1; Mon,
- 08 Dec 2025 05:05:25 -0500
-X-MC-Unique: a3Wu67K0PRGCb4fHriYFCg-1
-X-Mimecast-MFC-AGG-ID: a3Wu67K0PRGCb4fHriYFCg_1765188322
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A154A19560AD;
-	Mon,  8 Dec 2025 10:05:21 +0000 (UTC)
-Received: from fedora (unknown [10.45.224.91])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with SMTP id 794571800357;
-	Mon,  8 Dec 2025 10:05:11 +0000 (UTC)
-Received: by fedora (nbSMTP-1.00) for uid 1000
-	oleg@redhat.com; Mon,  8 Dec 2025 11:05:21 +0100 (CET)
-Date: Mon, 8 Dec 2025 11:05:09 +0100
-From: Oleg Nesterov <oleg@redhat.com>
-To: Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>
-Cc: Todd Kjos <tkjos@android.com>, Martijn Coenen <maco@android.com>,
-	Joel Fernandes <joelagnelf@nvidia.com>,
-	Christian Brauner <brauner@kernel.org>,
-	Carlos Llamas <cmllamas@google.com>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Felix Kuehling <Felix.Kuehling@amd.com>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Boris Brezillon <boris.brezillon@collabora.com>,
-	Rob Herring <robh@kernel.org>, Steven Price <steven.price@arm.com>,
-	=?iso-8859-1?Q?Adri=E1n?= Larumbe <adrian.larumbe@collabora.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Liviu Dudau <liviu.dudau@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=asE/L+QGXR9arSPELmj8RMw6QW2f67dSuKcrkUQlSzzFoCnjKt8QB6YKuQNIDJRoSYLIryk461c0wgPD0XLxfhG5KYNz8CTKLGeA3keCcUqxSLvT/DceowFpcru10S6zZknmJPP/5O/KLwUfTGbXpLCRx7oG0jfhgyDIb9W5T4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=mCYicAZS; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=8gpVs/bBnQZWYunBAJLd91l6PxkU8SbY1fqcBlsvY4g=; b=mCYicAZS+ZfG0qb1iMzqaXJLRb
+	zO9v361xTCLjsBnGfTwKH0I5iLv3JAa8b7xLwyVOJLSGg1607ErOH4sJ7ie9m0/A+Z/W5Qr4qnH91
+	i9Uzid6YnpF5Ux1bexWLl8vlTBxP4mnDH0/CZpkhT7hzOqdLwnhVU1LUJ5tyJrKjNYRSQ9YUk99QX
+	GjLnyxmg3HRP7aLwNnPXi4YjrJD8p/xfGDUU4pQ/TVdpGWMir3aNyVVRXnnNeOLmtcPgqHHdGSnr2
+	0ldN4KSZaiakABkoDpyIpI60YpwfWrISK7ugjx15LhG38qHsV3DgOPz8HlVQOYmLfyI9k/3nFLm8q
+	zfqbCNOw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59228)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vSYHo-000000007c9-1cvc;
+	Mon, 08 Dec 2025 10:16:08 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vSYHf-000000004wb-45Pa;
+	Mon, 08 Dec 2025 10:15:59 +0000
+Date: Mon, 8 Dec 2025 10:15:59 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: phasta@kernel.org
+Cc: Bjorn Helgaas <helgaas@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>, Yao Zi <ziyao@disroot.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-	dri-devel@lists.freedesktop.org, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 4/7] drm/amd: kill the outdated "Only the pthreads
- threading model is supported" checks
-Message-ID: <aTai1a2sFqTh7wv9@redhat.com>
-References: <aTV1jTmYK3Bjh4k6@redhat.com>
- <e8846bef-2a6b-4552-8fb6-a33a00273aab@amd.com>
+	Frank <Frank.Sae@motor-comm.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Chen-Yu Tsai <wens@csie.org>, Jisheng Zhang <jszhang@kernel.org>,
+	Furong Xu <0x1207@gmail.com>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Mingcong Bai <jeffbai@aosc.io>,
+	Kexy Biscuit <kexybiscuit@aosc.io>, Runhua He <hua@aosc.io>,
+	Xi Ruoyao <xry111@xry111.site>
+Subject: Re: [PATCH net-next v3 2/3] net: stmmac: Add glue driver for
+ Motorcomm YT6801 ethernet controller
+Message-ID: <aTalXy_85pvLraIy@shell.armlinux.org.uk>
+References: <20251205221629.GA3294018@bhelgaas>
+ <27fec7d0ed633218a7787be3edce63c3038c63e2.camel@mailbox.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <e8846bef-2a6b-4552-8fb6-a33a00273aab@amd.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+In-Reply-To: <27fec7d0ed633218a7787be3edce63c3038c63e2.camel@mailbox.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 12/08, Christian König wrote:
->
-> On 12/7/25 13:39, Oleg Nesterov wrote:
-> > Nowaday task->group_leader->mm != task->mm is only possible if
-> > a) task is not a group leader and b) task->group_leader->mm == NULL
-> > because task->group_leader has already exited using sys_exit().
->
-> Just for my understanding: That is because CLONE_THREAD can only be
-> specified together with CLONE_SIGHAND and CLONE_VM, correct?
+On Mon, Dec 08, 2025 at 10:54:36AM +0100, Philipp Stanner wrote:
+> The bad news is that it's not super trivial to remove. I looked into it
+> about two times and decided I can't invest that time currently. You
+> need to go over all drivers again to see who uses pcim_enable_device(),
+> then add free_irq_vecs() for them all and so onâ€¦
 
-Yes, copy copy_process() does
+So that I can confirm, you're saying that all drivers that call
+pci_alloc_irq_vectors() should call pci_free_irq_vectors() in their
+->remove() method and not rely on the devres behaviour that
+pcim_enable_device() will permit.
 
-	if ((clone_flags & CLONE_THREAD) && !(clone_flags & CLONE_SIGHAND))
-		return ERR_PTR(-EINVAL);
+In terms of whether it's safe to call this twice, pci_free_irq_vectors()
+calls pci_disable_msix() and pci_disable_msi().
 
-	if ((clone_flags & CLONE_SIGHAND) && !(clone_flags & CLONE_VM))
-		return ERR_PTR(-EINVAL);
+pci_disable_msix() checks:
 
-	...
+        if (!pci_msi_enabled() || !dev || !dev->msix_enabled)
+                return;
 
-	if (clone_flags & CLONE_THREAD) {
-		p->group_leader = current->group_leader;
-		p->tgid = current->tgid;
-	} else {
-		p->group_leader = p;
-		p->tgid = p->pid;
-	}
-> Reviewed-by: Christian König <christian.koenig@amd.com>
+which will set dev->msix_enabled to 0 via pci_msix_shutdown().
 
-Thanks!
+pci_disable_msi() does a similar check:
 
-> Should we pick that one up or do you want to merge it upstream somehow?
+        if (!pci_msi_enabled() || !dev || !dev->msi_enabled)
+                return;
 
-If you don't object, I would like to route this series via -mm tree.
+and similarly pci_msi_shutdown() sets dev->msi_enabled to 0.
 
-See 0/7, I am going to send more (simple) tree-wide changes which depend
-on this series.
+So my conclusion is it's safe to call pci_free_irq_vectors() twice for
+the same device.
 
-Oleg.
-
-> Regards,
-> Christian.
->
-> > ---
-> >  drivers/gpu/drm/amd/amdgpu/amdgpu_vm.c   |  3 ---
-> >  drivers/gpu/drm/amd/amdkfd/kfd_process.c | 10 ----------
-> >  2 files changed, 13 deletions(-)
-> >
-> > diff --git a/drivers/gpu/drm/amd/amdgpu/amdgpu_vm.c b/drivers/gpu/drm/amd/amdgpu/amdgpu_vm.c
-> > index a0f8ba382b9e..e44f158a11f0 100644
-> > --- a/drivers/gpu/drm/amd/amdgpu/amdgpu_vm.c
-> > +++ b/drivers/gpu/drm/amd/amdgpu/amdgpu_vm.c
-> > @@ -2551,9 +2551,6 @@ void amdgpu_vm_set_task_info(struct amdgpu_vm *vm)
-> >  	vm->task_info->task.pid = current->pid;
-> >  	get_task_comm(vm->task_info->task.comm, current);
-> >
-> > -	if (current->group_leader->mm != current->mm)
-> > -		return;
-> > -
-> >  	vm->task_info->tgid = current->tgid;
-> >  	get_task_comm(vm->task_info->process_name, current->group_leader);
-> >  }
-> > diff --git a/drivers/gpu/drm/amd/amdkfd/kfd_process.c b/drivers/gpu/drm/amd/amdkfd/kfd_process.c
-> > index a085faac9fe1..f8ef18a3aa71 100644
-> > --- a/drivers/gpu/drm/amd/amdkfd/kfd_process.c
-> > +++ b/drivers/gpu/drm/amd/amdkfd/kfd_process.c
-> > @@ -833,12 +833,6 @@ struct kfd_process *kfd_create_process(struct task_struct *thread)
-> >  	if (!(thread->mm && mmget_not_zero(thread->mm)))
-> >  		return ERR_PTR(-EINVAL);
-> >
-> > -	/* Only the pthreads threading model is supported. */
-> > -	if (thread->group_leader->mm != thread->mm) {
-> > -		mmput(thread->mm);
-> > -		return ERR_PTR(-EINVAL);
-> > -	}
-> > -
-> >  	/* If the process just called exec(3), it is possible that the
-> >  	 * cleanup of the kfd_process (following the release of the mm
-> >  	 * of the old process image) is still in the cleanup work queue.
-> > @@ -918,10 +912,6 @@ struct kfd_process *kfd_get_process(const struct task_struct *thread)
-> >  	if (!thread->mm)
-> >  		return ERR_PTR(-EINVAL);
-> >
-> > -	/* Only the pthreads threading model is supported. */
-> > -	if (thread->group_leader->mm != thread->mm)
-> > -		return ERR_PTR(-EINVAL);
-> > -
-> >  	process = find_process(thread, false);
-> >  	if (!process)
-> >  		return ERR_PTR(-EINVAL);
->
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
