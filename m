@@ -1,193 +1,214 @@
-Return-Path: <netdev+bounces-243984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-243985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6E47CAC93D
-	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 09:59:00 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B591CACCA0
+	for <lists+netdev@lfdr.de>; Mon, 08 Dec 2025 11:04:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AC1893007C47
-	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 08:58:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 126523097BB9
+	for <lists+netdev@lfdr.de>; Mon,  8 Dec 2025 10:02:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63FA12E8897;
-	Mon,  8 Dec 2025 08:58:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 244F8314B8C;
+	Mon,  8 Dec 2025 09:54:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="aHKBJXNG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f206.google.com (mail-oi1-f206.google.com [209.85.167.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78F2A2DC77D
-	for <netdev@vger.kernel.org>; Mon,  8 Dec 2025 08:58:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2FE6314A7B;
+	Mon,  8 Dec 2025 09:54:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765184308; cv=none; b=lb1a2F0JPB0QnpOtM4O1KHKP9nl716SVCGxGF2VAeuHtVt2QrmFTh0B02G91ujNlXxTw0A+sM43Z/dkXLsP9w87ghy5cAbP4YCX9q5nFtxscWkBxDeyGuv2WptiL66kq40aKrBhH1eKmjbp5ng7S2mZiI81gQkuJVbQzG26PD38=
+	t=1765187698; cv=none; b=MhTShO7nVVOh2NGU/lImrseU9PL33trhIEVBL+WY3J+pmR4yuiBOm7MckrDas3/Up6XFifGfzi806erECTNFZNf9g4hEKDxxeVPAOZ2ZZD8Bbn1QWHwFFVfrruudF+I++X6huT4Om6ddPu+7gerAMpDrBOLJ+f5aN0/CpxkKTIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765184308; c=relaxed/simple;
-	bh=ZS71SkdDyRKSWwtwVL9j8zb1nfO+MqbEZ7A91WWyfNU=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=QVh00oFsg4orfQI96BloKpVpUDwLApifGXtsG4e1Zr+Q98ZNOfINnNhoxrh3eUsXeFZ9Bsvrplb740XLCO2MYwBNVN0csabTd/Gg0m6S9kMdAS1XnizyrjFCbGxeV4H417jS97eEPVlFGhX3jwAxheotei3tLKCPhid1gGhIKO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.167.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oi1-f206.google.com with SMTP id 5614622812f47-450fd003480so6000291b6e.2
-        for <netdev@vger.kernel.org>; Mon, 08 Dec 2025 00:58:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765184305; x=1765789105;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9FQasKD4bqoPxS9gKhFI9S0GuhkqNXd0OMNuacVPrKw=;
-        b=MDTqcbWBzciBh1JViUq34uhfr6F/rtz7lcVl9hLiwF3ph9JU/7SX9iTudZE5y/rAqf
-         QJOuQXEiIe2rpbmpAGoW1c9DWNc4yxX+ZMSq0kkmhvlBz/MdEXvalYsAwtS9kvpvDypl
-         HHOFMGRYg8kC5xvE6xQ+RlOe/Rj6Jw0bZZL4YpS8aCpx1xrQ8HXHdoc8zG4JixabCHb2
-         rzpVDdvc54WRG8kYqsmFFHIUUoW/yhGqAUESG7BHw0miWGV1SQninGMZ9wi2ucGEKXrH
-         ubEJkEG88ecBz2HGIoI+f5E4OVmWO6ncdXmiJgJtH1Aed8/JEF4/D2iGNvzxEikidGzB
-         nZlw==
-X-Forwarded-Encrypted: i=1; AJvYcCVUBcPHJc2Ak5TTPywjcuUwypU8mhqZm6sGCo1mUs9Y0leKlLsZBha3e2HAq9LylVEolUPp/tM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIwvLGI7dtGocbNfWVGx4N0bnAPusynFd+Nx31N9/6MmvfiTcj
-	DeMqXpEj3Ododo0OBF842/9LYbBf+/zeMYVPQZnJSO/ShupJhCabEboI7mUIP/RfDtk7GiNIqf9
-	DE31JnNa4D8q/MlS/mDoBXunmgLIjh8u5I3YvH2FoNvRCIT7ZES93ZSsf9DY=
-X-Google-Smtp-Source: AGHT+IFZbjrqQF5gjS1Cv/xFxoq1Zp2A6lPpXNZ8sqN7jFPoGRpQglq9N/QrYtkv4alX3tXkL1Y9cbWV+nA2jo/oB4X4qT5ZeoO+
+	s=arc-20240116; t=1765187698; c=relaxed/simple;
+	bh=TMzvKUjgodkMI/IZsdxWqJWx8tpCFtuFGx/wZEf0WMo=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=t04aAGLhzMYswjkIC7yIV/40jfFvOcbdEAO49sKG7J0mLInxgrmL7LHqxqGuPT6uSNvXvYAHuYMBuaPKv3C8+yxjpIQEf99fzJoFHiYR1c0NUc8nVDZWIJc3t3QrY5Hh9v1sx2K41742KH1//cqFKz8pVk0sGayeD5CiDmB5X4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=aHKBJXNG; arc=none smtp.client-ip=80.241.56.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4dPy506TPXz9tgH;
+	Mon,  8 Dec 2025 10:54:44 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1765187685; h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=y7G99GFEMW7DWtZHSnN3HRGF1QQf6WJ1ZrDBEDIVJp0=;
+	b=aHKBJXNGpYWOeiJgwFHbzfw7wUJbdv3VcMzmvLVrEK4gep2XlLpVg7yCd/90gwKZZ5n5RS
+	F+umOOat8SyOvxu21T33ZGo29sBJn4TXD3OHiGEJLKRBuUSaHtSsN1nc/4DWcwn0A2QjGg
+	vplng6abSSlkuPfe8VwsOR70FHeCoKpbuoSU/EmtGFIy6bpA8XluW5wp5I74BByCI4y+kT
+	r2RHA+Y6AZeBCdGseYUgkWNrZO0PUnfXA5qEtS4poUJiZ0Grgm2zZP4szVJGofC0Sla8mD
+	jWTWSPu02tNiPrpku4YbL7694v8+pBCFJUPOml27/JuV9vDrBl2rmM+40Ph5aw==
+Message-ID: <27fec7d0ed633218a7787be3edce63c3038c63e2.camel@mailbox.org>
+Subject: Re: [PATCH net-next v3 2/3] net: stmmac: Add glue driver for
+ Motorcomm YT6801 ethernet controller
+From: Philipp Stanner <phasta@mailbox.org>
+Reply-To: phasta@kernel.org
+To: Bjorn Helgaas <helgaas@kernel.org>, "Russell King (Oracle)"
+ <linux@armlinux.org.uk>, Philipp Stanner <phasta@kernel.org>, Thomas
+ Gleixner <tglx@linutronix.de>
+Cc: Yao Zi <ziyao@disroot.org>, Bjorn Helgaas <bhelgaas@google.com>, Andrew
+ Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Frank <Frank.Sae@motor-comm.com>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Choong Yong Liang <yong.liang.choong@linux.intel.com>, Chen-Yu Tsai
+ <wens@csie.org>, Jisheng Zhang <jszhang@kernel.org>, Furong Xu
+ <0x1207@gmail.com>,  linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ Mingcong Bai <jeffbai@aosc.io>, Kexy Biscuit <kexybiscuit@aosc.io>, Runhua
+ He <hua@aosc.io>,  Xi Ruoyao <xry111@xry111.site>
+Date: Mon, 08 Dec 2025 10:54:36 +0100
+In-Reply-To: <20251205221629.GA3294018@bhelgaas>
+References: <20251205221629.GA3294018@bhelgaas>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:1621:b0:659:9a49:9045 with SMTP id
- 006d021491bc7-6599a8b6ef8mr3257881eaf.16.1765184305736; Mon, 08 Dec 2025
- 00:58:25 -0800 (PST)
-Date: Mon, 08 Dec 2025 00:58:25 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69369331.a70a0220.38f243.009d.GAE@google.com>
-Subject: [syzbot] [net?] [bpf?] general protection fault in bq_flush_to_queue (2)
-From: syzbot <syzbot+2b3391f44313b3983e91@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com, 
-	haoluo@google.com, hawk@kernel.org, john.fastabend@gmail.com, 
-	jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
-	sdf@fomichev.me, song@kernel.org, syzkaller-bugs@googlegroups.com, 
-	yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+X-MBO-RS-ID: 38cd42a6ba75c52707c
+X-MBO-RS-META: yigmkee8jr5ynr5ts8zd7ndt5ycufme3
 
-Hello,
+On Fri, 2025-12-05 at 16:16 -0600, Bjorn Helgaas wrote:
+> [+to Philipp, Thomas for MSI devres question]
+>=20
+> On Fri, Dec 05, 2025 at 09:34:54AM +0000, Russell King (Oracle) wrote:
+> > On Fri, Dec 05, 2025 at 05:31:34AM +0000, Yao Zi wrote:
+> > > On Mon, Nov 24, 2025 at 07:06:12PM +0000, Russell King (Oracle) wrote=
+:
+> > > > On Mon, Nov 24, 2025 at 04:32:10PM +0000, Yao Zi wrote:
+> > > > > +static int motorcomm_setup_irq(struct pci_dev *pdev,
+> > > > > +			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct stmmac_resources =
+*res,
+> > > > > +			=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct plat_stmmacenet_d=
+ata *plat)
+> > > > > +{
+> > > > > +	int ret;
+> > > > > +
+> > > > > +	ret =3D pci_alloc_irq_vectors(pdev, 6, 6, PCI_IRQ_MSIX);
+> > > > > +	if (ret > 0) {
+> > > > > +		res->rx_irq[0]	=3D pci_irq_vector(pdev, 0);
+> > > > > +		res->tx_irq[0]	=3D pci_irq_vector(pdev, 4);
+> > > > > +		res->irq	=3D pci_irq_vector(pdev, 5);
+> > > > > +
+> > > > > +		plat->flags |=3D STMMAC_FLAG_MULTI_MSI_EN;
+> > > > > +
+> > > > > +		return 0;
+> > > > > +	}
+> > > > > +
+> > > > > +	dev_info(&pdev->dev, "failed to allocate MSI-X vector: %d\n", r=
+et);
+> > > > > +	dev_info(&pdev->dev, "try MSI instead\n");
+> > > > > +
+> > > > > +	ret =3D pci_alloc_irq_vectors(pdev, 1, 1, PCI_IRQ_MSI);
+> > > > > +	if (ret < 0)
+> > > > > +		return dev_err_probe(&pdev->dev, ret,
+> > > > > +				=C2=A0=C2=A0=C2=A0=C2=A0 "failed to allocate MSI\n");
+> > > > > +
+> > > > > +	res->irq =3D pci_irq_vector(pdev, 0);
+> > > > > +
+> > > > > +	return 0;
+> > > > > +}
+> > > > > +
+> > > > > +static int motorcomm_probe(struct pci_dev *pdev, const struct pc=
+i_device_id *id)
+> > > > > +{
+> > > > ...
+> > > > > +	ret =3D motorcomm_setup_irq(pdev, &res, plat);
+> > > > > +	if (ret)
+> > > > > +		return dev_err_probe(&pdev->dev, ret, "failed to setup IRQ\n")=
+;
+> > > > > +
+> > > > > +	motorcomm_init(priv);
+> > > > > +
+> > > > > +	res.addr =3D priv->base + GMAC_OFFSET;
+> > > > > +
+> > > > > +	return stmmac_dvr_probe(&pdev->dev, plat, &res);
+> > > >=20
+> > > > If stmmac_dvr_probe() fails, then it will return an error code. Thi=
+s
+> > > > leaves the PCI MSI interrupt allocated...
+> > >=20
+> > > This isn't true. MSI API is a little magical: when the device is enab=
+led
 
-syzbot found the following issue on:
+s/magical/confusing and explosive
 
-HEAD commit:    aa833fc394ba drm/xe: Fix duplicated put due to merge resol..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=12f27cc2580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=bb66b4eefaf3f448
-dashboard link: https://syzkaller.appspot.com/bug?extid=2b3391f44313b3983e91
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=148d701a580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=166e7192580000
+;)
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/262740328d6d/disk-aa833fc3.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/bf629be0ab14/vmlinux-aa833fc3.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/b71e61abc00a/bzImage-aa833fc3.xz
+> > > through pcim_enable_device(), the device becomes devres-managed, and
+> > > a plain call to pci_alloc_irq_vectors() becomes managed, too, even if
+> > > its name doesn't indicate it's a devres-managed API.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+2b3391f44313b3983e91@syzkaller.appspotmail.com
+Just to be clear: Callers of pci_setup_msi_context() are the last users
+in PCI which express this strange behavior. All the other APIs behave
+as one could expect from their name (pcim_ vs pci_).
 
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-CPU: 0 UID: 0 PID: 6085 Comm: syz.0.18 Not tainted syzkaller #0 PREEMPT_{RT,(full)} 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
-RIP: 0010:__list_del include/linux/list.h:204 [inline]
-RIP: 0010:__list_del_clearprev include/linux/list.h:217 [inline]
-RIP: 0010:bq_flush_to_queue+0x46f/0x580 kernel/bpf/cpumap.c:740
-Code: 35 00 4d 8b 26 4d 8d 74 24 08 4c 89 f0 48 c1 e8 03 42 80 3c 38 00 74 08 4c 89 f7 e8 0b f2 35 00 49 89 1e 48 89 d8 48 c1 e8 03 <42> 80 3c 38 00 74 08 48 89 df e8 f2 f1 35 00 4c 89 23 48 8b 04 24
-RSP: 0018:ffffc90004207650 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 0000000000000001 RSI: 0000000000000004 RDI: 00000000ffffffff
-RBP: ffff888030b0c400 R08: ffff888024b2802b R09: 1ffff11004965005
-R10: dffffc0000000000 R11: ffffed1004965006 R12: ffffc90003ad79e0
-R13: 0000000000000008 R14: ffffc90003ad79e8 R15: dffffc0000000000
-FS:  00007f6b36bed6c0(0000) GS:ffff888126d5e000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f6b36becf98 CR3: 000000003f6c6000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- __cpu_map_flush+0x5d/0xd0 kernel/bpf/cpumap.c:808
- xdp_do_flush+0x13c/0x1d0 net/core/filter.c:4348
- xdp_test_run_batch net/bpf/test_run.c:348 [inline]
- bpf_test_run_xdp_live+0x154f/0x1b20 net/bpf/test_run.c:379
- bpf_prog_test_run_xdp+0x7c0/0x10e0 net/bpf/test_run.c:1388
- bpf_prog_test_run+0x2cd/0x340 kernel/bpf/syscall.c:4703
- __sys_bpf+0x562/0x860 kernel/bpf/syscall.c:6182
- __do_sys_bpf kernel/bpf/syscall.c:6274 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:6272 [inline]
- __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:6272
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f6b3759f749
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f6b36bed038 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-RAX: ffffffffffffffda RBX: 00007f6b377f6090 RCX: 00007f6b3759f749
-RDX: 0000000000000050 RSI: 0000200000000000 RDI: 000000000000000a
-RBP: 00007f6b37623f91 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f6b377f6128 R14: 00007f6b377f6090 R15: 00007ffda92d99b8
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:__list_del include/linux/list.h:204 [inline]
-RIP: 0010:__list_del_clearprev include/linux/list.h:217 [inline]
-RIP: 0010:bq_flush_to_queue+0x46f/0x580 kernel/bpf/cpumap.c:740
-Code: 35 00 4d 8b 26 4d 8d 74 24 08 4c 89 f0 48 c1 e8 03 42 80 3c 38 00 74 08 4c 89 f7 e8 0b f2 35 00 49 89 1e 48 89 d8 48 c1 e8 03 <42> 80 3c 38 00 74 08 48 89 df e8 f2 f1 35 00 4c 89 23 48 8b 04 24
-RSP: 0018:ffffc90004207650 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 0000000000000001 RSI: 0000000000000004 RDI: 00000000ffffffff
-RBP: ffff888030b0c400 R08: ffff888024b2802b R09: 1ffff11004965005
-R10: dffffc0000000000 R11: ffffed1004965006 R12: ffffc90003ad79e0
-R13: 0000000000000008 R14: ffffc90003ad79e8 R15: dffffc0000000000
-FS:  00007f6b36bed6c0(0000) GS:ffff888126d5e000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f6b36becf98 CR3: 000000003f6c6000 CR4: 00000000003526f0
-----------------
-Code disassembly (best guess):
-   0:	35 00 4d 8b 26       	xor    $0x268b4d00,%eax
-   5:	4d 8d 74 24 08       	lea    0x8(%r12),%r14
-   a:	4c 89 f0             	mov    %r14,%rax
-   d:	48 c1 e8 03          	shr    $0x3,%rax
-  11:	42 80 3c 38 00       	cmpb   $0x0,(%rax,%r15,1)
-  16:	74 08                	je     0x20
-  18:	4c 89 f7             	mov    %r14,%rdi
-  1b:	e8 0b f2 35 00       	call   0x35f22b
-  20:	49 89 1e             	mov    %rbx,(%r14)
-  23:	48 89 d8             	mov    %rbx,%rax
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	42 80 3c 38 00       	cmpb   $0x0,(%rax,%r15,1) <-- trapping instruction
-  2f:	74 08                	je     0x39
-  31:	48 89 df             	mov    %rbx,%rdi
-  34:	e8 f2 f1 35 00       	call   0x35f22b
-  39:	4c 89 23             	mov    %r12,(%rbx)
-  3c:	48 8b 04 24          	mov    (%rsp),%rax
+> > >=20
+> > > pci_free_irq_vectors() will be automatically called on driver deattac=
+h.
+> > > See pcim_setup_msi_release() in drivers/pci/msi/msi.c, which is invok=
+ed
+> > > by pci_alloc_irq_vectors() internally.
 
+Yes, this is correct.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+> >=20
+> > This looks very non-intuitive, and the documentation for
+> > pci_alloc_irq_vectors() doesn't help:
+> >=20
+> > =C2=A0* Upon a successful allocation, the caller should use pci_irq_vec=
+tor()
+> > =C2=A0* to get the Linux IRQ number to be passed to request_threaded_ir=
+q().
+> > =C2=A0* The driver must call pci_free_irq_vectors() on cleanup.
+> > =C2=A0=C2=A0 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> >=20
+> > because if what you say is correct (and it looks like it is) then this
+> > line is blatently incorrect.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+True, this line is false. It should probably state "If you didn't
+enable your PCI device with pcim_enable_device(), you must call
+pci_free_irq_vectors() on cleanup."
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+I don't know whether calling pci_free_irq_vectors() is a bug (once
+manually, once hidden by devres), though.
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+If it's not a bug, one could keep the docu that way or at least phrase
+it in a way so that no additional users start relying on that hybrid
+mechanism.
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+There is actually no reason anymore to call pcim_enable_device() at
+all, other than that you get automatic device disablement.
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+> >=20
+> > Bjorn?
 
-If you want to undo deduplication, reply with:
-#syz undup
+BTW, if PCI has a TODO list somewhere, removing that hybrid devres
+feature for MSI should be on it, for obvious reasons.
+
+The good news is that it's the last remainder of PCI hybrid devres and
+getting rid of it would allow for removal of some additional code, too
+(e.g., is_enabled bit and pcim_pin_device()).
+
+The bad news is that it's not super trivial to remove. I looked into it
+about two times and decided I can't invest that time currently. You
+need to go over all drivers again to see who uses pcim_enable_device(),
+then add free_irq_vecs() for them all and so on=E2=80=A6
+
+If you give me a pointer I can provide a TODO entry. In any case, feel
+free to set me as a reviewer!
+
+Regards
+Philipp
 
