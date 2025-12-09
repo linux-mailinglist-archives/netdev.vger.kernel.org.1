@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-244153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 233BCCB0A89
-	for <lists+netdev@lfdr.de>; Tue, 09 Dec 2025 18:03:04 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADFEFCB0A9B
+	for <lists+netdev@lfdr.de>; Tue, 09 Dec 2025 18:04:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0CCCB30B3FE6
-	for <lists+netdev@lfdr.de>; Tue,  9 Dec 2025 16:59:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 912DC30F6770
+	for <lists+netdev@lfdr.de>; Tue,  9 Dec 2025 16:59:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72BBE331A70;
-	Tue,  9 Dec 2025 16:59:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E4AD3002B0;
+	Tue,  9 Dec 2025 16:59:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mKvtD8q2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DADOQeit"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49E1B331A67;
-	Tue,  9 Dec 2025 16:59:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56AB8288537;
+	Tue,  9 Dec 2025 16:59:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765299546; cv=none; b=pcmKzomAxvIk/e49BvLBkaKIskHr5WCH/crdnBNKF6IWM43DZb73MKNr9DGBCCwBSjq3fQf9A0va8j1DBBI0f/L9wff2nmCsVo6BXSd1KkZgDBXt9ku5AfxTAeNCfkTLtm9UDn5wykGHe2R2Pvz+s5AtGzCp3/1HYRFgQnCxijI=
+	t=1765299593; cv=none; b=TwFOjdKDFqCcJb1aDZPVj+V9clAlkCRUa7A9bY5Hq+2AfMQ1Nx7uGK8cR5oI7jdc1osQfTcOeGlGUQmQFtcnLpTkrj6cd3e1c80U26A2gA9kTXg0yNIz1vvbPrkjgpZhosE97rE2jj4FfT9Dfp/aP0aWavjEU4WID/nwSe44g9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765299546; c=relaxed/simple;
-	bh=GSU1zRRZ1vI5CnLegphBkx4E2oL9eoOFk6M4Ekfe64U=;
+	s=arc-20240116; t=1765299593; c=relaxed/simple;
+	bh=oQeCQBqvczPrbkwcSpEGBVgCAauVVeb6dy/UD8J/4KY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qu7P1a6lPjjhd7jHkjD9SHyr5/yc45L9xQT8S5n0UIot2vMykDb7zWivaAv77TWRn3WTE1Zw5JnIm7qxZNTiq3+mHIm4X66qFbvXdNktg0F0iWxFjff1pxcR7gsXTciR1JchY+FH0Kri2HaZqGwZdVxn2P76N256uyMkxhHiHg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mKvtD8q2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7AB8C4CEF5;
-	Tue,  9 Dec 2025 16:59:02 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=pVoBvBZr2ibLK5Mh9XTapXRfAU/RIm3vzYeyp1BTnvugmXe4Yra5birIB6c1Zo+faUA4fHPSMtkSGSCsv5/1oqQ3k3VGj6SGMTLbunI/RLI2Av5XM2DfMpt96fhYOxcoJCeix6ohFycwknbaJGvVha8Rj6DFRE13EwjEWpbGg74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DADOQeit; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D09E8C4CEF5;
+	Tue,  9 Dec 2025 16:59:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765299545;
-	bh=GSU1zRRZ1vI5CnLegphBkx4E2oL9eoOFk6M4Ekfe64U=;
+	s=k20201202; t=1765299592;
+	bh=oQeCQBqvczPrbkwcSpEGBVgCAauVVeb6dy/UD8J/4KY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mKvtD8q2Mr5Ov8kujcm2nZu71BRn6LoYQZ6sMswc+LtDX3YKwyUI2Fw5Wr7gJZQ9O
-	 Z90TobqzwozMV4IzuTo7w7vFgsMcI2sF6NdjOMMRVJFXPAgqjKRt7bEyVGBj86Iqd3
-	 02kTqwp/X6R8Jr49iB1jGOwVzKQwLB0dgTBxJIX/+18r4nB6wAe33gMG+BP9rSIfnG
-	 CtXFPgnfUMpEbSExcUnmglCNsLf+c+FCFyRUuMq6aMDgQLHWz/vcCK2l4Em0HWe98Y
-	 1Lrr19nP85zRE5sXtriv5wcGrCbY7nkGuwceLCm5ARFKIXFthRKUUAybNH1yT3H2MC
-	 9FOk52Hg0z9FQ==
-Date: Tue, 9 Dec 2025 16:59:00 +0000
+	b=DADOQeitRhHQHmCZcbx7np0iolU2r1y9zEii1d0EZsGr4NxvyrvSy4p+ybXImjH2O
+	 MQ5PRu9r2j8UN/Xsrkc/6qzxY4ulBQvPIjmseKMPO15AHJ4b7/Yyl5S9cglLSzv+ZG
+	 cQrF9P/bh+E9/WaWUyQTIbuWLLq0j/drGS3vb1j2H1z4yJpZtnXKDngdQz3GBZmix0
+	 2yMVHnAd91Tp/R6LxTzSqNMlW8sKBvuDN484iRONyHQTno2quwGeIyw9I1/LVG5CJ5
+	 z89X06tuyGlp60pJd+ZzDtNa83ro/GmayC1WJ1y4HL/Z2QORGUPbJZTQs5hSanXU0C
+	 1oPf0/PadBVvA==
+Date: Tue, 9 Dec 2025 16:59:47 +0000
 From: Simon Horman <horms@kernel.org>
 To: Jijie Shao <shaojijie@huawei.com>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
@@ -48,11 +48,11 @@ Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 	huangdonghua3@h-partners.com, yangshuaisong@h-partners.com,
 	jonathan.cameron@huawei.com, salil.mehta@huawei.com,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 1/3] net: hns3: using the num_tqps in the vf driver
- to apply for resources
-Message-ID: <aThVVMH-1bAzpX3K@horms.kernel.org>
+Subject: Re: [PATCH net 2/3] net: hns3: using the num_tqps to check whether
+ tqp_index is out of range when vf get ring info from mbx
+Message-ID: <aThVg5BQW_StnV6K@horms.kernel.org>
 References: <20251209133825.3577343-1-shaojijie@huawei.com>
- <20251209133825.3577343-2-shaojijie@huawei.com>
+ <20251209133825.3577343-3-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,22 +61,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251209133825.3577343-2-shaojijie@huawei.com>
+In-Reply-To: <20251209133825.3577343-3-shaojijie@huawei.com>
 
-On Tue, Dec 09, 2025 at 09:38:23PM +0800, Jijie Shao wrote:
+On Tue, Dec 09, 2025 at 09:38:24PM +0800, Jijie Shao wrote:
 > From: Jian Shen <shenjian15@huawei.com>
 > 
-> Currently, hdev->htqp is allocated using hdev->num_tqps, and kinfo->tqp
-> is allocated using kinfo->num_tqps. However, kinfo->num_tqps is set to
-> min(new_tqps, hdev->num_tqps);  Therefore, kinfo->num_tqps may be smaller
-> than hdev->num_tqps, which causes some hdev->htqp[i] to remain
-> uninitialized in hclgevf_knic_setup().
+> Currently, rss_size = num_tqps / tc_num. If tc_num is 1, then num_tqps
+> equals rss_size. However, if the tc_num is greater than 1, then rss_size
+> will be less than num_tqps, causing the tqp_index check for subsequent TCs
+> using rss_size to always fail.
 > 
-> Thus, this patch allocates hdev->htqp and kinfo->tqp using hdev->num_tqps,
-> ensuring that the lengths of hdev->htqp and kinfo->tqp are consistent
-> and that all elements are properly initialized.
+> This patch uses the num_tqps to check whether tqp_index is out of range,
+> instead of rss_size.
 > 
-> Fixes: e2cb1dec9779 ("net: hns3: Add HNS3 VF HCL(Hardware Compatibility Layer) Support")
+> Fixes: 326334aad024 ("net: hns3: add a check for tqp_index in hclge_get_ring_chain_from_mbx()")
 > Signed-off-by: Jian Shen <shenjian15@huawei.com>
 > Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 
