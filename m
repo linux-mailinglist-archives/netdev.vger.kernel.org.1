@@ -1,123 +1,145 @@
-Return-Path: <netdev+bounces-244165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACE9ECB0F02
-	for <lists+netdev@lfdr.de>; Tue, 09 Dec 2025 20:30:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 39A0ECB0F81
+	for <lists+netdev@lfdr.de>; Tue, 09 Dec 2025 20:53:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A510A3029219
-	for <lists+netdev@lfdr.de>; Tue,  9 Dec 2025 19:30:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F09CF30F387F
+	for <lists+netdev@lfdr.de>; Tue,  9 Dec 2025 19:52:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4D213064B5;
-	Tue,  9 Dec 2025 19:30:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9BAC3081B0;
+	Tue,  9 Dec 2025 19:52:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jp4O1KKg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JYS/YKwB"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D3AC1E260A
-	for <netdev@vger.kernel.org>; Tue,  9 Dec 2025 19:30:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE68307AE9
+	for <netdev@vger.kernel.org>; Tue,  9 Dec 2025 19:52:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765308623; cv=none; b=r1utyHpdGZlW5/QE+vGsGGSyROLuzmQLcxf5X6sELEaAwCimL3BL8HLKWAZbes3plLA1poK10Tyi3jgpjz8Rsx6LFWv4ex2/XEPvM6s3GL3lJqFCboM7Ba5tUqOtmnAtiZIBG7h7LsNKZbF5sewkXWhaPDEB0mcF4wd9iOkgTro=
+	t=1765309956; cv=none; b=OiFMHjhs/uWxZKGzYLeZNo00zp8nfaDtoGX4wk4EFF9Z4Db2Nf349xnrKamBtHay+ECxlUabIKPfhvb89Ip8dK2dMCDuKhgyolhnNnZD1xW28hnjE1Ayurlbnt4WO3w/kso4+dFUdS1R056DRYHIWLkjnup84/lYOUet+hGqrEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765308623; c=relaxed/simple;
-	bh=7Wb9drLCp5rlsg3gVoLUsSjWlF01VVLONyUMWshXHkY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=H11+spIIe+dPjweRiB1X3o02IxnmDsz5tkJo5pB2lfo3sbfQA7qZ355uzJ6YxsG+m7BwUQZNhniDI72ARqXGIw9Xy3slu8r+WgfyzMYuzWujAQ5gH1BrAYnUe3eq+bZ7jUTCbLX5p3NNSj4PLaSvuqt2UmUBn1BQHUDeq6/xC2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Jp4O1KKg; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765308621;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=5NxTS4LxE4qH94Xw5LGwiw1iH2nY+WessKDIWX82CLk=;
-	b=Jp4O1KKgTHtYdskK278m1NZGrXG6s9PWy43DYotfJhAFxe31BDjwUEVlvwMTlxskAhrJMv
-	amRNAIbhSbFAflkUQXfcLcNiqOBUVl5edZd/kDrjQoVv0puQ66oyZQN8AAEqzMJlriRgKD
-	8V1dKsJ/VbJuRkTQyw/qKdKxItPSL3w=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-439--vlABgrBN1GuFxII7y4-cQ-1; Tue,
- 09 Dec 2025 14:30:19 -0500
-X-MC-Unique: -vlABgrBN1GuFxII7y4-cQ-1
-X-Mimecast-MFC-AGG-ID: -vlABgrBN1GuFxII7y4-cQ_1765308617
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8DC25195606F;
-	Tue,  9 Dec 2025 19:30:17 +0000 (UTC)
-Received: from aion.redhat.com (unknown [10.22.80.38])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3D3741956095;
-	Tue,  9 Dec 2025 19:30:17 +0000 (UTC)
-Received: from aion.redhat.com (localhost [IPv6:::1])
-	by aion.redhat.com (Postfix) with ESMTP id 84F0A54CA77;
-	Tue, 09 Dec 2025 14:30:15 -0500 (EST)
-From: Scott Mayhew <smayhew@redhat.com>
-To: chuck.lever@oracle.com
-Cc: kernel-tls-handshake@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: [PATCH] net/handshake: duplicate handshake cancellations leak socket
-Date: Tue,  9 Dec 2025 14:30:15 -0500
-Message-ID: <20251209193015.3032058-1-smayhew@redhat.com>
+	s=arc-20240116; t=1765309956; c=relaxed/simple;
+	bh=XHL/L/FSKYOnQq3SetiqQKZ3ve52BsUb+UjL14KbL8c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S3mqlUjLooXQ9FONMJIhZhdUFHVcOnAbPg5GQmDS3/SW5ResAHh2j31Zbjt7Ty2qSG0FXBCVtOHDV6IKr0oQ6MBf5MdvRd496WTipxFbxg2qzZLXNWq377oiok3NUewX8Z+k+R/9Tt4NwN41ZZJg86opZlo3wnRkcnr5zzruBO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JYS/YKwB; arc=none smtp.client-ip=74.125.224.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-6433f99eb15so5424132d50.3
+        for <netdev@vger.kernel.org>; Tue, 09 Dec 2025 11:52:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765309953; x=1765914753; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+S3XRmIfY6Nu+N2ZLCSjBdZjpwngwmUECGmLCvjDHC4=;
+        b=JYS/YKwBT9uINGJs0YtoEei+BcWgPlR28O3aqTc7ELWu4ak8jt96qj9N1A6rFEx97y
+         UoKYSu15kAi67xNZxzfPs0wRq0bWRh92qZx9kk+Jgy9tw31yGR3fmzJqAjwg4A4MOX7P
+         9bL7jbxmonzsi+LHrD7vqtHI1W98N7C8byFw44IVvhL3FBZdJoGQW/pzSoMHW+eGOB9f
+         X+g9AEgJDlsgG1Nz1WhPlCaPKHJTvHM68ooA71V4Gw6wC/FqskNUvUrASYlSq6ek7QQQ
+         zROMwFssQ7rk32CJwEQmETzhC6q1KpDga/wfeAkXudp4GV0SMqOZ2uQZvhD9Fb7CDd7N
+         sydA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765309953; x=1765914753;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+S3XRmIfY6Nu+N2ZLCSjBdZjpwngwmUECGmLCvjDHC4=;
+        b=JSzwQLcP8zZuDH8AnKpsjgUy1aH7hynYjSX6QGJA2VNwIqRMvfkFLhTcMmUVzlEaMi
+         LK79t2JwmOL9S0gFF2rUPoUZvafYftBouFxZx8VFlkrNwPgfuVV8VPA3DLBiLSWTimNm
+         Tdm0fqTnu2YzA03OBXhvsYvcc4yNISi26yED6p+lcTf7zhXbBK+0oVeS5Uxr2mbel/1d
+         +nfu+93WhlHuzejoX1ZjTKuenDHimc6QK025HpUzJgzjUjTBQ2+bx0ArfKCzkNK72hRj
+         w5FxkI/OQT6tBgyIFyGCToKFhCsZI3Dtmbu/l6On2wNkuzDavnt0uUatAbdjmF9wnaGv
+         wD4g==
+X-Gm-Message-State: AOJu0YyvUHH7BBlIcN58AKjkXile6zrHi9tNMMoccrFcdNbeByUBA58C
+	nbYY4iKvjG3dqMU1qq2HhRQCZzJblZKoDG3SrwwMVz4FVVp82NJI0REq
+X-Gm-Gg: AY/fxX5OBYdlvhZYyTT063QaysBAs8VXCdPWWwzBXo15x/j/+30zPswZyvmSFPOvb4A
+	tEkMZo2nsuvFFHIpE5t9krHqpKGhWSZ3s+mbDG+eiSMmFNV7hrkr47y5p/9+nvuav7SH3XdAU5n
+	Fjimo08E9M+3eZZyT3UXDZjM8MDK6yXouSehAGyR+LyBn/4jkN7Oj2MQ12KudY2bPMNh3abRu6c
+	mug2ojxqb417Y6ir+jUnYqlrv80LP7dbKJrI5fy2c6nvZkG+TMTtA2s8umQm6ANo4Z8WK6ufdFH
+	OW38SmAyeizyyjjM1qa9qgyXR9C+heTkmmjD/3QMTGfcFFzL+rWfCuqJ95fZxr1gthXUuGB2BgB
+	oNGyZd/sI2V9vQlddVMoPnsXivMkbCfShpjsgfnuDtu1puoDtyUvYP4mWLEqkaK+WpPmJg95GpA
+	r5TWewjJAhKtlUC3tD5smqDo4xnAGynVS2y1hG0EDzTGm/GBc=
+X-Google-Smtp-Source: AGHT+IGVa6r0iFDuAtcL6wIkP8nbDpeCfCQK9vF2pnYiCLEjTySXlHVWrlq2gK/PVPin4gJW60wg5g==
+X-Received: by 2002:a05:690e:2543:b0:640:d255:2d6f with SMTP id 956f58d0204a3-6446e93f952mr78609d50.34.1765309953244;
+        Tue, 09 Dec 2025 11:52:33 -0800 (PST)
+Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:54::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-78c1b4ae638sm63277367b3.4.2025.12.09.11.52.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Dec 2025 11:52:32 -0800 (PST)
+Date: Tue, 9 Dec 2025 11:52:31 -0800
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	David Ahern <dsahern@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v7 0/5] net: devmem: improve cpu cost of RX
+ token management
+Message-ID: <aTh9/waV23uRZc9E@devvm11784.nha0.facebook.com>
+References: <20251119-scratch-bobbyeshleman-devmem-tcp-token-upstream-v7-0-1abc8467354c@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251119-scratch-bobbyeshleman-devmem-tcp-token-upstream-v7-0-1abc8467354c@meta.com>
 
-When a handshake request is cancelled it is removed from the
-handshake_net->hn_requests list, but it is still present in the
-handshake_rhashtbl until it is destroyed.
+On Wed, Nov 19, 2025 at 07:37:07PM -0800, Bobby Eshleman wrote:
+> This series improves the CPU cost of RX token management by adding an
+> attribute to NETDEV_CMD_BIND_RX that configures sockets using the
+> binding to avoid the xarray allocator and instead use a per-binding niov
+> array and a uref field in niov.
+> 
+> Improvement is ~13% cpu util per RX user thread.
+>     
+> Using kperf, the following results were observed:
+> 
+> Before:
+> 	Average RX worker idle %: 13.13, flows 4, test runs 11
+> After:
+> 	Average RX worker idle %: 26.32, flows 4, test runs 11
+> 
+> Two other approaches were tested, but with no improvement. Namely, 1)
+> using a hashmap for tokens and 2) keeping an xarray of atomic counters
+> but using RCU so that the hotpath could be mostly lockless. Neither of
+> these approaches proved better than the simple array in terms of CPU.
+> 
+> The attribute NETDEV_A_DMABUF_AUTORELEASE is added to toggle the
+> optimization. It is an optional attribute and defaults to 0 (i.e.,
+> optimization on).
+> 
 
-If a second cancellation request arrives for the same handshake request,
-then remove_pending() will return false... and assuming
-HANDSHAKE_F_REQ_COMPLETED isn't set in req->hr_flags, we'll continue
-processing through the out_true label, where we put another reference on
-the sock and a refcount underflow occurs.
+[...]
+> 
+> Changes in v7:
+> - use netlink instead of sockopt (Stan)
+> - restrict system to only one mode, dmabuf bindings can not co-exist
+>   with different modes (Stan)
+> - use static branching to enforce single system-wide mode (Stan)
+> - Link to v6: https://lore.kernel.org/r/20251104-scratch-bobbyeshleman-devmem-tcp-token-upstream-v6-0-ea98cf4d40b3@meta.com
+> 
 
-This can happen for example if a handshake times out - particularly if
-the SUNRPC client sends the AUTH_TLS probe to the server but doesn't
-follow it up with the ClientHello due to a problem with tlshd.  When the
-timeout is hit on the server, the server will send a FIN, which triggers
-a cancellation request via xs_reset_transport().  When the timeout is
-hit on the client, another cancellation request happens via
-xs_tls_handshake_sync().
+Mina, I was wondering if you had any feedback on this approach?
 
-Add a test_and_set_bit(HANDSHAKE_F_REQ_COMPLETED) in the pending cancel
-path so duplicate cancels can be detected.
-
-Fixes: 3b3009ea8abb ("net/handshake: Create a NETLINK service for handling handshake requests")
-Suggested-by: Chuck Lever <chuck.lever@oracle.com>
-Signed-off-by: Scott Mayhew <smayhew@redhat.com>
----
- net/handshake/request.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/net/handshake/request.c b/net/handshake/request.c
-index 274d2c89b6b2..f78091680bca 100644
---- a/net/handshake/request.c
-+++ b/net/handshake/request.c
-@@ -324,7 +324,11 @@ bool handshake_req_cancel(struct sock *sk)
- 
- 	hn = handshake_pernet(net);
- 	if (hn && remove_pending(hn, req)) {
--		/* Request hadn't been accepted */
-+		/* Request hadn't been accepted - mark cancelled */
-+		if (test_and_set_bit(HANDSHAKE_F_REQ_COMPLETED, &req->hr_flags)) {
-+			trace_handshake_cancel_busy(net, req, sk);
-+			return false;
-+		}
- 		goto out_true;
- 	}
- 	if (test_and_set_bit(HANDSHAKE_F_REQ_COMPLETED, &req->hr_flags)) {
--- 
-2.51.0
-
+Best,
+Bobby
 
