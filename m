@@ -1,417 +1,299 @@
-Return-Path: <netdev+bounces-244045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64F80CAE722
-	for <lists+netdev@lfdr.de>; Tue, 09 Dec 2025 01:06:23 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E58F6CAE79B
+	for <lists+netdev@lfdr.de>; Tue, 09 Dec 2025 01:17:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 436A2306A05E
-	for <lists+netdev@lfdr.de>; Tue,  9 Dec 2025 00:05:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 07BBA3082D70
+	for <lists+netdev@lfdr.de>; Tue,  9 Dec 2025 00:16:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A45519005E;
-	Tue,  9 Dec 2025 00:05:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0D461FF5E3;
+	Tue,  9 Dec 2025 00:16:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Aq3lDq+q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WUj2ROSN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1432C1A9B46;
-	Tue,  9 Dec 2025 00:05:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765238734; cv=fail; b=OEixR40T+Ws4xVmtMbV+Tg80PoSvyyjSGqSQ/sffvr6k4dF1hGL+DeIqFSFZmAiTqsKdNup/Dr3VJWoTI1AlY3SK0HOWSHRLAjlnllAiECpQTFIG+cpZtzR0eAeyfD+c/ZmzRt99t3p0jRiE/7yeqIYp01Y81H16k7HFrz1bge0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765238734; c=relaxed/simple;
-	bh=DpH2BGFeexpJRWU/lXX3VuYDmcYGZGnsuKU4V8Jalio=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=TScnMMYWganeNMgzC6yN1K9+wvRMaqUNQK/cwbwNo219t3aExnTYPY4VCbRpA98gqjfaYoUnnI/cMHzjVJEUE7FHM62A2stsyWEJHBUctjSLlZHUaRItP905bVdeAQPyALhvHOlAQf4mXEorrGfxEtacIHhi0l5miY+cTrHGrkA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Aq3lDq+q; arc=fail smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765238733; x=1796774733;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:mime-version;
-  bh=DpH2BGFeexpJRWU/lXX3VuYDmcYGZGnsuKU4V8Jalio=;
-  b=Aq3lDq+q093lziyzw6pYSemh2aK61KC9VoC3Qyl1cxlLZOUeoqsfxYlR
-   AuTQuPKSnVHbgcLGYRM8VZ8Ag0mopT1Ank5WW8REpzzQZ8t/Lqw6qct0h
-   DUZ0wdUnDH1lEsLLau8PX7OcUXjanTerzY9hgJz+wNHR/Ls5vnxvq5E3q
-   ZdbWDTvhusAf2M+LYmbOTK9dkmdf+Bb4FhR9YkjKrTGWbHyllJbMB8065
-   3R0kHMwi/1plHc06tFiPiug3+S0d2zXeRiKqJWb+UsRHh7WpdZB9HasaK
-   DIpzLAoiUyh/b+dJqjoRVfSObH2xOhd/Kxmc3pKw4Nnd3L+OGIxSvyggR
-   A==;
-X-CSE-ConnectionGUID: sIEBOBgLSnu7jyoxPssYCA==
-X-CSE-MsgGUID: PNFTLRAERk+O41qgYOmBhQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11636"; a="66195927"
-X-IronPort-AV: E=Sophos;i="6.20,260,1758610800"; 
-   d="asc'?scan'208";a="66195927"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2025 16:05:32 -0800
-X-CSE-ConnectionGUID: HG3tQBCqSrOjCOo2iAiGCg==
-X-CSE-MsgGUID: Rjp/vjqhSeaHT2n1kMgRig==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,260,1758610800"; 
-   d="asc'?scan'208";a="219419664"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2025 16:05:32 -0800
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Mon, 8 Dec 2025 16:05:31 -0800
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29 via Frontend Transport; Mon, 8 Dec 2025 16:05:31 -0800
-Received: from CH1PR05CU001.outbound.protection.outlook.com (52.101.193.17) by
- edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Mon, 8 Dec 2025 16:05:31 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dqHJ7Q21IRJrkSgTI758cVubCb6ywFFEKjkpIpHvxPZbQ4rxCXXxXpLpX+u7V61WNC1BbwCgjg9UMgqvZ2G903zvK2TO3775xZHuHr610f14w1G6d93414Dgm6hXeh0gzPafgF9Kb83MtYHl3/ey+IeHLVMbFog4pID4V1KsTB99OZXUWP/6qmkPFmADu2JSWgfXZQwfjwGk/yW5UaypgicP3ax04xrg66PdZ/JUBb39KVKhmf+XyhoWxbob53sS8NKArWZoPugszB6MoEF/MJVFAFb/lqVKmjjTIcdKPkSmPYfdIOdL8tCM+jXX2lwpJI/hJJ1DGibul2+Roz3oXg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+pTb4piiHM99wAu4d/niogUWlXjcg2CY662nUcHlQTY=;
- b=jyS5/vKSlAlnDbIy70snAYq2akLjeJlzr1bOpMCcRJUuDrfjKdsnTiDwIvWyJ8O6pVEwM2Nq0FRsUa2dSOcz0mdjkNwDz4CncVvmTK6eid/u8c4InHnCzCrugJnVRPHrMZ5TKFQzylBmiRGGMGC3l4YZgDUEcEmvsb6PHyQC1/jeod0uei+c0gJ6rV3LMJcbqVtOPdF47E98h0DQ/UIm/JM347pst+veGJfJm60p4mD+a9rW+oQw/R41wp4So49i9DXYm9Big3YN3wUnbYFPgCTAD4DMnC6JcovgULWKmw8KUQPx1O3iMRRzAMJMksPRLNoUACPmhytNNWE1WEEjuA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by SN7PR11MB6828.namprd11.prod.outlook.com (2603:10b6:806:2a3::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9388.14; Tue, 9 Dec
- 2025 00:05:29 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::81f7:c6c0:ca43:11c3]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::81f7:c6c0:ca43:11c3%3]) with mapi id 15.20.9388.013; Tue, 9 Dec 2025
- 00:05:28 +0000
-Message-ID: <67a5ef2a-83bc-4b35-9eac-5b9297dfeb2d@intel.com>
-Date: Mon, 8 Dec 2025 16:05:27 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [BUG] ice: Temporary packet processing overload
- causes permanent RX drops
-To: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, <intel-wired-lan@lists.osuosl.org>, Netdev
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <sdn@hetzner-cloud.de>
-References: <672ab222-db78-4cad-821b-19256a7a4078@hetzner-cloud.de>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-Autocrypt: addr=jacob.e.keller@intel.com; keydata=
- xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
- J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
- qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
- CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
- UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
- MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
- apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
- cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
-In-Reply-To: <672ab222-db78-4cad-821b-19256a7a4078@hetzner-cloud.de>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="------------BqQnLKE9NhTn68nEIGLf7diu"
-X-ClientProxiedBy: MW4PR04CA0288.namprd04.prod.outlook.com
- (2603:10b6:303:89::23) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A00101A9B46;
+	Tue,  9 Dec 2025 00:16:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765239398; cv=none; b=ErI5MXTRn6+FVjnmc8big2KB8f1prDXRzzr0ZukkRZZ6o6LGyvomtuipHoGYBkGUzmylpLd0ikIaSL+BFYAfsMTmxBD3+5A+aCYvS/sWXYPZhomF4jCCVImNBEEaooIJ4ShhhXg5hUVr7QKTIar8+qX33PR6gwLb8XQ0YmI1CiU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765239398; c=relaxed/simple;
+	bh=wiRysEFUkuhH+VlDpC3sA3h+zQjzRcu4gDivr+e3HQs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=iSuHo8oI7iT/iPOYmt15ydDV3HyWiGMAWx9WURJMnHBJfRUHTrY4lTypBIbW0jJ1PGKpSymd71iWgm+9dYEvFAOM2ouYyX3yMIPikz4bu7u7qoS0znLjAM8K+9+Qah5dBv1HVVjfI92QlU0/IgPZQk1XrUcZ2USDO1hokbyVcCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WUj2ROSN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3ED6C4CEF1;
+	Tue,  9 Dec 2025 00:16:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765239398;
+	bh=wiRysEFUkuhH+VlDpC3sA3h+zQjzRcu4gDivr+e3HQs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=WUj2ROSNIFLuS5zziufvGbzRJ33rQ6Ko5lMvZWb4H9vZdGbDAhKBIn82hq7CLjVuL
+	 tAEUruA69S3eqq2lUhzJfw+6Fo1i5IlQ4INz7nIZIaNiiwJUjw41ABhHbE9GxZgQut
+	 hfv0+8ZiHu7tH2lmVQEEEnPXBaMtJKrHtIQBs9kN6HyLYaeR+OLjWSYYaDqcF9Qn1G
+	 455nMlwAzqanpWBD1VX3+5WnZs7g9SVIOW/OKiArSxibDt8nvVDvQ0kRYj7Kt/wYrk
+	 atjfRtl719Yi2yddGcX2ccAL+5nZN/aHarzyeIkuVnVhSufmzHx4ZKX8N9BDfPKa1q
+	 lI1YfZs0PfNLg==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Sasha Levin <sashal@kernel.org>,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.18-6.6] ipv6: clean up routes when manually removing address with a lifetime
+Date: Mon,  8 Dec 2025 19:14:55 -0500
+Message-ID: <20251209001610.611575-3-sashal@kernel.org>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20251209001610.611575-1-sashal@kernel.org>
+References: <20251209001610.611575-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|SN7PR11MB6828:EE_
-X-MS-Office365-Filtering-Correlation-Id: c06b8d22-6794-4269-c2c5-08de36b6a941
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016|921020;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?NFdTeXhXVzZSVUpnWGVxZzV1NU52WVhEN3A4Z0hwZytkYmw3ZGUwZkhucFJF?=
- =?utf-8?B?bi9TUzcyQ3NsRnlHR09Lb1F5b2tCNkhrZ1BHTGJXWkNSdFZBODlTWjFDTlNQ?=
- =?utf-8?B?aVI5TFAzNW1XMVZrbHNPb2FZekRqOWZCZkk5ck1NQXJKRFlKU3VwbVFqVlgv?=
- =?utf-8?B?Y3BoclRaRFByT28ycVdJT3AxUmJsOHo5c0tuR05DSUd5QnU5MWprS09MSDBM?=
- =?utf-8?B?RUZubUE1U1pncUUrMCtsOVI5b3dmVHVUU1hmOG9nSDlnNnFwOFVGckxvZ1Fi?=
- =?utf-8?B?SjRJK3A3cWVrVG8yMENsRExNakZPZk5BQWluV204MEU4Ui90RXZ1cUx2b01p?=
- =?utf-8?B?dm5xemVIKzVjTmpTNkdiR3Z3MzNXWURBZjlZMFdGeC8zd2JMclBkUzRoUE4z?=
- =?utf-8?B?NzRlZ0VOeWNXOVBsRFNKWDV4K2hyZExiUnQxcTVnWGd4S3ZsaHR4RlAydUdV?=
- =?utf-8?B?RVIvb2RRenhsQnU3TXVoeVBPK3lwcEN3dkkxT1E4MjVwK1FoL0syZWNLaEww?=
- =?utf-8?B?MlJvdlkxQ041REk1ZW5Ma2J1cytzbzdKdlNrQ1B5TFk2RmdMbVlNS0laK3NX?=
- =?utf-8?B?dXR3NmZrWk9JNE5scXFWbERuZTcxQUt1UFF0SHFRMXNwTFZTRXNLY0Jna1JL?=
- =?utf-8?B?aXRocFl6SlBQVlRZT1NTajhnRDdKN1g0RldFdWgwRHYvbFNxQllDb2dZWVhK?=
- =?utf-8?B?RFdYamE3d1VOWGliNUY0aFN0VEZOSGJnUmZybVFnZGduRGN3bzRMMTYwcWRx?=
- =?utf-8?B?ZVFBM3hCMDBGZ3NJVEpjVmpUa0pCcC9xdndFNnhKQ2xzMXl4YTMyaEhWWWZu?=
- =?utf-8?B?Z0VBa2RwNFFFYyt1SkdMckRuUWk1a3lWTG1TNXdNeVFmeEtkNTMyOHdoODlL?=
- =?utf-8?B?dXNJR2NDY3FKcEd0QUs3d2ZEUEFjMUhUYWlqQkdjTnNtM2JFK0x5VDNsR05q?=
- =?utf-8?B?RTBGQWVENXZwblRnMm5BVit1d3dVdE9lRGphUkRHMzhUV2tkOGdhNldPVXlP?=
- =?utf-8?B?VmdnM1lHR3pRZGlGVjBGT0pNYTQ5ekpGSzZ5c1MxT05oaHhaMTdSYXFvdU9k?=
- =?utf-8?B?WXpqK3BsdWc2RWZubWtKanI3dlVGZjFxQXBDbkJxUU5iS2N5bjBRcUtneXRR?=
- =?utf-8?B?eVYrZ09EQTVvTktVSWQ4eDVhYXc2KzNZeFVIcUg1T3ZqT1oyLzBxWUhoYS90?=
- =?utf-8?B?WWUzU1dMSXRZUGdueG92VUpEQjVnTWVCWFpqTXFnbERyYTJQcnV4NnJOaEJa?=
- =?utf-8?B?QlBQY0ZqRHFINWN5Z3NuMDZ4UFVGVVBmcWVCaE01NTFMZTBEczhpS25JM1Ay?=
- =?utf-8?B?N2hPa0IwVHdOcGRUVS9LQWdjS3RvbzZaTmZTVGRyRml1ZENtNHpDVWNTcjUy?=
- =?utf-8?B?SUVBZENueE5lekxOZ2IwWGlmbjR6NEU5YXBxMTE4b0FrdFNOME43N1pkTnhC?=
- =?utf-8?B?dmliZ25SRnZ0bEVRQ3dDL3dKcEdWUE1RamFGMHNGM3lnSzZkMUlxTGJ5eUNG?=
- =?utf-8?B?cVZRWXZnUHA5YWFvS0oyZXdEdmlaMHhuVXNJREtkalBFMUxiejI4cGhCOGNk?=
- =?utf-8?B?R1JCYVpWMTRpL0JFdE41RGhTQ3RRQkowNmdMZjcvVXFtRk9yazJIVUl2Z3B0?=
- =?utf-8?B?bXNBWVFRUzE5T3FmQVBkQ3BZT1RTYjk5NVBuNnRqSy9JZ3ZjVUJvOFZnMWRi?=
- =?utf-8?B?YjQ4amRVWUVWZkxXaTE5UUpxNkt0Y1Q0UEl5bFpxQ0dSQVcrUzhxMXBFT2Vh?=
- =?utf-8?B?dElZV2FFZlMva243eUN0d1NvYTBtR0tsTVJpUU1yN3B3MjUzbDNtYjhKd2s5?=
- =?utf-8?B?RkVSM1NBNkdKMTIxNzlEU1Rpd3Fpa013SU5iNEFuZzROZms0azhKMW10WjFU?=
- =?utf-8?B?dE15OHJEWDRzeTVNNnI5bXRYdVg4YlNwcEI1eElmeVlJNkNQS0NTaDNJSDFK?=
- =?utf-8?B?L1dHQzlwYjdOUDdnUUFxRVcyQlc2TG00S3ZpT01VZTNzUVNXelljZEVjZHo1?=
- =?utf-8?B?Y1pUVVBacjZJL21vTGpwWmwxR2VUakRzMU9WazNidWJ3TlQ1ZFR0WHJ1YWxw?=
- =?utf-8?Q?nwI8wY?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bkwwSldNZHJtV1RpUitCeHA4RmZoWkdhWXczVFVlaHlEM0xWbCtWbG5Qd3VF?=
- =?utf-8?B?UlArV2RzUGtTRExUR0FFUmo0Z2tGbkRINUpMeFl1MHJ6Wkd5YWY0NmVhekQ3?=
- =?utf-8?B?SXZYek11aG9Oa3dlZkQxd1plOHM5d2ZsM0JTVi82Vi96ZktIQnBTTGxXdFpk?=
- =?utf-8?B?OGwvQUZKaWdCaDROZXo4M1MvNUo5WVlRTTRHT0lVdy9OM2FVN0pqSWtYZ2h3?=
- =?utf-8?B?djlNaktZeE91TDBPaWxscEdiNXVJQjF5RitDRHV4NW5ldWdycTZBYXpwM3cz?=
- =?utf-8?B?VTZTUzZzdHpMc1BXM1JTdG1QcXlIVmJLbmIxUjZkMGFTamk1U1EvSnhsMU14?=
- =?utf-8?B?VDUreVdacFFabnIvZ0hwbmIySlV4bDVuL3NOTWNlTXBvRHZWNFZrc0VQTjBl?=
- =?utf-8?B?Nmxuc251WktmWmxObWtCdzRKS0k0eTl6QVJuZDBubjd4SzRRZWFNZ3lkRG85?=
- =?utf-8?B?NGZUUy8rOCtqcTRRbXRqcUovZTBnWHlvYmM2STlva1JwL3NyeFdJM3AraytD?=
- =?utf-8?B?TndNTHpObzJvUlFKVWZDT21FTmM5U0FZd0JxYytRVEtrNG9JQ3RKS0h4VXZi?=
- =?utf-8?B?SXUrVWxyNEZkV2xBUzRVSWk4dnJBQzVFdjJCREZXT3FockFuQUYraldFWlAw?=
- =?utf-8?B?dzIxRndwVkFTQmVTUFBCbGlORmdEaXhJZFdtMFA3VEw4Skt5cndndXJhUUFL?=
- =?utf-8?B?TTY0ampsMU12ZmlLMXZxdWdQYko3UEZvWjBGZ2NpZHNWdGd2aFJNMWJZSjBy?=
- =?utf-8?B?OWFkaUxib25RN1Z0NDVSYnQrZTdZYXFBMXFQcmRVUzFkdG9FUTBld0JTT1dz?=
- =?utf-8?B?T200V2JnaEZ5Qms4NS96bHhjdTRMTUFKMW1ZaHRURERrbU5wbFpFTXA5Z3py?=
- =?utf-8?B?NncyNGc5WW9IelNBYVhZRzl0QWM4aWUvekhQSjFlS1Q5NmQ4TUtVWVRFV3ZV?=
- =?utf-8?B?amROc0VjQ2VBb2xTV1RsVDIveExJKzA0eUtMNGtHYTM3OVd0WWtacXdwY3Nq?=
- =?utf-8?B?ZW9oWm9sTlpFN2VGaWhyRHk3UElSVHJ4ME94VzYyNktLcnFEM3JEUHlFYzRI?=
- =?utf-8?B?dGorZ0s0ZFB4anVKOTJlQjFVem41dWlXRWhQbVdyMlAyMW5JYzU1TlBoNlNz?=
- =?utf-8?B?WmN1Y0hybXUzR1l6alRuK0lBR0luNzlOdVd4bXdITUVjbCtUK29sRnVyWjVH?=
- =?utf-8?B?S0pWbUZ3ZHQ3L0lzVGRoU2MxbHFidXcraFFWRElkL0Y1cmNJRmZma0RhbnB1?=
- =?utf-8?B?VHp5OWh4cHZyT1RxM2RQT2dod0ZNL291NHU1OFpkWGxLMis2NDRPUC8zcTNi?=
- =?utf-8?B?Z1crV2NleFZab3VoVHk5WnU0UWNOMERNRGhZeUwzT3h1VmNydlpscHZHTUZr?=
- =?utf-8?B?bWViSXlhZVhYcWovZWpLYVVlWmtlWFhSS3FqeUJvbkRCQlVqR1hnVTB0L2Ji?=
- =?utf-8?B?dDJmUnM5Q3JYNXhML3BUQzJ5cmFlbkg4dlR1SlFZazBUcGhUQUZvSVh4UG1U?=
- =?utf-8?B?MUZVQWZad1lNREZ1VllIa3pXRnZrM1hiVGxkRWQ4VloydXBRZDMzSVYxRS9T?=
- =?utf-8?B?Q1Fuc3E1UjdFWWJsYmIzc1dHSTZqM1haamg4T1hGTWJhRTJGd3BXUmFQUkFt?=
- =?utf-8?B?aGVwSTlSOXpERVBnU2krUU5iZzRVamFhdk1iUndaT2lKelZJTlNpZ2czZTI4?=
- =?utf-8?B?cVhjdHBKWnZoaFVRTlZoekswNjA1b3hibC9KQ3JUZ210NVdBUlBVZ2pRYVJj?=
- =?utf-8?B?RG5ZVlh6YnhEcmc5a1RueGxqM1BINjl0cUtXKzFVMHIzOXBVWEtaMldaMi9O?=
- =?utf-8?B?RHM5REFpeTEyQTdIN2ZtNi9QNUJ3bkp0R2VFZWMxU2pxblVYNFJQd1RuZVEv?=
- =?utf-8?B?ZGRFSXl6QlQ5dDYyTWZScTN6VS9qRlFwR2pPOFo4RC9qL0dFY2I4Y3dzWFg1?=
- =?utf-8?B?QUxTVEZqc0JITmR1NmtMR1BnQUNOUnhHSXI0bzdqMGpxSEY4RExyc1IyN3h5?=
- =?utf-8?B?NFJrQnVuUU9YWlg4aDRpNkhsYno5WUEwN1ZsQ3dTM1EzUFBSNXlURFBvNFYv?=
- =?utf-8?B?RGsyWWZtM2k4SVBCMkVRcXJMVnU2ZER5VXNWNnVZTzhGNEtqYXBpK09nRnVF?=
- =?utf-8?B?RUNndDg0bENJL3pUYnk1ZnRURjhlUFBiekVHblRSaGhUQWZaMUJXRXlFNENQ?=
- =?utf-8?B?RVE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: c06b8d22-6794-4269-c2c5-08de36b6a941
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Dec 2025 00:05:28.7336
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ytgHIRNX8J7CHSMZNviUr/+kCtWGYk1laS8JnjKSypCRXVpcrShPpuCbC8l5VzKjAftzpN1CLym2uAW5kLiAFUjIRC8uoneXubb5fs8p5w0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB6828
-X-OriginatorOrg: intel.com
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.18
+Content-Transfer-Encoding: 8bit
 
---------------BqQnLKE9NhTn68nEIGLf7diu
-Content-Type: multipart/mixed; boundary="------------502qiqP07eeUmZ3vXPGrJ6FD";
- protected-headers="v1"
-Message-ID: <67a5ef2a-83bc-4b35-9eac-5b9297dfeb2d@intel.com>
-Date: Mon, 8 Dec 2025 16:05:27 -0800
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [BUG] ice: Temporary packet processing overload
- causes permanent RX drops
-To: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- intel-wired-lan@lists.osuosl.org, Netdev <netdev@vger.kernel.org>,
- linux-kernel@vger.kernel.org
-Cc: sdn@hetzner-cloud.de
-References: <672ab222-db78-4cad-821b-19256a7a4078@hetzner-cloud.de>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-Autocrypt: addr=jacob.e.keller@intel.com; keydata=
- xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
- J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
- qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
- CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
- UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
- MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
- apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
- cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
-In-Reply-To: <672ab222-db78-4cad-821b-19256a7a4078@hetzner-cloud.de>
+From: Jakub Kicinski <kuba@kernel.org>
 
---------------502qiqP07eeUmZ3vXPGrJ6FD
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+[ Upstream commit c7dc5b5228822d2389e6e441f10169e460bcc67a ]
 
+When an IPv6 address with a finite lifetime (configured with valid_lft
+and preferred_lft) is manually deleted, the kernel does not clean up the
+associated prefix route. This results in orphaned routes (marked "proto
+kernel") remaining in the routing table even after their corresponding
+address has been deleted.
 
+This is particularly problematic on networks using combination of SLAAC
+and bridges.
 
-On 12/5/2025 6:01 AM, Marcus Wichelmann wrote:
-> Hi there, I broke some network cards again. This time I noticed continu=
-ous RX packet drops with an Intel E810-XXV.
->=20
-> When such a card temporarily (just for a few seconds) receives a large =
-flood of packets and the kernel cannot keep
-> up with processing them, the following appears in the Kernel log:
->=20
-> kernel: ice 0000:c7:00.0: AMD-Vi: Event logged [IO_PAGE_FAULT domain=3D=
-0x002b address=3D0x4000180000 flags=3D0x0020]
-> kernel: ice 0000:c7:00.0: AMD-Vi: Event logged [IO_PAGE_FAULT domain=3D=
-0x002b address=3D0x4000180000 flags=3D0x0020]
-> kernel: workqueue: ice_rx_dim_work [ice] hogged CPU for >10000us 4 time=
-s, consider switching to WQ_UNBOUND
-> kernel: workqueue: drm_fb_helper_damage_work hogged CPU for >10000us 4 =
-times, consider switching to WQ_UNBOUND
-> kernel: workqueue: drm_fb_helper_damage_work hogged CPU for >10000us 5 =
-times, consider switching to WQ_UNBOUND
-> kernel: workqueue: ice_rx_dim_work [ice] hogged CPU for >10000us 5 time=
-s, consider switching to WQ_UNBOUND
-> kernel: workqueue: psi_avgs_work hogged CPU for >10000us 4 times, consi=
-der switching to WQ_UNBOUND
-> kernel: ice 0000:c7:00.0: AMD-Vi: Event logged [IO_PAGE_FAULT domain=3D=
-0x002b address=3D0x4000180000 flags=3D0x0020]
-> kernel: workqueue: drm_fb_helper_damage_work hogged CPU for >10000us 7 =
-times, consider switching to WQ_UNBOUND
-> kernel: workqueue: ice_rx_dim_work [ice] hogged CPU for >10000us 7 time=
-s, consider switching to WQ_UNBOUND
+1. Machine comes up and performs RA on eth0.
+2. User creates a bridge
+   - does an ip -6 addr flush dev eth0;
+   - adds the eth0 under the bridge.
+3. SLAAC happens on br0.
 
-I am a bit curious why the ice_rx_dim_work hogs so much CPU here..
+Even tho the address has "moved" to br0 there will still be a route
+pointing to eth0, but eth0 is not usable for IP any more.
 
-> kernel: workqueue: psi_avgs_work hogged CPU for >10000us 5 times, consi=
-der switching to WQ_UNBOUND
-> kernel: ice 0000:c7:00.0: AMD-Vi: Event logged [IO_PAGE_FAULT domain=3D=
-0x002b address=3D0x4000180000 flags=3D0x0020]
-> ...
->=20
-> After that, the NIC seems to be in a permanently broken state and conti=
-nues to drop a few percent of the received
-> packets, even at low data rates. When reducing the incoming packet rate=
- to just 10.000 pps, I can see over 500 pps
-> of that being dropped. After reinitializing the NIC (e.g. by changing t=
-he channel count using ethtool), the error
-> goes away and it's rock solid again. Until the next packet flood.
->=20
+Reviewed-by: David Ahern <dsahern@kernel.org>
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Link: https://patch.msgid.link/20251113031700.3736285-1-kuba@kernel.org
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
 
-A reset likely causes a bunch of stuff to get flushed and reconfigured.
+LLM Generated explanations, may be completely bogus:
 
-> We have reproduced this with:
->   Linux 6.8.0-88-generic (Ubuntu 24.04)
->   Linux 6.14.0-36-generic (Ubuntu 24.04 HWE)
->   Linux 6.18.0-061800-generic (Ubuntu Mainline PPA)
->=20
+# Analysis of Commit: ipv6: clean up routes when manually removing
+address with a lifetime
 
-I think we recently merged a bunch of work on the Rx path as part of our
-conversion to page pool. It would be interesting to see if those changes
-impact this. Clearly the issue goes back some time since v6.8 at least..
+## 1. COMMIT MESSAGE ANALYSIS
 
-> CPU: AMD EPYC 9825 144-Core Processor (288 threads)
->=20
-> lspci | grep Ethernet
->   c7:00.0 Ethernet controller: Intel Corporation Ethernet Controller E8=
-10-XXV for SFP (rev 02)
->   c7:00.1 Ethernet controller: Intel Corporation Ethernet Controller E8=
-10-XXV for SFP (rev 02)
->=20
-> ethtool -i eth0
->   driver: ice
->   version: 6.18.0-061800-generic
->   firmware-version: 4.90 0x80020ef6 1.3863.0
->   expansion-rom-version:=20
->   bus-info: 0000:c7:00.0
->   supports-statistics: yes
->   supports-test: yes
->   supports-eeprom-access: yes
->   supports-register-dump: yes
->   supports-priv-flags: yes
->=20
-> ethtool -l eth0
->   Channel parameters for eth0:
->   Pre-set maximums:
->   RX:		288
->   TX:		288
->   Other:		1
->   Combined:	288
->   Current hardware settings:
->   RX:		0
->   TX:		32
->   Other:		1
->   Combined:	256
-> These are the defaults after boot.
->=20
-> ethtool -S eth0 | grep rx_dropped
->   rx_dropped: 7206525
->   rx_dropped.nic: 0
-> ethtool -S eth1 | grep rx_dropped
->   rx_dropped: 6889634
->   rx_dropped.nic: 0
->=20
+**Subject:** Fixes route cleanup when IPv6 addresses with finite
+lifetimes are deleted manually
 
-Interesting. From reviewing the code, the rx_dropped counter appears to
-be the hardware Rx discard counter which comes from GLV_RDPC, which
-means its definitely hardware that is dropping the packets. Possibly
-because the rings are full and somehow don't get cleared even after the
-traffic stops...
+**Key Problem Described:**
+- When an IPv6 address configured with `valid_lft` and `preferred_lft`
+  is manually deleted, the kernel fails to clean up the associated
+  prefix route
+- Results in orphaned routes (marked "proto kernel") remaining in the
+  routing table
+- Particularly problematic with SLAAC + bridges (a real-world scenario)
 
-> How to reproduce:
->=20
-> 1. Use another host to flood the host with the E810 NIC with 64 byte la=
-rge UDP packets. I used trafgen for that and
-> made sure, that the source ports are randomized to make RSS spread the =
-load over all channels. The packet rate must
-> be high enough to overload the packet processing on the receiving host.=
+**Tags:**
+- `Reviewed-by: David Ahern` (network subsystem maintainer)
+- `Reviewed-by: Ido Schimmel` (networking contributor)
+- `Signed-off-by: Jakub Kicinski` (Linux networking maintainer)
 
-> In my case, 4 Mpps was already enough to make the errors show up in the=
- kernel log and trigger the permanent packet
-> loss, but the needed packet rate may depend on how CPU intensive the pr=
-ocessing of each packet is. Dropping packets
-> early (e.g. using iptables) makes reproducing harder.
->=20
-> 2. Monitor the rx_dropped counter and the kernel log. After a few secon=
-ds, above warnings/errors should show up in
-> the kernel log.
->=20
-> 3. Stop the traffic generator and re-run it with a way lower packet rat=
-e, e.g. 10.000 pps. Now it can be seen that
-> a good part of these packets is being dropped, even though the kernel c=
-ould easily keep up with this small packet rate.
->=20
+**Notable Missing Tags:**
+- No `Cc: stable@vger.kernel.org`
+- No `Fixes:` tag
 
-I assume the rx_dropped counter still incrementing here?
+## 2. CODE CHANGE ANALYSIS
 
-> In my case the two ports of the E810 NIC were part of a bonding, but I =
-don't think this is required to reproduce the
-> issue.
->=20
-> Please let me know, if there is more information I could provide.
->=20
-> Thanks,
-> Marcus
+The core fix is extremely minimal - a single condition change in
+`net/ipv6/addrconf.c`:
 
+**Before:**
+```c
+if (ifp->flags & IFA_F_PERMANENT && !(ifp->flags & IFA_F_NOPREFIXROUTE))
+```
 
---------------502qiqP07eeUmZ3vXPGrJ6FD--
+**After:**
+```c
+if (!(ifp->flags & IFA_F_NOPREFIXROUTE))
+```
 
---------------BqQnLKE9NhTn68nEIGLf7diu
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+**Technical Mechanism:**
+- `IFA_F_PERMANENT` flag is set for addresses WITHOUT a finite lifetime
+- Addresses with `valid_lft`/`preferred_lft` set do NOT have
+  `IFA_F_PERMANENT`
+- The old code only cleaned up prefix routes for permanent (infinite
+  lifetime) addresses
+- Non-permanent addresses (those with lifetimes) would have their routes
+  orphaned on manual deletion
+- The fix removes the overly-restrictive `IFA_F_PERMANENT` check,
+  ensuring route cleanup for ALL addresses that don't have
+  `IFA_F_NOPREFIXROUTE`
 
------BEGIN PGP SIGNATURE-----
+**Root Cause:** Logic error - the condition was too restrictive, failing
+to clean up routes for addresses with finite lifetimes.
 
-wnsEABYIACMWIQQgQFSp1zOQVirsQx5qll0+bw8o6AUCaTdnxwUDAAAAAAAKCRBqll0+bw8o6F+y
-AP4sCfEYni2gWv2IhmHlFFBw8N5LCfYROyLlIGvFEOQxfAEA90T5nSGEEDnfUaNZxlq/cFN/oWap
-MbBzunNEdA1zwAY=
-=mUtM
------END PGP SIGNATURE-----
+## 3. CLASSIFICATION
 
---------------BqQnLKE9NhTn68nEIGLf7diu--
+- **Bug Fix:** Yes - fixes route leakage/orphaning
+- **New Feature:** No - corrects existing cleanup behavior
+- **Security:** No explicit security issue, but orphaned routes can
+  cause routing problems
+
+## 4. SCOPE AND RISK ASSESSMENT
+
+**Lines Changed:**
+- Core fix: 1 line modified (condition simplification)
+- Test: ~20 lines added to selftest
+
+**Risk Level: LOW**
+- The `check_cleanup_prefix_route()` and `cleanup_prefix_route()`
+  functions already exist and are tested
+- The fix EXTENDS existing cleanup to more cases (non-permanent
+  addresses)
+- No new code paths introduced, just removes an unnecessary condition
+- Well-reviewed by multiple networking maintainers
+
+## 5. USER IMPACT
+
+**Affected Users:**
+- Anyone using IPv6 with finite address lifetimes (SLAAC, DHCPv6)
+- Users managing bridges with IPv6 addresses
+- Enterprise/data center environments with complex networking
+
+**Severity:** Medium
+- Orphaned routes can cause routing confusion and network connectivity
+  issues
+- The SLAAC + bridge scenario is common in real-world deployments
+- Routes pointing to unusable interfaces cause operational problems
+
+## 6. STABILITY INDICATORS
+
+**Positive:**
+- Three experienced networking maintainers involved (Kicinski, Ahern,
+  Schimmel)
+- Includes selftest (`kci_test_addrlft_route_cleanup`) for regression
+  testing
+- Simple, surgical change with clear intent
+
+## 7. DEPENDENCY CHECK
+
+- Self-contained fix with no dependencies on other commits
+- The affected functions (`check_cleanup_prefix_route`, etc.) have
+  existed for a long time
+- Should apply cleanly to recent stable kernels
+
+## ASSESSMENT SUMMARY
+
+**Pros:**
+1. Fixes a real, user-visible bug (orphaned routes)
+2. Extremely minimal change (removes one condition)
+3. Strong review from key networking maintainers
+4. Low regression risk - extends existing behavior to more cases
+5. Includes regression test
+6. Addresses a practical scenario (SLAAC + bridges)
+
+**Cons/Considerations:**
+1. No explicit `Cc: stable@vger.kernel.org` tag - maintainers didn't
+   request backport
+2. No `Fixes:` tag - unknown when bug was introduced (likely long-
+   standing)
+3. The bug has workarounds (routes eventually expire, or can be manually
+   deleted)
+
+## VERDICT
+
+This commit is a good candidate for stable backporting. It is:
+- **Obviously correct:** The `IFA_F_PERMANENT` check makes no logical
+  sense for route cleanup
+- **Fixes a real bug:** Orphaned routes are a tangible problem affecting
+  real users
+- **Small and contained:** Single condition change in one file
+- **Low risk:** Extends existing cleanup mechanism to more cases
+- **Well-tested:** Reviewed by maintainers and includes regression test
+
+The lack of stable tags is notable but not disqualifying. The fix is
+clearly beneficial and the risk is minimal. Stable tree users dealing
+with IPv6 address lifetimes and bridges would benefit from this fix.
+
+**YES**
+
+ net/ipv6/addrconf.c                      |  2 +-
+ tools/testing/selftests/net/rtnetlink.sh | 20 ++++++++++++++++++++
+ 2 files changed, 21 insertions(+), 1 deletion(-)
+
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index 40e9c336f6c55..b66217d1b2f82 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -1324,7 +1324,7 @@ static void ipv6_del_addr(struct inet6_ifaddr *ifp)
+ 		__in6_ifa_put(ifp);
+ 	}
+ 
+-	if (ifp->flags & IFA_F_PERMANENT && !(ifp->flags & IFA_F_NOPREFIXROUTE))
++	if (!(ifp->flags & IFA_F_NOPREFIXROUTE))
+ 		action = check_cleanup_prefix_route(ifp, &expires);
+ 
+ 	list_del_rcu(&ifp->if_list);
+diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selftests/net/rtnetlink.sh
+index 163a084d525d5..248c2b91fe42b 100755
+--- a/tools/testing/selftests/net/rtnetlink.sh
++++ b/tools/testing/selftests/net/rtnetlink.sh
+@@ -8,6 +8,7 @@ ALL_TESTS="
+ 	kci_test_polrouting
+ 	kci_test_route_get
+ 	kci_test_addrlft
++	kci_test_addrlft_route_cleanup
+ 	kci_test_promote_secondaries
+ 	kci_test_tc
+ 	kci_test_gre
+@@ -323,6 +324,25 @@ kci_test_addrlft()
+ 	end_test "PASS: preferred_lft addresses have expired"
+ }
+ 
++kci_test_addrlft_route_cleanup()
++{
++	local ret=0
++	local test_addr="2001:db8:99::1/64"
++	local test_prefix="2001:db8:99::/64"
++
++	run_cmd ip -6 addr add $test_addr dev "$devdummy" valid_lft 300 preferred_lft 300
++	run_cmd_grep "$test_prefix proto kernel" ip -6 route show dev "$devdummy"
++	run_cmd ip -6 addr del $test_addr dev "$devdummy"
++	run_cmd_grep_fail "$test_prefix" ip -6 route show dev "$devdummy"
++
++	if [ $ret -ne 0 ]; then
++		end_test "FAIL: route not cleaned up when address with valid_lft deleted"
++		return 1
++	fi
++
++	end_test "PASS: route cleaned up when address with valid_lft deleted"
++}
++
+ kci_test_promote_secondaries()
+ {
+ 	run_cmd ifconfig "$devdummy"
+-- 
+2.51.0
+
 
