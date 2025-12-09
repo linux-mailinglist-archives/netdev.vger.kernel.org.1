@@ -1,68 +1,56 @@
-Return-Path: <netdev+bounces-244156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40E6ECB0C4B
-	for <lists+netdev@lfdr.de>; Tue, 09 Dec 2025 18:47:11 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00A0FCB0CB9
+	for <lists+netdev@lfdr.de>; Tue, 09 Dec 2025 19:07:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4BF4F301CF90
-	for <lists+netdev@lfdr.de>; Tue,  9 Dec 2025 17:47:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 43F5630E97E8
+	for <lists+netdev@lfdr.de>; Tue,  9 Dec 2025 18:06:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B033D2E7198;
-	Tue,  9 Dec 2025 17:47:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2A742DBF47;
+	Tue,  9 Dec 2025 18:06:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="cgdOOaPO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iPxigFvL"
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0656E1DF248;
-	Tue,  9 Dec 2025 17:47:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC6A12D7803;
+	Tue,  9 Dec 2025 18:06:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765302428; cv=none; b=EgXBIg0sRF86khrD+3oIprvxzvsDKs2Y89G90318gG+YK407/3EGnu2/86O1/0HqMJtBLQGx8xnwkvU7fqVss1E+b6XEf3OKjdMA1cRN36b8ZBWoHuTDsPkksO/10+yEdewEwXBlBLWkyeijpGPn+ILziIzD7DI+3WDMlk593E8=
+	t=1765303610; cv=none; b=dvWREYin1LRyKObafWU+yaCuA/0WnpLz0cfe/vQU3wSbefybr385wgiu1KFOoUqThsuOKJbeHODYuSEd+rrVrgl3Am7O1H8Bjk0jMJxFKOZujJZG1eoNSvjQWjHMwwyvhGrpK7LuLybpBBRHPUWlCP0hfS1wCn0P8ExUw6OqARY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765302428; c=relaxed/simple;
-	bh=xz+3QBGORDWc4nUGQFkFWzRbLLJ+ECCdKFkHKqqRVsc=;
+	s=arc-20240116; t=1765303610; c=relaxed/simple;
+	bh=oXy8lcGgtyzeGMTsH2PksKxqz7e9MQNYzW6NnAqIqZ8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f0C9xI0//V27xYbgND+pryoxrriE/PZwU2OHHMjIiqZ4MEiDtkAaIfXNrdgH2bgltqssOsgKix9xwit7rUod78RW4OPN7ZH40R7SpC6YJvEahB894mC4etfGQ8ywvWH99m1twtLnA00ZkWEEKkJHIBHtq2KtsZjN57jqZpI/o50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=cgdOOaPO; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=nDbkCvbumVt/JXuMSApvso7Kk+anWI/zeUGcDxpNtLQ=; b=cgdOOaPOV8oGOVGnlgWghLZBIC
-	8pBhHRnKzJ9XWZXwTxExGR0uicxsCEj41Qt7nz2JZci4C1ZhMB/wZ6p1+OmKUU5vmOna4z79LK9dk
-	+RUHm0H2ve5ITTwBBpxR2lwr5eTnGKM63S2e6Lp07u3nWQpa9z/QtE+t1nxkO90RRXUsOSiTuf+on
-	rfggwHvisD4qGGjeZSpTW6HrlOa7l9U0H/IBlMhBtmLl0ShIfZI6057uuHVshl/hSOk4ebydbo89U
-	e1ocX21DC5RyWjXfEkdOD4QNG8grWEGgKizrTSsJsYVOSPD46+TKjYcNYG9bB3xYJpcsxZCk2C2Pr
-	CrkwYoTw==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.94.2)
-	(envelope-from <leitao@debian.org>)
-	id 1vT1nd-007IZV-5l; Tue, 09 Dec 2025 17:46:57 +0000
-Date: Tue, 9 Dec 2025 09:46:51 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Petr Mladek <pmladek@suse.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org, gustavold@gmail.com, 
-	asantostc@gmail.com, calvin@wbinvd.org, kernel-team@meta.com, davej@codemonkey.org.uk
-Subject: Re: [PATCH net-next 0/4] (no cover subject)
-Message-ID: <snoxl67npkzfi63l4ndh3d6qvx2lyxthtrwhfnharhf5llrv4j@zhyzxm3tegia>
-References: <20251128-netconsole_send_msg-v1-0-8cca4bbce9bc@debian.org>
- <20251201163622.4e50bf53@kernel.org>
- <4oybtunobxtemenpg2lg7jv4cyl3xoaxrjlqivbhs6zo72hxpu@fqp6estf5mpc>
- <20251202102442.568f91a7@kernel.org>
- <aTFmew5trILX3RpO@pathway.suse.cz>
- <aTFnzmc0ZtBvGg4y@pathway.suse.cz>
- <7jdruzcpkeyhuudwi6uzg2vsc5mhgpq7qz4ym7vqqmgs7j3524@cvtnzneddg2d>
- <20251209163745.3d0fcdfe@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=q5VUZdeZuG4VKglhEpbWNyaFHT04jNxICgSzdx44G4z7esP6khqowN/sbAhP3L5kexLAw3gmGcluk70Qor3hvmelmozeE9dVmCQe0LqfZzrZeblh4uk3Cs29RY+2s5Y/LnlgKbe10AdMabl0YMv4KXqIuVvvQYlyG/oV6ObdGxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iPxigFvL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1616DC4CEF5;
+	Tue,  9 Dec 2025 18:06:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765303610;
+	bh=oXy8lcGgtyzeGMTsH2PksKxqz7e9MQNYzW6NnAqIqZ8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iPxigFvLniyWs5QRv642DWfvPC2ZR34AqFt6kCDRYgP5dY0nJVn/XKY92oJnnpwla
+	 PW0K47sve9XjJrVCkUfPraj0rNYKc7l1UaNCzCIVvnOaUma0KOBpn+tyBmmtyX85nx
+	 UF6KlgwtA1sic1BqMSd3q8vnPCyiPyn6v2dHJFFt8uTos5+xiVl5ORZuBeqSEj6QoC
+	 KC8AxsaYzkpa7TiYHFvKgzVLSy+dGjdzGVunWRirR+wA/QlDWNi+ROOeuNNeN0kk+N
+	 kN5zXw9pmjLiARrswBGKiEv+1V7+487qbOePu2EGdh6chECHfBhEKQwEyahzRMScj0
+	 9OtKpON4gy5NA==
+Date: Tue, 9 Dec 2025 18:06:46 +0000
+From: Simon Horman <horms@kernel.org>
+To: Wang Liang <wangliang74@huawei.com>
+Cc: chuck.lever@oracle.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, brauner@kernel.org,
+	kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, yuehaibing@huawei.com,
+	zhangchangzhong@huawei.com
+Subject: Re: [PATCH net] net/handshake: Fix null-ptr-deref in
+ handshake_complete()
+Message-ID: <aThlNuc-kjPqd9kh@horms.kernel.org>
+References: <20251209115852.3827876-1-wangliang74@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,53 +59,131 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251209163745.3d0fcdfe@kernel.org>
-X-Debian-User: leitao
+In-Reply-To: <20251209115852.3827876-1-wangliang74@huawei.com>
 
-Hello Jakub,
-
-On Tue, Dec 09, 2025 at 04:37:45PM +0900, Jakub Kicinski wrote:
-> On Fri, 5 Dec 2025 02:21:08 -0800 Breno Leitao wrote:
-> > 1) Have a binary in each machine:
+On Tue, Dec 09, 2025 at 07:58:52PM +0800, Wang Liang wrote:
+> A null pointer dereference in handshake_complete() was observed [1].
 > 
-> > 2) Send a ping directly to the console
+> When handshake_req_next() return NULL in handshake_nl_accept_doit(),
+> function handshake_complete() will be called unexpectedly which triggers
+> this crash. Fix it by goto out_status when req is NULL.
 > 
-> > 3) Using per-loglevel patchset.
+> [1]
+> Oops: general protection fault, probably for non-canonical address 0xdffffc0000000005: 0000 [#1] SMP KASAN PTI
+> RIP: 0010:handshake_complete+0x36/0x2b0 net/handshake/request.c:288
+> Call Trace:
+>  <TASK>
+>  handshake_nl_accept_doit+0x32d/0x7e0 net/handshake/netlink.c:129
+>  genl_family_rcv_msg_doit+0x204/0x300 net/netlink/genetlink.c:1115
+>  genl_family_rcv_msg+0x436/0x670 net/netlink/genetlink.c:1195
+>  genl_rcv_msg+0xcc/0x170 net/netlink/genetlink.c:1210
+>  netlink_rcv_skb+0x14c/0x430 net/netlink/af_netlink.c:2550
+>  genl_rcv+0x2d/0x40 net/netlink/genetlink.c:1219
+>  netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+>  netlink_unicast+0x878/0xb20 net/netlink/af_netlink.c:1344
+>  netlink_sendmsg+0x897/0xd70 net/netlink/af_netlink.c:1894
+>  sock_sendmsg_nosec net/socket.c:727 [inline]
+>  __sock_sendmsg net/socket.c:742 [inline]
+>  ____sys_sendmsg+0xa39/0xbf0 net/socket.c:2592
+>  ___sys_sendmsg+0x121/0x1c0 net/socket.c:2646
+>  __sys_sendmsg+0x155/0x200 net/socket.c:2678
+>  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>  do_syscall_64+0x5f/0x350 arch/x86/entry/syscall_64.c:94
+>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>  </TASK>
 > 
-> > 4) send messages only to netconsole (this patchset)
+> Fixes: fe67b063f687 ("net/handshake: convert handshake_nl_accept_doit() to FD_PREPARE()")
+> Signed-off-by: Wang Liang <wangliang74@huawei.com>
+> ---
+>  net/handshake/netlink.c | 35 ++++++++++++++++++-----------------
+>  1 file changed, 18 insertions(+), 17 deletions(-)
 > 
-> I think I was alluding that another option (not saying that it's the
-> best but IIUC your requirements it'd be the best fit)):
-> 
-> 5) Add a keepalive configfs knob, if set to a non-zero value netconsole
-> will send an empty (?) message at given interval
-> 
->   Pros:
->    - truly does not require a user binary to run periodically, netcons
->      would set a timer in the kernel
->   Cons:
->    - does not provide the arbitrary "console bypass" message
->      functionality
+> diff --git a/net/handshake/netlink.c b/net/handshake/netlink.c
+> index 1d33a4675a48..cdaea8b8d004 100644
+> --- a/net/handshake/netlink.c
+> +++ b/net/handshake/netlink.c
+> @@ -106,25 +106,26 @@ int handshake_nl_accept_doit(struct sk_buff *skb, struct genl_info *info)
+>  
+>  	err = -EAGAIN;
+>  	req = handshake_req_next(hn, class);
+> -	if (req) {
+> -		sock = req->hr_sk->sk_socket;
+> -
+> -		FD_PREPARE(fdf, O_CLOEXEC, sock->file);
+> -		if (fdf.err) {
+> -			err = fdf.err;
+> -			goto out_complete;
+> -		}
+> -
+> -		get_file(sock->file); /* FD_PREPARE() consumes a reference. */
+> -		err = req->hr_proto->hp_accept(req, info, fd_prepare_fd(fdf));
+> -		if (err)
+> -			goto out_complete; /* Automatic cleanup handles fput */
+> -
+> -		trace_handshake_cmd_accept(net, req, req->hr_sk, fd_prepare_fd(fdf));
+> -		fd_publish(fdf);
+> -		return 0;
+> +	if (!req)
+> +		goto out_status;
+> +
+> +	sock = req->hr_sk->sk_socket;
+> +
+> +	FD_PREPARE(fdf, O_CLOEXEC, sock->file);
+> +	if (fdf.err) {
+> +		err = fdf.err;
+> +		goto out_complete;
+>  	}
+>  
+> +	get_file(sock->file); /* FD_PREPARE() consumes a reference. */
+> +	err = req->hr_proto->hp_accept(req, info, fd_prepare_fd(fdf));
+> +	if (err)
+> +		goto out_complete; /* Automatic cleanup handles fput */
+> +
+> +	trace_handshake_cmd_accept(net, req, req->hr_sk, fd_prepare_fd(fdf));
+> +	fd_publish(fdf);
+> +	return 0;
+> +
+>  out_complete:
+>  	handshake_complete(req, -EIO, NULL);
+>  out_status:
 
-This is a good idea if we change it slightly. What about a "ping"
-configfs item that send sit when I touch it?
+Hi,
 
-Something as:
+Clang 21.1.7 W=1 builds are rather unhappy about this:
 
-	# echo 1 > /sys/kernel/configs/<target>/ping
-	
-And it would ping the host with a predefined "ping" message, and nothing
-else.
+  net/handshake/netlink.c:110:3: error: cannot jump from this goto statement to its label
+    110 |                 goto out_status;
+        |                 ^
+  net/handshake/netlink.c:114:13: note: jump bypasses initialization of variable with __attribute__((cleanup))
+    114 |         FD_PREPARE(fdf, O_CLOEXEC, sock->file);
+        |                    ^
+  net/handshake/netlink.c:104:3: error: cannot jump from this goto statement to its label
+    104 |                 goto out_status;
+        |                 ^
+  net/handshake/netlink.c:114:13: note: jump bypasses initialization of variable with __attribute__((cleanup))
+    114 |         FD_PREPARE(fdf, O_CLOEXEC, sock->file);
+        |                    ^
+  net/handshake/netlink.c:100:3: error: cannot jump from this goto statement to its label
+    100 |                 goto out_status;
+        |                 ^
+  net/handshake/netlink.c:114:13: note: jump bypasses initialization of variable with __attribute__((cleanup))
+    114 |         FD_PREPARE(fdf, O_CLOEXEC, sock->file);
+        |                    ^
 
-That would work, for my current problem, honestly.
+My undersatnding of the problem is as follows:
 
-One drawback compared to a more flexible "send_msg" is that I don't have
-complete flexibility on the message format. Thus, if I want to pass
-extra information such as a Nonce, timestamp, host state, interface
-name, health state, it will not be possible, which is fine for now,
-given I am NOT planning to use it at this stage.
+FD_PREPARE uses __cleanup to call class_fd_prepare_destructor when
+resources when fdf goes out of scope.
 
-Thanks for the idea and discussion,
---breno
+Prior to this patch this was when the if (req) block was existed.
+Either via return or a goto due to an error.
 
+Now it is when handshake_nl_accept_doit() itself is exited.
+Again via a return or a goto due to error.
+
+But, importantly, such a goto can now occur before fdf is initialised.
+Boom!
+
+-- 
+pw-bot: changes-requested
 
