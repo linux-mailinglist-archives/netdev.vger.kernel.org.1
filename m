@@ -1,268 +1,157 @@
-Return-Path: <netdev+bounces-244173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id F08E7CB1378
-	for <lists+netdev@lfdr.de>; Tue, 09 Dec 2025 22:40:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 03187CB13F9
+	for <lists+netdev@lfdr.de>; Tue, 09 Dec 2025 22:56:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9B9E33020CE2
-	for <lists+netdev@lfdr.de>; Tue,  9 Dec 2025 21:40:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 54C6A30AC65D
+	for <lists+netdev@lfdr.de>; Tue,  9 Dec 2025 21:54:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35ADC31AAA4;
-	Tue,  9 Dec 2025 21:40:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70BAF2DEA79;
+	Tue,  9 Dec 2025 21:54:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J+zCazyP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CDT4WvDf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4454F30CD8B
-	for <netdev@vger.kernel.org>; Tue,  9 Dec 2025 21:40:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765316424; cv=fail; b=WXDWvLKesRIbzKUSQr+jSx7LIcI4F4ZbX2YF9lWBLQZglO5pZNyNJ4/g5SsZ93cClBFWrtEuEyIvQZzm5HNd37uIvg+iEO52MVbVxFo7YPfF2StdnxUaz5L6f5rhiA2IwVe3NLoqcJ2esVGMHISEet0o7RvJ64jSISBrtiD69PI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765316424; c=relaxed/simple;
-	bh=ewpqYaEK+vvGPswI3gSUSZ9EJhDiGUwyUm9FCmm9AWo=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=QY7qf8e04A+SepcXKds3K65dEpXoKfmVdQz9+15KELUa7B7g//irjwwTJZXo5ImyGg/4+SPcwhcTVEg58Yn8Loo/dcY2btGVL5KhdLW+7Rp5l0JAV1O6vNhnmwcVhPvYjz4K7qpBB55EPaUGpDODxt300zmESIEu/bCa4RagDZI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J+zCazyP; arc=fail smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1FAA262FC1;
+	Tue,  9 Dec 2025 21:54:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765317283; cv=none; b=fF4mWUbahSimVBgZSbzU1qheuDQ+u0P/h57k+f1v02zAJd70E1MFBcA4WW7uCsVm6tsP4kiEVgq2R7fKvzxvLlX2gzQc1WFqov2ZK4xbzJ3EH8C4KHcwY/irILZFGR9nL+V635HIxfdwWtvIo5S0bOUlMjnrOZRlUEh/gGST1SI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765317283; c=relaxed/simple;
+	bh=xtYLyHUmG1D0oKjx5ZhX3mwTe2vJZTh9I0Ydg0tBMjQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CH3nUfvvXyY2zTJvVjd1f3L4d9pNIPE58DaQ69PiYtbnIXDmgvWJpuB9OntKToimkJl9S2sfkCPMQQIcdtT4dB4qVZJWb1kkHCBqm2cpZuRDwsSEQ+SgBzdOinr21VxnIoezEHdGUtJGgdFM79+Ee6vyaGlnW3JM6UJLdOjeyxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CDT4WvDf; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765316422; x=1796852422;
+  t=1765317282; x=1796853282;
   h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=ewpqYaEK+vvGPswI3gSUSZ9EJhDiGUwyUm9FCmm9AWo=;
-  b=J+zCazyPlZpTtey21diuBD0eKRmWbWeh8iRGCyYyeyNoireUh//sS8qu
-   Rz0DAvdYHL5fTg3WiRON5oj1o6HjZF9YU9mLZ/sQa9vsVdZVw+xNmdjr1
-   Id06MyVja+LDFQlEkrRKUzcqORHbV/RAWTeBCDJTVnxQjx9l84PGSXer3
-   w716XfjinFKXcoCNZzKB5x/4MQQuGe9fvrrOpH1ZijrGsJDxWlCVvU3Hu
-   Equ1AFHCq7i6zDoTTlgOPNYwHJZp6b1NG0mZ6RASuaZ4zE6uPwoqCDmNd
-   VO2c2bLrOa1o6aVZAgYpMgywSQBqADkQ3T7j94h9lDw4MfJgOnTwWP37M
+   mime-version:in-reply-to;
+  bh=xtYLyHUmG1D0oKjx5ZhX3mwTe2vJZTh9I0Ydg0tBMjQ=;
+  b=CDT4WvDfaiFmt1eA9KbXD1rYNHtqO9GfB7PuMOSlZY3TPXbUvZoWPvTa
+   ou8YdcLqhAVcxWGIXYBrq25a7dq92blxZzTg9d+h1P+nGNgdyVtyw72Q0
+   6O5SMj27GxlYmIqBBHdTW5ev+snixP/DVWMAJw6GJl3UvNlSZ/WD/JM+S
+   PLN5sduEWH38uFZVWAX86pxFeLNBP9Knbak8dgTT1VhXxG6OwaJamT5Sf
+   0p3HUWvUYZ7BqVdC4SGs8hPPdo9xjilXor6zTJ/Fw4jdsqU84jmaJaZo0
+   jSIwtg/OgM7ABo2vbRvkVzhDIPBWg57QI11wh2/q7hJeHX1wE5iHavJpI
    Q==;
-X-CSE-ConnectionGUID: eHD/K01wSFmiDVigNb6D3A==
-X-CSE-MsgGUID: iOeZpwsJS8asBSesVpiJgA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11637"; a="67178429"
+X-CSE-ConnectionGUID: 1Fs+mFqaRxOIHm2+P7oa4w==
+X-CSE-MsgGUID: LepQURjsQAqku/24tor4Jw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11637"; a="67335278"
 X-IronPort-AV: E=Sophos;i="6.20,262,1758610800"; 
-   d="scan'208";a="67178429"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2025 13:40:21 -0800
-X-CSE-ConnectionGUID: oVXtQYdNTg2GKZvrfWJjyw==
-X-CSE-MsgGUID: 6/LZxc8zSOKQZCpnvzsZVg==
+   d="scan'208";a="67335278"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2025 13:54:41 -0800
+X-CSE-ConnectionGUID: xvwgSbk6Qq+Tzw0Qk9o/AQ==
+X-CSE-MsgGUID: p7dPqkNBQYS9nOuDpCUxjA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.20,262,1758610800"; 
-   d="scan'208";a="200759168"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2025 13:40:21 -0800
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Tue, 9 Dec 2025 13:40:20 -0800
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29 via Frontend Transport; Tue, 9 Dec 2025 13:40:20 -0800
-Received: from CH1PR05CU001.outbound.protection.outlook.com (52.101.193.66) by
- edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Tue, 9 Dec 2025 13:40:20 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fkDYfG4lbPrUtEP7B+xDTmbRWqxrsrOBoXAM1ebGfkre5rzm1fKtm3uVzJXHXYH2HWBSnRqBavmzfkvgjzXz/KUXlAKj1YjLGh552LlVhzfiL5wkZmGzaUQHoBGNMMFVhqcjqFv3edMhvBIHq3zfMzdkV7/Xg97yLRh82aAfCCaHiM13EoxnU84Oo/bc+CzaaOHuAYnVa20MnRcK0bunlXi4drTZLngH1tVsXUL1IeVB3jHyPlR8+bPEED20/i4B5fC4sXEjTjZGbQyOJJe5wSaSnc0rae7EDEeXN3VsWEriTX6I+wezh5uPIr/UG3eqXn3fhVJ8Ls+uUHWX4Typkw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zVP25X+wSKjMVsf7KRXUS+U4nQBae9s8V8W3lcNro+8=;
- b=d0X78rJJK1FRvMTtmcFxiXkgNCK13rd+R20LXrvI+bPJDvQ9haQEZCtat+WW3tohiF/U/pZVzl9I/k5nGMYPlFNVuWyeRBD5gBrxBVDRCnYJRKzorV8GCfb4F8Jt/WjHCD0W1ydDQgRHlSpy9Ah4PmXOYGk5CLHQMPw3qNpeA3apCUbyVQ+XCitMtCLsT+JPF8T9nV77SHdSDa5X33aNzt/y0DUpzzxbqTuWv4OM5UZVXcbkWr4Mxje/krA1Q7N70v4noSnBiXWFrhCStc2iDecWzn1P2OrlFGt6W6l7mzY97KXa81lWgzR4iz6ExfaktPV200S2ZjGVf9NLh9FwSw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CYYPR11MB8430.namprd11.prod.outlook.com (2603:10b6:930:c6::19)
- by PH7PR11MB8504.namprd11.prod.outlook.com (2603:10b6:510:2fe::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9412.6; Tue, 9 Dec
- 2025 21:40:18 +0000
-Received: from CYYPR11MB8430.namprd11.prod.outlook.com
- ([fe80::76d2:8036:2c6b:7563]) by CYYPR11MB8430.namprd11.prod.outlook.com
- ([fe80::76d2:8036:2c6b:7563%6]) with mapi id 15.20.9412.005; Tue, 9 Dec 2025
- 21:40:17 +0000
-Date: Tue, 9 Dec 2025 16:40:12 -0500
-From: Rodrigo Vivi <rodrigo.vivi@intel.com>
-To: Zack McKevitt <zachary.mckevitt@oss.qualcomm.com>
-CC: <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	<dri-devel@lists.freedesktop.org>, <intel-xe@lists.freedesktop.org>, "Hawking
- Zhang" <Hawking.Zhang@amd.com>, Alex Deucher <alexander.deucher@amd.com>,
-	Lukas Wunner <lukas@wunner.de>, Dave Airlie <airlied@gmail.com>, "Simona
- Vetter" <simona.vetter@ffwll.ch>, Aravind Iddamsetty
-	<aravind.iddamsetty@linux.intel.com>, Joonas Lahtinen
-	<joonas.lahtinen@linux.intel.com>
-Subject: Re: [PATCH 0/2] Introduce DRM_RAS using generic netlink for RAS
-Message-ID: <aTiXPASoozn_gA-B@intel.com>
-References: <20250929214415.326414-4-rodrigo.vivi@intel.com>
- <c8caad3b-d7b9-4e0c-8d90-5b2bc576cabf@oss.qualcomm.com>
- <aQylrqUCRkkUYzQl@intel.com>
- <7820644f-078a-4578-a444-5cc4b6844489@oss.qualcomm.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <7820644f-078a-4578-a444-5cc4b6844489@oss.qualcomm.com>
-X-ClientProxiedBy: SJ0PR03CA0380.namprd03.prod.outlook.com
- (2603:10b6:a03:3a1::25) To CYYPR11MB8430.namprd11.prod.outlook.com
- (2603:10b6:930:c6::19)
+   d="scan'208";a="200817543"
+Received: from dhhellew-desk2.ger.corp.intel.com (HELO localhost) ([10.245.245.237])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2025 13:54:37 -0800
+Date: Tue, 9 Dec 2025 23:54:34 +0200
+From: Andy Shevchenko <andriy.shevchenko@intel.com>
+To: David Laight <david.laight.linux@gmail.com>
+Cc: Yury Norov <yury.norov@gmail.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Crt Mori <cmo@melexis.com>,
+	Richard Genoud <richard.genoud@bootlin.com>,
+	Luo Jie <quic_luoj@quicinc.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Simon Horman <simon.horman@netronome.com>,
+	Mika Westerberg <mika.westerberg@linux.intel.com>,
+	Andreas Noever <andreas.noever@gmail.com>,
+	Yehezkel Bernat <YehezkelShB@gmail.com>,
+	Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+Subject: Re: [PATCH 4/9] bitfield: Copy #define parameters to locals
+Message-ID: <aTiamjTnVw8sYhE0@smile.fi.intel.com>
+References: <20251209100313.2867-1-david.laight.linux@gmail.com>
+ <20251209100313.2867-5-david.laight.linux@gmail.com>
+ <aThFlDZVFBEyBhFq@smile.fi.intel.com>
+ <20251209191148.16b7fdee@pumpkin>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CYYPR11MB8430:EE_|PH7PR11MB8504:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4df757da-2e74-452e-ea93-08de376b8b8d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?jck+UfY6ykHJDiJc8+d/WpMbJhdvdsjezqhav2nrMbo5qO57a11vW5zBNrM8?=
- =?us-ascii?Q?x4ViwPld6dutd2KTfIbL62q+5jmqNn1Uwk9M4+HcQ8X7Nej2IXR4cYVdL2uQ?=
- =?us-ascii?Q?kNykjEvUZqVghyPWXHqtWPIrnzSIiCLe1cW9cJm4f9gvw/bRqelvjLjzWoLI?=
- =?us-ascii?Q?H8rsFtty/rxc1Lh33eqox2zki7WLGKfKixGYaLkKD8AnkvOi46dXt1yjBso3?=
- =?us-ascii?Q?h3oG6UvCASh6k23AWQWlisBE3W9mg6qs9NzFQGOqZ+ItC03a+j853OHO8vTy?=
- =?us-ascii?Q?SmPb3LcjzVcj9Euji8lVlZrbTW39s0ElBoHmaiJzf/NoPSLzr/bKUIleZV3f?=
- =?us-ascii?Q?ss8o18nqFr/+8xl/1QJYSZsjo9lmkA6MRHb7IZYFywujmQvcgSQAj1EaxlAi?=
- =?us-ascii?Q?T4TfQE6/ac330Z2JkOla7TEZeH1SIfmU7DE6CvV1q+I6StW9aXEkZBCSKG95?=
- =?us-ascii?Q?fqz03zYyDUO7yKL7QYFjQPLaUv8+5V+R8NKlcG+onG3+Z69ORV0ekwZxFQkN?=
- =?us-ascii?Q?eGEmEOkdaOcx3nBtzPt5y1cHAVkZ+k22UmB+YNAx8aZYNmrPoNRSm7RE40x9?=
- =?us-ascii?Q?MIY1/umDIfwWPEtjtIPSELMjcVci9+9dtz2sawldiY9Akd5ZQeBFi9mDipvh?=
- =?us-ascii?Q?A8o5xt0c38jf14aG3+hU8qo1u71R38Lqb1SbH/QFLNFoiWYGKu6qzSRMEnWZ?=
- =?us-ascii?Q?YtSVxw6y17J4uAskEptSH7qNKFAFtCq7yRpEYOBydz9VmEfl5jAmTZFoPqNR?=
- =?us-ascii?Q?0L0oPXAqmMUV3XBvVL1uudKMi/+guu65T8fMZlZs4j/XFo7HJI8L7C4T5xxR?=
- =?us-ascii?Q?pvMd3LTNRmVZpWMeorpahbM9VNnsZIuiYJHCwQxTOIP36oOMdE7BsHa6Mmt1?=
- =?us-ascii?Q?cVwz382HD3mO4kJAlQcAQLMYfG+8trTqAX/cW9qL2btxIR77Y4M3UEZ+cp09?=
- =?us-ascii?Q?2Hftz0anqf+Tm2Lzcm7yQMUdXQuQkcS778w8JyLvvCba/FYvKzsyb2h2F5hd?=
- =?us-ascii?Q?qrtglv47rYd/yOKVWktL+7FamxsaZMkbERuGLW9nB0m+FZU2JWqMXsVswav+?=
- =?us-ascii?Q?kJNtZ/AolIICV5ik9MWHigj224Fbt3HtC2QbAUh5ebGdSrfJhasEhAPuM/az?=
- =?us-ascii?Q?QtG4gq4OV6QOQ5X9CKDotM8nJc5K1NS/qkDFgJLVFrZWT7XCb0WnwL8h4V9I?=
- =?us-ascii?Q?hZa4SEKbBCvIpM6yvpiDjEDC2rpsVj3odQmEUe9hpn6d7S1RL+qUE7DNZz+I?=
- =?us-ascii?Q?QTM337lv7GUQaoTtJjW4Amvl7hZjo+PIRt8MBHlDmJKl49z7q0iPK/b/GSz9?=
- =?us-ascii?Q?hrHzyQmFMn0synU4kgvfer9fWQupmAyGJQTAiG7DE9vtVD6+FRQRSOaJU/R6?=
- =?us-ascii?Q?Jk9FLg3WkxyZt502tF3LOkcUsUBIuVTIG8rHzYzJhLZsZ7MCE6aZjgW/Dlcy?=
- =?us-ascii?Q?Re+AbFhqtK7LLPzn9R8OYAWndEgaLcKigfJ3tkAe/mSqO/ZgPguKKg=3D=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR11MB8430.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?XpwI4fiC+tebP0yrlHFQEihnkr0LboOiLUz47tkWNcMECsvCpTeOk+3fPltm?=
- =?us-ascii?Q?R8ll4/ysaq3egKhrpEI+USTuOxyJHP1Lx27SnfVqh/CHNWabs70urNXV/Bto?=
- =?us-ascii?Q?fhm+UPPAsM35E7GizeyvZzrjzRDmVpHO6o0U/HVvf7ijyx7/jnOt9l8K328R?=
- =?us-ascii?Q?zgE1VUEueKHigp1WgPcsl9D6DsyO7b8gI6byoTVBLyX+bldqczpeTt6EUo0Z?=
- =?us-ascii?Q?uIVBPiWrtkObpYTnBUXMjbCAiMG6k8d736GNj8ysFW1/L1AalJTBvxnwZK47?=
- =?us-ascii?Q?DFbtD1wtNU09PbdkuUN+Oyt4BFMbC9fTkH/8BqA0qA4OJIoJVFHdKwO1NTcS?=
- =?us-ascii?Q?3KobweIPTLW0mY0PY/gPbQWCfcy7sqmPaQiPp5SRAenIptCb6peKh/Rch9pK?=
- =?us-ascii?Q?Ptflyqou7PnzxI5YR29ycjyx+eI0Uc15n0uHuJ1nXDmyB37I6TUwad0t/C2L?=
- =?us-ascii?Q?sQg80lAXn/Y1V5YNQ+uHxs+1c0GyyHLiek1+PfdkyXbR15W06ZACOVG1NM3T?=
- =?us-ascii?Q?Crg4/K+YlmXmREIfX49mxCLptbETlcB0cabFFL7IrjY4MbZGFqMoYCawRyi+?=
- =?us-ascii?Q?YZZe7yODPQC5Qv/HYUajKj7b7R+TSS5ZtE7C1B8l5ttRympC7OiwQxdhxJR6?=
- =?us-ascii?Q?9tVZefL4WQ0VRcTpJ1/VPazsujVxkJZfvauM3ynK3k/lYvmbvHukjXaDpp+C?=
- =?us-ascii?Q?Xyz+1aG3wkplAxIxg2B8WwrOg7mtrgwG76cDL81/YRj24FWvTK2WkDcdYYk8?=
- =?us-ascii?Q?e6ZgWvw0oI3cD+dIvZCxWlIAIx1JAR7RyP/e0o87dcMx7SFtE8bnz4zBGs1X?=
- =?us-ascii?Q?7rSvxT9xxkacicDqEyYVufQnByg/bXmoE9gWagHdH4z9oijiClFoJ12yI3h+?=
- =?us-ascii?Q?mKWwxnKnFvTFLDCFKV7bHVYEOKywiRIhGmgTGJAvhebN2yXyHtZkH1Txe55t?=
- =?us-ascii?Q?GfGwAbrGkUbIosbMp01F59rbT6RG6tnd/jmy8kIIZ78/XebcRvdv98ms5KB+?=
- =?us-ascii?Q?/Vmw1mPCOe6om/CDlxqbdQ6wnsl3oZqD0UKTCd/FmoaOff1QgkOI0av5FMnZ?=
- =?us-ascii?Q?jHUhhHG47V1HEgfz+jhcn7qXDn0cU2/h63c0ryYMBtCWFtbfpAVDbhYKniR+?=
- =?us-ascii?Q?4lAW3ph6jdDST9urp4yNSzKCsflU+oCT+sFP1ZlYe5NYj24whOwQeGBYEydR?=
- =?us-ascii?Q?TRXTjbtXyju4vZ5ZVlFQFcCNOw4/evwbdCNPkbdyuRZPimFUrnaaX8aE0CFg?=
- =?us-ascii?Q?krEtYYpl2ECFWAsL0lOqebrFl3WsoxdVIhBd3poSCXKOW7DUbBH06ZFD/H0U?=
- =?us-ascii?Q?B8INTu4gzeds3I9Kf3hEm6/mBq7XNYF3QTFpA7FJkcl+xZ1SthBwuaKbMu4g?=
- =?us-ascii?Q?bK2047dh18it+w5wgI1bEWJ6QX+8UUE54to5s4SVYoTTxJKzsP1LpQkHc+ox?=
- =?us-ascii?Q?+hIC6fjm12vIzfsaIUqTb9Y+6cLC865ZP4vmLg83/UJ1PWwLPIMUDolJfC8S?=
- =?us-ascii?Q?Ghuy9ztRa+hitZunbgO3BkA46lLSh40djVtDlVQh+FNYky6FcgoS05aJjRAL?=
- =?us-ascii?Q?PAvLmt1I5WU8Z6jNiJwt+NXI2o3i3gG4fnsWe1GO?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4df757da-2e74-452e-ea93-08de376b8b8d
-X-MS-Exchange-CrossTenant-AuthSource: CYYPR11MB8430.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Dec 2025 21:40:17.9391
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Nk69r7j607Lc8Cyf92zPAe/zKVGrVx7xIUJrgDkb/0rJVTeoNH8UYFgH5Av1B7597xUr1gJfG6f7lGJqVzUhwg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB8504
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251209191148.16b7fdee@pumpkin>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 
-On Fri, Nov 07, 2025 at 01:20:03PM -0700, Zack McKevitt wrote:
+On Tue, Dec 09, 2025 at 07:11:48PM +0000, David Laight wrote:
+> On Tue, 9 Dec 2025 17:51:48 +0200
+> Andy Shevchenko <andriy.shevchenko@intel.com> wrote:
+> > On Tue, Dec 09, 2025 at 10:03:08AM +0000, david.laight.linux@gmail.com wrote:
+
+...
+
+> > > -#define __BF_FIELD_CHECK_MASK(_mask, _val, _pfx)			\
+> > > +#define __BF_FIELD_CHECK_MASK(mask, val, pfx)				\
+> > >  	({								\
+> > > -		BUILD_BUG_ON_MSG(!__builtin_constant_p(_mask),		\
+> > > -				 _pfx "mask is not constant");		\
+> > > -		BUILD_BUG_ON_MSG((_mask) == 0, _pfx "mask is zero");	\
+> > > -		BUILD_BUG_ON_MSG(__builtin_constant_p(_val) ?		\
+> > > -				 ~((_mask) >> __bf_shf(_mask)) &	\
+> > > -					(0 + (_val)) : 0,		\
+> > > -				 _pfx "value too large for the field"); \
+> > > -		__BUILD_BUG_ON_NOT_POWER_OF_2((_mask) +			\
+> > > -					      (1ULL << __bf_shf(_mask))); \
+> > > +		BUILD_BUG_ON_MSG(!__builtin_constant_p(mask),		\
+> > > +				 pfx "mask is not constant");		\
+> > > +		BUILD_BUG_ON_MSG((mask) == 0, _pfx "mask is zero");	\
+> > > +		BUILD_BUG_ON_MSG(__builtin_constant_p(val) ?		\
+> > > +				 ~((mask) >> __bf_shf(mask)) &		\
+> > > +					(0 + (val)) : 0,		\
+> > > +				 pfx "value too large for the field");	\
+> > > +		__BUILD_BUG_ON_NOT_POWER_OF_2((mask) +			\
+> > > +					      (1ULL << __bf_shf(mask))); \
+> > >  	})  
+> > 
+> > I looks like renaming parameters without any benefit, actually the opposite
+> > it's very hard to see if there is any interesting change here. Please, drop
+> > this or make it clear to focus only on the things that needs to be changed.
 > 
-> 
-> On 11/6/2025 6:42 AM, Rodrigo Vivi wrote:
-> > > 
-> > > > Also, it is worth to mention that we have a in-tree pyynl/cli.py tool that entirely
-> > > > exercises this new API, hence I hope this can be the reference code for the uAPI
-> > > > usage, while we continue with the plan of introducing IGT tests and tools for this
-> > > > and adjusting the internal vendor tools to open with open source developments and
-> > > > changing them to support these flows.
-> > > 
-> > > I think it would be nice to see some accompanying userspace code that makes
-> > > use of this implementation to have as a reference if at all possible.
-> > 
-> > We have some folks working on the userspace tools, but I just realized that
-> > perhaps we don't even need that and we could perhaps only using the
-> > kernel-tools/ynl as official drm-ras consumer?
-> > 
-> > $ sudo ynl --family drm_ras --dump list-nodes
-> > [{'device-name': '00:02.0',
-> >    'node-id': 0,
-> >    'node-name': 'non-fatal',
-> >    'node-type': 'error-counter'},
-> >   {'device-name': '00:02.0',
-> >    'node-id': 1,
-> >    'node-name': 'correctable',
-> >   'node-type': 'error-counter'}]
-> > 
-> > thoughts?
-> > 
-> 
-> I think this is probably ok for demonstrating this patch's functionality,
-> but some userspace code would be helpful as a reference for applications
-> that might want to integrate this directly instead of relying on CLI tools.
+> I'm pretty sure there are no other changes in that bit.
 
-Here is an reference:
+Yes, but the rule of thumb to avoid putting several logical changes into a
+single patch and here AFAICT the renaming should be avoided  / split to a
+precursor or do it after this.
 
-https://lore.kernel.org/igt-dev/20251121064851.537365-1-ravi.kishore.koppuravuri@intel.com/
+> (The entire define is pretty much re-written in a later patch and I
+> did want to separate the changes.)
 
-> 
-> > > 
-> > > As a side note, I will be on vacation for a couple of weeks as of this
-> > > weekend and my response time will be affected.
-> > 
-> > Thank you,
-> > Please let me know if you have further thoughts here, or if you see any blocker
-> > or an ack to move forward with this path.
-> > 
-> > Thanks,
-> > Rodrigo.
-> > 
-> 
-> No further thoughts on the patch contents, I think it looks good. I see that
-> Jakub posted some TODOs while I was away, so I assume there will be another
-> iteration that I will take a look at if/when that comes in.
+Then probably don't do the change at all (renaming), as it's useless here?
 
-Yes, Riana is now on charge of that:
+> I wanted to the file to be absolutely consistent with the parameter/variable
+> names.
 
-https://lore.kernel.org/dri-devel/20251205083934.3602030-6-riana.tauro@intel.com
+No objection on this.
 
-Could you please take a look and ack if it is okay from your side.
+> Plausibly the scheme could be slightly different:
+> 'user' parameters are 'xxx', '__auto_type' variables are '_xxx'.
+> But internal defines that evaluate/expand parameters more than once are
+> '_xxx' and must be 'copied' by an outer define.
 
-We would love to go with the drm solution for this. As a plan B, if no other
-vendor is interested we might just convert to xe-ras genl thing and move to
-drm layer if someone later is interested in it.
+-- 
+With Best Regards,
+Andy Shevchenko
 
-Thanks a lot,
-Rodrigo
 
-> 
-> > > 
-> > > Thanks,
-> > > 
-> > > Zack
 
