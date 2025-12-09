@@ -1,198 +1,223 @@
-Return-Path: <netdev+bounces-244057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4C46CAEA0A
-	for <lists+netdev@lfdr.de>; Tue, 09 Dec 2025 02:29:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC2A8CAEC8C
+	for <lists+netdev@lfdr.de>; Tue, 09 Dec 2025 04:16:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 4F7AA300D577
-	for <lists+netdev@lfdr.de>; Tue,  9 Dec 2025 01:29:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 619BE3020CE9
+	for <lists+netdev@lfdr.de>; Tue,  9 Dec 2025 03:16:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 850F32797BE;
-	Tue,  9 Dec 2025 01:29:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB0961D61A3;
+	Tue,  9 Dec 2025 03:16:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bQXeLVpQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9862221DB9;
-	Tue,  9 Dec 2025 01:29:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A1DF16DC28
+	for <netdev@vger.kernel.org>; Tue,  9 Dec 2025 03:16:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765243784; cv=none; b=mTmYuBCw5wdtYVy5HfHVbyKpL6G3XxHwYljjyIG0PvrEbBvC5cTiaDFXPAMHlSWAiz/dVG5fzbiSiI4GvEkCoW27sulpu1xwlW001fhM5E/Ggr51pzrGUMqXqYaP4xLBP/idBxW/LrOGZkzoMwSmM8Krobwcs0nrH5WZLCgQGYg=
+	t=1765250199; cv=none; b=goShECtZXZcP19nhiJNBgOwPLHH/vn1EDPC0k4i63LBnhQKDzWm5lYCAMqTwr90pEBwWcYx5uw32YNSzTa4o1Xl8YACOPwlGlS6/Cd344s3rKXQJHi9gthrdQT6Jujs8AWvEO5vt79bX+rQHBSIFMSj2dnWOPJzH2dOTclyAHNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765243784; c=relaxed/simple;
-	bh=8599932m8bAx1as4Yw1IN2RxfwSzepoQ+4mpl0VrqzY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=chwyxeDVUhtnmAl6glgwFitux1XlhA7pVaRD2fR7QU95TCGAUaB+vXTWDmGoR3PEExhrp5iF1OrNDSFD7G3+QcrPdBTUtxWS9LfDVaPgh+UZ3dY5hwGkMCB9EysMyIRWLFOcoZoz2J8Xzmt1jF5HKz84xsDvZjqbvaE3a5GG/xg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vSmXp-000000005C1-0OcV;
-	Tue, 09 Dec 2025 01:29:37 +0000
-Date: Tue, 9 Dec 2025 01:29:34 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Rasmus Villemoes <ravi@prevas.dk>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: [PATCH net v4 4/4] net: dsa: mxl-gsw1xx: manually clear RANEG bit
-Message-ID: <76745fceb5a3f53088110fb7a96acf88434088ca.1765241054.git.daniel@makrotopia.org>
-References: <cover.1765241054.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1765250199; c=relaxed/simple;
+	bh=hYHXcBJqiE6Yb0MUNgUbnjO75UV/90nph27Fu0HltPM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WzjZKhVvX+NHXTNgewlOQAbHmaktW/3C7pgtdBIXX+lnnrdu5WxyABWYd9rqdDLbLRmjoyVPH6rbYh7aaqkEq6K1vGispceWdegXT5frXsxcjFrqBerXUbC67VibHIuptbPl7MG3PMZlm9Pa+XoCyBdyKgaO2zdhfgsuLOta7og=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bQXeLVpQ; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7d26a7e5639so5802267b3a.1
+        for <netdev@vger.kernel.org>; Mon, 08 Dec 2025 19:16:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765250198; x=1765854998; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Xbjh03zP4rMQL9+cf/Iuj90OUUWRY4VOBdkq+sEptSU=;
+        b=bQXeLVpQhi/drT694FqJw/Yc78bYM23uTRTHE3/sKf4gBZFqGCBDFYdZkZzNwixZZC
+         FIz9BOBcbIEpIUrjglY+ABMD5mNUxrkNM2TACHCI62EXJv0a+F+ccUcnxEnvaxw3oCxz
+         UZ9go8oA0edeSBSjOZcZ6XuV8L84lwVyUeKR9PAlDzAD+dYf9xgSi9w9idxCdWxARXuR
+         IRq8a9LHc0ucHinYrjqpFmWLej4kr16wppZc9LDH4xIMA5Z5oFp7pfCpuSl1WUFZyX9Y
+         KEgNA54GCqoJUoUOliSCHdmBHDEsPOE+/n3oP8tabyFsV9o17zABcIfn77k5qT/B8yOT
+         ncxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765250198; x=1765854998;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Xbjh03zP4rMQL9+cf/Iuj90OUUWRY4VOBdkq+sEptSU=;
+        b=EIFIuoGAWErrxZlOoutY3mAjvEzQRJ4FQDjutI/QukIzdYbC+IpKrgyhv6IopepDSp
+         U/XQzSkpeTUBhtOUWU5+wuK+lVc2vNzjYiv5uG57FNXqHc+TcP89LC55QvbBUvJWdxVJ
+         lHax2Z1KGrrqxVWWIToN8Z4Z+JHsd0g36DURiMWIsxcSyuU3zHhh4BmjszwrWWIoR2UK
+         Z7kTfGAYV86cToU8LwyJ9UyFqy0wW4DvV/Wf/2gGtON5t6CzG5xpffRK3kOFvJFTaGb+
+         EwuJP8i9q0KM9hsZlKQilC7ZyC3hD9WzhKmpenbOTVdsAgVFsTnAp2E2Tn0X4mwTc4NS
+         vwAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWbQnV/oedSoP261NSE9/gRdfiTo7V01paOwutE0m/ubrs6u6MAEHevVt7Fd1neMYkz7Viu89g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAGkw1S9GEEsvKjmXsN4bZNg/6tBXinaSGnulcOfRp5eoxkSVM
+	1j+mq7pqo1IUT+HSaxjX0I63+GAcQiAsjNfRff2wLO2vv5UpF/7vcvV/
+X-Gm-Gg: ASbGncuwxLda/5hGVgeSmAYbJqlGYiRaS4BeUzP0plWoY/zu7nghjCbqKomvWHOjfkU
+	rstgpy1JN9BjJ5d3K+J5y4RUes5WceKxY850hDVG2FHVl8R/ZLLTHRrQOhA5j5QcQbh3M4/DLzT
+	pzohsVQb+V6bap9tM7/BR0pL9TkohhQvR6yQCmcPkdAMdDo4ChvWifi2I4riWyxKFVwjOo562Nh
+	dclL0osq2JCZ6s1ssxdCuRTMoRJ16O6PkalRrR6yPilClw3Jl2kuyanWVKDy7/kJMBZp5z3j8jN
+	SjHPfXIoMaSPsH/nPpOwBELDBwydYh6CgF8pLmAqp/4BEZxKCkhc/z4o6a2XoUkk8CcCmjyqtq/
+	Zn9YfwYINONTivxymsb27FeDIP+TxlIo6jrKFSh3XTAK7CdI6ImsXliqMkAKDcDQyGE/F4Wdrx8
+	fRd405P3qwyuo3dNKFye7TEnpOhO00cIlDYsTI2HO3ftMzUz0l81m0iJe3cQ==
+X-Google-Smtp-Source: AGHT+IHQvgWeNtbf6rAOmu4e1CUtIgqvvM7NUPVdJ7LsQIwRvvKXNdF15hsTi3/ADWnNDURlKJZtQw==
+X-Received: by 2002:a05:6a00:a13:b0:792:f084:404f with SMTP id d2e1a72fcca58-7e8bb35f842mr8949291b3a.0.1765250197576;
+        Mon, 08 Dec 2025 19:16:37 -0800 (PST)
+Received: from KERNELXING-MB0.tencent.com ([43.132.141.20])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7e2a07213b6sm14491252b3a.26.2025.12.08.19.16.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Dec 2025 19:16:37 -0800 (PST)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	bjorn@kernel.org,
+	magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com,
+	jonathan.lemon@gmail.com,
+	sdf@fomichev.me,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com
+Cc: bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH RFC net-next v4] xsk: move cq_cached_prod_lock to avoid touching a cacheline in sending path
+Date: Tue,  9 Dec 2025 11:16:28 +0800
+Message-Id: <20251209031628.28429-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1765241054.git.daniel@makrotopia.org>
+Content-Transfer-Encoding: 8bit
 
-Despite being documented as self-clearing, the RANEG bit sometimes
-remains set, preventing auto-negotiation from happening.
+From: Jason Xing <kernelxing@tencent.com>
 
-Manually clear the RANEG bit after 10ms as advised by MaxLinear.
-In order to not hold RTNL during the 10ms of waiting schedule
-delayed work to take care of clearing the bit asynchronously, which
-is similar to the self-clearing behavior.
+We (Paolo and I) noticed that in the sending path touching an extra
+cacheline due to cq_cached_prod_lock will impact the performance. After
+moving the lock from struct xsk_buff_pool to struct xsk_queue, the
+performance is increased by ~5% which can be observed by xdpsock.
 
-Fixes: 22335939ec90 ("net: dsa: add driver for MaxLinear GSW1xx switch family")
-Reported-by: Rasmus Villemoes <ravi@prevas.dk>
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+An alternative approach [1] can be using atomic_try_cmpxchg() to have the
+same effect. But unfortunately I don't have evident performance number to
+prove the atomic approach is better than the current patch. The advantage
+is to save the contention time among multiple xsks sharing the same pool
+while the disadvantage is lose good maintenance. The full discussion can
+be found at the following link.
+
+[1]: https://lore.kernel.org/all/20251128134601.54678-1-kerneljasonxing@gmail.com/
+
+Suggested-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
 ---
-v4:
- * fix order of operations in remove and shutdown functions
+Q: since net-next will be open next year, I wonder if I should post this
+patch targetting bpf-next?
 
-v3:
- * fix wrong parameter name in call of cancel_delayed_work_sync
+RFC V4
+Link: https://lore.kernel.org/all/20251128134601.54678-1-kerneljasonxing@gmail.com/
+1. use moving lock method instead (Paolo, Magnus)
+2. Add credit to Paolo, thanks!
 
-v2:
- * cancel pending work before setting RANEG bit
- * cancel pending work on remove and shutdown
- * document that GSW1XX_RST_REQ_SGMII_SHELL also clears RANEG bit
- * improve commit message
+v3
+Link: https://lore.kernel.org/all/20251125085431.4039-1-kerneljasonxing@gmail.com/
+1. fix one race issue that cannot be resolved by simple seperated atomic
+operations. So this revision only updates patch [2/3] and tries to use
+try_cmpxchg method to avoid that problem. (paolo)
+2. update commit log accordingly.
 
- drivers/net/dsa/lantiq/mxl-gsw1xx.c | 34 ++++++++++++++++++++++++++++-
- 1 file changed, 33 insertions(+), 1 deletion(-)
+V2
+Link: https://lore.kernel.org/all/20251124080858.89593-1-kerneljasonxing@gmail.com/
+1. use separate functions rather than branches within shared routines. (Maciej)
+2. make each patch as simple as possible for easier review
+---
+ include/net/xsk_buff_pool.h | 5 -----
+ net/xdp/xsk.c               | 8 ++++----
+ net/xdp/xsk_buff_pool.c     | 2 +-
+ net/xdp/xsk_queue.h         | 5 +++++
+ 4 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/net/dsa/lantiq/mxl-gsw1xx.c b/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-index 4dc287ad141e1..f8ff8a604bf53 100644
---- a/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-+++ b/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-@@ -11,10 +11,12 @@
- 
- #include <linux/bits.h>
- #include <linux/delay.h>
-+#include <linux/jiffies.h>
- #include <linux/module.h>
- #include <linux/of_device.h>
- #include <linux/of_mdio.h>
- #include <linux/regmap.h>
-+#include <linux/workqueue.h>
- #include <net/dsa.h>
- 
- #include "lantiq_gswip.h"
-@@ -29,6 +31,7 @@ struct gsw1xx_priv {
- 	struct			regmap *clk;
- 	struct			regmap *shell;
- 	struct			phylink_pcs pcs;
-+	struct delayed_work	clear_raneg;
- 	phy_interface_t		tbi_interface;
- 	struct gswip_priv	gswip;
+diff --git a/include/net/xsk_buff_pool.h b/include/net/xsk_buff_pool.h
+index 92a2358c6ce3..0b1abdb99c9e 100644
+--- a/include/net/xsk_buff_pool.h
++++ b/include/net/xsk_buff_pool.h
+@@ -90,11 +90,6 @@ struct xsk_buff_pool {
+ 	 * destructor callback.
+ 	 */
+ 	spinlock_t cq_prod_lock;
+-	/* Mutual exclusion of the completion ring in the SKB mode.
+-	 * Protect: when sockets share a single cq when the same netdev
+-	 * and queue id is shared.
+-	 */
+-	spinlock_t cq_cached_prod_lock;
+ 	struct xdp_buff_xsk *free_heads[];
  };
-@@ -145,7 +148,9 @@ static void gsw1xx_pcs_disable(struct phylink_pcs *pcs)
+ 
+diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+index f093c3453f64..7613887b4122 100644
+--- a/net/xdp/xsk.c
++++ b/net/xdp/xsk.c
+@@ -543,9 +543,9 @@ static int xsk_cq_reserve_locked(struct xsk_buff_pool *pool)
  {
- 	struct gsw1xx_priv *priv = pcs_to_gsw1xx(pcs);
+ 	int ret;
  
--	/* Assert SGMII shell reset */
-+	cancel_delayed_work_sync(&priv->clear_raneg);
-+
-+	/* Assert SGMII shell reset (will also clear RANEG bit) */
- 	regmap_set_bits(priv->shell, GSW1XX_SHELL_RST_REQ,
- 			GSW1XX_RST_REQ_SGMII_SHELL);
+-	spin_lock(&pool->cq_cached_prod_lock);
++	spin_lock(&pool->cq->cq_cached_prod_lock);
+ 	ret = xskq_prod_reserve(pool->cq);
+-	spin_unlock(&pool->cq_cached_prod_lock);
++	spin_unlock(&pool->cq->cq_cached_prod_lock);
  
-@@ -428,12 +433,29 @@ static int gsw1xx_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
- 	return 0;
+ 	return ret;
+ }
+@@ -619,9 +619,9 @@ static void xsk_cq_submit_addr_locked(struct xsk_buff_pool *pool,
+ 
+ static void xsk_cq_cancel_locked(struct xsk_buff_pool *pool, u32 n)
+ {
+-	spin_lock(&pool->cq_cached_prod_lock);
++	spin_lock(&pool->cq->cq_cached_prod_lock);
+ 	xskq_prod_cancel_n(pool->cq, n);
+-	spin_unlock(&pool->cq_cached_prod_lock);
++	spin_unlock(&pool->cq->cq_cached_prod_lock);
  }
  
-+static void gsw1xx_pcs_clear_raneg(struct work_struct *work)
-+{
-+	struct gsw1xx_priv *priv =
-+		container_of(work, struct gsw1xx_priv, clear_raneg.work);
-+
-+	regmap_clear_bits(priv->sgmii, GSW1XX_SGMII_TBI_ANEGCTL,
-+			  GSW1XX_SGMII_TBI_ANEGCTL_RANEG);
-+}
-+
- static void gsw1xx_pcs_an_restart(struct phylink_pcs *pcs)
- {
- 	struct gsw1xx_priv *priv = pcs_to_gsw1xx(pcs);
+ INDIRECT_CALLABLE_SCOPE
+diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
+index 51526034c42a..127c17e02384 100644
+--- a/net/xdp/xsk_buff_pool.c
++++ b/net/xdp/xsk_buff_pool.c
+@@ -91,7 +91,7 @@ struct xsk_buff_pool *xp_create_and_assign_umem(struct xdp_sock *xs,
+ 	INIT_LIST_HEAD(&pool->xsk_tx_list);
+ 	spin_lock_init(&pool->xsk_tx_list_lock);
+ 	spin_lock_init(&pool->cq_prod_lock);
+-	spin_lock_init(&pool->cq_cached_prod_lock);
++	spin_lock_init(&xs->cq_tmp->cq_cached_prod_lock);
+ 	refcount_set(&pool->users, 1);
  
-+	cancel_delayed_work_sync(&priv->clear_raneg);
-+
- 	regmap_set_bits(priv->sgmii, GSW1XX_SGMII_TBI_ANEGCTL,
- 			GSW1XX_SGMII_TBI_ANEGCTL_RANEG);
-+
-+	/* despite being documented as self-clearing, the RANEG bit
-+	 * sometimes remains set, preventing auto-negotiation from happening.
-+	 * MaxLinear advises to manually clear the bit after 10ms.
+ 	pool->fq = xs->fq_tmp;
+diff --git a/net/xdp/xsk_queue.h b/net/xdp/xsk_queue.h
+index 1eb8d9f8b104..ec08d9c102b1 100644
+--- a/net/xdp/xsk_queue.h
++++ b/net/xdp/xsk_queue.h
+@@ -46,6 +46,11 @@ struct xsk_queue {
+ 	u64 invalid_descs;
+ 	u64 queue_empty_descs;
+ 	size_t ring_vmalloc_size;
++	/* Mutual exclusion of the completion ring in the SKB mode.
++	 * Protect: when sockets share a single cq when the same netdev
++	 * and queue id is shared.
 +	 */
-+	schedule_delayed_work(&priv->clear_raneg, msecs_to_jiffies(10));
- }
++	spinlock_t cq_cached_prod_lock;
+ };
  
- static void gsw1xx_pcs_link_up(struct phylink_pcs *pcs,
-@@ -636,6 +658,8 @@ static int gsw1xx_probe(struct mdio_device *mdiodev)
- 	if (ret)
- 		return ret;
- 
-+	INIT_DELAYED_WORK(&priv->clear_raneg, gsw1xx_pcs_clear_raneg);
-+
- 	ret = gswip_probe_common(&priv->gswip, version);
- 	if (ret)
- 		return ret;
-@@ -648,16 +672,21 @@ static int gsw1xx_probe(struct mdio_device *mdiodev)
- static void gsw1xx_remove(struct mdio_device *mdiodev)
- {
- 	struct gswip_priv *priv = dev_get_drvdata(&mdiodev->dev);
-+	struct gsw1xx_priv *gsw1xx_priv;
- 
- 	if (!priv)
- 		return;
- 
- 	dsa_unregister_switch(priv->ds);
-+
-+	gsw1xx_priv = container_of(priv, struct gsw1xx_priv, gswip);
-+	cancel_delayed_work_sync(&gsw1xx_priv->clear_raneg);
- }
- 
- static void gsw1xx_shutdown(struct mdio_device *mdiodev)
- {
- 	struct gswip_priv *priv = dev_get_drvdata(&mdiodev->dev);
-+	struct gsw1xx_priv *gsw1xx_priv;
- 
- 	if (!priv)
- 		return;
-@@ -665,6 +694,9 @@ static void gsw1xx_shutdown(struct mdio_device *mdiodev)
- 	dsa_switch_shutdown(priv->ds);
- 
- 	dev_set_drvdata(&mdiodev->dev, NULL);
-+
-+	gsw1xx_priv = container_of(priv, struct gsw1xx_priv, gswip);
-+	cancel_delayed_work_sync(&gsw1xx_priv->clear_raneg);
- }
- 
- static const struct gswip_hw_info gsw12x_data = {
+ struct parsed_desc {
 -- 
-2.52.0
+2.41.3
+
 
