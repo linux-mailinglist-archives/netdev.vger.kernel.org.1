@@ -1,241 +1,146 @@
-Return-Path: <netdev+bounces-244127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89881CB005C
-	for <lists+netdev@lfdr.de>; Tue, 09 Dec 2025 14:09:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 24D2DCB00C0
+	for <lists+netdev@lfdr.de>; Tue, 09 Dec 2025 14:23:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 720BE30C645B
-	for <lists+netdev@lfdr.de>; Tue,  9 Dec 2025 13:06:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3321F301F27D
+	for <lists+netdev@lfdr.de>; Tue,  9 Dec 2025 13:23:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CD20331A49;
-	Tue,  9 Dec 2025 13:06:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2525F2BE05B;
+	Tue,  9 Dec 2025 13:23:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GrPa+tiA";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="LCi5HFGP"
+	dkim=pass (2048-bit key) header.d=hale.at header.i=@hale.at header.b="jh16viRD"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from gw.hale.at (gw.hale.at [89.26.116.210])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F18B4331A5D
-	for <netdev@vger.kernel.org>; Tue,  9 Dec 2025 13:05:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A218819005E;
+	Tue,  9 Dec 2025 13:23:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.26.116.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765285560; cv=none; b=iBIV5eBP1XAbotomMkWl1HGEf0y7m9fVhi38ZxiUuybZ+IXo8snTF777Pf87ko5k/V4XUvLwhhV4BF4gC41z2uBeA0KCgnC2qxdEMzmPOa5i8rODhcpfx3FbHGwjBjjMuR91eKrFaqJze4jgLBUCNj0U9oUQ14HITcdIbaS1i1E=
+	t=1765286598; cv=none; b=abdjwR44uuvS1bvP+XEfx4uRoJfg8yLl0QvRrgPs61vEUAHK47rtOAfvQM/h0j/Kd7n6wnpznXqBpvWf8NluXd/6r/4bIJh9uw6jDUs6HE8kseJyVWVrRlb3ME4VZOTjUiIbyjT5JQtlffMgH/L4BYFvEhMpTav7Gd0OXVbPhEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765285560; c=relaxed/simple;
-	bh=8OpYSPc6f7O8KOMZoMzcw+MLAH+EZekjJDAjQynD8mQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BTJMFSJPI8N9NMa12zDgPBu9+gw5QXlo47TX2BPgPE1X7ugPYXvj5qOwyPNFn0F3gv5KiMORm5zRxuyg8Ti/7XopBVCXRPCTNrYpUk/AGRHeVnudujXvff8xDadQzH3x8x0D5bXXvvg7d31scpixCutv5DaUBmVBbGThM8KTYfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GrPa+tiA; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=LCi5HFGP; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765285557;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=C7bt9DIhoeZ6jD2VdZvxOLbQYfNsQNZi6wdwI6g+uRA=;
-	b=GrPa+tiABFfGweenwCzwHB9wT+fhg9fYUu+y5CIkch2YmBP+QZrp8OmXiebXDedzIM8l+A
-	57eZ8iOfflaQ8/9TNSwlhyofk7MaRqK46EwR1Nnbtdeo6Gf9hEiKm5n8nP+8AL40fT7dQO
-	BFWZJeEdWteuwduGpiZd+mPcEJR58cA=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-187-k23yo0EYNDyhOcZuBheG3w-1; Tue, 09 Dec 2025 08:05:55 -0500
-X-MC-Unique: k23yo0EYNDyhOcZuBheG3w-1
-X-Mimecast-MFC-AGG-ID: k23yo0EYNDyhOcZuBheG3w_1765285554
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-477a0ddd1d4so32567505e9.0
-        for <netdev@vger.kernel.org>; Tue, 09 Dec 2025 05:05:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1765285554; x=1765890354; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=C7bt9DIhoeZ6jD2VdZvxOLbQYfNsQNZi6wdwI6g+uRA=;
-        b=LCi5HFGP4mMudbYx5DhGs7rzLdnMbK1o+k8SosTdQc5PM5g9VdnO+f2QKrsz3N7yxY
-         jb/iMV5fSHuLCivLkavWbDh8m/tJUuXPuwUCHv8bEc/5KlEl9zCJwdAmmRmP6ylVyDlZ
-         miLRZ9PWu1ldk0xw70QGuV5cGhf+7E3lFfMTSiOiZ6Th/2R/5jekURdkNSq6ztwoqrqO
-         xb/lmtIX0N9xfUSBC2sF1mwYk26OGOSHhGyuCpmOXXr5PIFG7TkT+VXb+et6kdXf/Aal
-         XtOOGZOllHCchSwR1AKY949MCZaqX2W299b+SlvVE3j3KeJ3ZhI1kHnAHsF7bQlPoGZt
-         vmyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765285554; x=1765890354;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=C7bt9DIhoeZ6jD2VdZvxOLbQYfNsQNZi6wdwI6g+uRA=;
-        b=H28tZl9cZfXQ+1fJ6RtmT2pQivMUwoTQC32FR5z05ADZA8D+wf+hIrimpAN5xLvxRd
-         KMKoq1PwnnmXjbpadduF+FG6ocx3zU1YGVbqd60iaht5bZLHFTxoxqmlRaFVUvbP4vOM
-         clYvPBuqYttdmvoJuz2CETybH8K6JqPsMAXrZEUXIrf76+njjvXrojLVVIzfYA1mTFiH
-         wCZBogSZ1aZB+Bqm+iTJ9uWF6zDHfD1r2tnEwhzHbFOmWDl2v7MGw0FJQhUfeHUSutv+
-         XZCdaY8ZMg7EJZr0Q7DcWuv1zfr0v1ucvXvI/Jy3Z3o3cM8Iq6JWH0pkg2Uh1brEuwqM
-         eJ8g==
-X-Forwarded-Encrypted: i=1; AJvYcCU8cFDU5e919zrl7y+UT+FvM+LBhtrXDMBfsIvyp/ymSGQ6fQnPz5/IUwh4iowqEwx+YbfXHMM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyqxrCIEkzWK0/lV9DuInBnkIMHjGAKloYbj2//LFUj56AGHAaH
-	Lxxs5DdHm5SS5OlxleL+ojyWCaIs7S8RrJVUU4CrvTCa5oHgBJ+vsO6b2emL6aa/damMY3rGHKe
-	/3GVQ7Mv0mPddHNqqIbeo/S0I9CUE7n+t7v2Hy1SLQXDwMTY9I7mtDtJ62Q==
-X-Gm-Gg: ASbGncu6sU6qYD8icMisFg+IP9mFEU1WJF2PgJ6wv94r5F8N093zKCosYsIx5V/tAE+
-	h80Kj3jkXaWAV/BwwWaV5PVbot1apak9iqevUHQ/DU+GfC+DK2N225w7u6y1xBNWnDItMzjNXWE
-	q/ZXtMGKqVCsvhAwHNUWXrBBxbOs6kCASrKQHBjetG6POuXuI+IxgUAzK5LWVZDaZGWtn3kMxzr
-	t4lVSeXVMnK84fp9xnBh8YvGa8EQokhIWVURDtZ73Ezz3ozbvtnNfK9aVCDEV45CVG3JyOSs0ZQ
-	nrU7zOahTb6FWz0XFnwlHklZIcQAGOOdREuxNCUQLJlRD8uYNfCHyqLfRlj2UpLSzWPPDDxCO8l
-	1hkzkqnJ3xMGyyekfYghA6SDY2Hz/fxWdNg==
-X-Received: by 2002:a05:600c:1c1b:b0:477:b734:8c53 with SMTP id 5b1f17b1804b1-47939dfa09fmr106050905e9.12.1765285554108;
-        Tue, 09 Dec 2025 05:05:54 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHuQABtiUkLD+rMxYkpHCMPJ0jWGiDwWoX4yNSI50FHhHBBQ+qu1qOfQtW9LU1ZqHfufP6qYw==
-X-Received: by 2002:a05:600c:1c1b:b0:477:b734:8c53 with SMTP id 5b1f17b1804b1-47939dfa09fmr106050485e9.12.1765285553476;
-        Tue, 09 Dec 2025 05:05:53 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-38-228.inter.net.il. [80.230.38.228])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47a7d357820sm17802735e9.2.2025.12.09.05.05.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Dec 2025 05:05:52 -0800 (PST)
-Date: Tue, 9 Dec 2025 08:05:50 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: virtualization@lists.linux.dev, Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	netdev@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vhost/vsock: improve RCU read sections around
- vhost_vsock_get()
-Message-ID: <20251209080528-mutt-send-email-mst@kernel.org>
-References: <20251126133826.142496-1-sgarzare@redhat.com>
+	s=arc-20240116; t=1765286598; c=relaxed/simple;
+	bh=HCzKo2UWhyuJCYqj8TBsfFFHqIxpvvKOIjla3phcQ6M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HyDFcr6PMQCARnyosa1ICxUEQAsCizqMvXhZaQFFAXz9sKWLXg62SMHbtVNbZd9X3VKVn9z7u2NtvyHSDvn8FS85QzPmFUWElT6KGyESv5zvI7TDYRBIJksZOO1jJt0mBDffmH0Bkwj0XKIMjqzCTgQzJdDyGi5/XmFlTf1o4Zo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hale.at; spf=pass smtp.mailfrom=hale.at; dkim=pass (2048-bit key) header.d=hale.at header.i=@hale.at header.b=jh16viRD; arc=none smtp.client-ip=89.26.116.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hale.at
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hale.at
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=hale.at; i=@hale.at; q=dns/txt; s=mail;
+  t=1765286594; x=1796822594;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=HCzKo2UWhyuJCYqj8TBsfFFHqIxpvvKOIjla3phcQ6M=;
+  b=jh16viRDGo99SV5pSuNc3PjDw2V36EmJ34y8otCUMmFFaMX71+5iSW3U
+   tO1t2qF9PzwIJMinnHU2G3w85I0MgmNv5p1XX9Hn1+qCRgAj77x6/NwqM
+   VGuT4KGyxJykxEGcQDL0GXDEy6y6vVDJY0gvxSZL9uYX1sJL2ekZfK+EI
+   KVr1ly157GyJ+anMMl4zoFDSPLFsdH2wQsCrSO4vlSpf1xHZNvI0QHseD
+   ZGBsrhBRwy7Fn0fhPyuFja63WZNNQKXZBnGJChdCigv7LKqBEmFv5TFbv
+   tkQrkHY/rO/3Un50PlQq4YD68bgfLDtnFx2UkufBW8NNlacHmSIMAEQSR
+   g==;
+X-CSE-ConnectionGUID: KGueqkirSBiC/3C9NlgBEQ==
+X-CSE-MsgGUID: eD78PgnZR96zMCF3/Qb+Ug==
+IronPort-SDR: 69382263_3NtiH9HBNf9mH2ZwwHM14d08ogxzZpJE1rWfD5kQnACWmWy
+ 3Cn7qEn8m1CDUg/b4xj+rjqb0qCRc83kQ++uFkA==
+X-IronPort-AV: E=Sophos;i="6.20,261,1758578400"; 
+   d="scan'208";a="1474756"
+Received: from unknown (HELO mail4.hale.at) ([192.168.100.5])
+  by mgmt.hale.at with ESMTP; 09 Dec 2025 14:21:39 +0100
+Received: from mail4.hale.at (localhost.localdomain [127.0.0.1])
+	by mail4.hale.at (Postfix) with ESMTPS id B64BE13005C4;
+	Tue,  9 Dec 2025 14:21:19 +0100 (CET)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail4.hale.at (Postfix) with ESMTP id 9EBD513005DF;
+	Tue,  9 Dec 2025 14:21:19 +0100 (CET)
+X-Virus-Scanned: amavis at mail4.hale.at
+Received: from mail4.hale.at ([127.0.0.1])
+ by localhost (mail4.hale.at [127.0.0.1]) (amavis, port 10026) with ESMTP
+ id Z2CyTqiBAzSF; Tue,  9 Dec 2025 14:21:19 +0100 (CET)
+Received: from entw47.HALE.at (entw47 [192.168.100.117])
+	by mail4.hale.at (Postfix) with ESMTPSA id 7FF6E13005C4;
+	Tue,  9 Dec 2025 14:21:19 +0100 (CET)
+From: Michael Thalmeier <michael.thalmeier@hale.at>
+To: Deepak Sharma <deepak.sharma.472935@gmail.com>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Michael Thalmeier <michael.thalmeier@hale.at>,
+	stable@vger.kernel.org
+Subject: [PATCH] net: nfc: nci: Fix parameter validation for packet data
+Date: Tue,  9 Dec 2025 14:21:03 +0100
+Message-ID: <20251209132103.3736761-1-michael.thalmeier@hale.at>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251126133826.142496-1-sgarzare@redhat.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 26, 2025 at 02:38:26PM +0100, Stefano Garzarella wrote:
-> From: Stefano Garzarella <sgarzare@redhat.com>
-> 
-> vhost_vsock_get() uses hash_for_each_possible_rcu() to find the
-> `vhost_vsock` associated with the `guest_cid`. hash_for_each_possible_rcu()
-> should only be called within an RCU read section, as mentioned in the
-> following comment in include/linux/rculist.h:
-> 
-> /**
->  * hlist_for_each_entry_rcu - iterate over rcu list of given type
->  * @pos:	the type * to use as a loop cursor.
->  * @head:	the head for your list.
->  * @member:	the name of the hlist_node within the struct.
->  * @cond:	optional lockdep expression if called from non-RCU protection.
->  *
->  * This list-traversal primitive may safely run concurrently with
->  * the _rcu list-mutation primitives such as hlist_add_head_rcu()
->  * as long as the traversal is guarded by rcu_read_lock().
->  */
-> 
-> Currently, all calls to vhost_vsock_get() are between rcu_read_lock()
-> and rcu_read_unlock() except for calls in vhost_vsock_set_cid() and
-> vhost_vsock_reset_orphans(). In both cases, the current code is safe,
-> but we can make improvements to make it more robust.
-> 
-> About vhost_vsock_set_cid(), when building the kernel with
-> CONFIG_PROVE_RCU_LIST enabled, we get the following RCU warning when the
-> user space issues `ioctl(dev, VHOST_VSOCK_SET_GUEST_CID, ...)` :
-> 
->   WARNING: suspicious RCU usage
->   6.18.0-rc7 #62 Not tainted
->   -----------------------------
->   drivers/vhost/vsock.c:74 RCU-list traversed in non-reader section!!
-> 
->   other info that might help us debug this:
-> 
->   rcu_scheduler_active = 2, debug_locks = 1
->   1 lock held by rpc-libvirtd/3443:
->    #0: ffffffffc05032a8 (vhost_vsock_mutex){+.+.}-{4:4}, at: vhost_vsock_dev_ioctl+0x2ff/0x530 [vhost_vsock]
-> 
->   stack backtrace:
->   CPU: 2 UID: 0 PID: 3443 Comm: rpc-libvirtd Not tainted 6.18.0-rc7 #62 PREEMPT(none)
->   Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-7.fc42 06/10/2025
->   Call Trace:
->    <TASK>
->    dump_stack_lvl+0x75/0xb0
->    dump_stack+0x14/0x1a
->    lockdep_rcu_suspicious.cold+0x4e/0x97
->    vhost_vsock_get+0x8f/0xa0 [vhost_vsock]
->    vhost_vsock_dev_ioctl+0x307/0x530 [vhost_vsock]
->    __x64_sys_ioctl+0x4f2/0xa00
->    x64_sys_call+0xed0/0x1da0
->    do_syscall_64+0x73/0xfa0
->    entry_SYSCALL_64_after_hwframe+0x76/0x7e
->    ...
->    </TASK>
-> 
-> This is not a real problem, because the vhost_vsock_get() caller, i.e.
-> vhost_vsock_set_cid(), holds the `vhost_vsock_mutex` used by the hash
-> table writers. Anyway, to prevent that warning, add lockdep_is_held()
-> condition to hash_for_each_possible_rcu() to verify that either the
-> caller is in an RCU read section or `vhost_vsock_mutex` is held when
-> CONFIG_PROVE_RCU_LIST is enabled; and also clarify the comment for
-> vhost_vsock_get() to better describe the locking requirements and the
-> scope of the returned pointer validity.
-> 
-> About vhost_vsock_reset_orphans(), currently this function is only
-> called via vsock_for_each_connected_socket(), which holds the
-> `vsock_table_lock` spinlock (which is also an RCU read-side critical
-> section). However, add an explicit RCU read lock there to make the code
-> more robust and explicit about the RCU requirements, and to prevent
-> issues if the calling context changes in the future or if
-> vhost_vsock_reset_orphans() is called from other contexts.
-> 
-> Fixes: 834e772c8db0 ("vhost/vsock: fix use-after-free in network stack callers")
-> Cc: stefanha@redhat.com
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+Since commit 8fcc7315a10a ("net: nfc: nci: Add parameter validation for
+packet data") communication with nci nfc chips is not working any more.
 
+The mentioned commit tries to fix access of uninitialized data, but
+failed to understand that in some cases the data packet is of variable
+length and can therefore not be compared to the maximum packet length
+given by the sizeof(struct).
 
-queued, thanks!
+For these cases it is only possible to check for minimum packet length.
 
-> ---
->  drivers/vhost/vsock.c | 15 +++++++++++----
->  1 file changed, 11 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> index ae01457ea2cd..78cc66fbb3dd 100644
-> --- a/drivers/vhost/vsock.c
-> +++ b/drivers/vhost/vsock.c
-> @@ -64,14 +64,15 @@ static u32 vhost_transport_get_local_cid(void)
->  	return VHOST_VSOCK_DEFAULT_HOST_CID;
->  }
->  
-> -/* Callers that dereference the return value must hold vhost_vsock_mutex or the
-> - * RCU read lock.
-> +/* Callers must be in an RCU read section or hold the vhost_vsock_mutex.
-> + * The return value can only be dereferenced while within the section.
->   */
->  static struct vhost_vsock *vhost_vsock_get(u32 guest_cid)
->  {
->  	struct vhost_vsock *vsock;
->  
-> -	hash_for_each_possible_rcu(vhost_vsock_hash, vsock, hash, guest_cid) {
-> +	hash_for_each_possible_rcu(vhost_vsock_hash, vsock, hash, guest_cid,
-> +				   lockdep_is_held(&vhost_vsock_mutex)) {
->  		u32 other_cid = vsock->guest_cid;
->  
->  		/* Skip instances that have no CID yet */
-> @@ -707,9 +708,15 @@ static void vhost_vsock_reset_orphans(struct sock *sk)
->  	 * executing.
->  	 */
->  
-> +	rcu_read_lock();
-> +
->  	/* If the peer is still valid, no need to reset connection */
-> -	if (vhost_vsock_get(vsk->remote_addr.svm_cid))
-> +	if (vhost_vsock_get(vsk->remote_addr.svm_cid)) {
-> +		rcu_read_unlock();
->  		return;
-> +	}
-> +
-> +	rcu_read_unlock();
->  
->  	/* If the close timeout is pending, let it expire.  This avoids races
->  	 * with the timeout callback.
-> -- 
-> 2.51.1
+Fixes: 8fcc7315a10a ("net: nfc: nci: Add parameter validation for packet =
+data")
+Cc: stable@vger.kernel.org
+Signed-off-by: Michael Thalmeier <michael.thalmeier@hale.at>
+---
+ net/nfc/nci/ntf.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/net/nfc/nci/ntf.c b/net/nfc/nci/ntf.c
+index 418b84e2b260..5161e94f067f 100644
+--- a/net/nfc/nci/ntf.c
++++ b/net/nfc/nci/ntf.c
+@@ -58,7 +58,8 @@ static int nci_core_conn_credits_ntf_packet(struct nci_=
+dev *ndev,
+ 	struct nci_conn_info *conn_info;
+ 	int i;
+=20
+-	if (skb->len < sizeof(struct nci_core_conn_credit_ntf))
++	/* Minimal packet size for num_entries=3D1 is 1 x __u8 + 1 x conn_credi=
+t_entry */
++	if (skb->len < (sizeof(__u8) + sizeof(struct conn_credit_entry)))
+ 		return -EINVAL;
+=20
+ 	ntf =3D (struct nci_core_conn_credit_ntf *)skb->data;
+@@ -364,7 +365,8 @@ static int nci_rf_discover_ntf_packet(struct nci_dev =
+*ndev,
+ 	const __u8 *data;
+ 	bool add_target =3D true;
+=20
+-	if (skb->len < sizeof(struct nci_rf_discover_ntf))
++	/* Minimal packet size is 5 if rf_tech_specific_params_len=3D0 */
++	if (skb->len < (5 * sizeof(__u8)))
+ 		return -EINVAL;
+=20
+ 	data =3D skb->data;
+@@ -596,7 +598,10 @@ static int nci_rf_intf_activated_ntf_packet(struct n=
+ci_dev *ndev,
+ 	const __u8 *data;
+ 	int err =3D NCI_STATUS_OK;
+=20
+-	if (skb->len < sizeof(struct nci_rf_intf_activated_ntf))
++	/* Minimal packet size is 11 if
++	 * f_tech_specific_params_len=3D0 and activation_params_len=3D0
++	 */
++	if (skb->len < (11 * sizeof(__u8)))
+ 		return -EINVAL;
+=20
+ 	data =3D skb->data;
+--=20
+2.52.0
 
 
