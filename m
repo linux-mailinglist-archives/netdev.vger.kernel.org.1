@@ -1,189 +1,140 @@
-Return-Path: <netdev+bounces-244157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00A0FCB0CB9
-	for <lists+netdev@lfdr.de>; Tue, 09 Dec 2025 19:07:59 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C10ECB0DFB
+	for <lists+netdev@lfdr.de>; Tue, 09 Dec 2025 19:55:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 43F5630E97E8
-	for <lists+netdev@lfdr.de>; Tue,  9 Dec 2025 18:06:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2AF45301510E
+	for <lists+netdev@lfdr.de>; Tue,  9 Dec 2025 18:54:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2A742DBF47;
-	Tue,  9 Dec 2025 18:06:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBE73303A1A;
+	Tue,  9 Dec 2025 18:54:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iPxigFvL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hgmPErcd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC6A12D7803;
-	Tue,  9 Dec 2025 18:06:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 098F22FBDF5
+	for <netdev@vger.kernel.org>; Tue,  9 Dec 2025 18:54:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765303610; cv=none; b=dvWREYin1LRyKObafWU+yaCuA/0WnpLz0cfe/vQU3wSbefybr385wgiu1KFOoUqThsuOKJbeHODYuSEd+rrVrgl3Am7O1H8Bjk0jMJxFKOZujJZG1eoNSvjQWjHMwwyvhGrpK7LuLybpBBRHPUWlCP0hfS1wCn0P8ExUw6OqARY=
+	t=1765306497; cv=none; b=ZwZpm4xbqC9C6f8R+h5kRZMjEKdIFf+T1Nhywbde/fvw7NDeU+uNZPQ6FLEz/KYJRkmwxHDNYPyS5rK0EIekBAE0oqcF/KDoA4rzHu9s0hoPaDi29lMJGuzi09OrsY14Y2oaXjx+0qC6auhPzZMANtx1nRa96pXcGHByY3IVJ2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765303610; c=relaxed/simple;
-	bh=oXy8lcGgtyzeGMTsH2PksKxqz7e9MQNYzW6NnAqIqZ8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q5VUZdeZuG4VKglhEpbWNyaFHT04jNxICgSzdx44G4z7esP6khqowN/sbAhP3L5kexLAw3gmGcluk70Qor3hvmelmozeE9dVmCQe0LqfZzrZeblh4uk3Cs29RY+2s5Y/LnlgKbe10AdMabl0YMv4KXqIuVvvQYlyG/oV6ObdGxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iPxigFvL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1616DC4CEF5;
-	Tue,  9 Dec 2025 18:06:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765303610;
-	bh=oXy8lcGgtyzeGMTsH2PksKxqz7e9MQNYzW6NnAqIqZ8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iPxigFvLniyWs5QRv642DWfvPC2ZR34AqFt6kCDRYgP5dY0nJVn/XKY92oJnnpwla
-	 PW0K47sve9XjJrVCkUfPraj0rNYKc7l1UaNCzCIVvnOaUma0KOBpn+tyBmmtyX85nx
-	 UF6KlgwtA1sic1BqMSd3q8vnPCyiPyn6v2dHJFFt8uTos5+xiVl5ORZuBeqSEj6QoC
-	 KC8AxsaYzkpa7TiYHFvKgzVLSy+dGjdzGVunWRirR+wA/QlDWNi+ROOeuNNeN0kk+N
-	 kN5zXw9pmjLiARrswBGKiEv+1V7+487qbOePu2EGdh6chECHfBhEKQwEyahzRMScj0
-	 9OtKpON4gy5NA==
-Date: Tue, 9 Dec 2025 18:06:46 +0000
-From: Simon Horman <horms@kernel.org>
-To: Wang Liang <wangliang74@huawei.com>
-Cc: chuck.lever@oracle.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, brauner@kernel.org,
-	kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, yuehaibing@huawei.com,
-	zhangchangzhong@huawei.com
-Subject: Re: [PATCH net] net/handshake: Fix null-ptr-deref in
- handshake_complete()
-Message-ID: <aThlNuc-kjPqd9kh@horms.kernel.org>
-References: <20251209115852.3827876-1-wangliang74@huawei.com>
+	s=arc-20240116; t=1765306497; c=relaxed/simple;
+	bh=oxnsSzSSQAu/Bk/v2zSRSRpD8UW0cATc07H6GarnzDA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FrVO4PhXhCDzvosam8x/xiCZ/N80GzdjXpeUpqFZCuKlhlmrHGiKiTgUjTbhH2SeK4HvOCLEC/jgUh6a+3/f5sw5CQtYJBKyB85E3MHFXSuiJ1eTujw4ovaseGu+VXfGjqVX8Cb6aZmEMbZ6sfxZJkdGo1ZLDxrKOkOpR6zTClw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hgmPErcd; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-47775fb6c56so51557355e9.1
+        for <netdev@vger.kernel.org>; Tue, 09 Dec 2025 10:54:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765306494; x=1765911294; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HpdLUaMszOte+9P9trLbr49o0T/8IL0zVkv1y9a6ACQ=;
+        b=hgmPErcdpbOmWNv97DFI6MjvwovMomPavckD2iQ/zkYmw1PxLyXmJNwIWcKt5I0EDk
+         U+5r5ujCHuKSyWjPGyaBIqyP4UmwKS+lUsWnqCCLTwKg5GbDGIkrA16ZidVCfyFlDwCU
+         hPT2D9Ki5Tl88Y0jMGMa3SPDMA7LYl2LbkUT2fOsuwB1psGSHE93Twai/5sDGyyyeBSI
+         TPQxA6fONxJKZjbFxAa53IJsk3n2T4gytPU7mD5H2QKFqRi9ESqMzGwApHiWW0P9uciX
+         N17Av0DtfJjkw7TJ6YyWk/JmhOV8uS7XcLGfr2WhQHXYLXg35yxesgy4BqgXfzIYdr6A
+         0iKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765306494; x=1765911294;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=HpdLUaMszOte+9P9trLbr49o0T/8IL0zVkv1y9a6ACQ=;
+        b=pxSDf1CIDIVUSdqLZ+zbLVg4Clz54IgL+K7SGFYXUHCIIfMSYzGAIHUkDwssCMa3GA
+         pOSAK5i+rioq7JBwpbWduiBZ5elhqI/ZhDgZ6HGqSRTMyEz+3UCuJRAzz3u1192QfB3l
+         GHSaIu6jjhZxLxgJFyatBav6grY/rhj1SaQB9fryJL1LkMbZkFcsH3w+wlHrjr51WBfI
+         8kUYORwyP2FUj6kFglI5AHync+BbtPZ8CIH/eNW+kFFXkoWBgQ2Gp/uhLStxTipogK/A
+         yaKhyb45Ev8I4+vdxzRv6ZqOjg0+Zr+o1egcN3T62XBWw7ozSwxufDxLfKujJrNuJjM9
+         OlEA==
+X-Forwarded-Encrypted: i=1; AJvYcCXtuxG3b4jlnz8/PClHPTe+d7sOZxoCuC88rsXXy8PKFcJRAqpCpTdPN+2ecMTraDlPGZ5dJpQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXIN6xJXfhUuq39MM6Q3Vv1fAqMC7udFlhzIi15ZImO9PCY8Zw
+	6ZMgm9SGse1ffzlf5fyjIIH2E2piuxcA2WzoPDpXEg2xp3HWtKlW2Tat
+X-Gm-Gg: ASbGncumLuRiZMaZizbUm4tUYqUQF10HEQ5grvrayVgOTQ+4hC52r3cHFHEL+FH1GhL
+	r51mSVFoQOihsQeiHWTQfKYofTsxtaEMG/Ru0umwuYNFahJVfXYssZyToP3jnr+Z5E/MSeTGnlo
+	DNI1QkrwE7FcB0uisNXBrDqmpwpgWYY1WiEmzt4/DKh0MpG99ZDE9GHTR30cr/l/0nLpbJLe1MM
+	K3sbNgWLUkyFGhdoJ7aE/zatr/pD80lRILuUvf25ALNCOfhvAw3zHx/FgkpHz52hPf0v0JebHf2
+	i2Y+ZUU5MfRnoaNCn+dG972xzOz/Ua0XGrqKkDKwVf4Y9VdgHXY1OkRW7IIvOixMlQ2R9CAYX2I
+	TGXC8nzC5OnCBa6vB9gpEeYmcyxSnnyvIRWg+oXlnWZniYPCh18OHcEgXQAMjhahpVSdusalzhl
+	wsr5zLP3nN+qzXUe+lkK6qNEZTU4lMtimWDxxSY1F5M+akoKSUfVjAJKB/OWvt3r8=
+X-Google-Smtp-Source: AGHT+IFirw91TWSXU8QHpRvuGGX1U+haycOXGSNcwfW+RwtLxsf2h/xkUvj8XnU+zmLfR4fhgmr1+A==
+X-Received: by 2002:a05:600c:444a:b0:477:6e02:54a5 with SMTP id 5b1f17b1804b1-47939e20a92mr115156485e9.18.1765306494210;
+        Tue, 09 Dec 2025 10:54:54 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42f7d331092sm33581359f8f.30.2025.12.09.10.54.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Dec 2025 10:54:53 -0800 (PST)
+Date: Tue, 9 Dec 2025 18:54:52 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Andy Shevchenko <andriy.shevchenko@intel.com>
+Cc: Yury Norov <yury.norov@gmail.com>, Rasmus Villemoes
+ <linux@rasmusvillemoes.dk>, linux-kernel@vger.kernel.org,
+ linux-usb@vger.kernel.org, Geert Uytterhoeven <geert+renesas@glider.be>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>, Jonathan Cameron
+ <Jonathan.Cameron@huawei.com>, Crt Mori <cmo@melexis.com>, Richard Genoud
+ <richard.genoud@bootlin.com>, Luo Jie <quic_luoj@quicinc.com>, Peter
+ Zijlstra <peterz@infradead.org>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, Simon
+ Horman <simon.horman@netronome.com>, Mika Westerberg
+ <mika.westerberg@linux.intel.com>, Andreas Noever
+ <andreas.noever@gmail.com>, Yehezkel Bernat <YehezkelShB@gmail.com>,
+ Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+Subject: Re: [PATCH 3/9] bitmap: Use FIELD_PREP() in expansion of
+ FIELD_PREP_WM16()
+Message-ID: <20251209185452.707f4dbe@pumpkin>
+In-Reply-To: <aThETSRch_okmCbe@smile.fi.intel.com>
+References: <20251209100313.2867-1-david.laight.linux@gmail.com>
+	<20251209100313.2867-4-david.laight.linux@gmail.com>
+	<aThETSRch_okmCbe@smile.fi.intel.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251209115852.3827876-1-wangliang74@huawei.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Dec 09, 2025 at 07:58:52PM +0800, Wang Liang wrote:
-> A null pointer dereference in handshake_complete() was observed [1].
+On Tue, 9 Dec 2025 17:46:21 +0200
+Andy Shevchenko <andriy.shevchenko@intel.com> wrote:
+
+> On Tue, Dec 09, 2025 at 10:03:07AM +0000, david.laight.linux@gmail.com wrote:
 > 
-> When handshake_req_next() return NULL in handshake_nl_accept_doit(),
-> function handshake_complete() will be called unexpectedly which triggers
-> this crash. Fix it by goto out_status when req is NULL.
+> > Instead of directly expanding __BF_FIELD_CHECK() (which really ought
+> > not be used outside bitfield) and open-coding the generation of the
+> > masked value, just call FIELD_PREP() and add an extra check for
+> > the mask being at most 16 bits.  
 > 
-> [1]
-> Oops: general protection fault, probably for non-canonical address 0xdffffc0000000005: 0000 [#1] SMP KASAN PTI
-> RIP: 0010:handshake_complete+0x36/0x2b0 net/handshake/request.c:288
-> Call Trace:
->  <TASK>
->  handshake_nl_accept_doit+0x32d/0x7e0 net/handshake/netlink.c:129
->  genl_family_rcv_msg_doit+0x204/0x300 net/netlink/genetlink.c:1115
->  genl_family_rcv_msg+0x436/0x670 net/netlink/genetlink.c:1195
->  genl_rcv_msg+0xcc/0x170 net/netlink/genetlink.c:1210
->  netlink_rcv_skb+0x14c/0x430 net/netlink/af_netlink.c:2550
->  genl_rcv+0x2d/0x40 net/netlink/genetlink.c:1219
->  netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
->  netlink_unicast+0x878/0xb20 net/netlink/af_netlink.c:1344
->  netlink_sendmsg+0x897/0xd70 net/netlink/af_netlink.c:1894
->  sock_sendmsg_nosec net/socket.c:727 [inline]
->  __sock_sendmsg net/socket.c:742 [inline]
->  ____sys_sendmsg+0xa39/0xbf0 net/socket.c:2592
->  ___sys_sendmsg+0x121/0x1c0 net/socket.c:2646
->  __sys_sendmsg+0x155/0x200 net/socket.c:2678
->  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->  do_syscall_64+0x5f/0x350 arch/x86/entry/syscall_64.c:94
->  entry_SYSCALL_64_after_hwframe+0x76/0x7e
->  </TASK>
+> ...
 > 
-> Fixes: fe67b063f687 ("net/handshake: convert handshake_nl_accept_doit() to FD_PREPARE()")
-> Signed-off-by: Wang Liang <wangliang74@huawei.com>
-> ---
->  net/handshake/netlink.c | 35 ++++++++++++++++++-----------------
->  1 file changed, 18 insertions(+), 17 deletions(-)
+> > +#define FIELD_PREP_WM16(mask, val)				\
+> > +({								\
+> > +	__auto_type _mask = mask;				\
+> > +	u32 _val = FIELD_PREP(_mask, val);			\  
 > 
-> diff --git a/net/handshake/netlink.c b/net/handshake/netlink.c
-> index 1d33a4675a48..cdaea8b8d004 100644
-> --- a/net/handshake/netlink.c
-> +++ b/net/handshake/netlink.c
-> @@ -106,25 +106,26 @@ int handshake_nl_accept_doit(struct sk_buff *skb, struct genl_info *info)
->  
->  	err = -EAGAIN;
->  	req = handshake_req_next(hn, class);
-> -	if (req) {
-> -		sock = req->hr_sk->sk_socket;
-> -
-> -		FD_PREPARE(fdf, O_CLOEXEC, sock->file);
-> -		if (fdf.err) {
-> -			err = fdf.err;
-> -			goto out_complete;
-> -		}
-> -
-> -		get_file(sock->file); /* FD_PREPARE() consumes a reference. */
-> -		err = req->hr_proto->hp_accept(req, info, fd_prepare_fd(fdf));
-> -		if (err)
-> -			goto out_complete; /* Automatic cleanup handles fput */
-> -
-> -		trace_handshake_cmd_accept(net, req, req->hr_sk, fd_prepare_fd(fdf));
-> -		fd_publish(fdf);
-> -		return 0;
-> +	if (!req)
-> +		goto out_status;
-> +
-> +	sock = req->hr_sk->sk_socket;
-> +
-> +	FD_PREPARE(fdf, O_CLOEXEC, sock->file);
-> +	if (fdf.err) {
-> +		err = fdf.err;
-> +		goto out_complete;
->  	}
->  
-> +	get_file(sock->file); /* FD_PREPARE() consumes a reference. */
-> +	err = req->hr_proto->hp_accept(req, info, fd_prepare_fd(fdf));
-> +	if (err)
-> +		goto out_complete; /* Automatic cleanup handles fput */
-> +
-> +	trace_handshake_cmd_accept(net, req, req->hr_sk, fd_prepare_fd(fdf));
-> +	fd_publish(fdf);
-> +	return 0;
-> +
->  out_complete:
->  	handshake_complete(req, -EIO, NULL);
->  out_status:
+> > +	BUILD_BUG_ON_MSG(_mask > 0xffffu,			\
+> > +			 "FIELD_PREP_WM16: mask too large");	\  
+> 
+> Can it be static_assert() instead?
 
-Hi,
+No, they have to be 'integer constant expressions' not just
+'compile time constants'.
+Pretty useless for anything non-trivial.
 
-Clang 21.1.7 W=1 builds are rather unhappy about this:
+	David
 
-  net/handshake/netlink.c:110:3: error: cannot jump from this goto statement to its label
-    110 |                 goto out_status;
-        |                 ^
-  net/handshake/netlink.c:114:13: note: jump bypasses initialization of variable with __attribute__((cleanup))
-    114 |         FD_PREPARE(fdf, O_CLOEXEC, sock->file);
-        |                    ^
-  net/handshake/netlink.c:104:3: error: cannot jump from this goto statement to its label
-    104 |                 goto out_status;
-        |                 ^
-  net/handshake/netlink.c:114:13: note: jump bypasses initialization of variable with __attribute__((cleanup))
-    114 |         FD_PREPARE(fdf, O_CLOEXEC, sock->file);
-        |                    ^
-  net/handshake/netlink.c:100:3: error: cannot jump from this goto statement to its label
-    100 |                 goto out_status;
-        |                 ^
-  net/handshake/netlink.c:114:13: note: jump bypasses initialization of variable with __attribute__((cleanup))
-    114 |         FD_PREPARE(fdf, O_CLOEXEC, sock->file);
-        |                    ^
+> 
+> > +	_val | (_mask << 16);					\
+> > +})  
+> 
 
-My undersatnding of the problem is as follows:
-
-FD_PREPARE uses __cleanup to call class_fd_prepare_destructor when
-resources when fdf goes out of scope.
-
-Prior to this patch this was when the if (req) block was existed.
-Either via return or a goto due to an error.
-
-Now it is when handshake_nl_accept_doit() itself is exited.
-Again via a return or a goto due to error.
-
-But, importantly, such a goto can now occur before fdf is initialised.
-Boom!
-
--- 
-pw-bot: changes-requested
 
