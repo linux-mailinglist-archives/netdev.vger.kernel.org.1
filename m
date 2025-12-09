@@ -1,78 +1,88 @@
-Return-Path: <netdev+bounces-244129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 828F9CB012C
-	for <lists+netdev@lfdr.de>; Tue, 09 Dec 2025 14:37:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 82300CB0158
+	for <lists+netdev@lfdr.de>; Tue, 09 Dec 2025 14:47:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 278B33074CC4
-	for <lists+netdev@lfdr.de>; Tue,  9 Dec 2025 13:37:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 33F9130A7301
+	for <lists+netdev@lfdr.de>; Tue,  9 Dec 2025 13:46:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0427F327216;
-	Tue,  9 Dec 2025 13:37:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57E5832E6B7;
+	Tue,  9 Dec 2025 13:39:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jdnI/NN4"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="kcSkgsaJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from canpmsgout07.his.huawei.com (canpmsgout07.his.huawei.com [113.46.200.222])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D782221D96;
-	Tue,  9 Dec 2025 13:37:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD7D0328249;
+	Tue,  9 Dec 2025 13:39:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.222
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765287431; cv=none; b=Uzs54JWhkAF7PkBw5WpQ/sC/+t7aNTwirrFG4bzv5u07DDPKDawdHAwWn8KYKrZpyp+qdJfc41v6jsu9qpsenx6WtJn/QbPJhjxDn1LQxJoFfXnqZ+b2Ed1ZIyqjDiHj/EsyLleFf1XhKUHvkpEHDpB41JcygcMVP6IVeveH9vw=
+	t=1765287579; cv=none; b=XT3IbzMwyIJ+ODwdi0tNFZbSjDc7aX3EeU6Ws9SnWiXkdIYvZwhGeqbsEGAnLUSIoo49vAwqn7xjjKM92gI4uwiS5YzaDRKRNbewdWwPzh5cPuLNfh2DYVbCMGAsJlFTJPECe0o3Tyyb3/5mqF/mJIgwqLv6WjzpDuLljvTXfzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765287431; c=relaxed/simple;
-	bh=muuB0RdQ1Ps1jrTh03xzMRZ51ve6oMC3M/a6DjHI4uc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gslwAFCjLxuqr7myZ9lqEb9pokLjvG/n/O0rmNOQmZUlh3UijIdisSpjuNetnji4O14ouwx20x7l44NXYMsk5CT4PnTzL/EUQ8OEp/sA/OnIq0ocoOk6SJh9XNG/+1zCXstduyzif/3lqogsOUxILGZ2oeN5VcKZueRHe9/iSUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jdnI/NN4; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=s9MvnYuP6roOHf+OO0pXHIi0RkgGQOPsyaTOJ7Yh0y4=; b=jdnI/NN4SuhC0Gc4N/ZGAbLm8i
-	i00p/vJBNR0aybwvEaOf/7i+MjovUrg/H0BFHaxCmv96xunzyn+er8WnKLpUeUXasPrd/bhUP/xQb
-	va3NQm+1y+68hhZfnE+k+iaEfk9Dv+YGL2nfEau0EcjCuphANAW/epf4XGHSPoR+s/QI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vSxth-00GTIF-8M; Tue, 09 Dec 2025 14:36:57 +0100
-Date: Tue, 9 Dec 2025 14:36:57 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Vivek Pernamitta <vivek.pernamitta@oss.qualcomm.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Manivannan Sadhasivam <mani@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, mhi@lists.linux.dev,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v6 1/2] net: mhi: Enable Ethernet interface support
-Message-ID: <5a137b11-fa08-40b5-b4b4-79d10844a5b7@lunn.ch>
-References: <20251209-vdev_next-20251208_eth_v6-v6-0-80898204f5d8@quicinc.com>
- <20251209-vdev_next-20251208_eth_v6-v6-1-80898204f5d8@quicinc.com>
+	s=arc-20240116; t=1765287579; c=relaxed/simple;
+	bh=Zp0Pr4N/37r/YAgWiAT6epd+gmIdHQmJw9AvGx4czCI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UcDp1JbM7T/NzTtZSkiwtk8dDWCyM2yK46hohuvqrm50J40wKa5lB6WkjsNK6vkJbvCIeHx87VJMlCEE1im12TZn+s7/6CKM7RZYxu5BTQuMh3JWa0kAOh5gsEqTqnn1RmPBlSDAmZdwsDdNWB69tx/zhxPS0DKKE8/35fpgf3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=kcSkgsaJ; arc=none smtp.client-ip=113.46.200.222
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=rJrtuABW4FVkqAMHKhBPK/0KROz+PdPZF4hhgxrlpWg=;
+	b=kcSkgsaJf+gMDy+ygCDwSmjVhTwmioBZE+uXB9HXUm06IvmTiS5KHfNk3NCAg41lExCFKSDYf
+	nkOZCbTdUP0Ry+mx+go3XyL7GtziAoq27zpQXiWgRlZtOB257hlsv82m6JZcLrdZPDqXHln9Kqv
+	ygAsS7T4H6GFK2I+DLzEsjw=
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by canpmsgout07.his.huawei.com (SkyGuard) with ESMTPS id 4dQfzj26ZYzLlTc;
+	Tue,  9 Dec 2025 21:37:37 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id D67B814011F;
+	Tue,  9 Dec 2025 21:39:32 +0800 (CST)
+Received: from localhost.localdomain (10.90.31.46) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 9 Dec 2025 21:39:32 +0800
+From: Jijie Shao <shaojijie@huawei.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
+CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
+	<chenhao418@huawei.com>, <lantao5@huawei.com>,
+	<huangdonghua3@h-partners.com>, <yangshuaisong@h-partners.com>,
+	<jonathan.cameron@huawei.com>, <salil.mehta@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<shaojijie@huawei.com>
+Subject: [PATCH net 0/3] There are some bugfix for the HNS3 ethernet driver
+Date: Tue, 9 Dec 2025 21:38:22 +0800
+Message-ID: <20251209133825.3577343-1-shaojijie@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251209-vdev_next-20251208_eth_v6-v6-1-80898204f5d8@quicinc.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems200002.china.huawei.com (7.221.188.68) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
->  	ndev = alloc_netdev(sizeof(struct mhi_net_dev), info->netname,
-> -			    NET_NAME_PREDICTABLE, mhi_net_setup);
-> +			    NET_NAME_PREDICTABLE, info->ethernet_if ?
-> +			    mhi_ethernet_setup : mhi_net_setup);
+There are some bugfix for the HNS3 ethernet driver
 
-Is the name predictable? I thought "eth%d" was considered
-NET_NAME_ENUM?
+Jian Shen (3):
+  net: hns3: using the num_tqps in the vf driver to apply for resources
+  net: hns3: using the num_tqps to check whether tqp_index is out of
+    range when vf get ring info from mbx
+  net: hns3: add VLAN id validation before using
 
-https://elixir.bootlin.com/linux/v6.18/source/net/ethernet/eth.c#L382
+ drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c   | 3 +++
+ drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_mbx.c    | 4 ++--
+ drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c | 4 ++--
+ 3 files changed, 7 insertions(+), 4 deletions(-)
 
-	Andrew
+-- 
+2.33.0
+
 
