@@ -1,174 +1,200 @@
-Return-Path: <netdev+bounces-244139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 584D2CB0497
-	for <lists+netdev@lfdr.de>; Tue, 09 Dec 2025 15:29:39 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21A7ECB04E0
+	for <lists+netdev@lfdr.de>; Tue, 09 Dec 2025 15:40:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2201A304FBB9
-	for <lists+netdev@lfdr.de>; Tue,  9 Dec 2025 14:29:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9A8CF304D9E7
+	for <lists+netdev@lfdr.de>; Tue,  9 Dec 2025 14:39:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7895B2D3A75;
-	Tue,  9 Dec 2025 14:29:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E4EB2FE052;
+	Tue,  9 Dec 2025 14:39:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S+Qi2njg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com [209.85.161.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B211F2C0F62
-	for <netdev@vger.kernel.org>; Tue,  9 Dec 2025 14:29:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 447712FDC3C
+	for <netdev@vger.kernel.org>; Tue,  9 Dec 2025 14:39:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765290561; cv=none; b=Pxn4JZufq/I5y74d4UZKc+tUO9f30Z5Tzy4E7P7xz8MSpfoQpmLkgSlxNdouKhOR+7gJ7UNA2RBVjTlx0b2oR16zO9s3EBmMtbfhscdJ6CXftLYauij6lVHbck7igCwUYCkoy7vu79qe4fkRBfFH32grugqW+3511QQhKrLYU74=
+	t=1765291195; cv=none; b=F627MxO91ldjyi73ple4/e2MEEwlrWxd5dWcngLGRcIFAf8hxHX/2TCGOK9fcESZ4BmIhMvass3+nFttFhsdV3vxMXfnp22cxaywl2ZKujk84kL8hay/HGSwyCrdS1Ex1I+ICKQ9xiXYqgn5TDIJLQRD2+B6yc1dGdCy7BuF/Z8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765290561; c=relaxed/simple;
-	bh=T0G52xhxUV+hYN4E35qF6scATXQaRtY2ha70EFkuzEw=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=IWGaHKaXjnUxdrHx+cMEKZ8HQVgn0DU6uMWm4Nri19GRxfwjcp+2qn+caw6UKvYevjAVMzSHYlcwicZsNKKBk34tEAo2DGTRs8wyeX6gLhhskV0gov7vLx+XpPMXYm2oWIkagKcW7pKh//9BcEBnpCnybRE0a/fceXGFCBvr42k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-65b26eca9c7so283119eaf.0
-        for <netdev@vger.kernel.org>; Tue, 09 Dec 2025 06:29:19 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765290559; x=1765895359;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cYysQufbw2nCVl6oggUjelGPf4Gr2nSJlqFfZmaYsc0=;
-        b=WlVKH02ctPShMXXtLEiYDB4XeycdGrMR8LI0XO2SpWhS2IzByQcMK3axDhUWFgMSIw
-         FRJ9nXIr/Pr9luObcrUdHNPASDyF+gC2hzitrjVuZdzlQPN0eko7wskj+gvATAGA4UVj
-         1S/h2Sbqkoz1KkH+Q8pqCXz34iMUgw//WnaYmZDeVGFPht/SNuHM3GmqHU0LEDPTo6AG
-         Rt1g+SMPLUHjY6hA+gI3AKVw5qnpQNIbduNYD8DGmk9fh09NAg2PgPuoMK3HDLUbqVf9
-         KqtUvEZDBr82gsL0OnVFczoVHrDvhvsytDe/hMg1/ezbqilP7iJJH/Uqsxsz/g+f7iqZ
-         qz9w==
-X-Forwarded-Encrypted: i=1; AJvYcCX8yXJlJa/ZEI3dOBxciSk2bBSdshFpGZp475jK49Xg7ZSzlLi5OyvkEfFZ80UU3v9g2a5ZZL8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHKGpBST7P0UUreP0i4a7A6hgqCz0xH7rPi3g+CbdJY8wYrWgA
-	f1jmkXdpZARUqbx818xm6CwXsqbpGhYNN5o0ovPutsTbrUFpTfowOD7s889cdo1rAd+NAlQM4Kl
-	w3vPJGqboQyMfBGuSP4/JClpuTUOqwwKH/yfMJyQMFrgX8wOShFZkCigjj2Q=
-X-Google-Smtp-Source: AGHT+IEatLqMbS9wA0XrZ4QZ0mXraxrZAAaImbAlRgVX00IaRbeJeNur+JjISBk2uuFxuF1VO63cDpP6qJU9lRifpRhwsmQFZ6Bz
+	s=arc-20240116; t=1765291195; c=relaxed/simple;
+	bh=1hF3HAgQ1cEsZk2uWR3S2uVVcw4wBuKrck+ymnignT8=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=oEqjeaHxu/LxIpisyU1sBb5p8KGuycsXjlshQ6xT6wX03KXKMXwq4emS1QSGsp2OROI7SPGsESP6AmLxo3YG66z18SeYkeX9NcS2jawRHxDj2vZsqbjRyNP8Ws4lwMwIiSAKDAXwrmlPwOYA8w/ezx6FLFo6/C5f0TBTWXqQAT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S+Qi2njg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71945C4AF09;
+	Tue,  9 Dec 2025 14:39:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765291194;
+	bh=1hF3HAgQ1cEsZk2uWR3S2uVVcw4wBuKrck+ymnignT8=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=S+Qi2njgbf50RzpccDh8b3izRHBU3uR4WWOWek/16607VKFUNARI7aDnuWuN4/FGI
+	 /LW00HXI4rZ3+X/VlR6UkbWmZp6NujR9jvkS8gO/ee3HcoQz4bA3XfMI+0vIhyZJ0r
+	 MjYqbqQ/vsvRieSk85yigHEtXulKG5rIRrDCbWs/17zIQ99GJbbkjb9uQ6UKJdfTEv
+	 HC4ulDPmgX3FDPnLHPV2yvNHzzMCocywIhYDugTcfn8cJxga+ILDOpui3N6CzUi701
+	 U5z6OW6xR0d5LdrZ//TtE9Fz7ijnc6q96AHIoiCBeOKsOKVfMr+dEeUXe/xHVVOiym
+	 0J1YVt7ZaOaGg==
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 727BAF4006D;
+	Tue,  9 Dec 2025 09:39:53 -0500 (EST)
+Received: from phl-imap-15 ([10.202.2.104])
+  by phl-compute-10.internal (MEProxy); Tue, 09 Dec 2025 09:39:53 -0500
+X-ME-Sender: <xms:uTQ4abvfypaoG8e9QvO-6VluTDP26hJrM75z6HQ_l1T51rn28eZhNg>
+    <xme:uTQ4aXQYVr-rSlugkOO5cOicLexvFJo1jdRO5ITyux5MiTiN9Mv4HZG0pEyYWP5lP
+    Rm7En7-LVTWv_kV-VtofcUJSoYh5K6_945QXK9E23xCyC2BLfiVhcN3>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdduleekvdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefoggffhffvvefkjghfufgtgfesthejredtredttdenucfhrhhomhepfdevhhhutghk
+    ucfnvghvvghrfdcuoegtvghlsehkvghrnhgvlhdrohhrgheqnecuggftrfgrthhtvghrnh
+    epjeevhfduheeltedvjefhjeevgffhleegjeevvdfgudeuffefgedtjeeuhfeiudeknecu
+    ffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtnecurf
+    grrhgrmhepmhgrihhlfhhrohhmpegthhhutghklhgvvhgvrhdomhgvshhmthhprghuthhh
+    phgvrhhsohhnrghlihhthidqudeifeegleelleehledqfedvleekgeegvdefqdgtvghlpe
+    epkhgvrhhnvghlrdhorhhgsehfrghsthhmrghilhdrtghomhdpnhgspghrtghpthhtohep
+    udefpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegurghvvghmsegurghvvghmlh
+    hofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdp
+    rhgtphhtthhopeifrghnghhlihgrnhhgjeegsehhuhgrfigvihdrtghomhdprhgtphhtth
+    hopeihuhgvhhgrihgsihhngheshhhurgifvghirdgtohhmpdhrtghpthhtohepiihhrghn
+    ghgthhgrnhhgiihhohhngheshhhurgifvghirdgtohhmpdhrtghpthhtohepsghrrghunh
+    gvrheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdho
+    rhhgpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkvg
+    hrnhgvlhdqthhlshdqhhgrnhgushhhrghkvgeslhhishhtshdrlhhinhhugidruggvvh
+X-ME-Proxy: <xmx:uTQ4aW9QbPWlXptec3eKx7VW8-K6ycYU7hs1xGjrCFV9vdqm08EA9g>
+    <xmx:uTQ4aabse9VAS7OnY1KJQAFNFMtxWjM6zzW-fm6P0boq1u1wnaUWmg>
+    <xmx:uTQ4aUo04CAnAahCaqVDI5h-awvzgmM3dn0WmDqcBgQRCAJeOSyO_g>
+    <xmx:uTQ4af0GKf_oToO_wXwMSVMUVhrgvv_fblidPLpOsptVysYQlPGvLg>
+    <xmx:uTQ4acnPZXdtKyPYi4j96Xfxu5ybcocDCfqFkJMQKCwzVW9_A5SbXj_F>
+Feedback-ID: ifa6e4810:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 4C0CA780054; Tue,  9 Dec 2025 09:39:53 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:2911:b0:659:9a49:9077 with SMTP id
- 006d021491bc7-6599a97d923mr4163676eaf.66.1765290558915; Tue, 09 Dec 2025
- 06:29:18 -0800 (PST)
-Date: Tue, 09 Dec 2025 06:29:18 -0800
-In-Reply-To: <20251209085950.96231-1-kerneljasonxing@gmail.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6938323e.a70a0220.104cf0.0008.GAE@google.com>
-Subject: [syzbot ci] Re: xsk: introduce pre-allocated memory per xsk CQ
-From: syzbot ci <syzbot+cib018e69d32b0c0b5@syzkaller.appspotmail.com>
-To: ast@kernel.org, bjorn@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
-	hawk@kernel.org, john.fastabend@gmail.com, jonathan.lemon@gmail.com, 
-	kerneljasonxing@gmail.com, kernelxing@tencent.com, kuba@kernel.org, 
-	maciej.fijalkowski@intel.com, magnus.karlsson@intel.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com, sdf@fomichev.me
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-
-syzbot ci has tested the following series
-
-[v1] xsk: introduce pre-allocated memory per xsk CQ
-https://lore.kernel.org/all/20251209085950.96231-1-kerneljasonxing@gmail.com
-* [PATCH bpf-next v1 1/2] xsk: introduce local_cq for each af_xdp socket
-* [PATCH bpf-next v1 2/2] xsk: introduce a dedicated local completion queue for each xsk
-
-and found the following issue:
-WARNING in vfree
-
-Full report is available here:
-https://ci.syzbot.org/series/5df45d2b-41d6-4675-b3ad-4503516a9ae1
-
-***
-
-WARNING in vfree
-
-tree:      bpf-next
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/bpf/bpf-next.git
-base:      835a50753579aa8368a08fca307e638723207768
-arch:      amd64
-compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-config:    https://ci.syzbot.org/builds/726617c2-a613-4879-9987-91e65545dba1/config
-C repro:   https://ci.syzbot.org/findings/0c82a0b1-8cb3-49ae-9fbe-fa3bd02c2ba0/c_repro
-syz repro: https://ci.syzbot.org/findings/0c82a0b1-8cb3-49ae-9fbe-fa3bd02c2ba0/syz_repro
-
-------------[ cut here ]------------
-Trying to vfree() nonexistent vm area (ffffc900034e6000)
-WARNING: mm/vmalloc.c:3423 at 0x0, CPU#0: syz.0.19/5983
-Modules linked in:
-CPU: 0 UID: 0 PID: 5983 Comm: syz.0.19 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:vfree+0x393/0x400 mm/vmalloc.c:3422
-Code: e8 72 1d ab ff 4c 89 f7 48 83 c4 18 5b 41 5c 41 5d 41 5e 41 5f 5d e9 0c fa ff ff e8 57 1d ab ff 48 8d 3d 10 fc 6e 0d 4c 89 f6 <67> 48 0f b9 3a e9 fd fd ff ff e8 3e 1d ab ff 4c 89 e7 e8 66 00 00
-RSP: 0018:ffffc90004e37c40 EFLAGS: 00010293
-RAX: ffffffff82162d09 RBX: 0000000000000000 RCX: ffff88816c66d7c0
-RDX: 0000000000000000 RSI: ffffc900034e6000 RDI: ffffffff8f852920
-RBP: 1ffff1102289d8bf R08: ffff88810005f1bb R09: 1ffff1102000be37
-R10: dffffc0000000000 R11: ffffed102000be38 R12: ffff88801eed1818
-R13: dffffc0000000000 R14: ffffc900034e6000 R15: ffff8881144ec608
-FS:  0000555574db2500(0000) GS:ffff88818eab1000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00002000000000c0 CR3: 0000000112a48000 CR4: 00000000000006f0
-Call Trace:
- <TASK>
- xsk_clear_local_cq net/xdp/xsk.c:1188 [inline]
- xsk_release+0x6b3/0x880 net/xdp/xsk.c:1220
- __sock_release net/socket.c:653 [inline]
- sock_close+0xc3/0x240 net/socket.c:1446
- __fput+0x44c/0xa70 fs/file_table.c:468
- task_work_run+0x1d4/0x260 kernel/task_work.c:233
- resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
- __exit_to_user_mode_loop kernel/entry/common.c:44 [inline]
- exit_to_user_mode_loop+0xff/0x4f0 kernel/entry/common.c:75
- __exit_to_user_mode_prepare include/linux/irq-entry-common.h:226 [inline]
- syscall_exit_to_user_mode_prepare include/linux/irq-entry-common.h:256 [inline]
- syscall_exit_to_user_mode_work include/linux/entry-common.h:159 [inline]
- syscall_exit_to_user_mode include/linux/entry-common.h:194 [inline]
- do_syscall_64+0x2e3/0xf80 arch/x86/entry/syscall_64.c:100
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7eff8518f7c9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffd6ca61b78 EFLAGS: 00000246 ORIG_RAX: 00000000000001b4
-RAX: 0000000000000000 RBX: 000000000001253b RCX: 00007eff8518f7c9
-RDX: 0000000000000000 RSI: 000000000000001e RDI: 0000000000000003
-RBP: 0000000000000000 R08: 0000000000000001 R09: 000000086ca61e6f
-R10: 0000001b2f920000 R11: 0000000000000246 R12: 00007eff853e5fac
-R13: 00007eff853e5fa0 R14: ffffffffffffffff R15: 0000000000000003
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	e8 72 1d ab ff       	call   0xffab1d77
-   5:	4c 89 f7             	mov    %r14,%rdi
-   8:	48 83 c4 18          	add    $0x18,%rsp
-   c:	5b                   	pop    %rbx
-   d:	41 5c                	pop    %r12
-   f:	41 5d                	pop    %r13
-  11:	41 5e                	pop    %r14
-  13:	41 5f                	pop    %r15
-  15:	5d                   	pop    %rbp
-  16:	e9 0c fa ff ff       	jmp    0xfffffa27
-  1b:	e8 57 1d ab ff       	call   0xffab1d77
-  20:	48 8d 3d 10 fc 6e 0d 	lea    0xd6efc10(%rip),%rdi        # 0xd6efc37
-  27:	4c 89 f6             	mov    %r14,%rsi
-* 2a:	67 48 0f b9 3a       	ud1    (%edx),%rdi <-- trapping instruction
-  2f:	e9 fd fd ff ff       	jmp    0xfffffe31
-  34:	e8 3e 1d ab ff       	call   0xffab1d77
-  39:	4c 89 e7             	mov    %r12,%rdi
-  3c:	e8                   	.byte 0xe8
-  3d:	66 00 00             	data16 add %al,(%rax)
+X-ThreadId: AWkGxD5CsV8Z
+Date: Tue, 09 Dec 2025 09:39:25 -0500
+From: "Chuck Lever" <cel@kernel.org>
+To: "Wang Liang" <wangliang74@huawei.com>,
+ "Chuck Lever" <chuck.lever@oracle.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ "Simon Horman" <horms@kernel.org>, "Christian Brauner" <brauner@kernel.org>
+Cc: kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yuehaibing@huawei.com,
+ zhangchangzhong@huawei.com
+Message-Id: <13914223-071e-4374-882b-d6ca5257b751@app.fastmail.com>
+In-Reply-To: <20251209115852.3827876-1-wangliang74@huawei.com>
+References: <20251209115852.3827876-1-wangliang74@huawei.com>
+Subject: Re: [PATCH net] net/handshake: Fix null-ptr-deref in handshake_complete()
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
 
-***
 
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
+On Tue, Dec 9, 2025, at 6:58 AM, Wang Liang wrote:
+> A null pointer dereference in handshake_complete() was observed [1].
+>
+> When handshake_req_next() return NULL in handshake_nl_accept_doit(),
+> function handshake_complete() will be called unexpectedly which triggers
+> this crash. Fix it by goto out_status when req is NULL.
+>
+> [1]
+> Oops: general protection fault, probably for non-canonical address 
+> 0xdffffc0000000005: 0000 [#1] SMP KASAN PTI
+> RIP: 0010:handshake_complete+0x36/0x2b0 net/handshake/request.c:288
+> Call Trace:
+>  <TASK>
+>  handshake_nl_accept_doit+0x32d/0x7e0 net/handshake/netlink.c:129
+>  genl_family_rcv_msg_doit+0x204/0x300 net/netlink/genetlink.c:1115
+>  genl_family_rcv_msg+0x436/0x670 net/netlink/genetlink.c:1195
+>  genl_rcv_msg+0xcc/0x170 net/netlink/genetlink.c:1210
+>  netlink_rcv_skb+0x14c/0x430 net/netlink/af_netlink.c:2550
+>  genl_rcv+0x2d/0x40 net/netlink/genetlink.c:1219
+>  netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+>  netlink_unicast+0x878/0xb20 net/netlink/af_netlink.c:1344
+>  netlink_sendmsg+0x897/0xd70 net/netlink/af_netlink.c:1894
+>  sock_sendmsg_nosec net/socket.c:727 [inline]
+>  __sock_sendmsg net/socket.c:742 [inline]
+>  ____sys_sendmsg+0xa39/0xbf0 net/socket.c:2592
+>  ___sys_sendmsg+0x121/0x1c0 net/socket.c:2646
+>  __sys_sendmsg+0x155/0x200 net/socket.c:2678
+>  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>  do_syscall_64+0x5f/0x350 arch/x86/entry/syscall_64.c:94
+>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>  </TASK>
+>
+> Fixes: fe67b063f687 ("net/handshake: convert handshake_nl_accept_doit() 
+> to FD_PREPARE()")
+> Signed-off-by: Wang Liang <wangliang74@huawei.com>
+> ---
+>  net/handshake/netlink.c | 35 ++++++++++++++++++-----------------
+>  1 file changed, 18 insertions(+), 17 deletions(-)
+>
+> diff --git a/net/handshake/netlink.c b/net/handshake/netlink.c
+> index 1d33a4675a48..cdaea8b8d004 100644
+> --- a/net/handshake/netlink.c
+> +++ b/net/handshake/netlink.c
+> @@ -106,25 +106,26 @@ int handshake_nl_accept_doit(struct sk_buff *skb, 
+> struct genl_info *info)
+> 
+>  	err = -EAGAIN;
+>  	req = handshake_req_next(hn, class);
+> -	if (req) {
+> -		sock = req->hr_sk->sk_socket;
+> -
+> -		FD_PREPARE(fdf, O_CLOEXEC, sock->file);
+> -		if (fdf.err) {
+> -			err = fdf.err;
+> -			goto out_complete;
+> -		}
+> -
+> -		get_file(sock->file); /* FD_PREPARE() consumes a reference. */
+> -		err = req->hr_proto->hp_accept(req, info, fd_prepare_fd(fdf));
+> -		if (err)
+> -			goto out_complete; /* Automatic cleanup handles fput */
+> -
+> -		trace_handshake_cmd_accept(net, req, req->hr_sk, fd_prepare_fd(fdf));
+> -		fd_publish(fdf);
+> -		return 0;
+> +	if (!req)
+> +		goto out_status;
+> +
+> +	sock = req->hr_sk->sk_socket;
+> +
+> +	FD_PREPARE(fdf, O_CLOEXEC, sock->file);
+> +	if (fdf.err) {
+> +		err = fdf.err;
+> +		goto out_complete;
+>  	}
+> 
+> +	get_file(sock->file); /* FD_PREPARE() consumes a reference. */
+> +	err = req->hr_proto->hp_accept(req, info, fd_prepare_fd(fdf));
+> +	if (err)
+> +		goto out_complete; /* Automatic cleanup handles fput */
+> +
+> +	trace_handshake_cmd_accept(net, req, req->hr_sk, fd_prepare_fd(fdf));
+> +	fd_publish(fdf);
+> +	return 0;
+> +
+>  out_complete:
+>  	handshake_complete(req, -EIO, NULL);
+>  out_status:
+> -- 
+> 2.34.1
 
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+Reviewed-by: Chuck Lever <chuck.lever@oracle.com>
+Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+Closes: https://lore.kernel.org/kernel-tls-handshake/aScekpuOYHRM9uOd@morisot.1015granger.net/T/#m7cfa5c11efc626d77622b2981591197a2acdd65e
+
+
+-- 
+Chuck Lever
 
