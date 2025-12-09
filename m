@@ -1,57 +1,59 @@
-Return-Path: <netdev+bounces-244048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8473CAE882
-	for <lists+netdev@lfdr.de>; Tue, 09 Dec 2025 01:31:43 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C09A5CAE849
+	for <lists+netdev@lfdr.de>; Tue, 09 Dec 2025 01:28:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9EE1030F61CA
-	for <lists+netdev@lfdr.de>; Tue,  9 Dec 2025 00:27:32 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 08A1C30345BC
+	for <lists+netdev@lfdr.de>; Tue,  9 Dec 2025 00:27:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CFFB26CE1A;
-	Tue,  9 Dec 2025 00:17:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F15F027A461;
+	Tue,  9 Dec 2025 00:17:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PIV1JXEW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D/gNLRbl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6516526529A;
-	Tue,  9 Dec 2025 00:17:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3E0427A442;
+	Tue,  9 Dec 2025 00:17:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765239447; cv=none; b=H/zP1C5MvS0fREvNbUu+03CPHaV8+dL95WIXnQa8X1fLvo9dfirY8uC03zJb13hRFPFrg/DRudUqpmrsQErRYwuLcLVaBFEIjULEzGQDTjKu0ZsoEzGN3fMApblrgYG8466pDU60e/yMdqkYrffZHmyYShoJTVPQjoVc3GtQdPQ=
+	t=1765239459; cv=none; b=K9IOQZjo1Tg1NsEBv4XoAnPCz77WF8aaNYvmCS6J0pL2V6wZzJTHUR1NTi91eJPCDBfGeUudpvIF5cdVAAgJ+nD86aV0k9r+CF8h9l1QSoUoXrboYZ+qBCD2qxAm6dr8GvXHI2S5zBn5WxnJdGb42fl8HmEeLZHBeMFOvSNS7YA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765239447; c=relaxed/simple;
-	bh=NSvVx6PnzLFUc6PFMEvhuwqu/I7QZM68YLY7Ca8pH1M=;
+	s=arc-20240116; t=1765239459; c=relaxed/simple;
+	bh=v3OkS3q1l6uqmIpy47zLwVGi9HE8EN+dH7fJhgzl8H0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Cqx8IfsEfBWHm/Qqxgm8mSLdy0TBO5cGQ2FmC56YSiiyXtUdlJLKXa5+NpXx4Fr22P6NeayrOhhlqPrQnBNl0jvRoi2YEtsnWElPUsP1hLbjbKl0Jmy8gSwe+y6YmPvYwCQcVW7lrSqfUhDbfl0K6nDieui7jOhUAdrcFK8SW0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PIV1JXEW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70C05C19421;
-	Tue,  9 Dec 2025 00:17:25 +0000 (UTC)
+	 MIME-Version:Content-Type; b=AHplONAjOz7zvySeZwUPoLBy0lXLBFQlcq0aujUKc66S9yrFpOZMnLVwBGCgFtLE23NISqwV++WC5zMnDOd1kR57I9vgQQwAGTcPGDW0tX1GgMDlmziBMJegAqWpQW6elwMnY5eN1GdFj3Gb0BYUCsa5LhAOb1aqPczIjmhivkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D/gNLRbl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A31DC113D0;
+	Tue,  9 Dec 2025 00:17:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765239447;
-	bh=NSvVx6PnzLFUc6PFMEvhuwqu/I7QZM68YLY7Ca8pH1M=;
+	s=k20201202; t=1765239459;
+	bh=v3OkS3q1l6uqmIpy47zLwVGi9HE8EN+dH7fJhgzl8H0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PIV1JXEWJpkWYe+78yXMcKOSkQQgkIohEzrUv/SfQ2PJp+dvRRFbte/ex52JeZk4P
-	 z5A9Q3oqSx62Lcqd0xDTajN//zer/WaW8UU1AcnxBc6sIc1kA5nblnxiLkKGT4iDrF
-	 D4nWw2FBLlybiFPO4MqaYXgaMzkdjRym4UOEQESbxWxhdb2iZu2Z1nfEE3kURvmJR0
-	 qI+z9fHKkvj/T3ArXC6n2jzmwRhW5JYgOztKOjF5+9A+ejDg3wdW1wrpEYwJUkCVB+
-	 rYOysTwtp44tPA2tcWUuhOiChyZmRjJ81w7K0G935Tq8IisrpfaQXLt55bpXLtbaTW
-	 +czV5dvAi//5w==
+	b=D/gNLRblWBMSgdVzG4tuP+tUsp0otuqSRssbXmQ+NMcxJqUHrqYF73BrEfdcC3KKf
+	 w9CYDARtGzN0wNdWGhRJ9DbRFwZoZXAgG7qsYNs540aum978AbMUIQSMoB+DgxJJ8u
+	 Iotz6XDqf6t5bzHM0JpmRGMV7LJo9isz+j27+MpMxcpJ3rvoV7vfI6NUmTBMi1xsMZ
+	 jyjLX/nEMT2A/50CIoY7AjDrVAvbj4Q8BqUyA3byiAIVIkb0Mt+zhcA9ScMQUpwSIm
+	 l0KCYDPQRxZm7IEMZKo+IkXsKHMSz1KaeIKmz97nMT+kv040cJR72mum2NufbG15qi
+	 U+BwXsU453Ktw==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
-Cc: Alok Tiwari <alok.a.tiwari@oracle.com>,
-	Simon Horman <horms@kernel.org>,
-	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
+Cc: Alan Maguire <alan.maguire@oracle.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Potnuri Bharat Teja <bharat@chelsio.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	linux@armlinux.org.uk,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.18-5.10] net: amd-xgbe: use EOPNOTSUPP instead of ENOTSUPP in xgbe_phy_mii_read_c45
-Date: Mon,  8 Dec 2025 19:15:16 -0500
-Message-ID: <20251209001610.611575-24-sashal@kernel.org>
+	kees@kernel.org,
+	netdev@vger.kernel.org,
+	linux-hardening@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.18-6.12] cxgb4: Rename sched_class to avoid type clash
+Date: Mon,  8 Dec 2025 19:15:20 -0500
+Message-ID: <20251209001610.611575-28-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251209001610.611575-1-sashal@kernel.org>
 References: <20251209001610.611575-1-sashal@kernel.org>
@@ -61,248 +63,406 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.18
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
+From: Alan Maguire <alan.maguire@oracle.com>
 
-[ Upstream commit bd853a59a87ecf9fc060dd54b10a3a94e9786182 ]
+[ Upstream commit 380d19db6e6c089c7d2902e02a85fd2bde3e519b ]
 
-The MDIO read callback xgbe_phy_mii_read_c45() can propagate its return
-value up through phylink_mii_ioctl() to user space via netdev ioctls such
-as SIOCGMIIREG. Returning ENOTSUPP results in user space seeing
-"Unknown error", since ENOTSUPP is not a standard errno value.
+drivers/net/ethernet/chelsio/cxgb4/sched.h declares a sched_class
+struct which has a type name clash with struct sched_class
+in kernel/sched/sched.h (a type used in a field in task_struct).
 
-Replace ENOTSUPP with EOPNOTSUPP to align with the MDIO core’s
-usage and ensure user space receives a proper "Operation not supported"
-error instead of an unknown code.
+When cxgb4 is a builtin we end up with both sched_class types,
+and as a result of this we wind up with DWARF (and derived from
+that BTF) with a duplicate incorrect task_struct representation.
+When cxgb4 is built-in this type clash can cause kernel builds to
+fail as resolve_btfids will fail when confused which task_struct
+to use. See [1] for more details.
 
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Acked-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
-Link: https://patch.msgid.link/20251015025751.1532149-1-alok.a.tiwari@oracle.com
+As such, renaming sched_class to ch_sched_class (in line with
+other structs like ch_sched_flowc) makes sense.
+
+[1] https://lore.kernel.org/bpf/2412725b-916c-47bd-91c3-c2d57e3e6c7b@acm.org/
+
+Reported-by: Bart Van Assche <bvanassche@acm.org>
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Signed-off-by: Alan Maguire <alan.maguire@oracle.com>
+Acked-by: Potnuri Bharat Teja <bharat@chelsio.com>
+Link: https://patch.msgid.link/20251121181231.64337-1-alan.maguire@oracle.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-Now I have all the information I need for a complete analysis. Let me
-compile my findings:
-
-## Complete Analysis
+## Commit Analysis: cxgb4 sched_class rename
 
 ### 1. COMMIT MESSAGE ANALYSIS
 
-**Subject:** `net: amd-xgbe: use EOPNOTSUPP instead of ENOTSUPP in
-xgbe_phy_mii_read_c45`
+The commit addresses a **type name clash** between:
+- `struct sched_class` in `drivers/net/ethernet/chelsio/cxgb4/sched.h`
+  (cxgb4 driver's scheduling class)
+- `struct sched_class` in `kernel/sched/sched.h` (core scheduler's
+  scheduling class used in task_struct)
 
-**Key points from the commit message:**
-- The MDIO read callback `xgbe_phy_mii_read_c45()` can propagate its
-  return value up through `phylink_mii_ioctl()` to **user space** via
-  netdev ioctls (SIOCGMIIREG)
-- Returning ENOTSUPP (error code 524) results in **user space seeing
-  "Unknown error"** since ENOTSUPP is not a standard errno value
-- The fix replaces ENOTSUPP (524, kernel-internal) with EOPNOTSUPP (95,
-  standard POSIX errno)
+**Problem:** When cxgb4 is built-in (CONFIG_CHELSIO_T4=y), both types
+exist in the same compilation unit. This causes:
+1. Duplicate DWARF/BTF type representations
+2. **Build failures** because `resolve_btfids` tool cannot determine
+   which `task_struct` to use
 
-**Tags present:**
-- `Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>`
-- `Reviewed-by: Simon Horman <horms@kernel.org>` - Important! This is a
-  well-known networking reviewer
-- `Acked-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>` - AMD
-  maintainer acknowledgment
-- `Signed-off-by: Jakub Kicinski <kuba@kernel.org>` - Networking
+**Signals:**
+- **Reported-by:** Bart Van Assche (real user hit this issue)
+- **Reviewed-by/Acked-by:** Present from both reporter and driver
   maintainer
-
-**Missing tags:**
-- No `Cc: stable@vger.kernel.org`
-- No `Fixes:` tag (though one should have been added: `Fixes:
-  070f6186a2f1d ("amd-xgbe: Separate C22 and C45 transactions")`)
+- **Link:** References actual bug report on lore.kernel.org
+- **No Cc: stable** tag
+- **No Fixes:** tag
 
 ### 2. CODE CHANGE ANALYSIS
 
-**The diff (single line change):**
-```c
-- ret = -ENOTSUPP;
-+               ret = -EOPNOTSUPP;
-```
+The fix is purely mechanical - a simple rename:
+- `struct sched_class` → `struct ch_sched_class` (following existing
+  naming convention like `ch_sched_flowc`)
 
-**Location:** `drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c`, function
-`xgbe_phy_mii_read_c45()`
-
-**Context Analysis:**
-The function handles MII (Media Independent Interface) Clause 45 read
-operations:
-
-```c
-static int xgbe_phy_mii_read_c45(struct mii_bus *mii, int addr, int
-devad,
-                                 int reg)
-{
-        ...
-        if (phy_data->conn_type == XGBE_CONN_TYPE_SFP)
-                ret = -EOPNOTSUPP;   // Already correct
-        else if (phy_data->conn_type & XGBE_CONN_TYPE_MDIO)
-                ret = xgbe_phy_mdio_mii_read_c45(pdata, addr, devad,
-reg);
-        else
-                ret = -ENOTSUPP;     // BUG: should be -EOPNOTSUPP
-```
-
-**Root cause of the bug:**
-- Commit `070f6186a2f1d` ("amd-xgbe: Separate C22 and C45 transactions")
-  introduced this function in January 2023
-- Andrew Lunn correctly used `EOPNOTSUPP` for the SFP case
-- But **inconsistently/accidentally** used `ENOTSUPP` for the final else
-  branch
-- This is clearly an oversight/typo during the refactoring
-
-**Technical explanation of ENOTSUPP vs EOPNOTSUPP:**
-- `ENOTSUPP` (524): Defined in `include/linux/errno.h` as a **kernel-
-  internal error code** originally for NFSv3 protocol
-- `EOPNOTSUPP` (95): Defined in `include/uapi/asm-generic/errno.h` as a
-  **standard POSIX errno** "Operation not supported"
-- When kernel code returns errors through syscalls/ioctls, it must use
-  standard POSIX errno values
-- User-space `strerror()` doesn't know what errno 524 means → "Unknown
-  error 524"
+Changes across 5 files are all straightforward variable type name
+replacements. The diff shows ~20 locations where the type name is
+changed, with absolutely no logic modifications.
 
 ### 3. CLASSIFICATION
 
-- **Type:** Bug fix (incorrect error code returned to userspace)
-- **NOT a feature addition**
-- **NOT a device ID, quirk, or DT update**
-- This is fixing **incorrect API behavior** - returning a non-standard
-  errno to userspace
+This is a **BUILD FIX** - one of the explicitly allowed categories for
+stable backporting. The build fails when:
+- cxgb4 driver is built-in
+- BTF debugging is enabled (CONFIG_DEBUG_INFO_BTF=y)
+
+The `resolve_btfids` tool fails, preventing successful kernel
+compilation.
 
 ### 4. SCOPE AND RISK ASSESSMENT
 
-**Size:**
-- 1 line changed
-- 1 file touched
-- **Minimal scope**
+| Metric | Assessment |
+|--------|------------|
+| Lines changed | ~40 (all renames) |
+| Files touched | 5 (all within cxgb4 driver) |
+| Logic changes | **ZERO** |
+| External API changes | **NONE** |
+| Runtime risk | **NONE** - purely compile-time symbol naming |
 
-**Risk:**
-- **EXTREMELY LOW** - This is a pure error code change
-- Cannot cause crashes, data corruption, or regressions
-- The error path itself is unchanged; only the error code returned
-  differs
-- Changes from an unknown error (524) to a proper descriptive error (95)
-
-**Similar precedents:**
-I found multiple similar fixes already merged:
-- `f82acf6fb4211` - ixgbe: use EOPNOTSUPP instead of ENOTSUPP
-- `21d08d1c4c29f` - igc: use EOPNOTSUPP instead of ENOTSUPP
-- `bc73c5885c606` - igb: use EOPNOTSUPP instead of ENOTSUPP
-- `ab15aabac028a` - mtd: rawnand: qcom: Use EOPNOTSUPP instead of
-  ENOTSUPP
-
-All these have `Fixes:` tags and address the same class of bug.
+**Risk Level: EXTREMELY LOW** - This cannot cause any runtime regression
+as it's purely a symbol rename with no behavioral changes whatsoever.
 
 ### 5. USER IMPACT
 
-**Who is affected:**
-- Users of AMD XGBE network devices (10Gb Ethernet)
-- Any tool or application using SIOCGMIIREG/SIOCGMIIPHY ioctls
-- Diagnostic tools like `mii-tool`, `ethtool`, or custom MDIO access
-  utilities
+**Affected users:**
+- Those building kernels with cxgb4 built-in AND BTF enabled
+- This is a realistic configuration for users doing BPF/tracing work
+  with Chelsio network hardware
 
-**Severity:**
-- When the hardware connection type is neither SFP nor MDIO, the user
-  sees:
-  - **Before fix:** "Unknown error 524" - confusing, hard to debug
-  - **After fix:** "Operation not supported" - clear, standard message
-
-**Real-world impact:**
-- This is a **user-visible bug** affecting error reporting
-- While not a crash or data corruption, it degrades user experience
-- Makes debugging and troubleshooting harder
+**Severity:** BUILD FAILURE - Complete inability to compile the kernel
+for affected configurations.
 
 ### 6. STABILITY INDICATORS
 
-- `Reviewed-by: Simon Horman` - Very experienced networking reviewer
-- `Acked-by: Shyam Sundar S K` - AMD driver maintainer
-- `Signed-off-by: Jakub Kicinski` - Net maintainer
-- The change is trivially correct - single character difference in error
-  code
+- Has Reviewed-by and Acked-by tags
+- Change is mechanical and obviously correct
+- Merged through proper netdev maintainer path
+- The naming follows existing driver conventions (`ch_sched_*`)
 
 ### 7. DEPENDENCY CHECK
 
-**Dependencies:** None
-- The change is self-contained
-- No other commits are required
-- The affected code exists in all stable kernels from 6.3 onwards (where
-  `070f6186a2f1d` was merged)
+The change is self-contained within the cxgb4 driver. No external
+dependencies. The cxgb4 scheduler code has existed in stable trees for
+years, so this fix should apply cleanly.
 
-**Affected stable trees:**
-- 6.6.y: **Yes** - Contains the buggy commit, needs this fix
-- 6.10.y through 6.18.y: **Yes** - All affected
-- 6.1.y and earlier: **No** - The buggy code doesn't exist (function was
-  introduced in 6.3)
+### Decision Analysis
 
-### FINAL ASSESSMENT
+**FOR backporting:**
+1. **Build fix** - explicitly allowed in stable rules
+2. **Zero runtime risk** - purely a type rename, no logic changes
+3. **Fixes real bug** - reported by actual user, blocks compilation
+4. **Small and contained** - all changes within one driver
+5. **Obviously correct** - mechanical rename following existing
+   conventions
 
-**Pros for backporting:**
-1. ✅ Fixes a **real user-visible bug** - users see "Unknown error"
-   messages
-2. ✅ **Extremely small and surgical** - single 1-line change
-3. ✅ **Obviously correct** - changing from kernel-internal errno to
-   standard POSIX errno
-4. ✅ **Zero risk** - cannot introduce regressions
-5. ✅ **Well reviewed** - by networking and AMD maintainers
-6. ✅ **Precedent exists** - similar fixes have been applied to stable
-   trees
-7. ✅ **No dependencies** - applies cleanly to all affected stable trees
+**AGAINST backporting:**
+1. No `Cc: stable` tag from maintainer
+2. Affected configuration (built-in cxgb4 + BTF) is somewhat niche
+3. Issue may only manifest with newer toolchains
 
-**Cons:**
-1. ⚠️ No `Cc: stable@vger.kernel.org` tag - author didn't explicitly
-   request stable backport
-2. ⚠️ No `Fixes:` tag - though it clearly should have had one pointing
-   to `070f6186a2f1d`
-3. ⚠️ Minor severity - not a crash or security issue
+### Conclusion
 
-**Conclusion:**
+While the maintainer didn't add `Cc: stable`, this is a **legitimate
+build fix** that prevents kernel compilation for users with specific
+(but valid) configurations. Build fixes are explicitly listed as
+acceptable stable material in the kernel's stable rules. The change is
+mechanical, trivial, and carries effectively zero risk of any
+regression. Users who update their build toolchain on stable kernels
+could encounter this failure.
 
-This commit fixes a clear bug where an incorrect kernel-internal error
-code (ENOTSUPP, 524) is returned to userspace instead of the proper
-POSIX errno (EOPNOTSUPP, 95). This causes user-space tools to display
-"Unknown error 524" instead of "Operation not supported", degrading user
-experience and making debugging harder.
-
-The fix is:
-- Trivially small (1 line)
-- Obviously correct
-- Zero risk of regression
-- Well-reviewed by subsystem experts
-- Has precedent with identical fixes in other drivers
-
-While the commit lacks explicit `Cc: stable` and `Fixes:` tags, it meets
-all the criteria from stable-kernel-rules.rst: it fixes "a real bug that
-bothers people", is small, obviously correct, and tested (reviewed by
-multiple maintainers).
+The risk/benefit ratio strongly favors backporting: **zero risk** vs
+**fixing build failures**.
 
 **YES**
 
- drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .../net/ethernet/chelsio/cxgb4/cxgb4_main.c   |  2 +-
+ .../chelsio/cxgb4/cxgb4_tc_matchall.c         |  4 +-
+ .../ethernet/chelsio/cxgb4/cxgb4_tc_mqprio.c  |  2 +-
+ drivers/net/ethernet/chelsio/cxgb4/sched.c    | 44 +++++++++----------
+ drivers/net/ethernet/chelsio/cxgb4/sched.h    | 12 ++---
+ 5 files changed, 32 insertions(+), 32 deletions(-)
 
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c b/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
-index a56efc1bee339..35a381a83647d 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
-@@ -668,7 +668,7 @@ static int xgbe_phy_mii_read_c45(struct mii_bus *mii, int addr, int devad,
- 	else if (phy_data->conn_type & XGBE_CONN_TYPE_MDIO)
- 		ret = xgbe_phy_mdio_mii_read_c45(pdata, addr, devad, reg);
- 	else
--		ret = -ENOTSUPP;
-+		ret = -EOPNOTSUPP;
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
+index 392723ef14e51..ac0c7fe5743bd 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
++++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
+@@ -3485,7 +3485,7 @@ static int cxgb_set_tx_maxrate(struct net_device *dev, int index, u32 rate)
+ 	struct adapter *adap = pi->adapter;
+ 	struct ch_sched_queue qe = { 0 };
+ 	struct ch_sched_params p = { 0 };
+-	struct sched_class *e;
++	struct ch_sched_class *e;
+ 	u32 req_rate;
+ 	int err = 0;
  
- 	xgbe_phy_put_comm_ownership(pdata);
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_matchall.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_matchall.c
+index 1672d3afe5bef..f8dcf0b4abcdc 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_matchall.c
++++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_matchall.c
+@@ -56,7 +56,7 @@ static int cxgb4_matchall_egress_validate(struct net_device *dev,
+ 	struct port_info *pi = netdev2pinfo(dev);
+ 	struct flow_action_entry *entry;
+ 	struct ch_sched_queue qe;
+-	struct sched_class *e;
++	struct ch_sched_class *e;
+ 	u64 max_link_rate;
+ 	u32 i, speed;
+ 	int ret;
+@@ -180,7 +180,7 @@ static int cxgb4_matchall_alloc_tc(struct net_device *dev,
+ 	struct port_info *pi = netdev2pinfo(dev);
+ 	struct adapter *adap = netdev2adap(dev);
+ 	struct flow_action_entry *entry;
+-	struct sched_class *e;
++	struct ch_sched_class *e;
+ 	int ret;
+ 	u32 i;
  
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_mqprio.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_mqprio.c
+index 338b04f339b3d..a2dcd2e242631 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_mqprio.c
++++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_mqprio.c
+@@ -330,7 +330,7 @@ static int cxgb4_mqprio_alloc_tc(struct net_device *dev,
+ 	struct cxgb4_tc_port_mqprio *tc_port_mqprio;
+ 	struct port_info *pi = netdev2pinfo(dev);
+ 	struct adapter *adap = netdev2adap(dev);
+-	struct sched_class *e;
++	struct ch_sched_class *e;
+ 	int ret;
+ 	u8 i;
+ 
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/sched.c b/drivers/net/ethernet/chelsio/cxgb4/sched.c
+index a1b14468d1fff..38a30aeee1220 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/sched.c
++++ b/drivers/net/ethernet/chelsio/cxgb4/sched.c
+@@ -44,7 +44,7 @@ static int t4_sched_class_fw_cmd(struct port_info *pi,
+ {
+ 	struct adapter *adap = pi->adapter;
+ 	struct sched_table *s = pi->sched_tbl;
+-	struct sched_class *e;
++	struct ch_sched_class *e;
+ 	int err = 0;
+ 
+ 	e = &s->tab[p->u.params.class];
+@@ -122,7 +122,7 @@ static void *t4_sched_entry_lookup(struct port_info *pi,
+ 				   const u32 val)
+ {
+ 	struct sched_table *s = pi->sched_tbl;
+-	struct sched_class *e, *end;
++	struct ch_sched_class *e, *end;
+ 	void *found = NULL;
+ 
+ 	/* Look for an entry with matching @val */
+@@ -166,8 +166,8 @@ static void *t4_sched_entry_lookup(struct port_info *pi,
+ 	return found;
+ }
+ 
+-struct sched_class *cxgb4_sched_queue_lookup(struct net_device *dev,
+-					     struct ch_sched_queue *p)
++struct ch_sched_class *cxgb4_sched_queue_lookup(struct net_device *dev,
++						struct ch_sched_queue *p)
+ {
+ 	struct port_info *pi = netdev2pinfo(dev);
+ 	struct sched_queue_entry *qe = NULL;
+@@ -187,7 +187,7 @@ static int t4_sched_queue_unbind(struct port_info *pi, struct ch_sched_queue *p)
+ 	struct sched_queue_entry *qe = NULL;
+ 	struct adapter *adap = pi->adapter;
+ 	struct sge_eth_txq *txq;
+-	struct sched_class *e;
++	struct ch_sched_class *e;
+ 	int err = 0;
+ 
+ 	if (p->queue < 0 || p->queue >= pi->nqsets)
+@@ -218,7 +218,7 @@ static int t4_sched_queue_bind(struct port_info *pi, struct ch_sched_queue *p)
+ 	struct sched_queue_entry *qe = NULL;
+ 	struct adapter *adap = pi->adapter;
+ 	struct sge_eth_txq *txq;
+-	struct sched_class *e;
++	struct ch_sched_class *e;
+ 	unsigned int qid;
+ 	int err = 0;
+ 
+@@ -260,7 +260,7 @@ static int t4_sched_flowc_unbind(struct port_info *pi, struct ch_sched_flowc *p)
+ {
+ 	struct sched_flowc_entry *fe = NULL;
+ 	struct adapter *adap = pi->adapter;
+-	struct sched_class *e;
++	struct ch_sched_class *e;
+ 	int err = 0;
+ 
+ 	if (p->tid < 0 || p->tid >= adap->tids.neotids)
+@@ -288,7 +288,7 @@ static int t4_sched_flowc_bind(struct port_info *pi, struct ch_sched_flowc *p)
+ 	struct sched_table *s = pi->sched_tbl;
+ 	struct sched_flowc_entry *fe = NULL;
+ 	struct adapter *adap = pi->adapter;
+-	struct sched_class *e;
++	struct ch_sched_class *e;
+ 	int err = 0;
+ 
+ 	if (p->tid < 0 || p->tid >= adap->tids.neotids)
+@@ -322,7 +322,7 @@ static int t4_sched_flowc_bind(struct port_info *pi, struct ch_sched_flowc *p)
+ }
+ 
+ static void t4_sched_class_unbind_all(struct port_info *pi,
+-				      struct sched_class *e,
++				      struct ch_sched_class *e,
+ 				      enum sched_bind_type type)
+ {
+ 	if (!e)
+@@ -476,12 +476,12 @@ int cxgb4_sched_class_unbind(struct net_device *dev, void *arg,
+ }
+ 
+ /* If @p is NULL, fetch any available unused class */
+-static struct sched_class *t4_sched_class_lookup(struct port_info *pi,
+-						const struct ch_sched_params *p)
++static struct ch_sched_class *t4_sched_class_lookup(struct port_info *pi,
++						    const struct ch_sched_params *p)
+ {
+ 	struct sched_table *s = pi->sched_tbl;
+-	struct sched_class *found = NULL;
+-	struct sched_class *e, *end;
++	struct ch_sched_class *found = NULL;
++	struct ch_sched_class *e, *end;
+ 
+ 	if (!p) {
+ 		/* Get any available unused class */
+@@ -522,10 +522,10 @@ static struct sched_class *t4_sched_class_lookup(struct port_info *pi,
+ 	return found;
+ }
+ 
+-static struct sched_class *t4_sched_class_alloc(struct port_info *pi,
+-						struct ch_sched_params *p)
++static struct ch_sched_class *t4_sched_class_alloc(struct port_info *pi,
++						   struct ch_sched_params *p)
+ {
+-	struct sched_class *e = NULL;
++	struct ch_sched_class *e = NULL;
+ 	u8 class_id;
+ 	int err;
+ 
+@@ -579,8 +579,8 @@ static struct sched_class *t4_sched_class_alloc(struct port_info *pi,
+  * scheduling class with matching @p is found, then the matching class is
+  * returned.
+  */
+-struct sched_class *cxgb4_sched_class_alloc(struct net_device *dev,
+-					    struct ch_sched_params *p)
++struct ch_sched_class *cxgb4_sched_class_alloc(struct net_device *dev,
++					       struct ch_sched_params *p)
+ {
+ 	struct port_info *pi = netdev2pinfo(dev);
+ 	u8 class_id;
+@@ -607,7 +607,7 @@ void cxgb4_sched_class_free(struct net_device *dev, u8 classid)
+ 	struct port_info *pi = netdev2pinfo(dev);
+ 	struct sched_table *s = pi->sched_tbl;
+ 	struct ch_sched_params p;
+-	struct sched_class *e;
++	struct ch_sched_class *e;
+ 	u32 speed;
+ 	int ret;
+ 
+@@ -640,7 +640,7 @@ void cxgb4_sched_class_free(struct net_device *dev, u8 classid)
+ 	}
+ }
+ 
+-static void t4_sched_class_free(struct net_device *dev, struct sched_class *e)
++static void t4_sched_class_free(struct net_device *dev, struct ch_sched_class *e)
+ {
+ 	struct port_info *pi = netdev2pinfo(dev);
+ 
+@@ -660,7 +660,7 @@ struct sched_table *t4_init_sched(unsigned int sched_size)
+ 	s->sched_size = sched_size;
+ 
+ 	for (i = 0; i < s->sched_size; i++) {
+-		memset(&s->tab[i], 0, sizeof(struct sched_class));
++		memset(&s->tab[i], 0, sizeof(struct ch_sched_class));
+ 		s->tab[i].idx = i;
+ 		s->tab[i].state = SCHED_STATE_UNUSED;
+ 		INIT_LIST_HEAD(&s->tab[i].entry_list);
+@@ -682,7 +682,7 @@ void t4_cleanup_sched(struct adapter *adap)
+ 			continue;
+ 
+ 		for (i = 0; i < s->sched_size; i++) {
+-			struct sched_class *e;
++			struct ch_sched_class *e;
+ 
+ 			e = &s->tab[i];
+ 			if (e->state == SCHED_STATE_ACTIVE)
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/sched.h b/drivers/net/ethernet/chelsio/cxgb4/sched.h
+index 6b3c778815f09..4d3b5a7575366 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/sched.h
++++ b/drivers/net/ethernet/chelsio/cxgb4/sched.h
+@@ -71,7 +71,7 @@ struct sched_flowc_entry {
+ 	struct ch_sched_flowc param;
+ };
+ 
+-struct sched_class {
++struct ch_sched_class {
+ 	u8 state;
+ 	u8 idx;
+ 	struct ch_sched_params info;
+@@ -82,7 +82,7 @@ struct sched_class {
+ 
+ struct sched_table {      /* per port scheduling table */
+ 	u8 sched_size;
+-	struct sched_class tab[] __counted_by(sched_size);
++	struct ch_sched_class tab[] __counted_by(sched_size);
+ };
+ 
+ static inline bool can_sched(struct net_device *dev)
+@@ -103,15 +103,15 @@ static inline bool valid_class_id(struct net_device *dev, u8 class_id)
+ 	return true;
+ }
+ 
+-struct sched_class *cxgb4_sched_queue_lookup(struct net_device *dev,
+-					     struct ch_sched_queue *p);
++struct ch_sched_class *cxgb4_sched_queue_lookup(struct net_device *dev,
++						struct ch_sched_queue *p);
+ int cxgb4_sched_class_bind(struct net_device *dev, void *arg,
+ 			   enum sched_bind_type type);
+ int cxgb4_sched_class_unbind(struct net_device *dev, void *arg,
+ 			     enum sched_bind_type type);
+ 
+-struct sched_class *cxgb4_sched_class_alloc(struct net_device *dev,
+-					    struct ch_sched_params *p);
++struct ch_sched_class *cxgb4_sched_class_alloc(struct net_device *dev,
++					       struct ch_sched_params *p);
+ void cxgb4_sched_class_free(struct net_device *dev, u8 classid);
+ 
+ struct sched_table *t4_init_sched(unsigned int size);
 -- 
 2.51.0
 
