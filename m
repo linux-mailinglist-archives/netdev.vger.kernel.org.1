@@ -1,65 +1,63 @@
-Return-Path: <netdev+bounces-244070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F36CCAF29B
-	for <lists+netdev@lfdr.de>; Tue, 09 Dec 2025 08:38:27 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A40C5CAF320
+	for <lists+netdev@lfdr.de>; Tue, 09 Dec 2025 08:49:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5AAD330155C0
-	for <lists+netdev@lfdr.de>; Tue,  9 Dec 2025 07:37:52 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 1C3593008064
+	for <lists+netdev@lfdr.de>; Tue,  9 Dec 2025 07:49:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8034B287506;
-	Tue,  9 Dec 2025 07:37:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3547B214813;
+	Tue,  9 Dec 2025 07:49:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lRtbQdo8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sXNnhTHr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42592226D02;
-	Tue,  9 Dec 2025 07:37:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07F2E22F01;
+	Tue,  9 Dec 2025 07:49:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765265871; cv=none; b=p/z0xR4GPoLlWMNemYkbNCweyQMwPdR37poAzOmvwTz0kA4Xk+Bc+Z1rV7/AaBL1aVBK6v+tqhFHywVeNaWhtjKVh5ZukPmuoZz9APNMNY08wr4wSI65h7GYcPk9m9BViD9fo7Bi60eA2S6YGGO2xTH08MsKkWRCGOV7nqznbGc=
+	t=1765266551; cv=none; b=oUblWMpZuNxF2XhbCXDjp4saBFdtSjkxyC0qRisCf6wiEXAhIy0GgiZDtXRuah1Ssn77MVJWDQp3F5tlTDR3sSwTagI/PPAXSVzJjXNxpLcMj2LzQ2qzWm6MidC6dOOEc7KgAjxanvs3aKbS4WAAGTzubyvevEUCUnJ3lw8/hCI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765265871; c=relaxed/simple;
-	bh=PvvpvDEgxqUV3rvRXi5qKsznNiPJ9ikDtGVfJCATNhc=;
+	s=arc-20240116; t=1765266551; c=relaxed/simple;
+	bh=AQfCgr/2BxTNWm4TTVxZ3VOxU83+R3WB1gT9ntGoYiw=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SaKzgC16Wbw1HDUzmGi4vISsOMrsKeH1Y346oT+lvv/bPa3SdzX06UO4H0YVWWX8freuC2Ey3+q1VgmzJeYjixOO2EUD+/BVM0ZtVX01X/nrX9nD3WcpfNMcMHVaL8qx+dNhIQCOkQ3CppeLa8Buk5qd5xB5iH3a2yGW4mm5Y74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lRtbQdo8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B53BEC4CEF5;
-	Tue,  9 Dec 2025 07:37:47 +0000 (UTC)
+	 MIME-Version:Content-Type; b=CeYkfTfzMNJCAO5AODDHGp/y3PlcRSKGjYr3IFa7l00kmyiVvF9Vlhv+iDarkjGyyUg/w4F196RIrXPXtxpjqvzV+une4txS4Bs4N3d5I9j1uvie2WKet8nS6rW4FwXs6V1bCgyD+snuCsCtZ/zUyFE9+m5q6LIReqMTyBKO1mg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sXNnhTHr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37934C4CEF5;
+	Tue,  9 Dec 2025 07:49:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765265870;
-	bh=PvvpvDEgxqUV3rvRXi5qKsznNiPJ9ikDtGVfJCATNhc=;
+	s=k20201202; t=1765266550;
+	bh=AQfCgr/2BxTNWm4TTVxZ3VOxU83+R3WB1gT9ntGoYiw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lRtbQdo8NqlOi3WcWIgiE2/q74u9pmr2xr2OyqS+YGl3T1aK7IXIECeXNOLBUjFtO
-	 5hdQbtSMy4uatkCZqbo9fUg9YbuiPPH5Nj1GWE8NVDIVNvcK2j0LFOkISgQPxKwbvY
-	 K8t4DXIyvmkV1W2Gi3iOl9275qMtskAD5dzaYbQGJZGOHPqOW+nBua+ifs/b9o4PwB
-	 trxVfveyDVyHE/tDRw75MI67e1vayU4//fExuhRoa3tB0vzI+w8RD0S00U/ZQbS+Mz
-	 86hdawVt1pXE070HoUciv4/u0gleWZKsjcmCYVc6/UTiCQNtEJiGk6hkDmxScobbmC
-	 THIYKbKsJE9+w==
-Date: Tue, 9 Dec 2025 16:37:45 +0900
+	b=sXNnhTHrT0sU+MIKJhbnTFh+TmfTKkddnJIk4Wlmsd+rh8Um/+uKUNYU5+pao8Se7
+	 Two3SjztLjkTgs9yym43a9mNO7FHaSy8ZXPbiCK6oHxOdGc/aCQcO5iUpyN0fpfgJK
+	 LoHyE0E3meNeV7lMwaVmg30qgoYgANtKY7FyPrjqZ8sypQMTxoO370vCFvz09iwUb2
+	 z4iiFpGcl8KXPXE6yx7A99oeHso7Ks1+WJqKQwTrAVe99xiD/eCkGP6oeHaryhomvY
+	 GO8HXdCMpu38zPNLH4rg/2ZtBAfPpLxf/zOAsmN2iLrOG7EL/iV1T4URiHTcHIIS6F
+	 EsPZXwRv01R8g==
+Date: Tue, 9 Dec 2025 16:49:04 +0900
 From: Jakub Kicinski <kuba@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: Petr Mladek <pmladek@suse.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
- <shuah@kernel.org>, Simon Horman <horms@kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org,
- gustavold@gmail.com, asantostc@gmail.com, calvin@wbinvd.org,
- kernel-team@meta.com, davej@codemonkey.org.uk
-Subject: Re: [PATCH net-next 0/4] (no cover subject)
-Message-ID: <20251209163745.3d0fcdfe@kernel.org>
-In-Reply-To: <7jdruzcpkeyhuudwi6uzg2vsc5mhgpq7qz4ym7vqqmgs7j3524@cvtnzneddg2d>
-References: <20251128-netconsole_send_msg-v1-0-8cca4bbce9bc@debian.org>
-	<20251201163622.4e50bf53@kernel.org>
-	<4oybtunobxtemenpg2lg7jv4cyl3xoaxrjlqivbhs6zo72hxpu@fqp6estf5mpc>
-	<20251202102442.568f91a7@kernel.org>
-	<aTFmew5trILX3RpO@pathway.suse.cz>
-	<aTFnzmc0ZtBvGg4y@pathway.suse.cz>
-	<7jdruzcpkeyhuudwi6uzg2vsc5mhgpq7qz4ym7vqqmgs7j3524@cvtnzneddg2d>
+To: Mika Westerberg <mika.westerberg@linux.intel.com>,
+ david.laight.linux@gmail.com
+Cc: Yury Norov <yury.norov@gmail.com>, Rasmus Villemoes
+ <linux@rasmusvillemoes.dk>, linux-kernel@vger.kernel.org,
+ linux-usb@vger.kernel.org, Geert Uytterhoeven <geert+renesas@glider.be>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>, Jonathan Cameron
+ <Jonathan.Cameron@huawei.com>, Crt Mori <cmo@melexis.com>, Richard Genoud
+ <richard.genoud@bootlin.com>, Andy Shevchenko
+ <andriy.shevchenko@intel.com>, Luo Jie <quic_luoj@quicinc.com>, Peter
+ Zijlstra <peterz@infradead.org>, netdev@vger.kernel.org, "David S . Miller"
+ <davem@davemloft.net>, Simon Horman <simon.horman@netronome.com>, Andreas
+ Noever <andreas.noever@gmail.com>, Yehezkel Bernat <YehezkelShB@gmail.com>
+Subject: Re: [PATCH 0/9] bitfield: tidy up bitfield.h
+Message-ID: <20251209164904.6163fcff@kernel.org>
+In-Reply-To: <20251209070806.GB2275908@black.igk.intel.com>
+References: <20251208224250.536159-1-david.laight.linux@gmail.com>
+	<20251209070806.GB2275908@black.igk.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,25 +67,17 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 5 Dec 2025 02:21:08 -0800 Breno Leitao wrote:
-> 1) Have a binary in each machine:
+On Tue, 9 Dec 2025 08:08:06 +0100 Mika Westerberg wrote:
+> > drivers/thunderbolt/tb.h passes a bifield to FIELD_GET(), these can't
+> > be used with sizeof or __auto_type. The usual solution is to add zero,
+> > but that can't be done in FIELD_GET() because it doesn't want the value
+> > promoted to 'int' (no idea how _Generic() treated it.)
+> > The fix is just to add zero at the call site.
+> > (The bitfield seems to be in a structure rad from hardware - no idea
+> > how that works on BE (or any LE that uses an unusual order for bitfields.)  
+> 
+> Okay but can you CC me the actual patch too? I only got the cover letter
+> ;-)
 
-> 2) Send a ping directly to the console
-
-> 3) Using per-loglevel patchset.
-
-> 4) send messages only to netconsole (this patchset)
-
-I think I was alluding that another option (not saying that it's the
-best but IIUC your requirements it'd be the best fit)):
-
-5) Add a keepalive configfs knob, if set to a non-zero value netconsole
-will send an empty (?) message at given interval
-
-  Pros:
-   - truly does not require a user binary to run periodically, netcons
-     would set a timer in the kernel
-  Cons:
-   - does not provide the arbitrary "console bypass" message
-     functionality
+Right, David, please fix your CC lists. kernel dev 101..
 
