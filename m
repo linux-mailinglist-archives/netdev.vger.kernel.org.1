@@ -1,164 +1,112 @@
-Return-Path: <netdev+bounces-244205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E661FCB26C5
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 09:32:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B2ECBCB271F
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 09:40:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5C0CE3042FE8
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 08:31:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EA8C2312908B
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 08:35:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB6A4263F5E;
-	Wed, 10 Dec 2025 08:31:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ghM+4o8r"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D3E3306B20;
+	Wed, 10 Dec 2025 08:34:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A14C31F3FE9;
-	Wed, 10 Dec 2025 08:31:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9EA8305E33
+	for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 08:34:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765355491; cv=none; b=HmMkVrGojpdDrnyHqj5hhcj769m0hPou+0Hxb8hBV2xrG2sF8Jil+P76ftsC00q3h0y3GKQWtOICFF289cEnN94a62F1a9cHP4PkM29j2IKu+KUT5ejnH4xLwHEQXMMTpIK9uiGcWGJwiLgCr4YOfymss260PrRjfh3oXw8geMs=
+	t=1765355699; cv=none; b=U7ECrVKhg65HWHojBlp0hqHRL/XZr2Wg3kP7wEjXLsoa5hAhIs7yYJf2qwREjmAzzlak5QpHSOs6AMbyin3xvdyoQuWdZlpNg4+4/1gAMb2+kz/mDzQw13uqTrIbsm2bjs5c7IoOCeEe3gHPwPuKbp/uzEvdhf4KrjTym7eOtAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765355491; c=relaxed/simple;
-	bh=n7nCUlTV4fyFUAsZSXKYvC743HHeyUkFmbdCcDsWo+M=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C+7dfwcDwUy/3V9k2FtU/ucJshDWx8Ltf7NOZiR3GoGj+GSvvkXVXFAxwtD/nPrp0WRst3OIaJ3DKxmUyK4lAW/KEC8+PzdA6q0NhrCbJl0IVofPoN3kIeZK/05aU9z1GhaS4k26GvnuBu5dFDj12tR5kmTFptJW82ZkJhoklbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ghM+4o8r; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96596C4CEF1;
-	Wed, 10 Dec 2025 08:31:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765355491;
-	bh=n7nCUlTV4fyFUAsZSXKYvC743HHeyUkFmbdCcDsWo+M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ghM+4o8rF/F5mw+FOs2evBq07uS5QT/UaWbrA7+lu1nYQkS5toqOZTcnqNon7wus7
-	 cOZaVW7XoNseG15YkvjZ/xlc0GXNUFMmgGzb7pOAXQ3ll/nqMbPeVkg3jB2/N4SN0K
-	 a3AEA7zme/jWHTUguYbNpeKwQ1oo3Q+RXqJh7R4aoh8LDdiApAA7dUNoIdEmq2ETNj
-	 Ql1U/X/DTdeyAm8HcITheEW0pZaeRnG4u4S8RYGhatSD4Jr30Mu2c8rPD+fgCNaJqS
-	 pH2Ivxkdj4Db9Fn8nYf2I9fBDZytufzrx+nVoaXDRXLi3OwqkejLArsrq7HituzOG3
-	 ndBKO/RRsHI4w==
-Date: Wed, 10 Dec 2025 17:31:25 +0900
-From: Jakub Kicinski <kuba@kernel.org>
-To: Edward Adam Davis <eadavis@qq.com>
-Cc: davem@davemloft.net, edumazet@google.com, eperezma@redhat.com,
- horms@kernel.org, jasowang@redhat.com, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, mst@redhat.com, netdev@vger.kernel.org,
- pabeni@redhat.com, sgarzare@redhat.com, stefanha@redhat.com,
- syzbot+ci3edb9412aeb2e703@syzkaller.appspotmail.com,
- syzbot@lists.linux.dev, syzbot@syzkaller.appspotmail.com,
- syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev,
- xuanzhuo@linux.alibaba.com, will@kernel.org
-Subject: Re: [PATCH net-next V3] net: restore the iterator to its original
- state when an error occurs
-Message-ID: <20251210173125.281dc808@kernel.org>
-In-Reply-To: <tencent_3C86DFD37A0374496263BE24483777D76305@qq.com>
-References: <tencent_3C86DFD37A0374496263BE24483777D76305@qq.com>
+	s=arc-20240116; t=1765355699; c=relaxed/simple;
+	bh=y2rpGwsg8I3wMX4m0DRN6Qta/4zB9uRoDvZ6Mb2z6l0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pJbtkrORxJN1eneTevq9kIaa01AdUHL8+pgs8E7GxW+lAEPkk0e7bvRKsoHhlBcBdSr8GnrcBgoIREyY6Bl+EB2yaTIcWT0GbiO7v624lfkLFOSrG79SCeQmEoVFfrgTW6r4SbcDRnuWswJ/J5wmeuePUrYktHmg/Lwg0vonC3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vTFet-0007fX-N0; Wed, 10 Dec 2025 09:34:51 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vTFes-004vMg-23;
+	Wed, 10 Dec 2025 09:34:50 +0100
+Received: from blackshift.org (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 564AB4B3B23;
+	Wed, 10 Dec 2025 08:34:50 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net 0/2] pull-request: can 2025-12-10
+Date: Wed, 10 Dec 2025 09:32:22 +0100
+Message-ID: <20251210083448.2116869-1-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-CC: Will, as this looks like ZC side of 7fb1291257ea1e27
+Hello netdev-team,
 
-On Thu,  4 Dec 2025 00:03:39 +0800 Edward Adam Davis wrote:
-> In zerocopy_fill_skb_from_iter(), if two copy operations are performed
-> and the first one succeeds while the second one fails, it returns a
-> failure but the count in iterator has already been decremented due to
-> the first successful copy. This ultimately affects the local variable
-> rest_len in virtio_transport_send_pkt_info(), causing the remaining
-> count in rest_len to be greater than the actual iterator count. As a
-> result, packet sending operations continue even when the iterator count
-> is zero, which further leads to skb->len being 0 and triggers the warning
-> reported by syzbot [1].
-> 
-> Therefore, if the zerocopy operation fails, we should revert the iterator
-> to its original state.
-> 
-> The iov_iter_revert() in skb_zerocopy_iter_stream() is no longer needed
-> and has been removed.
-> 
-> [1]
-> 'send_pkt()' returns 0, but 4096 expected
-> WARNING: net/vmw_vsock/virtio_transport_common.c:430 at virtio_transport_send_pkt_info+0xd1e/0xef0 net/vmw_vsock/virtio_transport_common.c:428, CPU#1: syz.0.17/5986
-> Call Trace:
->  virtio_transport_stream_enqueue net/vmw_vsock/virtio_transport_common.c:1113 [inline]
->  virtio_transport_seqpacket_enqueue+0x143/0x1c0 net/vmw_vsock/virtio_transport_common.c:841
->  vsock_connectible_sendmsg+0xabf/0x1040 net/vmw_vsock/af_vsock.c:2158
->  sock_sendmsg_nosec net/socket.c:727 [inline]
->  __sock_sendmsg+0x21c/0x270 net/socket.c:746
-> 
-> Reported-by: syzbot+28e5f3d207b14bae122a@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=28e5f3d207b14bae122a
-> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
-> ---
-> v3:
->   - fix test tcp_zerocopy_maxfrags timeout
-> v2: https://lore.kernel.org/all/tencent_BA768766163C533724966E36344AAE754709@qq.com/
->   - Remove iov_iter_revert() in skb_zerocopy_iter_stream()
-> v1: https://lore.kernel.org/all/tencent_387517772566B03DBD365896C036264AA809@qq.com/
+this is a pull request of 2 patches for net/main.
 
-Have you investigated the other callers? Given problems with previous
-version of this patch I'm worried you have not. If you did please extend
-the commit message with the appropriate explanation.
+Arnd Bergmann's patch fixes a build dependency with the CAN protocols
+and drivers introduced in the current development cycle.
 
-Alternative would be to add a _full() flavor of this API, but not sure
-if other callers actually care.
+The last patch is by me and fixes the error handling cleanup in the
+gs_usb driver.
 
-> diff --git a/net/core/datagram.c b/net/core/datagram.c
-> index c285c6465923..3a612ebbbe80 100644
-> --- a/net/core/datagram.c
-> +++ b/net/core/datagram.c
-> @@ -748,9 +748,13 @@ int __zerocopy_sg_from_iter(struct msghdr *msg, struct sock *sk,
->  			    size_t length,
->  			    struct net_devmem_dmabuf_binding *binding)
->  {
-> +	struct iov_iter_state state;
+regards,
+Marc
 
-nit: if you respin move this one line down
+---
 
->  	unsigned long orig_size = skb->truesize;
->  	unsigned long truesize;
-> -	int ret;
-> +	int ret, orig_len;
-> +
-> +	iov_iter_save_state(from, &state);
-> +	orig_len = skb->len;
->  
->  	if (msg && msg->msg_ubuf && msg->sg_from_iter)
->  		ret = msg->sg_from_iter(skb, from, length);
-> @@ -759,6 +763,9 @@ int __zerocopy_sg_from_iter(struct msghdr *msg, struct sock *sk,
->  	else
->  		ret = zerocopy_fill_skb_from_iter(skb, from, length);
->  
-> +	if (ret == -EFAULT || (ret == -EMSGSIZE && skb->len == orig_len))
+The following changes since commit 186468c67fc687650b7fb713d8c627d5c8566886:
 
-I'd think that for the purpose of reverting iter the second part of
-this condition is completely moot. If skb len didn't change there should
-be nothing to revert?
+  Merge branch 'mptcp-misc-fixes-for-v6-19-rc1' (2025-12-08 23:54:06 -0800)
 
-> +		iov_iter_restore(from, &state);
-> +
->  	truesize = skb->truesize - orig_size;
->  	if (sk && sk->sk_type == SOCK_STREAM) {
->  		sk_wmem_queued_add(sk, truesize);
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index a00808f7be6a..7b8836f668b7 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -1908,7 +1908,6 @@ int skb_zerocopy_iter_stream(struct sock *sk, struct sk_buff *skb,
->  		struct sock *save_sk = skb->sk;
->  
->  		/* Streams do not free skb on error. Reset to prev state. */
-> -		iov_iter_revert(&msg->msg_iter, skb->len - orig_len);
->  		skb->sk = sk;
->  		___pskb_trim(skb, orig_len);
->  		skb->sk = save_sk;
--- 
-pw-bot: cr
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can.git tags/linux-can-fixes-for-6.19-20251210
+
+for you to fetch changes up to 3e54d3b4a8437b6783d4145c86962a2aa51022f3:
+
+  can: gs_usb: gs_can_open(): fix error handling (2025-12-10 09:30:31 +0100)
+
+----------------------------------------------------------------
+linux-can-fixes-for-6.19-20251210
+
+----------------------------------------------------------------
+Arnd Bergmann (1):
+      can: fix build dependency
+
+Marc Kleine-Budde (1):
+      can: gs_usb: gs_can_open(): fix error handling
+
+ drivers/net/can/Kconfig      | 5 +----
+ drivers/net/can/Makefile     | 2 +-
+ drivers/net/can/dev/Makefile | 5 ++---
+ drivers/net/can/usb/gs_usb.c | 2 +-
+ net/can/Kconfig              | 1 -
+ 5 files changed, 5 insertions(+), 10 deletions(-)
 
