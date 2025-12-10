@@ -1,169 +1,287 @@
-Return-Path: <netdev+bounces-244277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244278-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA77BCB38C5
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 18:00:47 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1877CB39E5
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 18:27:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B8FF53004428
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 17:00:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E7B23302532F
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 17:26:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F13EC301014;
-	Wed, 10 Dec 2025 17:00:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43A1730FF3B;
+	Wed, 10 Dec 2025 17:26:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="LpPMk0GC"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="SaQGVVW5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07A593B8D68
-	for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 17:00:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF6027B358
+	for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 17:26:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765386045; cv=none; b=R/lFlX0bjV5sjb8UIqfYY5q7bGSZtXFH8yRTxS/q2NWyLnQH3V4dhK7+i26cOWntqS7k5EefWFBjFjzjbiIp71zeT7wadfeiq4PrDS3NI9SetiBmTTQCNhB8AgdqrePBCSqByjrtrnEWnkFvWXYfEQ8qHNes5aZdWk9U4jnBj/o=
+	t=1765387573; cv=none; b=czc8gVie43IRAEa7QeLF7LBwE/98T14gQ5xBxJ3dCn8L8BL7e93fEWnUgGaS40MWfHsfvTj6YJ3jlN4Y9o4AbepwP7dMz/qHXBpLyxS6e9QPwBDl4C6YaVnILcOOGoHjxshVVCZAw6lKjqv8r96tilvlQsn369blLQOoXIDEx2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765386045; c=relaxed/simple;
-	bh=FBmwFdk8KmfQOZkTTcpkqcEG4/3NqAXMQcceK6coI64=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Tz5N1+Lk0/i02K32jKkVeYqvhstUjGgd+K4wsnL4dgtGYeN5i93Tz8WQEqfI5S2IHMORQdX3Rq4t9Dn8rl6oK7tyQ3ySZr81n8qweaAA+ZtwrE25zvOkZwh1qW4ksD0fGKKSug7Y/ejRX2NRGVn9NcbwxVyTYHSeodSqAJ6RVUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=LpPMk0GC; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-b737d4cde73so109721766b.2
-        for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 09:00:43 -0800 (PST)
+	s=arc-20240116; t=1765387573; c=relaxed/simple;
+	bh=Dj30wna/cGqsfd3+heWOiHPayNwVRle0QLdeRSXFnzg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ldTBcVGEPjP4mWatfmSo+Y4xbaa2qpQAuvyFuTr7SxI6NtTMTMtHcnfTTdx2onjh1r0p4x08qW3ZsY0B+EhOPrZk4qb1FMH7RJseYwtKRFDD+HNVg0p/HK1ITeQ4d01RgKFVjc9kLZLjYCLXhOsuiRXz0o88sISVnFkYKsK91YQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=SaQGVVW5; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4ee0ce50b95so10725961cf.0
+        for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 09:26:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1765386042; x=1765990842; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=tD08r0a78l8/LQa4IKNrj3hiCwXxjQYeAIVJcC5GLJc=;
-        b=LpPMk0GC9HOKE2e8pfyzUpfGf8NX1Qu+t3tQTAklR12jYbO0xGvYyxxVCKg2dFV6f7
-         imcGJviVgF0yZc9D20xgWjfwlqnDN4WdELgw/GnvIQhnt6HgEonwT2VHld/gj7sDCzP1
-         RnHUptnPBTQNin3OWVAgBPlzUVQmvD2oL5rdZuTuO69iCI3twQdmIrft5o0Skv3/sTZE
-         XV+oFYI7GTM5UayMHlQnQ92+aGKQwO+5lbxisof1zZme/EPpOShs/I5jAb5XwM2vVY1u
-         cMYK5OVSaxvQFAaowz5z0q+N4ARvHLgA8+gHwfT+sVZaCf8Booy9DaMLBBHM0UrN/xxW
-         uXSA==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1765387570; x=1765992370; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qortwmnraNcyPicOXQjsuNN3yW2jvMMJW5TuFjMLtNI=;
+        b=SaQGVVW5H9MJiOhckeq3jq9yOcSCO4z7zQRHcx2H6GymCknXjQxMMVAXO2jutIApqu
+         HLZOT7wZkcEnQj0Vrpon4anTmbkrEe63QYG+rPdbNehZh/GbqcRGyGRK3UuKwDI+61PT
+         ipYSxIsC6cMjbx5rLNGpjqoAeydkuoMXbcudNqlir5K9A6LmQjydiXQHm+mq/pTI8Xoi
+         AUtqmhuNB15nGhpMeQ/YGPXfoCC8EtUCSEMZ/vBXWyE22IQe1G548YmsxXpcdX+XX5od
+         0B1vYcECLBMWFBA5XYOgAJd7/XDK8VJDJ9/RKX0OLkv9X5n7d+ed2T6ahCsSxN5QBWpN
+         JTew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765386042; x=1765990842;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1765387570; x=1765992370;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tD08r0a78l8/LQa4IKNrj3hiCwXxjQYeAIVJcC5GLJc=;
-        b=ooBl0JAOt2/GHBVctmaqYzK/O59So7e38QBUa6t/c7OGDNBKIJl/xPNTi8LZYRS/Bl
-         FsaktrilxT9cBFKxGk0/kCcrot6hxUob/lrhl8rh1ECAyxJWC7orJqRQVl9H7Dh8/0TZ
-         Ae/ka++mlTB0IEUOGIoXQ6CG2CeMm0h4FuB10vdd94O00BgObyeZUlHm2GTqAk6EDEhZ
-         8RfcW8uWTsmMpkeA7bVJYHQTcxNRbm/S/F50UfIVD6k/jlcdMKrpZGhFzcCi+kEIdmfZ
-         ERB/4fP+KlnJBo9rEHIwW05I692ai6EqmGL8hF0YiClJ+sUTBUHv0NYD7wuWymhcL4gS
-         m5ZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUXujJlDpz9eGa972AqDjg1U9496vzHtoe453axRcywx6issJ1jmi/ANoC0AZmSMYcAvbLcp3Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNtIM7MGq1hcipJGHyKaMXtf9BYeoU0f6hP8pl2u2xCgsUg6dl
-	VMonOPAFNaikGPs4JwxaWaWfHkP8uBBxwK1IsqQjcpKni+OpEExYaes1GQDvMpK7dFQ=
-X-Gm-Gg: AY/fxX4gsXo02nn2/XMgCu3nuYogAv0V266rzbcgClohtcckflNu4YOrp4yU5sZ4UxU
-	gz/1lhdX1PR41ZTO5jc3O1h7y/w2A2stA/YJJ1ESuaAsbManAz/+05MqS62V7ug2gFGCOLf7kT/
-	qgNFy5pk2SNCowSpRYYQpAG6aGAraIQrSbknZX+OKMjS7msTzcPnDxaPQ0mrWYFV3zxxq1uL2w4
-	Fp0HlC9Doke1f9YFz6JQxccrjDpvoY//GkoMSiLonH6+1gSzGyOv484MKALcCjQO4YtJZNG27bk
-	oepEbyrvTMcpy6DwFqmnCi2NYngA86ErqNoLF3OWU4YnVxegbdRWSztY3EnedGXdl2U1uHEHoe0
-	alj0zwXIGusUmZP3/tJDUT/gNjnfJRHORs23KElO2YWQ4RW8E5TzawoyXqOd9+FgprE1C1skWKZ
-	uZk9I8bnBa2dLsIODqVH1UslVnVo4ktvLi+9jMnA9P11ByyAeUJN6AfNWqUHNMeYdztkBbb2wOk
-	g==
-X-Google-Smtp-Source: AGHT+IE9b2TKWKWerHCea/Hu7xxQ/Xr/I7f97pfyo9JbDmp7y9fYMSzYQ7ko2TC6vwBUEau8SdvygQ==
-X-Received: by 2002:a17:907:2d8e:b0:b76:7e96:8b79 with SMTP id a640c23a62f3a-b7ce8287b3dmr185158866b.2.1765386041807;
-        Wed, 10 Dec 2025 09:00:41 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:b41:c160:6a1d:efff:fe52:1959? ([2a01:e0a:b41:c160:6a1d:efff:fe52:1959])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7cfa5d258dsm5753766b.71.2025.12.10.09.00.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Dec 2025 09:00:40 -0800 (PST)
-Message-ID: <051053d9-65f2-43bf-936b-c12848367acd@6wind.com>
-Date: Wed, 10 Dec 2025 18:00:39 +0100
+        bh=qortwmnraNcyPicOXQjsuNN3yW2jvMMJW5TuFjMLtNI=;
+        b=R5jQALxbPe86kTr6eu2kM4M0t9Ou7q9F6SZWi8ekCHW8hZvu9bIjW22KSO/UVgIUWn
+         E3RUrRFdQubtTbkdCHK8Qc6N+1rFGzzsS6BL/kFC5NI951Bj9vXswfUaOfjwkjKUBz+G
+         5/em8P0J/cGdEUypQZbuP1GfFmHHdki00aTZFwTQPZ/sfTd3xW1tpOYhpfDgy/x1xPBc
+         JrYrSpf0pFBhP+IjXmRPcfdgcbxBNnqYuj2xEv4DfCW3jnWnnUrrVrTN4VXuXTD9b+j+
+         9V3Ql8/PXLTrJcyHlgzNCjCDVrggxkI4llm7i4qZr1oizWNOeF56wtH/6fzwJsNMWbn/
+         LbAA==
+X-Gm-Message-State: AOJu0Yzav7CdALi6JE4aaCqHbSFz0gfRPN6P53kjoAK9D7HT/HVHpz7z
+	ZB6xVS5aSLWhd8rrygqboqr14GK9Wxm40ZwYS6cbL+xJdgDMZ3EU/Orug4EPiRUrdQ==
+X-Gm-Gg: ASbGncv62NobpPiUortN7rK4WHNnYea72eU91tt7F3pU/wWm+zC345vRIqHdenXwy2G
+	i5RO5ZEjwMlR18wMMIWh86KimEsTtmmk1ZKlqn1guG2pIo4AUPTVvdonyJ+Xl2fYBGwqE0B102H
+	ObwoT5vsxmdjdJIEaTM1xp07iZk6eCL+V4dOzHPu9llC3yIIDNfxNN9d9b3cAotyNcMpwyDSpw0
+	5En27N37RZGtMF3OnNUKW6TttMu82cqC1L2ZUOkuUZBYcXKpRPjInpPIuJ8WF2WiVRgp2ImAgsp
+	8dt2teT3ky2cUg/tAb/85cJZR+2QavxQgela/w2IGuSH3LSAF8/2oiZzGehBW57VfWNGrrPRG7m
+	uWTAh+MXBxT/5UilDxJmu0Js9bPv3ljwQdWOpPl8LV5ILl5eCoKjBQjOulGzdGBLYfaj+ywgW21
+	Uu7MwxZlY1k5U=
+X-Google-Smtp-Source: AGHT+IEfmJdTs08Vw/2Nih+F5s961qD08RnAR4C/StEltfsBnJo+V1h490IBWqaGN+3yH/G4zhU/vg==
+X-Received: by 2002:a05:622a:11c9:b0:4f1:af84:f1f8 with SMTP id d75a77b69052e-4f1bbcace0emr3068021cf.12.1765387570007;
+        Wed, 10 Dec 2025 09:26:10 -0800 (PST)
+Received: from majuu.waya ([70.50.89.69])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4f027d24734sm118829591cf.23.2025.12.10.09.26.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Dec 2025 09:26:09 -0800 (PST)
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: netdev@vger.kernel.org,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	victor@mojatatu.com,
+	dcaratti@redhat.com,
+	lariel@nvidia.com,
+	daniel@iogearbox.net,
+	pablo@netfilter.org,
+	Jamal Hadi Salim <jhs@mojatatu.com>
+Subject: [PATCH RFC net 1/1] net: sched: Fix ethx:ingress -> ethy:egress -> ethx:ingress mirred loop
+Date: Wed, 10 Dec 2025 12:25:54 -0500
+Message-Id: <20251210172554.1071864-1-jhs@mojatatu.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH net] seg6: fix route leak for encap routes
-To: Andrea Mayer <andrea.mayer@uniroma2.it>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, David Lebrun
- <david.lebrun@uclouvain.be>, Paolo Lungaroni <paolo.lungaroni@uniroma2.it>,
- David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
- stefano.salsano@uniroma2.it
-References: <20251208102434.3379379-1-nicolas.dichtel@6wind.com>
- <20251210113745.145c55825034b2fe98522860@uniroma2.it>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <20251210113745.145c55825034b2fe98522860@uniroma2.it>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Le 10/12/2025 à 11:37, Andrea Mayer a écrit :
-> On Mon,  8 Dec 2025 11:24:34 +0100
-> Nicolas Dichtel <nicolas.dichtel@6wind.com> wrote:
-> 
->> The goal is to take into account the device used to set up the route.
->> Before this commit, it was mandatory but ignored. After encapsulation, a
->> second route lookup is performed using the encapsulated IPv6 address.
->> This route lookup is now done in the vrf where the route device is set.
->>
-> 
-> Hi Nicolas,
-Hi Andrea,
+This patch could be broken down into multiple patches(at least two), but
+posted as one because it is an RFC.
 
-> 
-> I've got your point. However, I'm still concerned about the implications of
-> using the *dev* field in the root lookup. This field has been ignored for this
-> purpose so far, so some existing configurations/scripts may need to be adapted
-> to work again. The adjustments made to the self-tests below show what might
-> happen.
-Yes, I was wondering how users use this *dev* arg. Maybe adding a new attribute,
-something like SEG6_IPTUNNEL_USE_NH_DEV will avoid any regressions.
+When mirred redirects from egress to ingress  the loop state is lost.
+This is because the current loop detection mechanism depends on the device
+being rememebred on the sched_mirred_dev array; however, that array is
+cleared when we go from egress->ingress because the packet ends up in the
+backlog and when we restart from the backlog the loop is amplified, on and
+on...
 
-> 
-> 
->> The l3vpn tests show the inconsistency; they are updated to reflect the
->> fix. Before the commit, the route to 'fc00:21:100::6046' was put in the
->> vrf-100 table while the encap route was pointing to veth0, which is not
->> associated with a vrf.
->>
->> Before:
->>> $ ip -n rt_2-Rh5GP7 -6 r list vrf vrf-100 | grep fc00:21:100::6046
->>> cafe::1  encap seg6 mode encap segs 1 [ fc00:21:100::6046 ] dev veth0 metric 1024 pref medium
->>> fc00:21:100::6046 via fd00::1 dev veth0 metric 1024 pref medium
->>
->> After:
->>> $ ip -n rt_2-Rh5GP7 -6 r list vrf vrf-100 | grep fc00:21:100::6046
->>> cafe::1  encap seg6 mode encap segs 1 [ fc00:21:100::6046 ] dev veth0 metric 1024 pref medium
->>> $ ip -n rt_2-Rh5GP7 -6 r list | grep fc00:21:100::6046
->>> fc00:21:100::6046 via fd00::1 dev veth0 metric 1024 pref medium
->>
->> Fixes: 6c8702c60b88 ("ipv6: sr: add support for SRH encapsulation and injection with lwtunnels")
->> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
->> ---
->>  net/ipv6/seg6_iptunnel.c                                | 6 ++++++
->>  tools/testing/selftests/net/srv6_end_dt46_l3vpn_test.sh | 2 +-
->>  tools/testing/selftests/net/srv6_end_dt4_l3vpn_test.sh  | 2 +-
->>  tools/testing/selftests/net/srv6_end_dt6_l3vpn_test.sh  | 2 +-
->>  4 files changed, 9 insertions(+), 3 deletions(-)
->>
->> diff --git a/net/ipv6/seg6_iptunnel.c b/net/ipv6/seg6_iptunnel.c
->> index 3e1b9991131a..9535aea28357 100644
->> --- a/net/ipv6/seg6_iptunnel.c
->> +++ b/net/ipv6/seg6_iptunnel.c
->> @@ -484,6 +484,12 @@ static int seg6_input_core(struct net *net, struct sock *sk,
->>  	 * now and use it later as a comparison.
->>  	 */
->>  	lwtst = orig_dst->lwtstate;
->> +	if (orig_dst->dev) {
-> 
-> When can 'orig_dst->dev' be NULL in this context?
-I was cautious to avoid any unpleasant surprises. A dst can have dst->dev set to
-NULL.
+A simple test case:
 
-Thanks,
-Nicolas
+tc qdisc add dev ethx clsact
+tc qdisc add dev ethy clsact
+tc filter add dev ethx ingress protocol ip \
+   prio 10 matchall action mirred egress redirect dev ethy
+tc filter add dev ethy egress protocol ip \
+   prio 10 matchall action mirred ingress redirect dev ethx
+
+ping such that packets arrive on ethx. Puff and sweat while the cpu
+consumption goes up. Or just delete those two qdiscs from above
+on ethx and ethy.
+
+For this to work we need to _remember the loop state in the skb_.
+We reclaim the bit "skb->from_ingress" to the qdisc_skb_cb since its use
+is constrained for ifb. We then use an extra bit that was available on
+the skb for a total of 2 "skb->ttl" bits.
+Mirred increments the ttl whenever it sees the same skb. We then
+catch it when it exceeds MIRRED_NEST_LIMIT iterations of the loop.
+
+Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+---
+ drivers/net/ifb.c         |  3 +--
+ include/linux/skbuff.h    | 35 +++--------------------------------
+ include/net/sch_generic.h | 30 ++++++++++++++++++++++++++++++
+ net/sched/act_mirred.c    |  5 ++++-
+ 4 files changed, 38 insertions(+), 35 deletions(-)
+
+diff --git a/drivers/net/ifb.c b/drivers/net/ifb.c
+index d3dc0914450a..4783d479d1d6 100644
+--- a/drivers/net/ifb.c
++++ b/drivers/net/ifb.c
+@@ -123,8 +123,7 @@ static void ifb_ri_tasklet(struct tasklet_struct *t)
+ 		}
+ 		rcu_read_unlock();
+ 		skb->skb_iif = txp->dev->ifindex;
+-
+-		if (!skb->from_ingress) {
++		if (!qdisc_skb_cb(skb)->from_ingress) {
+ 			dev_queue_xmit(skb);
+ 		} else {
+ 			skb_pull_rcsum(skb, skb->mac_len);
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index 86737076101d..2e76d84eddf8 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -1000,6 +1000,9 @@ struct sk_buff {
+ 	/* Indicates the inner headers are valid in the skbuff. */
+ 	__u8			encapsulation:1;
+ 	__u8			encap_hdr_csum:1;
++#ifdef CONFIG_NET_REDIRECT
++	__u8			ttl:2;
++#endif
+ 	__u8			csum_valid:1;
+ #ifdef CONFIG_IPV6_NDISC_NODETYPE
+ 	__u8			ndisc_nodetype:2;
+@@ -1016,9 +1019,6 @@ struct sk_buff {
+ 	__u8			offload_l3_fwd_mark:1;
+ #endif
+ 	__u8			redirected:1;
+-#ifdef CONFIG_NET_REDIRECT
+-	__u8			from_ingress:1;
+-#endif
+ #ifdef CONFIG_NETFILTER_SKIP_EGRESS
+ 	__u8			nf_skip_egress:1;
+ #endif
+@@ -5347,35 +5347,6 @@ static inline __wsum lco_csum(struct sk_buff *skb)
+ 	return csum_partial(l4_hdr, csum_start - l4_hdr, partial);
+ }
+ 
+-static inline bool skb_is_redirected(const struct sk_buff *skb)
+-{
+-	return skb->redirected;
+-}
+-
+-static inline void skb_set_redirected(struct sk_buff *skb, bool from_ingress)
+-{
+-	skb->redirected = 1;
+-#ifdef CONFIG_NET_REDIRECT
+-	skb->from_ingress = from_ingress;
+-	if (skb->from_ingress)
+-		skb_clear_tstamp(skb);
+-#endif
+-}
+-
+-static inline void skb_reset_redirect(struct sk_buff *skb)
+-{
+-	skb->redirected = 0;
+-}
+-
+-static inline void skb_set_redirected_noclear(struct sk_buff *skb,
+-					      bool from_ingress)
+-{
+-	skb->redirected = 1;
+-#ifdef CONFIG_NET_REDIRECT
+-	skb->from_ingress = from_ingress;
+-#endif
+-}
+-
+ static inline bool skb_csum_is_sctp(struct sk_buff *skb)
+ {
+ #if IS_ENABLED(CONFIG_IP_SCTP)
+diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+index c3a7268b567e..7580ccb65ba5 100644
+--- a/include/net/sch_generic.h
++++ b/include/net/sch_generic.h
+@@ -459,6 +459,7 @@ struct qdisc_skb_cb {
+ 	u8			post_ct:1;
+ 	u8			post_ct_snat:1;
+ 	u8			post_ct_dnat:1;
++	u8			from_ingress:1;
+ };
+ 
+ typedef void tcf_chain_head_change_t(struct tcf_proto *tp_head, void *priv);
+@@ -1140,6 +1141,35 @@ static inline void qdisc_dequeue_drop(struct Qdisc *q, struct sk_buff *skb,
+ 	q->to_free = skb;
+ }
+ 
++static inline bool skb_is_redirected(const struct sk_buff *skb)
++{
++	return skb->redirected;
++}
++
++static inline void skb_set_redirected(struct sk_buff *skb, bool from_ingress)
++{
++	skb->redirected = 1;
++#ifdef CONFIG_NET_REDIRECT
++	qdisc_skb_cb(skb)->from_ingress = from_ingress;
++	if (qdisc_skb_cb(skb)->from_ingress)
++		skb_clear_tstamp(skb);
++#endif
++}
++
++static inline void skb_reset_redirect(struct sk_buff *skb)
++{
++	skb->redirected = 0;
++}
++
++static inline void skb_set_redirected_noclear(struct sk_buff *skb,
++					      bool from_ingress)
++{
++	skb->redirected = 1;
++#ifdef CONFIG_NET_REDIRECT
++	qdisc_skb_cb(skb)->from_ingress = from_ingress;
++#endif
++}
++
+ /* Instead of calling kfree_skb() while root qdisc lock is held,
+  * queue the skb for future freeing at end of __dev_xmit_skb()
+  */
+diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+index 91c96cc625bd..fec5a5763fcb 100644
+--- a/net/sched/act_mirred.c
++++ b/net/sched/act_mirred.c
+@@ -318,8 +318,10 @@ static int tcf_mirred_to_dev(struct sk_buff *skb, struct tcf_mirred *m,
+ 
+ 		skb_set_redirected(skb_to_send, skb_to_send->tc_at_ingress);
+ 
++		skb_to_send->ttl++;
+ 		err = tcf_mirred_forward(at_ingress, want_ingress, skb_to_send);
+ 	} else {
++		skb_to_send->ttl++;
+ 		err = tcf_mirred_forward(at_ingress, want_ingress, skb_to_send);
+ 	}
+ 	if (err)
+@@ -434,7 +436,8 @@ TC_INDIRECT_SCOPE int tcf_mirred_act(struct sk_buff *skb,
+ #else
+ 	xmit = this_cpu_ptr(&softnet_data.xmit);
+ #endif
+-	if (unlikely(xmit->sched_mirred_nest >= MIRRED_NEST_LIMIT)) {
++
++	if (skb->ttl >= MIRRED_NEST_LIMIT - 1) {
+ 		net_warn_ratelimited("Packet exceeded mirred recursion limit on dev %s\n",
+ 				     netdev_name(skb->dev));
+ 		return TC_ACT_SHOT;
+-- 
+2.34.1
+
 
