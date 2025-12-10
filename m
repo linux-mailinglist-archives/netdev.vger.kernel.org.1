@@ -1,124 +1,181 @@
-Return-Path: <netdev+bounces-244270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244271-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6245ECB3713
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 17:16:42 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0F27CB3782
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 17:27:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5CD9C300721C
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 16:16:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0EB9C301E5BA
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 16:23:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F00C4327201;
-	Wed, 10 Dec 2025 16:16:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60BF325743D;
+	Wed, 10 Dec 2025 16:23:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dkkHka/p"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="KgVz8yHM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10CD92868AB
-	for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 16:16:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89D9E28489B
+	for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 16:23:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765383400; cv=none; b=WynC9juK2MJQJ6Riq3eB05T63F3AzJdBkrBLHZU860Q8mxDCew0MauXppY7Hqi7T0qBxQqUbw01pi2TmcoPHMxUC2iie4fDVBTKt8FpWm5XIvqcXm0iU6xMmrHG9E5ctwvaFmWWtEhWLFdIUqQYXVocKW+JW1Gw5TRO9dC/sKbI=
+	t=1765383796; cv=none; b=oTV3qCePdfRU406ya+0MGlyG5GxhnlBF/0bTVnardosYrqFrVp/G8YlCB4c1cmuJrArSQiarGJG1zMKA7FROo5I3r/PXh4+3VDSFTxkz66AiGjJwY1hwhk+lpNGUu8R30qzdO5XQ2aZ62JDNaOxK2gqAnKtnlXN/B57CdbOYHc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765383400; c=relaxed/simple;
-	bh=KY7UcVKJx2M5vV0fy/PMjqMS2fQo1kzZvxVGFq1E7iU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hsYS9jRnjomtPmk74LzimwprABKSWPucpRfkM7H3xLZaE/8SkyxaTA1W3A30UJ7u3n4w4Nvtyu4h9++gN2Nf3yrfo+DH6SMv3SA6vrAxA8vwVTI1WKp16PAXvwCc3RTc60m5bzxW6zQ9n7tL88kwellFVPvYWziwUKDc/BVa2rA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dkkHka/p; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4779e28ebefso5995875e9.2
-        for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 08:16:38 -0800 (PST)
+	s=arc-20240116; t=1765383796; c=relaxed/simple;
+	bh=TVYQlSswgyT4Y2yQXOMvxVwiBQeT6+KriqVo8PC2u5g=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=X+XAO4iH8Qj4euhhf9P6JQd5DH8ZGhW4sKnU4GxDyvuJwGMl/L/ZhuhzgIu5WM4rMlZx4BTwiPknQLDQsT/zjscAiwVCUyEU01K7JZ56P6Jj7wwVUpKY+bscHCve2PhmGmTIW/ZxGqHItAqGPfKL7nRHUDIqM3Eu0+UOuavcP1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=KgVz8yHM; arc=none smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-88057f5d041so31846d6.1
+        for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 08:23:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765383397; x=1765988197; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=J7gaiGsdHBlurzADrHTXibNWYhZRYOpdVz83hckt/C8=;
-        b=dkkHka/pe/1yLTARMD55cmjZF7iDyvnKa0tfWrL4JwwW6eGKk3fXVvDGOziPSNuPxk
-         33x2iiTE1S2CnYQAU43Lb4CI55uTIskpGNF31JJnEAYcfdqhxIuGAlIJxw+tQ2+aVV9I
-         YgodhWs0E7FHERtC6PMJyPJhb/QspxdN/6LUJBL0fNJJwignQt16vBPH1Jmid423Rc71
-         sg0ebORgQIBrtlw4fM8PX5mbUUPJzetkDPwMLfkxKraM8QsQet7EXF8h2W60Kb0vZrDW
-         XVPRs6MW3cx0nBZfzID8NCNL2MTsekNgYnl3Kl/oYAvIb+As5y4SlDBYFoc0K084YMm/
-         wdEg==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1765383792; x=1765988592; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2qaPQJgbEoeIPjFplI6qRjEqdrC6eBo7pPR0ANH2lMU=;
+        b=KgVz8yHMD3kvS7khrmusmvoEkEPy82XdNEoCSHqaIQTsbMus6XU4w3zyCr7HTBdgSe
+         sdkr7FrYzqzBKmf1Tz7znzfZvXyfJS+bjsdwjUpC7upTO33IZDEKN/zSog0JWvFOO7SW
+         ktXokz/Qhy8eFDPgTMnx60lXpLOJOHpIHB3f6/iwTVkVMSS3abgHF082/+b2LvsA6axj
+         vd+TrfISfMEuIp5muLFdpueoYeFoergq/x/vznb9yc8i3M6JsBr0cppvxVZYM+kQ4tdV
+         wqJV2C1wqePwqAkFzEGvmaj6fwQSc1UIAShNNcoHfsgO0TD+MzSWzJlK6o1PDKhmFCca
+         clSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765383397; x=1765988197;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=J7gaiGsdHBlurzADrHTXibNWYhZRYOpdVz83hckt/C8=;
-        b=J5gmlLq5SHjdn3t0Jwfj+EZ/zHa8LIcnyUKeeNagxrAgGuSnf6UZ3boWRXwY1qGXDF
-         KzkNs6bRF14ZaqwCPcYmg+/wJGlxCjV4l+FDxKCMUlb1kALRoJBsHybDfe0nhO+wDUrF
-         mIK6enXiuIm3uvXe5+4Fy6dDyO+7G+KrQ2YgZcy8zbhJxmAk+9hGcN++935VsOHXMh/0
-         MN5G9AGd1v8S41B8d4jbwGtO9aRZX9xO43IvY7d8dFHaF4uvLH9u7Mbk6q4hrAGERt5c
-         ckS02mk/hgzIZOZkfK3grwghekTcVfKBZwUSkn5Tl/L4Y7uIrFumxx6qmovEXn+wvMHH
-         38NQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXQSaCkW6F7i/2IAg6vJ2O6E3npljb2ejON9D/hCvOSAXhDZIHegcxI1pSsaXddGXqBc0m4gdY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKc3qdCJmWmrymZxjB1jyjpw7YwACSfLA5NRZ//4idsYnEWNwH
-	mtRKt2p6SsKYOXjzX2kadvp4oydYJVfXALnC9duVcty9bVk7KPHuR643
-X-Gm-Gg: ASbGncuE2ttmmIznpTEwz2k+2KjYSO8n1PvRZiDOmFzLjL7DOGxQmpWC1hPmSJvvkSW
-	ib8EidRX/y0pzUcDhvv6wruwNZYZZ5ynaVRR16sfTcembgsbELqSE4/DSLfDNeOBUfgLHE5IkC0
-	aP9qoagSveV0L+7itLrL3jN+zsibkVv388uOvSraSE74tnKDpZ7krmn0gCnb3ebjtx4V1GW2/Xw
-	02e3c1RrFdAjpOdN5TLloPNAv67vU+jxbsEXf1rpLavokSPCISCW7kzRbEktPiJf2PIDtYhKqHO
-	uyXSucfzqNiPWQg9ljKbrSJKLUUWcC+y7QdkXQwOq77JwPaQwwuannN6mYfGcgmCCS3RUWUW0V6
-	sZ50V42yMrjybq8KLxtKqZLi7FmMbCUTjfxLJ/JcWTihYPSgh2u6cCderT38YL7GcMoBjeyX4zY
-	8yOz8=
-X-Google-Smtp-Source: AGHT+IEn8XVJm38BXtgQpJHwPIRYh4SSmVYEP+9EFtVHZZlB7PB7qz8jRUrBe8HeGAVKj/Wk4hOcHw==
-X-Received: by 2002:a05:600c:1c93:b0:477:9a4d:b92d with SMTP id 5b1f17b1804b1-47a8380c622mr19222925e9.5.1765383397243;
-        Wed, 10 Dec 2025 08:16:37 -0800 (PST)
-Received: from skbuf ([2a02:2f04:d106:d600:6346:5010:4ce7:245c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47a882fe683sm270275e9.5.2025.12.10.08.16.35
+        d=1e100.net; s=20230601; t=1765383792; x=1765988592;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2qaPQJgbEoeIPjFplI6qRjEqdrC6eBo7pPR0ANH2lMU=;
+        b=p1Rmz0fFNQ2GouzySRVB/RNafsFs2tOEnswduPr91zwHriSs/NFCQyA3Y1PCJaf8D0
+         HZCWiZS8xUR3h3xFYcNaI/hoDhz3AevzqHzbJDwj2ADTK9uw/eEedY6g6EqE8pPpiYzn
+         PUuh5SMj2f46/UF+fbVLkhHCcxl9tWubKMPS/R3Woy2DP76eKrb0MqIpEKd9+OGwcHN/
+         8Z1VCK1Ze3py/VJCck5IPDP6Jn0vbtHsIAyfhrd7eWGYRz3CpLOKrS5QSXma/M5ZIqHv
+         eXxrg8npeGBq+kwetQsFeKeSMfVoge7IRfmfjBIIZHDlV3gFfEls564CcvcIS/HxVh+a
+         O9AA==
+X-Gm-Message-State: AOJu0YyhxsVX1ZVMA7pgVxroc6O8ZDfKqRmGhwgTjPbxIBBCFpdj775J
+	T5RoQMDLlp13kynkg1L3u/quWr2FDS+rXdLiwqVGOpPS44yyIrcv6EmAEDcYVVCOSA==
+X-Gm-Gg: AY/fxX6tPoYeS6+aPmdEgOwXjqXrulRXYusuxdr/tbig/a/CjmPbsgwmjQ7ILgdhhdX
+	lQBIOU4PpeLFBHOaQmAJ9SQbQ0+p6OV37BR+MWZaATkM94gFqjMZ/RvDA7B4FFjJdBu5jYDKXo/
+	9kvi2D3o5aC9St8O3hYr/ttfHoCyNEG3tyPVLV2h4tjOrIC6CRJa//ske0why7LiilfrcZ25UEH
+	/er3vlJWF62RSbP+OEDKZF7CaT1kAqZbMlUuhxyC6jyT6pb3kX1XkizXsLUQKOUlKmgkMmP2qTV
+	1nNI3IP1iXZPoj6NsqHOFy3u3ZONI4ZcQH7X/Lgu7kQG75sTvTvKSfz1d3hQdKnrgFUxWpfTE/u
+	Vx5L3FVLZk8g62CPstyqPQm2v69l45r9dPjXkgy9T7m72qtEMgqcEKTxt8Tu8E8NTQFuQ1co4h6
+	Oxgv0M/bFb10k=
+X-Google-Smtp-Source: AGHT+IE9FgOF78UmkUi/0wvK5chRQHDx92pyi3DS+Y8/IP5gRkMAP18yqVI1DoWfHKpt8VSZ+bx6nQ==
+X-Received: by 2002:a05:6214:b22:b0:888:6ea5:a90b with SMTP id 6a1803df08f44-8886ea5ac52mr2453086d6.0.1765383792272;
+        Wed, 10 Dec 2025 08:23:12 -0800 (PST)
+Received: from majuu.waya ([70.50.89.69])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8886eb1d624sm1044506d6.0.2025.12.10.08.23.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Dec 2025 08:16:36 -0800 (PST)
-Date: Wed, 10 Dec 2025 18:16:33 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Rasmus Villemoes <ravi@prevas.dk>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH net v4 0/4] net: dsa: lantiq: a bunch of fixes
-Message-ID: <20251210161633.ncj2lheqpwltb436@skbuf>
-References: <cover.1765241054.git.daniel@makrotopia.org>
+        Wed, 10 Dec 2025 08:23:11 -0800 (PST)
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: netdev@vger.kernel.org,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	victor@mojatatu.com,
+	dcaratti@redhat.com,
+	Jamal Hadi Salim <jhs@mojatatu.com>
+Subject: [PATCH net 1/2] net/sched: act_mirred: fix loop detection
+Date: Wed, 10 Dec 2025 11:22:54 -0500
+Message-Id: <20251210162255.1057663-1-jhs@mojatatu.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1765241054.git.daniel@makrotopia.org>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Dec 09, 2025 at 01:27:42AM +0000, Daniel Golle wrote:
-> This series is the continuation and result of comments received for a fix
-> for the SGMII restart-an bit not actually being self-clearing, which was
-> reported by by Rasmus Villemoes.
-> 
-> A closer investigation and testing the .remove and the .shutdown paths
-> of the mxl-gsw1xx.c and lantiq_gswip.c drivers has revealed a couple of
-> existing problems, which are also addressed in this series.
-> 
-> Daniel Golle (4):
->   net: dsa: lantiq_gswip: fix order in .remove operation
->   net: dsa: mxl-gsw1xx: fix order in .remove operation
->   net: dsa: mxl-gsw1xx: fix .shutdown driver operation
->   net: dsa: mxl-gsw1xx: manually clear RANEG bit
-> 
->  drivers/net/dsa/lantiq/lantiq_gswip.c        |  3 --
->  drivers/net/dsa/lantiq/lantiq_gswip.h        |  2 --
->  drivers/net/dsa/lantiq/lantiq_gswip_common.c | 19 +++++-----
->  drivers/net/dsa/lantiq/mxl-gsw1xx.c          | 38 +++++++++++++++++---
->  4 files changed, 44 insertions(+), 18 deletions(-)
-> 
-> -- 
-> 2.52.0
+Fix a loop scenario of ethx:egress->ethx:egress
 
-From a DSA API perspective this seems fine.
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+Example setup to reproduce:
+tc qdisc add dev ethx root handle 1: drr
+tc filter add dev ethx parent 1: protocol ip prio 1 matchall \
+         action mirred egress redirect dev ethx
+
+Now ping out of ethx and you get a deadlock:
+
+[  116.892898][  T307] ============================================
+[  116.893182][  T307] WARNING: possible recursive locking detected
+[  116.893418][  T307] 6.18.0-rc6-01205-ge05021a829b8-dirty #204 Not tainted
+[  116.893682][  T307] --------------------------------------------
+[  116.893926][  T307] ping/307 is trying to acquire lock:
+[  116.894133][  T307] ffff88800c122908 (&sch->root_lock_key){+...}-{3:3}, at: __dev_queue_xmit+0x2210/0x3b50
+[  116.894517][  T307]
+[  116.894517][  T307] but task is already holding lock:
+[  116.894836][  T307] ffff88800c122908 (&sch->root_lock_key){+...}-{3:3}, at: __dev_queue_xmit+0x2210/0x3b50
+[  116.895252][  T307]
+[  116.895252][  T307] other info that might help us debug this:
+[  116.895608][  T307]  Possible unsafe locking scenario:
+[  116.895608][  T307]
+[  116.895901][  T307]        CPU0
+[  116.896057][  T307]        ----
+[  116.896200][  T307]   lock(&sch->root_lock_key);
+[  116.896392][  T307]   lock(&sch->root_lock_key);
+[  116.896605][  T307]
+[  116.896605][  T307]  *** DEADLOCK ***
+[  116.896605][  T307]
+[  116.896864][  T307]  May be due to missing lock nesting notation
+[  116.896864][  T307]
+[  116.897123][  T307] 6 locks held by ping/307:
+[  116.897302][  T307]  #0: ffff88800b4b0250 (sk_lock-AF_INET){+.+.}-{0:0}, at: raw_sendmsg+0xb20/0x2cf0
+[  116.897808][  T307]  #1: ffffffff88c839c0 (rcu_read_lock){....}-{1:3}, at: ip_output+0xa9/0x600
+[  116.898138][  T307]  #2: ffffffff88c839c0 (rcu_read_lock){....}-{1:3}, at: ip_finish_output2+0x2c6/0x1ee0
+[  116.898459][  T307]  #3: ffffffff88c83960 (rcu_read_lock_bh){....}-{1:3}, at: __dev_queue_xmit+0x200/0x3b50
+[  116.898782][  T307]  #4: ffff88800c122908 (&sch->root_lock_key){+...}-{3:3}, at: __dev_queue_xmit+0x2210/0x3b50
+[  116.899132][  T307]  #5: ffffffff88c83960 (rcu_read_lock_bh){....}-{1:3}, at: __dev_queue_xmit+0x200/0x3b50
+[  116.899442][  T307]
+[  116.899442][  T307] stack backtrace:
+[  116.899667][  T307] CPU: 2 UID: 0 PID: 307 Comm: ping Not tainted 6.18.0-rc6-01205-ge05021a829b8-dirty #204 PREEMPT(voluntary)
+[  116.899672][  T307] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+[  116.899675][  T307] Call Trace:
+[  116.899678][  T307]  <TASK>
+[  116.899680][  T307]  dump_stack_lvl+0x6f/0xb0
+[  116.899688][  T307]  print_deadlock_bug.cold+0xc0/0xdc
+[  116.899695][  T307]  __lock_acquire+0x11f7/0x1be0
+[  116.899704][  T307]  lock_acquire+0x162/0x300
+[  116.899707][  T307]  ? __dev_queue_xmit+0x2210/0x3b50
+[  116.899713][  T307]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  116.899717][  T307]  ? stack_trace_save+0x93/0xd0
+[  116.899723][  T307]  _raw_spin_lock+0x30/0x40
+[  116.899728][  T307]  ? __dev_queue_xmit+0x2210/0x3b50
+[  116.899731][  T307]  __dev_queue_xmit+0x2210/0x3b50
+
+Fixes: 178ca30889a1 ("Revert "net/sched: Fix mirred deadlock on device recursion"")
+Tested-by: Victor Nogueira <victor@mojatatu.com>
+Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+---
+ net/sched/act_mirred.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+index f27b583def78..91c96cc625bd 100644
+--- a/net/sched/act_mirred.c
++++ b/net/sched/act_mirred.c
+@@ -281,6 +281,15 @@ static int tcf_mirred_to_dev(struct sk_buff *skb, struct tcf_mirred *m,
+ 
+ 	want_ingress = tcf_mirred_act_wants_ingress(m_eaction);
+ 
++	if (dev == skb->dev && want_ingress == at_ingress) {
++		pr_notice_once("tc mirred: Loop (%s:%s --> %s:%s)\n",
++			       netdev_name(skb->dev),
++			       at_ingress ? "ingress" : "egress",
++			       netdev_name(dev),
++			       want_ingress ? "ingress" : "egress");
++		goto err_cant_do;
++	}
++
+ 	/* All mirred/redirected skbs should clear previous ct info */
+ 	nf_reset_ct(skb_to_send);
+ 	if (want_ingress && !at_ingress) /* drop dst for egress -> ingress */
+-- 
+2.34.1
+
 
