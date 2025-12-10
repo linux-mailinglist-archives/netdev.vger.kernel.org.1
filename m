@@ -1,64 +1,48 @@
-Return-Path: <netdev+bounces-244206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F3D3CB271C
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 09:40:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 913DBCB276D
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 09:53:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9696D30A9CBD
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 08:34:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 45C613034ED5
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 08:53:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B4B5305E14;
-	Wed, 10 Dec 2025 08:34:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2E87302167;
+	Wed, 10 Dec 2025 08:53:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JrxgVk8J"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0C703064B7
-	for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 08:34:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96B7242D60;
+	Wed, 10 Dec 2025 08:53:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765355699; cv=none; b=MsM+RXbR61rDpr2JfVbXZn6bqwoLR2JpqUEW2wEGAZH2JDm+TEOdpkqb24PIKyUwOGLTVlQeFA7yQ4KiL+OdAS9+aNKPqOhhZYPUAYryIPoArtveRyvsYCoGKDS2Mkuo4JcbobWrxtssPiiOCexTdjhZPJZt5wz/51x2b642Eb4=
+	t=1765356792; cv=none; b=hpnA/qsotX9JdBb5pnIhz9qFHLLH5WESJBxeGR3LI0sr9VxhuYrva/ILxgzvxBXSJVNgTTETRGvu1897a6otpkdsHeSd+7pzkg/J5KuIU0SEV6OkMXjQ7eUVPkoKx/B7X5yDGwZ3Qj5fe5ecOd6OY0xMMOgaNvAFmN7FH+Hr8sQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765355699; c=relaxed/simple;
-	bh=h66wVx+pDZR9CBJkShCYbUTT6AFbZOddLraapcW4ung=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QkE8Wvtz/90NzxR2GZgryXNGwVhl+8vxkAua4tGyokkv8b6PRbjJdl//gETbGXvLgIuUizs2SREx3OTY6IwqOAIkqagX6ZmFlnPkrrxfszCvQoaRpo+vLuBKvAMjBC7WxaxBYvrn2YQrwcPw7VR0SbNgvuRJX7rydsyYzCi8iGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1vTFet-0007fZ-N1; Wed, 10 Dec 2025 09:34:51 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1vTFes-004vMi-2X;
-	Wed, 10 Dec 2025 09:34:50 +0100
-Received: from blackshift.org (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 6EF164B3B25;
-	Wed, 10 Dec 2025 08:34:50 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	linux-can@vger.kernel.org,
-	kernel@pengutronix.de,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	stable@vger.kernel.org
-Subject: [PATCH net 2/2] can: gs_usb: gs_can_open(): fix error handling
-Date: Wed, 10 Dec 2025 09:32:24 +0100
-Message-ID: <20251210083448.2116869-3-mkl@pengutronix.de>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251210083448.2116869-1-mkl@pengutronix.de>
-References: <20251210083448.2116869-1-mkl@pengutronix.de>
+	s=arc-20240116; t=1765356792; c=relaxed/simple;
+	bh=qDoGNCAWf0schiIM49QK83nRwlPkw6VFdS9o9n6aVxE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=D8pclmPxHlepgJ6htQtsEI0HzxRlxeagrGfDu67lV3HYQWxP01FRJ+wS5WSga85JLrecv+j0x4giqTJorTwx5tUm+ehDnbqKv3gBACQIUFprxhgA0B1lGay8O8nwwsubex1XdvchWQ5tD4EKtczf8iy+IbhiGq1l0jbXKpsvOHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JrxgVk8J; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49AB5C4CEF1;
+	Wed, 10 Dec 2025 08:53:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765356792;
+	bh=qDoGNCAWf0schiIM49QK83nRwlPkw6VFdS9o9n6aVxE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=JrxgVk8JnZhTB9JlhdOSG9CMgt6QfDEM53yavRekh/ZjZbOFCkY+p55WeZUivMrZC
+	 HRTWc3LIgjPQVmGt0SlFZ+TpzHtZvvJubTDo8+LDyDSXrOvzth6hDmKmcvg1NVgvDX
+	 3k7K+M5X5OOkn2tmYV/+yS+YXX87FNQvPU+ML3tREK4XH/NIR+vEviliGwceth+jeI
+	 AO/tAn9rLt6VyETOL5ZlU/SYDpSnebileohUdRAitUZA7om21UShFITWA135ht+qjT
+	 ZauARhCB/ulkZwqTVvC3KH6QPLF2LKgkk4yZolCdkmJ+lK48DoUfIOhDyLt1oRmZcT
+	 iWHPnpFBq9cig==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3BA423809A18;
+	Wed, 10 Dec 2025 08:50:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,47 +50,53 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: openvswitch: fix middle attribute validation in
+ push_nsh() action
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176535660704.514912.11425837372382255386.git-patchwork-notify@kernel.org>
+Date: Wed, 10 Dec 2025 08:50:07 +0000
+References: <20251204105334.900379-1-i.maximets@ovn.org>
+In-Reply-To: <20251204105334.900379-1-i.maximets@ovn.org>
+To: Ilya Maximets <i.maximets@ovn.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ linux-kernel@vger.kernel.org, dev@openvswitch.org, echaudro@redhat.com,
+ aconole@redhat.com, w@1wt.eu, kwqcheii@proton.me, zhuque@tencent.com
 
-Commit 2603be9e8167 ("can: gs_usb: gs_can_open(): improve error handling")
-added missing error handling to the gs_can_open() function.
+Hello:
 
-The driver uses 2 USB anchors to track the allocated URBs: the TX URBs in
-struct gs_can::tx_submitted for each netdev and the RX URBs in struct
-gs_usb::rx_submitted for the USB device. gs_can_open() allocates the RX
-URBs, while TX URBs are allocated during gs_can_start_xmit().
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-The cleanup in gs_can_open() kills all anchored dev->tx_submitted
-URBs (which is not necessary since the netdev is not yet registered), but
-misses the parent->rx_submitted URBs.
+On Thu,  4 Dec 2025 11:53:32 +0100 you wrote:
+> The push_nsh() action structure looks like this:
+> 
+>  OVS_ACTION_ATTR_PUSH_NSH(OVS_KEY_ATTR_NSH(OVS_NSH_KEY_ATTR_BASE,...))
+> 
+> The outermost OVS_ACTION_ATTR_PUSH_NSH attribute is OK'ed by the
+> nla_for_each_nested() inside __ovs_nla_copy_actions().  The innermost
+> OVS_NSH_KEY_ATTR_BASE/MD1/MD2 are OK'ed by the nla_for_each_nested()
+> inside nsh_key_put_from_nlattr().  But nothing checks if the attribute
+> in the middle is OK.  We don't even check that this attribute is the
+> OVS_KEY_ATTR_NSH.  We just do a double unwrap with a pair of nla_data()
+> calls - first time directly while calling validate_push_nsh() and the
+> second time as part of the nla_for_each_nested() macro, which isn't
+> safe, potentially causing invalid memory access if the size of this
+> attribute is incorrect.  The failure may not be noticed during
+> validation due to larger netlink buffer, but cause trouble later during
+> action execution where the buffer is allocated exactly to the size:
+> 
+> [...]
 
-Fix the problem by killing the rx_submitted instead of the tx_submitted.
+Here is the summary with links:
+  - [net] net: openvswitch: fix middle attribute validation in push_nsh() action
+    https://git.kernel.org/netdev/net/c/5ace7ef87f05
 
-Fixes: 2603be9e8167 ("can: gs_usb: gs_can_open(): improve error handling")
-Cc: stable@vger.kernel.org
-Link: https://patch.msgid.link/20251210-gs_usb-fix-error-handling-v1-1-d6a5a03f10bb@pengutronix.de
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
- drivers/net/can/usb/gs_usb.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/can/usb/gs_usb.c b/drivers/net/can/usb/gs_usb.c
-index e29e85b67fd4..a0233e550a5a 100644
---- a/drivers/net/can/usb/gs_usb.c
-+++ b/drivers/net/can/usb/gs_usb.c
-@@ -1074,7 +1074,7 @@ static int gs_can_open(struct net_device *netdev)
- 	usb_free_urb(urb);
- out_usb_kill_anchored_urbs:
- 	if (!parent->active_channels) {
--		usb_kill_anchored_urbs(&dev->tx_submitted);
-+		usb_kill_anchored_urbs(&parent->rx_submitted);
- 
- 		if (dev->feature & GS_CAN_FEATURE_HW_TIMESTAMP)
- 			gs_usb_timestamp_stop(parent);
+You are awesome, thank you!
 -- 
-2.51.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
