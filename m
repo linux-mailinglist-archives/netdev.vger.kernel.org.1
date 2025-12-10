@@ -1,67 +1,58 @@
-Return-Path: <netdev+bounces-244210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38E7FCB2791
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 09:57:51 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D2EFCB27D2
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 10:06:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id ED6B73050B99
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 08:57:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5EB5E300976A
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 09:06:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 009F826E6FA;
-	Wed, 10 Dec 2025 08:57:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 210D1303C9E;
+	Wed, 10 Dec 2025 09:06:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bfgzi6ht"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lsf+6D6Q"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDBEA1CAA79;
-	Wed, 10 Dec 2025 08:57:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E78711FA15E;
+	Wed, 10 Dec 2025 09:06:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765357067; cv=none; b=VWp+45QBUYg86Q05CaTrHs28LQ6AOFuzMDWNJDMqay+myNGTAuUd3PaK1VyE47SPJaPZVr/VD7MF1muzvjooaS1xOhL270AP0ThMUvP6+MdOkgRWeRW9iIIcRMUewwjmV1AJYTqpWqh4BCg/LYbNCkHFSAqAHq7cfYga7aWC8jw=
+	t=1765357605; cv=none; b=tJ6jUQYX+cx8JqsecjQMAdWTIFeEIKw8GsdDO4gSuJeQX7k8X6KSBHawloBB4+CciSueVT8LSFR88oKZfaORLr3UktrSzM5rtO+s1pRxIK41MQI7H2mhxqUCWk7B6X3eldQw8xrLjOgEBTNPcsmBLUVEXJUHrXcMd7g8EP5ky+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765357067; c=relaxed/simple;
-	bh=EPclZucFX7AUieJWyQ6LgdWVf0kbFbb2uxZpv0dy4TY=;
+	s=arc-20240116; t=1765357605; c=relaxed/simple;
+	bh=oqXaLvXswMKR+X2NSjmtZjLulAjooLz8zXWxpFKC5gU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=j1xl2A2WxQUEVNgdupmMyOM0plR4RtzEB7nSJq2BiBx8vX4TTB4ruk3B8qok7Opb7qbCGIba6IvQPoJwAYvqg7yNExYjs2q+Sts9yLTuz3wWqacSWBEElHdCKWHZFif/arZ6BWDdDT2evi7MWpjPR5KFpkwPML61Hrl5FARvuD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bfgzi6ht; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 506CAC4CEF1;
-	Wed, 10 Dec 2025 08:57:45 +0000 (UTC)
+	 MIME-Version:Content-Type; b=HyZzRp44TknpZpqcGYx0bDpfiyB6r35VTDI9coxUxSLoBOGVOVIiAapYSkGCEAgqQmsSrZNkqy9jLz7KXX15vFtskYs1GEOzGRjKteat5Qw12GHWXhN0ioiggE56vz0/CmcDcVDKyW7cKLBfINz34asu36kJGtagbiP7MOduLqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lsf+6D6Q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AB0AC4CEF1;
+	Wed, 10 Dec 2025 09:06:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765357067;
-	bh=EPclZucFX7AUieJWyQ6LgdWVf0kbFbb2uxZpv0dy4TY=;
+	s=k20201202; t=1765357604;
+	bh=oqXaLvXswMKR+X2NSjmtZjLulAjooLz8zXWxpFKC5gU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Bfgzi6ht2JuYoBOGXiDEinQTBcO5jOc/RNqvRF9KgLeSPrRF5jyzIJxqQgusZA0g1
-	 IxrhuV0ix/sAoCpRl001j0zAJI1KNsNSJHm07Et+cWyxzCPElUKF/ByfV8f1n0HBsk
-	 /9B2RHGg7gJBtYFJgTw0oWlhaTc8FhfQsn016gwvAsJjndnx5Sfwu+Sf3cED+U6fK9
-	 cgUGiXgsNGouy0Qe2AVOT51u1Cm5VJGZQRwlP5wac53Xmd44d7fP38+1kjlbCI8o54
-	 V7Wb6I0UJ3uvS8WarALnqvjeoOLwBlbLXl7qz9yup5WcQcPlmDWgE/ikZ7vPVM3u2J
-	 /gh/mscC5If5w==
-Date: Wed, 10 Dec 2025 17:57:42 +0900
+	b=Lsf+6D6QnPyGxIZXwPzfrXUtzDCVCpGR+vO/EihFAs1tk3RfdmWxcKvDYnZvoZYfi
+	 4z5SS5CUfJyRXeggB84EkC4vq/RidZpaH+bYolEBNlfbAXaQU9c5E7UjdVWzBnrV3r
+	 47opve41e8Wy98D00sXEYf8jx56PPS4Ago/1xmacGWPQuZcO+vKxMgNmq3KFD4R58D
+	 iEmx1yPajqhcS+AK4YSJEOEQvzLLRYHmqeKLMgtXZlY7UiDpnlisjxqo0zqY8lFiz+
+	 keF2gu+l42iNrFK3MlD7yMvEsdI23+nkngU45mPu6qF75wzkregYU6sM1b7p6IGytA
+	 c3xFyyAP5T2sQ==
+Date: Wed, 10 Dec 2025 18:06:40 +0900
 From: Jakub Kicinski <kuba@kernel.org>
-To: "Behera, VIVEK" <vivek.behera@siemens.com>
-Cc: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>, "Keller, Jacob
- E" <jacob.e.keller@intel.com>, "Nguyen, Anthony L"
- <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
- <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, "intel-wired-lan@lists.osuosl.org"
- <intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v5 iwl-net] igc: Fix trigger of incorrect irq in
- igc_xsk_wakeup function
-Message-ID: <20251210175742.3dba9318@kernel.org>
-In-Reply-To: <AS1PR10MB5392FCA415A38B9DD7BB5F218FA0A@AS1PR10MB5392.EURPRD10.PROD.OUTLOOK.COM>
-References: <AS1PR10MB5392B7268416DB8A1624FDB88FA7A@AS1PR10MB5392.EURPRD10.PROD.OUTLOOK.COM>
-	<4c90ed4e-307c-429a-9f8c-29032cc146ee@intel.com>
-	<AS1PR10MB5392C71EED7AB2446036FB9F8FA3A@AS1PR10MB5392.EURPRD10.PROD.OUTLOOK.COM>
-	<AS1PR10MB539202E6B3C43BE259831AD88FA3A@AS1PR10MB5392.EURPRD10.PROD.OUTLOOK.COM>
-	<IA3PR11MB89863C74B0554055470B9EE0E5A3A@IA3PR11MB8986.namprd11.prod.outlook.com>
-	<IA3PR11MB8986E4ACB7F264CF2DD1D750E5A0A@IA3PR11MB8986.namprd11.prod.outlook.com>
-	<AS1PR10MB5392FCA415A38B9DD7BB5F218FA0A@AS1PR10MB5392.EURPRD10.PROD.OUTLOOK.COM>
+To: Simon Horman <horms@kernel.org>
+Cc: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Sabrina Dubroca <sd@queasysnail.net>, Shuah Khan
+ <shuah@kernel.org>, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] selftests: tls: fix warning of
+ uninitialized variable
+Message-ID: <20251210180640.62fc3145@kernel.org>
+In-Reply-To: <aTQE9WDQxBA3g6Gr@horms.kernel.org>
+References: <20251205163242.14615-1-ankitkhushwaha.linux@gmail.com>
+	<aTQE9WDQxBA3g6Gr@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,21 +62,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 10 Dec 2025 07:50:55 +0000 Behera, VIVEK wrote:
-> Changes in v5:
-> - Updated comment style from multi-star to standard /* */ as suggested by  Aleksandr.
-> 
-> From ab2583ff8a17405d3aa6caf4df1c4fdfb21f5e98 Mon Sep 17 00:00:00 2001
-> From: Vivek Behera <vivek.behera@siemens.com>
-> Date: Fri, 5 Dec 2025 10:26:05 +0100
-> Subject: [PATCH v5] [iwl-net] igc: Fix trigger of incorrect irq in
->  igc_xsk_wakeup function
+On Sat, 6 Dec 2025 10:27:01 +0000 Simon Horman wrote:
+> Thanks for the update. Overall this seems good to me, however,
+> net-next is currently closed.
 
-The formatting of your submissions is all wrong. And you don't follow
-our guidance:
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
-
-Perhaps drop netdev@ and linux-kernel@ from the CC and Intel folks can
-help guide/teach you on their own list. Until you have the posting
-down..
+FWIW after Simon made this comment more fixes for various ksft warnings
+got posted, I think we should apply them now and to be consistent I'll
+also take this one.
 
