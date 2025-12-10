@@ -1,181 +1,114 @@
-Return-Path: <netdev+bounces-244179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D957CB19A4
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 02:36:36 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22112CB1B83
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 03:33:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A5D0F30B3A14
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 01:36:34 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 67205301B9D8
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 02:33:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EE7D221FDA;
-	Wed, 10 Dec 2025 01:36:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ngZplvnY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 104763B186;
+	Wed, 10 Dec 2025 02:33:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8827021348;
-	Wed, 10 Dec 2025 01:36:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D965F2686A0;
+	Wed, 10 Dec 2025 02:33:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765330593; cv=none; b=Bmn3f/zuW50AtlcPimov/btpaiIqdFlHvMyNOOvaz2WlJ2EVCRr4qf73CVLqhSg+xas8S45upFJDBDYTwDyVyIplG/Sd3zdYQtgSmz+bdgSVHDaC8NPZMfnVb0E+1vmhRvPW3IeUDlIiup6knXj+mpkoLJy5cdCTM8F9uo5Plyo=
+	t=1765333991; cv=none; b=jB8iSdU0UbEnX0S2GcWmLChFVFCK27MLqZByGgJbxuPPOZidOomAIrUOTuWlhx1c2mAbWTeI4/0uPhxD4FLp1L4YwNmxffFc6EJM7cEK7xiZIF7rFxP1a3QB/Mo8vj/aUcoaNbviFCBdDbhuPhuVBlhpdkrmeVBeS+hTRmlK3og=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765330593; c=relaxed/simple;
-	bh=K5odEHdQx6AReGW+bBKxgqCvZEHkimJ7Bft2ZBOGO04=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cX4OZPDPFspLiJ7lucN4/YLF6BUQPlsWfuRqwlaeMcPc7tlF6j7jXtjaKy9csPpJ/UPys6LvmgYdMIFnvlWzak+0ii6KKW4CALSVtYXR8PgsM3Neo5owiBM9cUP/lvvbbDhLwWzotJKV0y8AsDDQcET5Ay2LDAwQMiw088y+Www=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ngZplvnY; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765330592; x=1796866592;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=K5odEHdQx6AReGW+bBKxgqCvZEHkimJ7Bft2ZBOGO04=;
-  b=ngZplvnYu5qEV3cF/a+P8g4XZt87o6ScddjE9JZYAl/Wm3C1eLWbxqT9
-   KQ3wH6pe0sv3QyrWUGNeVMgDt/5+w7qkbjmELSCMOCqUFEzlc9C2tQK1e
-   AgLDlWGLfU9PSG+1mymZ+eUN3JNpEb/cJR9AYO7HKsCyWEpoub6EgAoIE
-   sqz4YI/ZVcsYrKuTDWPb+H2EAbWfa6fR2aruhLa8txZVCkgyScqBszqQb
-   x08tnHz1+e1E7DRm1yhz/wmI3MldKnTh+ZOGwCmRU95hqsPBhBZidGhnE
-   TsojI9PaGV/P1EANKBMAL71oUxsCbt406iu2JSKIuH5Rbiq5Yo30jt4G0
-   Q==;
-X-CSE-ConnectionGUID: F/fLMcsMTHSKy9sQkhXszw==
-X-CSE-MsgGUID: G6+NtLQSQvysGs76/xRwcA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11637"; a="84711125"
-X-IronPort-AV: E=Sophos;i="6.20,262,1758610800"; 
-   d="scan'208";a="84711125"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2025 17:36:31 -0800
-X-CSE-ConnectionGUID: Fx1f0ymTQfWL7CWfi6FUOg==
-X-CSE-MsgGUID: kGC7calUTMCwMTiPO6GqVw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,262,1758610800"; 
-   d="scan'208";a="201303730"
-Received: from lkp-server01.sh.intel.com (HELO d335e3c6db51) ([10.239.97.150])
-  by fmviesa004.fm.intel.com with ESMTP; 09 Dec 2025 17:36:27 -0800
-Received: from kbuild by d335e3c6db51 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vT97x-000000002Uv-1ixI;
-	Wed, 10 Dec 2025 01:36:25 +0000
-Date: Wed, 10 Dec 2025 09:36:05 +0800
-From: kernel test robot <lkp@intel.com>
-To: Wang Liang <wangliang74@huawei.com>, chuck.lever@oracle.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org, brauner@kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, yuehaibing@huawei.com,
-	zhangchangzhong@huawei.com, wangliang74@huawei.com
-Subject: Re: [PATCH net] net/handshake: Fix null-ptr-deref in
- handshake_complete()
-Message-ID: <202512100952.cr9q1lGr-lkp@intel.com>
-References: <20251209115852.3827876-1-wangliang74@huawei.com>
+	s=arc-20240116; t=1765333991; c=relaxed/simple;
+	bh=ag80Eo7W0tTquSre16KVgyzlL2w8cbwSMmdYxHMnsw0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jA3tQqjCsOljBch0QwvGmFOSqyrwwMoxyc74PkbpC/b9+moSFABewQeim9oEhxaxfIePrGXh158qJnx5NAO7GD7U5Y38nSRslZfLlr7p2fhjdWSAhe76ZFkibNrB1fUoULf6Jb9jwM/DxDb/Y9qjeKNCxgtMlDYKl1fvl16WE5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn; spf=pass smtp.mailfrom=isrc.iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=isrc.iscas.ac.cn
+Received: from localhost.localdomain (unknown [36.112.3.239])
+	by APP-01 (Coremail) with SMTP id qwCowAD3nmrM2zhpn84nAA--.13800S2;
+	Wed, 10 Dec 2025 10:32:46 +0800 (CST)
+From: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	lihaoxiang@isrc.iscas.ac.cn,
+	izumi.taku@jp.fujitsu.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH] fjes: Add missing iounmap in fjes_hw_init()
+Date: Wed, 10 Dec 2025 10:32:43 +0800
+Message-Id: <20251210023243.47945-1-lihaoxiang@isrc.iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251209115852.3827876-1-wangliang74@huawei.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qwCowAD3nmrM2zhpn84nAA--.13800S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrZF1xCr43Gr18WF47KF48Zwb_yoWkWrbE9r
+	1SgFsrW3WUCr15tF1UCrW3Zry2vF4DWrySg3W7tFWftasxCF9FyryIkFsxX348Xw45Zr93
+	A34UXr13Jw13ZjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUb38FF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6r1F6r1fM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
+	Cr1l84ACjcxK6I8E87Iv67AKxVWUJVW8JwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gr0_Gr
+	1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
+	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
+	n2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
+	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
+	17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
+	IF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4l
+	IxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWI
+	evJa73UjIFyTuYvjfUonmRUUUUU
+X-CM-SenderInfo: 5olkt0x0ld0ww6lv2u4olvutnvoduhdfq/1tbiBgoLE2k35laN1wABsh
 
-Hi Wang,
+In error paths, add fjes_hw_iounmap() to release the
+resource acquired by fjes_hw_iomap().
 
-kernel test robot noticed the following build errors:
+Fixes: 8cdc3f6c5d22 ("fjes: Hardware initialization routine")
+Cc: stable@vger.kernel.org
+Signed-off-by: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>
+---
+ drivers/net/fjes/fjes_hw.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-[auto build test ERROR on net/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Wang-Liang/net-handshake-Fix-null-ptr-deref-in-handshake_complete/20251209-194006
-base:   net/main
-patch link:    https://lore.kernel.org/r/20251209115852.3827876-1-wangliang74%40huawei.com
-patch subject: [PATCH net] net/handshake: Fix null-ptr-deref in handshake_complete()
-config: arm-mps2_defconfig (https://download.01.org/0day-ci/archive/20251210/202512100952.cr9q1lGr-lkp@intel.com/config)
-compiler: clang version 22.0.0git (https://github.com/llvm/llvm-project 6ec8c4351cfc1d0627d1633b02ea787bd29c77d8)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251210/202512100952.cr9q1lGr-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202512100952.cr9q1lGr-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> net/handshake/netlink.c:110:3: error: cannot jump from this goto statement to its label
-     110 |                 goto out_status;
-         |                 ^
-   net/handshake/netlink.c:114:13: note: jump bypasses initialization of variable with __attribute__((cleanup))
-     114 |         FD_PREPARE(fdf, O_CLOEXEC, sock->file);
-         |                    ^
-   net/handshake/netlink.c:104:3: error: cannot jump from this goto statement to its label
-     104 |                 goto out_status;
-         |                 ^
-   net/handshake/netlink.c:114:13: note: jump bypasses initialization of variable with __attribute__((cleanup))
-     114 |         FD_PREPARE(fdf, O_CLOEXEC, sock->file);
-         |                    ^
-   net/handshake/netlink.c:100:3: error: cannot jump from this goto statement to its label
-     100 |                 goto out_status;
-         |                 ^
-   net/handshake/netlink.c:114:13: note: jump bypasses initialization of variable with __attribute__((cleanup))
-     114 |         FD_PREPARE(fdf, O_CLOEXEC, sock->file);
-         |                    ^
-   3 errors generated.
-
-
-vim +110 net/handshake/netlink.c
-
-    89	
-    90	int handshake_nl_accept_doit(struct sk_buff *skb, struct genl_info *info)
-    91	{
-    92		struct net *net = sock_net(skb->sk);
-    93		struct handshake_net *hn = handshake_pernet(net);
-    94		struct handshake_req *req = NULL;
-    95		struct socket *sock;
-    96		int class, err;
-    97	
-    98		err = -EOPNOTSUPP;
-    99		if (!hn)
-   100			goto out_status;
-   101	
-   102		err = -EINVAL;
-   103		if (GENL_REQ_ATTR_CHECK(info, HANDSHAKE_A_ACCEPT_HANDLER_CLASS))
-   104			goto out_status;
-   105		class = nla_get_u32(info->attrs[HANDSHAKE_A_ACCEPT_HANDLER_CLASS]);
-   106	
-   107		err = -EAGAIN;
-   108		req = handshake_req_next(hn, class);
-   109		if (!req)
- > 110			goto out_status;
-   111	
-   112		sock = req->hr_sk->sk_socket;
-   113	
-   114		FD_PREPARE(fdf, O_CLOEXEC, sock->file);
-   115		if (fdf.err) {
-   116			err = fdf.err;
-   117			goto out_complete;
-   118		}
-   119	
-   120		get_file(sock->file); /* FD_PREPARE() consumes a reference. */
-   121		err = req->hr_proto->hp_accept(req, info, fd_prepare_fd(fdf));
-   122		if (err)
-   123			goto out_complete; /* Automatic cleanup handles fput */
-   124	
-   125		trace_handshake_cmd_accept(net, req, req->hr_sk, fd_prepare_fd(fdf));
-   126		fd_publish(fdf);
-   127		return 0;
-   128	
-   129	out_complete:
-   130		handshake_complete(req, -EIO, NULL);
-   131	out_status:
-   132		trace_handshake_cmd_accept_err(net, req, NULL, err);
-   133		return err;
-   134	}
-   135	
-
+diff --git a/drivers/net/fjes/fjes_hw.c b/drivers/net/fjes/fjes_hw.c
+index b9b5554ea862..a2e89ffa6f70 100644
+--- a/drivers/net/fjes/fjes_hw.c
++++ b/drivers/net/fjes/fjes_hw.c
+@@ -333,8 +333,10 @@ int fjes_hw_init(struct fjes_hw *hw)
+ 		return -EIO;
+ 
+ 	ret = fjes_hw_reset(hw);
+-	if (ret)
++	if (ret) {
++		fjes_hw_iounmap(hw);
+ 		return ret;
++	}
+ 
+ 	fjes_hw_set_irqmask(hw, REG_ICTL_MASK_ALL, true);
+ 
+@@ -347,8 +349,10 @@ int fjes_hw_init(struct fjes_hw *hw)
+ 	hw->max_epid = fjes_hw_get_max_epid(hw);
+ 	hw->my_epid = fjes_hw_get_my_epid(hw);
+ 
+-	if ((hw->max_epid == 0) || (hw->my_epid >= hw->max_epid))
++	if ((hw->max_epid == 0) || (hw->my_epid >= hw->max_epid)) {
++		fjes_hw_iounmap(hw);
+ 		return -ENXIO;
++	}
+ 
+ 	ret = fjes_hw_setup(hw);
+ 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.25.1
+
 
