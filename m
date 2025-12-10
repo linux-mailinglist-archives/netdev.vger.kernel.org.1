@@ -1,309 +1,216 @@
-Return-Path: <netdev+bounces-244263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF59CCB3480
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 16:20:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEFD9CB352E
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 16:33:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E0572307ECD2
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 15:20:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 41D8C30181AA
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 15:30:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45EB13016F3;
-	Wed, 10 Dec 2025 15:20:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AABA12C2364;
+	Wed, 10 Dec 2025 15:30:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TQfPExCV";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ozB+amrh"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E96AE2D0C84;
-	Wed, 10 Dec 2025 15:20:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E877526AC3
+	for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 15:30:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765380005; cv=none; b=sq3YbB7t5GdAYO3OMGeP+HPIcIDgdJNSEeRwCgjg3TbDUomi6wKiTN2zOi+VwfkV/ZLIA4AiWoZb9ralDrYXehOtMCGR/OAhEDSSrsrCtwG95C8SoZerURxkt9IRTJs+CKK+XQkpAFq4SVGx8eJF1bfkyUaYFIX9DRko+CQ+TP8=
+	t=1765380624; cv=none; b=QAHH97uMpnMpC8JFdg3PTiJCwKBstRc3DbEkfGp68Jzf/oi4XblSMuZ4aCHQma4uzmeknm3aOqSOI9XsDsClWLX9DLm9p+TRpfxfNLxDWuuuSI2Jy20gREsNyCvkdeYvSZp/I2r4SNxr2iVNwHyOjaKBRvPSFdqi0vPvvOFaNJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765380005; c=relaxed/simple;
-	bh=sT4TETdEy1ZyWcz1EzvQR0+wrpP7pkz8Jn/nlWmhFA4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aML9nhIKG/C2l1ychyui6hID6piOTx2INVqStlRlvKWA8GGhz+//IC8Rtu1NveN/Oy7e7GoJ0LroxZkD9StiRfwA9Z36fzhxx0ngbyEWmudXsV2n3G71JDPfNdb+BrN1yaUvzJekCXiCdI7HkSuUUmmtS0lvV1h/N0avYH47AAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vTLyl-0000000059m-2uJN;
-	Wed, 10 Dec 2025 15:19:47 +0000
-Date: Wed, 10 Dec 2025 15:19:43 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Frank Wunderlich <frankwu@gmx.de>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH RFC net-next 3/3] net: dsa: add basic initial driver for
- MxL862xx switches
-Message-ID: <aTmPjw83jFQXgWQt@makrotopia.org>
-References: <cover.1764717476.git.daniel@makrotopia.org>
- <d92766bc84e409e6fafdc5e3505573662dc19d08.1764717476.git.daniel@makrotopia.org>
- <c6525467-2229-4941-803d-1be5efb431c3@lunn.ch>
+	s=arc-20240116; t=1765380624; c=relaxed/simple;
+	bh=fKgiC27aXeEwEkJURDyda9hjIhsUz/XBgD0oxk0l2iM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Lgl19xOQS20uncTca7Eys/BvM7EaBnFAL+Iz2qroIc7NVnuKmmlpK/11qCL+lc7q6Ld3VUg78U8ZbldGcphjnhhyJSvSs1VDvz+bW15F+xAcVyfbKNMpWJ9U+jQW2v6U+oHT5uMlUTOV9oVotOV1Hn2SF6DWOGzklU/caYk2PhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TQfPExCV; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ozB+amrh; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1765380622;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=G+wsmW4VR7unE39vBofZpv46RyheC0as+jLhnNV6VxY=;
+	b=TQfPExCVGsgd6Bqn8lhFuX9lccIFAEOCa7dLaPoayBf0JgLLO4BISmWXa337I7dg0n1jpS
+	p1+Afp4fUS+bVuL+JFbEZzYWXsE0hW2KXvncDL9Ua1MHtrMjvGLy+VFZJx9t5nJdIFyMr9
+	ySEvSde8AxTXyoxSggtntOsu5laSilA=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-558-eIAWOh-tPKagROXAonFIAw-1; Wed, 10 Dec 2025 10:30:18 -0500
+X-MC-Unique: eIAWOh-tPKagROXAonFIAw-1
+X-Mimecast-MFC-AGG-ID: eIAWOh-tPKagROXAonFIAw_1765380617
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-649783da905so1428206a12.1
+        for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 07:30:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1765380617; x=1765985417; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=G+wsmW4VR7unE39vBofZpv46RyheC0as+jLhnNV6VxY=;
+        b=ozB+amrho6eXO9ykd/DvgWAzpPKaeiMHc4yyUWg86fpvh5kgNi6oU2VLFHDdEoIvVj
+         qTOQ0B4B9IMbfbiA1a2imxDRmqIP8QmW8CT1TsWUm0KOcmxH7f+oBbrSTBmD5yDi/Net
+         mWI6atliUF9RnSChG1FL8vfvxQpp7DWTdoFUoIhYWZk5F5Et+gcbQquqw3OXbIoOgGaD
+         AOUKy9mK1dXWgkzC32E66L0KyRq2z2LUr0P/ORTIVc7qd+p60cWnsiembxVtnbKS9PIP
+         qaqgOnwixg/kv+lg+t+KOhbmfA8v05BAQJxhZPBvRaL4j8GyccmkHRtuCgDFgkQ3NByq
+         xvdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765380617; x=1765985417;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=G+wsmW4VR7unE39vBofZpv46RyheC0as+jLhnNV6VxY=;
+        b=W/Iesfkj3Shx09cPJM4/LrZWaR4KRqXqA94x0tmyrscwJH4y9lOZQFd1XoU7tq7STJ
+         txgTtFhm/5cIE3jm0IsTyBSiDtjC2Im8HBnHaip8qjegYiGO8CCMKylgLa6cFXGC6kZf
+         SUyOnnxzuK8BvelQ9lOzHqP7Dkni7sux52PufoOtoUz7HYudWfckV7BZxRRI28LHHboQ
+         fTFK3AfhiIztXQzXTVO/7z3sm9I9bkTeBgv1RG+pvWeG2LQPTZdX9VlmMABHHqW3bpJ+
+         PJ+Q5NuJzCPph0Mr3X54ub1uHl6N5CHHWKGEe2Pqgm+H7imXVqyCWrnIlwGmUQOcQ3lt
+         borA==
+X-Forwarded-Encrypted: i=1; AJvYcCVDNionjxHWU4YEE7lydeAnH8x5RhRKp9lopVujaKA1rqAeOX1vVkYnpIvO8xCXsAsXivrPPbo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzDgJr0C4VvpTQIbb9LEJdRAVUDAc1+5aLX4bUykdkTkCcNVPxc
+	uABY9qxg3/O9VX/CQMp72DSeedIWYuUwFjXFZIFujEK5OqSJceJRT/6kjivWS9YS5wSn1WdgTdf
+	I7jAp5X749k5LUb28pQlRTeiXKXmcvRVfoRFC02DJWcuFl5QzibpYGNQLPFznZ3x94w==
+X-Gm-Gg: AY/fxX7W7T0XqUpysv+6cYkg9nT5IdRslPwHF0xX4mxB6X9oKE7mqYOPlA3vrPTvzzW
+	qUSxfkiIahG+SZ7PgkUpLjhtn5BRyEGMXkfW/mre3VnPiyOO1RBhz2+UwG7O1SuW0CMXJZYOK0/
+	aNVyCIvIhaj9xCu+DBCuJMdHlwFhG6RLuxbML+/r+u4Jo2gYB5XiN3fVcvJkoMS+yKKdpvGtj4D
+	goGCsjoVs64CJrf/ij4ufpjprPhJ8IzhYN9WArbKSGZUyLOhVvy/zc0pLALzfc4icojtnLkhVUv
+	PJ4vsW2Hl/Mk7z4KhG4+zgfESgWzBZx0+jpDIchI1Nvb0QOMLh3SldVb3znEyFztvnehCoIlph4
+	2mtGmywvX6iqUkeSPzwbioZ4pqsXWofN548V+4zhYGpUhIc8wJ4lCNPh821Q=
+X-Received: by 2002:a17:906:6a04:b0:b76:7e0e:4246 with SMTP id a640c23a62f3a-b7ce823a7edmr324760566b.12.1765380616949;
+        Wed, 10 Dec 2025 07:30:16 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE+n1oLk+lpYvSo3oxC/+zi9Dq/Bhke/wTJsYnKmfJeBSv2/uWajl8IxLNhM4rQIwoesrPtug==
+X-Received: by 2002:a17:906:6a04:b0:b76:7e0e:4246 with SMTP id a640c23a62f3a-b7ce823a7edmr324755166b.12.1765380616407;
+        Wed, 10 Dec 2025 07:30:16 -0800 (PST)
+Received: from [10.45.225.95] (5920ab7b.static.cust.trined.nl. [89.32.171.123])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-64956402185sm6637761a12.25.2025.12.10.07.30.15
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 10 Dec 2025 07:30:15 -0800 (PST)
+From: Eelco Chaudron <echaudro@redhat.com>
+To: =?utf-8?q?Adri=C3=A1n_Moreno?= <amorenoz@redhat.com>
+Cc: =?utf-8?b?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>,
+ Aaron Conole <aconole@redhat.com>, Ilya Maximets <i.maximets@ovn.org>,
+ Alexei Starovoitov <ast@kernel.org>, Jesse Gross <jesse@nicira.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, dev@openvswitch.org
+Subject: Re: [PATCH net] net: openvswitch: Avoid needlessly taking the RTNL on
+ vport destroy
+Date: Wed, 10 Dec 2025 16:30:13 +0100
+X-Mailer: MailMate (2.0r6290)
+Message-ID: <7C74F561-F12F-4683-9D99-0A086D098938@redhat.com>
+In-Reply-To: <CAG=2xmOib02j-fwoKtCYgrovdE3FZkW__hiE=v0PuGkGzJvvBQ@mail.gmail.com>
+References: <20251210125945.211350-1-toke@redhat.com>
+ <B299AD16-8511-41B7-A36A-25B911AEEBF4@redhat.com>
+ <CAG=2xmOib02j-fwoKtCYgrovdE3FZkW__hiE=v0PuGkGzJvvBQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c6525467-2229-4941-803d-1be5efb431c3@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
 
-thank you for the detailed review.
-See my replies inline below
 
-On Wed, Dec 03, 2025 at 03:07:20AM +0100, Andrew Lunn wrote:
-> > [...]
-> > +struct mxl862xx_ctp_port_assignment {
-> > +	u8 logical_port_id;
-> > +	__le16 first_ctp_port_id;
-> > +	__le16 number_of_ctp_port;
-> > +	enum mxl862xx_logical_port_mode mode;
-> > +	__le16 bridge_port_id;
-> > +} __packed;
-> 
-> Does the C standard define the size of an enum? Do you assume this is
-> a byte?
+On 10 Dec 2025, at 16:12, Adri=C3=A1n Moreno wrote:
 
-Yes, it needs to be a byte, and I guess the best is to then just use
-u8 type here and cast to u8 on assignment.
+> On Wed, Dec 10, 2025 at 02:28:36PM +0100, Eelco Chaudron wrote:
+>>
+>>
+>> On 10 Dec 2025, at 13:59, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>>
+>>> The openvswitch teardown code will immediately call
+>>> ovs_netdev_detach_dev() in response to a NETDEV_UNREGISTER notificati=
+on.
+>>> It will then start the dp_notify_work workqueue, which will later end=
+ up
+>>> calling the vport destroy() callback. This callback takes the RTNL to=
+ do
+>>> another ovs_netdev_detach_port(), which in this case is unnecessary.
+>>> This causes extra pressure on the RTNL, in some cases leading to
+>>> "unregister_netdevice: waiting for XX to become free" warnings on
+>>> teardown.
+>>>
+>>> We can straight-forwardly avoid the extra RTNL lock acquisition by
+>>> checking the device flags before taking the lock, and skip the lockin=
+g
+>>> altogether if the IFF_OVS_DATAPATH flag has already been unset.
+>>>
+>>> Fixes: b07c26511e94 ("openvswitch: fix vport-netdev unregister")
+>>> Tested-by: Adrian Moreno <amorenoz@redhat.com>
+>>> Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+>>> ---
+>>>  net/openvswitch/vport-netdev.c | 11 +++++++----
+>>>  1 file changed, 7 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/net/openvswitch/vport-netdev.c b/net/openvswitch/vport-n=
+etdev.c
+>>> index 91a11067e458..519f038526f9 100644
+>>> --- a/net/openvswitch/vport-netdev.c
+>>> +++ b/net/openvswitch/vport-netdev.c
+>>> @@ -160,10 +160,13 @@ void ovs_netdev_detach_dev(struct vport *vport)=
 
-> > + * struct mxl862xx_sys_fw_image_version - VLAN counter mapping configuration
-> 
-> The text seems wrong, probably cut/paste error?
+>>>
+>>>  static void netdev_destroy(struct vport *vport)
+>>>  {
+>>> -	rtnl_lock();
+>>> -	if (netif_is_ovs_port(vport->dev))
+>>> -		ovs_netdev_detach_dev(vport);
+>>> -	rtnl_unlock();
+>>> +	if (netif_is_ovs_port(vport->dev)) {
+>>
+>> Hi Toke,
+>>
+>> Thanks for digging into this!
+>>
+>> The patch looks technically correct to me, but maybe we should add a c=
+omment here explaining why we can do it this way, i.e., why we can call n=
+etif_is_ovs_port() without the lock.
+>> For example:
+>>
+>> /* We can avoid taking the rtnl lock as the IFF_OVS_DATAPATH flag is s=
+et/cleared in either netdev_create()/netdev_destroy(), which are both cal=
+led under the global ovs_lock(). */
+>>
+>> Additionally, I think the second netif_is_ovs_port() under the rtnl lo=
+ck is not required due to the above.
+>
+> In the case of netdevs being unregistered outside of OVS, the
+> ovs_dp_device_notifier gets called which then runs
+> "ovs_netdev_detach_dev" only under RTNL. Locking ovs_lock() in that
+> callback would be problematic since the rest of the OVS code assumes
+> ovs_lock is nested outside of RTNL.
+>
+> So this could race with a ovs_vport_cmd_del AFAICS.
 
-Yes, I agree ;)
+Not fully sure I understand the code path you are referring to, but if it=
+=E2=80=99s through ovs_dp_notify_wq()->dp_detach_port_notify()->ovs_dp_de=
+tach_port(), it takes the ovs_lock().
 
-> 
-> > +#define MXL862XX_MMD_DEV 30
-> 
-> Please use MDIO_MMD_VEND1
+By the way: in your testing, did you see the expected improvement, i.e., =
+no more =E2=80=9Cunregister=E2=80=9D delays?
 
-Ack.
+//Eelco
 
-> 
-> > +#define MXL862XX_MMD_REG_CTRL 0
-> > +#define MXL862XX_MMD_REG_LEN_RET 1
-> > +#define MXL862XX_MMD_REG_DATA_FIRST 2
-> > +#define MXL862XX_MMD_REG_DATA_LAST 95
-> > +#define MXL862XX_MMD_REG_DATA_MAX_SIZE \
-> > +		(MXL862XX_MMD_REG_DATA_LAST - MXL862XX_MMD_REG_DATA_FIRST + 1)
-> > +
-> > +#define MMD_API_SET_DATA_0 (0x0 + 0x2)
-> > +#define MMD_API_GET_DATA_0 (0x0 + 0x5)
-> > +#define MMD_API_RST_DATA (0x0 + 0x8)
-> 
-> What is the significant of these numbers? Can you use #defines to make
-> it clearer?
+>>
+>>> +		rtnl_lock();
+>>> +		/* check again while holding the lock */
+>>> +		if (netif_is_ovs_port(vport->dev))
+>>> +			ovs_netdev_detach_dev(vport);
+>>> +		rtnl_unlock();
+>>> +	}
+>>>
+>>>  	call_rcu(&vport->rcu, vport_netdev_free);
+>>>  }
+>>> --
+>>> 2.52.0
+>>
 
-I'll simplify this to be
-
-#define MMD_API_SET_DATA		2
-#define MMD_API_GET_DATA		5
-#define MMD_API_RST_DATA		8
-
-which makes it more clear I hope.
-
-> 
-> > +
-> > +static int mxl862xx_busy_wait(struct mxl862xx_priv *dev)
-> > +{
-> > +	int ret, i;
-> > +
-> > +	for (i = 0; i < MAX_BUSY_LOOP; i++) {
-> > +		ret = __mdiobus_c45_read(dev->bus, dev->sw_addr,
-> > +					 MXL862XX_MMD_DEV,
-> > +					 MXL862XX_MMD_REG_CTRL);
-> > +		if (ret < 0)
-> > +			return ret;
-> > +
-> > +		if (ret & CTRL_BUSY_MASK)
-> > +			usleep_range(10, 15);
-> > +		else
-> > +			return 0;
-> > +	}
-> > +
-> > +	return -ETIMEDOUT;
-> 
-> We already have phy_read_mmd_poll_timeout(). Maybe you should add a
-> __mdiobus_c45_read_poll_timeout()?
-> 
-> Also, as far as i can see, __mdiobus_c45_read() is always called with
-> the same first three parameters. Maybe add a mxl862xx_reg_read()?  and
-> a mxl862xx_reg_write()?
-
-Imho it would be nice to introduce unlock __mdiodev_c45_* helpers in
-include/linux/mdio.h, ie.
-
-static inline int __mdiodev_c45_read(struct mdio_device *mdiodev, int devad,
-				     u16 regnum)
-{
-	return __mdiobus_c45_read(mdiodev->bus, mdiodev->addr, devad, regnum);
-}
-
-static inline int __mdiodev_c45_write(struct mdio_device *mdiodev, u32 devad,
-				      u16 regnum, u16 val)
-{
-	return __mdiobus_c45_write(mdiodev->bus, mdiodev->addr, devad, regnum,
-				   val);
-}
-
-and then have something like this in mxl862xx-host.c:
-
-static int mxl862xx_reg_read(struct mxl862xx_priv *priv, u32 addr)
-{
-	return __mdiodev_c45_read(priv->mdiodev, MDIO_MMD_VEND1, addr);
-}
-
-static int mxl862xx_reg_write(struct mxl862xx_priv *priv, u32 addr, u16 data)
-{
-	return __mdiodev_c45_write(priv->mdiodev, MDIO_MMD_VEND1, addr, data);
-}
-
-static int mxl862xx_ctrl_read(struct mxl862xx_priv *priv)
-{
-	return mxl862xx_reg_read(priv, MXL862XX_MMD_REG_CTRL);
-}
-
-static int mxl862xx_busy_wait(struct mxl862xx_priv *priv)
-{
-	int val;
-
-	return readx_poll_timeout(mxl862xx_ctrl_read, priv, val,
-				  !(val & CTRL_BUSY_MASK), 15, 10000);
-}
-
-Do you agree?
-
-> > [...]
-> > +	if (result < 0) {
-> > +		ret = result;
-> > +		goto out;
-> > +	}
-> 
-> If i'm reading mxl862xx_send_cmd() correct, result is the value of a
-> register. It seems unlikely this is a Linux error code?
-
-Only someone with insights into the use of error codes by the uC
-firmware can really answer that. However, as also Russell pointed out,
-the whole use of s16 here with negative values being interpreted as
-errors is fishy here, because in the end this is also used to read
-registers from external MDIO connected PHYs which may return arbitrary
-16-bit values...
-Someone in MaxLinear will need to clarify here.
-
-> 
-> > +
-> > +	for (i = 0; i < max && read; i++) {
-> 
-> That is an unusual way to use read.
-
-Ack. I suggest
-
-if (!read)
-	goto out;
-
-> > +#define MXL862XX_API_WRITE(dev, cmd, data) \
-> > +	mxl862xx_api_wrap(dev, cmd, &(data), sizeof((data)), false)
-> > +#define MXL862XX_API_READ(dev, cmd, data) \
-> > +	mxl862xx_api_wrap(dev, cmd, &(data), sizeof((data)), true)
-> 
-> > +/* PHY access via firmware relay */
-> > +static int mxl862xx_phy_read_mmd(struct mxl862xx_priv *priv, int port,
-> > +				 int devadd, int reg)
-> > +{
-> > +	struct mdio_relay_data param = {
-> > +		.phy = port,
-> > +		.mmd = devadd,
-> > +		.reg = reg & 0xffff,
-> > +	};
-> > +	int ret;
-> > +
-> > +	ret = MXL862XX_API_READ(priv, INT_GPHY_READ, param);
-> 
-> That looks a bit ugly, using a macro as a function name. I would
-> suggest tiny functions rather than macros. The compiler should do the
-> right thing.
-
-The thing is that the macro way allows to use MXL862XX_API_* on
-arbitrary types, such as the packed structs. Using a function would
-require the type of the parameter to be defined, which would result
-in a lot of code duplication in this case.
-
-> 
-> > +/* Configure CPU tagging */
-> > +static int mxl862xx_configure_tag_proto(struct dsa_switch *ds, int port,
-> > +					bool enable)
-> > +{
-> > +	struct mxl862xx_ss_sp_tag tag = {
-> > +		.pid = DSA_MXL_PORT(port),
-> > +		.mask = BIT(0) | BIT(1),
-> > +		.rx = enable ? 2 : 1,
-> > +		.tx = enable ? 2 : 3,
-> > +	};
-> 
-> There is a bit comment at the beginning of the patch about these, but
-> it does not help much here. Please could you add some #defines for
-> these magic numbers.
-
-Ack, I'll do that.
-
-> 
-> > +/* Reset switch via MMD write */
-> > +static int mxl862xx_mmd_write(struct dsa_switch *ds, int reg, u16 data)
-> 
-> The comment does not fit what the function does.
-
-Ooops...
-
-> 
-> > +{
-> > +	struct mxl862xx_priv *priv = ds->priv;
-> > +	int ret;
-> > +
-> > +	mutex_lock(&priv->bus->mdio_lock);
-> > +	ret = __mdiobus_c45_write(priv->bus, priv->sw_addr, MXL862XX_MMD_DEV,
-> > +				  reg, data);
-> > +	mutex_unlock(&priv->bus->mdio_lock);
-> 
-> There is no point using the unlocked version if you wrap it in
-> lock/unlock...
-
-I'll throw all this out and instead introduce a high-level reset
-function in mxl8622xx-host.c, in that way all MDIO host access is kept
-in mxl8622xx-host.c.
-
-> > [...]
-> > +	/* Software reset */
-> > +	ret = mxl862xx_mmd_write(ds, 1, 0);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	ret = mxl862xx_mmd_write(ds, 0, 0x9907);
-> 
-> More magic numbers.
-
-Maybe someone in MaxLinear can demystify this?
 
