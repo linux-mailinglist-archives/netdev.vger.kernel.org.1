@@ -1,92 +1,162 @@
-Return-Path: <netdev+bounces-244223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF55ACB295E
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 10:41:00 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C726BCB2976
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 10:43:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 688DC305F32E
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 09:39:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3E8BA30C4041
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 09:41:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA8522D7DEA;
-	Wed, 10 Dec 2025 09:39:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3D542F9C37;
+	Wed, 10 Dec 2025 09:41:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dhZlDmBj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="B35kgfia"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AD1D285418;
-	Wed, 10 Dec 2025 09:39:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2828221543;
+	Wed, 10 Dec 2025 09:41:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765359590; cv=none; b=FQIiaOf7w7Kx7IgcF7s4XzsLr+z3IgWTrKiPpEFtlusuaqHj1J4R2k/S79vVJSTpMkO+2stItVXAIARQ+B3uHxKwZZmwUdTBJRhWnfftkgbnmrrBtRcaOx788Fm2orGGY4epe/6G0/PG9dYWekcQgTcUWKmmoBZ//aDUymZA8xs=
+	t=1765359669; cv=none; b=MSoVP4pCg3II+YVFMRpPmMjJjJmFNDNeYsIfCx871Z6PSMJdWhltzzYJssHLUeMiIsnyXN0nPxMReWgltXhpQbZ/9A9hcu9dBmZ1+fzRlwiycCqFeu0XZpDZhNrreVj4qpKn+9LaHcz5KwIg3A8H3n2lo4AXUcYZjtwBHuYQylE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765359590; c=relaxed/simple;
-	bh=GJ8CPv7S16exQpJpGNdwn6ANx6ifdjDHTlnpwo1Lpu0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bWsGC1yjyM3SQG3ZGZFqkIKzvdANETHlj/RBJ11qgNOqeMYI+ijYQQk9hEyViKtKAYLf8l5H29twZ+Jni3oSEif9uxx3fgj9FJ+0vU1Bn+A3HL/KTEXIMsSGANw+fjSCkubyh8f7fipksJuEVP5qLU3ubVbz8G4IcGj/pq1FE8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dhZlDmBj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3781C113D0;
-	Wed, 10 Dec 2025 09:39:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765359590;
-	bh=GJ8CPv7S16exQpJpGNdwn6ANx6ifdjDHTlnpwo1Lpu0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dhZlDmBjYEmKyc7pKokzqUfbT5t5Q8S0Dq+jMcvLlCHDwPp1EmMWCpWFyxkiuPeMu
-	 ZD8OLHsFCfUc5ugiWDbBJOV6nM++6Br1uWOz7eWAKUJZzs/VIBNH9lN7ydxB52YTNi
-	 yQdbrN9LDlc3JEUbFxhM0WD5GKJWJGwO/54jLMMsHF+GWFXjzKTTn134PszAFI4CmS
-	 WiKIe80AzyN52niNVOl9tFTtOmtqMOfCrfHeHAjE+IltsMdIi9L1QoLCzroZBrzXht
-	 WgG79Xl3aTwmXCqK+h+gLwHaD0GUXjW/tT8E7oiEn7e6RvPjUftKB+Uc5dCz2CkQ8C
-	 X+JV3IcSJZC5w==
-Date: Wed, 10 Dec 2025 18:39:46 +0900
-From: Jakub Kicinski <kuba@kernel.org>
-To: Vivek Pernamitta <vivek.pernamitta@oss.qualcomm.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Manivannan Sadhasivam <mani@kernel.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, mhi@lists.linux.dev,
- linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v6 2/2] bus: mhi: host: pci: Enable IP_SW1, IP_ETH0 and
- IP_ETH1 channels for QDU100
-Message-ID: <20251210183946.3740a3b3@kernel.org>
-In-Reply-To: <20251209-vdev_next-20251208_eth_v6-v6-2-80898204f5d8@quicinc.com>
-References: <20251209-vdev_next-20251208_eth_v6-v6-0-80898204f5d8@quicinc.com>
-	<20251209-vdev_next-20251208_eth_v6-v6-2-80898204f5d8@quicinc.com>
+	s=arc-20240116; t=1765359669; c=relaxed/simple;
+	bh=LzWO0JcXprNZY6it3VCd7deEX1hUefCblhQkrRAi/+w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nmyq8FewCDx85GUq1Ap4HHYIvpcWyHfNYJoFJjTZgcq3Q/WhKFw8ElMKMxTL9/LZWSALWq6HIVNz0aO/lrlJGVpMQgjynFKfpmoXds+Fbb/rLPoC8jz7FKJBVWKMdWap17npW1uJl3X7T5dd1XinuP2YS91GtHdc8yyMOP4BMm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=B35kgfia; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1765359668; x=1796895668;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=LzWO0JcXprNZY6it3VCd7deEX1hUefCblhQkrRAi/+w=;
+  b=B35kgfiaw9g1kcxxJ+5pjfyVQFw7JZHF6CSJpFmwUsmMu+rpDko6oGf8
+   +p8DBYQw/pDJoQAVhXSRwsLDpCQqAN/u7djgxpivWYCwp2oyJtin5yeg7
+   z8MI2dMpPvH/GuewJJl2V3lt1ZvHmjG4RIZZIjc/Ogtzu6DCBmn/QVwQm
+   4UBRnva5pcPy2zklqdgFkIWSVp6A3WXOJSwutXyvLqYhv8rhhov2OlfLN
+   CoFmJZlLp5QaYPwezokBhhOfSXiJgftjrKu83AQWAe8yG/dtYtNpFMlG+
+   HuL50SUSEfXC+kNm5ir06lMsdZCTuWs4b6EEmSibpgR07tVUJpv1/E1S0
+   Q==;
+X-CSE-ConnectionGUID: /GqXSxy2TjW9B2tJCZtIcg==
+X-CSE-MsgGUID: 9QWgYfiaROa3E6/2PB18XA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11637"; a="92804683"
+X-IronPort-AV: E=Sophos;i="6.20,263,1758610800"; 
+   d="scan'208";a="92804683"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2025 01:41:07 -0800
+X-CSE-ConnectionGUID: k3vHo+EZR4Cf+0vFxfhyNg==
+X-CSE-MsgGUID: Srnq+gtYQL21JexhZm7LyA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.20,263,1758610800"; 
+   d="scan'208";a="196074271"
+Received: from black.igk.intel.com ([10.91.253.5])
+  by fmviesa007.fm.intel.com with ESMTP; 10 Dec 2025 01:41:02 -0800
+Received: by black.igk.intel.com (Postfix, from userid 1001)
+	id 20ECD93; Wed, 10 Dec 2025 10:41:02 +0100 (CET)
+Date: Wed, 10 Dec 2025 10:41:02 +0100
+From: Mika Westerberg <mika.westerberg@linux.intel.com>
+To: David Laight <david.laight.linux@gmail.com>
+Cc: Yury Norov <yury.norov@gmail.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Crt Mori <cmo@melexis.com>,
+	Richard Genoud <richard.genoud@bootlin.com>,
+	Andy Shevchenko <andriy.shevchenko@intel.com>,
+	Luo Jie <quic_luoj@quicinc.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Simon Horman <simon.horman@netronome.com>,
+	Andreas Noever <andreas.noever@gmail.com>,
+	Yehezkel Bernat <YehezkelShB@gmail.com>,
+	Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+Subject: Re: [PATCH 2/9] thunderblot: Don't pass a bitfield to FIELD_GET
+Message-ID: <20251210094102.GF2275908@black.igk.intel.com>
+References: <20251209100313.2867-1-david.laight.linux@gmail.com>
+ <20251209100313.2867-3-david.laight.linux@gmail.com>
+ <20251210055617.GD2275908@black.igk.intel.com>
+ <20251210093403.5b0f440e@pumpkin>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20251210093403.5b0f440e@pumpkin>
 
-On Tue, 09 Dec 2025 16:55:39 +0530 Vivek Pernamitta wrote:
-> Enable IP_SW1, IP_ETH0 and IP_ETH1 channels for M-plane, NETCONF and
-> S-plane interface for QDU100.
+On Wed, Dec 10, 2025 at 09:34:03AM +0000, David Laight wrote:
+> On Wed, 10 Dec 2025 06:56:17 +0100
+> Mika Westerberg <mika.westerberg@linux.intel.com> wrote:
 > 
-> Signed-off-by: Vivek Pernamitta <vivek.pernamitta@oss.qualcomm.com>
-> ---
->  drivers/bus/mhi/host/pci_generic.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
+> > $subject has typo: thunderblot -> thunderbolt ;-)
+> > 
+> > On Tue, Dec 09, 2025 at 10:03:06AM +0000, david.laight.linux@gmail.com wrote:
+> > > From: David Laight <david.laight.linux@gmail.com>
+> > > 
+> > > FIELD_GET needs to use __auto_type to get the value of the 'reg'
+> > > parameter, this can't be used with bifields.
+> > > 
+> > > FIELD_GET also want to verify the size of 'reg' so can't add zero
+> > > to force the type to int.
+> > > 
+> > > So add a zero here.
+> > > 
+> > > Signed-off-by: David Laight <david.laight.linux@gmail.com>
+> > > ---
+> > >  drivers/thunderbolt/tb.h | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > 
+> > > diff --git a/drivers/thunderbolt/tb.h b/drivers/thunderbolt/tb.h
+> > > index e96474f17067..7ca2b5a0f01e 100644
+> > > --- a/drivers/thunderbolt/tb.h
+> > > +++ b/drivers/thunderbolt/tb.h
+> > > @@ -1307,7 +1307,7 @@ static inline struct tb_retimer *tb_to_retimer(struct device *dev)
+> > >   */
+> > >  static inline unsigned int usb4_switch_version(const struct tb_switch *sw)
+> > >  {
+> > > -	return FIELD_GET(USB4_VERSION_MAJOR_MASK, sw->config.thunderbolt_version);
+> > > +	return FIELD_GET(USB4_VERSION_MAJOR_MASK, sw->config.thunderbolt_version + 0);  
+> > 
+> > Can't this use a cast instead? If not then can you also add a comment here
+> > because next someone will send a patch "fixing" the unnecessary addition.
 > 
-> diff --git a/drivers/bus/mhi/host/pci_generic.c b/drivers/bus/mhi/host/pci_generic.c
-> index e3bc737313a2f0658bc9b9c4f7d85258aec2474c..b64b155e4bd70326fed0aa86f32d8502da2f49d0 100644
-> --- a/drivers/bus/mhi/host/pci_generic.c
-> +++ b/drivers/bus/mhi/host/pci_generic.c
-> @@ -269,6 +269,13 @@ static const struct mhi_channel_config mhi_qcom_qdu100_channels[] = {
->  	MHI_CHANNEL_CONFIG_DL(41, "MHI_PHC", 32, 4),
->  	MHI_CHANNEL_CONFIG_UL(46, "IP_SW0", 256, 5),
->  	MHI_CHANNEL_CONFIG_DL(47, "IP_SW0", 256, 5),
-> +	MHI_CHANNEL_CONFIG_UL(48, "IP_SW1", 256, 6),
-> +	MHI_CHANNEL_CONFIG_DL(49, "IP_SW1", 256, 6),
-> +	MHI_CHANNEL_CONFIG_UL(50, "IP_ETH0", 256, 7),
-> +	MHI_CHANNEL_CONFIG_DL(51, "IP_ETH0", 256, 7),
-> +	MHI_CHANNEL_CONFIG_UL(52, "IP_ETH1", 256, 8),
-> +	MHI_CHANNEL_CONFIG_DL(53, "IP_ETH1", 256, 8),
+> A cast can do other (possibly incorrect) conversions, adding zero is never going
+> to so any 'damage' - even if it looks a bit odd.
+> 
+> Actually, I suspect the best thing here is to delete USB4_VERSION_MAJOR_MASK and
+> just do:
+> 	/* The major version is in the top 3 bits */
+> 	return sw->config.thunderbolt_version > 5;
 
-What is this CHANNEL_CONFIG thing and why is it part of the bus code
-and not driver code? Having to modify the bus for driver changes
-indicates the abstractions aren't used properly here..
+You mean 
+
+	return sw->config.thunderbolt_version >> 5;
+
+?
+
+Yes that works but I prefer then:
+
+	return sw->config.thunderbolt_version >> USB4_VERSION_MAJOR_SHIFT;
+
+> 
+> The only other uses of thunderbolt_version are debug prints (in decimal).
+> 
+> 	David
+> 
+> > 
+> > >  }
+> > >  
+> > >  /**
+> > > -- 
+> > > 2.39.5  
 
