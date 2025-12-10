@@ -1,97 +1,120 @@
-Return-Path: <netdev+bounces-244200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2705ECB258C
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 09:03:18 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35656CB2580
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 09:02:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 1C47730026A1
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 08:03:17 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BD64E301B9E2
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 08:02:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EF3D2DA75A;
-	Wed, 10 Dec 2025 08:03:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E644194A6C;
+	Wed, 10 Dec 2025 08:02:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qlqPFuBV"
+	dkim=pass (2048-bit key) header.d=hale.at header.i=@hale.at header.b="j4x7zBgI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from gw.hale.at (gw.hale.at [89.26.116.210])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7EC7225415;
-	Wed, 10 Dec 2025 08:03:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827C321C9EA;
+	Wed, 10 Dec 2025 08:02:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.26.116.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765353794; cv=none; b=LukU2AtgORC02nq6Y3VB/UaQUfSKaQHoFXhez0btaRqC2/D5onZ7cl6xeDDY7IThVMHnDIZOwc0cQxZXGWlQTn2qcOpLWDFfv/apygsQ3OZxvHek/THt7DZmoZiZ6RHcPImltWbYe48cAKCx6m3IAKTlLCj2gZGp+CJhd0Rf6fA=
+	t=1765353752; cv=none; b=tE6CTAGqX0R2fwKH7jxE2P0WWykey1a/jhAu7AptU0yZmGUQQDRJbnrHEvkgPoFmIu8EEIFO+FiXKJIZghtkcyyBsM100aKXl+L1moRB6rXcl1x/CGRCan6dSZn/wDJXvCALK53y22IS198ca1y/D9nk1OwitQbBT5k3xwiY0Gs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765353794; c=relaxed/simple;
-	bh=eg6sqIrjSFRwMqCDvFPFBp9XRD0Q6ZvFkT/9lBl/LWU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=WR0zZM5tQNvDyQvFLNUpUpN448s3KxXsZWNdCVr+9t8sjQXrcgGGuHQUVFTEcIo0xWlHlmdGDZWsiKau/7OMS2k3eqEKr/kSQg/pYEmvuP845XzeTZKjrdavuEWvyG0tChFFXGCctU5nYxnvW3vUBw4b/w6ZI/U9PUTgHbxqWgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qlqPFuBV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55F95C4CEF1;
-	Wed, 10 Dec 2025 08:03:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765353794;
-	bh=eg6sqIrjSFRwMqCDvFPFBp9XRD0Q6ZvFkT/9lBl/LWU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qlqPFuBVKxzX/8TshxI44AbH7EEOyBEGQ95nU8/aj3Zc+UfXfDbsEwaQW5amF/Dms
-	 okS0ljkM8eVlTrk6MY1U4DWcKcmug8RGfSgqxGi2/5y/sl1RU2FssP4jNAOvoM6T8l
-	 xKxq+FWLqLmc57gZKTwnwYn6MDt7PBjJz00oYTFZJYWj4jfPQmmUsstg3souF2q8k5
-	 tp6t766SvInbxo+/UA7ls6sF5t+6+pw+T9/oxp+kQPUB2u8Fh89cfZiE8GZZvSdejd
-	 M0asV6o4d0mUQ0CctQtOuV3yNAF2dbG5m/XZ1ItD6Rxk/AuONsjWFSgwzICfQjD6wV
-	 FxIMnkmYhSRYw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3BB693809A18;
-	Wed, 10 Dec 2025 08:00:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1765353752; c=relaxed/simple;
+	bh=F88937KEeOv34OTjx3/qIHR/L+oFarYNTHp8BwLp0iU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gXZ0PdDj8faw9JM2jD/7r/rhuenVmS2U5kB4BHuqhTfCG7nQYN7wDi0KPRFE66twjgWsodGRE9jA5+G5KCqBDZMfZVqrDAiikppwalkG4jj4JZbw7Yofp0u8XrDnIs2Tda68ome0ZlowU2VaZmPwQetJKd0dHfl1CToXX9QqRBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hale.at; spf=pass smtp.mailfrom=hale.at; dkim=pass (2048-bit key) header.d=hale.at header.i=@hale.at header.b=j4x7zBgI; arc=none smtp.client-ip=89.26.116.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hale.at
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hale.at
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=hale.at; i=@hale.at; q=dns/txt; s=mail;
+  t=1765353748; x=1796889748;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=F88937KEeOv34OTjx3/qIHR/L+oFarYNTHp8BwLp0iU=;
+  b=j4x7zBgIElg66dVVXBSBxSPmVgrmBY1C2UKD9HVnDf3kJ1CSU/KztLDl
+   J+dUCF1UwJw6IIDrc9pHd7DYCclmIfdwOyLkdDz18J9mYtZSVloHKN6Ul
+   v0JNEtImwY0eHiOMI8X/GWvppdMInGH+GDd7RkVIQQ9/sTtuSTVZWPa3q
+   0vrme7sYcoEO9FAFAcfzGlLiKPPv6GkLj1yZGfXRplEwBZ5wPZEqvXB7y
+   qOJluqKcz4swsSdihl0cZ0p6/tuGKlpOMovJm8hGlQVVMms7Fg6M8IV2T
+   AKG3LGN4JG8tJiEaOJBOLLXxp9DJQv4oII40byUiLfCBUbzDbt3TQKUry
+   Q==;
+X-CSE-ConnectionGUID: 0VJmMiU/RziYp0AYQ1doew==
+X-CSE-MsgGUID: ZD5JtUBhQqSvv79B85X3KA==
+IronPort-SDR: 693928fa_tPIoLN0LbybcUrnD3nN0d3D1N8LnoHFX2UG5Fb5jq4DCiNo
+ CZFw9NrTiGB1Tfk301HKikNC4awDAkctyCT/g8A==
+X-IronPort-AV: E=Sophos;i="6.20,263,1758578400"; 
+   d="scan'208";a="1478287"
+Received: from unknown (HELO mail4.hale.at) ([192.168.100.5])
+  by mgmt.hale.at with ESMTP; 10 Dec 2025 09:02:03 +0100
+Received: from mail4.hale.at (localhost.localdomain [127.0.0.1])
+	by mail4.hale.at (Postfix) with ESMTPS id 1B46813005C8;
+	Wed, 10 Dec 2025 09:01:43 +0100 (CET)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail4.hale.at (Postfix) with ESMTP id 0400613005F4;
+	Wed, 10 Dec 2025 09:01:43 +0100 (CET)
+X-Virus-Scanned: amavis at mail4.hale.at
+Received: from mail4.hale.at ([127.0.0.1])
+ by localhost (mail4.hale.at [127.0.0.1]) (amavis, port 10026) with ESMTP
+ id XEJXAxwHLqfw; Wed, 10 Dec 2025 09:01:42 +0100 (CET)
+Received: from [192.168.100.117] (entw47 [192.168.100.117])
+	by mail4.hale.at (Postfix) with ESMTPSA id D3D5C13005C8;
+	Wed, 10 Dec 2025 09:01:42 +0100 (CET)
+Message-ID: <d92d036b-fc99-4ce0-8377-4079a3d00fb9@hale.at>
+Date: Wed, 10 Dec 2025 09:01:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next v2 0/2] bpf: cpumap: improve error propagation in
- cpu_map_update_elem()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176535360904.496554.15981377214035277789.git-patchwork-notify@kernel.org>
-Date: Wed, 10 Dec 2025 08:00:09 +0000
-References: <20251208131449.73036-1-enjuk@amazon.com>
-In-Reply-To: <20251208131449.73036-1-enjuk@amazon.com>
-To: Kohei Enju <enjuk@amazon.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
- davem@davemloft.net, kuba@kernel.org, hawk@kernel.org,
- john.fastabend@gmail.com, sdf@fomichev.me, andrii@kernel.org,
- martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, kpsingh@kernel.org, haoluo@google.com,
- jolsa@kernel.org, shuah@kernel.org, toke@kernel.org, kohei.enju@gmail.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: nfc: nci: Fix parameter validation for packet data
+To: Simon Horman <horms@kernel.org>
+Cc: Deepak Sharma <deepak.sharma.472935@gmail.com>,
+ Krzysztof Kozlowski <krzk@kernel.org>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, stable@vger.kernel.org
+References: <20251209132103.3736761-1-michael.thalmeier@hale.at>
+ <aThO7rm4MqONBurh@horms.kernel.org>
+From: Michael Thalmeier <michael.thalmeier@hale.at>
+Content-Language: en-US
+In-Reply-To: <aThO7rm4MqONBurh@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to bpf/bpf-next.git (master)
-by Alexei Starovoitov <ast@kernel.org>:
-
-On Mon, 8 Dec 2025 22:14:30 +0900 you wrote:
-> This series improves error propagation in cpumap and adds selftests that
-> cover the failure cases.
+On 12/9/25 17:31, Simon Horman wrote:
+> On Tue, Dec 09, 2025 at 02:21:03PM +0100, Michael Thalmeier wrote:
+>> Since commit 8fcc7315a10a ("net: nfc: nci: Add parameter validation for
+>> packet data") communication with nci nfc chips is not working any more.
+>>
+>> The mentioned commit tries to fix access of uninitialized data, but
+>> failed to understand that in some cases the data packet is of variable
+>> length and can therefore not be compared to the maximum packet length
+>> given by the sizeof(struct).
+>>
+>> For these cases it is only possible to check for minimum packet length.
+>>
+>> Fixes: 8fcc7315a10a ("net: nfc: nci: Add parameter validation for packet data")
 > 
-> Currently, failures returned from __cpu_map_entry_alloc() are ignored
-> and always converted to -ENOMEM by cpu_map_update_elem(). This series
-> ensures the correct error propagation and adds selftests.
+> Hi Michael,
 > 
-> [...]
+> I don't see that hash in net. Perhaps it should be:
+> 
+> Fixes: 9c328f54741b ("net: nfc: nci: Add parameter validation for packet data")
 
-Here is the summary with links:
-  - [bpf-next,v2,1/2] bpf: cpumap: propagate underlying error in cpu_map_update_elem()
-    https://git.kernel.org/bpf/bpf-next/c/48e11bad9a1f
-  - [bpf-next,v2,2/2] selftests/bpf: add tests for attaching invalid fd
-    https://git.kernel.org/bpf/bpf-next/c/18352f8fae91
+Hi Simon,
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+You are right. This was a hash from a stable branch.
+I will send a v2.
 
+> 
+>> Cc: stable@vger.kernel.org
+>> Signed-off-by: Michael Thalmeier <michael.thalmeier@hale.at>
+> 
+> ...
 
 
