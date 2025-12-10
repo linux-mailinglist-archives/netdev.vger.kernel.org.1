@@ -1,127 +1,144 @@
-Return-Path: <netdev+bounces-244229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0A81CB2A1A
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 11:08:55 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44ABCCB2A23
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 11:09:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9731C303C829
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 10:08:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 85EE9304065E
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 10:08:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4978F3093D1;
-	Wed, 10 Dec 2025 10:08:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAFEA30AAB3;
+	Wed, 10 Dec 2025 10:08:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jzb3qOLq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="imFsBinl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 891863093AD
-	for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 10:08:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C1BF30AAA6;
+	Wed, 10 Dec 2025 10:08:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765361332; cv=none; b=qApTvY7hFKUOJvsarjh313VwxBR8RY9A7zxMUFesom7IAs32DaHlSEndTewnvWx4nP1E9dLTAv3BuNTzOIrxWDzrjnbZ8dy7wUdWsJ6/UUqXabKVxXkoW8aSkfkaIC4xLc5sU/eyNTVGC2pfk1IJfjwh1Xe04H9UU51vpfadaiA=
+	t=1765361333; cv=none; b=qRiYr5ZS6UhwiCZazA6IPDNAT2m0/wgEj9jyyzZl+hxk09eybtkfzACEYvd/uGAZ7DiT/J4lQFrkV1bZuDuXg3Vh0CX7lismtFpjtFENZwE1x/5c1a1727VWC0g9uMKeCWmGd0lz6Js0ClUkdE8sWigcDraeTlUsTjUP4AiVu/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765361332; c=relaxed/simple;
-	bh=MJhTumMY+Rp+DB84OTm/RkSgYcX9Zva7nUwegUsKNpo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QXFSguEjCHw3gE++j6Tc+65TdGSK4PYA0oH9yEhZ+BUWdEFv7WdW6mxx6HcnnK4joXrNk+oIUjbRHCNQQcMlVFIJx51fQOb9/3iWtiSWFN+wDAuzR3IxQwmPg6xUSQrtwz8s5XjsdKz3Pmru7+3n7DXapDMWth9HxgHF0+/WK78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jzb3qOLq; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-47a80d4a065so9978855e9.2
-        for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 02:08:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765361329; x=1765966129; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NseMtzZhpH2Cj6pYcRihbjYl8y/WsGV5r9gIyYoFNUs=;
-        b=Jzb3qOLqFB4Fouv5sgGbieeuPevNpGH+oxW/P6lTAlx/cJZjbvKddmU9gUbs/nfqFN
-         6qame/YInFT3R88TwuzSCMyI9WkCfpl5Ge80VZ+tdQvxDZsY0KSM60LyWEdNnd2mvVhm
-         c0TV6LtjyQzujVG+u6w5a6Aui875ImuFtaL5ZE6wX3a1QzEqYHMvvnJPDBi0DG0AA2VO
-         B1gN0p0kpiLTn5V7WLXOdNbDDGMKkrFG8Uj0+ozHlcalaoqsHYQmFWYBhVRzPhQ0Y60/
-         odtkFAQML8hw1B2/vMn4erUQmXhSYr8wbhHNtMOxruwUOXV3SADowxJw8pJGcritPC8g
-         ygEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765361329; x=1765966129;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=NseMtzZhpH2Cj6pYcRihbjYl8y/WsGV5r9gIyYoFNUs=;
-        b=YN1QZrrAjJnxLbDv4eIMfPpUFObPnVOYsm1Icej7d95Et8qHD6esdtVNUHbKMJeS3f
-         zLELQNs4VWc1Xa6BJEUccNa+7cB44LalTty4uDU3X6DHOf+VQdvDbsrkFzd7uaJvGT9i
-         CrEuRubMBM9VE86DNOgmYPKtkeT8ObxokeKCoVH7GRD/fPuFsWMIuogtLSIuk61Plok4
-         Ttv5iDrTA2v6Cz3NNFKXXCaR6fgCtt0cCoa6c8ewjLoLhcr1Jf9JGTF7tQIF8d6WBran
-         Pn+hXcbc6ya8HM7m6Y1LbE9+YugJyy/u4veXqfOihEHz+81RDNiflBIAB3OlVOs68WP2
-         COkg==
-X-Forwarded-Encrypted: i=1; AJvYcCVZB3vm0zyQJn5xgaJZS9RKUcf/ygmrdSe1HLGPUklgcSL78hBHNaI4qdshKcUdehDYV4GGgBI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyS7lWTgJNuEAs85RJeUkqNOpJlmahQZ6925eLgSb02/w+7SxFL
-	sRPyJdFN8IEGjoWXe835VjLcQnfH87YkvgDGMEbOpOa0m7BLnJDI9Fo9
-X-Gm-Gg: ASbGncuYa9ALYMr5rDt6frrpl4l4IPNgqZ/UbFbsliQR9QxqInI6tO8IpV/XOkg/8gX
-	0/6CeYeG96DFqmGc2b77KqJwG1sbdTjKPy6+tLQa2i1s7qZXQ4Egi2naD5bKLG7d/CkarjGOlQv
-	FpFXJEqPSeszfQ6DjqMv7tx1xKreq1ALsC8Z7igL8/4SGElw8DDaSuMRYIynDgNaeTrgenq5MIT
-	gSYLwwiOeiK91jAh0DnRJThR6cJ9H+rAlQphvzpfHX9loHD7YCDFUje1c+Ht8YjLSzdQKovkJHM
-	xUO35rp6NwzLgY23eEbfP40SXb5TML+BQCbh7Q6mMID9n5X8VajhMyPVWhF58B+tGw04dn/il5l
-	yMEEKE97S5vvV+E155+QhILRLyIr3iy9adgvB7o2j81UftssHd3Gv+ArFKixvDo8trmQqtxuuin
-	/cxkjjCcYcrb9Pz8gK4svIVN+RfsdhJo02jTO+1CmZYPnv1oNkIJE9
-X-Google-Smtp-Source: AGHT+IFEJS4gDpOtkiXbQ4hQTDHkTmoqgl6+D6XpHgC+rNy3vgC5+/pYYcJMyggTtOaqPE8b4aQw+g==
-X-Received: by 2002:a05:600c:3151:b0:47a:814c:eea1 with SMTP id 5b1f17b1804b1-47a838534b1mr17827505e9.35.1765361328735;
-        Wed, 10 Dec 2025 02:08:48 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47a7d9d23e1sm38527975e9.4.2025.12.10.02.08.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Dec 2025 02:08:48 -0800 (PST)
-Date: Wed, 10 Dec 2025 10:08:46 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Yury Norov <yury.norov@gmail.com>, Rasmus Villemoes
- <linux@rasmusvillemoes.dk>, linux-kernel@vger.kernel.org,
- linux-usb@vger.kernel.org, Geert Uytterhoeven <geert+renesas@glider.be>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>, Jonathan Cameron
- <Jonathan.Cameron@huawei.com>, Crt Mori <cmo@melexis.com>, Richard Genoud
- <richard.genoud@bootlin.com>, Andy Shevchenko
- <andriy.shevchenko@intel.com>, Luo Jie <quic_luoj@quicinc.com>, Peter
- Zijlstra <peterz@infradead.org>, netdev@vger.kernel.org, "David S . Miller"
- <davem@davemloft.net>, Simon Horman <simon.horman@netronome.com>, Mika
- Westerberg <mika.westerberg@linux.intel.com>, Andreas Noever
- <andreas.noever@gmail.com>, Yehezkel Bernat <YehezkelShB@gmail.com>,
- Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
-Subject: Re: [PATCH 8/9] bitfield: Add comment block for the host/fixed
- endian functions
-Message-ID: <20251210100846.04e59dcf@pumpkin>
-In-Reply-To: <20251210182300.3fabcf74@kernel.org>
-References: <20251209100313.2867-1-david.laight.linux@gmail.com>
-	<20251209100313.2867-9-david.laight.linux@gmail.com>
-	<20251210182300.3fabcf74@kernel.org>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	s=arc-20240116; t=1765361333; c=relaxed/simple;
+	bh=89IlcdGdzzwXpS4A0/v3Qxrc1x2e4XUX10pWBNc4wN0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KaCNNil2CFwGj/Z2V4PbaLkuzLRcN5rn4LFO9SDKmZCpbzKd16bVJszUszzuGP7DYPiTDjsQAy57QidOvROeMTzISskfvvsUd0Zhcjm7gBD5aHPou39KjGdyPsazqWDeJOFk4/RCWUFiEPtHLyR1uyIUhgSJQEThpsXN9cEs0lE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=imFsBinl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1934C113D0;
+	Wed, 10 Dec 2025 10:08:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765361333;
+	bh=89IlcdGdzzwXpS4A0/v3Qxrc1x2e4XUX10pWBNc4wN0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=imFsBinl3fGYKIcDgOr9YHOFw+S1maS3kl/25JPKPJMKkOiohoCApbWgyA2H0PZoC
+	 2wtyxpb1/68sp4gINHKYfCYQ9gMhsTZ5Ovb372OUJRtiknheRmCH9/Ew0Lmp7i1pec
+	 EYmccFjzzLy5Po4/d/BYTnAAV3kSGZ0l+czCvvNpXtVV+Gq0PbOG9j9H21/SXqB+wD
+	 dnN0ETHWtLdMTUdPsQ3jbxMPCPv88JOVoqdrXd5cuTnATmWnAZSp9oOeeYW51XmsFe
+	 FZ5np051Q6kGpe84gYdw7rg5SP5HWwhUB+DinoviZPo7FvQModGXwVfo2RYC2S38AF
+	 Y2uOh+B18JAjg==
+Date: Wed, 10 Dec 2025 10:08:48 +0000
+From: Simon Horman <horms@kernel.org>
+To: Wang Liang <wangliang74@huawei.com>
+Cc: Chuck Lever <cel@kernel.org>, chuck.lever@oracle.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, brauner@kernel.org,
+	kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, yuehaibing@huawei.com,
+	zhangchangzhong@huawei.com
+Subject: Re: [PATCH net] net/handshake: Fix null-ptr-deref in
+ handshake_complete()
+Message-ID: <aTlGsMozNBaLDpNW@horms.kernel.org>
+References: <20251209115852.3827876-1-wangliang74@huawei.com>
+ <aThlNuc-kjPqd9kh@horms.kernel.org>
+ <5d5a0cf3-e085-4921-b340-b84446526985@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <5d5a0cf3-e085-4921-b340-b84446526985@huawei.com>
 
-On Wed, 10 Dec 2025 18:23:00 +0900
-Jakub Kicinski <kuba@kernel.org> wrote:
+On Wed, Dec 10, 2025 at 10:51:11AM +0800, Wang Liang wrote:
 
-> On Tue,  9 Dec 2025 10:03:12 +0000 david.laight.linux@gmail.com wrote:
-> > + * * u32 le32_get_bits(__le32 val, u32 field) extracts the contents of the
-> > + *   bitfield specified by @field in little-endian 32bit object @val and
-> > + *   converts it to host-endian.  
+...
+
+> > Hi,
+> > 
+> > Clang 21.1.7 W=1 builds are rather unhappy about this:
+> > 
+> >    net/handshake/netlink.c:110:3: error: cannot jump from this goto statement to its label
+> >      110 |                 goto out_status;
+> >          |                 ^
+> >    net/handshake/netlink.c:114:13: note: jump bypasses initialization of variable with __attribute__((cleanup))
+> >      114 |         FD_PREPARE(fdf, O_CLOEXEC, sock->file);
+> >          |                    ^
+> >    net/handshake/netlink.c:104:3: error: cannot jump from this goto statement to its label
+> >      104 |                 goto out_status;
+> >          |                 ^
+> >    net/handshake/netlink.c:114:13: note: jump bypasses initialization of variable with __attribute__((cleanup))
+> >      114 |         FD_PREPARE(fdf, O_CLOEXEC, sock->file);
+> >          |                    ^
+> >    net/handshake/netlink.c:100:3: error: cannot jump from this goto statement to its label
+> >      100 |                 goto out_status;
+> >          |                 ^
+> >    net/handshake/netlink.c:114:13: note: jump bypasses initialization of variable with __attribute__((cleanup))
+> >      114 |         FD_PREPARE(fdf, O_CLOEXEC, sock->file);
+> >          |                    ^
+> > 
+> > My undersatnding of the problem is as follows:
+> > 
+> > FD_PREPARE uses __cleanup to call class_fd_prepare_destructor when
+> > resources when fdf goes out of scope.
+> > 
+> > Prior to this patch this was when the if (req) block was existed.
+> > Either via return or a goto due to an error.
+> > 
+> > Now it is when handshake_nl_accept_doit() itself is exited.
+> > Again via a return or a goto due to error.
+> > 
+> > But, importantly, such a goto can now occur before fdf is initialised.
+> > Boom!
 > 
-> possibly also add declarations for these? So that ctags and co. sees
-> them?
+> 
+> Thanks for your analysis, you are right!
+> 
+> How about adding a null check before calling handshake_complete()?
 
-The functions are bulk-generated using a #define, ctags is never going to
-find definitions.
+I assumed the problem lies around the initialisation of fdf
+and class_fd_prepare_destructor being called regardless of that
+having occurred. But maybe I miss your point.
 
-Adding kerneldoc comments is also painful.
-I don't think it lets you use a single comment for multiple functions.
+In any case, I would advocate an approach that left FD_PREPARE in a scope
+where it is always called before the scope is exited.
 
-	David
-
-
+> 
+> Like:
+> 
+> diff --git a/net/handshake/netlink.c b/net/handshake/netlink.c
+> index 1d33a4675a48..b989456fc4c5 100644
+> --- a/net/handshake/netlink.c
+> +++ b/net/handshake/netlink.c
+> @@ -126,7 +126,8 @@ int handshake_nl_accept_doit(struct sk_buff *skb, struct
+> genl_info *info)
+>         }
+> 
+>  out_complete:
+> -       handshake_complete(req, -EIO, NULL);
+> +       if (req)
+> +               handshake_complete(req, -EIO, NULL);
+>  out_status:
+>         trace_handshake_cmd_accept_err(net, req, NULL, err);
+>         return err;
+> 
+> ------
+> Best regards
+> Wang Liang
+> 
 
