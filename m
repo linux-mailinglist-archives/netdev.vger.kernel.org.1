@@ -1,154 +1,170 @@
-Return-Path: <netdev+bounces-244283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0414CB3D37
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 20:08:55 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62C01CB3D3D
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 20:09:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B25E9300F5A1
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 19:05:51 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id EB76A300501D
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 19:09:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F471322B70;
-	Wed, 10 Dec 2025 19:05:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDF803271F1;
+	Wed, 10 Dec 2025 19:09:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OdseGsrC"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECAAF221540;
-	Wed, 10 Dec 2025 19:05:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CF4F155C97
+	for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 19:09:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765393551; cv=none; b=fZgMnY0FbiJhNoPr4nmVAndQmAwraFzFpe+X6BNwCSGo6QzdlE7B+Ua3Oh2zoKOzY6yM/J6kZg16+tFt/RFQRoHhoF6NNBl4bY3sx7UAlqPZlVj3ci4FCHp30F98lHlc/V+MUuh2hsXJ8J0pVk2HKkXTftl0Iawlu1yQ1Z/KEBs=
+	t=1765393746; cv=none; b=CIIjPUeeDVJQMTAgO79XC16lv36mnPFadp0stOq1fkSQVwJwRlrlOJvb5nWElMuCVSEk/L80Fr9FYu7EPn47+YvwuUjYiauGMVVj73hzQHle+DyoliRgwUipvsjkYyEqjMHCEkaz15/YZaEGrc6BFA6zLtDWpo5MuQbKeBM2Cxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765393551; c=relaxed/simple;
-	bh=KDEoCCT9zD0xJYow6wdIftf1Mh3RLXNQ3swoQ7pMTPg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TWsLAH8tIVrC1FXsACVJHV+IZugyNSQcMaILzKZbo02sLZmj+1sp+6p+ZEHFhBj93imutGSf2+cH6sfZQYgoBbeTAi46jKHiNGn2xCK6oaF9G6DNO2bczfoeJRIPUTkf1uedK5duKBDhPZ9Dcy1fID1774ypMCaWx30SBPs27tM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vTPVN-000000006DG-3tJi;
-	Wed, 10 Dec 2025 19:05:42 +0000
-Date: Wed, 10 Dec 2025 19:05:38 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Frank Wunderlich <frankwu@gmx.de>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH RFC net-next 3/3] net: dsa: add basic initial driver for
- MxL862xx switches
-Message-ID: <aTnEgjso87YRDlmr@makrotopia.org>
-References: <cover.1764717476.git.daniel@makrotopia.org>
- <d92766bc84e409e6fafdc5e3505573662dc19d08.1764717476.git.daniel@makrotopia.org>
- <c6525467-2229-4941-803d-1be5efb431c3@lunn.ch>
- <aTmPjw83jFQXgWQt@makrotopia.org>
- <d5ea5bee-40c5-43f5-9238-ced5ca1904b7@lunn.ch>
+	s=arc-20240116; t=1765393746; c=relaxed/simple;
+	bh=calyCJn7HCzDIZJYHFyyjL6bDhg5HBlqUnJKtZ4SEy8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WMojTomUcxCSNFP1tWSpH31VLtdgefFN5lto25EobtAAB0HumU6dTJ7o5L8PL/Cog7xWCXWCkSACRs+lHnIi/bqKGTV3iXDzh+Ha3QFmNGSxMtukUVkWkUjVV0xVsDdDCnDNlEKE24wfpdiAHGO+PsW5sR3gNw5hTlyStsi0Tfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OdseGsrC; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7b7828bf7bcso139227b3a.2
+        for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 11:09:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765393743; x=1765998543; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=ALnH7xZXyoaaX5d2lzICEZFSc7BpSTyBsbMHtfdCwVg=;
+        b=OdseGsrCSDM17b91kRYpWg7MASTMjNySzWplWVxy8WXB3GCDlgd4rQ/LuFxo0i+xH4
+         ySZXvvGhSgL4ndMO+kzoWwT3DuYz/e3Gdlr5wAn2PhHdA0fkKO6uTH3toxOH8+ZFK5Bj
+         SP+I0NaqGoBIHmwixgLgrzwL8DVlBFxq0IXThbONLUOGvdDelPgA5Tl19P6UIvMV32YS
+         +hv0cbteRuuZ4WslZLi7iq8u54GooPSuGXktig7kGMrO7pVZmp7LWqzs9gJhUBHZjcAt
+         GS3uckjv8FSjnJAStA/3Bmeco8HPMw1f5I7+HsTus34SfmQ1vCmAZsk1g5OjFtApTdoB
+         npTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765393743; x=1765998543;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:sender:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ALnH7xZXyoaaX5d2lzICEZFSc7BpSTyBsbMHtfdCwVg=;
+        b=IO68HwrVKp3fJpjwYOgryIwvnzINsYnZoiat7MVIA781hvswqWDI/btdjUaSTZloKH
+         phGqCjEHw+fr0uM5yfaCnE9PfvjKu9pdxmb/oem/0hDmABondZX8YnuvoFBCBhjEUel/
+         kMX6XJuvbTubcstEaQ7Ca5bBkStqIQIWc50NxuYL7D6+L3IQd8QqHszoWH6rpVfhlY2n
+         EMO9n4fZhREmLP45uxSPt5uxBc26dCWM+555X9Z7hUKT2roEQeinz5pusJvmMaqG/PGT
+         Gk2xRe6ccQg2t9lz84rrPsW0XARFe9+rygZwip7kFpzaz+BHqO9PAzwQJkhJdyOdypJE
+         ugfA==
+X-Forwarded-Encrypted: i=1; AJvYcCXiUZ5H40zmv6lZY0ltW0q2RwOBylksGizrJ/Jx9D9pO3WyU2PeOrgVHRaMo78B+IF90jrqYew=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxtzqvdr0+OQ1rqb8kKA2mTcVoPzZJcDd8CsfbqF4LHRdOAm0/t
+	L4SPBui6KxKERG6ZYZb170P48nBSPuA5aUX5BJWAg0E9E/jQk0FCw4MP
+X-Gm-Gg: ASbGncvh6CuoQ7KOVKEsZf50oio401QFmV55dRUfX1Wbce6itYwvq/0BFT+goGvqqWy
+	m3Slm02gXixCFYQEEsZ2+W+8ypEQETUsPHcDEmHr+R/+0vZrO7d6w3u8G4iOZBGo7Sd0Q+eOyao
+	tWhqRoDrIp42FZg+G3jfKcyb8T3+3TM1Ng5Zd5a2bj8N2/TjH9+fF4k50ryp683xJP4Jdmjpaue
+	h8FfzlRtvjtVV+HIO3qU5YxhmSWR9mur/fdeAa9y2kbroY7SHm6wTZT9vEIfHI/725lVXoiwha1
+	dEnNOsNHv6wOdMZkNFPG6aijnzlqVgmjH0chc4SgpV29bfeSo2Ugvk+BZF1lQQAOOOhoZ3wCOAd
+	cXU7VynG0a+IkQAUx415HQtbyXBcUQ1kZy6k9/ADbBESpQNEBn/xixU6do9oolWnmStsMUmKo2r
+	ujCI2NZSztroaFJFvnPOPEgGfQ8Jnuo0xZU0BfK1+CFGCkB3WYt604HEeIwcw=
+X-Google-Smtp-Source: AGHT+IFkBdc4L7W2yURiGuumsGT4dEWPci/s+wZEabce7HtaPIrwKqnYk/48B/cwUZ1Bk5R/h+PAYg==
+X-Received: by 2002:a05:6a20:3d82:b0:304:313a:4bcd with SMTP id adf61e73a8af0-366e120ef6fmr3658096637.30.1765393743391;
+        Wed, 10 Dec 2025 11:09:03 -0800 (PST)
+Received: from ?IPV6:2600:1700:e321:62f0:da43:aeff:fecc:bfd5? ([2600:1700:e321:62f0:da43:aeff:fecc:bfd5])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c0c25b7d59dsm248321a12.6.2025.12.10.11.09.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Dec 2025 11:09:02 -0800 (PST)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Message-ID: <3682159f-05ff-417c-95e9-976f0a504c09@roeck-us.net>
+Date: Wed, 10 Dec 2025 11:09:01 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d5ea5bee-40c5-43f5-9238-ced5ca1904b7@lunn.ch>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 08/13] selftests: net: netlink-dumps: Avoid
+ uninitialized variable warning
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Shuah Khan <shuah@kernel.org>, Christian Brauner <brauner@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, Kees Cook <kees@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ wine-devel@winehq.org, netdev@vger.kernel.org, bpf@vger.kernel.org
+References: <20251205171010.515236-1-linux@roeck-us.net>
+ <20251205171010.515236-9-linux@roeck-us.net>
+ <20251210181318.73075886@kernel.org>
+Content-Language: en-US
+From: Guenter Roeck <linux@roeck-us.net>
+Autocrypt: addr=linux@roeck-us.net; keydata=
+ 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
+ np3900V20aS7eD9K8GTU0TGC1pyz6IVJwIE=
+In-Reply-To: <20251210181318.73075886@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Dec 10, 2025 at 07:56:13PM +0100, Andrew Lunn wrote:
-> > Imho it would be nice to introduce unlock __mdiodev_c45_* helpers in
-> > include/linux/mdio.h, ie.
-> > 
-> > static inline int __mdiodev_c45_read(struct mdio_device *mdiodev, int devad,
-> > 				     u16 regnum)
-> > {
-> > 	return __mdiobus_c45_read(mdiodev->bus, mdiodev->addr, devad, regnum);
-> > }
-> > 
-> > static inline int __mdiodev_c45_write(struct mdio_device *mdiodev, u32 devad,
-> > 				      u16 regnum, u16 val)
-> > {
-> > 	return __mdiobus_c45_write(mdiodev->bus, mdiodev->addr, devad, regnum,
-> > 				   val);
-> > }
+On 12/10/25 01:13, Jakub Kicinski wrote:
+> On Fri,  5 Dec 2025 09:10:02 -0800 Guenter Roeck wrote:
+>> The following warning is seen when building netlink-dumps.
+>>
+>> netlink-dumps.c: In function ‘dump_extack’:
+>> ../kselftest_harness.h:788:35: warning: ‘ret’ may be used uninitialized
+>>
+>> Problem is that the loop which initializes 'ret' may exit early without
+>> initializing the variable if recv() returns an error. Always initialize
+>> 'ret' to solve the problem.
 > 
-> https://elixir.bootlin.com/linux/v6.18/source/drivers/net/phy/mdio_bus.c#L531
-
-That's __mdiobus_c45_*, but having __mdiodev_c45_* would be nice as
-well, see above.
-
-> > > > +	if (result < 0) {
-> > > > +		ret = result;
-> > > > +		goto out;
-> > > > +	}
-> > > 
-> > > If i'm reading mxl862xx_send_cmd() correct, result is the value of a
-> > > register. It seems unlikely this is a Linux error code?
-> > 
-> > Only someone with insights into the use of error codes by the uC
-> > firmware can really answer that. However, as also Russell pointed out,
-> > the whole use of s16 here with negative values being interpreted as
-> > errors is fishy here, because in the end this is also used to read
-> > registers from external MDIO connected PHYs which may return arbitrary
-> > 16-bit values...
-> > Someone in MaxLinear will need to clarify here.
+> Are you sure you're working off the latest tree? I think this should
+> already be fixed by 13cb6ac5b50
 > 
-> It looks wrong, and since different architectures use different error
-> code values, it is hard to get right. I would suggest you just return
-> EPROTO or EIO and add a netdev_err() to print the value of result.
 
-Ack, makes sense.
+Sorry for missing the fix. I was working off v6.18, which was the tip of
+the tree when I wrote the patch.
 
-> > > > +#define MXL862XX_API_WRITE(dev, cmd, data) \
-> > > > +	mxl862xx_api_wrap(dev, cmd, &(data), sizeof((data)), false)
-> > > > +#define MXL862XX_API_READ(dev, cmd, data) \
-> > > > +	mxl862xx_api_wrap(dev, cmd, &(data), sizeof((data)), true)
-> > > 
-> > > > +/* PHY access via firmware relay */
-> > > > +static int mxl862xx_phy_read_mmd(struct mxl862xx_priv *priv, int port,
-> > > > +				 int devadd, int reg)
-> > > > +{
-> > > > +	struct mdio_relay_data param = {
-> > > > +		.phy = port,
-> > > > +		.mmd = devadd,
-> > > > +		.reg = reg & 0xffff,
-> > > > +	};
-> > > > +	int ret;
-> > > > +
-> > > > +	ret = MXL862XX_API_READ(priv, INT_GPHY_READ, param);
-> > > 
-> > > That looks a bit ugly, using a macro as a function name. I would
-> > > suggest tiny functions rather than macros. The compiler should do the
-> > > right thing.
-> > 
-> > The thing is that the macro way allows to use MXL862XX_API_* on
-> > arbitrary types, such as the packed structs. Using a function would
-> > require the type of the parameter to be defined, which would result
-> > in a lot of code duplication in this case.
-> 
-> How many different invocations of these macros are there? For MDIO you
-> need two. How many more are there? 
+> I applied the other 3 networking changes.
 
-A lot, 80+ in total in the more-or-less complete driver, using 30+
-different __packed structs as parameters.
+Thanks a lot!
 
-https://github.com/dangowrt/linux/blob/mxl862xx-for-upstream/drivers/net/dsa/mxl862xx/mxl862xx.c
+Guenter
 
-https://github.com/dangowrt/linux/blob/mxl862xx-for-upstream/drivers/net/dsa/mxl862xx/mxl862xx-api.h
 
