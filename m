@@ -1,216 +1,226 @@
-Return-Path: <netdev+bounces-244264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEFD9CB352E
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 16:33:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EB0C3CB3549
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 16:37:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 41D8C30181AA
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 15:30:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B00EA31B7224
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 15:33:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AABA12C2364;
-	Wed, 10 Dec 2025 15:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44FF231283A;
+	Wed, 10 Dec 2025 15:33:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TQfPExCV";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ozB+amrh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XFZpAmJs"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E877526AC3
-	for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 15:30:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9EC524BBFD
+	for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 15:33:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765380624; cv=none; b=QAHH97uMpnMpC8JFdg3PTiJCwKBstRc3DbEkfGp68Jzf/oi4XblSMuZ4aCHQma4uzmeknm3aOqSOI9XsDsClWLX9DLm9p+TRpfxfNLxDWuuuSI2Jy20gREsNyCvkdeYvSZp/I2r4SNxr2iVNwHyOjaKBRvPSFdqi0vPvvOFaNJM=
+	t=1765380811; cv=none; b=uWUOLi90tN6xCtFQUcWhMDTuLSA+MdQA+NNBhzeTt/EyvZZGh+g1ZD4cH5h875Y9uZk6xZEwi+U8SLF9HawoKcs5DVTHIMiQc+haStAIL4LmfRCCmchgEnEwS42ospb9GUekgPXuZx5zjlkzCkq9Nk+iCr4bYv6thBS1VfmWB0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765380624; c=relaxed/simple;
-	bh=fKgiC27aXeEwEkJURDyda9hjIhsUz/XBgD0oxk0l2iM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Lgl19xOQS20uncTca7Eys/BvM7EaBnFAL+Iz2qroIc7NVnuKmmlpK/11qCL+lc7q6Ld3VUg78U8ZbldGcphjnhhyJSvSs1VDvz+bW15F+xAcVyfbKNMpWJ9U+jQW2v6U+oHT5uMlUTOV9oVotOV1Hn2SF6DWOGzklU/caYk2PhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TQfPExCV; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ozB+amrh; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765380622;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=G+wsmW4VR7unE39vBofZpv46RyheC0as+jLhnNV6VxY=;
-	b=TQfPExCVGsgd6Bqn8lhFuX9lccIFAEOCa7dLaPoayBf0JgLLO4BISmWXa337I7dg0n1jpS
-	p1+Afp4fUS+bVuL+JFbEZzYWXsE0hW2KXvncDL9Ua1MHtrMjvGLy+VFZJx9t5nJdIFyMr9
-	ySEvSde8AxTXyoxSggtntOsu5laSilA=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-558-eIAWOh-tPKagROXAonFIAw-1; Wed, 10 Dec 2025 10:30:18 -0500
-X-MC-Unique: eIAWOh-tPKagROXAonFIAw-1
-X-Mimecast-MFC-AGG-ID: eIAWOh-tPKagROXAonFIAw_1765380617
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-649783da905so1428206a12.1
-        for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 07:30:18 -0800 (PST)
+	s=arc-20240116; t=1765380811; c=relaxed/simple;
+	bh=Yx19Cw7PrTxmK2aj7a0su0iOLHk3ekoOT2KchGcwVTg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=r2iF7vAP+7FwOA4lkJ1JF2vHHv2jFUKaiK1TrMeFzlZSFzFZoOS7gDakK5wS9sVsuNGpRQ8YbDqwRxY0QKyVUTWGx3BsIC7nMzpmHnvGtJcA/jUrNRXgdtzolh+A7orVuAeK48PsRD6OS6yXFl7+5L5SOkzSjcmCE+f0JKNekiA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XFZpAmJs; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2956d816c10so80594415ad.1
+        for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 07:33:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1765380617; x=1765985417; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G+wsmW4VR7unE39vBofZpv46RyheC0as+jLhnNV6VxY=;
-        b=ozB+amrho6eXO9ykd/DvgWAzpPKaeiMHc4yyUWg86fpvh5kgNi6oU2VLFHDdEoIvVj
-         qTOQ0B4B9IMbfbiA1a2imxDRmqIP8QmW8CT1TsWUm0KOcmxH7f+oBbrSTBmD5yDi/Net
-         mWI6atliUF9RnSChG1FL8vfvxQpp7DWTdoFUoIhYWZk5F5Et+gcbQquqw3OXbIoOgGaD
-         AOUKy9mK1dXWgkzC32E66L0KyRq2z2LUr0P/ORTIVc7qd+p60cWnsiembxVtnbKS9PIP
-         qaqgOnwixg/kv+lg+t+KOhbmfA8v05BAQJxhZPBvRaL4j8GyccmkHRtuCgDFgkQ3NByq
-         xvdQ==
+        d=gmail.com; s=20230601; t=1765380809; x=1765985609; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ESuYFpOjYXjLgX7Fp3qymkbq56ElvjhTl63RkbJTEwg=;
+        b=XFZpAmJsPEa56/oA8pVgOCGNUOIO4vYGxnUAReDHHmZ+vH8rYPw6VSR09bSvWz9qYA
+         TYMpm+sZeK9GTJcA5/UBLCsZLFjerwBBiIGyOgpr6Oj+8vPIk94UUEpjOUhPWiMRWPko
+         5IPw8Dr+Xl/RSglyT/JedufffG4CUogff1+pj58Fve+Loo/2EYvK/J2/SYPOWKm9T3gE
+         kouG8XyWKIpOnAn+lu3u269F2Dadd19fYhAKMPcBgx1eAP9hVoEC63Su/VqE+GGmN456
+         h++4qYsE6PFnHwoboxDsReWGayOoQ9CVv9Lr9zYh2kcov/2pyEVj5yjrEn/C30u3ZxIv
+         aXyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765380617; x=1765985417;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=G+wsmW4VR7unE39vBofZpv46RyheC0as+jLhnNV6VxY=;
-        b=W/Iesfkj3Shx09cPJM4/LrZWaR4KRqXqA94x0tmyrscwJH4y9lOZQFd1XoU7tq7STJ
-         txgTtFhm/5cIE3jm0IsTyBSiDtjC2Im8HBnHaip8qjegYiGO8CCMKylgLa6cFXGC6kZf
-         SUyOnnxzuK8BvelQ9lOzHqP7Dkni7sux52PufoOtoUz7HYudWfckV7BZxRRI28LHHboQ
-         fTFK3AfhiIztXQzXTVO/7z3sm9I9bkTeBgv1RG+pvWeG2LQPTZdX9VlmMABHHqW3bpJ+
-         PJ+Q5NuJzCPph0Mr3X54ub1uHl6N5CHHWKGEe2Pqgm+H7imXVqyCWrnIlwGmUQOcQ3lt
-         borA==
-X-Forwarded-Encrypted: i=1; AJvYcCVDNionjxHWU4YEE7lydeAnH8x5RhRKp9lopVujaKA1rqAeOX1vVkYnpIvO8xCXsAsXivrPPbo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDgJr0C4VvpTQIbb9LEJdRAVUDAc1+5aLX4bUykdkTkCcNVPxc
-	uABY9qxg3/O9VX/CQMp72DSeedIWYuUwFjXFZIFujEK5OqSJceJRT/6kjivWS9YS5wSn1WdgTdf
-	I7jAp5X749k5LUb28pQlRTeiXKXmcvRVfoRFC02DJWcuFl5QzibpYGNQLPFznZ3x94w==
-X-Gm-Gg: AY/fxX7W7T0XqUpysv+6cYkg9nT5IdRslPwHF0xX4mxB6X9oKE7mqYOPlA3vrPTvzzW
-	qUSxfkiIahG+SZ7PgkUpLjhtn5BRyEGMXkfW/mre3VnPiyOO1RBhz2+UwG7O1SuW0CMXJZYOK0/
-	aNVyCIvIhaj9xCu+DBCuJMdHlwFhG6RLuxbML+/r+u4Jo2gYB5XiN3fVcvJkoMS+yKKdpvGtj4D
-	goGCsjoVs64CJrf/ij4ufpjprPhJ8IzhYN9WArbKSGZUyLOhVvy/zc0pLALzfc4icojtnLkhVUv
-	PJ4vsW2Hl/Mk7z4KhG4+zgfESgWzBZx0+jpDIchI1Nvb0QOMLh3SldVb3znEyFztvnehCoIlph4
-	2mtGmywvX6iqUkeSPzwbioZ4pqsXWofN548V+4zhYGpUhIc8wJ4lCNPh821Q=
-X-Received: by 2002:a17:906:6a04:b0:b76:7e0e:4246 with SMTP id a640c23a62f3a-b7ce823a7edmr324760566b.12.1765380616949;
-        Wed, 10 Dec 2025 07:30:16 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE+n1oLk+lpYvSo3oxC/+zi9Dq/Bhke/wTJsYnKmfJeBSv2/uWajl8IxLNhM4rQIwoesrPtug==
-X-Received: by 2002:a17:906:6a04:b0:b76:7e0e:4246 with SMTP id a640c23a62f3a-b7ce823a7edmr324755166b.12.1765380616407;
-        Wed, 10 Dec 2025 07:30:16 -0800 (PST)
-Received: from [10.45.225.95] (5920ab7b.static.cust.trined.nl. [89.32.171.123])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-64956402185sm6637761a12.25.2025.12.10.07.30.15
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 10 Dec 2025 07:30:15 -0800 (PST)
-From: Eelco Chaudron <echaudro@redhat.com>
-To: =?utf-8?q?Adri=C3=A1n_Moreno?= <amorenoz@redhat.com>
-Cc: =?utf-8?b?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>,
- Aaron Conole <aconole@redhat.com>, Ilya Maximets <i.maximets@ovn.org>,
- Alexei Starovoitov <ast@kernel.org>, Jesse Gross <jesse@nicira.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, dev@openvswitch.org
-Subject: Re: [PATCH net] net: openvswitch: Avoid needlessly taking the RTNL on
- vport destroy
-Date: Wed, 10 Dec 2025 16:30:13 +0100
-X-Mailer: MailMate (2.0r6290)
-Message-ID: <7C74F561-F12F-4683-9D99-0A086D098938@redhat.com>
-In-Reply-To: <CAG=2xmOib02j-fwoKtCYgrovdE3FZkW__hiE=v0PuGkGzJvvBQ@mail.gmail.com>
-References: <20251210125945.211350-1-toke@redhat.com>
- <B299AD16-8511-41B7-A36A-25B911AEEBF4@redhat.com>
- <CAG=2xmOib02j-fwoKtCYgrovdE3FZkW__hiE=v0PuGkGzJvvBQ@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1765380809; x=1765985609;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ESuYFpOjYXjLgX7Fp3qymkbq56ElvjhTl63RkbJTEwg=;
+        b=NHXf20Ko/ffbcCd0nyeHf2eAAQzVHksndHJJ/cnuV70YegVi7q8Bk0I0zjaUAt6FZ8
+         EpSPqHqOB+AENMmAuR+LE04AF1ubfIuZPQif7TriWXNigqa14yvo3NB9h+CyK9Ga7x00
+         K0sQaq52YBPr+PSgNrtt/tQnpuuC9f1pXCKeR6kUWTXVYnV8+zPDq4n/G6qJB/QYaGo/
+         QhmRhLAQhlRaR/DdV6avMNM/imAjFcGqT788g1qV0n2lW8ARiUoEnjg0ZOvrDJh5QIgK
+         I9fvcOXwCpEh+aJnfwOq7GPsDB/aICbWSbmVqSypHUU6BccW5SC8AsxUYLqjHiAwCTMi
+         d/6g==
+X-Gm-Message-State: AOJu0Yyrts4Oq+Fvzj5ITsRRka9Omn6ZIec9FDPrYxPVBkkNMp6dLpmP
+	S5iv+nH0jOktudoTZCj6ULpW1KkpeKEbfmW2hXsrV0f0lTuZIP3/J4qy
+X-Gm-Gg: AY/fxX6UCv5BylE4eq1twk3bHmmG6vsA0xz2N0LhqeEK8F+mVqevIyKAp674ZruQPky
+	66IVMLdn8bYaSv+EeL0evwUN4Fn59JW8LjPlAKN8p1Erwn8H7V03fv7KeqVCMR8XKVBZB0oGqmc
+	VfWNlySpAJTmvxstm+oZ29xcinADBZxSq98EHkozyv8PWJgQA5q3K2Z9TDwQ+xHmtGUy1UPHCV+
+	DpDG4ag/i8nRX6Zf1QYcuTL5ewev1BYrZs1cxPq6CrOHAFWImPBxDVs0dovdxNC4TqfFUP8Zvur
+	wYcLSijdD/fixl5JohahYCVBZkw5U0unE3bXhqCJN7N5lOx3YhIuSRGpKyM7aKh4c/uqaTeNics
+	DvRSIS7t/gW2cVAGp6alOFkNwFJJ+Odetj4gPCyaWr8PA/cxw3F/cOV4aljQlMNvVco0H0wcs/V
+	HOSvJRIyZ01L5frLiPjbSmCSUzfN/jW+v3n1XcIF5aceW+ftRp3j3Ws04tTWz0jA==
+X-Google-Smtp-Source: AGHT+IENrwT2Am+P2vjlTDz+KYOoqnBVC//oOg414tv75XRJNnToBhPmNfWibuLCCf4uNogdSV+RXQ==
+X-Received: by 2002:a17:903:2ac7:b0:298:2e7a:3c47 with SMTP id d9443c01a7336-29ec27be899mr30223795ad.42.1765380808606;
+        Wed, 10 Dec 2025 07:33:28 -0800 (PST)
+Received: from ?IPV6:2001:ee0:4f4c:210:311c:669b:9c36:4a99? ([2001:ee0:4f4c:210:311c:669b:9c36:4a99])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29dae49b196sm191451135ad.17.2025.12.10.07.33.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Dec 2025 07:33:28 -0800 (PST)
+Message-ID: <c83c386e-96a6-4f9f-8047-23ce866ed320@gmail.com>
+Date: Wed, 10 Dec 2025 22:33:17 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] virtio-net: enable all napis before scheduling refill
+ work
+To: Jason Wang <jasowang@redhat.com>
+Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, virtualization@lists.linux.dev,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+References: <20251208153419.18196-1-minhquangbui99@gmail.com>
+ <CACGkMEvtKVeoTMrGG0gZOrNKY=m-DGChVcM0TYcqx6-Ap+FY8w@mail.gmail.com>
+ <66d9f44c-295e-4b62-86ae-a0aff5f062bb@gmail.com>
+ <CACGkMEuF0rNYcSSUCdAgsW2Xfen9NGZHNxXpkO2Mt0a4zQJDqQ@mail.gmail.com>
+Content-Language: en-US
+From: Bui Quang Minh <minhquangbui99@gmail.com>
+In-Reply-To: <CACGkMEuF0rNYcSSUCdAgsW2Xfen9NGZHNxXpkO2Mt0a4zQJDqQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-
-
-On 10 Dec 2025, at 16:12, Adri=C3=A1n Moreno wrote:
-
-> On Wed, Dec 10, 2025 at 02:28:36PM +0100, Eelco Chaudron wrote:
->>
->>
->> On 10 Dec 2025, at 13:59, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->>
->>> The openvswitch teardown code will immediately call
->>> ovs_netdev_detach_dev() in response to a NETDEV_UNREGISTER notificati=
-on.
->>> It will then start the dp_notify_work workqueue, which will later end=
- up
->>> calling the vport destroy() callback. This callback takes the RTNL to=
- do
->>> another ovs_netdev_detach_port(), which in this case is unnecessary.
->>> This causes extra pressure on the RTNL, in some cases leading to
->>> "unregister_netdevice: waiting for XX to become free" warnings on
->>> teardown.
+On 12/10/25 12:45, Jason Wang wrote:
+> On Tue, Dec 9, 2025 at 11:23 PM Bui Quang Minh <minhquangbui99@gmail.com> wrote:
+>> On 12/9/25 11:30, Jason Wang wrote:
+>>> On Mon, Dec 8, 2025 at 11:35 PM Bui Quang Minh <minhquangbui99@gmail.com> wrote:
+>>>> Calling napi_disable() on an already disabled napi can cause the
+>>>> deadlock. In commit 4bc12818b363 ("virtio-net: disable delayed refill
+>>>> when pausing rx"), to avoid the deadlock, when pausing the RX in
+>>>> virtnet_rx_pause[_all](), we disable and cancel the delayed refill work.
+>>>> However, in the virtnet_rx_resume_all(), we enable the delayed refill
+>>>> work too early before enabling all the receive queue napis.
+>>>>
+>>>> The deadlock can be reproduced by running
+>>>> selftests/drivers/net/hw/xsk_reconfig.py with multiqueue virtio-net
+>>>> device and inserting a cond_resched() inside the for loop in
+>>>> virtnet_rx_resume_all() to increase the success rate. Because the worker
+>>>> processing the delayed refilled work runs on the same CPU as
+>>>> virtnet_rx_resume_all(), a reschedule is needed to cause the deadlock.
+>>>> In real scenario, the contention on netdev_lock can cause the
+>>>> reschedule.
+>>>>
+>>>> This fixes the deadlock by ensuring all receive queue's napis are
+>>>> enabled before we enable the delayed refill work in
+>>>> virtnet_rx_resume_all() and virtnet_open().
+>>>>
+>>>> Fixes: 4bc12818b363 ("virtio-net: disable delayed refill when pausing rx")
+>>>> Reported-by: Paolo Abeni <pabeni@redhat.com>
+>>>> Closes: https://netdev-ctrl.bots.linux.dev/logs/vmksft/drv-hw-dbg/results/400961/3-xdp-py/stderr
+>>>> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
+>>>> ---
+>>>>    drivers/net/virtio_net.c | 59 +++++++++++++++++++---------------------
+>>>>    1 file changed, 28 insertions(+), 31 deletions(-)
+>>>>
+>>>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+>>>> index 8e04adb57f52..f2b1ea65767d 100644
+>>>> --- a/drivers/net/virtio_net.c
+>>>> +++ b/drivers/net/virtio_net.c
+>>>> @@ -2858,6 +2858,20 @@ static bool try_fill_recv(struct virtnet_info *vi, struct receive_queue *rq,
+>>>>           return err != -ENOMEM;
+>>>>    }
+>>>>
+>>>> +static void virtnet_rx_refill_all(struct virtnet_info *vi)
+>>>> +{
+>>>> +       bool schedule_refill = false;
+>>>> +       int i;
+>>>> +
+>>>> +       enable_delayed_refill(vi);
+>>> This seems to be still racy?
 >>>
->>> We can straight-forwardly avoid the extra RTNL lock acquisition by
->>> checking the device flags before taking the lock, and skip the lockin=
-g
->>> altogether if the IFF_OVS_DATAPATH flag has already been unset.
+>>> For example, in virtnet_open() we had:
 >>>
->>> Fixes: b07c26511e94 ("openvswitch: fix vport-netdev unregister")
->>> Tested-by: Adrian Moreno <amorenoz@redhat.com>
->>> Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
->>> ---
->>>  net/openvswitch/vport-netdev.c | 11 +++++++----
->>>  1 file changed, 7 insertions(+), 4 deletions(-)
+>>> static int virtnet_open(struct net_device *dev)
+>>> {
+>>>           struct virtnet_info *vi = netdev_priv(dev);
+>>>           int i, err;
 >>>
->>> diff --git a/net/openvswitch/vport-netdev.c b/net/openvswitch/vport-n=
-etdev.c
->>> index 91a11067e458..519f038526f9 100644
->>> --- a/net/openvswitch/vport-netdev.c
->>> +++ b/net/openvswitch/vport-netdev.c
->>> @@ -160,10 +160,13 @@ void ovs_netdev_detach_dev(struct vport *vport)=
-
+>>>           for (i = 0; i < vi->max_queue_pairs; i++) {
+>>>                   err = virtnet_enable_queue_pair(vi, i);
+>>>                   if (err < 0)
+>>>                           goto err_enable_qp;
+>>>           }
 >>>
->>>  static void netdev_destroy(struct vport *vport)
->>>  {
->>> -	rtnl_lock();
->>> -	if (netif_is_ovs_port(vport->dev))
->>> -		ovs_netdev_detach_dev(vport);
->>> -	rtnl_unlock();
->>> +	if (netif_is_ovs_port(vport->dev)) {
->>
->> Hi Toke,
->>
->> Thanks for digging into this!
->>
->> The patch looks technically correct to me, but maybe we should add a c=
-omment here explaining why we can do it this way, i.e., why we can call n=
-etif_is_ovs_port() without the lock.
->> For example:
->>
->> /* We can avoid taking the rtnl lock as the IFF_OVS_DATAPATH flag is s=
-et/cleared in either netdev_create()/netdev_destroy(), which are both cal=
-led under the global ovs_lock(). */
->>
->> Additionally, I think the second netif_is_ovs_port() under the rtnl lo=
-ck is not required due to the above.
->
-> In the case of netdevs being unregistered outside of OVS, the
-> ovs_dp_device_notifier gets called which then runs
-> "ovs_netdev_detach_dev" only under RTNL. Locking ovs_lock() in that
-> callback would be problematic since the rest of the OVS code assumes
-> ovs_lock is nested outside of RTNL.
->
-> So this could race with a ovs_vport_cmd_del AFAICS.
-
-Not fully sure I understand the code path you are referring to, but if it=
-=E2=80=99s through ovs_dp_notify_wq()->dp_detach_port_notify()->ovs_dp_de=
-tach_port(), it takes the ovs_lock().
-
-By the way: in your testing, did you see the expected improvement, i.e., =
-no more =E2=80=9Cunregister=E2=80=9D delays?
-
-//Eelco
-
->>
->>> +		rtnl_lock();
->>> +		/* check again while holding the lock */
->>> +		if (netif_is_ovs_port(vport->dev))
->>> +			ovs_netdev_detach_dev(vport);
->>> +		rtnl_unlock();
->>> +	}
+>>>           virtnet_rx_refill_all(vi);
 >>>
->>>  	call_rcu(&vport->rcu, vport_netdev_free);
->>>  }
->>> --
->>> 2.52.0
->>
+>>> So NAPI and refill work is enabled in this case, so the refill work
+>>> could be scheduled and run at the same time?
+>> Yes, that's what we expect. We must ensure that refill work is scheduled
+>> only when all NAPIs are enabled. The deadlock happens when refill work
+>> is scheduled but there are still disabled RX NAPIs.
+> Just to make sure we are on the same page, I meant, after refill work
+> is enabled, rq0 is NAPI is enabled, in this case the refill work could
+> be triggered by the rq0's NAPI so we may end up in the refill work
+> that it tries to disable rq1's NAPI while holding the netdev lock.
+
+I don't quite get your point. The current deadlock scenario is this
+
+virtnet_rx_resume_all
+napi_enable(rq0) (the rq1 napi is still disabled)
+enable_refill_work
+
+refill_work
+napi_disable(rq0) -> still okay
+napi_enable(rq0) -> still okay
+napi_disable(rq1)
+-> hold netdev_lock
+     -> stuck inside the while loop in napi_disable_locked
+             while (val & (NAPIF_STATE_SCHED | NAPIF_STATE_NPSVC)) {
+                 usleep_range(20, 200);
+                 val = READ_ONCE(n->state);
+             }
+
+
+napi_enable(rq1)
+-> stuck while trying to acquire the netdev_lock
+
+The problem is that we must not call napi_disable() on an already 
+disabled NAPI (rq1's NAPI in the example).
+
+In the new virtnet_open
+
+static int virtnet_open(struct net_device *dev)
+{
+          struct virtnet_info *vi = netdev_priv(dev);
+          int i, err;
+
+          // Note that at this point, refill work is still disabled, vi->refill_enabled == false,
+          // so even if virtnet_receive is called, the refill_work will not be scheduled.
+          for (i = 0; i < vi->max_queue_pairs; i++) {
+                  err = virtnet_enable_queue_pair(vi, i);
+                  if (err < 0)
+                          goto err_enable_qp;
+          }
+
+          // Here all RX NAPIs are enabled so it's safe to enable refill work again
+          virtnet_rx_refill_all(vi);
+
+
+Thanks,
+Quang Minh.
 
 
