@@ -1,200 +1,151 @@
-Return-Path: <netdev+bounces-244203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 761FCCB25E9
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 09:13:51 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0672CB25FB
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 09:16:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0D59B30ADC59
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 08:12:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A2B1E300718B
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 08:16:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B59763019A5;
-	Wed, 10 Dec 2025 08:12:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48AF026056E;
+	Wed, 10 Dec 2025 08:16:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PiN2gT8/"
+	dkim=pass (2048-bit key) header.d=hale.at header.i=@hale.at header.b="ICMDKnU8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from gw.hale.at (gw.hale.at [89.26.116.210])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 047F3301715
-	for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 08:12:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F1DD3B8D6A;
+	Wed, 10 Dec 2025 08:16:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.26.116.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765354337; cv=none; b=G9bVJ7esfowpxCaKXV4yytz/lcj1fYcmLNnl9bWj0sYZDFgs4JmSxjevynQWk7Kexkk/eGM8LyGYKNiueXbCT0D+RHSzUnsSkJcNxwMpbZXfbjAh9AQqgQQJiGXxW2BKMEIRcNrcOPpJ9lv0PkK6nAi08VlD2jkK7bdAtY5wI8s=
+	t=1765354595; cv=none; b=egyNmJuZp3S8VjBXzrYNd1g6R7TnNXBmjIH8mZAlo+js/70EeZxcphb/AeNoCYcPk1lvRLtx9Ml0nySqIe32dT0DzdOuVWLgvAlrcST5XHT0lHyaTiL1LL533d4KWVpNsKMb5fLlX9+IVo7y7muXnaZfxgPVAWaXflXZfOpQPvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765354337; c=relaxed/simple;
-	bh=KE6vKyJykXgqERU9oUSSm2PL2KTpPjQb3VNOfOkDyJ4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=eCDeArme6fSru2N+EXeagACRukXfMcM+VYlmrrDNo9LOw3EkVAZCRDvjoC/Z2VSdi4/izHo5F25g9b4YtqOZ1hRu1B7LNkB2puLl5tQXCsnXYu697LtltdEB/9PZwQylWemWpdOukEf0CZfKVxQldJseqrYMDsUsWIpICeP1sc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PiN2gT8/; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-343e262230eso7381817a91.2
-        for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 00:12:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1765354334; x=1765959134; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8vHCHE3IGhbl2ADeua07wLDum4z/q/khwp1o+EHA+As=;
-        b=PiN2gT8/OeEVp+d9W9Vg5FNGZm4CIoVuMs6bYqJk36T4TonMK2tZ+5VT+vvTsqw1f2
-         wN3OxfieNVQqvy4AXy45eSGWJlQU6W+vK4hb9ww/S1EB70ZXx2l0JCyfwxu7nnRDm0vd
-         IU/AcjrSZ5IDULe94WDCPS3UI+s1lJP5ZJZHHtrWHXQFTU6dERa1Jk0A6bSP9afz20Ii
-         TxKGwdxLo+LjkIyv3XXDamarU8GwgW9gSjRJptsd8q7PYzf+tCZTJrU01rnt5tW16OVB
-         gHy9sI4SffBRGFCwJTktjvtwpGh97T1VOOU8jD9bomz4Jt92xqofhQ2yqvn0uMzkPI/Y
-         tZ3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765354334; x=1765959134;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8vHCHE3IGhbl2ADeua07wLDum4z/q/khwp1o+EHA+As=;
-        b=acscYI4wQ/KHpYau/IfD4+1bb+ZG310TshneJJCV7Bre5n4TvZ0W5TmDCJEbi8qu87
-         4nj0NU3kk/ncnReCxS2gyRBLPrGXLjTQaK4zyNOVjqe4J2Wi32+31uputVFJ6HYBfMFZ
-         L2YWlSZ5bwNv4OIXSyBnzMl9Y5Ryudp/8nL4TZanDfDd3Hp4COUFvx8Xg0LMMkeQUa0j
-         +M2roay6iYS0q4Ec+FrFq6TaLnGViDLylPI/y4XtpvQ6egr24RPPn9GQpJ85mkCNK9Yo
-         +KmC8rFW7DK/Gi6vc1/OSyZTpmYPfI316WD2yFVyCDmE7lzFZ//PcTWi9kZTp3zVRMoJ
-         Q5og==
-X-Forwarded-Encrypted: i=1; AJvYcCUVuUJruQFw8TSN9/KHVZhhAZLfxj4XpZd4rqcD23g383Z3k7jmv8Usd9Xi1nogtz4FmePeooc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDfN02qiY8Zx/Y64ghYHACcrltN7HbQMUi/0xkHvXUFinE5+cW
-	caw1AGSjmxNmbtKCj+hQKr1xjI9O5XryMaUccGG8gJhQB48Ay+5egX6sDiaTKtYLHvmA1BoLDDX
-	+qltSlA==
-X-Google-Smtp-Source: AGHT+IHjNLzWvC7USJUynwHR6Cv8OmsA/wNvOK0grRXb8vahy68BwO/kmoJi49jNXqgeaNmqwhqmCVGagCQ=
-X-Received: from pgct3.prod.google.com ([2002:a05:6a02:5283:b0:bc7:14b7:890])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:a127:b0:35d:2172:5ffb
- with SMTP id adf61e73a8af0-366e24507b7mr1639621637.47.1765354333699; Wed, 10
- Dec 2025 00:12:13 -0800 (PST)
-Date: Wed, 10 Dec 2025 08:11:13 +0000
-In-Reply-To: <20251210081206.1141086-1-kuniyu@google.com>
+	s=arc-20240116; t=1765354595; c=relaxed/simple;
+	bh=ZsmqiADQt0pzuhEybWFRe2+Z/cW03ilikPhPOMX3Rbg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TGv2UmRuQM+0XMvnTh9SKbSSFTAPsFhHO6lpZgPbXnr5p9XbYo4zER3boHFuatbUGC6Qm5v+7KfE7ebgmnIISMpflSpS7c+8ZOqf2shcExMHU4q5nOUK24zDFfbdDubUTEDNQ4Ilv5BPHP4UWJyVWV74Z2dWfNj6f+LMbz6fMlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hale.at; spf=pass smtp.mailfrom=hale.at; dkim=pass (2048-bit key) header.d=hale.at header.i=@hale.at header.b=ICMDKnU8; arc=none smtp.client-ip=89.26.116.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hale.at
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hale.at
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=hale.at; i=@hale.at; q=dns/txt; s=mail;
+  t=1765354593; x=1796890593;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ZsmqiADQt0pzuhEybWFRe2+Z/cW03ilikPhPOMX3Rbg=;
+  b=ICMDKnU8PIy84Qau+joHySnLjLZAyETeaxdV3U+b2PT/So3DCfXi7fCL
+   JBHwiPESw9TUE5p6vdaxUVv2b4GBE5wOG/uDOnQ5QjDMZfmjRmzdPL6aR
+   Q0Bt7UTKrYMnDGJGL8dORHXxfupLPtygP/Py9dNV1Nmu47t/Y7uLmQcXf
+   6r3TmrF4GyhgAiEywovhJ6O71ZZgQXNiYYFY7EGgAE7Im+d16kXIIor0h
+   m9lOFP0ZVQ2R5pxRJLI4om1aJHt+xbQyPw6NFu+86IsTnyTuXOkq/ORyq
+   nR4sOdbTxYlTX8osK6lslvjQ7F3BGpScyVeBA73yjJdphsQt0KKQxVRbe
+   A==;
+X-CSE-ConnectionGUID: kWDB6ak1SB2KKbxM0/Ne3Q==
+X-CSE-MsgGUID: 7S80rsPBQ3uFoWKWTNRdGw==
+IronPort-SDR: 69392c5e_VuZGNkkZd+YKzU6fk4RLtG3V2QslQOO4Iqwhwm1+wWzcw1E
+ CJkO8P8M4u4OJWTO37LPeyULGydtJOl4ldwqigA==
+X-IronPort-AV: E=Sophos;i="6.20,263,1758578400"; 
+   d="scan'208";a="1478371"
+Received: from unknown (HELO mail4.hale.at) ([192.168.100.5])
+  by mgmt.hale.at with ESMTP; 10 Dec 2025 09:16:31 +0100
+Received: from mail4.hale.at (localhost.localdomain [127.0.0.1])
+	by mail4.hale.at (Postfix) with ESMTPS id D1D70130075A;
+	Wed, 10 Dec 2025 09:16:10 +0100 (CET)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail4.hale.at (Postfix) with ESMTP id BA311130076A;
+	Wed, 10 Dec 2025 09:16:10 +0100 (CET)
+X-Virus-Scanned: amavis at mail4.hale.at
+Received: from mail4.hale.at ([127.0.0.1])
+ by localhost (mail4.hale.at [127.0.0.1]) (amavis, port 10026) with ESMTP
+ id hdFGQtDLzFOl; Wed, 10 Dec 2025 09:16:10 +0100 (CET)
+Received: from entw47.HALE.at (entw47 [192.168.100.117])
+	by mail4.hale.at (Postfix) with ESMTPSA id A4D70130075A;
+	Wed, 10 Dec 2025 09:16:10 +0100 (CET)
+From: Michael Thalmeier <michael.thalmeier@hale.at>
+To: Deepak Sharma <deepak.sharma.472935@gmail.com>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Simon Horman <horms@kernel.org>
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Michael Thalmeier <michael.thalmeier@hale.at>,
+	stable@vger.kernel.org
+Subject: [PATCH v2] net: nfc: nci: Fix parameter validation for packet data
+Date: Wed, 10 Dec 2025 09:16:05 +0100
+Message-ID: <20251210081605.3855663-1-michael.thalmeier@hale.at>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251210081206.1141086-1-kuniyu@google.com>
-X-Mailer: git-send-email 2.52.0.223.gf5cc29aaa4-goog
-Message-ID: <20251210081206.1141086-3-kuniyu@google.com>
-Subject: [PATCH v2 net 2/2] sctp: Clear inet_opt in sctp_v6_copy_ip_options().
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Xin Long <lucien.xin@gmail.com>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	syzbot+ec33a1a006ed5abe7309@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 
-syzbot reported the splat below. [0]
+Since commit 9c328f54741b ("net: nfc: nci: Add parameter validation for
+packet data") communication with nci nfc chips is not working any more.
 
-Since the cited commit, the child socket inherits all fields
-of its parent socket unless explicitly cleared.
+The mentioned commit tries to fix access of uninitialized data, but
+failed to understand that in some cases the data packet is of variable
+length and can therefore not be compared to the maximum packet length
+given by the sizeof(struct).
 
-syzbot set IP_OPTIONS to AF_INET6 socket and created a child
-socket inheriting inet_sk(sk)->inet_opt.
+For these cases it is only possible to check for minimum packet length.
 
-sctp_v6_copy_ip_options() only clones np->opt, and leaving
-inet_opt results in double-free.
-
-Let's clear inet_opt in sctp_v6_copy_ip_options().
-
-[0]:
-BUG: KASAN: double-free in inet_sock_destruct+0x538/0x740 net/ipv4/af_inet.c:159
-Free of addr ffff8880304b6d40 by task ksoftirqd/0/15
-
-CPU: 0 UID: 0 PID: 15 Comm: ksoftirqd/0 Not tainted syzkaller #0 PREEMPT(full)
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/02/2025
-Call Trace:
- <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0xca/0x240 mm/kasan/report.c:482
- kasan_report_invalid_free+0xea/0x110 mm/kasan/report.c:557
- check_slab_allocation+0xe1/0x130 include/linux/page-flags.h:-1
- kasan_slab_pre_free include/linux/kasan.h:198 [inline]
- slab_free_hook mm/slub.c:2484 [inline]
- slab_free mm/slub.c:6630 [inline]
- kfree+0x148/0x6d0 mm/slub.c:6837
- inet_sock_destruct+0x538/0x740 net/ipv4/af_inet.c:159
- __sk_destruct+0x89/0x660 net/core/sock.c:2350
- sock_put include/net/sock.h:1991 [inline]
- sctp_endpoint_destroy_rcu+0xa1/0xf0 net/sctp/endpointola.c:197
- rcu_do_batch kernel/rcu/tree.c:2605 [inline]
- rcu_core+0xcab/0x1770 kernel/rcu/tree.c:2861
- handle_softirqs+0x286/0x870 kernel/softirq.c:622
- run_ksoftirqd+0x9b/0x100 kernel/softirq.c:1063
- smpboot_thread_fn+0x542/0xa60 kernel/smpboot.c:160
- kthread+0x711/0x8a0 kernel/kthread.c:463
- ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-
-Allocated by task 6003:
- kasan_save_stack mm/kasan/common.c:56 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:77
- poison_kmalloc_redzone mm/kasan/common.c:400 [inline]
- __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:417
- kasan_kmalloc include/linux/kasan.h:262 [inline]
- __do_kmalloc_node mm/slub.c:5642 [inline]
- __kmalloc_noprof+0x411/0x7f0 mm/slub.c:5654
- kmalloc_noprof include/linux/slab.h:961 [inline]
- kzalloc_noprof include/linux/slab.h:1094 [inline]
- ip_options_get+0x51/0x4c0 net/ipv4/ip_options.c:517
- do_ip_setsockopt+0x1d9b/0x2d00 net/ipv4/ip_sockglue.c:1087
- ip_setsockopt+0x66/0x110 net/ipv4/ip_sockglue.c:1417
- do_sock_setsockopt+0x17c/0x1b0 net/socket.c:2360
- __sys_setsockopt net/socket.c:2385 [inline]
- __do_sys_setsockopt net/socket.c:2391 [inline]
- __se_sys_setsockopt net/socket.c:2388 [inline]
- __x64_sys_setsockopt+0x13f/0x1b0 net/socket.c:2388
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Freed by task 15:
- kasan_save_stack mm/kasan/common.c:56 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:77
- __kasan_save_free_info+0x46/0x50 mm/kasan/generic.c:587
- kasan_save_free_info mm/kasan/kasan.h:406 [inline]
- poison_slab_object mm/kasan/common.c:252 [inline]
- __kasan_slab_free+0x5c/0x80 mm/kasan/common.c:284
- kasan_slab_free include/linux/kasan.h:234 [inline]
- slab_free_hook mm/slub.c:2539 [inline]
- slab_free mm/slub.c:6630 [inline]
- kfree+0x19a/0x6d0 mm/slub.c:6837
- inet_sock_destruct+0x538/0x740 net/ipv4/af_inet.c:159
- __sk_destruct+0x89/0x660 net/core/sock.c:2350
- sock_put include/net/sock.h:1991 [inline]
- sctp_endpoint_destroy_rcu+0xa1/0xf0 net/sctp/endpointola.c:197
- rcu_do_batch kernel/rcu/tree.c:2605 [inline]
- rcu_core+0xcab/0x1770 kernel/rcu/tree.c:2861
- handle_softirqs+0x286/0x870 kernel/softirq.c:622
- run_ksoftirqd+0x9b/0x100 kernel/softirq.c:1063
- smpboot_thread_fn+0x542/0xa60 kernel/smpboot.c:160
- kthread+0x711/0x8a0 kernel/kthread.c:463
- ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
-Fixes: 16942cf4d3e31 ("sctp: Use sk_clone() in sctp_accept().")
-Reported-by: syzbot+ec33a1a006ed5abe7309@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/6936d112.a70a0220.38f243.00a8.GAE@google.com/
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+Fixes: 9c328f54741b ("net: nfc: nci: Add parameter validation for packet =
+data")
+Cc: stable@vger.kernel.org
+Signed-off-by: Michael Thalmeier <michael.thalmeier@hale.at>
 ---
- net/sctp/ipv6.c | 2 ++
- 1 file changed, 2 insertions(+)
+Changes in v2:
+- Reference correct commit hash
 
-diff --git a/net/sctp/ipv6.c b/net/sctp/ipv6.c
-index 069b7e45d8bda..531cb0690007a 100644
---- a/net/sctp/ipv6.c
-+++ b/net/sctp/ipv6.c
-@@ -492,6 +492,8 @@ static void sctp_v6_copy_ip_options(struct sock *sk, struct sock *newsk)
- 	struct ipv6_pinfo *newnp, *np = inet6_sk(sk);
- 	struct ipv6_txoptions *opt;
- 
-+	inet_sk(newsk)->inet_opt = NULL;
-+
- 	newnp = inet6_sk(newsk);
- 
- 	rcu_read_lock();
--- 
-2.52.0.223.gf5cc29aaa4-goog
+---
+ net/nfc/nci/ntf.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/net/nfc/nci/ntf.c b/net/nfc/nci/ntf.c
+index 418b84e2b260..5161e94f067f 100644
+--- a/net/nfc/nci/ntf.c
++++ b/net/nfc/nci/ntf.c
+@@ -58,7 +58,8 @@ static int nci_core_conn_credits_ntf_packet(struct nci_=
+dev *ndev,
+ 	struct nci_conn_info *conn_info;
+ 	int i;
+=20
+-	if (skb->len < sizeof(struct nci_core_conn_credit_ntf))
++	/* Minimal packet size for num_entries=3D1 is 1 x __u8 + 1 x conn_credi=
+t_entry */
++	if (skb->len < (sizeof(__u8) + sizeof(struct conn_credit_entry)))
+ 		return -EINVAL;
+=20
+ 	ntf =3D (struct nci_core_conn_credit_ntf *)skb->data;
+@@ -364,7 +365,8 @@ static int nci_rf_discover_ntf_packet(struct nci_dev =
+*ndev,
+ 	const __u8 *data;
+ 	bool add_target =3D true;
+=20
+-	if (skb->len < sizeof(struct nci_rf_discover_ntf))
++	/* Minimal packet size is 5 if rf_tech_specific_params_len=3D0 */
++	if (skb->len < (5 * sizeof(__u8)))
+ 		return -EINVAL;
+=20
+ 	data =3D skb->data;
+@@ -596,7 +598,10 @@ static int nci_rf_intf_activated_ntf_packet(struct n=
+ci_dev *ndev,
+ 	const __u8 *data;
+ 	int err =3D NCI_STATUS_OK;
+=20
+-	if (skb->len < sizeof(struct nci_rf_intf_activated_ntf))
++	/* Minimal packet size is 11 if
++	 * f_tech_specific_params_len=3D0 and activation_params_len=3D0
++	 */
++	if (skb->len < (11 * sizeof(__u8)))
+ 		return -EINVAL;
+=20
+ 	data =3D skb->data;
+--=20
+2.52.0
 
 
