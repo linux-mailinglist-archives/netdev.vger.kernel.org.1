@@ -1,172 +1,208 @@
-Return-Path: <netdev+bounces-244289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C94DCB4046
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 21:59:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FD1ACB4080
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 22:10:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D2D12303FA6A
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 20:59:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 78B52304C1D1
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 21:10:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5A4232BF51;
-	Wed, 10 Dec 2025 20:59:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAECF2FE066;
+	Wed, 10 Dec 2025 21:10:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UYljs9pz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h/il+UyR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18B97329C54
-	for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 20:59:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECB9A2E6CB3
+	for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 21:10:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765400361; cv=none; b=IBs/ibBOhTXaT6g1w5FOfb+oVcFMmow4UPpE86TdeTbi799IDLp18R/C+bZHsrJlasrBqauAvGJWB5KUXy8uHKegThu61yGdr9smHnGDgJXkQPHXEoB7uhfMfy3lCP8Th9s2gGFFud7eSeQIRgOoAkJ+tfYfzpGljs1UQchS8f8=
+	t=1765401023; cv=none; b=aiEixYO7pWchIKvoEXYT8AnFEASR+sBNksW767IzoYiae1/kWf/i6xeM3F1j2pB1vSGy1i4dL+GoCFGxVFEXCFJFPZSVWWrisqfPnEzH1J4wYVlAa4YojOG2Vot8S83jKyG+ikZSC/w+xJxZZ+JGqSGrwHeNOV+AD4vy0ZnpOjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765400361; c=relaxed/simple;
-	bh=ZcpC8Yxl/yp8T2h64azfVcrrmb4wlFbuHSjkmVg+Wjw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=krmX7sJgw398WgbtLvcTNVxChkmjC8b7HXZsbd/FFPZ3jWu1J2uGR43HpDcTnd0QT91/fMaVl4Ul6rYWnIFyaDFf58tnSiQWt/xBfhFhQUz7LQsB4Rgbz8uAP8Ii9/z7N7k9UeGst5AH6ZmasQRcMNQ3BPRbZ+qdJqqKICAkTFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UYljs9pz; arc=none smtp.client-ip=209.85.128.46
+	s=arc-20240116; t=1765401023; c=relaxed/simple;
+	bh=Uh+9H8bdDNwclyo234VBfjWf+hPZD/RjvnJ13fK+bUE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NA2DlteO+urG89FmWkU+ASlcDqikSO7cEHJr8+fjSdw216Q+ZeVeWycw+0YKPTDKzfODRS4N+P4AobtQpdq8X8mqe4C6U69pVUzLwI31B0ELLTOX2AwJ8/SEWxs9avMZszApUgqOi9FIx1vt9XGMaRfPjwS+ERaE27mLsRXWzRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h/il+UyR; arc=none smtp.client-ip=209.85.128.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4775895d69cso1076245e9.0
-        for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 12:59:19 -0800 (PST)
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-477563e28a3so1828135e9.1
+        for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 13:10:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765400358; x=1766005158; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1765401020; x=1766005820; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0XOBeiFzLRRI29udaIQcvDgIeWaap6zQQyEf4EzZYCk=;
-        b=UYljs9pznvRD9MzX6MYUacxIqSINCRfbY5mWBARDuSYv7K32CGbYdHwD35NOBeavze
-         iScvmXoAcWODmMQrRvzV5XvNyQ9aLZs0E7tOoy6JjudtLbV2zAQBco9mahJSCKCCRduc
-         3bxjzIXEH/fETAsoRjTS1EXqLqeK5rwjQ9G96dQdfd9NzrD0rSB5ancpY1BxM3G8YFLz
-         TEabuXdzHD2JutZa0oBozU1x19KOikCs0hyBD3E+fXczr7dmq4hKigFR9faBzSGPraZr
-         AKReKW4yAUk6hXfM3LhjHdvq2eCvQGJfTUvX4Oee0UVdG1D+sv8hWXKpsFCPkp+rXs6n
-         /Q8A==
+        bh=f6Ap2wL2QNWzNOuJh0hZXjD0O0VdpkojkcVs56Al8cw=;
+        b=h/il+UyRcfUV5ophE7yr1bMcD8/fMeLheEypjbuvu7gg07nvOz18oRtr5oLVz5LIyH
+         xUf21BFcctap5DVpMyUTbqXg8IKTvg45zLY1ajh6etNnEuom/Cx52lsTKw3LTj41JRMB
+         foS0SH8GdRloYqhxhBULP2sGCsUU2nngKpmtzwl7C11IdHVzd6RWOt8wmFfvyjn5pZpj
+         VIaB0tSnlnaKxfAc9hB7116T9zslVFg+lNl+TfIgyFnFTx12y6nF4wwZveALQl5HgPu8
+         p7YgcSurCZH/C/4PrCxCf2AdPcs7FoXdfw7qRqe7G76B4qLIg/ayaXaSL5cYqrCXNCoG
+         HcSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765400358; x=1766005158;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1765401020; x=1766005820;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=0XOBeiFzLRRI29udaIQcvDgIeWaap6zQQyEf4EzZYCk=;
-        b=gYQ6Sq8RhlguDGdEOVAo6K9uDadcIUtxvI8xqB6gX1JGuWKaJQsYOLTxlpbXH56F1W
-         dXv6iE7AaIZlkGkCsfZHGXsyCTfSebJkvQxiLA6zVfOtdgh4DL77VrYJ2kQVtiWk5dlU
-         fZN2gyXjdZ588HkmYmfuRbiELH8yBjcg8cMbvEKS0qJGRrA2mMN6XNCatfr1eSGPkgpg
-         Znb8FRrYZ8YLTVtx5sb+7z/sytbKKRg9GotM3atkBXb5k9QXqk0WBGN/dvOsOVAp+WZq
-         6cfpUW+DiOXs1q1YhS2zMwypZ5pTPPTGSxRla3mODmOf+JUq6UxW8Klg1pQHjzabaV5x
-         mC0g==
-X-Forwarded-Encrypted: i=1; AJvYcCWbp1yl+kWQdzukZ5D+2CBbFqi7ZNJkav5ji2uPhYH0mTdwst5Xq1DSI7mSqudr7wM/xBi3GFo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyFA9eaNTHx83sN1uw1DEkAyDv6oMPuAOJH2ttkZ2HWW2IgubnS
-	+7sQ5+4WSUhjfrUvCsRboUKlZBEHEfcE0Vh1G1J78pUTdqHFqwSoycQ6
-X-Gm-Gg: ASbGnctgwjmWnEwEr6nykHobq7BglG9lqpQwHfLdOqLJ5EramVLOWImYSdmTL8pGT76
-	dTYbbNmhZhjI2STtNB5qDMz0zAhIXFHn6B+Y1ZUzoEcal35M0Sk6cMaQ/7XUirnGufdzfw6Mx3B
-	jaudAAh6g5ZK+lSnbfXhV5eOB4XhqQnCtBRpNtwoWUp8vKzFt61epCuzk8jCj52tIicnOQ98hp0
-	SRf3yIn22RCGZKkFfCzLiHj+Cscpb5ydABShH/ldd7Cfep4feWvm/Z8GF13C7NS/8ZnvM/cIu92
-	BYzI5VNX0l/US1RdpfiR/zJuihIWnJ3iQrcH597m+8Qrrz8sFvygxfXcJG2XUeC2L6zws49e2/B
-	+SdQhUMXLd0VsggZvlcnQbLZqiBx8Qzr3BgbVq4KClZ54gc4TAhJN1lVv0mGGRPL9TWu9eTuy/q
-	31K2c14+5RdR5T93/j327CUm63tQi1/KyW/OJqrvgWBILoLYomru1E
-X-Google-Smtp-Source: AGHT+IFqWl1AEZJdv33HjXUj4u2PW+9exisa6AWNrimk2s7J9PgpfVbwFVoIk0HS4W55/QiDrON3lw==
-X-Received: by 2002:a05:600c:3105:b0:477:fcb:226b with SMTP id 5b1f17b1804b1-47a8376e315mr34983765e9.2.1765400358218;
-        Wed, 10 Dec 2025 12:59:18 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42fa8b85feasm1051301f8f.27.2025.12.10.12.59.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Dec 2025 12:59:18 -0800 (PST)
-Date: Wed, 10 Dec 2025 20:59:15 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
-Cc: Yury Norov <yury.norov@gmail.com>, Rasmus Villemoes
- <linux@rasmusvillemoes.dk>, linux-kernel@vger.kernel.org,
- linux-usb@vger.kernel.org, Geert Uytterhoeven <geert+renesas@glider.be>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>, Jonathan Cameron
- <Jonathan.Cameron@huawei.com>, Crt Mori <cmo@melexis.com>, Richard Genoud
- <richard.genoud@bootlin.com>, Andy Shevchenko
- <andriy.shevchenko@intel.com>, Luo Jie <quic_luoj@quicinc.com>, Peter
- Zijlstra <peterz@infradead.org>, Jakub Kicinski <kuba@kernel.org>,
- netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, Simon
- Horman <simon.horman@netronome.com>, Mika Westerberg
- <mika.westerberg@linux.intel.com>, Andreas Noever
- <andreas.noever@gmail.com>, Yehezkel Bernat <YehezkelShB@gmail.com>
-Subject: Re: [PATCH 3/9] bitmap: Use FIELD_PREP() in expansion of
- FIELD_PREP_WM16()
-Message-ID: <20251210205915.3b055b7c@pumpkin>
-In-Reply-To: <2262600.PYKUYFuaPT@workhorse>
-References: <20251209100313.2867-1-david.laight.linux@gmail.com>
-	<20251209100313.2867-4-david.laight.linux@gmail.com>
-	<2262600.PYKUYFuaPT@workhorse>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        bh=f6Ap2wL2QNWzNOuJh0hZXjD0O0VdpkojkcVs56Al8cw=;
+        b=uHoFc1lBMa5dzrQr4zUzZE7yYCwgZCdp4x4LIr6cZ3ZICLZIzq7T+KdDbmMNwykfMs
+         kseB33W4t0kX2rWaMT1xV/1BHGzoNlglm0MWl9mPXgOCaXjAZtiD/1MoUiVh6/xCWizR
+         zZZ9se0CQngnA6MpQV+zI8X/2HW3XNqhtxx5Lfp197LUjs56oMWkBgvhDNOP1covXzoC
+         tFfnOb4DbZE9XsuajE/sgcCQNdQeHwKzEy3AFHeqccG6xu9QkiZVCN0x1WlsKrWFeTej
+         4+HZ97SM8b9CtXsGsQccK7ss1aWMzunFd832YF7NhxJ++jGym5M9H+xqg4XP+INQctzB
+         DhJA==
+X-Forwarded-Encrypted: i=1; AJvYcCWIfzAGXA4f1FgPRnFfHhAYx0ncYxJXKLZEp+CDc39V0k4oRiOHlta2W/HpfqZHYSSKJ+rPUZg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy608RtHNHGaaCcbq3IU/hQoykWfKsUCK6jGG4LHh26ehaxf5mj
+	vBhiO7PX+e+oeABt8J14eJ39MPN4FS9TDaE58YeIsPen4vr/TpCddQZoGhjfNVghl90qWlsSDdI
+	DFfNWXfFl85NQ/LsBmf/rvBa2GxoN3TNeygkhp/gvdA==
+X-Gm-Gg: ASbGncuyk4cxV8r7flaOyrv+Y0yP2DEzycnueBnaUdy83KBgN8xZ0x8feovumd6G23Z
+	1eOR0wFMYQxWzoTvSINRXeN9SKUmmLPfdTS8jPRUKY7U+Mc/eZvj1f5ivBcRRFC2ZhVBipjj/Q6
+	0X1/90mdERZFtH6uDCZxj715fl8W28isvlZfvWGBYlmuWTgxV8VBm56sWDgMdYDMyzaMBx5BmAW
+	spfLP1Nyu5JH5s4K5rbJESM9gympmqU0pzOT/PCwNhzb8j0QRuA2LNvUa2eh7FeXTQKM9I7Bw==
+X-Google-Smtp-Source: AGHT+IFQU1/Jhu22RnkhsOBefhQOpeX8PaoabdXqTjqdirBbdMixKWOg/r6NaWYfEBa73u04Avqi37Rvk+u2FM+qxao=
+X-Received: by 2002:a05:600c:56c8:b0:477:9890:4528 with SMTP id
+ 5b1f17b1804b1-47a886a08e1mr5232305e9.2.1765401020116; Wed, 10 Dec 2025
+ 13:10:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20251121113553.2955854-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20251121113553.2955854-10-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20251121210504.ljeejnltaawahqtv@skbuf> <CA+V-a8ve6vV_O1XwPX0sn+Qqm5QoYrf6Xu5gansxW05waMf43Q@mail.gmail.com>
+ <20251209212841.upskgi5dphsmkrpi@skbuf>
+In-Reply-To: <20251209212841.upskgi5dphsmkrpi@skbuf>
+From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Date: Wed, 10 Dec 2025 21:09:52 +0000
+X-Gm-Features: AQt7F2o4iDtd3Rpuz4FTtk60m3_b-aAdWYBIboBEH1hguLv-mqZPIp_mG5EBJfA
+Message-ID: <CA+V-a8vkzrO77UBeR+YhPwcv608Zh9n7CHL-ugcsuhk-vuRyMg@mail.gmail.com>
+Subject: Re: [PATCH net-next 09/11] net: dsa: rzn1-a5psw: Add support for
+ management port frame length adjustment
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
+	Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Simon Horman <horms@kernel.org>, Philipp Zabel <p.zabel@pengutronix.de>, 
+	Russell King <linux@armlinux.org.uk>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Magnus Damm <magnus.damm@gmail.com>, linux-renesas-soc@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Biju Das <biju.das.jz@bp.renesas.com>, 
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 10 Dec 2025 20:18:30 +0100
-Nicolas Frattaroli <nicolas.frattaroli@collabora.com> wrote:
+Hi Vladimir,
 
-> On Tuesday, 9 December 2025 11:03:07 Central European Standard Time david.laight.linux@gmail.com wrote:
-> > From: David Laight <david.laight.linux@gmail.com>
-> > 
-> > Instead of directly expanding __BF_FIELD_CHECK() (which really ought
-> > not be used outside bitfield) and open-coding the generation of the
-> > masked value, just call FIELD_PREP() and add an extra check for
-> > the mask being at most 16 bits.
-> > 
-> > Signed-off-by: David Laight <david.laight.linux@gmail.com>
-> > ---
-> >  include/linux/hw_bitfield.h | 17 ++++++++---------
-> >  1 file changed, 8 insertions(+), 9 deletions(-)
-> > 
-> > diff --git a/include/linux/hw_bitfield.h b/include/linux/hw_bitfield.h
-> > index df202e167ce4..d7f21b60449b 100644
-> > --- a/include/linux/hw_bitfield.h
-> > +++ b/include/linux/hw_bitfield.h
-> > @@ -23,15 +23,14 @@
-> >   * register, a bit in the lower half is only updated if the corresponding bit
-> >   * in the upper half is high.
-> >   */
-> > -#define FIELD_PREP_WM16(_mask, _val)					     \
-> > -	({								     \
-> > -		typeof(_val) __val = _val;				     \
-> > -		typeof(_mask) __mask = _mask;				     \
-> > -		__BF_FIELD_CHECK(__mask, ((u16)0U), __val,		     \
-> > -				 "HWORD_UPDATE: ");			     \
-> > -		(((typeof(__mask))(__val) << __bf_shf(__mask)) & (__mask)) | \
-> > -		((__mask) << 16);					     \
-> > -	})
-> > +#define FIELD_PREP_WM16(mask, val)				\
-> > +({								\
-> > +	__auto_type _mask = mask;				\
-> > +	u32 _val = FIELD_PREP(_mask, val);			\
-> > +	BUILD_BUG_ON_MSG(_mask > 0xffffu,			\
-> > +			 "FIELD_PREP_WM16: mask too large");	\
-> > +	_val | (_mask << 16);					\
-> > +})
-> >  
-> >  /**
-> >   * FIELD_PREP_WM16_CONST() - prepare a constant bitfield element with a mask in
-> >   
-> 
-> This breaks the build for at least one driver that uses
-> FIELD_PREP_WM16, namely phy-rockchip-emmc.c:
+On Tue, Dec 9, 2025 at 9:28=E2=80=AFPM Vladimir Oltean <olteanv@gmail.com> =
+wrote:
+>
+> On Tue, Dec 09, 2025 at 04:02:19PM +0000, Lad, Prabhakar wrote:
+> > > In the next change you set this to 40. What's the reason behind such =
+a
+> > > high value (need to set the management port A5PSW_FRM_LENGTH value to
+> > > 1574 bytes to pass L2 payload of 1500 bytes)? It sounds like this nee=
+ds
+> > > to be called out more clearly for what it is - a hardware bug.
+> > >
+> > Regarding the question about the relatively large adjustment value:
+> > according to the hardware manual,
+> > =E2=80=9CSet the FRM_LENGTH register in port 3 (CPU port) to more than =
+or
+> > equal to the initial value. When you want to limit the frame length of
+> > the received frame, use FRM_LENGTH registers in port 0 to port 2.=E2=80=
+=9D
+> >
+> > In practice, with the default MTU (i.e. without applying the +40-byte
+> > adjustment), RX traffic operates correctly. For example, running
+> > iperf3 in reverse mode shows no issues, and frames are received
+> > without errors. However, in the forward direction (TX from the CPU
+> > port), throughput drops to zero and iperf3 fails.
+> >
+> > When the MTU of the CPU-facing interface is increased (e.g. ip link
+> > set lan0 mtu 1540),
+>
+> "lan0" isn't a typical name for a CPU-facing interface. Do you mean that
+> the primary action is that you increase the MTU of a user port, and the
+> FRM_LENGTH of the CPU port is implicitly readjusted by the driver as
+> well (to 1540 + ETH_HLEN + A5PSW_EXTRA_MTU_LEN + ETH_FCS_LEN)?
+>
+> This isn't actually bringing new data, because unless you also increase
+> the MTU of the other iperf3 device to 1540, the TCP MSS will still be
+> calculated as if the MTU were 1500, and you won't be making use of
+> larger packet sizes on the wire. On the contrary, you are introducing
+> one extra variable into the equation: with this test you are also
+> increasing the stmmac MTU, which you later clarify that by itself it
+> doesn't change the outcome.
+>
+> > TX traffic immediately starts working correctly.
+> > Likewise, increasing the FRM_LENGTH on the switch side for the CPU
+> > port resolves the problem, which indicates that the frame length
+> > configuration on this port is directly involved.
+>
+> So increasing FRM_LENGTH is the only factor that alters the outcome.
+>
+> > Given this behaviour, it appears that the management (CPU) port
+> > requires additional headroom to successfully transmit frames, even
+> > though RX succeeds without it. The STMMAC driver is used as the
+> > controller driver for the management port, we are trying to determine
+> > whether there is any known interaction, alignment constraint, or
+> > undocumented overhead that would explain the need for this extra
+> > margin.
+> >
+> > Could you please advise on how to handle this issue?
+>
+> Have you verified that the value you need to add to FRM_LENGTH is linear
+> for MTU values above 1500? I.e. that at MTU values of 1510, 1520, 1540,
+> 2000, ..., you always need to add 40 additional octets to FRM_LENGTH on
+> top of the ETH_HLEN + A5PSW_EXTRA_MTU_LEN + ETH_FCS_LEN extra that the
+> driver is already adding, and no less?
+>
+> One other thing to look at is to send known-size Ethernet frames using
+> mausezahn or ping over lan0, run ethtool -S on the eth0 stmmac interface
+> (this will also capture the switch's CPU port statistics counters) and
+> see by how many octets does the aOctetsReceivedOK counter increment for
+> a known size packet. Then, if you go oversize, look at the statistics
+> counters and see which counter marks the drop. Maybe this will provide
+> any clue.
+>
+So I started off with ping and that worked i.e. without +40 to
+FRM_LENGTH. So when I increased the size upto <=3D1440 ping worked OK.
+Anything after 1441 ping failed I could see
+p03_etherStatsOversizePkts/p03_ifInErrors incrementing.
 
-Not in my allmodconfig build.
-... 
-> pcie-dw-rockchip.c is similarly broken by this change, except
-> without the superfluous wrapper:
+              MTU Ifconfig
+-----------------------------
+ETH0 -  1508
+LAN0 -  1500
+LAN1 -  1500
 
-That one did get built.
+After increasing the MTU size to 1501 of lan0 propagtes change to eth0
+as seen below:
+root@rzn2h-evk:~# ip link set lan0 mtu 1501
 
-The problem is that FIELD_PREP_WM16() needs to use different 'local'
-variables than FIELD_PREP().
-The 'proper' fix is to use unique names (as min() and max() do), but that
-makes the whole thing unreadable and is best avoided unless nesting is
-likely.
-In this case s/mask/wm16_mask/ and s/val/wm16_val/ might be best.
+              MTU Ifconfig
+-----------------------------
+ETH0 -  1509
+LAN0 -  1501
+LAN1 -  1500
 
-	David
+$ ping -I lan0 192.168.10.30 -c5 -s 1441 # Works
+$ ping -I lan0 192.168.10.30 -c5 -s 1442 # Fails and
+p03_etherStatsOversizePkts/p03_ifInErrors increments.
 
+So +40 to FRM_LENGTH just made the iperf worked earlier as the length
+of iperf packets is 1514.
+
+I'm still looking into the switch on why it could be dropping the frames.
+
+Cheers,
+Prabhakar
 
