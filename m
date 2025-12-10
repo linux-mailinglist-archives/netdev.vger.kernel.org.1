@@ -1,99 +1,123 @@
-Return-Path: <netdev+bounces-244225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id E40F0CB29A9
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 10:53:20 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86539CB29D7
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 10:58:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DD7D2302DB94
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 09:53:19 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 41EA2302ECFC
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 09:58:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02F362FFDFF;
-	Wed, 10 Dec 2025 09:53:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16B5C303A17;
+	Wed, 10 Dec 2025 09:58:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d7JZOrPl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eAuUT4aL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD84D2FE053;
-	Wed, 10 Dec 2025 09:53:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA15F27E045;
+	Wed, 10 Dec 2025 09:58:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765360397; cv=none; b=dph7iFeEPNTtviV5ZBg442+lomqvHx3MNsWdR9DXcv0NHcE80A9pSnc3QC6drB0QJG/OcO++uGuR6hmrbncI+hnydBo6cz1mjtDBMs2kGr6bIDCaXxv3Nz1lt6I1/Lj4iPiUFVbYetXMYZ0/EYTWJUBfocPO/vDXn8GxbZtTLhI=
+	t=1765360693; cv=none; b=qQDIcx1TzWgQ4HRYqogoV6+MPJP3yvk+++loQ8u54qyuP6qmoE7BUf+NL5ZHdUcquNTKYeb57x/sdCpl/BZzkX/4V/ozjIRzwVh1sDuZUmtdpahRczNkHlnlYXQKyuD9fSAPZ/6ELRb1ZCM0UXQ8c2yGd/68fvMbYmsNDmR4al8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765360397; c=relaxed/simple;
-	bh=+1iuG26qlwxaL6MV8fpa5GVIUtaMHnVUq4nDGQ8Z1zI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=lKzqvSpSPigDEhtJb3U2Xiey4X2Ch2QvZLsHBVVhyZh31ct7Hfrww9BcxvoH9HVrgbCXS7ePbc6a/4MIJN+bF6AOaBf8qjjyQNCWmHieOG0AWjsUMxTQ39T/iiDnMQdN8zabY/D5LFeH/wueAC8/IGHtPI7bARxG4hSx62/ceRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d7JZOrPl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DE3AC4CEF1;
-	Wed, 10 Dec 2025 09:53:16 +0000 (UTC)
+	s=arc-20240116; t=1765360693; c=relaxed/simple;
+	bh=JZHmpG3KmRcucBEpb6iZ/rbIZ6/y3e6FvrLlH/dzNN4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Pavtk1M3mmijGclO1s6yWI2/EPomtvnWhe6XvFnHAe44/1VjjEyZuaqYHhMAfyOgyiYZQ61tbgx0djc5eCebPu5kGuc7ENAliE7GRRlMLRwooviOUt3mNWHU6SRxWsAf1G7VTDQ61T7VzLsKWsX+VNF2sYrOYvW78KH3rCZxdZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eAuUT4aL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7092EC4CEF1;
+	Wed, 10 Dec 2025 09:58:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765360396;
-	bh=+1iuG26qlwxaL6MV8fpa5GVIUtaMHnVUq4nDGQ8Z1zI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=d7JZOrPl+I6WNO9a6Di5P2s+N0X99m6puf3FDVeuRADF6n09fZOzGD+XdiNHAk7V4
-	 1lYGWVT1pwGZNE9q6M6mlPc1kia0XIjSh/vxtzQtplCjAAicVOgaDfWVQFjlEEA2rJ
-	 DxbZmnd+iSNtkZIycxRLbwr/E5WmPMelr8nvstAegtjgqtb84/6ChkD55D+CkkU2de
-	 ksvjwP4gC9dBvdQn+3LdmM7wb0jkBj+cY2UtMTNlzBoakTdlcZe4IeR6nw9pApX6p8
-	 luX16Og1wxxmOEjaUfdwcTmZOEwcArt0uX7OQHX30/6k6HPTzIuBjqO4+oNHK6bm4m
-	 xF6iTEjFlvKPw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3B8FD3809A18;
-	Wed, 10 Dec 2025 09:50:12 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1765360692;
+	bh=JZHmpG3KmRcucBEpb6iZ/rbIZ6/y3e6FvrLlH/dzNN4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eAuUT4aLMrHbDeqKMyTf6Z/aJdu9JLsDfiQLVavVrfalikcHuPWiEa/aiNFQw3q4v
+	 Q7cjb6kvoE6VCioNIJ54FVe55iJ0NuQRpYv1DLZzSrDc5vdN2aDXlvouPHbHByJSBz
+	 p4L2a03nRw9g6xfLpsBeUNxUkCaEnNXuZpkPzrZIk18DZBvwg4RSLB6uSX2RxF5Gk/
+	 72denooaH8Oro969WNSFkqPUyCfHVPW5kOs1cDckJFDrcRiAbqLZHJl3+jpPl5WPyu
+	 IK9KPDv0/QJdq0TEU/zOLF4JrjR4047HIenp4cqutOhoK085IhU9YWq3Q2zcnxUAWs
+	 wfE0v9rKiqLzg==
+Date: Wed, 10 Dec 2025 09:58:07 +0000
+From: Simon Horman <horms@kernel.org>
+To: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, izumi.taku@jp.fujitsu.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] fjes: Add missing iounmap in fjes_hw_init()
+Message-ID: <aTlEL6sYdo8K2S2F@horms.kernel.org>
+References: <20251210023243.47945-1-lihaoxiang@isrc.iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/4] inet: frags: flush pending skbs in
- fqdir_pre_exit()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176536021103.532791.16522947311403253332.git-patchwork-notify@kernel.org>
-Date: Wed, 10 Dec 2025 09:50:11 +0000
-References: <20251207010942.1672972-1-kuba@kernel.org>
-In-Reply-To: <20251207010942.1672972-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- pablo@netfilter.org, fw@strlen.de, netfilter-devel@vger.kernel.org,
- willemdebruijn.kernel@gmail.com, kuniyu@google.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251210023243.47945-1-lihaoxiang@isrc.iscas.ac.cn>
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sat,  6 Dec 2025 17:09:38 -0800 you wrote:
-> Fix the issue reported by NIPA starting on Sep 18th [1], where
-> pernet_ops_rwsem is constantly held by a reader, preventing writers
-> from grabbing it (specifically driver modules from loading).
+On Wed, Dec 10, 2025 at 10:32:43AM +0800, Haoxiang Li wrote:
+> In error paths, add fjes_hw_iounmap() to release the
+> resource acquired by fjes_hw_iomap().
 > 
-> The fact that reports started around that time seems coincidental.
-> The issue seems to be skbs queued for defrag preventing conntrack
-> from exiting.
-> 
-> [...]
+> Fixes: 8cdc3f6c5d22 ("fjes: Hardware initialization routine")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>
 
-Here is the summary with links:
-  - [net,1/4] inet: frags: avoid theoretical race in ip_frag_reinit()
-    https://git.kernel.org/netdev/net/c/8ef522c8a59a
-  - [net,2/4] inet: frags: add inet_frag_queue_flush()
-    https://git.kernel.org/netdev/net/c/1231eec6994b
-  - [net,3/4] inet: frags: flush pending skbs in fqdir_pre_exit()
-    https://git.kernel.org/netdev/net/c/006a5035b495
-  - [net,4/4] netfilter: conntrack: warn when cleanup is stuck
-    https://git.kernel.org/netdev/net/c/92df4c56cf5b
+Thanks,
 
-You are awesome, thank you!
+I agree that this is a problem and that it was introduced in the cited
+commit.
+
+However, I think it would be nicer to address this using an idiomatic
+goto. And that this is appropriate to do as the bug fix as you
+are already handling all such error paths. And the code does not
+seem materially more verbose than your patch. I'm proposing something like
+the following (compile tested only).
+
+If you agree feel free to incorporate it into a v2.
+
+diff --git a/drivers/net/fjes/fjes_hw.c b/drivers/net/fjes/fjes_hw.c
+index b9b5554ea862..5ad2673f213d 100644
+--- a/drivers/net/fjes/fjes_hw.c
++++ b/drivers/net/fjes/fjes_hw.c
+@@ -334,7 +334,7 @@ int fjes_hw_init(struct fjes_hw *hw)
+ 
+ 	ret = fjes_hw_reset(hw);
+ 	if (ret)
+-		return ret;
++		goto err_iounmap;
+ 
+ 	fjes_hw_set_irqmask(hw, REG_ICTL_MASK_ALL, true);
+ 
+@@ -347,8 +347,10 @@ int fjes_hw_init(struct fjes_hw *hw)
+ 	hw->max_epid = fjes_hw_get_max_epid(hw);
+ 	hw->my_epid = fjes_hw_get_my_epid(hw);
+ 
+-	if ((hw->max_epid == 0) || (hw->my_epid >= hw->max_epid))
+-		return -ENXIO;
++	if ((hw->max_epid == 0) || (hw->my_epid >= hw->max_epid)) {
++		ret = -ENXIO;
++		goto err_iounmap;
++	}
+ 
+ 	ret = fjes_hw_setup(hw);
+ 
+@@ -356,6 +358,10 @@ int fjes_hw_init(struct fjes_hw *hw)
+ 	hw->hw_info.trace_size = FJES_DEBUG_BUFFER_SIZE;
+ 
+ 	return ret;
++
++err_iounmap:
++	fjes_hw_iounmap(hw);
++	return ret;
+ }
+ 
+ void fjes_hw_exit(struct fjes_hw *hw)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: changes-requested
 
