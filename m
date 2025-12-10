@@ -1,107 +1,189 @@
-Return-Path: <netdev+bounces-244253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56BA8CB2F80
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 14:04:03 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27065CB305D
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 14:29:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1734C303FE56
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 13:03:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 835A43069C91
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 13:28:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55B10322C67;
-	Wed, 10 Dec 2025 13:03:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA75C2080C8;
+	Wed, 10 Dec 2025 13:28:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uEOC3TdG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UG9RzAo2";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="I1cI6X4l"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CEFD2494D8;
-	Wed, 10 Dec 2025 13:03:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE3DA2EBBB4
+	for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 13:28:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765371782; cv=none; b=kITMGtnza11qE6sXW/J5hahituw8PWlW5EcuY2+2h7S8kX/wgzQl54nAyoRYTtqJcycf9nSO5YqHpTD45IuPVsIC7EFn2OqTvvewef2lJ9JZAseNJskl5g4MNGr22XPx/XVvDdT2YvJcXnQmJ28+3cvgsJZwKb/Wqb0cTrjC0sg=
+	t=1765373324; cv=none; b=leKvLHNfLf1dzFXkw2FBbEnR0jGehqXnky2D0ZRPqqlm5gdtGxu65orxD+UtYMtLzSAJcuX6Nroglknzwf6kQ0sL3SB1ZZFPiyJU2+DfJUHTGuzk/Tp9R8aFZYMPGptJCutQc+6aC6pqdeiUfw70PFGHo1sUZWK1qre07Hby3UQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765371782; c=relaxed/simple;
-	bh=aNpw8kvr+DoIFi3UMjPFZem70ccZRqzTV6hLBbAQIo8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kwZnFncP9MTPHB9qkKR+S4SEQ77oOkxaiTFJLcsJwES1B1MzQZwC9S+NjPOcoTIwJmzYdxKd5+Aay7RqfBaKUT4zGVTHRqRrSpYBrIsW2FxUJodZIX6kSQKbKrcKHZvitekBpazf8yEZ+X7pnUHo9OcNsUg99qbG6punqXHGT5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uEOC3TdG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6F22C4CEF1;
-	Wed, 10 Dec 2025 13:02:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765371780;
-	bh=aNpw8kvr+DoIFi3UMjPFZem70ccZRqzTV6hLBbAQIo8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uEOC3TdGwqchFUrqQ0k7Gd2iee8sdr4TKGPuDcaEZTKXBIs8/Cq3eaFROWB4tZOUA
-	 v6BT8Z5qcEqV7dqWGuqGFB4fB17E6SC9c5/ZUmuxAWlrdCFyr5J0esSowTaiPV6O+V
-	 kMe78hjb5BT6KchyAHADY8P3hhfG+flE+3NYkoSmiWjy0+Rn4OgTtDa3/W88LweQwH
-	 mbldSf+H6uaMFrnv4eLEiyZgxq8sxMzoUHrOnOpti1WanBOIWiGBZjtuDU6RXM4Z0e
-	 0ZcDrTultgT94jXvYhSjZaydWvtlL43AoCmDPq0da2I61c0QtJaFFVMcnV6/ud2rn7
-	 H+wF/Dr4NUwnQ==
-Date: Wed, 10 Dec 2025 13:02:56 +0000
-From: Simon Horman <horms@kernel.org>
-To: Edward Adam Davis <eadavis@qq.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	syzbot+5dd615f890ddada54057@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH net v3] net: atm: implement pre_send to check input
- before sending
-Message-ID: <aTlvgIS6TxZ_Q5zE@horms.kernel.org>
-References: <aTlMBiGNH7ZChSit@horms.kernel.org>
- <tencent_4312D7064DC99FEEF62ED1CC8827F946E806@qq.com>
+	s=arc-20240116; t=1765373324; c=relaxed/simple;
+	bh=q2uCR8QQC4UQnkB3lwJ/XlKveQbBaYYYv9QPqyhSSQU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AJVO82k2wCgc8R+WfhDjS9WWQaSs4fTj3b8Gi03J7aU1RCGmIN3XUkrEGhqbgT/ErzTz9uFPFeXToQPPf4/qdmq8rwCAwDvgPmfozIVmaQsCXBpbg7tZ70iH3A8gW8zgJmDa9cBj9WZtdPNZfjE9vz/uLdJOgBwKQtYdgSmxh5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UG9RzAo2; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=I1cI6X4l; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1765373321;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RFdr0tsAr4e9VbweFlioJQoAGzREQF+H+QV/Ubn+hH8=;
+	b=UG9RzAo27Z+G16OIDwGbMF3ULr7B6rqKIEUFQcg67xfWgeg3qy/3oTP+WPqN6siZFvO8/A
+	qLuBJu8rNajay11ayHnm159dOtVJG909gQlrtlmltB1OstjHAWL0J/k+lIc1NyRxC8iMdZ
+	79yOXyFSjZIKfGpSJw+zrWoSCjrA7ws=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-380-0l6yX7m7PmWEFwbNWl4afA-1; Wed, 10 Dec 2025 08:28:40 -0500
+X-MC-Unique: 0l6yX7m7PmWEFwbNWl4afA-1
+X-Mimecast-MFC-AGG-ID: 0l6yX7m7PmWEFwbNWl4afA_1765373319
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b7a041a9121so651381166b.3
+        for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 05:28:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1765373319; x=1765978119; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RFdr0tsAr4e9VbweFlioJQoAGzREQF+H+QV/Ubn+hH8=;
+        b=I1cI6X4lsZ2HQ0eEm4Jo6T0f3bHjPaI0zzBL4HNyM7RXn9kM7pySELqWQ3Ptu3Z+p+
+         IeAOHOwlmYgHofohYsIOq6NrB1QlYmvl0IaIf57iLA5v7oEHC3OLhMv/I/1lXLr9NSfO
+         YWSHVofcyh8yIKMgqRFACmwRn2WFYMnFQExuicRQPyAAg6Vh3OLgYR0N9tvaYUQvXCU0
+         Dx56V9e99MW/S+4tAiNLCWo62Qy2FTivTkuPQI7o9ONwxC4NnJaTeOlcSmF9BGjcyuGL
+         OIjYptiq3bvxtfrMnTinPGlEtt531+ljslC/8ie0kJm1p9SJOd94iTvJI5oRfEzijjSo
+         YV4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765373319; x=1765978119;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=RFdr0tsAr4e9VbweFlioJQoAGzREQF+H+QV/Ubn+hH8=;
+        b=VM96paZHmoo5+JNjsTigkmE6D41chwSS0dXR+62qFaKrVm94bZdRUp0sj5L9EDp/KR
+         /1/isP8eA15SCN8A3b4zlG8YceAoNtOn0wa9uSQOX8Z78bj0vkOswqqKJeiBBumNHL5H
+         hYHpkwTD0w/hwIjfUwMRn+GbqcKPwNoFIRmeTNisDR70qr2dKZ1XZJf+wbla47tb/hoh
+         C26aO4dEbeiKwTvcChK2Y4jQvg2jkxM7JkVZMYx6dq07lKRMk3BzdKxXYPRcg4Igx7Mo
+         VFTnpBJ8PXJjXwGcT8P45aJMnBjzQsmPm2v0DlJ8LJFjXYsehFROU+FiN1K9ZcY5rjwZ
+         A6eQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUWNfr1G2VmbF8aqnuokzaZWqxWljoyKR13DQdZAMclJXjh7PHLO7dAVdOyX9d+v/5teXrhNow=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkB26boXx+LnUfAX+DzjMHHldKqQ4XVxstmCBz5oj3VryPycV2
+	BplsqsE6TbBamp0SpV6NJ7EWYJX8urSfZK5kvRRWqACuhGGHL24mkx/FdC83iDV018Ldfb/8NAL
+	IBnJ/iBYFr8JfwnGSOFtqNbYxqC3JBwkLBwiQ5YEWpEE+rgJ9mp3ozTlOvg==
+X-Gm-Gg: ASbGncvzoNWWQkltlgu10FOih9+1xf2xHSfMrbBLjQQPbkqha9UgARV/B8ukyhDhjzA
+	N/WpQIyARKMFb1msNGGO+wJGZdiqBChjTPVzJWpuX/03Af9SNzK0LVB6CzQp2vH+bxeeqvUMjtS
+	SKeZEqRX7EkY5N3YU8uycS2X1onguprYPBwiVmVFfS2/sz8SpfLT7GurrlSxWxrsYWF221bEfp0
+	gpNNklPrG+Oo4+TqbvWOeToOzq1niDyqbYZmG/l+z26+T/6vjORKDuM8LeBYhuuJ/CdY8cEFWh0
+	7c4Kredl5Gyql+PEJp/r4x+OEfsyrAjYjr7/s7Ctj69Ar5SF55WjC03c+Ae98W8l8fh4fVFYmmn
+	KMEwlEzXuS3+pzY2s6IiACKFozze2ZyNk6pUOB5oc/faaBuidPNjJvFw5oys=
+X-Received: by 2002:a17:907:1ca2:b0:b76:74b6:dbf8 with SMTP id a640c23a62f3a-b7ce831e2e3mr253395366b.14.1765373319267;
+        Wed, 10 Dec 2025 05:28:39 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGAU24CehXasPvHx6jcPc3vVrMoWIf6zOTsD8QmYV2p1kOUcW+E6DKKRjQtR0ZRYSpTwif4sg==
+X-Received: by 2002:a17:907:1ca2:b0:b76:74b6:dbf8 with SMTP id a640c23a62f3a-b7ce831e2e3mr253391966b.14.1765373318780;
+        Wed, 10 Dec 2025 05:28:38 -0800 (PST)
+Received: from [10.45.225.95] (5920ab7b.static.cust.trined.nl. [89.32.171.123])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b79f4976027sm1661260866b.39.2025.12.10.05.28.38
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 10 Dec 2025 05:28:38 -0800 (PST)
+From: Eelco Chaudron <echaudro@redhat.com>
+To: =?utf-8?b?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
+Cc: Aaron Conole <aconole@redhat.com>, Ilya Maximets <i.maximets@ovn.org>,
+ Alexei Starovoitov <ast@kernel.org>, Jesse Gross <jesse@nicira.com>,
+ Adrian Moreno <amorenoz@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, dev@openvswitch.org
+Subject: Re: [PATCH net] net: openvswitch: Avoid needlessly taking the RTNL on
+ vport destroy
+Date: Wed, 10 Dec 2025 14:28:36 +0100
+X-Mailer: MailMate (2.0r6290)
+Message-ID: <B299AD16-8511-41B7-A36A-25B911AEEBF4@redhat.com>
+In-Reply-To: <20251210125945.211350-1-toke@redhat.com>
+References: <20251210125945.211350-1-toke@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <tencent_4312D7064DC99FEEF62ED1CC8827F946E806@qq.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 10, 2025 at 06:50:02PM +0800, Edward Adam Davis wrote:
-> Sun, Wed, 10 Dec 2025 10:31:34 +0000, Simon Horman wrote:
-> > > syzbot found an uninitialized targetless variable. The user-provided
-> > > data was only 28 bytes long, but initializing targetless requires at
-> > > least 44 bytes. This discrepancy ultimately led to the uninitialized
-> > > variable access issue reported by syzbot [1].
-> > >
-> > > Besides the issues reported by syzbot regarding targetless messages
-> > > [1], similar problems exist in other types of messages as well. We will
-> > > uniformly add input data checks to pre_send to prevent uninitialized
-> > > issues from recurring.
-> > >
-> > > Additionally, for cases where sizeoftlvs is greater than 0, the skb
-> > > requires more memory, and this will also be checked.
-> > >
-> > > [1]
-> > > BUG: KMSAN: uninit-value in lec_arp_update net/atm/lec.c:1845 [inline]
-> > >  lec_arp_update net/atm/lec.c:1845 [inline]
-> > >  lec_atm_send+0x2b02/0x55b0 net/atm/lec.c:385
-> > >  vcc_sendmsg+0x1052/0x1190 net/atm/common.c:650
-> > >
-> > > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> > > Reported-by: syzbot+5dd615f890ddada54057@syzkaller.appspotmail.com
-> > > Closes: https://syzkaller.appspot.com/bug?extid=5dd615f890ddada54057
-> > > Signed-off-by: Edward Adam Davis <eadavis@qq.com>
-> > > ---
-> > > v3:
-> > >   - update coding style and practices
-> > > v2: https://lore.kernel.org/all/tencent_E83074AB763967783C9D36949674363C4A09@qq.com/
-> > >   - update subject and comments for pre_send
-> > > v1: https://lore.kernel.org/all/tencent_B31D1B432549BA28BB5633CB9E2C1B124B08@qq.com
-> > 
-> > FTR, a similar patch has been posted by Dharanitharan (CCed)
-> Didn't you check the dates? I released the third version of the patch
-> on December 4th (the first version was on November 28th), while this
-> person above released their first version of the patch on December 7th.
-> Their patch is far too similar to mine!
 
-Yes, I was aware of the timeline when I wrote my previous email.
 
-My preference is for some consensus to be reached on the way forward:
-both technically and in terms of process.
+On 10 Dec 2025, at 13:59, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+
+> The openvswitch teardown code will immediately call
+> ovs_netdev_detach_dev() in response to a NETDEV_UNREGISTER notification=
+=2E
+> It will then start the dp_notify_work workqueue, which will later end u=
+p
+> calling the vport destroy() callback. This callback takes the RTNL to d=
+o
+> another ovs_netdev_detach_port(), which in this case is unnecessary.
+> This causes extra pressure on the RTNL, in some cases leading to
+> "unregister_netdevice: waiting for XX to become free" warnings on
+> teardown.
+>
+> We can straight-forwardly avoid the extra RTNL lock acquisition by
+> checking the device flags before taking the lock, and skip the locking
+> altogether if the IFF_OVS_DATAPATH flag has already been unset.
+>
+> Fixes: b07c26511e94 ("openvswitch: fix vport-netdev unregister")
+> Tested-by: Adrian Moreno <amorenoz@redhat.com>
+> Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+> ---
+>  net/openvswitch/vport-netdev.c | 11 +++++++----
+>  1 file changed, 7 insertions(+), 4 deletions(-)
+>
+> diff --git a/net/openvswitch/vport-netdev.c b/net/openvswitch/vport-net=
+dev.c
+> index 91a11067e458..519f038526f9 100644
+> --- a/net/openvswitch/vport-netdev.c
+> +++ b/net/openvswitch/vport-netdev.c
+> @@ -160,10 +160,13 @@ void ovs_netdev_detach_dev(struct vport *vport)
+>
+>  static void netdev_destroy(struct vport *vport)
+>  {
+> -	rtnl_lock();
+> -	if (netif_is_ovs_port(vport->dev))
+> -		ovs_netdev_detach_dev(vport);
+> -	rtnl_unlock();
+> +	if (netif_is_ovs_port(vport->dev)) {
+
+Hi Toke,
+
+Thanks for digging into this!
+
+The patch looks technically correct to me, but maybe we should add a comm=
+ent here explaining why we can do it this way, i.e., why we can call neti=
+f_is_ovs_port() without the lock.
+For example:
+
+/* We can avoid taking the rtnl lock as the IFF_OVS_DATAPATH flag is set/=
+cleared in either netdev_create()/netdev_destroy(), which are both called=
+ under the global ovs_lock(). */
+
+Additionally, I think the second netif_is_ovs_port() under the rtnl lock =
+is not required due to the above.
+
+> +		rtnl_lock();
+> +		/* check again while holding the lock */
+> +		if (netif_is_ovs_port(vport->dev))
+> +			ovs_netdev_detach_dev(vport);
+> +		rtnl_unlock();
+> +	}
+>
+>  	call_rcu(&vport->rcu, vport_netdev_free);
+>  }
+> -- =
+
+> 2.52.0
+
 
