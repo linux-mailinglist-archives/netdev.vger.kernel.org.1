@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-244214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46198CB289F
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 10:23:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 876F7CB28A5
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 10:24:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9D11430D424A
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 09:23:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 830A43129099
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 09:23:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E5FC30FF2B;
-	Wed, 10 Dec 2025 09:23:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55C173126B8;
+	Wed, 10 Dec 2025 09:23:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Prkew8MV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="unzZsm74"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF26B3B8D6A;
-	Wed, 10 Dec 2025 09:23:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2722130DEB5;
+	Wed, 10 Dec 2025 09:23:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765358600; cv=none; b=WXRdyqBG2VrI+fbc5dZb2VzPUG58Yd0wdZ4Seu4XVoBuq3HJmJWILa5anUfw26kv6lAiNZ6ab9A0i7ekN6iZngP60lYB0zC5+a65MZhACMttmrjRWB2yc1j9Cm5fz5HgrcMbN5VIDd7hFn188ZwCZPHCXcUUAA16ggJO5GfXaqE=
+	t=1765358601; cv=none; b=Dj6UEUtYRuC9WoSbf65cDTE375AElyO7VFJxg2i5kKmv0AHl8FZUZMS4wLO7YuBcfqckqJxJjUHTyBzuvDqlC56MAhd5wuy6dlcs8yHhteqU5TaB4VUP/qmwd/e5T6e754IApPJBvTUdUH+XBwD4SPJgIRJLHoZS8QstmYxaNd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765358600; c=relaxed/simple;
-	bh=nSXaGQyn3GMiTlmiGFa5o8nysAMOlxs79eW/FrWmqmM=;
+	s=arc-20240116; t=1765358601; c=relaxed/simple;
+	bh=fQE8Piz7TeTd5PSXjii+oX+LMW5oTzgNtn7GW5Zzx4w=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Kh3oft76ELpKtcdPgsFGKWBLisBz9An1uqGJp1Frzq5X3DoQJlyUbnK4pOkEp3mufSmwLDOJzUGz+AnhV6LMEKAdgnrY/eKFeLsZxfCxNZoPdmopV3Iv9pSuIDGs2meqUUByytV7MjhHkJLYLNOKN4XcL+PCQAW/0QcpecGkoKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Prkew8MV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56C35C4CEF1;
-	Wed, 10 Dec 2025 09:23:19 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=FW1ekb+q75P/1/P9nFbiM3lXk1vx5zrwQZF9Ma1Td01aL+zREH4WhywgeRxqGS2GpUVs15ubAudKZFMM0xDFqFu6BH2TY3ulVFyqKIJEoJ6MwZ+7UISnT0rQfJNj7g5gKWbjkddxubJ5N7wgdAKYWOl/eTVMxnEUvp2eSfemxhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=unzZsm74; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90BC6C4CEF1;
+	Wed, 10 Dec 2025 09:23:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765358599;
-	bh=nSXaGQyn3GMiTlmiGFa5o8nysAMOlxs79eW/FrWmqmM=;
+	s=k20201202; t=1765358600;
+	bh=fQE8Piz7TeTd5PSXjii+oX+LMW5oTzgNtn7GW5Zzx4w=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Prkew8MVLr/c1LOshHUngb+MypHlPwgJF177RA90OoJtDT5kXxHHcT1T4R4zO3rLw
-	 Y53TNXyDsePF8oFFd69TIW0bEWJg27HIW8cOo8dH+OC66Ah5x/qvYMRRadz+rBYMQn
-	 y8JCmNc6GBVG7D8tuZ9S/ok2p7OIqPgbIeMscsXWlQbkB5HbhlXOi4E9VJY+wHZ18t
-	 LRo3941B6cokIvUdoxxFkeD8ZQg/8GJJ6Ebhp69XaMxP53lskcQmDAheB8a+H/+PAq
-	 r5F7k+iD7w9+uVL99sUfY9zaMLG8KeDIYolAg4tX7vezDXCy8M7F2MXVfwilVcVOE9
-	 tru6CU5ko3zXg==
+	b=unzZsm74oKaQ1xYbDLy2aiBkW1E17idwIMGYJCXkCMzs603QGnnJIptlSBQzuTQEz
+	 xG2IT28SxDOP8aD74l5+hJKfLW1DN8zxR+Q9tD5AMrI2IqqjTgqg8pBpMgru/vIYF2
+	 DpJh5qgHwSDbyE43yDyMTiQVwjRa7RAmm/idj2dMIqp7ELYvSrngOz8wPyxoaHWycU
+	 TFiNIflwTbNBmXn/cenC/ZW+vphWeoNysVZxn/2spkLGY+yLDAapyfM19kR3ipEdjg
+	 ot5TiKv+Na7dKyRVBh5QdFesWTLmPBa3U2bpqF3K/OECwlZ5GpyOfoxlwtNixvzDbM
+	 /P+6mCY55Obig==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3BCCE3809A18;
-	Wed, 10 Dec 2025 09:20:15 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 788683809A18;
+	Wed, 10 Dec 2025 09:20:16 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,63 +50,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 00/13] selftests: Fix build warnings and errors
+Subject: Re: [PATCH v3] net/handshake: restore destructor on submit failure
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176535841403.523551.9003145966659603890.git-patchwork-notify@kernel.org>
-Date: Wed, 10 Dec 2025 09:20:14 +0000
-References: <20251205171010.515236-1-linux@roeck-us.net>
-In-Reply-To: <20251205171010.515236-1-linux@roeck-us.net>
-To: Guenter Roeck <linux@roeck-us.net>
-Cc: shuah@kernel.org, kuba@kernel.org, brauner@kernel.org, tglx@linutronix.de,
- mingo@redhat.com, edumazet@google.com, kees@kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- wine-devel@winehq.org, netdev@vger.kernel.org, bpf@vger.kernel.org
+ <176535841527.523551.15411391386973921361.git-patchwork-notify@kernel.org>
+Date: Wed, 10 Dec 2025 09:20:15 +0000
+References: <20251204091058.1545151-1-caoping@cmss.chinamobile.com>
+In-Reply-To: <20251204091058.1545151-1-caoping@cmss.chinamobile.com>
+To: caoping <caoping@cmss.chinamobile.com>
+Cc: chuck.lever@oracle.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri,  5 Dec 2025 09:09:54 -0800 you wrote:
-> This series fixes build warnings and errors observed when trying to build
-> selftests.
+On Thu,  4 Dec 2025 01:10:58 -0800 you wrote:
+> handshake_req_submit() replaces sk->sk_destruct but never restores it when
+> submission fails before the request is hashed. handshake_sk_destruct() then
+> returns early and the original destructor never runs, leaking the socket.
+> Restore sk_destruct on the error path.
 > 
-> v2: Emphasize that the patch series fixes build warnings and errors
->     which are seen even if -Werror is not provided.
->     Fix usage of cc-option.
->     For "ignoring return value" warnings, use perror() to display an error
->     message if the affected function returns an error.
+> Fixes: 3b3009ea8abb ("net/handshake: Create a NETLINK service for handling handshake requests")
+> Reviewed-by: Chuck Lever <chuck.lever@oracle.com>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: caoping <caoping@cmss.chinamobile.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,01/13] clone3: clone3_cap_checkpoint_restore: Fix build warnings
-    (no matching commit)
-  - [v2,02/13] selftests: ntsync: Fix build warnings
-    (no matching commit)
-  - [v2,03/13] selftests/filesystems: fclog: Fix build warnings and errors
-    (no matching commit)
-  - [v2,04/13] selftests/filesystems: file_stressor: Fix build warning
-    (no matching commit)
-  - [v2,05/13] selftests/filesystems: anon_inode_test: Fix build warning
-    (no matching commit)
-  - [v2,06/13] selftest: af_unix: Support compilers without flex-array-member-not-at-end support
-    https://git.kernel.org/netdev/net/c/06f7cae92fe3
-  - [v2,07/13] selftest/futex: Comment out test_futex_mpol
-    (no matching commit)
-  - [v2,08/13] selftests: net: netlink-dumps: Avoid uninitialized variable warning
-    (no matching commit)
-  - [v2,09/13] selftests/seccomp: Fix build warning
-    (no matching commit)
-  - [v2,10/13] selftests: net: Fix build warnings
-    https://git.kernel.org/netdev/net/c/59546e874403
-  - [v2,11/13] selftests/fs/mount-notify: Fix build warning
-    (no matching commit)
-  - [v2,12/13] selftests/fs/mount-notify-ns: Fix build warning
-    (no matching commit)
-  - [v2,13/13] selftests: net: tfo: Fix build warning
-    https://git.kernel.org/netdev/net/c/91dc09a609d9
+  - [v3] net/handshake: restore destructor on submit failure
+    https://git.kernel.org/netdev/net/c/6af2a01d65f8
 
 You are awesome, thank you!
 -- 
