@@ -1,171 +1,132 @@
-Return-Path: <netdev+bounces-244272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05BDFCB376C
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 17:23:24 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05604CB37CF
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 17:35:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1FF88300EF38
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 16:23:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8EFD031158AA
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 16:33:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 210BB29617D;
-	Wed, 10 Dec 2025 16:23:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8C0C30F533;
+	Wed, 10 Dec 2025 16:33:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="eQqpFfh5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YZC5I9VH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31E5D296BBE
-	for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 16:23:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 909503B8D68;
+	Wed, 10 Dec 2025 16:33:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765383801; cv=none; b=rbknEWQFAyFoxF230VpKJsZ2RqGX5AACQQ+57ukqaFTCOs0gJ48SaM/Ox9uKCJoaC1EBBSammyoWxBSIr3k1RlsuzyG6LxydLwIqiGVknVKpiMWZuJwqTMyTcX/acA0ftPdn5XfkahK+jjELdFgNsGEKs55ifBq7O8Dop3B5GB0=
+	t=1765384430; cv=none; b=EJ1/DenI9sGrNfsaU0us/0wiJ+OjoHYmHnZc+MBKTGcZuQVl6tXPpBx6tX6Q7AkQ1NJs/UCp+JY7AGqx4Ke10ZLCNJHPdGAQ/70HPIc2yjdawgzf86DW1Z0nknuVa9F+XP3oGeTOLkjsp9JKJ1h0bUA1Y1gw57wEyc0euvjngAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765383801; c=relaxed/simple;
-	bh=zsaZqRo6+OBqJyZ7bcQ/kkWpiFYICWnzAx4flmPXcPE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rKIOJgHtOPVw21BLrAqkya8OedSvk0pOrtD44Bxwdkyn1tLlpd+0dJHFx1F4tLugGFLXOcGW4CxDQVoiq3ynbSkCux/dEVf+9Bo9fDWc/+58z42/8oqSqaCsVXLk6R94etgBsXGK+uhJ1xbZQhqs+aub1GNzD6kLCNJhDLTv9CA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=eQqpFfh5; arc=none smtp.client-ip=209.85.219.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-880576ebe38so48816d6.2
-        for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 08:23:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1765383797; x=1765988597; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xEWKlu78QRgtnGp8S7jauDYzDBKLBE3uQ+0ULpCzYEw=;
-        b=eQqpFfh5rxaKyz1Cz5rcDQ/9IsDryERI9XG5WXCZZTBYqIsgQvjg/YSRAT5ORGNmiS
-         pN1Thvdrd9A0nNQesOS/W4A2aJIj2cICRcbJ2qZXXc8q26eRR1w7hH6x+BbBIMWKWTVj
-         /grjnwUWKCeWF5fXdpcf80CguC+0QGadP6jdfh/cpGDDj4vwjcGTeDNbpWPVTqMA+xOh
-         G8CmfiC+705ESE9ZgiyXPqYSiSHXy57RxtFrqbLhSjerzAhRcwk68OtW8in29PbWMmz8
-         oaVuTYI7oyHvfZ4Zg3vcAl6pNq8pBCLf78MCePsypWuF/cvcWkcR03j3OM4wIojK+0rs
-         SaPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765383797; x=1765988597;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=xEWKlu78QRgtnGp8S7jauDYzDBKLBE3uQ+0ULpCzYEw=;
-        b=JQjHXmT7NAds7FTneyBQdpufsWliRA9ziHhDyNIo9KK9AbhvRnWLP0FiM881cYyyf9
-         GM7rBmuWDfedzIk5pK88Qgc6qGO7z2NQdjCvsxFB5WTKsW66d+j5L7odobxvL4UWOqI3
-         Imbtw+EfVtop+WW9+9NLlN6Gl81S86iRf+KKsm2kv9sAaCruGZU/IUH7DyfEbsq77+sE
-         CgXKiD8cVOYBYKJ4iCSCXHipENL9c55roFXxM9lUh2InWOh1rnQhfevKB5iyTrwDtpJO
-         nShv2T4HTAwV52irUHe6kesvoHh7z/ZDwdJBZTZIWnyLnZ9vpXThbiavZCe4eEkdN4BW
-         md3w==
-X-Gm-Message-State: AOJu0Yw5U4ahRR50gWGhaTIb8X98tgZGHhpyGxtlqSBtQhBg69gm9jvy
-	SMnB5zYMDy2vbSMwtei24wgoRP0XeRD33hy21Fk7vbXwBgOcrItN6i1SYjVdFpltYA==
-X-Gm-Gg: AY/fxX4T5Ie8ndtJLdDugN+t9L4vx5cCCmISQvvGJfPrzFhXqSzjlTc8H8tJrtHSCeA
-	VqtTWDVDOJV+DyDcBZf3gmQCXHDM9oQET7Q+uYBur0ZWRAWq9oeVpwJEy4Tfe0mO7Um003VuIWx
-	fDgm2/uYfVa2x3hnasSrGpnGlIFU327hccS/lzgMFlOSM+71jb0NbELLV8WJtsDre0SbiFkhtuL
-	yiiR2JyjM9DsErQRC8cwr2Ge3HXYKeFUabVg2BhOsbaGHttu78o/TWB9NXyMfoVe+3CoM/4ZIXt
-	L10ezyAMymn2DCQQYOLDPo8OBLiIpidEqwya4Wc1/2ZLHzVwp3nw33WqXyxjoF48tE2RjrMshBy
-	+QLS5QlKRgF+KAChJ1vcAvtCiYMEJrntmLFaARnY3xZhommOGvopTwSF6iiB9PcfRsOUXtT8wDW
-	sdvg2yrpg8NKc=
-X-Google-Smtp-Source: AGHT+IGG952If7Ivo08O6eJrjF1Nc4op0DeuZHFp6EUzKU+yAsP4x18QE6XjKw5F0N/S+HPCiE2Pmg==
-X-Received: by 2002:a05:6214:b6a:b0:81c:96cc:f7ec with SMTP id 6a1803df08f44-88863a64954mr45566506d6.12.1765383796810;
-        Wed, 10 Dec 2025 08:23:16 -0800 (PST)
-Received: from majuu.waya ([70.50.89.69])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-8886eb1d624sm1044506d6.0.2025.12.10.08.23.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Dec 2025 08:23:16 -0800 (PST)
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: netdev@vger.kernel.org,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	victor@mojatatu.com,
-	dcaratti@redhat.com,
-	Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: [PATCH net 2/2] selftests/tc-testing: Test case exercising potential mirred redirect deadlock
-Date: Wed, 10 Dec 2025 11:22:55 -0500
-Message-Id: <20251210162255.1057663-2-jhs@mojatatu.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20251210162255.1057663-1-jhs@mojatatu.com>
-References: <20251210162255.1057663-1-jhs@mojatatu.com>
+	s=arc-20240116; t=1765384430; c=relaxed/simple;
+	bh=RAVkpptHG6oJO9hSoLDzB0Os+BfA+qYSejoiWrxKU4Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AMaY/0u7hczkhzBXnOmnxcPVo8OERvNOy75H1g+lnmYX3rS4Zel/DkRTbgA7mFRHQ0m56/t1SSG2zYh5Yde9Gi7fODbv5aZA45rWHq2nCmYOMfVjXlZwCqZKRwkpiCbNjVDfjujHtpbCcCGdpxcUi7aTp3bO6JqHKlnaEm+Vgzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YZC5I9VH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3253CC4CEF1;
+	Wed, 10 Dec 2025 16:33:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765384430;
+	bh=RAVkpptHG6oJO9hSoLDzB0Os+BfA+qYSejoiWrxKU4Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YZC5I9VHWyMXJ19/yNiYo6ezpCM8sOhmTUF41m72Jtm2iABVgaS/27p0ZTqrKHh9Z
+	 bG0D7vM+v6w9EOFpDUmmi2mR2Ji9klQGmuoEEXdKT5sH0LKV1NfwG5SyCqR+rwBf22
+	 3f+xgcZscWmZnVWb0mlWjJ+ro/SQtsRiA3jQjRDuC/qc2XyaggmxLmTS0DwfMaRSmE
+	 C5m96GavAQ+CxKaR2ahdr0K0iov94ANatToT9spS59SQ6+q9r08QSUAbHCFTuPXNdh
+	 aJhFk/5B0+DjpskV68Wmb2QqHCarNXOW4Z8+UUSbyglElBaHthmaEo+PNHTbBeOO8u
+	 U6553F6TADWJA==
+Date: Wed, 10 Dec 2025 16:33:43 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Irving-CH Lin =?utf-8?B?KOael+W7uuW8mCk=?= <Irving-CH.Lin@mediatek.com>
+Cc: "robh@kernel.org" <robh@kernel.org>,
+	"ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
+	Sirius Wang =?utf-8?B?KOeOi+eak+aYsSk=?= <Sirius.Wang@mediatek.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"mturquette@baylibre.com" <mturquette@baylibre.com>,
+	"richardcochran@gmail.com" <richardcochran@gmail.com>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	Vince-WL Liu =?utf-8?B?KOWKieaWh+m+jSk=?= <Vince-WL.Liu@mediatek.com>,
+	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
+	Jh Hsu =?utf-8?B?KOioseW4jOWtnCk=?= <Jh.Hsu@mediatek.com>,
+	Project_Global_Chrome_Upstream_Group <Project_Global_Chrome_Upstream_Group@mediatek.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
+	"linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>,
+	"sboyd@kernel.org" <sboyd@kernel.org>,
+	Qiqi Wang =?utf-8?B?KOeOi+eQpueQpik=?= <Qiqi.Wang@mediatek.com>,
+	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH v3 01/21] dt-bindings: clock: mediatek: Add MT8189 clock
+ definitions
+Message-ID: <20251210-progress-overdue-bded69c47048@spud>
+References: <20251106124330.1145600-1-irving-ch.lin@mediatek.com>
+ <20251106124330.1145600-2-irving-ch.lin@mediatek.com>
+ <20251106-hug-stingray-2d3ff42fd365@spud>
+ <626b5c4b810678a7f0de1f109371a6d6694bd2a8.camel@mediatek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="6/aPeWQhkTkgoOqT"
+Content-Disposition: inline
+In-Reply-To: <626b5c4b810678a7f0de1f109371a6d6694bd2a8.camel@mediatek.com>
 
-From: Victor Nogueira <victor@mojatatu.com>
 
-Add a test case that reproduces deadlock scenario where the user has
-a drr qdisc attached to root and has a mirred action that redirects to
-self on egress
+--6/aPeWQhkTkgoOqT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Victor Nogueira <victor@mojatatu.com>
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
----
- .../tc-testing/tc-tests/actions/mirred.json   | 46 +++++++++++++++++++
- 1 file changed, 46 insertions(+)
+On Wed, Dec 10, 2025 at 10:01:24AM +0000, Irving-CH Lin (=E6=9E=97=E5=BB=BA=
+=E5=BC=98) wrote:
+> Hi Conor,
+>=20
+> On Thu, 2025-11-06 at 17:19 +0000, Conor Dooley wrote:
+> > On Thu, Nov 06, 2025 at 08:41:46PM +0800, irving.ch.lin wrote:
+> > > From: Irving-CH Lin <irving-ch.lin@mediatek.com>
+> > >=20
+> > > Add device tree bindings for the clock of MediaTek MT8189 SoC.
+> > >=20
+> > > Signed-off-by: Irving-CH Lin <irving-ch.lin@mediatek.com>
+> >=20
+> > Before I approve this, can you share the dts that actually uses it?
+> > This many different syscons really does look suspect, and that not
+> > all
+> > of these should be nodes of their own. They may very well be, I would
+> > just like to see what the dts looks like. Doesn't need to be a patch,
+> > a
+> > link to your tree will suffice.
+> >=20
+> > Cheers,
+> > Conor.
+> >=20
+> https://patchwork.kernel.org/project/linux-mediatek/patch/20251111070031.=
+305281-10-jh.hsu@mediatek.com/
+> Please refer to link for mt8189 dts.
 
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json b/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json
-index b73bd255ea36..da156feabcbf 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json
-@@ -1052,5 +1052,51 @@
-             "$TC qdisc del dev $DEV1 ingress_block 21 clsact",
-             "$TC actions flush action mirred"
-         ]
-+    },
-+    {
-+        "id": "7eba",
-+        "name": "Redirect multiport: dummy egress ->  dummy egress (Loop)",
-+        "category": [
-+            "filter",
-+            "mirred"
-+        ],
-+        "plugins": {
-+            "requires": [
-+                "nsPlugin"
-+            ]
-+        },
-+        "setup": [
-+            "$IP link set dev $DUMMY up || true",
-+            "$IP addr add 10.10.10.10/24 dev $DUMMY || true",
-+            "$TC qdisc add dev $DUMMY handle 1: root drr",
-+            "$TC filter add dev $DUMMY parent 1: protocol ip prio 10 matchall action mirred egress redirect dev $DUMMY index 1"
-+        ],
-+        "cmdUnderTest": "ping -c1 -W0.01 -I $DUMMY 10.10.10.1",
-+        "expExitCode": "1",
-+        "verifyCmd": "$TC -j -s actions get action mirred index 1",
-+        "matchJSON": [
-+            {
-+                "total acts": 0
-+            },
-+            {
-+                "actions": [
-+                    {
-+                        "order": 1,
-+                        "kind": "mirred",
-+                        "mirred_action": "redirect",
-+                        "direction": "egress",
-+                        "index": 1,
-+                        "stats": {
-+                            "packets": 1,
-+                            "overlimits": 1
-+                        },
-+                        "not_in_hw": true
-+                    }
-+                ]
-+            }
-+        ],
-+        "teardown": [
-+            "$TC qdisc del dev $DUMMY root"
-+        ]
-     }
- ]
--- 
-2.34.1
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
+pw-bot: not-applicable
 
+--6/aPeWQhkTkgoOqT
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaTmg5wAKCRB4tDGHoIJi
+0gQLAQDlf0YH1hYoXc9Bdh1D48xuvf9j1Xm/38X050i72dQjuAEA3Ycuor/nuZxO
+KtGQq2Rg+DlffLIgFceLi1KapRxZVQo=
+=RQBU
+-----END PGP SIGNATURE-----
+
+--6/aPeWQhkTkgoOqT--
 
