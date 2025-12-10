@@ -1,243 +1,253 @@
-Return-Path: <netdev+bounces-244259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D1EFCB321D
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 15:24:06 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id D97C0CB33BB
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 15:59:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2A28130E7112
-	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 14:22:52 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3120D300748F
+	for <lists+netdev@lfdr.de>; Wed, 10 Dec 2025 14:59:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D31EF32277B;
-	Wed, 10 Dec 2025 14:22:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F506259CBF;
+	Wed, 10 Dec 2025 14:59:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CS5BI736";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="K2lovAsS"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="F7jcJS8v"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0559D21423C
-	for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 14:22:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30CF1248F69
+	for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 14:59:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765376570; cv=none; b=PlsbOTi8Xty6zyvIZdxYudvKMUX7znGzS2bQQvkrYZpVer3px6YKv3jLBko1yXU7UWGIIaaxuwrlV+D23eyC1hUfAXvZnSAH7aWVAPj2iijzPW8uqGyXUflrMWFChSzRY0zTxq8yzFbK0osErStrCJhlZsZK9uWiFir39wyFMPY=
+	t=1765378784; cv=none; b=ZjAmSApLFF1z0KVYwL+jUq4J23ZUAbh+ovj18FbrmJtViWCaXpaknfUELAyv9vwgzbif/BlpNtWI5BDEncWAfC3Bwo9cNJoQ1MWPyjBeyDt7aD9gPofiyjVK7NDnbSRmXLzgbDh6lY6GASHHtzOGG+IOUlLCyTmm+PxE6Un411w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765376570; c=relaxed/simple;
-	bh=mR7FX3+KEfttN7RMnMM/NLVhqGV7g6DZNgB51VU9Uno=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fVCKvEFPI9mtlaRrlS0vgD9F8ryMtOqA89BxO0tQrulTsKEEz0ldNXGqv6z3cjRg/E2ky5fIhP7casHj1ea3OstdXFIv7XpmfMiZqtssNruujOPP9/0Dssqg+O+l38ySCbusBT2R2iRxH3Z68EH9YRSJZT9/N7H/KCtaJInIN64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CS5BI736; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=K2lovAsS; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765376567;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kRJ72Nh2zwp7g0tNeZhrixaAdGzbaonGGzR4qDRLA7Q=;
-	b=CS5BI736xTIfxN/Z+6wDjoFPW98+AtZ/T/euzhf69KKka8qrq2CYM7/kpvXG7xba0z88zw
-	ZZWuvbqY46SZu80gmaP1y2OIYFBusTKO8iZE9RfnAdkGhGTrUPRI8idnqz/z6TMb8uxzxp
-	9TnfhgGDZ3JgBR891mmTcZwzVohl5QQ=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-638-SX7LEImbMCutMOtGzgLdPA-1; Wed, 10 Dec 2025 09:22:46 -0500
-X-MC-Unique: SX7LEImbMCutMOtGzgLdPA-1
-X-Mimecast-MFC-AGG-ID: SX7LEImbMCutMOtGzgLdPA_1765376566
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-477bf8c1413so43381995e9.1
-        for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 06:22:46 -0800 (PST)
+	s=arc-20240116; t=1765378784; c=relaxed/simple;
+	bh=BX9GCeksrm871dWwF5T+K6bNl/z1hw13Z+q1a2aBIug=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hhGAP6cGs5SnFOzULNn7dMCif1lowYmVpcbTbJx1laoptnJxsUhb0OEVhVrDwV8auxLFhRwNJtEaJhjAXts7XAjO/gHmm4f5Q8AQcSG1O5BdqxNpN7wMF8qrIfxsgaAEiSJvRWxmXaajAI4aE5fR6Bnsr36erKdyX0Qy4bR2F+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=F7jcJS8v; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7e2762ad850so7244286b3a.3
+        for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 06:59:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1765376565; x=1765981365; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kRJ72Nh2zwp7g0tNeZhrixaAdGzbaonGGzR4qDRLA7Q=;
-        b=K2lovAsSPduXODbZvjLeNm104rshGqUMRMY54tJKnVnuF/EtdHxuj+vFKunou5tjhB
-         Vk5e5rPTVVoJEi0ao3TFx6+4eNrIsrhFqPoROEi1EqAO/DERJ5roUjDjcH6fbxG/1gMS
-         jPExobzN1HX/Es+5yu7OZGdgI8djzpeTz5fFe+TmtPcG3IdA6NIx86PT4AasEXUCT4xe
-         LK+YBizlVROaxo2/09snv/qxFMi98u90w3MR98cEdvehqGemmT3VGe+vGmLlZCH96ETf
-         HGBxep/tC5p+dkcBh5bTDfIoIzlizAyUYFWHauPXlmnji3KBsOybrEJycZ043sr0kleg
-         E8Uw==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1765378781; x=1765983581; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tthgIGp9nW3QqcCewKRsGoMrm0jaWkDqz+wuPCkHL9I=;
+        b=F7jcJS8v7C60NbHsfSIgod0aoMUq2grgSx/NtciYaXRvc3XYZEt4WIWaErYSfDWKoP
+         AUOpSsKg6MuHVfwmYDfJ4SYd7vSoz6YuNI9KUUJl75zjQo1CDqocFJiQ+7EW8GgkwQC0
+         stBSzgjgvcbw0Ff6qZnlSAR6fzf1DThPXSndaUYDt+3aVnuUuceS19gFu4qnQFhrzhMC
+         amExXdc9iUfIp25YuDKC29+WB7cF5Aq9Z9y75GNqExzk1QJJwOhMJkujs9rPvh+DtxoZ
+         LCswl55Oba4haYhYMRMJP16tGH5Oj0Q81QT82WREoU0Hqie4WyiEjwZOJy5JoOyFGw2d
+         /KiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765376565; x=1765981365;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kRJ72Nh2zwp7g0tNeZhrixaAdGzbaonGGzR4qDRLA7Q=;
-        b=KguWQt1X/fwjKOxhogFrfFcUv8ncO9nrwJho8V1dDlV7RenVYFZqcxBNQmRPE4KfXQ
-         kKhjYawDMrVDbasv+vLwIu5avC5elpkzLUX3UXkVelTTIjAEx/S+9Uc8Dx1GXJ1cxNx5
-         YebsWho7FAASVgv9jpzygJ1UxvQQqUKk5n5iOxx4UHhfjfW/Pg4Kx7bbaGaa46Zf5fXF
-         ExxQjwHh17fFf7CdZXaLPM4+Yr6bhQEnJqBB3Hs9WSxJqmlNRp2FBAJ6Wvjpk9OkmEpE
-         I7YpsTjw5kujC1CucOyQ4SDY8r9/b53SCH1DNEurLttivnWK2dHB/j4x5QMxT5xoOLGU
-         m3UQ==
-X-Gm-Message-State: AOJu0Yz9kgVQC29N63OEaVDBP8H8fTL4FA26Q/44hYUUfOlBAQp773IO
-	O69RnfcpmEtvas9rVJehasH0ou0JiZlAvNvcqTCpJOkGZ8M5ViGFvLqUdqTgsO0IZzv4gBLq/uT
-	gqQST7Y279sNKaaMsu6DhlKKax3zPZ2rCJcXFIW+GFfQSPM7a3grYMUM1FQ==
-X-Gm-Gg: AY/fxX6mbwMNUHX0XglMAN8puv3gHpBtqPrG3ZuhvkgeqnTuUhBuDxsPWP7z6DzniQA
-	zFeKJ5jvRumngnN2Zedfrwvav1J3YD989x0Irn5KZmJE4TNrslYZnMstbU+mpcFC6J82N+wS52z
-	yYJ7diPfZcEH53Ta0shFeIgD9V9NelNX0fA/7SV1RqKullRr3CRbdL6xlNJoWdRj/842/fxo03i
-	h1+8EUMAYLe+ElSvBWlXVvqka2k2WUNSWSaUz2TA8o/xlpq2V2Jc+IusMLBzvzpagxRHyF9Wvam
-	HFy024GaRvJHNfQjA7ouSykjS4BfXs7KvjA5i/YhbpKUo5MMEOn34+QuipaCXkfhyzCXhzRwqsI
-	HNYseEbwcvEgXqODeAfOAcobsvG6c6Zz8DpSuWtzewP5e6NQBCXzFtal9Ba/sYw==
-X-Received: by 2002:a05:6000:4282:b0:42b:47da:c318 with SMTP id ffacd0b85a97d-42fa3b18a0fmr2763517f8f.52.1765376565416;
-        Wed, 10 Dec 2025 06:22:45 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGe23O8ZHiqMm5vorjeh11c7DTLLOPAuIGwE8wgGZY4Ncci77xO6QqQLWpsM6fjDqtIM/m9Pw==
-X-Received: by 2002:a05:6000:4282:b0:42b:47da:c318 with SMTP id ffacd0b85a97d-42fa3b18a0fmr2763455f8f.52.1765376564834;
-        Wed, 10 Dec 2025 06:22:44 -0800 (PST)
-Received: from sgarzare-redhat (host-87-12-139-91.business.telecomitalia.it. [87.12.139.91])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42f7cbfee66sm37857142f8f.11.2025.12.10.06.22.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Dec 2025 06:22:44 -0800 (PST)
-Date: Wed, 10 Dec 2025 15:22:38 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Melbin K Mathew <mlbnkm1@gmail.com>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, stefanha@redhat.com, mst@redhat.com, jasowang@redhat.com
-Subject: Re: [PATCH net] vsock/virtio: cap TX credit to local buffer size
-Message-ID: <7m3k4fhwnyvocrpwyzkm2xpgssik7lph3f5kqagqifllijvhbq@5opsnu2vcgic>
-References: <20251210133259.16238-1-mlbnkm1@gmail.com>
+        d=1e100.net; s=20230601; t=1765378781; x=1765983581;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=tthgIGp9nW3QqcCewKRsGoMrm0jaWkDqz+wuPCkHL9I=;
+        b=mz2kwETuQGO9J2OEGGI2LeJ/867vFGLW3T7cJ8YvpMD6+skIo/tVbN8TKc2zHSmtKy
+         Ac3u30q0XS8IGeqrlpC1noVO7G5fVmd9nMxTbuJa6XtGwXHlD2Ff8rWeM5kggSoSqn5b
+         Cj5uuWbpKWgZFtLUet+vbJlmKomkNAhi+GBh5AMebv5e39oU059Q5YIUwZGNMlqZxeqd
+         5ZOKXtsScpnDH+TZawy7Uen67NYU8E9mh99Pm2upnjH5QIx25Zpp1PaFmauOKZfmS2j3
+         RazDNC4t8O+bQJFDq3mmU5xTO6LemVLzrfNc8WiH/LLbtWUZUTO3/jXgYONvP67j6t6t
+         ky6A==
+X-Forwarded-Encrypted: i=1; AJvYcCVKztVN0SPQmcnMSRzMtD3Mzxl6PNwCg8lKX59MFwlSnIN9pzLCQhQJMErvFBT4WXVgn5QlMLY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPST2rXk3KpgC48m7Cat+Mf8kqbuGhgJB7MDLEpK6xJwsFrT/f
+	SjpDbziriNwLk8GMxnnCLIRNm5iWu9bw1RaipEJJrt4x2SM0jK0uc+38XZb2ZYHpmey5124huQt
+	3IDye4gYDrmRDBTqCknpozO0KIERwDxbJMR2p65VIExiyJup74tQ=
+X-Gm-Gg: ASbGncvRWoDbIbXyoX3IKP08lolIq9UlB9H+4XS++meWe+CowX62YWZTQvcDnlP/FXV
+	jT4N4HMrKfhfvJ3G3XvjxPcDjyui0TBySJoUw0g/6COrPaCWzJP6BXMJUBeNESKKdkTMlAEYdlH
+	pqMWcz6pt0fa0o2ApoeRhscf/2zKfAqSfRdD6JKw+TQo34QT5zxmdw0pPdnqDwDt6hzzI0C5GNE
+	/di6npcYQUfCmLXVPe0rJVM5FzppZIYkTPQr5L2+T5BfSGpbEHFp4X8BxR6bs3NjE+QLheXoRCv
+	BE8=
+X-Google-Smtp-Source: AGHT+IETpuuZlhHeHQtcbCcEcbIQ9g0JazU3ez7ddZz674YeaD1RnC8G/WhgSsEX3PiYTVt8h5UnbsTzDvVI1J5gM4s=
+X-Received: by 2002:a05:6a00:b86:b0:7e8:4433:8fb8 with SMTP id
+ d2e1a72fcca58-7f2302ba42fmr3009529b3a.64.1765378781399; Wed, 10 Dec 2025
+ 06:59:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20251210133259.16238-1-mlbnkm1@gmail.com>
+References: <20251124200825.241037-1-jhs@mojatatu.com> <20251124145115.30c01882@kernel.org>
+ <CAM0EoM=jDt_CeCop82aH=Fch+4M9QawX4aQdKdiUCsdFzuC2rQ@mail.gmail.com>
+ <CAM0EoM=Rci1sfLFzenP9KyGhWNuLsprRZu0jS5pg2Wh35--4wg@mail.gmail.com>
+ <CANn89iJiapfb3OULLv8FxQET4e-c7Kei_wyx2EYb7Wt_0qaAtw@mail.gmail.com>
+ <CAM0EoMm4UZ9cM6zOTH+uT1kwyMdgEsP2BPR3C+d_-nmbXfrYyQ@mail.gmail.com>
+ <CANn89i+_4Hj2WApgy_UBFhsDy+FEM8M1HhutrUcUHKmqbMR1-A@mail.gmail.com>
+ <CAM0EoMmoMUtrBHyYUWNeBnFFj8kDFYPyQB+O1fdGB4xk_bMWZA@mail.gmail.com>
+ <CANn89i+zDW5ttPZ7fw2gDbVQqXj2uFoeEeTRSU6gzFLM3zGCeA@mail.gmail.com>
+ <CAM0EoMmzt1tDpoqK=mMZoj1=6UU2Ytim2aqJWOBAZmPfNyZSfQ@mail.gmail.com>
+ <CANn89iKKKwj33WgSbGKDa7JB=qRBXSH6VbiAV=umwOgwYsbmTQ@mail.gmail.com>
+ <CAM0EoMngngPdwCqFrbEQAFgu+cMe0eVfBs1XKD4zTUCTpYYHOw@mail.gmail.com>
+ <CAM0EoMn4rW3VOmEaxz2VBxGeywoQ_TBDSz7qKsS6AHjo0HNJWA@mail.gmail.com> <CAM0EoMmiTRqKaXK7Y7LQpm6yfkz6Q-pGn9e_bMo-t8++pqHZSQ@mail.gmail.com>
+In-Reply-To: <CAM0EoMmiTRqKaXK7Y7LQpm6yfkz6Q-pGn9e_bMo-t8++pqHZSQ@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Wed, 10 Dec 2025 09:59:28 -0500
+X-Gm-Features: AQt7F2rCtXPo2WBfqBkgafyBVV4worEbhZd604dU-UyypGnypMxUxt_c_ypzUZU
+Message-ID: <CAM0EoMnPVnPvffYFLygRQw7Oi-WpaxuKWqxx+GYE0O=kFK=4wQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] net/sched: act_mirred: Fix infinite loop
+To: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, pabeni@redhat.com, 
+	jiri@resnulli.us, xiyou.wangcong@gmail.com, netdev@vger.kernel.org, 
+	dcaratti@redhat.com, Victor Nogueira <victor@mojatatu.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 10, 2025 at 02:32:59PM +0100, Melbin K Mathew wrote:
->The virtio vsock transport currently derives its TX credit directly
->from peer_buf_alloc, which is set from the remote endpoint's
->SO_VM_SOCKETS_BUFFER_SIZE value.
+On Wed, Dec 3, 2025 at 9:27=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com> =
+wrote:
 >
->On the host side this means that the amount of data we are willing to
->queue for a connection is scaled by a guest-chosen buffer size,
->rather than the host's own vsock configuration. A malicious guest can
->advertise a large buffer and read slowly, causing the host to allocate
->a correspondingly large amount of sk_buff memory.
+> On Thu, Nov 27, 2025 at 11:21=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.c=
+om> wrote:
+> >
+> > On Thu, Nov 27, 2025 at 10:23=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu=
+.com> wrote:
+> > >
+> > > On Thu, Nov 27, 2025 at 10:11=E2=80=AFAM Eric Dumazet <edumazet@googl=
+e.com> wrote:
+> > > >
+> > > > On Thu, Nov 27, 2025 at 6:45=E2=80=AFAM Jamal Hadi Salim <jhs@mojat=
+atu.com> wrote:
+> > > > >
+> > > > > On Wed, Nov 26, 2025 at 3:30=E2=80=AFPM Eric Dumazet <edumazet@go=
+ogle.com> wrote:
+> > > > > >
+> > > > > > On Wed, Nov 26, 2025 at 12:20=E2=80=AFPM Jamal Hadi Salim <jhs@=
+mojatatu.com> wrote:
+> > > > > > >
+> > > > > > > On Wed, Nov 26, 2025 at 1:20=E2=80=AFPM Eric Dumazet <edumaze=
+t@google.com> wrote:
+> > > > > > > >
+> > > > > > > > On Wed, Nov 26, 2025 at 10:14=E2=80=AFAM Jamal Hadi Salim <=
+jhs@mojatatu.com> wrote:
+> > > > > > > >
+> > > > > > > > > It's the multiport redirection, particularly to ingress. =
+When it get
+> > > > > > > > > redirected to ingress it will get queued and then transit=
+ioned back.
+> > > > > > > > > xmit struct wont catch this as a recursion, so MIRRED_NES=
+T_LIMIT will
+> > > > > > > > > not help you.
+> > > > > > > > > Example (see the first accompanying tdc test):
+> > > > > > > > > packet showing up on port0:ingress mirred redirect --> po=
+rt1:egress
+> > > > > > > > > packet showing up on port1:egress mirred redirect --> por=
+t0:ingress
+> > > > > > > >
+> > > > > > > > Have you tried recording both devices ?
+> > > > > > > >
+> > > > > > > > diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.=
+c
+> > > > > > > > index f27b583def78e4afecc7112854b93d59c2520201..711fc2e31cb=
+0451c07a39f9c94226357d5faec09
+> > > > > > > > 100644
+> > > > > > > > --- a/net/sched/act_mirred.c
+> > > > > > > > +++ b/net/sched/act_mirred.c
+> > > > > > > > @@ -445,15 +445,17 @@ TC_INDIRECT_SCOPE int tcf_mirred_act(=
+struct sk_buff *skb,
+> > > > > > > >                 return retval;
+> > > > > > > >         }
+> > > > > > > >         for (i =3D 0; i < xmit->sched_mirred_nest; i++) {
+> > > > > > > > -               if (xmit->sched_mirred_dev[i] !=3D dev)
+> > > > > > > > +               if (xmit->sched_mirred_dev[i] !=3D dev &&
+> > > > > > > > +                   xmit->sched_mirred_dev[i] !=3D skb->dev=
+)
+> > > > > > > >                         continue;
+> > > > > > > > -               pr_notice_once("tc mirred: loop on device %=
+s\n",
+> > > > > > > > -                              netdev_name(dev));
+> > > > > > > > +               pr_notice_once("tc mirred: loop on device %=
+s/%s\n",
+> > > > > > > > +                              netdev_name(dev), netdev_nam=
+e(skb->dev));
+> > > > > > > >                 tcf_action_inc_overlimit_qstats(&m->common)=
+;
+> > > > > > > >                 return retval;
+> > > > > > > >         }
+> > > > > > > >
+> > > > > > > >         xmit->sched_mirred_dev[xmit->sched_mirred_nest++] =
+=3D dev;
+> > > > > > > > +       xmit->sched_mirred_dev[xmit->sched_mirred_nest++] =
+=3D skb->dev;
+> > > > > > > >
+> > > > > > > >         m_mac_header_xmit =3D READ_ONCE(m->tcfm_mac_header_=
+xmit);
+> > > > > > > >         m_eaction =3D READ_ONCE(m->tcfm_eaction);
+> > > > > > >
+> > > > > > > Did you mean not to decrement sched_mirred_nest twice?
+> > > > > >
+> > > > > > No, sorry, we should decrement twice of course.
+> > > > > >
+> > > > >
+> > > > > Ok, I tested.
+> > > > > While it "fixes" it - it's not really a fix. It works by ignoring=
+ direction.
+> > > > > Example, this is not a loop but currently would be claimed to be =
+a
+> > > > > loop because port0 appears twice:
+> > > > > port0 ingress --> port1 ingress --> port1 egress
+> > > > > Note: port0 ingress and port0 egress cannot create a loop.
+> > > >
+> > > > I am not familiar with this stuff, can the direction be known and
+> > > > taken into account ?
+> > > >
+> > >
+> > > Yes, it can.
+> > > To figure the target direction see tcf_mirred_act_wants_ingress() and
+> > > to get what the current direction see code like:
+> > > at_ingress =3D skb_at_tc_ingress(skb);
+> > >
+> > > > Really, anything but adding new bits in sk_buff.
+> > >
+> > > If we can fix it without restoring those two bits i will be happy.
+> > > To repeat something i said earlier:
+> > > The bigger challenge is somewhere along the way (after removing those
+> > > two bits) we ended sending the egress->ingress to netif_rx() (see
+> > > tcf_mirred_forward()), so any flow with that kind of setup will
+> > > nullify your xmit count i.e when we come back for the next leg the
+> > > xmit counter will be 0.
+> > >
+> >
+> > BTW, I have the attached patch but was waiting to see how this
+> > discussion is heading.
+> > It's when you have something like port0 egress --> port0 egress and
+> > you use something like drr as root qdisc.
+> >
+> > -- a/net/sched/act_mirred.c
+> > +++ b/net/sched/act_mirred.c
+> > @@ -281,6 +281,14 @@ static int tcf_mirred_to_dev(struct sk_buff *skb,
+> > struct tcf_mirred *m,
+> >
+> >         want_ingress =3D tcf_mirred_act_wants_ingress(m_eaction);
+> >
+> > +       if (dev =3D=3D skb->dev && want_ingress =3D=3D at_ingress) {
+> > +               pr_notice_once("tc mirred: Loop (%s:%s --> %s:%s)\n",
+> > +                              netdev_name(skb->dev),
+> > +                              at_ingress?"ingress":"egress",
+> > +                              netdev_name(dev),
+> > +                              want_ingress?"ingress":"egress");
+> > +               goto err_cant_do;
+> > +       }
+> >         /* All mirred/redirected skbs should clear previous ct info */
+> >         nf_reset_ct(skb_to_send);
+> >         if (want_ingress && !at_ingress) /* drop dst for egress -> ingr=
+ess */
+> >
 >
->Introduce a small helper, virtio_transport_peer_buf_alloc(), that
->returns min(peer_buf_alloc, buf_alloc), and use it wherever we consume
->peer_buf_alloc:
+> Eric,
+> Are you still looking at this?
 >
->  - virtio_transport_get_credit()
->  - virtio_transport_has_space()
->  - virtio_transport_seqpacket_enqueue()
->
->This ensures the effective TX window is bounded by both the peer's
->advertised buffer and our own buf_alloc (already clamped to
->buffer_max_size via SO_VM_SOCKETS_BUFFER_MAX_SIZE), so a remote guest
->cannot force the host to queue more data than allowed by the host's
->own vsock settings.
->
->On an unpatched Ubuntu 22.04 host (~64 GiB RAM), running a PoC with
->32 guest vsock connections advertising 2 GiB each and reading slowly
->drove Slab/SUnreclaim from ~0.5 GiB to ~57 GiB and the system only
->recovered after killing the QEMU process.
->
->With this patch applied, rerunning the same PoC yields:
->
->  Before:
->    MemFree:        ~61.6 GiB
->    MemAvailable:   ~62.3 GiB
->    Slab:           ~142 MiB
->    SUnreclaim:     ~117 MiB
->
->  After 32 high-credit connections:
->    MemFree:        ~61.5 GiB
->    MemAvailable:   ~62.3 GiB
->    Slab:           ~178 MiB
->    SUnreclaim:     ~152 MiB
->
->i.e. only ~35 MiB increase in Slab/SUnreclaim, no host OOM, and the
->guest remains responsive.
->
->Fixes: d021c344051a ("VSOCK: Introduce VM Sockets")
->Reported-by: Melbin K Mathew <mlbnkm1@gmail.com>
->Signed-off-by: Melbin K Mathew <mlbnkm1@gmail.com>
->---
-> net/vmw_vsock/virtio_transport_common.c | 27 ++++++++++++++++++++++---
-> 1 file changed, 24 insertions(+), 3 deletions(-)
 
-Thanks, in addition to Michael comments:
+i will send a bunch of RFC patches. Maybe one is a clear "easy fix",
+so i will send that one out against net. Just a bit of testing needed.
 
-Please run `./scripts/checkpatch.pl`, there are several warnings/errors 
-mainly related to spaces/tabs.
-
-Also please use `./scripts/get_maintainer.pl` since several maintainers 
-are missing in CC.
-
->
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index dcc8a1d58..f5afedf01 100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -491,6 +491,25 @@ void virtio_transport_consume_skb_sent(struct sk_buff *skb, bool consume)
-> }
-> EXPORT_SYMBOL_GPL(virtio_transport_consume_skb_sent);
->
->+/*
->+ * Return the effective peer buffer size for TX credit computation.
->+ *
->+ * The peer advertises its receive buffer via peer_buf_alloc, but we
->+ * cap that to our local buf_alloc (derived from
->+ * SO_VM_SOCKETS_BUFFER_SIZE and already clamped to buffer_max_size)
->+ * so that a remote endpoint cannot force us to queue more data than
->+ * our own configuration allows.
->+ */
->+static u32 virtio_transport_peer_buf_alloc(struct virtio_vsock_sock *vvs)
-
-This maybe can be called virtio_transport_tx_buf_alloc or something like 
-that, to make it clear that should be used in the TX path. (not a strong 
-opinion)
-
-Thanks,
-Stefano
-
->+{
->+	u32 peer  = vvs->peer_buf_alloc;
->+	u32 local = vvs->buf_alloc;
->+
->+	if (peer > local)
->+		return local;
->+	return peer;
->+}
->+
-> u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 credit)
-> {
-> 	u32 ret;
->@@ -499,7 +518,8 @@ u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 credit)
-> 		return 0;
->
-> 	spin_lock_bh(&vvs->tx_lock);
->-	ret = vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
->+	ret = virtio_transport_peer_buf_alloc(vvs) -
->+             (vvs->tx_cnt - vvs->peer_fwd_cnt);
-> 	if (ret > credit)
-> 		ret = credit;
-> 	vvs->tx_cnt += ret;
->@@ -831,7 +851,7 @@ virtio_transport_seqpacket_enqueue(struct vsock_sock *vsk,
->
-> 	spin_lock_bh(&vvs->tx_lock);
->
->-	if (len > vvs->peer_buf_alloc) {
->+	if (len > virtio_transport_peer_buf_alloc(vvs)) {
-> 		spin_unlock_bh(&vvs->tx_lock);
-> 		return -EMSGSIZE;
-> 	}
->@@ -882,7 +902,8 @@ static s64 virtio_transport_has_space(struct vsock_sock *vsk)
-> 	struct virtio_vsock_sock *vvs = vsk->trans;
-> 	s64 bytes;
->
->-	bytes = (s64)vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
->+	bytes = (s64)virtio_transport_peer_buf_alloc(vvs) -
->+               (vvs->tx_cnt - vvs->peer_fwd_cnt);
-> 	if (bytes < 0)
-> 		bytes = 0;
->
->-- 
->2.34.1
->
-
+cheers,
+jamal
+> cheers,
+> jamal
 
