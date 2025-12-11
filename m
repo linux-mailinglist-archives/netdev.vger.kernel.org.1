@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-244355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 098FDCB5650
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 10:44:05 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D365BCB5641
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 10:43:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A7F973014A34
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 09:43:23 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 50EC23001610
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 09:43:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C731B2FB602;
-	Thu, 11 Dec 2025 09:43:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA5932FC01C;
+	Thu, 11 Dec 2025 09:43:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kvGQMGID"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FDbU7mPN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D57A2F998D;
-	Thu, 11 Dec 2025 09:43:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A18AC2FBE10;
+	Thu, 11 Dec 2025 09:43:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765446202; cv=none; b=bk3Epr/aEyFtBsrpMEE8rxx8tBI0dYG1XEVOLFsaNZXNeSxQKCPTmsQjOm3p0xpySkwu4b9FxHoUnvWaIcn22MCqTbuDLM3wrlJ+Np5t1oWvTv1hGL+3ZWTMhCcDufYmodB2LZBx0DmJqSVplDFCXfeCcC6SQed4k3Hc22xgKIQ=
+	t=1765446203; cv=none; b=TbDYIDCD3zm9tOCIVZvTCj+MfgGZYK2IQBPhQEvtou6tK7/HgD/68hnuLs2FkCx60qczwpWd/lqLvZfDOhtH21kGH1YL7SBFbCKT2v4xezlkW1DUCds/zYxgnseUKhOBIpDyOahbalYRdNx3tqBZvfIcN4DPSz1u5PQz9P2XgZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765446202; c=relaxed/simple;
-	bh=QoXUSLb6pF12kg5hciMRtHaloEECSFceLd048LFulQM=;
+	s=arc-20240116; t=1765446203; c=relaxed/simple;
+	bh=Mb4oe9NOVj/ByxPMpfJp5GorIcuj+R8pUlJlrcEZGAs=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PyiQHz7aUPzIcEx6IOM+DG3fafbnwQfQ936YMrxItRCv80FSVWC6A4cy6gZJ/Ut+9RH3hIY9cE3EkUOgieJU+eIxarcEJCp7udX1Ou6KPt5nWxO3aQEda7wonmXxNKrCmnlmWicOzU4yoICrse6VFAsIq0MkhfbuHWcU8aXA6mY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kvGQMGID; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB074C4CEF7;
-	Thu, 11 Dec 2025 09:43:20 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=L9BvxUtVErA191KhVscIbF3Xr80if+dlMbe+CLZw3hZnIHVTtaZPHLk3+n+Xj13ZLh7snXaJQ/gwbly0SPwlzvCz0qR8UGNgaMAfuCJOYEWVtOR1/RrfKV1NRSPYXaW/XQzstHYW5Sv+uBT+2wR/E/HFHsbg0BxY0Jcp36xMEM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FDbU7mPN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A54AC113D0;
+	Thu, 11 Dec 2025 09:43:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765446201;
-	bh=QoXUSLb6pF12kg5hciMRtHaloEECSFceLd048LFulQM=;
+	s=k20201202; t=1765446202;
+	bh=Mb4oe9NOVj/ByxPMpfJp5GorIcuj+R8pUlJlrcEZGAs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kvGQMGIDtcuZd9G+/xzRI8ijlR/uGiSUN/c2J27EdwuRAe3VB8he+V7UQEX5/aFfI
-	 t1LXxvpWfOCqvZIRujWtl3npakUo2R9b6/2FuyCSzBLWGC5j3vdck0OHpwf0oYIXUo
-	 97oylUkaZPL7EPnRXxmS2pXflmzYlW3WRXWusWsiBVkspG+ov1a3VxKeOE/FIlrfnf
-	 KJ58aKY5LsLv8zBdkPNOZCTq7uaLOvYjkRQF4m4rrgjZr0KdGEKjoVF3fyJQJ7SbuQ
-	 BpjekZrp8f2p41ex1TZy/FoeP0sThBjvTU+GaoES7ZlKUhLtgxKv3DyhDLb94SIZKh
-	 CkHy8bMbfNtcw==
+	b=FDbU7mPNUzcYbU7T8rVVUR+YVshZrJlneaNJkj187j5XuG9YModEjoS3pLBKnkQsC
+	 kXwXve3XOZx4s7ccZTQOjkXaki9mlrGOh2GZFIsKmNe2oCNtEc4jgygM5BUdGu1wl1
+	 a7dCkE0xOHo98lhYUT3TtIZF2zGvSynIUf1hglpdV34jQ66yChruYCr8VIKzHyYFtE
+	 G9k5tq85sCnkyJ32zJgkoqWEeYGJt645VNcI4RR03MZy3oUR3wTWNI8BT9GHzuG1a0
+	 eVO/QCmyV7yiSVX71aVhWkUzXbaFk5yRLNqkxeurBFqPK4wim0jHNqP//wa/upXtgF
+	 1gsq5r7vwnzWA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3B9213809A35;
-	Thu, 11 Dec 2025 09:40:16 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 788953809A35;
+	Thu, 11 Dec 2025 09:40:17 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,37 +50,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] nfc: pn533: Fix error code in
- pn533_acr122_poweron_rdr()
+Subject: Re: [PATCH] caif: fix integer underflow in cffrml_receive()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176544601478.1308621.1840268156177987089.git-patchwork-notify@kernel.org>
-Date: Thu, 11 Dec 2025 09:40:14 +0000
-References: <aTfIJ9tZPmeUF4W1@stanley.mountain>
-In-Reply-To: <aTfIJ9tZPmeUF4W1@stanley.mountain>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: gregkh@linuxfoundation.org, krzk@kernel.org, johan@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- kernel-janitors@vger.kernel.org
+ <176544601627.1308621.3200906619222938174.git-patchwork-notify@kernel.org>
+Date: Thu, 11 Dec 2025 09:40:16 +0000
+References: 
+ <SYBPR01MB7881511122BAFEA8212A1608AFA6A@SYBPR01MB7881.ausprd01.prod.outlook.com>
+In-Reply-To: 
+ <SYBPR01MB7881511122BAFEA8212A1608AFA6A@SYBPR01MB7881.ausprd01.prod.outlook.com>
+To: Junrui Luo <moonafterrain@outlook.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, sjur.brandeland@stericsson.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, danisjiang@gmail.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 9 Dec 2025 09:56:39 +0300 you wrote:
-> Set the error code if "transferred != sizeof(cmd)" instead of
-> returning success.
+On Thu, 04 Dec 2025 21:30:47 +0800 you wrote:
+> The cffrml_receive() function extracts a length field from the packet
+> header and, when FCS is disabled, subtracts 2 from this length without
+> validating that len >= 2.
 > 
-> Fixes: dbafc28955fa ("NFC: pn533: don't send USB data off of the stack")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> ---
->  drivers/nfc/pn533/usb.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> If an attacker sends a malicious packet with a length field of 0 or 1
+> to an interface with FCS disabled, the subtraction causes an integer
+> underflow.
+> 
+> [...]
 
 Here is the summary with links:
-  - [net] nfc: pn533: Fix error code in pn533_acr122_poweron_rdr()
-    https://git.kernel.org/netdev/net/c/885bebac9909
+  - caif: fix integer underflow in cffrml_receive()
+    https://git.kernel.org/netdev/net/c/8a11ff0948b5
 
 You are awesome, thank you!
 -- 
