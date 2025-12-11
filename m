@@ -1,83 +1,101 @@
-Return-Path: <netdev+bounces-244321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D703DCB4C2F
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 06:27:54 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 373C1CB4D43
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 06:58:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3A08730111A9
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 05:26:55 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 9AFFC300160F
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 05:58:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89BC220C48A;
-	Thu, 11 Dec 2025 05:26:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T203esBN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C10023D7CE;
+	Thu, 11 Dec 2025 05:58:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com [209.85.161.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B34B17555;
-	Thu, 11 Dec 2025 05:26:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A8A1ACEDE
+	for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 05:58:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765430814; cv=none; b=HbiXdZcdnPXbR5UpKdXNC0V4dl4nT8KTPI0o02y+0UgJJVi/DdnQQHiX4pIuXPEiu/A3nEw/FanNiHE49sCjxn9tHMqJOUwv7oBxKK+kDRcGqthIb93gjCO8CPD3+c7NHozko5ur4o8z8P9sP3PiCAPJAM5wB69SJ5EsL398+cU=
+	t=1765432709; cv=none; b=aF3FkaM9p/i4wJxcoL2HPJvXRgl30r9zVcND1MnZq7zOaeo4OBbVmhrfa+3Wdm/bjgn1Wqo3yAVu9Fm6ra/EF4ADGZSqBKnnWsupa8AfsYYI6K9HZr3quH9dASLIDi0D8XmhRM4jK50M+Xifq8Aryct7YXCi9sGYNzSTMRqJyhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765430814; c=relaxed/simple;
-	bh=JfiVLZzDbMu81FCDfELxXxRKa/eCGvjPeVTUrMNbiJA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ED921cq+ns0lVHdg9MKfQip3/xaPh6MYAr4idPJ+4PQC7kdDzDaBLg8S7uzGQZlqldjpybPNH49Wx4lLoO6JYkuS8UaY+V7vWMlvaP1aJwCYH9i5PaAosS3Tsvm7NHu9hCGdjD2ZBUDBx8lq96e/xVE85iBwj3MIBgYvuh3zF+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T203esBN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D4FAC4CEFB;
-	Thu, 11 Dec 2025 05:26:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765430814;
-	bh=JfiVLZzDbMu81FCDfELxXxRKa/eCGvjPeVTUrMNbiJA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=T203esBNf/aoCuL6CSMYGbTY85xBAx4rKZ+/jAAdMDlQ4st6p72YkgEmyg8LiCGZj
-	 grBWTyZwa5xVr34fEMeSjI72coazpFIBoYAxTVWolvWL61Mxvx4ghoc0AMU+0k6jZA
-	 PPfSmKH65dI+9d8wOOKtQ+jEbJzuROwBp7p6GIes6nEmfPskNa6EDJMS/p27urBF0Q
-	 FdhBtadJKU7rqvYYfZGB2o0byvSTDr8nrt0D3cn/xTxvhcfNtOJebR9NuW+L6LeSNX
-	 ge9QT8WCx9v1a6h/RKA+dS1ibBhhthw2BmCcZxOxeVCtdZUGUd8zcs421lMYfbSbNh
-	 ZQdvDU2CndKKA==
-Date: Thu, 11 Dec 2025 14:26:46 +0900
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Laight <david.laight.linux@gmail.com>
-Cc: Yury Norov <yury.norov@gmail.com>, Rasmus Villemoes
- <linux@rasmusvillemoes.dk>, linux-kernel@vger.kernel.org,
- linux-usb@vger.kernel.org, Geert Uytterhoeven <geert+renesas@glider.be>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>, Jonathan Cameron
- <Jonathan.Cameron@huawei.com>, Crt Mori <cmo@melexis.com>, Richard Genoud
- <richard.genoud@bootlin.com>, Andy Shevchenko
- <andriy.shevchenko@intel.com>, Luo Jie <quic_luoj@quicinc.com>, Peter
- Zijlstra <peterz@infradead.org>, netdev@vger.kernel.org, "David S . Miller"
- <davem@davemloft.net>, Simon Horman <simon.horman@netronome.com>, Mika
- Westerberg <mika.westerberg@linux.intel.com>, Andreas Noever
- <andreas.noever@gmail.com>, Yehezkel Bernat <YehezkelShB@gmail.com>,
- Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
-Subject: Re: [PATCH 8/9] bitfield: Add comment block for the host/fixed
- endian functions
-Message-ID: <20251211142646.17642a46@kernel.org>
-In-Reply-To: <20251210100846.04e59dcf@pumpkin>
-References: <20251209100313.2867-1-david.laight.linux@gmail.com>
-	<20251209100313.2867-9-david.laight.linux@gmail.com>
-	<20251210182300.3fabcf74@kernel.org>
-	<20251210100846.04e59dcf@pumpkin>
+	s=arc-20240116; t=1765432709; c=relaxed/simple;
+	bh=gFzdWncsd05JppMuoS3BbcBpgtgIDjYSDmq6PBPfyP8=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=FWLipYzdrwTh4TJ+6WX8x/jHzPN9FjsfW56LF7ead5NQQcjATyPr4kz9eClngsfzrT6xpXtiCZS+vI0vq7e+qYho7PDqGJespsD81GGf95nTdWI/96zCZKmFgyazJKtJhNZEYGM1sPNm99MhmQZaTyGpcNTyUQc3wIvGWMlgIms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-65b2fb9d54bso974902eaf.1
+        for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 21:58:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765432706; x=1766037506;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=RSmm2sTWzvRWZH89PpDmyRQg9v0RdfilTJvtmUBWWtA=;
+        b=X7pac1f30g3GmZlfVKQprnexwYhWkYuO0y6Ff7OdJDh2nvmM7fvNZb+LLZR6NGFPdB
+         SkvOcuokAsPLtyU3Vmi/sog6Rngno4hi9O1PvGt1gVKU75QDmLB9kg1n2JiaQHW6INU5
+         pz2UiZiC2xRbHjBESTllf5YjgEBCm3QqZPd0RWocm2fNjXGVcTfIdsTlKtNu7hRR0zW/
+         xeNTzojPaNnD1fXy6DXuNKD3oaR3J4rUQypBU54iZSkOi9Xnpl7le7t6NDSS0m3tBZew
+         NwF9tdfAZ0IC7OmT1vw3hYhwV/lhh7gXPliJfAhtfYlX7Gophb2yXLywvha6WJ/ON7Dx
+         LECw==
+X-Forwarded-Encrypted: i=1; AJvYcCWpplMtM+RF9ObRRzkM8qRig8XlhcSGH+ktWLludObTyE9mr3KyRGcaw1/k9FRiI6tOcE7aWUo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyW48/8YvBQy7Z8BnaToVc/eFiADd48hi/5wNBVS2wZnr/vvoTB
+	CfKtXkDonsmuBOKWVS5IPcj0d4eX2tk/dhxg6tpaaOC9SlJ+UQqFobwb0EmvzaUWPeWdhu8/ROF
+	027Wxs3+sIBzAFzVQRK9SKz+b7VC7QNq5RqYSQSnQe/7R+ogsHH3i3X1iLRM=
+X-Google-Smtp-Source: AGHT+IFZMWDWNZLZHlz+wyde2aicwy+2i5rIPRif8BFm7XEwqhgHBK7hpLUMAXTtcB/8+E9PSY9hKDGu0xLpnIVpGZULqwKOhWAD
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a4a:e911:0:b0:659:9a49:8eef with SMTP id
+ 006d021491bc7-65b38259b26mr564591eaf.35.1765432706750; Wed, 10 Dec 2025
+ 21:58:26 -0800 (PST)
+Date: Wed, 10 Dec 2025 21:58:26 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <693a5d82.a70a0220.33cd7b.0025.GAE@google.com>
+Subject: [syzbot] Monthly nfc report (Dec 2025)
+From: syzbot <syzbot+list982a249b1c9936065e88@syzkaller.appspotmail.com>
+To: krzk@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 10 Dec 2025 10:08:46 +0000 David Laight wrote:
-> > possibly also add declarations for these? So that ctags and co. sees
-> > them?  
-> 
-> The functions are bulk-generated using a #define, ctags is never going to
-> find definitions.
+Hello nfc maintainers/developers,
 
-I know. That's why I said declarations. But for code completions etc
-decl is enough.
+This is a 31-day syzbot report for the nfc subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/nfc
+
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 6 issues are still open and 28 have already been fixed.
+
+Some of the still happening issues:
+
+Ref Crashes Repro Title
+<1> 1284    Yes   INFO: task hung in nfc_rfkill_set_block
+                  https://syzkaller.appspot.com/bug?extid=3e3c2f8ca188e30b1427
+<2> 593     Yes   INFO: task hung in rfkill_unregister (3)
+                  https://syzkaller.appspot.com/bug?extid=bb540a4bbfb4ae3b425d
+<3> 163     Yes   KMSAN: uninit-value in nci_ntf_packet (3)
+                  https://syzkaller.appspot.com/bug?extid=3f8fa0edaa75710cd66e
+<4> 105     Yes   INFO: task hung in rfkill_sync_work
+                  https://syzkaller.appspot.com/bug?extid=9ef743bba3a17c756174
+<5> 31      Yes   WARNING in nfc_rfkill_set_block
+                  https://syzkaller.appspot.com/bug?extid=535bbe83dfc3ae8d4be3
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
