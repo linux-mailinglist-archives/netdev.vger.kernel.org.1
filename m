@@ -1,161 +1,238 @@
-Return-Path: <netdev+bounces-244377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35111CB5F0B
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 13:52:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 218A7CB5F30
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 13:53:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F15543011416
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 12:51:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E95FA3051174
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 12:51:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D31BC311975;
-	Thu, 11 Dec 2025 12:51:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50BC63126D3;
+	Thu, 11 Dec 2025 12:51:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b="Yi2YLt1n"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mUQZ70TD"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-op-o15.zoho.com (sender4-op-o15.zoho.com [136.143.188.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 328D1311C3F;
-	Thu, 11 Dec 2025 12:51:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765457481; cv=pass; b=ZwLezT3LIDUL8ag2d+k/x70QtfbD6N+Uuv9jcs4hnpihSMboNxYF/9kd6koMXqJOXbJeUv9PAX7xMak1Mjb4wmmcyvn0tsDwUIF8lFtRh9Jtp6V54fiQiHfv9l87HLvqoFqeoJf3pg7oRL4fVPpA9uIccPxPnWqztBnBodpHe5g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765457481; c=relaxed/simple;
-	bh=UotlDZzTIEzcRItwp42SflKr1dHJl1J/Ncwa96BATk4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HBs6Skc1tp7gkhTYpV2kx02LUe+go/m8L/EHov/XdQAj/xNJn1U19uZZxIhDKySOQFWsd37+qq7sfXxWw55IjYICgnWaJC/xtBFJd3BCMioUU+Xyd0lUpHrpGdh3p6c0Vlcbqk7HJ0as5ApUlHyBJ6sAXRNtbpDfoIxrzu4/eMo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b=Yi2YLt1n; arc=pass smtp.client-ip=136.143.188.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-ARC-Seal: i=1; a=rsa-sha256; t=1765457437; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=kcUtD/eaoviqaIeEsrR41Pduoq1AYAKnqcE8XE5tTSIQ2BemdGq6+txvnCuk9yh4vl3WJaRt/uNMfB8u82hOXuBussErdEy0AvsiywzTxNxHgUSeItYmS66kHAE4O1LsVP/3CbTTnSLSGCD9tCbkAH2/js6lQEj1PK5z5V5blDU=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1765457437; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=ryxLHFOaruqbCroXVXS/PQz42TVjtoAvSN9FkkJhb2k=; 
-	b=DvjyhwkYHECpZJLpa1F0MAGLRbCrrlAb9s8hIp6O3rnEyylRjetkLg8YyeQ3+ABzuM2OUS3JMyABzjoAcT2r1l49Ma5l3oepEaVz88tjpFk62O4fjFkdpav54jqKz6simuav5JfwyGT15Kz+ZVIw2zHecAilKCcFNZloCKa/4fU=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=nicolas.frattaroli@collabora.com;
-	dmarc=pass header.from=<nicolas.frattaroli@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1765457437;
-	s=zohomail; d=collabora.com; i=nicolas.frattaroli@collabora.com;
-	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Content-Type:Message-Id:Reply-To;
-	bh=ryxLHFOaruqbCroXVXS/PQz42TVjtoAvSN9FkkJhb2k=;
-	b=Yi2YLt1nywJfWQOx3Algyky823qQUp++N19UqlKMP7wtPENx8V1d63Y+8YtYnGJK
-	GyESIJA/hGLJJqq0Aam3aJ23zt2i4LmmJwb5ZLeRdux5rLJMAxBTQ8N+dronk+AaJDq
-	bkgbIwXvA5VznufdLTB1nOs8K7iPBHQv+v/UdXoo=
-Received: by mx.zohomail.com with SMTPS id 1765457436311561.4113907322494;
-	Thu, 11 Dec 2025 04:50:36 -0800 (PST)
-From: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
-To: David Laight <david.laight.linux@gmail.com>
-Cc: Yury Norov <yury.norov@gmail.com>,
- Rasmus Villemoes <linux@rasmusvillemoes.dk>, linux-kernel@vger.kernel.org,
- linux-usb@vger.kernel.org, Geert Uytterhoeven <geert+renesas@glider.be>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>, Crt Mori <cmo@melexis.com>,
- Richard Genoud <richard.genoud@bootlin.com>,
- Andy Shevchenko <andriy.shevchenko@intel.com>,
- Luo Jie <quic_luoj@quicinc.com>, Peter Zijlstra <peterz@infradead.org>,
- Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
- "David S . Miller" <davem@davemloft.net>,
- Simon Horman <simon.horman@netronome.com>,
- Mika Westerberg <mika.westerberg@linux.intel.com>,
- Andreas Noever <andreas.noever@gmail.com>,
- Yehezkel Bernat <YehezkelShB@gmail.com>
-Subject:
- Re: [PATCH 3/9] bitmap: Use FIELD_PREP() in expansion of FIELD_PREP_WM16()
-Date: Thu, 11 Dec 2025 13:50:28 +0100
-Message-ID: <6719438.lOV4Wx5bFT@workhorse>
-In-Reply-To: <20251210205915.3b055b7c@pumpkin>
-References:
- <20251209100313.2867-1-david.laight.linux@gmail.com>
- <2262600.PYKUYFuaPT@workhorse> <20251210205915.3b055b7c@pumpkin>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 516B12F693A
+	for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 12:51:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765457514; cv=none; b=Th9Pmv02fXyGDz95nuyIhB0HILGG/vwJldF/naGPlKKgP9KATdc3W6XvFXAn6ah0fB8aN9ODGbVIvkvvFu1aYL8ggtZbt7k7Hx3Bdm8yzGp94YdeiA1PmElTF9/OxFulos7hcRsJdQGHf5FXK16owT5t0eh6dCVhBG0pNZJ0Ddo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765457514; c=relaxed/simple;
+	bh=UtcSCFo4lcJ+VNXPCswEjoKkIm8zmXXMCuHRDIRT/lI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=FIC5Te0UL/QlXm0WG7ucAlKfapZG3TgfyuYHmCkgQA7msTlSAS1smIzFW1fZnOvRIRkKkzS+te/XJ9FqRn0lPph/6I4pkSHnGzOJKReha+G0FBPAN+XcHDiD4QJBRboU6jth0WxDKdrmoKgNiFSm5J0jQQ0nIH+n/XJ9+zuTowQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mUQZ70TD; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-37b99da107cso442061fa.1
+        for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 04:51:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765457510; x=1766062310; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wUQdXYP6pOfCpe/+KEFALT6gCZMNZ8lZXJxhEyfJhoM=;
+        b=mUQZ70TDbzSE6P9Yp2X6KM+lzKckPoibpuwRUja1cL7UzmYLBgEkY2SpALi8wFH2XA
+         ckxcqQMMpprRfhVuRXJp/f0IJ5Usm+GKv3FnQVIF7KHCYPzGbi6ZJABG9XMpFfKMHe8O
+         /kNPTiR7PW41LktFROiFsa8fnvKEpNQX+BFLwsNXM0fFL7Q9U7RPEWTyxncYSCExMZmE
+         HOpFTKwc+BK+5dO+1+YzW9dQCQsanpkJ/JjOT4RwBcz07WLlmGiw+Ewgmviz6RQpeJhV
+         94CKsBLHP+eJe1us9ZXOrjuRfedpxBFUwbtQPGzZybpfpymYq992xPOFrpw3KYiI9N4v
+         6ouA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765457510; x=1766062310;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wUQdXYP6pOfCpe/+KEFALT6gCZMNZ8lZXJxhEyfJhoM=;
+        b=mTr3EF6y203pJFSRFlwQS8FJ1C83KoJfV+GJ/UgRio79rnFmE1eME9bjcK0RPccKL1
+         G474sv//BBxBIbBgvFFtMLvZqryO9BzeqzzcaJTF9EqsXCHlBkdMDV2VJjDh0s4dvV47
+         XanAAowMHMFRHr9AzMiPVR07WSElT+vN6CRgdARLPBwktbGMdHwmLHpsbirKAAH6eIjc
+         KyVQ8dGQIMxj9J2qPLBSD6ZVwHjD4XaQMkaedcU3mRy6Wol1tW5AuHn+tRhmsaZ4TdpM
+         MzixuB/bWAIMh1jwXm9UV3Zd7/ba4BMGZjwqTZ/9QQb6x1gtBwsuT0N+2JXJaaHCWx5L
+         q1+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWeP0kYsXQfiVwIQFnVxxBc7mjClB2mGGYEfpGkXvQl2G1aVsI+SKTONal8Zafqh0h8ZYO/8Gc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwkpOwT+UE2LGoqMQs8reIZTiPDVrX/S2xIefPRql3gPW7dKS7d
+	jqFr2OUsgEg89mgjXhO50AOm2OYCTyEI6IOBYQO7Pehtl2AaRSL1LExF
+X-Gm-Gg: AY/fxX7+VDKSEK/gMUHFxxF7HiLYPVKMWBY+t8n6e2wQVw991BAWV1uwkpt61K9rWA6
+	uxqA1ezvb0NDeeH8xmaTaNVxX2CDqzwXmSwDygbQSnBEcRDPoYz+VjHmJlsCH0t7dVG6luBJOI8
+	ObPakilRk+RxfHSsAE1aaatKWRpUU8bkCJ4rBYGoBfHfT4RC6pU4QD83xuH1h6E4dp1emlFH4OB
+	pO6+26hhUf5VOusOuBQfqqUiXZKaqPAXaCncOTDKZXtLCKqZBjsSkNw5p6/fT/ld3UitymeaUMp
+	FO53n/WcevppX9CvS+AEi/CalHTpwr5jhf2UOzIjpsF6hexIlnbPXdrdOdG8IIqHSpkDmHofc6W
+	wXK2FhQ9lWXzbDp/jvZaf2xbefU/zvQ34JgVrHyKkiOjVgl3drDjijQG8jD0lErsawuFBt5ZOdz
+	HEeV0c1wm27tc=
+X-Google-Smtp-Source: AGHT+IGENgtK1gusynnKiA94NWiQgv3EAxKkdXwr/sY+k3BPHQ54cU7oSPuV1/QDYEzaMtvI1s0nZQ==
+X-Received: by 2002:a05:6512:2316:b0:595:81ce:ff83 with SMTP id 2adb3069b0e04-598ee527456mr2125540e87.25.1765457508314;
+        Thu, 11 Dec 2025 04:51:48 -0800 (PST)
+Received: from Ubuntu-2204-jammy-amd64-base.. ([2a01:4f9:6a:4e9f::2])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-598f2f379d4sm835021e87.21.2025.12.11.04.51.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Dec 2025 04:51:47 -0800 (PST)
+From: Melbin K Mathew <mlbnkm1@gmail.com>
+To: stefanha@redhat.com,
+	sgarzare@redhat.com
+Cc: kvm@vger.kernel.org,
+	netdev@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	mst@redhat.com,
+	jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	Melbin K Mathew <mlbnkm1@gmail.com>
+Subject: [PATCH net v3] vsock/virtio: cap TX credit to local buffer size
+Date: Thu, 11 Dec 2025 13:51:04 +0100
+Message-Id: <20251211125104.375020-1-mlbnkm1@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wednesday, 10 December 2025 21:59:15 Central European Standard Time David Laight wrote:
-> On Wed, 10 Dec 2025 20:18:30 +0100
-> Nicolas Frattaroli <nicolas.frattaroli@collabora.com> wrote:
-> 
-> > On Tuesday, 9 December 2025 11:03:07 Central European Standard Time david.laight.linux@gmail.com wrote:
-> > > From: David Laight <david.laight.linux@gmail.com>
-> > > 
-> > > Instead of directly expanding __BF_FIELD_CHECK() (which really ought
-> > > not be used outside bitfield) and open-coding the generation of the
-> > > masked value, just call FIELD_PREP() and add an extra check for
-> > > the mask being at most 16 bits.
-> > > 
-> > > Signed-off-by: David Laight <david.laight.linux@gmail.com>
-> > > ---
-> > >  include/linux/hw_bitfield.h | 17 ++++++++---------
-> > >  1 file changed, 8 insertions(+), 9 deletions(-)
-> > > 
-> > > diff --git a/include/linux/hw_bitfield.h b/include/linux/hw_bitfield.h
-> > > index df202e167ce4..d7f21b60449b 100644
-> > > --- a/include/linux/hw_bitfield.h
-> > > +++ b/include/linux/hw_bitfield.h
-> > > @@ -23,15 +23,14 @@
-> > >   * register, a bit in the lower half is only updated if the corresponding bit
-> > >   * in the upper half is high.
-> > >   */
-> > > -#define FIELD_PREP_WM16(_mask, _val)					     \
-> > > -	({								     \
-> > > -		typeof(_val) __val = _val;				     \
-> > > -		typeof(_mask) __mask = _mask;				     \
-> > > -		__BF_FIELD_CHECK(__mask, ((u16)0U), __val,		     \
-> > > -				 "HWORD_UPDATE: ");			     \
-> > > -		(((typeof(__mask))(__val) << __bf_shf(__mask)) & (__mask)) | \
-> > > -		((__mask) << 16);					     \
-> > > -	})
-> > > +#define FIELD_PREP_WM16(mask, val)				\
-> > > +({								\
-> > > +	__auto_type _mask = mask;				\
-> > > +	u32 _val = FIELD_PREP(_mask, val);			\
-> > > +	BUILD_BUG_ON_MSG(_mask > 0xffffu,			\
-> > > +			 "FIELD_PREP_WM16: mask too large");	\
-> > > +	_val | (_mask << 16);					\
-> > > +})
-> > >  
-> > >  /**
-> > >   * FIELD_PREP_WM16_CONST() - prepare a constant bitfield element with a mask in
-> > >   
-> > 
-> > This breaks the build for at least one driver that uses
-> > FIELD_PREP_WM16, namely phy-rockchip-emmc.c:
-> 
-> Not in my allmodconfig build.
-> ... 
-> > pcie-dw-rockchip.c is similarly broken by this change, except
-> > without the superfluous wrapper:
-> 
-> That one did get built.
+The virtio vsock transport currently derives its TX credit directly from
+peer_buf_alloc, which is populated from the remote endpoint's
+SO_VM_SOCKETS_BUFFER_SIZE value.
 
-I build with clang 21.1.6 for arm64, in case that's any help.
-I don't see how pcie-dw-rockchip.c built for you if FIELD_PREP
-and FIELD_PREP_WM16 have conflicting symbol names?
+On the host side, this means the amount of data we are willing to queue
+for a given connection is scaled purely by a peer-chosen value, rather
+than by the host's own vsock buffer configuration. A guest that
+advertises a very large buffer and reads slowly can cause the host to
+allocate a correspondingly large amount of sk_buff memory for that
+connection.
 
-> 
-> The problem is that FIELD_PREP_WM16() needs to use different 'local'
-> variables than FIELD_PREP().
-> The 'proper' fix is to use unique names (as min() and max() do), but that
-> makes the whole thing unreadable and is best avoided unless nesting is
-> likely.
-> In this case s/mask/wm16_mask/ and s/val/wm16_val/ might be best.
-> 
-> 	David
-> 
-> 
+In practice, a malicious guest can:
 
+  - set a large AF_VSOCK buffer size (e.g. 2 GiB) with
+    SO_VM_SOCKETS_BUFFER_MAX_SIZE / SO_VM_SOCKETS_BUFFER_SIZE, and
 
+  - open multiple connections to a host vsock service that sends data
+    while the guest drains slowly.
 
+On an unconstrained host this can drive Slab/SUnreclaim into the tens of
+GiB range, causing allocation failures and OOM kills in unrelated host
+processes while the offending VM remains running.
+
+On non-virtio transports and compatibility:
+
+  - VMCI uses the AF_VSOCK buffer knobs to size its queue pairs per
+    socket based on the local vsk->buffer_* values; the remote side
+    can’t enlarge those queues beyond what the local endpoint
+    configured.
+
+  - Hyper-V’s vsock transport uses fixed-size VMBus ring buffers and
+    an MTU bound; there is no peer-controlled credit field comparable
+    to peer_buf_alloc, and the remote endpoint can’t drive in-flight
+    kernel memory above those ring sizes.
+
+  - The loopback path reuses virtio_transport_common.c, so it
+    naturally follows the same semantics as the virtio transport.
+
+Make virtio-vsock consistent with that model by intersecting the peer’s
+advertised receive window with the local vsock buffer size when
+computing TX credit. We introduce a small helper and use it in
+virtio_transport_get_credit(), virtio_transport_has_space() and
+virtio_transport_seqpacket_enqueue(), so that:
+
+    effective_tx_window = min(peer_buf_alloc, buf_alloc)
+
+This prevents a remote endpoint from forcing us to queue more data than
+our own configuration allows, while preserving the existing credit
+semantics and keeping virtio-vsock compatible with the other transports.
+
+On an unpatched Ubuntu 22.04 host (~64 GiB RAM), running a PoC with
+32 guest vsock connections advertising 2 GiB each and reading slowly
+drove Slab/SUnreclaim from ~0.5 GiB to ~57 GiB and the system only
+recovered after killing the QEMU process.
+
+With this patch applied, rerunning the same PoC yields:
+
+  Before:
+    MemFree:        ~61.6 GiB
+    MemAvailable:   ~62.3 GiB
+    Slab:           ~142 MiB
+    SUnreclaim:     ~117 MiB
+
+  After 32 high-credit connections:
+    MemFree:        ~61.5 GiB
+    MemAvailable:   ~62.3 GiB
+    Slab:           ~178 MiB
+    SUnreclaim:     ~152 MiB
+
+i.e. only ~35 MiB increase in Slab/SUnreclaim, no host OOM, and the
+guest remains responsive.
+
+Fixes: 06a8fc78367d ("VSOCK: Introduce virtio_vsock_common.ko")
+Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Melbin K Mathew <mlbnkm1@gmail.com>
+---
+ net/vmw_vsock/virtio_transport_common.c | 27 ++++++++++++++++++++++---
+ 1 file changed, 24 insertions(+), 3 deletions(-)
+
+diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+index dcc8a1d58..02eeb96dd 100644
+--- a/net/vmw_vsock/virtio_transport_common.c
++++ b/net/vmw_vsock/virtio_transport_common.c
+@@ -491,6 +491,25 @@ void virtio_transport_consume_skb_sent(struct sk_buff *skb, bool consume)
+ }
+ EXPORT_SYMBOL_GPL(virtio_transport_consume_skb_sent);
+ 
++/* Return the effective peer buffer size for TX credit computation.
++ *
++ * The peer advertises its receive buffer via peer_buf_alloc, but we
++ * cap that to our local buf_alloc (derived from
++ * SO_VM_SOCKETS_BUFFER_SIZE and already clamped to buffer_max_size)
++ * so that a remote endpoint cannot force us to queue more data than
++ * our own configuration allows.
++ */
++static u32 virtio_transport_tx_buf_alloc(struct virtio_vsock_sock *vvs)
++{
++	return min(vvs->peer_buf_alloc, vvs->buf_alloc);
++}
++
+ u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 credit)
+ {
+ 	u32 ret;
+@@ -499,7 +518,8 @@ u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 credit)
+ 		return 0;
+ 
+ 	spin_lock_bh(&vvs->tx_lock);
+-	ret = vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
++	ret = virtio_transport_tx_buf_alloc(vvs) -
++		(vvs->tx_cnt - vvs->peer_fwd_cnt);
+ 	if (ret > credit)
+ 		ret = credit;
+ 	vvs->tx_cnt += ret;
+@@ -831,7 +851,7 @@ virtio_transport_seqpacket_enqueue(struct vsock_sock *vsk,
+ 
+ 	spin_lock_bh(&vvs->tx_lock);
+ 
+-	if (len > vvs->peer_buf_alloc) {
++	if (len > virtio_transport_tx_buf_alloc(vvs)) {
+ 		spin_unlock_bh(&vvs->tx_lock);
+ 		return -EMSGSIZE;
+ 	}
+@@ -882,7 +902,8 @@ static s64 virtio_transport_has_space(struct vsock_sock *vsk)
+ 	struct virtio_vsock_sock *vvs = vsk->trans;
+ 	s64 bytes;
+ 
+-	bytes = (s64)vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
++	bytes = (s64)virtio_transport_tx_buf_alloc(vvs) -
++		(vvs->tx_cnt - vvs->peer_fwd_cnt);
+ 	if (bytes < 0)
+ 		bytes = 0;
+ 
+-- 
+2.34.1
 
 
