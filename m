@@ -1,175 +1,161 @@
-Return-Path: <netdev+bounces-244376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 859A3CB5B2E
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 12:50:37 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35111CB5F0B
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 13:52:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id D2D233002887
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 11:50:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F15543011416
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 12:51:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9DB930AABE;
-	Thu, 11 Dec 2025 11:50:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D31BC311975;
+	Thu, 11 Dec 2025 12:51:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N7K3yd3I";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="GHZNTGFN"
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b="Yi2YLt1n"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from sender4-op-o15.zoho.com (sender4-op-o15.zoho.com [136.143.188.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06CC830ACF6
-	for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 11:50:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765453834; cv=none; b=VXYv159SJPHX7p2FKV57xM2B1hZM4c1Uc6YJ0T6LO52kk0qaggmLtSlYef2QPnefr5Inae50ENTde0VtcBcM5gKMjAqi/dTtBzrQ+Vwh2412Jn57aJubBJlrKyAwo+mbMNdcMI/1zlDOKZUmQ4taq/atFC4t83Bdv8T2XEK+v5A=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765453834; c=relaxed/simple;
-	bh=Z+rgsSAEV9BsjDbs+xucaGUbyRMZlkyJALVOsnQMMAU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HY3c3ZBEAPPcVA3YTlSjImRnb0H3kagkzbmlFJdVAB4lwURUn6Vyg+H7q99DNn5A8lToty/DMRp0cukpMMB1Xv95QO2H0gBb9K37wbAOP31eoNQPXElLs+VPtF3PWR5k5JsjUa7fs9j2JpmA81d1CzyGT9tbJppk5Y/sWD8dgaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N7K3yd3I; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=GHZNTGFN; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765453832;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=PR7iEiYSjl9ZrPAUcGL5OXxyDi9qkZ3ly52QHdC09rU=;
-	b=N7K3yd3IYEQ7yHiPjKBmf/CJmma3+SWfl6wPczb6dS2tT0xP/6WLsp/FmaSvKjBQbjAUad
-	eyhAHLj0lt1sXXV6ODVwwD7lOYx3ntWwqz7Yrgc02LZcxrtWtCfTBdu5s6gp2MLD0UvtnD
-	FOQi62DC7+kO9f/bkHgm8gmNLyQCvT4=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-110-CBV37ctAN-WHcsP5yFqPoA-1; Thu, 11 Dec 2025 06:50:30 -0500
-X-MC-Unique: CBV37ctAN-WHcsP5yFqPoA-1
-X-Mimecast-MFC-AGG-ID: CBV37ctAN-WHcsP5yFqPoA_1765453829
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b70b974b818so58950866b.1
-        for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 03:50:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1765453829; x=1766058629; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PR7iEiYSjl9ZrPAUcGL5OXxyDi9qkZ3ly52QHdC09rU=;
-        b=GHZNTGFN1DEmdnd5IkV3v6Tk4Z+5cgY/RIodzRFqxhz9QPIlfOx5igDj4geGVicJw+
-         125dC66p4snE1CBgnS+t/R11R4rV5y32qZzecRFqzZDnQy+h1XeCLWfKUSasiDkifMJ0
-         Z8DkFeTnfKXkoqJooKdA/zd524cZ3/KRKptAKIEvTfO17tloP+uGIfrwELs36b39CjU5
-         eh6v6B/TwMwo16Z+VHTwPbjCua+H9vMczv21L6eqeJtFiClGq+tjUyN3qYoLaJWeiNpo
-         a3t/KleXjn9zeVES2eSD+xR2FGO4oD+8a2nLK727FB0QeO3dRyw8pQyWyZJBqxGqrHcU
-         5yVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765453829; x=1766058629;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PR7iEiYSjl9ZrPAUcGL5OXxyDi9qkZ3ly52QHdC09rU=;
-        b=dOAZULpy8F5O0NEiTO4OCSpU5+r+mKY7a5f/o4M7FbGMl6jp3ChZwuGkWUa9uNgMzI
-         aMyhx53+bJRROtmUBAftWNQNeFAZjwhZ6yd7oi74JsxQe9nvD/kWSlreu0NXS05AO9mo
-         5LvlLakcSNGxgkvoMHTiUCLMh3FFEholcv02J3gzHXLEQxf278tlBhRsl+UV4e2fCSZI
-         RDtiunDKLRDiNy6nWsUKCmtVu2m3nXWm9+fiMnvlJHvfFj/iIDECt5RG5AMUz7iXbr+n
-         Fl07lWSss50tYR9Qehvr22X2XvmtOL1H2FyOEnxuKtD9xbYyCPmnxPt6fZMYDHFb71DG
-         1xaQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUaln8ccvciPnwPcrYNH1XuaqRc18hh3GlC1BIqpx4Zi+MXOv8pCj74mUz5LjwZoIiJD2Gocp8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwiMCdwDWQ6Z/a44oMmWdMM5NmkOd7q2V6YuImHd/CzSBIiYo3b
-	1TnoFOVJoqCk/2LCHgtsHGt0dWA8FZO+71kFOeHyX6k/5coyb+wgi+gsQ1pNyzTKWD2ScbkGs+d
-	uNba6OoFQYqcaeCv7NDdtvbGW/ERDlLZIWbkQb8P3+M0mYqGzUWNhccMOMw==
-X-Gm-Gg: AY/fxX6ZuPw8z5O9EjJi5OToXl6WEbU4Rz3BVL6iCuH60se1H5UGdCUF2KiESPeoMqH
-	RFqFoaUExsR8SZ7iX6Q2A9ML3HcCWcof5Xb+vC7IGK+sJtJQzNPVTFX5vGerogMPYUb+ovvx2yA
-	NU7LCgqPFWjQq0l9cBbrRHrvpi6letkwr6rAM75DNeYsc1o1ZPCnErbBgOx3FmZB/MKi7Ee9UeZ
-	v4LrcVqMD1uQeWDbiGO236QGmgMskxhGF1iuVl4PZ+nlzPACorN6d3PInzCHZBUKBazdCkT6jrL
-	+DCPJSNm1nt7sfKo2qOlTDBY2eP7T8JIFzu0vPinbj8DjtCtqRYAyi0IY7OBk/6s6PDl71j27nm
-	o0z9fAlWTB0eCtIba8zaptiA9ihfJZP7tUoEQ
-X-Received: by 2002:a17:907:c22:b0:b70:aa96:6023 with SMTP id a640c23a62f3a-b7ce8357f13mr615894666b.24.1765453829317;
-        Thu, 11 Dec 2025 03:50:29 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFTpdh1ilYIMzAcUMWCxAHOJWluUexnVRm3sq63DN2fy/28cAx7yEGBnAD7+MpsuHrz7095vQ==
-X-Received: by 2002:a17:907:c22:b0:b70:aa96:6023 with SMTP id a640c23a62f3a-b7ce8357f13mr615892166b.24.1765453828912;
-        Thu, 11 Dec 2025 03:50:28 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7cfa29beb7sm251624366b.11.2025.12.11.03.50.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Dec 2025 03:50:28 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id A910C3CF601; Thu, 11 Dec 2025 12:50:27 +0100 (CET)
-From: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Aaron Conole <aconole@redhat.com>,
-	Eelco Chaudron <echaudro@redhat.com>,
-	Ilya Maximets <i.maximets@ovn.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Jesse Gross <jesse@nicira.com>
-Cc: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	Adrian Moreno <amorenoz@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	dev@openvswitch.org
-Subject: [PATCH v2] net: openvswitch: Avoid needlessly taking the RTNL on vport destroy
-Date: Thu, 11 Dec 2025 12:50:05 +0100
-Message-ID: <20251211115006.228876-1-toke@redhat.com>
-X-Mailer: git-send-email 2.52.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 328D1311C3F;
+	Thu, 11 Dec 2025 12:51:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765457481; cv=pass; b=ZwLezT3LIDUL8ag2d+k/x70QtfbD6N+Uuv9jcs4hnpihSMboNxYF/9kd6koMXqJOXbJeUv9PAX7xMak1Mjb4wmmcyvn0tsDwUIF8lFtRh9Jtp6V54fiQiHfv9l87HLvqoFqeoJf3pg7oRL4fVPpA9uIccPxPnWqztBnBodpHe5g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765457481; c=relaxed/simple;
+	bh=UotlDZzTIEzcRItwp42SflKr1dHJl1J/Ncwa96BATk4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HBs6Skc1tp7gkhTYpV2kx02LUe+go/m8L/EHov/XdQAj/xNJn1U19uZZxIhDKySOQFWsd37+qq7sfXxWw55IjYICgnWaJC/xtBFJd3BCMioUU+Xyd0lUpHrpGdh3p6c0Vlcbqk7HJ0as5ApUlHyBJ6sAXRNtbpDfoIxrzu4/eMo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b=Yi2YLt1n; arc=pass smtp.client-ip=136.143.188.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+ARC-Seal: i=1; a=rsa-sha256; t=1765457437; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=kcUtD/eaoviqaIeEsrR41Pduoq1AYAKnqcE8XE5tTSIQ2BemdGq6+txvnCuk9yh4vl3WJaRt/uNMfB8u82hOXuBussErdEy0AvsiywzTxNxHgUSeItYmS66kHAE4O1LsVP/3CbTTnSLSGCD9tCbkAH2/js6lQEj1PK5z5V5blDU=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1765457437; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=ryxLHFOaruqbCroXVXS/PQz42TVjtoAvSN9FkkJhb2k=; 
+	b=DvjyhwkYHECpZJLpa1F0MAGLRbCrrlAb9s8hIp6O3rnEyylRjetkLg8YyeQ3+ABzuM2OUS3JMyABzjoAcT2r1l49Ma5l3oepEaVz88tjpFk62O4fjFkdpav54jqKz6simuav5JfwyGT15Kz+ZVIw2zHecAilKCcFNZloCKa/4fU=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=nicolas.frattaroli@collabora.com;
+	dmarc=pass header.from=<nicolas.frattaroli@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1765457437;
+	s=zohomail; d=collabora.com; i=nicolas.frattaroli@collabora.com;
+	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Content-Type:Message-Id:Reply-To;
+	bh=ryxLHFOaruqbCroXVXS/PQz42TVjtoAvSN9FkkJhb2k=;
+	b=Yi2YLt1nywJfWQOx3Algyky823qQUp++N19UqlKMP7wtPENx8V1d63Y+8YtYnGJK
+	GyESIJA/hGLJJqq0Aam3aJ23zt2i4LmmJwb5ZLeRdux5rLJMAxBTQ8N+dronk+AaJDq
+	bkgbIwXvA5VznufdLTB1nOs8K7iPBHQv+v/UdXoo=
+Received: by mx.zohomail.com with SMTPS id 1765457436311561.4113907322494;
+	Thu, 11 Dec 2025 04:50:36 -0800 (PST)
+From: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+To: David Laight <david.laight.linux@gmail.com>
+Cc: Yury Norov <yury.norov@gmail.com>,
+ Rasmus Villemoes <linux@rasmusvillemoes.dk>, linux-kernel@vger.kernel.org,
+ linux-usb@vger.kernel.org, Geert Uytterhoeven <geert+renesas@glider.be>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>, Crt Mori <cmo@melexis.com>,
+ Richard Genoud <richard.genoud@bootlin.com>,
+ Andy Shevchenko <andriy.shevchenko@intel.com>,
+ Luo Jie <quic_luoj@quicinc.com>, Peter Zijlstra <peterz@infradead.org>,
+ Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+ "David S . Miller" <davem@davemloft.net>,
+ Simon Horman <simon.horman@netronome.com>,
+ Mika Westerberg <mika.westerberg@linux.intel.com>,
+ Andreas Noever <andreas.noever@gmail.com>,
+ Yehezkel Bernat <YehezkelShB@gmail.com>
+Subject:
+ Re: [PATCH 3/9] bitmap: Use FIELD_PREP() in expansion of FIELD_PREP_WM16()
+Date: Thu, 11 Dec 2025 13:50:28 +0100
+Message-ID: <6719438.lOV4Wx5bFT@workhorse>
+In-Reply-To: <20251210205915.3b055b7c@pumpkin>
+References:
+ <20251209100313.2867-1-david.laight.linux@gmail.com>
+ <2262600.PYKUYFuaPT@workhorse> <20251210205915.3b055b7c@pumpkin>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"
 
-The openvswitch teardown code will immediately call
-ovs_netdev_detach_dev() in response to a NETDEV_UNREGISTER notification.
-It will then start the dp_notify_work workqueue, which will later end up
-calling the vport destroy() callback. This callback takes the RTNL to do
-another ovs_netdev_detach_port(), which in this case is unnecessary.
-This causes extra pressure on the RTNL, in some cases leading to
-"unregister_netdevice: waiting for XX to become free" warnings on
-teardown.
+On Wednesday, 10 December 2025 21:59:15 Central European Standard Time David Laight wrote:
+> On Wed, 10 Dec 2025 20:18:30 +0100
+> Nicolas Frattaroli <nicolas.frattaroli@collabora.com> wrote:
+> 
+> > On Tuesday, 9 December 2025 11:03:07 Central European Standard Time david.laight.linux@gmail.com wrote:
+> > > From: David Laight <david.laight.linux@gmail.com>
+> > > 
+> > > Instead of directly expanding __BF_FIELD_CHECK() (which really ought
+> > > not be used outside bitfield) and open-coding the generation of the
+> > > masked value, just call FIELD_PREP() and add an extra check for
+> > > the mask being at most 16 bits.
+> > > 
+> > > Signed-off-by: David Laight <david.laight.linux@gmail.com>
+> > > ---
+> > >  include/linux/hw_bitfield.h | 17 ++++++++---------
+> > >  1 file changed, 8 insertions(+), 9 deletions(-)
+> > > 
+> > > diff --git a/include/linux/hw_bitfield.h b/include/linux/hw_bitfield.h
+> > > index df202e167ce4..d7f21b60449b 100644
+> > > --- a/include/linux/hw_bitfield.h
+> > > +++ b/include/linux/hw_bitfield.h
+> > > @@ -23,15 +23,14 @@
+> > >   * register, a bit in the lower half is only updated if the corresponding bit
+> > >   * in the upper half is high.
+> > >   */
+> > > -#define FIELD_PREP_WM16(_mask, _val)					     \
+> > > -	({								     \
+> > > -		typeof(_val) __val = _val;				     \
+> > > -		typeof(_mask) __mask = _mask;				     \
+> > > -		__BF_FIELD_CHECK(__mask, ((u16)0U), __val,		     \
+> > > -				 "HWORD_UPDATE: ");			     \
+> > > -		(((typeof(__mask))(__val) << __bf_shf(__mask)) & (__mask)) | \
+> > > -		((__mask) << 16);					     \
+> > > -	})
+> > > +#define FIELD_PREP_WM16(mask, val)				\
+> > > +({								\
+> > > +	__auto_type _mask = mask;				\
+> > > +	u32 _val = FIELD_PREP(_mask, val);			\
+> > > +	BUILD_BUG_ON_MSG(_mask > 0xffffu,			\
+> > > +			 "FIELD_PREP_WM16: mask too large");	\
+> > > +	_val | (_mask << 16);					\
+> > > +})
+> > >  
+> > >  /**
+> > >   * FIELD_PREP_WM16_CONST() - prepare a constant bitfield element with a mask in
+> > >   
+> > 
+> > This breaks the build for at least one driver that uses
+> > FIELD_PREP_WM16, namely phy-rockchip-emmc.c:
+> 
+> Not in my allmodconfig build.
+> ... 
+> > pcie-dw-rockchip.c is similarly broken by this change, except
+> > without the superfluous wrapper:
+> 
+> That one did get built.
 
-We can straight-forwardly avoid the extra RTNL lock acquisition by
-checking the device flags before taking the lock, and skip the locking
-altogether if the IFF_OVS_DATAPATH flag has already been unset.
+I build with clang 21.1.6 for arm64, in case that's any help.
+I don't see how pcie-dw-rockchip.c built for you if FIELD_PREP
+and FIELD_PREP_WM16 have conflicting symbol names?
 
-Fixes: b07c26511e94 ("openvswitch: fix vport-netdev unregister")
-Tested-by: Adrian Moreno <amorenoz@redhat.com>
-Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
----
-v2:
-- Expand comments explaining the logic
+> 
+> The problem is that FIELD_PREP_WM16() needs to use different 'local'
+> variables than FIELD_PREP().
+> The 'proper' fix is to use unique names (as min() and max() do), but that
+> makes the whole thing unreadable and is best avoided unless nesting is
+> likely.
+> In this case s/mask/wm16_mask/ and s/val/wm16_val/ might be best.
+> 
+> 	David
+> 
+> 
 
- net/openvswitch/vport-netdev.c | 17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
 
-diff --git a/net/openvswitch/vport-netdev.c b/net/openvswitch/vport-netdev.c
-index 91a11067e458..6574f9bcdc02 100644
---- a/net/openvswitch/vport-netdev.c
-+++ b/net/openvswitch/vport-netdev.c
-@@ -160,10 +160,19 @@ void ovs_netdev_detach_dev(struct vport *vport)
- 
- static void netdev_destroy(struct vport *vport)
- {
--	rtnl_lock();
--	if (netif_is_ovs_port(vport->dev))
--		ovs_netdev_detach_dev(vport);
--	rtnl_unlock();
-+	/* When called from ovs_db_notify_wq() after a dp_device_event(), the
-+	 * port has already been detached, so we can avoid taking the RTNL by
-+	 * checking this first.
-+	 */
-+	if (netif_is_ovs_port(vport->dev)) {
-+		rtnl_lock();
-+		/* Check again while holding the lock to ensure we don't race
-+		 * with the netdev notifier and detach twice.
-+		 */
-+		if (netif_is_ovs_port(vport->dev))
-+			ovs_netdev_detach_dev(vport);
-+		rtnl_unlock();
-+	}
- 
- 	call_rcu(&vport->rcu, vport_netdev_free);
- }
--- 
-2.52.0
+
 
 
