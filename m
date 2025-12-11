@@ -1,228 +1,99 @@
-Return-Path: <netdev+bounces-244314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D931DCB4820
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 03:08:33 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 836B4CB490F
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 03:39:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 2640A3008187
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 02:08:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 734463019343
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 02:39:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1044F296BDF;
-	Thu, 11 Dec 2025 02:08:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F5992BE7D1;
+	Thu, 11 Dec 2025 02:39:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="E4sIzcfr"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="kcSkgsaJ";
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="kcSkgsaJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013045.outbound.protection.outlook.com [40.107.159.45])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F205F21578F;
-	Thu, 11 Dec 2025 02:08:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765418909; cv=fail; b=UiTRN3rQ9c4ScjSDxbqIPDpE8zXfSMsE4ITQ2uEYlv8zswUr3dFhs++4ovoIuf1Ss2Ua5JdcRg6OmpVpWbldU6BHnAxVMIcP2BG7QxyrCHM7XOmvuTP0/m4Vq7PxWLkx9+APEDSoqyrkM6x7Y5Umwb/ipzT2oV/7gsHgKglwEFg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765418909; c=relaxed/simple;
-	bh=MVSK+TK17vn4e5tIexLG+WhW5E7RnoeuHXCC6kotSS0=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=Z3UkC1IHfvaq+U7KJXjz4kfpm3WuWf8hglDtbvl9ZJktHXdRfIlYPHXSOHDD1hDaKFqg9immCKCjm99Optzqlpzae7EIROphEh9bUS88d2q2gm8nzXWZcRexgpIeqLbAgD/uuowquV1cmQpwSDay+V6ObPoUTsY6H9oVRbc8hGk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=E4sIzcfr; arc=fail smtp.client-ip=40.107.159.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NgAIrzwWMz3pwMlagQBtboR1sTpoxjL2hAFQrQeMpiIvNw/wmXRy6jc9BtLVi67KUXm8gHA0cird0S8of7u6y+vskTFLfAX8XHlDkn0xogY6XGZL5KuP51Nc2gGwXSSjhsvwQPteNrMQYLWzRViKtgVyEQnMFCv1oK3aR0k4ri1SUnNKP+a4EeFPgDUexa5NH4Sagj9yR6ZDt7+m73P7DWm+pg4Ees+/vC90Tgy6z4RekBIzpR412n09OSooxP4MQgpBfWBs11OZkoWuZmWRTpi1CDy6pECM4tEXNLLg1afrL4ByvSGue570WVftZ6ozwS7YnY7SQqBKuwR0BcJz1Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MV91/ZCMEVRxqc9y7B3XCTASEUjE0d53P/wLnhZksBQ=;
- b=MZ9gIihthd62+MqT80I/nsaotPu5MK1CgyMG4hfJv2tBVAmXWnJDESF0ydh1E1t6Jt/0IVSGJKc8wY5nBeLBNw9RnEaP4Hg/tIRrCN1fu2QrPDEJn3+yP9P+XrD+1jbEa6dJrUJLLpFFfdhxQ3c2aOrJuYOYdp+jwpjWZqFa7nhpksblGIimVAlPZGz/ToIzIqzTpFSgbtJQUwl4mk9MYx8MR81UPG+XTGwPLySpefOIyLfxcV+JM/mhFq77acf1tPeMDSdcP9upnkMCATtLn7RO4n0GGaxdaFl5ai8edHUZbT4j+wpfXsG20MpNnQzBAdeeKocDS5TLHG3quLFNLg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MV91/ZCMEVRxqc9y7B3XCTASEUjE0d53P/wLnhZksBQ=;
- b=E4sIzcfrW6QCAkPGxCI97arT2AUylu0xq2g3cOhahZxLWVp0wfFx47r2C78WWEtRsdwe1S8Xcr/ifcJGFU8QL42LV0FhSJVEIvuEqgDEYZcQUtmznKHnSI6Js8IFtJmiZ6J+dMiwAbaqC0Mvs3blQQYRIRjI2ZO8KqUyfvZprmnd3r84nW6g1rtIygp7LaHwODWZYNK6hVaHEax+aECnqGSsIgUEi1R3a03XIAzyq5ycXDUbDS6Q3qmU1F6JuMMexbmVAU2p0LMiiTetROhzH8jCX6E42UG11Rd/78oTY5PETDHKey0n+7+v1OwMagSClq4C9/Q5U6y0pZWuhCyYFw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by GVXPR04MB9950.eurprd04.prod.outlook.com (2603:10a6:150:11a::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9412.9; Thu, 11 Dec
- 2025 02:08:23 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db%4]) with mapi id 15.20.9412.005; Thu, 11 Dec 2025
- 02:08:23 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: claudiu.manoil@nxp.com,
-	vladimir.oltean@nxp.com,
-	xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	sdf@fomichev.me,
-	frank.li@nxp.com
-Cc: imx@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: [PATCH v3 net] net: enetc: do not transmit redirected XDP frames when the link is down
-Date: Thu, 11 Dec 2025 10:09:19 +0800
-Message-Id: <20251211020919.121113-1-wei.fang@nxp.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SI2P153CA0036.APCP153.PROD.OUTLOOK.COM
- (2603:1096:4:190::11) To PAXPR04MB8510.eurprd04.prod.outlook.com
- (2603:10a6:102:211::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C00CE28C84D;
+	Thu, 11 Dec 2025 02:39:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765420750; cv=none; b=bD+6Fhg006ejuVPGWyG6KyYxiontv3HRdwyB9yrFP6kw8qjhj52hJxG5TrsxkUdn8/Df+2wS1dlpZHsB2ZE/LWk7GqOjHnjDo7WXbJ50IPSBrBmoNY6FdWMXz6iupOnVNW6t7tXni1uKGMc3ys9K6iGB/Qzhmlyuf1U5dBIuuCI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765420750; c=relaxed/simple;
+	bh=Zp0Pr4N/37r/YAgWiAT6epd+gmIdHQmJw9AvGx4czCI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XNjLnKE31rXog9c6xXMAqLUYlS7QjIXKbIJkvHKuuyOLxc5c5F8IyUMcjyMg36q97XfxzwGm0jIDASNlsBFMtwFtItrix0rU061+1SJ4my1awMxsIkoW4yKs6zZrdMi/J4pQekw+1AhHBEerrpv6ALXvA2wNBvE0rPKo2fAztxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=kcSkgsaJ; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=kcSkgsaJ; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=rJrtuABW4FVkqAMHKhBPK/0KROz+PdPZF4hhgxrlpWg=;
+	b=kcSkgsaJf+gMDy+ygCDwSmjVhTwmioBZE+uXB9HXUm06IvmTiS5KHfNk3NCAg41lExCFKSDYf
+	nkOZCbTdUP0Ry+mx+go3XyL7GtziAoq27zpQXiWgRlZtOB257hlsv82m6JZcLrdZPDqXHln9Kqv
+	ygAsS7T4H6GFK2I+DLzEsjw=
+Received: from canpmsgout09.his.huawei.com (unknown [172.19.92.135])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTPS id 4dRcGc3sCrz1BG4v;
+	Thu, 11 Dec 2025 10:38:48 +0800 (CST)
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=rJrtuABW4FVkqAMHKhBPK/0KROz+PdPZF4hhgxrlpWg=;
+	b=kcSkgsaJf+gMDy+ygCDwSmjVhTwmioBZE+uXB9HXUm06IvmTiS5KHfNk3NCAg41lExCFKSDYf
+	nkOZCbTdUP0Ry+mx+go3XyL7GtziAoq27zpQXiWgRlZtOB257hlsv82m6JZcLrdZPDqXHln9Kqv
+	ygAsS7T4H6GFK2I+DLzEsjw=
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by canpmsgout09.his.huawei.com (SkyGuard) with ESMTPS id 4dRcDW603wz1cyPb;
+	Thu, 11 Dec 2025 10:36:59 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 0BEF51A016C;
+	Thu, 11 Dec 2025 10:38:57 +0800 (CST)
+Received: from localhost.localdomain (10.90.31.46) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 11 Dec 2025 10:38:56 +0800
+From: Jijie Shao <shaojijie@huawei.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
+CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
+	<chenhao418@huawei.com>, <lantao5@huawei.com>,
+	<huangdonghua3@h-partners.com>, <yangshuaisong@h-partners.com>,
+	<jonathan.cameron@huawei.com>, <salil.mehta@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<shaojijie@huawei.com>
+Subject: [PATCH V2 net 0/3] There are some bugfix for the HNS3 ethernet driver
+Date: Thu, 11 Dec 2025 10:37:34 +0800
+Message-ID: <20251211023737.2327018-1-shaojijie@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB8510:EE_|GVXPR04MB9950:EE_
-X-MS-Office365-Filtering-Correlation-Id: a91b540a-42ac-47ee-08d7-08de385a29c8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|19092799006|376014|7416014|52116014|1800799024|38350700014|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?98XkxCtdrtbJ0Vkm4RB8vCMIYOYIj1y9O/3CATCYpRMFjer8XLE9LwNSwgl1?=
- =?us-ascii?Q?u3RNsuBkIJ6fQlNJaTY3zgXZppOWiUfWFOIVyqQGbRnUePeP+G+QkKcztMxN?=
- =?us-ascii?Q?HkqOcEszYybgGvoWoSKrLb+hWN9cCMY6bMZR9RVihtu09wGfwLpbB5r7H3U/?=
- =?us-ascii?Q?4hOrtBo2EsPuQu/pNBr4yYIeqVp4gRlhWuwW580vbU/jcb35ATnfKFv415YX?=
- =?us-ascii?Q?7SmWn/gZAa3Av35PGxu32VAgRT1vnNCrEuVplCOGnlPQUID4wfB6v2FqV5JT?=
- =?us-ascii?Q?1UYP/tpuW1uDw3C//FxGhttXL1OnymlHzetxtcemXZ0VJ0U3MSDFNHk+fYOa?=
- =?us-ascii?Q?p4LN4ChAItdeg0F5fRj9C54DaMdSEieiAohUJgkmUrkQj4av1ZfizNgLifgp?=
- =?us-ascii?Q?2Br/G5AzNuBafZ46fnF4UYwP1iSltPyIBhDClHNMJbpYP5+oCjM4PglB7L4L?=
- =?us-ascii?Q?ToYUZxbjTeYIkKWB6ZpGCUX8aB2ZmexRHY0TPog2wYjwN2mu/16kHw7Ghngw?=
- =?us-ascii?Q?R0J17nG3eycKKLovaVdXHmVAB+NXZD0Dzk+6v3wg3JeioqWlDNsXpFyeIK0t?=
- =?us-ascii?Q?qskXuBBCaYfbKwicOqfaP/EJDI5ggxpaKkRv/aIr6Gjof+a/uJNAE8F8TRJ+?=
- =?us-ascii?Q?78izucB+mtq5hUM/oDygLDqKvHRJLEvhZkqFwyEhgE6d0E4OYrdS18oQlRPX?=
- =?us-ascii?Q?SsdkotZNzq/WPDMq7PPQvHtZdasyahJqzlN4Ip8sMa+LbZyBIHPyWtImT/U7?=
- =?us-ascii?Q?0efT1LDLMuGorhwR/cyKqTHXUNaaYg56Kj0BHCYlporCvc+ZSsTvT7lhpcsX?=
- =?us-ascii?Q?iv8BJfdFGLsBenWnAkKZs8YItHXdKCwYjLYSqysJ22YuJ3rqbFXZFxkIuNV3?=
- =?us-ascii?Q?ouf/nksxoZntUp6Slk46PIbK4k0PQz4vsfwoxF6WjGWcx4Xo+FAV09I+OSj1?=
- =?us-ascii?Q?LlW/8CRfKXtBVGApJ4aPioSG97snDtbcDtUf/L1YgWmEBG+jMjgZl+UG23e3?=
- =?us-ascii?Q?ZvdJ9fDvHPpPhk51zP6crn/WI0F/vDFqSpjO13S7LdC4fZ2l7PIqLN/mNhyH?=
- =?us-ascii?Q?5KOzOcNplQkcjHZiFQb/R0TOkv4rWR+iZnqBAi+KtEtyGA9+YrWDmSAxNYgL?=
- =?us-ascii?Q?1LNZtsIiWF6sSScK8UWy8TSdkPKls2aFBf9jzQQ49ENA5JJ8XhgXbXjnrsOF?=
- =?us-ascii?Q?WH5p/a5ZjyWgXDbBnPBWY/ry3Ao4eJYi76r1ZE1ZyuQEMRL+arZChiHZ5AZh?=
- =?us-ascii?Q?e6JJqDBODaOCty4WEMUUkRy7Kv5p4aSsmPZrTB6Zq4qs5GqLlWykXiKw24lc?=
- =?us-ascii?Q?hytitBOcBVzHpuwOZkaAj8a3wSQBE+SYX+EoAlDqTkx1tB9MHnUFywnwU2SW?=
- =?us-ascii?Q?GdWI8f8iiWIAYv317zHqIrtdDMBNCO1t4ygUF86xlPF0jGAaVAqBpBeT/AHR?=
- =?us-ascii?Q?f+EnDLVbINMpXddYh9OLdd8bFov6DAtOmYcqMfQTgrUaq+opkCYRIPcIVSAI?=
- =?us-ascii?Q?DFBR0xmQCfFukQS1L+5KZ+TabNgR5097aFqQgOmBLPA1ey7dsfaeLxtqbOHf?=
- =?us-ascii?Q?rYPMz4V28RNB4PtNIC4=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(19092799006)(376014)(7416014)(52116014)(1800799024)(38350700014)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?BQoxkh0IeUUWfGxTUIms89zYQTzlUcuypNPbArC+GhpN6EeYdvSn9yaifGE8?=
- =?us-ascii?Q?mSL139TlnlI0Sl/BcGQ2q6JM4r6M06v3po2fOCLgQupmws3XBgfYxT7kW8vc?=
- =?us-ascii?Q?SZ1KZC3l84QcrVWU83n+drOKHAyZl04Z+irnlAPjGuk5fqIaPIT7HIbd4tMv?=
- =?us-ascii?Q?MiZXYXk4UYXqkwpNM1H9Hrp8JCYiIQieEXdQb5IiOIw28F1J8V7HANWM/Qcv?=
- =?us-ascii?Q?KenKqxD0m8WrsvkH+dTh/UFb5bKNCzYcUk6VfeWjkn2fiy+RLPA5YBr74ZhD?=
- =?us-ascii?Q?N3XcjtfA46O6ACWGQnHxaXZcBrj1Q7nanpoJdApNqaDJI/pp293lp6Ta2k5g?=
- =?us-ascii?Q?wrLEmEsELx9Z/rFPoT5YEmIOcFnAb2CssnjPPbzngZPtHu4SMdIF2cQbqxS8?=
- =?us-ascii?Q?vzUj4Gt/jCiel6rbuMTCQMYpCtS5b/5uEIv5hfNAv0qXJnfra/Y6wgUmxJB5?=
- =?us-ascii?Q?+Ltv5MsjaJndQTpII4masIXwMjTCZS6wj7Gs++J04XxtJhSJtugOcP35ZGcY?=
- =?us-ascii?Q?DWqVrHnHywR9yqXygSxLZbc8sO9vLfYsAQhbHHX/l0SRjGzQEqShXhkLST3L?=
- =?us-ascii?Q?/3jzDSU2bOHFLnI4xdPrD0AEHjHn+9Hs4jOU33WdyzMcWRukRgB8+UtM1Ea5?=
- =?us-ascii?Q?zwtxygtibnkCs+V3z0ooGcmIllG6CC0l4+ZnBzUJ0HrWWi//f9aIsd7njlR4?=
- =?us-ascii?Q?eRyOyY1KBZ48QldMXYhGH0ted0QiBUWIUyqsw0iAUxxSsDXnbW10ncvyydw4?=
- =?us-ascii?Q?3Sel5wgSocac7gbBEFiyisn4Od5roaV6Dm+A+hkwI2rvjGCEQyjzUWMpl+Cb?=
- =?us-ascii?Q?J/3lHFv7l/u5Ti/7d82M7MHZV0BbuZHqOLt8Zy8EoFomqMWeDW0+kJC+V59I?=
- =?us-ascii?Q?GZ3tDWN/vrueygMZ15XRizQeEwAMaKo8e783bRpN/GsA6AJeTfF60A0wuvIA?=
- =?us-ascii?Q?ROOCDJXZRIBqpQrjGLlFCewKlIUPzYyagaZzwO6sV3H2zw3zv21Htk4xKDyq?=
- =?us-ascii?Q?YCpYvx9cnkp4gOcJdemq8Wm0tzF0RwcI4wE97rGFeAsJkBmxSu/5N1Jgj/of?=
- =?us-ascii?Q?Hlkk2SrmfQmgB6Xhry5392L7uLd5CmHA+OgKnPSN67kdsjr9FxFukP+iCLDd?=
- =?us-ascii?Q?5KXx4eKOQK6t4wdSB710rJLnxeBRL2wdzLUroPt4WbIjgytRHl25Sr2wgmU2?=
- =?us-ascii?Q?TwCjtyy7QOsLycxv/wdSvi8L3qk9TZYi8rykqmxsMD34IyXSkhRtForAfPJa?=
- =?us-ascii?Q?r3T3jhG1fhwYDtAx96MKT8sMS0VigFVUKa6NN5J4XxkR1Z+VNZOB7a5uR83h?=
- =?us-ascii?Q?A8UleE993AXvmVWbtLiyx7lTtwjP4AGwbNGTfkDBkV4+qDjKGMcUs2iKCEjB?=
- =?us-ascii?Q?yKzPjuvwdP8rki+dYOzGHUUYhhRoh1SwrxBuN2mSlcM3ohMZ7LghKn4L5WSA?=
- =?us-ascii?Q?nEYMvZIfSqhb4NF6iSQPDvj3607JVv6Ef3DqYAjty1UBkPpKi8pF+y0Nn20s?=
- =?us-ascii?Q?bmCdJFZcOd2odEJhWc6VHL6QLZuskIKMEE0Sln641qiyrFsfn39ocC75Syl7?=
- =?us-ascii?Q?D5aVw/4DR+Z0XW5GR/vZcScLdl7qU+YoSjFfTC5o?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a91b540a-42ac-47ee-08d7-08de385a29c8
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Dec 2025 02:08:23.4660
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5rP7BvwCnRXUussn7wvtrNk9di2+RkRnNAEla/gtpPnmHSVIz6pexXht7bdgIC05166TcWbgUN5kgbkpgHddeg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR04MB9950
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
-In the current implementation, the enetc_xdp_xmit() always transmits
-redirected XDP frames even if the link is down, but the frames cannot
-be transmitted from TX BD rings when the link is down, so the frames
-are still kept in the TX BD rings. If the XDP program is uninstalled,
-users will see the following warning logs.
+There are some bugfix for the HNS3 ethernet driver
 
-fsl_enetc 0000:00:00.0 eno0: timeout for tx ring #6 clear
+Jian Shen (3):
+  net: hns3: using the num_tqps in the vf driver to apply for resources
+  net: hns3: using the num_tqps to check whether tqp_index is out of
+    range when vf get ring info from mbx
+  net: hns3: add VLAN id validation before using
 
-More worse, the TX BD ring cannot work properly anymore, because the
-HW PIR and CIR are not equal after the re-initialization of the TX
-BD ring. At this point, the BDs between CIR and PIR are invalid,
-which will cause a hardware malfunction.
+ drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c   | 3 +++
+ drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_mbx.c    | 4 ++--
+ drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c | 4 ++--
+ 3 files changed, 7 insertions(+), 4 deletions(-)
 
-Another reason is that there is internal context in the ring prefetch
-logic that will retain the state from the first incarnation of the ring
-and continue prefetching from the stale location when we re-initialize
-the ring. The internal context is only reset by an FLR. That is to say,
-for LS1028A ENETC, software cannot set the HW CIR and PIR when
-initializing the TX BD ring.
-
-It does not make sense to transmit redirected XDP frames when the link is
-down. Add a link status check to prevent transmission in this condition.
-This fixes part of the issue, but more complex cases remain. For example,
-the TX BD ring may still contain unsent frames when the link goes down.
-Those situations require additional patches, which will build on this
-one.
-
-Fixes: 9d2b68cc108d ("net: enetc: add support for XDP_REDIRECT")
-Signed-off-by: Wei Fang <wei.fang@nxp.com>
-Reviewed-by: Frank Li <Frank.Li@nxp.com>
-
----
-v3 changes:
-1. Improve the commit message
-2. Collect Reviewed-by tag
-v2: https://lore.kernel.org/imx/20251209135445.3443732-1-wei.fang@nxp.com/
-v2 changes:
-Improve the commit message
-v1: https://lore.kernel.org/imx/20251205105307.2756994-1-wei.fang@nxp.com/
----
- drivers/net/ethernet/freescale/enetc/enetc.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c b/drivers/net/ethernet/freescale/enetc/enetc.c
-index 0535e92404e3..f410c245ea91 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc.c
-@@ -1778,7 +1778,8 @@ int enetc_xdp_xmit(struct net_device *ndev, int num_frames,
- 	int xdp_tx_bd_cnt, i, k;
- 	int xdp_tx_frm_cnt = 0;
- 
--	if (unlikely(test_bit(ENETC_TX_DOWN, &priv->flags)))
-+	if (unlikely(test_bit(ENETC_TX_DOWN, &priv->flags) ||
-+		     !netif_carrier_ok(ndev)))
- 		return -ENETDOWN;
- 
- 	enetc_lock_mdio();
 -- 
-2.34.1
+2.33.0
 
 
