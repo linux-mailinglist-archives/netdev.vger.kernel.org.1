@@ -1,32 +1,32 @@
-Return-Path: <netdev+bounces-244385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE5C3CB6068
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 14:30:06 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD8FFCB609B
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 14:35:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D2014300D67B
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 13:30:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6076830124C7
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 13:34:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBFBD3126C5;
-	Thu, 11 Dec 2025 13:30:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4146D30F7F8;
+	Thu, 11 Dec 2025 13:34:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="P04z5f9Q"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Y+pMqO07"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B6DB313268;
-	Thu, 11 Dec 2025 13:30:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B5B0284672;
+	Thu, 11 Dec 2025 13:34:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765459804; cv=none; b=BksUMMEcQYhnpPcSZrA8Rgaj1rBXKE5cd8wLd7PoySl0bwOmFoO97HlsXqplMBFXDb+v4EbAx4GQ1Pkf69DSP5bIqfCGUMRS8md0/HrY7GbZ9fCMwyGjsGQj29PR6aBtG6iYn1yua30k0YqgptTDBW5/kdfmT0xJWWYQJHtEoIw=
+	t=1765460091; cv=none; b=V1tetUy6qhPo3K3UJRmlfC84aXFxreq4RyJQfTrEzRba+fLqbcqYqaAalXb5VGHOu5R7V8KD5cs/Z5N19GmVTjsXiwKgt4psxmEYOSm3M9Y/bQWAaTVsFvo2IJmNXyqBvgq8ugz8Utnx8MfrlrU+i/aCznhY4x4ZGZkL+34xBsM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765459804; c=relaxed/simple;
-	bh=lxQi+IzlhDXuZnNkRnSo3ZCQlKCArNUMb1pnUOHwlCQ=;
+	s=arc-20240116; t=1765460091; c=relaxed/simple;
+	bh=PX2xeICFOc8hwopXuENr+xB8Wmni5RPfx5e5kh/PRBo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VlDL1JpUNTssKMHAJ9aeCbpqLeMLynloRbFND0Oine5ITXcMznq1Ett4tC7E9L97kaNYR6peLtPxamDww5qFbC1SOieo1trw+lOFKVlrfryQeA9KLErO+l3bFUMLWnP0uQi7F1zaUqG1ehulvl5Z/nTbDGNChwODqyPuTJv0tbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=P04z5f9Q; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=O84UqtAlJdvBTnkmpkJZF1jpBkLMXGLLt+yIhYCKr7omFdX9Tw2t+odgI+o43cX3yRR32mDtgi0xdCMzf+dMJEeZoO/NKXK64Q9uz7mQPbKLddkk5jYR/WPeO8pVwu7riTC98i7aIy8Z/S3Op9zTuu/1R80coixx2wplmByahcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Y+pMqO07; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -34,29 +34,31 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=PfFxejg/br2zDaiaEBdU9ZBdpu/3APgsmRYKWbR2RV4=; b=P04z5f9QZhAjh49Y13gbduOzqp
-	vV0qjgaGNF2sYUMqiw8k9BpvW1l0DPcwMmbvMmXV31PKHlCovv5/Jms0qP4AD55otX18xsVdDdYeG
-	jLjA5stL9swHDLi/q94ykBcZAtxj0s/q/UgX5pPCDfEP3rJvRHJgEmfh4htwQZCklaCc=;
+	bh=87k6ZOPMZjikEVuPQMcOElrCO2sbaSMGE+CuXeuUymE=; b=Y+pMqO07thAfXDflKjPCaw9UDH
+	cefJt4/vw4yCPrfXRYr0yVTO9QDamI9Q7/ELHXhBojx8USvqA/wAKy4Wj3LWuZsrQr1kg6fVHFia+
+	Qx/kGfFBWcY26PbDF4mP6ek5z7u7h7/GSRT+h2gCgOAF5n5q+BItTusLN5f3G4ErqhV4=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vTgjQ-00Ge9n-Si; Thu, 11 Dec 2025 14:29:20 +0100
-Date: Thu, 11 Dec 2025 14:29:20 +0100
+	id 1vTgoQ-00GeC8-MV; Thu, 11 Dec 2025 14:34:30 +0100
+Date: Thu, 11 Dec 2025 14:34:30 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Jacky Chou <jacky_chou@aspeedtech.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+To: Miaoqian Lin <linmq006@gmail.com>
+Cc: Daniel Golle <daniel@makrotopia.org>, Qingfang Deng <dqfext@gmail.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
 	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Joel Stanley <joel@jms.id.au>,
-	Andrew Jeffery <andrew@codeconstruct.com.au>,
-	Potin Lai <potin.lai@quantatw.com>, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-aspeed@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org, Andrew Jeffery <andrew@aj.id.au>
-Subject: Re: [PATCH net v3] net: mdio: aspeed: add dummy read to avoid
- read-after-write issue
-Message-ID: <f53fcaf3-0154-4cc7-87be-ab815fa8b6f5@lunn.ch>
-References: <20251211-aspeed_mdio_add_dummy_read-v3-1-382868869004@aspeedtech.com>
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, stable@vger.kernel.org
+Subject: Re: [PATCH] net: phy: mediatek: fix nvmem cell reference leak in
+ mt798x_phy_calibration
+Message-ID: <57437939-6983-4db8-9178-dd19f1c7b971@lunn.ch>
+References: <20251211081313.2368460-1-linmq006@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,23 +67,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251211-aspeed_mdio_add_dummy_read-v3-1-382868869004@aspeedtech.com>
+In-Reply-To: <20251211081313.2368460-1-linmq006@gmail.com>
 
-On Thu, Dec 11, 2025 at 02:24:58PM +0800, Jacky Chou wrote:
-> The Aspeed MDIO controller may return incorrect data when a read operation
-> follows immediately after a write. Due to a controller bug, the subsequent
-> read can latch stale data, causing the polling logic to terminate earlier
-> than expected.
+On Thu, Dec 11, 2025 at 12:13:13PM +0400, Miaoqian Lin wrote:
+> When nvmem_cell_read() fails in mt798x_phy_calibration(), the function
+> returns without calling nvmem_cell_put(), leaking the cell reference.
 > 
-> To work around this hardware issue, insert a dummy read after each write
-> operation. This ensures that the next actual read returns the correct
-> data and prevents premature polling exit.
+> Move nvmem_cell_put() right after nvmem_cell_read() to ensure the cell
+> reference is always released regardless of the read result.
 > 
-> This workaround has been verified to stabilize MDIO transactions on
-> affected Aspeed platforms.
+> Found via static analysis and code review.
 > 
-> Fixes: f160e99462c6 ("net: phy: Add mdio-aspeed")
-> Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
+> Fixes: 98c485eaf509 ("net: phy: add driver for MediaTek SoC built-in GE PHYs")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Miaoqian Lin <linmq006@gmail.com>
 
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
