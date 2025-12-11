@@ -1,116 +1,213 @@
-Return-Path: <netdev+bounces-244382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C457CB6017
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 14:25:36 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63C3BCB6023
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 14:25:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D801130053DD
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 13:25:14 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 543A930019F2
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 13:25:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B10653128D8;
-	Thu, 11 Dec 2025 13:25:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="CED8m0U7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F191C30B513;
+	Thu, 11 Dec 2025 13:25:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFEC930FC34
-	for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 13:25:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5409F2F5473;
+	Thu, 11 Dec 2025 13:25:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765459512; cv=none; b=QI+eVT0vge/qXkeyJ3qiidyp5PywiPDTaIpNfiK3Qf24EkMeb4Dp7wE2MWXWtdBabhmHSPGRd3DeCdAcS49m7rAzPM7qFiAXiXaSpq+gfYH1nFjm7NJqspSPO0sHQkd9FW4K+Wi8Gwq4zOHFvvHWLdn19QJVrwZrKEFuO6FqZJo=
+	t=1765459551; cv=none; b=pEGL3uYx069DgMy2ALuN5BeK9wFhg4F+FdE2urKK6OhkbFKohDzmM0IqxSpS+2xxDy5D96Shkb0Ha6aduq3JziIQG1dRBlS+8isyuVgg2+HJ4pPPf+Fp/04EIO9NA99mA2dZZVeDQ+odC7KmuNvJLBH5oHa1hXgiru63UXBc/Ls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765459512; c=relaxed/simple;
-	bh=laY4BsscU+8JqNoFj3VikjPMD/kZ2xMsRi1KAeU4AGU=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ROUi+gcImWOUGICTkGg5iKNIWQwIfSPxZ2iBi6xOL0sdJ8jqPGaSOJyF9XplM6E0shGUokpX6vqsm1q4JgjqfNqVJ4OQJHqUuS8WaRHX1exgEX88A41ZtIl5SFv9MZZ1I/UuBdx+jRY9EknS0zhIg96S3GOJRnWkUZ6OOVj39ug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=CED8m0U7; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BBAnMNg3502117;
-	Thu, 11 Dec 2025 05:24:37 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=wfQbX2SjhrGKRQbrl94o40hS6
-	j97fIeP2C3+XHElKqg=; b=CED8m0U7vkVbXITVHO0xivHfeq27tkLDsksWl8M5u
-	Q+EVKPc2+/pqXgefh0kEp8Q7ZKiWEtzgHaEYMpbTGU/13x9jWMoMrhxck1VojNRZ
-	zdYKIdHcD9T4bW+RQW9ORGoeKrPLWun2ZUxQunYBZ8Yimov+k4aNppKRJRg9s7vX
-	zjLoyPwZhcdpQZTt8WhRMhe5wTDOXWZ6MiN3lJ/AxNEVMdudX9ssgMAfPvgmbxvo
-	Fq30grK3Ml47tfkfnd3yT2+SP2Hv38SHk06ebVhWEVtyJY+jjofWmJ86wANCCjdw
-	TOOWiDvSOA3464tJeQOsn6KblAZlm9RCYO+VdYFvV/0kA==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4ayjcr1jvj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 11 Dec 2025 05:24:36 -0800 (PST)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Thu, 11 Dec 2025 05:24:48 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Thu, 11 Dec 2025 05:24:48 -0800
-Received: from test-OptiPlex-Tower-Plus-7010 (unknown [10.29.37.157])
-	by maili.marvell.com (Postfix) with SMTP id 802335B694D;
-	Thu, 11 Dec 2025 05:24:34 -0800 (PST)
-Date: Thu, 11 Dec 2025 18:54:33 +0530
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: Carolina Jubran <cjubran@nvidia.com>
-CC: Michal Kubecek <mkubecek@suse.cz>,
-        "John W . Linville"
-	<linville@tuxdriver.com>,
-        <netdev@vger.kernel.org>, Yael Chemla
-	<ychemla@nvidia.com>
-Subject: Re: [PATCH ethtool 1/2] update UAPI header copies
-Message-ID: <aTrGEQIX6b40assX@test-OptiPlex-Tower-Plus-7010>
-References: <20251204075930.979564-1-cjubran@nvidia.com>
- <20251204075930.979564-2-cjubran@nvidia.com>
+	s=arc-20240116; t=1765459551; c=relaxed/simple;
+	bh=VLBhCFygsztsQ8BtAiJ2nMgwMLnuq8LlPDi0Qvj7P+o=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:References:Cc:
+	 In-Reply-To:Content-Type; b=kBITxBbN9hXhRDiHBbOjTllW/OL/Xb58FK5sf293WHslSBR5L4H8UV2H4B2rxw6Jd/KJs4Y5nXazXK82WhtaAHTbyyzHDzS8IXryP+yuKqPIZJ3VxnBwGwemEkGK6Iz7Oj3UK1lC9edlvwtoIEqwCF+eEUL/ubuQL75JHnYuvjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 5BBDP2Rv008491;
+	Thu, 11 Dec 2025 22:25:02 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 5BBDP2MI008482
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Thu, 11 Dec 2025 22:25:02 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <1722eff3-14c1-408b-999b-1be3e8fbfe5a@I-love.SAKURA.ne.jp>
+Date: Thu, 11 Dec 2025 22:24:59 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20251204075930.979564-2-cjubran@nvidia.com>
-X-Authority-Analysis: v=2.4 cv=XtT3+FF9 c=1 sm=1 tr=0 ts=693ac614 cx=c_pps
- a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
- a=kj9zAlcOel0A:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=Ikd4Dj_1AAAA:8 a=cUtql3D_vCewy87OvC0A:9 a=CjuIK1q_8ugA:10
-X-Proofpoint-ORIG-GUID: Gq0FeoqhOS3R1vZ45UrZvcjuEQaRWYTB
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjExMDEwNSBTYWx0ZWRfX+Q5vXUfUwm3W
- lSTNVcGt54e7Drbzaw65Z9FXjwEzOUgrKoGI70gnt8NsJyIFDrwsEOFhpIwgrbiH8bTdbaGOU7N
- uVeLytoqHd57VVE9m2k60wgFGaE/N/YuBVrQ/oDCo0ltspG4IITUCUNTvFNuaJ+L99EWVhIKnAW
- f6OI0OdY/RTLjHCiF/PlZala4J/RDEVbX/SWL52zvUD7KzkqjJZUC9flBykU1f9UpoGQvAMtCrU
- hK/MS2VKWhKKqDzLidqjk1PmPVL+LyN9Ja7Rs127CkaRSl+bOboRCvoUH2nw5GBdApsTCkH6F2h
- OtqTQ5ockfxv55kbShP0rf9A7U/aCayTSrQVnrOZk0vp16KkUCCfrLCHQGybVPwq+KviTDMSZSM
- fYBEo0fM32DS+6DP69dc2qMqCJpeaA==
-X-Proofpoint-GUID: Gq0FeoqhOS3R1vZ45UrZvcjuEQaRWYTB
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-11_01,2025-12-09_03,2025-10-01_01
+User-Agent: Mozilla Thunderbird
+Subject: [not-yet-signed PATCH] RDMA/core: flush gid_cache_wq WQ from
+ disable_device()
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+To: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+        Majd Dibbiny <majd@mellanox.com>, Doug Ledford <dledford@redhat.com>,
+        Yuval Shaia <yuval.shaia@oracle.com>
+References: <30ec01df-6c32-490c-aa26-c41653f5a257@I-love.SAKURA.ne.jp>
+ <8f90fba8-60b9-46e2-8990-45311c7b1540@I-love.SAKURA.ne.jp>
+Content-Language: en-US
+Cc: Bernard Metzler <bernard.metzler@linux.dev>,
+        OFED mailing list <linux-rdma@vger.kernel.org>,
+        Network Development <netdev@vger.kernel.org>
+In-Reply-To: <8f90fba8-60b9-46e2-8990-45311c7b1540@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav202.rs.sakura.ne.jp
+X-Virus-Status: clean
 
-On 2025-12-04 at 13:29:29, Carolina Jubran (cjubran@nvidia.com) wrote:
-> From: Yael Chemla <ychemla@nvidia.com>
-> 
-> Update to kernel commit 491c5dc98b84.
-> 
-> Signed-off-by: Yael Chemla <ychemla@nvidia.com>
-> Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
-> ---
->  uapi/linux/ethtool.h                   |  6 ++++
->  uapi/linux/ethtool_netlink_generated.h | 47 ++++++++++++++++++++++++++
->  uapi/linux/if_ether.h                  |  2 ++
->  uapi/linux/if_link.h                   |  3 ++
->  uapi/linux/stddef.h                    |  1 -
->  5 files changed, 58 insertions(+), 1 deletion(-)
->
+syzbot is reporting a net_device refcount leak in RDMA code.
+A debug printk() patch in next-20251204 reported that there is a refcount
+leak in ib_gid_table_entry handling. Another debug printk() patch in
+next-20251210 reported that netdevice_event_work_handler() is called for
+allocating GID entry but is not called for releasing GID entry.
 
-	looks like there are no changes in "stddef.h", but its part of this patch.
+  unregister_netdevice: waiting for ipvlan0 to become free. Usage count = 5
+  Call trace for ipvlan0@ffff888076d9da00 +1 at
+       alloc_gid_entry drivers/infiniband/core/cache.c:410 [inline]
+       add_modify_gid+0x317/0xcc0 drivers/infiniband/core/cache.c:550
+       __ib_cache_gid_add+0x230/0x370 drivers/infiniband/core/cache.c:681
+       ib_cache_gid_set_default_gid+0x5f9/0x710 drivers/infiniband/core/cache.c:960
+       ib_enum_roce_netdev+0x1ab/0x2e0 drivers/infiniband/core/device.c:2451
+       ib_enum_all_roce_netdevs+0xcc/0x160 drivers/infiniband/core/device.c:2477
+       netdevice_event_work_handler+0xef/0x260 drivers/infiniband/core/roce_gid_mgmt.c:660
+       process_one_work+0x93a/0x15a0 kernel/workqueue.c:3279
+  Call trace for ipvlan0@ffff888076d9de00 +1 at
+       alloc_gid_entry drivers/infiniband/core/cache.c:410 [inline]
+       add_modify_gid+0x317/0xcc0 drivers/infiniband/core/cache.c:550
+       __ib_cache_gid_add+0x230/0x370 drivers/infiniband/core/cache.c:681
+       update_gid drivers/infiniband/core/roce_gid_mgmt.c:110 [inline]
+       update_gid_ip drivers/infiniband/core/roce_gid_mgmt.c:294 [inline]
+       enum_netdev_ipv4_ips drivers/infiniband/core/roce_gid_mgmt.c:368 [inline]
+       _add_netdev_ips+0x98c/0x1560 drivers/infiniband/core/roce_gid_mgmt.c:424
+       ib_enum_roce_netdev+0x1ab/0x2e0 drivers/infiniband/core/device.c:2451
+       ib_enum_all_roce_netdevs+0xcc/0x160 drivers/infiniband/core/device.c:2477
+       netdevice_event_work_handler+0xef/0x260 drivers/infiniband/core/roce_gid_mgmt.c:660
+       process_one_work+0x93a/0x15a0 kernel/workqueue.c:3279
+  Call trace for ipvlan0@ffff888031e4eb00 +1 at
+       alloc_gid_entry drivers/infiniband/core/cache.c:410 [inline]
+       add_modify_gid+0x317/0xcc0 drivers/infiniband/core/cache.c:550
+       __ib_cache_gid_add+0x230/0x370 drivers/infiniband/core/cache.c:681
+       update_gid drivers/infiniband/core/roce_gid_mgmt.c:110 [inline]
+       enum_netdev_ipv6_ips drivers/infiniband/core/roce_gid_mgmt.c:415 [inline]
+       _add_netdev_ips+0x12d9/0x1560 drivers/infiniband/core/roce_gid_mgmt.c:426
+       ib_enum_roce_netdev+0x1ab/0x2e0 drivers/infiniband/core/device.c:2451
+       ib_enum_all_roce_netdevs+0xcc/0x160 drivers/infiniband/core/device.c:2477
+       netdevice_event_work_handler+0xef/0x260 drivers/infiniband/core/roce_gid_mgmt.c:660
+       process_one_work+0x93a/0x15a0 kernel/workqueue.c:3279
+  Call trace for ipvlan0@ffff888076d9da00 +1 at
+       get_gid_entry drivers/infiniband/core/cache.c:435 [inline]
+       rdma_get_gid_attr+0x2ee/0x3f0 drivers/infiniband/core/cache.c:1300
+       smc_ib_fill_mac net/smc/smc_ib.c:160 [inline]
+       smc_ib_remember_port_attr net/smc/smc_ib.c:369 [inline]
+       smc_ib_port_event_work+0x196/0x940 net/smc/smc_ib.c:388
+       process_one_work+0x93a/0x15a0 kernel/workqueue.c:3279
+  Call trace for ipvlan0@ffff888076d9da00 -1 at
+       put_gid_entry drivers/infiniband/core/cache.c:441 [inline]
+       rdma_put_gid_attr+0x7c/0x130 drivers/infiniband/core/cache.c:1381
+       smc_ib_fill_mac net/smc/smc_ib.c:165 [inline]
+       smc_ib_remember_port_attr net/smc/smc_ib.c:369 [inline]
+       smc_ib_port_event_work+0x1d4/0x940 net/smc/smc_ib.c:388
+       process_one_work+0x93a/0x15a0 kernel/workqueue.c:3279
+  balance for ipvlan0@ib_gid_table_entry is 3
 
-Thanks,
-Hariprasad k 
+If netdevice_event_work_handler() is supposed to be called for releasing
+GID entry upon NETDEV_UNREGISTER event, we can consider that something is
+preventing ib_enum_all_roce_netdevs() from being called. And I found
+possible race window explained below.
+
+Since ib_enum_all_roce_netdevs() uses xa_for_each_marked(DEVICE_REGISTERED)
+with devices_rwsem held for read, we need to ensure that all works queued
+by netdevice_event(NETDEV_UNREGISTER) completes before disable_device()
+calls xa_clear_mark(DEVICE_REGISTERED) with devices_rwsem held for write.
+Otherwise, ib_enum_all_roce_netdevs() will fail to find devices for
+NETDEV_UNREGISTER event (which is needed for dropping a refcount on
+ib_gid_table_entry which is holding a refcount on net_device).
+
+Since flush_workqueue(gid_cache_wq) is not called before disable_device()
+calls xa_clear_mark(), and commit 8fe8bacb92f2 ("IB/core: Add ordered
+workqueue for RoCE GID management") introduced gid_cache_wq as ordered,
+possibility of failing to complete some of works before xa_clear_mark() is
+called might not be negligible. Therefore, flush gid_cache_wq WQ before
+disable_device() calls xa_clear_mark().
+
+Also, add __GFP_NOFAIL when allocating memory for a work for netdev events.
+Since that commit is intended to ensure that netdev events are processed
+in the order netdevice_event() is called, failing to invoke corresponding
+event handler due to memory allocation failure is as bad as processing
+netdev events in parallel.
+---
+Since a reproducer for this bug is not available, I haven't verified
+whether this is a bug syzbot is currently reporting in
+https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84 .
+But I'd like to add Reported-by: syzbot if netdevice_event_work_handler()
+is supposed to be called for releasing GID entry upon NETDEV_UNREGISTER
+event. Thus, please review this change.
+
+ drivers/infiniband/core/core_priv.h     |  1 +
+ drivers/infiniband/core/device.c        |  1 +
+ drivers/infiniband/core/roce_gid_mgmt.c | 10 ++++++----
+ 3 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/infiniband/core/core_priv.h b/drivers/infiniband/core/core_priv.h
+index 05102769a918..8355020bb98a 100644
+--- a/drivers/infiniband/core/core_priv.h
++++ b/drivers/infiniband/core/core_priv.h
+@@ -142,6 +142,7 @@ int ib_cache_gid_del_all_netdev_gids(struct ib_device *ib_dev, u32 port,
+ 
+ int roce_gid_mgmt_init(void);
+ void roce_gid_mgmt_cleanup(void);
++void roce_flush_gid_cache_wq(void);
+ 
+ unsigned long roce_gid_type_mask_support(struct ib_device *ib_dev, u32 port);
+ 
+diff --git a/drivers/infiniband/core/device.c b/drivers/infiniband/core/device.c
+index 13e8a1714bbd..8638583a64f2 100644
+--- a/drivers/infiniband/core/device.c
++++ b/drivers/infiniband/core/device.c
+@@ -1300,6 +1300,7 @@ static void disable_device(struct ib_device *device)
+ 
+ 	WARN_ON(!refcount_read(&device->refcount));
+ 
++	roce_flush_gid_cache_wq();
+ 	down_write(&devices_rwsem);
+ 	xa_clear_mark(&devices, device->index, DEVICE_REGISTERED);
+ 	up_write(&devices_rwsem);
+diff --git a/drivers/infiniband/core/roce_gid_mgmt.c b/drivers/infiniband/core/roce_gid_mgmt.c
+index a9f2c6b1b29e..79982d448cd2 100644
+--- a/drivers/infiniband/core/roce_gid_mgmt.c
++++ b/drivers/infiniband/core/roce_gid_mgmt.c
+@@ -661,10 +661,7 @@ static int netdevice_queue_work(struct netdev_event_work_cmd *cmds,
+ {
+ 	unsigned int i;
+ 	struct netdev_event_work *ndev_work =
+-		kmalloc(sizeof(*ndev_work), GFP_KERNEL);
+-
+-	if (!ndev_work)
+-		return NOTIFY_DONE;
++		kmalloc(sizeof(*ndev_work), GFP_KERNEL | __GFP_NOFAIL);
+ 
+ 	memcpy(ndev_work->cmds, cmds, sizeof(ndev_work->cmds));
+ 	for (i = 0; i < ARRAY_SIZE(ndev_work->cmds) && ndev_work->cmds[i].cb; i++) {
+@@ -948,3 +945,8 @@ void __exit roce_gid_mgmt_cleanup(void)
+ 	 */
+ 	destroy_workqueue(gid_cache_wq);
+ }
++
++void roce_flush_gid_cache_wq(void)
++{
++	flush_workqueue(gid_cache_wq);
++}
+-- 
+2.47.3
+
+
 
