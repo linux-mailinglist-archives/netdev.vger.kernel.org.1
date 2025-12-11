@@ -1,143 +1,475 @@
-Return-Path: <netdev+bounces-244370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244371-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CFD8CB58E1
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 11:49:29 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25EAACB58FF
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 11:51:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 6398530019C2
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 10:49:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C4DC13010984
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 10:51:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A9AF305045;
-	Thu, 11 Dec 2025 10:49:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7D253064BB;
+	Thu, 11 Dec 2025 10:51:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="gteaPq/H";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="f5KV3Nef"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aFyGYBJB"
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-a5-smtp.messagingengine.com (flow-a5-smtp.messagingengine.com [103.168.172.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26F7226980F;
-	Thu, 11 Dec 2025 10:49:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC563305045
+	for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 10:51:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765450164; cv=none; b=D0bnut07EdI4/yCyS+Geb8w2SpyVeW1RlAYHQOQxbqrq6TsPfuzCsizFAH/lUykGvB+H+v9TdBsfpwUjiSb6Un7wVeW+bCv6CyhZaZVLZ+O6lgwPFOh7/1XcKKSNGA6MZkG9qXRETLEg+oLWYChIjNw4kaihArGnRFevkWOrV3A=
+	t=1765450276; cv=none; b=DC1vHbfZqmERO/KmTQRNcKwOeY5jfsrfJdsBQDeCojMAWl5dptTOfCz7zdX2w1lySlJuCjX0wTnLD5H2Q9DIGHTakhQWwWAV3/oGwRkRLYAv4vqvkR2KMd77opb3MGn34o58uKzrgQ2HtWmcLZ3STGluemda2FU7f4J3VTgAFOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765450164; c=relaxed/simple;
-	bh=ZMtEOQfHto48TI2NKNfhRYnk7HR3pQP1Ggw3Ig0X68s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sS15yOy/klYSLQZjad+dhCAK4ixQq7/wWAsRuhl8jiL+dfN+Wh/E1m8D63Qqr5Mb82RdOByDpYivpBqmwL3qEiaxrQw98uEp8xlUZ8iZfVNiwzgwwitaTCUOr3GkTqMK+feY+E0FLJHxIy7J555ZgMlCThzoldo43SwlQnzR1oU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com; spf=pass smtp.mailfrom=kroah.com; dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b=gteaPq/H; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=f5KV3Nef; arc=none smtp.client-ip=103.168.172.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kroah.com
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailflow.phl.internal (Postfix) with ESMTP id 0CE081380392;
-	Thu, 11 Dec 2025 05:49:21 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Thu, 11 Dec 2025 05:49:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm1; t=1765450161; x=1765457361; bh=mdcxiNd9OE
-	2zw6LOwpXaWFY/tSWlCV1tDp8LemnEQqI=; b=gteaPq/Hc6kbkAqiwI8Q3Q5Ynq
-	f35ZS2ymrGRVHT0q428o74Fvgdm/5fbwp1/K2I9bICfoXMc7uyaAYd7WZpfxOmVq
-	9iEMzjtJthUIFnR9unp2NY7OFw8FaiYRtlu0IV8Nv8ASJCg+M4p7P/HTAU/LrawE
-	277nzJeu2cGDPxTYph6Mq6vpbEZcbL2W5BAR54aYX4pDVCQah5lCsLWcyMDpenhW
-	O1aCKIkmYuGs6JAYS9SFJTTUoVz1xvW+6xEjJfy4cTJUrvsa3RHSA6bMnJMk+hSy
-	cUiHlpM/sIYP6o2CgnTBBWtlWBX2kPPZc6qjtJOFZaxERGuz7Zni7xJGrjfQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1765450161; x=1765457361; bh=mdcxiNd9OE2zw6LOwpXaWFY/tSWlCV1tDp8
-	LemnEQqI=; b=f5KV3NefGz0q79ugNgB5i6zV8RgCFv13lgyASFSFeB41TauIag/
-	6Sr4nX/2cB6s5NsWs6PxCjvCciY92j6HmFnQ5E//06ZldwqcWf6ZZvhCu/agtriO
-	QbEfIjKSxTCSFjwzpvLz0XBISI5iLqcwaf4VJW5mX+aIesih5JevP1KfvAhz3Udz
-	ZllEAAm0eKfUbLfAqT54hvmZbeGYyQon5tQVyqVzcM0IboV9hZhPEJZ//eVM3KJi
-	FjPFi5ZHbk8yd5wbM5RgxleigJZunDJn2ZLYeiL5b/lldVJ+c+hraY7gI55YKT1I
-	pFEPzEbRH9XrSMThdhX/M3xv4em/XwCq9SA==
-X-ME-Sender: <xms:r6E6aadZfVuEtDJTYQVhcsrCDZwjAkjKHhzH4QdvzhwzECKieleChg>
-    <xme:r6E6aRp8uV1c7f-btkOi5HywpyngKvARNsdZKGBwpib6lnIvnz7gzte3jdyYIaK2r
-    hTZ2dIFXq8eyjVFTYNts8TaaBle7ACmcqYPDROm2UWCsFV1>
-X-ME-Received: <xmr:r6E6abfuwZ_xQKp6RrN2T5GLz8NfLRXuaiCPYWu0jqS7iJoHgRhuTIbNUb_Goql0gD8S8VdRhY2jGh97xAxF2d0>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvhedutdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefirhgvghcumffj
-    uceoghhrvghgsehkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpeegheeuhefgtd
-    eluddtleekfeegjeetgeeikeehfeduieffvddufeefleevtddtvdenucffohhmrghinhep
-    khgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrg
-    hilhhfrhhomhepghhrvghgsehkrhhorghhrdgtohhmpdhnsggprhgtphhtthhopedvgedp
-    mhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepmhgrrhhkuhhsrdgvlhhfrhhinhhgse
-    ifvggsrdguvgdprhgtphhtthhopehlihhhrghogihirghnghesihhsrhgtrdhishgtrghs
-    rdgrtgdrtghnpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorh
-    hgpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphht
-    thhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrg
-    iivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdho
-    rhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhope
-    hhohhrmhhssehkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:r6E6aZmmA2-g-hxBdZGuCKrOAiV1klMTLH_JEBtR8ZPM7zdJdLoptA>
-    <xmx:r6E6aWu9C_plcyRcoa7-oqUUW9EbQki0-Ko_MjHmFzc7Ek79hA-hhw>
-    <xmx:r6E6aUz6L11_DvC7VLukBL126Z8Ct6QXLF0ZfyKff2VVtS4oMg-XSg>
-    <xmx:r6E6aZxDL7ipAWngghJX0YtNVuYzNSzcno9r2ktLP3TkIgJJrABZ3w>
-    <xmx:saE6ac2watM5pAhCs6mFU1ZFJh7FHwwvcd6yj3GU6EHfoNTbFSrwSw2g>
-Feedback-ID: i787e41f1:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 11 Dec 2025 05:49:19 -0500 (EST)
-Date: Thu, 11 Dec 2025 19:49:16 +0900
-From: Greg KH <greg@kroah.com>
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>, netdev@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Taku Izumi <izumi.taku@jp.fujitsu.com>, stable@vger.kernel.org,
-	LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2] fjes: Add missing iounmap in fjes_hw_init()
-Message-ID: <2025121108-armless-earthling-7a6f@gregkh>
-References: <20251211073756.101824-1-lihaoxiang@isrc.iscas.ac.cn>
- <b3c0256b-b54b-49c7-91e3-8ac189613abe@web.de>
+	s=arc-20240116; t=1765450276; c=relaxed/simple;
+	bh=gdPgK4oUQDxoPyQTXewOmQ7rKJ3Ie7VIM7Tt9UK5oHk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QmWiSMLwIvDyi864FtoiTcf998u02BvQwOfAOv3GsL1993TuhJpl0KXuMB9G3h9RfVHnjyx3YEd4N95CQY6/gdrNfNLeyAf8KYt5s3sqSVeDtOqYEqSTG+Okcyzvj0aRmZojSiKujW5MFGJKpXey80OrC2mhYs2Vj/ysd9SkLms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aFyGYBJB; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-477b91680f8so8314495e9.0
+        for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 02:51:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765450270; x=1766055070; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i2an3+eB2aZCZFSq1MVn0GhDCcCy4mOELw1EEwhLihM=;
+        b=aFyGYBJBw0FsyfNecmdAwhem3orqKPqO9bWDns0FJwv4KaUCmCwXl5DA1WzF36+xj5
+         NCaBsEhWhxzGlWS0US1VNeBhBq4Ctn/wzcNwKJJZKqgv9i6D2cP/iflXUe7ci7tDW++n
+         2yGdz/l6O2SvmcdXK7Pwx2TeTHU5QURFkLxmfuZ+wq7fAPZLaKDr0sQduL0pgjl0B9os
+         JuY5eeYAXbbekMPohwT05uXm6UTm6uzWKT7pgO7yF5ZQ35XApHqwDeYeWGOuKakLtvHd
+         npk5bUBMzmBk4xn3EpAfcAnAuQEDQoLXGwdY/T1goITUlj/mavgnuD5qWWEfiuFTIWU4
+         T1Dg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765450270; x=1766055070;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=i2an3+eB2aZCZFSq1MVn0GhDCcCy4mOELw1EEwhLihM=;
+        b=Pg7IFHKM98rkWCli+YXl9yCe1fU+vsjR9+wbCo752uqT4KByVunxHG6L/AcUY1j/d5
+         SYNBE7twIjoyVQ6oPFmtEDP/T8xr8AVeQoE3bIB8BKF2k7vVvBqkNB5JXF+06WlTvYvR
+         mre89/uixO0sBJ6n/xf7X7VAy2GNCb8FZn01P4OkOD4xVPuItXuU9X1A9xj7T4aOgQHJ
+         tLa/iJKjCMSQ0vM+tk6iVZaJvb6XFBA1g5CYRCKf/iml9lSAw/e0xM7pF1f1xy4Pc6k3
+         KcN9XNLcnkC4QhsRUY3k+7qe2T+0Lxn+tN7CFaJv0emTbaD7J6ZZCrOMqjggY9vSzN4o
+         F1Ug==
+X-Forwarded-Encrypted: i=1; AJvYcCUSHpaTzwrwLh1rF8ElWIKKlBxPFUQR/WE0MbjwGKGUPJ6FK+idiv1wg3cZ5AHKK8tsOXTj0pk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYwEoXX5j8Vl0vZ4wwSSDnmHlz86HWRmQc96SBWjo4pqJPOO36
+	kGRuI5hs7HtwzQO17/OP/ktHPIjBX5wGTTNTuXCK8KLSn9sIHvKrUYx8
+X-Gm-Gg: AY/fxX5uot3XUIUXWdbY5+IK029oHAZSll6O+eJEyWXPxb3hXwtA4iuZOfwOPi/Hzp2
+	xT/Ev8mMWeM+6zeYQQVCJR6Fn2n9CIzIes8ZRco987OT5frXZk8oxlxHUbfsYaJOM2NkwHyA3mD
+	HUyWdLBQaLc+nJ563gPod1Up794SflpshofW8CQp7g/ICo9ruWLwWrWa6AkVA6YG031ccAgDUh4
+	bzo0y6RMtHFF45grLMtR2F5sUknJ4587kgy4chQ5g/UGNXHX13qhcWcGLwPpkUeY0OhGOjhBFPV
+	ZsyUnn5QsdRK5ezOxWH+24ErHDLOuMJtTBIZdUgKi4MVJ3nbw98XTMH61cj105oNl8Zi9UHYbxn
+	4HUxgVOHJjrVW517TtzCp3mEfMPy3w4tiDSv43EoiAQrfYEgzaPUOF4YjGxjkjTpVUOVtK/xy7A
+	NmQ00CJZmlatr1Dj+auWOObmMymqrxWlS6F424eCVpcepV4MB2jlPs
+X-Google-Smtp-Source: AGHT+IEIRS9wqLxDJDlOnBNoFsFIq4s5NrTQQ7QKheGrcA1JG2VukjGU7UB3LRszvTwp9D69CgR0ew==
+X-Received: by 2002:a05:600c:630d:b0:479:3a86:dc1a with SMTP id 5b1f17b1804b1-47a837a41bemr53664785e9.36.1765450269932;
+        Thu, 11 Dec 2025 02:51:09 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47a89f0e42asm27917245e9.14.2025.12.11.02.51.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Dec 2025 02:51:09 -0800 (PST)
+Date: Thu, 11 Dec 2025 10:51:07 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Yury Norov <yury.norov@gmail.com>
+Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+ linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, Geert Uytterhoeven
+ <geert+renesas@glider.be>, Alexandre Belloni
+ <alexandre.belloni@bootlin.com>, Jonathan Cameron
+ <Jonathan.Cameron@huawei.com>, Crt Mori <cmo@melexis.com>, Richard Genoud
+ <richard.genoud@bootlin.com>, Andy Shevchenko
+ <andriy.shevchenko@intel.com>, Luo Jie <quic_luoj@quicinc.com>, Peter
+ Zijlstra <peterz@infradead.org>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, Simon
+ Horman <simon.horman@netronome.com>, Mika Westerberg
+ <mika.westerberg@linux.intel.com>, Andreas Noever
+ <andreas.noever@gmail.com>, Yehezkel Bernat <YehezkelShB@gmail.com>,
+ Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+Subject: Re: [PATCH 0/9] bitfield: tidy up bitfield.h
+Message-ID: <20251211105107.305e4828@pumpkin>
+In-Reply-To: <aTm54HCyCTm5k5ci@yury>
+References: <20251209100313.2867-1-david.laight.linux@gmail.com>
+	<aTm54HCyCTm5k5ci@yury>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b3c0256b-b54b-49c7-91e3-8ac189613abe@web.de>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Dec 11, 2025 at 10:10:37AM +0100, Markus Elfring wrote:
-> > In error paths, add fjes_hw_iounmap() to release the
-> > resource acquired by fjes_hw_iomap(). Add a goto label
-> > to do so.
+On Wed, 10 Dec 2025 13:20:16 -0500
+Yury Norov <yury.norov@gmail.com> wrote:
+
+> On Tue, Dec 09, 2025 at 10:03:04AM +0000, david.laight.linux@gmail.com wrote:
+> > From: David Laight <david.laight.linux@gmail.com>
+...
+> > I noticed some very long (18KB) error messages from the compiler.
+> > Turned out they were errors on lines that passed GENMASK() to FIELD_PREP().
+> > Since most of the #defines are already statement functions the values
+> > can be copied to locals so the actual parameters only get expanded once.
+> > 
+> > The 'bloat' is reduced further by using a simple test to ensure 'reg'
+> > is large enough, slightly simplifying the test for constant 'val' and
+> > only checking 'reg' and 'val' when the parameters are present.  
 > 
-> Under which circumstances would you get into the mood to take more desirable
-> word wrap preferences better into account?
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/submitting-patches.rst?h=v6.18#n658
+> So, can you share the before/after?
 
+Not that hard to generate since the kernel makefiles will create foo.i
 
-Hi,
+I would have fed the .i file though xargs - but someone broke it
+(there is no option to ignore quotes, and -s70 isn't allowed).
+So I used:
+tr ' ' '\n' foo.i | (ll=; while read -r l; do ll1="$ll $l"; [ ${#l} = 0 -o ${#ll1} -ge 70 ] && { echo "$ll"; ll="$l";} || ll="$ll1"; done; echo "$ll")
 
-This is the semi-friendly patch-bot of Greg Kroah-Hartman.
+GENMASK(hi, lo)
+    ((unsigned long)(((int)sizeof(struct
+    {_Static_assert(!(__builtin_choose_expr((sizeof(int) == sizeof(*(8 ?
+    ((void *)((long)((lo) > (hi)) * 0l)) : (int *)8))), (lo) > (hi),
+    false)), "const_true((lo) > (hi))" " is true");})) +
+    (((typeof(unsigned long))((((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))) - 1) + ((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))))) << (lo) & ((typeof(unsigned
+    long))((((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long))
+    - 1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1))) -
+    1) + ((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long)) -
+    1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1)))))
+    >> ((sizeof(unsigned long) * 8) - 1 - (hi)))))
 
-Markus, you seem to have sent a nonsensical or otherwise pointless
-review comment to a patch submission on a Linux kernel developer mailing
-list.  I strongly suggest that you not do this anymore.  Please do not
-bother developers who are actively working to produce patches and
-features with comments that, in the end, are a waste of time.
+A chunk of that would be removed by changing type_max() to do
+2 * (n - 1) + 1 instead of (n - 1) + n, but for unsigned types
+it isn't needed.
+Changing type_max(t) to (t)-1 GENMASK(hi, lo) becomes
+(patch not posted...)
+    ((unsigned long)(((int)sizeof(struct
+    {_Static_assert(!(__builtin_choose_expr((sizeof(int) == sizeof(*(8 ?
+    ((void *)((long)((lo) > (hi)) * 0l)) : (int *)8))), (lo) > (hi),
+    false)), "const_true((lo) > (hi))" " is true");})) + ((unsigned long)-1
+    << (lo) & (unsigned long)-1 >> ((sizeof(unsigned long) * 8) - 1 - (hi)))))
+There are still four expansions of both lo and hi - but they are
+usually trivial. 
 
-Patch submitter, please ignore Markus's suggestion; you do not need to
-follow it at all.  The person/bot/AI that sent it is being ignored by
-almost all Linux kernel maintainers for having a persistent pattern of
-behavior of producing distracting and pointless commentary, and
-inability to adapt to feedback.  Please feel free to also ignore emails
-from them.
+You asked for this one :-)
+old FIELD_GET(GENMASK(hi, lo), reg)
+    ({ do { __attribute__((__noreturn__)) extern void
+    __compiletime_assert_769(void) __attribute__((__error__("FIELD_GET: "
+    "type of reg too small for mask"))); if (!(!(((typeof(
+    _Generic((((unsigned long)(((int)sizeof(struct
+    {_Static_assert(!(__builtin_choose_expr((sizeof(int) == sizeof(*(8 ?
+    ((void *)((long)((lo) > (hi)) * 0l)) : (int *)8))), (lo) > (hi),
+    false)), "const_true((lo) > (hi))" " is true");})) +
+    (((typeof(unsigned long))((((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))) - 1) + ((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))))) << (lo) & ((typeof(unsigned
+    long))((((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long))
+    - 1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1))) -
+    1) + ((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long)) -
+    1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1)))))
+    >> ((sizeof(unsigned long) * 8) - 1 - (hi)))))), char: (unsigned
+    char)0, unsigned char: (unsigned char)0, signed char: (unsigned
+    char)0, unsigned short: (unsigned short)0, signed short: (unsigned
+    short)0, unsigned int: (unsigned int)0, signed int: (unsigned int)0,
+    unsigned long: (unsigned long)0, signed long: (unsigned long)0,
+    unsigned long long: (unsigned long long)0, signed long long:
+    (unsigned long long)0, default: (((unsigned long)(((int)sizeof(struct
+    {_Static_assert(!(__builtin_choose_expr((sizeof(int) == sizeof(*(8 ?
+    ((void *)((long)((lo) > (hi)) * 0l)) : (int *)8))), (lo) > (hi),
+    false)), "const_true((lo) > (hi))" " is true");})) +
+    (((typeof(unsigned long))((((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))) - 1) + ((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))))) << (lo) & ((typeof(unsigned
+    long))((((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long))
+    - 1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1))) -
+    1) + ((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long)) -
+    1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1)))))
+    >> ((sizeof(unsigned long) * 8) - 1 - (hi)))))))))(((unsigned
+    long)(((int)sizeof(struct
+    {_Static_assert(!(__builtin_choose_expr((sizeof(int) == sizeof(*(8 ?
+    ((void *)((long)((lo) > (hi)) * 0l)) : (int *)8))), (lo) > (hi),
+    false)), "const_true((lo) > (hi))" " is true");})) +
+    (((typeof(unsigned long))((((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))) - 1) + ((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))))) << (lo) & ((typeof(unsigned
+    long))((((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long))
+    - 1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1))) -
+    1) + ((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long)) -
+    1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1)))))
+    >> ((sizeof(unsigned long) * 8) - 1 - (hi))))))) > ((typeof(
+    _Generic((reg), char: (unsigned char)0, unsigned char: (unsigned
+    char)0, signed char: (unsigned char)0, unsigned short: (unsigned
+    short)0, signed short: (unsigned short)0, unsigned int: (unsigned
+    int)0, signed int: (unsigned int)0, unsigned long: (unsigned long)0,
+    signed long: (unsigned long)0, unsigned long long: (unsigned long
+    long)0, signed long long: (unsigned long long)0, default:
+    (reg))))(~0ull))))) __compiletime_assert_769(); } while (0); ({ ({ do
+    { __attribute__((__noreturn__)) extern void
+    __compiletime_assert_770(void) __attribute__((__error__("FIELD_GET: "
+    "mask is not constant"))); if (!(!(!__builtin_constant_p(((unsigned
+    long)(((int)sizeof(struct
+    {_Static_assert(!(__builtin_choose_expr((sizeof(int) == sizeof(*(8 ?
+    ((void *)((long)((lo) > (hi)) * 0l)) : (int *)8))), (lo) > (hi),
+    false)), "const_true((lo) > (hi))" " is true");})) +
+    (((typeof(unsigned long))((((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))) - 1) + ((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))))) << (lo) & ((typeof(unsigned
+    long))((((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long))
+    - 1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1))) -
+    1) + ((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long)) -
+    1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1)))))
+    >> ((sizeof(unsigned long) * 8) - 1 - (hi)))))))))
+    __compiletime_assert_770(); } while (0); do {
+    __attribute__((__noreturn__)) extern void
+    __compiletime_assert_771(void) __attribute__((__error__("FIELD_GET: "
+    "mask is zero"))); if (!(!((((unsigned long)(((int)sizeof(struct
+    {_Static_assert(!(__builtin_choose_expr((sizeof(int) == sizeof(*(8 ?
+    ((void *)((long)((lo) > (hi)) * 0l)) : (int *)8))), (lo) > (hi),
+    false)), "const_true((lo) > (hi))" " is true");})) +
+    (((typeof(unsigned long))((((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))) - 1) + ((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))))) << (lo) & ((typeof(unsigned
+    long))((((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long))
+    - 1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1))) -
+    1) + ((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long)) -
+    1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1)))))
+    >> ((sizeof(unsigned long) * 8) - 1 - (hi)))))) == 0)))
+    __compiletime_assert_771(); } while (0); do {
+    __attribute__((__noreturn__)) extern void
+    __compiletime_assert_772(void) __attribute__((__error__("FIELD_GET: "
+    "value too large for the field"))); if (!(!(__builtin_constant_p(0U)
+    ? ~((((unsigned long)(((int)sizeof(struct
+    {_Static_assert(!(__builtin_choose_expr((sizeof(int) == sizeof(*(8 ?
+    ((void *)((long)((lo) > (hi)) * 0l)) : (int *)8))), (lo) > (hi),
+    false)), "const_true((lo) > (hi))" " is true");})) +
+    (((typeof(unsigned long))((((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))) - 1) + ((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))))) << (lo) & ((typeof(unsigned
+    long))((((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long))
+    - 1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1))) -
+    1) + ((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long)) -
+    1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1)))))
+    >> ((sizeof(unsigned long) * 8) - 1 - (hi)))))) >>
+    (__builtin_ffsll(((unsigned long)(((int)sizeof(struct
+    {_Static_assert(!(__builtin_choose_expr((sizeof(int) == sizeof(*(8 ?
+    ((void *)((long)((lo) > (hi)) * 0l)) : (int *)8))), (lo) > (hi),
+    false)), "const_true((lo) > (hi))" " is true");})) +
+    (((typeof(unsigned long))((((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))) - 1) + ((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))))) << (lo) & ((typeof(unsigned
+    long))((((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long))
+    - 1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1))) -
+    1) + ((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long)) -
+    1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1)))))
+    >> ((sizeof(unsigned long) * 8) - 1 - (hi)))))) - 1)) & (0 + (0U)) :
+    0))) __compiletime_assert_772(); } while (0); do {
+    __attribute__((__noreturn__)) extern void
+    __compiletime_assert_773(void) __attribute__((__error__("BUILD_BUG_ON
+    failed: " "(((((unsigned long)(((int)sizeof(struct
+    {_Static_assert(!(__builtin_choose_expr((sizeof(int) == sizeof(*(8 ?
+    ((void *)((long)((lo) > (hi)) * 0l)) : (int *)8))), (lo) > (hi),
+    false)), \"const_true((lo) > (hi))\" \" is true\");})) +
+    (((typeof(unsigned long))((((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))) - 1) + ((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))))) << (lo) & ((typeof(unsigned
+    long))((((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long))
+    - 1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1))) -
+    1) + ((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long)) -
+    1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1)))))
+    >> ((sizeof(unsigned long) * 8) - 1 - (hi)))))) + (1ULL <<
+    (__builtin_ffsll(((unsigned long)(((int)sizeof(struct
+    {_Static_assert(!(__builtin_choose_expr((sizeof(int) == sizeof(*(8 ?
+    ((void *)((long)((lo) > (hi)) * 0l)) : (int *)8))), (lo) > (hi),
+    false)), \"const_true((lo) > (hi))\" \" is true\");})) +
+    (((typeof(unsigned long))((((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))) - 1) + ((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))))) << (lo) & ((typeof(unsigned
+    long))((((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long))
+    - 1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1))) -
+    1) + ((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long)) -
+    1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1)))))
+    >> ((sizeof(unsigned long) * 8) - 1 - (hi)))))) - 1))) &
+    (((((unsigned long)(((int)sizeof(struct
+    {_Static_assert(!(__builtin_choose_expr((sizeof(int) == sizeof(*(8 ?
+    ((void *)((long)((lo) > (hi)) * 0l)) : (int *)8))), (lo) > (hi),
+    false)), \"const_true((lo) > (hi))\" \" is true\");})) +
+    (((typeof(unsigned long))((((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))) - 1) + ((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))))) << (lo) & ((typeof(unsigned
+    long))((((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long))
+    - 1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1))) -
+    1) + ((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long)) -
+    1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1)))))
+    >> ((sizeof(unsigned long) * 8) - 1 - (hi)))))) + (1ULL <<
+    (__builtin_ffsll(((unsigned long)(((int)sizeof(struct
+    {_Static_assert(!(__builtin_choose_expr((sizeof(int) == sizeof(*(8 ?
+    ((void *)((long)((lo) > (hi)) * 0l)) : (int *)8))), (lo) > (hi),
+    false)), \"const_true((lo) > (hi))\" \" is true\");})) +
+    (((typeof(unsigned long))((((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))) - 1) + ((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))))) << (lo) & ((typeof(unsigned
+    long))((((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long))
+    - 1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1))) -
+    1) + ((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long)) -
+    1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1)))))
+    >> ((sizeof(unsigned long) * 8) - 1 - (hi)))))) - 1))) - 1)) !=
+    0"))); if (!(!((((((unsigned long)(((int)sizeof(struct
+    {_Static_assert(!(__builtin_choose_expr((sizeof(int) == sizeof(*(8 ?
+    ((void *)((long)((lo) > (hi)) * 0l)) : (int *)8))), (lo) > (hi),
+    false)), "const_true((lo) > (hi))" " is true");})) +
+    (((typeof(unsigned long))((((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))) - 1) + ((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))))) << (lo) & ((typeof(unsigned
+    long))((((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long))
+    - 1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1))) -
+    1) + ((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long)) -
+    1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1)))))
+    >> ((sizeof(unsigned long) * 8) - 1 - (hi)))))) + (1ULL <<
+    (__builtin_ffsll(((unsigned long)(((int)sizeof(struct
+    {_Static_assert(!(__builtin_choose_expr((sizeof(int) == sizeof(*(8 ?
+    ((void *)((long)((lo) > (hi)) * 0l)) : (int *)8))), (lo) > (hi),
+    false)), "const_true((lo) > (hi))" " is true");})) +
+    (((typeof(unsigned long))((((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))) - 1) + ((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))))) << (lo) & ((typeof(unsigned
+    long))((((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long))
+    - 1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1))) -
+    1) + ((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long)) -
+    1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1)))))
+    >> ((sizeof(unsigned long) * 8) - 1 - (hi)))))) - 1))) &
+    (((((unsigned long)(((int)sizeof(struct
+    {_Static_assert(!(__builtin_choose_expr((sizeof(int) == sizeof(*(8 ?
+    ((void *)((long)((lo) > (hi)) * 0l)) : (int *)8))), (lo) > (hi),
+    false)), "const_true((lo) > (hi))" " is true");})) +
+    (((typeof(unsigned long))((((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))) - 1) + ((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))))) << (lo) & ((typeof(unsigned
+    long))((((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long))
+    - 1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1))) -
+    1) + ((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long)) -
+    1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1)))))
+    >> ((sizeof(unsigned long) * 8) - 1 - (hi)))))) + (1ULL <<
+    (__builtin_ffsll(((unsigned long)(((int)sizeof(struct
+    {_Static_assert(!(__builtin_choose_expr((sizeof(int) == sizeof(*(8 ?
+    ((void *)((long)((lo) > (hi)) * 0l)) : (int *)8))), (lo) > (hi),
+    false)), "const_true((lo) > (hi))" " is true");})) +
+    (((typeof(unsigned long))((((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))) - 1) + ((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))))) << (lo) & ((typeof(unsigned
+    long))((((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long))
+    - 1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1))) -
+    1) + ((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long)) -
+    1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1)))))
+    >> ((sizeof(unsigned long) * 8) - 1 - (hi)))))) - 1))) - 1)) != 0)))
+    __compiletime_assert_773(); } while (0); }); (typeof(((unsigned
+    long)(((int)sizeof(struct
+    {_Static_assert(!(__builtin_choose_expr((sizeof(int) == sizeof(*(8 ?
+    ((void *)((long)((lo) > (hi)) * 0l)) : (int *)8))), (lo) > (hi),
+    false)), "const_true((lo) > (hi))" " is true");})) +
+    (((typeof(unsigned long))((((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))) - 1) + ((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))))) << (lo) & ((typeof(unsigned
+    long))((((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long))
+    - 1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1))) -
+    1) + ((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long)) -
+    1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1)))))
+    >> ((sizeof(unsigned long) * 8) - 1 - (hi)))))))(((reg) & (((unsigned
+    long)(((int)sizeof(struct
+    {_Static_assert(!(__builtin_choose_expr((sizeof(int) == sizeof(*(8 ?
+    ((void *)((long)((lo) > (hi)) * 0l)) : (int *)8))), (lo) > (hi),
+    false)), "const_true((lo) > (hi))" " is true");})) +
+    (((typeof(unsigned long))((((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))) - 1) + ((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))))) << (lo) & ((typeof(unsigned
+    long))((((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long))
+    - 1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1))) -
+    1) + ((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long)) -
+    1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1)))))
+    >> ((sizeof(unsigned long) * 8) - 1 - (hi))))))) >>
+    (__builtin_ffsll(((unsigned long)(((int)sizeof(struct
+    {_Static_assert(!(__builtin_choose_expr((sizeof(int) == sizeof(*(8 ?
+    ((void *)((long)((lo) > (hi)) * 0l)) : (int *)8))), (lo) > (hi),
+    false)), "const_true((lo) > (hi))" " is true");})) +
+    (((typeof(unsigned long))((((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))) - 1) + ((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))))) << (lo) & ((typeof(unsigned
+    long))((((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long))
+    - 1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1))) -
+    1) + ((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long)) -
+    1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1)))))
+    >> ((sizeof(unsigned long) * 8) - 1 - (hi)))))) - 1)); }); })
 
-thanks,
+new FIELD_GET(GENMASK(hi, lo), reg)
+    ({ __auto_type _mask = ((unsigned long)(((int)sizeof(struct
+    {_Static_assert(!(__builtin_choose_expr((sizeof(int) == sizeof(*(8 ?
+    ((void *)((long)((lo) > (hi)) * 0l)) : (int *)8))), (lo) > (hi),
+    false)), "const_true((lo) > (hi))" " is true");})) +
+    (((typeof(unsigned long))((((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))) - 1) + ((typeof(unsigned long))1 <<
+    (8*sizeof(typeof(unsigned long)) - 1 - (((typeof(unsigned long))(-1))
+    < ( typeof(unsigned long))1))))) << (lo) & ((typeof(unsigned
+    long))((((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long))
+    - 1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1))) -
+    1) + ((typeof(unsigned long))1 << (8*sizeof(typeof(unsigned long)) -
+    1 - (((typeof(unsigned long))(-1)) < ( typeof(unsigned long))1)))))
+    >> ((sizeof(unsigned long) * 8) - 1 - (hi))))); __auto_type _reg =
+    reg; ({ do { do { __attribute__((__noreturn__)) extern void
+    __compiletime_assert_697(void) __attribute__((__error__("FIELD_GET: "
+    "mask is not constant"))); if (!(!(!__builtin_constant_p(_mask))))
+    __compiletime_assert_697(); } while (0); do {
+    __attribute__((__noreturn__)) extern void
+    __compiletime_assert_698(void) __attribute__((__error__("FIELD_GET: "
+    "mask is zero or not contiguous"))); if (!(!((!(_mask) || ((_mask) &
+    ((_mask) + ((_mask) & -(_mask)))))))) __compiletime_assert_698(); }
+    while (0); } while (0); do { __attribute__((__noreturn__)) extern
+    void __compiletime_assert_699(void)
+    __attribute__((__error__("FIELD_GET: " "type of reg too small for
+    mask"))); if (!(!(_mask + 0U + 0UL + 0ULL > ~0ULL >> (64 - 8 * sizeof
+    (_reg))))) __compiletime_assert_699(); } while (0); ((_reg) &
+    (_mask)) >> (__builtin_ffsll(_mask) - 1); }); })
 
-greg k-h's patch email bot
+	David
+
 
