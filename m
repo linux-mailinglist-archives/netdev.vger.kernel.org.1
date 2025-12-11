@@ -1,61 +1,67 @@
-Return-Path: <netdev+bounces-244320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3193CCB4C5C
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 06:33:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D703DCB4C2F
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 06:27:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 31037302EA34
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 05:31:44 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3A08730111A9
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 05:26:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F8CC29BDA2;
-	Thu, 11 Dec 2025 05:21:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89BC220C48A;
+	Thu, 11 Dec 2025 05:26:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aF20OH89"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T203esBN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A81729B79B;
-	Thu, 11 Dec 2025 05:21:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B34B17555;
+	Thu, 11 Dec 2025 05:26:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765430509; cv=none; b=um2DfD2yGGXu9X1Khu7LH/SyO2qIJ7tur22cmdxP+dSybcOqpyw86ijl7mLMfeHg7dsKI/8u62e9VWFd+Imh0X+xpUjbtUUfpG0Oe7zEisPLVyxsrjh+FJjs1pLOrjoAnEWxk6wO13VxTWPGM3t+hJkV6f5n9V9MH46+ablU8HU=
+	t=1765430814; cv=none; b=HbiXdZcdnPXbR5UpKdXNC0V4dl4nT8KTPI0o02y+0UgJJVi/DdnQQHiX4pIuXPEiu/A3nEw/FanNiHE49sCjxn9tHMqJOUwv7oBxKK+kDRcGqthIb93gjCO8CPD3+c7NHozko5ur4o8z8P9sP3PiCAPJAM5wB69SJ5EsL398+cU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765430509; c=relaxed/simple;
-	bh=OMWsm1iBM7byGpIJdrYg85fUijHjOw33YpJot5aABSc=;
+	s=arc-20240116; t=1765430814; c=relaxed/simple;
+	bh=JfiVLZzDbMu81FCDfELxXxRKa/eCGvjPeVTUrMNbiJA=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EFvTugDry2vfqcgnaeM9toG3c+cdxDtslNCGhwSJZGd0/44kGhFKHLYuSpBHt+j0mP5P3HuOE/WqiVTDrAHuK+gTbHFLqVhHMS/1mi2tVxNH7AF6dXZmZA6oeQF8lWmZt1Qy7kBaZTPXlE+l5N6YQ1A2hJpi7EYuUoYy2VL4Hxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aF20OH89; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 933F0C4CEFB;
-	Thu, 11 Dec 2025 05:21:45 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ED921cq+ns0lVHdg9MKfQip3/xaPh6MYAr4idPJ+4PQC7kdDzDaBLg8S7uzGQZlqldjpybPNH49Wx4lLoO6JYkuS8UaY+V7vWMlvaP1aJwCYH9i5PaAosS3Tsvm7NHu9hCGdjD2ZBUDBx8lq96e/xVE85iBwj3MIBgYvuh3zF+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T203esBN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D4FAC4CEFB;
+	Thu, 11 Dec 2025 05:26:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765430508;
-	bh=OMWsm1iBM7byGpIJdrYg85fUijHjOw33YpJot5aABSc=;
+	s=k20201202; t=1765430814;
+	bh=JfiVLZzDbMu81FCDfELxXxRKa/eCGvjPeVTUrMNbiJA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aF20OH89Ffbbj7fjscKp8MVFjvoDVbV4Gbz/uHfJ20fwrtG3I1W/yQ0yHzUGmkE5/
-	 8sxUFAaYGBUllnti4MugpG5bLPk46TLiyU6YBwqZY3PMZYkDAZXOjsNUhrZMX5ktes
-	 uBoZFyWbX/HfYk2nuqAiwBXkDhnACArodGys9LDivdWq9YpMEP9ubdawH8E85pKJyc
-	 jJeB6Z3KRywtRYtcJvDrKUZd4Lp9wbiXfSW7Bys7iapkANCYDo/nlYFAMgD2p913IA
-	 23vPklcn7anqmZnH/1zJFj16oLsBZ8SN22nlyCFN5XODQLYhXxMWZAZliXWLhbggK2
-	 7BBfji3AVMW/g==
-Date: Thu, 11 Dec 2025 14:21:42 +0900
+	b=T203esBNf/aoCuL6CSMYGbTY85xBAx4rKZ+/jAAdMDlQ4st6p72YkgEmyg8LiCGZj
+	 grBWTyZwa5xVr34fEMeSjI72coazpFIBoYAxTVWolvWL61Mxvx4ghoc0AMU+0k6jZA
+	 PPfSmKH65dI+9d8wOOKtQ+jEbJzuROwBp7p6GIes6nEmfPskNa6EDJMS/p27urBF0Q
+	 FdhBtadJKU7rqvYYfZGB2o0byvSTDr8nrt0D3cn/xTxvhcfNtOJebR9NuW+L6LeSNX
+	 ge9QT8WCx9v1a6h/RKA+dS1ibBhhthw2BmCcZxOxeVCtdZUGUd8zcs421lMYfbSbNh
+	 ZQdvDU2CndKKA==
+Date: Thu, 11 Dec 2025 14:26:46 +0900
 From: Jakub Kicinski <kuba@kernel.org>
-To: Edward Adam Davis <eadavis@qq.com>
-Cc: davem@davemloft.net, edumazet@google.com, eperezma@redhat.com,
- horms@kernel.org, jasowang@redhat.com, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, mst@redhat.com, netdev@vger.kernel.org,
- pabeni@redhat.com, sgarzare@redhat.com, stefanha@redhat.com,
- syzbot+ci3edb9412aeb2e703@syzkaller.appspotmail.com,
- syzbot@lists.linux.dev, syzbot@syzkaller.appspotmail.com,
- syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev,
- xuanzhuo@linux.alibaba.com
-Subject: Re: [PATCH net-next V3] net: restore the iterator to its original
- state when an error occurs
-Message-ID: <20251211142142.18a4a0b2@kernel.org>
-In-Reply-To: <tencent_000364896CA3A544481764D76486C0336005@qq.com>
-References: <20251210173125.281dc808@kernel.org>
-	<tencent_000364896CA3A544481764D76486C0336005@qq.com>
+To: David Laight <david.laight.linux@gmail.com>
+Cc: Yury Norov <yury.norov@gmail.com>, Rasmus Villemoes
+ <linux@rasmusvillemoes.dk>, linux-kernel@vger.kernel.org,
+ linux-usb@vger.kernel.org, Geert Uytterhoeven <geert+renesas@glider.be>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>, Jonathan Cameron
+ <Jonathan.Cameron@huawei.com>, Crt Mori <cmo@melexis.com>, Richard Genoud
+ <richard.genoud@bootlin.com>, Andy Shevchenko
+ <andriy.shevchenko@intel.com>, Luo Jie <quic_luoj@quicinc.com>, Peter
+ Zijlstra <peterz@infradead.org>, netdev@vger.kernel.org, "David S . Miller"
+ <davem@davemloft.net>, Simon Horman <simon.horman@netronome.com>, Mika
+ Westerberg <mika.westerberg@linux.intel.com>, Andreas Noever
+ <andreas.noever@gmail.com>, Yehezkel Bernat <YehezkelShB@gmail.com>,
+ Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+Subject: Re: [PATCH 8/9] bitfield: Add comment block for the host/fixed
+ endian functions
+Message-ID: <20251211142646.17642a46@kernel.org>
+In-Reply-To: <20251210100846.04e59dcf@pumpkin>
+References: <20251209100313.2867-1-david.laight.linux@gmail.com>
+	<20251209100313.2867-9-david.laight.linux@gmail.com>
+	<20251210182300.3fabcf74@kernel.org>
+	<20251210100846.04e59dcf@pumpkin>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,15 +71,13 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 10 Dec 2025 18:03:14 +0800 Edward Adam Davis wrote:
-> > Have you investigated the other callers? Given problems with previous
-> > version of this patch I'm worried you have not. If you did please extend
-> > the commit message with the appropriate explanation.  
-> Are you asking if I investigated other zerocopy tests? NO.
+On Wed, 10 Dec 2025 10:08:46 +0000 David Laight wrote:
+> > possibly also add declarations for these? So that ctags and co. sees
+> > them?  
+> 
+> The functions are bulk-generated using a #define, ctags is never going to
+> find definitions.
 
-I said callers. You're changing behavior of a function, is it going 
-to break any of the callers.
-
-> The test results [T2] for this version of the patch do not show any
-> failures related to zerocopy.
+I know. That's why I said declarations. But for code completions etc
+decl is enough.
 
