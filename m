@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-244356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D365BCB5641
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 10:43:26 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C04FCB564A
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 10:43:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 50EC23001610
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 09:43:26 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9592C3002CC8
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 09:43:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA5932FC01C;
-	Thu, 11 Dec 2025 09:43:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53ED02FCC13;
+	Thu, 11 Dec 2025 09:43:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FDbU7mPN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h5gEkJEu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A18AC2FBE10;
-	Thu, 11 Dec 2025 09:43:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2723E381C4;
+	Thu, 11 Dec 2025 09:43:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765446203; cv=none; b=TbDYIDCD3zm9tOCIVZvTCj+MfgGZYK2IQBPhQEvtou6tK7/HgD/68hnuLs2FkCx60qczwpWd/lqLvZfDOhtH21kGH1YL7SBFbCKT2v4xezlkW1DUCds/zYxgnseUKhOBIpDyOahbalYRdNx3tqBZvfIcN4DPSz1u5PQz9P2XgZs=
+	t=1765446204; cv=none; b=prQTjLl441rMKJjD8mzvDAZgAvVwwSxNKlM1YpW1Ck4bnMgGTlQ0pLr5eoMCc4l6eW0IUH6oCdM4cEK30nch8E1pz2ibh4K+ypSBBrr6+/XFFzX0NfY3Q7TlpZR4MEo3WqeYfPzbObey8KVVia7vMtcBH3gF050xtt3xZSGUf9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765446203; c=relaxed/simple;
-	bh=Mb4oe9NOVj/ByxPMpfJp5GorIcuj+R8pUlJlrcEZGAs=;
+	s=arc-20240116; t=1765446204; c=relaxed/simple;
+	bh=GJaDJkmnWRTHvmHqWuLfnA/PUIOUXg8pn4fL0gM1KEA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=L9BvxUtVErA191KhVscIbF3Xr80if+dlMbe+CLZw3hZnIHVTtaZPHLk3+n+Xj13ZLh7snXaJQ/gwbly0SPwlzvCz0qR8UGNgaMAfuCJOYEWVtOR1/RrfKV1NRSPYXaW/XQzstHYW5Sv+uBT+2wR/E/HFHsbg0BxY0Jcp36xMEM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FDbU7mPN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A54AC113D0;
-	Thu, 11 Dec 2025 09:43:22 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=koMdchAPRlIyoByJQph6HhEnV2oeXCrC8ia63Pkv3PrC821G+BnM6ev0+qRVKoZM2wBkY8c0ukyjCHFTZx/n2H52w3V+XxdGzFauQgg7NX1TTncJDU3jCDEYPRG58DXGjZ5KEGD9HRPylOcSwC2K3X3C31vznUk7/hAwmXcI2tw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h5gEkJEu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF3A2C116B1;
+	Thu, 11 Dec 2025 09:43:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765446202;
-	bh=Mb4oe9NOVj/ByxPMpfJp5GorIcuj+R8pUlJlrcEZGAs=;
+	s=k20201202; t=1765446203;
+	bh=GJaDJkmnWRTHvmHqWuLfnA/PUIOUXg8pn4fL0gM1KEA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=FDbU7mPNUzcYbU7T8rVVUR+YVshZrJlneaNJkj187j5XuG9YModEjoS3pLBKnkQsC
-	 kXwXve3XOZx4s7ccZTQOjkXaki9mlrGOh2GZFIsKmNe2oCNtEc4jgygM5BUdGu1wl1
-	 a7dCkE0xOHo98lhYUT3TtIZF2zGvSynIUf1hglpdV34jQ66yChruYCr8VIKzHyYFtE
-	 G9k5tq85sCnkyJ32zJgkoqWEeYGJt645VNcI4RR03MZy3oUR3wTWNI8BT9GHzuG1a0
-	 eVO/QCmyV7yiSVX71aVhWkUzXbaFk5yRLNqkxeurBFqPK4wim0jHNqP//wa/upXtgF
-	 1gsq5r7vwnzWA==
+	b=h5gEkJEu/l0tv4J3gyz7VGy7902Sn1LA3BwJ7w3Xcwutl6VfBAt5R2AI1/S+JkAfD
+	 ugDdvqT/FmFn71a0pga6xu8dqkmvNNZCD0XWhynliXU9SdP2gIJRl1jlvu6bXRJ5XD
+	 ZViurZAhSQCFl9yRjLzI36pqII6mqgDW4CQB2nFZ/PuTAYPOxuv+onpBaKthNn/Eh1
+	 blVHz5SpDYIDZZhKPY5uJ0gFPcunPkPe5bmj/8GvXRJW9ruEK5tEoFBNqyifzuQivY
+	 UIFHUxaG23hpH7cZUJzhotYtyUkhDr0rZSNcD/hu4vE3jQ2PqoqlxK8KGr6SrtJ4Lj
+	 KyFqYRvTXoQ/Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 788953809A35;
-	Thu, 11 Dec 2025 09:40:17 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F2A0C3809A35;
+	Thu, 11 Dec 2025 09:40:18 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,39 +50,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] caif: fix integer underflow in cffrml_receive()
+Subject: Re: [PATCH net 1/2] can: fix build dependency
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176544601627.1308621.3200906619222938174.git-patchwork-notify@kernel.org>
-Date: Thu, 11 Dec 2025 09:40:16 +0000
-References: 
- <SYBPR01MB7881511122BAFEA8212A1608AFA6A@SYBPR01MB7881.ausprd01.prod.outlook.com>
-In-Reply-To: 
- <SYBPR01MB7881511122BAFEA8212A1608AFA6A@SYBPR01MB7881.ausprd01.prod.outlook.com>
-To: Junrui Luo <moonafterrain@outlook.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, sjur.brandeland@stericsson.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, danisjiang@gmail.com
+ <176544601752.1308621.3486706619884778020.git-patchwork-notify@kernel.org>
+Date: Thu, 11 Dec 2025 09:40:17 +0000
+References: <20251210083448.2116869-2-mkl@pengutronix.de>
+In-Reply-To: <20251210083448.2116869-2-mkl@pengutronix.de>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ linux-can@vger.kernel.org, kernel@pengutronix.de, arnd@arndb.de,
+ lkp@intel.com, socketcan@hartkopp.net
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This series was applied to netdev/net.git (main)
+by Marc Kleine-Budde <mkl@pengutronix.de>:
 
-On Thu, 04 Dec 2025 21:30:47 +0800 you wrote:
-> The cffrml_receive() function extracts a length field from the packet
-> header and, when FCS is disabled, subtracts 2 from this length without
-> validating that len >= 2.
+On Wed, 10 Dec 2025 09:32:23 +0100 you wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
 > 
-> If an attacker sends a malicious packet with a length field of 0 or 1
-> to an interface with FCS disabled, the subtraction causes an integer
-> underflow.
+> A recent bugfix introduced a new problem with Kconfig dependencies:
+> 
+> WARNING: unmet direct dependencies detected for CAN_DEV
+>   Depends on [n]: NETDEVICES [=n] && CAN [=m]
+>   Selected by [m]:
+>   - CAN [=m] && NET [=y]
 > 
 > [...]
 
 Here is the summary with links:
-  - caif: fix integer underflow in cffrml_receive()
-    https://git.kernel.org/netdev/net/c/8a11ff0948b5
+  - [net,1/2] can: fix build dependency
+    https://git.kernel.org/netdev/net/c/6abd4577bccc
+  - [net,2/2] can: gs_usb: gs_can_open(): fix error handling
+    https://git.kernel.org/netdev/net/c/3e54d3b4a843
 
 You are awesome, thank you!
 -- 
