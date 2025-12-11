@@ -1,137 +1,152 @@
-Return-Path: <netdev+bounces-244338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244339-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22399CB5159
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 09:19:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 68EA1CB51C2
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 09:30:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1BD9C300A1DA
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 08:13:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3A44830084DF
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 08:30:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BD5D2957C2;
-	Thu, 11 Dec 2025 08:13:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11CCE2D7DCF;
+	Thu, 11 Dec 2025 08:30:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NlfLN/PI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EHiJIiDd";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="fc+tieC6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C274E946A
-	for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 08:13:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4B9E2BEC42
+	for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 08:30:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765440812; cv=none; b=NTaZr01wkd2+1dfoepGKpqKQvejW0hOL/5owP4AdcWDjTciWt8qMqAhhg12T0zFBIhmYIiudbZmeYD7bl0m1oRAt8xGpOnb9C6aqPmzrwla6+n0u1yFK1q+fz5b4ZFCLUg6+fPsQUQcRH6IkGb7XENa+d3SZXns3y9Utm1j4tw0=
+	t=1765441819; cv=none; b=n3hzrUjexT6A9s7YG3HFP9WeQeaV1frUfDeVJZY+s2Sy9lXjVgAiV4EqBqMgKmTKRxSvf7ZXsVckqBQWTVXLEPzY+Y0g7EA0bEmWQnDLlat90Z9ahRzQ+paMgp5y8yxThgzwyJW6P5o8WIc3BWdySBgVcpDD7456Qq5YKk59UVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765440812; c=relaxed/simple;
-	bh=CRdQskgW/O6U/RpBs/bh42YAt536V9Rswk+rIj7pjMU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=belaczfBUTo6095QPR0zDGLF5lf7YylQ/9VJOxrb9DawkrnAItOBXMeWUpQfH6IZRd+klE8zYGovJI+QZgJo3uOyCY5BAV0XxM2qV2jqHahs0MfphjlcrMaaf63OtznH7JLTQidxHLHj97PMfaG60cmA0yu2SP7nMKcF1ytGfLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NlfLN/PI; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-298144fb9bcso7121705ad.0
-        for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 00:13:30 -0800 (PST)
+	s=arc-20240116; t=1765441819; c=relaxed/simple;
+	bh=vx2flSiC2ZzOI6DHmbaRJhsf8cDKzOr34NF/08N2QWk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bRGrGa9XmXFbJafSkYrx6JBI0zfblwGMsie8MxDCgFgYRiHgoHyCcrnqHSqul8S+1eBnCQ05+LSgn3XRy0YJ5ys9hLoY5rjanbJyEYhi5i8TQT9vYz8Foy27cVNOKPxSEIjw+fQc/ar9Lw+LAlCW1dmlAqoLxjQLAKGTmRrKY34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EHiJIiDd; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=fc+tieC6; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1765441816;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3idtZY7mSmwvuTMlPGQ2Fz6MYA6aCNvj4wJ0sTbDzCg=;
+	b=EHiJIiDdHyvOSAmmcGX3t5foQ8vZrG5kgY926VSPQ2ABvUO+4k8JTjWdKddnf3+CjeTrlr
+	jLhiMGmPN/49YjiqHaHTHdleFTPUyCa7I/Z7a0Amhk90ZNJm0wZMFJFAPYIYRcbH4tZVdS
+	0p7zlcB7uIJkKpTKgy6T25FKUSxDQ1k=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-363-AyTvs82RNe63xJpjMYI7RA-1; Thu, 11 Dec 2025 03:30:14 -0500
+X-MC-Unique: AyTvs82RNe63xJpjMYI7RA-1
+X-Mimecast-MFC-AGG-ID: AyTvs82RNe63xJpjMYI7RA_1765441814
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-64165abd7ffso1440750a12.0
+        for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 00:30:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765440810; x=1766045610; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=trUfnuuHzLWg0hqtTbFZbrBapbqubE16vGf51eAqUyI=;
-        b=NlfLN/PInJl3l93OXCX/IrY6gg8tW2yrkeDFDYQ75GGNEGfhf61rtrqglE0t7tFr/e
-         OkRBc1lkaFE/q2IGYbP16CwLYiWAc95IffbvIR5pvYBNGr+48ZTc4koCbVgnJnK89tQu
-         DjF++058N2d8Kpl9FIUiKbdGbWk10xK21EjG2IW09EoEDOLvRe+isNwC6Z3OFx0wpjSv
-         JfoRwjY84Wy8BgUw1rSiqshv8fqS2o77QYG77MbusJsreJx8lPfpYvcXZkfOi+2WtQ20
-         YUJEaYXHwCPfMUxQ64JozbC+B2SnYg9jlKbjOQ5051BV8k+HQ/gg4nxWkhLi3nlQhgGB
-         hlkw==
+        d=redhat.com; s=google; t=1765441814; x=1766046614; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3idtZY7mSmwvuTMlPGQ2Fz6MYA6aCNvj4wJ0sTbDzCg=;
+        b=fc+tieC6P1z/rzyYPxLlVmEYMkUXnQAMEKDI9pDDyBUSDUiGFcJQplFZupXzqtFUzE
+         +Nn2BxymCc5bkjrzdHcPZURYKv11aexFu4/MIiH3at1MLvL8JeOhlyNim158q9gSNsPl
+         JvzS7yUZwfwJhhf2DMd67xHHQX/zT4dZXCwtgqpLBj2B5NfYLGvQD8nxwdEsP9se8Wm7
+         1BHiZyorGTdLMg1bLRkQ0hcKGDUCupXmkaqPRO3qWbNB2nHh2Qkay9H9cR+fliKY0AGs
+         NAKwXyAN4/dVubSks5KGltoheIDnsZmNLvkzGknua0WFY34Ct/0zs8h3VGxx3QxX2wXt
+         vd/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765440810; x=1766045610;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=trUfnuuHzLWg0hqtTbFZbrBapbqubE16vGf51eAqUyI=;
-        b=mvWiWdOTTZ4ls3D03BFL4QrTQHnu8Fhwr6gIm65ZGx2eZZfW5Ucox62hA/HR3nc/Sm
-         SJZ+xAdi9/kfKfd3BK0ZlP9yiMhEcdtiEVSo7iifrXVzuf8QA/SORfl8s2kJjT9kFJB6
-         i8cQiXz7/U2RTXLFrWY4j3cpkfepR2DAx95Uvk8spa/tQUDdPOYEKcR8Doeub2eALe/j
-         NWJuTuVRCYmy8gZIK+lmkVgjcJj4PI2Eq877GcQIrpr4EzBxonAzjjtZXeUdChBPwnyx
-         MSNpYdEqWXPd+FPAVSwW9p9rJlXlIq25oya/Rg6WEBQXqEBTGOyMRIU8Fv/p6l9zypqx
-         WZkg==
-X-Forwarded-Encrypted: i=1; AJvYcCWJ6gS0wfCq1RHecI9z8TF+dK4PDoUaC4N1gUQL2azpEcQIPfzlFyjg/+zg1fi249QvvwmUkO0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxg/KOA3TL1peG1omXWR3j4u1+7LvHPBBuFIO5esqKs8EToV/9i
-	6xIrVqtXHV3J+HdeAEHQ8GajpDiERDbUPHdOxPXMrks9Kel4qDmh0HTF
-X-Gm-Gg: AY/fxX7RYdHf56yjCo2oh4hynpZPDjH6H8TwuVnEe4JzDKtFZqEWk/YBkrgdTKmRPo0
-	rh8UjXbA1u11XpuMyQIQR5W0GoF5zpThXXeO/lMEGkEkaKSGLVx1Ht+aoHQ3sMUslkK1iVzQ/VQ
-	aCyQWJZX8KgU+qSQkVTfaynq9XNJ0F/u2MIeFL06Zx5Ka9K3rKPCB0IBxsd7gCAfPvUdydwJQvW
-	GuL0DDTQESqBNnKQaQv4jp/j060822yJ0xrIAISl5gCmq7emXY9fxU/1vjbE80dyzU1ZnWopG1M
-	kprtoSHmWWyr+RvvgGqiR7Bw6g6Nnco2Z2ITGdn2a5KXMKjnSKt7L3UYts4Qji0AoxGisufnZ8l
-	5IYiOvKQmW3XS3BP3uDc9vazEfMEIJw/zDXmaiiy3go7mbhozNdQd853beuYnPjO4AZGbJXDTEX
-	Ew5p+Sj62N
-X-Google-Smtp-Source: AGHT+IGpU0Pf7s9UlmMW8EGY8yYMuomHFnlX0/Df9bPI6JMt8uShHZ+gMWWhZpAR4wob/58V/qG9Zw==
-X-Received: by 2002:a17:903:2c7:b0:295:6a69:4ad5 with SMTP id d9443c01a7336-29ec2803d18mr60221255ad.56.1765440810038;
-        Thu, 11 Dec 2025 00:13:30 -0800 (PST)
-Received: from c45b92c47440.. ([202.120.234.58])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-29eea04036bsm16048855ad.78.2025.12.11.00.13.23
+        d=1e100.net; s=20230601; t=1765441814; x=1766046614;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3idtZY7mSmwvuTMlPGQ2Fz6MYA6aCNvj4wJ0sTbDzCg=;
+        b=WPIZQyYdUGbIwJwR/fyHoAiRRVBDQiROT++cpqRNRa84RvwZyTW+w90mOmMuRERxo/
+         qOZ5GhV9ahLEPvN1nHLW6sqKmctFwpNtWapULbaCSAMiwYqePwyW4E8vUQDC5/7RA+N4
+         PDRSZu9LnE45y/IlrMW7LIVKkrDD/1sfIynJARXoudwy8dEafycA8JNZ1v8O0Ysmd75e
+         d2I/MELMuKmBTBjkVG9b/zmcdM8uANL8XMQAzET1e1nlKdaL5grnQ2yaMiFOvEWSQpFv
+         lVzJ5PIY9eroR42RVeXhOpGFxCsJXKkGxy6v5Ge7jhn5Q+/bKV+WSJHc/EFO6KYz8B84
+         KeRg==
+X-Forwarded-Encrypted: i=1; AJvYcCX2QR+YfVvccmQqsXbyMpsXuo+RYy4/yUhd4y3zJ0MrMvL9ZAYak6fMvMwmfJ+CbTmcoygnr5Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxklWoNkh/2h0pWXdrybaGV0Z/WcYyeLYcPCpBnrVrnvoa3r29t
+	2yg6/Lw8WT+uFa7OooCBi7I29XQAL0y00CU8qMB/9KNR8lfCM+EHoZ8+gG1k3KxT/S7WCJZ5rEy
+	0xltYn9PzKeT6znmvznHTPayxW2sp7lehnpUVYifnWtywR0uWxjCsL+6B3A==
+X-Gm-Gg: AY/fxX7XZrCHomm7Q7H9y1kw7U/XRTWKJsYewnV/XqCmX/sPMIV3H7Auw8351AfCC9k
+	kHXDOgHlEdCi3GP/tRjuNwqkKVXMCC4iQuJ4knfssQCe7V2pGeBTCAifoZgYCfsxh0rq3H/p/ja
+	Yk71vJRuhKJ+n/jXNhR1KwJ77m1sQgtlC13TfZ6EJCEdXuKk0UV9bQDN+XAi/F9PfBI9IbGkj1d
+	y+cGSA5ksmbhKYubrGT0aA2Lr8wViMrn3C37ZkIdxKJTh+ZSwZ5OHJ4G586qqSIlD0LgvdcOg4S
+	CiX9pTRHZfBjXOQDZcpZDjU4KsuNQqTgWNICZRxQ8xfDTrf/9LaHMsfvfgs+BLOVzX5IdxT/ULV
+	LeUhmrdhXAHH+QJoxt7arruk0mdMbqwz/mOcLiPpFW9m0mDQx0oMU+gQaNsw5Qw==
+X-Received: by 2002:a05:6402:2786:b0:645:1078:22aa with SMTP id 4fb4d7f45d1cf-6496cbbc23cmr4596710a12.19.1765441813611;
+        Thu, 11 Dec 2025 00:30:13 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGuwQjT4UHTBmwDXqoTBxPbsneTQexl6Aw6I9Srmcye45B0nUYzXfaqL0GoFMZfWMLEuTvP7A==
+X-Received: by 2002:a05:6402:2786:b0:645:1078:22aa with SMTP id 4fb4d7f45d1cf-6496cbbc23cmr4596676a12.19.1765441813080;
+        Thu, 11 Dec 2025 00:30:13 -0800 (PST)
+Received: from sgarzare-redhat (host-87-12-139-91.business.telecomitalia.it. [87.12.139.91])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6498204fbb3sm1831786a12.8.2025.12.11.00.30.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Dec 2025 00:13:29 -0800 (PST)
-From: Miaoqian Lin <linmq006@gmail.com>
-To: Daniel Golle <daniel@makrotopia.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Cc: linmq006@gmail.com,
-	stable@vger.kernel.org
-Subject: [PATCH] net: phy: mediatek: fix nvmem cell reference leak in mt798x_phy_calibration
-Date: Thu, 11 Dec 2025 12:13:13 +0400
-Message-Id: <20251211081313.2368460-1-linmq006@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        Thu, 11 Dec 2025 00:30:12 -0800 (PST)
+Date: Thu, 11 Dec 2025 09:30:06 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	virtualization@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net] vsock/virtio: Fix error code in
+ virtio_transport_recv_listen()
+Message-ID: <xz4ukol5bvxmk2ctrjtvpyncipntjlf4bdr7kjdam2ig5gf7ho@vuuwwu7asj7i>
+References: <aTp2q-K4xNwiDQSW@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <aTp2q-K4xNwiDQSW@stanley.mountain>
 
-When nvmem_cell_read() fails in mt798x_phy_calibration(), the function
-returns without calling nvmem_cell_put(), leaking the cell reference.
+On Thu, Dec 11, 2025 at 10:45:47AM +0300, Dan Carpenter wrote:
+>Return a negative error code if the transport doesn't match.  Don't
+>return success.
+>
+>Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
+>Cc: stable@vger.kernel.org
+>Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+>---
+>From static analysis.  Not tested.
+>
+> net/vmw_vsock/virtio_transport_common.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+>
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index dcc8a1d5851e..77fbc6c541bf 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -1550,7 +1550,7 @@ virtio_transport_recv_listen(struct sock *sk, struct sk_buff *skb,
+> 		release_sock(child);
+> 		virtio_transport_reset_no_sock(t, skb);
+> 		sock_put(child);
+>-		return ret;
+>+		return ret ?: -EINVAL;
 
-Move nvmem_cell_put() right after nvmem_cell_read() to ensure the cell
-reference is always released regardless of the read result.
+Thanks for this fix. I think we have a similar issue also in 
+net/vmw_vsock/vmci_transport.c introduced by the same commit.
+In net/vmw_vsock/hyperv_transport.c we have a similar pattern, but the 
+calling function return void, so no issue there.
 
-Found via static analysis and code review.
+Do you mind to fix also that one?
 
-Fixes: 98c485eaf509 ("net: phy: add driver for MediaTek SoC built-in GE PHYs")
-Cc: stable@vger.kernel.org
-Signed-off-by: Miaoqian Lin <linmq006@gmail.com>
----
- drivers/net/phy/mediatek/mtk-ge-soc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Sending a v2 to fix both or another patch just for that it's fine by me,
+so:
 
-diff --git a/drivers/net/phy/mediatek/mtk-ge-soc.c b/drivers/net/phy/mediatek/mtk-ge-soc.c
-index cd09fbf92ef2..2c4bbc236202 100644
---- a/drivers/net/phy/mediatek/mtk-ge-soc.c
-+++ b/drivers/net/phy/mediatek/mtk-ge-soc.c
-@@ -1167,9 +1167,9 @@ static int mt798x_phy_calibration(struct phy_device *phydev)
- 	}
- 
- 	buf = (u32 *)nvmem_cell_read(cell, &len);
-+	nvmem_cell_put(cell);
- 	if (IS_ERR(buf))
- 		return PTR_ERR(buf);
--	nvmem_cell_put(cell);
- 
- 	if (!buf[0] || !buf[1] || !buf[2] || !buf[3] || len < 4 * sizeof(u32)) {
- 		phydev_err(phydev, "invalid efuse data\n");
--- 
-2.25.1
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
 
