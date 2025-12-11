@@ -1,213 +1,154 @@
-Return-Path: <netdev+bounces-244383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63C3BCB6023
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 14:25:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09EC1CB604A
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 14:27:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 543A930019F2
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 13:25:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 673963020493
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 13:26:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F191C30B513;
-	Thu, 11 Dec 2025 13:25:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FC0F313298;
+	Thu, 11 Dec 2025 13:26:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L8MxOb2u"
 X-Original-To: netdev@vger.kernel.org
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5409F2F5473;
-	Thu, 11 Dec 2025 13:25:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18FC2313529
+	for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 13:26:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765459551; cv=none; b=pEGL3uYx069DgMy2ALuN5BeK9wFhg4F+FdE2urKK6OhkbFKohDzmM0IqxSpS+2xxDy5D96Shkb0Ha6aduq3JziIQG1dRBlS+8isyuVgg2+HJ4pPPf+Fp/04EIO9NA99mA2dZZVeDQ+odC7KmuNvJLBH5oHa1hXgiru63UXBc/Ls=
+	t=1765459583; cv=none; b=tC7uAzwP3L7g7DS2UiBrCj5FYtCcszuqodtQ3lzQJXQKeZbH6siGUMByMuVTOMdiQWPorrJKVuGhhO3KgaI2cWYVs4AGhXlv1bV9Rcta0k317YhmNUCGujXKusFUXr6s/Ljtct7cfXXx1wx96s76r90h6Hpp9hEsttVrnjIet7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765459551; c=relaxed/simple;
-	bh=VLBhCFygsztsQ8BtAiJ2nMgwMLnuq8LlPDi0Qvj7P+o=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:References:Cc:
-	 In-Reply-To:Content-Type; b=kBITxBbN9hXhRDiHBbOjTllW/OL/Xb58FK5sf293WHslSBR5L4H8UV2H4B2rxw6Jd/KJs4Y5nXazXK82WhtaAHTbyyzHDzS8IXryP+yuKqPIZJ3VxnBwGwemEkGK6Iz7Oj3UK1lC9edlvwtoIEqwCF+eEUL/ubuQL75JHnYuvjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 5BBDP2Rv008491;
-	Thu, 11 Dec 2025 22:25:02 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 5BBDP2MI008482
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Thu, 11 Dec 2025 22:25:02 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <1722eff3-14c1-408b-999b-1be3e8fbfe5a@I-love.SAKURA.ne.jp>
-Date: Thu, 11 Dec 2025 22:24:59 +0900
+	s=arc-20240116; t=1765459583; c=relaxed/simple;
+	bh=g4EZtkPk8SWeZdiy6hP00m8tmMqkLZiYMlk+LWYtQUQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZgOFxWNq/EMkeFFZ0xH23tyt0hwx0dgfzhl8/KNre3dDLlb7DEcxqAFjUCpOcN1nZ9e9JWoEP9bpcGEOzJTHitp2inwUY2xfUrcDBSZB5JEkPiw+84+YSrqAgMx4E5rHAdE6/3E0vpknsnX90a4Kjn96cLnJ2zLfsynqVTg4QcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L8MxOb2u; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-42e2e40582eso65393f8f.1
+        for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 05:26:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765459579; x=1766064379; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZlfuqWd+wXy1Z6z/5IbBi7MVW3SrOYuOUgMVtqsk6rQ=;
+        b=L8MxOb2uljsVbiEyIovNw3uL7W7zHBpVLh+IgmGwnmIyulhbXw1qevwovmiK6aj60L
+         PJhbIgFIu7x77pxe9LpyKa2qjzHpi6w+Ak95hszwXgIdkEaP2IDAdo39Hgx8KgJ0Edrq
+         fBK3UoBKAPhwEUvKL2DxsQ9mO0jRU7+WqxyeXp4ke2uQ0qQvdvnwxvSnuuSR/f8ovL1Y
+         hKTj1WSlzRNVehjZwjg2jBK+BUn0ueeu5oTav8N1l52bHFHq8Jlm3Q90TdkBqzVLeAhY
+         /d7c31l2Gb6kDsACyuQlcXg6nAYDP+Xocz5p61ynDD/tdc6u/VWGsQbrCPnqBrP8avdv
+         /f0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765459579; x=1766064379;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ZlfuqWd+wXy1Z6z/5IbBi7MVW3SrOYuOUgMVtqsk6rQ=;
+        b=UsJHT32IefIm5Oy8tvmZegd8NbGaXkaaVXF13A9dDxNmFEudCf0I6mmbVPImKebrqI
+         DB2WmVagtdkgytU48szMDXiU59lkk/EtKn1QSSgJweh4Zc2p7zgzCooWvNl1bCWaUZnO
+         FyDiJpd8BiGNYcT1U8CozWkjgyogRwW24EgpO2BStX5mCHSMv83/YBa3OaAMoOpQlnmE
+         8MrFThgiwoaNsC7CEEA1tKNt5vDRJZZSptwX2axSV+GUfx97M5MElVP/iq/0NSqExRdv
+         8AmGl2dWvHdU+NaJ7WHxyREvtfP4Tv8RxUleDvcxmEL0v6hdLDqIpJBdfiFTY8CBAcHN
+         09QQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXQ1ASxyheRbpsCwY/UJPhnOvHwB/OJqlyxW9ZEfAW1VIdgdKk4tdI7b1Z7EAKII8dJx6mhEBY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyh70Q9zjt8YFohGMvoufCRVhvUV/QvtFN2zU7UoEZaX9QhEwZi
+	11a1PWAN+RkLujzGSwSm3p6YWFmhsjBRRRi1PMpGDxYtGwom1zo2481R
+X-Gm-Gg: AY/fxX6OzpvaAhvlT+lU+y1hv/vIeV79E+4XRrsk3euFTDd3ne/7/fiid3NCtQoJm/z
+	Iffx1PeMjNN7zEza9uEMPkTcwtHKaQ0w8IboQgPicdpBizuPSaXMOkY1g4tZL/eRcYgcnunnUe9
+	jn9mddVHDp2qSGQSheqHn32WDolGpWiftIoXHU4ZjVRPG9ycbpfMnLTyIzH/ykBQhFyT+9b9C4S
+	1Hg+ULdXjyB2WmVyJdHBZ3VHKZJHOvTmDn2kx2kzF6wbE4X/n683RSlxjqlFX/7BgljZrRUjhcr
+	IFxHO2fD80pS5cqhbxUfqyPTEcTt7LGyl23YKa4EkGLS82i/HOOgAoKlWn2bWBplsIhZzw2qdMJ
+	kGcvtScV8bkRet8d98IQz8EaGmNNa1bXQ6zSV4KYws0EuF6WungZBF2b94bCObXDuC0fTgIIU41
+	6R3TS5dP51eFYmY4MZ/HsYw1JbfB3Mu8A7tyXu38DCLIADHUnm+lgR
+X-Google-Smtp-Source: AGHT+IH6movm7b2euzwcgRjXCZdmfEYd3c5Akj56OpLE2KX8CWu2MNAl4nC6XLt32a72nqxw++BF1w==
+X-Received: by 2002:a05:6000:2c11:b0:42b:4139:5794 with SMTP id ffacd0b85a97d-42fa3b12ba1mr6655880f8f.58.1765459578915;
+        Thu, 11 Dec 2025 05:26:18 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42fa8b9b259sm5539863f8f.41.2025.12.11.05.26.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Dec 2025 05:26:18 -0800 (PST)
+Date: Thu, 11 Dec 2025 13:26:16 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Junrui Luo <moonafterrain@outlook.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Sjur Braendeland
+ <sjur.brandeland@stericsson.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Yuhao Jiang <danisjiang@gmail.com>
+Subject: Re: [PATCH] caif: fix integer underflow in cffrml_receive()
+Message-ID: <20251211132616.0dd2c103@pumpkin>
+In-Reply-To: <SYBPR01MB7881511122BAFEA8212A1608AFA6A@SYBPR01MB7881.ausprd01.prod.outlook.com>
+References: <SYBPR01MB7881511122BAFEA8212A1608AFA6A@SYBPR01MB7881.ausprd01.prod.outlook.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [not-yet-signed PATCH] RDMA/core: flush gid_cache_wq WQ from
- disable_device()
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-To: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
-        Majd Dibbiny <majd@mellanox.com>, Doug Ledford <dledford@redhat.com>,
-        Yuval Shaia <yuval.shaia@oracle.com>
-References: <30ec01df-6c32-490c-aa26-c41653f5a257@I-love.SAKURA.ne.jp>
- <8f90fba8-60b9-46e2-8990-45311c7b1540@I-love.SAKURA.ne.jp>
-Content-Language: en-US
-Cc: Bernard Metzler <bernard.metzler@linux.dev>,
-        OFED mailing list <linux-rdma@vger.kernel.org>,
-        Network Development <netdev@vger.kernel.org>
-In-Reply-To: <8f90fba8-60b9-46e2-8990-45311c7b1540@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Anti-Virus-Server: fsav202.rs.sakura.ne.jp
-X-Virus-Status: clean
 
-syzbot is reporting a net_device refcount leak in RDMA code.
-A debug printk() patch in next-20251204 reported that there is a refcount
-leak in ib_gid_table_entry handling. Another debug printk() patch in
-next-20251210 reported that netdevice_event_work_handler() is called for
-allocating GID entry but is not called for releasing GID entry.
+On Thu, 04 Dec 2025 21:30:47 +0800
+Junrui Luo <moonafterrain@outlook.com> wrote:
 
-  unregister_netdevice: waiting for ipvlan0 to become free. Usage count = 5
-  Call trace for ipvlan0@ffff888076d9da00 +1 at
-       alloc_gid_entry drivers/infiniband/core/cache.c:410 [inline]
-       add_modify_gid+0x317/0xcc0 drivers/infiniband/core/cache.c:550
-       __ib_cache_gid_add+0x230/0x370 drivers/infiniband/core/cache.c:681
-       ib_cache_gid_set_default_gid+0x5f9/0x710 drivers/infiniband/core/cache.c:960
-       ib_enum_roce_netdev+0x1ab/0x2e0 drivers/infiniband/core/device.c:2451
-       ib_enum_all_roce_netdevs+0xcc/0x160 drivers/infiniband/core/device.c:2477
-       netdevice_event_work_handler+0xef/0x260 drivers/infiniband/core/roce_gid_mgmt.c:660
-       process_one_work+0x93a/0x15a0 kernel/workqueue.c:3279
-  Call trace for ipvlan0@ffff888076d9de00 +1 at
-       alloc_gid_entry drivers/infiniband/core/cache.c:410 [inline]
-       add_modify_gid+0x317/0xcc0 drivers/infiniband/core/cache.c:550
-       __ib_cache_gid_add+0x230/0x370 drivers/infiniband/core/cache.c:681
-       update_gid drivers/infiniband/core/roce_gid_mgmt.c:110 [inline]
-       update_gid_ip drivers/infiniband/core/roce_gid_mgmt.c:294 [inline]
-       enum_netdev_ipv4_ips drivers/infiniband/core/roce_gid_mgmt.c:368 [inline]
-       _add_netdev_ips+0x98c/0x1560 drivers/infiniband/core/roce_gid_mgmt.c:424
-       ib_enum_roce_netdev+0x1ab/0x2e0 drivers/infiniband/core/device.c:2451
-       ib_enum_all_roce_netdevs+0xcc/0x160 drivers/infiniband/core/device.c:2477
-       netdevice_event_work_handler+0xef/0x260 drivers/infiniband/core/roce_gid_mgmt.c:660
-       process_one_work+0x93a/0x15a0 kernel/workqueue.c:3279
-  Call trace for ipvlan0@ffff888031e4eb00 +1 at
-       alloc_gid_entry drivers/infiniband/core/cache.c:410 [inline]
-       add_modify_gid+0x317/0xcc0 drivers/infiniband/core/cache.c:550
-       __ib_cache_gid_add+0x230/0x370 drivers/infiniband/core/cache.c:681
-       update_gid drivers/infiniband/core/roce_gid_mgmt.c:110 [inline]
-       enum_netdev_ipv6_ips drivers/infiniband/core/roce_gid_mgmt.c:415 [inline]
-       _add_netdev_ips+0x12d9/0x1560 drivers/infiniband/core/roce_gid_mgmt.c:426
-       ib_enum_roce_netdev+0x1ab/0x2e0 drivers/infiniband/core/device.c:2451
-       ib_enum_all_roce_netdevs+0xcc/0x160 drivers/infiniband/core/device.c:2477
-       netdevice_event_work_handler+0xef/0x260 drivers/infiniband/core/roce_gid_mgmt.c:660
-       process_one_work+0x93a/0x15a0 kernel/workqueue.c:3279
-  Call trace for ipvlan0@ffff888076d9da00 +1 at
-       get_gid_entry drivers/infiniband/core/cache.c:435 [inline]
-       rdma_get_gid_attr+0x2ee/0x3f0 drivers/infiniband/core/cache.c:1300
-       smc_ib_fill_mac net/smc/smc_ib.c:160 [inline]
-       smc_ib_remember_port_attr net/smc/smc_ib.c:369 [inline]
-       smc_ib_port_event_work+0x196/0x940 net/smc/smc_ib.c:388
-       process_one_work+0x93a/0x15a0 kernel/workqueue.c:3279
-  Call trace for ipvlan0@ffff888076d9da00 -1 at
-       put_gid_entry drivers/infiniband/core/cache.c:441 [inline]
-       rdma_put_gid_attr+0x7c/0x130 drivers/infiniband/core/cache.c:1381
-       smc_ib_fill_mac net/smc/smc_ib.c:165 [inline]
-       smc_ib_remember_port_attr net/smc/smc_ib.c:369 [inline]
-       smc_ib_port_event_work+0x1d4/0x940 net/smc/smc_ib.c:388
-       process_one_work+0x93a/0x15a0 kernel/workqueue.c:3279
-  balance for ipvlan0@ib_gid_table_entry is 3
+> The cffrml_receive() function extracts a length field from the packet
+> header and, when FCS is disabled, subtracts 2 from this length without
+> validating that len >= 2.
+> 
+> If an attacker sends a malicious packet with a length field of 0 or 1
+> to an interface with FCS disabled, the subtraction causes an integer
+> underflow.
+> 
+> This can lead to memory exhaustion and kernel instability, potential
+> information disclosure if padding contains uninitialized kernel memory.
+> 
+> Fix this by validating that len >= 2 before performing the subtraction.
+> 
+> Reported-by: Yuhao Jiang <danisjiang@gmail.com>
+> Reported-by: Junrui Luo <moonafterrain@outlook.com>
+> Fixes: b482cd2053e3 ("net-caif: add CAIF core protocol stack")
+> Signed-off-by: Junrui Luo <moonafterrain@outlook.com>
+> ---
+>  net/caif/cffrml.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/caif/cffrml.c b/net/caif/cffrml.c
+> index 6651a8dc62e0..d4d63586053a 100644
+> --- a/net/caif/cffrml.c
+> +++ b/net/caif/cffrml.c
+> @@ -92,8 +92,15 @@ static int cffrml_receive(struct cflayer *layr, struct cfpkt *pkt)
+>  	len = le16_to_cpu(tmp);
+>  
+>  	/* Subtract for FCS on length if FCS is not used. */
+> -	if (!this->dofcs)
+> +	if (!this->dofcs) {
+> +		if (len < 2) {
+> +			++cffrml_rcv_error;
+> +			pr_err("Invalid frame length (%d)\n", len);
 
-If netdevice_event_work_handler() is supposed to be called for releasing
-GID entry upon NETDEV_UNREGISTER event, we can consider that something is
-preventing ib_enum_all_roce_netdevs() from being called. And I found
-possible race window explained below.
+Doesn't that let the same remote attacker flood the kernel message buffer?
 
-Since ib_enum_all_roce_netdevs() uses xa_for_each_marked(DEVICE_REGISTERED)
-with devices_rwsem held for read, we need to ensure that all works queued
-by netdevice_event(NETDEV_UNREGISTER) completes before disable_device()
-calls xa_clear_mark(DEVICE_REGISTERED) with devices_rwsem held for write.
-Otherwise, ib_enum_all_roce_netdevs() will fail to find devices for
-NETDEV_UNREGISTER event (which is needed for dropping a refcount on
-ib_gid_table_entry which is holding a refcount on net_device).
+	David
 
-Since flush_workqueue(gid_cache_wq) is not called before disable_device()
-calls xa_clear_mark(), and commit 8fe8bacb92f2 ("IB/core: Add ordered
-workqueue for RoCE GID management") introduced gid_cache_wq as ordered,
-possibility of failing to complete some of works before xa_clear_mark() is
-called might not be negligible. Therefore, flush gid_cache_wq WQ before
-disable_device() calls xa_clear_mark().
-
-Also, add __GFP_NOFAIL when allocating memory for a work for netdev events.
-Since that commit is intended to ensure that netdev events are processed
-in the order netdevice_event() is called, failing to invoke corresponding
-event handler due to memory allocation failure is as bad as processing
-netdev events in parallel.
----
-Since a reproducer for this bug is not available, I haven't verified
-whether this is a bug syzbot is currently reporting in
-https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84 .
-But I'd like to add Reported-by: syzbot if netdevice_event_work_handler()
-is supposed to be called for releasing GID entry upon NETDEV_UNREGISTER
-event. Thus, please review this change.
-
- drivers/infiniband/core/core_priv.h     |  1 +
- drivers/infiniband/core/device.c        |  1 +
- drivers/infiniband/core/roce_gid_mgmt.c | 10 ++++++----
- 3 files changed, 8 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/infiniband/core/core_priv.h b/drivers/infiniband/core/core_priv.h
-index 05102769a918..8355020bb98a 100644
---- a/drivers/infiniband/core/core_priv.h
-+++ b/drivers/infiniband/core/core_priv.h
-@@ -142,6 +142,7 @@ int ib_cache_gid_del_all_netdev_gids(struct ib_device *ib_dev, u32 port,
- 
- int roce_gid_mgmt_init(void);
- void roce_gid_mgmt_cleanup(void);
-+void roce_flush_gid_cache_wq(void);
- 
- unsigned long roce_gid_type_mask_support(struct ib_device *ib_dev, u32 port);
- 
-diff --git a/drivers/infiniband/core/device.c b/drivers/infiniband/core/device.c
-index 13e8a1714bbd..8638583a64f2 100644
---- a/drivers/infiniband/core/device.c
-+++ b/drivers/infiniband/core/device.c
-@@ -1300,6 +1300,7 @@ static void disable_device(struct ib_device *device)
- 
- 	WARN_ON(!refcount_read(&device->refcount));
- 
-+	roce_flush_gid_cache_wq();
- 	down_write(&devices_rwsem);
- 	xa_clear_mark(&devices, device->index, DEVICE_REGISTERED);
- 	up_write(&devices_rwsem);
-diff --git a/drivers/infiniband/core/roce_gid_mgmt.c b/drivers/infiniband/core/roce_gid_mgmt.c
-index a9f2c6b1b29e..79982d448cd2 100644
---- a/drivers/infiniband/core/roce_gid_mgmt.c
-+++ b/drivers/infiniband/core/roce_gid_mgmt.c
-@@ -661,10 +661,7 @@ static int netdevice_queue_work(struct netdev_event_work_cmd *cmds,
- {
- 	unsigned int i;
- 	struct netdev_event_work *ndev_work =
--		kmalloc(sizeof(*ndev_work), GFP_KERNEL);
--
--	if (!ndev_work)
--		return NOTIFY_DONE;
-+		kmalloc(sizeof(*ndev_work), GFP_KERNEL | __GFP_NOFAIL);
- 
- 	memcpy(ndev_work->cmds, cmds, sizeof(ndev_work->cmds));
- 	for (i = 0; i < ARRAY_SIZE(ndev_work->cmds) && ndev_work->cmds[i].cb; i++) {
-@@ -948,3 +945,8 @@ void __exit roce_gid_mgmt_cleanup(void)
- 	 */
- 	destroy_workqueue(gid_cache_wq);
- }
-+
-+void roce_flush_gid_cache_wq(void)
-+{
-+	flush_workqueue(gid_cache_wq);
-+}
--- 
-2.47.3
-
+> +			cfpkt_destroy(pkt);
+> +			return -EPROTO;
+> +		}
+>  		len -= 2;
+> +	}
+>  
+>  	if (cfpkt_setlen(pkt, len) < 0) {
+>  		++cffrml_rcv_error;
+> 
+> ---
+> base-commit: 559e608c46553c107dbba19dae0854af7b219400
+> change-id: 20251204-fixes-23393d72bfc8
+> 
+> Best regards,
 
 
