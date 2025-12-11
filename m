@@ -1,149 +1,291 @@
-Return-Path: <netdev+bounces-244395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A104CB63A6
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 15:42:28 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E164DCB63CD
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 15:45:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 14912300EA26
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 14:36:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 332EB301E912
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 14:44:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B12D279DA6;
-	Thu, 11 Dec 2025 14:36:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3957528727B;
+	Thu, 11 Dec 2025 14:44:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gw5ddyNH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BlVLteqZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ED4141C71;
-	Thu, 11 Dec 2025 14:36:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D2C1285C89
+	for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 14:44:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765463814; cv=none; b=fdUYQ5x4GF0RkM1nt8n4ir6kfe6R32PYvHvpQ95q0Miso3usH//r1PsrxIgWrvp1T+Y1LmXUE5yVB5/WCj0ZfWnwJ3mh0TSK5S2mG8JRLwJ+S3IH+L+6lKRM8Wxk/WsRAltUXLsf4zRoNnyiaEL9g1npzGxltAiuyZZbsgOPTPk=
+	t=1765464254; cv=none; b=Y63Wt+j8ThvOQz2Clx5k6rHHTfIQAWY930E5YHcn+NhxHJyymI9kYoVLevL5slRlMVnQdZeEeqfm+qTQ1w0a9mSfFlJXg4ivypIP9DgR6/PLhSmEvKRAiBTPiefZx3E+l6YvZjQyDNIzvy2T/6NzMjqOUvGx74I02gd+hVtaoMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765463814; c=relaxed/simple;
-	bh=ISs7rIFnpXZ7va3u8+WnalslXIivwIWI2O48OAtFi1E=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=qo/Vail8ZQbAqomvO2Ywt/9SCpolrSLPTFHs5LXu4HN4eQ7Ni7vRBi9vC7uMFy9XlNK0Rv2Zm15eN0LngAGi0ILqDobRQlo6RWIg2GT591FC7jD2l5fe3DQKum4MEGCMeCalCfYqrg2t//Z1no4+FrbzxmzSrr5/ua6FcJzceLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gw5ddyNH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87525C113D0;
-	Thu, 11 Dec 2025 14:36:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765463813;
-	bh=ISs7rIFnpXZ7va3u8+WnalslXIivwIWI2O48OAtFi1E=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=Gw5ddyNHaPhQHkl+stw8w/0qPrUNAY4wjsOPcNJidnQ7LaugA97gHBFHeIQzPiPF7
-	 J0uJQ/Wp4CaplWjyETfYlvwxAvw1kUXdwGtXpoUS77MeRdbLWtnctMJzELpI7dd4Dd
-	 TN+DN05vb0TlnHDDvPxaLugNZPM5bC3f/Sii0cdOVne1FsGs5djmr+Y33yCPaBIAO0
-	 JHmpuQ3vfyRufIJXMl3a6/JSK63wjYLSWpGZHo4uQ0rR8EM8ZL4LDHRteKM9hLLfuc
-	 QDAWaB6x3xqxuydVUugWVnhB5E0o6DshETl+9zjF/wuLgk0cTqdPHBeoB0tnuqIdMC
-	 opzP6KJvSGy4Q==
-Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 90BC2F4006A;
-	Thu, 11 Dec 2025 09:36:52 -0500 (EST)
-Received: from phl-imap-15 ([10.202.2.104])
-  by phl-compute-10.internal (MEProxy); Thu, 11 Dec 2025 09:36:52 -0500
-X-ME-Sender: <xms:BNc6aaZZBdHjGF49i2V8fzs-p0DBqSMgBc9wLWHsZnY79pV3cBPhbg>
-    <xme:BNc6aYMjaULxjhRFtX_GZctkhwnSlKExFSoI5LKPFqndpzgJnsfTpcaudObtzCMTQ
-    ms4kvOIFBtXX85_3VVzamHaBYSjtuSXvtxU6CR7Hos1RgUI20erRXg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgddvheehiecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpefoggffhffvvefkjghfufgtgfesthejredtredttdenucfhrhhomhepfdevhhhutghk
-    ucfnvghvvghrfdcuoegtvghlsehkvghrnhgvlhdrohhrgheqnecuggftrfgrthhtvghrnh
-    ephfffkefffedtgfehieevkeduuefhvdejvdefvdeuuddvgeelkeegtefgudfhfeelnecu
-    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheptghhuhgtkh
-    hlvghvvghrodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdduieefgeelleel
-    heelqdefvdelkeeggedvfedqtggvlheppehkvghrnhgvlhdrohhrghesfhgrshhtmhgrih
-    hlrdgtohhmpdhnsggprhgtphhtthhopeegpdhmohguvgepshhmthhpohhuthdprhgtphht
-    thhopehkvghrnhgvlhdqthhlshdqhhgrnhgushhhrghkvgeslhhishhtshdrlhhinhhugi
-    druggvvhdprhgtphhtthhopegthhhutghkrdhlvghvvghrsehorhgrtghlvgdrtghomhdp
-    rhgtphhtthhopehsmhgrhihhvgifsehrvgguhhgrthdrtghomhdprhgtphhtthhopehnvg
-    htuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:BNc6aVABD3O9yn01yyuYNACTfURImijeYWt_WhEXgdAzny6Prmzdag>
-    <xmx:BNc6ae-851xkdYTEYkkoeZPRjHAudUGLLAvoTk5XdwvR_2El6Bimsw>
-    <xmx:BNc6aUE_qbh1kZ-8_C2CYr-hBjarSca6S2uEVi3URmJplX3Xsp66vA>
-    <xmx:BNc6aUM7_XeaZHYlwDpkfw_leecjXfJrfgco_OYMb_wjv0bwYI7_Ug>
-    <xmx:BNc6aWcA5_gQhWs4pasNl7PuCSzrR89yPoO_eWSm8OJufmu2fYStJNdT>
-Feedback-ID: ifa6e4810:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 70086780054; Thu, 11 Dec 2025 09:36:52 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1765464254; c=relaxed/simple;
+	bh=HcERldN4lWho/JUPnC5sIgD6t5G2cLBp2BqazKe5Jrg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=V6s/U8flnkRw7j4DC8f6UFyQ1RCSwieWRXVQ0+Ahq+0B9KUGYZ2XfaZsSOsAVDeLfJegGTBaGzbW05mbSxkGOlf/RE7GnYmRAXSXgwaKyYM4BiDp+Du8ym2X7kQV/MusWPIHHJn56fm1C8gqVrC20n5zmlgn6Lu7XIFFHHQUlQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BlVLteqZ; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-29e93ab7ff5so2038985ad.3
+        for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 06:44:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765464252; x=1766069052; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EtINVVL3vB+IyxNj9ffA7lSqV98wLbUBVSb7OBPZY6U=;
+        b=BlVLteqZBeszJxirK6ZI+h+MyzDKWp8b/ReApVmyTZ93Lf2maGNpNHpTFgR0YTaW7r
+         QF/lHih/l+fjsQVwqqr9jtYR8rlZWzKJi4bucxdO8Y9gjTOQEFHG10d4mqPFU26oPpv1
+         IQxLMljhxvuhDOmF6S+Qn2+jg+mmCly+oIzTafpubI+vygdLSK1MWTayZU8aucZbr3XZ
+         cEApzlFvaWdJ/UdDPlmn6yHNkLPIMj0DymYPvX+9Q8I7GEnGLhvTydSC5Herp46Pwh96
+         58tEvDXsG+EPUFok+iEMdqgVlp67qwbQrh28byVbXPkft+ovH35dxhPZ40RO51kKS5VD
+         ehcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765464252; x=1766069052;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=EtINVVL3vB+IyxNj9ffA7lSqV98wLbUBVSb7OBPZY6U=;
+        b=JlX9oQxmpsSNoLcjrOEnlnUa1TeGb3lDLDoCA5ECA4xWoKuskz8/23hdH8s8GUhBRk
+         5R23Y1ZEKCenNuWkselDTjaTBMfstv7ongx0Adl51vb55tI51wM+2IeIYsHTEn3mP27+
+         RqhDdcj6G/27V+jYTBT9bxrAf87SvKrdkDSXSSpyhCy+MVnbMktjxqOlQadQ+2X7geaO
+         767ebsNTcfWqlfZ4pbCqHm/PpqtZF7PzMTc7c/1Im3TtAiRaYsS5FTw/pwZ6pli0njzS
+         mg0bH2FJB6J8ldHwXI8p1+unhPAXadvjdy77CiNt5FJmze0i+1i5zEJekaU6fcAdauzX
+         Z2vw==
+X-Forwarded-Encrypted: i=1; AJvYcCWRJv4DswqlrwMc0RZ9y+HsRZBIDnONtyK/4jZCJhooK48aZ/Ubc5s4++jN0gZ9uAcYvJsOs0M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YznxoJJrXOXG1MnNqFlzmLHAEVcQj+lOaDkfjZXUytAGduuelp/
+	Mwpgxc9dCl3B0K9S2xg09pt3Fd2sKE0rkz2tpLuGNmgVTps7EQocYiqlDY1X0YkkCqqxGu1Q8dz
+	wqamymrHlKq9XvAG5hn/ZfHnRQuXuLflPcG2LgMk6emdB
+X-Gm-Gg: AY/fxX7nCMxTIXXmc1fvM/ulwyYPElhjyEpw9eXE4p24DeGyNVfyj5kh0AVhZDF9ekd
+	zllgmTBNdKG9cc6w0iLiebEVO1L3ObevUWX5/XW9S0OAPAoRjLm49fjf5nyYTOSpC9Xe+GlBgQT
+	nkeL66K9wEL+cXbFvXZmgt/tXi3Co7LgpKRr3ZY0T+UfrN2mgQaazc2oIPOSeQYkOob+pJJcCwp
+	uuMA/QmBo2y5ttgzGB/ghXf/U0/CVwFEXEvaH8YiojngtsELMP6r6wBkXPLt1Kv/vxXzqY=
+X-Google-Smtp-Source: AGHT+IEmEFQlvbBlRShmDnefLZIZSx5DWO8WmdgzaULARHGEfaymct8sV/4h93v5RD8D4YSxFwM3CJl04SW4WB5B9eI=
+X-Received: by 2002:a17:903:3205:b0:295:5625:7e41 with SMTP id
+ d9443c01a7336-29ec2319bfdmr70617415ad.22.1765464251582; Thu, 11 Dec 2025
+ 06:44:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ThreadId: AZv7QDKcY8dk
-Date: Thu, 11 Dec 2025 09:36:32 -0500
-From: "Chuck Lever" <cel@kernel.org>
-To: "Scott Mayhew" <smayhew@redhat.com>,
- "Chuck Lever" <chuck.lever@oracle.com>
-Cc: kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org
-Message-Id: <2f0872f4-f92c-4364-bd7b-fc4826a86f35@app.fastmail.com>
-In-Reply-To: <20251209193015.3032058-1-smayhew@redhat.com>
-References: <20251209193015.3032058-1-smayhew@redhat.com>
-Subject: Re: [PATCH] net/handshake: duplicate handshake cancellations leak socket
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+References: <20251211125104.375020-1-mlbnkm1@gmail.com> <20251211080251-mutt-send-email-mst@kernel.org>
+ <zlhixzduyindq24osaedkt2xnukmatwhugfkqmaugvor6wlcol@56jsodxn4rhi>
+In-Reply-To: <zlhixzduyindq24osaedkt2xnukmatwhugfkqmaugvor6wlcol@56jsodxn4rhi>
+From: Melbin Mathew Antony <mlbnkm1@gmail.com>
+Date: Thu, 11 Dec 2025 14:43:59 +0000
+X-Gm-Features: AQt7F2pnwvtOPbnMcrHx8A-PKFVB-JfGrhIlVSiOwVGrW6Eib51aDnzbmR7nZ7M
+Message-ID: <CAMKc4jDpMsk1TtSN-GPLM1M_qp_jpoE1XL1g5qXRUiB-M0BPgQ@mail.gmail.com>
+Subject: Re: [PATCH net v3] vsock/virtio: cap TX credit to local buffer size
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, stefanha@redhat.com, kvm@vger.kernel.org, 
+	netdev@vger.kernel.org, virtualization@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, jasowang@redhat.com, xuanzhuo@linux.alibaba.com, 
+	eperezma@redhat.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi Stefano, Michael,
+
+Thanks for the feedback and for pointing out the s64 issue in
+virtio_transport_get_credit() and the vsock_test regression.
+
+I can take this up and send a small series:
+
+  1/2 =E2=80=93 vsock/virtio: cap TX credit to local buffer size
+        - use a helper to bound peer_buf_alloc by buf_alloc
+        - compute available credit in s64 like has_space(), and clamp
+          negative values to zero before applying the caller=E2=80=99s cred=
+it
+
+  2/2 =E2=80=93 vsock/test: fix seqpacket message bounds test
+        - include your vsock_test.c change so the seqpacket bounds test
+          keeps working with the corrected TX credit handling
+
+I=E2=80=99ll roll these into a [PATCH net v4 0/2] series and send it out sh=
+ortly.
+
+Thanks again for all the guidance,
+Melbin
 
 
-
-On Tue, Dec 9, 2025, at 2:30 PM, Scott Mayhew wrote:
-> When a handshake request is cancelled it is removed from the
-> handshake_net->hn_requests list, but it is still present in the
-> handshake_rhashtbl until it is destroyed.
+On Thu, Dec 11, 2025 at 1:57=E2=80=AFPM Stefano Garzarella <sgarzare@redhat=
+.com> wrote:
 >
-> If a second cancellation request arrives for the same handshake request,
-> then remove_pending() will return false... and assuming
-> HANDSHAKE_F_REQ_COMPLETED isn't set in req->hr_flags, we'll continue
-> processing through the out_true label, where we put another reference on
-> the sock and a refcount underflow occurs.
+> On Thu, Dec 11, 2025 at 08:05:11AM -0500, Michael S. Tsirkin wrote:
+> >On Thu, Dec 11, 2025 at 01:51:04PM +0100, Melbin K Mathew wrote:
+> >> The virtio vsock transport currently derives its TX credit directly fr=
+om
+> >> peer_buf_alloc, which is populated from the remote endpoint's
+> >> SO_VM_SOCKETS_BUFFER_SIZE value.
+> >>
+> >> On the host side, this means the amount of data we are willing to queu=
+e
+> >> for a given connection is scaled purely by a peer-chosen value, rather
+> >> than by the host's own vsock buffer configuration. A guest that
+> >> advertises a very large buffer and reads slowly can cause the host to
+> >> allocate a correspondingly large amount of sk_buff memory for that
+> >> connection.
+> >>
+> >> In practice, a malicious guest can:
+> >>
+> >>   - set a large AF_VSOCK buffer size (e.g. 2 GiB) with
+> >>     SO_VM_SOCKETS_BUFFER_MAX_SIZE / SO_VM_SOCKETS_BUFFER_SIZE, and
+> >>
+> >>   - open multiple connections to a host vsock service that sends data
+> >>     while the guest drains slowly.
+> >>
+> >> On an unconstrained host this can drive Slab/SUnreclaim into the tens =
+of
+> >> GiB range, causing allocation failures and OOM kills in unrelated host
+> >> processes while the offending VM remains running.
+> >>
+> >> On non-virtio transports and compatibility:
+> >>
+> >>   - VMCI uses the AF_VSOCK buffer knobs to size its queue pairs per
+> >>     socket based on the local vsk->buffer_* values; the remote side
+> >>     can=E2=80=99t enlarge those queues beyond what the local endpoint
+> >>     configured.
+> >>
+> >>   - Hyper-V=E2=80=99s vsock transport uses fixed-size VMBus ring buffe=
+rs and
+> >>     an MTU bound; there is no peer-controlled credit field comparable
+> >>     to peer_buf_alloc, and the remote endpoint can=E2=80=99t drive in-=
+flight
+> >>     kernel memory above those ring sizes.
+> >>
+> >>   - The loopback path reuses virtio_transport_common.c, so it
+> >>     naturally follows the same semantics as the virtio transport.
+> >>
+> >> Make virtio-vsock consistent with that model by intersecting the peer=
+=E2=80=99s
+> >> advertised receive window with the local vsock buffer size when
+> >> computing TX credit. We introduce a small helper and use it in
+> >> virtio_transport_get_credit(), virtio_transport_has_space() and
+> >> virtio_transport_seqpacket_enqueue(), so that:
+> >>
+> >>     effective_tx_window =3D min(peer_buf_alloc, buf_alloc)
+> >>
+> >> This prevents a remote endpoint from forcing us to queue more data tha=
+n
+> >> our own configuration allows, while preserving the existing credit
+> >> semantics and keeping virtio-vsock compatible with the other transport=
+s.
+> >>
+> >> On an unpatched Ubuntu 22.04 host (~64 GiB RAM), running a PoC with
+> >> 32 guest vsock connections advertising 2 GiB each and reading slowly
+> >> drove Slab/SUnreclaim from ~0.5 GiB to ~57 GiB and the system only
+> >> recovered after killing the QEMU process.
+> >>
+> >> With this patch applied, rerunning the same PoC yields:
+> >>
+> >>   Before:
+> >>     MemFree:        ~61.6 GiB
+> >>     MemAvailable:   ~62.3 GiB
+> >>     Slab:           ~142 MiB
+> >>     SUnreclaim:     ~117 MiB
+> >>
+> >>   After 32 high-credit connections:
+> >>     MemFree:        ~61.5 GiB
+> >>     MemAvailable:   ~62.3 GiB
+> >>     Slab:           ~178 MiB
+> >>     SUnreclaim:     ~152 MiB
+> >>
+> >> i.e. only ~35 MiB increase in Slab/SUnreclaim, no host OOM, and the
+> >> guest remains responsive.
+> >>
+> >> Fixes: 06a8fc78367d ("VSOCK: Introduce virtio_vsock_common.ko")
+> >> Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
+> >> Signed-off-by: Melbin K Mathew <mlbnkm1@gmail.com>
+> >> ---
+> >>  net/vmw_vsock/virtio_transport_common.c | 27 ++++++++++++++++++++++--=
+-
+> >>  1 file changed, 24 insertions(+), 3 deletions(-)
+> >>
+> >> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/v=
+irtio_transport_common.c
+> >> index dcc8a1d58..02eeb96dd 100644
+> >> --- a/net/vmw_vsock/virtio_transport_common.c
+> >> +++ b/net/vmw_vsock/virtio_transport_common.c
+> >> @@ -491,6 +491,25 @@ void virtio_transport_consume_skb_sent(struct sk_=
+buff *skb, bool consume)
+> >>  }
+> >>  EXPORT_SYMBOL_GPL(virtio_transport_consume_skb_sent);
+> >>
+> >> +/* Return the effective peer buffer size for TX credit computation.
+> >> + *
+> >> + * The peer advertises its receive buffer via peer_buf_alloc, but we
+> >> + * cap that to our local buf_alloc (derived from
+> >> + * SO_VM_SOCKETS_BUFFER_SIZE and already clamped to buffer_max_size)
+> >> + * so that a remote endpoint cannot force us to queue more data than
+> >> + * our own configuration allows.
+> >> + */
+> >> +static u32 virtio_transport_tx_buf_alloc(struct virtio_vsock_sock *vv=
+s)
+> >> +{
+> >> +    return min(vvs->peer_buf_alloc, vvs->buf_alloc);
+> >> +}
+> >> +
+> >>  u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 cr=
+edit)
+> >>  {
+> >>      u32 ret;
+> >> @@ -499,7 +518,8 @@ u32 virtio_transport_get_credit(struct virtio_vsoc=
+k_sock *vvs, u32 credit)
+> >>              return 0;
+> >>
+> >>      spin_lock_bh(&vvs->tx_lock);
+> >> -    ret =3D vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
+> >> +    ret =3D virtio_transport_tx_buf_alloc(vvs) -
+> >> +            (vvs->tx_cnt - vvs->peer_fwd_cnt);
+> >>      if (ret > credit)
+> >>              ret =3D credit;
+> >>      vvs->tx_cnt +=3D ret;
+> >> @@ -831,7 +851,7 @@ virtio_transport_seqpacket_enqueue(struct vsock_so=
+ck *vsk,
+> >>
+> >>      spin_lock_bh(&vvs->tx_lock);
+> >>
+> >> -    if (len > vvs->peer_buf_alloc) {
+> >> +    if (len > virtio_transport_tx_buf_alloc(vvs)) {
+> >>              spin_unlock_bh(&vvs->tx_lock);
+> >>              return -EMSGSIZE;
+> >>      }
+> >> @@ -882,7 +902,8 @@ static s64 virtio_transport_has_space(struct vsock=
+_sock *vsk)
+> >>      struct virtio_vsock_sock *vvs =3D vsk->trans;
+> >>      s64 bytes;
+> >>
+> >> -    bytes =3D (s64)vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd=
+_cnt);
+> >> +    bytes =3D (s64)virtio_transport_tx_buf_alloc(vvs) -
+> >> +            (vvs->tx_cnt - vvs->peer_fwd_cnt);
+> >>      if (bytes < 0)
+> >>              bytes =3D 0;
+> >>
+> >
+> >Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> >
+> >
+> >Looking at this, why is one place casting to s64 the other is not?
 >
-> This can happen for example if a handshake times out - particularly if
-> the SUNRPC client sends the AUTH_TLS probe to the server but doesn't
-> follow it up with the ClientHello due to a problem with tlshd.  When the
-> timeout is hit on the server, the server will send a FIN, which triggers
-> a cancellation request via xs_reset_transport().  When the timeout is
-> hit on the client, another cancellation request happens via
-> xs_tls_handshake_sync().
+> Yeah, I pointed out that too in previous interactions. IMO we should fix
+> virtio_transport_get_credit() since the peer can reduce `peer_buf_alloc`
+> so it will overflow. Fortunately, we are limited by the credit requested
+> by the caller, but we are still sending stuff when we shouldn't be.
 >
-> Add a test_and_set_bit(HANDSHAKE_F_REQ_COMPLETED) in the pending cancel
-> path so duplicate cancels can be detected.
+> @Melbin let me know if you will fix it, otherwise I can do that, but I'd
+> like to do in a single series (multiple patches), since they depends on
+> each other.
 >
-> Fixes: 3b3009ea8abb ("net/handshake: Create a NETLINK service for 
-> handling handshake requests")
-> Suggested-by: Chuck Lever <chuck.lever@oracle.com>
-> Signed-off-by: Scott Mayhew <smayhew@redhat.com>
-> ---
->  net/handshake/request.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
+> So if you prefer, I can pickup this patch and post a series with this +
+> the other fix + the fix on the test I posted on the v2.
 >
-> diff --git a/net/handshake/request.c b/net/handshake/request.c
-> index 274d2c89b6b2..f78091680bca 100644
-> --- a/net/handshake/request.c
-> +++ b/net/handshake/request.c
-> @@ -324,7 +324,11 @@ bool handshake_req_cancel(struct sock *sk)
-> 
->  	hn = handshake_pernet(net);
->  	if (hn && remove_pending(hn, req)) {
-> -		/* Request hadn't been accepted */
-> +		/* Request hadn't been accepted - mark cancelled */
-> +		if (test_and_set_bit(HANDSHAKE_F_REQ_COMPLETED, &req->hr_flags)) {
-> +			trace_handshake_cancel_busy(net, req, sk);
-> +			return false;
-> +		}
->  		goto out_true;
->  	}
->  	if (test_and_set_bit(HANDSHAKE_F_REQ_COMPLETED, &req->hr_flags)) {
-> -- 
-> 2.51.0
-
-Reviewed-by: Chuck Lever <chuck.lever@oracle.com>
-
-
--- 
-Chuck Lever
+> Stefano
+>
 
