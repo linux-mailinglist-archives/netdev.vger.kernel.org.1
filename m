@@ -1,79 +1,78 @@
-Return-Path: <netdev+bounces-244411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81340CB6A84
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 18:20:17 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B337CB6AAB
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 18:21:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B83EA30821EE
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 17:16:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 504B63095E7B
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 17:16:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6690E3168EB;
-	Thu, 11 Dec 2025 17:16:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5CE931A067;
+	Thu, 11 Dec 2025 17:16:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="lSu/qdQp"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="mAfvNkP7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B223B3176FD
-	for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 17:16:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E01A03161A0
+	for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 17:16:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765473371; cv=none; b=VRnWNO6UyeresUV3FwwTBTh7xMSie30bY/0k3emKh0w7ftrPVFaQCENnSVA7tocZGWBCL4GVkhMrYwJBm1+KedLH7WkHL2YJSEJB+xEBUVWR5jbJCu6NK0iO4iK5Rkb4uOikUDLGYYb7CkpDwWvIXRx0OVVSyFC/q6naRQY4gQ8=
+	t=1765473374; cv=none; b=T9Z9y8/8BFk+99Yxia7bsCcpiiWnwWXqn4bbDdQKt8iUm5sNscagueYR+cICvbsvpV/LN6gkQkQweElR1Ju7j8rMiD3EDeFLPlRqohO38Jzm4d7oSTQzyPrpO+UA2JRf+ffVBHiYaoSoFAFwnBVaelWfXve6ZiH4FAzb3TUCoIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765473371; c=relaxed/simple;
-	bh=u+iIVeAYKLIIY8APv+qwbM4v5dD7Dwi5f/EPantu/m8=;
+	s=arc-20240116; t=1765473374; c=relaxed/simple;
+	bh=/zcdGCyO/zJVJHXiHKgniHKKW+1n+is3abvzUXVsx+4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Skq7rkL8fbvCmryvmTs2xR5cvrgZHYzStFCSCwrW9N81TPw648W6O1+ikCP58B4gw4lpblh7hXU3O58OoeKBWGnO4iXBNKIaa7vSwGaU0jZFv7SHdPJ/8ig6sBsUJeN2XMVlLh0+NcJDvQXd+kDSwbKxDtUkFo/uD9gGh8spqzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=lSu/qdQp; arc=none smtp.client-ip=209.85.128.53
+	 MIME-Version:Content-Type; b=G/9BFDs6f6zYG+XaiDjAjsAtn7tSpZoVsm7cXJMkpHsjFkboE1aBbVCWVvW6dNizWzEClAxs7/53Bn21swPUoY5yhUfxCaLxxmMIutFPhCa+vmo3mtuOcybhi/JEjOAH5SWg2AGgXRDk/vDhRmDAeJQNziDhAPP3LmNUQ5TEUHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=mAfvNkP7; arc=none smtp.client-ip=209.85.128.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4779ce2a624so4338195e9.2
-        for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 09:16:08 -0800 (PST)
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-477b198f4bcso3053545e9.3
+        for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 09:16:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1765473367; x=1766078167; darn=vger.kernel.org;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1765473368; x=1766078168; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=diZjdouzEEhILOHSiCyNRKR9P2lTi1L2KPZWsItgxqs=;
-        b=lSu/qdQpWZsfSa6uNvVqgshjoix4KLW8sDq6IJ6SPVA64qeA/pQvivR4agi8pua8yb
-         wnW4evN0uCkz7VqEg07eb5Ay6VJvdGJMCZjr/EShYIjgHF3E7lmAmEQRzCczG3Jg2TWy
-         km73bkQk2Tt6F8EbYdgpt9CgRM790kLTFZN9OvI68t8gQPNN4HcXEqc+O2Yia2d0w2+c
-         glkLlMtaMhLaJheI2RPKDiVitzUeI1+vKJ269gaICs3AlMxPc+64Vrnd+p8Gl4azn5hb
-         Y9oGhU/9M1/AhGAFGOJvVC0qVDo2MQjKBiDjWvyj+mLuRyXu7y0L15nitMLZ3jHvkgDu
-         x/eQ==
+        bh=s5Ml4HJmxurjzbFHuGXuWnrdRmEuv/7EaCb1T3xZqb4=;
+        b=mAfvNkP7P43IGyFu4r7QhTMUtmSve4AMsKLN8i1Rx1goClXjJybGIMLREy0l+Bsmmy
+         xko+FllmPzopY0siygA3OVo5PZP1/6zHREVqsPCARbKEIYU9YGiRXhpsb28JDZmPqoZZ
+         vUapsgUM7ORbofmr8L0YxWGcy+Ku+cpaHdzyshzJrAVdcbi53pBKTGNqZqk7wU6rvzXf
+         IAU/KaJz+mbGdpxxudcZPTdg6lzEO3eTu+YHLrWx7bg7IE2giJpalscR58NYXBYXgDF2
+         bAtIFJXNcoZcOO4UPrtzzlqNJ7FQHbUGKhCd7lWOwTR7mC2AaQ12yRjGFXPj1t/1QYU3
+         tW6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765473367; x=1766078167;
+        d=1e100.net; s=20230601; t=1765473368; x=1766078168;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=diZjdouzEEhILOHSiCyNRKR9P2lTi1L2KPZWsItgxqs=;
-        b=Rt7Wu4dgn6DLBWGLH7ddE8k9XBWE3FC3BQF8AEonAceQQeRGza8NduSU2xf0IBffvz
-         /ZVTqmSULJs2Cz8fljChsxEheZOom/1RhPpbypvgGijFnS/6tdo/24K+lBq1VI7o7OSG
-         Llp8M+N6ayNHlUjM2PbPFKhrGt6aY3Ga4S79mNO5gpN6AKY6cEO3b4FmYMPlv9SLD8Qz
-         FasH7DsjamqLjz9j03P3t5Lrbh9sBHa3U7wxhhUdQkHxsmJbeJBpDV++ywFjhXfDApnX
-         3PHmPt015n5l+1YVDOYU7CNMJnxLZi/C7tgMkoOfZvNZsVx2fCdkvyc0HucDkIRvQVaC
-         //Uw==
-X-Forwarded-Encrypted: i=1; AJvYcCVX0Ro7cBtDqtVp6qs29LsmDGz5VHhhoqN/5xUX04dhlDdAp5r6PbhAA+A8QNtH22hjZ+7fkMU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzeekkdr4SEwtMYSaaI1Vrv2NodEXEpowFxoncOF9/BHWGrd14/
-	U3T0jbxVyTpGN7faKa0snj8z/FV80b66TED9zUjOJ1swUm8974W7RXr4mmPoCFWAoy70thSMrns
-	1x4J8
-X-Gm-Gg: AY/fxX6N8xO4vlivq68xTkEfLbAH+1N3QtSiQaBZSryqIunHAj/2ReRIHLZHAJ8PIqZ
-	SLqZzjEOm5q3k6dpw3WCdeUFXlyORqKvYfVMImFdE1ba0g6vP00SswL9r35yEOUQrRGPmJKDgcE
-	V8X6TTP09JEyRfOd6RZYdaqvx4+4AQ+6Jlru9reaJmd2tcp+vxSCOl2W1GxmQYb01b4lFKZyXyf
-	Qd9rP8WUblgJRhRGr1AQqZCpF9L2e1PQvkLc7L1uA7JSoiZ/e4cLtkLi1i8m4+jFkNs/IywYY0E
-	lpf43A93HascnRWFFXeLwrlo1hrq53ytARZ5jdtAlmpDIi9ihZs+P7qSDohfKiin8FfWMFXo2un
-	9IjWqwZ7ciZ8E+dHmWBUSwEbCTJ9GDO/7hnVUWE8rsLL58FPGtUGj5pCFPhsbUdD5aWyxaA1EPL
-	iFFP26d2Yd26w295eC/t3uqVWJzv2zaLzzAuOWXgRxaQ9ZsvBuW5jA3siDkf2RrJOFBNrGtI//L
-	Y8=
-X-Google-Smtp-Source: AGHT+IGUKWVSCHYwBEoDyb8aKAI3xda4j5uLNgFsDdq/ww+IXbbby6vKzmjBu3oTuW9ZdKJm7c1h5Q==
-X-Received: by 2002:a05:600c:548f:b0:477:b0b9:3131 with SMTP id 5b1f17b1804b1-47a83745633mr73090605e9.8.1765473367020;
-        Thu, 11 Dec 2025 09:16:07 -0800 (PST)
+        bh=s5Ml4HJmxurjzbFHuGXuWnrdRmEuv/7EaCb1T3xZqb4=;
+        b=euKCrH26J8pOGV+Axd8qlrpdCTvUu4R3dOCCoOU/nmDvmo3qQcxaGeAOdW06AvxLqK
+         LFLPb8D3gJ8xiJP+f87ycKuKq20r0rvCddik/Fc3D7603ZgyJDeq/IQfEOGcFWoO+0V0
+         iRL+hA+uL/eCo+STRxaLquhcpQo6s/IBV4VXuEarsYzBNLbaHwlQaqo+Y5M+vcPHj8Du
+         rSr0fmajWU3iVrTAIBRFR0dWSJWTfbzI+nmyrAbW6kESy336t48WW8P8sRYYoFp7B14S
+         SCQmsT1bkEA3akl/pfUWw+OX55qM6VgZVuUWanHTYG4uUCly8Gjq4NIkZ+9kdvYTvDr0
+         kcmw==
+X-Forwarded-Encrypted: i=1; AJvYcCWMUHzkN5eStBJWIPLNFf1judIOlwynopjBMJiNr5i0YOyA9dHNDjYBb8EH3fNIq6dEZl7awcM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywp+dG0nnQhd93kyhjZ0KH2gdACXBCho3g5rT4EOYujgNM9PGak
+	Y5g6TbUH+2BjVf9h4XmxPEZ9Fz4FSCDYOhJK2PgbrH/KEckAVw2Zhn9K4oxU5zmEcQ8=
+X-Gm-Gg: AY/fxX49h7FiJfE6l8Pbwiw+y3TwLjouk4W2LrL1mUX1AjHzJNOa8/BSkaRL9vDzfHL
+	da9XdvmxBxb+XnOyBqFiNOIiykGU2RwDCfrUifwSvHk2MMkmJP3FOlC0jMxpsmsGPlkFiP6asjo
+	bA75Hf8fsc87su1TRVQ1CIzlGXwrL8H1yvyzRsDGG1yZVKiqg+lU5T6v4yn+7KVxJlQ3+qdmz/h
+	qnMr4QgXrmYtwpnMGT5x8wsu4MVS8jscax+1Z+ZYFMDUBcHI83Vy0qrx7RqIhLaSJeAyZ2Srwc/
+	uKFMdIuXF/uhlq24p1JRHqjI4O8HY8bECMRu7BTnMINkiLeIgukNP+jhVgnt16GULQRqZQY7XvK
+	INh0ZTsqMy0ZWvH9U4tD03/F1T174o45tY2aGObFFXbTpIbmVtl1Ei8sdgHCght/biP8A8XkLdo
+	TbYnTAONkd1sQzHFa9co2q1KQYBuCtepq2F2rKnYHekCn/Boen10HrMepdFy4zKZyOhWdax8VP8
+	gg=
+X-Google-Smtp-Source: AGHT+IE0Pak8/lbklEkRDCW8Y7zvjMkJReE6ZBMN8ZhmPk/MHipynV8W1+LPXu/33++KhGMjio+QMA==
+X-Received: by 2002:a05:600c:4e49:b0:477:7c7d:d9b7 with SMTP id 5b1f17b1804b1-47a837a27d0mr82898065e9.33.1765473368108;
+        Thu, 11 Dec 2025 09:16:08 -0800 (PST)
 Received: from localhost (p200300f65f006608b66517f2bd017279.dip0.t-ipconnect.de. [2003:f6:5f00:6608:b665:17f2:bd01:7279])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-47a89d8e680sm16759715e9.6.2025.12.11.09.16.06
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-47a89f1e947sm52522015e9.3.2025.12.11.09.16.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Dec 2025 09:16:06 -0800 (PST)
+        Thu, 11 Dec 2025 09:16:07 -0800 (PST)
 From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
 To: Jens Wiklander <jens.wiklander@linaro.org>,
 	Michael Chan <michael.chan@broadcom.com>,
@@ -84,9 +83,9 @@ Cc: Sumit Garg <sumit.garg@kernel.org>,
 	netdev@vger.kernel.org,
 	linux-mips@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v1 12/17] firmware: tee_bnxt: Make use of module_tee_client_driver()
-Date: Thu, 11 Dec 2025 18:15:06 +0100
-Message-ID:  <5b520fd96f8b385acc280226f548913c9ee98011.1765472125.git.u.kleine-koenig@baylibre.com>
+Subject: [PATCH v1 13/17] firmware: tee_bnxt: Make use of tee bus methods
+Date: Thu, 11 Dec 2025 18:15:07 +0100
+Message-ID:  <f0b513d92355a53d30d8fdfcbbf7250457ec470e.1765472125.git.u.kleine-koenig@baylibre.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <cover.1765472125.git.u.kleine-koenig@baylibre.com>
 References: <cover.1765472125.git.u.kleine-koenig@baylibre.com>
@@ -97,50 +96,71 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1383; i=u.kleine-koenig@baylibre.com; h=from:subject:message-id; bh=u+iIVeAYKLIIY8APv+qwbM4v5dD7Dwi5f/EPantu/m8=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBpOvwzZJpnWSisd7DkoPNb7IKu3CNNzmY0kgG26 G88eoSnRsqJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCaTr8MwAKCRCPgPtYfRL+ Tgg/CACLTMdXNNR7oub78YhSrxPLhhHLys5JO5AfQdc7fc3upwrr/QfvoJ9HBdditXtvbVcJ/oY g/aKUVLH+ObNA20u8STng/Jqr6WmHu3+GJrzaYryu3q8tTvwVJlR7W4K3bCvLeoJlGWghCd0XUd FP0J12bY4/zvrbxOdPrNLXyt+33F/T7KeaRzpGa/tG++NAAEJ9uIRD8FtHdDD93eua0b0/k3H5M oqYEsIJgtT+71HZ99ufbhcjvi/oJ7BIiTodO2UafKakUtFAHlILcJl/OmOUiWWSqY/GlzMbBL8t gI1at+MmI2xPdyew1CWuPWaSSZyKwMElpp8S1sao/LcW0gHv
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2259; i=u.kleine-koenig@baylibre.com; h=from:subject:message-id; bh=/zcdGCyO/zJVJHXiHKgniHKKW+1n+is3abvzUXVsx+4=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBpOvw1dE1CQuBYvGVTWVxDbTjDXphCrVIig97hx yKXj9t/eKmJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCaTr8NQAKCRCPgPtYfRL+ TheQB/4y6MUCe6HoDloGZNlxErv3xbN/7CcKgAqBSZLsIY2AnM58rwFoeQpZtwcQFoh5vJPSjgf JBd0iBFOoJIXWK17LWD7nmG917NzAWX+Wu/btEbP3SY6iMZUDMVV4bJetR0Jc6BsXVSSDctjtvK Wttn4wjRwmSXr37rfytMHye+tBx1MRouulCVZmRT/nlyVKM5exWD/kri89uXya5zgLcg5nCOtv1 YLdPhUPsb+e4eMZCwwGm2Fs9BsRAHgMzTEkvtTFdkMrYQVEW56gsHqQVr1JTTMZIqzxahoq4XxO y42vX36v0uM2lxdFmFJgCeRVpXKcZvCeC4wvz6BzZgdB5Mh7
 X-Developer-Key: i=u.kleine-koenig@baylibre.com; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
 
-Reduce boilerplate by using the newly introduced module_tee_client_driver().
-That takes care of assigning the driver's bus, so the explicit assigning
-in this driver can be dropped.
+The tee bus got dedicated callbacks for probe and remove.
+Make use of these. This fixes a runtime warning about the driver needing
+to be converted to the bus methods.
 
 Signed-off-by: Uwe Kleine-König <u.kleine-koenig@baylibre.com>
 ---
- drivers/firmware/broadcom/tee_bnxt_fw.c | 14 +-------------
- 1 file changed, 1 insertion(+), 13 deletions(-)
+ drivers/firmware/broadcom/tee_bnxt_fw.c | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
 
 diff --git a/drivers/firmware/broadcom/tee_bnxt_fw.c b/drivers/firmware/broadcom/tee_bnxt_fw.c
-index 40e3183a3d11..fbdf1aa97c82 100644
+index fbdf1aa97c82..a706c84eb2b6 100644
 --- a/drivers/firmware/broadcom/tee_bnxt_fw.c
 +++ b/drivers/firmware/broadcom/tee_bnxt_fw.c
-@@ -261,25 +261,13 @@ static struct tee_client_driver tee_bnxt_fw_driver = {
+@@ -181,9 +181,9 @@ static int optee_ctx_match(struct tee_ioctl_version_data *ver, const void *data)
+ 	return (ver->impl_id == TEE_IMPL_ID_OPTEE);
+ }
+ 
+-static int tee_bnxt_fw_probe(struct device *dev)
++static int tee_bnxt_fw_probe(struct tee_client_device *bnxt_device)
+ {
+-	struct tee_client_device *bnxt_device = to_tee_client_device(dev);
++	struct device *dev = &bnxt_device->dev;
+ 	int ret, err = -ENODEV;
+ 	struct tee_ioctl_open_session_arg sess_arg;
+ 	struct tee_shm *fw_shm_pool;
+@@ -231,17 +231,15 @@ static int tee_bnxt_fw_probe(struct device *dev)
+ 	return err;
+ }
+ 
+-static int tee_bnxt_fw_remove(struct device *dev)
++static void tee_bnxt_fw_remove(struct tee_client_device *bnxt_device)
+ {
+ 	tee_shm_free(pvt_data.fw_shm_pool);
+ 	tee_client_close_session(pvt_data.ctx, pvt_data.session_id);
+ 	tee_client_close_context(pvt_data.ctx);
+ 	pvt_data.ctx = NULL;
+-
+-	return 0;
+ }
+ 
+-static void tee_bnxt_fw_shutdown(struct device *dev)
++static void tee_bnxt_fw_shutdown(struct tee_client_device *bnxt_device)
+ {
+ 	tee_shm_free(pvt_data.fw_shm_pool);
+ 	tee_client_close_session(pvt_data.ctx, pvt_data.session_id);
+@@ -258,12 +256,12 @@ static const struct tee_client_device_id tee_bnxt_fw_id_table[] = {
+ MODULE_DEVICE_TABLE(tee, tee_bnxt_fw_id_table);
+ 
+ static struct tee_client_driver tee_bnxt_fw_driver = {
++	.probe		= tee_bnxt_fw_probe,
++	.remove		= tee_bnxt_fw_remove,
++	.shutdown	= tee_bnxt_fw_shutdown,
  	.id_table	= tee_bnxt_fw_id_table,
  	.driver		= {
  		.name		= KBUILD_MODNAME,
--		.bus		= &tee_bus_type,
- 		.probe		= tee_bnxt_fw_probe,
- 		.remove		= tee_bnxt_fw_remove,
- 		.shutdown	= tee_bnxt_fw_shutdown,
+-		.probe		= tee_bnxt_fw_probe,
+-		.remove		= tee_bnxt_fw_remove,
+-		.shutdown	= tee_bnxt_fw_shutdown,
  	},
  };
  
--static int __init tee_bnxt_fw_mod_init(void)
--{
--	return driver_register(&tee_bnxt_fw_driver.driver);
--}
--
--static void __exit tee_bnxt_fw_mod_exit(void)
--{
--	driver_unregister(&tee_bnxt_fw_driver.driver);
--}
--
--module_init(tee_bnxt_fw_mod_init);
--module_exit(tee_bnxt_fw_mod_exit);
-+module_tee_client_driver(tee_bnxt_fw_driver);
- 
- MODULE_AUTHOR("Vikas Gupta <vikas.gupta@broadcom.com>");
- MODULE_DESCRIPTION("Broadcom bnxt firmware manager");
 -- 
 2.47.3
 
