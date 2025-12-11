@@ -1,94 +1,130 @@
-Return-Path: <netdev+bounces-244358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F23ECB565F
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 10:45:53 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E54A8CB5698
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 10:50:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 34E2D3019194
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 09:43:31 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id AEB16300994A
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 09:50:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D4922FD67F;
-	Thu, 11 Dec 2025 09:43:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEB4F23817E;
+	Thu, 11 Dec 2025 09:50:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z00bsfJ/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xx06pQkW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD30F2FD66E;
-	Thu, 11 Dec 2025 09:43:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 937211F5851;
+	Thu, 11 Dec 2025 09:50:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765446205; cv=none; b=EWd0/5ymfQJP9t2dVNiL+Id9mTVeVTdmBbRS66BLxyQn8p+BwolGw1Zjx4tv9RwY+lskvVoidSmiG5nkAQyY+VWEpXMSbhGc5iYFN26oKhAiGiAYTqr0KFai12HtMzN8LQhAh1QqO6ERtM0Kx8hSos5D0vQ9mFSsDszWDjTgmWo=
+	t=1765446607; cv=none; b=Tf3qe7+qLLqftj68vCdKLSgKyDhG3ztLSMSBwnbqP3oHYIGNMiCmy0/ZRQgfJJJmwjSiTZtUancdN4PuQlJmZfmeLMuqmvUBdk3LElvAs/qPRRkG4wnmjPkXB+/qTC385sEI+wsssQscT+c+XV3xReC0oIgI8iL94tS3uzx4VAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765446205; c=relaxed/simple;
-	bh=7umMjSgQbTfPmEUISZCRsrOrSoI1Ip5gO+NwMJLSGzg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=S8BNFqjOy6U79gV8fsIKE+X7ob+y3Km5qLxEeasOROWZ6e4oDxc/1PEJy9aiNzwd89p7459CYFN/qr/imZo9YgLbYQVqu2aHu0NxZyHLFSsBMDwxfCnjViy/qIqntOJamR7c97xXx0oliPizNxRgVlmIgERZz4qp1wqfgeIa5bU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z00bsfJ/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C715C4CEF7;
-	Thu, 11 Dec 2025 09:43:25 +0000 (UTC)
+	s=arc-20240116; t=1765446607; c=relaxed/simple;
+	bh=fz+ZSdSrWx849zMNBOatENIDRggiloYOCWEVBUKvZD0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dqqWXWGBOJZE6MbqfBA9r3iUX5u2vzhn7P2qit74QKElLgz4GaWi/HoAfhNDlru5IfHVDLiOjhdsry0CCyLqVIPj+GuxfQn8Cwm7kXHEfs+VsCURnfhRDj1+4Rm+3mS5Xq1uJ8ylbwfUaLbDVqthB9WSftCCV3CE5p8Aua7mOlc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xx06pQkW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A45E5C4CEF7;
+	Thu, 11 Dec 2025 09:50:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765446205;
-	bh=7umMjSgQbTfPmEUISZCRsrOrSoI1Ip5gO+NwMJLSGzg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Z00bsfJ//Hy2hmbk25JEENJWAgCgCBvRw7KmjxirOpiolwB6q9mgTRThFac9npMPd
-	 nuHTSEd8yVaz87jQBauYIisUPQoZOxKyw0103n9Z8WitvA7bHlGvYoW44w8BUSjJU3
-	 gTj8H4aKyHShb1JsnYMy7rej9AprvIJHLgAWlEa7eGV2F3CGriI77aLjMKrOQqCC0c
-	 MWQwAEzAjqQIpitHlmnjwL23scELNbqJM/Ef4YRHZGU6tRa2j6ygqb35ZdmKVERJZI
-	 YBmQgeoqdsL+pKmBy+91A6pX6oRpizNNzAds/ZF0uehsP9SMK/aCjx3IcEP9RsSUgE
-	 f7nOYX3fL0vxg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 788453809A35;
-	Thu, 11 Dec 2025 09:40:20 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1765446605;
+	bh=fz+ZSdSrWx849zMNBOatENIDRggiloYOCWEVBUKvZD0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Xx06pQkWKSb1yzMbU8wItuJnn5bCftHO3vNvL8R6lrv+bb/etVbDKIIILof1O8hha
+	 gGo0s0Ig6iRoJUjsX40icQxseF2aS9lIgw+wHDRC4yrf6wCsGCntlZsPTuz6DneRK8
+	 Y7M6Ut79AyMi13+eIxxSi/5EDwpsQ3R41tMFnVmqwOEJ19KLfDxMnHcMfJSEfyy/Nh
+	 ZKtgmV6kw4vzz3kOqQUXiZ0qaEa9Qx0ox+D+7f0mEDUxnmnsU2H9k4Oh3Y15highhd
+	 iAV2C1D/cVdRZ09m8ngBHSbovU1+pq5WhziVWv846GmH5B74R5+ZgrOnPweOVJreeF
+	 OiYdB7YNXhUoA==
+Date: Thu, 11 Dec 2025 18:50:02 +0900
+From: Jakub Kicinski <kuba@kernel.org>
+To: Minseong Kim <ii4gsp@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+Subject: Re: [PATCH net v3 1/1] atm: mpoa: Fix UAF on qos_head list in
+ procfs
+Message-ID: <20251211185002.44e4aee3@kernel.org>
+In-Reply-To: <20251204062421.96986-2-ii4gsp@gmail.com>
+References: <20251204062421.96986-1-ii4gsp@gmail.com>
+	<20251204062421.96986-2-ii4gsp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net: sfp: extend Potron XGSPON quirk to cover additional
- EEPROM variant
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176544601902.1308621.10788873361579147045.git-patchwork-notify@kernel.org>
-Date: Thu, 11 Dec 2025 09:40:19 +0000
-References: <20251207210355.333451-1-marcus.hughes@betterinternet.ltd>
-In-Reply-To: <20251207210355.333451-1-marcus.hughes@betterinternet.ltd>
-To: Marcus Hughes <marcus.hughes@betterinternet.ltd>
-Cc: netdev@vger.kernel.org, linux@armlinux.org.uk, andrew@lunn.ch,
- hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu,  4 Dec 2025 15:24:21 +0900 Minseong Kim wrote:
+> Reported-by: Minseong Kim <ii4gsp@gmail.com>
+> Closes: https://lore.kernel.org/netdev/CAKrymDR1X3XTX_1ZW3XXXnuYH+kzsnv7Av5uivzR1sto+5BFQg@mail.gmail.com/
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Minseong Kim <ii4gsp@gmail.com>
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+The tags are wrong. Reported-by is only used when it's not the same as
+author. And you're pointing Closes at previous version? I don't get it.
 
-On Sun,  7 Dec 2025 21:03:55 +0000 you wrote:
-> Some Potron SFP+ XGSPON ONU sticks are shipped with different EEPROM
-> vendor ID and vendor name strings, but are otherwise functionally
-> identical to the existing "Potron SFP+ XGSPON ONU Stick" handled by
-> sfp_quirk_potron().
-> 
-> These modules, including units distributed under the "Better Internet"
-> branding, use the same UART pin assignment and require the same
-> TX_FAULT/LOS behaviour and boot delay. Re-use the existing Potron
-> quirk for this EEPROM variant.
-> 
-> [...]
+> -int atm_mpoa_delete_qos(struct atm_mpoa_qos *entry)
+> +static int __atm_mpoa_delete_qos_locked(struct atm_mpoa_qos *entry)
+>  {
+>  	struct atm_mpoa_qos *curr;
+>  
+> -	if (entry == NULL)
+> +	if (!entry)
+>  		return 0;
+> +
 
-Here is the summary with links:
-  - net: sfp: extend Potron XGSPON quirk to cover additional EEPROM variant
-    https://git.kernel.org/netdev/net/c/71cfa7c893a0
+please avoid unrelated code cleanups in fixes
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+>  	if (entry == qos_head) {
+> -		qos_head = qos_head->next;
+> -		kfree(entry);
+> +		qos_head = entry->next;
+>  		return 1;
+>  	}
+>  
+>  	curr = qos_head;
+> -	while (curr != NULL) {
+> +	while (curr) {
+>  		if (curr->next == entry) {
+>  			curr->next = entry->next;
+> -			kfree(entry);
+>  			return 1;
+>  		}
+>  		curr = curr->next;
+
+> + * Overwrites the old entry or makes a new one.
+> + */
+> +struct atm_mpoa_qos *atm_mpoa_add_qos(__be32 dst_ip, struct atm_qos *qos)
+> +{
+> +	struct atm_mpoa_qos *entry;
+> +	struct atm_mpoa_qos *new;
+> +
+> +	/* Fast path: update existing entry */
+> +	mutex_lock(&qos_mutex);
+> +	entry = __atm_mpoa_search_qos(dst_ip);
+> +	if (entry) {
+> +		entry->qos = *qos;
+> +		mutex_unlock(&qos_mutex);
+> +		return entry;
+> +	}
+> +	mutex_unlock(&qos_mutex);
+> +
+> +	/* Allocate outside lock */
+
+Why allocate outside the lock? It makes the code more complicated,
+keep it simple unless you can prove real life benefits.
+
+> +	new = kmalloc(sizeof(*new), GFP_KERNEL);
+> +	if (!new)
+> +		return NULL;
 
 
 
