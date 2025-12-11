@@ -1,167 +1,102 @@
-Return-Path: <netdev+bounces-244412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244413-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B337CB6AAB
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 18:21:34 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D6BDCB6BB6
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 18:31:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 504B63095E7B
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 17:16:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 84D4A3011EC5
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 17:31:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5CE931A067;
-	Thu, 11 Dec 2025 17:16:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="mAfvNkP7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAF6132ED4E;
+	Thu, 11 Dec 2025 17:31:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from postmaster.electro-mail.ru (postmaster.electro-mail.ru [109.236.68.122])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E01A03161A0
-	for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 17:16:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48FF632ED47;
+	Thu, 11 Dec 2025 17:30:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.236.68.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765473374; cv=none; b=T9Z9y8/8BFk+99Yxia7bsCcpiiWnwWXqn4bbDdQKt8iUm5sNscagueYR+cICvbsvpV/LN6gkQkQweElR1Ju7j8rMiD3EDeFLPlRqohO38Jzm4d7oSTQzyPrpO+UA2JRf+ffVBHiYaoSoFAFwnBVaelWfXve6ZiH4FAzb3TUCoIw=
+	t=1765474261; cv=none; b=m7W4cNcUFU/Vt2SHQZDzqdTbHWP8JnvswAe8/C6VPSGYIJ6UmVfkQ00D6vx4Ej79+xbXorIvNZJ9xN8JVABItPEt3TSyRP44YSxAJbHyMK6+20DbINZwbYnAeF3B2bNrVYMVLGF0RVTb3e72fU3vszdOynLz1LIyfYBNLQHdx+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765473374; c=relaxed/simple;
-	bh=/zcdGCyO/zJVJHXiHKgniHKKW+1n+is3abvzUXVsx+4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=G/9BFDs6f6zYG+XaiDjAjsAtn7tSpZoVsm7cXJMkpHsjFkboE1aBbVCWVvW6dNizWzEClAxs7/53Bn21swPUoY5yhUfxCaLxxmMIutFPhCa+vmo3mtuOcybhi/JEjOAH5SWg2AGgXRDk/vDhRmDAeJQNziDhAPP3LmNUQ5TEUHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=mAfvNkP7; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-477b198f4bcso3053545e9.3
-        for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 09:16:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1765473368; x=1766078168; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s5Ml4HJmxurjzbFHuGXuWnrdRmEuv/7EaCb1T3xZqb4=;
-        b=mAfvNkP7P43IGyFu4r7QhTMUtmSve4AMsKLN8i1Rx1goClXjJybGIMLREy0l+Bsmmy
-         xko+FllmPzopY0siygA3OVo5PZP1/6zHREVqsPCARbKEIYU9YGiRXhpsb28JDZmPqoZZ
-         vUapsgUM7ORbofmr8L0YxWGcy+Ku+cpaHdzyshzJrAVdcbi53pBKTGNqZqk7wU6rvzXf
-         IAU/KaJz+mbGdpxxudcZPTdg6lzEO3eTu+YHLrWx7bg7IE2giJpalscR58NYXBYXgDF2
-         bAtIFJXNcoZcOO4UPrtzzlqNJ7FQHbUGKhCd7lWOwTR7mC2AaQ12yRjGFXPj1t/1QYU3
-         tW6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765473368; x=1766078168;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=s5Ml4HJmxurjzbFHuGXuWnrdRmEuv/7EaCb1T3xZqb4=;
-        b=euKCrH26J8pOGV+Axd8qlrpdCTvUu4R3dOCCoOU/nmDvmo3qQcxaGeAOdW06AvxLqK
-         LFLPb8D3gJ8xiJP+f87ycKuKq20r0rvCddik/Fc3D7603ZgyJDeq/IQfEOGcFWoO+0V0
-         iRL+hA+uL/eCo+STRxaLquhcpQo6s/IBV4VXuEarsYzBNLbaHwlQaqo+Y5M+vcPHj8Du
-         rSr0fmajWU3iVrTAIBRFR0dWSJWTfbzI+nmyrAbW6kESy336t48WW8P8sRYYoFp7B14S
-         SCQmsT1bkEA3akl/pfUWw+OX55qM6VgZVuUWanHTYG4uUCly8Gjq4NIkZ+9kdvYTvDr0
-         kcmw==
-X-Forwarded-Encrypted: i=1; AJvYcCWMUHzkN5eStBJWIPLNFf1judIOlwynopjBMJiNr5i0YOyA9dHNDjYBb8EH3fNIq6dEZl7awcM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywp+dG0nnQhd93kyhjZ0KH2gdACXBCho3g5rT4EOYujgNM9PGak
-	Y5g6TbUH+2BjVf9h4XmxPEZ9Fz4FSCDYOhJK2PgbrH/KEckAVw2Zhn9K4oxU5zmEcQ8=
-X-Gm-Gg: AY/fxX49h7FiJfE6l8Pbwiw+y3TwLjouk4W2LrL1mUX1AjHzJNOa8/BSkaRL9vDzfHL
-	da9XdvmxBxb+XnOyBqFiNOIiykGU2RwDCfrUifwSvHk2MMkmJP3FOlC0jMxpsmsGPlkFiP6asjo
-	bA75Hf8fsc87su1TRVQ1CIzlGXwrL8H1yvyzRsDGG1yZVKiqg+lU5T6v4yn+7KVxJlQ3+qdmz/h
-	qnMr4QgXrmYtwpnMGT5x8wsu4MVS8jscax+1Z+ZYFMDUBcHI83Vy0qrx7RqIhLaSJeAyZ2Srwc/
-	uKFMdIuXF/uhlq24p1JRHqjI4O8HY8bECMRu7BTnMINkiLeIgukNP+jhVgnt16GULQRqZQY7XvK
-	INh0ZTsqMy0ZWvH9U4tD03/F1T174o45tY2aGObFFXbTpIbmVtl1Ei8sdgHCght/biP8A8XkLdo
-	TbYnTAONkd1sQzHFa9co2q1KQYBuCtepq2F2rKnYHekCn/Boen10HrMepdFy4zKZyOhWdax8VP8
-	gg=
-X-Google-Smtp-Source: AGHT+IE0Pak8/lbklEkRDCW8Y7zvjMkJReE6ZBMN8ZhmPk/MHipynV8W1+LPXu/33++KhGMjio+QMA==
-X-Received: by 2002:a05:600c:4e49:b0:477:7c7d:d9b7 with SMTP id 5b1f17b1804b1-47a837a27d0mr82898065e9.33.1765473368108;
-        Thu, 11 Dec 2025 09:16:08 -0800 (PST)
-Received: from localhost (p200300f65f006608b66517f2bd017279.dip0.t-ipconnect.de. [2003:f6:5f00:6608:b665:17f2:bd01:7279])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-47a89f1e947sm52522015e9.3.2025.12.11.09.16.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Dec 2025 09:16:07 -0800 (PST)
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-To: Jens Wiklander <jens.wiklander@linaro.org>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	=?utf-8?b?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>
-Cc: Sumit Garg <sumit.garg@kernel.org>,
-	op-tee@lists.trustedfirmware.org,
-	netdev@vger.kernel.org,
-	linux-mips@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v1 13/17] firmware: tee_bnxt: Make use of tee bus methods
-Date: Thu, 11 Dec 2025 18:15:07 +0100
-Message-ID:  <f0b513d92355a53d30d8fdfcbbf7250457ec470e.1765472125.git.u.kleine-koenig@baylibre.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <cover.1765472125.git.u.kleine-koenig@baylibre.com>
-References: <cover.1765472125.git.u.kleine-koenig@baylibre.com>
+	s=arc-20240116; t=1765474261; c=relaxed/simple;
+	bh=ozU9m/XaU3oz5LPCsa3Se6LsM+CvWJ8+mGeve9FvDrQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jChrqBIuuZ2SmQHiGHk3EtHBHkkMfDhGxfoVoOq2TVCgY007gCA0TKaQe4ImKbO4OM5u3mXTmDGtiNGOr+z97G8PZ1bHS/fEHkhJmv8Of5b7nOt8OOODIYOrzKe+j6zRMETP3KI3wLxi4nIJ1WmgvrfhwIQF8hSerpRhFFts26k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tpz.ru; spf=pass smtp.mailfrom=tpz.ru; arc=none smtp.client-ip=109.236.68.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tpz.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tpz.ru
+Received: from localhost (localhost [127.0.0.1])
+	by postmaster.electro-mail.ru (Postfix) with ESMTP id 7E0451006BA1;
+	Thu, 11 Dec 2025 20:30:57 +0300 (MSK)
+Received: from postmaster.electro-mail.ru ([127.0.0.1])
+	by localhost (postmaster.electro-mail.ru [127.0.0.1]) (amavisd-new, port 10032)
+	with ESMTP id FaFmj9ZbOJ-E; Thu, 11 Dec 2025 20:30:56 +0300 (MSK)
+Received: from postmaster.electro-mail.ru (localhost [127.0.0.1])
+	by postmaster.electro-mail.ru (Postfix) with ESMTPS id B9E841006E41;
+	Thu, 11 Dec 2025 20:30:56 +0300 (MSK)
+Received: from email.electro-mail.ru (unknown [10.10.0.10])
+	by postmaster.electro-mail.ru (Postfix) with ESMTPS id A58621006BA1;
+	Thu, 11 Dec 2025 20:30:56 +0300 (MSK)
+Received: from lvc.d-systems.local (109.236.68.122) by email.electro-mail.ru
+ (10.120.0.4) with Microsoft SMTP Server (TLS) id 14.3.487.0; Thu, 11 Dec 2025
+ 20:30:56 +0300
+From: Ilya Krutskih <devsec@tpz.ru>
+To: Andrew Lunn <andrew+netdev@lunn.ch>
+CC: Ilya Krutskih <devsec@tpz.ru>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
+	<mingo@kernel.org>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<lvc-project@linuxtesting.org>, <stable@vger.kernel.org>
+Subject: [PATCH v2] net: fealnx: fix possible 'card_idx' integer overflow in
+Date: Thu, 11 Dec 2025 17:30:33 +0000
+Message-ID: <20251211173035.852756-1-devsec@tpz.ru>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2259; i=u.kleine-koenig@baylibre.com; h=from:subject:message-id; bh=/zcdGCyO/zJVJHXiHKgniHKKW+1n+is3abvzUXVsx+4=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBpOvw1dE1CQuBYvGVTWVxDbTjDXphCrVIig97hx yKXj9t/eKmJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCaTr8NQAKCRCPgPtYfRL+ TheQB/4y6MUCe6HoDloGZNlxErv3xbN/7CcKgAqBSZLsIY2AnM58rwFoeQpZtwcQFoh5vJPSjgf JBd0iBFOoJIXWK17LWD7nmG917NzAWX+Wu/btEbP3SY6iMZUDMVV4bJetR0Jc6BsXVSSDctjtvK Wttn4wjRwmSXr37rfytMHye+tBx1MRouulCVZmRT/nlyVKM5exWD/kri89uXya5zgLcg5nCOtv1 YLdPhUPsb+e4eMZCwwGm2Fs9BsRAHgMzTEkvtTFdkMrYQVEW56gsHqQVr1JTTMZIqzxahoq4XxO y42vX36v0uM2lxdFmFJgCeRVpXKcZvCeC4wvz6BzZgdB5Mh7
-X-Developer-Key: i=u.kleine-koenig@baylibre.com; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-KSE-ServerInfo: srv-mail-01.tpz.local, 9
+X-KSE-AntiSpam-Interceptor-Info: trusted connection
+X-KSE-Antiphishing-Interceptor-Info: protection disabled
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 09.10.2024 20:59:00
+X-KSE-Attachment-Filter-Scan-Result: Clean
+X-KSE-Attachment-Filter-Scan-Result: skipped
+Content-Transfer-Encoding: quoted-printable
 
-The tee bus got dedicated callbacks for probe and remove.
-Make use of these. This fixes a runtime warning about the driver needing
-to be converted to the bus methods.
+'card_idx' can be overflowed when fealnx_init_one() will be called more t=
+han
+INT_MAX times. Check before incremention is required.
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@baylibre.com>
+Fixes: 15c037d6423e ("fealnx: Move the Myson driver")
+Cc: stable@vger.kernel.org # v5.10+
+Signed-off-by: Ilya Krutskih <devsec@tpz.ru>
 ---
- drivers/firmware/broadcom/tee_bnxt_fw.c | 16 +++++++---------
- 1 file changed, 7 insertions(+), 9 deletions(-)
+ drivers/net/ethernet/fealnx.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/firmware/broadcom/tee_bnxt_fw.c b/drivers/firmware/broadcom/tee_bnxt_fw.c
-index fbdf1aa97c82..a706c84eb2b6 100644
---- a/drivers/firmware/broadcom/tee_bnxt_fw.c
-+++ b/drivers/firmware/broadcom/tee_bnxt_fw.c
-@@ -181,9 +181,9 @@ static int optee_ctx_match(struct tee_ioctl_version_data *ver, const void *data)
- 	return (ver->impl_id == TEE_IMPL_ID_OPTEE);
- }
- 
--static int tee_bnxt_fw_probe(struct device *dev)
-+static int tee_bnxt_fw_probe(struct tee_client_device *bnxt_device)
- {
--	struct tee_client_device *bnxt_device = to_tee_client_device(dev);
-+	struct device *dev = &bnxt_device->dev;
- 	int ret, err = -ENODEV;
- 	struct tee_ioctl_open_session_arg sess_arg;
- 	struct tee_shm *fw_shm_pool;
-@@ -231,17 +231,15 @@ static int tee_bnxt_fw_probe(struct device *dev)
- 	return err;
- }
- 
--static int tee_bnxt_fw_remove(struct device *dev)
-+static void tee_bnxt_fw_remove(struct tee_client_device *bnxt_device)
- {
- 	tee_shm_free(pvt_data.fw_shm_pool);
- 	tee_client_close_session(pvt_data.ctx, pvt_data.session_id);
- 	tee_client_close_context(pvt_data.ctx);
- 	pvt_data.ctx = NULL;
--
--	return 0;
- }
- 
--static void tee_bnxt_fw_shutdown(struct device *dev)
-+static void tee_bnxt_fw_shutdown(struct tee_client_device *bnxt_device)
- {
- 	tee_shm_free(pvt_data.fw_shm_pool);
- 	tee_client_close_session(pvt_data.ctx, pvt_data.session_id);
-@@ -258,12 +256,12 @@ static const struct tee_client_device_id tee_bnxt_fw_id_table[] = {
- MODULE_DEVICE_TABLE(tee, tee_bnxt_fw_id_table);
- 
- static struct tee_client_driver tee_bnxt_fw_driver = {
-+	.probe		= tee_bnxt_fw_probe,
-+	.remove		= tee_bnxt_fw_remove,
-+	.shutdown	= tee_bnxt_fw_shutdown,
- 	.id_table	= tee_bnxt_fw_id_table,
- 	.driver		= {
- 		.name		= KBUILD_MODNAME,
--		.probe		= tee_bnxt_fw_probe,
--		.remove		= tee_bnxt_fw_remove,
--		.shutdown	= tee_bnxt_fw_shutdown,
- 	},
- };
- 
--- 
-2.47.3
+diff --git a/drivers/net/ethernet/fealnx.c b/drivers/net/ethernet/fealnx.=
+c
+index 6ac8547ef9b8..7eb6e42b4551 100644
+--- a/drivers/net/ethernet/fealnx.c
++++ b/drivers/net/ethernet/fealnx.c
+@@ -489,7 +489,10 @@ static int fealnx_init_one(struct pci_dev *pdev,
+ 	int bar =3D 1;
+ #endif
+=20
+-	card_idx++;
++	if (card_idx =3D=3D INT_MAX)
++		return -EINVAL;
++	else
++		card_idx++;
+ 	sprintf(boardname, "fealnx%d", card_idx);
+=20
+ 	option =3D card_idx < MAX_UNITS ? options[card_idx] : 0;
+--=20
+2.43.0
 
 
