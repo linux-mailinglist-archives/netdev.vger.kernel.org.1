@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-244354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B30E2CB564D
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 10:43:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 098FDCB5650
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 10:44:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A2A21300ACF2
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 09:43:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A7F973014A34
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 09:43:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B7B42F998D;
-	Thu, 11 Dec 2025 09:43:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C731B2FB602;
+	Thu, 11 Dec 2025 09:43:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jnh5oMIk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kvGQMGID"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 077B22F5322
-	for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 09:43:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D57A2F998D;
+	Thu, 11 Dec 2025 09:43:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765446200; cv=none; b=NjfQ/C8cKx9EWOvWHgSfuycKkjSXdQ0FRdgQPLLoikcD1DrL3Ax22JDPPlFZl9JCv5NC2bs3oJTMVcccpx+52gwvWY7+KLZgmefPZZZG54hv7IcXm13VeHSxqFme/isbXTI4BOEe5oEJYid6YuameOqBzM+OisNHbqWdH2VQZAY=
+	t=1765446202; cv=none; b=bk3Epr/aEyFtBsrpMEE8rxx8tBI0dYG1XEVOLFsaNZXNeSxQKCPTmsQjOm3p0xpySkwu4b9FxHoUnvWaIcn22MCqTbuDLM3wrlJ+Np5t1oWvTv1hGL+3ZWTMhCcDufYmodB2LZBx0DmJqSVplDFCXfeCcC6SQed4k3Hc22xgKIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765446200; c=relaxed/simple;
-	bh=79LqOU9AE+pSmw6FX1NVsgN2Bq/2RE5BjyWeTSD1af8=;
+	s=arc-20240116; t=1765446202; c=relaxed/simple;
+	bh=QoXUSLb6pF12kg5hciMRtHaloEECSFceLd048LFulQM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=XLudR1sEY1BrfqD7DdM719Jgr2rMSVZVsFdoLncvxNu4TtqdfTWycw8bEOoxuZvdfSM2dCI4xZYN9/pNTj+QDnblb3CFJw7kutu7RW9ad9Gs1J67p//mvtlHDXWYTXwwxEiUE5/Zqcas91ByeSXVLCowx9s0pyoyc20qXQtuqr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jnh5oMIk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BFA4C19421;
-	Thu, 11 Dec 2025 09:43:19 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=PyiQHz7aUPzIcEx6IOM+DG3fafbnwQfQ936YMrxItRCv80FSVWC6A4cy6gZJ/Ut+9RH3hIY9cE3EkUOgieJU+eIxarcEJCp7udX1Ou6KPt5nWxO3aQEda7wonmXxNKrCmnlmWicOzU4yoICrse6VFAsIq0MkhfbuHWcU8aXA6mY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kvGQMGID; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB074C4CEF7;
+	Thu, 11 Dec 2025 09:43:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765446199;
-	bh=79LqOU9AE+pSmw6FX1NVsgN2Bq/2RE5BjyWeTSD1af8=;
+	s=k20201202; t=1765446201;
+	bh=QoXUSLb6pF12kg5hciMRtHaloEECSFceLd048LFulQM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=jnh5oMIkspgfTUY7ZfDO3oDAqUs1O3NGTYwp7xU1HdeijeAXWO6WdQR5hjwpEc/lb
-	 /6W4x/HuPVRBoeR5tALdz3LW+Iemm3nNSYxP6+R+ozCLg9qTRfDGkglmlHp3PRhpgg
-	 3AYGhMCNRDcq5WaVwt9CDsTnCmj6DPzNoXXZ0H38fRqMuw7VRCoAmVK2K7m4pI4urF
-	 e5+83VTthLqzVKSNswr5UeMjyTtTaB4bESS7FGOEcPxbWS4dOdYRbthqD7m7m374d1
-	 3Bme0V9j3grPFYCt0eYQQmB/jz5ZiLOQ3lqH6Dn843GylGWQB7QEGkIa8lok9xs8/n
-	 0U0B2pOf6uNoQ==
+	b=kvGQMGIDtcuZd9G+/xzRI8ijlR/uGiSUN/c2J27EdwuRAe3VB8he+V7UQEX5/aFfI
+	 t1LXxvpWfOCqvZIRujWtl3npakUo2R9b6/2FuyCSzBLWGC5j3vdck0OHpwf0oYIXUo
+	 97oylUkaZPL7EPnRXxmS2pXflmzYlW3WRXWusWsiBVkspG+ov1a3VxKeOE/FIlrfnf
+	 KJ58aKY5LsLv8zBdkPNOZCTq7uaLOvYjkRQF4m4rrgjZr0KdGEKjoVF3fyJQJ7SbuQ
+	 BpjekZrp8f2p41ex1TZy/FoeP0sThBjvTU+GaoES7ZlKUhLtgxKv3DyhDLb94SIZKh
+	 CkHy8bMbfNtcw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B5A3A3809A35;
-	Thu, 11 Dec 2025 09:40:14 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3B9213809A35;
+	Thu, 11 Dec 2025 09:40:16 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -50,42 +50,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/2] net/sched: ets: Remove drr class from the active
- list
- if it changes to strict
+Subject: Re: [PATCH net] nfc: pn533: Fix error code in
+ pn533_acr122_poweron_rdr()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176544601354.1308621.17954090130242300432.git-patchwork-notify@kernel.org>
-Date: Thu, 11 Dec 2025 09:40:13 +0000
-References: <20251208190125.1868423-1-victor@mojatatu.com>
-In-Reply-To: <20251208190125.1868423-1-victor@mojatatu.com>
-To: Victor Nogueira <victor@mojatatu.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, jhs@mojatatu.com, jiri@resnulli.us,
- xiyou.wangcong@gmail.com, horms@kernel.org, dcaratti@redhat.com,
- petrm@nvidia.com, netdev@vger.kernel.org
+ <176544601478.1308621.1840268156177987089.git-patchwork-notify@kernel.org>
+Date: Thu, 11 Dec 2025 09:40:14 +0000
+References: <aTfIJ9tZPmeUF4W1@stanley.mountain>
+In-Reply-To: <aTfIJ9tZPmeUF4W1@stanley.mountain>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: gregkh@linuxfoundation.org, krzk@kernel.org, johan@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel-janitors@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon,  8 Dec 2025 16:01:24 -0300 you wrote:
-> Whenever a user issues an ets qdisc change command, transforming a
-> drr class into a strict one, the ets code isn't checking whether that
-> class was in the active list and removing it. This means that, if a
-> user changes a strict class (which was in the active list) back to a drr
-> one, that class will be added twice to the active list [1].
+On Tue, 9 Dec 2025 09:56:39 +0300 you wrote:
+> Set the error code if "transferred != sizeof(cmd)" instead of
+> returning success.
 > 
-> Doing so with the following commands:
-> 
-> [...]
+> Fixes: dbafc28955fa ("NFC: pn533: don't send USB data off of the stack")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> ---
+>  drivers/nfc/pn533/usb.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Here is the summary with links:
-  - [net,1/2] net/sched: ets: Remove drr class from the active list if it changes to strict
-    https://git.kernel.org/netdev/net/c/b1e125ae425a
-  - [net,2/2] selftests/tc-testing: Create tests to exercise ets classes active list misplacements
-    https://git.kernel.org/netdev/net/c/5914428e0e44
+  - [net] nfc: pn533: Fix error code in pn533_acr122_poweron_rdr()
+    https://git.kernel.org/netdev/net/c/885bebac9909
 
 You are awesome, thank you!
 -- 
