@@ -1,291 +1,194 @@
-Return-Path: <netdev+bounces-244396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E164DCB63CD
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 15:45:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B548CB63DF
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 15:47:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 332EB301E912
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 14:44:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 85598300A1F2
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 14:45:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3957528727B;
-	Thu, 11 Dec 2025 14:44:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E694423F439;
+	Thu, 11 Dec 2025 14:45:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BlVLteqZ"
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="lorCRtaB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D2C1285C89
-	for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 14:44:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00B8A220F37;
+	Thu, 11 Dec 2025 14:45:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765464254; cv=none; b=Y63Wt+j8ThvOQz2Clx5k6rHHTfIQAWY930E5YHcn+NhxHJyymI9kYoVLevL5slRlMVnQdZeEeqfm+qTQ1w0a9mSfFlJXg4ivypIP9DgR6/PLhSmEvKRAiBTPiefZx3E+l6YvZjQyDNIzvy2T/6NzMjqOUvGx74I02gd+hVtaoMo=
+	t=1765464318; cv=none; b=oOTutW/yFCvLgTkNpG6YfToGLLDBPcUhixbybtgNQQvbpKV21u3MT4q7rIGc888s3p+Wka6lRdid1DuV7BqqvajUv0BfkuJoCEDAOl07NYKamCSEsOeJYBI0fHAgb0mqthRVjIbmyWUPPmY0G57nH8gJdPPo0eO+hQduwLdNjEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765464254; c=relaxed/simple;
-	bh=HcERldN4lWho/JUPnC5sIgD6t5G2cLBp2BqazKe5Jrg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=V6s/U8flnkRw7j4DC8f6UFyQ1RCSwieWRXVQ0+Ahq+0B9KUGYZ2XfaZsSOsAVDeLfJegGTBaGzbW05mbSxkGOlf/RE7GnYmRAXSXgwaKyYM4BiDp+Du8ym2X7kQV/MusWPIHHJn56fm1C8gqVrC20n5zmlgn6Lu7XIFFHHQUlQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BlVLteqZ; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-29e93ab7ff5so2038985ad.3
-        for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 06:44:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765464252; x=1766069052; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EtINVVL3vB+IyxNj9ffA7lSqV98wLbUBVSb7OBPZY6U=;
-        b=BlVLteqZBeszJxirK6ZI+h+MyzDKWp8b/ReApVmyTZ93Lf2maGNpNHpTFgR0YTaW7r
-         QF/lHih/l+fjsQVwqqr9jtYR8rlZWzKJi4bucxdO8Y9gjTOQEFHG10d4mqPFU26oPpv1
-         IQxLMljhxvuhDOmF6S+Qn2+jg+mmCly+oIzTafpubI+vygdLSK1MWTayZU8aucZbr3XZ
-         cEApzlFvaWdJ/UdDPlmn6yHNkLPIMj0DymYPvX+9Q8I7GEnGLhvTydSC5Herp46Pwh96
-         58tEvDXsG+EPUFok+iEMdqgVlp67qwbQrh28byVbXPkft+ovH35dxhPZ40RO51kKS5VD
-         ehcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765464252; x=1766069052;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=EtINVVL3vB+IyxNj9ffA7lSqV98wLbUBVSb7OBPZY6U=;
-        b=JlX9oQxmpsSNoLcjrOEnlnUa1TeGb3lDLDoCA5ECA4xWoKuskz8/23hdH8s8GUhBRk
-         5R23Y1ZEKCenNuWkselDTjaTBMfstv7ongx0Adl51vb55tI51wM+2IeIYsHTEn3mP27+
-         RqhDdcj6G/27V+jYTBT9bxrAf87SvKrdkDSXSSpyhCy+MVnbMktjxqOlQadQ+2X7geaO
-         767ebsNTcfWqlfZ4pbCqHm/PpqtZF7PzMTc7c/1Im3TtAiRaYsS5FTw/pwZ6pli0njzS
-         mg0bH2FJB6J8ldHwXI8p1+unhPAXadvjdy77CiNt5FJmze0i+1i5zEJekaU6fcAdauzX
-         Z2vw==
-X-Forwarded-Encrypted: i=1; AJvYcCWRJv4DswqlrwMc0RZ9y+HsRZBIDnONtyK/4jZCJhooK48aZ/Ubc5s4++jN0gZ9uAcYvJsOs0M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YznxoJJrXOXG1MnNqFlzmLHAEVcQj+lOaDkfjZXUytAGduuelp/
-	Mwpgxc9dCl3B0K9S2xg09pt3Fd2sKE0rkz2tpLuGNmgVTps7EQocYiqlDY1X0YkkCqqxGu1Q8dz
-	wqamymrHlKq9XvAG5hn/ZfHnRQuXuLflPcG2LgMk6emdB
-X-Gm-Gg: AY/fxX7nCMxTIXXmc1fvM/ulwyYPElhjyEpw9eXE4p24DeGyNVfyj5kh0AVhZDF9ekd
-	zllgmTBNdKG9cc6w0iLiebEVO1L3ObevUWX5/XW9S0OAPAoRjLm49fjf5nyYTOSpC9Xe+GlBgQT
-	nkeL66K9wEL+cXbFvXZmgt/tXi3Co7LgpKRr3ZY0T+UfrN2mgQaazc2oIPOSeQYkOob+pJJcCwp
-	uuMA/QmBo2y5ttgzGB/ghXf/U0/CVwFEXEvaH8YiojngtsELMP6r6wBkXPLt1Kv/vxXzqY=
-X-Google-Smtp-Source: AGHT+IEmEFQlvbBlRShmDnefLZIZSx5DWO8WmdgzaULARHGEfaymct8sV/4h93v5RD8D4YSxFwM3CJl04SW4WB5B9eI=
-X-Received: by 2002:a17:903:3205:b0:295:5625:7e41 with SMTP id
- d9443c01a7336-29ec2319bfdmr70617415ad.22.1765464251582; Thu, 11 Dec 2025
- 06:44:11 -0800 (PST)
+	s=arc-20240116; t=1765464318; c=relaxed/simple;
+	bh=Rn5ctt9toG1dhvX7KH2XC7syM1SfFxKIrbnE7/2XRkw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=U52PM0bxdw4oXSaCQup0e8Wb38TltJ5ySOdHU1KULWNowWd3VS6xoX3GLDhiAANM4WOFG9W/2lYMflUR6mJIA6AdHJRZIdE5/Qc/6lPXXEkR37i03Y6SLds6puS/fqMqxtoPMkFEhSY5VySZj4sUjbJzH4Xas8oUOfqzsx+eMZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=lorCRtaB; arc=none smtp.client-ip=80.241.56.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4dRwNg13KYz9spF;
+	Thu, 11 Dec 2025 15:45:07 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1765464307; h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Rn5ctt9toG1dhvX7KH2XC7syM1SfFxKIrbnE7/2XRkw=;
+	b=lorCRtaB+hEfb5/FCHWF1mrQrWbp0b0l8qOGJMF6812UTQp4gPV0SlUBeJOX/MvFqrqc1m
+	p6zNHUWDuisYFJMJNVJyH3WLyLXZY7nfK7NQnlRnNFF9lImT27f0iQXISkz09QMyPE/nJB
+	bLfgM4wW3U4EyWMPYjsxP+d6Rig7T+XKrCjgjefGs/jVr4dLWRpa9oPyPaLqFWOx6w3mNM
+	dKsJcRI+1aPpxXhNvkYqwFd0APxkjTQ3RqPbD09Sjd07GWUO4rt00k11fBCN5xU0XuU+kL
+	WRcy9FPJ2oyEyCGbssUgPqt6mQfcMXJ7LLNHi68qmZF0oXw8bJweSbFtylDOqw==
+Message-ID: <130064e95124f32a40618620450016bec0a96ffd.camel@mailbox.org>
+Subject: Re: [PATCH net-next v3 2/3] net: stmmac: Add glue driver for
+ Motorcomm YT6801 ethernet controller
+From: Philipp Stanner <phasta@mailbox.org>
+Reply-To: phasta@kernel.org
+To: Yao Zi <me@ziyao.cc>, phasta@kernel.org, Bjorn Helgaas
+ <helgaas@kernel.org>,  "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Thomas Gleixner <tglx@linutronix.de>
+Cc: Bjorn Helgaas <bhelgaas@google.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>,  "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Frank <Frank.Sae@motor-comm.com>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Choong Yong Liang <yong.liang.choong@linux.intel.com>, Chen-Yu Tsai
+ <wens@csie.org>, Jisheng Zhang <jszhang@kernel.org>, Furong Xu
+ <0x1207@gmail.com>,  linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ Mingcong Bai <jeffbai@aosc.io>, Kexy Biscuit <kexybiscuit@aosc.io>, Runhua
+ He <hua@aosc.io>,  Xi Ruoyao <xry111@xry111.site>
+Date: Thu, 11 Dec 2025 15:44:57 +0100
+In-Reply-To: <aTrT3rHhtXkSyPOO@pie>
+References: <20251205221629.GA3294018@bhelgaas>
+	 <27fec7d0ed633218a7787be3edce63c3038c63e2.camel@mailbox.org>
+	 <aTrT3rHhtXkSyPOO@pie>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251211125104.375020-1-mlbnkm1@gmail.com> <20251211080251-mutt-send-email-mst@kernel.org>
- <zlhixzduyindq24osaedkt2xnukmatwhugfkqmaugvor6wlcol@56jsodxn4rhi>
-In-Reply-To: <zlhixzduyindq24osaedkt2xnukmatwhugfkqmaugvor6wlcol@56jsodxn4rhi>
-From: Melbin Mathew Antony <mlbnkm1@gmail.com>
-Date: Thu, 11 Dec 2025 14:43:59 +0000
-X-Gm-Features: AQt7F2pnwvtOPbnMcrHx8A-PKFVB-JfGrhIlVSiOwVGrW6Eib51aDnzbmR7nZ7M
-Message-ID: <CAMKc4jDpMsk1TtSN-GPLM1M_qp_jpoE1XL1g5qXRUiB-M0BPgQ@mail.gmail.com>
-Subject: Re: [PATCH net v3] vsock/virtio: cap TX credit to local buffer size
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, stefanha@redhat.com, kvm@vger.kernel.org, 
-	netdev@vger.kernel.org, virtualization@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, jasowang@redhat.com, xuanzhuo@linux.alibaba.com, 
-	eperezma@redhat.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MBO-RS-ID: e7cebc86a28cdecb066
+X-MBO-RS-META: rzi1kojuuhsp3kmd1ynxcm1appakrfq9
 
-Hi Stefano, Michael,
+On Thu, 2025-12-11 at 14:23 +0000, Yao Zi wrote:
+> On Mon, Dec 08, 2025 at 10:54:36AM +0100, Philipp Stanner wrote:
+> > On Fri, 2025-12-05 at 16:16 -0600, Bjorn Helgaas wrote:
+> > > [+to Philipp, Thomas for MSI devres question]
+> > >=20
+> > > On Fri, Dec 05, 2025 at 09:34:54AM +0000, Russell King (Oracle) wrote=
+:
+> > > > On Fri, Dec 05, 2025 at 05:31:34AM +0000, Yao Zi wrote:
+> > > > > On Mon, Nov 24, 2025 at 07:06:12PM +0000, Russell King (Oracle) w=
+rote:
+> > > > > > On Mon, Nov 24, 2025 at 04:32:10PM +0000, Yao Zi wrote:
+>=20
+> ...
+>=20
+> > > > This looks very non-intuitive, and the documentation for
+> > > > pci_alloc_irq_vectors() doesn't help:
+> > > >=20
+> > > > =C2=A0* Upon a successful allocation, the caller should use pci_irq=
+_vector()
+> > > > =C2=A0* to get the Linux IRQ number to be passed to request_threade=
+d_irq().
+> > > > =C2=A0* The driver must call pci_free_irq_vectors() on cleanup.
+> > > > =C2=A0=C2=A0 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^=
+^
+> > > >=20
+> > > > because if what you say is correct (and it looks like it is) then t=
+his
+> > > > line is blatently incorrect.
+> >=20
+> > True, this line is false. It should probably state "If you didn't
+> > enable your PCI device with pcim_enable_device(), you must call
+> > pci_free_irq_vectors() on cleanup."
+> >=20
+> > If it's not a bug, one could keep the docu that way or at least phrase
+> > it in a way so that no additional users start relying on that hybrid
+> > mechanism.
+>=20
+> Thanks for the clarification, would you mind me sending a patch to fix
+> the description, and also mention the automatic clean-up behavior
+> shouldn't be relied anymore in new code?
 
-Thanks for the feedback and for pointing out the s64 issue in
-virtio_transport_get_credit() and the vsock_test regression.
+If I would mind if *you* send such a patch? I for sure wouldn't mind,
+that's the entire idea of open source development ^^
 
-I can take this up and send a small series:
+I can of course review it if you +Cc me.
 
-  1/2 =E2=80=93 vsock/virtio: cap TX credit to local buffer size
-        - use a helper to bound peer_buf_alloc by buf_alloc
-        - compute available credit in s64 like has_space(), and clamp
-          negative values to zero before applying the caller=E2=80=99s cred=
-it
+>=20
+> ...
+>=20
+> > The good news is that it's the last remainder of PCI hybrid devres and
+> > getting rid of it would allow for removal of some additional code, too
+> > (e.g., is_enabled bit and pcim_pin_device()).
+> >=20
+> > The bad news is that it's not super trivial to remove. I looked into it
+> > about two times and decided I can't invest that time currently. You
+> > need to go over all drivers again to see who uses pcim_enable_device(),
+> > then add free_irq_vecs() for them all and so on=E2=80=A6
+>=20
+> Do you think adding an implementation of pcim_alloc_irq_vectors(), that
+> always call pci_free_irq_vectors() regardless whether the PCI device is
+> managed, will help the conversion?
+>=20
+> This will make it more trival to rewrite drivers depending on the
+> automatic clean-up behavior: since calling pci_free_irq_vectors()
+> several times is okay, we could simply change pci_alloc_irq_vectors() to
+> pcim_alloc_irq_vectors(), without considering where to call
+> pci_free_irq_vectors().
+>=20
+> Introducing pcim_alloc_irq_vectors() will also help newly-introduced
+> drivers to reduce duplicated code to handle resource clean-up.
 
-  2/2 =E2=80=93 vsock/test: fix seqpacket message bounds test
-        - include your vsock_test.c change so the seqpacket bounds test
-          keeps working with the corrected TX credit handling
+That's in fact how I have cleaned up the hybrid nature that was present
+until this year in pci_request_region() et al.:
 
-I=E2=80=99ll roll these into a [PATCH net v4 0/2] series and send it out sh=
-ortly.
+https://lore.kernel.org/linux-pci/20250519112959.25487-2-phasta@kernel.org/
 
-Thanks again for all the guidance,
-Melbin
+It's one way to do it. First port everyone who relies on managed
+behavior to a pcim_ function, and once they're all ported, remove the
+hybrid nature from the pci_ function.
+
+So that works, yes. The real question is just whether one wants a pcim_
+function for the irq vectors. My personal impression is that this looks
+like a useful feature; but my expertise with MSI is a bit limited.
+There's also this strange kernel-wide msi_enabled global bool..=20
+
+I guess the best way to find out is to try implementing it.
+
+In case of doubt, the boring unmanaged pci_ version is the safe choice.
+One contributor around here has once called the managed versions "the
+crazy devres voodoo" :p
+
+(BTW, just to be sure, pcim_ functions must not be interconnected with
+pcim_enable() in the future anymore, nor shall they use global state.
+All PCI devres functionality should purely work on the device file
+through pure devres. The pcim_enable() interconnection cam only from
+the hybrid feature.)
 
 
-On Thu, Dec 11, 2025 at 1:57=E2=80=AFPM Stefano Garzarella <sgarzare@redhat=
-.com> wrote:
->
-> On Thu, Dec 11, 2025 at 08:05:11AM -0500, Michael S. Tsirkin wrote:
-> >On Thu, Dec 11, 2025 at 01:51:04PM +0100, Melbin K Mathew wrote:
-> >> The virtio vsock transport currently derives its TX credit directly fr=
-om
-> >> peer_buf_alloc, which is populated from the remote endpoint's
-> >> SO_VM_SOCKETS_BUFFER_SIZE value.
-> >>
-> >> On the host side, this means the amount of data we are willing to queu=
-e
-> >> for a given connection is scaled purely by a peer-chosen value, rather
-> >> than by the host's own vsock buffer configuration. A guest that
-> >> advertises a very large buffer and reads slowly can cause the host to
-> >> allocate a correspondingly large amount of sk_buff memory for that
-> >> connection.
-> >>
-> >> In practice, a malicious guest can:
-> >>
-> >>   - set a large AF_VSOCK buffer size (e.g. 2 GiB) with
-> >>     SO_VM_SOCKETS_BUFFER_MAX_SIZE / SO_VM_SOCKETS_BUFFER_SIZE, and
-> >>
-> >>   - open multiple connections to a host vsock service that sends data
-> >>     while the guest drains slowly.
-> >>
-> >> On an unconstrained host this can drive Slab/SUnreclaim into the tens =
-of
-> >> GiB range, causing allocation failures and OOM kills in unrelated host
-> >> processes while the offending VM remains running.
-> >>
-> >> On non-virtio transports and compatibility:
-> >>
-> >>   - VMCI uses the AF_VSOCK buffer knobs to size its queue pairs per
-> >>     socket based on the local vsk->buffer_* values; the remote side
-> >>     can=E2=80=99t enlarge those queues beyond what the local endpoint
-> >>     configured.
-> >>
-> >>   - Hyper-V=E2=80=99s vsock transport uses fixed-size VMBus ring buffe=
-rs and
-> >>     an MTU bound; there is no peer-controlled credit field comparable
-> >>     to peer_buf_alloc, and the remote endpoint can=E2=80=99t drive in-=
-flight
-> >>     kernel memory above those ring sizes.
-> >>
-> >>   - The loopback path reuses virtio_transport_common.c, so it
-> >>     naturally follows the same semantics as the virtio transport.
-> >>
-> >> Make virtio-vsock consistent with that model by intersecting the peer=
-=E2=80=99s
-> >> advertised receive window with the local vsock buffer size when
-> >> computing TX credit. We introduce a small helper and use it in
-> >> virtio_transport_get_credit(), virtio_transport_has_space() and
-> >> virtio_transport_seqpacket_enqueue(), so that:
-> >>
-> >>     effective_tx_window =3D min(peer_buf_alloc, buf_alloc)
-> >>
-> >> This prevents a remote endpoint from forcing us to queue more data tha=
-n
-> >> our own configuration allows, while preserving the existing credit
-> >> semantics and keeping virtio-vsock compatible with the other transport=
-s.
-> >>
-> >> On an unpatched Ubuntu 22.04 host (~64 GiB RAM), running a PoC with
-> >> 32 guest vsock connections advertising 2 GiB each and reading slowly
-> >> drove Slab/SUnreclaim from ~0.5 GiB to ~57 GiB and the system only
-> >> recovered after killing the QEMU process.
-> >>
-> >> With this patch applied, rerunning the same PoC yields:
-> >>
-> >>   Before:
-> >>     MemFree:        ~61.6 GiB
-> >>     MemAvailable:   ~62.3 GiB
-> >>     Slab:           ~142 MiB
-> >>     SUnreclaim:     ~117 MiB
-> >>
-> >>   After 32 high-credit connections:
-> >>     MemFree:        ~61.5 GiB
-> >>     MemAvailable:   ~62.3 GiB
-> >>     Slab:           ~178 MiB
-> >>     SUnreclaim:     ~152 MiB
-> >>
-> >> i.e. only ~35 MiB increase in Slab/SUnreclaim, no host OOM, and the
-> >> guest remains responsive.
-> >>
-> >> Fixes: 06a8fc78367d ("VSOCK: Introduce virtio_vsock_common.ko")
-> >> Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
-> >> Signed-off-by: Melbin K Mathew <mlbnkm1@gmail.com>
-> >> ---
-> >>  net/vmw_vsock/virtio_transport_common.c | 27 ++++++++++++++++++++++--=
--
-> >>  1 file changed, 24 insertions(+), 3 deletions(-)
-> >>
-> >> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/v=
-irtio_transport_common.c
-> >> index dcc8a1d58..02eeb96dd 100644
-> >> --- a/net/vmw_vsock/virtio_transport_common.c
-> >> +++ b/net/vmw_vsock/virtio_transport_common.c
-> >> @@ -491,6 +491,25 @@ void virtio_transport_consume_skb_sent(struct sk_=
-buff *skb, bool consume)
-> >>  }
-> >>  EXPORT_SYMBOL_GPL(virtio_transport_consume_skb_sent);
-> >>
-> >> +/* Return the effective peer buffer size for TX credit computation.
-> >> + *
-> >> + * The peer advertises its receive buffer via peer_buf_alloc, but we
-> >> + * cap that to our local buf_alloc (derived from
-> >> + * SO_VM_SOCKETS_BUFFER_SIZE and already clamped to buffer_max_size)
-> >> + * so that a remote endpoint cannot force us to queue more data than
-> >> + * our own configuration allows.
-> >> + */
-> >> +static u32 virtio_transport_tx_buf_alloc(struct virtio_vsock_sock *vv=
-s)
-> >> +{
-> >> +    return min(vvs->peer_buf_alloc, vvs->buf_alloc);
-> >> +}
-> >> +
-> >>  u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 cr=
-edit)
-> >>  {
-> >>      u32 ret;
-> >> @@ -499,7 +518,8 @@ u32 virtio_transport_get_credit(struct virtio_vsoc=
-k_sock *vvs, u32 credit)
-> >>              return 0;
-> >>
-> >>      spin_lock_bh(&vvs->tx_lock);
-> >> -    ret =3D vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
-> >> +    ret =3D virtio_transport_tx_buf_alloc(vvs) -
-> >> +            (vvs->tx_cnt - vvs->peer_fwd_cnt);
-> >>      if (ret > credit)
-> >>              ret =3D credit;
-> >>      vvs->tx_cnt +=3D ret;
-> >> @@ -831,7 +851,7 @@ virtio_transport_seqpacket_enqueue(struct vsock_so=
-ck *vsk,
-> >>
-> >>      spin_lock_bh(&vvs->tx_lock);
-> >>
-> >> -    if (len > vvs->peer_buf_alloc) {
-> >> +    if (len > virtio_transport_tx_buf_alloc(vvs)) {
-> >>              spin_unlock_bh(&vvs->tx_lock);
-> >>              return -EMSGSIZE;
-> >>      }
-> >> @@ -882,7 +902,8 @@ static s64 virtio_transport_has_space(struct vsock=
-_sock *vsk)
-> >>      struct virtio_vsock_sock *vvs =3D vsk->trans;
-> >>      s64 bytes;
-> >>
-> >> -    bytes =3D (s64)vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd=
-_cnt);
-> >> +    bytes =3D (s64)virtio_transport_tx_buf_alloc(vvs) -
-> >> +            (vvs->tx_cnt - vvs->peer_fwd_cnt);
-> >>      if (bytes < 0)
-> >>              bytes =3D 0;
-> >>
-> >
-> >Acked-by: Michael S. Tsirkin <mst@redhat.com>
-> >
-> >
-> >Looking at this, why is one place casting to s64 the other is not?
->
-> Yeah, I pointed out that too in previous interactions. IMO we should fix
-> virtio_transport_get_credit() since the peer can reduce `peer_buf_alloc`
-> so it will overflow. Fortunately, we are limited by the credit requested
-> by the caller, but we are still sending stuff when we shouldn't be.
->
-> @Melbin let me know if you will fix it, otherwise I can do that, but I'd
-> like to do in a single series (multiple patches), since they depends on
-> each other.
->
-> So if you prefer, I can pickup this patch and post a series with this +
-> the other fix + the fix on the test I posted on the v2.
->
-> Stefano
->
+P.
+
+>=20
+> > If you give me a pointer I can provide a TODO entry. In any case, feel
+> > free to set me as a reviewer!
+>=20
+> > Regards
+> > Philipp
+>=20
+> Regards,
+> Yao Zi
+
 
