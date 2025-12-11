@@ -1,125 +1,107 @@
-Return-Path: <netdev+bounces-244324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D4C8CB4DE9
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 07:25:15 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED35DCB4E0A
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 07:32:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A29D63001601
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 06:25:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A9B31300ACC2
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 06:32:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70302286D70;
-	Thu, 11 Dec 2025 06:25:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 622F727C84E;
+	Thu, 11 Dec 2025 06:32:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="eaJeKcQB"
 X-Original-To: netdev@vger.kernel.org
-Received: from TWMBX01.aspeed.com (mail.aspeedtech.com [211.20.114.72])
+Received: from out203-205-221-192.mail.qq.com (out203-205-221-192.mail.qq.com [203.205.221.192])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D06DC28541A;
-	Thu, 11 Dec 2025 06:25:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.20.114.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B174F24169D;
+	Thu, 11 Dec 2025 06:32:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.192
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765434312; cv=none; b=MDmouuW3y4IM7zp4zo/kNp5CHTEEN2WxRiX4dwojAcFrKMiEuRcNubXjIRYT48xezDEoruB4nsX7YgwRaRbh1FtY/+g0mTcyOj/l5akMKz2JTR86wd4nhspB44Apo1API208USVHhoZKvrLPwpd5SYI+syC7q5o0xQNgAU5XI3o=
+	t=1765434753; cv=none; b=NdEFWDRr7TtEt3+4tNgipmzXaW76YqZd/P6JaRyNtEqMt2YY8mgZVjNv3ckNOn6Yq2erzeWOQlF3gksoUyU+HFEhJLUpHKNQDUh/Xt7/pM/V4SxKwjUlUkWbNTq/VTGX/bNhYRgsU0ue/WEGln5ac3HaVTqnmMJiSf3kCaPzb+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765434312; c=relaxed/simple;
-	bh=/F4kIXDvh45WJxiCbdIwAGVfMvFPrac8MDCbVP75p2g=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=FN6VEv7b4MwbsLaFmSN65VNoWm6uvq1g3FPj8wrfvG1vUQBRAu61d0tLdwCt4gcQi0AXejngAfgm595BUI/H7Fp7/VmCcepVfXgjGiWGHsz+Z5LJloFvpM0VWwW8ndlVlK+vDdKN+ArKT4jGMAWm+3zHmCWmNDcvvTSQTh8v9Gk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; arc=none smtp.client-ip=211.20.114.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
-Received: from TWMBX01.aspeed.com (192.168.0.62) by TWMBX01.aspeed.com
- (192.168.0.62) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.10; Thu, 11 Dec
- 2025 14:25:01 +0800
-Received: from [127.0.1.1] (192.168.10.13) by TWMBX01.aspeed.com
- (192.168.0.62) with Microsoft SMTP Server id 15.2.1748.10 via Frontend
- Transport; Thu, 11 Dec 2025 14:25:01 +0800
-From: Jacky Chou <jacky_chou@aspeedtech.com>
-Date: Thu, 11 Dec 2025 14:24:58 +0800
-Subject: [PATCH net v3] net: mdio: aspeed: add dummy read to avoid
- read-after-write issue
+	s=arc-20240116; t=1765434753; c=relaxed/simple;
+	bh=fIvPNLHeDzWJF31MVDenOR42FEqmZ79q0H8utAhI720=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=GtJ5JtPEY1VKyOT9yLqWzVHwgr0rvWdqSljhrl8wi7B+UvGKovITCN2s79MpcMF65AMdQ9qWDxykM7e4pJ+RQdUFCIOvqJqYD1U6DRXmYvJXdN9E23G19+G7u+xwIEUr64NCdcmWjSMFuMCL0NO1iG0/k/L6PMBcZkxJ4YKaM9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=eaJeKcQB; arc=none smtp.client-ip=203.205.221.192
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1765434742; bh=j9YJeKxZIVNEPnjmawJSw8tc2oM/QEMGoWkZljnyWFE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=eaJeKcQBlF8VpzSaRSU9J9OfWnQgEuBFJrBu4Ll2j9zInAuK/I+KUVNrougxX/qKF
+	 UBlXY9InI2/0SYygm8WnMCNZ1CqPv6pMVxWcyFGu92kXud/4Y0ua1U52Q/a/EiFRVX
+	 uf0Vj7bDbMzxdYEkA1UtsYwp9hxa+CdSwN4uCD2M=
+Received: from lxu-ped-host.. ([111.201.7.117])
+	by newxmesmtplogicsvrsza53-0.qq.com (NewEsmtp) with SMTP
+	id 81197280; Thu, 11 Dec 2025 14:32:17 +0800
+X-QQ-mid: xmsmtpt1765434737t9ud65iy0
+Message-ID: <tencent_62102EE16E389458E93EED06CEBC780A6D0A@qq.com>
+X-QQ-XMAILINFO: N1p/MiiOj+Nxnc8ixv9aB6Cuhh1Kg38gNO1ezC8t5gz9BfwdrqVb1jlDr2wZOA
+	 ERbWwQzhvvNcEptlPvLm+td0AOlAyg5AN2J3aaF8+idRx3D+9zZdJ19JMlV7n2dKYbqq9EAk/4qt
+	 OBUcHMcc0ldyIbIKMEbz6NcMNQgTMhpHzF/NSxxJ7nuWQYHd+uos5B55s7giqxd7OTue4Gw1KqBa
+	 J8VGyUfnDGp/Z7iTKEpGuJvKxo6PSGRvs/EWsK0FYUDg7ikGKsaAVcnRb3KFQKd8rn381898ajKy
+	 d4/BXPOuxqQWaSCsu6UjF3kiCpDSUKdD38SvmaTjP9jkfwC14cVe8F1pOf26FlgkCfCar2nytGH+
+	 Blld7Yx4IIpAu+ceG+ya6CPzlAgqdLgsf0cX0znwYWoQ7gXM+wG83ffi8njN6BRdhFXlDcyk53o2
+	 q12DIDhLUwwo8B3pmgLgoz9Ds2M8seYyY7P+hJe+MIWjuFNcpZicMKJ1sVlPdiW4BQX6WOTO8/ap
+	 MVsBTpiPS6WcOjqngH8JtQyW4LI70PWVBfCvMD4M0l1tfi3smcXoUBbvzBy+UzFP9lBOrvBucnJf
+	 hV7jETV8CRccEMNhJslep92QxBwezHtEcIX0IcrGfdKeS4gjSuiioL6zM7RAegeA2TCaWuN7p4Bh
+	 xBJpM7TVFvCc3g1cjKCUZ9qbFqWYDCFIOk90wElp1MyHI8AnwFWuJPdBt2l/ai59w7meXhM/X+kc
+	 MVTLl0kOOrd3sKN1AHO1Wty8xTYp0SA+p45I4lKoXIzffhbpYGpmDGaW/GbuEKkDkJvUKv2OvS6Z
+	 9fElMXys2KLlGlCeehKEfc9mWC+8YM0NRTSnfhHrtwRLngvT6xWcVV0mJbsM8MlRVw9SAJlaukBg
+	 C9fSE7MK2Jss8MctRniiF4aN9pCLmfyorNNOQeQb72xZmSlKYwl4kyvhuiu+QKyVFOctV9yIiL2V
+	 3Ks5p1rCHknj7egVgRAg0UaFbfunHL5A8hesQWabzOHpWpLHjgTvFeIaIYeHErVzMhlZYCF7laAM
+	 OOpTW77eg+7hhJAW2W1ya4q00FRTEae03LaB6/zA==
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
+From: Edward Adam Davis <eadavis@qq.com>
+To: kuba@kernel.org
+Cc: davem@davemloft.net,
+	eadavis@qq.com,
+	edumazet@google.com,
+	eperezma@redhat.com,
+	horms@kernel.org,
+	jasowang@redhat.com,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	mst@redhat.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	sgarzare@redhat.com,
+	stefanha@redhat.com,
+	syzbot+ci3edb9412aeb2e703@syzkaller.appspotmail.com,
+	syzbot@lists.linux.dev,
+	syzbot@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com,
+	virtualization@lists.linux.dev,
+	xuanzhuo@linux.alibaba.com
+Subject: Re: [PATCH net-next V3] net: restore the iterator to its original state when an error occurs
+Date: Thu, 11 Dec 2025 14:32:18 +0800
+X-OQ-MSGID: <20251211063217.38761-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20251211142142.18a4a0b2@kernel.org>
+References: <20251211142142.18a4a0b2@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20251211-aspeed_mdio_add_dummy_read-v3-1-382868869004@aspeedtech.com>
-X-B4-Tracking: v=1; b=H4sIALljOmkC/43NQQ7CIBAF0Ks0rMUwaCl15T2MIVimlgWlgUpsm
- t5dghsTE+Pyz5+8v5KIwWIkp2olAZON1o85HHYV6QY93pFakzPhjNfAmaQ6TohGOWO90sYo83B
- uUQG1obVs9E1KJiU0JANTwN4+C34hI87kmo+DjbMPSxlMUKp/7AQUKNMgBWjDQcD5/TxjN+w77
- 4qd+KfX/vR49upeMAHiCK1sv7xt214iS3GuHgEAAA==
-X-Change-ID: 20251208-aspeed_mdio_add_dummy_read-587ab8808817
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Joel Stanley
-	<joel@jms.id.au>, Andrew Jeffery <andrew@codeconstruct.com.au>, Potin Lai
-	<potin.lai@quantatw.com>
-CC: <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-aspeed@lists.ozlabs.org>, <linux-kernel@vger.kernel.org>, "Andrew
- Jeffery" <andrew@aj.id.au>, Jacky Chou <jacky_chou@aspeedtech.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1765434301; l=2016;
- i=jacky_chou@aspeedtech.com; s=20251031; h=from:subject:message-id;
- bh=/F4kIXDvh45WJxiCbdIwAGVfMvFPrac8MDCbVP75p2g=;
- b=oJptiug7G0Gd4SocdRv+VJ4ONlyM5fmP7zoWOeQc6wU3FZ/KkhT4lxdo14vQWCOtkRhz67Y2g
- 97WIqf9bH2XBjn3dkbiQSY0jjL20PVv1/htH/ayyKn+s8t/nwgFZKHH
-X-Developer-Key: i=jacky_chou@aspeedtech.com; a=ed25519;
- pk=8XBx7KFM1drEsfCXTH9QC2lbMlGU4XwJTA6Jt9Mabdo=
+Content-Transfer-Encoding: 8bit
 
-The Aspeed MDIO controller may return incorrect data when a read operation
-follows immediately after a write. Due to a controller bug, the subsequent
-read can latch stale data, causing the polling logic to terminate earlier
-than expected.
-
-To work around this hardware issue, insert a dummy read after each write
-operation. This ensures that the next actual read returns the correct
-data and prevents premature polling exit.
-
-This workaround has been verified to stabilize MDIO transactions on
-affected Aspeed platforms.
-
-Fixes: f160e99462c6 ("net: phy: Add mdio-aspeed")
-Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
----
-Changes in v3:
-- Remove (void)
-- Link to v2: https://lore.kernel.org/r/20251209-aspeed_mdio_add_dummy_read-v2-1-5f6061641989@aspeedtech.com
-
-Changes in v2:
-- Updated the Fixes: tag
-- Link to v1: https://lore.kernel.org/r/20251208-aspeed_mdio_add_dummy_read-v1-1-0a1861ad2161@aspeedtech.com
----
- drivers/net/mdio/mdio-aspeed.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/drivers/net/mdio/mdio-aspeed.c b/drivers/net/mdio/mdio-aspeed.c
-index e55be6dc9ae7..d6b9004c61dc 100644
---- a/drivers/net/mdio/mdio-aspeed.c
-+++ b/drivers/net/mdio/mdio-aspeed.c
-@@ -63,6 +63,13 @@ static int aspeed_mdio_op(struct mii_bus *bus, u8 st, u8 op, u8 phyad, u8 regad,
- 
- 	iowrite32(ctrl, ctx->base + ASPEED_MDIO_CTRL);
- 
-+	/* Workaround for read-after-write issue.
-+	 * The controller may return stale data if a read follows immediately
-+	 * after a write. A dummy read forces the hardware to update its
-+	 * internal state, ensuring that the next real read returns correct data.
-+	 */
-+	ioread32(ctx->base + ASPEED_MDIO_CTRL);
-+
- 	return readl_poll_timeout(ctx->base + ASPEED_MDIO_CTRL, ctrl,
- 				!(ctrl & ASPEED_MDIO_CTRL_FIRE),
- 				ASPEED_MDIO_INTERVAL_US,
-
----
-base-commit: 6bcb7727d9e612011b70d64a34401688b986d6ab
-change-id: 20251208-aspeed_mdio_add_dummy_read-587ab8808817
-
-Best regards,
--- 
-Jacky Chou <jacky_chou@aspeedtech.com>
+On Thu, 11 Dec 2025 14:21:42 +0900, Jakub Kicinski wrote:
+> > > Have you investigated the other callers? Given problems with previous
+> > > version of this patch I'm worried you have not. If you did please extend
+> > > the commit message with the appropriate explanation.
+> > Are you asking if I investigated other zerocopy tests? NO.
+> 
+> I said callers. You're changing behavior of a function, is it going
+> to break any of the callers.
+I investigated the relevant callers and found no similar restore/revert
+operations. Furthermore, if such a restore action existed, the ZC
+related test programs would have detected it, just as the tests
+detected the revert operation in skb_zerocopy_iter_stream().
 
 
