@@ -1,130 +1,128 @@
-Return-Path: <netdev+bounces-244331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id F134ACB4FF2
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 08:38:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6BB4CB501C
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 08:46:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 76CC930012D4
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 07:38:35 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B52B43011EF7
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 07:45:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C64E42D2387;
-	Thu, 11 Dec 2025 07:38:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D772C2D592C;
+	Thu, 11 Dec 2025 07:45:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JHBTkAsB"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23B342D3237;
-	Thu, 11 Dec 2025 07:38:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99BA823BD06
+	for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 07:45:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765438713; cv=none; b=Ij5/0N97vqZfSVepuyEuKHR0/ibe0oCCLGHpEBe/kzU21cr2og3FsZqRFvlWqBF2ds8yMFMnNa2I1WxmyG93zF9l/VLeJt9+xbPogiN+zEp+Yr+te9aC2KVv22RagaTLTlqOyfMjB+OpedhPxuH6aXAAu6PDmnKioVchN/UK8GY=
+	t=1765439155; cv=none; b=rD/pc7LO9535FyMJasD+s5i+LLRuXgIlbf6GKHMBW57lIZ/dH9wsX2t3JzqPJdGFQFgkb42AB8Uf133cm6eI8f2Z6mQoidlTpli+1ugof/XD9q/Q8tzUbPUdupbfGSoH6yaFt8mp7cmK0Uiz+Cp2N/AmXuND94msJZJDWJTyvyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765438713; c=relaxed/simple;
-	bh=MyU/EXJW3Oa3f5V78Uft2sD9r17cnuRAzdb3bovzUUY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XXsMjNAh0ZI3nl9BFxYXxo2sW+rgFs3onXLkEz3CTyvB85BOa01HsR3w+XDURsYlKu7mA0TKfojk9BTBGm02wicdU24vpCsKJyakIrRXxXoxw0YBWnv8XXRT5qMip5s5G6bYsG26p0FeYvkrtt6h2SwY2OIQ3krOVC8ZFs357Vw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn; spf=pass smtp.mailfrom=isrc.iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=isrc.iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=isrc.iscas.ac.cn
-Received: from localhost.localdomain (unknown [36.112.3.239])
-	by APP-03 (Coremail) with SMTP id rQCowABnTOPXdDpptCJIAA--.16140S2;
-	Thu, 11 Dec 2025 15:38:00 +0800 (CST)
-From: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	izumi.taku@jp.fujitsu.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>,
-	stable@vger.kernel.org,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH v2] fjes: Add missing iounmap in fjes_hw_init()
-Date: Thu, 11 Dec 2025 15:37:56 +0800
-Message-Id: <20251211073756.101824-1-lihaoxiang@isrc.iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1765439155; c=relaxed/simple;
+	bh=9mvg3H/c8i6Vw6drMjILUPrnDLVQ4fS3OBd1K9POmt0=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=sMpq9+3z1Vyk2OxXE+0L1JP9bwZCcaSX0Hbjc8bUQ03+dC9gB/Cy22UjZ/lHCw25nDFxZFgdbLmxOmziru1YkPrlfjJLAVySzY9tax16IsqARpzEePwBx/ifpzxSvQyxMcrOXS9QXD67TvPBLHVfFWJ4dI8/2ExzwsVb59HjCgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=JHBTkAsB; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-477b91680f8so6261985e9.0
+        for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 23:45:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1765439152; x=1766043952; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=X5PFu97mrs/j5hiZkT9fpEkRD8VCD4PVmKLSzKLxEz0=;
+        b=JHBTkAsBs6CLKKp65u0MNvEQmof6eP7cSBEhmIip3P7oBLrJG+h1vgLgipmMeUP+0V
+         M9QacK5AksgwkrNtQtewDCaL8GRYlMLEfsjLV1V/0av2J7Cd8KQXi0MpH2k8Qf7LIJrr
+         3O49AYU6AN3jjpOMc/dbHnJ/UuW45obE2LES6DNA5A7q6tvJ69v96WSMh2Vwyxb2J+eu
+         2UUG7mJ9x5rM5Tq/5K4YO4+B9cOI86whdebY7no8M5lUPJz1mvAE0DRlkmKQutfViEuc
+         5Ngdt6aIJx2m0qZPepCPV+n1Il5alkzZxC7oAHe6IAdnmIITLNXMaNQcOS/661q1WYqg
+         WJ7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765439152; x=1766043952;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=X5PFu97mrs/j5hiZkT9fpEkRD8VCD4PVmKLSzKLxEz0=;
+        b=jk6KkrZajSGFaLDJ/FRtB7hIcC4HurZwCIkXM1GkHWb0lk9GJoLCkQgYCVNi3ccwg+
+         SkzDG/gHocMVSJn+VyeHt31ZM9PEcUEQ8JFs3DzubwiqwfF80K9rvkt+aF7uJhLfWQej
+         0/4WSGhRnbIfBDtSYHvpkJlhNS2pbiNvrgRwyTjwe009ec7N3Qd2781ekB9ZE1X4gzCu
+         ZwwH6O78/ptXZ+Jl+YNeh6D5kXpvsUK+LgP/Jp+pCrxTP+ZOvl6duY/sxTTwV8jJwnp9
+         TPb+3AxB6uFOCMDHAueX772dEEnn8FjL49F1SPllqTdWG+MiRnXv/K41l36RJcAPS2E6
+         PrSw==
+X-Forwarded-Encrypted: i=1; AJvYcCWu6q/dSMYwHeG9Mgt2QX7QYPlMmI0xYpoi9qgDz6QoYf36sVqlwrx9UUZVhszMMMW9G1AY+40=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYq6FcUasmV4y4+NXjE7T+GDIfmshileNtJ0Mb5OFaEw4pgKTN
+	y8q6n74uL2f3qWwJLHoW9bgNeguxrf+KMNLRXkgB0TLTYvk9ZC/ymG2v8N+HLnh/6BU=
+X-Gm-Gg: AY/fxX7y2mPYZ4Gf/5wkuIogCCc25gTVj/v27U777rkSkTbbyvPCWKFXBV6yqGafGp9
+	fIFQlGxU2u1JouG0Eh+C7ixWT1cqsQA5R/qF/p+d/1xrG4At5UBjaw/iXF7zDujwCHAWks150/S
+	llCzafFrFYevZoHL2GBieCyGB0HeHZQvcbjUGMd5emgb+ZE5VbxkzrH0hrUAtdL8SEZ7ThUiPpt
+	W1YxOxW+yMb7avM7FgIAiziAe9U4uu5iM80AcuM8InUHhZsRbjw3mMvvv+6y86FcH1mbaKIVobp
+	8vW2BRBPemyLfKtRqrWcizKS1+XQWYaG5Yf42O+DWkBc3Xd9hKYRIeEv7YFIl1LhFa5xUSj+IHy
+	YpsNESV4HBhocczc+3dMcyUwNKvhV+fb+xSvI3AEJH3Yxk2XDCmCQw7ZfdxlAeiGR/gca+5LIn6
+	HQKz5trm1sLQI8R3M3
+X-Google-Smtp-Source: AGHT+IF7TmgbE+Uw5kfOPicBWaMZFFELImJD78GoXEDw+MdgM7iNhig2tJYwraCIhaxT+6NDNvyhbA==
+X-Received: by 2002:a05:600c:630e:b0:477:ae31:1311 with SMTP id 5b1f17b1804b1-47a8375a1f6mr46323505e9.13.1765439151697;
+        Wed, 10 Dec 2025 23:45:51 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47a89f8c145sm19182315e9.14.2025.12.10.23.45.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Dec 2025 23:45:51 -0800 (PST)
+Date: Thu, 11 Dec 2025 10:45:47 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, virtualization@lists.linux.dev,
+	kvm@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: [PATCH net] vsock/virtio: Fix error code in
+ virtio_transport_recv_listen()
+Message-ID: <aTp2q-K4xNwiDQSW@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowABnTOPXdDpptCJIAA--.16140S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7WrW3ur4fGw13Zr48GFy3urg_yoW8XFW8pF
-	yUu3s3ArZxJF4UXw1xAF4fZFyaya4xGry5C3y7Cw1fJwn0vF1ay3WrCa1IvrZ8KrykXFya
-	9Fn8Aw15uF1DZa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWUWVWUuwAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r4j6r
-	4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
-	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
-	VFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
-X-CM-SenderInfo: 5olkt0x0ld0ww6lv2u4olvutnvoduhdfq/1tbiBwsME2k5OmMfvwABs7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
 
-In error paths, add fjes_hw_iounmap() to release the
-resource acquired by fjes_hw_iomap(). Add a goto label
-to do so.
+Return a negative error code if the transport doesn't match.  Don't
+return success.
 
-Fixes: 8cdc3f6c5d22 ("fjes: Hardware initialization routine")
+Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
 Cc: stable@vger.kernel.org
-Signed-off-by: Haoxiang Li <lihaoxiang@isrc.iscas.ac.cn>
-Signed-off-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 ---
-Changes in v2:
-- Use an idiomatic goto to do the error hanlding.
-- Thanks for pointing out the issues with the patch, Simon!
----
- drivers/net/fjes/fjes_hw.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+From static analysis.  Not tested.
 
-diff --git a/drivers/net/fjes/fjes_hw.c b/drivers/net/fjes/fjes_hw.c
-index b9b5554ea862..5ad2673f213d 100644
---- a/drivers/net/fjes/fjes_hw.c
-+++ b/drivers/net/fjes/fjes_hw.c
-@@ -334,7 +334,7 @@ int fjes_hw_init(struct fjes_hw *hw)
- 
- 	ret = fjes_hw_reset(hw);
- 	if (ret)
+ net/vmw_vsock/virtio_transport_common.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+index dcc8a1d5851e..77fbc6c541bf 100644
+--- a/net/vmw_vsock/virtio_transport_common.c
++++ b/net/vmw_vsock/virtio_transport_common.c
+@@ -1550,7 +1550,7 @@ virtio_transport_recv_listen(struct sock *sk, struct sk_buff *skb,
+ 		release_sock(child);
+ 		virtio_transport_reset_no_sock(t, skb);
+ 		sock_put(child);
 -		return ret;
-+		goto err_iounmap;
++		return ret ?: -EINVAL;
+ 	}
  
- 	fjes_hw_set_irqmask(hw, REG_ICTL_MASK_ALL, true);
- 
-@@ -347,8 +347,10 @@ int fjes_hw_init(struct fjes_hw *hw)
- 	hw->max_epid = fjes_hw_get_max_epid(hw);
- 	hw->my_epid = fjes_hw_get_my_epid(hw);
- 
--	if ((hw->max_epid == 0) || (hw->my_epid >= hw->max_epid))
--		return -ENXIO;
-+	if ((hw->max_epid == 0) || (hw->my_epid >= hw->max_epid)) {
-+		ret = -ENXIO;
-+		goto err_iounmap;
-+	}
- 
- 	ret = fjes_hw_setup(hw);
- 
-@@ -356,6 +358,10 @@ int fjes_hw_init(struct fjes_hw *hw)
- 	hw->hw_info.trace_size = FJES_DEBUG_BUFFER_SIZE;
- 
- 	return ret;
-+
-+err_iounmap:
-+	fjes_hw_iounmap(hw);
-+	return ret;
- }
- 
- void fjes_hw_exit(struct fjes_hw *hw)
+ 	if (virtio_transport_space_update(child, skb))
 -- 
-2.25.1
+2.51.0
 
 
