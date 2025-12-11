@@ -1,314 +1,104 @@
-Return-Path: <netdev+bounces-244362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9B69CB57A0
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 11:14:41 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE31BCB57A3
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 11:14:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A4E27301DBAB
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 10:13:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 07CD43021779
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 10:13:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B8A62FF17F;
-	Thu, 11 Dec 2025 10:13:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70FE92FD690;
+	Thu, 11 Dec 2025 10:13:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fCNxAnUa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jsujrt+m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46A3C279DB3
-	for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 10:13:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765447995; cv=fail; b=BE77ed3IwZp+Nb23OTUq6R5J/ZxTeH45nWqFn0SarLtQoOCy6QvSKWa0sjbRXRk29e6bBMAbsPfBd3Vsvv9O11csvpEbfGf9oSjSwS3Ri5Z0D3vxYlx0CNCMYyxYy3KeqameLpjjXaP6xxs9iSwqQXArIQy0ppG1KvebIS/W7V0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765447995; c=relaxed/simple;
-	bh=RRZytUy/bILONXOxgXeQNIm/Tl97L2Zyqs8YhB13LF8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=XJKxXNxYa00d99DvoCyRmU6jrohnW1VpsZa3N8p8ECazkMvIqqsTGxpY+GA+Bl/qAm3B3mxagQHPwAIrP0bhq1S0FEYs65XWLjXGCa38Trd7IkFCbL7jwlvoC/dcJkEagyatxqjAZtAIP/MYZ3Xq41o3VGzYtVrShhTx4UZce/0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fCNxAnUa; arc=fail smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765447993; x=1796983993;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=RRZytUy/bILONXOxgXeQNIm/Tl97L2Zyqs8YhB13LF8=;
-  b=fCNxAnUa+nLh5bxlGpCfLv50wX3hPA/nQCuVEa5W0UM7GFo6A5w17WUK
-   w1HJAbHSF/SOoU6uWjCfTeb8p47QOIMbOXdgQonwz1U2a9keLLiEyGpwW
-   QGl1NQkX4pB4fow8IjX1XTp37hLLyEGq+ekViqvVgcMCuYHRYSuiC4+Up
-   AqeI4pu71TT+08nxM+6dRd2dP4stpMiNrgweC4ItJbHEx7KWvHlRHILQ/
-   FnyebHOdPgRY42QILsatU/ezSbyOn4kF0M7GbGEzUxUmkazNVn1kFS6Xe
-   jVsW2eL7sERrtmqWXJZE4Mc94LXVQWsfKX+2vmpP3EOKn7Pu6EkCKQh63
-   w==;
-X-CSE-ConnectionGUID: w+TqmF+ITXeAf3FKvxYlUA==
-X-CSE-MsgGUID: /OpPFQNtSHux22QaZpuWYQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11638"; a="92906752"
-X-IronPort-AV: E=Sophos;i="6.20,265,1758610800"; 
-   d="scan'208";a="92906752"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2025 02:13:12 -0800
-X-CSE-ConnectionGUID: buIzJKClRKWdI5+MfWePLw==
-X-CSE-MsgGUID: Z7J+6H3aQ6iwwzAsVUXb0Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.20,265,1758610800"; 
-   d="scan'208";a="196031972"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2025 02:13:13 -0800
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Thu, 11 Dec 2025 02:13:12 -0800
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29 via Frontend Transport; Thu, 11 Dec 2025 02:13:12 -0800
-Received: from CH1PR05CU001.outbound.protection.outlook.com (52.101.193.43) by
- edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Thu, 11 Dec 2025 02:13:11 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DgFFlmQvWBZHqWsSFen6T6MvOvYF2sM3U0PXwATDXF2G8Fl7tJ/UA0+de8HWxQOi0LYwOIpbvZHHXilOx1/kLDepzqKBHQOB04TrHcqoMqAk2170dNJ3UGOXKaLVrqYEo5zHSm/b/rM9aEWzO3w8s9LpMANXphfY6YqdT/MEL/rZwGXrpCGYiQfkF1us4C6I+cvncWVJAZSEFCgoMvpbj6TopWc/rI0QcjI7IkGO4MIoTK8UgQkq7ooechBjsAac8/lJuCf0S/e0RVfWaWx/dTImX6xFOYDB/OroQ9w7HzQ5rOK31LOf5UzVMFN09SSz+btXvufOx4oG8F+TXoEucg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KA+Nuv15hQcAGD6Rxs8g9RYuITdVYwLNWlKTVKFessg=;
- b=px9ZBD2+oBbGrsc828D+/my6YflxrBa+frVBXTfXQZmQ4BqsU9x/4exaJvNmPwYfVhpFl9GDRxcwn26oj4vcibPvE49VQddxknwAT4P5JLFtXBcInqvLY/0dHFGmSCYaDdhF4ke6+k8jSXeaGO8tWZPUGKVIM3FpPGk972tekaw8ICw/p6nrKUzeclTwRC8Dln3ZrbEPMxXbHlbkX9fYkdq7EEpcWIwR1iG05H+hGsVCeaiQIcghGGuFyQcpk2wYaCVLxshm0cVwBwx2gW86bWIrIW9sl+8flOexStIciO8ASe9qicMuouIW0Cl2YW8ZIc3aWnkNDIft4UoIIfRD3Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
- by DS0PR11MB6351.namprd11.prod.outlook.com (2603:10b6:8:cc::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9412.7; Thu, 11 Dec
- 2025 10:13:10 +0000
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::395e:7a7f:e74c:5408]) by IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::395e:7a7f:e74c:5408%3]) with mapi id 15.20.9388.013; Thu, 11 Dec 2025
- 10:13:10 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: Kohei Enju <enjuk@amazon.com>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Jagielski,
- Jedrzej" <jedrzej.jagielski@intel.com>, "Wegrzyn, Stefan"
-	<stefan.wegrzyn@intel.com>, Simon Horman <horms@kernel.org>, "Keller, Jacob
- E" <jacob.e.keller@intel.com>, "kohei@enjuk.org" <kohei@enjuk.org>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-net v2 1/2] ixgbe: fix memory leaks
- in the ixgbe_recovery_probe() path
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-net v2 1/2] ixgbe: fix memory leaks
- in the ixgbe_recovery_probe() path
-Thread-Index: AQHcan79Eg0aYyiaDkKhJxRMa4PFYrUcNdyw
-Date: Thu, 11 Dec 2025 10:13:09 +0000
-Message-ID: <IA3PR11MB8986CAD67FDC2D778567A046E5A1A@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <20251211091636.57722-1-enjuk@amazon.com>
- <20251211091636.57722-2-enjuk@amazon.com>
-In-Reply-To: <20251211091636.57722-2-enjuk@amazon.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|DS0PR11MB6351:EE_
-x-ms-office365-filtering-correlation-id: 761d5f06-ecc4-46b4-6ed1-08de389de2da
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016|38070700021;
-x-microsoft-antispam-message-info: =?us-ascii?Q?4QwpndrmyjFVUbW0u/uqK/CL4ZkdsAeRKbI20RNlIodXeDcHfXl5ygf5/kpO?=
- =?us-ascii?Q?+1OEUHeBXjSlqJpTwzjT7pmFKc1/9c4MNtKcZZgNxFNeRP08ucEJ1hTtPLnZ?=
- =?us-ascii?Q?ntZAY3rLbYTpA3P+xGQo17ZtnQB1qHFHpF6t+s/16O7bORwHJ46oF6yyyHiu?=
- =?us-ascii?Q?onZwu/4pKZKAm+G/No3+f549Vfi26U2Yba03BygGYxQ2Z42224AfquggIUsv?=
- =?us-ascii?Q?YKAHtv9ZF27epfDiftXYOVIgS6LLQJjdORVw1PzUzVc5+bAqK1sPpdzpQgtG?=
- =?us-ascii?Q?dAgRDzkQvnqtIsLWnnvOE10lIYQUlFVUh9VkvEaNT0c09dwmbUBkVBDuehtJ?=
- =?us-ascii?Q?UTRzqWRibLDrhopj5uch7v0uPYApl1WCvmexZCskxm91prHHtHvZ+gP0htdb?=
- =?us-ascii?Q?tctgoxlHT47Vwjm8o12LolK/7WHT51q8BI5YJ+TupPtbLwsPXA7aQqjgirG8?=
- =?us-ascii?Q?QvtMLAZgXrzEMTKrNxW1RCSH6mtrbD4Wuia53jh+PWObtnnm0NpQRH/NaLee?=
- =?us-ascii?Q?m2UxS1NgcjyOJad71EzVKx7DefXZYNY2/6dOq9UAUDR3AJInBOzhrCQmLrun?=
- =?us-ascii?Q?7Wex+edbyGL5moC58RYknjBIS5wUkwWb2+OnHWvHhnn+uqMl8UdV6TdYsmUF?=
- =?us-ascii?Q?k6W5EF0OZ1+8JUf9NhioEEvX/P4z6QvLCftgvQjBquIGpwpbtNx0IO65fFvX?=
- =?us-ascii?Q?1U02K/BGo+ST5PqBcTvoyZFdKebmu40lvct8mwDtu1YmVjkwrP+aB1tsOA+a?=
- =?us-ascii?Q?Ehwc/+Nux90RPyd76S+Oa/2Yn4quCMNJ9mvVgSfVMHvLTQAgJIVwyfQw135T?=
- =?us-ascii?Q?Z+GsrM2dohUliD2WjhFb3BPqS7gqfYbAK0UF4+2sIvd9f55zDbspGltoPkeP?=
- =?us-ascii?Q?WlNYDbQ+xzb2VTSvnkcla/ycnb0iSkXJh2r/DUQ9gSdBbpOzNLaqvgEEzkaY?=
- =?us-ascii?Q?5LRSFLCJvRPv+wgTacodShUhpjQoIInOs4l0kkSgywaqdhuSO5kbNo8SOl0n?=
- =?us-ascii?Q?a75VmrDdzbg8IkN5k4tSsnYQhjglHzhG2IQ7cCMn9ayM9TompzXWXZD+lco3?=
- =?us-ascii?Q?eczsSxIPXpTOY1cjG48zHAWaw2jHU13KfPnzjfZKiqbMnEDZrQZPoDevVMoL?=
- =?us-ascii?Q?PuGhkHdQBRRYAohXmrhc2xdiBXAc5LtbEYf/32HEM3nnZVlzmTZe1U7l1pyM?=
- =?us-ascii?Q?MRHGSeM+lRUcFhjAkVo44LfgU2CyydDWUQ/chj2OSuFHeuoXH/Hn1J6yyllz?=
- =?us-ascii?Q?AJ/TKY3tgpMEU5p0dCqp5/Neiwb6zCk/aLiaUL0wNC1EBWSBuXhNQ5s9Ne11?=
- =?us-ascii?Q?PCClfvCbfo+W0xRNLe7dUD8M1D+s48FigCiRh4OYS08JN5bcIJdRJgUrJCLi?=
- =?us-ascii?Q?Dbau/LZ9GSoFChm2IOmTeygc8+l+8UtXQ97TIOTMUlYBeB8Dil7Q0dcKJ3jL?=
- =?us-ascii?Q?34Bf5Ds8uZPOUdwL+l8lu/yUAZYwcfcF0r8FcesGtoEPdo06s9ChxNJHSzYV?=
- =?us-ascii?Q?reUqQkj2ozu09GPpm6IcSIV5Wfr36V2ZkRm9?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?isNGcjmR1+ss2sIvPUFwjcTYyxa+BjFnD4wnAglLZduFOBboxfX6SkvPt/ua?=
- =?us-ascii?Q?DjPyzAxFLx3Yr8n0ibJMzhXJpjZr06CsbuVnKCfS+DCDNtvYHCSanz2GT48o?=
- =?us-ascii?Q?gHfSW5F+mJtZy+ZHZ65UkNej8z9jMyVeQf7qjj6pqLTlzwKz44So6up5kjwl?=
- =?us-ascii?Q?6qVHQJDBchXSfL5wu7GbfL4ZABxQECU4APQrtpRnTYboIMLBCNd2f7ex9hQq?=
- =?us-ascii?Q?HFnR5bbeacdaKzUg9Cek/NXXzSU4/OppCZhEVnAtY0g/wWJ1YEFU2zQ6Egxu?=
- =?us-ascii?Q?XZNgJnht3VBQgVwgFkZM+LvBWGtI3EDUCkiNuagCSF5Ck6hd0RxbFVN0IQJO?=
- =?us-ascii?Q?MFSzpcXwQ+f8hO7pFOtrZ8UJscMZwMD8LiMjAfZRBC2wHpgWTPISQK3+9edx?=
- =?us-ascii?Q?dUfCcnPurBKbvH2T86TLwBH0LN07k3K1qgzSCZ/XEaSNqzb4iPTOcDGzbgcY?=
- =?us-ascii?Q?KSL7DVzTLtXxt3p/Jrt2Tul12fvBR0YtINNx50sFA+ILaJnHchAuTH/x4akK?=
- =?us-ascii?Q?h4WwpRuTFw/YdgNFJQMtfptGZRxfhLKPIDKf2+ayaa5afgTN/aXIL8h6D983?=
- =?us-ascii?Q?DGMmcYgBwfHFu6s4K+ImrNqQbG4JOTIpb1aS4QNvJD9PwUgUcdlWJ7l1N4Io?=
- =?us-ascii?Q?RuJCfMvSjXrsgtw0gA84BYSgVsgmCQNItxWa9eWyeIJPrUdHXpqGKS8W4Smw?=
- =?us-ascii?Q?d/AfYEGMV40brafLgJ+yVjex6aU53krJ/8y126xaGsXFAcg6ZAtd6q5xudho?=
- =?us-ascii?Q?ci5VKhjAOwA1Yc1NFNN7GcZMRctCPZHPdpzCkqwn5UYrxx020LsCYcXfK5II?=
- =?us-ascii?Q?lkgVWSsR4a98z61xZPAXVAek19Ye/QYtzVPc+mTIJVJwflfTRk1nH5vkBR6R?=
- =?us-ascii?Q?moInuRyQUiOY2OA9WZFRO1BvesaxXJClZPdXPIaazPtTIXN9k+xkT876iim6?=
- =?us-ascii?Q?+fTqYwhC1UQcvOrzfbh/6bEgq9E3LhIb0T52ztV+Kofvrp+uJyUaAW9Rf2+y?=
- =?us-ascii?Q?bGnviGIfprZRgI2TtP/mgHrjwYgeeaWWuS+LmRuuKefSilgYyvYjAHwnmgt1?=
- =?us-ascii?Q?xzaYPoQdfhg7LC34s9VOm46/bPklKEU2GkUxiB74DjSoVgbBE8GD8BZU0+Se?=
- =?us-ascii?Q?4M8tP8FOYc8Xkn2mhos1ranLVSwTrfh9+8rZFXcy6GNeeTSlRw7sov93z1Vi?=
- =?us-ascii?Q?D033CQ67RjPieVPi49JtM87fg1+5neRhlsSkCkNzIInnlT4A+sObSLJPj1a7?=
- =?us-ascii?Q?36rxdxWJ7Epuhwya86WnLTpBMOTMz1TxVrmnoQznvUdQlVcBDpq4lcDPhrwC?=
- =?us-ascii?Q?VTIf90jFUDiBMTu92EBfAA1U/onCMX3kEqEdcmoMGrGqRqrwjUQeNQhrg75Q?=
- =?us-ascii?Q?LIVqxJPnWPXXAwqva1Ps/Mhxvj8p1WyytuZ6NIpEc1AUSm0YtdsrzfQqkoZ+?=
- =?us-ascii?Q?s4T6oxwUzqfEHX9tlI0W6M2gy35ivWe7lXSiuRfP/hH8/IFlf2ETqrT0Go3J?=
- =?us-ascii?Q?qSsUitzgJuy6XwcgPcU3vS534xyzKPRW0ANExbzrRX1WMhjb/2EaVQmfFRlS?=
- =?us-ascii?Q?q400PYI7RYNPM4zb7y0R0xgW4AmU3qMThSg1VEDT0tJNX8EBj0ibgLet81b2?=
- =?us-ascii?Q?SA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C0892D77EA
+	for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 10:13:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765448021; cv=none; b=HKb52qPIahuEXbTJpA9ro1lKR9GaFsYA53AOohAX1ZHxq9bVTkcRZ6xtF7kgZK3N5wduH59pbgFgk6SXI3/WreHaqPic2b9kgcwymYhU4X4QxfMenh3TyQ87Wu4ke8IEPCXQ5805w7mVRrJTKroJwPg0k0yNVcLUrVUUgIBM8F4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765448021; c=relaxed/simple;
+	bh=L9Xxm1csAi9qlDdqlJJLNQjozlpOvefQRN2OmVvA0ho=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ce3sFRRR2KBypLoLdkeGc9OoBcjv4wvulMQ88utOuj0eA7KIjPHLt8kN1GQhXppUb+xYx4hTCCsKGUmfnaFc1soMmq6upULoCLpMgRe9rAYmjeMjTPEuKCMLibBCLmis0irCVxR/Gv47bugQ5uHtP75beVtyeAO63x/vVmpl8cM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jsujrt+m; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90387C4CEF7;
+	Thu, 11 Dec 2025 10:13:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765448020;
+	bh=L9Xxm1csAi9qlDdqlJJLNQjozlpOvefQRN2OmVvA0ho=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jsujrt+mzuu9+/2qNX+Zafmc/iGGN/N4mih/nwfEVeJLyLG6bp77mLVfCGA9cu2IT
+	 0Ho/hr58qzM4gEu5lhLEvRVwg1iPrdMF51svHl3K1eADR6U1tVKLGE8/yxFdS7vyZS
+	 lXrNhxWM9VYz/D6ps4gEDG4DiO27dON8y+eZFYRAn4NL4D8IQIFWYXQCfIC2xQZCpb
+	 2WiYS31e05yfX6zv+lihwRgMy1zNf22Q8pBxX/mzu9Feyx5gXjICa2vTvUHHGSgvgw
+	 Eb3L/D+ZT7mow+zk1EMXVLRdjb+T4mJL1mgbuLT3PiI2Yn3+sEtDY9IRiMLhQHGGhc
+	 +jLms5sqacryA==
+Date: Thu, 11 Dec 2025 10:13:37 +0000
+From: Simon Horman <horms@kernel.org>
+To: "Alice C. Munduruca" <alice.munduruca@canonical.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net] selftests: net: fix "buffer overflow detected" for
+ tap.c
+Message-ID: <aTqZUSZaZjDTlejt@horms.kernel.org>
+References: <20251210223932.957446-1-alice.munduruca@canonical.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 761d5f06-ecc4-46b4-6ed1-08de389de2da
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Dec 2025 10:13:09.9837
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: WvuXkSydCwpCf46iMof/cqWd8SKgq9u6Z4w9R0zPzGG2TzTgB7uW8J0l+8QrPQTxQG7u/pUZLGLeyTB8jmZiDMx7kFyQbAUlcc3EzKF+f6U=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB6351
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251210223932.957446-1-alice.munduruca@canonical.com>
 
+On Wed, Dec 10, 2025 at 05:39:32PM -0500, Alice C. Munduruca wrote:
+> When 'tap.c' is compiled with '-D_FORTIFY_SOURCE=3', the strcpy() in
+> rtattr_add_strsz() is replaced with a checked version which causes the
+> test to consistently fail when compiled with toolchains for which this
+> option is enabled by default.
+> 
+>  TAP version 13
+>  1..3
+>  # Starting 3 tests from 1 test cases.
+>  #  RUN           tap.test_packet_valid_udp_gso ...
+>  *** buffer overflow detected ***: terminated
+>  # test_packet_valid_udp_gso: Test terminated by assertion
+>  #          FAIL  tap.test_packet_valid_udp_gso
+>  not ok 1 tap.test_packet_valid_udp_gso
+>  #  RUN           tap.test_packet_valid_udp_csum ...
+>  *** buffer overflow detected ***: terminated
+>  # test_packet_valid_udp_csum: Test terminated by assertion
+>  #          FAIL  tap.test_packet_valid_udp_csum
+>  not ok 2 tap.test_packet_valid_udp_csum
+>  #  RUN           tap.test_packet_crash_tap_invalid_eth_proto ...
+>  *** buffer overflow detected ***: terminated
+>  # test_packet_crash_tap_invalid_eth_proto: Test terminated by assertion
+>  #          FAIL  tap.test_packet_crash_tap_invalid_eth_proto
+>  not ok 3 tap.test_packet_crash_tap_invalid_eth_proto
+>  # FAILED: 0 / 3 tests passed.
+>  # Totals: pass:0 fail:3 xfail:0 xpass:0 skip:0 error:0
+> 
+> Using `memcpy`, an unchecked function, avoids this issue and allows
+> the tests to go forwards as expected.
+> 
+> Fixes: 2e64fe4624d1 ("selftests: add few test cases for tap driver")
+> Signed-off-by: Alice C. Munduruca <alice.munduruca@canonical.com>
 
+Thanks Alice,
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
-> Of Kohei Enju
-> Sent: Thursday, December 11, 2025 10:16 AM
-> To: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org
-> Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel,
-> Przemyslaw <przemyslaw.kitszel@intel.com>; Andrew Lunn
-> <andrew+netdev@lunn.ch>; David S. Miller <davem@davemloft.net>; Eric
-> Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo
-> Abeni <pabeni@redhat.com>; Jagielski, Jedrzej
-> <jedrzej.jagielski@intel.com>; Wegrzyn, Stefan
-> <stefan.wegrzyn@intel.com>; Simon Horman <horms@kernel.org>; Keller,
-> Jacob E <jacob.e.keller@intel.com>; kohei@enjuk.org; Kohei Enju
-> <enjuk@amazon.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-net v2 1/2] ixgbe: fix memory
-> leaks in the ixgbe_recovery_probe() path
->=20
-> When ixgbe_recovery_probe() is invoked and this function fails,
-> allocated resources in advance are not completely freed, because
-> ixgbe_probe() returns ixgbe_recovery_probe() directly and
-> ixgbe_recovery_probe() only frees partial resources, resulting in
-> memory leaks including:
-> - adapter->io_addr
-> - adapter->jump_tables[0]
-> - adapter->mac_table
-> - adapter->rss_key
-> - adapter->af_xdp_zc_qps
->=20
-> The leaked MMIO region can be observed in /proc/vmallocinfo, and the
-> remaining leaks are reported by kmemleak.
->=20
-> Don't return ixgbe_recovery_probe() directly, and instead let
-> ixgbe_probe() to clean up resources on failures.
->=20
-> Fixes: 29cb3b8d95c7 ("ixgbe: add E610 implementation of FW recovery
-> mode")
-> Signed-off-by: Kohei Enju <enjuk@amazon.com>
-> ---
->  drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 20 ++++++++----------
-> -
->  1 file changed, 8 insertions(+), 12 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> index 4af3b3e71ff1..85023bb4e5a5 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> @@ -11468,14 +11468,12 @@ static void ixgbe_set_fw_version(struct
-> ixgbe_adapter *adapter)
->   */
->  static int ixgbe_recovery_probe(struct ixgbe_adapter *adapter)  {
-> -	struct net_device *netdev =3D adapter->netdev;
->  	struct pci_dev *pdev =3D adapter->pdev;
->  	struct ixgbe_hw *hw =3D &adapter->hw;
-> -	bool disable_dev;
->  	int err =3D -EIO;
->=20
->  	if (hw->mac.type !=3D ixgbe_mac_e610)
-> -		goto clean_up_probe;
-> +		return err;
-You've removed the clean_up_probe: label and its cleanup code (free_netdev,=
- devlink_free, pci_release_mem_regions, pci_disable_device) without providi=
-ng a proof that ixgbe_probe()'s error path correctly handles all these reso=
-urces.
-I'm afraid this patch may trade one leak for another, or cause double-free =
-issues.
+I agree that this approach makes sense.
+But I wonder if the commit message should also mention:
 
+1. That this is consistent with usage elsewhere in this file
+2. Why there is actually no overflow.
 
->=20
->  	ixgbe_get_hw_control(adapter);
->  	mutex_init(&hw->aci.lock);
-> @@ -11507,13 +11505,6 @@ static int ixgbe_recovery_probe(struct
-> ixgbe_adapter *adapter)
->  shutdown_aci:
->  	mutex_destroy(&adapter->hw.aci.lock);
->  	ixgbe_release_hw_control(adapter);
-> -clean_up_probe:
-> -	disable_dev =3D !test_and_set_bit(__IXGBE_DISABLED, &adapter-
-> >state);
-> -	free_netdev(netdev);
-> -	devlink_free(adapter->devlink);
-> -	pci_release_mem_regions(pdev);
-> -	if (disable_dev)
-> -		pci_disable_device(pdev);
->  	return err;
->  }
->=20
-> @@ -11655,8 +11646,13 @@ static int ixgbe_probe(struct pci_dev *pdev,
-> const struct pci_device_id *ent)
->  	if (err)
->  		goto err_sw_init;
->=20
-> -	if (ixgbe_check_fw_error(adapter))
-> -		return ixgbe_recovery_probe(adapter);
-> +	if (ixgbe_check_fw_error(adapter)) {
-> +		err =3D ixgbe_recovery_probe(adapter);
-> +		if (err)
-> +			goto err_sw_init;
-The early return 0; on successful ixgbe_recovery_probe() bypasses the remai=
-nder of ixgbe_probe().
-The commit message doesn't explain what subsequent initialization steps (if=
- any) are intentionally skipped in recovery mode, or whether this is correc=
-t behavior.
-
-> +
-> +		return 0;
-> +	}
->=20
->  	if (adapter->hw.mac.type =3D=3D ixgbe_mac_e610) {
->  		err =3D ixgbe_get_caps(&adapter->hw);
-> --
-> 2.52.0
-
+...
 
