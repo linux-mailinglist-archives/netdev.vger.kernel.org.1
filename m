@@ -1,145 +1,259 @@
-Return-Path: <netdev+bounces-244399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B292ACB644B
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 16:04:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E1F3CB645D
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 16:05:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A7AD2301894F
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 15:04:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 90B953027CF3
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 15:04:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 339FB288C08;
-	Thu, 11 Dec 2025 15:04:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46A572D6E4F;
+	Thu, 11 Dec 2025 15:04:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="P374qeqj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k/3FbWWc"
 X-Original-To: netdev@vger.kernel.org
-Received: from pdx-out-006.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-006.esa.us-west-2.outbound.mail-perimeter.amazon.com [52.26.1.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CF3123D2B4
-	for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 15:04:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.26.1.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DD6026E719
+	for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 15:04:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765465473; cv=none; b=fzv8RXuVDYlqwQrbtHyFVxdkdx0Hy6eYfBrmuGZk/X5waFx87gXU61ORKUGKNPfG6xkh17fUmDeFaRiQduaIac1Tiep75GlStrTmrkGUD+1ndQX5WwjV898tCbkCHR/oSKkST5Bm9F9tAItU/G9DYzK7l0+le5dVrdKKuslRUyk=
+	t=1765465474; cv=none; b=o9T8SSNVVY6Tq99i8bIueRS+JG6mfqerfq9M3eSB0+8kyOjs3cnD65Hbfxfzt3msR0+LOp+eQkbGigWq0p3CjP/VlWfkfMKM3wscqH4BmZSKLRrxeU71d2wCiJVs+r2OjzeDYQTjWiordvhyicG2QvZq0HBrFyB6YKD1D2RpJck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765465473; c=relaxed/simple;
-	bh=ELjRw4qKwSoMZylan+i8w8bmVrzrbWCP4Nh2bNeBerU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PJpLHHVB+vpiDiD7oXONxo9H+4OWz5pDmzdyLaYTOBLwfd3mIX/jY52+9QWSVxGifubC5lJ80YwsCFqfR6am7J0jSgk/YVkkNj6DfFtooLPMBtazoKgFf5H+L1gyf1ppee0P7unKqIBHumueHkXdboUZiIvW3gqz/2r+nJ9pOj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=P374qeqj; arc=none smtp.client-ip=52.26.1.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1765465474; c=relaxed/simple;
+	bh=BHz3xcbiNKi6kN2GjKxGbF0MGFW5yOnSwwfsylgU5cs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=u2DJtciW2ky3DvibqGEsWjd4Sz51JTBIVu0i5JGwhJnv3W2BhjqL6133D74C2oRCFuRAtTI6MV0HWYfFDzVn2i/9HMZgkgMlnZkQ721E2I6zOnIP2x2TfH6vaeVltsSVnyVycmPNGRCwzbwwVwIyQu05zJXjUmqXu2ZQySizgbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k/3FbWWc; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7aa2170adf9so182767b3a.0
+        for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 07:04:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
-  t=1765465471; x=1797001471;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=cwCs81f0vNPkN78ID9FHsqJBuMhnxPNmOIYW60KiI4Q=;
-  b=P374qeqjcikgcH+MnaF+p4MpZ4gtzX0KeN3Mi5+pd9GQ1AVRECMrmUJT
-   rF/OXV8IS7lipT4sLOYQmSVR5np7NsqxD5ncleFQI/uQpYTI3upJCRolr
-   TPzgllk1YcKBKSsp2Tqz7aWOE6kpocttOkXvRCPLlaLQqH2n+/FawkJUy
-   bVbh3JOGe7/ljfTj0/JGyifkMu5fKoUjmZ0nOX6dFhvFkAvGfREIR1j7T
-   +Ayzca/N8KfKGDByP4uOWn1wYoIxD+Gi24gw5QhCgHFAKAUPVOnm8aeSu
-   VE0zfDDmLGnNq7GBf40jDZtISTXgJ5w8B+mYQyAEE+QoAmoTS3ZkBVkHZ
-   w==;
-X-CSE-ConnectionGUID: eIzLcVBQSLClYiulwhaZ2g==
-X-CSE-MsgGUID: Z2L+z05sR1qArPePkkQpTw==
-X-IronPort-AV: E=Sophos;i="6.21,141,1763424000"; 
-   d="scan'208";a="8903553"
-Received: from ip-10-5-12-219.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.12.219])
-  by internal-pdx-out-006.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2025 15:04:28 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [205.251.233.111:21079]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.21.145:2525] with esmtp (Farcaster)
- id d8c1259c-a35c-4f31-99db-6ab443e229f5; Thu, 11 Dec 2025 15:04:28 +0000 (UTC)
-X-Farcaster-Flow-ID: d8c1259c-a35c-4f31-99db-6ab443e229f5
-Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
- Thu, 11 Dec 2025 15:04:28 +0000
-Received: from b0be8375a521.amazon.com (10.37.244.7) by
- EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
- Thu, 11 Dec 2025 15:04:24 +0000
-From: Kohei Enju <enjuk@amazon.com>
-To: <aleksandr.loktionov@intel.com>
-CC: <andrew+netdev@lunn.ch>, <anthony.l.nguyen@intel.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <enjuk@amazon.com>,
-	<horms@kernel.org>, <intel-wired-lan@lists.osuosl.org>,
-	<jacob.e.keller@intel.com>, <jedrzej.jagielski@intel.com>, <kohei@enjuk.org>,
-	<kuba@kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<przemyslaw.kitszel@intel.com>, <stefan.wegrzyn@intel.com>
-Subject: Re: RE: [Intel-wired-lan] [PATCH iwl-net v2 1/2] ixgbe: fix memory leaks in the ixgbe_recovery_probe() path
-Date: Fri, 12 Dec 2025 00:03:10 +0900
-Message-ID: <20251211150416.88637-1-enjuk@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <IA3PR11MB8986CAD67FDC2D778567A046E5A1A@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <IA3PR11MB8986CAD67FDC2D778567A046E5A1A@IA3PR11MB8986.namprd11.prod.outlook.com>
+        d=gmail.com; s=20230601; t=1765465472; x=1766070272; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QGiOaxxeedYSgO7KsDHaFkoLTRKOhWXoKaus+BgsSis=;
+        b=k/3FbWWcPeZjA11G8NakVceLqCa927GzenD+CQf6b9tQV6ugl5ZvPYiRzMv1hBXrli
+         +5bIsiuKmCI5UYxRdT1qL+HcokhbXQdPGrS1NbtDoYBvDUcXgjWdvSDOnGkjBrpuPAry
+         pd2QczxWguowsDsmXxkUuHNO4wyPeL9FHwbYAjpsXqjhf6xRTIOb1eKjlr3rsLhJNFC2
+         bLUuV3WOjvcsOBUC+BYa/eVcg+nrWxfVAHUL3byVr5U2hJ+mPfxHw7hnVvTXgx8XrH7T
+         ziFPKdW+9jRTT0NMaqCTZGdUowspdEWQx9JresLirlNaZLelUwes3ahiGD+nQJgpiLjv
+         NUiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765465472; x=1766070272;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QGiOaxxeedYSgO7KsDHaFkoLTRKOhWXoKaus+BgsSis=;
+        b=qFh6uV8+wNLnVray3zxS704KqyKL03bz2H/gsuhmiLoDkne1PwZPgGhiQm/9N+lGsz
+         tpeHTDNLQoHkq+OmeO6AJYT6Qf2cMfgZLa5EguoRV+qQ6u7fbW6TcGzkwmWjZpB2n5Cq
+         tDduh5ugZE6+0khpiuXEdIrLoMBVQjXDR1KUqV46o3vE3ZQRoeebJ0XIRH0vpU6ctOjC
+         ITCd8KA8SdOD8hhFawHQLT9Iqfxu8bNlM9+/+V7B6/Bc0+BO85yvZxBMMNM2UjxgT3Tb
+         Gbt3WWVCrLkF2AH5ePMLFz7A/lDzmcXlqxclQU3ubQ9GY8s2/eBt4885oD3LMRcVgMRj
+         hVVA==
+X-Gm-Message-State: AOJu0YxwLsaYsvTBU51MIdWjkkpNVtjHFytLf5aIf7bhisY2xavOQ6ot
+	oFA0duD/MG2zWOaSxal0cHPBtNRFt7IgDgKlGKgHHl4UT5rwuW9f/Ilx
+X-Gm-Gg: AY/fxX5nD5/beKipvvwTM4z4K8pzOQcqB+FXVgo+IKKSvwggfr1mcyFGuC/pnwNVG0M
+	/pwRZoekWNVyBp255XIXmTIjuWq3kfgXt3WPc8Abe0bZiBkVHmMlPYWZvtz1O7dJRFn8LJs4yz1
+	6oJv1DNE3s8P6ulh7uY0ZuSPgaTL9CjQt/pBLiZ7M0MoxrxdkN09aLSo4gNQ918GNxRHHNAGMrq
+	rnjmPP3eFo4lgVPbZVylzCyFPXzGqv+Zx14/exxSDBeXPpV+rlaIiLguhuAlsvfNP1uVo+VpVM4
+	/jqi7ZOS0jXijpJLJFzM77Ebdw8IYtZQc35C2k9AijBf5kMTZ8eKnx48nBLJZ7D1h4EZTiKfQvz
+	VvotwwkH2UioSuejX7IfwBLrUimkLxlWPer49YsGlFtWnU78v/kf/19YeNYOcGXCNYPUhJpKWGl
+	PrM6RUGx0voDhf2tvTiDmfco6BLgl9GQGchYpye16JtTTSPodVw6Y3BOBWr/p4sQ==
+X-Google-Smtp-Source: AGHT+IEDIDXduddojC2oF/NtI7nTuLQKy8+7uwAI70KDBtBUQRB3kFaFndB46SIt3slBE1QS+pBD5w==
+X-Received: by 2002:a05:6a20:158b:b0:352:3695:fa64 with SMTP id adf61e73a8af0-366e2450a28mr5947102637.37.1765465471013;
+        Thu, 11 Dec 2025 07:04:31 -0800 (PST)
+Received: from ?IPV6:2001:ee0:4f4c:210:6f73:e1bc:9239:c004? ([2001:ee0:4f4c:210:6f73:e1bc:9239:c004])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c0c2b8e0fb4sm2619107a12.25.2025.12.11.07.04.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Dec 2025 07:04:30 -0800 (PST)
+Message-ID: <6281cd92-10aa-4182-a456-81538cff822a@gmail.com>
+Date: Thu, 11 Dec 2025 22:04:23 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] virtio-net: enable all napis before scheduling refill
+ work
+To: Jason Wang <jasowang@redhat.com>
+Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, virtualization@lists.linux.dev,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+References: <20251208153419.18196-1-minhquangbui99@gmail.com>
+ <CACGkMEvtKVeoTMrGG0gZOrNKY=m-DGChVcM0TYcqx6-Ap+FY8w@mail.gmail.com>
+ <66d9f44c-295e-4b62-86ae-a0aff5f062bb@gmail.com>
+ <CACGkMEuF0rNYcSSUCdAgsW2Xfen9NGZHNxXpkO2Mt0a4zQJDqQ@mail.gmail.com>
+ <c83c386e-96a6-4f9f-8047-23ce866ed320@gmail.com>
+ <CACGkMEv7XpKsfN3soR9GijY-DLqwuOdYp+48ye5jweNpho8vow@mail.gmail.com>
+Content-Language: en-US
+From: Bui Quang Minh <minhquangbui99@gmail.com>
+In-Reply-To: <CACGkMEv7XpKsfN3soR9GijY-DLqwuOdYp+48ye5jweNpho8vow@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D039UWB002.ant.amazon.com (10.13.138.79) To
- EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-On Thu, 11 Dec 2025 10:13:09 +0000, Loktionov, Aleksandr wrote:
+On 12/11/25 14:27, Jason Wang wrote:
+> On Wed, Dec 10, 2025 at 11:33 PM Bui Quang Minh
+> <minhquangbui99@gmail.com> wrote:
+>> On 12/10/25 12:45, Jason Wang wrote:
+>>> On Tue, Dec 9, 2025 at 11:23 PM Bui Quang Minh <minhquangbui99@gmail.com> wrote:
+>>>> On 12/9/25 11:30, Jason Wang wrote:
+>>>>> On Mon, Dec 8, 2025 at 11:35 PM Bui Quang Minh <minhquangbui99@gmail.com> wrote:
+>>>>>> Calling napi_disable() on an already disabled napi can cause the
+>>>>>> deadlock. In commit 4bc12818b363 ("virtio-net: disable delayed refill
+>>>>>> when pausing rx"), to avoid the deadlock, when pausing the RX in
+>>>>>> virtnet_rx_pause[_all](), we disable and cancel the delayed refill work.
+>>>>>> However, in the virtnet_rx_resume_all(), we enable the delayed refill
+>>>>>> work too early before enabling all the receive queue napis.
+>>>>>>
+>>>>>> The deadlock can be reproduced by running
+>>>>>> selftests/drivers/net/hw/xsk_reconfig.py with multiqueue virtio-net
+>>>>>> device and inserting a cond_resched() inside the for loop in
+>>>>>> virtnet_rx_resume_all() to increase the success rate. Because the worker
+>>>>>> processing the delayed refilled work runs on the same CPU as
+>>>>>> virtnet_rx_resume_all(), a reschedule is needed to cause the deadlock.
+>>>>>> In real scenario, the contention on netdev_lock can cause the
+>>>>>> reschedule.
+>>>>>>
+>>>>>> This fixes the deadlock by ensuring all receive queue's napis are
+>>>>>> enabled before we enable the delayed refill work in
+>>>>>> virtnet_rx_resume_all() and virtnet_open().
+>>>>>>
+>>>>>> Fixes: 4bc12818b363 ("virtio-net: disable delayed refill when pausing rx")
+>>>>>> Reported-by: Paolo Abeni <pabeni@redhat.com>
+>>>>>> Closes: https://netdev-ctrl.bots.linux.dev/logs/vmksft/drv-hw-dbg/results/400961/3-xdp-py/stderr
+>>>>>> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
+>>>>>> ---
+>>>>>>     drivers/net/virtio_net.c | 59 +++++++++++++++++++---------------------
+>>>>>>     1 file changed, 28 insertions(+), 31 deletions(-)
+>>>>>>
+>>>>>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+>>>>>> index 8e04adb57f52..f2b1ea65767d 100644
+>>>>>> --- a/drivers/net/virtio_net.c
+>>>>>> +++ b/drivers/net/virtio_net.c
+>>>>>> @@ -2858,6 +2858,20 @@ static bool try_fill_recv(struct virtnet_info *vi, struct receive_queue *rq,
+>>>>>>            return err != -ENOMEM;
+>>>>>>     }
+>>>>>>
+>>>>>> +static void virtnet_rx_refill_all(struct virtnet_info *vi)
+>>>>>> +{
+>>>>>> +       bool schedule_refill = false;
+>>>>>> +       int i;
+>>>>>> +
+>>>>>> +       enable_delayed_refill(vi);
+>>>>> This seems to be still racy?
+>>>>>
+>>>>> For example, in virtnet_open() we had:
+>>>>>
+>>>>> static int virtnet_open(struct net_device *dev)
+>>>>> {
+>>>>>            struct virtnet_info *vi = netdev_priv(dev);
+>>>>>            int i, err;
+>>>>>
+>>>>>            for (i = 0; i < vi->max_queue_pairs; i++) {
+>>>>>                    err = virtnet_enable_queue_pair(vi, i);
+>>>>>                    if (err < 0)
+>>>>>                            goto err_enable_qp;
+>>>>>            }
+>>>>>
+>>>>>            virtnet_rx_refill_all(vi);
+>>>>>
+>>>>> So NAPI and refill work is enabled in this case, so the refill work
+>>>>> could be scheduled and run at the same time?
+>>>> Yes, that's what we expect. We must ensure that refill work is scheduled
+>>>> only when all NAPIs are enabled. The deadlock happens when refill work
+>>>> is scheduled but there are still disabled RX NAPIs.
+>>> Just to make sure we are on the same page, I meant, after refill work
+>>> is enabled, rq0 is NAPI is enabled, in this case the refill work could
+>>> be triggered by the rq0's NAPI so we may end up in the refill work
+>>> that it tries to disable rq1's NAPI while holding the netdev lock.
+>> I don't quite get your point. The current deadlock scenario is this
+>>
+>> virtnet_rx_resume_all
+>> napi_enable(rq0) (the rq1 napi is still disabled)
+>> enable_refill_work
+>>
+>> refill_work
+>> napi_disable(rq0) -> still okay
+>> napi_enable(rq0) -> still okay
+>> napi_disable(rq1)
+>> -> hold netdev_lock
+>>       -> stuck inside the while loop in napi_disable_locked
+>>               while (val & (NAPIF_STATE_SCHED | NAPIF_STATE_NPSVC)) {
+>>                   usleep_range(20, 200);
+>>                   val = READ_ONCE(n->state);
+>>               }
+>>
+>>
+>> napi_enable(rq1)
+>> -> stuck while trying to acquire the netdev_lock
+>>
+>> The problem is that we must not call napi_disable() on an already
+>> disabled NAPI (rq1's NAPI in the example).
+>>
+>> In the new virtnet_open
+>>
+>> static int virtnet_open(struct net_device *dev)
+>> {
+>>            struct virtnet_info *vi = netdev_priv(dev);
+>>            int i, err;
+>>
+>>            // Note that at this point, refill work is still disabled, vi->refill_enabled == false,
+>>            // so even if virtnet_receive is called, the refill_work will not be scheduled.
+>>            for (i = 0; i < vi->max_queue_pairs; i++) {
+>>                    err = virtnet_enable_queue_pair(vi, i);
+>>                    if (err < 0)
+>>                            goto err_enable_qp;
+>>            }
+>>
+>>            // Here all RX NAPIs are enabled so it's safe to enable refill work again
+>>            virtnet_rx_refill_all(vi);
+>>
+> I meant this part:
+>
+> +static void virtnet_rx_refill_all(struct virtnet_info *vi)
+> +{
+> +       bool schedule_refill = false;
+> +       int i;
+> +
+> +       enable_delayed_refill(vi);
+>
+> refill_work could run here.
 
->> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
->> b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
->> index 4af3b3e71ff1..85023bb4e5a5 100644
->> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
->> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
->> @@ -11468,14 +11468,12 @@ static void ixgbe_set_fw_version(struct
->> ixgbe_adapter *adapter)
->>   */
->>  static int ixgbe_recovery_probe(struct ixgbe_adapter *adapter)  {
->> -	struct net_device *netdev = adapter->netdev;
->>  	struct pci_dev *pdev = adapter->pdev;
->>  	struct ixgbe_hw *hw = &adapter->hw;
->> -	bool disable_dev;
->>  	int err = -EIO;
->> 
->>  	if (hw->mac.type != ixgbe_mac_e610)
->> -		goto clean_up_probe;
->> +		return err;
->You've removed the clean_up_probe: label and its cleanup code (free_netdev, devlink_free, pci_release_mem_regions, pci_disable_device) without providing a proof that ixgbe_probe()'s error path correctly handles all these resources.
->I'm afraid this patch may trade one leak for another, or cause double-free issues.
+I don't see how this can trigger the current deadlock race. However, I 
+see that this code is racy, the try_fill_recv function is not safe to 
+concurrently executed on the same receive queue. So there is a 
+requirement that we need to call try_fill_recv before enabling napi. Is 
+it what you mean?
 
-Hi Alex, thank you for taking a look.
+>
+> +       for (i = 0; i < vi->curr_queue_pairs; i++)
+> +               if (!try_fill_recv(vi, &vi->rq[i], GFP_KERNEL))
+> +                       schedule_refill = true;
+> +
+>
+> I think it can be fixed by moving enable_delayed_refill() here.
+>
+> +       if (schedule_refill)
+> +               schedule_delayed_work(&vi->refill, 0);
+> +}
 
-First, ixgbe_recovery_probe() is a static function and is only called
-from ixgbe_probe(), so potential affected scope is limited to the
-ixgbe_probe() function (at least for now). Also I don't think
-ixgbe_recovery_probe() is a common util function which would be used in
-other functions than ixgbe_probe().
+Thanks,
+Quang Minh.
 
-Also I changed ixgbe_probe() to cleanup those resources when
-ixgbe_recovery_probe() fails to keep consistency, just because those
-resources are allocated by ixgbe_probe(), not by ixgbe_recovery_probe().
 
-Considering the conversation I had in v1 patch [1], I think this change
-would be acceptable, and rather preferable to reduce the possibility of
-future regression.
-
-[1] https://lore.kernel.org/all/b5787c94-2ad0-4519-9cdb-5e82acfebe05@intel.com/
-
->> @@ -11655,8 +11646,13 @@ static int ixgbe_probe(struct pci_dev *pdev,
->> const struct pci_device_id *ent)
->>  	if (err)
->>  		goto err_sw_init;
->> 
->> -	if (ixgbe_check_fw_error(adapter))
->> -		return ixgbe_recovery_probe(adapter);
->> +	if (ixgbe_check_fw_error(adapter)) {
->> +		err = ixgbe_recovery_probe(adapter);
->> +		if (err)
->> +			goto err_sw_init;
->The early return 0; on successful ixgbe_recovery_probe() bypasses the remainder of ixgbe_probe().
->The commit message doesn't explain what subsequent initialization steps (if any) are intentionally skipped in recovery mode, or whether this is correct behavior.
-
-On successful path, ixgbe_probe() just returns ixgbe_recovery_probe()
-and don't execute following codes, so there's no change of behavior.
 
