@@ -1,173 +1,143 @@
-Return-Path: <netdev+bounces-244312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E050CCB4727
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 02:40:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B7E2FCB47AB
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 02:50:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6D26E303524B
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 01:39:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 10FB33019B55
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 01:49:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FFD422E3E7;
-	Thu, 11 Dec 2025 01:39:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CF7B26D4C3;
+	Thu, 11 Dec 2025 01:49:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MihA49fl"
+	dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b="ZUOU5aqS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pdx-out-012.esa.us-west-2.outbound.mail-perimeter.amazon.com (pdx-out-012.esa.us-west-2.outbound.mail-perimeter.amazon.com [35.162.73.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AF7F23185E
-	for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 01:39:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 901EF1A23AC
+	for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 01:49:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.162.73.231
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765417166; cv=none; b=bg0ex8k245L6jvRT8yfWOKnZrsyg8378MhtU91du5Kjm8GEYmqdRwjO1l5sdEA+pHmyNfqY0FmJXTUT+bki3WaOucildlEtdnESk9M7U/aaJOKjQCrZZKxDzrnZnBgfs1Cw8TGBDXy1WidYq490+Cc22SmgRQZRrioJncsqs3Tw=
+	t=1765417783; cv=none; b=EtipcXQK720I57jy8b8aaCnvRKllowwMuHZlG5dP+pEZ8YLVOQaG6vHNXTqhuNWmM64qGfHsmGqc7sWGUpurtjPIvtiY/GRZLJHWMHGhR9YxUqw8Ukw2ef1KgQ3edHRZFKaSaBQSLy7zkMGfptSXdW4C72Xjpk7Ul9Vl4HV2ZKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765417166; c=relaxed/simple;
-	bh=erA1n//FwJ/YQXinNTTcC2usXHzwpMJZDsBPQoI9z90=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VpnEZesixsvPqCqezxXzZT+9JblfJEgomu1M9Pt+6V7T6qbDYVjPDD1knosqMmBha88S/mof+kmApGpiaPmk1IS54T62vnB2xUF5pt2eabDDjnWm5BohSlP5fDwefH9r+tZ+yoFakbUtI0VQ+bb3PK4jpiJ19t39FmKe1oURD+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MihA49fl; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-298250d7769so3782295ad.0
-        for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 17:39:24 -0800 (PST)
+	s=arc-20240116; t=1765417783; c=relaxed/simple;
+	bh=VqGQEDgjbA0A+QCKfXCIOxxF2hNvwx24HalYTrVhZrI=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=C4eW4zkW7B4tBS/9cwwfduSLBpiy0bRpm5LbfH3QLS66lr8UeaG82EcMBtCqvXR2zYBioWt2fOGhFlx0MoG0tDVwcMaG6F4wkySyHXshfjq/Cxwjk/bdFu2S3l2BPdBYgeesH21iKZZiv4z9RjTlppAKDn8+rrB/KTP3OmcejJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (2048-bit key) header.d=amazon.com header.i=@amazon.com header.b=ZUOU5aqS; arc=none smtp.client-ip=35.162.73.231
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765417164; x=1766021964; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IPBrlzp2E8C4ePjFcmKaseg+JThcQtY0+QpZZyIeYQc=;
-        b=MihA49flq+R4MySAVx6PVn8LV9SHm9fmPVZDqyINdglAfg9noE/uNWlXJrbeNro3Mr
-         8JNaMzXARd/jqYr6q8x9eDSyT/9JuuO0OcpDDQTqPVwnDDL0bCiOEU8YFabLTAESyXn6
-         9jD3LSSn3HbmA+HXEkufAwCXzymhmiQq6QOzfyx7SxVoRI4Y/07LJbp2/f03thiaxoBA
-         rVx7gA/CpADHDTbjcwuNeCrgl1D3K/7dAbcKlC8vAMCdT+GiUDnV8qHqrmVnc++5ZbHf
-         k9z52FuPUyqUT3VilR8uVhTuLcPXor3EL2elBNK8kGpF3kj0ltS0UG1o0pM/QO7JGnOJ
-         /uzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765417164; x=1766021964;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IPBrlzp2E8C4ePjFcmKaseg+JThcQtY0+QpZZyIeYQc=;
-        b=GTl9CyNqkpn5jnj/NAjsRoT5c9Q1jLifvsbsOMr07OVMV8O5A71NDMe8MYm8flftol
-         bgW7V12IugM5TqFB/aCJNMygqyLc7+gnZ7HMSGuLppo1p2e1HlfAlA9HJXL0fZNY9tWT
-         /vUEfhM0cdC3rdjgi8KOzVfxMrT8uOYLeO5O+ePWknkkbcf8Gpe2bl/uyxecVVvxchYY
-         MhQdOmq54xu6hxQLQzyDTuPOssBiOCzHKQH952UNa4Rz6rdy4EuWCHTs3pb0NyzPwq9T
-         UekVjUfyW15Ckob7UhbL1QboUvst8UmoTox5kCr/R3XgdTgjPYdr+EHzy9gtUoUOP9TD
-         kApw==
-X-Gm-Message-State: AOJu0YwSbq+CL+cZ8U8hHPw590nBAsb847g955fgWqwPoieYbljEsMji
-	nMXyF7ZtiTzPsjHicsUaM31SwQcVNVLvAs9xMuc0iu5Qa3A1sOrHRsn+
-X-Gm-Gg: AY/fxX4ubJnOSATw0Ya6ZIYGwSv54VUU7gkhhTpzvim5EET0r3V2wOmAPCNr6nY25qp
-	h3ANcFsooBqpOnOMa3hByv0EoYcYGraMWCBLc67xt5YHATCv+R54wpWpJnyJBgjADkT6542afO/
-	0WSzH+oDvukC4bLm93z1Sc4lKV4ZfQAMYtMbL4R2u02bGuCDxi+riAtLQ9rBGed6kYzJ36FlHeh
-	yIOAGngHEHU+vd3Z3tzwvCMLd7MQqnGCuC/V5lg+p7n+N+wTGKMYC6pgwRgkox4jyY1ufNsnqHZ
-	wkcP0DL8Brsg5b2ml4S0kaNeALLPhPXmxbrRQcAtyw/enAIb4ODh9HiI3rH1m9smYkopwwdzOFQ
-	96hPdOztqjZfeFqHp8k96L5n3VjzenMyMShuH932Bx1ftMa6UWIWGC03woC5blEF8Besu4la4WZ
-	IRdNwE5XgWhxorPnUGblF+Sku7Nx1q9yUVZ7oIfG4GsAgw/VPnbaA6En5MILnH72UWegO5ToDj6
-	CMy2fJ4O/p/kguPswCt2WbGLHE7e2V8L5v+nqEm+PeLw3T164LLGfXD9dDtMg==
-X-Google-Smtp-Source: AGHT+IHMLbGR0SeszHCUe5dGxSuVdd58yhBKf6E+3phqHxJVDWFPPS1CN++3WroD7xAIWnKPrzG/Ow==
-X-Received: by 2002:a17:903:2311:b0:295:9cb5:ae07 with SMTP id d9443c01a7336-29ec25a7010mr41542155ad.38.1765417163663;
-        Wed, 10 Dec 2025 17:39:23 -0800 (PST)
-Received: from [10.200.8.97] (fs98a57d9d.tkyc007.ap.nuro.jp. [152.165.125.157])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29eea06dd9bsm5759535ad.99.2025.12.10.17.39.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Dec 2025 17:39:23 -0800 (PST)
-Message-ID: <c97d2c95-31c5-4bf6-b58f-552e85314056@gmail.com>
-Date: Thu, 11 Dec 2025 01:39:25 +0000
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazoncorp2;
+  t=1765417779; x=1796953779;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=4VxzSH0RAxFjh1KUG5Gw6TQgRgK6WCjPPkz2uzUjmP0=;
+  b=ZUOU5aqSIW0D9vxwloTGmZbMipafSwEWviSXMwEawO7KmH7wqjrsjLMg
+   WVlnE/6/RapwYENV0LglHLfagfldkvMKpAjGOC2ysVs+3CjJ7pQeNRy0+
+   ga49dNFlR1l4OH478ZA1zqNcMqHLBSz4OgIyFjOujEXT4OsZAfPWyLkyO
+   S5ZR76XUAgK0GlmXVChvTb8x0YtG7AjO2zSBXRWYk0upo1da979xSC32f
+   GN7qtTuR2ALL/+RC5WD/oTMDF/IQkRoDBG7WYVKtQqyd63xVy3jtozZi4
+   Ewt+xsLyaiSG0NWY9ry7H8Z/c8yf7A2l7CTyledRSLVD4ty30nMhLClFW
+   g==;
+X-CSE-ConnectionGUID: AlqyqGCvTNGjLzgJ5p1wPQ==
+X-CSE-MsgGUID: hQMlOTd2RWWSEp4evTiX0Q==
+X-IronPort-AV: E=Sophos;i="6.20,265,1758585600"; 
+   d="scan'208";a="8665825"
+Received: from ip-10-5-0-115.us-west-2.compute.internal (HELO smtpout.naws.us-west-2.prod.farcaster.email.amazon.dev) ([10.5.0.115])
+  by internal-pdx-out-012.esa.us-west-2.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Dec 2025 01:49:36 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [205.251.233.236:19808]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.11.136:2525] with esmtp (Farcaster)
+ id e55c749a-dfbb-454e-9305-146680b85105; Thu, 11 Dec 2025 01:49:35 +0000 (UTC)
+X-Farcaster-Flow-ID: e55c749a-dfbb-454e-9305-146680b85105
+Received: from EX19D001UWA001.ant.amazon.com (10.13.138.214) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
+ Thu, 11 Dec 2025 01:49:35 +0000
+Received: from b0be8375a521.amazon.com (10.37.244.8) by
+ EX19D001UWA001.ant.amazon.com (10.13.138.214) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
+ Thu, 11 Dec 2025 01:49:33 +0000
+From: Kohei Enju <enjuk@amazon.com>
+To: <jacob.e.keller@intel.com>
+CC: <andrew+netdev@lunn.ch>, <anthony.l.nguyen@intel.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <enjuk@amazon.com>,
+	<horms@kernel.org>, <intel-wired-lan@lists.osuosl.org>,
+	<jedrzej.jagielski@intel.com>, <kohei.enju@gmail.com>, <kuba@kernel.org>,
+	<mateusz.polchlopek@intel.com>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <przemyslaw.kitszel@intel.com>,
+	<stefan.wegrzyn@intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net v1] ixgbe: fix memory leaks in ixgbe_recovery_probe()
+Date: Thu, 11 Dec 2025 10:49:24 +0900
+Message-ID: <20251211014925.64457-1-enjuk@amazon.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <b5787c94-2ad0-4519-9cdb-5e82acfebe05@intel.com>
+References: <b5787c94-2ad0-4519-9cdb-5e82acfebe05@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 7/9] eth: bnxt: allow providers to set rx buf
- size
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Jonathan Corbet <corbet@lwn.net>, Michael Chan <michael.chan@broadcom.com>,
- Pavan Chebbi <pavan.chebbi@broadcom.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>, Shuah Khan
- <shuah@kernel.org>, Mina Almasry <almasrymina@google.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Yue Haibing <yuehaibing@huawei.com>,
- David Wei <dw@davidwei.uk>, Haiyue Wang <haiyuewa@163.com>,
- Jens Axboe <axboe@kernel.dk>, Joe Damato <jdamato@fastly.com>,
- Simon Horman <horms@kernel.org>, Vishwanath Seshagiri <vishs@fb.com>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- io-uring@vger.kernel.org, dtatulea@nvidia.com
-References: <cover.1764542851.git.asml.silence@gmail.com>
- <95566e5d1b75abcaefe3dca9a52015c2b5f04933.1764542851.git.asml.silence@gmail.com>
- <20251202105820.14d6de99@kernel.org>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20251202105820.14d6de99@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D038UWB002.ant.amazon.com (10.13.139.185) To
+ EX19D001UWA001.ant.amazon.com (10.13.138.214)
 
-On 12/2/25 18:58, Jakub Kicinski wrote:
-> On Sun, 30 Nov 2025 23:35:22 +0000 Pavel Begunkov wrote:
->> +static ssize_t bnxt_get_rx_buf_size(struct bnxt *bp, int rxq_idx)
->> +{
->> +	struct netdev_rx_queue *rxq = __netif_get_rx_queue(bp->dev, rxq_idx);
->> +	size_t rx_buf_size;
->> +
->> +	rx_buf_size = rxq->mp_params.rx_buf_len;
->> +	if (!rx_buf_size)
->> +		return BNXT_RX_PAGE_SIZE;
+On Mon, 8 Dec 2025 17:14:28 -0800, Jacob Keller wrote:
+
 > 
-> I'd like to retain my cfg objects in the queue API, if you don't mind.
-> I guess we just need the way for drivers to fill in the defaults and
-> then plumb them into the ops.
-
-It was problematic, I wanted to split it into more digestible chunks.
-My main problem is that it was not really optional and could break
-drivers that don't even care about this qcfg len option but allow
-setting it device-wise via ethtool, and I won't even have a way to
-test them.
-
-Maybe there is a way to strip down qcfg and only apply it to marked
-queue api enabled drivers for now, and then extend the idea it in
-the future. E.g.
-
-set 1) optional and for qapi drivers only
-set 2) patch up all qapi drivers and make it mandatory
-set 3) convert all other drivers that set the length.
-
-I can take a look at implementing 1) in this series. It should help
-to keep complexity manageable.
-
-...
->>   static int bnxt_queue_mem_alloc(struct net_device *dev, void *qmem, int idx)
->>   {
->>   	struct bnxt_rx_ring_info *rxr, *clone;
->>   	struct bnxt *bp = netdev_priv(dev);
->>   	struct bnxt_ring_struct *ring;
->> +	ssize_t rx_buf_size;
->>   	int rc;
->>   
->>   	if (!bp->rx_ring)
->>   		return -ENETDOWN;
->>   
->> +	rx_buf_size = bnxt_get_rx_buf_size(bp, idx);
->> +	if (rx_buf_size < 0)
->> +		return rx_buf_size;
 > 
-> Does this survive full ring reconfig? IIRC the large changes to the NIC
-> config (like changing ring sizes) free and reallocate all rings in bnxt,
-> but due to "historic reasons?" they don't go thru the queue ops.
+>On 12/8/2025 9:06 AM, Simon Horman wrote:
+>> On Sun, Dec 07, 2025 at 12:51:27AM +0900, Kohei Enju wrote:
+>>> ixgbe_recovery_probe() does not free the following resources in its
+>>> error path, unlike ixgbe_probe():
+>>> - adapter->io_addr
+>>> - adapter->jump_tables[0]
+>>> - adapter->mac_table
+>>> - adapter->rss_key
+>>> - adapter->af_xdp_zc_qps
+>>>
+>>> The leaked MMIO region can be observed in /proc/vmallocinfo, and the
+>>> remaining leaks are reported by kmemleak.
+>>>
+>>> Free these allocations and unmap the MMIO region on failure to avoid the
+>>> leaks.
+>>>
+>>> Fixes: 29cb3b8d95c7 ("ixgbe: add E610 implementation of FW recovery mode")
+>>> Signed-off-by: Kohei Enju <enjuk@amazon.com>
+>> 
+>> Hi,
+>> 
+>> It seems that ixgbe_recovery_probe()  is only called from ixgbe_probe().
+>> And that ixgbe_probe() already has an unwind ladder for these resources.
+>> So I would suggest using that rather than replicating it
+>> in ixgbe_recovery_probe. That is, have ixgbe_probe() unwind when
+>> ixgbe_recovery_probe returns an error.
+>
+>Right. If resources are allocated by ixgbe_probe() they should be freed
+>in ixgbe_probe() and not in ixgbe_recovery_probe() which is a smaller
+>function called by ixgbe_probe() to enter recovery mode where only
+>devlink flash update is enabled.
+>
+>It looks like most of these resources are allocated by probe and then
+>ixgbe_recovery_probe() is called, which should instead let regular probe
+>do cleanup for stuff it didn't setup itself.
 
-I'll check when I'm back from lpc, but I was coming from an assumption
-that the qcfg series was doing it right, and I believe only the restart
-path was looking up the set len value. I'll double check.
+That makes sense. I'll revise the patch and work on v2.
 
--- 
-Pavel Begunkov
+>
+>> 
+>> Also, maybe I'm wrong, but it seems that hw->aci.lock
+>> is initialised more than once if ixgbe_recovery_probe() is called.
+>> 
+>
+>Its initialized in ixgbe_sw_init, which is called before the
+>ixgbe_recovery_probe, so yes that does look like a double initialization.
 
+Good catch, I overlooked that. I'll address that as well.
+
+Thank you for taking a look, Simon and Jacob.
 
