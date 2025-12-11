@@ -1,120 +1,125 @@
-Return-Path: <netdev+bounces-244323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0F91CB4DE6
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 07:25:07 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D4C8CB4DE9
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 07:25:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 691CF3008880
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 06:25:06 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id A29D63001601
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 06:25:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAC082773D4;
-	Thu, 11 Dec 2025 06:25:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bFtOJ7rZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70302286D70;
+	Thu, 11 Dec 2025 06:25:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f194.google.com (mail-pl1-f194.google.com [209.85.214.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from TWMBX01.aspeed.com (mail.aspeedtech.com [211.20.114.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28BC6286D70
-	for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 06:25:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D06DC28541A;
+	Thu, 11 Dec 2025 06:25:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.20.114.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765434305; cv=none; b=EUL52x5l02O83JAgbpb0mt5Ga0pTOAcs1RSKLRd4XblvLDJcWzp+Q80WMfR4nBayHMUzeLeakXdaWoY6Zhi/PY+SRQfE1UigTmsxx3Zms9JFaWIRSV/Ln9sOf4nn99wzP8SQQ9S7UEbJq3IL36hdpj2TBWe3n4mtEpZKoHb/8R4=
+	t=1765434312; cv=none; b=MDmouuW3y4IM7zp4zo/kNp5CHTEEN2WxRiX4dwojAcFrKMiEuRcNubXjIRYT48xezDEoruB4nsX7YgwRaRbh1FtY/+g0mTcyOj/l5akMKz2JTR86wd4nhspB44Apo1API208USVHhoZKvrLPwpd5SYI+syC7q5o0xQNgAU5XI3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765434305; c=relaxed/simple;
-	bh=Oq9w0VryMvuYfFs5PKrxDOa+y4Rf440HymdqdCTUl2E=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jORfoLxtSoopxWbsOmA5JMw2XyVOE2uHX/KDZqvDshBGiaTGuArdGUFWQRIyrnp7YvrMQ/DU8sD0CnCVOOAU3/E5FMshv7IQAahzC3VWvtxlwq8nDz25z09pJyzSoUCFBF16wfRk8jYTWGUTHafU5Npj7IRnnGVJfsW1wsIGVP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bFtOJ7rZ; arc=none smtp.client-ip=209.85.214.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f194.google.com with SMTP id d9443c01a7336-29844c68068so8324665ad.2
-        for <netdev@vger.kernel.org>; Wed, 10 Dec 2025 22:25:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765434302; x=1766039102; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=XaPSMqgFDwXVtwoGnYeBs0ffc4tdGw8E2FYib2USsLk=;
-        b=bFtOJ7rZkjJvDAXKsLoTKOMnOC+mAImrL4l+6hxpzVq15Xsc+TL9ZQ8g8AD/+xH2yy
-         vq5beSQ8xFkrsYe5rwekBI8lJ/EhGkbCStubU010cQNCQ8t4CIcv1nM33tDJwfiMYc1P
-         D1LTIK6QRQo3Kp5auxs9Y4OfJ/IeaIZnAbbEk+FPfWa6oydt9O/6EcntMMIdhcTpRFDj
-         PA7zGKlT4U6QVynAEIwDRbfr1qZNg2yD4KV137TQomV8T0MgwMliQ/1c+dBr08+LEnlw
-         jOOlLmgZF82zRdMhB1ogDW/on4iNr8lqKF4fHiYJZe2kqwa4V2H2meCx9CvC/y4N5aeP
-         i/+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765434302; x=1766039102;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XaPSMqgFDwXVtwoGnYeBs0ffc4tdGw8E2FYib2USsLk=;
-        b=RWWIydQwY2K0PRzi/C4O3jHoOQHaV0O99Qul/Mo5z8E0giEaGlMBibdge0had5rGJU
-         cy9CLBmchEXHTCtqpt4LxKySW/x3GoxgeKBjuKYQ6QsnM6n5+vVIaCTBycirT7URlihB
-         Vlw7/uGQPEXNdKmIYcPDBnHWX/28iqZiZRW3Rp5AfTEYL3wj57i66ArhX0sccB4xtQOG
-         JajC9Lxl7OGV1VF9d5bblYyKjAxCm8irwPtvDeGzGF/7e6FQFSWtSBegQF7RKfSVoz/8
-         jPyttP/hlt2u5sYRjZWUQMPR2yM/ddsindq3Rohhrs6b063Sbob38GRVwho5YqdHOFQm
-         hC9A==
-X-Gm-Message-State: AOJu0Yz+fxNjOh4DCJRDOhOZACzi4jGfag5q/yKPUECiM1AO70K5nC6O
-	t0KU3c6h9GNeZCioPGggblT4Canz3MHOfQu4Q9PpOPz2lxvLru77BaTvTRCtErNl4twuTg==
-X-Gm-Gg: AY/fxX4DIzvrH05TnQNhrfz7d+TDevSzv9YfkrHFCb75D93aodFZ1/VzvBlh9iJ0mOW
-	+/fiNC52w5OUzhkdV2xKAuNVppWhEHnc5ENONZWUKEacDP5lG4lhrsNLyJXhfGO8B3QFra1Fjn4
-	CPoWVawA3FAL8QD1r94fkulf0GNmf9iBnAxqMyU3XF43zCua0G4HF5LrNYikKqVlk3J8NFtYomv
-	ItqCDuEyga96/hO3Ytg0qYO6uEEtlXyxYG3zRP9xazvXb8J2vJ9cEkwiqxan5eNC5AJ0SZZ51F8
-	+XgfiSOS6DSiNR2v4HPJOkUMEKXyBkI9to5/Stcyiv0KdIvjkyVunByEFW3nao/MbYO9Qt3hZBS
-	RYbuhe3Z8Yx1VqbyDuSl4EpZ4N1A183P5x7cfizP7LhZr2ZRfYC/AqUfDFmh3cGi1rDiwTGEbXQ
-	oe/vEQ9xjsu7K44vewSP3dErq9BFYDOT+QYtof4EX3xeObHrYS7XLCiCr3mTk4Qq+GWSEMuahC/
-	I6W
-X-Google-Smtp-Source: AGHT+IGZUNAWRT4MEWYISXMFNkBW3disGfrc1KwAIqE8NKGjYL44e5oxPTy5BkOX8qfMQjvTLc97Mw==
-X-Received: by 2002:a05:7022:6b89:b0:11b:9386:8263 with SMTP id a92af1059eb24-11f296f43fcmr4799213c88.48.1765434301979;
-        Wed, 10 Dec 2025 22:25:01 -0800 (PST)
-Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-11f2e30491dsm4920158c88.16.2025.12.10.22.25.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Dec 2025 22:25:01 -0800 (PST)
-From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Subject: [PATCH] net: usb: sr9700: support devices with virtual driver CD
-Date: Wed, 10 Dec 2025 22:24:51 -0800
-Message-ID: <20251211062451.139036-1-enelsonmoore@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1765434312; c=relaxed/simple;
+	bh=/F4kIXDvh45WJxiCbdIwAGVfMvFPrac8MDCbVP75p2g=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=FN6VEv7b4MwbsLaFmSN65VNoWm6uvq1g3FPj8wrfvG1vUQBRAu61d0tLdwCt4gcQi0AXejngAfgm595BUI/H7Fp7/VmCcepVfXgjGiWGHsz+Z5LJloFvpM0VWwW8ndlVlK+vDdKN+ArKT4jGMAWm+3zHmCWmNDcvvTSQTh8v9Gk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; arc=none smtp.client-ip=211.20.114.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
+Received: from TWMBX01.aspeed.com (192.168.0.62) by TWMBX01.aspeed.com
+ (192.168.0.62) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.10; Thu, 11 Dec
+ 2025 14:25:01 +0800
+Received: from [127.0.1.1] (192.168.10.13) by TWMBX01.aspeed.com
+ (192.168.0.62) with Microsoft SMTP Server id 15.2.1748.10 via Frontend
+ Transport; Thu, 11 Dec 2025 14:25:01 +0800
+From: Jacky Chou <jacky_chou@aspeedtech.com>
+Date: Thu, 11 Dec 2025 14:24:58 +0800
+Subject: [PATCH net v3] net: mdio: aspeed: add dummy read to avoid
+ read-after-write issue
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-ID: <20251211-aspeed_mdio_add_dummy_read-v3-1-382868869004@aspeedtech.com>
+X-B4-Tracking: v=1; b=H4sIALljOmkC/43NQQ7CIBAF0Ks0rMUwaCl15T2MIVimlgWlgUpsm
+ t5dghsTE+Pyz5+8v5KIwWIkp2olAZON1o85HHYV6QY93pFakzPhjNfAmaQ6TohGOWO90sYo83B
+ uUQG1obVs9E1KJiU0JANTwN4+C34hI87kmo+DjbMPSxlMUKp/7AQUKNMgBWjDQcD5/TxjN+w77
+ 4qd+KfX/vR49upeMAHiCK1sv7xt214iS3GuHgEAAA==
+X-Change-ID: 20251208-aspeed_mdio_add_dummy_read-587ab8808817
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Joel Stanley
+	<joel@jms.id.au>, Andrew Jeffery <andrew@codeconstruct.com.au>, Potin Lai
+	<potin.lai@quantatw.com>
+CC: <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-aspeed@lists.ozlabs.org>, <linux-kernel@vger.kernel.org>, "Andrew
+ Jeffery" <andrew@aj.id.au>, Jacky Chou <jacky_chou@aspeedtech.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1765434301; l=2016;
+ i=jacky_chou@aspeedtech.com; s=20251031; h=from:subject:message-id;
+ bh=/F4kIXDvh45WJxiCbdIwAGVfMvFPrac8MDCbVP75p2g=;
+ b=oJptiug7G0Gd4SocdRv+VJ4ONlyM5fmP7zoWOeQc6wU3FZ/KkhT4lxdo14vQWCOtkRhz67Y2g
+ 97WIqf9bH2XBjn3dkbiQSY0jjL20PVv1/htH/ayyKn+s8t/nwgFZKHH
+X-Developer-Key: i=jacky_chou@aspeedtech.com; a=ed25519;
+ pk=8XBx7KFM1drEsfCXTH9QC2lbMlGU4XwJTA6Jt9Mabdo=
 
-Some SR9700 devices have an SPI flash chip containing a virtual driver
-CD, in which case they appear as a device with two interfaces and
-product ID 0x9702. Interface 0 is the driver CD and interface 1 is the
-Ethernet device.
+The Aspeed MDIO controller may return incorrect data when a read operation
+follows immediately after a write. Due to a controller bug, the subsequent
+read can latch stale data, causing the polling logic to terminate earlier
+than expected.
 
-See:
-https://github.com/name-kurniawan/usb-lan
-https://www.draisberghof.de/usb_modeswitch/bb/viewtopic.php?t=2185
-Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+To work around this hardware issue, insert a dummy read after each write
+operation. This ensures that the next actual read returns the correct
+data and prevents premature polling exit.
+
+This workaround has been verified to stabilize MDIO transactions on
+affected Aspeed platforms.
+
+Fixes: f160e99462c6 ("net: phy: Add mdio-aspeed")
+Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
 ---
- drivers/net/usb/sr9700.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Changes in v3:
+- Remove (void)
+- Link to v2: https://lore.kernel.org/r/20251209-aspeed_mdio_add_dummy_read-v2-1-5f6061641989@aspeedtech.com
 
-diff --git a/drivers/net/usb/sr9700.c b/drivers/net/usb/sr9700.c
-index 091bc2aca7e8..d8ffb59eaf34 100644
---- a/drivers/net/usb/sr9700.c
-+++ b/drivers/net/usb/sr9700.c
-@@ -539,6 +539,11 @@ static const struct usb_device_id products[] = {
- 		USB_DEVICE(0x0fe6, 0x9700),	/* SR9700 device */
- 		.driver_info = (unsigned long)&sr9700_driver_info,
- 	},
-+	{
-+		/* SR9700 with virtual driver CD-ROM - interface 0 is the CD-ROM device */
-+		USB_DEVICE_INTERFACE_NUMBER(0x0fe6, 0x9702, 1),
-+		.driver_info = (unsigned long)&sr9700_driver_info,
-+	},
- 	{},			/* END */
- };
+Changes in v2:
+- Updated the Fixes: tag
+- Link to v1: https://lore.kernel.org/r/20251208-aspeed_mdio_add_dummy_read-v1-1-0a1861ad2161@aspeedtech.com
+---
+ drivers/net/mdio/mdio-aspeed.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/drivers/net/mdio/mdio-aspeed.c b/drivers/net/mdio/mdio-aspeed.c
+index e55be6dc9ae7..d6b9004c61dc 100644
+--- a/drivers/net/mdio/mdio-aspeed.c
++++ b/drivers/net/mdio/mdio-aspeed.c
+@@ -63,6 +63,13 @@ static int aspeed_mdio_op(struct mii_bus *bus, u8 st, u8 op, u8 phyad, u8 regad,
  
+ 	iowrite32(ctrl, ctx->base + ASPEED_MDIO_CTRL);
+ 
++	/* Workaround for read-after-write issue.
++	 * The controller may return stale data if a read follows immediately
++	 * after a write. A dummy read forces the hardware to update its
++	 * internal state, ensuring that the next real read returns correct data.
++	 */
++	ioread32(ctx->base + ASPEED_MDIO_CTRL);
++
+ 	return readl_poll_timeout(ctx->base + ASPEED_MDIO_CTRL, ctrl,
+ 				!(ctrl & ASPEED_MDIO_CTRL_FIRE),
+ 				ASPEED_MDIO_INTERVAL_US,
+
+---
+base-commit: 6bcb7727d9e612011b70d64a34401688b986d6ab
+change-id: 20251208-aspeed_mdio_add_dummy_read-587ab8808817
+
+Best regards,
 -- 
-2.43.0
+Jacky Chou <jacky_chou@aspeedtech.com>
 
 
