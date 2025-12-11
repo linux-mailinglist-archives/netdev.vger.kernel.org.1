@@ -1,174 +1,271 @@
-Return-Path: <netdev+bounces-244387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85D8ECB60FE
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 14:41:29 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7C30CB61EB
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 14:59:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 85C4B30136E6
-	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 13:41:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3658B305CF0C
+	for <lists+netdev@lfdr.de>; Thu, 11 Dec 2025 13:57:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA72F313294;
-	Thu, 11 Dec 2025 13:41:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ADD62C15B7;
+	Thu, 11 Dec 2025 13:57:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dr55NmsQ";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y3SO+bf3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f78.google.com (mail-ot1-f78.google.com [209.85.210.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06BE430F93D
-	for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 13:41:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83FCE2C0F6D
+	for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 13:57:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765460486; cv=none; b=bHtPSxP5QwQZxn46JTRTFCBGY45+SEz3Q83dIy3Q3JhTnd5BwOqI/p8r4a1wLF/mKZpnx5If66ttr98gYdMNhrEGx+BCKOAaPPLgOpBPh0rVmc3aiUh/cJX78ZjGqt2hEsr06KYoGGTG2bi007ixgrJrDcrhvLE4USqi5ZYVn/M=
+	t=1765461429; cv=none; b=rpEIMwXzuK8yxYrWgkQMVK7LjiTIqh8FETmU4JebDJOoslLZwPA717d+yHse8KBabezqAf6Zas0U+DPVUT1VtgErEY9MeVYVUoPsMY4oJJXQ3ODDuAhrzD9i3zS3dcO3XnLoOZoFwadWXV7ajeFquqTgGycI/Gm0LxInDgQjuRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765460486; c=relaxed/simple;
-	bh=CDE1ttNTa5AMSgjBBmBwDvE2XcaWTCNIO92rjWyj8sE=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ah4CWjRjg1YAs1hptY0MK4tJSfJ0jbKpkRYfZjdxsumsFDrItEiD9LPwpMxs9yNWvxSgTiJ2vX151jsoyO+4ashUKSvqcVTs61oAU+Q/ttbcMA74eenJpK7mpTaeWuGNe9fl4RkT7VcGOT6efe23acx7TzC1jQqNre0aAKTthrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-ot1-f78.google.com with SMTP id 46e09a7af769-7c702d1a4f7so127960a34.3
-        for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 05:41:24 -0800 (PST)
+	s=arc-20240116; t=1765461429; c=relaxed/simple;
+	bh=+MVABDurZoU3qR9+rsjOF4huwV5cza451zquYpBwYAo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TS6vxWgXU6WlX9MavNKSbglNm8vbblAEtczR325aIBY75eODUmJrMI/ZZu7/76gqUjR+X3Pq3SODz8V3HkbMlf2rFtjQzB//Tql6iULUOaFB0f6gD2narBjkS7Hu1drO4AgTbEU4EnQpQA88qDzS8v2Sa6z98Qfau9ECGp8iQMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Dr55NmsQ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y3SO+bf3; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1765461425;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rsvyJctSZ+XWD9ctkjkuUDFq51ROW0DhwfkxivMg8ec=;
+	b=Dr55NmsQBruILlf3EnS/nBltIY0wW9QbF7B0xVBUNsa2W0jwcbbtHXMGWsDHoNXO2PCA/p
+	S3YAiNrVaU49KY5D3UUQTr8m1uKWYFStCZvhSMppUw+YRAkWfPwG8OD1ccLjHB+UCMdgh6
+	B9yD92wCEtWpHLHHE/oUq5a/PMAV8zU=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-489-S9GU-ilBNR2ZcMv6rqCe9A-1; Thu, 11 Dec 2025 08:57:02 -0500
+X-MC-Unique: S9GU-ilBNR2ZcMv6rqCe9A-1
+X-Mimecast-MFC-AGG-ID: S9GU-ilBNR2ZcMv6rqCe9A_1765461421
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-42b2f79759bso86869f8f.2
+        for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 05:57:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1765461421; x=1766066221; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=rsvyJctSZ+XWD9ctkjkuUDFq51ROW0DhwfkxivMg8ec=;
+        b=Y3SO+bf3YSWIeyGLdUNjVF6WmPZvkvcJZ43OJXXdd5Sd/BImvemjutUR/peR3Ps0ro
+         4Fq1Je3Z+/hjUFMciyB9svBf3py1J9coHmdmg185ddp6q7PiZxD96Y7KP0iC6qmj3eiB
+         0ccPn9dSmpyrFt9upGt2rWWg3uS+fqutVqCceZkuKHRfF0xxNFgXI7WVSuHvbt+IBraK
+         8DSbsrKpJzUE/3xI9uvZscgmCoE2Goy6E7BEY9zQmYS1SND+zNcvhO4MzF22ZcBQtU2b
+         7Fg5zvgede36C9kkUWCIINgfIyyW+hvb+3BT6Iy5rAlzmhYt3Zcl655hz9GbGt8ZnIwu
+         veNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765460484; x=1766065284;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZdhV1m8aeGU2YokLDtNvPFAfeUluHSpx/80Pd07MRPc=;
-        b=cdwQQDyJlSogYRe2ojMEoLlx/YMHYvdem83SLPa7R9gWM9PxtydjfWE/FZ/1JJiOVE
-         bfTNxiyxH8+RC3ezRf7/wSxY+bsqZN48vyvVwsVkzi2/5e9jG/DHGMqfl5M84ISjeuU5
-         i6qatQl5XfWJKXFsWUuaYTdoz48+94mUtdQU4SnHeYlxhhLtKxdRkUpJKr4BRqjyF1zk
-         khMOP/aok6tnYTzZHYLpYvyiVfgDU+eMq4w7zR6JhjHeJJOYjpC2nwDsfMkKIJdvuaoh
-         zAIPrJTz1d2cxMYytgCMlU+5EYu8wdL/AMFwRPKzjQQMpsQNaeWVj5WTBHdvz5mtQ8/+
-         2YDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUPSm2FkHh/HuyrN/tRshFSeufhwKwlKISJDP6U/WBvaZO9/A3pXjmIOdGVPf0y6pnIqUXdLe0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3yX0raqwVdtEgz7XCRWGbOwyOxXdjK6mnYbKlPdwCqGZMsq5C
-	4vIRjiVtAlIDMIYYcbdp4Ad7rCHGlVNYwooiEgyuvSnGkppPUgMnubk3er8+MK48BMiWCSp6+6h
-	Ht1v9+Hg/RY+5t9cjZJSu6LJF5AOV637dqnHSX0rrKM0WUATCkFMP+jUoZ8k=
-X-Google-Smtp-Source: AGHT+IGNnZYJRKkVKEoqr1aOebOWcitP/eJc29wiPAqSj9kqrQC8LVU+8N0bc9k787UTSjA5rJaWEWXkMS8eEhLrT67SHYwSjOZO
+        d=1e100.net; s=20230601; t=1765461421; x=1766066221;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rsvyJctSZ+XWD9ctkjkuUDFq51ROW0DhwfkxivMg8ec=;
+        b=XUgscsZNlahohCcolk/Rj2b2BlLDHFSF+2koyyjq7kpxedtQwGGj1iv9l6gL6eDrr4
+         U/OjTS++T5cftQ0LrC/eYtD/1qWhbCbAYh6dMSVFdD9knzcSPk642umiA0cmgefI/luq
+         JZsV6zvJSEb7uw/ThtwbfKjvH25/a7Ex4CApQ9dRe3fTOMYCpuQP5x3IkB9nErog/Yrm
+         VZNrr7N0mwKZBBo2iLh3CEg2w5b8uuiYBIHNGSZtjje+INnpqbZi72u9v1D0gb55zW+l
+         6WA6IBBbu6s6f0NthBc0pantdPdu1mwi/HW03neTqoIaQrYCcQqEzMKqUjbJiArZuob6
+         26gg==
+X-Forwarded-Encrypted: i=1; AJvYcCXyjCDY8ZjLc8sWR045nBgjGPlWf1NNQfpuvQyqCGl+BWuES+gKO0cViMiLZhh1jWwXSQkjaSA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzb3B3H7Hr0eNPnOQA+CaaSdc0C+4eT/KaXDOOkrlaORsJI0tVP
+	919TdW+yeHqFDx8EE7N3flmTWv9DqqZpEKt6ZbMEFXX//3WXh9JikKLpnMKxrOP7NM0+6RrcQDm
+	S9NUFIlrppjUgCCAoEPSDgtq+zWV8zDDQmE1RUXgCC/IajivnpTjwRjVpLQ==
+X-Gm-Gg: AY/fxX7HchMTaDPN8Q4ic3s/Mbyqbp4HCLx5ueW2nBmQT1fp42Kpo5qYzbwQwWIdwN2
+	0erUhZQsnXY8d1wHseOiN9bhHwomfirszTHPWWo/zqeKC2cNh4E0hDJy5Beq1VsbPanndZi6MgU
+	54jPnoKXeWvzS9iPhpSjc7bfxvHB4X/BQbBZUCUpMLPlsrFEhO5Eo5JQZJVPjlQvKs2/cp4mAwp
+	BV4MdoNq2eCMCYH4kykn47rRosJaUnzYiw2Fzc9akWMEuDAOQftb6ORv0F1V836/qR+bvAFqMIR
+	osgbXOeQCULv31df6N4kTdJEi2g9KyUkI5Sw7asIadicsFdPczF9tYrQ1mQ7eNiT381ZS9Df7FW
+	2aIGY7oBz8aPCJVnKM/RzncnYDPwL/s1YCgwqE2ToopjSiJHV82YUMdg54ardyw==
+X-Received: by 2002:a05:6000:178d:b0:429:dc9a:ed35 with SMTP id ffacd0b85a97d-42fa3b0aa73mr6515891f8f.43.1765461420986;
+        Thu, 11 Dec 2025 05:57:00 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEEGc99cmBNOvRu/1E0FcEBzDpZsrjVh8bWjY+YIg6PKhABRUKZzIdeQiTlGB1SQ5wUnM9hhw==
+X-Received: by 2002:a05:6000:178d:b0:429:dc9a:ed35 with SMTP id ffacd0b85a97d-42fa3b0aa73mr6515868f8f.43.1765461420506;
+        Thu, 11 Dec 2025 05:57:00 -0800 (PST)
+Received: from sgarzare-redhat (host-87-12-139-91.business.telecomitalia.it. [87.12.139.91])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42fa8b9b259sm5714243f8f.41.2025.12.11.05.56.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Dec 2025 05:56:58 -0800 (PST)
+Date: Thu, 11 Dec 2025 14:56:53 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Melbin K Mathew <mlbnkm1@gmail.com>, stefanha@redhat.com, 
+	kvm@vger.kernel.org, netdev@vger.kernel.org, virtualization@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, jasowang@redhat.com, xuanzhuo@linux.alibaba.com, 
+	eperezma@redhat.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org
+Subject: Re: [PATCH net v3] vsock/virtio: cap TX credit to local buffer size
+Message-ID: <zlhixzduyindq24osaedkt2xnukmatwhugfkqmaugvor6wlcol@56jsodxn4rhi>
+References: <20251211125104.375020-1-mlbnkm1@gmail.com>
+ <20251211080251-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:3084:b0:659:9a49:8ff5 with SMTP id
- 006d021491bc7-65b2accaa61mr3088477eaf.34.1765460484238; Thu, 11 Dec 2025
- 05:41:24 -0800 (PST)
-Date: Thu, 11 Dec 2025 05:41:24 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <693aca04.050a0220.4004e.0346.GAE@google.com>
-Subject: [syzbot] [wireless?] WARNING in __alloc_workqueue
-From: syzbot <syzbot+392a2c3f461094707435@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, pkshih@realtek.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251211080251-mutt-send-email-mst@kernel.org>
 
-Hello,
+On Thu, Dec 11, 2025 at 08:05:11AM -0500, Michael S. Tsirkin wrote:
+>On Thu, Dec 11, 2025 at 01:51:04PM +0100, Melbin K Mathew wrote:
+>> The virtio vsock transport currently derives its TX credit directly from
+>> peer_buf_alloc, which is populated from the remote endpoint's
+>> SO_VM_SOCKETS_BUFFER_SIZE value.
+>>
+>> On the host side, this means the amount of data we are willing to queue
+>> for a given connection is scaled purely by a peer-chosen value, rather
+>> than by the host's own vsock buffer configuration. A guest that
+>> advertises a very large buffer and reads slowly can cause the host to
+>> allocate a correspondingly large amount of sk_buff memory for that
+>> connection.
+>>
+>> In practice, a malicious guest can:
+>>
+>>   - set a large AF_VSOCK buffer size (e.g. 2 GiB) with
+>>     SO_VM_SOCKETS_BUFFER_MAX_SIZE / SO_VM_SOCKETS_BUFFER_SIZE, and
+>>
+>>   - open multiple connections to a host vsock service that sends data
+>>     while the guest drains slowly.
+>>
+>> On an unconstrained host this can drive Slab/SUnreclaim into the tens of
+>> GiB range, causing allocation failures and OOM kills in unrelated host
+>> processes while the offending VM remains running.
+>>
+>> On non-virtio transports and compatibility:
+>>
+>>   - VMCI uses the AF_VSOCK buffer knobs to size its queue pairs per
+>>     socket based on the local vsk->buffer_* values; the remote side
+>>     can’t enlarge those queues beyond what the local endpoint
+>>     configured.
+>>
+>>   - Hyper-V’s vsock transport uses fixed-size VMBus ring buffers and
+>>     an MTU bound; there is no peer-controlled credit field comparable
+>>     to peer_buf_alloc, and the remote endpoint can’t drive in-flight
+>>     kernel memory above those ring sizes.
+>>
+>>   - The loopback path reuses virtio_transport_common.c, so it
+>>     naturally follows the same semantics as the virtio transport.
+>>
+>> Make virtio-vsock consistent with that model by intersecting the peer’s
+>> advertised receive window with the local vsock buffer size when
+>> computing TX credit. We introduce a small helper and use it in
+>> virtio_transport_get_credit(), virtio_transport_has_space() and
+>> virtio_transport_seqpacket_enqueue(), so that:
+>>
+>>     effective_tx_window = min(peer_buf_alloc, buf_alloc)
+>>
+>> This prevents a remote endpoint from forcing us to queue more data than
+>> our own configuration allows, while preserving the existing credit
+>> semantics and keeping virtio-vsock compatible with the other transports.
+>>
+>> On an unpatched Ubuntu 22.04 host (~64 GiB RAM), running a PoC with
+>> 32 guest vsock connections advertising 2 GiB each and reading slowly
+>> drove Slab/SUnreclaim from ~0.5 GiB to ~57 GiB and the system only
+>> recovered after killing the QEMU process.
+>>
+>> With this patch applied, rerunning the same PoC yields:
+>>
+>>   Before:
+>>     MemFree:        ~61.6 GiB
+>>     MemAvailable:   ~62.3 GiB
+>>     Slab:           ~142 MiB
+>>     SUnreclaim:     ~117 MiB
+>>
+>>   After 32 high-credit connections:
+>>     MemFree:        ~61.5 GiB
+>>     MemAvailable:   ~62.3 GiB
+>>     Slab:           ~178 MiB
+>>     SUnreclaim:     ~152 MiB
+>>
+>> i.e. only ~35 MiB increase in Slab/SUnreclaim, no host OOM, and the
+>> guest remains responsive.
+>>
+>> Fixes: 06a8fc78367d ("VSOCK: Introduce virtio_vsock_common.ko")
+>> Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
+>> Signed-off-by: Melbin K Mathew <mlbnkm1@gmail.com>
+>> ---
+>>  net/vmw_vsock/virtio_transport_common.c | 27 ++++++++++++++++++++++---
+>>  1 file changed, 24 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>> index dcc8a1d58..02eeb96dd 100644
+>> --- a/net/vmw_vsock/virtio_transport_common.c
+>> +++ b/net/vmw_vsock/virtio_transport_common.c
+>> @@ -491,6 +491,25 @@ void virtio_transport_consume_skb_sent(struct sk_buff *skb, bool consume)
+>>  }
+>>  EXPORT_SYMBOL_GPL(virtio_transport_consume_skb_sent);
+>>
+>> +/* Return the effective peer buffer size for TX credit computation.
+>> + *
+>> + * The peer advertises its receive buffer via peer_buf_alloc, but we
+>> + * cap that to our local buf_alloc (derived from
+>> + * SO_VM_SOCKETS_BUFFER_SIZE and already clamped to buffer_max_size)
+>> + * so that a remote endpoint cannot force us to queue more data than
+>> + * our own configuration allows.
+>> + */
+>> +static u32 virtio_transport_tx_buf_alloc(struct virtio_vsock_sock *vvs)
+>> +{
+>> +	return min(vvs->peer_buf_alloc, vvs->buf_alloc);
+>> +}
+>> +
+>>  u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 credit)
+>>  {
+>>  	u32 ret;
+>> @@ -499,7 +518,8 @@ u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 credit)
+>>  		return 0;
+>>
+>>  	spin_lock_bh(&vvs->tx_lock);
+>> -	ret = vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
+>> +	ret = virtio_transport_tx_buf_alloc(vvs) -
+>> +		(vvs->tx_cnt - vvs->peer_fwd_cnt);
+>>  	if (ret > credit)
+>>  		ret = credit;
+>>  	vvs->tx_cnt += ret;
+>> @@ -831,7 +851,7 @@ virtio_transport_seqpacket_enqueue(struct vsock_sock *vsk,
+>>
+>>  	spin_lock_bh(&vvs->tx_lock);
+>>
+>> -	if (len > vvs->peer_buf_alloc) {
+>> +	if (len > virtio_transport_tx_buf_alloc(vvs)) {
+>>  		spin_unlock_bh(&vvs->tx_lock);
+>>  		return -EMSGSIZE;
+>>  	}
+>> @@ -882,7 +902,8 @@ static s64 virtio_transport_has_space(struct vsock_sock *vsk)
+>>  	struct virtio_vsock_sock *vvs = vsk->trans;
+>>  	s64 bytes;
+>>
+>> -	bytes = (s64)vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
+>> +	bytes = (s64)virtio_transport_tx_buf_alloc(vvs) -
+>> +		(vvs->tx_cnt - vvs->peer_fwd_cnt);
+>>  	if (bytes < 0)
+>>  		bytes = 0;
+>>
+>
+>Acked-by: Michael S. Tsirkin <mst@redhat.com>
+>
+>
+>Looking at this, why is one place casting to s64 the other is not?
 
-syzbot found the following issue on:
+Yeah, I pointed out that too in previous interactions. IMO we should fix 
+virtio_transport_get_credit() since the peer can reduce `peer_buf_alloc` 
+so it will overflow. Fortunately, we are limited by the credit requested 
+by the caller, but we are still sending stuff when we shouldn't be.
 
-HEAD commit:    37bb2e7217b0 Merge tag 'staging-6.19-rc1' of git://git.ker..
-git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git usb-testing
-console output: https://syzkaller.appspot.com/x/log.txt?x=125bceb4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e79f218bc0cd167b
-dashboard link: https://syzkaller.appspot.com/bug?extid=392a2c3f461094707435
-compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1046f21a580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12b9521a580000
+@Melbin let me know if you will fix it, otherwise I can do that, but I'd 
+like to do in a single series (multiple patches), since they depends on 
+each other.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/26124775173b/disk-37bb2e72.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/bd4182168b83/vmlinux-37bb2e72.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/a78be0ee345d/bzImage-37bb2e72.xz
+So if you prefer, I can pickup this patch and post a series with this + 
+the other fix + the fix on the test I posted on the v2.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+392a2c3f461094707435@syzkaller.appspotmail.com
+Stefano
 
-usb 3-1: SerialNumber: syz
-usb 3-1: config 0 descriptor??
-------------[ cut here ]------------
-WARNING: kernel/workqueue.c:5701 at __alloc_workqueue+0x114c/0x1810 kernel/workqueue.c:5701, CPU#0: kworker/0:2/121
-Modules linked in:
-CPU: 0 UID: 0 PID: 121 Comm: kworker/0:2 Not tainted syzkaller #0 PREEMPT(voluntary) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
-Workqueue: usb_hub_wq hub_event
-RIP: 0010:__alloc_workqueue+0x114c/0x1810 kernel/workqueue.c:5701
-Code: e9 de fc ff ff 48 c7 44 24 08 e8 55 e8 88 e9 8f f6 ff ff 41 be 08 00 00 00 41 bd 00 04 00 00 e9 53 f1 ff ff e8 a5 9a 34 00 90 <0f> 0b 90 31 ed e9 af fc ff ff e8 95 9a 34 00 90 0f 0b 90 31 ed e9
-RSP: 0018:ffffc900014aedf8 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: 0000000000000002 RCX: ffffffff814b4179
-RDX: ffff88810caa9d40 RSI: ffffffff814b527b RDI: 0000000000000005
-RBP: ffffc900014aef60 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000002 R11: ffff88810caaa7e8 R12: 0000000000000003
-R13: 0000000000000000 R14: ffffffff87e3cc20 R15: ffffc900014aeea0
-FS:  0000000000000000(0000) GS:ffff888268bf5000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f8d89852a60 CR3: 0000000117746000 CR4: 00000000003506f0
-Call Trace:
- <TASK>
- alloc_workqueue_noprof+0xd2/0x200 kernel/workqueue.c:5820
- rtw_usb_init_rx drivers/net/wireless/realtek/rtw88/usb.c:968 [inline]
- rtw_usb_probe+0x13bf/0x2d10 drivers/net/wireless/realtek/rtw88/usb.c:1295
- usb_probe_interface+0x303/0xa80 drivers/usb/core/driver.c:396
- call_driver_probe drivers/base/dd.c:581 [inline]
- really_probe+0x241/0xb20 drivers/base/dd.c:659
- __driver_probe_device+0x1de/0x470 drivers/base/dd.c:801
- driver_probe_device+0x4c/0x1b0 drivers/base/dd.c:831
- __device_attach_driver+0x1df/0x350 drivers/base/dd.c:959
- bus_for_each_drv+0x159/0x1e0 drivers/base/bus.c:500
- __device_attach+0x1e4/0x4e0 drivers/base/dd.c:1031
- device_initial_probe+0xaa/0xc0 drivers/base/dd.c:1086
- bus_probe_device+0x64/0x150 drivers/base/bus.c:574
- device_add+0x116e/0x1980 drivers/base/core.c:3689
- usb_set_configuration+0x1187/0x1e50 drivers/usb/core/message.c:2210
- usb_generic_driver_probe+0xb1/0x110 drivers/usb/core/generic.c:250
- usb_probe_device+0xef/0x400 drivers/usb/core/driver.c:291
- call_driver_probe drivers/base/dd.c:581 [inline]
- really_probe+0x241/0xb20 drivers/base/dd.c:659
- __driver_probe_device+0x1de/0x470 drivers/base/dd.c:801
- driver_probe_device+0x4c/0x1b0 drivers/base/dd.c:831
- __device_attach_driver+0x1df/0x350 drivers/base/dd.c:959
- bus_for_each_drv+0x159/0x1e0 drivers/base/bus.c:500
- __device_attach+0x1e4/0x4e0 drivers/base/dd.c:1031
- device_initial_probe+0xaa/0xc0 drivers/base/dd.c:1086
- bus_probe_device+0x64/0x150 drivers/base/bus.c:574
- device_add+0x116e/0x1980 drivers/base/core.c:3689
- usb_new_device+0xd07/0x1a90 drivers/usb/core/hub.c:2695
- hub_port_connect drivers/usb/core/hub.c:5567 [inline]
- hub_port_connect_change drivers/usb/core/hub.c:5707 [inline]
- port_event drivers/usb/core/hub.c:5871 [inline]
- hub_event+0x31bf/0x5420 drivers/usb/core/hub.c:5953
- process_one_work+0x9ba/0x1b20 kernel/workqueue.c:3257
- process_scheduled_works kernel/workqueue.c:3340 [inline]
- worker_thread+0x6c8/0xf10 kernel/workqueue.c:3421
- kthread+0x3c5/0x780 kernel/kthread.c:463
- ret_from_fork+0x74f/0xa30 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
