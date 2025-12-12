@@ -1,204 +1,128 @@
-Return-Path: <netdev+bounces-244464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 577F0CB82AB
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 08:52:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78E01CB82B7
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 08:53:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1DD6930088D6
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 07:52:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DBC9A3040A72
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 07:52:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 655FF30F927;
-	Fri, 12 Dec 2025 07:52:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9FE430F536;
+	Fri, 12 Dec 2025 07:52:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ubuntu.com header.i=@ubuntu.com header.b="QAJCWwvH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CIxJL8Ug"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.forwardemail.net (smtp.forwardemail.net [149.28.215.223])
+Received: from mail-dl1-f47.google.com (mail-dl1-f47.google.com [74.125.82.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AAE330E83F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60444305047
 	for <netdev@vger.kernel.org>; Fri, 12 Dec 2025 07:52:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=149.28.215.223
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.82.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765525938; cv=none; b=fN1xuLVSaoK1nQ4DGj5+QTZzkbSApnd4w56WcjE2c2xQQy+aMPhTTNAON8j7KcwxCNoeK0kW7l5VJD0Z2ia2tnOdSQe9NVB6EcapuSD0nYGPSYQmv3WYuLsRcGOsh1m6wxcSqD7Ul7NGrYWAvI05fyiIH4eeMg3TEMfy04RcoAU=
+	t=1765525936; cv=none; b=NEPwoGXYrkISsftxihsQs7DGxpjN32XP2kI5gugWrfCYmxaatOPVGcu1HrVQnXAVX9EdB2oeTLTg0BiRKDDMJmBxWoH0DInp+Puq7bukk4JaP1B1UpgNO+8+RpGdeE+amosvyvsOgE6oDSprDnbkqCZGBATess4G9b7VH9tZ0+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765525938; c=relaxed/simple;
-	bh=y/bvT8VZdx+5yko665QNlOLFOQbvNzV7Cf31v/zetaQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SGElXRJ5NLVg1xe5OneJ468HV88JxrZE4lhJH09IydL5YNWYrgQFAxMJifIHtneCZwWjhFHRBO4yZ9ASZ3GmRv1AWnsI7gSBFr3OiI8PaWv97Bqml6U7eVwdYvbiJM5I9917GdWyAypbjr1ibSoY95GLaURpWtE45nyyqZSXmJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ubuntu.com; spf=pass smtp.mailfrom=fe-bounces.ubuntu.com; dkim=pass (2048-bit key) header.d=ubuntu.com header.i=@ubuntu.com header.b=QAJCWwvH; arc=none smtp.client-ip=149.28.215.223
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ubuntu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fe-bounces.ubuntu.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ubuntu.com;
- h=Content-Transfer-Encoding: MIME-Version: Message-ID: Date: Subject: Cc:
- To: From; q=dns/txt; s=fe-953a8a3ca9; t=1765525935;
- bh=5pmJtC2v5HuKgTd8XiTTdyFsEdHnMITFvy/fl8k9hdM=;
- b=QAJCWwvHP1AWv0Y69Vh9mja+eaWSifpXm4NoENYzU5l8acfnHBQpatr/blCY3W7c+zZm/NIFb
- NLlF4LYq3X9RZRj/Q9s3JVW2RFEw1WfECa2Z+pA8lW4vXXZsmHvX9eCVbgD5xA7G5zBqg6MhhMm
- 5Q8jVSeyIiM69m41nKiF9SgdSADZA7Er1SsIldCq1WuPk4B4j6dtecmnZKXCChMcTpyKdn6iObW
- Z5ywTcdqG1mLncps3d6E04iilAmAns3mp9x8MoLacQJBmLmspScPGC0l5AVCmbvAIYgmF9c4nAF
- +PX9tPB4ZCko2O+hvYo53GpKDpHgypdWdxWYcrGYqOAQ==
-X-Forward-Email-ID: 693bc4f9bcfd39afaeb67eae
-X-Forward-Email-Sender: rfc822; fnordahl@ubuntu.com, smtp.forwardemail.net,
- 149.28.215.223
-X-Forward-Email-Version: 1.6.6
-X-Forward-Email-Website: https://forwardemail.net
-X-Complaints-To: abuse@forwardemail.net
-X-Report-Abuse: abuse@forwardemail.net
-X-Report-Abuse-To: abuse@forwardemail.net
-From: Frode Nordahl <fnordahl@ubuntu.com>
-To: netdev@vger.kernel.org
-Cc: fnordahl@ubuntu.com,
-	stable@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Gal Pressman <gal@nvidia.com>,
-	Kees Cook <kees@kernel.org>,
-	Cosmin Ratiu <cratiu@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] erspan: Initialize options_len before referencing options.
-Date: Fri, 12 Dec 2025 07:32:01 +0000
-Message-ID: <20251212073202.13153-1-fnordahl@ubuntu.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1765525936; c=relaxed/simple;
+	bh=BQVch3Zrr7oIILOgV2AMkxvg7cE9UJnrX8P4cQ3AVAI=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=QNVkFBcoSp02vQmvPEdYKN1a26devKFpgyx+w5lgTOlfarwoHCQ8pcRSX2YqqxO+pUONnFnoTriLHemuFVhYm1nb1Ae0ubme1i2BcgfWK5Jqmc9qlYeYZaT7ndy9Ft2K/3NczEkLksXx6OU7bE6oCyb/EibycqHAbovH7herXZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CIxJL8Ug; arc=none smtp.client-ip=74.125.82.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-dl1-f47.google.com with SMTP id a92af1059eb24-11b6bc976d6so1195637c88.0
+        for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 23:52:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765525934; x=1766130734; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=g0+OL375DlJZBChyN+LFQBvKaqLhEoBHitMOMJRXqlc=;
+        b=CIxJL8Ug/nVXTikL7GTa6XIKeq/b/uc1s2qG72tqocpBMRDkiYON6cMc/RSfzyuFPK
+         lT6+z0S4XguoIJfoROSFGvitTxr9zM6Fw4Cp90aeRbRxV+A+4qMiQ2uSebI6Yph+hDSl
+         gbn34vgPovDeNP01cNZaE+/rQ9SVgDwfLiVBsMwF3KXe6YYMeMcKGGAsbRFzxn7u3kAp
+         CyzgS8NRdrjIViQ/he5XFOdjt+Co5PjK/FOUi1Imom6qGFBVvcUSAcHQPAtZ7q1cqzNQ
+         CbQ9sAO+C4MrcknnWJUcW9Wn/JvjYKfQYyDDgnkucptpO0PjkKo2fvNGu4RXu1UAFsGJ
+         vrrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765525934; x=1766130734;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=g0+OL375DlJZBChyN+LFQBvKaqLhEoBHitMOMJRXqlc=;
+        b=gANN0eQI6AU+yZBFUGgDAfMJR3CaMcBQJQFGHGq4lyD1sX1vKHvbAJuLEljkC2AA6D
+         1ZNYUFvA84iuurS1i0ieZa6IigGI6KPNeuRtC65kvTUO3eB76Nog+QSmxpV4p+VnJ3dn
+         oDHh9pLOp9SgwnfSQfBBrvAoEqLpl6bMp4qOuImLZ2bZMbcqCMVRJmRfrRT7ZWf9yM5Q
+         wkAHFJE+Kc+MCOCfbWVYM6uTLG2UGtco7jeuFFT8WaNZWdiS8a43w3tK3LSvJXFCBCol
+         AYItCfgFzsKE9fOxyADzbjw81n63DxZjEi/kIwo7DDrb3gLhZrAew3t5Qp6j7oCc+2dg
+         qcuw==
+X-Gm-Message-State: AOJu0Yz1+tnzclSDVMbwc1O+hbs8C+0OEzt110V5g/0FJkoefP6N3Ncs
+	sIKIdCXOYfCqTM+TGctg0xdHrIJ/XokfNuiPZHRoAEWocoQvHUsCgL/SGAUE6UU8+hBdMTDZmP4
+	esQMbD4MC1z3gL8v/b1lxSr3xoRyr/vkKsqXBiiin9Q==
+X-Gm-Gg: AY/fxX6CVuIzIIg2Omuno5BwrWwzad6+BBRcs514TSGoiTTBe/kR2czkQC57XvDL8aa
+	fZPN5PEIKBZtIsDyxbJcoml5dlV34+0QauRr6OWhsdNbOQVX9ZrWS2MLoRqYIP3B7mrR6yHKB1Z
+	4JXuVg1gOpwQexbdDHAQogsKBUR8EBYMWCVQOpHvPsO55RrwwAMR1bQUOxAPwRU47XmLSBXdrVZ
+	RBirm6ckB0+AQjArBg3Jtb9r17PCNbeyh76zeFOYI1U1XVBj5exDP5pz7ozkz3tKD8iDx8x4YuL
+	9VsSUQ==
+X-Google-Smtp-Source: AGHT+IHv8ZqJ1PmknbzFmDHR9oVIqES7WTjEtv4kEsGZ0d0+JATrMRSKhA3N2ybhYrc2uCvTpmXEvEGg3x7j+BLctRw=
+X-Received: by 2002:a05:7022:384c:b0:11b:a738:65b2 with SMTP id
+ a92af1059eb24-11f2ebc92f6mr3287095c88.5.1765525934305; Thu, 11 Dec 2025
+ 23:52:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: Tuo Li <islituo@gmail.com>
+Date: Fri, 12 Dec 2025 15:52:01 +0800
+X-Gm-Features: AQt7F2ocigM-AmUusutfTjhGIohTkSnFbtuOTKP9LUp3RaQiXpKOcVQBKKvAIwk
+Message-ID: <CADm8Tem-jtBmmOO9S6jW-jzffCqe7X_DpJcy25KRkyY9Tn+TZA@mail.gmail.com>
+Subject: [BUG] net: 3com: 3c59x: Possible null-pointer dereferences caused by
+ Compaq PCI BIOS32 problem
+To: klassert@kernel.org, andrew+netdev@lunn.ch, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, mingo@kernel.org, 
+	tglx@linutronix.de
+Cc: netdev@vger.kernel.org, Linux Kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-The struct ip_tunnel_info has a flexible array member named
-options that is protected by a counted_by(options_len)
-attribute.
+Hi,
 
-The compiler will use this information to enforce runtime bounds
-checking deployed by FORTIFY_SOURCE string helpers.
+I found a few potential null-pointer dereferences in vortex_probe1() in
+Linux 6.18.
 
-As laid out in the GCC documentation, the counter must be
-initialized before the first reference to the flexible array
-member.
+IIn this function, gendev is checked at lines 1109 and 1173, which
+indicates that it may be NULL. However, it is later passed directly to
+dma_alloc_coherent() at line 1211:
 
-In the normal case the ip_tunnel_info_opts_set() helper is used
-which would initialize options_len properly, however in the GRE
-ERSPAN code a partial update is done, preventing the use of the
-helper function.
+  vp->rx_ring = dma_alloc_coherent(gendev, ...)
 
-Before this change the handling of ERSPAN traffic in GRE tunnels
-would cause a kernel panic when the kernel is compiled with
-GCC 15+ and having FORTIFY_SOURCE configured:
+This can lead to some null-pointer dereferences. Here is an example
+calling context:
 
-memcpy: detected buffer overflow: 4 byte write of buffer size 0
+  dma_alloc_coherent(gendev, ...)
+    dma_alloc_attrs(dev, ...)
+      get_dma_ops(dev);
+          if (dev->dma_ops)   // dereferenced here
+      WARN_ON_ONCE(!dev->coherent_dma_mask);  // dereferenced here
 
-Call Trace:
- <IRQ>
- __fortify_panic+0xd/0xf
- erspan_rcv.cold+0x68/0x83
- ? ip_route_input_slow+0x816/0x9d0
- gre_rcv+0x1b2/0x1c0
- gre_rcv+0x8e/0x100
- ? raw_v4_input+0x2a0/0x2b0
- ip_protocol_deliver_rcu+0x1ea/0x210
- ip_local_deliver_finish+0x86/0x110
- ip_local_deliver+0x65/0x110
- ? ip_rcv_finish_core+0xd6/0x360
- ip_rcv+0x186/0x1a0
+Similarly, pdev is checked by an if statement at line 1466, but is then
+used unconditionally when freeing DMA memory at line 1476:
 
-Link: https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-counted_005fby-variable-attribute
-Reported-at: https://launchpad.net/bugs/2129580
-Fixes: bb5e62f2d547 ("net: Add options as a flexible array to struct ip_tunnel_info")
-Signed-off-by: Frode Nordahl <fnordahl@ubuntu.com>
----
- net/ipv4/ip_gre.c  | 18 ++++++++++++++++--
- net/ipv6/ip6_gre.c | 18 ++++++++++++++++--
- 2 files changed, 32 insertions(+), 4 deletions(-)
+  dma_free_coherent(&pdev->dev, ...)
 
-diff --git a/net/ipv4/ip_gre.c b/net/ipv4/ip_gre.c
-index 761a53c6a89a..285a656c9e41 100644
---- a/net/ipv4/ip_gre.c
-+++ b/net/ipv4/ip_gre.c
-@@ -330,6 +330,22 @@ static int erspan_rcv(struct sk_buff *skb, struct tnl_ptk_info *tpi,
- 			if (!tun_dst)
- 				return PACKET_REJECT;
- 
-+			/* The struct ip_tunnel_info has a flexible array member named
-+			 * options that is protected by a counted_by(options_len)
-+			 * attribute.
-+			 *
-+			 * The compiler will use this information to enforce runtime bounds
-+			 * checking deployed by FORTIFY_SOURCE string helpers.
-+			 *
-+			 * As laid out in the GCC documentation, the counter must be
-+			 * initialized before the first reference to the flexible array
-+			 * member.
-+			 *
-+			 * Link: https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-counted_005fby-variable-attribute
-+			 */
-+			info = &tun_dst->u.tun_info;
-+			info->options_len = sizeof(*md);
-+
- 			/* skb can be uncloned in __iptunnel_pull_header, so
- 			 * old pkt_md is no longer valid and we need to reset
- 			 * it
-@@ -344,10 +360,8 @@ static int erspan_rcv(struct sk_buff *skb, struct tnl_ptk_info *tpi,
- 			memcpy(md2, pkt_md, ver == 1 ? ERSPAN_V1_MDSIZE :
- 						       ERSPAN_V2_MDSIZE);
- 
--			info = &tun_dst->u.tun_info;
- 			__set_bit(IP_TUNNEL_ERSPAN_OPT_BIT,
- 				  info->key.tun_flags);
--			info->options_len = sizeof(*md);
- 		}
- 
- 		skb_reset_mac_header(skb);
-diff --git a/net/ipv6/ip6_gre.c b/net/ipv6/ip6_gre.c
-index c82a75510c0e..eb840a11b93b 100644
---- a/net/ipv6/ip6_gre.c
-+++ b/net/ipv6/ip6_gre.c
-@@ -535,6 +535,22 @@ static int ip6erspan_rcv(struct sk_buff *skb,
- 			if (!tun_dst)
- 				return PACKET_REJECT;
- 
-+			/* The struct ip_tunnel_info has a flexible array member named
-+			 * options that is protected by a counted_by(options_len)
-+			 * attribute.
-+			 *
-+			 * The compiler will use this information to enforce runtime bounds
-+			 * checking deployed by FORTIFY_SOURCE string helpers.
-+			 *
-+			 * As laid out in the GCC documentation, the counter must be
-+			 * initialized before the first reference to the flexible array
-+			 * member.
-+			 *
-+			 * Link: https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-counted_005fby-variable-attribute
-+			 */
-+			info = &tun_dst->u.tun_info;
-+			info->options_len = sizeof(*md);
-+
- 			/* skb can be uncloned in __iptunnel_pull_header, so
- 			 * old pkt_md is no longer valid and we need to reset
- 			 * it
-@@ -543,7 +559,6 @@ static int ip6erspan_rcv(struct sk_buff *skb,
- 			     skb_network_header_len(skb);
- 			pkt_md = (struct erspan_metadata *)(gh + gre_hdr_len +
- 							    sizeof(*ershdr));
--			info = &tun_dst->u.tun_info;
- 			md = ip_tunnel_info_opts(info);
- 			md->version = ver;
- 			md2 = &md->u.md2;
-@@ -551,7 +566,6 @@ static int ip6erspan_rcv(struct sk_buff *skb,
- 						       ERSPAN_V2_MDSIZE);
- 			__set_bit(IP_TUNNEL_ERSPAN_OPT_BIT,
- 				  info->key.tun_flags);
--			info->options_len = sizeof(*md);
- 
- 			ip6_tnl_rcv(tunnel, skb, tpi, tun_dst, log_ecn_error);
- 
--- 
-2.43.0
+It looks like these issues stem from the call at line 987 used as a
+workaround for the Compaq PCI BIOS32 problem:
 
+vortex_eisa_init(void)
+  /* Special code to work-around the Compaq PCI BIOS32 problem. */
+  if (compaq_ioaddr) {
+    vortex_probe1(NULL, ioport_map(compaq_ioaddr, VORTEX_TOTAL_SIZE),
+      compaq_irq, compaq_device_id, vortex_cards_found++);
+  }
+
+This passes a NULL gendev into vortex_probe1().
+
+I am not fully sure whether these paths are reachable in practice and how
+to fix it. Any feedback would be appreciated.
+
+Sincerely,
+Tuo Li
 
