@@ -1,248 +1,395 @@
-Return-Path: <netdev+bounces-244490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F60ECB8CA7
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 13:23:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 32738CB8CBF
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 13:27:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 5A2803014BC3
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 12:23:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4D15530119F5
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 12:27:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F40783115B1;
-	Fri, 12 Dec 2025 12:23:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 229B830DEBB;
+	Fri, 12 Dec 2025 12:27:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="N3oXfel6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HTBz9cs1";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="lEGzlNF5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E3B42C11F3;
-	Fri, 12 Dec 2025 12:23:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47E8F3164DB
+	for <netdev@vger.kernel.org>; Fri, 12 Dec 2025 12:27:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765542225; cv=none; b=XlbcLckGEy7IVHmfHOV+VKbf7A0cIklFrRHvBLxy60SzdalM5+lcHpTHRliGZw2lFwUK97fNFbw0kTuunLAyBwVZTVOjh95A272hV8j+J5fMRTjFrNgQ04WEF9fO5o108ZRI6+Fmt8nwiJiBL8h15GrMXtyd63FTlsXY67xqMiE=
+	t=1765542427; cv=none; b=Xb44/4wmZa9PpDnF/7KX28BSydAJ7n4bQ2rfXxapdAKfT/RPafTjefjoY+JDftso71sFxh5alMViWGrrVAtfn75s8dDWMHlYWEuKy2sBWtxJ+uE/+SqGFFSwhEVVItFW1UhtFWvwGSSFY6Ss4FgT6cRXqq4TVWhjt054/JXLIJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765542225; c=relaxed/simple;
-	bh=RZIgm8HY1YD/cocv1qXh9Jr0qfsgGPfivLRvEKFDQdc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=k/M1vikLR5InCr8jBXDtYskxFs9cmawPSkktOhMFET4z5OW/PQGAnzOSCLcmc5TvHJxoGAmL1UYVOtXqu0rrWUGtVZUtFxs4Gf0Z8t0cwQasQ1K6rHBq0AC9FkqQ6+i0gInmC9d1JsOyTfMppj73/DR0yiRH48ifHMl4YGIdcqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=N3oXfel6; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BBNS59p3755296;
-	Fri, 12 Dec 2025 04:23:36 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=3
-	/3sCamQhiE5u0bnwAImbrTbT2uQHqoAQ6K3CnEqTDI=; b=N3oXfel6NNsqAzOuP
-	KiCXyHwWtrySTFkEA0vfLGwbrzzAYf1Ic8idDddpYXxw0IB3o69PtelfsmOSnt7a
-	Baz+mwNzoUyOXRKmgae1An9AeX7eZhVA2ItCmKongwakB1eE5S63YuA/GSwHgCuC
-	f6L11QTzM8VxJnXR85zhIys4naaQwPWYjXS+up5dxuEs++SZkkOUX8BW/HJ/h6Kj
-	E0tRaVNR35HwtJb1jdTUYichymWPBgbOMju7I3l6lTMS5zeRa81Gzbr8ugm2OuIy
-	IP5D/Plsxy6+aPJIwkjCYPIBsbMRqigZ56QWQ4vBg4Sytzskkig9D7kC4aqeHlka
-	PxlMg==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4b07nfsb88-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 12 Dec 2025 04:23:35 -0800 (PST)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Fri, 12 Dec 2025 04:23:48 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Fri, 12 Dec 2025 04:23:48 -0800
-Received: from sapphire1.sclab.marvell.com (unknown [10.111.132.245])
-	by maili.marvell.com (Postfix) with ESMTP id 039843F7088;
-	Fri, 12 Dec 2025 04:23:33 -0800 (PST)
-From: Vimlesh Kumar <vimleshk@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <sedara@marvell.com>, <srasheed@marvell.com>, <hgani@marvell.com>,
-        "Vimlesh Kumar" <vimleshk@marvell.com>,
-        Veerasenareddy Burru
-	<vburru@marvell.com>,
-        Satananda Burla <sburla@marvell.com>,
-        Andrew Lunn
-	<andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>
-Subject: [PATCH net v1 3/3] octeon_ep_vf: ensure dbell BADDR updation
-Date: Fri, 12 Dec 2025 12:23:02 +0000
-Message-ID: <20251212122304.2562229-4-vimleshk@marvell.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251212122304.2562229-1-vimleshk@marvell.com>
-References: <20251212122304.2562229-1-vimleshk@marvell.com>
+	s=arc-20240116; t=1765542427; c=relaxed/simple;
+	bh=arpZlHgTP/Q2XHdUgjjUMg9eCk7R5xCuBgD64udECtM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IjCDLBmTYRMLd8VLIL2tIFeiOEYMhWhHXjZtnCLWo1kWvPqqZBmMJov+E/yEHt8QctSw52G3hh6xzbyqMHZ9pthZnNwqFRCrrqm/AANsixn7qSFA/dZEBjfR44jyNcYYm2TceUChpBAW7te6uLjbVbuQyyp1NHzH6SPXP4n/9Dw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HTBz9cs1; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=lEGzlNF5; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1765542424;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=L/arTEPx+inQ9VeH2LUAllPPM58s2xpZHbogC2hjw54=;
+	b=HTBz9cs1qTuhx+d4AiohJI3TB/i8ihZYVd9Lpz3iGmDXzoJy5e4eJH+F6d8q6x7NR+8VD8
+	4nGbSpN8S0Y0NbFK5WiK/TeFC6EdC0K56m1YbymRFLiahgarOVZEXTYJye7p0sZVIwgDZt
+	+yZRFj47tQcVwBFFctEhcpbGzZ2Uql0=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-323-pNHaMQWoME6bW1kidRa9nQ-1; Fri, 12 Dec 2025 07:27:02 -0500
+X-MC-Unique: pNHaMQWoME6bW1kidRa9nQ-1
+X-Mimecast-MFC-AGG-ID: pNHaMQWoME6bW1kidRa9nQ_1765542421
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-b79f6dcde96so338462666b.2
+        for <netdev@vger.kernel.org>; Fri, 12 Dec 2025 04:27:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1765542421; x=1766147221; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=L/arTEPx+inQ9VeH2LUAllPPM58s2xpZHbogC2hjw54=;
+        b=lEGzlNF5cayoMdKbULUEBdVlSfh9P/IGjoOhuJq/slfWpsCyZBbLfsvFFssmGFpzas
+         YUGAtM6xikqYbPaGImxgUcfJqp2GYIxKo9h0GN+/+c8U9dpQSYXV4oRKUFnZ6mTAs/GQ
+         sqMYM5aViyzqJfxWQG5ywetrpedgxoVkoUYhx820uvfDyZ2cCmRdTk/ZoO4+gDFPB1hS
+         m3NzjLpU3Qd3cDFgirXTJYIMZ9M4IZPlsEBDIrLOlvfNDsrNWj7cNWrL/KcqHAXmo8LV
+         SEfHWscvSj965wIEavYSQFFPRZF6SOeYgm3GtAV1B+RTMm9tQT6jGQSzIKUVtYxOlOS0
+         5sTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765542421; x=1766147221;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=L/arTEPx+inQ9VeH2LUAllPPM58s2xpZHbogC2hjw54=;
+        b=viZtBUknMmBJv0ay4bL8uyvrg6yXUFe8XH06RkRk9HosWpfM99Nuszb/e2e4dWxxGh
+         AqN52FjaCDxZIZIkb79+WJydpJxgXub7OW+Zfi+zt+00ymYkR1ua8iuWDcSLIQu4oFwK
+         3btaixyN0ghqD8a6k0SXHMjsoSubkkxtQ95L6+81sd+/zJ+THOwYWrTOpwUQWIuqVOal
+         CYl00d44qHEn5kWffW2px9/kIu4/Nnwj9wvbYnfmJB8OLNdoQvh+Pf7M/chV074BWlfK
+         OOlxolF7Y2vC/irbAgA5wW6rmW3lV3UXYIkPcMTmvpoERaAqIb0tl5NXhVxl6cUP2vBu
+         Ek4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXfdweQPX9ug0OOjPu0TCU6LagxgQSdkG46RWJJcxAn1oS4grfCaHqWKGSeg3Mk+jEs/YzxQsQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBkkYljOSCVibhh4Kfx9CCpeyjfCjC6JxCQX2VbNcyM0UPf4L3
+	D9XtsycJYIQIB87hx4Zd7TJxXDCy4gP4Nxhcx2/RRHbf8WHjl+xgEwiTAc6lJiCZ96Xznm7uM8C
+	sr5sCMq9WkJQZZRFkVOo75PHhHk3Az06HE14YiLLdxRRB6mU3VCps9Zql5g==
+X-Gm-Gg: AY/fxX45jeEZGsLBt4xeactjiwxfyvXEQlUDzBQ+1rVmRFkszO8JY6Co6klwD9BArYV
+	igrAmSE1avyxBjeyS1Zfz0kjYCHwmrmu9O8UayevITUWxv37Yp1/rXJdlQLxW1Eu1bKTFWnby6I
+	sajxO9zV9hPAeo1IPy3FLS4Lo9cxNVUWvhM5GT1Yc8iAPrgQUAkwd8mwICHDwxrjRW6rXa8CatP
+	cSnPwHvRBY0Fxjzo2XIRRFhXXXlq5XeqrDasxsOA00wAaBFJz0evnihZMYGQTP3eNGMjPdbXTF/
+	4cspE2PSlSspoto+Vu1qCa7fZiX2GIjiXP8+Tiea0L0NLsiQFNUi4WHXqScoguqR+Bu9fg25YsK
+	jYX9rzk38xiSusRRBxZIAYoTpYtgX1X8F2+Y+3hdL9or1S1HTCAMWJGhrAeEqTQ==
+X-Received: by 2002:a17:907:7f23:b0:b73:3e15:a370 with SMTP id a640c23a62f3a-b7d23d0519emr166949266b.57.1765542421330;
+        Fri, 12 Dec 2025 04:27:01 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHJ8k95XyEgRKLOlMYKPgD8ZmrsPj3lizzCfh8rKYc1FUcJTIMFHxjLZLBoQTYJNZQdaPwGmw==
+X-Received: by 2002:a17:907:7f23:b0:b73:3e15:a370 with SMTP id a640c23a62f3a-b7d23d0519emr166946666b.57.1765542420793;
+        Fri, 12 Dec 2025 04:27:00 -0800 (PST)
+Received: from sgarzare-redhat (host-87-12-25-233.business.telecomitalia.it. [87.12.25.233])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7cf9f38778sm570646266b.0.2025.12.12.04.26.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Dec 2025 04:27:00 -0800 (PST)
+Date: Fri, 12 Dec 2025 13:26:44 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Melbin K Mathew <mlbnkm1@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, stefanha@redhat.com, 
+	kvm@vger.kernel.org, netdev@vger.kernel.org, virtualization@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, jasowang@redhat.com, xuanzhuo@linux.alibaba.com, 
+	eperezma@redhat.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org
+Subject: Re: [PATCH net v3] vsock/virtio: cap TX credit to local buffer size
+Message-ID: <tandvvk6vas3kgqjuo6w3aagqai246qxejfnzhkbvbxds3w4y6@umqvf7f3m5ie>
+References: <20251211125104.375020-1-mlbnkm1@gmail.com>
+ <20251211080251-mutt-send-email-mst@kernel.org>
+ <zlhixzduyindq24osaedkt2xnukmatwhugfkqmaugvor6wlcol@56jsodxn4rhi>
+ <CAMKc4jDpMsk1TtSN-GPLM1M_qp_jpoE1XL1g5qXRUiB-M0BPgQ@mail.gmail.com>
+ <CAGxU2F7WOLs7bDJao-7Qd=GOqj_tOmS+EptviMphGqSrgsadqg@mail.gmail.com>
+ <CAMKc4jDLdcGsL5_d+4CP6n-57s-R0vzrX2M7Ni=1GeCB1cxVYA@mail.gmail.com>
+ <bwmol6raorw233ryb3dleh4meaui5vbe7no53boixckl3wgclz@s6grefw5dqen>
+ <deccf66c-dcd3-4187-9fb6-43ddf7d0a905@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: SMBZumO5rdAjs1FlWfITfJVpJrNiYvup
-X-Authority-Analysis: v=2.4 cv=QtZTHFyd c=1 sm=1 tr=0 ts=693c0948 cx=c_pps
- a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
- a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=M5GUcnROAAAA:8
- a=9s7rcsES4n5jIWhP9eIA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjEyMDA5NiBTYWx0ZWRfX9t5YTyDPmd0Z
- K+KDiM36fsX1cbSmMIfyKYi903ohmq5A7XiI6CJh59BAYyGqSOF+w8L4+bR6YgDO1GVHhHoL6/l
- 3awDUsww7IH6V6EggmHg3Z58f7A/hVfYg3SioUJ28jglr7t+G18sNgH7GBt9DeKTRnhkblgjZuW
- DF4+Xi61g/67rCm12vVFsPe9B1d7ft0P7kTgEq7EUyY1bSOCqxjamETqg9ARqW4a7hCiNsPnwh2
- Z48fmMj/uO9+OGzlb6Dex1TVW7Vb1vQaBJV32gVEpEDoYi/Aedx0v9mAbbOjM5DhrcI7nggAQxK
- agCqcbK1WVggOVHjjWDh+peOiQqAv4N7ufYGe8RRyfkScfLLybPlP7E5nSxU/a60Tv8AEfmCcLt
- ymTtmrIduODRoFgxae40Hkd9tjzbGw==
-X-Proofpoint-ORIG-GUID: SMBZumO5rdAjs1FlWfITfJVpJrNiYvup
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-12_03,2025-12-11_01,2025-10-01_01
+In-Reply-To: <deccf66c-dcd3-4187-9fb6-43ddf7d0a905@gmail.com>
 
-Make sure the OUT DBELL base address reflects the
-latest values written to it.
+On Fri, Dec 12, 2025 at 11:40:03AM +0000, Melbin K Mathew wrote:
+>
+>
+>On 12/12/2025 10:40, Stefano Garzarella wrote:
+>>On Fri, Dec 12, 2025 at 09:56:28AM +0000, Melbin Mathew Antony wrote:
+>>>Hi Stefano, Michael,
+>>>
+>>>Thanks for the suggestions and guidance.
+>>
+>>You're welcome, but please avoid top-posting in the future:
+>>https://www.kernel.org/doc/html/latest/process/submitting- 
+>>patches.html#use-trimmed-interleaved-replies-in-email-discussions
+>>
+>Sure. Thanks
+>>>
+>>>I’ve drafted a 4-part series based on the recap. I’ve included the
+>>>four diffs below for discussion. Can wait for comments, iterate, and
+>>>then send the patch series in a few days.
+>>>
+>>>---
+>>>
+>>>Patch 1/4 — vsock/virtio: make get_credit() s64-safe and clamp negatives
+>>>
+>>>virtio_transport_get_credit() was doing unsigned arithmetic; if the
+>>>peer shrinks its window, the subtraction can underflow and look like
+>>>“lots of credit”. This makes it compute “space” in s64 and clamp < 0
+>>>to 0.
+>>>
+>>>diff --git a/net/vmw_vsock/virtio_transport_common.c
+>>>b/net/vmw_vsock/virtio_transport_common.c
+>>>--- a/net/vmw_vsock/virtio_transport_common.c
+>>>+++ b/net/vmw_vsock/virtio_transport_common.c
+>>>@@ -494,16 +494,23 @@ 
+>>>EXPORT_SYMBOL_GPL(virtio_transport_consume_skb_sent);
+>>>u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 
+>>>credit)
+>>>{
+>>>+ s64 bytes;
+>>> u32 ret;
+>>>
+>>> if (!credit)
+>>> return 0;
+>>>
+>>> spin_lock_bh(&vvs->tx_lock);
+>>>- ret = vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
+>>>- if (ret > credit)
+>>>- ret = credit;
+>>>+ bytes = (s64)vvs->peer_buf_alloc -
+>>
+>>Why not just calling virtio_transport_has_space()?
+>virtio_transport_has_space() takes struct vsock_sock *, while 
+>virtio_transport_get_credit() takes struct virtio_vsock_sock *, so I 
+>cannot directly call has_space() from get_credit() without changing 
+>signatures.
+>
+>Would you be OK if I factor the common “space” calculation into a 
+>small helper that operates on struct virtio_vsock_sock * and is used 
+>by both paths? Something like:
 
-Fix:
-Add a wait until the OUT DBELL base address register
-is updated with the DMA ring descriptor address,
-and modify the setup_oq function to properly
-handle failures.
+Why not just change the signature of virtio_transport_has_space()?
 
-Fixes: 2c0c32c72be29 ("octeon_ep_vf: add hardware configuration APIs")
-Signed-off-by: Sathesh Edara <sedara@marvell.com>
-Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
-Signed-off-by: Vimlesh Kumar <vimleshk@marvell.com>
----
- .../marvell/octeon_ep_vf/octep_vf_cn9k.c      |  3 ++-
- .../marvell/octeon_ep_vf/octep_vf_cnxk.c      | 25 ++++++++++++++++---
- .../marvell/octeon_ep_vf/octep_vf_main.h      |  6 ++++-
- .../marvell/octeon_ep_vf/octep_vf_rx.c        |  4 ++-
- 4 files changed, 32 insertions(+), 6 deletions(-)
+Thanks,
+Stefano
 
-diff --git a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_cn9k.c b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_cn9k.c
-index 88937fce75f1..4c769b27c278 100644
---- a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_cn9k.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_cn9k.c
-@@ -196,7 +196,7 @@ static void octep_vf_setup_iq_regs_cn93(struct octep_vf_device *oct, int iq_no)
- }
- 
- /* Setup registers for a hardware Rx Queue  */
--static void octep_vf_setup_oq_regs_cn93(struct octep_vf_device *oct, int oq_no)
-+static int octep_vf_setup_oq_regs_cn93(struct octep_vf_device *oct, int oq_no)
- {
- 	struct octep_vf_oq *oq = oct->oq[oq_no];
- 	u32 time_threshold = 0;
-@@ -239,6 +239,7 @@ static void octep_vf_setup_oq_regs_cn93(struct octep_vf_device *oct, int oq_no)
- 	time_threshold = CFG_GET_OQ_INTR_TIME(oct->conf);
- 	reg_val = ((u64)time_threshold << 32) | CFG_GET_OQ_INTR_PKT(oct->conf);
- 	octep_vf_write_csr64(oct, CN93_VF_SDP_R_OUT_INT_LEVELS(oq_no), reg_val);
-+	return 0;
- }
- 
- /* Setup registers for a VF mailbox */
-diff --git a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_cnxk.c b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_cnxk.c
-index 1f79dfad42c6..30dc09205446 100644
---- a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_cnxk.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_cnxk.c
-@@ -199,11 +199,12 @@ static void octep_vf_setup_iq_regs_cnxk(struct octep_vf_device *oct, int iq_no)
- }
- 
- /* Setup registers for a hardware Rx Queue  */
--static void octep_vf_setup_oq_regs_cnxk(struct octep_vf_device *oct, int oq_no)
-+static int octep_vf_setup_oq_regs_cnxk(struct octep_vf_device *oct, int oq_no)
- {
- 	struct octep_vf_oq *oq = oct->oq[oq_no];
- 	u32 time_threshold = 0;
- 	u64 oq_ctl = ULL(0);
-+	u64 reg_ba_val;
- 	u64 reg_val;
- 
- 	reg_val = octep_vf_read_csr64(oct, CNXK_VF_SDP_R_OUT_CONTROL(oq_no));
-@@ -214,6 +215,25 @@ static void octep_vf_setup_oq_regs_cnxk(struct octep_vf_device *oct, int oq_no)
- 			reg_val = octep_vf_read_csr64(oct, CNXK_VF_SDP_R_OUT_CONTROL(oq_no));
- 		} while (!(reg_val & CNXK_VF_R_OUT_CTL_IDLE));
- 	}
-+	octep_vf_write_csr64(oct, CNXK_VF_SDP_R_OUT_WMARK(oq_no),  oq->max_count);
-+	/* Wait for WMARK to get applied */
-+	usleep_range(10, 15);
-+
-+	octep_vf_write_csr64(oct, CNXK_VF_SDP_R_OUT_SLIST_BADDR(oq_no), oq->desc_ring_dma);
-+	octep_vf_write_csr64(oct, CNXK_VF_SDP_R_OUT_SLIST_RSIZE(oq_no), oq->max_count);
-+	reg_ba_val = octep_vf_read_csr64(oct, CNXK_VF_SDP_R_OUT_SLIST_BADDR(oq_no));
-+	if (reg_ba_val != oq->desc_ring_dma) {
-+		do {
-+			if (reg_ba_val == UINT64_MAX)
-+				return -1;
-+			octep_vf_write_csr64(oct, CNXK_VF_SDP_R_OUT_SLIST_BADDR(oq_no),
-+					     oq->desc_ring_dma);
-+			octep_vf_write_csr64(oct, CNXK_VF_SDP_R_OUT_SLIST_RSIZE(oq_no),
-+					     oq->max_count);
-+			reg_ba_val = octep_vf_read_csr64(oct,
-+							 CNXK_VF_SDP_R_OUT_SLIST_BADDR(oq_no));
-+		} while (reg_ba_val != oq->desc_ring_dma);
-+	}
- 
- 	reg_val &= ~(CNXK_VF_R_OUT_CTL_IMODE);
- 	reg_val &= ~(CNXK_VF_R_OUT_CTL_ROR_P);
-@@ -227,8 +247,6 @@ static void octep_vf_setup_oq_regs_cnxk(struct octep_vf_device *oct, int oq_no)
- 	reg_val |= (CNXK_VF_R_OUT_CTL_ES_P);
- 
- 	octep_vf_write_csr64(oct, CNXK_VF_SDP_R_OUT_CONTROL(oq_no), reg_val);
--	octep_vf_write_csr64(oct, CNXK_VF_SDP_R_OUT_SLIST_BADDR(oq_no), oq->desc_ring_dma);
--	octep_vf_write_csr64(oct, CNXK_VF_SDP_R_OUT_SLIST_RSIZE(oq_no), oq->max_count);
- 
- 	oq_ctl = octep_vf_read_csr64(oct, CNXK_VF_SDP_R_OUT_CONTROL(oq_no));
- 	/* Clear the ISIZE and BSIZE (22-0) */
-@@ -250,6 +268,7 @@ static void octep_vf_setup_oq_regs_cnxk(struct octep_vf_device *oct, int oq_no)
- 	reg_val &= ~GENMASK_ULL(31, 0);
- 	reg_val |= CFG_GET_OQ_WMARK(oct->conf);
- 	octep_vf_write_csr64(oct, CNXK_VF_SDP_R_OUT_WMARK(oq_no), reg_val);
-+	return 0;
- }
- 
- /* Setup registers for a VF mailbox */
-diff --git a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.h b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.h
-index b9f13506f462..65454d875677 100644
---- a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.h
-@@ -40,6 +40,10 @@
- 				  (iq_)->max_count - IQ_INSTR_PENDING(iq_); \
- 				})
- 
-+#ifndef UINT64_MAX
-+#define UINT64_MAX ((u64)(~((u64)0)))        /* 0xFFFFFFFFFFFFFFFF */
-+#endif
-+
- /* PCI address space mapping information.
-  * Each of the 3 address spaces given by BAR0, BAR2 and BAR4 of
-  * Octeon gets mapped to different physical address spaces in
-@@ -55,7 +59,7 @@ struct octep_vf_mmio {
- 
- struct octep_vf_hw_ops {
- 	void (*setup_iq_regs)(struct octep_vf_device *oct, int q);
--	void (*setup_oq_regs)(struct octep_vf_device *oct, int q);
-+	int (*setup_oq_regs)(struct octep_vf_device *oct, int q);
- 	void (*setup_mbox_regs)(struct octep_vf_device *oct, int mbox);
- 
- 	irqreturn_t (*non_ioq_intr_handler)(void *ioq_vector);
-diff --git a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c
-index d70c8be3cfc4..6446f6bf0b90 100644
---- a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c
-@@ -171,7 +171,9 @@ static int octep_vf_setup_oq(struct octep_vf_device *oct, int q_no)
- 		goto oq_fill_buff_err;
- 
- 	octep_vf_oq_reset_indices(oq);
--	oct->hw_ops.setup_oq_regs(oct, q_no);
-+	if (oct->hw_ops.setup_oq_regs(oct, q_no))
-+		goto oq_fill_buff_err;
-+
- 	oct->num_oqs++;
- 
- 	return 0;
--- 
-2.47.0
+>
+>/* Must be called with vvs->tx_lock held. Returns >= 0. */
+>static s64 virtio_transport_tx_space(struct virtio_vsock_sock *vvs)
+>{
+>	s64 bytes;
+>
+>	bytes = (s64)vvs->peer_buf_alloc -
+>		((s64)vvs->tx_cnt - (s64)vvs->peer_fwd_cnt);
+>	if (bytes < 0)
+>		bytes = 0;
+>
+>	return bytes;
+>}
+>
+>Then:
+>
+>get_credit() would do bytes = virtio_transport_tx_space(vvs); ret = 
+>min_t(u32, credit, (u32)bytes);
+>
+>has_space() would use the same helper after obtaining vvs = vsk->trans;
+>
+>Does that match what you had in mind, or would you prefer a different 
+>factoring?
+>
+>>
+>>>+ ((s64)vvs->tx_cnt - (s64)vvs->peer_fwd_cnt);
+>>>+ if (bytes < 0)
+>>>+ bytes = 0;
+>>>+
+>>>+ ret = min_t(u32, credit, (u32)bytes);
+>>> vvs->tx_cnt += ret;
+>>> vvs->bytes_unsent += ret;
+>>> spin_unlock_bh(&vvs->tx_lock);
+>>>
+>>> return ret;
+>>>}
+>>>
+>>>
+>>>---
+>>>
+>>>Patch 2/4 — vsock/virtio: cap TX window by local buffer (helper + use
+>>>everywhere in TX path)
+>>>
+>>>Cap the effective advertised window to min(peer_buf_alloc, buf_alloc)
+>>>and use it consistently in TX paths (get_credit, has_space,
+>>>seqpacket_enqueue).
+>>>
+>>>diff --git a/net/vmw_vsock/virtio_transport_common.c
+>>>b/net/vmw_vsock/virtio_transport_common.c
+>>>--- a/net/vmw_vsock/virtio_transport_common.c
+>>>+++ b/net/vmw_vsock/virtio_transport_common.c
+>>>@@ -491,6 +491,16 @@ void virtio_transport_consume_skb_sent(struct
+>>>sk_buff *skb, bool consume)
+>>>}
+>>>EXPORT_SYMBOL_GPL(virtio_transport_consume_skb_sent);
+>>>+/* Return the effective peer buffer size for TX credit computation.
+>>>+ *
+>>>+ * The peer advertises its receive buffer via peer_buf_alloc, but 
+>>>we cap it
+>>>+ * to our local buf_alloc (derived from SO_VM_SOCKETS_BUFFER_SIZE and
+>>>+ * already clamped to buffer_max_size).
+>>>+ */
+>>>+static u32 virtio_transport_tx_buf_alloc(struct virtio_vsock_sock *vvs)
+>>>+{
+>>>+ return min(vvs->peer_buf_alloc, vvs->buf_alloc);
+>>>+}
+>>>
+>>>u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 
+>>>credit)
+>>>{
+>>> s64 bytes;
+>>>@@ -502,7 +512,8 @@ u32 virtio_transport_get_credit(struct
+>>>virtio_vsock_sock *vvs, u32 credit)
+>>> return 0;
+>>>
+>>> spin_lock_bh(&vvs->tx_lock);
+>>>- bytes = (s64)vvs->peer_buf_alloc -
+>>>+ bytes = (s64)virtio_transport_tx_buf_alloc(vvs) -
+>>> ((s64)vvs->tx_cnt - (s64)vvs->peer_fwd_cnt);
+>>> if (bytes < 0)
+>>> bytes = 0;
+>>>@@ -834,7 +845,7 @@ virtio_transport_seqpacket_enqueue(struct 
+>>>vsock_sock *vsk,
+>>> spin_lock_bh(&vvs->tx_lock);
+>>>
+>>>- if (len > vvs->peer_buf_alloc) {
+>>>+ if (len > virtio_transport_tx_buf_alloc(vvs)) {
+>>> spin_unlock_bh(&vvs->tx_lock);
+>>> return -EMSGSIZE;
+>>> }
+>>>@@ -884,7 +895,8 @@ static s64 virtio_transport_has_space(struct
+>>>vsock_sock *vsk)
+>>> struct virtio_vsock_sock *vvs = vsk->trans;
+>>> s64 bytes;
+>>>
+>>>- bytes = (s64)vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
+>>>+ bytes = (s64)virtio_transport_tx_buf_alloc(vvs) -
+>>>+ ((s64)vvs->tx_cnt - (s64)vvs->peer_fwd_cnt);
+>>> if (bytes < 0)
+>>> bytes = 0;
+>>>
+>>> return bytes;
+>>>}
+>>>
+>>>
+>>>---
+>>>
+>>>Patch 3/4 — vsock/test: fix seqpacket msg bounds test (set client 
+>>>buf too)
+>>
+>>Please just include in the series the patch I sent to you.
+>>
+>Thanks. I'll use your vsock_test.c patch as-is for 3/4
+>>>
+>>>After fixing TX credit bounds, the client can fill its TX window and
+>>>block before it wakes the server. Setting the buffer on the client
+>>>makes the test deterministic again.
+>>>
+>>>diff --git a/tools/testing/vsock/vsock_test.c 
+>>>b/tools/testing/vsock/ vsock_test.c
+>>>--- a/tools/testing/vsock/vsock_test.c
+>>>+++ b/tools/testing/vsock/vsock_test.c
+>>>@@ -353,6 +353,7 @@ static void test_stream_msg_peek_server(const
+>>>struct test_opts *opts)
+>>>
+>>>static void test_seqpacket_msg_bounds_client(const struct 
+>>>test_opts *opts)
+>>>{
+>>>+ unsigned long long sock_buf_size;
+>>> unsigned long curr_hash;
+>>> size_t max_msg_size;
+>>> int page_size;
+>>>@@ -366,6 +367,18 @@ static void
+>>>test_seqpacket_msg_bounds_client(const struct test_opts *opts)
+>>> exit(EXIT_FAILURE);
+>>> }
+>>>
+>>>+ sock_buf_size = SOCK_BUF_SIZE;
+>>>+
+>>>+ setsockopt_ull_check(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_MAX_SIZE,
+>>>+    sock_buf_size,
+>>>+    "setsockopt(SO_VM_SOCKETS_BUFFER_MAX_SIZE)");
+>>>+
+>>>+ setsockopt_ull_check(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_SIZE,
+>>>+    sock_buf_size,
+>>>+    "setsockopt(SO_VM_SOCKETS_BUFFER_SIZE)");
+>>>+
+>>> /* Wait, until receiver sets buffer size. */
+>>> control_expectln("SRVREADY");
+>>>
+>>>
+>>>---
+>>>
+>>>Patch 4/4 — vsock/test: add stream TX credit bounds regression test
+>>>
+>>>This directly guards the original failure mode for stream sockets: if
+>>>the peer advertises a large window but the sender’s local policy is
+>>>small, the sender must stall quickly (hit EAGAIN in nonblocking mode)
+>>>rather than queueing megabytes.
+>>
+>>Yeah, using nonblocking mode LGTM!
+>>
+>>>
+>>>diff --git a/tools/testing/vsock/vsock_test.c 
+>>>b/tools/testing/vsock/ vsock_test.c
+>>>--- a/tools/testing/vsock/vsock_test.c
+>>>+++ b/tools/testing/vsock/vsock_test.c
+>>>@@ -349,6 +349,7 @@
+>>>#define SOCK_BUF_SIZE (2 * 1024 * 1024)
+>>>+#define SMALL_SOCK_BUF_SIZE (64 * 1024ULL)
+>>>#define MAX_MSG_PAGES 4
+>>>
+>>>/* Insert new test functions after test_stream_msg_peek_server, before
+>>> * test_seqpacket_msg_bounds_client (around line 352) */
+>>>
+>>>+static void test_stream_tx_credit_bounds_client(const struct 
+>>>test_opts *opts)
+>>>+{
+>>>+ ... /* full function as provided */
+>>>+}
+>>>+
+>>>+static void test_stream_tx_credit_bounds_server(const struct 
+>>>test_opts *opts)
+>>>+{
+>>>+ ... /* full function as provided */
+>>>+}
+>>>
+>>>@@ -2224,6 +2305,10 @@
+>>> .run_client = test_stream_msg_peek_client,
+>>> .run_server = test_stream_msg_peek_server,
+>>> },
+>>>+ {
+>>>+ .name = "SOCK_STREAM TX credit bounds",
+>>>+ .run_client = test_stream_tx_credit_bounds_client,
+>>>+ .run_server = test_stream_tx_credit_bounds_server,
+>>>+ },
+>>
+>>Please put it at the bottom. Tests are skipped by index, so we don't 
+>>want to change index of old tests.
+>>
+>>Please fix your editor, those diffs are hard to read without tabs/spaces.
+>seems like some issue with my email client. Hope it is okay now
+>>
+>>Thanks,
+>>Stefano
+>>
+>
 
 
