@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-244509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88981CB93A1
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 17:07:48 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D556CB93BF
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 17:13:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 087B6303FE66
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 16:07:30 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 543D9301005B
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 16:13:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA2C723B609;
-	Fri, 12 Dec 2025 16:07:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4285A2566F5;
+	Fri, 12 Dec 2025 16:13:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C8wGMSzP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DUM0CnA0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0A4144C8F;
-	Fri, 12 Dec 2025 16:07:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 189E423AB98;
+	Fri, 12 Dec 2025 16:13:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765555647; cv=none; b=tZlby216ieqcPAfWa4NKQyppPChBm9eNdh7x8Nros4DYIR2X6OZ1Ksz9bFETdIIj5w1P3QHW65haBspYyc50uHD9nLyrZFX1XOBuEIpGjJYCi6Q4BTwihvquDvIEIDcmcXuuR/dbf+JTvJMQQXjuWFhWe49Y/wN9R5CoI+nQNyk=
+	t=1765555998; cv=none; b=LO1skQZzb91rqKGvo5eRiTgLWe47/JmiWKIAggLEThc+WyfacYgLtjyforjgoB9jetdA5CP8AHCrHHcdEfckc7Uh21ylkHO/gt1kvf966c8KUa1mpUbzRyZSLzoHkBpudwfrrDprqbTmZ3ZYjvjQAGCi0ZGQrRa1mHpF9wYneEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765555647; c=relaxed/simple;
-	bh=MKQzlstlg1IG9jT2vvHFof/BP3rK+NlYQDP9+HgmlMo=;
+	s=arc-20240116; t=1765555998; c=relaxed/simple;
+	bh=W+IUPDO4jVl5AWP3w1yWONE38/ov8bvq8js6MKveMrM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pAKH6wFtyx3wdEOdfDIN9QZ1Y89sFVDZlrGRCHBIby8wCf+/kjZmolZSptWqAPmv0p5b0kNFTloLZFhxOjRElGJ9SpZRXme40bOKNitTEVCDWahlXNA2kjJUYWTNHspGAgu8HglfOuNkZb0oubr/eISdnqMsc4U4IRZsurcVIu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C8wGMSzP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBD63C4CEF1;
-	Fri, 12 Dec 2025 16:07:24 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=kPvSEfyo4kILfqz1zOhzBEJVz+h/6a962amWEHybspBOSBBMAMHgvbaUo+RwAGf3PiAOXIfYoCFBkS1GO83pguaGigAGkmm0Xh8RvvOinLqBg93bI74k3PucZe3j8AxxJWHoPtx9/r6E1Tw2gy6vSSVVxXpRlEN/OEwygKwfxg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DUM0CnA0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1D8EC4CEF1;
+	Fri, 12 Dec 2025 16:13:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765555647;
-	bh=MKQzlstlg1IG9jT2vvHFof/BP3rK+NlYQDP9+HgmlMo=;
+	s=k20201202; t=1765555997;
+	bh=W+IUPDO4jVl5AWP3w1yWONE38/ov8bvq8js6MKveMrM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=C8wGMSzPahxtNs76VBRkZMG5ec+PS3tl/jL1D3q58AHFKt4nz7yuJR4Q65K9rbj/o
-	 5+l23R6kS+bagDxMaHNDDHhjcOw6FjjMAkXn281hGO9XNvjet3Wy2wMHRrRsGZcjCe
-	 cTHIgaH5WUw7xH45g3BLD6igB3AEg24IUl/AuhuTDH99A4/5zQkA9lAne51xfXYPb5
-	 2gjlW3LiAQAHPd6zIord91qR1079b4LeeaYo6DoWdQCHskWuWb4xhkyjxXNjr1uvWW
-	 UGAx3qm/nHph1mEun9fCy3Vn6FWJaQ7XI2foXdpi8LDIM0pvIYn39kr7BWw6gQ3Lyn
-	 SihtzhrBru5mA==
-Date: Fri, 12 Dec 2025 16:07:22 +0000
+	b=DUM0CnA0Nq8DSh6E1grP+RDv3dqRQdn68Uan1fuS8zVYENWsAnxRMSCiZmOy47ufc
+	 UYN7jicQodtu5/5Cv706B5HWScEkp94fFyyf1Mu8Z51iq8gC2EVVdz+7N7itmkbNGm
+	 qrt4kiGmr8jzofZdGMPvjpgkLr4vIobYYgp0GWgPhXxJoiQmils28AQHtKN/gzuC9S
+	 U5xHaHQN8XxXSY3FjFtERC7z4AyWqwEW3P5VDr9VbGHLR5cgAo1T+tFM1M5A9nHKep
+	 wWGG+cm8j8gC8HJHu2hvjnzGelaSkWsbjZmJHm/8zRQLWdCR/c9eikq56AIwOnqLMT
+	 0nRz1fc/9aOuw==
+Date: Fri, 12 Dec 2025 16:13:12 +0000
 From: Simon Horman <horms@kernel.org>
 To: Vimlesh Kumar <vimleshk@marvell.com>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -48,11 +48,13 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net v1 2/3] octeon_ep: ensure dbell BADDR updation
-Message-ID: <aTw9uutDeFnKDX1d@horms.kernel.org>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Satananda Burla <sburla@marvell.com>,
+	Abhijit Ayarekar <aayarekar@marvell.com>
+Subject: Re: [PATCH net v1 1/3] octeon_ep: disable per ring interrupts
+Message-ID: <aTw_GDbjNAB-AVKS@horms.kernel.org>
 References: <20251212122304.2562229-1-vimleshk@marvell.com>
- <20251212122304.2562229-3-vimleshk@marvell.com>
+ <20251212122304.2562229-2-vimleshk@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,101 +63,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251212122304.2562229-3-vimleshk@marvell.com>
+In-Reply-To: <20251212122304.2562229-2-vimleshk@marvell.com>
 
-On Fri, Dec 12, 2025 at 12:23:01PM +0000, Vimlesh Kumar wrote:
-> Make sure the OUT DBELL base address reflects the
-> latest values written to it.
+On Fri, Dec 12, 2025 at 12:23:00PM +0000, Vimlesh Kumar wrote:
+> Disable the MSI-X per ring interrupt for every PF ring when PF
+> netdev goes down.
 > 
-> Fix:
-> Add a wait until the OUT DBELL base address register
-> is updated with the DMA ring descriptor address,
-> and modify the setup_oq function to properly
-> handle failures.
-> 
-> Fixes: 0807dc76f3bf5("octeon_ep: support Octeon CN10K devices")
-
-Hi Vimlesh,
-
-Thanks for your patch.
-
-Some feedback from my side.
-First, there is a space missing in the Fixes tag:
-
-Fixes: 0807dc76f3bf ("octeon_ep: support Octeon CN10K devices")
-
+> Fixes: 1f2c2d0cee023 ("octeon_ep: add hardware configuration APIs")
 > Signed-off-by: Sathesh Edara <sedara@marvell.com>
 > Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
 > Signed-off-by: Vimlesh Kumar <vimleshk@marvell.com>
-
-...
-
->  /* Setup registers for a PF mailbox */
-> diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_cnxk_pf.c b/drivers/net/ethernet/marvell/octeon_ep/octep_cnxk_pf.c
-
-...
-
-> @@ -343,6 +344,23 @@ static void octep_setup_oq_regs_cnxk_pf(struct octep_device *oct, int oq_no)
->  			reg_val = octep_read_csr64(oct, CNXK_SDP_R_OUT_CONTROL(oq_no));
->  		} while (!(reg_val & CNXK_R_OUT_CTL_IDLE));
->  	}
-> +	octep_write_csr64(oct, CNXK_SDP_R_OUT_WMARK(oq_no),  oq->max_count);
-> +	/* Wait for WMARK to get applied */
-> +	usleep_range(10, 15);
-> +
-> +	octep_write_csr64(oct, CNXK_SDP_R_OUT_SLIST_BADDR(oq_no), oq->desc_ring_dma);
-
-Please line-wrap Networking code to 80 columns wide or less where it can
-be done without reducing readability (which is the case here).
-
-checkpatch.pl --max-line-length=80 should flag this.
-
-> +	octep_write_csr64(oct, CNXK_SDP_R_OUT_SLIST_RSIZE(oq_no), oq->max_count);
-> +	reg_ba_val = octep_read_csr64(oct, CNXK_SDP_R_OUT_SLIST_BADDR(oq_no));
-> +	if (reg_ba_val != oq->desc_ring_dma) {
-> +		do {
-> +			if (reg_ba_val == UINT64_MAX)
-
-I think that ULLONG_MAX here, rather than defining UINT64_MAX
-elsewhere in this patch.
-
-It might be better if the Kernel provided UINT64_MAX and friends.
-But it doesn't. (And I'm sure there are many opinions on why.)
-
-> +				return -1;
-
-This should be a standard error code.
-Perhaps -EFAULT?
-
-> +			octep_write_csr64(oct, CNXK_SDP_R_OUT_SLIST_BADDR(oq_no),
-> +					  oq->desc_ring_dma);
-> +			octep_write_csr64(oct, CNXK_SDP_R_OUT_SLIST_RSIZE(oq_no), oq->max_count);
-> +			reg_ba_val = octep_read_csr64(oct, CNXK_SDP_R_OUT_SLIST_BADDR(oq_no));
-> +		} while (reg_ba_val != oq->desc_ring_dma);
-
-I am concerned that this loop is unbounded.
-Could some limit be placed on it?
-
-...
-
-> diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.h b/drivers/net/ethernet/marvell/octeon_ep/octep_main.h
-> index 81ac4267811c..76622cdf577d 100644
-> --- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.h
-> +++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.h
-> @@ -55,6 +55,10 @@
->  				  (iq_)->max_count - IQ_INSTR_PENDING(iq_); \
->  				})
+> ---
+>  .../net/ethernet/marvell/octeon_ep/octep_cn9k_pf.c   | 12 ++++++++++--
+>  .../net/ethernet/marvell/octeon_ep/octep_cnxk_pf.c   | 12 ++++++++++--
+>  2 files changed, 20 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_cn9k_pf.c b/drivers/net/ethernet/marvell/octeon_ep/octep_cn9k_pf.c
+> index b5805969404f..db8ae1734e1b 100644
+> --- a/drivers/net/ethernet/marvell/octeon_ep/octep_cn9k_pf.c
+> +++ b/drivers/net/ethernet/marvell/octeon_ep/octep_cn9k_pf.c
+> @@ -696,14 +696,22 @@ static void octep_enable_interrupts_cn93_pf(struct octep_device *oct)
+>  /* Disable all interrupts */
+>  static void octep_disable_interrupts_cn93_pf(struct octep_device *oct)
+>  {
+> -	u64 intr_mask = 0ULL;
+> +	u64 reg_val, intr_mask = 0ULL;
+>  	int srn, num_rings, i;
 >  
-> +#ifndef UINT64_MAX
-> +#define UINT64_MAX ((u64)(~((u64)0)))        /* 0xFFFFFFFFFFFFFFFF */
-> +#endif
+>  	srn = CFG_GET_PORTS_PF_SRN(oct->conf);
+>  	num_rings = CFG_GET_PORTS_ACTIVE_IO_RINGS(oct->conf);
+>  
+> -	for (i = 0; i < num_rings; i++)
+> +	for (i = 0; i < num_rings; i++) {
+>  		intr_mask |= (0x1ULL << (srn + i));
+> +		reg_val = octep_read_csr64(oct, CN93_SDP_R_IN_INT_LEVELS(srn + i));
+> +		reg_val &= ~(0x1ULL << 62);
+> +		octep_write_csr64(oct, CN93_SDP_R_IN_INT_LEVELS(srn + i), reg_val);
 > +
->  /* PCI address space mapping information.
->   * Each of the 3 address spaces given by BAR0, BAR2 and BAR4 of
->   * Octeon gets mapped to different physical address spaces in
+> +		reg_val = octep_read_csr64(oct, CN93_SDP_R_OUT_INT_LEVELS(srn + i));
+> +		reg_val &= ~(0x1ULL << 62);
+> +		octep_write_csr64(oct, CN93_SDP_R_OUT_INT_LEVELS(srn + i), reg_val);
+> +	}
+>  
+
+I see that (0x1ULL << 62) is already used in this file.
+So I think that as a fix what you have is fine.
+
+But, as a follow-up, it may be nice to name this bit using a #define,
+and to define it using BIT_ULL().
+
+Likewise, it may be nice to use BIT_ULL() in place of (0x1Ull << ...) elsewhere.
 
 ...
-
--- 
-pw-bot: cr
 
