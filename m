@@ -1,141 +1,109 @@
-Return-Path: <netdev+bounces-244504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15D28CB913C
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 16:13:25 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 640E8CB9152
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 16:18:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 0C5583007CA6
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 15:13:24 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3799E30056CE
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 15:18:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D110830FC1D;
-	Fri, 12 Dec 2025 15:13:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 844782773C3;
+	Fri, 12 Dec 2025 15:18:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IJGsAQ3Q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NAdfjk2r"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A61AF1531F9;
-	Fri, 12 Dec 2025 15:13:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26784224AF7
+	for <netdev@vger.kernel.org>; Fri, 12 Dec 2025 15:17:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765552402; cv=none; b=EA+KH0xvvH5FTEAWHEhln4iQKKP1Y67qP11/CT5cFZ4yEbDUYpslKquWKrjqAmxx5g2P9Mi0iSUMDIwauIfJxrKBRSkzYpeuIKQbLwRqZJGkwMdPRMWzenkyunJ727l6RveDSarNTTO42qOI5g3xsJZRnzY5Tktw/5KoTA+otO8=
+	t=1765552682; cv=none; b=WZjmVT7fe5c4T8NhgL9gcmcun2rUY7kdgjzXlDV5CE2ZCLEKatwg44DyPdRcJc3mZ34Klpfven2RKxrNhwZBnzGImYRuGVkjnBy3QJAMpd22pLH4NvL8QKWR/zbE2ykhWTPR25msB4aSSFi1euacjYtaqiGzj0gmxPztKkQOYHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765552402; c=relaxed/simple;
-	bh=UUNgLmg8kTALS3WP6Kh52zkkNjWHrZxSFvJYZHaby3k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QzhJaSmsUcAOOoaWATftAyI+xjSPN0Qjb3gWkZv6I4U2bgqpEOFChK3WARf4JJ2iu9wopQsdunHvRUuj3sgYLcnAj5hfnlkxf5A3AWZgXFkcZ8mA1iYmwJxl5g77MhF0tsJ1y49gWeUtCqTf5Alvpw/jkeaeosaRIU51591E7w0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IJGsAQ3Q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60DD8C4CEF1;
-	Fri, 12 Dec 2025 15:13:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765552400;
-	bh=UUNgLmg8kTALS3WP6Kh52zkkNjWHrZxSFvJYZHaby3k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IJGsAQ3QQL6QDhTh4c4OkXjCv4prjEVPM8VY2sUGFIWR8lFzhBv7Or2mcHit4attL
-	 ScZh25edONVuyfsIYm2YsdtjTRIY+sGTcoKOpHhR316BBWGZigAk9rfWQWjlA9rRn1
-	 Z7F8btFKV0H62oF31b93KJnCShgUxLEdgKPUL7l1VQai3sYNWEJrJfg7XkwJ4Nsc/u
-	 ICBdMaCUOX335dLMhcJxDPBed+FqcfwSnZMD7w9YMNeHnoVVJEU7TI45ruAn/N15kU
-	 8coH3HF9swN3Z6GIUto7JvjZxuTg/nFsv4+xD4taMZD1s0T1o9pxsuoJcSX4A4JyXO
-	 c7JM5FBnULBnw==
-Date: Fri, 12 Dec 2025 15:13:16 +0000
-From: Simon Horman <horms@kernel.org>
-To: Frode Nordahl <fnordahl@ubuntu.com>
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Gal Pressman <gal@nvidia.com>, Kees Cook <kees@kernel.org>,
-	Cosmin Ratiu <cratiu@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] erspan: Initialize options_len before referencing
- options.
-Message-ID: <aTwxDBODyDmerGAt@horms.kernel.org>
-References: <20251212073202.13153-1-fnordahl@ubuntu.com>
+	s=arc-20240116; t=1765552682; c=relaxed/simple;
+	bh=ZUnJGigN0uay7O/PPWrjrh8k8H36qaMfLReyX7pstCs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pBJPRKJl71hZFozoShOGjCPHAVI5zjO8sbJLBom9FxaF5eHcmhltVEDitF258Q3jLZMwhAkPpj1oelX3Vqqg4xDz2J7Ho1LlkVrMluYhQ8pzPmOKyfWOsSvYf7UWCWGYGEHKARN3C0Nqox/1EC4NID4C7kAnuTyKCcxjWINT3gY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NAdfjk2r; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-34a8a5f3d44so1476539a91.1
+        for <netdev@vger.kernel.org>; Fri, 12 Dec 2025 07:17:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765552679; x=1766157479; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rZZlSe/3yKyozwh1rDWKvHDaKkFzdQL8XOOUdf58mGc=;
+        b=NAdfjk2rHux+L2XjIzij7WgEjqetocn/0bBqCtEoecFmcm0ZseV81gj1pohzXbd2Av
+         Ikab/rT/3fSt72X9eJzLCkMXciq/xKW45juvJaUz6LS7iBynnwszSWRqu9CGrHb+q3TQ
+         aCrZ2iuoWJuDEmXABnkR4oqArzPb2mZPyYYhmjaIWLoZfIoN1/exHfVUhpUxT0sCXMzP
+         Ojq/XBbimYcvvyos0BkJ/vRgVYIjCOFzUZK4WrZriO2WV9Q+P2GChiy3rY0psf4nje+e
+         jd/UBLPuol5M8I6JkpFvMmtfsmq3imfq1G2kMOLjnLaf1ywwgIyBx6ZngQRcc+hbvW5C
+         RfLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765552679; x=1766157479;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rZZlSe/3yKyozwh1rDWKvHDaKkFzdQL8XOOUdf58mGc=;
+        b=t9NM6WIDwGD26T05XGKSgSDbGb1hW0hlK5eW9axBBFUyc57asdhU6BWAA9mfRMfNIo
+         CHk2qcVGyTqKV3dEVWONToVn6rWwZQ3NA1Hxfa4XjlmkatuWDlFnMY2UHTl7pyj/8sc7
+         CfYrnzHcOoBCrgW1X0Oyud1ybNgoSesLN2+CuYm6Lhao4c1YYXM5Acu3pqUUdd252tDn
+         90v01irFwIbh5zPRv8HnDZB9PTgfLacFmjfP3DKMdYgnsP8IxBazSRVRDrvv1vATHu1O
+         /FIh4Rh1g+MllZ0ODzIWWDejkUKO5fu8gzt7nc947GPTmPo3Vf2hlJPTAiSrGVCmmeY7
+         MzEg==
+X-Forwarded-Encrypted: i=1; AJvYcCU/qtg/4xhFlrGXv/BaMnUF10LUDjCEW5/tyQTMO/7v85PiOacobfDM05z8gj0sqzWOve8Z8kE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzY4GtqFI2IXp34Md/rUHgDQPWcwvb+QNq6LL9yAvS6JtLTKARD
+	YPfCTMhojC+lz3qlNIHzOmfsxHzwj1k+KM2ZBF0pbm+yfmjU/l38dk0W
+X-Gm-Gg: AY/fxX60g1OF1ssHTJpYlCiYMd1mwfW7kSCjfxuuArKZv1LWZiyn1WNgU6wPPMcBbAE
+	rxaz3MUY1iCYpqQdyW1TDpgf48JQ9OOcaSn4G9/74kFb17a9E/gdUCJZmLs8AjK4+wj8cMMT48V
+	UqvhPSyokhX2AmcejAmnvHSEVjQwYUUcICEc5QQD3Vpa7d2KEOM/DjCVJaiX+CV6k2mcBQE5wGG
+	fL+Ea7Fjc7h3dqdI33VZav/w6hVs1orqqm5mpdYfAVmmZcWWVyss+kqj1ETiylQJTzT5PHR5XNM
+	nF0awM7JItffM3T7aZu9e6mJ05Yat6ftBJhuL3FrrgxLiHLyXSD6ilHvhczvE8pv9sm9gPYioS+
+	mK348SeUcoQkVO2yd8c5XMwlSC2zbuzmd2reaebhP/bZHTj8BY/7LjbqLh5c9oBc4GTtY06OBw5
+	jqWFAvl4JPIlIcbHr8A7pl/u22Q+AbpckHEAVbEbtZLOta+1xcVBT7RshjH9hmxtzZne4=
+X-Google-Smtp-Source: AGHT+IHrvLPpg3t6kLMu9Eotmoa5F7KrFBIMW9dOWUNDKq6rC38YS04nLcFdp7xPAIwZ9NkCD98ftQ==
+X-Received: by 2002:a17:90b:2811:b0:340:bb51:17eb with SMTP id 98e67ed59e1d1-34abd6d35c0mr2361730a91.15.1765552679329;
+        Fri, 12 Dec 2025 07:17:59 -0800 (PST)
+Received: from ?IPV6:2405:201:2c:5868:7bc2:74c9:dfb4:ddb3? ([2405:201:2c:5868:7bc2:74c9:dfb4:ddb3])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34abe1ffde5sm2278443a91.1.2025.12.12.07.17.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 12 Dec 2025 07:17:58 -0800 (PST)
+Message-ID: <81d4181d-484a-458d-b0dd-e5d0a79f85d9@gmail.com>
+Date: Fri, 12 Dec 2025 20:47:53 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251212073202.13153-1-fnordahl@ubuntu.com>
-
-On Fri, Dec 12, 2025 at 07:32:01AM +0000, Frode Nordahl wrote:
-> The struct ip_tunnel_info has a flexible array member named
-> options that is protected by a counted_by(options_len)
-> attribute.
-> 
-> The compiler will use this information to enforce runtime bounds
-> checking deployed by FORTIFY_SOURCE string helpers.
-> 
-> As laid out in the GCC documentation, the counter must be
-> initialized before the first reference to the flexible array
-> member.
-> 
-> In the normal case the ip_tunnel_info_opts_set() helper is used
-> which would initialize options_len properly, however in the GRE
-> ERSPAN code a partial update is done, preventing the use of the
-> helper function.
-> 
-> Before this change the handling of ERSPAN traffic in GRE tunnels
-> would cause a kernel panic when the kernel is compiled with
-> GCC 15+ and having FORTIFY_SOURCE configured:
-> 
-> memcpy: detected buffer overflow: 4 byte write of buffer size 0
-> 
-> Call Trace:
->  <IRQ>
->  __fortify_panic+0xd/0xf
->  erspan_rcv.cold+0x68/0x83
->  ? ip_route_input_slow+0x816/0x9d0
->  gre_rcv+0x1b2/0x1c0
->  gre_rcv+0x8e/0x100
->  ? raw_v4_input+0x2a0/0x2b0
->  ip_protocol_deliver_rcu+0x1ea/0x210
->  ip_local_deliver_finish+0x86/0x110
->  ip_local_deliver+0x65/0x110
->  ? ip_rcv_finish_core+0xd6/0x360
->  ip_rcv+0x186/0x1a0
-> 
-> Link: https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-counted_005fby-variable-attribute
-> Reported-at: https://launchpad.net/bugs/2129580
-> Fixes: bb5e62f2d547 ("net: Add options as a flexible array to struct ip_tunnel_info")
-> Signed-off-by: Frode Nordahl <fnordahl@ubuntu.com>
-
-Hi Frode,
-
-Thanks for your patch (and nice to see you recently in Prague :).
-
-Overall this looks good to me but I have some minor feedback.
+User-Agent: Mozilla Thunderbird
+Subject: Re: net/sched: Fix divide error in tabledist
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: xiyou.wangcong@gmail.com, Jiri Pirko <jiri@resnulli.us>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+References: <f69b2c8f-8325-4c2e-a011-6dbc089f30e4@gmail.com>
+ <20251212171856.37cfb4dd@stephen-xps.local>
+Content-Language: en-US
+From: Manas Ghandat <ghandatmanas@gmail.com>
+In-Reply-To: <20251212171856.37cfb4dd@stephen-xps.local>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
-Firstly, the cited patch seems to cover more than erspan.
-So I'm wondering if you took at look at other cases where
-this might occur? No problem either way, but if so it might
-be worth mentioning in the commit message.
-
-
-Regarding the comments in the code. I am wondering if the are necessary
-as the information is also contained in the commit message. And if the
-source documented every such case then things could get rather verbose.
-
-If you do feel strongly about it keeping it then could I ask that
-(other than the URL) it is line-wrapped trimmed to 80 columns wide or less,
-as is still preferred for Networking (but confusingly not all Kernel) code.
-
-
-As a fix for code present in net this should be targeted at that tree.
-It's best to do so explicitly like this:
-
-Subject: [PATCH net] ...
-
-And it's probably also best to CC stable@vger.kernel.org.
-That practice isn't as widespread as perhaps it should be for Networking code.
-But it does seem worth mentioning.
-
-...
+On 12/12/25 13:48, Stephen Hemminger wrote:
+> The whole netem_in_tree check is problematic as well.
+Can you mention the issues. Maybe I can include that in my patch as well.
+> Your mail system is corrupting the patch.
+I will resend the patch.
+> Is this the same as earlier patch
+I have just moved the check before the values in qdisc are changed. This 
+would prevent the values being affected in case we bail out taking the 
+error path.
 
