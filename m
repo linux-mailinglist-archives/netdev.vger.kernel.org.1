@@ -1,58 +1,59 @@
-Return-Path: <netdev+bounces-244498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244499-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D871DCB8FBC
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 15:43:13 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6D9FCB8FCE
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 15:46:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CEB373054809
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 14:43:11 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A40893007DA7
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 14:46:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 131D32F49FE;
-	Fri, 12 Dec 2025 14:43:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE5E42749E6;
+	Fri, 12 Dec 2025 14:46:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="CMiBUqoz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gQXY0nFH"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 030A127B50C;
-	Fri, 12 Dec 2025 14:43:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE3031A9F87;
+	Fri, 12 Dec 2025 14:46:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765550591; cv=none; b=CHyH53JR/QvoRhRZvRLIOru/XCeyNFCSDeXg7Kb6nqIUxWRH2AcYh9N6+HUj2ov+Iiy29kaZY9pONVIle/GtaO4s0B94boigIbO3MXNy/yo1W+3x7RSzl9mlUGESwthS45/hRx8qO8yWDdpyBNsPZGn6Xvk9qIlpqI9Jxc/d93c=
+	t=1765550768; cv=none; b=Lm+u+MsPgtHAuSJJKRJxT6qVuJzwDyVN4cYChnwSoX2wvllBuakoDX+rSY9tmQbl4WgGWfwh+ZUl3Q1aKARtHOhjKjFMHLvYwW0+6EI8lyPgs3OiDMgeP7q1G1ONBHJTKy7ZWpCKMoFbnE8HgBrzj+1F6eAXP5k8GgjAwploDY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765550591; c=relaxed/simple;
-	bh=rzMQ/037zwg8z3uaIT3ZqZJNRtyStxnh8UKMN+kQ8IQ=;
+	s=arc-20240116; t=1765550768; c=relaxed/simple;
+	bh=189Htd6XXodl8CyrTXDtYKVyhYZKDvKx9AdMlw9EutA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oPLbg1N51mzGqMDnRa+E4bMZTXPJskkJZDIkgoRVwArxuyY3p8AlWsscADEyV1gICvTZj7wPRO5P96nADH6OOAnyM+YJEoHc7ve0lG+r3mZrIdBRDrsDveA0V3KT+ydJ/aRh5OACxv0rhHKrcisPg89wyXcBUJIYb0b4OgDJqTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=CMiBUqoz; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=kAASwr/6DNPwttxcrRLp3+naX7IaQbsctQ3H3dxQ2x4=; b=CMiBUqozdPWfhN5fiFIjp5PANS
-	GPaJRXWvJyj6Ma582GD90oebwDt3LkYWsLx2fHNUOG4ReYsGWgEW8AZFjYd3NQCYGjwGco5OZLdGc
-	VLXNasGJ2r8zFmfZMUqAgf++WCG5DjR/DBBw5sDqw25SYVGYNHro9nRV9NFIMHsfoS2w=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vU4ML-00GlAX-NX; Fri, 12 Dec 2025 15:43:05 +0100
-Date: Fri, 12 Dec 2025 15:43:05 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Stefano Radaelli <stefano.radaelli21@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Xu Liang <lxu@maxlinear.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [RFC] net: phy: mxl-86110: Manage broadcast configuration
-Message-ID: <64765daa-ae1b-43f8-a81f-a2820d2107c2@lunn.ch>
-References: <aTwom4FdQDcTyIdL@Lord-Beerus.station>
+	 Content-Type:Content-Disposition:In-Reply-To; b=fR8qBv+LgI3wWc7k+jUVU44qOH8SGCpaG91FBWqW7Q3n9oR/jVKQ+1XYdTmu7g/A+8LvsInDL75HHSBv1jIp1WmlRGDImCTepk1ciuvdgAjtZwSgmLSK1fVy30ynsnODw9iZkxGR0cJqK0abfBL9F24ecMRCqoSur5BFzLm/NxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gQXY0nFH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1E4CC4CEF1;
+	Fri, 12 Dec 2025 14:46:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765550768;
+	bh=189Htd6XXodl8CyrTXDtYKVyhYZKDvKx9AdMlw9EutA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gQXY0nFH44CNy2MRqjJHAfB9Zfmt/Owp5CPC708M/g2WTD63oWRVLmTHTTmMQO3Cw
+	 9AJwzrDIq0oZG+o56PYZQwEumhHsH1HOSHICZUF69vsFIBeEt2oPs+Gkg9pdyiV17Y
+	 CUigxXCZwL2WQUs2JV7/xHxcEII6A+egbE0hTT6yAHdJbyGvMVXI7glJe2JSuf7KrD
+	 ztbf76Qkk1p1/unIX8KXogrgM4RQxEFLDeeUqn/iRvLJO/RHuGcVA7qPoLQ2FvHtHL
+	 Z+3nbp26G5Mx126UCb8NDX6C/8HRXucS7mz7+1/BJn3ICxhtv/FrpSqPeTebAH9ZFv
+	 rqUQyg/l/Qvcw==
+Date: Fri, 12 Dec 2025 14:46:03 +0000
+From: Simon Horman <horms@kernel.org>
+To: kernel test robot <lkp@intel.com>
+Cc: Ilya Krutskih <devsec@tpz.ru>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	oe-kbuild-all@lists.linux.dev, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v2] net: fealnx: fix possible 'card_idx' integer overflow
+ in
+Message-ID: <aTwqqxPgMWG9CqJL@horms.kernel.org>
+References: <20251211173035.852756-1-devsec@tpz.ru>
+ <202512121907.n3Bzh2zF-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,15 +62,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aTwom4FdQDcTyIdL@Lord-Beerus.station>
+In-Reply-To: <202512121907.n3Bzh2zF-lkp@intel.com>
 
-> Is there a recommended or established approach for enabling
-> user-configurable broadcast behaviour in PHY drivers?
+On Fri, Dec 12, 2025 at 07:30:04PM +0800, kernel test robot wrote:
+> Hi Ilya,
+> 
+> kernel test robot noticed the following build warnings:
+> 
+> [auto build test WARNING on net-next/main]
+> [also build test WARNING on net/main linus/master v6.18 next-20251212]
+> [If your patch is applied to the wrong git tree, kindly drop us a note.
+> And when submitting patch, we suggest to use '--base' as documented in
+> https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> 
+> url:    https://github.com/intel-lab-lkp/linux/commits/Ilya-Krutskih/net-fealnx-fix-possible-card_idx-integer-overflow-in/20251212-013335
+> base:   net-next/main
+> patch link:    https://lore.kernel.org/r/20251211173035.852756-1-devsec%40tpz.ru
+> patch subject: [PATCH v2] net: fealnx: fix possible 'card_idx' integer overflow in
+> config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20251212/202512121907.n3Bzh2zF-lkp@intel.com/config)
+> compiler: alpha-linux-gcc (GCC) 15.1.0
+> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251212/202512121907.n3Bzh2zF-lkp@intel.com/reproduce)
+> 
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202512121907.n3Bzh2zF-lkp@intel.com/
+> 
+> All warnings (new ones prefixed by >>):
+> 
+>    drivers/net/ethernet/fealnx.c: In function 'fealnx_init_one':
+> >> drivers/net/ethernet/fealnx.c:496:35: warning: '%d' directive writing between 1 and 11 bytes into a region of size 6 [-Wformat-overflow=]
+>      496 |         sprintf(boardname, "fealnx%d", card_idx);
+>          |                                   ^~
+>    drivers/net/ethernet/fealnx.c:496:28: note: directive argument in the range [-2147483647, 2147483647]
+>      496 |         sprintf(boardname, "fealnx%d", card_idx);
+>          |                            ^~~~~~~~~~
+>    drivers/net/ethernet/fealnx.c:496:9: note: 'sprintf' output between 8 and 18 bytes into a destination of size 12
+>      496 |         sprintf(boardname, "fealnx%d", card_idx);
+>          |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Hard code disable it.
-
-Unless you have a real need for it, a board which requires it. Then
-place explain your use case.
-
-	Andrew
+Although I think these new warnings are not strictly for problems
+introduced by this patch. They do make me wonder
+if it would be best to cap card_index MAX_UNITS and
+return an error if that limit is exceeded.
 
