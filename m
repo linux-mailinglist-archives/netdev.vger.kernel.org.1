@@ -1,140 +1,204 @@
-Return-Path: <netdev+bounces-244462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38741CB80EF
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 07:50:33 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 577F0CB82AB
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 08:52:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A4E92300ADAE
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 06:50:32 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1DD6930088D6
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 07:52:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0AD330EF96;
-	Fri, 12 Dec 2025 06:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 655FF30F927;
+	Fri, 12 Dec 2025 07:52:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="PVhDcPRO"
+	dkim=pass (2048-bit key) header.d=ubuntu.com header.i=@ubuntu.com header.b="QAJCWwvH"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.forwardemail.net (smtp.forwardemail.net [149.28.215.223])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00FE02F6569;
-	Fri, 12 Dec 2025 06:50:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AAE330E83F
+	for <netdev@vger.kernel.org>; Fri, 12 Dec 2025 07:52:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=149.28.215.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765522230; cv=none; b=dwzkzY3tQ/ryDyIRRoGKTj96mliJqp3XpL55es00ZwBlrgtgBOue/Qk96E1n8FEm2j5gcRYLCOHj7I7bpKWdmnf2x6EEcbsyLF3OWj7wjDjOf14lHtlblXC/8+6wqvu9n+DEWskjSEEREZa3NCc/7wNzGYtL8EwVSSPM0I64jak=
+	t=1765525938; cv=none; b=fN1xuLVSaoK1nQ4DGj5+QTZzkbSApnd4w56WcjE2c2xQQy+aMPhTTNAON8j7KcwxCNoeK0kW7l5VJD0Z2ia2tnOdSQe9NVB6EcapuSD0nYGPSYQmv3WYuLsRcGOsh1m6wxcSqD7Ul7NGrYWAvI05fyiIH4eeMg3TEMfy04RcoAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765522230; c=relaxed/simple;
-	bh=+c1MAB5EwW4T7Q8EJQbHiyIAymFu+PD/okJff73t/+o=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=KBn9ioIb6LDK7s+4E5O16lCeYdh2u3fRbTcEkhCcSPk7eurfSoZAeihIoYBjG/jCHFiigD/+PmXrYnA+7E2tCWOcIBi+xPKn5GMjh92Ji+Q073gz5sV9nJURNE10bWYWOktbk92qgUb9ZFMxB4P0xNdpEHbZPqk/h8A6NgolEYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=PVhDcPRO; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1765522222; h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type;
-	bh=MsJVSWhNq3rE3HurXTce8VbnsysGEyaJspLDI8MhOM4=;
-	b=PVhDcPROtW5gh/T3rUChNHoJz4TprYpvSOe9W094d96bu2jR2GcrI6/1UsAYWdHusUTzrNPFYu8fPfHY/yBq/wvw31WXHUssltnFc7IxRvYSco3QkxxhncaxFaFlKsNCiaJcnoQg8c67w4i9cZ39BIDAptXYU8ApR1XeQoUzjPM=
-Received: from 30.221.129.89(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WudL14G_1765522213 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 12 Dec 2025 14:50:21 +0800
-Message-ID: <c92b47cf-3da0-446d-8b8f-674830256143@linux.alibaba.com>
-Date: Fri, 12 Dec 2025 14:50:13 +0800
+	s=arc-20240116; t=1765525938; c=relaxed/simple;
+	bh=y/bvT8VZdx+5yko665QNlOLFOQbvNzV7Cf31v/zetaQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SGElXRJ5NLVg1xe5OneJ468HV88JxrZE4lhJH09IydL5YNWYrgQFAxMJifIHtneCZwWjhFHRBO4yZ9ASZ3GmRv1AWnsI7gSBFr3OiI8PaWv97Bqml6U7eVwdYvbiJM5I9917GdWyAypbjr1ibSoY95GLaURpWtE45nyyqZSXmJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ubuntu.com; spf=pass smtp.mailfrom=fe-bounces.ubuntu.com; dkim=pass (2048-bit key) header.d=ubuntu.com header.i=@ubuntu.com header.b=QAJCWwvH; arc=none smtp.client-ip=149.28.215.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ubuntu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fe-bounces.ubuntu.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ubuntu.com;
+ h=Content-Transfer-Encoding: MIME-Version: Message-ID: Date: Subject: Cc:
+ To: From; q=dns/txt; s=fe-953a8a3ca9; t=1765525935;
+ bh=5pmJtC2v5HuKgTd8XiTTdyFsEdHnMITFvy/fl8k9hdM=;
+ b=QAJCWwvHP1AWv0Y69Vh9mja+eaWSifpXm4NoENYzU5l8acfnHBQpatr/blCY3W7c+zZm/NIFb
+ NLlF4LYq3X9RZRj/Q9s3JVW2RFEw1WfECa2Z+pA8lW4vXXZsmHvX9eCVbgD5xA7G5zBqg6MhhMm
+ 5Q8jVSeyIiM69m41nKiF9SgdSADZA7Er1SsIldCq1WuPk4B4j6dtecmnZKXCChMcTpyKdn6iObW
+ Z5ywTcdqG1mLncps3d6E04iilAmAns3mp9x8MoLacQJBmLmspScPGC0l5AVCmbvAIYgmF9c4nAF
+ +PX9tPB4ZCko2O+hvYo53GpKDpHgypdWdxWYcrGYqOAQ==
+X-Forward-Email-ID: 693bc4f9bcfd39afaeb67eae
+X-Forward-Email-Sender: rfc822; fnordahl@ubuntu.com, smtp.forwardemail.net,
+ 149.28.215.223
+X-Forward-Email-Version: 1.6.6
+X-Forward-Email-Website: https://forwardemail.net
+X-Complaints-To: abuse@forwardemail.net
+X-Report-Abuse: abuse@forwardemail.net
+X-Report-Abuse-To: abuse@forwardemail.net
+From: Frode Nordahl <fnordahl@ubuntu.com>
+To: netdev@vger.kernel.org
+Cc: fnordahl@ubuntu.com,
+	stable@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Gal Pressman <gal@nvidia.com>,
+	Kees Cook <kees@kernel.org>,
+	Cosmin Ratiu <cratiu@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] erspan: Initialize options_len before referencing options.
+Date: Fri, 12 Dec 2025 07:32:01 +0000
+Message-ID: <20251212073202.13153-1-fnordahl@ubuntu.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 1/2] ptp: introduce Alibaba CIPU PHC driver
-From: Wen Gu <guwen@linux.alibaba.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Richard Cochran <richardcochran@gmail.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- xuanzhuo@linux.alibaba.com, dust.li@linux.alibaba.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20251030121314.56729-1-guwen@linux.alibaba.com>
- <20251030121314.56729-2-guwen@linux.alibaba.com>
- <20251031165820.70353b68@kernel.org>
- <8a74f801-1de5-4a1d-adc7-66a91221485d@linux.alibaba.com>
- <20251105162429.37127978@kernel.org>
- <34b30157-6d67-46ec-abde-da9087fbf318@linux.alibaba.com>
- <20251127083610.6b66a728@kernel.org>
- <f2afb292-287e-4f2f-b131-50a1650bbb1d@linux.alibaba.com>
- <20251128102437.7657f88f@kernel.org>
- <9a75e3b2-4d1c-4911-81e4-cab988c24b77@linux.alibaba.com>
-In-Reply-To: <9a75e3b2-4d1c-4911-81e4-cab988c24b77@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+The struct ip_tunnel_info has a flexible array member named
+options that is protected by a counted_by(options_len)
+attribute.
 
+The compiler will use this information to enforce runtime bounds
+checking deployed by FORTIFY_SOURCE string helpers.
 
-On 2025/12/1 14:04, Wen Gu wrote:
-> 
-> 
-> On 2025/11/29 02:24, Jakub Kicinski wrote:
->> On Fri, 28 Nov 2025 14:22:21 +0800 Wen Gu wrote:
->>>> Could you go complain to clock people? Or virtualization people?
->>>
->>> I understand that the PTP implementations in drivers/ptp aren't closely
->>> related to networking though drivers/ptp is included in NETWORKING DRIVERS
->>> in the MAINTAINER file.
->>>
->>> I noticed that drivers/ptp/* is also inclued in PTP HARDWARE CLOCK SUPPORT.
->>> This attribution seems more about 'clock'.
->>>
->>> Hi @Richard Cochran, could you please review this? Thanks! :)
->>
->> It's Thanksgiving weekend in the US, Richard may be AFK so excuse my
->> speaking for him, but he mentioned in the past that he is also not
->> interested in becoming a maintainer for general clocks, unrelated
->> to PTP.
->>
-> 
-> Wishing you a Happy Thanksgiving!
-> 
-> I think you misunderstood. I didn't encourage Richard to maintain
-> general clocks unrelated to PTP. Rather, I believe this driver should
-> belong to the PTP subsystem, and here are my reasons (which have been
-> mentioned in previous emails):
-> 
-> 1. CIPU provides high-precision PHCs for VMs or bare metals, which
->     are exposed as ptp_clock according to the definition in [1]. its
->     usage is no different from other ptp devices. So this is a PTP
->     driver.
-> 
-> [1] https://docs.kernel.org/driver-api/ptp.html
-> 
-> 2. The PTP implementations that are independent of networking and
->     NICs are placed under drivers/ptp. These devices are provided from
->     chip/FPGA/hypervisor and maintain clock accuracy in their own unique
->     ways. CIPU ptp driver is no different and should also be placed
->     under the drivers/ptp from this perspective.
-> 
-> According to the MAINTAINERS file, drivers/ptp/* is maintained by the
-> NETWORKING DRIVERS and PTP HARDWARE CLOCK SUPPORT subsystems. Considering
-> you mentioned that drivers/ptp is not closely related to networking, I
-> think it might be more appropriate for the PTP HARDWARE CLOCK SUPPORT
-> subsystem maintainer to review it. After it merges into the upstream,
-> we will be its maintainers.
-> 
->> Search the mailing list, there are at least 3 drivers like yours being
->> proposed. Maybe you can get together with also the KVM and VMclock
->> authors and form a new subsystem?
-> 
-> I think drivers under drivers/ptp are all similar. But aside from the
-> fact that they are all exposed as PTP devices and therefore classified
-> in the PTP subsystem, I haven't been able to find a way to classify
-> them into another class (note that CIPU ptp can't be considered a
-> VM/hypervisor clock class since bare metal scenario is also applicable).
-> 
-> Regards.
+As laid out in the GCC documentation, the counter must be
+initialized before the first reference to the flexible array
+member.
 
+In the normal case the ip_tunnel_info_opts_set() helper is used
+which would initialize options_len properly, however in the GRE
+ERSPAN code a partial update is done, preventing the use of the
+helper function.
 
-Given that net-next is closed and the EOY break is here, I was wondering
-whether the review discussion might continue during this period or should
-wait until after the break.
+Before this change the handling of ERSPAN traffic in GRE tunnels
+would cause a kernel panic when the kernel is compiled with
+GCC 15+ and having FORTIFY_SOURCE configured:
 
-Thanks.
+memcpy: detected buffer overflow: 4 byte write of buffer size 0
+
+Call Trace:
+ <IRQ>
+ __fortify_panic+0xd/0xf
+ erspan_rcv.cold+0x68/0x83
+ ? ip_route_input_slow+0x816/0x9d0
+ gre_rcv+0x1b2/0x1c0
+ gre_rcv+0x8e/0x100
+ ? raw_v4_input+0x2a0/0x2b0
+ ip_protocol_deliver_rcu+0x1ea/0x210
+ ip_local_deliver_finish+0x86/0x110
+ ip_local_deliver+0x65/0x110
+ ? ip_rcv_finish_core+0xd6/0x360
+ ip_rcv+0x186/0x1a0
+
+Link: https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-counted_005fby-variable-attribute
+Reported-at: https://launchpad.net/bugs/2129580
+Fixes: bb5e62f2d547 ("net: Add options as a flexible array to struct ip_tunnel_info")
+Signed-off-by: Frode Nordahl <fnordahl@ubuntu.com>
+---
+ net/ipv4/ip_gre.c  | 18 ++++++++++++++++--
+ net/ipv6/ip6_gre.c | 18 ++++++++++++++++--
+ 2 files changed, 32 insertions(+), 4 deletions(-)
+
+diff --git a/net/ipv4/ip_gre.c b/net/ipv4/ip_gre.c
+index 761a53c6a89a..285a656c9e41 100644
+--- a/net/ipv4/ip_gre.c
++++ b/net/ipv4/ip_gre.c
+@@ -330,6 +330,22 @@ static int erspan_rcv(struct sk_buff *skb, struct tnl_ptk_info *tpi,
+ 			if (!tun_dst)
+ 				return PACKET_REJECT;
+ 
++			/* The struct ip_tunnel_info has a flexible array member named
++			 * options that is protected by a counted_by(options_len)
++			 * attribute.
++			 *
++			 * The compiler will use this information to enforce runtime bounds
++			 * checking deployed by FORTIFY_SOURCE string helpers.
++			 *
++			 * As laid out in the GCC documentation, the counter must be
++			 * initialized before the first reference to the flexible array
++			 * member.
++			 *
++			 * Link: https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-counted_005fby-variable-attribute
++			 */
++			info = &tun_dst->u.tun_info;
++			info->options_len = sizeof(*md);
++
+ 			/* skb can be uncloned in __iptunnel_pull_header, so
+ 			 * old pkt_md is no longer valid and we need to reset
+ 			 * it
+@@ -344,10 +360,8 @@ static int erspan_rcv(struct sk_buff *skb, struct tnl_ptk_info *tpi,
+ 			memcpy(md2, pkt_md, ver == 1 ? ERSPAN_V1_MDSIZE :
+ 						       ERSPAN_V2_MDSIZE);
+ 
+-			info = &tun_dst->u.tun_info;
+ 			__set_bit(IP_TUNNEL_ERSPAN_OPT_BIT,
+ 				  info->key.tun_flags);
+-			info->options_len = sizeof(*md);
+ 		}
+ 
+ 		skb_reset_mac_header(skb);
+diff --git a/net/ipv6/ip6_gre.c b/net/ipv6/ip6_gre.c
+index c82a75510c0e..eb840a11b93b 100644
+--- a/net/ipv6/ip6_gre.c
++++ b/net/ipv6/ip6_gre.c
+@@ -535,6 +535,22 @@ static int ip6erspan_rcv(struct sk_buff *skb,
+ 			if (!tun_dst)
+ 				return PACKET_REJECT;
+ 
++			/* The struct ip_tunnel_info has a flexible array member named
++			 * options that is protected by a counted_by(options_len)
++			 * attribute.
++			 *
++			 * The compiler will use this information to enforce runtime bounds
++			 * checking deployed by FORTIFY_SOURCE string helpers.
++			 *
++			 * As laid out in the GCC documentation, the counter must be
++			 * initialized before the first reference to the flexible array
++			 * member.
++			 *
++			 * Link: https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-counted_005fby-variable-attribute
++			 */
++			info = &tun_dst->u.tun_info;
++			info->options_len = sizeof(*md);
++
+ 			/* skb can be uncloned in __iptunnel_pull_header, so
+ 			 * old pkt_md is no longer valid and we need to reset
+ 			 * it
+@@ -543,7 +559,6 @@ static int ip6erspan_rcv(struct sk_buff *skb,
+ 			     skb_network_header_len(skb);
+ 			pkt_md = (struct erspan_metadata *)(gh + gre_hdr_len +
+ 							    sizeof(*ershdr));
+-			info = &tun_dst->u.tun_info;
+ 			md = ip_tunnel_info_opts(info);
+ 			md->version = ver;
+ 			md2 = &md->u.md2;
+@@ -551,7 +566,6 @@ static int ip6erspan_rcv(struct sk_buff *skb,
+ 						       ERSPAN_V2_MDSIZE);
+ 			__set_bit(IP_TUNNEL_ERSPAN_OPT_BIT,
+ 				  info->key.tun_flags);
+-			info->options_len = sizeof(*md);
+ 
+ 			ip6_tnl_rcv(tunnel, skb, tpi, tun_dst, log_ecn_error);
+ 
+-- 
+2.43.0
 
 
