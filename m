@@ -1,183 +1,258 @@
-Return-Path: <netdev+bounces-244479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2A63CB89F6
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 11:30:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74FA0CB8A08
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 11:35:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1EC3E30115AA
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 10:29:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F07C0300E034
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 10:35:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5F9B314A67;
-	Fri, 12 Dec 2025 10:29:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8BFE28C5AA;
+	Fri, 12 Dec 2025 10:35:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="cXfUbfUM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OuZVw6jT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F4533168F2
-	for <netdev@vger.kernel.org>; Fri, 12 Dec 2025 10:29:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC82169AD2;
+	Fri, 12 Dec 2025 10:34:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765535398; cv=none; b=l0MGaFSljPINt/vPpD3ugRc0fbYWLBLago89JAhN5blkEt0qe8cbue/OTN1ZBK5m/CUTwK5g4xXydgjQPtb8rCkTLofVEd1la1rYOlmO4dwgEZ8tWvqlcsO7hbqnAvwf/7L2ApqFIM8sTxNot02MbF9ZJ8a1iRDZ1TGK76vg/js=
+	t=1765535701; cv=none; b=d+HpuuNLQuNcZS9B0gPtGyVsdabeHJIg0JUxIMmWgvr5Zywh4YoH5fLJb8QrRb7LJawwa5L0DIrkOSEVj70+f2CSOnWRIkCAu1h2qA/jNEl1JB/foX8WBbWqalizugEVx1Tidz5pGs5ThZEq7H5Cvp6QxMSeZKrtl6QSDWiXvJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765535398; c=relaxed/simple;
-	bh=btbqvPGFse/taUiYClETwKgL9QrmsUUJmU/97AwopB0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FGVH1UkyfYU3kYWyfscM3J1XGwTI29XqJ+V98/ZjXQdzfi6dfY99qjWJzXlxPX8x+6KdBh4R8ZKBbUJSynR9JFiEyscI7UJ2fzScctGYYA5KrZ/CqreOK7LsBLWuKzDhV1ASCwO8d1jUmCysNe0VULDy3LtGX/EO28Csm03kaDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=cXfUbfUM; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-47775fb6cb4so8178105e9.0
-        for <netdev@vger.kernel.org>; Fri, 12 Dec 2025 02:29:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1765535394; x=1766140194; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6tFE0a1pHgT0unxzOi6yQRChV8EFDCDkCPGE+hNyUTU=;
-        b=cXfUbfUMgTFUnup7NsqNbA0g1zvoMQ0XC3pNGp4KQHbVyRwdqYLgnU0YChax3jFLHk
-         kd9QyUkDG0Hg6MeFwMJv8t3MfD4IkuLcsul2WBDPFPwYCdqylTJ5Xiuw4Lr1bG/VKf2r
-         7c7BqjxCHWiiidtKKCoXUWH1DC0oXg4TjMbUN0H+kyvsou3MX/8ZXgfwJx2Dql6Ut0mJ
-         p3NgK5hsak1pHdpfPIuJWxbwOUrcPMmyDd2mpxeZ5+lxj+cYLkD0ytRRLQgRY9b6L5SK
-         sqxJhnxjUZfzUUoNYO/tH6OH6i4gNyMjRb/nwGDYV8dAFamgKlUjuFvDsUjUcxECCwTD
-         aD5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765535394; x=1766140194;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6tFE0a1pHgT0unxzOi6yQRChV8EFDCDkCPGE+hNyUTU=;
-        b=L2uG4SQbS5cAQuQDSaqRhgJVAKQLCn9Mj+u8rPzX++r2QbaHjaHOJqWhdMats0CTt9
-         r0LR11ts8xUBXoyVlX4W0LQv6OvDnatFS5J2VQH1oW7oxitnSSPEinkpkyBbOBJA9Afq
-         fef+XyCPsrqqSuhFMxt26jefDndNpwSjW8zO5ei7CH1jDCPbeLWUuu1YJo/eSN9Jffpq
-         4Hc8rZkvbm7Tg0gFk8R3BwFHTK7RDY9cq0KYXum2/wNfpsn5JRdjzwTM3O8iMYlG/bPd
-         d3MLQYEDj7g/u0Rt29csoCVepv45M/7brUguTVC8mufuvruJRNMY1IpUggZRN9Y5N6zp
-         beMQ==
-X-Gm-Message-State: AOJu0YxgOH2jnAJBSyNUduJo6PaL5HBNub8p8X3tSn7HBuibLCbNP757
-	fDXd1lB93mFMXY2X3PCC8fcQWswPzy2KBD9cNkWdsI7dmWmAgUfHqIPhuN6EjRCXYB6oNHi3mrf
-	GbvDo
-X-Gm-Gg: AY/fxX42QbFz4THZ8M4O7Z47zrhYwoNdq1x4K2S2ztqyyyigdy9CCEBsTATs+P9JTNu
-	AeupQfXKeyotwJz3kyzKP6byv2+f2YCWSjHplI7V9STwVNOqUhyaiFLvSy/pj7jyRISyrSQchAH
-	cEdP4uEpEvKVFlwjQVU4FHMA7sR3Si9YoU46gxEcskiY64REQqd7bujVZO5zgpUgXZCYns3bi1X
-	pAwuZujLopYPdAXue1g81C/eP38IXmtuLpN0iSPWmNiMdyHRFjKdtmMxF8rHAHojthuG5XfkbiH
-	XdTLX1LMrK7K/opU13vcx+Yzm0OJQvBCVpRRoNHNKOnquDuDL+ADkbvmeq4FXwMk4N5uzIjxidY
-	KpDsiYKtXzcJ7N4mrzF21QR3w0BYXQLM+jm4oGJiB5XcOdpubyI0muYRjbdTJQ48N37ogxtVAgW
-	F9gQ==
-X-Google-Smtp-Source: AGHT+IE22uoCLDBuRYBWBxPuOxfjJ/s/N02cbjGaLd2SRwZ4tJ/TD+mGnwYlEC7795mvkbTuTgHkmA==
-X-Received: by 2002:a05:600c:8115:b0:477:8b77:155f with SMTP id 5b1f17b1804b1-47a8f8a80eemr14822045e9.8.1765535394360;
-        Fri, 12 Dec 2025 02:29:54 -0800 (PST)
-Received: from localhost ([85.163.81.98])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42fa8a665e3sm11423088f8f.6.2025.12.12.02.29.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Dec 2025 02:29:53 -0800 (PST)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	dharanitharan725@gmail.com
-Subject: [PATCH net] team: fix check for port enabled in team_queue_override_port_prio_changed()
-Date: Fri, 12 Dec 2025 11:29:53 +0100
-Message-ID: <20251212102953.167287-1-jiri@resnulli.us>
-X-Mailer: git-send-email 2.51.1
+	s=arc-20240116; t=1765535701; c=relaxed/simple;
+	bh=tpoLmlWNdgfPUN+3GVk5CixxlW8xGaDG0EeFHjNwi7Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=o1QYembsVbXOS991Nw6T18OGXn4zrVXyMxJl89x7eJYBvF1+L+hPh4syMgu+B+aI1YczUG4WITHF++9u5zLUElrzcOp7ymhpaT745rHx0//JFWba02k6RtZBojU9foNeHiG/fa28xgs8uY6/d88SatFQFldEmTTTum+jhx15tN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OuZVw6jT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD031C4CEF1;
+	Fri, 12 Dec 2025 10:34:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765535699;
+	bh=tpoLmlWNdgfPUN+3GVk5CixxlW8xGaDG0EeFHjNwi7Y=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=OuZVw6jT+j1cDhnrP9PXiRVBpZ7prSuT9DJPD4BnL+BrJhkYJxfY6DoZ4WwWXafKe
+	 9v9I8nts41hdMjLoflTY2zxTuS48woD6YvTNmXdmagit1d56Mltzxcb/xEAMhQmksj
+	 puqk/WcOB+iSdL+7G0jOHcdmSUltqXNa14sClz74oB5h9JbI5oBdkdv+IMr+4Iya6p
+	 eGagb3N6JGnAX+o3rifssAxpNUq8OSUqeyMvCEPIEce/esa7FYVnqgh+zXa5d39LF3
+	 cOWQwNxdPbC+BwgFpm4wxGGsppmDHuGfPmxRUneug7078kL0B7sK/3M3UjtCJoXTh7
+	 no0j92tDuKHrg==
+Message-ID: <87064d74-2090-4d0f-ba34-129942e60450@kernel.org>
+Date: Fri, 12 Dec 2025 11:34:53 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] subflow: relax WARN in subflow_data_ready() on teardown
+ races
+Content-Language: en-GB, fr-BE
+To: evan.li@linux.alibaba.com
+Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev,
+ linux-kernel@vger.kernel.org, kitta <kitta@linux.alibaba.com>,
+ martineau@kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
+References: <20251212095909.2480475-1-evan.li@linux.alibaba.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20251212095909.2480475-1-evan.li@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Jiri Pirko <jiri@nvidia.com>
+Hi Evan, Kitta,
 
-There has been a syzkaller bug reported recently with the following
-trace:
+Thank you for sharing this patch.
 
-list_del corruption, ffff888058bea080->prev is LIST_POISON2 (dead000000000122)
-------------[ cut here ]------------
-kernel BUG at lib/list_debug.c:59!
-Oops: invalid opcode: 0000 [#1] SMP KASAN NOPTI
-CPU: 3 UID: 0 PID: 21246 Comm: syz.0.2928 Not tainted syzkaller #0 PREEMPT(full)
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-RIP: 0010:__list_del_entry_valid_or_report+0x13e/0x200 lib/list_debug.c:59
-Code: 48 c7 c7 e0 71 f0 8b e8 30 08 ef fc 90 0f 0b 48 89 ef e8 a5 02 55 fd 48 89 ea 48 89 de 48 c7 c7 40 72 f0 8b e8 13 08 ef fc 90 <0f> 0b 48 89 ef e8 88 02 55 fd 48 89 ea 48 b8 00 00 00 00 00 fc ff
-RSP: 0018:ffffc9000d49f370 EFLAGS: 00010286
-RAX: 000000000000004e RBX: ffff888058bea080 RCX: ffffc9002817d000
-RDX: 0000000000000000 RSI: ffffffff819becc6 RDI: 0000000000000005
-RBP: dead000000000122 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000080000000 R11: 0000000000000001 R12: ffff888039e9c230
-R13: ffff888058bea088 R14: ffff888058bea080 R15: ffff888055461480
-FS:  00007fbbcfe6f6c0(0000) GS:ffff8880d6d0a000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000110c3afcb0 CR3: 00000000382c7000 CR4: 0000000000352ef0
-Call Trace:
- <TASK>
- __list_del_entry_valid include/linux/list.h:132 [inline]
- __list_del_entry include/linux/list.h:223 [inline]
- list_del_rcu include/linux/rculist.h:178 [inline]
- __team_queue_override_port_del drivers/net/team/team_core.c:826 [inline]
- __team_queue_override_port_del drivers/net/team/team_core.c:821 [inline]
- team_queue_override_port_prio_changed drivers/net/team/team_core.c:883 [inline]
- team_priority_option_set+0x171/0x2f0 drivers/net/team/team_core.c:1534
- team_option_set drivers/net/team/team_core.c:376 [inline]
- team_nl_options_set_doit+0x8ae/0xe60 drivers/net/team/team_core.c:2653
- genl_family_rcv_msg_doit+0x209/0x2f0 net/netlink/genetlink.c:1115
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0x55c/0x800 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x158/0x420 net/netlink/af_netlink.c:2552
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
- netlink_unicast+0x5aa/0x870 net/netlink/af_netlink.c:1346
- netlink_sendmsg+0x8c8/0xdd0 net/netlink/af_netlink.c:1896
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg net/socket.c:742 [inline]
- ____sys_sendmsg+0xa98/0xc70 net/socket.c:2630
- ___sys_sendmsg+0x134/0x1d0 net/socket.c:2684
- __sys_sendmsg+0x16d/0x220 net/socket.c:2716
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+On 12/12/2025 10:59, evan.li@linux.alibaba.com wrote:
+> From: Evan Li <evan.li@linux.alibaba.com>
+> 
+> A WARN splat in subflow_data_ready() can be triggered when a subflow
+> enters an unexpected state during connection teardown or cleanup:
+> 
+> WARNING: net/mptcp/subflow.c:1527 at subflow_data_ready+0x38a/0x670
 
-The problem is in this flow:
-1) Port is enabled, queue_id != 0, in qom_list
-2) Port gets disabled
-        -> team_port_disable()
-        -> team_queue_override_port_del()
-        -> del (removed from list)
-3) Port is disabled, queue_id != 0, not in any list
-4) Priority changes
-        -> team_queue_override_port_prio_changed()
-        -> checks: port disabled && queue_id != 0
-        -> calls del - hits the BUG as it is removed already
+Please always share the full stacktrace, not just the warning: it helps
+reviewers, devs later, and other people who found the same issue on
+their side.
 
-To fix this, change the check in team_queue_override_port_prio_changed()
-so it returns early if port is not enabled.
+> This comes from the following check:
+> 
+> WARN_ON_ONCE(!__mptcp_check_fallback(msk) &&
+> !subflow->mp_capable &&
+> !subflow->mp_join &&
+> !(state & TCPF_CLOSE));
+> 
+> Under fuzzing and other stress scenarios, there are legitimate windows
+> where this condition can become true without indicating a real bug, for
+> example:
+> 
+> during connection teardown / fastclose handling
+> races with subflow destruction
+> packets arriving after subflow cleanup
+> when the parent MPTCP socket is being destroyed
+> After commit ae155060247b ("mptcp: fix duplicate reset on fastclose"),
+> these edge cases became easier to trigger and the WARN started firing
+> spuriously, causing noisy reports but no functional issues.
+> 
+> Refine the state check in subflow_data_ready() so that:
+> 
+> if the socket is in a known teardown/cleanup situation
+> (SOCK_DEAD, zero parent refcnt, or repair/recv-queue handling),
+> the function simply returns without emitting a warning; and
+> 
+> for other unexpected states, we emit a ratelimited pr_debug() to
+> aid debugging, instead of a WARN_ON_ONCE() that can panic
+> fuzzing/CI kernels or flood logs in production.
+> 
+> This suppresses the bogus warning while preserving diagnostics for any
+> real state machine bugs.
+> 
+> Fixes: ae155060247b ("mptcp: fix duplicate reset on fastclose")
+> Reported-by: kitta <kitta@linux.alibaba.com>
+> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=220856
 
-Reported-by: syzbot+422806e5f4cce722a71f@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=422806e5f4cce722a71f
-Fixes: 6c31ff366c11 ("team: remove synchronize_rcu() called during queue override change")
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
----
- drivers/net/team/team_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I don't think you should continue using Bugzilla: it is no longer used
+for the Networking subsystem, and it might be shutdown soon. Instead,
+please check the instructions in the MAINTAINERS file: for general
+Networking issues, send them by email. For MPTCP, there is a bug tracker
+on GitHub.
 
-diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
-index 4d5c9ae8f221..c08a5c1bd6e4 100644
---- a/drivers/net/team/team_core.c
-+++ b/drivers/net/team/team_core.c
-@@ -878,7 +878,7 @@ static void __team_queue_override_enabled_check(struct team *team)
- static void team_queue_override_port_prio_changed(struct team *team,
- 						  struct team_port *port)
- {
--	if (!port->queue_id || team_port_enabled(port))
-+	if (!port->queue_id || !team_port_enabled(port))
- 		return;
- 	__team_queue_override_port_del(team, port);
- 	__team_queue_override_port_add(team, port);
+Note that you don't need to open an issue somewhere if you already have
+the patch: simply put all the details in the commit message, e.g.
+stacktrace, reproducer, conditions, etc. You only need to open an issue
+somewhere if you need to include large files, or if you need help to fix
+it. I know Checkpatch will ask you to add a link after a "Reported-by"
+but that's only valid if the initial report was done publicly: in your
+case, you can then ignore this warning.
+
+> Co-developed-by: kitta <kitta@linux.alibaba.com>
+
+(Note that a Co-developed-by should be followed by a Signed-off-by from
+the same person.)
+
+
+https://docs.kernel.org/process/submitting-patches.html#when-to-use-acked-by-cc-and-co-developed-by
+
+While at it, please next time use the 'net' prefix, see:
+
+  https://docs.kernel.org/process/maintainer-netdev.html
+
+> Signed-off-by: Evan Li <evan.li@linux.alibaba.com>
+> ---
+>  net/mptcp/subflow.c | 24 +++++++++++++++++++++---
+>  1 file changed, 21 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
+> index 86ce58ae5..01d30679c 100644
+> --- a/net/mptcp/subflow.c
+> +++ b/net/mptcp/subflow.c
+> @@ -1524,9 +1524,27 @@ static void subflow_data_ready(struct sock *sk)
+>  		return;
+>  	}
+>  
+> -	WARN_ON_ONCE(!__mptcp_check_fallback(msk) && !subflow->mp_capable &&
+> -		     !subflow->mp_join && !(state & TCPF_CLOSE));
+> -
+> +	/* Check if subflow is in a valid state. Skip warning for legitimate edge cases
+> +	 * such as connection teardown, race conditions, or when parent is being destroyed.
+> +	 */
+> +	if (!__mptcp_check_fallback(msk) && !subflow->mp_capable &&
+> +	    !subflow->mp_join && !(state & TCPF_CLOSE)) {
+> +	/* Legitimate cases where this can happen:
+> +	 * 1. During connection teardown
+> +	 * 2. Race conditions with subflow destruction
+> +	 * 3. Packets arriving after subflow cleanup
+> +	 * Log debug info but don't warn loudly in production.
+> +	 */
+> +	if (unlikely(tcp_sk(sk)->repair_queue == TCP_RECV_QUEUE ||
+> +	    sock_flag(sk, SOCK_DEAD) || !refcount_read(&parent->sk_refcnt))) {
+> +			/* Expected during cleanup, silently return */
+> +			return;
+> +	}
+> +	/* For other cases, still log for debugging but don't WARN */
+> +	if (net_ratelimit())
+> +		pr_debug("MPTCP: subflow in unexpected state sk=%p parent=%p state=%u\n",
+> +			 sk, parent, state);
+> +	}
+
+The warning was there to catch issues: it is *not* normal to have to
+process data in this state. I think it is better to prevent
+subflow_data_ready() to be called in this state than ignoring the
+warning, even if the warnings you saw didn't cause visible functional
+issues. Please also note that a pr_debug() will very likely not be
+caught in case of real issues: a WARN_ON_ONCE should have been kept.
+
+Regarding this issue, it was already tracked in our bug tracker, see:
+
+  https://github.com/multipath-tcp/mptcp_net-next/issues/586
+
+There are two patches from Paolo in our tree addressing it:
+
+  https://lore.kernel.org/mptcp/cover.1764928598.git.pabeni@redhat.com
+
+I was waiting to upstream them because they are not urgent and net
+maintainers are busy at the LPC for the moment, but I guess I should
+still send them to avoid syzkaller instances to complain about these
+issues. I will try to do that today.
+
+Do you mind checking if they fix the issues on your side please?
+
+pw-bot: cr
+
+>  	if (mptcp_subflow_data_available(sk)) {
+>  		mptcp_data_ready(parent, sk);
+>  
+
+Cheers,
+Matt
 -- 
-2.51.1
+Sponsored by the NGI0 Core fund.
 
 
