@@ -1,286 +1,171 @@
-Return-Path: <netdev+bounces-244530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D273ACB9773
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 18:37:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E38FACB98DD
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 19:22:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 97C22304D9C6
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 17:37:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BDDEB30B1DBE
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 18:22:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21C4923A994;
-	Fri, 12 Dec 2025 17:37:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2A8D3016F0;
+	Fri, 12 Dec 2025 18:22:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="tgx+9ZmE"
+	dkim=pass (2048-bit key) header.d=ubuntu.com header.i=@ubuntu.com header.b="EDkeI2Ig"
 X-Original-To: netdev@vger.kernel.org
-Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010025.outbound.protection.outlook.com [52.101.46.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.forwardemail.net (smtp.forwardemail.net [149.28.215.223])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77BC345948;
-	Fri, 12 Dec 2025 17:37:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.25
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765561049; cv=fail; b=EFDL5W8UgE6/gdSBi3It2kP1tYrQT7GHcww0E7LCLIiVUqMlacFLDSFTXLtwMiuvJkdcj2acOVkO0YqIbN3a5DBkn+WpYiuDKsgxsNhRoU/rAJqfSbWvFzwsYORIH/N7H/E1oPRQw05IpM7pp90ACru1Cw3mDlcZNr3hkbvugKg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765561049; c=relaxed/simple;
-	bh=uihHkhTy0hHaNXuWiertCHE43nsp1WU+/BgXtTLoixU=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=D07XYynG9PSajO9o4QmU3uvlQe3vCRlwZSafPZkpZhkduhv5y/QuWHWWaDQZk41ARfBC5scipDmmM68wz3ZIXQqcrmZOKq/ggFC8kaPWRldh9hX9otV0ensk4mdRie2Wzvdy89zDw/C/J2rBksX+9p51NbFNojPCUwjEY5eKGfE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=tgx+9ZmE; arc=fail smtp.client-ip=52.101.46.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=maYvHhPNnMkEPKkWUjrpHwcfUNqhHqL0EX0j44P4+T/wh7mp1h6/t9EF+ClqfE/qDto8+cU09vqmzeIpFpXasLd6s8dp2fUl42lZNVV7K+yI6hp3j9e8AcB+et3+CGi6O90G+brskGuN++hin2bFlD0RJsqlYk+zirSWc9Uw1PQk4riWOB1Sih/NYhC7yGMcSFHoBFSEzLFMDRySj/u53kdA3r1COU7dVTUAA/Y0W9QWl4qnrvvQ6yXZgtqf44ysnO/2wjwZ6tUbct+4mTQJp2SO3QoVNGGYXm3862dpeK3L0OtcDdn+N0lX8JL8ZqOg6XgxauVwVhQN1FcUd3FMmw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6ig7l0ZbKODP7fsJEh7TDUC0ThU5RhTL0dQEiIZmdH4=;
- b=Wbf9giElR5tNT0IgyL5BA+2KS757Wx9kFcCd3zLdmCQp3zgIzELYUVou/HtnZhsuU8tY8zHQs0I2//iX25QmBlj5ofzAgxoDQnkzeef3JO451SgoFoNE64Cg0Xs6d8pBenpfPUVeb+CMFW2Tx7W1grkZs9rdxOTXGhvjrX8t8Y1Fs/wqpNUsWaRTkK5n1xJ3E/dNukyz2PKOIROzp4+1EYm7UJw9NPVk4bOZd+kKvDALbW75KyBWHy3A7iy2C1t8cdFStaVWmYc2uIK8M9uHPXekuQbRuZKh0eP4w88vxr0Ed1ancf3gdOkMNyDgTEtNpjVhGZO3gg06BL+iwlbweA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6ig7l0ZbKODP7fsJEh7TDUC0ThU5RhTL0dQEiIZmdH4=;
- b=tgx+9ZmESy8nJEUMGxw7AyEht3VQzqd0M/UKRGvDfTiWdEOJnBAAEmXs3zGYdbX3oyAF2pM0OFYAGYV2Uycsa0xJEohNom45YweUyN/AxB0cjaGd5VJyWo9cI9jGY2TUNPia24iIY86VbBm94JqOXHQ7ymnnNsWIQE/SFnQ5P7M=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
- by PH0PR12MB8774.namprd12.prod.outlook.com (2603:10b6:510:28e::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9412.11; Fri, 12 Dec
- 2025 17:37:24 +0000
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::bfd5:ffcf:f153:636a]) by PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::bfd5:ffcf:f153:636a%5]) with mapi id 15.20.9412.005; Fri, 12 Dec 2025
- 17:37:23 +0000
-Message-ID: <ad274880-8736-459b-ac9e-fac2477b44ea@amd.com>
-Date: Fri, 12 Dec 2025 09:37:20 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/1] i40e: validate ring_len parameter against
- hardware-specific values
-To: gregory.herrero@oracle.com, aleksandr.loktionov@intel.com,
- anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20251117083326.2784380-1-gregory.herrero@oracle.com>
- <20251117083326.2784380-2-gregory.herrero@oracle.com>
-Content-Language: en-US
-From: "Creeley, Brett" <bcreeley@amd.com>
-In-Reply-To: <20251117083326.2784380-2-gregory.herrero@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0251.namprd04.prod.outlook.com
- (2603:10b6:303:88::16) To PH0PR12MB7982.namprd12.prod.outlook.com
- (2603:10b6:510:28d::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F28E73019AD
+	for <netdev@vger.kernel.org>; Fri, 12 Dec 2025 18:22:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=149.28.215.223
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765563725; cv=none; b=fXPD6bknktHPLoqflVjfuQ+zGE2XkerH1QiLfLbqKM+nEACU7ooSQmZOGkFtTgDE/R2PFgLecIrMiZ94gCJVGPm+AUeHnfnr4LHv6uh91W97yW/1Y/8Vh2UTg5WdYmbRiAEsZzYGomleHwFFw0IqSCqq7LnazwJgXD9TOkurK/U=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765563725; c=relaxed/simple;
+	bh=nlwWzd8H/QFVfZ9XD9u/sEx2dehXu4fN3B5Rte1Am0I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lRd3D60rKOXfitiO1tsXRH1FhwrUnDVLSHOUfN5ndvhoYXVm5j/Y4I+2KdVCmAP+BpzRbmv8nW5YXECKoq2ftr6YDbbs84ncmjeLzGQClQuq765UbbVRZoxG5DjEnxH8oacruPI+zfR03VljzVWhvlhhCJHIfd188nuHAcasi0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ubuntu.com; spf=pass smtp.mailfrom=fe-bounces.ubuntu.com; dkim=pass (2048-bit key) header.d=ubuntu.com header.i=@ubuntu.com header.b=EDkeI2Ig; arc=none smtp.client-ip=149.28.215.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ubuntu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fe-bounces.ubuntu.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ubuntu.com;
+ h=Content-Transfer-Encoding: Content-Type: In-Reply-To: From: References:
+ Cc: To: Subject: MIME-Version: Date: Message-ID; q=dns/txt;
+ s=fe-953a8a3ca9; t=1765563723;
+ bh=ujl+sTrNhXHxwNX5b2qn7Bp4IFE1VBkaZlKsjfIZgjU=;
+ b=EDkeI2Igx04rpUYW+YMCLRdTW38V39eajGm+Ce8ynDv+8OTmJX+3PpgG/CjcW9pY83Oem+T8R
+ ixCSnU+f74e7po4gPgrMzIAIxJQ0NHqdtJ5MTWgTflkBl2IQ/5UnCVxOrBDF88Z9RQGfGBUaEkx
+ 1wbIt62Ln4k5P313e6qCPDER9EhS8E7jycgDwLJ6/ZLHVZubxjWxeelyd1Yds6/BzH/7T8UOfre
+ GDnfffw7eSPzWfcgc+W0/vMmc7eXNXqwJJViJv7dlHQYU3p2PYZJUdd3ngrhAN0ygOtFRtFUUXC
+ Em32JH+sty9PRCqbjJjYXA/bM6UrGU0ddyfDx/+mCZhg==
+X-Forward-Email-ID: 693c5d44fd4b94c0e94ea407
+X-Forward-Email-Sender: rfc822; fnordahl@ubuntu.com, smtp.forwardemail.net,
+ 149.28.215.223
+X-Forward-Email-Version: 1.6.6
+X-Forward-Email-Website: https://forwardemail.net
+X-Complaints-To: abuse@forwardemail.net
+X-Report-Abuse: abuse@forwardemail.net
+X-Report-Abuse-To: abuse@forwardemail.net
+Message-ID: <bb4f7703-b704-4eb8-942b-d693f64aed63@ubuntu.com>
+Date: Fri, 12 Dec 2025 19:21:49 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|PH0PR12MB8774:EE_
-X-MS-Office365-Filtering-Correlation-Id: f3787f42-4e29-4d5c-20bd-08de39a51c24
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|7416014|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?RFFNdFovUzZhK3JsampnN0tyTldCOUQrNXNXU21tSGNGbXZHcWVxU05aNGRD?=
- =?utf-8?B?NUNFWGhOWVB3YlZlQzBma0psSG9HQlh5Y3lRUTFwTFdxZGxINHY0OGJhQ0x2?=
- =?utf-8?B?Zk9lTHlUYmdqTSt6TDJUeE02SEp5TXF4VStWZk9hN3NEb1VnWFNhQWdaZ2hD?=
- =?utf-8?B?OUZ4VjdXT2NNUmUzeFJJdVR5QXBHR0JxeGJ0MkZnYVJQMEVxZnhlRCtkNGRw?=
- =?utf-8?B?c2RtWlBTbmdNeEdEMDRHc3cwakNVSytLaUZPYkhFM2JVeGlHY0tlSFZpQVVK?=
- =?utf-8?B?M2s4czd2L3pIOEJsU08zdzVlR3hqeU01aFhpeTBSYU80cEVPNkJLZkwwRkRu?=
- =?utf-8?B?bll5MjdyZzBZbE5Ic2FmTWtUZlAvMThMdWRueWJlUDk1NUlIWVllUlNZWEFn?=
- =?utf-8?B?cHB4cDNqOGw4aGFaem52R3p1NmRyWC91bGhBdXFaVjcxTzB0Y0xkdUc2QUpW?=
- =?utf-8?B?ajRPL2kwUXFjSHZuVmE2YW5kUGtyYzZwY3NXeEFQdklXaEVoNmJyS21GWElw?=
- =?utf-8?B?dEJWN29RVE11WGlHMWs2Zjd5ZnRjT0VkS0twek00NzBPTjdlU0lEVmpqY2Zk?=
- =?utf-8?B?TFpCRU5aWFlWZHFGSERkYk9mMVUzYlFUWHExZlBydDA1a2FaMERWUHhkekR5?=
- =?utf-8?B?cFVlMDFuOEJ2UU5LOG8zNTZpOVZZNEtMeWNtMUc0REExNTRoTWVYNzJoU3g3?=
- =?utf-8?B?bEd5Uy90TFkvaklpSk1NcE9rbXN3RVc3NU1FZmZVbExxZ1R6YmtKVEVsa2FZ?=
- =?utf-8?B?Y0RUcFFTRUxQbTVDbWhCN294ZG9GeTRiaGpjUFR3ZXZ6S1lEbTdWeVE5bnVS?=
- =?utf-8?B?aXlqQ2ZRV0p1MjMwdk1yU21EK2JoNzIzQ1AwUUM5SXMrYXhrQ3lROWdHSldy?=
- =?utf-8?B?cXUxc2t6U3pKVVRUNSs3Y1hXdGVEOXFyWnYyMEN6eHNibE1oUW52bXB4eURL?=
- =?utf-8?B?bXAyWCswYWxJYWQyVjI5VUVacWc4cWdkUXhFYjVDcUJ2RG5XeU10bWRadE54?=
- =?utf-8?B?K1ZXNXlkR0FHeG50b01mQmhCQzFnL1N4TTREWlJyN1pLdGVSZitxMHJVMnVv?=
- =?utf-8?B?OEZTVGpwUG1BN0xBdVZrMUlQTFJwQUlPbk1vNnlBRGNCTXo3Sm9NS2pTTTQv?=
- =?utf-8?B?NHlGMG1UTXBjYXFURHVFanlNMXlyT3RRUU5NOEFVNlY5b0ZiYzE2M0NxVVJY?=
- =?utf-8?B?WHZlN1FmVTJOMlVOQmFnRC92ZTVhNGU4MEQyWTBVMWRLYmY0RHFvWlVwdllQ?=
- =?utf-8?B?eWZJc3VFUEpvZjRseDlNbGY5elRxajVCV1A2c3ZzSmt4VkZVMkVHK05TRDRL?=
- =?utf-8?B?dy9pVG55QUc0K0FOZzNMSnh1YzQ3eUtNd0QxNVNnK2hOaHdHTEJvcVJBVWNp?=
- =?utf-8?B?enRlZGdBOE9mYitLUE1MREJUZE1nR0FIQXBxaUs2OXFYRHAwTVBBL3VzVkRH?=
- =?utf-8?B?eXlzaWlzVjJWOHBWYTRoYzNnRFc1VSt0bzZHVVVvSnF2bWkzR2U3N2pZSmdO?=
- =?utf-8?B?bWFZR0NCSXN2R2VTY1ltL001Rm9RRjRoOVg4VzNXc1ZBMUJhNTNyYU5XOUJ6?=
- =?utf-8?B?QytkRjEyWXYwQmdpQW9PaUFVRitCUG1Lc1Z6U2JEcUxRdlBYQ3o2d25mdG9z?=
- =?utf-8?B?UDVsQjRIQjk2V2p4ZGdsODdycTlkZGpDZ3AwQmlJbmlVZVo5dEZ2cGFtNXdS?=
- =?utf-8?B?QkdHS3c1WU50RHUxQUtsWkltSm9NRllBN2xQUkRpY3E4VStTTUo4QnhXcHJC?=
- =?utf-8?B?QnN0S1hGSkZZaE1GNjhON3FWZ2xYSG0wOE9hNnZQVXhSSzZJeFN2NUE4andN?=
- =?utf-8?B?eTNUYTRSdXFlMTVsT1MxRGRpUS93alJFYjF3SmRDSWV5akFBbHhvaGZ1STUw?=
- =?utf-8?B?R0FTKzI3NTk2eVV6Wlc0K3B5Z0xUaG9WN25nS0s4VWZLVFRmR2pWVXNLSEtv?=
- =?utf-8?Q?pmoiaNMdlkCQKsJS+kDTVgiELdd16Ud6?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?SzFxbzRubWZ3ZXNHMVh1d1JYVjh6V0JWMk1rcHRWbGt3c1BWM1lQd2VCVVJR?=
- =?utf-8?B?UU1oczF0SUpGV2Njbkg3UVFBKzFhaE1hdmhtclJhbkM4SkRRTlN0MTEvWVZq?=
- =?utf-8?B?elowTkgxMHBpWTRtK0JmQ2Rocm1BV2VmaUh1dVEwcFFFbjFTQ2NOUE5jK0t6?=
- =?utf-8?B?VWVBMmZRMXVqcU9xOXRaRytDM05RN1V3elpmRlpheWk5Q0VZUjc5S3MrTCsr?=
- =?utf-8?B?Mk9Id0JSdGg1ZXA3MUtuSUNnWnZ4YTN0YmVES2FHb0VFRE95ODFFK25VOUZY?=
- =?utf-8?B?VVdmeVFHQ3BVR2ljbnZZWEk2MXk5QWFUQjhMRWQzWE92UjhaazhkN2dKekFV?=
- =?utf-8?B?NFUrczRTMXpSdjZxZ1hITGVHaTFlelZiTnFCSDdJbkRic2tycUZFQUczS3M1?=
- =?utf-8?B?N1FlSUVHU2VvWU96OGVLclVQUDhjcTN6a250YXMvaGxielNyS1VYTGU5ZlZN?=
- =?utf-8?B?eEE3L1JmRy85OHdUOGVCd0pFMjdpTDNsL0J5LzV0WnYxZitnenJMZ3VFVHF3?=
- =?utf-8?B?Q0lHTnVVTXhLQ3p2aXdIUWVBZVlXVTllazBqVU5IU1BYTFh6WVh0NEtJUmEy?=
- =?utf-8?B?dURIOExYNEhhWkRmSno0T25mNnFHWnhBclZZdllNTGpXTnNONmFKRlZqemsx?=
- =?utf-8?B?eVI1M2IzSncreTdBTk5jZDYydFlsK2dnT0E2RWowNTY0S0RlMkdBNzZOY1Ju?=
- =?utf-8?B?bmhFUm03cERDL2ZBdFlsUFB4NWplVnNhUitucUtiQlZZS2FYQVJvVnViNGU4?=
- =?utf-8?B?Zk5SUXhEc2ZydnI5TUhmUXhqRmF6TGdzSkswQXZGdkRVb1NVWC9JWGtlY0h4?=
- =?utf-8?B?dklOeFltUlM0ZHAwV3JxNHY4a09WaFBjTEo5R3o0QUcwbjZkNGhkUndHdW5r?=
- =?utf-8?B?RUp2ZEZwd1pkeklqSmNZcHM3QllrS1p1QXNTUFhLa3oxVnc5SXc2RTVHSjI5?=
- =?utf-8?B?alpibm9oa1VIM3htTTlPcnhCWitMS1FOL0pJczRlZi96MWl3MUpHaHNxcnpj?=
- =?utf-8?B?dFB2eXBFV2w1MldlS24vcURKc3JSN1NTUjNNa1NTcW4wUEV0WlBMeFh1cFBQ?=
- =?utf-8?B?dEtRMVBSYVl6eEJPbG1HQTBHL1R6alBNWng1S29BalJGOXRZNHFGMTI2a3NC?=
- =?utf-8?B?OEtIeG4vc0JUSVQzQmVSdFR2dEYya3FQajJSdXZwRTc3c1p1R1VUd3J4Mk9n?=
- =?utf-8?B?b2hWUzZuMHNRMy9oeit5dFBuSXRsa0g5WGlTYzBoZjg4c3BxL09pU3VJaHJi?=
- =?utf-8?B?OUpMaURsNk8vWlBkZWsvTWVPZ1llUk9CRlUvODBLdkwwRWVoZ0tJMmFkOVR5?=
- =?utf-8?B?ei9mb2ZjSU1mRkJoN0l5c3dSdzBuOTlXRkJEbkZSaWkzRW5Rc3J3QU1lT2hB?=
- =?utf-8?B?MlEyREVHS1BDQmNCU1VyUVVPYnI5NDY4SUpXSDIxTFZaemp3Nkd6VklUdGkv?=
- =?utf-8?B?ZzN5aElEOVlhNHYwcXNaaHZkV0sxQUh6Vnl4MUFXeG1YUmxCQ0ZUYVdQUENW?=
- =?utf-8?B?Ukc1eEViZlhzMDBuaUlLZHhKcE82eGtBc1F1bXFrSHFCQmhqU0dPSnQyN1hE?=
- =?utf-8?B?N2MwUGY3a0EzYS9meC9BQVI4UkVYbE9IS0ZUSmVydTlnYVFIYlhMTDJiZ2Fs?=
- =?utf-8?B?NWxGSFd0MmExODNlTWZaSDNkTlBxUURiUXY1K3h0K1paRlZpMmtESXJhT1Na?=
- =?utf-8?B?dVluT2RJV2trKzkrZVAzaFUyelUzK2Iwai9aTTNPV2RkUmV4TUZBQkNRcXA2?=
- =?utf-8?B?UnFuQysxSXFYbFZwTHE0b0RNTm1BRDJubGl4U0ZXcmZuNk5YRkpKa25xaUdp?=
- =?utf-8?B?cUx6STZ4YmFBRXZNZ2VNOW5KMS85M1ZoMUlja1lxakVLRGp5MzhCa1N5TG85?=
- =?utf-8?B?bFh2cGMxTWtOTmRYelhLbmN0RktkRWRaTkt5WHVOdUtVeHVscGo3OElHdFVD?=
- =?utf-8?B?Y1Qvb2gvMFJkKytTUFBsbjFnTW5WMHp5T20veEZHWUpuaHBia0UvdlBHQk9j?=
- =?utf-8?B?TFdwYTZoWHdlTWQ3NlAxejF0TDNrek5BeStGQzU0T3JTMHNQQlRkN2VnaFg2?=
- =?utf-8?B?UmFhSW1Jc1c1M0R4SXdaN3FSZDlaS1dZZ0pzZHV1Z2xCN2RFMGZnaG56Vnh1?=
- =?utf-8?Q?7KRWlmE6JPyK0A/uOIf7dxV5F?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f3787f42-4e29-4d5c-20bd-08de39a51c24
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Dec 2025 17:37:23.9156
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Z8OC+8Bczpy4I5MOgN9n1ZJ3U8y98kTY3tSCJCXDKiAJBeKQ1sMcXg7yYhkL0HgmuxyaaM6qoVQEvgcPX9Hm+g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB8774
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] erspan: Initialize options_len before referencing
+ options.
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Gal Pressman <gal@nvidia.com>,
+ Kees Cook <kees@kernel.org>, Cosmin Ratiu <cratiu@nvidia.com>,
+ Tariq Toukan <tariqt@nvidia.com>, linux-kernel@vger.kernel.org
+References: <20251212073202.13153-1-fnordahl@ubuntu.com>
+ <nZEr2jHd7_uGuwbqEiM3iStGK4aQ_EgMoNLBgyJrYmeTlhzT2-qGpuBxKPW6U7k8ZqAr6HExn5ncXLMA5EbRQQ==@protonmail.internalid>
+ <aTwxDBODyDmerGAt@horms.kernel.org>
+Content-Language: en-US
+From: Frode Nordahl <fnordahl@ubuntu.com>
+In-Reply-To: <aTwxDBODyDmerGAt@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 12/12/25 16:13, Simon Horman wrote:
+> On Fri, Dec 12, 2025 at 07:32:01AM +0000, Frode Nordahl wrote:
+>> The struct ip_tunnel_info has a flexible array member named
+>> options that is protected by a counted_by(options_len)
+>> attribute.
+>>
+>> The compiler will use this information to enforce runtime bounds
+>> checking deployed by FORTIFY_SOURCE string helpers.
+>>
+>> As laid out in the GCC documentation, the counter must be
+>> initialized before the first reference to the flexible array
+>> member.
+>>
+>> In the normal case the ip_tunnel_info_opts_set() helper is used
+>> which would initialize options_len properly, however in the GRE
+>> ERSPAN code a partial update is done, preventing the use of the
+>> helper function.
+>>
+>> Before this change the handling of ERSPAN traffic in GRE tunnels
+>> would cause a kernel panic when the kernel is compiled with
+>> GCC 15+ and having FORTIFY_SOURCE configured:
+>>
+>> memcpy: detected buffer overflow: 4 byte write of buffer size 0
+>>
+>> Call Trace:
+>>   <IRQ>
+>>   __fortify_panic+0xd/0xf
+>>   erspan_rcv.cold+0x68/0x83
+>>   ? ip_route_input_slow+0x816/0x9d0
+>>   gre_rcv+0x1b2/0x1c0
+>>   gre_rcv+0x8e/0x100
+>>   ? raw_v4_input+0x2a0/0x2b0
+>>   ip_protocol_deliver_rcu+0x1ea/0x210
+>>   ip_local_deliver_finish+0x86/0x110
+>>   ip_local_deliver+0x65/0x110
+>>   ? ip_rcv_finish_core+0xd6/0x360
+>>   ip_rcv+0x186/0x1a0
+>>
+>> Link: https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-counted_005fby-variable-attribute
+>> Reported-at: https://launchpad.net/bugs/2129580
+>> Fixes: bb5e62f2d547 ("net: Add options as a flexible array to struct ip_tunnel_info")
+>> Signed-off-by: Frode Nordahl <fnordahl@ubuntu.com>
+> 
+> Hi Frode,
+> 
+> Thanks for your patch (and nice to see you recently in Prague :).
 
-On 11/17/2025 12:33 AM, gregory.herrero@oracle.com wrote:
-> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
->
->
-> From: Gregory Herrero <gregory.herrero@oracle.com>
->
-> The maximum number of descriptors supported by the hardware is hardware
-> dependent and can be retrieved using i40e_get_max_num_descriptors().
-> Move this function to a shared header and use it when checking for valid
-> ring_len parameter rather than using hardcoded value.
->
-> By fixing an over-acceptance issue, behavior change could be seen where
-> ring_len could now be rejected while configuring rx and tx queues if its
-> size is larger than the hardware-specific maximum number of descriptors.
->
-> Fixes: 55d225670def ("i40e: add validation for ring_len param")
-> Signed-off-by: Gregory Herrero <gregory.herrero@oracle.com>
-> ---
->   drivers/net/ethernet/intel/i40e/i40e.h         | 18 ++++++++++++++++++
->   drivers/net/ethernet/intel/i40e/i40e_ethtool.c | 12 ------------
->   .../net/ethernet/intel/i40e/i40e_virtchnl_pf.c |  4 ++--
->   3 files changed, 20 insertions(+), 14 deletions(-)
->
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
-> index 801a57a925da..5b367397ae43 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e.h
-> +++ b/drivers/net/ethernet/intel/i40e/i40e.h
-> @@ -1418,4 +1418,22 @@ static inline struct i40e_veb *i40e_pf_get_main_veb(struct i40e_pf *pf)
->          return (pf->lan_veb != I40E_NO_VEB) ? pf->veb[pf->lan_veb] : NULL;
->   }
->
-> +/**
-> + * i40e_get_max_num_descriptors - get maximum number of descriptors for this
-> + * hardware.
-> + * @pf: pointer to a PF
-> + *
-> + * Return: u32 value corresponding to the maximum number of descriptors.
-> + **/
+Thank you for taking the time to review, much appreciated (I enjoyed the 
+recent conference in Prague and our exchanges there!).
 
-Nit, but the function name is descriptive enough without the documentation.
+> Overall this looks good to me but I have some minor feedback.
+> 
+> 
+> Firstly, the cited patch seems to cover more than erspan.
+> So I'm wondering if you took at look at other cases where
+> this might occur? No problem either way, but if so it might
+> be worth mentioning in the commit message.
 
-I think the purpose of the function would be even more obvious if the 
-argument was a pointer to the hw structure instead of a pointer to the 
-pf since the max is based on the hw not the pf.
+I did some quick searches which formed the basis of the statement of the 
+normal case being to use the ip_tunnel_info_opts_set(), I could expand a 
+bit upon that statement.
 
-Brett
+> Regarding the comments in the code. I am wondering if the are necessary
+> as the information is also contained in the commit message. And if the
+> source documented every such case then things could get rather verbose.
+> 
+> If you do feel strongly about it keeping it then could I ask that
+> (other than the URL) it is line-wrapped trimmed to 80 columns wide or less,
+> as is still preferred for Networking (but confusingly not all Kernel) code.
 
-> +static inline u32 i40e_get_max_num_descriptors(const struct i40e_pf *pf)
-> +{
-> +       const struct i40e_hw *hw = &pf->hw;
-> +
-> +       switch (hw->mac.type) {
-> +       case I40E_MAC_XL710:
-> +               return I40E_MAX_NUM_DESCRIPTORS_XL710;
-> +       default:
-> +               return I40E_MAX_NUM_DESCRIPTORS;
-> +       }
-> +}
->   #endif /* _I40E_H_ */
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-> index 86c72596617a..61c39e881b00 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-> @@ -2013,18 +2013,6 @@ static void i40e_get_drvinfo(struct net_device *netdev,
->                  drvinfo->n_priv_flags += I40E_GL_PRIV_FLAGS_STR_LEN;
->   }
->
-> -static u32 i40e_get_max_num_descriptors(struct i40e_pf *pf)
-> -{
-> -       struct i40e_hw *hw = &pf->hw;
-> -
-> -       switch (hw->mac.type) {
-> -       case I40E_MAC_XL710:
-> -               return I40E_MAX_NUM_DESCRIPTORS_XL710;
-> -       default:
-> -               return I40E_MAX_NUM_DESCRIPTORS;
-> -       }
-> -}
-> -
->   static void i40e_get_ringparam(struct net_device *netdev,
->                                 struct ethtool_ringparam *ring,
->                                 struct kernel_ethtool_ringparam *kernel_ring,
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> index 081a4526a2f0..cf831c649c9c 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> @@ -656,7 +656,7 @@ static int i40e_config_vsi_tx_queue(struct i40e_vf *vf, u16 vsi_id,
->
->          /* ring_len has to be multiple of 8 */
->          if (!IS_ALIGNED(info->ring_len, 8) ||
-> -           info->ring_len > I40E_MAX_NUM_DESCRIPTORS_XL710) {
-> +           info->ring_len > i40e_get_max_num_descriptors(pf)) {
->                  ret = -EINVAL;
->                  goto error_context;
->          }
-> @@ -726,7 +726,7 @@ static int i40e_config_vsi_rx_queue(struct i40e_vf *vf, u16 vsi_id,
->
->          /* ring_len has to be multiple of 32 */
->          if (!IS_ALIGNED(info->ring_len, 32) ||
-> -           info->ring_len > I40E_MAX_NUM_DESCRIPTORS_XL710) {
-> +           info->ring_len > i40e_get_max_num_descriptors(pf)) {
->                  ret = -EINVAL;
->                  goto error_param;
->          }
-> --
-> 2.51.0
->
->
+Yes, I guess it became a bit verbose.  The thought was that it would be 
+very easy to miss this important detail for anyone (including future me) 
+spelunking into this part of the code.
+
+I'll trim it down to a single line, which should be enough to give the 
+urge to look at the commit message.
+
+> As a fix for code present in net this should be targeted at that tree.
+> It's best to do so explicitly like this:
+> 
+> Subject: [PATCH net] ...
+
+Ack.
+
+> And it's probably also best to CC stable@vger.kernel.org.
+> That practice isn't as widespread as perhaps it should be for Networking code.
+> But it does seem worth mentioning.
+
+Ack, the intention was indeed to Cc them, I only put them into the 
+e-mail header and the stable kernel bot pointed out that the Cc also 
+needs to be in the commit message.
+
+-- 
+Frode Nordahl
 
