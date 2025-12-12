@@ -1,152 +1,161 @@
-Return-Path: <netdev+bounces-244508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E78D0CB9327
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 16:52:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88981CB93A1
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 17:07:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 799D43029BB3
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 15:51:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 087B6303FE66
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 16:07:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54B17323416;
-	Fri, 12 Dec 2025 15:43:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA2C723B609;
+	Fri, 12 Dec 2025 16:07:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="POZ68xxT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C8wGMSzP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E11513233FA
-	for <netdev@vger.kernel.org>; Fri, 12 Dec 2025 15:43:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0A4144C8F;
+	Fri, 12 Dec 2025 16:07:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765554230; cv=none; b=Atb35r2IWAEAbACbMBk8Jn8/5v9WQPklCa6MMdZtli/Z5b9xFPKTfHAP2AdDfVyI4YnJxCv8F+NxStFw+VZZeqHC6AobJhxcdkV27e23SiY+We3dNHZ3am6E6EnsyvD+iwqqNuiESWK02SCKMTc2VxWNv7rN1ucu2n/nQ7HpmMw=
+	t=1765555647; cv=none; b=tZlby216ieqcPAfWa4NKQyppPChBm9eNdh7x8Nros4DYIR2X6OZ1Ksz9bFETdIIj5w1P3QHW65haBspYyc50uHD9nLyrZFX1XOBuEIpGjJYCi6Q4BTwihvquDvIEIDcmcXuuR/dbf+JTvJMQQXjuWFhWe49Y/wN9R5CoI+nQNyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765554230; c=relaxed/simple;
-	bh=57/2QXmprtiDegZn0F8NQg3Qzp5N6UM87nK+a1oFiiA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KHW7glKAm/yCi7UoQamH/qPZWPl/ERuexr/lp7tZzKCyEOhPZVcgPt4BruaJhGaU4VY3W32RZlTbD3gQg4dlWeH3wM8xIoh6zjgydMYyWYsxRjgnnOKY5paTem2th0ZX7fugsRon3o/lcK5ZoVtKaaGuCjgqMBINrg9Vj6HozTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=POZ68xxT; arc=none smtp.client-ip=209.85.215.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-bc4b952cc9dso1126274a12.3
-        for <netdev@vger.kernel.org>; Fri, 12 Dec 2025 07:43:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765554228; x=1766159028; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=86AGtXOmh8bPVSUWpWu8yE4ZL4nYZrP63L43343qKlk=;
-        b=POZ68xxTCYL0HmvzDbScfCBj7wg69C4ipVI71WLU4OI0iXVwsBW6MSo8LhBP09i5/p
-         i5dOiZOmshJFCWzeBpvGjFhmiWreYdVN3sQF7TtLW1qyeLZYREqyU2oL/DlQlpUOoLDc
-         rUPqpku6CR8ardpr3yxSQ8Tl3CVpsGR0cSXk1DiTMplakKAjvw7Vmtr1Wc2tFIIQbbu4
-         KOHkO+5DZFs2lSPQr4BxMegXmDggiJQWRu8lrBsiaiYL4DLc98K13cZ+rrTaKn8wFtNu
-         BDQgWxu3icXPjEiYjN3ASi4gs/eoSbSYKfbc8xez+sDDeVhVeGkEfIX6gaJWhm5U6nGX
-         1g0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765554228; x=1766159028;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=86AGtXOmh8bPVSUWpWu8yE4ZL4nYZrP63L43343qKlk=;
-        b=BLfZWFrrBgbcytbX4WdXgPpoGaNBvo58Z/GUymkq0NoZRUqM26ykpHmV2aMCPyozvv
-         46oLRqUpTj78Iy1wbgOEgiINXeKnxRLvrCTgzI2QFOsnNyXgRHkEK8+VfI7WXlUJBng9
-         naaDy+Ap0qqdp3R3a0xDfwknOoWQDysPPCGZR9Yq8HhVbk6ta43W9eqMEZr10nkoAkGW
-         35DT7jayT3I4PL369XSJQ+LSHySxaU3TgTjW2TBNqGsfECOszl2okiFHYTG342i1lw4b
-         lOQ3gCrzU6BOnpqtmkMGv0/2Uc/F4Z/kUigAVJVxxtdc7knCAzwDgVf11MDBG1/dBEHQ
-         6Tsg==
-X-Forwarded-Encrypted: i=1; AJvYcCWN17A8+AOHpfBSeAMSgh89LmNkPVqVMZCyb8Tf+tvzL1GWZ2KTszgs+SbDkefKbh0Mqi3XdJc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwbL6NyLGD23fVFJG96/n1USIsvgAFuk1Z8VOTVOnHRg+2fP0cT
-	2Jjs6qcRyX7qplxqGHDyax5ubge+ScSBwrOFbCQ/G0Oy67NMyFcTrt48PexFUvGai70To7cKQDK
-	70uRQ/eAL5SwefNXM4psgmU+AIan12dc=
-X-Gm-Gg: AY/fxX7OKeaQDTyW892/n6NO4VzdsYCFpUNibHJktessuGhjKWTa01w2U67AzzYpt8u
-	uvw1ah6fd50dMX1BQD5aHbP0hd4qtfR/VtgvsPFfJji1Chh2YbZY2kb84KBioXznFp/70v3LD4p
-	W2CxDt2HMxGh4niPLsg1zO0RKpIitcP91rPh4KSFKwJoVFGKtLxCZ6GwM1FF87cCMs+KTiG32Qa
-	DUiY3tR/MqDqF370bqZYAKgF4vAXi3iTmQu0BxyPyxcIdOl2/plQhBe1dSM7z7C8sQ40co=
-X-Google-Smtp-Source: AGHT+IGgsCkKd879py4tIU07CCUR7G051VQXSmmR5Yos1fJaCBJe3Uk3GzwbucF2eLremyYxLXQ1blGnpC2rIig6eOo=
-X-Received: by 2002:a05:7301:7387:b0:2a7:2db:954 with SMTP id
- 5a478bee46e88-2ac2f8a9b81mr1511398eec.15.1765554227968; Fri, 12 Dec 2025
- 07:43:47 -0800 (PST)
+	s=arc-20240116; t=1765555647; c=relaxed/simple;
+	bh=MKQzlstlg1IG9jT2vvHFof/BP3rK+NlYQDP9+HgmlMo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pAKH6wFtyx3wdEOdfDIN9QZ1Y89sFVDZlrGRCHBIby8wCf+/kjZmolZSptWqAPmv0p5b0kNFTloLZFhxOjRElGJ9SpZRXme40bOKNitTEVCDWahlXNA2kjJUYWTNHspGAgu8HglfOuNkZb0oubr/eISdnqMsc4U4IRZsurcVIu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C8wGMSzP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBD63C4CEF1;
+	Fri, 12 Dec 2025 16:07:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765555647;
+	bh=MKQzlstlg1IG9jT2vvHFof/BP3rK+NlYQDP9+HgmlMo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=C8wGMSzPahxtNs76VBRkZMG5ec+PS3tl/jL1D3q58AHFKt4nz7yuJR4Q65K9rbj/o
+	 5+l23R6kS+bagDxMaHNDDHhjcOw6FjjMAkXn281hGO9XNvjet3Wy2wMHRrRsGZcjCe
+	 cTHIgaH5WUw7xH45g3BLD6igB3AEg24IUl/AuhuTDH99A4/5zQkA9lAne51xfXYPb5
+	 2gjlW3LiAQAHPd6zIord91qR1079b4LeeaYo6DoWdQCHskWuWb4xhkyjxXNjr1uvWW
+	 UGAx3qm/nHph1mEun9fCy3Vn6FWJaQ7XI2foXdpi8LDIM0pvIYn39kr7BWw6gQ3Lyn
+	 SihtzhrBru5mA==
+Date: Fri, 12 Dec 2025 16:07:22 +0000
+From: Simon Horman <horms@kernel.org>
+To: Vimlesh Kumar <vimleshk@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	sedara@marvell.com, srasheed@marvell.com, hgani@marvell.com,
+	Veerasenareddy Burru <vburru@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net v1 2/3] octeon_ep: ensure dbell BADDR updation
+Message-ID: <aTw9uutDeFnKDX1d@horms.kernel.org>
+References: <20251212122304.2562229-1-vimleshk@marvell.com>
+ <20251212122304.2562229-3-vimleshk@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CADm8Tem-jtBmmOO9S6jW-jzffCqe7X_DpJcy25KRkyY9Tn+TZA@mail.gmail.com>
- <166381e1-5287-414c-baa4-be371fe46e3f@lunn.ch>
-In-Reply-To: <166381e1-5287-414c-baa4-be371fe46e3f@lunn.ch>
-From: Tuo Li <islituo@gmail.com>
-Date: Fri, 12 Dec 2025 23:43:37 +0800
-X-Gm-Features: AQt7F2pD0p5U6w663alqqGE6zOUi9j60C0Jr2UXuG_7q-t9Ni9nyQ6tuRQFNMNE
-Message-ID: <CADm8Temw5Eq__N7RGuCfAiRE6qH7rUWObWiciFgf9FwOL6nziQ@mail.gmail.com>
-Subject: Re: [BUG] net: 3com: 3c59x: Possible null-pointer dereferences caused
- by Compaq PCI BIOS32 problem
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: klassert@kernel.org, andrew+netdev@lunn.ch, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, mingo@kernel.org, 
-	tglx@linutronix.de, netdev@vger.kernel.org, 
-	Linux Kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251212122304.2562229-3-vimleshk@marvell.com>
 
-Hi Andrew,
+On Fri, Dec 12, 2025 at 12:23:01PM +0000, Vimlesh Kumar wrote:
+> Make sure the OUT DBELL base address reflects the
+> latest values written to it.
+> 
+> Fix:
+> Add a wait until the OUT DBELL base address register
+> is updated with the DMA ring descriptor address,
+> and modify the setup_oq function to properly
+> handle failures.
+> 
+> Fixes: 0807dc76f3bf5("octeon_ep: support Octeon CN10K devices")
 
-On Fri, Dec 12, 2025 at 10:02=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote=
-:
->
-> On Fri, Dec 12, 2025 at 03:52:01PM +0800, Tuo Li wrote:
-> > Hi,
-> >
-> > I found a few potential null-pointer dereferences in vortex_probe1() in
-> > Linux 6.18.
->
-> You might want to look at the history of this driver. The last time
-> anybody seemed to really care about this driver was:
->
-> commit a6522c08987daa6f9ac25a9c08870041a43db6b0
-> Author: Neil Horman <nhorman@tuxdriver.com>
-> Date:   Thu Feb 25 13:02:50 2016 -0500
->
->     3c59x: mask LAST_FRAG bit from length field in ring
->
->     Recently, I fixed a bug in 3c59x:
->
->     commit 6e144419e4da11a9a4977c8d899d7247d94ca338
->     Author: Neil Horman <nhorman@tuxdriver.com>
->     Date:   Wed Jan 13 12:43:54 2016 -0500
->
->         3c59x: fix another page map/single unmap imbalance
->
->     Which correctly rebalanced dma mapping and unmapping types.  Unfortun=
-ately it
->     introduced a new bug which causes oopses on older systems.
->
-> Everything since then has been tree wide changes.
->
-> > It looks like these issues stem from the call at line 987 used as a
-> > workaround for the Compaq PCI BIOS32 problem:
->
-> Also, maybe do some research into "Compaq PCI BIOS32". I _think_ that
-> was from the time of the 80386? Maybe 80486? Support for those
-> processors has been dropped, so i don't think it is even possible to
-> boot such a machine to invoke this possible NULL pointer dereference.
->
-> Please do some sanity checking before reporting potential issues. I
-> _think_ you are wasting your own time, and valuable Maintainer time.
->
->         Andrew
+Hi Vimlesh,
 
-Thanks for the explanation and for pointing me to the history of this
-driver.
+Thanks for your patch.
 
-I apologize for the insufficient consideration. I'll be more careful about
-checking the historical background and the practical reachability of code
-paths before sending reports.
+Some feedback from my side.
+First, there is a space missing in the Fixes tag:
 
-Thanks again for taking the time to clarify this.
+Fixes: 0807dc76f3bf ("octeon_ep: support Octeon CN10K devices")
 
-Sincerely,
-Tuo Li
+> Signed-off-by: Sathesh Edara <sedara@marvell.com>
+> Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
+> Signed-off-by: Vimlesh Kumar <vimleshk@marvell.com>
+
+...
+
+>  /* Setup registers for a PF mailbox */
+> diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_cnxk_pf.c b/drivers/net/ethernet/marvell/octeon_ep/octep_cnxk_pf.c
+
+...
+
+> @@ -343,6 +344,23 @@ static void octep_setup_oq_regs_cnxk_pf(struct octep_device *oct, int oq_no)
+>  			reg_val = octep_read_csr64(oct, CNXK_SDP_R_OUT_CONTROL(oq_no));
+>  		} while (!(reg_val & CNXK_R_OUT_CTL_IDLE));
+>  	}
+> +	octep_write_csr64(oct, CNXK_SDP_R_OUT_WMARK(oq_no),  oq->max_count);
+> +	/* Wait for WMARK to get applied */
+> +	usleep_range(10, 15);
+> +
+> +	octep_write_csr64(oct, CNXK_SDP_R_OUT_SLIST_BADDR(oq_no), oq->desc_ring_dma);
+
+Please line-wrap Networking code to 80 columns wide or less where it can
+be done without reducing readability (which is the case here).
+
+checkpatch.pl --max-line-length=80 should flag this.
+
+> +	octep_write_csr64(oct, CNXK_SDP_R_OUT_SLIST_RSIZE(oq_no), oq->max_count);
+> +	reg_ba_val = octep_read_csr64(oct, CNXK_SDP_R_OUT_SLIST_BADDR(oq_no));
+> +	if (reg_ba_val != oq->desc_ring_dma) {
+> +		do {
+> +			if (reg_ba_val == UINT64_MAX)
+
+I think that ULLONG_MAX here, rather than defining UINT64_MAX
+elsewhere in this patch.
+
+It might be better if the Kernel provided UINT64_MAX and friends.
+But it doesn't. (And I'm sure there are many opinions on why.)
+
+> +				return -1;
+
+This should be a standard error code.
+Perhaps -EFAULT?
+
+> +			octep_write_csr64(oct, CNXK_SDP_R_OUT_SLIST_BADDR(oq_no),
+> +					  oq->desc_ring_dma);
+> +			octep_write_csr64(oct, CNXK_SDP_R_OUT_SLIST_RSIZE(oq_no), oq->max_count);
+> +			reg_ba_val = octep_read_csr64(oct, CNXK_SDP_R_OUT_SLIST_BADDR(oq_no));
+> +		} while (reg_ba_val != oq->desc_ring_dma);
+
+I am concerned that this loop is unbounded.
+Could some limit be placed on it?
+
+...
+
+> diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.h b/drivers/net/ethernet/marvell/octeon_ep/octep_main.h
+> index 81ac4267811c..76622cdf577d 100644
+> --- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.h
+> +++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.h
+> @@ -55,6 +55,10 @@
+>  				  (iq_)->max_count - IQ_INSTR_PENDING(iq_); \
+>  				})
+>  
+> +#ifndef UINT64_MAX
+> +#define UINT64_MAX ((u64)(~((u64)0)))        /* 0xFFFFFFFFFFFFFFFF */
+> +#endif
+> +
+>  /* PCI address space mapping information.
+>   * Each of the 3 address spaces given by BAR0, BAR2 and BAR4 of
+>   * Octeon gets mapped to different physical address spaces in
+
+...
+
+-- 
+pw-bot: cr
 
