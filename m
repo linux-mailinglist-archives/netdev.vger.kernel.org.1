@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-244547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244539-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4366ECB9B1B
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 20:49:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E79F5CB9A79
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 20:39:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8FD8F3116D42
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 19:46:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CE1A430BEA7C
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 19:38:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4B26314A9F;
-	Fri, 12 Dec 2025 19:38:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73B8530C373;
+	Fri, 12 Dec 2025 19:38:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b="GbCAZmdY"
+	dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b="pagUMnJu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D36B30E0DF;
-	Fri, 12 Dec 2025 19:38:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74C292F83DC;
+	Fri, 12 Dec 2025 19:38:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765568302; cv=none; b=JItok7ikyTD5rHStzqOsjNIbtvdKEDem7m00elxxhnBEGSacgoaXCIc89k7dhMUp1BpqZxNLqgJQfETt/XIe29YnhiyJx6qt8qeSfPcUhxdnwDt48svLl4cllaBs+Gh1AlI22nZdvI74lDdA1SOY28x3opJMyQV3uOxZFyQeCug=
+	t=1765568297; cv=none; b=FITsWjn/ElxfH4AXQWZ/L7gYqkV/LtiEM+/mD/sXJXoPnJnhJDxleE2ZEYsgyFRg7TcGGZEqUlkuqH7GnFkXlGFRs6ADMf5tVYQVmm2GWWKWpKxBmzs+YVksXWeKvCLzh3J1jUCTZBxr7yiAqcsNxCBQ1ybLLeriqEDhvzRRmKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765568302; c=relaxed/simple;
-	bh=eSanA0nLIBnaxYkOxEDR3V3ZjDGcD9zNpqK4QeXpRW0=;
+	s=arc-20240116; t=1765568297; c=relaxed/simple;
+	bh=zAilw6c1cTSLXleqFwparWwFnbwn1cLEm5G/XlL7Ptg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=uP7W9K/V3iGs1w6BJeRMyZo4aD7YV1binykddWrRqU9glx47CP1P7HLgII8v+XVBj8gjg41Ls4FuKfTMvr6U0s7bbRy3rKupULhVO21yyAMebLq/Q4oom9icmrWIX8d9AZMX0/ER570SyuyBwp2qR0XV55t4WoX3Ukg2Vd38fPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=runbox.com; dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b=GbCAZmdY; arc=none smtp.client-ip=185.226.149.37
+	 MIME-Version; b=HLtAbEEjdu+cwRdUm4hVWBHZodzMK65wPzGBVKgF1r8ODTSLRlWhLpJNdlfMU9akWGvE9ruZGhm7LvL7dRa8t4JshdOCphGbNSi6qKORRjuTiRi8wvEgRIgGPVWvTJE3TUEKSqlI5eG9Hq+DOSkjPjN7qtc+me/arEprMR56LLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=runbox.com; dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b=pagUMnJu; arc=none smtp.client-ip=185.226.149.38
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=runbox.com
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <david.laight.linux_spam@runbox.com>)
-	id 1vU8xw-0087cj-9E; Fri, 12 Dec 2025 20:38:12 +0100
+	id 1vU8xu-007Tao-Tr; Fri, 12 Dec 2025 20:38:10 +0100
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=runbox.com;
 	 s=selector2; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To
 	:Message-Id:Date:Subject:Cc:To:From;
-	bh=E/tgkX0LFHmCKon+QMYZwmLD5pzvPWhgIG9AyUVS/4A=; b=GbCAZmdYgLDD6BsKEv/7nB5GEj
-	SCi0M5uT3FlqXbwhSGRdAsoIZBKDw+DNz4YP/Tuxphx8LFDUFyOLUVMxTu2wlxOgYzzSZVndai3Z2
-	tqGbsp45aznudJRQappgJddb+Wq47yHv0KZjbWnRhHzzJjH6O9jFNADB45lpo8ojMIu4jiZTyjIUS
-	/57sbdSiOiyloDKXVoKJFp9zvI0B83/CSL1UDxkYo60A+uhtUWicciSeD+3lCLFPv2DCRoR1vlNcj
-	TG5fF8kdwhwFl/+Asg0G4/XgPcihZIZCi28PCzl2Dp/c7GzqCbjf1e6oRGYkXq01hVq7d6BZ3UsPM
-	qKHF3g7g==;
+	bh=gClv2ms3a8GLsRYy6HjqpYNYZFcf9BvN9jrm2mdq1WA=; b=pagUMnJuCRnozopuHaivaccyLT
+	r2pGb7PaZDYxLpM6osM7m7vz8KS09ge9xR/l0xhNbNcZow/5z5y66+dlsJgz15f+r7pCjFKDxZWYq
+	gI5jLfMAl7+AQk6/Mk7f6N7C4vX+vNA8/LWkMi0okplFi333u8tX8/KZ6NdNK+6EvYQ1ZKmG5CLf7
+	3hIvLwfScFl3TqOw5jGZ99gP8G0Y/eATz7rtY/9geL6+kFc9DV5EAn+C5Z8HqG/a2+f3FTWhigRjq
+	/97QXdh7j4Fem4VgmPj7yWl5DWNc/YXK7jXffW7tftTH3K0CSuLvHlu/icnlzX8tPSnL68+QZK++0
+	HoiCd0/w==;
 Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <david.laight.linux_spam@runbox.com>)
-	id 1vU8xv-0003A9-SF; Fri, 12 Dec 2025 20:38:12 +0100
+	id 1vU8xu-0006uh-Ig; Fri, 12 Dec 2025 20:38:10 +0100
 Received: by submission02.runbox with esmtpsa  [Authenticated ID (1493616)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.93)
-	id 1vU8xZ-0030pR-Ho; Fri, 12 Dec 2025 20:37:49 +0100
+	id 1vU8xa-0030pR-JL; Fri, 12 Dec 2025 20:37:50 +0100
 From: david.laight.linux@gmail.com
 To: Yury Norov <yury.norov@gmail.com>,
 	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
@@ -71,9 +71,9 @@ To: Yury Norov <yury.norov@gmail.com>,
 	Yehezkel Bernat <YehezkelShB@gmail.com>,
 	Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
 Cc: David Laight <david.laight.linux@gmail.com>
-Subject: [PATCH v2 01/16] nfp: Call FIELD_PREP() in NFP_ETH_SET_BIT_CONFIG() wrapper
-Date: Fri, 12 Dec 2025 19:37:06 +0000
-Message-Id: <20251212193721.740055-2-david.laight.linux@gmail.com>
+Subject: [PATCH v2 02/16] thunderbolt: Don't pass a bitfield to FIELD_GET
+Date: Fri, 12 Dec 2025 19:37:07 +0000
+Message-Id: <20251212193721.740055-3-david.laight.linux@gmail.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20251212193721.740055-1-david.laight.linux@gmail.com>
 References: <20251212193721.740055-1-david.laight.linux@gmail.com>
@@ -87,65 +87,60 @@ Content-Transfer-Encoding: 8bit
 
 From: David Laight <david.laight.linux@gmail.com>
 
-Rather than use a define that should be internal to the implementation
-of FIELD_PREP(), pass the shifted 'val' to nfp_eth_set_bit_config()
-and change the test for 'value unchanged' to match.
+None of sizeof(), typeof() or __auto_type can be used with bitfields
+which makes it difficult to assign a #define parameter to a local
+without promoting char and short to int.
 
-This is a simpler change than the one used to avoid calling both
-FIELD_GET() and FIELD_PREP() with non-constant mask values.
+Change:
+	u32 thunderbolt_version:8;
+to the equivalent:
+	u8 thunderbolt_version;
+(and the other three bytes of 'DWORD 4' to match).
+
+This is necessary so that FIELD_GET can use sizeof() to verify 'reg'.
 
 Signed-off-by: David Laight <david.laight.linux@gmail.com>
 ---
 
-Unchanged for v2.
+Changes for v2:
+- Change structure definition instead of call to FIELD_GET().
 
- .../ethernet/netronome/nfp/nfpcore/nfp_nsp_eth.c | 16 ++++++----------
- 1 file changed, 6 insertions(+), 10 deletions(-)
+FIELD_GET currently uses _Generic() which behaves differently for
+gcc and clang (I suspect both are wrong!).
+gcc treats 'u32 foo:8' as 'u8', but will take the 'default' for other
+widths (which will generate an error in FIED_GET().
+clang treats 'u32 foo:n' as 'u32'.
 
-diff --git a/drivers/net/ethernet/netronome/nfp/nfpcore/nfp_nsp_eth.c b/drivers/net/ethernet/netronome/nfp/nfpcore/nfp_nsp_eth.c
-index 5cfddc9a5d87..4a71ff47fbef 100644
---- a/drivers/net/ethernet/netronome/nfp/nfpcore/nfp_nsp_eth.c
-+++ b/drivers/net/ethernet/netronome/nfp/nfpcore/nfp_nsp_eth.c
-@@ -509,8 +509,7 @@ int nfp_eth_set_configured(struct nfp_cpp *cpp, unsigned int idx, bool configed)
+ drivers/thunderbolt/tb_regs.h | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/thunderbolt/tb_regs.h b/drivers/thunderbolt/tb_regs.h
+index c0bf136236e6..f35f062beb34 100644
+--- a/drivers/thunderbolt/tb_regs.h
++++ b/drivers/thunderbolt/tb_regs.h
+@@ -180,14 +180,14 @@ struct tb_regs_switch_header {
+ 	u32 route_hi:31;
+ 	bool enabled:1;
+ 	/* DWORD 4 */
+-	u32 plug_events_delay:8; /*
+-				  * RW, pause between plug events in
+-				  * milliseconds. Writing 0x00 is interpreted
+-				  * as 255ms.
+-				  */
+-	u32 cmuv:8;
+-	u32 __unknown4:8;
+-	u32 thunderbolt_version:8;
++	u8 plug_events_delay; /*
++			       * RW, pause between plug events in
++			       * milliseconds. Writing 0x00 is interpreted
++			       * as 255ms.
++			       */
++	u8 cmuv;
++	u8 __unknown4;
++	u8 thunderbolt_version;
+ } __packed;
  
- static int
- nfp_eth_set_bit_config(struct nfp_nsp *nsp, unsigned int raw_idx,
--		       const u64 mask, const unsigned int shift,
--		       u64 val, const u64 ctrl_bit)
-+		       const u64 mask, u64 shifted_val, const u64 ctrl_bit)
- {
- 	union eth_table_entry *entries = nfp_nsp_config_entries(nsp);
- 	unsigned int idx = nfp_nsp_config_idx(nsp);
-@@ -527,11 +526,11 @@ nfp_eth_set_bit_config(struct nfp_nsp *nsp, unsigned int raw_idx,
- 
- 	/* Check if we are already in requested state */
- 	reg = le64_to_cpu(entries[idx].raw[raw_idx]);
--	if (val == (reg & mask) >> shift)
-+	if (shifted_val == (reg & mask))
- 		return 0;
- 
- 	reg &= ~mask;
--	reg |= (val << shift) & mask;
-+	reg |= shifted_val;
- 	entries[idx].raw[raw_idx] = cpu_to_le64(reg);
- 
- 	entries[idx].control |= cpu_to_le64(ctrl_bit);
-@@ -571,12 +570,9 @@ int nfp_eth_set_idmode(struct nfp_cpp *cpp, unsigned int idx, bool state)
- 	return nfp_eth_config_commit_end(nsp);
- }
- 
--#define NFP_ETH_SET_BIT_CONFIG(nsp, raw_idx, mask, val, ctrl_bit)	\
--	({								\
--		__BF_FIELD_CHECK(mask, 0ULL, val, "NFP_ETH_SET_BIT_CONFIG: "); \
--		nfp_eth_set_bit_config(nsp, raw_idx, mask, __bf_shf(mask), \
--				       val, ctrl_bit);			\
--	})
-+#define NFP_ETH_SET_BIT_CONFIG(nsp, raw_idx, mask, val, ctrl_bit)	  \
-+	nfp_eth_set_bit_config(nsp, raw_idx, mask, FIELD_PREP(mask, val), \
-+			       ctrl_bit)
- 
- /**
-  * __nfp_eth_set_aneg() - set PHY autonegotiation control bit
+ /* Used with the router thunderbolt_version */
 -- 
 2.39.5
 
