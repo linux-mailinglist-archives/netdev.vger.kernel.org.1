@@ -1,118 +1,127 @@
-Return-Path: <netdev+bounces-244451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B839CB7D07
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 05:00:34 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9075BCB7DBC
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 05:26:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0DBE7300FE18
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 04:00:33 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A9D2C3005013
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 04:26:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E196F2EC0A3;
-	Fri, 12 Dec 2025 04:00:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="tm62fkmv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 406412C11F3;
+	Fri, 12 Dec 2025 04:26:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from siberian.tulip.relay.mailchannels.net (siberian.tulip.relay.mailchannels.net [23.83.218.246])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63EBC2E093F
-	for <netdev@vger.kernel.org>; Fri, 12 Dec 2025 04:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765512030; cv=none; b=k4jnu3JgdbnmplKOZzKbTiTNaoURbRCw9K1znwFnHgO7WZUXQ3lb40nyR0rfXPEYOpLKX+y1Wj4SHJ13D0MBUKEWHURigdU2FqkoKqC84Z8nZlbHuFg0Ie4aeJoVG06LwcTf0z9aa0BRfFGcqYmuWU/Ub/Nvmvfct4HY1R4ir0o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765512030; c=relaxed/simple;
-	bh=jMmmWJOEHOjpFM4kn/vYckPigFDxsbPEd4OVO16MrfM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PpRWoPT4DGjR95dkLFGYBa0OoUG6CE+KdC146tWNxvzEkorCEDltgAkgywRAXiHmfxI2pCkKaqGgv1LPbl/yZN3TqMzbhQg+8jGarFdShFPYdUZA6+USXyaGKQwFMC+2LDZPzQ89ZNG4TKTqfZhkIRHfkYOK2JOZ7i47yIf873M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=tm62fkmv; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-297ec50477aso3352585ad.1
-        for <netdev@vger.kernel.org>; Thu, 11 Dec 2025 20:00:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1765512027; x=1766116827; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xZqZ+z8tvqhGcBaviDEqLLRZIh7wEbMOsq19107JFIY=;
-        b=tm62fkmvPrJG2IbIm/0icJwDjErIXKgknUF62/g9i0/uS/slEJvZt0jOReNmSLInK+
-         eeu9BQ1TZIbypjTxK3A6yCnTnwxl6VYKB7MIa8Ql/HgobZ8ovPuva4u4s5bC/NyziGDY
-         pGMCQRhc6rWQbqx3oXN/TklV2cWn0H6OF9W0WpPOHnhbej1aAuQNUOE3qoiKsvltATjR
-         AcLux59Hr84jZz3VhOt/ckJBFmTSio7l0tiXB4iiDc2ILW+rOjxEGV3ddsoDpobHRVDq
-         vW1E5ISdiOz4a6ZKe0ds7jKygmCVStjFp/HodJEAC1Rcob2NBVQ421jOPSkPH1Y5wFIl
-         WJ1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765512027; x=1766116827;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=xZqZ+z8tvqhGcBaviDEqLLRZIh7wEbMOsq19107JFIY=;
-        b=pne9XQpl9djlcBxQyLSpY2m1tv7suX731Hw63P19PMdAO4uwbtse+YQk5HWPsGMDT4
-         LGC8BKickRkt1UWPtxPV9W21TB5RPvlYcUg/7Ih53FtNGvpDR1XdOyP7vCKaS2asD55j
-         f5DvgIIn5RpdvPpM/A6GR5XnqXNwL1bWS4C78pqVaOst7MTMJuWbb405we3rpLGX57ZC
-         O5J7Fr0r3wL4/HBd1siJtP4QivxVtpyawiSiKbe2zExfok+bvgFbCPTscspKjfLVfcnd
-         Xypdu3R6H08NTcggrngTOdO7g/hFgEdAZ24n5f/mGsunbT4NHj9BQ9J2aGOGGzbgIpop
-         FB4g==
-X-Gm-Message-State: AOJu0Yx+vMPsOnD4zVqrjHwkvW5w5ysoKLrG2UsTffgVbDE5iOFoK8Hb
-	bsKelfrwcJywmVVfhlQsoBAr73dN5gv1LJJbQKHGt3xx9otcJqIDquAblFPObxFXBrEZuqTMt++
-	H7V4EH0E=
-X-Gm-Gg: AY/fxX621n8BeId5MGg5ViAb+9mxlTXQNzzTckJbvGV0OhRBv1RRG1D2k+qAAlDgkoF
-	fElx6hFZo5BXr3FSibkCft1hTmTHBH0mfqUowZMtJshD5vNEvnRVXPot7n60AzsTHzd2MnsQTe5
-	okanI2T+DVIggJrsaRciFESSiAXtBXmTM6NiIpIKddy4XJiWQxImzP8vj0EbzRwDktJCa0mXnv1
-	p68XAmX7jdBZvV5XH3haZnUvS8z0pFmABlI82gvuy1swBO0ikR9HTidDpGTeE7vYzzNL7jwcITj
-	JQBp9VUSLAma006nVqKnAyjl3kf6bIf46SuffzKPDrrLnrY8vbynRlbcwEUjInpjwTs1Mj81b6z
-	MwyQAhW2sxzEo2cDwGKuV6kW+Tb+8SIJiSJWQYsl6FyM5uZ/RhIzjvA2Hy8UJIf9iNBlCz1m2S1
-	ApOcLRVYuAERqNySZwQb29o4SBewk5Ug==
-X-Google-Smtp-Source: AGHT+IFRbKb6VOolGB8sxGAqY8rX+DGNIVRNd5fDq/AoXQEVgEmgw5At36RpkzSO+x43Gv5S/EhoJw==
-X-Received: by 2002:a17:902:f70e:b0:29f:1b1f:784 with SMTP id d9443c01a7336-29f1b1f0a06mr15420055ad.4.1765512027382;
-        Thu, 11 Dec 2025 20:00:27 -0800 (PST)
-Received: from stephen-xps.local ([2001:f70:700:2500:cb58:a2f0:9144:fccf])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29eea016c63sm38001065ad.48.2025.12.11.20.00.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Dec 2025 20:00:27 -0800 (PST)
-Date: Fri, 12 Dec 2025 13:00:20 +0900
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: "Eric Sun (ericsun2)" <ericsun2@cisco.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: bridge-utils: request to fix git tags
-Message-ID: <20251212130020.7a555eb3@stephen-xps.local>
-In-Reply-To: <161B0C34-1F18-4010-B89B-738DA12F77DC@cisco.com>
-References: <161B0C34-1F18-4010-B89B-738DA12F77DC@cisco.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D50AA2F2909
+	for <netdev@vger.kernel.org>; Fri, 12 Dec 2025 04:26:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.218.246
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765513588; cv=pass; b=lnW7p4Aoiffk5frnOdISIp/zsG3ehisbFhWkPsJNNLmFNGLTj8UcvMNeb0jpL4jOkMfX0Vn7gJD4M1mBfNWdezelwxLbHQ1RLBZhYvDstPqJPbSsCrY0QsMl0CN1l0HGl2CfEAMki35GPbrgUmqBYq0Y7jmAvecQobDzW6zN1iQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765513588; c=relaxed/simple;
+	bh=8pkmy2FlWxSygJE1dQiAtceFHABT+5+Jikn/82zUWBA=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=W0w4JalQyBzKiX7kq56NeDNLWSis2XZjM/pMZkW5CvOFS+MqDTcKcljedM3+9tK+bDkIqRHG7S78bQ/CA9dEOY86mY+6K+BbSaPgEpF7qHcDliYlOcem4Y8pWieLcEfHRnr2Hc9XhhO82JVNX9u+pN49tvDpyKbxqEyVuIulaQE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=christoph.anton.mitterer.name; spf=pass smtp.mailfrom=scientia.org; arc=pass smtp.client-ip=23.83.218.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=christoph.anton.mitterer.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=scientia.org
+X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+	by relay.mailchannels.net (Postfix) with ESMTP id DCB5F46166D;
+	Fri, 12 Dec 2025 04:26:18 +0000 (UTC)
+Received: from cpanel-007-fra.hostingww.com (trex-green-1.trex.outbound.svc.cluster.local [100.102.46.239])
+	(Authenticated sender: instrampxe0y3a)
+	by relay.mailchannels.net (Postfix) with ESMTPA id 2E3194611D1
+	for <netdev@vger.kernel.org>; Fri, 12 Dec 2025 04:26:18 +0000 (UTC)
+ARC-Seal: i=1; a=rsa-sha256; d=mailchannels.net; s=arc-2022; cv=none;
+	t=1765513578;
+	b=3dQdl0LMGm1cdnyxzjGWDhnun3fdrd9szHTKMycY+j5+tIu1WGa518EFruwx55zOl1aK4t
+	hx9tkJqIskcRWBg+GgJcqW4LFFwirGl+d3XAExCijoab7jrkto/LYA8LueznSWME26TE2M
+	RI8s7Toxbrwqrk8ZYir5xf7pJ96F4nvBdqbsWFaj/0/dG9xysxJ5h6PR00ZaWQRD/dcHgK
+	zpWrDW3kcV2shdHXz8aAfk8OXy4bWOhsNQGv4VIy/Q2zjMbCILU9voz8iRtfOOvKaCCgHL
+	8aGa3bfMGOC7QIwcCQ+E8DogxLBGLdymunCbCyg/0JTFKC22+FEAgOMoWTVzow==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mailchannels.net;
+	s=arc-2022; t=1765513578;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=8pkmy2FlWxSygJE1dQiAtceFHABT+5+Jikn/82zUWBA=;
+	b=DfKqzT/03zvaa9lUTywwAD8sYugyLfox4W5EklQ8Vb8BOblTGHVxRQuNX0kAqvXBvApu19
+	NHQA8DfoRbbZ2/7sYwocH6XZJ9Shc9RZKK9dRiQg0WviXy8lDKwjNfux+91bsEv4iC4iK/
+	w4oCqeI4dyITJGrghcFK8LndNuew+9cZoQ+mBuuMC0Gcma0Y1FAIC9h3jbIgdQoPvTeIwP
+	p/io2rhusBRfX0KRRMNo6enX4SnSJ7hREjUPjnLuAtfAM+KK5XBetforqVsdrVlpinKGE1
+	Gu8c8knyZ4blUdQde3+Tm+ev42KY42Yxad9sUJEpz8kiAfgdyFqvy27+WfMyow==
+ARC-Authentication-Results: i=1;
+	rspamd-9c757c4bc-ksz2f;
+	auth=pass smtp.auth=instrampxe0y3a smtp.mailfrom=calestyo@scientia.org
+X-Sender-Id: instrampxe0y3a|x-authuser|calestyo@scientia.org
+X-MC-Relay: Neutral
+X-MC-Copy: stored-urls
+X-MailChannels-SenderId: instrampxe0y3a|x-authuser|calestyo@scientia.org
+X-MailChannels-Auth-Id: instrampxe0y3a
+X-Battle-Befitting: 1b68fe2714c81dbe_1765513578757_1638524499
+X-MC-Loop-Signature: 1765513578757:4273121484
+X-MC-Ingress-Time: 1765513578757
+Received: from cpanel-007-fra.hostingww.com (cpanel-007-fra.hostingww.com
+ [3.69.87.180])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
+	by 100.102.46.239 (trex/7.1.3);
+	Fri, 12 Dec 2025 04:26:18 +0000
+Received: from p5090f480.dip0.t-ipconnect.de ([80.144.244.128]:63908 helo=heisenberg.scientia.org)
+	by cpanel-007-fra.hostingww.com with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <calestyo@scientia.org>)
+	id 1vTujR-000000068cH-0uCe
+	for netdev@vger.kernel.org;
+	Fri, 12 Dec 2025 04:26:16 +0000
+Received: by heisenberg.scientia.org (Postfix, from userid 1000)
+	id 7422C6213AAA; Fri, 12 Dec 2025 05:26:14 +0100 (CET)
+From: Christoph Anton Mitterer <mail@christoph.anton.mitterer.name>
+To: netdev@vger.kernel.org
+Subject: [PATCH 0/1] lib: Align naming rules with the kernel
+Date: Fri, 12 Dec 2025 05:18:12 +0100
+Message-ID: <20251212042611.786603-1-mail@christoph.anton.mitterer.name>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-AuthUser: calestyo@scientia.org
 
-On Fri, 12 Dec 2025 02:26:02 +0000
-"Eric Sun (ericsun2)" <ericsun2@cisco.com> wrote:
+Hey.
 
-> Hello,
-> 
-> The bridge-utils git repo [1] has several tags that cause recent-ish git fsck
-> to fail with the missingSpaceBeforeDate error [2]. This is frustrating when
-> working with github, where such cosmetic errors are not ignored by default as
-> they are by other platforms (e.g. gitlab).
-> 
-> Though bridge-utils is deprecated,  I was hoping somebody with access might be
-> willing to fix up the tags?
-> 
-> I've verified that something like [3, see: "How to work around that issue..."]
-> address it correctly.
-> 
-> Thanks in advance!
-> 
-> [1] https://git.kernel.org/pub/scm/network/bridge/bridge-utils.git
-> [2] https://git-scm.com/docs/git-fsck#Documentation/git-fsck.txt-missingSpaceBeforeDate
-> [3] https://sunweavers.net/blog/node/36
-> 
-> 
-> Cisco Confidential
+Seems the check rules in iproute2 have gotten out of sync with those of the
+kernel. This patch brings them up-to-date.
 
-I can see if this is fixable. But sometimes old stuff has to be preserved
+It shall be noted, that these changes would also affect those for alnames (like
+before, just without enforcing the maximum length, which AFAIU was the main (or
+even whole?) point of altnames[0]).
+
+
+I made a small test and compiled iproute2 with its `check_altifname()` simply
+always returning true.
+Turnes out, that the kernel seems to accept any name (i.e. including whitespace
+and `/`) and I didn’t find any check functions for altnames in the kernel
+either (okay I didn’t look that hard ^^).
+
+Not sure, but maybe altnames should really be allowed to contain anything?
+If so, we’d of course need to change this patch.
+OTOH, e.g. systemd already assumes that certain characters aren’t allowed in
+interface names (see `Name=` in systemd.link(5)) and e.g. `nmcli` uses `:` to
+separate fields in its machine readable output.
+
+But then again, the kernel should perhaps check altnames?
+
+
+Cheers,
+Chris.
+
+[0] https://lore.kernel.org/netdev/20190719110029.29466-1-jiri@resnulli.us/
+
 
