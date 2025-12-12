@@ -1,58 +1,51 @@
-Return-Path: <netdev+bounces-244445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A82ADCB7754
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 01:37:28 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 609D7CB77E5
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 02:01:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7F7C1301D587
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 00:37:08 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6731E300214B
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 01:01:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27F2E21CFFA;
-	Fri, 12 Dec 2025 00:37:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fr.zoreil.com header.i=@fr.zoreil.com header.b="IIC7vyuK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89E061C84D0;
+	Fri, 12 Dec 2025 01:01:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from violet.fr.zoreil.com (violet.fr.zoreil.com [92.243.8.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5457217F53
-	for <netdev@vger.kernel.org>; Fri, 12 Dec 2025 00:37:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.243.8.30
+Received: from vmicros1.altlinux.org (vmicros1.altlinux.org [194.107.17.57])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDBBB1A2C25;
+	Fri, 12 Dec 2025 01:01:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.57
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765499828; cv=none; b=o062R3SYYC2ZoPbo0ioW+HUlJeNAmdKv692le79DQgvVDwtUukr9pe/SkOsyqdCR4cAidnKUl7Dss4vHGXKCjXrSo77xgo+z6b4PmEv7IyeqOszYKmKV7JZs5n3Co/2TRsrHgsk+JFPOA2OVoMJYhBF+zvXAGyQ4Wn8acGpJNX0=
+	t=1765501307; cv=none; b=jiMUylk31fxD3elgF60pnnuTexQre1EpUqR9VR2Y/p+Vw6xZgbvBShLwffr4RzDsaPDUPFQAz12wey9AiO0IORQYEUIC8/bk2IKHY16zZk4n4a+L1dGZr2wZv57xgQe85aJfAI2PRyL6d+O41SeNPzz8EJuKnWSDqbFuVWHOwNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765499828; c=relaxed/simple;
-	bh=PBPIvxJPyfAUKuzkEJ84KOdiVQNxNF7W9EysHCiFzck=;
+	s=arc-20240116; t=1765501307; c=relaxed/simple;
+	bh=RvqkoCui2IQB/RgbUMRXZgPo927HN07kQXHCLZ0t/ko=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NM3yTtykISDHW7xLJ/8L6Bq7OxmbaWe7Qrw4cEIz7UGf7umCp6VcYBvsEyyi1n0tfKV8UgcVZ2+Fvtwx6EQ426qe1Ox8rOkL4uXw4jXc700nkL5kGJUZAqcJMKhoiKil3EE5sTwELt8oBjgtFKO3/WchuTiUziWDM/45OMwhpc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fr.zoreil.com; spf=pass smtp.mailfrom=fr.zoreil.com; dkim=pass (1024-bit key) header.d=fr.zoreil.com header.i=@fr.zoreil.com header.b=IIC7vyuK; arc=none smtp.client-ip=92.243.8.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fr.zoreil.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fr.zoreil.com
-Received: from violet.fr.zoreil.com ([127.0.0.1])
-	by violet.fr.zoreil.com (8.17.1/8.17.1) with ESMTP id 5BC0b0JY766585;
-	Fri, 12 Dec 2025 01:37:00 +0100
-DKIM-Filter: OpenDKIM Filter v2.11.0 violet.fr.zoreil.com 5BC0b0JY766585
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fr.zoreil.com;
-	s=v20220413; t=1765499820;
-	bh=jCakqoTJukG9WlRb8vCZiheesEQFmp5aknKdUs9Q2n0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IIC7vyuKI0N9EI9o+LlpJcVsBrEBHP4WHaPecM8IACHODbwtnKTfLA4JbUH54QCU8
-	 5lJxg8GPJP8FUNGWd3OnWXih9JHB2ZRzf2zv6XnyVZE1p+ikcj18O+B5K/zUmtOmE5
-	 2ze+9fSPmfi40h6C6XFaXGAPEfcN6jyYaWnz3vw0=
-Received: (from romieu@localhost)
-	by violet.fr.zoreil.com (8.17.1/8.17.1/Submit) id 5BC0axhi766584;
-	Fri, 12 Dec 2025 01:36:59 +0100
-Date: Fri, 12 Dec 2025 01:36:59 +0100
-From: Francois Romieu <romieu@fr.zoreil.com>
-To: Sai Krishna Gajula <saikrishnag@marvell.com>
-Cc: Ethan Nelson-Moore <enelsonmoore@gmail.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH] epic100: remove module version and switch to
- module_pci_driver
-Message-ID: <20251212003659.GB766557@electric-eye.fr.zoreil.com>
-References: <20251211074922.154268-1-enelsonmoore@gmail.com>
- <BY3PR18MB47070F7D806327202FEB4066A0A1A@BY3PR18MB4707.namprd18.prod.outlook.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=djL5bI0J0wYTjKOsKWxqq28IHCt8De6u7G1JDy3jH8XJFBE9t8cci9fIREy3Bt6fC0sfnzBVMlTEGz3zvhccTDG6FM4hyViIryrmXCGK+mH4asK/h6demHe7fje/gxNvvmeEefLYSWvwakY31C4h1wmRl/vC0OeIf5JircLumGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
+Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
+	by vmicros1.altlinux.org (Postfix) with ESMTP id D440E72C8CC;
+	Fri, 12 Dec 2025 03:54:26 +0300 (MSK)
+Received: from pony.office.basealt.ru (unknown [193.43.10.9])
+	by imap.altlinux.org (Postfix) with ESMTPSA id CCDD536D016E;
+	Fri, 12 Dec 2025 03:54:26 +0300 (MSK)
+Received: by pony.office.basealt.ru (Postfix, from userid 500)
+	id AD8A7360D63C; Fri, 12 Dec 2025 03:54:26 +0300 (MSK)
+Date: Fri, 12 Dec 2025 03:54:26 +0300
+From: Vitaly Chikunov <vt@altlinux.org>
+To: Ranganath V N <vnranganath.20@gmail.com>, 
+	linux-rt-devel@lists.linux.dev
+Cc: edumazet@google.com, davem@davemloft.net, david.hunter.linux@gmail.com, 
+	horms@kernel.org, jhs@mojatatu.com, jiri@resnulli.us, khalid@kernel.org, 
+	kuba@kernel.org, pabeni@redhat.com, xiyou.wangcong@gmail.com, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, skhan@linuxfoundation.org
+Subject: Re: [PATCH net v4 2/2] net: sched: act_ife: initialize struct tc_ife
+ to fix KMSAN kernel-infoleak
+Message-ID: <tnqp5igbbqyl6emzqnei2o4kuz@altlinux.org>
+References: <20251109091336.9277-1-vnranganath.20@gmail.com>
+ <20251109091336.9277-3-vnranganath.20@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,19 +54,90 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <BY3PR18MB47070F7D806327202FEB4066A0A1A@BY3PR18MB4707.namprd18.prod.outlook.com>
-X-Organisation: Land of Sunshine Inc.
+In-Reply-To: <20251109091336.9277-3-vnranganath.20@gmail.com>
 
-Sai Krishna Gajula <saikrishnag@marvell.com> :
-[...]
-> One downside is, users who previously relied on the printed epic100 version strings in dmesg, will no longer see them. 
-It may be called a feature so that devs who previously relied on users hear
-them again.
+On Sun, Nov 09, 2025 at 02:43:36PM +0530, Ranganath V N wrote:
+> Fix a KMSAN kernel-infoleak detected  by the syzbot .
+> 
+> [net?] KMSAN: kernel-infoleak in __skb_datagram_iter
+> 
+> In tcf_ife_dump(), the variable 'opt' was partially initialized using a
+> designatied initializer. While the padding bytes are reamined
+> uninitialized. nla_put() copies the entire structure into a
+> netlink message, these uninitialized bytes leaked to userspace.
+> 
+> Initialize the structure with memset before assigning its fields
+> to ensure all members and padding are cleared prior to beign copied.
+> 
+> This change silences the KMSAN report and prevents potential information
+> leaks from the kernel memory.
+> 
+> This fix has been tested and validated by syzbot. This patch closes the
+> bug reported at the following syzkaller link and ensures no infoleak.
+> 
+> Reported-by: syzbot+0c85cae3350b7d486aee@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=0c85cae3350b7d486aee
+> Tested-by: syzbot+0c85cae3350b7d486aee@syzkaller.appspotmail.com
+> Fixes: ef6980b6becb ("introduce IFE action")
+> Signed-off-by: Ranganath V N <vnranganath.20@gmail.com>
+> ---
+>  net/sched/act_ife.c | 12 +++++++-----
+>  1 file changed, 7 insertions(+), 5 deletions(-)
+> 
+> diff --git a/net/sched/act_ife.c b/net/sched/act_ife.c
+> index 107c6d83dc5c..7c6975632fc2 100644
+> --- a/net/sched/act_ife.c
+> +++ b/net/sched/act_ife.c
+> @@ -644,13 +644,15 @@ static int tcf_ife_dump(struct sk_buff *skb, struct tc_action *a, int bind,
+>  	unsigned char *b = skb_tail_pointer(skb);
+>  	struct tcf_ife_info *ife = to_ife(a);
+>  	struct tcf_ife_params *p;
+> -	struct tc_ife opt = {
+> -		.index = ife->tcf_index,
+> -		.refcnt = refcount_read(&ife->tcf_refcnt) - ref,
+> -		.bindcnt = atomic_read(&ife->tcf_bindcnt) - bind,
+> -	};
+> +	struct tc_ife opt;
+>  	struct tcf_t t;
+>  
+> +	memset(&opt, 0, sizeof(opt));
+> +
+> +	opt.index = ife->tcf_index,
+> +	opt.refcnt = refcount_read(&ife->tcf_refcnt) - ref,
+> +	opt.bindcnt = atomic_read(&ife->tcf_bindcnt) - bind,
 
-There is also a user noticeable change in ethtool_drvinfo.
+Are you sure this is correct to delimit with commas instead of
+semicolons?
 
-User(s) of this hardware are probably able to cope anyway.
+This already causes build failures of 5.10.247-rt141 kernel, because
+their spin_lock_bh unrolls into do { .. } while (0):
 
--- 
-Ueimor
+     CC [M]  net/sched/act_ife.o
+   In file included from ./include/linux/spinlock.h:329,
+                    from ./include/linux/mmzone.h:8,
+                    from ./include/linux/gfp.h:6,
+                    from ./include/linux/mm.h:10,
+                    from ./include/linux/bvec.h:14,
+                    from ./include/linux/skbuff.h:17,
+                    from net/sched/act_ife.c:20:
+   net/sched/act_ife.c: In function 'tcf_ife_dump':
+   ./include/linux/spinlock_rt.h:44:2: error: expected expression before 'do'
+      44 |  do {     \
+         |  ^~
+   net/sched/act_ife.c:655:2: note: in expansion of macro 'spin_lock_bh'
+     655 |  spin_lock_bh(&ife->tcf_lock);
+         |  ^~~~~~~~~~~~
+   make[2]: *** [scripts/Makefile.build:286: net/sched/act_ife.o] Error 1
+   make[2]: *** Waiting for unfinished jobs....
+
+
+Thanks,
+
+> +
+>  	spin_lock_bh(&ife->tcf_lock);
+>  	opt.action = ife->tcf_action;
+>  	p = rcu_dereference_protected(ife->params,
+> -- 
+> 2.43.0
+> 
 
