@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-244477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E126CB89F0
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 11:29:54 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A29BCB89F5
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 11:30:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id DDB78300986C
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 10:29:52 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 18ED730433C1
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 10:29:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9511C314D0A;
-	Fri, 12 Dec 2025 10:29:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AB8B316909;
+	Fri, 12 Dec 2025 10:29:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iUks2+T9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jn4uPqVt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66DC2309F02;
-	Fri, 12 Dec 2025 10:29:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D386D3168F2;
+	Fri, 12 Dec 2025 10:29:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765535391; cv=none; b=VaAsrGdojGcFUS3Ld83/86ogKJBJjwDuBzFGT8jdnDaB3Sli/HjPRcRhUFW72BxJ7p/yfVQzxwg89sliRBRHCYVay8WMjgiNWGjXE6OpDXmnrxiVqqRemeNE5aFG8DAExiwNbkNuMAgcxHjpvVVrYkrkYyHPdyrV//ThbRiHKsM=
+	t=1765535391; cv=none; b=ReZw49XccYkV3KdodwWXG7/A3YM0Pzu3LLCp11ZZFdJdNnn/bXmER4yCBJ74dLfDORIBr49QdVij2bXAaEuTrA8jndOo8q/2TyFRimbN2lgW47vaXpMWsajHFSdIUBhavdqtMgIgwJ5ggA1jkJlo4YPM4vgGSR09pDP/5Cdf0r0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1765535391; c=relaxed/simple;
-	bh=4x7gvl8Pcdg6DrRkR8n/Ln3XNmU3RDU1c2ARw9mcN5g=;
+	bh=8AU+2nFn4mNMq1b2sfU+FOX9v7gIi6t2Rn3vZZyjlxM=;
 	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=fU4KIkkhlP/NSMu5aViVVLpOpSN6ZVEHVbquCq3x8+Z4bCQhJ+n+sFRAhuA8YTdqZWV36LpIa0qyl14x+8yjYC35lnHIyBJy6Kt2PqMnrMjlpcl6xT1SGbL9C7udOWgS4lOvPayvEN4nlPITrx6+t77RCGydhlI6HsSHt8oz+Is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iUks2+T9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6A57C4CEF1;
-	Fri, 12 Dec 2025 10:29:49 +0000 (UTC)
+	 Message-Id:Subject; b=rMwXIYQWrJUJkIsU6C/iD/gbIICU70Ws+FANNtjn2kYTxLhOpax9xMv+0jDeaGxwECiyvKAfhJndSLlkGooyJhYv7wY2J2C257S9oDMWOmSM2LtnInJX/0zheLLJtLwfMzalyU31dMxDNFurTDP+N3pF94C8FT5ogyguIeoRaKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jn4uPqVt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A3DBC4CEF5;
+	Fri, 12 Dec 2025 10:29:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765535390;
-	bh=4x7gvl8Pcdg6DrRkR8n/Ln3XNmU3RDU1c2ARw9mcN5g=;
+	s=k20201202; t=1765535391;
+	bh=8AU+2nFn4mNMq1b2sfU+FOX9v7gIi6t2Rn3vZZyjlxM=;
 	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=iUks2+T9pLFHHUS1zdcHORK+NJec6bufwbsJsnA2S9ZORubV5fgV3qxbmwXW8B8Sd
-	 +8lJQMb53BiEkUzF1TYdp93MpuLMzM7ZXNLCMM2XJRO043gF6YkEAu5+eYfq0wHmTP
-	 xRm0U9FXI+ixN2ajLlcDrnDqLLKz8xFehDne0eIyf9BbvcGgyJv8EJsWhK/aLmwxro
-	 098djJQ2/k3/JBa3RlzYoyBJibOCdeILzN/Wgu3/8d8t07fLAQ89TNYHgZLBp+5mIY
-	 h2tOYeHOgxbu2Nu6RcpsoIfRRniqkI/4bX8ZLk84xtijjB8fIRJOOCA65xjQEM3xTm
-	 on0xCD+q8ZyRQ==
-Date: Fri, 12 Dec 2025 04:29:47 -0600
+	b=jn4uPqVtDWHxrncbw8nIEh19p5Ao7Xkh1aTGxBbS0j/A0+D52+j24XKYczKya9I2n
+	 pPAeKHplNsqKPxEo71JlPL+Cqsbji1qYCCVi2WYmwG+laSvXMqc1khv3OSJbc/42v4
+	 9FV2Msgx4llzSL7paaondFg4v4H1KgiEgi5nzDcBBWoB++GMlXIlaAPMpt2MNcuZ5K
+	 2yMfWEm8+96wJOacc75qcQ+y/hGIBL1yeugAU33h/x5dagZfVOWQ1Q90stvj0fE0yd
+	 k0/FtGspKDqeUx35nGPjnKVlrF/KxwPGadARVuRYhsTnpjFK5ui+uRSvoJyh3UW9gp
+	 HMlpsxVJiov9A==
+Date: Fri, 12 Dec 2025 04:29:50 -0600
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -49,60 +49,52 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: kuba@kernel.org, krzk+dt@kernel.org, linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, davem@davemloft.net, geert+renesas@glider.be, 
- francesco.dolcini@toradex.com, conor+dt@kernel.org, 
- rafael.beims@toradex.com, ben.dooks@codethink.co.uk, 
- Stefan Eichenberger <stefan.eichenberger@toradex.com>, hkallweit1@gmail.com, 
- edumazet@google.com, devicetree@vger.kernel.org, andrew+netdev@lunn.ch, 
- pabeni@redhat.com, linux@armlinux.org.uk
+Cc: hkallweit1@gmail.com, krzk+dt@kernel.org, linux-kernel@vger.kernel.org, 
+ rafael.beims@toradex.com, pabeni@redhat.com, ben.dooks@codethink.co.uk, 
+ netdev@vger.kernel.org, francesco.dolcini@toradex.com, edumazet@google.com, 
+ andrew+netdev@lunn.ch, conor+dt@kernel.org, linux@armlinux.org.uk, 
+ Stefan Eichenberger <stefan.eichenberger@toradex.com>, 
+ devicetree@vger.kernel.org, davem@davemloft.net, geert+renesas@glider.be, 
+ kuba@kernel.org
 To: Stefan Eichenberger <eichest@gmail.com>
-In-Reply-To: <20251212084657.29239-3-eichest@gmail.com>
+In-Reply-To: <20251212084657.29239-2-eichest@gmail.com>
 References: <20251212084657.29239-1-eichest@gmail.com>
- <20251212084657.29239-3-eichest@gmail.com>
-Message-Id: <176553538562.3334907.2349485324753514759.robh@kernel.org>
-Subject: Re: [PATCH net-next v1 2/3] dt-bindings: net: micrel: Add
- keep-preamble-before-sfd
+ <20251212084657.29239-2-eichest@gmail.com>
+Message-Id: <176553538695.3335118.18332220352949601890.robh@kernel.org>
+Subject: Re: [PATCH net-next v1 1/3] dt-bindings: net: micrel: Convert to
+ YAML schema
 
 
-On Fri, 12 Dec 2025 09:46:17 +0100, Stefan Eichenberger wrote:
+On Fri, 12 Dec 2025 09:46:16 +0100, Stefan Eichenberger wrote:
 > From: Stefan Eichenberger <stefan.eichenberger@toradex.com>
 > 
-> Add a property to activate a Micrel PHY feature that keeps the preamble
-> enabled before the SFD (Start Frame Delimiter) is transmitted.
-> 
-> This allows to workaround broken Ethernet controllers as found on the
-> NXP i.MX8MP. Specifically, errata ERR050694 that states:
-> ENET_QOS: MAC incorrectly discards the received packets when Preamble
-> Byte does not precede SFD or SMD.
-> 
-> The bit which disables this feature is not documented in the datasheet
-> from Micrel, but has been found by NXP and Micrel following this
-> discussion:
-> https://community.nxp.com/t5/i-MX-Processors/iMX8MP-eqos-not-working-for-10base-t/m-p/2151032
-> 
-> It has been tested on Verdin iMX8MP from Toradex by forcing the PHY to
-> 10MBit. Withouth this property set, no packets are received. With this
-> property set, reception works fine.
+> Convert the devicetree bindings for the Micrel PHY to YAML schema. This
+> also combines the information from micrel.txt and micrel-ksz90x1.txt
+> into a single micrel.yaml file as this PHYs are from the same series.
+> Use yaml conditions to differentiate the properties that only apply to
+> specific PHY models.
 > 
 > Signed-off-by: Stefan Eichenberger <stefan.eichenberger@toradex.com>
 > ---
->  Documentation/devicetree/bindings/net/micrel.yaml | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
+>  .../bindings/net/micrel-ksz90x1.txt           | 228 --------
+>  .../devicetree/bindings/net/micrel.txt        |  57 --
+>  .../devicetree/bindings/net/micrel.yaml       | 527 ++++++++++++++++++
+>  3 files changed, 527 insertions(+), 285 deletions(-)
+>  delete mode 100644 Documentation/devicetree/bindings/net/micrel-ksz90x1.txt
+>  delete mode 100644 Documentation/devicetree/bindings/net/micrel.txt
+>  create mode 100644 Documentation/devicetree/bindings/net/micrel.yaml
 > 
 
 My bot found errors running 'make dt_binding_check' on your patch:
 
 yamllint warnings/errors:
-./Documentation/devicetree/bindings/net/micrel.yaml:517:1: [warning] too many blank lines (2 > 1) (empty-lines)
+./Documentation/devicetree/bindings/net/micrel.yaml:504:1: [warning] too many blank lines (2 > 1) (empty-lines)
 
 dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/renesas,ether.example.dtb: ethernet-phy@1 (ethernet-phy-id0022.1537): compatible: ['ethernet-phy-id0022.1537', 'ethernet-phy-ieee802.3-c22'] is too long
-	from schema $id: http://devicetree.org/schemas/net/micrel.yaml
 
 doc reference errors (make refcheckdocs):
 
-See https://patchwork.kernel.org/project/devicetree/patch/20251212084657.29239-3-eichest@gmail.com
+See https://patchwork.kernel.org/project/devicetree/patch/20251212084657.29239-2-eichest@gmail.com
 
 The base for the series is generally the latest rc1. A different dependency
 should be noted in *this* patch.
