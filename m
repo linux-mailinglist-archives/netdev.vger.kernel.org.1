@@ -1,168 +1,153 @@
-Return-Path: <netdev+bounces-244537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id E32F9CB9A0C
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 20:18:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F224CB9BEA
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 21:13:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E37DB30056C4
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 19:18:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0F51B30A5E9D
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 20:13:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9235A2D9786;
-	Fri, 12 Dec 2025 19:18:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B8BA30EF88;
+	Fri, 12 Dec 2025 20:13:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OT2e//Zh"
+	dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b="rcQrJ1Uq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6F652C2357
-	for <netdev@vger.kernel.org>; Fri, 12 Dec 2025 19:18:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70AF22DFA3A;
+	Fri, 12 Dec 2025 20:12:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765567109; cv=none; b=UhFp4Cr29NTA5EB0MJmVSj0KGg0flgtN50nNrHKQOA+D6IJ31VmXrCqzuaCRBhbwG0fThQcQguOFA8IR4b/izokqYHyPmmaL5meoyGWV27aQ/b1MFAWz/kf6EeckcLUxaYH6eD5Mcsx/jyZ4cgWfZig4Nn3vt28BfkFedV5BMkA=
+	t=1765570380; cv=none; b=nD9iToPmw7sr+PRR8NfyMQSIXPK2UPknvRfzloBIgJakUqKbX/UqcJ1QS0EMM859yq/5alrJZPG8aKHs/hTW9kUcGAHxBtqa+bhZy3cOoOinIB/95Q960lAR1nI0wXvp8Zmef693KbK6FUwmXT93t22gf//l7chTGP0W7pAEn4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765567109; c=relaxed/simple;
-	bh=8wcS+L79g5XoNmj2pIEFde7UEeJjjURZHcBwOgPMvxI=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=YqFg0EOB4fhdKai7hy1TLYNFQlRgzegAFuHAQ35Fec4w125qLRBCbrSgsfAq5qFgXJY23Aap0YxwxGnDm+hBo2EwkLM1v0rdFgN6F/fDSH9IGK/VWihToDJdGtzE/QqyWHBl2Rm9FF8iPypuOtGI0cUTvOGKmvcMXLq+Ja5LwsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OT2e//Zh; arc=none smtp.client-ip=74.125.224.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-6446d7a8eadso1574238d50.0
-        for <netdev@vger.kernel.org>; Fri, 12 Dec 2025 11:18:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765567107; x=1766171907; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tikmRlOkb+pR+sxB177TWT+tvTqTt4D0eR1nii/xhZc=;
-        b=OT2e//ZhacEW/jscFQVa/eppcs3IFhINXzDT+uBTMHPGEgmrrkkAhQayc/sU5umGX+
-         y0nECzZzlgKo4mQ4snJRyKLGG26KsQmhQPBD+s26QdnFn6wwQT4xyxEXL3fPfiAm20/s
-         V/4leb1u3zj/5JoIzXSy07K7yn7pNO6KYAOQ3tc7pGxf4Zasz5pn+V7D/I3ZTaz2CHyo
-         zxKPxEPWM2xK6JP2hQTk5y8zAQRlhDJSM2ev2CLKuJoD5Ew2PzX8dtUjEZbDjOQrFRcZ
-         nyi3uhAcVklHwtKbJFSjHBMiDJAaVjQ+Os0UZWOn+BxDnocolSxymJkNE1+s8AfYNMLJ
-         ddIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765567107; x=1766171907;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tikmRlOkb+pR+sxB177TWT+tvTqTt4D0eR1nii/xhZc=;
-        b=s4JqxKR0oKmPsquBgczD1EQwoLqZ+Vmrgx8NYh/y4aUDktmSCtpc8xoG/UC9VDu47/
-         i2EzSNR9IlWE51S+RIgcoLnLFWUYPCZt/Evt6VQ1NSAl/0umuM5qro5uzjSSNL2Wi08u
-         w41KwMftiygQjzGMbSpH84J9khioUoCmkaECfTDLEJsghb6g4l846Lj8vReNd3wihL3v
-         mg5eG/lb+SrG69MnLlh2uGZI32TH2Gl2wptSxBReEjV04A8UkKIBVgoj+TddrQnpO6zU
-         y6Yirupzdn/EvFB5lvJivFA6kCQIGKDJvm2llRRJIUwHoTvTkss2nm576MsD0/3B9Hg6
-         K6Kg==
-X-Forwarded-Encrypted: i=1; AJvYcCXJaEEfDnBAoJ7jqrJmVQJ5UBBO8Wtj96j5F9rTC0rlVsdTJeKK3pg7pcQzWI9YxVLgik6Ggco=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwW1UJ78RVtx9pAbyEuSj7/INhIwsRd+NlObzM/yNwWLmV/LDf1
-	BIkKZq7bQ0QEWMJ/weO2wXm7qW6br0P59igLYg+PGsORj7AyRU4t6oW4oFVFYA==
-X-Gm-Gg: AY/fxX5Md4ScKt2s76Zuo9JbdEmSyiB8vb+sqoW2EMuRn6bc1E31fab0qycu6cQHkZy
-	pwvahfEeQYPBa8wDUCtLsEJ0HS27zNsIGAKJCdmtfU2uh1T9PIpzW424Mds03jlz2TKRmFUrKYK
-	U/NnHAJYWu9H3Z7AlkMkr6oracL5Seo8rgNsYqZMGXKEUdCmBh+A/gfBU+G7qrskZoyMMxt/Amd
-	74vFrIzyhxnwbc30tONcPBPWg17TmitYO40ZfK+MnFyDxu8qm4khNLcYFIKtglT5iS9BY8HOFox
-	tyJlU0H5i1OA9rwFtln88aSo3t2GkmcHBNVYEU7HmUIVNY8St9ERAw07hbsvvmnufNRd0Nnafb8
-	TyiaU4wo20w9/UN+Ti7zvu1cX69RVQ3ic4SFTvg4zJDir6aSjIXDYjnhN7JpwF+ho9ydXAMw2GE
-	nApL55VMlLsEm8Qg9kkfZ8J6CSE3si8LLd/aqliz/q2FC5xMYLL+hC8bHV1PRgUUNPaUw=
-X-Google-Smtp-Source: AGHT+IFwjmfgY9PUmvyHi3gh4Krkf6WPU5h2bmejZGipu3YO819vylIKMEgF5lmWqyWuWYoH2kbs/A==
-X-Received: by 2002:a05:690e:28a:b0:644:5d3f:844b with SMTP id 956f58d0204a3-6455564f195mr1950681d50.54.1765567106826;
-        Fri, 12 Dec 2025 11:18:26 -0800 (PST)
-Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-78e69ffadcdsm7771707b3.17.2025.12.12.11.18.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Dec 2025 11:18:25 -0800 (PST)
-Date: Fri, 12 Dec 2025 14:18:25 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: "Alice C. Munduruca" <alice.munduruca@canonical.com>, 
- netdev@vger.kernel.org
-Cc: linux-kselftest@vger.kernel.org, 
- "Alice C. Munduruca" <alice.munduruca@canonical.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Shuah Khan <shuah@kernel.org>, 
- Willem de Bruijn <willemb@google.com>
-Message-ID: <willemdebruijn.kernel.1702e18dd0a@gmail.com>
-In-Reply-To: <20251212144921.16915-1-alice.munduruca@canonical.com>
-References: <20251212144921.16915-1-alice.munduruca@canonical.com>
-Subject: Re: [PATCH net v2] selftests: net: fix "buffer overflow detected" for
- tap.c
+	s=arc-20240116; t=1765570380; c=relaxed/simple;
+	bh=v4FUhHFdi5ZXqVqGPGRtWuk27Ggt9EW1AEDL4D/CxK4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Q5AQyjhmDrEeVIXO4uT1rHNLRuYIVSML91qIsfsFCSTVDluS79vQFPoVCuSX9nYOHtfXzze+LlinWXMk/fsoZON7oSunJxNPniFYaQMwAvE90/23DOId1qMPUBN0dPwbIlFuVtstnKOXURvxF3T/YIBTL7w71JlLv9MLTK1me54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=runbox.com; dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b=rcQrJ1Uq; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=runbox.com
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <david.laight.linux_spam@runbox.com>)
+	id 1vU8xb-0087YP-88; Fri, 12 Dec 2025 20:37:51 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=runbox.com;
+	 s=selector2; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:
+	Subject:Cc:To:From; bh=4XbSLZvBmYJ9LzNNMyiNSXY8ll6ZHX2gvyxQipHU0mg=; b=rcQrJ1
+	UqegrICDo4fAnkhXKRRqrV0O8Ls326sDv/JcKcAk6Al2todKLnhlDNHsWwE3AK6hL1vZSqmtNyNVE
+	1OroZmCdGG07T7I6ydVzd/0k9mznWFvrss5MbAQmlkY6gfYbY6wdrXKKJTBvudku0zcOZrcX7kXs6
+	MCA+d2s5ZzuEFiEIdof9pZd6Ezoxs68O7fatVUKHjvMLYTxCWcRixnBFSnf/aJwm0C9NJCGdMjTq5
+	udguTWojDliIij6K8xW7LDs1g/RP381FYb0iKSH4SOcYfKKVbtxo46b/ul2fQTf3YFHb7+4Uta+sI
+	pOo4poy5yN6CaWpipJVUCkx0WELQ==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <david.laight.linux_spam@runbox.com>)
+	id 1vU8xZ-00039D-A3; Fri, 12 Dec 2025 20:37:49 +0100
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (1493616)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1vU8xY-0030pR-Gm; Fri, 12 Dec 2025 20:37:48 +0100
+From: david.laight.linux@gmail.com
+To: Yury Norov <yury.norov@gmail.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	linux-kernel@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Crt Mori <cmo@melexis.com>,
+	Richard Genoud <richard.genoud@bootlin.com>,
+	Andy Shevchenko <andriy.shevchenko@intel.com>,
+	Luo Jie <quic_luoj@quicinc.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Mika Westerberg <mika.westerberg@linux.intel.com>,
+	Andreas Noever <andreas.noever@gmail.com>,
+	Yehezkel Bernat <YehezkelShB@gmail.com>,
+	Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+Cc: David Laight <david.laight.linux@gmail.com>
+Subject: [PATCH v2 0/16] bitfield: tidy up bitfield.h
+Date: Fri, 12 Dec 2025 19:37:05 +0000
+Message-Id: <20251212193721.740055-1-david.laight.linux@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Alice C. Munduruca wrote:
-> When the selftest 'tap.c' is compiled with '-D_FORTIFY_SOURCE=3', the
-> strcpy() in rtattr_add_strsz() is replaced with a checked version which
-> causes the test to consistently fail when compiled with toolchains for
-> which this option is enabled by default.
-> 
->  TAP version 13
->  1..3
->  # Starting 3 tests from 1 test cases.
->  #  RUN           tap.test_packet_valid_udp_gso ...
->  *** buffer overflow detected ***: terminated
->  # test_packet_valid_udp_gso: Test terminated by assertion
->  #          FAIL  tap.test_packet_valid_udp_gso
->  not ok 1 tap.test_packet_valid_udp_gso
->  #  RUN           tap.test_packet_valid_udp_csum ...
->  *** buffer overflow detected ***: terminated
->  # test_packet_valid_udp_csum: Test terminated by assertion
->  #          FAIL  tap.test_packet_valid_udp_csum
->  not ok 2 tap.test_packet_valid_udp_csum
->  #  RUN           tap.test_packet_crash_tap_invalid_eth_proto ...
->  *** buffer overflow detected ***: terminated
->  # test_packet_crash_tap_invalid_eth_proto: Test terminated by assertion
->  #          FAIL  tap.test_packet_crash_tap_invalid_eth_proto
->  not ok 3 tap.test_packet_crash_tap_invalid_eth_proto
->  # FAILED: 0 / 3 tests passed.
->  # Totals: pass:0 fail:3 xfail:0 xpass:0 skip:0 error:0
-> 
-> A buffer overflow is detected by the fortified glibc __strcpy_chk()
-> since the __builtin_object_size() of `RTA_DATA(rta)` is incorrectly
-> reported as 1, even though there is ample space in its bounding buffer
-> `req`.
-> 
-> Using the unchecked function memcpy() here instead allows us to match
-> the way rtattr_add_str() is written while avoiding the spurious test
-> failure.
-> 
-> Fixes: 2e64fe4624d1 ("selftests: add few test cases for tap driver")
-> Signed-off-by: Alice C. Munduruca <alice.munduruca@canonical.com>
-> ---
->  tools/testing/selftests/net/tap.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/net/tap.c b/tools/testing/selftests/net/tap.c
-> index 247c3b3ac1c9..dd961b629295 100644
-> --- a/tools/testing/selftests/net/tap.c
-> +++ b/tools/testing/selftests/net/tap.c
-> @@ -67,7 +67,7 @@ static struct rtattr *rtattr_add_strsz(struct nlmsghdr *nh, unsigned short type,
->  {
->  	struct rtattr *rta = rtattr_add(nh, type, strlen(s) + 1);
->  
-> -	strcpy(RTA_DATA(rta), s);
-> +	memcpy(RTA_DATA(rta), s, strlen(s) + 1);
+From: David Laight <david.laight.linux@gmail.com>
 
-Could call strlen(s) only once in the function.
+I noticed some very long (18KB) error messages from the compiler.
+Turned out they were errors on lines that passed GENMASK() to FIELD_PREP().
+Since most of the #defines are already statement functions the values
+can be copied to locals so the actual parameters only get expanded once.
 
-Why does rtattr_add_str do the same without the terminating '\0'?
-It is only used with IFNAME so assumes max size of IFNAMSIZ perhaps?
->  	return rta;
->  }
->  
-> -- 
-> 2.48.1
-> 
+The 'bloat' is reduced further by using a simple test to ensure 'reg'
+is large enough, slightly simplifying the test for constant 'val' and
+only checking 'reg' and 'val' when the parameters are present.
 
+The first two patches are slightly problematic.
+
+drivers/net/ethernet/netronome/nfp/nfpcore/nfp_nsp_eth.c manages to use
+a #define that should be an internal to bitfield.h, the changed file
+is actually more similar to the previous version.
+
+drivers/thunderbolt/tb.h passes a bifield to FIELD_GET(), these can't
+be used with sizeof, typeof or __auto_type.
+The existing FIELD_GET() uses _Generic(); gcc treats 'u32 foo:8' as
+'unsigned char' and clang treats 'u32 foo:n' as 'unsigned int'.
+So the code currentyly compiles 'by accident', pass 'u32 foo:6' and
+gcc will error the attempt to use typeof with a bitfield.
+For v2 fixed by changing the structure definition to use u8 for the
+relevant field.
+
+Both changes may need to to through the same tree as the header file changes.
+
+The changes are based on 'next' and contain the addition of field_prep()
+and field_get() for non-constant values.
+
+I also know it is the merge window.
+I expect to be generating a v3 in the new year (someone always has a comment).
+
+Changes for v2:
+- Change thunderbolt header (see above).
+- Fix variable name re-use in FIELD_PREP_WM16()
+- Use 'mask' (not _mask) in __BF_SHIFT().
+The changes to bitfield.h have been split into multiple patches,
+but the actual final file only has whitespace differences.
+
+David Laight (16):
+  nfp: Call FIELD_PREP() in NFP_ETH_SET_BIT_CONFIG() wrapper
+  thunderbolt: Don't pass a bitfield to FIELD_GET
+  bitmap: Use FIELD_PREP() in expansion of FIELD_PREP_WM16()
+  bitfield: Copy #define parameters to locals
+  bitfield: Merge __field_prep/get() into field_prep/get()
+  bitfield: Remove some pointless casts
+  bitfield: FIELD_MODIFY: Only do a single read/write on  the target
+  bitfield: Simplify __BF_FIELD_CHECK_REG()
+  bitfield: Rename __FIELD_PREP/GET() to __BF_FIELD_PREP/GET()
+  bitfield: Split the 'val' check out of __BF_FIELD_CHECK_MASK()
+  bitfield: Common up validation of the mask parameter
+  bitfield: Remove leading _ from #define formal parameter names
+  bitfield: Reduce indentation
+  bitfield: Add comment block for the host/fixed endian functions
+  bitfield: Update comments for le/be functions
+  build_bug.h; Remove __BUILD_BUG_ON_NOT_POWER_OF_2()
+
+ .../netronome/nfp/nfpcore/nfp_nsp_eth.c       |  16 +-
+ drivers/thunderbolt/tb_regs.h                 |  16 +-
+ include/linux/bitfield.h                      | 278 ++++++++++--------
+ include/linux/build_bug.h                     |   2 -
+ include/linux/hw_bitfield.h                   |  21 +-
+ 5 files changed, 175 insertions(+), 158 deletions(-)
+
+-- 
+2.39.5
 
 
