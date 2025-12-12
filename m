@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-244523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B579ECB95FD
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 17:55:32 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CCFACB9477
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 17:37:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 510B43113A1A
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 16:52:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8712C3063387
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 16:37:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC0712D94BD;
-	Fri, 12 Dec 2025 16:44:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A520E2C324F;
+	Fri, 12 Dec 2025 16:37:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=buffet.re header.i=@buffet.re header.b="Lq7rPI/Y"
+	dkim=pass (2048-bit key) header.d=buffet.re header.i=@buffet.re header.b="Afyak1ZU"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx1.buffet.re (mx1.buffet.re [51.83.41.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CC4F2D8DBB;
-	Fri, 12 Dec 2025 16:44:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 031D12C1595;
+	Fri, 12 Dec 2025 16:37:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.83.41.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765557883; cv=none; b=kqPq4iZ0lH/QW45Keo6lUwG9UZHhStrFvKt9HeG8NeM+bZ+cn6ivYPce0dEPICPxoqrW6kw1dYa7jDR+GgEPRAYAHS2+dsOubTGIHn5rkuzU4UbaFSboYYrtqO3pOxJr6YSe+RC530qSHa04J6KuSBRxf12hlgfyESWxxwV6Tx4=
+	t=1765557435; cv=none; b=Y6kNpAiISyDk03DNNdQPCGS2/eUMUcE15YYdig2QQtTDY/HY922UldbSah7k14HqjNOn8Fc6NKbVF3/W275MXbu0MDYlGYpTTTAYAziCXpoQY30Ow9+16QXT1lgIuP56OwHOBlIFF5k6TdED/j5udh4Swca20Lsa0SRkgTaTxjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765557883; c=relaxed/simple;
-	bh=BVGKi/ZRioRY7CSv2Aa80YJsF62/2xRvZ8kQFTwhgHM=;
+	s=arc-20240116; t=1765557435; c=relaxed/simple;
+	bh=TMrYGEy7EHUCz0sy7NRJVoNRK1P5EOEY6i1X3hKDD3E=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=BylJfqiOGckn4ZfCI7+KIPrVvPRADMO9SFNfmF56O98SFxhgwDZRe60JpyTCezfEoUNkhXASU9OBVPrPJ334dFw/NjyvqPj4GvhiPY3q/O0rkhYLt6Q/OKb0RR0vX78EOSkSRFvfXRONLJJTSjQaLxN0SswXdddyo8AhPTR2lJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=buffet.re; spf=pass smtp.mailfrom=buffet.re; dkim=pass (2048-bit key) header.d=buffet.re header.i=@buffet.re header.b=Lq7rPI/Y; arc=none smtp.client-ip=51.83.41.69
+	 MIME-Version; b=VpAW+khi19XBk4Pds+FXiRN1In8X8KOpa/i463SKUec7Xa17qAEw4WCc1q36rZ8I7BjWil9h6ojDYD+VSEVAHK0wjLtmb6G7vYu+QHvIpCMq8SMWSSnfzRYioZoINBq6LRlprUDPa0wD/YgSA+dn7PeaMUNiiYmn1DEry3vsqN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=buffet.re; spf=pass smtp.mailfrom=buffet.re; dkim=pass (2048-bit key) header.d=buffet.re header.i=@buffet.re header.b=Afyak1ZU; arc=none smtp.client-ip=51.83.41.69
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=buffet.re
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=buffet.re
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=buffet.re; s=mx1;
-	t=1765557426; bh=BVGKi/ZRioRY7CSv2Aa80YJsF62/2xRvZ8kQFTwhgHM=;
+	t=1765557428; bh=TMrYGEy7EHUCz0sy7NRJVoNRK1P5EOEY6i1X3hKDD3E=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Lq7rPI/YBJHWjfF7Fm+8sxh6W/xafDDkHZ+nCof1/jYLfkjdP9kJ3fggQicjjZiF5
-	 a7RlT551BKqSQz4xvY5KuIaIOjN3Ts8etLmkayfId6mdS1kUfdIkst+lLJPf+rATRr
-	 qlFMBaMLoNDCI3lj9RNN2kkHJpph/QbB3MnRBnyQPFKjLoYTd016DfuPUzORj4I2od
-	 qBL0nNjKPnbPTvfxM4VxRddN5+irFcasoniWYuWrk7a1RASNcU6xZVCxjuX09ctnpd
-	 k7EzLIubhg6z7aHrOOjrG7XOqNJ5veMttbmdIh9WP2CUIM/gaxjjhgHFzpteEfhZOO
-	 +TDocro46YjIw==
+	b=Afyak1ZUWYCRkJRBFIKwQeSPFwCpFdvPHsnm61EL3cSeslio0Yvuuek+NkuYws1zR
+	 yaelz3UZcbFbJUUZaT4m3A8LBL09ODwqlUNEX+CVJA5ZvxVh1u59rbsnDNhpVP9VHT
+	 iPJIO2lVOCZLM0TTu2U5YgJG2IAlT5cnG9lyeXzw9ariOcyVCXEE7uKnFun1W33QCP
+	 KczWCRyiod4XkEpoMyMx+wAsLnCllYmBgDgkYrPBQb+0lorFzyOITNzrDAELJ4+Uo0
+	 0LMNzyUCt6x0amq0KHZ93QHqnEZsfQNDSKVFILsvfvVmtCRiLUQ7fGrx/eZMYlTodQ
+	 Zot4CRX1CIHqw==
 Received: from localhost.localdomain (unknown [10.0.1.3])
-	by mx1.buffet.re (Postfix) with ESMTPSA id 81160125488;
-	Fri, 12 Dec 2025 17:37:06 +0100 (CET)
+	by mx1.buffet.re (Postfix) with ESMTPSA id 0642212548B;
+	Fri, 12 Dec 2025 17:37:07 +0100 (CET)
 From: Matthieu Buffet <matthieu@buffet.re>
 To: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
 Cc: =?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack@google.com>,
@@ -49,9 +49,9 @@ Cc: =?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack@google.com>,
 	konstantin.meskhidze@huawei.com,
 	netdev@vger.kernel.org,
 	Matthieu Buffet <matthieu@buffet.re>
-Subject: [RFC PATCH v3 3/8] landlock: Add UDP bind+connect access control
-Date: Fri, 12 Dec 2025 17:36:59 +0100
-Message-Id: <20251212163704.142301-4-matthieu@buffet.re>
+Subject: [RFC PATCH v3 4/8] selftests/landlock: Add UDP bind/connect tests
+Date: Fri, 12 Dec 2025 17:37:00 +0100
+Message-Id: <20251212163704.142301-5-matthieu@buffet.re>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20251212163704.142301-1-matthieu@buffet.re>
 References: <20251212163704.142301-1-matthieu@buffet.re>
@@ -63,217 +63,739 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If a process doesn't need to be able to open UDP sockets, it should be
-denied the right to create UDP sockets altogether. For processes using
-UDP, add support for two more fine-grained access rights:
-
-- LANDLOCK_ACCESS_NET_CONNECT_UDP, to gate the possibility to connect()
-  a UDP socket. For client apps (those which want to avoid specifying a
-  destination for each datagram they send), and for a few servers (those
-  creating per-client sockets, which want to receive traffic only from a
-  specific address)
-
-- LANDLOCK_ACCESS_NET_BIND_UDP, to gate the possibility to bind() a UDP
-  socket. For most servers (to start receiving datagrams), and some
-  clients that need to use a specific source port (e.g. mDNS requires to
-  use port 5353)
-
-Access control is only enforced when trying to set the local or remote
-end of a UDP socket. So, nothing prevents a client with the right to
-send datagrams to use it to get an automatically bound socket and
-receive datagrams on an ephemeral port of their choice, without having
-LANDLOCK_ACCESS_NET_BIND_UDP. Restricting send/recv semantics is left
-for a future patch, as it would require tagging sockets or a netfilter
-hook.
-
-Bump ABI to v8 to allow userland to detect and use these new access
-rights.
+Make basic changes to the existing bind() and connect() test suite to
+also encompass testing UDP access control.
 
 Signed-off-by: Matthieu Buffet <matthieu@buffet.re>
 ---
- include/uapi/linux/landlock.h | 20 ++++++++++++++---
- security/landlock/audit.c     |  2 ++
- security/landlock/limits.h    |  2 +-
- security/landlock/net.c       | 41 ++++++++++++++++++++++-------------
- security/landlock/syscalls.c  |  2 +-
- 5 files changed, 47 insertions(+), 20 deletions(-)
+ tools/testing/selftests/landlock/base_test.c |   2 +-
+ tools/testing/selftests/landlock/net_test.c  | 389 ++++++++++++++-----
+ 2 files changed, 303 insertions(+), 88 deletions(-)
 
-diff --git a/include/uapi/linux/landlock.h b/include/uapi/linux/landlock.h
-index efb383af40b2..8f748fcf79dd 100644
---- a/include/uapi/linux/landlock.h
-+++ b/include/uapi/linux/landlock.h
-@@ -186,9 +186,9 @@ struct landlock_net_port_attr {
- 	 * with ``setsockopt(IP_LOCAL_PORT_RANGE)``.
- 	 *
- 	 * A Landlock rule with port 0 and the %LANDLOCK_ACCESS_NET_BIND_TCP
--	 * right means that requesting to bind on port 0 is allowed and it will
--	 * automatically translate to binding on a kernel-assigned ephemeral
--	 * port.
-+	 * or %LANDLOCK_ACCESS_NET_BIND_UDP right means that requesting to bind
-+	 * on port 0 is allowed and it will automatically translate to binding
-+	 * on a kernel-assigned ephemeral port.
- 	 */
- 	__u64 port;
+diff --git a/tools/testing/selftests/landlock/base_test.c b/tools/testing/selftests/landlock/base_test.c
+index 7b69002239d7..f4b1a275d8d9 100644
+--- a/tools/testing/selftests/landlock/base_test.c
++++ b/tools/testing/selftests/landlock/base_test.c
+@@ -76,7 +76,7 @@ TEST(abi_version)
+ 	const struct landlock_ruleset_attr ruleset_attr = {
+ 		.handled_access_fs = LANDLOCK_ACCESS_FS_READ_FILE,
+ 	};
+-	ASSERT_EQ(7, landlock_create_ruleset(NULL, 0,
++	ASSERT_EQ(8, landlock_create_ruleset(NULL, 0,
+ 					     LANDLOCK_CREATE_RULESET_VERSION));
+ 
+ 	ASSERT_EQ(-1, landlock_create_ruleset(&ruleset_attr, 0,
+diff --git a/tools/testing/selftests/landlock/net_test.c b/tools/testing/selftests/landlock/net_test.c
+index b34b139b3f89..977d82eb9934 100644
+--- a/tools/testing/selftests/landlock/net_test.c
++++ b/tools/testing/selftests/landlock/net_test.c
+@@ -35,6 +35,7 @@ enum sandbox_type {
+ 	NO_SANDBOX,
+ 	/* This may be used to test rules that allow *and* deny accesses. */
+ 	TCP_SANDBOX,
++	UDP_SANDBOX,
  };
-@@ -340,10 +340,24 @@ struct landlock_net_port_attr {
-  *   port. Support added in Landlock ABI version 4.
-  * - %LANDLOCK_ACCESS_NET_CONNECT_TCP: Connect TCP sockets to the given
-  *   remote port. Support added in Landlock ABI version 4.
-+ *
-+ * And similarly for UDP port numbers:
-+ *
-+ * - %LANDLOCK_ACCESS_NET_BIND_UDP: Bind UDP sockets to the given local
-+ *   port. Support added in Landlock ABI version 8.
-+ *   Note: this access right is not required if your program sends
-+ *   datagrams and just uses the implicitly bound port assigned by the
-+ *   kernel to reply. Conversely, denying this right only blocks a
-+ *   program from binding to non-ephemeral ports if it can send datagrams.
-+ * - %LANDLOCK_ACCESS_NET_CONNECT_UDP: Connect UDP sockets to remote
-+ *   addresses with the given remote port. Support added in Landlock ABI
-+ *   version 8.
-  */
+ 
+ static int set_service(struct service_fixture *const srv,
+@@ -93,11 +94,20 @@ static bool prot_is_tcp(const struct protocol_variant *const prot)
+ 	       (prot->protocol == IPPROTO_TCP || prot->protocol == IPPROTO_IP);
+ }
+ 
++static bool prot_is_udp(const struct protocol_variant *const prot)
++{
++	return (prot->domain == AF_INET || prot->domain == AF_INET6) &&
++	       prot->type == SOCK_DGRAM &&
++	       (prot->protocol == IPPROTO_UDP || prot->protocol == IPPROTO_IP);
++}
++
+ static bool is_restricted(const struct protocol_variant *const prot,
+ 			  const enum sandbox_type sandbox)
+ {
+ 	if (sandbox == TCP_SANDBOX)
+ 		return prot_is_tcp(prot);
++	else if (sandbox == UDP_SANDBOX)
++		return prot_is_udp(prot);
+ 	return false;
+ }
+ 
+@@ -271,10 +281,9 @@ FIXTURE_VARIANT(protocol)
+ 
+ FIXTURE_SETUP(protocol)
+ {
+-	const struct protocol_variant prot_unspec = {
+-		.domain = AF_UNSPEC,
+-		.type = SOCK_STREAM,
+-	};
++	struct protocol_variant prot_unspec = variant->prot;
++
++	prot_unspec.domain = AF_UNSPEC;
+ 
+ 	disable_caps(_metadata);
+ 
+@@ -510,6 +519,92 @@ FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_unix_datagram) {
+ 	},
+ };
+ 
++/* clang-format off */
++FIXTURE_VARIANT_ADD(protocol, udp_sandbox_with_ipv4_udp1) {
++	/* clang-format on */
++	.sandbox = UDP_SANDBOX,
++	.prot = {
++		.domain = AF_INET,
++		.type = SOCK_DGRAM,
++		.protocol = IPPROTO_UDP,
++	},
++};
++
++/* clang-format off */
++FIXTURE_VARIANT_ADD(protocol, udp_sandbox_with_ipv4_udp2) {
++	/* clang-format on */
++	.sandbox = UDP_SANDBOX,
++	.prot = {
++		.domain = AF_INET,
++		.type = SOCK_DGRAM,
++		/* IPPROTO_IP == 0 */
++		.protocol = IPPROTO_IP,
++	},
++};
++
++/* clang-format off */
++FIXTURE_VARIANT_ADD(protocol, udp_sandbox_with_ipv6_udp1) {
++	/* clang-format on */
++	.sandbox = UDP_SANDBOX,
++	.prot = {
++		.domain = AF_INET6,
++		.type = SOCK_DGRAM,
++		.protocol = IPPROTO_UDP,
++	},
++};
++
++/* clang-format off */
++FIXTURE_VARIANT_ADD(protocol, udp_sandbox_with_ipv6_udp2) {
++	/* clang-format on */
++	.sandbox = UDP_SANDBOX,
++	.prot = {
++		.domain = AF_INET6,
++		.type = SOCK_DGRAM,
++		/* IPPROTO_IP == 0 */
++		.protocol = IPPROTO_IP,
++	},
++};
++
++/* clang-format off */
++FIXTURE_VARIANT_ADD(protocol, udp_sandbox_with_ipv4_tcp) {
++	/* clang-format on */
++	.sandbox = UDP_SANDBOX,
++	.prot = {
++		.domain = AF_INET,
++		.type = SOCK_STREAM,
++	},
++};
++
++/* clang-format off */
++FIXTURE_VARIANT_ADD(protocol, udp_sandbox_with_ipv6_tcp) {
++	/* clang-format on */
++	.sandbox = UDP_SANDBOX,
++	.prot = {
++		.domain = AF_INET6,
++		.type = SOCK_STREAM,
++	},
++};
++
++/* clang-format off */
++FIXTURE_VARIANT_ADD(protocol, udp_sandbox_with_unix_stream) {
++	/* clang-format on */
++	.sandbox = UDP_SANDBOX,
++	.prot = {
++		.domain = AF_UNIX,
++		.type = SOCK_STREAM,
++	},
++};
++
++/* clang-format off */
++FIXTURE_VARIANT_ADD(protocol, udp_sandbox_with_unix_datagram) {
++	/* clang-format on */
++	.sandbox = UDP_SANDBOX,
++	.prot = {
++		.domain = AF_UNIX,
++		.type = SOCK_DGRAM,
++	},
++};
++
+ static void test_bind_and_connect(struct __test_metadata *const _metadata,
+ 				  const struct service_fixture *const srv,
+ 				  const bool deny_bind, const bool deny_connect)
+@@ -602,7 +697,7 @@ static void test_bind_and_connect(struct __test_metadata *const _metadata,
+ 		ret = connect_variant(connect_fd, srv);
+ 		if (deny_connect) {
+ 			EXPECT_EQ(-EACCES, ret);
+-		} else if (deny_bind) {
++		} else if (deny_bind && srv->protocol.type == SOCK_STREAM) {
+ 			/* No listening server. */
+ 			EXPECT_EQ(-ECONNREFUSED, ret);
+ 		} else {
+@@ -641,18 +736,25 @@ static void test_bind_and_connect(struct __test_metadata *const _metadata,
+ 
+ TEST_F(protocol, bind)
+ {
+-	if (variant->sandbox == TCP_SANDBOX) {
++	if (variant->sandbox == TCP_SANDBOX ||
++	    variant->sandbox == UDP_SANDBOX) {
++		const __u64 bind_access =
++			(variant->sandbox == TCP_SANDBOX ?
++				 LANDLOCK_ACCESS_NET_BIND_TCP :
++				 LANDLOCK_ACCESS_NET_BIND_UDP);
++		const __u64 connect_access =
++			(variant->sandbox == TCP_SANDBOX ?
++				 LANDLOCK_ACCESS_NET_CONNECT_TCP :
++				 LANDLOCK_ACCESS_NET_CONNECT_UDP);
+ 		const struct landlock_ruleset_attr ruleset_attr = {
+-			.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
+-					      LANDLOCK_ACCESS_NET_CONNECT_TCP,
++			.handled_access_net = bind_access | connect_access,
+ 		};
+-		const struct landlock_net_port_attr tcp_bind_connect_p0 = {
+-			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP |
+-					  LANDLOCK_ACCESS_NET_CONNECT_TCP,
++		const struct landlock_net_port_attr bind_connect_p0 = {
++			.allowed_access = bind_access | connect_access,
+ 			.port = self->srv0.port,
+ 		};
+-		const struct landlock_net_port_attr tcp_connect_p1 = {
+-			.allowed_access = LANDLOCK_ACCESS_NET_CONNECT_TCP,
++		const struct landlock_net_port_attr connect_p1 = {
++			.allowed_access = connect_access,
+ 			.port = self->srv1.port,
+ 		};
+ 		int ruleset_fd;
+@@ -664,12 +766,12 @@ TEST_F(protocol, bind)
+ 		/* Allows connect and bind for the first port.  */
+ 		ASSERT_EQ(0,
+ 			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+-					    &tcp_bind_connect_p0, 0));
++					    &bind_connect_p0, 0));
+ 
+ 		/* Allows connect and denies bind for the second port. */
+ 		ASSERT_EQ(0,
+ 			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+-					    &tcp_connect_p1, 0));
++					    &connect_p1, 0));
+ 
+ 		enforce_ruleset(_metadata, ruleset_fd);
+ 		EXPECT_EQ(0, close(ruleset_fd));
+@@ -691,18 +793,25 @@ TEST_F(protocol, bind)
+ 
+ TEST_F(protocol, connect)
+ {
+-	if (variant->sandbox == TCP_SANDBOX) {
++	if (variant->sandbox == TCP_SANDBOX ||
++	    variant->sandbox == UDP_SANDBOX) {
++		const __u64 bind_access =
++			(variant->sandbox == TCP_SANDBOX ?
++				 LANDLOCK_ACCESS_NET_BIND_TCP :
++				 LANDLOCK_ACCESS_NET_BIND_UDP);
++		const __u64 connect_access =
++			(variant->sandbox == TCP_SANDBOX ?
++				 LANDLOCK_ACCESS_NET_CONNECT_TCP :
++				 LANDLOCK_ACCESS_NET_CONNECT_UDP);
+ 		const struct landlock_ruleset_attr ruleset_attr = {
+-			.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
+-					      LANDLOCK_ACCESS_NET_CONNECT_TCP,
++			.handled_access_net = bind_access | connect_access,
+ 		};
+-		const struct landlock_net_port_attr tcp_bind_connect_p0 = {
+-			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP |
+-					  LANDLOCK_ACCESS_NET_CONNECT_TCP,
++		const struct landlock_net_port_attr bind_connect_p0 = {
++			.allowed_access = bind_access | connect_access,
+ 			.port = self->srv0.port,
+ 		};
+-		const struct landlock_net_port_attr tcp_bind_p1 = {
+-			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP,
++		const struct landlock_net_port_attr bind_p1 = {
++			.allowed_access = bind_access,
+ 			.port = self->srv1.port,
+ 		};
+ 		int ruleset_fd;
+@@ -714,12 +823,12 @@ TEST_F(protocol, connect)
+ 		/* Allows connect and bind for the first port. */
+ 		ASSERT_EQ(0,
+ 			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+-					    &tcp_bind_connect_p0, 0));
++					    &bind_connect_p0, 0));
+ 
+ 		/* Allows bind and denies connect for the second port. */
+ 		ASSERT_EQ(0,
+ 			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+-					    &tcp_bind_p1, 0));
++					    &bind_p1, 0));
+ 
+ 		enforce_ruleset(_metadata, ruleset_fd);
+ 		EXPECT_EQ(0, close(ruleset_fd));
+@@ -737,16 +846,24 @@ TEST_F(protocol, connect)
+ 
+ TEST_F(protocol, bind_unspec)
+ {
+-	const struct landlock_ruleset_attr ruleset_attr = {
+-		.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP,
+-	};
+-	const struct landlock_net_port_attr tcp_bind = {
+-		.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP,
+-		.port = self->srv0.port,
+-	};
++	const int bind_access_right = (variant->sandbox == TCP_SANDBOX ?
++					       LANDLOCK_ACCESS_NET_BIND_TCP :
++					       LANDLOCK_ACCESS_NET_BIND_UDP);
+ 	int bind_fd, ret;
+ 
+-	if (variant->sandbox == TCP_SANDBOX) {
++	if (variant->sandbox == TCP_SANDBOX ||
++	    variant->sandbox == UDP_SANDBOX) {
++		const struct landlock_ruleset_attr ruleset_attr = {
++			.handled_access_net = bind_access_right,
++		};
++		const struct landlock_net_port_attr bind = {
++			.allowed_access =
++				(variant->sandbox == TCP_SANDBOX ?
++					 LANDLOCK_ACCESS_NET_BIND_TCP :
++					 LANDLOCK_ACCESS_NET_BIND_UDP),
++			.port = self->srv0.port,
++		};
++
+ 		const int ruleset_fd = landlock_create_ruleset(
+ 			&ruleset_attr, sizeof(ruleset_attr), 0);
+ 		ASSERT_LE(0, ruleset_fd);
+@@ -754,7 +871,7 @@ TEST_F(protocol, bind_unspec)
+ 		/* Allows bind. */
+ 		ASSERT_EQ(0,
+ 			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+-					    &tcp_bind, 0));
++					    &bind, 0));
+ 		enforce_ruleset(_metadata, ruleset_fd);
+ 		EXPECT_EQ(0, close(ruleset_fd));
+ 	}
+@@ -782,7 +899,11 @@ TEST_F(protocol, bind_unspec)
+ 	}
+ 	EXPECT_EQ(0, close(bind_fd));
+ 
+-	if (variant->sandbox == TCP_SANDBOX) {
++	if (variant->sandbox == TCP_SANDBOX ||
++	    variant->sandbox == UDP_SANDBOX) {
++		const struct landlock_ruleset_attr ruleset_attr = {
++			.handled_access_net = bind_access_right,
++		};
+ 		const int ruleset_fd = landlock_create_ruleset(
+ 			&ruleset_attr, sizeof(ruleset_attr), 0);
+ 		ASSERT_LE(0, ruleset_fd);
+@@ -829,10 +950,12 @@ TEST_F(protocol, bind_unspec)
+ TEST_F(protocol, connect_unspec)
+ {
+ 	const struct landlock_ruleset_attr ruleset_attr = {
+-		.handled_access_net = LANDLOCK_ACCESS_NET_CONNECT_TCP,
++		.handled_access_net = LANDLOCK_ACCESS_NET_CONNECT_TCP |
++				      LANDLOCK_ACCESS_NET_CONNECT_UDP,
+ 	};
+-	const struct landlock_net_port_attr tcp_connect = {
+-		.allowed_access = LANDLOCK_ACCESS_NET_CONNECT_TCP,
++	const struct landlock_net_port_attr connect = {
++		.allowed_access = LANDLOCK_ACCESS_NET_CONNECT_TCP |
++				  LANDLOCK_ACCESS_NET_CONNECT_UDP,
+ 		.port = self->srv0.port,
+ 	};
+ 	int bind_fd, client_fd, status;
+@@ -865,7 +988,8 @@ TEST_F(protocol, connect_unspec)
+ 			EXPECT_EQ(0, ret);
+ 		}
+ 
+-		if (variant->sandbox == TCP_SANDBOX) {
++		if (variant->sandbox == TCP_SANDBOX ||
++		    variant->sandbox == UDP_SANDBOX) {
+ 			const int ruleset_fd = landlock_create_ruleset(
+ 				&ruleset_attr, sizeof(ruleset_attr), 0);
+ 			ASSERT_LE(0, ruleset_fd);
+@@ -873,7 +997,7 @@ TEST_F(protocol, connect_unspec)
+ 			/* Allows connect. */
+ 			ASSERT_EQ(0, landlock_add_rule(ruleset_fd,
+ 						       LANDLOCK_RULE_NET_PORT,
+-						       &tcp_connect, 0));
++						       &connect, 0));
+ 			enforce_ruleset(_metadata, ruleset_fd);
+ 			EXPECT_EQ(0, close(ruleset_fd));
+ 		}
+@@ -896,7 +1020,8 @@ TEST_F(protocol, connect_unspec)
+ 			EXPECT_EQ(0, ret);
+ 		}
+ 
+-		if (variant->sandbox == TCP_SANDBOX) {
++		if (variant->sandbox == TCP_SANDBOX ||
++		    variant->sandbox == UDP_SANDBOX) {
+ 			const int ruleset_fd = landlock_create_ruleset(
+ 				&ruleset_attr, sizeof(ruleset_attr), 0);
+ 			ASSERT_LE(0, ruleset_fd);
+@@ -975,6 +1100,13 @@ FIXTURE_VARIANT_ADD(ipv4, tcp_sandbox_with_tcp) {
+ 	.type = SOCK_STREAM,
+ };
+ 
++/* clang-format off */
++FIXTURE_VARIANT_ADD(ipv4, udp_sandbox_with_tcp) {
++	/* clang-format on */
++	.sandbox = UDP_SANDBOX,
++	.type = SOCK_STREAM,
++};
++
  /* clang-format off */
- #define LANDLOCK_ACCESS_NET_BIND_TCP			(1ULL << 0)
- #define LANDLOCK_ACCESS_NET_CONNECT_TCP			(1ULL << 1)
-+#define LANDLOCK_ACCESS_NET_BIND_UDP			(1ULL << 2)
-+#define LANDLOCK_ACCESS_NET_CONNECT_UDP			(1ULL << 3)
+ FIXTURE_VARIANT_ADD(ipv4, no_sandbox_with_udp) {
+ 	/* clang-format on */
+@@ -989,6 +1121,13 @@ FIXTURE_VARIANT_ADD(ipv4, tcp_sandbox_with_udp) {
+ 	.type = SOCK_DGRAM,
+ };
+ 
++/* clang-format off */
++FIXTURE_VARIANT_ADD(ipv4, udp_sandbox_with_udp) {
++	/* clang-format on */
++	.sandbox = UDP_SANDBOX,
++	.type = SOCK_DGRAM,
++};
++
+ FIXTURE_SETUP(ipv4)
+ {
+ 	const struct protocol_variant prot = {
+@@ -1010,16 +1149,21 @@ FIXTURE_TEARDOWN(ipv4)
+ 
+ TEST_F(ipv4, from_unix_to_inet)
+ {
++	const int access_rights =
++		(variant->sandbox == TCP_SANDBOX ?
++			 LANDLOCK_ACCESS_NET_BIND_TCP |
++				 LANDLOCK_ACCESS_NET_CONNECT_TCP :
++			 LANDLOCK_ACCESS_NET_BIND_UDP |
++				 LANDLOCK_ACCESS_NET_CONNECT_UDP);
+ 	int unix_stream_fd, unix_dgram_fd;
+ 
+-	if (variant->sandbox == TCP_SANDBOX) {
++	if (variant->sandbox == TCP_SANDBOX ||
++	    variant->sandbox == UDP_SANDBOX) {
+ 		const struct landlock_ruleset_attr ruleset_attr = {
+-			.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
+-					      LANDLOCK_ACCESS_NET_CONNECT_TCP,
++			.handled_access_net = access_rights,
+ 		};
+-		const struct landlock_net_port_attr tcp_bind_connect_p0 = {
+-			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP |
+-					  LANDLOCK_ACCESS_NET_CONNECT_TCP,
++		const struct landlock_net_port_attr bind_connect_p0 = {
++			.allowed_access = access_rights,
+ 			.port = self->srv0.port,
+ 		};
+ 		int ruleset_fd;
+@@ -1032,7 +1176,7 @@ TEST_F(ipv4, from_unix_to_inet)
+ 		/* Allows connect and bind for srv0.  */
+ 		ASSERT_EQ(0,
+ 			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+-					    &tcp_bind_connect_p0, 0));
++					    &bind_connect_p0, 0));
+ 
+ 		enforce_ruleset(_metadata, ruleset_fd);
+ 		EXPECT_EQ(0, close(ruleset_fd));
+@@ -1326,11 +1470,13 @@ FIXTURE_TEARDOWN(mini)
+ 
+ /* clang-format off */
+ 
+-#define ACCESS_LAST LANDLOCK_ACCESS_NET_CONNECT_TCP
++#define ACCESS_LAST LANDLOCK_ACCESS_NET_CONNECT_UDP
+ 
+ #define ACCESS_ALL ( \
+ 	LANDLOCK_ACCESS_NET_BIND_TCP | \
+-	LANDLOCK_ACCESS_NET_CONNECT_TCP)
++	LANDLOCK_ACCESS_NET_CONNECT_TCP | \
++	LANDLOCK_ACCESS_NET_BIND_UDP | \
++	LANDLOCK_ACCESS_NET_CONNECT_UDP)
+ 
  /* clang-format on */
  
- /**
-diff --git a/security/landlock/audit.c b/security/landlock/audit.c
-index e899995f1fd5..23d8dee320ef 100644
---- a/security/landlock/audit.c
-+++ b/security/landlock/audit.c
-@@ -44,6 +44,8 @@ static_assert(ARRAY_SIZE(fs_access_strings) == LANDLOCK_NUM_ACCESS_FS);
- static const char *const net_access_strings[] = {
- 	[BIT_INDEX(LANDLOCK_ACCESS_NET_BIND_TCP)] = "net.bind_tcp",
- 	[BIT_INDEX(LANDLOCK_ACCESS_NET_CONNECT_TCP)] = "net.connect_tcp",
-+	[BIT_INDEX(LANDLOCK_ACCESS_NET_BIND_UDP)] = "net.bind_udp",
-+	[BIT_INDEX(LANDLOCK_ACCESS_NET_CONNECT_UDP)] = "net.connect_udp",
+@@ -1697,7 +1843,7 @@ FIXTURE_VARIANT_ADD(port_specific, no_sandbox_with_ipv4) {
  };
  
- static_assert(ARRAY_SIZE(net_access_strings) == LANDLOCK_NUM_ACCESS_NET);
-diff --git a/security/landlock/limits.h b/security/landlock/limits.h
-index 65b5ff051674..13dd5503e471 100644
---- a/security/landlock/limits.h
-+++ b/security/landlock/limits.h
-@@ -23,7 +23,7 @@
- #define LANDLOCK_MASK_ACCESS_FS		((LANDLOCK_LAST_ACCESS_FS << 1) - 1)
- #define LANDLOCK_NUM_ACCESS_FS		__const_hweight64(LANDLOCK_MASK_ACCESS_FS)
+ /* clang-format off */
+-FIXTURE_VARIANT_ADD(port_specific, sandbox_with_ipv4) {
++FIXTURE_VARIANT_ADD(port_specific, tcp_sandbox_with_ipv4) {
+ 	/* clang-format on */
+ 	.sandbox = TCP_SANDBOX,
+ 	.prot = {
+@@ -1706,6 +1852,16 @@ FIXTURE_VARIANT_ADD(port_specific, sandbox_with_ipv4) {
+ 	},
+ };
  
--#define LANDLOCK_LAST_ACCESS_NET	LANDLOCK_ACCESS_NET_CONNECT_TCP
-+#define LANDLOCK_LAST_ACCESS_NET	LANDLOCK_ACCESS_NET_CONNECT_UDP
- #define LANDLOCK_MASK_ACCESS_NET	((LANDLOCK_LAST_ACCESS_NET << 1) - 1)
- #define LANDLOCK_NUM_ACCESS_NET		__const_hweight64(LANDLOCK_MASK_ACCESS_NET)
++/* clang-format off */
++FIXTURE_VARIANT_ADD(port_specific, udp_sandbox_with_ipv4) {
++	/* clang-format on */
++	.sandbox = UDP_SANDBOX,
++	.prot = {
++		.domain = AF_INET,
++		.type = SOCK_DGRAM,
++	},
++};
++
+ /* clang-format off */
+ FIXTURE_VARIANT_ADD(port_specific, no_sandbox_with_ipv6) {
+ 	/* clang-format on */
+@@ -1717,7 +1873,7 @@ FIXTURE_VARIANT_ADD(port_specific, no_sandbox_with_ipv6) {
+ };
  
-diff --git a/security/landlock/net.c b/security/landlock/net.c
-index 59438285e73b..9bddcf466ce9 100644
---- a/security/landlock/net.c
-+++ b/security/landlock/net.c
-@@ -68,28 +68,31 @@ static int current_check_access_socket(struct socket *const sock,
+ /* clang-format off */
+-FIXTURE_VARIANT_ADD(port_specific, sandbox_with_ipv6) {
++FIXTURE_VARIANT_ADD(port_specific, tcp_sandbox_with_ipv6) {
+ 	/* clang-format on */
+ 	.sandbox = TCP_SANDBOX,
+ 	.prot = {
+@@ -1726,6 +1882,16 @@ FIXTURE_VARIANT_ADD(port_specific, sandbox_with_ipv6) {
+ 	},
+ };
  
- 	switch (address->sa_family) {
- 	case AF_UNSPEC:
--		if (access_request == LANDLOCK_ACCESS_NET_CONNECT_TCP) {
-+		if (access_request == LANDLOCK_ACCESS_NET_CONNECT_TCP ||
-+		    access_request == LANDLOCK_ACCESS_NET_CONNECT_UDP) {
- 			/*
- 			 * Connecting to an address with AF_UNSPEC dissolves
--			 * the TCP association, which have the same effect as
--			 * closing the connection while retaining the socket
--			 * object (i.e., the file descriptor).  As for dropping
--			 * privileges, closing connections is always allowed.
--			 *
--			 * For a TCP access control system, this request is
--			 * legitimate. Let the network stack handle potential
-+			 * the remote association while retaining the socket
-+			 * object (i.e., the file descriptor). For TCP, it has
-+			 * the same effect as closing the connection. For UDP,
-+			 * it removes any preset remote address. As for
-+			 * dropping privileges, these actions are always
-+			 * allowed.
-+			 * Let the network stack handle potential
- 			 * inconsistencies and return -EINVAL if needed.
- 			 */
- 			return 0;
--		} else if (access_request == LANDLOCK_ACCESS_NET_BIND_TCP) {
-+		} else if (access_request == LANDLOCK_ACCESS_NET_BIND_TCP ||
-+			   access_request == LANDLOCK_ACCESS_NET_BIND_UDP) {
- 			/*
- 			 * Binding to an AF_UNSPEC address is treated
- 			 * differently by IPv4 and IPv6 sockets. The socket's
- 			 * family may change under our feet due to
- 			 * setsockopt(IPV6_ADDRFORM), but that's ok: we either
- 			 * reject entirely or require
--			 * %LANDLOCK_ACCESS_NET_BIND_TCP for the given port, so
--			 * it cannot be used to bypass the policy.
-+			 * %LANDLOCK_ACCESS_NET_BIND_TCP or
-+			 * %LANDLOCK_ACCESS_NET_BIND_UDP for the given port,
-+			 * so it cannot be used to bypass the policy.
- 			 *
- 			 * IPv4 sockets map AF_UNSPEC to AF_INET for
- 			 * retrocompatibility for bind accesses, only if the
-@@ -132,10 +135,12 @@ static int current_check_access_socket(struct socket *const sock,
- 		addr4 = (struct sockaddr_in *)address;
- 		port = addr4->sin_port;
++/* clang-format off */
++FIXTURE_VARIANT_ADD(port_specific, udp_sandbox_with_ipv6) {
++	/* clang-format on */
++	.sandbox = UDP_SANDBOX,
++	.prot = {
++		.domain = AF_INET6,
++		.type = SOCK_DGRAM,
++	},
++};
++
+ FIXTURE_SETUP(port_specific)
+ {
+ 	disable_caps(_metadata);
+@@ -1745,14 +1911,19 @@ TEST_F(port_specific, bind_connect_zero)
+ 	uint16_t port;
  
--		if (access_request == LANDLOCK_ACCESS_NET_CONNECT_TCP) {
-+		if (access_request == LANDLOCK_ACCESS_NET_CONNECT_TCP ||
-+		    access_request == LANDLOCK_ACCESS_NET_CONNECT_UDP) {
- 			audit_net.dport = port;
- 			audit_net.v4info.daddr = addr4->sin_addr.s_addr;
--		} else if (access_request == LANDLOCK_ACCESS_NET_BIND_TCP) {
-+		} else if (access_request == LANDLOCK_ACCESS_NET_BIND_TCP ||
-+			   access_request == LANDLOCK_ACCESS_NET_BIND_UDP) {
- 			audit_net.sport = port;
- 			audit_net.v4info.saddr = addr4->sin_addr.s_addr;
- 		} else {
-@@ -154,10 +159,12 @@ static int current_check_access_socket(struct socket *const sock,
- 		addr6 = (struct sockaddr_in6 *)address;
- 		port = addr6->sin6_port;
+ 	/* Adds a rule layer with bind and connect actions. */
+-	if (variant->sandbox == TCP_SANDBOX) {
++	if (variant->sandbox == TCP_SANDBOX ||
++	    variant->sandbox == UDP_SANDBOX) {
++		const int access_rights =
++			(variant->sandbox == TCP_SANDBOX ?
++				 LANDLOCK_ACCESS_NET_BIND_TCP |
++					 LANDLOCK_ACCESS_NET_CONNECT_TCP :
++				 LANDLOCK_ACCESS_NET_BIND_UDP |
++					 LANDLOCK_ACCESS_NET_CONNECT_UDP);
+ 		const struct landlock_ruleset_attr ruleset_attr = {
+-			.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
+-					      LANDLOCK_ACCESS_NET_CONNECT_TCP
++			.handled_access_net = access_rights,
+ 		};
+ 		const struct landlock_net_port_attr tcp_bind_connect_zero = {
+-			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP |
+-					  LANDLOCK_ACCESS_NET_CONNECT_TCP,
++			.allowed_access = access_rights,
+ 			.port = 0,
+ 		};
+ 		int ruleset_fd;
+@@ -1785,11 +1956,13 @@ TEST_F(port_specific, bind_connect_zero)
+ 	ret = bind_variant(bind_fd, &self->srv0);
+ 	EXPECT_EQ(0, ret);
  
--		if (access_request == LANDLOCK_ACCESS_NET_CONNECT_TCP) {
-+		if (access_request == LANDLOCK_ACCESS_NET_CONNECT_TCP ||
-+		    access_request == LANDLOCK_ACCESS_NET_CONNECT_UDP) {
- 			audit_net.dport = port;
- 			audit_net.v6info.daddr = addr6->sin6_addr;
--		} else if (access_request == LANDLOCK_ACCESS_NET_BIND_TCP) {
-+		} else if (access_request == LANDLOCK_ACCESS_NET_BIND_TCP ||
-+			   access_request == LANDLOCK_ACCESS_NET_BIND_UDP) {
- 			audit_net.sport = port;
- 			audit_net.v6info.saddr = addr6->sin6_addr;
- 		} else {
-@@ -215,6 +222,8 @@ static int hook_socket_bind(struct socket *const sock,
+-	EXPECT_EQ(0, listen(bind_fd, backlog));
++	if (variant->prot.type == SOCK_STREAM) {
++		EXPECT_EQ(0, listen(bind_fd, backlog));
  
- 	if (sk_is_tcp(sock->sk))
- 		access_request = LANDLOCK_ACCESS_NET_BIND_TCP;
-+	else if (sk_is_udp(sock->sk))
-+		access_request = LANDLOCK_ACCESS_NET_BIND_UDP;
- 	else
- 		return 0;
+-	/* Connects on port 0. */
+-	ret = connect_variant(connect_fd, &self->srv0);
+-	EXPECT_EQ(-ECONNREFUSED, ret);
++		/* Connects on port 0. */
++		ret = connect_variant(connect_fd, &self->srv0);
++		EXPECT_EQ(-ECONNREFUSED, ret);
++	}
  
-@@ -230,6 +239,8 @@ static int hook_socket_connect(struct socket *const sock,
+ 	/* Sets binded port for both protocol families. */
+ 	port = get_binded_port(bind_fd, &variant->prot);
+@@ -1813,21 +1986,25 @@ TEST_F(port_specific, bind_connect_1023)
+ 	int bind_fd, connect_fd, ret;
  
- 	if (sk_is_tcp(sock->sk))
- 		access_request = LANDLOCK_ACCESS_NET_CONNECT_TCP;
-+	else if (sk_is_udp(sock->sk))
-+		access_request = LANDLOCK_ACCESS_NET_CONNECT_UDP;
- 	else
- 		return 0;
+ 	/* Adds a rule layer with bind and connect actions. */
+-	if (variant->sandbox == TCP_SANDBOX) {
++	if (variant->sandbox == TCP_SANDBOX ||
++	    variant->sandbox == UDP_SANDBOX) {
++		const int access_rights =
++			(variant->sandbox == TCP_SANDBOX ?
++				 LANDLOCK_ACCESS_NET_BIND_TCP |
++					 LANDLOCK_ACCESS_NET_CONNECT_TCP :
++				 LANDLOCK_ACCESS_NET_BIND_UDP |
++					 LANDLOCK_ACCESS_NET_CONNECT_UDP);
+ 		const struct landlock_ruleset_attr ruleset_attr = {
+-			.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
+-					      LANDLOCK_ACCESS_NET_CONNECT_TCP
++			.handled_access_net = access_rights,
+ 		};
+ 		/* A rule with port value less than 1024. */
+-		const struct landlock_net_port_attr tcp_bind_connect_low_range = {
+-			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP |
+-					  LANDLOCK_ACCESS_NET_CONNECT_TCP,
++		const struct landlock_net_port_attr bind_connect_low_range = {
++			.allowed_access = access_rights,
+ 			.port = 1023,
+ 		};
+ 		/* A rule with 1024 port. */
+-		const struct landlock_net_port_attr tcp_bind_connect = {
+-			.allowed_access = LANDLOCK_ACCESS_NET_BIND_TCP |
+-					  LANDLOCK_ACCESS_NET_CONNECT_TCP,
++		const struct landlock_net_port_attr bind_connect = {
++			.allowed_access = access_rights,
+ 			.port = 1024,
+ 		};
+ 		int ruleset_fd;
+@@ -1838,10 +2015,10 @@ TEST_F(port_specific, bind_connect_1023)
  
-diff --git a/security/landlock/syscalls.c b/security/landlock/syscalls.c
-index 0116e9f93ffe..66fd196be85a 100644
---- a/security/landlock/syscalls.c
-+++ b/security/landlock/syscalls.c
-@@ -161,7 +161,7 @@ static const struct file_operations ruleset_fops = {
-  * Documentation/userspace-api/landlock.rst should be updated to reflect the
-  * UAPI change.
-  */
--const int landlock_abi_version = 7;
-+const int landlock_abi_version = 8;
+ 		ASSERT_EQ(0,
+ 			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+-					    &tcp_bind_connect_low_range, 0));
++					    &bind_connect_low_range, 0));
+ 		ASSERT_EQ(0,
+ 			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+-					    &tcp_bind_connect, 0));
++					    &bind_connect, 0));
  
- /**
-  * sys_landlock_create_ruleset - Create a new ruleset
+ 		enforce_ruleset(_metadata, ruleset_fd);
+ 		EXPECT_EQ(0, close(ruleset_fd));
+@@ -1865,7 +2042,8 @@ TEST_F(port_specific, bind_connect_1023)
+ 	ret = bind_variant(bind_fd, &self->srv0);
+ 	clear_cap(_metadata, CAP_NET_BIND_SERVICE);
+ 	EXPECT_EQ(0, ret);
+-	EXPECT_EQ(0, listen(bind_fd, backlog));
++	if (variant->prot.type == SOCK_STREAM)
++		EXPECT_EQ(0, listen(bind_fd, backlog));
+ 
+ 	/* Connects on the binded port 1023. */
+ 	ret = connect_variant(connect_fd, &self->srv0);
+@@ -1885,7 +2063,8 @@ TEST_F(port_specific, bind_connect_1023)
+ 	/* Binds on port 1024. */
+ 	ret = bind_variant(bind_fd, &self->srv0);
+ 	EXPECT_EQ(0, ret);
+-	EXPECT_EQ(0, listen(bind_fd, backlog));
++	if (variant->prot.type == SOCK_STREAM)
++		EXPECT_EQ(0, listen(bind_fd, backlog));
+ 
+ 	/* Connects on the binded port 1024. */
+ 	ret = connect_variant(connect_fd, &self->srv0);
+@@ -1895,9 +2074,9 @@ TEST_F(port_specific, bind_connect_1023)
+ 	EXPECT_EQ(0, close(bind_fd));
+ }
+ 
+-static int matches_log_tcp(const int audit_fd, const char *const blockers,
+-			   const char *const dir_addr, const char *const addr,
+-			   const char *const dir_port)
++static int matches_log_prot(const int audit_fd, const char *const blockers,
++			    const char *const dir_addr, const char *const addr,
++			    const char *const dir_port)
+ {
+ 	static const char log_template[] = REGEX_LANDLOCK_PREFIX
+ 		" blockers=%s %s=%s %s=1024$";
+@@ -1933,7 +2112,7 @@ FIXTURE_VARIANT(audit)
+ };
+ 
+ /* clang-format off */
+-FIXTURE_VARIANT_ADD(audit, ipv4) {
++FIXTURE_VARIANT_ADD(audit, ipv4_tcp) {
+ 	/* clang-format on */
+ 	.addr = "127\\.0\\.0\\.1",
+ 	.prot = {
+@@ -1943,7 +2122,17 @@ FIXTURE_VARIANT_ADD(audit, ipv4) {
+ };
+ 
+ /* clang-format off */
+-FIXTURE_VARIANT_ADD(audit, ipv6) {
++FIXTURE_VARIANT_ADD(audit, ipv4_udp) {
++	/* clang-format on */
++	.addr = "127\\.0\\.0\\.1",
++	.prot = {
++		.domain = AF_INET,
++		.type = SOCK_DGRAM,
++	},
++};
++
++/* clang-format off */
++FIXTURE_VARIANT_ADD(audit, ipv6_tcp) {
+ 	/* clang-format on */
+ 	.addr = "::1",
+ 	.prot = {
+@@ -1952,6 +2141,16 @@ FIXTURE_VARIANT_ADD(audit, ipv6) {
+ 	},
+ };
+ 
++/* clang-format off */
++FIXTURE_VARIANT_ADD(audit, ipv6_udp) {
++	/* clang-format on */
++	.addr = "::1",
++	.prot = {
++		.domain = AF_INET6,
++		.type = SOCK_DGRAM,
++	},
++};
++
+ FIXTURE_SETUP(audit)
+ {
+ 	ASSERT_EQ(0, set_service(&self->srv0, variant->prot, 0));
+@@ -1972,9 +2171,17 @@ FIXTURE_TEARDOWN(audit)
+ 
+ TEST_F(audit, bind)
+ {
++	const char *audit_evt = (variant->prot.type == SOCK_STREAM ?
++					 "net\\.bind_tcp" :
++					 "net\\.bind_udp");
++	const int access_rights =
++		(variant->prot.type == SOCK_STREAM ?
++			 LANDLOCK_ACCESS_NET_BIND_TCP |
++				 LANDLOCK_ACCESS_NET_CONNECT_TCP :
++			 LANDLOCK_ACCESS_NET_BIND_UDP |
++				 LANDLOCK_ACCESS_NET_CONNECT_UDP);
+ 	const struct landlock_ruleset_attr ruleset_attr = {
+-		.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
+-				      LANDLOCK_ACCESS_NET_CONNECT_TCP,
++		.handled_access_net = access_rights,
+ 	};
+ 	struct audit_records records;
+ 	int ruleset_fd, sock_fd;
+@@ -1988,8 +2195,8 @@ TEST_F(audit, bind)
+ 	sock_fd = socket_variant(&self->srv0);
+ 	ASSERT_LE(0, sock_fd);
+ 	EXPECT_EQ(-EACCES, bind_variant(sock_fd, &self->srv0));
+-	EXPECT_EQ(0, matches_log_tcp(self->audit_fd, "net\\.bind_tcp", "saddr",
+-				     variant->addr, "src"));
++	EXPECT_EQ(0, matches_log_prot(self->audit_fd, audit_evt, "saddr",
++				      variant->addr, "src"));
+ 
+ 	EXPECT_EQ(0, audit_count_records(self->audit_fd, &records));
+ 	EXPECT_EQ(0, records.access);
+@@ -2000,9 +2207,17 @@ TEST_F(audit, bind)
+ 
+ TEST_F(audit, connect)
+ {
++	const char *audit_evt = (variant->prot.type == SOCK_STREAM ?
++					 "net\\.connect_tcp" :
++					 "net\\.connect_udp");
++	const int access_rights =
++		(variant->prot.type == SOCK_STREAM ?
++			 LANDLOCK_ACCESS_NET_BIND_TCP |
++				 LANDLOCK_ACCESS_NET_CONNECT_TCP :
++			 LANDLOCK_ACCESS_NET_BIND_UDP |
++				 LANDLOCK_ACCESS_NET_CONNECT_UDP);
+ 	const struct landlock_ruleset_attr ruleset_attr = {
+-		.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
+-				      LANDLOCK_ACCESS_NET_CONNECT_TCP,
++		.handled_access_net = access_rights,
+ 	};
+ 	struct audit_records records;
+ 	int ruleset_fd, sock_fd;
+@@ -2016,8 +2231,8 @@ TEST_F(audit, connect)
+ 	sock_fd = socket_variant(&self->srv0);
+ 	ASSERT_LE(0, sock_fd);
+ 	EXPECT_EQ(-EACCES, connect_variant(sock_fd, &self->srv0));
+-	EXPECT_EQ(0, matches_log_tcp(self->audit_fd, "net\\.connect_tcp",
+-				     "daddr", variant->addr, "dest"));
++	EXPECT_EQ(0, matches_log_prot(self->audit_fd, audit_evt, "daddr",
++				      variant->addr, "dest"));
+ 
+ 	EXPECT_EQ(0, audit_count_records(self->audit_fd, &records));
+ 	EXPECT_EQ(0, records.access);
 -- 
 2.47.3
 
