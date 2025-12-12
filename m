@@ -1,143 +1,126 @@
-Return-Path: <netdev+bounces-244446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 609D7CB77E5
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 02:01:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F092CB7821
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 02:07:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6731E300214B
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 01:01:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D8DAA301619C
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 01:07:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89E061C84D0;
-	Fri, 12 Dec 2025 01:01:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4457226F478;
+	Fri, 12 Dec 2025 01:07:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="MciBeZo6"
 X-Original-To: netdev@vger.kernel.org
-Received: from vmicros1.altlinux.org (vmicros1.altlinux.org [194.107.17.57])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDBBB1A2C25;
-	Fri, 12 Dec 2025 01:01:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.57
+Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B845B26FDB3;
+	Fri, 12 Dec 2025 01:06:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765501307; cv=none; b=jiMUylk31fxD3elgF60pnnuTexQre1EpUqR9VR2Y/p+Vw6xZgbvBShLwffr4RzDsaPDUPFQAz12wey9AiO0IORQYEUIC8/bk2IKHY16zZk4n4a+L1dGZr2wZv57xgQe85aJfAI2PRyL6d+O41SeNPzz8EJuKnWSDqbFuVWHOwNI=
+	t=1765501620; cv=none; b=u9VXuFfA8FKJYtT47uUM/RaaKZpM4crHYG40iL2ENbUntSY4VeNdc355K00MATQhfejDYhuF0ERBrtHF7/YNcza2qIt0JtJLqXyEDK+rtsXK+gwEIL7gXsZmSPWPgJcWhuMsvXhk0jxQ3vO+sReMtpe4gA359TrjxUJT5/kX9sE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765501307; c=relaxed/simple;
-	bh=RvqkoCui2IQB/RgbUMRXZgPo927HN07kQXHCLZ0t/ko=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=djL5bI0J0wYTjKOsKWxqq28IHCt8De6u7G1JDy3jH8XJFBE9t8cci9fIREy3Bt6fC0sfnzBVMlTEGz3zvhccTDG6FM4hyViIryrmXCGK+mH4asK/h6demHe7fje/gxNvvmeEefLYSWvwakY31C4h1wmRl/vC0OeIf5JircLumGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
-Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
-	by vmicros1.altlinux.org (Postfix) with ESMTP id D440E72C8CC;
-	Fri, 12 Dec 2025 03:54:26 +0300 (MSK)
-Received: from pony.office.basealt.ru (unknown [193.43.10.9])
-	by imap.altlinux.org (Postfix) with ESMTPSA id CCDD536D016E;
-	Fri, 12 Dec 2025 03:54:26 +0300 (MSK)
-Received: by pony.office.basealt.ru (Postfix, from userid 500)
-	id AD8A7360D63C; Fri, 12 Dec 2025 03:54:26 +0300 (MSK)
-Date: Fri, 12 Dec 2025 03:54:26 +0300
-From: Vitaly Chikunov <vt@altlinux.org>
-To: Ranganath V N <vnranganath.20@gmail.com>, 
-	linux-rt-devel@lists.linux.dev
-Cc: edumazet@google.com, davem@davemloft.net, david.hunter.linux@gmail.com, 
-	horms@kernel.org, jhs@mojatatu.com, jiri@resnulli.us, khalid@kernel.org, 
-	kuba@kernel.org, pabeni@redhat.com, xiyou.wangcong@gmail.com, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, skhan@linuxfoundation.org
-Subject: Re: [PATCH net v4 2/2] net: sched: act_ife: initialize struct tc_ife
- to fix KMSAN kernel-infoleak
-Message-ID: <tnqp5igbbqyl6emzqnei2o4kuz@altlinux.org>
-References: <20251109091336.9277-1-vnranganath.20@gmail.com>
- <20251109091336.9277-3-vnranganath.20@gmail.com>
+	s=arc-20240116; t=1765501620; c=relaxed/simple;
+	bh=aczU1JfBLxP2khwCirtNjzBSNECnoRTmttzNtlwxNUg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bOzyIhLC6AZDy6pHE92WB3fGlz/0SqVbhGKOEtfRATC11+NGympM/7tGwHly04FRydTnxXBrTfvvcIjRS835IFUfesGs65HxpZ/cObrmUtUWV6K7wzFC1YRL9S8TDpvbneB1l8VAgTXj1yZA7JyTN12HCiPpno9XDcZQYIysbxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=MciBeZo6; arc=none smtp.client-ip=113.46.200.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=hw8tuactDGjDGNOJ5xlRE25GO/eWacUHzTR/n+O1OCg=;
+	b=MciBeZo6do0ynq3ObqEemd+esv2NFLzcEF+2LZu/dqVOW7AWokW4DM+7yLVFQ18+I0H6dFzPz
+	c+lPmIfh/2Wy3G7uDbhX8phXNvmJjDrpEheuoM0WAU2CB14rglgWE2MHTGgj0x5n6CGRw86uMBp
+	4Hu+WDtQclL+yrKAYNwgjlE=
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4dSB7M2GxtznTV6;
+	Fri, 12 Dec 2025 09:04:31 +0800 (CST)
+Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
+	by mail.maildlp.com (Postfix) with ESMTPS id D3A071401F1;
+	Fri, 12 Dec 2025 09:06:47 +0800 (CST)
+Received: from huawei.com (10.50.85.128) by dggpemf500016.china.huawei.com
+ (7.185.36.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 12 Dec
+ 2025 09:06:47 +0800
+From: Wang Liang <wangliang74@huawei.com>
+To: <chuck.lever@oracle.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<brauner@kernel.org>
+CC: <kernel-tls-handshake@lists.linux.dev>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <yuehaibing@huawei.com>,
+	<zhangchangzhong@huawei.com>, <wangliang74@huawei.com>
+Subject: [PATCH net v2] net/handshake: Fix null-ptr-deref in handshake_complete()
+Date: Fri, 12 Dec 2025 09:27:23 +0800
+Message-ID: <20251212012723.4111831-1-wangliang74@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251109091336.9277-3-vnranganath.20@gmail.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ dggpemf500016.china.huawei.com (7.185.36.197)
 
-On Sun, Nov 09, 2025 at 02:43:36PM +0530, Ranganath V N wrote:
-> Fix a KMSAN kernel-infoleak detected  by the syzbot .
-> 
-> [net?] KMSAN: kernel-infoleak in __skb_datagram_iter
-> 
-> In tcf_ife_dump(), the variable 'opt' was partially initialized using a
-> designatied initializer. While the padding bytes are reamined
-> uninitialized. nla_put() copies the entire structure into a
-> netlink message, these uninitialized bytes leaked to userspace.
-> 
-> Initialize the structure with memset before assigning its fields
-> to ensure all members and padding are cleared prior to beign copied.
-> 
-> This change silences the KMSAN report and prevents potential information
-> leaks from the kernel memory.
-> 
-> This fix has been tested and validated by syzbot. This patch closes the
-> bug reported at the following syzkaller link and ensures no infoleak.
-> 
-> Reported-by: syzbot+0c85cae3350b7d486aee@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=0c85cae3350b7d486aee
-> Tested-by: syzbot+0c85cae3350b7d486aee@syzkaller.appspotmail.com
-> Fixes: ef6980b6becb ("introduce IFE action")
-> Signed-off-by: Ranganath V N <vnranganath.20@gmail.com>
-> ---
->  net/sched/act_ife.c | 12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
-> 
-> diff --git a/net/sched/act_ife.c b/net/sched/act_ife.c
-> index 107c6d83dc5c..7c6975632fc2 100644
-> --- a/net/sched/act_ife.c
-> +++ b/net/sched/act_ife.c
-> @@ -644,13 +644,15 @@ static int tcf_ife_dump(struct sk_buff *skb, struct tc_action *a, int bind,
->  	unsigned char *b = skb_tail_pointer(skb);
->  	struct tcf_ife_info *ife = to_ife(a);
->  	struct tcf_ife_params *p;
-> -	struct tc_ife opt = {
-> -		.index = ife->tcf_index,
-> -		.refcnt = refcount_read(&ife->tcf_refcnt) - ref,
-> -		.bindcnt = atomic_read(&ife->tcf_bindcnt) - bind,
-> -	};
-> +	struct tc_ife opt;
->  	struct tcf_t t;
->  
-> +	memset(&opt, 0, sizeof(opt));
-> +
-> +	opt.index = ife->tcf_index,
-> +	opt.refcnt = refcount_read(&ife->tcf_refcnt) - ref,
-> +	opt.bindcnt = atomic_read(&ife->tcf_bindcnt) - bind,
+A null pointer dereference in handshake_complete() was observed [1].
 
-Are you sure this is correct to delimit with commas instead of
-semicolons?
+When handshake_req_next() return NULL in handshake_nl_accept_doit(),
+function handshake_complete() will be called unexpectedly which triggers
+this crash. Fix it by goto out_status when req is NULL.
 
-This already causes build failures of 5.10.247-rt141 kernel, because
-their spin_lock_bh unrolls into do { .. } while (0):
+[1]
+Oops: general protection fault, probably for non-canonical address 0xdffffc0000000005: 0000 [#1] SMP KASAN PTI
+RIP: 0010:handshake_complete+0x36/0x2b0 net/handshake/request.c:288
+Call Trace:
+ <TASK>
+ handshake_nl_accept_doit+0x32d/0x7e0 net/handshake/netlink.c:129
+ genl_family_rcv_msg_doit+0x204/0x300 net/netlink/genetlink.c:1115
+ genl_family_rcv_msg+0x436/0x670 net/netlink/genetlink.c:1195
+ genl_rcv_msg+0xcc/0x170 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x14c/0x430 net/netlink/af_netlink.c:2550
+ genl_rcv+0x2d/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+ netlink_unicast+0x878/0xb20 net/netlink/af_netlink.c:1344
+ netlink_sendmsg+0x897/0xd70 net/netlink/af_netlink.c:1894
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0xa39/0xbf0 net/socket.c:2592
+ ___sys_sendmsg+0x121/0x1c0 net/socket.c:2646
+ __sys_sendmsg+0x155/0x200 net/socket.c:2678
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0x5f/0x350 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
+ </TASK>
 
-     CC [M]  net/sched/act_ife.o
-   In file included from ./include/linux/spinlock.h:329,
-                    from ./include/linux/mmzone.h:8,
-                    from ./include/linux/gfp.h:6,
-                    from ./include/linux/mm.h:10,
-                    from ./include/linux/bvec.h:14,
-                    from ./include/linux/skbuff.h:17,
-                    from net/sched/act_ife.c:20:
-   net/sched/act_ife.c: In function 'tcf_ife_dump':
-   ./include/linux/spinlock_rt.h:44:2: error: expected expression before 'do'
-      44 |  do {     \
-         |  ^~
-   net/sched/act_ife.c:655:2: note: in expansion of macro 'spin_lock_bh'
-     655 |  spin_lock_bh(&ife->tcf_lock);
-         |  ^~~~~~~~~~~~
-   make[2]: *** [scripts/Makefile.build:286: net/sched/act_ife.o] Error 1
-   make[2]: *** Waiting for unfinished jobs....
+Fixes: fe67b063f687 ("net/handshake: convert handshake_nl_accept_doit() to FD_PREPARE()")
+Reviewed-by: Chuck Lever <chuck.lever@oracle.com>
+Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+Closes: https://lore.kernel.org/kernel-tls-handshake/aScekpuOYHRM9uOd@morisot.1015granger.net/T/#m7cfa5c11efc626d77622b2981591197a2acdd65e
+Signed-off-by: Wang Liang <wangliang74@huawei.com>
+---
+ net/handshake/netlink.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
+diff --git a/net/handshake/netlink.c b/net/handshake/netlink.c
+index 1d33a4675a48..b989456fc4c5 100644
+--- a/net/handshake/netlink.c
++++ b/net/handshake/netlink.c
+@@ -126,7 +126,8 @@ int handshake_nl_accept_doit(struct sk_buff *skb, struct genl_info *info)
+ 	}
+ 
+ out_complete:
+-	handshake_complete(req, -EIO, NULL);
++	if (req)
++		handshake_complete(req, -EIO, NULL);
+ out_status:
+ 	trace_handshake_cmd_accept_err(net, req, NULL, err);
+ 	return err;
+-- 
+2.34.1
 
-Thanks,
-
-> +
->  	spin_lock_bh(&ife->tcf_lock);
->  	opt.action = ife->tcf_action;
->  	p = rcu_dereference_protected(ife->params,
-> -- 
-> 2.43.0
-> 
 
