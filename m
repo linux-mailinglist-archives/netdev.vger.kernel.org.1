@@ -1,65 +1,56 @@
-Return-Path: <netdev+bounces-244569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D26EECB9FD3
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 23:51:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 489CBCBA041
+	for <lists+netdev@lfdr.de>; Sat, 13 Dec 2025 00:08:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9316930361D9
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 22:50:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 71C5C30ACE9C
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 23:07:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7420C2DA762;
-	Fri, 12 Dec 2025 22:50:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4EBC309DAB;
+	Fri, 12 Dec 2025 23:07:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cHPCMHnc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mPUFXOOX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CC2E25F96D;
-	Fri, 12 Dec 2025 22:50:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5C4A2F5A13;
+	Fri, 12 Dec 2025 23:07:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765579833; cv=none; b=YyWnZ340Vw5klNbpq8ui62fBboBsQX5KjBRnH7Rnr7se0jvInZ29E0wDRP74V96GoUXsKnJAo15SCZMoOsh+uOlWqSvqF0RD7iDG2leQmGcTRCfxg6MVjhHzyXCj4TGxaaKxj86VrHhxz6pdUbs80C6JjVZT8oTM5vDeTKZNxq0=
+	t=1765580842; cv=none; b=OBlW8S9ViujkCYAQGlZw9GfFqYz/oHQZtOSE279N3P+a9p9mOOtIfHjyev737iHntqU0eVCvsfd9uNZGkykvf6Ab8x3J+5ZgBp5NGyT17YMcDSZIwhLqxcMtZ1fVOFBxv/Jf13TtRaLWcsldBxS8ekIC+6WSPtJREriW2b/DR/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765579833; c=relaxed/simple;
-	bh=K3OUR/kNXzqGUHaKdtKMqclLlrFTdQ9fQxwZ4t7N58U=;
+	s=arc-20240116; t=1765580842; c=relaxed/simple;
+	bh=0W8wws/RuGsVz4stYt00FBBbEFbTAe3lPcPMKm0ZbcA=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aGIZlMMHvEEcDR6u56+5Q4TE1bHjeLT1IRenUTCUqWbElJiRAY5NMbVuGgdslfDIyfAQVcv/x6wUjE8RHkXIeqYP1Zpp7yK0ifO+HbOf/8lgAvEcr0ozuA2YwBuPEDUcO5NSOJrCR3jtWKN14IM42wWTci2Wqvq0A6cRnJWVjOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cHPCMHnc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39550C4CEF1;
-	Fri, 12 Dec 2025 22:50:31 +0000 (UTC)
+	 MIME-Version:Content-Type; b=MAzm/C9f0TyZ+0dfcIrY0gja5ucNanFcAt+a0rKimOyL3fF66vaOmENDS+3KZgGa6dZ0IusdoWg15AGJhrVXCCjrdi31Ay3sxuzXVrw5LhjnoXF8IALC13HdkDnjYecpnCHH4tXZ2te9iSR4KZW4Aiq1czMSqN1aEcFrcrc7UYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mPUFXOOX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 607CFC113D0;
+	Fri, 12 Dec 2025 23:07:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765579832;
-	bh=K3OUR/kNXzqGUHaKdtKMqclLlrFTdQ9fQxwZ4t7N58U=;
+	s=k20201202; t=1765580842;
+	bh=0W8wws/RuGsVz4stYt00FBBbEFbTAe3lPcPMKm0ZbcA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cHPCMHncLJ+Uo7qbmB3RieIgY2KGWzkaABnfY4nG6znvsoPad9ExIFvXZ4wfulcgV
-	 qh8W84rkvRX/NTz6e9LwYxQL/X0zlOu8THNrQWCyn28cfuDFHy3kO9AmGVeHCo5+5V
-	 2yCmZ/ADFEFu84fcjU09EErMSFXZBUbdPq+CL2+W15IlhGIv2XbSINt+Z2u3rWVsdM
-	 Pjq83u8WlWa8K/SyqsO60K6i38DSjKiVhOKQoznD7mUKmmwF4OniF5tiw00wPeIvBj
-	 D9IhtbVbw4rUqYG0GbZOkQWNJvnSv/XZOpBr7Mq1J1+WQV0SYinjKPjSeA0NQp1RQl
-	 H/kUJKiMZwEhA==
-Date: Sat, 13 Dec 2025 07:50:28 +0900
+	b=mPUFXOOXfcphcRVsHDJ+21y8y/pf8c3PD0ZTMO20M9lMCCYbkgwB4DLu+LqzL5dbd
+	 JjHhbLtF2sp74KYGwYZ+FEL6c1bh2SRl8YlGroJrpluQOc6FnPiCDJF8B8Iin/saa7
+	 3RCHxJLFomRpyz9dU4lbRaZhozTF4iDvBqVuJmOtURap6GqWhqqizxIZbt/0w8eq8A
+	 4V9+Ewg3uqohAF9AwDFOQ+XD3i3x2y8QQYgEqqLogXwGKrcQPPuNBfKfwen12CxCGh
+	 pk15TEF9ec4+HDB/Eht073TmL3Q/HnraBiUCRQOisUMVUxM7n+sxMGZwo4qu1vZDAv
+	 d49SgwNSYvy5A==
+Date: Sat, 13 Dec 2025 08:07:16 +0900
 From: Jakub Kicinski <kuba@kernel.org>
-To: Wen Gu <guwen@linux.alibaba.com>
-Cc: Richard Cochran <richardcochran@gmail.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- xuanzhuo@linux.alibaba.com, dust.li@linux.alibaba.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v5 1/2] ptp: introduce Alibaba CIPU PHC driver
-Message-ID: <20251213075028.2f570f23@kernel.org>
-In-Reply-To: <c92b47cf-3da0-446d-8b8f-674830256143@linux.alibaba.com>
-References: <20251030121314.56729-1-guwen@linux.alibaba.com>
-	<20251030121314.56729-2-guwen@linux.alibaba.com>
-	<20251031165820.70353b68@kernel.org>
-	<8a74f801-1de5-4a1d-adc7-66a91221485d@linux.alibaba.com>
-	<20251105162429.37127978@kernel.org>
-	<34b30157-6d67-46ec-abde-da9087fbf318@linux.alibaba.com>
-	<20251127083610.6b66a728@kernel.org>
-	<f2afb292-287e-4f2f-b131-50a1650bbb1d@linux.alibaba.com>
-	<20251128102437.7657f88f@kernel.org>
-	<9a75e3b2-4d1c-4911-81e4-cab988c24b77@linux.alibaba.com>
-	<c92b47cf-3da0-446d-8b8f-674830256143@linux.alibaba.com>
+To: syzbot <syzbot+4393c47753b7808dac7d@syzkaller.appspotmail.com>
+Cc: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com,
+ fw@strlen.de, horms@kernel.org, kadlec@netfilter.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org,
+ phil@nwl.cc, syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [netfilter?] WARNING in nf_conntrack_cleanup_net_list
+Message-ID: <20251213080716.27a25928@kernel.org>
+In-Reply-To: <693b0fa7.050a0220.4004e.040d.GAE@google.com>
+References: <693b0fa7.050a0220.4004e.040d.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,12 +60,18 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 12 Dec 2025 14:50:13 +0800 Wen Gu wrote:
-> Given that net-next is closed and the EOY break is here, I was wondering
-> whether the review discussion might continue during this period or should
-> wait until after the break.
+On Thu, 11 Dec 2025 10:38:31 -0800 syzbot wrote:
+> ------------[ cut here ]------------
+> conntrack cleanup blocked for 60s
+> WARNING: net/netfilter/nf_conntrack_core.c:2512 at
 
-This is a somewhat frustrating thing to hear. My position is that
-net-next is not the right home for this work, so its status should 
-be irrelevant.
+Yes, I was about to comment on the patch which added the warning..
+
+There is still a leak somewhere. Running ip_defrag.sh and then load /
+unload ipvlan repros this (modprobe ipvlan is a quick check if the
+cleanup thread is wedged, if it is modprobe will hang, if it isn't
+run ip_defrag.sh, again etc).
+
+I looked around last night but couldn't find an skb stuck anywhere.
+The nf_conntrack_net->count was == 1
 
