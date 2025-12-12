@@ -1,66 +1,56 @@
-Return-Path: <netdev+bounces-244525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86901CB95A9
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 17:50:13 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5892FCB95C4
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 17:52:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id B96AF3013447
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 16:50:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4AABA30BEA68
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 16:50:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 692442FFDF8;
-	Fri, 12 Dec 2025 16:50:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B92362F49F9;
+	Fri, 12 Dec 2025 16:50:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bkK7cMvb"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9819A26E715;
-	Fri, 12 Dec 2025 16:50:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93B342580D7;
+	Fri, 12 Dec 2025 16:50:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765558209; cv=none; b=Hf9FpBTWA96Xxoxrug0pxIzVefF3neRHWzK1dC7pVICnC0T0VyEBZ0U3aUfRRjn6AF8W+Yfxn7emMhyHjokOvXYq9O3KHEVQyBAnSGV11rA+xseD38Tv8wcPv6lqyo62A2lskhNfyF+KT9u225GDiO6ftCmP0WdMZRUN2GIX68o=
+	t=1765558257; cv=none; b=GNkDhlOTaSM/LXgANth2/IzGROrm4X5yPFrAs15kwIn6NZBGKKz81THtEbg+vPt0bI4QfyArb+YtpClRuO24wIZQC/LrQase+y898GqumJEA5rjsBVkdOYuggtjdW1oa1QXj/EaD+RPAe8doGrm67YWSOzOzFqzOFBemvge2JR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765558209; c=relaxed/simple;
-	bh=uoKoD2ATk0+/eBaR59U2Jf4JIe9a82syCTGli0vQ3IQ=;
+	s=arc-20240116; t=1765558257; c=relaxed/simple;
+	bh=OcHsKLbBZRjLnwJzCx8BqpA7PpLlbGBhVjpwidAlopo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SZDJRzQ9Vd6SOVAwMLjXR2vfdY4QtSpP0zmP0ZYM7Ali7OZywWnxnhd+VOVwHHYuh7GEcQBRsu3Frh0GTc2vdKHRoNOp5UTK1VurGMhjp8Aut4KogXVTPUITj0a/fb5KeNffN3ioL723/A5laXwTgh/0dz45O6wDqm6Ftgq5HM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vU6L1-000000000JK-0kpu;
-	Fri, 12 Dec 2025 16:49:51 +0000
-Date: Fri, 12 Dec 2025 16:49:47 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Frank Wunderlich <frankwu@gmx.de>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH RFC net-next 3/3] net: dsa: add basic initial driver for
- MxL862xx switches
-Message-ID: <aTxHq8PGNPCzZngk@makrotopia.org>
-References: <cover.1764717476.git.daniel@makrotopia.org>
- <d92766bc84e409e6fafdc5e3505573662dc19d08.1764717476.git.daniel@makrotopia.org>
- <c6525467-2229-4941-803d-1be5efb431c3@lunn.ch>
- <aTmPjw83jFQXgWQt@makrotopia.org>
- <d5ea5bee-40c5-43f5-9238-ced5ca1904b7@lunn.ch>
+	 Content-Type:Content-Disposition:In-Reply-To; b=jHH6ywil0wG0BNHobaevfJfVSOZIw4ve66FxxjxFafosWw8sLzaC3lK5vpVGYDTFzlZ7JJ0YLwDc5TmgC/p8gFlL7L6r3tUk8ANt0jPprtVNXZO7DFQeEAZhyEsklgr2FvXtM10S6LITju8SeNXcZP5reKgAgEcu3+1L4RINQ3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bkK7cMvb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80476C116B1;
+	Fri, 12 Dec 2025 16:50:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765558256;
+	bh=OcHsKLbBZRjLnwJzCx8BqpA7PpLlbGBhVjpwidAlopo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bkK7cMvbkvvL1TjmBnSXXES/9z7FxXjrEgrRx6E1Uo2r4JuFcSx9CyCqBnSlmu0FY
+	 RbKVfGHGVEd0fRyf7VRq+7B5OK1pFw6/gJMSe/QmAyAzNucDgoGBhbD8T6akfsnvVy
+	 T2HL0HO2JT2KyKdcKvn7JtkbJ/c5WZf5twN6RJNMjsGjZUr/FAo13xgLBSzQtCwDov
+	 MzHal26SX48wioxzJiOALzeWWOnJpIeu0Vx5AWg+xa19wulZvtDnlnBlv0kEn81Z5q
+	 BHThl40NyxIWDtIdmITGR8E9DR6CFSw+2Xh6QGbH0+CVdAZSmWstKrQdz6IBzUxhhC
+	 wl+uqrhH6b+eA==
+Date: Fri, 12 Dec 2025 16:50:52 +0000
+From: Simon Horman <horms@kernel.org>
+To: Wang Liang <wangliang74@huawei.com>
+Cc: chuck.lever@oracle.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, brauner@kernel.org,
+	kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, yuehaibing@huawei.com,
+	zhangchangzhong@huawei.com
+Subject: Re: [PATCH net v2] net/handshake: Fix null-ptr-deref in
+ handshake_complete()
+Message-ID: <aTxH7E2Jq_S9b6rq@horms.kernel.org>
+References: <20251212012723.4111831-1-wangliang74@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,42 +59,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d5ea5bee-40c5-43f5-9238-ced5ca1904b7@lunn.ch>
+In-Reply-To: <20251212012723.4111831-1-wangliang74@huawei.com>
 
-Hi Andrew,
-
-On Wed, Dec 10, 2025 at 07:56:13PM +0100, Andrew Lunn wrote:
-> > > > +	if (result < 0) {
-> > > > +		ret = result;
-> > > > +		goto out;
-> > > > +	}
-> > > 
-> > > If i'm reading mxl862xx_send_cmd() correct, result is the value of a
-> > > register. It seems unlikely this is a Linux error code?
-> > 
-> > Only someone with insights into the use of error codes by the uC
-> > firmware can really answer that. However, as also Russell pointed out,
-> > the whole use of s16 here with negative values being interpreted as
-> > errors is fishy here, because in the end this is also used to read
-> > registers from external MDIO connected PHYs which may return arbitrary
-> > 16-bit values...
-> > Someone in MaxLinear will need to clarify here.
+On Fri, Dec 12, 2025 at 09:27:23AM +0800, Wang Liang wrote:
+> A null pointer dereference in handshake_complete() was observed [1].
 > 
-> It looks wrong, and since different architectures use different error
-> code values, it is hard to get right. I would suggest you just return
-> EPROTO or EIO and add a netdev_err() to print the value of result.
+> When handshake_req_next() return NULL in handshake_nl_accept_doit(),
+> function handshake_complete() will be called unexpectedly which triggers
+> this crash. Fix it by goto out_status when req is NULL.
+> 
+> [1]
+> Oops: general protection fault, probably for non-canonical address 0xdffffc0000000005: 0000 [#1] SMP KASAN PTI
+> RIP: 0010:handshake_complete+0x36/0x2b0 net/handshake/request.c:288
+> Call Trace:
+>  <TASK>
+>  handshake_nl_accept_doit+0x32d/0x7e0 net/handshake/netlink.c:129
+>  genl_family_rcv_msg_doit+0x204/0x300 net/netlink/genetlink.c:1115
+>  genl_family_rcv_msg+0x436/0x670 net/netlink/genetlink.c:1195
+>  genl_rcv_msg+0xcc/0x170 net/netlink/genetlink.c:1210
+>  netlink_rcv_skb+0x14c/0x430 net/netlink/af_netlink.c:2550
+>  genl_rcv+0x2d/0x40 net/netlink/genetlink.c:1219
+>  netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+>  netlink_unicast+0x878/0xb20 net/netlink/af_netlink.c:1344
+>  netlink_sendmsg+0x897/0xd70 net/netlink/af_netlink.c:1894
+>  sock_sendmsg_nosec net/socket.c:727 [inline]
+>  __sock_sendmsg net/socket.c:742 [inline]
+>  ____sys_sendmsg+0xa39/0xbf0 net/socket.c:2592
+>  ___sys_sendmsg+0x121/0x1c0 net/socket.c:2646
+>  __sys_sendmsg+0x155/0x200 net/socket.c:2678
+>  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+>  do_syscall_64+0x5f/0x350 arch/x86/entry/syscall_64.c:94
+>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>  </TASK>
+> 
+> Fixes: fe67b063f687 ("net/handshake: convert handshake_nl_accept_doit() to FD_PREPARE()")
+> Reviewed-by: Chuck Lever <chuck.lever@oracle.com>
+> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Closes: https://lore.kernel.org/kernel-tls-handshake/aScekpuOYHRM9uOd@morisot.1015granger.net/T/#m7cfa5c11efc626d77622b2981591197a2acdd65e
+> Signed-off-by: Wang Liang <wangliang74@huawei.com>
+> ---
+>  net/handshake/netlink.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
-MaxLinear folks got back to me. So the error codes returned by the firmware
-are basically based on Zephyr's errno.h which seems to be a copy of a BSD
-header, see
+Thanks for the update and for addressing my review of v1.
 
-https://github.com/zephyrproject-rtos/zephyr/blob/main/lib/libc/minimal/include/errno.h
+Considering that this function combines __cleanup (via FD_PREPARE) with
+goto labels, which IMHO leads to an awkward arrangement of the code, I
+think this approach is a good one for a bug fix.
 
-So the best would probably be to modify and include that header with the
-driver, together with a function translating the error codes to what ever
-is defined in uapi/asm/errno.h for the architecture we are building for.
-
-They also told me that (obviously) not all error codes are currently
-used by the firmware, but the best would be to just catch all the possible
-error codes and translate Zephyr libc -> Linux kernel.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
