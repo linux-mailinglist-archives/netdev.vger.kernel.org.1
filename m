@@ -1,165 +1,152 @@
-Return-Path: <netdev+bounces-244500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD571CB9010
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 15:50:07 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19F27CB901C
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 15:52:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0B6543053B3B
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 14:49:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E04CF300D54A
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 14:52:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F93F26C3A2;
-	Fri, 12 Dec 2025 14:49:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5926B30AABE;
+	Fri, 12 Dec 2025 14:52:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="k1O/WETs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UE3mfPyP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D49ED18A6AD
-	for <netdev@vger.kernel.org>; Fri, 12 Dec 2025 14:49:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 968B1299957
+	for <netdev@vger.kernel.org>; Fri, 12 Dec 2025 14:52:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765550995; cv=none; b=iYnaM+8rC7pO+wFd9rzZECuqAnJaTms5ugeFHhRInv/cyX1P9E1rt5Nd6647OZUArKTNUve2o4QcYQHVSR3T/aioZrzgr9uDMkeXEw1b3qf0ary3QDlFdslbBP18Da1GYkS5fJDzxN4RTvmh8rKj17AN3TXepu5iNFC856/IuYs=
+	t=1765551123; cv=none; b=PTZ3jDO6Q4mHPE8SCoeZaQ5hcNtz+kFC4tzaQJ8nDocsu3kb9BFA7WDn4zw8bPYHgBJ824ATDshiXN9QfNzJxIUB50L3rN/uryjO7Eqqx8zbwg5q0zyxuPzOI3ha28LwQjaVa7gcl0VOqQb1TcnkWlPeQZdZp7AjxbnIjgZRVxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765550995; c=relaxed/simple;
-	bh=lEOPbLZ8iK9A4EcSY6GtElHcm2Z2lNDMRR0j2H3qVSs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MzwnX0c17ezh0aBH26seo/vdCYaf3lcumm98i9Z4cvFo9AxNtMr6V3kJ/M9aj+Bp7J5okRd1A9BzuJC0NZHnuSffzwcE5m2sgl9vhYkqsUGNIgMBq/7v9C0+UM5SoW/mwg+xCX5KC8PRUULzEkvo8OqB7TaTCapcS/eEPzmNbkA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=k1O/WETs; arc=none smtp.client-ip=185.125.188.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com [209.85.219.71])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 331763F829
-	for <netdev@vger.kernel.org>; Fri, 12 Dec 2025 14:49:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1765550985;
-	bh=EoivPywf7QXsLeTHC8lXLQ+O9tet6+0xD7qUCbPDZtM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version;
-	b=k1O/WETss1W1yE0mVYBu1vv2xO6Cor2Jei/t/Uyk9GXHVmXwsyDX/sWT65+Q4ttTP
-	 FXCKmJ5wIZFi9sVQey88GDU/16M2wkScI3ceLvzNWLznSELLRzbFR23sHRdCIxZyzp
-	 UrQi7sh3l88UMvHcgda3kACec188TDgkW7JKR7yIRj8rCvxvZUC1vTn/iV3pylTqvs
-	 oFmvl3Z23NHEdPSR3503joz1QsXu2HX0zTzj6dkV6haccck/3mtVlEDUhgZioFhG0D
-	 gpR6KZr07qSLI2a5miuvoyWO8mp/G9g5+uylnLyEMSkPMMsW76stt0Od9Fu/CQq+Zg
-	 IwjGDA7lawRaI+Jj0iCZJ/ti4+v0+gZAW0BQUdV6JsPcdnzi6fXp2mUJlEsie+N13n
-	 l1xVHru+BHJ/INJHrZ3V9m2oiBhLeRybKbykgZd0L2D/ufaR9A/5IQkAKc5Del5wdU
-	 81yfuBuv+CqA5KFxuhAp7QVlQnl72WHGjOR02phakgPHlv9qTSx5mG19ABfj0AHZis
-	 g0wb/k1aznfEAYHSjOE9131xynZA7fqmv8vp515Ghah45U5XxYDXCTJwCodv2u3q/k
-	 g4gqmFNG6AHBZ0qi6YXVZqg9zCcodmJ0bmGc7hop5CjbKNl65DaGeFFQtzcqbFMyOe
-	 CC+VZM8kJ5yHRyfmya3FowBk=
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-8823f4666abso26089546d6.0
-        for <netdev@vger.kernel.org>; Fri, 12 Dec 2025 06:49:45 -0800 (PST)
+	s=arc-20240116; t=1765551123; c=relaxed/simple;
+	bh=UqY+yiLaQuiVuCXEZUTKHeKvJK1tzjeO8F5/j9gYSMw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bMV4A0SA7GmmzUrFZOJXo/4dViImzilg+pp6o4tIVhzCtT2tMHT8TYeGQlL83WQl5WqYltK3d1zwSM3a32t8iUL3Isw9fkLQKgXofDw3J8gfyGlEJi/Ac9z7Gtovo1IZh6brPWPJsSQv1WdWsAyPDLJeKQXj7TOmsW5OzcPe04E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UE3mfPyP; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-64981b544a1so1730525a12.1
+        for <netdev@vger.kernel.org>; Fri, 12 Dec 2025 06:52:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765551120; x=1766155920; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9bdq+s2ZwfYVuONhzydOJ97RjH0CLzXEFqbGidtolnQ=;
+        b=UE3mfPyPVfhnsKnzrSUYaBqyJE6s2OqDA5DKwRkIowRm+9HmRHAnI9r4JqstPNVXF2
+         mKkfLrODPGcTWh8IZAFdBewx87NaFaYaf1iP3RVG9/ohswjnoecMaMukDknX07Xa8mYM
+         Ns+g96+8mZkEUsHKbzupgN34ajpS9rbWjb3EFsFmEY9U7Ye+hdtxeT8J5Xb9dsH1ei7T
+         80JNnKMVL4f59/lN1zYslb479YmF8U25ugPWDWBbHQItkfmkNceh0je3hl2HRUyerQJK
+         WELAJk5V+ufdSM0wIc3iLBBzPaTH75j9J6OcMWLjEN2H2yfxPkPYk1Q7SNlN8FYtHKaZ
+         gB0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765550983; x=1766155783;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EoivPywf7QXsLeTHC8lXLQ+O9tet6+0xD7qUCbPDZtM=;
-        b=m6HeLtEaW6yQI0Z01mMwoTp7hRHIKjwzDJn2tNSotGS+AdCxL7mXybYOwsG4ufRSM5
-         OUF4sTsHHNrseukLgihrlSVEs+np6Idfqs2RBW2M9IpquzQWB7CWWesBwKYZ88qoopiY
-         H20cBPEJX6p02p0r+S0y8aIoeO3GzZF5s9gBSWvC85OFRkc8Q6SSy57crr4Fjons51d+
-         ayX6pMrj+6BODnPWHUpfKEOgIOWVOe6hWcD4xcGQIpIEGwaCM/nblCR7glzXDluDUjJQ
-         DNU7csO3Kho6kbQdmKPi5pRr1JQNw/vnudyfxSKjwPDSbulnsSyBL0k8xKv6dQMW8g/b
-         Cs7Q==
-X-Gm-Message-State: AOJu0YyJ2wUl8bXtyuq5U2UfaDEZuf5vKX90W40Sij9+e6ZTNVAHbT3N
-	xZK8NJSjeuzh+onQSasizsc4QYhVMvBiiOwRip63cE2YE/93aBQu9wAXvMYVlksgreMjELi7dvw
-	++Ryb8lNNS+fFjQA4hUBRz1eoERBDskwEBOHPkXIgD3LyU5Qq1V8kFPyN0kPuIsjKsLrP0iJVNk
-	Hrd2KP/w==
-X-Gm-Gg: AY/fxX7SPSNLSHnNs21aK9y5jy/qsblXrlDzQRyMaAsoZwATNTF7SGxsIT8UZnlljwx
-	zpNPBQxDUCtIncxDX4Rb3hzgw1PokEeevdCnrbNxQnqSl6IzwfHudD5CWyqi2djEjVdfZmjMmus
-	7tLYV/b/TfkFcAbKwfdh6YvQBuayqReYfmqWraID031LIxDvD6mqlMSSF/lXE9ckkRpvv7ZaVnJ
-	mfH0anCpxW/gYWa+8WDExPKsdReS/96aC9UouPN0XPxR7Poh5Gmiom5U47ilHTa/aHvype9XhRZ
-	NhxIwjYAL4GblXoulWMgzU+TAv7Q1qc5AkqclrVfIFOc63EvHOOtFpnuDujAyyW8pf+2pCLOBNm
-	4TQ5Qqox3/qLuAqyXT5JoPktjVIi0T/BdYVWrOSVaQdZkv29bEe0qRcVw5/djBuln
-X-Received: by 2002:a05:6214:5b89:b0:888:633f:391e with SMTP id 6a1803df08f44-8887e46e988mr31021096d6.67.1765550983607;
-        Fri, 12 Dec 2025 06:49:43 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH9wmfgV3BJqpriF+99pAJs5NZio3o6jMd/99nKRfDWX1FmNlTIdtjSoVnEpsZJII6jI8LPjQ==
-X-Received: by 2002:a05:6214:5b89:b0:888:633f:391e with SMTP id 6a1803df08f44-8887e46e988mr31020866d6.67.1765550983276;
-        Fri, 12 Dec 2025 06:49:43 -0800 (PST)
-Received: from localhost (modemcable137.35-177-173.mc.videotron.ca. [173.177.35.137])
-        by smtp.gmail.com with UTF8SMTPSA id 6a1803df08f44-888818cd87asm12157646d6.30.2025.12.12.06.49.42
+        d=1e100.net; s=20230601; t=1765551120; x=1766155920;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9bdq+s2ZwfYVuONhzydOJ97RjH0CLzXEFqbGidtolnQ=;
+        b=h877nwqv/hz9l4MgdZ+OlSZyPLDEhScJe1Ka62WN+kdjr4k87N1xzy/+zmcVmD6VJE
+         tc/cWYfAZRAoMuLyBZKAjNY5mPmgnemQg+gYB0ieQWwyS5hqSzrnv2zQD24T+cVQ9ACs
+         Fi6C+OsBKkEOdHkpkFEgB6ltD3muH7WuAL/2fzoAEYuAGf7Tp5yI1XtQjcQyojIkOMsM
+         PEuwoGn3c5WNw5fEk+HsnmBCzuW1CptMV/k7aXZycaRVMyY7zV1S5eZd510cP5fAKZo+
+         luQW4yk2AmP5Vhwr7MprUWGWn62eyWy7xDCi6sw1//RAeAvaBh+jzQwf89UgXKcpfv3K
+         mo/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWM19Zpb49WbMFe9fBtRE94FQkhqV+5qq67MwOAw5xq12I3CONgymWQl2kwUzGSkL+NmDCh8og=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYGS04utqM6KLnxjXK47K4t0/ySMT2ZuYaZh6D79P9TYp21KgK
+	LE1cJh2OaaxQC8o5Y9mEvgXFti767eNgbRxW0IRYsdQYENrWTF92GWj6
+X-Gm-Gg: AY/fxX6mZdNkk6IiAMYjIYNKbL/ghXGZTlSp8Bv9PnpSVjWhRl9jNpUpRIp5tWQJQ6P
+	Hk5M2b6SM7/leRnXPuX4h9wFjlNgQ4xATJLubZlTjQeU0NeO1DH1ye4JE1WmQUshW3/ViMwIdJt
+	OqucQ/Gy8y/AN133zAXAgE+I3wVSa/msTuUr6fYJxWHN73wEacP+YTaxoOSZVahAkhvx1dgiwzo
+	Vvx90mjrtW1cOp3VUhmNPPVRKTNZBmSsvoXkCgFY3GCvkxkMLLcnR/HolOAEU6D7BVLjwllo+S9
+	/TvADdAQAV2E4wd865UR/oPlsLF68h5Y0H5R4x0d2kLX1DFxy6nyqtk/IKuiR0rp2uiegh2BqYl
+	D6r/TCzXj1ddsp0gKYijewcEcvKh3K7REEw0K967GBjN5AiwxEaUaTw/vV/sde/rbRlxkGu/xNu
+	I9qgZ6LwAR0N8=
+X-Google-Smtp-Source: AGHT+IFGPQs3clltXIfWm+Vn8fLF+G/QkerjA1itJMxmint1Fsoag8kkKjn1NIkD84kir9MLUM6lug==
+X-Received: by 2002:a17:907:60d0:b0:b70:b3cb:3b30 with SMTP id a640c23a62f3a-b7d23abe574mr221476166b.59.1765551119710;
+        Fri, 12 Dec 2025 06:51:59 -0800 (PST)
+Received: from eichest-laptop ([77.109.188.37])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7cfa5142efsm579431066b.38.2025.12.12.06.51.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Dec 2025 06:49:42 -0800 (PST)
-From: "Alice C. Munduruca" <alice.munduruca@canonical.com>
-To: netdev@vger.kernel.org
-Cc: linux-kselftest@vger.kernel.org,
-	"Alice C. Munduruca" <alice.munduruca@canonical.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net v2] selftests: net: fix "buffer overflow detected" for tap.c
-Date: Fri, 12 Dec 2025 09:49:21 -0500
-Message-ID: <20251212144921.16915-1-alice.munduruca@canonical.com>
-X-Mailer: git-send-email 2.48.1
+        Fri, 12 Dec 2025 06:51:59 -0800 (PST)
+Date: Fri, 12 Dec 2025 15:51:57 +0100
+From: Stefan Eichenberger <eichest@gmail.com>
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: hkallweit1@gmail.com, krzk+dt@kernel.org, linux-kernel@vger.kernel.org,
+	rafael.beims@toradex.com, pabeni@redhat.com,
+	ben.dooks@codethink.co.uk, netdev@vger.kernel.org,
+	francesco.dolcini@toradex.com, edumazet@google.com,
+	andrew+netdev@lunn.ch, conor+dt@kernel.org, linux@armlinux.org.uk,
+	Stefan Eichenberger <stefan.eichenberger@toradex.com>,
+	devicetree@vger.kernel.org, davem@davemloft.net,
+	geert+renesas@glider.be, kuba@kernel.org
+Subject: Re: [PATCH net-next v1 1/3] dt-bindings: net: micrel: Convert to
+ YAML schema
+Message-ID: <aTwsDUMDosM-aJk5@eichest-laptop>
+References: <20251212084657.29239-1-eichest@gmail.com>
+ <20251212084657.29239-2-eichest@gmail.com>
+ <176553538695.3335118.18332220352949601890.robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <176553538695.3335118.18332220352949601890.robh@kernel.org>
 
-When the selftest 'tap.c' is compiled with '-D_FORTIFY_SOURCE=3', the
-strcpy() in rtattr_add_strsz() is replaced with a checked version which
-causes the test to consistently fail when compiled with toolchains for
-which this option is enabled by default.
+On Fri, Dec 12, 2025 at 04:29:50AM -0600, Rob Herring (Arm) wrote:
+> 
+> On Fri, 12 Dec 2025 09:46:16 +0100, Stefan Eichenberger wrote:
+> > From: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+> > 
+> > Convert the devicetree bindings for the Micrel PHY to YAML schema. This
+> > also combines the information from micrel.txt and micrel-ksz90x1.txt
+> > into a single micrel.yaml file as this PHYs are from the same series.
+> > Use yaml conditions to differentiate the properties that only apply to
+> > specific PHY models.
+> > 
+> > Signed-off-by: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+> > ---
+> >  .../bindings/net/micrel-ksz90x1.txt           | 228 --------
+> >  .../devicetree/bindings/net/micrel.txt        |  57 --
+> >  .../devicetree/bindings/net/micrel.yaml       | 527 ++++++++++++++++++
+> >  3 files changed, 527 insertions(+), 285 deletions(-)
+> >  delete mode 100644 Documentation/devicetree/bindings/net/micrel-ksz90x1.txt
+> >  delete mode 100644 Documentation/devicetree/bindings/net/micrel.txt
+> >  create mode 100644 Documentation/devicetree/bindings/net/micrel.yaml
+> > 
+> 
+> My bot found errors running 'make dt_binding_check' on your patch:
+> 
+> yamllint warnings/errors:
+> ./Documentation/devicetree/bindings/net/micrel.yaml:504:1: [warning] too many blank lines (2 > 1) (empty-lines)
+> 
+> dtschema/dtc warnings/errors:
+> 
+> doc reference errors (make refcheckdocs):
+> 
+> See https://patchwork.kernel.org/project/devicetree/patch/20251212084657.29239-2-eichest@gmail.com
+> 
+> The base for the series is generally the latest rc1. A different dependency
+> should be noted in *this* patch.
+> 
+> If you already ran 'make dt_binding_check' and didn't see the above
+> error(s), then make sure 'yamllint' is installed and dt-schema is up to
+> date:
+> 
+> pip3 install dtschema --upgrade
+> 
+> Please check and re-submit after running the above command yourself. Note
+> that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+> your schema. However, it must be unset to test all examples with your schema.
 
- TAP version 13
- 1..3
- # Starting 3 tests from 1 test cases.
- #  RUN           tap.test_packet_valid_udp_gso ...
- *** buffer overflow detected ***: terminated
- # test_packet_valid_udp_gso: Test terminated by assertion
- #          FAIL  tap.test_packet_valid_udp_gso
- not ok 1 tap.test_packet_valid_udp_gso
- #  RUN           tap.test_packet_valid_udp_csum ...
- *** buffer overflow detected ***: terminated
- # test_packet_valid_udp_csum: Test terminated by assertion
- #          FAIL  tap.test_packet_valid_udp_csum
- not ok 2 tap.test_packet_valid_udp_csum
- #  RUN           tap.test_packet_crash_tap_invalid_eth_proto ...
- *** buffer overflow detected ***: terminated
- # test_packet_crash_tap_invalid_eth_proto: Test terminated by assertion
- #          FAIL  tap.test_packet_crash_tap_invalid_eth_proto
- not ok 3 tap.test_packet_crash_tap_invalid_eth_proto
- # FAILED: 0 / 3 tests passed.
- # Totals: pass:0 fail:3 xfail:0 xpass:0 skip:0 error:0
+Thanks for the finding, I will fix it in the next version. Somehow, my
+linter doesn't catch that even if I run it manually, sorry about that.
 
-A buffer overflow is detected by the fortified glibc __strcpy_chk()
-since the __builtin_object_size() of `RTA_DATA(rta)` is incorrectly
-reported as 1, even though there is ample space in its bounding buffer
-`req`.
-
-Using the unchecked function memcpy() here instead allows us to match
-the way rtattr_add_str() is written while avoiding the spurious test
-failure.
-
-Fixes: 2e64fe4624d1 ("selftests: add few test cases for tap driver")
-Signed-off-by: Alice C. Munduruca <alice.munduruca@canonical.com>
----
- tools/testing/selftests/net/tap.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/net/tap.c b/tools/testing/selftests/net/tap.c
-index 247c3b3ac1c9..dd961b629295 100644
---- a/tools/testing/selftests/net/tap.c
-+++ b/tools/testing/selftests/net/tap.c
-@@ -67,7 +67,7 @@ static struct rtattr *rtattr_add_strsz(struct nlmsghdr *nh, unsigned short type,
- {
- 	struct rtattr *rta = rtattr_add(nh, type, strlen(s) + 1);
- 
--	strcpy(RTA_DATA(rta), s);
-+	memcpy(RTA_DATA(rta), s, strlen(s) + 1);
- 	return rta;
- }
- 
--- 
-2.48.1
-
+Regards,
+Stefan
 
