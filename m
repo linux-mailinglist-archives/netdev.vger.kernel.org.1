@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-244552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 596FDCB9AE8
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 20:47:39 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D84BCB9AA3
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 20:41:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1C74D30146E9
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 19:47:14 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2656330202EF
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 19:39:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B6B83233EE;
-	Fri, 12 Dec 2025 19:38:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBF972F25F1;
+	Fri, 12 Dec 2025 19:38:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b="bu2KWORW"
+	dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b="V44ODLQ+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46A95316197
-	for <netdev@vger.kernel.org>; Fri, 12 Dec 2025 19:38:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A37BB30C60E
+	for <netdev@vger.kernel.org>; Fri, 12 Dec 2025 19:38:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765568305; cv=none; b=Qqlke0OBMXOYBETc5crrIuYJ8IHMSIc66QptOndXHpgtntX6lNm1WLdp7Uz/y7PJ9Ru/BGrM7anj23U2ogfRny/X7/77RpWOtN0ijGlnsCps8hD994L6hKLVNIEsb9JmYIbq+BWJt/tccZLziBBwkB/Hxefjpox/P3ivpwX8jSQ=
+	t=1765568299; cv=none; b=jBjtIXCMs8+Ek4+e4u4C2cWOr6k2/64U52GmZTfENURz5cQzsRVrzmuicCY6mQPVqB82yZXh68+daXMJ0hpUSnhEfi2GxjOUBrAJGoXkXmdJBCsEzl4XTXSO24ThsZe/6//OPV01PswRMz3olylukzTWWTjqCT6p/P7JpFco7nw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765568305; c=relaxed/simple;
-	bh=0LivVI6n2Hn6n9OC7XzMKkHYvEuxGTxy2TCbVRFLvp8=;
+	s=arc-20240116; t=1765568299; c=relaxed/simple;
+	bh=rrMpiY2/32uiPUxnNhqmlvJHbOrcOpzblK5lbAIbRbk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=o2h7zbvZCryjHXo7woyJABTEaGAiKNQPqdxZkICenfIduRh/m2KO/ZMdkCic2nYTgPzKjqXeSA+j2Ky9RqZ9gBu2P0MlwKja3tlYi9jPgCliB/Z6U9WpkMlNgYEH75cezxAEqYzezT5sj+NQpYmNmncZ264r2fFv7YI4mwGwY2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=runbox.com; dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b=bu2KWORW; arc=none smtp.client-ip=185.226.149.37
+	 MIME-Version; b=o2iQJaK3kueeO6t8xa2I9SVUvx0F4xDUDJQ6qdI7MULW8O32WGpnu5VBJdKnapiV9U5pGNkzJLyMd4w/2yDm0QNu/J5jKLzb+4g7XqIBq5K+j3pDPz0GiD46uaDY2jBp5q3Ia+cHQo1TEp6oeYciXA9EweDE3UJsk3wDKNr6x78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=runbox.com; dkim=pass (2048-bit key) header.d=runbox.com header.i=@runbox.com header.b=V44ODLQ+; arc=none smtp.client-ip=185.226.149.38
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=runbox.com
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <david.laight.linux_spam@runbox.com>)
-	id 1vU8xx-0087fN-97; Fri, 12 Dec 2025 20:38:13 +0100
+	id 1vU8xw-007TbX-Rg; Fri, 12 Dec 2025 20:38:12 +0100
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=runbox.com;
 	 s=selector2; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To
 	:Message-Id:Date:Subject:Cc:To:From;
-	bh=K3GjdOlpY6miMHRcMr+AALWLshNL5czI7BOpgFx6os0=; b=bu2KWORW3Adja9xUa9PQSPIHCd
-	m7v/JlPBqaiVxiddGomf5+e//NGcMrmdU14xBevFL7J9CiEQC8gXKX1oG8cMXugLfttp1D24e1Rrp
-	32n3ZR7jQi696/px2IfrAXnxAiPR00U/OdtqSpGLzrcrwDqGbBBvJcndNkokLTOTWdkMWE5F7HwjI
-	2ewng04+DRmokPV05S8vtly1MV5DhE33mBZSoRQGkWPtD7OJz6Iaeif06EszmPEMy/molKwrYSwoG
-	kFycIHX6QmkOtdej9rG0HrlVe1vd7qs/GOgrA0Zx8XY68hKOplySl03QqGgCHzZRG8eV4u99hOXSC
-	o8+W3Sgg==;
+	bh=XcOghhLB9x/wa6Uum/aSGpecagme4zwlntT5IjlJr3M=; b=V44ODLQ+lRgGqyb8F3/YQo74rb
+	evsoP15xN7rXIKPmlxe6TPFmmNoTy0ucJiW/coe/xJioVH6J+3GLLYV0mlu31L9GinwvaZfuCuVeX
+	eptBv1kmqug6H38uY8TrSlyKntc39s8JIhc1PqaapytK6DcJkNtWxwFRVXIJiroGzIPlcFRCca8gq
+	AYJGhqpSDAI2OmK8GJ7Un+N40YS7siSvOuCZiYDfz3ceRVWC3OPcdWxMu/r9RNFjTAaI9ZTPQxcO/
+	/0wM/LFGBDVNssoa3EZf56Fy99Yow1efbWRPXx94LyABiruiviFiPwKCebYdl3FSmHK6vJUlXykC/
+	Wg6AMe+A==;
 Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <david.laight.linux_spam@runbox.com>)
-	id 1vU8xw-0006ut-TP; Fri, 12 Dec 2025 20:38:13 +0100
+	id 1vU8xw-0003AG-BA; Fri, 12 Dec 2025 20:38:12 +0100
 Received: by submission02.runbox with esmtpsa  [Authenticated ID (1493616)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.93)
-	id 1vU8xo-0030pR-77; Fri, 12 Dec 2025 20:38:04 +0100
+	id 1vU8xp-0030pR-93; Fri, 12 Dec 2025 20:38:05 +0100
 From: david.laight.linux@gmail.com
 To: Yury Norov <yury.norov@gmail.com>,
 	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
@@ -71,9 +71,9 @@ To: Yury Norov <yury.norov@gmail.com>,
 	Yehezkel Bernat <YehezkelShB@gmail.com>,
 	Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
 Cc: David Laight <david.laight.linux@gmail.com>
-Subject: [PATCH v2 15/16] bitfield: Update comments for le/be functions
-Date: Fri, 12 Dec 2025 19:37:20 +0000
-Message-Id: <20251212193721.740055-16-david.laight.linux@gmail.com>
+Subject: [PATCH v2 16/16] build_bug.h; Remove __BUILD_BUG_ON_NOT_POWER_OF_2()
+Date: Fri, 12 Dec 2025 19:37:21 +0000
+Message-Id: <20251212193721.740055-17-david.laight.linux@gmail.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20251212193721.740055-1-david.laight.linux@gmail.com>
 References: <20251212193721.740055-1-david.laight.linux@gmail.com>
@@ -87,80 +87,30 @@ Content-Transfer-Encoding: 8bit
 
 From: David Laight <david.laight.linux@gmail.com>
 
-Make it clear the the values are converted to host order before
-being acted on.
-Order the explantions with the simple functions first.
+It was added for, and only used by, bitfield.h.
+That not longer uses it so it can be removed.
 
-These still need converting to kerneldoc format.
+It should have been called BUILD_BUG_ON_NOT_ZERO_OR_POWER_OF_2()
+but there is no real need for such a specialised function.
 
 Signed-off-by: David Laight <david.laight.linux@gmail.com>
 ---
- include/linux/bitfield.h | 38 ++++++++++++++++++--------------------
- 1 file changed, 18 insertions(+), 20 deletions(-)
+ include/linux/build_bug.h | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/include/linux/bitfield.h b/include/linux/bitfield.h
-index 3bf82121a282..3f43683ebe96 100644
---- a/include/linux/bitfield.h
-+++ b/include/linux/bitfield.h
-@@ -184,24 +184,24 @@ do {								\
- /*
-  * Primitives for manipulating bitfields both in host- and fixed-endian.
-  *
-- * * u32 le32_get_bits(__le32 val, u32 field) extracts the contents of the
-- *   bitfield specified by @field in little-endian 32bit object @val and
-- *   converts it to host-endian.
-  *
-- * * void le32p_replace_bits(__le32 *p, u32 v, u32 field) replaces
-- *   the contents of the bitfield specified by @field in little-endian
-- *   32bit object pointed to by @p with the value of @v.  New value is
-- *   given in host-endian and stored as little-endian.
-+ * * u32 le32_get_bits(__le32 val, u32 field) converts the little-endian 32bit
-+ *   object @val to host-endian then extracts the contents of the bitfield
-+ *   specified by @field.
-+ *
-+ * * __le32 le32_encode_bits(u32 v, u32 field) encodes the value of @v into
-+ *   the bitfield specified by @field then converts the value to little-endian.
-+ *   All the bits outside that bitfield being zero.
-  *
-- * * __le32 le32_replace_bits(__le32 old, u32 v, u32 field) is equivalent to
-- *   ({__le32 tmp = old; le32p_replace_bits(&tmp, v, field); tmp;})
-- *   In other words, instead of modifying an object in memory, it takes
-- *   the initial value and returns the modified one.
-+ * * __le32 le32_replace_bits(__le32 old, u32 v, u32 field) converts the
-+ *   little-endian 32bit object @old to host order, replaces the contents
-+ *   of the bitfield specified by @field with @v, then returns the value
-+ *   converted back to little-endian.
-  *
-- * * __le32 le32_encode_bits(u32 v, u32 field) is equivalent to
-- *   le32_replace_bits(0, v, field).  In other words, it returns a little-endian
-- *   32bit object with the bitfield specified by @field containing the
-- *   value of @v and all bits outside that bitfield being zero.
-+ * * void le32p_replace_bits(__le32 *p, u32 v, u32 field) replaces
-+ *   the contents of the bitfield specified by @field in little-endian
-+ *   32bit object pointed to by @p with the value of @v.
-+ *   Equivalent to *p = le32_replace_bits(*p, v, field).
-  *
-  * Such set of helpers is defined for each of little-, big- and host-endian
-  * types; e.g. u64_get_bits(val, field) will return the contents of the bitfield
-@@ -210,15 +210,13 @@ do {								\
-  *
-  * Fields to access are specified as GENMASK() values - an N-bit field
-  * starting at bit #M is encoded as GENMASK(M + N - 1, M).  Note that
-- * bit numbers refer to endianness of the object we are working with -
-+ * bit numbers refer to the value after being converted to host order -
-  * e.g. GENMASK(11, 0) in __be16 refers to the second byte and the lower
-  * 4 bits of the first byte.  In __le16 it would refer to the first byte
-  * and the lower 4 bits of the second byte, etc.
-  *
-- * Field specification must be a constant; __builtin_constant_p() doesn't
-- * have to be true for it, but compiler must be able to evaluate it at
-- * build time.  If it cannot or if the value does not encode any bitfield,
-- * the build will fail.
-+ * Field specification must be a non-zero constant, otherwise the build
-+ * will fail.
-  *
-  * If the value being stored in a bitfield is a constant that does not fit
-  * into that bitfield, a warning will be generated at compile time.
+diff --git a/include/linux/build_bug.h b/include/linux/build_bug.h
+index 2cfbb4c65c78..0ca6cb79f704 100644
+--- a/include/linux/build_bug.h
++++ b/include/linux/build_bug.h
+@@ -17,8 +17,6 @@
+ 	__BUILD_BUG_ON_ZERO_MSG(e, ##__VA_ARGS__, #e " is true")
+ 
+ /* Force a compilation error if a constant expression is not a power of 2 */
+-#define __BUILD_BUG_ON_NOT_POWER_OF_2(n)	\
+-	BUILD_BUG_ON(((n) & ((n) - 1)) != 0)
+ #define BUILD_BUG_ON_NOT_POWER_OF_2(n)			\
+ 	BUILD_BUG_ON((n) == 0 || (((n) & ((n) - 1)) != 0))
+ 
 -- 
 2.39.5
 
