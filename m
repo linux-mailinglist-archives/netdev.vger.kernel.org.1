@@ -1,395 +1,105 @@
-Return-Path: <netdev+bounces-244491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32738CB8CBF
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 13:27:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F9FCCB8D4D
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 13:54:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 4D15530119F5
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 12:27:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E242230690FE
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 12:54:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 229B830DEBB;
-	Fri, 12 Dec 2025 12:27:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB39A1E1E16;
+	Fri, 12 Dec 2025 12:54:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HTBz9cs1";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="lEGzlNF5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ldwqzYpc"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47E8F3164DB
-	for <netdev@vger.kernel.org>; Fri, 12 Dec 2025 12:27:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BAA029A2;
+	Fri, 12 Dec 2025 12:54:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765542427; cv=none; b=Xb44/4wmZa9PpDnF/7KX28BSydAJ7n4bQ2rfXxapdAKfT/RPafTjefjoY+JDftso71sFxh5alMViWGrrVAtfn75s8dDWMHlYWEuKy2sBWtxJ+uE/+SqGFFSwhEVVItFW1UhtFWvwGSSFY6Ss4FgT6cRXqq4TVWhjt054/JXLIJA=
+	t=1765544063; cv=none; b=UXEC2iKhcXimAeajE4Zo6KEbCUlSCO2FHkvc4RMYN+pctq8NxZbBp1OlFJy12RZB3EJV9j3VJqz8Gn2cTDoPd3DcDeEoirX0E2guOq8BZHteN5DPQ5POIGVhVkXI9v1QBNx5TDiAeFGHuONInas4yXVs7Rwrc84JXJ6vM1yutkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765542427; c=relaxed/simple;
-	bh=arpZlHgTP/Q2XHdUgjjUMg9eCk7R5xCuBgD64udECtM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IjCDLBmTYRMLd8VLIL2tIFeiOEYMhWhHXjZtnCLWo1kWvPqqZBmMJov+E/yEHt8QctSw52G3hh6xzbyqMHZ9pthZnNwqFRCrrqm/AANsixn7qSFA/dZEBjfR44jyNcYYm2TceUChpBAW7te6uLjbVbuQyyp1NHzH6SPXP4n/9Dw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HTBz9cs1; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=lEGzlNF5; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765542424;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=L/arTEPx+inQ9VeH2LUAllPPM58s2xpZHbogC2hjw54=;
-	b=HTBz9cs1qTuhx+d4AiohJI3TB/i8ihZYVd9Lpz3iGmDXzoJy5e4eJH+F6d8q6x7NR+8VD8
-	4nGbSpN8S0Y0NbFK5WiK/TeFC6EdC0K56m1YbymRFLiahgarOVZEXTYJye7p0sZVIwgDZt
-	+yZRFj47tQcVwBFFctEhcpbGzZ2Uql0=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-323-pNHaMQWoME6bW1kidRa9nQ-1; Fri, 12 Dec 2025 07:27:02 -0500
-X-MC-Unique: pNHaMQWoME6bW1kidRa9nQ-1
-X-Mimecast-MFC-AGG-ID: pNHaMQWoME6bW1kidRa9nQ_1765542421
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-b79f6dcde96so338462666b.2
-        for <netdev@vger.kernel.org>; Fri, 12 Dec 2025 04:27:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1765542421; x=1766147221; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=L/arTEPx+inQ9VeH2LUAllPPM58s2xpZHbogC2hjw54=;
-        b=lEGzlNF5cayoMdKbULUEBdVlSfh9P/IGjoOhuJq/slfWpsCyZBbLfsvFFssmGFpzas
-         YUGAtM6xikqYbPaGImxgUcfJqp2GYIxKo9h0GN+/+c8U9dpQSYXV4oRKUFnZ6mTAs/GQ
-         sqMYM5aViyzqJfxWQG5ywetrpedgxoVkoUYhx820uvfDyZ2cCmRdTk/ZoO4+gDFPB1hS
-         m3NzjLpU3Qd3cDFgirXTJYIMZ9M4IZPlsEBDIrLOlvfNDsrNWj7cNWrL/KcqHAXmo8LV
-         SEfHWscvSj965wIEavYSQFFPRZF6SOeYgm3GtAV1B+RTMm9tQT6jGQSzIKUVtYxOlOS0
-         5sTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765542421; x=1766147221;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=L/arTEPx+inQ9VeH2LUAllPPM58s2xpZHbogC2hjw54=;
-        b=viZtBUknMmBJv0ay4bL8uyvrg6yXUFe8XH06RkRk9HosWpfM99Nuszb/e2e4dWxxGh
-         AqN52FjaCDxZIZIkb79+WJydpJxgXub7OW+Zfi+zt+00ymYkR1ua8iuWDcSLIQu4oFwK
-         3btaixyN0ghqD8a6k0SXHMjsoSubkkxtQ95L6+81sd+/zJ+THOwYWrTOpwUQWIuqVOal
-         CYl00d44qHEn5kWffW2px9/kIu4/Nnwj9wvbYnfmJB8OLNdoQvh+Pf7M/chV074BWlfK
-         OOlxolF7Y2vC/irbAgA5wW6rmW3lV3UXYIkPcMTmvpoERaAqIb0tl5NXhVxl6cUP2vBu
-         Ek4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXfdweQPX9ug0OOjPu0TCU6LagxgQSdkG46RWJJcxAn1oS4grfCaHqWKGSeg3Mk+jEs/YzxQsQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBkkYljOSCVibhh4Kfx9CCpeyjfCjC6JxCQX2VbNcyM0UPf4L3
-	D9XtsycJYIQIB87hx4Zd7TJxXDCy4gP4Nxhcx2/RRHbf8WHjl+xgEwiTAc6lJiCZ96Xznm7uM8C
-	sr5sCMq9WkJQZZRFkVOo75PHhHk3Az06HE14YiLLdxRRB6mU3VCps9Zql5g==
-X-Gm-Gg: AY/fxX45jeEZGsLBt4xeactjiwxfyvXEQlUDzBQ+1rVmRFkszO8JY6Co6klwD9BArYV
-	igrAmSE1avyxBjeyS1Zfz0kjYCHwmrmu9O8UayevITUWxv37Yp1/rXJdlQLxW1Eu1bKTFWnby6I
-	sajxO9zV9hPAeo1IPy3FLS4Lo9cxNVUWvhM5GT1Yc8iAPrgQUAkwd8mwICHDwxrjRW6rXa8CatP
-	cSnPwHvRBY0Fxjzo2XIRRFhXXXlq5XeqrDasxsOA00wAaBFJz0evnihZMYGQTP3eNGMjPdbXTF/
-	4cspE2PSlSspoto+Vu1qCa7fZiX2GIjiXP8+Tiea0L0NLsiQFNUi4WHXqScoguqR+Bu9fg25YsK
-	jYX9rzk38xiSusRRBxZIAYoTpYtgX1X8F2+Y+3hdL9or1S1HTCAMWJGhrAeEqTQ==
-X-Received: by 2002:a17:907:7f23:b0:b73:3e15:a370 with SMTP id a640c23a62f3a-b7d23d0519emr166949266b.57.1765542421330;
-        Fri, 12 Dec 2025 04:27:01 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHJ8k95XyEgRKLOlMYKPgD8ZmrsPj3lizzCfh8rKYc1FUcJTIMFHxjLZLBoQTYJNZQdaPwGmw==
-X-Received: by 2002:a17:907:7f23:b0:b73:3e15:a370 with SMTP id a640c23a62f3a-b7d23d0519emr166946666b.57.1765542420793;
-        Fri, 12 Dec 2025 04:27:00 -0800 (PST)
-Received: from sgarzare-redhat (host-87-12-25-233.business.telecomitalia.it. [87.12.25.233])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7cf9f38778sm570646266b.0.2025.12.12.04.26.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Dec 2025 04:27:00 -0800 (PST)
-Date: Fri, 12 Dec 2025 13:26:44 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Melbin K Mathew <mlbnkm1@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, stefanha@redhat.com, 
-	kvm@vger.kernel.org, netdev@vger.kernel.org, virtualization@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, jasowang@redhat.com, xuanzhuo@linux.alibaba.com, 
-	eperezma@redhat.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org
-Subject: Re: [PATCH net v3] vsock/virtio: cap TX credit to local buffer size
-Message-ID: <tandvvk6vas3kgqjuo6w3aagqai246qxejfnzhkbvbxds3w4y6@umqvf7f3m5ie>
-References: <20251211125104.375020-1-mlbnkm1@gmail.com>
- <20251211080251-mutt-send-email-mst@kernel.org>
- <zlhixzduyindq24osaedkt2xnukmatwhugfkqmaugvor6wlcol@56jsodxn4rhi>
- <CAMKc4jDpMsk1TtSN-GPLM1M_qp_jpoE1XL1g5qXRUiB-M0BPgQ@mail.gmail.com>
- <CAGxU2F7WOLs7bDJao-7Qd=GOqj_tOmS+EptviMphGqSrgsadqg@mail.gmail.com>
- <CAMKc4jDLdcGsL5_d+4CP6n-57s-R0vzrX2M7Ni=1GeCB1cxVYA@mail.gmail.com>
- <bwmol6raorw233ryb3dleh4meaui5vbe7no53boixckl3wgclz@s6grefw5dqen>
- <deccf66c-dcd3-4187-9fb6-43ddf7d0a905@gmail.com>
+	s=arc-20240116; t=1765544063; c=relaxed/simple;
+	bh=PIUUA/Tc3FIsiIbSk0OVbF+BcmAcPFlTxA7DFbQKFnM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=QrCM7dOHsaoKGGtZiBYN7vzNkiB5kShCskFnqu0llLFgqYAYkILkvSDownog1GUldiPyBwG0hQrwjOnBZ+RH0TBtssUej2VDBBgxE+nWm/tOOjInu2G0LzWXQWmcOkmVVWU1g+tXe3iWQrmKYM163bz1S2FlvIIlsiz5YeYxoNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ldwqzYpc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66916C4CEF1;
+	Fri, 12 Dec 2025 12:54:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765544063;
+	bh=PIUUA/Tc3FIsiIbSk0OVbF+BcmAcPFlTxA7DFbQKFnM=;
+	h=From:Subject:Date:To:Cc:From;
+	b=ldwqzYpcZ7UeZGA98v2UowFMuoROs06oUCxp1gGDN7UCWdm7kxo/ZSndB1+dUIaY8
+	 Yf5rmB+PkhDman3mbvb1VcsqnsjkvKqm3O115UXa47im29cZLaWAN6m+zINGzfh+99
+	 7++n+dDOeFsXuK+CPlSaaqzP4x0ix2doRekUsirhp7Eng1Fc+PPNg0Hw47UI7X0m3/
+	 ERpBkieVFmm67/IptxUYFDIOc4AcMAUhw37Mwen4o82+vPvF6bsAXNk7AOXmswLUEe
+	 WMcRKENlJ2RZ3++0OFYf1uBuPyhD36blIXvpPo6u8SmtGN53PmAx0Oo+XUnG26UmYl
+	 2EfE+9GtZOGXg==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net 0/2] mptcp: fix warn on bad status
+Date: Fri, 12 Dec 2025 13:54:02 +0100
+Message-Id: <20251212-net-mptcp-subflow_data_ready-warn-v1-0-d1f9fd1c36c8@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <deccf66c-dcd3-4187-9fb6-43ddf7d0a905@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAGoQPGkC/x2N0QrCMAwAf2Xk2UAbUKa/IjJim2pAu5JWp4z9u
+ 8XHe7i7FaqYSoXTsILJW6vOuYPfDRDunG+CGjsDOdp78oRZGj5LCwXr65oe8zJFbjyZcPziwpY
+ xxdHTgdwYjg56p5gk/fwfZ+g6XLbtByDNJmd4AAAA
+X-Change-ID: 20251212-net-mptcp-subflow_data_ready-warn-fd8126208c90
+To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+ Dmytro Shytyi <dmytro@shytyi.net>
+Cc: Evan Li <evan.li@linux.alibaba.com>, kitta <kitta@linux.alibaba.com>, 
+ netdev@vger.kernel.org, mptcp@lists.linux.dev, linux-kernel@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, stable@vger.kernel.org, 
+ syzbot+0ff6b771b4f7a5bce83b@syzkaller.appspotmail.com
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=937; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=PIUUA/Tc3FIsiIbSk0OVbF+BcmAcPFlTxA7DFbQKFnM=;
+ b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDJtBCqaAx5rXpt4+MHJ5EnRV4Nz2NhYr+i0Jdzi0P7iG
+ Xwz66RXRykLgxgXg6yYIot0W2T+zOdVvCVefhYwc1iZQIYwcHEKwERinjEy/P4lHTLj4kYOdcuG
+ zDkblYuPeSj69zO+Lt62MeR0wqJlrxgZNjjHLLwYl6CeF7tFZs+MN8rTfv7MuHSi9ctdni8qL8L
+ jGQA=
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-On Fri, Dec 12, 2025 at 11:40:03AM +0000, Melbin K Mathew wrote:
->
->
->On 12/12/2025 10:40, Stefano Garzarella wrote:
->>On Fri, Dec 12, 2025 at 09:56:28AM +0000, Melbin Mathew Antony wrote:
->>>Hi Stefano, Michael,
->>>
->>>Thanks for the suggestions and guidance.
->>
->>You're welcome, but please avoid top-posting in the future:
->>https://www.kernel.org/doc/html/latest/process/submitting- 
->>patches.html#use-trimmed-interleaved-replies-in-email-discussions
->>
->Sure. Thanks
->>>
->>>I’ve drafted a 4-part series based on the recap. I’ve included the
->>>four diffs below for discussion. Can wait for comments, iterate, and
->>>then send the patch series in a few days.
->>>
->>>---
->>>
->>>Patch 1/4 — vsock/virtio: make get_credit() s64-safe and clamp negatives
->>>
->>>virtio_transport_get_credit() was doing unsigned arithmetic; if the
->>>peer shrinks its window, the subtraction can underflow and look like
->>>“lots of credit”. This makes it compute “space” in s64 and clamp < 0
->>>to 0.
->>>
->>>diff --git a/net/vmw_vsock/virtio_transport_common.c
->>>b/net/vmw_vsock/virtio_transport_common.c
->>>--- a/net/vmw_vsock/virtio_transport_common.c
->>>+++ b/net/vmw_vsock/virtio_transport_common.c
->>>@@ -494,16 +494,23 @@ 
->>>EXPORT_SYMBOL_GPL(virtio_transport_consume_skb_sent);
->>>u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 
->>>credit)
->>>{
->>>+ s64 bytes;
->>> u32 ret;
->>>
->>> if (!credit)
->>> return 0;
->>>
->>> spin_lock_bh(&vvs->tx_lock);
->>>- ret = vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
->>>- if (ret > credit)
->>>- ret = credit;
->>>+ bytes = (s64)vvs->peer_buf_alloc -
->>
->>Why not just calling virtio_transport_has_space()?
->virtio_transport_has_space() takes struct vsock_sock *, while 
->virtio_transport_get_credit() takes struct virtio_vsock_sock *, so I 
->cannot directly call has_space() from get_credit() without changing 
->signatures.
->
->Would you be OK if I factor the common “space” calculation into a 
->small helper that operates on struct virtio_vsock_sock * and is used 
->by both paths? Something like:
+Two somewhat related fixes addressing different issues found by
+syzkaller, and producing the exact same splat: a WARNING in
+subflow_data_ready().
 
-Why not just change the signature of virtio_transport_has_space()?
+- Patch 1: fallback earlier on simultaneous connections to avoid a
+  warning. A fix for v5.19.
 
-Thanks,
-Stefano
+- Patch 2: ensure context reset on disconnect, also to avoid a similar
+  warning. A fix for v6.2.
 
->
->/* Must be called with vvs->tx_lock held. Returns >= 0. */
->static s64 virtio_transport_tx_space(struct virtio_vsock_sock *vvs)
->{
->	s64 bytes;
->
->	bytes = (s64)vvs->peer_buf_alloc -
->		((s64)vvs->tx_cnt - (s64)vvs->peer_fwd_cnt);
->	if (bytes < 0)
->		bytes = 0;
->
->	return bytes;
->}
->
->Then:
->
->get_credit() would do bytes = virtio_transport_tx_space(vvs); ret = 
->min_t(u32, credit, (u32)bytes);
->
->has_space() would use the same helper after obtaining vvs = vsk->trans;
->
->Does that match what you had in mind, or would you prefer a different 
->factoring?
->
->>
->>>+ ((s64)vvs->tx_cnt - (s64)vvs->peer_fwd_cnt);
->>>+ if (bytes < 0)
->>>+ bytes = 0;
->>>+
->>>+ ret = min_t(u32, credit, (u32)bytes);
->>> vvs->tx_cnt += ret;
->>> vvs->bytes_unsent += ret;
->>> spin_unlock_bh(&vvs->tx_lock);
->>>
->>> return ret;
->>>}
->>>
->>>
->>>---
->>>
->>>Patch 2/4 — vsock/virtio: cap TX window by local buffer (helper + use
->>>everywhere in TX path)
->>>
->>>Cap the effective advertised window to min(peer_buf_alloc, buf_alloc)
->>>and use it consistently in TX paths (get_credit, has_space,
->>>seqpacket_enqueue).
->>>
->>>diff --git a/net/vmw_vsock/virtio_transport_common.c
->>>b/net/vmw_vsock/virtio_transport_common.c
->>>--- a/net/vmw_vsock/virtio_transport_common.c
->>>+++ b/net/vmw_vsock/virtio_transport_common.c
->>>@@ -491,6 +491,16 @@ void virtio_transport_consume_skb_sent(struct
->>>sk_buff *skb, bool consume)
->>>}
->>>EXPORT_SYMBOL_GPL(virtio_transport_consume_skb_sent);
->>>+/* Return the effective peer buffer size for TX credit computation.
->>>+ *
->>>+ * The peer advertises its receive buffer via peer_buf_alloc, but 
->>>we cap it
->>>+ * to our local buf_alloc (derived from SO_VM_SOCKETS_BUFFER_SIZE and
->>>+ * already clamped to buffer_max_size).
->>>+ */
->>>+static u32 virtio_transport_tx_buf_alloc(struct virtio_vsock_sock *vvs)
->>>+{
->>>+ return min(vvs->peer_buf_alloc, vvs->buf_alloc);
->>>+}
->>>
->>>u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 
->>>credit)
->>>{
->>> s64 bytes;
->>>@@ -502,7 +512,8 @@ u32 virtio_transport_get_credit(struct
->>>virtio_vsock_sock *vvs, u32 credit)
->>> return 0;
->>>
->>> spin_lock_bh(&vvs->tx_lock);
->>>- bytes = (s64)vvs->peer_buf_alloc -
->>>+ bytes = (s64)virtio_transport_tx_buf_alloc(vvs) -
->>> ((s64)vvs->tx_cnt - (s64)vvs->peer_fwd_cnt);
->>> if (bytes < 0)
->>> bytes = 0;
->>>@@ -834,7 +845,7 @@ virtio_transport_seqpacket_enqueue(struct 
->>>vsock_sock *vsk,
->>> spin_lock_bh(&vvs->tx_lock);
->>>
->>>- if (len > vvs->peer_buf_alloc) {
->>>+ if (len > virtio_transport_tx_buf_alloc(vvs)) {
->>> spin_unlock_bh(&vvs->tx_lock);
->>> return -EMSGSIZE;
->>> }
->>>@@ -884,7 +895,8 @@ static s64 virtio_transport_has_space(struct
->>>vsock_sock *vsk)
->>> struct virtio_vsock_sock *vvs = vsk->trans;
->>> s64 bytes;
->>>
->>>- bytes = (s64)vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
->>>+ bytes = (s64)virtio_transport_tx_buf_alloc(vvs) -
->>>+ ((s64)vvs->tx_cnt - (s64)vvs->peer_fwd_cnt);
->>> if (bytes < 0)
->>> bytes = 0;
->>>
->>> return bytes;
->>>}
->>>
->>>
->>>---
->>>
->>>Patch 3/4 — vsock/test: fix seqpacket msg bounds test (set client 
->>>buf too)
->>
->>Please just include in the series the patch I sent to you.
->>
->Thanks. I'll use your vsock_test.c patch as-is for 3/4
->>>
->>>After fixing TX credit bounds, the client can fill its TX window and
->>>block before it wakes the server. Setting the buffer on the client
->>>makes the test deterministic again.
->>>
->>>diff --git a/tools/testing/vsock/vsock_test.c 
->>>b/tools/testing/vsock/ vsock_test.c
->>>--- a/tools/testing/vsock/vsock_test.c
->>>+++ b/tools/testing/vsock/vsock_test.c
->>>@@ -353,6 +353,7 @@ static void test_stream_msg_peek_server(const
->>>struct test_opts *opts)
->>>
->>>static void test_seqpacket_msg_bounds_client(const struct 
->>>test_opts *opts)
->>>{
->>>+ unsigned long long sock_buf_size;
->>> unsigned long curr_hash;
->>> size_t max_msg_size;
->>> int page_size;
->>>@@ -366,6 +367,18 @@ static void
->>>test_seqpacket_msg_bounds_client(const struct test_opts *opts)
->>> exit(EXIT_FAILURE);
->>> }
->>>
->>>+ sock_buf_size = SOCK_BUF_SIZE;
->>>+
->>>+ setsockopt_ull_check(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_MAX_SIZE,
->>>+    sock_buf_size,
->>>+    "setsockopt(SO_VM_SOCKETS_BUFFER_MAX_SIZE)");
->>>+
->>>+ setsockopt_ull_check(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_SIZE,
->>>+    sock_buf_size,
->>>+    "setsockopt(SO_VM_SOCKETS_BUFFER_SIZE)");
->>>+
->>> /* Wait, until receiver sets buffer size. */
->>> control_expectln("SRVREADY");
->>>
->>>
->>>---
->>>
->>>Patch 4/4 — vsock/test: add stream TX credit bounds regression test
->>>
->>>This directly guards the original failure mode for stream sockets: if
->>>the peer advertises a large window but the sender’s local policy is
->>>small, the sender must stall quickly (hit EAGAIN in nonblocking mode)
->>>rather than queueing megabytes.
->>
->>Yeah, using nonblocking mode LGTM!
->>
->>>
->>>diff --git a/tools/testing/vsock/vsock_test.c 
->>>b/tools/testing/vsock/ vsock_test.c
->>>--- a/tools/testing/vsock/vsock_test.c
->>>+++ b/tools/testing/vsock/vsock_test.c
->>>@@ -349,6 +349,7 @@
->>>#define SOCK_BUF_SIZE (2 * 1024 * 1024)
->>>+#define SMALL_SOCK_BUF_SIZE (64 * 1024ULL)
->>>#define MAX_MSG_PAGES 4
->>>
->>>/* Insert new test functions after test_stream_msg_peek_server, before
->>> * test_seqpacket_msg_bounds_client (around line 352) */
->>>
->>>+static void test_stream_tx_credit_bounds_client(const struct 
->>>test_opts *opts)
->>>+{
->>>+ ... /* full function as provided */
->>>+}
->>>+
->>>+static void test_stream_tx_credit_bounds_server(const struct 
->>>test_opts *opts)
->>>+{
->>>+ ... /* full function as provided */
->>>+}
->>>
->>>@@ -2224,6 +2305,10 @@
->>> .run_client = test_stream_msg_peek_client,
->>> .run_server = test_stream_msg_peek_server,
->>> },
->>>+ {
->>>+ .name = "SOCK_STREAM TX credit bounds",
->>>+ .run_client = test_stream_tx_credit_bounds_client,
->>>+ .run_server = test_stream_tx_credit_bounds_server,
->>>+ },
->>
->>Please put it at the bottom. Tests are skipped by index, so we don't 
->>want to change index of old tests.
->>
->>Please fix your editor, those diffs are hard to read without tabs/spaces.
->seems like some issue with my email client. Hope it is okay now
->>
->>Thanks,
->>Stefano
->>
->
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Paolo Abeni (2):
+      mptcp: fallback earlier on simult connection
+      mptcp: ensure context reset on disconnect()
+
+ net/mptcp/options.c  | 10 ++++++++++
+ net/mptcp/protocol.c |  8 +++++---
+ net/mptcp/protocol.h |  9 ++++-----
+ net/mptcp/subflow.c  |  6 ------
+ 4 files changed, 19 insertions(+), 14 deletions(-)
+---
+base-commit: 885bebac9909994050bbbeed0829c727e42bd1b7
+change-id: 20251212-net-mptcp-subflow_data_ready-warn-fd8126208c90
+
+Best regards,
+-- 
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
