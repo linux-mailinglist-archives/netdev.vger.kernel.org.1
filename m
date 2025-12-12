@@ -1,239 +1,130 @@
-Return-Path: <netdev+bounces-244532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id C92BDCB98EF
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 19:24:29 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E11FECB99BE
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 19:58:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 41CD83015AF4
-	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 18:24:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 88EE93051322
+	for <lists+netdev@lfdr.de>; Fri, 12 Dec 2025 18:58:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E116B302168;
-	Fri, 12 Dec 2025 18:24:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ubuntu.com header.i=@ubuntu.com header.b="BvXsH93X"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE5A030B50D;
+	Fri, 12 Dec 2025 18:58:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.forwardemail.net (smtp.forwardemail.net [121.127.44.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CBEB302155
-	for <netdev@vger.kernel.org>; Fri, 12 Dec 2025 18:24:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=121.127.44.73
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B20F023AB98;
+	Fri, 12 Dec 2025 18:58:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765563867; cv=none; b=XDf7pd2Es7Z7wpdju5xz7goisTH4An3VVYAaiHaU9f/IesgysiBGSh6EpXrPeijyd9N6dRVE6GHWuXihLcXV0akU7WNnNWD2X8Aqd5GPR23JMr++TWnbIaEMZhs/xsYjimHxpkaIKkVsQu22Za0NHiRcP7swSQRvpwpi2oCZzaE=
+	t=1765565905; cv=none; b=RS9O8+LdJ+pWyaNGI6uh3WoRcLxLihjV2wMVEAjFNYQ2650FSLCzOtmkrYdSW9+nA/6PV78IdVIioMXvJJ1vK3+7RXIDkvtRYVDz8k6kXzV49VW6GhscwWxPbeYFNotmpkplt+dgKjX8KUeysQZKNLxrgJUZtEnsqplo6EyZ9Ao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765563867; c=relaxed/simple;
-	bh=hDCn04wMFczg2ZKEtyKI65dUdL8Yy8DTr2U9MbionXw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oqK+jCQGnFIodJ51kH/SIXL/GddJb+NLkX1LbOq+pf9aKiRmGuAz/Q/6Lv8DKSajdHPoe+sKKbZENFksYt7ky+jt59sDmsg5k/nwaichkqx+oflx4u/LGng6hJAj3iCUCjTv0udt1WOrcKfL+rTYSi/PoORsgZDAH8GPCd9Rrbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ubuntu.com; spf=pass smtp.mailfrom=fe-bounces.ubuntu.com; dkim=pass (2048-bit key) header.d=ubuntu.com header.i=@ubuntu.com header.b=BvXsH93X; arc=none smtp.client-ip=121.127.44.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ubuntu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fe-bounces.ubuntu.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ubuntu.com;
- h=Content-Transfer-Encoding: Content-Type: In-Reply-To: From: References:
- Cc: To: Subject: MIME-Version: Date: Message-ID; q=dns/txt;
- s=fe-953a8a3ca9; t=1765563864;
- bh=QWy3lytTR7D0TLdcSjtSydcSonNRc5eH+V2CcyhEwkI=;
- b=BvXsH93X547IL2JWLCuLe3vgPPDy4OIP0u7bS3wbyVTEMfmibqC/0lQ3mNCsGpT7O876kqV86
- SHKnoJ3GrIP2c5zJ198JHaf51eGTVApSDBVpZYnzHNqducd9datIATdzOo6RGn+2TbSI0+EVVQf
- Fpid8ruy2aakXMe9Pb5TRaFzY3JCEe6awKidfi+y+BOdXpmkSQR9Ky+j2bcHiZ9fBglfbl4Uqs0
- KaBXhW75ibz2gOh5MIBmFfk/7F0ksJzpURhrtxRdq7a8oSqFbm0e4jDhUFQ2EX/7hADxOl/PMk5
- 6y7wNMS9TLJWCieSrl3xle/bSgRAb4hblR5kWyP5r95Q==
-X-Forward-Email-ID: 693c5dd3fd4b94c0e94eabae
-X-Forward-Email-Sender: rfc822; fnordahl@ubuntu.com, smtp.forwardemail.net,
- 121.127.44.73
-X-Forward-Email-Version: 1.6.6
-X-Forward-Email-Website: https://forwardemail.net
-X-Complaints-To: abuse@forwardemail.net
-X-Report-Abuse: abuse@forwardemail.net
-X-Report-Abuse-To: abuse@forwardemail.net
-Message-ID: <04d484b3-de7a-414a-9389-a19fac0e0daf@ubuntu.com>
-Date: Fri, 12 Dec 2025 19:24:13 +0100
+	s=arc-20240116; t=1765565905; c=relaxed/simple;
+	bh=g38d3m05nHgfeOS3d7XyoMwvU5uH6YHdd5X12LxkPbk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Osql9TNmqaitbw8ZTQvbBL/Ocyw6YQfFDfdnDjTwucsFYsHGKRhNsdUXcNpfviz7OoulPvNQpTm1LQ1uEHf7iH2T8ok+gec4cYh2nwro6DsfepKYoGiR+BLmugnnvGZJhr1zZY5yFqNOUGmmrqfsC/sA9rky2impd3C3xgvVJqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C607E1063;
+	Fri, 12 Dec 2025 10:58:14 -0800 (PST)
+Received: from e129823.cambridge.arm.com (e129823.arm.com [10.1.197.6])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id D8CF43F762;
+	Fri, 12 Dec 2025 10:58:19 -0800 (PST)
+From: Yeoreum Yun <yeoreum.yun@arm.com>
+To: nico@fluxnic.net,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	bigeasy@linutronix.de,
+	clrkwllms@kernel.org,
+	rostedt@goodmis.org,
+	dongdong.deng@windriver.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rt-devel@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Yeoreum Yun <yeoreum.yun@arm.com>
+Subject: [PATCH] smc91x: fix broken irq-context in PREEMPT_RT
+Date: Fri, 12 Dec 2025 18:58:18 +0000
+Message-Id: <20251212185818.2209573-1-yeoreum.yun@arm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] erspan: Initialize options_len before referencing
- options.
-To: "Creeley, Brett" <bcreeley@amd.com>, netdev@vger.kernel.org
-Cc: stable@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Gal Pressman <gal@nvidia.com>,
- Kees Cook <kees@kernel.org>, Cosmin Ratiu <cratiu@nvidia.com>,
- Tariq Toukan <tariqt@nvidia.com>, linux-kernel@vger.kernel.org
-References: <20251212073202.13153-1-fnordahl@ubuntu.com>
- <uCkgTf4IONTdT-df6jpwHmRGTBaYtp2vrLaQWzL7kfPxpJrvZarTkx6oNdnYWzNVnDmlNUVpd3iYO36CEYx7Dw==@protonmail.internalid>
- <1735c1c0-e731-4fec-83b1-818012194fc8@amd.com>
-Content-Language: en-US
-From: Frode Nordahl <fnordahl@ubuntu.com>
-In-Reply-To: <1735c1c0-e731-4fec-83b1-818012194fc8@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 12/12/25 18:23, Creeley, Brett wrote:
-> 
-> On 12/11/2025 11:32 PM, Frode Nordahl wrote:
->> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
->>
->>
->> The struct ip_tunnel_info has a flexible array member named
->> options that is protected by a counted_by(options_len)
->> attribute.
->>
->> The compiler will use this information to enforce runtime bounds
->> checking deployed by FORTIFY_SOURCE string helpers.
->>
->> As laid out in the GCC documentation, the counter must be
->> initialized before the first reference to the flexible array
->> member.
->>
->> In the normal case the ip_tunnel_info_opts_set() helper is used
->> which would initialize options_len properly, however in the GRE
->> ERSPAN code a partial update is done, preventing the use of the
->> helper function.
->>
->> Before this change the handling of ERSPAN traffic in GRE tunnels
->> would cause a kernel panic when the kernel is compiled with
->> GCC 15+ and having FORTIFY_SOURCE configured:
->>
->> memcpy: detected buffer overflow: 4 byte write of buffer size 0
->>
->> Call Trace:
->>    <IRQ>
->>    __fortify_panic+0xd/0xf
->>    erspan_rcv.cold+0x68/0x83
->>    ? ip_route_input_slow+0x816/0x9d0
->>    gre_rcv+0x1b2/0x1c0
->>    gre_rcv+0x8e/0x100
->>    ? raw_v4_input+0x2a0/0x2b0
->>    ip_protocol_deliver_rcu+0x1ea/0x210
->>    ip_local_deliver_finish+0x86/0x110
->>    ip_local_deliver+0x65/0x110
->>    ? ip_rcv_finish_core+0xd6/0x360
->>    ip_rcv+0x186/0x1a0
->>
->> Link: https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-counted_005fby-variable-attribute
->> Reported-at: https://launchpad.net/bugs/2129580
->> Fixes: bb5e62f2d547 ("net: Add options as a flexible array to struct ip_tunnel_info")
-> 
-> Should this be [PATCH net]?
-> 
-> It seems like this should be intended for the net tree.
+When smc91x.c is built with PREEMPT_RT, the following splat occurs
+in arm FVP_RevC:
 
-Indeed, thank you for pointing it out!
+[   13.055000] smc91x LNRO0003:00 eth0: link up, 10Mbps, half-duplex, lpa 0x0000
+[   13.062137] BUG: workqueue leaked atomic, lock or RCU: kworker/2:1[106]
+[   13.062137]      preempt=0x00000000 lock=0->0 RCU=0->1 workfn=mld_ifc_work
+[   13.062266] C
+** replaying previous printk message **
+[   13.062266] CPU: 2 UID: 0 PID: 106 Comm: kworker/2:1 Not tainted 6.18.0-dirty #179 PREEMPT_{RT,(full)}
+[   13.062353] Hardware name:  , BIOS
+[   13.062382] Workqueue: mld mld_ifc_work
+[   13.062469] Call trace:
+[   13.062494]  show_stack+0x24/0x40 (C)
+[   13.062602]  __dump_stack+0x28/0x48
+[   13.062710]  dump_stack_lvl+0x7c/0xb0
+[   13.062818]  dump_stack+0x18/0x34
+[   13.062926]  process_scheduled_works+0x294/0x450
+[   13.063043]  worker_thread+0x260/0x3d8
+[   13.063124]  kthread+0x1c4/0x228
+[   13.063235]  ret_from_fork+0x10/0x20
 
->> Signed-off-by: Frode Nordahl <fnordahl@ubuntu.com>
->> ---
->>    net/ipv4/ip_gre.c  | 18 ++++++++++++++++--
->>    net/ipv6/ip6_gre.c | 18 ++++++++++++++++--
->>    2 files changed, 32 insertions(+), 4 deletions(-)
->>
->> diff --git a/net/ipv4/ip_gre.c b/net/ipv4/ip_gre.c
->> index 761a53c6a89a..285a656c9e41 100644
->> --- a/net/ipv4/ip_gre.c
->> +++ b/net/ipv4/ip_gre.c
->> @@ -330,6 +330,22 @@ static int erspan_rcv(struct sk_buff *skb, struct tnl_ptk_info *tpi,
->>                           if (!tun_dst)
->>                                   return PACKET_REJECT;
->>
->> +                       /* The struct ip_tunnel_info has a flexible array member named
->> +                        * options that is protected by a counted_by(options_len)
->> +                        * attribute.
->> +                        *
->> +                        * The compiler will use this information to enforce runtime bounds
->> +                        * checking deployed by FORTIFY_SOURCE string helpers.
->> +                        *
->> +                        * As laid out in the GCC documentation, the counter must be
->> +                        * initialized before the first reference to the flexible array
->> +                        * member.
->> +                        *
->> +                        * Link: https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-counted_005fby-variable-attribute
-> 
-> Nit, but I wonder if the Link in the commit message is good enough? Same
-> comment below.
+This happens because smc_special_trylock() disables IRQs even on PREEMPT_RT,
+but smc_special_unlock() does not restore IRQs on PREEMPT_RT.
+The reason is that smc_special_unlock() calls spin_unlock_irqrestore(),
+and rcu_read_unlock_bh() in __dev_queue_xmit() cannot invoke
+rcu_read_unlock() through __local_bh_enable_ip() when current->softirq_disable_cnt becomes zero.
 
-Yes, in retrospect the comments and links in-line became a bit too 
-verbose, I'll trim them down in the next iteration.
+To address this issue, replace smc_special_trylock() with spin_trylock_irqsave().
 
-> Thanks,
+Fixes: 8ff499e43c53 ("smc91x: let smc91x work well under netpoll")
+Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+---
+This patch based on v6.18
+---
+ drivers/net/ethernet/smsc/smc91x.c | 11 ++---------
+ 1 file changed, 2 insertions(+), 9 deletions(-)
 
-Thank you for taking the time to review, much appreciated!
+diff --git a/drivers/net/ethernet/smsc/smc91x.c b/drivers/net/ethernet/smsc/smc91x.c
+index 9d1a83a5fa7e..b7fef6ce8615 100644
+--- a/drivers/net/ethernet/smsc/smc91x.c
++++ b/drivers/net/ethernet/smsc/smc91x.c
+@@ -516,15 +516,7 @@ static inline void  smc_rcv(struct net_device *dev)
+  * any other concurrent access and C would always interrupt B. But life
+  * isn't that easy in a SMP world...
+  */
+-#define smc_special_trylock(lock, flags)				\
+-({									\
+-	int __ret;							\
+-	local_irq_save(flags);						\
+-	__ret = spin_trylock(lock);					\
+-	if (!__ret)							\
+-		local_irq_restore(flags);				\
+-	__ret;								\
+-})
++#define smc_special_trylock(lock, flags)	spin_trylock_irqsave(lock, flags)
+ #define smc_special_lock(lock, flags)		spin_lock_irqsave(lock, flags)
+ #define smc_special_unlock(lock, flags) 	spin_unlock_irqrestore(lock, flags)
+ #else
+@@ -658,6 +650,7 @@ smc_hard_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		return NETDEV_TX_OK;
+ 	}
 
--- 
-Frode Nordahl
++	pr_err("[LEVI:%s:%d] before xmit_one %d\n", __func__, __LINE__, irqs_disabled());
+ 	smc_special_lock(&lp->lock, flags);
 
-> Brett
-> 
->> +                        */
->> +                       info = &tun_dst->u.tun_info;
->> +                       info->options_len = sizeof(*md);
->> +
->>                           /* skb can be uncloned in __iptunnel_pull_header, so
->>                            * old pkt_md is no longer valid and we need to reset
->>                            * it
->> @@ -344,10 +360,8 @@ static int erspan_rcv(struct sk_buff *skb, struct tnl_ptk_info *tpi,
->>                           memcpy(md2, pkt_md, ver == 1 ? ERSPAN_V1_MDSIZE :
->>                                                          ERSPAN_V2_MDSIZE);
->>
->> -                       info = &tun_dst->u.tun_info;
->>                           __set_bit(IP_TUNNEL_ERSPAN_OPT_BIT,
->>                                     info->key.tun_flags);
->> -                       info->options_len = sizeof(*md);
->>                   }
->>
->>                   skb_reset_mac_header(skb);
->> diff --git a/net/ipv6/ip6_gre.c b/net/ipv6/ip6_gre.c
->> index c82a75510c0e..eb840a11b93b 100644
->> --- a/net/ipv6/ip6_gre.c
->> +++ b/net/ipv6/ip6_gre.c
->> @@ -535,6 +535,22 @@ static int ip6erspan_rcv(struct sk_buff *skb,
->>                           if (!tun_dst)
->>                                   return PACKET_REJECT;
->>
->> +                       /* The struct ip_tunnel_info has a flexible array member named
->> +                        * options that is protected by a counted_by(options_len)
->> +                        * attribute.
->> +                        *
->> +                        * The compiler will use this information to enforce runtime bounds
->> +                        * checking deployed by FORTIFY_SOURCE string helpers.
->> +                        *
->> +                        * As laid out in the GCC documentation, the counter must be
->> +                        * initialized before the first reference to the flexible array
->> +                        * member.
->> +                        *
->> +                        * Link: https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-counted_005fby-variable-attribute
->> +                        */
->> +                       info = &tun_dst->u.tun_info;
->> +                       info->options_len = sizeof(*md);
->> +
->>                           /* skb can be uncloned in __iptunnel_pull_header, so
->>                            * old pkt_md is no longer valid and we need to reset
->>                            * it
->> @@ -543,7 +559,6 @@ static int ip6erspan_rcv(struct sk_buff *skb,
->>                                skb_network_header_len(skb);
->>                           pkt_md = (struct erspan_metadata *)(gh + gre_hdr_len +
->>                                                               sizeof(*ershdr));
->> -                       info = &tun_dst->u.tun_info;
->>                           md = ip_tunnel_info_opts(info);
->>                           md->version = ver;
->>                           md2 = &md->u.md2;
->> @@ -551,7 +566,6 @@ static int ip6erspan_rcv(struct sk_buff *skb,
->>                                                          ERSPAN_V2_MDSIZE);
->>                           __set_bit(IP_TUNNEL_ERSPAN_OPT_BIT,
->>                                     info->key.tun_flags);
->> -                       info->options_len = sizeof(*md);
->>
->>                           ip6_tnl_rcv(tunnel, skb, tpi, tun_dst, log_ecn_error);
->>
->> --
->> 2.43.0
->>
->>
-
-
+ 	/* now, try to allocate the memory */
+--
+LEVI:{C3F47F37-75D8-414A-A8BA-3980EC8A46D7}
 
 
