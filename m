@@ -1,62 +1,52 @@
-Return-Path: <netdev+bounces-244597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7EE1CBB156
-	for <lists+netdev@lfdr.de>; Sat, 13 Dec 2025 17:27:10 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59EFCCBB251
+	for <lists+netdev@lfdr.de>; Sat, 13 Dec 2025 19:55:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 895D0301BCBF
-	for <lists+netdev@lfdr.de>; Sat, 13 Dec 2025 16:27:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0A8F6300956D
+	for <lists+netdev@lfdr.de>; Sat, 13 Dec 2025 18:54:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F7E62DAFA9;
-	Sat, 13 Dec 2025 16:27:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nWAWTl/6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D58A82E92B3;
+	Sat, 13 Dec 2025 18:54:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6101B1DF736;
-	Sat, 13 Dec 2025 16:27:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63AA51DE4E1;
+	Sat, 13 Dec 2025 18:54:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765643226; cv=none; b=nXtqTC3YLD4IDNkbpAl1uQBx99vKewZI/Wd46S66GLKtulGvEf5o7R37MlULu4j39t7GFLJGlRyJXRxzck5CwIe5RhKSTmuOu5uAARMV5NT3HJ//q/WCgEHG5dku92/B4CBE1l9lAFFnRuCJIofnhsv2ti13Hy1S+Y34s0RxKLE=
+	t=1765652097; cv=none; b=bgM9tomVJi7l2m9V4/wbTIyCyOgpv+arQU+lWo62jw05Ia5DBitnzAbtz9Oa9+OrQmdSXBY936mmQuUbkDuMJdZvzpP23y5MmMnsIe2Nty+bNDZWmhOQ5o0Hs92MNdyQ4q7OgK5rOdqAj27e536ni5Z38zmfTXv1IYNtn7VajLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765643226; c=relaxed/simple;
-	bh=RuSYuEpf2hoURn7aa0FDJJchNpBdFJbBF13tEAR3aAc=;
+	s=arc-20240116; t=1765652097; c=relaxed/simple;
+	bh=DQMXc/7LpFfbhS3pKjholK4C3ph+20JnwFpwL1FQ4Lg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pqdxmkb5eP5YQtq4Vw9OF4Y+dR++tm8x+dp3UubNxSKBh4EQMglcJe3f3BPMDLYJ4iGr7kZ91q9OtGnswLjC6zTIbzuOkolnoEQ1j+/gFw+SJAu7+XiBztbwtfDF+eW0GdsSQJiWEcyEIKGGJXjdC3G8wvNIPM9GgWuMjedtNUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nWAWTl/6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EE72C4CEF7;
-	Sat, 13 Dec 2025 16:27:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765643224;
-	bh=RuSYuEpf2hoURn7aa0FDJJchNpBdFJbBF13tEAR3aAc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nWAWTl/6+EjJD0lTBxE+DOOYoKiiWAaaASou11WlGXQaXUV9oljb0MOcL3eRFQdwq
-	 uwXMLnGQPn3YGxDpddDscFhUzYUk0O8cqozSGffVPqjZyssktFPcPg39VUP0+hj33/
-	 VTDgUU8Gqqqy9/HXJP2P9YCwklcajMKmkpj/OMNefHXpFg4jeHF808YZAYRxanC5Mz
-	 Tb/ppvsNFuO5Hv4QPssZKVjBKmYPywbbhBWeM3qGFU8rNFahfXRm/I/t88rYQRRIrW
-	 NYVFmAi+rcNeUVC1W6OmMQ2SAHzCGQW5egbXctsykqWrJrGQUSURO9QyFT3Au1Ab4/
-	 Pvhad2xnPrsQg==
-Date: Sat, 13 Dec 2025 16:27:00 +0000
-From: Simon Horman <horms@kernel.org>
-To: Frode Nordahl <fnordahl@ubuntu.com>
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Gal Pressman <gal@nvidia.com>, Kees Cook <kees@kernel.org>,
-	Cosmin Ratiu <cratiu@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] erspan: Initialize options_len before referencing
- options.
-Message-ID: <aT2T1GQfKJ3Bj1aj@horms.kernel.org>
-References: <20251212073202.13153-1-fnordahl@ubuntu.com>
- <nZEr2jHd7_uGuwbqEiM3iStGK4aQ_EgMoNLBgyJrYmeTlhzT2-qGpuBxKPW6U7k8ZqAr6HExn5ncXLMA5EbRQQ==@protonmail.internalid>
- <aTwxDBODyDmerGAt@horms.kernel.org>
- <bb4f7703-b704-4eb8-942b-d693f64aed63@ubuntu.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=eGU3yiVOFD3jxeh9JNoyo9UA1YKKlio3EcxBTE36XA9ZGf/pl18jiC37m6RL4X88padjOibUk+0txnvQrYTZYEjHID7WNVuQoT4BG+vIyDngOt7bMxYsY2Cp9GLCoMAf3VDSjBE6knn6xU7lmuf31J4TE2MzZcM8zqna70qP9JM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id 0B77A60232; Sat, 13 Dec 2025 19:54:53 +0100 (CET)
+Date: Sat, 13 Dec 2025 19:54:42 +0100
+From: Florian Westphal <fw@strlen.de>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	syzbot <syzbot+4393c47753b7808dac7d@syzkaller.appspotmail.com>,
+	coreteam@netfilter.org, davem@davemloft.net, horms@kernel.org,
+	kadlec@netfilter.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	pabeni@redhat.com, pablo@netfilter.org, phil@nwl.cc,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [netfilter?] WARNING in nf_conntrack_cleanup_net_list
+Message-ID: <aT22cheoCSd1JfIM@strlen.de>
+References: <693b0fa7.050a0220.4004e.040d.GAE@google.com>
+ <20251213080716.27a25928@kernel.org>
+ <aT1pyVp3pQRvCjLn@strlen.de>
+ <CANn89i+V0XfUMjo5azSAkcr6EKucQFs6fv6mpNeL3rN41SsTzg@mail.gmail.com>
+ <aT1sxJHiK1mcrXaE@strlen.de>
+ <CANn89iKDFe83G4_bmzPVkKwVwNcxTX1pyjBqoHwrt+rk3A9=dQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,106 +55,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <bb4f7703-b704-4eb8-942b-d693f64aed63@ubuntu.com>
+In-Reply-To: <CANn89iKDFe83G4_bmzPVkKwVwNcxTX1pyjBqoHwrt+rk3A9=dQ@mail.gmail.com>
 
-On Fri, Dec 12, 2025 at 07:21:49PM +0100, Frode Nordahl wrote:
-> On 12/12/25 16:13, Simon Horman wrote:
-> > On Fri, Dec 12, 2025 at 07:32:01AM +0000, Frode Nordahl wrote:
-> > > The struct ip_tunnel_info has a flexible array member named
-> > > options that is protected by a counted_by(options_len)
-> > > attribute.
-> > > 
-> > > The compiler will use this information to enforce runtime bounds
-> > > checking deployed by FORTIFY_SOURCE string helpers.
-> > > 
-> > > As laid out in the GCC documentation, the counter must be
-> > > initialized before the first reference to the flexible array
-> > > member.
-> > > 
-> > > In the normal case the ip_tunnel_info_opts_set() helper is used
-> > > which would initialize options_len properly, however in the GRE
-> > > ERSPAN code a partial update is done, preventing the use of the
-> > > helper function.
-> > > 
-> > > Before this change the handling of ERSPAN traffic in GRE tunnels
-> > > would cause a kernel panic when the kernel is compiled with
-> > > GCC 15+ and having FORTIFY_SOURCE configured:
-> > > 
-> > > memcpy: detected buffer overflow: 4 byte write of buffer size 0
-> > > 
-> > > Call Trace:
-> > >   <IRQ>
-> > >   __fortify_panic+0xd/0xf
-> > >   erspan_rcv.cold+0x68/0x83
-> > >   ? ip_route_input_slow+0x816/0x9d0
-> > >   gre_rcv+0x1b2/0x1c0
-> > >   gre_rcv+0x8e/0x100
-> > >   ? raw_v4_input+0x2a0/0x2b0
-> > >   ip_protocol_deliver_rcu+0x1ea/0x210
-> > >   ip_local_deliver_finish+0x86/0x110
-> > >   ip_local_deliver+0x65/0x110
-> > >   ? ip_rcv_finish_core+0xd6/0x360
-> > >   ip_rcv+0x186/0x1a0
-> > > 
-> > > Link: https://gcc.gnu.org/onlinedocs/gcc/Common-Variable-Attributes.html#index-counted_005fby-variable-attribute
-> > > Reported-at: https://launchpad.net/bugs/2129580
-> > > Fixes: bb5e62f2d547 ("net: Add options as a flexible array to struct ip_tunnel_info")
-> > > Signed-off-by: Frode Nordahl <fnordahl@ubuntu.com>
-> > 
-> > Hi Frode,
-> > 
-> > Thanks for your patch (and nice to see you recently in Prague :).
+Eric Dumazet <edumazet@google.com> wrote:
+> > UDP, but I can't say yet if thats an udp specific issue or not.
+> > (the packets are generated via ip_defrag.c).
 > 
-> Thank you for taking the time to review, much appreciated (I enjoyed the
-> recent conference in Prague and our exchanges there!).
+> skb_release_head_state() does not follow the fraglist. Oh well.
 > 
-> > Overall this looks good to me but I have some minor feedback.
-> > 
-> > 
-> > Firstly, the cited patch seems to cover more than erspan.
-> > So I'm wondering if you took at look at other cases where
-> > this might occur? No problem either way, but if so it might
-> > be worth mentioning in the commit message.
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index a00808f7be6a1b86c595183f8b131996e3d0afcc..f597769d8c206dc063b53938a18edbe9620101d9
+> 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -1497,7 +1497,9 @@ void napi_consume_skb(struct sk_buff *skb, int budget)
 > 
-> I did some quick searches which formed the basis of the statement of the
-> normal case being to use the ip_tunnel_info_opts_set(), I could expand a bit
-> upon that statement.
+>         DEBUG_NET_WARN_ON_ONCE(!in_softirq());
+> 
+> -       if (skb->alloc_cpu != smp_processor_id() && !skb_shared(skb)) {
+> +       if (skb->alloc_cpu != smp_processor_id() &&
+> +           !skb_shared(skb) &&
+> +           !skb_has_frag_list(skb)) {
+>                 skb_release_head_state(skb);
+>                 return skb_attempt_defer_free(skb);
 
-Understood. Whichever way you want to go on this is fine by me.
+There is also:
+skb_attempt_defer_free -> skb_attempt_defer_free
 
-> > Regarding the comments in the code. I am wondering if the are necessary
-> > as the information is also contained in the commit message. And if the
-> > source documented every such case then things could get rather verbose.
-> > 
-> > If you do feel strongly about it keeping it then could I ask that
-> > (other than the URL) it is line-wrapped trimmed to 80 columns wide or less,
-> > as is still preferred for Networking (but confusingly not all Kernel) code.
-> 
-> Yes, I guess it became a bit verbose.  The thought was that it would be very
-> easy to miss this important detail for anyone (including future me)
-> spelunking into this part of the code.
-> 
-> I'll trim it down to a single line, which should be enough to give the urge
-> to look at the commit message.
+Alternatively we could export skb_defer_free_flush or
+kick_defer_list_purge() and call that from nf_conntrack
+net exit path.
 
-Thanks.
-
-> > As a fix for code present in net this should be targeted at that tree.
-> > It's best to do so explicitly like this:
-> > 
-> > Subject: [PATCH net] ...
-> 
-> Ack.
-> 
-> > And it's probably also best to CC stable@vger.kernel.org.
-> > That practice isn't as widespread as perhaps it should be for Networking code.
-> > But it does seem worth mentioning.
-> 
-> Ack, the intention was indeed to Cc them, I only put them into the e-mail
-> header and the stable kernel bot pointed out that the Cc also needs to be in
-> the commit message.
-> 
-> -- 
-> Frode Nordahl
-> 
+I will investigate more closely on monday, I still don't
+understand why fragments are conntracked in the first place.
 
