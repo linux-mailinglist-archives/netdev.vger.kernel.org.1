@@ -1,146 +1,197 @@
-Return-Path: <netdev+bounces-244580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE937CBA34E
-	for <lists+netdev@lfdr.de>; Sat, 13 Dec 2025 03:30:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 22ECACBA741
+	for <lists+netdev@lfdr.de>; Sat, 13 Dec 2025 09:48:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C324830E8963
-	for <lists+netdev@lfdr.de>; Sat, 13 Dec 2025 02:28:37 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2156930690E0
+	for <lists+netdev@lfdr.de>; Sat, 13 Dec 2025 08:48:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5A06280018;
-	Sat, 13 Dec 2025 02:28:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15F841AAE17;
+	Sat, 13 Dec 2025 08:48:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fmiqz8yK"
+	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="ciYkIJen";
+	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="eEPWgltI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0EF6274FE9
-	for <netdev@vger.kernel.org>; Sat, 13 Dec 2025 02:28:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765592916; cv=none; b=b828AqqLSAxRiVF0pHl4qzHUGxfY/uevTmLU59jsj/SDykzvJ5rjDh/LgqqRkJvENKE+6VEIPMhFOMttZ9DM6cXVBczCKzulmRPA9ArVxCW9WuDNFIzITJrhDWgHYPi9tUnrxFOpZDcOocMO6Y5shTaH3ADQc6KrU07i5CWONuU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765592916; c=relaxed/simple;
-	bh=0x1vMcMShduTmxRWyvBiBRlMvGc3ZDzpLSl3K9pvsVg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BBYVjvzi/D1/WScFT2sPsvJIa6QGG0hHQBHSuIRXHdX97Sr3aPkonaJUzCRZB9DUHj/VLxZXuE845K4tEsvDtEHDA9pqtgwzmPdzoaV7fymD8TtZFE6d6NhcQi846W9Jgns8AfeIMdS45sTma2TbxdBb8XhnVrCGL/wbAp56dXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fmiqz8yK; arc=none smtp.client-ip=209.85.128.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-78a835353e4so19848287b3.2
-        for <netdev@vger.kernel.org>; Fri, 12 Dec 2025 18:28:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765592912; x=1766197712; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=C8tj7zFmiGIgl+/XLeshTiYqJVDhHxNQCvlvR2nqqLk=;
-        b=fmiqz8yKiqzwLZquhd12/HuAp0bAsycTk1IlQwq43jp1H+NwQRey3u+yUmkcuZ+GpQ
-         Xjse24767hWTx2b4gn8vZknuwop1ABNj2Hxxv+gESdZlhSdErhrsZmJAGkUJTwBPMQrU
-         Gkyiib+2WqAOMVAQ3Ox6DZcdiw1w+HayrQ8bl2Uw4cXpnt8A3jeq9WD/Afr9zhD938jx
-         dgOHo0XM/qL974u73KDD+UZKwdejRXMnCn0IdMEsbS9ZwhpWq/LWUT9vBDG42ReDlwAb
-         vPA8YPgH7nBoSXaQescWuyeUbx+CISriWu/bauQ8jjQxySlmmjAyF9+xtR+rcPHMj6zH
-         3r5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765592912; x=1766197712;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=C8tj7zFmiGIgl+/XLeshTiYqJVDhHxNQCvlvR2nqqLk=;
-        b=UrtdeIt7OkasNMd0g6dKiXrmxnM9hedns/aXC5ZBZybTyRFPpqk2dQdsbwwSN++I/9
-         h3dOY5oUFOqPKRhXfXsuMR5xXaVnaOiy/d20ow53ewlxDkCAjbllcGFULod7ojzBEB12
-         9vzUufmatbRLZFQ+TZ2h7X3aTadL62+XlH99bmjIvkdlFsdVuXr6oQOzLubrYPDJV9mo
-         hYU6eFD4eKPgn78XpkMRbtGaX5c+DbLjcCnfF1QYdzbOkGGf/GA0vobGdp20E9G98Kny
-         BHElvCtWNx6lUt6UV6zuFNK4zXDoNeZtWCAbaHWRhiZcBvMsGlLzHz243+neTntDiwiC
-         ub5w==
-X-Forwarded-Encrypted: i=1; AJvYcCUK3Q9v4cFQLeKsFFqlD9HTwP2w6AiFvSESbAfCGAGEZnQlxzDd77nCB30bzgbCBVJhhNMABmU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yze8T6i+DjMaYUL1QKwkpoAIPlPoO+zguje45ubD20VA4QBbFsZ
-	aWLTvhqYgKR3yy387Z4NeiX1RH/MI3dSZD2NvzMMoTiLKhpx8kcwPmUw
-X-Gm-Gg: AY/fxX6Czt550Fpnj6FqUFWw04wGJOukV6A/72GA6EJ0eU7mth7NrCYok7td9SLvJd/
-	cBbUjPuudm15Lq0BFxwLESf9Mw/NYjrjstaxeL6n1/W+mc0Y0rgM63Aum0/o2130zoP+aNhIpIL
-	mkdoXavo9g83EYm2hI511BLRBqcHPIv5p4IFQCPm3q1vdDm2HOjaD5yPrRUTBJoXDJZCIh+41Iz
-	CFA3W1zaxzcuNso0/ovBYDtW96rVBY+GId1JHFuB79w+HL2C4brLN2qz11olLZdT03s3HbneMg1
-	Y4012+mtho+DkjBY7MaNwnrfbAGywZH3FdEjihFdeLu9Do2XBi/JdFa2d+5jUXvIwwelWqv/4GN
-	l3/+AFFpuRhbUjDZ+xsfGhmJQgu5NfW4jKs58JmGDMkWsQgXcPHGV5VOZITWzemwz/2nCuEy98H
-	/pWHFQ/g==
-X-Google-Smtp-Source: AGHT+IGpiya8RbWHXeXIazjjoeNE0QQuWIrlOz/AC0+4esxyba8hfzVjiroZs9tNrTzZxt7cJ04SSA==
-X-Received: by 2002:a05:690e:12ce:b0:645:5b0e:c914 with SMTP id 956f58d0204a3-6455b0ecac8mr1974338d50.66.1765592912124;
-        Fri, 12 Dec 2025 18:28:32 -0800 (PST)
-Received: from localhost ([2601:346:0:79bd:86f:7039:22f0:5fbb])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-64477db607esm3280998d50.18.2025.12.12.18.28.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Dec 2025 18:28:31 -0800 (PST)
-Date: Fri, 12 Dec 2025 21:28:31 -0500
-From: Yury Norov <yury.norov@gmail.com>
-To: david.laight.linux@gmail.com
-Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Crt Mori <cmo@melexis.com>,
-	Richard Genoud <richard.genoud@bootlin.com>,
-	Andy Shevchenko <andriy.shevchenko@intel.com>,
-	Luo Jie <quic_luoj@quicinc.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Mika Westerberg <mika.westerberg@linux.intel.com>,
-	Andreas Noever <andreas.noever@gmail.com>,
-	Yehezkel Bernat <YehezkelShB@gmail.com>,
-	Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
-Subject: Re: [PATCH v2 02/16] thunderbolt: Don't pass a bitfield to FIELD_GET
-Message-ID: <aTzPT2kAt96ypGU-@yury>
-References: <20251212193721.740055-1-david.laight.linux@gmail.com>
- <20251212193721.740055-3-david.laight.linux@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3371182D2;
+	Sat, 13 Dec 2025 08:48:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765615687; cv=pass; b=jrHqHbLNXFBaIuidPYVebcHq/jMTfx02pkWa60r9PPYJ2sG2ABMiR2FqBmxXzjc1GhDhoqJTjFXcxvCV0VlnVRf715rDJLqqFiI/+jZ4NptQR8VvQsf22H8OoNkO+3/6r/UTa7ztr1TOBA6IygLMrqRVJP5ETqLLsxkHhpfog/E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765615687; c=relaxed/simple;
+	bh=w0AP2MvOSzY2StnZhZwikWc213GoFGRuWI+QaGzrItg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CWjfEHHRKQtsCoIwzEnYgPe3uhKirgt+dxR7MY1mPkcBxnTjxSFgF7+LPoTmXTbifauuOCOm+BDpwDOPCm9RVfybiCSh3SNefx/AoCOIgBC360R3D4duqHkoPhdACJ9lufsuJpdC29k4KdaeIsbpllyj1IBrBJLtqaZd1mVmqTA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=ciYkIJen; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=eEPWgltI; arc=pass smtp.client-ip=85.215.255.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
+ARC-Seal: i=1; a=rsa-sha256; t=1765615304; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=NO4UpnHoDGJYpO7+1oSvv7WoTImml07inka1oOqk6OtPtzRf3Yukxy0kqlKRDdaol+
+    to6nEDxF8XwBjESmxrI1tmiyJvF9etC3v5aB4kg0j2K0c6M5sdd06oRc443vtVmUW3eK
+    CpiiZ2yO6bWWT+rGiN6yqhX4/vtZ7IGB0V0p2CQaj5Xu5cs54beswWW6TftgnYrSdZB1
+    QFG1jy8mtVxqywbwpHxamZazUvZ4rNzD0gGuu2fCvMjcr2yVak1saBMA2OFsWlkASOUB
+    8WteBbCF8rSC6UddrJfKcMkAWN7uun6tXhCnsZCLQnLmFX08qDIjY1dMxlOB8WkgAdmy
+    0tow==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1765615304;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=sjyaFnAVrn6yJFe2WQ0FAcxBNWbILjXKtPmIJdvEZ68=;
+    b=RvnTY7Z4HURF7VbCjaHUTAv0yemXEpgNuahfUK/OE+J076mzPN/hIhXxcUxwWfRRVt
+    foQkrHVr8yH7qFEZz8Q+WQMDcqaO9WIEpLcY+Pc6FHRKFe3q0YpFd3DAE0k9of6hiNZX
+    y/diQE6b5/wRzxNcJoRcS6IylSej1goxtgSpZpmssCeTMQ5/N6cSBvA0EVPeprXmnM4V
+    uA16qi0uNPQIHxDvdxBFIkS5V0h3GNjR9Hn2HfpgjDJdgqadLHws7kKkmN8G2FnVLNVI
+    jZ2x91REwtJu/VsXgTK7Gxc7PMH/cCSwJV0P/nQxSLtPlpzfvUmAHTXsJxdRjVkKivCC
+    mv9w==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1765615304;
+    s=strato-dkim-0002; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=sjyaFnAVrn6yJFe2WQ0FAcxBNWbILjXKtPmIJdvEZ68=;
+    b=ciYkIJen0eXV6zu9svWhhnXxQdIupL+vTrZk1zkFEmdc4n/h/H6VqOhyTjotGp2pya
+    M8GWCcWgh9hlFWFip83dnNnMihLrYTxIkwHv+ax7OMwMu4Ply2vK8mFgfGEiFx/pHamR
+    xHLvfExzSdg15EXVJLGXYyoM0S59y2cj2+y+VWgID+OrhY/X2PFnb0pw4ZmYO3KGI8es
+    oBIUvb0sBiyYdiUrs/dEjz42c8Vi0urjjaNruBJDr9BajDvYjlTTFIBC3SKfD7XpHLrV
+    L5kiOjL5sdJlX3PSRVEESh83zGyYx5wVpZNYL95LZlq6+XjAP4ccJttgq+aup2WmZj1C
+    pCQg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1765615304;
+    s=strato-dkim-0003; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=sjyaFnAVrn6yJFe2WQ0FAcxBNWbILjXKtPmIJdvEZ68=;
+    b=eEPWgltIArZuPdnTJwsF/Dn23vvPuOTLvax/CLrk6oBkj5DjZt6b2Ossis7JTfBiV0
+    nG3IyTJcfnbsDaO3yFBw==
+X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tTUsMrZpkO3Mw3lZ/t54cFxeFQ7s8bGWj0Q=="
+Received: from [IPV6:2a00:6020:4a38:6800::9f3]
+    by smtp.strato.de (RZmta 54.1.0 AUTH)
+    with ESMTPSA id K0e68b1BD8fhmjc
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Sat, 13 Dec 2025 09:41:43 +0100 (CET)
+Message-ID: <6f183d9b-183f-46df-bbf2-f9ace1455404@hartkopp.net>
+Date: Sat, 13 Dec 2025 09:41:37 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251212193721.740055-3-david.laight.linux@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwlwifi-fixes] wifi: iwlwifi: Implement settime64 as stub
+ for MVM/MLD PTP
+To: Yao Zi <ziyao@disroot.org>,
+ Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Johannes Berg <johannes.berg@intel.com>,
+ Anjaneyulu <pagadala.yesu.anjaneyulu@intel.com>,
+ Daniel Gabay <daniel.gabay@intel.com>
+Cc: linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, Mingcong Bai <jeffbai@aosc.io>,
+ Kexy Biscuit <kexybiscuit@aosc.io>, Nathan Chancellor <nathan@kernel.org>
+References: <20251204123204.9316-1-ziyao@disroot.org>
+Content-Language: en-US
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+In-Reply-To: <20251204123204.9316-1-ziyao@disroot.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Dec 12, 2025 at 07:37:07PM +0000, david.laight.linux@gmail.com wrote:
-> From: David Laight <david.laight.linux@gmail.com>
+
+
+On 04.12.25 13:32, Yao Zi wrote:
+> Since commit dfb073d32cac ("ptp: Return -EINVAL on ptp_clock_register if
+> required ops are NULL"), PTP clock registered through ptp_clock_register
+> is required to have ptp_clock_info.settime64 set, however, neither MVM
+> nor MLD's PTP clock implementation sets it, resulting in warnings when
+> the interface starts up, like
 > 
-> None of sizeof(), typeof() or __auto_type can be used with bitfields
-> which makes it difficult to assign a #define parameter to a local
-> without promoting char and short to int.
+> WARNING: drivers/ptp/ptp_clock.c:325 at ptp_clock_register+0x2c8/0x6b8, CPU#1: wpa_supplicant/469
+> CPU: 1 UID: 0 PID: 469 Comm: wpa_supplicant Not tainted 6.18.0+ #101 PREEMPT(full)
+> ra: ffff800002732cd4 iwl_mvm_ptp_init+0x114/0x188 [iwlmvm]
+> ERA: 9000000002fdc468 ptp_clock_register+0x2c8/0x6b8
+> iwlwifi 0000:01:00.0: Failed to register PHC clock (-22)
 > 
-> Change:
-> 	u32 thunderbolt_version:8;
-> to the equivalent:
-> 	u8 thunderbolt_version;
-> (and the other three bytes of 'DWORD 4' to match).
+> I don't find an appropriate firmware interface to implement settime64()
+> for iwlwifi MLD/MVM, thus instead create a stub that returns
+> -EOPTNOTSUPP only, suppressing the warning and allowing the PTP clock to
+> be registered.
 > 
-> This is necessary so that FIELD_GET can use sizeof() to verify 'reg'.
-> 
-> Signed-off-by: David Laight <david.laight.linux@gmail.com>
+> Reported-by: Nathan Chancellor <nathan@kernel.org>
+> Closes: https://lore.kernel.org/all/20251108044822.GA3262936@ax162/
+> Signed-off-by: Yao Zi <ziyao@disroot.org>
+
+Tested-by: Oliver Hartkopp <socketcan@hartkopp.net>
+
+I can see no progress that this patch gets upstreamed.
+Who is picking up this fix?
+
+Best regards,
+Oliver
+
+
 > ---
+>   drivers/net/wireless/intel/iwlwifi/mld/ptp.c | 7 +++++++
+>   drivers/net/wireless/intel/iwlwifi/mvm/ptp.c | 7 +++++++
+>   2 files changed, 14 insertions(+)
 > 
-> Changes for v2:
-> - Change structure definition instead of call to FIELD_GET().
-> 
-> FIELD_GET currently uses _Generic() which behaves differently for
-> gcc and clang (I suspect both are wrong!).
-> gcc treats 'u32 foo:8' as 'u8', but will take the 'default' for other
-> widths (which will generate an error in FIED_GET().
-> clang treats 'u32 foo:n' as 'u32'.
+> diff --git a/drivers/net/wireless/intel/iwlwifi/mld/ptp.c b/drivers/net/wireless/intel/iwlwifi/mld/ptp.c
+> index ffeb37a7f830..231920425c06 100644
+> --- a/drivers/net/wireless/intel/iwlwifi/mld/ptp.c
+> +++ b/drivers/net/wireless/intel/iwlwifi/mld/ptp.c
+> @@ -121,6 +121,12 @@ static int iwl_mld_ptp_gettime(struct ptp_clock_info *ptp,
+>   	return 0;
+>   }
+>   
+> +static int iwl_mld_ptp_settime(struct ptp_clock_info *ptp,
+> +			       const struct timespec64 *ts)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +
+>   static int iwl_mld_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
+>   {
+>   	struct iwl_mld *mld = container_of(ptp, struct iwl_mld,
+> @@ -279,6 +285,7 @@ void iwl_mld_ptp_init(struct iwl_mld *mld)
+>   
+>   	mld->ptp_data.ptp_clock_info.owner = THIS_MODULE;
+>   	mld->ptp_data.ptp_clock_info.gettime64 = iwl_mld_ptp_gettime;
+> +	mld->ptp_data.ptp_clock_info.settime64 = iwl_mld_ptp_settime;
+>   	mld->ptp_data.ptp_clock_info.max_adj = 0x7fffffff;
+>   	mld->ptp_data.ptp_clock_info.adjtime = iwl_mld_ptp_adjtime;
+>   	mld->ptp_data.ptp_clock_info.adjfine = iwl_mld_ptp_adjfine;
+> diff --git a/drivers/net/wireless/intel/iwlwifi/mvm/ptp.c b/drivers/net/wireless/intel/iwlwifi/mvm/ptp.c
+> index 06a4c9f74797..ad156b82eaa9 100644
+> --- a/drivers/net/wireless/intel/iwlwifi/mvm/ptp.c
+> +++ b/drivers/net/wireless/intel/iwlwifi/mvm/ptp.c
+> @@ -220,6 +220,12 @@ static int iwl_mvm_ptp_gettime(struct ptp_clock_info *ptp,
+>   	return 0;
+>   }
+>   
+> +static int iwl_mvm_ptp_settime(struct ptp_clock_info *ptp,
+> +			       const struct timespec64 *ts)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +
+>   static int iwl_mvm_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
+>   {
+>   	struct iwl_mvm *mvm = container_of(ptp, struct iwl_mvm,
+> @@ -281,6 +287,7 @@ void iwl_mvm_ptp_init(struct iwl_mvm *mvm)
+>   	mvm->ptp_data.ptp_clock_info.adjfine = iwl_mvm_ptp_adjfine;
+>   	mvm->ptp_data.ptp_clock_info.adjtime = iwl_mvm_ptp_adjtime;
+>   	mvm->ptp_data.ptp_clock_info.gettime64 = iwl_mvm_ptp_gettime;
+> +	mvm->ptp_data.ptp_clock_info.settime64 = iwl_mvm_ptp_settime;
+>   	mvm->ptp_data.scaled_freq = SCALE_FACTOR;
+>   
+>   	/* Give a short 'friendly name' to identify the PHC clock */
 
-FIELD_GET() works just well with bitfields, and whatever you do breaks
-it. I pointed that in v1, but instead of fixing it, you do really well
-hiding the problem.
-
-I see no reasons to hack a random victim because of your rework. So
-NAK for this. 
-
-In v3, please add an explicit test to make sure that bitfields are not
-broken with new implementation.
-
-Thanks,
-Yury
 
