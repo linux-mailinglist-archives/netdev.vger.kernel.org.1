@@ -1,82 +1,94 @@
-Return-Path: <netdev+bounces-244584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244585-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C92CECBA8AB
-	for <lists+netdev@lfdr.de>; Sat, 13 Dec 2025 13:11:14 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86CFECBA8B1
+	for <lists+netdev@lfdr.de>; Sat, 13 Dec 2025 13:17:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 757E430B2EBA
-	for <lists+netdev@lfdr.de>; Sat, 13 Dec 2025 12:11:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1110A30136C9
+	for <lists+netdev@lfdr.de>; Sat, 13 Dec 2025 12:17:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA4492E6CC5;
-	Sat, 13 Dec 2025 12:11:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F82D19F464;
+	Sat, 13 Dec 2025 12:16:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kfVKc7oo"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="DtkqMJet"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DEAA2D73A1
-	for <netdev@vger.kernel.org>; Sat, 13 Dec 2025 12:11:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A16172602
+	for <netdev@vger.kernel.org>; Sat, 13 Dec 2025 12:16:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765627872; cv=none; b=MvU3OZtUqENw4nqLwCpGrVC1O+x0z2ScEby6oHiTJhmKTRukAZGmUt51+b3YFQnzLEN/E1YR9Pa6Xvd8yxgjIQAetOyKKuyxx0s0NNuP2ibMhT8ZwAJkHcTdYrBgcC5QxQYeNXZYJKJIK184Yj3XNwmW5fjkQmNETcpRZ5NhOQM=
+	t=1765628218; cv=none; b=q31M+FudWngKUNZtpOYd1LtAFYU1P6TVpCk/8ayr5God1X3SzaTeYDPMQGx8Uo170wYFWpABIuRGCm52IXHbfNHdsTyEcz4PQkO03qkrrUw8g05Lx+3uLokvCNQxqMgHNiiW2H6jjle6cLu3qyW0v07wuyrmFb6UU1DUCpL0zjo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765627872; c=relaxed/simple;
-	bh=bem3wRQCjgBf23CbeaTBpqrxizxf/yxfEoMPtIJkq0Q=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AaPDr9aCxrSQsiYlIHDt1Wz0xCCjCCJ9lBLhSgwOXqNoOBKloHMuinSclEK9TixA2BygKezFdxUF+TvLkDframg4msvxRuf/aKXNPpNrl/Ftwh9fYhLAy3ZLVPNNeARVzL66j8r5vObElH2wgi4GB1CS4/Z8/69QQioZUSDgwkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kfVKc7oo; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-649820b4b3aso3121432a12.3
-        for <netdev@vger.kernel.org>; Sat, 13 Dec 2025 04:11:10 -0800 (PST)
+	s=arc-20240116; t=1765628218; c=relaxed/simple;
+	bh=oPzJYCSEmOomkH0py8Fl5KkIHnbQ9TJ3DyLsLr4SPrY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RmBPKsF91khrvhPJTH5oRwALifar2GRq09pYZOqoGIvI96eIbU47Hr22XfCgCsjYXH76qWZQo2gncb8aTzBS0ACEtGy+OL0tZ6ZaRo/8wLxeJB8XG1peqBzXc/M3onnFT/akHX81gKtqBiA9uJPV2Rl5CrzP/rzXaB5E2XwcB3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=DtkqMJet; arc=none smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-8b2d7c38352so213405185a.0
+        for <netdev@vger.kernel.org>; Sat, 13 Dec 2025 04:16:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765627869; x=1766232669; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1765628215; x=1766233015; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4TB2UVG2E+GFNI7iKxb5BS0GxMZTNJO+7f400h+yjSs=;
-        b=kfVKc7ooZMAIVLONZodESFOhlGFV5+4TZ1ZJK/OaY/lBmPe8oEc7/5hw19WLGiLcVI
-         9tUc5yHo/zcKL7FU4Fau47urdClw71QSNju++Zog3UJ9UIsTIfapuQW5zQs6sFdjsNhs
-         tKKoyIi2c3nX/sp23KsQMTag5w+29YMikmhNKePX4ssWtc/vWO0zPl9J4UlmFSd4LYCe
-         LN7B6F6lkk1IWx2S6TGhr95RkAT+dn2AG1NyxUatqzjCLtWeMQyOVhKZklUSxeM/i7x9
-         DokEQRlmS8AerfAL/jWFyIUM+5OcKJ8PBcaqHLzjDlKSxzbybF2vzD3ccRMGPyHUChj6
-         uINw==
+        bh=qV4QS6czt4N7BvIj5WADk7dY5ypNmbjBfRYX0QBI7RI=;
+        b=DtkqMJetdIA2sEuV5t7xl5G+gRJFysqgQSGzt2Vd3rbXK/ZQS5c1r2B3iarqLboKDZ
+         W2grNo6es+U2bqMUIM9A3YaFM86brXpFvcVwEefmWrgsqhYV/cW0LxBRSKCc1zmpeS7u
+         dPM5d1nVXrXb91q8/K9GR99H/rptwAmM9h5bZGZWj0C4MkpJ9/p6famAIvO8pI9Yie4h
+         Qa2hRB7YGp6HqI5FUiuTXKkciE1nk3nS1+OD/N5VAwf7nJFb6oolbvh3iDmlBovuwtpX
+         2PvwIB4W7ts+5my3jNui4w2BjRPw87wcJBvZaSZuss0K4vYFkln59dgN1AEp/w9jVqVK
+         p6rQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765627869; x=1766232669;
+        d=1e100.net; s=20230601; t=1765628215; x=1766233015;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4TB2UVG2E+GFNI7iKxb5BS0GxMZTNJO+7f400h+yjSs=;
-        b=S1DYIl6cwu/36LIrL1/BpXUOXpU2LNu16PAmHN0ramq4HfbfqPYMBaySpgQ0P+p3qH
-         lNzdUOZ7g3zUpCfUiaV9dRFGWkunhJJ9zl5+AEfTSYJV4q6UPcdwtau97DBtP6flNpKj
-         H7byzKV5WVMPXAc2d7Mx8iQzyklYWAXmcHzEKEBDxVD5XuM0bIOvHn3xHWaG2pUBd41F
-         OeMUQSW8ZLMbADdeMzq216xP7fiVlB7bE/NccL2hu6QU/LnvuDQvCwnattn5UdLqP0a2
-         3gpNrOGwxabv24OkBS9YWcdhIGfnWP2i73v7qGlIz3FIO/QeAnawnzITYl3ljva8t8Nt
-         Z5hw==
-X-Gm-Message-State: AOJu0Yy9+arlFp7yFjrAotClzkqa33p11H8g5I4F5Mi7Zq6FKtxHXyit
-	Lov+QWIYm7SZNtkUIEe2QfbQuX1vbHPNRq+tzPiQXbM985XE4MPugKNd4SoTjrgg
-X-Gm-Gg: AY/fxX5xDwtfmoa5b2wA49kJGNijFzdhkNAJYhlVn6wFuf7kRJ+vvZp4dSw3Ist1wzw
-	lJ4cSlriwBqxm6COrwnatnL3uMq9LENmgRRedFhdGQEH58+jN9QxX81Kt5ADIBUcu9vrbxDj381
-	qqYcCP7m7SEp5W2SxDbU0qoLN6YOYq6JvXoaE44r863Hzp2QlLOeTj6Am15E4LiOKbaA4+4CxKS
-	4a2jfqHE83kl4gwzvqDBxLO+ka8Fz7ATc0xlA3irVcNB8viF6nYayB3CLcIQDbxKZ7Q/LYhEeiT
-	nMkdbcp0u+ImbYT0PlI+vX+/6qa/IfQSDyvR7OwUlHY+pwACVyiVG+3Fx7iANadwvhcE5MGUjy8
-	0ZIfjnmzaAKkZkokC5AOdfKrTQbIc6TMWLMCm99LPZX5ILuI2112arboHysFaCT8Cg2ibiThEaB
-	Gjkw==
-X-Google-Smtp-Source: AGHT+IHUUWToZ1YcR2OijjGkCGcKb/ZY1XCxIUfEaXkG+kOwSVpZzbVfseRejI316MXaLh2SKyJOwg==
-X-Received: by 2002:a17:906:eeca:b0:b53:e871:f0ea with SMTP id a640c23a62f3a-b7d23b37ea3mr524222766b.56.1765627869080;
-        Sat, 13 Dec 2025 04:11:09 -0800 (PST)
-Received: from wdesk. ([37.218.240.70])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7cfa29bea0sm851394966b.8.2025.12.13.04.11.07
+        bh=qV4QS6czt4N7BvIj5WADk7dY5ypNmbjBfRYX0QBI7RI=;
+        b=jSQ0IFtlTSabMphVdufh4HZD8lwliC+molSboEojiQx6MgrXMjp69KVXNLp0C/SpXW
+         QBnbmbfh59WepTfc/tXw+mIjd5BPAVdXiHNcyvRdus+TNXNGDgIC8GfubV+14wtfDJqF
+         GgnxINjGYeB4HR3ezMmFLEdDERLQm1Mmq0EqzR9kzVdDld+42GeiTUQ0ZTnGGLrjPsML
+         oQ8lzNJNnMe8baX/yyELmwpkOLbKJ++2pg9gisMZ5YzuxPJvGcKPnpGVUdTXzwcMhB7u
+         AJQa4Wbt4ZVVdC8wIuIphkc+f7BvoCRGl/WcqjgDEQsSMLEJYyfCZPCRixQk7mQTCio+
+         dKIA==
+X-Gm-Message-State: AOJu0Yzy7UWHFlWPpkfF/YcXAQR3gDDSIfUqJOCh3NNuEJWCw0dhv4Fh
+	7aFUgdQrrdfGt2Gma6r1TSyImdZjtWvfsEv6Tlc0D0FMSukzg7Rl7XKv9qfTzxvYtw==
+X-Gm-Gg: AY/fxX71d4TDQ7Xc38kwfkjp2Xy2Yf1ybm2ZTl6tsa/RMiSF0FrijB1Mk7LO4Q1tDw4
+	kQ5otiP2gRcIsSjKagI3QgGVv93no8OR5jNsD8wrZMq1Af6mR7dvbv+2OQc8BY8yswNH/nFdDIP
+	9I+2LVq70qM7YIq3DPx8/qz4Ih0IOrbwrwfAe2QZD6Ror30g+rLqcPJdidYA48+NXm6r2DgqiJ+
+	EL4I3fQSuAzC4GxOlqkb0vZ6OeTOnlfMOL7Pn5VdPx194sBtYcBakLO1Ia8UgaddgcvvV9E1vCh
+	YJx4zwcLbL3cVr9kjjlXpro5VUQYRv8QkOkTx+VSA0H1u/lTNxxpPI9WezqeOQg+WS5+7dNvgv9
+	82f6g7Ei9MIan8eYyy3LGKWRpzW9jFKMwe66VSjW9+reDLCRINaU3vtos3omqS35hcRNsD/md7a
+	chWkUFuwy6ibQ=
+X-Google-Smtp-Source: AGHT+IHFb+dJTx+k2gpvVw/ruzyrxsaelQ2Pcp2/SW+M+1NTUES9eN3583MWn+GVsWSygA/Zxx2SwQ==
+X-Received: by 2002:a05:620a:2910:b0:8b2:e3c1:24b7 with SMTP id af79cd13be357-8bad440bfdbmr1301121685a.29.1765628215016;
+        Sat, 13 Dec 2025 04:16:55 -0800 (PST)
+Received: from majuu.waya ([70.50.89.69])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-889a860ffebsm12883206d6.57.2025.12.13.04.16.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 13 Dec 2025 04:11:08 -0800 (PST)
-From: Mahdi Faramarzpour <mahdifrmx@gmail.com>
-To: netdev@vger.kernel.org,
+        Sat, 13 Dec 2025 04:16:53 -0800 (PST)
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
 	kuba@kernel.org,
-	edumazet@google.com
-Cc: Mahdi Faramarzpour <mahdifrmx@gmail.com>
-Subject: [PATCH net] udp: remove obsolete SNMP TODO
-Date: Sat, 13 Dec 2025 15:40:24 +0330
-Message-Id: <20251213121024.219353-1-mahdifrmx@gmail.com>
+	pabeni@redhat.com,
+	horms@kernel.org,
+	andrew+netdev@lunn.ch
+Cc: netdev@vger.kernel.org,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	victor@mojatatu.com,
+	dcaratti@redhat.com,
+	lariel@nvidia.com,
+	daniel@iogearbox.net,
+	pablo@netfilter.org,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	kernel test robot <lkp@intel.com>
+Subject: [PATCH RFC net 1/1] net: sched: Fix ethx:ingress -> ethy:egress -> ethx:ingress mirred loop
+Date: Sat, 13 Dec 2025 07:16:36 -0500
+Message-Id: <20251213121636.132568-1-jhs@mojatatu.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -86,29 +98,206 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The TODO comment demands SNMP counters be increased, and that
-is already implemented by the callers of __udp_enqueue_schedule_skb()
-which are __udp_queue_rcv_skb() and __udpv6_queue_rcv_skb().
+Changes in V1:
+1) Fix compile issues found by Intel bot. Thank you bot
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202512121401.3NRi0dUf-lkp@intel.com/
+2) Fix other issues found by patchwork
+ - https://patchwork.kernel.org/project/netdevbpf/patch/20251210172554.1071864-1-jhs@mojatatu.com/
+3) The AI reviewer claimed there was an issue but the link was a 404
+ - https://netdev-ai.bots.linux.dev/ai-review.html?id=23b3f0a5-ca6c-4cd2-962e-34cbf46f9d24
 
-That makes the TODO obsolete.
+This patch could be broken down into multiple patches(at least two), but
+posted as one because it is an RFC.
 
-Signed-off-by: Mahdi Faramarzpour <mahdifrmx@gmail.com>
+When mirred redirects from egress to ingress  the loop state is lost.
+This is because the current loop detection mechanism depends on the device
+being rememebred on the sched_mirred_dev array; however, that array is
+cleared when we go from egress->ingress because the packet ends up in the
+backlog and when we restart from the backlog the loop is amplified, on and
+on...
+
+A simple test case:
+
+tc qdisc add dev ethx clsact
+tc qdisc add dev ethy clsact
+tc filter add dev ethx ingress protocol ip \
+   prio 10 matchall action mirred egress redirect dev ethy
+tc filter add dev ethy egress protocol ip \
+   prio 10 matchall action mirred ingress redirect dev ethx
+
+ping such that packets arrive on ethx. Puff and sweat while the cpu
+consumption goes up. Or just delete those two qdiscs from above
+on ethx and ethy.
+
+For this to work we need to _remember the loop state in the skb_.
+We reclaim the bit "skb->from_ingress" to the qdisc_skb_cb since its use
+is constrained for ifb. We then use an extra bit that was available on
+the skb for a total of 2 "skb->ttl" bits.
+Mirred increments the ttl whenever it sees the same skb. We then
+catch it when it exceeds MIRRED_NEST_LIMIT iterations of the loop.
+
+Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
 ---
- net/ipv4/udp.c | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/net/ifb.c              |  3 +--
+ include/linux/skbuff.h         | 26 ++++----------------------
+ include/net/sch_generic.h      | 20 ++++++++++++++++++++
+ net/netfilter/nft_fwd_netdev.c |  1 +
+ net/sched/act_mirred.c         |  5 ++++-
+ 5 files changed, 30 insertions(+), 25 deletions(-)
 
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index ffe074cb5..60d549a24 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -1797,7 +1797,6 @@ int __udp_enqueue_schedule_skb(struct sock *sk, struct sk_buff *skb)
- 			skb = to_drop;
- 			to_drop = skb->next;
- 			skb_mark_not_on_list(skb);
--			/* TODO: update SNMP values. */
- 			sk_skb_reason_drop(sk, skb, SKB_DROP_REASON_PROTO_MEM);
+diff --git a/drivers/net/ifb.c b/drivers/net/ifb.c
+index d3dc0914450a..4783d479d1d6 100644
+--- a/drivers/net/ifb.c
++++ b/drivers/net/ifb.c
+@@ -123,8 +123,7 @@ static void ifb_ri_tasklet(struct tasklet_struct *t)
  		}
- 		numa_drop_add(&udp_sk(sk)->drop_counters, nb);
+ 		rcu_read_unlock();
+ 		skb->skb_iif = txp->dev->ifindex;
+-
+-		if (!skb->from_ingress) {
++		if (!qdisc_skb_cb(skb)->from_ingress) {
+ 			dev_queue_xmit(skb);
+ 		} else {
+ 			skb_pull_rcsum(skb, skb->mac_len);
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index 86737076101d..a6df99714a44 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -840,6 +840,7 @@ enum skb_tstamp_type {
+  *	@no_fcs:  Request NIC to treat last 4 bytes as Ethernet FCS
+  *	@encapsulation: indicates the inner headers in the skbuff are valid
+  *	@encap_hdr_csum: software checksum is needed
++ *	@ttl: time to live count when a packet loops.
+  *	@csum_valid: checksum is already valid
+  *	@csum_not_inet: use CRC32c to resolve CHECKSUM_PARTIAL
+  *	@csum_complete_sw: checksum was completed by software
+@@ -1000,6 +1001,9 @@ struct sk_buff {
+ 	/* Indicates the inner headers are valid in the skbuff. */
+ 	__u8			encapsulation:1;
+ 	__u8			encap_hdr_csum:1;
++#ifdef CONFIG_NET_REDIRECT
++	__u8			ttl:2;
++#endif
+ 	__u8			csum_valid:1;
+ #ifdef CONFIG_IPV6_NDISC_NODETYPE
+ 	__u8			ndisc_nodetype:2;
+@@ -1016,9 +1020,6 @@ struct sk_buff {
+ 	__u8			offload_l3_fwd_mark:1;
+ #endif
+ 	__u8			redirected:1;
+-#ifdef CONFIG_NET_REDIRECT
+-	__u8			from_ingress:1;
+-#endif
+ #ifdef CONFIG_NETFILTER_SKIP_EGRESS
+ 	__u8			nf_skip_egress:1;
+ #endif
+@@ -5352,30 +5353,11 @@ static inline bool skb_is_redirected(const struct sk_buff *skb)
+ 	return skb->redirected;
+ }
+ 
+-static inline void skb_set_redirected(struct sk_buff *skb, bool from_ingress)
+-{
+-	skb->redirected = 1;
+-#ifdef CONFIG_NET_REDIRECT
+-	skb->from_ingress = from_ingress;
+-	if (skb->from_ingress)
+-		skb_clear_tstamp(skb);
+-#endif
+-}
+-
+ static inline void skb_reset_redirect(struct sk_buff *skb)
+ {
+ 	skb->redirected = 0;
+ }
+ 
+-static inline void skb_set_redirected_noclear(struct sk_buff *skb,
+-					      bool from_ingress)
+-{
+-	skb->redirected = 1;
+-#ifdef CONFIG_NET_REDIRECT
+-	skb->from_ingress = from_ingress;
+-#endif
+-}
+-
+ static inline bool skb_csum_is_sctp(struct sk_buff *skb)
+ {
+ #if IS_ENABLED(CONFIG_IP_SCTP)
+diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+index c3a7268b567e..ee494310165f 100644
+--- a/include/net/sch_generic.h
++++ b/include/net/sch_generic.h
+@@ -459,6 +459,7 @@ struct qdisc_skb_cb {
+ 	u8			post_ct:1;
+ 	u8			post_ct_snat:1;
+ 	u8			post_ct_dnat:1;
++	u8			from_ingress:1;
+ };
+ 
+ typedef void tcf_chain_head_change_t(struct tcf_proto *tp_head, void *priv);
+@@ -1140,6 +1141,25 @@ static inline void qdisc_dequeue_drop(struct Qdisc *q, struct sk_buff *skb,
+ 	q->to_free = skb;
+ }
+ 
++static inline void skb_set_redirected(struct sk_buff *skb, bool from_ingress)
++{
++	skb->redirected = 1;
++#ifdef CONFIG_NET_REDIRECT
++	qdisc_skb_cb(skb)->from_ingress = from_ingress;
++	if (qdisc_skb_cb(skb)->from_ingress)
++		skb_clear_tstamp(skb);
++#endif
++}
++
++static inline void skb_set_redirected_noclear(struct sk_buff *skb,
++					      bool from_ingress)
++{
++	skb->redirected = 1;
++#ifdef CONFIG_NET_REDIRECT
++	qdisc_skb_cb(skb)->from_ingress = from_ingress;
++#endif
++}
++
+ /* Instead of calling kfree_skb() while root qdisc lock is held,
+  * queue the skb for future freeing at end of __dev_xmit_skb()
+  */
+diff --git a/net/netfilter/nft_fwd_netdev.c b/net/netfilter/nft_fwd_netdev.c
+index 152a9fb4d23a..d62c856ef96a 100644
+--- a/net/netfilter/nft_fwd_netdev.c
++++ b/net/netfilter/nft_fwd_netdev.c
+@@ -16,6 +16,7 @@
+ #include <net/netfilter/nf_dup_netdev.h>
+ #include <net/neighbour.h>
+ #include <net/ip.h>
++#include <net/sch_generic.h>
+ 
+ struct nft_fwd_netdev {
+ 	u8	sreg_dev;
+diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+index 91c96cc625bd..fec5a5763fcb 100644
+--- a/net/sched/act_mirred.c
++++ b/net/sched/act_mirred.c
+@@ -318,8 +318,10 @@ static int tcf_mirred_to_dev(struct sk_buff *skb, struct tcf_mirred *m,
+ 
+ 		skb_set_redirected(skb_to_send, skb_to_send->tc_at_ingress);
+ 
++		skb_to_send->ttl++;
+ 		err = tcf_mirred_forward(at_ingress, want_ingress, skb_to_send);
+ 	} else {
++		skb_to_send->ttl++;
+ 		err = tcf_mirred_forward(at_ingress, want_ingress, skb_to_send);
+ 	}
+ 	if (err)
+@@ -434,7 +436,8 @@ TC_INDIRECT_SCOPE int tcf_mirred_act(struct sk_buff *skb,
+ #else
+ 	xmit = this_cpu_ptr(&softnet_data.xmit);
+ #endif
+-	if (unlikely(xmit->sched_mirred_nest >= MIRRED_NEST_LIMIT)) {
++
++	if (skb->ttl >= MIRRED_NEST_LIMIT - 1) {
+ 		net_warn_ratelimited("Packet exceeded mirred recursion limit on dev %s\n",
+ 				     netdev_name(skb->dev));
+ 		return TC_ACT_SHOT;
 -- 
 2.34.1
 
