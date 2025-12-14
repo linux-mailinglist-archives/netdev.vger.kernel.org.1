@@ -1,151 +1,150 @@
-Return-Path: <netdev+bounces-244607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244608-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80F0FCBB530
-	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 01:17:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8293CCBB545
+	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 01:41:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9C062300983B
-	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 00:17:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0546B300983E
+	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 00:41:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B18F03E47B;
-	Sun, 14 Dec 2025 00:17:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WdG15sA4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B416015ECD7;
+	Sun, 14 Dec 2025 00:41:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B1C52940B
-	for <netdev@vger.kernel.org>; Sun, 14 Dec 2025 00:17:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D03CF2EB10;
+	Sun, 14 Dec 2025 00:40:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765671422; cv=none; b=oANp6bWVtX/tRPbmUtetato2zIoUIyeFPtlTaoTQncl03wsqZ4CmA2u70wZ61dy0KAHb/JppohftzmnERZ2YnMJiYJtVNirSN6kJt9pe2RQsSiTTiQtQcnUKwmlb/2uzFXqB6Ed2gh7Bl3nPHX7JI5/gu7/+ib3UfxxYpLQNgQI=
+	t=1765672862; cv=none; b=H97OB5S78yEb7GguSa5JMhNZut/eJ9teP3ca/BNANTWW/zVNZlhgmAxlDpmG5pst8kQoRXIl1lxD08VNc+usNQPUibyJU5y3q3T84fdiTp+kzKOgy5+HdqfYW2jkQOqwH9tGKOrbS+Og0PkICKFN20lEDy7xHHR+5MMFYmbaNw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765671422; c=relaxed/simple;
-	bh=4YnEvx2T6wIO+k4WvLZdUk0ePYrHjCLTLqetUiCY3HQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RSIlgllfTfeeC2+wrhBZ7quDBQNNaB7HqSPNWjgWskAy+hfnRM20c/8dYLe2O5YqPQ7iyn2/nNfyUekv+aC4lG1s16M5z0Fs2YtgeafWmRZUONnE2fHfQMjAnIOUgJ8A/TTezCFUIwxXZ9BzVKX+KFqbsdqejTKfFHiap5epVtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WdG15sA4; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-34c3259da34so868403a91.2
-        for <netdev@vger.kernel.org>; Sat, 13 Dec 2025 16:17:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765671420; x=1766276220; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=SXb+PpQxABhg5OSvFmLR0g0fj9WnLmBsWI+vQOQf3z8=;
-        b=WdG15sA4A7A7aPrFFc3sLoB6Vmw+yYCy4U6Rv1dQvYwjYV54kKayP5jZfVnk7Xt6c7
-         q01tcBcdUNnq4g616MTUFJL66uPDUYZhxzQyKb0z5D4n+NORMZGPCHmZVh+xmcKR6lhA
-         vgbHJpf/QooXqSeXQl/GVPj4y4/MmxwoJe3vFoG48XswrpJjR7fNnnL+ty9v9iEmHeJ3
-         Hku45/J7vU+bDZmKNxWWIjD4UCH1Akjg+42bUXRgmsMwT7wKUuHZLtOTdyZA6E16PLAg
-         Ychf1QlT9c1fyp14Hnqjri7YeL/6YMSazJfP9vppf28W25NH3STFl6OHeHU2v6381B6H
-         /0zw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765671420; x=1766276220;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SXb+PpQxABhg5OSvFmLR0g0fj9WnLmBsWI+vQOQf3z8=;
-        b=ONYtoOP/H23L0M2U7LFL5pEVdv7yjXEbSt7LAuBIV/Cdso1eGn9yA/KkIT/CVhRD5J
-         US+RN1g93MlnPeCyocXyFVnXTvfh4Ql9N8mDgsiOOdRvkpy75STnn2kFCW14VXDCdWtf
-         QUT93s5MmZH4kt6ZLSAPgjtp9r96xmoCmF3Qgb64XBSVlX5UCtthICKOtVRegXlSk6eL
-         bZnpSDVhPO5myktGFG0x/5IWZ5Jl3vMAyJemJYdP5HIWPXpb9gglCPHqELYl9tnXUJ6b
-         deT4/haXfV7MkwzxVAS1dyyyDz9DXgljqCaufKl2xpAsfeeoBOkvmPUSrvs6Jajyo0AI
-         c+LA==
-X-Forwarded-Encrypted: i=1; AJvYcCX5SkTwJ+o+SIc6ohy01jOe/SSeNtd28yULkBTU/Z6+bHPjCeix0PAXyP8lgXQ64j41fQbkAZc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhOxazBhd00n+Bn4Wn8P9RrJl8Gjlc7BQMMV3/d0fdSTmqz/P1
-	IXvUW2igXKwnP/jDr7j5B4MthlQJw73qdWcK847PzvtpMrk1iQU/SaHc
-X-Gm-Gg: AY/fxX6FZtT2RfRbt98cQXlFsENxWQpOK73yk8h4gw3NgCQWY0rSXGSbEqJ8I7x7FLq
-	6vGCCpDW+YaIPBSozgXCZQRSfY7aZGsY+t4+4RzlAsnyc26teP34a3lGD3btehabBNeIu41go22
-	LkeE08pQFcIjVnwLDFjSLecIox1lg9VD4XBKp/nSPpXRdfcZ6+lLyADgZhkE4RGZqIdoEjy0AZc
-	Pe6AFRWzSEMOuwJQ0syNLl4YK6XGvlp3ZaUbJiLt1Zwq8XLihCB64p/Ta8fi97bO4fHUTSx+Z7Z
-	XnijGJX4W85Bzyzx5Xua7R9um69/25FJ4nQeWfkyA9QbuElMQwmWorowZpbXixsgJHHUt4ZmYb/
-	0skoJRrJxiJpk/oEhQ1pCDT4CpNcibXgxGWTXDQVbUaSNnAwLlgFJ7miJFEVRYgYIF6Wrk9Nzmk
-	PsGb2YVfxspCFEmgt8UrN2iHz1Sj2cBj6SLct5VaU=
-X-Google-Smtp-Source: AGHT+IEkbvehZPfODyds5PjOrUhsAgbJg/nqkZZGsbOgiCeo9uXm0nw94C/8hUoQCovwSJ1Mg9OSIg==
-X-Received: by 2002:a17:90b:2749:b0:33b:ba50:fccc with SMTP id 98e67ed59e1d1-34abe477fc1mr5621266a91.18.1765671420426;
-        Sat, 13 Dec 2025 16:17:00 -0800 (PST)
-Received: from localhost.localdomain ([202.164.139.255])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34abe216c54sm5212504a91.7.2025.12.13.16.16.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 13 Dec 2025 16:17:00 -0800 (PST)
-Received: (nullmailer pid 1127174 invoked by uid 1000);
-	Sun, 14 Dec 2025 00:14:10 -0000
-From: Kathara Sasikumar <katharasasikumar007@gmail.com>
-To: alex.aring@gmail.com, stefan@datenfreihafen.org, miquel.raynal@bootlin.com
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, linux-wpan@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, shuah@kernel.org, skhan@linuxfoundation.org, Kathara Sasikumar <katharasasikumar007@gmail.com>, syzbot+60a66d44892b66b56545@syzkaller.appspotmail.com
-Subject: [PATCH] mac802154: fix uninitialized security header fields
-Date: Sun, 14 Dec 2025 00:13:39 +0000
-Message-ID: <20251214001338.1127132-2-katharasasikumar007@gmail.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1765672862; c=relaxed/simple;
+	bh=KxcnItTyRqm0LRhEBw+W8qCpjohBWywOpOR/gma97Fg=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=LfoitWafaF8jYlR0LTtIhdQK9zB148+ZWtnNfk0sJUkMgp3pEfskVCmFJQm1AY9q9kudfOX+xo6qpNi6885ZOhCTNNsZ+nTsMWHo/tEwp80JqoqvNjYtOZ8TCWXXfsTRx3vCHmvCCcDYqV7jKyKqa56yEksU9IAeYHPYfZfw+z8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.99)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1vUaAG-000000006kv-1ze4;
+	Sun, 14 Dec 2025 00:40:44 +0000
+Date: Sun, 14 Dec 2025 00:40:40 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
+	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
+	Juraj Povazanec <jpovazanec@maxlinear.com>,
+	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	"Livia M. Rosu" <lrosu@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: [RFC PATCH v2 net-next 0/4] net: dsa: initial support for MaxLinear
+ MxL862xx switches
+Message-ID: <cover.1765671579.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-KMSAN reported an uninitialized-value access in
-ieee802154_hdr_push_sechdr(). This happened because
-mac802154_set_header_security() allowed frames with cb->secen=1 but
-LLSEC disabled when secen_override=0, leaving parts of the security
-header uninitialized.
+Hi,
 
-Fix the validation so security-enabled frames are rejected whenever
-LLSEC is disabled, regardless of secen_override. Also clear the full
-header struct in the header creation functions to avoid partial
-initialization.
+This series adds very basic DSA support for the MaxLinear MxL86252
+(5 PHY ports) and MxL86282 (8 PHY ports) switches. The intent is to
+validate and get feedback on the overall approach and driver structure,
+especially the firmware-mediated host interface.
 
-Reported-by: syzbot+60a66d44892b66b56545@syzkaller.appspotmail.com
-Tested-by: syzbot+60a66d44892b66b56545@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=60a66d44892b66b56545
-Signed-off-by: Kathara Sasikumar <katharasasikumar007@gmail.com>
----
- net/mac802154/iface.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+MxL862xx integrates a firmware running on an embedded processor (Zephyr
+RTOS). Host interaction uses a simple API transported over MDIO/MMD.
+This series includes only what's needed to pass traffic between user
+ports and the CPU port: relayed MDIO to internal PHYs, basic port
+enable/disable, and CPU-port special tagging.
 
-diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
-index 9e4631fade90..a1222c1b62b3 100644
---- a/net/mac802154/iface.c
-+++ b/net/mac802154/iface.c
-@@ -328,8 +328,14 @@ static int mac802154_set_header_security(struct ieee802154_sub_if_data *sdata,
- 
- 	mac802154_llsec_get_params(&sdata->sec, &params);
- 
--	if (!params.enabled && cb->secen_override && cb->secen)
--		return -EINVAL;
-+	if (!cb->secen_override) {
-+        	if (!params.enabled)
-+                	return 0;
-+	} else {
-+        	if (cb->secen && !params.enabled)
-+                	return -EINVAL;
-+	}
-+
- 	if (!params.enabled ||
- 	    (cb->secen_override && !cb->secen) ||
- 	    !params.out_level)
-@@ -366,7 +372,7 @@ static int ieee802154_header_create(struct sk_buff *skb,
- 	if (!daddr)
- 		return -EINVAL;
- 
--	memset(&hdr.fc, 0, sizeof(hdr.fc));
-+	memset(&hdr, 0, sizeof(hdr));
- 	hdr.fc.type = cb->type;
- 	hdr.fc.security_enabled = cb->secen;
- 	hdr.fc.ack_request = cb->ackreq;
-@@ -432,7 +438,7 @@ static int mac802154_header_create(struct sk_buff *skb,
- 	if (!daddr)
- 		return -EINVAL;
- 
--	memset(&hdr.fc, 0, sizeof(hdr.fc));
-+	memset(&hdr, 0, sizeof(hdr));
- 	hdr.fc.type = IEEE802154_FC_TYPE_DATA;
- 	hdr.fc.ack_request = wpan_dev->ackreq;
- 	hdr.seq = atomic_inc_return(&dev->ieee802154_ptr->dsn) & 0xFF;
+Thanks for taking a look.
+
+
+Changes since initial RFC
+
+1/4 dt-bindings: net: dsa: add bindings for MaxLinear MxL862xx
+ * better description in dt-bindings doc
+
+2/4 net: dsa: add tag formats for MxL862xx switches
+ * make sure all tag fields are initialized
+
+3/4 net: mdio: add unlocked mdiodev C45 bus accessors
+ * new patch
+
+4/4 net: dsa: add basic initial driver for MxL862xx switches
+ * make use of struct mdio_device
+ * add phylink_mac_ops stubs
+ * drop leftover nonsense from mxl862xx_phylink_get_caps()
+ * fix endian conversions
+ * use __le32 instead of enum types in over-the-wire structs
+ * use existing MDIO_* macros whenever possible
+ * simplify API constants to be more readable
+ * use readx_poll_timeout instead of open-coding poll timeout loop
+ * add mxl862xx_reg_read() and mxl862xx_reg_write() helpers
+ * demystify error codes returned by the firmware
+ * add #defines for mxl862xx_ss_sp_tag member values
+ * move reset to dedicated function, clarify magic number being the
+   reset command ID
+
+Daniel Golle (4):
+  dt-bindings: net: dsa: add bindings for MaxLinear MxL862xx
+  net: dsa: add tag formats for MxL862xx switches
+  net: mdio: add unlocked mdiodev C45 bus accessors
+  net: dsa: add basic initial driver for MxL862xx switches
+
+ .../bindings/net/dsa/maxlinear,mxl862xx.yaml  | 162 ++++++++
+ MAINTAINERS                                   |   8 +
+ drivers/net/dsa/Kconfig                       |   2 +
+ drivers/net/dsa/Makefile                      |   1 +
+ drivers/net/dsa/mxl862xx/Kconfig              |  12 +
+ drivers/net/dsa/mxl862xx/Makefile             |   3 +
+ drivers/net/dsa/mxl862xx/mxl862xx-api.h       | 118 ++++++
+ drivers/net/dsa/mxl862xx/mxl862xx-cmd.h       |  28 ++
+ drivers/net/dsa/mxl862xx/mxl862xx-host.c      | 229 +++++++++++
+ drivers/net/dsa/mxl862xx/mxl862xx-host.h      |   4 +
+ drivers/net/dsa/mxl862xx/mxl862xx.c           | 361 ++++++++++++++++++
+ drivers/net/dsa/mxl862xx/mxl862xx.h           |  24 ++
+ include/linux/mdio.h                          |  13 +
+ include/net/dsa.h                             |   2 +
+ net/dsa/Kconfig                               |   7 +
+ net/dsa/Makefile                              |   1 +
+ net/dsa/tag_mxl862xx.c                        | 113 ++++++
+ 17 files changed, 1088 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/dsa/maxlinear,mxl862xx.yaml
+ create mode 100644 drivers/net/dsa/mxl862xx/Kconfig
+ create mode 100644 drivers/net/dsa/mxl862xx/Makefile
+ create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx-api.h
+ create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx-cmd.h
+ create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx-host.c
+ create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx-host.h
+ create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx.c
+ create mode 100644 drivers/net/dsa/mxl862xx/mxl862xx.h
+ create mode 100644 net/dsa/tag_mxl862xx.c
+
 -- 
-2.51.0
-
+2.52.0
 
