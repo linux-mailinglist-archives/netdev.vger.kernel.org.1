@@ -1,109 +1,146 @@
-Return-Path: <netdev+bounces-244617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2734CBB934
-	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 11:14:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D7C2CBB974
+	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 11:29:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 850283001FCD
-	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 10:14:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2AF5630056DB
+	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 10:29:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3672D28E571;
-	Sun, 14 Dec 2025 10:14:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 598F127B359;
+	Sun, 14 Dec 2025 10:29:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="P1Kx3/iD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f1gH0XsH"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f52.google.com (mail-yx1-f52.google.com [74.125.224.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 145C6287505;
-	Sun, 14 Dec 2025 10:14:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA351155389
+	for <netdev@vger.kernel.org>; Sun, 14 Dec 2025 10:29:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765707249; cv=none; b=lLs6pdRYZZvZ+7sXWXHMdOAAwsJDq/Qob9/M6bUq7okJku5o2zL0OGm3YpPhb/F3kC0eA3vSo+tgXGylo/GVFvYWhfjU0MEiZsk9qp+mIQ2e9CckPQ6vPQ0gB2Bc0cQY1Gqo1HMQm1s3UKCZFEX/TxBr6B7SYcXaOx65rpdZJag=
+	t=1765708176; cv=none; b=HyGOam6R29y84Oe7wemGD65Z9ak6TJ+SIAmZToNUwVxpPo98Q5lmW8rJRnbuHzJpgk5+zYYey57gOTD0Ue1hZVbX3ks/iY+uCVXGFilUn+JHZB9SQs4rDq1yD0/g8uYJ53DKQoV4XAnpk+SKB8daH3Vj6JE4FT2/gCfexNJlx4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765707249; c=relaxed/simple;
-	bh=XlSU56szVhQgrcQeRl+5gH1+exER6ztV8KCHTdNmhOA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RsRS5v51xpeFsLFkpXAEylcSZOFhtPBWLnW73pQbQ73QKSkmY3LtZRDsw2EpbAbkFzqc9YqufAcWUBOxlgTJHT1vQSyIP/qM/eVHgCS6DM8yjEdRo/8TElnpQmjiaKkfcKuur0EgKrSci35z6lfTnhXAgw60QPpqrc3inXiYxgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=P1Kx3/iD; arc=none smtp.client-ip=117.135.210.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=kb
-	i/ttDQOId+XDKOmaeNna6XQhSMKUgACh/eiMz2aTA=; b=P1Kx3/iDO+ByQIDRyz
-	i2+d6lXZO6uhWVSKVV+BwZBPv+naPOjJ38Pmv5870gMdQeUUvXIUi4XZiDYtoiTR
-	vP5G6F2yPsKS6eRFQxb8N+koUj5odZciXPFGoPQaEPMXvywGojB7Beh6267Updks
-	bb0tIiwc3+YT3cIgXCVJoGmg8=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g1-2 (Coremail) with SMTP id _____wAXpgapjT5p7CRRAQ--.14065S4;
-	Sun, 14 Dec 2025 18:13:13 +0800 (CST)
-From: David Wang <00107082@163.com>
-To: ziyao@disroot.org,
-	thostet@google.com
-Cc: daniel.gabay@intel.com,
-	jeffbai@aosc.io,
-	johannes.berg@intel.com,
-	kexybiscuit@aosc.io,
-	linux-kernel@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	miriam.rachel.korenblit@intel.com,
-	nathan@kernel.org,
-	netdev@vger.kernel.org,
-	pagadala.yesu.anjaneyulu@intel.com,
-	richardcochran@gmail.com
-Subject: Re: [PATCH iwlwifi-fixes] wifi: iwlwifi: Implement settime64 as stub for MVM/MLD PTP
-Date: Sun, 14 Dec 2025 18:12:57 +0800
-Message-ID: <20251214101257.4190-1-00107082@163.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251204123204.9316-1-ziyao@disroot.org>
-References: <20251204123204.9316-1-ziyao@disroot.org>
+	s=arc-20240116; t=1765708176; c=relaxed/simple;
+	bh=C6l1ufEOemw8wDjqnO0b4oa6vhXSfwQ33CIk4d9RKuA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VrArqTgQEYG/UBlhYm0m3qZOJPVTiMzccArcp4kcaoydifbu3yC0ll1Uj8fnP0KJpC+xBBnham49+uuwT/j2YAPbcMO7D9ak/AQoP8tNTfRcv6u6rWTLjAxaqyuHVVJrO6L/VoTe/nDKEPbTOw42myLfOnXM7AWhXMmhT+KejFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f1gH0XsH; arc=none smtp.client-ip=74.125.224.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-6455a60c12bso1388662d50.3
+        for <netdev@vger.kernel.org>; Sun, 14 Dec 2025 02:29:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765708173; x=1766312973; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=APUZ/fpPVqueV9oc4vPO3W1N5VqnQjnZ6bozLKKB4IQ=;
+        b=f1gH0XsH/iWjY9o1V4MoEFNIQ+t7ueGDT3Y/IuMeSfB9zhYtaH3/gLv0G64+pkiKlO
+         mnqtwEwkJkWjibZ4q8F/8XoES3yd0UtbTwvN96e8tqlFm/FLUacPiWmXirawM0YLuCPV
+         IApa1QVjc/NPnKWAQA6C2zYH3Ol3HmhbKyfLvu8MH3qQsJnByTZj676DMYnJCsxAl2U2
+         oiQRKWyXpHN5ogYX0RLw8DQHa76VKkA82WgiXLT5tu7j/CDqeo0HATmblXl1OKmv9U5U
+         pN5a0AwU7D4z353xTqWlA8Zd1SslePUkEYok+/fqYLYJ1UCgp+9MSRRlNT1pyxfDlnX+
+         5jag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765708173; x=1766312973;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=APUZ/fpPVqueV9oc4vPO3W1N5VqnQjnZ6bozLKKB4IQ=;
+        b=qL128NVmPcTdCsepk1Iv1ssB7yOn12a8PzkrIrEwSawSCpJoqA1iKV1g1P4uG0INw6
+         f5YjJPMaPXFrA4dOUbiQhzRPPk6eQeEaVVRYuvhs0bELAB9CpHXSw8reJ4PXyZDZ832Z
+         Zez1RUwOXnaORxMxtxkzk6HZKAtCvfDwANzevRFxVZxLPGWQt/9sFM+aLsh7RjQxWrPn
+         jx6w9hUmwiDGsvqnXJ6FzZSMVlpoWVCg9Ycf0gh6SE9LtLwUB+kavkB8BwKS1C0/Zr37
+         DnZn8mF9DxBTCBApzV9pAYdCPE2DEVt9jIHJGhOqy2F7GkhuDt/yCrg/Wt5WH9vCXrwG
+         GK4g==
+X-Gm-Message-State: AOJu0YzPi/K0CuTKwePsbauf6+/IDYqsDSWMCRlfC3sua1LI2qcEizm1
+	+UH0Qi8waIZNCtPNbtyQBvn4Hc0ZslrQnnqHDwa+sSV/3n/xn0jbOQAuj6iSc5VUQHsIrmWHN9w
+	dF0Vy3Rn+tCBXPm0PV8qIzI3+TC+/N6Y/EDLCw9g=
+X-Gm-Gg: AY/fxX6Is7+Q784HPiFpiUcIjC0FXe+T85yrRc83zRlP+UA8mRoVZXqC2bX42QRE7I2
+	hb+PxZ44KRULtXTQcRvNqOrMmogWnFgcm/IdBB6BExwRxWTbwBVTqZPc6YSygwDg2dpOhLf8NbB
+	/cAOlrfp+RZ6eEZmR/v70IRpECBqzuSVes6gxyIH29pm/mEMVIfGXNYWrsrmcGp/29AKyFiVMqF
+	JG+OYy9mw+ByY7tfBvwYV3kLfeejhB9+rrFPRY0sN/JrIgzpGvv7k4nTR8hoVPOaOWpFevzwumP
+	KVAQRA==
+X-Google-Smtp-Source: AGHT+IHWM0wLbnNx0jcHZQuSLepq0Mvn6Fta5xO8cU9QkuFapBBoQpQUqTNX3qWiyLQKPXX8KvCRgc2UGbSWdCbRdxg=
+X-Received: by 2002:a05:690e:1206:b0:63f:9979:2f9e with SMTP id
+ 956f58d0204a3-645555cdb95mr6343827d50.17.1765708173577; Sun, 14 Dec 2025
+ 02:29:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wAXpgapjT5p7CRRAQ--.14065S4
-X-Coremail-Antispam: 1Uf129KBjvJXoW7WFy7uw18CrW3Zr1xAr18Zrb_yoW8XFyxpa
-	yfGwn8Ar40qFWruFsrta17uas5Gwn3GF42vr1xJwn8Z3WUuFZFga10yrWakasrGws5Aw13
-	XrnF9a1jva1qyw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zRoKZZUUUUU=
-X-CM-SenderInfo: qqqrilqqysqiywtou0bp/xtbC7ht7Jmk+jbtW9QAA3q
+References: <20251213121024.219353-1-mahdifrmx@gmail.com> <CANn89iJnV=ea+bP3LCF7FKVAXrvc5qHd9j9yrgv50-rFaPO0ig@mail.gmail.com>
+In-Reply-To: <CANn89iJnV=ea+bP3LCF7FKVAXrvc5qHd9j9yrgv50-rFaPO0ig@mail.gmail.com>
+From: Mahdi Faramarzpour <mahdifrmx@gmail.com>
+Date: Sun, 14 Dec 2025 13:59:22 +0330
+X-Gm-Features: AQt7F2rNdfQfa8AknrZ4WxSZT2zCPtgwOMzclM-EDjxbp73eUTID5q213-LKsvQ
+Message-ID: <CA+KdSGO_KoQBR0OOa7N7-5d=iRRNbfynundh53zsz-wvzOt-5g@mail.gmail.com>
+Subject: Re: [PATCH net] udp: remove obsolete SNMP TODO
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 04, 2025 at 12:32:04PM +0000, Yao Zi wrote:
-> Since commit dfb073d32cac ("ptp: Return -EINVAL on ptp_clock_register if
-> required ops are NULL"), PTP clock registered through ptp_clock_register
-> is required to have ptp_clock_info.settime64 set, however, neither MVM
-> nor MLD's PTP clock implementation sets it, resulting in warnings when
-> the interface starts up, like
-> 
-> WARNING: drivers/ptp/ptp_clock.c:325 at ptp_clock_register+0x2c8/0x6b8, CPU#1: wpa_supplicant/469
-> CPU: 1 UID: 0 PID: 469 Comm: wpa_supplicant Not tainted 6.18.0+ #101 PREEMPT(full)
-> ra: ffff800002732cd4 iwl_mvm_ptp_init+0x114/0x188 [iwlmvm]
-> ERA: 9000000002fdc468 ptp_clock_register+0x2c8/0x6b8
-> iwlwifi 0000:01:00.0: Failed to register PHC clock (-22)
-> 
-> I don't find an appropriate firmware interface to implement settime64()
-> for iwlwifi MLD/MVM, thus instead create a stub that returns
-> -EOPTNOTSUPP only, suppressing the warning and allowing the PTP clock to
-> be registered.
+On Sat, Dec 13, 2025 at 5:06=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Sat, Dec 13, 2025 at 1:11=E2=80=AFPM Mahdi Faramarzpour <mahdifrmx@gma=
+il.com> wrote:
+> >
+> > The TODO comment demands SNMP counters be increased, and that
+> > is already implemented by the callers of __udp_enqueue_schedule_skb()
+> > which are __udp_queue_rcv_skb() and __udpv6_queue_rcv_skb().
+> >
+> > That makes the TODO obsolete.
+>
+> This is not true.
+>
+> Please carefully read commit b650bf0977d3 ("udp: remove busylock and
+> add per NUMA queues")
+> And perhaps you will see what needs to be changed, thus the TODO .
+>
+> hint : to_drop can contain more than one skb.
+>
+> >
+> > Signed-off-by: Mahdi Faramarzpour <mahdifrmx@gmail.com>
+> > ---
+> >  net/ipv4/udp.c | 1 -
+> >  1 file changed, 1 deletion(-)
+> >
+> > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> > index ffe074cb5..60d549a24 100644
+> > --- a/net/ipv4/udp.c
+> > +++ b/net/ipv4/udp.c
+> > @@ -1797,7 +1797,6 @@ int __udp_enqueue_schedule_skb(struct sock *sk, s=
+truct sk_buff *skb)
+> >                         skb =3D to_drop;
+> >                         to_drop =3D skb->next;
+> >                         skb_mark_not_on_list(skb);
+> > -                       /* TODO: update SNMP values. */
+> >                         sk_skb_reason_drop(sk, skb, SKB_DROP_REASON_PRO=
+TO_MEM);
+> >                 }
+> >                 numa_drop_add(&udp_sk(sk)->drop_counters, nb);
+> > --
+> > 2.34.1
+> >
 
-This seems disturbing....If a null settime64 deserve a kernel WARN dump, so should
-a settime64 which returns error.
+Hi Eric, thanks for your response. Yes I read that commit and now
+one thing remains: SNMP stats are per-cpu. Is it necessary that
+the counter corresponding to the original cpu which put the skb in
+the prod queue be increased? Or can we just do with increasing that
+of the cpu which drops them?
+The only place that I saw we use those counters is net/ipv4/proc.c
+which calculates their sum with snmp_get_cpu_field_batch_cnt, so
+their individual values does not seem to concern us at this point.
+Sorry if the question sounds noobie, it's actually my first time
+contributing.
+If you're positive with that, I'll submit another patch.
 
-Before fixing the warning, the expected behavior of settime64 should be specified clearly,
-hence why the dfb073d32cac ("ptp: Return -EINVAL on ptp_clock_register if required ops are NULL")?
-
-
-
-David
-
-> 
-> Reported-by: Nathan Chancellor <nathan@kernel.org>
-> Closes: https://lore.kernel.org/all/20251108044822.GA3262936@ax162/
-> Signed-off-by: Yao Zi <ziyao@disroot.org>
-> ---
-
+cheers
+Mahdi
 
