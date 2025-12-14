@@ -1,145 +1,103 @@
-Return-Path: <netdev+bounces-244630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A20ACBBB45
-	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 14:54:53 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63774CBBB54
+	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 15:04:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 5319630010DF
-	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 13:54:49 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4E8AA3003BD5
+	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 14:04:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 043392528FD;
-	Sun, 14 Dec 2025 13:54:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF3CD1E5B68;
+	Sun, 14 Dec 2025 14:04:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IeU8RZ4j"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="fNf3DOHI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E0A11EA65
-	for <netdev@vger.kernel.org>; Sun, 14 Dec 2025 13:54:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 798493B8D68;
+	Sun, 14 Dec 2025 14:04:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765720485; cv=none; b=f3iXkq4N1+GFaPnP5e+RVVcr3k9JNoh3SWM1bkG3sIzgwe8vN62g3BBAKFmo3ip+wuVLAe1dN5XuRD8kxVOOrH/yVQBNC0RUJc8wy3VyFllkf801ZftOFu6z3V1fJtshwdhYASQawkJxwSYipXlRwEi38n2AUle0BqLusqtsNRE=
+	t=1765721051; cv=none; b=p8If9PH4LpSjXN0EWA0sO5hpxzoesfWoqMRHE1SdbduPYsgL3udXQxVOXJpGw2BeGUtJsNF+z4Ii+KQaMKDDTcyiac8EWgLyHYZ+s97Kl2FzzqJEOQTOZXINRLuG4PEyzZ5FSjl65GsndV/XY7zzoco13YI0Sir/W31eORF0ShM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765720485; c=relaxed/simple;
-	bh=PjGrwWZV81DPFzMQNA4x3xriIjb0S8YAsDZbn2pcA6U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=R4HAQFQaD8LiZZr2UlkMwduWQ8oWtn8XeTpL8zPGpzoMp1Ceh20o0SPbx8xTnf3zBK831ZjUEN3hIJsOARL6u8iUHakaPHyvN5DuELL/iasTWxQHDSjH9pDZQazarx2YeoVz0KVqmazXVreGaQ3b4WZ7xcT45dABH2O2mFno0Ks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IeU8RZ4j; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4777771ed1aso20254005e9.2
-        for <netdev@vger.kernel.org>; Sun, 14 Dec 2025 05:54:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765720482; x=1766325282; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A27ILOHpvAtHnE+6lvnDEAst4fggOFaoxUBA4wWZFjE=;
-        b=IeU8RZ4jvC+WmapLF9dlbFIqlZbg18sWO66y0ieYZj/Ak4RFOZjMZhWNhuRjUdEBE0
-         SUBI6M+r1oB70c0wiptn2g9iiEW/9PZBIRigRaWesnU/cYAkj6nG4wnXj7H419j69u1+
-         6FRtAeP+wJl8hOWkUVACQmSTdZDOSUdgkKUAZmkQBRFkzrZznwp5sIUTzchbqcn/mu5X
-         AaeCFBMXGB081ZlOL9cvin/GH683T0R1WuGSTLvpysl4HzHj0566Do0aGkoz+r2xon1V
-         Y1zvl+Z7vbjYpAYVvYYubyiX5SEoYYaP/B69bPN43l6bkZ4yuVAoiKR4GSjZbCGeXQgQ
-         Bpcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765720482; x=1766325282;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=A27ILOHpvAtHnE+6lvnDEAst4fggOFaoxUBA4wWZFjE=;
-        b=sPamqoj1X++WcIGU4JFt+2udv8wFQ+RnWYd6Dj4g8kABR8V8NL4v/5a8/dL8uDd0BQ
-         dEDaCQ4JkwC6QjK30cUAQ2AEfyxkIqsS8nBdcIVr9cY5c89oxIj0p8mopH0eoHtewkkc
-         9+O95LIj9mtYY9VywUlfFDskkbDfsEczy2T/uDXjDvxjy4DrVYdVaKxWy2UAKFg/YmHr
-         Xzrg8J1XVCl+P+Swl9t0Cw179hPk5FFO5vGNpbevp/Z9Visl1dsaiw0ZxUPv4r6kPmRs
-         XMiqklUrBPPKtTG0eu9DRAn8xkQcZ/F3h66ScHabN36U8DSV6dHpUFmURnsSd18p1WCJ
-         IIVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVUtwKGUBkGblC6cpLUgSH4R/iUSO12msKnXIHfxjBAurUVKI3d15dbynWZOFjNu4UA7JREFyc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjbcXcvFFpfHDs1Uv2rIaZHqU22K1H+rrn5TN6kz0aADfzLjGe
-	9gt+l1/1b7M8sc1n3eG2W6dTc7pp/7ypuz484FLQHEt/KMu9/TgqR/nG
-X-Gm-Gg: AY/fxX6NmoGqkYY0iIpgnJd1hjUjDt1xdPNltewsgsHi7OBi8n6z8rwzM02hWgddoCd
-	oB0PZkiri3EXN2hbJ68vzFNYelfADMDHKdnmuZ5hNvU/KLSOysY+B84P5YV/JgX+eYVRsGOL2ce
-	cUnGLVHSvG8DBJYLCBFiPCVts0+REyp9KxJClpY3EIpQPcGQFuR3oCJ1pk2R7+/TeZZ0Y0N4XBj
-	x23KB8OD2I/0j5lCSsub0gz0+1fzqtGDvy5OJaiqIrnpw2jHbSbf4CqzkTpkusIeMfztftFbi5Q
-	6PnJJeOH8x1+Kh8h1gOA9//kLjdfDKnFBo/TOZbeEtrfL17wyGb7kioThKEBfl10dqsBdE6bRPV
-	gx2ak94zBSy8XjzZz9eHlxDGpcC9AofTGnszSNXmqHV1iQhtN1nUnbQgFgN8Ln7LjDPTb05e/Ds
-	/+6WlJVVgBPisG3nes85iZcU7JHDkAC7Ko1+LYifWgR2VBOMOMWeUb
-X-Google-Smtp-Source: AGHT+IHTxNR+ZUDxw8OLVbLKKhDwZuONnZ52bWZfD6ui4ltu6ALafY6AXlfWh7ujj0ZxW5VYZ5/Z9Q==
-X-Received: by 2002:a05:600c:3ace:b0:46f:b32e:5094 with SMTP id 5b1f17b1804b1-47a8f915c57mr66690115e9.32.1765720482446;
-        Sun, 14 Dec 2025 05:54:42 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47a957de489sm114389375e9.5.2025.12.14.05.54.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Dec 2025 05:54:42 -0800 (PST)
-Date: Sun, 14 Dec 2025 13:54:40 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Ma Ke <make24@iscas.ac.cn>
-Cc: krzk@kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- aloisio.almeida@openbossa.org, lauro.venancio@openbossa.org,
- sameo@linux.intel.com, linville@tuxdriver.com, johannes@sipsolutions.net,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- akpm@linux-foundation.org, stable@vger.kernel.org
-Subject: Re: [PATCH] NFC: Fix error handling in nfc_genl_dump_targets
-Message-ID: <20251214135440.51409316@pumpkin>
-In-Reply-To: <20251214131726.5353-1-make24@iscas.ac.cn>
-References: <20251214131726.5353-1-make24@iscas.ac.cn>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	s=arc-20240116; t=1765721051; c=relaxed/simple;
+	bh=eXX145i+DZx7UCFZb8hqnM/Nrp5M6/VGTiWZnmkfLIs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MnYbBTbQgxPOQf8bnmnqAOl4reeFtddns4rQRZgVCO70Yr18b/fqijQNL/vKKjk1SIaVnT91OauZEV6OBffFkfn7GfWlPZNxGnz2xJaIpPjgA/b1SYXNreiu7GrGXEmGcbtKr00rAHH2Tr2cWV8tfsABuG1Cf2JZ8xUm+zaZiy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=fNf3DOHI; arc=none smtp.client-ip=115.124.30.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1765721039; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=L0lIEk74fxQ1+QFx9nQ74wuO+ycMoCiKrV1YvssNGvw=;
+	b=fNf3DOHI26kZI1i9Jc1DD6n0rCNVIVCCGMMmcg/5/rgWRRJah11Lr5OSjm6Nr9I6Dmg61Isx0OYicjmFvRb4stYdC/F8ax+afABnox4Oe/ynPMUJkRnJQu7yiS+Mk+fy+qR/NYz6cmWsZxuXOvN/QVhYFC4rgXoYw43vV0IwTz8=
+Received: from 30.180.98.196(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WukHqM._1765721037 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Sun, 14 Dec 2025 22:03:58 +0800
+Message-ID: <fb01b35d-55a8-4313-ad14-b529b63c9e04@linux.alibaba.com>
+Date: Sun, 14 Dec 2025 22:03:57 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 1/2] ptp: introduce Alibaba CIPU PHC driver
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Richard Cochran <richardcochran@gmail.com>, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ xuanzhuo@linux.alibaba.com, dust.li@linux.alibaba.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20251030121314.56729-1-guwen@linux.alibaba.com>
+ <20251030121314.56729-2-guwen@linux.alibaba.com>
+ <20251031165820.70353b68@kernel.org>
+ <8a74f801-1de5-4a1d-adc7-66a91221485d@linux.alibaba.com>
+ <20251105162429.37127978@kernel.org>
+ <34b30157-6d67-46ec-abde-da9087fbf318@linux.alibaba.com>
+ <20251127083610.6b66a728@kernel.org>
+ <f2afb292-287e-4f2f-b131-50a1650bbb1d@linux.alibaba.com>
+ <20251128102437.7657f88f@kernel.org>
+ <9a75e3b2-4d1c-4911-81e4-cab988c24b77@linux.alibaba.com>
+ <c92b47cf-3da0-446d-8b8f-674830256143@linux.alibaba.com>
+ <20251213075028.2f570f23@kernel.org>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <20251213075028.2f570f23@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Sun, 14 Dec 2025 21:17:26 +0800
-Ma Ke <make24@iscas.ac.cn> wrote:
 
-> nfc_genl_dump_targets() increments the device reference count via
-> nfc_get_device() but fails to decrement it properly. nfc_get_device()
-> calls class_find_device() which internally calls get_device() to
-> increment the reference count. No corresponding put_device() is made
-> to decrement the reference count.
+
+On 2025/12/13 06:50, Jakub Kicinski wrote:
+> On Fri, 12 Dec 2025 14:50:13 +0800 Wen Gu wrote:
+>> Given that net-next is closed and the EOY break is here, I was wondering
+>> whether the review discussion might continue during this period or should
+>> wait until after the break.
 > 
-> Add proper reference count decrementing using nfc_put_device() when
-> the dump operation completes or encounters an error, ensuring balanced
-> reference counting.
-> 
-> Found by code review.
+> This is a somewhat frustrating thing to hear. My position is that
+> net-next is not the right home for this work, so its status should
+> be irrelevant.
 
-Is that some half-hearted AI code review?
+Hi Jakub, I'm sorry, but I still don't understand why you object to
+this being a PTP clock driver and to placing it under `drivers/ptp`.
+Could you please explain your reasons?
 
-Isn't the 'put' done by nfc_genl_dump_targets_done() which it looks
-like the outer code calls sometime later on.
+You mentioned that it's unrelated to networking, but most of the drivers
+under `drivers/ptp` are also unrelated to networking. PTP implementations
+that are independent of network drivers are placed here.
 
-	David
+If the PTP HARDWARE CLOCK SUPPORT maintainers don't review it, which
+subsystem should I go to?
 
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 4d12b8b129f1 ("NFC: add nfc generic netlink interface")
-> Signed-off-by: Ma Ke <make24@iscas.ac.cn>
-> ---
->  net/nfc/netlink.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/net/nfc/netlink.c b/net/nfc/netlink.c
-> index a18e2c503da6..9ae138ee91dd 100644
-> --- a/net/nfc/netlink.c
-> +++ b/net/nfc/netlink.c
-> @@ -159,6 +159,11 @@ static int nfc_genl_dump_targets(struct sk_buff *skb,
->  
->  	cb->args[0] = i;
->  
-> +	if (rc < 0 || i >= dev->n_targets) {
-> +		nfc_put_device(dev);
-> +		cb->args[1] = 0;
-> +	}
-> +
->  	return skb->len;
->  }
->  
+If you're suggesting creating a new subsystem, I think we should first
+answer this question: why can't it be part of the current ptp subsystem,
+and what are the differences between the drivers under `drivers/ptp`
+and those in the new subsystem?
 
+Thanks, and sorry for bothering you during your EOY break.
+
+Regards.
 
