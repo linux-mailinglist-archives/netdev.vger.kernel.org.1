@@ -1,44 +1,79 @@
-Return-Path: <netdev+bounces-244631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63774CBBB54
-	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 15:04:14 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59319CBBD35
+	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 17:02:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4E8AA3003BD5
-	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 14:04:13 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id F05A130021F1
+	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 16:02:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF3CD1E5B68;
-	Sun, 14 Dec 2025 14:04:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 820D428B4F0;
+	Sun, 14 Dec 2025 16:02:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="fNf3DOHI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mf7aZETZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 798493B8D68;
-	Sun, 14 Dec 2025 14:04:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88CE772602
+	for <netdev@vger.kernel.org>; Sun, 14 Dec 2025 16:02:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765721051; cv=none; b=p8If9PH4LpSjXN0EWA0sO5hpxzoesfWoqMRHE1SdbduPYsgL3udXQxVOXJpGw2BeGUtJsNF+z4Ii+KQaMKDDTcyiac8EWgLyHYZ+s97Kl2FzzqJEOQTOZXINRLuG4PEyzZ5FSjl65GsndV/XY7zzoco13YI0Sir/W31eORF0ShM=
+	t=1765728159; cv=none; b=Knwt86dnOsnvrhSodFiOmxg2sHbGKQQuvKhyNVvqtTYEdaZaMDod14vWGwUIqaf9EiZ5LgNLqUdYhNGc/LIiA4nO+Lzx2cF/oCP/LKPGPRNePgkB8B4nT/Nu05C7a8zptaqlpn4Wu7yElua6Sw+lS3n+sZSHfXVJ5CpwpHFLPoc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765721051; c=relaxed/simple;
-	bh=eXX145i+DZx7UCFZb8hqnM/Nrp5M6/VGTiWZnmkfLIs=;
+	s=arc-20240116; t=1765728159; c=relaxed/simple;
+	bh=WClbA3JP9PBCEQbLahbBZ/+egWdj23cqYt7+rBR+M8Q=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MnYbBTbQgxPOQf8bnmnqAOl4reeFtddns4rQRZgVCO70Yr18b/fqijQNL/vKKjk1SIaVnT91OauZEV6OBffFkfn7GfWlPZNxGnz2xJaIpPjgA/b1SYXNreiu7GrGXEmGcbtKr00rAHH2Tr2cWV8tfsABuG1Cf2JZ8xUm+zaZiy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=fNf3DOHI; arc=none smtp.client-ip=115.124.30.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1765721039; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=L0lIEk74fxQ1+QFx9nQ74wuO+ycMoCiKrV1YvssNGvw=;
-	b=fNf3DOHI26kZI1i9Jc1DD6n0rCNVIVCCGMMmcg/5/rgWRRJah11Lr5OSjm6Nr9I6Dmg61Isx0OYicjmFvRb4stYdC/F8ax+afABnox4Oe/ynPMUJkRnJQu7yiS+Mk+fy+qR/NYz6cmWsZxuXOvN/QVhYFC4rgXoYw43vV0IwTz8=
-Received: from 30.180.98.196(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WukHqM._1765721037 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Sun, 14 Dec 2025 22:03:58 +0800
-Message-ID: <fb01b35d-55a8-4313-ad14-b529b63c9e04@linux.alibaba.com>
-Date: Sun, 14 Dec 2025 22:03:57 +0800
+	 In-Reply-To:Content-Type; b=K5y6m9WUMX7FP5lYOMKhY5/lu9Vw470MXugsQp7IDlI2uWZwFCbK5N5/NiKEuDFthPLsls+e86iYZ9SKjS77mjFGjonqvpQr3XExR+s6f7WfHR+bFWjmGt/mFq1MZeHaKYPWo1x6+T24NGwAq04zhbrJxI/ezufU4i5d7QHMOVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mf7aZETZ; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b736d883ac4so422226566b.2
+        for <netdev@vger.kernel.org>; Sun, 14 Dec 2025 08:02:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765728156; x=1766332956; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1HRjVx+w0FUfej9H+if55vg50Zyzey3BxyfSJanV6SE=;
+        b=Mf7aZETZqpALHFu3VbM2xBuKrNXrWug9+mg7W4T27vSOyLlucNUD8oESoWt0F2BkSd
+         mLNolIohsR43r8TMH5wKcaGvCcf6o44LjbSF61vf1oTzSfkk7KWkrgg7DQ7BRbztASO7
+         1UdxEJSs2bpcLfbWHCa0A8qiMVpGF1xK1BBukWg/Pp48bWthhkQCP0Xgbwe5H6hJMb6x
+         WHzf2AcvdVBu2Js/YZH0Zro/+gAGxWrBJMMIdW3rCL9t+jk+uOixVfX18EdNi15yVXt7
+         MY/yh4PUw45Tw33LCswO9tqVbwdml17/39LzdSOrh7H7bknQqMZyUsfzhB+zzyNrcZCx
+         hw8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765728156; x=1766332956;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1HRjVx+w0FUfej9H+if55vg50Zyzey3BxyfSJanV6SE=;
+        b=mcU3cRf3cNthlI1R8psItTJQlBo0ijD15Uqa+DgmdnmpQhn9t58NIFb7hyibu9sYqi
+         Q7sYUnWVTTbojpFGuPnBqk/dkQqnjfQluxg3k4qJK8OjXuDMZ/yfzgz0aMXKnT1QCmya
+         M3QaXIxYyHP8U3OgiO3IQHcb1MCEIV8+ELUt6DRZ/s5E+jHISR6QnI6+3fTtmTTZwqNi
+         Y+XwwXQqAx0EKmO3uNmug/5RYvy/u7wAFtuyr+fNc+A+b1GMepbHAWJaCagxHHnEyhAm
+         1vO7AXd3LD4rrb2eJY+PJJ9qek87IunLh+c546lxZqblDFSHwET3NlV8S/TXzBKRkb2P
+         D/Tg==
+X-Gm-Message-State: AOJu0Ywm06/YUbZDvAgeeT67zSr8JTVscBnilIvOyfq5DrCCK+f8UhIz
+	TGlhnn0ffxKLKRcEFiy8mKulEk7P4nLgYWSqkriyYMMG3XZV3NqnnA7e1uzjIA==
+X-Gm-Gg: AY/fxX57ME4zKm5rszETABGnB6VkLg0ZCP50yfo7NBRA4IDk5X7W7NmC+HMXEuU107u
+	pe1G8+QYWODbndgqAryiTTcDvcaa6GBecIHkLE2urMYEhhDxpb61PvjEH+WY0d88f46uN52FWPW
+	mfb7xgMqbQyPI4Wuam4DMpayK9krauyC6oV2dqoMBHlOqQ0/KGgGUKzE1IIqS+HqrlRjlF8Ad2t
+	lQb8w1LGe+x6HNypcfqeAGy7GHiH/ITOKc7fuAG3+3EgrEsNXy+feunt3zNld2SL8I+NLYrOzq2
+	iam0ap7A+P5V9fPa1ZknJjWYqNgtNwYoz7PZ1dPky9otVuxPkCoGnpFSEbnll0u4yt1t7jTW9Oo
+	7Qd5T0IamRPFVHSnNPGa7yI8+P3dhHoMdDigR0cLd2EziNurNzn7DguCu0PSJGc2sm76nGv9uyK
+	51AT2Sd+2xv9Gn90XeNKkqFcuX/oNuCAza5DoIra/0lEGzbf4L6YKfPwB7imBnsaNqaWveAYhM
+X-Google-Smtp-Source: AGHT+IFWOX+q/68f3C3UaXjuHgRyTcHnGkkYvoTOTSRdTMz0p4912j7OAGU1Gsmdx9vlNh9tWKRW1Q==
+X-Received: by 2002:a17:907:60cb:b0:b73:880a:fdb7 with SMTP id a640c23a62f3a-b7d238fd2f5mr896492366b.35.1765728155474;
+        Sun, 14 Dec 2025 08:02:35 -0800 (PST)
+Received: from [192.168.0.2] (dslb-002-205-018-238.002.205.pools.vodafone-ip.de. [2.205.18.238])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7cfa29be92sm1132110266b.10.2025.12.14.08.02.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 14 Dec 2025 08:02:34 -0800 (PST)
+Message-ID: <39ba16a9-9b7d-4c26-91b5-cf775a7f8169@gmail.com>
+Date: Sun, 14 Dec 2025 17:02:33 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -46,58 +81,138 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 1/2] ptp: introduce Alibaba CIPU PHC driver
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Richard Cochran <richardcochran@gmail.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- xuanzhuo@linux.alibaba.com, dust.li@linux.alibaba.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20251030121314.56729-1-guwen@linux.alibaba.com>
- <20251030121314.56729-2-guwen@linux.alibaba.com>
- <20251031165820.70353b68@kernel.org>
- <8a74f801-1de5-4a1d-adc7-66a91221485d@linux.alibaba.com>
- <20251105162429.37127978@kernel.org>
- <34b30157-6d67-46ec-abde-da9087fbf318@linux.alibaba.com>
- <20251127083610.6b66a728@kernel.org>
- <f2afb292-287e-4f2f-b131-50a1650bbb1d@linux.alibaba.com>
- <20251128102437.7657f88f@kernel.org>
- <9a75e3b2-4d1c-4911-81e4-cab988c24b77@linux.alibaba.com>
- <c92b47cf-3da0-446d-8b8f-674830256143@linux.alibaba.com>
- <20251213075028.2f570f23@kernel.org>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <20251213075028.2f570f23@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: Re: [PATCH v2] net: dsa: Fix error handling in dsa_port_parse_of
+To: Ma Ke <make24@iscas.ac.cn>, andrew@lunn.ch, olteanv@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, tobias@waldekranz.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ akpm@linux-foundation.org, stable@vger.kernel.org
+References: <20251214131204.4684-1-make24@iscas.ac.cn>
+From: Jonas Gorski <jonas.gorski@gmail.com>
+Content-Language: en-US
+In-Reply-To: <20251214131204.4684-1-make24@iscas.ac.cn>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
+Hi,
 
+On 12/14/25 14:12, Ma Ke wrote:
+> When of_find_net_device_by_node() successfully acquires a reference to
 
-On 2025/12/13 06:50, Jakub Kicinski wrote:
-> On Fri, 12 Dec 2025 14:50:13 +0800 Wen Gu wrote:
->> Given that net-next is closed and the EOY break is here, I was wondering
->> whether the review discussion might continue during this period or should
->> wait until after the break.
+Your subject is missing the () of dsa_port_parse_of()
+
+> a network device but the subsequent call to dsa_port_parse_cpu()
+> fails, dsa_port_parse_of() returns without releasing the reference
+> count on the network device.
 > 
-> This is a somewhat frustrating thing to hear. My position is that
-> net-next is not the right home for this work, so its status should
-> be irrelevant.
+> of_find_net_device_by_node() increments the reference count of the
+> returned structure, which should be balanced with a corresponding
+> put_device() when the reference is no longer needed.
+> 
+> Found by code review.
 
-Hi Jakub, I'm sorry, but I still don't understand why you object to
-this being a PTP clock driver and to placing it under `drivers/ptp`.
-Could you please explain your reasons?
+I agree with the reference not being properly released on failure,
+but I don't think this fix is complete.
 
-You mentioned that it's unrelated to networking, but most of the drivers
-under `drivers/ptp` are also unrelated to networking. PTP implementations
-that are independent of network drivers are placed here.
+I was trying to figure out where the put_device() would happen in
+the success case (or on removal), and I failed to find it.
 
-If the PTP HARDWARE CLOCK SUPPORT maintainers don't review it, which
-subsystem should I go to?
+Also if the (indirect) top caller of dsa_port_parse_of(),
+dsa_switch_probe(), fails at a later place the reference won't be
+released either.
 
-If you're suggesting creating a new subsystem, I think we should first
-answer this question: why can't it be part of the current ptp subsystem,
-and what are the differences between the drivers under `drivers/ptp`
-and those in the new subsystem?
+The only explicit put_device() that happens is in
+dsa_dev_to_net_device(), which seems to convert a device
+reference to a netdev reference via dev_hold().
 
-Thanks, and sorry for bothering you during your EOY break.
+But the only caller of that, dsa_port_parse() immediately
+calls dev_put() on it, essentially dropping all references, and
+then continuing using it.
 
-Regards.
+dsa_switch_shutdown() talks about dropping references taken via
+netdev_upper_dev_link(), but AFAICT this happens only after
+dsa_port_parse{,_of}() setup the conduit, so it looks like there
+could be a window without any reference held onto the conduit.
+
+So AFAICT the current state is:
+
+dsa_port_parse_of() keeps the device reference.
+dsa_port_parse() drops the device reference, and shortly has a
+dev_hold(), but it does not extend beyond the function.
+
+Therefore if my analysis is correct (which it may very well not
+be), the correct fix(es) here could be:
+
+dsa_port_parse{,_of}() should keep a reference via e.g. dev_hold()
+on success to the conduit.
+
+Or maybe they should unconditionally drop if *after* calling
+dsa_port_parse_cpu(), and dsa_port_parse_cpu() should take one
+when assigning dsa_port::conduit.
+
+Regardless, the end result should be that there is a reference on
+the conduit stored in dsa_port::conduit.
+
+dsa_switch_release_ports() should drop the references, as this
+seems to be called in all error paths of dsa_port_parse{,of} as
+well by dsa_switch_remove().
+
+And maybe dsa_switch_shutdown() then also needs to drop the
+reference? Though it may need to then retake the reference on
+resume, and I don't know where that exactly should happen. Maybe
+it should also lookup the conduit(s) again to be correct.
+
+But here I'm more doing educated guesses then actually knowing
+what's correct.
+
+The alternative/quick "fix" would be to just drop the
+reference unconditionally, which would align the behaviour
+to that of dsa_port_parse(). Not sure if it should mirror the
+dev_hold() / dev_put() spiel as well.
+
+Not that I think this would be the correct behaviour though.
+
+Sorry for the lengthy review/train of thought.
+
+Best regards,
+Jonas
+
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: deff710703d8 ("net: dsa: Allow default tag protocol to be overridden from DT")
+> Signed-off-by: Ma Ke <make24@iscas.ac.cn>
+> ---
+> Changes in v2:
+> - simplified the patch as suggestions;
+> - modified the Fixes tag as suggestions.
+> ---
+>  net/dsa/dsa.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/dsa/dsa.c b/net/dsa/dsa.c
+> index a20efabe778f..31b409a47491 100644
+> --- a/net/dsa/dsa.c
+> +++ b/net/dsa/dsa.c
+> @@ -1247,6 +1247,7 @@ static int dsa_port_parse_of(struct dsa_port *dp, struct device_node *dn)
+>  	struct device_node *ethernet = of_parse_phandle(dn, "ethernet", 0);
+>  	const char *name = of_get_property(dn, "label", NULL);
+>  	bool link = of_property_read_bool(dn, "link");
+> +	int err = 0;
+>  
+>  	dp->dn = dn;
+>  
+> @@ -1260,7 +1261,11 @@ static int dsa_port_parse_of(struct dsa_port *dp, struct device_node *dn)
+>  			return -EPROBE_DEFER;
+>  
+>  		user_protocol = of_get_property(dn, "dsa-tag-protocol", NULL);
+> -		return dsa_port_parse_cpu(dp, conduit, user_protocol);
+> +		err = dsa_port_parse_cpu(dp, conduit, user_protocol);
+> +		if (err)
+> +			put_device(conduit);
+> +
+> +		return err;
+>  	}
+>  
+>  	if (link)
+
 
