@@ -1,218 +1,145 @@
-Return-Path: <netdev+bounces-244629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FC83CBBB39
-	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 14:40:35 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A20ACBBB45
+	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 14:54:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 438133005EBD
-	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 13:40:34 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 5319630010DF
+	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 13:54:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 150F925782D;
-	Sun, 14 Dec 2025 13:40:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 043392528FD;
+	Sun, 14 Dec 2025 13:54:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="eSuPBOwq";
-	dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="AcjX1mIs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IeU8RZ4j"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23C4F256C83
-	for <netdev@vger.kernel.org>; Sun, 14 Dec 2025 13:40:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E0A11EA65
+	for <netdev@vger.kernel.org>; Sun, 14 Dec 2025 13:54:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765719633; cv=none; b=X1VdHePr6OH6BqfYz5+X4K70F5MhnoeqYUGcdPPs7PP2aiF0AKHLIjkunJCl3hnxJPAde4C36qdJHNLR+eK6zVF/3+inKrbZc8ArZlP86cePtM+lHQ0K4wWUrWkR2fqyWksawLCp2bHjd5nNFcxAm/I3zTuo4b7J7Uzpjqs6bJo=
+	t=1765720485; cv=none; b=f3iXkq4N1+GFaPnP5e+RVVcr3k9JNoh3SWM1bkG3sIzgwe8vN62g3BBAKFmo3ip+wuVLAe1dN5XuRD8kxVOOrH/yVQBNC0RUJc8wy3VyFllkf801ZftOFu6z3V1fJtshwdhYASQawkJxwSYipXlRwEi38n2AUle0BqLusqtsNRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765719633; c=relaxed/simple;
-	bh=y4/gw3q+5vUV2AlNKkMEiUtOK7v4FxUdlWYCuttRNcY=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=F0M6aPDN1wmBaNy9c/AJHEB2rqfE9Ex1hXBcTuK2QH27sU+ZPz4+CYobZvaHVWOz9HrXq2CbLHbnhB8TUjp6Zv7qZkZ0nFtJaJpma5knfkLBQXD4UREqesPGHUXJB4irZjW+DGbfEhoGSHILkdEqK/xrDPOzm9N5zfIDvGFLj+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=eSuPBOwq; dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=AcjX1mIs; arc=none smtp.client-ip=160.80.4.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
-Received: from smtpauth-2019-1.uniroma2.it (smtpauth-2019-1.uniroma2.it [160.80.5.46])
-	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 5BEDdljw021250;
-	Sun, 14 Dec 2025 14:39:52 +0100
-Received: from lubuntu-18.04 (unknown [160.80.103.126])
-	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id 24D781205C5;
-	Sun, 14 Dec 2025 14:39:43 +0100 (CET)
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
-	s=ed201904; t=1765719583; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UgOq6ObpVzjWvN6aLkDLv1M6UeEfOp9SBk+Qjqyf2u8=;
-	b=eSuPBOwqsz2Hwh5A3xXMlmHgpD217jxbVqk7TFQ2Zka/hpJV30EoxsFT6QgOx3lx1Ss9IA
-	bQ4T7QgwGchcsgBQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
-	t=1765719583; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UgOq6ObpVzjWvN6aLkDLv1M6UeEfOp9SBk+Qjqyf2u8=;
-	b=AcjX1mIs1ktRx6mwspFmIWXh000JVAcFntNC1SjgyoxAiuH6bbO4sUVPlfOJyzMP3ptNUl
-	tTjNUPktHhrTlMepBFCuGT4y2V3zoLAIE3tnmd2IQ4TpcGIEEyDq5eZjgWRjOagbDuYoa3
-	H8k7UFFITfLPUcttc50GTFOaqMCjjapX1UAjn4TB1EtIjcWiYq3xxOy9Sf9tBVwLYjOmWn
-	DN1xlzyyFHeIK2pvx33phDMwPU2E6NK7Ldleu9V1yecZSMeTPjUHfc6Kekb3a7luPeApWi
-	2xXHBOoDPBBDXXf+hkyYaK09UEC1kdHh2AmVqHxtlNvjxlTt+/6jN/CWbxa/bQ==
-Date: Sun, 14 Dec 2025 14:39:42 +0100
-From: Andrea Mayer <andrea.mayer@uniroma2.it>
-To: nicolas.dichtel@6wind.com
-Cc: "David S . Miller" <davem@davemloft.net>,
-        Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet
- <edumazet@google.com>,
-        David Lebrun <david.lebrun@uclouvain.be>,
-        Paolo
- Lungaroni <paolo.lungaroni@uniroma2.it>,
-        David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
-        stefano.salsano@uniroma2.it, Andrea Mayer
- <andrea.mayer@uniroma2.it>
-Subject: Re: [PATCH net] seg6: fix route leak for encap routes
-Message-Id: <20251214143942.ccc2ec1a46ce6a8fcc3ede55@uniroma2.it>
-In-Reply-To: <051053d9-65f2-43bf-936b-c12848367acd@6wind.com>
-References: <20251208102434.3379379-1-nicolas.dichtel@6wind.com>
-	<20251210113745.145c55825034b2fe98522860@uniroma2.it>
-	<051053d9-65f2-43bf-936b-c12848367acd@6wind.com>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1765720485; c=relaxed/simple;
+	bh=PjGrwWZV81DPFzMQNA4x3xriIjb0S8YAsDZbn2pcA6U=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=R4HAQFQaD8LiZZr2UlkMwduWQ8oWtn8XeTpL8zPGpzoMp1Ceh20o0SPbx8xTnf3zBK831ZjUEN3hIJsOARL6u8iUHakaPHyvN5DuELL/iasTWxQHDSjH9pDZQazarx2YeoVz0KVqmazXVreGaQ3b4WZ7xcT45dABH2O2mFno0Ks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IeU8RZ4j; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4777771ed1aso20254005e9.2
+        for <netdev@vger.kernel.org>; Sun, 14 Dec 2025 05:54:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765720482; x=1766325282; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A27ILOHpvAtHnE+6lvnDEAst4fggOFaoxUBA4wWZFjE=;
+        b=IeU8RZ4jvC+WmapLF9dlbFIqlZbg18sWO66y0ieYZj/Ak4RFOZjMZhWNhuRjUdEBE0
+         SUBI6M+r1oB70c0wiptn2g9iiEW/9PZBIRigRaWesnU/cYAkj6nG4wnXj7H419j69u1+
+         6FRtAeP+wJl8hOWkUVACQmSTdZDOSUdgkKUAZmkQBRFkzrZznwp5sIUTzchbqcn/mu5X
+         AaeCFBMXGB081ZlOL9cvin/GH683T0R1WuGSTLvpysl4HzHj0566Do0aGkoz+r2xon1V
+         Y1zvl+Z7vbjYpAYVvYYubyiX5SEoYYaP/B69bPN43l6bkZ4yuVAoiKR4GSjZbCGeXQgQ
+         Bpcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765720482; x=1766325282;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=A27ILOHpvAtHnE+6lvnDEAst4fggOFaoxUBA4wWZFjE=;
+        b=sPamqoj1X++WcIGU4JFt+2udv8wFQ+RnWYd6Dj4g8kABR8V8NL4v/5a8/dL8uDd0BQ
+         dEDaCQ4JkwC6QjK30cUAQ2AEfyxkIqsS8nBdcIVr9cY5c89oxIj0p8mopH0eoHtewkkc
+         9+O95LIj9mtYY9VywUlfFDskkbDfsEczy2T/uDXjDvxjy4DrVYdVaKxWy2UAKFg/YmHr
+         Xzrg8J1XVCl+P+Swl9t0Cw179hPk5FFO5vGNpbevp/Z9Visl1dsaiw0ZxUPv4r6kPmRs
+         XMiqklUrBPPKtTG0eu9DRAn8xkQcZ/F3h66ScHabN36U8DSV6dHpUFmURnsSd18p1WCJ
+         IIVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVUtwKGUBkGblC6cpLUgSH4R/iUSO12msKnXIHfxjBAurUVKI3d15dbynWZOFjNu4UA7JREFyc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyjbcXcvFFpfHDs1Uv2rIaZHqU22K1H+rrn5TN6kz0aADfzLjGe
+	9gt+l1/1b7M8sc1n3eG2W6dTc7pp/7ypuz484FLQHEt/KMu9/TgqR/nG
+X-Gm-Gg: AY/fxX6NmoGqkYY0iIpgnJd1hjUjDt1xdPNltewsgsHi7OBi8n6z8rwzM02hWgddoCd
+	oB0PZkiri3EXN2hbJ68vzFNYelfADMDHKdnmuZ5hNvU/KLSOysY+B84P5YV/JgX+eYVRsGOL2ce
+	cUnGLVHSvG8DBJYLCBFiPCVts0+REyp9KxJClpY3EIpQPcGQFuR3oCJ1pk2R7+/TeZZ0Y0N4XBj
+	x23KB8OD2I/0j5lCSsub0gz0+1fzqtGDvy5OJaiqIrnpw2jHbSbf4CqzkTpkusIeMfztftFbi5Q
+	6PnJJeOH8x1+Kh8h1gOA9//kLjdfDKnFBo/TOZbeEtrfL17wyGb7kioThKEBfl10dqsBdE6bRPV
+	gx2ak94zBSy8XjzZz9eHlxDGpcC9AofTGnszSNXmqHV1iQhtN1nUnbQgFgN8Ln7LjDPTb05e/Ds
+	/+6WlJVVgBPisG3nes85iZcU7JHDkAC7Ko1+LYifWgR2VBOMOMWeUb
+X-Google-Smtp-Source: AGHT+IHTxNR+ZUDxw8OLVbLKKhDwZuONnZ52bWZfD6ui4ltu6ALafY6AXlfWh7ujj0ZxW5VYZ5/Z9Q==
+X-Received: by 2002:a05:600c:3ace:b0:46f:b32e:5094 with SMTP id 5b1f17b1804b1-47a8f915c57mr66690115e9.32.1765720482446;
+        Sun, 14 Dec 2025 05:54:42 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47a957de489sm114389375e9.5.2025.12.14.05.54.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 14 Dec 2025 05:54:42 -0800 (PST)
+Date: Sun, 14 Dec 2025 13:54:40 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Ma Ke <make24@iscas.ac.cn>
+Cc: krzk@kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ aloisio.almeida@openbossa.org, lauro.venancio@openbossa.org,
+ sameo@linux.intel.com, linville@tuxdriver.com, johannes@sipsolutions.net,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ akpm@linux-foundation.org, stable@vger.kernel.org
+Subject: Re: [PATCH] NFC: Fix error handling in nfc_genl_dump_targets
+Message-ID: <20251214135440.51409316@pumpkin>
+In-Reply-To: <20251214131726.5353-1-make24@iscas.ac.cn>
+References: <20251214131726.5353-1-make24@iscas.ac.cn>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
-X-Virus-Status: Clean
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, 10 Dec 2025 18:00:39 +0100
-Nicolas Dichtel <nicolas.dichtel@6wind.com> wrote:
+On Sun, 14 Dec 2025 21:17:26 +0800
+Ma Ke <make24@iscas.ac.cn> wrote:
 
-> Le 10/12/2025 =E0 11:37, Andrea Mayer a =E9crit=A0:
-> > On Mon,  8 Dec 2025 11:24:34 +0100
-> > Nicolas Dichtel <nicolas.dichtel@6wind.com> wrote:
-> >=20
-> >> The goal is to take into account the device used to set up the route.
-> >> Before this commit, it was mandatory but ignored. After encapsulation,=
- a
-> >> second route lookup is performed using the encapsulated IPv6 address.
-> >> This route lookup is now done in the vrf where the route device is set.
-> >>
-> >=20
-> > Hi Nicolas,
-> Hi Andrea,
->=20
+> nfc_genl_dump_targets() increments the device reference count via
+> nfc_get_device() but fails to decrement it properly. nfc_get_device()
+> calls class_find_device() which internally calls get_device() to
+> increment the reference count. No corresponding put_device() is made
+> to decrement the reference count.
+> 
+> Add proper reference count decrementing using nfc_put_device() when
+> the dump operation completes or encounters an error, ensuring balanced
+> reference counting.
+> 
+> Found by code review.
 
-Hi Nicolas,
+Is that some half-hearted AI code review?
 
-> >=20
-> > I've got your point. However, I'm still concerned about the implication=
-s of
-> > using the *dev* field in the root lookup. This field has been ignored f=
-or this
-> > purpose so far, so some existing configurations/scripts may need to be =
-adapted
-> > to work again. The adjustments made to the self-tests below show what m=
-ight
-> > happen.
-> Yes, I was wondering how users use this *dev* arg. Maybe adding a new att=
-ribute,
-> something like SEG6_IPTUNNEL_USE_NH_DEV will avoid any regressions.
->=20
+Isn't the 'put' done by nfc_genl_dump_targets_done() which it looks
+like the outer code calls sometime later on.
 
-IMHO using a new attribute seems to be a safer approach.
+	David
 
-Is this new attribute intended to be used (a) to enable/disable the use of =
-*dev*
-during the route lookup, or (b) to carry the interface identifier (oif)
-explicitly for use in the lookup?
-In the latter case (b), the route *dev* would no longer be consulted at all=
- for=20
-this purpose.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: 4d12b8b129f1 ("NFC: add nfc generic netlink interface")
+> Signed-off-by: Ma Ke <make24@iscas.ac.cn>
+> ---
+>  net/nfc/netlink.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/net/nfc/netlink.c b/net/nfc/netlink.c
+> index a18e2c503da6..9ae138ee91dd 100644
+> --- a/net/nfc/netlink.c
+> +++ b/net/nfc/netlink.c
+> @@ -159,6 +159,11 @@ static int nfc_genl_dump_targets(struct sk_buff *skb,
+>  
+>  	cb->args[0] = i;
+>  
+> +	if (rc < 0 || i >= dev->n_targets) {
+> +		nfc_put_device(dev);
+> +		cb->args[1] = 0;
+> +	}
+> +
+>  	return skb->len;
+>  }
+>  
 
-
-> >=20
-> >=20
-> >> The l3vpn tests show the inconsistency; they are updated to reflect the
-> >> fix. Before the commit, the route to 'fc00:21:100::6046' was put in the
-> >> vrf-100 table while the encap route was pointing to veth0, which is not
-> >> associated with a vrf.
-> >>
-> >> Before:
-> >>> $ ip -n rt_2-Rh5GP7 -6 r list vrf vrf-100 | grep fc00:21:100::6046
-> >>> cafe::1  encap seg6 mode encap segs 1 [ fc00:21:100::6046 ] dev veth0=
- metric 1024 pref medium
-> >>> fc00:21:100::6046 via fd00::1 dev veth0 metric 1024 pref medium
-> >>
-> >> After:
-> >>> $ ip -n rt_2-Rh5GP7 -6 r list vrf vrf-100 | grep fc00:21:100::6046
-> >>> cafe::1  encap seg6 mode encap segs 1 [ fc00:21:100::6046 ] dev veth0=
- metric 1024 pref medium
-> >>> $ ip -n rt_2-Rh5GP7 -6 r list | grep fc00:21:100::6046
-> >>> fc00:21:100::6046 via fd00::1 dev veth0 metric 1024 pref medium
-> >>
-> >> Fixes: 6c8702c60b88 ("ipv6: sr: add support for SRH encapsulation and =
-injection with lwtunnels")
-> >> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-> >> ---
-> >>  net/ipv6/seg6_iptunnel.c                                | 6 ++++++
-> >>  tools/testing/selftests/net/srv6_end_dt46_l3vpn_test.sh | 2 +-
-> >>  tools/testing/selftests/net/srv6_end_dt4_l3vpn_test.sh  | 2 +-
-> >>  tools/testing/selftests/net/srv6_end_dt6_l3vpn_test.sh  | 2 +-
-> >>  4 files changed, 9 insertions(+), 3 deletions(-)
-> >>
-> >> diff --git a/net/ipv6/seg6_iptunnel.c b/net/ipv6/seg6_iptunnel.c
-> >> index 3e1b9991131a..9535aea28357 100644
-> >> --- a/net/ipv6/seg6_iptunnel.c
-> >> +++ b/net/ipv6/seg6_iptunnel.c
-> >> @@ -484,6 +484,12 @@ static int seg6_input_core(struct net *net, struc=
-t sock *sk,
-> >>  	 * now and use it later as a comparison.
-> >>  	 */
-> >>  	lwtst =3D orig_dst->lwtstate;
-> >> +	if (orig_dst->dev) {
-> >=20
-> > When can 'orig_dst->dev' be NULL in this context?
-> I was cautious to avoid any unpleasant surprises. A dst can have dst->dev=
- set to
-> NULL.
->=20
-
-I see your point regarding caution.
-
-However, if 'orig_dst->dev' were NULL at this point, the kernel would crash
-anyway because subsequent functions (e.g., __seg6_do_srh_encap()) rely on
-'orig_dst->dev' (not NULL) to retrieve the net.
-
-
-> >> +		rcu_read_lock();
-> >> +		skb->dev =3D l3mdev_master_dev_rcu(orig_dst->dev) ?:
-> >> +			dev_net(skb->dev)->loopback_dev;
-
-One issue here is that the outgoing device (*dev*) is being treated as the
-packet's *incoming* interface.
-
-ip6_route_input() uses 'skb->dev->ifindex' to populate 'flowi6_iif'.
-Consequently, if there is an 'ip rule' matching on 'iif' (ingress interface=
-),
-it will evaluate against the *dev* (the VRF or the loopback) instead of the
-actual interface the packet was received on.
-This can lead to incorrect policy routing lookups.
-
-
-> >> +		rcu_read_unlock();
-> >> +	}
-
-
-> Thanks,
-> Nicolas
-
-Thanks,
-
-Ciao,
-Andrea
 
