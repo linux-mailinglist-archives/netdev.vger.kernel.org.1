@@ -1,153 +1,218 @@
-Return-Path: <netdev+bounces-244627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32274CBBB18
-	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 14:17:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FC83CBBB39
+	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 14:40:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2646A3002D78
-	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 13:17:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 438133005EBD
+	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 13:40:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A721227EB9;
-	Sun, 14 Dec 2025 13:17:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 150F925782D;
+	Sun, 14 Dec 2025 13:40:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fS6rKOxE"
+	dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="eSuPBOwq";
+	dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="AcjX1mIs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DD0D1DE4E1
-	for <netdev@vger.kernel.org>; Sun, 14 Dec 2025 13:17:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23C4F256C83
+	for <netdev@vger.kernel.org>; Sun, 14 Dec 2025 13:40:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.40
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765718266; cv=none; b=D62oIpclULZw8vS9bnd4Gmew5fcg+i58ROdwXNo3SQPBVwOa2LhCcpVEsEVTuuQmcrePtgBs/wBOzcu/3tKE+CXre5eiklNje194guesORGtGxiza4XHc6UPq7DRlWHBdwlp+qr0xTJU7ECIdLht6HmuYRtZgckM73vaAvdsGeI=
+	t=1765719633; cv=none; b=X1VdHePr6OH6BqfYz5+X4K70F5MhnoeqYUGcdPPs7PP2aiF0AKHLIjkunJCl3hnxJPAde4C36qdJHNLR+eK6zVF/3+inKrbZc8ArZlP86cePtM+lHQ0K4wWUrWkR2fqyWksawLCp2bHjd5nNFcxAm/I3zTuo4b7J7Uzpjqs6bJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765718266; c=relaxed/simple;
-	bh=XmtOq1WlOXv5tvapcKs/oIm0cZgNGon3Gb1VCrDVVgw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fjlDbR43TNNYjWQPVrGM/w/Tk0YYn+OyUwkaDCjP1sbPYSj8obSGZ3KzK3e2BTzaOX7MO80L+RYf64H26Q0zrm5TQbkPzYL9eVzFOJ6K+Hrx9rnmQ7soGSGfvOhpAGlM0MH+U5s2Ysi0P63RshLeP7wO2urFnkjkYsAC+wYWZiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fS6rKOxE; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4775895d69cso10258805e9.0
-        for <netdev@vger.kernel.org>; Sun, 14 Dec 2025 05:17:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765718262; x=1766323062; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mpywd0ooBqabRS+5lH7EYtrqn3sd1kp/pArhDDLgKLk=;
-        b=fS6rKOxECWqFG4sVcdaFbufZFN0mNF9qFZ7VjjqnN2KZvEygJpFhJLZAxt6NvZLFVu
-         f+DTEadQhuz4AekF2cWxUtc6075GBBhfbApDp9/0MkXytirYBLDLrsEkIpf3RmmSUoFY
-         8tcMQNJd0mGu4nsxXGfrhywKa38I1GfrSwBJGNcYbeh/8r4lexXrBsGXlAkT87Sds8Kk
-         nH2liVbqLto6rS6LS8W2358HZ8t5i9WjGSzZxZ7OoxpYuLrwKqYZlj+hDenqkQNvMuzh
-         CNOG/kWR9nYlRX+m2jvmUVrJEBsmVFXfaElXRHb5q/Qm5XLoW3cxaNskk7RcpcLhz3OJ
-         vePA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765718262; x=1766323062;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=mpywd0ooBqabRS+5lH7EYtrqn3sd1kp/pArhDDLgKLk=;
-        b=lve27S8mB2Y2pZrRQg2VHwoLp3W06BQNT1LWoRpvIwudQEqxPFMpllnLWKiLtqkwQA
-         +F/JYFwGfRvhO83P4Y3KwnB4H0hR3bVdLL5M5lFOlxdd/iXaCDMxLze3K4Cklp3Pdw7D
-         OmJpkMV+Nwr72gpAFt/wPasSQis1rEQofcXk30u2h2zxBmT3r/t/WGgX23fZzrQ47n6v
-         nlJJsZ539UGldbmekkwSw+5HO4GM7G58z9x58S/E75CDvjvIRg2uXoMm/mItFeDsEEG3
-         G0ZloXdYabpjXOhV0b+99B5ZLoWwGB5zR3e+m/Dr2gRrJTdfvRXp591g4GJ8hNLhwnRl
-         Szyw==
-X-Forwarded-Encrypted: i=1; AJvYcCXhYs6mLBjSboIm4W0bMORDKG0yDmHZcczMh9Sl9eLGCnoY8NvJlLnZTWt8rYOb6YRIf+psoPg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMOZfwENa4279wI0nNBuuf4CRIvbH12UUSxCYVz9OyXsCoDhqJ
-	eKxbg+m41WitfwPByrzf2gOu4dHD5u9dIRurY1/aTJPJ8LJx2ulvJZTu
-X-Gm-Gg: AY/fxX64R+CzMwNCuujyoV3FfBeUkUqSGCqzDT4L1ClPWEat975zsiXDgQinRDCR7kB
-	BcOh1ivuIYuJq1cIDgtT5J2qyQ4c0fP5nuJji0ngEEdF+tWoX95K62/it+OutDDStNBDrnb0q4M
-	KdoMpm83mjgDbOpjF+7kpf3GR4Bt1N9HpIcvXnYChMeaNCxn6yhc6lpBuNbKyHPycKgycQ9x41b
-	Xv/bvC988/FnA6KZuLyphj3G2bDdarIxsw/45OmtNfFt58bq5ucn2HL0KJ5l3x8TM27H/u3wzhA
-	qq+Otbl3U5VDxl87TLMvmN5pxi1s4iINyAB3UO5faDzqfYo9ZPw7cbYDo945JzzB95rsSf8dJil
-	YbU0YxqP2yQXOBjS1dJekmUN4VMLsCm1SEQBKzVZpfMGXOwT1jo3ZDmaXT+5KHDZ2Xu7XNEPFGr
-	HXzGDqmrFh3Qbrnl+jS+vnQdaAALPkHqWyJV35wc/vjAOmSAyYYuMI
-X-Google-Smtp-Source: AGHT+IHTX2KIoo6rHKnWJhWyrUXne9SI979vSJQ8O09DKd6yhp5jXCNNQXUTEJFhlKpFkjoCo3wQwg==
-X-Received: by 2002:a05:600c:a009:b0:46f:d682:3c3d with SMTP id 5b1f17b1804b1-47a8f8c4b8emr81227825e9.13.1765718262416;
-        Sun, 14 Dec 2025 05:17:42 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47a8f4af065sm50301095e9.6.2025.12.14.05.17.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Dec 2025 05:17:42 -0800 (PST)
-Date: Sun, 14 Dec 2025 13:17:40 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: kernel test robot <lkp@intel.com>
-Cc: Yury Norov <yury.norov@gmail.com>, Rasmus Villemoes
- <linux@rasmusvillemoes.dk>, linux-kernel@vger.kernel.org,
- linux-usb@vger.kernel.org, Geert Uytterhoeven <geert+renesas@glider.be>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>, Jonathan Cameron
- <Jonathan.Cameron@huawei.com>, Crt Mori <cmo@melexis.com>, Richard Genoud
- <richard.genoud@bootlin.com>, Andy Shevchenko
- <andriy.shevchenko@intel.com>, Luo Jie <quic_luoj@quicinc.com>, Peter
- Zijlstra <peterz@infradead.org>, Jakub Kicinski <kuba@kernel.org>,
- netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, Mika
- Westerberg <mika.westerberg@linux.intel.com>, Andreas Noever
- <andreas.noever@gmail.com>, Yehezkel Bernat <YehezkelShB@gmail.com>,
- Nicolas Frattaroli <nicolas.frattaroli@collabora.com>,
- oe-kbuild-all@lists.linux.dev
-Subject: Re: [PATCH v2 11/16] bitfield: Common up validation of the mask
- parameter
-Message-ID: <20251214131740.40063fd7@pumpkin>
-In-Reply-To: <202512141305.J3aPiiBv-lkp@intel.com>
-References: <20251212193721.740055-12-david.laight.linux@gmail.com>
-	<202512141305.J3aPiiBv-lkp@intel.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	s=arc-20240116; t=1765719633; c=relaxed/simple;
+	bh=y4/gw3q+5vUV2AlNKkMEiUtOK7v4FxUdlWYCuttRNcY=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=F0M6aPDN1wmBaNy9c/AJHEB2rqfE9Ex1hXBcTuK2QH27sU+ZPz4+CYobZvaHVWOz9HrXq2CbLHbnhB8TUjp6Zv7qZkZ0nFtJaJpma5knfkLBQXD4UREqesPGHUXJB4irZjW+DGbfEhoGSHILkdEqK/xrDPOzm9N5zfIDvGFLj+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=eSuPBOwq; dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=AcjX1mIs; arc=none smtp.client-ip=160.80.4.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
+Received: from smtpauth-2019-1.uniroma2.it (smtpauth-2019-1.uniroma2.it [160.80.5.46])
+	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 5BEDdljw021250;
+	Sun, 14 Dec 2025 14:39:52 +0100
+Received: from lubuntu-18.04 (unknown [160.80.103.126])
+	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id 24D781205C5;
+	Sun, 14 Dec 2025 14:39:43 +0100 (CET)
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
+	s=ed201904; t=1765719583; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UgOq6ObpVzjWvN6aLkDLv1M6UeEfOp9SBk+Qjqyf2u8=;
+	b=eSuPBOwqsz2Hwh5A3xXMlmHgpD217jxbVqk7TFQ2Zka/hpJV30EoxsFT6QgOx3lx1Ss9IA
+	bQ4T7QgwGchcsgBQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
+	t=1765719583; h=from:from:sender:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UgOq6ObpVzjWvN6aLkDLv1M6UeEfOp9SBk+Qjqyf2u8=;
+	b=AcjX1mIs1ktRx6mwspFmIWXh000JVAcFntNC1SjgyoxAiuH6bbO4sUVPlfOJyzMP3ptNUl
+	tTjNUPktHhrTlMepBFCuGT4y2V3zoLAIE3tnmd2IQ4TpcGIEEyDq5eZjgWRjOagbDuYoa3
+	H8k7UFFITfLPUcttc50GTFOaqMCjjapX1UAjn4TB1EtIjcWiYq3xxOy9Sf9tBVwLYjOmWn
+	DN1xlzyyFHeIK2pvx33phDMwPU2E6NK7Ldleu9V1yecZSMeTPjUHfc6Kekb3a7luPeApWi
+	2xXHBOoDPBBDXXf+hkyYaK09UEC1kdHh2AmVqHxtlNvjxlTt+/6jN/CWbxa/bQ==
+Date: Sun, 14 Dec 2025 14:39:42 +0100
+From: Andrea Mayer <andrea.mayer@uniroma2.it>
+To: nicolas.dichtel@6wind.com
+Cc: "David S . Miller" <davem@davemloft.net>,
+        Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Eric Dumazet
+ <edumazet@google.com>,
+        David Lebrun <david.lebrun@uclouvain.be>,
+        Paolo
+ Lungaroni <paolo.lungaroni@uniroma2.it>,
+        David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+        stefano.salsano@uniroma2.it, Andrea Mayer
+ <andrea.mayer@uniroma2.it>
+Subject: Re: [PATCH net] seg6: fix route leak for encap routes
+Message-Id: <20251214143942.ccc2ec1a46ce6a8fcc3ede55@uniroma2.it>
+In-Reply-To: <051053d9-65f2-43bf-936b-c12848367acd@6wind.com>
+References: <20251208102434.3379379-1-nicolas.dichtel@6wind.com>
+	<20251210113745.145c55825034b2fe98522860@uniroma2.it>
+	<051053d9-65f2-43bf-936b-c12848367acd@6wind.com>
+X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
+X-Virus-Status: Clean
 
-On Sun, 14 Dec 2025 14:19:30 +0800
-kernel test robot <lkp@intel.com> wrote:
+On Wed, 10 Dec 2025 18:00:39 +0100
+Nicolas Dichtel <nicolas.dichtel@6wind.com> wrote:
 
-> Hi,
-> 
-> kernel test robot noticed the following build errors:
-> 
-> [auto build test ERROR on linus/master]
-> [also build test ERROR on v6.19-rc1 next-20251212]
-> [cannot apply to westeri-thunderbolt/next]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch#_base_tree_information]
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/david-laight-linux-gmail-com/nfp-Call-FIELD_PREP-in-NFP_ETH_SET_BIT_CONFIG-wrapper/20251213-040625
-> base:   linus/master
-> patch link:    https://lore.kernel.org/r/20251212193721.740055-12-david.laight.linux%40gmail.com
-> patch subject: [PATCH v2 11/16] bitfield: Common up validation of the mask parameter
-> config: i386-randconfig-053-20251213 (https://download.01.org/0day-ci/archive/20251214/202512141305.J3aPiiBv-lkp@intel.com/config)
-> compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251214/202512141305.J3aPiiBv-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202512141305.J3aPiiBv-lkp@intel.com/
-> 
-> All errors (new ones prefixed by >>):
-> 
-> >> drivers/gpu/drm/xe/xe_guc.c:639:19: error: converting the result of '<<' to a boolean always evaluates to true [-Werror,-Wtautological-constant-compare]  
->      639 |                 klvs[count++] = PREP_GUC_KLV_TAG(OPT_IN_FEATURE_EXT_CAT_ERR_TYPE);
->          |                                 ^
->    drivers/gpu/drm/xe/xe_guc_klv_helpers.h:62:2: note: expanded from macro 'PREP_GUC_KLV_TAG'
->       62 |         PREP_GUC_KLV_CONST(MAKE_GUC_KLV_KEY(TAG), MAKE_GUC_KLV_LEN(TAG))
->          |         ^
->    drivers/gpu/drm/xe/xe_guc_klv_helpers.h:38:20: note: expanded from macro 'PREP_GUC_KLV_CONST'
->       38 |         (FIELD_PREP_CONST(GUC_KLV_0_KEY, (key)) | \
->          |                           ^
->    drivers/gpu/drm/xe/abi/guc_klvs_abi.h:36:35: note: expanded from macro 'GUC_KLV_0_KEY'
->       36 | #define GUC_KLV_0_KEY                           (0xffffu << 16)
->          |                                                          ^
+> Le 10/12/2025 =E0 11:37, Andrea Mayer a =E9crit=A0:
+> > On Mon,  8 Dec 2025 11:24:34 +0100
+> > Nicolas Dichtel <nicolas.dichtel@6wind.com> wrote:
+> >=20
+> >> The goal is to take into account the device used to set up the route.
+> >> Before this commit, it was mandatory but ignored. After encapsulation,=
+ a
+> >> second route lookup is performed using the encapsulated IPv6 address.
+> >> This route lookup is now done in the vrf where the route device is set.
+> >>
+> >=20
+> > Hi Nicolas,
+> Hi Andrea,
+>=20
 
-I've just sent a patch to move that warning to W=2.
-It is picking up the same sort of things that -Wtype-limits does - already in W=2.
+Hi Nicolas,
 
-	David
+> >=20
+> > I've got your point. However, I'm still concerned about the implication=
+s of
+> > using the *dev* field in the root lookup. This field has been ignored f=
+or this
+> > purpose so far, so some existing configurations/scripts may need to be =
+adapted
+> > to work again. The adjustments made to the self-tests below show what m=
+ight
+> > happen.
+> Yes, I was wondering how users use this *dev* arg. Maybe adding a new att=
+ribute,
+> something like SEG6_IPTUNNEL_USE_NH_DEV will avoid any regressions.
+>=20
+
+IMHO using a new attribute seems to be a safer approach.
+
+Is this new attribute intended to be used (a) to enable/disable the use of =
+*dev*
+during the route lookup, or (b) to carry the interface identifier (oif)
+explicitly for use in the lookup?
+In the latter case (b), the route *dev* would no longer be consulted at all=
+ for=20
+this purpose.
+
+
+> >=20
+> >=20
+> >> The l3vpn tests show the inconsistency; they are updated to reflect the
+> >> fix. Before the commit, the route to 'fc00:21:100::6046' was put in the
+> >> vrf-100 table while the encap route was pointing to veth0, which is not
+> >> associated with a vrf.
+> >>
+> >> Before:
+> >>> $ ip -n rt_2-Rh5GP7 -6 r list vrf vrf-100 | grep fc00:21:100::6046
+> >>> cafe::1  encap seg6 mode encap segs 1 [ fc00:21:100::6046 ] dev veth0=
+ metric 1024 pref medium
+> >>> fc00:21:100::6046 via fd00::1 dev veth0 metric 1024 pref medium
+> >>
+> >> After:
+> >>> $ ip -n rt_2-Rh5GP7 -6 r list vrf vrf-100 | grep fc00:21:100::6046
+> >>> cafe::1  encap seg6 mode encap segs 1 [ fc00:21:100::6046 ] dev veth0=
+ metric 1024 pref medium
+> >>> $ ip -n rt_2-Rh5GP7 -6 r list | grep fc00:21:100::6046
+> >>> fc00:21:100::6046 via fd00::1 dev veth0 metric 1024 pref medium
+> >>
+> >> Fixes: 6c8702c60b88 ("ipv6: sr: add support for SRH encapsulation and =
+injection with lwtunnels")
+> >> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+> >> ---
+> >>  net/ipv6/seg6_iptunnel.c                                | 6 ++++++
+> >>  tools/testing/selftests/net/srv6_end_dt46_l3vpn_test.sh | 2 +-
+> >>  tools/testing/selftests/net/srv6_end_dt4_l3vpn_test.sh  | 2 +-
+> >>  tools/testing/selftests/net/srv6_end_dt6_l3vpn_test.sh  | 2 +-
+> >>  4 files changed, 9 insertions(+), 3 deletions(-)
+> >>
+> >> diff --git a/net/ipv6/seg6_iptunnel.c b/net/ipv6/seg6_iptunnel.c
+> >> index 3e1b9991131a..9535aea28357 100644
+> >> --- a/net/ipv6/seg6_iptunnel.c
+> >> +++ b/net/ipv6/seg6_iptunnel.c
+> >> @@ -484,6 +484,12 @@ static int seg6_input_core(struct net *net, struc=
+t sock *sk,
+> >>  	 * now and use it later as a comparison.
+> >>  	 */
+> >>  	lwtst =3D orig_dst->lwtstate;
+> >> +	if (orig_dst->dev) {
+> >=20
+> > When can 'orig_dst->dev' be NULL in this context?
+> I was cautious to avoid any unpleasant surprises. A dst can have dst->dev=
+ set to
+> NULL.
+>=20
+
+I see your point regarding caution.
+
+However, if 'orig_dst->dev' were NULL at this point, the kernel would crash
+anyway because subsequent functions (e.g., __seg6_do_srh_encap()) rely on
+'orig_dst->dev' (not NULL) to retrieve the net.
+
+
+> >> +		rcu_read_lock();
+> >> +		skb->dev =3D l3mdev_master_dev_rcu(orig_dst->dev) ?:
+> >> +			dev_net(skb->dev)->loopback_dev;
+
+One issue here is that the outgoing device (*dev*) is being treated as the
+packet's *incoming* interface.
+
+ip6_route_input() uses 'skb->dev->ifindex' to populate 'flowi6_iif'.
+Consequently, if there is an 'ip rule' matching on 'iif' (ingress interface=
+),
+it will evaluate against the *dev* (the VRF or the loopback) instead of the
+actual interface the packet was received on.
+This can lead to incorrect policy routing lookups.
+
+
+> >> +		rcu_read_unlock();
+> >> +	}
+
+
+> Thanks,
+> Nicolas
+
+Thanks,
+
+Ciao,
+Andrea
 
