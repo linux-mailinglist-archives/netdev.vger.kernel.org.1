@@ -1,192 +1,124 @@
-Return-Path: <netdev+bounces-244634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBBCFCBBD53
-	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 17:14:22 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8301FCBBD60
+	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 17:21:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6AB0B300995E
-	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 16:14:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B50C0300157D
+	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 16:21:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA3472DC359;
-	Sun, 14 Dec 2025 16:14:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F41F11FE471;
+	Sun, 14 Dec 2025 16:21:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gLQRt1KN"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zbiXxnFb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2527B26B74A
-	for <netdev@vger.kernel.org>; Sun, 14 Dec 2025 16:14:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB3C17A31C;
+	Sun, 14 Dec 2025 16:21:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765728859; cv=none; b=SQCDFgX3bCBHTH/jEVjx01M9xvDEX3WbRqDoCLQ2UKdtldZKKhwA4U0lrxHm9KMvr03p5QwQjQEnK6154/wBAFdu2GT15b0lUV16JhQHBMwA2FLzOCXTc3zAGBz9dh0UgMX+5M/V/JMqoSMobbjKjhwWfgOpHDFDqj4FkfNHL0I=
+	t=1765729293; cv=none; b=IGXvHmwKwt3pJSFNVb1oFuKFU2R0RKDC0hf1Q8q2VK9S6LeGb/h2jwxSoUoGlEzuHzJ5oDpba72Qiiuh+l+lquzSayQ9IaWQNpO1qACuzh5tOOubQDBPjE6gJLXu17lEwafjH9UJyxkwciMLBwfNSrdA/siYdX8XM3/J76REALI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765728859; c=relaxed/simple;
-	bh=GRpIF/d8/1fyo2bgcDG2clg18PiLNuT5jKrducENkQI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Suuh5CzPHBX1F8iYOizGCNOt1VpYyVaz0fj1FWhqf27NoW8FHRG4QoCPpYv8b+EK62YErg7QRmf/E6FddlyZ+lagqlDg9lX0W1hEDCHWWC5UzKh5eO18qU8vs1j3YAgJb9wH1ra8O+cdIRfTGNl28xhdQEmJOA9g0Ozij/CEPAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gLQRt1KN; arc=none smtp.client-ip=209.85.128.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-78e7cfd782aso4128017b3.0
-        for <netdev@vger.kernel.org>; Sun, 14 Dec 2025 08:14:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765728856; x=1766333656; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GRpIF/d8/1fyo2bgcDG2clg18PiLNuT5jKrducENkQI=;
-        b=gLQRt1KNvaeUO9teGz0leapvPXjIzdpg9TUX/uxhJtEzqFuqvgmn1f+cBLsR9oopBL
-         P85Q4c7o7yA2Z85bHUfaJut6mx5EGdIgqyNABDc6CpUYrOMnlPxl0l8Rf2uM0VNTZ1DT
-         ZypynXxALUxYnf5Qn210UVAC9kSqr63OIrQ6JffuCdQRSp9carH8Iw+VYhBqaZRkzWsS
-         ijEADSRkYty8jxZNluxkWV37cPfVTyyzRztEGIJGKdJNsHHl/Vbv63CuEeFFE0Wt9nZE
-         FqcMkyldI9raWSNBbWMb1inJsUbjeooiHwUclO7avA0BN5vIYETJI+e4r46WXtIk3MKV
-         97wQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765728856; x=1766333656;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=GRpIF/d8/1fyo2bgcDG2clg18PiLNuT5jKrducENkQI=;
-        b=b963H9q4ud9niDFQ1YBecgYqi0QKhWwOT525YyWSD6VUCGBG+OPF5QZs7QcI6Qy/lP
-         4Yoev/Do/0NvHac/JRaKZyXvTNG0I/Ufx8a+MPNdr6RhrMqXa0WHUbHnV4XGtcvcbWj4
-         vbQ93Tiiy+X81hJ7WY1tRj6hKPRfrke6yrjrtKLdvn0u4UHtKVCjaqeiIX1AOyDFoidA
-         S0rYf37lGDZph3D/G3/FOypPB92McBFxJnP4wy92L18cZvse6BQffdMwpzOkUoYkBWIC
-         0Qbd7f4ly7p07koDyC0nc/GVHhw5U91Fx6BiQ9JBngKPt5UCzfeU42bfqVKPv6iflR4x
-         mylQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWyy00kwDKk22WCPaaDHOungP2HsgUAwW0rcYjCq3tB3ecGPLi0EVWHV/CrAObYUYjM6uN2KWU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZ7HiSKIKWqCb4a/xvVAPKC+wsGv3s4wuoWAyUPik5gvuiF3dA
-	o1VglUuxUNhZJfAWAHSfrDjkvTKbMjj1/1ugtHOkbve4/TtZNEV1yLleh5pDv7AgrFfyaikZ+C7
-	X1n1yE4d6KqzQTRDDKFJ1KxQUX0DvRuiQmw==
-X-Gm-Gg: AY/fxX6vqXfdCEzA2Li3zCbJ7epkcGzYxiNcJ4tz1lfEDPpELFCkd2gi/v0CWA1N9K5
-	SQiY1rr85VWzMo+xdxoW4ZFwZmsHTEgrypibz3ohFfdkvhqXx0bkYHXpkKql414hC6eQYbCP55Z
-	eUvHmBLTuFcu1iFvzCtqng1yyazWsQOuJT2gjcH0/sWduETb88zXdMdAl2Dr3SxThGFFmzHNHr/
-	5NU0uxJqAMv1dnvPxJH1Qqr3901BMcCcnxalsmECr8qWATA6G0nYL8m1x0GKmVzhbKJQA==
-X-Google-Smtp-Source: AGHT+IHYP3T80/B8AfiG3uNoE6jS0f+vGFsH+W/e+KxgsbBRpSwjgogu0Rhw73C/8b1M9I+m+nUVxh3jqTRMteuSfU4=
-X-Received: by 2002:a05:690c:4c08:b0:786:5789:57d1 with SMTP id
- 00721157ae682-78e6841f484mr60894597b3.52.1765728856046; Sun, 14 Dec 2025
- 08:14:16 -0800 (PST)
+	s=arc-20240116; t=1765729293; c=relaxed/simple;
+	bh=oKeYvhSD8UppLEXpZFvXnphWhmTlKQA0MVeyGw/vbR0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bEfHfNWo7kFcdLuNS7w23bsM7IrcLfxnkFPlt7COVKjFwBQvDeFKu7VT2FAE4yZPiLs10Fct4Q6U1V0Ho0BH9MQ9Jkrt1Z5s9MX27rrBI7/VarSKIymVUBMWGYN+LrHSjixNl3bz4BBz1MlLf2n5BRC9nyPtuW7PuXcsjeiY+ZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zbiXxnFb; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=b5iDoQ4t1oS+0WiPDGUQIZJ9YDhuCciE8h6VNTnQ24o=; b=zbiXxnFbXyEyGr+nuZZt0UsdVS
+	v/HnFI3uPqoB7YxmIk4Sl9Pd9SrTsR8shN+tVarnoFBYZBlzmNM/X5e15bxt530plddKsCWlM/E0s
+	TQnfHY4MmSwD6uXLl8FW70GeE8Y6rnFNS2Xh8t+L41GqFFbGACPDKkkcsXaAQ6g/56mY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vUoqa-00GveI-DG; Sun, 14 Dec 2025 17:21:24 +0100
+Date: Sun, 14 Dec 2025 17:21:24 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Changwoo Min <changwoo@igalia.com>
+Cc: Donald Hunter <donald.hunter@gmail.com>,
+	Lukasz Luba <lukasz.luba@arm.com>, linux-pm@vger.kernel.org,
+	sched-ext@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
+	Network Development <netdev@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: Concerns with em.yaml YNL spec
+Message-ID: <bb7871f1-3ea7-4bf7-baa9-a306a2371e4b@lunn.ch>
+References: <CAD4GDZy-aeWsiY=-ATr+Y4PzhMX71DFd_mmdMk4rxn3YG8U5GA@mail.gmail.com>
+ <081e0ba7-055c-4243-8b39-e2c0cb9a8c5a@lunn.ch>
+ <4bb1ea43-ef52-47ae-8009-6a2944dbf92b@igalia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251214131204.4684-1-make24@iscas.ac.cn> <39ba16a9-9b7d-4c26-91b5-cf775a7f8169@gmail.com>
- <20251214161023.5qcyyifscu73b47u@skbuf>
-In-Reply-To: <20251214161023.5qcyyifscu73b47u@skbuf>
-From: Jonas Gorski <jonas.gorski@gmail.com>
-Date: Sun, 14 Dec 2025 17:14:04 +0100
-X-Gm-Features: AQt7F2qFqUHDdXEIzkgvN0n3_WvlsoB3yN8yNhONS16laPmF4gsHsS86NfUQ6tM
-Message-ID: <CAOiHx=kp-trJ6OVoC-Vc54=pquYa5wU5ZCSyLVkyNATbbadsVw@mail.gmail.com>
-Subject: Re: [PATCH v2] net: dsa: Fix error handling in dsa_port_parse_of
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Ma Ke <make24@iscas.ac.cn>, andrew@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	tobias@waldekranz.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	akpm@linux-foundation.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4bb1ea43-ef52-47ae-8009-6a2944dbf92b@igalia.com>
 
-On Sun, Dec 14, 2025 at 5:10=E2=80=AFPM Vladimir Oltean <olteanv@gmail.com>=
- wrote:
->
-> Hi Jonas, Ma Ke,
->
-> On Sun, Dec 14, 2025 at 05:02:33PM +0100, Jonas Gorski wrote:
-> > Hi,
-> >
-> > On 12/14/25 14:12, Ma Ke wrote:
-> > > When of_find_net_device_by_node() successfully acquires a reference t=
-o
-> >
-> > Your subject is missing the () of dsa_port_parse_of()
-> >
-> > > a network device but the subsequent call to dsa_port_parse_cpu()
-> > > fails, dsa_port_parse_of() returns without releasing the reference
-> > > count on the network device.
-> > >
-> > > of_find_net_device_by_node() increments the reference count of the
-> > > returned structure, which should be balanced with a corresponding
-> > > put_device() when the reference is no longer needed.
-> > >
-> > > Found by code review.
-> >
-> > I agree with the reference not being properly released on failure,
-> > but I don't think this fix is complete.
-> >
-> > I was trying to figure out where the put_device() would happen in
-> > the success case (or on removal), and I failed to find it.
-> >
-> > Also if the (indirect) top caller of dsa_port_parse_of(),
-> > dsa_switch_probe(), fails at a later place the reference won't be
-> > released either.
-> >
-> > The only explicit put_device() that happens is in
-> > dsa_dev_to_net_device(), which seems to convert a device
-> > reference to a netdev reference via dev_hold().
-> >
-> > But the only caller of that, dsa_port_parse() immediately
-> > calls dev_put() on it, essentially dropping all references, and
-> > then continuing using it.
-> >
-> > dsa_switch_shutdown() talks about dropping references taken via
-> > netdev_upper_dev_link(), but AFAICT this happens only after
-> > dsa_port_parse{,_of}() setup the conduit, so it looks like there
-> > could be a window without any reference held onto the conduit.
-> >
-> > So AFAICT the current state is:
-> >
-> > dsa_port_parse_of() keeps the device reference.
-> > dsa_port_parse() drops the device reference, and shortly has a
-> > dev_hold(), but it does not extend beyond the function.
-> >
-> > Therefore if my analysis is correct (which it may very well not
-> > be), the correct fix(es) here could be:
-> >
-> > dsa_port_parse{,_of}() should keep a reference via e.g. dev_hold()
-> > on success to the conduit.
-> >
-> > Or maybe they should unconditionally drop if *after* calling
-> > dsa_port_parse_cpu(), and dsa_port_parse_cpu() should take one
-> > when assigning dsa_port::conduit.
-> >
-> > Regardless, the end result should be that there is a reference on
-> > the conduit stored in dsa_port::conduit.
-> >
-> > dsa_switch_release_ports() should drop the references, as this
-> > seems to be called in all error paths of dsa_port_parse{,of} as
-> > well by dsa_switch_remove().
-> >
-> > And maybe dsa_switch_shutdown() then also needs to drop the
-> > reference? Though it may need to then retake the reference on
-> > resume, and I don't know where that exactly should happen. Maybe
-> > it should also lookup the conduit(s) again to be correct.
-> >
-> > But here I'm more doing educated guesses then actually knowing
-> > what's correct.
-> >
-> > The alternative/quick "fix" would be to just drop the
-> > reference unconditionally, which would align the behaviour
-> > to that of dsa_port_parse(). Not sure if it should mirror the
-> > dev_hold() / dev_put() spiel as well.
-> >
-> > Not that I think this would be the correct behaviour though.
-> >
-> > Sorry for the lengthy review/train of thought.
-> >
-> > Best regards,
-> > Jonas
->
-> Thank you for your thoughts on this topic. Indeed there is a problem,
-> for which I managed to find a few hours today to investigate. I was
-> going to just submit a patch directly and refer Ma Ke to it directly,
-> but since you started looking into the situation as well, I just thought
-> I'd reply "please standby". It's currently undergoing testing.
+> > We also need to watch out for other meaning of these letters. In the
+> > context of networking and Power over Ethernet, PD means Powered
+> > Device. We generally don't need to enumerate the PD, we are more
+> > interested in the Power Sourcing Equipment, PSE.
+> > 
+> > And a dumb question. What is an energy model? A PSE needs some level
+> > of energy model, it needs to know how much energy each PD can consume
+> > in order that it is not oversubscribed.Is the energy model generic
+> > enough that it could be used for this? Or should this energy model get
+> > a prefix to limit its scope to a performance domain? The suggested
+> > name of this file would then become something like
+> > performance-domain-energy-model.yml?
+> > 
+> 
+> Lukasz might be the right person for this question. In my view, the
+> energy model essentially provides the performance-versus-power-
+> consumption curve for each performance domain.
 
-A patch already, that's even better! I'll gladly stand by :)
+The problem here is, you are too narrowly focused. My introduction
+said:
 
-Best regards,
-Jonas
+> > In the context of networking and Power over Ethernet, PD means
+> > Powered Device.
+
+You have not given any context. Reading the rest of your email, it
+sounds like you are talking about the energy model/performance domain
+for a collection of CPU cores?
+
+Now think about Linux as a whole, not the little corner you are
+interested in. Are there energy models anywhere else in Linux? What
+about the GPU cores? What about Linux regulators controlling power to
+peripherals? I pointed out the use case of Power over Ethernet needing
+an energy model.
+
+> Conceptually, the energy model covers the system-wide information; a
+> performance domain is information about one domain (e.g., big/medium/
+> little CPU blocks), so it is under the energy model; a performance state
+> is one dot in the performance-versus-power-consumption curve of a
+> performance domain.
+> 
+> Since the energy model covers the system-wide information, energy-
+> model.yaml (as Donald suggested) sounds better to me.
+
+By system-wide, do you mean the whole of Linux? I could use it for
+GPUs, regulators, PoE? Is it sufficiently generic? I somehow doubt it
+is. So i think you need some sort of prefix to indicate the domain it
+is applicable to. We can then add GPU energy models, PoE energy
+models, etc by the side without getting into naming issues.
+
+Naming is important, and causes a lot of pain when you get it
+wrong. Linux has PHYs and generic PHYs. The PHY subsystem has been
+around a long time, and generic PHY is much newer. And sometimes a PHY
+has a generic PHY associated to it, so it can get really confusing
+unless you are very precises with wording.
+
+We need to be careful with any generic term, such as energy model.
+
+	Andrew
 
