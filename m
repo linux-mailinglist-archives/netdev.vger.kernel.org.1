@@ -1,146 +1,167 @@
-Return-Path: <netdev+bounces-244645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6395CBC078
-	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 22:38:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DA54CBC0F3
+	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 23:16:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B8D8830084D9
-	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 21:38:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 77B0A300D414
+	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 22:15:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7070931354C;
-	Sun, 14 Dec 2025 21:38:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A270D315D50;
+	Sun, 14 Dec 2025 22:15:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sIYVbP79"
 X-Original-To: netdev@vger.kernel.org
-Received: from vmicros1.altlinux.org (vmicros1.altlinux.org [194.107.17.57])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0861248F47;
-	Sun, 14 Dec 2025 21:38:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.57
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A44F19A2A3;
+	Sun, 14 Dec 2025 22:15:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765748308; cv=none; b=N6U4CLAjXgcGSpCwGcz4wndsx+g4/hhezI2PdG03n8PpSgsVx3X2I+ek+2D9khXb++wnJPZKMBlR/Xu3r/OIvNElnMda94/bXVx/AApSppgip/mGm/KKKdm+2BSsABx1HZii+rqN3YOZ2ovClD/A7f+au+/Jej0MmgwxHx8oxK4=
+	t=1765750553; cv=none; b=U8cUvhMwHtTT3SNduqqqt+a9bQousAvzD/mkoYQRI6XoDTk5MfiQtZOBib9udnEUSoZo59tiyy18oW1oaGYqQcwW9J9z+5skg4vZZpTLAZlEn6rWdl4ikZDy03ZBFLFT9cvaTk+ywUgxD+e4UOKrd++vXcfzk5YITTupV2tZ1ZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765748308; c=relaxed/simple;
-	bh=NYLyzvVuuleE9gG/8P+CRXYvr4qbLrmQTlA3ApljXEk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zyn7u0XFsY2YY7Vq4Aqti+LZFiPLZnYaClsbknOJPpzd+p60faWJY5RYirTG+8F9GW9Vd9LpBr8R0eaW04wLimTWMjT24KIJUgAegRucjp/W3bfSoncXJDhNuh6QbG8+001uISFBte4OciWQLJg0xwQy7ERoTy3vaZ7w322jASk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
-Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
-	by vmicros1.altlinux.org (Postfix) with ESMTP id E892572C8CC;
-	Mon, 15 Dec 2025 00:38:16 +0300 (MSK)
-Received: from altlinux.org (unknown [193.43.10.9])
-	by imap.altlinux.org (Postfix) with ESMTPSA id D194B36D00D3;
-	Mon, 15 Dec 2025 00:38:16 +0300 (MSK)
-Date: Mon, 15 Dec 2025 00:38:16 +0300
-From: Vitaly Chikunov <vt@altlinux.org>
-To: Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Clark Williams <clrkwllms@kernel.org>, 
-	Steven Rostedt <rostedt@goodmis.org>
-Cc: Ranganath V N <vnranganath.20@gmail.com>, 
-	linux-rt-devel@lists.linux.dev, edumazet@google.com, davem@davemloft.net, 
-	david.hunter.linux@gmail.com, horms@kernel.org, jiri@resnulli.us, khalid@kernel.org, 
-	kuba@kernel.org, pabeni@redhat.com, xiyou.wangcong@gmail.com, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, skhan@linuxfoundation.org
-Subject: Re: [PATCH net v4 2/2] net: sched: act_ife: initialize struct tc_ife
- to fix KMSAN kernel-infoleak
-Message-ID: <3kwhg36anlckq57bez25aimvyj@altlinux.org>
-References: <20251109091336.9277-1-vnranganath.20@gmail.com>
- <20251109091336.9277-3-vnranganath.20@gmail.com>
- <tnqp5igbbqyl6emzqnei2o4kuz@altlinux.org>
- <CAM0EoMmnDe+Re5P0YPiRTJ=N+4omhtv=r3i5iicav8R7hg6TTQ@mail.gmail.com>
- <CAM0EoMneOSX=AMe53hQibY=O6n=KYnudAWfVtUdOf8qc_Bmw+Q@mail.gmail.com>
+	s=arc-20240116; t=1765750553; c=relaxed/simple;
+	bh=eoWq0R056rv6qFunXhkW+ex9LyETDs54864ThvZUEN0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=mUiWKSKAB2BWysmZyfEVi9MSmu8orDyp8b3WZVBbCP2fVHVcLR8W+YMeQX5KZiSLnoIuZzepak+qlyrYJ1aEpkXHwAcorrOhsMrr6724eP4ibfpGM3Qy5Ek4khBmFjvcUlHKSkyJlo+3iIBZ0u2RLrGEoYyjugDMXg1Za6ceIM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sIYVbP79; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E9315C4CEF1;
+	Sun, 14 Dec 2025 22:15:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765750553;
+	bh=eoWq0R056rv6qFunXhkW+ex9LyETDs54864ThvZUEN0=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=sIYVbP79jyu36bP2/ttcG9+TnIZASIbsMOfDQlGt67dlHV5o3hlT6W4jlWsk2iGWS
+	 /90+fX6H6VbzZOvk+vvCLijEwlCkQ2leZan8z9L6MizQ3HNSR13QmN8FdAwtaDhwrW
+	 AoKjELjgs9maUHNjiJ+PM1yamiYUrkxITT4ig2wgxYDbn0CaTW5lb7RPgSyczSACif
+	 bZ+gwMwKgYAX3S08OEvIMDtiC385cpJkO76aQ4Hb158rQHM/3ja022s/Z7RCvYleuZ
+	 Ty5MSoqaBfhOqDRznL/5rIXZCaLMnjRa8s7iIsvykLso8PsEoW64bfqUQ05AoE8D6V
+	 nmYV1PtNApxAg==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D17A8D5B16E;
+	Sun, 14 Dec 2025 22:15:52 +0000 (UTC)
+From: Jan Petrous via B4 Relay <devnull+jan.petrous.oss.nxp.com@kernel.org>
+Subject: [PATCH RFC 0/4] Support multi-channel IRQs in stmmac platform
+ drivers
+Date: Sun, 14 Dec 2025 23:15:36 +0100
+Message-Id: <20251214-dwmac_multi_irq-v1-0-36562ab0e9f7@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAM0EoMneOSX=AMe53hQibY=O6n=KYnudAWfVtUdOf8qc_Bmw+Q@mail.gmail.com>
+X-B4-Tracking: v=1; b=H4sIAAg3P2kC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDI1NDIwNL3ZTy3MTk+NzSnJLM+MyiQl3LFIs0MwMTM6PkZEMloK6CotS0zAq
+ widFKQW7OSrG1tQC+VpqgZgAAAA==
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Chester Lin <chester62515@gmail.com>, Matthias Brugger <mbrugger@suse.com>, 
+ Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>, 
+ NXP S32 Linux Team <s32@nxp.com>, Shawn Guo <shawnguo@kernel.org>, 
+ Sascha Hauer <s.hauer@pengutronix.de>, 
+ Pengutronix Kernel Team <kernel@pengutronix.de>, 
+ Fabio Estevam <festevam@gmail.com>, Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ imx@lists.linux.dev, devicetree@vger.kernel.org, 
+ "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1765750551; l=4064;
+ i=jan.petrous@oss.nxp.com; s=20240922; h=from:subject:message-id;
+ bh=eoWq0R056rv6qFunXhkW+ex9LyETDs54864ThvZUEN0=;
+ b=2gQIU5wXxSZN34/wa2M1NFfbZH0jsb3PuTqiNgL/E7P0BbaWTcjdieFbbA7UU7kR4LeCpMq6i
+ XH6Jmr1v0jWAEEMu9tEhHckAVlKp6UMi8B3z0/Ksqx3lOIILWxGtVh4
+X-Developer-Key: i=jan.petrous@oss.nxp.com; a=ed25519;
+ pk=Ke3wwK7rb2Me9UQRf6vR8AsfJZfhTyoDaxkUCqmSWYY=
+X-Endpoint-Received: by B4 Relay for jan.petrous@oss.nxp.com/20240922 with
+ auth_id=217
+X-Original-From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+Reply-To: jan.petrous@oss.nxp.com
 
-Jamal, and linux-rt-devel,
+The stmmac core supports two interrupt modes, controlled by the
+flag STMMAC_FLAG_MULTI_MSI_EN.
+- When the flag is set, the driver uses multi-channel IRQ mode (multi-IRQ).
+- Otherwise, a single IRQ line is requested:
 
-On Fri, Dec 12, 2025 at 11:29:24AM -0500, Jamal Hadi Salim wrote:
-> On Fri, Dec 12, 2025 at 11:26 AM Jamal Hadi Salim <jhs@mojatatu.com> wrote:
-> >
-> > On Thu, Dec 11, 2025 at 7:54 PM Vitaly Chikunov <vt@altlinux.org> wrote:
-> > >
-> > > On Sun, Nov 09, 2025 at 02:43:36PM +0530, Ranganath V N wrote:
-> > > > Fix a KMSAN kernel-infoleak detected  by the syzbot .
-> > > >
-> > > > [net?] KMSAN: kernel-infoleak in __skb_datagram_iter
-> > > >
-> > > > In tcf_ife_dump(), the variable 'opt' was partially initialized using a
-> > > > designatied initializer. While the padding bytes are reamined
-> > > > uninitialized. nla_put() copies the entire structure into a
-> > > > netlink message, these uninitialized bytes leaked to userspace.
-> > > >
-> > > > Initialize the structure with memset before assigning its fields
-> > > > to ensure all members and padding are cleared prior to beign copied.
-> > > >
-> > > > This change silences the KMSAN report and prevents potential information
-> > > > leaks from the kernel memory.
-> > > >
-> > > > This fix has been tested and validated by syzbot. This patch closes the
-> > > > bug reported at the following syzkaller link and ensures no infoleak.
-> > > >
-> > > > Reported-by: syzbot+0c85cae3350b7d486aee@syzkaller.appspotmail.com
-> > > > Closes: https://syzkaller.appspot.com/bug?extid=0c85cae3350b7d486aee
-> > > > Tested-by: syzbot+0c85cae3350b7d486aee@syzkaller.appspotmail.com
-> > > > Fixes: ef6980b6becb ("introduce IFE action")
-> > > > Signed-off-by: Ranganath V N <vnranganath.20@gmail.com>
-> > > > ---
-> > > >  net/sched/act_ife.c | 12 +++++++-----
-> > > >  1 file changed, 7 insertions(+), 5 deletions(-)
-> > > >
-> > > > diff --git a/net/sched/act_ife.c b/net/sched/act_ife.c
-> > > > index 107c6d83dc5c..7c6975632fc2 100644
-> > > > --- a/net/sched/act_ife.c
-> > > > +++ b/net/sched/act_ife.c
-> > > > @@ -644,13 +644,15 @@ static int tcf_ife_dump(struct sk_buff *skb, struct tc_action *a, int bind,
-> > > >       unsigned char *b = skb_tail_pointer(skb);
-> > > >       struct tcf_ife_info *ife = to_ife(a);
-> > > >       struct tcf_ife_params *p;
-> > > > -     struct tc_ife opt = {
-> > > > -             .index = ife->tcf_index,
-> > > > -             .refcnt = refcount_read(&ife->tcf_refcnt) - ref,
-> > > > -             .bindcnt = atomic_read(&ife->tcf_bindcnt) - bind,
-> > > > -     };
-> > > > +     struct tc_ife opt;
-> > > >       struct tcf_t t;
-> > > >
-> > > > +     memset(&opt, 0, sizeof(opt));
-> > > > +
-> > > > +     opt.index = ife->tcf_index,
-> > > > +     opt.refcnt = refcount_read(&ife->tcf_refcnt) - ref,
-> > > > +     opt.bindcnt = atomic_read(&ife->tcf_bindcnt) - bind,
-> > >
-> > > Are you sure this is correct to delimit with commas instead of
-> > > semicolons?
-> > >
-> > > This already causes build failures of 5.10.247-rt141 kernel, because
-> > > their spin_lock_bh unrolls into do { .. } while (0):
-> > >
-> >
-> > Do you have access to this?
-> > commit 205305c028ad986d0649b8b100bab6032dcd1bb5
-> > Author: Chen Ni <nichen@iscas.ac.cn>
-> > Date:   Wed Nov 12 15:27:09 2025 +0800
-> >
-> >     net/sched: act_ife: convert comma to semicolon
-> >
-> 
-> Sigh. I see the problem: that patch did not have a Fixes tag;
-> otherwise, it would have been backported.
+static int stmmac_request_irq(struct net_device *dev)
+{
+        /* Request the IRQ lines */
+        if (priv->plat->flags & STMMAC_FLAG_MULTI_MSI_EN)
+                ret = stmmac_request_irq_multi_msi(dev);
+        else
+                ret = stmmac_request_irq_single(dev);
+}
 
-Thanks! I will pick this for the local builds. But, perhaps, someone
-should send it to stable@kernel.org to fix the older -rt kernels too.
+At present, only PCI drivers (Intel and Loongson) make use of the multi-IRQ
+mode. This concept can be extended to DT-based embedded glue drivers
+(dwmac-xxx.c).
 
-Thanks,
+This series adds support for reading per-channel IRQs from the DT node and
+reuses the existing STMMAC_FLAG_MULTI_MSI_EN flag to enable multi-IRQ
+operation in platform drivers.
 
-> 
-> cheers,
-> jamal
+NXP S32G2/S32G3/S32R SoCs integrate the DWMAC IP with multi-channel
+interrupt support. The dwmac-s32.c driver change is provided as an example of
+enabling multi-IRQ mode for non-PCI drivers.
+
+An open question remains: should platform drivers support both single-IRQ
+and multi-IRQ modes, or should multi-IRQ be required with the DT node
+specifying all channel interrupts? The current RFC implementation follows
+the latter approach — dwmac-s32 requires IRQs to be defined for all
+channels.
+
+So, when the glue driver has set the flag, but the corresponding DT node
+has not expanded 'interrupts' property accordingly, the driver init
+fails with the following error:
+
+[4.925420] s32-dwmac 4033c000.ethernet eth0: stmmac_request_irq_multi_msi: alloc rx-0  MSI -6 (error: -22)
+
+When correctly set, the assigned IRQs can be visible
+in /proc/interrupts:
+
+root@s32g399aevb3:~# grep eth /proc/interrupts
+ 29:          0          0          0          0          0          0          0          0    GICv3  89 Level     eth0:mac
+ 30:          0          0          0          0          0          0          0          0    GICv3  91 Level     eth0:rx-0
+ 31:          0          0          0          0          0          0          0          0    GICv3  93 Level     eth0:rx-1
+ 32:          0          0          0          0          0          0          0          0    GICv3  95 Level     eth0:rx-2
+ 33:          0          0          0          0          0          0          0          0    GICv3  97 Level     eth0:rx-3
+ 34:          0          0          0          0          0          0          0          0    GICv3  99 Level     eth0:rx-4
+ 35:          0          0          0          0          0          0          0          0    GICv3  90 Level     eth0:tx-0
+ 36:          0          0          0          0          0          0          0          0    GICv3  92 Level     eth0:tx-1
+ 37:          0          0          0          0          0          0          0          0    GICv3  94 Level     eth0:tx-2
+ 38:          0          0          0          0          0          0          0          0    GICv3  96 Level     eth0:tx-3
+ 39:          0          0          0          0          0          0          0          0    GICv3  98 Level     eth0:tx-4
+
+Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
+---
+Jan Petrous (OSS) (4):
+      net: stmmac: platform: read channels irq
+      dt-bindings: net: nxp,s32-dwmac: Declare per-queue interrupts
+      arm64: dts: s32: set Ethernet channel irqs
+      stmmac: s32: enable multi irqs mode
+
+ .../devicetree/bindings/net/nxp,s32-dwmac.yaml     | 40 +++++++++++++++++++---
+ arch/arm64/boot/dts/freescale/s32g2.dtsi           | 24 +++++++++++--
+ arch/arm64/boot/dts/freescale/s32g3.dtsi           | 24 +++++++++++--
+ drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c    |  3 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_platform.c  | 38 +++++++++++++++++++-
+ 5 files changed, 119 insertions(+), 10 deletions(-)
+---
+base-commit: cb015814f8b6eebcbb8e46e111d108892c5e6821
+change-id: 20251209-dwmac_multi_irq-9d8f60462cc1
+
+Best regards,
+-- 
+Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
+
+
 
