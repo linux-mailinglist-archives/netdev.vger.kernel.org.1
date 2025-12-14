@@ -1,157 +1,109 @@
-Return-Path: <netdev+bounces-244616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5400BCBB8EF
-	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 10:30:26 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2734CBB934
+	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 11:14:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A1AB33006706
-	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 09:30:25 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 850283001FCD
+	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 10:14:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C008156237;
-	Sun, 14 Dec 2025 09:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3672D28E571;
+	Sun, 14 Dec 2025 10:14:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AWeuqQUG"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="P1Kx3/iD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB94B9463
-	for <netdev@vger.kernel.org>; Sun, 14 Dec 2025 09:30:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 145C6287505;
+	Sun, 14 Dec 2025 10:14:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765704623; cv=none; b=aLztJ1LAWoDlq+zVRstZ2lpwwacw5RyMD8VIINHNK7bShHpXvZdFzXukmb1kFAue2aXLU6CODnQzCaKpep88zhMO0l974jjnGuHNsCqsz9Did8BzWCYHqVy77DzH1xa0ILGYXW2DyRG8T9eCFQgd08XqiXEN9HvOBMjErXIoDpo=
+	t=1765707249; cv=none; b=lLs6pdRYZZvZ+7sXWXHMdOAAwsJDq/Qob9/M6bUq7okJku5o2zL0OGm3YpPhb/F3kC0eA3vSo+tgXGylo/GVFvYWhfjU0MEiZsk9qp+mIQ2e9CckPQ6vPQ0gB2Bc0cQY1Gqo1HMQm1s3UKCZFEX/TxBr6B7SYcXaOx65rpdZJag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765704623; c=relaxed/simple;
-	bh=0n3uJxHqX735kn4eG0/+bhoqe1AcToHA7kHImCjcZBc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=RSvp7oVeLwz6f5QRzK6XWoZL32/QELC+IBEyIDcgxh1yrWh+di8SN/4JEnkSD9zoTw5PdQcLe9sCpfI7xcKqjOVzIEXMugqUewGeIycAOmQJ3Ucd/FRUNN3o+UdT6oHlKMHKU7zQNsFUNcphk9Q1aHXJsiSG6fV5s2aElaIZwaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AWeuqQUG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF490C4CEF1;
-	Sun, 14 Dec 2025 09:30:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765704623;
-	bh=0n3uJxHqX735kn4eG0/+bhoqe1AcToHA7kHImCjcZBc=;
-	h=From:Date:Subject:To:Cc:From;
-	b=AWeuqQUGrdXf1eD20KsNuPVWAk1M+Uz4UJ3bcZIkZC2hMm0sXHEXtWUSpQYiDN+LW
-	 0UPiBQKHzRk57pddyvYX49WFKWAbO4r+cVh3uU1OMVL4FbNNKy6ASa19pje5JT1tFT
-	 71I6xHiTV0z6shx7HOA2hlr7O42h6gDEkBQLHeXBBIwiFKpG4YhdIemc7XSW8ExqDZ
-	 lRW83blw5c7k9WoH9WZWAYRQ1Lx+8W47b/YS6pdq+4izV80/vEUlLcaPGzr1pR8cjX
-	 Z/8RNT2+pyopdWpB8micIV6ov/mPZlwphR+hxLk5R+TgZ47XGjChGYuFmzsdIr0ghj
-	 wsocXbACFp7oQ==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Sun, 14 Dec 2025 10:30:07 +0100
-Subject: [PATCH net] net: airoha: Move net_devs registration in a dedicated
- routine
+	s=arc-20240116; t=1765707249; c=relaxed/simple;
+	bh=XlSU56szVhQgrcQeRl+5gH1+exER6ztV8KCHTdNmhOA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=RsRS5v51xpeFsLFkpXAEylcSZOFhtPBWLnW73pQbQ73QKSkmY3LtZRDsw2EpbAbkFzqc9YqufAcWUBOxlgTJHT1vQSyIP/qM/eVHgCS6DM8yjEdRo/8TElnpQmjiaKkfcKuur0EgKrSci35z6lfTnhXAgw60QPpqrc3inXiYxgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=P1Kx3/iD; arc=none smtp.client-ip=117.135.210.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=kb
+	i/ttDQOId+XDKOmaeNna6XQhSMKUgACh/eiMz2aTA=; b=P1Kx3/iDO+ByQIDRyz
+	i2+d6lXZO6uhWVSKVV+BwZBPv+naPOjJ38Pmv5870gMdQeUUvXIUi4XZiDYtoiTR
+	vP5G6F2yPsKS6eRFQxb8N+koUj5odZciXPFGoPQaEPMXvywGojB7Beh6267Updks
+	bb0tIiwc3+YT3cIgXCVJoGmg8=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g1-2 (Coremail) with SMTP id _____wAXpgapjT5p7CRRAQ--.14065S4;
+	Sun, 14 Dec 2025 18:13:13 +0800 (CST)
+From: David Wang <00107082@163.com>
+To: ziyao@disroot.org,
+	thostet@google.com
+Cc: daniel.gabay@intel.com,
+	jeffbai@aosc.io,
+	johannes.berg@intel.com,
+	kexybiscuit@aosc.io,
+	linux-kernel@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	miriam.rachel.korenblit@intel.com,
+	nathan@kernel.org,
+	netdev@vger.kernel.org,
+	pagadala.yesu.anjaneyulu@intel.com,
+	richardcochran@gmail.com
+Subject: Re: [PATCH iwlwifi-fixes] wifi: iwlwifi: Implement settime64 as stub for MVM/MLD PTP
+Date: Sun, 14 Dec 2025 18:12:57 +0800
+Message-ID: <20251214101257.4190-1-00107082@163.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20251204123204.9316-1-ziyao@disroot.org>
+References: <20251204123204.9316-1-ziyao@disroot.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251214-airoha-fix-dev-registration-v1-1-860e027ad4c6@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x2M0QpAQBAAf0X7bMueI/kVedjcYl/QnqTk320ep
- 2bmgSymkqEvHjC5NOu+OVBZwLTytghqcoZQhYYCRWS1fWWc9cYkF5osmk/j0zucaiaKqekiteC
- Hw8S9/z6M7/sBdsmVxW0AAAA=
-X-Change-ID: 20251214-airoha-fix-dev-registration-c3a114d58416
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-X-Mailer: b4 0.14.2
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wAXpgapjT5p7CRRAQ--.14065S4
+X-Coremail-Antispam: 1Uf129KBjvJXoW7WFy7uw18CrW3Zr1xAr18Zrb_yoW8XFyxpa
+	yfGwn8Ar40qFWruFsrta17uas5Gwn3GF42vr1xJwn8Z3WUuFZFga10yrWakasrGws5Aw13
+	XrnF9a1jva1qyw7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zRoKZZUUUUU=
+X-CM-SenderInfo: qqqrilqqysqiywtou0bp/xtbC7ht7Jmk+jbtW9QAA3q
 
-Since airoha_probe() is not executed under rtnl lock, there is small race
-where a given device is configured by user-space while the remaining ones
-are not completely loaded from the dts yet. This condition will allow a
-hw device misconfiguration since there are some conditions (e.g. GDM2 check
-in airoha_dev_init()) that require all device are properly loaded from the
-device tree. Fix the issue moving net_devices registration at the end of
-the airoha_probe routine.
+On Thu, Dec 04, 2025 at 12:32:04PM +0000, Yao Zi wrote:
+> Since commit dfb073d32cac ("ptp: Return -EINVAL on ptp_clock_register if
+> required ops are NULL"), PTP clock registered through ptp_clock_register
+> is required to have ptp_clock_info.settime64 set, however, neither MVM
+> nor MLD's PTP clock implementation sets it, resulting in warnings when
+> the interface starts up, like
+> 
+> WARNING: drivers/ptp/ptp_clock.c:325 at ptp_clock_register+0x2c8/0x6b8, CPU#1: wpa_supplicant/469
+> CPU: 1 UID: 0 PID: 469 Comm: wpa_supplicant Not tainted 6.18.0+ #101 PREEMPT(full)
+> ra: ffff800002732cd4 iwl_mvm_ptp_init+0x114/0x188 [iwlmvm]
+> ERA: 9000000002fdc468 ptp_clock_register+0x2c8/0x6b8
+> iwlwifi 0000:01:00.0: Failed to register PHC clock (-22)
+> 
+> I don't find an appropriate firmware interface to implement settime64()
+> for iwlwifi MLD/MVM, thus instead create a stub that returns
+> -EOPTNOTSUPP only, suppressing the warning and allowing the PTP clock to
+> be registered.
 
-Fixes: 9cd451d414f6e ("net: airoha: Add loopback support for GDM2")
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/airoha/airoha_eth.c | 39 +++++++++++++++++++++-----------
- 1 file changed, 26 insertions(+), 13 deletions(-)
+This seems disturbing....If a null settime64 deserve a kernel WARN dump, so should
+a settime64 which returns error.
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 75893c90a0a17c528c27fc0e986de194e7736637..315d97036ac1d611cc786020cbf2c6df810995a9 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -2924,19 +2924,26 @@ static int airoha_alloc_gdm_port(struct airoha_eth *eth,
- 	port->id = id;
- 	eth->ports[p] = port;
- 
--	err = airoha_metadata_dst_alloc(port);
--	if (err)
--		return err;
-+	return airoha_metadata_dst_alloc(port);
-+}
- 
--	err = register_netdev(dev);
--	if (err)
--		goto free_metadata_dst;
-+static int airoha_register_gdm_devices(struct airoha_eth *eth)
-+{
-+	int i;
- 
--	return 0;
-+	for (i = 0; i < ARRAY_SIZE(eth->ports); i++) {
-+		struct airoha_gdm_port *port = eth->ports[i];
-+		int err;
- 
--free_metadata_dst:
--	airoha_metadata_dst_free(port);
--	return err;
-+		if (!port)
-+			continue;
-+
-+		err = register_netdev(port->dev);
-+		if (err)
-+			return err;
-+	}
-+
-+	return 0;
- }
- 
- static int airoha_probe(struct platform_device *pdev)
-@@ -3027,6 +3034,10 @@ static int airoha_probe(struct platform_device *pdev)
- 		}
- 	}
- 
-+	err = airoha_register_gdm_devices(eth);
-+	if (err)
-+		goto error_napi_stop;
-+
- 	return 0;
- 
- error_napi_stop:
-@@ -3040,10 +3051,12 @@ static int airoha_probe(struct platform_device *pdev)
- 	for (i = 0; i < ARRAY_SIZE(eth->ports); i++) {
- 		struct airoha_gdm_port *port = eth->ports[i];
- 
--		if (port && port->dev->reg_state == NETREG_REGISTERED) {
-+		if (!port)
-+			continue;
-+
-+		if (port->dev->reg_state == NETREG_REGISTERED)
- 			unregister_netdev(port->dev);
--			airoha_metadata_dst_free(port);
--		}
-+		airoha_metadata_dst_free(port);
- 	}
- 	free_netdev(eth->napi_dev);
- 	platform_set_drvdata(pdev, NULL);
+Before fixing the warning, the expected behavior of settime64 should be specified clearly,
+hence why the dfb073d32cac ("ptp: Return -EINVAL on ptp_clock_register if required ops are NULL")?
 
----
-base-commit: 8f7aa3d3c7323f4ca2768a9e74ebbe359c4f8f88
-change-id: 20251214-airoha-fix-dev-registration-c3a114d58416
 
-Best regards,
--- 
-Lorenzo Bianconi <lorenzo@kernel.org>
+
+David
+
+> 
+> Reported-by: Nathan Chancellor <nathan@kernel.org>
+> Closes: https://lore.kernel.org/all/20251108044822.GA3262936@ax162/
+> Signed-off-by: Yao Zi <ziyao@disroot.org>
+> ---
 
 
