@@ -1,129 +1,123 @@
-Return-Path: <netdev+bounces-244650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CE46CBC102
-	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 23:16:28 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B291CBC133
+	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 23:31:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C663730173BC
-	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 22:15:57 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9A97230021ED
+	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 22:31:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D54123161B9;
-	Sun, 14 Dec 2025 22:15:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0840D314A62;
+	Sun, 14 Dec 2025 22:31:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EJwZiL8/"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2rEh/LIV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D06E31578F;
-	Sun, 14 Dec 2025 22:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 928C9221F39;
+	Sun, 14 Dec 2025 22:31:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765750553; cv=none; b=YIEaATG2AXRWe2ggxEI4oqPRe8YWC0s+CvF0H9N4uoioMBUaniY9KdkpjAsxAqIFEREdyZi5603lgyRNITjIoH1eGBqjK6J3McsEcCj1MSvgZt27f6B2NGITHaIPVikGsa+dIxsUhJn5aAma4njKYy4BTNnzJJlPhJSOk1CCXr0=
+	t=1765751479; cv=none; b=jSDAQNilMdSnIKIQbPmkhbhdcAiOkraoY8yZBweAvZudnXWr8a/BCA/DKzb2OjH3hqarUpsMxbGxbsaJJIuyGx+WR6+obnhq67O4Bbjhm+ZRzix0xqqEPD1swKaSyRM3d1yQb/yShSDAKg4Lny7laU9IoYmO8lCYHz5jsJHGJ/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765750553; c=relaxed/simple;
-	bh=+dB1ubbQUZbbOBra3vCG6KF5yaKYR81O/ni3EMy7Nb8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=SKy2xOqboFduy6ainlzamUZ3nEn4y4ZtRP0x87Smgdig2Xf8gGTDGvRTf/ns06Ih4utINUbDNSM7ncr99oplgFgPxvwe2xHF3zT1HP/zqNu49tdaln4env25zqHEbrcIO/udNChwx5vtfXcddk5N1ud9WE+dCKVp+VfpEmvekXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EJwZiL8/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 56912C2BCB3;
-	Sun, 14 Dec 2025 22:15:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765750553;
-	bh=+dB1ubbQUZbbOBra3vCG6KF5yaKYR81O/ni3EMy7Nb8=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=EJwZiL8/o8OAqNHR8DmIpjMQJmZS6GarMS4Dh7gOfFm84cO8ExZqijdqRoTaxFQ+N
-	 zUkS8m0lWsuZ6MoMnByvAHLj3smihk0bdyZscRIKvklUQot/Ig9SSdHHiqP9UQsAYQ
-	 fs4AMbK83DrtyqxpTsQ8ZOF1BirIzZnmaBt1u4JCMrqua5086jLVJCGo2WSzJj6meG
-	 8d3gYkLQIdnHKz7MfXT5a14XDp8DEFPFjpLBd+RN/qziaJuWQpTazfaF+9iAPiykeW
-	 cuZTT0EvzgXMlnAeN15MX85386AIAZtZNY2Nb+8oqqNJxzORlvf2Ka7arrTkLJNcCS
-	 xGXIgwScvgxqQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4810AD5B16F;
-	Sun, 14 Dec 2025 22:15:53 +0000 (UTC)
-From: Jan Petrous via B4 Relay <devnull+jan.petrous.oss.nxp.com@kernel.org>
-Date: Sun, 14 Dec 2025 23:15:40 +0100
-Subject: [PATCH RFC 4/4] stmmac: s32: enable multi irqs mode
+	s=arc-20240116; t=1765751479; c=relaxed/simple;
+	bh=n/dhjzhd/Pp2IXEKArQf3Uz07bOuxKVxtYSTm0xXQKc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tmrPDWw8BZQ0P5gKEujmpJ5OqHqJ9Y3IzSbVBWlPQXdx2DNV9OB2e2q3DQRBEnFcnw+BtzI83kjRb0Qe9eCd4vB8tQeTwGuxYxErXQGdU2TCFHNZZrR8O6+RZNibVQ2fzRP0kWawDZz9RQ6g7gc5XHwxpmpnsCL9Mi0BXbfO2rQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2rEh/LIV; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=z6fXs+IIbDChxuFtTKIP2sLb6jR6q7HS1FdEpkJpi6g=; b=2rEh/LIVp8lLB0Cmg0619HT3ME
+	YLLfXMm8HuA25MtApqKFp1X85UfJ7fAykF9Eyig4AJuNW1FgFBmoV9/q7aiok7X3EQ1bVhljtMylJ
+	ujYx/7ZUEo/Hz6Dzeq42dceYvih8RtSxHWeGZrY4yWA4IhDxUHx3yvbRglCvtmXq0r24=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vUubz-00GwZz-Sv; Sun, 14 Dec 2025 23:30:43 +0100
+Date: Sun, 14 Dec 2025 23:30:43 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: jan.petrous@oss.nxp.com
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Chester Lin <chester62515@gmail.com>,
+	Matthias Brugger <mbrugger@suse.com>,
+	Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>,
+	NXP S32 Linux Team <s32@nxp.com>, Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev, devicetree@vger.kernel.org
+Subject: Re: [PATCH RFC 1/4] net: stmmac: platform: read channels irq
+Message-ID: <b9c8580f-e615-4eaa-8878-2fb8d888c0aa@lunn.ch>
+References: <20251214-dwmac_multi_irq-v1-0-36562ab0e9f7@oss.nxp.com>
+ <20251214-dwmac_multi_irq-v1-1-36562ab0e9f7@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251214-dwmac_multi_irq-v1-4-36562ab0e9f7@oss.nxp.com>
-References: <20251214-dwmac_multi_irq-v1-0-36562ab0e9f7@oss.nxp.com>
-In-Reply-To: <20251214-dwmac_multi_irq-v1-0-36562ab0e9f7@oss.nxp.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Chester Lin <chester62515@gmail.com>, Matthias Brugger <mbrugger@suse.com>, 
- Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>, 
- NXP S32 Linux Team <s32@nxp.com>, Shawn Guo <shawnguo@kernel.org>, 
- Sascha Hauer <s.hauer@pengutronix.de>, 
- Pengutronix Kernel Team <kernel@pengutronix.de>, 
- Fabio Estevam <festevam@gmail.com>, Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- imx@lists.linux.dev, devicetree@vger.kernel.org, 
- "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
-X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1765750551; l=1135;
- i=jan.petrous@oss.nxp.com; s=20240922; h=from:subject:message-id;
- bh=uKYPU0Ih9OcJADxPjnsSZTg/aiN/NSWTJ7b+174uNp0=;
- b=ccktjokTsHbY0A8sCrOp0tvellHMrF7o/nyJheYG8kgkcnDKKoYdHjDKtsJCQl7WUSZQnL3hC
- etvrjrpdbBbDMgbIUC/YcKNTWUWoFvuM3l4eTc66bLQcMfsxAg2TFRv
-X-Developer-Key: i=jan.petrous@oss.nxp.com; a=ed25519;
- pk=Ke3wwK7rb2Me9UQRf6vR8AsfJZfhTyoDaxkUCqmSWYY=
-X-Endpoint-Received: by B4 Relay for jan.petrous@oss.nxp.com/20240922 with
- auth_id=217
-X-Original-From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
-Reply-To: jan.petrous@oss.nxp.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251214-dwmac_multi_irq-v1-1-36562ab0e9f7@oss.nxp.com>
 
-From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+On Sun, Dec 14, 2025 at 11:15:37PM +0100, Jan Petrous via B4 Relay wrote:
+> From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+> 
+> Read IRQ resources for all channels, to allow multi IRQ mode
+> for platform glue drivers.
+> 
+> Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
+> ---
+>  .../net/ethernet/stmicro/stmmac/stmmac_platform.c  | 38 +++++++++++++++++++++-
+>  1 file changed, 37 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> index 8979a50b5507..29e40253bdfe 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> @@ -700,6 +700,9 @@ EXPORT_SYMBOL_GPL(stmmac_pltfr_find_clk);
+>  int stmmac_get_platform_resources(struct platform_device *pdev,
+>  				  struct stmmac_resources *stmmac_res)
+>  {
+> +	int i;
+> +	char name[8];
 
-Signalize support for multi irq mode.
+Reverse Christmas tree please.
 
-From now, if yoused old DT node, without channel IRQs set,
-the driver fails to init with the following error:
+>  	memset(stmmac_res, 0, sizeof(*stmmac_res));
+>  
+>  	/* Get IRQ information early to have an ability to ask for deferred
+> @@ -743,7 +746,40 @@ int stmmac_get_platform_resources(struct platform_device *pdev,
+>  
+>  	stmmac_res->addr = devm_platform_ioremap_resource(pdev, 0);
+>  
+> -	return PTR_ERR_OR_ZERO(stmmac_res->addr);
+> +	if (IS_ERR(stmmac_res->addr))
+> +		return PTR_ERR(stmmac_res->addr);
+> +
+> +	/* RX channels irq */
+> +	for (i = 0; i < MTL_MAX_RX_QUEUES; i++) {
+> +		scnprintf(name, 8, "rx-queue-%d", i);
 
-[4.925420] s32-dwmac 4033c000.ethernet eth0: stmmac_request_irq_multi_msi: alloc rx-0  MSI -6 (error: -22)
+It would be better to use sizeof(name), not 8.
 
-Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
----
- drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Also, 'rx-queue-' is 9 characters. So i don't see how this can
+actually work?
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
-index 5a485ee98fa7..284e2067a00b 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
-@@ -2,7 +2,7 @@
- /*
-  * NXP S32G/R GMAC glue layer
-  *
-- * Copyright 2019-2024 NXP
-+ * Copyright 2019-2025 NXP
-  *
-  */
- 
-@@ -149,6 +149,7 @@ static int s32_dwmac_probe(struct platform_device *pdev)
- 	plat->core_type = DWMAC_CORE_GMAC4;
- 	plat->pmt = 1;
- 	plat->flags |= STMMAC_FLAG_SPH_DISABLE;
-+	plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
- 	plat->rx_fifo_size = 20480;
- 	plat->tx_fifo_size = 20480;
- 
-
--- 
-2.47.0
-
-
+	Andrew
 
