@@ -1,392 +1,442 @@
-Return-Path: <netdev+bounces-244614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF85DCBB6F5
-	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 07:19:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1776FCBB70A
+	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 07:38:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9B45230010E6
-	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 06:19:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D1A5D300C0FF
+	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 06:38:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E97612367B5;
-	Sun, 14 Dec 2025 06:19:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26535270EDF;
+	Sun, 14 Dec 2025 06:38:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n30+CsPh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QFP4YU7N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 991842AD22;
-	Sun, 14 Dec 2025 06:19:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B542B224AED
+	for <netdev@vger.kernel.org>; Sun, 14 Dec 2025 06:38:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765693192; cv=none; b=snYwsrXjSG+WjwtB4kaqSSB3HyeXvZaWqnbIoGmK2hJxQELHM68spyzRguCW8ToykpjyaPpfHGJsGoR6I0P6DV2xPORZOa6RndRQIK6pDBm5FKlIjva+5LS/f2NSKEZ5+UzlywohPFh94JjxihFNs522p/GRHRaFxfR2Zm051es=
+	t=1765694310; cv=none; b=lwCfqgZAw9wot3+PzYLAtjduuaqAKe69MMcSSosqGEFOpHx0GuINRQOsH5Tb4suKSR/d0kUxogleqBNRw6AH32PjfF2hv30LTKuOcdejUGAPl6DYZT2I6ajMrVuuT67bf36aVdB/b2dG+MmHOt+6B1XEFkzXS5Xd/SSm5OFMePs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765693192; c=relaxed/simple;
-	bh=eZUgN1MEjmI69Dx6xkOmA6NzMD2tqyUe/mkRtjP8KY0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MGJUpDFxxeB53k9UGE86AGhDMZ1x3Y2jfbem0Aj2NAnnqPLfNd1D7PRhAht3WQxzsu8sr2xnaPosbGRF2r2PAE9ijO6fboIZnv3p3W97xU59CqQX3IUJFerWejn4dEu0awMjRjuC9Net9O62tSQwDAuTuKloVaUqzlN1NaPUDxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n30+CsPh; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765693191; x=1797229191;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=eZUgN1MEjmI69Dx6xkOmA6NzMD2tqyUe/mkRtjP8KY0=;
-  b=n30+CsPh/60fTCJLq3sU9ABvlYg0gQTOvm/ikoASz1zHTYaen2bKeV8X
-   InLjjSpOSK916/4pejySqfKz7q29iOPhOO9W6qVcpnZI087bpSQRAvRgS
-   h9+FK5p6qtfZT9rDqQ/vr4EeW+9C3QK/8M7zLGyJkQjeSsL2KuMobgCxS
-   xZg7HTAx3I5LZIWwx6TVjOQO5HnLGT2cWegMEpJFdxe+jN7CqWKgxosdT
-   K+LyRvaoAjVXLsUDxyTWC6h+PqcXdygnwv1+FYJnCqQV22B3+k/BFw5Fb
-   J7GEmqT3vgbyBXLiGTHt7/jG7KF8bVYAIxx+hN9YwTW/cckdMTs+qQIVm
-   g==;
-X-CSE-ConnectionGUID: 36meaS38SmG2CjU/mVqSMQ==
-X-CSE-MsgGUID: g1HTcv/4SCSTskVtfdslRw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11641"; a="77947755"
-X-IronPort-AV: E=Sophos;i="6.21,147,1763452800"; 
-   d="scan'208";a="77947755"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2025 22:19:50 -0800
-X-CSE-ConnectionGUID: i5grRnW/RNeIrsP1MNjeLg==
-X-CSE-MsgGUID: I6iPCiSRQwqpIjzZltUqpg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,147,1763452800"; 
-   d="scan'208";a="201869248"
-Received: from lkp-server01.sh.intel.com (HELO d335e3c6db51) ([10.239.97.150])
-  by fmviesa005.fm.intel.com with ESMTP; 13 Dec 2025 22:19:45 -0800
-Received: from kbuild by d335e3c6db51 with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vUfSI-000000008ez-2MLv;
-	Sun, 14 Dec 2025 06:19:42 +0000
-Date: Sun, 14 Dec 2025 14:19:30 +0800
-From: kernel test robot <lkp@intel.com>
-To: david.laight.linux@gmail.com, Yury Norov <yury.norov@gmail.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Crt Mori <cmo@melexis.com>,
-	Richard Genoud <richard.genoud@bootlin.com>,
-	Andy Shevchenko <andriy.shevchenko@intel.com>,
-	Luo Jie <quic_luoj@quicinc.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Mika Westerberg <mika.westerberg@linux.intel.com>,
-	Andreas Noever <andreas.noever@gmail.com>,
-	Yehezkel Bernat <YehezkelShB@gmail.com>,
-	Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
-Cc: oe-kbuild-all@lists.linux.dev,
-	David Laight <david.laight.linux@gmail.com>
-Subject: Re: [PATCH v2 11/16] bitfield: Common up validation of the mask
- parameter
-Message-ID: <202512141305.J3aPiiBv-lkp@intel.com>
-References: <20251212193721.740055-12-david.laight.linux@gmail.com>
+	s=arc-20240116; t=1765694310; c=relaxed/simple;
+	bh=yLpYmY+EhSy4abAWbhr3gJTq77TsZsZuhspXQY+yB4s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RBO084LoS3FfKVSn4BNzc4Wlyf0B+iFokNx1XCwOB0F4DGgneVUFeGNcVATrRweHnArujY7uRCA6NAeVY2iKMtIy81jSpGZlv/xavV8W+TjO+Ne8CjoIwMc/iS4o+ajiy5C2cKtwLH6Zkaxz0mctj5fMvNUltLnG9ldaMkuozoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QFP4YU7N; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-477619f8ae5so18630145e9.3
+        for <netdev@vger.kernel.org>; Sat, 13 Dec 2025 22:38:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765694305; x=1766299105; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=axrQHkzxz0KpEHvUlLXeQIagSIg4MG47QjW3/6LfZU0=;
+        b=QFP4YU7NDeW+pSOvykTx/rhizAOcpJsoml9GkQ/AUDpFqIbsgRjnh+bX2toNcLpU3u
+         E7YW8JwhvQhhtjuSpRs02nhXNiZRxyuwgzb/LLLGGM8QMcT622R/ag70u1IDJgcx7dYs
+         SM/gNWTaPVSkF3/GewINVv8cBxQGQjZYC9Vd1V67qvgWLRyiR3z8W85TN6etroRYHtER
+         2aiA1P/Rdhd0GaJ+VCJMVQyAial+GB7m8r0czy3wpGJ1+ujcNA9meT9vuZWrKRWY/KXy
+         ANb6vLgIDZACJhra6sw+rzoOmdIzn2P/39q4z0yofWwjIlwXc+6BnYpHQ9FoPqrGubn4
+         u94w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765694305; x=1766299105;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=axrQHkzxz0KpEHvUlLXeQIagSIg4MG47QjW3/6LfZU0=;
+        b=GLDKKlkQFzr2xbth06PL63ehqG5hKjG6IQ3hUQiwOMiF9p7QMrEamJ2D/cxcXTUujn
+         mu/wEQYX4Su4f/zpT7LLek8wTm2NwAMF0kAwInd0OMkOR7AHI7l+cV6p2AP6kprJGm9Z
+         bfj1orV6au/obr5spD8pbPtNXNiW7KSSmEDwUChF8HqSxJ9sq75BPvLjia8qUvYiY986
+         JrGK8+JrsgnLByY8thfRQacGtqRTUOeJZukPL8eCHeU8DD9Um0AKogGvsw7NE6Cbw12s
+         0GQtFruV4leTMfO5JkbiCCvNEX7FwAKbHvKzGcHGogqvy57MizLtykT4IhQF++kZRkff
+         HRWw==
+X-Forwarded-Encrypted: i=1; AJvYcCWDHpvcjfd0Ritfs2DUWOyAyqe0hM2NMpED/GM6yWGP5ISnKSY0Q6bYWCszrfQuvVmS1zVbu5Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxNZb9D8uRhYEfWcE3RsML8BbeHglmpxUzihYgbZcvn4OEye3LI
+	4IehOYipHvdB6vwO7F3FxK9xLjzl3c3hbYvyuQzzYnIlNHQxvIxZQjNv
+X-Gm-Gg: AY/fxX45JTdGkMo/TLZdAKOUIQLV7gihmENTn8SCfE68akFXkEij36U3I3ITMWTQoVM
+	IyPL4z8VUke3RB0pDPBgqPheM08HrD0mKhMWesTWgcI7lBYeyuobZ/A7I8U92VXUoFFTIePcsAe
+	WC+Hb+djfF+9o6Iau9LGGgB+ly+LHVTHCPabGuvg4n1RanPnulD8r+etNWnAtfN6Z+O8Rq1ecim
+	G4FukBV/ttFvyZ9zLmRPy+LlbRw4ZU+YTwPWuN4l/ImYulqg5Wi8CDNYxNycpZcqwd4JGakbjjB
+	kq+REi8CJah1i0bgrOp06JPBRhCO9pcLZIHJnA9guvpgHWsstrvY2HU4VzDEgj1ovcRdPS4Hnzs
+	L7FHpF6nRTZ1edXh0yXkAFhVQT5nimq9i6pmGupgJK09OI2d0jGYcRKx6WL27Z+lrSRlKI5AzCK
+	Fl0zStfGFWp1khaosWMrZfccqUNUPdpYyWn/IjN43hF3o/nx3KuuMQYjPQvndqKbb5sizr9idhB
+	R1fZAw=
+X-Google-Smtp-Source: AGHT+IG9JoSb6msVo1qCxcATC1m0efC94+Z21fe2Smru+QlOODZum3iTG70a6YMjFsBcs3efW3tTXQ==
+X-Received: by 2002:a05:600c:6291:b0:479:3a2a:94e7 with SMTP id 5b1f17b1804b1-47a8f8b1449mr72294215e9.10.1765694304770;
+        Sat, 13 Dec 2025 22:38:24 -0800 (PST)
+Received: from [192.168.0.173] (108.228-30-62.static.virginmediabusiness.co.uk. [62.30.228.108])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-430f7475895sm2899972f8f.33.2025.12.13.22.38.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 13 Dec 2025 22:38:23 -0800 (PST)
+Message-ID: <24b9961d-7e0d-4239-97b3-39799524909f@gmail.com>
+Date: Sun, 14 Dec 2025 06:38:22 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251212193721.740055-12-david.laight.linux@gmail.com>
-
-Hi,
-
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on linus/master]
-[also build test ERROR on v6.19-rc1 next-20251212]
-[cannot apply to westeri-thunderbolt/next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/david-laight-linux-gmail-com/nfp-Call-FIELD_PREP-in-NFP_ETH_SET_BIT_CONFIG-wrapper/20251213-040625
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20251212193721.740055-12-david.laight.linux%40gmail.com
-patch subject: [PATCH v2 11/16] bitfield: Common up validation of the mask parameter
-config: i386-randconfig-053-20251213 (https://download.01.org/0day-ci/archive/20251214/202512141305.J3aPiiBv-lkp@intel.com/config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251214/202512141305.J3aPiiBv-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202512141305.J3aPiiBv-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> drivers/gpu/drm/xe/xe_guc.c:639:19: error: converting the result of '<<' to a boolean always evaluates to true [-Werror,-Wtautological-constant-compare]
-     639 |                 klvs[count++] = PREP_GUC_KLV_TAG(OPT_IN_FEATURE_EXT_CAT_ERR_TYPE);
-         |                                 ^
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:62:2: note: expanded from macro 'PREP_GUC_KLV_TAG'
-      62 |         PREP_GUC_KLV_CONST(MAKE_GUC_KLV_KEY(TAG), MAKE_GUC_KLV_LEN(TAG))
-         |         ^
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:38:20: note: expanded from macro 'PREP_GUC_KLV_CONST'
-      38 |         (FIELD_PREP_CONST(GUC_KLV_0_KEY, (key)) | \
-         |                           ^
-   drivers/gpu/drm/xe/abi/guc_klvs_abi.h:36:35: note: expanded from macro 'GUC_KLV_0_KEY'
-      36 | #define GUC_KLV_0_KEY                           (0xffffu << 16)
-         |                                                          ^
->> drivers/gpu/drm/xe/xe_guc.c:639:19: error: converting the result of '<<' to a boolean always evaluates to true [-Werror,-Wtautological-constant-compare]
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:62:2: note: expanded from macro 'PREP_GUC_KLV_TAG'
-      62 |         PREP_GUC_KLV_CONST(MAKE_GUC_KLV_KEY(TAG), MAKE_GUC_KLV_LEN(TAG))
-         |         ^
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:39:20: note: expanded from macro 'PREP_GUC_KLV_CONST'
-      39 |          FIELD_PREP_CONST(GUC_KLV_0_LEN, (len)))
-         |                           ^
-   drivers/gpu/drm/xe/abi/guc_klvs_abi.h:37:35: note: expanded from macro 'GUC_KLV_0_LEN'
-      37 | #define GUC_KLV_0_LEN                           (0xffffu << 0)
-         |                                                          ^
-   drivers/gpu/drm/xe/xe_guc.c:642:19: error: converting the result of '<<' to a boolean always evaluates to true [-Werror,-Wtautological-constant-compare]
-     642 |                 klvs[count++] = PREP_GUC_KLV_TAG(OPT_IN_FEATURE_DYNAMIC_INHIBIT_CONTEXT_SWITCH);
-         |                                 ^
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:62:2: note: expanded from macro 'PREP_GUC_KLV_TAG'
-      62 |         PREP_GUC_KLV_CONST(MAKE_GUC_KLV_KEY(TAG), MAKE_GUC_KLV_LEN(TAG))
-         |         ^
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:38:20: note: expanded from macro 'PREP_GUC_KLV_CONST'
-      38 |         (FIELD_PREP_CONST(GUC_KLV_0_KEY, (key)) | \
-         |                           ^
-   drivers/gpu/drm/xe/abi/guc_klvs_abi.h:36:35: note: expanded from macro 'GUC_KLV_0_KEY'
-      36 | #define GUC_KLV_0_KEY                           (0xffffu << 16)
-         |                                                          ^
-   drivers/gpu/drm/xe/xe_guc.c:642:19: error: converting the result of '<<' to a boolean always evaluates to true [-Werror,-Wtautological-constant-compare]
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:62:2: note: expanded from macro 'PREP_GUC_KLV_TAG'
-      62 |         PREP_GUC_KLV_CONST(MAKE_GUC_KLV_KEY(TAG), MAKE_GUC_KLV_LEN(TAG))
-         |         ^
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:39:20: note: expanded from macro 'PREP_GUC_KLV_CONST'
-      39 |          FIELD_PREP_CONST(GUC_KLV_0_LEN, (len)))
-         |                           ^
-   drivers/gpu/drm/xe/abi/guc_klvs_abi.h:37:35: note: expanded from macro 'GUC_KLV_0_LEN'
-      37 | #define GUC_KLV_0_LEN                           (0xffffu << 0)
-         |                                                          ^
-   4 errors generated.
---
->> drivers/gpu/drm/xe/xe_guc_submit.c:371:12: error: converting the result of '<<' to a boolean always evaluates to true [-Werror,-Wtautological-constant-compare]
-     371 |         *emit++ = PREP_GUC_KLV_TAG(SCHEDULING_POLICIES_RENDER_COMPUTE_YIELD);
-         |                   ^
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:62:2: note: expanded from macro 'PREP_GUC_KLV_TAG'
-      62 |         PREP_GUC_KLV_CONST(MAKE_GUC_KLV_KEY(TAG), MAKE_GUC_KLV_LEN(TAG))
-         |         ^
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:38:20: note: expanded from macro 'PREP_GUC_KLV_CONST'
-      38 |         (FIELD_PREP_CONST(GUC_KLV_0_KEY, (key)) | \
-         |                           ^
-   drivers/gpu/drm/xe/abi/guc_klvs_abi.h:36:35: note: expanded from macro 'GUC_KLV_0_KEY'
-      36 | #define GUC_KLV_0_KEY                           (0xffffu << 16)
-         |                                                          ^
->> drivers/gpu/drm/xe/xe_guc_submit.c:371:12: error: converting the result of '<<' to a boolean always evaluates to true [-Werror,-Wtautological-constant-compare]
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:62:2: note: expanded from macro 'PREP_GUC_KLV_TAG'
-      62 |         PREP_GUC_KLV_CONST(MAKE_GUC_KLV_KEY(TAG), MAKE_GUC_KLV_LEN(TAG))
-         |         ^
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:39:20: note: expanded from macro 'PREP_GUC_KLV_CONST'
-      39 |          FIELD_PREP_CONST(GUC_KLV_0_LEN, (len)))
-         |                           ^
-   drivers/gpu/drm/xe/abi/guc_klvs_abi.h:37:35: note: expanded from macro 'GUC_KLV_0_LEN'
-      37 | #define GUC_KLV_0_LEN                           (0xffffu << 0)
-         |                                                          ^
-   2 errors generated.
---
->> drivers/gpu/drm/xe/xe_gt_sriov_pf_config.c:163:3: error: converting the result of '<<' to a boolean always evaluates to true [-Werror,-Wtautological-constant-compare]
-     163 |                 PREP_GUC_KLV_TAG(VF_CFG_GGTT_START),
-         |                 ^
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:62:2: note: expanded from macro 'PREP_GUC_KLV_TAG'
-      62 |         PREP_GUC_KLV_CONST(MAKE_GUC_KLV_KEY(TAG), MAKE_GUC_KLV_LEN(TAG))
-         |         ^
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:38:20: note: expanded from macro 'PREP_GUC_KLV_CONST'
-      38 |         (FIELD_PREP_CONST(GUC_KLV_0_KEY, (key)) | \
-         |                           ^
-   drivers/gpu/drm/xe/abi/guc_klvs_abi.h:36:35: note: expanded from macro 'GUC_KLV_0_KEY'
-      36 | #define GUC_KLV_0_KEY                           (0xffffu << 16)
-         |                                                          ^
->> drivers/gpu/drm/xe/xe_gt_sriov_pf_config.c:163:3: error: converting the result of '<<' to a boolean always evaluates to true [-Werror,-Wtautological-constant-compare]
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:62:2: note: expanded from macro 'PREP_GUC_KLV_TAG'
-      62 |         PREP_GUC_KLV_CONST(MAKE_GUC_KLV_KEY(TAG), MAKE_GUC_KLV_LEN(TAG))
-         |         ^
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:39:20: note: expanded from macro 'PREP_GUC_KLV_CONST'
-      39 |          FIELD_PREP_CONST(GUC_KLV_0_LEN, (len)))
-         |                           ^
-   drivers/gpu/drm/xe/abi/guc_klvs_abi.h:37:35: note: expanded from macro 'GUC_KLV_0_LEN'
-      37 | #define GUC_KLV_0_LEN                           (0xffffu << 0)
-         |                                                          ^
-   drivers/gpu/drm/xe/xe_gt_sriov_pf_config.c:166:3: error: converting the result of '<<' to a boolean always evaluates to true [-Werror,-Wtautological-constant-compare]
-     166 |                 PREP_GUC_KLV_TAG(VF_CFG_GGTT_SIZE),
-         |                 ^
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:62:2: note: expanded from macro 'PREP_GUC_KLV_TAG'
-      62 |         PREP_GUC_KLV_CONST(MAKE_GUC_KLV_KEY(TAG), MAKE_GUC_KLV_LEN(TAG))
-         |         ^
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:38:20: note: expanded from macro 'PREP_GUC_KLV_CONST'
-      38 |         (FIELD_PREP_CONST(GUC_KLV_0_KEY, (key)) | \
-         |                           ^
-   drivers/gpu/drm/xe/abi/guc_klvs_abi.h:36:35: note: expanded from macro 'GUC_KLV_0_KEY'
-      36 | #define GUC_KLV_0_KEY                           (0xffffu << 16)
-         |                                                          ^
-   drivers/gpu/drm/xe/xe_gt_sriov_pf_config.c:166:3: error: converting the result of '<<' to a boolean always evaluates to true [-Werror,-Wtautological-constant-compare]
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:62:2: note: expanded from macro 'PREP_GUC_KLV_TAG'
-      62 |         PREP_GUC_KLV_CONST(MAKE_GUC_KLV_KEY(TAG), MAKE_GUC_KLV_LEN(TAG))
-         |         ^
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:39:20: note: expanded from macro 'PREP_GUC_KLV_CONST'
-      39 |          FIELD_PREP_CONST(GUC_KLV_0_LEN, (len)))
-         |                           ^
-   drivers/gpu/drm/xe/abi/guc_klvs_abi.h:37:35: note: expanded from macro 'GUC_KLV_0_LEN'
-      37 | #define GUC_KLV_0_LEN                           (0xffffu << 0)
-         |                                                          ^
-   drivers/gpu/drm/xe/xe_gt_sriov_pf_config.c:177:3: error: converting the result of '<<' to a boolean always evaluates to true [-Werror,-Wtautological-constant-compare]
-     177 |                 PREP_GUC_KLV_TAG(VF_CFG_BEGIN_CONTEXT_ID),
-         |                 ^
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:62:2: note: expanded from macro 'PREP_GUC_KLV_TAG'
-      62 |         PREP_GUC_KLV_CONST(MAKE_GUC_KLV_KEY(TAG), MAKE_GUC_KLV_LEN(TAG))
-         |         ^
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:38:20: note: expanded from macro 'PREP_GUC_KLV_CONST'
-      38 |         (FIELD_PREP_CONST(GUC_KLV_0_KEY, (key)) | \
-         |                           ^
-   drivers/gpu/drm/xe/abi/guc_klvs_abi.h:36:35: note: expanded from macro 'GUC_KLV_0_KEY'
-      36 | #define GUC_KLV_0_KEY                           (0xffffu << 16)
-         |                                                          ^
-   drivers/gpu/drm/xe/xe_gt_sriov_pf_config.c:177:3: error: converting the result of '<<' to a boolean always evaluates to true [-Werror,-Wtautological-constant-compare]
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:62:2: note: expanded from macro 'PREP_GUC_KLV_TAG'
-      62 |         PREP_GUC_KLV_CONST(MAKE_GUC_KLV_KEY(TAG), MAKE_GUC_KLV_LEN(TAG))
-         |         ^
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:39:20: note: expanded from macro 'PREP_GUC_KLV_CONST'
-      39 |          FIELD_PREP_CONST(GUC_KLV_0_LEN, (len)))
-         |                           ^
-   drivers/gpu/drm/xe/abi/guc_klvs_abi.h:37:35: note: expanded from macro 'GUC_KLV_0_LEN'
-      37 | #define GUC_KLV_0_LEN                           (0xffffu << 0)
-         |                                                          ^
-   drivers/gpu/drm/xe/xe_gt_sriov_pf_config.c:179:3: error: converting the result of '<<' to a boolean always evaluates to true [-Werror,-Wtautological-constant-compare]
-     179 |                 PREP_GUC_KLV_TAG(VF_CFG_NUM_CONTEXTS),
-         |                 ^
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:62:2: note: expanded from macro 'PREP_GUC_KLV_TAG'
-      62 |         PREP_GUC_KLV_CONST(MAKE_GUC_KLV_KEY(TAG), MAKE_GUC_KLV_LEN(TAG))
-         |         ^
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:38:20: note: expanded from macro 'PREP_GUC_KLV_CONST'
-      38 |         (FIELD_PREP_CONST(GUC_KLV_0_KEY, (key)) | \
-         |                           ^
-   drivers/gpu/drm/xe/abi/guc_klvs_abi.h:36:35: note: expanded from macro 'GUC_KLV_0_KEY'
-      36 | #define GUC_KLV_0_KEY                           (0xffffu << 16)
-         |                                                          ^
-   drivers/gpu/drm/xe/xe_gt_sriov_pf_config.c:179:3: error: converting the result of '<<' to a boolean always evaluates to true [-Werror,-Wtautological-constant-compare]
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:62:2: note: expanded from macro 'PREP_GUC_KLV_TAG'
-      62 |         PREP_GUC_KLV_CONST(MAKE_GUC_KLV_KEY(TAG), MAKE_GUC_KLV_LEN(TAG))
-         |         ^
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:39:20: note: expanded from macro 'PREP_GUC_KLV_CONST'
-      39 |          FIELD_PREP_CONST(GUC_KLV_0_LEN, (len)))
-         |                           ^
-   drivers/gpu/drm/xe/abi/guc_klvs_abi.h:37:35: note: expanded from macro 'GUC_KLV_0_LEN'
-      37 | #define GUC_KLV_0_LEN                           (0xffffu << 0)
-         |                                                          ^
-   drivers/gpu/drm/xe/xe_gt_sriov_pf_config.c:189:3: error: converting the result of '<<' to a boolean always evaluates to true [-Werror,-Wtautological-constant-compare]
-     189 |                 PREP_GUC_KLV_TAG(VF_CFG_BEGIN_DOORBELL_ID),
-         |                 ^
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:62:2: note: expanded from macro 'PREP_GUC_KLV_TAG'
-      62 |         PREP_GUC_KLV_CONST(MAKE_GUC_KLV_KEY(TAG), MAKE_GUC_KLV_LEN(TAG))
-         |         ^
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:38:20: note: expanded from macro 'PREP_GUC_KLV_CONST'
-      38 |         (FIELD_PREP_CONST(GUC_KLV_0_KEY, (key)) | \
-         |                           ^
-   drivers/gpu/drm/xe/abi/guc_klvs_abi.h:36:35: note: expanded from macro 'GUC_KLV_0_KEY'
-      36 | #define GUC_KLV_0_KEY                           (0xffffu << 16)
-         |                                                          ^
-   drivers/gpu/drm/xe/xe_gt_sriov_pf_config.c:189:3: error: converting the result of '<<' to a boolean always evaluates to true [-Werror,-Wtautological-constant-compare]
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:62:2: note: expanded from macro 'PREP_GUC_KLV_TAG'
-      62 |         PREP_GUC_KLV_CONST(MAKE_GUC_KLV_KEY(TAG), MAKE_GUC_KLV_LEN(TAG))
-         |         ^
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:39:20: note: expanded from macro 'PREP_GUC_KLV_CONST'
-      39 |          FIELD_PREP_CONST(GUC_KLV_0_LEN, (len)))
-         |                           ^
-   drivers/gpu/drm/xe/abi/guc_klvs_abi.h:37:35: note: expanded from macro 'GUC_KLV_0_LEN'
-      37 | #define GUC_KLV_0_LEN                           (0xffffu << 0)
-         |                                                          ^
-   drivers/gpu/drm/xe/xe_gt_sriov_pf_config.c:191:3: error: converting the result of '<<' to a boolean always evaluates to true [-Werror,-Wtautological-constant-compare]
-     191 |                 PREP_GUC_KLV_TAG(VF_CFG_NUM_DOORBELLS),
-         |                 ^
---
->> drivers/gpu/drm/xe/xe_sriov_packet.c:381:16: error: converting the result of '<<' to a boolean always evaluates to true [-Werror,-Wtautological-constant-compare]
-     381 |         klvs[len++] = PREP_GUC_KLV_CONST(MIGRATION_KLV_DEVICE_DEVID_KEY,
-         |                       ^
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:38:20: note: expanded from macro 'PREP_GUC_KLV_CONST'
-      38 |         (FIELD_PREP_CONST(GUC_KLV_0_KEY, (key)) | \
-         |                           ^
-   drivers/gpu/drm/xe/abi/guc_klvs_abi.h:36:35: note: expanded from macro 'GUC_KLV_0_KEY'
-      36 | #define GUC_KLV_0_KEY                           (0xffffu << 16)
-         |                                                          ^
->> drivers/gpu/drm/xe/xe_sriov_packet.c:381:16: error: converting the result of '<<' to a boolean always evaluates to true [-Werror,-Wtautological-constant-compare]
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:39:20: note: expanded from macro 'PREP_GUC_KLV_CONST'
-      39 |          FIELD_PREP_CONST(GUC_KLV_0_LEN, (len)))
-         |                           ^
-   drivers/gpu/drm/xe/abi/guc_klvs_abi.h:37:35: note: expanded from macro 'GUC_KLV_0_LEN'
-      37 | #define GUC_KLV_0_LEN                           (0xffffu << 0)
-         |                                                          ^
-   drivers/gpu/drm/xe/xe_sriov_packet.c:384:16: error: converting the result of '<<' to a boolean always evaluates to true [-Werror,-Wtautological-constant-compare]
-     384 |         klvs[len++] = PREP_GUC_KLV_CONST(MIGRATION_KLV_DEVICE_REVID_KEY,
-         |                       ^
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:38:20: note: expanded from macro 'PREP_GUC_KLV_CONST'
-      38 |         (FIELD_PREP_CONST(GUC_KLV_0_KEY, (key)) | \
-         |                           ^
-   drivers/gpu/drm/xe/abi/guc_klvs_abi.h:36:35: note: expanded from macro 'GUC_KLV_0_KEY'
-      36 | #define GUC_KLV_0_KEY                           (0xffffu << 16)
-         |                                                          ^
-   drivers/gpu/drm/xe/xe_sriov_packet.c:384:16: error: converting the result of '<<' to a boolean always evaluates to true [-Werror,-Wtautological-constant-compare]
-   drivers/gpu/drm/xe/xe_guc_klv_helpers.h:39:20: note: expanded from macro 'PREP_GUC_KLV_CONST'
-      39 |          FIELD_PREP_CONST(GUC_KLV_0_LEN, (len)))
-         |                           ^
-   drivers/gpu/drm/xe/abi/guc_klvs_abi.h:37:35: note: expanded from macro 'GUC_KLV_0_LEN'
-      37 | #define GUC_KLV_0_LEN                           (0xffffu << 0)
-         |                                                          ^
-   4 errors generated.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3] vsock/virtio: cap TX credit to local buffer size
+Content-Language: en-GB
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, stefanha@redhat.com,
+ kvm@vger.kernel.org, netdev@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-kernel@vger.kernel.org, jasowang@redhat.com,
+ xuanzhuo@linux.alibaba.com, eperezma@redhat.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
+References: <20251211125104.375020-1-mlbnkm1@gmail.com>
+ <20251211080251-mutt-send-email-mst@kernel.org>
+ <zlhixzduyindq24osaedkt2xnukmatwhugfkqmaugvor6wlcol@56jsodxn4rhi>
+ <CAMKc4jDpMsk1TtSN-GPLM1M_qp_jpoE1XL1g5qXRUiB-M0BPgQ@mail.gmail.com>
+ <CAGxU2F7WOLs7bDJao-7Qd=GOqj_tOmS+EptviMphGqSrgsadqg@mail.gmail.com>
+ <CAMKc4jDLdcGsL5_d+4CP6n-57s-R0vzrX2M7Ni=1GeCB1cxVYA@mail.gmail.com>
+ <bwmol6raorw233ryb3dleh4meaui5vbe7no53boixckl3wgclz@s6grefw5dqen>
+ <deccf66c-dcd3-4187-9fb6-43ddf7d0a905@gmail.com>
+ <tandvvk6vas3kgqjuo6w3aagqai246qxejfnzhkbvbxds3w4y6@umqvf7f3m5ie>
+From: Melbin K Mathew <mlbnkm1@gmail.com>
+In-Reply-To: <tandvvk6vas3kgqjuo6w3aagqai246qxejfnzhkbvbxds3w4y6@umqvf7f3m5ie>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
 
-vim +639 drivers/gpu/drm/xe/xe_guc.c
 
-9c7d93a8f1ec04 Daniele Ceraolo Spurio 2025-06-25  616  
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  617  #define OPT_IN_MAX_DWORDS 16
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  618  int xe_guc_opt_in_features_enable(struct xe_guc *guc)
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  619  {
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  620  	struct xe_device *xe = guc_to_xe(guc);
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  621  	CLASS(xe_guc_buf, buf)(&guc->buf, OPT_IN_MAX_DWORDS);
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  622  	u32 count = 0;
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  623  	u32 *klvs;
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  624  	int ret;
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  625  
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  626  	if (!xe_guc_buf_is_valid(buf))
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  627  		return -ENOBUFS;
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  628  
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  629  	klvs = xe_guc_buf_cpu_ptr(buf);
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  630  
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  631  	/*
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  632  	 * The extra CAT error type opt-in was added in GuC v70.17.0, which maps
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  633  	 * to compatibility version v1.7.0.
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  634  	 * Note that the GuC allows enabling this KLV even on platforms that do
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  635  	 * not support the extra type; in such case the returned type variable
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  636  	 * will be set to a known invalid value which we can check against.
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  637  	 */
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  638  	if (GUC_SUBMIT_VER(guc) >= MAKE_GUC_VER(1, 7, 0))
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25 @639  		klvs[count++] = PREP_GUC_KLV_TAG(OPT_IN_FEATURE_EXT_CAT_ERR_TYPE);
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  640  
-9c7d93a8f1ec04 Daniele Ceraolo Spurio 2025-06-25  641  	if (supports_dynamic_ics(guc))
-9c7d93a8f1ec04 Daniele Ceraolo Spurio 2025-06-25  642  		klvs[count++] = PREP_GUC_KLV_TAG(OPT_IN_FEATURE_DYNAMIC_INHIBIT_CONTEXT_SWITCH);
-9c7d93a8f1ec04 Daniele Ceraolo Spurio 2025-06-25  643  
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  644  	if (count) {
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  645  		xe_assert(xe, count <= OPT_IN_MAX_DWORDS);
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  646  
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  647  		ret = __guc_opt_in_features_enable(guc, xe_guc_buf_flush(buf), count);
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  648  		if (ret < 0) {
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  649  			xe_gt_err(guc_to_gt(guc),
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  650  				  "failed to enable GuC opt-in features: %pe\n",
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  651  				  ERR_PTR(ret));
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  652  			return ret;
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  653  		}
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  654  	}
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  655  
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  656  	return 0;
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  657  }
-a7ffcea8631af9 Daniele Ceraolo Spurio 2025-06-25  658  
+On 12/12/2025 12:26, Stefano Garzarella wrote:
+> On Fri, Dec 12, 2025 at 11:40:03AM +0000, Melbin K Mathew wrote:
+>>
+>>
+>> On 12/12/2025 10:40, Stefano Garzarella wrote:
+>>> On Fri, Dec 12, 2025 at 09:56:28AM +0000, Melbin Mathew Antony wrote:
+>>>> Hi Stefano, Michael,
+>>>>
+>>>> Thanks for the suggestions and guidance.
+>>>
+>>> You're welcome, but please avoid top-posting in the future:
+>>> https://www.kernel.org/doc/html/latest/process/submitting- 
+>>> patches.html#use-trimmed-interleaved-replies-in-email-discussions
+>>>
+>> Sure. Thanks
+>>>>
+>>>> I’ve drafted a 4-part series based on the recap. I’ve included the
+>>>> four diffs below for discussion. Can wait for comments, iterate, and
+>>>> then send the patch series in a few days.
+>>>>
+>>>> ---
+>>>>
+>>>> Patch 1/4 — vsock/virtio: make get_credit() s64-safe and clamp 
+>>>> negatives
+>>>>
+>>>> virtio_transport_get_credit() was doing unsigned arithmetic; if the
+>>>> peer shrinks its window, the subtraction can underflow and look like
+>>>> “lots of credit”. This makes it compute “space” in s64 and clamp < 0
+>>>> to 0.
+>>>>
+>>>> diff --git a/net/vmw_vsock/virtio_transport_common.c
+>>>> b/net/vmw_vsock/virtio_transport_common.c
+>>>> --- a/net/vmw_vsock/virtio_transport_common.c
+>>>> +++ b/net/vmw_vsock/virtio_transport_common.c
+>>>> @@ -494,16 +494,23 @@ 
+>>>> EXPORT_SYMBOL_GPL(virtio_transport_consume_skb_sent);
+>>>> u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 
+>>>> credit)
+>>>> {
+>>>> + s64 bytes;
+>>>>  u32 ret;
+>>>>
+>>>>  if (!credit)
+>>>>  return 0;
+>>>>
+>>>>  spin_lock_bh(&vvs->tx_lock);
+>>>> - ret = vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
+>>>> - if (ret > credit)
+>>>> - ret = credit;
+>>>> + bytes = (s64)vvs->peer_buf_alloc -
+>>>
+>>> Why not just calling virtio_transport_has_space()?
+>> virtio_transport_has_space() takes struct vsock_sock *, while 
+>> virtio_transport_get_credit() takes struct virtio_vsock_sock *, so I 
+>> cannot directly call has_space() from get_credit() without changing 
+>> signatures.
+>>
+>> Would you be OK if I factor the common “space” calculation into a 
+>> small helper that operates on struct virtio_vsock_sock * and is used 
+>> by both paths? Something like:
+> 
+> Why not just change the signature of virtio_transport_has_space()?
+Thanks, that is cleaner.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+For Patch 1 i'll change virtio_transport_has_space() to take
+struct virtio_vsock_sock * and call it from both
+virtio_transport_stream_has_space() and virtio_transport_get_credit().
+
+/*
+  * Return available peer buffer space for TX (>= 0).
+  *
+  * Use s64 arithmetic so that if the peer shrinks peer_buf_alloc while
+  * we have bytes in flight (tx_cnt - peer_fwd_cnt), the subtraction does
+  * not underflow into a large positive value as it would with u32.
+  *
+  * Must be called with vvs->tx_lock held.
+  */
+static s64 virtio_transport_has_space(struct virtio_vsock_sock *vvs)
+{
+	s64 bytes;
+
+	bytes = (s64)vvs->peer_buf_alloc -
+		((s64)vvs->tx_cnt - (s64)vvs->peer_fwd_cnt);
+	if (bytes < 0)
+		bytes = 0;
+
+	return bytes;
+}
+
+s64 virtio_transport_stream_has_space(struct vsock_sock *vsk)
+{
+	struct virtio_vsock_sock *vvs = vsk->trans;
+	s64 bytes;
+
+	spin_lock_bh(&vvs->tx_lock);
+	bytes = virtio_transport_has_space(vvs);
+	spin_unlock_bh(&vvs->tx_lock);
+
+	return bytes;
+}
+
+u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 credit)
+{
+	u32 ret;
+
+	if (!credit)
+		return 0;
+
+	spin_lock_bh(&vvs->tx_lock);
+	ret = min_t(u32, credit, (u32)virtio_transport_has_space(vvs));
+	vvs->tx_cnt += ret;
+	vvs->bytes_unsent += ret;
+	spin_unlock_bh(&vvs->tx_lock);
+
+	return ret;
+}
+
+Does this look right?
+> Thanks,
+> Stefano
+> 
+>>
+>> /* Must be called with vvs->tx_lock held. Returns >= 0. */
+>> static s64 virtio_transport_tx_space(struct virtio_vsock_sock *vvs)
+>> {
+>>     s64 bytes;
+>>
+>>     bytes = (s64)vvs->peer_buf_alloc -
+>>         ((s64)vvs->tx_cnt - (s64)vvs->peer_fwd_cnt);
+>>     if (bytes < 0)
+>>         bytes = 0;
+>>
+>>     return bytes;
+>> }
+>>
+>> Then:
+>>
+>> get_credit() would do bytes = virtio_transport_tx_space(vvs); ret = 
+>> min_t(u32, credit, (u32)bytes);
+>>
+>> has_space() would use the same helper after obtaining vvs = vsk->trans;
+>>
+>> Does that match what you had in mind, or would you prefer a different 
+>> factoring?
+>>
+>>>
+>>>> + ((s64)vvs->tx_cnt - (s64)vvs->peer_fwd_cnt);
+>>>> + if (bytes < 0)
+>>>> + bytes = 0;
+>>>> +
+>>>> + ret = min_t(u32, credit, (u32)bytes);
+>>>>  vvs->tx_cnt += ret;
+>>>>  vvs->bytes_unsent += ret;
+>>>>  spin_unlock_bh(&vvs->tx_lock);
+>>>>
+>>>>  return ret;
+>>>> }
+>>>>
+>>>>
+>>>> ---
+>>>>
+>>>> Patch 2/4 — vsock/virtio: cap TX window by local buffer (helper + use
+>>>> everywhere in TX path)
+>>>>
+>>>> Cap the effective advertised window to min(peer_buf_alloc, buf_alloc)
+>>>> and use it consistently in TX paths (get_credit, has_space,
+>>>> seqpacket_enqueue).
+>>>>
+>>>> diff --git a/net/vmw_vsock/virtio_transport_common.c
+>>>> b/net/vmw_vsock/virtio_transport_common.c
+>>>> --- a/net/vmw_vsock/virtio_transport_common.c
+>>>> +++ b/net/vmw_vsock/virtio_transport_common.c
+>>>> @@ -491,6 +491,16 @@ void virtio_transport_consume_skb_sent(struct
+>>>> sk_buff *skb, bool consume)
+>>>> }
+>>>> EXPORT_SYMBOL_GPL(virtio_transport_consume_skb_sent);
+>>>> +/* Return the effective peer buffer size for TX credit computation.
+>>>> + *
+>>>> + * The peer advertises its receive buffer via peer_buf_alloc, but 
+>>>> we cap it
+>>>> + * to our local buf_alloc (derived from SO_VM_SOCKETS_BUFFER_SIZE and
+>>>> + * already clamped to buffer_max_size).
+>>>> + */
+>>>> +static u32 virtio_transport_tx_buf_alloc(struct virtio_vsock_sock 
+>>>> *vvs)
+>>>> +{
+>>>> + return min(vvs->peer_buf_alloc, vvs->buf_alloc);
+>>>> +}
+>>>>
+>>>> u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 
+>>>> credit)
+>>>> {
+>>>>  s64 bytes;
+>>>> @@ -502,7 +512,8 @@ u32 virtio_transport_get_credit(struct
+>>>> virtio_vsock_sock *vvs, u32 credit)
+>>>>  return 0;
+>>>>
+>>>>  spin_lock_bh(&vvs->tx_lock);
+>>>> - bytes = (s64)vvs->peer_buf_alloc -
+>>>> + bytes = (s64)virtio_transport_tx_buf_alloc(vvs) -
+>>>>  ((s64)vvs->tx_cnt - (s64)vvs->peer_fwd_cnt);
+>>>>  if (bytes < 0)
+>>>>  bytes = 0;
+>>>> @@ -834,7 +845,7 @@ virtio_transport_seqpacket_enqueue(struct 
+>>>> vsock_sock *vsk,
+>>>>  spin_lock_bh(&vvs->tx_lock);
+>>>>
+>>>> - if (len > vvs->peer_buf_alloc) {
+>>>> + if (len > virtio_transport_tx_buf_alloc(vvs)) {
+>>>>  spin_unlock_bh(&vvs->tx_lock);
+>>>>  return -EMSGSIZE;
+>>>>  }
+>>>> @@ -884,7 +895,8 @@ static s64 virtio_transport_has_space(struct
+>>>> vsock_sock *vsk)
+>>>>  struct virtio_vsock_sock *vvs = vsk->trans;
+>>>>  s64 bytes;
+>>>>
+>>>> - bytes = (s64)vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
+>>>> + bytes = (s64)virtio_transport_tx_buf_alloc(vvs) -
+>>>> + ((s64)vvs->tx_cnt - (s64)vvs->peer_fwd_cnt);
+>>>>  if (bytes < 0)
+>>>>  bytes = 0;
+>>>>
+>>>>  return bytes;
+>>>> }
+>>>>
+>>>>
+>>>> ---
+>>>>
+>>>> Patch 3/4 — vsock/test: fix seqpacket msg bounds test (set client 
+>>>> buf too)
+>>>
+>>> Please just include in the series the patch I sent to you.
+>>>
+>> Thanks. I'll use your vsock_test.c patch as-is for 3/4
+>>>>
+>>>> After fixing TX credit bounds, the client can fill its TX window and
+>>>> block before it wakes the server. Setting the buffer on the client
+>>>> makes the test deterministic again.
+>>>>
+>>>> diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/ 
+>>>> vsock_test.c
+>>>> --- a/tools/testing/vsock/vsock_test.c
+>>>> +++ b/tools/testing/vsock/vsock_test.c
+>>>> @@ -353,6 +353,7 @@ static void test_stream_msg_peek_server(const
+>>>> struct test_opts *opts)
+>>>>
+>>>> static void test_seqpacket_msg_bounds_client(const struct test_opts 
+>>>> *opts)
+>>>> {
+>>>> + unsigned long long sock_buf_size;
+>>>>  unsigned long curr_hash;
+>>>>  size_t max_msg_size;
+>>>>  int page_size;
+>>>> @@ -366,6 +367,18 @@ static void
+>>>> test_seqpacket_msg_bounds_client(const struct test_opts *opts)
+>>>>  exit(EXIT_FAILURE);
+>>>>  }
+>>>>
+>>>> + sock_buf_size = SOCK_BUF_SIZE;
+>>>> +
+>>>> + setsockopt_ull_check(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_MAX_SIZE,
+>>>> +    sock_buf_size,
+>>>> +    "setsockopt(SO_VM_SOCKETS_BUFFER_MAX_SIZE)");
+>>>> +
+>>>> + setsockopt_ull_check(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_SIZE,
+>>>> +    sock_buf_size,
+>>>> +    "setsockopt(SO_VM_SOCKETS_BUFFER_SIZE)");
+>>>> +
+>>>>  /* Wait, until receiver sets buffer size. */
+>>>>  control_expectln("SRVREADY");
+>>>>
+>>>>
+>>>> ---
+>>>>
+>>>> Patch 4/4 — vsock/test: add stream TX credit bounds regression test
+>>>>
+>>>> This directly guards the original failure mode for stream sockets: if
+>>>> the peer advertises a large window but the sender’s local policy is
+>>>> small, the sender must stall quickly (hit EAGAIN in nonblocking mode)
+>>>> rather than queueing megabytes.
+>>>
+>>> Yeah, using nonblocking mode LGTM!
+>>>
+>>>>
+>>>> diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/ 
+>>>> vsock_test.c
+>>>> --- a/tools/testing/vsock/vsock_test.c
+>>>> +++ b/tools/testing/vsock/vsock_test.c
+>>>> @@ -349,6 +349,7 @@
+>>>> #define SOCK_BUF_SIZE (2 * 1024 * 1024)
+>>>> +#define SMALL_SOCK_BUF_SIZE (64 * 1024ULL)
+>>>> #define MAX_MSG_PAGES 4
+>>>>
+>>>> /* Insert new test functions after test_stream_msg_peek_server, before
+>>>>  * test_seqpacket_msg_bounds_client (around line 352) */
+>>>>
+>>>> +static void test_stream_tx_credit_bounds_client(const struct 
+>>>> test_opts *opts)
+>>>> +{
+>>>> + ... /* full function as provided */
+>>>> +}
+>>>> +
+>>>> +static void test_stream_tx_credit_bounds_server(const struct 
+>>>> test_opts *opts)
+>>>> +{
+>>>> + ... /* full function as provided */
+>>>> +}
+>>>>
+>>>> @@ -2224,6 +2305,10 @@
+>>>>  .run_client = test_stream_msg_peek_client,
+>>>>  .run_server = test_stream_msg_peek_server,
+>>>>  },
+>>>> + {
+>>>> + .name = "SOCK_STREAM TX credit bounds",
+>>>> + .run_client = test_stream_tx_credit_bounds_client,
+>>>> + .run_server = test_stream_tx_credit_bounds_server,
+>>>> + },
+>>>
+>>> Please put it at the bottom. Tests are skipped by index, so we don't 
+>>> want to change index of old tests.
+>>>
+>>> Please fix your editor, those diffs are hard to read without tabs/ 
+>>> spaces.
+>> seems like some issue with my email client. Hope it is okay now
+>>>
+>>> Thanks,
+>>> Stefano
+>>>
+>>
+> 
+
 
