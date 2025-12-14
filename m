@@ -1,32 +1,32 @@
-Return-Path: <netdev+bounces-244635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8301FCBBD60
-	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 17:21:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 31335CBBDB4
+	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 17:43:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B50C0300157D
-	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 16:21:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E56443006F51
+	for <lists+netdev@lfdr.de>; Sun, 14 Dec 2025 16:43:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F41F11FE471;
-	Sun, 14 Dec 2025 16:21:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4826D281503;
+	Sun, 14 Dec 2025 16:43:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zbiXxnFb"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="OH22I2af"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB3C17A31C;
-	Sun, 14 Dec 2025 16:21:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F6B4156237;
+	Sun, 14 Dec 2025 16:43:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765729293; cv=none; b=IGXvHmwKwt3pJSFNVb1oFuKFU2R0RKDC0hf1Q8q2VK9S6LeGb/h2jwxSoUoGlEzuHzJ5oDpba72Qiiuh+l+lquzSayQ9IaWQNpO1qACuzh5tOOubQDBPjE6gJLXu17lEwafjH9UJyxkwciMLBwfNSrdA/siYdX8XM3/J76REALI=
+	t=1765730615; cv=none; b=CplNcZlVlqHTdrKrQ+QJHVMVKc2/1iVRAUqTyZxmBD/qvFsaqtz4I6EdAp8jYSeVg8MItq8V8NHBz0n2v8La6Ew0H2G+MUL3VZPlQmF1Sum/nnZ3wL3JU6XIDMMb9pNNG7lN5l7kXkce0oQrDNoVTe/Q2EUco4g/3TBTALgyoio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765729293; c=relaxed/simple;
-	bh=oKeYvhSD8UppLEXpZFvXnphWhmTlKQA0MVeyGw/vbR0=;
+	s=arc-20240116; t=1765730615; c=relaxed/simple;
+	bh=Ldlxd+SWE/5owwcc7rNKslzyFVc6IwiKZXHASzrvQoQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bEfHfNWo7kFcdLuNS7w23bsM7IrcLfxnkFPlt7COVKjFwBQvDeFKu7VT2FAE4yZPiLs10Fct4Q6U1V0Ho0BH9MQ9Jkrt1Z5s9MX27rrBI7/VarSKIymVUBMWGYN+LrHSjixNl3bz4BBz1MlLf2n5BRC9nyPtuW7PuXcsjeiY+ZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zbiXxnFb; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=VTHesWCGAN3O2l18oAzybsEacVm6UxzdjC6dZEsKMPbY7vmqv3VuDOb2S+wfpnEp+lZxexuWbRTxhvzjSC91/cjxT3L42wW3gGZ9Bn+MfEe/7JFtIVYBX6s2QbzauRuerImKQIqu2r/EQp/fQvjqn6zxI+A7/iAOYv6ts73dqWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=OH22I2af; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -34,25 +34,33 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=b5iDoQ4t1oS+0WiPDGUQIZJ9YDhuCciE8h6VNTnQ24o=; b=zbiXxnFbXyEyGr+nuZZt0UsdVS
-	v/HnFI3uPqoB7YxmIk4Sl9Pd9SrTsR8shN+tVarnoFBYZBlzmNM/X5e15bxt530plddKsCWlM/E0s
-	TQnfHY4MmSwD6uXLl8FW70GeE8Y6rnFNS2Xh8t+L41GqFFbGACPDKkkcsXaAQ6g/56mY=;
+	bh=Pg87C69KDoANHttxY5/rYmwSNvXQD1N6oOe5W7TAlAI=; b=OH22I2afa/RvDGRyP4pUNGZexE
+	s3zZ09oxoSnT2SMGDFZwpgX7vgx+7Osdl4DtoZqAYXTwpaZTLBXFLRgMBJpVp5GqhZAciNWMJLptG
+	OmtC9f9y8GFogObl0EPK/8EdOtttGgE5HO18j2oUE8pgEVWo4gUMDMVgr230kxbfKwKE=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vUoqa-00GveI-DG; Sun, 14 Dec 2025 17:21:24 +0100
-Date: Sun, 14 Dec 2025 17:21:24 +0100
+	id 1vUpBg-00Gvjt-F5; Sun, 14 Dec 2025 17:43:12 +0100
+Date: Sun, 14 Dec 2025 17:43:12 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Changwoo Min <changwoo@igalia.com>
-Cc: Donald Hunter <donald.hunter@gmail.com>,
-	Lukasz Luba <lukasz.luba@arm.com>, linux-pm@vger.kernel.org,
-	sched-ext@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
-	Network Development <netdev@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: Concerns with em.yaml YNL spec
-Message-ID: <bb7871f1-3ea7-4bf7-baa9-a306a2371e4b@lunn.ch>
-References: <CAD4GDZy-aeWsiY=-ATr+Y4PzhMX71DFd_mmdMk4rxn3YG8U5GA@mail.gmail.com>
- <081e0ba7-055c-4243-8b39-e2c0cb9a8c5a@lunn.ch>
- <4bb1ea43-ef52-47ae-8009-6a2944dbf92b@igalia.com>
+To: Frank Wunderlich <linux@fw-web.de>
+Cc: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Frank Wunderlich <frank-w@public-files.de>,
+	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Mason Chang <mason-cw.chang@mediatek.com>
+Subject: Re: [RFC net-next v3 2/3] net: ethernet: mtk_eth_soc: Add RSS support
+Message-ID: <cbe399db-11b9-4176-b842-a50956df7d26@lunn.ch>
+References: <20251214110310.7009-1-linux@fw-web.de>
+ <20251214110310.7009-3-linux@fw-web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,64 +69,23 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4bb1ea43-ef52-47ae-8009-6a2944dbf92b@igalia.com>
+In-Reply-To: <20251214110310.7009-3-linux@fw-web.de>
 
-> > We also need to watch out for other meaning of these letters. In the
-> > context of networking and Power over Ethernet, PD means Powered
-> > Device. We generally don't need to enumerate the PD, we are more
-> > interested in the Power Sourcing Equipment, PSE.
-> > 
-> > And a dumb question. What is an energy model? A PSE needs some level
-> > of energy model, it needs to know how much energy each PD can consume
-> > in order that it is not oversubscribed.Is the energy model generic
-> > enough that it could be used for this? Or should this energy model get
-> > a prefix to limit its scope to a performance domain? The suggested
-> > name of this file would then become something like
-> > performance-domain-energy-model.yml?
-> > 
-> 
-> Lukasz might be the right person for this question. In my view, the
-> energy model essentially provides the performance-versus-power-
-> consumption curve for each performance domain.
+>  bpi-r4.its                                  |  16 +-
 
-The problem here is, you are too narrowly focused. My introduction
-said:
+I don't think this file belongs in this patch?
 
-> > In the context of networking and Power over Ethernet, PD means
-> > Powered Device.
+> +#define MTK_RX_RSS_NUM			(eth->soc->rss_num)
+> +#define MTK_RSS_HASH_KEY_DW(x)		(reg_map->pdma.rss_glo_cfg + 0x20 +	\
+> +					 ((x) * 0x4))
+> +#define MTK_RSS_INDR_TABLE_DW(x)	(reg_map->pdma.rss_glo_cfg + 0x50 +	\
+> +					 ((x) * 0x4))
 
-You have not given any context. Reading the rest of your email, it
-sounds like you are talking about the energy model/performance domain
-for a collection of CPU cores?
+It is bad practice for a macro to access things not passed to it. At
+minimum, pass eth & reg_map to the macro.
 
-Now think about Linux as a whole, not the little corner you are
-interested in. Are there energy models anywhere else in Linux? What
-about the GPU cores? What about Linux regulators controlling power to
-peripherals? I pointed out the use case of Power over Ethernet needing
-an energy model.
+    Andrew
 
-> Conceptually, the energy model covers the system-wide information; a
-> performance domain is information about one domain (e.g., big/medium/
-> little CPU blocks), so it is under the energy model; a performance state
-> is one dot in the performance-versus-power-consumption curve of a
-> performance domain.
-> 
-> Since the energy model covers the system-wide information, energy-
-> model.yaml (as Donald suggested) sounds better to me.
-
-By system-wide, do you mean the whole of Linux? I could use it for
-GPUs, regulators, PoE? Is it sufficiently generic? I somehow doubt it
-is. So i think you need some sort of prefix to indicate the domain it
-is applicable to. We can then add GPU energy models, PoE energy
-models, etc by the side without getting into naming issues.
-
-Naming is important, and causes a lot of pain when you get it
-wrong. Linux has PHYs and generic PHYs. The PHY subsystem has been
-around a long time, and generic PHY is much newer. And sometimes a PHY
-has a generic PHY associated to it, so it can get really confusing
-unless you are very precises with wording.
-
-We need to be careful with any generic term, such as energy model.
-
-	Andrew
+---
+pw-bot: cr
 
