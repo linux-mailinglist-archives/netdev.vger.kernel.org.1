@@ -1,195 +1,205 @@
-Return-Path: <netdev+bounces-244837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244838-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51C66CBFB5B
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 21:17:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 720EECBFC03
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 21:31:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AC97C30656C7
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 20:11:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EA905301F25C
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 20:31:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AC00224AED;
-	Mon, 15 Dec 2025 20:11:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7FC73126A6;
+	Mon, 15 Dec 2025 20:31:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Y+WZlXvr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PzOTulrZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB41B227EA7
-	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 20:11:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E52D725485A
+	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 20:30:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765829472; cv=none; b=K8ijt5rQmkPfcgj85kTOqluENVFNrHSvrkGqRFBnBNthpKP9f/UXwLoyt7oXMaCM6Cp8CB1fSz83p4CwBhSgK2sK07MAdk1moWLImSRomymdkIPSjsmdkoNQGp2Kg/bhHdPryZm42pwmwW9E0eqLn8EL3UgcMXIt9Q8cc7nP3HY=
+	t=1765830660; cv=none; b=ssdhRBhKafNozvx1z7uCli3DHTMN+AnkdwhobZcS9/qkeYAr/4wtcvTTdcRJSHoKEvTb47YIM5ItvyTsVqKNL0v7iJsG4BbbsmO9yrA4DdEjiq0MZ/a66jKLkrvsZA8MPKRQ4NwzZkqn2/kxZ60vRLU5+yYiuqaagpvqGGbgbF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765829472; c=relaxed/simple;
-	bh=bZS2d4r6+t0avva4udbs7u4lgZ+/m7V0Af/OnBnRGOE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WJyvnX1nrSmb+6cG0q/N9ngVblUrborUB8ZQB6sY49TBjsq+QqZl9QEDsLVRFi1vhohar/DjJX9nc+kVql/R74ls+f3yhfHNTKWZMuMySn6J3027V0+EmgqOC9hScqff54xHN635UAcnXKdXnHKtqgym/HkeQ3LrQoC/DS9A2uY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Y+WZlXvr; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4775ae77516so46598325e9.1
-        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 12:11:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1765829468; x=1766434268; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NVHWp8cheEcClOBV4c/zxK94NkQEphirpcQRQ+Yuj0w=;
-        b=Y+WZlXvrQBStn5H9hqcx7999QFxTj/F2ySRfQJxEtC5DqzayTEQmaLWN4KZ9LTdpND
-         5aygj5OHCwr2zjsVwfzmfHBC6vY/thI5mOl81KEEUGva12FHGp46YJ8cWfD+K+b0bNqr
-         vLS8nCK/y8ePTgCIK0WMRe/TjPs4gHfGOLq5TXcMxCc20odhaPAh8QGdWdpaydTwJgqC
-         Q+m+NauBtGh9uCMpHfbr7sDTmzNKkrdRYzbd6Esku9d6ya1bZPZa1rJ8AMCzlggy+zo3
-         R7C/h9jaOmWLu8pp0IFtBXKI43hSZJRCGys65eGWRbml1T1IbiRFUOLSzYXwkSU5QIzq
-         /EcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765829468; x=1766434268;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NVHWp8cheEcClOBV4c/zxK94NkQEphirpcQRQ+Yuj0w=;
-        b=TMgRD6xmk5NjM4Z2v7drWjR9pLUDFU7wC1c1NProwlcapGKsQunPmE0WWU/cLbG+3C
-         vZgOMryo+c/s1rYvIcI9OiWCyhQkgISVHXYvWLGlwUgCRNlUVdMcoMzGGyvjbPaL5K+Z
-         rXn3jtUJWbTTRB5rpSvjP7ME2YFolYvuNOs5suvMYRRVJYe1H914rCJm8ZQHR1YOiOxx
-         KZy1l609KJ9zqgcnGnZiuDB6ymYPqfC/vKDIZNApXQQ8+oYguGNpT1HMWQnXzGZfO39i
-         jNZ5APQCWkyJtfWNCJUCplmD70+W2152GB/ojuWCAFI+VqExvk3J0Mvh7udLSacExatv
-         CjyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVFJ+U8WWAq1awpagGDma3vX9NrJDtezCRFAVMo70d1FE1h/XZkSFgOEhioIEcQaXn23xFcmYE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxyRzbd5J12uNSW82e/uDWmwVJpjBqR9bZzUMU7h5XrOZU0QH7x
-	NiTy5d95Yk6w/GoC4T1Gq2OUwbzD4mfHPMznpxeLZ76+B8GlADSLOyxe13MalKFkhds=
-X-Gm-Gg: AY/fxX7UxF+pAdlUAylKJ1oudaUhSW8h0LZ0wLkRGRnIPXMP+olWvJ5FuePIabxP9nJ
-	Gj3FurMCJAkogsYksN2ofruMVYLuxGaLcEhBeB4DXeLaHyXb4sBaaeE8Djdkda+eIUURljEhxoe
-	hFlNsb5ZHxyJb48AbYnN3MtPtGWm5JLIIHaUUvE+bqYw0EbSFI+PuZl+dRv+KwZD2Iz+X4dmNT4
-	ltjkrglJD2L/Gve3EkzO9Tx7gLDNRHPgtxNg18Ik904ASvBPEr05M4C/SS2d9OnPLMBAklw9L6T
-	cYOtnlVH0zIJO2vek73KUS9POIlDcgf5t4ISr1zs7Q1UTpbOUJ/Rv4XlYM51G8GNsDjtNeRLFdi
-	tgA4vLdhhNpkXYASq8IehzakbmH1a+Xgvjn4eFZpNSd00rV7YQKbq50aISbNM77if/kBcwLtHlr
-	2w28zqSHhNVQp0dmtl
-X-Google-Smtp-Source: AGHT+IFzTdgd8HuBCRpheWEKJMhw6vXCy8KxXaScp0+GwrnVXW68cCuyCfDLEuzw7wX+ZV30A2XRQg==
-X-Received: by 2002:a05:600c:46c4:b0:46e:59bd:f7d3 with SMTP id 5b1f17b1804b1-47a8f9046fcmr137755605e9.20.1765829468100;
-        Mon, 15 Dec 2025 12:11:08 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47a8f4ace61sm200864155e9.7.2025.12.15.12.11.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Dec 2025 12:11:07 -0800 (PST)
-Date: Mon, 15 Dec 2025 23:11:03 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Frank Li <Frank.li@nxp.com>
-Cc: Chester Lin <chester62515@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	s=arc-20240116; t=1765830660; c=relaxed/simple;
+	bh=SHZt1xLw1ZmPdp57TFJNx25aVwMtAQfw8AmycOD6hIg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YFtMt2vDmanheXCPT9bJYdFdodrXICBSa9eGSLk4mkYl52FlrqsNGrpz1fsxbQd0jTmU1KxqQ8YaG/bm7YKivn2FogjBnPSqgLBwSdqJ8sM+dCfCCCadHOSA+t0mUfXcik+QyxPrA/Cfp89DxGQ/HFG1ZJQRC6qKZ6C0Wa0MUjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PzOTulrZ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1765830657;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=kFKP1wRB7MG8FdwSMPJtMRcQY82d/F+Hn/PXu/Kymsk=;
+	b=PzOTulrZa/FurPiO38luizKfPFBjYKTz4ORlGlclzumzJG/7zO/2b9FAmvBY8E8Ql2R6JM
+	cd3ibhKqmKtrsPnKk4VpRbvhLPUrw/S0LbP2z7M+PuzOYImdkip3+cR8fZdQvQC+gGi0sP
+	D/r1LV6QMePpnOzyf1kF7/a4kDJNFGA=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-295-fV4hTD3GOUeULQgWq9f_sw-1; Mon,
+ 15 Dec 2025 15:30:53 -0500
+X-MC-Unique: fV4hTD3GOUeULQgWq9f_sw-1
+X-Mimecast-MFC-AGG-ID: fV4hTD3GOUeULQgWq9f_sw_1765830649
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 30D6218002ED;
+	Mon, 15 Dec 2025 20:30:49 +0000 (UTC)
+Received: from p16v.redhat.com (unknown [10.45.224.214])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C414630001A8;
+	Mon, 15 Dec 2025 20:30:38 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
 	Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>, devicetree@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Fabio Estevam <festevam@gmail.com>,
-	Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>,
-	imx@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
-	Jan Petrous <jan.petrous@oss.nxp.com>,
+	Grzegorz Nitka <grzegorz.nitka@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Lee Jones <lee@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Matthias Brugger <mbrugger@suse.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	NXP S32 Linux Team <s32@nxp.com>, Paolo Abeni <pabeni@redhat.com>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Leon Romanovsky <leon@kernel.org>,
+	Mark Bloch <mbloch@nvidia.com>,
+	Michal Schmidt <mschmidt@redhat.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Petr Oros <poros@redhat.com>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Richard Cochran <richardcochran@gmail.com>,
 	Rob Herring <robh@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Shawn Guo <shawnguo@kernel.org>, linaro-s32@linaro.org
-Subject: Re: [PATCH v2 0/4] s32g: Use a syscon for GPR
-Message-ID: <aUBrV2_Iv4oTPkC4@stanley.mountain>
-References: <cover.1765806521.git.dan.carpenter@linaro.org>
- <aUAvwRmIZBC0W6ql@lizhi-Precision-Tower-5810>
- <aUBUkuLf7NHtLSl1@stanley.mountain>
- <aUBha2/xiZsIF/o5@lizhi-Precision-Tower-5810>
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Simon Horman <horms@kernel.org>,
+	Stefan Wahren <wahrenst@gmx.net>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Willem de Bruijn <willemb@google.com>,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	linux-rdma@vger.kernel.org
+Subject: [PATCH RFC net-next v2 00/13] dpll: Core improvements and ice E825-C SyncE support
+Date: Mon, 15 Dec 2025 21:30:25 +0100
+Message-ID: <20251215203037.1324945-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aUBha2/xiZsIF/o5@lizhi-Precision-Tower-5810>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Mon, Dec 15, 2025 at 02:28:43PM -0500, Frank Li wrote:
-> On Mon, Dec 15, 2025 at 09:33:54PM +0300, Dan Carpenter wrote:
-> > On Mon, Dec 15, 2025 at 10:56:49AM -0500, Frank Li wrote:
-> > > On Mon, Dec 15, 2025 at 05:41:43PM +0300, Dan Carpenter wrote:
-> > > > The s32g devices have a GPR register region which holds a number of
-> > > > miscellaneous registers.  Currently only the stmmac/dwmac-s32.c uses
-> > > > anything from there and we just add a line to the device tree to
-> > > > access that GMAC_0_CTRL_STS register:
-> > > >
-> > > >                         reg = <0x4033c000 0x2000>, /* gmac IP */
-> > > >                               <0x4007c004 0x4>;    /* GMAC_0_CTRL_STS */
-> > > >
-> > > > We still have to maintain backwards compatibility to this format,
-> > > > of course, but it would be better to access these through a syscon.
-> > > > First of all, putting all the registers together is more organized
-> > > > and shows how the hardware actually is implemented.  Secondly, in
-> > > > some versions of this chipset those registers can only be accessed
-> > > > via SCMI, if the registers aren't grouped together each driver will
-> > > > have to create a whole lot of if then statements to access it via
-> > > > IOMEM or via SCMI,
-> > >
-> > > Does SCMI work as regmap? syscon look likes simple, but missed abstract
-> > > in overall.
-> > >
-> >
-> > The SCMI part of this is pretty complicated and needs discussion.  It
-> > might be that it requires a vendor extension.  Right now, the out of
-> > tree code uses a nvmem vendor extension but that probably won't get
-> > merged upstream.
-> >
-> > But in theory, it's fairly simple, you can write a regmap driver and
-> > register it as a syscon and everything that was accessing nxp,phy-sel
-> > accesses the same register but over SCMI.
-> 
-> nxp,phy-sel is not standard API. Driver access raw register value. such
-> as write 1 to offset 0x100.
-> 
-> After change to SCMI, which may mapped to difference command. Even change
-> to other SOC, value and offset also need be changed. It is not standilzed
-> as what you expected.
+This series introduces Synchronous Ethernet (SyncE) support for
+the Intel E825-C Ethernet controller. Unlike previous generations where
+DPLL connections were implicitly assumed, the E825-C architecture relies
+on the platform firmware to describe the physical connections between
+the network controller and external DPLLs (such as the ZL3073x).
 
-We're writing to an offset in a syscon.  Right now the device tree
-says that the syscon is an MMIO syscon.  But for SCMI devices we
-would point the phandle to a custom syscon.  The phandle and the offset
-would stay the same, but how the syscon is implemented would change.
+To accommodate this, the series extends the DPLL subsystem to support
+firmware node (fwnode) associations, asynchronous discovery via notifiers,
+and dynamic pin management. Additionally, a significant refactor of
+the DPLL reference counting logic is included to ensure robustness and
+debuggability.
 
-> 
-> >
-> > > You still use regmap by use MMIO. /* GMAC_0_CTRL_STS */
-> > >
-> > > regmap = devm_regmap_init_mmio(dev, sts_offset, &regmap_config);
-> > >
-> >
-> > You can use have an MMIO syscon, or you can create a custom driver
-> > and register it as a syscon using of_syscon_register_regmap().
-> 
-> My means is that it is not necessary to create nxp,phy-sel, especially
-> there already have <0x4007c004 0x4>;    /* GMAC_0_CTRL_STS */
-> 
+DPLL Core Extensions:
+* Firmware Node Support: Pins can now be registered with an associated
+  struct fwnode_handle. This allows consumer drivers to lookup pins based
+  on device properties (dpll-pins).
+* Asynchronous Notifiers: A raw notifier chain is added to the DPLL core.
+  This allows the network driver (ice driver in this series) to subscribe
+  to events and react when the platform DPLL driver registers the parent
+  pins, resolving probe ordering dependencies.
+* Dynamic Indexing: Drivers can now request DPLL_PIN_IDX_UNSPEC to have
+  the core automatically allocate a unique pin index, simplifying driver
+  implementation for virtual or non-indexed pins.
 
-Right now the out of tree dwmac-s32cc.c driver does something like
-this:
+Reference Counting & Debugging:
+* Refactor: The reference counting logic in the core is consolidated.
+  Internal list management helpers now automatically handle hold/put
+  operations, removing fragile open-coded logic in the registration paths.
+* Duplicate Checks: The core now strictly rejects duplicate registration
+  attempts for the same pin/device context.
+* Reference Tracking: A new Kconfig option DPLL_REFCNT_TRACKER is added
+  (using the kernel's REF_TRACKER infrastructure). This allows developers
+  to instrument and debug reference leaks by recording stack traces for
+  every get/put operation.
 
-    89          if (gmac->use_nvmem) {
-    90                  ret = write_nvmem_cell(gmac->dev, "gmac_phy_intf_sel", intf_sel);
-    91                  if (ret)
-    92                          return ret;
-    93          } else {
-    94                  writel(intf_sel, gmac->ctrl_sts);
-    95          }
+Driver Updates:
+* zl3073x: Updated to register pins with their firmware nodes and support
+  the 'mux' pin type.
+* ice: Implements the E825-C specific hardware configuration for SyncE
+  (CGU registers). It utilizes the new notifier and fwnode APIs to
+  dynamically discover and attach to the platform DPLLs.
 
-Which is quite complicated, but with a syscon, then it's just:
+Patch Summary:
+* Patch 1-3:
+  DT bindings and helper functions for finding DPLL pins via fwnode.
+* Patch 4:
+  Updates zl3073x to register pins with fwnode.
+* Patch 5-6:
+  Adds notifiers and dynamic pin index allocation to DPLL core.
+* Patch 7:
+  Adds 'mux' pin type support to zl3073x.
+* Patch 8-9:
+  Refactors DPLL core refcounting and adds duplicate registration checks.
+* Patch 10-11:
+  Adds REF_TRACKER infrastructure and updates existing drivers to support it.
+* Patch 12:
+  Implements the E825-C SyncE logic in the ice driver using the new
+  infrastructure.
 
-	regmap_write(gmac->sts_regmap, gmac->sts_offset, S32_PHY_INTF_SEL_RGMII);
+Arkadiusz Kubalewski (1):
+  ice: dpll: Support E825-C SyncE and dynamic pin discovery
 
-Even without SCMI, the hardware has all these registers grouped together
-it just feels cleaner to group them together in the device tree as well.
+Ivan Vecera (10):
+  dt-bindings: net: ethernet-controller: Add DPLL pin properties
+  dpll: Allow associating dpll pin with a firmware node
+  net: eth: Add helpers to find DPLL pin firmware node
+  dpll: zl3073x: Associate pin with fwnode handle
+  dpll: Support dynamic pin index allocation
+  dpll: zl3073x: Add support for mux pin type
+  dpll: Enhance and consolidate reference counting logic
+  dpll: Prevent duplicate registrations
+  dpll: Add reference count tracking support
+  drivers: Add support for DPLL reference count tracking
 
-regards,
-dan carpenter
+Petr Oros (1):
+  dpll: Add notifier chain for dpll events
+
+ .../bindings/net/ethernet-controller.yaml     |  13 +
+ drivers/dpll/Kconfig                          |  15 +
+ drivers/dpll/dpll_core.c                      | 296 +++++-
+ drivers/dpll/dpll_core.h                      |  11 +
+ drivers/dpll/dpll_netlink.c                   |   6 +
+ drivers/dpll/zl3073x/dpll.c                   |  14 +-
+ drivers/dpll/zl3073x/dpll.h                   |   1 +
+ drivers/dpll/zl3073x/prop.c                   |   2 +
+ drivers/net/ethernet/intel/ice/ice_dpll.c     | 977 ++++++++++++++++--
+ drivers/net/ethernet/intel/ice/ice_dpll.h     |  33 +
+ drivers/net/ethernet/intel/ice/ice_lib.c      |   3 +
+ drivers/net/ethernet/intel/ice/ice_ptp.c      |  29 +
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c   |   9 +-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |   1 +
+ drivers/net/ethernet/intel/ice/ice_tspll.c    | 223 ++++
+ drivers/net/ethernet/intel/ice/ice_tspll.h    |  14 +-
+ drivers/net/ethernet/intel/ice/ice_type.h     |   6 +
+ .../net/ethernet/mellanox/mlx5/core/dpll.c    |  16 +-
+ drivers/ptp/ptp_ocp.c                         |  18 +-
+ include/linux/dpll.h                          |  59 +-
+ include/linux/etherdevice.h                   |   4 +
+ net/ethernet/eth.c                            |  20 +
+ 22 files changed, 1614 insertions(+), 156 deletions(-)
+
+-- 
+2.51.2
 
 
