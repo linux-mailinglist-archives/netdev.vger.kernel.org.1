@@ -1,145 +1,195 @@
-Return-Path: <netdev+bounces-244663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F95DCBC576
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 04:42:48 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2647ACBC624
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 04:51:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6C29430072B6
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 03:42:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7496C3020CDD
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 03:50:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC05129E0F8;
-	Mon, 15 Dec 2025 03:42:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F43531BC9E;
+	Mon, 15 Dec 2025 03:50:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ziyao.cc header.i=@ziyao.cc header.b="SpArnzPt"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="be1LxQPL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.out.flockmail.com (mail1.out.flockmail.com [35.175.0.24])
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1478299923
-	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 03:42:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.175.0.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52E932DBF76;
+	Mon, 15 Dec 2025 03:50:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765770157; cv=none; b=Oqc3SK36Uw9lFC23n2DVVQfK+2ATMIkKZ2l9miO8k2HzQb8wwzAK9rhyavhuD1jTdVTCzLXtrDh3LdGUjtuSXtuEENsQ6Qb1luIbLIuMyTzMQQ15baJ4a2yd8rqaYLReRE+YoCSmYZRDe3Zrmu+fH3RW1TnZAkOTUMJwdk88EPc=
+	t=1765770610; cv=none; b=TcyI/hwd9qC/skEBL9yyKOCq7s5xR935tunWpdGdRw7tWgPPxZykuAD8HOpRzUbgEfwwGQy+rL8yBcIjDe3HtNaFG4gtarR+f8LvW7MZq4JqZhx3y1Lz0rrKzZ5jCzu1Z3khC7IuVy2+2vnI1iJSVniisyn6Nt9ScupeoS2WMMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765770157; c=relaxed/simple;
-	bh=J18Jw5H9RPUchSnE0svQUKBZBIqeUdP4PUjtGE7O8Wg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kVuaPIOQExyzR3F4UIfxvXY0hga50BuXfEMJWpBRckgAOPvvXO+OBqh5CNsaUuORsPoA1N6dT7AtONdfLaz2DR5p0hzLYZCHM0eyVJmdmlRuC4MFJkzsL6Vn43UFzpkOXv0CjZ/fR3SoZYFFLUq+Z27XmveB+QyLwR5hAoWJoY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ziyao.cc; spf=pass smtp.mailfrom=ziyao.cc; dkim=pass (1024-bit key) header.d=ziyao.cc header.i=@ziyao.cc header.b=SpArnzPt; arc=none smtp.client-ip=35.175.0.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ziyao.cc
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziyao.cc
-Received: from localhost (localhost [127.0.0.1])
-	by smtp-out.flockmail.com (Postfix) with ESMTP id 4dV5VF1n63z2xBK;
-	Mon, 15 Dec 2025 03:42:29 +0000 (UTC)
-DKIM-Signature: a=rsa-sha256; bh=bKCrOiA7/P+MZsTh36bLrFTi2l+0P02csnPywnMu9Xg=;
-	c=relaxed/relaxed; d=ziyao.cc;
-	h=from:cc:message-id:to:in-reply-to:date:references:subject:mime-version:from:to:cc:subject:date:message-id:in-reply-to:references:reply-to;
-	q=dns/txt; s=titan1; t=1765770149; v=1;
-	b=SpArnzPtGR+gmQFp9upU0+tvZNQLhbhEhkIHW65IPvqideBGFZeY6JqgmPNywozHVBiOrjJh
-	deVfVmvu+zVYhu3g5X7f/e+4GvBMf/EykstgPEEvJ9xXoRuMRXoC4WAv9hQEjZIJ4nyvwQQwqgv
-	YHSonP3FxumyFpYuQsYVcNI8=
-Received: from pie (unknown [117.171.66.90])
-	by smtp-out.flockmail.com (Postfix) with ESMTPA id 4dV5V874j5z2x9X;
-	Mon, 15 Dec 2025 03:42:24 +0000 (UTC)
-Date: Mon, 15 Dec 2025 03:42:17 +0000
-Feedback-ID: :me@ziyao.cc:ziyao.cc:flockmailId
-From: Yao Zi <me@ziyao.cc>
-To: David Wang <00107082@163.com>, thostet@google.com
-Cc: daniel.gabay@intel.com, jeffbai@aosc.io, johannes.berg@intel.com,
-	kexybiscuit@aosc.io, linux-kernel@vger.kernel.org,
-	linux-wireless@vger.kernel.org, miriam.rachel.korenblit@intel.com,
-	nathan@kernel.org, netdev@vger.kernel.org,
-	pagadala.yesu.anjaneyulu@intel.com, richardcochran@gmail.com,
-	Kuniyuki Iwashima <kuniyu@google.com>
-Subject: Re: [PATCH iwlwifi-fixes] wifi: iwlwifi: Implement settime64 as stub
- for MVM/MLD PTP
-Message-ID: <aT-DmZTh_8I13Mg1@pie>
-References: <20251204123204.9316-1-ziyao@disroot.org>
- <20251214101257.4190-1-00107082@163.com>
+	s=arc-20240116; t=1765770610; c=relaxed/simple;
+	bh=nLli6r+BLSyXaVoyr9+pqYbOzsTpUEnpJ5mU8tZecOg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=sKreMrhTef5cCatm4ZTpNIzROi8qdKF30C+AyWz3IcCiGYRitGUThJPPJ9NMcqNTFpoMyIbZ7hEXuPEeN9Jy5se2KZOV74uD7D4vT3X5BB4ItWza0KBed4ZaXYJdMa2/WHMhAblqWQZL+BzpGO/DbBOmAhrPD3nLyojyRokdz4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=be1LxQPL; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: 1cb52f38d96911f0b2bf0b349165d6e0-20251215
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=IIh5JOQFkFZinjDskp0Z+lFWW/2TCih0jqb8pD5/rCc=;
+	b=be1LxQPLHohDJQk1OgGl8l6H02zijTyZn2FJHB7N/fdPO4gSWzXYsBHhZgh7uTGqVjFdA4bBF3a9GaUgjZiyfVNCBOAnVg5oaKJrXEa1269wZ4NkXcyqOFGvnuiU4FDb218/ALyKcNr/reo5wYsXw839xPNfsDNGdTAoIFEeUcM=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.6,REQID:1da73031-b37b-43f1-915b-8bd73b0bdcaa,IP:0,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
+	elease,TS:0
+X-CID-META: VersionHash:a9d874c,CLOUDID:3cd0c402-1fa9-44eb-b231-4afc61466396,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102|836|888|898,TC:-5,Content:0|15|5
+	0,EDM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OS
+	A:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 1cb52f38d96911f0b2bf0b349165d6e0-20251215
+Received: from mtkmbs10n2.mediatek.inc [(172.21.101.183)] by mailgw01.mediatek.com
+	(envelope-from <irving-ch.lin@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1488152436; Mon, 15 Dec 2025 11:49:52 +0800
+Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
+ MTKMBS14N1.mediatek.inc (172.21.101.75) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1748.26; Mon, 15 Dec 2025 11:49:50 +0800
+Received: from mtksitap99.mediatek.inc (10.233.130.16) by
+ mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.2562.29 via Frontend Transport; Mon, 15 Dec 2025 11:49:50 +0800
+From: irving.ch.lin <irving-ch.lin@mediatek.com>
+To: Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+	<sboyd@kernel.org>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+	<krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
+	<matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+	<angelogioacchino.delregno@collabora.com>, Ulf Hansson
+	<ulf.hansson@linaro.org>, Richard Cochran <richardcochran@gmail.com>
+CC: Qiqi Wang <qiqi.wang@mediatek.com>, <linux-clk@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>,
+	<linux-pm@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<Project_Global_Chrome_Upstream_Group@mediatek.com>,
+	<sirius.wang@mediatek.com>, <vince-wl.liu@mediatek.com>,
+	<jh.hsu@mediatek.com>, <irving-ch.lin@mediatek.com>
+Subject: [PATCH v4 00/21] Add support for MT8189 clock/power controller
+Date: Mon, 15 Dec 2025 11:49:09 +0800
+Message-ID: <20251215034944.2973003-1-irving-ch.lin@mediatek.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251214101257.4190-1-00107082@163.com>
-X-F-Verdict: SPFVALID
-X-Titan-Src-Out: 1765770149083250194.27573.1538939435451385954@prod-use1-smtp-out1001.
-X-CMAE-Score: 0
-X-CMAE-Analysis: v=2.4 cv=TPG/S0la c=1 sm=1 tr=0 ts=693f83a5
-	a=rBp+3XZz9uO5KTvnfbZ58A==:117 a=rBp+3XZz9uO5KTvnfbZ58A==:17
-	a=kj9zAlcOel0A:10 a=MKtGQD3n3ToA:10 a=CEWIc4RMnpUA:10 a=VwQbUJbxAAAA:8
-	a=QyXUC8HyAAAA:8 a=LpNgXrTXAAAA:8 a=SYGaFrxvNFvLGzGqgu4A:9
-	a=CjuIK1q_8ugA:10 a=LqOpv0_-CX5VL_7kjZO3:22 a=3z85VNIBY5UIEeAh_hcH:22
-	a=NWVoK91CQySWRX1oVYDe:22
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On Sun, Dec 14, 2025 at 06:12:57PM +0800, David Wang wrote:
-> On Thu, Dec 04, 2025 at 12:32:04PM +0000, Yao Zi wrote:
-> > Since commit dfb073d32cac ("ptp: Return -EINVAL on ptp_clock_register if
-> > required ops are NULL"), PTP clock registered through ptp_clock_register
-> > is required to have ptp_clock_info.settime64 set, however, neither MVM
-> > nor MLD's PTP clock implementation sets it, resulting in warnings when
-> > the interface starts up, like
-> > 
-> > WARNING: drivers/ptp/ptp_clock.c:325 at ptp_clock_register+0x2c8/0x6b8, CPU#1: wpa_supplicant/469
-> > CPU: 1 UID: 0 PID: 469 Comm: wpa_supplicant Not tainted 6.18.0+ #101 PREEMPT(full)
-> > ra: ffff800002732cd4 iwl_mvm_ptp_init+0x114/0x188 [iwlmvm]
-> > ERA: 9000000002fdc468 ptp_clock_register+0x2c8/0x6b8
-> > iwlwifi 0000:01:00.0: Failed to register PHC clock (-22)
-> > 
-> > I don't find an appropriate firmware interface to implement settime64()
-> > for iwlwifi MLD/MVM, thus instead create a stub that returns
-> > -EOPTNOTSUPP only, suppressing the warning and allowing the PTP clock to
-> > be registered.
-> 
-> This seems disturbing....If a null settime64 deserve a kernel WARN dump, so should
-> a settime64 which returns error.
+From: Irving-CH Lin <irving-ch.lin@mediatek.com>
 
-They're separate things. A ptp clock implementing not provinding
-settime64() or gettime64()/gettimex64() callback will crash when
-userspace tries to call clock_gettime()/clock_settime() on it, since
-either ptp_clock_settime() or ptp_clock_gettime() invokes these
-callbacks unconditionally.
+Changes since v4:
+- Fix dt_binding_check warning.
+- Check prepare_enable before set_parent to ensure our reference clock is ready.
+- Enable fhctl in apmixed driver.
+- Refine clock drivers: 
+  - Change subsys name, regs base/size (clock related part, instead of whole subsys).
+  - Simply code with GATE_MTK macro.
+  - Add MODULE_DEVICE_TABLE, MODULE_DESCRIPTION
+  - Register remove callback mtk_clk_simple_remove.
+  - Remove most of CLK_OPS_PARENT_ENABLE and CLK_IGNORE_UNUSED which may block bringup,
+      but some subsys will power off before we disable unused clocks, so still need here.  
 
-However, failing with -ENOTSUPP/-EOPNOTSUPP when clock_settime() isn't
-supported by a dynamic POSIX clock device is a documented behavior, see
-man-page clock_getres(2).
+changes since v3:
+- Add power-controller dt-schema to mediatek,power-controller.yaml.
+- Separates clock commit to small parts (by sub-system).
+- Change to mtk-pm-domains for new MTK pm framework.
 
-> Before fixing the warning, the expected behavior of settime64 should be specified clearly,
+changes since v2:
+- Fix dt-schema checking fails
+- Merge dt-binding files and dt-schema files into one patch.
+- Add vendor information to dt-binding file name.
+- Remove NR define in dt-binding header.
+- Add struct member description.
 
-I think failing with -EOPNOTSUPP (which is the same as -ENOTSUPP on
-Linux) when the operation isn't supported is well-documented, and is
-suitable for this case.
+  This series add support for the clock and power controllers
+of MediaTek's new SoC, MT8189. With these changes,
+other modules can easily manage clock and power resources
+using standard Linux APIs, such as the Common Clock Framework (CCF)
+and pm_runtime on MT8189 platform.
 
-One may argue that it'd be helpful for ptp_clock_register() to provide
-a default implementation of settime64() that always fails with
--EOPNOTSUPP when the driver doesn't provide one.
+Irving-CH Lin (21):
+  dt-bindings: clock: mediatek: Add MT8189 clock definitions
+  dt-bindings: power: mediatek: Add MT8189 power domain definitions
+  clk: mediatek: clk-mux: Make sure bypass clk enabled while setting MFG
+    rate
+  clk: mediatek: Add MT8189 apmixedsys clock support
+  clk: mediatek: Add MT8189 topckgen clock support
+  clk: mediatek: Add MT8189 vlpckgen clock support
+  clk: mediatek: Add MT8189 vlpcfg clock support
+  clk: mediatek: Add MT8189 bus clock support
+  clk: mediatek: Add MT8189 cam clock support
+  clk: mediatek: Add MT8189 dbgao clock support
+  clk: mediatek: Add MT8189 dvfsrc clock support
+  clk: mediatek: Add MT8189 i2c clock support
+  clk: mediatek: Add MT8189 img clock support
+  clk: mediatek: Add MT8189 mdp clock support
+  clk: mediatek: Add MT8189 mfg clock support
+  clk: mediatek: Add MT8189 dispsys clock support
+  clk: mediatek: Add MT8189 scp clock support
+  clk: mediatek: Add MT8189 ufs clock support
+  clk: mediatek: Add MT8189 vcodec clock support
+  pmdomain: mediatek: Add bus protect control flow for MT8189
+  pmdomain: mediatek: Add power domain driver for MT8189 SoC
 
-However, it's likely a programming bug when gettime64()/settime64() is
-missing, so the current behavior of warning sounds reasonable to me.
+ .../bindings/clock/mediatek,mt8189-clock.yaml |   90 ++
+ .../clock/mediatek,mt8189-sys-clock.yaml      |   58 +
+ .../power/mediatek,power-controller.yaml      |    1 +
+ drivers/clk/mediatek/Kconfig                  |  146 +++
+ drivers/clk/mediatek/Makefile                 |   14 +
+ drivers/clk/mediatek/clk-mt8189-apmixedsys.c  |  192 ++++
+ drivers/clk/mediatek/clk-mt8189-bus.c         |  196 ++++
+ drivers/clk/mediatek/clk-mt8189-cam.c         |  108 ++
+ drivers/clk/mediatek/clk-mt8189-dbgao.c       |   94 ++
+ drivers/clk/mediatek/clk-mt8189-dispsys.c     |  172 +++
+ drivers/clk/mediatek/clk-mt8189-dvfsrc.c      |   54 +
+ drivers/clk/mediatek/clk-mt8189-iic.c         |  118 ++
+ drivers/clk/mediatek/clk-mt8189-img.c         |  107 ++
+ drivers/clk/mediatek/clk-mt8189-mdpsys.c      |   91 ++
+ drivers/clk/mediatek/clk-mt8189-mfg.c         |   53 +
+ drivers/clk/mediatek/clk-mt8189-scp.c         |   73 ++
+ drivers/clk/mediatek/clk-mt8189-topckgen.c    | 1020 +++++++++++++++++
+ drivers/clk/mediatek/clk-mt8189-ufs.c         |   89 ++
+ drivers/clk/mediatek/clk-mt8189-vcodec.c      |   93 ++
+ drivers/clk/mediatek/clk-mt8189-vlpcfg.c      |  111 ++
+ drivers/clk/mediatek/clk-mt8189-vlpckgen.c    |  280 +++++
+ drivers/clk/mediatek/clk-mux.c                |    9 +-
+ drivers/pmdomain/mediatek/mt8189-pm-domains.h |  485 ++++++++
+ drivers/pmdomain/mediatek/mtk-pm-domains.c    |   36 +-
+ drivers/pmdomain/mediatek/mtk-pm-domains.h    |    5 +
+ .../dt-bindings/clock/mediatek,mt8189-clk.h   |  580 ++++++++++
+ .../dt-bindings/power/mediatek,mt8189-power.h |   38 +
+ 27 files changed, 4306 insertions(+), 7 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/clock/mediatek,mt8189-clock.yaml
+ create mode 100644 Documentation/devicetree/bindings/clock/mediatek,mt8189-sys-clock.yaml
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-apmixedsys.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-bus.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-cam.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-dbgao.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-dispsys.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-dvfsrc.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-iic.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-img.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-mdpsys.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-mfg.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-scp.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-topckgen.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-ufs.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-vcodec.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-vlpcfg.c
+ create mode 100644 drivers/clk/mediatek/clk-mt8189-vlpckgen.c
+ create mode 100644 drivers/pmdomain/mediatek/mt8189-pm-domains.h
+ create mode 100644 include/dt-bindings/clock/mediatek,mt8189-clk.h
+ create mode 100644 include/dt-bindings/power/mediatek,mt8189-power.h
 
-> hence why the dfb073d32cac ("ptp: Return -EINVAL on ptp_clock_register if required ops are NULL")?
+-- 
+2.45.2
 
-You may be interested in the original series[1] where the idea of
-warning for missing settime64/gettime64/gettimex64 callbacks came up.
-
-Also cc Kuniyuki, in case that I missed something or got it wrong.
-
-> 
-> David
-
-Best regards,
-Yao Zi
-
-> > 
-> > Reported-by: Nathan Chancellor <nathan@kernel.org>
-> > Closes: https://lore.kernel.org/all/20251108044822.GA3262936@ax162/
-> > Signed-off-by: Yao Zi <ziyao@disroot.org>
-> > ---
-> 
-
-[1]: https://lore.kernel.org/all/20251028095143.396385-1-junjie.cao@intel.com/
 
