@@ -1,132 +1,519 @@
-Return-Path: <netdev+bounces-244687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8BADCBC75E
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 05:22:18 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCD19CBC7A2
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 05:38:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4E5FA300453B
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 04:22:17 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id E8C5A3008780
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 04:38:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0AEB2874E0;
-	Mon, 15 Dec 2025 04:22:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="jQ4Vjxxb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A09C931B102;
+	Mon, 15 Dec 2025 04:38:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCDA219258E;
-	Mon, 15 Dec 2025 04:22:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67C1E312834;
+	Mon, 15 Dec 2025 04:38:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765772536; cv=none; b=Ox6d4epUs2uKj0vjP5Ue6U9wFAZj0ARuNmrQMpOPMBflJjKxyRDs3FTG6gExxwJ7ulwJc+yzNkTerJPIt/6t/PyLfIUg+rGsIIwgg9vzRbknPXkWQfGq8BFEDU80yXCd8jNsgzqUtPHb8TkSktTDtEKEUegMhTSFsUOcEB5k1Tk=
+	t=1765773491; cv=none; b=RBlKwGD7E2wAmwAAiYjL5PM1Q/Jpp3kLPO5KMt7p7avJ+lEKQiWVd6wpDq8anItThxiFAfUofSfRU1nVF5cc8z4/yBItOtuDGU3wgSJkLo1bVQ/afnFbElbRQlGMVHa59tVMNjVkySTqlZ/N7PtCvvfBdY+6TtnIukSlmGnkuzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765772536; c=relaxed/simple;
-	bh=sHbrYLaauTmnUdbRMtVJCVmpyp6JPetQFcchtY6iAqk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=Y948SM4yRh+L1VLzuoK8Lq8EWEcvDPVP0klOW/prvFoLkSYRZdhGLFX0dZaprYa2FcTZLfdr/+5WDTeaC5omydX/WFEQ7iCllnTtrBhjXbfCpJ0WwIUokQoT4RqvtMCkYAe6qB8kM5P9pyYYMBX78deak8tUDebeDHtSApl327U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=jQ4Vjxxb; arc=none smtp.client-ip=220.197.31.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=sHbrYLaauTmnUdbRMtVJCVmpyp6JPetQFcchtY6iAqk=; b=j
-	Q4VjxxbYHqkOOwZokaoy3FyIu4b5sMqSulkVzlIt3isVSYYzDaigGPLMHNbtsggc
-	uFefduM+yjJDZF01Uwg9mTCfwOQzk8Dn5LFKULaOY00Jd9BDUDzUGuEEcy9h+ArV
-	5X0KMKg31EVrCY6Ne/Y2+cuu8Nwembhr96UFTi8j6c=
-Received: from 00107082$163.com ( [111.35.191.189] ) by
- ajax-webmail-wmsvr-40-140 (Coremail) ; Mon, 15 Dec 2025 12:20:43 +0800
- (CST)
-Date: Mon, 15 Dec 2025 12:20:43 +0800 (CST)
-From: "David Wang" <00107082@163.com>
-To: "Yao Zi" <me@ziyao.cc>
-Cc: thostet@google.com, daniel.gabay@intel.com, jeffbai@aosc.io,
-	johannes.berg@intel.com, kexybiscuit@aosc.io,
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-	miriam.rachel.korenblit@intel.com, nathan@kernel.org,
-	netdev@vger.kernel.org, pagadala.yesu.anjaneyulu@intel.com,
-	richardcochran@gmail.com, "Kuniyuki Iwashima" <kuniyu@google.com>
-Subject: Re: [PATCH iwlwifi-fixes] wifi: iwlwifi: Implement settime64 as
- stub for MVM/MLD PTP
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
- 20250723(a044bf12) Copyright (c) 2002-2025 www.mailtech.cn 163com
-In-Reply-To: <aT-DmZTh_8I13Mg1@pie>
-References: <20251204123204.9316-1-ziyao@disroot.org>
- <20251214101257.4190-1-00107082@163.com> <aT-DmZTh_8I13Mg1@pie>
-X-NTES-SC: AL_Qu2dB/ucvUwv5SWRYekZnEYQheY4XMKyuPkg1YJXOp80hyXO2yctVkVHJHDd3uONAQGLkwivTghyxMl2dKpBW6DrUAhNHAp/QMhlHx/TMkJv
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=GBK
+	s=arc-20240116; t=1765773491; c=relaxed/simple;
+	bh=qqxWqnXhe90QLloQ4PLY9BFWtNYjD+6g4eILkpOK6Us=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IkJLUs6zywhVoDXbjMqQrSswyp+N9rufx1NwmLtT6D7+A7DObCHpo8wo8Ocsx53CNwvulkXMSGh1D0u0hfSXOCjULUIpaDvY8tI1k2/bGGyKwikW8WWrt/NpsOelY10oiDHOiPqQrrBnDk0OAOqU/d4vf74FT6hYfb4Bc/E7hd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-c2dff70000001609-81-693f8d138eaf
+Date: Mon, 15 Dec 2025 13:22:37 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
+	torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
+	linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
+	linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org,
+	will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
+	joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
+	duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
+	tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
+	amir73il@gmail.com, gregkh@linuxfoundation.org, kernel-team@lge.com,
+	linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
+	minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
+	sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+	penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+	ngupta@vflare.org, linux-block@vger.kernel.org,
+	josef@toxicpanda.com, linux-fsdevel@vger.kernel.org, jack@suse.cz,
+	jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
+	djwong@kernel.org, dri-devel@lists.freedesktop.org,
+	rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
+	hamohammed.sa@gmail.com, harry.yoo@oracle.com,
+	chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
+	max.byungchul.park@gmail.com, boqun.feng@gmail.com,
+	longman@redhat.com, yunseong.kim@ericsson.com, ysk@kzalloc.com,
+	yeoreum.yun@arm.com, netdev@vger.kernel.org,
+	matthew.brost@intel.com, her0gyugyu@gmail.com, corbet@lwn.net,
+	catalin.marinas@arm.com, bp@alien8.de, x86@kernel.org,
+	hpa@zytor.com, luto@kernel.org, sumit.semwal@linaro.org,
+	gustavo@padovan.org, christian.koenig@amd.com,
+	andi.shyti@kernel.org, arnd@arndb.de, lorenzo.stoakes@oracle.com,
+	Liam.Howlett@oracle.com, rppt@kernel.org, surenb@google.com,
+	mcgrof@kernel.org, petr.pavlu@suse.com, da.gomez@kernel.org,
+	samitolvanen@google.com, paulmck@kernel.org, frederic@kernel.org,
+	neeraj.upadhyay@kernel.org, joelagnelf@nvidia.com,
+	josh@joshtriplett.org, urezki@gmail.com,
+	mathieu.desnoyers@efficios.com, jiangshanlai@gmail.com,
+	qiang.zhang@linux.dev, juri.lelli@redhat.com,
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+	bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
+	chuck.lever@oracle.com, neil@brown.name, okorniev@redhat.com,
+	Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org,
+	anna@kernel.org, kees@kernel.org, bigeasy@linutronix.de,
+	clrkwllms@kernel.org, mark.rutland@arm.com, ada.coupriediaz@arm.com,
+	kristina.martsenko@arm.com, wangkefeng.wang@huawei.com,
+	broonie@kernel.org, kevin.brodsky@arm.com, dwmw@amazon.co.uk,
+	shakeel.butt@linux.dev, ast@kernel.org, ziy@nvidia.com,
+	yuzhao@google.com, baolin.wang@linux.alibaba.com,
+	usamaarif642@gmail.com, joel.granados@kernel.org,
+	richard.weiyang@gmail.com, geert+renesas@glider.be,
+	tim.c.chen@linux.intel.com, linux@treblig.org,
+	alexander.shishkin@linux.intel.com, lillian@star-ark.net,
+	chenhuacai@kernel.org, francesco@valla.it,
+	guoweikang.kernel@gmail.com, link@vivo.com, jpoimboe@kernel.org,
+	masahiroy@kernel.org, brauner@kernel.org,
+	thomas.weissschuh@linutronix.de, oleg@redhat.com, mjguzik@gmail.com,
+	andrii@kernel.org, wangfushuai@baidu.com, linux-doc@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, linux-i2c@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-modules@vger.kernel.org,
+	rcu@vger.kernel.org, linux-nfs@vger.kernel.org,
+	linux-rt-devel@lists.linux.dev, 2407018371@qq.com, dakr@kernel.org,
+	miguel.ojeda.sandonis@gmail.com, neilb@ownmail.net,
+	wsa+renesas@sang-engineering.com, dave.hansen@intel.com,
+	geert@linux-m68k.org, ojeda@kernel.org, alex.gaynor@gmail.com,
+	gary@garyguo.net, bjorn3_gh@protonmail.com, lossin@kernel.org,
+	a.hindborg@kernel.org, aliceryhl@google.com, tmgross@umich.edu,
+	rust-for-linux@vger.kernel.org
+Subject: Re: [PATCH v18 25/42] dept: add documents for dept
+Message-ID: <20251215042237.GA49936@system.software.com>
+References: <20251205071855.72743-1-byungchul@sk.com>
+ <20251205071855.72743-26-byungchul@sk.com>
+ <aTN38kJjBftxnjm9@archie.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <1218241a.4a90.19b203d3fd8.Coremail.00107082@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:jCgvCgDnf4ScjD9prok5AA--.1283W
-X-CM-SenderInfo: qqqrilqqysqiywtou0bp/xtbCxhx0H2k-jJySPAAA3Z
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aTN38kJjBftxnjm9@archie.me>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUxTVxjHc+6599xLZ5e7guudJIurGzqMOIwfnswF/eJ2Z0Liy75sZmHd
+	aEZjQVMUZcmmnZRV3BiYFWaVWWwsDFDIrUPlnYJg1bIuuq4g3UBdtVvBt1pEoO5WYua3X/7P
+	//zOSw6HVcfIIk5fsFNnLNAaNERBKyYW1K5I/m6t/q0WZzpYzHvBb+qh4WHUQoNFOsxAdPoa
+	C1YTgqrfDmEI+LoxNJ02UfCgJU7AOn6TQHXYRIMtdISFJ8FbFPwRiyD4t+ougdrxIIb74TEE
+	f1f8gsFjPUhgsoVAaKSTgv2OZgLnxtpYaJSyZYcsO9lOwWXHKA1HvFcYmB3PhOD3VhpOTfzK
+	wF+DpQxIw+cRSDf8DHSOLIcrbUcJ+HouMXBp4AINsfJUGK6OsOB8eIcFU6+Dhp87vQQG7C9D
+	6YM4Ayeikxi+ud1OYLT8Hxq6LGMU9DefoaA51IfBJVkx+A8dI+BtvciC+dtp+dqzFgIHzVXy
+	U/THMLTcqyMw80jetXzoPaiJZkK0sYGsWydOmctpsemnJiRGT+zHYl/kDhZLXLvFzpidFs/Z
+	gqxY0jXCinZpl+iqTxcdHWFKlBoOELF25jYWR/0dRJwcGmJFd58FbXz9I8U7uTqDvkhnXJn1
+	iSKvYi7C7Phx855qz1F6H3KuKUNJnMCvFm7d9eJnXHZhhkkwzb8h3Aub2QQTfqkQCEw/7aTw
+	ywSP65GcKzjMW18V5gYaUWKQzK8R7IFKKsFKHoQ6y0mUKKl4ExIG++rp+cFLgufwzaeM+XQh
+	EA/LCziZU4W6OJeIk/g3haBlvr6QXyL0tA5SCY/AX08SJsp87PxJXxF66wN0BeJtz2ltz2lt
+	/2vtCDcglb6gKF+rN6zOyCsu0O/J+Gx7voTkb+v8cnbrWXTft8WNeA5pFih9p7P0KkZbVFic
+	70YChzUpSktAjpS52uIvdMbtOcZdBl2hG6VytEatXBXbnaviP9fu1G3T6XbojM+mFJe0aB/6
+	IeXD/OCfofWraq560j7ojry/xdkDmddfyxGzNrx4fKrj49Zr6sZutVp6vHebAS8/1ZUxvMG7
+	eNC2KT7tX+lenLaW1KSVmkK9X212pao2OZ7ktE1+PWcs+b1ytMHUfIBf9vaNd5MvPu7/9Cpb
+	nF29ImVha3twyQtTlaJ649bsuaXraQ1dmKfNTMfGQu1/0PHig7IDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0xTZxzG877n0kO15qxiPMHFJV2M4qLOqMlfcczb9OgicUqyxX0YjR6l
+	4SJpBcXNS8HG6txSGttKCw6ZVMdNKQp22IggRawo9UYjYtVUZgXEC1W5tOxUs8wvb37v8zy/
+	5P3wMoR8jIpjVJnbBXWmMl1BS0lpUkL+LPlvX6u+fPIsAfS6vXDfH6DgrraRhNCgnoSi05U0
+	hG31EtA7Cim40plHQkd1BQJ/SI/g7YiNAJ1zjISw0S2BwaEuCZi0CMZcbgRmr5EAX8dFAirP
+	ajG8PhOhobf5FQLTowANlqCWhAH7YQTWHpsEgi2roN/fQMFY9z8YOt/0IbAHIhgCjQcQhM1p
+	8EdpraibX9Aw0n6DAIupA8HxR90EvAo+RHDW/QCB61QeDU8M5wi4FZgAt0MDNLSZfqWh31uE
+	4fkZGkryXBR4r/UiKLYZEfTcc2HI//M0DeZiBwnOh39LwNs7iuG+2YihwrEW/PYeEjyGUiw+
+	V1zVTAabJR+Lx1MMpqoGDEP2csmSMsS/1f1O8uW1dZjX3QzTfOWxSsSPDBsRP1iWT/A6g3ht
+	7hsg+P21O/gyTx/ND4fu0LzrTQnJXy3l+BMHhzFf0D6Ld1q7JeuWbpQu3iykq3IE9ZzEFGmq
+	IdxHZR1dv9PSVkTuQ/aEQyiG4dj53KErI1SUSXYa9zKok0SZZqdzPt8QEeVYdgbXVvtOzKUM
+	wZqmcmF3BYoWE9kErsRXgKMsY4E7qa9C0ZGc1SKutfkU+aH4hGsrDLxngp3J+SJBUWBEnsKd
+	jDDROIaN57r1H+aT2M+5xrpWbEAy60e29SPb+r9dgohyFKvKzMlQqtIXzNakpeZmqnbO3rQt
+	w4HEb2nfPVpwHg3eWtWEWAYpxst8DYkqOaXM0eRmNCGOIRSxMr1PjGSblbm7BPW2n9TZ6YKm
+	CU1hSMVk2ZrvhRQ5u1W5XUgThCxB/V+LmZi4fYia6pm0wuP/7PhWk/sH97fP93y6fLTKefhC
+	/LrCc47vVlYvDNZ512/ItQh/eZ6uRslHq49Mr7+OS3f/3B65nDg8cW/9pWXZG7eoQj/Gxyz5
+	oji5a03nwqSO+VkTmmrolMfSAnrl4q+SF81bPffIpdhN4dvxC/offzMw7pcW37QVfE2cS+lU
+	kJpU5dyZhFqj/Bcf4v0VkgMAAA==
+X-CFilter-Loop: Reflected
 
-CkF0IDIwMjUtMTItMTUgMTE6NDI6MTcsICJZYW8gWmkiIDxtZUB6aXlhby5jYz4gd3JvdGU6Cj5P
-biBTdW4sIERlYyAxNCwgMjAyNSBhdCAwNjoxMjo1N1BNICswODAwLCBEYXZpZCBXYW5nIHdyb3Rl
-Ogo+PiBPbiBUaHUsIERlYyAwNCwgMjAyNSBhdCAxMjozMjowNFBNICswMDAwLCBZYW8gWmkgd3Jv
-dGU6Cj4+ID4gU2luY2UgY29tbWl0IGRmYjA3M2QzMmNhYyAoInB0cDogUmV0dXJuIC1FSU5WQUwg
-b24gcHRwX2Nsb2NrX3JlZ2lzdGVyIGlmCj4+ID4gcmVxdWlyZWQgb3BzIGFyZSBOVUxMIiksIFBU
-UCBjbG9jayByZWdpc3RlcmVkIHRocm91Z2ggcHRwX2Nsb2NrX3JlZ2lzdGVyCj4+ID4gaXMgcmVx
-dWlyZWQgdG8gaGF2ZSBwdHBfY2xvY2tfaW5mby5zZXR0aW1lNjQgc2V0LCBob3dldmVyLCBuZWl0
-aGVyIE1WTQo+PiA+IG5vciBNTEQncyBQVFAgY2xvY2sgaW1wbGVtZW50YXRpb24gc2V0cyBpdCwg
-cmVzdWx0aW5nIGluIHdhcm5pbmdzIHdoZW4KPj4gPiB0aGUgaW50ZXJmYWNlIHN0YXJ0cyB1cCwg
-bGlrZQo+PiA+IAo+PiA+IFdBUk5JTkc6IGRyaXZlcnMvcHRwL3B0cF9jbG9jay5jOjMyNSBhdCBw
-dHBfY2xvY2tfcmVnaXN0ZXIrMHgyYzgvMHg2YjgsIENQVSMxOiB3cGFfc3VwcGxpY2FudC80NjkK
-Pj4gPiBDUFU6IDEgVUlEOiAwIFBJRDogNDY5IENvbW06IHdwYV9zdXBwbGljYW50IE5vdCB0YWlu
-dGVkIDYuMTguMCsgIzEwMSBQUkVFTVBUKGZ1bGwpCj4+ID4gcmE6IGZmZmY4MDAwMDI3MzJjZDQg
-aXdsX212bV9wdHBfaW5pdCsweDExNC8weDE4OCBbaXdsbXZtXQo+PiA+IEVSQTogOTAwMDAwMDAw
-MmZkYzQ2OCBwdHBfY2xvY2tfcmVnaXN0ZXIrMHgyYzgvMHg2YjgKPj4gPiBpd2x3aWZpIDAwMDA6
-MDE6MDAuMDogRmFpbGVkIHRvIHJlZ2lzdGVyIFBIQyBjbG9jayAoLTIyKQo+PiA+IAo+PiA+IEkg
-ZG9uJ3QgZmluZCBhbiBhcHByb3ByaWF0ZSBmaXJtd2FyZSBpbnRlcmZhY2UgdG8gaW1wbGVtZW50
-IHNldHRpbWU2NCgpCj4+ID4gZm9yIGl3bHdpZmkgTUxEL01WTSwgdGh1cyBpbnN0ZWFkIGNyZWF0
-ZSBhIHN0dWIgdGhhdCByZXR1cm5zCj4+ID4gLUVPUFROT1RTVVBQIG9ubHksIHN1cHByZXNzaW5n
-IHRoZSB3YXJuaW5nIGFuZCBhbGxvd2luZyB0aGUgUFRQIGNsb2NrIHRvCj4+ID4gYmUgcmVnaXN0
-ZXJlZC4KPj4gCj4+IFRoaXMgc2VlbXMgZGlzdHVyYmluZy4uLi5JZiBhIG51bGwgc2V0dGltZTY0
-IGRlc2VydmUgYSBrZXJuZWwgV0FSTiBkdW1wLCBzbyBzaG91bGQKPj4gYSBzZXR0aW1lNjQgd2hp
-Y2ggcmV0dXJucyBlcnJvci4KPgo+VGhleSdyZSBzZXBhcmF0ZSB0aGluZ3MuIEEgcHRwIGNsb2Nr
-IGltcGxlbWVudGluZyBub3QgcHJvdmluZGluZwo+c2V0dGltZTY0KCkgb3IgZ2V0dGltZTY0KCkv
-Z2V0dGltZXg2NCgpIGNhbGxiYWNrIHdpbGwgY3Jhc2ggd2hlbgo+dXNlcnNwYWNlIHRyaWVzIHRv
-IGNhbGwgY2xvY2tfZ2V0dGltZSgpL2Nsb2NrX3NldHRpbWUoKSBvbiBpdCwgc2luY2UKPmVpdGhl
-ciBwdHBfY2xvY2tfc2V0dGltZSgpIG9yIHB0cF9jbG9ja19nZXR0aW1lKCkgaW52b2tlcyB0aGVz
-ZQo+Y2FsbGJhY2tzIHVuY29uZGl0aW9uYWxseS4KPgo+SG93ZXZlciwgZmFpbGluZyB3aXRoIC1F
-Tk9UU1VQUC8tRU9QTk9UU1VQUCB3aGVuIGNsb2NrX3NldHRpbWUoKSBpc24ndAo+c3VwcG9ydGVk
-IGJ5IGEgZHluYW1pYyBQT1NJWCBjbG9jayBkZXZpY2UgaXMgYSBkb2N1bWVudGVkIGJlaGF2aW9y
-LCBzZWUKPm1hbi1wYWdlIGNsb2NrX2dldHJlcygyKS4KPgo+PiBCZWZvcmUgZml4aW5nIHRoZSB3
-YXJuaW5nLCB0aGUgZXhwZWN0ZWQgYmVoYXZpb3Igb2Ygc2V0dGltZTY0IHNob3VsZCBiZSBzcGVj
-aWZpZWQgY2xlYXJseSwKPgo+SSB0aGluayBmYWlsaW5nIHdpdGggLUVPUE5PVFNVUFAgKHdoaWNo
-IGlzIHRoZSBzYW1lIGFzIC1FTk9UU1VQUCBvbgo+TGludXgpIHdoZW4gdGhlIG9wZXJhdGlvbiBp
-c24ndCBzdXBwb3J0ZWQgaXMgd2VsbC1kb2N1bWVudGVkLCBhbmQgaXMKPnN1aXRhYmxlIGZvciB0
-aGlzIGNhc2UuCj4KPk9uZSBtYXkgYXJndWUgdGhhdCBpdCdkIGJlIGhlbHBmdWwgZm9yIHB0cF9j
-bG9ja19yZWdpc3RlcigpIHRvIHByb3ZpZGUKPmEgZGVmYXVsdCBpbXBsZW1lbnRhdGlvbiBvZiBz
-ZXR0aW1lNjQoKSB0aGF0IGFsd2F5cyBmYWlscyB3aXRoCj4tRU9QTk9UU1VQUCB3aGVuIHRoZSBk
-cml2ZXIgZG9lc24ndCBwcm92aWRlIG9uZS4KPgo+SG93ZXZlciwgaXQncyBsaWtlbHkgYSBwcm9n
-cmFtbWluZyBidWcgd2hlbiBnZXR0aW1lNjQoKS9zZXR0aW1lNjQoKSBpcwo+bWlzc2luZywgc28g
-dGhlIGN1cnJlbnQgYmVoYXZpb3Igb2Ygd2FybmluZyBzb3VuZHMgcmVhc29uYWJsZSB0byBtZS4K
-Pgo+PiBoZW5jZSB3aHkgdGhlIGRmYjA3M2QzMmNhYyAoInB0cDogUmV0dXJuIC1FSU5WQUwgb24g
-cHRwX2Nsb2NrX3JlZ2lzdGVyIGlmIHJlcXVpcmVkIG9wcyBhcmUgTlVMTCIpPwo+Cj5Zb3UgbWF5
-IGJlIGludGVyZXN0ZWQgaW4gdGhlIG9yaWdpbmFsIHNlcmllc1sxXSB3aGVyZSB0aGUgaWRlYSBv
-Zgo+d2FybmluZyBmb3IgbWlzc2luZyBzZXR0aW1lNjQvZ2V0dGltZTY0L2dldHRpbWV4NjQgY2Fs
-bGJhY2tzIGNhbWUgdXAuCgpUaGFua3MgZm9yIHRoZSBpbmZvcm1hdGlvbiwgdGhpcyBsaW5rIGhv
-bGRzIHdheSBtb3JlIHJlbGV2YW50IGluZm9ybWF0aW9uIHRoYW4gdGhlICpMaW5rKiB0YWcgaW4g
-ZGZiMDczZDMyY2FjLiAgOikKCkJ1dCBpc24ndCAgdGhlIHBhdGNoIGluIFsxXSAgYW5kIHNpbWls
-YXIgY2hhbmdlIHRvIHNldHRpbWU2NCBiZXR0ZXI/IApXaGF0IGlzIHRoZSAgZGlmZmVyZW5jZSBi
-ZXR3ZWVuIGEgbnVsbCBjYWxsYmFjayBhbmQgYSBjYWxsYmFjayByZXR1cm5pbmcgZXJyb3I/IGFy
-ZW4ndCB0aGV5IHNheWluZyB0aGUgc2FtZQp0aGluZzogInRoaXMgZGV2aWNlIGRvZXMgbm90IHN1
-cHBvcnQgaXQiPwoKCgpEYXZpZAoKPgo+QWxzbyBjYyBLdW5peXVraSwgaW4gY2FzZSB0aGF0IEkg
-bWlzc2VkIHNvbWV0aGluZyBvciBnb3QgaXQgd3JvbmcuCj4KPj4gCj4+IERhdmlkCj4KPkJlc3Qg
-cmVnYXJkcywKPllhbyBaaQo+Cj4+ID4gCj4+ID4gUmVwb3J0ZWQtYnk6IE5hdGhhbiBDaGFuY2Vs
-bG9yIDxuYXRoYW5Aa2VybmVsLm9yZz4KPj4gPiBDbG9zZXM6IGh0dHBzOi8vbG9yZS5rZXJuZWwu
-b3JnL2FsbC8yMDI1MTEwODA0NDgyMi5HQTMyNjI5MzZAYXgxNjIvCj4+ID4gU2lnbmVkLW9mZi1i
-eTogWWFvIFppIDx6aXlhb0BkaXNyb290Lm9yZz4KPj4gPiAtLS0KPj4gCj4KPlsxXTogaHR0cHM6
-Ly9sb3JlLmtlcm5lbC5vcmcvYWxsLzIwMjUxMDI4MDk1MTQzLjM5NjM4NS0xLWp1bmppZS5jYW9A
-aW50ZWwuY29tLwo=
+On Sat, Dec 06, 2025 at 07:25:22AM +0700, Bagas Sanjaya wrote:
+> On Fri, Dec 05, 2025 at 04:18:38PM +0900, Byungchul Park wrote:
+> > Add documents describing the concept and APIs of dept.
+> > 
+> > Signed-off-by: Byungchul Park <byungchul@sk.com>
+> > ---
+> >  Documentation/dev-tools/dept.rst     | 778 +++++++++++++++++++++++++++
+> >  Documentation/dev-tools/dept_api.rst | 125 +++++
+> 
+> You forget to add toctree entries:
+
+I'm sorry for late reply.
+
+Thanks a lot!
+
+> ---- >8 ----
+> diff --git a/Documentation/dev-tools/index.rst b/Documentation/dev-tools/index.rst
+> index 4b8425e348abd1..02c858f5ed1fa2 100644
+> --- a/Documentation/dev-tools/index.rst
+> +++ b/Documentation/dev-tools/index.rst
+> @@ -22,6 +22,8 @@ Documentation/process/debugging/index.rst
+>     clang-format
+>     coccinelle
+>     sparse
+> +   dept
+> +   dept_api
+>     kcov
+>     gcov
+>     kasan
+> 
+> > +Lockdep detects a deadlock by checking lock acquisition order.  For
+> > +example, a graph to track acquisition order built by lockdep might look
+> > +like:
+> > +
+> > +.. literal::
+> > +
+> > +   A -> B -
+> > +           \
+> > +            -> E
+> > +           /
+> > +   C -> D -
+> > +
+> > +   where 'A -> B' means that acquisition A is prior to acquisition B
+> > +   with A still held.
+> 
+> Use code-block directive for literal code blocks:
+
+I will.
+
+> ---- >8 ----
+> diff --git a/Documentation/dev-tools/dept.rst b/Documentation/dev-tools/dept.rst
+> index 333166464543d7..8394c4ea81bc2a 100644
+> --- a/Documentation/dev-tools/dept.rst
+> +++ b/Documentation/dev-tools/dept.rst
+> @@ -10,7 +10,7 @@ Lockdep detects a deadlock by checking lock acquisition order.  For
+>  example, a graph to track acquisition order built by lockdep might look
+>  like:
+>  
+> -.. literal::
+> +.. code-block::
+>  
+>     A -> B -
+>             \
+> @@ -25,7 +25,7 @@ Lockdep keeps adding each new acquisition order into the graph at
+>  runtime.  For example, 'E -> C' will be added when the two locks have
+>  been acquired in the order, E and then C.  The graph will look like:
+>  
+> -.. literal::
+> +.. code-block::
+>  
+>         A -> B -
+>                 \
+> @@ -41,7 +41,7 @@ been acquired in the order, E and then C.  The graph will look like:
+>  
+>  This graph contains a subgraph that demonstrates a loop like:
+>  
+> -.. literal::
+> +.. code-block::
+>  
+>                  -> E -
+>                 /      \
+> @@ -76,7 +76,7 @@ e.g. irq context, normal process context, wq worker context, or so on.
+>  
+>  Can lockdep detect the following deadlock?
+>  
+> -.. literal::
+> +.. code-block::
+>  
+>     context X	   context Y	   context Z
+>  
+> @@ -91,7 +91,7 @@ Can lockdep detect the following deadlock?
+>  
+>  No.  What about the following?
+>  
+> -.. literal::
+> +.. code-block::
+>  
+>     context X		   context Y
+>  
+> @@ -116,7 +116,7 @@ What leads a deadlock
+>  A deadlock occurs when one or multi contexts are waiting for events that
+>  will never happen.  For example:
+>  
+> -.. literal::
+> +.. code-block::
+>  
+>     context X	   context Y	   context Z
+>  
+> @@ -148,7 +148,7 @@ In terms of dependency:
+>  
+>  Dependency graph reflecting this example will look like:
+>  
+> -.. literal::
+> +.. code-block::
+>  
+>      -> C -> A -> B -
+>     /                \
+> @@ -171,7 +171,7 @@ Introduce DEPT
+>  DEPT(DEPendency Tracker) tracks wait and event instead of lock
+>  acquisition order so as to recognize the following situation:
+>  
+> -.. literal::
+> +.. code-block::
+>  
+>     context X	   context Y	   context Z
+>  
+> @@ -186,7 +186,7 @@ acquisition order so as to recognize the following situation:
+>  and builds up a dependency graph at runtime that is similar to lockdep.
+>  The graph might look like:
+>  
+> -.. literal::
+> +.. code-block::
+>  
+>      -> C -> A -> B -
+>     /                \
+> @@ -199,7 +199,7 @@ DEPT keeps adding each new dependency into the graph at runtime.  For
+>  example, 'B -> D' will be added when event D occurrence is a
+>  prerequisite to reaching event B like:
+>  
+> -.. literal::
+> +.. code-block::
+>  
+>     context W
+>  
+> @@ -211,7 +211,7 @@ prerequisite to reaching event B like:
+>  
+>  After the addition, the graph will look like:
+>  
+> -.. literal::
+> +.. code-block::
+>  
+>                       -> D
+>                      /
+> @@ -236,7 +236,7 @@ How DEPT works
+>  Let's take a look how DEPT works with the 1st example in the section
+>  'Limitation of lockdep'.
+>  
+> -.. literal::
+> +.. code-block::
+>  
+>     context X	   context Y	   context Z
+>  
+> @@ -256,7 +256,7 @@ event.
+>  
+>  Adding comments to describe DEPT's view in detail:
+>  
+> -.. literal::
+> +.. code-block::
+>  
+>     context X	   context Y	   context Z
+>  
+> @@ -293,7 +293,7 @@ Adding comments to describe DEPT's view in detail:
+>  
+>  Let's build up dependency graph with this example.  Firstly, context X:
+>  
+> -.. literal::
+> +.. code-block::
+>  
+>     context X
+>  
+> @@ -304,7 +304,7 @@ Let's build up dependency graph with this example.  Firstly, context X:
+>  
+>  There are no events to create dependency.  Next, context Y:
+>  
+> -.. literal::
+> +.. code-block::
+>  
+>     context Y
+>  
+> @@ -332,7 +332,7 @@ event A cannot be triggered if wait B cannot be awakened by event B.
+>  Therefore, we can say event A depends on event B, say, 'A -> B'.  The
+>  graph will look like after adding the dependency:
+>  
+> -.. literal::
+> +.. code-block::
+>  
+>     A -> B
+>  
+> @@ -340,7 +340,7 @@ graph will look like after adding the dependency:
+>  
+>  Lastly, context Z:
+>  
+> -.. literal::
+> +.. code-block::
+>  
+>     context Z
+>  
+> @@ -362,7 +362,7 @@ triggered if wait A cannot be awakened by event A.  Therefore, we can
+>  say event B depends on event A, say, 'B -> A'.  The graph will look like
+>  after adding the dependency:
+>  
+> -.. literal::
+> +.. code-block::
+>  
+>      -> A -> B -
+>     /           \
+> @@ -386,7 +386,7 @@ Interpret DEPT report
+>  
+>  The following is the same example in the section 'How DEPT works'.
+>  
+> -.. literal::
+> +.. code-block::
+>  
+>     context X	   context Y	   context Z
+>  
+> @@ -425,7 +425,7 @@ We can simplify this by labeling each waiting point with [W], each
+>  point where its event's context starts with [S] and each event with [E].
+>  This example will look like after the labeling:
+>  
+> -.. literal::
+> +.. code-block::
+>  
+>     context X	   context Y	   context Z
+>  
+> @@ -443,7 +443,7 @@ DEPT uses the symbols [W], [S] and [E] in its report as described above.
+>  The following is an example reported by DEPT for a real problem in
+>  practice.
+>  
+> -.. literal::
+> +.. code-block::
+>  
+>     Link: https://lore.kernel.org/lkml/6383cde5-cf4b-facf-6e07-1378a485657d@I-love.SAKURA.ne.jp/#t
+>     Link: https://lore.kernel.org/lkml/1674268856-31807-1-git-send-email-byungchul.park@lge.com/
+> @@ -646,7 +646,7 @@ practice.
+>  
+>  Let's take a look at the summary that is the most important part.
+>  
+> -.. literal::
+> +.. code-block::
+>  
+>     ---------------------------------------------------
+>     summary
+> @@ -669,7 +669,7 @@ Let's take a look at the summary that is the most important part.
+>  
+>  The summary shows the following scenario:
+>  
+> -.. literal::
+> +.. code-block::
+>  
+>     context A	   context B	   context ?(unknown)
+>  
+> @@ -684,7 +684,7 @@ The summary shows the following scenario:
+>  
+>  Adding comments to describe DEPT's view in detail:
+>  
+> -.. literal::
+> +.. code-block::
+>  
+>     context A	   context B	   context ?(unknown)
+>  
+> @@ -711,7 +711,7 @@ Adding comments to describe DEPT's view in detail:
+>  
+>  Let's build up dependency graph with this report. Firstly, context A:
+>  
+> -.. literal::
+> +.. code-block::
+>  
+>     context A
+>  
+> @@ -735,7 +735,7 @@ unlock(&ni->ni_lock:0) depends on folio_unlock(&f1), say,
+>  
+>  The graph will look like after adding the dependency:
+>  
+> -.. literal::
+> +.. code-block::
+>  
+>     unlock(&ni->ni_lock:0) -> folio_unlock(&f1)
+>  
+> @@ -743,7 +743,7 @@ The graph will look like after adding the dependency:
+>  
+>  Secondly, context B:
+>  
+> -.. literal::
+> +.. code-block::
+>  
+>     context B
+>  
+> @@ -762,7 +762,7 @@ folio_unlock(&f1) depends on unlock(&ni->ni_lock:0), say,
+>  
+>  The graph will look like after adding the dependency:
+>  
+> -.. literal::
+> +.. code-block::
+>  
+>      -> unlock(&ni->ni_lock:0) -> folio_unlock(&f1) -
+>     /                                                \
+> 
+> > +Limitation of lockdep
+> > +---------------------
+> > +
+> > +Lockdep deals with a deadlock by typical lock e.g. spinlock and mutex,
+> > +that are supposed to be released within the acquisition context.
+> > +However, when it comes to a deadlock by folio lock that is not supposed
+> > +to be released within the acquisition context or other general
+> > +synchronization mechanisms, lockdep doesn't work.
+> > +
+> > +NOTE:  In this document, 'context' refers to any type of unique context
+> > +e.g. irq context, normal process context, wq worker context, or so on.
+> > +
+> > +Can lockdep detect the following deadlock?
+> > +
+> > +.. literal::
+> > +
+> > +   context X	   context Y	   context Z
+> > +
+> > +		   mutex_lock A
+> > +   folio_lock B
+> > +		   folio_lock B <- DEADLOCK
+> > +				   mutex_lock A <- DEADLOCK
+> > +				   folio_unlock B
+> > +		   folio_unlock B
+> > +		   mutex_unlock A
+> > +				   mutex_unlock A
+> > +
+> > +No.  What about the following?
+> > +
+> > +.. literal::
+> > +
+> > +   context X		   context Y
+> > +
+> > +			   mutex_lock A
+> > +   mutex_lock A <- DEADLOCK
+> > +			   wait_for_complete B <- DEADLOCK
+> > +   complete B
+> > +			   mutex_unlock A
+> > +   mutex_unlock A
+> > +
+> > +No.
+> 
+> One unanswered question from my v17 review [1]: You explain in "How DEPT works"
+> section how DEPT detects deadlock in the first example (the former with three
+> contexts). Can you do the same on the second example (the latter with two
+> contexts)?
+
+Did you mean to update the document with it?  I misunderstood what you
+meant but sure I will update it as [1].
+
+[1] https://lore.kernel.org/linux-doc/20251013012855.GB52546@system.software.com/
+
+Thanks.
+
+	Byungchul
+
+> Thanks.
+> 
+> [1]: https://lore.kernel.org/linux-doc/aN84jKyrE1BumpLj@archie.me/
+> 
+> -- 
+> An old man doll... just what I always wanted! - Clara
+
+
 
