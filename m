@@ -1,176 +1,94 @@
-Return-Path: <netdev+bounces-244697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C543CBCDD0
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 08:54:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D3D2CBCFF1
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 09:41:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5E4113018958
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 07:54:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0ECC83029228
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 08:40:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 790CB329371;
-	Mon, 15 Dec 2025 07:54:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7375D41C72;
+	Mon, 15 Dec 2025 08:40:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UyjrkH6K"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="lH47VaGq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 240C430E82B;
-	Mon, 15 Dec 2025 07:54:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 923112EACF2;
+	Mon, 15 Dec 2025 08:40:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765785267; cv=none; b=FGamO8XXnM/QVtcLsaxVS/YkcrtN941U32wyMRnriYLYGr9fynRmXl8SHXqZ/t0Vb6bFeA8f0gEhKXBjbQyN2SmfUsYmFt5TMHkXtf6DbZHTprnyaDXVuwG+N1K2CFaSEEh62NAMbaYmCYAIKl6S2XjXrKPWynBXRXUCzFW1Rws=
+	t=1765788013; cv=none; b=l+NX7lJe0vbq7iTBXIhPNC3xc/VWBwTuR/+oY6RoZfX6fbCPybRhYwfYCawRP/ePYxCEdZn4mVw3rCelbieDzfAECter59e7/J7Ew0bhZ1IFMJJhw8SqbVmG0z0K8Klx5L15a78pMpBDlEzd+O1cHgKSpZEz9JYubi1Hu+IieI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765785267; c=relaxed/simple;
-	bh=v/92elu0+HvI8sObJNUPXdOl7LjF+U9jY1BY0X5X81M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rHFcx4Sv+o64YYpvTXIoPB1wqMm7zI9VX8Jlrq/7TRxJ8hxIyV6GQkm5871DWen/IbVvQtXohl3a8nTSh6FapNMSh+WzrqzKDg3Xwjhf42/0NCiGa5J+VWuRVE3nGx0ki2/aSfrCP3PwxJQBgDS2Y3YqGogFDSclbjDa8rRjETc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UyjrkH6K; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22802C19421;
-	Mon, 15 Dec 2025 07:54:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765785266;
-	bh=v/92elu0+HvI8sObJNUPXdOl7LjF+U9jY1BY0X5X81M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UyjrkH6KtnThxV3unDn7bby/GiiSiQSPftVpABjisSWU2uFJUOSoLOiJ1XOF8YjOp
-	 I40Nc0tRoSWwyXZw3oFdsyqnAaagma7510sWIAUaNrX4+PjLfSRLD+et/jmtmNvL+p
-	 fd4Yahc3vd/qAeYLCUCQr2QPTBPU15ibXG263IfBgtMJdpwq5a9dE2n/RsAVjJh07f
-	 tBknFVn5nsVHGveX55SVFDgvPqaXIiTsXroBhscCr8hxdkkc2/x2GJwzqKuPDYEuTo
-	 2nEzH829pMn8wb+YSsr4CldmREQ2VzSqT1cZK03HP02QTa8mhN+yfwFBVy6LBXOcO0
-	 DVK3rvhjXpeNg==
-Date: Mon, 15 Dec 2025 16:54:11 +0900
-From: Sumit Garg <sumit.garg@kernel.org>
-To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>
-Cc: Jens Wiklander <jens.wiklander@linaro.org>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Sumit Garg <sumit.garg@oss.qualcomm.com>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Jan Kiszka <jan.kiszka@siemens.com>,
-	Sudeep Holla <sudeep.holla@arm.com>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Mimi Zohar <zohar@linux.ibm.com>,
-	David Howells <dhowells@redhat.com>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Peter Huewe <peterhuewe@gmx.de>, op-tee@lists.trustedfirmware.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-rtc@vger.kernel.org, linux-efi@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	Cristian Marussi <cristian.marussi@arm.com>,
-	arm-scmi@vger.kernel.org, netdev@vger.kernel.org,
-	linux-mips@vger.kernel.org, linux-integrity@vger.kernel.org,
-	keyrings@vger.kernel.org, linux-security-module@vger.kernel.org,
-	Jason Gunthorpe <jgg@ziepe.ca>
-Subject: Re: [PATCH v1 00/17] tee: Use bus callbacks instead of driver
- callbacks
-Message-ID: <aT--ox375kg2Mzh-@sumit-X1>
-References: <cover.1765472125.git.u.kleine-koenig@baylibre.com>
+	s=arc-20240116; t=1765788013; c=relaxed/simple;
+	bh=nTOeqU30kT/x5/9yPNQq+Y+ZK8e5DQKGTbEd03W/y/I=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=h9vfPytfnRuwjzpJ1sw3/sFb3LshFYpbD2ImlvJpBsJ5C51GHn1X6A1uo8oXwBM/HWtO8RrbvDm2GIAbW4s31Zc+/emYoX+Olf1MaBTs03zf0OA+fbCIsrOVSoVzeNCT77NUN0ZaN7ewMvUb9+sFGI2U6Egqg/l9alzrZKLsr8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=lH47VaGq; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=nTOeqU30kT/x5/9yPNQq+Y+ZK8e5DQKGTbEd03W/y/I=;
+	t=1765788010; x=1766997610; b=lH47VaGquIJg419B5noS0PqbUClGVp3GmyjrjSSYZ8DuTKv
+	8sLoIVNrZf74GL9ow1pdrt01keWPJMk4W7oWUfLnhvTPhWt1bUJpv5E5CE0CTVaX9PRs+25k8CuAV
+	9/I/yAnskwRJbmb4OG8luan70kOulQPCMPwwxbjb0BzhldWw5dTUvZL6/Bh0wzU0qkEq3/jnXy514
+	z102ZDVAPny8dTqvYS37Hghu4Bq+p9SwcKvwPk2jABsT4oJV5Ic2C+4QlofBa/B9150vcjfgD+2A4
+	usascUVhBA17EyAXMbv99wRFDPGNWHCn0ccoOSewGrIWo1b8h730tTM5nOP5jJ0Q==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1vV47U-00000008pPA-02cI;
+	Mon, 15 Dec 2025 09:39:52 +0100
+Message-ID: <d24c7d6bdb97aa2f54667366aaaf044042734bff.camel@sipsolutions.net>
+Subject: Re: [PATCH] NFC: Fix error handling in nfc_genl_dump_targets
+From: Johannes Berg <johannes@sipsolutions.net>
+To: David Laight <david.laight.linux@gmail.com>, Ma Ke <make24@iscas.ac.cn>
+Cc: krzk@kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, 	pabeni@redhat.com, horms@kernel.org,
+ aloisio.almeida@openbossa.org, 	lauro.venancio@openbossa.org,
+ sameo@linux.intel.com, linville@tuxdriver.com, 	netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, akpm@linux-foundation.org, 
+	stable@vger.kernel.org
+Date: Mon, 15 Dec 2025 09:39:51 +0100
+In-Reply-To: <20251214135440.51409316@pumpkin> (sfid-20251214_145444_057503_A0AE70B0)
+References: <20251214131726.5353-1-make24@iscas.ac.cn>
+	 <20251214135440.51409316@pumpkin> (sfid-20251214_145444_057503_A0AE70B0)
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.2 (3.56.2-2.fc42) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <cover.1765472125.git.u.kleine-koenig@baylibre.com>
+X-malware-bazaar: not-scanned
 
-On Thu, Dec 11, 2025 at 06:14:54PM +0100, Uwe Kleine-König wrote:
-> Hello,
-> 
-> the objective of this series is to make tee driver stop using callbacks
-> in struct device_driver. These were superseded by bus methods in 2006
-> (commit 594c8281f905 ("[PATCH] Add bus_type probe, remove, shutdown
-> methods.")) but nobody cared to convert all subsystems accordingly.
-> 
-> Here the tee drivers are converted. The first commit is somewhat
-> unrelated, but simplifies the conversion (and the drivers). It
-> introduces driver registration helpers that care about setting the bus
-> and owner. (The latter is missing in all drivers, so by using these
-> helpers the drivers become more correct.)
-> 
-> The patches #4 - #17 depend on the first two, so if they should be
-> applied to their respective subsystem trees these must contain the first
-> two patches first.
+On Sun, 2025-12-14 at 13:54 +0000, David Laight wrote:
+> On Sun, 14 Dec 2025 21:17:26 +0800
+> Ma Ke <make24@iscas.ac.cn> wrote:
+>=20
+> > nfc_genl_dump_targets() increments the device reference count via
+> > nfc_get_device() but fails to decrement it properly. nfc_get_device()
+> > calls class_find_device() which internally calls get_device() to
+> > increment the reference count. No corresponding put_device() is made
+> > to decrement the reference count.
+> >=20
+> > Add proper reference count decrementing using nfc_put_device() when
+> > the dump operation completes or encounters an error, ensuring balanced
+> > reference counting.
+> >=20
+> > Found by code review.
+>=20
+> Is that some half-hearted AI code review?
 
-Thanks Uwe for your efforts to clean up the boilerplate code for TEE bus
-drivers.
+Probably. They also resubmitted the same patch after being told 3 weeks
+ago to go away.
 
-> 
-> Note that after patch #2 is applied, unconverted drivers provoke a
-> warning in driver_register(), so it would be good for the user
-> experience if the whole series goes in during a single merge window.
-
-+1
-
-I suggest the whole series goes via the Jens tree since there shouldn't
-be any chances for conflict here.
-
-> So
-> I guess an immutable branch containing the frist three patches that can
-> be merged into the other subsystem trees would be sensible.
-> 
-> After all patches are applied, tee_bus_type can be made private to
-> drivers/tee as it's not used in other places any more.
-> 
-
-Feel free to make the tee_bus_type private as the last patch in the series
-such that any followup driver follows this clean approach.
-
--Sumit
-
-> Best regards
-> Uwe
-> 
-> Uwe Kleine-König (17):
->   tee: Add some helpers to reduce boilerplate for tee client drivers
->   tee: Add probe, remove and shutdown bus callbacks to tee_client_driver
->   tee: Adapt documentation to cover recent additions
->   hwrng: optee - Make use of module_tee_client_driver()
->   hwrng: optee - Make use of tee bus methods
->   rtc: optee: Migrate to use tee specific driver registration function
->   rtc: optee: Make use of tee bus methods
->   efi: stmm: Make use of module_tee_client_driver()
->   efi: stmm: Make use of tee bus methods
->   firmware: arm_scmi: optee: Make use of module_tee_client_driver()
->   firmware: arm_scmi: Make use of tee bus methods
->   firmware: tee_bnxt: Make use of module_tee_client_driver()
->   firmware: tee_bnxt: Make use of tee bus methods
->   KEYS: trusted: Migrate to use tee specific driver registration
->     function
->   KEYS: trusted: Make use of tee bus methods
->   tpm/tpm_ftpm_tee: Make use of tee specific driver registration
->   tpm/tpm_ftpm_tee: Make use of tee bus methods
-> 
->  Documentation/driver-api/tee.rst             | 18 +----
->  drivers/char/hw_random/optee-rng.c           | 26 ++----
->  drivers/char/tpm/tpm_ftpm_tee.c              | 31 +++++---
->  drivers/firmware/arm_scmi/transports/optee.c | 32 +++-----
->  drivers/firmware/broadcom/tee_bnxt_fw.c      | 30 ++-----
->  drivers/firmware/efi/stmm/tee_stmm_efi.c     | 25 ++----
->  drivers/rtc/rtc-optee.c                      | 27 ++-----
->  drivers/tee/tee_core.c                       | 84 ++++++++++++++++++++
->  include/linux/tee_drv.h                      | 12 +++
->  security/keys/trusted-keys/trusted_tee.c     | 17 ++--
->  10 files changed, 164 insertions(+), 138 deletions(-)
-> 
-> 
-> base-commit: 7d0a66e4bb9081d75c82ec4957c50034cb0ea449
-> -- 
-> 2.47.3
-> 
+johannes
 
