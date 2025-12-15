@@ -1,81 +1,96 @@
-Return-Path: <netdev+bounces-244734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35F3ACBDC96
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 13:27:15 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E647CBDC1C
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 13:20:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 45692303D939
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 12:20:47 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id F40D83009565
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 12:14:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64212330B31;
-	Mon, 15 Dec 2025 12:11:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C50B314B93;
+	Mon, 15 Dec 2025 12:14:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N3bvd+uS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PZIH88CQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60B5932FA00
-	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 12:11:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 667BA2857EA
+	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 12:14:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765800682; cv=none; b=tP3Ifht+AUcfR17dczenAQltYRCL9f+mygOQ3fj1Px20tv5qm1pRhWRXOcEriQMmesXKiWGYyPm4knY158gCKd7wQqgg/G1HbdLk8Qo72wLOwK2ftt7d4OK5ecGtHDEM0rgZagQ+ge8t4u3r2Ao+9v4JW4j6Xb1jr6IiHY3Ae7I=
+	t=1765800886; cv=none; b=suO+dPljqcQ0twfmjCHZ9nd9jbT6ERoJC+rkdpgg++sxIlf5nEP7l81KI+ETjjiBl6/+yOOmn6YtB7/CL/FyESsgdgUmU9jaeNU+KXlZ/RCDvbRyYD9NbEocYl/yvfNDCzbYGEDOrx+yXfnMt+iNTpygxO5NWhaM7+pNChZQTJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765800682; c=relaxed/simple;
-	bh=70qHZxOHi97jCdAFDNZjWzFPJb7M58f3lAutVEcRZL0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Fd+k8MjVL1anSXOOTS1J9D60xlTHqTtvo6B7x/k9PPkMLQcDL2NATDmoRg+qx8Ri0uhKziZROUpeWgAki4+gndBv+DVYorHsntraiaJejjlS9Jrh6l15bbMwBvVHRh0oI4MOExx5OyfHwqdO5fncPAepY3zzlSWwO2k0pxWRnVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N3bvd+uS; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1765800680; x=1797336680;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=70qHZxOHi97jCdAFDNZjWzFPJb7M58f3lAutVEcRZL0=;
-  b=N3bvd+uSmzXJhT8BBsPvxJe4EeiHObrwxRPk2nNgaKljVeZ3L6hE7anP
-   Jp8ZeQnm/geeucHzddlVmBp0MzujpfSYlXwzqgTNvC8G0LC57SotDsJwg
-   PtkXjRXtN7IcExTQJOQKD1LtlUfXc0KagmAIvlZlzQ73zhh6DqBkA4trD
-   N3vS7pW0XumtW3a2cTjIrT6hEJfGnnunjbE5CXjlMwTi3qft27ZIajS7M
-   wHAsZxDq/HRw542YUfFmpGpioE5cxGnyjIm6M0iBkUI97L6TRRJFyeAi2
-   KDjeaE+JQ4BnN0w7JICWF4dcLei4jsYq+TSXJcXveKs0qBkTGccy47VDH
-   A==;
-X-CSE-ConnectionGUID: eo354uGqR3yCE+28fRQMVA==
-X-CSE-MsgGUID: eGE5WhbkR2iPam7pBuEAXA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11642"; a="78815409"
-X-IronPort-AV: E=Sophos;i="6.21,150,1763452800"; 
-   d="scan'208";a="78815409"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2025 04:11:16 -0800
-X-CSE-ConnectionGUID: y5UZGv3FS+CU09qZJXyAgg==
-X-CSE-MsgGUID: nI48duEFTDOc+STCGmvJ5A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,150,1763452800"; 
-   d="scan'208";a="202214172"
-Received: from black.igk.intel.com ([10.91.253.5])
-  by orviesa004.jf.intel.com with ESMTP; 15 Dec 2025 04:11:13 -0800
-Received: by black.igk.intel.com (Postfix, from userid 1001)
-	id 7E315A1; Mon, 15 Dec 2025 13:11:09 +0100 (CET)
-From: Mika Westerberg <mika.westerberg@linux.intel.com>
-To: netdev@vger.kernel.org
-Cc: Yehezkel Bernat <YehezkelShB@gmail.com>,
-	Ian MacDonald <ian@netstatz.com>,
-	Salvatore Bonaccorso <carnil@debian.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1765800886; c=relaxed/simple;
+	bh=qzev6H1XEFsSXgdNdXoA6uKXhB+qml6NnknlVg8Mgf0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Rx84bsKiSl25M55xi/tIUqZ1nI+5esydhdyMvQozknbfA2yAyjMb/mh8tGOD4nLw9nHnQ5eUARnN2u7ehR+c0oE48/TId3Uq5DGxDrJuSFdhLnuprCHxhBsNaStIPXzFUXlck286l3QYxVCDwBHHUCfgpLO8Jq4KKQLtUys39fo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PZIH88CQ; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4779cc419b2so35546905e9.3
+        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 04:14:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765800883; x=1766405683; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QUzh3HRON4HuLqM3J/BiPzn56jwNwHP4ZMm17mHr9BY=;
+        b=PZIH88CQS92Wf95/bTpIClI29Ut+0XPRy7iyclp+6bt4dPMZTI6OHcrqwF4mffEfms
+         TmBSactjr3ixUpWpav6BDyZGxfnAgChmwcoTcvney9yW+JJBOxebeFD+bz2Qqcdq+tXj
+         wNB9/SFXkHHwUj4ODsy8NgGeD32yOP8heYHmH9Vi793MDEvSURH/kYEwldkwWnrddl3s
+         MDF/vYQGfpluZPrJF+YzsIUI625hxu5rlooA0+PrgqSm8AAzS7nwYyvnb+3xEXWTmItq
+         yYUe0VzhWsdfhO9wg8wCaNL+oczHYAah1wICNJFNZvYrc0HNuiFboi6iqK1Mnrha8l/C
+         mD3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765800883; x=1766405683;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QUzh3HRON4HuLqM3J/BiPzn56jwNwHP4ZMm17mHr9BY=;
+        b=HPDkDWI6pVi5il0fpVlwbCu0XApyAEtpIQMhAI83kRL0CfYh09rQe9YZ8aAASSNaLr
+         lJcMNtJtmcTzknDtVqEVRKhXaDayCCT+N770gkGFRJ5bYYotityLxqkffk5r6Jl7bQ3x
+         wZl3/RxCqHnonup4DDDaHWdWk2MudgMn7StLi7icNuXe2Gp36KacXmIGKsfyDlKJsJXD
+         rUxMTfajQGsaWNhNOV9LOJJgalnjiC4AcB2wp6WcGWe+WMjpdP1j999e3ywqEzpRRM6i
+         CJep7JfJU2VJJPj1K/SNvGfE188xGsoGN/QSIxhUUsxBcBKjEZFh8AzzYYMlJPvW9ZDS
+         o5ww==
+X-Forwarded-Encrypted: i=1; AJvYcCV28IawblTM+x/F0vB0ozD0XKiM2ITiC6jc2ViYQX7Jxn+i2j94tz6VAuT4aQ2eMu5a4eVttOU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwKGsq6ueCgSGgO6SGME+wepl5VVw/HSFmDBhm3pBS3b1+aCRuT
+	M95zQZ5Y9BYpFz3wg96DFDmaXkj+vnMoHO+qApZK+inzvsDSWyDHS4Lo
+X-Gm-Gg: AY/fxX7Px9MdHFCO/L4Cp3LwBM9n8QXk8XeaHu5GsADBz+Co4CkHsJ7rJDRPWveor9c
+	PbAgZMEVQ7ZZJiKl1T/93FXV1jGnVnsuRYUSmKfPvKHC1ywaHOLKDHQDqptKD6j0xaaQrafg6Bl
+	5Yfwr7UxBd37kadZpUYSwXHelIij1b3moQIHct6yWSB430K8kVN+1cdyLwK2QoZhX5yGK5qToVK
+	wwKChLggmrFqWhH26+BF4z+02CQzE+WWQXaZVMiskHS35ptSIr6rVaJt5LgMLYEZumVzUSu6QFe
+	l/sThZWcVQ4JC40bBvzEsF+bDUMiR2l8SQngGIQSGKACTQrnuryXMc473StiZ44cxXEpIYyfFtT
+	m79H1+1ZX+QH9bVX88eEDatbp+qdc6/RepkkGnWjJuv2e3XfXpP487vY3RYjOwjCk5GVjeDMv6Y
+	jjfjqPnCty+MPS/lYKWz2tsXpPn3U7vg081Q6Xq1C3a3dw2ba3KZnwRsICMgjPxps=
+X-Google-Smtp-Source: AGHT+IFkFI5Fed5WJZaom+Q22BnP7VYpBn2pZsMhlwsCKTPIWco3rZqhSM6jBupF7mLLbA3zdSm3Nw==
+X-Received: by 2002:a05:6000:1acb:b0:42b:3e20:f1b0 with SMTP id ffacd0b85a97d-42fb44a39e3mr8300705f8f.7.1765800882550;
+        Mon, 15 Dec 2025 04:14:42 -0800 (PST)
+Received: from t14.labs.westermo.se (static-193-12-47-89.cust.tele2.se. [193.12.47.89])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-430f42a3290sm13465847f8f.17.2025.12.15.04.14.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Dec 2025 04:14:42 -0800 (PST)
+From: Anders Grahn <anders.grahn@gmail.com>
+X-Google-Original-From: Anders Grahn <anders.grahn@westermo.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Jay Vosburgh <jv@jvosburgh.net>,
-	Mika Westerberg <mika.westerberg@linux.intel.com>
-Subject: [PATCH net-next v2 5/5] net: thunderbolt: Allow reading link settings
-Date: Mon, 15 Dec 2025 13:11:09 +0100
-Message-ID: <20251215121109.4042218-6-mika.westerberg@linux.intel.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20251215121109.4042218-1-mika.westerberg@linux.intel.com>
-References: <20251215121109.4042218-1-mika.westerberg@linux.intel.com>
+	Simon Horman <horms@kernel.org>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Anders Grahn <anders.grahn@westermo.com>,
+	linux-kernel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org
+Subject: [PATCH] netfilter: nft_counter: Fix reset of counters on 32bit archs
+Date: Mon, 15 Dec 2025 13:12:57 +0100
+Message-ID: <20251215121258.843823-1-anders.grahn@westermo.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,94 +99,68 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Ian MacDonald <ian@netstatz.com>
+nft_counter_reset() calls u64_stats_add() with a negative value to reset
+the counter. This will work on 64bit archs, hence the negative value
+added will wrap as a 64bit value which then can wrap the stat counter as
+well.
 
-In order to use Thunderbolt networking as part of bonding device it
-needs to support ->get_link_ksettings() ethtool operation, so that the
-bonding driver can read the link speed and the related attributes. Add
-support for this to the driver.
+On 32bit archs, the added negative value will wrap as a 32bit value and
+_not_ wrapping the stat counter properly. In most cases, this would just
+lead to a very large 32bit value being added to the stat counter.
 
-Signed-off-by: Ian MacDonald <ian@netstatz.com>
-Signed-off-by: Mika Westerberg <mika.westerberg@linux.intel.com>
+Fix by introducing u64_stats_sub().
+
+Fixes: 4a1d3acd6ea8 ("netfilter: nft_counter: Use u64_stats_t for statistic")
+Signed-off-by: Anders Grahn <anders.grahn@westermo.com>
 ---
- drivers/net/thunderbolt/main.c | 49 ++++++++++++++++++++++++++++++++++
- 1 file changed, 49 insertions(+)
+ include/linux/u64_stats_sync.h | 10 ++++++++++
+ net/netfilter/nft_counter.c    |  4 ++--
+ 2 files changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/thunderbolt/main.c b/drivers/net/thunderbolt/main.c
-index 20bac55a3e20..74160d14cf46 100644
---- a/drivers/net/thunderbolt/main.c
-+++ b/drivers/net/thunderbolt/main.c
-@@ -10,6 +10,7 @@
-  */
+diff --git a/include/linux/u64_stats_sync.h b/include/linux/u64_stats_sync.h
+index 457879938fc1..9942d29b17e5 100644
+--- a/include/linux/u64_stats_sync.h
++++ b/include/linux/u64_stats_sync.h
+@@ -89,6 +89,11 @@ static inline void u64_stats_add(u64_stats_t *p, unsigned long val)
+ 	local64_add(val, &p->v);
+ }
  
- #include <linux/atomic.h>
-+#include <linux/ethtool.h>
- #include <linux/highmem.h>
- #include <linux/if_vlan.h>
- #include <linux/jhash.h>
-@@ -1276,6 +1277,53 @@ static const struct net_device_ops tbnet_netdev_ops = {
- 	.ndo_change_mtu	= tbnet_change_mtu,
- };
- 
-+static int tbnet_get_link_ksettings(struct net_device *dev,
-+				    struct ethtool_link_ksettings *cmd)
++static inline void u64_stats_sub(u64_stats_t *p, unsigned long val)
 +{
-+	const struct tbnet *net = netdev_priv(dev);
-+	const struct tb_xdomain *xd = net->xd;
-+	int speed;
-+
-+	ethtool_link_ksettings_zero_link_mode(cmd, supported);
-+	ethtool_link_ksettings_zero_link_mode(cmd, advertising);
-+
-+	/* Figure out the current link speed and width */
-+	switch (xd->link_speed) {
-+	case 40:
-+		speed = SPEED_80000;
-+		break;
-+
-+	case 20:
-+		if (xd->link_width == 2)
-+			speed = SPEED_40000;
-+		else
-+			speed = SPEED_20000;
-+		break;
-+
-+	case 10:
-+		if (xd->link_width == 2) {
-+			speed = SPEED_20000;
-+			break;
-+		}
-+		fallthrough;
-+
-+	default:
-+		speed = SPEED_10000;
-+		break;
-+	}
-+
-+	cmd->base.speed = speed;
-+	cmd->base.duplex = DUPLEX_FULL;
-+	cmd->base.autoneg = AUTONEG_DISABLE;
-+	cmd->base.port = PORT_OTHER;
-+
-+	return 0;
++	local64_sub(val, &p->v);
 +}
 +
-+static const struct ethtool_ops tbnet_ethtool_ops = {
-+	.get_link_ksettings = tbnet_get_link_ksettings,
-+};
-+
- static void tbnet_generate_mac(struct net_device *dev)
+ static inline void u64_stats_inc(u64_stats_t *p)
  {
- 	const struct tbnet *net = netdev_priv(dev);
-@@ -1326,6 +1374,7 @@ static int tbnet_probe(struct tb_service *svc, const struct tb_service_id *id)
+ 	local64_inc(&p->v);
+@@ -130,6 +135,11 @@ static inline void u64_stats_add(u64_stats_t *p, unsigned long val)
+ 	p->v += val;
+ }
  
- 	strcpy(dev->name, "thunderbolt%d");
- 	dev->netdev_ops = &tbnet_netdev_ops;
-+	dev->ethtool_ops = &tbnet_ethtool_ops;
++static inline void u64_stats_sub(u64_stats_t *p, unsigned long val)
++{
++	p->v -= val;
++}
++
+ static inline void u64_stats_inc(u64_stats_t *p)
+ {
+ 	p->v++;
+diff --git a/net/netfilter/nft_counter.c b/net/netfilter/nft_counter.c
+index cc7325329496..0d70325280cc 100644
+--- a/net/netfilter/nft_counter.c
++++ b/net/netfilter/nft_counter.c
+@@ -117,8 +117,8 @@ static void nft_counter_reset(struct nft_counter_percpu_priv *priv,
+ 	nft_sync = this_cpu_ptr(&nft_counter_sync);
  
- 	/* ThunderboltIP takes advantage of TSO packets but instead of
- 	 * segmenting them we just split the packet into Thunderbolt
+ 	u64_stats_update_begin(nft_sync);
+-	u64_stats_add(&this_cpu->packets, -total->packets);
+-	u64_stats_add(&this_cpu->bytes, -total->bytes);
++	u64_stats_sub(&this_cpu->packets, total->packets);
++	u64_stats_sub(&this_cpu->bytes, total->bytes);
+ 	u64_stats_update_end(nft_sync);
+ 
+ 	local_bh_enable();
 -- 
-2.50.1
+2.43.0
 
 
