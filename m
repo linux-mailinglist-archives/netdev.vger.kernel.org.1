@@ -1,146 +1,109 @@
-Return-Path: <netdev+bounces-244749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98A18CBDF58
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 14:13:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BD2EBCBDF82
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 14:16:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DDBEC3026ABC
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 13:08:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7EE9C300D168
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 13:14:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9910D2D4811;
-	Mon, 15 Dec 2025 13:08:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A52472C21FC;
+	Mon, 15 Dec 2025 13:14:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="IsBVPjvz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aSGCbnsf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95CD42C1593
-	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 13:08:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB66E2C234C
+	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 13:14:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765804119; cv=none; b=OUobgy2690SWGILDb7hmBIAYX6WJuxCsO1PuGBcFO1ArjLD8jDmMYcmzTE1Aq3yrZ27ApW340OlW1Got3gdcDInkm3JEEcBoLCmixAmsD6bIidnoFs1Xk6pM5w3qz1VdCsdaKmjqc8+4HLiHjs6rZloYarWfBSr418eyEF85vcg=
+	t=1765804459; cv=none; b=dG7VGLMnIwju4FAxeQqv97e7XN1YMPfujmMhIOMOjAJXM2ChngzpT31B7VOSbSJjHrTT1Jt7zEVdvFm/2aDH+kC7veJwi5CTlL2U3mEKjd+tum48SrWEpYSwbK1h0s+c9WNZ/vxqI5HxLdYlhmk/PoRlpSfM3FWCePVuv/Pr6Lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765804119; c=relaxed/simple;
-	bh=ZYmTRTKIVD+6TduLcshjIka+qce51+uR2+bkkTZBuWo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UePmirpt6X8rKzPyMx23cddw+i3CgYR6OHpmgFTP0QKWF3RB9UD5n5sAwwPyMf83nDBjM6AcyMerj6l5qYFJcl8dDPCWqr7cDel8rgTfjHaOyPFo6TltjR2ZzWTSSqy2ChlBnJYKXOYS3jSBlpZwhezx2SX0E5SSBQox54kbgDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=IsBVPjvz; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-477a219dbcaso30076415e9.3
-        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 05:08:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1765804116; x=1766408916; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cGF6UGlZTvH/e7EAbUoFjWHETVQLZMdqI3gLEZl8+UE=;
-        b=IsBVPjvz+stZ959QVielmyjWE9BV9a3+CCVbQSc9u0pf1gIP2yEXS9ut9zsCDknVov
-         PvS2zo1ruCW4G+D2wdWY4lwn+egxlDn1P8a3GD4HaV8k2WKkF8BjfwsMwx1yJBzUIRdL
-         Qm0Dk7rYyYJMYAwzPdclqLhjmDz0Yha/dTvNHu8afS2mloGh1osRM+Rp+y/Xj85HgXps
-         GXyLzMegXFIKQbOSn+neeWcHk2xl4lKYuZq7zBPgugM8HGi0Bkuhpop1n93pEnjOti+z
-         imcWudYWvqcbHosvX7T/gsvDYLKo3k7PGvcfjBBxb1ugJzzfVxtGNRf/pfdj6Oq2y7G0
-         tetQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765804116; x=1766408916;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cGF6UGlZTvH/e7EAbUoFjWHETVQLZMdqI3gLEZl8+UE=;
-        b=rpN8ZDXgoIL4h9L1m7M2ThtXMCpf+qE6erRqD/HC4cFkSRTI0E5q2qNuZwQs1fZS3A
-         DcxQBJlZ9vBZmsX/JsR8TWtlkVkwZJomywL4aI0CKOod4PSiTtsEvZMmCfcTYERM7L1g
-         ApEJ2nFt9Ww2odbaWo4cKyGGyn+PIttEMgCBCXYxDVEGha/0FRMAZ8N1q0h2ONaBlcAr
-         JfCfyaPRGu/LoQHtY7JOZmXO+CnHZlUUd019iNdJmFIcNBweMe+tY3z33YBVSO4EDW11
-         kD6+c2vRWiMYxKbq9UqicW33wPNiuv0DsrX5WhR7uUvmsaaCb9zkm/DUaJmXZzv0J51t
-         UEeA==
-X-Gm-Message-State: AOJu0Yxbp6OdXkeAjJjFOhmPmXHATqVF5y6xorS9s6GWfAT5to6LbLm5
-	M1zU6Fx9/9kzLzIj7z/g+em1WJ0ZHdFToJu2GjrOB1myCnSwnmq9p0szBkSckfxqphU=
-X-Gm-Gg: AY/fxX650xDU3Mq2z+J55JRYUHCHDAm0r0uyZSZr9MwpnlXoevDgQ1+g4ObXl4MzG9v
-	Y5WXXb84soxa3Xi5ZerEOPA1qMpx+QB7empWGKZDorFt7oqXm3L1F8H3ytV5ihS9zhgyOOt+29e
-	N+jpMWPlPevKkG1URNSehzz7oBu5745cy5gu6JhLgoWEjL8+l1qibGbu/z8OlVCjMCMBmej3g7f
-	sp0M/DFeTofdlBdkl/MJt1xcCUdkG6QeF2qyhinL6KFJtq4ZLV0zOnBLZPSoX7R1ZVpzXgnwdg5
-	IuxkC3hriUZ2BX45FthRd4HQJIQ2Ob8CgiKw7B9UGeQBqRsiW+QUtxssuLiU8B16Nhcr7IrIH2h
-	TUxEHgP9XKs3dT9N3uyTUU2SVRx78q0VOsMCQrgOxdV6k3d5eWtkWNaSIY+yUKRLLM8vsUxwo3K
-	raG95V2UGtUGwYwnF+OGSDOt70Afx05v53XQ==
-X-Google-Smtp-Source: AGHT+IGDeAHVk3bjmiKEh4J5iHFH7+EdX4092IVfO054I0rigKsg6ZDX9O2Htj98oWT0RTZ7eaXYhQ==
-X-Received: by 2002:a05:6000:4285:b0:429:b8e2:1064 with SMTP id ffacd0b85a97d-42fb490f769mr11817646f8f.47.1765804115472;
-        Mon, 15 Dec 2025 05:08:35 -0800 (PST)
-Received: from FV6GYCPJ69 ([140.209.217.211])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-430f268d459sm13887608f8f.32.2025.12.15.05.08.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Dec 2025 05:08:34 -0800 (PST)
-Date: Mon, 15 Dec 2025 14:08:31 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>, Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, 
-	Grzegorz Nitka <grzegorz.nitka@intel.com>, Petr Oros <poros@redhat.com>, 
-	Michal Schmidt <mschmidt@redhat.com>, Prathosh Satish <Prathosh.Satish@microchip.com>, 
-	Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
-	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
-	Richard Cochran <richardcochran@gmail.com>, Jonathan Lemon <jonathan.lemon@gmail.com>, 
-	Simon Horman <horms@kernel.org>, Alexander Lobakin <aleksander.lobakin@intel.com>, 
-	Willem de Bruijn <willemb@google.com>, Stefan Wahren <wahrenst@gmx.net>, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org
-Subject: Re: [PATCH RFC net-next 02/13] dpll: Allow registering pin with
- firmware node
-Message-ID: <tawd6udewifjeoymxkfkapxgcgfviixb4zgcjnplycigk5ffws@rdymwt2hknsl>
-References: <20251211194756.234043-1-ivecera@redhat.com>
- <20251211194756.234043-3-ivecera@redhat.com>
- <ahyyksqki6bas5rqngd735k4fmoeaj7l2a7lazm43ky3lj6ero@567g2ijcpekp>
- <3E2869EC-61B3-40DA-98E2-CD9543424468@redhat.com>
+	s=arc-20240116; t=1765804459; c=relaxed/simple;
+	bh=4yBilBIOFB+XSPspX7KZlrIC4ZqVUB3Ii3u4NYeLtCs=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Lu9S4RSe2q026q/hsX9QwevYcq0GjxJhT00RxsAsvFQtVEp/FqytPvF7Ca7QXkQQ+wqFZUg44t+ey8RAWhiJFIVj9TS2P+ZoJHD4+8xR6yrlTEE4RyrR+aRAyOjy0/R5/S+6eDhFa6lypY42f/Ntw7vNEkxijrjy8AA9KWM1tWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aSGCbnsf; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1765804456;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4yBilBIOFB+XSPspX7KZlrIC4ZqVUB3Ii3u4NYeLtCs=;
+	b=aSGCbnsfAnqSpjsGLye+EDHpPfKHUodqTP1SoLksJ+ULw5hvQk5jNqoFAlfxivEvNz/dQu
+	vZ6A7UbmitZdtrg6yaw9UFJrigFYSPWmDijJiKOACUvmM10XiABVHC/Mz4uXqzIkjUBSDh
+	sXnC9rltEHVGX+VxKYRXCG0El5kKwy0=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-680-39YAVIdXObmGb2zRfw7BGg-1; Mon,
+ 15 Dec 2025 08:14:13 -0500
+X-MC-Unique: 39YAVIdXObmGb2zRfw7BGg-1
+X-Mimecast-MFC-AGG-ID: 39YAVIdXObmGb2zRfw7BGg_1765804452
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B1ED6195605B;
+	Mon, 15 Dec 2025 13:14:11 +0000 (UTC)
+Received: from RHTRH0061144 (unknown [10.22.65.86])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F25FD1955F21;
+	Mon, 15 Dec 2025 13:14:08 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+Cc: Eelco Chaudron <echaudro@redhat.com>,  Ilya Maximets
+ <i.maximets@ovn.org>,  Alexei Starovoitov <ast@kernel.org>,  Jesse Gross
+ <jesse@nicira.com>,  Adrian Moreno <amorenoz@redhat.com>,  "David S.
+ Miller" <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Simon
+ Horman <horms@kernel.org>,  netdev@vger.kernel.org,  dev@openvswitch.org
+Subject: Re: [PATCH v2] net: openvswitch: Avoid needlessly taking the RTNL
+ on vport destroy
+In-Reply-To: <20251211115006.228876-1-toke@redhat.com> ("Toke
+	=?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen=22's?= message of "Thu, 11 Dec 2025
+ 12:50:05 +0100")
+References: <20251211115006.228876-1-toke@redhat.com>
+Date: Mon, 15 Dec 2025 08:14:07 -0500
+Message-ID: <f7t5xa7anvk.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3E2869EC-61B3-40DA-98E2-CD9543424468@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Sun, Dec 14, 2025 at 08:35:01PM +0100, ivecera@redhat.com wrote:
->
->
->On December 12, 2025 12:25:12 PM GMT+01:00, Jiri Pirko <jiri@resnulli.us> wrote:
->>Thu, Dec 11, 2025 at 08:47:45PM +0100, ivecera@redhat.com wrote:
->>
->>[..]
->>
->>>@@ -559,7 +563,8 @@ EXPORT_SYMBOL(dpll_netdev_pin_clear);
->>>  */
->>> struct dpll_pin *
->>> dpll_pin_get(u64 clock_id, u32 pin_idx, struct module *module,
->>>-	     const struct dpll_pin_properties *prop)
->>>+	     const struct dpll_pin_properties *prop,
->>>+	     struct fwnode_handle *fwnode)
->>> {
->>> 	struct dpll_pin *pos, *ret = NULL;
->>> 	unsigned long i;
->>>@@ -568,14 +573,15 @@ dpll_pin_get(u64 clock_id, u32 pin_idx, struct module *module,
->>> 	xa_for_each(&dpll_pin_xa, i, pos) {
->>> 		if (pos->clock_id == clock_id &&
->>> 		    pos->pin_idx == pin_idx &&
->>>-		    pos->module == module) {
->>>+		    pos->module == module &&
->>>+		    pos->fwnode == fwnode) {
->>
->>Is fwnode part of the key? Doesn't look to me like that. Then you can
->>have a simple helper to set fwnode on struct dpll_pin *, and leave
->>dpll_pin_get() out of this, no?
->
->IMHO yes, because particular fwnode identifies exact dpll pin, so
->I think it should be a part of the key.
+Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com> writes:
 
-The key items serve for userspace identification purposes as well. For
-that, fwnode is non-sense.
-fwnode identifies exact pin, that is nice. But is it the only
-differentiator among other key items? I don't expect so.
-
+> The openvswitch teardown code will immediately call
+> ovs_netdev_detach_dev() in response to a NETDEV_UNREGISTER notification.
+> It will then start the dp_notify_work workqueue, which will later end up
+> calling the vport destroy() callback. This callback takes the RTNL to do
+> another ovs_netdev_detach_port(), which in this case is unnecessary.
+> This causes extra pressure on the RTNL, in some cases leading to
+> "unregister_netdevice: waiting for XX to become free" warnings on
+> teardown.
 >
+> We can straight-forwardly avoid the extra RTNL lock acquisition by
+> checking the device flags before taking the lock, and skip the locking
+> altogether if the IFF_OVS_DATAPATH flag has already been unset.
+>
+> Fixes: b07c26511e94 ("openvswitch: fix vport-netdev unregister")
+> Tested-by: Adrian Moreno <amorenoz@redhat.com>
+> Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+> ---
+
+LGTM,
+
+Acked-by: Aaron Conole <aconole@redhat.com>
+
 
