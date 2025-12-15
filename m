@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-244720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58301CBD96E
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 12:48:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BF6FCCBDA40
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 12:56:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 70F0E3081836
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 11:40:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B90EF305114C
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 11:48:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ECB7332ED1;
-	Mon, 15 Dec 2025 11:39:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6C03336EC0;
+	Mon, 15 Dec 2025 11:48:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QZ2bPcSy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OweAlaqf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAE22330B2D
-	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 11:39:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5CA33358B8
+	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 11:48:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765798766; cv=none; b=SYdjqnItLLmVrRPrtLm2HTdtLVbbtjcd/Gj0uxNbMfERcr7Op9koDA4o4hoI4NTbR+ov0VKNNqPsaxrJheLCpq3Gs1o7gPaF4xYk6g6ZVLb63QSY7b96tI9DhkrneHlw41/k44tkErOTCp8qytApCaJCNb7Ymk9mgxMv2bGzaj0=
+	t=1765799324; cv=none; b=WIJ6tHpMnIcmISVhc1wbTIahLvhcTsO4GHtK79EqaK80UKtoTw1uxnbL4xoSsT5Nys3aR4OA1z2fLAwEBf0U+fZ3zmYLq4dKkZITb46pBQ0tt3goOvrwofC5+1IqS4U/9NHjzgGaCGD1ovXpy9/JTFEXdX5pJBHmDTnb0nq7y6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765798766; c=relaxed/simple;
-	bh=g0JdaQypaND4lTcW0ZqbYUYcFFa4BCtHp67rCXQ3qdI=;
+	s=arc-20240116; t=1765799324; c=relaxed/simple;
+	bh=UEs/C9BYSnit6YUYNsXI/TPVZ8wlbVWtOoMfZCt2Czk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NVk82lBe/kvO/b+q9FSWZeydiBkLdcVXc2DWC/MdPv1rJFMxYemZ8B0fZntDpjlCbzVN5UTKdHJE0dRtx6ADh0z9Zy0UCnIJGvN6GYbck8EYqecSZf1dRk1alu3hbI6iJTNYeX7YRX/yVYS3jP3U3Eh7mCrMDDOJkaVdLBTred4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QZ2bPcSy; arc=none smtp.client-ip=209.85.216.53
+	 MIME-Version; b=LJBrxAyd56BVptGIW/Opr16cKnqfGNVRXXal6z5j4Dj2Tx7jIPMI7Z/JqHS2MhaRqNCvSy9hN+keSsQrFCntC6h8prB97LADW5bO6/E0a+ol85fmmNLL7lcGmB/6DKKZxed86CLHOcVMwZ/fJ2roccEkF3xLYCCojYsWWJG/E/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OweAlaqf; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-34c868b197eso920365a91.2
-        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 03:39:23 -0800 (PST)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-29844c68068so41128405ad.2
+        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 03:48:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765798763; x=1766403563; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1765799322; x=1766404122; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=c1jHunOtVkIwedmQvRsrzJgL7loZmMhygmTOE5iX6PY=;
-        b=QZ2bPcSyG+tJ9fGX18Feb1vqd5n6XetH4ZtDRsUSqe0yejhEagRkvX3mCWc9U94+os
-         UODT9B5wXa1p5HcV0/d7C76dd+2ygUmpCdkootvGaVvfnhlLHxZ/KdI3X0SXJVnslw7L
-         TwcGhGKgfT1eOdXW9QVdN4wmX8pKMsLeR2c9heaLY49BFjfBZIGrvlKGCDVDTVea54+A
-         MM6Nslk1bnsdoYjnf3uMszpQX236vcsnlq7OtjvnbT7de/tNjHxKkYVFkv8fd45JZ8GK
-         KsDAMNCiVcJ8e3d1MmzQvF8yVqocfFa+3lW3kPt6OUamaQVk9jX7DHYZNtESB8qvJFZg
-         aytA==
+        bh=6HauKBmXABfepG7VVzo5pWgXSZcUBePm/ZvLfsSGC9U=;
+        b=OweAlaqfINL7xdPdmKk7yZe4PNrDwsXB/WguG+W6yGXU/N4FmmQsaiJTz9UcZNvddq
+         oyD5s+xq1SoElPYVq1NfOAf8IoJjyaqPlhsHryoMSo8e0CPsDCuBCb/4lW8uDPMctSky
+         LE8GBndKHvLKRarKfht22U+rMUvkYsBLNOdBg2YV06C4a+ZeoilpdlpmSPzLY5IGnZPC
+         5ygciS5mbNeWYspdSVCiVqHLNsu6g0wWEVTGR9tF14j5GdVW4qK8VljQDH0TF3JD5ND/
+         7mOGw3PJrznkPFe/ifku14nsvF/qjiOI2lGEJxErhHzfBb2VyPT280arSuUDg7ivq7Pl
+         jAHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765798763; x=1766403563;
+        d=1e100.net; s=20230601; t=1765799322; x=1766404122;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=c1jHunOtVkIwedmQvRsrzJgL7loZmMhygmTOE5iX6PY=;
-        b=amdWE+wnJ8uXNTlWba/lWdeFesSMORcUIRXOVDcCX5WsJdLCU9UMmU8HEHTyt9wHJI
-         JvpsrKobuxadn4IDQt+KIDqm5YgTGc2qVrP8kCDOVCORDlTtHlCoG0mM0W3WYa5uogcr
-         sQ4BWoWVo2xnm/Yq8J3g5W+6NJsd0wrQQqCybd0VLiYLuhybEiIeyTDtnnpp3eJNfgIa
-         YWzBbJ7seX7fT9NE2KYjxzB9VTsH4aaBiWogqwkTNO0LNBX83Xv2oviYmITMSwGxiVSR
-         YalORi8KP3RcqJEIp9Ijk9TP0K2/v5A7A841W2Uewaa5BQioohHSWXg4ZpYTcyVWdBEb
-         WTxw==
-X-Forwarded-Encrypted: i=1; AJvYcCWQSvU+g0QwyY4IY01Y7LcgyaQox+yoFcWmRTskf5/2ViFdzVo2cReVDVFTAvqivgOJ7VPNzRE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwP5mAGpN2NVqB6ZOsC80gcEa0HCIg1yFp/gh6N8ijgmThlBTY7
-	Z6dD2BtQOJpZVFk9F4zdU49rn/APfX02Ezcaxz3kf5KqmwtePAlDeKys
-X-Gm-Gg: AY/fxX6d4V9Com9ZGaoCkgL7Xef6Pg1Hk+AfBKILwc3kleCBPHLbdMyXkdQd/Bi6fRx
-	9oCfGYooS/zWzL9/L9VRLzZY2Md7VPbhLZfKT5593rDu2fHwVMShdqbTWJN58dhk5irh2z1hbfX
-	eUq81oSw72hEzPBg2Fp/h7uVnMaa7RgafYYtD+wuNwumIX/ATC8qr3OYyAlBd2m0j0ExB6lK1r1
-	RikVftHI0yI0U/CfsRNDVopckpE/4B9uMwk/3b9MxdLUhMc3kBmixJQ6EzJv7aayIHzMoJntO1y
-	3JMQDcWQVZo66/fY5Ka09KOxHYocNDwrN5k+B6slSKgrT0sS+MNyIOxVYmwlCH5oTwZ8hXZA4nk
-	PCB9h6ksrl0kdeK75pzOrFk1La7Q3jl2pttxgYkRqE/EPVh0acoLtPI8iOxkI8qouj5vXDv4M8M
-	3ni5Doho5lS1U=
-X-Google-Smtp-Source: AGHT+IGkBlvtTJJI36YenJR2Mj5A83uVH+1orPi0BLwAvata7acR5hue/qogcd9VSy03MC0if9MWYQ==
-X-Received: by 2002:a17:902:dad1:b0:2a0:b066:3f55 with SMTP id d9443c01a7336-2a0b06646d5mr58199625ad.10.1765798762558;
-        Mon, 15 Dec 2025 03:39:22 -0800 (PST)
+        bh=6HauKBmXABfepG7VVzo5pWgXSZcUBePm/ZvLfsSGC9U=;
+        b=novy0+JWwkoZMj1HUWN/MbP6k2QDazLKI5OYYzBn5qjMAjkiGwsUq0+IYz7xHQ5UL+
+         S6EdH8FmKE0b/BFphD1wjlFVWSlNhrgDo0kFJukfGxy146otxsVn4Wyk0KXWlDY4xn4+
+         3eSaRTPrn1faE/lCe7RIb8N+OCJeBIl2RybhBuFZtqM+B4BTp7/breDrWFFze34Fv7pw
+         YVShmt22rEBQKpA01PGXWcQHm3v39I/+/akz7c61wq64Y8MqNoXnlOc8sNMxVGvj+Ev9
+         h/NX99Q1u7xKwjcb4Zw+nEP97nwEQOl8gSfuJP/nKhQm7i/B0fWQpeUQIm5VtfAb8FQl
+         720w==
+X-Forwarded-Encrypted: i=1; AJvYcCV18B8Tim4HUJTjKUOYqf1srMyRJs/48oUt8Ey8+ZlMF5neV8w2nnz1FzmC3MpixdsKrPa4JyU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7IU+3uTFM2ihbqqfIoAkkpe/yMmezl+dTT1TGBuNLSeMekEt3
+	qIXfcijFYRVYUYoXfGVZEE3Lu/RVdMG+qzlmlUjfN67cK3oO5cdsTAGy
+X-Gm-Gg: AY/fxX6DbPOPXyRrSE8+cKMXIXUzTZcNct1oX5on99RR0pREYC3KCgqbHWUmFMU/YUW
+	hLRxorjJqz0ITOKFypYl/jQl2D1dCdwwMIQyg7cq6zBL5Ocji5gW/MGf+NJu7bmcP4Ess1tjhgk
+	couUiuqUoerYDrzyyLEWa8Z92qJVJoSiVXENvN5PW08WcketIPRjjgL6wOzRBpGycZYPeCc6dIl
+	NR+g0S2n0uYCSW4JYWmogIDL7Woil4fDbD2XXsZei4SpIbVzFi2X4KSwN0NZAFfdaNCxDJea6GU
+	YQ9UNYc2wAWV1XgUYxofjHoLLlrWjupxHI87Bn5hrOFzi34Adp8T8DmOkxv53oyeH2kDnafGXc7
+	g4qC5JvpGmfvg9Q0/KNlAr4Pgnp4OJTkrL+eb9bffZRRWBqk56Zfyjha2RN5pk8AQqYRnUGYc86
+	rNx799ECKh4ZI=
+X-Google-Smtp-Source: AGHT+IHfPz2x7Vw5nYSquN5rdr59IqpuimzSW/oHADfYTkii49T/33BfFck+CRU3WD2YFqFgGY1MBw==
+X-Received: by 2002:a17:902:ccc8:b0:2a0:823f:4da6 with SMTP id d9443c01a7336-2a0823f4e6bmr66287715ad.50.1765799322057;
+        Mon, 15 Dec 2025 03:48:42 -0800 (PST)
 Received: from archie.me ([210.87.74.117])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29ee9d394easm129684215ad.25.2025.12.15.03.39.14
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29f271bc8a0sm97458185ad.92.2025.12.15.03.48.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Dec 2025 03:39:18 -0800 (PST)
+        Mon, 15 Dec 2025 03:48:41 -0800 (PST)
 Received: by archie.me (Postfix, from userid 1000)
-	id DE7F144588D6; Mon, 15 Dec 2025 18:39:06 +0700 (WIB)
+	id 1E64B44588D7; Mon, 15 Dec 2025 18:39:06 +0700 (WIB)
 From: Bagas Sanjaya <bagasdotme@gmail.com>
 To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
 	Linux AMDGPU <amd-gfx@lists.freedesktop.org>,
@@ -161,9 +161,9 @@ Cc: Harry Wentland <harry.wentland@amd.com>,
 	Jilin Yuan <yuanjilin@cdjrlc.com>,
 	Swaraj Gaikwad <swarajgaikwad1925@gmail.com>,
 	George Anthony Vernon <contact@gvernon.com>
-Subject: [PATCH 09/14] drm/amd/display: Don't use kernel-doc comment in dc_register_software_state struct
-Date: Mon, 15 Dec 2025 18:38:57 +0700
-Message-ID: <20251215113903.46555-10-bagasdotme@gmail.com>
+Subject: [PATCH 10/14] drm/amdgpu: Describe @AMD_IP_BLOCK_TYPE_RAS in amd_ip_block_type enum
+Date: Mon, 15 Dec 2025 18:38:58 +0700
+Message-ID: <20251215113903.46555-11-bagasdotme@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20251215113903.46555-1-bagasdotme@gmail.com>
 References: <20251215113903.46555-1-bagasdotme@gmail.com>
@@ -173,36 +173,34 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1238; i=bagasdotme@gmail.com; h=from:subject; bh=g0JdaQypaND4lTcW0ZqbYUYcFFa4BCtHp67rCXQ3qdI=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDJn2n4OZ3cRMgut038Q1Mvx+WnR34qt26aRSjxQZU2vjg 6FirXs7SlkYxLgYZMUUWSYl8jWd3mUkcqF9rSPMHFYmkCEMXJwCMJFN+xkZVrl1e0394/7u+RLu +RrXLfO4ZDZ3GN7cIROa8FQ8sjv1CCPD78WiQS1yNZrTC6Ti9OZz7YjK/sxnP51XNFzRTCM96w0 nAA==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1065; i=bagasdotme@gmail.com; h=from:subject; bh=UEs/C9BYSnit6YUYNsXI/TPVZ8wlbVWtOoMfZCt2Czk=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDJn2n4P/rZd71fJeeea2Y6ze7l+/BUWfvZxbPVvJ7FLhc b8Ca2nfjlIWBjEuBlkxRZZJiXxNp3cZiVxoX+sIM4eVCWQIAxenAEzkQCXDH065v1Nu7J+SJNXm fKBEpbzzpEZrbklCWe8WSUFLrulTkhn+J33s75ffwvJ3fu98iUql0+pnUqJKXmg5a8ursxTsZFv IBQA=
 X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
 Content-Transfer-Encoding: 8bit
 
 Sphinx reports kernel-doc warning:
 
-WARNING: ./drivers/gpu/drm/amd/display/dc/dc.h:2796 This comment starts with '/**', but isn't a kernel-doc comment. Refer to Documentation/doc-guide/kernel-doc.rst
- * Software state variables used to program register fields across the display pipeline
+WARNING: ./drivers/gpu/drm/amd/include/amd_shared.h:113 Enum value 'AMD_IP_BLOCK_TYPE_RAS' not described in enum 'amd_ip_block_type'
 
-Don't use kernel-doc comment syntax to fix it.
+Describe the value to fix it.
 
-Fixes: b0ff344fe70cd2 ("drm/amd/display: Add interface to capture expected HW state from SW state")
+Fixes: 7169e706c82d7b ("drm/amdgpu: Add ras module ip block to amdgpu discovery")
 Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
 ---
- drivers/gpu/drm/amd/display/dc/dc.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/gpu/drm/amd/include/amd_shared.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/gpu/drm/amd/display/dc/dc.h b/drivers/gpu/drm/amd/display/dc/dc.h
-index 29edfa51ea2cc0..0a9758a042586f 100644
---- a/drivers/gpu/drm/amd/display/dc/dc.h
-+++ b/drivers/gpu/drm/amd/display/dc/dc.h
-@@ -2793,7 +2793,7 @@ void dc_get_underflow_debug_data_for_otg(struct dc *dc, int primary_otg_inst, st
- 
- void dc_get_power_feature_status(struct dc *dc, int primary_otg_inst, struct power_features *out_data);
- 
--/**
-+/*
-  * Software state variables used to program register fields across the display pipeline
-  */
- struct dc_register_software_state {
+diff --git a/drivers/gpu/drm/amd/include/amd_shared.h b/drivers/gpu/drm/amd/include/amd_shared.h
+index 17945094a13834..d8ed3799649172 100644
+--- a/drivers/gpu/drm/amd/include/amd_shared.h
++++ b/drivers/gpu/drm/amd/include/amd_shared.h
+@@ -89,6 +89,7 @@ enum amd_apu_flags {
+ * @AMD_IP_BLOCK_TYPE_VPE: Video Processing Engine
+ * @AMD_IP_BLOCK_TYPE_UMSCH_MM: User Mode Scheduler for Multimedia
+ * @AMD_IP_BLOCK_TYPE_ISP: Image Signal Processor
++* @AMD_IP_BLOCK_TYPE_RAS: RAS
+ * @AMD_IP_BLOCK_TYPE_NUM: Total number of IP block types
+ */
+ enum amd_ip_block_type {
 -- 
 An old man doll... just what I always wanted! - Clara
 
