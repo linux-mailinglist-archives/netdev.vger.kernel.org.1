@@ -1,250 +1,322 @@
-Return-Path: <netdev+bounces-244833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8284DCBF89D
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 20:27:36 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7749CBF960
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 20:43:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1AAEE3019D05
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 19:27:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2CB1730221B0
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 19:40:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15AFB330B05;
-	Mon, 15 Dec 2025 19:27:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49742339B30;
+	Mon, 15 Dec 2025 19:28:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="XDh1l391"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f78.google.com (mail-oo1-f78.google.com [209.85.161.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010037.outbound.protection.outlook.com [52.101.193.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31E48327790
-	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 19:27:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.78
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765826852; cv=none; b=KYekGi5DQIGqJYsP2jWgma0g9SeaR0XVeHOq4TyE/9Y73Tc/QQXwoFBnw/tpC3kGtRJOLLbsMEZ7J9rNIYZziKtUpDzFhrEiiQguK5cdoEL97M7gtCekB5y/0u96aIHD1C0wnbchcPqWPX90LUdM+DNSAWbuzoXg5gjDbRQvht0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765826852; c=relaxed/simple;
-	bh=mPLTD7PpWjEKl0jd1qi6Si2UiYoQzTB4owpo9VMt5H4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=YSCcl5PwN8U57IP4XL+tnY55Qk64sBPStOWEtvbTUExnkYMMNk95/cIhd9H8IoIe1DSKKnxlD8JuhGCzOfQ2Il9K9xwIP+ED7BopdmC9LZq/mVJjt1vWj6q58e3rOSxHlYUvgLKE6T8hVSeBey/H1qRFqo0h4apBFHSbFz2s19U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f78.google.com with SMTP id 006d021491bc7-6576fd62dffso5554816eaf.2
-        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 11:27:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765826849; x=1766431649;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5Fl+D8efnNL5bxbx7e53ARiPdpxbQVRmWTwvpsZJzuk=;
-        b=A+xET/XsRKJYBBA0geK0DIxPWYFs+GuqcOmHaBAiqoHMIpAPQ6rVnp3S+GDZ3aJwan
-         vgn3gR+y3kfV42jXcKaVbLtfmb6GpC/XejhiiMDsIG25w3zD9S3Gi0FGCvYQhKfefRUs
-         CbB65v0/mPCduHLP+eivJdfgXCwwsjsO1kBfqMObxggNg3BkpwUZ1d7LScb2cGz+3lVp
-         8bRL6vPK8teUsdHZKV+tfu63Ezmli4h+zsGzXCt3vrOx0t21YKVhZiA5WTax/rJfchOk
-         ZIDbzdCxu6UoSuCMSacMZmQfE0nmPvGUuk7+e1Iw7z6SrMRecsl+yZJbGHDM7IdGpY7X
-         Ai+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU2eGVqHHhHqGT+v5dJcNK6ZaLkJ5nTmWSnOfegmvLPENZYv75r8BgxnNoHv/+8NVTHYuotOcM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyyOWXd1yiU1S88eMcje1CUticE8hPlgSQWLU0Y6/wvUAnxoEth
-	MjcOlk7erEVx2Ksrxe9WfuIDZFty3FJtB61Q2utDNn/cM4aukCHCNJitjhQr7l/FRS0lICSFgFQ
-	temX2HvDZiFD84/AOoBLEAx3T7SaLAuQQk/EkHp8OAn1uiOenHKfh6wyNxus=
-X-Google-Smtp-Source: AGHT+IGHoX6wRWJXGeCesAWSdNxXVJzgieQtRGIPaFAHJDiUt6iatyiLciauCH56AltUPSWq4tNFj2FTIZp+SophYMdq2GxcKtEU
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C377339B20;
+	Mon, 15 Dec 2025 19:28:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765826927; cv=fail; b=iTrWOO5diG8pvquCIW4/J1zFPHGUp7nTeFLVHR6fQUtqvqRxwV4IFHlo69i9AGXpdS84H23xOmpm8MZQlewOJ4x51U1h5hA4NIUjYUuqxLj+Hj/XjZZxwZNFkWue9fty0XNaRV/iYHCcetImvD9WjENnXi/fYcnsC4ZdLpiBKrk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765826927; c=relaxed/simple;
+	bh=iQeaXXALyAd4xBYccVXawOiMMMp/JWkTLsNC6U+JQjU=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=fU+uEsuGrn5TOFNp0oZG3EGJwrwl1WS0qZHWBQyumhE6J2rvrnzasaBOL/Wjiqu1xTM1Ojc4y0rIAue7vCUvpTrnZayzEsli9NVEw0P9kDuv8Qi41bDFgr4vGwqu8dBcOwubBIoRvFG2aS974/jQ5hgn1xYIvZcM5Tgg2Av6Cxo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=XDh1l391; arc=fail smtp.client-ip=52.101.193.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=kz1MIRfQof2JxTHdBTPDNaBqEXu/6lklMqwSAovI59BDrgkOg41cImZaOwnjpR5zOvTc3FISSHVR5S4R3y4+xtUTek3DUWWeJy/UVw5pNX4tA0BOQDuF5m9A8XN6xy5JgMgv3C/l+MA1c8WHzP6Ha6KJ/i/u9p7lS6sPGZarh4tD1KUTlS0tkIYLSedO/XRTxkyAaeRvBDOutKmUdd3SE7PzcWHtRThaWlgLWyE1DMnvcFO+PlQ0y47tiRbe5GFncCeaGkKPAb5Zim+7CgqfCt2wN4jqP/YEeaTM83wEpEuwltalF6pdFR1cDhnrJc4NT13qx9gEQYL3rSbroGkJXw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=orhk93tCLjEajsFgG7CualKNDc2gPSudbq9CiMr1Dv4=;
+ b=tkq62CVcaFNuz33ZCqKu07tse+UmNct37qSuvrz3KVJxYNzr7IMIsWVFG+D7T68GdOgXBjCxALQHXTH54zaUuUEaeJVXawP1pClMgORmRnJL5MgtlG/JilDhG/ikoARceljxPxIbLziYFi9KLWoPnQWc/mv9IxtMPgeg3J0ovIZJ2lcAddnZ+wY97OLRSz1Yw7JBHQh06K3PtlUIhpXIjUoKb685WJUlFBtkXutvfBjUUxmsFt4UIjN0x2RCQCZa0LtCFjR2fRkLVYTKH5rLVdg3bllILtJIxPeD/yc7ggy6+OZnBoLHVz/Q8s8UqwGc0C3DmDIMpiZkKIP8p/ULzw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=orhk93tCLjEajsFgG7CualKNDc2gPSudbq9CiMr1Dv4=;
+ b=XDh1l391DPVoF27KxJJbLnzXe33Qd9URi5Ocfs1zBKzrQLXSXS14Z1oSkOV9dviGN23pcTKtT9FDrPy7X2ioxEr1YJWsUyxSem9WxqPF9U9PEh8CXxrm7SvgaESqitLP5n0x3R29vRaCgiDoPtkwsNBo2k/Kteyeu0CgRB/Pq3I=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
+ by MW3PR12MB4491.namprd12.prod.outlook.com (2603:10b6:303:5c::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9412.13; Mon, 15 Dec
+ 2025 19:28:40 +0000
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::bfd5:ffcf:f153:636a]) by PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::bfd5:ffcf:f153:636a%5]) with mapi id 15.20.9412.011; Mon, 15 Dec 2025
+ 19:28:40 +0000
+Message-ID: <d101cf0e-bf7c-4aa7-a444-f6b61a1854ad@amd.com>
+Date: Mon, 15 Dec 2025 11:28:36 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC net-next v3 1/3] net: ethernet: mtk_eth_soc: Add register
+ definitions for RSS and LRO
+To: Frank Wunderlich <linux@fw-web.de>, Felix Fietkau <nbd@nbd.name>,
+ Sean Wang <sean.wang@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Russell King <linux@armlinux.org.uk>
+Cc: Frank Wunderlich <frank-w@public-files.de>,
+ Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, Mason Chang <mason-cw.chang@mediatek.com>
+References: <20251214110310.7009-1-linux@fw-web.de>
+ <20251214110310.7009-2-linux@fw-web.de>
+Content-Language: en-US
+From: "Creeley, Brett" <bcreeley@amd.com>
+In-Reply-To: <20251214110310.7009-2-linux@fw-web.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PH7PR10CA0017.namprd10.prod.outlook.com
+ (2603:10b6:510:23d::10) To PH0PR12MB7982.namprd12.prod.outlook.com
+ (2603:10b6:510:28d::5)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:22a9:b0:659:9a49:8f62 with SMTP id
- 006d021491bc7-65b457054a5mr5373943eaf.39.1765826849363; Mon, 15 Dec 2025
- 11:27:29 -0800 (PST)
-Date: Mon, 15 Dec 2025 11:27:29 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69406121.a70a0220.104cf0.0340.GAE@google.com>
-Subject: [syzbot] [net?] INFO: rcu detected stall in rtnl_getlink (2)
-From: syzbot <syzbot+106c54b7b120976392e6@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    8f0b4cce4481 Linux 6.19-rc1
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=10e3c11a580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a94030c847137a18
-dashboard link: https://syzkaller.appspot.com/bug?extid=106c54b7b120976392e6
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12682d92580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=121039c2580000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/2b5022055115/disk-8f0b4cce.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/17c3669e328d/vmlinux-8f0b4cce.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/7e72b5dbef4f/bzImage-8f0b4cce.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+106c54b7b120976392e6@syzkaller.appspotmail.com
-
-rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-rcu: 	Tasks blocked on level-0 rcu_node (CPUs 0-1): P5822/1:b..l
-rcu: 	(detected by 0, t=10502 jiffies, g=9529, q=101 ncpus=2)
-task:syz-executor290 state:R  running task     stack:23608 pid:5822  tgid:5822  ppid:5819   task_flags:0x400140 flags:0x00080800
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5256 [inline]
- __schedule+0x14bc/0x5000 kernel/sched/core.c:6863
- preempt_schedule_irq+0xb5/0x150 kernel/sched/core.c:7190
- irqentry_exit+0x5d8/0x660 kernel/entry/common.c:216
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
-RIP: 0010:unwind_next_frame+0xc98/0x2390 arch/x86/kernel/unwind_orc.c:-1
-Code: 8b 5c 24 70 4c 8b 6c 24 50 4c 8b 64 24 10 74 08 48 89 df e8 5a bd b3 00 4c 89 23 ba 10 00 00 00 4c 89 ef 31 f6 e8 28 bf b3 00 <48> 8b 14 24 e9 c5 04 00 00 4c 89 7c 24 28 48 89 5c 24 78 4d 8d 66
-RSP: 0018:ffffc90003226a78 EFLAGS: 00000202
-RAX: ffffc90003226b98 RBX: ffffc90003226b80 RCX: 0000000000000000
-RDX: 0000000000000010 RSI: 0000000000000000 RDI: ffffc90003226ba8
-RBP: dffffc0000000000 R08: ffffc90003226ba7 R09: ffffc90003226b98
-R10: dffffc0000000000 R11: fffff52000644d75 R12: ffffc90003227260
-R13: ffffc90003226b98 R14: ffffc90003226b48 R15: ffffc90003226b90
- arch_stack_walk+0x11c/0x150 arch/x86/kernel/stacktrace.c:25
- stack_trace_save+0x9c/0xe0 kernel/stacktrace.c:122
- kasan_save_stack mm/kasan/common.c:56 [inline]
- kasan_save_track+0x3e/0x80 mm/kasan/common.c:77
- poison_kmalloc_redzone mm/kasan/common.c:397 [inline]
- __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:414
- kasan_kmalloc include/linux/kasan.h:262 [inline]
- __do_kmalloc_node mm/slub.c:5657 [inline]
- __kmalloc_node_track_caller_noprof+0x575/0x820 mm/slub.c:5764
- kmalloc_reserve+0x136/0x290 net/core/skbuff.c:608
- pskb_expand_head+0x19d/0x1160 net/core/skbuff.c:2282
- netlink_trim+0x1b3/0x2c0 net/netlink/af_netlink.c:1299
- netlink_broadcast_filtered+0xd6/0x1000 net/netlink/af_netlink.c:1512
- nlmsg_multicast_filtered include/net/netlink.h:1165 [inline]
- nlmsg_multicast include/net/netlink.h:1184 [inline]
- nlmsg_notify+0xf0/0x1a0 net/netlink/af_netlink.c:2593
- netif_state_change+0x289/0x380 net/core/dev.c:1586
- linkwatch_do_dev+0x117/0x170 net/core/link_watch.c:186
- linkwatch_sync_dev+0x27f/0x390 net/core/link_watch.c:289
- rtnl_getlink+0x920/0xcd0 net/core/rtnetlink.c:4188
- rtnetlink_rcv_msg+0x77c/0xb70 net/core/rtnetlink.c:6967
- netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2550
- netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
- netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1344
- netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1894
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg+0x21c/0x270 net/socket.c:742
- __sys_sendto+0x3bd/0x520 net/socket.c:2206
- __do_sys_sendto net/socket.c:2213 [inline]
- __se_sys_sendto net/socket.c:2209 [inline]
- __x64_sys_sendto+0xde/0x100 net/socket.c:2209
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fa2a690ff9c
-RSP: 002b:00007ffcfdfcc780 EFLAGS: 00000293 ORIG_RAX: 000000000000002c
-RAX: ffffffffffffffda RBX: 0000000000000004 RCX: 00007fa2a690ff9c
-RDX: 0000000000000020 RSI: 00007fa2a69972f0 RDI: 0000000000000004
-RBP: 0000000000000000 R08: 00007ffcfdfcc7c4 R09: 000000000000000c
-R10: 0000000000000000 R11: 0000000000000293 R12: 00007ffcfdfcc910
-R13: 0000000000000010 R14: 0000000000000000 R15: 00007fa2a69972f0
- </TASK>
-rcu: rcu_preempt kthread starved for 10560 jiffies! g9529 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x0 ->cpu=1
-rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
-rcu: RCU grace-period kthread stack dump:
-task:rcu_preempt     state:R  running task     stack:26136 pid:16    tgid:16    ppid:2      task_flags:0x208040 flags:0x00080000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5256 [inline]
- __schedule+0x14bc/0x5000 kernel/sched/core.c:6863
- __schedule_loop kernel/sched/core.c:6945 [inline]
- schedule+0x165/0x360 kernel/sched/core.c:6960
- schedule_timeout+0x12b/0x270 kernel/time/sleep_timeout.c:99
- rcu_gp_fqs_loop+0x301/0x1540 kernel/rcu/tree.c:2083
- rcu_gp_kthread+0x99/0x390 kernel/rcu/tree.c:2285
- kthread+0x711/0x8a0 kernel/kthread.c:463
- ret_from_fork+0x599/0xb30 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
- </TASK>
-rcu: Stack dump where RCU GP kthread last ran:
-Sending NMI from CPU 0 to CPUs 1:
-NMI backtrace for cpu 1
-CPU: 1 UID: 0 PID: 5860 Comm: syz-executor290 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
-RIP: 0010:check_kcov_mode kernel/kcov.c:183 [inline]
-RIP: 0010:write_comp_data kernel/kcov.c:246 [inline]
-RIP: 0010:__sanitizer_cov_trace_cmp4+0x26/0x90 kernel/kcov.c:288
-Code: 90 90 90 90 f3 0f 1e fa 48 8b 04 24 65 48 8b 14 25 08 b0 7e 92 65 8b 0d 58 fd bc 10 81 e1 00 01 ff 00 74 11 81 f9 00 01 00 00 <75> 5b 83 ba 6c 16 00 00 00 74 52 8b 8a 48 16 00 00 83 f9 03 75 47
-RSP: 0018:ffffc90000a08e20 EFLAGS: 00000006
-RAX: ffffffff81afcf46 RBX: 0000000000000003 RCX: 0000000000010000
-RDX: ffff88802e7b5b80 RSI: 0000000000000003 RDI: 0000000000000003
-RBP: 0000000000000003 R08: ffffffff81afce27 R09: ffffffff998e3508
-R10: dffffc0000000000 R11: ffffffff8168e910 R12: 0000002d4f5ab498
-R13: 0000000027e6dd95 R14: ffff8880b87284a0 R15: 0000000000009034
-FS:  00007fa2a60ba6c0(0000) GS:ffff888125f35000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00002000000001c0 CR3: 000000002743c000 CR4: 0000000000350ef0
-Call Trace:
- <IRQ>
- ktime_get_update_offsets_now+0x186/0x3d0 kernel/time/timekeeping.c:2576
- hrtimer_update_base kernel/time/hrtimer.c:633 [inline]
- hrtimer_interrupt+0x132/0xaa0 kernel/time/hrtimer.c:1885
- local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1045 [inline]
- __sysvec_apic_timer_interrupt+0x102/0x3e0 arch/x86/kernel/apic/apic.c:1062
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1056 [inline]
- sysvec_apic_timer_interrupt+0xa1/0xc0 arch/x86/kernel/apic/apic.c:1056
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
-RIP: 0010:__sanitizer_cov_trace_const_cmp4+0x4/0x90 kernel/kcov.c:315
-Code: 89 74 11 18 48 89 44 11 20 e9 e3 8b 4e ff cc 0f 1f 80 00 00 00 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa <48> 8b 04 24 65 48 8b 14 25 08 b0 7e 92 65 8b 0d d8 fa bc 10 81 e1
-RSP: 0018:ffffc900030d7838 EFLAGS: 00000246
-RAX: 0000000000000008 RBX: 0000000000000004 RCX: 0000000000000002
-RDX: ffff88802e7b5b80 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: ffffc900030d7978 R08: 0000000000000000 R09: ffff88802e7b5b80
-R10: dffffc0000000000 R11: fffff5200061af65 R12: dffffc0000000000
-R13: 00007fa2a69971a8 R14: 0000000000000002 R15: 0000000000000000
- get_futex_key+0x10a/0x1660 kernel/futex/core.c:562
- futex_wait_setup+0x4f/0x590 kernel/futex/waitwake.c:617
- __futex_wait+0x148/0x3d0 kernel/futex/waitwake.c:682
- futex_wait+0x104/0x360 kernel/futex/waitwake.c:715
- do_futex+0x333/0x420 kernel/futex/syscalls.c:130
- __do_sys_futex kernel/futex/syscalls.c:207 [inline]
- __se_sys_futex+0x36f/0x400 kernel/futex/syscalls.c:188
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fa2a690e589
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 d1 1d 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fa2a60ba178 EFLAGS: 00000246 ORIG_RAX: 00000000000000ca
-RAX: ffffffffffffffda RBX: 00007fa2a69971a8 RCX: 00007fa2a690e589
-RDX: 0000000000000000 RSI: 0000000000000080 RDI: 00007fa2a69971a8
-RBP: 00007fa2a69971a0 R08: 00007fa2a60ba6c0 R09: 00007fa2a60ba6c0
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007fa2a69971ac
-R13: 0000000000000010 R14: 00007ffcfdfcc440 R15: 00007ffcfdfcc528
- </TASK>
-INFO: NMI handler (nmi_cpu_backtrace_handler) took too long to run: 1.742 msecs
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|MW3PR12MB4491:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8d2a0630-7662-4474-57fb-08de3c1026d4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|366016|376014|1800799024|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?MitydENVVTcxdE1BUlhGWVZrSkxrWWg0SkNnbDR3eFl4bFFjbHIwbWE0OEVh?=
+ =?utf-8?B?NUxFOWVrcjBqVXUwNXNMQ0dCeFhTczArdmh0Mmt6U0pLWDVLRi9yZys5ZnJp?=
+ =?utf-8?B?Vi9xRTNwR0NkamthVXBmMGtGQnFaR0xUWDJsL2ZlTlN2clh6SnExN1kybGc2?=
+ =?utf-8?B?NU1IUzRpVENMTis5NjJkSlVRTWZ4Z0FOb0NlMXpDWDVsSzlVOGwvZ0tOcDRM?=
+ =?utf-8?B?YjBXUEoxNW15SnJwVWd5cVpUSXhxUWdKRlZrOXdrdEVYbjNTbDMrVlFvVFRt?=
+ =?utf-8?B?MEpUTllqYklyclVTazlpNkdJSjM5aU9zdGYwTHZwbGI1dTJYTVhRTFJBbnRu?=
+ =?utf-8?B?dlZpNnFnRG9WOGxCS0o0am1DdWN5Vm8yOTQyYVd0VkRuaVpUeG5MYkhRZzUy?=
+ =?utf-8?B?QWNqbEFpQk84VCtDZENXVFY5V3hlUXFpNDZWZDFiRmdyR1k0eFJTMllraEZu?=
+ =?utf-8?B?Nzl4c0toU3llVkNOc21YSG5NYk9Bc0ZXQ1JrWEh3QXdCQXY5WjQyZkNEazU5?=
+ =?utf-8?B?TUMrSU9rMVZhRFErbmsxa1JZK05ZTXlRRjRwWkdpb3JkOXhudGJaVU9uUCtw?=
+ =?utf-8?B?TUU3MzUreVNzUDJLbHF0UXJIeHBKUSs2NUNHeUVYTnFvSUxsdEZQbTliWXZD?=
+ =?utf-8?B?bG5DdW1McUZOR1hvcm42dnYvR3gzTnBIbGlxdFdiaXFUOFFPRFByeFJlcDhv?=
+ =?utf-8?B?aDVLUFJTOXlxanFreFlLTzhBTnhwWmV1eUVwYXg2V0g0YXh6bmJMbWttNWQ1?=
+ =?utf-8?B?TzM5dzI4Y0FnSHJZQWlGZCtOMFNpU1VnZ0RFMkRVcVZ0Yjl1V0xTUlVJcW1h?=
+ =?utf-8?B?NmJTS09FVU95bkwyMjRMb2hFcDlHNCtheThVWTZ3b005TTVmWTYvdVRZNTNs?=
+ =?utf-8?B?RjRhMDd3cjF5SmhmbmpGVGNManNXeU9LZ0JWcE41UlVTenNzTXBsZlhwOTA4?=
+ =?utf-8?B?Ym9Ta2xwVmtYOUVQNzRRYW9GenVwMnVkM2xpaWZ4UDh2R3E2cTlnUU00SkRC?=
+ =?utf-8?B?eWp3d2NiOFFsbXRzdDJVcGpiT2ZRUE1idE9XSEZRMGZINUwvbFhaZmRTWGZU?=
+ =?utf-8?B?aHZFMTBhNlBVbVltL0w4TE15L0ZMMXVjeDYrR1N0SlhzVmpETnNMeU1TZ0hk?=
+ =?utf-8?B?ZGVDamhncXZ0MFdJbEZwZjlvaUJMQmt3WXpnN1JwbEJvcEpZZ3lHM2R6U25U?=
+ =?utf-8?B?SDRLamRBaWUwK2hxc3BCd3hjTmlUNEZCejg0Nk1pVlNkRG4vRUV0UnNBTVJ3?=
+ =?utf-8?B?OEZRTGZmOVR5YVNKWmtXR3ZrNmxId05VZTlYM3pmNy8xcEViNFMxcE1kSFNG?=
+ =?utf-8?B?U0p5ZU9wOWlVSmwvZVZoYndTeVBMWlNtckpGWERCRXl6dTBnSjloTW9oM2FP?=
+ =?utf-8?B?dHM0dG9mbXV3N1h2Vi9XOFdTM2NNWERPUkFLb0xYZXpYbnBpYXJtdloxZ1J3?=
+ =?utf-8?B?emdaSlVqUjZONkI1aHdjN0hndVRtbmoydHNKUzVKci9Nc2R0UWd2RkpzZHpI?=
+ =?utf-8?B?V3QxMDV0UlF6clQwMUlNTTNRUERaVTNUSTV5ZnVkQnd0eDBPa1lJWis5QkRX?=
+ =?utf-8?B?ekRmTjdWU3FRdUlxNEk4V1IyQm81ZXFWcDRmMWFtUEdyMjJaYTJ3aDJGa0Z6?=
+ =?utf-8?B?QitGdXNsWmxDUm5uVmhZc05JeU9BK201Q1Z3cGZMTnBKWlRWYXBEcEZkY1Fo?=
+ =?utf-8?B?dTdSVkxuNkRWdmtCZUI1MjF2Tnd5VEpPeXpLK0ZKVkFucEtMaDZLVTVpYXM2?=
+ =?utf-8?B?ZGFFaFJ3RUhOaVdwMEF6a1dpTkFsZVVsSlR2RnhNS1dHaGdQaUJXM2Y3alBT?=
+ =?utf-8?B?NTBESER4OEdIVjlXYTc5VGl6Z2hueGVtY0tWcS80bTAyMldsOXNFOXZ4WktK?=
+ =?utf-8?B?a3dXUmlNOVlFRGpFVEprVTg5bG5wSGVRcjlnZVVKelRiQ0Vjb0JMaFN1cDlz?=
+ =?utf-8?B?YzRVY05qYXpDNGdDQWpwclRGOFpCbnJicEVBRWNZTU1YRXRTOW1URlYrZ1M2?=
+ =?utf-8?Q?X2uVmQPOQcYatE7T2xmu0BNGhuh/9I=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(376014)(1800799024)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?bVRzVDRnV2JwelRuZzA4OTVpVE5rWkR4bWlIcm14M2hKdDlrQTl2UHdFNDNY?=
+ =?utf-8?B?Z1U4SHlLRnZCM2ZVbWpPa2JTR3hrTkZpLzliTGczbVVFUktzOUhLckZ2TnNL?=
+ =?utf-8?B?Y3pmWUJCOEkxdlJZRExOTUFJWTJwWC9pTUJFMUlZcHBqSGgzMWhSSUtXcmxV?=
+ =?utf-8?B?bmswMjRwSy9iRmlsQytHMzE4SWJOckRxdCtDQzQxVW9kVDBOMmdXVXB1Ny9P?=
+ =?utf-8?B?RnpaL3EzcVlzbVovOStoNUZqNTdZQTM5aTdIYlhReDU3UDZJaTBFZ3FFajNU?=
+ =?utf-8?B?S0JuNkx5eDRlVHUwZzlwRXhGRFRndk52RUVCWm1HY0R2Z1ZoVWE0OGNnblFL?=
+ =?utf-8?B?eUhsb0Q3ZTY2V2ZGbnRESEZQelIybkJJenFXVTdZSThCNUdON3BsZFd3cWRO?=
+ =?utf-8?B?Uy9rSlplajlZNUxod2dpbldUdVRJRUQ3cGl0MFhYUlNLa0szaUpGNXpVMFpW?=
+ =?utf-8?B?MGhyQlc3UTZOc05LY0F4UUlLYnRiLzdPV0d3TUtsanRyWHFwSWdNeDVsVXB0?=
+ =?utf-8?B?bkE2QTJMSVB0anpTeFNmdjlzb2xaeUFqYUJUbGhxSFlVaktTeVpEMUdpSDVp?=
+ =?utf-8?B?bVpWNUluamZNM3FuY2lvdmZoaGN6aFZHN0JhRVVRUmlnVE56dWEwOEVTNUlX?=
+ =?utf-8?B?UU1scWxXVGovVW13T2Y4N1hla1pCKzVMaXlNN2Irai9YNTVYaURhQXZrVFJB?=
+ =?utf-8?B?dGRBK29rR0pvNU0rVXNzSzJ2MGJ3MElweW1MK0dGVzNxNHNHczBiYWYvTHNF?=
+ =?utf-8?B?Q1ZiVGtJL1pUU3NvYkdhRWUxN3RGeW5ROW04aVdoRERjMzdrN1lYTERyT1Ew?=
+ =?utf-8?B?S3ZKZTdQbk1tSVJWSk40eUY1SUdDM0kzZUpEMWUzUmlZT3k3ZHg4NHBEUzQx?=
+ =?utf-8?B?VVhLdHpaN3ZSd3pPb21JMGVwWjE2OFk4RTJyZmxpQ25BNVJLOVkvbnh0aTZI?=
+ =?utf-8?B?MDF2RDRuczJqYlI3aGlrZUFXY3dxY1JBMCt1RXpQa21kRTBhbFdPUTZkTlVq?=
+ =?utf-8?B?ZC84eGp5eUNDRktjS0JoY1U5bHNkejBtNlNZMjUvRERSRTdvRXZ6WStKY2Q0?=
+ =?utf-8?B?cHQzamxyMzJ4ZnAxQUJCemtDT056V0s0dzNwdDNYSkNPNWxDYWFob3VyMzNO?=
+ =?utf-8?B?VXBiN0xTVzhzeGd3cGsxbmJzWWxocDUrcGVnOHpWNXJFSm9sOGdwVEJzanBj?=
+ =?utf-8?B?MGtQK0NxMWVvSXNTc1ZBL0d4WG5qaXM5MDlNTGVSQlhTUEoxTFJ0OVNwYjU1?=
+ =?utf-8?B?MktZdzhBV0xqTU85OXJnQ3RaVXVibnVoVEVOdjJLeUt3TnI5aVR5dTBpa1Ay?=
+ =?utf-8?B?TmRoczV5MXh5RDVzVWVTbHl3Y1dlM1JCVzBhMHVjcUNVUExHeUJ6dXdYN01K?=
+ =?utf-8?B?Tk0yc0RVZFJFck91RVgwSDRLYlFOOUZ3WHVQeHZKQnFSekEwM29LVDhqVXQx?=
+ =?utf-8?B?blBONVBvVHpzNTdZV0s5UVVzeTg0a1ZEZU80cGRFNEFMVDZtaHdURldXQ0Uw?=
+ =?utf-8?B?UTk3SUhpMnBQMXZFR0Z5Qm44NDFHM2VOM2ZVTDR1MmFFLzZlMnpVSEcyUHBU?=
+ =?utf-8?B?ek04QVg3WTlJemZneUJoWUlzSG5na1NWNkM3UUdHeW1TOE53YkNRVUh0MS9u?=
+ =?utf-8?B?QTRUK1JoWEp1TEExcTJNRFZsWjV6Tm8rSW5TMldyUC9CWmtkVUNvR3FvdzRL?=
+ =?utf-8?B?ZHZMSkRxYjRNNWRvS3ZHL0lVV1pRL214ZU93MG1WY3BNNkVBOXpYUDhkbHVm?=
+ =?utf-8?B?N2V0Z1VlR1VqSytBT1hGRkZIK1dNV1NOZkNKUkdKOERqSWZXVC9tMVQ1eTZJ?=
+ =?utf-8?B?RThSMjZBUHN1MGxWaklCMlQrQ00vakpZS0llQkQ3Nk81WjUvaHBOYm5XRlNC?=
+ =?utf-8?B?aWhBdzZRcXg5dHlvWnc2SWEwVkJ2RzFpQXdXbkxOSXlFSVV4ZktMWjhieVVB?=
+ =?utf-8?B?ckZKVVhiaUk0bXBxOS9GVzZLZUdYZnRLWWNHN3Z2U1piS213cFBLak9OOVdo?=
+ =?utf-8?B?dmdKM1FJN3BlMVI4R2FXUlhzSkpZVmtINFdJVEVkRWVGWW1UNFpQN1h5dmVX?=
+ =?utf-8?B?cGlTV1o1U2dGcVl4NkdWci9uUlZOczRnZWNmN2VMK2pMUjdBZVJsYUJON2hR?=
+ =?utf-8?Q?bNrFjzfP1L3uVIBarCQ7gwXLz?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8d2a0630-7662-4474-57fb-08de3c1026d4
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2025 19:28:40.3218
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: fzTWbutaqlnESTrsSPGUIJ/EmdbXUPew9UJFB6K87hh/gqszGrlnKz9QM5nicPTpewD6qEVMPliSjWjhgD44pQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4491
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+On 12/14/2025 3:03 AM, Frank Wunderlich wrote:
+> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
+>
+>
+> From: Mason Chang <mason-cw.chang@mediatek.com>
+>
+> Add definitions for Receive Side Scaling and Large Receive Offload support.
+>
+> Signed-off-by: Mason Chang <mason-cw.chang@mediatek.com>
+> Signed-off-by: Frank Wunderlich <frank-w@public-files.de>
+> ---
+>   drivers/net/ethernet/mediatek/mtk_eth_soc.c | 23 +++++++++++++++
+>   drivers/net/ethernet/mediatek/mtk_eth_soc.h | 32 +++++++++++++++------
+>   2 files changed, 46 insertions(+), 9 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> index e68997a29191..243ff16fd15e 100644
+> --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+> @@ -50,13 +50,18 @@ static const struct mtk_reg_map mtk_reg_map = {
+>                  .rx_ptr         = 0x0900,
+>                  .rx_cnt_cfg     = 0x0904,
+>                  .pcrx_ptr       = 0x0908,
+> +               .lro_ctrl_dw0   = 0x0980,
+>                  .glo_cfg        = 0x0a04,
+>                  .rst_idx        = 0x0a08,
+>                  .delay_irq      = 0x0a0c,
+>                  .irq_status     = 0x0a20,
+>                  .irq_mask       = 0x0a28,
+>                  .adma_rx_dbg0   = 0x0a38,
+> +               .lro_alt_score_delta    = 0x0a4c,
+>                  .int_grp        = 0x0a50,
+> +               .lro_rx1_dly_int        = 0x0a70,
+> +               .lro_ring_dip_dw0       = 0x0b04,
+> +               .lro_ring_ctrl_dw1      = 0x0b28,
+>          },
+>          .qdma = {
+>                  .qtx_cfg        = 0x1800,
+> @@ -113,6 +118,7 @@ static const struct mtk_reg_map mt7986_reg_map = {
+>          .tx_irq_mask            = 0x461c,
+>          .tx_irq_status          = 0x4618,
+>          .pdma = {
+> +               .rss_glo_cfg    = 0x2800,
+>                  .rx_ptr         = 0x4100,
+>                  .rx_cnt_cfg     = 0x4104,
+>                  .pcrx_ptr       = 0x4108,
+> @@ -123,6 +129,12 @@ static const struct mtk_reg_map mt7986_reg_map = {
+>                  .irq_mask       = 0x4228,
+>                  .adma_rx_dbg0   = 0x4238,
+>                  .int_grp        = 0x4250,
+> +               .int_grp3       = 0x422c,
+> +               .lro_ctrl_dw0   = 0x4180,
+> +               .lro_alt_score_delta    = 0x424c,
+> +               .lro_rx1_dly_int        = 0x4270,
+> +               .lro_ring_dip_dw0       = 0x4304,
+> +               .lro_ring_ctrl_dw1      = 0x4328,
+>          },
+>          .qdma = {
+>                  .qtx_cfg        = 0x4400,
+> @@ -170,10 +182,21 @@ static const struct mtk_reg_map mt7988_reg_map = {
+>                  .glo_cfg        = 0x6a04,
+>                  .rst_idx        = 0x6a08,
+>                  .delay_irq      = 0x6a0c,
+> +               .rx_cfg         = 0x6a10,
+>                  .irq_status     = 0x6a20,
+>                  .irq_mask       = 0x6a28,
+>                  .adma_rx_dbg0   = 0x6a38,
+>                  .int_grp        = 0x6a50,
+> +               .int_grp3       = 0x6a58,
+> +               .tx_delay_irq   = 0x6ab0,
+> +               .rx_delay_irq   = 0x6ac0,
+> +               .lro_ctrl_dw0   = 0x6c08,
+> +               .lro_alt_score_delta    = 0x6c1c,
+> +               .lro_ring_dip_dw0       = 0x6c14,
+> +               .lro_ring_ctrl_dw1      = 0x6c38,
+> +               .lro_alt_dbg    = 0x6c40,
+> +               .lro_alt_dbg_data       = 0x6c44,
+> +               .rss_glo_cfg    = 0x7000,
+>          },
+>          .qdma = {
+>                  .qtx_cfg        = 0x4400,
+> diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.h b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
+> index 0168e2fbc619..334625814b97 100644
+> --- a/drivers/net/ethernet/mediatek/mtk_eth_soc.h
+> +++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
+> @@ -1143,16 +1143,30 @@ struct mtk_reg_map {
+>          u32     tx_irq_mask;
+>          u32     tx_irq_status;
+>          struct {
+> -               u32     rx_ptr;         /* rx base pointer */
+> -               u32     rx_cnt_cfg;     /* rx max count configuration */
+> -               u32     pcrx_ptr;       /* rx cpu pointer */
+> -               u32     glo_cfg;        /* global configuration */
+> -               u32     rst_idx;        /* reset index */
+> -               u32     delay_irq;      /* delay interrupt */
+> -               u32     irq_status;     /* interrupt status */
+> -               u32     irq_mask;       /* interrupt mask */
+> +               u32     rx_ptr;                 /* rx base pointer */
+> +               u32     rx_cnt_cfg;             /* rx max count configuration */
+> +               u32     pcrx_ptr;               /* rx cpu pointer */
+> +               u32     pdrx_ptr;               /* rx dma pointer */
+> +               u32     glo_cfg;                /* global configuration */
+> +               u32     rst_idx;                /* reset index */
+> +               u32     rx_cfg;                 /* rx dma configuration */
+> +               u32     delay_irq;              /* delay interrupt */
+> +               u32     irq_status;             /* interrupt status */
+> +               u32     irq_mask;               /* interrupt mask */
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+Small nit - is the comment alignment really necessary?
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Thanks,
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+Brett
+>                  u32     adma_rx_dbg0;
+> -               u32     int_grp;
+> +               u32     int_grp;                /* interrupt group1 */
+> +               u32     int_grp3;               /* interrupt group3 */
+> +               u32     tx_delay_irq;           /* tx delay interrupt */
+> +               u32     rx_delay_irq;           /* rx delay interrupt */
+> +               u32     lro_ctrl_dw0;           /* lro ctrl dword0 */
+> +               u32     lro_alt_score_delta;    /* lro auto-learn score delta */
+> +               u32     lro_rx1_dly_int;        /* lro rx ring1 delay interrupt */
+> +               u32     lro_ring_dip_dw0;       /* lro ring dip dword0 */
+> +               u32     lro_ring_ctrl_dw1;      /* lro ring ctrl dword1 */
+> +               u32     lro_alt_dbg;            /* lro auto-learn debug */
+> +               u32     lro_alt_dbg_data;       /* lro auto-learn debug data */
+> +               u32     rss_glo_cfg;            /* rss global configuration */
+> +
+>          } pdma;
+>          struct {
+>                  u32     qtx_cfg;        /* tx queue configuration */
+> --
+> 2.43.0
+>
+>
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
