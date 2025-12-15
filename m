@@ -1,183 +1,148 @@
-Return-Path: <netdev+bounces-244704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C15CCBD5D5
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 11:27:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7729DCBD5DB
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 11:30:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A7C01300D022
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 10:27:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 00C0D30115CB
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 10:30:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 917A0329384;
-	Mon, 15 Dec 2025 10:27:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE0252E0938;
+	Mon, 15 Dec 2025 10:30:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uzU6N05p"
 X-Original-To: netdev@vger.kernel.org
-Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F7A31AF25
-	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 10:27:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.136.29.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B747522D4C3
+	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 10:30:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765794430; cv=none; b=LcGMeKzuC41tSp0e9nL+neTEDl1IZDJU7EwnzYJpMRWM1IaqNn7EMe9t72uS6n2uNrwxoEDa8q0xc5URr/7wRyRBuqCoHO45IRG8NosXn6L4J9q19y45SKAl/A0k6ZmbS3+/XscPxS+hSJy/Y+2oVtCCG9ipHszvDd9MWgPcqUc=
+	t=1765794654; cv=none; b=ImqOADl8yT0NAcguJ5QPSJiV9LEv/NEzTEb/4aI7Uc/s20doj0K+T2L94DWoRgdStWKMOvDntbwpiLPiZfSIXtLQkl9gVJ5GIInm8SpE6wW1j/PYQqcVrp2OSflT1xlXlpcYjH2HmCwxPyJhckdp5lg77XMwCP2xWbEcLUafQ7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765794430; c=relaxed/simple;
-	bh=XkzgWCV1z6KAGTIBt7YKzssf0oXhR5s1z9G5ZoRUG0k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=juqLvPxZCPn1s/jctupcEqm0/4hE65H4MjDtLZACBTezRnXnPHP/EyMNs5rtOQ8Ti+AdBD8IYjZaMMlX0bjTf89jHX6PvlJiFqsatUfSDTQGH36ESUdy74BQ4AGmIFJpV2qM7tlWAP0Qkm0vBzGvR3qEIPmlHzWHpou6VEbXEH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com; spf=pass smtp.mailfrom=proxmox.com; arc=none smtp.client-ip=94.136.29.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proxmox.com
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
-	by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 30D4449459;
-	Mon, 15 Dec 2025 11:19:51 +0100 (CET)
-Message-ID: <cd44c0d2-17ed-460d-9f89-759987d423dc@proxmox.com>
-Date: Mon, 15 Dec 2025 11:19:49 +0100
+	s=arc-20240116; t=1765794654; c=relaxed/simple;
+	bh=lJbEumrw1RnGbVillJylf+DruSz2R9MFbavbJPGtHzM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=E63uwslX2B2TlwZEVLeMtgbe1b4lb0BbysiCM0TaZEW04Ldmd2ckbR8RFfpm6oMP8SSGTnRI5UNP9+7FggU5JOCnZS53xGqLtejLOlc/c2oquT22NSntMUJisZ4OfiZsSTPei7h9h8+aftmhfzzdCG1DS5JQ6bCtSzJFB4BBFtg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uzU6N05p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A557C19424
+	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 10:30:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765794654;
+	bh=lJbEumrw1RnGbVillJylf+DruSz2R9MFbavbJPGtHzM=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=uzU6N05pS6b1GdEt7Dy2QiDpafrteyxiaMjfFf3YXNp+psH1WL0idFhGlJ14s3l4s
+	 VPlTSq90z7wkqBOtLeH7BcpK213acZHIpwf+PBi23bFvWWWHkH+ykipNDCL5UXLpsV
+	 /mimMGSmzYv1cKmGaAZ2+cqdymTW1OGAQIJ8cW0UbE/YKBaRkc4JLitGdWSNpjPs+V
+	 ohj5GXYfrDVW5ODJyU9yS6sXYbobju0icB+nHYE8OgtloiuMVeEgKlKwUQo5CSm5X0
+	 pzHzHwkOYrUx78Jmxm50ofZVwGPj5rvWCtknqwKLHvwdJjmchmy4cGsGBqYHQlFhjV
+	 brixSc/JB9Cng==
+Received: by mail-oo1-f54.google.com with SMTP id 006d021491bc7-657a6028fbbso1812048eaf.3
+        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 02:30:54 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXNEiDcMIFTQk3lS8Dv2abwcsnoGGZD2ZpTd4k8UU1hXMSR8l+UDJZkQLxEy4mTVgxzAX32+os=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzafgHsXK8GCBAZRfcQB4WbyPBnCMtR5BK2ywU9Xjqipe6VaFWy
+	vORsHlg3Q8Ma/WI3Uw9UwBHerM5314RwHpQj0Eni53BnYlKqM9NkqQxoke3mjXMiKtNpE9jjLR6
+	W+OvSoFknV1ANTJNV3WZkHEEERNlQ7t0=
+X-Google-Smtp-Source: AGHT+IEoBpCjoSps8D+YgdCDShE9GQ0VNljBKFeTmfnEM6ZQwgOcZKzgv9BvCfPOUEqlcRH85eHG+nMTVNwYGJwcvSg=
+X-Received: by 2002:a05:6820:1b05:b0:659:9a49:8ebf with SMTP id
+ 006d021491bc7-65b45280c29mr5558461eaf.67.1765794653666; Mon, 15 Dec 2025
+ 02:30:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 7/8] tcp: stronger sk_rcvbuf checks
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
- Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org,
- eric.dumazet@gmail.com
-References: <20250711114006.480026-1-edumazet@google.com>
- <20250711114006.480026-8-edumazet@google.com>
-Content-Language: en-US, de-DE
-From: Christian Ebner <c.ebner@proxmox.com>
-In-Reply-To: <20250711114006.480026-8-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Bm-Milter-Handled: 55990f41-d878-4baa-be0a-ee34c49e34d2
-X-Bm-Transport-Timestamp: 1765793983261
+References: <CAD4GDZy-aeWsiY=-ATr+Y4PzhMX71DFd_mmdMk4rxn3YG8U5GA@mail.gmail.com>
+ <081e0ba7-055c-4243-8b39-e2c0cb9a8c5a@lunn.ch> <4bb1ea43-ef52-47ae-8009-6a2944dbf92b@igalia.com>
+ <bb7871f1-3ea7-4bf7-baa9-a306a2371e4b@lunn.ch> <c65961d2-d31b-4ff9-ac1c-b5e3c06a46ba@igalia.com>
+In-Reply-To: <c65961d2-d31b-4ff9-ac1c-b5e3c06a46ba@igalia.com>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Mon, 15 Dec 2025 11:30:41 +0100
+X-Gmail-Original-Message-ID: <CAJZ5v0iX39rvdaoha18N-rpKLinGZ1cjTb1rV1Azh0Y7kYdaJQ@mail.gmail.com>
+X-Gm-Features: AQt7F2oqYG9Tt0dNzgC-8tRKT4CJtDwCvddIJZFUdGN8qw17Y5dsEOJ6fuuZZGg
+Message-ID: <CAJZ5v0iX39rvdaoha18N-rpKLinGZ1cjTb1rV1Azh0Y7kYdaJQ@mail.gmail.com>
+Subject: Re: Concerns with em.yaml YNL spec
+To: Changwoo Min <changwoo@igalia.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Donald Hunter <donald.hunter@gmail.com>, 
+	Lukasz Luba <lukasz.luba@arm.com>, linux-pm@vger.kernel.org, sched-ext@lists.linux.dev, 
+	Jakub Kicinski <kuba@kernel.org>, Network Development <netdev@vger.kernel.org>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Mon, Dec 15, 2025 at 2:57=E2=80=AFAM Changwoo Min <changwoo@igalia.com> =
+wrote:
+>
+> Hi  Andrew,
+>
+> On 12/15/25 01:21, Andrew Lunn wrote:
+> >>> We also need to watch out for other meaning of these letters. In the
+> >>> context of networking and Power over Ethernet, PD means Powered
+> >>> Device. We generally don't need to enumerate the PD, we are more
+> >>> interested in the Power Sourcing Equipment, PSE.
+> >>>
+> >>> And a dumb question. What is an energy model? A PSE needs some level
+> >>> of energy model, it needs to know how much energy each PD can consume
+> >>> in order that it is not oversubscribed.Is the energy model generic
+> >>> enough that it could be used for this? Or should this energy model ge=
+t
+> >>> a prefix to limit its scope to a performance domain? The suggested
+> >>> name of this file would then become something like
+> >>> performance-domain-energy-model.yml?
+> >>>
+> >>
+> >> Lukasz might be the right person for this question. In my view, the
+> >> energy model essentially provides the performance-versus-power-
+> >> consumption curve for each performance domain.
+> >
+> > The problem here is, you are too narrowly focused. My introduction
+> > said:
+> >
+> >>> In the context of networking and Power over Ethernet, PD means
+> >>> Powered Device.
+> >
+> > You have not given any context. Reading the rest of your email, it
+> > sounds like you are talking about the energy model/performance domain
+> > for a collection of CPU cores?
+> >
+> > Now think about Linux as a whole, not the little corner you are
+> > interested in. Are there energy models anywhere else in Linux? What
+> > about the GPU cores? What about Linux regulators controlling power to
+> > peripherals? I pointed out the use case of Power over Ethernet needing
+> > an energy model.
+> >
+> >> Conceptually, the energy model covers the system-wide information; a
+> >> performance domain is information about one domain (e.g., big/medium/
+> >> little CPU blocks), so it is under the energy model; a performance sta=
+te
+> >> is one dot in the performance-versus-power-consumption curve of a
+> >> performance domain.
+> >>
+> >> Since the energy model covers the system-wide information, energy-
+> >> model.yaml (as Donald suggested) sounds better to me.
+> >
+> > By system-wide, do you mean the whole of Linux? I could use it for
+> > GPUs, regulators, PoE? Is it sufficiently generic? I somehow doubt it
+> > is. So i think you need some sort of prefix to indicate the domain it
+> > is applicable to. We can then add GPU energy models, PoE energy
+> > models, etc by the side without getting into naming issues.
+> >
+>
+> This is really the question for the energy model maintainers. In my
+> understanding, the energy model can cover any device in the system,
+> including GPUs.
 
-some of our users (Proxmox Backup Server) are seeing issues with slow
-and stale backups on kernel versions 6.17 and 6.18, especially in
-combination with MTU 9000. The issue persists also with the mainline
-kernel v6.18. Backups are running over a single TCP connection using
-HTTP/2 based protocol, the stall affects only the single TCP connection
-while the rest of the network is unaffected. Also, other network
-traffic does not reproduce the issue so far.
+That's correct.
 
-When reverting to older kernel versions the issue disappears [0].
-Unfortunately the stale connections are not easily reproduced.
+> But, in my limited experience, I haven=E2=80=99t seen such cases beyond C=
+PUs.
+>
+> @Lukasz =E2=80=94 What do you think? The focus here is on the scope of th=
+e
+> =E2=80=9Cenergy model=E2=80=9D and its proper naming in the NETLINK.
 
-In an effort to identify the issue, bisection lead us and independently
-an affected user [1] to this commit:
-
-"1d2fbaad: tcp: stronger sk_rcvbuf checks"
-
-Taking note that there were several patches with bugfixes and
-additional adaptions, we are reaching out in order to ask for guidance
-on how to best debug this issue further, given that it persists also
-with the latest stable kernel.
-
-What outputs could we provide to narrow down the possible root cause
-of the stale TCP connections?
-
-Output from `ss` and `nstat` gathered during 2 stale connections as
-provided by an affected user [2]:
-```
-State                                           Recv-Q 
-                          Send-Q 
-                                                      Local Address:Port 
-  
-                        Peer Address:Port 
-  
-  
-  
-
-ESTAB                                           0 
-                          0 
-                                               [::ffff:10.x.y.a]:8007 
-  
-             [::ffff:10.x.y.c]:48288
-          cubic wscale:7,10 rto:207 rtt:6.582/11.374 ato:40 mss:8948 
-pmtu:9000 rcvmss:3072 advmss:8948 cwnd:10 ssthresh:16 bytes_sent:1084107 
-bytes_retrans:123 bytes_acked:1083984 bytes_received:3703857790 
-segs_out:317478 segs_in:315112 data_segs_out:2343 data_segs_in:314619 
-send 109Mbps lastsnd:423225 lastrcv:76 lastack:76 pacing_rate 131Mbps 
-delivery_rate 3.33Gbps delivered:2344 app_limited busy:3592ms 
-retrans:0/1 dsack_dups:1 rcv_rtt:207.33 rcv_space:146392 
-rcv_ssthresh:592739 minrtt:0.044 rcv_ooopack:890 snd_wnd:1065728 
-rcv_wnd:3072
-ESTAB                                           0 
-                          0 
-                                               [::ffff:10.x.y.a]:8007 
-  
-             [::ffff:10.x.y.b]:46712
-          cubic wscale:10,10 rto:201 rtt:0.333/0.496 ato:40 mss:8948 
-pmtu:9000 rcvmss:4096 advmss:8948 cwnd:10 bytes_sent:861063 
-bytes_acked:861063 bytes_received:181206715 segs_out:17834 segs_in:17552 
-data_segs_out:382 data_segs_in:17280 send 2.15Gbps lastsnd:53439 
-lastrcv:191 lastack:191 pacing_rate 4.29Gbps delivery_rate 2.95Gbps 
-delivered:383 app_limited busy:405ms rcv_rtt:207.33 rcv_space:95745 
-rcv_ssthresh:246825 minrtt:0.04 rcv_ooopack:75 snd_wnd:193536 rcv_wnd:4096
-```
-
-```
-#kernel
-IpInReceives                    18674              0.0
-IpInDelivers                    18672              0.0
-IpOutRequests                   21147              0.0
-IpOutTransmits                  21147              0.0
-TcpActiveOpens                  806                0.0
-TcpPassiveOpens                 1052               0.0
-TcpAttemptFails                 280                0.0
-TcpInSegs                       18607              0.0
-TcpOutSegs                      22190              0.0
-TcpRetransSegs                  40                 0.0
-TcpOutRsts                      280                0.0
-UdpInDatagrams                  10                 0.0
-UdpOutDatagrams                 31                 0.0
-UdpIgnoredMulti                 17                 0.0
-Ip6InReceives                   37                 0.0
-Ip6InDiscards                   37                 0.0
-Ip6InOctets                     2664               0.0
-TcpExtTW                        526                0.0
-TcpExtTWRecycled                2                  0.0
-TcpExtDelayedACKs               19                 0.0
-TcpExtDelayedACKLost            1                  0.0
-TcpExtTCPHPHits                 1065               0.0
-TcpExtTCPPureAcks               2901               0.0
-TcpExtTCPHPAcks                 2010               0.0
-TcpExtTCPSackRecovery           6                  0.0
-TcpExtTCPSACKReorder            2                  0.0
-TcpExtTCPLostRetransmit         2                  0.0
-TcpExtTCPFastRetrans            40                 0.0
-TcpExtTCPBacklogCoalesce        4                  0.0
-TcpExtTCPDSACKOldSent           1                  0.0
-TcpExtTCPSackShifted            5                  0.0
-TcpExtTCPSackMerged             16                 0.0
-TcpExtTCPSackShiftFallback      13                 0.0
-TcpExtTCPRcvCoalesce            65                 0.0
-TcpExtTCPAutoCorking            77                 0.0
-TcpExtTCPFromZeroWindowAdv      2946               0.0
-TcpExtTCPToZeroWindowAdv        248                0.0
-TcpExtTCPOrigDataSent           8414               0.0
-TcpExtTCPDelivered              7886               0.0
-IpExtInMcastPkts                38                 0.0
-IpExtInBcastPkts                17                 0.0
-IpExtInOctets                   22147530           0.0
-IpExtOutOctets                  16300295           0.0
-IpExtInMcastOctets              1216               0.0
-IpExtInBcastOctets              2755               0.0
-IpExtInNoECTPkts                18663              0.0
-IpExtInECT0Pkts                 11                 0.0
-```
-
-[0] https://forum.proxmox.com/threads/176444/
-[1] https://forum.proxmox.com/threads/176444/post-824615
-[2] https://forum.proxmox.com/threads/176444/post-824407
-
-Best regards,
-Christian Ebner
-
+I think you need to frame your question more specifically.
 
