@@ -1,60 +1,101 @@
-Return-Path: <netdev+bounces-244759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91B83CBE70A
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 15:58:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1F0DCBE324
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 15:10:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5456730146C7
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 14:56:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7EB213010AB0
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 14:09:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28B60311955;
-	Mon, 15 Dec 2025 14:03:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AD452DFA2F;
+	Mon, 15 Dec 2025 14:09:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Eqn+25td"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="mY6XLWLm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05CC3115B8;
-	Mon, 15 Dec 2025 14:03:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65E6C334681
+	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 14:09:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765807414; cv=none; b=C0Yc6DtXrq1OY13gdArrLXhD/LyOCrfPqzy+25E2YFPnd9keg760UxG2oLMAgeEg7vMjAajl9S5IC0fYq+FyByVf91lnIBfrOPTk4w67czR1ESHY8+zEkKUMmwX55O3mpgPyT5TQEq5vnXiP1HnGv9tUmGZSyT9u2XidDrgiio8=
+	t=1765807787; cv=none; b=XyoQxKMPSZhXsu/abuK80yf9zv7RPr186d9eQ0PJWnDmPFcv7PsI6AZcst3WfnwxUs3pAAXc8FTBBku+z/jFxLbkIel4+wz8mseEJvV36wVchTKmJmKs+3ijdSHurEjq25dkFEgt8xDmYYy1Mapw6n29Rv++rYmRv0Rsa3flIBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765807414; c=relaxed/simple;
-	bh=rFQyuWHfFcZlHMejIvhAa1DF/jOp6uqvkdWv/+Mb6s0=;
+	s=arc-20240116; t=1765807787; c=relaxed/simple;
+	bh=a5hF4QBR+ZhlAFZc1a4Tnj7bIyil6UNwxw/cBS7TTfk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kLNgK1O6EMlTyrlM5g1XZ91+ZiAcu8UAX9G5edktL1JvQso6/LMUhk6ycz9jUU7J5MY8X8EWgqS0G5/u8ppTZFKb4f/0+X2VdeojThwBNgsFpSZXsX931MD2IeBekcIl/uJ5qEJSo7eKx3p1/mMgIhQjULc8hgawcNJ6/z6ZyJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Eqn+25td; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36D12C4CEF5;
-	Mon, 15 Dec 2025 14:03:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765807413;
-	bh=rFQyuWHfFcZlHMejIvhAa1DF/jOp6uqvkdWv/+Mb6s0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Eqn+25tdHr5Wrrm3Xn8rbqWT7Cdod3hLETZm9Xr8ldxluc3aeOueqyGp5QHgBo4tp
-	 iudPuSduvdNkGWl9ZP4unZ071ajNA3y3RN1diT0GzQ7znJNaCUVfgYZ/jV/o2TkeRc
-	 H2gILEXItKx0IUuWaJk8gz1hQCIzU7AVCWete254A0km3zdQsa4prIUvq0ORAxN7vx
-	 xCHXokOZ0NAXxXlMvyrHR44hS2RFx5BNaATueokHHaVsn99rtLIqrTURa0g8jjIhCL
-	 YTUS3rgQzHofTHnfi7usX+RYStx+7nMXDKAWYeRn8cHAmDOoiJxHkhdH6349TudcnB
-	 4xXdwcFnQQZpA==
-Date: Mon, 15 Dec 2025 08:03:30 -0600
-From: Rob Herring <robh@kernel.org>
-To: Stefan Eichenberger <eichest@gmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, krzk+dt@kernel.org,
-	conor+dt@kernel.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	geert+renesas@glider.be, ben.dooks@codethink.co.uk,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, francesco.dolcini@toradex.com,
-	rafael.beims@toradex.com,
-	Stefan Eichenberger <stefan.eichenberger@toradex.com>
-Subject: Re: [PATCH net-next v1 2/3] dt-bindings: net: micrel: Add
- keep-preamble-before-sfd
-Message-ID: <20251215140330.GA2360845-robh@kernel.org>
-References: <20251212084657.29239-1-eichest@gmail.com>
- <20251212084657.29239-3-eichest@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=oTb9eOcAV0DUIPC95W8wZUg4hQiNy49yheTVeoDvH7prJTnaIm9FGziwUoyMeCVfFci+y8Ig5in8z/Kx3f4Gx4XXgBQLSm+LPDRAn2M1FkXfUIsghAFAOTcyC19FN/ZgCapZ34SOEOy9tONXwnVWR0o+By6r30b1NnVZc8q62/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=mY6XLWLm; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4775ae77516so42059545e9.1
+        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 06:09:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1765807783; x=1766412583; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oc/35n7eOAP8pFt55syhr1wbpjAJtoSwVCMNoOaa6ls=;
+        b=mY6XLWLmOjwPh1HcltXU1I9yEOOx9shXwvGhp+uyoBeTLT+o2P5RjrZDvhyvgKG7v1
+         EfznDC0/REn7YEd/VKbtaJHjA8NNGnClDuoB8OALi/9G0LvmgkSwt6fCiySrtsO1a680
+         D3nJ8w1vqwobT/CzvnFNhllqb5fWu2nSKKBDcWud5Hj3EW4c3wj4bpNNk9leudWTRmGj
+         aJR+WS5Xb9jtj36uSurGgInmn03tAsd5TL5KfvaV12Ap6Xtso2/KFIxz5GcS5UWW4yUu
+         +j/9Ci0j/xPGYaZ21xH85e7LhPQnlXtTJ2QcbHiBHfGMCpvb53LRgbBCtn7verGqP9jf
+         yj2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765807783; x=1766412583;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oc/35n7eOAP8pFt55syhr1wbpjAJtoSwVCMNoOaa6ls=;
+        b=aj11ptWA+eGBSuCxHf+/CN4jTHucDut30xMBkd4A2ipuKJWdmbQ3ItI4AvKP6eH8Wm
+         a3orYXta5lcuDu0v6mHV+oU9YUhVtSZ/yFGdTH+/G6C4YE/MKAZxYMmzIFWNuV3HmGfZ
+         JQgbU7LBZD/5glDr6rv31mhvKOOE8LbnzOl7xP4n5xFjCW84jH5N3tgwEvNW4kdPD4GA
+         7QvaJ/t2ZpZmuo+Y/To+/WbH40Ca8Tb+KvZoi3K/3F38RY7AVL8aOic+oNq/EDShNZIR
+         vMhhLcz/gkoRU2TRA+ry/LYYktM3vwFVUYSsTfoUH5akhnUhptJ0XWZHte0+Ur+uXJTD
+         vUNg==
+X-Gm-Message-State: AOJu0YxoMqISHoYuytXpZrSwBMNjbhYJIlgDP3i0JOHC4o+15wSsHpym
+	148MOGNa0lrXbSQxUICzrJoSFE68YgPBNj1I5FjGJW9iBFsK1uNzzRqYP69lYVDtYOc=
+X-Gm-Gg: AY/fxX5HSPae8JNHePqeej65g2PQZvI1obE+NfP50RjL0EuDf6vPdM87UYFr0z8Uv58
+	ksSF8Bw7bTldGeskRi/ZKSheUfBUtE+cyZOoWaqYE33OT0jzd4wrwcA0YFgpm6LeVAimz6cpIkv
+	Qx18EHKP20eB8eQt0RQCsfU/KprH4jFHCjT+AwI8IhvjfaXa9cN81QRopK7byZSpQKkxLyWMoKi
+	EMNYnEDt6Cebxecb26e9hcbEUiSLfI22/9LaiFFWtX8xd1FRCBXWyaatGUu7KamQlSSLsn5DSFb
+	emdepcGdFD6Zkdr4Vzg+nDSoadvovvBRBXmAuEqILd7ZUmVuksCWJwhEfUxcjzhM1JWP+LFAHMN
+	DiAM4V/OAz38IcJBbva5jBggFUq8mB/uj5DBbjHYmdOgTnzHqcMc5tUBCWbYSk+AssErGNNTg7z
+	gPU+B3I3DWLzYbqNwAXfJmAUY=
+X-Google-Smtp-Source: AGHT+IFJ7XhIHXbaOzx1TEAlEfyUnyEwSWzsivaISUhktsBUoRVHQJCmyr0qoXUugUvu/YlkS2NEog==
+X-Received: by 2002:a05:600c:3e85:b0:477:9d54:58d7 with SMTP id 5b1f17b1804b1-47a8f90cffemr109935815e9.29.1765807782193;
+        Mon, 15 Dec 2025 06:09:42 -0800 (PST)
+Received: from FV6GYCPJ69 ([140.209.217.211])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47a8f74b17bsm192749655e9.2.2025.12.15.06.09.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Dec 2025 06:09:41 -0800 (PST)
+Date: Mon, 15 Dec 2025 15:09:37 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>, Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, 
+	Grzegorz Nitka <grzegorz.nitka@intel.com>, Petr Oros <poros@redhat.com>, 
+	Michal Schmidt <mschmidt@redhat.com>, Prathosh Satish <Prathosh.Satish@microchip.com>, 
+	Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
+	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
+	Richard Cochran <richardcochran@gmail.com>, Jonathan Lemon <jonathan.lemon@gmail.com>, 
+	Simon Horman <horms@kernel.org>, Alexander Lobakin <aleksander.lobakin@intel.com>, 
+	Willem de Bruijn <willemb@google.com>, Stefan Wahren <wahrenst@gmx.net>, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH RFC net-next 02/13] dpll: Allow registering pin with
+ firmware node
+Message-ID: <dssuif6sbx7zp6pkk6divo4qceyopcq4rijkvqu7wmtqegucnd@etq3m2vvolo4>
+References: <20251211194756.234043-1-ivecera@redhat.com>
+ <20251211194756.234043-3-ivecera@redhat.com>
+ <ahyyksqki6bas5rqngd735k4fmoeaj7l2a7lazm43ky3lj6ero@567g2ijcpekp>
+ <3E2869EC-61B3-40DA-98E2-CD9543424468@redhat.com>
+ <tawd6udewifjeoymxkfkapxgcgfviixb4zgcjnplycigk5ffws@rdymwt2hknsl>
+ <eee9be12-603d-4e8e-92f8-e76728974313@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,34 +104,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251212084657.29239-3-eichest@gmail.com>
+In-Reply-To: <eee9be12-603d-4e8e-92f8-e76728974313@redhat.com>
 
-On Fri, Dec 12, 2025 at 09:46:17AM +0100, Stefan Eichenberger wrote:
-> From: Stefan Eichenberger <stefan.eichenberger@toradex.com>
-> 
-> Add a property to activate a Micrel PHY feature that keeps the preamble
-> enabled before the SFD (Start Frame Delimiter) is transmitted.
-> 
-> This allows to workaround broken Ethernet controllers as found on the
-> NXP i.MX8MP. Specifically, errata ERR050694 that states:
-> ENET_QOS: MAC incorrectly discards the received packets when Preamble
-> Byte does not precede SFD or SMD.
+Mon, Dec 15, 2025 at 02:51:36PM +0100, ivecera@redhat.com wrote:
+>On 12/15/25 2:08 PM, Jiri Pirko wrote:
+>> Sun, Dec 14, 2025 at 08:35:01PM +0100, ivecera@redhat.com wrote:
+>> > 
+>> > 
+>> > On December 12, 2025 12:25:12 PM GMT+01:00, Jiri Pirko <jiri@resnulli.us> wrote:
+>> > > Thu, Dec 11, 2025 at 08:47:45PM +0100, ivecera@redhat.com wrote:
+>> > > 
+>> > > [..]
+>> > > 
+>> > > > @@ -559,7 +563,8 @@ EXPORT_SYMBOL(dpll_netdev_pin_clear);
+>> > > >   */
+>> > > > struct dpll_pin *
+>> > > > dpll_pin_get(u64 clock_id, u32 pin_idx, struct module *module,
+>> > > > -	     const struct dpll_pin_properties *prop)
+>> > > > +	     const struct dpll_pin_properties *prop,
+>> > > > +	     struct fwnode_handle *fwnode)
+>> > > > {
+>> > > > 	struct dpll_pin *pos, *ret = NULL;
+>> > > > 	unsigned long i;
+>> > > > @@ -568,14 +573,15 @@ dpll_pin_get(u64 clock_id, u32 pin_idx, struct module *module,
+>> > > > 	xa_for_each(&dpll_pin_xa, i, pos) {
+>> > > > 		if (pos->clock_id == clock_id &&
+>> > > > 		    pos->pin_idx == pin_idx &&
+>> > > > -		    pos->module == module) {
+>> > > > +		    pos->module == module &&
+>> > > > +		    pos->fwnode == fwnode) {
+>> > > 
+>> > > Is fwnode part of the key? Doesn't look to me like that. Then you can
+>> > > have a simple helper to set fwnode on struct dpll_pin *, and leave
+>> > > dpll_pin_get() out of this, no?
+>> > 
+>> > IMHO yes, because particular fwnode identifies exact dpll pin, so
+>> > I think it should be a part of the key.
+>> 
+>> The key items serve for userspace identification purposes as well. For
+>> that, fwnode is non-sense.
+>> fwnode identifies exact pin, that is nice. But is it the only
+>> differentiator among other key items? I don't expect so.
+>
+>From this point of view, not. I will not touch dpll_pin_get() and rather
+>use new helper like dpll_pin_fwnode_set(), ok?
 
-It doesn't really work right if you have to change the DT to work-around 
-a quirk in the kernel. You should have all the information needed 
-already in the DT. The compatible string for the i.MX8MP ethernet 
-controller is not sufficient? 
+Yes please. Thanks!
 
-> 
-> The bit which disables this feature is not documented in the datasheet
-> from Micrel, but has been found by NXP and Micrel following this
-> discussion:
-> https://community.nxp.com/t5/i-MX-Processors/iMX8MP-eqos-not-working-for-10base-t/m-p/2151032
-> 
-> It has been tested on Verdin iMX8MP from Toradex by forcing the PHY to
-> 10MBit. Withouth this property set, no packets are received. With this
-> property set, reception works fine.
 
-What's the impact of just unconditionally setting this bit? Seems like 
-any impact would be minimal given 10MBit is probably pretty rare now.
+>
+>Thanks,
+>Ivan
+>
 
