@@ -1,29 +1,29 @@
-Return-Path: <netdev+bounces-244654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C25D2CBC214
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 01:11:35 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AEB8CBC21F
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 01:12:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 95E3F300442B
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 00:11:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9DE0730084C7
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 00:11:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A350BEED8;
-	Mon, 15 Dec 2025 00:11:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5728A1C862F;
+	Mon, 15 Dec 2025 00:11:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEBFE1FB1;
-	Mon, 15 Dec 2025 00:11:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AED814BF92;
+	Mon, 15 Dec 2025 00:11:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765757492; cv=none; b=J7HnFpaxCcLIPVEYZEEZdpii9BKUmgxeUpAQBxWJkd7N4ah7r5Ecn+RhNC1bGv45t6x0IVYuCd8mT6vPcbpy+Zerxm0JyadTfRtXi8wj/NMRpl4JWOco6n37R0EvfqFNlEDBZZprJwyp+kzkzaP6fMLCK1E87+KV0qJGG7a93Gs=
+	t=1765757514; cv=none; b=Iz2xXANbcsAL+5SJgoRat3Pu8kVg3WnVdBjifLlktfEbmCjUCx1MXXjTPuzCMpksbsbbivOEUo8/ArkK5N2fMSJ+nu1eFWN5lUekHDf+B+rq97MTLPW0LnqlYLHn10CHBJ5OgA9V9ZegyuTvex7XoyEBMRdJHxPvfn7yNtqE9/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765757492; c=relaxed/simple;
-	bh=hIyISU9h3K08ZadbsG/uLIEceNWeHbr8DXu5kD6ZMD8=;
+	s=arc-20240116; t=1765757514; c=relaxed/simple;
+	bh=eohVNmcf5VNm1EKn5VzsKZDxZQtlxJv6MfySzJid1ps=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PCr4E5C+GLm5ncmrQxgcvpUog1AckhcTWWpBekzg/ezMU1uOKZPZRBEL7DI51oCmD9iZQtTNItGdY48QSBGXEynYttUXTe5ZCBAa+KDPXiv5cfCeDYbhEz0rRHWQzisZD5fqnX0olUvkJB20TLXvK47lGrb+MehXUpCEI1Yv+RM=
+	 Content-Type:Content-Disposition:In-Reply-To; b=c0W8dEWUosbyqugcKBzoXWwHWj2GVTDp+rcr5mvvREeaNEiucygoBxnw5HgNSiPTnBYvxq31lrXjsyvlfqoTgE1kkgkUbe47tMQJnegcZbEWZye97i8SbYycs88owNf6DyXg5taWNi3ig1M9gIxdmHlXFbLaaH9lW3UVirPU8Lc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -31,9 +31,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.99)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1vUwBS-000000002Ih-0Suc;
-	Mon, 15 Dec 2025 00:11:26 +0000
-Date: Mon, 15 Dec 2025 00:11:22 +0000
+	id 1vUwBm-000000002JC-3W5h;
+	Mon, 15 Dec 2025 00:11:46 +0000
+Date: Mon, 15 Dec 2025 00:11:43 +0000
 From: Daniel Golle <daniel@makrotopia.org>
 To: Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -56,9 +56,9 @@ Cc: Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
 	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
 	"Livia M. Rosu" <lrosu@maxlinear.com>,
 	John Crispin <john@phrozen.org>
-Subject: [PATCH RFC net-next v3 1/4] dt-bindings: net: dsa: add bindings for
- MaxLinear MxL862xx
-Message-ID: <cf190e3a4192f38eecba260cd2775b660874746e.1765757027.git.daniel@makrotopia.org>
+Subject: [PATCH RFC net-next v3 2/4] net: dsa: add tag formats for MxL862xx
+ switches
+Message-ID: <de01f08a3c99921d439bc15eeafd94e759688554.1765757027.git.daniel@makrotopia.org>
 References: <cover.1765757027.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -70,204 +70,205 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1765757027.git.daniel@makrotopia.org>
 
-Add documentation and an example for MaxLinear MxL86282 and MxL86252
-switches.
+Add proprietary special tag format for the MaxLinear MXL862xx family of
+switches. While using the same Ethertype as MaxLinear's GSW1xx swtiches,
+the actual tag format differs significantly, hence we need a dedicated
+tag driver for that.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
 RFC v3: no changes
-RFC v2: better description in dt-bindings doc
+RFC v2: make sure all tag fields are initialized
 
- .../bindings/net/dsa/maxlinear,mxl862xx.yaml  | 162 ++++++++++++++++++
- MAINTAINERS                                   |   6 +
- 2 files changed, 168 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/dsa/maxlinear,mxl862xx.yaml
+ MAINTAINERS            |   1 +
+ include/net/dsa.h      |   2 +
+ net/dsa/Kconfig        |   7 +++
+ net/dsa/Makefile       |   1 +
+ net/dsa/tag_mxl862xx.c | 113 +++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 124 insertions(+)
+ create mode 100644 net/dsa/tag_mxl862xx.c
 
-diff --git a/Documentation/devicetree/bindings/net/dsa/maxlinear,mxl862xx.yaml b/Documentation/devicetree/bindings/net/dsa/maxlinear,mxl862xx.yaml
-new file mode 100644
-index 0000000000000..159b64d5474b4
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/dsa/maxlinear,mxl862xx.yaml
-@@ -0,0 +1,162 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/dsa/maxlinear,mxl862xx.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: MaxLinear MxL862xx Ethernet Switch Family
-+
-+maintainers:
-+  - Daniel Golle <daniel@makrotopia.org>
-+
-+description:
-+  The MaxLinear MxL862xx switch family are multi-port Ethernet switches with
-+  integrated 2.5GE PHYs. The MxL86252 has five PHY ports and the MxL86282
-+  has eight PHY ports. Both models come with two 10 Gigabit/s SerDes
-+  interfaces to be used to connect external PHYs or SFP cages, or as CPU
-+  port.
-+
-+allOf:
-+  - $ref: dsa.yaml#/$defs/ethernet-ports
-+
-+properties:
-+  compatible:
-+    enum:
-+      - maxlinear,mxl86252
-+      - maxlinear,mxl86282
-+
-+  reg:
-+    maxItems: 1
-+    description: MDIO address of the switch
-+
-+  mdio:
-+    $ref: /schemas/net/mdio.yaml#
-+    unevaluatedProperties: false
-+
-+required:
-+  - compatible
-+  - reg
-+
-+unevaluatedProperties: false
-+
-+examples:
-+  - |
-+    mdio {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+
-+        switch@0 {
-+            compatible = "maxlinear,mxl86282";
-+            reg = <0>;
-+
-+            ethernet-ports {
-+                #address-cells = <1>;
-+                #size-cells = <0>;
-+
-+                port@0 {
-+                    reg = <0>;
-+                    label = "lan1";
-+                    phy-handle = <&phy0>;
-+                    phy-mode = "internal";
-+                };
-+
-+                port@1 {
-+                    reg = <1>;
-+                    label = "lan2";
-+                    phy-handle = <&phy1>;
-+                    phy-mode = "internal";
-+                };
-+
-+                port@2 {
-+                    reg = <2>;
-+                    label = "lan3";
-+                    phy-handle = <&phy2>;
-+                    phy-mode = "internal";
-+                };
-+
-+                port@3 {
-+                    reg = <3>;
-+                    label = "lan4";
-+                    phy-handle = <&phy3>;
-+                    phy-mode = "internal";
-+                };
-+
-+                port@4 {
-+                    reg = <4>;
-+                    label = "lan5";
-+                    phy-handle = <&phy4>;
-+                    phy-mode = "internal";
-+                };
-+
-+                port@5 {
-+                    reg = <5>;
-+                    label = "lan6";
-+                    phy-handle = <&phy5>;
-+                    phy-mode = "internal";
-+                };
-+
-+                port@6 {
-+                    reg = <6>;
-+                    label = "lan7";
-+                    phy-handle = <&phy6>;
-+                    phy-mode = "internal";
-+                };
-+
-+                port@7 {
-+                    reg = <7>;
-+                    label = "lan8";
-+                    phy-handle = <&phy7>;
-+                    phy-mode = "internal";
-+                };
-+
-+                port@8 {
-+                    reg = <8>;
-+                    label = "cpu";
-+                    ethernet = <&gmac0>;
-+                    phy-mode = "usxgmii";
-+
-+                    fixed-link {
-+                        speed = <10000>;
-+                        full-duplex;
-+                    };
-+                };
-+            };
-+
-+            mdio {
-+                #address-cells = <1>;
-+                #size-cells = <0>;
-+
-+                phy0: ethernet-phy@0 {
-+                    reg = <0>;
-+                };
-+
-+                phy1: ethernet-phy@1 {
-+                    reg = <1>;
-+                };
-+
-+                phy2: ethernet-phy@2 {
-+                    reg = <2>;
-+                };
-+
-+                phy3: ethernet-phy@3 {
-+                    reg = <3>;
-+                };
-+
-+                phy4: ethernet-phy@4 {
-+                    reg = <4>;
-+                };
-+
-+                phy5: ethernet-phy@5 {
-+                    reg = <5>;
-+                };
-+
-+                phy6: ethernet-phy@6 {
-+                    reg = <6>;
-+                };
-+
-+                phy7: ethernet-phy@7 {
-+                    reg = <7>;
-+                };
-+            };
-+        };
-+    };
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 9707f53d62935..c433a15d9797a 100644
+index c433a15d9797a..a20498cc8320b 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -15604,6 +15604,12 @@ S:	Supported
- F:	drivers/net/phy/mxl-86110.c
- F:	drivers/net/phy/mxl-gpy.c
+@@ -15609,6 +15609,7 @@ M:	Daniel Golle <daniel@makrotopia.org>
+ L:	netdev@vger.kernel.org
+ S:	Maintained
+ F:	Documentation/devicetree/bindings/net/dsa/maxlinear,mxl862xx.yaml
++F:	net/dsa/tag_mxl862xx.c
  
-+MAXLINEAR MXL862XX SWITCH DRIVER
-+M:	Daniel Golle <daniel@makrotopia.org>
-+L:	netdev@vger.kernel.org
-+S:	Maintained
-+F:	Documentation/devicetree/bindings/net/dsa/maxlinear,mxl862xx.yaml
-+
  MCAN DEVICE DRIVER
  M:	Markus Schneider-Pargmann <msp@baylibre.com>
- L:	linux-can@vger.kernel.org
+diff --git a/include/net/dsa.h b/include/net/dsa.h
+index e40cdc12f7f39..e4c2b47a2a46e 100644
+--- a/include/net/dsa.h
++++ b/include/net/dsa.h
+@@ -57,6 +57,7 @@ struct tc_action;
+ #define DSA_TAG_PROTO_BRCM_LEGACY_FCS_VALUE	29
+ #define DSA_TAG_PROTO_YT921X_VALUE		30
+ #define DSA_TAG_PROTO_MXL_GSW1XX_VALUE		31
++#define DSA_TAG_PROTO_MXL862_VALUE		32
+ 
+ enum dsa_tag_protocol {
+ 	DSA_TAG_PROTO_NONE		= DSA_TAG_PROTO_NONE_VALUE,
+@@ -91,6 +92,7 @@ enum dsa_tag_protocol {
+ 	DSA_TAG_PROTO_VSC73XX_8021Q	= DSA_TAG_PROTO_VSC73XX_8021Q_VALUE,
+ 	DSA_TAG_PROTO_YT921X		= DSA_TAG_PROTO_YT921X_VALUE,
+ 	DSA_TAG_PROTO_MXL_GSW1XX	= DSA_TAG_PROTO_MXL_GSW1XX_VALUE,
++	DSA_TAG_PROTO_MXL862		= DSA_TAG_PROTO_MXL862_VALUE,
+ };
+ 
+ struct dsa_switch;
+diff --git a/net/dsa/Kconfig b/net/dsa/Kconfig
+index f86b30742122f..c897d62326f5b 100644
+--- a/net/dsa/Kconfig
++++ b/net/dsa/Kconfig
+@@ -145,6 +145,13 @@ config NET_DSA_TAG_QCA
+ 	  Say Y or M if you want to enable support for tagging frames for
+ 	  the Qualcomm Atheros QCA8K switches.
+ 
++config NET_DSA_TAG_MXL862
++	tristate "Tag driver for MxL862xx switches"
++	help
++	  Say Y or M if you want to enable support for tagging frames for the
++	  Maxlinear MxL86252 and MxL86282 switches using their native 8-byte
++	  tagging protocol.
++
+ config NET_DSA_TAG_RTL4_A
+ 	tristate "Tag driver for Realtek 4 byte protocol A tags"
+ 	help
+diff --git a/net/dsa/Makefile b/net/dsa/Makefile
+index 42d173f5a7013..dbe2a742e3322 100644
+--- a/net/dsa/Makefile
++++ b/net/dsa/Makefile
+@@ -28,6 +28,7 @@ obj-$(CONFIG_NET_DSA_TAG_HELLCREEK) += tag_hellcreek.o
+ obj-$(CONFIG_NET_DSA_TAG_KSZ) += tag_ksz.o
+ obj-$(CONFIG_NET_DSA_TAG_LAN9303) += tag_lan9303.o
+ obj-$(CONFIG_NET_DSA_TAG_MTK) += tag_mtk.o
++obj-$(CONFIG_NET_DSA_TAG_MXL862) += tag_mxl862xx.o
+ obj-$(CONFIG_NET_DSA_TAG_MXL_GSW1XX) += tag_mxl-gsw1xx.o
+ obj-$(CONFIG_NET_DSA_TAG_NONE) += tag_none.o
+ obj-$(CONFIG_NET_DSA_TAG_OCELOT) += tag_ocelot.o
+diff --git a/net/dsa/tag_mxl862xx.c b/net/dsa/tag_mxl862xx.c
+new file mode 100644
+index 0000000000000..9c5e5f90dcb63
+--- /dev/null
++++ b/net/dsa/tag_mxl862xx.c
+@@ -0,0 +1,113 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * DSA Special Tag for MaxLinear 862xx switch chips
++ *
++ * Copyright (C) 2025 Daniel Golle <daniel@makrotopia.org>
++ * Copyright (C) 2024 MaxLinear Inc.
++ */
++
++#include <linux/bitops.h>
++#include <linux/etherdevice.h>
++#include <linux/skbuff.h>
++#include <net/dsa.h>
++#include "tag.h"
++
++#define MXL862_NAME	"mxl862xx"
++
++/* To define the outgoing port and to discover the incoming port a special
++ * tag is used by the GSW1xx.
++ *
++ *       Dest MAC       Src MAC    special TAG        EtherType
++ * ...| 1 2 3 4 5 6 | 1 2 3 4 5 6 | 1 2 3 4 5 6 7 8 | 1 2 |...
++ *                                |<--------------->|
++ */
++
++#define MXL862_HEADER_LEN 8
++
++/* Byte 7 */
++#define MXL862_IGP_EGP GENMASK(3, 0)
++
++static struct sk_buff *mxl862_tag_xmit(struct sk_buff *skb,
++				       struct net_device *dev)
++{
++	struct dsa_port *dp = dsa_user_to_port(dev);
++	struct dsa_port *cpu_dp = dp->cpu_dp;
++	unsigned int cpu_port = cpu_dp->index + 1;
++	unsigned int usr_port = dp->index + 1;
++	__be16 *mxl862_tag;
++
++	if (!skb)
++		return skb;
++
++	/* provide additional space 'MXL862_HEADER_LEN' bytes */
++	skb_push(skb, MXL862_HEADER_LEN);
++
++	/* shift MAC address to the beginnig of the enlarged buffer,
++	 * releasing the space required for DSA tag (between MAC address and
++	 * Ethertype)
++	 */
++	dsa_alloc_etype_header(skb, MXL862_HEADER_LEN);
++
++	/* special tag ingress */
++	mxl862_tag = dsa_etype_header_pos_tx(skb);
++	mxl862_tag[0] = htons(ETH_P_MXLGSW);
++	mxl862_tag[1] = 0;
++	mxl862_tag[2] = htons(usr_port + 16 - cpu_port);
++	mxl862_tag[3] = htons(FIELD_PREP(MXL862_IGP_EGP, cpu_port));
++
++	return skb;
++}
++
++static struct sk_buff *mxl862_tag_rcv(struct sk_buff *skb,
++				      struct net_device *dev)
++{
++	int port;
++	__be16 *mxl862_tag;
++
++	if (unlikely(!pskb_may_pull(skb, MXL862_HEADER_LEN))) {
++		dev_warn_ratelimited(&dev->dev, "Cannot pull SKB, packet dropped\n");
++		return NULL;
++	}
++
++	mxl862_tag = dsa_etype_header_pos_rx(skb);
++
++	if (unlikely(mxl862_tag[0] != htons(ETH_P_MXLGSW))) {
++		dev_warn_ratelimited(&dev->dev, "Invalid special tag marker, packet dropped\n");
++		dev_warn_ratelimited(&dev->dev, "Rx Packet Tag: %8ph\n",
++				     mxl862_tag);
++		return NULL;
++	}
++
++	/* Get source port information */
++	port = FIELD_GET(MXL862_IGP_EGP, ntohs(mxl862_tag[3]));
++	port = port - 1;
++	skb->dev = dsa_conduit_find_user(dev, 0, port);
++	if (!skb->dev) {
++		dev_warn_ratelimited(&dev->dev, "Invalid source port, packet dropped\n");
++		dev_warn_ratelimited(&dev->dev, "Rx Packet Tag: %8ph\n",
++				     mxl862_tag);
++		return NULL;
++	}
++
++	/* remove the MxL862xx special tag between the MAC addresses and the
++	 * current ethertype field.
++	 */
++	skb_pull_rcsum(skb, MXL862_HEADER_LEN);
++	dsa_strip_etype_header(skb, MXL862_HEADER_LEN);
++
++	return skb;
++}
++
++static const struct dsa_device_ops mxl862_netdev_ops = {
++	.name = "mxl862",
++	.proto = DSA_TAG_PROTO_MXL862,
++	.xmit = mxl862_tag_xmit,
++	.rcv = mxl862_tag_rcv,
++	.needed_headroom = MXL862_HEADER_LEN,
++};
++
++MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_MXL862, MXL862_NAME);
++MODULE_DESCRIPTION("DSA tag driver for MaxLinear MxL862xx switches");
++MODULE_LICENSE("GPL");
++
++module_dsa_tag_driver(mxl862_netdev_ops);
 -- 
 2.52.0
 
