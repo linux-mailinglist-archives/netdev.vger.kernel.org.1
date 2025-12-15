@@ -1,204 +1,161 @@
-Return-Path: <netdev+bounces-244737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C3C6CBDD53
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 13:36:23 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57187CBDD47
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 13:35:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CAD043037CDE
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 12:30:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 631163023EB3
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 12:32:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A841225408;
-	Mon, 15 Dec 2025 12:30:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D59E021B185;
+	Mon, 15 Dec 2025 12:32:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eD3IuVwU";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="grdH/Dd2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f77.google.com (mail-oa1-f77.google.com [209.85.160.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1948221D3F0
-	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 12:30:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CF891EB5C2
+	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 12:31:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765801835; cv=none; b=lIdvSQR26qKqpYsR2iJFGq167IPPcDutLj+8aIv/dDhUEDKHizGqf6p/h4UiywOmINCeD55LB+aOU3pij6q7N+2A+pUtowHcJBJUTpTb60uVKGrxs+KAKFJW/wI/yqkaDKdDBHFkoXhOJd3E+XXVXMv4MJToxTCwJ2LWzqm+eXk=
+	t=1765801920; cv=none; b=ouicmo0sCLB0yKnIDHQGXAStg3s0fu7Nvx2kEW5M7FFd43mg9vvUGtv+3K4r02xPNueVtxG+Q54O3mqFN662W98+b0IyS7JgQmvXu8kzD9/hUUNqBO7tSCH7WYy8N7qAHmOPx5JCtrModgW+1bvcWLtecyGQNrXLNJsvvinGeqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765801835; c=relaxed/simple;
-	bh=t7mnA1JXNIt1sowABfFOYKVU4INnCQt8fzFOmRHGBxo=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=PEpGZloJMj+u3XsUn+5acTPkxYFovGvVN54gy0Jn39ZKEIFPXD0vepLp4ks5MYVfD/UVN0WpjHJJPWt6COoZea/ZvI0RQjK6rEstigphLP1jAhXqILzVTkmhl8eok9/lK/fLryop970Jcps2mBF87iX10tCW+WhJzV6RCDWY4LE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oa1-f77.google.com with SMTP id 586e51a60fabf-3f99d3f06f6so924848fac.2
-        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 04:30:31 -0800 (PST)
+	s=arc-20240116; t=1765801920; c=relaxed/simple;
+	bh=DwX+1zLWMhG9c5yqMqifXYDlyLFUb+ZqcfpFSbA5yco=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ud64CWT1qfDcRK64VvziAoHgA2j5nCpPMdbkE9oRv0ovxH8TKxcExVWiLDe/Bn6chdqHUQ6RmDlsXDrvbdF7X3VdZ0vCoWYhC6XVYGbw0fUa4yPjjnGZexByARVX7n4d6fx1pSyZKRxhFtEt1dwqqm1VUbZu0UqMhONQMsRqJtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eD3IuVwU; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=grdH/Dd2; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1765801918;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DwX+1zLWMhG9c5yqMqifXYDlyLFUb+ZqcfpFSbA5yco=;
+	b=eD3IuVwULQSGbLyHfdmyEp6jpY2rdLOsUvK1xTtOZIqopLwhfuYvCWqKaIx8C+0dftCkff
+	oFRmNYtxPDGcO7nFS5BfsoAM+2dOF/UvQMLtith1yHsJ4iRmjMmeot+DaTGcbbJMybwY72
+	lbW+sh6rfOFps5CMcT9JKJPzzWcnJMo=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-58-n6xMVSpZNC-PDWWo-hrS6w-1; Mon, 15 Dec 2025 07:31:56 -0500
+X-MC-Unique: n6xMVSpZNC-PDWWo-hrS6w-1
+X-Mimecast-MFC-AGG-ID: n6xMVSpZNC-PDWWo-hrS6w_1765801916
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b726a3c3214so335151066b.2
+        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 04:31:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1765801915; x=1766406715; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DwX+1zLWMhG9c5yqMqifXYDlyLFUb+ZqcfpFSbA5yco=;
+        b=grdH/Dd2uAohm1BUawdllQrHsCbiBSM/wMnPEEgepFTuFl2QW0bH3KjBYojHttu5uo
+         Yzz1cw6qoUJ4PhiNZFaI8ts0W3io7tO9anWsUl/fvKHm+INV7o3ATdiSXNNqgJhW41mx
+         VtKDrsyIkdTK2VoJMY1qJfNxXdWfP1VBUpxwXtRO3W39ciF72OPEnY8S0vbFvjf41owu
+         AaVPej36JjB/oNTDnaI2ihQpz9L2KOkT9ei4JtI2LymhkvzbO6xvJdtiYjPPsq4mfhJ7
+         MnGG3cPlm+oL9KUcVKjUmQh104kkPPL3k9yfVJel3JfMLwr8s3xFUtfR+tNMBRC7n0Ko
+         6vCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765801831; x=1766406631;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FmkbodutDZC8hdluHMNGaoY/QA3lBOYK1JpBNIovc6o=;
-        b=JMSQBlYllu3QpC4HUuRk/2kkq3bt5WqTZK0t5xRwbPQDL12Bwfczs6vXdj0b3vZSbX
-         S3YOuMgUIZz50tLEYecWpi11kOom9ofQKNXlzGqfXWlzEK/pZV3QdN3BVesMzL4UGl2j
-         mdLD1id7pW2njzcIEk76+Tpe9tniAEUDbbOLMwOAs/E1khD5tkdRiII61AiXlF4JxqKq
-         EcXTpybCF+0ctB2io2+rleo2nl9BGN73zK/+DKUDLyekE5SjeR+uHR2tLR30634rdp04
-         PxPwALCLWkUrP1syi5cbfNzxxyaaeuK8ycYJ4om6V52zzicjbWxvYgtgeu+bFgRXhP1l
-         RiXg==
-X-Forwarded-Encrypted: i=1; AJvYcCXsq/YaHi6qeEmbpMNspBz4m6X3WyKnf0H8HMciUZrBioz+E4JNmDbni9wbCayroZPbHHmpefA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyb4TGCX8SobiTwb2th+gLkKx97qV4zY1TtFVZFZc54v1THoUJt
-	j1TsBQgY7pPBviCjYuVQq4RilaGZ42p7N/4tc+l1zi1iE8sB5i3T7eGuxYXLR+6eo94KYdZu6cb
-	EhOokZzZxBaIdf/T2sX67ODtEtU4ZWk95YJzL+7+vSiIA7uAq/tYJakEbqkE=
-X-Google-Smtp-Source: AGHT+IFBpHRYsDCnNt2eAl1dpSRNDfYZWXdJ00ZGq0lOAKWf1vzhcrgROGEj8y0yiOAlvGdE03Dxkp/doBRwRaci4pJ+5cVKzusy
+        d=1e100.net; s=20230601; t=1765801915; x=1766406715;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=DwX+1zLWMhG9c5yqMqifXYDlyLFUb+ZqcfpFSbA5yco=;
+        b=Zss/TYdVpkHOLrLJQdSnljz2OCz05D+QOZ9c80uJDkbWn1SAjByvPWtdXDj89csIWW
+         oR755DwjKCZpqPjI3npPrWBP0AiP1ElpgSbYn2jOsJsh6iHQsDih5vys2DDZPiQEYa3N
+         HC0VxiDYEWyJWVWPTCYKC8I2LMfT3x7mljxuHUqGMGaO37lvhecHg/jPYuLplkw/BBZK
+         vRFALc/uUQ6Ebf7qx3ghYpfjUdaHqUGqrVZyqpkPwtrU66AH6fzuNb/D+5ipUcgvyldk
+         LsYONe3JcGr9mlbQGhQRmoqxx0oPjGtP4P4oHWwRsX1Z9K22GA64m5KR5r/09HpA/heL
+         m26Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUazX6jVvrB/2cC3ndSw0dgqWptVXLBn3dVrNRbP6wS9sMFEjMsAL1B91QVN61Sceov7fIFrUw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAE3rt/og4BpL41L5kZU3aW2AA158P2y6253eqn/kbVXsGyNry
+	Ei/+Sb+H9Bv44xPypESQkJ5bi54AMwwCJIVzy73eUvRO24EhulGeHuTHYQyJy3hDWm7+j6ywMN0
+	OEmHS2FhYqfsgPnXfVhb9ZT+y6MkOcKgfzY890n4XJ00nxe32/q2XeNYDxg==
+X-Gm-Gg: AY/fxX5HcZ4povZ6lUcr2G9UDD38HdBJFCL5qCdtgxcjm9BkcuXR52p5L89LlMh4HAZ
+	Pm3BjTPeQlVspI3nLfRHU/Clis8ulwpHLWetGwAY1RrIEzJSfY1G4BCu/HMJuPvr4lOjCtRzgiZ
+	VVKKylsS2XlAv05NKuIeDCmfPQjetW88s9t9PxrgoCPCd/UU7ekMJnheRBi8osuRrwkTjBjEz8Y
+	Ef+7cC6VZC6AE0kcSmSBfKXVkwg03ypIzEDbFTYeot5DBhznnA5mzyZYGkNRRY73sXrcmTCGRk3
+	s+DniIf+WH+KTCYkc3bJw64Q5UfGPyGX06/7x/tUPZaDZ8Q8GK+Fg8LSTYWnF65UWMgf9EJ/35u
+	LRfzi6VeG70o0Utrqp3Gl2jjSk/Xa0bRR/wbNXFOon84exxfR5KdSPSooFkI=
+X-Received: by 2002:a17:906:ef03:b0:b79:b910:fd45 with SMTP id a640c23a62f3a-b7d238bb08emr1115742266b.38.1765801915482;
+        Mon, 15 Dec 2025 04:31:55 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFH/zmTEBETCcU5nGWAabRKLe7SiWJwjBA2DBtyA/t1RuG13frO9+qbmZ3D0bUOqE483xpIbg==
+X-Received: by 2002:a17:906:ef03:b0:b79:b910:fd45 with SMTP id a640c23a62f3a-b7d238bb08emr1115738766b.38.1765801915012;
+        Mon, 15 Dec 2025 04:31:55 -0800 (PST)
+Received: from [10.44.33.154] (5920ab7b.static.cust.trined.nl. [89.32.171.123])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7fe8a956a5sm13997866b.29.2025.12.15.04.31.54
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 15 Dec 2025 04:31:54 -0800 (PST)
+From: Eelco Chaudron <echaudro@redhat.com>
+To: =?utf-8?b?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
+Cc: Adrian Moreno <amorenoz@redhat.com>, Aaron Conole <aconole@redhat.com>,
+ Ilya Maximets <i.maximets@ovn.org>, Alexei Starovoitov <ast@kernel.org>,
+ Jesse Gross <jesse@nicira.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, dev@openvswitch.org
+Subject: Re: [PATCH v2] net: openvswitch: Avoid needlessly taking the RTNL on
+ vport destroy
+Date: Mon, 15 Dec 2025 13:31:53 +0100
+X-Mailer: MailMate (2.0r6290)
+Message-ID: <E6D49A6B-A0F7-46B6-BC32-A5C4ADAFD6DC@redhat.com>
+In-Reply-To: <87qzswklc7.fsf@toke.dk>
+References: <20251211115006.228876-1-toke@redhat.com>
+ <198C2570-F384-4385-8A6B-84DCC38BB5F5@redhat.com> <87qzswklc7.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:f009:b0:657:5723:76c8 with SMTP id
- 006d021491bc7-65b451812f6mr5115110eaf.6.1765801830725; Mon, 15 Dec 2025
- 04:30:30 -0800 (PST)
-Date: Mon, 15 Dec 2025 04:30:30 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <693fff66.a70a0220.104cf0.033d.GAE@google.com>
-Subject: [syzbot] [net?] [usb?] WARNING in mdiobus_get_phy
-From: syzbot <syzbot+3d43c9066a5b54902232@syzkaller.appspotmail.com>
-To: andrew@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	hkallweit1@gmail.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-usb@vger.kernel.org, linux@armlinux.org.uk, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    5ce74bc1b7cb Add linux-next specific files for 20251211
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=130b51c2580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b9f785244b836412
-dashboard link: https://syzkaller.appspot.com/bug?extid=3d43c9066a5b54902232
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13baa61a580000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/e550c10060d5/disk-5ce74bc1.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/80331ba2b4cc/vmlinux-5ce74bc1.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/4bcb4f82dfcf/bzImage-5ce74bc1.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+3d43c9066a5b54902232@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-addr 207 out of range
-WARNING: drivers/net/phy/mdio_bus.c:76 at mdiobus_find_device drivers/net/phy/mdio_bus.c:76 [inline], CPU#0: kworker/0:5/6044
-WARNING: drivers/net/phy/mdio_bus.c:76 at mdiobus_get_phy+0xaf/0xd0 drivers/net/phy/mdio_bus.c:86, CPU#0: kworker/0:5/6044
-Modules linked in:
-CPU: 0 UID: 0 PID: 6044 Comm: kworker/0:5 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
-Workqueue: usb_hub_wq hub_event
-RIP: 0010:mdiobus_find_device drivers/net/phy/mdio_bus.c:76 [inline]
-RIP: 0010:mdiobus_get_phy+0xb1/0xd0 drivers/net/phy/mdio_bus.c:86
-Code: e8 34 1c 73 fb eb 07 e8 ed 17 73 fb 31 db 48 89 d8 5b 41 5e 41 5f c3 cc cc cc cc cc e8 d8 17 73 fb 48 8d 3d 31 16 81 09 89 de <67> 48 0f b9 3a eb db 89 f9 80 e1 07 80 c1 03 38 c1 7c b1 e8 57 7a
-RSP: 0018:ffffc900033a6aa8 EFLAGS: 00010293
-RAX: ffffffff864edf78 RBX: 00000000000000cf RCX: ffff88802a9ebd00
-RDX: 0000000000000000 RSI: 00000000000000cf RDI: ffffffff8fcff5b0
-RBP: ffffc900033a6bf0 R08: ffffc900033a6787 R09: 1ffff92000674cf0
-R10: dffffc0000000000 R11: fffff52000674cf1 R12: ffff888078e2cdc0
-R13: dffffc0000000000 R14: ffff88807cd12000 R15: dffffc0000000000
-FS:  0000000000000000(0000) GS:ffff8881259e6000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f1c669c9e9c CR3: 000000000e13a000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- ax88772_init_phy+0x8e/0x390 drivers/net/usb/asix_devices.c:722
- ax88772_bind+0x961/0xde0 drivers/net/usb/asix_devices.c:937
- usbnet_probe+0xab5/0x28f0 drivers/net/usb/usbnet.c:1802
- usb_probe_interface+0x668/0xc90 drivers/usb/core/driver.c:396
- call_driver_probe drivers/base/dd.c:-1 [inline]
- really_probe+0x26d/0xad0 drivers/base/dd.c:659
- __driver_probe_device+0x18c/0x320 drivers/base/dd.c:801
- driver_probe_device+0x4f/0x240 drivers/base/dd.c:831
- __device_attach_driver+0x279/0x430 drivers/base/dd.c:959
- bus_for_each_drv+0x251/0x2e0 drivers/base/bus.c:500
- __device_attach+0x2b8/0x430 drivers/base/dd.c:1031
- device_initial_probe+0xa1/0xd0 drivers/base/dd.c:1086
- bus_probe_device+0x12a/0x220 drivers/base/bus.c:574
- device_add+0x7b6/0xb80 drivers/base/core.c:3689
- usb_set_configuration+0x1a87/0x2110 drivers/usb/core/message.c:2210
- usb_generic_driver_probe+0x8d/0x150 drivers/usb/core/generic.c:250
- usb_probe_device+0x1c4/0x3c0 drivers/usb/core/driver.c:291
- call_driver_probe drivers/base/dd.c:-1 [inline]
- really_probe+0x26d/0xad0 drivers/base/dd.c:659
- __driver_probe_device+0x18c/0x320 drivers/base/dd.c:801
- driver_probe_device+0x4f/0x240 drivers/base/dd.c:831
- __device_attach_driver+0x279/0x430 drivers/base/dd.c:959
- bus_for_each_drv+0x251/0x2e0 drivers/base/bus.c:500
- __device_attach+0x2b8/0x430 drivers/base/dd.c:1031
- device_initial_probe+0xa1/0xd0 drivers/base/dd.c:1086
- bus_probe_device+0x12a/0x220 drivers/base/bus.c:574
- device_add+0x7b6/0xb80 drivers/base/core.c:3689
- usb_new_device+0xa39/0x1720 drivers/usb/core/hub.c:2695
- hub_port_connect drivers/usb/core/hub.c:5567 [inline]
- hub_port_connect_change drivers/usb/core/hub.c:5707 [inline]
- port_event drivers/usb/core/hub.c:5871 [inline]
- hub_event+0x29b1/0x4ef0 drivers/usb/core/hub.c:5953
- process_one_work+0x93a/0x15a0 kernel/workqueue.c:3279
- process_scheduled_works kernel/workqueue.c:3362 [inline]
- worker_thread+0x9b0/0xee0 kernel/workqueue.c:3443
- kthread+0x711/0x8a0 kernel/kthread.c:463
- ret_from_fork+0x599/0xb30 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	e8 34 1c 73 fb       	call   0xfb731c39
-   5:	eb 07                	jmp    0xe
-   7:	e8 ed 17 73 fb       	call   0xfb7317f9
-   c:	31 db                	xor    %ebx,%ebx
-   e:	48 89 d8             	mov    %rbx,%rax
-  11:	5b                   	pop    %rbx
-  12:	41 5e                	pop    %r14
-  14:	41 5f                	pop    %r15
-  16:	c3                   	ret
-  17:	cc                   	int3
-  18:	cc                   	int3
-  19:	cc                   	int3
-  1a:	cc                   	int3
-  1b:	cc                   	int3
-  1c:	e8 d8 17 73 fb       	call   0xfb7317f9
-  21:	48 8d 3d 31 16 81 09 	lea    0x9811631(%rip),%rdi        # 0x9811659
-  28:	89 de                	mov    %ebx,%esi
-* 2a:	67 48 0f b9 3a       	ud1    (%edx),%rdi <-- trapping instruction
-  2f:	eb db                	jmp    0xc
-  31:	89 f9                	mov    %edi,%ecx
-  33:	80 e1 07             	and    $0x7,%cl
-  36:	80 c1 03             	add    $0x3,%cl
-  39:	38 c1                	cmp    %al,%cl
-  3b:	7c b1                	jl     0xffffffee
-  3d:	e8                   	.byte 0xe8
-  3e:	57                   	push   %rdi
-  3f:	7a                   	.byte 0x7a
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+On 15 Dec 2025, at 12:58, Toke Høiland-Jørgensen wrote:
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+> Eelco Chaudron <echaudro@redhat.com> writes:
+>
+>> On 11 Dec 2025, at 12:50, Toke Høiland-Jørgensen wrote:
+>>
+>>> The openvswitch teardown code will immediately call
+>>> ovs_netdev_detach_dev() in response to a NETDEV_UNREGISTER notification.
+>>> It will then start the dp_notify_work workqueue, which will later end up
+>>> calling the vport destroy() callback. This callback takes the RTNL to do
+>>> another ovs_netdev_detach_port(), which in this case is unnecessary.
+>>> This causes extra pressure on the RTNL, in some cases leading to
+>>> "unregister_netdevice: waiting for XX to become free" warnings on
+>>> teardown.
+>>>
+>>> We can straight-forwardly avoid the extra RTNL lock acquisition by
+>>> checking the device flags before taking the lock, and skip the locking
+>>> altogether if the IFF_OVS_DATAPATH flag has already been unset.
+>>>
+>>> Fixes: b07c26511e94 ("openvswitch: fix vport-netdev unregister")
+>>> Tested-by: Adrian Moreno <amorenoz@redhat.com>
+>>> Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
+>>
+>> Guess the change looks good, but I’m waiting for some feedback from
+>> Adrian to see if this change makes sense.
+>
+> OK.
+>
+>> Any luck reproducing the issue it’s supposed to fix?
+>
+> We got a report from the customer that originally reported it (who had
+> their own reproducer) that this patch fixes their issue to the point
+> where they can now delete ~2000 pods/node without triggering the
+> unregister_netdevice warning at all (where before it triggered at around
+> ~500 pod deletions). So that's encouraging :)
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+That’s good news; just wanted to make sure we are not chasing a red herring :)
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+Acked-by: Eelco Chaudron echaudro@redhat.com
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
