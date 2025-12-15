@@ -1,114 +1,136 @@
-Return-Path: <netdev+bounces-244822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3D04CBF18F
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 18:04:10 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C144CBF327
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 18:16:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 2D0C9300216E
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 17:04:10 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 755513054C2A
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 17:10:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A8993385B6;
-	Mon, 15 Dec 2025 17:00:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5890E337BA2;
+	Mon, 15 Dec 2025 17:10:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FZMVOEwP"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65860338592;
-	Mon, 15 Dec 2025 17:00:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC81431352C;
+	Mon, 15 Dec 2025 17:10:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765818058; cv=none; b=Wn4MLF1L2Tr3gIqpaSqhuDMeNA7WHROxh1sw8EiSUe7wO7IxLzURpC/edA95Yyj0zQeIjgUQTDq6XOLIKCUzKWtNDZhnZfnHi8z2FoBHEHxXkJBWgoXvW4/mnuA+T36sxHWtHF6KFH0hH1SzZAMk1nvpaU59cbgd6/0oG9gKTI0=
+	t=1765818650; cv=none; b=TGQASUT5C3OaV6K2E8FJSWrov1NFc4MTEyTt+MHacmjYcvq8XtSIScvublHRNvM1FxEauobtRI0z8QUBTAR+nrJWCX+SzEs1Q+yZ/qjlYCfV0HDgaqorGhfKyc+2kS1Jry6TqcK3KLfpf8HTHyhEPkx4q5iA41QkIZ0AFHk3CE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765818058; c=relaxed/simple;
-	bh=MeAZ1GStC6m6uPIP0sg9vcwJjUoIqzUK8vvFUNls+A8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=MMqEuLJrEGTmgvaaMW1zXaACTiRSC5DpyMj+yOUDGYQqayhna1LapJsV9RbcrLkIq4Nn1MXuTKt20MmqM+zF6Elfqk1OCwtFb4Q7iKM2cZ6sEKsOOi7R2jgqyw3MAwwWTPC5LDY9oHNq1rzM++VvMnxhSK7EqfMZAUTT6JfesCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.224.150])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dVRBz3B71zJ46BK;
-	Tue, 16 Dec 2025 01:00:27 +0800 (CST)
-Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
-	by mail.maildlp.com (Postfix) with ESMTPS id C9C8D40539;
-	Tue, 16 Dec 2025 01:00:53 +0800 (CST)
-Received: from [10.123.122.223] (10.123.122.223) by
- mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 15 Dec 2025 20:00:53 +0300
-Message-ID: <4a0b0695-f13e-4611-a6a5-524b4967ff6e@huawei.com>
-Date: Mon, 15 Dec 2025 20:00:52 +0300
+	s=arc-20240116; t=1765818650; c=relaxed/simple;
+	bh=cwMR/Fk5tha92MiDNpmUeFP+QNMa9XhwhgULZKix1PY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mczn1qRV9iFy1wQ8mFkp6Xehrgg9QkGDjwDM9PsyfKrCCl1veT0C2o7G8wE3Mqkh7L/qCVcnkyHNriGfohRN6udTGpXpratD3xdmnLnNVkLhB1PQUZJ6Bd2AaMI1CZmXBA7mHZf62sdvxW/cEnYbBthbpM7l7l/U4Nii8c6KS2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FZMVOEwP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F880C4CEF5;
+	Mon, 15 Dec 2025 17:10:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765818648;
+	bh=cwMR/Fk5tha92MiDNpmUeFP+QNMa9XhwhgULZKix1PY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FZMVOEwPzqZZWOFPQ6Wa00Okn6d0OJMvDCcP+Ke/6f59VpIzMzvl9yX9EQWOGXLL3
+	 k9G8gIrcVqMjIjyJBnyNy7wyFBMTpxQ0PgBtCdwsOj2DqJL8Px3KVTBbjZs3TXeW06
+	 Qx3dtmbRvVyym2X9vldBHcSErJ+2/7lD6UYGgbGCAOnvcuDB874wIsHJluhHL9uTd5
+	 sOqtEe4FkdAKX5H89+7i5gVZ2DT6GO/hRx+dS83zP5R+d9Do1kJmKi37Qxa0YRiMI7
+	 fHE3p1zn0APIXoXguSrqvXgkJamO9sentpByvn77geIUgGt2kX7MMn7Wj7+SBHZj+8
+	 XnzY4Tz4lrE2g==
+Date: Mon, 15 Dec 2025 17:10:43 +0000
+From: Simon Horman <horms@kernel.org>
+To: Yeoreum Yun <yeoreum.yun@arm.com>
+Cc: nico@fluxnic.net, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	bigeasy@linutronix.de, clrkwllms@kernel.org, rostedt@goodmis.org,
+	dongdong.deng@windriver.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rt-devel@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2] smc91x: fix broken irq-context in PREEMPT_RT
+Message-ID: <aUBBE-W4kwQbsp9t@horms.kernel.org>
+References: <20251212190338.2318843-1-yeoreum.yun@arm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] ipvlan: Make the addrs_lock be per port
-To: <netdev@vger.kernel.org>, Xiao Liang <shaw.leon@gmail.com>, Jakub Kicinski
-	<kuba@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, Guillaume Nault
-	<gnault@redhat.com>, Julian Vetter <julian@outer-limits.org>, Eric Dumazet
-	<edumazet@google.com>, Stanislav Fomichev <sdf@fomichev.me>, Etienne
- Champetier <champetier.etienne@gmail.com>, "David S. Miller"
-	<davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
-	<linux-kernel@vger.kernel.org>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>
-References: <20251215165457.752634-1-skorodumov.dmitry@huawei.com>
-Content-Language: en-US
-From: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
-In-Reply-To: <20251215165457.752634-1-skorodumov.dmitry@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: mscpeml500003.china.huawei.com (7.188.49.51) To
- mscpeml500004.china.huawei.com (7.188.26.250)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251212190338.2318843-1-yeoreum.yun@arm.com>
 
-I'm working currently on some selftests/net for ipvtap for some kind of test (test calls "ip a a/ip a d" in several threads), but I'm unsure how to proceed:
+On Fri, Dec 12, 2025 at 07:03:38PM +0000, Yeoreum Yun wrote:
+> When smc91x.c is built with PREEMPT_RT, the following splat occurs
+> in FVP_RevC:
+> 
+> [   13.055000] smc91x LNRO0003:00 eth0: link up, 10Mbps, half-duplex, lpa 0x0000
+> [   13.062137] BUG: workqueue leaked atomic, lock or RCU: kworker/2:1[106]
+> [   13.062137]      preempt=0x00000000 lock=0->0 RCU=0->1 workfn=mld_ifc_work
+> [   13.062266] C
+> ** replaying previous printk message **
+> [   13.062266] CPU: 2 UID: 0 PID: 106 Comm: kworker/2:1 Not tainted 6.18.0-dirty #179 PREEMPT_{RT,(full)}
+> [   13.062353] Hardware name:  , BIOS
+> [   13.062382] Workqueue: mld mld_ifc_work
+> [   13.062469] Call trace:
+> [   13.062494]  show_stack+0x24/0x40 (C)
+> [   13.062602]  __dump_stack+0x28/0x48
+> [   13.062710]  dump_stack_lvl+0x7c/0xb0
+> [   13.062818]  dump_stack+0x18/0x34
+> [   13.062926]  process_scheduled_works+0x294/0x450
+> [   13.063043]  worker_thread+0x260/0x3d8
+> [   13.063124]  kthread+0x1c4/0x228
+> [   13.063235]  ret_from_fork+0x10/0x20
+> 
+> This happens because smc_special_trylock() disables IRQs even on PREEMPT_RT,
+> but smc_special_unlock() does not restore IRQs on PREEMPT_RT.
+> The reason is that smc_special_unlock() calls spin_unlock_irqrestore(),
+> and rcu_read_unlock_bh() in __dev_queue_xmit() cannot invoke
+> rcu_read_unlock() through __local_bh_enable_ip() when current->softirq_disable_cnt becomes zero.
+> 
+> To address this issue, replace smc_special_trylock() with spin_trylock_irqsave().
+> 
+> Fixes: 8ff499e43c53 ("smc91x: let smc91x work well under netpoll")
+> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+> ---
+> This patch based on v6.18.
+> 
+> History
+> ========
+> 
+> >From v1 to v2:
+>   - remove debug log.
+>   - https://lore.kernel.org/all/20251212185818.2209573-1-yeoreum.yun@arm.com/
+> 
 
-This patch is supposed to be a "fix". But selftest - obviously not a fix.
+Firstly, I'd like to note that it seems to me that the last
+non-trivial update to this driver seems to have occurred back in 2016.
+Do you know if it is still actively used?
 
-So, I'm unsure how to send a selftest for this.
+I agree that this patch seems appropriate as a bug fix.
+But I do wonder if, as a follow-up for net-next when it re-opens,
+smc_special_*lock could be removed entirely.
+Other than being the source of this bug (which I guess is special),
+they don't seem very special anymore. Perhaps they were once,
+but that time seems to have passed.
 
-Dmitry
+Regarding the Fixes tag. I wonder if this one, which post-dates the
+currently cited commit is correct. It seems to be when RT variants of
+these locks was introduced.
+
+Fixes: 342a93247e08 ("locking/spinlock: Provide RT variant header: <linux/spinlock_rt.h>")
+
+Lastly, for reference, when posting fixes for Networking code, please:
+
+* Target the patches at net like this:
+
+  [PATCH net] ...
+
+* Allow at least 24h to pass before posting updated patch versions
+
+More can be found here: https://docs.kernel.org/process/maintainer-netdev.html
 
 
-On 15.12.2025 19:54, Dmitry Skorodumov wrote:
-> Make the addrs_lock be per port, not per ipvlan dev.
->
-> Initial code seems to be written in the assumption,
-> that any address change must occur under RTNL.
-> But it is not so for the case of IPv6. So
->
-> 1) Introduce per-port addrs_lock.
->
-> 2) It was needed to fix places where it was forgotten
-> to take lock (ipvlan_open/ipvlan_close)
->
-> 3) Fix places, where list_for_each_entry_rcu()
-> was used to iterate the list while holding a lock
->
-> This appears to be a very minor problem though.
-> Since it's highly unlikely that ipvlan_add_addr() will
-> be called on 2 CPU simultaneously. But nevertheless,
-> this could cause:
->
-> 1) False-negative of ipvlan_addr_busy(): one interface
-> iterated through all port->ipvlans + ipvlan->addrs
-> under some ipvlan spinlock, and another added IP
-> under its own lock. Though this is only possible
-> for IPv6, since looks like only ipvlan_addr6_event() can be
-> called without rtnl_lock.
->
-> 2) Race since ipvlan_ht_addr_add(port) is called under
-> different ipvlan->addrs_lock locks
->
-> This should not affect performance, since add/remove IP
-> is a rare situation and spinlock is not taken on fast
-> paths.
->
-> Fixes: 8230819494b3 ("ipvlan: use per device spinlock to protect addrs list updates")
-> Signed-off-by: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
-> CC: Paolo Abeni <pabeni@redhat.com>
-> Signed-off-by: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
 
