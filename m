@@ -1,152 +1,103 @@
-Return-Path: <netdev+bounces-244701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E787CBD23F
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 10:19:40 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4401ECBD2CD
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 10:32:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7349630528EF
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 09:16:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DE97B3009864
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 09:32:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6590B32B998;
-	Mon, 15 Dec 2025 09:06:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6094314B7D;
+	Mon, 15 Dec 2025 09:32:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DbFVAkV+"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="MlyuHyeG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81F9D329C74
-	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 09:06:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BC5A286413
+	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 09:32:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765789598; cv=none; b=pFXjFid3im8hwU8tUX2YkVaYOuWguWK77GpwgOqxGIxL5/hsvzLXxnS7lHl3fN0Tpm+WK0IUqT5JLf7rDN2WuTmPmJKU6b8sIRg0OZXMgvIRTM5oru6wXT1WULZtB1IDkLo+G7850obtR4T95C+/ItsCgsuTrAK2mY2B7mRVsMA=
+	t=1765791144; cv=none; b=p3GUzftXHTR3mUFb3rPXYFmfrvqp0aKZsRowGD1H+8/Ittq1ybXKY5tQf6a8W99CAEGTdCm5VubwLTCp5wA4riQq/0Ngci04NFzlG/rG69iFuVRsM1BA8yWyIh/vezmzpguUBDD39TRZYl9iKvg/H9RPLYWLM750hRnmvh+obw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765789598; c=relaxed/simple;
-	bh=S+I//71CAh3HG/ntXLeYl26reZdigPregIquYcMsXSQ=;
+	s=arc-20240116; t=1765791144; c=relaxed/simple;
+	bh=3u9umm7/VPjetaVInDHrnL/zR8rzXm2g3nThmHm+BUU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T82z/kJx7/FlEvDNct+IKdwTU7HVJMtGLyf7wsd5OqFRKsTPJ9F3kVIVbpb4GuZ1OKQ+ulrKwfOCNEXNxnYNtWsBUz8HVm7gvHMJmYH63jn6LTeLpJB89SZOsGPvfMnLunEkmW+kFhZRNMDnrS+2ssCIflWaYBvMBWYAPJDx01Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DbFVAkV+; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2a081c163b0so19430165ad.0
-        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 01:06:34 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=pOcA5ld3IlY+lW0FK2FDEAzucr0W1jX6obBgtema5Rjg5/6AMq39V+kJ0Lrn9xnH5kslGsVA3dNr4zZjEzNdTfyIq2U/mvmkOhilxMefGTOkziYoYVYvCidbLgva3Bc782vBZ098zB+NZRyWkyx4YP7i4U65H7oDo1qRtediKs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=MlyuHyeG; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-6419b7b4b80so4876916a12.2
+        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 01:32:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765789594; x=1766394394; darn=vger.kernel.org;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1765791140; x=1766395940; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8TFzbFLNA/s8ANuMZPs94U2cOEd+GIJ7ZeP4XFmQHWk=;
-        b=DbFVAkV+9bTUaL3zUOZGSc0ehmkKrcH059r2y+rCYu7r+CHzao1iJXSCCC5cedExGk
-         lUC2x3ndImTxfy2TzVNU7aYEMm8XfAAcAwI+/6JLFQ9jLRJvSbjYfnlhjcC5TrYW9VjU
-         R+FFVb8CvOJyUo4cFcBrc9zCq4UNwbfkmt0RK4S/sFIrK8JRRDElD4P2xebPK4ZF+RDQ
-         PN38jaHyahmmFKr8N+L8e7UCZhhKzUzX4GyVaFn1lHh1UyLS/UnZQqaJrNfKgZyKoiHn
-         g2szT0mVHspGhIaaEeT5bxxsrxGNsX8UTGokIauxxAN1NuvFMl13TZFfSZYm5Hjzvf6n
-         9OOg==
+        bh=pMgRQp2NAuNDw0Pr8DKsFpJ1DQmsliJUNJj+b1nHdRA=;
+        b=MlyuHyeGNU/hwfhc8TNJZIHkuMZvDLYkHIG0aKz8n4YJGzOpXjNR9ltFG2r3GqnLDm
+         UZh2qsTa72lAtxe0DW8o2maHEGuJfrYFtaF2+qlVDnEVhvA8vwU2gGW6eXd11YSLAGNX
+         TSNdgOJQClkV8kFYPZ0L/Ypi6+kLiCZEKXU7ACAOu8jLElWimU/caMAIM9drAPmK2sHz
+         rW2m0xh6Jt7MCUfJSzm8l+5kQ91OvQDKZJTcHmq0Y0DyDpeQZxsGxr1eEir1C940C4ma
+         h6knkXpR0A4VkeXeeOlLiqfVXVprYK0XBBvBKNbnsnMEWiZTPq+O9abnX77iAt8Ox3u7
+         IcAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765789594; x=1766394394;
+        d=1e100.net; s=20230601; t=1765791140; x=1766395940;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8TFzbFLNA/s8ANuMZPs94U2cOEd+GIJ7ZeP4XFmQHWk=;
-        b=ow/QMNCDKQMGBwjJOM8OXE7HETmHLdQunrSHBH/leEbt++hWAutuzUI8+ZgnD4NgEn
-         kR9gi4/DDvU4/OcxsU4Jr+b2/2mex0xINJSO0RkxJa3scBOza9m+ic1uBngO77xO5ze6
-         5o3vnDc9yhjxwiq/nq9wrrGdtel3QH2YKGYgP2vWYzGAIEfnCkN/pxsRd/GYDtHpbqY4
-         cXGgzJaGX1/eBQdkGuQgQxd6hkqWXLqsSaPqYXAH523Kjkj3kFdp0Hz588ct8IEzday6
-         dGRkyyP07jrFIWzjk/hDgXxo7Nx8nzZAb8buXBnbjz8S6boIGbKPpGzjGz2XsXbTAz4L
-         gr2A==
-X-Forwarded-Encrypted: i=1; AJvYcCXf/D0YOYxp/qxXHqrbX8q3rF2QY1PHiwDNE6IdKHMNZShqiI+LwgVfQkQH99RVf1MZ+3YXsbE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcwAtznNQ6zWsHjzlTVYYbac5xAf1pkMlgqEsV1tN5r1pxXfQZ
-	U+5rPLqkLOxQsMoi9VWoYevYKIgUKAVEVXU6TXUxfB2348KplgtFC2368tDdBCcn5Go=
-X-Gm-Gg: AY/fxX6wq+D/MObzL6pF98n13aMLLUlk/YOaiFUG6PAoArDjp7IDf13WDmOEoZ3QdSd
-	ICetPRLKQCMnN01mDOsH5znf9zYqrWtZot1CAIkVZnxo4Z6eqDdXqnbj8V2zR0Oi1Sph8uNtxtr
-	DWBxURi64FJ2jFezfogpShXmuJumboJITRnVaNRIn+qjHN7sekHcslDo5TnAh5xNQP3kqmt85eM
-	CrDQvFlSINRLO6MSiUrcQRZxAOF27hWIVgThD/rsTeOdZxrqUMZu5wymseI28hah4xfuEoFVNIa
-	SHx62li0tpnxZmL3JdiygM/5DLBf7QgBmHkRF0mpk6TF7m6Xs/C2abZKY5N6vHA1qoohgJFgL6p
-	gOy5r/NFQh7QSZGJ9f5dmYvowRTpgF/WX1L30c7ruKfTrJhyySS0J+KbjERDZZq82yhvWqS52q1
-	fU4OOHox/Nn2Mbz349MzLC1Q==
-X-Google-Smtp-Source: AGHT+IGzyDWmqhEU1Z8oAXr89HQnWirxmApn4cZ+UbhSq+NqKKmus5Ux4BVNBkt46IA1IaRTWuk54w==
-X-Received: by 2002:a17:903:2f10:b0:295:570d:116e with SMTP id d9443c01a7336-29f243447f0mr103959285ad.41.1765789593648;
-        Mon, 15 Dec 2025 01:06:33 -0800 (PST)
-Received: from archie.me ([210.87.74.117])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29ee9d38ae7sm127996155ad.35.2025.12.15.01.06.31
+        bh=pMgRQp2NAuNDw0Pr8DKsFpJ1DQmsliJUNJj+b1nHdRA=;
+        b=mMz9PPBrv9n/DUamwmIoSET+fLwwWKwnBGHmwPJaaXSgfqG3bUeOKp2rjqmdc9BhqE
+         0hZaVbupnmfMJ3vAj/zQVYs1OgFG5Yw2PLAOymr0QJSRcVXy8Pjzp3ItrTAQkGKIRU2/
+         13pROFuNwsLU5D42+9N9HHIp+ISglzNlZPi8H+FTTSRm4Wa7BS/r8V4Ortn0zEds7uI9
+         OM5tAhEnjD4mgKDEVwO28xW6vi08qsqUpd46AzvL8SBVyzCLHVqY19XLcPYKuz1qJCZN
+         96GuSbEeAvvkgqlWHHbKfdFmn7ppMAYwleC2xlfefDkLINiIAf63XZa5Y0P7xiv/4DGH
+         ictQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXhSzpWW224pVfgovWgwAuHg1qukDmTAPdkfvazSZoyFb6MfXgVe6aO0tzliUHBGy1NrciKvyk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy97PgOSg3hxWgRGf6dXzIjz38IfczK27zfV+vzQFs+Vnxg8duN
+	7wZQtFHybzKeAEjCpbevggjpsgeu8Vc2pv5DLIeUxr16BvcRuSudtNCr0j9T5GLallM=
+X-Gm-Gg: AY/fxX7cC1s97D9WDxjWOZL+2ql/YLX8a3WFkpdbN/qu8GqrNbJsiFc7lUv+BMaraPM
+	PjVQdukXFvcSZn/MB74dGWbEJ28++atGVF3qOc3Js9WyQEp0ZhP8/DPl3zOxytMMAES8pxYXMVg
+	V+ZBITRwKoLThWU/XVbmVTEiJjicR2WGisAfUtC28e3wzWg7ef9/vDVOdsZCH2psKObIpt8Itu4
+	foUghogyH9v+LelhM9b/sC20mtW08yi8KEpI6uZ4NZ+0/feKLjLKn3TRCVxQduI5Pc7fufvmQzY
+	babBjz2c5iUpWetPf977TeMTSx4eZyptT8LmpbCM3SRRxaEtZ7aCZKiU37yQJ4/6bKvGdtHAp4h
+	nd+TZN5af6UsA4Ccxfq5per/Zb6YR1CzBRF3A7YCq4k5VrTvHppMGCs2522pKYkLM2wt2zh6x/k
+	76wjdi4JZH56rqzIZTftquElOf254dCS2QC8xkmZ1tnE4/SiUcvJC1fRpbPjjvYWyBwFpvTXwIt
+	cU=
+X-Google-Smtp-Source: AGHT+IEaCg0quo15SNx/nGnta9oq72ocRWkg5l3SHsMTaK2wohhdkzDoQR/uDt0uWt8Scz8Vq184Fw==
+X-Received: by 2002:a17:907:1c0b:b0:b7a:1be1:984 with SMTP id a640c23a62f3a-b7d23a912c7mr930197866b.64.1765791140272;
+        Mon, 15 Dec 2025 01:32:20 -0800 (PST)
+Received: from localhost (p200300f65f006608181e6e27368f7e86.dip0.t-ipconnect.de. [2003:f6:5f00:6608:181e:6e27:368f:7e86])
+        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-b7cfa56a7f9sm1329836266b.51.2025.12.15.01.32.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Dec 2025 01:06:32 -0800 (PST)
-Received: by archie.me (Postfix, from userid 1000)
-	id 271FE41902F7; Mon, 15 Dec 2025 16:06:28 +0700 (WIB)
-Date: Mon, 15 Dec 2025 16:06:28 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Byungchul Park <byungchul@sk.com>
-Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
-	torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
-	linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
-	linux-ext4@vger.kernel.org, mingo@redhat.com, peterz@infradead.org,
-	will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
-	joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
-	duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
-	tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
-	amir73il@gmail.com, gregkh@linuxfoundation.org, kernel-team@lge.com,
-	linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
-	minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
-	sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
-	penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
-	ngupta@vflare.org, linux-block@vger.kernel.org,
-	josef@toxicpanda.com, linux-fsdevel@vger.kernel.org, jack@suse.cz,
-	jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
-	djwong@kernel.org, dri-devel@lists.freedesktop.org,
-	rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
-	hamohammed.sa@gmail.com, harry.yoo@oracle.com,
-	chris.p.wilson@intel.com, gwan-gyeong.mun@intel.com,
-	max.byungchul.park@gmail.com, boqun.feng@gmail.com,
-	longman@redhat.com, yunseong.kim@ericsson.com, ysk@kzalloc.com,
-	yeoreum.yun@arm.com, netdev@vger.kernel.org,
-	matthew.brost@intel.com, her0gyugyu@gmail.com, corbet@lwn.net,
-	catalin.marinas@arm.com, bp@alien8.de, x86@kernel.org,
-	hpa@zytor.com, luto@kernel.org, sumit.semwal@linaro.org,
-	gustavo@padovan.org, christian.koenig@amd.com,
-	andi.shyti@kernel.org, arnd@arndb.de, lorenzo.stoakes@oracle.com,
-	Liam.Howlett@oracle.com, rppt@kernel.org, surenb@google.com,
-	mcgrof@kernel.org, petr.pavlu@suse.com, da.gomez@kernel.org,
-	samitolvanen@google.com, paulmck@kernel.org, frederic@kernel.org,
-	neeraj.upadhyay@kernel.org, joelagnelf@nvidia.com,
-	josh@joshtriplett.org, urezki@gmail.com,
-	mathieu.desnoyers@efficios.com, jiangshanlai@gmail.com,
-	qiang.zhang@linux.dev, juri.lelli@redhat.com,
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-	bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
-	chuck.lever@oracle.com, neil@brown.name, okorniev@redhat.com,
-	Dai.Ngo@oracle.com, tom@talpey.com, trondmy@kernel.org,
-	anna@kernel.org, kees@kernel.org, bigeasy@linutronix.de,
-	clrkwllms@kernel.org, mark.rutland@arm.com, ada.coupriediaz@arm.com,
-	kristina.martsenko@arm.com, wangkefeng.wang@huawei.com,
-	broonie@kernel.org, kevin.brodsky@arm.com, dwmw@amazon.co.uk,
-	shakeel.butt@linux.dev, ast@kernel.org, ziy@nvidia.com,
-	yuzhao@google.com, baolin.wang@linux.alibaba.com,
-	usamaarif642@gmail.com, joel.granados@kernel.org,
-	richard.weiyang@gmail.com, geert+renesas@glider.be,
-	tim.c.chen@linux.intel.com, linux@treblig.org,
-	alexander.shishkin@linux.intel.com, lillian@star-ark.net,
-	chenhuacai@kernel.org, francesco@valla.it,
-	guoweikang.kernel@gmail.com, link@vivo.com, jpoimboe@kernel.org,
-	masahiroy@kernel.org, brauner@kernel.org,
-	thomas.weissschuh@linutronix.de, oleg@redhat.com, mjguzik@gmail.com,
-	andrii@kernel.org, wangfushuai@baidu.com, linux-doc@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-media@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org, linux-i2c@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-modules@vger.kernel.org,
-	rcu@vger.kernel.org, linux-nfs@vger.kernel.org,
-	linux-rt-devel@lists.linux.dev, 2407018371@qq.com, dakr@kernel.org,
-	miguel.ojeda.sandonis@gmail.com, neilb@ownmail.net,
-	wsa+renesas@sang-engineering.com, dave.hansen@intel.com,
-	geert@linux-m68k.org, ojeda@kernel.org, alex.gaynor@gmail.com,
-	gary@garyguo.net, bjorn3_gh@protonmail.com, lossin@kernel.org,
-	a.hindborg@kernel.org, aliceryhl@google.com, tmgross@umich.edu,
-	rust-for-linux@vger.kernel.org
-Subject: Re: [PATCH v18 25/42] dept: add documents for dept
-Message-ID: <aT_PlFHyQB6HyZXG@archie.me>
-References: <20251205071855.72743-1-byungchul@sk.com>
- <20251205071855.72743-26-byungchul@sk.com>
- <aTN38kJjBftxnjm9@archie.me>
- <20251215042237.GA49936@system.software.com>
+        Mon, 15 Dec 2025 01:32:19 -0800 (PST)
+Date: Mon, 15 Dec 2025 10:32:18 +0100
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+To: Sumit Garg <sumit.garg@kernel.org>
+Cc: Jens Wiklander <jens.wiklander@linaro.org>, 
+	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	=?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
+	Ard Biesheuvel <ardb@kernel.org>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Sumit Garg <sumit.garg@oss.qualcomm.com>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, 
+	Sudeep Holla <sudeep.holla@arm.com>, Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
+	Michael Chan <michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, 
+	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>, James Bottomley <James.Bottomley@hansenpartnership.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Mimi Zohar <zohar@linux.ibm.com>, 
+	David Howells <dhowells@redhat.com>, Paul Moore <paul@paul-moore.com>, 
+	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, 
+	Peter Huewe <peterhuewe@gmx.de>, op-tee@lists.trustedfirmware.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-rtc@vger.kernel.org, linux-efi@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
+	Cristian Marussi <cristian.marussi@arm.com>, arm-scmi@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-integrity@vger.kernel.org, keyrings@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, Jason Gunthorpe <jgg@ziepe.ca>
+Subject: Re: [PATCH v1 00/17] tee: Use bus callbacks instead of driver
+ callbacks
+Message-ID: <dhunzydod4d7vj73llpuqemxb5er2ja4emxusr66irwf77jhhb@es4yd2axzl25>
+References: <cover.1765472125.git.u.kleine-koenig@baylibre.com>
+ <aT--ox375kg2Mzh-@sumit-X1>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -154,420 +105,104 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="oXMU5jEQKY7U45cC"
+	protocol="application/pgp-signature"; boundary="yi4htjinth7u7w6q"
 Content-Disposition: inline
-In-Reply-To: <20251215042237.GA49936@system.software.com>
+In-Reply-To: <aT--ox375kg2Mzh-@sumit-X1>
 
 
---oXMU5jEQKY7U45cC
-Content-Type: text/plain; charset=utf-8
+--yi4htjinth7u7w6q
+Content-Type: text/plain; protected-headers=v1; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v1 00/17] tee: Use bus callbacks instead of driver
+ callbacks
+MIME-Version: 1.0
 
-On Mon, Dec 15, 2025 at 01:22:37PM +0900, Byungchul Park wrote:
-> On Sat, Dec 06, 2025 at 07:25:22AM +0700, Bagas Sanjaya wrote:
-> > On Fri, Dec 05, 2025 at 04:18:38PM +0900, Byungchul Park wrote:
-> > > Add documents describing the concept and APIs of dept.
-> > >=20
-> > > Signed-off-by: Byungchul Park <byungchul@sk.com>
-> > > ---
-> > >  Documentation/dev-tools/dept.rst     | 778 +++++++++++++++++++++++++=
-++
-> > >  Documentation/dev-tools/dept_api.rst | 125 +++++
-> >=20
-> > You forget to add toctree entries:
->=20
-> I'm sorry for late reply.
->=20
-> Thanks a lot!
->=20
-> > ---- >8 ----
-> > diff --git a/Documentation/dev-tools/index.rst b/Documentation/dev-tool=
-s/index.rst
-> > index 4b8425e348abd1..02c858f5ed1fa2 100644
-> > --- a/Documentation/dev-tools/index.rst
-> > +++ b/Documentation/dev-tools/index.rst
-> > @@ -22,6 +22,8 @@ Documentation/process/debugging/index.rst
-> >     clang-format
-> >     coccinelle
-> >     sparse
-> > +   dept
-> > +   dept_api
-> >     kcov
-> >     gcov
-> >     kasan
-> >=20
-> > > +Lockdep detects a deadlock by checking lock acquisition order.  For
-> > > +example, a graph to track acquisition order built by lockdep might l=
-ook
-> > > +like:
-> > > +
-> > > +.. literal::
-> > > +
-> > > +   A -> B -
-> > > +           \
-> > > +            -> E
-> > > +           /
-> > > +   C -> D -
-> > > +
-> > > +   where 'A -> B' means that acquisition A is prior to acquisition B
-> > > +   with A still held.
-> >=20
-> > Use code-block directive for literal code blocks:
->=20
-> I will.
->=20
-> > ---- >8 ----
-> > diff --git a/Documentation/dev-tools/dept.rst b/Documentation/dev-tools=
-/dept.rst
-> > index 333166464543d7..8394c4ea81bc2a 100644
-> > --- a/Documentation/dev-tools/dept.rst
-> > +++ b/Documentation/dev-tools/dept.rst
-> > @@ -10,7 +10,7 @@ Lockdep detects a deadlock by checking lock acquisiti=
-on order.  For
-> >  example, a graph to track acquisition order built by lockdep might look
-> >  like:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     A -> B -
-> >             \
-> > @@ -25,7 +25,7 @@ Lockdep keeps adding each new acquisition order into =
-the graph at
-> >  runtime.  For example, 'E -> C' will be added when the two locks have
-> >  been acquired in the order, E and then C.  The graph will look like:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >         A -> B -
-> >                 \
-> > @@ -41,7 +41,7 @@ been acquired in the order, E and then C.  The graph =
-will look like:
-> > =20
-> >  This graph contains a subgraph that demonstrates a loop like:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >                  -> E -
-> >                 /      \
-> > @@ -76,7 +76,7 @@ e.g. irq context, normal process context, wq worker c=
-ontext, or so on.
-> > =20
-> >  Can lockdep detect the following deadlock?
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context X	   context Y	   context Z
-> > =20
-> > @@ -91,7 +91,7 @@ Can lockdep detect the following deadlock?
-> > =20
-> >  No.  What about the following?
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context X		   context Y
-> > =20
-> > @@ -116,7 +116,7 @@ What leads a deadlock
-> >  A deadlock occurs when one or multi contexts are waiting for events th=
-at
-> >  will never happen.  For example:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context X	   context Y	   context Z
-> > =20
-> > @@ -148,7 +148,7 @@ In terms of dependency:
-> > =20
-> >  Dependency graph reflecting this example will look like:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >      -> C -> A -> B -
-> >     /                \
-> > @@ -171,7 +171,7 @@ Introduce DEPT
-> >  DEPT(DEPendency Tracker) tracks wait and event instead of lock
-> >  acquisition order so as to recognize the following situation:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context X	   context Y	   context Z
-> > =20
-> > @@ -186,7 +186,7 @@ acquisition order so as to recognize the following =
-situation:
-> >  and builds up a dependency graph at runtime that is similar to lockdep.
-> >  The graph might look like:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >      -> C -> A -> B -
-> >     /                \
-> > @@ -199,7 +199,7 @@ DEPT keeps adding each new dependency into the grap=
-h at runtime.  For
-> >  example, 'B -> D' will be added when event D occurrence is a
-> >  prerequisite to reaching event B like:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context W
-> > =20
-> > @@ -211,7 +211,7 @@ prerequisite to reaching event B like:
-> > =20
-> >  After the addition, the graph will look like:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >                       -> D
-> >                      /
-> > @@ -236,7 +236,7 @@ How DEPT works
-> >  Let's take a look how DEPT works with the 1st example in the section
-> >  'Limitation of lockdep'.
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context X	   context Y	   context Z
-> > =20
-> > @@ -256,7 +256,7 @@ event.
-> > =20
-> >  Adding comments to describe DEPT's view in detail:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context X	   context Y	   context Z
-> > =20
-> > @@ -293,7 +293,7 @@ Adding comments to describe DEPT's view in detail:
-> > =20
-> >  Let's build up dependency graph with this example.  Firstly, context X:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context X
-> > =20
-> > @@ -304,7 +304,7 @@ Let's build up dependency graph with this example. =
- Firstly, context X:
-> > =20
-> >  There are no events to create dependency.  Next, context Y:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context Y
-> > =20
-> > @@ -332,7 +332,7 @@ event A cannot be triggered if wait B cannot be awa=
-kened by event B.
-> >  Therefore, we can say event A depends on event B, say, 'A -> B'.  The
-> >  graph will look like after adding the dependency:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     A -> B
-> > =20
-> > @@ -340,7 +340,7 @@ graph will look like after adding the dependency:
-> > =20
-> >  Lastly, context Z:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context Z
-> > =20
-> > @@ -362,7 +362,7 @@ triggered if wait A cannot be awakened by event A. =
- Therefore, we can
-> >  say event B depends on event A, say, 'B -> A'.  The graph will look li=
-ke
-> >  after adding the dependency:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >      -> A -> B -
-> >     /           \
-> > @@ -386,7 +386,7 @@ Interpret DEPT report
-> > =20
-> >  The following is the same example in the section 'How DEPT works'.
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context X	   context Y	   context Z
-> > =20
-> > @@ -425,7 +425,7 @@ We can simplify this by labeling each waiting point=
- with [W], each
-> >  point where its event's context starts with [S] and each event with [E=
-].
-> >  This example will look like after the labeling:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context X	   context Y	   context Z
-> > =20
-> > @@ -443,7 +443,7 @@ DEPT uses the symbols [W], [S] and [E] in its repor=
-t as described above.
-> >  The following is an example reported by DEPT for a real problem in
-> >  practice.
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     Link: https://lore.kernel.org/lkml/6383cde5-cf4b-facf-6e07-1378a485=
-657d@I-love.SAKURA.ne.jp/#t
-> >     Link: https://lore.kernel.org/lkml/1674268856-31807-1-git-send-emai=
-l-byungchul.park@lge.com/
-> > @@ -646,7 +646,7 @@ practice.
-> > =20
-> >  Let's take a look at the summary that is the most important part.
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     ---------------------------------------------------
-> >     summary
-> > @@ -669,7 +669,7 @@ Let's take a look at the summary that is the most i=
-mportant part.
-> > =20
-> >  The summary shows the following scenario:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context A	   context B	   context ?(unknown)
-> > =20
-> > @@ -684,7 +684,7 @@ The summary shows the following scenario:
-> > =20
-> >  Adding comments to describe DEPT's view in detail:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context A	   context B	   context ?(unknown)
-> > =20
-> > @@ -711,7 +711,7 @@ Adding comments to describe DEPT's view in detail:
-> > =20
-> >  Let's build up dependency graph with this report. Firstly, context A:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context A
-> > =20
-> > @@ -735,7 +735,7 @@ unlock(&ni->ni_lock:0) depends on folio_unlock(&f1)=
-, say,
-> > =20
-> >  The graph will look like after adding the dependency:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     unlock(&ni->ni_lock:0) -> folio_unlock(&f1)
-> > =20
-> > @@ -743,7 +743,7 @@ The graph will look like after adding the dependenc=
-y:
-> > =20
-> >  Secondly, context B:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >     context B
-> > =20
-> > @@ -762,7 +762,7 @@ folio_unlock(&f1) depends on unlock(&ni->ni_lock:0)=
-, say,
-> > =20
-> >  The graph will look like after adding the dependency:
-> > =20
-> > -.. literal::
-> > +.. code-block::
-> > =20
-> >      -> unlock(&ni->ni_lock:0) -> folio_unlock(&f1) -
-> >     /                                                \
-> >=20
-> > > +Limitation of lockdep
-> > > +---------------------
-> > > +
-> > > +Lockdep deals with a deadlock by typical lock e.g. spinlock and mute=
-x,
-> > > +that are supposed to be released within the acquisition context.
-> > > +However, when it comes to a deadlock by folio lock that is not suppo=
-sed
-> > > +to be released within the acquisition context or other general
-> > > +synchronization mechanisms, lockdep doesn't work.
-> > > +
-> > > +NOTE:  In this document, 'context' refers to any type of unique cont=
-ext
-> > > +e.g. irq context, normal process context, wq worker context, or so o=
-n.
-> > > +
-> > > +Can lockdep detect the following deadlock?
-> > > +
-> > > +.. literal::
-> > > +
-> > > +   context X	   context Y	   context Z
-> > > +
-> > > +		   mutex_lock A
-> > > +   folio_lock B
-> > > +		   folio_lock B <- DEADLOCK
-> > > +				   mutex_lock A <- DEADLOCK
-> > > +				   folio_unlock B
-> > > +		   folio_unlock B
-> > > +		   mutex_unlock A
-> > > +				   mutex_unlock A
-> > > +
-> > > +No.  What about the following?
-> > > +
-> > > +.. literal::
-> > > +
-> > > +   context X		   context Y
-> > > +
-> > > +			   mutex_lock A
-> > > +   mutex_lock A <- DEADLOCK
-> > > +			   wait_for_complete B <- DEADLOCK
-> > > +   complete B
-> > > +			   mutex_unlock A
-> > > +   mutex_unlock A
-> > > +
-> > > +No.
-> >=20
-> > One unanswered question from my v17 review [1]: You explain in "How DEP=
-T works"
-> > section how DEPT detects deadlock in the first example (the former with=
- three
-> > contexts). Can you do the same on the second example (the latter with t=
-wo
-> > contexts)?
->=20
-> Did you mean to update the document with it?  I misunderstood what you
-> meant but sure I will update it as [1].
+Hello Sumit,
 
-Of course!
+On Mon, Dec 15, 2025 at 04:54:11PM +0900, Sumit Garg wrote:
+> On Thu, Dec 11, 2025 at 06:14:54PM +0100, Uwe Kleine-K=F6nig wrote:
+> > Hello,
+> >=20
+> > the objective of this series is to make tee driver stop using callbacks
+> > in struct device_driver. These were superseded by bus methods in 2006
+> > (commit 594c8281f905 ("[PATCH] Add bus_type probe, remove, shutdown
+> > methods.")) but nobody cared to convert all subsystems accordingly.
+> >=20
+> > Here the tee drivers are converted. The first commit is somewhat
+> > unrelated, but simplifies the conversion (and the drivers). It
+> > introduces driver registration helpers that care about setting the bus
+> > and owner. (The latter is missing in all drivers, so by using these
+> > helpers the drivers become more correct.)
+> >=20
+> > The patches #4 - #17 depend on the first two, so if they should be
+> > applied to their respective subsystem trees these must contain the first
+> > two patches first.
+>=20
+> Thanks Uwe for your efforts to clean up the boilerplate code for TEE bus
+> drivers.
 
---=20
-An old man doll... just what I always wanted! - Clara
+Thanks for your feedback. I will prepare a v2 and address your comments
+(whitespace issues and wrong callback in the shutdown method).
 
---oXMU5jEQKY7U45cC
-Content-Type: application/pgp-signature; name=signature.asc
+> > Note that after patch #2 is applied, unconverted drivers provoke a
+> > warning in driver_register(), so it would be good for the user
+> > experience if the whole series goes in during a single merge window.
+>=20
+> +1
+>=20
+> I suggest the whole series goes via the Jens tree since there shouldn't
+> be any chances for conflict here.
+>=20
+> > So
+> > I guess an immutable branch containing the frist three patches that can
+> > be merged into the other subsystem trees would be sensible.
+> >=20
+> > After all patches are applied, tee_bus_type can be made private to
+> > drivers/tee as it's not used in other places any more.
+> >=20
+>=20
+> Feel free to make the tee_bus_type private as the last patch in the series
+> such that any followup driver follows this clean approach.
+
+There is a bit more to do for that than I'm willing to invest. With my
+patch series applied `tee_bus_type` is still used in
+drivers/tee/optee/device.c and drivers/tee/tee_core.c. Maybe it's
+sensible to merge these two files into a single one.
+
+The things I wonder about additionally are:
+
+ - if CONFIG_OPTEE=3Dn and CONFIG_TEE=3Dy|m the tee bus is only used for
+   drivers but not devices.
+
+ - optee_register_device() calls device_create_file() on
+   &optee_device->dev after device_register(&optee_device->dev).
+   (Attention half-knowledge!) I think device_create_file() should not
+   be called on an already registered device (or you have to send a
+   uevent afterwards). This should probably use type attribute groups.
+   (Or the need_supplicant attribute should be dropped as it isn't very
+   useful. This would maybe be considered an ABI change however.)
+
+ - Why does optee_probe() in drivers/tee/optee/smc_abi.c unregister all
+   optee devices in its error path (optee_unregister_devices())?
+
+Best regards
+Uwe
+
+--yi4htjinth7u7w6q
+Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCaT/PiwAKCRD2uYlJVVFO
-o2U6AQDUdKZUTdPI5wclaV+upvJdG2B4MNuJFQ3Ausve1JhRAgD9FqcmmRDdNgTg
-fQNwIxnV8dOThdPBY4c1vylRfqTVTQg=
-=1ic4
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmk/1ZQACgkQj4D7WH0S
+/k5/qQf+NMGu64faecGn5WH+D12Iy/zqcfwRwh4Jv5/z/9n8f9SRKuXtH6kM3hvA
+3qOp/DbN1aDIomzFdgcPUq9OJEeC51ry33uJW7UWHl5lUk4UawAR28vX/1R3nV7t
+tz6suQjR2YkY2a/sAxZTSKZZ/A6RTGDxePvozHzuElCmEYDDbNhZpHsvgsLqs3T+
+Cso9zyEM2is8g673w2FcAnlW3JL/8jKClvZfcm9JEIRlx48uP6uCqbWeRcYS3rrt
+JBUGmWSMNEfYbD3cQbhybixsTPLzfKqkGrbJSyVRkJ2AUAQuRS14sbv7uSGhFw3B
+QWGugzTdTxcSdC0SqkOUZrCXgVUKmA==
+=VNEB
 -----END PGP SIGNATURE-----
 
---oXMU5jEQKY7U45cC--
+--yi4htjinth7u7w6q--
 
