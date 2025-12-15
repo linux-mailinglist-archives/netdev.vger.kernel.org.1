@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-244719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFEDFCBD8CF
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 12:40:12 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4F3CCBD911
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 12:41:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 7D7C830181EB
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 11:39:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 178FB300CAE8
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 11:41:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 944B133290E;
-	Mon, 15 Dec 2025 11:39:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCE08333750;
+	Mon, 15 Dec 2025 11:39:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bdmUpkgj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XytzJRAR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCBFA330B27
-	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 11:39:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D895D330322
+	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 11:39:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765798762; cv=none; b=kZ2O8KzwvvhyK6o+phtTgxUKOvK3G4EDK9GSY505njMZ0S9fePvU0pqiN6SkhxEFFov595316/qCQTE/npeZAXIvJTNJCz+JG7M8jx1Y7BsVbeInceFz1QBD4yu4ObIrWpY8y8a/ByfFgOTZM4Of/LsRX/M1i6cIYH4fTp5xZhg=
+	t=1765798768; cv=none; b=fr6oD4UR4xDl010Zs1EXXkghfyA52WEq8TuauJLzK9T67eQtJ97wQ0/eShKhL6Hl7GZQGwa5Hev/Vi2WrAlU87zPLf7et32XU4ja1EBw/3VgkN9549wsMy+IkJOw4rCpf3si4AB4at7JQprSgB2nNb/eH3+ljANHukKFWVR7RZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765798762; c=relaxed/simple;
-	bh=ZF9oIk+6VfTU18bKiromuOjnT5V3QoMoKRjEOTmh6aM=;
+	s=arc-20240116; t=1765798768; c=relaxed/simple;
+	bh=XiWwx/yBvL5qhtur1OJ6r0Qtve5kN/UAKMQDFDv8Kk4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lm1F5c9s6ehiWixOnq5QgqkoYX8z8WbuZ6EpFWAuJ9fVpkn5Jaa9xU0c3TNazsxeJ8m9y9TLb2vZeKgY6I65nXgNr9HZH/GoCDBYQyXFPeJPxIju/yXyRDEADqbzFuRZuUOpNeMS1EsYbWNohHgZ5UTrkz182LykVZyuIYKTs8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bdmUpkgj; arc=none smtp.client-ip=209.85.210.173
+	 MIME-Version; b=FK0M+3qriAhkY6VXLanNe4kotdsGhz3aza36LF2vXGaMiCDZAMO2NTIv/J6dDf8UUU48HUvw5+573V3FxaEp83stzrqQ6ZI3oYG5pgogSddzRe+WGt7yOca/jdiBgxuVX0TybQwfyDsJxJPh4b9p0e8FfirAKdt6tieNvQooAxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XytzJRAR; arc=none smtp.client-ip=209.85.216.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7b9c17dd591so2678775b3a.3
-        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 03:39:19 -0800 (PST)
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-34c84dc332cso993281a91.0
+        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 03:39:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765798759; x=1766403559; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1765798763; x=1766403563; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XhdWc9MI61x0CV5VCAtcSDjXy8TDKlNky9k0yGxBSF0=;
-        b=bdmUpkgjG3A8l3BasLLFRqyXr+2XJuYbch+Hq+yAEPrg7wpPcdx7I/jpNbylqYdiqk
-         3QsRYHXpwqH14EvQeUgpUY+RquV1E9+wIqG7bSiJgDLRspYNZqwv5fzFfmUKIaOwAWmN
-         eLkDuwWlqL7hbu/WzWFB20S6jwEKdHSVObJFYOvUC3m7rHiH6j6lPeFp5rqtjRAGCuRi
-         Ck7gGIzrxXlCEO07uvcLgrev8tblGfHnErPfzxxyib6DQvy6vLfHOpHQhov4ZVVHi7tn
-         rawLwpf17tCFUfq7t1FORzuEApjYZxJNEx/qktof7BEDr2R/5IGdYpfl5R9W8jfCsvI1
-         85eQ==
+        bh=KFsNe5Gu995f8GfU2RxaYzwbXM91ZCVhfkD06BV90tM=;
+        b=XytzJRARBFCGn2wkwkzcKGcQxZVspcyrUETa6kb4/Whu+HngPYUDtnXiVcnTNT5THM
+         tluZeafaX/Xu1YjXUj24bBzkauectMVxvfK1wrNtyoTxDAq6YXy5+hoBXfQs8gvFEwQg
+         U2fHhiSAHyiD+0ZHdIsr5XmZTQC/lIbr+scipAN2wO9fBcVQ4az5nIXC2jGSKfefSfJj
+         NJFlRmb6++Mh6N7y4i5xPsgvP4eb31RqyGiy5BjroqqwnZxxThie3Fb8gKJW1slA1ZgK
+         t/b5xtdMAq9prQMyUHZOd/u8JquiqUYMUo6WPyjWxhAn8vTzCvKzNa4q0/BytzCGMVm2
+         8K+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765798759; x=1766403559;
+        d=1e100.net; s=20230601; t=1765798763; x=1766403563;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=XhdWc9MI61x0CV5VCAtcSDjXy8TDKlNky9k0yGxBSF0=;
-        b=qEZK7wup6cigFkBkvMXobPtTwF4hdbtYRZ9XgpkD7EJsjB1UWXjb8uczagsRdC+B1g
-         6N6ilczvwWyjRIVcdsWJrlOh7BZOrGc50ibh8gvJ/XHq5kcoPSaxerv7ZtG8GwEe+efC
-         fILckOcmjuhOtBYYzHsFZ9P7tCfNc25zuLzyOB+GdWNDHUrh838z632v3dAbgg6B020H
-         kn8iIhuw/jibdV8cYWOYQj+gZfVkC8fiiCkPcuNu7AkXmRMbF2YVqOkbgwGpuqVHlkRX
-         tiO9OHzEODP25hZH+P2Asduu9wdDzS2zMsdMGPNIWi1N2nRowESpupnSN9qtWDxgHoHv
-         TYLg==
-X-Forwarded-Encrypted: i=1; AJvYcCWm7BtPCObFD5M+4HWtoztOR4RewpP2IevoxFMQP/ojt0DTiA0wrvJE9ioFba9qo5kTEIW+PfU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyAcrOVEs5BGH9tTjv0ZUqJMs6wRaRieHhQSPX+hYtxQCUXmkya
-	64kNuQADUjI39SU21RnQGD+0i/oV4y7eCD/vWxXWCGPKIMLpTmrUDUHD
-X-Gm-Gg: AY/fxX6T5VtWDyWYYHtEMnBDzLSUaruzel/qEaCWePsjrnU9RcH55RrH9ZZDBc2iAB2
-	tRIhL88MNFQ3OixFQfYkia64eBblr6m93Tw6Q4wi21hve8P1urS5h9WW3g0yv4izSlw8bpgwae9
-	VoiucfbkkgM1QEkxI2daltQetYx3Ddux6/wNEEDtWyvva/wOxqJO86bxnLnJ3sBykrEeZxospDV
-	VV1A4+YrmvLIgZpZX1vTyYTGDS7Q7uOAygoTxxsmfUM6/kNSFVDT+weE+cZ1/Wmi5SForocpuSN
-	ST+ASINqoD097WigRF8VVfyrWVMudsXLwqdwqa5voIT7bK2PJ5RwV+gcHmJDCkfqdIyL1uP5mSD
-	FzxrgQqAKKz88zwExPdn4UR6WaOMIYLCxTb+PauRPNJif05+GMgxlatIVvaVGTo+yaISeMfwSHQ
-	qPgn1Y5mW/0BY=
-X-Google-Smtp-Source: AGHT+IEml9qI+VrrnmRfetIj/W3ZZs/y3fpGJeeY3YNSfL1Lp+Ud1G2wHo5sReKCb7zM9fF8T1soPQ==
-X-Received: by 2002:a05:6a00:4211:b0:7e8:4587:e8c8 with SMTP id d2e1a72fcca58-7f669c8ea65mr9926386b3a.59.1765798758916;
-        Mon, 15 Dec 2025 03:39:18 -0800 (PST)
+        bh=KFsNe5Gu995f8GfU2RxaYzwbXM91ZCVhfkD06BV90tM=;
+        b=AKFzkMa3PRVDevZg+mTrjq/ve4R45DdvvWbxqmhhnlkOCw5FHGgyOTC29tnDnYKuvg
+         cAU6QFdTuLOakKLdmcSl88GsEB0iiDyvBrnC9Vgr5EyVQWbVURB+7vnCVWxzME33TIaa
+         gnl8mk+f6QH5ro4sLHbyiRoVm0PUSKQIt9pML+YWUS3O2O5kotMDr0X6dRCgWE/duFqs
+         Z81cKvRtXaGkIcDvBB1AtV7pp8gE7yO9F7q3g1YybZIsXCuBfi+/Ma19efRMpp1VKD5e
+         glY8kcc0yP96qMQcVVKukETqWDx09C5RfWQbKIwMXCwtpz6KGaER1m3ZIitleKmC03Xe
+         Sayg==
+X-Forwarded-Encrypted: i=1; AJvYcCXwJaNapY4TMY3+1ItE2JBx9icVkiTx/k+USREL5ix36jC7UPL/gK+nXL7Rz9EYHRbvrAXhkIo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjGa2tkYENsSiPGbTJjkMnF9f2BaKAbmlJvu8Jjl63rOOplW6O
+	ghwjEYzzTU6i9BImAdwi1OD/sqqhf2Vzl8tKo9eJpoirsJl6sl3rQl11
+X-Gm-Gg: AY/fxX5erQdX/TrJrn3THJk/GqDTnWp6kEeHwcKAxquqPsGybTZbIyjiSLFuVlJ/Cob
+	16KlL0dawPfYxRM3ntWWGwJxk2/Gy+SUETGyooEwO3NQesaInjvpDMUEsXrRkhY035SEPkIrYNy
+	O9+BlevnnW8EYV3dJeh2o2Nh97I32L7ND+vfMK1PniON8h4PvGqpeM2PoxPL1O58JNtFfOcLo/a
+	VewlRPE8NT3wW3yFsjyB13qnqGA+FzSWiRa4NCAafmtimaJbGNWI5KoSvU8clunjEfb2joR2R+V
+	21wEwVs1IQ2iiZUGJKG/FvXQFDvtQtUaDYMz+47w+r5xbiBE6abC9VufE2bj7NRLFzVvhX2ERMD
+	wpuorxIuc8IPjB8EVaNUDdhrkL7tM3BZZj+3MItu8YjITmhcJ7UXvq4E0UPAM4dTNq6A/cpWUWj
+	puOaoL3UgRdc4=
+X-Google-Smtp-Source: AGHT+IEy2tcNugFFoZ/L1b/kwWL3FdgAjYD+lvIJBPYKZMY6hs2UzwV9S1AhT0ES6IDo2vtVEhI5ug==
+X-Received: by 2002:a17:90b:2811:b0:340:bb51:17eb with SMTP id 98e67ed59e1d1-34abd6d35c0mr9572904a91.15.1765798763360;
+        Mon, 15 Dec 2025 03:39:23 -0800 (PST)
 Received: from archie.me ([210.87.74.117])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7f4c566c7cfsm12487742b3a.67.2025.12.15.03.39.13
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34abe2f34c7sm2908684a91.9.2025.12.15.03.39.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Mon, 15 Dec 2025 03:39:18 -0800 (PST)
 Received: by archie.me (Postfix, from userid 1000)
-	id BCD48444B396; Mon, 15 Dec 2025 18:39:06 +0700 (WIB)
+	id CA7C1444B397; Mon, 15 Dec 2025 18:39:06 +0700 (WIB)
 From: Bagas Sanjaya <bagasdotme@gmail.com>
 To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
 	Linux AMDGPU <amd-gfx@lists.freedesktop.org>,
@@ -161,9 +161,9 @@ Cc: Harry Wentland <harry.wentland@amd.com>,
 	Jilin Yuan <yuanjilin@cdjrlc.com>,
 	Swaraj Gaikwad <swarajgaikwad1925@gmail.com>,
 	George Anthony Vernon <contact@gvernon.com>
-Subject: [PATCH 07/14] fs: Describe @isnew parameter in ilookup5_nowait()
-Date: Mon, 15 Dec 2025 18:38:55 +0700
-Message-ID: <20251215113903.46555-8-bagasdotme@gmail.com>
+Subject: [PATCH 08/14] VFS: fix __start_dirop() kernel-doc warnings
+Date: Mon, 15 Dec 2025 18:38:56 +0700
+Message-ID: <20251215113903.46555-9-bagasdotme@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20251215113903.46555-1-bagasdotme@gmail.com>
 References: <20251215113903.46555-1-bagasdotme@gmail.com>
@@ -173,34 +173,40 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=946; i=bagasdotme@gmail.com; h=from:subject; bh=ZF9oIk+6VfTU18bKiromuOjnT5V3QoMoKRjEOTmh6aM=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDJn2n4NPZboGqi8J0lGIEPx09J91+O5zYvcmVc9uCnNeq KyqY9/YUcrCIMbFICumyDIpka/p9C4jkQvtax1h5rAygQxh4OIUgIloczEyXFE5FS25V7U4nF3s wsyajN23tv7S0jlgc8jW4LrtPJ7fvYwMd203HZvEp7U3/4W850Q53mn2BsnZf49w2jwWklnFefM GBwA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1286; i=bagasdotme@gmail.com; h=from:subject; bh=XiWwx/yBvL5qhtur1OJ6r0Qtve5kN/UAKMQDFDv8Kk4=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDJn2n4O3vI8WDrMwXuvBLq8mNivp3ZeuaVYeu+cJXRZ0u 9ehPPdrRykLgxgXg6yYIsukRL6m07uMRC60r3WEmcPKBDKEgYtTACbSG8vI8EpCRPb0s1m/77E2 hv9V7O9IOeS06tfyqjLP7/lK/+xuKjL8zzy7NtZA+f5K8VWm3d9utqf1737naLT7ZsEzs3nvY45 PYQUA
 X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
 Content-Transfer-Encoding: 8bit
 
-Sphinx reports kernel-doc warning:
+Sphinx report kernel-doc warnings:
 
-WARNING: ./fs/inode.c:1607 function parameter 'isnew' not described in 'ilookup5_nowait'
+WARNING: ./fs/namei.c:2853 function parameter 'state' not described in '__start_dirop'
+WARNING: ./fs/namei.c:2853 expecting prototype for start_dirop(). Prototype was for __start_dirop() instead
 
-Describe the parameter.
+Fix them up.
 
-Fixes: a27628f4363435 ("fs: rework I_NEW handling to operate without fences")
+Fixes: ff7c4ea11a05c8 ("VFS: add start_creating_killable() and start_removing_killable()")
 Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
 ---
- fs/inode.c | 1 +
- 1 file changed, 1 insertion(+)
+ fs/namei.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/fs/inode.c b/fs/inode.c
-index 521383223d8a45..2f4beda7bb8841 100644
---- a/fs/inode.c
-+++ b/fs/inode.c
-@@ -1593,6 +1593,7 @@ EXPORT_SYMBOL(igrab);
-  * @hashval:	hash value (usually inode number) to search for
-  * @test:	callback used for comparisons between inodes
-  * @data:	opaque data pointer to pass to @test
-+ * @isnew:	whether the inode is new or not
+diff --git a/fs/namei.c b/fs/namei.c
+index bf0f66f0e9b92c..91fd3a786704e2 100644
+--- a/fs/namei.c
++++ b/fs/namei.c
+@@ -2836,10 +2836,11 @@ static int filename_parentat(int dfd, struct filename *name,
+ }
+ 
+ /**
+- * start_dirop - begin a create or remove dirop, performing locking and lookup
++ * __start_dirop - begin a create or remove dirop, performing locking and lookup
+  * @parent:       the dentry of the parent in which the operation will occur
+  * @name:         a qstr holding the name within that parent
+  * @lookup_flags: intent and other lookup flags.
++ * @state:        task state bitmask
   *
-  * Search for the inode specified by @hashval and @data in the inode cache.
-  * If the inode is in the cache, the inode is returned with an incremented
+  * The lookup is performed and necessary locks are taken so that, on success,
+  * the returned dentry can be operated on safely.
 -- 
 An old man doll... just what I always wanted! - Clara
 
