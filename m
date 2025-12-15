@@ -1,141 +1,164 @@
-Return-Path: <netdev+bounces-244831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A536CBF79E
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 20:01:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A8A4CBF7B9
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 20:08:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6189430164CE
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 19:01:35 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4302B300D64D
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 19:08:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0EEC28C862;
-	Mon, 15 Dec 2025 19:01:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21A73318140;
+	Mon, 15 Dec 2025 19:08:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pLyLtFSt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="niOxzK0R"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 877AA2494F0
-	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 19:01:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2140D30C611;
+	Mon, 15 Dec 2025 19:08:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765825294; cv=none; b=SmaWD/ETS6c+9d+xhvf13vFoVCEJ1PMCWeIZ/TQjd15xdpYX9NlMEetSljZLkTrkA+5M3iMTsbq9CpuUVBClHSN6PAIdFLyAPwU06khdNAwVhjOrar1J6PRK85hlnP9IsQNGYZuoijip4NSqnqaE1wAlcA3ro/GbL2cHCDqzglA=
+	t=1765825690; cv=none; b=kVNMXdxBy3rTJ13DYMeUc+YJlumxCigkgSm5hS7DaLNXJemN4smJfUeJBA5C0dNmC+DK2hI4lQzipn5OFkWWyS4GIQ7PSlO6V92RYwfetcq0F7k4irmYfUBT/82JXS6qLH90Ecy/Gg0sg7THIIOD+tclFJ/gp8dcYkTliKiKAnQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765825294; c=relaxed/simple;
-	bh=Cz9syAheLkwg8RSqR+wRynFTx1zZ4dlT7aiaNsNBNrQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JittIaLDEF+iQj4fQNBhWvkHHKVlSuXGZk2OepM8FpZHssi8rkRdZRdL+oLA2DM/0dOGReaMYJhvwzt91iOZqml6XyfaMwOJoVliNryOB7xpPc12MzCLd1NLv4MU6269xF/tXSdnEk+DqG4sGwdhJUfA043craofkG/Gbqkuets=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pLyLtFSt; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <8bdd9a18-018e-4b87-a2e0-e7d1080b3bf3@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1765825289;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+a5hShS2j3JyVxg/IWCFAXcQwoVvcFKqUQww0+gsUd4=;
-	b=pLyLtFSt/PetCs2bM8wlzHoE2Al7OaXjlvl2gzCDL/iuM6+ILPbUEF6BWpNQ3I/LZatrPm
-	mNjk3xrHwxfIiJTGAYsMKN1T4zNuQXHQzhw8ssar9LAuj3INLkwK7pyH9gtMKkuTMgy6bL
-	gYxPJOgZpGAzNEiXnpF4YkOXX7DhSUg=
-Date: Mon, 15 Dec 2025 20:01:25 +0100
+	s=arc-20240116; t=1765825690; c=relaxed/simple;
+	bh=1JDNfp0Z5+nrp/ObFicZ4XwSPUDiATXg/OEvzD6472Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UqAB2QuQ3E2AQEL80cE4JeqPJ3oPedByGHoS+cRoK3mXj4FicUB3J7I9UwIND/1YqZHhKO2v62FdYzm66p35i6HlwbH3f2M9Xk5Cl4gQqFfi7PVDe4SCRiJwrjryYFpTD1/ev2FhjtdxgHHw8JzLVGXofeROvtRx3WIAMfHfaq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=niOxzK0R; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1765825688; x=1797361688;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=1JDNfp0Z5+nrp/ObFicZ4XwSPUDiATXg/OEvzD6472Y=;
+  b=niOxzK0RP93PZsK6PXFG3PlJ/6GKpWNen7BHVVWDrRnO7P3o6Pg2OTbO
+   ja57CNDs9pGh4peFUT6HdhIFm/O9LuekdxK3VjN5Bqx5Geavq1I21KPSG
+   ff/av+FgeE8A2d4zQU91BNzjNRnx9X8Dl/AjXvHH4X4ZtGvwnbYDceN8o
+   FAlGNXrcxkUdJAwJepNWMvbo0Bt0RhW3lCakTKIkD8mMFKisQN+B0X2a8
+   DTzK8NeBAIFN8mn734RCFD/D9N3bMp6np+L8mU2K1eBvHixFZjt4DFj7t
+   UsZvpxnbMZiDX4lzibdeGxlwwC2OC9CkRPEw6R+0FiAHhUKw59ZPYLbzi
+   A==;
+X-CSE-ConnectionGUID: 87tCdgv8SWeCSu574WabmA==
+X-CSE-MsgGUID: upy9i0b1R0ClmxtjJJDM9g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11643"; a="66921503"
+X-IronPort-AV: E=Sophos;i="6.21,151,1763452800"; 
+   d="scan'208";a="66921503"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2025 11:08:07 -0800
+X-CSE-ConnectionGUID: mM3qZZf/QHyrBDdX5VBDKw==
+X-CSE-MsgGUID: zlwDi811Sa2s2GleHZKjPg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,151,1763452800"; 
+   d="scan'208";a="198626807"
+Received: from igk-lkp-server01.igk.intel.com (HELO 8a0c053bdd2a) ([10.211.93.152])
+  by fmviesa010.fm.intel.com with ESMTP; 15 Dec 2025 11:08:01 -0800
+Received: from kbuild by 8a0c053bdd2a with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vVDvL-000000002kO-0LU9;
+	Mon, 15 Dec 2025 19:07:59 +0000
+Date: Mon, 15 Dec 2025 20:07:47 +0100
+From: kernel test robot <lkp@intel.com>
+To: Byungchul Park <byungchul@sk.com>, linux-mm@kvack.org,
+	akpm@linux-foundation.org, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
+	kernel_team@skhynix.com, harry.yoo@oracle.com, ast@kernel.org,
+	daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org,
+	hawk@kernel.org, john.fastabend@gmail.com, sdf@fomichev.me,
+	saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
+	mbloch@nvidia.com, andrew+netdev@lunn.ch, edumazet@google.com,
+	pabeni@redhat.com, david@redhat.com, lorenzo.stoakes@oracle.com,
+	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
+	surenb@google.com, mhocko@suse.com, horms@kernel.org,
+	jackmanb@google.com, hannes@cmpxchg.org
+Subject: Re: [PATCH 2/2] mm, netmem: remove the page pool members in struct
+ page
+Message-ID: <202512152043.rdzLcS1a-lkp@intel.com>
+References: <20251215071001.78263-3-byungchul@sk.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net 2/2] selftests: fib_nexthops: Add test case for ipv4
- multi nexthops
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
- <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Willem de Bruijn <willemb@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org
-References: <20251213135849.2054677-1-vadim.fedorenko@linux.dev>
- <20251213135849.2054677-2-vadim.fedorenko@linux.dev>
- <aT-x1ZQtu4rsGxgI@shredder>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <aT-x1ZQtu4rsGxgI@shredder>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251215071001.78263-3-byungchul@sk.com>
 
-On 15/12/2025 06:59, Ido Schimmel wrote:
-> On Sat, Dec 13, 2025 at 01:58:49PM +0000, Vadim Fedorenko wrote:
->> diff --git a/tools/testing/selftests/net/fib_nexthops.sh b/tools/testing/selftests/net/fib_nexthops.sh
->> index 2b0a90581e2f..9d6f57399a73 100755
->> --- a/tools/testing/selftests/net/fib_nexthops.sh
->> +++ b/tools/testing/selftests/net/fib_nexthops.sh
->> @@ -31,6 +31,7 @@ IPV4_TESTS="
->>   	ipv4_compat_mode
->>   	ipv4_fdb_grp_fcnal
->>   	ipv4_mpath_select
->> +	ipv4_mpath_select_nogrp
->>   	ipv4_torture
->>   	ipv4_res_torture
->>   "
->> @@ -375,6 +376,17 @@ check_large_res_grp()
->>   	log_test $? 0 "Dump large (x$buckets) nexthop buckets"
->>   }
->>   
->> +get_route_dev_src()
->> +{
->> +	local pfx="$1"
->> +	local src="$2"
->> +	local out
->> +
->> +	if out=$($IP -j route get "$pfx" from "$src" | jq -re ".[0].dev"); then
->> +		echo "$out"
->> +	fi
->> +}
->> +
->>   get_route_dev()
->>   {
->>   	local pfx="$1"
->> @@ -641,6 +653,79 @@ ipv4_fdb_grp_fcnal()
->>   	$IP link del dev vx10
->>   }
->>   
->> +ipv4_mpath_select_nogrp()
->> +{
->> +	local rc dev match h addr
->> +
->> +	echo
->> +	echo "IPv4 multipath selection no group"
->> +	echo "------------------------"
->> +	if [ ! -x "$(command -v jq)" ]; then
->> +		echo "SKIP: Could not run test; need jq tool"
->> +		return $ksft_skip
->> +	fi
->> +
->> +	IP="ip -netns $peer"
->> +	# Use status of existing neighbor entry when determining nexthop for
->> +	# multipath routes.
->> +	local -A gws
->> +	gws=([veth2]=172.16.1.1 [veth4]=172.16.2.1)
->> +	local -A other_dev
->> +	other_dev=([veth2]=veth4 [veth4]=veth2)
->> +	local -A local_ips
->> +	local_ips=([veth2]=172.16.1.2 [veth4]=172.16.2.2 [veth5]=172.16.100.1)
->> +	local -A route_devs
->> +	route_devs=([veth2]=0 [veth4]=0)
->> +
->> +	run_cmd "$IP address add 172.16.100.1/32 dev lo"
->> +	run_cmd "$IP ro add 172.16.102.0/24 nexthop via ${gws['veth2']} dev veth2 nexthop via ${gws['veth4']} dev veth4"
-> 
-> fib_nexthops.sh is for tests using nexthop objects: "This test is for
-> checking IPv4 and IPv6 FIB behavior with nexthop objects".
-> 
-> I suggest moving this to fib_tests.sh. See commit 4d0dac499bf3
-> ("selftests/net: test tcp connection load balancing") that was added as
-> a test for the blamed commit.
+Hi Byungchul,
 
-Yep, got it. Will move in v2
+kernel test robot noticed the following build errors:
 
+[auto build test ERROR on d0a24447990a9d8212bfb3a692d59efa74ce9f86]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Byungchul-Park/mm-introduce-a-new-page-type-for-page-pool-in-page-type/20251215-151232
+base:   d0a24447990a9d8212bfb3a692d59efa74ce9f86
+patch link:    https://lore.kernel.org/r/20251215071001.78263-3-byungchul%40sk.com
+patch subject: [PATCH 2/2] mm, netmem: remove the page pool members in struct page
+config: x86_64-rhel-9.4 (https://download.01.org/0day-ci/archive/20251215/202512152043.rdzLcS1a-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251215/202512152043.rdzLcS1a-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202512152043.rdzLcS1a-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   drivers/net/ethernet/intel/ice/ice_ethtool.c: In function 'ice_lbtest_receive_frames':
+>> drivers/net/ethernet/intel/ice/ice_ethtool.c:1254:36: error: 'struct page' has no member named 'pp'
+    1254 |                                page->pp->p.offset;
+         |                                    ^~
+
+
+vim +1254 drivers/net/ethernet/intel/ice/ice_ethtool.c
+
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1223  
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1224  #define ICE_LB_FRAME_SIZE 64
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1225  /**
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1226   * ice_lbtest_receive_frames - receive and verify test frames
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1227   * @rx_ring: pointer to the receive ring
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1228   *
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1229   * Function receives loopback packets and verify their correctness.
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1230   * Returns number of received valid frames.
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1231   */
+e72bba21355dbb Maciej Fijalkowski     2021-08-19  1232  static int ice_lbtest_receive_frames(struct ice_rx_ring *rx_ring)
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1233  {
+93f53db9f9dc4a Michal Kubiak          2025-09-25  1234  	struct libeth_fqe *rx_buf;
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1235  	int valid_frames, i;
+93f53db9f9dc4a Michal Kubiak          2025-09-25  1236  	struct page *page;
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1237  	u8 *received_buf;
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1238  
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1239  	valid_frames = 0;
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1240  
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1241  	for (i = 0; i < rx_ring->count; i++) {
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1242  		union ice_32b_rx_flex_desc *rx_desc;
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1243  
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1244  		rx_desc = ICE_RX_DESC(rx_ring, i);
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1245  
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1246  		if (!(rx_desc->wb.status_error0 &
+283d736ff7c7e9 Maciej Fijalkowski     2022-07-07  1247  		    (cpu_to_le16(BIT(ICE_RX_FLEX_DESC_STATUS0_DD_S)) |
+283d736ff7c7e9 Maciej Fijalkowski     2022-07-07  1248  		     cpu_to_le16(BIT(ICE_RX_FLEX_DESC_STATUS0_EOF_S)))))
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1249  			continue;
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1250  
+93f53db9f9dc4a Michal Kubiak          2025-09-25  1251  		rx_buf = &rx_ring->rx_fqes[i];
+93f53db9f9dc4a Michal Kubiak          2025-09-25  1252  		page = __netmem_to_page(rx_buf->netmem);
+93f53db9f9dc4a Michal Kubiak          2025-09-25  1253  		received_buf = page_address(page) + rx_buf->offset +
+93f53db9f9dc4a Michal Kubiak          2025-09-25 @1254  			       page->pp->p.offset;
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1255  
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1256  		if (ice_lbtest_check_frame(received_buf))
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1257  			valid_frames++;
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1258  	}
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1259  
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1260  	return valid_frames;
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1261  }
+0e674aeb0b7790 Anirudh Venkataramanan 2019-04-16  1262  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
