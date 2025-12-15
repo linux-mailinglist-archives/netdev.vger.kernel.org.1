@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-244716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6B85CBD8F9
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 12:41:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B643CBD938
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 12:43:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 87A5C302AF9F
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 11:39:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 03D8B30456D8
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 11:39:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C26233121C;
-	Mon, 15 Dec 2025 11:39:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE7D7330B02;
+	Mon, 15 Dec 2025 11:39:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tojwlwse"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RRfwwMLw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C969A330B01
-	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 11:39:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4DAB330B37
+	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 11:39:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765798755; cv=none; b=u5e8BNGN/f91kCzGPMV0WLdaNZgpuXmE8Ic+ioUkYF2PjthKhPrcjlnotL+dApHd9gk7mh52lM0nIDaUm3u6czy2Y9GSHz8T6U0VHYDiL1710Bzwy4kdhOtBxxsI8uxNNk3KUXZoTrPdkzHebTz9qN4UL+0YAksilT6CYkCzpXQ=
+	t=1765798757; cv=none; b=g7+HRhHLQpsgxXa8WYp18QTTqXVs4BNKBZdP+rb8OgJjU9YYyqsF0QGQCWdBA3pt/Cwic1soShrw9zX+w5Qj0jpANCiHEwls72ArfhP1eag5WX3K1cs8+Xg7GB+X1bylCjaydiAyv1HyKVNqBPmJHPOTZ2RghRHbMlrGPXVLOPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765798755; c=relaxed/simple;
-	bh=1tOY86lhWOCbSHsqmK/tuDEilXGPwKXl/15tM3wSixs=;
+	s=arc-20240116; t=1765798757; c=relaxed/simple;
+	bh=sT1prVB7LRNvf/W4XodTbc9bjm2B3700BxVWkrXUues=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hMvWu8vFsYIRar9VnJoxurFnTDlH7shEQjvZszmT23pkbPIkyEAax+hTY6vHnnEwyGJcG8eyYNqEHKf7GUaHsJtv5uQLN5QUAAVRepdPLREp8WhNhMM1goqjv7C1rTzLA7UL2gLCtQb+tUA/0V8KFnPxXwxD3i4ptFLy5CJ0gJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tojwlwse; arc=none smtp.client-ip=209.85.216.47
+	 MIME-Version; b=bAkqymz+uqsS1W70FyuyhSJ8LzmnoHNOEeuehjuvDiziT7LsZanRoPswCyHLYVKrmWCnEx5987mJm/vGOXoi87DVFmr1DZHxO3Ai/oSWD7r+R3Puh++ifpHHnWM02WEoPKOdUip3NwTULtCKZX/X0gvtegZM6nlJBh5OSnAE3ec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RRfwwMLw; arc=none smtp.client-ip=209.85.210.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-34c213f7690so1777864a91.2
-        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 03:39:12 -0800 (PST)
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7f0db5700b2so2938270b3a.0
+        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 03:39:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765798752; x=1766403552; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1765798754; x=1766403554; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TWXueLrhDneeDmCGizpSHzMSgAg8yMgxTmeT/qXEn+I=;
-        b=TojwlwseVX+yx8hiv6n42hswCsaChjgYL7PZiLWeal4LB2weD0075dxOBQbjM2/VH3
-         LbQuoXw+owmioB9Y1rSG4HbW/yf2TRUTHH8DKIRA9EbKUZF9HKtEE/09znZ8i49Z2wvY
-         IsouIW+CiFxgM/HujW+0dJeaPdSx983d0AAmLFtrYEO/a5gtleSWwPmTPr1Ky5NHHNm6
-         ennU+kXIpbuvsUaEd5FbjPMEQJpoSRYOHN506DBFi+vp3gexG9caYgTxYlwvobzYrfBe
-         +s/5okQ5trSeDdrw2d+5mHJOsXxuO64dtKvi9mxaXjM7mayzWPr1E2NUzjlU3q40K4IW
-         LFMg==
+        bh=yYIA++CxPIcYPKgHl3oGianXtJJpe/hDcX33067gP64=;
+        b=RRfwwMLw3zaa5wZ5fx7VBbwTe8OfC5Cv2aJtWvQtM2OWYw6wL6PW+2/kfpHE0V6apy
+         p4y6NyeCE6qzUR8yaVY/xeA0VMa6UoBl+GuetBBuFr3vpU8RD3eKqGB+52wd3NLvxVSF
+         qAhQhiwKbXXVr+6lweELCgmt5Uclu/r6g5r/VCSj+5Xl4l/0OI64sEgIvGFqDSFn1Y4m
+         42RErcDkREEz4QoSGQSGzdBGJxGiLv6MfIZto+GCgBNauQ0vHAGWngpHttKUbZKLHada
+         QyZhPYzQXozSYcnEgFZiT6/AXRNrXSdUZ5dfBvcI69xPMo83ro6XXOs2N0QWbmlngP9c
+         SZ7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765798752; x=1766403552;
+        d=1e100.net; s=20230601; t=1765798754; x=1766403554;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=TWXueLrhDneeDmCGizpSHzMSgAg8yMgxTmeT/qXEn+I=;
-        b=U3pbD8BoKBB9CPl/nloFWAnCZtxzSM9GuryWZ8cax9EiltysrYBc0EzxqOM055JNsI
-         9TuH0iZLC/UteS1rwIJA12IT05RGwRPRwThisKmnvQq+38jqco+11L+MQkJUDnhX2iP4
-         lE6qK37AaE5yfUXCPBOSmz0Iy0SUoBMLcR+gPO/BE8m2yRD6kiTx6zLvv8MPkBFfyJiu
-         4WldZTbeLQaJTdILvKLxRrgEh3mSdtBU1CbokeehqAqZoSLhZJML7RSKbfu/0SoO64r/
-         VkP9e6sQ1LlIZPf7BRUQlhmxHVWxxOScP5+NXmEvNQ0hM8CF7YkpuZ/1dlZCGeaxAjbK
-         NJHw==
-X-Forwarded-Encrypted: i=1; AJvYcCXjJk3eHQdH5NM8kB/m1YaQKh0HA6muVZhx7pq6RWUpxjSVGTnfmOnCzxxlOP7tifHDe/QSnDM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFDAnBqo2Nsn4mAXQyYeY1cTSCTmaaqMMHJYDUtEGHJlahwM2f
-	wNdYJLgLQaqa6YHkU6Ew90XW/VmPhfrEqSmUDSgDI19+Q3K6S6pzFZT/
-X-Gm-Gg: AY/fxX6jK1k4egO+0YaUMUUp5ZBFGACuSppsc1VuWeyc8zyHungaGDS2n3RR3SEmLBT
-	rBH/agbrYOul2KW3y+AYRxatSdAjuegL7L48Ny7fEVxc5g0j2OxK5sTEoNyD2wmNNU69jHQkqXl
-	cgk4Q9st0QkPrhs5MUyMImgPXgJVp+W0x6uWPi+Q5H4bGRPq4Z8x/VEyMj0s6sIrcBqestvJcnF
-	v1cvRi7+fkRLJ60HFTT96ipHEn2iUhT/hYLbE/hqbsasrPxic1nTlxAGNYUgbgKuaLUi8r2mcFU
-	aGWyel7SpSlJrDI5UfSkgT+UJGZp8ziTVLaG2Q16LB5TYdoZ3HnLmmbAdLuMKZUBKMSipboPFBA
-	95B3ZimWQXusmsno0DBe05CSuT+WEOWuZdJgh1WRHHkaXZhoqsevyCj4eGn00osQjxyfo6TPGv2
-	l9RhWacS7EPFQ=
-X-Google-Smtp-Source: AGHT+IHBwyvn37cMWft6XaLu78i521F3TitB1ZgZCjrLkgz/dWJXwkRq1mT1+qz6m/LgaTgF4rxTDQ==
-X-Received: by 2002:a17:903:3d10:b0:2a0:a4b7:44af with SMTP id d9443c01a7336-2a0a4b74893mr49683665ad.26.1765798752075;
-        Mon, 15 Dec 2025 03:39:12 -0800 (PST)
+        bh=yYIA++CxPIcYPKgHl3oGianXtJJpe/hDcX33067gP64=;
+        b=lmVPLUTyWhc9h2/+BnGWiMqiOPhvyGeYSWaX/bLtWWdhSiwac0WZW9GWNqtL9A7gXR
+         LEQwQ+kjlERqvaGnc9R7eq5gl3p4GxZywgtiy49zZALt6AC5TjoKjBEzjW0lyOR39RzY
+         Ql99iNSpUw5MUORLvU64UyFeJY5LvR6FxxPRW6PIcHlyUQ29mo0L9ejWYeHIhbr3sg2+
+         xBxWW5V8e9eGWkk0zVImFV63/mfs1zhAvwNDcYjOTxy8VOW7l+euLDLiIFda6sZC8JTX
+         MBE97uNKMUGMwrAFW3E8i1GYEiZTpuuPFWXzp5n+G344ucrgoE2KEYr9Wpls5TZedo/o
+         wa6A==
+X-Forwarded-Encrypted: i=1; AJvYcCXN807nJVuhABiYIs/j621nreISzDg/At34Kbv6Kp16wiHnf4VF588HcTz8hhBt3KjRvTn7ae0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywfc7ByYzQblJWBaHiuWYkuEfCHZD1lRKhIJ1fzPzefyQOQVgVZ
+	l+tRu3AWM0Cxb2z4BTXywRzeZMtBHGydik6rRnSIZHTaBdSGlu8ekZxc
+X-Gm-Gg: AY/fxX7v+NQ0XiTUshHLEghczwgE+dL3TAyiYcaaaloaCiyCW4GspqSoLt0VTVB+kKK
+	rma9i5SUDEt1yvLvbx1WQgBr2dwz/RWvqyA6yDdZOxI2BWFOEnFvLHRVGBQNSIfed+RJR6OT1qt
+	qlDQ80jYVNLFwCK2gmoGDdjRkQEKuotvnr+rOOK7P1FK4685M/A4qioWQTAgfv26HzGm5nL0t5H
+	W1rGCEApPGLWiSoFVQMU1j0XABBy/pHndoAAgBNaCi5+7rxXFkBV0YUqBwTvw09Xank9ukA4+g5
+	jtkntrnMWvkOoUdvsIR7J6A4lQ8afGUvS362kYlpPU+bREDNJVLnff6EjmRubS+mAuL2ja7lWsg
+	FJC5QxhnCPVyQb2R5ucAwCcKnJfp619rQ2tz9bsBpmt0WoWM6DL3TwbDo2ne5yyvsHujXyhwxNV
+	WaPJfYPzFxY/c=
+X-Google-Smtp-Source: AGHT+IHZqxApH7RH4SvWeJJw7f7kzbBWfG87+pyKENlTOJ0etjJH+97jX9IVf9ZouLQDPcaXmCZT+w==
+X-Received: by 2002:a05:6a20:3d8b:b0:35e:11ff:45b4 with SMTP id adf61e73a8af0-369adfb3407mr9418258637.21.1765798753761;
+        Mon, 15 Dec 2025 03:39:13 -0800 (PST)
 Received: from archie.me ([210.87.74.117])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29ee9d36ddcsm132733715ad.32.2025.12.15.03.39.10
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c0c26eb0f6bsm12221315a12.14.2025.12.15.03.39.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Dec 2025 03:39:11 -0800 (PST)
+        Mon, 15 Dec 2025 03:39:12 -0800 (PST)
 Received: by archie.me (Postfix, from userid 1000)
-	id 504F3444B392; Mon, 15 Dec 2025 18:39:05 +0700 (WIB)
+	id 70D25444B393; Mon, 15 Dec 2025 18:39:05 +0700 (WIB)
 From: Bagas Sanjaya <bagasdotme@gmail.com>
 To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
 	Linux AMDGPU <amd-gfx@lists.freedesktop.org>,
@@ -160,11 +160,10 @@ Cc: Harry Wentland <harry.wentland@amd.com>,
 	Charles Han <hanchunchao@inspur.com>,
 	Jilin Yuan <yuanjilin@cdjrlc.com>,
 	Swaraj Gaikwad <swarajgaikwad1925@gmail.com>,
-	George Anthony Vernon <contact@gvernon.com>,
-	Thomas Graf <tgraf@suug.ch>
-Subject: [PATCH 03/14] textsearch: Describe @list member in ts_ops search
-Date: Mon, 15 Dec 2025 18:38:51 +0700
-Message-ID: <20251215113903.46555-4-bagasdotme@gmail.com>
+	George Anthony Vernon <contact@gvernon.com>
+Subject: [PATCH 04/14] mm: vmalloc: Fix up vrealloc_node_align() kernel-doc macro name
+Date: Mon, 15 Dec 2025 18:38:52 +0700
+Message-ID: <20251215113903.46555-5-bagasdotme@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20251215113903.46555-1-bagasdotme@gmail.com>
 References: <20251215113903.46555-1-bagasdotme@gmail.com>
@@ -174,36 +173,35 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=896; i=bagasdotme@gmail.com; h=from:subject; bh=1tOY86lhWOCbSHsqmK/tuDEilXGPwKXl/15tM3wSixs=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDJn2n4Mqzx7cbGl2s1Xb5iYDm7bLkws+2881173X3pa/f UbeT2+PjlIWBjEuBlkxRZZJiXxNp3cZiVxoX+sIM4eVCWQIAxenAEzk0hqGfzoRZw50iXbWS+pV RRyxzVGfNT/eQV3w9+MclUw9PumMlYwMO5cdc7i131P/rrG85octa1tun66WP3rW6W/Ropnr7E6 G8AIA
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1025; i=bagasdotme@gmail.com; h=from:subject; bh=sT1prVB7LRNvf/W4XodTbc9bjm2B3700BxVWkrXUues=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDJn2n4OyyibMaS/TcJdL00op76xZei7L2Pv7hFORU9uuV vT80n3YUcrCIMbFICumyDIpka/p9C4jkQvtax1h5rAygQxh4OIUgInIP2BkeHzeo3teoLm8pE9N cXOPl0J5QO7s9Yesjvev3nrjTaKBPiND/5K7Lkx+c2t1WS5sWq6V/2tGhSPf8dA5nnLdX2fcuhb OBwA=
 X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
 Content-Transfer-Encoding: 8bit
 
 Sphinx reports kernel-doc warning:
 
-WARNING: ./include/linux/textsearch.h:49 struct member 'list' not described in 'ts_ops'
+WARNING: ./mm/vmalloc.c:4284 expecting prototype for vrealloc_node_align_noprof(). Prototype was for vrealloc_node_align() instead
 
-Describe @list member to fix it.
+Fix the macro name in vrealloc_node_align_noprof() kernel-doc comment.
 
-Cc: Thomas Graf <tgraf@suug.ch>
-Cc: "David S. Miller" <davem@davemloft.net>
-Fixes: 2de4ff7bd658c9 ("[LIB]: Textsearch infrastructure.")
+Fixes: 4c5d3365882dbb ("mm/vmalloc: allow to set node and align in vrealloc")
 Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
 ---
- include/linux/textsearch.h | 1 +
- 1 file changed, 1 insertion(+)
+ mm/vmalloc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/textsearch.h b/include/linux/textsearch.h
-index 6673e4d4ac2e1b..4933777404d618 100644
---- a/include/linux/textsearch.h
-+++ b/include/linux/textsearch.h
-@@ -35,6 +35,7 @@ struct ts_state
-  * @get_pattern: return head of pattern
-  * @get_pattern_len: return length of pattern
-  * @owner: module reference to algorithm
-+ * @list: list to search
-  */
- struct ts_ops
- {
+diff --git a/mm/vmalloc.c b/mm/vmalloc.c
+index ecbac900c35f9c..2c3db9fefeb7ab 100644
+--- a/mm/vmalloc.c
++++ b/mm/vmalloc.c
+@@ -4248,7 +4248,7 @@ void *vzalloc_node_noprof(unsigned long size, int node)
+ EXPORT_SYMBOL(vzalloc_node_noprof);
+ 
+ /**
+- * vrealloc_node_align_noprof - reallocate virtually contiguous memory; contents
++ * vrealloc_node_align - reallocate virtually contiguous memory; contents
+  * remain unchanged
+  * @p: object to reallocate memory for
+  * @size: the size to reallocate
 -- 
 An old man doll... just what I always wanted! - Clara
 
