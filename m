@@ -1,215 +1,451 @@
-Return-Path: <netdev+bounces-244795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D5CCCBECB8
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 16:57:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 194FCCBEDAF
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 17:16:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B7A57300C505
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 15:57:45 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E2047301098A
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 16:10:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A843030F80F;
-	Mon, 15 Dec 2025 15:57:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59EDA31196D;
+	Mon, 15 Dec 2025 16:10:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RdSQ/fU/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fwbwvSc0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f48.google.com (mail-yx1-f48.google.com [74.125.224.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6408F2F069E
-	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 15:57:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765814264; cv=none; b=XxGJGWvwDCl1YbgIiKKUKXOVfPZy4k16hdU8ck+PAiexpNmR2U14bmIymCzgNiOKtq3uO1XbnU5WDrPXbtvSxYP4ERmL7PIk4TOl5sEsQFQmOEjVMhp9f0P7WW+P0LKuraPcxWvh/23S68e7LSzefR+cQJ53y9glV6LxsmUn07s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765814264; c=relaxed/simple;
-	bh=wWPC/2Smq4jtjLX5cNQnH721pExURZn2+t/Lpx8wgiY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AGN3lDa75i9iiNtU1A5Qd/9Mr5FSKZKUNrCAfVUBqrdSX0l9bgN5lcdRlcYRbZyZNaO+dlXIpgxlA3im9eUIlCYusbbHJ4k3TvWYuFv1VT4d6N4PcOOtRQGismbxNUWBZW6vWpf+PCFWDC+crn3vEmS0tbj4qKGzdCsBW+9v5kI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=RdSQ/fU/; arc=none smtp.client-ip=74.125.224.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yx1-f48.google.com with SMTP id 956f58d0204a3-64470c64c1bso4992524d50.1
-        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 07:57:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1765814261; x=1766419061; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=jD2gSrbwz8qwRcQAUIoCa/YtmLX1qZ3zgXWUCARLWUM=;
-        b=RdSQ/fU/1PDz3di3Ks5pKKDb8xLXR7WdRNI/1j/0Od0eUew+mRRpGtc49Yc9hTleWE
-         GNd4sWCXVWZ8vvW/SnTb/SEXsdKHBVfQcQeWPUP63rPFcRrOThlyhKkWvme74lWsZdg2
-         Z/FOWHJSzw1CVwIXQo7alxZhy0ioHiBUb92sdbaH45WZqsYcA9eFgxcl9TL6QnSq359m
-         P+ussN5KRMqTaw3dQ076/tslENmEl4Lp0IsMe8XjCeNHy+FUFRNRhy2ocHx8XF0+1m7K
-         9I7XFpVA7yJPstSVNt5ntk83PRH031iQkpmI6mDOEbZCyICiwXFCYBLpEYDVMCTyOjpc
-         NAOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765814261; x=1766419061;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jD2gSrbwz8qwRcQAUIoCa/YtmLX1qZ3zgXWUCARLWUM=;
-        b=YAM5qExBsl7Qjn8nkXK9HQDMg3YarbQDS4BzGUaTRqIvaLcTFjY/LFmyZjVIMxfyOU
-         NBaEElAUzRhMqSTakmPb8WulGwvCBrRQSJXv/JHv2bkI1QjH7rRkFi7G9zcuTndHyPKB
-         JvgRHhoqecItf1ONiJt9ML0fIDlH+NIlmCh6p5rP6+0i32V5ySQNXmu/yKhAiFz0ft2v
-         QxeWtEJ7FyTifzj0SvHldc1DDYH3+weeKICzpz5zLo8D7rn+olRbT6yfDYw+k1sGEq35
-         gYZewv5PKPJlRJBsq9AJwHx7qybmsMhJRm/z9LUk6ZpxhzOKQ0c4rL8fpmD1/X4Tzb65
-         Gv2g==
-X-Forwarded-Encrypted: i=1; AJvYcCV4ZjmSFGzmp7iPr2zB0FRfz6qW5Z4qt0cA3tP2URaxLFXYJ3k4kKau2WGrJZd1mgA6pgDBLQw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJy+Iz68Rm++E9GvNBrQl9/jxnNsKFPPnm+I/Vj+lfv2voSm0+
-	7CaHe2UaoCSDrU7PA3E91RBevz3ecVPqZMWjafhc92gPTbkc18Wg6gN6cub416CLy805QeZ3ONE
-	ktBrnDD04HaqqsjhhKk6Y9wGelCC+i51IeKwt34bl1g==
-X-Gm-Gg: AY/fxX7VxAH2Bq2OgRz98f9BGl5Oz47IQuKY3J8jNknL4r+GaIe6Zotz1KzRuQugK3F
-	4hRdBeFEEWsHqEVyift6beHjYP5FxSt8lW1m2+PIEjAEWJNIqC2dzlAqxdtBq8dhoi1QQSEOWyM
-	zxTAd+CC0wISBZNlYI0eP5J67xajF2GVmuBufWiHSmlnMY5STAh+bCGIjKEWsPEMCasmU3CoNKt
-	8I8Pa3OqzvGhOiqhXccrRLR6qIoyTqyXY2tURXR2JOsFPvB0uGYi2RVGMT1ItTOcMmX/uwi
-X-Google-Smtp-Source: AGHT+IHnzK21TfrVLiBrKEfsBY0yy3nNModkqTwvqLIVjQPjpPnPxA37IWTaMsN5LsanoFGI3JzdpIiVMlmjMLIYn+0=
-X-Received: by 2002:a53:acc2:0:20b0:63f:af94:79d2 with SMTP id
- 956f58d0204a3-6447a58f4a3mr9014275d50.34.1765814261319; Mon, 15 Dec 2025
- 07:57:41 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ADDF2D0602;
+	Mon, 15 Dec 2025 16:10:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765815036; cv=fail; b=W07XD5xr1tJrDrO3coeO/94vm/M7zFG63vx8iYIEV2W+VV8Dvv7G/6mBXdgdi+5yE5f38CVUwalYLQAxjmj1EnTgG9MrT46+nPzeSZ9gg8lVStP2b1F7gKyuraOkDTErhfKAxJFmvYIWhDXPte14b+Ns5bzO5NMyUxxM+jSM+UM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765815036; c=relaxed/simple;
+	bh=ORPW/PhDVY0ckZAz+zz6a4g+5MV/noJ4NuhB61kTxe4=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=SJRkoPceaeINHZrThV0hp0Im635he3KsQqH1NoEu3ctORA9cGJ2gYGwuABCctP8NxpRFFffsRyKQrDRrsixflrBXctduhkHdjv7ua39KK2HOB5pzlzeJm3PzVWTJKVUEluh4n2rQ4RBvy31ASmF3qhiei7OLOm+LmHgcW5L7/KI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fwbwvSc0; arc=fail smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1765815034; x=1797351034;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=ORPW/PhDVY0ckZAz+zz6a4g+5MV/noJ4NuhB61kTxe4=;
+  b=fwbwvSc0sL7/yiLtWWqGQJPeEqWL7bv+QMukl4OAzIN7CyzI8IM+NyxQ
+   dIb28qwlV3v6uKta2UFMBvorrROZ8ubLl+AT3uyS1qwMVV5oi4PL55MP6
+   rZzBzaOSDhwJvqxTBI5x2xbBPLMiyHVNuk0PSNJlvT4n1Pgw5bKwHONBl
+   EooF8n4Ww48QjxxZLz9AhJu7+bxdFq9u5ZLtBE/y7Rw/dyZzhZ2t/z8Xx
+   3Se0RiFj95q78wbz6wss7gQajluv4WqXTgs0NYwA+/0Y4wker2pQ5oejw
+   JRzrYmnWQ257jWW6fvMuLzqpkQH1Bfas2Sz/coXQDi8upbuV3rUGlNU7D
+   w==;
+X-CSE-ConnectionGUID: od4YOTJtS8mnCqpXAdBVMw==
+X-CSE-MsgGUID: jzAXg2DHTqGbGoF5WoW38A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11643"; a="78425125"
+X-IronPort-AV: E=Sophos;i="6.21,151,1763452800"; 
+   d="scan'208";a="78425125"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2025 08:10:33 -0800
+X-CSE-ConnectionGUID: dkDh7zJeTnaDXIwc3qxwcg==
+X-CSE-MsgGUID: /Y/d4zZ6SU+o/VMtnwqAtg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,151,1763452800"; 
+   d="scan'208";a="201940944"
+Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
+  by orviesa003.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2025 08:10:33 -0800
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Mon, 15 Dec 2025 08:10:32 -0800
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29 via Frontend Transport; Mon, 15 Dec 2025 08:10:32 -0800
+Received: from PH0PR06CU001.outbound.protection.outlook.com (40.107.208.27) by
+ edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Mon, 15 Dec 2025 08:10:31 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Fho3jqXndgZuYkWPkXJ0/av/RG8drE5PGsYy7BuWZ9yxMu+vbaNn47jbVoMPKu0vpPC/6er60bmkdL/LoM9Xy0jJqjnhigjlCSi6dLcrR41HU6sPuOnf/mWt1rE2CR5M1QOzJV8ObDIS+SukxezmEDZH7Nv4K7Z70nhtKkK+2JrjCGJZ9koeJLHu11cMBLK72FJ20fb8nZUJMF9MgVKcXPNEF6fU4kXgnR7ks5FMN81iyNbk9TB5tlvrEgBFaM5PEu8nDeMpS0OvIGLEQcrIKJX5JwSUXNPKwn27req6FB5i5KaAXUqXVThhW9OF/KxV912SQwZfFQ7gPMULdvxIsA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PY0xoOgkLhIZDxymJ+DhrA7ukrxJbsGLN+qM5XKy4ko=;
+ b=YCJl0+VnSt4tT45Elm/7GJ8TS5cBT8UDY3gx4WTTeVrcTdbAoCovieJCM6/wj+sBVyqfHuZ6GEL1OX2v29gTjk1TTcK4IhIOGpEeNolDIJRIQLktQvRiXU26aFqVJAhVPnZQW3GKgTDKvAmbHKpWffecg04KeMdNxQUAxI5BzZ9q3YSXwRurGPNlknaC5Y5Qwg7mSTDVOOiW5EKGG76dHyAbHDAWIRBoCfH4ov+w9Zt3ILXYZm0HDe/MvXHnQtmiSOoPIsJzTTSjv/gFAljgoOsC+WVplu8Tna5IUe23MiantdEpcoLHtFfHfPPsEaySFVeyhNhUCDXfiUQMtzLozA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
+ by IA1PR11MB6419.namprd11.prod.outlook.com (2603:10b6:208:3a9::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9412.13; Mon, 15 Dec
+ 2025 16:10:28 +0000
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::399f:ff7c:adb2:8d29]) by SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::399f:ff7c:adb2:8d29%5]) with mapi id 15.20.9412.011; Mon, 15 Dec 2025
+ 16:10:28 +0000
+Date: Mon, 15 Dec 2025 17:10:14 +0100
+From: Larysa Zaremba <larysa.zaremba@intel.com>
+To: "Tantilov, Emil S" <emil.s.tantilov@intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, <aleksander.lobakin@intel.com>,
+	<sridhar.samudrala@intel.com>, "Singhai, Anjali" <anjali.singhai@intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, "Fijalkowski,
+ Maciej" <maciej.fijalkowski@intel.com>, Madhu Chittim
+	<madhu.chittim@intel.com>, Josh Hay <joshua.a.hay@intel.com>, "Keller, Jacob
+ E" <jacob.e.keller@intel.com>, <jayaprakash.shanmugam@intel.com>,
+	<natalia.wochtman@intel.com>, Jiri Pirko <jiri@resnulli.us>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Richard Cochran
+	<richardcochran@gmail.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, <netdev@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "Aleksandr
+ Loktionov" <aleksandr.loktionov@intel.com>
+Subject: Re: [PATCH iwl-next v5 09/15] idpf: refactor idpf to use libie
+ control queues
+Message-ID: <aUAy5vJ04DWAVohe@soc-5CG4396X81.clients.intel.com>
+References: <20251117134912.18566-1-larysa.zaremba@intel.com>
+ <20251117134912.18566-10-larysa.zaremba@intel.com>
+ <f9a69abd-dabc-440a-a3cd-c88b184f7e77@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <f9a69abd-dabc-440a-a3cd-c88b184f7e77@intel.com>
+X-ClientProxiedBy: VI1PR09CA0125.eurprd09.prod.outlook.com
+ (2603:10a6:803:78::48) To SN7PR11MB7540.namprd11.prod.outlook.com
+ (2603:10b6:806:340::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251215034944.2973003-1-irving-ch.lin@mediatek.com>
-In-Reply-To: <20251215034944.2973003-1-irving-ch.lin@mediatek.com>
-From: Ulf Hansson <ulf.hansson@linaro.org>
-Date: Mon, 15 Dec 2025 16:57:03 +0100
-X-Gm-Features: AQt7F2pOE88ysP1TXeUkBFRRwGo0OeDBvPna4LwWc08y3UTdwUmGokrHz2XyogY
-Message-ID: <CAPDyKFrsRTmvc4JmFAT_mCEEaG9yGkZn_JJqqyqCnB-AmpZgsQ@mail.gmail.com>
-Subject: Re: [PATCH v4 00/21] Add support for MT8189 clock/power controller
-To: "irving.ch.lin" <irving-ch.lin@mediatek.com>
-Cc: Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Richard Cochran <richardcochran@gmail.com>, Qiqi Wang <qiqi.wang@mediatek.com>, 
-	linux-clk@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-mediatek@lists.infradead.org, linux-pm@vger.kernel.org, 
-	netdev@vger.kernel.org, Project_Global_Chrome_Upstream_Group@mediatek.com, 
-	sirius.wang@mediatek.com, vince-wl.liu@mediatek.com, jh.hsu@mediatek.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|IA1PR11MB6419:EE_
+X-MS-Office365-Filtering-Correlation-Id: f7b24cf9-45ce-42bd-f3ab-08de3bf476bc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024|10070799003;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?u66DCjuuCUTB29CJMz8KZkoTI+GcxPpXvdaV9aGjfRh/oT13rL+8le2BaWyS?=
+ =?us-ascii?Q?/aOR3OMK7SuirTUBGlIrS3tn+ZZUMEEiVQbiCA5nBB2WnREqUHJFkP1PFZOT?=
+ =?us-ascii?Q?Blk0kOUlSrUni5raqSjiAbmh4vBXVtWj/InoDi4TTXisuXPYItuOU551VIqb?=
+ =?us-ascii?Q?RqGFvVeW2J6mx6GdU5en2w8knjl6kHOEpzCCJHcoTAO0OEmE+Acde7RZ0Qt+?=
+ =?us-ascii?Q?BOxHdCcT7jub7UH1iWkLw2AaPIC3GKqEDoUOHb1nBtsMEa8/DczissypMSLo?=
+ =?us-ascii?Q?vCdW61zxoEb3Qy/Nua758MNNYqvQL4cOfudH1IAZPYDEClYod6ivGaGmNOu/?=
+ =?us-ascii?Q?TN7vhInNacdygJXVje5S8k9JPeno/6uXvIMB7tgk/pDA5p+hr0hvWqPiWwGN?=
+ =?us-ascii?Q?gIKBhrtn/FOZIMYm16oXMaRnNTn66Z6lz1mKGVKmapDNjd43dKYZsKgZmTAH?=
+ =?us-ascii?Q?yn7FyFreVoCJdBuU6ew5ouD572wW+8C/9VyQHvzRW5TayXWEnJfdVsEIAfqG?=
+ =?us-ascii?Q?1qTgieMSsmRxhWEcBlzekHvcj5Ouw3Qhj6Zte56jlF3rrWezdGHxG3w9ENhn?=
+ =?us-ascii?Q?ES1KVgioNYjglq+7S/5B9tYeAi1i6ofdQellLDj149sx01cNtg0cX/5Np9JQ?=
+ =?us-ascii?Q?7hYzgHfyca4xmvAjDKA3itocnfNzMsiG0N5jQDaWVdY2O/BGJq+iAAzYLtEv?=
+ =?us-ascii?Q?E/aPJq/WycxsTCzbZuw9WePjxpbaNLddtbgRNcBXbekppxqHtaLUHqTHsVWe?=
+ =?us-ascii?Q?QniH2uoMi8fuxxBYOrUUnT/4QiPcdhwHRiGg2WX8liBrX03P29X3VZMkzKh4?=
+ =?us-ascii?Q?jJBiZEsgCGS9P+l+NTDEgdCnlrDz+Tge9Mgdyb73YxNXDtUNB90Xfgs8rmQ0?=
+ =?us-ascii?Q?1canKGDMgM8F2fL5IhVwIUF9/+L7HqTKaTWalzhnE+SQV6X/KzpFe97aM9Bb?=
+ =?us-ascii?Q?TYUNctkvwHFp78vKmIh0zFJFB570ICK0fYpyfdgNaLKrVT5RBHP8KTiWTtxj?=
+ =?us-ascii?Q?S/9fd7rr3XgucJSjG4EvR49UmxzibbrHciUUubRcIZC8Eni/Ljm/AZINJLQy?=
+ =?us-ascii?Q?P8ROKUM1kYqf9JXvNZOCrSPDVLso6vp25o7JdFtUskDMUdii9SX1F76/yk5T?=
+ =?us-ascii?Q?lfn7d3PoYWmRPn1Txk/4q/jzRZR7e5COGjnnjdOyGfIxQx0qtRG/E7OQR8Sj?=
+ =?us-ascii?Q?75mrRjJARBzVPiFlsc4g6JRhM7S34qZHl4hRAijRQfJ1dw2tEfRp4E1Ry4/S?=
+ =?us-ascii?Q?jWoC4Xh7AgnzI1ZDTd5Phkcq4ErGTP6sEEMi+tUw7RHIhY4odJSCGoY1ZvSn?=
+ =?us-ascii?Q?TbM/jyCVPYuFpyDEHPDjiNKt8ocOuvEWgIyOucc7yPMRhi39NVgEOdG/oFF8?=
+ =?us-ascii?Q?rAC0OZCwlKUuyInG2Y8JcLYrd2K2umbncqSYx4qExUZ+nVV3O1vWSzaEVttX?=
+ =?us-ascii?Q?bydL7J3Pbz31giEK48WTqId73jngXtgDn/TRdCxdHNlSbXjx2VAIXw=3D=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(10070799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?FK4zZ5QGfdde/xqjscZW5+vBgLwMyd6LMiWiI5/TuN5ZqyvuAv2PyoyT/88b?=
+ =?us-ascii?Q?qKf7prpGb60AH16eviuLHhLkEJQj0tnvTk9QGXFnmLmnYTZxZekfEeu8Iq1R?=
+ =?us-ascii?Q?Nuhp5m4AHPdTZj7JwAk6G4nhiPk9qcTg9+xPTXi7tCRB7PEOHCxf756u2Ugq?=
+ =?us-ascii?Q?kcWBdhvCwzwMwrU1T2iT0T0WNjWSAK0wmoCNip7Zku4qxK/rPdNgkFcvJIab?=
+ =?us-ascii?Q?QniYNyRawrFbkQi+3VkIurD5SPCK1mJ4I6QfnpcVzUjgvJeRQqt51sEjBJfp?=
+ =?us-ascii?Q?cnsldec7vwG9YOln7gCvGfMU7whQvtLOCYztGYZx3df7UXW4gRjBAWJCm2QT?=
+ =?us-ascii?Q?CeFCU6g3jA7JQmnmKnWoAv5BFQpgcy4b48xpKTq6SF9OStxR9cSg2awp5+20?=
+ =?us-ascii?Q?LS0LL1c7qY3qzvTotv3jwPboksUQAgJSUXN4r5EKYKsuZJiB77BDZEdHj8ZY?=
+ =?us-ascii?Q?m1Y8et/KEDO7iRFlM4d/SqYcNfLTDrnMDY+rQW2LDcdKKvywcwAWiDJ3ymux?=
+ =?us-ascii?Q?OEAHYiDXQao/GTDkBbo0K9EYCMRjmlFd+gbxqtwNGq3/GOUU0kTuODDezsxO?=
+ =?us-ascii?Q?LoMl3sMWI6wEvaN9FiXELvVOKj9AaJqz4jvDnekyYIZH3nokELIrJyG4VHl2?=
+ =?us-ascii?Q?cIGVgSN5PyTo4RXBb9D59DKbmgNaF8LXrTErS4LJkhGj+Of6xKjVA78p8dUu?=
+ =?us-ascii?Q?7RfWAbM74GyLYQWDx5/PKLHaaw+bC0OK5eBBVYPb/gm1QmeNpweWFwzSImtz?=
+ =?us-ascii?Q?0XdOgx10iru2zudQ4VkoqFXNcMFxietgmdnMfxUVCTw9cLkDhviHbCKLJTED?=
+ =?us-ascii?Q?8iHCIrvAIVOOM0OSJZNoESsREUfq+M43I0XTDlpNgvrtuBZyqTHn9GTvQ/Li?=
+ =?us-ascii?Q?gW4xya86LSr9kfmDvb3qw5Ga5ASHAgwD0KEC32pKH6V6eC7Y4eFwGJoSY+Ch?=
+ =?us-ascii?Q?Oamv+g+6VTO+6MiXjG9Q0dWIU7TUuZg65+bHondMWZ28BrG85UXd1C/v9XUR?=
+ =?us-ascii?Q?9QvaFSSavctVcIFZCkvHpNLzK0l2K4hDz9nnQ4Be5/oF1zr8LUmh6UYXpZBP?=
+ =?us-ascii?Q?MBHXm6XMAgXeD//PLsN0qcKFNM7FAYqnl6m5UkuKfjFBEOwm7Y8MN5//9Khc?=
+ =?us-ascii?Q?yVfHR/UnL4uZhbmOUUMfDlGXvxTW694jfxqGYLo72O97BuH+62E9oSVJNr7P?=
+ =?us-ascii?Q?vUMS+tvtz3+BIQ0P6DwQm+8+6YfZ5IcANmW+XK8712zi5wKjaoTXVhJ1LkyF?=
+ =?us-ascii?Q?J/F4hRKMaRK67JkTtSh7mT1R83By/NQ6z5y9/eJHXbs4V4nNR9bCdjEFtvr7?=
+ =?us-ascii?Q?xrnDp3A7msqi9CFYoi0G3dydKEN3BXUaHyt90NMShbNkbjg+PDsOOpAumd1Q?=
+ =?us-ascii?Q?l0HIxX6a+7zoDednZKJpvyrrOWF84JCcj5+tjw+PaBfHk0Kg2wAjMOLti4Ix?=
+ =?us-ascii?Q?DMzPhCRRsTZBBjsfHjE3VkpuX/AD050arPzbeLdIkg7Kfn5YkdD1Ssank9xP?=
+ =?us-ascii?Q?3MITStsD/Mn5omvyAregRE1kfGI9+aqBsN7k3w9bgiCaQShtSvRL6twksxj7?=
+ =?us-ascii?Q?VHIcr8MHmsSrkcsgG3ZqHvvmk+dWhtKGl/5cSLxE5EqWvFUFA5bgl3lo0CUV?=
+ =?us-ascii?Q?Uk97XDjOy0X3oC/L5jxpcNEk5mOyBNQBW0/zffNv5Qx4ElR1rash7AbtNA7r?=
+ =?us-ascii?Q?Hx6RRA=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: f7b24cf9-45ce-42bd-f3ab-08de3bf476bc
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2025 16:10:28.6787
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: na2bhG8kgN6PSaDQwEgzdpXz9Jl3gWbs70VebdPZVUvy30sQtTkQnLTmE9l7vFsa8HNjrSmHP5WSMchD2RHEKDygqznJ8PgwhJZonpXn7uo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6419
+X-OriginatorOrg: intel.com
 
-On Mon, 15 Dec 2025 at 04:50, irving.ch.lin <irving-ch.lin@mediatek.com> wrote:
->
-> From: Irving-CH Lin <irving-ch.lin@mediatek.com>
->
-> Changes since v4:
-> - Fix dt_binding_check warning.
-> - Check prepare_enable before set_parent to ensure our reference clock is ready.
-> - Enable fhctl in apmixed driver.
-> - Refine clock drivers:
->   - Change subsys name, regs base/size (clock related part, instead of whole subsys).
->   - Simply code with GATE_MTK macro.
->   - Add MODULE_DEVICE_TABLE, MODULE_DESCRIPTION
->   - Register remove callback mtk_clk_simple_remove.
->   - Remove most of CLK_OPS_PARENT_ENABLE and CLK_IGNORE_UNUSED which may block bringup,
->       but some subsys will power off before we disable unused clocks, so still need here.
+On Wed, Dec 10, 2025 at 07:42:53PM -0800, Tantilov, Emil S wrote:
+> 
+> On 11/17/2025 5:48 AM, Larysa Zaremba wrote:
+> > From: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+> > 
+> > Support to initialize and configure controlqs, and manage their
+> > transactions was introduced in libie. As part of it, most of the existing
+> > controlq structures are renamed and modified. Use those APIs in idpf and
+> > make all the necessary changes.
+> > 
+> > Previously for the send and receive virtchnl messages, there used to be a
+> > memcpy involved in controlq code to copy the buffer info passed by the send
+> > function into the controlq specific buffers. There was no restriction to
+> > use automatic memory in that case. The new implementation in libie removed
+> > copying of the send buffer info and introduced DMA mapping of the send
+> > buffer itself. To accommodate it, use dynamic memory for the larger send
+> > buffers. For smaller ones (<= 128 bytes) libie still can copy them into the
+> > pre-allocated message memory.
+> > 
+> > In case of receive, idpf receives a page pool buffer allocated by the libie
+> > and care should be taken to release it after use in the idpf.
+> > 
+> > The changes are fairly trivial and localized, with a notable exception
+> > being the consolidation of idpf_vc_xn_shutdown and idpf_deinit_dflt_mbx
+> > under the latter name. This has some additional consequences that are
+> > addressed in the following patches.
+> > 
+> > This refactoring introduces roughly additional 40KB of module storage used
+> > for systems that only run idpf, so idpf + libie_cp + libie_pci takes about
+> > 7% more storage than just idpf before refactoring.
+> > 
+> > We now pre-allocate small TX buffers, so that does increase the memory
+> > usage, but reduces the need to allocate. This results in additional 256 *
+> > 128B of memory permanently used, increasing the worst-case memory usage by
+> > 32KB but our ctlq RX buffers need to be of size 4096B anyway (not changed
+> > by the patchset), so this is hardly noticeable.
+> > 
+> > As for the timings, the fact that we are mostly limited by the HW response
+> > time which is far from instant, is not changed by this refactor.
+> > 
+> > Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> > Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+> > Co-developed-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> > Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> > ---
+> >   drivers/net/ethernet/intel/idpf/Makefile      |    2 -
+> >   drivers/net/ethernet/intel/idpf/idpf.h        |   28 +-
+> >   .../net/ethernet/intel/idpf/idpf_controlq.c   |  633 -------
+> >   .../net/ethernet/intel/idpf/idpf_controlq.h   |  142 --
+> >   .../ethernet/intel/idpf/idpf_controlq_api.h   |  177 --
+> >   .../ethernet/intel/idpf/idpf_controlq_setup.c |  171 --
+> >   drivers/net/ethernet/intel/idpf/idpf_dev.c    |   60 +-
+> >   .../net/ethernet/intel/idpf/idpf_ethtool.c    |   20 +-
+> >   drivers/net/ethernet/intel/idpf/idpf_lib.c    |   67 +-
+> >   drivers/net/ethernet/intel/idpf/idpf_main.c   |    5 -
+> >   drivers/net/ethernet/intel/idpf/idpf_mem.h    |   20 -
+> >   drivers/net/ethernet/intel/idpf/idpf_txrx.h   |    2 +-
+> >   drivers/net/ethernet/intel/idpf/idpf_vf_dev.c |   67 +-
+> >   .../net/ethernet/intel/idpf/idpf_virtchnl.c   | 1580 ++++++-----------
+> >   .../net/ethernet/intel/idpf/idpf_virtchnl.h   |   90 +-
+> >   .../ethernet/intel/idpf/idpf_virtchnl_ptp.c   |  239 ++-
+> >   16 files changed, 783 insertions(+), 2520 deletions(-)
+> >   delete mode 100644 drivers/net/ethernet/intel/idpf/idpf_controlq.c
+> >   delete mode 100644 drivers/net/ethernet/intel/idpf/idpf_controlq.h
+> >   delete mode 100644 drivers/net/ethernet/intel/idpf/idpf_controlq_api.h
+> >   delete mode 100644 drivers/net/ethernet/intel/idpf/idpf_controlq_setup.c
+> >   delete mode 100644 drivers/net/ethernet/intel/idpf/idpf_mem.h
+> > 
+> 
+> <snip>
+> 
+> > diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+> > index e15b1e8effc8..7751a81fc29d 100644
+> > --- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
+> > +++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+> > @@ -1363,6 +1363,7 @@ void idpf_statistics_task(struct work_struct *work)
+> >    */
+> >   void idpf_mbx_task(struct work_struct *work)
+> >   {
+> > +	struct libie_ctlq_xn_recv_params xn_params;
+> >   	struct idpf_adapter *adapter;
+> >   	adapter = container_of(work, struct idpf_adapter, mbx_task.work);
+> > @@ -1373,7 +1374,14 @@ void idpf_mbx_task(struct work_struct *work)
+> >   		queue_delayed_work(adapter->mbx_wq, &adapter->mbx_task,
+> >   				   usecs_to_jiffies(300));
+> > -	idpf_recv_mb_msg(adapter, adapter->hw.arq);
+> > +	xn_params = (struct libie_ctlq_xn_recv_params) {
+> > +		.xnm = adapter->xn_init_params.xnm,
+> > +		.ctlq = adapter->arq,
+> > +		.ctlq_msg_handler = idpf_recv_event_msg,
+> > +		.budget = LIBIE_CTLQ_MAX_XN_ENTRIES,
+> > +	};
+> > +
+> > +	libie_ctlq_xn_recv(&xn_params);
+> >   }
+> >   /**
+> > @@ -1907,7 +1915,6 @@ static void idpf_init_hard_reset(struct idpf_adapter *adapter)
+> >   		idpf_vc_core_deinit(adapter);
+> >   		if (!is_reset)
+> >   			reg_ops->trigger_reset(adapter, IDPF_HR_FUNC_RESET);
+> > -		idpf_deinit_dflt_mbx(adapter);
+> >   	} else {
+> >   		dev_err(dev, "Unhandled hard reset cause\n");
+> >   		err = -EBADRQC;
+> > @@ -1972,19 +1979,11 @@ void idpf_vc_event_task(struct work_struct *work)
+> >   	if (test_bit(IDPF_REMOVE_IN_PROG, adapter->flags))
+> >   		return;
+> > -	if (test_bit(IDPF_HR_FUNC_RESET, adapter->flags))
+> > -		goto func_reset;
+> > -
+> > -	if (test_bit(IDPF_HR_DRV_LOAD, adapter->flags))
+> > -		goto drv_load;
+> > -
+> > -	return;
+> > -
+> > -func_reset:
+> > -	idpf_vc_xn_shutdown(adapter->vcxn_mngr);
+> 
+> This will cause a regression where VC can timeout on reset:
+> https://lore.kernel.org/intel-wired-lan/20250508184715.7631-1-emil.s.tantilov@intel.com/
+> 
+> I think we can keep this logic, remove the calls to vc_xn_shutdown in
+> idpf_vc_core_deinit() and add it to idpf_remove().
+> 
+> Thanks,
+> Emil
+> 
 
-I assume I can pick the pmdomain related changes (patch2, patch20 and
-patch21) from this series, as they are independent from the clock
-changes, right?
+Thank you for bringging this up!
 
-Kind regards
-Uffe
+It's a shame that the solution that we have agreed with you on previouly has 
+such unintended consequences. Well, after looking at it this way, I see no good 
+solution except bringing back xnm shutdown, but in libie. See the suggested diff 
+below. Please, say if it works for you.
 
+When fixed up in a final patch idpf_vc_event_task will only have one changed 
+line:
 
->
-> changes since v3:
-> - Add power-controller dt-schema to mediatek,power-controller.yaml.
-> - Separates clock commit to small parts (by sub-system).
-> - Change to mtk-pm-domains for new MTK pm framework.
->
-> changes since v2:
-> - Fix dt-schema checking fails
-> - Merge dt-binding files and dt-schema files into one patch.
-> - Add vendor information to dt-binding file name.
-> - Remove NR define in dt-binding header.
-> - Add struct member description.
->
->   This series add support for the clock and power controllers
-> of MediaTek's new SoC, MT8189. With these changes,
-> other modules can easily manage clock and power resources
-> using standard Linux APIs, such as the Common Clock Framework (CCF)
-> and pm_runtime on MT8189 platform.
->
-> Irving-CH Lin (21):
->   dt-bindings: clock: mediatek: Add MT8189 clock definitions
->   dt-bindings: power: mediatek: Add MT8189 power domain definitions
->   clk: mediatek: clk-mux: Make sure bypass clk enabled while setting MFG
->     rate
->   clk: mediatek: Add MT8189 apmixedsys clock support
->   clk: mediatek: Add MT8189 topckgen clock support
->   clk: mediatek: Add MT8189 vlpckgen clock support
->   clk: mediatek: Add MT8189 vlpcfg clock support
->   clk: mediatek: Add MT8189 bus clock support
->   clk: mediatek: Add MT8189 cam clock support
->   clk: mediatek: Add MT8189 dbgao clock support
->   clk: mediatek: Add MT8189 dvfsrc clock support
->   clk: mediatek: Add MT8189 i2c clock support
->   clk: mediatek: Add MT8189 img clock support
->   clk: mediatek: Add MT8189 mdp clock support
->   clk: mediatek: Add MT8189 mfg clock support
->   clk: mediatek: Add MT8189 dispsys clock support
->   clk: mediatek: Add MT8189 scp clock support
->   clk: mediatek: Add MT8189 ufs clock support
->   clk: mediatek: Add MT8189 vcodec clock support
->   pmdomain: mediatek: Add bus protect control flow for MT8189
->   pmdomain: mediatek: Add power domain driver for MT8189 SoC
->
->  .../bindings/clock/mediatek,mt8189-clock.yaml |   90 ++
->  .../clock/mediatek,mt8189-sys-clock.yaml      |   58 +
->  .../power/mediatek,power-controller.yaml      |    1 +
->  drivers/clk/mediatek/Kconfig                  |  146 +++
->  drivers/clk/mediatek/Makefile                 |   14 +
->  drivers/clk/mediatek/clk-mt8189-apmixedsys.c  |  192 ++++
->  drivers/clk/mediatek/clk-mt8189-bus.c         |  196 ++++
->  drivers/clk/mediatek/clk-mt8189-cam.c         |  108 ++
->  drivers/clk/mediatek/clk-mt8189-dbgao.c       |   94 ++
->  drivers/clk/mediatek/clk-mt8189-dispsys.c     |  172 +++
->  drivers/clk/mediatek/clk-mt8189-dvfsrc.c      |   54 +
->  drivers/clk/mediatek/clk-mt8189-iic.c         |  118 ++
->  drivers/clk/mediatek/clk-mt8189-img.c         |  107 ++
->  drivers/clk/mediatek/clk-mt8189-mdpsys.c      |   91 ++
->  drivers/clk/mediatek/clk-mt8189-mfg.c         |   53 +
->  drivers/clk/mediatek/clk-mt8189-scp.c         |   73 ++
->  drivers/clk/mediatek/clk-mt8189-topckgen.c    | 1020 +++++++++++++++++
->  drivers/clk/mediatek/clk-mt8189-ufs.c         |   89 ++
->  drivers/clk/mediatek/clk-mt8189-vcodec.c      |   93 ++
->  drivers/clk/mediatek/clk-mt8189-vlpcfg.c      |  111 ++
->  drivers/clk/mediatek/clk-mt8189-vlpckgen.c    |  280 +++++
->  drivers/clk/mediatek/clk-mux.c                |    9 +-
->  drivers/pmdomain/mediatek/mt8189-pm-domains.h |  485 ++++++++
->  drivers/pmdomain/mediatek/mtk-pm-domains.c    |   36 +-
->  drivers/pmdomain/mediatek/mtk-pm-domains.h    |    5 +
->  .../dt-bindings/clock/mediatek,mt8189-clk.h   |  580 ++++++++++
->  .../dt-bindings/power/mediatek,mt8189-power.h |   38 +
->  27 files changed, 4306 insertions(+), 7 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/clock/mediatek,mt8189-clock.yaml
->  create mode 100644 Documentation/devicetree/bindings/clock/mediatek,mt8189-sys-clock.yaml
->  create mode 100644 drivers/clk/mediatek/clk-mt8189-apmixedsys.c
->  create mode 100644 drivers/clk/mediatek/clk-mt8189-bus.c
->  create mode 100644 drivers/clk/mediatek/clk-mt8189-cam.c
->  create mode 100644 drivers/clk/mediatek/clk-mt8189-dbgao.c
->  create mode 100644 drivers/clk/mediatek/clk-mt8189-dispsys.c
->  create mode 100644 drivers/clk/mediatek/clk-mt8189-dvfsrc.c
->  create mode 100644 drivers/clk/mediatek/clk-mt8189-iic.c
->  create mode 100644 drivers/clk/mediatek/clk-mt8189-img.c
->  create mode 100644 drivers/clk/mediatek/clk-mt8189-mdpsys.c
->  create mode 100644 drivers/clk/mediatek/clk-mt8189-mfg.c
->  create mode 100644 drivers/clk/mediatek/clk-mt8189-scp.c
->  create mode 100644 drivers/clk/mediatek/clk-mt8189-topckgen.c
->  create mode 100644 drivers/clk/mediatek/clk-mt8189-ufs.c
->  create mode 100644 drivers/clk/mediatek/clk-mt8189-vcodec.c
->  create mode 100644 drivers/clk/mediatek/clk-mt8189-vlpcfg.c
->  create mode 100644 drivers/clk/mediatek/clk-mt8189-vlpckgen.c
->  create mode 100644 drivers/pmdomain/mediatek/mt8189-pm-domains.h
->  create mode 100644 include/dt-bindings/clock/mediatek,mt8189-clk.h
->  create mode 100644 include/dt-bindings/power/mediatek,mt8189-power.h
->
-> --
-> 2.45.2
->
+@@ -1981,7 +1986,7 @@ void idpf_vc_event_task(struct work_struct *work)
+        return;
+
+ func_reset:
+-       idpf_vc_xn_shutdown(adapter->vcxn_mngr);
++       libie_ctlq_xn_shutdown(adapter->xnm);
+ drv_load:
+        set_bit(IDPF_HR_RESET_IN_PROG, adapter->flags);
+        idpf_init_hard_reset(adapter);
+
+libie_ctlq_xn_shutdown() sets the state to shutdown, so no new xns can be 
+taken (-EAGAIN) and running xns are prematurely completed 
+resulting in a timed out error. At the same it does not free any memory, so no 
+use-after-free risks.
+
+---------------------
+The main diff:
+
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+index 69eb72ed6b99..dff931ebbd9f 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+@@ -1977,12 +1977,19 @@ void idpf_vc_event_task(struct work_struct *work)
+
+        if (test_bit(IDPF_REMOVE_IN_PROG, adapter->flags))
+                return;
++       if (test_bit(IDPF_HR_FUNC_RESET, adapter->flags))
++               goto func_reset;
+
+-       if (test_bit(IDPF_HR_FUNC_RESET, adapter->flags) ||
+-           test_bit(IDPF_HR_DRV_LOAD, adapter->flags)) {
+-               set_bit(IDPF_HR_RESET_IN_PROG, adapter->flags);
+-               idpf_init_hard_reset(adapter);
+-       }
++       if (test_bit(IDPF_HR_DRV_LOAD, adapter->flags))
++               goto drv_load;
++
++       return;
++
++func_reset:
++       libie_ctlq_xn_shutdown(adapter->xn_init_params.xnm);
++drv_load:
++       set_bit(IDPF_HR_RESET_IN_PROG, adapter->flags);
++       idpf_init_hard_reset(adapter);
+ }
+
+ /**
+diff --git a/drivers/net/ethernet/intel/libie/controlq.c b/drivers/net/ethernet/intel/libie/controlq.c
+index 9b24a87872e5..a39ee6ea37f1 100644
+--- a/drivers/net/ethernet/intel/libie/controlq.c
++++ b/drivers/net/ethernet/intel/libie/controlq.c
+@@ -694,7 +694,7 @@ static void libie_ctlq_xn_put(struct libie_ctlq_xn_manager *xnm,
+  */
+ static void libie_ctlq_xn_deinit_dma(struct device *dev,
+                                     struct libie_ctlq_xn_manager *xnm,
+-                                     u32 num_entries)
++                                    u32 num_entries)
+ {
+        for (u32 i = 0; i < num_entries; i++) {
+                struct libie_ctlq_xn *xn = &xnm->ring[i];
+@@ -1093,14 +1093,12 @@ u32 libie_ctlq_xn_send_clean(const struct libie_ctlq_xn_clean_params *params)
+ EXPORT_SYMBOL_NS_GPL(libie_ctlq_xn_send_clean, "LIBIE_CP");
+
+ /**
+- * libie_ctlq_xn_deinit - deallocate and free the transaction manager resources
++ * libie_ctlq_xn_shutdown - terminate control queue transactions
+  * @xnm: pointer to the transaction manager
+- * @ctx: controlq context structure
+  *
+- * All Rx processing must be stopped beforehand.
++ * Synchronously terminate existing transactions and stop accepting new ones.
+  */
+-void libie_ctlq_xn_deinit(struct libie_ctlq_xn_manager *xnm,
+-                         struct libie_ctlq_ctx *ctx)
++void libie_ctlq_xn_shutdown(struct libie_ctlq_xn_manager *xnm)
+ {
+        bool must_wait = false;
+        u32 i;
+@@ -1129,7 +1127,20 @@ void libie_ctlq_xn_deinit(struct libie_ctlq_xn_manager *xnm,
+
+        if (must_wait)
+                wait_for_completion(&xnm->can_destroy);
++}
++EXPORT_SYMBOL_NS_GPL(libie_ctlq_xn_shutdown, "LIBIE_CP");
+
++/**
++ * libie_ctlq_xn_deinit - deallocate and free the transaction manager resources
++ * @xnm: pointer to the transaction manager
++ * @ctx: controlq context structure
++ *
++ * All Rx processing must be stopped beforehand.
++ */
++void libie_ctlq_xn_deinit(struct libie_ctlq_xn_manager *xnm,
++                         struct libie_ctlq_ctx *ctx)
++{
++       libie_ctlq_xn_shutdown(xnm);
+        libie_ctlq_xn_deinit_dma(&ctx->mmio_info.pdev->dev, xnm,
+                                 LIBIE_CTLQ_MAX_XN_ENTRIES);
+        kfree(xnm);
+diff --git a/include/linux/intel/libie/controlq.h b/include/linux/intel/libie/controlq.h
+index 4a627670814e..98f082b5d039 100644
+--- a/include/linux/intel/libie/controlq.h
++++ b/include/linux/intel/libie/controlq.h
+@@ -414,6 +414,7 @@ struct libie_ctlq_xn_init_params {
+ int libie_ctlq_xn_init(struct libie_ctlq_xn_init_params *params);
+ void libie_ctlq_xn_deinit(struct libie_ctlq_xn_manager *xnm,
+                          struct libie_ctlq_ctx *ctx);
++void libie_ctlq_xn_shutdown(struct libie_ctlq_xn_manager *xnm);
+ int libie_ctlq_xn_send(struct libie_ctlq_xn_send_params *params);
+ u32 libie_ctlq_xn_recv(struct libie_ctlq_xn_recv_params *params);
+ u32 libie_ctlq_xn_send_clean(const struct libie_ctlq_xn_clean_params *params);
 
