@@ -1,113 +1,208 @@
-Return-Path: <netdev+bounces-244748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FE1BCBDEFB
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 14:04:09 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17591CBDEF2
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 14:03:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 2C5C530329F1
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 13:00:34 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A3643305AC78
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 12:58:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C28C2BE64C;
-	Mon, 15 Dec 2025 13:00:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5554D22126D;
+	Mon, 15 Dec 2025 12:58:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="LfrZfV0+";
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="LfrZfV0+"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="pwB5aJIj";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="uhL6Wzq1";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="wbudG5tR";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="/lEzb7cY"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5589A2D7D2E;
-	Mon, 15 Dec 2025 13:00:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9424227815E
+	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 12:57:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765803605; cv=none; b=ZK8aDf4AlmcW0HTA9zpAqvnEF6TvvOsg4cQPgWHnIbPoWvJaDybG5cKLGk1572R/GEBRohQ8lp42beGopxEXM9jOxEQj+/uBJAaAJ27qFMnlbHbALTinKDWe+MLsmCKLpUKsgHHzSwQJbSVlHfkm9fbgNHogwWY94/c0QmzQU8I=
+	t=1765803482; cv=none; b=FnrrfMNuk3qSW8uJU9bTx80yYoaiA2prBupdYZ+KRZcEP59EXOnp5eTJ9TF3di/AN3cW2MkVecHvdqMMWoNrmOHUYBc3CAO5B/+qcj9lTpUHOvjAbbawEKQ8KgbnspPeDsCq+eLLvbAbc60iRdM/AAqOqqz4Pn9eDYsOjwEZKKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765803605; c=relaxed/simple;
-	bh=bFW5wc7teN8wCrjLWApoNlxe5ivNEhXG0ZFJWMv1Om0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uIhpxnCY4glOKqpHaxykHlL3NETBp1CKRNfhSbUBkAJSGboo8RFyeWmaHr/ZidSSBBQb6xkb02R4p0NF6lRsvHRxfscs8YynroNbpehDfb24ra7X2mm3TSUHGHR9gD5ah3qE+pUbcHmkI6nXrbI5J+pk8TMA3bNkR7BGEIztSsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=LfrZfV0+; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=LfrZfV0+; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=/BAOnQl4PiBFWoROmLFA/gBRGEHU/8ET6VKFmfi7mQQ=;
-	b=LfrZfV0+uuxrwE+xZihutr3i0daDSADpyAvJGAOuxVA1L1K8rrxycuDlXU1+Bvp8Vm7Sld1nu
-	71sqlVorS2fJaRL/KEeXD2LdBXQ6fpSc8Br7lgE5pSqUJTImVt0IUR1spTQf/qj4ZEmoQz/aD0p
-	0xJsKmz5PdBgO0ccYIUCXzI=
-Received: from canpmsgout11.his.huawei.com (unknown [172.19.92.148])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTPS id 4dVKs94Ttgz1BG4S;
-	Mon, 15 Dec 2025 20:59:41 +0800 (CST)
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=/BAOnQl4PiBFWoROmLFA/gBRGEHU/8ET6VKFmfi7mQQ=;
-	b=LfrZfV0+uuxrwE+xZihutr3i0daDSADpyAvJGAOuxVA1L1K8rrxycuDlXU1+Bvp8Vm7Sld1nu
-	71sqlVorS2fJaRL/KEeXD2LdBXQ6fpSc8Br7lgE5pSqUJTImVt0IUR1spTQf/qj4ZEmoQz/aD0p
-	0xJsKmz5PdBgO0ccYIUCXzI=
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by canpmsgout11.his.huawei.com (SkyGuard) with ESMTPS id 4dVKq33MvnzKm6s;
-	Mon, 15 Dec 2025 20:57:51 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 9BB601402C6;
-	Mon, 15 Dec 2025 20:59:51 +0800 (CST)
-Received: from localhost.localdomain (10.90.31.46) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 15 Dec 2025 20:59:50 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
-	<Frank.Sae@motor-comm.com>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>
-CC: <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
-	<chenhao418@huawei.com>, <jonathan.cameron@huawei.com>,
-	<salil.mehta@huawei.com>, <shiyongbang@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>
-Subject: [PATCH RFC net-next 6/6] net: phy: motorcomm: fix duplex setting error for phy leds
-Date: Mon, 15 Dec 2025 20:57:05 +0800
-Message-ID: <20251215125705.1567527-7-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20251215125705.1567527-1-shaojijie@huawei.com>
-References: <20251215125705.1567527-1-shaojijie@huawei.com>
+	s=arc-20240116; t=1765803482; c=relaxed/simple;
+	bh=OrvUkA/OYEVIy2HAOWaodbUWPIFHAKNggXoBeeKaNVM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jJP7RvBqt6uWemeAYUgsyugRCowEwZ0v9TxXH0dteCfZLxRhElbOYAftSj66FnCsmfvHQ+UNIfdTiEOATqsGXqCroELM1U8h4v5mJdLRD7dHcKDtAIPwkbJUOo04q+mT276MLjm4Ms/taEdSSxFXWATnuk/WNdRTC6uXldOfANI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=pwB5aJIj; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=uhL6Wzq1; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=wbudG5tR; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=/lEzb7cY; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id C790F5BDC1;
+	Mon, 15 Dec 2025 12:57:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1765803475; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+MMpU8iu26hMrIy/s70C2uUD4P60923K9CkgBqEJuQM=;
+	b=pwB5aJIjn8phLTPx90dciLVvvsfvcKP4gkJ66yBeotWcB8KfB5XiqvoFO7jy2uTkyC7Yb0
+	JZLMWnyBnFSISomtilFsdBk9B36BOYrswpfuNRST6oxzuo68CfSRARwKaa2cXsYIM2sUeE
+	4lDFqwFwDELbInSqS57Nt+ZBmoPWBs0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1765803475;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+MMpU8iu26hMrIy/s70C2uUD4P60923K9CkgBqEJuQM=;
+	b=uhL6Wzq1R+PNBj6rfCcqGNMgxtVxaRnHoZyyToVvx4kGFick0Y9bgj6VQ/quRzQ0+xnmCi
+	0lYA7snQbCFB6cBg==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=wbudG5tR;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b="/lEzb7cY"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1765803474; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+MMpU8iu26hMrIy/s70C2uUD4P60923K9CkgBqEJuQM=;
+	b=wbudG5tRrT5mSpJlFzatkqSwIBsOCTdfoHnUgi2Sq9omNJkKuKsXswef7UpkpzalsaCUOA
+	Dll6hqGranEacsANrMAceL1D8/syjts30TI7weAKtY3ETHR/fxxKgSWzqbzQyiEzCS6Ldm
+	vwP4EuI/mR5KXUTIq6jvDZNHMvAhH44=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1765803474;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+MMpU8iu26hMrIy/s70C2uUD4P60923K9CkgBqEJuQM=;
+	b=/lEzb7cYQcLGYieeI0FGHc2j6U844YUTFaZ0ICjqymlBjCArBNNka7sLpYwDMBbyBbL1c4
+	SAALQB2mHJPlRmCw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B77483EA65;
+	Mon, 15 Dec 2025 12:57:54 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 3lEkLNIFQGkhTQAAD6G6ig
+	(envelope-from <jack@suse.cz>); Mon, 15 Dec 2025 12:57:54 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 6303FA0951; Mon, 15 Dec 2025 13:57:39 +0100 (CET)
+Date: Mon, 15 Dec 2025 13:57:39 +0100
+From: Jan Kara <jack@suse.cz>
+To: Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+	Linux AMDGPU <amd-gfx@lists.freedesktop.org>, Linux DRI Development <dri-devel@lists.freedesktop.org>, 
+	Linux Filesystems Development <linux-fsdevel@vger.kernel.org>, Linux Media <linux-media@vger.kernel.org>, 
+	linaro-mm-sig@lists.linaro.org, kasan-dev@googlegroups.com, 
+	Linux Virtualization <virtualization@lists.linux.dev>, Linux Memory Management List <linux-mm@kvack.org>, 
+	Linux Network Bridge <bridge@lists.linux.dev>, Linux Networking <netdev@vger.kernel.org>, 
+	Harry Wentland <harry.wentland@amd.com>, Leo Li <sunpeng.li@amd.com>, 
+	Rodrigo Siqueira <siqueira@igalia.com>, Alex Deucher <alexander.deucher@amd.com>, 
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>, David Airlie <airlied@gmail.com>, 
+	Simona Vetter <simona@ffwll.ch>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+	Matthew Brost <matthew.brost@intel.com>, Danilo Krummrich <dakr@kernel.org>, 
+	Philipp Stanner <phasta@kernel.org>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Sumit Semwal <sumit.semwal@linaro.org>, 
+	Alexander Potapenko <glider@google.com>, Marco Elver <elver@google.com>, 
+	Dmitry Vyukov <dvyukov@google.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Uladzislau Rezki <urezki@gmail.com>, Nikolay Aleksandrov <razor@blackwall.org>, 
+	Ido Schimmel <idosch@nvidia.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Taimur Hassan <Syed.Hassan@amd.com>, Wayne Lin <Wayne.Lin@amd.com>, Alex Hung <alex.hung@amd.com>, 
+	Aurabindo Pillai <aurabindo.pillai@amd.com>, Dillon Varone <Dillon.Varone@amd.com>, 
+	George Shen <george.shen@amd.com>, Aric Cyr <aric.cyr@amd.com>, Cruise Hung <Cruise.Hung@amd.com>, 
+	Mario Limonciello <mario.limonciello@amd.com>, Sunil Khatri <sunil.khatri@amd.com>, 
+	Dominik Kaszewski <dominik.kaszewski@amd.com>, David Hildenbrand <david@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Lorenzo Stoakes <lorenzo.stoakes@oracle.com>, 
+	Max Kellermann <max.kellermann@ionos.com>, "Nysal Jan K.A." <nysal@linux.ibm.com>, 
+	Ryan Roberts <ryan.roberts@arm.com>, Alexey Skidanov <alexey.skidanov@intel.com>, 
+	Vlastimil Babka <vbabka@suse.cz>, Kent Overstreet <kent.overstreet@linux.dev>, 
+	Vitaly Wool <vitaly.wool@konsulko.se>, Harry Yoo <harry.yoo@oracle.com>, 
+	Mateusz Guzik <mjguzik@gmail.com>, NeilBrown <neil@brown.name>, Amir Goldstein <amir73il@gmail.com>, 
+	Jeff Layton <jlayton@kernel.org>, Ivan Lipski <ivan.lipski@amd.com>, Tao Zhou <tao.zhou1@amd.com>, 
+	YiPeng Chai <YiPeng.Chai@amd.com>, Hawking Zhang <Hawking.Zhang@amd.com>, 
+	Lyude Paul <lyude@redhat.com>, Daniel Almeida <daniel.almeida@collabora.com>, 
+	Luben Tuikov <luben.tuikov@amd.com>, Matthew Auld <matthew.auld@intel.com>, 
+	Roopa Prabhu <roopa@cumulusnetworks.com>, Mao Zhu <zhumao001@208suo.com>, 
+	Shaomin Deng <dengshaomin@cdjrlc.com>, Charles Han <hanchunchao@inspur.com>, 
+	Jilin Yuan <yuanjilin@cdjrlc.com>, Swaraj Gaikwad <swarajgaikwad1925@gmail.com>, 
+	George Anthony Vernon <contact@gvernon.com>
+Subject: Re: [PATCH 07/14] fs: Describe @isnew parameter in ilookup5_nowait()
+Message-ID: <qxbixswc7daxb3y7o7ebmy34dpa3uv6i5vc2fnj2p6f3sckulk@vcbuzldig7al>
+References: <20251215113903.46555-1-bagasdotme@gmail.com>
+ <20251215113903.46555-8-bagasdotme@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251215113903.46555-8-bagasdotme@gmail.com>
+X-Spamd-Result: default: False [-4.01 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RCVD_COUNT_THREE(0.00)[3];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FREEMAIL_TO(0.00)[gmail.com];
+	ARC_NA(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_LAST(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,lists.freedesktop.org,lists.linaro.org,googlegroups.com,lists.linux.dev,kvack.org,amd.com,igalia.com,gmail.com,ffwll.ch,linux.intel.com,kernel.org,suse.de,intel.com,zeniv.linux.org.uk,suse.cz,linaro.org,google.com,redhat.com,linux.alibaba.com,linux-foundation.org,blackwall.org,nvidia.com,davemloft.net,infradead.org,oracle.com,ionos.com,linux.ibm.com,arm.com,linux.dev,konsulko.se,brown.name,collabora.com,cumulusnetworks.com,208suo.com,cdjrlc.com,inspur.com,gvernon.com];
+	RCPT_COUNT_GT_50(0.00)[86];
+	TO_MATCH_ENVRCPT_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	R_RATELIMIT(0.00)[to_ip_from(RLp36nysqjba7qgmtychm5q4em)];
+	MISSING_XM_UA(0.00)[];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.com:email,suse.cz:dkim]
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spam-Level: 
+X-Rspamd-Queue-Id: C790F5BDC1
+X-Spam-Flag: NO
+X-Spam-Score: -4.01
 
-fix duplex setting error for phy leds
+On Mon 15-12-25 18:38:55, Bagas Sanjaya wrote:
+> Sphinx reports kernel-doc warning:
+> 
+> WARNING: ./fs/inode.c:1607 function parameter 'isnew' not described in 'ilookup5_nowait'
+> 
+> Describe the parameter.
+> 
+> Fixes: a27628f4363435 ("fs: rework I_NEW handling to operate without fences")
+> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
 
-Fixes: 355b82c54c12 ("net: phy: motorcomm: Add support for PHY LEDs on YT8521")
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
----
- drivers/net/phy/motorcomm.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+...
 
-diff --git a/drivers/net/phy/motorcomm.c b/drivers/net/phy/motorcomm.c
-index 89b5b19a9bd2..42d46b5758fc 100644
---- a/drivers/net/phy/motorcomm.c
-+++ b/drivers/net/phy/motorcomm.c
-@@ -1741,10 +1741,10 @@ static int yt8521_led_hw_control_set(struct phy_device *phydev, u8 index,
- 		val |= YT8521_LED_1000_ON_EN;
- 
- 	if (test_bit(TRIGGER_NETDEV_FULL_DUPLEX, &rules))
--		val |= YT8521_LED_HDX_ON_EN;
-+		val |= YT8521_LED_FDX_ON_EN;
- 
- 	if (test_bit(TRIGGER_NETDEV_HALF_DUPLEX, &rules))
--		val |= YT8521_LED_FDX_ON_EN;
-+		val |= YT8521_LED_HDX_ON_EN;
- 
- 	if (test_bit(TRIGGER_NETDEV_TX, &rules) ||
- 	    test_bit(TRIGGER_NETDEV_RX, &rules))
+> @@ -1593,6 +1593,7 @@ EXPORT_SYMBOL(igrab);
+>   * @hashval:	hash value (usually inode number) to search for
+>   * @test:	callback used for comparisons between inodes
+>   * @data:	opaque data pointer to pass to @test
+> + * @isnew:	whether the inode is new or not
+
+I'm sorry but this is true but misleading at the same time. I'd write there
+something like:
+
+ * @isnew:    return argument telling whether I_NEW was set when the inode
+              was found in hash (the caller needs to wait for I_NEW to clear).
+
+
+								Honza
 -- 
-2.33.0
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
 
