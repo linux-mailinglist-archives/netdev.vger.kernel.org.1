@@ -1,264 +1,200 @@
-Return-Path: <netdev+bounces-244764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B93FCBE3D0
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 15:17:29 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29EEFCBEDBC
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 17:17:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 86577301BCD8
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 14:16:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2171C3052209
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 16:10:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78E0533B97B;
-	Mon, 15 Dec 2025 14:15:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FD2F33D6C7;
+	Mon, 15 Dec 2025 14:17:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZHt7Cyu7";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Km5bXhrt"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="0/MwqUlQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f68.google.com (mail-ed1-f68.google.com [209.85.208.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE3631B4F09
-	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 14:15:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CD3433BBCB
+	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 14:17:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765808138; cv=none; b=th4kGfaDrwjOD+SmNxWNte+8IdHtSYkTtIJAVAHhhwklk2QoKipiUDuMuFO3biha4ot+acKzNPoPncQ1/v7E9Wf10y4Ghz7zSOQ5mBo2JN+QIVCjJ2+q6W5sW0ZlxAQFOzIIYNQBeL/9PIoSBmvgS5ADePl1XuJz34AwWQKIq9c=
+	t=1765808263; cv=none; b=dXwicp7oKFyx5gwWZi7zwDfH4OAwShtPPs40X9dOEtCU/D2RzG8wv/1QSYSYVarGeeBKsIu6LAIKRNehmWO49S0MGrDnba6gQhH41wy7VTnsHU9Avo3JLoyjMs1R80Huk5TBwbe6gU2jQjcoMdmDTEcbBWpcbxsE+FAsOclBq4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765808138; c=relaxed/simple;
-	bh=XCaTRYYtdjBnDMmtW6LMz2eDeLZgPQs0Zj1KdxrUzfs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pLXnQtdj05sa/BJ0DCuwAxdDGvaevCqFZTkmzaOmoqyIDQQjsPlVo+hwOPniX+wWwTJho/1dO5EL2sQQv/YxltElXC+nV1rrU9KxdmrrCWl6/HGybD40IPNwQ1a/Lgz7tJ1kAvfh+si7g7QB3oxIGzHko+WgNBfl43Bfmez1NIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZHt7Cyu7; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Km5bXhrt; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765808135;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=L49NIO1n5q1751W/k8gzxOpfDxRxrpcTIrbILgaPsTg=;
-	b=ZHt7Cyu7nCClh7wd/fjjaeRWmFPmsqrZqQFbYOc8RedXqvMaljrTGRqT+If2sBUMqXk/0H
-	sfaM/1+XribY+BWDU0szNtvMxrXN5ryqvy66Am5Gq1LKo9gIfYsKCNCwFcNP8qpqBGfWFm
-	DBWdaXOUzdm6MsyAuOGfyKldHhDUGqc=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-587-NDC6vvCsNGSDbXN0INnfSw-1; Mon, 15 Dec 2025 09:15:33 -0500
-X-MC-Unique: NDC6vvCsNGSDbXN0INnfSw-1
-X-Mimecast-MFC-AGG-ID: NDC6vvCsNGSDbXN0INnfSw_1765808132
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-477964c22e0so24534955e9.0
-        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 06:15:33 -0800 (PST)
+	s=arc-20240116; t=1765808263; c=relaxed/simple;
+	bh=KVuyHGeUtpLkpGJYZbfb5WtDJicjtg3giXBlS+vhN0U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=sc7znAvEAFYjxXXtBACrvrHs6GyTXE1TU4oF8PZXchNqXmzkmwRjO7w5mMuhJ64R7k0uu3xC1U3JrnkTuCb6yi29M1njzFz42iu2wxtgYGx+sj2jyIJBmSYX2ckrIVrAo4nh+lmhewnB1i9goscpLgCx8+y5HPRzfeEheLaNLRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=0/MwqUlQ; arc=none smtp.client-ip=209.85.208.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-ed1-f68.google.com with SMTP id 4fb4d7f45d1cf-64165cd689eso5527821a12.0
+        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 06:17:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1765808132; x=1766412932; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=L49NIO1n5q1751W/k8gzxOpfDxRxrpcTIrbILgaPsTg=;
-        b=Km5bXhrtdN2KikWd5IIL/6aCY0asNiWVxdAlBBlZjrJb2H2uFyl9cjXpr7SIT1H6aN
-         kiVx7sThAasJcTGofSio393QL5u5TRIweCFugqMDVqMltC2m45BDMLKFlA7JUodU2JKJ
-         DNhNXMf1K9BAfTl4C8BrBQ4OdC0E1Ww0ye/vm0tJOLzgb0cM9DsYupvh3DX10ACJBkoy
-         VbZLSci7zcab5NE0LIsojyBPYlYOWXic1mTSDup4k/BCI7Laz2ijBKOYl5gsSPE6XcmV
-         oTJ4yRJXoQhcJN/Kq47oRp6Rjr65n4gsTKJLX/65ugJtOVCPtPb6VkmeKC4F+cvmCtBX
-         pV2Q==
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1765808255; x=1766413055; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ppOcPFqIwq9P7NGqZqTz1/tjn18c3F+fMKSBb9x2/Cg=;
+        b=0/MwqUlQdu789oy/P41nfqLWb7EnWXY85sbaj1smEzYO15dtuHKqLxDRGab17o4MUA
+         D9TVJCvajbSn5mubZh7M9K5h4OT9pI/1qbh3beoBI1s+cs7/fK/G4sJRfPkfXVwqwBh3
+         SXWcXenTFagxpnUecAa9mbcMVNCQ0U0akf+J4xD5CfLDcNwb1vJBMEz8cd19gt/edXo+
+         6prwzju0rCEY9Jjuz4PQX50jj8chQizO7srmUjvdHU5PwJBwJQDO9vd0BIIvgTsOQttn
+         fOSTaGyo9VctrEKOw8TJvYNlkT8bhVXwWSOKvHyDcKwgwrFzGeqWEX80uILWCX3i0XTf
+         hi4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765808132; x=1766412932;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=L49NIO1n5q1751W/k8gzxOpfDxRxrpcTIrbILgaPsTg=;
-        b=SgVQcQmsZ67qnb1Qlc4BjZdvHbGJKVqG2qlFuM4ITfMYsm3oarnwmHpyOzQtgnsKkx
-         1jd6IiIjHqf1lLPKtL5XbGSCEoG4+Mh5KKk/yAg6Jg+0rwQ+vA/sGNLiQ9WNPupITOP4
-         FTW8WnBSQ6k9ImKRD/36jodju4hDuGLis4Y1rDoOExs3wYzoWU6I9pi0/djIVvPhsKDL
-         yibz3Bd5SFNMDow85BF5VSznaRUoAdDD5aTFNR0SIx5jKGgZV4kh80KdwQczf//78Jox
-         MwsbxE32mX1LEzrWmxRTSj0tB8i7iRHB4tGbWpmb8V1RomwE5LcNRqdtktZZk3ZuQ5qd
-         Gjhg==
-X-Forwarded-Encrypted: i=1; AJvYcCV9iHMOy07yx8mwaEHNNUsphrgPaGm5NZenpcBS99CYhtmRZXlSlzQEbOCGR/aJu3pdNBjSRFQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4rDqj9M7e/JTjZQatce6JTsYpLn1CQ63dJKv20Lfg/fXKdW4l
-	G5x6N9+AHSpW6/wnK5YaiOQpBXLaCucUgKyAzJruwQ3YL4t7tlWX5oWg6MX6K8B2DymSt1OqNNv
-	e7XUaYkC1FZMpwK2wee3R0J9oiE9MDfwpipo2f8tLEdt3gR4oNGKzMML3IQ==
-X-Gm-Gg: AY/fxX6Mno9TFcIyh7R6OPp7AZRyuRjrLXSxgdnedY6AaCa85mUy+XVkNWEqNCv0C6D
-	DbmbUNvJ6qUJZTnxsd80n1NDxnERZk8qEkDCOUnKJu9pc+JY6Hj1oQkIYFnMyV5MJfeMgSQ4sLN
-	hYs6jqXPYtXWK//meUBA5R2d1O7M2ctvj96cNhAu/1BknBzi+PqN2fXDMjan4mu/M+rWIVRDMBu
-	3hKF9/8Lx9diHCPJK1NRHkIT+zUx4NHe4Km6F0cu4HPrPBJ6ntuBIYXnheK5uIiMvHu48rUcKEm
-	9YGfszrIg7yBtP/OJBVCcjOsj09Y/9rbEE8jJ4ukB9LBo4KGRa+XkFI5Z/eLlnI3Vp/Qy1GBAT+
-	aIPyCyJMK1W+e3lKE
-X-Received: by 2002:a05:600c:c0d2:10b0:477:9cec:c83e with SMTP id 5b1f17b1804b1-47a89d9c2f9mr119399545e9.1.1765808132062;
-        Mon, 15 Dec 2025 06:15:32 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFnn39+IGc8T4gbIMiapFrAkLpdN3U9Oa1ixlw3v9TO5MUF+UqsPDl1fUxMRulxmuHP3h3NgA==
-X-Received: by 2002:a05:600c:c0d2:10b0:477:9cec:c83e with SMTP id 5b1f17b1804b1-47a89d9c2f9mr119399175e9.1.1765808131556;
-        Mon, 15 Dec 2025 06:15:31 -0800 (PST)
-Received: from sgarzare-redhat ([193.207.203.161])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47a8f8e90f2sm186130175e9.13.2025.12.15.06.15.28
+        d=1e100.net; s=20230601; t=1765808255; x=1766413055;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ppOcPFqIwq9P7NGqZqTz1/tjn18c3F+fMKSBb9x2/Cg=;
+        b=mICbGPzTZgnleBoq43L0fHyENqrrEmz4l2yNCJ815Px1CcuUniUqRGRtysKrQSRlpO
+         VdcZy8VDWKMpTVzzKoGHFaYmogwBrt4q4ll7N+uF9Ez7sIoPyWyBGAtVpnRBzaoab+fn
+         lS5EApvQuywbwOUyexRlgkhEF2CtHlmquyVOZ1dLpWu+2//mfkB3ERqxAGBn7diVwbec
+         ahGROvkgNVp0AiRstS63Ts8m/D+PsB/TYpoELRbYEboSDsEfq3BYa5YnmBCQT24eRGaJ
+         TNan1Gmpiof/3oEBclZgG6CwSNLB7a53ylXhj2Dc9NqHKQF7funixBN9QBooEFTfW+GT
+         z4bg==
+X-Forwarded-Encrypted: i=1; AJvYcCVmYTyu7m+l1OfPDx6qLWt+BjDaKFJ9dX5TH67QKE27LD10SUQ7K+V9AkTdiTJutGPJlWVH/IA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7bNw3qof4TUVB5xl+85eSABITJCBN0vkF9CoOQt1X3b5NgKbm
+	TI9pirmVZwwYqrR626d9r0cbaJAXh47Cpd8lP46B6aaLXL4M4Gi28SVEJL2b831OPk8=
+X-Gm-Gg: AY/fxX754s2xwEQWVQ6uIpfj+QqPi9IavcS7KIWmxwsgXzXAoAcsZD6SEPI2GUItW7v
+	Orrio7y4oL7tAWm4qb+Vt+C2iML8rJSpC28AxM+CdlY145rKy3TsPlr5BlLJRfUGkNzEz111LxH
+	2/aafyCoc7XtXn9PbZKR0EuACM75Cx6RUe3t0PjddB8/Z0Nv+FrbEDvdN3uYXsc/nYXo+qxKk4F
+	0nQe8ti/q1ggha/wMJbbC7q1sm4ZqvgDk4ETJKp5Gu5yRX0zjl24cvzcvpTzkWOsC3gsixvENOZ
+	mqElq3/GKDKj5VumL9dvYnuZzpyU9iLKEnUMbwbbF8tCgMaEBQz94019yXPXXfXoX0MAeloKiB0
+	HOZ28IDXVrdk+Y3n4ySdVbj3mSOUT8zSPMZsMOeGYkgZa4TGdIIzeOM0TGIihdcMeKSmdCxfSw1
+	15IEt3VDGYlRl9LBe75nX6eNw9t1DuNLt+0um5qT2nx9cIYJYCSNdKgt3vrg==
+X-Google-Smtp-Source: AGHT+IF5kWl8asvVZ2gDn2/ukMC7FmJVzWuHgbBPUo4GSSTrWpKfiHxIiV3JEK3vNep6zj7EVQ2rxQ==
+X-Received: by 2002:a17:907:a909:b0:b7c:cc8d:14ef with SMTP id a640c23a62f3a-b7d218d55fdmr1188092466b.32.1765808254923;
+        Mon, 15 Dec 2025 06:17:34 -0800 (PST)
+Received: from localhost (ip-046-005-122-062.um12.pools.vodafone-ip.de. [46.5.122.62])
+        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-b7cfa56c152sm1380034166b.56.2025.12.15.06.17.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Dec 2025 06:15:30 -0800 (PST)
-Date: Mon, 15 Dec 2025 15:15:22 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Melbin K Mathew <mlbnkm1@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, stefanha@redhat.com, 
-	kvm@vger.kernel.org, netdev@vger.kernel.org, virtualization@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, jasowang@redhat.com, xuanzhuo@linux.alibaba.com, 
-	eperezma@redhat.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org
-Subject: Re: [PATCH net v3] vsock/virtio: cap TX credit to local buffer size
-Message-ID: <wssxyvbgq3a3icydzxsbj5bliqd67xreffaqqusfia2suxrjdk@gcke3jemvycx>
-References: <20251211125104.375020-1-mlbnkm1@gmail.com>
- <20251211080251-mutt-send-email-mst@kernel.org>
- <zlhixzduyindq24osaedkt2xnukmatwhugfkqmaugvor6wlcol@56jsodxn4rhi>
- <CAMKc4jDpMsk1TtSN-GPLM1M_qp_jpoE1XL1g5qXRUiB-M0BPgQ@mail.gmail.com>
- <CAGxU2F7WOLs7bDJao-7Qd=GOqj_tOmS+EptviMphGqSrgsadqg@mail.gmail.com>
- <CAMKc4jDLdcGsL5_d+4CP6n-57s-R0vzrX2M7Ni=1GeCB1cxVYA@mail.gmail.com>
- <bwmol6raorw233ryb3dleh4meaui5vbe7no53boixckl3wgclz@s6grefw5dqen>
- <deccf66c-dcd3-4187-9fb6-43ddf7d0a905@gmail.com>
- <tandvvk6vas3kgqjuo6w3aagqai246qxejfnzhkbvbxds3w4y6@umqvf7f3m5ie>
- <24b9961d-7e0d-4239-97b3-39799524909f@gmail.com>
+        Mon, 15 Dec 2025 06:17:34 -0800 (PST)
+From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+To: Jens Wiklander <jens.wiklander@linaro.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Sumit Garg <sumit.garg@kernel.org>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	=?utf-8?b?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Sumit Garg <sumit.garg@oss.qualcomm.com>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Jan Kiszka <jan.kiszka@siemens.com>,
+	=?utf-8?q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	=?utf-8?b?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	James Bottomley <James.Bottomley@HansenPartnership.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Mimi Zohar <zohar@linux.ibm.com>,
+	David Howells <dhowells@redhat.com>,
+	Paul Moore <paul@paul-moore.com>,
+	James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Peter Huewe <peterhuewe@gmx.de>
+Cc: op-tee@lists.trustedfirmware.org,
+	linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-rtc@vger.kernel.org,
+	linux-efi@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	Cristian Marussi <cristian.marussi@arm.com>,
+	arm-scmi@vger.kernel.org,
+	linux-mips@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-integrity@vger.kernel.org,
+	keyrings@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	Jason Gunthorpe <jgg@ziepe.ca>
+Subject: [PATCH v2 00/17] tee: Use bus callbacks instead of driver callbacks
+Date: Mon, 15 Dec 2025 15:16:30 +0100
+Message-ID: <cover.1765791463.git.u.kleine-koenig@baylibre.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3083; i=u.kleine-koenig@baylibre.com; h=from:subject:message-id; bh=KVuyHGeUtpLkpGJYZbfb5WtDJicjtg3giXBlS+vhN0U=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBpQBhBsL1Z+rYFoGFHUfEy6nbD85QotpwGnuS0G OxYNqNRFI2JATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCaUAYQQAKCRCPgPtYfRL+ TugUB/9E31O/wKyUkNJNEPUiyayhLen3mT/3afyja8AKlZtLRRSDYD85SklWs8WUYR25f620Tug HCQFCBGP6zvWFDFUJWDts8iS5V7u/2f3fzK4EwWEIO8RjWf//RCGbcOXzrjD+gHhyiO4ntF2NWr 3ospR0B/APcHFEMI3zfkmIaPNlyEhNrddsNRbaHKA+WTWhZm7A/yqOnVYIJ6MLuTrhjHLZZoL5u gBimMOyT/Dmu6TUF9ex7Rhk+vookCt9jpn+vbxsz0ArRtMIo0W8fVdouxPDFA9SMn/bCn6BBJ+B fl85F7WiQwNbfWoeC8/qrjWMCGDfxgyRZi39jRQ+nWgTC5V5
+X-Developer-Key: i=u.kleine-koenig@baylibre.com; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <24b9961d-7e0d-4239-97b3-39799524909f@gmail.com>
 
-On Sun, Dec 14, 2025 at 06:38:22AM +0000, Melbin K Mathew wrote:
->
->
->On 12/12/2025 12:26, Stefano Garzarella wrote:
->>On Fri, Dec 12, 2025 at 11:40:03AM +0000, Melbin K Mathew wrote:
->>>
->>>
->>>On 12/12/2025 10:40, Stefano Garzarella wrote:
->>>>On Fri, Dec 12, 2025 at 09:56:28AM +0000, Melbin Mathew Antony wrote:
->>>>>Hi Stefano, Michael,
->>>>>
->>>>>Thanks for the suggestions and guidance.
->>>>
->>>>You're welcome, but please avoid top-posting in the future:
->>>>https://www.kernel.org/doc/html/latest/process/submitting- 
->>>>patches.html#use-trimmed-interleaved-replies-in-email-discussions
->>>>
->>>Sure. Thanks
->>>>>
->>>>>I’ve drafted a 4-part series based on the recap. I’ve included the
->>>>>four diffs below for discussion. Can wait for comments, iterate, and
->>>>>then send the patch series in a few days.
->>>>>
->>>>>---
->>>>>
->>>>>Patch 1/4 — vsock/virtio: make get_credit() s64-safe and clamp 
->>>>>negatives
->>>>>
->>>>>virtio_transport_get_credit() was doing unsigned arithmetic; if the
->>>>>peer shrinks its window, the subtraction can underflow and look like
->>>>>“lots of credit”. This makes it compute “space” in s64 and clamp < 0
->>>>>to 0.
->>>>>
->>>>>diff --git a/net/vmw_vsock/virtio_transport_common.c
->>>>>b/net/vmw_vsock/virtio_transport_common.c
->>>>>--- a/net/vmw_vsock/virtio_transport_common.c
->>>>>+++ b/net/vmw_vsock/virtio_transport_common.c
->>>>>@@ -494,16 +494,23 @@ 
->>>>>EXPORT_SYMBOL_GPL(virtio_transport_consume_skb_sent);
->>>>>u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, 
->>>>>u32 credit)
->>>>>{
->>>>>+ s64 bytes;
->>>>> u32 ret;
->>>>>
->>>>> if (!credit)
->>>>> return 0;
->>>>>
->>>>> spin_lock_bh(&vvs->tx_lock);
->>>>>- ret = vvs->peer_buf_alloc - (vvs->tx_cnt - vvs->peer_fwd_cnt);
->>>>>- if (ret > credit)
->>>>>- ret = credit;
->>>>>+ bytes = (s64)vvs->peer_buf_alloc -
->>>>
->>>>Why not just calling virtio_transport_has_space()?
->>>virtio_transport_has_space() takes struct vsock_sock *, while 
->>>virtio_transport_get_credit() takes struct virtio_vsock_sock *, so 
->>>I cannot directly call has_space() from get_credit() without 
->>>changing signatures.
->>>
->>>Would you be OK if I factor the common “space” calculation into a 
->>>small helper that operates on struct virtio_vsock_sock * and is 
->>>used by both paths? Something like:
->>
->>Why not just change the signature of virtio_transport_has_space()?
->Thanks, that is cleaner.
->
->For Patch 1 i'll change virtio_transport_has_space() to take
->struct virtio_vsock_sock * and call it from both
->virtio_transport_stream_has_space() and virtio_transport_get_credit().
->
->/*
-> * Return available peer buffer space for TX (>= 0).
-> *
-> * Use s64 arithmetic so that if the peer shrinks peer_buf_alloc while
-> * we have bytes in flight (tx_cnt - peer_fwd_cnt), the subtraction does
-> * not underflow into a large positive value as it would with u32.
-> *
-> * Must be called with vvs->tx_lock held.
-> */
->static s64 virtio_transport_has_space(struct virtio_vsock_sock *vvs)
->{
->	s64 bytes;
->
->	bytes = (s64)vvs->peer_buf_alloc -
->		((s64)vvs->tx_cnt - (s64)vvs->peer_fwd_cnt);
+Hello,
 
-wait, why casting also the counters?
-they are supposed to wrap, so should be fine to avoid the cast there.
+the objective of this series is to make tee driver stop using callbacks
+in struct device_driver. These were superseded by bus methods in 2006
+(commit 594c8281f905 ("[PATCH] Add bus_type probe, remove, shutdown
+methods.")) but nobody cared to convert all subsystems accordingly.
 
-Please, avoid too many changes in a single patch.
+Here the tee drivers are converted. The first commit is somewhat
+unrelated, but simplifies the conversion (and the drivers). It
+introduces driver registration helpers that care about setting the bus
+and owner. (The latter is missing in all drivers, so by using these
+helpers the drivers become more correct.)
 
->	if (bytes < 0)
->		bytes = 0;
->
->	return bytes;
->}
->
->s64 virtio_transport_stream_has_space(struct vsock_sock *vsk)
->{
->	struct virtio_vsock_sock *vvs = vsk->trans;
->	s64 bytes;
->
->	spin_lock_bh(&vvs->tx_lock);
->	bytes = virtio_transport_has_space(vvs);
->	spin_unlock_bh(&vvs->tx_lock);
->
->	return bytes;
->}
->
->u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 credit)
->{
->	u32 ret;
->
->	if (!credit)
->		return 0;
->
->	spin_lock_bh(&vvs->tx_lock);
->	ret = min_t(u32, credit, (u32)virtio_transport_has_space(vvs));
+v1 of this series is available at
+https://lore.kernel.org/all/cover.1765472125.git.u.kleine-koenig@baylibre.com
 
-min_t() is supposed to be use exactly to avoid to cast each member, so 
-why adding the cast to the value returned by 
-virtio_transport_has_space() ?
+Changes since v1:
 
->	vvs->tx_cnt += ret;
->	vvs->bytes_unsent += ret;
->	spin_unlock_bh(&vvs->tx_lock);
->
->	return ret;
->}
->
->Does this look right?
+ - rebase to v6.19-rc1 (no conflicts)
+ - add tags received so far
+ - fix whitespace issues pointed out by Sumit Garg
+ - fix shutdown callback to shutdown and not remove
 
-Pretty much yes, a part some comments, but I'd like to see the final 
-solution.
+As already noted in v1's cover letter, this series should go in during a
+single merge window as there are runtime warnings when the series is
+only applied partially. Sumit Garg suggested to apply the whole series
+via Jens Wiklander's tree.
+If this is done the dependencies in this series are honored, in case the
+plan changes: Patches #4 - #17 depend on the first two.
 
-Thanks,
-Stefano
+Note this series is only build tested.
+
+Uwe Kleine-König (17):
+  tee: Add some helpers to reduce boilerplate for tee client drivers
+  tee: Add probe, remove and shutdown bus callbacks to tee_client_driver
+  tee: Adapt documentation to cover recent additions
+  hwrng: optee - Make use of module_tee_client_driver()
+  hwrng: optee - Make use of tee bus methods
+  rtc: optee: Migrate to use tee specific driver registration function
+  rtc: optee: Make use of tee bus methods
+  efi: stmm: Make use of module_tee_client_driver()
+  efi: stmm: Make use of tee bus methods
+  firmware: arm_scmi: optee: Make use of module_tee_client_driver()
+  firmware: arm_scmi: Make use of tee bus methods
+  firmware: tee_bnxt: Make use of module_tee_client_driver()
+  firmware: tee_bnxt: Make use of tee bus methods
+  KEYS: trusted: Migrate to use tee specific driver registration
+    function
+  KEYS: trusted: Make use of tee bus methods
+  tpm/tpm_ftpm_tee: Make use of tee specific driver registration
+  tpm/tpm_ftpm_tee: Make use of tee bus methods
+
+ Documentation/driver-api/tee.rst             | 18 +----
+ drivers/char/hw_random/optee-rng.c           | 26 ++----
+ drivers/char/tpm/tpm_ftpm_tee.c              | 31 +++++---
+ drivers/firmware/arm_scmi/transports/optee.c | 32 +++-----
+ drivers/firmware/broadcom/tee_bnxt_fw.c      | 30 ++-----
+ drivers/firmware/efi/stmm/tee_stmm_efi.c     | 25 ++----
+ drivers/rtc/rtc-optee.c                      | 27 ++-----
+ drivers/tee/tee_core.c                       | 84 ++++++++++++++++++++
+ include/linux/tee_drv.h                      | 12 +++
+ security/keys/trusted-keys/trusted_tee.c     | 17 ++--
+ 10 files changed, 164 insertions(+), 138 deletions(-)
+
+base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
+-- 
+2.47.3
 
 
