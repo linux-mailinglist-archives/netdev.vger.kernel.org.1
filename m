@@ -1,191 +1,159 @@
-Return-Path: <netdev+bounces-244828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2648ACBF6FB
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 19:32:29 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 684ACCBF714
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 19:34:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5C32D30053DA
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 18:31:28 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C2F60300183E
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 18:34:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3B0E2D6E7E;
-	Mon, 15 Dec 2025 18:31:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80BC830B517;
+	Mon, 15 Dec 2025 18:34:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Iwqzu3wY"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="g1ozq0u+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D25B19D8AC
-	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 18:31:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BB9128A72F
+	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 18:34:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765823487; cv=none; b=J62j24B3d7ejk4eCm2fVpBRvldX18mF5GMRAZDzob0EcRn1zfW6/Nnitl+v4RubCnpRW4Zx0U1SMDvwBHHQWqD6NZmkF+sM2WEYKBzyV4n8UbjHqCkOI/u+r0TYd2CJTd5UchejFEzc+pa9KWxl12uUHwt79vEPfKm57HzTugRg=
+	t=1765823642; cv=none; b=MxILrvpX8zLYWd2Wxap40DoE3XPIgTxhd5PtPvyHKIr6fHmRKejAz90lWusuK2irs1vVH4SgUbNy5pgtFSbPeiEsbiwMWbtAbvrRKqNYQel0G0Oe9EoHjZEbsWaWDimmsOBOhZZlqfIumBKQj2TpwVxOG2QnCPHlzg+yh5ACqHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765823487; c=relaxed/simple;
-	bh=4fD5Zg3iwUVMs3vNint5/CmO4+UYUPnmOSzpBuFjcWc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZobEYYG18pnWfB4D+gfgUUCYY5ST2s3V2kwC3KwItqO5GuM1K17suJDWIbGKDL3xLxKvao8eBc04BA6EV+ZFrx2/sqq0a6MU40MuFy5xu7B/KmLjK3/wr36qcRAiRwUU8sE/ujOPioUuLgYaBODVZYRmgECpG9Zp4B7IsatdAC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Iwqzu3wY; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2a0bb2f093aso18880835ad.3
-        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 10:31:25 -0800 (PST)
+	s=arc-20240116; t=1765823642; c=relaxed/simple;
+	bh=WNJuxtR4xjqLFfaBNgAaSfYdatv+C8mw731fRCaI/ck=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cCVW/UKhD/jeoZFYfK1WCK6eacwMJc30Quyk+ninlc2Ex0qEqudqQbed6ddFRSpyJxMr7BqcIwQFQss1USko20otM+7aBv/AwUXto85IyCOBRAUjlRvV8bKdEk/vT2Gs/d1kkzQbv4t3kSsFigBTM0NR+bf40HmqRe0gQ8JVodY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=g1ozq0u+; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-477aa218f20so25077115e9.0
+        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 10:34:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765823485; x=1766428285; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ts9vx4lbDf7SIWRrocd9S3ZEWBKTDnibYwQZiHwQQnA=;
-        b=Iwqzu3wYzIrLRRbeGmdGNkfRIRvkmFWjMEuPMjfzeipJPElGV5mVzYrGi/26+RFzni
-         yCc/eZYYzU8a5NLTsbAPV4Nk9HYjDSRb5zNW0hqVqdXEAu28FHWpHE6/c5dFHeccRxUB
-         rmp795w+gjXOBe27f5RV9wDokdguyNNpYUNwIGAaZjEDKX59MBIr8hVg61hKaD/HemCC
-         pHggowl9YIOyLceHTuXWZ4ujfAn+nkjsAlnV96zEV16l76BxRlhtwkBIK5UbGhDsRAmo
-         CN6iZD40spLLzJ+tQ97R/BhbFIg2Vh+JXoJLemHOr8qHf7ZL/djkfZocad27rluqONjy
-         PpZQ==
+        d=linaro.org; s=google; t=1765823639; x=1766428439; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8ivCXo0tlAhX6SrgNkqQcm5Kx6Z8sjaJXC/TK9cEdNg=;
+        b=g1ozq0u+qLCyj9/71XQmGIJOtbq9JBPKG747QJ5uDfUQgFG1VpDkeniMNPpJmSvAoy
+         TCe/WGK2Z6g2XllSPXHOap6N2lGRcer6m7VT9rY3XqDcfmMj0H4LA6GscFw2+GCBxOyZ
+         9s2YdlKzNhGpmgpNnwj5Tp2VU7orV7aTC+FP6no5BLyYinrT9v6cA/Dg4SsBq/F2qhg9
+         0R3eFkPlm+FHmQExZlSyu0h8/qURh/XyIVU06OJDibG0cE79oIqh9+15elCXTS0Q9DT4
+         8ZVCg5jU/pdaAKBox1GGT4rZhZGWufHoGi3NKS7nedBjCfMdqwxFHZFiCp/55/dWSoJe
+         CedQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765823485; x=1766428285;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ts9vx4lbDf7SIWRrocd9S3ZEWBKTDnibYwQZiHwQQnA=;
-        b=PNsQEWsdNoz5rS9RW+siUmewlFW1UqV/UkX/dtCRiIq5eQKSZzQXMv39XuVd4GKS/q
-         o/iHBdb4IttCAitSixoZPo8IwiflCTrl+HdrEPf9y6M+UUOAG+a10Z3PHt/pcgeQwhWt
-         HYnAPk4YyWczizZmPmbG8rOszv8cXghHAxwqAyy5aY71Ivu9v30Yr1y2Xf6Ua0q+Eykj
-         Wsa2MELeNmmJpTQb32kWiS54PbQVzDyuDKGEqC6eOYHt33r+ggef5Dk7eHIzgsxNok5t
-         gWkSCMGxAsFqYeBP37FhAU9T+czmlN3Znm33mnKBT8XVcsLLcFJ035EqzMSG+FPSlCoQ
-         X5rQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWxCpz16GqXvWPsfVDEJXhdyX32QbyTf4AQ4ZmHsI5aw915EETKyAcLvj53sDd55H42yjjS/YU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEevKon7HCzNhKg70F4/0Fuwt59adK2ZbythoRnOXrJNDJc38s
-	A1jVk75Wlo5dmLWJVz4xRj1BoCu8QKvsrMR1HSyCtpP6l36QGLAgbGF4
-X-Gm-Gg: AY/fxX6wNOjz+5vEvkpkOFyCZ7AxFHsiawMGxAlHhb0W3IFyurH/2+nMz5LlF9iZJJs
-	z8R2FL0dyEMOWJ/hW81oifHviZf6R+HP0+rWa1FKHZ0QCFypk4EKczeMQ78w+eiuRfLBUIcYbEt
-	9mOnr5PKxql0kU19L5fKiRB0N7xGnhET7RMUNSDTXKVzdqaeVUTQenTxIXVFvodfZnvaC7jdq9v
-	Dl2OeS+y/OPt08S78m6RJaay34Ey5gu5e4w1L/JXLm9/8ApIVhCmbUwiFDs+7Jm2gnzwbp9tQ8m
-	Z1SvXpRiQfSyZFXSmDyoIkBrsYRfytMDS8QEwcvzZKlxwL4oyCy49/DPqAU9X0qWaCRj7zF271m
-	V8S9lkyqbmlR/lvbKB1LCwgnewecjhQKiWcdlNthuga373xzeFl4V2esrvxjPSzxgqXJlfwAu2v
-	xTs54DNu2vKCjB5gdCJxImn4yRNRnOYJDkLLOgJ4Y=
-X-Google-Smtp-Source: AGHT+IGRPeyH64m1e7ktoJoSQ6oCxFED9RrNQpBKEfyYSaGdXux3w5BCzl6rn4QI1bw6oBNRL8uY/A==
-X-Received: by 2002:a17:903:40c5:b0:298:4ef0:5e98 with SMTP id d9443c01a7336-29f23d2019dmr116659585ad.56.1765823485320;
-        Mon, 15 Dec 2025 10:31:25 -0800 (PST)
-Received: from SLSGDTSWING002.tail0ac356.ts.net ([129.126.109.177])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29f25cb1609sm106467285ad.57.2025.12.15.10.31.22
+        d=1e100.net; s=20230601; t=1765823639; x=1766428439;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8ivCXo0tlAhX6SrgNkqQcm5Kx6Z8sjaJXC/TK9cEdNg=;
+        b=ED3MMTj909qO6+mxWXmXSOUDDmcXd5ExeGfMXc5tnq9hfyYHJeNFyY25B7Yva6L8km
+         /gNZmm0I7Lh1sSBYV6a1eo9nGsutBnpsCb5K+A04L6m0cjQdDaUi9wt7KHWrZDfV978/
+         cfmsN8QPDu4O/MCxwrNqPD3yDSHMlrbVKftknaKpQ3WRW2RDvS8If4yu2oIjWAigpvzS
+         kRIznufyyWYDhWjpDNmj1eX/o5NE8gki/+OHyCI24OvujtGIljumg+rmuXt7xuHjVmsM
+         ugBUlPqqs7M6u5eA4695E4mQBkadL38e2l5dGnJLKflZS3XXlhwdwDS8b5jEjqZfrkRO
+         CuOw==
+X-Forwarded-Encrypted: i=1; AJvYcCW0qIOLjuWCorHUiIQNP0BcbC4yNjdBISOLund8NLZtNun2OXxYFRsMn9CyQM8xjJF9UIyvGP0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywd6jWxOAtuoJ5N6ZuEjxsKETju03AhEHZj5FKazc5LurbSOz0K
+	3uY0FGngCC6dn3kkdVExVVkg6WSpGN/BIiu3mWrscq/VxTkn/Fua+8k6gmF1KLQbBC8=
+X-Gm-Gg: AY/fxX5vQBa95PgVA5sqZS6J2PuiUUET6umIsEKU+LNLbsHjo/pMcSL9Eh5MWMk3Sz1
+	YpGnU3gAFz8ONQLQ3h8g67dr3+K8XgvTj1hysvYPClbdJFEqmilhH1dfObPNzMJ4QdC6hL01XTQ
+	lDy8AV/XFVN3Um679EOxhKf70/901pEyFiA++232XqfMSaoSFJGDa4CuhsVbVLyQcShU4qxkvCv
+	XJw0HqgTcsO3JrugCdnbVgzsorgNHI+Hqv1PfjQhqnB72oPpWKUHI+4XOMCxXRRmqR7eV1t/f4K
+	nohBCGFAi/gMUFB//llFPzdlyaH127UVSH3cIinxmrsYH7wdQ4m1MLXeLYyvaNC+rwNxt+LvuGX
+	853lOa8PBB+ySU2R1+l8oqbqLUtj1LMDnFvBQ+2Yz/0wcT50vJb94ovTGCcHLtaa9c1nUoqKNT6
+	9Tk4N7F8cjLOKqY8u+
+X-Google-Smtp-Source: AGHT+IGD9iih4mWv4BLSj82m0Ympx0mGmlL43wh+neFiQaKbjBxHvTG8uww0J8sP/od0z1H7q0uRNg==
+X-Received: by 2002:a05:600c:5252:b0:477:76cb:4812 with SMTP id 5b1f17b1804b1-47a8f708ebamr117215125e9.0.1765823638856;
+        Mon, 15 Dec 2025 10:33:58 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-430f280cf05sm16491842f8f.7.2025.12.15.10.33.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Dec 2025 10:31:24 -0800 (PST)
-From: bestswngs@gmail.com
-To: security@kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
+        Mon, 15 Dec 2025 10:33:58 -0800 (PST)
+Date: Mon, 15 Dec 2025 21:33:54 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Frank Li <Frank.li@nxp.com>
+Cc: Chester Lin <chester62515@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>, devicetree@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Fabio Estevam <festevam@gmail.com>,
+	Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>,
+	imx@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
+	Jan Petrous <jan.petrous@oss.nxp.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Lee Jones <lee@kernel.org>, linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
-	xmei5@asu.edu,
-	"Weiming Shi" <bestswngs@gmail.com>
-Subject: [PATCH v3] net: skbuff: add usercopy region to skbuff_fclone_cache
-Date: Tue, 16 Dec 2025 02:29:14 +0800
-Message-ID: <20251215182913.955478-2-bestswngs@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	linux-stm32@st-md-mailman.stormreply.com,
+	Matthias Brugger <mbrugger@suse.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	NXP S32 Linux Team <s32@nxp.com>, Paolo Abeni <pabeni@redhat.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Rob Herring <robh@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Shawn Guo <shawnguo@kernel.org>, linaro-s32@linaro.org
+Subject: Re: [PATCH v2 0/4] s32g: Use a syscon for GPR
+Message-ID: <aUBUkuLf7NHtLSl1@stanley.mountain>
+References: <cover.1765806521.git.dan.carpenter@linaro.org>
+ <aUAvwRmIZBC0W6ql@lizhi-Precision-Tower-5810>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aUAvwRmIZBC0W6ql@lizhi-Precision-Tower-5810>
 
-From: "Weiming Shi" <bestswngs@gmail.com>
+On Mon, Dec 15, 2025 at 10:56:49AM -0500, Frank Li wrote:
+> On Mon, Dec 15, 2025 at 05:41:43PM +0300, Dan Carpenter wrote:
+> > The s32g devices have a GPR register region which holds a number of
+> > miscellaneous registers.  Currently only the stmmac/dwmac-s32.c uses
+> > anything from there and we just add a line to the device tree to
+> > access that GMAC_0_CTRL_STS register:
+> >
+> >                         reg = <0x4033c000 0x2000>, /* gmac IP */
+> >                               <0x4007c004 0x4>;    /* GMAC_0_CTRL_STS */
+> >
+> > We still have to maintain backwards compatibility to this format,
+> > of course, but it would be better to access these through a syscon.
+> > First of all, putting all the registers together is more organized
+> > and shows how the hardware actually is implemented.  Secondly, in
+> > some versions of this chipset those registers can only be accessed
+> > via SCMI, if the registers aren't grouped together each driver will
+> > have to create a whole lot of if then statements to access it via
+> > IOMEM or via SCMI,
+> 
+> Does SCMI work as regmap? syscon look likes simple, but missed abstract
+> in overall.
+> 
 
-skbuff_fclone_cache was created without defining a usercopy region, [1]
-unlike skbuff_head_cache which properly whitelists the cb[] field.  [2]
-This causes a usercopy BUG() when CONFIG_HARDENED_USERCOPY is enabled
-and the kernel attempts to copy sk_buff.cb data to userspace via
-sock_recv_errqueue() -> put_cmsg().
+The SCMI part of this is pretty complicated and needs discussion.  It
+might be that it requires a vendor extension.  Right now, the out of
+tree code uses a nvmem vendor extension but that probably won't get
+merged upstream.
 
-The crash occurs when:
-1. TCP allocates an skb using alloc_skb_fclone() 
-   (from skbuff_fclone_cache) [1]
-2. The skb is cloned via skb_clone() using the pre-allocated fclone [3]
-3. The cloned skb is queued to sk_error_queue for timestamp reporting
-4. Userspace reads the error queue via recvmsg(MSG_ERRQUEUE)
-5. sock_recv_errqueue() calls put_cmsg() to copy serr->ee from skb->cb [4]
-6. __check_heap_object() fails because skbuff_fclone_cache has no
-   usercopy whitelist [5]
+But in theory, it's fairly simple, you can write a regmap driver and
+register it as a syscon and everything that was accessing nxp,phy-sel
+accesses the same register but over SCMI.
 
-When cloned skbs allocated from skbuff_fclone_cache are used in the
-socket error queue, accessing the sock_exterr_skb structure in skb->cb
-via put_cmsg() triggers a usercopy hardening violation:
+> You still use regmap by use MMIO. /* GMAC_0_CTRL_STS */
+> 
+> regmap = devm_regmap_init_mmio(dev, sts_offset, &regmap_config);
+> 
 
-[    5.379589] usercopy: Kernel memory exposure attempt detected from SLUB object 'skbuff_fclone_cache' (offset 296, size 16)!
-[    5.382796] kernel BUG at mm/usercopy.c:102!
-[    5.383923] Oops: invalid opcode: 0000 [#1] SMP KASAN NOPTI
-[    5.384903] CPU: 1 UID: 0 PID: 138 Comm: poc_put_cmsg Not tainted 6.12.57 #7
-[    5.384903] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
-[    5.384903] RIP: 0010:usercopy_abort+0x6c/0x80
-[    5.384903] Code: 1a 86 51 48 c7 c2 40 15 1a 86 41 52 48 c7 c7 c0 15 1a 86 48 0f 45 d6 48 c7 c6 80 15 1a 86 48 89 c1 49 0f 45 f3 e8 84 27 88 ff <0f> 0b 490
-[    5.384903] RSP: 0018:ffffc900006f77a8 EFLAGS: 00010246
-[    5.384903] RAX: 000000000000006f RBX: ffff88800f0ad2a8 RCX: 1ffffffff0f72e74
-[    5.384903] RDX: 0000000000000000 RSI: 0000000000000004 RDI: ffffffff87b973a0
-[    5.384903] RBP: 0000000000000010 R08: 0000000000000000 R09: fffffbfff0f72e74
-[    5.384903] R10: 0000000000000003 R11: 79706f6372657375 R12: 0000000000000001
-[    5.384903] R13: ffff88800f0ad2b8 R14: ffffea00003c2b40 R15: ffffea00003c2b00
-[    5.384903] FS:  0000000011bc4380(0000) GS:ffff8880bf100000(0000) knlGS:0000000000000000
-[    5.384903] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[    5.384903] CR2: 000056aa3b8e5fe4 CR3: 000000000ea26004 CR4: 0000000000770ef0
-[    5.384903] PKRU: 55555554
-[    5.384903] Call Trace:
-[    5.384903]  <TASK>
-[    5.384903]  __check_heap_object+0x9a/0xd0
-[    5.384903]  __check_object_size+0x46c/0x690
-[    5.384903]  put_cmsg+0x129/0x5e0
-[    5.384903]  sock_recv_errqueue+0x22f/0x380
-[    5.384903]  tls_sw_recvmsg+0x7ed/0x1960
-[    5.384903]  ? srso_alias_return_thunk+0x5/0xfbef5
-[    5.384903]  ? schedule+0x6d/0x270
-[    5.384903]  ? srso_alias_return_thunk+0x5/0xfbef5
-[    5.384903]  ? mutex_unlock+0x81/0xd0
-[    5.384903]  ? __pfx_mutex_unlock+0x10/0x10
-[    5.384903]  ? __pfx_tls_sw_recvmsg+0x10/0x10
-[    5.384903]  ? _raw_spin_lock_irqsave+0x8f/0xf0
-[    5.384903]  ? _raw_read_unlock_irqrestore+0x20/0x40
-[    5.384903]  ? srso_alias_return_thunk+0x5/0xfbef5
+You can use have an MMIO syscon, or you can create a custom driver
+and register it as a syscon using of_syscon_register_regmap().
 
-In our patch, we referenced 
-    net: Whitelist the `skb_head_cache` "cb" field. [5]
+> So all code can use regmap function without if-then statements if SCMI work
+> as regmap.
+> 
 
-Fix by using kmem_cache_create_usercopy() with the same cb[] region
-whitelist as skbuff_head_cache.
-
-[1] https://elixir.bootlin.com/linux/v6.12.62/source/net/ipv4/tcp.c#L885
-[2] https://elixir.bootlin.com/linux/v6.12.62/source/net/core/skbuff.c#L5104
-[3] https://elixir.bootlin.com/linux/v6.12.62/source/net/core/skbuff.c#L5566
-[4] https://elixir.bootlin.com/linux/v6.12.62/source/net/core/skbuff.c#L5491
-[5] https://elixir.bootlin.com/linux/v6.12.62/source/mm/slub.c#L5719
-[6] https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=79a8a642bf05c
-
-Fixes: 6d07d1cd300f ("usercopy: Restrict non-usercopy caches to size 0")
-Reported-by: Xiang Mei <xmei5@asu.edu>
-Signed-off-by: Weiming Shi <bestswngs@gmail.com>
----
- v2: Fix the Commit Message
- v3: Add "From" email adress, Fix "CC" and "TO" email address
-
- net/core/skbuff.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index c52e955dd3a0..89c98ce6106a 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -5157,7 +5157,7 @@ void __init skb_init(void)
- 					      NULL);
- 	skbuff_cache_size = kmem_cache_size(net_hotdata.skbuff_cache);
- 
--	net_hotdata.skbuff_fclone_cache = kmem_cache_create("skbuff_fclone_cache",
-+	net_hotdata.skbuff_fclone_cache = kmem_cache_create_usercopy("skbuff_fclone_cache",
- 						sizeof(struct sk_buff_fclones),
- 						0,
- 						SLAB_HWCACHE_ALIGN|SLAB_PANIC,
--- 
-2.43.0
+regards,
+dan carpenter
 
 
