@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-244707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244708-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5DF5CBD6C2
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 11:59:20 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51E5DCBD70A
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 12:04:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 04619300CE3D
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 10:59:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E2CFD300DC9E
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 11:04:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5417A199FB0;
-	Mon, 15 Dec 2025 10:59:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63DB232B9BE;
+	Mon, 15 Dec 2025 11:04:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dq1hSwv7"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BB2qxLmQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FA5F329C7E
-	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 10:59:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC62331B818
+	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 11:04:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765796359; cv=none; b=OwsfCnXUuwOfxLW6Uc6ZXxPH6qCEqogdFtdBJQPvsxSU0bkUdRPXc1OBqQWcg/XT+oPA4431oA4QZHQ2VjV3m1mYn5/goZukl1UpQRIuSyflbGVVTaAxIApWE9v9IEMHAi7LuLEZuxEOUS7XOz3dBw6bG6n0lpQ7Xz2giw2mbFw=
+	t=1765796643; cv=none; b=CZ19at9kP/iSaK4zCUPr3YBXF/7J4FWf6JDCWSF+jLbhh5I9rEsb04NjxGLq3rwly6ZLyEGkfiS8+ldv80qsFwtrUzyP7jYxzoHKYEckIdA9/xjOVngmcFjbvHVoRZLIWVcaHoQUreMYJYTzE94SmN1BcIzlq2CZ2flAsV0UDPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765796359; c=relaxed/simple;
-	bh=djrbPV7aDjAG4Ht6zJYVPSbYH7m2DhrIo7FgNqH8XGY=;
+	s=arc-20240116; t=1765796643; c=relaxed/simple;
+	bh=C0yWRkCJWAnUZ9aVqQYR6Eg1NP8zeZ6hWqVwaupvUPA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VQEvui6X2AvF/Fj77d5mS8dymjsEPOzyJQZSd3ILoggejy0v9IHVxS586leccq2UOr1CwdXAeHbSv31BtpgcpL1gh8vGTmKL5hB4SccUaLD9IH2z+hT3PoNiWOqsdler/OdODZ54U63h4Tlm5F27IB7M24+z1a8Ub2IcsS5VZRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=dq1hSwv7; arc=none smtp.client-ip=209.85.128.43
+	 Content-Type:Content-Disposition:In-Reply-To; b=C8PmDb5Z7WdTgOxfOX4eLyFL57O5Udy2Lxccb4O6QBcP1iN4aYIG/lGBuCBP44yIn1EdkhDWUnaAxUcGHnRyop1stoQQ/PrpFqbNAJLqNncqzkhRt8c9cz9pC70NskYpNdVl83NBCs+lsd5iWPSL7zev3pW2agBZoOTYgPgRx58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=BB2qxLmQ; arc=none smtp.client-ip=209.85.219.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-47775fb6c56so26105975e9.1
-        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 02:59:15 -0800 (PST)
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-88a367a1dbbso4206126d6.0
+        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 03:04:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1765796354; x=1766401154; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1765796639; x=1766401439; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oYqXtVKyq57wNwuuGpuKCQcMdBdTV6AFm/yWfAMKePQ=;
-        b=dq1hSwv7Bf7kevWDaBVK2hYzelzZep3k88xx7Es6Cv158rHVW3rFbeqPfMn75fdl8C
-         nL0i5r1lZ32nPCDmdybIuC3hTXvkyjy/VJbCjfJWoq4jy4hfChqzh5KRMbFpuWZ5nZxj
-         qOAuB8Jg2eLInUdJ7cF2vqrE8MNSstrXNd2manO2V6HrWRuXgFBIjwvvVwY1vF6g3Tj8
-         CXiPKZ8QU0yk7+BQEqZABaq0UBMHILqJZHQiy/8o6B5KmjD3LMVC3rEhKLYhJ4sDIE3w
-         dOnWeV5X+8oyobrbf+c0yZntu+FvTp7Ig79M61biZTJk5ApFlaqZauVh1f1sMdXIGwYG
-         mBNg==
+        bh=cSDo6jz1KfR8x2xQj2Xi0AZoqdKCXUhtN1yJ6/bnb5k=;
+        b=BB2qxLmQMP4N/on/Hvl5qQRWatqg8o2tfoVAPlY8cH1VE39iGUsn1u9tKGJSH4v1mL
+         phaWhOyDV5TZ0klreBwP6SmqBaMIeKaJaQxGIpfI0W4SxX+9KzN+7xq3JH7mY4IMhSAN
+         TZ2NGZZFrvFi6mrShdsigSpozc9MFVx1XcpXM/pMoNsBXdB1CBHfF8hyxjCTQKajklat
+         dthlKl+vbCgJNGr6h6j1H7+J/x/OB1qoqAer7cdtWJPtysk71EIAI4atNaZDBX1rk3Oz
+         9/YpQEryT7A4rbq3YYyNv/XGw1GU9fwWYDXLiqZXNnOtzmVbIG4liE0nX3+IJgJpeSdk
+         YDYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765796354; x=1766401154;
+        d=1e100.net; s=20230601; t=1765796639; x=1766401439;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=oYqXtVKyq57wNwuuGpuKCQcMdBdTV6AFm/yWfAMKePQ=;
-        b=Y2O2PkU8WvoewKsoP1UC1fxEoZm/h6g+EKDpm78dYj78oUluJyihv6eSOZlCAvTWoY
-         nlpIAoGfZqgMpIvFBtdkdQRURNClsg3KbWjzHKfar6clcggIf8TEftCqLYDzdT1ZgIOM
-         Ix5KY8beVAQ1xZOUNoVt9PVN6/9CHj0QXa8DQO96kCUwo2lVGUJLNklp5B23P2/vPTpG
-         UK47KfnRJOrAO492WbCesLRyAuF9TnD3C1em+tAQo5vJ36wHwECkbABOOab9RHaOiHrr
-         xh71DAApFeZxK2wPFfdNmcRX7xegziElAcpNGs3qAEw11pRjUmXP+6oCvUDKvyXlBDxF
-         8OMw==
-X-Forwarded-Encrypted: i=1; AJvYcCWmwGmOLgmYofV9Va5xdG8az+HJUsFljbD6RaRU9/wjPVn13ZXvmwl6t8NalsJXi9CRo7vlY6s=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzih9qjbcnavln0hS2sqem6nmn4/EG0XKWtyc74ag/f+JpIhieD
-	mOK0Lf6CkqpfNCVjEad6lASwAclqPrunnzNfMLxR1vYsopgHXBpbiy3aQYJ0lyg6yNE=
-X-Gm-Gg: AY/fxX7Omwn9Xo4HyLPGJu/ay6v/C8T90m64+k+gdJIt8bG2Tg8p09MjpVuuzDohjwD
-	aXkN1jqiHgJR2SUgySlmXyd7faj7yV2Pp3YXG7zTBxVf3UFPAlW7fRvi3ljRkush3ph/TcA/vWn
-	xdN+DhBXt83cLOa34X22XHhHOBEee5cDCI6E0PIob/h9vSwAuKA0dfV5p0/saUV3Pi46UdF4Fo7
-	X8EIpjlepqPCwmZt8tQUo1OcjHhsXJ0HEifVw094sfS0t67/inYlLq8B5dehQ/GliJdM5OGs7tl
-	A/O9XSgQSi2+B434oCH0IBV8rh+fpNW+qi0onsiucpV3AKTzZcCze97VyVMsFAFNQ9jak2ApYKC
-	kkZUb4hjd2lpJTZIAXuY8pmlnfV5gnXlKBaYyPOg0+sEY7+Tw7G7b57+1Zw1hmykiJaoyRW6J45
-	7gyWiOjz1diucFMbPi
-X-Google-Smtp-Source: AGHT+IHzuHMc+1EqAojQlJLPTccSt6L/oqVylXvWSnMxI2jVuwsY9rZt+YJM1Zn/rmatqjYye/VhgA==
-X-Received: by 2002:a05:600c:a31a:b0:47a:9165:efc4 with SMTP id 5b1f17b1804b1-47a9165f157mr86631275e9.33.1765796353574;
-        Mon, 15 Dec 2025 02:59:13 -0800 (PST)
+        bh=cSDo6jz1KfR8x2xQj2Xi0AZoqdKCXUhtN1yJ6/bnb5k=;
+        b=GjZkcA605aMEq/YaSXc4uveJbCZU4uaz7xg3zkaCe7E4/mHCyUaD/Eiscrfymb7HaT
+         2iMHxAUlHhF8pGFyT9eJCiHQ8+C38/9+wvYM86GTwQZalVz8SI/lUmY+Te4tv8MdjZMD
+         /IPcIkng6ZT5kIGm5gehjN9EwT3FM1dsWId0auUFMd7EXUZsJLByt3jxf2mMQ1TtG7Qc
+         9RYqJmoxxEnOmZTdWqEj2E+O7QP9lvB6kjXfZP5uzg6yfRuUhggc3VlpRPnBGfIfxW+n
+         sAhpF7BZPDuBYHj2Eqd6HNPFyD4ayvS2uYOJtu8U6DcVw8etrJNOcNz7QE4qCsyxD2um
+         dy8A==
+X-Forwarded-Encrypted: i=1; AJvYcCW2VUjQL5iMuzIdz61GOKFFD+usK6A170tilChewpZG/xTsl2uIFCvd10J0miKonzA9AvIh3uY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywne+ylQcjUyJuf52qqbZ16IdkZi1d69FsteBDGUXjulnwXbC2m
+	uAVwP8o1Xwh8ASj/Fj5fLWlHzQVnSNvfDlThl/OyQOvvGDaTDNjND2mjB5J2yAr8kmY=
+X-Gm-Gg: AY/fxX557UbCcKqeH4CauLd0h/y0rPgSurO1PrPPhws/xg8ulvfOX44HbSYhuNIWBsP
+	C72kqfaAIIKtvefpsTtr5ZPUpBJqEfsvWQiJfReISROV5SKhoyMuqSW7Fo4YGhXfZz9/P1fhiDr
+	QoAqo/QviMtxUyKldgmDtjmg9mSj3BkC+u03KUcjsC52qW9T+5E0M1F0mkpkeABjWaVG8PfE2UW
+	ee8Tlm49l4ArZI2hep3FCFpkb+8bm3jtyE+PuqjaTivl0rXt6bup7j+5S5EWfLkX/mL98BjsVud
+	jGvrjoZEvBvOsc/FYRZWV3DjFfiGmOs+MNsdUTV8gVpH+EX4Cmw79S9zY15Q4wG0YB+6/Upt4vr
+	mZpU94uHmRJviod/sJI5SsrP/Z3gap7m2OKHFdXF8FzZqMDBdIZ7iM8C7wyZ1m2xaZehV2iNzA2
+	eIufAVNGCqUuqUruPEMSqaVFdUa8E=
+X-Google-Smtp-Source: AGHT+IH2GuS1S7AkjP0vDORe6yuPxMlX8bc9q8EfoO0YiGtEfV6xDMqm1UzyQj1c6BZCLpH7j0FH7g==
+X-Received: by 2002:a05:6214:5287:b0:888:201e:57c7 with SMTP id 6a1803df08f44-8887dfeddaamr142209466d6.5.1765796639203;
+        Mon, 15 Dec 2025 03:03:59 -0800 (PST)
 Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47a8f6e5baasm191989945e9.13.2025.12.15.02.59.12
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-88993b6a80fsm48360486d6.18.2025.12.15.03.03.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Dec 2025 02:59:13 -0800 (PST)
-Date: Mon, 15 Dec 2025 13:59:09 +0300
+        Mon, 15 Dec 2025 03:03:58 -0800 (PST)
+Date: Mon, 15 Dec 2025 14:03:54 +0300
 From: Dan Carpenter <dan.carpenter@linaro.org>
 To: Krzysztof Kozlowski <krzk@kernel.org>
 Cc: Jan Petrous <jan.petrous@oss.nxp.com>, s32@nxp.com,
@@ -85,10 +85,11 @@ Cc: Jan Petrous <jan.petrous@oss.nxp.com>, s32@nxp.com,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linaro-s32@linaro.org
 Subject: Re: [PATCH 3/4] dt-bindings: net: nxp,s32-dwmac: Use the GPR syscon
-Message-ID: <aT_p_aGfBpyEOC3M@stanley.mountain>
+Message-ID: <aT_rGgjpCiWp349A@stanley.mountain>
 References: <cover.1764592300.git.dan.carpenter@linaro.org>
  <333487ea3d23699c7953524cda082813ac4d7be3.1764592300.git.dan.carpenter@linaro.org>
  <16bb96e9-c632-457c-8179-82c17bd2a685@kernel.org>
+ <aT_p_aGfBpyEOC3M@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,74 +98,74 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <16bb96e9-c632-457c-8179-82c17bd2a685@kernel.org>
+In-Reply-To: <aT_p_aGfBpyEOC3M@stanley.mountain>
 
-On Mon, Dec 01, 2025 at 06:33:07PM +0100, Krzysztof Kozlowski wrote:
-> On 01/12/2025 14:08, Dan Carpenter wrote:
-> > The S32 chipset has a GPR region which has a miscellaneous registers
-> > including the GMAC_0_CTRL_STS register.  Originally this code accessed
-> > that register in a sort of ad-hoc way, but we want to access it using
-> > the syscon interface.
+On Mon, Dec 15, 2025 at 01:59:09PM +0300, Dan Carpenter wrote:
+> On Mon, Dec 01, 2025 at 06:33:07PM +0100, Krzysztof Kozlowski wrote:
+> > On 01/12/2025 14:08, Dan Carpenter wrote:
+> > > The S32 chipset has a GPR region which has a miscellaneous registers
+> > > including the GMAC_0_CTRL_STS register.  Originally this code accessed
+> > > that register in a sort of ad-hoc way, but we want to access it using
+> > > the syscon interface.
+> > > 
+> > > We still need to maintain the old method of accessing the GMAC register
+> > > but using a syscon will let us access other registers more cleanly.
+> > > 
+> > > Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> > > ---
+> > >  Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml | 6 ++++++
+> > >  1 file changed, 6 insertions(+)
+> > > 
+> > > diff --git a/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml b/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
+> > > index 2b8b74c5feec..17f6c50dca03 100644
+> > > --- a/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
+> > > +++ b/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
+> > > @@ -32,6 +32,11 @@ properties:
+> > >        - description: Main GMAC registers
+> > >        - description: GMAC PHY mode control register
+> > >  
+> > > +  phy-sel:
 > > 
-> > We still need to maintain the old method of accessing the GMAC register
-> > but using a syscon will let us access other registers more cleanly.
+> > Missing vendor prefix.
 > > 
-> > Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> > ---
-> >  Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml | 6 ++++++
-> >  1 file changed, 6 insertions(+)
+> > > +    $ref: /schemas/types.yaml#/definitions/phandle-array
+> > > +    items:
+> > > +      - description: The offset into the s32 GPR syscon
 > > 
-> > diff --git a/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml b/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
-> > index 2b8b74c5feec..17f6c50dca03 100644
-> > --- a/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
-> > +++ b/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
-> > @@ -32,6 +32,11 @@ properties:
-> >        - description: Main GMAC registers
-> >        - description: GMAC PHY mode control register
-> >  
-> > +  phy-sel:
+> > No, first item is not the offset but the phandle. You need syntax like here:
+> > 
+> > https://elixir.bootlin.com/linux/v5.18-rc1/source/Documentation/devicetree/bindings/soc/samsung/exynos-usi.yaml#L42
+> > 
+> > The description of the first item (unlike in example above) should say
+> > what is the purpose, how this device is using GPR region, what is it
+> > needed for.
 > 
-> Missing vendor prefix.
+> I had to do it a bit differently from the exynos-usi.yaml code.  When I
+> tried it that way I got the following warning that the "phy-sel" wasn't
+> a common suffix and it doesn't have a description.
 > 
-> > +    $ref: /schemas/types.yaml#/definitions/phandle-array
-> > +    items:
-> > +      - description: The offset into the s32 GPR syscon
+> $ make dt_binding_check DT_SCHEMA_FILES=net/nxp,s32-dwmac.yaml
+>   SCHEMA  Documentation/devicetree/bindings/processed-schema.json
+>   CHKDT   ./Documentation/devicetree/bindings
+> /home/dcarpenter/progs/kernel/nxp_gpr/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml: properties:nxp,phy-sel: 'anyOf' conditional failed, one must be fixed:
+>         'description' is a dependency of '$ref'
+>         '/schemas/types.yaml#/definitions/phandle-array' does not match '^#/(definitions|\\$defs)/'
+>                 hint: A vendor property can have a $ref to a a $defs schema
+>         hint: Vendor specific properties must have a type and description unless they have a defined, common suffix.
+>         from schema $id: http://devicetree.org/meta-schemas/vendor-props.yaml#
+>   LINT    ./Documentation/devicetree/bindings
+>   DTEX    Documentation/devicetree/bindings/net/nxp,s32-dwmac.example.dts
+>   DTC [C] Documentation/devicetree/bindings/net/nxp,s32-dwmac.example.dtb
 > 
-> No, first item is not the offset but the phandle. You need syntax like here:
-> 
-> https://elixir.bootlin.com/linux/v5.18-rc1/source/Documentation/devicetree/bindings/soc/samsung/exynos-usi.yaml#L42
-> 
-> The description of the first item (unlike in example above) should say
-> what is the purpose, how this device is using GPR region, what is it
-> needed for.
+> The exynos-usi.yaml file doesn't generate a warning like that and I wasn't
+> able to figure out why that is.
 
-I had to do it a bit differently from the exynos-usi.yaml code.  When I
-tried it that way I got the following warning that the "phy-sel" wasn't
-a common suffix and it doesn't have a description.
-
-$ make dt_binding_check DT_SCHEMA_FILES=net/nxp,s32-dwmac.yaml
-  SCHEMA  Documentation/devicetree/bindings/processed-schema.json
-  CHKDT   ./Documentation/devicetree/bindings
-/home/dcarpenter/progs/kernel/nxp_gpr/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml: properties:nxp,phy-sel: 'anyOf' conditional failed, one must be fixed:
-        'description' is a dependency of '$ref'
-        '/schemas/types.yaml#/definitions/phandle-array' does not match '^#/(definitions|\\$defs)/'
-                hint: A vendor property can have a $ref to a a $defs schema
-        hint: Vendor specific properties must have a type and description unless they have a defined, common suffix.
-        from schema $id: http://devicetree.org/meta-schemas/vendor-props.yaml#
-  LINT    ./Documentation/devicetree/bindings
-  DTEX    Documentation/devicetree/bindings/net/nxp,s32-dwmac.example.dts
-  DTC [C] Documentation/devicetree/bindings/net/nxp,s32-dwmac.example.dtb
-
-The exynos-usi.yaml file doesn't generate a warning like that and I wasn't
-able to figure out why that is.  But what worked for me was adding the
-phandle description like this:
-
-  nxp,phy-sel:
-    description: phandle to the GPR syscon node
-    $ref: /schemas/types.yaml#/definitions/phandle-array
-    items:
-      - description: offset of PHY selection register
+Oh, crap.  I'm an idiot.  I've been staring at this for an embarrassing
+long time, and I didn't see that the exynos-usi.yaml has a description
+after the - items description.  And then I send this and I immediately
+see it.  :/
 
 regards,
 dan carpenter
+
 
