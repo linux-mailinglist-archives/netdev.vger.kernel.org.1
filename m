@@ -1,109 +1,120 @@
-Return-Path: <netdev+bounces-244750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD2EBCBDF82
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 14:16:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DB873CBDFA4
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 14:18:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7EE9C300D168
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 13:14:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id AE4D2301D5B6
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 13:17:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A52472C21FC;
-	Mon, 15 Dec 2025 13:14:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 050E42DC76D;
+	Mon, 15 Dec 2025 13:17:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aSGCbnsf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OQo6xXXl"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB66E2C234C
-	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 13:14:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EAAA2D97BE
+	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 13:17:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765804459; cv=none; b=dG7VGLMnIwju4FAxeQqv97e7XN1YMPfujmMhIOMOjAJXM2ChngzpT31B7VOSbSJjHrTT1Jt7zEVdvFm/2aDH+kC7veJwi5CTlL2U3mEKjd+tum48SrWEpYSwbK1h0s+c9WNZ/vxqI5HxLdYlhmk/PoRlpSfM3FWCePVuv/Pr6Lo=
+	t=1765804640; cv=none; b=Y7V4gpzQyq7pRRu5oepEUNthOcweZjBUzAVzbL6qw8UfVwnjIkTRSDY05tSgV5ruoop3OOjD24UZTV9WSg8f+DexMWdLzFuVAwUoG0i3FXELoRfGW2l7g7limCzYsY8rjxoQxxyTAdY1PWbVjEM+ikgjftKrFkf8iREhiwJwtcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765804459; c=relaxed/simple;
-	bh=4yBilBIOFB+XSPspX7KZlrIC4ZqVUB3Ii3u4NYeLtCs=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Lu9S4RSe2q026q/hsX9QwevYcq0GjxJhT00RxsAsvFQtVEp/FqytPvF7Ca7QXkQQ+wqFZUg44t+ey8RAWhiJFIVj9TS2P+ZoJHD4+8xR6yrlTEE4RyrR+aRAyOjy0/R5/S+6eDhFa6lypY42f/Ntw7vNEkxijrjy8AA9KWM1tWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aSGCbnsf; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765804456;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4yBilBIOFB+XSPspX7KZlrIC4ZqVUB3Ii3u4NYeLtCs=;
-	b=aSGCbnsfAnqSpjsGLye+EDHpPfKHUodqTP1SoLksJ+ULw5hvQk5jNqoFAlfxivEvNz/dQu
-	vZ6A7UbmitZdtrg6yaw9UFJrigFYSPWmDijJiKOACUvmM10XiABVHC/Mz4uXqzIkjUBSDh
-	sXnC9rltEHVGX+VxKYRXCG0El5kKwy0=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-680-39YAVIdXObmGb2zRfw7BGg-1; Mon,
- 15 Dec 2025 08:14:13 -0500
-X-MC-Unique: 39YAVIdXObmGb2zRfw7BGg-1
-X-Mimecast-MFC-AGG-ID: 39YAVIdXObmGb2zRfw7BGg_1765804452
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B1ED6195605B;
-	Mon, 15 Dec 2025 13:14:11 +0000 (UTC)
-Received: from RHTRH0061144 (unknown [10.22.65.86])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F25FD1955F21;
-	Mon, 15 Dec 2025 13:14:08 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-Cc: Eelco Chaudron <echaudro@redhat.com>,  Ilya Maximets
- <i.maximets@ovn.org>,  Alexei Starovoitov <ast@kernel.org>,  Jesse Gross
- <jesse@nicira.com>,  Adrian Moreno <amorenoz@redhat.com>,  "David S.
- Miller" <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Simon
- Horman <horms@kernel.org>,  netdev@vger.kernel.org,  dev@openvswitch.org
-Subject: Re: [PATCH v2] net: openvswitch: Avoid needlessly taking the RTNL
- on vport destroy
-In-Reply-To: <20251211115006.228876-1-toke@redhat.com> ("Toke
-	=?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen=22's?= message of "Thu, 11 Dec 2025
- 12:50:05 +0100")
-References: <20251211115006.228876-1-toke@redhat.com>
-Date: Mon, 15 Dec 2025 08:14:07 -0500
-Message-ID: <f7t5xa7anvk.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1765804640; c=relaxed/simple;
+	bh=CpChH6XBVwNzsULRI5sfdZSyY2QzhI0ICFKhAooCm4I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qL0btt2zBp9vaqEmrgjBt1u6CA5I/wITpe1DdzM6j43EZ0nUHqkSwdhoLh8bIAbTlzAZ5oKXyuryfCfgnPCB2bj/UavpWGvBzyLQnISKLcD3qc6xIy+zUDdl9NMIuwddlU6vkV83WeeLp162qu0kEP4jr/nzIEv7gZ4CxCCS9Mg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OQo6xXXl; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-430ff148844so356733f8f.1
+        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 05:17:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765804637; x=1766409437; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kX23ndU6M94o44GURT4Dg9znUAX/wFKjkjxaLn6MLp8=;
+        b=OQo6xXXl6WFWMEuD+N5boAIZh5FbHc7qyT3ee/hbfW7eGN54CPkyBSeqBNvgPpDlbH
+         Yerlucmq8q8a5aNQX+kT0YONSKxY3BZyPiRHwSK+trl42bzlnGmAkDDnPTQEzw4Lzg36
+         jbP+NXP1tyTaYYaqolJWuv+tTiQsByuEuZie7jMktujj9CE9JgQgcLMYL4a9yGxLFgmv
+         pEHfpmcptU/hnE5uLNDZ7H+OsDaRGfGioSneITJvh75MDRfi2z0SPNc9791Ju7GJ5+A3
+         XlxExdbtDlU8uh9+eN42jn3vCvY0LHFA2ZPKtbNshAn+AO+lLMgjp4XFdNub8EV69BjQ
+         YbNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765804637; x=1766409437;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kX23ndU6M94o44GURT4Dg9znUAX/wFKjkjxaLn6MLp8=;
+        b=kjRzMOgJ8yFl8x+v5Tn7rOMyAUpAqBuWs8hxLVKbK7UXJxDczCyNeSnDjZtsS4w9Hm
+         jo2bH89RWgkwuzhvKRORwXteg+h/XHpPHWdORZyM6zISoVaLE5SB1HzNk4yWG9YjcL9V
+         recHw2TGHampSp35ndt9v9TOuYfH22uNTSMg99L8nZrBnwM1HYiaALCTKsYcA88VvjeW
+         +lmoZy7WP0tPpnABmX/VhVnR14OYOij91zrSWrGBEaOp4I1/wZ+QQSuY0wOWJY+a74x1
+         8xX17O2jrcykNXkxnemD73GaAahpGDk6aySDHr0CIIWE3hKXGVDYt0WXlTVr96WiK7sG
+         miaA==
+X-Forwarded-Encrypted: i=1; AJvYcCUC8aQwkp3FvcjPqWLAKVkyQ5ie+eI4nDsMtjmdGt3IbnZ43hfbYqO2dWbSYF1nig7rd1U+XhE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzY3UD693yAXbFCQg1sGZsweaeHn5PDeEaWb0iTwn3dBK4m8LED
+	dv8F4CgSBiLHGzTZGk7/cuCUD6ahJ5DrPMNCdFlZ1DooDWiXcTP/uXnn
+X-Gm-Gg: AY/fxX5uYJAANMgkU8rQJqhrhbIieBzO6m3imJzRCrFZYJlCVyiAEGBel8c9S/HhnNw
+	l1PQy9eaPEkU7Emahtq/JMPP6K2UquZg2/+9sza3nHgCwGfyqcZcXoS2yENTmsQ8Qn859mCl+aQ
+	0PafP5/P2cQCTt5NTqiknUJOgmZBmnYn7Ty8gpZHONmorPq+kQYKSCIYZUTk7LkPz1TO+1N1Rsa
+	GS+3rZVoP6E8GU7mlNJ8u2+Qp+WU6HRWPsQ106xh7tW9P+//gtkcwn7+rUW3/bfPZ1H15v8ze3F
+	NnS7gQ7KGv+ClPuYBscRpADDoGTbuf5WjQzcchFewcVqZj/r6wpUjaWmkuWF+h6yA9p3Jlz5K/6
+	mpFW/Nrv74gTG+7WFmHckxkSVbBjGuqZ0v6H4CVLEEcXZl3Ozeoez1JJ66K7sUcsDb1Y+UjqM/K
+	JN8suEsE8dpzbFyz9DRFsLvBfQMMrCaMAuq3I98O8DWCwoSYtsvRqDyVVCHJ9Jkr3dKSbeceTt1
+	nELe+5oBoTP
+X-Google-Smtp-Source: AGHT+IH7fIvnlL6YouwbGTO5//B8WsqjPffnUKjT65xkhd4Q0MMVRtlfIHMPKRIxKiLS93T3R0SCpQ==
+X-Received: by 2002:a05:6000:3111:b0:430:fd0e:a502 with SMTP id ffacd0b85a97d-430fd0ea63bmr3262763f8f.22.1765804637136;
+        Mon, 15 Dec 2025 05:17:17 -0800 (PST)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-430f4126477sm13332514f8f.10.2025.12.15.05.17.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 15 Dec 2025 05:17:16 -0800 (PST)
+Message-ID: <c3e98e4c-abc6-4918-9d63-cf3c6b47d943@gmail.com>
+Date: Mon, 15 Dec 2025 13:17:15 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net-next] sfc: correct kernel-doc complaints
+To: Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, linux-net-drivers@amd.com
+References: <20251214191603.2169432-1-rdunlap@infradead.org>
+Content-Language: en-GB
+From: Edward Cree <ecree.xilinx@gmail.com>
+In-Reply-To: <20251214191603.2169432-1-rdunlap@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com> writes:
+On 14/12/2025 19:16, Randy Dunlap wrote:
+> Fix kernel-doc warnings by adding 3 missing struct member descriptions
+> in struct efx_ef10_nic_data and removing preprocessor directives (which
+> are not handled by kernel-doc).
+> 
+> Fixes these 5 warnings:
+> Warning: drivers/net/ethernet/sfc/nic.h:158 bad line: #ifdef CONFIG_SFC_SRIOV
+> Warning: drivers/net/ethernet/sfc/nic.h:160 bad line: #endif
+> Warning: drivers/net/ethernet/sfc/nic.h:204 struct member 'port_id'
+>  not described in 'efx_ef10_nic_data'
+> Warning: drivers/net/ethernet/sfc/nic.h:204 struct member 'vf_index'
+>  not described in 'efx_ef10_nic_data'
+> Warning: drivers/net/ethernet/sfc/nic.h:204 struct member 'licensed_features'
+>  not described in 'efx_ef10_nic_data'
+> 
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
 
-> The openvswitch teardown code will immediately call
-> ovs_netdev_detach_dev() in response to a NETDEV_UNREGISTER notification.
-> It will then start the dp_notify_work workqueue, which will later end up
-> calling the vport destroy() callback. This callback takes the RTNL to do
-> another ovs_netdev_detach_port(), which in this case is unnecessary.
-> This causes extra pressure on the RTNL, in some cases leading to
-> "unregister_netdevice: waiting for XX to become free" warnings on
-> teardown.
->
-> We can straight-forwardly avoid the extra RTNL lock acquisition by
-> checking the device flags before taking the lock, and skip the locking
-> altogether if the IFF_OVS_DATAPATH flag has already been unset.
->
-> Fixes: b07c26511e94 ("openvswitch: fix vport-netdev unregister")
-> Tested-by: Adrian Moreno <amorenoz@redhat.com>
-> Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-> ---
+Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
 
-LGTM,
-
-Acked-by: Aaron Conole <aconole@redhat.com>
-
+(and sorry for using gmail despite its ongoing war on federation;
+ unfortunately it's the least bad alternative available to me)
 
