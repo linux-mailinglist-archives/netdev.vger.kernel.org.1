@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-244715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D62DCBD8FF
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 12:41:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFC5ACBD953
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 12:46:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id F2C4C302C4EA
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 11:39:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A38403061A5C
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 11:39:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 112D7331213;
-	Mon, 15 Dec 2025 11:39:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2522E3328E4;
+	Mon, 15 Dec 2025 11:39:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dvrDFpz5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="amKR7JsN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1D7A330B11
-	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 11:39:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B958333122C
+	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 11:39:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765798755; cv=none; b=VeJWn3lOqTfyufwjSiQTLnJa7QqArZyGUSkgaIkUAfPQwbfsqx3FB2tbPhpWBepEQ0JbOhKc+77wS5SwRwi++23OFzLLnLoIv89rDKpkROxcnmuA/BwJlImytbibrVhisdKoDFFweeYju0xng0t8PKjemn7yp4pykTLH1pzQb0o=
+	t=1765798760; cv=none; b=enJiIWH5JPEJuajtJ5w+yaNcD8nRY7fGnO4+1gtZBDZkNA6olw6LVXBMxyKfe4oNAaNp0J9SECx2QU3Mt+tb7z+fywJsGBzHVIymKgj3otN2W8D1ZiYF0kcMh9luaQDqmL1CdcYow1rWePtcJbWkUCuGBSGUMKAvJwyBlXOeKgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765798755; c=relaxed/simple;
-	bh=mcnZ1soLgF/JTT1YuxC/XOQhVy9SZYDoshinxHejwDU=;
+	s=arc-20240116; t=1765798760; c=relaxed/simple;
+	bh=bVwk3E00Ao0/BsL4XlONNDCfpFF0qzpzGvJu4GqJ/kY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uWmpeFOkjN27ha1Mq1QR4n3U7/fyIhSW+QylccWVIbwjRw7jpZfT47p48fQG0rbEew30DZVNXRfPBxcL3cvje+GUO5VC8Z8GdOB0/9XXfGTK6zgpdwBmHBHeQSELpXIplnAbu81laPlTPr6NSoILPXiVYOcP+Wdz3twyn+laqhk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dvrDFpz5; arc=none smtp.client-ip=209.85.210.170
+	 MIME-Version; b=oL8Xi70XqIQYbt7mJhNZzyuLUSkcbvqOaNz1b7V9XLyrGxrOL4k67c9bUQ+bHKMZuQ3QxrOjtUHcByW9PyVjzr5GqFkgem9Jp7WPjos8wDCHCDB5hw11FRK2fXhju9lvTG8x3DEchzKnyOhvmLxmvOhDdnOHkQzqI/XEs6xGvqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=amKR7JsN; arc=none smtp.client-ip=209.85.216.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-7b7828bf7bcso3579468b3a.2
-        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 03:39:13 -0800 (PST)
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-34c1d98ba11so2665509a91.3
+        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 03:39:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765798753; x=1766403553; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1765798756; x=1766403556; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lORwJoeOdmqWvp6Gaq9g1tKkad6KEP5mAC3mejLEu6E=;
-        b=dvrDFpz59wUBAQj8mWk3dRETxpnBYFVsfn1kb2lz+IM9uRySwAiZd3SIwFvwBX5gEW
-         jqUrf9C94sp6be2ivLljvjYd3OGkbYZBMKK0ebKge94fbdIVk+nWAEHGdTC/RaAF7KED
-         kzbvDSqJMnjGmSuBWxyeokl21bELVCdKyfXYC/8hRsBBftYXaETMa7WSku6MIUCriAL6
-         Hm/AI+wsn1WNk8maXf515OzgdeS9Xmuc4WM/xTSlVeK2VCCaMI/YTZof5ENPVWjh9eTo
-         GF2n2QaFq/Q40woBy95lVKLwE0TjSYJtdXJtDUYKVkZmLUvSshxKR6/cnO2jcvONw5tq
-         K0jA==
+        bh=9thXFyBI9wECeAoZwvjVxFD8Ol9j6G4X/I1qZGpsX1M=;
+        b=amKR7JsNW/OlGqjwVvJKVpPH5D9UwZJBut96t2CI1nfWa8ulByQB4Nw4BT2+1E1zBk
+         Dwh5hYPmfbvSAI3cP4Tyf3x3gOXDrFMxHlgsDRP4FIhnR+94V0wDWR5WZGvaeXycPfPV
+         GjqHr9pjAjtLsVaXucSt8IV+WgNJJT3NJe1/j/ajTs4nA0xgJPtOSXC2fKLO2vKoJv3J
+         yDDwIa25NNWGaVFnoQNIZN9RnURsBd+eNlQiLk76rtVahrSyCdaXDUI1Gir0ch1I7oC3
+         E39czRgaYHT+B6L2iv4n2lcsrNyAovpEIeWMkQkBTL9/mHxuJh6LhW8YXeJ//HxbUjOw
+         AUBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765798753; x=1766403553;
+        d=1e100.net; s=20230601; t=1765798756; x=1766403556;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=lORwJoeOdmqWvp6Gaq9g1tKkad6KEP5mAC3mejLEu6E=;
-        b=hy9VumqR0grHpZwMTFX0+XK4D0VO050MlqCjPmHuMsSbNso5c1pQxY36SkUZ72GNIB
-         6lGEb3UXVooD2nFlk7WP7G8Fn+yu2C4r9mILxREoyXJ0wZ2HcmxRsoYQYMR4HIlFzkWB
-         Oq5e1suTRQVa6bJ9dpK6hFbzfeiAaakwoL6z6dI/xV5/hKoKYTXLvpUHw/fzstK1E1lI
-         EwlT3a5MfSE9Vasc7AAgNloKu2GttU/+UlHheLeBKumNMCpvBOZrQU6eGckBA8CjJ+97
-         f1hYElnCUkJVBs6NlXGZ0tlMW5zKrU7HX/BoxUEsusBiODOF/fm7xMbOUm+OVWedIZXa
-         rR6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUaVgQ1h0V7lLPT+0PXQo5ukfHHxfG2slqkXCLb0d4Vb7d8KNG74lz18WiYNsE/HW7XpHwQIpU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLU+TB7YVSzNwoNahS7dVaJgn+9ckxPacjGDIu5wgQwPf+b5rr
-	H93uvFBePgedfqvoEbz/APA+cmU5L5evMIr37W/fswBr3GP5BrLMUZEy
-X-Gm-Gg: AY/fxX6Ymi63RXURwVMrH5nIZbKW/UFFrWgEI4/8KHpRRXfRCPqw5GhNOF3R1pmXtIu
-	MMKKhaOioJLSXxpq0SLBO8gme9+JlxafLlKNfhzUbtVpjHZt3saGAy7jiTvM6GhgkeSXAeBT6sS
-	eo6wvGhd9tBdEcXtAnzcDof3jv/GAv378lKvK/Ekr2S+tJLsnTYVXNccTn8VWJoL32XZP3PU2H0
-	PPexRMHsyDobyi/8c4B/z0uVQoPkWockDtnCoSSLE/mVwe0ScgfcdbUffgZ6SEwTu9eNgYndjgV
-	qGGceBN4LqdnQ0a/qCCdMXHD4P6cuIfgzpyRoNvfiTCCOn2ZE6kxPdSCmilEMXuFtcqIngfgi4H
-	p3PMBZR+SXrqnPybZ/ADY5gob4LjaebHhP2N/kaQqAku7QJmaG0SFsNhMfU5vRwt1AFTX+sHvn5
-	6HNX3rAksutv0=
-X-Google-Smtp-Source: AGHT+IH43ZxDlO+sXZpKsRY9ws0CLb4ZSMlMGi8iin8W4Uc9EL2/AE6hhR6bEKC++ztievLapVcsEA==
-X-Received: by 2002:a05:6a20:6a28:b0:364:387:8f4e with SMTP id adf61e73a8af0-369ae490337mr10620715637.34.1765798752795;
-        Mon, 15 Dec 2025 03:39:12 -0800 (PST)
+        bh=9thXFyBI9wECeAoZwvjVxFD8Ol9j6G4X/I1qZGpsX1M=;
+        b=G0JG3wCkL46Z4uFmGhFtyop2UajpXfNhw9YH9plDuFNCtTrpydLrUJZlCpnqGJJiQ6
+         11fbsA5/Barofi4F4SYM+n43dNkqCkxF99+E/LfkP1AhoDdcNCpspIScR/jICWXGDzzE
+         CITLgai0KjmxDxK4K2aWpuaAzw6NpmypgT0ynb9chp1pRqN9aVadrfyrpjLytQ3N9XsL
+         KC/da57c8aO70VgH9u8hcuzGzv6hWXogH+pQy/ZPvl1BtN1kU8etvHim+I2ohA2+vQj7
+         D539hoDjuZaG5lYiW9e409VQ8bIEWZtyExR82bFIO7rLx7DhaTxCSOkKsbSb+pVlHrHk
+         SFHA==
+X-Forwarded-Encrypted: i=1; AJvYcCUGHQvkzgmQIOQdImyGYV8mKNGRrZwvtTM0/2Ga5atj5VkQr+o46whf5IYDghOQfVfyaxTsA5k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YylcuihW2NmIkuCB0ieQ2575Fx+VrpaLuvDQjW+lr0fH0Xf9ihU
+	/2YNEus8S7/KHHRZcVsgfkJiINqaoHGVNtGS6ORMHA4lgi6WXs5PFKc0
+X-Gm-Gg: AY/fxX4UNHEWh7ciZPW7ss7zUtGC3M6F4aFcoIv0ZIPsCAvYDPBZbWyigKLFFbb9R4Y
+	VSqfK+cEch+kNlPTnUhRGE8KDKYExwW4uCBhGoZqLeYx7acOJ+uB8QSeYooriXwS+LeA4HI9bRR
+	o60ZKqDn/pFMzfI1uLNSO5FTuNU6gIkOnhUyYMvkSFwE8nl1o7XENpIuex0NuGZYcXOtn406m2x
+	DiZ54XKlrCyaFnybeqHrSfIdSJgy+2vLQr3YnlCFlvUWuA/5jWBFoTv8gq87E0wnnYnqXSDLwaz
+	fmimKaz4SA+aTJO2MNaIPGA+nAX0Kgl756qZVrB2umtoN7HOVWVzkXJrNiYHGULVjB+8zrxm9IR
+	QycvCm9kO/HTJu4ynBKJywI7vnn6ZUKpIxs1/QK0zioGMG8EVgN+tZ4BI/IZv4DMB+kL2dRofGV
+	zBycIJQBWjFJE=
+X-Google-Smtp-Source: AGHT+IE3LQMlInYBtZW6kVYJLJE4CFzfJfm+/f5olU3OmDWyxxykzQlHP1rsXKl8Sxl863J3gFT+2A==
+X-Received: by 2002:a17:90b:4b47:b0:33b:8ac4:1ac4 with SMTP id 98e67ed59e1d1-34abd78051dmr11974090a91.35.1765798755860;
+        Mon, 15 Dec 2025 03:39:15 -0800 (PST)
 Received: from archie.me ([210.87.74.117])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c0c2ae4e3casm12755809a12.21.2025.12.15.03.39.11
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34abe294892sm8918293a91.10.2025.12.15.03.39.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Mon, 15 Dec 2025 03:39:12 -0800 (PST)
 Received: by archie.me (Postfix, from userid 1000)
-	id 811FA444B394; Mon, 15 Dec 2025 18:39:06 +0700 (WIB)
+	id 9EFFF444B395; Mon, 15 Dec 2025 18:39:06 +0700 (WIB)
 From: Bagas Sanjaya <bagasdotme@gmail.com>
 To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
 	Linux AMDGPU <amd-gfx@lists.freedesktop.org>,
@@ -161,9 +161,9 @@ Cc: Harry Wentland <harry.wentland@amd.com>,
 	Jilin Yuan <yuanjilin@cdjrlc.com>,
 	Swaraj Gaikwad <swarajgaikwad1925@gmail.com>,
 	George Anthony Vernon <contact@gvernon.com>
-Subject: [PATCH 05/14] mm, kfence: Describe @slab parameter in __kfence_obj_info()
-Date: Mon, 15 Dec 2025 18:38:53 +0700
-Message-ID: <20251215113903.46555-6-bagasdotme@gmail.com>
+Subject: [PATCH 06/14] virtio: Describe @map and @vmap members in virtio_device struct
+Date: Mon, 15 Dec 2025 18:38:54 +0700
+Message-ID: <20251215113903.46555-7-bagasdotme@gmail.com>
 X-Mailer: git-send-email 2.52.0
 In-Reply-To: <20251215113903.46555-1-bagasdotme@gmail.com>
 References: <20251215113903.46555-1-bagasdotme@gmail.com>
@@ -173,34 +173,41 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=849; i=bagasdotme@gmail.com; h=from:subject; bh=mcnZ1soLgF/JTT1YuxC/XOQhVy9SZYDoshinxHejwDU=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDJn2n4P0Tdf6vI2dt8iwUrrPLU6ToytxCmtRXso3wY/50 fGG9Ws6SlkYxLgYZMUUWSYl8jWd3mUkcqF9rSPMHFYmkCEMXJwCMBHZKwz/nVbIB4ee2zunpOHQ vBz35Ga7xwYL3V6/ES+tt/jmsMTsOCPDXNsiGd24sMjVrB9Z5rD2NZvPm8/+bp/rS8/i2IdH8rc yAgA=
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1385; i=bagasdotme@gmail.com; h=from:subject; bh=bVwk3E00Ao0/BsL4XlONNDCfpFF0qzpzGvJu4GqJ/kY=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDJn2n4N3qByLSAtcbrWEYbHxfzPeVTVyK4Naco81fnbf9 sGw4M+ujlIWBjEuBlkxRZZJiXxNp3cZiVxoX+sIM4eVCWQIAxenAEwk4Ckjw37unJpIS7sDggaL LUJm/L7quGjlN51XE6JFNZoPynqvOsvIsMhqy5y4fbtebC8768S8lM/yytfC9QdFWExtD//Srpa 6yQYA
 X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
 Content-Transfer-Encoding: 8bit
 
-Sphinx reports kernel-doc warning:
+Sphinx reports kernel-doc warnings:
 
-WARNING: ./include/linux/kfence.h:220 function parameter 'slab' not described in '__kfence_obj_info'
+WARNING: ./include/linux/virtio.h:181 struct member 'map' not described in 'virtio_device'
+WARNING: ./include/linux/virtio.h:181 struct member 'vmap' not described in 'virtio_device'
 
-Fix it by describing @slab parameter.
+Describe these members.
 
-Fixes: 2dfe63e61cc31e ("mm, kfence: support kmem_dump_obj() for KFENCE objects")
+Fixes: bee8c7c24b7373 ("virtio: introduce map ops in virtio core")
 Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
 ---
- include/linux/kfence.h | 1 +
- 1 file changed, 1 insertion(+)
+ include/linux/virtio.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/include/linux/kfence.h b/include/linux/kfence.h
-index 0ad1ddbb8b996a..e5822f6e7f2794 100644
---- a/include/linux/kfence.h
-+++ b/include/linux/kfence.h
-@@ -211,6 +211,7 @@ struct kmem_obj_info;
-  * __kfence_obj_info() - fill kmem_obj_info struct
-  * @kpp: kmem_obj_info to be filled
-  * @object: the object
-+ * @slab: the slab
-  *
-  * Return:
-  * * false - not a KFENCE object
+diff --git a/include/linux/virtio.h b/include/linux/virtio.h
+index 132a474e59140a..68ead8fda9c921 100644
+--- a/include/linux/virtio.h
++++ b/include/linux/virtio.h
+@@ -150,11 +150,13 @@ struct virtio_admin_cmd {
+  * @id: the device type identification (used to match it with a driver).
+  * @config: the configuration ops for this device.
+  * @vringh_config: configuration ops for host vrings.
++ * @map: configuration ops for device's mapping buffer
+  * @vqs: the list of virtqueues for this device.
+  * @features: the 64 lower features supported by both driver and device.
+  * @features_array: the full features space supported by both driver and
+  *		    device.
+  * @priv: private pointer for the driver's use.
++ * @vmap: device virtual map
+  * @debugfs_dir: debugfs directory entry.
+  * @debugfs_filter_features: features to be filtered set by debugfs.
+  */
 -- 
 An old man doll... just what I always wanted! - Clara
 
