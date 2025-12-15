@@ -1,167 +1,204 @@
-Return-Path: <netdev+bounces-244736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7A0BCBDCDE
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 13:29:51 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C3C6CBDD53
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 13:36:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6A3A2301E9B2
-	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 12:25:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CAD043037CDE
+	for <lists+netdev@lfdr.de>; Mon, 15 Dec 2025 12:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CE5F2D3A89;
-	Mon, 15 Dec 2025 12:25:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="MFNtC9o7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A841225408;
+	Mon, 15 Dec 2025 12:30:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f77.google.com (mail-oa1-f77.google.com [209.85.160.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 305A12C3255;
-	Mon, 15 Dec 2025 12:25:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1948221D3F0
+	for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 12:30:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765801527; cv=none; b=WZEhER4SNUh1qzajpDxDY9oFeDT0E/KPmACPTicN2DD2hzdpd/f00p473Fw7JJ5GhgYqyhgq/0xxfSHcNwcb1LuC9iQz+M9c01OXJ6TcPhM0VT6Zd9O5mZs9OrWtKnF2FEOrJF+VnGDkSgCC3YEeTqfwAXF00uM0zCZh1h6SRTc=
+	t=1765801835; cv=none; b=lIdvSQR26qKqpYsR2iJFGq167IPPcDutLj+8aIv/dDhUEDKHizGqf6p/h4UiywOmINCeD55LB+aOU3pij6q7N+2A+pUtowHcJBJUTpTb60uVKGrxs+KAKFJW/wI/yqkaDKdDBHFkoXhOJd3E+XXVXMv4MJToxTCwJ2LWzqm+eXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765801527; c=relaxed/simple;
-	bh=gJOFMp1/K+qQ0MSqjWn/CbbRaLJJuaP23xTo6CU3FMU=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=tUV/lgcB2eJ2IJmAml5mJz0QTSRGVh4PNPPI/o/rduv2kWDeABnr8spgPGdNvM6vmnC/vcOU2F6cBbGFS09TJlnJE/0V57MGNEaCbnzo6Xnkw0FecO+UhFCLe6hm8GntIYrldCKgohez8qqiwOp9YUgsR8j8ixMBEP3gsnW3RC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=MFNtC9o7; arc=none smtp.client-ip=80.241.56.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4dVK5Q3lJFz9scD;
-	Mon, 15 Dec 2025 13:25:14 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1765801514; h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gJOFMp1/K+qQ0MSqjWn/CbbRaLJJuaP23xTo6CU3FMU=;
-	b=MFNtC9o7GDr77G4gP5pdlWOgQeeiKPzkDClg8L2DPLsenZjXbBPFNYiW+f7Yt3dIHPmQyP
-	OJMvPnvOPIvbcMj8jkup2nPMtdqY9haLsfcz/IxOV2J03K4sDF356sDyQ23TsGQ07TViaD
-	FhWOVrJMTFcJ9CeKh2BEanhmBKLu/puWhJkeqyz5IF7MKc0wDX6+LpZo37kPzrx07UbVHu
-	/SrGIEw9Yb9k6R4DHidfnQwttDmp8t0gODXRNwKwn1DjYqW3hsQZd1gJ97ZgepaPr9lGGF
-	Kb4b3/HsX4GoqvHqXz/IOEsaMsqC0j4WmS+EX3sDV8DayQFJEqKPzO/PssjTDQ==
-Message-ID: <1f0fd860bf3466b9967d5a99ecd49eb93e0f7a19.camel@mailbox.org>
-Subject: Re: [PATCH 12/14] drm/scheduler: Describe @result in
- drm_sched_job_done()
-From: Philipp Stanner <phasta@mailbox.org>
-Reply-To: phasta@kernel.org
-To: Bagas Sanjaya <bagasdotme@gmail.com>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux AMDGPU
- <amd-gfx@lists.freedesktop.org>,  Linux DRI Development
- <dri-devel@lists.freedesktop.org>, Linux Filesystems Development
- <linux-fsdevel@vger.kernel.org>,  Linux Media
- <linux-media@vger.kernel.org>, linaro-mm-sig@lists.linaro.org,
- kasan-dev@googlegroups.com,  Linux Virtualization
- <virtualization@lists.linux.dev>, Linux Memory Management List
- <linux-mm@kvack.org>, Linux Network Bridge <bridge@lists.linux.dev>, Linux
- Networking <netdev@vger.kernel.org>
-Cc: Harry Wentland <harry.wentland@amd.com>, Leo Li <sunpeng.li@amd.com>, 
- Rodrigo Siqueira <siqueira@igalia.com>, Alex Deucher
- <alexander.deucher@amd.com>, Christian =?ISO-8859-1?Q?K=F6nig?=
- <christian.koenig@amd.com>, David Airlie <airlied@gmail.com>, Simona Vetter
- <simona@ffwll.ch>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann
- <tzimmermann@suse.de>, Matthew Brost <matthew.brost@intel.com>, Danilo
- Krummrich <dakr@kernel.org>, Philipp Stanner <phasta@kernel.org>, Alexander
- Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan
- Kara <jack@suse.cz>, Sumit Semwal <sumit.semwal@linaro.org>,  Alexander
- Potapenko <glider@google.com>, Marco Elver <elver@google.com>, Dmitry
- Vyukov <dvyukov@google.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason
- Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio
- =?ISO-8859-1?Q?P=E9rez?= <eperezma@redhat.com>, Andrew Morton
- <akpm@linux-foundation.org>, Uladzislau Rezki <urezki@gmail.com>, Nikolay
- Aleksandrov <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Taimur Hassan <Syed.Hassan@amd.com>, Wayne Lin
- <Wayne.Lin@amd.com>, Alex Hung <alex.hung@amd.com>, Aurabindo Pillai
- <aurabindo.pillai@amd.com>, Dillon Varone <Dillon.Varone@amd.com>, George
- Shen <george.shen@amd.com>, Aric Cyr <aric.cyr@amd.com>, Cruise Hung
- <Cruise.Hung@amd.com>, Mario Limonciello <mario.limonciello@amd.com>, Sunil
- Khatri <sunil.khatri@amd.com>, Dominik Kaszewski
- <dominik.kaszewski@amd.com>, David Hildenbrand <david@kernel.org>, Peter
- Zijlstra <peterz@infradead.org>, Lorenzo Stoakes
- <lorenzo.stoakes@oracle.com>, Max Kellermann <max.kellermann@ionos.com>,
- "Nysal Jan K.A." <nysal@linux.ibm.com>, Ryan Roberts
- <ryan.roberts@arm.com>, Alexey Skidanov <alexey.skidanov@intel.com>, 
- Vlastimil Babka <vbabka@suse.cz>, Kent Overstreet
- <kent.overstreet@linux.dev>, Vitaly Wool <vitaly.wool@konsulko.se>, Harry
- Yoo <harry.yoo@oracle.com>, Mateusz Guzik <mjguzik@gmail.com>, NeilBrown
- <neil@brown.name>, Amir Goldstein <amir73il@gmail.com>, Jeff Layton
- <jlayton@kernel.org>, Ivan Lipski <ivan.lipski@amd.com>, Tao Zhou
- <tao.zhou1@amd.com>, YiPeng Chai <YiPeng.Chai@amd.com>, Hawking Zhang
- <Hawking.Zhang@amd.com>, Lyude Paul <lyude@redhat.com>, Daniel Almeida
- <daniel.almeida@collabora.com>, Luben Tuikov <luben.tuikov@amd.com>,
- Matthew Auld <matthew.auld@intel.com>, Roopa Prabhu
- <roopa@cumulusnetworks.com>, Mao Zhu <zhumao001@208suo.com>, Shaomin Deng
- <dengshaomin@cdjrlc.com>, Charles Han <hanchunchao@inspur.com>, Jilin Yuan
- <yuanjilin@cdjrlc.com>, Swaraj Gaikwad <swarajgaikwad1925@gmail.com>,
- George Anthony Vernon <contact@gvernon.com>
-Date: Mon, 15 Dec 2025 13:24:46 +0100
-In-Reply-To: <20251215113903.46555-13-bagasdotme@gmail.com>
-References: <20251215113903.46555-1-bagasdotme@gmail.com>
-	 <20251215113903.46555-13-bagasdotme@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1765801835; c=relaxed/simple;
+	bh=t7mnA1JXNIt1sowABfFOYKVU4INnCQt8fzFOmRHGBxo=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=PEpGZloJMj+u3XsUn+5acTPkxYFovGvVN54gy0Jn39ZKEIFPXD0vepLp4ks5MYVfD/UVN0WpjHJJPWt6COoZea/ZvI0RQjK6rEstigphLP1jAhXqILzVTkmhl8eok9/lK/fLryop970Jcps2mBF87iX10tCW+WhJzV6RCDWY4LE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oa1-f77.google.com with SMTP id 586e51a60fabf-3f99d3f06f6so924848fac.2
+        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 04:30:31 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765801831; x=1766406631;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FmkbodutDZC8hdluHMNGaoY/QA3lBOYK1JpBNIovc6o=;
+        b=JMSQBlYllu3QpC4HUuRk/2kkq3bt5WqTZK0t5xRwbPQDL12Bwfczs6vXdj0b3vZSbX
+         S3YOuMgUIZz50tLEYecWpi11kOom9ofQKNXlzGqfXWlzEK/pZV3QdN3BVesMzL4UGl2j
+         mdLD1id7pW2njzcIEk76+Tpe9tniAEUDbbOLMwOAs/E1khD5tkdRiII61AiXlF4JxqKq
+         EcXTpybCF+0ctB2io2+rleo2nl9BGN73zK/+DKUDLyekE5SjeR+uHR2tLR30634rdp04
+         PxPwALCLWkUrP1syi5cbfNzxxyaaeuK8ycYJ4om6V52zzicjbWxvYgtgeu+bFgRXhP1l
+         RiXg==
+X-Forwarded-Encrypted: i=1; AJvYcCXsq/YaHi6qeEmbpMNspBz4m6X3WyKnf0H8HMciUZrBioz+E4JNmDbni9wbCayroZPbHHmpefA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyb4TGCX8SobiTwb2th+gLkKx97qV4zY1TtFVZFZc54v1THoUJt
+	j1TsBQgY7pPBviCjYuVQq4RilaGZ42p7N/4tc+l1zi1iE8sB5i3T7eGuxYXLR+6eo94KYdZu6cb
+	EhOokZzZxBaIdf/T2sX67ODtEtU4ZWk95YJzL+7+vSiIA7uAq/tYJakEbqkE=
+X-Google-Smtp-Source: AGHT+IFBpHRYsDCnNt2eAl1dpSRNDfYZWXdJ00ZGq0lOAKWf1vzhcrgROGEj8y0yiOAlvGdE03Dxkp/doBRwRaci4pJ+5cVKzusy
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MBO-RS-META: q9aiurnjorghwoz79fww7b6wqkkf5zeq
-X-MBO-RS-ID: ca016de3dd37ac937be
+X-Received: by 2002:a05:6820:f009:b0:657:5723:76c8 with SMTP id
+ 006d021491bc7-65b451812f6mr5115110eaf.6.1765801830725; Mon, 15 Dec 2025
+ 04:30:30 -0800 (PST)
+Date: Mon, 15 Dec 2025 04:30:30 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <693fff66.a70a0220.104cf0.033d.GAE@google.com>
+Subject: [syzbot] [net?] [usb?] WARNING in mdiobus_get_phy
+From: syzbot <syzbot+3d43c9066a5b54902232@syzkaller.appspotmail.com>
+To: andrew@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	hkallweit1@gmail.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-usb@vger.kernel.org, linux@armlinux.org.uk, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-nit about commit title:
-We use "drm/sched:" as prefix nowadays
+Hello,
 
-On Mon, 2025-12-15 at 18:39 +0700, Bagas Sanjaya wrote:
-> Sphinx reports kernel-doc warning:
->=20
-> WARNING: ./drivers/gpu/drm/scheduler/sched_main.c:367 function parameter =
-'result' not described in 'drm_sched_job_done'
->=20
-> Describe @result parameter to fix it
->=20
+syzbot found the following issue on:
 
-Thx for fixing this!
+HEAD commit:    5ce74bc1b7cb Add linux-next specific files for 20251211
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=130b51c2580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b9f785244b836412
+dashboard link: https://syzkaller.appspot.com/bug?extid=3d43c9066a5b54902232
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13baa61a580000
 
-> .
->=20
-> Fixes: 539f9ee4b52a8b ("drm/scheduler: properly forward fence errors")
-> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
-> ---
-> =C2=A0drivers/gpu/drm/scheduler/sched_main.c | 1 +
-> =C2=A01 file changed, 1 insertion(+)
->=20
-> diff --git a/drivers/gpu/drm/scheduler/sched_main.c b/drivers/gpu/drm/sch=
-eduler/sched_main.c
-> index 1d4f1b822e7b76..4f844087fd48eb 100644
-> --- a/drivers/gpu/drm/scheduler/sched_main.c
-> +++ b/drivers/gpu/drm/scheduler/sched_main.c
-> @@ -361,6 +361,7 @@ static void drm_sched_run_free_queue(struct drm_gpu_s=
-cheduler *sched)
-> =C2=A0/**
-> =C2=A0 * drm_sched_job_done - complete a job
-> =C2=A0 * @s_job: pointer to the job which is done
-> + * @result: job result
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/e550c10060d5/disk-5ce74bc1.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/80331ba2b4cc/vmlinux-5ce74bc1.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/4bcb4f82dfcf/bzImage-5ce74bc1.xz
 
-"error code for the job's finished-fence" would be a bit better and
-more verbose.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+3d43c9066a5b54902232@syzkaller.appspotmail.com
 
-With that:
+------------[ cut here ]------------
+addr 207 out of range
+WARNING: drivers/net/phy/mdio_bus.c:76 at mdiobus_find_device drivers/net/phy/mdio_bus.c:76 [inline], CPU#0: kworker/0:5/6044
+WARNING: drivers/net/phy/mdio_bus.c:76 at mdiobus_get_phy+0xaf/0xd0 drivers/net/phy/mdio_bus.c:86, CPU#0: kworker/0:5/6044
+Modules linked in:
+CPU: 0 UID: 0 PID: 6044 Comm: kworker/0:5 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+Workqueue: usb_hub_wq hub_event
+RIP: 0010:mdiobus_find_device drivers/net/phy/mdio_bus.c:76 [inline]
+RIP: 0010:mdiobus_get_phy+0xb1/0xd0 drivers/net/phy/mdio_bus.c:86
+Code: e8 34 1c 73 fb eb 07 e8 ed 17 73 fb 31 db 48 89 d8 5b 41 5e 41 5f c3 cc cc cc cc cc e8 d8 17 73 fb 48 8d 3d 31 16 81 09 89 de <67> 48 0f b9 3a eb db 89 f9 80 e1 07 80 c1 03 38 c1 7c b1 e8 57 7a
+RSP: 0018:ffffc900033a6aa8 EFLAGS: 00010293
+RAX: ffffffff864edf78 RBX: 00000000000000cf RCX: ffff88802a9ebd00
+RDX: 0000000000000000 RSI: 00000000000000cf RDI: ffffffff8fcff5b0
+RBP: ffffc900033a6bf0 R08: ffffc900033a6787 R09: 1ffff92000674cf0
+R10: dffffc0000000000 R11: fffff52000674cf1 R12: ffff888078e2cdc0
+R13: dffffc0000000000 R14: ffff88807cd12000 R15: dffffc0000000000
+FS:  0000000000000000(0000) GS:ffff8881259e6000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f1c669c9e9c CR3: 000000000e13a000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ ax88772_init_phy+0x8e/0x390 drivers/net/usb/asix_devices.c:722
+ ax88772_bind+0x961/0xde0 drivers/net/usb/asix_devices.c:937
+ usbnet_probe+0xab5/0x28f0 drivers/net/usb/usbnet.c:1802
+ usb_probe_interface+0x668/0xc90 drivers/usb/core/driver.c:396
+ call_driver_probe drivers/base/dd.c:-1 [inline]
+ really_probe+0x26d/0xad0 drivers/base/dd.c:659
+ __driver_probe_device+0x18c/0x320 drivers/base/dd.c:801
+ driver_probe_device+0x4f/0x240 drivers/base/dd.c:831
+ __device_attach_driver+0x279/0x430 drivers/base/dd.c:959
+ bus_for_each_drv+0x251/0x2e0 drivers/base/bus.c:500
+ __device_attach+0x2b8/0x430 drivers/base/dd.c:1031
+ device_initial_probe+0xa1/0xd0 drivers/base/dd.c:1086
+ bus_probe_device+0x12a/0x220 drivers/base/bus.c:574
+ device_add+0x7b6/0xb80 drivers/base/core.c:3689
+ usb_set_configuration+0x1a87/0x2110 drivers/usb/core/message.c:2210
+ usb_generic_driver_probe+0x8d/0x150 drivers/usb/core/generic.c:250
+ usb_probe_device+0x1c4/0x3c0 drivers/usb/core/driver.c:291
+ call_driver_probe drivers/base/dd.c:-1 [inline]
+ really_probe+0x26d/0xad0 drivers/base/dd.c:659
+ __driver_probe_device+0x18c/0x320 drivers/base/dd.c:801
+ driver_probe_device+0x4f/0x240 drivers/base/dd.c:831
+ __device_attach_driver+0x279/0x430 drivers/base/dd.c:959
+ bus_for_each_drv+0x251/0x2e0 drivers/base/bus.c:500
+ __device_attach+0x2b8/0x430 drivers/base/dd.c:1031
+ device_initial_probe+0xa1/0xd0 drivers/base/dd.c:1086
+ bus_probe_device+0x12a/0x220 drivers/base/bus.c:574
+ device_add+0x7b6/0xb80 drivers/base/core.c:3689
+ usb_new_device+0xa39/0x1720 drivers/usb/core/hub.c:2695
+ hub_port_connect drivers/usb/core/hub.c:5567 [inline]
+ hub_port_connect_change drivers/usb/core/hub.c:5707 [inline]
+ port_event drivers/usb/core/hub.c:5871 [inline]
+ hub_event+0x29b1/0x4ef0 drivers/usb/core/hub.c:5953
+ process_one_work+0x93a/0x15a0 kernel/workqueue.c:3279
+ process_scheduled_works kernel/workqueue.c:3362 [inline]
+ worker_thread+0x9b0/0xee0 kernel/workqueue.c:3443
+ kthread+0x711/0x8a0 kernel/kthread.c:463
+ ret_from_fork+0x599/0xb30 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0:	e8 34 1c 73 fb       	call   0xfb731c39
+   5:	eb 07                	jmp    0xe
+   7:	e8 ed 17 73 fb       	call   0xfb7317f9
+   c:	31 db                	xor    %ebx,%ebx
+   e:	48 89 d8             	mov    %rbx,%rax
+  11:	5b                   	pop    %rbx
+  12:	41 5e                	pop    %r14
+  14:	41 5f                	pop    %r15
+  16:	c3                   	ret
+  17:	cc                   	int3
+  18:	cc                   	int3
+  19:	cc                   	int3
+  1a:	cc                   	int3
+  1b:	cc                   	int3
+  1c:	e8 d8 17 73 fb       	call   0xfb7317f9
+  21:	48 8d 3d 31 16 81 09 	lea    0x9811631(%rip),%rdi        # 0x9811659
+  28:	89 de                	mov    %ebx,%esi
+* 2a:	67 48 0f b9 3a       	ud1    (%edx),%rdi <-- trapping instruction
+  2f:	eb db                	jmp    0xc
+  31:	89 f9                	mov    %edi,%ecx
+  33:	80 e1 07             	and    $0x7,%cl
+  36:	80 c1 03             	add    $0x3,%cl
+  39:	38 c1                	cmp    %al,%cl
+  3b:	7c b1                	jl     0xffffffee
+  3d:	e8                   	.byte 0xe8
+  3e:	57                   	push   %rdi
+  3f:	7a                   	.byte 0x7a
 
-Reviewed-by: Philipp Stanner <phasta@kernel.org>
 
-> =C2=A0 *
-> =C2=A0 * Finish the job's fence and resubmit the work items.
-> =C2=A0 */
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
