@@ -1,184 +1,171 @@
-Return-Path: <netdev+bounces-244941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A457CC3811
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 15:18:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 85232CC388D
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 15:24:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4A8A530422BA
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 14:14:41 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 1DE033035A16
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 14:21:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A814333A9E4;
-	Tue, 16 Dec 2025 14:05:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A978343D79;
+	Tue, 16 Dec 2025 14:21:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="JkqPXz3t"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a/gSau6p"
 X-Original-To: netdev@vger.kernel.org
-Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010004.outbound.protection.outlook.com [52.101.201.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31E3728CF5E;
-	Tue, 16 Dec 2025 14:05:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.4
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765893923; cv=fail; b=CmB3Z7KV26TtVJ9CzDjJXyNlsdjACqPH9bkGU2uodrct8wPsO0ICZ3b229duApYJdQvRr6CfK27TdWuni+q4nJTb3kFW7xJIpYO0mGEFFDxQ6A/FjMVlyQj+gRYUPUrd4e4cBUtnN3WlAJZZm1ADziWU8ViXtc6HpaOKhQttfdM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765893923; c=relaxed/simple;
-	bh=Z6AYX2v7JZp9vYjl07DZbf4xfNBufntR4tQll8SaEZ8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=b04fR85UV6tlxlVAN5YygbHTK64n4aS2ccQRhYKqh1qlvjoO064yGMFr0t5lBU7JQnS6/Sw00jrdwW+b8zEYZr3pL+pv3HwWHeXNo12AdjVmwfxpsakOjUnoxgB0yCwmDvKd2nke03X5Lwehpac0CFt3MVmVCDdG13kwCnUKTNw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=JkqPXz3t; arc=fail smtp.client-ip=52.101.201.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=yYPdBKIxeTnwxSRIzh2ICYK3VzViNjEbcfTzCQ6b6uC3+VYk8i/scTGhQeKsZ7R0Wl6vT49LMz81utyZx+0WcYHoJpQDrHk30TxqP1fzhe+WjrBgu78qjUm9Ni4a82DSLSyAkGMcEfcdw4eyk8pOkp2dP0BW/HSeFsQvWpEM1jDnbBtAacuCdkTAmX7T8jJCgShfueKMzsYpxJpNEaQH7RmyFG6JCjyIdlKWOwVKPW8yB6ucDmmxQIoJQTnfmhDu4FpGCOch6J6C5TldvGy/bpKf3YvsfiXSYAyV8Xb2MqJCEb+siohz0AU/vWbJIJN2SMs4XnIyw574jY68WNwx2A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=E/0tlSGDuSaMTagT6K3ta01ZJXilKQfGqPsnUPVfNsI=;
- b=Lk4RXTjLnvOalX1QLykX7lhOLsv6qbc657hwCthWXOzye7/24GswP2FguErWoXIT9yBVSwwKWoDHsgkEuIVGB/Rvy9dNomuLOVAlaSx0JVCmwZuNeGpIEaKhNEc8bDBGLDRgqFGmhZATM0iKB7u/m8r8kZQ/1Nn7wyLZ3kFZB69pVl7WFQgjqKFY4EV540GiCT3ChSY/apxGoSciSRb8iMQFTUMV+i332G1vpTkzgIkSaldAoyV/zjqbQSXTy7dYwrXPhyJRK7XKksi3WRpCDVTCOAci2Mk6xS8rtZNoq64MgoNgojVS/k9p577ORgFvjYMw5T7pdVLEmOg3b0ANiQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=E/0tlSGDuSaMTagT6K3ta01ZJXilKQfGqPsnUPVfNsI=;
- b=JkqPXz3tIVsvJZEWDhZiCMCGt7wDnUt1TsIPhl/oFEzeLdZFgmAzO0n1dGmd1bN+f0zFEX39DwoqwHwG21rtLL3c8Vgk7903K5r+qs8WREXMSQPSkw1Z3yRlkoHtcttUlVC+4N+WnkrOpmO6hJaSb/tmUOZPRnruzaS6qRw11+X3Y+m+A69lAQcaWm7gv/bBjzzQMnrDYBfGWn/v0wG/Ep7Mcvl4YHhKFMFsBLpwSo5Ososs9mubgLblHu+cBDA8mw2q89HfNDxi9exmhN9XPzXgfLxNKFOZrU+afa8anbbksDXZNU+0M71fzG1QZvhlcD+Aaf1HjsXlregYRxZebA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CY1PR12MB9601.namprd12.prod.outlook.com (2603:10b6:930:107::16)
- by SJ2PR12MB8832.namprd12.prod.outlook.com (2603:10b6:a03:4d0::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9412.13; Tue, 16 Dec
- 2025 14:05:14 +0000
-Received: from CY1PR12MB9601.namprd12.prod.outlook.com
- ([fe80::cd76:b497:475f:4de3]) by CY1PR12MB9601.namprd12.prod.outlook.com
- ([fe80::cd76:b497:475f:4de3%6]) with mapi id 15.20.9412.011; Tue, 16 Dec 2025
- 14:05:14 +0000
-Date: Tue, 16 Dec 2025 10:05:12 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc: Leon Romanovsky <leon@kernel.org>, Majd Dibbiny <majd@mellanox.com>,
-	Doug Ledford <dledford@redhat.com>,
-	Yuval Shaia <yshaia@marvell.com>, Matan Barak <matanb@mellanox.com>,
-	Bernard Metzler <bernard.metzler@linux.dev>,
-	OFED mailing list <linux-rdma@vger.kernel.org>,
-	Network Development <netdev@vger.kernel.org>
-Subject: Re: [not-yet-signed PATCH] RDMA/core: flush gid_cache_wq WQ from
- disable_device()
-Message-ID: <20251216140512.GC6079@nvidia.com>
-References: <30ec01df-6c32-490c-aa26-c41653f5a257@I-love.SAKURA.ne.jp>
- <8f90fba8-60b9-46e2-8990-45311c7b1540@I-love.SAKURA.ne.jp>
- <1722eff3-14c1-408b-999b-1be3e8fbfe5a@I-love.SAKURA.ne.jp>
- <9b4ce0df-1fbf-4052-9eb9-1f3d6ad6a685@I-love.SAKURA.ne.jp>
- <13f54775-7a36-48f2-b9cd-62ab9f15a82b@I-love.SAKURA.ne.jp>
- <ace1ebe4-4fdb-49f4-a3fa-bbf11e1b40ed@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ace1ebe4-4fdb-49f4-a3fa-bbf11e1b40ed@I-love.SAKURA.ne.jp>
-X-ClientProxiedBy: MN0PR05CA0030.namprd05.prod.outlook.com
- (2603:10b6:208:52c::27) To CY1PR12MB9601.namprd12.prod.outlook.com
- (2603:10b6:930:107::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EEC42356A4
+	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 14:21:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765894902; cv=none; b=R5K3eu20VOv3Tg7j1X0uSYVs+dSfodvqcHYZ9T/JEkDX4uUliGmhOfG7NKqSj5K9wiImrJOPcgXBJs9hsKramukcUT49QbzDl7X78BdzgWARhQ08pE4dRHN9vFAt8nQkiTJSHXo1Gfl7w8q3JVLYudddL5fEkNGGUS9diOGZ20Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765894902; c=relaxed/simple;
+	bh=rRg1rU7RdBd7Gq/Vczw/5nedpV2H6E5sTzFYSK2TRDk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=hOo9jeyLlxZ01NK9YEdDzuuFbNKf7bSk1m6ShtpII2lOO13hQeTeI3KTYBsUpEFzHDs1nkP6mClae9eRczO4v5zmYzcG86G5dBMNGJ++JbbTNQC/nlCbtM/Mv2UT4PqkGfX+6GLe738wTt7sUyFiIQ6dKCQ1KCDDAWQQ4QUvaFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a/gSau6p; arc=none smtp.client-ip=209.85.128.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-78c5b5c1eccso62486107b3.1
+        for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 06:21:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765894898; x=1766499698; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=N0mup+HLlOmrVWqFXbyf+MzotU/km+jMX39WXot6KIA=;
+        b=a/gSau6pK/u1fIeU4zuETqT0VmX0W0tfKs7peZ9Fauug8kh0UZGSyaxxrvyeFJst21
+         4gy1SWA3wp9Zx7sHocCCp2Z3af95NwabA02wFYIStJkCoI8p57dTfyb9vqwSIKQN8So7
+         6KWpnx03+pQ4K9l1NK95ILFRge3F7ntylo5SGzfLbTyDrOfu5swJ4A1GMeFg/tVA4BDA
+         1Ta/VUIHtKBg/aonSOOa9GOyZmitqo1baKkHEiHm0m3kVKC21snSh5pRA8NkL8AZLCH3
+         tkpevNRRh8bHcHNpU+N9uyBiIa4n6vYbA+zOXY8spnqs8ug20uX7MU4npDjTGPUMaV+o
+         o/eg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765894898; x=1766499698;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=N0mup+HLlOmrVWqFXbyf+MzotU/km+jMX39WXot6KIA=;
+        b=VmWAIBg9wVjYmq7muXjaQPWeWCPBoM9CEqPq5KJrUjr/QIfB/1NYBsVFofC58ap2jJ
+         rJszcpfW0F+sAsAzzAc5DKUFlToHc91b4gDc6E8MeyLUoT635MvllTtwkwFi1i/cQYFJ
+         lqR8u/A7VqTp5S8tXPlD44MgGzbHY1nmeCKF0BmoqBjXez/zpImDTJpwWRV8hw7/lQoD
+         WRSILwYHUeRZfxGPA+HTVbkRwXlUCBNPTLyVv9K/kjW2pfV8mrXcBxHBTgxINuIOVXQF
+         odKGZWJ4gguhG5g/qaZdpAhepPYxHTstw0770iJ+Lr1ef1+gcrBbSH6pZPwy5nFBY53A
+         6DBg==
+X-Gm-Message-State: AOJu0Yzwx3KowF9aAvN0DcUuM1wg6G9zgMA3aOYy+nvssJLVmCCikiul
+	/6CKmnS8dYzJnIO82Uqwgtm7ELPmhhww43jffzbftvpUmif0HSJMkk4S
+X-Gm-Gg: AY/fxX7A0NR5qqBo4FPZ0ZY4LELMQ4a4Vb0WR4wX96E89xmzoKKQYfOUoFsSS5PxoqR
+	E9G6+sLmzd/rmWgufSdK2uURHjAeNjAZDWwld9lZD96Oh/6BsJm0zJrm64uyNV1aAB1x7odrvcF
+	bcvXM1p8bVDccusijZ/hQqZw4zpRw4F1Wxw+O4KYSQY9BZnSRrRBE7yyITGOhwUqhW2n39z6ovh
+	DD3W4v35QodBBo6dqmhYtxtOTS1Kzt1E46R7K5K2CmC6LMjsaNZSkR8DmSuSYHzBlgAluyeBg0e
+	RZLawMPd3F4EevFL0TLB+A21MOx0Y2a13bhVApSTN/n8Vd7Qcupp72+AKAdyoqYsgfimaGjP/VY
+	dEXoopF2nRkFMAsrqkT9uEQvJrLeDPEMlonG1r57a1pq/O2nJD5y1uizOee+hxOmODkE3xC9/U2
+	p/tUE12+VVqrXlNf6NXb3AnqaN+EZ/9Yo=
+X-Google-Smtp-Source: AGHT+IGejGVDSZX+7LKGxziOgzMccisD2YOnvJr92J3v9iAv92NOwjPH5YZx0F1XbU1v7gDjsWQY9A==
+X-Received: by 2002:a05:690c:4c0a:b0:786:8410:31f6 with SMTP id 00721157ae682-78e67155d6amr106126917b3.22.1765894897917;
+        Tue, 16 Dec 2025 06:21:37 -0800 (PST)
+Received: from localhost ([2a03:2880:25ff:58::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-78e749e5bccsm39322147b3.26.2025.12.16.06.21.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Dec 2025 06:21:37 -0800 (PST)
+From: Daniel Zahka <daniel.zahka@gmail.com>
+Subject: [PATCH net 0/2] selftests: drv-net: psp: fix templated test names
+ in psp.py
+Date: Tue, 16 Dec 2025 06:21:34 -0800
+Message-Id: <20251216-psp-test-fix-v1-0-3b5a6dde186f@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY1PR12MB9601:EE_|SJ2PR12MB8832:EE_
-X-MS-Office365-Filtering-Correlation-Id: c8471fb8-41fc-4d53-f424-08de3cac2249
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?M27DLyo7Fq8hcXX0QYlyycPMK7ydhXh5gwTvR8qayGnh0PWARhlm6UZ6nzjJ?=
- =?us-ascii?Q?Fja0/gexx9z/G4I+dqeI2v/g57zwKPkM4mQn/PDdYhvRl5ouPTEB/je+TLss?=
- =?us-ascii?Q?LbaRxEAXPOKjFFEBIm2iD0LpgbTebmk4QrkY6Mqh0qWb7iuI+WoRsIocGlGc?=
- =?us-ascii?Q?z0Jr6+8w7B7lzCbOuGzJJDhtCwcuN4rRBM1tJSutUJvSZts4MTfq8pgGp8Ol?=
- =?us-ascii?Q?sCr8qzegDl0NiRN7jqr4MPkRaCTK5Bytl/UViBtGwXUv3Z77xv1Q67njrEv1?=
- =?us-ascii?Q?Bi1a+0GriZuFC1WnftbBLBKB6UPQLO5yxDQVBgz5Q++00dIPvmhhRZXjYN2k?=
- =?us-ascii?Q?sxW/tY1MC1ZxGmUs76d9KNX3/BxXVDW6+c9ZmnKjZHS6sd+BjLd1fPuOWVTU?=
- =?us-ascii?Q?rBxF28xBeAXkSa2wi0urXa3US14YulIF4JnGdObKLwi8OX/npnrT1yZTvDre?=
- =?us-ascii?Q?7F2sUcSKyxoJ52/pRoiep0aR3Fvd+q+RqO082A7ufwle2nyGf6U0q/gW6z+g?=
- =?us-ascii?Q?thsy37RqCF01p6D7cMXHZ4r5iOskh7F4AFJhih54Rg+jkcmc33zQ9xfjPeO1?=
- =?us-ascii?Q?qNg083QtGyS+qN0embEqRWD0C/yc8ANPn98fNEZ9W+SpOUc/7O5hsnYJWDmn?=
- =?us-ascii?Q?i2QDJRBk0vyE0cmRwrdRtyTPGmsv00OHwQJWEUdJVSh1ypziS/WdVKCKA9rz?=
- =?us-ascii?Q?mrP/P3USL+smhbcCf4ODA+9p+MMg9cYXlRa0MsnDpx0lpy9FBiqEz62r04MS?=
- =?us-ascii?Q?pPgeQOGx70MNkmcvmmvufftLDv4+t6W3s/NI5+BZoTbJiUSHwu4Xh5QP21ai?=
- =?us-ascii?Q?vhvcPfbEskBV/jPpZPnkvi/kdLFeBL0oZOkqSQCxm6bAQPakwK8KHTtN2cz8?=
- =?us-ascii?Q?NV7BFs/ZabW8Oftx3G67tx6Vdd9xobw9lBo64LOzCGkphzzhuSS06Y1LGwIg?=
- =?us-ascii?Q?PQRxWQOJ8pislHpump/6T6DTz4c7A7tK6s0Ezqxx3PdZk/XYjoz5A7f2vpQ3?=
- =?us-ascii?Q?fDY/fNHxErvyfRsdMb9qV8EBF+cZPYD6kA/cyuHkx0lENDWBS+xN/cfl+tI/?=
- =?us-ascii?Q?TDnD0MIE1CrELIuFaD4AnaD/wl4KH3879KKdljEEq+pzhklXmofBUNiZWZoW?=
- =?us-ascii?Q?zxBMOIW2iKCc9k3IXf0nCIgNoaCdwxB7cDejAHyhFuFHkZrtwodZ88GwofxC?=
- =?us-ascii?Q?rl1k/gN2zBJqKdZ9dL8yyZiQi1E3UJ0U07Hr2lbGzq1KGe20oAl82Tv1jkOk?=
- =?us-ascii?Q?W9D/6RQeRbzyZv2KPDnZZq3UkgPjiOgNoEP80D8d3pAth/4yiDeUTpLY8gWe?=
- =?us-ascii?Q?yZI9s9RT3WtUSr/FLwi3KeVpjszN6UraUpAowyYcbkW2XGXaiCJUwydNOhoi?=
- =?us-ascii?Q?BeWjK9jt2JGetD32zPa5dYVusD3Q01Z2NpwACUPZh+La1B0aIzoeI6umg1xj?=
- =?us-ascii?Q?guXuxv1TpDEGjctU/Aa05xQ4J7uBbeMo?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY1PR12MB9601.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?FltosFGUfsSbPNstd+VzRtL8Lsfa+WD/5Uiyl8X+qRd95a8cIP6cjsMxw/xm?=
- =?us-ascii?Q?O4TVnJF3nbtSHmmeu6TJgcG3LNpOOZR8Gk+Wf5m0Y+prSsNAoAU5U9Zb/9mc?=
- =?us-ascii?Q?3rHzc9doHHddM8vYAWeQkiKvqEoggSIWChj9llRzLTUB+qA/JE/e7cxRZfYZ?=
- =?us-ascii?Q?S6ckAH5W+jfdPxr2vIZ/KgDJ3f/oRiad2u1E9Q+Sgn8tsoLUQLxrKhBmG8fy?=
- =?us-ascii?Q?aW0zAbMHz6N1ISgC3+thzFMNmvOmHpjC/QU08UFHquXq51FL3zTRzpjROqMi?=
- =?us-ascii?Q?D2NX5LELRgc7g57xtB7xochCUmsbil5U5Hx/OWCqTX/FHcK3c1hmqV22UX5i?=
- =?us-ascii?Q?D0NZ4BLn3MTwrSoSXqSZ+pIIn+pAO0ZMlYMbwIttcJRXcCm+Nds91FB5cXSR?=
- =?us-ascii?Q?sSdpezHAuTVGBdJwrYfLmdXcXbb3ciNpPVWc3Cc0a6MhVKMd6Ws4Sbx4q3KV?=
- =?us-ascii?Q?jAyvqUzoqj8Bg/NbzmNOz3gFWuHSdmOWc7C3fyx5prWyxFn+3od5+I3TAgXw?=
- =?us-ascii?Q?NfKpatK4DJwf7xwtFHkNVa8WBlDqJtjpuvNFLW4umoTJDdvV/ufXL+LbsUKn?=
- =?us-ascii?Q?xOgJuYyQ4lwpHQYTrT4jFU0bqseb6YutAVkDkHQxwfXW4m71YnISM/mgz/Jp?=
- =?us-ascii?Q?z8B8j87GUmwKozyu5ITRyJD1JLODV3wKUcV0U0p9usA93wwjxBYp0AUsCpQr?=
- =?us-ascii?Q?/5wKK+JTMpELUgBeK+Fd2NY/xzHDhf5c5YPxpF6/mn+PUGv3nmuPaVTg7Ef5?=
- =?us-ascii?Q?gbwg+iBdv1sf7hR9PyWVnZ2nKNhYBJwydJoEZ6n6wiZktJkJwyKHUaTMeBTH?=
- =?us-ascii?Q?gabbHONYFy70sQMlLk6K9X5ntqoingLqArYQxoGEFHyTRTE1p65CCxwyo26R?=
- =?us-ascii?Q?fFpDn7wCUQ5c/dwtWyl3JBABvDQo9WTe0fq+wi9wFaJgASfI6GeSwiPuhHtL?=
- =?us-ascii?Q?X3Ym1Q9Yz1N+4S0fIULTHJz0OjwdyZSiWhf8e0ZNCsJImnu5s63gk5OFZTyL?=
- =?us-ascii?Q?2F3414E0/dBIpVAFN7nvlsWXHTvzLJmvnZmGGbOdau9jLE42j0P3dONFeLi4?=
- =?us-ascii?Q?B7zp+8tkrtjXZSYxvzASSb6j2mLms7oHs53+nr4IvPjWbxMfnGI093Bu/jdz?=
- =?us-ascii?Q?Cdu1dG4JQgC6z6Vt2ILBm4sb4ERJrv3fRXoSpD4V545JcwTHaQ/GgoojfOmP?=
- =?us-ascii?Q?cWnJdJ8ESpE5VQEIYWi0Rpz09cM8d8tYbAoXuSsoX2wjgbr/15Xh3HjAOtDl?=
- =?us-ascii?Q?/uI35Qhs71Q9Su9HyAfRuJA258qVIxW2215cQUIhMfJWNltGXmrd+CoQ9vuX?=
- =?us-ascii?Q?DC4jkH020FnFCpTxwtHyYWaw9IeZ5KYPQHMHWzBHvGCN8oqP0K7MhkBGfBjK?=
- =?us-ascii?Q?5PLrAGchgMwuEaHxdZ2/Q1mNW7ju4K1YLv8hqniJrGx9NWQSmrJFANixVt6S?=
- =?us-ascii?Q?QQfB0ePlUVFQk0Fbg7MuSjbT7aaUl4TGcuXTIts+dMiwHil/Xw9SEWg5GypB?=
- =?us-ascii?Q?lvMCi+m3SxbYDtF41PlTHhqy1iAuvXfs9QKWDgvQeGmP6yybGTdcxdBvqqLB?=
- =?us-ascii?Q?puWZfRBbrbsh19qQCRY=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c8471fb8-41fc-4d53-f424-08de3cac2249
-X-MS-Exchange-CrossTenant-AuthSource: CY1PR12MB9601.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Dec 2025 14:05:14.2151
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gMItQyeGo81IkMpTGhnsjznqYyQgk1Cty35vhkqGtxK7eIU9P+jr7jd5sdWtvTZt
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8832
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAO9qQWkC/x2MQQqAMAzAviI9W1iLivgV8SCz017mWIcI4t8dH
+ hNIHjDJKgZT80CWS03PWIHaBvyxxl1Qt8rAjntiYkyWsIgVDHpjcCMNvnMre4KapCxV/7sZohR
+ Y3vcDi6GTbWMAAAA=
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Shuah Khan <shuah@kernel.org>, Willem de Bruijn <willemb@google.com>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Daniel Zahka <daniel.zahka@gmail.com>
+X-Mailer: b4 0.13.0
 
-On Tue, Dec 16, 2025 at 10:29:29PM +0900, Tetsuo Handa wrote:
-> Hmm, I misinterpreted that commit. Since ib_register_device() was doing
-> 
-> 	down_write(&lists_rwsem);
-> 	list_add_tail(&device->core_list, &device_list);
-> 	up_write(&lists_rwsem);
-> 
-> , it was
-> 
-> 	down_write(&lists_rwsem);
-> 	list_del(&device->core_list);
-> 
-> in ib_unregister_device() that makes ib_enum_all_roce_netdevs() no longer
-> call ib_enum_roce_netdev().
-> 
-> Then, calling ib_enum_all_roce_netdevs() asynchronously was always racy
-> since commit 03db3a2d81e6 ("IB/core: Add RoCE GID table management") was added?
+The templated test names in psp.py had a bug that was not exposed
+until 80970e0fc07e ("selftests: net: py: extract the case generation
+logic") changed the order of test case evaluation and test case name
+extraction.
 
-Yes, probably, it may need to grab the registration lock in the WQ.
+The test cases created in psp_ip_ver_test_builder() and
+ipver_test_builder() were only assigning formatted names to the test
+cases they returned, when the test itself was run. This series moves
+the test case naming to the point where the test function is created.
 
-Jason
+Using netdevsim psp:
+Before:
+./tools/testing/selftests/drivers/net/psp.py
+  TAP version 13
+  1..28
+  ok 1 psp.test_case
+  ok 2 psp.test_case
+  ok 3 psp.test_case
+  ok 4 psp.test_case
+  ok 5 psp.test_case
+  ok 6 psp.test_case
+  ok 7 psp.test_case
+  ok 8 psp.test_case
+  ok 9 psp.test_case
+  ok 10 psp.test_case
+  ok 11 psp.dev_list_devices
+  ...
+  ok 28 psp.removal_device_bi
+  # Totals: pass:28 fail:0 xfail:0 xpass:0 skip:0 error:0
+  # 
+  # Responder logs (0):
+  # STDERR:
+  #  Set PSP enable on device 3 to 0xf
+  #  Set PSP enable on device 3 to 0x0
+
+After:
+./tools/testing/selftests/drivers/net/psp.py
+  TAP version 13
+  1..28
+  ok 1 psp.data_basic_send_v0_ip4
+  ok 2 psp.data_basic_send_v0_ip6
+  ok 3 psp.data_basic_send_v1_ip4
+  ok 4 psp.data_basic_send_v1_ip6
+  ok 5 psp.data_basic_send_v2_ip4
+  ok 6 psp.data_basic_send_v2_ip6
+  ok 7 psp.data_basic_send_v3_ip4
+  ok 8 psp.data_basic_send_v3_ip6
+  ok 9 psp.data_mss_adjust_ip4
+  ok 10 psp.data_mss_adjust_ip6
+  ok 11 psp.dev_list_devices
+  ...
+  ok 28 psp.removal_device_bi
+  # Totals: pass:28 fail:0 xfail:0 xpass:0 skip:0 error:0
+  # 
+  # Responder logs (0):
+  # STDERR:
+  #  Set PSP enable on device 3 to 0xf
+  #  Set PSP enable on device 3 to 0x0
+
+Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
+---
+Daniel Zahka (2):
+      selftests: drv-net: psp: fix templated test names in psp_ip_ver_test_builder()
+      selftests: drv-net: psp: fix test names in ipver_test_builder()
+
+ tools/testing/selftests/drivers/net/psp.py | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+---
+base-commit: 885bebac9909994050bbbeed0829c727e42bd1b7
+change-id: 20251212-psp-test-fix-f0816c40a2c1
+
+Best regards,
+-- 
+Daniel Zahka <daniel.zahka@gmail.com>
+
 
