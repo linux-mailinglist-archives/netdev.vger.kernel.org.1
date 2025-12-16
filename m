@@ -1,134 +1,144 @@
-Return-Path: <netdev+bounces-244971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2011DCC44CB
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 17:30:51 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ED09CC4537
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 17:35:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 21E533033C82
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 16:26:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1999B3093F9D
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 16:30:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D20E327A465;
-	Tue, 16 Dec 2025 16:25:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C00A62D97B4;
+	Tue, 16 Dec 2025 16:29:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SDotlHVh"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="JdmxJGyQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0828925BF13
-	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 16:25:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5839929BD88;
+	Tue, 16 Dec 2025 16:29:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765902359; cv=none; b=uEinshV/nSQc2/Ttu7gLeY9S0y5l70614XGRT8+tRdwXzEnaTTOKA4dTEisT3Q+Ui6vF5F/6xtgG8cpQ9CymjNQ5PfndS6brKrdbU6wm3LNyaU8tWlv/6IKAAZpSLFJMzzrXz/hpJIr84jlrjPVtZcVAhvvesqYWxs44ttrgcgo=
+	t=1765902547; cv=none; b=QL0G7Q6f0pjTUU+3XfhxbiJESv9FugmqKSIYd/uq6e6BuRVXMxv0L0D6cX2SuMPNUohixuo0kVxihxFuOYqsgqixs4Sm7lspUp2pTE2fDFJOlhk5kW8HgSGCz76JUfbC2dbbwGEWvkze+uyFFmRo6PbjcoIKgy39rCoWM0z9OdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765902359; c=relaxed/simple;
-	bh=yhJUbCINpxh/auc5U5F4nsB73Bffl6eilqOnpz5DwFg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k57Z4AHzrv1LIquoqyJGfJoYOYZcuqUBTrfcG4AigiNSGgtVsRgAbGRi48fsv9eT+bkayDLtRk1BfG/RssSII+tyTXUCmqxzCOFzyLthmQO0Sg0x5YK7gEu880KPL+foNoAY5TComk5v9o20McGDFH1b7+YUtw7uqpAvN+UymcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SDotlHVh; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-42fb0fc5aa9so1909563f8f.1
-        for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 08:25:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765902356; x=1766507156; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PX+3JbKQd1Ma8RRu1V0Qq95QByN2KfQrm38mIFaCTAg=;
-        b=SDotlHVh0j58/ANy0ESCUsp7qYddroPe7TO/2GLtkZCUsD0CviZ+egZyThQ9XkIPu9
-         thQ4DwtmdA/fntiqp9J5eHhCVrllp2gamVxIYjUlNyjOguKZ9/3XOB+0fzgH+M7UDL2z
-         CejHRjYV7Zghu8wznjMPZ3wmouxu9UZo7FaCcdGYLDRJhwzbqEs+SqsmGBY336PB0GOg
-         xTGz3jy/U4FuOdMugzxUsFQmHR+ZnjY8h2HZBmDyJ4z8E2izBFgSMED6NK8Lm3PQnuuk
-         bEhFqAIcv0hFD+JRMEpc0F2YAXNGs3LGLS2PkelorpVweHPEW9cYZYPvacdSVWdk10XR
-         0X6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765902356; x=1766507156;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PX+3JbKQd1Ma8RRu1V0Qq95QByN2KfQrm38mIFaCTAg=;
-        b=cZE8DsHmWWhembP6P1TQUh4GGbtbfG8E88gpvwUciMIs3UxwHtFKy/Ch7NORxRgAfl
-         fUw+Ui3yQwZS41+ctQyicWVYuCf6yQKFsy5pfREKIQUqLD/TF8umdHRkk4Fo3zA4UUih
-         xSwOcHPVUqFQVZBkwyF7qnVscVx++MzfU0vds2tY9p3U8MtRcZ3+PSbMwkNfs4MEHxZf
-         1qHj9yuTZHPzBYGI8kgesZikvkFIcx5WLE959mi/0bWTShf7SPg3UTktT9EiYVe93o6z
-         AC1Nw6s4TmmJEG8+FPqLNFKSt0wfLYt35uzZf09bACGIC+lNZZI2ip9sb6+t308OjKU3
-         +D1Q==
-X-Gm-Message-State: AOJu0YzGfojsj63R78qehz/Kkqi1pd5rrtexN9cPTJ1LoKkTIqvDw2Ka
-	pw8vOhO0M/gyR7RhERqEENxI/X18dtCjYLZ5Gq+rJ24IuI2/uO/8yzAXGnuUMhOi
-X-Gm-Gg: AY/fxX6rKljs6MFaN81pI+xeTDGK7ayKbUDld5Ac9giQHQJz3N66JusGeFHccTyYXQ7
-	n+ZyaifRCXl91ayXIEaVU3VWFLjF27uKfZh2hnB7zX3gGafqDR+uPwPDOEJs5eWNodD0sw4d9Nk
-	ZSoi7ZopNlAG2y76WaA+uQLrLreoRAGOu5POaQMWQOof8g1eNQQhph92r6EfNIAEuJWRfOyXQtI
-	KiQxJtT+IUNQWd8Gif/DqQmToEii+KHFHvGBR+vw+9nm1BSwbLf1xS5MPfDsil70JqBsWRZX8uc
-	bkPHbxFFsF5/EiyYDv0KPjk3hMCt2GHUL1Q9w1DbslfjzDo1z10poy1d1bgiSzInTr5OgWBl9D2
-	D7IeDGFI2fgYiH29Aq5JJs2KmzMDX7T0UPQ6wnxlORA8jdSzs3bdE9FGFL1+DkfAMxuw/Iv6fOl
-	69CXAi+HeegkNS0CCrRt7q0ll2YgImxQu0Mm5SQxuyG/XnayYVwXZVdQ2Ea402sojQiENeqVqXh
-	Cdz/4938YhrVgY=
-X-Google-Smtp-Source: AGHT+IGXRD6HFpyqQVc/wf8iqGFKyIb05ivxCNYXQ4rHj0cs+H834YP88+rvw+KorrLC+jI05vadpA==
-X-Received: by 2002:a05:6000:2892:b0:430:fafd:f1d2 with SMTP id ffacd0b85a97d-430fafdf3bfmr9773877f8f.11.1765902356018;
-        Tue, 16 Dec 2025 08:25:56 -0800 (PST)
-Received: from Lord-Beerus.station (net-5-94-28-5.cust.vodafonedsl.it. [5.94.28.5])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-430f7475895sm17750190f8f.33.2025.12.16.08.25.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Dec 2025 08:25:55 -0800 (PST)
-From: Stefano Radaelli <stefano.radaelli21@gmail.com>
-X-Google-Original-From: Stefano Radaelli <stefano.r@variscite.com>
-To: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Stefano Radaelli <stefano.r@variscite.com>,
-	Xu Liang <lxu@maxlinear.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Stefano Radaelli <stefano.radaelli21@gmail.com>
-Subject: [PATCH net v1] net: phy: mxl-86110: Add power management and soft reset support
-Date: Tue, 16 Dec 2025 17:25:34 +0100
-Message-ID: <20251216162534.141825-1-stefano.r@variscite.com>
-X-Mailer: git-send-email 2.47.3
+	s=arc-20240116; t=1765902547; c=relaxed/simple;
+	bh=2Q+qK2NqcPX9cbzhyXO64+yCRyf/DbYINlYSrayO9q0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZYjGxfWm6uLfREkpzCUdAhW4dtPFh81MzIjEXyqueu4TWs8+HdTxQKDqpDhr6x4vNQBKVr5g7hE6/QvQ3UXGxkbCLssanjZsWz7Q5OdftqCiiBdO99G+fTIVXwbgMtJKEE+g47Dmgx136Ul7w5WdAwUW1SWVay8D/jM+2Q790pk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=JdmxJGyQ; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 5877C1A223D;
+	Tue, 16 Dec 2025 16:29:02 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 150F96071C;
+	Tue, 16 Dec 2025 16:29:02 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B6A63119A9036;
+	Tue, 16 Dec 2025 17:28:41 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1765902535; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=WDH8v49meu1cbdbqCsHVd8Ol6TU4lh3FhMKZUYOzIyw=;
+	b=JdmxJGyQPl89ZvAe+i5sgqoeA7jQmxJWnBAIHwZxcehomzVI9qb40ttSy9cx0wRqbThzlq
+	lHAyEaQZl2k3DPsEQjC65K+IuLFg7sKNjqiBePyTq7VviJcrRHiM9bN2eMTapQXooL3Lmu
+	joBBSrhkICZtvT6a/2rKkS5eNphmHSGwgOESA/7qal3nmlbmOmLz+W6tugpU9vkYI95Zr+
+	oxUYy7GXXT1YkRVynXnWByxfKZ94QxEpAfuHNh8d9Ac3oWCQsqX4988ORYKqvM0U/YQqfL
+	3mBQCk3ssFunMThFAA4+VRHjyfUtDGefOn2sRBJLRZ0Frk8p1CsW+dFfmlCeIg==
+Date: Tue, 16 Dec 2025 17:28:41 +0100
+From: Alexandre Belloni <alexandre.belloni@bootlin.com>
+To: Robert Marko <robert.marko@sartura.hr>
+Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+	nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
+	Steen.Hegelund@microchip.com, daniel.machon@microchip.com,
+	UNGLinuxDriver@microchip.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, vkoul@kernel.org, linux@roeck-us.net,
+	andi.shyti@kernel.org, lee@kernel.org, andrew+netdev@lunn.ch,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	linusw@kernel.org, olivia@selenic.com, radu_nicolae.pirea@upb.ro,
+	richard.genoud@bootlin.com, gregkh@linuxfoundation.org,
+	jirislaby@kernel.org, mturquette@baylibre.com, sboyd@kernel.org,
+	richardcochran@gmail.com, wsa+renesas@sang-engineering.com,
+	romain.sioen@microchip.com, Ryan.Wanner@microchip.com,
+	lars.povlsen@microchip.com, tudor.ambarus@linaro.org,
+	charan.pedumuru@microchip.com, kavyasree.kotagiri@microchip.com,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	dmaengine@vger.kernel.org, linux-hwmon@vger.kernel.org,
+	linux-i2c@vger.kernel.org, netdev@vger.kernel.org,
+	linux-gpio@vger.kernel.org, linux-spi@vger.kernel.org,
+	linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
+	linux-clk@vger.kernel.org, mwalle@kernel.org,
+	luka.perkov@sartura.hr
+Subject: Re: [PATCH v2 04/19] dt-bindings: arm: move AT91 to generic
+ Microchip binding
+Message-ID: <202512161628415e9896d1@mail.local>
+References: <20251215163820.1584926-1-robert.marko@sartura.hr>
+ <20251215163820.1584926-4-robert.marko@sartura.hr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251215163820.1584926-4-robert.marko@sartura.hr>
+X-Last-TLS-Session-Version: TLSv1.3
 
-Implement soft_reset, suspend, and resume callbacks using
-genphy_soft_reset(), genphy_suspend(), and genphy_resume()
-to fix PHY initialization and power management issues.
+On 15/12/2025 17:35:21+0100, Robert Marko wrote:
+> Create a new binding file named microchip.yaml, to which all Microchip
+> based devices will be moved to.
+> 
+> Start by moving AT91, next will be SparX-5.
 
-The soft_reset callback is needed to properly recover the PHY after an
-ifconfig down/up cycle. Without it, the PHY can remain in power-down
-state, causing MDIO register access failures during config_init().
-The soft reset ensures the PHY is operational before configuration.
+Both lines of SoCs are designed by different business units and are
+wildly different and while both business units are currently owned by
+the same company, there are no guarantees this will stay this way so I
+would simply avoid merging both.
 
-The suspend/resume callbacks enable proper power management during
-system suspend/resume cycles.
+> 
+> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
+> ---
+>  .../bindings/arm/{atmel-at91.yaml => microchip.yaml}       | 7 ++-----
+>  1 file changed, 2 insertions(+), 5 deletions(-)
+>  rename Documentation/devicetree/bindings/arm/{atmel-at91.yaml => microchip.yaml} (98%)
+> 
+> diff --git a/Documentation/devicetree/bindings/arm/atmel-at91.yaml b/Documentation/devicetree/bindings/arm/microchip.yaml
+> similarity index 98%
+> rename from Documentation/devicetree/bindings/arm/atmel-at91.yaml
+> rename to Documentation/devicetree/bindings/arm/microchip.yaml
+> index 88edca9b84d2..3c76f5b585fc 100644
+> --- a/Documentation/devicetree/bindings/arm/atmel-at91.yaml
+> +++ b/Documentation/devicetree/bindings/arm/microchip.yaml
+> @@ -1,19 +1,16 @@
+>  # SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+>  %YAML 1.2
+>  ---
+> -$id: http://devicetree.org/schemas/arm/atmel-at91.yaml#
+> +$id: http://devicetree.org/schemas/arm/microchip.yaml#
+>  $schema: http://devicetree.org/meta-schemas/core.yaml#
+>  
+> -title: Atmel AT91.
+> +title: Microchip platforms
+>  
+>  maintainers:
+>    - Alexandre Belloni <alexandre.belloni@bootlin.com>
+>    - Claudiu Beznea <claudiu.beznea@microchip.com>
+>    - Nicolas Ferre <nicolas.ferre@microchip.com>
+>  
+> -description: |
+> -  Boards with a SoC of the Atmel AT91 or SMART family shall have the following
+> -
+>  properties:
+>    $nodename:
+>      const: '/'
+> -- 
+> 2.52.0
+> 
 
-Fixes: b2908a989c59 ("net: phy: add driver for MaxLinear MxL86110 PHY")
-Signed-off-by: Stefano Radaelli <stefano.r@variscite.com>
----
- drivers/net/phy/mxl-86110.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/net/phy/mxl-86110.c b/drivers/net/phy/mxl-86110.c
-index e5d137a37a1d..42a5fe3f115f 100644
---- a/drivers/net/phy/mxl-86110.c
-+++ b/drivers/net/phy/mxl-86110.c
-@@ -938,6 +938,9 @@ static struct phy_driver mxl_phy_drvs[] = {
- 		PHY_ID_MATCH_EXACT(PHY_ID_MXL86110),
- 		.name			= "MXL86110 Gigabit Ethernet",
- 		.config_init		= mxl86110_config_init,
-+		.suspend		= genphy_suspend,
-+		.resume			= genphy_resume,
-+		.soft_reset		= genphy_soft_reset,
- 		.get_wol		= mxl86110_get_wol,
- 		.set_wol		= mxl86110_set_wol,
- 		.led_brightness_set	= mxl86110_led_brightness_set,
 -- 
-2.47.3
-
+Alexandre Belloni, co-owner and COO, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
