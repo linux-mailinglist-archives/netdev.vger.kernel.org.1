@@ -1,225 +1,156 @@
-Return-Path: <netdev+bounces-244905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244906-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3270BCC170B
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 09:02:18 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4626BCC16A8
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 08:59:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3156C306801A
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 07:56:21 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 883E03007A97
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 07:58:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA9AD337694;
-	Tue, 16 Dec 2025 07:56:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52848339B3B;
+	Tue, 16 Dec 2025 07:58:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kKL4AC78"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="IGe0nUns"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8877338580
-	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 07:56:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5805339708
+	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 07:58:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765871780; cv=none; b=TP2G9Y5ZuXxGxYDdonEGHhlW8E+EPCDm4CrdQdMos4ptVsA48uV9Y1UI+QbiS+48x/tslA5tLpuNXzioDNTgUkSPkG90VK4NOK6+pVcA5NujvKk+vHN9NVFFRzjtf+jqSEaFomra6/rKuWvdyjJqGPXe4zMym1WRkNZmVxwGQ/I=
+	t=1765871921; cv=none; b=fgebpJvgpzc11nIsf3uPOhoXHs0voXDCZiCSIVzK8mr7P8jxUEEcYQgfZxPzOrE5Kknsf7RWnF9odFUXYmAPMimapfj/GrVx49fQIVKZ8uxbQmOItdZxUMlWCXARH0fr8qhTkbHjuiZSfxEcipoTYQF427gzf12bl+BiPUHWEyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765871780; c=relaxed/simple;
-	bh=UvaxdPuzE9cHgjQPNN5Yc11mBV2d86BG3I765ToiYLQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YcJag3db3p47nvq6lYIrQifNGvMczC9Qr7vfQ1aaGrgF+tAiYryk1lxZ1TOP5VlxYY/V+oXi88ZFSub6V1TsE4BA/7XJ4sD3QIL218mY/dB2Rk7E4gPdddnzcPjirrOwI23zcgv68w95IB1057gLzyMz8DVsDQHePosuvVnDBX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=kKL4AC78; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4779a4fc95aso15046215e9.1
-        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 23:56:08 -0800 (PST)
+	s=arc-20240116; t=1765871921; c=relaxed/simple;
+	bh=DK7icG0xbloyzh33AbYb45dyPUaU85bnSKimNzCLxKE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bupuvI22X/qRTSAPpec1oK/v+F9FQKGGwub9aScxBoF2hulIoR5AyVxZUZ341V2myBDQ/FMPHMxIbAfS9bI4wGQmnc9dGB4naaa1ocWm6+BtAzb6g5RLrCVjTyXe8KNSVilkN/Gn5SsK5TK7Pc2xj4PiQSbk28olS5br1AswhYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=IGe0nUns; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-42e2ba54a6fso1702644f8f.3
+        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 23:58:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1765871767; x=1766476567; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dgLiR9L5wEhCMccIYV392PBhORkDXeC6wYlSh2crOgg=;
-        b=kKL4AC788ZGK7hbbd+EIUBXOOeZA3iigMdC1aw6LkK+PSmvbQIwrR87cyEwETDgDSH
-         hKbJI4VrZnCpnroLWGyHQe2iT5i8IjXwG4CigDh4c7PG5UsoKDWvPdyM27Q6eIXpcNAg
-         YUaVS6J0O3LY3xuU6PU4fqg/9NFffcntId8Aj09azJ3Zce3uVKeU4dJ7Bls1L8w1hXH8
-         br0i69YJ/GNnZJaYIgBU6mr38Hp9CJUIrqr7RCp3mIC7nRK7h7jxbFEV9lYuWPTuMgK/
-         KKTYatLaS/hZF5weJQeohBEtOlE8zymH/uaoDxui0T81ZjhISFVXBHZGrbSrYnKrSV88
-         H69Q==
+        d=blackwall.org; s=google; t=1765871916; x=1766476716; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=97+Mtmy/QOkXKgRJz1EGvFd6epy5X9AZxAMhh0WtV8U=;
+        b=IGe0nUnsSuWnV3zyqWB0qcX/PmA1RfbpFMJRu0X4cDcloynKidt51EEqdmBUc2OHwN
+         bFrLIrlpEbYP9MIHyvuqKQFTDFj3Hru4WebMAykE6Drqu2jG6FEkRabb50B6ios3lZUP
+         9yQ2vQ+TdJQ/FalKU/GWHHw8joi/89CnU3kKR+61V0DdrDpvRDDh7B/Jp+n81hR2f6D0
+         QWOKtN9xcNHEu7xUe6+ty7ovUZi219wYsYquLAfaWN2LfiTooCed3kaUkmpU4/8yilQ7
+         8Q1GDGGriXWSAM7Eh32HB+3njL94FhQp1CHHqiSaW+lEiqZ/2yPEo849V1LfBaG8Y/nD
+         VN+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765871767; x=1766476567;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dgLiR9L5wEhCMccIYV392PBhORkDXeC6wYlSh2crOgg=;
-        b=ujDzAVDQf6bMxKIx3H52EHDC8NZaQ1sYspbQo10oyP4RGMfdcA8txcxvQd19tnTztQ
-         fyA02i0uAdGgKdmsZTm5rV81RqRxF1Qw9iyF7DQzWhdeFKFbNg+Of/LSeckXVKwmPr/L
-         wvnm+8/uPP/hpqTc6D1Zz7rEThWZHZJPvrfulMw0/iWrHb7dEoi7jR25M22nikoV7qmK
-         DS25EQtpY7cACLLycGyWyr6vUyIY8Z5G+qDkhiuREJB7rf9rCPegDfJWZ+abpSIpSICi
-         TUwpeDmW6brzk0l4dUv+Hzua+8gK4ak6VGbA7c4TwC1ou7eNpf/0BlXWdMI8Nfn4PGAu
-         XLYw==
-X-Forwarded-Encrypted: i=1; AJvYcCWBqY3FU+hkQTvACkkpU2x+3IBwgThyhDTAKDoUYoRuSkPyRrsbhFqiorophT1upG7aBTCzQfQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzb67c4ouKB5elRNuWRAqcr58kkfCRsDWX0rJ3NPjaemUbKCcxL
-	uQN7Ekz/JRqAMJaz4OISgS1PSW187EB76uUWjKnR6dqqNKRFqxCQbkQaaBZ9GmhH7DM=
-X-Gm-Gg: AY/fxX5QPTp2NBenfeSB3AxlplsPfEoAVgvuieLfL1zBuj2Y3OXbBs+4aJHMLChGFqt
-	nE+52pZptqMoRrDgPxCKhfr/LFS7VdWnU2BpIbvdu5xwMOjiev6R5PTLKK15GwqK3BeHZrS/aLr
-	5GmmOfHjm6O1Z9FGlN0VqcEQqJ+h25pyadu1OLzuyRrZNNIJSyb8n7ymuRV+UaKEMlEkhB6PRAo
-	4IOY46yWv0RuZ4ODrfFT18KjqoXvgDXeJoc3PXa3klMQJI5O9welRF3kmdqL8/JFBzgfyAiwsjh
-	e1tGIjDIbj7etmiRggaXGElHwQ1ltOcObm9RU9Ywm8p68+2sWRMGpKVeIgmKpiZEqQNFdwcJXh2
-	2WzgcwVVWczg7dTT/AOg2KSFy3KHUxL6GpbUvsdwWK2kHxi4/QwLVGnQvmDAteXccSlMwHeGuCe
-	3tmPnPu06HhyVeKLpy
-X-Google-Smtp-Source: AGHT+IG+piBYJp8yRE0JaiL0XBKJcrLuB82TEEFiVQtz41FJiO/E2QY1ciGNs20Cvz2Woq6tSTEwTw==
-X-Received: by 2002:a05:6000:26d0:b0:430:f74d:6e9f with SMTP id ffacd0b85a97d-430f74d6ef6mr8155517f8f.14.1765871766545;
-        Mon, 15 Dec 2025 23:56:06 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-430f1fa232csm19824386f8f.6.2025.12.15.23.56.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Dec 2025 23:56:06 -0800 (PST)
-Date: Tue, 16 Dec 2025 10:56:02 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Frank Li <Frank.li@nxp.com>
-Cc: Chester Lin <chester62515@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>, devicetree@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Fabio Estevam <festevam@gmail.com>,
-	Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>,
-	imx@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
-	Jan Petrous <jan.petrous@oss.nxp.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Lee Jones <lee@kernel.org>, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Matthias Brugger <mbrugger@suse.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	NXP S32 Linux Team <s32@nxp.com>, Paolo Abeni <pabeni@redhat.com>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Rob Herring <robh@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Shawn Guo <shawnguo@kernel.org>, linaro-s32@linaro.org
-Subject: Re: [PATCH v2 0/4] s32g: Use a syscon for GPR
-Message-ID: <aUEQkuzSZXFs5nqr@stanley.mountain>
-References: <cover.1765806521.git.dan.carpenter@linaro.org>
- <aUAvwRmIZBC0W6ql@lizhi-Precision-Tower-5810>
- <aUBUkuLf7NHtLSl1@stanley.mountain>
- <aUBha2/xiZsIF/o5@lizhi-Precision-Tower-5810>
- <aUBrV2_Iv4oTPkC4@stanley.mountain>
- <aUB4pFEwmMBzW52T@lizhi-Precision-Tower-5810>
+        d=1e100.net; s=20230601; t=1765871916; x=1766476716;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=97+Mtmy/QOkXKgRJz1EGvFd6epy5X9AZxAMhh0WtV8U=;
+        b=oQZgHmdtoVSknfLVO8QYGj85h0e8/5jV1HKKCnlFf/I54S3t7mdWml1WIKD/bBN+GH
+         sKfiVGVeMF+Lxge67dIbrsUeBVSGe0GMM82MpvLtripTzvA7CAu0cRs+BjwoCOIl3xhU
+         R0oz4U1+W0ma3belxZJBa68akT1p8BXmDUjCESTuiUHEpPSil2Hmk/+s4UFzWEkSyZ2b
+         OSP6qoZSwpzMMlHTYZruR4AoXxiTgynuWhN9pZjRdi1c052HPPsrV4pC0+mUPIhDX673
+         Zz9bMrV7jgXkznMSGvfgLXwK16dTdqj1CFwNbFizBH61eFSzz/AgtfW1bVepDrRO28yM
+         NuUA==
+X-Forwarded-Encrypted: i=1; AJvYcCXfs7lTQEZIawBxa+3oyHMm0Bwspu+2o60Lpp7bb03sftbYoB6w4e4Fa7sHI8jQ0vlzjXJ7kDk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzxpeIbgKH8rJfIudI4zBrtWtDabNU0ExpKh5tlWHJJyIVs6sdn
+	QDSfazK6NktgPpHB5yfEJR+8pOItGsfVLYnvFja191KsdpnuZqkyyER7pFCmuc/7/EI=
+X-Gm-Gg: AY/fxX6GRmdu6lHAsTf+T8dlOM+rx1duIY1oPlqp8OVqCGPGuOVhKdU8nU5GnRKA3na
+	Rbydk8wmFTIYPnG9OuuDaPwPUtAVcNBJnT3j+6tz/Wa0xiQxPX2qU0ZFeLoSFHbRP+1uLaBXoy5
+	/rg7zd6JFAc0mdkD6B6XqtchkUzryrMS6L5BCJO5WzhvOLlElfBKVlAXeYlnpQFbT8FgsGuV6Kw
+	MgeEcABVvIpiRyiT9NzF23yDeFkSrSc4waTNYRLDFEgv0cb4GStsvvTS82nEH7HVWTn42LtEjPM
+	MusOQNH99Bqo+VQ0Y9O0YGWvvEQ1ckt0qeFM0nXvpmjKezxsYjZ0FZhg6XodGZF6qiOXpX90ikO
+	99zSpuBN/mYz4BoMgVm2wEZ10Sgb2k8AB/vNGcf92A5BdaaxblMH7fXuOJ9eRwAVe5E5PYr74GJ
+	icrqT/li8PSCDYUmBqGQW/+Z+9bDiE9OjvMWvtA+OLrg==
+X-Google-Smtp-Source: AGHT+IH3fMt96wP9+5/cjnguTDIZz8YgGHxMBC46sU92EVfEEwlbtcITHEH6mygiqdo5JACpONinJA==
+X-Received: by 2002:a05:6000:4201:b0:431:74:cca with SMTP id ffacd0b85a97d-43100740d6cmr4977272f8f.44.1765871916089;
+        Mon, 15 Dec 2025 23:58:36 -0800 (PST)
+Received: from [192.168.0.161] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-430fa5f6ab7sm14452090f8f.25.2025.12.15.23.58.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 15 Dec 2025 23:58:35 -0800 (PST)
+Message-ID: <32b3de64-93d5-4342-8255-6e6f991b933a@blackwall.org>
+Date: Tue, 16 Dec 2025 09:58:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aUB4pFEwmMBzW52T@lizhi-Precision-Tower-5810>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] vxlan: fix dst ref count leak in the vxlan_xmit_one()
+ error path
+To: Wentao Liang <vulab@iscas.ac.cn>, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: petrm@nvidia.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+References: <20251216033647.1792250-1-vulab@iscas.ac.cn>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20251216033647.1792250-1-vulab@iscas.ac.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Dec 15, 2025 at 04:07:48PM -0500, Frank Li wrote:
-> On Mon, Dec 15, 2025 at 11:11:03PM +0300, Dan Carpenter wrote:
-> > On Mon, Dec 15, 2025 at 02:28:43PM -0500, Frank Li wrote:
-> > > On Mon, Dec 15, 2025 at 09:33:54PM +0300, Dan Carpenter wrote:
-> > > > On Mon, Dec 15, 2025 at 10:56:49AM -0500, Frank Li wrote:
-> > > > > On Mon, Dec 15, 2025 at 05:41:43PM +0300, Dan Carpenter wrote:
-> > > > > > The s32g devices have a GPR register region which holds a number of
-> > > > > > miscellaneous registers.  Currently only the stmmac/dwmac-s32.c uses
-> > > > > > anything from there and we just add a line to the device tree to
-> > > > > > access that GMAC_0_CTRL_STS register:
-> > > > > >
-> > > > > >                         reg = <0x4033c000 0x2000>, /* gmac IP */
-> > > > > >                               <0x4007c004 0x4>;    /* GMAC_0_CTRL_STS */
-> > > > > >
-> > > > > > We still have to maintain backwards compatibility to this format,
-> > > > > > of course, but it would be better to access these through a syscon.
-> > > > > > First of all, putting all the registers together is more organized
-> > > > > > and shows how the hardware actually is implemented.  Secondly, in
-> > > > > > some versions of this chipset those registers can only be accessed
-> > > > > > via SCMI, if the registers aren't grouped together each driver will
-> > > > > > have to create a whole lot of if then statements to access it via
-> > > > > > IOMEM or via SCMI,
-> > > > >
-> > > > > Does SCMI work as regmap? syscon look likes simple, but missed abstract
-> > > > > in overall.
-> > > > >
-> > > >
-> > > > The SCMI part of this is pretty complicated and needs discussion.  It
-> > > > might be that it requires a vendor extension.  Right now, the out of
-> > > > tree code uses a nvmem vendor extension but that probably won't get
-> > > > merged upstream.
-> > > >
-> > > > But in theory, it's fairly simple, you can write a regmap driver and
-> > > > register it as a syscon and everything that was accessing nxp,phy-sel
-> > > > accesses the same register but over SCMI.
-> > >
-> > > nxp,phy-sel is not standard API. Driver access raw register value. such
-> > > as write 1 to offset 0x100.
-> > >
-> > > After change to SCMI, which may mapped to difference command. Even change
-> > > to other SOC, value and offset also need be changed. It is not standilzed
-> > > as what you expected.
-> >
-> > We're writing to an offset in a syscon.  Right now the device tree
-> > says that the syscon is an MMIO syscon.  But for SCMI devices we
-> > would point the phandle to a custom syscon.  The phandle and the offset
-> > would stay the same, but how the syscon is implemented would change.
+On 16/12/2025 05:36, Wentao Liang wrote:
+> In the vxlan_xmit_one(), when the encap_bypass_if_local() returns an
+> error, the function jumps to out_unlock without releasing the dst
+> reference obtained from the udp_tunnel_dst_lookup(). This causes a
+> reference count leak in both IPv4 and IPv6 paths.
 > 
-> Your SCMI syscon driver will convert some private hard code to some
-> function, such previous example's '1' as SEL_RGMII. It is hard maintained
-> in long term.
+> Fix by calling the dst_release() before goto out_unlock in both error
+> paths:
+> - For IPv4: release &rt->dst
+> - For IPv6: release ndst
 > 
+> Fixes: 56de859e9967 ("vxlan: lock RCU on TX path")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+> ---
+>   drivers/net/vxlan/vxlan_core.c | 8 ++++++--
+>   1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+> index dab864bc733c..41bbc92cc234 100644
+> --- a/drivers/net/vxlan/vxlan_core.c
+> +++ b/drivers/net/vxlan/vxlan_core.c
+> @@ -2479,8 +2479,10 @@ void vxlan_xmit_one(struct sk_buff *skb, struct net_device *dev,
+>   			err = encap_bypass_if_local(skb, dev, vxlan, AF_INET,
+>   						    dst_port, ifindex, vni,
+>   						    &rt->dst, rt->rt_flags);
+> -			if (err)
+> +			if (err) {
+> +				dst_release(&rt->dst);
+>   				goto out_unlock;
+> +			}
+>   
+>   			if (vxlan->cfg.df == VXLAN_DF_SET) {
+>   				df = htons(IP_DF);
+> @@ -2560,8 +2562,10 @@ void vxlan_xmit_one(struct sk_buff *skb, struct net_device *dev,
+>   			err = encap_bypass_if_local(skb, dev, vxlan, AF_INET6,
+>   						    dst_port, ifindex, vni,
+>   						    ndst, rt6i_flags);
+> -			if (err)
+> +			if (err) {
+> +				dst_release(ndst);
+>   				goto out_unlock;
+> +			}
+>   		}
+>   
+>   		err = skb_tunnel_check_pmtu(skb, ndst,
 
-No, there isn't any conversion needed.  It's exactly the same as writing
-to the register except it goes through SCMI.
+Did you check what encap_bypass_if_local() does at all?
 
-> >
-> > >
-> > > >
-> > > > > You still use regmap by use MMIO. /* GMAC_0_CTRL_STS */
-> > > > >
-> > > > > regmap = devm_regmap_init_mmio(dev, sts_offset, &regmap_config);
-> > > > >
-> > > >
-> > > > You can use have an MMIO syscon, or you can create a custom driver
-> > > > and register it as a syscon using of_syscon_register_regmap().
-> > >
-> > > My means is that it is not necessary to create nxp,phy-sel, especially
-> > > there already have <0x4007c004 0x4>;    /* GMAC_0_CTRL_STS */
-> > >
-> >
-> > Right now the out of tree dwmac-s32cc.c driver does something like
-> > this:
-> >
-> >     89          if (gmac->use_nvmem) {
-> >     90                  ret = write_nvmem_cell(gmac->dev, "gmac_phy_intf_sel", intf_sel);
-> >     91                  if (ret)
-> >     92                          return ret;
-> >     93          } else {
-> >     94                  writel(intf_sel, gmac->ctrl_sts);
-> >     95          }
-> >
-> > Which is quite complicated, but with a syscon, then it's just:
-> >
-> > 	regmap_write(gmac->sts_regmap, gmac->sts_offset, S32_PHY_INTF_SEL_RGMII);
-> >
-> > Even without SCMI, the hardware has all these registers grouped together
-> > it just feels cleaner to group them together in the device tree as well.
-> 
-> Why not implement standard phy interface,
-> phy_set_mode_ext(PHY_MODE_ETHERNET, RGMII);
-> 
-> For example:  drivers/pci/controller/dwc/pci-imx6.c
-> 
-> In legency platform, it use syscon to set some registers. It becomes mess
-> when more platform added.  And it becomes hard to convert because avoid
-> break compatibltiy now.
-> 
-> It doesn't become worse since new platforms switched to use standard
-> inteface, (phy, reset ...).
-> 
+There is a reason why the code jumps to out_unlock on error,
+encap_bypass_if_local handles that case itself. Don't blindly
+change code, first check what it does.
 
-This happens below that layer, this is just saying where the registers
-are found.  The GMAC_0_CTRL_STS is just one register in the GPR region,
-most of the others are unrelated to PHY.
+Cheers,
+  Nik
 
-regards,
-dan carpenter
+
 
 
