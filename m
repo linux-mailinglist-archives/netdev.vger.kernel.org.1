@@ -1,180 +1,188 @@
-Return-Path: <netdev+bounces-244913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06714CC1E7F
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 11:06:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 53020CC1F1F
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 11:20:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5CF7C300E145
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 10:06:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0264D300BBB9
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 10:20:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 728CD30C376;
-	Tue, 16 Dec 2025 10:06:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDD2E315D32;
+	Tue, 16 Dec 2025 10:20:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="PbHP4YRp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f77.google.com (mail-oo1-f77.google.com [209.85.161.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SEYPR02CU001.outbound.protection.outlook.com (mail-koreacentralazolkn19013083.outbound.protection.outlook.com [52.103.74.83])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8704223323
-	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 10:06:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.77
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765879598; cv=none; b=iDhdRb4h7Sj0wWEMnGOopOfLGUxOScjHv1rqEbQ2OTP4cbQaqOl8qc5qIJjtVWJe+xTFWuuB3/5GMHChemLUwEMz3G5XQP3+JSr2AeT4yjIkEE4gwjd4TRkdFtS4lTHYGWPNuYlpC38MChCHZz8uT1nBo2jGx0+iDBy/6p1dTiU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765879598; c=relaxed/simple;
-	bh=Qvd1NP5Xf9TeKcs1qYesTBGue9jRZL+FCu0Kzl25spo=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=JCTH25fBYF4+2WDHd8fiHpetxWY47CB6kmOgqGlODk4xy50p9tmBveEDge78BL1R962V0C/oCnp/dFCd4KKAtoPptaSNB5PuJNywgIPvBbhVEEljAsbCuRksATUsJ3nku+o/0YVF06r24/K0h3tDqm+X+CA88pROH8z7UiP+WPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f77.google.com with SMTP id 006d021491bc7-6573d873f92so3706068eaf.2
-        for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 02:06:36 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765879595; x=1766484395;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SUJpa87UrKKziuKtUiBdGUaEWcsGpioTwzn+vG4XG6I=;
-        b=f/jUKAD6hyR/xb806y9gx4JjYUc3O2WWYb2OjW16lq++RRZOLw9Qo8No73mC2b+sdh
-         uyKy7PtYzOIIg5pL+iE22clRzpyNtGUazU71qe7Ti7inRGrDuVAg519Uq+9MdovswHI1
-         4qAJgX9sBS2MeKor0zv4D0151ulXQ4VzZ4BoGewJpV21Uk70wD+X3TQ29OGMysg2m5h+
-         TiiRRCFAWxLKph2UfxTJ2fj+WcUNLp3TcWjXjvwMpcxUsaAVss8msF9lGiOG2/1Ak9wA
-         aq4RC/eEJtCNrGzTicJ5qA3PD88NdlEZN2+6IRZrSRntLjorI40uLYH237AMoD8TAqpC
-         2X5g==
-X-Forwarded-Encrypted: i=1; AJvYcCVmz+LjUbDe1N6qYj4RiXrhbameYCGWtNMdnAVtcIKiMC8WeXZd4wIb4ejM2kzjqWTSkN666dM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzs/RtxdrAR2LsrguVsKc+3cXNj7ZdmTvnghXfK/0CyyZBObcBG
-	+9v18t9RvN+2OAA6BMKk7HwO0Oa1KAVO2RjC8Gim2sfR2iGaemN5h5dfpA+3LBkPo1OxvSdQtXA
-	iF9oCQtgNpO7CSA2LerZwqN5Tc1gH/VEEIgTJ8P5F/wMpZV7yDY7MCmZEmQ0=
-X-Google-Smtp-Source: AGHT+IG7G6T3Hen13lkGA8rw46Ci0BTT+qn6Zc2NlE4Bh+pJMOxQZ+ETXsSn5SZdkhQrKFYELYTi8O0kF1wYhens5JFzSG9VE3Xp
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC1A52FDC3D;
+	Tue, 16 Dec 2025 10:20:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.74.83
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765880414; cv=fail; b=R5l72jZrd6OH2JHW5etx87qSeivXD05b7d1FWhGnKBsY3Yfi4migsDTyxkfGeYOMxKTbCJFSC3HvYh99cawLUkG06mBfdvGAlS+hQbd54sanMBABpNYRZZ7HgHybfFgK2RXHelmmQlxmCTHgsshp9FTEZhiGVYmJu1GU1/wFsT0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765880414; c=relaxed/simple;
+	bh=QvS/y1KqNxd2do2RRIm7t5So0/sXaCiMevieMTPhRAI=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=k2uRWI1/a8xdrToPfLnMA6CYDaPz2Yy49U4HHTE/+dhJyJ2Tt5JrIG+KPpGZX+dPd6FJlUWTQ4WLRlwx9ycBqnbEubo+ZrbVxaIvRw7fYt1CzF6Y5MLwOyXNp77yhWZUbZMPEhW1OUQBJO5yLUDRQe5MfBYiP6lnxiG2C2h9kq4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=PbHP4YRp; arc=fail smtp.client-ip=52.103.74.83
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Ug6DDbwq857da40Eoo2/+kZIuimgWAZ27Z40Y9KmcNdtBVyfOCCWp3O/ylC/0CeUJw2LSIGH5o2RjYikcuH2xN6yNUAew4A5cYiK6xyc1kj/pLNmdnbF3PKSb+Rj+H6vRBW6aFI4U77qp/DZCnELuw1Y21S8QlNNmGC9YkFhvUt/gozLHr2FwrqDHmR5keK3MTrj9H/+xeA7VmM/qy69ywyr/bNAQedkY+ZBf95gNOK+CCQdGys8GpkKcwnRhdJHOM9xm2TU9znWj2HiXPtNXi7eaJMH3bLX1B2qaNC4YTu7bXD3CUIyAS81q5epCCpF6GT0/gNfkmsC0T0WJiVc5A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QvS/y1KqNxd2do2RRIm7t5So0/sXaCiMevieMTPhRAI=;
+ b=Mg+V7rIIYvjgwopdjH6AwH7YSqDzHjZoJCSqcOYXO5t6qtWHUpyEtrDgySDtsGvDu79sTnDWz/Owl+s7PJBk9xQGctrAZZ71fY8qNe7zEj1D4C6T6jy7Mk3WCDXN4hZiHyZt6xVq+JX6yuZUlOqhsoDyabigtDOqL2zV/rnysZc/8sC5UiqlrZJSP1yCiUp3xNBIYil9Yn3++MYLnGhA5hl84tJFjugDP1E9dZ6lAqGn6INErc1Tnb4ThNmMDmgZVjj322E30nikbFLQiuvwUXHohA0XbAbWMIGzJeeaFSj2ngPO69AotYRKJsrQeVCoPuCexB80WZjItgR0LcUglQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QvS/y1KqNxd2do2RRIm7t5So0/sXaCiMevieMTPhRAI=;
+ b=PbHP4YRpCmd/dyrXuiNn+Ls7eG7KQZX2Pth4yWb8X7nHQsRjWVcqgJL/1hNkTuiqswGvaBwCo/QFFHbzUGKflPAv+TNt8RT5/zqX7AeNTuV4IRNiZ849ZGCaP1lpAaXyjK1lxGOWtjRwdKbqXB8H1HqAAiownwipTQxgFSwnacrADgOZ8d560Jv45sPISPoQDVvECWgm7FJf1HiYK704EJKW5kCAi+CBEO64Wj4KhxxFj3NzOhyRB0ZsAiP80hsEJAGgjTr97kVdLNbfN7oFTEX85W/juMP6WxcL9w/okvaGJr6jLNDESM+EebDilCjoI/q6iZTlrHAByoCOoIOlhQ==
+Received: from SEYPR06MB6523.apcprd06.prod.outlook.com (2603:1096:101:172::5)
+ by TYZPR06MB5930.apcprd06.prod.outlook.com (2603:1096:400:336::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9412.13; Tue, 16 Dec
+ 2025 10:20:08 +0000
+Received: from SEYPR06MB6523.apcprd06.prod.outlook.com
+ ([fe80::4f9d:bbfb:647d:e75f]) by SEYPR06MB6523.apcprd06.prod.outlook.com
+ ([fe80::4f9d:bbfb:647d:e75f%3]) with mapi id 15.20.9412.005; Tue, 16 Dec 2025
+ 10:20:08 +0000
+From: Abdullah Alomani <the.omania@outlook.com>
+To: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: [PATCH] net: docs: fix grammar in CAIF stack description
+Thread-Topic: [PATCH] net: docs: fix grammar in CAIF stack description
+Thread-Index: AQHcbnUW/uU0ndLqa06O2qf98g64SQ==
+Date: Tue, 16 Dec 2025 10:20:07 +0000
+Message-ID:
+ <SEYPR06MB6523AA8FFC17D23FD3539A658EAAA@SEYPR06MB6523.apcprd06.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SEYPR06MB6523:EE_|TYZPR06MB5930:EE_
+x-ms-office365-filtering-correlation-id: ec01f3fc-8c99-47fe-c9ae-08de3c8cafe7
+x-microsoft-antispam:
+ BCL:0;ARA:14566002|461199028|51005399006|31061999003|19110799012|8060799015|8062599012|15030799006|15080799012|3412199025|440099028|40105399003|102099032;
+x-microsoft-antispam-message-info:
+ =?iso-8859-1?Q?uISeJB04VJhteYieDRX37EaOli8O7pMosqoy5K5zkzeWiCO23TNd5xetlj?=
+ =?iso-8859-1?Q?gmzsnaLQzyEmyFRx2opPtJfSrtSDbcbTAj/WDhd1QzuaQAunlUQKrAAPEL?=
+ =?iso-8859-1?Q?+ZFHCzVREYWoQ7AVEl50sNE+QAj/oZZ46z2InyRqxRTxtMBd20kxlg51je?=
+ =?iso-8859-1?Q?l9ZUk/FrTE+ueoYV+zOL1dFkewH03nYawxbZiQh+k8kwcgoXUnIUkIKqkN?=
+ =?iso-8859-1?Q?X99zuXwdUZhweDd8KLZENtM7386UFDun0GfHafoU34Hhwm3Fq6ULhy6ywE?=
+ =?iso-8859-1?Q?nYlnptPWGwIantPcls3poVSRi54yT1vbnTDNy2LrIzK2Wv368jG//6qitQ?=
+ =?iso-8859-1?Q?ODw0nN+okqprz/XEtFzTiyshBzr4dvVzhtSc6j1hj3GZduz+SvP0ehzOh4?=
+ =?iso-8859-1?Q?CPG/JsYIjfIFA8nSES9ibbXZJoddGek8EGb6LuNat32/U+8AA4VxBhC59+?=
+ =?iso-8859-1?Q?MbmoEEmQcf3uj0Gd3G2OhirWh2Z3Cc/MrLxMJsL3NYQ7V3kTAK5cm1noQG?=
+ =?iso-8859-1?Q?s8cDsU4NX450Viix9mpNaN9LbOoszzU+13FyZtLrrTol8W0CzkFb39vPq8?=
+ =?iso-8859-1?Q?BioNV/UWdTrDaC6AzAhi1dNKmG7ennk3bgnVp5LJK1GhwR1yilzmmcy1P9?=
+ =?iso-8859-1?Q?F3yUdqNPbbbbpjAnMnaqnyXqoQevsCXewhouC9RQrr1HNUoUc+Mg4kjkJv?=
+ =?iso-8859-1?Q?KM5gWDGljD9kpOqEelwpRZVkOl8SZmqpmlWpE0a+PFMChd8m8BqsjsatrZ?=
+ =?iso-8859-1?Q?fpzntBnX0b+9D0JysNEBtP1+558OENlVXHXC2KE3FT1d3z2HIayecCjqxN?=
+ =?iso-8859-1?Q?9F4Dp0Pu8ZTGcZlVzG/lzmuLLXYdHHR+rc0ulZYgmUCzjt4WTh+iVHEc7Z?=
+ =?iso-8859-1?Q?CwNUP5su2tsg/tpib7OvgOq19dOFQls/p7ZWMABFOOx+DpTxCM1DQiwTLe?=
+ =?iso-8859-1?Q?lPzAjfrvY2038ZctRsNfH0qaGUgH2PmCb8Kkt4lmINPcWdoSJ6JP9S9YQ5?=
+ =?iso-8859-1?Q?RDrMfg7HAXRjPBvUdzl0+wIiYMPtC8AACit+jqcQcAd2SqMmVxmf8PJEZK?=
+ =?iso-8859-1?Q?UVj0/Hj4hui7EkWd94YkwRgX+3iMTPT9firs3L6OkCC+H4kAvAJmnv9z2n?=
+ =?iso-8859-1?Q?XJvpaCKixdRuckraFubPc9u4DuCAkZbxijRckxYsFBdUv8mSd66sadD8Ko?=
+ =?iso-8859-1?Q?eO2yq3Vi3nGDcQ29nuDm0A81Imn0qpRq+XNS2YUSYBEUMmjZ2C1FyFEuax?=
+ =?iso-8859-1?Q?Rp0IwNeLglkHGAxnoWqg=3D=3D?=
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?l8W6G4grDdwAolcr34rtJYRF5NjKOeG5/BjQeE72EFUmsQg5DY4uH9D2U5?=
+ =?iso-8859-1?Q?0SdzmnzjM7sbbEjyIIAk2ql3U9vG8TJwCaHMT5KyAEyKt9E+dp0c9Mp2Uz?=
+ =?iso-8859-1?Q?DbDhfbjdZxA1P29Yum7dB4zq//5Xr266s/YdGP03ODyw43zLp0IAfdzPOq?=
+ =?iso-8859-1?Q?UX1I8M0cikOorQiIlaI7gSY0dGJ/osRimoiDD40nj/k2jTJPk4xLsFi/UJ?=
+ =?iso-8859-1?Q?g/e7pxz5tHAN27sotMgPgCxKcs/iqnSe3R0ljRWODX9V+QGE8FXPFyaVJm?=
+ =?iso-8859-1?Q?YEb0f4iw4D9xwcR8lNOij/z4fyfhvpdtRKZnSPqDaWjlKg4DFkQuKhFIpG?=
+ =?iso-8859-1?Q?g3y2uiFnXANxfMv4PGEPUoFz0dImBh4Xto/xSvoeH4gOm23ny1hPnk5hEJ?=
+ =?iso-8859-1?Q?eMJV/Yg+JA+ND50UzVWvXsDw9c29Z3PvTBP+/eU4gfB2g+2EfgAU2t/TQY?=
+ =?iso-8859-1?Q?SgMGAtdnKavLqeXJ6nENPiasa7hj++me3EL9ZdhzFFpnnKP5/nKMlz7pum?=
+ =?iso-8859-1?Q?YnIc0cydC9DdfIHHpteitHjsk8qFXHQvV74u0HtLA1GOyoInnpFYA1/JSB?=
+ =?iso-8859-1?Q?5YT8izbdQxJi9JoeBj1r+YlKxvc92H2UUGAKgTmXGpA7GGnmgrngKy+n4Z?=
+ =?iso-8859-1?Q?j3L8oUKlOQJGOQDpTIcVNBimcUfcmW1RflFmF6Tkl7iBeenXcg0wdH06Nk?=
+ =?iso-8859-1?Q?fq/UZgP0fojp1LoAlMLUjb/4xnjIidbULmTV2KUUTZlydNOzDinFEel0Yb?=
+ =?iso-8859-1?Q?zGcnEdjxqT63tfrAatGxxAGda4rFmGZUaWUpwBEdGN0UBGn2FY7TfdBDx4?=
+ =?iso-8859-1?Q?zC25+pQBTfSZdgeKXy/hSaWbyWDxthJqSLIPI8SQknHnbNU7es1JAkQsnw?=
+ =?iso-8859-1?Q?EdP3G5R38B/CIIwkhK3KWpByJOI/GvGCqsGpZ99wBCHjfdSSNaaW/l7fM1?=
+ =?iso-8859-1?Q?FJqRmq+4e0LV+/jVIPoFMq5OSDW0YXOGcQ6kGjLb4et+GHm6Ty3XytMB44?=
+ =?iso-8859-1?Q?z0EjWWYR9h78CVJ0gs3M/w+vimORzXnyyUHmGg6Ls5VevSuEZ96UZPbXyy?=
+ =?iso-8859-1?Q?BZ/RRF2TSs9/aUKEYrmJokbx1DSrM2yLp9ZlvPNtR8f/dOlzhK5HL0l6kD?=
+ =?iso-8859-1?Q?fN+WVE9k1GHpLwatg7cmJdyzSOpWVuWUmfMbBbDt9oOVDEN+/0xETGiDEX?=
+ =?iso-8859-1?Q?lp0ZS6PPEAbSUHtkhOMCOmrYgm6/MMMkPM3yxBroV0NzQ4qXOZxEgR44MN?=
+ =?iso-8859-1?Q?wXCF5M45bkjRSZYvye0vBaUAYLgEC7K3E2mzxKpO4psvVTm0avd1/aWUlP?=
+ =?iso-8859-1?Q?Cztb2S7UtM2Rw0RzXuMBOqRFulroLlxwXUn+f/NN6g2qf/E=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:1607:b0:65b:81eb:ae5c with SMTP id
- 006d021491bc7-65b81ebb6dbmr279838eaf.8.1765879595628; Tue, 16 Dec 2025
- 02:06:35 -0800 (PST)
-Date: Tue, 16 Dec 2025 02:06:35 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69412f2b.a70a0220.104cf0.034b.GAE@google.com>
-Subject: [syzbot] [net?] [usb?] memory leak in rtl8150_set_multicast
-From: syzbot <syzbot+8dd915c7cb0490fc8c52@syzkaller.appspotmail.com>
-To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, petkan@nucleusys.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SEYPR06MB6523.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: ec01f3fc-8c99-47fe-c9ae-08de3c8cafe7
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Dec 2025 10:20:07.7081
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYZPR06MB5930
 
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    d358e5254674 Merge tag 'for-6.19/dm-changes' of git://git...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11e431c2580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=9a0268003e02068d
-dashboard link: https://syzkaller.appspot.com/bug?extid=8dd915c7cb0490fc8c52
-compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12dd661a580000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/e79f317bb571/disk-d358e525.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/cf9e2849af10/vmlinux-d358e525.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/73d80a967038/bzImage-d358e525.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+8dd915c7cb0490fc8c52@syzkaller.appspotmail.com
-
-BUG: memory leak
-unreferenced object 0xffff888127d51010 (size 16):
-  comm "dhcpcd", pid 5479, jiffies 4294951443
-  hex dump (first 16 bytes):
-    40 05 30 01 00 00 02 00 9e 00 00 00 00 00 00 00  @.0.............
-  backtrace (crc 5546a3be):
-    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
-    slab_post_alloc_hook mm/slub.c:4958 [inline]
-    slab_alloc_node mm/slub.c:5263 [inline]
-    __kmalloc_cache_noprof+0x3b2/0x570 mm/slub.c:5771
-    kmalloc_noprof include/linux/slab.h:957 [inline]
-    async_set_registers drivers/net/usb/rtl8150.c:192 [inline]
-    rtl8150_set_multicast+0x7a/0x1c0 drivers/net/usb/rtl8150.c:679
-    __dev_set_rx_mode+0xc5/0x120 net/core/dev.c:9655
-    dev_set_rx_mode net/core/dev.c:9661 [inline]
-    __dev_open+0x23f/0x3c0 net/core/dev.c:1691
-    __dev_change_flags+0x30c/0x380 net/core/dev.c:9734
-    netif_change_flags+0x35/0x90 net/core/dev.c:9797
-    dev_change_flags+0x64/0xf0 net/core/dev_api.c:68
-    devinet_ioctl+0x5bf/0xd30 net/ipv4/devinet.c:1199
-    inet_ioctl+0x27c/0x2b0 net/ipv4/af_inet.c:1009
-    sock_do_ioctl+0x84/0x1a0 net/socket.c:1254
-    sock_ioctl+0x149/0x480 net/socket.c:1375
-    vfs_ioctl fs/ioctl.c:51 [inline]
-    __do_sys_ioctl fs/ioctl.c:597 [inline]
-    __se_sys_ioctl fs/ioctl.c:583 [inline]
-    __x64_sys_ioctl+0xf4/0x140 fs/ioctl.c:583
-    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-    do_syscall_64+0xa4/0xf80 arch/x86/entry/syscall_64.c:94
-    entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-BUG: memory leak
-unreferenced object 0xffff8881282bae40 (size 192):
-  comm "dhcpcd", pid 5479, jiffies 4294951443
-  hex dump (first 32 bytes):
-    01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    00 00 00 00 00 00 00 00 58 ae 2b 28 81 88 ff ff  ........X.+(....
-  backtrace (crc d110b1b3):
-    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
-    slab_post_alloc_hook mm/slub.c:4958 [inline]
-    slab_alloc_node mm/slub.c:5263 [inline]
-    __do_kmalloc_node mm/slub.c:5656 [inline]
-    __kmalloc_noprof+0x3e0/0x660 mm/slub.c:5669
-    kmalloc_noprof include/linux/slab.h:961 [inline]
-    usb_alloc_urb+0x66/0xa0 drivers/usb/core/urb.c:75
-    async_set_registers drivers/net/usb/rtl8150.c:195 [inline]
-    rtl8150_set_multicast+0x97/0x1c0 drivers/net/usb/rtl8150.c:679
-    __dev_set_rx_mode+0xc5/0x120 net/core/dev.c:9655
-    dev_set_rx_mode net/core/dev.c:9661 [inline]
-    __dev_open+0x23f/0x3c0 net/core/dev.c:1691
-    __dev_change_flags+0x30c/0x380 net/core/dev.c:9734
-    netif_change_flags+0x35/0x90 net/core/dev.c:9797
-    dev_change_flags+0x64/0xf0 net/core/dev_api.c:68
-    devinet_ioctl+0x5bf/0xd30 net/ipv4/devinet.c:1199
-    inet_ioctl+0x27c/0x2b0 net/ipv4/af_inet.c:1009
-    sock_do_ioctl+0x84/0x1a0 net/socket.c:1254
-    sock_ioctl+0x149/0x480 net/socket.c:1375
-    vfs_ioctl fs/ioctl.c:51 [inline]
-    __do_sys_ioctl fs/ioctl.c:597 [inline]
-    __se_sys_ioctl fs/ioctl.c:583 [inline]
-    __x64_sys_ioctl+0xf4/0x140 fs/ioctl.c:583
-    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-    do_syscall_64+0xa4/0xf80 arch/x86/entry/syscall_64.c:94
-    entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-connection error: failed to recv *flatrpc.ExecutorMessageRawT: EOF
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+From dca59dfe5e73f39885d1c65b01d8da115a7a2c22 Mon Sep 17 00:00:00 2001=0A=
+From: Abdullah Alomani <the.omania@outlook.com>=0A=
+Date: Tue, 16 Dec 2025 12:20:36 +0300=0A=
+Subject: [PATCH] net: docs: fix grammar in CAIF stack description=0A=
+=0A=
+Corrected "handled as by the rest of the layers" to "handled like the rest =
+of the layers"=0A=
+to clearly indicate that the transmit and receive behavior of this layer=0A=
+follows the same pattern as other layers in the CAIF stack.=0A=
+=0A=
+This makes it explicit that no additional layer-specific handling occurs,=
+=0A=
+improving clarity for readers and developers implementing or maintaining=0A=
+CAIF layers.=0A=
+=0A=
+Signed-off-by: Abdullah Alomani <the.omania@outlook.com>=0A=
+---=0A=
+ Documentation/networking/caif/linux_caif.rst | 4 ++--=0A=
+ 1 file changed, 2 insertions(+), 2 deletions(-)=0A=
+=0A=
+diff --git a/Documentation/networking/caif/linux_caif.rst b/Documentation/n=
+etworking/caif/linux_caif.rst=0A=
+index a0480862ab8c..969e4a2af98f 100644=0A=
+--- a/Documentation/networking/caif/linux_caif.rst=0A=
++++ b/Documentation/networking/caif/linux_caif.rst=0A=
+@@ -181,8 +181,8 @@ CAIF Core protocol. The IP Interface and CAIF socket ha=
+ve an instance of=0A=
+ 'struct cflayer', just like the CAIF Core protocol stack.=0A=
+ Net device and Socket implement the 'receive()' function defined by=0A=
+ 'struct cflayer', just like the rest of the CAIF stack. In this way, trans=
+mit and=0A=
+-receive of packets is handled as by the rest of the layers: the 'dn->trans=
+mit()'=0A=
+-function is called in order to transmit data.=0A=
++receive of packets is handled like the rest of the layers: the 'dn->transm=
+it()'=0A=
++function is called to transmit data.=0A=
+=0A=
+ Configuration of Link Layer=0A=
+ ---------------------------=0A=
+--=0A=
+2.52.0=0A=
 
