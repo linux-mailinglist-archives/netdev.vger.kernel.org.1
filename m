@@ -1,174 +1,221 @@
-Return-Path: <netdev+bounces-244923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244925-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD1A0CC2CFE
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 13:36:09 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14853CC2986
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 13:16:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 661D7301B826
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 12:36:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 964143029B6B
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 12:16:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3103034D39C;
-	Tue, 16 Dec 2025 12:00:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 795713502B0;
+	Tue, 16 Dec 2025 12:13:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kma4nztI";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="TPYD01gm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X51dFIIX"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7733734C991
-	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 12:00:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C7B34F250
+	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 12:13:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765886408; cv=none; b=i39MFhkQcVfMIfhxKF5SRMoZnU7XeNSSRcP1eesxGpMEeRoRsP4bnl+/AmHtL6J2teVm+2xHBiEjLN+rNADJTJcWK8prRl/m1uBqAc7EtDfGigoHI1adAvH1djG9SiEOWs/IZdh0OKrjGSN8ocymsrd+Ec5JzMZCHX+GEk6dzUI=
+	t=1765887224; cv=none; b=ciWZc8FT+S7kOKoZZv+Joxb9d8/DiBkj/T+T05L8m1v727xbFaBR61SHDGwkFct6dWIcvTyrUx5X59ODV9HYzlZlT7sfO1lYGeyXkxMi0S/V0Fmv7n9yh/BX2pk58qyhUgsYzLHkorI7CVHq552KyAThelOOenxYr//XImYo7I0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765886408; c=relaxed/simple;
-	bh=RXYeLW2XkvvCnEbbRD0mciJ2uRel61TJ/NONGFAsFp0=;
-	h=From:References:MIME-Version:In-Reply-To:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iHvISNh2+y0K+/QlhcZ0r8OtIrOK3TaTbWtuulDPqw3OwYgMR1ZmcBZ4OrTRAbuWOI+nhzpJYDIofI0SFRyBGr9w7MGLkZ5blZW1H0n+l7KdPTZtvGqJAMuJvxdoOon4Zvu3D3ZGk1cfZaI1+DskhwFIkeLG8EshC6j62hXTsRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Kma4nztI; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=TPYD01gm; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765886402;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RXYeLW2XkvvCnEbbRD0mciJ2uRel61TJ/NONGFAsFp0=;
-	b=Kma4nztII6/oHW3x0BsuusJb7FrEXMoPyOFt6WIJpI7Ft93/eUkHEpfVS0vHK/0O27A+sq
-	52oh+/NpDsqjH1XUXTfNtkrAKOv3c6BfI1TfbHzoRLzNOnlY76rD17nOuWHdePbdV5+SBH
-	ZINMjdXH4EkPcQImKJOXH2Tr5y6VLrY=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-515-uwNgMn61P-Kuj3UQoAiY_Q-1; Tue, 16 Dec 2025 07:00:00 -0500
-X-MC-Unique: uwNgMn61P-Kuj3UQoAiY_Q-1
-X-Mimecast-MFC-AGG-ID: uwNgMn61P-Kuj3UQoAiY_Q_1765886399
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-b79f6dcde96so1005758466b.2
-        for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 04:00:00 -0800 (PST)
+	s=arc-20240116; t=1765887224; c=relaxed/simple;
+	bh=/4kyx6JuTUj4HqQDL5fD0YXB3s5ROcvNO+Gc0P+Ys1Q=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=GWxANmw3gtEXXMuNU/di54Umm8gaFZ3cqlvp4RKRatBek+XxbKAYMzTOUuTsM0YgKioXuGcU3vimViPHZW0w+MIC0PzsY9xaGJLwigf5Ojlq3HLCMXNaH/IgjdDDtDTXD0mbZOrKLupoHu19IVALz8ZLN9fTPYZ0AB+ewKIAIsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X51dFIIX; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-34c93e0269cso1283421a91.1
+        for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 04:13:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1765886399; x=1766491199; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:in-reply-to
-         :mime-version:references:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RXYeLW2XkvvCnEbbRD0mciJ2uRel61TJ/NONGFAsFp0=;
-        b=TPYD01gm33EarBKCBBnmvE76KQ9Hi+BGW0g6b19LOQX6BaCkaV+1jCENeI0OIA3klu
-         ioudNcGhkpU6OSzMO4XEb88o6WctXLPhKFfgVfwGwpgwT6V9XH1iMUHpR4Bq5wtZkzSZ
-         OWnX9ncGqZf0G+6dJvKCttE7GtbIJ0DZ2rYMjuazp6k4YBrHRv0YhcAKoLZ0FQSeTH48
-         zpIgd+YEFXmNjj16GJW76FsO3l1W+sVWNxTZ38btoETQy4mkgGU3yyTZ3m0flwp4/gxK
-         L7lykp8gRNpJbH8/NdcEVRJaDeHM6BamWOpNnthak+eMiT8vcScCadb5+QOur6YLLaD3
-         Uysw==
+        d=gmail.com; s=20230601; t=1765887222; x=1766492022; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Z+ncE4gPE3ALMb2f5l4z/btioNlvQ97Fqg7z/7QtpPQ=;
+        b=X51dFIIXwIYa/FsVLHctR1tCr40JZPqX2Wd2RfeIBFM7b6OGD7NnxMJoTbEu4pExcr
+         Zdab90+lKfuixHS/Y09Sktf/BuXgfHDXj6Z8xar43dzqaiSIHLtafOPOJn4U0NqN2k9o
+         bBCOAAVhX9QXdmBNNWcV24IE3Bjs5Vgq0yev2buKZfHGNFpdpPYN4YAHj8mm9MXKe4C0
+         HZNkKx2N0gNBYiJZVS5APltk7qJG/MnWmmfbVKVGhGE8jHxN/pNOtl0fiPEsnRaF7n7O
+         Qewh1qgU2FWmUDw3KC7nDkgZEg8OlVU77b2CgupOQPdNEcPrLqG2S753/29lUWWRfGY3
+         Kz6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765886399; x=1766491199;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:in-reply-to
-         :mime-version:references:from:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RXYeLW2XkvvCnEbbRD0mciJ2uRel61TJ/NONGFAsFp0=;
-        b=cBroQPSvov/AG26wx/OdSBvS2cT2il5LbjabIaMvMa6fPp2//9WtjYReTM/kNljGgG
-         nNrUA0Lr+OuQJ+ZL4qN7ru36LEskDZZpdLLHqOqUdlPBG3zwMQe9lQR+7QXl3kfX8+r1
-         pvuWbkJTmVCZCScVkYKHvgdbtIHIGInEQWEeT7wx4Qw/wV7dA03oFm3lP6tWF38FQpeo
-         k/Q8HcuXza9Ko/lgggj8cF2wo+DnRbpkvckzL6fk2EFc0Erompu/zhgHzkcbW9XiNnz+
-         ZP4wdXOC8ahb+q5uXGGRf1P/IqmPjME+FeUJMgx82XKiY23uw0pvZf+D8T6jb7BUF57n
-         QDyA==
-X-Forwarded-Encrypted: i=1; AJvYcCXYNYV5pPSnP0JwYrQwDZ28n4ccTdbMv8gQB7Gx+J+HrPsNvud1rr/R6dDSh0OGYR+18XBBtqc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7bXtkxLqvDvknvEx/8npe94/MveXdoLjUS96HuhTGGuxDZM5U
-	1PEjN173qO8HsyYk5dT0AxUJS+G30SpXRb7ADPn9LyslYkutIjKTQbUFWuubHcxpSTPk/UNAiQU
-	FgviHlXivlMH8Yisl0ZQdnihZk12Kk1dY3d1da+sXSiklW/jNBOs2zefmAMTWXs0CuqnbLIJDMq
-	fPXBHKpIA4Gz5Rgj0YJ2mlwp0XZwgtzGnT
-X-Gm-Gg: AY/fxX5rCCwSY17gh90dMJzS6qCZF8sxcDfn3JOIbHgPE6ITWYnP2l9WxtYX2GSPF2Y
-	IshA7R5LCfUbbytiECy0l3GboM9qxIWCUsRUWN5BzJuvCOkPhmPuIlJEmFBmp5k9Q7Rn+QmPrmW
-	3iKR4WHHjVsdj+t2FtD8mryGiA+p2/KX1lx9sBSg+j1phirm2QzK86Y5B4P/PIu9H9mR99
-X-Received: by 2002:a17:907:7296:b0:b79:ecb0:db74 with SMTP id a640c23a62f3a-b7d23d11086mr1315644066b.59.1765886399406;
-        Tue, 16 Dec 2025 03:59:59 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHEPKy1Hw/u0C7BzYtJuy83NwNy1BeV3TwcUncJkKLgQxEHkFGCD3kgPt0u+a+yZMBB9+s+C+7ah7s6rCxO5p8=
-X-Received: by 2002:a17:907:7296:b0:b79:ecb0:db74 with SMTP id
- a640c23a62f3a-b7d23d11086mr1315640766b.59.1765886398975; Tue, 16 Dec 2025
- 03:59:58 -0800 (PST)
-Received: from 753933720722 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 16 Dec 2025 11:59:58 +0000
-Received: from 753933720722 named unknown by gmailapi.google.com with
- HTTPREST; Tue, 16 Dec 2025 11:59:58 +0000
-From: =?UTF-8?Q?Adri=C3=A1n_Moreno?= <amorenoz@redhat.com>
-References: <20251211115006.228876-1-toke@redhat.com> <f7t5xa7anvk.fsf@redhat.com>
- <CAKDHXDHsdfRfaDyfzoTymsPkm=mPdFtJOA=GHb6HGx6TjvYA7w@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1765887222; x=1766492022;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Z+ncE4gPE3ALMb2f5l4z/btioNlvQ97Fqg7z/7QtpPQ=;
+        b=sPSc8aYTb6rxEcK9Meqw0Yfuo6lQX7nO2N2Pttq0AQ5X/tXy0Wj+TXcqZVs+MshX/O
+         jZ4a+VDPsjBPH6pZY2Xt/ovVYkX0gO1TKdX8kdxs+H0Xg0M3rqWK5xnf3H9lVCO315cE
+         QkH7ceYzqx1qMhHhw4uCysj4JzW0lE6xfstSZ6ksJj5oLwEY6s//dLLeaiIsXks2/Lea
+         puKLlw9Y3cuW5ylNBChPVu3ztqYsJmOWV8gpP267kR99hERs6ZHw49+0MgrPge+D/hYt
+         q2aoqmXuHsUpqyAqFTH0aEv+xm9KFpUlprqglPPWEBuWJrBLiw+9XYSq55falHsvYjWS
+         juwQ==
+X-Gm-Message-State: AOJu0YwfqK7kHAIYBqhL94mMnTWTHbe4AVtjfwppmIHyGfZ9fL4WpqMj
+	nmwoY/Adf+Zomhx9x7o5hcJ/u8pIPDFzQB3mxZV0shlqGhMFBKtRH+AH848QUA==
+X-Gm-Gg: AY/fxX7Qjjku/D7dNI1SECHcdrhJJBU6W0KkcwMFMx4L6zlOiRhhbv+xvSDiT0IXzhI
+	JMwj/N3rGguxPOezdGThvBYrYExkKXF7zM+Chj+6LcXyNCrYPC3FyCrFwnYplu7jWsS8lxO6jfJ
+	anjSbGxK1+wbrlxIVtXFa8b8MYPZIHSPTnq2VF8Z/UbDtEtZe2ObkLDqPRGPjyySaPbjELILbzF
+	q65Y9XBrm/1bPa9hv8OacgOn28fNrWumefQKmHQoqRZ0EnSmulVIlEjozZWr9aGbWrnhcR11/no
+	mE6//oVj2tZUoplMUDtfbRhwJSBx5/A3jwMRMfclvJ0eJzz4C1GWk6iCEIl9FuLff02C2C0OOAZ
+	Zw0q+dMMZ+/xnZiRXDHmoZobLX2uu0BqPUVj1L0Ubt/hsQAkrhPpgj4GF4HhMgw8/3Jg3wlVcyJ
+	Rv+DygYg7PLEReuVuAaipbyGkcT2G9
+X-Google-Smtp-Source: AGHT+IF2W1U+zEhuQpD9htDknN0GiwzPBhppXNc52n2TKoBe4Bb1WzM+z5TXw+Szfy2wyWGjocRong==
+X-Received: by 2002:a17:90b:3bd0:b0:32e:72bd:6d5a with SMTP id 98e67ed59e1d1-34abdc4b083mr14168682a91.1.1765887221481;
+        Tue, 16 Dec 2025 04:13:41 -0800 (PST)
+Received: from DESKTOP-6DS2CAQ.localdomain ([211.115.227.244])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34abe200077sm11770023a91.3.2025.12.16.04.13.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Dec 2025 04:13:40 -0800 (PST)
+From: Minseong Kim <ii4gsp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	stable@vger.kernel.org
+Subject: [PATCH net v4] atm: mpoa: Fix UAF on qos_head list in procfs
+Date: Tue, 16 Dec 2025 21:09:10 +0900
+Message-Id: <20251216120910.337436-1-ii4gsp@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20251204062421.96986-2-ii4gsp@gmail.com>
+References: <20251204062421.96986-2-ii4gsp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAKDHXDHsdfRfaDyfzoTymsPkm=mPdFtJOA=GHb6HGx6TjvYA7w@mail.gmail.com>
-Date: Tue, 16 Dec 2025 11:59:58 +0000
-X-Gm-Features: AQt7F2oESsHo2hZgAlHuocZrz0XEUSt0irAWdNZP-YQ3iOXqnP75EaSgWFxNfNM
-Message-ID: <CAG=2xmM_AyOmvDbuAi7CmgGDhtYkDDe_kmFG_iAc11JqnbHhuA@mail.gmail.com>
-Subject: Re: [PATCH v2] net: openvswitch: Avoid needlessly taking the RTNL on
- vport destroy
-To: Vladimir Shebordaev <vladimir.shebordaev@gmail.com>
-Cc: Aaron Conole <aconole@redhat.com>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
-	Eelco Chaudron <echaudro@redhat.com>, Ilya Maximets <i.maximets@ovn.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Jesse Gross <jesse@nicira.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	netdev@vger.kernel.org, dev@openvswitch.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Dec 16, 2025 at 04:31:14AM +0300, Vladimir Shebordaev wrote:
-> Perhaps, ovs_netdev_tunnel_destroy() is also worth to be modified this wa=
-y.
-> It is invoked as a vport destructor in similar code paths and even has a
-> nice comment about its double duty.
->
+/proc/net/atm/mpc read-side iterates qos_head without synchronization,
+while write-side can delete and free entries concurrently, leading to
+use-after-free.
 
-In this case OVS owns the underlying tunnel device so it's less likely
-that someone will delete it by other means. Still, I think you're
-right and we could spare one RTNL lock in such case.
+Protect qos_head with a mutex and ensure procfs search+delete operations
+are serialized under the same lock.
 
-We can fix this in an independent patch so that Fixes points to the
-right commit.
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Cc: stable@vger.kernel.org
+Signed-off-by: Minseong Kim <ii4gsp@gmail.com>
+---
+ net/atm/mpc.c       |  9 ++++++++-
+ net/atm/mpc.h       |  4 ++++
+ net/atm/mpoa_proc.c | 11 ++++++++++-
+ 3 files changed, 22 insertions(+), 2 deletions(-)
 
-Thanks.
-Adri=C3=A1n
-
-> --
-> Regards,
-> Vladimir
->
->
-> On Mon, Dec 15, 2025 at 4:16=E2=80=AFPM Aaron Conole <aconole@redhat.com>=
- wrote:
->
-> > Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com> writes:
-> >
-> > > The openvswitch teardown code will immediately call
-> > > ovs_netdev_detach_dev() in response to a NETDEV_UNREGISTER notificati=
-on.
-> > > It will then start the dp_notify_work workqueue, which will later end=
- up
-> > > calling the vport destroy() callback. This callback takes the RTNL to=
- do
-> > > another ovs_netdev_detach_port(), which in this case is unnecessary.
-> > > This causes extra pressure on the RTNL, in some cases leading to
-> > > "unregister_netdevice: waiting for XX to become free" warnings on
-> > > teardown.
-> > >
-> > > We can straight-forwardly avoid the extra RTNL lock acquisition by
-> > > checking the device flags before taking the lock, and skip the lockin=
-g
-> > > altogether if the IFF_OVS_DATAPATH flag has already been unset.
-> > >
-> > > Fixes: b07c26511e94 ("openvswitch: fix vport-netdev unregister")
-> > > Tested-by: Adrian Moreno <amorenoz@redhat.com>
-> > > Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-> > > ---
-> >
-> > LGTM,
-> >
-> > Acked-by: Aaron Conole <aconole@redhat.com>
-> >
-> >
-> >
+diff --git a/net/atm/mpc.c b/net/atm/mpc.c
+index f6b447bba329..c198381281fa 100644
+--- a/net/atm/mpc.c
++++ b/net/atm/mpc.c
+@@ -9,6 +9,7 @@
+ #include <linux/bitops.h>
+ #include <linux/capability.h>
+ #include <linux/seq_file.h>
++#include <linux/mutex.h>
+ 
+ /* We are an ethernet device */
+ #include <linux/if_ether.h>
+@@ -122,6 +123,7 @@ static struct notifier_block mpoa_notifier = {
+ 
+ struct mpoa_client *mpcs = NULL; /* FIXME */
+ static struct atm_mpoa_qos *qos_head = NULL;
++DEFINE_MUTEX(qos_mutex); /* Protect qos_head list */
+ static DEFINE_TIMER(mpc_timer, mpc_cache_check);
+ 
+ 
+@@ -246,10 +248,11 @@ void atm_mpoa_disp_qos(struct seq_file *m)
+ {
+ 	struct atm_mpoa_qos *qos;
+ 
+-	qos = qos_head;
+ 	seq_printf(m, "QoS entries for shortcuts:\n");
+ 	seq_printf(m, "IP address\n  TX:max_pcr pcr     min_pcr max_cdv max_sdu\n  RX:max_pcr pcr     min_pcr max_cdv max_sdu\n");
+ 
++	mutex_lock(&qos_mutex);
++	qos = qos_head;
+ 	while (qos != NULL) {
+ 		seq_printf(m, "%pI4\n     %-7d %-7d %-7d %-7d %-7d\n     %-7d %-7d %-7d %-7d %-7d\n",
+ 			   &qos->ipaddr,
+@@ -265,6 +268,7 @@ void atm_mpoa_disp_qos(struct seq_file *m)
+ 			   qos->qos.rxtp.max_sdu);
+ 		qos = qos->next;
+ 	}
++	mutex_unlock(&qos_mutex);
+ }
+ 
+ static struct net_device *find_lec_by_itfnum(int itf)
+@@ -1521,8 +1525,11 @@ static void __exit atm_mpoa_cleanup(void)
+ 		mpc = tmp;
+ 	}
+ 
++	mutex_lock(&qos_mutex);
+ 	qos = qos_head;
+ 	qos_head = NULL;
++	mutex_unlock(&qos_mutex);
++
+ 	while (qos != NULL) {
+ 		nextqos = qos->next;
+ 		dprintk("freeing qos entry %p\n", qos);
+diff --git a/net/atm/mpc.h b/net/atm/mpc.h
+index 454abd07651a..35719b5c5e88 100644
+--- a/net/atm/mpc.h
++++ b/net/atm/mpc.h
+@@ -7,6 +7,7 @@
+ #include <linux/atmmpc.h>
+ #include <linux/skbuff.h>
+ #include <linux/spinlock.h>
++#include <linux/mutex.h>
+ #include "mpoa_caches.h"
+ 
+ /* kernel -> mpc-daemon */
+@@ -54,6 +55,9 @@ int atm_mpoa_delete_qos(struct atm_mpoa_qos *qos);
+ struct seq_file;
+ void atm_mpoa_disp_qos(struct seq_file *m);
+ 
++/* Protect qos_head list */
++extern struct mutex qos_mutex;
++
+ #ifdef CONFIG_PROC_FS
+ int mpc_proc_init(void);
+ void mpc_proc_clean(void);
+diff --git a/net/atm/mpoa_proc.c b/net/atm/mpoa_proc.c
+index aaf64b953915..b91676187dd1 100644
+--- a/net/atm/mpoa_proc.c
++++ b/net/atm/mpoa_proc.c
+@@ -253,8 +253,15 @@ static int parse_qos(const char *buff)
+ 
+ 	if (sscanf(buff, "del %hhu.%hhu.%hhu.%hhu",
+ 			ip, ip+1, ip+2, ip+3) == 4) {
++		struct atm_mpoa_qos *entry;
++		int ret;
++
+ 		ipaddr = *(__be32 *)ip;
+-		return atm_mpoa_delete_qos(atm_mpoa_search_qos(ipaddr));
++		mutex_lock(&qos_mutex);
++		entry = atm_mpoa_search_qos(ipaddr);
++		ret = atm_mpoa_delete_qos(entry);
++		mutex_unlock(&qos_mutex);
++		return ret;
+ 	}
+ 
+ 	if (sscanf(buff, "add %hhu.%hhu.%hhu.%hhu tx=%d,%d rx=tx",
+@@ -277,7 +284,9 @@ static int parse_qos(const char *buff)
+ 		qos.txtp.max_pcr, qos.txtp.max_sdu,
+ 		qos.rxtp.max_pcr, qos.rxtp.max_sdu);
+ 
++	mutex_lock(&qos_mutex);
+ 	atm_mpoa_add_qos(ipaddr, &qos);
++	mutex_unlock(&qos_mutex);
+ 	return 1;
+ }
+ 
+-- 
+2.34.1
 
 
