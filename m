@@ -1,122 +1,92 @@
-Return-Path: <netdev+bounces-244882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E997CC0BA6
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 04:37:22 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C468CC0C15
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 04:51:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 98E21301FF68
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 03:37:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B7819302F68F
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 03:49:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA17B30E856;
-	Tue, 16 Dec 2025 03:37:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A45D279795;
+	Tue, 16 Dec 2025 03:49:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com [209.85.161.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF7EE30DD12;
-	Tue, 16 Dec 2025 03:37:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A36661CBEB9
+	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 03:49:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765856239; cv=none; b=lX+e/oobSPbaAdCb6MhXnCUvOnIQdNdZ/SJky4neZ3srylrTQY0Etx5StDYgpSXQCDKzb9K8amLnWohd0dWjYTX51yBgDDjILwZcCushmWZdMY2HJNqz+0ohUwVdneFgLdkXsyK7QVjg5w4LO6a8x/FGW4ytdFHpqhiEy09pcUE=
+	t=1765856946; cv=none; b=g+F9hq/xMtXE4sgg32xtDpQi+45DSveRZLXEAUaU+fbuK2K7kMH9D1TdgwEp7rMkrwyLOP7le/SGwQD+y2+MyynIhrBkpxvWQWlYeQklmUoD47NM/wrA/B6QECk7tKqj56+ms7iXjfdQa52tys61ep4+fCzil+1sgRsU5AhDBVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765856239; c=relaxed/simple;
-	bh=bAD7qxNiFLFdzt7WlIweVUEMW3vywq12f1bQwNdKBXo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=eO1RgKm8dyrtWYTjseiQX4QKHw+RakOr23A4MX7AkTHikgadDeGWn5Tj/xRdj8CTf5nX5om5ZX4RnK4wsojdzG2onXCfx/AMHFTBDG68eWKqJHl0RzFKh+x1bhKqlwr9NcmKfbIGW2DlgevEGVl+VpNiQqS98uumRMra7l8jZdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from dfae2b116770.home.arpa (unknown [124.16.138.129])
-	by APP-05 (Coremail) with SMTP id zQCowABX7A_Q00Bpk4rTAA--.50339S2;
-	Tue, 16 Dec 2025 11:36:48 +0800 (CST)
-From: Wentao Liang <vulab@iscas.ac.cn>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: razor@blackwall.org,
-	petrm@nvidia.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wentao Liang <vulab@iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH] vxlan: fix dst ref count leak in the vxlan_xmit_one() error path
-Date: Tue, 16 Dec 2025 03:36:47 +0000
-Message-Id: <20251216033647.1792250-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1765856946; c=relaxed/simple;
+	bh=Unutd6wCkiNh4RacUyjP326EvR/Ys1jEQu6+sKGiWAg=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=pz1+0ptDJHsl9W3TCsIpW2V48fjfY4Go1eiiSLwPtH4CvCPOZRzGkraXADqNFwGOrEnv4O77PPhuqdUHK5eoIt0VfV1dVrmV/9zGH/a8Q3ACNgl64Pm95Xq+wq7b01CJfaPQnNiLvGVOhECls0XYpEjfC4kBq5OgQkCWro7PasU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-65703b66ebfso6359160eaf.0
+        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 19:49:04 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765856943; x=1766461743;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UA7NZRyjwv7hEiqYjxI52dnHRVbVd/ftI8bUbW0TUwQ=;
+        b=auMgB4a7B6vuR7RFfDsAcCWnrvPVcOVq4d9mwAHqmZyuFX8NVDS83mlXiN3SVLbdv2
+         6LuQyaZF8tlAYiOvBGG145Yz/dz4FXhM1dEReTCaD8LvmoPC7h/1tEvSbks+mDnMvSUG
+         Z/IDJYgVo6Nf8dsxTT4c5GLjZ8FyVOb3fasbOE+tNOMXuMFqxopjvgPY5ADi3Fg+dk2g
+         q367KTO1eYC2+Y+6rHNQArrAWybom52hcRB+2ZdZRggvJ6YOBV7KGc2gc8fjTkKFkLzR
+         SclLhMvdVTX2Orvx1uCRgQEDHY16MPlfPeqvH/n36pVRQvyGg/MMQE3j18YBHL2mNTnf
+         YcQw==
+X-Forwarded-Encrypted: i=1; AJvYcCXbrj4RlMWbzK5rHCeD+M4HzMwzYTvgHjOOy7Z054NDat7Pyx6cjPy7+rNT4fi8StiE3KZViT4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/t9b8Jz2ca1DKyFGKRiEKKBQdgzYWFUE54yqCVuVzk/4Q++ba
+	0bkgxhZ6WJUrHaQmkmRefl6VwbOL7YRkeATJKwkL7t+4Wltgo3gpsAaKGqpIR0PG9eeoWQirnxs
+	EJATzonQmOmd1EnLKuBGAB0lq+pUe16lTG644KxbrTLUQoR7IPhydzB12tnY=
+X-Google-Smtp-Source: AGHT+IFa3E9j4szhRq4TjaO4AExrxT/b7DDledAz5tQ3PDW6L+l1D/C6ucPqDcs4X3BVKRZBrKXJtp55A0s0736sTiygqQP1UvT6
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowABX7A_Q00Bpk4rTAA--.50339S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7WFWDGr47Xw1DZr1rur47CFg_yoW8XrWfpF
-	4v9398ZFW3J3yqqw4xJw1rXFWrKay0k34Ikr1vka4Fqw13A34DGa4q9Fy29rs0qrWxury5
-	Jr42gryrAF98ZrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9K14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Avz4vE14v_Gr4l42xK82IYc2Ij64vIr4
-	1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK
-	67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI
-	8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAv
-	wI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14
-	v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUn9a9DUUUU
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiDAgSA2lArg2VKgAAsg
+X-Received: by 2002:a05:6820:178e:b0:659:a130:dfdf with SMTP id
+ 006d021491bc7-65b37e856a8mr7438243eaf.8.1765856943606; Mon, 15 Dec 2025
+ 19:49:03 -0800 (PST)
+Date: Mon, 15 Dec 2025 19:49:03 -0800
+In-Reply-To: <20251216031018.1615363-1-donglaipang@126.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6940d6af.a70a0220.33cd7b.0130.GAE@google.com>
+Subject: Re: [syzbot] [net?] [bpf?] general protection fault in
+ bq_flush_to_queue (2)
+From: syzbot <syzbot+2b3391f44313b3983e91@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, donglaipang@126.com, 
+	eddyz87@gmail.com, haoluo@google.com, hawk@kernel.org, 
+	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev, 
+	netdev@vger.kernel.org, sdf@fomichev.me, song@kernel.org, 
+	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-In the vxlan_xmit_one(), when the encap_bypass_if_local() returns an
-error, the function jumps to out_unlock without releasing the dst
-reference obtained from the udp_tunnel_dst_lookup(). This causes a
-reference count leak in both IPv4 and IPv6 paths.
+Hello,
 
-Fix by calling the dst_release() before goto out_unlock in both error
-paths:
-- For IPv4: release &rt->dst
-- For IPv6: release ndst
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-Fixes: 56de859e9967 ("vxlan: lock RCU on TX path")
-Cc: stable@vger.kernel.org
-Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
----
- drivers/net/vxlan/vxlan_core.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+Reported-by: syzbot+2b3391f44313b3983e91@syzkaller.appspotmail.com
+Tested-by: syzbot+2b3391f44313b3983e91@syzkaller.appspotmail.com
 
-diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-index dab864bc733c..41bbc92cc234 100644
---- a/drivers/net/vxlan/vxlan_core.c
-+++ b/drivers/net/vxlan/vxlan_core.c
-@@ -2479,8 +2479,10 @@ void vxlan_xmit_one(struct sk_buff *skb, struct net_device *dev,
- 			err = encap_bypass_if_local(skb, dev, vxlan, AF_INET,
- 						    dst_port, ifindex, vni,
- 						    &rt->dst, rt->rt_flags);
--			if (err)
-+			if (err) {
-+				dst_release(&rt->dst);
- 				goto out_unlock;
-+			}
- 
- 			if (vxlan->cfg.df == VXLAN_DF_SET) {
- 				df = htons(IP_DF);
-@@ -2560,8 +2562,10 @@ void vxlan_xmit_one(struct sk_buff *skb, struct net_device *dev,
- 			err = encap_bypass_if_local(skb, dev, vxlan, AF_INET6,
- 						    dst_port, ifindex, vni,
- 						    ndst, rt6i_flags);
--			if (err)
-+			if (err) {
-+				dst_release(ndst);
- 				goto out_unlock;
-+			}
- 		}
- 
- 		err = skb_tunnel_check_pmtu(skb, ndst,
--- 
-2.34.1
+Tested on:
 
+commit:         8f0b4cce Linux 6.19-rc1
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=137ab91a580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=412fc3ec22077a03
+dashboard link: https://syzkaller.appspot.com/bug?extid=2b3391f44313b3983e91
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=10be172c580000
+
+Note: testing is done by a robot and is best-effort only.
 
