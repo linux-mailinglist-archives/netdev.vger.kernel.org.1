@@ -1,92 +1,110 @@
-Return-Path: <netdev+bounces-245003-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245004-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76B2FCC4D9E
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 19:23:44 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79B0BCC4E37
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 19:30:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 220373037B8E
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 18:23:29 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 3B264302F1BD
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 18:30:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DAAB252906;
-	Tue, 16 Dec 2025 18:13:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D56DE33971E;
+	Tue, 16 Dec 2025 18:30:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T6Nw8kYI"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Cwrm8Sld"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B8A78F2B
-	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 18:13:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5851221FDE
+	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 18:30:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765908800; cv=none; b=EcbBCYLJOpSs4zkK0YjCU61v3bvI8BL1xjGYFlgGpxK4S2Rvy/70zmysekoXsdz+GDsF91tsHcPgUh/+bpvMWJCawB9bl1T25pe2aB8JDBNAjeSEi138Q2pDyLJSFD7JDKd0AzQXtSkpQTm45R169P/p0CT+JBLKx+v8nEvzjZ4=
+	t=1765909816; cv=none; b=op2wcqcW1VB8QIKYRHConwWqT2wrX3F2Q6R++lrl3vOrrzXa0jXdkZX89fHq0paIBTcN/oL/CIUsFNA0yLjXfwkRq3DhzaDn1SHs3QnVpCOmH8n8xFh5841UO080p/SzMCqn7IKH4RBxfXPBnVCmeD/G9yfPGryrfO7NSjlRyoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765908800; c=relaxed/simple;
-	bh=1WD2AgbR0CB6c6WH237tb/F1j4LqnO1t2NAbM5RtarM=;
+	s=arc-20240116; t=1765909816; c=relaxed/simple;
+	bh=/QX1+siljLhXuETEqMly+imYqZN+VvoqR7nTfdr+yXo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fwiiNhq4l1m/Q6oH+21Q/iZb/RLMMAlVMsDlMwLWqA6CbNKUKBh+upfU/a/+HajnK29JnVV+hdGoM7DtI5dwKoQDe+aO1IFlMe0NWgw9umM/pf+TmBWEwyNSewJ6K0ZsSJ4cK6exZ/p0nNd/h8lPZnkLu5Xyjp2jLOtr9GMO/0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T6Nw8kYI; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-b72e7205953so83008666b.0
-        for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 10:13:18 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=sz7iwIvuPUxxUxNYIYOu/2qZEX9bHbLTaDpwRfDNRm3waikysHV0QN4nFXrDfK+FHJt6en4kkywn9reJPrFc8to9hwm6BPZsCERnf9aePYOHutO8z73wrPWfxA+Lz7hrC4eBoudvCQMMt1dHhhHu0hH9XHsrsKxAn58oly4VsMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Cwrm8Sld; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-477632d9326so30062745e9.1
+        for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 10:30:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765908797; x=1766513597; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1765909813; x=1766514613; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RmaB4ev8W3tz37Ek2hvrRn1VIAwgRQkGwDiR4TTSpX0=;
-        b=T6Nw8kYII0Oq2szX1dA0yJMXiCZ34YMP+5BzFW3GbYCfxQNuvNnAhYdYi4He33B/Be
-         NdGk1yQ6O2avS5EIwpYZlaZ5gpVp2Tt35g36/vz+F81UN3Yu12eIPmJdbJ7AUSmrq24a
-         aLSQ25BXlwGeksHsUP7oOTyNlQe7fnOOUag013B27kfTlqYgDvs2kZwZ/4O8GpHsi+wH
-         BAiS98KpnLwub1LBBQzrJNRfWfjI1mw2W2CIQvcupiaoMvPOGVnxj3jBXUUZmfe5lrBA
-         kmWMTdzEwkGyMh5f+wffBGr7VnDTs9PG8J4IgighEbxkIdBXQrjbBcWDjmewO4iwZY9Y
-         OLQA==
+        bh=O2qwyKoiSE4y0S7R/sYbAU8Ep9J/DNr0jxtlpXQRjF8=;
+        b=Cwrm8SldF2gSQUsvPOPiroVHw61dCrfsACHy8I854U4ByeuCe60bSLFKsc715Jm+oG
+         P4A/4dOns7Pj9NJ+fbIHhqrQTEdfZukbFsKXH8XddQy69nBFE0omto7hgKhr4U7P/fx7
+         tAIGTCrwqBkUgosO4X9edB9L0qmoBNXOokCss0f2CjJSD1USbncYOVEf86I8gcqjkkUX
+         W/TbST1mjQPf3ic9J4e6dOyuccN+EEh6m7kN84EAhxg+sDtchs1CkuINSP9OncElWdpH
+         caFu9TBTmw4nuVomtNIVE+shYlFnCFeWwXir1yXWhV0bYgV0lZIGXHvOnnbS1syb7Pix
+         8Qvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765908797; x=1766513597;
+        d=1e100.net; s=20230601; t=1765909813; x=1766514613;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=RmaB4ev8W3tz37Ek2hvrRn1VIAwgRQkGwDiR4TTSpX0=;
-        b=N/c7R2aM5Pcp6cRSkNXHCOsIQUXSUgnXeuljcoL2gThLovZNkFmi6IkEK8KkFD+ZRd
-         5WE4RnzxBoLQ5u2CoT0XJ/4GgjOvEBhvIHELrl6myBpxApQKlJNnmUXLOxWyOz9qHKDp
-         ICHiIa2fwrep62VHViGPKtenzqg2BZQBQ/NwKK02t5wFYXttqhjF6NW4ITraPZq679lJ
-         bI//kA0ln2OvaH+7SUu611sBYIvFqADp04MvlzZGaXi0VTaXTBO/ydBgNSUVLZfM1f+j
-         dIY0qUz7cq18syPPE+H+q0s5Ju0ixXEKX3i+vnxlBHm6uu+gFiGfiXheqgDmiB5TX8vn
-         7kXA==
-X-Forwarded-Encrypted: i=1; AJvYcCV61wftJdFB37MUNoMqVkGDtQK2YEuU5UfnmXZwreEgTWLHqzPwojiSO6MUvLOIPJ5TVLNUVjM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPNGNcgLzq2LDXlH8cGFon56YqqPnR92R3issaOeZHg1KjFBef
-	kPVyKxuIhgGgAEkdTH8sy5/poEc9Rp5KVhG7oZHvv8St7GSWKl8W0739
-X-Gm-Gg: AY/fxX6L8zWZ3nlkfiTq/kRQaDzs1m7gjqrIPo3JYi16mmAba69L2umyVLxYmzk/KAj
-	hfH2otIRGKQrb2dhysUz3Oc+kKtlHnRxf3e6/1v/z3FwK4bH5xZOmuRcEvAQQmi5V9hP63vm5En
-	rRbPAcqZ4j9yWqTAJHLkoVAvJVtnl1CHtCkSntHt6IcjkLTPjSL8oJBqSNbBzsieCqK4gH3bs1d
-	QHjDnXzVv3aF4D2kYDLYX08u4qH8TirlzyOXN55qTffD6btSeP65zreJFRVeZ+7J5rtts5KP/7d
-	j/c6Ya2I9kJiPmes4YhME3/KUIA14eKk5IOvNEZmPh0eyH5OiXfXcM+pX95U/y7ZRP8dmWqJMpl
-	pdHPlPmENlNDOpEXZZol1bbtH/4B7woibtSnFZ7krUekq0XYGaenrJGp/a7PTQuQmCUGDMJNEHI
-	ar
-X-Google-Smtp-Source: AGHT+IGIeR9se1hUWC3ZK0/I8qc+joVCW+w9vOIo/2WkdYVDl6z0QWPwuG0teFhFkc3BBgr0VoSMnw==
-X-Received: by 2002:a17:907:3da7:b0:b73:4445:85a8 with SMTP id a640c23a62f3a-b7d23a8caf0mr899586266b.8.1765908797155;
-        Tue, 16 Dec 2025 10:13:17 -0800 (PST)
-Received: from skbuf ([2a02:2f04:d106:d600:c18:aa1:b847:17e5])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7cfa2e70c2sm1716927466b.15.2025.12.16.10.13.15
+        bh=O2qwyKoiSE4y0S7R/sYbAU8Ep9J/DNr0jxtlpXQRjF8=;
+        b=t3Bjd3z8ObMTljcs/xtNawQbMiU8jtTW6ytdQboRuUfaHuSJez6m9kxDVdkSIisCvG
+         8s2XpvpYvSU7P+KFUd9MqahdJQPnruHOracz+MqLhoIs0hzOX64isezRzpaZi55tG3X2
+         aboebtV9dXi+/DwS6OZl2bEQ7YRPn4BXBl0DISvAzUc+33ehucv1cR1VuUUieN3bmcbg
+         Zxros3oAtJy41vr5u/SJb3M+rgEuNeRVZm4OfIx5U0g8A+Xm8SwXHsYLIZ1Tsg2tXOzw
+         MuXDDcZsGSOdaxf3Rr4NxBjn9fEMw51xw8M4cky2dL2OTo2RKXi3dS4D8bJ8STiRq3Vp
+         IZtw==
+X-Forwarded-Encrypted: i=1; AJvYcCUJNe1DIDe1LYJ5FwNd0oDjCIkngDfvTA++WRrbbKkAr3onV3Jy2gJcjIKUNoPPsrIXF4/IBIA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwACJtTbIW9+KiXDcJE0lWuJTW+4eIynexQIgKn3oUdKjq8Ba+Y
+	NjfDVA4LfS0JrUWLFh9KwgZrvvppMpJeyUuuS1cEy7hE/1kwPL9IzBE48GACMAjv9Y8=
+X-Gm-Gg: AY/fxX5b+OElBZlSats22hkz7VyTXRPraT/8IQCv8YYRpqTwrQ3vXGxB/tyxxWdpeBt
+	dzDofXXwfG4dPdXJPm8WawTf9MBJaLaPk3URqAoH1JYKeqnB5K/eQcrFmEtsD0SA4kCdm6HUHvi
+	KZuakw+WPyf31vr+Iz5Myn2YGdy+XWLebqUr7/xOoHqdTUUhNlO8CFdgNHJSWiuo1q8cxftuxN6
+	8NSBP5mnqHxulyFokwRD5gusKzlLuH9y91haNjnagvZTPZOF5/U1ai6efeBMDuM6r6XIKXOdWqD
+	Hu0SSrYbScHgTGf56JseKxZLXxtKlZHkGM/VS/LvaXIredJK2vcVWUz4JKVX54ru+oLZ0KsXKvO
+	1qRmomFoDArROK/3xwJkGZ3OhB0kkGbdEMBXTP26VOXg+Kr72/JVXwcUKYckeZMmp0jUTCTv1fG
+	TredLZDAVKc6HRJBOI
+X-Google-Smtp-Source: AGHT+IF+nY/k4C/6P18u9JysznJj/Z5B3Y6A+1aqCm2cbh7pc65+FeNcv1ODeP4J/8ke38+irCHPGg==
+X-Received: by 2002:a05:600c:45c9:b0:479:3a87:2eeb with SMTP id 5b1f17b1804b1-47a8f91515amr130008935e9.37.1765909812657;
+        Tue, 16 Dec 2025 10:30:12 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47bdc23c2b0sm2187435e9.15.2025.12.16.10.30.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Dec 2025 10:13:16 -0800 (PST)
-Date: Tue, 16 Dec 2025 20:13:13 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+        Tue, 16 Dec 2025 10:30:12 -0800 (PST)
+Date: Tue, 16 Dec 2025 21:30:08 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Frank Li <Frank.li@nxp.com>
+Cc: Chester Lin <chester62515@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>, devicetree@vger.kernel.org,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Rasmus Villemoes <ravi@prevas.dk>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH net v4 0/4] net: dsa: lantiq: a bunch of fixes
-Message-ID: <20251216181313.tn4n5tj6zv6z6wr7@skbuf>
-References: <cover.1765241054.git.daniel@makrotopia.org>
- <20251210161633.ncj2lheqpwltb436@skbuf>
- <aUGgBj8YZHQnaIsv@makrotopia.org>
+	Fabio Estevam <festevam@gmail.com>,
+	Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>,
+	imx@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
+	Jan Petrous <jan.petrous@oss.nxp.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Lee Jones <lee@kernel.org>, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Matthias Brugger <mbrugger@suse.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	NXP S32 Linux Team <s32@nxp.com>, Paolo Abeni <pabeni@redhat.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Rob Herring <robh@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Shawn Guo <shawnguo@kernel.org>, linaro-s32@linaro.org
+Subject: Re: [PATCH v2 0/4] s32g: Use a syscon for GPR
+Message-ID: <aUGlMP7J19L_AHF2@stanley.mountain>
+References: <cover.1765806521.git.dan.carpenter@linaro.org>
+ <aUAvwRmIZBC0W6ql@lizhi-Precision-Tower-5810>
+ <aUBUkuLf7NHtLSl1@stanley.mountain>
+ <aUBha2/xiZsIF/o5@lizhi-Precision-Tower-5810>
+ <aUBrV2_Iv4oTPkC4@stanley.mountain>
+ <aUB4pFEwmMBzW52T@lizhi-Precision-Tower-5810>
+ <aUEQkuzSZXFs5nqr@stanley.mountain>
+ <aUFvvmDUai9QrhZ2@lizhi-Precision-Tower-5810>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,47 +113,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aUGgBj8YZHQnaIsv@makrotopia.org>
+In-Reply-To: <aUFvvmDUai9QrhZ2@lizhi-Precision-Tower-5810>
 
-On Tue, Dec 16, 2025 at 06:08:06PM +0000, Daniel Golle wrote:
-> On Wed, Dec 10, 2025 at 06:16:33PM +0200, Vladimir Oltean wrote:
-> > On Tue, Dec 09, 2025 at 01:27:42AM +0000, Daniel Golle wrote:
-> > > This series is the continuation and result of comments received for a fix
-> > > for the SGMII restart-an bit not actually being self-clearing, which was
-> > > reported by by Rasmus Villemoes.
-> > > 
-> > > A closer investigation and testing the .remove and the .shutdown paths
-> > > of the mxl-gsw1xx.c and lantiq_gswip.c drivers has revealed a couple of
-> > > existing problems, which are also addressed in this series.
-> > > 
-> > > Daniel Golle (4):
-> > >   net: dsa: lantiq_gswip: fix order in .remove operation
-> > >   net: dsa: mxl-gsw1xx: fix order in .remove operation
-> > >   net: dsa: mxl-gsw1xx: fix .shutdown driver operation
-> > >   net: dsa: mxl-gsw1xx: manually clear RANEG bit
-> > > 
-> > >  drivers/net/dsa/lantiq/lantiq_gswip.c        |  3 --
-> > >  drivers/net/dsa/lantiq/lantiq_gswip.h        |  2 --
-> > >  drivers/net/dsa/lantiq/lantiq_gswip_common.c | 19 +++++-----
-> > >  drivers/net/dsa/lantiq/mxl-gsw1xx.c          | 38 +++++++++++++++++---
-> > >  4 files changed, 44 insertions(+), 18 deletions(-)
-> > > 
-> > > -- 
-> > > 2.52.0
-> > 
-> > From a DSA API perspective this seems fine.
-> > Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
-> > 
+On Tue, Dec 16, 2025 at 09:42:06AM -0500, Frank Li wrote:
+> > >
+> > > Why not implement standard phy interface,
+> > > phy_set_mode_ext(PHY_MODE_ETHERNET, RGMII);
+> > >
+> > > For example:  drivers/pci/controller/dwc/pci-imx6.c
+> > >
+> > > In legency platform, it use syscon to set some registers. It becomes mess
+> > > when more platform added.  And it becomes hard to convert because avoid
+> > > break compatibltiy now.
+> > >
+> > > It doesn't become worse since new platforms switched to use standard
+> > > inteface, (phy, reset ...).
+> > >
+> >
+> > This happens below that layer, this is just saying where the registers
+> > are found.  The GMAC_0_CTRL_STS is just one register in the GPR region,
+> > most of the others are unrelated to PHY.
 > 
-> In case you are reluctant to accept patch 4/4 ("net: dsa: mxl-gsw1xx:
-> manually clear RANEG bit") it'd be nice to have at least patch 1, 2 and
-> 3 merged as-is, and I'll resend 4/4 as a single patch being a simple
-> msleep(10) instead of the delayed_work approach, if that's the reason
-> for the series not being accepted.
+> The other register should work as other function's providor with mfd.
+> 
 
-I think it has more to do with the fact that network maintainers are
-taking a well deserved end of year break.
-https://lore.kernel.org/netdev/15b104e5-7e8d-4a7c-a500-5632a4f3f9a8@redhat.com/
+Syscons are a really standard way to do register accesses.  The
+pci-imx6.c driver you mentioned earlier does it that way...  The only
+thing which my code does differently is I put the offset into the
+phandle, but that's not so unusual and it's arguably a cleaner way
+because now both the base address and offset are in the same file.
 
-There are older patches than yours in patchwork.
+regards,
+dan carpenter
+
 
