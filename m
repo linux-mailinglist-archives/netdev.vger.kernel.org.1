@@ -1,199 +1,130 @@
-Return-Path: <netdev+bounces-244928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C12CCC2B83
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 13:28:33 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C748CC31D3
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 14:14:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A51C8302A0AA
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 12:26:39 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A8C6B30797CF
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 13:10:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC6F936C0A1;
-	Tue, 16 Dec 2025 12:17:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E50C534D905;
+	Tue, 16 Dec 2025 12:20:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b="Adaifra/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZCZJjVc1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-65-227.siemens.flowmailer.net (mta-65-227.siemens.flowmailer.net [185.136.65.227])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBDAC36BCCC
-	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 12:17:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.65.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8DAF34D3AB;
+	Tue, 16 Dec 2025 12:20:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765887439; cv=none; b=c24uESBXvKi/hq8PNE23JnWIv4QHpC5HznQ1BNdIJOR2JExEoD0rVVJdf6CFLaaBcNl+q31zbHc1BBRcHJNQnv+qGYQIWTzAGUm8QuEmq29mCsLserqA+kMQwnKl5z9oYKqcMaPyox38jvjXq+zIGO7+3tIvhRqeXqfjChDVowU=
+	t=1765887645; cv=none; b=G5DanFSthevPHdzZ4TGMmjsntavvTRB+GIv2eyBIdO6IBwFrQOJUrJuHG5YIR7glbgXWiUTPVF5pZCFCNRuGh8VbYKj3ksj1I2K5FGMn3x3flhvh45sQvzsmJpUM/a3v/GUM8TzVAnXmX2KmXUQTc2+GnrJtYSZXLewpN8h0irQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765887439; c=relaxed/simple;
-	bh=vuq4eF9sjeQ4XhtBW4fUIOK6VBkbSp52r/WJd8GvaRY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ElGl41DrDBWv6Ve6watrbb94phdW+M45nv6nnaNJQvGwnDSrVU9ZpUnFK6l9rd+Usx6gsF8ahhV1tftCxhmUI1CGEk4257mbT4X/EPnogd5R9ORl1oZJZWV3VcbXMmNbZDkasKu2jLNNmguVxx/TU2fDYB/wTntTbYiJZhbSjqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b=Adaifra/; arc=none smtp.client-ip=185.136.65.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
-Received: by mta-65-227.siemens.flowmailer.net with ESMTPSA id 20251216121708ba6d10947500020743
-        for <netdev@vger.kernel.org>;
-        Tue, 16 Dec 2025 13:17:08 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm2;
- d=siemens.com; i=alexander.sverdlin@siemens.com;
- h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
- bh=kxa/wxHoMM+iUpsXVC+Um989vKgYKN1K4z4nEt1mwcw=;
- b=Adaifra/dnRGT2aB00yBGbiYl1y4bux9DmxCMjp+D3YpK1mqiO/zJstTC6ZlX1xWMNymKN
- 32SKBiP84d6ULdp+S6OQfyDKtYGzwzXYLDFpLBGX14Kc6ETBypf1g72LHNDDnBCn5fK7smoF
- s/OWWSFRfmcxLmqyDgXqRls0kEG/YeORmVVHhRZHOWyIkDbeeyKgP8B3DvrTQ+OMwpZqGau9
- c+sAujJBh85QlBeUUD9AKuY9Je0oixNFBiYwsnHH0M/B5oLRW+Ni0G4H3iOo9F/qBEVC5d6n
- KXK3q7QPrQR9qHcHRwZlDVeAvwXC6wqlhHX9XlJ29cje+JEtg9KmJjpw==;
-From: "A. Sverdlin" <alexander.sverdlin@siemens.com>
-To: netdev@vger.kernel.org
-Cc: Alexander Sverdlin <alexander.sverdlin@siemens.com>,
-	Hauke Mehrtens <hauke@hauke-m.de>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Daniel Golle <daniel@makrotopia.org>
-Subject: [PATCH net-next v2 2/2] net: dsa: mxl-gsw1xx: Support R(G)MII slew rate configuration
-Date: Tue, 16 Dec 2025 13:17:01 +0100
-Message-ID: <20251216121705.65156-3-alexander.sverdlin@siemens.com>
-In-Reply-To: <20251216121705.65156-1-alexander.sverdlin@siemens.com>
-References: <20251216121705.65156-1-alexander.sverdlin@siemens.com>
+	s=arc-20240116; t=1765887645; c=relaxed/simple;
+	bh=YUQEOtdBM4h1nc++QKKGyni9ZcT7y5HRI51H7ug9qvw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qPjjU86rWQCsFVRS+uWRnIiqszlQ0xdz+9z/61Pywh50Xd3g43tT9YJhlJbqAN281cyIl15DGZLXGcIcWDJyFtnY8HlScpl7qGBRDExngI6wg0bsH8riuYS961PaHRQQlEi0Bcnlg1iSz20ym32Tpr4RL1r/CbcPhBxBkc8fKGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZCZJjVc1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C09AC4CEF1;
+	Tue, 16 Dec 2025 12:20:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765887645;
+	bh=YUQEOtdBM4h1nc++QKKGyni9ZcT7y5HRI51H7ug9qvw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZCZJjVc1mPf1+U6aTg+0G2Dl9Qalans3zgrluwgOXTe/kxNISyaJrQlZ2udr1s0X5
+	 x8ch/uWQA0zFx+zD2vNwNTHd5qM18OzzQU3+f7hQX2zdWjog9qXKeuyc6sIYtN55hT
+	 evIxHDpRELyQNYzfdaZGluY71DPKucFGP3xzm2vNEhuKtPoAz9kakmrF9ddAreb02H
+	 ucoyThGwOdS8V4+psw9oD29cFmWQUgbJrIHC6+ilUh9COsm1AvReVJolaNX6Mer8Nx
+	 hj282intAZYueA6YPvVZf/uvJaV/Xyv+1dM5b/wrE/77zGwX1CB5or1emjgGjy4RkJ
+	 t4mkuziICA1iQ==
+Date: Tue, 16 Dec 2025 12:20:39 +0000
+From: Simon Horman <horms@kernel.org>
+To: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	longli@microsoft.com, kotaranov@microsoft.com,
+	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	dipayanroy@microsoft.com
+Subject: Re: [PATCH net-next] net: mana: Fix use-after-free in reset service
+ rescan path
+Message-ID: <aUFOl4euBSyPtA5F@horms.kernel.org>
+References: <20251216105508.GA13584@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Flowmailer-Platform: Siemens
-Feedback-ID: 519:519-456497:519-21489:flowmailer
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251216105508.GA13584@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 
-From: Alexander Sverdlin <alexander.sverdlin@siemens.com>
+On Tue, Dec 16, 2025 at 02:55:08AM -0800, Dipayaan Roy wrote:
+> When mana_serv_reset() encounters -ETIMEDOUT or -EPROTO from
+> mana_gd_resume(), it performs a PCI rescan via mana_serv_rescan().
+> 
+> mana_serv_rescan() calls pci_stop_and_remove_bus_device(), which can
+> invoke the driver's remove path and free the gdma_context associated
+> with the device. After returning, mana_serv_reset() currently jumps to
+> the out label and attempts to clear gc->in_service, dereferencing a
+> freed gdma_context.
+> 
+> The issue was observed with the following call logs:
+> [  698.942636] BUG: unable to handle page fault for address: ff6c2b638088508d
+> [  698.943121] #PF: supervisor write access in kernel mode
+> [  698.943423] #PF: error_code(0x0002) - not-present page
+> [S[  698.943793] Pat Dec  6 07:GD5 100000067 P4D 1002f7067 PUD 1002f8067 PMD 101bef067 PTE 0
+> 0:56 2025] hv_[n e 698.944283] Oops: Oops: 0002 [#1] SMP NOPTI
+> tvsc f8615163-00[  698.944611] CPU: 28 UID: 0 PID: 249 Comm: kworker/28:1
+> ...
+> [Sat Dec  6 07:50:56 2025] R10: [  699.121594] mana 7870:00:00.0 enP30832s1: Configured vPort 0 PD 18 DB 16
+> 000000000000001b R11: 0000000000000000 R12: ff44cf3f40270000
+> [Sat Dec  6 07:50:56 2025] R13: 0000000000000001 R14: ff44cf3f402700c8 R15: ff44cf3f4021b405
+> [Sat Dec  6 07:50:56 2025] FS:  0000000000000000(0000) GS:ff44cf7e9fcf9000(0000) knlGS:0000000000000000
+> [Sat Dec  6 07:50:56 2025] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [Sat Dec  6 07:50:56 2025] CR2: ff6c2b638088508d CR3: 000000011fe43001 CR4: 0000000000b73ef0
+> [Sat Dec  6 07:50:56 2025] Call Trace:
+> [Sat Dec  6 07:50:56 2025]  <TASK>
+> [Sat Dec  6 07:50:56 2025]  mana_serv_func+0x24/0x50 [mana]
+> [Sat Dec  6 07:50:56 2025]  process_one_work+0x190/0x350
+> [Sat Dec  6 07:50:56 2025]  worker_thread+0x2b7/0x3d0
+> [Sat Dec  6 07:50:56 2025]  kthread+0xf3/0x200
+> [Sat Dec  6 07:50:56 2025]  ? __pfx_worker_thread+0x10/0x10
+> [Sat Dec  6 07:50:56 2025]  ? __pfx_kthread+0x10/0x10
+> [Sat Dec  6 07:50:56 2025]  ret_from_fork+0x21a/0x250
+> [Sat Dec  6 07:50:56 2025]  ? __pfx_kthread+0x10/0x10
+> [Sat Dec  6 07:50:56 2025]  ret_from_fork_asm+0x1a/0x30
+> [Sat Dec  6 07:50:56 2025]  </TASK>
+> 
+> Fix this by returning immediately after mana_serv_rescan() to avoid
+> accessing GC state that may no longer be valid.
+> 
+> Fixes: 9bf66036d686 ("net: mana: Handle hardware recovery events when probing the device")
+> 
 
-Support newly introduced maxlinear,mii-slew-rate-slow device tree property
-to configure R(G)MII interface pins slew rate into "slow" mode. It might be
-used to reduce the radiated emissions.
+nit: no blank line here please - tags should all appear in one block
 
-Signed-off-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
----
-Changelog:
-v2:
-- do not hijack gsw1xx_phylink_mac_select_pcs() for configuring the port,
-  introduce struct gswip_hw_info::port_setup callback
-- actively configure "normal" slew rate (if the new DT property is missing)
-- properly use regmap_set_bits() (v1 had reg and value mixed up)
+> Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
 
- drivers/net/dsa/lantiq/lantiq_gswip.h        |  1 +
- drivers/net/dsa/lantiq/lantiq_gswip_common.c |  6 +++++
- drivers/net/dsa/lantiq/mxl-gsw1xx.c          | 26 ++++++++++++++++++++
- drivers/net/dsa/lantiq/mxl-gsw1xx.h          |  2 ++
- 4 files changed, 35 insertions(+)
+I see that this patch is targeted at net-next.
+But this is a fix for a patch present in net.
+So it should be targeted at net instead
 
-diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.h b/drivers/net/dsa/lantiq/lantiq_gswip.h
-index 9c38e51a75e80..3dc6c232a2e7b 100644
---- a/drivers/net/dsa/lantiq/lantiq_gswip.h
-+++ b/drivers/net/dsa/lantiq/lantiq_gswip.h
-@@ -263,6 +263,7 @@ struct gswip_hw_info {
- 				 struct phylink_config *config);
- 	struct phylink_pcs *(*mac_select_pcs)(struct phylink_config *config,
- 					      phy_interface_t interface);
-+	int (*port_setup)(struct dsa_switch *ds, int port);
- };
- 
- struct gswip_gphy_fw {
-diff --git a/drivers/net/dsa/lantiq/lantiq_gswip_common.c b/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-index 9da39edf8f574..efa7526609a41 100644
---- a/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-+++ b/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-@@ -425,6 +425,12 @@ static int gswip_port_setup(struct dsa_switch *ds, int port)
- 	struct gswip_priv *priv = ds->priv;
- 	int err;
- 
-+	if (priv->hw_info->port_setup) {
-+		err = priv->hw_info->port_setup(ds, port);
-+		if (err)
-+			return err;
-+	}
-+
- 	if (!dsa_is_cpu_port(ds, port)) {
- 		err = gswip_add_single_port_br(priv, port, true);
- 		if (err)
-diff --git a/drivers/net/dsa/lantiq/mxl-gsw1xx.c b/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-index 0816c61a47f12..cf35d5a00b7c8 100644
---- a/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-+++ b/drivers/net/dsa/lantiq/mxl-gsw1xx.c
-@@ -531,6 +531,29 @@ static struct phylink_pcs *gsw1xx_phylink_mac_select_pcs(struct phylink_config *
- 	}
- }
- 
-+static int gsw1xx_port_setup(struct dsa_switch *ds, int port)
-+{
-+	struct dsa_port *dp = dsa_to_port(ds, port);
-+	struct gsw1xx_priv *gsw1xx_priv;
-+	struct gswip_priv *gswip_priv;
-+	int ret;
-+
-+	if (dp->index != GSW1XX_MII_PORT)
-+		return 0;
-+
-+	gswip_priv = ds->priv;
-+	gsw1xx_priv = container_of(gswip_priv, struct gsw1xx_priv, gswip);
-+
-+	if (of_property_read_bool(dp->dn, "maxlinear,mii-slew-rate-slow"))
-+		ret = regmap_set_bits(gsw1xx_priv->shell, GSW1XX_SHELL_RGMII_SLEW_CFG,
-+				      RGMII_SLEW_CFG_DRV_TXD | RGMII_SLEW_CFG_DRV_TXC);
-+	else
-+		ret = regmap_clear_bits(gsw1xx_priv->shell, GSW1XX_SHELL_RGMII_SLEW_CFG,
-+					RGMII_SLEW_CFG_DRV_TXD | RGMII_SLEW_CFG_DRV_TXC);
-+
-+	return ret;
-+}
-+
- static struct regmap *gsw1xx_regmap_init(struct gsw1xx_priv *priv,
- 					 const char *name,
- 					 unsigned int reg_base,
-@@ -674,6 +697,7 @@ static const struct gswip_hw_info gsw12x_data = {
- 	.pce_microcode		= &gsw1xx_pce_microcode,
- 	.pce_microcode_size	= ARRAY_SIZE(gsw1xx_pce_microcode),
- 	.tag_protocol		= DSA_TAG_PROTO_MXL_GSW1XX,
-+	.port_setup		= gsw1xx_port_setup,
- };
- 
- static const struct gswip_hw_info gsw140_data = {
-@@ -687,6 +711,7 @@ static const struct gswip_hw_info gsw140_data = {
- 	.pce_microcode		= &gsw1xx_pce_microcode,
- 	.pce_microcode_size	= ARRAY_SIZE(gsw1xx_pce_microcode),
- 	.tag_protocol		= DSA_TAG_PROTO_MXL_GSW1XX,
-+	.port_setup		= gsw1xx_port_setup,
- };
- 
- static const struct gswip_hw_info gsw141_data = {
-@@ -699,6 +724,7 @@ static const struct gswip_hw_info gsw141_data = {
- 	.pce_microcode		= &gsw1xx_pce_microcode,
- 	.pce_microcode_size	= ARRAY_SIZE(gsw1xx_pce_microcode),
- 	.tag_protocol		= DSA_TAG_PROTO_MXL_GSW1XX,
-+	.port_setup		= gsw1xx_port_setup,
- };
- 
- /*
-diff --git a/drivers/net/dsa/lantiq/mxl-gsw1xx.h b/drivers/net/dsa/lantiq/mxl-gsw1xx.h
-index 38e03c048a26c..8c0298b2b7663 100644
---- a/drivers/net/dsa/lantiq/mxl-gsw1xx.h
-+++ b/drivers/net/dsa/lantiq/mxl-gsw1xx.h
-@@ -110,6 +110,8 @@
- #define   GSW1XX_RST_REQ_SGMII_SHELL		BIT(5)
- /* RGMII PAD Slew Control Register */
- #define  GSW1XX_SHELL_RGMII_SLEW_CFG		0x78
-+#define   RGMII_SLEW_CFG_DRV_TXC		BIT(2)
-+#define   RGMII_SLEW_CFG_DRV_TXD		BIT(3)
- #define   RGMII_SLEW_CFG_RX_2_5_V		BIT(4)
- #define   RGMII_SLEW_CFG_TX_2_5_V		BIT(5)
- 
--- 
-2.52.0
+Subject: [PATCH net] ...
 
+Probably it is not necessary to repost in order to address the minor
+feedback I've provided above. But if you do, please be sure to observe
+the 24h rule and wait that long between posting revisions of that patch.
+
+https://docs.kernel.org/process/maintainer-netdev.html
+
+The above not withstanding, this patch looks good to me.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
 
