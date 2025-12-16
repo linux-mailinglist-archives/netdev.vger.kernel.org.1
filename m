@@ -1,151 +1,134 @@
-Return-Path: <netdev+bounces-244930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAC8DCC48DD
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 18:08:59 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DD1CCC3312
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 14:26:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3784E3034676
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 17:08:36 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 618EC3008860
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 13:26:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BE603901FA;
-	Tue, 16 Dec 2025 12:44:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02C4D35505D;
+	Tue, 16 Dec 2025 13:11:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="DE3BNhOc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fFwjwqyl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 048C73901F3
-	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 12:44:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89538354AF1;
+	Tue, 16 Dec 2025 13:11:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765889064; cv=none; b=HfNxUI+AmZIqAHaBQyutVi2PBy2/9BBqHhPNLPrFHtKS4Zri6rFN8gMnXM5hg3Xn799g5sUc1Nk5yZa3+1xGs+oGOUlqx+cXjSr3FW6ozIb0K2Fj7vFXYRBw3Ac55hOMfrymgyLNiSTEAgGbc9ltah3lZw9x6HrkX/tFE81/i4g=
+	t=1765890711; cv=none; b=JJqjVcrzVs6ePmYLduXmlxXfnRcZNuN0e89qpUznwgkDPFJjFeqn3DZV3e2pdY4I/B+RgMHli6ReqCEZZkb0za/mqCIUgP38fP/PQzSYY7TkWxFRn3XytXs9fllG6I7M+3pEXFGU6q457V8W8/fOATc9Mp1YGcxGL4ropPps7rE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765889064; c=relaxed/simple;
-	bh=boIqxM+ov9nSjwgWpy63cnTTzp37ctPMetwDRjr716c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YRe9IbXAkHCp4gpWYB3iN3UUNvOHOLVI5N4IPFH7DwVnqPUKF5tw9G4vF+Rz0/Pvavy+l9V9ypKZDx67CBG3hJGpR0pVYVCpQ9WwnO9evjbRqAnbz4RxGk3+YLu8+TnexxBwzCLWDaDEoBcrtrp+6CpDu7ubUlcoziGLnq5kIvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=DE3BNhOc; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4777771ed1aso34811855e9.2
-        for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 04:44:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1765889060; x=1766493860; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/lTD5T6FLVPMFiI1zK6zOO1/qp2X5cLGG7vD5u13cD0=;
-        b=DE3BNhOcc+HNQXvq2D9wHK7NIuewOffYSeXDSlTTjBkaAYU97BUwxMG9Bd17Vj04G0
-         Udn8He0ZTL2b6WWpup21Pz65uKv9xFnVS7CsZ3CMMxLk4LdE+ORIqEU90QzUCeZoYY3E
-         M93a4SOb9XP+Clv4+mIKU4Mp8YVXMRjFWFsAvF6zu11+Ni4hYptYb8CfRJTJBTud4Nwq
-         C61+N5a2YmlS6bDZ/Ku2Q5wgp/hTUEegwISlmbTHBHBU5TMM+11ijwfMN4CfjDDiL/MH
-         g4UfBRPjvF2wlxN0Xv8vHhKINDlp+zTZpBTb3GZCiCYQBxHLtYr5ITzGE3AKYiitxSzC
-         1FZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765889060; x=1766493860;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/lTD5T6FLVPMFiI1zK6zOO1/qp2X5cLGG7vD5u13cD0=;
-        b=qOFIxXcpc24nvBqTKcAJktndtlT+2hnzIbtAttLUsLPa7w7PEHGdw1bfTlP2sRfjwY
-         eYVP9NBwYHaBaraBSIzYYj4eaXn7EtVKQ6Iz9i3wEbhaJAL3uxJwZAb90gtbGBURcA8l
-         zWdUlX8OLMAzxDhgNpZT2Z/NiFZXnc3az8ojPLVK5Uy47qLwmbEmjNMyJgtiQ2Mt7RlZ
-         sZ8CAONwxcCS4VBvC9zZDW1vtxyHXuGMk9pDlu+hd8lWR+YINNn/n3pWONa6FRgyHyIY
-         X4mgmY0lxmkKc0xOuudUxqMjIQ6UF+pXtkVWkJ+MhXlCxMzASTnNmNKDrTrGDtYgK9FJ
-         dpeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW3n06OQnfvuKdsn3QVQamSWbHYhBoFFh3NM7/sAtXawQEMeEXpZAWgTaguo6hHcGWmVT5pS9U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxeN7BfvdcgeiWHjmZMBkjST/ATsb2zO3NFUPlPF9Tex9cXOLrj
-	4mCNzbnZZca87hzhgf0lwiXN2Jh0nkS+BDyEtSGgNeFiB74eMzEBUSG8Dvalv/v7wYE=
-X-Gm-Gg: AY/fxX47jnS92gHV1wIFyH486pemVO5iIERfOA/h48S9UiZfr+0EmofjFBcgNbBoqyk
-	G8UtLNgwkvoMMxYYLJV418HvPRUmFUXtLx0Aq6UVTd4whrqGfGfC4jp7q75jhkOlFySHOqbcSu0
-	seYyIzf1rwcULAlvHOTpOMrlitSl9rceY5FJJmOREjipqOih+TCoLd8SjnLT4bqfYYY6gRkOY11
-	CbqwqYf+0YC0ZGKXrraxxt95YUsPUiFJ7iB8QlXCzPcfadejEmQK8FoMBxV0yUT3/uxZN+wlohF
-	NIZvaLkm2Q5iXdcLsGn5WcrRcUXjwqFKkRVl/j6Rz5dktSktgdUsHItVnr9Wncp4QqBb5Grx6dQ
-	6GJMCPAJU4R1kNFuAQ+Thp1W2fBl8dUpukUKFg3IjKmGsd2LF3Df/lAT8wI2GRzhLvh5g9xqwBk
-	0p6W7sTWgdhir8GQ==
-X-Google-Smtp-Source: AGHT+IFW5qDickl4JAEFRsGArKDI6FcAB611ceysvy3jNS62BLSz150yvQDh+EMhh7oPcWPJX+4yHw==
-X-Received: by 2002:a05:600c:3acf:b0:477:1bb6:17de with SMTP id 5b1f17b1804b1-47a8f90f96bmr152908605e9.30.1765889060304;
-        Tue, 16 Dec 2025 04:44:20 -0800 (PST)
-Received: from pathway.suse.cz ([176.114.240.130])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47bd95e0161sm9700215e9.2.2025.12.16.04.44.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Dec 2025 04:44:19 -0800 (PST)
-Date: Tue, 16 Dec 2025 13:44:17 +0100
-From: Petr Mladek <pmladek@suse.com>
-To: Joel Granados <joel.granados@kernel.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	Muchun Song <muchun.song@linux.dev>,
-	Oscar Salvador <osalvador@suse.de>,
-	David Hildenbrand <david@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	John Ogness <john.ogness@linutronix.de>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	linux-hams@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH] sysctl: Remove unused ctl_table forward declarations
-Message-ID: <aUFUIfVvRcYN3_ID@pathway.suse.cz>
-References: <20251215-jag-sysctl_fw_decl-v1-1-2a9af78448f8@kernel.org>
+	s=arc-20240116; t=1765890711; c=relaxed/simple;
+	bh=uK7rtQd0fuH8HIq2iyTTKTpcKJsEkMoXU53XE1O8rzg=;
+	h=From:Date:Content-Type:MIME-Version:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=WjqNvnPVSnnLYiNDt9GKiqMAKsWDOG/gLl3KPDJ8QB7RZCSLCzVw1Z6uGsIVJrJKVreTbmuj7Kx7qRtlcKRDF6le3uEkRXGbxKKR7iHhCIHBTZ7EQqDQ9Jn1go3aD7Zm0KsRDqI/fv5sK2ufufz8docbp0UhoOQH0To2SvwJUOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fFwjwqyl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB05BC19423;
+	Tue, 16 Dec 2025 13:11:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765890711;
+	bh=uK7rtQd0fuH8HIq2iyTTKTpcKJsEkMoXU53XE1O8rzg=;
+	h=From:Date:Cc:To:In-Reply-To:References:Subject:From;
+	b=fFwjwqyl4XciRQVPx8XogJowdRcsdYKb/ioKdv1BlYgi1o+jrg3aT4TAjJOxcokcI
+	 QsSoL7E/aTwp0Xx89fUuxiHPnEWOL+3YP75h9bjRELSdSMWlSEQ92eq4Dd4ceSznxM
+	 FA0++iF6bDiu+t9pjncqus1HTUPK3svYbIJYzU9lKuMSr/WEguQljrDJAZRNzhNg42
+	 v7hCHoWhSvks4wsNhavYOp/zj1CynIbu8P4b+tzQRYE66RX9T0NwB8sBSiXWwnDEBo
+	 MIlWjd8LzSrypRzNesJoMN6k5blOrxuig+/T5bgwizw08Jd3RqQ5mQlMx9Ug7dba8M
+	 js45kMZa3qkiw==
+From: Rob Herring <robh@kernel.org>
+Date: Tue, 16 Dec 2025 07:11:49 -0600
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251215-jag-sysctl_fw_decl-v1-1-2a9af78448f8@kernel.org>
+Cc: netdev@vger.kernel.org, linusw@kernel.org, vkoul@kernel.org, 
+ pabeni@redhat.com, jirislaby@kernel.org, lars.povlsen@microchip.com, 
+ linux-arm-kernel@lists.infradead.org, claudiu.beznea@tuxon.dev, 
+ kuba@kernel.org, mturquette@baylibre.com, Steen.Hegelund@microchip.com, 
+ mwalle@kernel.org, tudor.ambarus@linaro.org, devicetree@vger.kernel.org, 
+ UNGLinuxDriver@microchip.com, edumazet@google.com, 
+ linux-clk@vger.kernel.org, andi.shyti@kernel.org, olivia@selenic.com, 
+ conor+dt@kernel.org, luka.perkov@sartura.hr, richard.genoud@bootlin.com, 
+ linux-hwmon@vger.kernel.org, krzk+dt@kernel.org, 
+ wsa+renesas@sang-engineering.com, Ryan.Wanner@microchip.com, 
+ linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+ alexandre.belloni@bootlin.com, lee@kernel.org, linux@roeck-us.net, 
+ davem@davemloft.net, gregkh@linuxfoundation.org, 
+ kavyasree.kotagiri@microchip.com, nicolas.ferre@microchip.com, 
+ andrew+netdev@lunn.ch, romain.sioen@microchip.com, sboyd@kernel.org, 
+ linux-gpio@vger.kernel.org, linux-spi@vger.kernel.org, 
+ linux-serial@vger.kernel.org, daniel.machon@microchip.com, 
+ dmaengine@vger.kernel.org, richardcochran@gmail.com, 
+ herbert@gondor.apana.org.au, charan.pedumuru@microchip.com, 
+ linux-crypto@vger.kernel.org, linux-i2c@vger.kernel.org, 
+ radu_nicolae.pirea@upb.ro
+To: Robert Marko <robert.marko@sartura.hr>
+In-Reply-To: <20251215163820.1584926-1-robert.marko@sartura.hr>
+References: <20251215163820.1584926-1-robert.marko@sartura.hr>
+Message-Id: <176589052274.1815136.7513475493879599819.robh@kernel.org>
+Subject: Re: [PATCH v2 01/19] include: dt-bindings: add LAN969x clock
+ bindings
 
-On Mon 2025-12-15 16:25:19, Joel Granados wrote:
-> Remove superfluous forward declarations of ctl_table from header files
-> where they are no longer needed. These declarations were left behind
-> after sysctl code refactoring and cleanup.
+
+On Mon, 15 Dec 2025 17:35:18 +0100, Robert Marko wrote:
+> Add the required LAN969x clock bindings.
 > 
-> Signed-off-by: Joel Granados <joel.granados@kernel.org>
+> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
+> ---
+> Changes in v2:
+> * Rename file to microchip,lan9691.h
+> 
+>  include/dt-bindings/clock/microchip,lan9691.h | 24 +++++++++++++++++++
+>  1 file changed, 24 insertions(+)
+>  create mode 100644 include/dt-bindings/clock/microchip,lan9691.h
+> 
 
-For the printk part:
 
-Reviewed-by: Petr Mladek <pmladek@suse.com>
+My bot found new DTB warnings on the .dts files added or changed in this
+series.
 
-That said, I have found one more declaration in kernel/printk/internal.h.
-It is there because of devkmsg_sysctl_set_loglvl() declaration.
-But I think that a better solution would be:
+Some warnings may be from an existing SoC .dtsi. Or perhaps the warnings
+are fixed by another series. Ultimately, it is up to the platform
+maintainer whether these warnings are acceptable or not. No need to reply
+unless the platform maintainer has comments.
 
-diff --git a/kernel/printk/internal.h b/kernel/printk/internal.h
-index dff97321741a..27169fd33231 100644
---- a/kernel/printk/internal.h
-+++ b/kernel/printk/internal.h
-@@ -4,9 +4,9 @@
-  */
- #include <linux/console.h>
- #include <linux/types.h>
-+#include <linux/sysctl.h>
- 
- #if defined(CONFIG_PRINTK) && defined(CONFIG_SYSCTL)
--struct ctl_table;
- void __init printk_sysctl_init(void);
- int devkmsg_sysctl_set_loglvl(const struct ctl_table *table, int write,
- 			      void *buffer, size_t *lenp, loff_t *ppos);
-diff --git a/kernel/printk/sysctl.c b/kernel/printk/sysctl.c
-index bb8fecb3fb05..512f0c692d6a 100644
---- a/kernel/printk/sysctl.c
-+++ b/kernel/printk/sysctl.c
-@@ -3,7 +3,6 @@
-  * sysctl.c: General linux system control interface
-  */
- 
--#include <linux/sysctl.h>
- #include <linux/printk.h>
- #include <linux/capability.h>
- #include <linux/ratelimit.h>
+If you already ran DT checks and didn't see these error(s), then
+make sure dt-schema is up to date:
 
-Feel free to add this into v2. Or we could do this in a separate patch.
+  pip3 install dtschema --upgrade
 
-Best Regards,
-Petr
+
+This patch series was applied (using b4) to base:
+ Base: attempting to guess base-commit...
+ Base: tags/next-20251215 (best guess, 14/15 blobs matched)
+ Base: tags/next-20251215 (use --merge-base to override)
+
+If this is not the correct base, please add 'base-commit' tag
+(or use b4 which does this automatically)
+
+New warnings running 'make CHECK_DTBS=y for arch/arm64/boot/dts/microchip/' for 20251215163820.1584926-1-robert.marko@sartura.hr:
+
+arch/arm64/boot/dts/microchip/sparx5_pcb135_emmc.dtb: / (microchip,sparx5-pcb135): compatible: ['microchip,sparx5-pcb135', 'microchip,sparx5'] is valid under each of {'items': [{'const': 'microchip,sparx5-pcb135'}, {'const': 'microchip,sparx5'}], 'maxItems': 2, 'minItems': 2, 'type': 'array'}, {}
+	from schema $id: http://devicetree.org/schemas/arm/microchip.yaml
+arch/arm64/boot/dts/microchip/sparx5_pcb135.dtb: / (microchip,sparx5-pcb135): compatible: ['microchip,sparx5-pcb135', 'microchip,sparx5'] is valid under each of {'items': [{'const': 'microchip,sparx5-pcb135'}, {'const': 'microchip,sparx5'}], 'maxItems': 2, 'minItems': 2, 'type': 'array'}, {}
+	from schema $id: http://devicetree.org/schemas/arm/microchip.yaml
+arch/arm64/boot/dts/microchip/sparx5_pcb134.dtb: / (microchip,sparx5-pcb134): compatible: ['microchip,sparx5-pcb134', 'microchip,sparx5'] is valid under each of {'items': [{'const': 'microchip,sparx5-pcb134'}, {'const': 'microchip,sparx5'}], 'maxItems': 2, 'minItems': 2, 'type': 'array'}, {}
+	from schema $id: http://devicetree.org/schemas/arm/microchip.yaml
+arch/arm64/boot/dts/microchip/sparx5_pcb134_emmc.dtb: / (microchip,sparx5-pcb134): compatible: ['microchip,sparx5-pcb134', 'microchip,sparx5'] is valid under each of {'items': [{'const': 'microchip,sparx5-pcb134'}, {'const': 'microchip,sparx5'}], 'maxItems': 2, 'minItems': 2, 'type': 'array'}, {}
+	from schema $id: http://devicetree.org/schemas/arm/microchip.yaml
+arch/arm64/boot/dts/microchip/sparx5_pcb125.dtb: / (microchip,sparx5-pcb125): compatible: ['microchip,sparx5-pcb125', 'microchip,sparx5'] is valid under each of {'items': [{'const': 'microchip,sparx5-pcb125'}, {'const': 'microchip,sparx5'}], 'maxItems': 2, 'minItems': 2, 'type': 'array'}, {}
+	from schema $id: http://devicetree.org/schemas/arm/microchip.yaml
+
+
+
+
+
 
