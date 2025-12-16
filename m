@@ -1,193 +1,122 @@
-Return-Path: <netdev+bounces-244984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02995CC48C2
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 18:08:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 640B2CC4A64
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 18:27:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 65CAA3001509
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 17:07:45 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 6361930161EE
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 17:27:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 425E92D3737;
-	Tue, 16 Dec 2025 17:07:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0EC8331201;
+	Tue, 16 Dec 2025 17:27:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="fgOxuPtV"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PpezN6fg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E324940855
-	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 17:07:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C73330B0D;
+	Tue, 16 Dec 2025 17:27:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765904864; cv=none; b=tarSJMEsiJz+9drrU7Q7pHHMqbYTFM+7HN32zSkvt0wNREtDUS/sQZ8ZPFYx4XTho1uIhM2guxjZISBh1ANhRsr629s5V9drv0xUl+VSuJU+0CgV0WgD4KR0N0NWSYyPZkwElMhyxY3G39JCleI10BkNpca7Eo3m3PQ8o/dZM+Q=
+	t=1765906030; cv=none; b=MFDEGFkfWHGQbPsYaa8pZxsxhww0mbpucGC7elodFGYT9f0z3jIwzkZTpQMpf671Z2gATbU6RC2tuuuDQtAa4prrRjnBtnVb+vOgtu4c8bmOdWDecKN/Wdq+o+UIylbdrWnaewvOqT7kQ2GufWQ5Cp00i4MqaX/J0xY4iEid6Lc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765904864; c=relaxed/simple;
-	bh=r/FDIWaDcL7tzJvoOctfFeLod3RGeiffLgS1g//bHlQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RcjR3P96Nbd4FO+FRcgob1+qNkvcAVGXVuIVJn5WvDS+jumYr6dXYTB/5Ky2ct6eyfbJ1ZCbsU5lSaCbYBAPkT61E9xmXw5puD30bcsII/noEwePtXmTvhu+chqHkxVd/wf5iYaN9oysDnCVLpoxZlYKPW9V6JnZJjuJ6rlhvQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=fgOxuPtV; arc=none smtp.client-ip=185.125.188.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 9F1C13F2CB
-	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 17:07:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1765904858;
-	bh=0Wv3W8Or+AfdbFFZhOAbvXi7U6Iihxvczf8zxZ/vudY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version;
-	b=fgOxuPtVsETmL5CZZl4/Z6U9lPSzVUTAzRUpj4IWTFXMdBTNPEHerUeQGUDaEFf6n
-	 QDXRVt0/F1R5INpaupv7K/qA+WIioTrwpjxfMVxHLbOMh0k5nLtyRs2ovJyy7FLCJp
-	 GnX/NmakCdvCBZC/o3E/Qfcik4Q4Z13DnLAScLUGanm6+wAFXsLvO8n4gcSfVVcA5Q
-	 yfCCJwKtA/Y4xmHRQyw4LsWJmy7dHxu3+AbKiQDLzkYswV4bCcxqGrZ8hd/oVE4rbw
-	 NG6JFrQteKvQ8jX3ZRMkYM6MCwArrohdiTpNE38cbQR8/7yU4jf11mm/qY/AKL4Rkn
-	 O3Kn/qixcOWYvW8Tfj34bfpbREDHE/s+q61djrxSEG+TVcGcdt12XXDgetDJO6CFaW
-	 v9VcEQFDCK3dXbbRCjs8IOXLd4mselbhjtxtkZCR7YMz6nE7NRBx195/JOMMDz9Glw
-	 3eZgLL2pp+xJ86gZU1go8p6vD4OA0v4a1eSi4yJtDm7DNjAwy5F9BvMWfFHgOCZtre
-	 ryMAyIjRHC8fQITxs3A/fxsiURECRJ/O9UokpZ71SIsbuYzQh1B9C0K7EKfD4rNmR6
-	 GbfRWGOoUjxsKmKBqgy2anQp5mMQe5bQHXvoFgHzW2O3MkGlVlppzacZf/7PkC52O/
-	 aYibf8HT90zGvqj32EKpliAQ=
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-8b6963d1624so1200783585a.0
-        for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 09:07:38 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765904857; x=1766509657;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0Wv3W8Or+AfdbFFZhOAbvXi7U6Iihxvczf8zxZ/vudY=;
-        b=p7t7V/iqV7ZbbTGCT3VbWOjBlKlt0ygMMNfK4ZysINkJsklKLYdjxgEz+/VTLA5iJZ
-         HKmoNzrjzkIQrWJH6pM9JEuAaIgTjvf1K9yfC6EAwxwjNQ4/SA8IRktUTxfEUPYbGAIw
-         pRvZcEH8DNwQe56FbeGuJzWihzgPGQ63CWx7D9I8cAEEnR9vz9dkZiwY5Z/OsOj5N6B1
-         dG4qm3VAVyk4jVv6zaDzVqOEXF5Im5Upsm9DAfJ2hoDCDTT90QOsSZaMzhx9g68OH1Cd
-         itjwGHIili8E32G8Du2kWfZaJOeaMF9kYHPTX9XqSi8JZ4i8V3C1IwTYvFhWrbz5Ym5m
-         EJjg==
-X-Gm-Message-State: AOJu0Yy2JDtI+Fp5lIPH8w5kQvfJUYU9yLLmpoXGSHmytYUNrqQzmwJ+
-	LiPgftQPfNX/d9u0zLdCAHwB5BtfcgR5GLzxQQa8aKxdxdmkGtZmm++4T0vuP5zIm3sJ1cuosCf
-	tCDAjSTWp+E1k3K7EbxE6v8SmmYKq5TeRXorMO/PIZGk+7Mz86yGLhJu2alM+RISHCCzeHzPqcv
-	96Bih80w==
-X-Gm-Gg: AY/fxX5ioSrkCl/UocKCX2VPAdT4ovxGuvfn+IR/nCfG8eioMSkSClLHLulP+hIupvm
-	DoS8OpZTRF07X/KPQkHaZiiaXTZUq2+gFEtJQt3WfV7mEU596wDeHnUe56IECeNNzfHxJpFlIXl
-	uLv6HpT++ZsN8RdaLyqtjclNgWBQWpeAhAPYmeQbONerUjcMcIgMDnAlApcJ3TSmiuX0HErdI2g
-	TihmMBPAx4UVb0RhW9btKUcD1ny3va3DsuKjjfZM2g/MrOUorVjBlR1gVZaWAOisxtWQelloJgO
-	tLbgyWjDrUoPFoN3rHYghNJwdJrMv+KTFaSe9QPsnPbHboNky/pTf3jGV1o/xe9Vj1/EaMy0oaW
-	rmaWEDlE7frHenDrmdhhuLTHS2o+99y/CJPRph33rCKMWPzC0fn8NgGkQklsrSO2m
-X-Received: by 2002:a05:620a:40c1:b0:8b9:d2cc:cded with SMTP id af79cd13be357-8bb3a27623bmr2246353585a.52.1765904856063;
-        Tue, 16 Dec 2025 09:07:36 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEoVMP64M1IhGDJjh39XY59ctMuj3UH2eDMGIf3ZwpmoQLFJ9DzmyofZbh9CRewHdRRI2tbGQ==
-X-Received: by 2002:a05:620a:40c1:b0:8b9:d2cc:cded with SMTP id af79cd13be357-8bb3a27623bmr2246330685a.52.1765904854123;
-        Tue, 16 Dec 2025 09:07:34 -0800 (PST)
-Received: from localhost (modemcable137.35-177-173.mc.videotron.ca. [173.177.35.137])
-        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-8be31b53dbasm224404285a.34.2025.12.16.09.07.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Dec 2025 09:07:33 -0800 (PST)
-From: "Alice C. Munduruca" <alice.munduruca@canonical.com>
-To: netdev@vger.kernel.org
-Cc: linux-kselftest@vger.kernel.org,
-	"Alice C. Munduruca" <alice.munduruca@canonical.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Willem de Bruijn <willemb@google.com>,
-	Cengiz Can <cengiz.can@canonical.com>
-Subject: [PATCH net v3] selftests: net: fix "buffer overflow detected" for tap.c
-Date: Tue, 16 Dec 2025 12:06:41 -0500
-Message-ID: <20251216170641.250494-1-alice.munduruca@canonical.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1765906030; c=relaxed/simple;
+	bh=LOoNsfgtqQFSm+0gZYo/RrK4QnqByvGvMQcD4Xfny+o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TTJZd8/l9xFDgMd8MrYLA0Aaaa7B0P92rAicBnaRNJjJ+5KLbz7uHKf3PT1OVLHUh5F4rFIWTx5/RO9BRV7M3cl6OHOzGHPJTivgBMkmjpUHRVS/kx3ZPcfEzdkKWA9D7djMAQ07reHQsaoaeWJrrgiTuO3PtQR8T7FRV7In+ns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PpezN6fg; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 89B4A4E41C34;
+	Tue, 16 Dec 2025 17:27:03 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 557F26071C;
+	Tue, 16 Dec 2025 17:27:03 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A9AD3119A9759;
+	Tue, 16 Dec 2025 18:26:44 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1765906017; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=EmrY+TtKs52sxJBoXVm7+OMPrZ2mV5ot/olhs/S4NT8=;
+	b=PpezN6fgd+3PEQFLhd6fNgyfQKDlPVICMLyWK1hTZw7smVZG3VMfI3/lykbKBvnCQgDxvf
+	DRA1bIlc4wxUxz+bs0dkav6nr9jnHdl70bQhIXsRhWXvYNPqlSVVT/ZEK913ctS7cn/k4I
+	Nd/R/OFduTnhKVFoTJH+TjJOwKQoCebd9g88kfA+0QCBkmSWDQDWy0vfHiyneCUqyf38YJ
+	Bo3gBkdvkFRDkvnm1oJyOe4CafHvM8u8Na/fyKn+vlXHYSdZMlIsPMVx9pBrh4Dyr53yR9
+	re5OTg4aWBY5HDcz4U6PMuQQTqJOk/EPLQ+torGwHiqi34ySsxXe2G2r7vB9VQ==
+Date: Tue, 16 Dec 2025 18:26:44 +0100
+From: Alexandre Belloni <alexandre.belloni@bootlin.com>
+To: Robert Marko <robert.marko@sartura.hr>
+Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+	nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
+	Steen.Hegelund@microchip.com, daniel.machon@microchip.com,
+	UNGLinuxDriver@microchip.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, vkoul@kernel.org, linux@roeck-us.net,
+	andi.shyti@kernel.org, lee@kernel.org, andrew+netdev@lunn.ch,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	linusw@kernel.org, olivia@selenic.com, radu_nicolae.pirea@upb.ro,
+	richard.genoud@bootlin.com, gregkh@linuxfoundation.org,
+	jirislaby@kernel.org, mturquette@baylibre.com, sboyd@kernel.org,
+	richardcochran@gmail.com, wsa+renesas@sang-engineering.com,
+	romain.sioen@microchip.com, Ryan.Wanner@microchip.com,
+	lars.povlsen@microchip.com, tudor.ambarus@linaro.org,
+	charan.pedumuru@microchip.com, kavyasree.kotagiri@microchip.com,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	dmaengine@vger.kernel.org, linux-hwmon@vger.kernel.org,
+	linux-i2c@vger.kernel.org, netdev@vger.kernel.org,
+	linux-gpio@vger.kernel.org, linux-spi@vger.kernel.org,
+	linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
+	linux-clk@vger.kernel.org, mwalle@kernel.org,
+	luka.perkov@sartura.hr
+Subject: Re: [PATCH v2 04/19] dt-bindings: arm: move AT91 to generic
+ Microchip binding
+Message-ID: <202512161726449fe42d71@mail.local>
+References: <20251215163820.1584926-1-robert.marko@sartura.hr>
+ <20251215163820.1584926-4-robert.marko@sartura.hr>
+ <202512161628415e9896d1@mail.local>
+ <CA+HBbNFG+xNokn5VY5G6Cgh41NZ=KteRi0D9c0B15xb77mzv8w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CA+HBbNFG+xNokn5VY5G6Cgh41NZ=KteRi0D9c0B15xb77mzv8w@mail.gmail.com>
+X-Last-TLS-Session-Version: TLSv1.3
 
-When the selftest 'tap.c' is compiled with '-D_FORTIFY_SOURCE=3',
-the strcpy() in rtattr_add_strsz() is replaced with a checked
-version which causes the test to consistently fail when compiled
-with toolchains for which this option is enabled by default.
+On 16/12/2025 17:56:20+0100, Robert Marko wrote:
+> On Tue, Dec 16, 2025 at 5:29 PM Alexandre Belloni
+> <alexandre.belloni@bootlin.com> wrote:
+> >
+> > On 15/12/2025 17:35:21+0100, Robert Marko wrote:
+> > > Create a new binding file named microchip.yaml, to which all Microchip
+> > > based devices will be moved to.
+> > >
+> > > Start by moving AT91, next will be SparX-5.
+> >
+> > Both lines of SoCs are designed by different business units and are
+> > wildly different and while both business units are currently owned by
+> > the same company, there are no guarantees this will stay this way so I
+> > would simply avoid merging both.
+> 
+> Hi Alexandre,
+> 
+> The merge was requested by Conor instead of adding a new binding for LAN969x [1]
+> 
+> [1] https://patchwork.kernel.org/project/linux-arm-kernel/patch/20251203122313.1287950-2-robert.marko@sartura.hr/
+> 
 
- TAP version 13
- 1..3
- # Starting 3 tests from 1 test cases.
- #  RUN           tap.test_packet_valid_udp_gso ...
- *** buffer overflow detected ***: terminated
- # test_packet_valid_udp_gso: Test terminated by assertion
- #          FAIL  tap.test_packet_valid_udp_gso
- not ok 1 tap.test_packet_valid_udp_gso
- #  RUN           tap.test_packet_valid_udp_csum ...
- *** buffer overflow detected ***: terminated
- # test_packet_valid_udp_csum: Test terminated by assertion
- #          FAIL  tap.test_packet_valid_udp_csum
- not ok 2 tap.test_packet_valid_udp_csum
- #  RUN           tap.test_packet_crash_tap_invalid_eth_proto ...
- *** buffer overflow detected ***: terminated
- # test_packet_crash_tap_invalid_eth_proto: Test terminated by assertion
- #          FAIL  tap.test_packet_crash_tap_invalid_eth_proto
- not ok 3 tap.test_packet_crash_tap_invalid_eth_proto
- # FAILED: 0 / 3 tests passed.
- # Totals: pass:0 fail:3 xfail:0 xpass:0 skip:0 error:0
+I would still keep them separate, SparX-5 is closer to what is
+devicetree/bindings/mips/mscc.txt than to any atmel descended SoCs.
 
-A buffer overflow is detected by the fortified glibc __strcpy_chk()
-since the __builtin_object_size() of `RTA_DATA(rta)` is incorrectly
-reported as 1, even though there is ample space in its bounding
-buffer `req`.
-
-Additionally, given that IFLA_IFNAME also expects a null-terminated
-string, callers of rtaddr_add_str{,sz}() could simply use the
-rtaddr_add_strsz() variant. (which has been renamed to remove the
-trailing `sz`) memset() has been used for this function since it
-is unchecked and thus circumvents the issue discussed in the
-previous paragraph.
-
-Fixes: 2e64fe4624d1 ("selftests: add few test cases for tap driver")
-Signed-off-by: Alice C. Munduruca <alice.munduruca@canonical.com>
-Reviewed-by: Cengiz Can <cengiz.can@canonical.com>
----
- tools/testing/selftests/net/tap.c | 16 +++++-----------
- 1 file changed, 5 insertions(+), 11 deletions(-)
-
-diff --git a/tools/testing/selftests/net/tap.c b/tools/testing/selftests/net/tap.c
-index 247c3b3ac1c9..51a209014f1c 100644
---- a/tools/testing/selftests/net/tap.c
-+++ b/tools/testing/selftests/net/tap.c
-@@ -56,18 +56,12 @@ static void rtattr_end(struct nlmsghdr *nh, struct rtattr *attr)
- static struct rtattr *rtattr_add_str(struct nlmsghdr *nh, unsigned short type,
- 				     const char *s)
- {
--	struct rtattr *rta = rtattr_add(nh, type, strlen(s));
-+	unsigned int strsz = strlen(s) + 1;
-+	struct rtattr *rta;
- 
--	memcpy(RTA_DATA(rta), s, strlen(s));
--	return rta;
--}
--
--static struct rtattr *rtattr_add_strsz(struct nlmsghdr *nh, unsigned short type,
--				       const char *s)
--{
--	struct rtattr *rta = rtattr_add(nh, type, strlen(s) + 1);
-+	rta = rtattr_add(nh, type, strsz);
- 
--	strcpy(RTA_DATA(rta), s);
-+	memcpy(RTA_DATA(rta), s, strsz);
- 	return rta;
- }
- 
-@@ -119,7 +113,7 @@ static int dev_create(const char *dev, const char *link_type,
- 
- 	link_info = rtattr_begin(&req.nh, IFLA_LINKINFO);
- 
--	rtattr_add_strsz(&req.nh, IFLA_INFO_KIND, link_type);
-+	rtattr_add_str(&req.nh, IFLA_INFO_KIND, link_type);
- 
- 	if (fill_info_data) {
- 		info_data = rtattr_begin(&req.nh, IFLA_INFO_DATA);
 -- 
-2.48.1
-
+Alexandre Belloni, co-owner and COO, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
