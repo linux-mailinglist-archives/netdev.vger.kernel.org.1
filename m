@@ -1,124 +1,166 @@
-Return-Path: <netdev+bounces-244947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00D47CC3AAF
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 15:41:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2070BCC3BB4
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 15:49:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7DAA430169B4
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 14:35:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DAEA230699F0
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 14:43:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 498AA33A9D3;
-	Tue, 16 Dec 2025 14:35:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QJ9MC+No";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="HI9DpcgF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF6282D77E6;
+	Tue, 16 Dec 2025 14:38:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 947D63A1E6C
-	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 14:35:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84E8B2BD035
+	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 14:38:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765895746; cv=none; b=WDl680D2rAECS6o/veJg8RSbAhQjx6yWZd1lUTc+fD9MSESnmLUXJwQoCrCBabmn9IAzYsF2a1D60b5m4q5Af2ox1U1TkLyThSDlEjoi+EC8gnaQNdHDL6ecRg1KBSKz9V8JIkGrnztiDrmQn+A0thwnLjd6DgS04UEec95iV1U=
+	t=1765895929; cv=none; b=XdDqGfw6ncgsZh5f2RTPCrpoGK1Nci779IVhzJBXGYN03kyNP9eWAAA9xfrxAoFEbQfljp0+HqyQ3eI1Mh0R22xf1ScEKGi196KViNg9+1cO3RybgDWKwU2eDi2tJP14QgTwLuJb1NcUR1QxiZ0WXR0dSYFfO2YwuHS6wCQCrPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765895746; c=relaxed/simple;
-	bh=bRJifwBpOn5/UKOhHLvWKxzpriP409m/28t9c1F6o0w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MbNvIWbn5bMy2MTi/OOLSkXdPXFbNJExe8ipOhHdeDQUvRMF2Taetj4RPVUFVx/UQelVcjFlaYeTifaJiSAw+4I8onMK6yRz+deSSwXf8f2evedMIcvmU2rYkwiDEWZmky9241CLnLzH9LKmffbt4bMl5Rb1iTubLXUxU6kwYrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QJ9MC+No; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=HI9DpcgF; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765895743;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bRJifwBpOn5/UKOhHLvWKxzpriP409m/28t9c1F6o0w=;
-	b=QJ9MC+NoH4FGxx/AfjEIX/r6BJ9oiHH5RU7W2BpTnib6LSR23WcE7ntuVBmRraUEX25277
-	GKzNw90biS8eJVO07/8969YkL8TbvpJKZNcHUFjsJk+oWfgPGAj6d4PvQG9OMCEU47TpDj
-	5YpalZnl3NWBxB8GQXXfTQ5+F2zGmnU=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-673-Wxz8tr2uNXmxUfolnZ8_SQ-1; Tue, 16 Dec 2025 09:35:42 -0500
-X-MC-Unique: Wxz8tr2uNXmxUfolnZ8_SQ-1
-X-Mimecast-MFC-AGG-ID: Wxz8tr2uNXmxUfolnZ8_SQ_1765895741
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-43102ac1da8so1128923f8f.2
-        for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 06:35:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1765895741; x=1766500541; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bRJifwBpOn5/UKOhHLvWKxzpriP409m/28t9c1F6o0w=;
-        b=HI9DpcgFTcq7/oQoiFTFel4T/ubbksw5YSYskJwMcDLqPmqBc9CTvgqBYG6kiKoVwD
-         g0fWPA2S2naqgi0gqI6EXx1y/uJNmkzZBUN6ulhQaw6kIeqQKVAszTshlaTiBt8uDZY1
-         Lh0R4QDmL7P3ON4NjU/kPbimDrK8SzjdxDwDo9HC5684YzUqBG5xrxYCRqUQ7Vf6+ANx
-         s+m1DzfIsj3N6CRJtj171bn4CTIl4j7gw9o+cbxhjYRHY1E9g7wZADuE9bxBsMzzIzSB
-         78MqVqeY4E+ULfTPBm6uWxQTAkH/el7PdxfTBM7hR1XhnYfZAJ2cZ/4Ag9hcaPKAQM3x
-         inYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765895741; x=1766500541;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=bRJifwBpOn5/UKOhHLvWKxzpriP409m/28t9c1F6o0w=;
-        b=e9UBZ+EO4SWxAldC8gwQa8xlhUDtLEy3ZB4tnubQN1xKLHnHzEgHRBDbGEpSTVuOuL
-         ypSmS/neYtkDeleCWLISRhRFoTaHB/9fFOmuB6Ly2WzE7j2Sw8LyQ6hDwdCrcuTtZse/
-         C9Rq56v/BGOWTU2eGPL2MCilp59hg5w4hTb/4MnrrRmcGKBDHG1Cdgg+Nx8fy5L7BO0C
-         ukbsI8ixHJy2oDUyPwnLa1Yq+CNWGkSw4fiqkUpJyE3vPGM9ljV1Rsy643RUr7vJiNQg
-         37PXYqQeUtqxo/lKF2YHkWvDQJh9zo4n7k90+HpB/XL9d5MWHn/leqaQ7nDTTkbvEPqE
-         dM8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCULI55l20ob0pjzhHb52Nv3os+vALZh7JWoKEDc15GFM1dyBtRnwoXBxY7lCFSzcFuTcTDtHnM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzs0SzB68cS8uD597DgYjeYZC2vhfJ5E6TkHegMnjPWrk7/5o/X
-	AuXUZ7cr92Elh7+4XVn3RVekofwrikggoYuQqoTQon8eEf014yg8zH6cXmzO/HiXEs8qri0k6SJ
-	iayaaB90UMutji23YSf20GGudbjn42ZlNd9rpwOUnfdVhAbeBtKZuuuIG8A==
-X-Gm-Gg: AY/fxX7shUC/pdwpzhgF5woOgfHij1c4K28E5mc4hrSvJQMAM6jB1UOOdexzbUKLQpq
-	5kbB2qv3KqDR8t8em3AqgMFsaJQksAdqLzFgxgVvy5H5Ctpy6d/r4H6QPlTZoNZAi4sHSpAFQ70
-	sB+uQ+QnoJFwSnbY5EmNP6owpeU5nVni40iSwJXArEY3CC3vQ8xVyPwy4GoRgwuUPK++6Vqk3UX
-	UpXQWUO3eeLKkFUWwqvTf5uPJOfCTzHGBP/Tr8zg9OR+b8YxsAr4FJ8jeOsryjpdwukNTbVMTMa
-	gu6ZaTUxq4F+xYgiZg2zjZeY4he7aX0zyxVGjxG/XX7fwaPe0Q+txKGHjs7Or9fCKRrV1yeihay
-	hrehpMoFgGoJtZyydc1WsBVB/P1S1f414M3FAAaKxcVlipPN3s/iIDxzYlg==
-X-Received: by 2002:a05:6000:178e:b0:430:f463:b6a7 with SMTP id ffacd0b85a97d-430f463b786mr10423858f8f.45.1765895741330;
-        Tue, 16 Dec 2025 06:35:41 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEEiQf6BBDsC38L/5VWuZcUazJwh3+kQd4Ox+qhR2hGcQAYTsyHnr0moIxAY07XF4YHlOkdZw==
-X-Received: by 2002:a05:6000:178e:b0:430:f463:b6a7 with SMTP id ffacd0b85a97d-430f463b786mr10423822f8f.45.1765895740892;
-        Tue, 16 Dec 2025 06:35:40 -0800 (PST)
-Received: from air.bos2.lab (IGLD-80-230-108-89.inter.net.il. [80.230.108.89])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42fa8a09fbesm35964873f8f.0.2025.12.16.06.35.39
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 16 Dec 2025 06:35:40 -0800 (PST)
-From: Vitaly Grinberg <vgrinber@redhat.com>
-To: grzegorz.nitka@intel.com
-Cc: aleksandr.loktionov@intel.com,
-	anthony.l.nguyen@intel.com,
-	arkadiusz.kubalewski@intel.com,
-	horms@kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pmenzel@molgen.mpg.de,
-	przemyslaw.kitszel@intel.com
-Subject: Re:[Intel-wired-lan] [PATCH v5 iwl-next] ice: add support for unmanaged DPLL on E830 NIC
-Date: Tue, 16 Dec 2025 16:35:38 +0200
-Message-ID: <20251216143538.14975-1-vgrinber@redhat.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20251120105208.2291441-1-grzegorz.nitka@intel.com>
-References: <20251120105208.2291441-1-grzegorz.nitka@intel.com>
+	s=arc-20240116; t=1765895929; c=relaxed/simple;
+	bh=b1k+1VZGu+5jj64DAxHNDoZ4uxvQQI5DwLS8flan4TU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=flfaZvLTCw4YKu7IrMmkIYlDUsKp7v896NR1RaYXJZzzuJZ2PBWKUSd8hOsWd4Hv8+Bvtax0jp1BGQ5aw33YgofsA1Tf915pwv5A5LolbLk2BFqD3fUyw33UpTB4iFtA72g5R3Kg9AbFpZGjt3ZGFNkrckkJAb41/1RBou5Tm1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 5BGEcdcI065864;
+	Tue, 16 Dec 2025 23:38:39 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 5BGEcc9d065861
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Tue, 16 Dec 2025 23:38:38 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <10caea5b-9ad1-44ce-9eaf-a0f4023f2017@I-love.SAKURA.ne.jp>
+Date: Tue, 16 Dec 2025 23:38:37 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH] RDMA/core: flush gid_cache_wq WQ from disable_device()
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Majd Dibbiny <majd@mellanox.com>,
+        Doug Ledford <dledford@redhat.com>, Yuval Shaia <yshaia@marvell.com>,
+        Bernard Metzler <bernard.metzler@linux.dev>,
+        OFED mailing list <linux-rdma@vger.kernel.org>,
+        Network Development <netdev@vger.kernel.org>
+References: <30ec01df-6c32-490c-aa26-c41653f5a257@I-love.SAKURA.ne.jp>
+ <8f90fba8-60b9-46e2-8990-45311c7b1540@I-love.SAKURA.ne.jp>
+ <1722eff3-14c1-408b-999b-1be3e8fbfe5a@I-love.SAKURA.ne.jp>
+ <9b4ce0df-1fbf-4052-9eb9-1f3d6ad6a685@I-love.SAKURA.ne.jp>
+ <13f54775-7a36-48f2-b9cd-62ab9f15a82b@I-love.SAKURA.ne.jp>
+ <ace1ebe4-4fdb-49f4-a3fa-bbf11e1b40ed@I-love.SAKURA.ne.jp>
+ <20251216140512.GC6079@nvidia.com>
+Content-Language: en-US
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <20251216140512.GC6079@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Virus-Status: clean
+X-Anti-Virus-Server: fsav203.rs.sakura.ne.jp
 
-Will a notification be provided when the lock is re-acquired?
+syzbot is reporting a net_device refcount leak in RDMA code.
+A debug printk() patch reported that ib_enum_roce_netdev() is called for
+allocating GID entry but is not called for releasing GID entry.
+This result suggests that something is preventing ib_enum_roce_netdev()
+ from ib_enum_all_roce_netdevs() from netdevice_event_work_handler() from
+being called when releasing GID entry.
 
-Another concern is the absence of periodical pin notifications. With the E810, users received the active pin notifications every 1 second. However, the unmanaged DPLL appears to lack this functionality. User implementations currently rely on these periodical notifications to derive the overall clock state, metrics and events from the phase offset. It seems that unmanaged DPLL users will be forced to support two distinct types of DPLLs: one that sends periodical pin notifications and one that does not. Crucially, this difference does not appear to be reflected in the device capabilities, meaning users cannot know in advance whether to expect these notifications.
+Commit 03db3a2d81e6 ("IB/core: Add RoCE GID table management") introduced
+ib_enum_all_roce_netdevs(), but calling this function asynchronously from
+WQ context is racy. I can observe using simple atomic_t counters that there
+are sometimes pending netdevice_event() works as of immediately before
+clearing DEVICE_REGISTERED flag in disable_device() from
+__ib_unregister_device(). If pending works contained ib_enum_roce_netdev()
+call for releasing GID entry, this race can result in a net_device refcount
+leak.
+
+Therefore, flush pending works immediately before clearing
+DEVICE_REGISTERED flag.
+
+Also, since commit 8fe8bacb92f2 ("IB/core: Add ordered workqueue for RoCE
+GID management") was intended to ensure that netdev events are processed
+in the order netdevice_event() is called, failing to invoke corresponding
+event handler due to memory allocation failure is as bad as processing
+netdev events in parallel.
+
+Therefore, add __GFP_NOFAIL when allocating memory for a work for netdev
+events.
+
+Reported-by: syzbot+881d65229ca4f9ae8c84@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84
+Fixes: 03db3a2d81e6 ("IB/core: Add RoCE GID table management")
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+---
+I haven't confirmed that netdevice_event_work_handler() is called for
+releasing GID entry.
+But I'd like to try this patch in linux-next tree via my tree for testing.
+
+ drivers/infiniband/core/core_priv.h     |  1 +
+ drivers/infiniband/core/device.c        |  1 +
+ drivers/infiniband/core/roce_gid_mgmt.c | 10 ++++++----
+ 3 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/infiniband/core/core_priv.h b/drivers/infiniband/core/core_priv.h
+index 05102769a918..8355020bb98a 100644
+--- a/drivers/infiniband/core/core_priv.h
++++ b/drivers/infiniband/core/core_priv.h
+@@ -142,6 +142,7 @@ int ib_cache_gid_del_all_netdev_gids(struct ib_device *ib_dev, u32 port,
+ 
+ int roce_gid_mgmt_init(void);
+ void roce_gid_mgmt_cleanup(void);
++void roce_flush_gid_cache_wq(void);
+ 
+ unsigned long roce_gid_type_mask_support(struct ib_device *ib_dev, u32 port);
+ 
+diff --git a/drivers/infiniband/core/device.c b/drivers/infiniband/core/device.c
+index 13e8a1714bbd..8638583a64f2 100644
+--- a/drivers/infiniband/core/device.c
++++ b/drivers/infiniband/core/device.c
+@@ -1300,6 +1300,7 @@ static void disable_device(struct ib_device *device)
+ 
+ 	WARN_ON(!refcount_read(&device->refcount));
+ 
++	roce_flush_gid_cache_wq();
+ 	down_write(&devices_rwsem);
+ 	xa_clear_mark(&devices, device->index, DEVICE_REGISTERED);
+ 	up_write(&devices_rwsem);
+diff --git a/drivers/infiniband/core/roce_gid_mgmt.c b/drivers/infiniband/core/roce_gid_mgmt.c
+index a9f2c6b1b29e..79982d448cd2 100644
+--- a/drivers/infiniband/core/roce_gid_mgmt.c
++++ b/drivers/infiniband/core/roce_gid_mgmt.c
+@@ -661,10 +661,7 @@ static int netdevice_queue_work(struct netdev_event_work_cmd *cmds,
+ {
+ 	unsigned int i;
+ 	struct netdev_event_work *ndev_work =
+-		kmalloc(sizeof(*ndev_work), GFP_KERNEL);
+-
+-	if (!ndev_work)
+-		return NOTIFY_DONE;
++		kmalloc(sizeof(*ndev_work), GFP_KERNEL | __GFP_NOFAIL);
+ 
+ 	memcpy(ndev_work->cmds, cmds, sizeof(ndev_work->cmds));
+ 	for (i = 0; i < ARRAY_SIZE(ndev_work->cmds) && ndev_work->cmds[i].cb; i++) {
+@@ -948,3 +945,8 @@ void __exit roce_gid_mgmt_cleanup(void)
+ 	 */
+ 	destroy_workqueue(gid_cache_wq);
+ }
++
++void roce_flush_gid_cache_wq(void)
++{
++	flush_workqueue(gid_cache_wq);
++}
+-- 
+2.47.3
+
 
 
