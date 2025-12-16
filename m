@@ -1,235 +1,160 @@
-Return-Path: <netdev+bounces-244865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E81EACC0726
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 02:24:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B0ED9CC073B
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 02:25:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 9225A303C9A4
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 01:22:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5BD32300156C
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 01:25:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4725126A09B;
-	Tue, 16 Dec 2025 01:22:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA129270ED7;
+	Tue, 16 Dec 2025 01:25:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E85KftC4"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="jMPVFjfr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02A84230BD5
-	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 01:22:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F76326CE0A;
+	Tue, 16 Dec 2025 01:25:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765848131; cv=none; b=p1eRXc9EQlHRSp4or5CqGvd9H7cgkBYRIRLzeh8MjXr6ush5D/t7YiWJmxg9iBJgg6ghptO9O+IwTkraga44xoVmUwsXHkwz7SpLm2msfz9m58OeWXddQoJagOketv64/Je1XZZ4HXMzhWOj8Kr7+iK/Ay6Ojf9vvMOljMrP/xg=
+	t=1765848322; cv=none; b=fFcMPoeO1Rrw7ZX0YgKam2X9RLrv166+oyG8RHg1usIDsWEiyiXGr3bNNgl9HVKl33xgyWQYmNdPHGNg30RpAy4iT/pAVQJUadEUi4fO41Jn4od2CzbXpOfIZtazJUjgCIQDIB8lQItDGHZz1O1Buiy9DjP5/58LqsRyzKIIHjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765848131; c=relaxed/simple;
-	bh=KhTpBrq3o1OcDzqZyQ5v6akeq46HasfcRLGJ5YYrEKI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CpvEg8Rlr6sRsrC2D748az0MCI0mGd3qwz0pdwaxdVFdyxCRA4SLjaI1HRzBrw2Rmx767p685ope0powFaQFfPRFxI5fASUBr2k7512efwaL3pF8v+G3ubNE3YMZvifaNj90Q+8UguF3eRgLnUbuRmRSBZY4v7LNtaZaVYvj6AM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E85KftC4; arc=none smtp.client-ip=74.125.224.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-642fcb38f35so3550985d50.1
-        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 17:22:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765848127; x=1766452927; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lI4+C9X3I7yvyc2773MJlpz/r2L4renU7eOoChO1rz0=;
-        b=E85KftC4BWZfUx89LtZEIH8y7/RxFdxyiOLkF/oGhurra3KCTuuTJmFT29mGuDqhmC
-         ekGXhRUT8UCkCdfhC1g+OBDvcWXLE7x4vuiTCBNxq/6/oSLmJxCCudHAeg9dtOwTLhP7
-         2zVPhEafOkBq3IsFm0xmc8K0M1DRgZab9KpcWlxKImXXLmk7i5/EZoqvUdSVy3d3keUq
-         u09A5L3XTMi7GhosnNUH3ITVQbgUophG9kNdAB/9iUGr5yLfZURBwoHfkZj6DwpuDSOf
-         Ox+M5hZD4MSgsMS29AuTiQo4tbX85GGZR9einVh9K+y4ecgUvbTD8aF1JF8NPyJMEC5K
-         PiHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765848127; x=1766452927;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lI4+C9X3I7yvyc2773MJlpz/r2L4renU7eOoChO1rz0=;
-        b=qGaDLCVOB9W+n3/5br1qY/GLQugqGFtlVfAmeOfvGpzHv3vmQWgVVETRox/JFpDzDZ
-         fiMkxpFA25n6UH9pV8RybitsuKF/UAa+BlclLe4LgdoNTFw5ptVZ99NgFnq5tLVB18y2
-         YAg/mJ6lG02I+xFuRoIk3EH+JKeXnjFl0COoGOxmpWAsPZuUz+e8EKElnsGyCw1cq2pm
-         yTYXusDbMcs8ABId75M2bribYm9Y9aKK5v7vBk4HwwIDw7XCnhlFHhOZN/yn56waMT9v
-         JvWj8VQPhgFOSpEbQiUq4nb+81LZe8ihOuo80RvbSpPneRpcXLmkUJqD8Mc/4wZhBCux
-         6U2g==
-X-Forwarded-Encrypted: i=1; AJvYcCV9p7jZdB8+zGVQX5/z0klxvAoxEWhEDtSrkAo/hCXNGaxcgo9CH2rQU7uHdh/f41kpGCnASO0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxc9h8ePpKdcoGYOs4P2fhYCC+tejZPZqiNZf7y3a0sH+wMGda6
-	ryAdsv7bKkkZ+wskfFhJs6h/E5Z33L7poD2RaGvZiVs6lmMf/OTEu79S
-X-Gm-Gg: AY/fxX4cxmaX+6w1f4SKvgz+oiaiygFof7SY5zSEF4ojyzQu57j9nKyRSKb1YnSEN0r
-	u4eb1S+jJPQ8HpCIUPpPipIgQ/nNgHDMk3TjDtNYDgQO7flvG0HfbC71DAvlp5E5KiiHjBXsKkx
-	T3KtaEfFwQ1Qjgey43Ck2n8RdsTr//lmZ1SBq8kjoN9e2U9VraGLWZ2trlMuGvnNdrQLMZdpu73
-	IKu9AWhDAUYC2VNc60BMSBWs5pgKY7vTmHtVPoaj3QABy6RV2OwhXKmAUPv5KmEmHl8+1jEdy8+
-	YKbkTkanULBsGnYXnvvxJHoOwLcBYeKyLMcMVSuEtyg/U4NLqmcQOc5woeITRG+QWsWo07xPIIL
-	4jU0xnv2+8ysTpbEP1+dBT3ooGYGswcw2f+Z2BznNUZvW1GAgvhQE/qIesOJZ/Fl8QAhGOpGzl4
-	NgiYfx4Vad+gkNnRe0Wada3yS0NpO6rEU8GmyvoeDYM3UAMc8=
-X-Google-Smtp-Source: AGHT+IHFuEiGcW0GH4lABrKUUSbE6qv7huuMOYC9DtT8UyxlS9XUtUukZA6W5M9Qt9zONS5q8T2xVg==
-X-Received: by 2002:a05:690e:128c:b0:63f:ab00:1a07 with SMTP id 956f58d0204a3-64555643a56mr9274950d50.49.1765848124847;
-        Mon, 15 Dec 2025 17:22:04 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:58::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-78e748cecd9sm34175187b3.9.2025.12.15.17.22.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Dec 2025 17:22:04 -0800 (PST)
-Date: Mon, 15 Dec 2025 17:22:02 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, berrange@redhat.com,
-	Sargun Dhillon <sargun@sargun.me>,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v12 04/12] vsock: add netns support to virtio
- transports
-Message-ID: <aUC0Op2trtt3z405@devvm11784.nha0.facebook.com>
-References: <20251126-vsock-vmtest-v12-0-257ee21cd5de@meta.com>
- <20251126-vsock-vmtest-v12-4-257ee21cd5de@meta.com>
- <6cef5a68-375a-4bb6-84f8-fccc00cf7162@redhat.com>
- <aS8oMqafpJxkRKW5@devvm11784.nha0.facebook.com>
- <06b7cfea-d366-44f7-943e-087ead2f25c2@redhat.com>
- <aS9hoOKb7yA5Qgod@devvm11784.nha0.facebook.com>
- <aTw0F6lufR/nT7OY@devvm11784.nha0.facebook.com>
- <uidarlot7opjsuozylevyrlgdpjd32tsi7mwll2lsvce226v24@75sq4jdo5tgv>
+	s=arc-20240116; t=1765848322; c=relaxed/simple;
+	bh=3zSPmz/NCkE7wWGBlwPS2JqQRbZqsgUd+xF3nDaHKA0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JqzDIQGL64E59irC6MGubLMKDGt/GH8RUPYv0ArKZA6Jf7je2jIVXFZAc8YDDIh42AFcH9ZHDUqrMVI3BEDuv+g3AYpR8c5X76mEOrOrsQYOImiznRvp3N3ObA/BiR6Fx2ouOkb6qHTl3SJjznANOms8mtag5/0Q3nqrBp7CgO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=jMPVFjfr; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1765848317;
+	bh=0plY8aRXrmAzEnRYdeWviS9sqQo6p5zP5wPOiczpzbE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jMPVFjfrFR+MtukDfHy7Qw4juRI0EqSXNyoaQ/soObaLLCnEbK679LqGLWFCUB8Ub
+	 587xYIhje4IAUflSFydVt6rDw13De8l4Mo4L+vtfHSVFSdhQFFaLkR4/QAoTMIbkFm
+	 2OzHdJ7cBz2xLJDN1jJJZ480L+CjmKLvZgkCB3v3OSNRuuU+5LOAtScOc+x70z1GQO
+	 enF4kIHe8IFkzbBs7K7IoPdY1cuj4Gv6XsK50j9BSNIbwCXXTOGEVfoqyNQVW0s9Gd
+	 FSXz7Vbl1/Cj7i+Hdja9PyhNDgLXnssFrUapfOswQ3mnZ1K1ebhdytgWlzIdoW2SxN
+	 pfpKyDVcDaQzQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4dVfPR2z5Kz4wCm;
+	Tue, 16 Dec 2025 12:25:15 +1100 (AEDT)
+Date: Tue, 16 Dec 2025 12:25:14 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
+ <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>
+Cc: KernelCI bot <bot@kernelci.org>, kernelci@lists.linux.dev,
+ kernelci-results@groups.io, regressions@lists.linux.dev, gus@collabora.com,
+ linux-next@vger.kernel.org, bpf <bpf@vger.kernel.org>, Networking
+ <netdev@vger.kernel.org>, Andy Shevchenko
+ <andriy.shevchenko@linux.intel.com>
+Subject: Re: [REGRESSION] next/pending-fixes: (build) error: unknown warning
+ option '-Wno-suggest-attribute=format'; did...
+Message-ID: <20251216122514.7ee70d5f@canb.auug.org.au>
+In-Reply-To: <176584314280.2550.10885082269394184097@77bfb67944a2>
+References: <176584314280.2550.10885082269394184097@77bfb67944a2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <uidarlot7opjsuozylevyrlgdpjd32tsi7mwll2lsvce226v24@75sq4jdo5tgv>
+Content-Type: multipart/signed; boundary="Sig_/69et5i_lNvN.91T_ot13ewr";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Mon, Dec 15, 2025 at 03:11:22PM +0100, Stefano Garzarella wrote:
-> On Fri, Dec 12, 2025 at 07:26:15AM -0800, Bobby Eshleman wrote:
-> > On Tue, Dec 02, 2025 at 02:01:04PM -0800, Bobby Eshleman wrote:
-> > > On Tue, Dec 02, 2025 at 09:47:19PM +0100, Paolo Abeni wrote:
-> > > > On 12/2/25 6:56 PM, Bobby Eshleman wrote:
-> > > > > On Tue, Dec 02, 2025 at 11:18:14AM +0100, Paolo Abeni wrote:
-> > > > >> On 11/27/25 8:47 AM, Bobby Eshleman wrote:
-> > > > >>> @@ -674,6 +689,17 @@ static int vhost_vsock_dev_open(struct inode *inode, struct file *file)
-> > > > >>>  		goto out;
-> > > > >>>  	}
-> > > > >>>
-> > > > >>> +	net = current->nsproxy->net_ns;
-> > > > >>> +	vsock->net = get_net_track(net, &vsock->ns_tracker, GFP_KERNEL);
-> > > > >>> +
-> > > > >>> +	/* Store the mode of the namespace at the time of creation. If this
-> > > > >>> +	 * namespace later changes from "global" to "local", we want this vsock
-> > > > >>> +	 * to continue operating normally and not suddenly break. For that
-> > > > >>> +	 * reason, we save the mode here and later use it when performing
-> > > > >>> +	 * socket lookups with vsock_net_check_mode() (see vhost_vsock_get()).
-> > > > >>> +	 */
-> > > > >>> +	vsock->net_mode = vsock_net_mode(net);
-> > > > >>
-> > > > >> I'm sorry for the very late feedback. I think that at very least the
-> > > > >> user-space needs a way to query if the given transport is in local or
-> > > > >> global mode, as AFAICS there is no way to tell that when socket creation
-> > > > >> races with mode change.
-> > > > >
-> > > > > Are you thinking something along the lines of sockopt?
-> > > >
-> > > > I'd like to see a way for the user-space to query the socket 'namespace
-> > > > mode'.
-> > > >
-> > > > sockopt could be an option; a possibly better one could be sock_diag. Or
-> > > > you could do both using dumping the info with a shared helper invoked by
-> > > > both code paths, alike what TCP is doing.
-> > > > >> Also I'm a bit uneasy with the model implemented here, as 'local' socket
-> > > > >> may cross netns boundaris and connect to 'local' socket in other netns
-> > > > >> (if I read correctly patch 2/12). That in turns AFAICS break the netns
-> > > > >> isolation.
-> > > > >
-> > > > > Local mode sockets are unable to communicate with local mode (and global
-> > > > > mode too) sockets that are in other namespaces. The key piece of code
-> > > > > for that is vsock_net_check_mode(), where if either modes is local the
-> > > > > namespaces must be the same.
-> > > >
-> > > > Sorry, I likely misread the large comment in patch 2:
-> > > >
-> > > > https://lore.kernel.org/netdev/20251126-vsock-vmtest-v12-2-257ee21cd5de@meta.com/
-> > > >
-> > > > >> Have you considered instead a slightly different model, where the
-> > > > >> local/global model is set in stone at netns creation time - alike what
-> > > > >> /proc/sys/net/ipv4/tcp_child_ehash_entries is doing[1] - and
-> > > > >> inter-netns connectivity is explicitly granted by the admin (I guess
-> > > > >> you will need new transport operations for that)?
-> > > > >>
-> > > > >> /P
-> > > > >>
-> > > > >> [1] tcp allows using per-netns established socket lookup tables - as
-> > > > >> opposed to the default global lookup table (even if match always takes
-> > > > >> in account the netns obviously). The mentioned sysctl specify such
-> > > > >> configuration for the children namespaces, if any.
-> > > > >
-> > > > > I'll save this discussion if the above doesn't resolve your concerns.
-> > > > I still have some concern WRT the dynamic mode change after netns
-> > > > creation. I fear some 'unsolvable' (or very hard to solve) race I can't
-> > > > see now. A tcp_child_ehash_entries-like model will avoid completely the
-> > > > issue, but I understand it would be a significant change over the
-> > > > current status.
-> > > >
-> > > > "Luckily" the merge window is on us and we have some time to discuss. Do
-> > > > you have a specific use-case for the ability to change the netns >
-> > > mode
-> > > > after creation?
-> > > >
-> > > > /P
-> > > 
-> > > I don't think there is a hard requirement that the mode be change-able
-> > > after creation. Though I'd love to avoid such a big change... or at
-> > > least leave unchanged as much of what we've already reviewed as
-> > > possible.
-> > > 
-> > > In the scheme of defining the mode at creation and following the
-> > > tcp_child_ehash_entries-ish model, what I'm imagining is:
-> > > - /proc/sys/net/vsock/child_ns_mode can be set to "local" or "global"
-> > > - /proc/sys/net/vsock/child_ns_mode is not immutable, can change any
-> > >   number of times
-> > > 
-> > > - when a netns is created, the new netns mode is inherited from
-> > >   child_ns_mode, being assigned using something like:
-> > > 
-> > > 	  net->vsock.ns_mode =
-> > > 		get_net_ns_by_pid(current->pid)->child_ns_mode
-> > > 
-> > > - /proc/sys/net/vsock/ns_mode queries the current mode, returning
-> > >   "local" or "global", returning value of net->vsock.ns_mode
-> > > - /proc/sys/net/vsock/ns_mode and net->vsock.ns_mode are immutable and
-> > >   reject writes
-> > > 
-> > > Does that align with what you have in mind?
-> > 
-> > Hey Paolo, I just wanted to sync up on this one. Does the above align
-> > with what you envision?
-> 
-> Hi Bobby, AFAIK Paolo was at LPC, so there could be some delay.
-> 
-> FYI I'll be off from Dec 25 to Jan 6, so if we want to do an RFC in the
-> middle, I'll do my best to take a look before my time off.
-> 
-> Thanks,
-> Stefano
-> 
+--Sig_/69et5i_lNvN.91T_ot13ewr
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Sounds like a plan, thanks!
+Hi all,
 
-Best,
-Bobby
+On Mon, 15 Dec 2025 23:59:03 -0000 KernelCI bot <bot@kernelci.org> wrote:
+>
+> Hello,
+>=20
+> New build issue found on next/pending-fixes:
+>=20
+> ---
+>  error: unknown warning option '-Wno-suggest-attribute=3Dformat'; did you=
+ mean '-Wno-property-attribute-mismatch'? [-Werror,-Wunknown-warning-option=
+] in kernel/bpf/helpers.o (scripts/Makefile.build:287) [logspec:kbuild,kbui=
+ld.compiler.error]
+> ---
+>=20
+> - dashboard: https://d.kernelci.org/i/maestro:32e32983183c2c586f588a4a3a7=
+cda83311d5be9
+> - giturl: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next=
+.git
+> - commit HEAD:  326785a1dd4cea4065390fb99b0249781c9912bf
+>=20
+>=20
+> Please include the KernelCI tag when submitting a fix:
+>=20
+> Reported-by: kernelci.org bot <bot@kernelci.org>
+>=20
+>=20
+> Log excerpt:
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D
+>   CC      kernel/bpf/helpers.o
+> error: unknown warning option '-Wno-suggest-attribute=3Dformat'; did you =
+mean '-Wno-property-attribute-mismatch'? [-Werror,-Wunknown-warning-option]
+>=20
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D
+>=20
+>=20
+> # Builds where the incident occurred:
+>=20
+> ## defconfig on (arm64):
+> - compiler: clang-21
+> - config: https://files.kernelci.org/kbuild-clang-21-arm64-mainline-69409=
+7d2cbfd84c3cdba292d/.config
+> - dashboard: https://d.kernelci.org/build/maestro:694097d2cbfd84c3cdba292d
+>=20
+>=20
+> #kernelci issue maestro:32e32983183c2c586f588a4a3a7cda83311d5be9
+>=20
+> --
+> This is an experimental report format. Please send feedback in!
+> Talk to us at kernelci@lists.linux.dev
+>=20
+> Made with love by the KernelCI team - https://kernelci.org
+>=20
+
+Presumably caused by commit
+
+ ba34388912b5 ("bpf: Disable false positive -Wsuggest-attribute=3Dformat wa=
+rning")
+
+in the bpf tree.
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/69et5i_lNvN.91T_ot13ewr
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmlAtPoACgkQAVBC80lX
+0Gwnlwf/c8kn9K6aG0sl1X13gll7DqASHge6iKGaTEZHx/RSIDn/b4V+PGysnXHe
+MAymJ9jhvWXmxAsbQ7Jz9wS1D17NALYYSWinxetr8gxKKqd4q4+pL4R56r0yqqQz
+u7PGLi0RUPSvX7rlHtT0Fs2PECd0i18O3z7omnRfITxLTKhJXF7th1GE5XBEHdSI
+JQPfqDKe7zwencS4pZSksdkCAmOE68IQDvODSiXwe1C5v3+owbGde2XF0u39Q0q3
+yuBB6D1/s7T9uy1n1N547bPs+QK3HWGrTigsrYUTuuoYs0ZF9xJKahyWG76+MDfo
+rrwxXS9dFO/HcmRmV7LpwhzWzwZcWg==
+=OyqN
+-----END PGP SIGNATURE-----
+
+--Sig_/69et5i_lNvN.91T_ot13ewr--
 
