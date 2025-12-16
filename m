@@ -1,157 +1,235 @@
-Return-Path: <netdev+bounces-244864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A92ABCC05EB
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 01:47:55 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E81EACC0726
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 02:24:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A016A3014118
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 00:47:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9225A303C9A4
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 01:22:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA4F22BCF5;
-	Tue, 16 Dec 2025 00:47:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4725126A09B;
+	Tue, 16 Dec 2025 01:22:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eIz66vpI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E85KftC4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f44.google.com (mail-yx1-f44.google.com [74.125.224.44])
+Received: from mail-yx1-f41.google.com (mail-yx1-f41.google.com [74.125.224.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42AB43B8D55
-	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 00:47:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02A84230BD5
+	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 01:22:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765846073; cv=none; b=LDMucnU+JHg8GfDweiaVw3sBld4hVmfGbZu7TDMhuwBSCoHhRi9i3v0LR+QFX2nFQVSz8qaeCjRHFphpIQnKWeY9zrGYizwl2sEUpPHRp76YKtawg6I7xS13tNTB4IXTvcqS7D/47SXl/j/xBU2eLNUEnNPoTg4FRycYjvxeeag=
+	t=1765848131; cv=none; b=p1eRXc9EQlHRSp4or5CqGvd9H7cgkBYRIRLzeh8MjXr6ush5D/t7YiWJmxg9iBJgg6ghptO9O+IwTkraga44xoVmUwsXHkwz7SpLm2msfz9m58OeWXddQoJagOketv64/Je1XZZ4HXMzhWOj8Kr7+iK/Ay6Ojf9vvMOljMrP/xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765846073; c=relaxed/simple;
-	bh=HIaQjWfioV/QhO6O8UjvzgX1rLJudYj908F/ubxE8u8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=b/hbM20I1LZmObsf5pSWvxN2+iHqQ96jyr8S0qa7bxOKDqxKM/RMAYT5zFGRC6dO3Ykyx5TYYX+9DwRdB4T1xdkBjzbHw8Ojz5ivSUQkVMfsju+5FmJwIOngIF8f0/nOLaRf0RM6DPR90pll2YaUEeG8+N07s4I6FxeHbzmtvrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eIz66vpI; arc=none smtp.client-ip=74.125.224.44
+	s=arc-20240116; t=1765848131; c=relaxed/simple;
+	bh=KhTpBrq3o1OcDzqZyQ5v6akeq46HasfcRLGJ5YYrEKI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CpvEg8Rlr6sRsrC2D748az0MCI0mGd3qwz0pdwaxdVFdyxCRA4SLjaI1HRzBrw2Rmx767p685ope0powFaQFfPRFxI5fASUBr2k7512efwaL3pF8v+G3ubNE3YMZvifaNj90Q+8UguF3eRgLnUbuRmRSBZY4v7LNtaZaVYvj6AM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E85KftC4; arc=none smtp.client-ip=74.125.224.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-641e942242cso3211637d50.1
-        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 16:47:52 -0800 (PST)
+Received: by mail-yx1-f41.google.com with SMTP id 956f58d0204a3-642fcb38f35so3550985d50.1
+        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 17:22:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765846071; x=1766450871; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=htpnQg+KpeLBxyspd7VOYcBUfuFQaw1hHqa/WboeOvQ=;
-        b=eIz66vpI7XfXOV2MoqIZis0ONkKRjb+EgA5AAwuQWIxda4xTPvUD6tBzRNXJrVBZnq
-         vX+ktQlPyBDzAH1XBu6DxYveGOeAQAAMw0CUpKMQ+GCy/L7BY4OYQPD+lrdXJel12frD
-         3QPg0CxG0NVUPYzl4FbR8dI89l5tvVWfyhIHy5S6YdzZS89j1eUKsAhEfVp2yPc6xdNk
-         Ja3qfHiasZ3/Z44vcAIsUGSGYZ8TTb2zSe7G7RCm5dEkjw+Jsv3g8areuufg2nSDpQS/
-         ZceQMK9GBwAhOiLpO3rqJb1djCJOHtE0YweBgUUjR57gn77ClpZ4q6yvt+BsfuaOp1ZM
-         taDA==
+        d=gmail.com; s=20230601; t=1765848127; x=1766452927; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lI4+C9X3I7yvyc2773MJlpz/r2L4renU7eOoChO1rz0=;
+        b=E85KftC4BWZfUx89LtZEIH8y7/RxFdxyiOLkF/oGhurra3KCTuuTJmFT29mGuDqhmC
+         ekGXhRUT8UCkCdfhC1g+OBDvcWXLE7x4vuiTCBNxq/6/oSLmJxCCudHAeg9dtOwTLhP7
+         2zVPhEafOkBq3IsFm0xmc8K0M1DRgZab9KpcWlxKImXXLmk7i5/EZoqvUdSVy3d3keUq
+         u09A5L3XTMi7GhosnNUH3ITVQbgUophG9kNdAB/9iUGr5yLfZURBwoHfkZj6DwpuDSOf
+         Ox+M5hZD4MSgsMS29AuTiQo4tbX85GGZR9einVh9K+y4ecgUvbTD8aF1JF8NPyJMEC5K
+         PiHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765846071; x=1766450871;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=htpnQg+KpeLBxyspd7VOYcBUfuFQaw1hHqa/WboeOvQ=;
-        b=t+HmffSlZYVsBeWZk5JtCG6WJK8LA5UQHYtmzjZc8PV08aJVyTW+Y4emzQlIgzqmSR
-         dU+FQBvO0HEaZgXvd5sDuBJCF4lt8KVo8WEdtnyEQMzKmEWtyZLwn6am3L3JG05gHTui
-         PEpPPf7kTOEjnf8Ii4lrC0lfZKNfeu7LrPykBXN15lua69m564cTrc5kuS70+mYK3Oza
-         7zSvc0xxBTWmZeUMxOlpzaDIYwoVmsL76jcHirln12ovXNRWRk3h6Y/qfr30ggKl5ysm
-         1IHok4tzFqft1vtysUdjMN/T2GHfYYohg/9KPtlI565eK9NfDaAqcuPkclgUD5pAdf9Z
-         BgZw==
-X-Forwarded-Encrypted: i=1; AJvYcCX1P98pGEVnqu3dKvu4nVG0UBDKmaW9adKBsJZLb42B5+aSRuH60WkksjlvDtvcVARtmBf+PAA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyzIGKvpjuJyXH1x2EKmOSiKQsIcVZ3TMJmQwCjMPnMmRM8A6gv
-	yD+RQXI1RPYAEeFfnqbhBNFOXui62O08/akkXRzB1rt96vvkgNtbv6iI
-X-Gm-Gg: AY/fxX5IHznyyfS0nebq+8rvzM/gQjelgO3C2K4AuPluAmewutVIYdliJeUWU3N/L4t
-	F11Ozm21xs0B0B96+CPBdk0yC0XepfIYFUjymCYJjFnAQCiZnwF25kgGP8uRAt9DegK9SwBrIXm
-	1yGHIRrF9pRq4RWmnY9k53Wqb6XBoO5ZuQG7MgOjRqQILUH1AMEvKahdFFLA3Sbt+ejJ0VM3Sfx
-	M6VtF+g4XOuX6vIHU+4CeEiqvsP0b3j2B91M7tsSzYJUySBT55sMgSyfdWrLvLqZfAhnHvsoDrD
-	gXzIra+vGb6WkZLcXgGQpEnV7bzQ6133gN7kBx2dUqMSaOb1y9kut7w0iDnCBbkP72jcYq/o+J6
-	RBombZjV0qM1iRsGC9nP9nd4Usntv2NR1mCHd+nQ4Z8FJ2yfc8H26Brma5qRrspNNqUodFVwKCz
-	U5IWr9PQ==
-X-Google-Smtp-Source: AGHT+IFq+15LrM8DYkmiFJs04hZ8RTo3rucE4z/jkGAw/h4CjNSMcfqoxeOPS87HxufEvEDGqMvAqQ==
-X-Received: by 2002:a05:690e:4185:b0:644:60d9:866b with SMTP id 956f58d0204a3-6455567bd76mr8079705d50.92.1765846071260;
-        Mon, 15 Dec 2025 16:47:51 -0800 (PST)
-Received: from localhost ([2601:346:0:79bd:6b0:1f10:bc87:9bd7])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-64477dab686sm7019840d50.16.2025.12.15.16.47.50
+        d=1e100.net; s=20230601; t=1765848127; x=1766452927;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lI4+C9X3I7yvyc2773MJlpz/r2L4renU7eOoChO1rz0=;
+        b=qGaDLCVOB9W+n3/5br1qY/GLQugqGFtlVfAmeOfvGpzHv3vmQWgVVETRox/JFpDzDZ
+         fiMkxpFA25n6UH9pV8RybitsuKF/UAa+BlclLe4LgdoNTFw5ptVZ99NgFnq5tLVB18y2
+         YAg/mJ6lG02I+xFuRoIk3EH+JKeXnjFl0COoGOxmpWAsPZuUz+e8EKElnsGyCw1cq2pm
+         yTYXusDbMcs8ABId75M2bribYm9Y9aKK5v7vBk4HwwIDw7XCnhlFHhOZN/yn56waMT9v
+         JvWj8VQPhgFOSpEbQiUq4nb+81LZe8ihOuo80RvbSpPneRpcXLmkUJqD8Mc/4wZhBCux
+         6U2g==
+X-Forwarded-Encrypted: i=1; AJvYcCV9p7jZdB8+zGVQX5/z0klxvAoxEWhEDtSrkAo/hCXNGaxcgo9CH2rQU7uHdh/f41kpGCnASO0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxc9h8ePpKdcoGYOs4P2fhYCC+tejZPZqiNZf7y3a0sH+wMGda6
+	ryAdsv7bKkkZ+wskfFhJs6h/E5Z33L7poD2RaGvZiVs6lmMf/OTEu79S
+X-Gm-Gg: AY/fxX4cxmaX+6w1f4SKvgz+oiaiygFof7SY5zSEF4ojyzQu57j9nKyRSKb1YnSEN0r
+	u4eb1S+jJPQ8HpCIUPpPipIgQ/nNgHDMk3TjDtNYDgQO7flvG0HfbC71DAvlp5E5KiiHjBXsKkx
+	T3KtaEfFwQ1Qjgey43Ck2n8RdsTr//lmZ1SBq8kjoN9e2U9VraGLWZ2trlMuGvnNdrQLMZdpu73
+	IKu9AWhDAUYC2VNc60BMSBWs5pgKY7vTmHtVPoaj3QABy6RV2OwhXKmAUPv5KmEmHl8+1jEdy8+
+	YKbkTkanULBsGnYXnvvxJHoOwLcBYeKyLMcMVSuEtyg/U4NLqmcQOc5woeITRG+QWsWo07xPIIL
+	4jU0xnv2+8ysTpbEP1+dBT3ooGYGswcw2f+Z2BznNUZvW1GAgvhQE/qIesOJZ/Fl8QAhGOpGzl4
+	NgiYfx4Vad+gkNnRe0Wada3yS0NpO6rEU8GmyvoeDYM3UAMc8=
+X-Google-Smtp-Source: AGHT+IHFuEiGcW0GH4lABrKUUSbE6qv7huuMOYC9DtT8UyxlS9XUtUukZA6W5M9Qt9zONS5q8T2xVg==
+X-Received: by 2002:a05:690e:128c:b0:63f:ab00:1a07 with SMTP id 956f58d0204a3-64555643a56mr9274950d50.49.1765848124847;
+        Mon, 15 Dec 2025 17:22:04 -0800 (PST)
+Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:58::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-78e748cecd9sm34175187b3.9.2025.12.15.17.22.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Dec 2025 16:47:50 -0800 (PST)
-From: "Yury Norov (NVIDIA)" <yury.norov@gmail.com>
-To: Sunil Goutham <sgoutham@marvell.com>,
-	Linu Cherian <lcherian@marvell.com>,
-	Geetha sowjanya <gakula@marvell.com>,
-	Jerin Jacob <jerinj@marvell.com>,
-	hariprasad <hkelam@marvell.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+        Mon, 15 Dec 2025 17:22:04 -0800 (PST)
+Date: Mon, 15 Dec 2025 17:22:02 -0800
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Paolo Abeni <pabeni@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: "Yury Norov (NVIDIA)" <yury.norov@gmail.com>
-Subject: [PATCH] Octeontx2-af: use bitmap_empty() where appropriate
-Date: Mon, 15 Dec 2025 19:47:41 -0500
-Message-ID: <20251216004742.337016-1-yury.norov@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, berrange@redhat.com,
+	Sargun Dhillon <sargun@sargun.me>,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v12 04/12] vsock: add netns support to virtio
+ transports
+Message-ID: <aUC0Op2trtt3z405@devvm11784.nha0.facebook.com>
+References: <20251126-vsock-vmtest-v12-0-257ee21cd5de@meta.com>
+ <20251126-vsock-vmtest-v12-4-257ee21cd5de@meta.com>
+ <6cef5a68-375a-4bb6-84f8-fccc00cf7162@redhat.com>
+ <aS8oMqafpJxkRKW5@devvm11784.nha0.facebook.com>
+ <06b7cfea-d366-44f7-943e-087ead2f25c2@redhat.com>
+ <aS9hoOKb7yA5Qgod@devvm11784.nha0.facebook.com>
+ <aTw0F6lufR/nT7OY@devvm11784.nha0.facebook.com>
+ <uidarlot7opjsuozylevyrlgdpjd32tsi7mwll2lsvce226v24@75sq4jdo5tgv>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <uidarlot7opjsuozylevyrlgdpjd32tsi7mwll2lsvce226v24@75sq4jdo5tgv>
 
-bitmap_empty() is more verbose and efficient, as it stops traversing
-bitmap as soon as the 1st set bit found.
+On Mon, Dec 15, 2025 at 03:11:22PM +0100, Stefano Garzarella wrote:
+> On Fri, Dec 12, 2025 at 07:26:15AM -0800, Bobby Eshleman wrote:
+> > On Tue, Dec 02, 2025 at 02:01:04PM -0800, Bobby Eshleman wrote:
+> > > On Tue, Dec 02, 2025 at 09:47:19PM +0100, Paolo Abeni wrote:
+> > > > On 12/2/25 6:56 PM, Bobby Eshleman wrote:
+> > > > > On Tue, Dec 02, 2025 at 11:18:14AM +0100, Paolo Abeni wrote:
+> > > > >> On 11/27/25 8:47 AM, Bobby Eshleman wrote:
+> > > > >>> @@ -674,6 +689,17 @@ static int vhost_vsock_dev_open(struct inode *inode, struct file *file)
+> > > > >>>  		goto out;
+> > > > >>>  	}
+> > > > >>>
+> > > > >>> +	net = current->nsproxy->net_ns;
+> > > > >>> +	vsock->net = get_net_track(net, &vsock->ns_tracker, GFP_KERNEL);
+> > > > >>> +
+> > > > >>> +	/* Store the mode of the namespace at the time of creation. If this
+> > > > >>> +	 * namespace later changes from "global" to "local", we want this vsock
+> > > > >>> +	 * to continue operating normally and not suddenly break. For that
+> > > > >>> +	 * reason, we save the mode here and later use it when performing
+> > > > >>> +	 * socket lookups with vsock_net_check_mode() (see vhost_vsock_get()).
+> > > > >>> +	 */
+> > > > >>> +	vsock->net_mode = vsock_net_mode(net);
+> > > > >>
+> > > > >> I'm sorry for the very late feedback. I think that at very least the
+> > > > >> user-space needs a way to query if the given transport is in local or
+> > > > >> global mode, as AFAICS there is no way to tell that when socket creation
+> > > > >> races with mode change.
+> > > > >
+> > > > > Are you thinking something along the lines of sockopt?
+> > > >
+> > > > I'd like to see a way for the user-space to query the socket 'namespace
+> > > > mode'.
+> > > >
+> > > > sockopt could be an option; a possibly better one could be sock_diag. Or
+> > > > you could do both using dumping the info with a shared helper invoked by
+> > > > both code paths, alike what TCP is doing.
+> > > > >> Also I'm a bit uneasy with the model implemented here, as 'local' socket
+> > > > >> may cross netns boundaris and connect to 'local' socket in other netns
+> > > > >> (if I read correctly patch 2/12). That in turns AFAICS break the netns
+> > > > >> isolation.
+> > > > >
+> > > > > Local mode sockets are unable to communicate with local mode (and global
+> > > > > mode too) sockets that are in other namespaces. The key piece of code
+> > > > > for that is vsock_net_check_mode(), where if either modes is local the
+> > > > > namespaces must be the same.
+> > > >
+> > > > Sorry, I likely misread the large comment in patch 2:
+> > > >
+> > > > https://lore.kernel.org/netdev/20251126-vsock-vmtest-v12-2-257ee21cd5de@meta.com/
+> > > >
+> > > > >> Have you considered instead a slightly different model, where the
+> > > > >> local/global model is set in stone at netns creation time - alike what
+> > > > >> /proc/sys/net/ipv4/tcp_child_ehash_entries is doing[1] - and
+> > > > >> inter-netns connectivity is explicitly granted by the admin (I guess
+> > > > >> you will need new transport operations for that)?
+> > > > >>
+> > > > >> /P
+> > > > >>
+> > > > >> [1] tcp allows using per-netns established socket lookup tables - as
+> > > > >> opposed to the default global lookup table (even if match always takes
+> > > > >> in account the netns obviously). The mentioned sysctl specify such
+> > > > >> configuration for the children namespaces, if any.
+> > > > >
+> > > > > I'll save this discussion if the above doesn't resolve your concerns.
+> > > > I still have some concern WRT the dynamic mode change after netns
+> > > > creation. I fear some 'unsolvable' (or very hard to solve) race I can't
+> > > > see now. A tcp_child_ehash_entries-like model will avoid completely the
+> > > > issue, but I understand it would be a significant change over the
+> > > > current status.
+> > > >
+> > > > "Luckily" the merge window is on us and we have some time to discuss. Do
+> > > > you have a specific use-case for the ability to change the netns >
+> > > mode
+> > > > after creation?
+> > > >
+> > > > /P
+> > > 
+> > > I don't think there is a hard requirement that the mode be change-able
+> > > after creation. Though I'd love to avoid such a big change... or at
+> > > least leave unchanged as much of what we've already reviewed as
+> > > possible.
+> > > 
+> > > In the scheme of defining the mode at creation and following the
+> > > tcp_child_ehash_entries-ish model, what I'm imagining is:
+> > > - /proc/sys/net/vsock/child_ns_mode can be set to "local" or "global"
+> > > - /proc/sys/net/vsock/child_ns_mode is not immutable, can change any
+> > >   number of times
+> > > 
+> > > - when a netns is created, the new netns mode is inherited from
+> > >   child_ns_mode, being assigned using something like:
+> > > 
+> > > 	  net->vsock.ns_mode =
+> > > 		get_net_ns_by_pid(current->pid)->child_ns_mode
+> > > 
+> > > - /proc/sys/net/vsock/ns_mode queries the current mode, returning
+> > >   "local" or "global", returning value of net->vsock.ns_mode
+> > > - /proc/sys/net/vsock/ns_mode and net->vsock.ns_mode are immutable and
+> > >   reject writes
+> > > 
+> > > Does that align with what you have in mind?
+> > 
+> > Hey Paolo, I just wanted to sync up on this one. Does the above align
+> > with what you envision?
+> 
+> Hi Bobby, AFAIK Paolo was at LPC, so there could be some delay.
+> 
+> FYI I'll be off from Dec 25 to Jan 6, so if we want to do an RFC in the
+> middle, I'll do my best to take a look before my time off.
+> 
+> Thanks,
+> Stefano
+> 
 
-Switch the driver from bitmap_weight() to bitmap_empty() where
-appropriate.
+Sounds like a plan, thanks!
 
-Signed-off-by: Yury Norov (NVIDIA) <yury.norov@gmail.com>
----
- drivers/net/ethernet/marvell/octeontx2/af/cgx.c | 6 +++---
- drivers/net/ethernet/marvell/octeontx2/af/rpm.c | 2 +-
- 2 files changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-index 42044cd810b1..2958522f3198 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-@@ -672,7 +672,7 @@ void cgx_lmac_enadis_rx_pause_fwding(void *cgxd, int lmac_id, bool enable)
- 		return;
- 
- 	/* Pause frames are not enabled just return */
--	if (!bitmap_weight(lmac->rx_fc_pfvf_bmap.bmap, lmac->rx_fc_pfvf_bmap.max))
-+	if (bitmap_empty(lmac->rx_fc_pfvf_bmap.bmap, lmac->rx_fc_pfvf_bmap.max))
- 		return;
- 
- 	cgx_lmac_get_pause_frm_status(cgx, lmac_id, &rx_pause, &tx_pause);
-@@ -970,13 +970,13 @@ int verify_lmac_fc_cfg(void *cgxd, int lmac_id, u8 tx_pause, u8 rx_pause,
- 		set_bit(pfvf_idx, lmac->tx_fc_pfvf_bmap.bmap);
- 
- 	/* check if other pfvfs are using flow control */
--	if (!rx_pause && bitmap_weight(lmac->rx_fc_pfvf_bmap.bmap, lmac->rx_fc_pfvf_bmap.max)) {
-+	if (!rx_pause && !bitmap_empty(lmac->rx_fc_pfvf_bmap.bmap, lmac->rx_fc_pfvf_bmap.max)) {
- 		dev_warn(&cgx->pdev->dev,
- 			 "Receive Flow control disable not permitted as its used by other PFVFs\n");
- 		return -EPERM;
- 	}
- 
--	if (!tx_pause && bitmap_weight(lmac->tx_fc_pfvf_bmap.bmap, lmac->tx_fc_pfvf_bmap.max)) {
-+	if (!tx_pause && !bitmap_empty(lmac->tx_fc_pfvf_bmap.bmap, lmac->tx_fc_pfvf_bmap.max)) {
- 		dev_warn(&cgx->pdev->dev,
- 			 "Transmit Flow control disable not permitted as its used by other PFVFs\n");
- 		return -EPERM;
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rpm.c b/drivers/net/ethernet/marvell/octeontx2/af/rpm.c
-index 2e9945446199..fba76846fcbb 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rpm.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rpm.c
-@@ -178,7 +178,7 @@ void rpm_lmac_enadis_rx_pause_fwding(void *rpmd, int lmac_id, bool enable)
- 		return;
- 
- 	/* Pause frames are not enabled just return */
--	if (!bitmap_weight(lmac->rx_fc_pfvf_bmap.bmap, lmac->rx_fc_pfvf_bmap.max))
-+	if (bitmap_empty(lmac->rx_fc_pfvf_bmap.bmap, lmac->rx_fc_pfvf_bmap.max))
- 		return;
- 
- 	if (enable) {
--- 
-2.43.0
-
+Best,
+Bobby
 
