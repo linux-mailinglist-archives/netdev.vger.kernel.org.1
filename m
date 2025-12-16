@@ -1,140 +1,193 @@
-Return-Path: <netdev+bounces-244982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECBD4CC4892
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 18:05:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 02995CC48C2
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 18:08:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 93B183018327
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 17:03:28 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 65CAA3001509
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 17:07:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12B6B3242AD;
-	Tue, 16 Dec 2025 17:03:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 425E92D3737;
+	Tue, 16 Dec 2025 17:07:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="HUR0c1oP"
+	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="fgOxuPtV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB013258ECC
-	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 17:03:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E324940855
+	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 17:07:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765904594; cv=none; b=do+hVrmSZPow9B20gB1lgt1CHmK2DQ9qGzwOLHSUqzJUkXr8AbL0KNTQTC/I5olVHzQPj5jy6HMhhSg7JIQb79Dhq8bE4Vf9uSrM0undT31i4c0cgo4DS23QcLiF3eV1HpSfJUzjucwBKUvMOjD7HNtbCvaDpKLJyaH5CZYuJyc=
+	t=1765904864; cv=none; b=tarSJMEsiJz+9drrU7Q7pHHMqbYTFM+7HN32zSkvt0wNREtDUS/sQZ8ZPFYx4XTho1uIhM2guxjZISBh1ANhRsr629s5V9drv0xUl+VSuJU+0CgV0WgD4KR0N0NWSYyPZkwElMhyxY3G39JCleI10BkNpca7Eo3m3PQ8o/dZM+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765904594; c=relaxed/simple;
-	bh=F5ummgPhzVwfH3aJi4+uY671i9nGNbXpL0FkgxynloY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=r6+NWjqrOVRLyrV/LbUMCzdvxDu66hOb35A4ofnX5FsW7SEmVqx9FdcKShhFFWiJuUnlS3nZ1UV5NgnGLtEY9vmDY712zGFiDpkSedBOp64pSKZc5wEvSXKOaANBZEl5+V6gPa/vR5A9mW+cLrIa9VfcqhklNoHY5LvHkdMXVpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=HUR0c1oP; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-6496a8dc5a7so6603069a12.2
-        for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 09:03:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sartura.hr; s=sartura; t=1765904589; x=1766509389; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=F5ummgPhzVwfH3aJi4+uY671i9nGNbXpL0FkgxynloY=;
-        b=HUR0c1oP2r19YIGGQc967WfYD/smuI0IJPFKrMRJYAdsvIaZyCJkMtulHBsm50ODwb
-         JauGSBBPrDXsSq6QkLWzTbFOO2IIL4lhNSXyLb8MqULUXURDfgh4GPvBYCnxfqO/uGNH
-         M7T/KWr9FIkE5Oj2EjHFjl5VFswk6OifRQzQIZh7me8snBfVDzURqctiIcbpDzzWfl/X
-         ALEri3nkrW2HWDbC3o0fNTuIobUwibSu89QPHCHEcc1P1KG8qKwBmI39JeSZVzimFedS
-         2b5iNPv4DU/s9e6srUZGkRWZB64tCxPJenC/s7w0P87DEsXXQyZLfIfqFHTWLG0iZxY6
-         DQ9w==
+	s=arc-20240116; t=1765904864; c=relaxed/simple;
+	bh=r/FDIWaDcL7tzJvoOctfFeLod3RGeiffLgS1g//bHlQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RcjR3P96Nbd4FO+FRcgob1+qNkvcAVGXVuIVJn5WvDS+jumYr6dXYTB/5Ky2ct6eyfbJ1ZCbsU5lSaCbYBAPkT61E9xmXw5puD30bcsII/noEwePtXmTvhu+chqHkxVd/wf5iYaN9oysDnCVLpoxZlYKPW9V6JnZJjuJ6rlhvQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=fgOxuPtV; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com [209.85.222.199])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 9F1C13F2CB
+	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 17:07:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20251003; t=1765904858;
+	bh=0Wv3W8Or+AfdbFFZhOAbvXi7U6Iihxvczf8zxZ/vudY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version;
+	b=fgOxuPtVsETmL5CZZl4/Z6U9lPSzVUTAzRUpj4IWTFXMdBTNPEHerUeQGUDaEFf6n
+	 QDXRVt0/F1R5INpaupv7K/qA+WIioTrwpjxfMVxHLbOMh0k5nLtyRs2ovJyy7FLCJp
+	 GnX/NmakCdvCBZC/o3E/Qfcik4Q4Z13DnLAScLUGanm6+wAFXsLvO8n4gcSfVVcA5Q
+	 yfCCJwKtA/Y4xmHRQyw4LsWJmy7dHxu3+AbKiQDLzkYswV4bCcxqGrZ8hd/oVE4rbw
+	 NG6JFrQteKvQ8jX3ZRMkYM6MCwArrohdiTpNE38cbQR8/7yU4jf11mm/qY/AKL4Rkn
+	 O3Kn/qixcOWYvW8Tfj34bfpbREDHE/s+q61djrxSEG+TVcGcdt12XXDgetDJO6CFaW
+	 v9VcEQFDCK3dXbbRCjs8IOXLd4mselbhjtxtkZCR7YMz6nE7NRBx195/JOMMDz9Glw
+	 3eZgLL2pp+xJ86gZU1go8p6vD4OA0v4a1eSi4yJtDm7DNjAwy5F9BvMWfFHgOCZtre
+	 ryMAyIjRHC8fQITxs3A/fxsiURECRJ/O9UokpZ71SIsbuYzQh1B9C0K7EKfD4rNmR6
+	 GbfRWGOoUjxsKmKBqgy2anQp5mMQe5bQHXvoFgHzW2O3MkGlVlppzacZf/7PkC52O/
+	 aYibf8HT90zGvqj32EKpliAQ=
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-8b6963d1624so1200783585a.0
+        for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 09:07:38 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765904589; x=1766509389;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=F5ummgPhzVwfH3aJi4+uY671i9nGNbXpL0FkgxynloY=;
-        b=ULSLc26rxceJiXt6/kPlcwrF6yCL+G/V2f0xZkr9ORw3qtkxGDylTQoAG5TGI/ic0O
-         7u9DOtHrER4iT2u0RfrJcdJwTlETl20CpZgp6I6xVlwtlJPux/dI2LfL1jvYDtyA2pRi
-         DFiyaX0W29xpyHsTrPi5F1AFdzWayucbEnNN2KHtjVsqgkMNSM/TqT9FOKXtvIZ84TRv
-         FwQx+n7klrZso70iuLvnzKDJdMhHg9VSgFuxJlhXaJ0EspjHzqxXDMTBh6BecUEKLJ2W
-         hTgG3YBNXFZt3Waz930m/5COqDUOM/Fkmfxhg7LLeQn6Z4xMHHkvz1z0NQRUzs6MX+Yw
-         lmBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV3eMsWn0KMGJ8kKAblt5UeYBkjVMIZbV7DKzY+mhQtU3kSsjNDgBAGMr3XYWUMFw2poBK7poc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz6R+WNaeCB4K0M4yGb/TlZbTucIvftS+kVYM8RmknHfdio3BQY
-	cLStkhcnWGpWM+KMBKGhMsai+JKH7/8q/IJFB0B9fKllm0wtJqAN/eGqbymWyLoeE4AxmRWUVnO
-	kSQ036j9z6On+WhwmIHay4IzkK8UVlSjhwmkWJzJAwA==
-X-Gm-Gg: AY/fxX5CtJgG0QPnHjVdyTLlfRqb1g+PX+FCBY8a4PbMTgMFggD0iTOSXAu++rW+93A
-	ymKoj7f4EqTmm3FnkyRjh3vRCY1apSZ3vta+DNImnzEv2agb4hNIdHvwQezF2b6OC5DYiyQPM40
-	vVw1c/hLgcQYFXrU6p7WXHccNUKnfkv0wIL+x99XAfXOamWIOS9UCpJI74DwYUI5PnL74Kv7Eyh
-	2puK/J5M4KoxSAeNHLsLmS9Jkypf7EU9STd25RzdLIu7K30UlQ79nXTyF3Dl7Edf260Qpau
-X-Google-Smtp-Source: AGHT+IFN/waKvJ1dk6OhR5cf+U/bNCur64fqPTgP6eIpNT5zthYFXF01jY49UDISUGnP6m+DUwrvZmTGOhEzi55R+Mg=
-X-Received: by 2002:a05:6402:1ed1:b0:647:532f:8efc with SMTP id
- 4fb4d7f45d1cf-6499b31266bmr15476133a12.33.1765904588965; Tue, 16 Dec 2025
- 09:03:08 -0800 (PST)
+        d=1e100.net; s=20230601; t=1765904857; x=1766509657;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0Wv3W8Or+AfdbFFZhOAbvXi7U6Iihxvczf8zxZ/vudY=;
+        b=p7t7V/iqV7ZbbTGCT3VbWOjBlKlt0ygMMNfK4ZysINkJsklKLYdjxgEz+/VTLA5iJZ
+         HKmoNzrjzkIQrWJH6pM9JEuAaIgTjvf1K9yfC6EAwxwjNQ4/SA8IRktUTxfEUPYbGAIw
+         pRvZcEH8DNwQe56FbeGuJzWihzgPGQ63CWx7D9I8cAEEnR9vz9dkZiwY5Z/OsOj5N6B1
+         dG4qm3VAVyk4jVv6zaDzVqOEXF5Im5Upsm9DAfJ2hoDCDTT90QOsSZaMzhx9g68OH1Cd
+         itjwGHIili8E32G8Du2kWfZaJOeaMF9kYHPTX9XqSi8JZ4i8V3C1IwTYvFhWrbz5Ym5m
+         EJjg==
+X-Gm-Message-State: AOJu0Yy2JDtI+Fp5lIPH8w5kQvfJUYU9yLLmpoXGSHmytYUNrqQzmwJ+
+	LiPgftQPfNX/d9u0zLdCAHwB5BtfcgR5GLzxQQa8aKxdxdmkGtZmm++4T0vuP5zIm3sJ1cuosCf
+	tCDAjSTWp+E1k3K7EbxE6v8SmmYKq5TeRXorMO/PIZGk+7Mz86yGLhJu2alM+RISHCCzeHzPqcv
+	96Bih80w==
+X-Gm-Gg: AY/fxX5ioSrkCl/UocKCX2VPAdT4ovxGuvfn+IR/nCfG8eioMSkSClLHLulP+hIupvm
+	DoS8OpZTRF07X/KPQkHaZiiaXTZUq2+gFEtJQt3WfV7mEU596wDeHnUe56IECeNNzfHxJpFlIXl
+	uLv6HpT++ZsN8RdaLyqtjclNgWBQWpeAhAPYmeQbONerUjcMcIgMDnAlApcJ3TSmiuX0HErdI2g
+	TihmMBPAx4UVb0RhW9btKUcD1ny3va3DsuKjjfZM2g/MrOUorVjBlR1gVZaWAOisxtWQelloJgO
+	tLbgyWjDrUoPFoN3rHYghNJwdJrMv+KTFaSe9QPsnPbHboNky/pTf3jGV1o/xe9Vj1/EaMy0oaW
+	rmaWEDlE7frHenDrmdhhuLTHS2o+99y/CJPRph33rCKMWPzC0fn8NgGkQklsrSO2m
+X-Received: by 2002:a05:620a:40c1:b0:8b9:d2cc:cded with SMTP id af79cd13be357-8bb3a27623bmr2246353585a.52.1765904856063;
+        Tue, 16 Dec 2025 09:07:36 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEoVMP64M1IhGDJjh39XY59ctMuj3UH2eDMGIf3ZwpmoQLFJ9DzmyofZbh9CRewHdRRI2tbGQ==
+X-Received: by 2002:a05:620a:40c1:b0:8b9:d2cc:cded with SMTP id af79cd13be357-8bb3a27623bmr2246330685a.52.1765904854123;
+        Tue, 16 Dec 2025 09:07:34 -0800 (PST)
+Received: from localhost (modemcable137.35-177-173.mc.videotron.ca. [173.177.35.137])
+        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-8be31b53dbasm224404285a.34.2025.12.16.09.07.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Dec 2025 09:07:33 -0800 (PST)
+From: "Alice C. Munduruca" <alice.munduruca@canonical.com>
+To: netdev@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org,
+	"Alice C. Munduruca" <alice.munduruca@canonical.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Willem de Bruijn <willemb@google.com>,
+	Cengiz Can <cengiz.can@canonical.com>
+Subject: [PATCH net v3] selftests: net: fix "buffer overflow detected" for tap.c
+Date: Tue, 16 Dec 2025 12:06:41 -0500
+Message-ID: <20251216170641.250494-1-alice.munduruca@canonical.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251215163820.1584926-1-robert.marko@sartura.hr>
- <20251215163820.1584926-3-robert.marko@sartura.hr> <d9665340-5a96-4105-88e9-ec14a715df5a@kernel.org>
-In-Reply-To: <d9665340-5a96-4105-88e9-ec14a715df5a@kernel.org>
-From: Robert Marko <robert.marko@sartura.hr>
-Date: Tue, 16 Dec 2025 18:02:57 +0100
-X-Gm-Features: AQt7F2rU23EYA-TATIPjguH2zW0uOL-rOKCV2dD8OGkl08WLSt_IEutVu0MO3jw
-Message-ID: <CA+HBbNF2EeP=miC9GpEm2HpPTmZAefV2fwxKjm0vHB6tj_1usQ@mail.gmail.com>
-Subject: Re: [PATCH v2 03/19] dt-bindings: arm: AT91: relicense to dual GPL-2.0/BSD-2-Clause
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
-	nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com, 
-	claudiu.beznea@tuxon.dev, Steen.Hegelund@microchip.com, 
-	daniel.machon@microchip.com, UNGLinuxDriver@microchip.com, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org, 
-	linux@roeck-us.net, andi.shyti@kernel.org, lee@kernel.org, 
-	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, linusw@kernel.org, olivia@selenic.com, 
-	radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com, 
-	gregkh@linuxfoundation.org, jirislaby@kernel.org, mturquette@baylibre.com, 
-	sboyd@kernel.org, richardcochran@gmail.com, wsa+renesas@sang-engineering.com, 
-	romain.sioen@microchip.com, Ryan.Wanner@microchip.com, 
-	lars.povlsen@microchip.com, tudor.ambarus@linaro.org, 
-	charan.pedumuru@microchip.com, kavyasree.kotagiri@microchip.com, 
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	dmaengine@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, netdev@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-spi@vger.kernel.org, linux-serial@vger.kernel.org, 
-	linux-usb@vger.kernel.org, linux-clk@vger.kernel.org, mwalle@kernel.org, 
-	luka.perkov@sartura.hr
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Dec 16, 2025 at 4:55=E2=80=AFPM Krzysztof Kozlowski <krzk@kernel.or=
-g> wrote:
->
-> On 15/12/2025 17:35, Robert Marko wrote:
-> > As it is preferred to have bindings dual licensed, lets relicense the A=
-T91
-> > bindings from GPL-2.0 only to GPL-2.0/BSD-2 Clause.
-> >
-> > Signed-off-by: Robert Marko <robert.marko@sartura.hr>
->
-> You need all contributors to ack this...
+When the selftest 'tap.c' is compiled with '-D_FORTIFY_SOURCE=3',
+the strcpy() in rtattr_add_strsz() is replaced with a checked
+version which causes the test to consistently fail when compiled
+with toolchains for which this option is enabled by default.
 
-I understand, all of the contributors were CC-ed.
+ TAP version 13
+ 1..3
+ # Starting 3 tests from 1 test cases.
+ #  RUN           tap.test_packet_valid_udp_gso ...
+ *** buffer overflow detected ***: terminated
+ # test_packet_valid_udp_gso: Test terminated by assertion
+ #          FAIL  tap.test_packet_valid_udp_gso
+ not ok 1 tap.test_packet_valid_udp_gso
+ #  RUN           tap.test_packet_valid_udp_csum ...
+ *** buffer overflow detected ***: terminated
+ # test_packet_valid_udp_csum: Test terminated by assertion
+ #          FAIL  tap.test_packet_valid_udp_csum
+ not ok 2 tap.test_packet_valid_udp_csum
+ #  RUN           tap.test_packet_crash_tap_invalid_eth_proto ...
+ *** buffer overflow detected ***: terminated
+ # test_packet_crash_tap_invalid_eth_proto: Test terminated by assertion
+ #          FAIL  tap.test_packet_crash_tap_invalid_eth_proto
+ not ok 3 tap.test_packet_crash_tap_invalid_eth_proto
+ # FAILED: 0 / 3 tests passed.
+ # Totals: pass:0 fail:3 xfail:0 xpass:0 skip:0 error:0
 
-Regards,
-Robert
+A buffer overflow is detected by the fortified glibc __strcpy_chk()
+since the __builtin_object_size() of `RTA_DATA(rta)` is incorrectly
+reported as 1, even though there is ample space in its bounding
+buffer `req`.
 
->
-> Best regards,
-> Krzysztof
+Additionally, given that IFLA_IFNAME also expects a null-terminated
+string, callers of rtaddr_add_str{,sz}() could simply use the
+rtaddr_add_strsz() variant. (which has been renamed to remove the
+trailing `sz`) memset() has been used for this function since it
+is unchecked and thus circumvents the issue discussed in the
+previous paragraph.
 
+Fixes: 2e64fe4624d1 ("selftests: add few test cases for tap driver")
+Signed-off-by: Alice C. Munduruca <alice.munduruca@canonical.com>
+Reviewed-by: Cengiz Can <cengiz.can@canonical.com>
+---
+ tools/testing/selftests/net/tap.c | 16 +++++-----------
+ 1 file changed, 5 insertions(+), 11 deletions(-)
 
+diff --git a/tools/testing/selftests/net/tap.c b/tools/testing/selftests/net/tap.c
+index 247c3b3ac1c9..51a209014f1c 100644
+--- a/tools/testing/selftests/net/tap.c
++++ b/tools/testing/selftests/net/tap.c
+@@ -56,18 +56,12 @@ static void rtattr_end(struct nlmsghdr *nh, struct rtattr *attr)
+ static struct rtattr *rtattr_add_str(struct nlmsghdr *nh, unsigned short type,
+ 				     const char *s)
+ {
+-	struct rtattr *rta = rtattr_add(nh, type, strlen(s));
++	unsigned int strsz = strlen(s) + 1;
++	struct rtattr *rta;
+ 
+-	memcpy(RTA_DATA(rta), s, strlen(s));
+-	return rta;
+-}
+-
+-static struct rtattr *rtattr_add_strsz(struct nlmsghdr *nh, unsigned short type,
+-				       const char *s)
+-{
+-	struct rtattr *rta = rtattr_add(nh, type, strlen(s) + 1);
++	rta = rtattr_add(nh, type, strsz);
+ 
+-	strcpy(RTA_DATA(rta), s);
++	memcpy(RTA_DATA(rta), s, strsz);
+ 	return rta;
+ }
+ 
+@@ -119,7 +113,7 @@ static int dev_create(const char *dev, const char *link_type,
+ 
+ 	link_info = rtattr_begin(&req.nh, IFLA_LINKINFO);
+ 
+-	rtattr_add_strsz(&req.nh, IFLA_INFO_KIND, link_type);
++	rtattr_add_str(&req.nh, IFLA_INFO_KIND, link_type);
+ 
+ 	if (fill_info_data) {
+ 		info_data = rtattr_begin(&req.nh, IFLA_INFO_DATA);
+-- 
+2.48.1
 
---=20
-Robert Marko
-Staff Embedded Linux Engineer
-Sartura d.d.
-Lendavska ulica 16a
-10000 Zagreb, Croatia
-Email: robert.marko@sartura.hr
-Web: www.sartura.hr
 
