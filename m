@@ -1,126 +1,207 @@
-Return-Path: <netdev+bounces-244915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE8AFCC208F
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 11:55:13 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5DCACC2137
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 12:08:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8EC5E30214ED
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 10:55:12 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id C95D0301CD37
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 11:08:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08F36315786;
-	Tue, 16 Dec 2025 10:55:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 546F433CEB9;
+	Tue, 16 Dec 2025 11:08:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="lA7HgkV5"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="TuhEal39"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C51C2BCF6C;
-	Tue, 16 Dec 2025 10:55:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F1C33B943
+	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 11:08:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765882509; cv=none; b=JPMtSiU6CtZs5RFtuiQ7WxYxjtgS7RLcjqOQK9F6w/FonVcHSvVIZdah+G5RPGfaVpFRXB032luupha/9NBDc6YkvPyueunnLDPC8WRgmqQ1OSSCTkaK6IYg+O/IFUUBxHL99jaxze5TMxurvog051lcF7WYYCAGBa9mu3YjN3U=
+	t=1765883325; cv=none; b=PP1RzGDo7zQVxXsmbW/9/Q4n/2yVE0xpcdBRQy7lPBKQhWanXCRSjBXyfVzxLHOYp/nlx/foQemlW3wXWtEF2/NEWOUnCPdNHCiXGLGZt0xmRS7UTctsJjnGERdtKdRF2ykGgMozqKLXK1EFiBdb5X4Yr7pqJc/pmlY973dOpu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765882509; c=relaxed/simple;
-	bh=B+f4zlNzZBPUZPXd/Z+otBEhzXLqmkj0hCenAv9cAlk=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=fQxTv/72I055TQ0uIM3PCN9zjNnmSqQV1BCs9kiZkciQEnAYntHHVOVU8eiHXl4f6Is0hXYD9VgQEv9eSnV7pFLmEVhIDA98Oa7fTT4W//jDUhkb9TNoHF0889hWvAj2TeYeb7oPWxoo/teneViTPH0Wg9s+a4xPqSiDOkrPa6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=lA7HgkV5; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1204)
-	id 12DFF2012428; Tue, 16 Dec 2025 02:55:08 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 12DFF2012428
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1765882508;
-	bh=o3bOnnraKXEZsNJ4ojfTJylt4MC87O/BQeSoi/0QbqQ=;
-	h=Date:From:To:Subject:From;
-	b=lA7HgkV5xivU+TzKse12cYyk9AIxKkh68l2nIfjWbYPpzxUM/0LrWQxKF7aHl7trW
-	 mFtT76ta/vpMlvRUdp04WLcWldNLODntHTbgtRONdwEnL+oSY5rxgG1A3oGFvLqiI7
-	 sfrDvMaPiLsSLryH+pMgXQ8y8AvEnp6UBJ8dqO40=
-Date: Tue, 16 Dec 2025 02:55:08 -0800
-From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-To: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
-	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
-	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	dipayanroy@microsoft.com
-Subject: [PATCH net-next] net: mana: Fix use-after-free in reset service
- rescan path
-Message-ID: <20251216105508.GA13584@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	s=arc-20240116; t=1765883325; c=relaxed/simple;
+	bh=7eCpaO8h0XuRWUlnnZDRQQvxiOwboz4wCDo5+3haAtQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mKTwJFTa7vBq8NQpve8jMMcDJvQ/A4o9gv7kk0foJU0AKBD/fVovUOErBqv5VQ16Pa1pX8TE/y38/x4vggkMNDk+3ojzJajM5w7U4f4/TVJT2UkaIWgwTyujkUN2cqmnvuiEwHp35+74TXymKlKpginauGPtFcsLWWaE7UTYvC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=TuhEal39; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4775e891b5eso19634595e9.2
+        for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 03:08:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1765883321; x=1766488121; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JzbZNSoR9XV7c/fw2WEyAJLfwBQw/kZL/Ydt6MIWYlk=;
+        b=TuhEal39hD7OzJsRaLhLQRzrJWrmiGxmtcdjrQQEW3h4ZHalghwmMgBq5J88Pvef9/
+         1AyxW7vmjGodV8qgsJmC3Dy2PBUX8p80aXi1G2HA0Q/38H1Vz0fvkmnUHJz8oR2nN5nX
+         lzluP0XFgEIOQmzX5WCwDHqg9J+STt5D/CvEH5OlmpJa4VBcMX20w6Axb3xxbbFuOjYf
+         31xqFcD1UKZguaYIOdSgvBeQRZuFNraMApNS3a1DDHOxFJR/xqGB+OkPq9p1lC/qS+QX
+         4siVEiXEDqiCFDLE26nWnEFiiMNdVlDtsnk4gY2ytH0eU23DNANtfygwZ+Fc6a2uvfzK
+         eiBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765883321; x=1766488121;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JzbZNSoR9XV7c/fw2WEyAJLfwBQw/kZL/Ydt6MIWYlk=;
+        b=d1C//ppAM5QSFxLQ5SN3qD6Ej74hEsSJjlxQV6ePDRhlnTBp8MGFIWciQKdELfL63d
+         DzqLs+cS/mESy99ElKWxYcr1TsxK8HyMIhpd0P4U1C8ac6hYEh93XWKOYLTwaWhtdU/u
+         l0pzXp3uDnxBi188HUNn8x5330g2B7FbuEs3PFjD74NSP3qh9QiyBZYY6UcYVbu9pSaQ
+         66s16lGw64ma01JCvWcwlYo7NLP5Crb2/QPqIlU6gnOIixg0F9KECbnlEHIK9+SeBZrC
+         fY/okK/jYPs2NlCSe9RSk7Vf06R+QiPJx3AFKQdPT/SACb+7wh/l7DKZdBnqE/Im40lp
+         1ziA==
+X-Forwarded-Encrypted: i=1; AJvYcCVHj2omKIZBTuyVTUB0wVBSWyf4D1F7gMDyACuv/s9aj2rN++UcPkDobLsQ9M73lhdc7Z+P/u8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxLx8pys3gU2KQ1UI6QtumFI/C6NN1j9r901LoCEEtDOP0lfNV
+	EGD1seZhW2aQtKRujtsV3DVbg6fxnzKLlfPaM1Zx+5DSNzKaH8h2qaBnkFZ6qWk43ww=
+X-Gm-Gg: AY/fxX661NvwoSlyFG7JvkN1HnLmIGRonR7xeMnkL0Nqhjwn5gC1tQ7OIw8QdCt3CJM
+	794LkiVWcZfcXFzTAJFK9coartWzXe7HIqcUyxZ7O/U5WqRkueqV73QAdtAHLY5HwzGBd15eo0x
+	4Xeu5mUqcGu34qNjGwwg2DJXoLI05d1r2BSU+ZrqcpQZ8sErO+B6TTj/4oT7RZkzE9w0QOxR2Np
+	01aiane9mhRiZn7BLdeaQK4T9K6+vK2VPS6n65Czu6h2OcK72/FPoZ57la/pujBV3k6A6zRT1k9
+	9juAZnvQxjC8Nw0gYF8aHW5xwdUraVzpfpscEiSrcpwqbYH5UNGEjulkgeg6IGYjnkuErKzOaGF
+	ILMFHMsDK0PltDphihbokf++Q3ycjbeKQradQZE8NWsf08oBcImSszb5Qq0XQ2zKY2zab2cjzMs
+	AqN+3q6jPvqx1fEWxA/zUG2SEvzlkhBRH7t5rkTijVk4Zdls0hc0LAq06NzC7TyYO4LDjO7IeZH
+	So=
+X-Google-Smtp-Source: AGHT+IFp5IncMGvMC+pwiacOOoEIbditx6SKu86limMmxyrWyAZX1pq9RrgklnX8yEKbt8tmwVfkyQ==
+X-Received: by 2002:a05:600c:8288:b0:477:a1a2:d829 with SMTP id 5b1f17b1804b1-47a8f8c0caamr134941025e9.13.1765883320955;
+        Tue, 16 Dec 2025 03:08:40 -0800 (PST)
+Received: from localhost (p200300f65f00660852dfbbf029d2e03c.dip0.t-ipconnect.de. [2003:f6:5f00:6608:52df:bbf0:29d2:e03c])
+        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-47a8f4ace61sm233401395e9.7.2025.12.16.03.08.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Dec 2025 03:08:40 -0800 (PST)
+Date: Tue, 16 Dec 2025 12:08:38 +0100
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+To: Sumit Garg <sumit.garg@oss.qualcomm.com>
+Cc: Sumit Garg <sumit.garg@kernel.org>, 
+	Jens Wiklander <jens.wiklander@linaro.org>, Olivia Mackall <olivia@selenic.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
+	Alexandre Belloni <alexandre.belloni@bootlin.com>, Ard Biesheuvel <ardb@kernel.org>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, 
+	Sudeep Holla <sudeep.holla@arm.com>, Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
+	Michael Chan <michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, 
+	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>, James Bottomley <James.Bottomley@hansenpartnership.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Mimi Zohar <zohar@linux.ibm.com>, 
+	David Howells <dhowells@redhat.com>, Paul Moore <paul@paul-moore.com>, 
+	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, 
+	Peter Huewe <peterhuewe@gmx.de>, op-tee@lists.trustedfirmware.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-rtc@vger.kernel.org, linux-efi@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
+	Cristian Marussi <cristian.marussi@arm.com>, arm-scmi@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-integrity@vger.kernel.org, keyrings@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, Jason Gunthorpe <jgg@ziepe.ca>
+Subject: Re: [PATCH v1 00/17] tee: Use bus callbacks instead of driver
+ callbacks
+Message-ID: <ayebinxqpcnl7hpa35ytrudiy7j75u5bdk3enlirkp5pevppeg@6mx6a5fwymwf>
+References: <cover.1765472125.git.u.kleine-koenig@baylibre.com>
+ <aT--ox375kg2Mzh-@sumit-X1>
+ <dhunzydod4d7vj73llpuqemxb5er2ja4emxusr66irwf77jhhb@es4yd2axzl25>
+ <CAGptzHOOqLhBnAXDURAzkgckUvRr__UuF1S_7MLV0u-ZxYEdyA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="judjbtjlccebrcda"
 Content-Disposition: inline
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <CAGptzHOOqLhBnAXDURAzkgckUvRr__UuF1S_7MLV0u-ZxYEdyA@mail.gmail.com>
 
-When mana_serv_reset() encounters -ETIMEDOUT or -EPROTO from
-mana_gd_resume(), it performs a PCI rescan via mana_serv_rescan().
 
-mana_serv_rescan() calls pci_stop_and_remove_bus_device(), which can
-invoke the driver's remove path and free the gdma_context associated
-with the device. After returning, mana_serv_reset() currently jumps to
-the out label and attempts to clear gc->in_service, dereferencing a
-freed gdma_context.
+--judjbtjlccebrcda
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v1 00/17] tee: Use bus callbacks instead of driver
+ callbacks
+MIME-Version: 1.0
 
-The issue was observed with the following call logs:
-[  698.942636] BUG: unable to handle page fault for address: ff6c2b638088508d
-[  698.943121] #PF: supervisor write access in kernel mode
-[  698.943423] #PF: error_code(0x0002) - not-present page
-[S[  698.943793] Pat Dec  6 07:GD5 100000067 P4D 1002f7067 PUD 1002f8067 PMD 101bef067 PTE 0
-0:56 2025] hv_[n e 698.944283] Oops: Oops: 0002 [#1] SMP NOPTI
-tvsc f8615163-00[  698.944611] CPU: 28 UID: 0 PID: 249 Comm: kworker/28:1
-...
-[Sat Dec  6 07:50:56 2025] R10: [  699.121594] mana 7870:00:00.0 enP30832s1: Configured vPort 0 PD 18 DB 16
-000000000000001b R11: 0000000000000000 R12: ff44cf3f40270000
-[Sat Dec  6 07:50:56 2025] R13: 0000000000000001 R14: ff44cf3f402700c8 R15: ff44cf3f4021b405
-[Sat Dec  6 07:50:56 2025] FS:  0000000000000000(0000) GS:ff44cf7e9fcf9000(0000) knlGS:0000000000000000
-[Sat Dec  6 07:50:56 2025] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[Sat Dec  6 07:50:56 2025] CR2: ff6c2b638088508d CR3: 000000011fe43001 CR4: 0000000000b73ef0
-[Sat Dec  6 07:50:56 2025] Call Trace:
-[Sat Dec  6 07:50:56 2025]  <TASK>
-[Sat Dec  6 07:50:56 2025]  mana_serv_func+0x24/0x50 [mana]
-[Sat Dec  6 07:50:56 2025]  process_one_work+0x190/0x350
-[Sat Dec  6 07:50:56 2025]  worker_thread+0x2b7/0x3d0
-[Sat Dec  6 07:50:56 2025]  kthread+0xf3/0x200
-[Sat Dec  6 07:50:56 2025]  ? __pfx_worker_thread+0x10/0x10
-[Sat Dec  6 07:50:56 2025]  ? __pfx_kthread+0x10/0x10
-[Sat Dec  6 07:50:56 2025]  ret_from_fork+0x21a/0x250
-[Sat Dec  6 07:50:56 2025]  ? __pfx_kthread+0x10/0x10
-[Sat Dec  6 07:50:56 2025]  ret_from_fork_asm+0x1a/0x30
-[Sat Dec  6 07:50:56 2025]  </TASK>
+Hello,
 
-Fix this by returning immediately after mana_serv_rescan() to avoid
-accessing GC state that may no longer be valid.
+On Tue, Dec 16, 2025 at 01:08:38PM +0530, Sumit Garg wrote:
+> On Mon, Dec 15, 2025 at 3:02=E2=80=AFPM Uwe Kleine-K=C3=B6nig
+> <u.kleine-koenig@baylibre.com> wrote:
+> > On Mon, Dec 15, 2025 at 04:54:11PM +0900, Sumit Garg wrote:
+> > > Feel free to make the tee_bus_type private as the last patch in the s=
+eries
+> > > such that any followup driver follows this clean approach.
+> >
+> > There is a bit more to do for that than I'm willing to invest. With my
+> > patch series applied `tee_bus_type` is still used in
+> > drivers/tee/optee/device.c and drivers/tee/tee_core.c.
+>=20
+> Oh I see, I guess we need to come with some helpers around device
+> register/unregister from TEE subsystem as well. Let's plan that for a
+> followup patch-set, I don't want this patch-set to be bloated more.
 
-Fixes: 9bf66036d686 ("net: mana: Handle hardware recovery events when probing the device")
+Don't consider me in for that. But it sounds like a nice addition.
 
-Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
----
- drivers/net/ethernet/microsoft/mana/gdma_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> > Maybe it's
+> > sensible to merge these two files into a single one.
+>=20
+> It's not possible as the design for TEE bus is to have TEE
+> implementation drivers like OP-TEE, AMD-TEE, TS-TEE, QTEE and so on to
+> register devices on the bus.
 
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index efb4e412ec7e..0055c231acf6 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -481,7 +481,7 @@ static void mana_serv_reset(struct pci_dev *pdev)
- 		/* Perform PCI rescan on device if we failed on HWC */
- 		dev_err(&pdev->dev, "MANA service: resume failed, rescanning\n");
- 		mana_serv_rescan(pdev);
--		goto out;
-+		return;
- 	}
- 
- 	if (ret)
--- 
-2.34.1
+So only OP-TEE uses the bus for devices and the other *-TEE don't. Also
+sounds like something worth to be fixed.
 
+> > The things I wonder about additionally are:
+> >
+> >  - if CONFIG_OPTEE=3Dn and CONFIG_TEE=3Dy|m the tee bus is only used for
+> >    drivers but not devices.
+>=20
+> Yeah since the devices are rather added by the TEE implementation driver.
+>=20
+> >
+> >  - optee_register_device() calls device_create_file() on
+> >    &optee_device->dev after device_register(&optee_device->dev).
+> >    (Attention half-knowledge!) I think device_create_file() should not
+> >    be called on an already registered device (or you have to send a
+> >    uevent afterwards). This should probably use type attribute groups.
+> >    (Or the need_supplicant attribute should be dropped as it isn't very
+> >    useful. This would maybe be considered an ABI change however.)
+>=20
+> The reasoning for this attribute should be explained by commit:
+> 7269cba53d90 ("tee: optee: Fix supplicant based device enumeration").
+> In summary it's due to a weird dependency for devices we have with the
+> user-space daemon: tee-supplicant.
+
+=46rom reading that once I don't understand it. (But no need to explain
+:-)
+
+Still the file should better be added before device_add() is called.
+
+> >  - Why does optee_probe() in drivers/tee/optee/smc_abi.c unregister all
+> >    optee devices in its error path (optee_unregister_devices())?
+>=20
+> This is mostly to take care of if any device got registered before the
+> failure occured. Let me know if you have a better way to address that.
+
+Without understanding the tee stuff, I'd say: Don't bother and only undo
+the things that probe did before the failure.
+
+Best regards
+Uwe
+
+--judjbtjlccebrcda
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmlBPbMACgkQj4D7WH0S
+/k50zggAsVQDsAnPdX//uyplsEvssm5818ssVGID4+9TjkXIhLGs1HOk+Aj1Obfh
+3kp723jXSfcxla/GVnutv+SGgjCbWQLat1zF3XNhzFZBDegNnPHffiYotY4NYV+x
+z+cBC6Mgx1s9c5xNg134fGOJ+TxBlfUxarnCrkXKqWF+dVSwTe5Cv3f0SXlVU/7L
+l/3T0OflRgILL2Y6wod6E9ydmYfiSapc79eKAzVY5jnUx1sGt7oLNYrjpHmJklBF
+J4I7ToK96aPowluUQqNPzlS13OTb/sx00zg5CnrrGchqVR6i1kK71xhoszfQPcx5
+IOs/eRzJsAmcF/JiN04ZsRRMrAvppA==
+=QAXr
+-----END PGP SIGNATURE-----
+
+--judjbtjlccebrcda--
 
