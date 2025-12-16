@@ -1,128 +1,122 @@
-Return-Path: <netdev+bounces-244881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 340C7CC0B9D
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 04:34:27 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E997CC0BA6
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 04:37:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id CDC233010E23
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 03:34:14 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 98E21301FF68
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 03:37:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F8222C3248;
-	Tue, 16 Dec 2025 03:34:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mhjUqGaX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA17B30E856;
+	Tue, 16 Dec 2025 03:37:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 330FA26059B;
-	Tue, 16 Dec 2025 03:34:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF7EE30DD12;
+	Tue, 16 Dec 2025 03:37:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765856053; cv=none; b=fa2aqZGMwI8S5J9qBi8De3MKjWGTrpdQ77/c64x3dUTgbiZx881xdxMy8eCHEypJ2RNaO4s8AzkOUHu9fdfLYJiy/PmYEicggvXiTTRyuEpzD4bQBZkACkICDJyli4l4tOZMNHKoHAuRXmhXqFog1NSHl62LfwIKCoQVFBNhF8U=
+	t=1765856239; cv=none; b=lX+e/oobSPbaAdCb6MhXnCUvOnIQdNdZ/SJky4neZ3srylrTQY0Etx5StDYgpSXQCDKzb9K8amLnWohd0dWjYTX51yBgDDjILwZcCushmWZdMY2HJNqz+0ohUwVdneFgLdkXsyK7QVjg5w4LO6a8x/FGW4ytdFHpqhiEy09pcUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765856053; c=relaxed/simple;
-	bh=KeCxncnuSFJjzzaRe8K2a8BqmNbS4k4iVP3dvPsYyns=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=H6bK3rpagmu0umVqJ6jDPoi3F5DXJkopId3DMf+ZLiGK5QZHLgyIHn/i1Hh/Ox3QRKYR7/X8aYtGRWP9hu9WXs1MomCNtMWL3xChDc+vf0xLlp/co3v5nv7Y6P4XMUr6qyI+f3i3mYxMyaUPBEKBsRCmW38xEqBxkfWTL9yxSss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mhjUqGaX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41C13C4CEF5;
-	Tue, 16 Dec 2025 03:34:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765856052;
-	bh=KeCxncnuSFJjzzaRe8K2a8BqmNbS4k4iVP3dvPsYyns=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=mhjUqGaXnUXFG/D7Hdv3D+2Y8oGBbTElQdwfKCo54UDO5vfD3rmbK8Hy95aaxa8mt
-	 cb8rAYx78CZ40kdR/Tu23CxAavfHK/wBjmbPz/VcSaNGAWPf7A4DUJrQhvfKV38Pkx
-	 XJI3b46GNX2uCu9qhDL0JiV75NXnV87X32UMl2r8PNsDYCYR7UXlIGUWg4BhoMg/zK
-	 bWejhJqTLuq9vUBx3X+kCZ9+IRRFyigQVyoWZPFSaw2sxyqkk1WhlkHeVnZ1UlC7HY
-	 wio2Thtdce8g5g2tl9QX0QVGjQ2fcL0xS9HcLhgDRj1ArVMtPmP72QvksRMUm4Agdy
-	 unWS7gsyJbtEw==
-Content-Type: multipart/mixed; boundary="===============2241353678792354598=="
+	s=arc-20240116; t=1765856239; c=relaxed/simple;
+	bh=bAD7qxNiFLFdzt7WlIweVUEMW3vywq12f1bQwNdKBXo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=eO1RgKm8dyrtWYTjseiQX4QKHw+RakOr23A4MX7AkTHikgadDeGWn5Tj/xRdj8CTf5nX5om5ZX4RnK4wsojdzG2onXCfx/AMHFTBDG68eWKqJHl0RzFKh+x1bhKqlwr9NcmKfbIGW2DlgevEGVl+VpNiQqS98uumRMra7l8jZdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from dfae2b116770.home.arpa (unknown [124.16.138.129])
+	by APP-05 (Coremail) with SMTP id zQCowABX7A_Q00Bpk4rTAA--.50339S2;
+	Tue, 16 Dec 2025 11:36:48 +0800 (CST)
+From: Wentao Liang <vulab@iscas.ac.cn>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: razor@blackwall.org,
+	petrm@nvidia.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Wentao Liang <vulab@iscas.ac.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH] vxlan: fix dst ref count leak in the vxlan_xmit_one() error path
+Date: Tue, 16 Dec 2025 03:36:47 +0000
+Message-Id: <20251216033647.1792250-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <3c943df286f9886735ac6212e4096731b80f6db4f245303cd2864157fac2072d@mail.kernel.org>
-In-Reply-To: <20251216031018.1615363-1-donglaipang@126.com>
-References: <20251216031018.1615363-1-donglaipang@126.com>
-Subject: Re: [PATCH] bpf: Fix NULL deref in __list_del_clearprev for flush_node
-From: bot+bpf-ci@kernel.org
-To: donglaipang@126.com,syzbot+2b3391f44313b3983e91@syzkaller.appspotmail.com
-Cc: andrii@kernel.org,ast@kernel.org,bpf@vger.kernel.org,daniel@iogearbox.net,davem@davemloft.net,eddyz87@gmail.com,haoluo@google.com,hawk@kernel.org,john.fastabend@gmail.com,jolsa@kernel.org,kpsingh@kernel.org,kuba@kernel.org,linux-kernel@vger.kernel.org,martin.lau@linux.dev,netdev@vger.kernel.org,sdf@fomichev.me,song@kernel.org,syzkaller-bugs@googlegroups.com,yonghong.song@linux.dev,donglaipang@126.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Tue, 16 Dec 2025 03:34:12 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQCowABX7A_Q00Bpk4rTAA--.50339S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7WFWDGr47Xw1DZr1rur47CFg_yoW8XrWfpF
+	4v9398ZFW3J3yqqw4xJw1rXFWrKay0k34Ikr1vka4Fqw13A34DGa4q9Fy29rs0qrWxury5
+	Jr42gryrAF98ZrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9K14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Avz4vE14v_Gr4l42xK82IYc2Ij64vIr4
+	1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK
+	67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI
+	8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAv
+	wI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14
+	v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUn9a9DUUUU
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiDAgSA2lArg2VKgAAsg
 
---===============2241353678792354598==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+In the vxlan_xmit_one(), when the encap_bypass_if_local() returns an
+error, the function jumps to out_unlock without releasing the dst
+reference obtained from the udp_tunnel_dst_lookup(). This causes a
+reference count leak in both IPv4 and IPv6 paths.
 
-> diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
-> index 04171fbc39cb..6ab6eae31989 100644
-> --- a/kernel/bpf/cpumap.c
-> +++ b/kernel/bpf/cpumap.c
-> @@ -450,6 +450,7 @@ __cpu_map_entry_alloc(struct bpf_map *map, struct bpf_cpumap_val *value,
->
->  	for_each_possible_cpu(i) {
->  		bq = per_cpu_ptr(rcpu->bulkq, i);
-> +		INIT_LIST_HEAD(&bq->flush_node);
->  		bq->obj = rcpu;
->  	}
->
+Fix by calling the dst_release() before goto out_unlock in both error
+paths:
+- For IPv4: release &rt->dst
+- For IPv6: release ndst
 
-[ ... ]
-
-> diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
-> index 2625601de76e..7a7347e709cc 100644
-> --- a/kernel/bpf/devmap.c
-> +++ b/kernel/bpf/devmap.c
-> @@ -428,7 +428,8 @@ void __dev_flush(struct list_head *flush_list)
->  		bq_xmit_all(bq, XDP_XMIT_FLUSH);
->  		bq->dev_rx = NULL;
->  		bq->xdp_prog = NULL;
-> -		__list_del_clearprev(&bq->flush_node);
-> +		if (bq->flush_node.prev)
-> +			__list_del_clearprev(&bq->flush_node);
-                ^^^^
-
-The devmap code adds the same defensive check but doesn't initialize
-flush_node the way cpumap does. Looking at dev_map_notification(), when
-NETDEV_REGISTER occurs, it calls:
-
-    alloc_percpu(struct xdp_dev_bulk_queue)
-
-And then only initializes the dev field:
-
-    per_cpu_ptr(netdev->xdp_bulkq, cpu)->dev = netdev;
-
-Without INIT_LIST_HEAD(&bq->flush_node), if alloc_percpu() returns
-memory with non-zero bytes, bq->flush_node.prev could contain garbage.
-
-The enqueue path in bq_enqueue() uses:
-
-    if (!bq->dev_rx)
-        list_add(&bq->flush_node, flush_list);
-
-So if dev_rx contains non-zero garbage, the node never gets added to the
-list. But this flush code checks bq->flush_node.prev which could also be
-garbage, causing __list_del_clearprev() to be called with invalid
-pointers.
-
-Does devmap need INIT_LIST_HEAD(&bq->flush_node) similar to cpumap? The
-commit message states that initialization is part of the fix, but only
-cpumap gets it.
-
-[ ... ]
-
-
+Fixes: 56de859e9967 ("vxlan: lock RCU on TX path")
+Cc: stable@vger.kernel.org
+Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
 ---
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+ drivers/net/vxlan/vxlan_core.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/20255377282
+diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+index dab864bc733c..41bbc92cc234 100644
+--- a/drivers/net/vxlan/vxlan_core.c
++++ b/drivers/net/vxlan/vxlan_core.c
+@@ -2479,8 +2479,10 @@ void vxlan_xmit_one(struct sk_buff *skb, struct net_device *dev,
+ 			err = encap_bypass_if_local(skb, dev, vxlan, AF_INET,
+ 						    dst_port, ifindex, vni,
+ 						    &rt->dst, rt->rt_flags);
+-			if (err)
++			if (err) {
++				dst_release(&rt->dst);
+ 				goto out_unlock;
++			}
+ 
+ 			if (vxlan->cfg.df == VXLAN_DF_SET) {
+ 				df = htons(IP_DF);
+@@ -2560,8 +2562,10 @@ void vxlan_xmit_one(struct sk_buff *skb, struct net_device *dev,
+ 			err = encap_bypass_if_local(skb, dev, vxlan, AF_INET6,
+ 						    dst_port, ifindex, vni,
+ 						    ndst, rt6i_flags);
+-			if (err)
++			if (err) {
++				dst_release(ndst);
+ 				goto out_unlock;
++			}
+ 		}
+ 
+ 		err = skb_tunnel_check_pmtu(skb, ndst,
+-- 
+2.34.1
 
---===============2241353678792354598==--
 
