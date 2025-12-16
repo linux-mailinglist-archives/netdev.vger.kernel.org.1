@@ -1,123 +1,119 @@
-Return-Path: <netdev+bounces-245009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAF16CC4F54
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 19:53:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0DCDCC4F9A
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 20:09:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1FD1830495A6
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 18:53:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B9FFC303A1B0
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 19:09:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B971133DECA;
-	Tue, 16 Dec 2025 18:53:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TzAUPjSW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C48683254A7;
+	Tue, 16 Dec 2025 19:09:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62E552652B7;
-	Tue, 16 Dec 2025 18:53:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24119265CA8;
+	Tue, 16 Dec 2025 19:09:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765911184; cv=none; b=jzmQDeV1eV0FjRaEsLd1TIE5L/2Nw8Nm2ZjN4UNEn3zG77m8+PwGHRRwQULfDxzTSxqTpDOoGfB4ptXtewT1dkv4/5BRU1xMQDL7cJG/eNURxdnh0Cvq8vr2J24XqDdP4e67DeR7krrk5uGfPJ9gHsp4+kHZBM+GG4libll/e28=
+	t=1765912153; cv=none; b=kbHNC8Q4EEXUdLs5kc4/46WooKUF7QmCtctbwpjLEzxxF/gKOjKkihxfSEjnjrlKJSzQs78PMJrODXqiTUBnAF58MaQhYosV17MLIKYiR+1NO3O4uw4zzpLFWnq0oNVN3fkD9jMNDPARgRIxXepwDvFwWpndjCj4JUoCuMCpqRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765911184; c=relaxed/simple;
-	bh=V72KZIkvRJxTqzRbnLjRwswTaHH6wcpmi2d+xQOkaQ8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HA7ibdS6HPJu9AxTvEHlIsj2JoSYYRGtRJJ8r2Ju9+6scQdq+ZgiOD6wv64As4KHfog5dj+Ub3sW3wB5G2SrxReZgjFFMHvyczbESkXF767d5oxW8SAFFzP3oO6zVI6TJSxha3rTrkbbEqhFQLxFyUriM7sJJc+xozhzTG5FTPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TzAUPjSW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE011C4CEF1;
-	Tue, 16 Dec 2025 18:52:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765911183;
-	bh=V72KZIkvRJxTqzRbnLjRwswTaHH6wcpmi2d+xQOkaQ8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TzAUPjSW1CSsiObqjSMX67ja4VWZr2wKq1Z78pd+ElLow0iLJhg0Y/a6hFpwoaKsP
-	 /p4DtUPm6jT2ZzSWQmF6hnJz7joEO+l5Caauglhhe/LcV341yHqgxkRRq6/JhwhNwG
-	 8JGLMJJghiOG/uZUOlinlzwYMyH5OKdW1H3El0MiKvEZ5VglXADnsTj0gy+sRjdbi0
-	 7Xryg/W26d8Mt/1Re/0iFMOpqXKyMyFwC1Pz7cu9urLqrCBnRep63sORbUvWNyIi4W
-	 TdLORrw6IC9obpGp+VjFh5X4Fv4j/ecLEuxrDd1/hP9lwp/EmsJhbvrEmz5hXTBGKD
-	 pRawtF4SfVH1g==
-Date: Tue, 16 Dec 2025 18:52:52 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Robert Marko <robert.marko@sartura.hr>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org,
-	nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com,
-	claudiu.beznea@tuxon.dev, Steen.Hegelund@microchip.com,
-	daniel.machon@microchip.com, UNGLinuxDriver@microchip.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org,
-	linux@roeck-us.net, andi.shyti@kernel.org, lee@kernel.org,
-	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, linusw@kernel.org, olivia@selenic.com,
-	radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com,
-	gregkh@linuxfoundation.org, jirislaby@kernel.org,
-	mturquette@baylibre.com, sboyd@kernel.org, richardcochran@gmail.com,
-	wsa+renesas@sang-engineering.com, romain.sioen@microchip.com,
-	Ryan.Wanner@microchip.com, lars.povlsen@microchip.com,
-	tudor.ambarus@linaro.org, charan.pedumuru@microchip.com,
-	kavyasree.kotagiri@microchip.com, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
-	linux-hwmon@vger.kernel.org, linux-i2c@vger.kernel.org,
-	netdev@vger.kernel.org, linux-gpio@vger.kernel.org,
-	linux-spi@vger.kernel.org, linux-serial@vger.kernel.org,
-	linux-usb@vger.kernel.org, linux-clk@vger.kernel.org,
-	mwalle@kernel.org, luka.perkov@sartura.hr
-Subject: Re: [PATCH v2 03/19] dt-bindings: arm: AT91: relicense to dual
- GPL-2.0/BSD-2-Clause
-Message-ID: <20251216-dictation-flatbed-adb40e164970@spud>
-References: <20251215163820.1584926-1-robert.marko@sartura.hr>
- <20251215163820.1584926-3-robert.marko@sartura.hr>
- <d9665340-5a96-4105-88e9-ec14a715df5a@kernel.org>
- <CA+HBbNF2EeP=miC9GpEm2HpPTmZAefV2fwxKjm0vHB6tj_1usQ@mail.gmail.com>
+	s=arc-20240116; t=1765912153; c=relaxed/simple;
+	bh=K7j8EhOuhxmVWmCa4WA1h/DSVIfonZwqI/e7hXyWS08=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jhq9YW1kJf7RjWbUAaZdyetNc53pB+4vNGKv3bgne0V4MVve5yrWpFvKjYzYnGtGzMaSnrnEDMRNOsM6RzmQ8jHKjI8TyRkueN/g4KrfbnwmmajZ/BccMI9mLqWTy4s7LFYYA1Y+7KMbpwMbhk6tJLq3NAvHGPoo1RI9SQ6V6I8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=Chamillionaire.breakpoint.cc
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id D99896024F; Tue, 16 Dec 2025 20:09:08 +0100 (CET)
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	<netfilter-devel@vger.kernel.org>,
+	pablo@netfilter.org
+Subject: [PATCH net 0/6] netfilter: updates for net
+Date: Tue, 16 Dec 2025 20:08:58 +0100
+Message-ID: <20251216190904.14507-1-fw@strlen.de>
+X-Mailer: git-send-email 2.51.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="HEeirbPNqgZXqmm8"
-Content-Disposition: inline
-In-Reply-To: <CA+HBbNF2EeP=miC9GpEm2HpPTmZAefV2fwxKjm0vHB6tj_1usQ@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 
+Hi,
 
---HEeirbPNqgZXqmm8
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The following patchset contains Netfilter fixes for *net*:
 
-On Tue, Dec 16, 2025 at 06:02:57PM +0100, Robert Marko wrote:
-> On Tue, Dec 16, 2025 at 4:55=E2=80=AFPM Krzysztof Kozlowski <krzk@kernel.=
-org> wrote:
-> >
-> > On 15/12/2025 17:35, Robert Marko wrote:
-> > > As it is preferred to have bindings dual licensed, lets relicense the=
- AT91
-> > > bindings from GPL-2.0 only to GPL-2.0/BSD-2 Clause.
-> > >
-> > > Signed-off-by: Robert Marko <robert.marko@sartura.hr>
-> >
-> > You need all contributors to ack this...
->=20
-> I understand, all of the contributors were CC-ed.
+1)  Jozsef Kadlecsik is retiring.  Fortunately Jozsef will still keep an
+    eye on ipset patches.
 
-I pointed it out last time, but for Krzysztof's sake there's only two
-(Wolfram and Michael) that I am not aware of having stated that their
-binding contributions can be converted to dual license.
+2)  remove a bogus direction check from nat core, this caused spurious
+    flakes in the 'reverse clash' selftest, from myself.
 
---HEeirbPNqgZXqmm8
-Content-Type: application/pgp-signature; name="signature.asc"
+3) nf_tables doesn't need to do chain validation on register store,
+   from Pablo Neira Ayuso.
 
------BEGIN PGP SIGNATURE-----
+4) nf_tables shouldn't revisit chains during ruleset (graph) validation
+   if possible.  Both 3 and 4 were slated for -next initially but there
+   are now two independent reports of people hitting soft lockup errors
+   during ruleset validation, so it makes no sense anymore to route
+   this via -next given this is -stable material. From myself.
 
-iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaUGqhAAKCRB4tDGHoIJi
-0jwWAQCZik4ZGOhimmWnpw0y4lz1SWuwmfJxq6ZgMB0P8RvK6gD8CE4M0v/QTsRw
-ssYPM7Vn9Y7M6VvaNEs2U68pR1Fp4Q8=
-=NxNo
------END PGP SIGNATURE-----
+5) call cond_resched() in a more frequently visited place during nf_tables
+   chain validation, this wasn't possible earlier due to rcu read lock,
+   but nowadays its not held anymore during set walks.
 
---HEeirbPNqgZXqmm8--
+6) Don't fail conntrack packetdrill test with HZ=100 kernels.
+
+Please, pull these changes from:
+The following changes since commit 885bebac9909994050bbbeed0829c727e42bd1b7:
+
+  nfc: pn533: Fix error code in pn533_acr122_poweron_rdr() (2025-12-11 01:40:00 -0800)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-25-12-16
+
+for you to fetch changes up to fec7b0795548b43e2c3c46e3143c34ef6070341c:
+
+  selftests: netfilter: packetdrill: avoid failure on HZ=100 kernel (2025-12-15 15:04:04 +0100)
+
+----------------------------------------------------------------
+netfilter pull request nf-25-12-16
+
+----------------------------------------------------------------
+Florian Westphal (4):
+      netfilter: nf_nat: remove bogus direction check
+      netfilter: nf_tables: avoid chain re-validation if possible
+      netfilter: nf_tables: avoid softlockup warnings in nft_chain_validate
+      selftests: netfilter: packetdrill: avoid failure on HZ=100 kernel
+
+Jozsef Kadlecsik (1):
+      MAINTAINERS: Remove Jozsef Kadlecsik from MAINTAINERS file
+
+Pablo Neira Ayuso (1):
+      netfilter: nf_tables: remove redundant chain validation on register store
+
+ CREDITS                                            |  1 +
+ MAINTAINERS                                        |  1 -
+ include/net/netfilter/nf_tables.h                  | 34 ++++++---
+ net/netfilter/nf_nat_core.c                        | 14 +---
+ net/netfilter/nf_tables_api.c                      | 84 +++++++++++++++++-----
+ .../net/netfilter/conntrack_reverse_clash.c        | 13 ++--
+ .../net/netfilter/conntrack_reverse_clash.sh       |  2 +
+ .../packetdrill/conntrack_syn_challenge_ack.pkt    |  2 +-
+ 8 files changed, 107 insertions(+), 44 deletions(-)
+
+# WARNING: skip 0001-MAINTAINERS-Remove-Jozsef-Kadlecsik-from-MAINTAINERS.patch, no "Fixes" tag!
+# INFO: 0002-netfilter-nf_nat-remove-bogus-direction-check.patch fixes commit from v6.12-rc1~38^2^2~13
+# INFO: 0003-netfilter-nf_tables-remove-redundant-chain-validatio.patch fixes commit from v4.18-rc1~114^2~78^2~5
+# WARNING: skip 0004-netfilter-nf_tables-avoid-chain-re-validation-if-pos.patch, no "Fixes" tag!
 
