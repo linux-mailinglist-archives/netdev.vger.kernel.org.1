@@ -1,118 +1,103 @@
-Return-Path: <netdev+bounces-244997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 126CCCC4D3E
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 19:18:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 821BDCC4EB2
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 19:36:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D666430CDFE5
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 18:13:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0D20230AA8CA
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 18:33:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55A3834104C;
-	Tue, 16 Dec 2025 18:04:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95A0433E35F;
+	Tue, 16 Dec 2025 18:03:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ziyao.cc header.i=@ziyao.cc header.b="Hn08hZax"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sGZhLxNX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail123.out.titan.email (mail123.out.titan.email [34.198.80.90])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B168C340DBE
-	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 18:04:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=34.198.80.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3911632ABFE;
+	Tue, 16 Dec 2025 18:03:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765908255; cv=none; b=KulEuCKwaoXhP1glKEvGZfhvtNV/gOMFtJ019nQr4A/q7WgL5dYFvvMX5a/TYNDAQLZGdPAr/j4GLqdhjO3H2FOyi0fbNMkHqh1HbWMlrq0SfgO9PhL7ZPTzWd9iM+ZgmJSvyS4c5vLVbtwZwhmeJk5ihSDw4YlxUP2X9Sdn92g=
+	t=1765908229; cv=none; b=ZD2/mMcOhQEXTqljtBbctW2gQMxOvcfbtM1JL4hp/+G85pS1q5QXIwKlbo1Fs1RA2H0EB5cWRScEiPZlkhKzuYu9vKYHkTMu9TONdgguZAWi7l7O20W8nPXEZ9Y0aTcxFDERcmjb112Sq/gg6pblZz9/KsVqplDwp+T1M3P20fw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765908255; c=relaxed/simple;
-	bh=Cq8e88JiIvNizOWXEY4DxtIDVedONKmcD2p5e5rhajU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FIbf9OFcbCKuwZZRfdsGPHDxPJwmdxnfblkFHAhdJnPiViBfIPfg/jOOuZk6QkOFYgr3+DeGrlTFymODB+uu/hRy0ZiMi9VjUYGaKmG3QRcx+UVylNmILdHGWwDcvSGekNObD8+1MOU6nq/ZjhShQ+F/8SwY3iYHalvt98MfJVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ziyao.cc; spf=pass smtp.mailfrom=ziyao.cc; dkim=pass (1024-bit key) header.d=ziyao.cc header.i=@ziyao.cc header.b=Hn08hZax; arc=none smtp.client-ip=34.198.80.90
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ziyao.cc
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziyao.cc
-Received: from localhost (localhost [127.0.0.1])
-	by smtp-out.flockmail.com (Postfix) with ESMTP id 4dW4Yz29nRz2xCs;
-	Tue, 16 Dec 2025 18:04:07 +0000 (UTC)
-DKIM-Signature: a=rsa-sha256; bh=Kq1bEJooA3uMWxhU1+TR0ORYnkY1s/WzdC1SduHyG0Q=;
-	c=relaxed/relaxed; d=ziyao.cc;
-	h=to:from:cc:date:in-reply-to:references:subject:message-id:mime-version:from:to:cc:subject:date:message-id:in-reply-to:references:reply-to;
-	q=dns/txt; s=titan1; t=1765908247; v=1;
-	b=Hn08hZaxpBiKoqwVrbMn7TOrcjzAjEi4LEEJOIzx7DvgT/Xzfgf8fivcuB2hbIl41p1w7jiZ
-	uYPQQZYIyeSvAHBCeTlHI0QG9GlEksNxto/txpkics1TZfHnujA93AgXNCfp1/koBFNXVhuyQXy
-	IlR1NpVRdecKB5yLu1ir5xz0=
-Received: from ketchup (unknown [117.171.66.90])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp-out.flockmail.com (Postfix) with ESMTPSA id 4dW4Ys5Y4nz2xNc;
-	Tue, 16 Dec 2025 18:04:01 +0000 (UTC)
-Feedback-ID: :me@ziyao.cc:ziyao.cc:flockmailId
-From: Yao Zi <me@ziyao.cc>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Frank <Frank.Sae@motor-comm.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Jisheng Zhang <jszhang@kernel.org>,
-	Furong Xu <0x1207@gmail.com>
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Mingcong Bai <jeffbai@aosc.io>,
-	Kexy Biscuit <kexybiscuit@aosc.io>,
-	Yao Zi <me@ziyao.cc>
-Subject: [RFC PATCH net-next v4 3/3] MAINTAINERS: Assign myself as maintainer of Motorcomm DWMAC glue driver
-Date: Tue, 16 Dec 2025 18:03:31 +0000
-Message-ID: <20251216180331.61586-4-me@ziyao.cc>
-X-Mailer: git-send-email 2.51.2
-In-Reply-To: <20251216180331.61586-1-me@ziyao.cc>
-References: <20251216180331.61586-1-me@ziyao.cc>
+	s=arc-20240116; t=1765908229; c=relaxed/simple;
+	bh=uw9UEE73Oa47vY+WaW3IP3rQLFkIq6VPLGolGwYjMaI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lyA04XMTHVam5inUs08KEqyZlY4Yc74usXVkWl85gQqlSf2LhYOCFMwAihmRu4kI19C0SgT2jmxUZrvuLpDB0j0GRAMkEnYFSQdlRnl9iO32zOAlFq9Q0yt7SRDxnhjLDz3vEPECZzH8Iwmx33Qigd4fSCD8q0wCmi1NncvqFrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sGZhLxNX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B7ACC4CEF1;
+	Tue, 16 Dec 2025 18:03:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765908228;
+	bh=uw9UEE73Oa47vY+WaW3IP3rQLFkIq6VPLGolGwYjMaI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sGZhLxNX9Ydu6dthlTe18VJTZkswMmwuPGkq35ZKGKMYjSInCx4uEalEGIllueAnW
+	 eO5fnqFPsYKuEVuv/Rn9h3kFNzG45YYo5pb2hnG7qMf7awzTl4cpM++VOaTlpr631r
+	 TJWa7f5mb+zU81nvDWJ3SZrnJZ/pPEQ6sNRmrqThtnHD9KmFK2NbUAA6YVSx5f/ATa
+	 KLD3CbsOBnNuDQqgE2YzKrodUkyxap82DZfBii0zXy6YHmdgnwyEAd+ucX8eGKR65c
+	 Y29DZ/Ar1sex+yf3CrCXybPb+WEZOi5bQvnGSV1tXXda8CKbnRiWczD02rnzrsVsJK
+	 BB3sxiayVAXPw==
+Date: Tue, 16 Dec 2025 18:03:37 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Robert Marko <robert.marko@sartura.hr>
+Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+	nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com,
+	claudiu.beznea@tuxon.dev, Steen.Hegelund@microchip.com,
+	daniel.machon@microchip.com, UNGLinuxDriver@microchip.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org,
+	linux@roeck-us.net, andi.shyti@kernel.org, lee@kernel.org,
+	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linusw@kernel.org, olivia@selenic.com,
+	radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com,
+	gregkh@linuxfoundation.org, jirislaby@kernel.org,
+	mturquette@baylibre.com, sboyd@kernel.org, richardcochran@gmail.com,
+	wsa+renesas@sang-engineering.com, romain.sioen@microchip.com,
+	Ryan.Wanner@microchip.com, lars.povlsen@microchip.com,
+	tudor.ambarus@linaro.org, charan.pedumuru@microchip.com,
+	kavyasree.kotagiri@microchip.com, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
+	linux-hwmon@vger.kernel.org, linux-i2c@vger.kernel.org,
+	netdev@vger.kernel.org, linux-gpio@vger.kernel.org,
+	linux-spi@vger.kernel.org, linux-serial@vger.kernel.org,
+	linux-usb@vger.kernel.org, linux-clk@vger.kernel.org,
+	mwalle@kernel.org, luka.perkov@sartura.hr
+Subject: Re: [PATCH v2 12/19] dt-bindings: crypto: atmel,at91sam9g46-sha: add
+ microchip,lan9691-sha
+Message-ID: <20251216-cozily-taking-b35950730d69@spud>
+References: <20251215163820.1584926-1-robert.marko@sartura.hr>
+ <20251215163820.1584926-12-robert.marko@sartura.hr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-F-Verdict: SPFVALID
-X-Titan-Src-Out: 1765908247165786655.27573.7088989779329087934@prod-use1-smtp-out1001.
-X-CMAE-Score: 0
-X-CMAE-Analysis: v=2.4 cv=a8/K9VSF c=1 sm=1 tr=0 ts=69419f17
-	a=rBp+3XZz9uO5KTvnfbZ58A==:117 a=rBp+3XZz9uO5KTvnfbZ58A==:17
-	a=MKtGQD3n3ToA:10 a=1oJP67jkp3AA:10 a=CEWIc4RMnpUA:10 a=VwQbUJbxAAAA:8
-	a=NfpvoiIcAAAA:8 a=QS5k1xlMZ-r-HGU3PrcA:9 a=HwjPHhrhEcEjrsLHunKI:22
-	a=3z85VNIBY5UIEeAh_hcH:22 a=NWVoK91CQySWRX1oVYDe:22
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="RCIzIz+3EuWNz1kl"
+Content-Disposition: inline
+In-Reply-To: <20251215163820.1584926-12-robert.marko@sartura.hr>
 
-I volunteer to maintain the DWMAC glue driver for Motorcomm ethernet
-controllers.
 
-Signed-off-by: Yao Zi <me@ziyao.cc>
----
- MAINTAINERS | 6 ++++++
- 1 file changed, 6 insertions(+)
+--RCIzIz+3EuWNz1kl
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e5b1342ee2a6..1483c1071d16 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -17666,6 +17666,12 @@ F:	drivers/most/
- F:	drivers/staging/most/
- F:	include/linux/most.h
- 
-+MOTORCOMM DWMAC GLUE DRIVER
-+M:	Yao Zi <me@ziyao.cc>
-+L:	netdev@vger.kernel.org
-+S:	Maintained
-+F:	drivers/net/ethernet/stmicro/stmmac/dwmac-motorcomm.c
-+
- MOTORCOMM PHY DRIVER
- M:	Frank <Frank.Sae@motor-comm.com>
- L:	netdev@vger.kernel.org
--- 
-2.51.2
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
+pw-bot: not-applicable
 
+--RCIzIz+3EuWNz1kl
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaUGe+QAKCRB4tDGHoIJi
+0oFzAQCd0B8fI/kWrW+YgnhlZzsAK++wCY88Dj3KIOSLAh08lQEAz65r/pWKhVdX
+rH7pB3H/kWDCyp5zEG3tgkZnZbZRrQg=
+=1r2y
+-----END PGP SIGNATURE-----
+
+--RCIzIz+3EuWNz1kl--
 
