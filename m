@@ -1,68 +1,76 @@
-Return-Path: <netdev+bounces-244992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8204CC4C8D
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 19:01:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C1442CC4D71
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 19:21:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D769E3081D52
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 17:59:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EA33930F55DF
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 18:14:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94BC533C50A;
-	Tue, 16 Dec 2025 17:59:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D129C33EB0C;
+	Tue, 16 Dec 2025 18:03:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="hdTZSRCq"
+	dkim=pass (1024-bit key) header.d=ziyao.cc header.i=@ziyao.cc header.b="i5nHNCah"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from mail102.out.titan.email (mail102.out.titan.email [52.45.239.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEDC12D5922;
-	Tue, 16 Dec 2025 17:59:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA0A233554B
+	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 18:03:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.45.239.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765907976; cv=none; b=B62l5JB7cUMXkdx1ZGiQwJ7NoxfEy1CXkabLpE+viGcYByqZITpkt6/9zt2YmGCVzzjWyXTqvUPulmabAKVfLoO5+BnOLRi63UPGoQxIMil/9HT96seKw3AoREbzKuNTFpsDms7q+hgp7gI7EN4C4UzJQkJEXOHFIA7net2lUOA=
+	t=1765908237; cv=none; b=ssZiYsmQSX90zSGHofl2QQWq/QALnDFGTscCe2SuMWRkH10RrgfkRpDTJMQA3xskSG2ZcMPT/5U3tsHWzxik/pSgWxZ3d+MhVmnjoMVXwyiXImoZT38Pml0wgc7BfxOtI80c1hFgQ4UFzxqWHPFJVwwGpN5d5y6FYv9I4PM/UZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765907976; c=relaxed/simple;
-	bh=NpX2cYgamudQZSSttYEcw79K6PPsUN0dvIDSwahU1PU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=T5HhIlDI5DxlZ2/Gf8X5yu9fJJhxfv5XBhmw0uQMrlUa5aPUrcsnbGowDAv6pRpKOg/0LKi7+8vHdUSrpW0Wctt+3i2uFmnXaYpx2wgvKH8WceArhfu4Xcs5/BESpod8HG7hTe9ZSO15Lf1QIwioLJENl44jsqwEfT6ewjwT2Ak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=hdTZSRCq; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BGBNYeu2375057;
-	Tue, 16 Dec 2025 09:59:24 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=uKA8UNZEdRzgO8gcqOTTkDa
-	DxtJPZsAsk0uuI7FmGKg=; b=hdTZSRCq0OKxvdt4E8Z7YOLcsNgZA33dX4Joah1
-	YdS2kSp/j19VbiXt79rzUl9dgBSwlcIEwxnxfGNtXGFrflTJNTQpbhKZGzIwrrGY
-	cfvf/NZQT13OLUn9WG07IaZta+kJHmf7w0JO0hnUUUxnTJkWFo6wce0vLNldIfB5
-	yL6X0dZXzslsLdeKG5YeqLoRdUgl0C9I4OHKnEOYWonl3oqlIKjjyeGbX7TC83wb
-	sBSrwjLRIgdZA77GXfB09ze7x3ETZ7O6ArwpcjPGZCb7ZR+99gQ9mR70Ttd4SEIH
-	mbU6qNZAiqzncWeQkUHRjtxvD5wnLNXYB/gW9p6bqK4KpqA==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4b36gjruta-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 16 Dec 2025 09:59:24 -0800 (PST)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Tue, 16 Dec 2025 09:59:36 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Tue, 16 Dec 2025 09:59:36 -0800
-Received: from 5810.marvell.com (unknown [10.29.45.105])
-	by maili.marvell.com (Postfix) with ESMTP id 836F55B692E;
-	Tue, 16 Dec 2025 09:59:19 -0800 (PST)
-From: Kommula Shiva Shankar <kshankar@marvell.com>
-To: <netdev@vger.kernel.org>, <mst@redhat.com>, <jasowang@redhat.com>
-CC: <virtualization@lists.linux.dev>, <eperezma@redhat.com>,
-        <kvm@vger.kernel.org>, <jerinj@marvell.com>, <ndabilpuram@marvell.com>,
-        <schalla@marvell.com>
-Subject: [PATCH net-next ] vdpa: fix caching attributes of MMIO regions by setting them explicitly
-Date: Tue, 16 Dec 2025 23:29:18 +0530
-Message-ID: <20251216175918.544641-1-kshankar@marvell.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1765908237; c=relaxed/simple;
+	bh=6NJ4QGWQlriE4UJw51AEavMvHJyyg9wuWwNA/m2aGOY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=k+utsQPVFHJSJR0vgnhTNAI/sSWWZz9F4KPffHrgoRtNT42TcB05YwO/gNQ810kxpO+zk43vIn3BJZyFFkAb4o7PY4SX6nLSgyiug8OCCj2Fjh994+BvZb/WC8M4o84W2CRjbLSSd36wgmT33ute83p+o/rWoS0WXw+/PtnD9o4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ziyao.cc; spf=pass smtp.mailfrom=ziyao.cc; dkim=pass (1024-bit key) header.d=ziyao.cc header.i=@ziyao.cc header.b=i5nHNCah; arc=none smtp.client-ip=52.45.239.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ziyao.cc
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziyao.cc
+Received: from localhost (localhost [127.0.0.1])
+	by smtp-out.flockmail.com (Postfix) with ESMTP id 4dW4Yk5vxnz2xMn;
+	Tue, 16 Dec 2025 18:03:54 +0000 (UTC)
+DKIM-Signature: a=rsa-sha256; bh=CDawo+fF0LESR9TpJ+UYGDKMkCrwqrs00DCR3DiPQws=;
+	c=relaxed/relaxed; d=ziyao.cc;
+	h=references:date:in-reply-to:mime-version:from:cc:to:subject:message-id:from:to:cc:subject:date:message-id:in-reply-to:references:reply-to;
+	q=dns/txt; s=titan1; t=1765908234; v=1;
+	b=i5nHNCahqOiglhBMjW/L3/G1AmyioAfYDdeDmrHwWMLYev/ESTtK4dQmRdKubF2b72ZWs5T2
+	o1cvbh3wbJ2Tm638uU2VRfoVBlTg/8nY8/q5ipZt60YhITIqMCegI3smXAvI28Sydihxnv96E7L
+	Bbk7OsvETr4U524QfkAzzpEU=
+Received: from ketchup (unknown [117.171.66.90])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp-out.flockmail.com (Postfix) with ESMTPSA id 4dW4Yd2Mx5z2xNX;
+	Tue, 16 Dec 2025 18:03:49 +0000 (UTC)
+Feedback-ID: :me@ziyao.cc:ziyao.cc:flockmailId
+From: Yao Zi <me@ziyao.cc>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Frank <Frank.Sae@motor-comm.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jisheng Zhang <jszhang@kernel.org>,
+	Furong Xu <0x1207@gmail.com>
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Mingcong Bai <jeffbai@aosc.io>,
+	Kexy Biscuit <kexybiscuit@aosc.io>,
+	Yao Zi <me@ziyao.cc>
+Subject: [RFC PATCH net-next v4 1/3] net: phy: motorcomm: Support YT8531S PHY in YT6801 Ethernet controller
+Date: Tue, 16 Dec 2025 18:03:29 +0000
+Message-ID: <20251216180331.61586-2-me@ziyao.cc>
+X-Mailer: git-send-email 2.51.2
+In-Reply-To: <20251216180331.61586-1-me@ziyao.cc>
+References: <20251216180331.61586-1-me@ziyao.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,49 +78,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=eckwvrEH c=1 sm=1 tr=0 ts=69419dfc cx=c_pps
- a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
- a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=M5GUcnROAAAA:8
- a=crWdm8P_I_FkJ7v9e20A:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-GUID: ko9HbogPsc2fxcEwByVLM5SUTp5F3Y3c
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjE2MDE1NCBTYWx0ZWRfXxmI7g2Jx9lEX
- cvLZWtuvEuIcCw17/TpStlaGwGYxHKXP/yW+LPt4kCO+m7EQL4KfGmleWYs3gCsdY6H7piAJARG
- r795ztlOS9YBs6SRjjKup+lxaEZnfCHYjlRH5pYNNPCXcLzzdaH1dVlZyv4fFx1D1wW6/tG9qzP
- meHoF0T9cEuXYk8f56YVxmAz2wagpw99NaArDAnkjlXy1z5AVP7Sf3p44GXteoXVpu1PiKy3AD2
- IoDfwe5BT3/EnSQHirQa9AwniTs6QgdymcEBA2LIcedw3e5AAOrScg1OKCgmlkI3MbpGuxUHzis
- iE+NWRB6OdhStLKi/2cQBKZtxLr2jzTZvU8SInhHfa3t4OC9T83KnUXnuvGZTLwrwzkeblqsf61
- +IHi9KoY2Zek3K16rMIxUZY1ztnTVg==
-X-Proofpoint-ORIG-GUID: ko9HbogPsc2fxcEwByVLM5SUTp5F3Y3c
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-16_02,2025-12-16_02,2025-10-01_01
+X-F-Verdict: SPFVALID
+X-Titan-Src-Out: 1765908234689110305.27573.9134173884844574602@prod-use1-smtp-out1001.
+X-CMAE-Score: 0
+X-CMAE-Analysis: v=2.4 cv=a8/K9VSF c=1 sm=1 tr=0 ts=69419f0a
+	a=rBp+3XZz9uO5KTvnfbZ58A==:117 a=rBp+3XZz9uO5KTvnfbZ58A==:17
+	a=MKtGQD3n3ToA:10 a=1oJP67jkp3AA:10 a=CEWIc4RMnpUA:10 a=VwQbUJbxAAAA:8
+	a=NfpvoiIcAAAA:8 a=uCHZyEKV_PbTw5-4gUMA:9 a=HwjPHhrhEcEjrsLHunKI:22
+	a=3z85VNIBY5UIEeAh_hcH:22 a=NWVoK91CQySWRX1oVYDe:22
 
-Explicitly set non-cached caching attributes for MMIO regions.
-Default write-back mode can cause CPU to cache device memory,
-causing invalid reads and unpredictable behavior.
+YT6801's internal PHY is confirmed as a GMII-capable variant of YT8531S
+by a previous series[1] and reading PHY ID. Add support for
+PHY_INTERFACE_MODE_GMII for YT8531S to allow the Ethernet driver to
+reuse the PHY code for its internal PHY.
 
-Invalid read and write issues were observed on ARM64 when mapping the
-notification area to userspace via mmap.
-
-Signed-off-by: Kommula Shiva Shankar <kshankar@marvell.com>
+Link: https://lore.kernel.org/all/a48d76ac-db08-46d5-9528-f046a7b541dc@motor-comm.com/ # [1]
+Co-developed-by: Frank Sae <Frank.Sae@motor-comm.com>
+Signed-off-by: Frank Sae <Frank.Sae@motor-comm.com>
+Signed-off-by: Yao Zi <me@ziyao.cc>
 ---
- drivers/vhost/vdpa.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/phy/motorcomm.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-index 05a481e4c385..b0179e8567ab 100644
---- a/drivers/vhost/vdpa.c
-+++ b/drivers/vhost/vdpa.c
-@@ -1527,6 +1527,7 @@ static int vhost_vdpa_mmap(struct file *file, struct vm_area_struct *vma)
- 	if (vma->vm_end - vma->vm_start != notify.size)
- 		return -ENOTSUPP;
- 
-+	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
- 	vm_flags_set(vma, VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP);
- 	vma->vm_ops = &vhost_vdpa_vm_ops;
- 	return 0;
+diff --git a/drivers/net/phy/motorcomm.c b/drivers/net/phy/motorcomm.c
+index 89b5b19a9bd2..b751fbc6711a 100644
+--- a/drivers/net/phy/motorcomm.c
++++ b/drivers/net/phy/motorcomm.c
+@@ -910,6 +910,10 @@ static int ytphy_rgmii_clk_delay_config(struct phy_device *phydev)
+ 		val |= FIELD_PREP(YT8521_RC1R_RX_DELAY_MASK, rx_reg) |
+ 		       FIELD_PREP(YT8521_RC1R_GE_TX_DELAY_MASK, tx_reg);
+ 		break;
++	case PHY_INTERFACE_MODE_GMII:
++		if (phydev->drv->phy_id != PHY_ID_YT8531S)
++			return -EOPNOTSUPP;
++		break;
+ 	default: /* do not support other modes */
+ 		return -EOPNOTSUPP;
+ 	}
 -- 
-2.48.1
+2.51.2
 
 
