@@ -1,156 +1,260 @@
-Return-Path: <netdev+bounces-244906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4626BCC16A8
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 08:59:03 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDB9DCC196F
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 09:34:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 883E03007A97
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 07:58:52 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 886F330024C3
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 08:33:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52848339B3B;
-	Tue, 16 Dec 2025 07:58:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 625FC346E6C;
+	Tue, 16 Dec 2025 08:10:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="IGe0nUns"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="TnDfFdfS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012044.outbound.protection.outlook.com [52.101.48.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5805339708
-	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 07:58:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765871921; cv=none; b=fgebpJvgpzc11nIsf3uPOhoXHs0voXDCZiCSIVzK8mr7P8jxUEEcYQgfZxPzOrE5Kknsf7RWnF9odFUXYmAPMimapfj/GrVx49fQIVKZ8uxbQmOItdZxUMlWCXARH0fr8qhTkbHjuiZSfxEcipoTYQF427gzf12bl+BiPUHWEyw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765871921; c=relaxed/simple;
-	bh=DK7icG0xbloyzh33AbYb45dyPUaU85bnSKimNzCLxKE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bupuvI22X/qRTSAPpec1oK/v+F9FQKGGwub9aScxBoF2hulIoR5AyVxZUZ341V2myBDQ/FMPHMxIbAfS9bI4wGQmnc9dGB4naaa1ocWm6+BtAzb6g5RLrCVjTyXe8KNSVilkN/Gn5SsK5TK7Pc2xj4PiQSbk28olS5br1AswhYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=IGe0nUns; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-42e2ba54a6fso1702644f8f.3
-        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 23:58:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1765871916; x=1766476716; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=97+Mtmy/QOkXKgRJz1EGvFd6epy5X9AZxAMhh0WtV8U=;
-        b=IGe0nUnsSuWnV3zyqWB0qcX/PmA1RfbpFMJRu0X4cDcloynKidt51EEqdmBUc2OHwN
-         bFrLIrlpEbYP9MIHyvuqKQFTDFj3Hru4WebMAykE6Drqu2jG6FEkRabb50B6ios3lZUP
-         9yQ2vQ+TdJQ/FalKU/GWHHw8joi/89CnU3kKR+61V0DdrDpvRDDh7B/Jp+n81hR2f6D0
-         QWOKtN9xcNHEu7xUe6+ty7ovUZi219wYsYquLAfaWN2LfiTooCed3kaUkmpU4/8yilQ7
-         8Q1GDGGriXWSAM7Eh32HB+3njL94FhQp1CHHqiSaW+lEiqZ/2yPEo849V1LfBaG8Y/nD
-         VN+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765871916; x=1766476716;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=97+Mtmy/QOkXKgRJz1EGvFd6epy5X9AZxAMhh0WtV8U=;
-        b=oQZgHmdtoVSknfLVO8QYGj85h0e8/5jV1HKKCnlFf/I54S3t7mdWml1WIKD/bBN+GH
-         sKfiVGVeMF+Lxge67dIbrsUeBVSGe0GMM82MpvLtripTzvA7CAu0cRs+BjwoCOIl3xhU
-         R0oz4U1+W0ma3belxZJBa68akT1p8BXmDUjCESTuiUHEpPSil2Hmk/+s4UFzWEkSyZ2b
-         OSP6qoZSwpzMMlHTYZruR4AoXxiTgynuWhN9pZjRdi1c052HPPsrV4pC0+mUPIhDX673
-         Zz9bMrV7jgXkznMSGvfgLXwK16dTdqj1CFwNbFizBH61eFSzz/AgtfW1bVepDrRO28yM
-         NuUA==
-X-Forwarded-Encrypted: i=1; AJvYcCXfs7lTQEZIawBxa+3oyHMm0Bwspu+2o60Lpp7bb03sftbYoB6w4e4Fa7sHI8jQ0vlzjXJ7kDk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxpeIbgKH8rJfIudI4zBrtWtDabNU0ExpKh5tlWHJJyIVs6sdn
-	QDSfazK6NktgPpHB5yfEJR+8pOItGsfVLYnvFja191KsdpnuZqkyyER7pFCmuc/7/EI=
-X-Gm-Gg: AY/fxX6GRmdu6lHAsTf+T8dlOM+rx1duIY1oPlqp8OVqCGPGuOVhKdU8nU5GnRKA3na
-	Rbydk8wmFTIYPnG9OuuDaPwPUtAVcNBJnT3j+6tz/Wa0xiQxPX2qU0ZFeLoSFHbRP+1uLaBXoy5
-	/rg7zd6JFAc0mdkD6B6XqtchkUzryrMS6L5BCJO5WzhvOLlElfBKVlAXeYlnpQFbT8FgsGuV6Kw
-	MgeEcABVvIpiRyiT9NzF23yDeFkSrSc4waTNYRLDFEgv0cb4GStsvvTS82nEH7HVWTn42LtEjPM
-	MusOQNH99Bqo+VQ0Y9O0YGWvvEQ1ckt0qeFM0nXvpmjKezxsYjZ0FZhg6XodGZF6qiOXpX90ikO
-	99zSpuBN/mYz4BoMgVm2wEZ10Sgb2k8AB/vNGcf92A5BdaaxblMH7fXuOJ9eRwAVe5E5PYr74GJ
-	icrqT/li8PSCDYUmBqGQW/+Z+9bDiE9OjvMWvtA+OLrg==
-X-Google-Smtp-Source: AGHT+IH3fMt96wP9+5/cjnguTDIZz8YgGHxMBC46sU92EVfEEwlbtcITHEH6mygiqdo5JACpONinJA==
-X-Received: by 2002:a05:6000:4201:b0:431:74:cca with SMTP id ffacd0b85a97d-43100740d6cmr4977272f8f.44.1765871916089;
-        Mon, 15 Dec 2025 23:58:36 -0800 (PST)
-Received: from [192.168.0.161] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-430fa5f6ab7sm14452090f8f.25.2025.12.15.23.58.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 15 Dec 2025 23:58:35 -0800 (PST)
-Message-ID: <32b3de64-93d5-4342-8255-6e6f991b933a@blackwall.org>
-Date: Tue, 16 Dec 2025 09:58:34 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96D9346E5F;
+	Tue, 16 Dec 2025 08:10:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765872655; cv=fail; b=EBeRLYchDp1uNsweN4D+PemyP0AIj6bwuv/blJVCeFVFiarzp6jT+XTOtdfoY4iJSmqVtkUG0DuHsm2HUrFu353oBhtU8MV82LmpN72oIplTAsY0JWl+ESxJxG6gL7QulE3nLN/6yplHH3iY7aMk/bi3OOSfYVla5bLeqcwFmOo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765872655; c=relaxed/simple;
+	bh=nhRYD9VfjlXJy+x6cutxBzwtvLRNiJ72t758U5n4sAA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=omccAS2sYMC+VrqoJMH3fWvBffGfCecBqp89AYRElrkgubK/db1NM9zljrm7LJbctabelxehSyqGPKXqksKJIOOXhqPjMYQLNEvhcoZqIIixbENPPB+TdhB4M1NKEboSs6ogzEaevpFs8pXuj6jNxJNYiSol0/5MZyR4GmMuYwM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=TnDfFdfS; arc=fail smtp.client-ip=52.101.48.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=mXve7OSXvtv/5gSaMxTLRaj+HGlQauenyDMEKfLQQbCJhvpnPU5Mnk7HWYTejn3+LjIFconj42qi6wP47GjFomeaAXYDouKq1dQixVwwwqGTl+yKXVaSDhovK5dinP6l+ilsz+umnCJcZSoSPROb0wvbOub7KRet+EtzcUVmdABTHV67MAjM2l2ZVUy8qVBbU/qbEESEOliVuKsly/zUSgKdNmCtsiP770L1vc6aT8FcxAMUErz2rAlXKs/zvlG07WHGFusrEEpsk8xjroTyhVwco7pyUS0jqW01u8rO/ECk7KVim5avmXZ8USA2eqGHV01HLcmdxFH6/Ys8E5NUyw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Ml4hLnysdu+pRUQKE1SCNbox8jlqtOFBVtq8LGX5IgM=;
+ b=uXTkU9JNrhAdWziNwi92hy34E4hmxblQSZJf8IoopqE/gpGd3whtIfdLuMeQvBujC0Wu/FQgw7kOeuZXkNBoliyuemsSvmq88iHgHH7NkR3C1j29V3j4/wjUZ7mJwkpRZBUpI18Ehjdc0710javw/4SdZ9CtHMGzxhEoH3MPoYqcWL0Mkum7rNDyaRdsOl3oIEcfmdLRQWJWxKd4+egjc5A/CBZ9X6PdS/9pH6KKKXcwMNhwZOKKpy11beCniaaK6v7FTO5cNa47lpVX7Z62WObesn4EQaIGL/TmyBgJr6j8thQ+5vPNTI/y5dM//FyF5eXlpqOB84x1/FdmrFdbGw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ml4hLnysdu+pRUQKE1SCNbox8jlqtOFBVtq8LGX5IgM=;
+ b=TnDfFdfSSTqxrPj/D0FBqPGEFLwd6kBkIS4QYR/XN1MUiZZCJMvmdVHjQZu20iUhBLYc538+q0mIIAn+pzKACEs/O4C21Ig41g2R3pRf5fyPMww6ndA8TDL8sBpPOj/U3kbFxl5iztxvaEXJYgDwZqENTmCWk5zqshocAsQmIJj8h6kAKTZv2I2a3bofr3uOq4JSIeVk2BtpI5Vu8qsb2fYjEwl0xY4Uq8sA1H/Ag5XvyQvdLihuHOaJR5+dGnk9kK50VkyIldBFKp6CSBB0kd6Q3A7YreCvZbAy53spmcHk/9lFHycAzoKMdi3NCbkZO+iZNSrhFoD2iuAswGl//Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by DS7PR12MB9476.namprd12.prod.outlook.com (2603:10b6:8:250::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9412.13; Tue, 16 Dec
+ 2025 08:10:50 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2%2]) with mapi id 15.20.9412.011; Tue, 16 Dec 2025
+ 08:10:50 +0000
+Date: Tue, 16 Dec 2025 10:10:37 +0200
+From: Ido Schimmel <idosch@nvidia.com>
+To: Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux AMDGPU <amd-gfx@lists.freedesktop.org>,
+	Linux DRI Development <dri-devel@lists.freedesktop.org>,
+	Linux Filesystems Development <linux-fsdevel@vger.kernel.org>,
+	Linux Media <linux-media@vger.kernel.org>,
+	linaro-mm-sig@lists.linaro.org, kasan-dev@googlegroups.com,
+	Linux Virtualization <virtualization@lists.linux.dev>,
+	Linux Memory Management List <linux-mm@kvack.org>,
+	Linux Network Bridge <bridge@lists.linux.dev>,
+	Linux Networking <netdev@vger.kernel.org>,
+	Harry Wentland <harry.wentland@amd.com>,
+	Leo Li <sunpeng.li@amd.com>, Rodrigo Siqueira <siqueira@igalia.com>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Matthew Brost <matthew.brost@intel.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Philipp Stanner <phasta@kernel.org>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Alexander Potapenko <glider@google.com>,
+	Marco Elver <elver@google.com>, Dmitry Vyukov <dvyukov@google.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Taimur Hassan <Syed.Hassan@amd.com>, Wayne Lin <Wayne.Lin@amd.com>,
+	Alex Hung <alex.hung@amd.com>,
+	Aurabindo Pillai <aurabindo.pillai@amd.com>,
+	Dillon Varone <Dillon.Varone@amd.com>,
+	George Shen <george.shen@amd.com>, Aric Cyr <aric.cyr@amd.com>,
+	Cruise Hung <Cruise.Hung@amd.com>,
+	Mario Limonciello <mario.limonciello@amd.com>,
+	Sunil Khatri <sunil.khatri@amd.com>,
+	Dominik Kaszewski <dominik.kaszewski@amd.com>,
+	David Hildenbrand <david@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
+	Max Kellermann <max.kellermann@ionos.com>,
+	"Nysal Jan K.A." <nysal@linux.ibm.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Alexey Skidanov <alexey.skidanov@intel.com>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	Vitaly Wool <vitaly.wool@konsulko.se>,
+	Harry Yoo <harry.yoo@oracle.com>, Mateusz Guzik <mjguzik@gmail.com>,
+	NeilBrown <neil@brown.name>, Amir Goldstein <amir73il@gmail.com>,
+	Jeff Layton <jlayton@kernel.org>, Ivan Lipski <ivan.lipski@amd.com>,
+	Tao Zhou <tao.zhou1@amd.com>, YiPeng Chai <YiPeng.Chai@amd.com>,
+	Hawking Zhang <Hawking.Zhang@amd.com>,
+	Lyude Paul <lyude@redhat.com>,
+	Daniel Almeida <daniel.almeida@collabora.com>,
+	Luben Tuikov <luben.tuikov@amd.com>,
+	Matthew Auld <matthew.auld@intel.com>,
+	Roopa Prabhu <roopa@cumulusnetworks.com>,
+	Mao Zhu <zhumao001@208suo.com>,
+	Shaomin Deng <dengshaomin@cdjrlc.com>,
+	Charles Han <hanchunchao@inspur.com>,
+	Jilin Yuan <yuanjilin@cdjrlc.com>,
+	Swaraj Gaikwad <swarajgaikwad1925@gmail.com>,
+	George Anthony Vernon <contact@gvernon.com>
+Subject: Re: [PATCH 14/14] net: bridge: Describe @tunnel_hash member in
+ net_bridge_vlan_group struct
+Message-ID: <aUET_bbW6KyxtQKB@shredder>
+References: <20251215113903.46555-1-bagasdotme@gmail.com>
+ <20251215113903.46555-15-bagasdotme@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251215113903.46555-15-bagasdotme@gmail.com>
+X-ClientProxiedBy: TL2P290CA0009.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:2::10) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] vxlan: fix dst ref count leak in the vxlan_xmit_one()
- error path
-To: Wentao Liang <vulab@iscas.ac.cn>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: petrm@nvidia.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-References: <20251216033647.1792250-1-vulab@iscas.ac.cn>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20251216033647.1792250-1-vulab@iscas.ac.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|DS7PR12MB9476:EE_
+X-MS-Office365-Filtering-Correlation-Id: c99754f8-7600-423a-a605-08de3c7aa003
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|7416014|1800799024|376014|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?qkXm0BjdGAi9VT55N2GLH1J6bsnNuBFCBwMBR2yCqs75pzLJpg/epURp95hP?=
+ =?us-ascii?Q?YmOlmW/O/zn+f0hpeky9N9he5zJlc4nxJzHKgvEG7Q0KGzO/dzirkGSHjAuE?=
+ =?us-ascii?Q?WMnZo4xaKWnFaxo7D1OBZKZfIRZenW9US7H025qI8cEZ/3DQzldcIhOELmKA?=
+ =?us-ascii?Q?osoQ/4YEy4G8pZDXdBy2/947Ej7xXUB3oS68VfUgnhBpx4W3cS9YaVufWGQc?=
+ =?us-ascii?Q?b6Nmmp9E8u+P0JhgUtT/6mmOZdWVOF+k4Wi4djLL6lNsNHcS9vhiYet5UU++?=
+ =?us-ascii?Q?/DCBYdih5WGqI6s91PMWPrnaadkiGBcCIkX4n6bh+cWYrYOf74UV4knx4NK5?=
+ =?us-ascii?Q?hW9I07m5vtwHwKuHYC6GnuEOO9nqMDYuzpALPDEHvaKLJwqYRcqL+Td576Js?=
+ =?us-ascii?Q?aKlFrwfFQbH6jqbUcEslnKy46ovXktUB02A25U0RZpUl2Fl3KfeLaMxyjS2W?=
+ =?us-ascii?Q?PJ5n2gviNK+d5kTifykm808oKiID98CN8rrtTUltiiAt8Z91Y4L4Yy39n1/d?=
+ =?us-ascii?Q?hoLPqGSDWm5teJWwRF0wo2pgUQU4z8bQMzZHkiECN3ZlyM0sIMEY9m3QPHhc?=
+ =?us-ascii?Q?3MNp364/b2wsPSlSc4Rww2WmfovQF52rmo4HcX27GNlZ+AvAQJCIpp363TSe?=
+ =?us-ascii?Q?+9R1nAlW8pTVanabC5+dgQAdGg4kkcKgnzunxPhvmnQ+9mozeuuByC9Z6lr9?=
+ =?us-ascii?Q?SjwZIht8+h6IFmp1+6SyQ8GT4M/PHTkFIRbo8sDScjFCBWkP+MxMQVRFJwNy?=
+ =?us-ascii?Q?FjQHtXP44rlUxgcfyZPWZ1lzt7hIzZT4jVxLA5inmyd9ystdsbTCIs68lcLX?=
+ =?us-ascii?Q?PMDLBZp4p2NdasmZ5NggNeurU78GWsTPQqp5EivXk1RH3t/at6lFpEP8arET?=
+ =?us-ascii?Q?Zi+tOSpetzmFuZrxqc0nOmVq0bq1sdtTnfphk41AbDPhe7m1TSwrCV2OsxLr?=
+ =?us-ascii?Q?GZDJjYYCY0BJ6CoqrpXfdzPGc13IPTT1G0AEt/YTJ0GVQ536S59VzBf5AHHq?=
+ =?us-ascii?Q?SBX83ugiI1nTcRwd2qC4ncQr6p84RhyAqTTUG7l85anUfcvghLHUStY94ugs?=
+ =?us-ascii?Q?l7yyJOxMalgJw43lmrO/LfxcCeN+KNnFOTWRUTM7pyNsPUR7R8Y4BZi6QK4R?=
+ =?us-ascii?Q?s3hSFS4R2EO2hHb1Qo6D6Cbe9ICeKDpvW74fdGODR0dljLXduMdRfQ6snUep?=
+ =?us-ascii?Q?C4iiLxdLxdDPske0KRKRRQbBHX3ljrWJkcvfZIE+gpaEdYAXfgcNm7jdh0e3?=
+ =?us-ascii?Q?iG30ianLApDBUb87dMvNdYDeWDl8N3sAFM3vuxY2bNXbkNn49nJo8HDsRpIP?=
+ =?us-ascii?Q?dyng77uq/GtwqnaAuLpwkpype42rXNVv5ZwKgIlRqN44gIjFHXk7X7CvveH2?=
+ =?us-ascii?Q?teXf81LuKCRipSXtHR1P0Q2F+w7DF2GZoM8XBA0a87r929nl3qRfj6JPpOzP?=
+ =?us-ascii?Q?/vqI651aAm0PksX5cYuSQNeeqsqhFtRW?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(1800799024)(376014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?GMR1rsjwA+mZmoSMlv2Zqg5PhqQvwG8PoT76TB/A7KZed62KBuWIauK+iQUD?=
+ =?us-ascii?Q?uqpmWREc30w6mRNi5ZM+SjzSTCLZkPr7JV+KMTFQe6swH7d5vHQ+zf0dpYEt?=
+ =?us-ascii?Q?GIu2nHe0s1+O5gi3kbCSy4YVOPvlhsWt7HpXf05B24SpVoI+noihEmsQWPnJ?=
+ =?us-ascii?Q?ILZaQm7+mm3b7LyanIN1PbEQTmA3+P92L90GLscWYjn7YmX2SfAEZabSuwST?=
+ =?us-ascii?Q?EjzvPmwUggnpTDt1TC2ihx+at7BwZdyEs0eUyFNvKGwjXTz7/hC62JXuJQg8?=
+ =?us-ascii?Q?XoUrra5DhVrRL3aw+Hddml8cPqNRCa5l9abdCYsXe0uQo1F2O9/1v5+zNlNW?=
+ =?us-ascii?Q?4DU6Q9xKfxVXNzYRGLxrdf85/q7erU9E21eZeE7pGRzOEY/mhnaCk/75vEkt?=
+ =?us-ascii?Q?QH1OpHfZit7YlGftmEmS7aEiqIjnFUPlqF98rweJ3l/V9DIfjuXuqAJ5PBj7?=
+ =?us-ascii?Q?UnsqzCJQp60swuQ+qy2Ba14FIGUlM9BSBOiyUNormsAzpmmzzoaJDu8DQxAu?=
+ =?us-ascii?Q?L+16lHUrWCg+mkcf+8lciTm7bpaWrqbBsmlpYBILrgRtdngKMchSkQO0CPZi?=
+ =?us-ascii?Q?F/oYlyxHw4x+R90OERWWufHHpvkwH0A3mL3LllKG39XTJMaoFNWxT8w4mB0z?=
+ =?us-ascii?Q?i2B5+voSnM6kCEymaC867AKfDsXAG5sK9R/9+kV8HabwMYND7BSw8/38zRqF?=
+ =?us-ascii?Q?DNSAdyi82jDhA48jTTCObFQLoLfQVODKyD1VAzp1sCn6CT6nONj/DTK/H0uN?=
+ =?us-ascii?Q?Vx1sQS8aiEG6QII16LPjMdpXowgqN77vM11t+g0ixxdpZRTBWBXOaGDdW7Fd?=
+ =?us-ascii?Q?dx2gNtLpzxqMWhz7Y43E6QHY5HzYiiSgThF8JzGT6YeuKjNvQRAp4SWC3CUr?=
+ =?us-ascii?Q?tnfcoFBpmqJZDOps2W/r6TJ6PWJw337aiqNbSXw2b3eg7F2K0DS/2IS4kRXv?=
+ =?us-ascii?Q?YQV6Yc3vwaT9z6yvPk4kGqcZsou6p1sHC47KJm3mLwVaJscJAk1ciDNvRNU4?=
+ =?us-ascii?Q?vmiHRt4ek71JrydTLI8KdF07jnu36Sr0WPFWVjCcdGBLQtbsQ31Wdezm0ecI?=
+ =?us-ascii?Q?JhYsNwavM2eC6zIceUUh6fzAx463Pt6R1+pO4Y8FIPVTvnBRry/btE0aTsB7?=
+ =?us-ascii?Q?82aUOmogWVosQj0I10Z+Pmh/pS1bd5H+IBBhirjKJJYFmmXvqquDHgdx4KJ+?=
+ =?us-ascii?Q?hiFN+omF4jz/iGrIrIrbOJpICy35rsfB5zJy25Kh5B/niJnHDoJFc9LHwBnh?=
+ =?us-ascii?Q?U2PFkdA1AfchKfHeOL4THF2tbpnjA6eLSlpBovdzTLvMRm9yQTpXhycJJOPV?=
+ =?us-ascii?Q?D2uTb0krBVKe6qgTZ50sCTfhoI3YmXH4JfAhXVsknrQbZyygV6sab6SoBwCS?=
+ =?us-ascii?Q?/5FDPaa7Q3yttccbpijFvir4egNbEwBU9KOM5w5KWM+V5JIEVz5ZKf5pU99s?=
+ =?us-ascii?Q?Ud465tArDFqI/avl1KA009dDNBLcOjYElirDsKEl6Ye3S1O1texnMUWKO11d?=
+ =?us-ascii?Q?frEIMFMUdr6tjl00pNuvfiyGoJ5yWrAlXM3Sddfs6wLYPs7T0SV/2dhN1HKF?=
+ =?us-ascii?Q?ny1xJLWxk2w+I+uF3fEkAqZW+bWWRVolqxRSdDKC?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c99754f8-7600-423a-a605-08de3c7aa003
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Dec 2025 08:10:50.4122
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9Jn1GRAVl7fWR6i2nOitnqAdyxeLG+agMppQMoqRYGdALbOZFDDkQLF4Y8PSVW8MdLCtX3o9nK8w98LWXl102A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB9476
 
-On 16/12/2025 05:36, Wentao Liang wrote:
-> In the vxlan_xmit_one(), when the encap_bypass_if_local() returns an
-> error, the function jumps to out_unlock without releasing the dst
-> reference obtained from the udp_tunnel_dst_lookup(). This causes a
-> reference count leak in both IPv4 and IPv6 paths.
+On Mon, Dec 15, 2025 at 06:39:02PM +0700, Bagas Sanjaya wrote:
+> Sphinx reports kernel-doc warning:
 > 
-> Fix by calling the dst_release() before goto out_unlock in both error
-> paths:
-> - For IPv4: release &rt->dst
-> - For IPv6: release ndst
+> WARNING: ./net/bridge/br_private.h:267 struct member 'tunnel_hash' not described in 'net_bridge_vlan_group'
 > 
-> Fixes: 56de859e9967 ("vxlan: lock RCU on TX path")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+> Fix it by describing @tunnel_hash member.
+> 
+> Fixes: efa5356b0d9753 ("bridge: per vlan dst_metadata netlink support")
+> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
 > ---
->   drivers/net/vxlan/vxlan_core.c | 8 ++++++--
->   1 file changed, 6 insertions(+), 2 deletions(-)
+>  net/bridge/br_private.h | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-> index dab864bc733c..41bbc92cc234 100644
-> --- a/drivers/net/vxlan/vxlan_core.c
-> +++ b/drivers/net/vxlan/vxlan_core.c
-> @@ -2479,8 +2479,10 @@ void vxlan_xmit_one(struct sk_buff *skb, struct net_device *dev,
->   			err = encap_bypass_if_local(skb, dev, vxlan, AF_INET,
->   						    dst_port, ifindex, vni,
->   						    &rt->dst, rt->rt_flags);
-> -			if (err)
-> +			if (err) {
-> +				dst_release(&rt->dst);
->   				goto out_unlock;
-> +			}
->   
->   			if (vxlan->cfg.df == VXLAN_DF_SET) {
->   				df = htons(IP_DF);
-> @@ -2560,8 +2562,10 @@ void vxlan_xmit_one(struct sk_buff *skb, struct net_device *dev,
->   			err = encap_bypass_if_local(skb, dev, vxlan, AF_INET6,
->   						    dst_port, ifindex, vni,
->   						    ndst, rt6i_flags);
-> -			if (err)
-> +			if (err) {
-> +				dst_release(ndst);
->   				goto out_unlock;
-> +			}
->   		}
->   
->   		err = skb_tunnel_check_pmtu(skb, ndst,
+> diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
+> index 7280c4e9305f36..bf441ac1c4d38a 100644
+> --- a/net/bridge/br_private.h
+> +++ b/net/bridge/br_private.h
+> @@ -247,6 +247,7 @@ struct net_bridge_vlan {
+>   * struct net_bridge_vlan_group
+>   *
+>   * @vlan_hash: VLAN entry rhashtable
+> + * @tunnel_hash: tunnel rhashtable
 
-Did you check what encap_bypass_if_local() does at all?
+While you are at it, I suggest making the comment a bit more useful.
+Something like:
 
-There is a reason why the code jumps to out_unlock on error,
-encap_bypass_if_local handles that case itself. Don't blindly
-change code, first check what it does.
+@tunnel_hash: Hash table to map from tunnel key ID (e.g., VXLAN VNI) to VLAN
 
-Cheers,
-  Nik
-
-
-
+>   * @vlan_list: sorted VLAN entry list
+>   * @num_vlans: number of total VLAN entries
+>   * @pvid: PVID VLAN id
+> -- 
+> An old man doll... just what I always wanted! - Clara
+> 
 
