@@ -1,115 +1,125 @@
-Return-Path: <netdev+bounces-244869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id A279ECC07AA
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 02:43:08 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30863CC08FB
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 03:07:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3A757301C894
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 01:43:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 13E1230133E7
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 02:07:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F31712857EA;
-	Tue, 16 Dec 2025 01:43:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A68612C0F93;
+	Tue, 16 Dec 2025 02:07:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dDLQX6v8"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="LW9KzPpO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43A62281368
-	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 01:42:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92A85284689;
+	Tue, 16 Dec 2025 02:07:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765849382; cv=none; b=BrVD+vpz20UIrmb7v+rgLOQizfZJPiW+DoXID1TAy9IjjTmYHbZQtuQU9HLlZxLDUzDwBtgIjkeel3BcJiji+UZ0aiJLbtkoBtGg6hEyq/iFsjl7rlWXvv+nzf3gcrHFH+fckGZnW9kPfhWPuVsQLoAzeBf7VqGW5WFxIx3kOtI=
+	t=1765850827; cv=none; b=FNC8qjUFLKNf+VZaLs8b7f/9FvxauCRfAfildwNBSnK4XQVLiYlwtOXB0Kw8p5Qh6oS+NIznbRqNUdDo+Xy8kz4CItHsJ8zAQ69wCkydTpFftpGgCq4cqvj+X4ajoqg0qbl/eKOJzZPc4u0HJ3oZPTuyj//EMCL+L+z4DNFzOWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765849382; c=relaxed/simple;
-	bh=ZyiAfBS1SHi1ogYvB6RKd2TbkiFPHcyLTNoNsrXdb6o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RQ4dwlNBrC+v8jZJOfjG4R/o7KfztDkioZ+YkQBXvLjtuP6oslE2c1tPDSKQPOoo3lOw3xahU1k5XIP35yfzA4x8SJIfJoeObYIwuNgG90fX2Os6o9fOKhveiD+EfwAb4CvPT4L6AIj2yFLkDRBlok2ob9MWLPIQ7FAW914C+6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dDLQX6v8; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4779a4fc95aso14026355e9.1
-        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 17:42:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765849377; x=1766454177; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZyiAfBS1SHi1ogYvB6RKd2TbkiFPHcyLTNoNsrXdb6o=;
-        b=dDLQX6v8xVx58d9y4lPH83vCx7nAbXoodPpqTmM0oWNmbVvOdGsENfXSco5Lgs9344
-         zLQAE0JiACBwqMJjVVmVWY78HmZAQnVh/NLMg8Ns2X5y1ujQ6Ve2RvpKwEPBZxFzFnAU
-         1c/V11w89MYQCHxfAFIL4qCthAqpqwI9KqYaAr2gQMVsWZ6gftv2+LGba7UR7umgDdhE
-         v0b2eGdoDYPHd+XQJ774NDDGKSgy+W3GzPli/OiGOmuyKQBwxaIo5PoBFJxK4EWrwCEh
-         /OspgPaMaDnRZSyoawBo1e7DZeyfAra6HWP/J3trzCQ3LlSxzlWkqnsQXA7ytn6oNqh2
-         Xi+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765849377; x=1766454177;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ZyiAfBS1SHi1ogYvB6RKd2TbkiFPHcyLTNoNsrXdb6o=;
-        b=guCYgLtiGUkibLRwFk40o02UE4/XwJpTNvzvebrbWTbkdAkIYzOmqMjcJiTKhRGQfp
-         dTKwYFbTTqgJHn25tpt4wi72h4yE7VD8skz3N5oAa6vcILfeZT9k+UJ9rzq3cfB5vKo/
-         EuWAhDz5i1Ob55fLA7UzjunEQVej+mFCvgl+kCotAyMvRhi1FD/bQH9obtE9cpWidF+H
-         1dhvp1zIROba9Knd+KGpTyUdSZxSrCcTcLra6uHzoeldzIyhQXN34iPZaR4KnH3ZPdLh
-         Mzx8UWPU0yK+HtHG3/ZrdPDU4P2XggZB+UV0I6CN0LsQPn5uBz4b5YTnUIeePiEuTq0s
-         reKw==
-X-Forwarded-Encrypted: i=1; AJvYcCU/o1RenI6V1oCeXiaUIAykFuIN69N0BoXFmUYbMdc/TYgPC4UjIqFO92YCjVHg4m9a1PGi62k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrvfV+0sNsY1/TGq2sm38hJufW7RjqS3OH7/Z7kIfPpb2GbrxJ
-	kvR7dSXBYwgAShXX9WufhjLeMRYr6YdtQulklZ9FhPDnNhywNnW2ayAJmIqxBvI8+mL/yHpWjNg
-	oeVbxKzu8cskKR1oiDn8LBHMhe7EPoCE=
-X-Gm-Gg: AY/fxX4ET8RgxDTSj6HphpacQDDVbKHRK7gXvcZurHUo3fRQwwoUj4uL2NYDCpxrHVm
-	NCAODvh7SY9W/gwxWC0INWWlmi8Ix2g8tvipWWLtQBzmNV49PKBPFOqb2XGJbu3CpDqDS+RM3bu
-	pJEfpB4HrjCmDGj5cu9ZdHoTFGq9vfiJEQz4EUB2w0n2rWPWN6eKcPXbxbbl7Oy9zcR4+P5fSf7
-	HVyn6fFh+Lgqg/5ifOWwaMRvzobKjj5F+Q7N37lismsuwd0jxAIYOamLaOv6hYhxR4PEcOWzxAU
-	Ee7JrZFLY0xh4rga6f7aVtmnG4eR
-X-Google-Smtp-Source: AGHT+IHXZEfg1p3HRgI0++xedDQyyt6TVJAX8tLf80JYu34CJbWOG8x06pVXb0fDbpBBSUhZfKL0ivJQkRM5N2F1zdU=
-X-Received: by 2002:a05:6000:381:b0:430:f3bd:720a with SMTP id
- ffacd0b85a97d-430f3bd763amr10307348f8f.27.1765849377540; Mon, 15 Dec 2025
- 17:42:57 -0800 (PST)
+	s=arc-20240116; t=1765850827; c=relaxed/simple;
+	bh=vJNzuAB9aCQ3iCQ/OVtcwtSW5InmdrpWVS63tpANSUY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eNjkya8c7gyPmQYBYrCqnpD2OlJLgRtDwZt+AWMPh34Gvp9jFEoGmEFyMoEaQBtYBktp43hO/BNCKUEfB7iGVm9sXnHPpYaWN6QywunYeKcB06BNOLOvGkzyXV+jFQsMhHfhm4hlfb0fiaPSu3/QyhW089jZ+vhS3E6mbS7ynAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=LW9KzPpO; arc=none smtp.client-ip=213.97.179.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ldRBwp84+N56IOmiRqFbTLgnv/9C2lSWj3Qv9qjuFSI=; b=LW9KzPpObkzHDAgeJ/VTx9d755
+	iGasc+utW+HupKuEC3hgobNMpHf+7na2I4V+NORj0mglCmnLq2br4t33RZxKQ98MTmFc1dvWnKzhQ
+	GARcC5o4zSdsjk9nQ+bCQC9ZtVw3dDCbQvj1HD5VLHAwf7WD7N3fYk4hx46RY9is5RwgdxO79yE2E
+	PCh1j/2to7SjpsQT5oPTGrZ4WhAhMIu2zSJEKpJe5Utm/sxCuty5dUBdcjuvAGOAOZSHEcr5HTBDf
+	vu5fD4k49VLv3aBM9Q0OPncoi1AmLGJDUeoELah6xE7dT+/Ewq2XPd1ZKFEk0ehPRxvEKAYx1a8Ge
+	Egr37ivQ==;
+Received: from [58.29.143.236] (helo=[192.168.1.6])
+	by fanzine2.igalia.com with esmtpsa 
+	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128) (Exim)
+	id 1vVKSm-00DCLx-4S; Tue, 16 Dec 2025 03:06:56 +0100
+Message-ID: <0d523461-c9b9-402a-b317-badcbd48dae0@igalia.com>
+Date: Tue, 16 Dec 2025 11:06:49 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <176584314280.2550.10885082269394184097@77bfb67944a2>
- <20251216122514.7ee70d5f@canb.auug.org.au> <3cd2c37e-458f-409c-86e9-cd3c636fb071@linux.dev>
- <CAADnVQKB1Ubr8ntTAb0Q6D1ek+2tLk1yJucLOXouaF_vMqP3GA@mail.gmail.com>
-In-Reply-To: <CAADnVQKB1Ubr8ntTAb0Q6D1ek+2tLk1yJucLOXouaF_vMqP3GA@mail.gmail.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Mon, 15 Dec 2025 17:42:45 -0800
-X-Gm-Features: AQt7F2qZ64Mmn0-BWatGXdXbAgAM-TAJMN_WlLu09kQhu9Y_Np5ib-yXqYgCTp8
-Message-ID: <CAADnVQLE1R=DDjj88u+xuws8+JLKo6J2HiLj=jpO8MLpbp98SA@mail.gmail.com>
-Subject: Re: [REGRESSION] next/pending-fixes: (build) error: unknown warning
- option '-Wno-suggest-attribute=format'; did...
-To: Ihor Solodrai <ihor.solodrai@linux.dev>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, KernelCI bot <bot@kernelci.org>, 
-	kernelci@lists.linux.dev, kernelci-results@groups.io, 
-	Linux Regressions <regressions@lists.linux.dev>, gus@collabora.com, 
-	Linux-Next Mailing List <linux-next@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
-	Networking <netdev@vger.kernel.org>, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: Concerns with em.yaml YNL spec
+To: "Rafael J. Wysocki" <rafael@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Donald Hunter <donald.hunter@gmail.com>,
+ Lukasz Luba <lukasz.luba@arm.com>, linux-pm@vger.kernel.org,
+ sched-ext@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
+ Network Development <netdev@vger.kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+References: <CAD4GDZy-aeWsiY=-ATr+Y4PzhMX71DFd_mmdMk4rxn3YG8U5GA@mail.gmail.com>
+ <081e0ba7-055c-4243-8b39-e2c0cb9a8c5a@lunn.ch>
+ <4bb1ea43-ef52-47ae-8009-6a2944dbf92b@igalia.com>
+ <bb7871f1-3ea7-4bf7-baa9-a306a2371e4b@lunn.ch>
+ <c65961d2-d31b-4ff9-ac1c-b5e3c06a46ba@igalia.com>
+ <CAJZ5v0iX39rvdaoha18N-rpKLinGZ1cjTb1rV1Azh0Y7kYdaJQ@mail.gmail.com>
+ <d5b50da2-bc1f-4138-9733-218688bc1838@igalia.com>
+ <CAJZ5v0gpYQwC=1piaX-PNoyeoYJ7uw=DtAGdTVEXAsi4bnSdbA@mail.gmail.com>
+From: Changwoo Min <changwoo@igalia.com>
+Content-Language: en-US, ko-KR, en-US-large, ko
+In-Reply-To: <CAJZ5v0gpYQwC=1piaX-PNoyeoYJ7uw=DtAGdTVEXAsi4bnSdbA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Dec 15, 2025 at 5:37=E2=80=AFPM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
->
->
-> I removed the offending patch from bpf tree.
 
-All,
+On 12/16/25 00:06, Rafael J. Wysocki wrote:
+> On Mon, Dec 15, 2025 at 4:01 PM Changwoo Min <changwoo@igalia.com> wrote:
+>>
+>> Let me provide the context of what has been discussed. Essentially, the
+>> question is what the proper name of the netlink protocol is and its file
+>> name for the energy model.
+>>
+>> Donald raised concerns that “em” is too cryptic, so it should be
+>> “energy-model”. The following is Donald’s comment:
+>>
+>>
+>>     “- I think the spec could have been called energy-model.yaml and the
+>>      family called "energy-model" instead of "em".”
+>>
+>>
+>> Andrew’s opinion is that it would be appropriate to limit the scope of
+>> “energy-model” by adding a prefix, for example, “performance-domain-
+>> energy-model”. Andrew’s comment is as follows:
+>>
+>>     “And a dumb question. What is an energy model? A PSE needs some level
+>>     of energy model, it needs to know how much energy each PD can consume
+>>     in order that it is not oversubscribed. Is the energy model generic
+>>     enough that it could be used for this? Or should this energy model get
+>>     a prefix to limit its scope to a performance domain? The suggested
+>>     name of this file would then become something like
+>>     performance-domain-energy-model.yml?”
+>>
+>> For me, “performance-domain-energy-model” sounds weird because the
+>> performance domain is conceptually under the energy model. If adding a
+>> prefix to limit the scope, it should be something like “system-energy-
+>> model”, and the “system” prefix looks redundant to me.
+>>
+>> So, the question is what the proper name is for the energy model
+>> protocol: “em”, “energy-model”, “performance-domain-energy-model”, or
+>> something else?
+> 
+> I personally would be for something like "device-energy-model", where
+> "device" may mean any kind of device including CPU devices.
+> 
 
-heads up. gmail doesn't like me :(
-I see Steven's and Ihor's replies in lore, but nothing in my mailbox.
+"device-energy-model" sounds good to me. I will prepare the patchset
+using that name. Thanks a lot!
 
-And Steven's reply was a couple hours ago.
-Nothing in my spam either, and I was cc-ed directly!
-So it's not mailing list delivery throttling.
-Ouch.
+Regards,
+Changwoo Min
 
-If it looks like I'm ignoring your emails, it's not me. It's gmail fault.
 
