@@ -1,168 +1,201 @@
-Return-Path: <netdev+bounces-245018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54599CC504C
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 20:36:14 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38841CC50BB
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 20:55:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4DC423028C67
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 19:36:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id EB98E3035272
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 19:55:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04BC0335553;
-	Tue, 16 Dec 2025 19:36:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A6B0316194;
+	Tue, 16 Dec 2025 19:55:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="PIdvrWND"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AYfJABa4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35032334C23
-	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 19:36:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBA2C2820A9
+	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 19:54:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765913765; cv=none; b=Yv4NBmb96DCD2QEYblWYym1leSOto6px2jGCmbL0CblzkquZyHfRo81NG0JeHHW32QUGn2UT896P0TJERg5hlfLw3qjchBDxFOcjqx/yrXuV5a11gshAqWBMXMMd5XhrZz7ff4ZSrS3tu6BMWnYSwWX07WqJCuuqXae2SXTdwlA=
+	t=1765914901; cv=none; b=WP/t5WXh3IK4fqrNjAfiWth2OHAHa3+g8m5nj7nn/vI977h5ndV02+IiUHsG8qhZmJpKUQik3Gg+0H9tEC9OrHBHywqnHxabvHhff+OLEa92XRmP6eZkfM7j+1wbOzjkGbGiJ154u9Yl01iaDqZ0QLQLclKO4p6QUGqvtDnmBn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765913765; c=relaxed/simple;
-	bh=DyIKB2hJJPGNfOXTwj8MacflXxSMbpI7LrFqsSt1Jpw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VZl9a5GKjbP32c+70vdbXtVHDXLGHHNoxMDLqU/M2nwxqPwVtk5NNMEe+sAG96ACu8S/j4D1s9jCibOs2riLDznZ5DPuOywkPPxgF//KDhs4wcytcn5Aobsswa8S6j4W8dAGMj9Z1fE85XoPny+f7werMyB1X6Bn7vhqO/9y9ho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=PIdvrWND; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-b79d6a70fc8so876194566b.0
-        for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 11:36:01 -0800 (PST)
+	s=arc-20240116; t=1765914901; c=relaxed/simple;
+	bh=MfqDH4/O8KDzWjnyDBeFxR8tAnjUXaceNmNX3aeJYhE=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=XXWhh8EU97yepw+YG8i85+LFqrfJn4wLgl9Yj9hZMHOYe60hEfQsrUx/xOKaREXmSdGoBDIc/yv3paV1vS7L6m1C6u9xjpaI5qEDQ0+l1l5ML6B3SELzP9eLa1gorTZi8jxNsw3GvgBzt2aHPWycJZoqjrnzrCq80f8W7p9ci64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AYfJABa4; arc=none smtp.client-ip=209.85.128.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-78c4d112cd8so48060297b3.2
+        for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 11:54:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sartura.hr; s=sartura; t=1765913760; x=1766518560; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1765914899; x=1766519699; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DyIKB2hJJPGNfOXTwj8MacflXxSMbpI7LrFqsSt1Jpw=;
-        b=PIdvrWNDDkXLnkqIgGC29aaQhDxS5xxdJwzQ1Gvo0YMV3PEI80xK6mO1gu11OnOZuv
-         3BLETZeImjGoprIOUDGIYMfTiw9+Dg5wruZ7KlEYpOW0qxKg2h8/Zl840vJXydD2Ubyd
-         xTnarw5j30I9lIp8OYc66k7Meoa1IGPl3DxM5IQyWajo+GU68PnkbIDOB8co1xgvUCvH
-         wbYkynT7pDB4z9GALnUaExA6zSk5k+Uw6Qj+BBCGTlGixU8inglD6zNiJSQR8rzuOfdE
-         jIUbfq1xEm/qbPDVHWByqjleRo/qIpJQJIYdbJwHNEooTlBabuq+0gXf6k8BNpA5uKJp
-         3baA==
+        bh=be7JUAAiM3hDUesPFCNkuJpo8VlqDg0Gc+p9llIp0js=;
+        b=AYfJABa48t0H317KhfFy5O3tHj6oi+LPM9OYatXKr2FGi/O4RgNokgbSm1m4dI6XzR
+         e2EUa6RTUxjexvT0W37OKnJ3mw064PSkj/87dbCRNm7qJIlUi7gg9V0mGLX2AGHhiz1P
+         E7hwZYT6H+1v2jHCG04vyEBv4X+1/IlpZDXeZKS2pvq9Dp8EQqh+iLxOu22cN7qBy6Ra
+         UDHeTZMDY2hHspiASXoVovMLg27UcSm037cGxVX+5OzQKrcz3NGGx/v86r2rFjU67lZR
+         nmifE+L2FVDE0TVySD/vOvmrbf8izbi6wOO32HKpdCeBWCgnfuVz0KAcROMbbSn92Sri
+         KuNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765913760; x=1766518560;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=DyIKB2hJJPGNfOXTwj8MacflXxSMbpI7LrFqsSt1Jpw=;
-        b=oXH7xjO3qGLFYpM3EguAs6yOurp82dp/v8kohmEYbzmlR9911GPYtSIHUkrtZswnzt
-         uQU/t7IpY9ndi2xWS5D4WIGw16GGG3yjslfR2/FyTWVJI/rLwFsHKbt6xiaWfFVIHUzM
-         +YZ8TKUW4ZgTSq1CsCgq/PW1itNaIL3bLa6D7eqEOM8/Kob4ij/WC2e1vXg04UoH70Jv
-         pyrv8K+u6s5bu6mvtlLef9kPWSU2VERjLwJkIVNKzUwYS8SK6tAj9/W6hnJYSIh9UgKR
-         gCO1pRB7Y4xXn0O4vWuoA14R5pQVlz8ilxpXdxSjg7ZCOUqgUt/faLKx+n133C5dp2WK
-         WGWw==
-X-Forwarded-Encrypted: i=1; AJvYcCU2J6eOiD8TLvz4ukHxorZ49xlVxzAtRlI3HUqsfVoj8on9nqBopznwuwsC2AJawpqtVaFkOOo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YznkK+Pge1sKa0cUnX7BMf8hZxP8srh6lBhQOy5WJaOEtsc7dJ6
-	4PzjgUw9PF9Z++lIX4iyctJuri9Cwh8mBbTIZi/IVLfSXG3Jz/8enujKyheEcIlS8M9h93pOovL
-	wDDyjHOZYnPDnMQx6AcroDffA31e2wLBOzSr+GbQfDw==
-X-Gm-Gg: AY/fxX43J6kusYOls56BxzlkWsYV8tobneZRrtFrDeo8g+OLZ4UJDJa907Hz5kBcVCk
-	HZvpr5Up9HR7CrNZOguSGv3R4ic4vx8RVLLzLH/lhV6wKqePbV1i6ZJHisICnS0G2+yPrO4dSmM
-	oJC+NEuxBqTmIdRMIwVprOk0Fj1DcW0Lw7IQCI5rQMUAr0ECKCJYpPL+AqNaSnvreLoZIgLs0eL
-	KuUsaIdd717zYm4vyFvqwiZcYxZREcT35MF50wkLMRHus2C+lipN/tqsGTHPxjwkL2b1nhr
-X-Google-Smtp-Source: AGHT+IHNQYfHhSZB51dtsDipQL9/5fDZcPe/Z6WdB1j+IUPGZTp0qnMPAX1NRpIDGnC0FktvfYyl1BhfRBlJ1lJ36qI=
-X-Received: by 2002:a17:907:cd07:b0:b79:f965:1ce1 with SMTP id
- a640c23a62f3a-b7d238ba3e3mr1542684066b.42.1765913760345; Tue, 16 Dec 2025
- 11:36:00 -0800 (PST)
+        d=1e100.net; s=20230601; t=1765914899; x=1766519699;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=be7JUAAiM3hDUesPFCNkuJpo8VlqDg0Gc+p9llIp0js=;
+        b=HGv2hwPpvUc8TI/2G3CoDuxeBv4GMR9lwUjOh04kIjagDhyazD6fl0sIn447QbLUol
+         iEpb1q9IPwZXJns3dUVUML2DNKW7WhOpiUEtIWRQ6mfX7/DsYzm+jHbLGlIXowyYPzCw
+         zDuQ70Zu4HVwbUIMMJa0T0+Lm/CzzQ7Bxo3iX7Ks/Isku1YjRoBYJwQU4t4DLsQiiMWj
+         WpPxP5g/yUbV7ZP5A9Y7olS4iDR1CDlUtUtsIRH3QFVd7k/5t/2ZtobcQkLPcMzyCO4J
+         2LfS1sqmO3vA+1aKxuU3ufshUwD/61H0o3RC/lBVLcVUyMp9Fwy8kva/xuXxCc/mkVTd
+         L3Aw==
+X-Forwarded-Encrypted: i=1; AJvYcCXbbv/hsFGc16yp1WJT2/zK9ytLYWNI8UtGPQnyBAKrQR39uje3f6fU4Cd+VtZ9NGxc5RiskW0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxojA+8TX2BHr19lmmHIlKwRpaQ+UQSowfHBvsNwdGdF69Ge5Fh
+	5AQX+vysmgvqn4ndmBQdA8r5e4/Ncqr7jsoK3d8SKJKU7nn6MgANDZJy
+X-Gm-Gg: AY/fxX4o4bx38w6RlKx99SvLnxFt2/dWNhKIIwvlTOSZ6P6n3/UW105UXyZLU9NsZwu
+	a9tBoVtT6ycuoS8X6CnolxDl9RXNspUHzlt1qADX7Mu889riM93E3+v6zBcKX6MThkH3g5oiXPA
+	fjxhiiPgUX80LmitrKGK3KK7/IWHUshoWHp+9Ick2qrsRS85holwPxqWqEDVrxW/shPgv8n/HF4
+	cj8qMMyNw7nFQDPCQVyfJcv67DmOfZS+fOKDrkudWANCABjAQ25sFcbrT/A46jF5aGsYxqOrr60
+	9kvIHS75eKTSh66LAYXVHQSoyDCfq0ygn79DD/ZUF7xVhmM5ajkLtUeV1wVGEJeu9qk6lISYa47
+	hSwYs6JxsoYb1gZHhGlroJhlPC/M87yuLSo1JlRJacPEUvyAT7jlNQvM4l6MJ1o1xujcG/SdkWp
+	3vYLJBtaR0bAoJa9RCyfA4xfatTg2eFn0qwGxfZyr3V/Buac6eAM2o4pXAF6erremX6Hh4oXVxd
+	vNqSw==
+X-Google-Smtp-Source: AGHT+IEuqpeuP1UDy+6XnjcNYN1ogGOeKRu57NupIJPcHrmfdc0of+efEM03iL2q5TAnMgXbrad84Q==
+X-Received: by 2002:a05:690c:3581:b0:78e:1aa5:e98a with SMTP id 00721157ae682-78e66dc9157mr271655907b3.37.1765914898696;
+        Tue, 16 Dec 2025 11:54:58 -0800 (PST)
+Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id 956f58d0204a3-64477dab686sm8053046d50.16.2025.12.16.11.54.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Dec 2025 11:54:58 -0800 (PST)
+Date: Tue, 16 Dec 2025 14:54:57 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: "Alice C. Munduruca" <alice.munduruca@canonical.com>, 
+ netdev@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org, 
+ "Alice C. Munduruca" <alice.munduruca@canonical.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Cengiz Can <cengiz.can@canonical.com>, 
+ cbulinaru@gmail.com
+Message-ID: <willemdebruijn.kernel.311f094b4d393@gmail.com>
+In-Reply-To: <20251216170641.250494-1-alice.munduruca@canonical.com>
+References: <20251216170641.250494-1-alice.munduruca@canonical.com>
+Subject: Re: [PATCH net v3] selftests: net: fix "buffer overflow detected" for
+ tap.c
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251215163820.1584926-1-robert.marko@sartura.hr>
- <20251215163820.1584926-4-robert.marko@sartura.hr> <202512161628415e9896d1@mail.local>
- <CA+HBbNFG+xNokn5VY5G6Cgh41NZ=KteRi0D9c0B15xb77mzv8w@mail.gmail.com>
- <202512161726449fe42d71@mail.local> <20251216-underarm-trapped-626f16d856f5@spud>
-In-Reply-To: <20251216-underarm-trapped-626f16d856f5@spud>
-From: Robert Marko <robert.marko@sartura.hr>
-Date: Tue, 16 Dec 2025 20:35:49 +0100
-X-Gm-Features: AQt7F2ovlD6q1uGr-F_qGhYebApPtJxD_ztM4nzL5Jt_8Qv6aSDXR9OqFn9QCtE
-Message-ID: <CA+HBbNFq=+uWp05YD08EQtaOhrN9FCBAtnOAsOJc4dNfoJRfxA@mail.gmail.com>
-Subject: Re: [PATCH v2 04/19] dt-bindings: arm: move AT91 to generic Microchip binding
-To: Conor Dooley <conor@kernel.org>
-Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>, robh@kernel.org, krzk+dt@kernel.org, 
-	conor+dt@kernel.org, nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev, 
-	Steen.Hegelund@microchip.com, daniel.machon@microchip.com, 
-	UNGLinuxDriver@microchip.com, herbert@gondor.apana.org.au, 
-	davem@davemloft.net, vkoul@kernel.org, linux@roeck-us.net, 
-	andi.shyti@kernel.org, lee@kernel.org, andrew+netdev@lunn.ch, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, linusw@kernel.org, 
-	olivia@selenic.com, radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com, 
-	gregkh@linuxfoundation.org, jirislaby@kernel.org, mturquette@baylibre.com, 
-	sboyd@kernel.org, richardcochran@gmail.com, wsa+renesas@sang-engineering.com, 
-	romain.sioen@microchip.com, Ryan.Wanner@microchip.com, 
-	lars.povlsen@microchip.com, tudor.ambarus@linaro.org, 
-	kavyasree.kotagiri@microchip.com, devicetree@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org, 
-	linux-hwmon@vger.kernel.org, linux-i2c@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-gpio@vger.kernel.org, linux-spi@vger.kernel.org, 
-	linux-serial@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-clk@vger.kernel.org, mwalle@kernel.org, luka.perkov@sartura.hr
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Dec 16, 2025 at 8:21=E2=80=AFPM Conor Dooley <conor@kernel.org> wro=
-te:
->
-> On Tue, Dec 16, 2025 at 06:26:44PM +0100, Alexandre Belloni wrote:
-> > On 16/12/2025 17:56:20+0100, Robert Marko wrote:
-> > > On Tue, Dec 16, 2025 at 5:29=E2=80=AFPM Alexandre Belloni
-> > > <alexandre.belloni@bootlin.com> wrote:
-> > > >
-> > > > On 15/12/2025 17:35:21+0100, Robert Marko wrote:
-> > > > > Create a new binding file named microchip.yaml, to which all Micr=
-ochip
-> > > > > based devices will be moved to.
-> > > > >
-> > > > > Start by moving AT91, next will be SparX-5.
-> > > >
-> > > > Both lines of SoCs are designed by different business units and are
-> > > > wildly different and while both business units are currently owned =
-by
-> > > > the same company, there are no guarantees this will stay this way s=
-o I
-> > > > would simply avoid merging both.
-> > >
-> > > Hi Alexandre,
-> > >
-> > > The merge was requested by Conor instead of adding a new binding for =
-LAN969x [1]
-> > >
-> > > [1] https://patchwork.kernel.org/project/linux-arm-kernel/patch/20251=
-203122313.1287950-2-robert.marko@sartura.hr/
-> > >
-> >
-> > I would still keep them separate, SparX-5 is closer to what is
-> > devicetree/bindings/mips/mscc.txt than to any atmel descended SoCs.
->
-> If you don't want the sparx-5 stuff in with the atmel bits, that's fine,
-> but I stand over my comments about this lan969x stuff not getting a file
-> of its own.
-> Probably that means putting it in the atmel file, alongside the lan966x
-> boards that are in there at the moment.
+Alice C. Munduruca wrote:
+> When the selftest 'tap.c' is compiled with '-D_FORTIFY_SOURCE=3',
+> the strcpy() in rtattr_add_strsz() is replaced with a checked
+> version which causes the test to consistently fail when compiled
+> with toolchains for which this option is enabled by default.
+> 
+>  TAP version 13
+>  1..3
+>  # Starting 3 tests from 1 test cases.
+>  #  RUN           tap.test_packet_valid_udp_gso ...
+>  *** buffer overflow detected ***: terminated
+>  # test_packet_valid_udp_gso: Test terminated by assertion
+>  #          FAIL  tap.test_packet_valid_udp_gso
+>  not ok 1 tap.test_packet_valid_udp_gso
+>  #  RUN           tap.test_packet_valid_udp_csum ...
+>  *** buffer overflow detected ***: terminated
+>  # test_packet_valid_udp_csum: Test terminated by assertion
+>  #          FAIL  tap.test_packet_valid_udp_csum
+>  not ok 2 tap.test_packet_valid_udp_csum
+>  #  RUN           tap.test_packet_crash_tap_invalid_eth_proto ...
+>  *** buffer overflow detected ***: terminated
+>  # test_packet_crash_tap_invalid_eth_proto: Test terminated by assertion
+>  #          FAIL  tap.test_packet_crash_tap_invalid_eth_proto
+>  not ok 3 tap.test_packet_crash_tap_invalid_eth_proto
+>  # FAILED: 0 / 3 tests passed.
+>  # Totals: pass:0 fail:3 xfail:0 xpass:0 skip:0 error:0
+> 
+> A buffer overflow is detected by the fortified glibc __strcpy_chk()
+> since the __builtin_object_size() of `RTA_DATA(rta)` is incorrectly
+> reported as 1, even though there is ample space in its bounding
+> buffer `req`.
+> 
+> Additionally, given that IFLA_IFNAME also expects a null-terminated
+> string, callers of rtaddr_add_str{,sz}() could simply use the
+> rtaddr_add_strsz() variant. (which has been renamed to remove the
+> trailing `sz`) memset() has been used for this function since it
+> is unchecked and thus circumvents the issue discussed in the
+> previous paragraph.
+> 
+> Fixes: 2e64fe4624d1 ("selftests: add few test cases for tap driver")
+> Signed-off-by: Alice C. Munduruca <alice.munduruca@canonical.com>
+> Reviewed-by: Cengiz Can <cengiz.can@canonical.com>
 
-Hi Conor,
-What do you think about renaming the SparX-5 binding and adding LAN969x to =
-that?
-Cause both are from the current Microchip and from the same UNG
-business unit, with
-probably more generations to follow.
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
-LAN969x does not really belong in Atmel bindings to me, but I am flexible.
+Cc: original author cbulinaru@gmail.com in case we're overlooking a
+reason for the split between rtattr_add_str and rtattr_add_strsz.
 
-Regards,
-Robert
---=20
-Robert Marko
-Staff Embedded Linux Engineer
-Sartura d.d.
-Lendavska ulica 16a
-10000 Zagreb, Croatia
-Email: robert.marko@sartura.hr
-Web: www.sartura.hr
+the first avoids the \0 and is used for IFLA_NAME. Device names are
+guaranteed to fit into IFNAMSIZ, including the terminating \0.
+> ---
+>  tools/testing/selftests/net/tap.c | 16 +++++-----------
+>  1 file changed, 5 insertions(+), 11 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/net/tap.c b/tools/testing/selftests/net/tap.c
+> index 247c3b3ac1c9..51a209014f1c 100644
+> --- a/tools/testing/selftests/net/tap.c
+> +++ b/tools/testing/selftests/net/tap.c
+> @@ -56,18 +56,12 @@ static void rtattr_end(struct nlmsghdr *nh, struct rtattr *attr)
+>  static struct rtattr *rtattr_add_str(struct nlmsghdr *nh, unsigned short type,
+>  				     const char *s)
+>  {
+> -	struct rtattr *rta = rtattr_add(nh, type, strlen(s));
+> +	unsigned int strsz = strlen(s) + 1;
+> +	struct rtattr *rta;
+>  
+> -	memcpy(RTA_DATA(rta), s, strlen(s));
+> -	return rta;
+> -}
+> -
+> -static struct rtattr *rtattr_add_strsz(struct nlmsghdr *nh, unsigned short type,
+> -				       const char *s)
+> -{
+> -	struct rtattr *rta = rtattr_add(nh, type, strlen(s) + 1);
+> +	rta = rtattr_add(nh, type, strsz);
+>  
+> -	strcpy(RTA_DATA(rta), s);
+> +	memcpy(RTA_DATA(rta), s, strsz);
+>  	return rta;
+>  }
+>  
+> @@ -119,7 +113,7 @@ static int dev_create(const char *dev, const char *link_type,
+>  
+>  	link_info = rtattr_begin(&req.nh, IFLA_LINKINFO);
+>  
+> -	rtattr_add_strsz(&req.nh, IFLA_INFO_KIND, link_type);
+> +	rtattr_add_str(&req.nh, IFLA_INFO_KIND, link_type);
+>  
+>  	if (fill_info_data) {
+>  		info_data = rtattr_begin(&req.nh, IFLA_INFO_DATA);
+> -- 
+> 2.48.1
+> 
+
+
 
