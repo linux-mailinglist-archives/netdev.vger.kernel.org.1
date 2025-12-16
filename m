@@ -1,46 +1,79 @@
-Return-Path: <netdev+bounces-244967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 443D7CC4281
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 17:12:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D8BCCC449E
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 17:28:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 9A2263048F79
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 16:09:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3D7673072AD9
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 16:23:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0D2634E26C;
-	Tue, 16 Dec 2025 15:58:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22D8F2DC33F;
+	Tue, 16 Dec 2025 16:23:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uzvgoXSx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AJjVGTM7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5032D34E25C;
-	Tue, 16 Dec 2025 15:58:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8D46328B7A
+	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 16:23:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765900717; cv=none; b=MATSwdlDe3jVeu3YScRJfn278oQOJ12kZGwMHZ6dZalHsSHnIXzwd7YsshAmVksxxQaGNLOYO2fQgvrgBModXvJmSXmD0IhjIvCzrFJn42zx4HIeSBqTrhBfEjVssKoWbgVncelAYYf02Pkp8P43nureW6bRPcgdjzUifttIIr4=
+	t=1765902197; cv=none; b=UaiYJtWUk5FsQlXoZq5AtvNZ+Boae8spIOu9oHT1nP854c+yJRlxWO+C1mllOgjY5qOPU8maTs6jY8DiovkeiWwXixU81YMoFF0fjoU8Tgnye+sQ6tfQH5IyCQJ9P+ABqSLa4fv1lFnD9yz+RGFQLNOCzwVuW7q+XP8ltXUb7lc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765900717; c=relaxed/simple;
-	bh=FoGkFvPI30UFCJ36SpXYyzKXdoONF4L7CQ41Dk+tn9M=;
+	s=arc-20240116; t=1765902197; c=relaxed/simple;
+	bh=SLX1m3nU08SsL41tzHOdEaPGIcnB60w6kwnMIe7g1D8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=haQ/+1cH1tBZHqgxTcIYBvVoajasgCgdOtjFZbxcXW3IXtCkRxPFk+95ouzqq+eqeNy8byGGoZfY6Cy0+P/DfZuX+fEpXdfL0YDZRqKHzAt4b0MAO7hrOSRQu1jG1ZkZ74oOLfv5r/GI6OArTQAhkeHz+YUtvXsWTqu+wi6RGdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uzvgoXSx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5480C113D0;
-	Tue, 16 Dec 2025 15:58:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765900717;
-	bh=FoGkFvPI30UFCJ36SpXYyzKXdoONF4L7CQ41Dk+tn9M=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=uzvgoXSx+bQiqW2zigAwzmKLzfTX85z5JXu5vVz4bZQbUQj4TTBICPj5+11WX7QCj
-	 6RvGZXC9LX49G6wsI1gOHCNVOUBCF4dVzdrCFWDQo1U2OLw1/zEBoKVUwT7VxxlfEx
-	 cTUzLYJGJQZRbZhBMFIbx6Hvu2YsxnTufoEdDTvd77JfuvsfDkPLZZOvAR9SRz+Fsg
-	 iHhFnJlDgdWjRucKNaDF3cRI6FzuIyAmgrVw8wgNAelQwwWf0B6ZJn/rggR2JsCerd
-	 /0swZqAarPBkyic7/CvbJCqJcvfWndmKYfGTbCEpQHJy2EbHFUlaqvdvPp2GWibM0A
-	 JhBko8CxoacWw==
-Message-ID: <fe15fcce-865a-4969-9b6f-95920fcaa5c7@kernel.org>
-Date: Tue, 16 Dec 2025 16:58:25 +0100
+	 In-Reply-To:Content-Type; b=U+p/6mUxhcQDq+zkNGxumTgOoAYxbAeHDpVZjmJzLyhYJ6iNvXQHtRqDIGbQJpO5+wHyhLs5aK3CCssFroceyrdvrcgSrUdCdwvVbX6fVaai0VEbGtouq0vna4YQsxKCUX3Y0m2qOzKQnz0buitgnKnkclL5Xy2+dMdKazq2tRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AJjVGTM7; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7b9387df58cso7308393b3a.3
+        for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 08:23:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765902192; x=1766506992; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=j5vCKhasJ1Ig30OHsuQK/Y6r0bPzjGj3HFYq+PgtrOQ=;
+        b=AJjVGTM7XpDfXWGy0gPq7xS3kaZ2fKALIguR6VN2mi058QrVFEYoi59Z7BnP/4TX54
+         HCgDd59buA1cVTH542lXEnG3OrHAi0WwXFP/MLXGLnwNP8ti27qM02q9/URdoonjemds
+         x61nixnZ0dtld20k1G7twYBB19fcvhB1mId070eKqOgQpd38N8DrAx0n7VxjJcImp9u0
+         ty6ckOp0h92tBSRmKbd1o7yFwjcaIOjOQLyllJxbxyS98woZ/QQEaSzY5qjfsBfVF65c
+         sZwEbTf2XNbsT11nkXSUebU2xkaA3bD7PMXZrqhECzClF9n6/pGmgjLdCPodEQ6nS4A6
+         Dvsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765902192; x=1766506992;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=j5vCKhasJ1Ig30OHsuQK/Y6r0bPzjGj3HFYq+PgtrOQ=;
+        b=hf32ka/8/N/DvjyrCWrlBjL/0a4gupSJkG3R7XxqiARkQIlr0V5EYpIODqMUJcz5zt
+         RHsjkPEIijgO2cbxWr3jahGKtW0imVUgHCADvppCQkjAYA5SjM5+cjXUeCTWHa1TY0Ov
+         Y7YvWB8nzAB+GAk0B6BgdS3ZIrq/rLF6JeJFvHxatxHdUmai4n09zgSbAWYODqzsU62d
+         +D0a1iUc+TRo6rY9PeKli4RVwJaF27E3OFf6Ceg9wKO99OXSSr9dHqad0yAyjcj+726T
+         MCpegodIui0bqEs0fh4J9zCdWs9yrRu0iNpamZ6MUPOzZBAthzcENuJM43JRYsER8bwm
+         Om3A==
+X-Gm-Message-State: AOJu0YzqXqBdAZPqfpYW+eQYvS/YZqbGcsWqO6kNBPdkowr0U1rK38Ay
+	l+yrfJx1kdVDxBZhfR8D3jIDaFaL72MVYthNxGBIaQIDpiEh0qPGPDgS
+X-Gm-Gg: AY/fxX4mXHIW79ATmFPN5zs/HqhAluCe0KyAhGr4XnGP3lr+KuSLFX1zSGw43ocI7Zq
+	71p2g5raeF9cxN2iX5UMRfKF1WHKHlsPekXZa/oZLKmORR9gHihm7+bsHByKvI2cPNhi60B2w7x
+	qH1gXqVlnY+yBmW+BjzavxhzuvVukXSxp0u1JOwJtT3aF9LqRAk51tMFxoCAij4TRGy5Vv9OZNz
+	AX4GIoSGFTFgaFPphtF8iJmCu1MjhtSK7s6mI3Ch3xMtFVPuqfVAL/EWqPQHTRjlvrU9KBa5l5h
+	UiUjY5OeADBIoqFqt4U3Nz4Mwaqjd/zc2bMoxM8OeqBEv1S+bdgju7Gfn5sDL+q7G4tQ3+KVLXf
+	UjMTuZJE6w1Kvi4Y6myTyUkoNfYUVc1ywIeEqx8rgwjahYGZ/spZQy2l/tQsxBPQnE0K7WQzU8/
+	ZRcdjUkaDKHfiAOIlGc35sRN3jpzFSVQAJpBd2lRSBYUF2BKMBVed1x3CI+U8=
+X-Google-Smtp-Source: AGHT+IECYfe/OWkP+h6xwdXpAJwtn05ZsuE/m7/iUcw3NPvb9j7sxFVFBX2c8mmvByjxd+djfC6elw==
+X-Received: by 2002:a05:6a00:1d0a:b0:7b7:6f69:e9ba with SMTP id d2e1a72fcca58-7f667447030mr15140623b3a.1.1765902191527;
+        Tue, 16 Dec 2025 08:23:11 -0800 (PST)
+Received: from ?IPV6:2001:ee0:4f4c:210:aa6d:57b:2df9:35ae? ([2001:ee0:4f4c:210:aa6d:57b:2df9:35ae])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7f4c4e9d9e3sm15921893b3a.45.2025.12.16.08.23.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 16 Dec 2025 08:23:11 -0800 (PST)
+Message-ID: <3f5613e9-ccd0-4096-afc3-67ee94f6f660@gmail.com>
+Date: Tue, 16 Dec 2025 23:23:04 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,169 +81,124 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 05/19] dt-bindings: arm: microchip: move SparX-5 to
- generic Microchip binding
-To: Robert Marko <robert.marko@sartura.hr>, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, nicolas.ferre@microchip.com,
- alexandre.belloni@bootlin.com, claudiu.beznea@tuxon.dev,
- Steen.Hegelund@microchip.com, daniel.machon@microchip.com,
- UNGLinuxDriver@microchip.com, herbert@gondor.apana.org.au,
- davem@davemloft.net, vkoul@kernel.org, linux@roeck-us.net,
- andi.shyti@kernel.org, lee@kernel.org, andrew+netdev@lunn.ch,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, linusw@kernel.org,
- olivia@selenic.com, radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com,
- gregkh@linuxfoundation.org, jirislaby@kernel.org, mturquette@baylibre.com,
- sboyd@kernel.org, richardcochran@gmail.com,
- wsa+renesas@sang-engineering.com, romain.sioen@microchip.com,
- Ryan.Wanner@microchip.com, lars.povlsen@microchip.com,
- tudor.ambarus@linaro.org, charan.pedumuru@microchip.com,
- kavyasree.kotagiri@microchip.com, devicetree@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
- linux-hwmon@vger.kernel.org, linux-i2c@vger.kernel.org,
- netdev@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-spi@vger.kernel.org, linux-serial@vger.kernel.org,
- linux-usb@vger.kernel.org, linux-clk@vger.kernel.org, mwalle@kernel.org
-Cc: luka.perkov@sartura.hr
-References: <20251215163820.1584926-1-robert.marko@sartura.hr>
- <20251215163820.1584926-5-robert.marko@sartura.hr>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH net v2] virtio-net: enable all napis before scheduling
+ refill work
+To: Jason Wang <jasowang@redhat.com>
+Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, virtualization@lists.linux.dev,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org, stable@vger.kernel.org
+References: <20251212152741.11656-1-minhquangbui99@gmail.com>
+ <CACGkMEtzXmfDhiQiq=5qPGXG+rJcxGkWk0CZ4X_2cnr2UVH+eQ@mail.gmail.com>
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20251215163820.1584926-5-robert.marko@sartura.hr>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Bui Quang Minh <minhquangbui99@gmail.com>
+In-Reply-To: <CACGkMEtzXmfDhiQiq=5qPGXG+rJcxGkWk0CZ4X_2cnr2UVH+eQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 15/12/2025 17:35, Robert Marko wrote:
-> Now that we have a generic Microchip binding, lets move SparX-5 as well as
-> there is no reason to have specific binding file for each SoC series.
-> 
-> The check for AXI node was dropped.
+On 12/16/25 11:16, Jason Wang wrote:
+> On Fri, Dec 12, 2025 at 11:28 PM Bui Quang Minh
+> <minhquangbui99@gmail.com> wrote:
+>> Calling napi_disable() on an already disabled napi can cause the
+>> deadlock. In commit 4bc12818b363 ("virtio-net: disable delayed refill
+>> when pausing rx"), to avoid the deadlock, when pausing the RX in
+>> virtnet_rx_pause[_all](), we disable and cancel the delayed refill work.
+>> However, in the virtnet_rx_resume_all(), we enable the delayed refill
+>> work too early before enabling all the receive queue napis.
+>>
+>> The deadlock can be reproduced by running
+>> selftests/drivers/net/hw/xsk_reconfig.py with multiqueue virtio-net
+>> device and inserting a cond_resched() inside the for loop in
+>> virtnet_rx_resume_all() to increase the success rate. Because the worker
+>> processing the delayed refilled work runs on the same CPU as
+>> virtnet_rx_resume_all(), a reschedule is needed to cause the deadlock.
+>> In real scenario, the contention on netdev_lock can cause the
+>> reschedule.
+>>
+>> This fixes the deadlock by ensuring all receive queue's napis are
+>> enabled before we enable the delayed refill work in
+>> virtnet_rx_resume_all() and virtnet_open().
+>>
+>> Fixes: 4bc12818b363 ("virtio-net: disable delayed refill when pausing rx")
+>> Reported-by: Paolo Abeni <pabeni@redhat.com>
+>> Closes: https://netdev-ctrl.bots.linux.dev/logs/vmksft/drv-hw-dbg/results/400961/3-xdp-py/stderr
+>> Cc: stable@vger.kernel.org
+>> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
+>> ---
+>> Changes in v2:
+>> - Move try_fill_recv() before rx napi_enable()
+>> - Link to v1: https://lore.kernel.org/netdev/20251208153419.18196-1-minhquangbui99@gmail.com/
+>> ---
+>>   drivers/net/virtio_net.c | 71 +++++++++++++++++++++++++---------------
+>>   1 file changed, 45 insertions(+), 26 deletions(-)
+>>
+>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+>> index 8e04adb57f52..4e08880a9467 100644
+>> --- a/drivers/net/virtio_net.c
+>> +++ b/drivers/net/virtio_net.c
+>> @@ -3214,21 +3214,31 @@ static void virtnet_update_settings(struct virtnet_info *vi)
+>>   static int virtnet_open(struct net_device *dev)
+>>   {
+>>          struct virtnet_info *vi = netdev_priv(dev);
+>> +       bool schedule_refill = false;
+>>          int i, err;
+>>
+>> -       enable_delayed_refill(vi);
+>> -
+>> +       /* - We must call try_fill_recv before enabling napi of the same receive
+>> +        * queue so that it doesn't race with the call in virtnet_receive.
+>> +        * - We must enable and schedule delayed refill work only when we have
+>> +        * enabled all the receive queue's napi. Otherwise, in refill_work, we
+>> +        * have a deadlock when calling napi_disable on an already disabled
+>> +        * napi.
+>> +        */
+>>          for (i = 0; i < vi->max_queue_pairs; i++) {
+>>                  if (i < vi->curr_queue_pairs)
+>>                          /* Make sure we have some buffers: if oom use wq. */
+>>                          if (!try_fill_recv(vi, &vi->rq[i], GFP_KERNEL))
+>> -                               schedule_delayed_work(&vi->refill, 0);
+>> +                               schedule_refill = true;
+>>
+>>                  err = virtnet_enable_queue_pair(vi, i);
+>>                  if (err < 0)
+>>                          goto err_enable_qp;
+>>          }
+> So NAPI could be scheduled and it may want to refill but since refill
+> is not enabled, there would be no refill work.
+>
+> Is this a problem?
 
-Why?
+You are right. It is indeed a problem.
 
-> 
-> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
-> ---
->  .../bindings/arm/microchip,sparx5.yaml        | 67 -------------------
->  .../devicetree/bindings/arm/microchip.yaml    | 22 ++++++
->  2 files changed, 22 insertions(+), 67 deletions(-)
->  delete mode 100644 Documentation/devicetree/bindings/arm/microchip,sparx5.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/arm/microchip,sparx5.yaml b/Documentation/devicetree/bindings/arm/microchip,sparx5.yaml
-> deleted file mode 100644
-> index 9a0d54e9799c..000000000000
-> --- a/Documentation/devicetree/bindings/arm/microchip,sparx5.yaml
-> +++ /dev/null
-> @@ -1,67 +0,0 @@
-> -# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> -%YAML 1.2
-> ----
-> -$id: http://devicetree.org/schemas/arm/microchip,sparx5.yaml#
-> -$schema: http://devicetree.org/meta-schemas/core.yaml#
-> -
-> -title: Microchip Sparx5 Boards
-> -
-> -maintainers:
-> -  - Lars Povlsen <lars.povlsen@microchip.com>
-> -
-> -description: |+
-> -   The Microchip Sparx5 SoC is a ARMv8-based used in a family of
-> -   gigabit TSN-capable gigabit switches.
-> -
-> -   The SparX-5 Ethernet switch family provides a rich set of switching
-> -   features such as advanced TCAM-based VLAN and QoS processing
-> -   enabling delivery of differentiated services, and security through
-> -   TCAM-based frame processing using versatile content aware processor
-> -   (VCAP)
-> -
-> -properties:
-> -  $nodename:
-> -    const: '/'
-> -  compatible:
-> -    oneOf:
-> -      - description: The Sparx5 pcb125 board is a modular board,
-> -          which has both spi-nor and eMMC storage. The modular design
-> -          allows for connection of different network ports.
-> -        items:
-> -          - const: microchip,sparx5-pcb125
-> -          - const: microchip,sparx5
-> -
-> -      - description: The Sparx5 pcb134 is a pizzabox form factor
-> -          gigabit switch with 20 SFP ports. It features spi-nor and
-> -          either spi-nand or eMMC storage (mount option).
-> -        items:
-> -          - const: microchip,sparx5-pcb134
-> -          - const: microchip,sparx5
-> -
-> -      - description: The Sparx5 pcb135 is a pizzabox form factor
-> -          gigabit switch with 48+4 Cu ports. It features spi-nor and
-> -          either spi-nand or eMMC storage (mount option).
-> -        items:
-> -          - const: microchip,sparx5-pcb135
-> -          - const: microchip,sparx5
-> -
-> -  axi@600000000:
-> -    type: object
-> -    description: the root node in the Sparx5 platforms must contain
-> -      an axi bus child node. They are always at physical address
-> -      0x600000000 in all the Sparx5 variants.
-> -    properties:
-> -      compatible:
-> -        items:
-> -          - const: simple-bus
-> -
-> -    required:
-> -      - compatible
-> -
-> -required:
-> -  - compatible
-> -  - axi@600000000
+I think we can unconditionally schedule the delayed refill after 
+enabling all the RX NAPIs (don't check the boolean schedule_refill 
+anymore) to ensure that we will have refill work. We can still keep the 
+try_fill_recv here to fill the receive buffer earlier in normal case. 
+What do you think?
 
-Nothing explains the rationale for doing this.
+>
+>
+>> +       enable_delayed_refill(vi);
+>> +       if (schedule_refill)
+>> +               schedule_delayed_work(&vi->refill, 0);
+>> +
+>>          if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_STATUS)) {
+>>                  if (vi->status & VIRTIO_NET_S_LINK_UP)
+>>                          netif_carrier_on(vi->dev);
+>> @@ -3463,39 +3473,48 @@ static void virtnet_rx_pause(struct virtnet_info *vi, struct receive_queue *rq)
+>>          __virtnet_rx_pause(vi, rq);
+>>   }
+>>
+> Thanks
+>
 
-Best regards,
-Krzysztof
+Thanks,
+Quang Minh.
+
 
