@@ -1,164 +1,127 @@
-Return-Path: <netdev+bounces-244890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C7B4CC0F2B
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 05:58:47 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EF81CC1013
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 06:25:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D11DC301CD1B
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 04:58:45 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 1037030620CD
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 05:20:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44AFB317715;
-	Tue, 16 Dec 2025 04:58:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6A0833555C;
+	Tue, 16 Dec 2025 05:20:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YP3rRXs0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f80.google.com (mail-oo1-f80.google.com [209.85.161.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6C88330B1D
-	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 04:58:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39383299952;
+	Tue, 16 Dec 2025 05:20:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765861123; cv=none; b=VJiJsv764rdOxtaDjVTBIL9skpVQwbRGReiOhry7i8fp3W3ssuA7ZCmvDiUOu6/YT7tCMBQeIPP4Q7LOMkcsLP5i5vKC9fChtcY94Y1sA8MEuQOaKBc5dLfkwwlnZ9StsP4qa7njWFU1zR/5wInPiYq1dreM5i108K2R+9XfsuY=
+	t=1765862425; cv=none; b=DbpeCOGKrDj0Qsa+XzCJhiogXc5Am9ITVfsPF2W7nFLCkCns2go3Gg4Qf1zRwjW3eHn2L646jP0N3HIbJKOUSu1FFKBCQcBJTUD5eu2PtpsmEocckVEpfjXX7ysZC1NXOAe6Qm7SRJ+7HE00CilpzKMQYqJu0RD4PTKVvwMvdG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765861123; c=relaxed/simple;
-	bh=aZk1EHRGxaEL9/vrGqHv62SBWmLu3vwA443KWlQpbJY=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=T9DtHeh3fehHArXifXdXZWpKjQYOvgkshTXUgXHqVaZYdEmTm4+U0bETIpOnpiSAL4UzXyIwXPoBqRXlZLti+j+ZcQ/4t6gix5CmR3g8G99POpIVB86GMHQ+bAel19MmyKraZrB81SFKAc2gWEza+mqKQSN49cS1+zBrl/2ssY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f80.google.com with SMTP id 006d021491bc7-6574d3d44f9so6949337eaf.3
-        for <netdev@vger.kernel.org>; Mon, 15 Dec 2025 20:58:34 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765861111; x=1766465911;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=A9VJ2NjuLHAb4xBKj6JiMynK6+8wfONvXDjZG6Z5Uzg=;
-        b=JLHEII8YjO22p3LJjzHEtFTql5z+78FwL2WNMxkYLo8RotaLPgoOekdXJPhG0Efe29
-         ZobJXwQsefzXnHRpvSRqpNs5OdSbMq5ylwtB7r8X0KUvxjHDnA/dcSBAPyETnZiLqS0T
-         zr3qv50GDeWVNjyH1/Z04tSqGwSBDMkvnRWz3Cm1Ku5+UcadrYBSjCAPl3Lo+08aiUjE
-         mLAJ3hH1aUb7Lf228MEWtUKu7ABErxWsii92sJJ0SYMpR/dad3YDfyCEOSdjU40QLMT4
-         thgT3KzQrZ/2Lp1xx/SZWTHs1q7t2ShIvSEjQHTJJW0Xc+HVnKkBXMKUiBCIJHNV8DlE
-         9RUA==
-X-Forwarded-Encrypted: i=1; AJvYcCU5nhBvZ927SI0Penq5oXNvN2CnT+bmZmjYJN7K6qmpmBSYIhdtj3uhDjB2sSBl/B7vYn04zrg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEZGnYDrqTlZgJjwu8kICDe3mlL3C3l2jbF2en8qeUPLFXB7hl
-	QiyDJxWB9Gdlda/K5jSbOTx1fIZYbV7nilPKmRJFOAJy+NBCv2oUL/MNepdgVXRCetepM5ii0T7
-	BNrMiLbNhLAEGgt/5MFlKa8ZQi8Cgwzlhg9qR0y+62fSMeO8JOjgDpL5rejw=
-X-Google-Smtp-Source: AGHT+IE4CRdIxLZXnKMCACcPdimYF6ytn3cR0bwSBEUFU6igp132iUYNVvCwU/V9lOE/ATEBseE4+QjnBrr45Fnchcfbo3jBH/Oy
+	s=arc-20240116; t=1765862425; c=relaxed/simple;
+	bh=xE1dhCsdlPenvPb/QwLxKPIL9ggriBZhbOJquY4jLUA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fqYli5GScT+3YRKfrRGG9ooIJnQr7ocGlxqpAh5fk8VQY2RiFuc67HDrwYSx3jo+Vn2dZi0/xVWFiYOaF/19CzFVQVQ/LOpB6xXoFQAPAocaLi0FouXDtd60PPJEQ6m9eWTJiCySzzVeNs3lqHZ58JTGUkKRKOLeLk4ZCFp5jfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YP3rRXs0; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1765862419; x=1797398419;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=xE1dhCsdlPenvPb/QwLxKPIL9ggriBZhbOJquY4jLUA=;
+  b=YP3rRXs0wsNKx3febgHHBc5RII179CL1TtcbicO+asJOaJtD/3wkrV2a
+   iJ4r4bIuyWtZC8kyO8/2TIgGUZp0ZaEqq9gvIH4NQSApctbm/KGconbW0
+   vwK8H8/MQYL4uiq+3dC/JQlaHGkSyd6QMQemI0QbP5jBU7YWdeySoV7sX
+   OnzWNT9oZ93z4keVFB3Dx1Vg1TRjdKUP1y3lln+dG2RrgknnXnwmhKhs3
+   wvl76wPzNCLHwJcd7pyEZVT1cz/t5zP/ttjVKguq50XbE5/rgIS67z3zX
+   AwrXFGOED5DtG4Yt70eNynyVl1Ac+6N2OurYvjwNv3jmTH0DCCx7k++aO
+   w==;
+X-CSE-ConnectionGUID: cbiJsu2ZTrqP7SA5KzlPAw==
+X-CSE-MsgGUID: cwmL92HGTtW7sRo5/l3GWA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11643"; a="71404177"
+X-IronPort-AV: E=Sophos;i="6.21,152,1763452800"; 
+   d="scan'208";a="71404177"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2025 21:20:14 -0800
+X-CSE-ConnectionGUID: rNZx0CiUTtCYXIYnN27CqQ==
+X-CSE-MsgGUID: Wsb/7tfDR4q+03zf9hrv/g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,152,1763452800"; 
+   d="scan'208";a="197811430"
+Received: from igk-lkp-server01.igk.intel.com (HELO 8a0c053bdd2a) ([10.211.93.152])
+  by fmviesa006.fm.intel.com with ESMTP; 15 Dec 2025 21:20:12 -0800
+Received: from kbuild by 8a0c053bdd2a with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vVNTm-0000000031U-2s3b;
+	Tue, 16 Dec 2025 05:20:10 +0000
+Date: Tue, 16 Dec 2025 06:20:03 +0100
+From: kernel test robot <lkp@intel.com>
+To: Dharanitharan R <dharanitharan725@gmail.com>,
+	syzbot+422806e5f4cce722a71f@syzkaller.appspotmail.com
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, dharanitharan725@gmail.com
+Subject: Re: [PATCH net v2] team: fix qom_list corruption by using
+ list_del_init_rcu()
+Message-ID: <202512160610.CtwITAzk-lkp@intel.com>
+References: <20251210053104.23608-2-dharanitharan725@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:2224:b0:659:9a49:9027 with SMTP id
- 006d021491bc7-65b452c8e73mr5077427eaf.84.1765861111505; Mon, 15 Dec 2025
- 20:58:31 -0800 (PST)
-Date: Mon, 15 Dec 2025 20:58:31 -0800
-In-Reply-To: <694001b8.a70a0220.33cd7b.00fe.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6940e6f7.a70a0220.33cd7b.0134.GAE@google.com>
-Subject: Re: [syzbot] [net?] [nfc?] WARNING in nfc_dev_down
-From: syzbot <syzbot+4ef89409a235d804c6c2@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	krzk@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251210053104.23608-2-dharanitharan725@gmail.com>
 
-syzbot has found a reproducer for the following issue on:
+Hi Dharanitharan,
 
-HEAD commit:    8f0b4cce4481 Linux 6.19-rc1
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=102035c2580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=1f2b6fe1fdf1a00b
-dashboard link: https://syzkaller.appspot.com/bug?extid=4ef89409a235d804c6c2
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1101b91a580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=142035c2580000
+kernel test robot noticed the following build errors:
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/ea3b19e4d883/disk-8f0b4cce.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/bd7c115820ba/vmlinux-8f0b4cce.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/e5813cc1963f/bzImage-8f0b4cce.xz
+[auto build test ERROR on net/main]
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+4ef89409a235d804c6c2@syzkaller.appspotmail.com
+url:    https://github.com/intel-lab-lkp/linux/commits/Dharanitharan-R/team-fix-qom_list-corruption-by-using-list_del_init_rcu/20251210-133429
+base:   net/main
+patch link:    https://lore.kernel.org/r/20251210053104.23608-2-dharanitharan725%40gmail.com
+patch subject: [PATCH net v2] team: fix qom_list corruption by using list_del_init_rcu()
+config: x86_64-rhel-9.4-ltp (https://download.01.org/0day-ci/archive/20251216/202512160610.CtwITAzk-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251216/202512160610.CtwITAzk-lkp@intel.com/reproduce)
 
-------------[ cut here ]------------
-rtmutex deadlock detected
-WARNING: kernel/locking/rtmutex.c:1674 at rt_mutex_handle_deadlock+0x21/0xb0 kernel/locking/rtmutex.c:1674, CPU#1: syz.3.31/6310
-Modules linked in:
-CPU: 1 UID: 0 PID: 6310 Comm: syz.3.31 Not tainted syzkaller #0 PREEMPT_{RT,(full)} 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
-RIP: 0010:rt_mutex_handle_deadlock+0x21/0xb0 kernel/locking/rtmutex.c:1674
-Code: 90 90 90 90 90 90 90 90 90 41 57 41 56 41 55 41 54 53 83 ff dd 0f 85 86 00 00 00 48 89 f7 e8 66 3b 01 00 48 8d 3d 6f 83 08 04 <67> 48 0f b9 3a 4c 8d 3d 00 00 00 00 65 48 8b 1c 25 08 d0 b1 91 4c
-RSP: 0018:ffffc90004d97930 EFLAGS: 00010286
-RAX: 0000000080000000 RBX: ffffc90004d979c0 RCX: 0000000000000000
-RDX: 0000000000000006 RSI: ffffffff8ce0bc0c RDI: ffffffff8ede53f0
-RBP: ffffc90004d97ad8 R08: ffffffff8edb3177 R09: 1ffffffff1db662e
-R10: dffffc0000000000 R11: fffffbfff1db662f R12: 1ffff920009b2f34
-R13: ffffffff8ad5cb69 R14: ffff888037dc6098 R15: dffffc0000000000
-FS:  000055557d26b500(0000) GS:ffff888126e03000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffcf0a37f52 CR3: 00000000329d0000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- __rt_mutex_slowlock kernel/locking/rtmutex.c:1734 [inline]
- __rt_mutex_slowlock_locked kernel/locking/rtmutex.c:1760 [inline]
- rt_mutex_slowlock+0x666/0x6b0 kernel/locking/rtmutex.c:1800
- __rt_mutex_lock kernel/locking/rtmutex.c:1815 [inline]
- __mutex_lock_common kernel/locking/rtmutex_api.c:534 [inline]
- mutex_lock_nested+0x16a/0x1d0 kernel/locking/rtmutex_api.c:552
- device_lock include/linux/device.h:895 [inline]
- nfc_dev_down+0x3b/0x290 net/nfc/core.c:143
- nfc_rfkill_set_block+0x2d/0x100 net/nfc/core.c:179
- rfkill_set_block+0x1e5/0x450 net/rfkill/core.c:346
- rfkill_fop_write+0x44e/0x580 net/rfkill/core.c:1301
- vfs_write+0x287/0xb40 fs/read_write.c:684
- ksys_write+0x14b/0x260 fs/read_write.c:738
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f28f61cf749
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fffd96926f8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 00007f28f6425fa0 RCX: 00007f28f61cf749
-RDX: 0000000000000008 RSI: 0000200000000080 RDI: 0000000000000004
-RBP: 00007f28f6253f91 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f28f6425fa0 R14: 00007f28f6425fa0 R15: 0000000000000003
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	90                   	nop
-   1:	90                   	nop
-   2:	90                   	nop
-   3:	90                   	nop
-   4:	90                   	nop
-   5:	90                   	nop
-   6:	90                   	nop
-   7:	90                   	nop
-   8:	90                   	nop
-   9:	41 57                	push   %r15
-   b:	41 56                	push   %r14
-   d:	41 55                	push   %r13
-   f:	41 54                	push   %r12
-  11:	53                   	push   %rbx
-  12:	83 ff dd             	cmp    $0xffffffdd,%edi
-  15:	0f 85 86 00 00 00    	jne    0xa1
-  1b:	48 89 f7             	mov    %rsi,%rdi
-  1e:	e8 66 3b 01 00       	call   0x13b89
-  23:	48 8d 3d 6f 83 08 04 	lea    0x408836f(%rip),%rdi        # 0x4088399
-* 2a:	67 48 0f b9 3a       	ud1    (%edx),%rdi <-- trapping instruction
-  2f:	4c 8d 3d 00 00 00 00 	lea    0x0(%rip),%r15        # 0x36
-  36:	65 48 8b 1c 25 08 d0 	mov    %gs:0xffffffff91b1d008,%rbx
-  3d:	b1 91
-  3f:	4c                   	rex.WR
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202512160610.CtwITAzk-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   drivers/net/team/team_core.c: In function '__team_queue_override_port_del':
+>> drivers/net/team/team_core.c:827:9: error: implicit declaration of function 'list_del_init_rcu'; did you mean 'hlist_del_init_rcu'? [-Wimplicit-function-declaration]
+     827 |         list_del_init_rcu(&port->qom_list);
+         |         ^~~~~~~~~~~~~~~~~
+         |         hlist_del_init_rcu
 
 
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+vim +827 drivers/net/team/team_core.c
+
+   820	
+   821	static void __team_queue_override_port_del(struct team *team,
+   822						   struct team_port *port)
+   823	{
+   824		if (!port->queue_id)
+   825			return;
+   826		/* Ensure safe repeated deletion */
+ > 827		list_del_init_rcu(&port->qom_list);
+   828	}
+   829	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
