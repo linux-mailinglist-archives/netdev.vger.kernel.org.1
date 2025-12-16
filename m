@@ -1,60 +1,96 @@
-Return-Path: <netdev+bounces-244929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-244930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C748CC31D3
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 14:14:39 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAC8DCC48DD
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 18:08:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A8C6B30797CF
-	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 13:10:11 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 3784E3034676
+	for <lists+netdev@lfdr.de>; Tue, 16 Dec 2025 17:08:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E50C534D905;
-	Tue, 16 Dec 2025 12:20:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BE603901FA;
+	Tue, 16 Dec 2025 12:44:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZCZJjVc1"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="DE3BNhOc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8DAF34D3AB;
-	Tue, 16 Dec 2025 12:20:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 048C73901F3
+	for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 12:44:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765887645; cv=none; b=G5DanFSthevPHdzZ4TGMmjsntavvTRB+GIv2eyBIdO6IBwFrQOJUrJuHG5YIR7glbgXWiUTPVF5pZCFCNRuGh8VbYKj3ksj1I2K5FGMn3x3flhvh45sQvzsmJpUM/a3v/GUM8TzVAnXmX2KmXUQTc2+GnrJtYSZXLewpN8h0irQ=
+	t=1765889064; cv=none; b=HfNxUI+AmZIqAHaBQyutVi2PBy2/9BBqHhPNLPrFHtKS4Zri6rFN8gMnXM5hg3Xn799g5sUc1Nk5yZa3+1xGs+oGOUlqx+cXjSr3FW6ozIb0K2Fj7vFXYRBw3Ac55hOMfrymgyLNiSTEAgGbc9ltah3lZw9x6HrkX/tFE81/i4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765887645; c=relaxed/simple;
-	bh=YUQEOtdBM4h1nc++QKKGyni9ZcT7y5HRI51H7ug9qvw=;
+	s=arc-20240116; t=1765889064; c=relaxed/simple;
+	bh=boIqxM+ov9nSjwgWpy63cnTTzp37ctPMetwDRjr716c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qPjjU86rWQCsFVRS+uWRnIiqszlQ0xdz+9z/61Pywh50Xd3g43tT9YJhlJbqAN281cyIl15DGZLXGcIcWDJyFtnY8HlScpl7qGBRDExngI6wg0bsH8riuYS961PaHRQQlEi0Bcnlg1iSz20ym32Tpr4RL1r/CbcPhBxBkc8fKGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZCZJjVc1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C09AC4CEF1;
-	Tue, 16 Dec 2025 12:20:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765887645;
-	bh=YUQEOtdBM4h1nc++QKKGyni9ZcT7y5HRI51H7ug9qvw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZCZJjVc1mPf1+U6aTg+0G2Dl9Qalans3zgrluwgOXTe/kxNISyaJrQlZ2udr1s0X5
-	 x8ch/uWQA0zFx+zD2vNwNTHd5qM18OzzQU3+f7hQX2zdWjog9qXKeuyc6sIYtN55hT
-	 evIxHDpRELyQNYzfdaZGluY71DPKucFGP3xzm2vNEhuKtPoAz9kakmrF9ddAreb02H
-	 ucoyThGwOdS8V4+psw9oD29cFmWQUgbJrIHC6+ilUh9COsm1AvReVJolaNX6Mer8Nx
-	 hj282intAZYueA6YPvVZf/uvJaV/Xyv+1dM5b/wrE/77zGwX1CB5or1emjgGjy4RkJ
-	 t4mkuziICA1iQ==
-Date: Tue, 16 Dec 2025 12:20:39 +0000
-From: Simon Horman <horms@kernel.org>
-To: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	longli@microsoft.com, kotaranov@microsoft.com,
-	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
-	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	dipayanroy@microsoft.com
-Subject: Re: [PATCH net-next] net: mana: Fix use-after-free in reset service
- rescan path
-Message-ID: <aUFOl4euBSyPtA5F@horms.kernel.org>
-References: <20251216105508.GA13584@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	 Content-Type:Content-Disposition:In-Reply-To; b=YRe9IbXAkHCp4gpWYB3iN3UUNvOHOLVI5N4IPFH7DwVnqPUKF5tw9G4vF+Rz0/Pvavy+l9V9ypKZDx67CBG3hJGpR0pVYVCpQ9WwnO9evjbRqAnbz4RxGk3+YLu8+TnexxBwzCLWDaDEoBcrtrp+6CpDu7ubUlcoziGLnq5kIvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=DE3BNhOc; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4777771ed1aso34811855e9.2
+        for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 04:44:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1765889060; x=1766493860; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/lTD5T6FLVPMFiI1zK6zOO1/qp2X5cLGG7vD5u13cD0=;
+        b=DE3BNhOcc+HNQXvq2D9wHK7NIuewOffYSeXDSlTTjBkaAYU97BUwxMG9Bd17Vj04G0
+         Udn8He0ZTL2b6WWpup21Pz65uKv9xFnVS7CsZ3CMMxLk4LdE+ORIqEU90QzUCeZoYY3E
+         M93a4SOb9XP+Clv4+mIKU4Mp8YVXMRjFWFsAvF6zu11+Ni4hYptYb8CfRJTJBTud4Nwq
+         C61+N5a2YmlS6bDZ/Ku2Q5wgp/hTUEegwISlmbTHBHBU5TMM+11ijwfMN4CfjDDiL/MH
+         g4UfBRPjvF2wlxN0Xv8vHhKINDlp+zTZpBTb3GZCiCYQBxHLtYr5ITzGE3AKYiitxSzC
+         1FZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765889060; x=1766493860;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/lTD5T6FLVPMFiI1zK6zOO1/qp2X5cLGG7vD5u13cD0=;
+        b=qOFIxXcpc24nvBqTKcAJktndtlT+2hnzIbtAttLUsLPa7w7PEHGdw1bfTlP2sRfjwY
+         eYVP9NBwYHaBaraBSIzYYj4eaXn7EtVKQ6Iz9i3wEbhaJAL3uxJwZAb90gtbGBURcA8l
+         zWdUlX8OLMAzxDhgNpZT2Z/NiFZXnc3az8ojPLVK5Uy47qLwmbEmjNMyJgtiQ2Mt7RlZ
+         sZ8CAONwxcCS4VBvC9zZDW1vtxyHXuGMk9pDlu+hd8lWR+YINNn/n3pWONa6FRgyHyIY
+         X4mgmY0lxmkKc0xOuudUxqMjIQ6UF+pXtkVWkJ+MhXlCxMzASTnNmNKDrTrGDtYgK9FJ
+         dpeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW3n06OQnfvuKdsn3QVQamSWbHYhBoFFh3NM7/sAtXawQEMeEXpZAWgTaguo6hHcGWmVT5pS9U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxeN7BfvdcgeiWHjmZMBkjST/ATsb2zO3NFUPlPF9Tex9cXOLrj
+	4mCNzbnZZca87hzhgf0lwiXN2Jh0nkS+BDyEtSGgNeFiB74eMzEBUSG8Dvalv/v7wYE=
+X-Gm-Gg: AY/fxX47jnS92gHV1wIFyH486pemVO5iIERfOA/h48S9UiZfr+0EmofjFBcgNbBoqyk
+	G8UtLNgwkvoMMxYYLJV418HvPRUmFUXtLx0Aq6UVTd4whrqGfGfC4jp7q75jhkOlFySHOqbcSu0
+	seYyIzf1rwcULAlvHOTpOMrlitSl9rceY5FJJmOREjipqOih+TCoLd8SjnLT4bqfYYY6gRkOY11
+	CbqwqYf+0YC0ZGKXrraxxt95YUsPUiFJ7iB8QlXCzPcfadejEmQK8FoMBxV0yUT3/uxZN+wlohF
+	NIZvaLkm2Q5iXdcLsGn5WcrRcUXjwqFKkRVl/j6Rz5dktSktgdUsHItVnr9Wncp4QqBb5Grx6dQ
+	6GJMCPAJU4R1kNFuAQ+Thp1W2fBl8dUpukUKFg3IjKmGsd2LF3Df/lAT8wI2GRzhLvh5g9xqwBk
+	0p6W7sTWgdhir8GQ==
+X-Google-Smtp-Source: AGHT+IFW5qDickl4JAEFRsGArKDI6FcAB611ceysvy3jNS62BLSz150yvQDh+EMhh7oPcWPJX+4yHw==
+X-Received: by 2002:a05:600c:3acf:b0:477:1bb6:17de with SMTP id 5b1f17b1804b1-47a8f90f96bmr152908605e9.30.1765889060304;
+        Tue, 16 Dec 2025 04:44:20 -0800 (PST)
+Received: from pathway.suse.cz ([176.114.240.130])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47bd95e0161sm9700215e9.2.2025.12.16.04.44.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Dec 2025 04:44:19 -0800 (PST)
+Date: Tue, 16 Dec 2025 13:44:17 +0100
+From: Petr Mladek <pmladek@suse.com>
+To: Joel Granados <joel.granados@kernel.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Muchun Song <muchun.song@linux.dev>,
+	Oscar Salvador <osalvador@suse.de>,
+	David Hildenbrand <david@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	John Ogness <john.ogness@linutronix.de>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-hams@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH] sysctl: Remove unused ctl_table forward declarations
+Message-ID: <aUFUIfVvRcYN3_ID@pathway.suse.cz>
+References: <20251215-jag-sysctl_fw_decl-v1-1-2a9af78448f8@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,68 +99,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251216105508.GA13584@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+In-Reply-To: <20251215-jag-sysctl_fw_decl-v1-1-2a9af78448f8@kernel.org>
 
-On Tue, Dec 16, 2025 at 02:55:08AM -0800, Dipayaan Roy wrote:
-> When mana_serv_reset() encounters -ETIMEDOUT or -EPROTO from
-> mana_gd_resume(), it performs a PCI rescan via mana_serv_rescan().
+On Mon 2025-12-15 16:25:19, Joel Granados wrote:
+> Remove superfluous forward declarations of ctl_table from header files
+> where they are no longer needed. These declarations were left behind
+> after sysctl code refactoring and cleanup.
 > 
-> mana_serv_rescan() calls pci_stop_and_remove_bus_device(), which can
-> invoke the driver's remove path and free the gdma_context associated
-> with the device. After returning, mana_serv_reset() currently jumps to
-> the out label and attempts to clear gc->in_service, dereferencing a
-> freed gdma_context.
-> 
-> The issue was observed with the following call logs:
-> [  698.942636] BUG: unable to handle page fault for address: ff6c2b638088508d
-> [  698.943121] #PF: supervisor write access in kernel mode
-> [  698.943423] #PF: error_code(0x0002) - not-present page
-> [S[  698.943793] Pat Dec  6 07:GD5 100000067 P4D 1002f7067 PUD 1002f8067 PMD 101bef067 PTE 0
-> 0:56 2025] hv_[n e 698.944283] Oops: Oops: 0002 [#1] SMP NOPTI
-> tvsc f8615163-00[  698.944611] CPU: 28 UID: 0 PID: 249 Comm: kworker/28:1
-> ...
-> [Sat Dec  6 07:50:56 2025] R10: [  699.121594] mana 7870:00:00.0 enP30832s1: Configured vPort 0 PD 18 DB 16
-> 000000000000001b R11: 0000000000000000 R12: ff44cf3f40270000
-> [Sat Dec  6 07:50:56 2025] R13: 0000000000000001 R14: ff44cf3f402700c8 R15: ff44cf3f4021b405
-> [Sat Dec  6 07:50:56 2025] FS:  0000000000000000(0000) GS:ff44cf7e9fcf9000(0000) knlGS:0000000000000000
-> [Sat Dec  6 07:50:56 2025] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [Sat Dec  6 07:50:56 2025] CR2: ff6c2b638088508d CR3: 000000011fe43001 CR4: 0000000000b73ef0
-> [Sat Dec  6 07:50:56 2025] Call Trace:
-> [Sat Dec  6 07:50:56 2025]  <TASK>
-> [Sat Dec  6 07:50:56 2025]  mana_serv_func+0x24/0x50 [mana]
-> [Sat Dec  6 07:50:56 2025]  process_one_work+0x190/0x350
-> [Sat Dec  6 07:50:56 2025]  worker_thread+0x2b7/0x3d0
-> [Sat Dec  6 07:50:56 2025]  kthread+0xf3/0x200
-> [Sat Dec  6 07:50:56 2025]  ? __pfx_worker_thread+0x10/0x10
-> [Sat Dec  6 07:50:56 2025]  ? __pfx_kthread+0x10/0x10
-> [Sat Dec  6 07:50:56 2025]  ret_from_fork+0x21a/0x250
-> [Sat Dec  6 07:50:56 2025]  ? __pfx_kthread+0x10/0x10
-> [Sat Dec  6 07:50:56 2025]  ret_from_fork_asm+0x1a/0x30
-> [Sat Dec  6 07:50:56 2025]  </TASK>
-> 
-> Fix this by returning immediately after mana_serv_rescan() to avoid
-> accessing GC state that may no longer be valid.
-> 
-> Fixes: 9bf66036d686 ("net: mana: Handle hardware recovery events when probing the device")
-> 
+> Signed-off-by: Joel Granados <joel.granados@kernel.org>
 
-nit: no blank line here please - tags should all appear in one block
+For the printk part:
 
-> Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+Reviewed-by: Petr Mladek <pmladek@suse.com>
 
-I see that this patch is targeted at net-next.
-But this is a fix for a patch present in net.
-So it should be targeted at net instead
+That said, I have found one more declaration in kernel/printk/internal.h.
+It is there because of devkmsg_sysctl_set_loglvl() declaration.
+But I think that a better solution would be:
 
-Subject: [PATCH net] ...
+diff --git a/kernel/printk/internal.h b/kernel/printk/internal.h
+index dff97321741a..27169fd33231 100644
+--- a/kernel/printk/internal.h
++++ b/kernel/printk/internal.h
+@@ -4,9 +4,9 @@
+  */
+ #include <linux/console.h>
+ #include <linux/types.h>
++#include <linux/sysctl.h>
+ 
+ #if defined(CONFIG_PRINTK) && defined(CONFIG_SYSCTL)
+-struct ctl_table;
+ void __init printk_sysctl_init(void);
+ int devkmsg_sysctl_set_loglvl(const struct ctl_table *table, int write,
+ 			      void *buffer, size_t *lenp, loff_t *ppos);
+diff --git a/kernel/printk/sysctl.c b/kernel/printk/sysctl.c
+index bb8fecb3fb05..512f0c692d6a 100644
+--- a/kernel/printk/sysctl.c
++++ b/kernel/printk/sysctl.c
+@@ -3,7 +3,6 @@
+  * sysctl.c: General linux system control interface
+  */
+ 
+-#include <linux/sysctl.h>
+ #include <linux/printk.h>
+ #include <linux/capability.h>
+ #include <linux/ratelimit.h>
 
-Probably it is not necessary to repost in order to address the minor
-feedback I've provided above. But if you do, please be sure to observe
-the 24h rule and wait that long between posting revisions of that patch.
+Feel free to add this into v2. Or we could do this in a separate patch.
 
-https://docs.kernel.org/process/maintainer-netdev.html
-
-The above not withstanding, this patch looks good to me.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
+Best Regards,
+Petr
 
