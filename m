@@ -1,97 +1,133 @@
-Return-Path: <netdev+bounces-245033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C44ECCC5A9D
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 02:04:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C7E76CC5AE5
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 02:15:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6F86A300980C
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 01:04:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 73BD93012DC8
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 01:15:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01D1222F76F;
-	Wed, 17 Dec 2025 01:04:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98BEF1E412A;
+	Wed, 17 Dec 2025 01:15:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z+kvoubX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mO6/Qka3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6C2819E839;
-	Wed, 17 Dec 2025 01:04:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CEAA18CC13
+	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 01:15:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765933448; cv=none; b=YbwJuuykq5QmGlZPI9pwawqt3IYjBPzid6S2HOC4Au6007Oy4jeFifwKxDLg7tI3keIv3m9BiHUnZuEL3RF/ll5y5vkJ5nIVwyqjLIy0SRx4zBbi18zQIIjNn0EsYDSATf1BNHMoMRab/XKqEZH9yj92iPFfUvMMvPzI0uapxGo=
+	t=1765934155; cv=none; b=MmhJ1mgBfVXsHXJJU5IkbcF1EXbmR4CKi6vP9wbQ6kpIt0a4Be8zRwr2WHRWPQusG7SVqLjqifWQgZYJ2HmB9dYwEcafHRZt48fn0HG0PMmQU5fGAEsBWBNM6GeNs3dWMNN7iAAYbbUEJXQoSHEWXOnue/1C2HgfLM5EwSBiLSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765933448; c=relaxed/simple;
-	bh=rA8m553sjOXTqrA/1tm7Zp2jR5sngGgp7J+kIfy6AU8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m/S3sZ2NaiiwUKMnKWvUs9NWIl2lnz6tVBaN/hHZ9wSesOAWFcKFHGOOGOODHyg9VJMbMt9CmxPblYZOQZhtd/lscDhvvNsMbGGA0h09IT/qhkvRYKlAJHCmQhuVCLGM/xcf60Q4YrqxCuV+c6dl/WjRUp6bQCYUt93JDsxIixg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z+kvoubX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF9FBC4CEF1;
-	Wed, 17 Dec 2025 01:04:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765933445;
-	bh=rA8m553sjOXTqrA/1tm7Zp2jR5sngGgp7J+kIfy6AU8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Z+kvoubX/6VRDqapcXGj2PwFwd+FSL67UFm4+Ggr1OE94ngwM1CVSa1lS7lKbFQqQ
-	 0UysnBIa5ApyGsgEkVbdrOQBF5WXU6Zxd96dnPS4IwrcBGB7EfO9EfoEILYm7Bnvz7
-	 OfC5QGchnkQ+tjeh1a1mASK9NbKtb3+eNpKFjLuASzJt+5JeeopG/9MMgMk9FKrDWi
-	 knYDYDGCRDTu9PaPsfQlQM3IltvJom4mxtBFlTzu8rzo35CIyu85qGN+yq1H/3XuyA
-	 pBmUPMVlyWm9NJdz/s4N2V5mOto9IN90qwuBOzEdmJbHjX/nkyHtD6+NjTMbRRagch
-	 Zxl5ej9Usz5Tw==
-Date: Tue, 16 Dec 2025 19:04:03 -0600
-From: Rob Herring <robh@kernel.org>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1765934155; c=relaxed/simple;
+	bh=5NqdR0KahKnnPoX+6MD1dyWNtJM/5gJGED+S8VpfHBE=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=tfJvPJeJGtfkD7t33b3GCXMx9R7VNY/YToVPkymtE3DbTyfMh9ne26dSMSa+x5uNEXZ3viDnvfSOeZQDDfmFo4aKb8TYMModWwC91DAJR6JIMxHKfsdRAyUbbq62x7k3c5Ov+tRJm2bFjd5ae7Vh7GSxBd3s+/zlFmkWu/1ChBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mO6/Qka3; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-29e619586deso7943775ad.3
+        for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 17:15:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765934153; x=1766538953; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oAPpQXLFQFMqUELx3ET/17MTkGzZAB2Bx7aG6WIuk/g=;
+        b=mO6/Qka3JfRVoiIP16g7khJ4iOnCKB/oZZ19aZYjUBxyv3+6S5fIfaF5/bglcGYFE4
+         qBpobkRyrpZWRAw5M4zegE5rfVMVNE3nEWDoLKTe8KSoQD79CYUkGOzDF5W9BuECBCV7
+         0mU//LiPmsGKObdNr6/BiN0Ct58+RPfSo1p6LyRDdFMPCwEB3vw02uPa3oJPGLlDIof1
+         kN9xvJzHvmYQBszGGH1e9Ok+Qo82hStTZx+jS6ADDIlIFrzlvwgRPRxa1W5f2gxj8uIs
+         zMb6z4zyw5etHlJQZ+ahoDI5Ne0dk8Z3aNq2jJb3kUkvf4cByjBMQTeeTYk88vbPlUgM
+         rMPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765934153; x=1766538953;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=oAPpQXLFQFMqUELx3ET/17MTkGzZAB2Bx7aG6WIuk/g=;
+        b=ApJx6qw7pG/tcbr5RrEHX6Os/hHxEsRnt/+cjmKzY9eO9PIQJnDdxPgF4aa8LBDYbg
+         D+t7wg9RPv2PbpLzD2LxL2QkzrnCUyD3z9MP7gMol+IIh3eu/4ZeIX09WIyqbTU9PU7/
+         91a4Waxz0WaeljaSnfhiO8ub8WYLCJB2USWrWXNzZ3TxKAIqpWHwKCOSfjdKjscBp3ux
+         WGSR/36aKYAipQi130uDaropesDF16twa3hQntOK/xxnaxeCbRZb7m9A6BAly2xi+dmw
+         NGd3GA04BAoE/RhJhJf06emjylZvdigCa258w/t6VRsyW1ik3cDnxNLlqK1QggZ5v72U
+         yDuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV+qNgZsw9i/8Yst5pau42aNNCmHtrUwezsU27h/5kISI0NQhET72pVmVGWmWTaeXghuY/Dnww=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwwF0xEQeaZqBv0LTJXgkclHHpJwZuoncKLvkF5QEP0TVdN3SyQ
+	Z3EfKByW9gYZrM7VSIrQe/O5NYpVugnSYn2+wveTuPz3sOWWEw+hLIIv
+X-Gm-Gg: AY/fxX5HGszJCtu7ETBySvYExp5Nqxb6f7ioC0OKwp2W+Ptg8f+ksCYGRCsDB8W6xIl
+	xtVqv38ketczlzXQwSn/yoKvegqABJuIYaaN9Iw+YktpyrW5XpnEvEOulUM7YS9l3cZdlx+QTiy
+	PJGmhzFsx7Pay2R7+MWz5mTsAGL5nMvY2losgmLD/Gx245bJ7ibIduBrxA1eTKWWJoMoKIqWPjI
+	YN17ycQuoSKzMWeSeX7pJpCyH69KwXCECKzVIA2tDpLjngv3Pom0cU9+i0K2XsK7BvoKskMIPbn
+	g0Hpdfnp33l4e2Wov7FQ8OEzYmMrmOt7udvWF45C0VYubH7r3ou91fZGayOoGhl640O1RAXqFZM
+	Mlvd6sXul13vF3ao1Y2+eNrrD8jrpis6RNm+i65tkC4AuzYSGXXRlj0W5rO6gMiSbJ/USZ4xYtG
+	yhjA+t7S6OjiOl4QmL+JTlQCbaF/Y92zLxnYw+3+hDNmWgMPe/1ItGws3M484BwN4WPqEbxZZO
+X-Google-Smtp-Source: AGHT+IFZrDf9vqRQ/g6EePpa5uBEVkMmx0VjSy5xkIfuhbvdzQMUtH3Bh0xKcFCQL8LtdAKwzvNqvQ==
+X-Received: by 2002:a17:90b:3f0e:b0:349:2cdd:434a with SMTP id 98e67ed59e1d1-34abd7602f0mr12147245a91.5.1765934153401;
+        Tue, 16 Dec 2025 17:15:53 -0800 (PST)
+Received: from poi.localdomain (KD118158218050.ppp-bb.dion.ne.jp. [118.158.218.50])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34cfdc61cecsm641012a91.9.2025.12.16.17.15.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Dec 2025 17:15:52 -0800 (PST)
+From: Qianchang Zhao <pioooooooooip@gmail.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Frank Wunderlich <frankwu@gmx.de>, Chad Monroe <chad@monroe.io>,
-	Cezary Wilmanski <cezary.wilmanski@adtran.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH RFC net-next v3 1/4] dt-bindings: net: dsa: add bindings
- for MaxLinear MxL862xx
-Message-ID: <20251217010403.GA3467893-robh@kernel.org>
-References: <cover.1765757027.git.daniel@makrotopia.org>
- <cf190e3a4192f38eecba260cd2775b660874746e.1765757027.git.daniel@makrotopia.org>
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	Zhitong Liu <liuzhitong1993@gmail.com>,
+	Qianchang Zhao <pioooooooooip@gmail.com>
+Subject: [PATCH] nfc: llcp: stop processing on LLCP_CLOSED in nfc_llcp_recv_hdlc()
+Date: Wed, 17 Dec 2025 10:15:38 +0900
+Message-Id: <20251217011538.16029-1-pioooooooooip@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <307c2afe-8e8e-4edf-b6d1-1056fe8949f6@kernel.org>
+References: <307c2afe-8e8e-4edf-b6d1-1056fe8949f6@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cf190e3a4192f38eecba260cd2775b660874746e.1765757027.git.daniel@makrotopia.org>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Dec 15, 2025 at 12:11:22AM +0000, Daniel Golle wrote:
-> Add documentation and an example for MaxLinear MxL86282 and MxL86252
-> switches.
+nfc_llcp_sock_get() takes a reference on the LLCP socket via sock_hold().
 
-Since you have to resend, drop 'bindings for' in the subject.
+In nfc_llcp_recv_hdlc(), the LLCP_CLOSED branch releases the socket lock and
+drops the reference, but the function continues to operate on llcp_sock/sk and
+later runs release_sock() and nfc_llcp_sock_put() again on the common exit path.
 
-> 
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
-> RFC v3: no changes
-> RFC v2: better description in dt-bindings doc
-> 
->  .../bindings/net/dsa/maxlinear,mxl862xx.yaml  | 162 ++++++++++++++++++
->  MAINTAINERS                                   |   6 +
->  2 files changed, 168 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/dsa/maxlinear,mxl862xx.yaml
+Return immediately after the CLOSED cleanup to avoid refcount/lock imbalance and
+to avoid using the socket after dropping the reference.
 
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+Reported-by: Qianchang Zhao <pioooooooooip@gmail.com>
+Reported-by: Zhitong Liu <liuzhitong1993@gmail.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Qianchang Zhao <pioooooooooip@gmail.com>
+---
+ net/nfc/llcp_core.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
+index beeb3b4d2..be01ec9f4 100644
+--- a/net/nfc/llcp_core.c
++++ b/net/nfc/llcp_core.c
+@@ -1089,6 +1089,7 @@ static void nfc_llcp_recv_hdlc(struct nfc_llcp_local *local,
+ 	if (sk->sk_state == LLCP_CLOSED) {
+ 		release_sock(sk);
+ 		nfc_llcp_sock_put(llcp_sock);
++		return;
+ 	}
+ 
+ 	/* Pass the payload upstream */
+-- 
+2.34.1
+
 
