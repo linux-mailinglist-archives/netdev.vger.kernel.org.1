@@ -1,89 +1,143 @@
-Return-Path: <netdev+bounces-245215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC287CC901F
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 18:17:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EECBCC91AB
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 18:43:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id A31B3304E569
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 17:05:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2421231765F9
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 17:33:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABCFB348445;
-	Wed, 17 Dec 2025 17:05:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F227834DCE7;
+	Wed, 17 Dec 2025 17:17:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="KEMDSHKt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XKNWmpy4"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01E5933EB01;
-	Wed, 17 Dec 2025 17:05:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A20AC32E738;
+	Wed, 17 Dec 2025 17:17:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765991112; cv=none; b=T/uCbCCWVD66SB7z5jXaUubV+ZYzz/K8xUNcG7oxonSG117KTsv3p+q5pnPeU/OqF+D13G/ebIR6vdZyTPI6qSuwx82h5p6yfTsmRXTWnd0HeKuJLddrlYxXREpFiYKcTr2wE5itSsrtQKxYd+6InuuolOm3LXvbJMMbm8+i8qI=
+	t=1765991821; cv=none; b=WknkRvP6E14DIw3A23fpUtgxBQuC0icK83SmOilgQTSicrH05rUFjRgcyEWL8x/6lqePMvc/TbyQ2Ar+4hIbdnmNHpJRFHzSqoRRB6cN+u5uk3yHQq1CXyC9Y1Tv660+Ng5UsUPTt9TkdHGFngspt5byBJTgMso64RXay2vlciI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765991112; c=relaxed/simple;
-	bh=hQUiowIqnPYoumnsju6v2Rby74tKXjQbS/1VFaVx75A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cKE9ynqDxlM6c92yGObXx7n3jOvh1gMdT+X50QiWy12/smFR+ktC/Cwysw6Rmmi8DvVez2619xGHqRlD5VUoDM2wfRGLfC9CuY4Xm1k4VHeTYoxzh8F8Hs9XaP6MJQHkWyAvYfUQaPXwUKv9gCUmMVd2LrzOBSCxltbQRhNiAVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=KEMDSHKt; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=JC/OAnrwflrdD+697YshlNQb8A1fVQJOhNEeBZnuY4o=; b=KEMDSHKtY0k0H+lZ6204QXDLnP
-	IYEaaMGQRmp17Vfxs3oERU9L65fhet7KbBQv7w/QQr2RfEnW6xjnQD7HJmAkkiUx4ffBxrV0xZ31X
-	gklJ2KmN8k/og0ipZ0Qbj3IuJ6MPuQEM6PrmEsODbiTRODjllsiDmLhsLxlyQq8Uu0k4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vVuxM-00HEmV-Az; Wed, 17 Dec 2025 18:04:56 +0100
-Date: Wed, 17 Dec 2025 18:04:56 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Stefan Eichenberger <eichest@gmail.com>
-Cc: Rob Herring <robh@kernel.org>, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, krzk+dt@kernel.org, conor+dt@kernel.org,
-	hkallweit1@gmail.com, linux@armlinux.org.uk,
-	geert+renesas@glider.be, ben.dooks@codethink.co.uk,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, francesco.dolcini@toradex.com,
-	rafael.beims@toradex.com,
-	Stefan Eichenberger <stefan.eichenberger@toradex.com>
-Subject: Re: [PATCH net-next v1 2/3] dt-bindings: net: micrel: Add
- keep-preamble-before-sfd
-Message-ID: <49385cb4-6ce9-4120-9dd6-c08d763f0564@lunn.ch>
-References: <20251212084657.29239-1-eichest@gmail.com>
- <20251212084657.29239-3-eichest@gmail.com>
- <20251215140330.GA2360845-robh@kernel.org>
- <aUJ-3v-OO0YYbEtu@eichest-laptop>
- <aUKgP4Hi-8tP9eaK@eichest-laptop>
- <20251217135519.GA767145-robh@kernel.org>
- <aUK-h6jDsng0Awjm@eichest-laptop>
+	s=arc-20240116; t=1765991821; c=relaxed/simple;
+	bh=nCNmapLXVkzx5G0AMg0w1rDB82qxLQX+MYjj3DhiKp4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=AiZY/ZPf75wMrtdt9O9/JSot46/bBFuvm4qwMh1wywMntlDh9kpUgatBLHaeBu5pbI5VhvCBq8z1B6nSmNyMWBHV1leBt5QWxAAMLphjWaQ0pGJvlkfwbJoJ1QD/rTKkvPEnbYURYqPDQmCJXL9S4G8BZa/kHYyEJ4qmKtrybJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XKNWmpy4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 62943C4CEF5;
+	Wed, 17 Dec 2025 17:17:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765991821;
+	bh=nCNmapLXVkzx5G0AMg0w1rDB82qxLQX+MYjj3DhiKp4=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=XKNWmpy4m79ww++MMmPrggUkdOn2gZ8gefp8Nh5CQsp/ZAqAGzKerSg95thiEkcOP
+	 NuB/EMl77H1Xmqn3WMCIRUZyy3bnCafUs+PG0ZcbmAXJst9RNckeI3KKu/b2lRKno1
+	 OL2+IZ2susK1SiaxP2rHvu8HgDWHsrmdTtFc3A6guRoc3kc+gL3YstQtU4AHQhNQGO
+	 TRYdvCbDVnkOo2JTKcPpPdkdedn6G6RoIdaudox8t0/6bIT5HfmRESsxR9MGZa24ql
+	 g8Ea5iBUWHxuWi6mLRl5T09AvLPHRcHAgpad9DDTy9BaxJoGKDR2mWDsnxxsYtocbm
+	 0KA4S7pZimAaw==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46B3CD65C53;
+	Wed, 17 Dec 2025 17:17:01 +0000 (UTC)
+From: Manivannan Sadhasivam via B4 Relay <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org>
+Subject: [PATCH 0/2] net: qrtr: Drop the MHI 'auto_queue' feature
+Date: Wed, 17 Dec 2025 22:46:50 +0530
+Message-Id: <20251217-qrtr-fix-v1-0-f6142a3ec9d8@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aUK-h6jDsng0Awjm@eichest-laptop>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAILlQmkC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDI1NDI0Nz3cKikiLdtMwK3WQDUwugWIpFimGiElB5QVEqUBhsVHRsbS0AovM
+ Jm1oAAAA=
+X-Change-ID: 20251217-qrtr-fix-c058251d8d1a
+To: Jeff Hugo <jeff.hugo@oss.qualcomm.com>, 
+ Carl Vanderlip <carl.vanderlip@oss.qualcomm.com>, 
+ Oded Gabbay <ogabbay@kernel.org>, Manivannan Sadhasivam <mani@kernel.org>, 
+ Jeff Johnson <jjohnson@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Loic Poulain <loic.poulain@oss.qualcomm.com>, 
+ Maxim Kochetkov <fido_max@inbox.ru>
+Cc: linux-arm-msm@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+ linux-kernel@vger.kernel.org, mhi@lists.linux.dev, 
+ linux-wireless@vger.kernel.org, ath11k@lists.infradead.org, 
+ ath12k@lists.infradead.org, netdev@vger.kernel.org, 
+ Bjorn Andersson <andersson@kernel.org>, Johan Hovold <johan@kernel.org>, 
+ Chris Lew <quic_clew@quicinc.com>, 
+ Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>, 
+ stable@vger.kernel.org
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1833;
+ i=manivannan.sadhasivam@oss.qualcomm.com; h=from:subject:message-id;
+ bh=nCNmapLXVkzx5G0AMg0w1rDB82qxLQX+MYjj3DhiKp4=;
+ b=owEBbQGS/pANAwAKAVWfEeb+kc71AcsmYgBpQuWLGsKVi00BM9j9k2fzmDyfhFZKHkWaVpwxL
+ mEyD11ffiGJATMEAAEKAB0WIQRnpUMqgUjL2KRYJ5dVnxHm/pHO9QUCaULliwAKCRBVnxHm/pHO
+ 9dflCACJcSVT7YDyfd1eVp65ty6CysudUmNCdkpwxqBUbCrnGNo3J5HA5Hjn0fxfolTcFBBLQ07
+ NeDnBv7hbBbeyy/YGPc7B2nWrkzT2oE/O6mX1dmUEBSjUBVMBq+M2qerwQHpjy3mT6EmN+lLYuk
+ EoZKz4737MjFD7GJoeu4mMQuQOXQ86hQRcwpELNcqSYNc+8fep+/5IiIPQ2NgkCKu4cKF+CAANE
+ NmFlrFhiohovN3SfcwHdt4M3dZd2Klsd1aCphMoU9i8/gw1xIHR1cGHhWU1Y6+l7SUkLrL6jBh+
+ YTWv2owV7o/wUYhLImCgqMf3xtU5X3/Kt/L/XHl60z1w9ez8
+X-Developer-Key: i=manivannan.sadhasivam@oss.qualcomm.com; a=openpgp;
+ fpr=C668AEC3C3188E4C611465E7488550E901166008
+X-Endpoint-Received: by B4 Relay for
+ manivannan.sadhasivam@oss.qualcomm.com/default with auth_id=461
+X-Original-From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+Reply-To: manivannan.sadhasivam@oss.qualcomm.com
 
-> > I think the ideal implementation would be the MAC driver calling some 
-> > phy API to apply the quirk, and then that gets passed on to the phy 
-> > driver. Surely this isn't the first case of a MAC-PHY combination 
-> > needing to go fiddle with some special setting.
-> 
-> I was also hoping to find something like that, but I couldn't really
-> find it. However, I will try looking in that direction. At least we can
-> identify the broken MAC via the compatible string of the MAC driver, as
-> they use two different compatibles: 'fsl,imx8mp-fec' (fine) and
-> 'nxp,imx8mp-dwmac-eqos' (affected by the errata).
+Hi,
 
-Maybe see if you can use phy_register_fixup_for_id().
+This series intends to fix the race between the MHI stack and the MHI client
+drivers due to the MHI 'auto_queue' feature. As it turns out often, the best
+way to fix an issue in a feature is to drop the feature itself and this series
+does exactly that.
 
-	Andrew
+There is no real benefit in having the 'auto_queue' feature in the MHI stack,
+other than saving a few lines of code in the client drivers. Since the QRTR is
+the only client driver which makes use of this feature, this series reworks the
+QRTR driver to manage the buffer on its own.
+
+Testing
+=======
+
+Tested on Qcom X1E based Lenovo Thinkpad T14s laptop with WLAN device.
+
+Merge Strategy
+==============
+
+Since this series modifies many subsystem drivers, I'd like to get acks from
+relevant subsystem maintainers and take the series through MHI tree.
+
+Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+---
+Manivannan Sadhasivam (2):
+      net: qrtr: Drop the MHI auto_queue feature for IPCR DL channels
+      bus: mhi: host: Drop the auto_queue support
+
+ drivers/accel/qaic/mhi_controller.c   | 44 -------------------
+ drivers/bus/mhi/host/init.c           | 10 -----
+ drivers/bus/mhi/host/internal.h       |  3 --
+ drivers/bus/mhi/host/main.c           | 81 +----------------------------------
+ drivers/bus/mhi/host/pci_generic.c    | 20 +--------
+ drivers/net/wireless/ath/ath11k/mhi.c |  4 --
+ drivers/net/wireless/ath/ath12k/mhi.c |  4 --
+ include/linux/mhi.h                   | 14 ------
+ net/qrtr/mhi.c                        | 67 ++++++++++++++++++++++++-----
+ 9 files changed, 60 insertions(+), 187 deletions(-)
+---
+base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
+change-id: 20251217-qrtr-fix-c058251d8d1a
+
+Best regards,
+-- 
+Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+
+
 
