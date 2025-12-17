@@ -1,327 +1,153 @@
-Return-Path: <netdev+bounces-245218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5842CC9100
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 18:31:47 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3ECDCC92D7
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 19:03:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 8BFC53009489
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 17:31:46 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2559A3006FDA
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 18:03:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A9A334DCFC;
-	Wed, 17 Dec 2025 17:17:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A8E52264A7;
+	Wed, 17 Dec 2025 18:03:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ppv9FTuW"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="LjoJGj2l"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C58AD34D4E3;
-	Wed, 17 Dec 2025 17:17:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D73CC221F15;
+	Wed, 17 Dec 2025 18:03:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765991821; cv=none; b=TSKKSH1iyBtnCpk8BYRY07ME2HC3fCN5kGfl3kPxHs9hhh+xcKmaUHIYbJ49h7ndvi8xEx1QTHes85QT7XRNjc7T+dzg+raB81wVq48KczR9aRLjMf7kEI8bUHuW0kM60ZwJq9kQ+6STyxPi77wi9X5KfRNfWITCYjHBko4VXCk=
+	t=1765994598; cv=none; b=P2astcdnloZInqBuM7gq/0A9QobtnPUZfkafeIvBmzV8v690VsVhkkGqaUltXhF21rI/lJDQbtNVazNgGr6FGv5xCAFl4vtS2VpX04s/PfTlq0zMYjopDKciKsgB+vtRm4ZLoCeAcQ4dACcOFbasALv2hPJuQcZKcgY53+vJjR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765991821; c=relaxed/simple;
-	bh=AD7dDXAD3itkjdYA9TfORuuV9wOhDa/AZUPfi5Hae9k=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=KhXdXDPH+BAvzHv9QW/qPxEdO/T9Tg9aUqurGdAE2SIjB58qGmxo12mLUCyKd/HOpYlFCILIxFWCRW+9wswoat6cwTi6iAzMzZ6s8SHVXnVWjJKxg4zIbWkii2Iy6AvkhUe9syBM+IuvXVR1Zblw+PKVGyEW+PbHNvlLOMiSCoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ppv9FTuW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8CEB6C19421;
-	Wed, 17 Dec 2025 17:17:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765991821;
-	bh=AD7dDXAD3itkjdYA9TfORuuV9wOhDa/AZUPfi5Hae9k=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=ppv9FTuWEHdNKSoznW2U69F+f/KnzH91SZNCxEErTRR1CUqHGWGh32PIpm3SAA8Y0
-	 dol7hmh3gMleLRiECS98M48jEoWvrA1HfLm7LWPAWi1g5yN6xZwqYrxTorabcRTkM5
-	 RPzTj2w9GKDBT4EGQDRe99d/bdVB4O+Lo8u/eFQWLFLf6p2fnE5Y3+b5BHp8dVnz+g
-	 K7kgeVSMmW37lHg9Vjm2rpEhq/UtoKBauSgTlBa46GYVi2q1dEVbOflfpbJCbsDGrQ
-	 KDd7J1dj56t77HsDCa9X50CdMLzcXAOgBTDzrtrJHUnJKvUXfY28BmLoTtXYs585Oz
-	 wZH32/DEmyPXg==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DFD2D65C7D;
-	Wed, 17 Dec 2025 17:17:01 +0000 (UTC)
-From: Manivannan Sadhasivam via B4 Relay <devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org>
-Date: Wed, 17 Dec 2025 22:46:52 +0530
-Subject: [PATCH 2/2] bus: mhi: host: Drop the auto_queue support
+	s=arc-20240116; t=1765994598; c=relaxed/simple;
+	bh=uSceWFaMRv/vLMPCIs0E55jB2q/opgZHsOR3k2RQotQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bralHANW0UOWCEJdl+krewqikHtzGDEhLJXnb5OXZmo+Xbx6oCHdKhcokJgcCPkR6SgTLX8oKcX5qUbkeShfi3gV4ZlA348j01i6DcbpiR18YhM5nXP82BP19uYlucMgdyBHgilc8QYDxW/JVCauJrEQrN5a+T0lRQmO/ytKcQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=LjoJGj2l; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5BHBKDBo029270;
+	Wed, 17 Dec 2025 18:03:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=XG2ZaD
+	P/0AFoPQxBvishTBzsRDMVjKNentwRDxaL4vw=; b=LjoJGj2lFq8zdtZO9fMctl
+	FraF6ARa5T28kg3oJj4h2q8uxZJek962cc6a4ZiDBhNJ5JBFb8U1iBCwvtGWHXd9
+	ezb5PBo2m7GOsgrSjmaZGxQjS3In52l58CgAAhQqJpAc1PNjaI6KtfzmUx9vezi4
+	j+r8RdJ2vLV2EGhjI+BElUND4FCBsPEH2HMPMTAWV7BWU5MfVrKKDZWXks10/Was
+	cH4CMkYlheJ9qvGQLox6BXo5W0kLwr417+KRhJlv55p0RqyP6RD8yTFsEA/zDyMg
+	vMpTjt6NJ5NWQccmiRwccNIQxAacFxDEKPzPHkvic/M2jkMsKI0yBUZHZjODO+yg
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4b0ytvegdn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 17 Dec 2025 18:03:11 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5BHHvItn021490;
+	Wed, 17 Dec 2025 18:03:10 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4b0ytvegdg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 17 Dec 2025 18:03:10 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5BHFXdp6005762;
+	Wed, 17 Dec 2025 18:03:09 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4b1tgp2fcn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 17 Dec 2025 18:03:09 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5BHI38uU9437558
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 17 Dec 2025 18:03:08 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 059DA2004B;
+	Wed, 17 Dec 2025 18:03:08 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 51B5420040;
+	Wed, 17 Dec 2025 18:03:06 +0000 (GMT)
+Received: from [9.124.209.67] (unknown [9.124.209.67])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 17 Dec 2025 18:03:05 +0000 (GMT)
+Message-ID: <e9f4abee-b132-440f-a50e-bced0868b5a7@linux.ibm.com>
+Date: Wed, 17 Dec 2025 23:33:04 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [REPORT] Null pointer deref in net/core/dev.c on PowerPC
+To: Eric Dumazet <edumazet@google.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <q3j7p3zkhipxleesykpfrfhznasqnn6mnfqlcphponzvsyavxf@a6ko6obdpso3>
+ <CANn89i+8hX9SjbhR2GOe+RfEkeksKCtPbkz-6pQhCA=pjnr5zg@mail.gmail.com>
+ <CANn89iKUQXmR6uaxVJDi=c3iTgtHbVaTQfRZ_w-YsPywS-fHaw@mail.gmail.com>
+ <CANn89iJj_Vyt2g6QewwaNAXAZ+0iso=4yj0t3U11V_nuUk4ThQ@mail.gmail.com>
+Content-Language: en-US
+From: Aditya Gupta <adityag@linux.ibm.com>
+In-Reply-To: <CANn89iJj_Vyt2g6QewwaNAXAZ+0iso=4yj0t3U11V_nuUk4ThQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251217-qrtr-fix-v1-2-f6142a3ec9d8@oss.qualcomm.com>
-References: <20251217-qrtr-fix-v1-0-f6142a3ec9d8@oss.qualcomm.com>
-In-Reply-To: <20251217-qrtr-fix-v1-0-f6142a3ec9d8@oss.qualcomm.com>
-To: Jeff Hugo <jeff.hugo@oss.qualcomm.com>, 
- Carl Vanderlip <carl.vanderlip@oss.qualcomm.com>, 
- Oded Gabbay <ogabbay@kernel.org>, Manivannan Sadhasivam <mani@kernel.org>, 
- Jeff Johnson <jjohnson@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- Loic Poulain <loic.poulain@oss.qualcomm.com>, 
- Maxim Kochetkov <fido_max@inbox.ru>
-Cc: linux-arm-msm@vger.kernel.org, dri-devel@lists.freedesktop.org, 
- linux-kernel@vger.kernel.org, mhi@lists.linux.dev, 
- linux-wireless@vger.kernel.org, ath11k@lists.infradead.org, 
- ath12k@lists.infradead.org, netdev@vger.kernel.org, 
- Bjorn Andersson <andersson@kernel.org>, Johan Hovold <johan@kernel.org>, 
- Chris Lew <quic_clew@quicinc.com>, 
- Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-X-Mailer: b4 0.14.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=7752;
- i=manivannan.sadhasivam@oss.qualcomm.com; h=from:subject:message-id;
- bh=VV1/Ikl0OH6lDMHohEMkdP14WyebiuRyo/ktlKpfYQ0=;
- b=owEBbQGS/pANAwAKAVWfEeb+kc71AcsmYgBpQuWLymmyGTbV8eF0fjUIB0p3YI1DhyQBE4klb
- 8kCicS1Oa2JATMEAAEKAB0WIQRnpUMqgUjL2KRYJ5dVnxHm/pHO9QUCaULliwAKCRBVnxHm/pHO
- 9f8NB/4pb1tI5jOjRcvH7nqMIvhr0IshwN2BGFpgymF6Pqg2ovOgSWiITOPGtpgeDwuTeuMofNq
- VJ+zsH8/hmSDmNuIfbb1uRzu3xNiBI50/5Knqw99RFdVu5wer7HL+F9AsG/4tuh7igH/VofxnoJ
- 7JaDGbVyajrKnkuLP7A0/kKjCFTc+eWFeWWWZnIHgq/2k2tp8G2raOmrquJSqExOMYt9CIhm89p
- m4oHnZgqmlWMm9dg8glTibgBM1xYkOfgk99G5XczRPLbt5q5fPVG+fPGghyJc5IvpMBVGfW2u0l
- O8fcUyy/ZqUf3iCP/Tu5EBZc5GzfGRIpRrq2Gl+h8CCjmaLr
-X-Developer-Key: i=manivannan.sadhasivam@oss.qualcomm.com; a=openpgp;
- fpr=C668AEC3C3188E4C611465E7488550E901166008
-X-Endpoint-Received: by B4 Relay for
- manivannan.sadhasivam@oss.qualcomm.com/default with auth_id=461
-X-Original-From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-Reply-To: manivannan.sadhasivam@oss.qualcomm.com
+X-TM-AS-GCONF: 00
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjEzMDAyMyBTYWx0ZWRfX38k9md9b5tOx
+ 4rqYENnyq5njkddUEFOOkHgtXoHcQ12NYcP4sjeIPA2qKLSXg750fLZ+9bh4Wju5/mpAh/pusNZ
+ e3GKeJ3GsWPpSGdhcWJaol0qSU44FxMip+nWIeLHUJ5DMxPOLri0ibxumHd2vi0nVS2H7sYTJZ6
+ iCOkybDQ7wnQ/7iUHWYgTSk79LvkCFjjylW3/asbYBCmQBfwlO8ruFDvHnSs9IQEA07TOdPmLxJ
+ R/Fa+g1tJE7Wg185HjaioYcg9WAtDzZadWVTNpTzDWPxVNn6bucvligkvM36JmM1X0GsVJe+BiX
+ KbTFI090QDwljWZWbxNzD+Ynr9liL1+er7I2p7OWQyMP/rAIm6/3Ee3ID9NnwrT4fnZbsyDX+Qd
+ 3DDyOR60isfjulQ7GO1A1hYOFU9o1w==
+X-Proofpoint-ORIG-GUID: 7ZmvwSR6rZJDkQ5BBXspCaRkehw7umBt
+X-Authority-Analysis: v=2.4 cv=QtRTHFyd c=1 sm=1 tr=0 ts=6942f05f cx=c_pps
+ a=aDMHemPKRhS1OARIsFnwRA==:117 a=aDMHemPKRhS1OARIsFnwRA==:17
+ a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VtXhkl1E8SHrIERY0sQA:9 a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: Pj43X6vaWNCRcmx2CqDTyZ3JHc3RgHm4
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-12-17_03,2025-12-16_05,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 adultscore=0 malwarescore=0 lowpriorityscore=0 spamscore=0
+ priorityscore=1501 bulkscore=0 suspectscore=0 impostorscore=0 clxscore=1015
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2512130023
 
-From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+On 17/12/25 20:11, Eric Dumazet wrote:
 
-Now that the only user of the 'auto_queue' feature, (QRTR) has been
-converted to manage the buffers on its own, drop the code related to it.
+> <...snip...>
+>
+> I will send the following fix, thanks.
+>
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 9094c0fb8c68..36dc5199037e 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -4241,9 +4241,11 @@ static inline int __dev_xmit_skb(struct sk_buff
+> *skb, struct Qdisc *q,
+>                  int count = 0;
+>
+>                  llist_for_each_entry_safe(skb, next, ll_list, ll_node) {
+> -                       prefetch(next);
+> -                       prefetch(&next->priority);
+> -                       skb_mark_not_on_list(skb);
+> +                       if (next) {
+> +                               prefetch(next);
+> +                               prefetch(&next->priority);
+> +                               skb_mark_not_on_list(skb);
+> +                       }
+>                          rc = dev_qdisc_enqueue(skb, q, &to_free, txq);
+>                          count++;
+>                  }
 
-Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
----
- drivers/bus/mhi/host/init.c     | 10 -----
- drivers/bus/mhi/host/internal.h |  3 --
- drivers/bus/mhi/host/main.c     | 81 +----------------------------------------
- include/linux/mhi.h             | 14 -------
- 4 files changed, 2 insertions(+), 106 deletions(-)
+Thanks for the quick fix Eric !
 
-diff --git a/drivers/bus/mhi/host/init.c b/drivers/bus/mhi/host/init.c
-index 099be8dd1900..b020a6489c07 100644
---- a/drivers/bus/mhi/host/init.c
-+++ b/drivers/bus/mhi/host/init.c
-@@ -841,18 +841,8 @@ static int parse_ch_cfg(struct mhi_controller *mhi_cntrl,
- 		mhi_chan->lpm_notify = ch_cfg->lpm_notify;
- 		mhi_chan->offload_ch = ch_cfg->offload_channel;
- 		mhi_chan->db_cfg.reset_req = ch_cfg->doorbell_mode_switch;
--		mhi_chan->pre_alloc = ch_cfg->auto_queue;
- 		mhi_chan->wake_capable = ch_cfg->wake_capable;
- 
--		/*
--		 * If MHI host allocates buffers, then the channel direction
--		 * should be DMA_FROM_DEVICE
--		 */
--		if (mhi_chan->pre_alloc && mhi_chan->dir != DMA_FROM_DEVICE) {
--			dev_err(dev, "Invalid channel configuration\n");
--			goto error_chan_cfg;
--		}
--
- 		/*
- 		 * Bi-directional and direction less channel must be an
- 		 * offload channel
-diff --git a/drivers/bus/mhi/host/internal.h b/drivers/bus/mhi/host/internal.h
-index 7937bb1f742c..7b0ee5e3a12d 100644
---- a/drivers/bus/mhi/host/internal.h
-+++ b/drivers/bus/mhi/host/internal.h
-@@ -286,7 +286,6 @@ struct mhi_chan {
- 	bool lpm_notify;
- 	bool configured;
- 	bool offload_ch;
--	bool pre_alloc;
- 	bool wake_capable;
- };
- 
-@@ -389,8 +388,6 @@ int mhi_rddm_prepare(struct mhi_controller *mhi_cntrl,
- 		      struct image_info *img_info);
- void mhi_fw_load_handler(struct mhi_controller *mhi_cntrl);
- 
--/* Automatically allocate and queue inbound buffers */
--#define MHI_CH_INBOUND_ALLOC_BUFS BIT(0)
- int mhi_init_chan_ctxt(struct mhi_controller *mhi_cntrl,
- 		       struct mhi_chan *mhi_chan);
- void mhi_deinit_chan_ctxt(struct mhi_controller *mhi_cntrl,
-diff --git a/drivers/bus/mhi/host/main.c b/drivers/bus/mhi/host/main.c
-index 861551274319..53c0ffe30070 100644
---- a/drivers/bus/mhi/host/main.c
-+++ b/drivers/bus/mhi/host/main.c
-@@ -664,23 +664,6 @@ static int parse_xfer_event(struct mhi_controller *mhi_cntrl,
- 				mhi_cntrl->runtime_put(mhi_cntrl);
- 			}
- 
--			/*
--			 * Recycle the buffer if buffer is pre-allocated,
--			 * if there is an error, not much we can do apart
--			 * from dropping the packet
--			 */
--			if (mhi_chan->pre_alloc) {
--				if (mhi_queue_buf(mhi_chan->mhi_dev,
--						  mhi_chan->dir,
--						  buf_info->cb_buf,
--						  buf_info->len, MHI_EOT)) {
--					dev_err(dev,
--						"Error recycling buffer for chan:%d\n",
--						mhi_chan->chan);
--					kfree(buf_info->cb_buf);
--				}
--			}
--
- 			read_lock_bh(&mhi_chan->lock);
- 		}
- 		break;
-@@ -1177,17 +1160,12 @@ static int mhi_queue(struct mhi_device *mhi_dev, struct mhi_buf_info *buf_info,
- int mhi_queue_skb(struct mhi_device *mhi_dev, enum dma_data_direction dir,
- 		  struct sk_buff *skb, size_t len, enum mhi_flags mflags)
- {
--	struct mhi_chan *mhi_chan = (dir == DMA_TO_DEVICE) ? mhi_dev->ul_chan :
--							     mhi_dev->dl_chan;
- 	struct mhi_buf_info buf_info = { };
- 
- 	buf_info.v_addr = skb->data;
- 	buf_info.cb_buf = skb;
- 	buf_info.len = len;
- 
--	if (unlikely(mhi_chan->pre_alloc))
--		return -EINVAL;
--
- 	return mhi_queue(mhi_dev, &buf_info, dir, mflags);
- }
- EXPORT_SYMBOL_GPL(mhi_queue_skb);
-@@ -1472,45 +1450,6 @@ static int mhi_prepare_channel(struct mhi_controller *mhi_cntrl,
- 	if (ret)
- 		goto error_pm_state;
- 
--	if (mhi_chan->dir == DMA_FROM_DEVICE)
--		mhi_chan->pre_alloc = !!(flags & MHI_CH_INBOUND_ALLOC_BUFS);
--
--	/* Pre-allocate buffer for xfer ring */
--	if (mhi_chan->pre_alloc) {
--		int nr_el = get_nr_avail_ring_elements(mhi_cntrl,
--						       &mhi_chan->tre_ring);
--		size_t len = mhi_cntrl->buffer_len;
--
--		while (nr_el--) {
--			void *buf;
--			struct mhi_buf_info info = { };
--
--			buf = kmalloc(len, GFP_KERNEL);
--			if (!buf) {
--				ret = -ENOMEM;
--				goto error_pre_alloc;
--			}
--
--			/* Prepare transfer descriptors */
--			info.v_addr = buf;
--			info.cb_buf = buf;
--			info.len = len;
--			ret = mhi_gen_tre(mhi_cntrl, mhi_chan, &info, MHI_EOT);
--			if (ret) {
--				kfree(buf);
--				goto error_pre_alloc;
--			}
--		}
--
--		read_lock_bh(&mhi_cntrl->pm_lock);
--		if (MHI_DB_ACCESS_VALID(mhi_cntrl)) {
--			read_lock_irq(&mhi_chan->lock);
--			mhi_ring_chan_db(mhi_cntrl, mhi_chan);
--			read_unlock_irq(&mhi_chan->lock);
--		}
--		read_unlock_bh(&mhi_cntrl->pm_lock);
--	}
--
- 	mutex_unlock(&mhi_chan->mutex);
- 
- 	return 0;
-@@ -1522,12 +1461,6 @@ static int mhi_prepare_channel(struct mhi_controller *mhi_cntrl,
- error_init_chan:
- 	mutex_unlock(&mhi_chan->mutex);
- 
--	return ret;
--
--error_pre_alloc:
--	mutex_unlock(&mhi_chan->mutex);
--	mhi_unprepare_channel(mhi_cntrl, mhi_chan);
--
- 	return ret;
- }
- 
-@@ -1600,12 +1533,8 @@ static void mhi_reset_data_chan(struct mhi_controller *mhi_cntrl,
- 		mhi_del_ring_element(mhi_cntrl, buf_ring);
- 		mhi_del_ring_element(mhi_cntrl, tre_ring);
- 
--		if (mhi_chan->pre_alloc) {
--			kfree(buf_info->cb_buf);
--		} else {
--			result.buf_addr = buf_info->cb_buf;
--			mhi_chan->xfer_cb(mhi_chan->mhi_dev, &result);
--		}
-+		result.buf_addr = buf_info->cb_buf;
-+		mhi_chan->xfer_cb(mhi_chan->mhi_dev, &result);
- 	}
- }
- 
-@@ -1666,12 +1595,6 @@ int mhi_prepare_for_transfer(struct mhi_device *mhi_dev)
- }
- EXPORT_SYMBOL_GPL(mhi_prepare_for_transfer);
- 
--int mhi_prepare_for_transfer_autoqueue(struct mhi_device *mhi_dev)
--{
--	return __mhi_prepare_for_transfer(mhi_dev, MHI_CH_INBOUND_ALLOC_BUFS);
--}
--EXPORT_SYMBOL_GPL(mhi_prepare_for_transfer_autoqueue);
--
- void mhi_unprepare_from_transfer(struct mhi_device *mhi_dev)
- {
- 	struct mhi_controller *mhi_cntrl = mhi_dev->mhi_cntrl;
-diff --git a/include/linux/mhi.h b/include/linux/mhi.h
-index dd372b0123a6..88ccb3e14f48 100644
---- a/include/linux/mhi.h
-+++ b/include/linux/mhi.h
-@@ -215,7 +215,6 @@ enum mhi_db_brst_mode {
-  * @lpm_notify: The channel master requires low power mode notifications
-  * @offload_channel: The client manages the channel completely
-  * @doorbell_mode_switch: Channel switches to doorbell mode on M0 transition
-- * @auto_queue: Framework will automatically queue buffers for DL traffic
-  * @wake-capable: Channel capable of waking up the system
-  */
- struct mhi_channel_config {
-@@ -232,7 +231,6 @@ struct mhi_channel_config {
- 	bool lpm_notify;
- 	bool offload_channel;
- 	bool doorbell_mode_switch;
--	bool auto_queue;
- 	bool wake_capable;
- };
- 
-@@ -743,18 +741,6 @@ void mhi_device_put(struct mhi_device *mhi_dev);
-  */
- int mhi_prepare_for_transfer(struct mhi_device *mhi_dev);
- 
--/**
-- * mhi_prepare_for_transfer_autoqueue - Setup UL and DL channels with auto queue
-- *                                      buffers for DL traffic
-- * @mhi_dev: Device associated with the channels
-- *
-- * Allocate and initialize the channel context and also issue the START channel
-- * command to both channels. Channels can be started only if both host and
-- * device execution environments match and channels are in a DISABLED state.
-- * The MHI core will automatically allocate and queue buffers for the DL traffic.
-- */
--int mhi_prepare_for_transfer_autoqueue(struct mhi_device *mhi_dev);
--
- /**
-  * mhi_unprepare_from_transfer - Reset UL and DL channels for data transfer.
-  *                               Issue the RESET channel command and let the
-
--- 
-2.48.1
-
+- Aditya G
 
 
