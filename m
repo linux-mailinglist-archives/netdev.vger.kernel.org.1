@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-245073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D8BBCC6A57
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 09:45:59 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 761ECCC6A53
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 09:45:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 149683019BCB
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 08:45:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 29E8D3042B06
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 08:45:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D187D33B6D2;
-	Wed, 17 Dec 2025 08:45:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3FEF33B946;
+	Wed, 17 Dec 2025 08:45:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="okNe3fen"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="cgzbhcHm"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 712BD271A7B;
-	Wed, 17 Dec 2025 08:45:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24D4D281368;
+	Wed, 17 Dec 2025 08:45:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765961110; cv=none; b=YybDgCYeQJ+7/4m7DK2tk537/4sFp6/6/6PrY349tHMbIwm3yANDLwfMaApf05fs+ywEdeS7eSfy3zMKwuTndtrMLlYTc/e0+LaWI/lw682VbUmcfW7V+v0sICVR//HnJKiSpDpJaLmEfmO0eH+WH7CxZ9RJjrw4YGPKzQe8Yrg=
+	t=1765961112; cv=none; b=L//ByDmR1v7ogtNIbe4G/gbkrlryXxkRK9VIUp/BfpSdOiOXG4aCp8QOrH2fx6erJBxjZENdeViaLP8Mq7J4xmNq6IOQH3xe2sJpjlNFnfBgnKZHv4DHMqry4LGBI0HaX9bH4GPVjwMNLFXOHB/L0TR8OOLjoNlIjfiNSAQz1nQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765961110; c=relaxed/simple;
-	bh=o/w3owZuG+CxQo+msQdq071q//SHp4ra6FMBF+UNC2g=;
+	s=arc-20240116; t=1765961112; c=relaxed/simple;
+	bh=uyE2FB3W0UUHglg+Lbzoo++q97wFy5hvhxjHDXmhHrI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hJXBjo3UYih1Y6Ldx2xloRaCNyHmI9XnTUx41nFYOjzBAy6FwFI/QdoKAyNTBXcxiz3ZiSS9T8pYkDpZBXJQCfqZ08KieMLH0qP7rnlRwbT7dzum6CCYozfCusZ9meO5B2j5B34JmnRiuMDGnPUwHRKKPkBW7OUqWObpxmpuJdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=okNe3fen; arc=none smtp.client-ip=117.135.210.3
+	 MIME-Version; b=WzKywMyubGIRd/10KU6oPLzr60ILLye5gJGU1lc9nuozuJoPA19aiy/7FO/hXfvRuYRDx0u2BUxlS2eqagDGhoFqf7PGuTJagv4ObKC3wQti+zblsyhCAV+Uysf3744qk92ZEIS42C0SkCmLd4WEq4x/OGppGWpFcDGL/2hMHOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=cgzbhcHm; arc=none smtp.client-ip=220.197.31.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=a0
-	daBDYGRYqdbsbo55Y/5vbulZQ8GSPXdvblgAof10s=; b=okNe3fenktW1mXoz0A
-	+hL7gPBGRDWaCHZVLwHXb1u9dwAojXVm/Fh/oP19Ejg4gMPkhEgx5utGrPsggmir
-	SgRNbpFXPXqMF6ZAGJHGL4XeJJYuPCkoGeEk2lKlWm4yM+954/s6NudeGboyqfEz
-	V+1gHT5yUeGCeCiQOXT/k8Am4=
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version; bh=Ke
+	jZjpTs2z1nHnBhKeAa5cYW+32jLZLXvvWN/3sqCvU=; b=cgzbhcHmrxc8S+B2C+
+	QROdT/0WEz4uUbhCtqsdUiAmXEmOKe+K33ipMusu6+tVrDEjMI4Irc3vbkqpkhi4
+	w7OOxGg5h2XDrZ2lf0f7YzwpY6eeSUS3r/LBRcUKLlynD0K6++PJr1ZWFdvl9wxj
+	pY9rV6mNSDYjNz9fBiYq6J9q8=
 Received: from xwm-TianYi510Pro-14IMB.. (unknown [])
-	by gzga-smtp-mtada-g0-4 (Coremail) with SMTP id _____wDnwYJnbUJpSC+YAw--.48902S8;
+	by gzga-smtp-mtada-g0-4 (Coremail) with SMTP id _____wDnwYJnbUJpSC+YAw--.48902S9;
 	Wed, 17 Dec 2025 16:44:26 +0800 (CST)
 From: Xiong Weimin <15927021679@163.com>
 To: Alexei Starovoitov <ast@kernel.org>,
@@ -49,9 +49,9 @@ To: Alexei Starovoitov <ast@kernel.org>,
 Cc: linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	xiongweimin <xiongweimin@kylinos.cn>
-Subject: [PATCH 03/14] examples/vhost_user_rdma: implement create and destroy completion queue commands
-Date: Wed, 17 Dec 2025 16:43:29 +0800
-Message-ID: <20251217084422.4875-5-15927021679@163.com>
+Subject: [PATCH 04/14] examples/vhost_user_rdma: implement protection domain create/destroy commands
+Date: Wed, 17 Dec 2025 16:43:30 +0800
+Message-ID: <20251217084422.4875-6-15927021679@163.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251217084422.4875-1-15927021679@163.com>
 References: <20251217084422.4875-1-15927021679@163.com>
@@ -62,93 +62,76 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDnwYJnbUJpSC+YAw--.48902S8
-X-Coremail-Antispam: 1Uf129KBjvJXoWxWrykKFyrJry3KF1kGw4kWFg_yoW7JF18pa
-	1Igw13WrW2qr17C3sFyw4Du3W3X3yrAry7JrZ3K3Z8tF15Krn5AaykC3Wjyr43tFW7Jr1x
-	XFyUtFyrCF13A3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jnZ2-UUUUU=
-X-CM-SenderInfo: jprvmjixqsilmxzbiqqrwthudrp/xtbC9Apg6GlCbWoPLQAA34
+X-CM-TRANSID:_____wDnwYJnbUJpSC+YAw--.48902S9
+X-Coremail-Antispam: 1Uf129KBjvJXoWxJF1xKr1DKF1ruFyfZF43KFg_yoWrCFy8pF
+	1Igw13WrZrtr17GwsFkw4DZF1fWr4rAry7GFs3G3Z5tF1jyrn5Aa1kCa1jkF4UGFW7Arn7
+	X3WUtFyrCF13Z37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jnCztUUUUU=
+X-CM-SenderInfo: jprvmjixqsilmxzbiqqrwthudrp/xtbC8wpg6GlCbWoSVwAA3Y
 
 From: xiongweimin <xiongweimin@kylinos.cn>
 
-This commit adds core functionality for managing RDMA Completion Queues (CQs):
-1. CREATE_CQ command handler with resource allocation and initialization
-2. DESTROY_CQ command with safe teardown procedures
-3. Reference counting for lifecycle management
-4. Concurrency control via spinlocks
-5. Integration with device resource pools
+Added core functionality for managing RDMA Protection Domains (PDs):
+1. CREATE_PD command for resource allocation and initialization
+2. DESTROY_PD command with reference-counted teardown
+3. Integration with device-specific PD resource pool
+4. Minimalist state management for security domains
+5. Robust input validation and error handling
 
 Key features:
-- Strict validation of CQ size against device capabilities
-- Atomic state management with `is_dying` flag
-- Virtual queue index reset during destruction
-- Error logging for allocation failures
+- PD identifier (pdn) generation and return to guest
+- Atomic reference counting for lifecycle management
+- Device association for resource tracking
 - Memory-safe buffer handling with CHK_IOVEC
+- ENOMEM handling for allocation failures
 
-Signed-off-by: xiongweimin <xiongweimin@kylinos.cn>
-Change-Id: Ie4b51c90f36a1ceadfe4dbc622dc6fcaaaaf4261
+Signed-off-by: Xiong Weimin<xiongweimin@kylinos.cn>
+Change-Id: I36d841a76067813c1880069c71b2eba90337609b
 ---
- examples/vhost_user_rdma/vhost_rdma_ib.c | 59 +++++++++++++++++++++++-
- examples/vhost_user_rdma/vhost_rdma_ib.h | 33 ++++++++++++-
- 2 files changed, 89 insertions(+), 3 deletions(-)
+ examples/vhost_user_rdma/vhost_rdma_ib.c | 38 ++++++++++++++++++++++++
+ examples/vhost_user_rdma/vhost_rdma_ib.h | 30 +++++++++----------
+ 2 files changed, 53 insertions(+), 15 deletions(-)
 
 diff --git a/examples/vhost_user_rdma/vhost_rdma_ib.c b/examples/vhost_user_rdma/vhost_rdma_ib.c
-index edb6e3fea3..5ec0de8ae7 100644
+index 5ec0de8ae7..e590b555d3 100644
 --- a/examples/vhost_user_rdma/vhost_rdma_ib.c
 +++ b/examples/vhost_user_rdma/vhost_rdma_ib.c
-@@ -563,13 +563,68 @@ vhost_rdma_query_port(__rte_unused struct vhost_rdma_device *dev,
+@@ -616,6 +616,42 @@ vhost_rdma_destroy_cq(struct vhost_rdma_device *dev, struct iovec *in, CTRL_NO_R
  	return 0;
  }
  
 +static int
-+vhost_rdma_create_cq(struct vhost_rdma_device *dev,
-+					struct iovec *in,
-+					struct iovec *out)
++vhost_rdma_create_pd(struct vhost_rdma_device *dev, CTRL_NO_CMD, struct iovec *out)
 +{
-+	struct vhost_rdma_cmd_create_cq *create_cmd;
-+	struct vhost_rdma_ack_create_cq *create_rsp;
-+	struct vhost_rdma_cq *cq;
-+	uint32_t cqn;
-+
-+	CHK_IOVEC(create_cmd, in);
-+	if (create_cmd->cqe > dev->attr.max_cqe)
-+		return -EINVAL;
++	struct vhost_rdma_ack_create_pd *create_rsp;
++	struct vhost_rdma_pd *pd;
++	uint32_t idx;
 +
 +	CHK_IOVEC(create_rsp, out);
 +
-+	cq = vhost_rdma_pool_alloc(&dev->cq_pool, &cqn);
-+	if (cq == NULL) {
-+		RDMA_LOG_ERR("cq alloc failed");
++	pd = vhost_rdma_pool_alloc(&dev->pd_pool, &idx);
++	if(pd == NULL) {
++		return -ENOMEM;
 +	}
-+	vhost_rdma_ref_init(cq);
++	vhost_rdma_ref_init(pd);
 +
-+	rte_spinlock_init(&cq->cq_lock);
-+	cq->is_dying = false;
-+	cq->notify = 0;
-+	cq->vq = &dev->cq_vqs[cqn];
-+	cq->cqn = cqn;
-+	create_rsp->cqn = cqn;
++	pd->dev = dev;
++	pd->pdn = idx;
++	create_rsp->pdn = idx;
 +
 +	return 0;
 +}
 +
 +static int
-+vhost_rdma_destroy_cq(struct vhost_rdma_device *dev, struct iovec *in, CTRL_NO_RSP)
++vhost_rdma_destroy_pd(struct vhost_rdma_device *dev, struct iovec *in, CTRL_NO_RSP)
 +{
-+	struct vhost_rdma_cmd_destroy_cq *destroy_cmd;
-+	struct vhost_rdma_cq *cq;
++	struct vhost_rdma_cmd_destroy_pd *create_cmd;
++	struct vhost_rdma_pd *pd;
 +
-+	CHK_IOVEC(destroy_cmd, in);
++	CHK_IOVEC(create_cmd, in);
 +
-+	cq = vhost_rdma_pool_get(&dev->cq_pool, destroy_cmd->cqn);
-+
-+	rte_spinlock_lock(&cq->cq_lock);
-+	cq->is_dying = true;
-+	cq->vq->last_avail_idx = 0;
-+	cq->vq->last_used_idx = 0;
-+	rte_spinlock_unlock(&cq->cq_lock);
-+
-+	vhost_rdma_drop_ref(cq, dev, cq);
++	pd = vhost_rdma_pool_get(&dev->pd_pool, create_cmd->pdn);
++	vhost_rdma_drop_ref(pd, dev, pd);
 +
 +	return 0;
 +}
@@ -156,75 +139,79 @@ index edb6e3fea3..5ec0de8ae7 100644
  /* Command handler table declaration */
  struct {
  	int (*handler)(struct vhost_rdma_device *dev, struct iovec *in, struct iovec *out);
- 	const char *name;  /* Name of the command (for logging) */
- } cmd_tbl[] = {
--	DEFINE_VIRTIO_RDMA_CMD(VHOST_RDMA_CTRL_ROCE_QUERY_DEVICE, vhost_rdma_query_device),
--	DEFINE_VIRTIO_RDMA_CMD(VHOST_RDMA_CTRL_ROCE_QUERY_PORT, vhost_rdma_query_port),
-+	DEFINE_VIRTIO_RDMA_CMD(VHOST_RDMA_CTRL_ROCE_QUERY_DEVICE,			vhost_rdma_query_device),
-+	DEFINE_VIRTIO_RDMA_CMD(VHOST_RDMA_CTRL_ROCE_QUERY_PORT,				vhost_rdma_query_port),
-+	DEFINE_VIRTIO_RDMA_CMD(VHOST_RDMA_CTRL_ROCE_CREATE_CQ,				vhost_rdma_create_cq),
-+	DEFINE_VIRTIO_RDMA_CMD(VHOST_RDMA_CTRL_ROCE_DESTROY_CQ,				vhost_rdma_destroy_cq),
+@@ -625,6 +661,8 @@ struct {
+ 	DEFINE_VIRTIO_RDMA_CMD(VHOST_RDMA_CTRL_ROCE_QUERY_PORT,				vhost_rdma_query_port),
+ 	DEFINE_VIRTIO_RDMA_CMD(VHOST_RDMA_CTRL_ROCE_CREATE_CQ,				vhost_rdma_create_cq),
+ 	DEFINE_VIRTIO_RDMA_CMD(VHOST_RDMA_CTRL_ROCE_DESTROY_CQ,				vhost_rdma_destroy_cq),
++	DEFINE_VIRTIO_RDMA_CMD(VHOST_RDMA_CTRL_ROCE_CREATE_PD,				vhost_rdma_create_pd),
++	DEFINE_VIRTIO_RDMA_CMD(VHOST_RDMA_CTRL_ROCE_DESTROY_PD,				vhost_rdma_destroy_pd),
  };
  
  /**
 diff --git a/examples/vhost_user_rdma/vhost_rdma_ib.h b/examples/vhost_user_rdma/vhost_rdma_ib.h
-index 664067b024..6420c8c7e2 100644
+index 6420c8c7e2..6356abc65a 100644
 --- a/examples/vhost_user_rdma/vhost_rdma_ib.h
 +++ b/examples/vhost_user_rdma/vhost_rdma_ib.h
-@@ -31,6 +31,12 @@
+@@ -667,44 +667,44 @@ struct vhost_rdma_ctrl_hdr {
  
- #include "eal_interrupts.h"
- 
-+#define vhost_rdma_ref_init(obj) \
-+	do{\
-+		rte_atomic32_init(&(obj)->refcnt); \
-+		rte_atomic32_inc(&(obj)->refcnt); \
-+	}while(0)
-+
- /* Forward declarations */
- struct vhost_rdma_device;
- struct vhost_queue;
-@@ -370,7 +376,7 @@ struct vhost_user_rdma_msg {
-  * @brief Completion Queue (CQ)
-  */
- struct vhost_rdma_cq {
--	struct vhost_queue *vq;			/**< Notification V-ring */
-+	struct vhost_user_queue *vq;         /**< Notification V-ring */
- 	rte_spinlock_t cq_lock;			/**< Protect CQ operations */
- 	uint8_t notify;					/**< Notify pending flag */
- 	bool is_dying;					/**< Being destroyed */
-@@ -676,6 +682,31 @@ struct vhost_rdma_ack_query_port {
+ struct vhost_rdma_ack_query_port {
+ 	enum vhost_rdma_ib_port_state	state;
+-	enum vhost_rdma_ib_mtu		    max_mtu;
+-	enum vhost_rdma_ib_mtu		    active_mtu;
++	enum vhost_rdma_ib_mtu			max_mtu;
++	enum vhost_rdma_ib_mtu			active_mtu;
+ 	uint32_t			phys_mtu;
+-	int			        gid_tbl_len;
++	int					gid_tbl_len;
+ 	uint32_t			port_cap_flags;
+ 	uint32_t			max_msg_sz;
+ 	uint32_t			bad_pkey_cntr;
+ 	uint32_t			qkey_viol_cntr;
+ 	uint16_t			pkey_tbl_len;
+ 	uint16_t			active_speed;
+-	uint8_t			    active_width;
+-	uint8_t			    phys_state;
++	uint8_t				active_width;
++	uint8_t				phys_state;
  	uint32_t			reserved[32];	/* For future extensions */
  }__rte_packed;
  
-+struct vhost_rdma_cmd_create_cq {
-+        /* Size of CQ */
-+        uint32_t cqe;
-+};
-+
-+struct vhost_rdma_ack_create_cq {
-+        /* The index of CQ */
-+        uint32_t cqn;
-+};
-+
-+struct vhost_rdma_cmd_destroy_cq {
-+        /* The index of CQ */
-+        uint32_t cqn;
-+};
-+
-+struct vhost_rdma_ack_create_pd {
-+        /* The handle of PD */
-+        uint32_t pdn;
-+};
-+
-+struct vhost_rdma_cmd_destroy_pd {
-+        /* The handle of PD */
-+        uint32_t pdn;
-+};
-+
+ struct vhost_rdma_cmd_create_cq {
+-        /* Size of CQ */
+-        uint32_t cqe;
++	/* Size of CQ */
++	uint32_t cqe;
+ };
+ 
+ struct vhost_rdma_ack_create_cq {
+-        /* The index of CQ */
+-        uint32_t cqn;
++	/* The index of CQ */
++	uint32_t cqn;
+ };
+ 
+ struct vhost_rdma_cmd_destroy_cq {
+-        /* The index of CQ */
+-        uint32_t cqn;
++	/* The index of CQ */
++	uint32_t cqn;
+ };
+ 
+ struct vhost_rdma_ack_create_pd {
+-        /* The handle of PD */
+-        uint32_t pdn;
++	/* The handle of PD */
++	uint32_t pdn;
+ };
+ 
+ struct vhost_rdma_cmd_destroy_pd {
+-        /* The handle of PD */
+-        uint32_t pdn;
++	/* The handle of PD */
++	uint32_t pdn;
+ };
+ 
  /**
-  * @brief Convert IB MTU enum to byte size
-  * @param mtu The MTU enum value
 -- 
 2.43.0
 
