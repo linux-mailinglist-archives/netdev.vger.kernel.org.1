@@ -1,91 +1,156 @@
-Return-Path: <netdev+bounces-245146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61FBACC87CA
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 16:37:41 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id D60F7CC7C82
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 14:16:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5EF5930A477B
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 15:35:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 12E743009FD2
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 13:15:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 540C134678D;
-	Wed, 17 Dec 2025 13:02:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E2F835A956;
+	Wed, 17 Dec 2025 13:07:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="C+oXNFCc"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="wHgMmUg2"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout03.his.huawei.com (canpmsgout03.his.huawei.com [113.46.200.218])
+Received: from server.couthit.com (server.couthit.com [162.240.164.96])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 197FE3451AA;
-	Wed, 17 Dec 2025 13:02:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FFB3359FB8;
+	Wed, 17 Dec 2025 13:07:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765976529; cv=none; b=amxUYumcCMDkZiaaVwq/1xwTOfq3mt1qFrn34tJ8N25gbjH530M+2qLyauQtLueNsdptpMdag3pp7Js8RjRxqQ0/qSd6tIlIEjPwGGAv00sdAlYXcJuzS75NTJMoQvFcu6/wo2RSmc5iihorazJTYmTvTi10XX7iGO/CEs5Z3ro=
+	t=1765976879; cv=none; b=FKohPsrYw+pDl+0V9RhuxFRtaOayo60O0GXKsSrQdn95yuR5OxfnUAK4l/xmNV3aGym2c1lGJAI2pJ7lma3vqtjdFXgjHjkz6XXliCwwtFCUZb071ukJSqQoOBXxCujtjHVf+rgCyLKpQaldM1DfBal+hKhVEXrvUtZ0MXvNSa8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765976529; c=relaxed/simple;
-	bh=qCzVZQzuBUhcKrdr3i5HGoKQonpCi+4q03mjkRYS6qE=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=aCuARRTGo01r0yX1ijp9WrDW9FyDw4iv0ec5nmZZ7JI0+DiF98uEajxvPoWnn8fjoCUvPFw4jUVFkVL5Be7vG4ZjBoUNkZ9HRdosY3601jUgzWaKY+DnGrW0xgirW+i9kLY/Xx9V7tyuLDVL+2ajLts0O/gdIOQwX4gfQ1AdZgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=C+oXNFCc; arc=none smtp.client-ip=113.46.200.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=qCzVZQzuBUhcKrdr3i5HGoKQonpCi+4q03mjkRYS6qE=;
-	b=C+oXNFCc19FDH0lJFkNr09ZI4BxiTi/+CGUYnF9EsOQFoF6rICjSpSwOBSz5NP5TggDivbaBt
-	mwvrqySjH6naq4yDj4ZpeG81NlNuwN2LXXzA5txJsYxvK1i/C07mYDtWVCtuvx0vSWyvz5wlsJ+
-	aclQGGQf3CG530E5qYOxSjg=
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by canpmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4dWYlq3kdgzpSvn;
-	Wed, 17 Dec 2025 20:59:19 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id E226C140137;
-	Wed, 17 Dec 2025 21:02:03 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 17 Dec 2025 21:02:03 +0800
-Message-ID: <6aed6675-fd0c-45fe-9780-d05156df639f@huawei.com>
-Date: Wed, 17 Dec 2025 21:02:02 +0800
+	s=arc-20240116; t=1765976879; c=relaxed/simple;
+	bh=lP4PhQCxCm6BBgsF/P7b1oNE6B09HGWn+J/scX2pYVA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fi+FnbPTVWd2yqPPORBPr02pwaSDslARU93o7XCmnPirLEZohUKBgdcA+rmJPPoFSzGkNV46hnNZ47lrpyJRS74dVnvWpzEZX7xqmovVjkQgeCFRQG2Tfdh2hjoR0aEZEkOKAtpVMhqlyMTjV7RTnPQ3XTQGBqQnhw5KAh6U1Gw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=wHgMmUg2; arc=none smtp.client-ip=162.240.164.96
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject
+	:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=hrA26kJxYisBVzZPyZptSjyhMEOXDeL2AaDHESx8+qw=; b=wHgMmUg2/vORK81JwuoyhzjOEZ
+	bx7IEfQy4kElFdCWLfY87m85atAtQluQSanj3fLodg5dZbhLhc+jI4b+RbyKXUlULvzPMc8IONZbm
+	IJESalaZun0iXmt220jwIfKgCMK1SL6NmvIp8pmxo9KcQt1GReRn5f9J7Y55tiTiRWCk5V6uqIBul
+	dpv/QF1mWZPogKNiddx7kTdq7kcjP/WA66hJhpq2LkK7gKvw3GbfoD7CAroFQDMhUiVrGO1R99lEy
+	te6bhguRhYgMKLHAXEMbdjXGzIRH6nCNwNJ6diR+DDPK2gBxdiY6rmc/3T6RnCcVeTQgZsloiv06i
+	Gzq/E5jQ==;
+Received: from [122.175.9.182] (port=62422 helo=cypher.couthit.local)
+	by server.couthit.com with esmtpa (Exim 4.98.1)
+	(envelope-from <parvathi@couthit.com>)
+	id 1vVrFx-0000000FG2C-0TAi;
+	Wed, 17 Dec 2025 08:07:53 -0500
+From: Parvathi Pudi <parvathi@couthit.com>
+To: nm@ti.com,
+	vigneshr@ti.com,
+	afd@ti.com,
+	khilman@baylibre.com,
+	rogerq@kernel.org,
+	tony@atomide.com,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	richardcochran@gmail.com,
+	aaro.koskinen@iki.fi,
+	andreas@kemnade.info
+Cc: andrew@lunn.ch,
+	linux-omap@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	danishanwar@ti.com,
+	pratheesh@ti.com,
+	j-rameshbabu@ti.com,
+	praneeth@ti.com,
+	srk@ti.com,
+	rogerq@ti.com,
+	krishna@couthit.com,
+	mohan@couthit.com,
+	pmohan@couthit.com,
+	basharath@couthit.com,
+	parvathi@couthit.com
+Subject: [RESEND PATCH v3 0/2] Add support for ICSSM Ethernet on AM57x, AM437x, and AM335x
+Date: Wed, 17 Dec 2025 18:34:37 +0530
+Message-ID: <20251217130715.1327138-1-parvathi@couthit.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
-	<horms@kernel.org>, <Frank.Sae@motor-comm.com>, <hkallweit1@gmail.com>,
-	<linux@armlinux.org.uk>, <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
-	<chenhao418@huawei.com>, <jonathan.cameron@huawei.com>,
-	<salil.mehta@huawei.com>, <shiyongbang@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH RFC net-next 4/6] net: hibmcge: support get phy_leds_reg
- from spec register
-To: Andrew Lunn <andrew@lunn.ch>
-References: <20251215125705.1567527-1-shaojijie@huawei.com>
- <20251215125705.1567527-5-shaojijie@huawei.com>
- <38e441ce-b67f-4ddb-940b-1e737a45225c@lunn.ch>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <38e441ce-b67f-4ddb-940b-1e737a45225c@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+Content-Transfer-Encoding: 8bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.couthit.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: parvathi@couthit.com
+X-Authenticated-Sender: server.couthit.com: parvathi@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
+Hi,
 
-on 2025/12/16 15:19, Andrew Lunn wrote:
-> On Mon, Dec 15, 2025 at 08:57:03PM +0800, Jijie Shao wrote:
->> support get phy_leds_reg from spec register,
-> What is the spec register?
+This series adds support for ICSSM Ethernet on Texas Instruments AM57x,
+AM437x and AM335x platforms.
 
-These are some MAC and PHY-related properties, such as MTU specifications, MDIO frequency, etc.,
-similar to the properties in the device tree.
-However, these properties come from the BAR space registers.
+The AM57x and AM437x IDKs support two PRU-ICSS instances, each consisting
+of two PRU cores, with each PRU-ICSS instance capable of handling two
+Ethernet ports. For the AM57x platforms, the PRU-ICSS2 node has been added
+to the am57xx-idk-common.dtsi, while for the AM437x platform, the PRU-ICSS1
+node has been added to the am437x-idk-evm.dts.
 
-Thanks,
-Jijie Shao
+The AM335x ICE features a single PRU-ICSS instance. A new device tree overlay
+source file, am335x-icev2-prueth-overlay.dtso, has been introduced to define the
+PRU-ICSS node for the AM335x platform.
+
+This is v3 of the patch series [v1]. It addresses comments made on [v2].
+This series is based on the latest next-20251217 linux-next.
+
+Changes from v2 to v3 :
+
+*) Addressed Andrew Davis's comment by placing PRUETH nodes in a new overlay file
+am335x-icev2-prueth-overlay.dtso.
+*) Rebased the series on latest linux-next.
+
+Changes from v1 to v2 :
+
+*) Addressed Andrew Lunn's comment on patch 1 of the series.
+*) Addressed MD Danish Anwar comment on patch 1 of the series.
+*) Rebased the series on latest linux-next.
+
+[v1] https://lore.kernel.org/all/20251013125401.1435486-1-parvathi@couthit.com/
+[v2] https://lore.kernel.org/all/20251103124820.1679167-1-parvathi@couthit.com/
+
+Thanks and Regards,
+Parvathi.
+
+Roger Quadros (2):
+  arm: dts: ti: Adds device tree nodes for PRU Cores, IEP and eCAP
+    modules of PRU-ICSS2 Instance.
+  arm: dts: ti: Adds support for AM335x and AM437x
+
+ arch/arm/boot/dts/ti/omap/Makefile            |   5 +
+ .../ti/omap/am335x-icev2-prueth-overlay.dtso  | 190 ++++++++++++++++++
+ arch/arm/boot/dts/ti/omap/am33xx-l4.dtsi      |  11 +
+ arch/arm/boot/dts/ti/omap/am4372.dtsi         |  11 +
+ arch/arm/boot/dts/ti/omap/am437x-idk-evm.dts  | 137 ++++++++++++-
+ arch/arm/boot/dts/ti/omap/am57-pruss.dtsi     |  11 +
+ arch/arm/boot/dts/ti/omap/am571x-idk.dts      |   8 +-
+ arch/arm/boot/dts/ti/omap/am572x-idk.dts      |  10 +-
+ arch/arm/boot/dts/ti/omap/am574x-idk.dts      |  10 +-
+ .../boot/dts/ti/omap/am57xx-idk-common.dtsi   |  61 ++++++
+ 10 files changed, 444 insertions(+), 10 deletions(-)
+ create mode 100644 arch/arm/boot/dts/ti/omap/am335x-icev2-prueth-overlay.dtso
+
+-- 
+2.43.0
 
 
