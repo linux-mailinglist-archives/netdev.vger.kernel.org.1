@@ -1,134 +1,178 @@
-Return-Path: <netdev+bounces-245133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3FD8CC7974
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 13:25:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40B87CC7A5E
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 13:38:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C3B70303B7D8
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 12:21:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2CC2530A12D2
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 12:34:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11B1729B764;
-	Wed, 17 Dec 2025 12:21:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E396A34253C;
+	Wed, 17 Dec 2025 12:33:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SNMV+RRd"
+	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="A2rYCXgU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E91424BBEE
-	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 12:21:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5908B342148
+	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 12:33:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765974086; cv=none; b=swQzKnqpREj8YlknuWOB9gJmdQldJRiXG3FHzbs+xlLIuMH+1ywIJerEmgK8dVx+Euh1fucMAs/J9RUglaw8D8nhEpo4bZ4cMk10MSc7xCluuQzJCmFYvWpUluAsbpJK8dWHa2hiG0L1Jx3ehYqjpAhtqZqoZkZaL7B9zhonVWg=
+	t=1765974838; cv=none; b=KKlaEsGj3DfO4QgomNkcXrUCVjbzkLjKSjhBDpEa6NUjF5W1U/L9bg+mISOO7qRTPaum1ePwYd/PA8fDXirhEpMyKBN2gCAuXFhxcEhkYX18sOf/8DbOEszsVK+OeqwJl9IhLqKswEj+5kyfRhjLt34kLL6hJ7cYdxhrxxJrkAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765974086; c=relaxed/simple;
-	bh=fny9SFTxturF7015JakyAPXxKQIp2Ma/cwO/hVKlOlQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HoSVPLuqWKp4fAJPinWCVJ67kurtc32HzGgO1DTKtqUhZOaJPI54Z1EBHGEizDyOeYAyg6kA9LCUDte+gx/MRj8TqfwYPwjeLqVm1EnsohlwxPmvglZgeIqpiuhjoS3GgZADmcbjmchnKKIjUZsong6hR1H6TGYF7K48H4T0NnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SNMV+RRd; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-47a8195e515so46661005e9.0
-        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 04:21:23 -0800 (PST)
+	s=arc-20240116; t=1765974838; c=relaxed/simple;
+	bh=s8GEKXnaSXfLaP2KVal8xoX7Yub2x5YeO61XyI9SmwQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BQc7BkNfhNIXsBBWzHMfZ9VvbR8V9L+0t7sZlcSnCOh7XrbzfXrh2IvoHrXHSubOyOI7VjdEhZpUi+PEXwEVAkOKtmAlEMQbmrilj6NhZeGQ662SsH2FX/67gnmfakKy0Zc3PblzPbFOKoouhaC4vZ7+1t41LSxMeW4vCYPimzU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=A2rYCXgU; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b7355f6ef12so1102059966b.3
+        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 04:33:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765974082; x=1766578882; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DYXq2m6KIBeaHm0Y860B+iQgDTaW343HwilrkCCxiCU=;
-        b=SNMV+RRd6noDNpXs2aKVhos/B28mz0h992v9tw4Rb2eWuEIE8FaQlpeELC4w85+Xgx
-         3Syxrufaeu+7L2zMEvd0V4ByRSFlmltdrPjyM4UUQKKbyuFXiYvYP6egaqyLaNDaCjYN
-         3vt0ZX4VECLqxLzgC95/J8cea2rj9JC/RolhB7sqpY/DSwSm8nvAWtnIGZK1a9i6uMGX
-         wZqVwbsmAtEVaGDEr5hdm8ee1cEpi1UXEtJ9TZvF+QveAHcuZziMzxFN0dRb1iwssIlf
-         WzUAPnXxbpn1ff7JO+xrDmukXlsfYjjGv2GwQAeDyPEEZ9brEWzmIitMaxTa7BXkdKeS
-         NfLQ==
+        d=sartura.hr; s=sartura; t=1765974835; x=1766579635; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=s8GEKXnaSXfLaP2KVal8xoX7Yub2x5YeO61XyI9SmwQ=;
+        b=A2rYCXgUYr9ALJpNgKYHWr7vJr+BFYlLRilkjQiry5X9M3LQQ88mX4hFh1RagqJ6lZ
+         uLtt7f7uVrILg7+B+4YELj4FONtVCFqJA7XwsLHNNYAUI6dirg68L6UOFtUVg/pflSZn
+         976Z2ay8EvD2m28JR88LPxi35onEJ8E+FN4FGVILCcgQKmTMqb22K5nAnVyqmLxQDd6O
+         LbFKdJDvIY/Y8kWMUSdGNCbLVuKFxZCVvOnWjidEXE282hJwaojoXOnOsdvcE8Yo8AOE
+         MRm/wjI6RrNDNxlhO3goPl87r39rYRTEA/cEsAWTInxIkFYA/Fm8IQlepQjUUy1g/gnO
+         RIDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765974082; x=1766578882;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DYXq2m6KIBeaHm0Y860B+iQgDTaW343HwilrkCCxiCU=;
-        b=AeAKuZ0+dTxVuUAXxZfXTuB7SPiYg9C235RBoKVySrHGtqwPx8Lomx8Mqk+caZjBeX
-         dkc2u4LXq49Jpm1SufaizaQXMz4r9XeIBdbAkxcHaYKveTqu1ik/yA6HofjSwP7HUD/S
-         bjmizoplqOIHsCMue3wl9PfxMWbOqrxrcOziIDwiJ8bojXXPaFrVCoM+DdryLrc7xF2b
-         FQJ6AlGN7L6K8M2JcYvxynHYJ03/vsVds/Ui+r3tuYL9OiL5QA4IZmmUbGhA6ebNwrJK
-         N+ukhRYiQegTF7QQrTxo2ECnCO66gIrmZgmmCVlt1RdyVDKoaDzy6cQ5MfC7YsKvXVft
-         3e+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVkQ6T8F4tGAN6mc5hAnlvUe0fOh7jMQwBqiLAHBqA3qwU41GY/Dq8cme/KEMaGGHdr5hq0gJg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTh8ftE5znRvYnuCvh5Ka8tQInS0424QWiekrh43yJbSMb2fDt
-	TSAd7ZE4noUuY1zp17s1cdrjCOhap97P/cv4O7withc8xNcCQpdva3zX
-X-Gm-Gg: AY/fxX4NFqFttQiOo54a1/lWPvp2uflDtZRCeddF9qMG73X2nnHnfXkLSlPRo5R0EnE
-	y12bkZa6Cmz8r4QDfn0LyVqxQBOoSCY3FZTSfuFOEUUEdkhM08oLoxjNGrlnK0GBcdUwhvmqhwp
-	dDFaLyMRWSegiS1yzfoLZT+XJvR9dBT8DO6SKOJvcEvVbMOLrjLyscqgn/WHtV7TTzQdd7Fjr58
-	VGG+Nv6PdttXdoKeJGoVZGee5BvFXhr3v6MIpUxUd0Lnqdpazyl8ACSENrBVJ9f5BQ2p+TVLC9k
-	sGKbSWi14MzrLir762ylGiROHl7HMJAF3D1E6McyU8Lf44mvOebpbg3Dfsn2nO/YZ9Ijh61UsCb
-	780GEXO7aUVJBLjhQXu8fEV09mibwdlGkZ+pPMPNNCMYqCirwUuB/joCYIK8w6dhArBLrhjtZGj
-	sSnh3foZVI5x8=
-X-Google-Smtp-Source: AGHT+IEHnifimtj7VdGfz6MjbhY2lEOpq0xdu6/7cpFkjgiXCk7n3y9Quh4Rc68+jvf5AZydr2IWWA==
-X-Received: by 2002:a05:600c:3486:b0:477:561f:6fc8 with SMTP id 5b1f17b1804b1-47a8f8a79e4mr188945585e9.5.1765974082138;
-        Wed, 17 Dec 2025 04:21:22 -0800 (PST)
-Received: from eichest-laptop ([2a02:168:af72:0:b288:1a0e:e6f7:d63a])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47bdc1d991fsm37975775e9.5.2025.12.17.04.21.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Dec 2025 04:21:21 -0800 (PST)
-Date: Wed, 17 Dec 2025 13:21:19 +0100
-From: Stefan Eichenberger <eichest@gmail.com>
-To: Rob Herring <robh@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, krzk+dt@kernel.org,
-	conor+dt@kernel.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	geert+renesas@glider.be, ben.dooks@codethink.co.uk,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, francesco.dolcini@toradex.com,
-	rafael.beims@toradex.com,
-	Stefan Eichenberger <stefan.eichenberger@toradex.com>
-Subject: Re: [PATCH net-next v1 2/3] dt-bindings: net: micrel: Add
- keep-preamble-before-sfd
-Message-ID: <aUKgP4Hi-8tP9eaK@eichest-laptop>
-References: <20251212084657.29239-1-eichest@gmail.com>
- <20251212084657.29239-3-eichest@gmail.com>
- <20251215140330.GA2360845-robh@kernel.org>
- <aUJ-3v-OO0YYbEtu@eichest-laptop>
+        d=1e100.net; s=20230601; t=1765974835; x=1766579635;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=s8GEKXnaSXfLaP2KVal8xoX7Yub2x5YeO61XyI9SmwQ=;
+        b=Gz0Si9idGRRwT72FvyamVM7Xq8HQKc/aA9W4M3SNbvqirVsFhRk/fMbs8ITM9nnfr3
+         /+qdtLmSdX3Cu0fwQTM6H2sYGTx+9MEWbDj+BImNg6vjpcSo3Vc/0T7KH/LpKhR9Jrq5
+         cGoTHXmC9WoMbMi8YW3n02ZZVz69MmX/qEWWibFkhoW4g6+JNvcsa4KliwneOGikTBB4
+         uGmRqM7n1zPyXQyUVBhxv2MXInjwe6ZOVpyY2Qt/2htgmDqf4qF25tb7FWagZRtMIRw/
+         oX3IQUyGVKL0DU0VntwpD9OtRYQ5B9gr5htiJsBOwXDCoQy4xv1ztMpBvrPJ4X9R/u07
+         2USQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVhqIQucaSt8WJOb2LdK9ki7axE8D0Im84yir82SiZ2gVfJol5RHYKV1qU+NSfNLjR4tKWeVRc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzwk5kiSONcGxHj52GG3P7c/v+bRMmR4QPSqo337u++HycZ6OP+
+	nIX4W5KE3Stz4oCUKVvhRZdmdZYbDeKrvQh6ah7Nt3M4RzM8QlcDv+A3ax4kOHW2Vowek7oJQMC
+	z158J8COuQmkGv4Yms4kfd8WLC7b5K6kUPN/pCItbWw==
+X-Gm-Gg: AY/fxX4il2qEzQ3O/h4dzTT/Zn2VibgBA2Ck3TaztTT192LmH/C4+weQNE5iV+Gp4kQ
+	Wy7fLVlewFoOMARLxX003UfJQ4gJ6nU92B4e4HYTcgccCyxOpYFIcv8S7PTC1p5I3LZJoDJeLQo
+	xr0iLvh4zOKD1ZfUP/PyWoBAJ5OcJualDAH+bw8PCAuw0SbXnUyO2WdYhRr+6Q65bQqPQOcwZv+
+	9dLRwjyNrjJXTsTGM8dgGlyBReO//d0Z8wP56ysxoxObV4ygPWIDsQVKHVJV/inHAKgdpWXoq2f
+	gihng2D0NOAGChFyPP4O8gfYijYlkMUy6KHFFAqwQ+sGFvpbEc/Y
+X-Google-Smtp-Source: AGHT+IE7Hjde/+kkViqYv1A0LhGo3fNDzXkWHEO+dWmCgW+32Gp4be+4LUgDpSNymwFzE86qvkEGL0RYLcWs3u76qoo=
+X-Received: by 2002:a17:907:3d43:b0:b7c:e320:5250 with SMTP id
+ a640c23a62f3a-b7d238ebd71mr1711209066b.7.1765974834580; Wed, 17 Dec 2025
+ 04:33:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aUJ-3v-OO0YYbEtu@eichest-laptop>
+References: <20251215163820.1584926-1-robert.marko@sartura.hr>
+ <20251215163820.1584926-4-robert.marko@sartura.hr> <202512161628415e9896d1@mail.local>
+ <CA+HBbNFG+xNokn5VY5G6Cgh41NZ=KteRi0D9c0B15xb77mzv8w@mail.gmail.com>
+ <202512161726449fe42d71@mail.local> <20251216-underarm-trapped-626f16d856f5@spud>
+ <2025121622404642e6f789@mail.local>
+In-Reply-To: <2025121622404642e6f789@mail.local>
+From: Robert Marko <robert.marko@sartura.hr>
+Date: Wed, 17 Dec 2025 13:33:42 +0100
+X-Gm-Features: AQt7F2rRCO2ytZ0VdvYzTGe4b0Ox8AKF-v29YqVKrXuogSLDfcjlg9rn0S9yxlg
+Message-ID: <CA+HBbNGPWcwzCSGbMCU-n8Y+g6SjBSKcS7p6Mmrn3gFCWCSCeA@mail.gmail.com>
+Subject: Re: [PATCH v2 04/19] dt-bindings: arm: move AT91 to generic Microchip binding
+To: Alexandre Belloni <alexandre.belloni@bootlin.com>
+Cc: Conor Dooley <conor@kernel.org>, robh@kernel.org, krzk+dt@kernel.org, 
+	conor+dt@kernel.org, nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev, 
+	Steen.Hegelund@microchip.com, daniel.machon@microchip.com, 
+	UNGLinuxDriver@microchip.com, herbert@gondor.apana.org.au, 
+	davem@davemloft.net, vkoul@kernel.org, linux@roeck-us.net, 
+	andi.shyti@kernel.org, lee@kernel.org, andrew+netdev@lunn.ch, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, linusw@kernel.org, 
+	olivia@selenic.com, radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com, 
+	gregkh@linuxfoundation.org, jirislaby@kernel.org, mturquette@baylibre.com, 
+	sboyd@kernel.org, richardcochran@gmail.com, wsa+renesas@sang-engineering.com, 
+	romain.sioen@microchip.com, Ryan.Wanner@microchip.com, 
+	lars.povlsen@microchip.com, tudor.ambarus@linaro.org, 
+	kavyasree.kotagiri@microchip.com, devicetree@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org, 
+	linux-hwmon@vger.kernel.org, linux-i2c@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-gpio@vger.kernel.org, linux-spi@vger.kernel.org, 
+	linux-serial@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-clk@vger.kernel.org, mwalle@kernel.org, luka.perkov@sartura.hr
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Dec 17, 2025 at 10:58:54AM +0100, Stefan Eichenberger wrote:
-> On Mon, Dec 15, 2025 at 08:03:30AM -0600, Rob Herring wrote:
-> > On Fri, Dec 12, 2025 at 09:46:17AM +0100, Stefan Eichenberger wrote:
-> > > From: Stefan Eichenberger <stefan.eichenberger@toradex.com>
-> > > 
-> > > Add a property to activate a Micrel PHY feature that keeps the preamble
-> > > enabled before the SFD (Start Frame Delimiter) is transmitted.
-> > > 
-> > > This allows to workaround broken Ethernet controllers as found on the
-> > > NXP i.MX8MP. Specifically, errata ERR050694 that states:
-> > > ENET_QOS: MAC incorrectly discards the received packets when Preamble
-> > > Byte does not precede SFD or SMD.
-> > 
-> > It doesn't really work right if you have to change the DT to work-around 
-> > a quirk in the kernel. You should have all the information needed 
-> > already in the DT. The compatible string for the i.MX8MP ethernet 
-> > controller is not sufficient? 
-> 
-> Is doing something like this acceptable in a phy driver?
-> if (of_machine_is_compatible("fsl,imx8mp")) {
-> ...
-> }
-> 
-> That would be a different option, rather than having to add a new DT
-> property. Unfortunately, the workaround affects the PHY rather than the
-> MAC driver. This is why we considered adding a DT property.
+On Tue, Dec 16, 2025 at 11:40=E2=80=AFPM Alexandre Belloni
+<alexandre.belloni@bootlin.com> wrote:
+>
+> On 16/12/2025 19:21:27+0000, Conor Dooley wrote:
+> > On Tue, Dec 16, 2025 at 06:26:44PM +0100, Alexandre Belloni wrote:
+> > > On 16/12/2025 17:56:20+0100, Robert Marko wrote:
+> > > > On Tue, Dec 16, 2025 at 5:29=E2=80=AFPM Alexandre Belloni
+> > > > <alexandre.belloni@bootlin.com> wrote:
+> > > > >
+> > > > > On 15/12/2025 17:35:21+0100, Robert Marko wrote:
+> > > > > > Create a new binding file named microchip.yaml, to which all Mi=
+crochip
+> > > > > > based devices will be moved to.
+> > > > > >
+> > > > > > Start by moving AT91, next will be SparX-5.
+> > > > >
+> > > > > Both lines of SoCs are designed by different business units and a=
+re
+> > > > > wildly different and while both business units are currently owne=
+d by
+> > > > > the same company, there are no guarantees this will stay this way=
+ so I
+> > > > > would simply avoid merging both.
+> > > >
+> > > > Hi Alexandre,
+> > > >
+> > > > The merge was requested by Conor instead of adding a new binding fo=
+r LAN969x [1]
+> > > >
+> > > > [1] https://patchwork.kernel.org/project/linux-arm-kernel/patch/202=
+51203122313.1287950-2-robert.marko@sartura.hr/
+> > > >
+> > >
+> > > I would still keep them separate, SparX-5 is closer to what is
+> > > devicetree/bindings/mips/mscc.txt than to any atmel descended SoCs.
+> >
+> > If you don't want the sparx-5 stuff in with the atmel bits, that's fine=
+,
+> > but I stand over my comments about this lan969x stuff not getting a fil=
+e
+> > of its own.
+> > Probably that means putting it in the atmel file, alongside the lan966x
+> > boards that are in there at the moment.
+>
+> I'm fine with this.
 
-Francesco made a good point about this. The i.MX8MP has two MACs, but
-only one of them is affected. Therefore, checking the machine's
-compatible string would not be correct. As far as I know, checking the
-MAC's compatible string from within the PHY driver is also not good
-practice, is it?
+Works for me, will switch to it in v3.
+
+Regards,
+Robert
+
+>
+> --
+> Alexandre Belloni, co-owner and COO, Bootlin
+> Embedded Linux and Kernel engineering
+> https://bootlin.com
+
+
+
+--=20
+Robert Marko
+Staff Embedded Linux Engineer
+Sartura d.d.
+Lendavska ulica 16a
+10000 Zagreb, Croatia
+Email: robert.marko@sartura.hr
+Web: www.sartura.hr
 
