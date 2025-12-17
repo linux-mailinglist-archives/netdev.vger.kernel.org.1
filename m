@@ -1,116 +1,150 @@
-Return-Path: <netdev+bounces-245251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FA3BCC9B08
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 23:21:51 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59929CC9B76
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 23:32:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 02D19300A20E
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 22:21:48 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 2485D300D556
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 22:32:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86D1330F532;
-	Wed, 17 Dec 2025 22:21:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9E0531AF39;
+	Wed, 17 Dec 2025 22:32:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gehIvb8v"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BlS+9TqY"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7255422FDEC;
-	Wed, 17 Dec 2025 22:21:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 867153191BA
+	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 22:31:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766010106; cv=none; b=lM2s0BSp6EBZUUGtZiWpQ7sf4fPqwqz5ditz5+uJ2JksfFOCSU4mWOWE+Cq4ADSF8vJAyC0ptqaDftWfQDy+SOhfrDyXP0Tp2jLLn/LImGEozIwcvAx8iHAd+qk9K72vP+2mgMUXoe6trEq1kx9qmt5/M8n5u5upRMjkiDnM91E=
+	t=1766010724; cv=none; b=mO06+6uqKgeXAxdozfwwhk+JUxVDpcg2XyYD75sfttBbNoKEgSZ8+LURdFylafIAfMEUaLVQSgzdsBDTw2d+qMxKw1Tthe+oW4yrYEJve1/NcTqKIIZThcfuy7f2YXL7INn7yKlrP6TEy1gxPcqx/UhJfGYfww73WELFUAnN/3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766010106; c=relaxed/simple;
-	bh=8TVQULurGcGRotUrDk4zQTVLEFon/CSyK+2OIoPapxs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZV1s+Ge+Mqpq8/NPu2sbq7EzkJP2/NiyZ3zeuRe+7GV67zNEKGcv/mG6ye4jvSE4bJzBsADhEsXl8fsiQFbmnO/GTp1aL3A8hbH71kzqq3bDyLknRHx/il+nntV1N9S+Sbm2SXNJsgeZnCtqVFctb2TiLEtxYrpzoWzkfMi6NzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=gehIvb8v; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=rx4a/Tij62thpCcp6gcHLKgQ2+6op4+X9dBMhuA0NbM=; b=gehIvb8vh+VFwQGU+TlRKzXVME
-	g3jp0Qb984HJBHPLgnoXIehEK9X2VLiMj7eZaR0RNTJER85l77Uc81UUVZuYgl++qA1wW52iVaWP6
-	4JoR5o8jy03D6dVIS7x4qjYNeILyJEZdkTYosJFsgLlbsIhSJ0xaBSNA+nUD/GjLxtC4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vVztl-00HGQp-UY; Wed, 17 Dec 2025 23:21:33 +0100
-Date: Wed, 17 Dec 2025 23:21:33 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Deepanshu Kartikey <kartikey406@gmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, khalasa@piap.pl,
-	o.rempel@pengutronix.de, linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	syzbot+3d43c9066a5b54902232@syzkaller.appspotmail.com
-Subject: Re: [PATCH] net: usb: asix: validate PHY address before use
-Message-ID: <f2d9f69c-ab08-4e65-8078-0404a474af80@lunn.ch>
-References: <20251217085057.270704-1-kartikey406@gmail.com>
+	s=arc-20240116; t=1766010724; c=relaxed/simple;
+	bh=T0qprnyzkCqllee0y3moUHDkLXu8Ov8u+m2G0gde7TI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bSuvhsQ3lqoWF/+/Z3yr86TG7p1Nz+2GE/BuS22m3EkTwCLs1lVPkGFvDRy4eOjHs0vQn2YVCMmIKZHw3bWNb/yvBv2PFRFcHGlAeoSzEqaezV3FIlYVBYzmjextQQ3fYkYlTJmmIsNPCzyP6BKuhhgKFdSOpqxFr316b/0RiUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BlS+9TqY; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-42fbc305552so3833507f8f.0
+        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 14:31:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1766010718; x=1766615518; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=L9xZC3AkWLvoYCE+LC0bupKfq74kKT5/LfsWMU3Z49U=;
+        b=BlS+9TqYrE/HXv66I+FpgfH/iXbVtlJjxxSwpUJmz2S0iREc4gPZMlCsqGgK1jRQkq
+         34HCZGDrIk+0SXRmhtIIajeZcBo83Ym5128v+1/pryMtVN52ZV6E2Yx3KFLXoZhSRLkA
+         ysPR0gFtHcm1gq7Ig4K6qlbCEfmOg7AcOVv3/GdRyh6ATWzttzQFED475a+YYRgS7YLD
+         aMViq+JF2yJomUMr3Sa+Ke4JT7rcQfCJSj2ccV657aJfXtWhK722T8F5RSqTATLKolo3
+         wAejyZEa0vxTckStDoY5bgZeFsYoIwfP1BXnnPgP/auayZ34xTMcYhpS3k2sda7x1WO6
+         0VNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766010718; x=1766615518;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=L9xZC3AkWLvoYCE+LC0bupKfq74kKT5/LfsWMU3Z49U=;
+        b=V5Py9tkPmN3DAXKppiBUN25EhQ6hxxiq+HuUKhJY6TAPVzN21Ct932+lfB5R8vDoB2
+         KK8ROxuVowC55dT598KztW/Du3vPMF4OtgGPgM1dyaZk8jwoDeWu1ni7NjKMlAKuvr1s
+         5C0+9RCpVGOdQXXJMfGtwvJq1QWXGxcWrerqv7ZDIhHjZSrEWwC7SmFf4Iskdfa0n1AQ
+         mwoZs3uMHwQEbmnux0Vi4317xExC4XkvFOSgszOPGfBxKKUXfjG8jtKQ2hu/+30xdL0o
+         6ovANHPZnjPKmiGbaVTyERCMVzICRVDCky0lmJ27VmHykXdYk6t1BTbe4RgsXn9wwDip
+         QUHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXq6UQN2BHLwuXqjjgaQ1Q7DcWUHic1ux41cnXeM5NXAVxlvX5lB5Q832Ntz6Lgt6i9bs0PFJU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhLMLNIzdycyuQjoLMLFkOFTEwrB8LWsMk1Cep/W4C9NCoT6WM
+	hn/lKlEbTU/Pi3l/cv5N0TVJxswgD8yqitp/rXMF1DyIH9SUPQf+yluY
+X-Gm-Gg: AY/fxX780TznGltu/lqdBxyAf9dDaeHsx5mzgVSa6onp882e7dEhue3LR3CGI+POsMO
+	DNA5yX9TCptD7GkT+WR18KRvBlpGcON5chfiWc3lXx6EKg6rW+3GUw7AtQv6Xjk2XZL1PMlOxk7
+	gjUKO92GZsdBXdeonkdR7nzhcDSgF4JrKgMGQVAD2Fd3jHQK++0LORQlCryZXpvRp8GDLylyq8s
+	q+gCgEhjI2H1/2VslnNkVJYwNM3UMzBC30rCWF6AoNWw+6uLmo3IJyHFvoyfZJhpjV1/G0yYV/h
+	ad/7oKAapY8k5E57wXPnZWXfxNehxFsGwaB8SICF82XG8hz0z4tLd+J4C0xKwO/cmjD05aPkV8p
+	Jce+XxbVil45ssWlVXZLZ0Y/x17ZuYfeNp6CUq13ufOAakyfg9Y94sJEcbFf4IvMmc5RppHXbQx
+	DVclW1/yRw2iVD56StnzBQ2gHaXjUYf4CuZcIXCOqRaxTFK7DZ+cPf
+X-Google-Smtp-Source: AGHT+IGAjtsCe1CgOB6Bh4/hmtqRmC0JIqrqfOPjJTopW3ABFAivzVOgBF7fd2YchRnO35zq0uHieA==
+X-Received: by 2002:a05:6000:2311:b0:430:ff0c:35f9 with SMTP id ffacd0b85a97d-430ff0c37damr11656138f8f.48.1766010717494;
+        Wed, 17 Dec 2025 14:31:57 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324493fda5sm1364377f8f.17.2025.12.17.14.31.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Dec 2025 14:31:57 -0800 (PST)
+Date: Wed, 17 Dec 2025 22:31:55 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Jonathan Cameron <jonathan.cameron@huawei.com>
+Cc: Yury Norov <yury.norov@gmail.com>, Rasmus Villemoes
+ <linux@rasmusvillemoes.dk>, <linux-kernel@vger.kernel.org>,
+ <linux-usb@vger.kernel.org>, Geert Uytterhoeven <geert+renesas@glider.be>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>, Crt Mori
+ <cmo@melexis.com>, Richard Genoud <richard.genoud@bootlin.com>, "Andy
+ Shevchenko" <andriy.shevchenko@intel.com>, Luo Jie <quic_luoj@quicinc.com>,
+ Peter Zijlstra <peterz@infradead.org>, Jakub Kicinski <kuba@kernel.org>,
+ <netdev@vger.kernel.org>, "David S . Miller" <davem@davemloft.net>, "Mika
+ Westerberg" <mika.westerberg@linux.intel.com>, Andreas Noever
+ <andreas.noever@gmail.com>, Yehezkel Bernat <YehezkelShB@gmail.com>,
+ "Nicolas Frattaroli" <nicolas.frattaroli@collabora.com>
+Subject: Re: [PATCH v2 08/16] bitfield: Simplify __BF_FIELD_CHECK_REG()
+Message-ID: <20251217223155.52249236@pumpkin>
+In-Reply-To: <20251217102618.0000465f@huawei.com>
+References: <20251212193721.740055-1-david.laight.linux@gmail.com>
+	<20251212193721.740055-9-david.laight.linux@gmail.com>
+	<20251217102618.0000465f@huawei.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251217085057.270704-1-kartikey406@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Dec 17, 2025 at 02:20:57PM +0530, Deepanshu Kartikey wrote:
-> The ASIX driver reads the PHY address from the USB device via
-> asix_read_phy_addr(). A malicious or faulty device can return an
-> invalid address (>= PHY_MAX_ADDR), which causes a warning in
-> mdiobus_get_phy():
+On Wed, 17 Dec 2025 10:26:18 +0000
+Jonathan Cameron <jonathan.cameron@huawei.com> wrote:
+
+> On Fri, 12 Dec 2025 19:37:13 +0000
+> david.laight.linux@gmail.com wrote:
 > 
->   addr 207 out of range
->   WARNING: drivers/net/phy/mdio_bus.c:76
+> > From: David Laight <david.laight.linux@gmail.com>
+> > 
+> > Simplify the check for 'reg' being large enough to hold 'mask' using
+> > sizeof (reg) rather than a convoluted scheme to generate an unsigned
+> > type the same size as 'reg'.
+> > 
+> > Signed-off-by: David Laight <david.laight.linux@gmail.com>  
+> Hi David,
 > 
-> Validate the PHY address before returning it from asix_read_phy_addr().
+> Just one really trivial comment inline. Feel free to ignore.
 > 
-> Reported-by: syzbot+3d43c9066a5b54902232@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3d43c9066a5b54902232
-> Tested-by: syzbot+3d43c9066a5b54902232@syzkaller.appspotmail.com
-> Fixes: 7e88b11a862a ("net: usb: asix: refactor asix_read_phy_addr() and handle errors on return")
-> Signed-off-by: Deepanshu Kartikey <kartikey406@gmail.com>
-> ---
->  drivers/net/usb/asix_common.c | 5 +++++
->  1 file changed, 5 insertions(+)
+> Jonathan
 > 
-> diff --git a/drivers/net/usb/asix_common.c b/drivers/net/usb/asix_common.c
-> index 7fd763917ae2..6ab3486072cb 100644
-> --- a/drivers/net/usb/asix_common.c
-> +++ b/drivers/net/usb/asix_common.c
-> @@ -335,6 +335,11 @@ int asix_read_phy_addr(struct usbnet *dev, bool internal)
->  	offset = (internal ? 1 : 0);
->  	ret = buf[offset];
->  
-> +	if (ret >= PHY_MAX_ADDR) {
-> +		netdev_err(dev->net, "invalid PHY address: %d\n", ret);
-> +		return -ENODEV;
-> +	}
-> +
+> > ---
+> > @@ -75,8 +59,8 @@
+> >  	})
+> >  
+> >  #define __BF_FIELD_CHECK_REG(mask, reg, pfx)				\
+> > -	BUILD_BUG_ON_MSG(__bf_cast_unsigned(mask, mask) >		\
+> > -			 __bf_cast_unsigned(reg, ~0ull),		\
+> > +	BUILD_BUG_ON_MSG((mask) + 0U + 0UL + 0ULL >			\
+> > +			 ~0ULL >> (64 - 8 * sizeof (reg)),		\  
+> 
+> Trivial.  sizeof(reg) is much more comment syntax in kernel code.
+                                     (common)
 
-https://elixir.bootlin.com/linux/v6.18.1/source/drivers/net/usb/ax88172a.c#L213
+Hmm. sizeof is an operator not a function.
+Its argument is either a variable/expression or a bracketed type
+(I don't usually put variables in brackets).
+So 'sizeof(reg)' is nearly as bad as 'return(reg)'.
 
-	ret = asix_read_phy_addr(dev, priv->use_embdphy);
-	if (ret < 0)
-		goto free;
-	if (ret >= PHY_MAX_ADDR) {
-		netdev_err(dev->net, "Invalid PHY address %#x\n", ret);
-		ret = -ENODEV;
-		goto free;
-	}
+	David
 
-Your change makes this a repeated netdev_err(). Please can you extend
-your patch by removing this second error message.
+> 
+> >  			 pfx "type of reg too small for mask")
+> >  
+> >  #define __BF_FIELD_CHECK(mask, reg, val, pfx)				\  
+> 
 
-    Andrew
-
----
-pw-bot: cr
 
