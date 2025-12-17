@@ -1,79 +1,81 @@
-Return-Path: <netdev+bounces-245152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA388CC888A
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 16:42:58 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD89ACC8DB6
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 17:47:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id C00A6302F908
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 15:42:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DEE1030CE6B6
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 16:37:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5AE535FF5D;
-	Wed, 17 Dec 2025 13:11:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0CA7267B92;
+	Wed, 17 Dec 2025 13:15:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L7e8AreG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jPq914Dk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18F1A35FF5A
-	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 13:11:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0AB821CA03
+	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 13:15:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765977079; cv=none; b=VwL3SslW0wjPCV2koiUVNI9QT7eV5UhBbiFyPi3Stea1wp/kfF44ePpBmMMxAJF5Zws7oPqmv0lSi/s9cri2SQu9uraLA1faPzrsYoNpz8XNrmF+TFGsdXLL+47JX+M52tafUarxH++rNfTvUzcvnud3hSVi9eMyydCVoJtPU98=
+	t=1765977342; cv=none; b=VQ507DBHNdmWdfpN8dRQ5hqG7TgiTzKpRS+9S1fqVkQWfEQ7bB41D2QxA1ZPqArxj2DUP2DncY0tnYnIOx3r4RrQWAZvTUBIGOVRF8XYRIm2CU11mazuuDS8KAbKU/LDPxeu2BIqGo7M44jXeV6BI/Y6v0BYFcS7ZIBWEeNmyYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765977079; c=relaxed/simple;
-	bh=Om1TnknF8svFxwcbl4KqUtDFwkHFW/Rz+8ty3MLobM0=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=FzrxXRB6ue9Y1iCQhQ3SFCLYyH2a/y/g1HYF6rpueLT9isV6Uma46WPGCqvby2m6JfkshkqMWYopCW+BdINnaZ1x6MBwXF1/jGHXYkApiki6LnK/eoTR3O0qa3h41kLgOY/chehpKiRZf5AJPAv8A8X9L7hSJDbtPbNMAc6iU/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L7e8AreG; arc=none smtp.client-ip=209.85.221.46
+	s=arc-20240116; t=1765977342; c=relaxed/simple;
+	bh=f96S71trim0g+HPpzGDMkG7axZcuaPQwx800ipbJaSE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XFj6JE1xnckwdOJgiS6uuMbZhGvkgZXGcP3YZfXFLkfLRhz5F55lG/vG/jXtrHCrIH2vlcbK59odB+MhfWHtK+y8y2x8CoX68X/EV7zNere3DTIhk3z4lD6zUu/HcZAL10dvZeJun/4NEAOLm2h1JU8J/Km8G2NbbhY2WM8OC0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jPq914Dk; arc=none smtp.client-ip=209.85.218.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-42fbc305914so3734833f8f.0
-        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 05:11:17 -0800 (PST)
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-b73161849e1so1350559866b.2
+        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 05:15:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765977076; x=1766581876; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=9Z4HSgH6g7AvwtCkEH+wMmW4znl93Jz3EGhls0Goj0M=;
-        b=L7e8AreGtJc2dH2t39XXJenUCk3Iop8HIUMbw00TQT7A02YSjnr7pyPuYhlTdUEA5J
-         S/sXnEm90OVTKPBPqH87asdqGxPDS5Bbg6FgSWoM1IjHIhBzdppLMYVfASxWigWvLxr1
-         CVUMkSMyMv7cBRY0zmMWaIgenojCMNvQG7LJAzumpaEUCSt7YNW6yTUvuniF3gxxh3nE
-         EfM54uInq1mJ4hYW12WJ16ZAYN28OXM0rx2Bh9yUrlF4ZIv1jyGkr0x1tQ0OH2Y6tiOZ
-         NcMuTcM7erVh2aFFcpRMNmeUgdocOBHxXTqm5HN/VRO6118w6WHNVegdM95OLHNK+H3S
-         aMLQ==
+        d=gmail.com; s=20230601; t=1765977339; x=1766582139; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1F+XhGDyzhWPwRMa7bHo6bLqb91juDMIm0R67eyz4L0=;
+        b=jPq914DkYP6Sycf42AySdvrVjrqxGBhy+WT6FQ6x+tLPRE3+C5tWjfw9ixFG0ExCoo
+         blnI0xMc/mbfL86GwJ/xQg6auTy31FzGJO6QR6AbBm4dycH3c8zUv9W8ZV4q6Lmuftfr
+         TxPdUwe/uDSd8c0DflMAY5ceKtCfJPoGcNnKE84Z4+X1T/BAF4g0bOg5xxJT120129cu
+         EcyAqaW60EUt8ph6jpvySuqRriCrwwm+tCP7iCa9k/6g1FCppHesxzdvvgOq2DoMsmkm
+         kN6KVdtrao1H74IQMKEVrWSEO1V47FEJecPhh0HDQf5Tz/MoQ3I2dQmhSW/E1wX3igvI
+         sGng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765977076; x=1766581876;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9Z4HSgH6g7AvwtCkEH+wMmW4znl93Jz3EGhls0Goj0M=;
-        b=ovDOOH3NPIM2edNtIC/yxTSoQgUQdo+PQJWFhidWj4/jzzS84grBWoIRm4U+EAHcVF
-         KxKxLS61fHf0VZkHKXMhZp/2ScFACbM2h2HV8CLJNRbv3AG/hKGKbvmRITNxCP6uy20U
-         ycCwPVdvXE6RmEykeYjp/4vjwbxsngULd9GbaTlep1NepO2HZ3dwVoq0rC7kvjPbrWFX
-         VYetfnIF4UqsQmEdf73j+rckWFx4IWXlvE5x6aUXk2qAY9DUeH4naerIfgqhCHG3mtig
-         bxqRADM3RPpU756AtQmxFsBKxpYsa+rRmmZNTNDCiUU5k5DLJxnU+4wWDs5Pc0r2inKy
-         J9cA==
-X-Gm-Message-State: AOJu0YykukmQja52vvur1lEU92Vnsqm9ts6/7a8mBm8Ct8fEHFnElWdM
-	EcR0gT+IWcnpMCTtI0ARk3U4C1IBieGVnl7VBotgdD6sy3VCCFxLm00e
-X-Gm-Gg: AY/fxX7x9TgP+drRmbX3jJIxU7GZPzmXHc8aKu83R+SZa8tyO1aR8OxHMDj4x3CdPM+
-	nsh+BaK5E48Z0DWKm7SpbfCzjqJJuhpXB3BxIbsIno5L2BbxTgk3OgltA3LsOddRI8ch6U1J0F5
-	sfiPsZs/zc84wRc84OvMj2VJKA/pIGRG0Bw7fsY0KBQUyAOY+waCkv00oSVAzGBR8ZIztkX0yfi
-	OETchwY9/bRJf41CmVNOnPTsf+4P5ACKWGh3Ds0tk44+x1dwRUkpEL5AGgiF8t4mzt4k4xYCIAU
-	w9gAsvcT89dIog1LRHqOBV8ce4y9gT649Mq+gD4iTmoqlVkgMjLEAwxfAPGYs8oY9HiNvngwNFY
-	i5zi4F9cPA/3kfwNN42uF7rKoDEu3TRobarFRSp+tKa8qrhMbPgFazNdckHE77iXaVnKcMRNc1G
-	MOZyHvF0bgqSwC22yVQXHL/t/GkQ8v1Z76vey76D9qlmFs0XC5alfMugqJWuJe5HjAbv46qpe+7
-	4Dc4jB5/WJGzurMwQz50Fpha8aC1dBuHGF/mQZuiRwJBpM3NHQcTwUDOaT97DMm
-X-Google-Smtp-Source: AGHT+IH4M27L0GnkKa5YZjgEGFIEggORP144TJzRSbqK2PgPBt0czr5vNAg03Rt65ew76snUH/SXqg==
-X-Received: by 2002:a05:6000:2083:b0:431:16d:63a3 with SMTP id ffacd0b85a97d-431016d695fmr10732866f8f.46.1765977076158;
-        Wed, 17 Dec 2025 05:11:16 -0800 (PST)
+        d=1e100.net; s=20230601; t=1765977339; x=1766582139;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1F+XhGDyzhWPwRMa7bHo6bLqb91juDMIm0R67eyz4L0=;
+        b=GfFxvOCLVpKJ1efp/Y7U3/1dXOHa329Cq86D8NabXxW4CN6mGpozAXdimpx+Yw9bRp
+         pcxGEmHWFUYT2g8nRdMYV4hshczjPt78Yz3xwauv1PL324s6li2rXASXS7OvAJM92yqt
+         kvd8LFwSspOjYjc4DUtWjUYspsw+JfYsBjvlDKMw+vtvO1H04DCOFbVL+jOMCZZdrJ5y
+         X3bfjniN8RfLO0Lt6VFxAj0/euNKJTsROeChRwxKJMqSDAXWZqd7zznYWzaQVFfPmJLI
+         lNJOIH6yp4VV10nyqV/44mI1kn/QJ7zYE5041l3LCUA39ZCxOz3KGJFYgukx0BSZxjGd
+         jHEw==
+X-Forwarded-Encrypted: i=1; AJvYcCVgbHVMg3SWibluBPo0ZygFS/PWuui72DCAzLwfaQRo4h1hc1ld7H0kfwaMRdOWJGK0WyjHMsI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyu2tn+19YV4zsx4+2tSEgzcUI1Ike9RXRnR2R5+Ob1FOzrMcGH
+	dPziY2x3Oz6UNOopwdVm3KeAaCQ3RCb1hfe0BBgz9CBg0vArHdCNFTL7
+X-Gm-Gg: AY/fxX7aLo822BiYZYnAMAtUfbczEOEQf33Wd1VllYRuoq/kCOdavsvUq8C0VbL9D2P
+	UKe3hg9w6ZSGNsdietyzcLrl/KLn4uB3gNfBtJ1JFfKRgDR1AhEIlVoaDa5bi5KhPfQnhfsvg5F
+	paspT8ykpbPLqsbbedY/fac3WhKROT5apiL4m6qtfsqDXFEK4WiGymyrCbAJ7J1PcZdAgWhHpF1
+	shK8UnKa8HJq8CvjREWKWxyZ7XCVW43ymLpSt2YlslLAKLWWl2AT9CtUWfXD5mblVbdcPnvGHDT
+	Ep8oaXSM5xDGdRGZQjqsezwh2HDMOYYleYszirgler/gMhBE+BoIDuoTVAMEW1vlh3vTvq3SLXa
+	lbZVEtkHgvJD8fNApjQOsP6kS7CoG3GgM+nwVW9aiIt89mHcO2HA8F+I32E0G5A40Oo6zBFDtK+
+	BswlMD0Q/qFQG20EkSdjrJlDhZUY9dj82kS3ES6GCapG3YKRiCiE5N+r06ouMRFdRDstPMPwmVs
+	V7QHkgZI7a6pXGikIh/39lM/mFp/WmFt4zY0cFj32WLtkHCIgti96TxmYHtXLplA6+E+A95ox8=
+X-Google-Smtp-Source: AGHT+IFJFc+tAj9+1ZWQ33lxgGX+8wQEs7FAeIC0HBzWXEDQ1X33lh9OIi5obJ3o1fl/Fh8XvLSyBw==
+X-Received: by 2002:a17:907:3d92:b0:b7a:2ba7:197f with SMTP id a640c23a62f3a-b7d23a63a2emr1945186566b.52.1765977338934;
+        Wed, 17 Dec 2025 05:15:38 -0800 (PST)
 Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4310adeee0esm4849071f8f.29.2025.12.17.05.11.15
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7cfa29f51esm1970726066b.14.2025.12.17.05.15.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Dec 2025 05:11:15 -0800 (PST)
-Message-ID: <37b642bd-9f26-477e-9fca-1e3c931c0efb@gmail.com>
-Date: Wed, 17 Dec 2025 13:11:28 +0000
+        Wed, 17 Dec 2025 05:15:38 -0800 (PST)
+Message-ID: <39e285e0-81b7-47b2-b36f-50de7e51f95b@gmail.com>
+Date: Wed, 17 Dec 2025 13:15:51 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,44 +83,82 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: Pavel Begunkov <asml.silence@gmail.com>
-Subject: Re: [PATCH net-next] ice: access @pp through netmem_desc instead of
- page
-To: Matthew Wilcox <willy@infradead.org>, Byungchul Park <byungchul@sk.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
- kernel_team@skhynix.com, harry.yoo@oracle.com, david@redhat.com,
- toke@redhat.com, almasrymina@google.com, anthony.l.nguyen@intel.com,
- przemyslaw.kitszel@intel.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, intel-wired-lan@lists.osuosl.org
+Subject: Re: [Intel-wired-lan] [PATCH net-next] ice: access @pp through
+ netmem_desc instead of page
+To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
+ Byungchul Park <byungchul@sk.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "kuba@kernel.org" <kuba@kernel.org>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "kernel_team@skhynix.com" <kernel_team@skhynix.com>,
+ "harry.yoo@oracle.com" <harry.yoo@oracle.com>,
+ "david@redhat.com" <david@redhat.com>,
+ "willy@infradead.org" <willy@infradead.org>,
+ "toke@redhat.com" <toke@redhat.com>,
+ "almasrymina@google.com" <almasrymina@google.com>,
+ "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+ "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+ "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "pabeni@redhat.com" <pabeni@redhat.com>,
+ "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
 References: <20251216040723.10545-1-byungchul@sk.com>
- <aUDd9lLy76sBejrP@casper.infradead.org>
+ <IA3PR11MB898618246F68FA71AF695B3DE5ABA@IA3PR11MB8986.namprd11.prod.outlook.com>
 Content-Language: en-US
-In-Reply-To: <aUDd9lLy76sBejrP@casper.infradead.org>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <IA3PR11MB898618246F68FA71AF695B3DE5ABA@IA3PR11MB8986.namprd11.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 12/16/25 04:20, Matthew Wilcox wrote:
-> On Tue, Dec 16, 2025 at 01:07:23PM +0900, Byungchul Park wrote:
+On 12/17/25 11:46, Loktionov, Aleksandr wrote:
+> 
+> 
+>> -----Original Message-----
+>> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+>> Of Byungchul Park
+>> Sent: Tuesday, December 16, 2025 5:07 AM
+>> To: netdev@vger.kernel.org; kuba@kernel.org
+>> Cc: linux-kernel@vger.kernel.org; kernel_team@skhynix.com;
+>> harry.yoo@oracle.com; david@redhat.com; willy@infradead.org;
+>> toke@redhat.com; asml.silence@gmail.com; almasrymina@google.com;
+>> Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
+>> <przemyslaw.kitszel@intel.com>; andrew+netdev@lunn.ch;
+>> davem@davemloft.net; edumazet@google.com; pabeni@redhat.com; intel-
+>> wired-lan@lists.osuosl.org
+>> Subject: [Intel-wired-lan] [PATCH net-next] ice: access @pp through
+>> netmem_desc instead of page
+>>
+>> To eliminate the use of struct page in page pool, the page pool users
+>> should use netmem descriptor and APIs instead.
+>>
+>> Make ice driver access @pp through netmem_desc instead of page.
+>>
+> Please add test info: HW/ASIC + PF/VF/SR-IOV, kernel version/branch, exact repro steps, before/after results (expected vs. observed).
+> 
+>> Signed-off-by: Byungchul Park <byungchul@sk.com>
+>> ---
+>>   drivers/net/ethernet/intel/ice/ice_ethtool.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c
+>> b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+>> index 969d4f8f9c02..ae8a4e35cb10 100644
+>> --- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
 >> +++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
->> @@ -1251,7 +1251,7 @@ static int ice_lbtest_receive_frames(struct ice_rx_ring *rx_ring)
+>> @@ -1251,7 +1251,7 @@ static int ice_lbtest_receive_frames(struct
+>> ice_rx_ring *rx_ring)
 >>   		rx_buf = &rx_ring->rx_fqes[i];
 >>   		page = __netmem_to_page(rx_buf->netmem);
 >>   		received_buf = page_address(page) + rx_buf->offset +
 >> -			       page->pp->p.offset;
 >> +			       pp_page_to_nmdesc(page)->pp->p.offset;
-> 
-> Shouldn't we rather use:
-> 
-> 		nmdesc = __netmem_to_nmdesc(rx_buf->netmem);
-> 		received_buf = nmdesc_address(nmdesc) + rx_buf->offset +
-> 				nmdesc->pp->p_offset;
-> 
-> (also. i think we're missing a nmdesc_address() function in our API).
+> If rx_buf->netmem is not backed by a page pool (e.g., fallback allocation), pp will be NULL and this dereferences NULL.
+> I think the loopback test runs in a controlled environment, but the code must verify pp is valid before dereferencing.
+> Isn't it?
 
-It wouldn't make sense as net_iov backed nmdescs don't have/expose
-host addresses (only dma addresses). nmdesc_address() would still
-need to rely on the caller knowing that it's a page. An explicit
-cast with *netmem_to_page() should be better.
+Considering "page->pp->p.offset" poking into the pool, if that can
+happen it's a pre-existing problem, which should be fixed first.
 
 -- 
 Pavel Begunkov
