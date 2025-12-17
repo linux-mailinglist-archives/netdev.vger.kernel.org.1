@@ -1,154 +1,125 @@
-Return-Path: <netdev+bounces-245048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1937CC6663
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 08:45:55 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FCCCCC6609
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 08:38:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A78B73036D85
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 07:45:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2DAA13012240
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 07:38:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D483E346FC3;
-	Wed, 17 Dec 2025 07:35:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92CB0272801;
+	Wed, 17 Dec 2025 07:38:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nQ+djcBo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OpCnWix4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3939346FC0;
-	Wed, 17 Dec 2025 07:35:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D890A1AA7BF
+	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 07:38:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765956952; cv=none; b=MS/uu42w5oybfReXzPmGEDRLyqRd0faxUQBcZ3Idh+UeP+c50OIPKFWOd+x03I27Nlrc3W/pFWgCXZNfsGvtGzka7/Z4YLkHQkWJRfZ4DHvlpJr6bGmXmhLUES3P5lTBets6Di4U9D4efPC8ombzfNN/X+TGDBoUpzNlBXkNqJI=
+	t=1765957132; cv=none; b=dQxRO3io0RjHKNQg+wRpwteRr68l74tAXCYeSeDBea/uLyrcTfy0nzzmMhhyMfZHYv/u6bCljBw2McZ37EjYFEskMa/tJ0w/zmLfQIj9KTf/5ffsEmvulrLxOjRTJQpVw1SN/YYZtP9vRIdmVTl03s+7ZJ2byxbS+JPOzMTaLZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765956952; c=relaxed/simple;
-	bh=2XaaukzgeLgytcWUCUB6nIAs5el47mPMOlJZsiCmdRs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FNRyYreuNpfK6PdITBHD+UDLT1KsOg2PV6bueviPdGhoV4shxwzH5c1epw/eJMTJszOx2xp+l9AwxkkRZmHimzzdRG6pOf8WhAU3eAc/2Rux9TyKv7CliXNggZQ7ojzIrPqxEqi+MdW575iDC+KycTC41LYRUCd4cBh/KGjHkoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nQ+djcBo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12B0DC4CEF5;
-	Wed, 17 Dec 2025 07:35:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765956952;
-	bh=2XaaukzgeLgytcWUCUB6nIAs5el47mPMOlJZsiCmdRs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=nQ+djcBonq0nRLg69vpqJvZHxWI/QnyyJYKBkmXePeGS4JZQq4kbbmUNcBxPYBKf6
-	 0JbZHjV97P9dK5N1/Vc6NLL9tthXR0COT/Vst3lnI1Qwcv9x8L7/yV0yrJCuFSWcWb
-	 VvceGWpCYYm3HJ180tmU9TRX/UwQLEyk43hbRLBeHzENE0c14RZdEMaDLCUSNNrUE0
-	 wyKkwytZkVM86n+of60I0upVcbkc5T5SrYjkenbSi8eQVfw2J3Z8MC4mfZKeU5GOL4
-	 aKQhPeZ6TjGsgGN+J678lKGfaSCkgSI9nP9XM6bqEY07BmdDFcwTFgAHR4rOos+wQg
-	 Lkv6hzkWQ0+Gg==
-Message-ID: <07e506c9-21f7-4d4a-ada3-ad0004acf6fc@kernel.org>
-Date: Wed, 17 Dec 2025 08:35:48 +0100
+	s=arc-20240116; t=1765957132; c=relaxed/simple;
+	bh=Hsb56Rs90x2k4ukE0Ot8r6/OwCWWMm1hIIq3hRHiUkc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OrvhDFGcjvpplk/ZwS6UFA4YkMeXaidWNRBYVeBbyKq7BkRmtL1I/L0qiXxyGHXdroqbHMIWjIPV77zvRf1utMSWn3h/OH9yqA+TJy8Scj1SSfmwhKO8p0LkjtGQktA+c1K5AmkbDfV7J3Gx7bSjuzdUdLUbsqNz8YooL24JUfI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OpCnWix4; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-42f9ece6387so2130070f8f.0
+        for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 23:38:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1765957129; x=1766561929; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cbqhzpWH7PyaGirZsS8sgiEKvpbvpZb7J4Lujfr7Cw8=;
+        b=OpCnWix4H/DHbEOAVXbEePBZvGpjjZG+byqjaP5EYu4y8shRghGGOS2OBssmUL4oXs
+         VfmfBwo+1Kb2cB25XhkFIqCFpvqjnR+o1hYoT/GrgnmEiOJMX+D6oKOkJeVuN7Ok9FS/
+         +f47wDkE97TsDwrPLxOrh4QcAXT5wyi8WNE5qOABDpesCeviIrAB/BHaeQnZ+lcpt7rU
+         ifEixFxfw+cVsFSMRI8m4KSpKrxqOFTRKWHc8HgT7LCf3Y/Ru5klQMaJs14bxunh/mk5
+         HhVyZmZouglEEjhKcVbFPFo7LIYDC4lEhWTWlRBoCvpTZ3JauUUWchCdEY8aechc2TAK
+         Dhcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765957129; x=1766561929;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=cbqhzpWH7PyaGirZsS8sgiEKvpbvpZb7J4Lujfr7Cw8=;
+        b=L5fWC3jY9mjqbsmQoaFne87cULaWojPzHtFKLNC93V4hgO/ErCdin8Sxh08c4PKAyL
+         82mfQRkjcwIz4T05D1IavIuqkf9yEkg60iGwMnl1ccn5zrnhMIkCDIRH3FuAJKrSdXmF
+         hIbSKyrtJqNbfKC7wFpSPh+/JzqShEFvVl4+tJR+cOzaQfBKNB83ZSzYmgDyEfD73qGy
+         1N6XOdIPfqVtDgjH4+PFI8WmEGI3cZs7sMHKpVcrTedmuLGEhRZ0j8LuFE0LpSVMH7Yw
+         Laf4DAbnQ/0IwyhfnH+4Pb0BD+FpPzXxz5CNJUfEwSwDgVl/TTdq2Wcvbd1MfoXhlho/
+         rSjQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUPT/MEOXR9yO3pph9kSnoDAF2nMoirf2FBFCv0KLWazNl2LDIKzN/LWQ8fTHsz23mVEDm+wac=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzE1aqOwBby377pLLKHq8cZdYHvnppoIa5syvyztG/R0LFxu/S9
+	bv9/M89EA3rkUD40PdMUzRCHUQ3XmEGqOk1BOXr/NgMjezQY83pv3SKNVrfrSWDdD0gmAZgxKsY
+	8pO//ewpUDO2NudR4MliXKegobJO4QR0=
+X-Gm-Gg: AY/fxX7QG7GaknKyokHOvcVbqOuRwXMeBdoQu3Dog2Nc5mtABJPKg1Kgef6/cDjoTyH
+	DMKldd99eFI4x8VJOgqicVskAzIaO2kZVUfurh8kXzQa5cscQiLYOujpzE0idFi7sTTm5WNIX71
+	qPFbmnjw4BbLcV06Vh56UJEFOzz65i0iU0WXaAEWsPBVTGKMd90OHfz1CruRPV3A+PDQ2+pDNfc
+	VFoylAZyu7I2YmRxQcYPW/fqsUbk2KVvPtWMPxM7bWMKq+XE5wC9gEVhKQzV5cZoH7GoNApf7MD
+	crpRfT2rj2F/K/0v4Ey3+jIu9Gdx3A==
+X-Google-Smtp-Source: AGHT+IF1d/OhXg0L/2AreTO1JLf6LtyhYdbdF4v0qna6Dg0KUlZSE7gqWoK7bBwMpfC9YRqlfnXsO4eNSi9QPN5Op98=
+X-Received: by 2002:a05:6000:18a6:b0:430:fd84:3179 with SMTP id
+ ffacd0b85a97d-430fd8434b3mr8675400f8f.33.1765957128980; Tue, 16 Dec 2025
+ 23:38:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] nfc: llcp: stop processing on LLCP_CLOSED in
- nfc_llcp_recv_hdlc()
-To: Qianchang Zhao <pioooooooooip@gmail.com>, Paolo Abeni
- <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org, Zhitong Liu <liuzhitong1993@gmail.com>
-References: <307c2afe-8e8e-4edf-b6d1-1056fe8949f6@kernel.org>
- <20251217011538.16029-1-pioooooooooip@gmail.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20251217011538.16029-1-pioooooooooip@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <aUJYSv6kqb9QauMI@westworld> <a5ef868d-b957-4124-a9ed-030f863dcd29@nvidia.com>
+In-Reply-To: <a5ef868d-b957-4124-a9ed-030f863dcd29@nvidia.com>
+From: Kyle Zeng <zengyhkyle@gmail.com>
+Date: Wed, 17 Dec 2025 00:38:11 -0700
+X-Gm-Features: AQt7F2p-BYMdwBvcqpmQpZ9o-7T-_YNct-DlQUY8OZldAlmulsYGkefgGFpYLEw
+Message-ID: <CADW8OBstQyqcrt6f0qt9EQOr4_LrFgMd1ve15ZerTw0P-qQN6w@mail.gmail.com>
+Subject: Re: [PATCH] ptp: prevent info leak to userspace
+To: Gal Pressman <gal@nvidia.com>
+Cc: richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 17/12/2025 02:15, Qianchang Zhao wrote:
-> nfc_llcp_sock_get() takes a reference on the LLCP socket via sock_hold().
-> 
-> In nfc_llcp_recv_hdlc(), the LLCP_CLOSED branch releases the socket lock and
-> drops the reference, but the function continues to operate on llcp_sock/sk and
-> later runs release_sock() and nfc_llcp_sock_put() again on the common exit path.
-> 
-> Return immediately after the CLOSED cleanup to avoid refcount/lock imbalance and
-> to avoid using the socket after dropping the reference.
-> 
-> Reported-by: Qianchang Zhao <pioooooooooip@gmail.com>
-> Reported-by: Zhitong Liu <liuzhitong1993@gmail.com>
+I apologize for the rookie mistake. Should've known better than this.
+And thanks for the correction.
 
-No, drop. Same comments as for other patch.
-
-Organize your patches in a patchset. Don't send independent works, it's
-just more work for maintainers to apply.
-
-
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Qianchang Zhao <pioooooooooip@gmail.com>
-> ---
->  net/nfc/llcp_core.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
-> index beeb3b4d2..be01ec9f4 100644
-> --- a/net/nfc/llcp_core.c
-> +++ b/net/nfc/llcp_core.c
-> @@ -1089,6 +1089,7 @@ static void nfc_llcp_recv_hdlc(struct nfc_llcp_local *local,
->  	if (sk->sk_state == LLCP_CLOSED) {
->  		release_sock(sk);
->  		nfc_llcp_sock_put(llcp_sock);
-> +		return;
-
-Answer my previous questions from the private thread.
-
->  	}
->  
->  	/* Pass the payload upstream */
-
-
-Best regards,
-Krzysztof
+On Wed, Dec 17, 2025 at 12:28=E2=80=AFAM Gal Pressman <gal@nvidia.com> wrot=
+e:
+>
+> On 17/12/2025 9:14, Kyle Zeng wrote:
+> > Somehow the `memset` is lost after refactor, which leaks a lot of kerne=
+l
+> > stack data to userspace directly. This patch clears the reserved data
+> > region to prevent the info leak.
+> >
+> > Signed-off-by: Kyle Zeng <zengyhkyle@gmail.com>
+> > ---
+> >  drivers/ptp/ptp_chardev.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> >
+> > diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
+> > index c61cf9edac48..06f71011fb04 100644
+> > --- a/drivers/ptp/ptp_chardev.c
+> > +++ b/drivers/ptp/ptp_chardev.c
+> > @@ -195,6 +195,8 @@ static long ptp_clock_getcaps(struct ptp_clock *ptp=
+, void __user *arg)
+> >       if (caps.adjust_phase)
+> >               caps.max_phase_adj =3D ptp->info->getmaxphase(ptp->info);
+> >
+> > +     memset(caps.rsv, 0, sizeof(caps.rsv));
+> > +
+> >       return copy_to_user(arg, &caps, sizeof(caps)) ? -EFAULT : 0;
+> >  }
+> >
+>
+> This is not how C works, the designated initializer clears the field
+> implicitly.
 
