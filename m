@@ -1,186 +1,180 @@
-Return-Path: <netdev+bounces-245050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F4A9CC6657
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 08:45:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 57299CC6723
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 08:56:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3C7FB300EDCC
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 07:45:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DE135303CCFA
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 07:56:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EA11338585;
-	Wed, 17 Dec 2025 07:45:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD2C8335566;
+	Wed, 17 Dec 2025 07:55:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ELlSPoe4"
 X-Original-To: netdev@vger.kernel.org
-Received: from baidu.com (mx24.baidu.com [111.206.215.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E83B3335070;
-	Wed, 17 Dec 2025 07:45:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.206.215.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86537313264;
+	Wed, 17 Dec 2025 07:55:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765957518; cv=none; b=VetEOZndZJJ4CqieSpR1GQ57fxUnFRi/CqYm5nXsHKibcOmqt1oKKRi2CD7WynCJnyDLNcC18xoQeMsRAc12Fi+j2zqFrZlMwnWIti2QM44qmNIz6YVOamfkElcPw4h/zc4fsI6AMq4o1F+pP361pHCzHQ0c7pfPg2QrmO4A/W0=
+	t=1765958157; cv=none; b=Wr7408CjKwmcJb9V3lDsIgh+isc/oxglNPgVFZEHgE5iSK2NlJ4QdEALWQUtXD3ISyfP3ofnAN2bVgYQAW7rXwrML1+64ybWzbLGQjnFuwmV/GBbXZW4l7FKzhM5Tt6OSM7yEAbYKWRVfFVKS214s+keNPq7ksuQbkhGp97Ybmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765957518; c=relaxed/simple;
-	bh=Z+Jzz041A/hSxFfjiERCGO9Bw7pgIwdNbbfMviJ0dxM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=NqrLrblRrF9S0UPKGUustJsFgWqFMTe0tKSq0cwYZt5iQv8gSGmS/D2SG5Dw0JNcIRhjMD5jhbxDxZfMlLNXTdWssoB1g0bGinIHjrcH+uHGEysiisI3VJWa1gjNzUq6COiMoFipWjYaVYZTTNSgQlGlNrlLx/M6TIb6ndJmAYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=111.206.215.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
-From: "Li,Rongqing" <lirongqing@baidu.com>
-To: Lance Yang <lance.yang@linux.dev>
-CC: Nicholas Piggin <npiggin@gmail.com>, Christophe Leroy
-	<chleroy@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, "Eduard
- Zingerman" <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
-	<yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, "KP
- Singh" <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo
-	<haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-aspeed@lists.ozlabs.org"
-	<linux-aspeed@lists.ozlabs.org>, "linux-openrisc@vger.kernel.org"
-	<linux-openrisc@vger.kernel.org>, "linuxppc-dev@lists.ozlabs.org"
-	<linuxppc-dev@lists.ozlabs.org>, "dri-devel@lists.freedesktop.org"
-	<dri-devel@lists.freedesktop.org>, "bpf@vger.kernel.org"
-	<bpf@vger.kernel.org>, "linux-kselftest@vger.kernel.org"
-	<linux-kselftest@vger.kernel.org>, "wireguard@lists.zx2c4.com"
-	<wireguard@lists.zx2c4.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>
-Subject: =?utf-8?B?562U5aSNOiBb5aSW6YOo6YKu5Lu2XSBSZTogW1BBVENIXSB3YXRjaGRvZzog?=
- =?utf-8?B?c29mdGxvY2t1cDogcGFuaWMgd2hlbiBsb2NrdXAgZHVyYXRpb24gZXhjZWVk?=
- =?utf-8?Q?s_N_thresholds?=
-Thread-Topic: =?utf-8?B?W+WklumDqOmCruS7tl0gUmU6IFtQQVRDSF0gd2F0Y2hkb2c6IHNvZnRsb2Nr?=
- =?utf-8?B?dXA6IHBhbmljIHdoZW4gbG9ja3VwIGR1cmF0aW9uIGV4Y2VlZHMgTiB0aHJl?=
- =?utf-8?Q?sholds?=
-Thread-Index: AQHcbl/9zLj0PrwWtkKQBC8uxPlgN7Uk2YoAgACa3iA=
-Date: Wed, 17 Dec 2025 07:43:48 +0000
-Message-ID: <e7296a3d65a6445fa6ad4f81a3f7cd55@baidu.com>
-References: <20251216074521.2796-1-lirongqing@baidu.com>
- <e216e4ae-b882-454d-be8f-24f21a3549d9@linux.dev>
-In-Reply-To: <e216e4ae-b882-454d-be8f-24f21a3549d9@linux.dev>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1765958157; c=relaxed/simple;
+	bh=Xo9c1qEYiQMSvCEooBFQkEOr2bYPsShQNIttr2X1DG8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WPfMXK5DTKOSa1/ubqkw3Ft5S8CalKuzCjpDHdalvaDGTOPIiY2p/khF+VfurDoyQ7uaIYNz03ILYAZNU/WUiSKP3FVbMwyx63BtozfF6gmMOeWQjLrIFHSdHZ23qCFOOOZr+ZPAa+9yaJthxSa0sH+7akvrRkIRAiE2dSwhdK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ELlSPoe4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69B78C4CEF5;
+	Wed, 17 Dec 2025 07:55:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765958157;
+	bh=Xo9c1qEYiQMSvCEooBFQkEOr2bYPsShQNIttr2X1DG8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ELlSPoe46Vp/wKpVK3LLNZx61ZRTeN9a8aiwZ+dBOq6JSgu8lT1rxJ3wY80rxeXhw
+	 OZrPCLpEBFk6TLKFBA5pONUweIEe6/iPED+L08U/dXepE25vl89hRZiQ/FCns7UqdC
+	 coya/6tg0ImJ/cGQDCryPzjE8vQi9Nqu3aUuHEAmYgRVp1m3qEkelGkvr/TPOrnFV9
+	 yhPHmKfYuEbW8BihXNYfIx3rYzf4yaVAhlcte6H35pz0VG5SbKINKXAIGTAmOGvHIK
+	 XqbbXlo5Mxru1Gcnu0BaAUfhCIDC3t50dTRFkXYmmP/w7QngJootP/5QLOgvwTke2k
+	 Z91VDTNTIflIw==
+Date: Wed, 17 Dec 2025 13:25:39 +0530
+From: Sumit Garg <sumit.garg@kernel.org>
+To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>
+Cc: Sumit Garg <sumit.garg@oss.qualcomm.com>,
+	Jens Wiklander <jens.wiklander@linaro.org>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Jan Kiszka <jan.kiszka@siemens.com>,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Mimi Zohar <zohar@linux.ibm.com>,
+	David Howells <dhowells@redhat.com>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Peter Huewe <peterhuewe@gmx.de>, op-tee@lists.trustedfirmware.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-rtc@vger.kernel.org, linux-efi@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	Cristian Marussi <cristian.marussi@arm.com>,
+	arm-scmi@vger.kernel.org, netdev@vger.kernel.org,
+	linux-mips@vger.kernel.org, linux-integrity@vger.kernel.org,
+	keyrings@vger.kernel.org, linux-security-module@vger.kernel.org,
+	Jason Gunthorpe <jgg@ziepe.ca>
+Subject: Re: [PATCH v1 00/17] tee: Use bus callbacks instead of driver
+ callbacks
+Message-ID: <aUJh--HGVeJWIilS@sumit-xelite>
+References: <cover.1765472125.git.u.kleine-koenig@baylibre.com>
+ <aT--ox375kg2Mzh-@sumit-X1>
+ <dhunzydod4d7vj73llpuqemxb5er2ja4emxusr66irwf77jhhb@es4yd2axzl25>
+ <CAGptzHOOqLhBnAXDURAzkgckUvRr__UuF1S_7MLV0u-ZxYEdyA@mail.gmail.com>
+ <ayebinxqpcnl7hpa35ytrudiy7j75u5bdk3enlirkp5pevppeg@6mx6a5fwymwf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-FEAS-Client-IP: 172.31.50.47
-X-FE-Policy-ID: 52:10:53:SYSTEM
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ayebinxqpcnl7hpa35ytrudiy7j75u5bdk3enlirkp5pevppeg@6mx6a5fwymwf>
 
-PiA+IGRpZmYgLS1naXQgYS9Eb2N1bWVudGF0aW9uL2FkbWluLWd1aWRlL2tlcm5lbC1wYXJhbWV0
-ZXJzLnR4dA0KPiA+IGIvRG9jdW1lbnRhdGlvbi9hZG1pbi1ndWlkZS9rZXJuZWwtcGFyYW1ldGVy
-cy50eHQNCj4gPiBpbmRleCBhOGQwYWZkLi4yN2M1Zjk2IDEwMDY0NA0KPiA+IC0tLSBhL0RvY3Vt
-ZW50YXRpb24vYWRtaW4tZ3VpZGUva2VybmVsLXBhcmFtZXRlcnMudHh0DQo+ID4gKysrIGIvRG9j
-dW1lbnRhdGlvbi9hZG1pbi1ndWlkZS9rZXJuZWwtcGFyYW1ldGVycy50eHQNCj4gPiBAQCAtNjkz
-NCwxMiArNjkzNCwxMiBAQCBLZXJuZWwgcGFyYW1ldGVycw0KPiA+DQo+ID4gICAJc29mdGxvY2t1
-cF9wYW5pYz0NCj4gPiAgIAkJCVtLTkxdIFNob3VsZCB0aGUgc29mdC1sb2NrdXAgZGV0ZWN0b3Ig
-Z2VuZXJhdGUgcGFuaWNzLg0KPiA+IC0JCQlGb3JtYXQ6IDAgfCAxDQo+ID4gKwkJCUZvcm1hdDog
-PGludD4NCj4gPg0KPiA+IC0JCQlBIHZhbHVlIG9mIDEgaW5zdHJ1Y3RzIHRoZSBzb2Z0LWxvY2t1
-cCBkZXRlY3Rvcg0KPiA+IC0JCQl0byBwYW5pYyB0aGUgbWFjaGluZSB3aGVuIGEgc29mdC1sb2Nr
-dXAgb2NjdXJzLiBJdCBpcw0KPiA+IC0JCQlhbHNvIGNvbnRyb2xsZWQgYnkgdGhlIGtlcm5lbC5z
-b2Z0bG9ja3VwX3BhbmljIHN5c2N0bA0KPiA+IC0JCQlhbmQgQ09ORklHX0JPT1RQQVJBTV9TT0ZU
-TE9DS1VQX1BBTklDLCB3aGljaCBpcyB0aGUNCj4gPiArCQkJQSB2YWx1ZSBvZiBub24temVybyBp
-bnN0cnVjdHMgdGhlIHNvZnQtbG9ja3VwIGRldGVjdG9yDQo+ID4gKwkJCXRvIHBhbmljIHRoZSBt
-YWNoaW5lIHdoZW4gYSBzb2Z0LWxvY2t1cCBkdXJhdGlvbiBleGNlZWRzDQo+ID4gKwkJCU4gdGhy
-ZXNob2xkcy4gSXQgaXMgYWxzbyBjb250cm9sbGVkIGJ5IHRoZSBrZXJuZWwuc29mdGxvY2t1cF9w
-YW5pYw0KPiA+ICsJCQlzeXNjdGwgYW5kIENPTkZJR19CT09UUEFSQU1fU09GVExPQ0tVUF9QQU5J
-Qywgd2hpY2ggaXMNCj4gdGhlDQo+ID4gICAJCQlyZXNwZWN0aXZlIGJ1aWxkLXRpbWUgc3dpdGNo
-IHRvIHRoYXQgZnVuY3Rpb25hbGl0eS4NCj4gDQo+IFNlZW1zIGxpa2Uga2VybmVsL2NvbmZpZ3Mv
-ZGVidWcuY29uZmlnIHN0aWxsIGhhcyB0aGUgb2xkIGZvcm1hdCAiIw0KPiBDT05GSUdfQk9PVFBB
-UkFNX1NPRlRMT0NLVVBfUEFOSUMgaXMgbm90IHNldCIgLi4uDQo+IA0KPiBTaG91bGQgYmUgdXBk
-YXRlZCB0byAiQ09ORklHX0JPT1RQQVJBTV9TT0ZUTE9DS1VQX1BBTklDPTAiLCByaWdodD8NCj4g
-DQoNCldpbGwgZml4IA0KDQoNCj4gPg0KPiA+ICAgCXNvZnRsb2NrdXBfYWxsX2NwdV9iYWNrdHJh
-Y2U9DQo+ID4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtL2NvbmZpZ3MvYXNwZWVkX2c1X2RlZmNvbmZp
-Zw0KPiA+IGIvYXJjaC9hcm0vY29uZmlncy9hc3BlZWRfZzVfZGVmY29uZmlnDQo+ID4gaW5kZXgg
-MmU2ZWExMy4uZWM1NThlNSAxMDA2NDQNCj4gPiAtLS0gYS9hcmNoL2FybS9jb25maWdzL2FzcGVl
-ZF9nNV9kZWZjb25maWcNCj4gPiArKysgYi9hcmNoL2FybS9jb25maWdzL2FzcGVlZF9nNV9kZWZj
-b25maWcNCj4gPiBAQCAtMzA2LDcgKzMwNiw3IEBAIENPTkZJR19TQ0hFRF9TVEFDS19FTkRfQ0hF
-Q0s9eQ0KPiA+ICAgQ09ORklHX1BBTklDX09OX09PUFM9eQ0KPiA+ICAgQ09ORklHX1BBTklDX1RJ
-TUVPVVQ9LTENCj4gPiAgIENPTkZJR19TT0ZUTE9DS1VQX0RFVEVDVE9SPXkNCj4gPiAtQ09ORklH
-X0JPT1RQQVJBTV9TT0ZUTE9DS1VQX1BBTklDPXkNCj4gPiArQ09ORklHX0JPT1RQQVJBTV9TT0ZU
-TE9DS1VQX1BBTklDPTENCj4gPiAgIENPTkZJR19CT09UUEFSQU1fSFVOR19UQVNLX1BBTklDPTEN
-Cj4gPiAgIENPTkZJR19XUV9XQVRDSERPRz15DQo+ID4gICAjIENPTkZJR19TQ0hFRF9ERUJVRyBp
-cyBub3Qgc2V0DQo+ID4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtL2NvbmZpZ3MvcHhhM3h4X2RlZmNv
-bmZpZw0KPiA+IGIvYXJjaC9hcm0vY29uZmlncy9weGEzeHhfZGVmY29uZmlnDQo+ID4gaW5kZXgg
-MDdkNDIyZi4uZmIyNzJlMyAxMDA2NDQNCj4gPiAtLS0gYS9hcmNoL2FybS9jb25maWdzL3B4YTN4
-eF9kZWZjb25maWcNCj4gPiArKysgYi9hcmNoL2FybS9jb25maWdzL3B4YTN4eF9kZWZjb25maWcN
-Cj4gPiBAQCAtMTAwLDcgKzEwMCw3IEBAIENPTkZJR19QUklOVEtfVElNRT15DQo+ID4gICBDT05G
-SUdfREVCVUdfS0VSTkVMPXkNCj4gPiAgIENPTkZJR19NQUdJQ19TWVNSUT15DQo+ID4gICBDT05G
-SUdfREVCVUdfU0hJUlE9eQ0KPiA+IC1DT05GSUdfQk9PVFBBUkFNX1NPRlRMT0NLVVBfUEFOSUM9
-eQ0KPiA+ICtDT05GSUdfQk9PVFBBUkFNX1NPRlRMT0NLVVBfUEFOSUM9MQ0KPiA+ICAgIyBDT05G
-SUdfU0NIRURfREVCVUcgaXMgbm90IHNldA0KPiA+ICAgQ09ORklHX0RFQlVHX1NQSU5MT0NLPXkN
-Cj4gPiAgIENPTkZJR19ERUJVR19TUElOTE9DS19TTEVFUD15DQo+ID4gZGlmZiAtLWdpdCBhL2Fy
-Y2gvb3BlbnJpc2MvY29uZmlncy9vcjFrbGl0ZXhfZGVmY29uZmlnDQo+ID4gYi9hcmNoL29wZW5y
-aXNjL2NvbmZpZ3Mvb3Ixa2xpdGV4X2RlZmNvbmZpZw0KPiA+IGluZGV4IGZiMWViOWEuLjk4NGIw
-ZTMgMTAwNjQ0DQo+ID4gLS0tIGEvYXJjaC9vcGVucmlzYy9jb25maWdzL29yMWtsaXRleF9kZWZj
-b25maWcNCj4gPiArKysgYi9hcmNoL29wZW5yaXNjL2NvbmZpZ3Mvb3Ixa2xpdGV4X2RlZmNvbmZp
-Zw0KPiA+IEBAIC01Miw1ICs1Miw1IEBADQo+IENPTkZJR19MU009ImxvY2tkb3duLHlhbWEsbG9h
-ZHBpbixzYWZlc2V0aWQsaW50ZWdyaXR5LGJwZiINCj4gPiAgIENPTkZJR19QUklOVEtfVElNRT15
-DQo+ID4gICBDT05GSUdfUEFOSUNfT05fT09QUz15DQo+ID4gICBDT05GSUdfU09GVExPQ0tVUF9E
-RVRFQ1RPUj15DQo+ID4gLUNPTkZJR19CT09UUEFSQU1fU09GVExPQ0tVUF9QQU5JQz15DQo+ID4g
-K0NPTkZJR19CT09UUEFSQU1fU09GVExPQ0tVUF9QQU5JQz0xDQo+ID4gICBDT05GSUdfQlVHX09O
-X0RBVEFfQ09SUlVQVElPTj15DQo+ID4gZGlmZiAtLWdpdCBhL2FyY2gvcG93ZXJwYy9jb25maWdz
-L3NraXJvb3RfZGVmY29uZmlnDQo+ID4gYi9hcmNoL3Bvd2VycGMvY29uZmlncy9za2lyb290X2Rl
-ZmNvbmZpZw0KPiA+IGluZGV4IDJiNzFhNmQuLmE0MTE0ZmMgMTAwNjQ0DQo+ID4gLS0tIGEvYXJj
-aC9wb3dlcnBjL2NvbmZpZ3Mvc2tpcm9vdF9kZWZjb25maWcNCj4gPiArKysgYi9hcmNoL3Bvd2Vy
-cGMvY29uZmlncy9za2lyb290X2RlZmNvbmZpZw0KPiA+IEBAIC0yODksNyArMjg5LDcgQEAgQ09O
-RklHX1NDSEVEX1NUQUNLX0VORF9DSEVDSz15DQo+ID4gICBDT05GSUdfREVCVUdfU1RBQ0tPVkVS
-RkxPVz15DQo+ID4gICBDT05GSUdfUEFOSUNfT05fT09QUz15DQo+ID4gICBDT05GSUdfU09GVExP
-Q0tVUF9ERVRFQ1RPUj15DQo+ID4gLUNPTkZJR19CT09UUEFSQU1fU09GVExPQ0tVUF9QQU5JQz15
-DQo+ID4gK0NPTkZJR19CT09UUEFSQU1fU09GVExPQ0tVUF9QQU5JQz0xDQo+ID4gICBDT05GSUdf
-SEFSRExPQ0tVUF9ERVRFQ1RPUj15DQo+ID4gICBDT05GSUdfQk9PVFBBUkFNX0hBUkRMT0NLVVBf
-UEFOSUM9eQ0KPiA+ICAgQ09ORklHX1dRX1dBVENIRE9HPXkNCj4gPiBkaWZmIC0tZ2l0IGEvZHJp
-dmVycy9ncHUvZHJtL2NpL2FybS5jb25maWcNCj4gPiBiL2RyaXZlcnMvZ3B1L2RybS9jaS9hcm0u
-Y29uZmlnIGluZGV4IDQxMWU4MTQuLmQ3YzUxNjcgMTAwNjQ0DQo+ID4gLS0tIGEvZHJpdmVycy9n
-cHUvZHJtL2NpL2FybS5jb25maWcNCj4gPiArKysgYi9kcml2ZXJzL2dwdS9kcm0vY2kvYXJtLmNv
-bmZpZw0KPiA+IEBAIC01Miw3ICs1Miw3IEBAIENPTkZJR19UTVBGUz15DQo+ID4gICBDT05GSUdf
-UFJPVkVfTE9DS0lORz1uDQo+ID4gICBDT05GSUdfREVCVUdfTE9DS0RFUD1uDQo+ID4gICBDT05G
-SUdfU09GVExPQ0tVUF9ERVRFQ1RPUj1uDQo+ID4gLUNPTkZJR19CT09UUEFSQU1fU09GVExPQ0tV
-UF9QQU5JQz1uDQo+ID4gK0NPTkZJR19CT09UUEFSQU1fU09GVExPQ0tVUF9QQU5JQz0wDQo+ID4N
-Cj4gPiAgIENPTkZJR19GV19MT0FERVJfQ09NUFJFU1M9eQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBh
-L2RyaXZlcnMvZ3B1L2RybS9jaS9hcm02NC5jb25maWcNCj4gPiBiL2RyaXZlcnMvZ3B1L2RybS9j
-aS9hcm02NC5jb25maWcgaW5kZXggZmRkZmJkNC4uZWEwZTMwNyAxMDA2NDQNCj4gPiAtLS0gYS9k
-cml2ZXJzL2dwdS9kcm0vY2kvYXJtNjQuY29uZmlnDQo+ID4gKysrIGIvZHJpdmVycy9ncHUvZHJt
-L2NpL2FybTY0LmNvbmZpZw0KPiA+IEBAIC0xNjEsNyArMTYxLDcgQEAgQ09ORklHX1RNUEZTPXkN
-Cj4gPiAgIENPTkZJR19QUk9WRV9MT0NLSU5HPW4NCj4gPiAgIENPTkZJR19ERUJVR19MT0NLREVQ
-PW4NCj4gPiAgIENPTkZJR19TT0ZUTE9DS1VQX0RFVEVDVE9SPXkNCj4gPiAtQ09ORklHX0JPT1RQ
-QVJBTV9TT0ZUTE9DS1VQX1BBTklDPXkNCj4gPiArQ09ORklHX0JPT1RQQVJBTV9TT0ZUTE9DS1VQ
-X1BBTklDPTENCj4gPg0KPiA+ICAgQ09ORklHX0RFVEVDVF9IVU5HX1RBU0s9eQ0KPiA+DQo+ID4g
-ZGlmZiAtLWdpdCBhL2RyaXZlcnMvZ3B1L2RybS9jaS94ODZfNjQuY29uZmlnDQo+ID4gYi9kcml2
-ZXJzL2dwdS9kcm0vY2kveDg2XzY0LmNvbmZpZw0KPiA+IGluZGV4IDhlYWJhMzg4Li43YWM5OGE3
-IDEwMDY0NA0KPiA+IC0tLSBhL2RyaXZlcnMvZ3B1L2RybS9jaS94ODZfNjQuY29uZmlnDQo+ID4g
-KysrIGIvZHJpdmVycy9ncHUvZHJtL2NpL3g4Nl82NC5jb25maWcNCj4gPiBAQCAtNDcsNyArNDcs
-NyBAQCBDT05GSUdfVE1QRlM9eQ0KPiA+ICAgQ09ORklHX1BST1ZFX0xPQ0tJTkc9bg0KPiA+ICAg
-Q09ORklHX0RFQlVHX0xPQ0tERVA9bg0KPiA+ICAgQ09ORklHX1NPRlRMT0NLVVBfREVURUNUT1I9
-eQ0KPiA+IC1DT05GSUdfQk9PVFBBUkFNX1NPRlRMT0NLVVBfUEFOSUM9eQ0KPiA+ICtDT05GSUdf
-Qk9PVFBBUkFNX1NPRlRMT0NLVVBfUEFOSUM9MQ0KPiA+DQo+ID4gICBDT05GSUdfREVURUNUX0hV
-TkdfVEFTSz15DQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEva2VybmVsL3dhdGNoZG9nLmMgYi9rZXJu
-ZWwvd2F0Y2hkb2cuYyBpbmRleA0KPiA+IDA2ODVlM2EuLmE1ZmExMTYgMTAwNjQ0DQo+ID4gLS0t
-IGEva2VybmVsL3dhdGNoZG9nLmMNCj4gPiArKysgYi9rZXJuZWwvd2F0Y2hkb2cuYw0KPiA+IEBA
-IC0zNjMsNyArMzYzLDcgQEAgc3RhdGljIHN0cnVjdCBjcHVtYXNrIHdhdGNoZG9nX2FsbG93ZWRf
-bWFzaw0KPiA+IF9fcmVhZF9tb3N0bHk7DQo+ID4NCj4gPiAgIC8qIEdsb2JhbCB2YXJpYWJsZXMs
-IGV4cG9ydGVkIGZvciBzeXNjdGwgKi8NCj4gPiAgIHVuc2lnbmVkIGludCBfX3JlYWRfbW9zdGx5
-IHNvZnRsb2NrdXBfcGFuaWMgPQ0KPiA+IC0JCQlJU19FTkFCTEVEKENPTkZJR19CT09UUEFSQU1f
-U09GVExPQ0tVUF9QQU5JQyk7DQo+ID4gKwkJCUNPTkZJR19CT09UUEFSQU1fU09GVExPQ0tVUF9Q
-QU5JQzsNCj4gPg0KPiA+ICAgc3RhdGljIGJvb2wgc29mdGxvY2t1cF9pbml0aWFsaXplZCBfX3Jl
-YWRfbW9zdGx5Ow0KPiA+ICAgc3RhdGljIHU2NCBfX3JlYWRfbW9zdGx5IHNhbXBsZV9wZXJpb2Q7
-IEBAIC04NzksNyArODc5LDkgQEAgc3RhdGljDQo+ID4gZW51bSBocnRpbWVyX3Jlc3RhcnQgd2F0
-Y2hkb2dfdGltZXJfZm4oc3RydWN0IGhydGltZXIgKmhydGltZXIpDQo+ID4NCj4gPiAgIAkJYWRk
-X3RhaW50KFRBSU5UX1NPRlRMT0NLVVAsIExPQ0tERVBfU1RJTExfT0spOw0KPiA+ICAgCQlzeXNf
-aW5mbyhzb2Z0bG9ja3VwX3NpX21hc2sgJiB+U1lTX0lORk9fQUxMX0JUKTsNCj4gPiAtCQlpZiAo
-c29mdGxvY2t1cF9wYW5pYykNCj4gPiArCQlkdXJhdGlvbiA9IGR1cmF0aW9uIC8gZ2V0X3NvZnRs
-b2NrdXBfdGhyZXNoKCk7DQo+IA0KPiBOaXQ6IHJldXNpbmcgImR1cmF0aW9uIiBoZXJlIG1ha2Vz
-IHRoaW5ncyBhIGJpdCBjb25mdXNpbmcsIG1heWJlIGp1c3QgdXNlIGEgdGVtcA0KPiB2YXJpYWJs
-ZT8NCj4gDQo+IAl0aHJlc2hfY291bnQgPSBkdXJhdGlvbiAvIGdldF9zb2Z0bG9ja3VwX3RocmVz
-aCgpOw0KPiANCj4gCWlmIChzb2Z0bG9ja3VwX3BhbmljICYmIHRocmVzaF9jb3VudCA+PSBzb2Z0
-bG9ja3VwX3BhbmljKQ0KPiAJCXBhbmljKCJzb2Z0bG9ja3VwOiBodW5nIHRhc2tzIik7DQo+IA0K
-DQpXaWxsIGNoYW5nZSBpbiBuZXh0IHZlcnNpb24sIHRoYW5rcw0KDQpbTGksUm9uZ3FpbmddIA0K
-DQoNCg==
+On Tue, Dec 16, 2025 at 12:08:38PM +0100, Uwe Kleine-König wrote:
+> Hello,
+> 
+> On Tue, Dec 16, 2025 at 01:08:38PM +0530, Sumit Garg wrote:
+> > On Mon, Dec 15, 2025 at 3:02 PM Uwe Kleine-König
+> > <u.kleine-koenig@baylibre.com> wrote:
+> > > On Mon, Dec 15, 2025 at 04:54:11PM +0900, Sumit Garg wrote:
+> > > > Feel free to make the tee_bus_type private as the last patch in the series
+> > > > such that any followup driver follows this clean approach.
+> > >
+> > > There is a bit more to do for that than I'm willing to invest. With my
+> > > patch series applied `tee_bus_type` is still used in
+> > > drivers/tee/optee/device.c and drivers/tee/tee_core.c.
+> > 
+> > Oh I see, I guess we need to come with some helpers around device
+> > register/unregister from TEE subsystem as well. Let's plan that for a
+> > followup patch-set, I don't want this patch-set to be bloated more.
+> 
+> Don't consider me in for that. But it sounds like a nice addition.
+>
+
+No worries, the current cleanup is fine for now.
+
+> > > Maybe it's
+> > > sensible to merge these two files into a single one.
+> > 
+> > It's not possible as the design for TEE bus is to have TEE
+> > implementation drivers like OP-TEE, AMD-TEE, TS-TEE, QTEE and so on to
+> > register devices on the bus.
+> 
+> So only OP-TEE uses the bus for devices and the other *-TEE don't. Also
+> sounds like something worth to be fixed.
+
+The TEE bus is common for all the TEE implementation drivers which need
+to support kernel TEE client drivers. I am aware there will be QTEE and
+TS-TEE from past discussion that they will be exposing devices on the
+TEE bus.
+
+> 
+> > > The things I wonder about additionally are:
+> > >
+> > >  - if CONFIG_OPTEE=n and CONFIG_TEE=y|m the tee bus is only used for
+> > >    drivers but not devices.
+> > 
+> > Yeah since the devices are rather added by the TEE implementation driver.
+> > 
+> > >
+> > >  - optee_register_device() calls device_create_file() on
+> > >    &optee_device->dev after device_register(&optee_device->dev).
+> > >    (Attention half-knowledge!) I think device_create_file() should not
+> > >    be called on an already registered device (or you have to send a
+> > >    uevent afterwards). This should probably use type attribute groups.
+> > >    (Or the need_supplicant attribute should be dropped as it isn't very
+> > >    useful. This would maybe be considered an ABI change however.)
+> > 
+> > The reasoning for this attribute should be explained by commit:
+> > 7269cba53d90 ("tee: optee: Fix supplicant based device enumeration").
+> > In summary it's due to a weird dependency for devices we have with the
+> > user-space daemon: tee-supplicant.
+> 
+> From reading that once I don't understand it. (But no need to explain
+> :-)
+> 
+> Still the file should better be added before device_add() is called.
+
+Noted, let me see if I can get to fix this until someone jumps in before
+me.
+
+> 
+> > >  - Why does optee_probe() in drivers/tee/optee/smc_abi.c unregister all
+> > >    optee devices in its error path (optee_unregister_devices())?
+> > 
+> > This is mostly to take care of if any device got registered before the
+> > failure occured. Let me know if you have a better way to address that.
+> 
+> Without understanding the tee stuff, I'd say: Don't bother and only undo
+> the things that probe did before the failure.
+> 
+
+True, but this is special case where if there is any leftover device
+registered from the TEE implementation then it is likely going to cause
+the corresponding kernel client driver crash.
+
+-Sumit
 
