@@ -1,135 +1,209 @@
-Return-Path: <netdev+bounces-245040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D1ACCC5EFC
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 04:56:04 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30CE2CC61A4
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 06:49:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 66034300BBBF
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 03:56:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 571243093F8B
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 05:48:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99A6C27FD7C;
-	Wed, 17 Dec 2025 03:56:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB2752D593E;
+	Wed, 17 Dec 2025 05:39:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="Tlni7/FI"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="DT4ORhZT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f226.google.com (mail-pf1-f226.google.com [209.85.210.226])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACEEC23D7C7;
-	Wed, 17 Dec 2025 03:55:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67A682D5C67
+	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 05:39:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765943762; cv=none; b=NsbW/zdmpYAjaG/3010QPbyHzB8B2zRWKmmC3o1i/g0nZo+WDqv4xMJ/UrL11tN815CF77BUVoM10OLmtTzx8ngvvgeK5AD078VG71h89SP/7iEaBR6ptc0uA0Jh44rzltPhaOxtNTjNuWRCB7SqkdbwWb7VEdxRVwClcaTRdbg=
+	t=1765949957; cv=none; b=UOAq5lD8pjnHG/JikeBzJKiJjbE2zT9qBxAtI8a9SI0B/xhgrjACslBlAxJN2fBJBjJmx4L8udpLpEwHWF9xOSqt3YbqZYjyxg3yGBbhNmwQ9C7WUv/y1hXI1LirLCxshd5BjYFu/qh6U5C8tyBrysUr01x7q90CfydCzTttMDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765943762; c=relaxed/simple;
-	bh=LE0uHuh6pTS+B0PdD5RafJ+S+XfDAz4yBSHP/iVnrZk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uXFsft623Kk/CyluwERF4hUrxNt505xu25kcHKr2SeNNivBerj2vWIm36Ta0EOj1WHDPkSIhtdHzqCD8KZ865Bu5HtCznzJYL3lfONtexzzXdWhSbJdAtiaQmFtzz5jMjr+5OVm2jpjSrMMuxUcnJ1EPw2XMV/+y38C1aIuxARY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=Tlni7/FI; arc=none smtp.client-ip=210.61.82.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: 48f769bedafc11f0b33aeb1e7f16c2b6-20251217
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=g6vBW2JewppFyaRLb6KGyeqKVlYw6haEmZpTMY8QxvI=;
-	b=Tlni7/FISvDqX4RHVG3FxCMKhoNzFiQ8m8hrBTkHN/TCMoxCbPdWonNZdiwU6+wLPhQNMsjust2OZlW64AIkp8lXrpcRfMsWoSg116LddbRckcasrpP31cbAMHLc2bwDlk3PcPX28sP6D8958jocsdyZOv8IyLhWc2JedZRpFao=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.3.6,REQID:7f37a831-eed9-4c19-9ade-06229eace0b8,IP:0,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:r
-	elease,TS:0
-X-CID-META: VersionHash:a9d874c,CLOUDID:2e469b28-e3a2-4f78-a442-8c73c4eb9e9d,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102|836|888|898,TC:-5,Content:0|15|5
-	0,EDM:-3,IP:nil,URL:0,File:130,RT:0,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OS
-	A:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 2,SSN|SDN
-X-CID-BAS: 2,SSN|SDN,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
-X-UUID: 48f769bedafc11f0b33aeb1e7f16c2b6-20251217
-Received: from mtkmbs13n1.mediatek.inc [(172.21.101.193)] by mailgw02.mediatek.com
-	(envelope-from <jibin.zhang@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 1373861328; Wed, 17 Dec 2025 11:55:53 +0800
-Received: from mtkmbs13n2.mediatek.inc (172.21.101.108) by
- MTKMBS09N1.mediatek.inc (172.21.101.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Wed, 17 Dec 2025 11:55:52 +0800
-Received: from mbjsdccf07.mediatek.inc (10.15.20.246) by
- mtkmbs13n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.2562.29 via Frontend Transport; Wed, 17 Dec 2025 11:55:51 +0800
-From: Jibin Zhang <jibin.zhang@mediatek.com>
-To: Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>, "David S . Miller"
-	<davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
-CC: <wsd_upstream@mediatek.com>, <shiming.cheng@mediatek.com>,
-	<defa.li@mediatek.com>, Jibin Zhang <jibin.zhang@mediatek.com>
-Subject: [PATCH] net: fix segmentation of forwarding fraglist GRO
-Date: Wed, 17 Dec 2025 11:55:42 +0800
-Message-ID: <20251217035548.8104-1-jibin.zhang@mediatek.com>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1765949957; c=relaxed/simple;
+	bh=zH8txaQ0XSPjp+a8hEHVgLfbYoAVeSW0Vz9enyJPQkw=;
+	h=From:MIME-Version:Date:Message-ID:Subject:To:Content-Type; b=irlJQpYlQwZzsBNx8QqsIDm98w0aD1PEOg0OI3tF9PlB9xSIqoJUssVnB21VWUNJmdNOLn6JyMPs278vJrdlCrLuy0rLZL4ovRVd+EulsDxgcJ4MWEfDwpotzlPs0sWn0a5GQD7xlM7r+gszTgGhOx5iifw7jBbRsHAxEzh3al0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=DT4ORhZT; arc=none smtp.client-ip=209.85.210.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pf1-f226.google.com with SMTP id d2e1a72fcca58-7b9215e55e6so3901013b3a.2
+        for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 21:39:16 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765949956; x=1766554756;
+        h=to:subject:message-id:date:thread-index:mime-version:from
+         :dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zH8txaQ0XSPjp+a8hEHVgLfbYoAVeSW0Vz9enyJPQkw=;
+        b=PAe56rXQeEwQ2GUAVAXF42cFHQOCtdgHeaj5FVQy/jySfC6Cc8RiLmtlQYRKdCzgcA
+         cRLZNV2W7SeOuHbosaONgREN/iW11sTE78F2a5IAOXEer3bjI2C6oQMD3ShLSgRsW05y
+         UZEzYThPktXFwTQmvn5pEzrJHCgT1sCLaDU4dxyBlBIx/RHjvMqVsw6Ig4hOyTr0EsXM
+         k0B6M9AP7AstsD/31ZYk39cI1OH18zRB9NrsJiiMqZeFzGO38aJlu+5h3x/J1SbCTl+o
+         li83DyKAEJejsMt2mk+dNTPuWn4wcHWCtxautzm+UTc592SRoYu/iJ3PfLqq/8wktGMy
+         PC1A==
+X-Gm-Message-State: AOJu0Yyd4TbJCuIbVh2UTqgwS60KEJuxVE5KJaSE0eTl6odiAmG0yjxc
+	7JYUyUz6igrKKqwZPAx4xEQmtUEuMJ+emTOQmehmGxgQDIfDK22q2fy+Dsgx+cdirF6qPF7ZB7B
+	2KyioeHVj/6sddnUjy8DEzGbeufLwj77UgpJHAUzvhF7VGam9s3gc5PVigrd+Y0NJKSl+2oDhOz
+	VULca7GXUQthhZhAtRGfws5gQPvDOGvpc+gHpJks4ZjwUeLfxiTrJRQrsT0MzypkjOIHMH82TSC
+	LAnw06kRJ7A91I=
+X-Gm-Gg: AY/fxX5gnlIt2sq088woVPJGqbEoI61yjRcSJV0vs2bh6d1JuempaJ9zVnM4w7eJxWL
+	kYOsSBoo6UR8uyEv+PZDim7Id9Ecc0GrppJqef1LtEAG998kUHYFR9CGZrIjMlZpxhb9MAzap5v
+	dLmgy4HRLNBCBhUcEykD3KzOKCxG3asrRV+xXgTur+xEN/qgunOpN+S9zzfRBs7nf8bNR+nwz+Q
+	AeBM4EtYmVvMDwsFs9CTZE0+ayQumCY1ZwvSURhQ1cFCRNvuhJ6JkQd1SOod24U6s4gZ8pv13s0
+	++B34qBCFsQq0lEZ9w3/v+Cl+pvoe0C5I3bPwM0W1frsF/N2qG0xAWN4lyrZO9iZA7tsUKkmEDE
+	Sy/GG//mVHSRfGRSfP5iT+brFqt/RL0JV6cf07RTim9STC/eaM2F8O6ZQx130sN1MRA3nHGu1Dg
+	3tiP5MfKh/PDkytmXeyAl8hNr+z4XYBZGHtzpIXRZn00cP/mqo
+X-Google-Smtp-Source: AGHT+IGUZ4xNi1rfSU7+rO52hQbB3QrjhPSeWU0+5ekVb5jUCWmnCt3Z2UhRH/YIA+6uR76XUgJpOQY1NIy3
+X-Received: by 2002:a05:6a00:94f4:b0:7f1:14a8:1cd8 with SMTP id d2e1a72fcca58-7f6693a66b0mr16397678b3a.36.1765949955547;
+        Tue, 16 Dec 2025 21:39:15 -0800 (PST)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-19.dlp.protect.broadcom.com. [144.49.247.19])
+        by smtp-relay.gmail.com with ESMTPS id d2e1a72fcca58-7fcbaf28651sm212340b3a.8.2025.12.16.21.39.15
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 16 Dec 2025 21:39:15 -0800 (PST)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-yx1-f72.google.com with SMTP id 956f58d0204a3-6446ee26635so8793818d50.1
+        for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 21:39:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1765949954; x=1766554754; darn=vger.kernel.org;
+        h=to:subject:message-id:date:thread-index:mime-version:from:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=zH8txaQ0XSPjp+a8hEHVgLfbYoAVeSW0Vz9enyJPQkw=;
+        b=DT4ORhZTFp40ybkBuwDcEg5MqzD+iNob7DCV2/R5XdZN/XWnZcdmn0Gav2nRqqP9Kr
+         eYsbTXVUJXPywAD5cGeiOBy5PwT5J9GTkElYPoukcTo1pcichUxl3TXpVt0IM/WQWmkQ
+         /wT2wPh89/bBZG9SGru+PgvrILQqF6gcmeZuQ=
+X-Received: by 2002:a05:690e:16a0:b0:640:fc53:3b6d with SMTP id 956f58d0204a3-6455566348cmr12386279d50.64.1765949954275;
+        Tue, 16 Dec 2025 21:39:14 -0800 (PST)
+X-Received: by 2002:a05:690e:16a0:b0:640:fc53:3b6d with SMTP id
+ 956f58d0204a3-6455566348cmr12386273d50.64.1765949953936; Tue, 16 Dec 2025
+ 21:39:13 -0800 (PST)
+From: Dharmender Garg Garg <dharmender.garg@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AdxvF3iOtZ3Rr73tT86ZiFmm2XXosQ==
+Date: Wed, 17 Dec 2025 11:09:12 +0530
+X-Gm-Features: AQt7F2q_TgQyLzp-JdKU1DAZrde_1AZbRswBUZvw-HnBKWv1bAQbkWRk2_P9FLY
+Message-ID: <460258fdca70a8b68ecb151480ef99d9@mail.gmail.com>
+Subject: subscribe netdev
+To: netdev@vger.kernel.org
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000bb263e06461f4394"
 
-This patch enhances GSO segment checks by verifying the presence
-of frag_list and protocol consistency, addressing low throughput
-issues on IPv4 servers when used as hotspots
+--000000000000bb263e06461f4394
+Content-Type: text/plain; charset="UTF-8"
 
-Specifically, it fixes a bug in GSO segmentation when forwarding
-GRO packets with frag_list. The function skb_segment_list cannot
-correctly process GRO skbs converted by XLAT, because XLAT only
-converts the header of the head skb. As a result, skbs in the
-frag_list may remain unconverted, leading to protocol
-inconsistencies and reduced throughput.
+subscribe netdev
 
-To resolve this, the patch uses skb_segment to handle forwarded
-packets converted by XLAT, ensuring that all fragments are
-properly converted and segmented.
+--000000000000bb263e06461f4394
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-Signed-off-by: Jibin Zhang <jibin.zhang@mediatek.com>
----
- net/ipv4/tcp_offload.c | 3 ++-
- net/ipv4/udp_offload.c | 3 ++-
- 2 files changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
-index fdda18b1abda..162a384a15bb 100644
---- a/net/ipv4/tcp_offload.c
-+++ b/net/ipv4/tcp_offload.c
-@@ -104,7 +104,8 @@ static struct sk_buff *tcp4_gso_segment(struct sk_buff *skb,
- 	if (!pskb_may_pull(skb, sizeof(struct tcphdr)))
- 		return ERR_PTR(-EINVAL);
- 
--	if (skb_shinfo(skb)->gso_type & SKB_GSO_FRAGLIST) {
-+	if ((skb_shinfo(skb)->gso_type & SKB_GSO_FRAGLIST) && skb_has_frag_list(skb) &&
-+	    (skb->protocol == skb_shinfo(skb)->frag_list->protocol)) {
- 		struct tcphdr *th = tcp_hdr(skb);
- 
- 		if (skb_pagelen(skb) - th->doff * 4 == skb_shinfo(skb)->gso_size)
-diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-index 19d0b5b09ffa..704fb32d10d7 100644
---- a/net/ipv4/udp_offload.c
-+++ b/net/ipv4/udp_offload.c
-@@ -512,7 +512,8 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
- 		return NULL;
- 	}
- 
--	if (skb_shinfo(gso_skb)->gso_type & SKB_GSO_FRAGLIST) {
-+	if ((skb_shinfo(gso_skb)->gso_type & SKB_GSO_FRAGLIST) && skb_has_frag_list(gso_skb) &&
-+	    (gso_skb->protocol == skb_shinfo(gso_skb)->frag_list->protocol)) {
- 		 /* Detect modified geometry and pass those to skb_segment. */
- 		if (skb_pagelen(gso_skb) - sizeof(*uh) == skb_shinfo(gso_skb)->gso_size)
- 			return __udp_gso_segment_list(gso_skb, features, is_ipv6);
--- 
-2.45.2
-
+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
+CQCHbf4K/sa8yiOw2qEx2eHv0fXb9txmt8tq4oBDb/8/e7QzqwyP4AF9QNRqoo7YhEposVJ01Mm8
+LrKelbYWEVPj74y4AQ2x3T8Tt3eeM7pO+65eXzC0iwRM+PnfwMTd/WVzXEnFRlqElQ2L92Rcg+nL
+Br5nZRQJzGJKrm/dghG0HIA8STne+2+0Vl0Jm1/xWwd3PVUlCF+kkWZqC63N/AreShgU5X46XKAw
+Y3pllKzJ4tzC22oMMTxSRjG7M3ZjDoTj5xHmoDC3LvONHfO84AfTZ5Z2UQIDAQABo4IB4DCCAdww
+DgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwgZMGCCsGAQUFBwEBBIGGMIGDMEYGCCsGAQUF
+BzAChjpodHRwOi8vc2VjdXJlLmdsb2JhbHNpZ24uY29tL2NhY2VydC9nc2djY3I2c21pbWVjYTIw
+MjMuY3J0MDkGCCsGAQUFBzABhi1odHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3I2c21p
+bWVjYTIwMjMwZQYDVR0gBF4wXDAJBgdngQwBBQMDMAsGCSsGAQQBoDIBKDBCBgorBgEEAaAyCgMC
+MDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2JhbHNpZ24uY29tL3JlcG9zaXRvcnkvMEEG
+A1UdHwQ6MDgwNqA0oDKGMGh0dHA6Ly9jcmwuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2Ey
+MDIzLmNybDAnBgNVHREEIDAegRxkaGFybWVuZGVyLmdhcmdAYnJvYWRjb20uY29tMBMGA1UdJQQM
+MAoGCCsGAQUFBwMEMB8GA1UdIwQYMBaAFAApNp5ceroPry1QLdugI4UYsKCSMB0GA1UdDgQWBBQ1
+gmbMVhlI4fI5gzyrvJdjYNX4dDANBgkqhkiG9w0BAQsFAAOCAgEAIilBYcPY1c/pd64W9/sOUnkd
+tkJ991eiIjAB6UXvFJC7Jg8m6XmodhIB+5N+OAz+qdE5wy1PUXwFmMEos0c9Cwq7YRTfEZ7WI7Hu
+X8niHzBg4rfU46fm5Virt7VzS740EQhzzH8TCq+v8VluSBtCYcQH30OfPZIh5imVt6qU+O6uYr/m
+b7MndySA/eQUzDF9PAPisD+tnqfZpYhUeAK944Aeyz5arAFEwfqZDSX5BxiUfJHaca3r+zRK7pOv
+LOgij3lAmWlai3D0I+nAR4FPLncyvX72G8NDOUMC15xYW9MWaq2bsZukywxLjrHCAGtGDGj88zMm
+qG3n2nfcK7+2StXDi65b1ZGFurDHLAf4k9PLxcc7vbu/ayQfZu/WMefE2EiCQlcAcVyDI6v4a1/d
+dDrYSoX+qqRLhv0SVf1yOTzeEsHc6sGW2qBJN+6+t1Kl4D8hcox98Y7Q3LmpMqUJXWcpI1OpTubV
+qYxJnAbHmXZaqlaG2T2u0k3YMgWBv62g/1bh3zuYefH81WSdcjqWlswhMeMT9xo6e4Q4/lSh+8Yk
+afEHAKS2zP92yLyShwjb6MGxOP4KtvUhEXyBN8g8yy9CL2LXP/IeNl7j4cUjjdQDu5hjEF4pdKF1
+jlyFu5TadFv8+ve14VtBGOveOAIKYbd7sWCAo1vG/Kuvwns/XzAxggJXMIICUwIBATBiMFIxCzAJ
+BgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMSgwJgYDVQQDEx9HbG9iYWxTaWdu
+IEdDQyBSNiBTTUlNRSBDQSAyMDIzAgwCLpwddxj5oLQ8kx4wDQYJYIZIAWUDBAIBBQCggccwLwYJ
+KoZIhvcNAQkEMSIEIBM/EkSkcLR/kNRSQu/SFcsJamb6QM9Q9Kxl05QwslvJMBgGCSqGSIb3DQEJ
+AzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MTIxNzA1MzkxNFowXAYJKoZIhvcNAQkP
+MU8wTTALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzAL
+BgkqhkiG9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBAI45jLaIfcAVYa8IB/wI
+8LCGCALcBoh+pMiP2zburTIOFOOBy/EHlPe5xQdV5Sm/Dx9hIxM9weAmZosDV+Ud44NiZ+H4LG2Y
+bgbhcf8kiulgH5DgqMczrdRMFnheBrEZVu011enq50YmNk6SRuu7N2/F0cukWK1uAL1IllmyVXut
+RaITO56eerUGhA53rL5EUedOeAkS0OT6NKp61qN8i+8drcAdawBku+TZ1NFjf+XkRqkE/LY1BocG
+RRY+MBMvmfck6jHzWvWUb6oY8j3OGikAjTiYg6/5spJ7PxPtWlAxad0TCmoIZMUYMoaqQ7mXi+vv
+3hpbF0jjN5AVB0dCZ/k=
+--000000000000bb263e06461f4394--
 
