@@ -1,128 +1,137 @@
-Return-Path: <netdev+bounces-245035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0BA2CC5AFE
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 02:22:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47B10CC5B67
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 02:41:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 27BBA301004F
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 01:22:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E8C29300D494
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 01:41:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3687A242D8B;
-	Wed, 17 Dec 2025 01:22:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBDFE251791;
+	Wed, 17 Dec 2025 01:41:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GBv19nhH";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="fO0GU2oV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zctc0A7l"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54FAB1FECCD
-	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 01:22:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47D8222F76F
+	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 01:41:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765934540; cv=none; b=j41idVTcUD5XRrTu0iizD42wuNdfk3GrVy2hKSSkkH7becqAt6xgcEA5KRUthpY0vFgWH/+5AyhGAPot1OxXgZPJlNghwTsROiHTy1Me9bs20eyV4eISoGzTYyBxXTXYOL7Sit2lwRwR8hbWJssL+Z/IR6tAmSLfF/6fiEKk1NM=
+	t=1765935663; cv=none; b=ARGKKFxbfFEVCnutDAiEcVnwrWB9j+s1aIs3/0+CAmVz8KBcZ7asreIybHu84yhAM3jafpwfrm23h42jeH5if16gNqXq1VJ2vpLi3R3YDg9DJf+X7hRUM7p8J0WI7kYImdwg3B5/mYC/javu9dG31zOZLGQYKSj9YwvG6qrYgw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765934540; c=relaxed/simple;
-	bh=9boVk68kYNusC+MXtLi8MSVwKnke4dYwoVkCzCoc7c0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=J/3TzrZRrFYt630BZ7udIxAxBwZLvIkEF8Nn2YUwfjoFa+4VB5ue+80zF2v+GSAUyI+R8bLKbGw2SHBBY+tIzDGDIwmb17KOe3IjujD9/glcE73r9KpI+0sGR9cvqDz2OOYfJlLK4Yuii5SghLPijM2kJ2G9edr+BwQHugfHJV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GBv19nhH; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=fO0GU2oV; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765934536;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9boVk68kYNusC+MXtLi8MSVwKnke4dYwoVkCzCoc7c0=;
-	b=GBv19nhH9XZD9S4AyCb2S7hWhUKjBC93AwewvhJVD2qEdlj685TSmoT8JrRwrhVzw7UbTQ
-	ZpdWGbOvX17s4evzCK/nKl2zsGo4KDU2GKe5vNfFTUrJyslPr8lzL8DMQpffzJDAhu3hCg
-	QFOidVOu/k5DM1A9ocUj7AWbW3FVyok=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-467-7JquKrlcMGmYAKMdQuL-dg-1; Tue, 16 Dec 2025 20:22:13 -0500
-X-MC-Unique: 7JquKrlcMGmYAKMdQuL-dg-1
-X-Mimecast-MFC-AGG-ID: 7JquKrlcMGmYAKMdQuL-dg_1765934532
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-34c5d7865e4so4902274a91.2
-        for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 17:22:13 -0800 (PST)
+	s=arc-20240116; t=1765935663; c=relaxed/simple;
+	bh=8TyVSvKXYxR05iL0+NnYb0R4ktZ+w5a/caOd/UaYwpk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Xza7BOziv0qxYQLN3A35ZzAjy0Of04BS8YpcuLWgEu8Lnnd6egJS4d5uWNbhqKrVEEsx17tYeMZCQ8w9aLF5kYtdU54I9RlNsvw2OoxmLJHnehV5aE4SdUffiurbY+McQUAaNqtTM1hhVB8BAkkr1B1SiyrpyIsLcqj7bj5Rm/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zctc0A7l; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2a0abca9769so6524425ad.1
+        for <netdev@vger.kernel.org>; Tue, 16 Dec 2025 17:41:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1765934532; x=1766539332; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9boVk68kYNusC+MXtLi8MSVwKnke4dYwoVkCzCoc7c0=;
-        b=fO0GU2oVZ6FKjAkZU4V6va5pvqEWW9thNqJn8WH6C5UCjKAiapP9v+8j4pbYnqQpnN
-         vP/vsCYmLxpFjBh89w3QdEv/Vt1fzQgsTiyL/Bii/ZXAQ/mDhz1RLs8ld4X9rQqk+gPY
-         pYYf+5AzHoPWFgng9SFYjHQ7LEFfzf2yv9fok10G/6k4Gm8zHWkfJvyyHLdwROzKxQiS
-         AQX/CRVORfrxBErAhf5WFFwLHCj7G1Da3nJ0H+wa8HRkxp3mrr/IOuFyauZboEDUnVbl
-         jJ6C10DfFZkNk+5MGcm3zn2QuxbsFcp8KpwXpmyyqWtfUhqjpU3o98ZIb6QKJrSsZelU
-         oOSg==
+        d=gmail.com; s=20230601; t=1765935662; x=1766540462; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=mDxHcZkTjmjUFpD0nPdaDh+C7TB+4JYFvDaSUk+afn4=;
+        b=Zctc0A7lyZ3TvRozNmzCOk6Ut3H6lHvT7WTfVdYkv6TGiHwfd3tajEnlHG9VFxhTmr
+         19LjuylpMNb7JsxsxnwMDyXNUIN1m/fwh7zf/I46bguaADrn6CHiiOxlmBnC8e5VLLjj
+         m1AlUQJpLZCdrSGEYvNzGBOQ6t/U26yFpcUsWS2+Eqj0cdX5y8cB8ivewjI1PNX5UsDR
+         4FGm3NyNG0rN+vNOOpdepTGofVngIrc12F+VD0XfIH1GQCvXj6/Z9MSCUgoG+Y7/zhDW
+         inaojLFQcoNpiPog5C+tPj9WmCAEb5djsEyodoN4akEwN6BnOmuoHAdk3OZZIhI5mOLX
+         yR/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765934532; x=1766539332;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=9boVk68kYNusC+MXtLi8MSVwKnke4dYwoVkCzCoc7c0=;
-        b=TG5K0qdCQUCnJOUyVN9HtBm6FSTbytLVTJDH+o7Dr4jPP7sZRev10iQ4iRJWeiQdxO
-         VUJwcuNbS6axmyZM66w1Ob0tMAqzTHf90xO8y9/eUTvGRoDt4BIdqJvHbOx5k6AJ/hpj
-         cJ9t1gYd/9n8vRZr0jpTVFE6MfPs+TSJ3Iz53Yxs96LQ7Wq9FHRcUe3Hp4R02+4G3rBn
-         xVcoQeAiL4PDqiVjQ8qiMr67SDlpClu84GW5qfDUYi+CS0MHkb0MmHJ/Q7H1eLwuNbHd
-         V/xUU5LojidepuPW46tN+frRtQ0k9urqQxNMELfrvCjd62LFawYE4VKFzCAP7bz5TOKf
-         MgAQ==
-X-Gm-Message-State: AOJu0YzxK1t8SBmlylozBv+tR7Mu/oig/GwlNi3SVaIVXNuyUgWAMg/k
-	jtgcII8qfkwYYWC8gix/nuxBuAZ041y15mcw9FzX9iVq+kkntaTlmjBaEnwqu5Ju+EKGVKf07+Z
-	tp67X0+Cwvx+mUuRiZgBekOBPnt83bcP99gmI580e0xyS7s9j6NsdNcy5cnoqq/G8szm4auzOoh
-	fX8IZGG4Y9vMCkgX64zhpghOJN+Job/o9z
-X-Gm-Gg: AY/fxX6Mnaw5fEJR4elWdTwadsSDZKcTs+SDJmkf5fpXZhkPIBHFn4Ga7r3E+xP0EKc
-	OMiaYXf5AsvqytbgAID2UWnDcTahvMv83hsbcJIyZdCRYTJ9X+WEyr7qr6RGKYw4S3Mf53C7udM
-	7I9dFOCb3iMUWPPJfKhDFV/xcXP+LP5ZAaSLROhqc7W18JfehtSgl9AZJcjz7E9Dyayw==
-X-Received: by 2002:a17:90b:1345:b0:34c:fe57:278c with SMTP id 98e67ed59e1d1-34cfe5731d8mr891200a91.34.1765934532501;
-        Tue, 16 Dec 2025 17:22:12 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH2Qj1MjAZsaJatY38cVNtUzo65vJvXXqfgYjDc1M1txBuTCxEU1f06oaF/Mba6iW1H5lOe2BX+sqswTaGgyuE=
-X-Received: by 2002:a17:90b:1345:b0:34c:fe57:278c with SMTP id
- 98e67ed59e1d1-34cfe5731d8mr891185a91.34.1765934532113; Tue, 16 Dec 2025
- 17:22:12 -0800 (PST)
+        d=1e100.net; s=20230601; t=1765935662; x=1766540462;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mDxHcZkTjmjUFpD0nPdaDh+C7TB+4JYFvDaSUk+afn4=;
+        b=eMFflHg69pMmCtgeSy4bCmpui0r4807xUxXdqEYE6teVjrL+HjVh1bFMCmWIcvNfak
+         uNyAH9bG4MqIO9cr9pSVr++7Fwh3gJ2xdowrYGa7KNx7Elqme93ESjW+sEZd4DuAP9l+
+         QFWbQx5CmbbfS5esThtUEVLT5XJK0Ad4MpP350y3nutNyhfrPCaclaQ1nMkwX4n7fasz
+         va/VVcPGb3OKVLC+hsQqz3khP1TKV0ZxCKb4kctw/xN/mSga9wwm4w60iLIxcXwI5gX/
+         ROXE1kHH9an7d9Zb1L0rD5OYUXW0gbCb3TiW4kMuncx1PV5qfK8qloYyUbI8hAPB1imv
+         qmeg==
+X-Forwarded-Encrypted: i=1; AJvYcCWc54vJluPi7D4laK2j/RrM/L3arEwbBhnFgEXQb1/6Ke/xCxseujdkFlTvkJ5TrD2mx7fg6xo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyOZbqPW82dDaGPAb4DDdNem9AMmRHqQ4+49N4EkDc44ubnFM6b
+	eSubwfrmwPm03arIYlkG1dzZnvDGryTfxCwAUsZucD38C5aE168er3Tc
+X-Gm-Gg: AY/fxX5dLoNJ/K0poY380b799En09qdHsV45tCuLxDHhFLNTSR07T91Wqo8Fbh7YOBm
+	1rvIKB1WyA8uXLh2DIJJhi5+00qTJggE8f9v9fGEAL57cEgg8BrdvoaSJzXkE26g3z+SByENg2/
+	9q5WpFl4onuqLKEXpuVc9uLT/TUBrbRJ3CEM5qC5NRJg9npDfEgRlqmPRGr8BC3aEBldNSqQSff
+	4Azkwk9AtFXeJJ8ISjeHYEX7Q98yt4W3zsxOcj1vq8hXkteXnFTee6wr2/wlqnw5wTVH4sttv3u
+	Z5s6ugilUmwK2ify4pBbPHYqsRN94ZONWOrjYROT6vqj3Hr5Hb/XpoKH0YTwaP5bssN7PWN8JN3
+	dRZ5eDfHkeP3ypoO/NE9QKrq4QNNrlEhQvZFSJ5e1lFex11nNgpGlR1yFJJ4sYJKbATnC0BSsV6
+	8LPd1zYvmKgv96Si0kMz+NKZplhEeZEqpEYpr1dABlxZdm0WE1nZF/ufFOn1fnL3tjO6tldnDdm
+	m30O3OYxSc=
+X-Google-Smtp-Source: AGHT+IF/SEOxDOKcFv5IqFKvN9ywf362IPWc8RJF/t4t5MrZbneoibmeTII8xwlbnor44Kr5k43j5Q==
+X-Received: by 2002:a17:902:ce8b:b0:2a0:ccee:b356 with SMTP id d9443c01a7336-2a0cceebcddmr72318115ad.1.1765935661607;
+        Tue, 16 Dec 2025 17:41:01 -0800 (PST)
+Received: from poi.localdomain (KD118158218050.ppp-bb.dion.ne.jp. [118.158.218.50])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29eea016f80sm179600095ad.60.2025.12.16.17.40.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Dec 2025 17:41:01 -0800 (PST)
+From: Qianchang Zhao <pioooooooooip@gmail.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	Zhitong Liu <liuzhitong1993@gmail.com>,
+	Qianchang Zhao <pioooooooooip@gmail.com>
+Subject: [PATCH] nfc: llcp: avoid double release/put on LLCP_CLOSED in nfc_llcp_recv_disc()
+Date: Wed, 17 Dec 2025 10:40:48 +0900
+Message-Id: <20251217014048.16889-1-pioooooooooip@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251216175918.544641-1-kshankar@marvell.com>
-In-Reply-To: <20251216175918.544641-1-kshankar@marvell.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 17 Dec 2025 09:22:00 +0800
-X-Gm-Features: AQt7F2p59SvA8jqbLDZpsRBclL2mVEfHsYjkaUO7M68_TRk-7vqIcAO9BWf3AVs
-Message-ID: <CACGkMEvgA-A=aZc06kc1o68Em8AeXmWPeRa-S=ziqWencpSk3Q@mail.gmail.com>
-Subject: Re: [PATCH net-next ] vdpa: fix caching attributes of MMIO regions by
- setting them explicitly
-To: Kommula Shiva Shankar <kshankar@marvell.com>
-Cc: netdev@vger.kernel.org, mst@redhat.com, virtualization@lists.linux.dev, 
-	eperezma@redhat.com, kvm@vger.kernel.org, jerinj@marvell.com, 
-	ndabilpuram@marvell.com, schalla@marvell.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Dec 17, 2025 at 1:59=E2=80=AFAM Kommula Shiva Shankar
-<kshankar@marvell.com> wrote:
->
-> Explicitly set non-cached caching attributes for MMIO regions.
-> Default write-back mode can cause CPU to cache device memory,
-> causing invalid reads and unpredictable behavior.
->
-> Invalid read and write issues were observed on ARM64 when mapping the
-> notification area to userspace via mmap.
->
-> Signed-off-by: Kommula Shiva Shankar <kshankar@marvell.com>
-> ---
+nfc_llcp_sock_get() takes a reference on the LLCP socket via sock_hold().
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+In nfc_llcp_recv_disc(), when the socket is already in LLCP_CLOSED state, the
+code used to perform release_sock() and nfc_llcp_sock_put() in the CLOSED branch
+but then continued execution and later performed the same cleanup again on the
+common exit path. This results in refcount imbalance (double put) and unbalanced
+lock release.
 
-Btw, I think this should go with Michael's vhost tree.
+Remove the redundant CLOSED-branch cleanup so that release_sock() and
+nfc_llcp_sock_put() are performed exactly once via the common exit path, while
+keeping the existing DM_DISC reply behavior.
 
-Thanks
+Reported-by: Qianchang Zhao <pioooooooooip@gmail.com>
+Reported-by: Zhitong Liu <liuzhitong1993@gmail.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Qianchang Zhao <pioooooooooip@gmail.com>
+---
+ net/nfc/llcp_core.c | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
+index beeb3b4d2..ed37604ed 100644
+--- a/net/nfc/llcp_core.c
++++ b/net/nfc/llcp_core.c
+@@ -1177,11 +1177,6 @@ static void nfc_llcp_recv_disc(struct nfc_llcp_local *local,
+ 
+ 	nfc_llcp_socket_purge(llcp_sock);
+ 
+-	if (sk->sk_state == LLCP_CLOSED) {
+-		release_sock(sk);
+-		nfc_llcp_sock_put(llcp_sock);
+-	}
+-
+ 	if (sk->sk_state == LLCP_CONNECTED) {
+ 		nfc_put_device(local->dev);
+ 		sk->sk_state = LLCP_CLOSED;
+-- 
+2.34.1
 
 
