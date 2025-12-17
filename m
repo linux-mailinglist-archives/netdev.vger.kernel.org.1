@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-245046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3347CCC65FD
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 08:36:30 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D7E7CC660F
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 08:40:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 26CF730E8A66
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 07:31:58 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 2131C3025720
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 07:40:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B46333ADB3;
-	Wed, 17 Dec 2025 07:31:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B935D34405F;
+	Wed, 17 Dec 2025 07:34:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EhrFksbp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AQbybXgF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BA6633AD83;
-	Wed, 17 Dec 2025 07:31:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B3FB3358D5;
+	Wed, 17 Dec 2025 07:34:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765956710; cv=none; b=QltgpOxzAhCdOzKxtNTIsS8nDLTTnV8XO7AVt2SqCwyImePV4mu3auXuWoHu5lBc9XRhvsXFtnX45f3bAw705VJwv5wp3Vth3Ies3cwC06KLGjSwQ50K7xV++xsJRdrRBAijb2WUtHEGOATBqbhjJwUNKJKDZArYAT/GbU/4RqA=
+	t=1765956858; cv=none; b=VyVYahYdEP9pcuaTOdt77Y1lr1XxMqXd9nvs9ArnJ9pF54U5D5L8M6TllfC31AyfE5PXU4U+nehz16jZWVOgbF05EFr9fWC6GgAMuJIQQJG+3sGzO6ScdMIQ/YMhjjhjAsypPyKPso/hkhzjDOAM/06clpYg3aZvVXK3vLkBxwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765956710; c=relaxed/simple;
-	bh=Ww8YVr7oabIihRnQ8dUyXwffspSVwC3gqZ+3UO9gL7I=;
+	s=arc-20240116; t=1765956858; c=relaxed/simple;
+	bh=QCj3f/NR0mhkrNbwRn7wEBRkVRffQb+7IpIGEpz+0hA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rIp5JhXa9xpV/eDZCX2JqFU+QYWApETrR2yyBOBiFTb0vzk6xeoQCim6JA0RZFtzFkqU66TKhlXMVWSDRsSFAkx+9T7jPChpTrF7Kuy+2bZP3IJrOH/H0AkShnA7slgbhgCpBbMo3ZAMinROkDQkP9XFUM8t+wyb91g3cYw7YDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EhrFksbp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8721FC19421;
-	Wed, 17 Dec 2025 07:31:47 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=tzUiH+MfblhosUQ52XFGqh6nukWNI+tz1x/8rp7KSo426K3KVkTRAr+ydM+NEwRBLUB4ckOLwlFcB81mtzGjGOaXNiN6CPtI2Kp1LFIM+nwRVHC/wC0D7goXUNC3g+zqvG7WIXElwvUQr0YlkD+4Df9yJL+0so2I30xM9uuO23o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AQbybXgF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E51A3C4CEF5;
+	Wed, 17 Dec 2025 07:34:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765956709;
-	bh=Ww8YVr7oabIihRnQ8dUyXwffspSVwC3gqZ+3UO9gL7I=;
+	s=k20201202; t=1765956858;
+	bh=QCj3f/NR0mhkrNbwRn7wEBRkVRffQb+7IpIGEpz+0hA=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=EhrFksbpoCgxzJ+0ecpIgXWbFC4oQv1kzDFyqAATXrLgAOpvNrXAUq6d+tnYNmnND
-	 NOvZY+zg2O5nyTLHP//YFj3Vk25c8V17+mft7UoLjEjkpYza/+ELDtnse6ji6hHgXO
-	 LciGK+MDpcOf13WTcVOmD10unmriLNloMRFCE2o6LCw2uDVbN4Yskt+QkRdozf7G6f
-	 +0JVQyKQRo+j7vtUHo/LiDlUZEDOrjlqHXC9MmoStXXKE/2KZRW13IC68kc9QrnD7U
-	 APa89rRSbSBL3imk0GeOfCzOKw3PVmOcwquSvUeP63BTC5/3dGG4OGgNE6coL0U43N
-	 uBid6R4vKtLAg==
-Message-ID: <ea5ae096-fdbd-4c93-98ff-7f5b67860898@kernel.org>
-Date: Wed, 17 Dec 2025 08:31:45 +0100
+	b=AQbybXgFQfqHJxyKElammxi3aGKChh4X8v4rllgwqWW/39Tlt8m4zY+pmegUZmjWT
+	 Be/rEU+jarmvxXYqCKphe83NQVvS2lWbs1XqSmKy3Xd9kewajT/qQAIY28ebntyqgJ
+	 +7+57WA0fT8MywE5WOtJd3XA5NTf75I3P8IuszgrpRc/PAeqewMt4cFekFzq3oPROd
+	 F6WKXzQNfAV1Aj/XBQ2i17ZKJgVoWlqGqfCslz/pel29Ls0TdNi8PmenTc58hOxA0m
+	 ohc2AyjFwma46jaiDxtjkoUylprohqyAI2ORIYejpwhQF/5sxNxQh8JLl1MMTW23hq
+	 /PiAmB7FgaH6A==
+Message-ID: <579e05b2-4124-4883-ac97-f7ad294ba635@kernel.org>
+Date: Wed, 17 Dec 2025 08:34:14 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,13 +48,15 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: nfc: fix deadlock between nfc_unregister_device and
- rfkill_fop_write
-To: Deepanshu Kartikey <kartikey406@gmail.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzbot+4ef89409a235d804c6c2@syzkaller.appspotmail.com
-References: <20251217054908.178907-1-kartikey406@gmail.com>
+Subject: Re: [PATCH] nfc: llcp: avoid double release/put on LLCP_CLOSED in
+ nfc_llcp_recv_disc()
+To: Qianchang Zhao <pioooooooooip@gmail.com>, Paolo Abeni
+ <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org, Zhitong Liu <liuzhitong1993@gmail.com>
+References: <20251217014048.16889-1-pioooooooooip@gmail.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -100,98 +102,60 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
  zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
  XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
-In-Reply-To: <20251217054908.178907-1-kartikey406@gmail.com>
+In-Reply-To: <20251217014048.16889-1-pioooooooooip@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 17/12/2025 06:49, Deepanshu Kartikey wrote:
-> A deadlock can occur between nfc_unregister_device() and rfkill_fop_write()
-> due to lock ordering inversion between device_lock and rfkill_global_mutex.
+On 17/12/2025 02:40, Qianchang Zhao wrote:
+> nfc_llcp_sock_get() takes a reference on the LLCP socket via sock_hold().
 > 
-> The problematic lock order is:
+> In nfc_llcp_recv_disc(), when the socket is already in LLCP_CLOSED state, the
+> code used to perform release_sock() and nfc_llcp_sock_put() in the CLOSED branch
+> but then continued execution and later performed the same cleanup again on the
+> common exit path. This results in refcount imbalance (double put) and unbalanced
+> lock release.
+
+You did not answer to my questions, so I repeat the same question I
+already asked you. Don't ignore reviewer's feedback.
+
 > 
-> Thread A (rfkill_fop_write):
->   rfkill_fop_write()
->     mutex_lock(&rfkill_global_mutex)
->       rfkill_set_block()
->         nfc_rfkill_set_block()
->           nfc_dev_down()
->             device_lock(&dev->dev)    <- waits for device_lock
+> Remove the redundant CLOSED-branch cleanup so that release_sock() and
+> nfc_llcp_sock_put() are performed exactly once via the common exit path, while
+> keeping the existing DM_DISC reply behavior.
 > 
-> Thread B (nfc_unregister_device):
->   nfc_unregister_device()
->     device_lock(&dev->dev)
->       rfkill_unregister()
->         mutex_lock(&rfkill_global_mutex)  <- waits for rfkill_global_mutex
-> 
-> This creates a classic ABBA deadlock scenario.
-> 
-> Fix this by moving rfkill_unregister() and rfkill_destroy() outside the
-> device_lock critical section. To ensure safety, set shutting_down flag
-> first and store rfkill pointer in a local variable before releasing the
-> lock. The shutting_down flag ensures that nfc_dev_down() and nfc_dev_up()
-> will bail out early if called during device unregistration.
-> 
-> Reported-by: syzbot+4ef89409a235d804c6c2@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=4ef89409a235d804c6c2
+> Reported-by: Qianchang Zhao <pioooooooooip@gmail.com>
+> Reported-by: Zhitong Liu <liuzhitong1993@gmail.com>
 
-You need Fixes and CC-stable tags.
+Drop both. You are the author, there are no reported-by credits for authors.
 
-So this was introduced by previous fix from Lin Ma... All these random
-drive-bys by various people based on syzbot are just patching buggy code
-with more buggy code. :/ No one cares too look more than just the syzbot
-report.
+Missing Fixes tag.
 
-And you as well. If you fix ABBA here, you should look and fix in other
-places as well. There is exactly same order of locks in
-nfc_register_device(). That's the register path which should not be a
-problem, maybe except false LOCKDEP positives, but you should explain
-that in commit msg why leaving ABBA there is safe.
-
-
-
-
-> Signed-off-by: Deepanshu Kartikey <kartikey406@gmail.com>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Qianchang Zhao <pioooooooooip@gmail.com>
 > ---
->  net/nfc/core.c | 10 +++++++---
->  1 file changed, 7 insertions(+), 3 deletions(-)
+>  net/nfc/llcp_core.c | 5 -----
+>  1 file changed, 5 deletions(-)
 > 
-> diff --git a/net/nfc/core.c b/net/nfc/core.c
-> index ae1c842f9c64..201d2b95432b 100644
-> --- a/net/nfc/core.c
-> +++ b/net/nfc/core.c
-> @@ -1154,7 +1154,7 @@ EXPORT_SYMBOL(nfc_register_device);
->  void nfc_unregister_device(struct nfc_dev *dev)
->  {
->  	int rc;
+> diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
+> index beeb3b4d2..ed37604ed 100644
+> --- a/net/nfc/llcp_core.c
+> +++ b/net/nfc/llcp_core.c
+> @@ -1177,11 +1177,6 @@ static void nfc_llcp_recv_disc(struct nfc_llcp_local *local,
+>  
+>  	nfc_llcp_socket_purge(llcp_sock);
+>  
+> -	if (sk->sk_state == LLCP_CLOSED) {
+> -		release_sock(sk);
+> -		nfc_llcp_sock_put(llcp_sock);
+
+So why now sending to closed socket is right?
+
+> -	}
 > -
+>  	if (sk->sk_state == LLCP_CONNECTED) {
+>  		nfc_put_device(local->dev);
+>  		sk->sk_state = LLCP_CLOSED;
 
-Do not remove blank line.
-
-> +	struct rfkill *rfk = NULL;
->  	pr_debug("dev_name=%s\n", dev_name(&dev->dev));
->  
->  	rc = nfc_genl_device_removed(dev);
-> @@ -1164,13 +1164,17 @@ void nfc_unregister_device(struct nfc_dev *dev)
->  
->  	device_lock(&dev->dev);
->  	if (dev->rfkill) {
-> -		rfkill_unregister(dev->rfkill);
-> -		rfkill_destroy(dev->rfkill);
-> +		rfk = dev->rfkill;
->  		dev->rfkill = NULL;
->  	}
->  	dev->shutting_down = true;
->  	device_unlock(&dev->dev);
-
-1. So your code allows concurrent thread nfc_rfkill_set_block() to be
-called at this spot
-2. Original thread of unregistering will shortly later call
-device_del(), which goes through lock+kill+unlock,
-3. Then the concurrent thread proceeds to device_lock() and all other
-things with freed device.
-
-You just replaced one issue with another issue, right?
 
 Best regards,
 Krzysztof
