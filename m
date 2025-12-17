@@ -1,156 +1,168 @@
-Return-Path: <netdev+bounces-245068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD9ECCC68A3
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 09:23:34 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F1C9CC68A6
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 09:23:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 686463033A8C
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 08:23:05 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id F2A8F3019DB1
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 08:23:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71E4E346A11;
-	Wed, 17 Dec 2025 08:11:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E84DA337BBD;
+	Wed, 17 Dec 2025 08:21:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i7ccWfGx"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="tKg28GRE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8649346A0C
-	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 08:11:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41A4E33710E
+	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 08:21:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765959092; cv=none; b=R5tmJeOagBTgw3wPiaPeMDCIqabBdh7oFdmMiFKD2zfmkiFmWULGwnYSxZnbveJPuU8NypaX23+GNLUc/2p77sQp6C3Oys1crPSAfSjB7C3Z+QnkTR9yFu900MNbuQs3UdQkzJKIjGlRBOqBIpb8202zpDrEvIoAfHj/9iBoYbk=
+	t=1765959708; cv=none; b=guab9D4akxuxVaiTKKDNujvYuR5tle5NF5b651DDni278F3yM7/teL4BpFaLWb1qHTpLuye7c0E67j5QVYuJ7iDeTocO+ZrOcds1J/ZjB8VR+FNwmQRecFPKGwvlJLLBqzSz8uAzuepGSpWjI/1CYWXfXB7VJpPL90+FrbZH4TE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765959092; c=relaxed/simple;
-	bh=VP4slbkuMNhOyt7ePv5O1rMZejitKV/WZW9BwIPLmig=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Yhpz4wsDsxuuhTgKFzLgK/TotwSFcc4B36fe0I4H3R6gmV+2Nw+mBwsh1zxPzEljbTrQibYT8va6sCBbAfUX8i+M5e4XJYZJYcElhWiOCfm213sMWAOn/ukYBrJpv5KQyuOUMAoqCb2Cas7CBBsRMwrJ2SPDyURuzSjA4+af2YU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i7ccWfGx; arc=none smtp.client-ip=209.85.128.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-787da30c53dso55489177b3.0
-        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 00:11:30 -0800 (PST)
+	s=arc-20240116; t=1765959708; c=relaxed/simple;
+	bh=WuQeI+WkXQSWQInmvdcHjxfQ36N4wXa/UmX/Y1u7BWc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jg3Q2oKpfeP2BCrFZJMCNVpUM9Zvk5JYT6S/OexJSdp1c6s1NDJxDDG1bDCgi2EqCSvZ0eNvgqfh6KJZT6A0Bgtd5EF2fd1crAHkKhsKHLtWgRmCq6TAoCV5/WJFbYq7sflQre7KqT79W2vT8dDeJNFk/ZN2K6JOpqv4DnPzUZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=tKg28GRE; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-b736ffc531fso1069534966b.1
+        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 00:21:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765959090; x=1766563890; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=se9qlqaNK4Zda1UW6fV88JOcpay1tuUGGKJbYPeSY4k=;
-        b=i7ccWfGxlyRD8ejoTUws8FtWTYApuWenulgaMNrUAFo2VR5dJl7WhveRpslZhYmDOo
-         mpWt/qd2GpsQn9JBilp3DWKJR/9Mo8BvtjT1937vpbaav+BBmcd5EW5RnkEvyHpUG/jK
-         wX5VgKoqjfRjQ7CmC7PcxKzlRpktP98KKZZfjQCAlGzDFcqSPQUmDfYVAbxsAQ1mYo3w
-         molzx0IS3WtLe1Xasa1DWb1cCfV5lz5D0ZB1TMRcgrVYfzxXd5C1hu1xCtEgwYuYbCAN
-         zoMbVcnf/fwzbpL8Ymf7hJkzeBFCoHEnQ9OU/uoUBLdlYv9d19arimz28jOovUztm376
-         2xAQ==
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1765959703; x=1766564503; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=b+Q8ghXVyCQDXjBoffiftwRpwO3ivtFGMCLgHbR9KKc=;
+        b=tKg28GREQe5lulh5QpQRqYXGF/NStwtvQV/wsg7RPUMi5PZwIT8kfVKdqo83NPM54J
+         1KerTy2h4+3tvbMX8ysqEA7rUpVCC+Ii+aDny/tIB6E3QUNXTCPCSew0Bs/F2hQ3ojUx
+         aF3DQIaaywmS8xePYp9DtxBHL9pw6W9uP3eatkQX25U+n9FHWnGDVW2lcsgbhjGWeEpF
+         n0KxcxSvPydtKAIeuCAW20YFG48YVsH0oDpFE3MVarShjFIfbgi34+LQzIgHH2cTuh+t
+         SElz7H4lJ8YbuprC3vrWpJjTR5p8zh4i+hzMb58wcNU/mrHDS917566dJsiSsgzEYmMB
+         /XVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765959090; x=1766563890;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=se9qlqaNK4Zda1UW6fV88JOcpay1tuUGGKJbYPeSY4k=;
-        b=ML8/4lPOnVLly5D+xOOZJyTXQQEgzpd6RmOxsoLoSItnuMNlfH10bsNhlIQlQaWtFm
-         3ANxdVtTexin7D2obV8AqYYgK5gM+P8ZVWuqCFc6n8Ueyax0DrBAYw7Rm2oK1B6KV/Lx
-         XMHn52cAoR/8kFe+GLRHGUB9A7VlLobcQdwQ++DbWbzSGFtlErrH8xeKdRqwhukisg7h
-         GfEVEw8JeYSK1pWwy/IlufuyWzkcCrAXgWILFmirZer+cu1Iy3ZlSGmjtWDjYYn4Cph5
-         WnqoHjdASe5PtBAcs3GgFEqvqTPUaZFWr3L8nMyOGp+8ytrfU09+MvoVjLt6zbqROp2W
-         RwVw==
-X-Forwarded-Encrypted: i=1; AJvYcCVoHIk2ioEhXf/bWjt0kkZQAeZfRrhONhvNPrXCZbmUJr2Qng6xDM2lHl1asvqQY23g8P8EJh8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVHUWWm/MHUGaPn1vVVaDgWZd9uNNm5Ow+sMLw3WQImcLQqTGv
-	UP/0D0gUq5dgvVWs8hrp98I4hzsiFPH0gkN7xzZaFRlec2uOYFQ06c3e3PEonM1nflx4GpJ5Lb1
-	xiztXUg0ci+qKky6UoL1ymr/0dUrq8uw=
-X-Gm-Gg: AY/fxX6FSs/3WjQqz8WG2BZz7JQm9j4gFtrgbPEPxNTrr46hXi7XaokpkG1GCuo1bgu
-	BwFojwb0as+KlqPB0SuOlrCWKswddElapilpA56K0Jj633hkcZ0JJeqb3un17eyf/cRRy0XVZxH
-	1+SoL77JRhA8s5iNdCaAaB+rDXpSQ0nFODzh0aMHHdyw3UcVdHjMmIAeJfjPt1AJeF6mghf8GwY
-	+3JfXkwrlkX+TaOuRHUghhRC+NHW6NGlxoE9EPoJk731fnkhEeowH0Fh80/O5vnBSxLJ6Br/SHn
-	EwK/R+sJ97Pt3SCSP52fU8qhQfFD/dMro5JY6f6sFx439Z5G9IPCfCcbcRj9
-X-Google-Smtp-Source: AGHT+IHwFE8LQ70NmhySNinUszjIWXXVa0CUscfFXT8ZG0i+4lpei3MD7y7T54rfBzISK24Y6TP+EtGMOB8be1M0sF4=
-X-Received: by 2002:a05:690c:4b0e:b0:787:c9a1:13f0 with SMTP id
- 00721157ae682-78e66ce44demr144008317b3.8.1765959089932; Wed, 17 Dec 2025
- 00:11:29 -0800 (PST)
+        d=1e100.net; s=20230601; t=1765959703; x=1766564503;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=b+Q8ghXVyCQDXjBoffiftwRpwO3ivtFGMCLgHbR9KKc=;
+        b=fRnvYOWO+uzTOTXuKBYTIrtkwKGGkgUuCNqfWIeoRgN6rmqX+JQbA6jLndUePh72oZ
+         g3HRnPbfrTnntZ3DnUX+xzw3QesVXxV2RyDOGmRT8/ju0YOTTbIl5nPKMFbVYiDe+mif
+         b3Sz6GzVhLq8sEdOv3UtpHRnUzXqMlZxBjNHtMAshPf23CQn7ojpj66Ad51Yr9bCrDyB
+         uMbfk3mND2oYdfN30SiBYefk55gaGhGh22HTmxivdW9J2ivhRqO2pJO7Qe+gRLyHvWZ2
+         FrNaXytV0T90E0Q/vNPPsxDCAMi6H9vjMNjtwdibiS6WVlBPeZDWCt9zJbczbdtamgfR
+         mBFA==
+X-Forwarded-Encrypted: i=1; AJvYcCXwiWAc3MNWx4ONmX/C6kh/xIRjXzXY2wPGGK0cuwxr5i/gE1rnNxLw2tEOi/kpGXqEQ5js/hE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzmkaO/Guu9x5BdQU3TvxKm4Q/oq3iK1lYHuo9izmRBJBSGLreO
+	XM5FG/hI9E0TaK82ZWOMFlwj5+MyNOrtT8JT+x92b/DD+HjHNa+GomKivfp9HdJWRqo=
+X-Gm-Gg: AY/fxX5dp05JyNVIWNnVtxjmsMxh0b5Ut1gOO7trdRR9yG5fvDCni8rHrUwzIw1g5c3
+	kz2Fx3Pe+ns+GA5Z//+kblHdFVADR/3ZQKiE8AA5SbWedGL3+qjtQ/NcaTuTz13OJ+zjRxgrSIy
+	RDDH8u1YLiwKlJEOFXb0lbTn30KahIzLe+aaqo/N5LBN0xNplcAGovrfCsx9KmuIH872zS01JrT
+	jOqFrPJ2nwIUs/1QX8N4pzw/JjC3s2dNOFodQpUNwuY14vXHNG+tp510WiwcWNEeT5euFugjORq
+	UhptvFGvYRQzzP22MdmxsgHuJfWxGI8xkciYfFLjBgM00X+kg6owpQGHfBAStFZqRGg6P2i0gtY
+	wF7wi4se/CW7surUuQRVhA/LFxQ8PJvbnfNVkxdvjx0qCuUcAJuBZrDsuDYrL5z0YZTMvUGlA81
+	j42URMTNtOHsveBK7q
+X-Google-Smtp-Source: AGHT+IFCoak6awfsvNzuanPNEFvtnm4npy82/7GDiD4hlE+WRwlv0VOch5efQB3V/p3Rq/g2NEI9Nw==
+X-Received: by 2002:a17:907:d94:b0:b73:5f5e:574d with SMTP id a640c23a62f3a-b7d23a89c52mr1790501866b.59.1765959703434;
+        Wed, 17 Dec 2025 00:21:43 -0800 (PST)
+Received: from localhost ([2a02:8071:b783:6940:1d24:d58d:2b65:c291])
+        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-b7ffacd9192sm337793366b.70.2025.12.17.00.21.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Dec 2025 00:21:42 -0800 (PST)
+Date: Wed, 17 Dec 2025 09:21:41 +0100
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+To: Sumit Garg <sumit.garg@kernel.org>
+Cc: Sumit Garg <sumit.garg@oss.qualcomm.com>, 
+	Jens Wiklander <jens.wiklander@linaro.org>, Olivia Mackall <olivia@selenic.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
+	Alexandre Belloni <alexandre.belloni@bootlin.com>, Ard Biesheuvel <ardb@kernel.org>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, 
+	Sudeep Holla <sudeep.holla@arm.com>, Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
+	Michael Chan <michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, 
+	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>, James Bottomley <James.Bottomley@hansenpartnership.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Mimi Zohar <zohar@linux.ibm.com>, 
+	David Howells <dhowells@redhat.com>, Paul Moore <paul@paul-moore.com>, 
+	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, 
+	Peter Huewe <peterhuewe@gmx.de>, op-tee@lists.trustedfirmware.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-rtc@vger.kernel.org, linux-efi@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
+	Cristian Marussi <cristian.marussi@arm.com>, arm-scmi@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-integrity@vger.kernel.org, keyrings@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, Jason Gunthorpe <jgg@ziepe.ca>
+Subject: Re: [PATCH v1 00/17] tee: Use bus callbacks instead of driver
+ callbacks
+Message-ID: <max5wxkcjjvnftwfwgymybwbnvf5s3ytwpy4oo5i74kfvnav4m@m2wasqyxsf4h>
+References: <cover.1765472125.git.u.kleine-koenig@baylibre.com>
+ <aT--ox375kg2Mzh-@sumit-X1>
+ <dhunzydod4d7vj73llpuqemxb5er2ja4emxusr66irwf77jhhb@es4yd2axzl25>
+ <CAGptzHOOqLhBnAXDURAzkgckUvRr__UuF1S_7MLV0u-ZxYEdyA@mail.gmail.com>
+ <ayebinxqpcnl7hpa35ytrudiy7j75u5bdk3enlirkp5pevppeg@6mx6a5fwymwf>
+ <aUJh--HGVeJWIilS@sumit-xelite>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251217054908.178907-1-kartikey406@gmail.com> <ea5ae096-fdbd-4c93-98ff-7f5b67860898@kernel.org>
-In-Reply-To: <ea5ae096-fdbd-4c93-98ff-7f5b67860898@kernel.org>
-From: Deepanshu Kartikey <kartikey406@gmail.com>
-Date: Wed, 17 Dec 2025 13:41:18 +0530
-X-Gm-Features: AQt7F2oPGgilSXG77WtNwldSwnm35r6WedpdHH_Og8vUH0XFja7XcEW0kty3y2k
-Message-ID: <CADhLXY4pBLt8vLfo8JeZMgfNYD7f=F+zGWTim5HmPyM-7j9THg@mail.gmail.com>
-Subject: Re: [PATCH] net: nfc: fix deadlock between nfc_unregister_device and rfkill_fop_write
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, 
-	syzbot+4ef89409a235d804c6c2@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="p6kfp3quyfb6lwgz"
+Content-Disposition: inline
+In-Reply-To: <aUJh--HGVeJWIilS@sumit-xelite>
+
+
+--p6kfp3quyfb6lwgz
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v1 00/17] tee: Use bus callbacks instead of driver
+ callbacks
+MIME-Version: 1.0
 
-On Wed, Dec 17, 2025 at 1:01=E2=80=AFPM Krzysztof Kozlowski <krzk@kernel.or=
-g> wrote:
->
-> 1. So your code allows concurrent thread nfc_rfkill_set_block() to be
-> called at this spot
-> 2. Original thread of unregistering will shortly later call
-> device_del(), which goes through lock+kill+unlock,
-> 3. Then the concurrent thread proceeds to device_lock() and all other
-> things with freed device.
->
-> You just replaced one issue with another issue, right?
->
+Hello Sumit,
 
-Hi Krzysztof,
+On Wed, Dec 17, 2025 at 01:25:39PM +0530, Sumit Garg wrote:
+> On Tue, Dec 16, 2025 at 12:08:38PM +0100, Uwe Kleine-K=C3=B6nig wrote:
+> > On Tue, Dec 16, 2025 at 01:08:38PM +0530, Sumit Garg wrote:
+> > > On Mon, Dec 15, 2025 at 3:02=E2=80=AFPM Uwe Kleine-K=C3=B6nig
+> > > <u.kleine-koenig@baylibre.com> wrote:
+> > > >  - Why does optee_probe() in drivers/tee/optee/smc_abi.c unregister=
+ all
+> > > >    optee devices in its error path (optee_unregister_devices())?
+> > >=20
+> > > This is mostly to take care of if any device got registered before the
+> > > failure occured. Let me know if you have a better way to address that.
+> >=20
+> > Without understanding the tee stuff, I'd say: Don't bother and only undo
+> > the things that probe did before the failure.
+>=20
+> True, but this is special case where if there is any leftover device
+> registered from the TEE implementation then it is likely going to cause
+> the corresponding kernel client driver crash.
 
-Thanks for the review.
+You are aware that this is racy? So if a driver crashes e.g. after
+teedev_close_context() it might happen that it is registered just after
+optee_unregister_devices() returns.
 
-Regarding the UAF concern:
+Best regards
+Uwe
 
-The callback nfc_rfkill_set_block() is invoked from rfkill_fop_write()
-which holds rfkill_global_mutex for the entire operation:
+--p6kfp3quyfb6lwgz
+Content-Type: application/pgp-signature; name="signature.asc"
 
-rfkill_fop_write():
-    mutex_lock(&rfkill_global_mutex);
-    list_for_each_entry(rfkill, &rfkill_list, node) {
-        rfkill_set_block(rfkill, ev.soft);
-    }
-    mutex_unlock(&rfkill_global_mutex);
+-----BEGIN PGP SIGNATURE-----
 
-rfkill_set_block() calls ops->set_block() (i.e., nfc_rfkill_set_block)
-without releasing rfkill_global_mutex.
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmlCaBIACgkQj4D7WH0S
+/k7jZwf/S32gHxmpuL9ts6Dq9pI9CDW9KNDwfTzIptzaNQEofHnz2Ph9Ejs/bZAl
+1skNWxxt2vGIVP016BxUqi9V0RyKNUV0GCk23ZMdeGE09A47y9N0bT00HDJrrZYp
+FYCoNNwL8vICQzfAti/0+DHGI1uHwrXCwQWf/VaNggCAhb3eTCfcmUtogT7hhbtH
++6bLk0/LEYmrIg1pkq6m4Y4vxBOEwnSZVDa4/15mxJ7jExJeoQmha2Y2whq5WZtY
+TEMgHL6KNg7ifbee+/Y0HUJizQ45rf4pJo2bvrbwXc+3KaEqfzNpD3jKVcKJSNBx
+jL7uprws5c1kFtHG4vp8QjaZRNJtpw==
+=trcC
+-----END PGP SIGNATURE-----
 
-Since rfkill_unregister() also acquires rfkill_global_mutex:
-
-void rfkill_unregister(struct rfkill *rfkill)
-{
-    ...
-    mutex_lock(&rfkill_global_mutex);
-    rfkill_send_events(rfkill, RFKILL_OP_DEL);
-    list_del_init(&rfkill->node);
-    ...
-    mutex_unlock(&rfkill_global_mutex);
-}
-
-The unregister path cannot proceed past rfkill_unregister() until any
-ongoing callback completes. Since device_del() is called after
-rfkill_unregister() returns, no UAF should be possible.
-
-Additionally, if nfc_dev_down() runs after we set shutting_down =3D true,
-it will see the flag and bail out early with -ENODEV without accessing
-device internals.
-
-Regarding nfc_register_device(): The same lock ordering exists there
-(device_lock -> rfkill_global_mutex via rfkill_register), but during
-registration the device is not yet visible to other subsystems, so no
-concurrent rfkill operations can occur. The ABBA pattern there should
-not cause an actual deadlock.
-
-I will send a v2 addressing:
-- Adding Fixes and Cc: stable tags
-- Keeping the blank line after variable declaration
-
-Thanks,
-Deepanshu
+--p6kfp3quyfb6lwgz--
 
