@@ -1,108 +1,171 @@
-Return-Path: <netdev+bounces-245070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74C2BCC69F9
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 09:40:58 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AD79CC6A41
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 09:45:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D8C783010A87
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 08:37:06 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 97E03301705C
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 08:45:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF92D30E0F6;
-	Wed, 17 Dec 2025 08:37:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2CF0339869;
+	Wed, 17 Dec 2025 08:45:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W47vCtRc"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="UO9Zhr8b"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ACE0288D6;
-	Wed, 17 Dec 2025 08:37:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D2003385BE;
+	Wed, 17 Dec 2025 08:45:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765960625; cv=none; b=LxzLr9RufuZZsiL/uMCzDzH/wGc1yAd67fEcW4mia2nfW+W/cmHSZKWua6n20q0DHr97MhdTrYIdVhNiO6VMTpPzQwpNmv6UNYj7r93FEuJHQASlgqu0Vd5y9FXtQmZt2aeC7SC/CU1mK7OVUmxQc2oPQ2s1hufPw9fgCBeNaD8=
+	t=1765961104; cv=none; b=PKhmAaLuyM36dBhzKQHmG0ILhfh9phGLO1JTMY/uJ0IAJCDEzS789AiCyTkb4Ird0kkrgaVG/UP+yvOOszragfDHEhJscbJ+o51meCqE0BOO+b8WXYUOWsArSb2CV1EH4ee/LMIteJy2XnPFcvGivvamGBiV2KnKeBCId75Vahg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765960625; c=relaxed/simple;
-	bh=KAQs8LiC0Yfd4rW28C195gtmvQ2iLTjhXonSSp4r1+c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y2WYlIIjKDoPcnRi70xQ7j9rqanSrFX3dlILdozpvIjcLpcD/AkGNECB6q1V0rFiQav5inAlE2d43am/ZFMPJmasuhHLNXjzyn1pmPLTq0dg4gkLI6QeqKcettx2EcQSzRKFiXMchX0Daa6Sf91/V4NqtYiXrNpQoPI5Epk65Cs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W47vCtRc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6569BC4CEF5;
-	Wed, 17 Dec 2025 08:37:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1765960625;
-	bh=KAQs8LiC0Yfd4rW28C195gtmvQ2iLTjhXonSSp4r1+c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=W47vCtRc2fjZpQe/DRm+pPSRqT8FgIjIIRf2fcHiNzSfRwfN9FSNmNhfSNsomcwSZ
-	 shUz34HPQQt6QsrC72mdmgJ2kAOKPXTU5yvT2bf9EzQAoeKTAwi+8Z9q4l5/IyaHJE
-	 w0dIZZ61skCOa1af9EcoK4jlfs4frthhbXwFQbcpYbmYBzCiUmU+0V7dpZFs2FhzY6
-	 Ilw2aNq9h0FBq/T2glswF071hRUoOSkhuY6XwfXZcgpqHZYa1NLC9lrxsvdjf+MbsY
-	 NZ7Hm3zKDEO1+/DWE3pz6PmJZOwopgc3zT/AoM7n9Uo3WbCAQBW0TGMgCLrxbFD0xn
-	 VWQhHJVoQolrA==
-Date: Wed, 17 Dec 2025 09:37:02 +0100
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Jan Petrous <jan.petrous@oss.nxp.com>, s32@nxp.com, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, imx@lists.linux.dev, 
-	linaro-s32@linaro.org
-Subject: Re: [PATCH v2 3/4] dt-bindings: net: nxp,s32-dwmac: Use the GPR
- syscon
-Message-ID: <20251217-elated-vicugna-of-whirlwind-23d6bc@quoll>
-References: <cover.1765806521.git.dan.carpenter@linaro.org>
- <1ecafee4bd7dc3577adfc4ada8bcc50b5eb3e863.1765806521.git.dan.carpenter@linaro.org>
+	s=arc-20240116; t=1765961104; c=relaxed/simple;
+	bh=x/E/deY9vTVLTGF3py+vQE2us8+WcHa4e2RC0cgnHTM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UXidaFjMRAZuBcfKjCzkwcBM2BIxauOzfcVRGfcD13Eme0/7OSvl1uFvuVzRQA1Txiry8FKYQ6JqlVBQH8SSrh760ykjmslqT7r9rc1+zUUMt7LM04LyEuOsRPWcR7t5ItUk5Kcq9iu/hVfuGnVWYlPU0Qs4IDB4anqjy3FyCjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=UO9Zhr8b; arc=none smtp.client-ip=220.197.31.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version:
+	Content-Type; bh=UseiUIzWQ5jcCpGWT2FDdMdJpS00Sb35hFZExtBF5UM=;
+	b=UO9Zhr8brIQSYJAa6fSNHG4yBSQ1Uz+9Cvmgqnq4g2kQe2Lg7fmgdHhttc0/xf
+	/2aeK+r25mBRPa4efYWYDYQFMJ7D30v2AwjxwELNFog583zHukMPx6JZFEpi4XDv
+	p8TIZ+ZQNNlAFVYp6ebBUPAc+9DoRrAQgtCyFG95NVy2o=
+Received: from xwm-TianYi510Pro-14IMB.. (unknown [])
+	by gzga-smtp-mtada-g0-4 (Coremail) with SMTP id _____wDnwYJnbUJpSC+YAw--.48902S4;
+	Wed, 17 Dec 2025 16:44:24 +0800 (CST)
+From: Xiong Weimin <15927021679@163.com>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Implement initial driver for virtio-RDMA devices(kernel), virtio-rdma device model(qemu) and vhost-user-RDMA backend device(dpdk)
+Date: Wed, 17 Dec 2025 16:43:25 +0800
+Message-ID: <20251217084422.4875-1-15927021679@163.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1ecafee4bd7dc3577adfc4ada8bcc50b5eb3e863.1765806521.git.dan.carpenter@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wDnwYJnbUJpSC+YAw--.48902S4
+X-Coremail-Antispam: 1Uf129KBjvJXoWxXr4rKrWDGF1DAF4UGw4rKrg_yoW5tFy8pr
+	W2gF9rCrZ8Gr43G3yUW345uF42gFZ3A3y3Crn8G348K3Z5Xr9YvF1q9F15Way7GrZxAF18
+	XFy8Jr92ka4UAaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jUhLnUUUUU=
+X-CM-SenderInfo: jprvmjixqsilmxzbiqqrwthudrp/xtbC0ghg6GlCbWhyVAAA3a
 
-On Mon, Dec 15, 2025 at 05:41:57PM +0300, Dan Carpenter wrote:
-> The S32 chipsets have a GPR region which has a miscellaneous registers
-> including the GMAC_0_CTRL_STS register.  Originally, this code accessed
-> that register in a sort of ad-hoc way, but it's cleaner to use a
-> syscon interface to access these registers.
-> 
-> We still need to maintain the old method of accessing the GMAC register
-> but using a syscon will let us access other registers more cleanly.
-> 
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> ---
-> v2: Add the vendor prefix to the phandle
->     Fix the documentation
-> 
->  .../devicetree/bindings/net/nxp,s32-dwmac.yaml         | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml b/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
-> index 2b8b74c5feec..a65036806d60 100644
-> --- a/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
-> @@ -32,6 +32,15 @@ properties:
->        - description: Main GMAC registers
->        - description: GMAC PHY mode control register
->  
-> +  nxp,phy-sel:
-> +    $ref: /schemas/types.yaml#/definitions/phandle-array
-> +    items:
-> +      - description: phandle to the GPR syscon node
-> +      - description: offset of PHY selection register
-> +    description:
-> +      This is a phandle/offset pair.  The phandle points to the
-> +      GPR region and the offset is the GMAC_0_CTRL_STS register.
+Hi all,
 
-Do not repeat description twice. The GMAC_0_CTRL_STS should be explained
-in description of individual item. This description should only say what
-is the purpose of it, why the hardware needs to poke in other devices.
+This testing instructions aims to introduce an emulating a soft ROCE 
+device with normal NIC(no RDMA), we have finished a vhost-user RDMA
+device demo, which can work with RDMA features such as CM, QP type of 
+UC/UD and so on.
 
-Best regards,
-Krzysztof
+There are testing instructions of the demo:
+
+1.Test Environment Configuration
+Hardware Environment
+Servers: 1 identically configured servers
+
+CPU: HUAWEI Kunpeng 920 (96 cores)
+
+Memory: 3T DDR4
+
+NIC: TAP (paired virtio-net device for RDMA)
+
+Software Environment
+Server Host OS: 6.4.0-10.1.0.20.oe2309.aarch64
+
+Kernel: linux-6.16.8 (with kernel-vrdma module)
+
+QEMU: 9.0.2 (compiled with vhost-user-rdma virtual device support)
+
+DPDK: 24.07.0-rc2
+
+Dependencies:
+
+	rdma-core
+	
+	rdma_rxe
+
+	libibverbs-dev
+	
+2. Test Procedures
+a. Starting DPDK with vhost-user-rdma first: 
+1). Configure Hugepages
+   echo 2048 | sudo tee /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
+2). app start  
+  /DPDKDIR/build/examples/dpdk-vhost_user_rdma -l 1-4 -n 4 --vdev "net_tap0" -- --socket-file /tmp/vhost-rdma0
+
+b. Booting guest kernel with qemu, command line: 
+...
+-netdev tap,id=hostnet1,ifname=tap1,script=no,downscript=no 
+-device virtio-net-pci,netdev=hostnet1,id=net1,mac=52:54:00:14:72:30,bus=pci.3,addr=0x0.0,multifunction=on 
+-chardev socket,path=/tmp/vhost-rdma0,id=vurdma 
+-device vhost-user-rdma-pci,bus=pci.3,addr=0x0.1,page-per-vq=on,disable-legacy=on,chardev=vurdma
+...
+
+c. Guest Kernel Module Loading and Validation
+# Load vhost_rdma kernel module
+sudo modprobe vrdma
+
+# Verify module loading
+lsmod | grep vrdma
+
+# Check kernel logs
+dmesg | grep vhost_rdma
+
+# Expected output:
+[    4.935473] vrdma_init_device: Initializing vRDMA device with max_cq=64, max_qp=64
+[    4.949888] [vrdma_init_device]: Successfully initialized, last qp_vq index=192
+[    4.949907] [vrdma_init_netdev]: Found paired net_device 'enp3s0f0' (on 0000:03:00.0)
+[    4.949924] Bound vRDMA device to net_device 'enp3s0f0'
+[    5.026032] vrdma virtio2: vrdma_alloc_pd: allocated PD 1
+[    5.028006] Successfully registered vRDMA device as 'vrdma0'
+[    5.028020] [vrdma_probe]: Successfully probed VirtIO RDMA device (index=2)
+[    5.028104] VirtIO RDMA driver initialized successfully
+
+d. Inside VM, one rdma device fs node will be generated in /dev/infiniband: 
+[root@localhost ~]# ll -h /dev/infiniband/
+total 0
+drwxr-xr-x. 2 root root       60 Dec 17 11:24 by-ibdev
+drwxr-xr-x. 2 root root       60 Dec 17 11:24 by-path
+crw-rw-rw-. 1 root root  10, 259 Dec 17 11:24 rdma_cm
+crw-rw-rw-. 1 root root 231, 192 Dec 17 11:24 uverbs0
+
+e. The following are to be done in the future version: 
+1). SRQ support
+2). DPDK support for physical RDMA NIC for handling the datapath between front and backend
+3). Reset of VirtQueue
+4). Increase size of VirtQueue for PCI transport
+5). Performance Testing
+
+f. Test Results
+1). Functional Test Results:
+Kernel module loading	PASS	Module loaded without errors
+DPDK startup	        PASS	vhost-user-rdma backend initialized
+QEMU VM launch	        PASS	VM booted using RDMA device
+Network connectivity	PASS	Host-VM communication established
+RDMA device detection	PASS	Virtual RDMA device recognized
+
+f.Test Conclusion
+1). Full functional compliance with specifications
+2). Stable operation under extended stress conditions
+
+Recommendations:
+1). Optimize memory copy paths for higher throughput
+2). Enhance error handling and recovery mechanisms
 
 
