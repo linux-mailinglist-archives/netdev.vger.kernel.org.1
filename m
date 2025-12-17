@@ -1,206 +1,173 @@
-Return-Path: <netdev+bounces-245240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14280CC971B
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 20:51:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E785DCC9778
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 21:15:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 86CC5309EC08
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 19:50:10 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 4219930421B1
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 20:14:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5A352FB616;
-	Wed, 17 Dec 2025 19:50:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B33D5303C94;
+	Wed, 17 Dec 2025 20:14:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N0I4Sc8C"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="wtngo0LO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBE5E2F7ABB;
-	Wed, 17 Dec 2025 19:50:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F673002DC;
+	Wed, 17 Dec 2025 20:14:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766001008; cv=none; b=nECaDS7LUAd1d6QtV1t3tzFZNyRPg8OICmEbsTdDlbWXoaGo+OMpmFmrHnQzpQdj2GhahedYWRB+/1/I2vr0iF40gMHQzPQKUEfqrtAJ2PDcXS1IuL+mm1ashb43FU9+12xXbkwUA03KcTgw2SH2t3bDdWxc5tBpIGQPi6awAsg=
+	t=1766002488; cv=none; b=SN0X6mWReX6eJOQneWr343mDnRNRdJXIBEleCO7tohsJWj9YAb1MMLyWwVdrCkaPqkB1XJRo4qf4hW3CiwbcOyo85bFWqwPtJbHikRH1tllLSSjpVcKdsGyNRq41wvyN6JsrIIpVJp8yx1X2318+DKHD5DNh5cNm0IXMmdE1qlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766001008; c=relaxed/simple;
-	bh=J3iATDkGdfPOjewbdIrj7WAt5Ip09ic5N1O2CSXYCSI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jQMwI7cukohUNxmWy3pDOd7jtnI6QaVlKoqu8y86Yofs6vqARna6t8eo0zfHgjGayIJDOQRFHIhpuivJrycnvti1Vj9dN25JJfDq1S/tXCEDO4sAf7h4N6L0tvMcSjc9Kx4s4rH2cQreW9WRV0Ci1wcH7OGKlxd10MUQEBphvhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N0I4Sc8C; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1766001007; x=1797537007;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=J3iATDkGdfPOjewbdIrj7WAt5Ip09ic5N1O2CSXYCSI=;
-  b=N0I4Sc8CZy8oEmRkuoAh71YAC0fNbQw2wQiX9zcaStK7XEr79mlQ0xKp
-   h7njd94eQmg8PrZYA9lWn0tWUlcH1K2ZI84w6NXmLFzY3V7dVd1X3vBao
-   umlc26h4RSFdHXguZgH0rtFdlR602ml0OHVAJ/vNLaX5Y1Y6zYmll/sST
-   2TwipVdWLPcrW25wKh/V3L0yjxtHkBzN2kt52frKO0LK4dEoQf1z9RxSH
-   cCD3qzBwZ/n06ibj6gXIGwkLnvWZSWGfDK3VwyLWxpiwapZa4OD9hXOFL
-   0kEmDou3Lot9u2bkgtGSLkfSLzaMJQqHKaaDBJs6Cm2jwRv3DysS1nIK+
-   Q==;
-X-CSE-ConnectionGUID: BmL8pj8iSf+PJwmfeIHeSQ==
-X-CSE-MsgGUID: 1FJXjBWOSkycHzAkFNnjhg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11645"; a="67841453"
-X-IronPort-AV: E=Sophos;i="6.21,156,1763452800"; 
-   d="scan'208";a="67841453"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Dec 2025 11:50:02 -0800
-X-CSE-ConnectionGUID: jRLh55kIQbOunSV/vgFqDA==
-X-CSE-MsgGUID: DCwwKP99QJCrsLEkw7HPow==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,156,1763452800"; 
-   d="scan'208";a="202898052"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa004.jf.intel.com with ESMTP; 17 Dec 2025 11:50:02 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: Guangshuo Li <lgs201920130244@gmail.com>,
-	anthony.l.nguyen@intel.com,
-	fw@strlen.de,
-	stable@vger.kernel.org,
-	Simon Horman <horms@kernel.org>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: [PATCH net 6/6] e1000: fix OOB in e1000_tbi_should_accept()
-Date: Wed, 17 Dec 2025 11:49:45 -0800
-Message-ID: <20251217194947.2992495-7-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20251217194947.2992495-1-anthony.l.nguyen@intel.com>
-References: <20251217194947.2992495-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1766002488; c=relaxed/simple;
+	bh=cQ08mY9z2Gemqbief5bingl5ACj337jaMdct73LU3NQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hLybHUrP4+DbHsVGXT5DzQNIslsPRrdBVTXd2aEzDVP63OBP0dQsEwIIXCar7AVgvW8H/sTXRYcfKLVbP0/5sBTmVYyq+vNKLsaWCx9pOzOt/jHyBzrNmLw8XN+A4L5Cxqr2BiOb9ctF/2WlU6noezFoa8PoJdwCtGuVcB7eA0s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=wtngo0LO; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
+	Resent-Message-ID:In-Reply-To:References;
+	bh=DXEzkvJjySPMsSzjfUcca6+8ktMG185qSDMZrNC4W7s=; t=1766002486; x=1767212086; 
+	b=wtngo0LOyXTlcYlDvUgz3P0sh5RsKAcCCBx0CNZZNQZ+6pPd1vb5cXHVtfoK0JKpF1yIDnMxqQH
+	ofRwthOPwpR2Uk54v4cdfWInar54Il2TQNHT4SPa6+iiBmtSCSYCvIgcD90tDyODihPoDllXT1W3n
+	yrmQPqpxK68JnVWMhR+virQrgyBHcvu+RYCvLS+skt2NEut60yKAoHb6jnjVwO9pPjGrHg9xZKnFW
+	iiyVmku9Dl+yxEcZnNe+1W4JfA2RU8851akzmAwlOhwDBG/vKkX1Gq7oEg528mf0foXqrM+kwUrVG
+	Lp5fvW+39Cc59Z2hdzOLq6qKG5pxzZ/5rijg==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1vVxv2-0000000CDwn-00u2;
+	Wed, 17 Dec 2025 21:14:44 +0100
+From: Johannes Berg <johannes@sipsolutions.net>
+To: netdev@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Subject: [GIT PULL] wireless-2025-12-17
+Date: Wed, 17 Dec 2025 21:12:20 +0100
+Message-ID: <20251217201441.59876-3-johannes@sipsolutions.net>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-malware-bazaar: not-scanned
 
-From: Guangshuo Li <lgs201920130244@gmail.com>
+Hi,
 
-In e1000_tbi_should_accept() we read the last byte of the frame via
-'data[length - 1]' to evaluate the TBI workaround. If the descriptor-
-reported length is zero or larger than the actual RX buffer size, this
-read goes out of bounds and can hit unrelated slab objects. The issue
-is observed from the NAPI receive path (e1000_clean_rx_irq):
+First set of changes for -rc, and then I'm pretty much ready
+to sign off for vacations for a bit, I hope nothing critical
+comes up.
 
-==================================================================
-BUG: KASAN: slab-out-of-bounds in e1000_tbi_should_accept+0x610/0x790
-Read of size 1 at addr ffff888014114e54 by task sshd/363
+The tag message is almost bigger than the code changes which
+I'd say isn't a bad sign :)
 
-CPU: 0 PID: 363 Comm: sshd Not tainted 5.18.0-rc1 #1
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
-Call Trace:
- <IRQ>
- dump_stack_lvl+0x5a/0x74
- print_address_description+0x7b/0x440
- print_report+0x101/0x200
- kasan_report+0xc1/0xf0
- e1000_tbi_should_accept+0x610/0x790
- e1000_clean_rx_irq+0xa8c/0x1110
- e1000_clean+0xde2/0x3c10
- __napi_poll+0x98/0x380
- net_rx_action+0x491/0xa20
- __do_softirq+0x2c9/0x61d
- do_softirq+0xd1/0x120
- </IRQ>
- <TASK>
- __local_bh_enable_ip+0xfe/0x130
- ip_finish_output2+0x7d5/0xb00
- __ip_queue_xmit+0xe24/0x1ab0
- __tcp_transmit_skb+0x1bcb/0x3340
- tcp_write_xmit+0x175d/0x6bd0
- __tcp_push_pending_frames+0x7b/0x280
- tcp_sendmsg_locked+0x2e4f/0x32d0
- tcp_sendmsg+0x24/0x40
- sock_write_iter+0x322/0x430
- vfs_write+0x56c/0xa60
- ksys_write+0xd1/0x190
- do_syscall_64+0x43/0x90
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7f511b476b10
-Code: 73 01 c3 48 8b 0d 88 d3 2b 00 f7 d8 64 89 01 48 83 c8 ff c3 66 0f 1f 44 00 00 83 3d f9 2b 2c 00 00 75 10 b8 01 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 31 c3 48 83 ec 08 e8 8e 9b 01 00 48 89 04 24
-RSP: 002b:00007ffc9211d4e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 0000000000004024 RCX: 00007f511b476b10
-RDX: 0000000000004024 RSI: 0000559a9385962c RDI: 0000000000000003
-RBP: 0000559a9383a400 R08: fffffffffffffff0 R09: 0000000000004f00
-R10: 0000000000000070 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007ffc9211d57f R14: 0000559a9347bde7 R15: 0000000000000003
- </TASK>
-Allocated by task 1:
- __kasan_krealloc+0x131/0x1c0
- krealloc+0x90/0xc0
- add_sysfs_param+0xcb/0x8a0
- kernel_add_sysfs_param+0x81/0xd4
- param_sysfs_builtin+0x138/0x1a6
- param_sysfs_init+0x57/0x5b
- do_one_initcall+0x104/0x250
- do_initcall_level+0x102/0x132
- do_initcalls+0x46/0x74
- kernel_init_freeable+0x28f/0x393
- kernel_init+0x14/0x1a0
- ret_from_fork+0x22/0x30
-The buggy address belongs to the object at ffff888014114000
- which belongs to the cache kmalloc-2k of size 2048
-The buggy address is located 1620 bytes to the right of
- 2048-byte region [ffff888014114000, ffff888014114800]
-The buggy address belongs to the physical page:
-page:ffffea0000504400 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x14110
-head:ffffea0000504400 order:3 compound_mapcount:0 compound_pincount:0
-flags: 0x100000000010200(slab|head|node=0|zone=1)
-raw: 0100000000010200 0000000000000000 dead000000000001 ffff888013442000
-raw: 0000000000000000 0000000000080008 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-==================================================================
+Please pull and let us know if there's any problem.
 
-This happens because the TBI check unconditionally dereferences the last
-byte without validating the reported length first:
+Thanks,
+johannes
 
-	u8 last_byte = *(data + length - 1);
 
-Fix by rejecting the frame early if the length is zero, or if it exceeds
-adapter->rx_buffer_len. This preserves the TBI workaround semantics for
-valid frames and prevents touching memory beyond the RX buffer.
 
-Fixes: 2037110c96d5 ("e1000: move tbi workaround code into helper function")
-Cc: stable@vger.kernel.org
-Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/e1000/e1000_main.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+The following changes since commit 8f7aa3d3c7323f4ca2768a9e74ebbe359c4f8f88:
 
-diff --git a/drivers/net/ethernet/intel/e1000/e1000_main.c b/drivers/net/ethernet/intel/e1000/e1000_main.c
-index 292389aceb2d..7f078ec9c14c 100644
---- a/drivers/net/ethernet/intel/e1000/e1000_main.c
-+++ b/drivers/net/ethernet/intel/e1000/e1000_main.c
-@@ -4094,7 +4094,15 @@ static bool e1000_tbi_should_accept(struct e1000_adapter *adapter,
- 				    u32 length, const u8 *data)
- {
- 	struct e1000_hw *hw = &adapter->hw;
--	u8 last_byte = *(data + length - 1);
-+	u8 last_byte;
-+
-+	/* Guard against OOB on data[length - 1] */
-+	if (unlikely(!length))
-+		return false;
-+	/* Upper bound: length must not exceed rx_buffer_len */
-+	if (unlikely(length > adapter->rx_buffer_len))
-+		return false;
-+	last_byte = *(data + length - 1);
- 
- 	if (TBI_ACCEPT(hw, status, errors, length, last_byte)) {
- 		unsigned long irq_flags;
--- 
-2.47.1
+  Merge tag 'net-next-6.19' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next (2025-12-03 17:24:33 -0800)
 
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2025-12-17
+
+for you to fetch changes up to 81d90d93d22ca4f61833cba921dce9a0bd82218f:
+
+  wifi: iwlwifi: Implement settime64 as stub for MVM/MLD PTP (2025-12-16 18:52:58 +0100)
+
+----------------------------------------------------------------
+Various fixes all over, most are recent regressions but
+also some long-standing issues:
+
+ - cfg80211:
+    - fix an issue with overly long SSIDs
+
+ - mac80211:
+    - long-standing beacon protection issue on some devices
+    - for for a multi-BSSID AP-side issue
+    - fix a syzbot warning on OCB (not really used in practice)
+    - remove WARN on connections using disabled channels,
+      as that can happen due to changes in the disable flag
+    - fix monitor mode list iteration
+
+ - iwlwifi:
+    - fix firmware loading on certain (really old) devices
+    - add settime64 to PTP clock to avoid a warning and clock
+      registration failure, but it's not actually supported
+
+ - rtw88:
+    - remove WQ_UNBOUND since it broke USB adapters
+      (because it can't be used with WQ_BH)
+    - fix SDIO issues with certain devices
+
+ - rtl8192cu: fix TID array out-of-bounds (since 6.9)
+
+ - wlcore (TI): add missing skb push headroom increase
+
+----------------------------------------------------------------
+Aloka Dixit (1):
+      wifi: mac80211: do not use old MBSSID elements
+
+Bitterblue Smith (1):
+      Revert "wifi: rtw88: add WQ_UNBOUND to alloc_workqueue users"
+
+Dan Carpenter (1):
+      wifi: cfg80211: sme: store capped length in __cfg80211_connect_result()
+
+Dmitry Antipov (1):
+      wifi: mac80211: fix list iteration in ieee80211_add_virtual_monitor()
+
+Johannes Berg (2):
+      Merge tag 'rtw-2025-12-15' of https://github.com/pkshih/rtw
+      wifi: mac80211: don't WARN for connections on invalid channels
+
+Jouni Malinen (1):
+      wifi: mac80211: Discard Beacon frames to non-broadcast address
+
+Moon Hee Lee (1):
+      wifi: mac80211: ocb: skip rx_no_sta when interface is not joined
+
+Morning Star (1):
+      wifi: rtlwifi: 8192cu: fix tid out of range in rtl92cu_tx_fill_desc()
+
+Peter Åstrand (1):
+      wifi: wlcore: ensure skb headroom before skb_push
+
+Ping-Ke Shih (1):
+      wifi: rtw88: limit indirect IO under powered off for RTL8822CS
+
+Ville Syrjälä (1):
+      wifi: iwlwifi: Fix firmware version handling
+
+Yao Zi (1):
+      wifi: iwlwifi: Implement settime64 as stub for MVM/MLD PTP
+
+ drivers/net/wireless/intel/iwlwifi/iwl-drv.c         |  4 ++--
+ drivers/net/wireless/intel/iwlwifi/mld/ptp.c         |  7 +++++++
+ drivers/net/wireless/intel/iwlwifi/mvm/ptp.c         |  7 +++++++
+ drivers/net/wireless/realtek/rtlwifi/rtl8192cu/trx.c |  3 ++-
+ drivers/net/wireless/realtek/rtw88/sdio.c            |  4 +++-
+ drivers/net/wireless/realtek/rtw88/usb.c             |  3 +--
+ drivers/net/wireless/ti/wlcore/tx.c                  |  5 +++++
+ net/mac80211/cfg.c                                   | 10 ----------
+ net/mac80211/iface.c                                 |  2 +-
+ net/mac80211/mlme.c                                  |  5 ++++-
+ net/mac80211/ocb.c                                   |  3 +++
+ net/mac80211/rx.c                                    |  5 +++++
+ net/wireless/sme.c                                   |  2 +-
+ 13 files changed, 41 insertions(+), 19 deletions(-)
 
