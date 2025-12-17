@@ -1,229 +1,239 @@
-Return-Path: <netdev+bounces-245158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245159-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A12DFCC82DF
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 15:26:47 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8A0ECC8BD0
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 17:22:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D0B083121CC4
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 14:21:06 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id BAECB304E60C
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 16:15:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04047350A1D;
-	Wed, 17 Dec 2025 13:43:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="ybi8bsTq";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="nj/6g9vP";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="rWXg37lE";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="yELPvp4G"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27D97357A21;
+	Wed, 17 Dec 2025 13:49:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-ot1-f79.google.com (mail-ot1-f79.google.com [209.85.210.79])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBF0B34EEF8
-	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 13:43:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DA57357711
+	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 13:49:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.79
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765978995; cv=none; b=qH71npaQMem/OMWexr0SGz014VPJWIShBLkPnGWTKk2SAi8/sY1sJGe7DXTGTjMYznLyLPwyPCuYk1cXD6Wqe6uaKIGLynzW+AiF6KTUAV8VPbmqAxsp9mSDkAXgAnvDtL88W41uxSUIP8/cWOZtcpep59kEj5t/CWn4ayne+8U=
+	t=1765979364; cv=none; b=iQgJF+dPYAjfFeyY1amnw6ckpU+ug0OqKfLTpa5TCujf7V8ZY/N6vmWWilXQKFSphvvB2phvGtQRUDaJYQCxUhU7YBOs2aFtZ0i0pqxkeEpr/cTr+JKQd33Oc8ryC0lwYsEhzBuEbFbyKreCFnpZ8q3KuQ/s00Nv3eq/BMlK/Bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765978995; c=relaxed/simple;
-	bh=dfCzW7+MZOL3fC2W2UmAlhv69wpX6UTEOMs9QwGAy4s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pnOGrm2omD8wklsaijPt9mWmhpS2Nq5B6c7VEih8Ur5vcR+wuTuKR+00pXmD3jM1dOppln8z1cMZ3+X47pLtFu8P+mDmvDZI/g8zVovhv2mUc1sMUw8JOd2QzRx2C5OC1OAcASp0f2XxkrPx86KZOHwY3mC+uMZIW3wbw/A5KuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=ybi8bsTq; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=nj/6g9vP; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=rWXg37lE; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=yELPvp4G; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 8CB49336D4;
-	Wed, 17 Dec 2025 13:43:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1765978989; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=FBjgti/w/DVH81mtuH8uFCoRWeqR8Uk0Q5nkCd9uPVk=;
-	b=ybi8bsTqBVfBFrRRaqXh1WLl4CoYZxMnLRfsx+I3W7xFHLx4i51Ca//p9gceFXwDv/QmKH
-	sJxKt7ciGhvdljjfOQLLSaQqugqM7JF+E6xO5dogt0ubffwDjTVM++BuC3V1aH0hZdDJ7Y
-	5t2e1uOSJ9eWE0SIn8e2OPcAVmQ7bJI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1765978989;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=FBjgti/w/DVH81mtuH8uFCoRWeqR8Uk0Q5nkCd9uPVk=;
-	b=nj/6g9vPZvvfB+fVnUCMfyYE2SBKJ2V0mOkoEl2zdMkmENasve3ByMkVULJrggMHDPouEv
-	Gk6mDqcwJBKzc8BQ==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1765978988; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=FBjgti/w/DVH81mtuH8uFCoRWeqR8Uk0Q5nkCd9uPVk=;
-	b=rWXg37lErWuxpeG/GaZ6hgEWx4/vITQfddnkTCm1nEvvt+LIyGL4fb0k9AWIHLholSFelg
-	2HVpVDXGu6uEYtChiSf5DvoIwsqQik1mjR7qlDj5/IwZidUFASuUSxsFouPNQh235pbr/k
-	8PMWa9d8c4aDs2teCwEINr3pR0icK80=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1765978988;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=FBjgti/w/DVH81mtuH8uFCoRWeqR8Uk0Q5nkCd9uPVk=;
-	b=yELPvp4Gz/ZYabrJ3OiTJPPR6MmiaDtT6CtpAcwdliGWv79/HgYwbv0rOwn1418wLJGlFD
-	QZPXYe68PoSD6lCA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 31FE13EA63;
-	Wed, 17 Dec 2025 13:43:08 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 38axCmyzQmmlYAAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Wed, 17 Dec 2025 13:43:08 +0000
-Message-ID: <776b0429-d5ae-4b00-ba83-e25f6d877c0a@suse.cz>
-Date: Wed, 17 Dec 2025 14:43:07 +0100
+	s=arc-20240116; t=1765979364; c=relaxed/simple;
+	bh=5Vwwy7hL1uhdo8IHPU9L/moNqREhRtoG6iohSgZOW0c=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=uvEajfHnbJbABU+Toc3P/zdH/BbpVb5W5dd292WVCawa2ROqxnwl8Phzm1oWzjK9PNXI0V370WszFta9Du33bJJMUwdLyC1s+oUoCxm5p0gLA9C+NF2M7gNLyYwhdKZhvr4ebdlprl4vcKgq7AD1RdPHI9gaKdECv46zJb5L0x0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.210.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-ot1-f79.google.com with SMTP id 46e09a7af769-7c765a491bdso5913855a34.2
+        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 05:49:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765979361; x=1766584161;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=06BWFj+ZWS2ge2WI899eyKp7jOw541WF5gUg5w7TR7U=;
+        b=KyWyk7Zf+rrFSPacwMiVFRTm1EsXLoumgXLJVrI+BkWmB5v9pwg0S2XXhqtDRzrb+N
+         U4NjFr2ebEFJOfqiIrvhwxHtPE00b0gSnkW/106hEVPo3je1D2yYG9S3GXN3N8MkY02C
+         vg7IObi1OTZ3vj+KDaIsixJJvSsnmxUMPKkIkXaFZwAbmszslI76pACMj299flwo6j3Z
+         KbSa7DOOBF54eMUxUHDhOjzyaVkbmEMvUOW2fUh99wibzxvrhVTCBgtKp14Te0fussTE
+         gj9+GvxqhWfh9xD1hw7hJapcJfcVKf7pb4eY3M3hqE0w7Fm4OsW5KCjzXf+l+38Wd7Im
+         Qoqw==
+X-Forwarded-Encrypted: i=1; AJvYcCWdKW/bFTKOB1qeXFIhI7b4g9S01ZnOaSRZmUF+iZXNcUAEeHmi5pghIjEVjprrv6jy2XQ3iuQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxqXzV+RKA7gHGGVgRvPe1smpR/ofSpMzYDCm8XSjYbieUZPJar
+	oRvQYDb+F3jcmBXBzVRuIAjmmRWyvMiFj5nw4+ISka3m+ZYDl9G6usQHSP6orbxd+YDUpY/NIdi
+	SpV6SS3PNr0e2h5UZuNmYImsbwv2QmD/zEfTfMVksSZZAR8Eyxe2kq+5mgyE=
+X-Google-Smtp-Source: AGHT+IHHOhnagbZQhsbBXe1CwfKzGk+4jy262Ev57Vbg8JEw3PW0CcPAidVcZiuzpytWIWykPt/JO9jS19aQdi56YNS7ys3wp/6J
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/1] finalize removing the page pool members in struct
- page
-Content-Language: en-US
-To: Byungchul Park <byungchul@sk.com>, linux-mm@kvack.org,
- akpm@linux-foundation.org, netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
- harry.yoo@oracle.com, ast@kernel.org, daniel@iogearbox.net,
- davem@davemloft.net, kuba@kernel.org, hawk@kernel.org,
- john.fastabend@gmail.com, sdf@fomichev.me, saeedm@nvidia.com,
- leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
- andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com,
- david@redhat.com, lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
- rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org,
- jackmanb@google.com, hannes@cmpxchg.org, ziy@nvidia.com,
- ilias.apalodimas@linaro.org, willy@infradead.org, brauner@kernel.org,
- kas@kernel.org, yuzhao@google.com, usamaarif642@gmail.com,
- baolin.wang@linux.alibaba.com, almasrymina@google.com, toke@redhat.com,
- asml.silence@gmail.com, bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
- sfr@canb.auug.org.au, dw@davidwei.uk, ap420073@gmail.com, dtatulea@nvidia.com
-References: <20251216030314.29728-1-byungchul@sk.com>
-From: Vlastimil Babka <vbabka@suse.cz>
-Autocrypt: addr=vbabka@suse.cz; keydata=
- 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
- m6M14QORSWTLRg==
-In-Reply-To: <20251216030314.29728-1-byungchul@sk.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[47];
-	TAGGED_RCPT(0.00)[netdev];
-	MID_RHS_MATCH_FROM(0.00)[];
-	R_RATELIMIT(0.00)[to_ip_from(RLu874uidxseximu1chzy6dbs4)];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,skhynix.com,oracle.com,kernel.org,iogearbox.net,davemloft.net,gmail.com,fomichev.me,nvidia.com,lunn.ch,google.com,redhat.com,suse.com,cmpxchg.org,linaro.org,infradead.org,linux.alibaba.com,canb.auug.org.au,davidwei.uk];
-	RCVD_TLS_ALL(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.cz:mid]
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spam-Score: -2.80
+X-Received: by 2002:a05:6820:81ca:b0:659:9a49:8dff with SMTP id
+ 006d021491bc7-65b4524c904mr7747148eaf.65.1765979361191; Wed, 17 Dec 2025
+ 05:49:21 -0800 (PST)
+Date: Wed, 17 Dec 2025 05:49:21 -0800
+In-Reply-To: <682444b7.a00a0220.104b28.0009.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6942b4e1.050a0220.2a2f17.0000.GAE@google.com>
+Subject: Re: [syzbot] [sctp?] INFO: rcu detected stall in inet6_rtm_newaddr (3)
+From: syzbot <syzbot+3e17d9c9a137bb913b61@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-sctp@vger.kernel.org, lucien.xin@gmail.com, marcelo.leitner@gmail.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 12/16/25 04:03, Byungchul Park wrote:
-> Since this patch requires to use newly introduced APIs in net tree, I've
-> been waiting for those to be ready in mm tree.  Now that mm tree has
-> been rebased so as to include the APIs, this patch can be merged to mm
-> tree.
-> 
-> This patch has been carried out in a separate thread so far for the
-> reviews [1]:
-> 
->  [1] https://lore.kernel.org/all/20251119012709.35895-1-byungchul@sk.com/
-> ---
-> Changes from v1:
-> 	1. Drop the finalizing patch removing the pp fields of struct
-> 	   page since I found that there is still code accessing a pp
-> 	   field via struct page.  I will retry the finalizing patch
-> 	   after resolving the issue.
+syzbot has found a reproducer for the following issue on:
 
-Could we just make that necessary change of
-drivers/net/ethernet/intel/ice/ice_ethtool.c part of this series and do it
-all at once? We're changing both mm and net anyway.
+HEAD commit:    12b95d29eb97 Add linux-next specific files for 20251217
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=10c69d92580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=2b21d95ed921dffe
+dashboard link: https://syzkaller.appspot.com/bug?extid=3e17d9c9a137bb913b61
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10974a2a580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1003177c580000
 
-Also which tree will carry the series? I assume net will want to, as the
-changes are mostly there?
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/9fb4b501730c/disk-12b95d29.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/fc92d98fa8d2/vmlinux-12b95d29.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/f25cfc55950a/bzImage-12b95d29.xz
 
-> ---
-> Byungchul Park (1):
->   mm: introduce a new page type for page pool in page type
-> 
->  .../net/ethernet/mellanox/mlx5/core/en/xdp.c  |  2 +-
->  include/linux/mm.h                            | 27 +++----------------
->  include/linux/page-flags.h                    |  6 +++++
->  include/net/netmem.h                          | 15 +++++++++--
->  mm/page_alloc.c                               | 11 +++++---
->  net/core/netmem_priv.h                        | 20 +++++---------
->  net/core/page_pool.c                          | 18 +++++++++++--
->  7 files changed, 53 insertions(+), 46 deletions(-)
-> 
-> 
-> base-commit: d0a24447990a9d8212bfb3a692d59efa74ce9f86
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+3e17d9c9a137bb913b61@syzkaller.appspotmail.com
 
+rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+rcu: 	Tasks blocked on level-0 rcu_node (CPUs 0-1): P6135/1:b..l P5964/2:b..l
+rcu: 	(detected by 1, t=10502 jiffies, g=14189, q=315 ncpus=2)
+task:syz-executor    state:R  running task     stack:19496 pid:5964  tgid:5964  ppid:5963   task_flags:0x400140 flags:0x00080000
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5258 [inline]
+ __schedule+0x150e/0x5070 kernel/sched/core.c:6866
+ preempt_schedule_irq+0xb5/0x150 kernel/sched/core.c:7193
+ irqentry_exit+0x5d8/0x660 kernel/entry/common.c:216
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
+RIP: 0010:orc_find arch/x86/kernel/unwind_orc.c:228 [inline]
+RIP: 0010:unwind_next_frame+0x214/0x23d0 arch/x86/kernel/unwind_orc.c:510
+Code: ef 08 8b 15 6e 32 47 0c 8d 42 ff 44 39 f8 0f 86 78 04 00 00 44 89 f8 4c 8d 2c 85 f8 f5 e0 90 4c 89 e8 48 c1 e8 03 0f b6 04 28 <84> c0 48 89 eb 0f 85 2c 1c 00 00 45 8b 6d 00 44 89 f8 ff c0 48 8d
+RSP: 0018:ffffc900043eed38 EFLAGS: 00000a03
+RAX: 0000000000000000 RBX: 0000000000000001 RCX: a87a6bbecf920600
+RDX: 00000000000a60ce RSI: ffffffff8be075c0 RDI: ffffffff8be07580
+RBP: dffffc0000000000 R08: ffffffff81742f85 R09: ffffffff8e13f8a0
+R10: ffffc900043eee58 R11: ffffffff81ad9f20 R12: ffffffff8aa4f9ce
+R13: ffffffff910789dc R14: ffffc900043eee08 R15: 000000000009a4f9
+ arch_stack_walk+0x11c/0x150 arch/x86/kernel/stacktrace.c:25
+ stack_trace_save+0x9c/0xe0 kernel/stacktrace.c:122
+ kasan_save_stack mm/kasan/common.c:57 [inline]
+ kasan_save_track+0x3e/0x80 mm/kasan/common.c:78
+ poison_kmalloc_redzone mm/kasan/common.c:398 [inline]
+ __kasan_kmalloc+0x93/0xb0 mm/kasan/common.c:415
+ kasan_kmalloc include/linux/kasan.h:263 [inline]
+ __kmalloc_cache_noprof+0x3e2/0x700 mm/slub.c:5780
+ kmalloc_noprof include/linux/slab.h:957 [inline]
+ kzalloc_noprof include/linux/slab.h:1094 [inline]
+ sctp_inet6addr_event+0x37f/0x740 net/sctp/ipv6.c:86
+ notifier_call_chain+0x19d/0x3a0 kernel/notifier.c:85
+ atomic_notifier_call_chain+0xda/0x180 kernel/notifier.c:223
+ ipv6_add_addr+0xda9/0x1090 net/ipv6/addrconf.c:1186
+ inet6_addr_add+0x3c3/0xce0 net/ipv6/addrconf.c:3050
+ inet6_rtm_newaddr+0x93d/0xd20 net/ipv6/addrconf.c:5059
+ rtnetlink_rcv_msg+0x7cf/0xb70 net/core/rtnetlink.c:6958
+ netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2550
+ netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
+ netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1344
+ netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1894
+ sock_sendmsg_nosec+0x18f/0x1d0 net/socket.c:737
+ __sock_sendmsg net/socket.c:752 [inline]
+ __sys_sendto+0x3ce/0x540 net/socket.c:2221
+ __do_sys_sendto net/socket.c:2228 [inline]
+ __se_sys_sendto net/socket.c:2224 [inline]
+ __x64_sys_sendto+0xde/0x100 net/socket.c:2224
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f30ce1915dc
+RSP: 002b:00007ffc905dd720 EFLAGS: 00000293 ORIG_RAX: 000000000000002c
+RAX: ffffffffffffffda RBX: 00007f30cef14620 RCX: 00007f30ce1915dc
+RDX: 0000000000000040 RSI: 00007f30cef14670 RDI: 0000000000000003
+RBP: 0000000000000000 R08: 00007ffc905dd774 R09: 000000000000000c
+R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000003
+R13: 0000000000000000 R14: 00007f30cef14670 R15: 0000000000000000
+ </TASK>
+task:sed             state:R  running task     stack:24312 pid:6135  tgid:6135  ppid:6134   task_flags:0x400000 flags:0x00080000
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5258 [inline]
+ __schedule+0x150e/0x5070 kernel/sched/core.c:6866
+ preempt_schedule_irq+0xb5/0x150 kernel/sched/core.c:7193
+ irqentry_exit+0x5d8/0x660 kernel/entry/common.c:216
+ asm_sysvec_reschedule_ipi+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+RIP: 0010:arch_atomic64_read arch/x86/include/asm/atomic64_64.h:-1 [inline]
+RIP: 0010:raw_atomic64_read include/linux/atomic/atomic-arch-fallback.h:2583 [inline]
+RIP: 0010:atomic64_read include/linux/atomic/atomic-instrumented.h:1611 [inline]
+RIP: 0010:ktime_get_coarse_real_ts64_mg+0x37/0x1e0 kernel/time/timekeeping.c:2445
+Code: 53 48 83 ec 10 48 89 fb e8 36 04 12 00 48 c7 c7 c0 12 e1 8d be 08 00 00 00 e8 65 62 78 00 48 8b 05 5e 4d 31 0c 48 89 44 24 08 <4c> 8d 73 08 49 89 dd 49 c1 ed 03 4c 89 f0 48 c1 e8 03 48 89 04 24
+RSP: 0018:ffffc900034d75b8 EFLAGS: 00000256
+RAX: 000000261054af24 RBX: ffffc900034d7640 RCX: ffffffff81afc55b
+RDX: 0000000000000000 RSI: 0000000000000008 RDI: ffffffff8de112c0
+RBP: ffffc900034d76b8 R08: ffffffff8de112c7 R09: 1ffffffff1bc2258
+R10: dffffc0000000000 R11: fffffbfff1bc2259 R12: dffffc0000000000
+R13: dffffc0000000000 R14: ffffc900034d7640 R15: dffffc0000000000
+ current_time+0x8e/0x360 fs/inode.c:2343
+ atime_needs_update+0x320/0x6d0 fs/inode.c:2206
+ pick_link+0x549/0xfa0 fs/namei.c:1983
+ step_into_slowpath+0x53b/0x7d0 fs/namei.c:2066
+ step_into fs/namei.c:2091 [inline]
+ walk_component fs/namei.c:2227 [inline]
+ link_path_walk+0xd50/0x18d0 fs/namei.c:2589
+ path_openat+0x2b0/0x3840 fs/namei.c:4782
+ do_filp_open+0x1fa/0x410 fs/namei.c:4813
+ do_sys_openat2+0x121/0x200 fs/open.c:1391
+ do_sys_open fs/open.c:1397 [inline]
+ __do_sys_openat fs/open.c:1413 [inline]
+ __se_sys_openat fs/open.c:1408 [inline]
+ __x64_sys_openat+0x138/0x170 fs/open.c:1408
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fabfcd360ba
+RSP: 002b:00007fff94803a88 EFLAGS: 00000206 ORIG_RAX: 0000000000000101
+RAX: ffffffffffffffda RBX: 00007fff94803b00 RCX: 00007fabfcd360ba
+RDX: 0000000000080000 RSI: 00007fff94803b00 RDI: 00000000ffffff9c
+RBP: 00007fff94803af0 R08: 00007fff94803cf7 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000206 R12: 0000000000000017
+R13: 00007fabfcd0a000 R14: 00007fff94803d10 R15: 0000000000000000
+ </TASK>
+rcu: rcu_preempt kthread starved for 10598 jiffies! g14189 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x0 ->cpu=1
+rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
+rcu: RCU grace-period kthread stack dump:
+task:rcu_preempt     state:R  running task     stack:27168 pid:16    tgid:16    ppid:2      task_flags:0x208040 flags:0x00080000
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5258 [inline]
+ __schedule+0x150e/0x5070 kernel/sched/core.c:6866
+ __schedule_loop kernel/sched/core.c:6948 [inline]
+ schedule+0x165/0x360 kernel/sched/core.c:6963
+ schedule_timeout+0x12b/0x270 kernel/time/sleep_timeout.c:99
+ rcu_gp_fqs_loop+0x301/0x1540 kernel/rcu/tree.c:2083
+ rcu_gp_kthread+0x99/0x390 kernel/rcu/tree.c:2285
+ kthread+0x711/0x8a0 kernel/kthread.c:463
+ ret_from_fork+0x599/0xb30 arch/x86/kernel/process.c:158
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
+ </TASK>
+rcu: Stack dump where RCU GP kthread last ran:
+CPU: 1 UID: 0 PID: 0 Comm: swapper/1 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+RIP: 0010:pv_native_safe_halt+0x13/0x20 arch/x86/kernel/paravirt.c:82
+Code: cc cc cc cc cc cc cc 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 66 90 0f 00 2d 33 4e 2b 00 f3 0f 1e fa fb f4 <e9> 48 ee 02 00 cc cc cc cc cc cc cc cc 90 90 90 90 90 90 90 90 90
+RSP: 0018:ffffc90000197de0 EFLAGS: 000002c6
+RAX: fcd00228fb9d7700 RBX: ffffffff8197888a RCX: fcd00228fb9d7700
+RDX: 0000000000000001 RSI: ffffffff8d99597b RDI: ffffffff8be075e0
+RBP: ffffc90000197f10 R08: ffff8880b87336db R09: 1ffff110170e66db
+R10: dffffc0000000000 R11: ffffed10170e66dc R12: ffffffff8fa20e70
+R13: 1ffff11003adcb70 R14: 0000000000000001 R15: 0000000000000001
+FS:  0000000000000000(0000) GS:ffff888125d2d000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fabfca09a10 CR3: 0000000076504000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ arch_safe_halt arch/x86/include/asm/paravirt.h:107 [inline]
+ default_idle+0x13/0x20 arch/x86/kernel/process.c:767
+ default_idle_call+0x73/0xb0 kernel/sched/idle.c:122
+ cpuidle_idle_call kernel/sched/idle.c:191 [inline]
+ do_idle+0x1ea/0x520 kernel/sched/idle.c:332
+ cpu_startup_entry+0x44/0x60 kernel/sched/idle.c:430
+ start_secondary+0x101/0x110 arch/x86/kernel/smpboot.c:312
+ common_startup_64+0x13e/0x147
+ </TASK>
+
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
