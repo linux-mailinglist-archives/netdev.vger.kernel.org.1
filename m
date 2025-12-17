@@ -1,318 +1,128 @@
-Return-Path: <netdev+bounces-245246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6370DCC9869
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 21:55:20 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2B33CC9887
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 21:58:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 33D8C300C2BA
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 20:55:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id D8D1830069B7
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 20:58:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE3E6309EE4;
-	Wed, 17 Dec 2025 20:55:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 207C628DB56;
+	Wed, 17 Dec 2025 20:58:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="frgUq2na";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="daVOfudq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eRwB2itY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0118F2820AC
-	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 20:55:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 657AA1A9F96
+	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 20:58:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766004916; cv=none; b=RPO7hyKpWJzAbca6qvHXViMEOfXEoAtirgxfzLo2SHylQjrJzntQyxAXKddVfpUqlPLNwYodIteLP3qwQ7GA4Cpo6yWL+lLURt4eoV4XN0e62wbgm08weDXDDKB8koF0a1HQdFXXhE0xjXunF2HN0wBf6ACx/BKtpuKUPLga0S8=
+	t=1766005087; cv=none; b=IDJTosFulNeKrOj2Amymq5yLyLWHzA9VGSrXlJLiZS/9llCI6ZH9Q7Ls1unSbY4nFdqBAwVYF4X+9ErpdOypTXdSW5t7q1irac5KFRAEdeJTJRcx1s9SRybPd+7Z6z/z57J8ECpPQvnYcmwWT6uy7Ud15ccQsyxZ0qdnzDGO+pA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766004916; c=relaxed/simple;
-	bh=ZcCopzOY7izL11ae5HCSHWlmhMGLhCXPDvIU4yKWWi4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ptz1/+rWuwwmzTyHCCttCLgCOX8jEFD+48CXKAuM0fX1S44RIR1lz23elnWzwU9P9tv21m4acMObWrmeW5YPWljZ1B+0sJBWhlYcJ2Xd4Tby0/ybrzW399ZD/aqdoTtdznfvFvuIyQwabjyskWweiGCS3xoxNa/fGXOBhUkhFl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=frgUq2na; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=daVOfudq; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BHJBu8d4083872
-	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 20:55:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	HgMaZiIuQy5vybIqaOL5aswqYfbddufKQttDrC14/fE=; b=frgUq2naW/f3Z10b
-	qhlkzoQG/bBIkMHs9pjkrJlAllgM/1Sc8QGkpXI0tnnN+20I24C9vY0ZESuahSd8
-	+c2gk+U75SLx+IRGoOEweVFcWESkD3fiLfgKC1hm9Y8egrFQ/Mi0Xdip193OAkCg
-	7v1UmOWgOcmGdD4PW1Lm4wGYJH6gJZYTZwpb7jlBzBF114KKcH8doXizoAbDjYYV
-	tphoXAuxeMwhhpY3ZVi5ZYvA7KY36al6VVmCEDkTMCC/xFQCvLyKlRhSBolJlziI
-	GXjGfORKUacLpAJRIPFOp6VL1+8oYjTPpTAzoExAjN2x/4H0DnksSMj+EMIk2RNJ
-	2fgYPQ==
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com [209.85.160.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4b3j39kg79-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 20:55:13 +0000 (GMT)
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-4edb6a94873so113301911cf.0
-        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 12:55:13 -0800 (PST)
+	s=arc-20240116; t=1766005087; c=relaxed/simple;
+	bh=d+zlEPk0bwlVMAv9eOfllTgFc/mp+VNTAuVYhe4tO5A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gLJK+nG9VTiyfANwWH2D/U2yb+dvq8pImnebvkdAqBSm3Aeiv2PHLkEUwE9NtOmg8GOsTYRCiuclbMddARNlNUbyyrKVQtWSG4HdPfrL4kqNYeDPejDu59Gw7KcGvKTJtHlgR9QNlM4hIaBSyP+lesBc8bcgSKQVovvwp/jMTn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eRwB2itY; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-477b91680f8so60844565e9.0
+        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 12:58:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1766004913; x=1766609713; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HgMaZiIuQy5vybIqaOL5aswqYfbddufKQttDrC14/fE=;
-        b=daVOfudqydBn1MB/VCPyJtcRV7upY0gJQSgVESv3yDcsyBk6nxm9azsx9ZL6br4ESK
-         /s4j1a8y8h/PP80QYQ7TmIKjsHb1WgYRF8WUCbde/+YOIO45hVOws6PB4o0EhO88ov8i
-         ipeivsq8XvRs7SGwrmfuPtKeL+oGYyP3Lg9z0acf+beiHPfUKSjQsTq2u2sV3yMCs7V1
-         mStQf8J3HhhmlnrKmKf4J35qvsyjhBvD29BaJCZiC2TAqa7QeICILPe3CFGfQsk1xfyM
-         rcJlQerOTpHGTaCgqW/T2FvwWkqqn1RdKQl1MNrPtXZRAWAA2sAnL6cPQePxiVrtjwG8
-         SOxg==
+        d=gmail.com; s=20230601; t=1766005084; x=1766609884; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=e9An7Spk1ahHsNbHCce3nw5X83+9lif1DQ15nH/hZo4=;
+        b=eRwB2itYQ6kh/0sayloKDj47lPtGXt/oBUALhS4S9gr39GIhKQkfNaXGaybIqwIAsr
+         9SMwJ2Ntuzsi1mdMhebDkKYSDnH0ijTgKrdNu68nqwvbVYls2ymsY7qejQdGDtp5u3d3
+         /NuerMSY7Kq5EN7ef6g8HLEEbhxYZOjiW6uHdLmkjBtucXz1BpXYF6Z9gosURkKzm4lu
+         q7tp3tOZYYNPmZWgKuFNUwj6lSMUoHesp3utiQAtKV1pP5rxNTBzb5BDJUymbOppePx3
+         X0wqq2Vqsl9Veh+KXCJBY8lK+LBol3hBEGVB4S955fdWHlUJwvFMRwxRISYtf+phPHBk
+         YYRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766004913; x=1766609713;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=HgMaZiIuQy5vybIqaOL5aswqYfbddufKQttDrC14/fE=;
-        b=m207rBFiLUmFZCKRByeaEHC8ru7Wh95pljz0EJjK/3ztxoiCiZqsS2hic3Yn2i2twT
-         Rsvu4zxNGvt8Bg7WuaGIMvCFW5rXhhKaFOSraLoQbxlwY88I05yo5jQ5pZWNVe7Y4exF
-         9hdoSqDfzlQkoeybQUQM11zaa9vUrE6x3+sOkaS4UGwQYMEAnIJULCOK5KTnTEdPiIjT
-         Tv7G4+48+0yDj5TLE8dScYesPSdYsVcfAEqChHRpIds85rlrXeX0k1xSry4f5My4SmiP
-         bS4JxakyYD/jgCgXfbuNpfSXel0fCmqbrM86ATxrdoOFCfdB1QOlSJ95DW/V76tqZf3v
-         BoYA==
-X-Forwarded-Encrypted: i=1; AJvYcCUCxDqGwI3FAwBrJ9DUZ/Hux7pL1d/I9mpQ7YBcWgGP5i5PdkUY8p0R5IYP8zBqjilWTDtF3Vw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwHik3L4GQ2oWpoBp/ws25H3EMiXIriKo+wfV+5u/FssyZd+mI3
-	+Brx7PNUfqcpnD10IvDi75fquTF4d8XDhAsf2q3CSw0TDhdzCBoW9pqHJK9ngefj4TG/LydbpWC
-	Y6lprxgjOLx/GgejdrUIUqi1ZkrVV5WRe0Rr8vsvMegWRINR/vsm5ihQ6JwFnCsDvMih8wYLDyK
-	IYfhkyJkRG7DWKy7vH2tsv8WfHYroolVM84Q==
-X-Gm-Gg: AY/fxX5imTpFERfvUEMn3ypEoYBx9FDJtIiLfbIkeUOKKW2V4mUFLKG67I09K6R5/og
-	jml836dSOYAV6ResW9KRl6EsLIu3X1JWhOGcvu38/zCZYUt/XLXLJ8dXOeb7bffkFnd6+58tcNh
-	ys+0gvTlk6DYUik/pVNHxp4RHemFS9B2iw0VxUrjGYWp3EQCBpF3wIeOmpT0KAgLoUdUCRCZRYZ
-	tkjC3G/9hyIg5vRp675T8BLSvE=
-X-Received: by 2002:a05:622a:1f8d:b0:4e8:aff9:a7a8 with SMTP id d75a77b69052e-4f1d059e6demr255486221cf.52.1766004913119;
-        Wed, 17 Dec 2025 12:55:13 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEIxV8yAj25Ai89Xzbv01C4M56wH08D8F+HimFkmmUMgUnz2y/j/qSKVn3Br5Bb5T4cygsAlkkPPFEOhhJoBLc=
-X-Received: by 2002:a05:622a:1f8d:b0:4e8:aff9:a7a8 with SMTP id
- d75a77b69052e-4f1d059e6demr255485861cf.52.1766004912714; Wed, 17 Dec 2025
- 12:55:12 -0800 (PST)
+        d=1e100.net; s=20230601; t=1766005084; x=1766609884;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=e9An7Spk1ahHsNbHCce3nw5X83+9lif1DQ15nH/hZo4=;
+        b=dicwQ1Vmm+bUXuLNSSfx76o67x9BhT/OSA8/IUIlGYySSJTTRs7x1bzYuORpBsD+wU
+         BkDKaYxDII3Js8Glc7F7fgUw98jld4/yu91FRO0YylC/gcrlk9BmJfC9bHPlKIpaRRoh
+         63/qly8bQF9pX+ATOejWnaufNbj+tFgPPmEB534iV9DPhFNI1O76Jf3Li4VTdQJFSDyD
+         CTIe856ltBnWtQOYiGTg+Kq6Kqng8CQx6ehVrAps832FPfbC1HFuPGX5/Y4bAIXW/Itr
+         N0H3C+L5Esmp1jtlEDpntcW/+uf+9yhLGV9slJOHB8UlDbtcrbq11832o2/0j4/m6xnW
+         JPew==
+X-Forwarded-Encrypted: i=1; AJvYcCWeQgrWuU8ByP8cxBe7iAdnILC3bizmQPnpTJTOQQScYULVKRsI8UE+/xsV2ssicEmgfthHjP0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0bBrDaB3UZqIyu9/WToyb//7jwFZId+aGvSgXm7jJmId/6z/O
+	vi3iozf+FR1D/16OfFn7UmJHv4xEmKKPBiYvGI0g+8LrmJjMJgTqYqDI
+X-Gm-Gg: AY/fxX4M7d6CPech6hJ611Wo43mMi3lQl2Ahdw2sP1hiRUCB34TPxf+wblp3mYNnrHb
+	hcZb4LkDTjyPs32Q57ruQrtLI90HXstCHeO25rXRghpd05Bc3C3yCy6SesxiiKPh8htE+OL7vie
+	AQf992oM2d+JFIIPLTr9nm10yNk+o+y+4cG4vXFvE5Zx4wE4oTyBVwmObW56Z5kPYZb1SH+SUZh
+	09HwyJAfGGyvmPhLFeB20Vxr578y5PSZuL03adU3Kh/Azlr4e+0QqFlX1h24cF8zVBUYTM5F3SM
+	Wy/cWrMpfge5+UtCP3lWnhBRMUdm0cq8mtcYvfYgwN12dWv9LPuX/Y6hnwUCXWRhTjF8f7TjWhk
+	eFTcZ7fVlk8s8wf2OMv4n9Te8ehAnQxuqeBMZTbfCwg2WuotHZFv3mGbRsiv0x7z6BokChEIr1s
+	imRxUqawgTCM0tUBPxFJXZGMVvazpSYpdaZm+y+NYJfrafzIW7pIqpVl2Q+6qQT3P3zRk=
+X-Google-Smtp-Source: AGHT+IEAa28T/wJQCGQxP3zh6ddik5Wk5Jn191LMQzoQJ/+WNEiMdywV1ooqtp6fqOYv9biK97NXfQ==
+X-Received: by 2002:a05:600c:46c4:b0:46e:59bd:f7d3 with SMTP id 5b1f17b1804b1-47a8f9046fcmr213910735e9.20.1766005083486;
+        Wed, 17 Dec 2025 12:58:03 -0800 (PST)
+Received: from localhost (dslb-002-205-018-238.002.205.pools.vodafone-ip.de. [2.205.18.238])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47be273f147sm10461455e9.7.2025.12.17.12.58.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Dec 2025 12:58:02 -0800 (PST)
+From: Jonas Gorski <jonas.gorski@gmail.com>
+To: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] net: dsa: b53: skip multicast entries for fdb_dump()
+Date: Wed, 17 Dec 2025 21:57:56 +0100
+Message-ID: <20251217205756.172123-1-jonas.gorski@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251217-qrtr-fix-v1-0-f6142a3ec9d8@oss.qualcomm.com> <20251217-qrtr-fix-v1-1-f6142a3ec9d8@oss.qualcomm.com>
-In-Reply-To: <20251217-qrtr-fix-v1-1-f6142a3ec9d8@oss.qualcomm.com>
-From: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Date: Wed, 17 Dec 2025 21:55:01 +0100
-X-Gm-Features: AQt7F2oMGXyRcd9Myafrtktq7XvNVC31AVGxMw8-BPcHboXB0o1yL4pAKjFRRZ0
-Message-ID: <CAFEp6-0iuJNDM9hdU3rWns=Vst6Ev1iyNim1ngRH3Z44CHwTAg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] net: qrtr: Drop the MHI auto_queue feature for IPCR
- DL channels
-To: manivannan.sadhasivam@oss.qualcomm.com
-Cc: Jeff Hugo <jeff.hugo@oss.qualcomm.com>,
-        Carl Vanderlip <carl.vanderlip@oss.qualcomm.com>,
-        Oded Gabbay <ogabbay@kernel.org>,
-        Manivannan Sadhasivam <mani@kernel.org>,
-        Jeff Johnson <jjohnson@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Maxim Kochetkov <fido_max@inbox.ru>, linux-arm-msm@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
-        mhi@lists.linux.dev, linux-wireless@vger.kernel.org,
-        ath11k@lists.infradead.org, ath12k@lists.infradead.org,
-        netdev@vger.kernel.org, Bjorn Andersson <andersson@kernel.org>,
-        Johan Hovold <johan@kernel.org>, Chris Lew <quic_clew@quicinc.com>,
-        stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjE3MDE2NiBTYWx0ZWRfX/a48mCsn2bTc
- 760h5sWouXXtmYXAsP1xOHAR20Qgl5EAoBi7DZh99X0jfqEWR+armh3vFiQi/Iv20ziEhwbPm+u
- HknvxCRSdMu3PTaG5aVHb8P/biyZpXI6hANn7MQZP3jSMiHJ7+sfioRtbZ43ieBGRGe3ZkhQLqw
- rBkqPVYjVSrlccENzaWBge0D2QGaj6der9vz5fpZ+UhHCn/eKxDYQA9C1HeTnNoOGIpyrzfqNi2
- Tsb63trrBf9KefZBAUPCN25q4UrhZ/I+WaEGL78BVzKPNlt0vmoqS1YLeEMTnjsFs5Xb+V/5KDi
- XGPIbDh5EBbVkFhn645+Tq6De76EWaRjibEMs4Py1QyLkLFG16meqrh/b/0YHHwcXMteCnISjuS
- 063rACM9wTzqOmq/Y/L3C7qIOI3NVQ==
-X-Proofpoint-ORIG-GUID: UDsdIFNfbsu3j0TGbDLnUI0rlc0C8CYK
-X-Proofpoint-GUID: UDsdIFNfbsu3j0TGbDLnUI0rlc0C8CYK
-X-Authority-Analysis: v=2.4 cv=ToXrRTXh c=1 sm=1 tr=0 ts=694318b1 cx=c_pps
- a=mPf7EqFMSY9/WdsSgAYMbA==:117 a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10
- a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=zitRP-D0AAAA:8
- a=EUspDBNiAAAA:8 a=COk6AnOGAAAA:8 a=b7YbY6zhk6ih5Eb82B4A:9 a=QEXdDO2ut3YA:10
- a=dawVfQjAaf238kedN5IG:22 a=xwnAI6pc5liRhupp6brZ:22 a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-17_03,2025-12-17_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 priorityscore=1501 impostorscore=0 bulkscore=0 clxscore=1015
- spamscore=0 phishscore=0 suspectscore=0 adultscore=0 lowpriorityscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2512170166
+Content-Transfer-Encoding: 8bit
 
-Hi Mani,
+port_fdb_dump() is supposed to only add fdb entries, but we iterate over
+the full ARL table, which also inludes multicast entries.
 
-On Wed, Dec 17, 2025 at 6:17=E2=80=AFPM Manivannan Sadhasivam via B4 Relay
-<devnull+manivannan.sadhasivam.oss.qualcomm.com@kernel.org> wrote:
->
-> From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
->
-> MHI stack offers the 'auto_queue' feature, which allows the MHI stack to
-> auto queue the buffers for the RX path (DL channel). Though this feature
-> simplifies the client driver design, it introduces race between the clien=
-t
-> drivers and the MHI stack. For instance, with auto_queue, the 'dl_callbac=
-k'
-> for the DL channel may get called before the client driver is fully probe=
-d.
-> This means, by the time the dl_callback gets called, the client driver's
-> structures might not be initialized, leading to NULL ptr dereference.
->
-> Currently, the drivers have to workaround this issue by initializing the
-> internal structures before calling mhi_prepare_for_transfer_autoqueue().
-> But even so, there is a chance that the client driver's internal code pat=
-h
-> may call the MHI queue APIs before mhi_prepare_for_transfer_autoqueue() i=
-s
-> called, leading to similar NULL ptr dereference. This issue has been
-> reported on the Qcom X1E80100 CRD machines affecting boot.
->
-> So to properly fix all these races, drop the MHI 'auto_queue' feature
-> altogether and let the client driver (QRTR) manage the RX buffers manuall=
-y.
-> In the QRTR driver, queue the RX buffers based on the ring length during
-> probe and recycle the buffers in 'dl_callback' once they are consumed. Th=
-is
-> also warrants removing the setting of 'auto_queue' flag from controller
-> drivers.
->
-> Currently, this 'auto_queue' feature is only enabled for IPCR DL channel.
-> So only the QRTR client driver requires the modification.
->
-> Cc: stable@vger.kernel.org
-> Fixes: 227fee5fc99e ("bus: mhi: core: Add an API for auto queueing buffer=
-s for DL channel")
-> Fixes: 68a838b84eff ("net: qrtr: start MHI channel after endpoit creation=
-")
-> Reported-by: Johan Hovold <johan@kernel.org>
-> Closes: https://lore.kernel.org/linux-arm-msm/ZyTtVdkCCES0lkl4@hovoldcons=
-ulting.com
-> Suggested-by: Chris Lew <quic_clew@quicinc.com>
-> Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.=
-com>
-> ---
->  drivers/accel/qaic/mhi_controller.c   | 44 -----------------------
->  drivers/bus/mhi/host/pci_generic.c    | 20 ++---------
->  drivers/net/wireless/ath/ath11k/mhi.c |  4 ---
->  drivers/net/wireless/ath/ath12k/mhi.c |  4 ---
->  net/qrtr/mhi.c                        | 67 +++++++++++++++++++++++++++++=
-------
->  5 files changed, 58 insertions(+), 81 deletions(-)
-[...]
-> diff --git a/net/qrtr/mhi.c b/net/qrtr/mhi.c
-> index 69f53625a049..0b4d181ea747 100644
-> --- a/net/qrtr/mhi.c
-> +++ b/net/qrtr/mhi.c
-> @@ -24,13 +24,25 @@ static void qcom_mhi_qrtr_dl_callback(struct mhi_devi=
-ce *mhi_dev,
->         struct qrtr_mhi_dev *qdev =3D dev_get_drvdata(&mhi_dev->dev);
->         int rc;
->
-> -       if (!qdev || mhi_res->transaction_status)
-> +       if (!qdev || (mhi_res->transaction_status && mhi_res->transaction=
-_status !=3D -ENOTCONN))
->                 return;
->
-> +       /* Channel got reset. So just free the buffer */
-> +       if (mhi_res->transaction_status =3D=3D -ENOTCONN) {
-> +               devm_kfree(&mhi_dev->dev, mhi_res->buf_addr);
-> +               return;
-> +       }
-> +
->         rc =3D qrtr_endpoint_post(&qdev->ep, mhi_res->buf_addr,
->                                 mhi_res->bytes_xferd);
->         if (rc =3D=3D -EINVAL)
->                 dev_err(qdev->dev, "invalid ipcrouter packet\n");
-> +
-> +       /* Done with the buffer, now recycle it for future use */
-> +       rc =3D mhi_queue_buf(mhi_dev, DMA_FROM_DEVICE, mhi_res->buf_addr,
-> +                          mhi_dev->mhi_cntrl->buffer_len, MHI_EOT);
-> +       if (rc)
-> +               dev_err(&mhi_dev->dev, "Failed to recycle the buffer: %d\=
-n", rc);
->  }
->
->  /* From QRTR to MHI */
-> @@ -72,6 +84,27 @@ static int qcom_mhi_qrtr_send(struct qrtr_endpoint *ep=
-, struct sk_buff *skb)
->         return rc;
->  }
->
-> +static int qcom_mhi_qrtr_queue_dl_buffers(struct mhi_device *mhi_dev)
-> +{
-> +       void *buf;
-> +       int ret;
-> +
-> +       while (!mhi_queue_is_full(mhi_dev, DMA_FROM_DEVICE)) {
+So check if the entry is a multicast entry before passing it on to the
+callback().
 
-This approach might be a bit racy, since a buffer could complete
-before the alloc+queue loop finishes. That could e.g lead to recycle
-error in a concurrent DL callback. It might be simpler to just queue
-the number of descriptors returned by mhi_get_free_desc_count().
+Additionally, the port of those entries is a bitmask, not a port number,
+so any included entries would have even be for the wrong port.
 
-> +               buf =3D devm_kmalloc(&mhi_dev->dev, mhi_dev->mhi_cntrl->b=
-uffer_len, GFP_KERNEL);
-> +               if (!buf)
-> +                       return -ENOMEM;
-> +
-> +               ret =3D mhi_queue_buf(mhi_dev, DMA_FROM_DEVICE, buf, mhi_=
-dev->mhi_cntrl->buffer_len,
-> +                                   MHI_EOT);
-> +               if (ret) {
-> +                       dev_err(&mhi_dev->dev, "Failed to queue buffer: %=
-d\n", ret);
-> +                       return ret;
-> +               }
-> +       }
-> +
-> +       return 0;
-> +}
-> +
->  static int qcom_mhi_qrtr_probe(struct mhi_device *mhi_dev,
->                                const struct mhi_device_id *id)
->  {
-> @@ -87,20 +120,30 @@ static int qcom_mhi_qrtr_probe(struct mhi_device *mh=
-i_dev,
->         qdev->ep.xmit =3D qcom_mhi_qrtr_send;
->
->         dev_set_drvdata(&mhi_dev->dev, qdev);
-> -       rc =3D qrtr_endpoint_register(&qdev->ep, QRTR_EP_NID_AUTO);
-> -       if (rc)
-> -               return rc;
->
->         /* start channels */
-> -       rc =3D mhi_prepare_for_transfer_autoqueue(mhi_dev);
-> -       if (rc) {
-> -               qrtr_endpoint_unregister(&qdev->ep);
-> +       rc =3D mhi_prepare_for_transfer(mhi_dev);
-> +       if (rc)
->                 return rc;
-> -       }
-> +
-> +       rc =3D qrtr_endpoint_register(&qdev->ep, QRTR_EP_NID_AUTO);
-> +       if (rc)
-> +               goto err_unprepare;
-> +
-> +       rc =3D qcom_mhi_qrtr_queue_dl_buffers(mhi_dev);
-> +       if (rc)
-> +               goto err_unregister;
->
->         dev_dbg(qdev->dev, "Qualcomm MHI QRTR driver probed\n");
->
->         return 0;
-> +
-> +err_unregister:
-> +       qrtr_endpoint_unregister(&qdev->ep);
-> +err_unprepare:
-> +       mhi_unprepare_from_transfer(mhi_dev);
-> +
-> +       return rc;
->  }
+Fixes: 1da6df85c6fb ("net: dsa: b53: Implement ARL add/del/dump operations")
+Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
+---
+ drivers/net/dsa/b53/b53_common.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Regards,
-Loic
+diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
+index a1a177713d99..2c4131ed7e30 100644
+--- a/drivers/net/dsa/b53/b53_common.c
++++ b/drivers/net/dsa/b53/b53_common.c
+@@ -2169,6 +2169,9 @@ static int b53_fdb_copy(int port, const struct b53_arl_entry *ent,
+ 	if (!ent->is_valid)
+ 		return 0;
+ 
++	if (is_multicast_ether_addr(ent->mac))
++		return 0;
++
+ 	if (port != ent->port)
+ 		return 0;
+ 
+-- 
+2.43.0
+
 
