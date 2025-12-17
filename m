@@ -1,116 +1,146 @@
-Return-Path: <netdev+bounces-245206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64E50CC8A04
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 16:58:10 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DDEDCC898C
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 16:53:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6BD143178DFC
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 15:46:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5BDC730DEA3C
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 15:45:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 993833570AF;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 115E43563E9;
 	Wed, 17 Dec 2025 15:44:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fLgC2xmb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jsRlPpOi"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E2C635505D
-	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 15:44:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14366354AD4
+	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 15:44:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765986260; cv=none; b=an3dB3oVETb6VY/4Yu0AVwxVNB3OkNgzYAlCzXF+U5jWpKWLz6rJC1J/ALQdXve/n/OuPwjHfIKla3Vrlk/KFHRA38R518TtK4avJbUWsoeBdqto+RdGW/6N6GHn4lD3ygqH0X5LAoAXP3M+m+CJsXs8OCc2IlGIGNGxfVkloWU=
+	t=1765986260; cv=none; b=C9Ay6z7Q0ByAdXTdVTogN7Htk9T4XQiuz5Too2lghtT2OrPRQuyx5VEgCCa3ZsXRperg4Oz87UiM++tyaxOSNTUteWLdFPoFGzip38TCKIIK4Z+aIcljcSdAWAA8wyIvuIkv4udOqtuRkv10P1ODgN+ujMPXFhnsBq+csFs3YOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1765986260; c=relaxed/simple;
-	bh=GRw3k37jzZigcwcP/ph2YPqgDHd5l8rSTChmEXFVsjc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RCg6jtBXCdEY8L7KCKub3bm6jpxTauGB4mA8nG/oWn404pmUoWm4Vb2j06M19DaFqoCWxXuJtDTwUUtM/sFLAk7SzmDhAnjij3WbXIR9reE63n7Q86tGrFOkHqqPXSXCRJXoa9PrH7O9IrIRr+/urJYptRDRvKM3L43z2UF2vRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fLgC2xmb; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1765986257;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=qe7gu7rkTT6RSV7820IncIBCE7lirH9igpBFZqT8LW4=;
-	b=fLgC2xmb85zQ+/9ckEzGzWfjXaNVAwoNfLl89EKAsuvhUn7aUpf+wsXd4DqzLjEZ+o2FLg
-	3Ex9PchMhqzlGH7ivRRX0cFkZBrxxFGyhbfgxr++iZt0qwV3dOZQ9eL/nVQFdR4rLaruvV
-	jC3GT0qIFqQbHlr+LGHzbHXpl1BQSOo=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-500-1zCJbMOvPWejgYXap53Q3g-1; Wed,
- 17 Dec 2025 10:44:15 -0500
-X-MC-Unique: 1zCJbMOvPWejgYXap53Q3g-1
-X-Mimecast-MFC-AGG-ID: 1zCJbMOvPWejgYXap53Q3g_1765986255
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0721A1958FC7
-	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 15:44:15 +0000 (UTC)
-Received: from dev64.shokupan.com (unknown [10.64.240.13])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 88D8A19560B4;
-	Wed, 17 Dec 2025 15:44:13 +0000 (UTC)
-From: Masatake YAMATO <yamato@redhat.com>
-To: netdev@vger.kernel.org
-Cc: yamato@redhat.com
-Subject: [PATCH iproute2 1/2] man: explain the naming convention of files under .d dir
-Date: Thu, 18 Dec 2025 00:43:53 +0900
-Message-ID: <20251217154354.2410098-1-yamato@redhat.com>
+	bh=ppU3j2lZksoglhDW0EJVi4k7Xru09KCe+n/nfrWzViY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SFJsqTYx0E/CzdK8IeRFhLxIIwH0LimDRzqg8WaOAiujl6dO5ShIpHGwLi8MWwjfffVJJ/weJcCHvZjx6AK5jIIsDNfNAQxSQYC94tlOm5BxfRo6TqNAMmTD1gqUl8mE29Gm78gCGfZATDIeimZj9oQ9MUxksDeD/asYftt1z1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jsRlPpOi; arc=none smtp.client-ip=209.85.128.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-78c33f74b72so55069097b3.2
+        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 07:44:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1765986257; x=1766591057; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Iopfrv3MnPwwQ2rY2e5oa1mDYysahBYSwhvZmps0EBA=;
+        b=jsRlPpOiZaxJ304WaOY9lGdjistYSS7se6oWOY1qDeRx/MwL+agS6ybTYRRbycZCEl
+         s3rQqqeqLFIYfRAC3oDiwhJzNPLMKLHN1IfPNaEEm098rUw6xnEl+Lc+TUow/bdisMiF
+         lwo5D8eye86xBYxBRVaMdpIVsZkceWy03FxDo7gMI/RDPrZTYBL+Q9nlCCj50pcz1OG2
+         IDKl7Dya7ZMiqYNFSi0T+M52sEjr4wjDcY4V7rolOkFMG498U9+pPM5x434e3lf/TZVx
+         SuIXtCIvyc4pr0ISLdoqSiNmE4XP9OxqjpXnTlicUSqI99IONHIAsM+d+Gs+Fc0P5Gag
+         CKXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1765986257; x=1766591057;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Iopfrv3MnPwwQ2rY2e5oa1mDYysahBYSwhvZmps0EBA=;
+        b=XhruwicP27MilSh9MXh5JwV4M8Yz/1/ETaIzc4w8augYlJ8S8sZylfbrSjpjPdkUCz
+         h0lrzSFatBzRKJwyufXzib3X2ZQy0RdNV82oEXf6t1WMMjoJXnyFQbXHonynxpgrGPdL
+         FKk7pV0bPyjsx3VaCwcmEGrNASk9/LNHXVh2GCjcO0uTp6I/tkAbNImYIz7lx926CIJ+
+         XImpVsa2UlLWp1+2Uk0016zarQVBLHD8hTPK6s2nhLN3/91L/UZ4Hlx+6cEpb0cjXVj8
+         6Y/EtbmxLRj2T3qvdU/P5LxVOwZ/daNNb/6k6JSP8KRKBWimRrkfVxdR5H8pZ1IsWFTc
+         hjGg==
+X-Forwarded-Encrypted: i=1; AJvYcCWVlo5tl7AXHeB/ZQGAQhyJ2I8ZCNvj8bQ4uNazicN7GwU0Qol236JxupBOFXbiPrNeMHIbapY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlSg18vvKSgHZk+L4jN/pB1bbAyWpfsdzyanpagK/F88+zxSic
+	2QC52n7JeumPIaelZbET7PXb5DGRGd4VpUZ03p+kMHn6G7Pjmm1AIQ6VOuVDtRQZAmt1I5g50Tt
+	twGcHyt+tBgSGPoAIbjYs7H/IV7vNdG4jDVK/Thbr
+X-Gm-Gg: AY/fxX6c72teHwBCf4nKh9b0IuFwrJI0VyZIzVzZY/B2qGUO90WJ7c4Uv+bk9zoc8DW
+	JNFH1j/wOWAil8k/MlXPX3v1RG3/36Fpjq6mxRVvDkIRftMLrfd9i9EuPawHmifO0oA7ghGulzH
+	NvSQcxBuhYOMLEHzTaCEcC5GkfMbztLAJzqSk8WtTTT/QdWQTSjJUn/DPIXE4JIUHlYfbUElpMd
+	P63SSOhYoGQgmekeXmgvndzTvJ0p0Z7rVUDqVWOojYyFowEJtq2smsP7zrW5GZ9WDi9PkkA
+X-Google-Smtp-Source: AGHT+IG4rtpahx6R9bomNsuM4kVxoxSOy3f0EszD5++oV6H5itfwOXE3I7lS9RF9ET+eJ6HkwchSeL0/9Xrm5EERo0I=
+X-Received: by 2002:a05:690e:1888:b0:646:60c5:8c46 with SMTP id
+ 956f58d0204a3-64660c5918dmr995581d50.51.1765986256414; Wed, 17 Dec 2025
+ 07:44:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+References: <q3j7p3zkhipxleesykpfrfhznasqnn6mnfqlcphponzvsyavxf@a6ko6obdpso3>
+ <CANn89i+8hX9SjbhR2GOe+RfEkeksKCtPbkz-6pQhCA=pjnr5zg@mail.gmail.com>
+ <CANn89iKUQXmR6uaxVJDi=c3iTgtHbVaTQfRZ_w-YsPywS-fHaw@mail.gmail.com>
+ <CANn89iJj_Vyt2g6QewwaNAXAZ+0iso=4yj0t3U11V_nuUk4ThQ@mail.gmail.com>
+ <6d508d6a-6d4f-4b78-96e0-65e5dfe4e8f0@oracle.com> <CANn89iKjJ-P0YR-oGzEd+EvrFAQA=0LsjsYHUDpFNRHCDwXeWA@mail.gmail.com>
+ <5da37621-279f-46ea-94e7-b766a6e601f3@oracle.com>
+In-Reply-To: <5da37621-279f-46ea-94e7-b766a6e601f3@oracle.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 17 Dec 2025 16:44:04 +0100
+X-Gm-Features: AQt7F2o6glrXpebovDO_hJ-ngJUpq4WKZnmHIf3JWf6frZd0DoXCg8mM5nvxvEg
+Message-ID: <CANn89iK_HyO_9Ek0VRcvjsM-mY-_kUvDsVPkh2iUvi-qcAhDCA@mail.gmail.com>
+Subject: Re: [External] : Re: [REPORT] Null pointer deref in net/core/dev.c on PowerPC
+To: ALOK TIWARI <alok.a.tiwari@oracle.com>
+Cc: Aditya Gupta <adityag@linux.ibm.com>, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Masatake YAMATO <yamato@redhat.com>
----
- man/man8/ip-address.8.in | 7 +++++++
- man/man8/ip-link.8.in    | 7 +++++--
- 2 files changed, 12 insertions(+), 2 deletions(-)
+On Wed, Dec 17, 2025 at 4:38=E2=80=AFPM ALOK TIWARI <alok.a.tiwari@oracle.c=
+om> wrote:
+>
+>
+>
+> On 12/17/2025 8:52 PM, Eric Dumazet wrote:
+> >>> I will send the following fix, thanks.
+> >>>
+> >>> diff --git a/net/core/dev.c b/net/core/dev.c
+> >>> index 9094c0fb8c68..36dc5199037e 100644
+> >>> --- a/net/core/dev.c
+> >>> +++ b/net/core/dev.c
+> >>> @@ -4241,9 +4241,11 @@ static inline int __dev_xmit_skb(struct sk_buf=
+f
+> >>> *skb, struct Qdisc *q,
+> >>>                   int count =3D 0;
+> >>>
+> >>>                   llist_for_each_entry_safe(skb, next, ll_list, ll_no=
+de) {
+> >>> -                       prefetch(next);
+> >>> -                       prefetch(&next->priority);
+> >>> -                       skb_mark_not_on_list(skb);
+> >>> +                       if (next) {
+> >>> +                               prefetch(next);
+> >>> +                               prefetch(&next->priority);
+> >>> +                               skb_mark_not_on_list(skb);
+> >>> +                       }
+> >>>                           rc =3D dev_qdisc_enqueue(skb, q, &to_free, =
+txq);
+> >>>                           count++;
+> >>>                   }
+> >>>
+> >> why not only ?
+> >> if (likely(next)) {
+> >>       prefetch(next);
+> >>       prefetch(&next->priority);
+> >> }
+> > Because we also can avoid clearing skb->next, we know it is already NUL=
+L.
+> >
+> > Since we pay the price of a conditional, let's amortize its cost :/
+>
+> Thanks a lot for the explanation, I understand the goal of amortizing
+> the cost and avoiding unnecessary writes to skb->next.
+> Would it make sense to add if (likely(next)) around the prefetch?
 
-diff --git a/man/man8/ip-address.8.in b/man/man8/ip-address.8.in
-index 79942c1a..e88a114f 100644
---- a/man/man8/ip-address.8.in
-+++ b/man/man8/ip-address.8.in
-@@ -331,6 +331,13 @@ values have a fixed interpretation. Namely:
- The rest of the values are not reserved and the administrator is free
- to assign (or not to assign) protocol tags.
- 
-+When scanning
-+.BR rt_addrprotos.d
-+directory, only files ending
-+.BR .conf
-+are considered.
-+Files beginning with a dot are ignored.
-+
- .SS ip address delete - delete protocol address
- .B Arguments:
- coincide with the arguments of
-diff --git a/man/man8/ip-link.8.in b/man/man8/ip-link.8.in
-index ef45fe08..67f9e2f0 100644
---- a/man/man8/ip-link.8.in
-+++ b/man/man8/ip-link.8.in
-@@ -2315,8 +2315,11 @@ down on the switch port.
- .BR "protodown_reason PREASON on " or " off"
- set
- .B PROTODOWN
--reasons on the device. protodown reason bit names can be enumerated under
--/etc/iproute2/protodown_reasons.d/. possible reasons bits 0-31
-+reasons on the device. protodown reason bit names can be enumerated in the
-+.BR *.conf
-+files under
-+.BR @SYSCONF_USR_DIR@/protodown_reasons.d " or " @SYSCONF_ETC_DIR@/protodown_reasons.d "."
-+possible reasons bits 0-31
- 
- .TP
- .BR "dynamic on " or " dynamic off"
--- 
-2.51.0
+I do not think this is unlikely(), otherwise my recent optimizations should=
+ not
+have been needed in the first place.
 
+Just leave that to cpu branch prediction.
 
