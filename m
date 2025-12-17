@@ -1,168 +1,212 @@
-Return-Path: <netdev+bounces-245069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F1C9CC68A6
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 09:23:39 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE7A9CC7018
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 11:14:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id F2A8F3019DB1
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 08:23:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1174930C19E7
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 10:10:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E84DA337BBD;
-	Wed, 17 Dec 2025 08:21:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0625733EAEC;
+	Wed, 17 Dec 2025 10:03:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="tKg28GRE"
+	dkim=pass (2048-bit key) header.d=aspeedtech.com header.i=@aspeedtech.com header.b="o8lPRnoK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from OS8PR02CU002.outbound.protection.outlook.com (mail-japanwestazon11022140.outbound.protection.outlook.com [40.107.75.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41A4E33710E
-	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 08:21:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765959708; cv=none; b=guab9D4akxuxVaiTKKDNujvYuR5tle5NF5b651DDni278F3yM7/teL4BpFaLWb1qHTpLuye7c0E67j5QVYuJ7iDeTocO+ZrOcds1J/ZjB8VR+FNwmQRecFPKGwvlJLLBqzSz8uAzuepGSpWjI/1CYWXfXB7VJpPL90+FrbZH4TE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765959708; c=relaxed/simple;
-	bh=WuQeI+WkXQSWQInmvdcHjxfQ36N4wXa/UmX/Y1u7BWc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Jg3Q2oKpfeP2BCrFZJMCNVpUM9Zvk5JYT6S/OexJSdp1c6s1NDJxDDG1bDCgi2EqCSvZ0eNvgqfh6KJZT6A0Bgtd5EF2fd1crAHkKhsKHLtWgRmCq6TAoCV5/WJFbYq7sflQre7KqT79W2vT8dDeJNFk/ZN2K6JOpqv4DnPzUZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=tKg28GRE; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-b736ffc531fso1069534966b.1
-        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 00:21:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1765959703; x=1766564503; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=b+Q8ghXVyCQDXjBoffiftwRpwO3ivtFGMCLgHbR9KKc=;
-        b=tKg28GREQe5lulh5QpQRqYXGF/NStwtvQV/wsg7RPUMi5PZwIT8kfVKdqo83NPM54J
-         1KerTy2h4+3tvbMX8ysqEA7rUpVCC+Ii+aDny/tIB6E3QUNXTCPCSew0Bs/F2hQ3ojUx
-         aF3DQIaaywmS8xePYp9DtxBHL9pw6W9uP3eatkQX25U+n9FHWnGDVW2lcsgbhjGWeEpF
-         n0KxcxSvPydtKAIeuCAW20YFG48YVsH0oDpFE3MVarShjFIfbgi34+LQzIgHH2cTuh+t
-         SElz7H4lJ8YbuprC3vrWpJjTR5p8zh4i+hzMb58wcNU/mrHDS917566dJsiSsgzEYmMB
-         /XVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765959703; x=1766564503;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=b+Q8ghXVyCQDXjBoffiftwRpwO3ivtFGMCLgHbR9KKc=;
-        b=fRnvYOWO+uzTOTXuKBYTIrtkwKGGkgUuCNqfWIeoRgN6rmqX+JQbA6jLndUePh72oZ
-         g3HRnPbfrTnntZ3DnUX+xzw3QesVXxV2RyDOGmRT8/ju0YOTTbIl5nPKMFbVYiDe+mif
-         b3Sz6GzVhLq8sEdOv3UtpHRnUzXqMlZxBjNHtMAshPf23CQn7ojpj66Ad51Yr9bCrDyB
-         uMbfk3mND2oYdfN30SiBYefk55gaGhGh22HTmxivdW9J2ivhRqO2pJO7Qe+gRLyHvWZ2
-         FrNaXytV0T90E0Q/vNPPsxDCAMi6H9vjMNjtwdibiS6WVlBPeZDWCt9zJbczbdtamgfR
-         mBFA==
-X-Forwarded-Encrypted: i=1; AJvYcCXwiWAc3MNWx4ONmX/C6kh/xIRjXzXY2wPGGK0cuwxr5i/gE1rnNxLw2tEOi/kpGXqEQ5js/hE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzmkaO/Guu9x5BdQU3TvxKm4Q/oq3iK1lYHuo9izmRBJBSGLreO
-	XM5FG/hI9E0TaK82ZWOMFlwj5+MyNOrtT8JT+x92b/DD+HjHNa+GomKivfp9HdJWRqo=
-X-Gm-Gg: AY/fxX5dp05JyNVIWNnVtxjmsMxh0b5Ut1gOO7trdRR9yG5fvDCni8rHrUwzIw1g5c3
-	kz2Fx3Pe+ns+GA5Z//+kblHdFVADR/3ZQKiE8AA5SbWedGL3+qjtQ/NcaTuTz13OJ+zjRxgrSIy
-	RDDH8u1YLiwKlJEOFXb0lbTn30KahIzLe+aaqo/N5LBN0xNplcAGovrfCsx9KmuIH872zS01JrT
-	jOqFrPJ2nwIUs/1QX8N4pzw/JjC3s2dNOFodQpUNwuY14vXHNG+tp510WiwcWNEeT5euFugjORq
-	UhptvFGvYRQzzP22MdmxsgHuJfWxGI8xkciYfFLjBgM00X+kg6owpQGHfBAStFZqRGg6P2i0gtY
-	wF7wi4se/CW7surUuQRVhA/LFxQ8PJvbnfNVkxdvjx0qCuUcAJuBZrDsuDYrL5z0YZTMvUGlA81
-	j42URMTNtOHsveBK7q
-X-Google-Smtp-Source: AGHT+IFCoak6awfsvNzuanPNEFvtnm4npy82/7GDiD4hlE+WRwlv0VOch5efQB3V/p3Rq/g2NEI9Nw==
-X-Received: by 2002:a17:907:d94:b0:b73:5f5e:574d with SMTP id a640c23a62f3a-b7d23a89c52mr1790501866b.59.1765959703434;
-        Wed, 17 Dec 2025 00:21:43 -0800 (PST)
-Received: from localhost ([2a02:8071:b783:6940:1d24:d58d:2b65:c291])
-        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-b7ffacd9192sm337793366b.70.2025.12.17.00.21.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Dec 2025 00:21:42 -0800 (PST)
-Date: Wed, 17 Dec 2025 09:21:41 +0100
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-To: Sumit Garg <sumit.garg@kernel.org>
-Cc: Sumit Garg <sumit.garg@oss.qualcomm.com>, 
-	Jens Wiklander <jens.wiklander@linaro.org>, Olivia Mackall <olivia@selenic.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
-	Alexandre Belloni <alexandre.belloni@bootlin.com>, Ard Biesheuvel <ardb@kernel.org>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, 
-	Sudeep Holla <sudeep.holla@arm.com>, Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
-	Michael Chan <michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, 
-	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>, James Bottomley <James.Bottomley@hansenpartnership.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Mimi Zohar <zohar@linux.ibm.com>, 
-	David Howells <dhowells@redhat.com>, Paul Moore <paul@paul-moore.com>, 
-	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, 
-	Peter Huewe <peterhuewe@gmx.de>, op-tee@lists.trustedfirmware.org, linux-kernel@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-rtc@vger.kernel.org, linux-efi@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
-	Cristian Marussi <cristian.marussi@arm.com>, arm-scmi@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-integrity@vger.kernel.org, keyrings@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, Jason Gunthorpe <jgg@ziepe.ca>
-Subject: Re: [PATCH v1 00/17] tee: Use bus callbacks instead of driver
- callbacks
-Message-ID: <max5wxkcjjvnftwfwgymybwbnvf5s3ytwpy4oo5i74kfvnav4m@m2wasqyxsf4h>
-References: <cover.1765472125.git.u.kleine-koenig@baylibre.com>
- <aT--ox375kg2Mzh-@sumit-X1>
- <dhunzydod4d7vj73llpuqemxb5er2ja4emxusr66irwf77jhhb@es4yd2axzl25>
- <CAGptzHOOqLhBnAXDURAzkgckUvRr__UuF1S_7MLV0u-ZxYEdyA@mail.gmail.com>
- <ayebinxqpcnl7hpa35ytrudiy7j75u5bdk3enlirkp5pevppeg@6mx6a5fwymwf>
- <aUJh--HGVeJWIilS@sumit-xelite>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9A9C345738;
+	Wed, 17 Dec 2025 10:03:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.75.140
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1765965797; cv=fail; b=GwxThDCus1KL6YbBH3SiI8pxmT0KSsIAL6vHHI70GZUOWQdr5HMoDJg71KHvUkIK28tPfTALMpSpqC8cMDem280YUoEdMf3cVqawYlbjIxRxqVKhC4fi33c1OqC/TTYugptI/yOWp5Da7YpdQ8QOpxQQ/A+hFxZdSlnBlZphUPI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1765965797; c=relaxed/simple;
+	bh=/owkVYhFyv4BgSv/BTciEka+6kbKpOKm3ghO2Lkrrhs=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=mxfLzUQ/JwMmgH5E/wHXpOcOrO7bgJmMVlw1Fudq/sIF4OJgAqvg7HCfcjomZjl27UcLn/6ljW5AkHzM3CLVR8c+5zpGYAoXz249pPEcxGD+B54kNyzfAgnISR7CsoYicYRqIn5masWX3NuYKBaHFsGDyYYDAUHf7Ny2ftrxqE0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; dkim=pass (2048-bit key) header.d=aspeedtech.com header.i=@aspeedtech.com header.b=o8lPRnoK; arc=fail smtp.client-ip=40.107.75.140
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=tbTyC9HViQp48EUwjC+vTtGKfdOkb9wDu4Zj1pPLV9zTnVoJjtkJvWyRZDFcCxKryGUTUJcn7VBvMlPRCUwJy3kIvZ7CC7Js0GnwC4dreQdEpwEvjT4fZV5sgaYVyM8TSA3o/KgcAiR1qwiFzGoOjTdMt/tWew/x9w2VTIkGXZMVDVdmwBRLC/0pFxdp9vJfXV6KNx10/xbPvk9KO8BodWQkzb5Oz7kHVgQ+CPZVWA6TI3Me3xypa8jjZ7p30hw7Ox9WwkqSBHkydlG3TDxxXmiXOQpzzuDu+uBYdEgHKs98ZJ/80ryA/mJ8hPf3yltu5MO0Z1fsD/7pqJI3QuDjYA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Spo6+y5DVeqGZ1m75gGt9pYCYeYsuKocIQA5Y6Tq/7c=;
+ b=ujwupdKN7gQqxCAIOa3BRfhbxluRYpNXt+iqYjsMAzi7bGCBVRBheHt/uCRloElihkmJ1wQnfm5mffEBeZ8CE1GyBoZNY54opB9ALi7kYxK/4T4rFyZLL38jXiBp5sItEe81vBy218MmwFscvprpy5wqybESLTWMWVbZhF1W83PS7UPMyBs9kil+cW7X1HdSCIkTuWzDe65YMBmqA3jWB7ELeEEX9EWh8yOrtR+ymmldiG5VNbo083ig23NY/vjcvzw/622VpS7Gl6SgxQXcHnNd/4hTru96WARBWXYagRqq/7JmqQ8kqDqg72YFjovkf3Ie/M4mB95KychT1mTSWw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=aspeedtech.com; dmarc=pass action=none
+ header.from=aspeedtech.com; dkim=pass header.d=aspeedtech.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aspeedtech.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Spo6+y5DVeqGZ1m75gGt9pYCYeYsuKocIQA5Y6Tq/7c=;
+ b=o8lPRnoKxt3kozZn+v6/tDjLZ0p2WDMs8FzsfArj/fndIKF+xPNyaeB2rQM9ZtttfOmJfmSxgClMQd8WjpE0hFYaJrfZvAelEpqyDlS0SCViXbVFHirzmUwSbIh4+vz1Z0unRE0G9SJmRqb46olDrnqQhlyQTolrWg3bta8CpR/XzCavIsMjoWbIF/UEVaPOvLK/ilo/z+inWD5Fxi40kDcZS9vtvFkQ5s+DGouE7uUc54oHRkY0L6v2ub9pCDc3WvuUEt74hDhX97rqefMH5Cc63iukyNByO6Wp3RJ8QbNI0qtk/RDxywmRpF2R8qsAHc0a6tbNujaM+xdFEsnEiw==
+Received: from SEYPR06MB5134.apcprd06.prod.outlook.com (2603:1096:101:5a::12)
+ by KL1PR0601MB5824.apcprd06.prod.outlook.com (2603:1096:820:b5::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9434.6; Wed, 17 Dec
+ 2025 08:28:57 +0000
+Received: from SEYPR06MB5134.apcprd06.prod.outlook.com
+ ([fe80::6b58:6014:be6e:2f28]) by SEYPR06MB5134.apcprd06.prod.outlook.com
+ ([fe80::6b58:6014:be6e:2f28%6]) with mapi id 15.20.9412.011; Wed, 17 Dec 2025
+ 08:28:57 +0000
+From: Jacky Chou <jacky_chou@aspeedtech.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+	<conor+dt@kernel.org>, Po-Yu Chuang <ratbert@faraday-tech.com>, Joel Stanley
+	<joel@jms.id.au>, Andrew Jeffery <andrew@codeconstruct.com.au>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-aspeed@lists.ozlabs.org"
+	<linux-aspeed@lists.ozlabs.org>, "taoren@meta.com" <taoren@meta.com>
+Subject: [PATCH net-next v5 3/4] net: ftgmac100: Add RGMII delay support for
+ AST2600
+Thread-Topic: [PATCH net-next v5 3/4] net: ftgmac100: Add RGMII delay support
+ for AST2600
+Thread-Index: AQHcZcz+EkyleBdIVUyJ/jAx8mAZD7UU8TIAgBChGkA=
+Date: Wed, 17 Dec 2025 08:28:57 +0000
+Message-ID:
+ <SEYPR06MB5134025EC9AD6DE6210F21ED9DABA@SEYPR06MB5134.apcprd06.prod.outlook.com>
+References: <20251205-rgmii_delay_2600-v5-0-bd2820ad3da7@aspeedtech.com>
+ <20251205-rgmii_delay_2600-v5-3-bd2820ad3da7@aspeedtech.com>
+ <8a991b33-f653-4f0c-bbea-b5b3404cdfe6@lunn.ch>
+In-Reply-To: <8a991b33-f653-4f0c-bbea-b5b3404cdfe6@lunn.ch>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=aspeedtech.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SEYPR06MB5134:EE_|KL1PR0601MB5824:EE_
+x-ms-office365-filtering-correlation-id: 8618a19b-12dc-4fb3-f8a3-08de3d465262
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|1800799024|7416014|366016|38070700021;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?aJxbIlnjML28q3SXfvQ4xHOxYcI803met+6R9vOQsQWffwMVxlXJo0gNofvD?=
+ =?us-ascii?Q?LKsx0gQAFdzp4EYRkeqDzxsIlvSsrvZaK0ks2l/uZfziNAOkURBezTdSDNCB?=
+ =?us-ascii?Q?eK1/5VZQo7i3TDZtmSCpedoWS2Hs12n6283JAcA1ZHyf4vgbh2vx9ZnR5hfq?=
+ =?us-ascii?Q?HWwdr5y3smr/vywcw5tG8jL7T6FK9xF/z3xKHLxWKA/T5XkbKaPYKBIFqX+9?=
+ =?us-ascii?Q?AXjbuCio5PtrP//tuU6QUvNTIr+iUTJPMcvV0oQ3xOXZA4/NvMndb2OgP7FM?=
+ =?us-ascii?Q?ibxohsGTSAuHJU4OsKSV+EH+vaKofG7oYMrsw5HTGjRwko7KQ0FXyRo+K+5M?=
+ =?us-ascii?Q?vdb9Jmgfu8pVw49LqY18JnldE8y8PdqLZNumWG/52JFkOH1MXPP02yv60m0v?=
+ =?us-ascii?Q?4uYt+3b7Absn4d1Clxz6ywhgVH0OFeLaoO2xoHE6FKgmjEEl9PqK5lgC46aj?=
+ =?us-ascii?Q?ER/byO7JtI8D2nPtgV/p6onvjxQGpk14Aloy8lzG1GOOTGnIpnMe2joGq515?=
+ =?us-ascii?Q?N3s/3t64fVcyV2MlIGrcJxWw606msFNRMKjnye0TFzUHaVcMM89kTU/fM8SY?=
+ =?us-ascii?Q?LnsSyXGrz5Pk8/cE6Yow9mDVHQ9qDrbnE3/Zm8W0dm7YUzZ8ISWuL7y/Q2aK?=
+ =?us-ascii?Q?I942fsuF4Jis6F+IkKv9oyErcX1aOny4cfkmUK+2xoJ65kUxl99rjavgpGZ3?=
+ =?us-ascii?Q?RvjQhL6Rypq20b2/bIRxi5pAV6DkJlZfQSZSAgMj2V/A8O1pllrCTOnei4/Y?=
+ =?us-ascii?Q?OCXVDXekOPe5+Mhp5vnBgtuudx2R4uO81xi5yF0fu5xXKg7lz7ncMGZ5RKld?=
+ =?us-ascii?Q?jRBRUsoqJCMwku1dP3tnacg1Dmj8rr/AcuuaDhwU4wNv4UxqmNT9CT7IjgIc?=
+ =?us-ascii?Q?5DTZi6jPbbpcB2Rw+dRG7WTJXi9Uxf+9f3HCM1Ck/xtonGrhC11D/UvljYse?=
+ =?us-ascii?Q?05by18bXH7RWrxQ82X2fvz8vnO05ddwOCDKpAnag3h5aMsdWhpNGzIPW9s2Y?=
+ =?us-ascii?Q?S/6U/sOFQwebcI/7oOlN8hgVRcdo3dKuDigy/TVIuUiqTFFpVlRyt53ASj7f?=
+ =?us-ascii?Q?6uvMa89wel9g+5NJ+BtbrZfseMqNmg6NrJQTugiBXW3J7Wg994lu1Hz8Vgeq?=
+ =?us-ascii?Q?73BHdPOppZWF0wMlN9w2QbcfPBDvMmYUS6gYBM/vpgoaooptizAYPV2QI0Y2?=
+ =?us-ascii?Q?/hgGwZvKzDGeET2oarVLJTUu9AzsHaMqoUzbefLaf51vuL6+uQy0TSE7nwv4?=
+ =?us-ascii?Q?Y1XA2C5fsbxqIpY7fci3ZvgOxtWX2xZCgZr0SJOuHqcEZTM7v3fNuO9gU/Kz?=
+ =?us-ascii?Q?Yv75S1eJTcWG+9e2X7BSHPjJhrc6Fm/pUrLkIxC9jXynIcEoO3BiOa5DmSjq?=
+ =?us-ascii?Q?gCV+gab2w+Ck17YpKjsaJCakmZYGiMSrAubWgzloFQfTGahQGiEWu2AEBuEL?=
+ =?us-ascii?Q?dGxcwce9c1cvf17LSdbdCE7DNraKRhtjVnOOBceIBfllx8j876ZznptzQa0s?=
+ =?us-ascii?Q?MjwC0SeL6nX068ot9lzeFd6pwrAuDhdWtKWK?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SEYPR06MB5134.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016)(38070700021);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?8RcOPORmfqeacMZXzKrcjgez+QkaM3+AV9bkkXymANngz0fkBAEfODMqHo1p?=
+ =?us-ascii?Q?IY8vSdJRZ3C6gIQtDK1rWbSTeC+QAbLrRBP9nz8q8SnOrEj1zgHABLEhaVta?=
+ =?us-ascii?Q?Oe8Z14Q2cQMKyM+/wE6LermoNh8AIs8yVQ5cQlJmmLCBQq0qH/cngbr4qbJK?=
+ =?us-ascii?Q?2PNo3QXN/w8q40i49SHWHKR7i+9PfJtnQFSfeFH2LAVVQFbVM2ArMNp0Uu9J?=
+ =?us-ascii?Q?VZP/nUdnP7YXri94cJB6AHS+0dmcwIldNoIKw79exEgpY9DhZV+m4Q7B2Mf2?=
+ =?us-ascii?Q?weGLXC3Nwax2u18LLEaLsQ55/zP/qRbDymcXdmmsOELYgeCFbvnj7tT/im3x?=
+ =?us-ascii?Q?xxUWqwmXbRNzXnpQ0HFhN6qPzlWJSSscEAtOUfuqbWSr2NyrUnWK+FxLMUFt?=
+ =?us-ascii?Q?znNa4dV7ydr9f1Tw5m5ZAU5b5ym1lGPgWr+9CD0S21jjLBVFJ45oUQVQj1M4?=
+ =?us-ascii?Q?fYZoHWFYeOjWuZ2RfOq1oAkKIluLGGjANRkcP/Wc3wxYpsfz/kRcm4M4ek05?=
+ =?us-ascii?Q?NR0YANHHI+AoiMdsL7i+70lBQ4p5F8FqgM1dg1MZGxQic0mcQ5kDA0xv+XBA?=
+ =?us-ascii?Q?EEFDXi9pR8Qe4JUy2YedARu35tZEPxPQfPtg0Ovx0P9lL+ovStkSE/dUD2aK?=
+ =?us-ascii?Q?MUqQ6b+deOynkfLLOFyyV3W2w8v2/DGvl5kQxfVZ+1pJk+wJhJzKK8qxY6j/?=
+ =?us-ascii?Q?8jn5tUo0PdzCMNxwTo5a8NCELhSx4AvXdSSaxIp90NTWIJYTrQPkG2oLEqM5?=
+ =?us-ascii?Q?/2SmYHXr8dkc1ARrPZJ207XNKwCWm0IYsftAjolkuVbfUQ1SB3P2jjmfWHGs?=
+ =?us-ascii?Q?iGbmIfqOCZUf5G6of7iWLgzLhvWGcPl5CFG/6e1A7vyYqruZwks6aBk0Rlu5?=
+ =?us-ascii?Q?DoNgY3Bwf9X0n/A61Z6neWOjwKgGnjzldnpOhMa+6NrsZ/MBEpZcYVAdwcm0?=
+ =?us-ascii?Q?PgcFHQjP6wAn7uavCCwpCVun8/Tqy46IQ1cndh0gocV1LIUEcPo91B09rXxl?=
+ =?us-ascii?Q?0abJt44z7I4cIRPe/+4GZaObK3NHISuHH8/wuPsBUTdW3PNtmKQWQFBC272W?=
+ =?us-ascii?Q?O31PTRDBTE+Hfqt74a4ysF9c2qcXU0hV11q+YUfjOzN0ZtZ1VRoZZ9uMAXX+?=
+ =?us-ascii?Q?axMZ4AOnG7H+SQoKmstxuCJaEl4tKn8mlkDUjAfHEmHMsfOTwNwrGH2jkpZY?=
+ =?us-ascii?Q?1TEqQ1vHEl14wTH0CaNUrBmwMLQ5jp7wp8qam0NKxBgHWtGCqOEA/dGQ9L3f?=
+ =?us-ascii?Q?cR7lU7KhVDgWR8PTeIJbf7OtH3abj4erwEErrnDq1BJ5oDUnlcQ48SeGKZ2s?=
+ =?us-ascii?Q?lj+Xgl9K3/L97Fs2+xPH/tnemSJrLqyEOD20d3H9pe6wfXZ+9mv2iV2cEP6G?=
+ =?us-ascii?Q?hcmdNmfdpDaS5RpheQtK1VXh95LeRCnhEkQZ9c66hT0+uNTw5ymgnJ/ra2Ri?=
+ =?us-ascii?Q?6dM0OMQDjAlVI28q/pCx5vrftv3bsKcaoagNXuA9/fzPdT9Ff5wIxn7v7Omx?=
+ =?us-ascii?Q?MDd8pVEs5re8a7nhy53PbHs73D9wvbuF0RGtUZpjqdFeAnRangBRiNvqZi3T?=
+ =?us-ascii?Q?tD29J8AB9UhJNV34/Dqjd8Rfrckjf68LOXd5SfOc?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="p6kfp3quyfb6lwgz"
-Content-Disposition: inline
-In-Reply-To: <aUJh--HGVeJWIilS@sumit-xelite>
+X-OriginatorOrg: aspeedtech.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SEYPR06MB5134.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8618a19b-12dc-4fb3-f8a3-08de3d465262
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Dec 2025 08:28:57.1860
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43d4aa98-e35b-4575-8939-080e90d5a249
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: e+KYhjoyT1+EbUrA6N+Dozz5/wwKgJUtawz7hZtzhuAsVhxvRfFm8P1meG73c2h8Fb5IByDyJ4LUfGasSlzH71QQBWyattrXauKj5PHCBTQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: KL1PR0601MB5824
 
+Hi Andrew,
 
---p6kfp3quyfb6lwgz
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v1 00/17] tee: Use bus callbacks instead of driver
- callbacks
-MIME-Version: 1.0
+Thank you for your reply.
 
-Hello Sumit,
-
-On Wed, Dec 17, 2025 at 01:25:39PM +0530, Sumit Garg wrote:
-> On Tue, Dec 16, 2025 at 12:08:38PM +0100, Uwe Kleine-K=C3=B6nig wrote:
-> > On Tue, Dec 16, 2025 at 01:08:38PM +0530, Sumit Garg wrote:
-> > > On Mon, Dec 15, 2025 at 3:02=E2=80=AFPM Uwe Kleine-K=C3=B6nig
-> > > <u.kleine-koenig@baylibre.com> wrote:
-> > > >  - Why does optee_probe() in drivers/tee/optee/smc_abi.c unregister=
- all
-> > > >    optee devices in its error path (optee_unregister_devices())?
-> > >=20
-> > > This is mostly to take care of if any device got registered before the
-> > > failure occured. Let me know if you have a better way to address that.
-> >=20
-> > Without understanding the tee stuff, I'd say: Don't bother and only undo
-> > the things that probe did before the failure.
+> > @@ -1907,6 +2179,10 @@ static int ftgmac100_probe(struct
+> platform_device *pdev)
+> >  		priv->rxdes0_edorr_mask =3D BIT(30);
+> >  		priv->txdes0_edotr_mask =3D BIT(30);
+> >  		priv->is_aspeed =3D true;
+> > +		/* Configure RGMII delay if there are the corresponding compatibles
+> */
+> > +		err =3D ftgmac100_set_internal_delay(priv, &phy_intf);
+> > +		if (err)
+> > +			goto err_phy_connect;
 >=20
-> True, but this is special case where if there is any leftover device
-> registered from the TEE implementation then it is likely going to cause
-> the corresponding kernel client driver crash.
+> Thinking forward to when you add 2700 support, i really think you need to
+> break the probe up into helpers for 2500 and before, 2600 and in the futu=
+re
+> 2700. You currently have a couple of tests on the compatible which you ca=
+n
+> reduce to one.
+>=20
+> In fact, this driver has 10 calls to of_device_is_compatible(). I think y=
+ou should
+> first refactor the code to list each compatible in ftgmac100_of_match[], =
+and
+> add a data structure which contains an enum of the MAC type. You can then
+> transfer this to priv, and replace all the of_device_is_compatible() test=
+s to just
+> look at the enum value.
+>=20
 
-You are aware that this is racy? So if a driver crashes e.g. after
-teedev_close_context() it might happen that it is registered just after
-optee_unregister_devices() returns.
+We will start to refactor the probe() in this driver.
+We will also pause work on the RGMII delay patches until this task is compl=
+eted.
 
-Best regards
-Uwe
+Thanks,
+Jacky
 
---p6kfp3quyfb6lwgz
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmlCaBIACgkQj4D7WH0S
-/k7jZwf/S32gHxmpuL9ts6Dq9pI9CDW9KNDwfTzIptzaNQEofHnz2Ph9Ejs/bZAl
-1skNWxxt2vGIVP016BxUqi9V0RyKNUV0GCk23ZMdeGE09A47y9N0bT00HDJrrZYp
-FYCoNNwL8vICQzfAti/0+DHGI1uHwrXCwQWf/VaNggCAhb3eTCfcmUtogT7hhbtH
-+6bLk0/LEYmrIg1pkq6m4Y4vxBOEwnSZVDa4/15mxJ7jExJeoQmha2Y2whq5WZtY
-TEMgHL6KNg7ifbee+/Y0HUJizQ45rf4pJo2bvrbwXc+3KaEqfzNpD3jKVcKJSNBx
-jL7uprws5c1kFtHG4vp8QjaZRNJtpw==
-=trcC
------END PGP SIGNATURE-----
-
---p6kfp3quyfb6lwgz--
 
