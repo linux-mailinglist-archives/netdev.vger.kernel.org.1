@@ -1,53 +1,46 @@
-Return-Path: <netdev+bounces-245139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DD08CC7B57
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 13:56:00 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 964CFCC7F54
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 14:49:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4068F303C9C4
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 12:55:13 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0B48E306E2BD
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 13:46:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07D8B2737E7;
-	Wed, 17 Dec 2025 12:55:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A78DE34A3DF;
+	Wed, 17 Dec 2025 12:57:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="HuygHyOC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RlDE75kL"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout05.his.huawei.com (canpmsgout05.his.huawei.com [113.46.200.220])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3601A9FAC;
-	Wed, 17 Dec 2025 12:55:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77F5F2B9B7;
+	Wed, 17 Dec 2025 12:57:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765976111; cv=none; b=gmzjsfl10eePbqLs5vEuQ2aJeE6FQ5378z7txqNKndV1u2S0SeAApo0Zo1kMpks0SaSBgpOZcxdixoKzQMJwGvxpVlupmEyLFFXB0384tQGfvEQ/WIOAXQVGf+Y/FaPi5LjaP7ON41nZlea6YTAGkM0+OrR8B0m0lvYZq9i5BhU=
+	t=1765976251; cv=none; b=Su7Fcgkjsk1cfqyN5lhWjiWZS3movpexvkJuhP556YlM67Tz3UGaHUMCOkk0wdGa4+tQmzN9OMmLCTBvKUs/ATSvOUKwHf0ufq6NIPouSTQQL6z18QbiMPZbDCI08u7Vpw1dKExWzNTcPFJIx/e+FlOe/y2xYQORHfVSaUcpBQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765976111; c=relaxed/simple;
-	bh=9OYJu7NQ6Jyui/nscSQIbad7plIfuJIL8N+ZEqAkeEs=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=GocS+s2d9APcnJ+GYMA3WUwwe3wv0oYSc8teX4BFWo+GpZN4OyC2yTi2Khuj4YIwtzBh3b5YqQXswPdIuQh2ec5bM5WaUgp/HyHQtjtgLBAHMck126yiX2ZjNxfpQg66NW28IICkpB1axZarq4DPE/N7IBs5vWMg3tgC5HzJJ9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=HuygHyOC; arc=none smtp.client-ip=113.46.200.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=vGKscwXMKJ29Xox2XUVNkSMhP5dbp3pjHaG4+qsnogI=;
-	b=HuygHyOC493r6mlc8PJXTT4eWnSwS6BOA5dIbWyGiGZB1M01Xx7wsW9VI4Eewb8Boeq8xi69Y
-	GhSdNonlWK141CZlFzkESJxo3R4vWGEwYcHVmRVtalOFZSDLyiIQkEu9bwVQC24LNM3AxkKXwaj
-	D3wzIszoaWMPduRPRKRfzBo=
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by canpmsgout05.his.huawei.com (SkyGuard) with ESMTPS id 4dWYcH3xV2z12LDy;
-	Wed, 17 Dec 2025 20:52:47 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2EFCB18048C;
-	Wed, 17 Dec 2025 20:55:01 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 17 Dec 2025 20:55:00 +0800
-Message-ID: <647f91c7-72c2-4e9d-a26d-3f1b5ee42b21@huawei.com>
-Date: Wed, 17 Dec 2025 20:54:59 +0800
+	s=arc-20240116; t=1765976251; c=relaxed/simple;
+	bh=xG7W+Y4d7Z9xo+6wMqLD3A9Y6qCX0ZKq5jQ78368xjQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Hzr6IrnNh/trnNPgwSAiQYO2m59FQzN2feotSGo8awTfLxalOufyBEJeOjHF4kaZcOU/j+Vn/OoD8TX/93kJ2ct1UDdWdhvMTgfMoiCVwLq9rj++FgxK52iOaZGG/kn1wrF86WRAd7ZhWcn19IiqyM+U2s7chVrFzl6IJqF2qO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RlDE75kL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB950C113D0;
+	Wed, 17 Dec 2025 12:57:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765976251;
+	bh=xG7W+Y4d7Z9xo+6wMqLD3A9Y6qCX0ZKq5jQ78368xjQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=RlDE75kL3EXbOR08VkR8U7W0FDUdZ6/S5TT687mJqHcUlpvI64LWQPugdo5r1HlfA
+	 7IzuYbz2ve/5F7VX7vRRsricIS4gpuCSG7Y7jZAutEb+zd87vMC+4bFcmCY0xrBMGn
+	 JaGIROnMp9no6K1Rfc+1W9lYaxeuPUAjsmv7Lt6nAGpDSh5GcMYbdt3+4lzMG5Tqub
+	 TrccQLuDJu80eXjtPyBIIeH39TMtaM0WX1hejpLZvhQVSyHwao+Tp7qMUCrF3EwrM4
+	 30vvpPlR0c5tZ3pnH5YW/R2sLt5Eid+3NSCaq114AxZu9si6QoIbDU6hM2gIF4TB8f
+	 7yddiHoU21Xww==
+Message-ID: <ebb7cb16-781b-4f33-b7c0-3c5dd383913c@kernel.org>
+Date: Wed, 17 Dec 2025 13:57:27 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,49 +48,122 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
-	<horms@kernel.org>, <Frank.Sae@motor-comm.com>, <hkallweit1@gmail.com>,
-	<linux@armlinux.org.uk>, <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
-	<chenhao418@huawei.com>, <jonathan.cameron@huawei.com>,
-	<salil.mehta@huawei.com>, <shiyongbang@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH RFC net-next 2/6] net: phy: add support to set default
- rules
-To: Andrew Lunn <andrew@lunn.ch>
-References: <20251215125705.1567527-1-shaojijie@huawei.com>
- <20251215125705.1567527-3-shaojijie@huawei.com>
- <fe22ae64-2a09-45ce-8dbf-a4683745e21c@lunn.ch>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <fe22ae64-2a09-45ce-8dbf-a4683745e21c@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Subject: Re: [PATCH v2 1/2] nfc: llcp: avoid double release/put on LLCP_CLOSED
+ in nfc_llcp_recv_disc()
+To: Qianchang Zhao <pioooooooooip@gmail.com>, linux-nfc@lists.01.org
+Cc: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20251217124659.19274-1-pioooooooooip@gmail.com>
+ <20251217124659.19274-2-pioooooooooip@gmail.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
+ cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
+ JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
+ gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
+ J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
+ NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
+ BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
+ vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
+ Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
+ TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
+ S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
+ FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJoF1BKBQkWlnSaAAoJEBuTQ307
+ QWKbHukP/3t4tRp/bvDnxJfmNdNVn0gv9ep3L39IntPalBFwRKytqeQkzAju0whYWg+R/rwp
+ +r2I1Fzwt7+PTjsnMFlh1AZxGDmP5MFkzVsMnfX1lGiXhYSOMP97XL6R1QSXxaWOpGNCDaUl
+ ajorB0lJDcC0q3xAdwzRConxYVhlgmTrRiD8oLlSCD5baEAt5Zw17UTNDnDGmZQKR0fqLpWy
+ 786Lm5OScb7DjEgcA2PRm17st4UQ1kF0rQHokVaotxRM74PPDB8bCsunlghJl1DRK9s1aSuN
+ hL1Pv9VD8b4dFNvCo7b4hfAANPU67W40AaaGZ3UAfmw+1MYyo4QuAZGKzaP2ukbdCD/DYnqi
+ tJy88XqWtyb4UQWKNoQqGKzlYXdKsldYqrLHGoMvj1UN9XcRtXHST/IaLn72o7j7/h/Ac5EL
+ 8lSUVIG4TYn59NyxxAXa07Wi6zjVL1U11fTnFmE29ALYQEXKBI3KUO1A3p4sQWzU7uRmbuxn
+ naUmm8RbpMcOfa9JjlXCLmQ5IP7Rr5tYZUCkZz08LIfF8UMXwH7OOEX87Y++EkAB+pzKZNNd
+ hwoXulTAgjSy+OiaLtuCys9VdXLZ3Zy314azaCU3BoWgaMV0eAW/+gprWMXQM1lrlzvwlD/k
+ whyy9wGf0AEPpLssLVt9VVxNjo6BIkt6d1pMg6mHsUEVzsFNBFVDXDQBEADNkrQYSREUL4D3
+ Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
+ MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
+ OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
+ GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
+ 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
+ YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
+ 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
+ BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
+ JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
+ 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
+ YpsFAmgXUF8FCRaWWyoACgkQG5NDfTtBYptO0w//dlXJs5/42hAXKsk+PDg3wyEFb4NpyA1v
+ qmx7SfAzk9Hf6lWwU1O6AbqNMbh6PjEwadKUk1m04S7EjdQLsj/MBSgoQtCT3MDmWUUtHZd5
+ RYIPnPq3WVB47GtuO6/u375tsxhtf7vt95QSYJwCB+ZUgo4T+FV4hquZ4AsRkbgavtIzQisg
+ Dgv76tnEv3YHV8Jn9mi/Bu0FURF+5kpdMfgo1sq6RXNQ//TVf8yFgRtTUdXxW/qHjlYURrm2
+ H4kutobVEIxiyu6m05q3e9eZB/TaMMNVORx+1kM3j7f0rwtEYUFzY1ygQfpcMDPl7pRYoJjB
+ dSsm0ZuzDaCwaxg2t8hqQJBzJCezTOIkjHUsWAK+tEbU4Z4SnNpCyM3fBqsgYdJxjyC/tWVT
+ AQ18NRLtPw7tK1rdcwCl0GFQHwSwk5pDpz1NH40e6lU+NcXSeiqkDDRkHlftKPV/dV+lQXiu
+ jWt87ecuHlpL3uuQ0ZZNWqHgZoQLXoqC2ZV5KrtKWb/jyiFX/sxSrodALf0zf+tfHv0FZWT2
+ zHjUqd0t4njD/UOsuIMOQn4Ig0SdivYPfZukb5cdasKJukG1NOpbW7yRNivaCnfZz6dTawXw
+ XRIV/KDsHQiyVxKvN73bThKhONkcX2LWuD928tAR6XMM2G5ovxLe09vuOzzfTWQDsm++9UKF a/A=
+In-Reply-To: <20251217124659.19274-2-pioooooooooip@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+
+On 17/12/2025 13:46, Qianchang Zhao wrote:
+> nfc_llcp_sock_get() takes a reference on the LLCP socket via sock_hold().
+> 
+> In nfc_llcp_recv_disc(), when the socket is already in LLCP_CLOSED state, the
+> code used to perform release_sock() and nfc_llcp_sock_put() in the CLOSED branch
+> but then continued execution and later performed the same cleanup again on the
+> common exit path. This results in refcount imbalance (double put) and unbalanced
+
+Please wrap commit message according to Linux coding style / submission
+process (neither too early nor over the limit):
+https://elixir.bootlin.com/linux/v6.4-rc1/source/Documentation/process/submitting-patches.rst#L597
+
+> lock release.
+> 
+> Remove the redundant CLOSED-branch cleanup so that release_sock() and
+> nfc_llcp_sock_put() are performed exactly once via the common exit path, while
+> keeping the existing DM_DISC reply behavior.
+> 
+> Fixes: d646960f7986fefb460a2b062d5ccc8ccfeacc3a ("NFC: Initial LLCP support")
+
+12 char sha.
+
+Please run scripts/checkpatch.pl on the patches and fix reported
+warnings. After that, run also 'scripts/checkpatch.pl --strict' on the
+patches and (probably) fix more warnings. Some warnings can be ignored,
+especially from --strict run, but the code here looks like it needs a
+fix. Feel free to get in touch if the warning is not clear.
 
 
-on 2025/12/16 15:09, Andrew Lunn wrote:
-> On Mon, Dec 15, 2025 at 08:57:01PM +0800, Jijie Shao wrote:
->> The node of led need add new property: rules,
->> and rules can be set as:
->> BIT(TRIGGER_NETDEV_LINK) | BIT(TRIGGER_NETDEV_RX)
-> Please could you expand this description. It is not clear to my why it
-> is needed. OF systems have not needed it so far. What is special about
-> your hardware?
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Qianchang Zhao <pioooooooooip@gmail.com>
+> ---
+>  net/nfc/llcp_core.c | 5 -----
+>  1 file changed, 5 deletions(-)
+> 
+> diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
+> index beeb3b4d2..ed37604ed 100644
+> --- a/net/nfc/llcp_core.c
+> +++ b/net/nfc/llcp_core.c
+> @@ -1177,11 +1177,6 @@ static void nfc_llcp_recv_disc(struct nfc_llcp_local *local,
+>  
+>  	nfc_llcp_socket_purge(llcp_sock);
+>  
+> -	if (sk->sk_state == LLCP_CLOSED) {
+> -		release_sock(sk);
+> -		nfc_llcp_sock_put(llcp_sock);
 
-I hope to configure the default rules.
-Currently, the LED does not configure rules during initialization; it uses the default rules in the PHY registers.
-I would like to change the default rules during initialization.
+You did not answer my previous review. You also did not answer my
+concerns from earlier private report. Please respond before you send
+again v3.
+
+> -	}
+> -
+>  	if (sk->sk_state == LLCP_CONNECTED) {
+>  		nfc_put_device(local->dev);
+>  		sk->sk_state = LLCP_CLOSED;
 
 
-Some of our boards have only one LED, and we want to indicate both link and active(TX and RX) status simultaneously.
-
-Thanks,
-Jijie Shao
-
->
-> Also, it looks like you are expanding the DT binding, so you need to
-> update the binding .yaml file.
->
-> 	Andrew
+Best regards,
+Krzysztof
 
