@@ -1,53 +1,46 @@
-Return-Path: <netdev+bounces-245141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CA43CC7F75
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 14:50:36 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3574BCC89B0
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 16:54:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4F24E307644B
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 13:46:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DB7FF313A16D
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 15:42:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F168334D38A;
-	Wed, 17 Dec 2025 12:57:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB33D335553;
+	Wed, 17 Dec 2025 13:00:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="25p97wh6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EPrhLhEc"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout10.his.huawei.com (canpmsgout10.his.huawei.com [113.46.200.225])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 909F233F383;
-	Wed, 17 Dec 2025 12:57:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FF4F23A9B3;
+	Wed, 17 Dec 2025 13:00:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765976275; cv=none; b=Dt/x49s8VHO32EI8TGUWB42WlKzHdrrTuv289XkCGoF5KHpO0YDZA4/Rdqcgt0oVlKjkbOn1rbjN5jze94JKWVPk89B6RdzPlyMABVjrCEacTwDztGQzATjc9lH6UTKC16uI3GJH0IPo3uoeuXZ3KBNrG3hOuplXi8Nj+Q4fd2k=
+	t=1765976453; cv=none; b=VPswuuu55FQsLLfuqfvUvAGiZslA5YgvzvzdicyrmI5UAEATND9eDcMO8NrJxGINMHagTB9UXW8RIBF60aUIOSi/41SpRrV+BnWGWkytrpNYipaKYxBNL+hXRhSBjZUnONCeIR+NGvXqGwrwAbKcxEYyqfTgWdaLNzz7krQXHpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765976275; c=relaxed/simple;
-	bh=R2WQXy0HlYWZT5WgbTNL4ElDqundmQ18DzVyCX6CaOg=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=NFTgacGCyGqVkdmyK6Zi7tW+8joykctD075Mtj58V0qUrY8fF0jl2YVyjed8TC/wtbTkbbfRXfLL9LtZrsDkuQzlAanVXFheLlkMyYYhX8yKbnMIHFW1mQ492RxaSweYP5zsiSvaDKLj4378Qw7h1IvcJovcskXffCkkzr4FEGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=25p97wh6; arc=none smtp.client-ip=113.46.200.225
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=9uTeC33HWrE/FGLHxrN1UCj58rBsGBt6Q2oc2HoVVsQ=;
-	b=25p97wh6wmwPnSh7UT5D8bRRCyerWnHFCXK3QDY3St2YmxpTmyB/XYjS6JBfGop2BXKbN9mJn
-	/kbvKBc35R8fEEerSFqDrby9oq3R259Gslb8wWh5BpLHijfySUOC/i40U61GL4nHOdnUuYXTMNY
-	1WiVtaPM13U9fcABZWe+HbI=
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by canpmsgout10.his.huawei.com (SkyGuard) with ESMTPS id 4dWYfc69SGz1K968;
-	Wed, 17 Dec 2025 20:54:48 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 8D6931800B2;
-	Wed, 17 Dec 2025 20:57:49 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 17 Dec 2025 20:57:48 +0800
-Message-ID: <41fb1824-7576-46c4-ba1b-ab7f9680c562@huawei.com>
-Date: Wed, 17 Dec 2025 20:57:47 +0800
+	s=arc-20240116; t=1765976453; c=relaxed/simple;
+	bh=Oi2B2VsgolJ7dOo9+gxrD6L357ILuwez/VTEjBlynsE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dbogWp200Jks7hUxOTHsbf02s05UpviQr3HlVcpefQJ8CWO9UUxmQR5vgESyv3mkKI+MCYVJLQ5GMKAEQxl+KKWZj8vNqhV2dth4s2NKS5RgnjILAK/YBqMqeLxDbUqjp0bH1pYdZxEYqyD3Cw0SLp2HWthw1Sm3zbwzaUxP6QY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EPrhLhEc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44294C4CEF5;
+	Wed, 17 Dec 2025 13:00:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1765976453;
+	bh=Oi2B2VsgolJ7dOo9+gxrD6L357ILuwez/VTEjBlynsE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=EPrhLhEcnmUyyFcPSmttaU+SkNywdjCMUzCe0N9fWA7SwdrZU3ZRSD0YUklbdW9Um
+	 ZDt3FPxKiK4cO/M2FJXDQigQzEnpa5nIFVWIhFd5TKadD80EE5QjoQVJaXvTVdhQz8
+	 UItarPmyaWO6m2pL/FZzHnfR0X7a81p/zkXBKQM/LTaeDQAz0+fa8iFvJlf3p/X+s9
+	 QgYB2SZbxN4GBwMlco1EjmfMnL7JPaSTC1dVXY4WOosYSdG50xqvBeP+NSsNZaJH3A
+	 1TMchFi/aOtauh2TKudzPM7HHJRY90DWSyA0bRjHM3+joeJUq3tRinIesw2SL+3QWw
+	 Nwzfn7ROOVmHw==
+Message-ID: <4a237dd3-d818-4578-bbeb-1fbf0008c680@kernel.org>
+Date: Wed, 17 Dec 2025 14:00:49 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,57 +48,82 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>,
-	<horms@kernel.org>, <Frank.Sae@motor-comm.com>, <hkallweit1@gmail.com>,
-	<linux@armlinux.org.uk>, <shenjian15@huawei.com>, <liuyonglong@huawei.com>,
-	<chenhao418@huawei.com>, <jonathan.cameron@huawei.com>,
-	<salil.mehta@huawei.com>, <shiyongbang@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH RFC net-next 3/6] net: hibmcge: create a software node for
- phy_led
-To: Andrew Lunn <andrew@lunn.ch>
-References: <20251215125705.1567527-1-shaojijie@huawei.com>
- <20251215125705.1567527-4-shaojijie@huawei.com>
- <543efb90-da56-4190-afa7-665d32303c8c@lunn.ch>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <543efb90-da56-4190-afa7-665d32303c8c@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+Subject: Re: [PATCH v2 1/2] nfc: llcp: avoid double release/put on LLCP_CLOSED
+ in nfc_llcp_recv_disc()
+To: Qianchang Zhao <pioooooooooip@gmail.com>, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+ stable@vger.kernel.org
+References: <20251217125746.19304-1-pioooooooooip@gmail.com>
+ <20251217125746.19304-2-pioooooooooip@gmail.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <20251217125746.19304-2-pioooooooooip@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 17/12/2025 13:57, Qianchang Zhao wrote:
+> nfc_llcp_sock_get() takes a reference on the LLCP socket via sock_hold().
+> 
+> In nfc_llcp_recv_disc(), when the socket is already in LLCP_CLOSED state, the
+> code used to perform release_sock() and nfc_llcp_sock_put() in the CLOSED branch
+> but then continued execution and later performed the same cleanup again on the
+> common exit path. This results in refcount imbalance (double put) and unbalanced
+> lock release.
+> 
+> Remove the redundant CLOSED-branch cleanup so that release_sock() and
+> nfc_llcp_sock_put() are performed exactly once via the common exit path, while
+> keeping the existing DM_DISC reply behavior.
+> 
+> Fixes: d646960f7986fefb460a2b062d5ccc8ccfeacc3a ("NFC: Initial LLCP support")
+> Cc: stable@vger.kernel.org
 
-on 2025/12/16 15:17, Andrew Lunn wrote:
-> On Mon, Dec 15, 2025 at 08:57:02PM +0800, Jijie Shao wrote:
->> +int hbg_mdio_init(struct hbg_priv *priv)
->> +{
->> +	struct device *dev = &priv->pdev->dev;
->> +	struct hbg_mac *mac = &priv->mac;
->>   	struct mii_bus *mdio_bus;
->>   	int ret;
->>   
->> @@ -281,7 +389,7 @@ int hbg_mdio_init(struct hbg_priv *priv)
->>   
->>   	mdio_bus->parent = dev;
->>   	mdio_bus->priv = priv;
->> -	mdio_bus->phy_mask = ~(1 << mac->phy_addr);
->> +	mdio_bus->phy_mask = 0xFFFFFFFF; /* not scan phy device */
->>   	mdio_bus->name = "hibmcge mii bus";
->>   	mac->mdio_bus = mdio_bus;
-> I think you are taking the wrong approach.
->
-> Please consider trying to use of_mdiobus_register(). Either load a DT
-> overlay, or see if you can construct a tree of properties as you have
-> been doing, and pass it to of_mdiobus_register(). You then don't need
-> to destroy and create PHY devices.
->
-> 	Andrew
+NAK, stop sending the same again and again. Respond to previous emails.
 
-
-Ok， I will try like this
-
-Thanks
-Jijie Shao
-
+Best regards,
+Krzysztof
 
