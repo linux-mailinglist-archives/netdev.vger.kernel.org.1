@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-245082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 210BECC6A9D
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 09:55:32 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 888F4CC6BB1
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 10:12:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1C55B30198C0
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 08:55:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 29CEB3065034
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 09:02:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BAAE34165F;
-	Wed, 17 Dec 2025 08:47:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F3C634404D;
+	Wed, 17 Dec 2025 08:51:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="qSke9S8Y"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="iSSgci50"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B5AA34107D;
-	Wed, 17 Dec 2025 08:47:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75466343D67;
+	Wed, 17 Dec 2025 08:51:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765961272; cv=none; b=lFM90v/FARfCMsK21yLEsoo2Gemliu6bvnYBco2Ma3mo5bcUXJZ27ghkFdA+oA89XSf1KhiCQFQBY/6b2qbuNLW3Ovy0X9Q6j3+L37gnQy9gIP1bqse2UyIaK65aw9TIrWHKoKXI6fywP+DRmSMTZM1Q3Q1PwHNnXfgrtEm1v5Y=
+	t=1765961485; cv=none; b=likZwACnyabHrY6251ib1MvA5YkZURSjfexFe4qY+AmBQXn0bvSoJIOVfHfadfQV5nlZ97EfGU1UTQyKLqqAmLL3V3SeMV6o7AWXcFdo2ONMKAGflWbBS3AXXtL/1IzlLsXHafz3uqpzerZ44hvCtrKYmkGkDREch16+YNePgYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765961272; c=relaxed/simple;
-	bh=x/E/deY9vTVLTGF3py+vQE2us8+WcHa4e2RC0cgnHTM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XTmKjPK1UTHiVbf3AvHZizAWynnjreUgkpi0//l1MdtrKCsgsrQMJy/sG8gauO5iPNi7YDbOJFh+lNdnHN+dNptv0TOgXao0qkKymXfPBDy5Ro/pW6d7ZaN+3W/ZjtMg510dF/gC8IVTthblucD+vf/TWu/hWQHPFtbwYZmk0mw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=qSke9S8Y; arc=none smtp.client-ip=220.197.31.4
+	s=arc-20240116; t=1765961485; c=relaxed/simple;
+	bh=0tmXTPJ+lz7iao3w5yv2UowUDIC552iZY/Wt523QSHw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=sYYYAg4rHUYZ5gzbJAxEkSEhs7ySEp/YafceIKqhXOO6q4SxKfdLnYd2VZiTYkbig/Tj+TF5eBV6JkcWRwSUERj2xBYVyNTY3PFlWegoEigIiQsn+cAoHFAzgpdPuNHekr6DGSHTVrcuK9uUmf7zuRpCiASUailO64J0m6GbtZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=iSSgci50; arc=none smtp.client-ip=117.135.210.3
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
 	s=s110527; h=From:To:Subject:Date:Message-ID:MIME-Version:
 	Content-Type; bh=UseiUIzWQ5jcCpGWT2FDdMdJpS00Sb35hFZExtBF5UM=;
-	b=qSke9S8YKLzrxKkkx5Ssz3Bwqxl7JEoHSYdWGsJnessY95j3taTVaq4nOwJdl1
-	yrhiQAkSEg/Ui+5r/G5oul0FnH/MABvTIHRBJrJHxTSwCB2RvsMUE8OXeoTraH2d
-	KHYcUJcfABqcVI6xbgjVxQ9rR0JPBHZd7qHINu4X7vPDs=
+	b=iSSgci50fvxNoZ24pGz4HbNJ7XmKjF8tHBqr/Dh3RxQnKol/eE3iYlgcmBQi5J
+	XrmY0/YIqAYviu52mZ+Psfi7SYLIiKdx0kTLDMZ1v53SzPNpAzt+R7/p90Ymrwd4
+	Dp8y07l4ACfZMxdYcS0N0vsfzwVyebu1iqTXKMpl6jO2o=
 Received: from xwm-TianYi510Pro-14IMB.. (unknown [])
-	by gzga-smtp-mtada-g0-4 (Coremail) with SMTP id _____wC3Ms0UbkJpr5KYAw--.48364S4;
-	Wed, 17 Dec 2025 16:47:17 +0800 (CST)
+	by gzga-smtp-mtada-g1-4 (Coremail) with SMTP id _____wAXSZ7lbkJp2ZeZAw--.42656S4;
+	Wed, 17 Dec 2025 16:50:47 +0800 (CST)
 From: Xiong Weimin <15927021679@163.com>
 To: Alexei Starovoitov <ast@kernel.org>,
 	Daniel Borkmann <daniel@iogearbox.net>,
@@ -48,8 +48,8 @@ To: Alexei Starovoitov <ast@kernel.org>,
 Cc: linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
 Subject: Implement initial driver for virtio-RDMA devices(kernel), virtio-rdma device model(qemu) and vhost-user-RDMA backend device(dpdk)
-Date: Wed, 17 Dec 2025 16:45:32 +0800
-Message-ID: <20251217084640.5060-2-15927021679@163.com>
+Date: Wed, 17 Dec 2025 16:49:47 +0800
+Message-ID: <20251217085044.5432-1-15927021679@163.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -59,12 +59,12 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wC3Ms0UbkJpr5KYAw--.48364S4
+X-CM-TRANSID:_____wAXSZ7lbkJp2ZeZAw--.42656S4
 X-Coremail-Antispam: 1Uf129KBjvJXoWxXr4rKrWDGF1DAF4UGw4rKrg_yoW5tFy8pr
 	W2gF9rCrZ8Gr43G3yUW345uF42gFZ3A3y3Crn8G348K3Z5Xr9YvF1q9F15Way7GrZxAF18
 	XFy8Jr92ka4UAaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jU-B_UUUUU=
-X-CM-SenderInfo: jprvmjixqsilmxzbiqqrwthudrp/xtbC0hWLFGlCbhWIIQAA3h
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jU739UUUUU=
+X-CM-SenderInfo: jprvmjixqsilmxzbiqqrwthudrp/xtbC0ge-SGlCbuehtgAA3X
 
 Hi all,
 
@@ -167,5 +167,6 @@ f.Test Conclusion
 Recommendations:
 1). Optimize memory copy paths for higher throughput
 2). Enhance error handling and recovery mechanisms
+ 
 
 
