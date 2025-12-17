@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-245238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A49E9CC970F
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 20:50:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14280CC971B
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 20:51:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A097B301CDB2
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 19:50:08 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 86CC5309EC08
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 19:50:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D2E2F8BC3;
-	Wed, 17 Dec 2025 19:50:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5A352FB616;
+	Wed, 17 Dec 2025 19:50:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="P+LkbpkD"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N0I4Sc8C"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F0742F6170
-	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 19:50:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBE5E2F7ABB;
+	Wed, 17 Dec 2025 19:50:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766001007; cv=none; b=fn7dRArLMHa1QbvVDhFcjZ4DdLT8KHzcBk3p+M7YHRvqmRxrc3LXiffv5NzxmO3OGjpwE1gfiwVrfVuul3ZNxiQFwoY4dpWqukRXQBBxWk4yPl+0u6goPtCIWjXRLHfMCrIAngIHjM372eacYLtuIJtXWm0rZaj8yD05V0SvZhU=
+	t=1766001008; cv=none; b=nECaDS7LUAd1d6QtV1t3tzFZNyRPg8OICmEbsTdDlbWXoaGo+OMpmFmrHnQzpQdj2GhahedYWRB+/1/I2vr0iF40gMHQzPQKUEfqrtAJ2PDcXS1IuL+mm1ashb43FU9+12xXbkwUA03KcTgw2SH2t3bDdWxc5tBpIGQPi6awAsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766001007; c=relaxed/simple;
-	bh=Vfhq8bWSR5vPbQF3UAiZ7r9T4KAwwg1X8LJmbb1dips=;
+	s=arc-20240116; t=1766001008; c=relaxed/simple;
+	bh=J3iATDkGdfPOjewbdIrj7WAt5Ip09ic5N1O2CSXYCSI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GgeConkHW5nYiLvO7h0j19Y0YOpe5w23lXRen6+/Dogoi9+I3eZwht1Rh9EcuJ0iwwdXId67zLm2ICWcsXVRUXH5+z+FUcJ4dtML4Lb50kbbsJHA+T1XlMekju5MPVZ91JRcXqQpqB6vVXNwAR102f90d+L0pj2RRNx4PmFMeQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=P+LkbpkD; arc=none smtp.client-ip=198.175.65.19
+	 MIME-Version; b=jQMwI7cukohUNxmWy3pDOd7jtnI6QaVlKoqu8y86Yofs6vqARna6t8eo0zfHgjGayIJDOQRFHIhpuivJrycnvti1Vj9dN25JJfDq1S/tXCEDO4sAf7h4N6L0tvMcSjc9Kx4s4rH2cQreW9WRV0Ci1wcH7OGKlxd10MUQEBphvhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N0I4Sc8C; arc=none smtp.client-ip=198.175.65.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1766001006; x=1797537006;
+  t=1766001007; x=1797537007;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Vfhq8bWSR5vPbQF3UAiZ7r9T4KAwwg1X8LJmbb1dips=;
-  b=P+LkbpkD1r/NP2fmrFgg5JUqvDNCG3/oOky5gmOuvb5rX175c4itVW8u
-   unmm3tM4WVKEpA94JKEjr2ItzvWhZVvlZxZIEwcgqFMGncO10N/7hzRje
-   Pv5fgT5zpSo1AnO5G+hM2KatsoauV/57ga/9xR91OPzitKKnLd6dmVfli
-   sjDIoAxgxTi4RimtqDv7bLk6uFpSSuP3ZCy6fozEDMYpC03Q3ayxSCNbj
-   4sTMLpAl5u75rNNuasGTHPV5pfuXiBWi+m/EwcZd8sr4PXJ/Y/bWnDEJR
-   dkTGQPPwNhGX1HH9Is4TLqhQL2ktlKz+KuxnPOLLdw9DlyCKuXF/vM9ZR
+  bh=J3iATDkGdfPOjewbdIrj7WAt5Ip09ic5N1O2CSXYCSI=;
+  b=N0I4Sc8CZy8oEmRkuoAh71YAC0fNbQw2wQiX9zcaStK7XEr79mlQ0xKp
+   h7njd94eQmg8PrZYA9lWn0tWUlcH1K2ZI84w6NXmLFzY3V7dVd1X3vBao
+   umlc26h4RSFdHXguZgH0rtFdlR602ml0OHVAJ/vNLaX5Y1Y6zYmll/sST
+   2TwipVdWLPcrW25wKh/V3L0yjxtHkBzN2kt52frKO0LK4dEoQf1z9RxSH
+   cCD3qzBwZ/n06ibj6gXIGwkLnvWZSWGfDK3VwyLWxpiwapZa4OD9hXOFL
+   0kEmDou3Lot9u2bkgtGSLkfSLzaMJQqHKaaDBJs6Cm2jwRv3DysS1nIK+
    Q==;
-X-CSE-ConnectionGUID: YicSn3xsSjy5eDM68DY9Fg==
-X-CSE-MsgGUID: LnSPjKOkQIWpKTMlAb6nMA==
-X-IronPort-AV: E=McAfee;i="6800,10657,11645"; a="67841446"
+X-CSE-ConnectionGUID: BmL8pj8iSf+PJwmfeIHeSQ==
+X-CSE-MsgGUID: 1FJXjBWOSkycHzAkFNnjhg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11645"; a="67841453"
 X-IronPort-AV: E=Sophos;i="6.21,156,1763452800"; 
-   d="scan'208";a="67841446"
+   d="scan'208";a="67841453"
 Received: from orviesa004.jf.intel.com ([10.64.159.144])
   by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Dec 2025 11:50:02 -0800
-X-CSE-ConnectionGUID: MOTF6ijOTx+ZrqMsnspUew==
-X-CSE-MsgGUID: uef/J1KVQPSNNfczrHmamg==
+X-CSE-ConnectionGUID: jRLh55kIQbOunSV/vgFqDA==
+X-CSE-MsgGUID: DCwwKP99QJCrsLEkw7HPow==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,156,1763452800"; 
-   d="scan'208";a="202898049"
+   d="scan'208";a="202898052"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa004.jf.intel.com with ESMTP; 17 Dec 2025 11:50:02 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -63,14 +63,15 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Brian Vazquez <brianvv@google.com>,
+Cc: Guangshuo Li <lgs201920130244@gmail.com>,
 	anthony.l.nguyen@intel.com,
-	willemb@google.com,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Samuel Salin <Samuel.salin@intel.com>
-Subject: [PATCH net 5/6] idpf: reduce mbx_task schedule delay to 300us
-Date: Wed, 17 Dec 2025 11:49:44 -0800
-Message-ID: <20251217194947.2992495-6-anthony.l.nguyen@intel.com>
+	fw@strlen.de,
+	stable@vger.kernel.org,
+	Simon Horman <horms@kernel.org>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Subject: [PATCH net 6/6] e1000: fix OOB in e1000_tbi_should_accept()
+Date: Wed, 17 Dec 2025 11:49:45 -0800
+Message-ID: <20251217194947.2992495-7-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20251217194947.2992495-1-anthony.l.nguyen@intel.com>
 References: <20251217194947.2992495-1-anthony.l.nguyen@intel.com>
@@ -82,52 +83,123 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Brian Vazquez <brianvv@google.com>
+From: Guangshuo Li <lgs201920130244@gmail.com>
 
-During the IDPF init phase, the mailbox runs in poll mode until it is
-configured to properly handle interrupts. The previous delay of 300ms is
-excessively long for the mailbox polling mechanism, which causes a slow
-initialization of ~2s:
+In e1000_tbi_should_accept() we read the last byte of the frame via
+'data[length - 1]' to evaluate the TBI workaround. If the descriptor-
+reported length is zero or larger than the actual RX buffer size, this
+read goes out of bounds and can hit unrelated slab objects. The issue
+is observed from the NAPI receive path (e1000_clean_rx_irq):
 
-echo 0000:06:12.4 > /sys/bus/pci/drivers/idpf/bind
+==================================================================
+BUG: KASAN: slab-out-of-bounds in e1000_tbi_should_accept+0x610/0x790
+Read of size 1 at addr ffff888014114e54 by task sshd/363
 
-[   52.444239] idpf 0000:06:12.4: enabling device (0000 -> 0002)
-[   52.485005] idpf 0000:06:12.4: Device HW Reset initiated
-[   54.177181] idpf 0000:06:12.4: PTP init failed, err=-EOPNOTSUPP
-[   54.206177] idpf 0000:06:12.4: Minimum RX descriptor support not provided, using the default
-[   54.206182] idpf 0000:06:12.4: Minimum TX descriptor support not provided, using the default
+CPU: 0 PID: 363 Comm: sshd Not tainted 5.18.0-rc1 #1
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
+Call Trace:
+ <IRQ>
+ dump_stack_lvl+0x5a/0x74
+ print_address_description+0x7b/0x440
+ print_report+0x101/0x200
+ kasan_report+0xc1/0xf0
+ e1000_tbi_should_accept+0x610/0x790
+ e1000_clean_rx_irq+0xa8c/0x1110
+ e1000_clean+0xde2/0x3c10
+ __napi_poll+0x98/0x380
+ net_rx_action+0x491/0xa20
+ __do_softirq+0x2c9/0x61d
+ do_softirq+0xd1/0x120
+ </IRQ>
+ <TASK>
+ __local_bh_enable_ip+0xfe/0x130
+ ip_finish_output2+0x7d5/0xb00
+ __ip_queue_xmit+0xe24/0x1ab0
+ __tcp_transmit_skb+0x1bcb/0x3340
+ tcp_write_xmit+0x175d/0x6bd0
+ __tcp_push_pending_frames+0x7b/0x280
+ tcp_sendmsg_locked+0x2e4f/0x32d0
+ tcp_sendmsg+0x24/0x40
+ sock_write_iter+0x322/0x430
+ vfs_write+0x56c/0xa60
+ ksys_write+0xd1/0x190
+ do_syscall_64+0x43/0x90
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7f511b476b10
+Code: 73 01 c3 48 8b 0d 88 d3 2b 00 f7 d8 64 89 01 48 83 c8 ff c3 66 0f 1f 44 00 00 83 3d f9 2b 2c 00 00 75 10 b8 01 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 31 c3 48 83 ec 08 e8 8e 9b 01 00 48 89 04 24
+RSP: 002b:00007ffc9211d4e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 0000000000004024 RCX: 00007f511b476b10
+RDX: 0000000000004024 RSI: 0000559a9385962c RDI: 0000000000000003
+RBP: 0000559a9383a400 R08: fffffffffffffff0 R09: 0000000000004f00
+R10: 0000000000000070 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffc9211d57f R14: 0000559a9347bde7 R15: 0000000000000003
+ </TASK>
+Allocated by task 1:
+ __kasan_krealloc+0x131/0x1c0
+ krealloc+0x90/0xc0
+ add_sysfs_param+0xcb/0x8a0
+ kernel_add_sysfs_param+0x81/0xd4
+ param_sysfs_builtin+0x138/0x1a6
+ param_sysfs_init+0x57/0x5b
+ do_one_initcall+0x104/0x250
+ do_initcall_level+0x102/0x132
+ do_initcalls+0x46/0x74
+ kernel_init_freeable+0x28f/0x393
+ kernel_init+0x14/0x1a0
+ ret_from_fork+0x22/0x30
+The buggy address belongs to the object at ffff888014114000
+ which belongs to the cache kmalloc-2k of size 2048
+The buggy address is located 1620 bytes to the right of
+ 2048-byte region [ffff888014114000, ffff888014114800]
+The buggy address belongs to the physical page:
+page:ffffea0000504400 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x14110
+head:ffffea0000504400 order:3 compound_mapcount:0 compound_pincount:0
+flags: 0x100000000010200(slab|head|node=0|zone=1)
+raw: 0100000000010200 0000000000000000 dead000000000001 ffff888013442000
+raw: 0000000000000000 0000000000080008 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+==================================================================
 
-Changing the delay to 300us avoids the delays during the initial mailbox
-transactions, making the init phase much faster:
+This happens because the TBI check unconditionally dereferences the last
+byte without validating the reported length first:
 
-[   83.342590] idpf 0000:06:12.4: enabling device (0000 -> 0002)
-[   83.384402] idpf 0000:06:12.4: Device HW Reset initiated
-[   83.518323] idpf 0000:06:12.4: PTP init failed, err=-EOPNOTSUPP
-[   83.547430] idpf 0000:06:12.4: Minimum RX descriptor support not provided, using the default
-[   83.547435] idpf 0000:06:12.4: Minimum TX descriptor support not provided, using the default
+	u8 last_byte = *(data + length - 1);
 
-Fixes: 4930fbf419a7 ("idpf: add core init and interrupt request")
-Signed-off-by: Brian Vazquez <brianvv@google.com>
+Fix by rejecting the frame early if the length is zero, or if it exceeds
+adapter->rx_buffer_len. This preserves the TBI workaround semantics for
+valid frames and prevents touching memory beyond the RX buffer.
+
+Fixes: 2037110c96d5 ("e1000: move tbi workaround code into helper function")
+Cc: stable@vger.kernel.org
+Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Tested-by: Samuel Salin <Samuel.salin@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/idpf/idpf_lib.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/intel/e1000/e1000_main.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-index 7a7e101afeb6..7ce4eb71a433 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-@@ -1271,7 +1271,7 @@ void idpf_mbx_task(struct work_struct *work)
- 		idpf_mb_irq_enable(adapter);
- 	else
- 		queue_delayed_work(adapter->mbx_wq, &adapter->mbx_task,
--				   msecs_to_jiffies(300));
-+				   usecs_to_jiffies(300));
+diff --git a/drivers/net/ethernet/intel/e1000/e1000_main.c b/drivers/net/ethernet/intel/e1000/e1000_main.c
+index 292389aceb2d..7f078ec9c14c 100644
+--- a/drivers/net/ethernet/intel/e1000/e1000_main.c
++++ b/drivers/net/ethernet/intel/e1000/e1000_main.c
+@@ -4094,7 +4094,15 @@ static bool e1000_tbi_should_accept(struct e1000_adapter *adapter,
+ 				    u32 length, const u8 *data)
+ {
+ 	struct e1000_hw *hw = &adapter->hw;
+-	u8 last_byte = *(data + length - 1);
++	u8 last_byte;
++
++	/* Guard against OOB on data[length - 1] */
++	if (unlikely(!length))
++		return false;
++	/* Upper bound: length must not exceed rx_buffer_len */
++	if (unlikely(length > adapter->rx_buffer_len))
++		return false;
++	last_byte = *(data + length - 1);
  
- 	idpf_recv_mb_msg(adapter);
- }
+ 	if (TBI_ACCEPT(hw, status, errors, length, last_byte)) {
+ 		unsigned long irq_flags;
 -- 
 2.47.1
 
