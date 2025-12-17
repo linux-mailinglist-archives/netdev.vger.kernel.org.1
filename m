@@ -1,257 +1,195 @@
-Return-Path: <netdev+bounces-245227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C39BBCC9413
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 19:18:18 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B30A1CC945E
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 19:21:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B772630F6C22
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 18:13:07 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 964DC30319B8
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 18:18:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 846A233FE2F;
-	Wed, 17 Dec 2025 18:12:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 160F629D29D;
+	Wed, 17 Dec 2025 18:18:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mdGlgC/4"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="XX0FTlGh";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="dnHvZqcR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E028813DBA0
-	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 18:12:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 526A82C21FC
+	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 18:18:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765995164; cv=none; b=PMwJIixEg01tKCuXk6PX+t/0hoUYMFH2Ni/hTJxyDN+SPBL5fcmtjKnvk1FzHKzTpjWQvLCKGnN9vRDSE8QDRUA4Fbj8dIuq8lduRFJQM4Q/Hx+2DrRLpalxfHxH5+fj+Uj5vAVN23klSUOzPDwZBmWq6Z/OYBdJtWg8Ys6Xcg4=
+	t=1765995529; cv=none; b=m3X7B2zYmKmXKc4qjpObVz8Qy7yVHNFKn8L3PNhV+os1bPTnLZpPB0x9mpdmu8Mp9orxfJWV1A8FVO/sojWY5GJRbyKJ2rCPIp2kmkBAb7YHenc/Up0i7aIW6LwJP+g1YjAS04ddpvR9OsM/rt6RYl13D9obNMn5dtl2YcW72Fw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765995164; c=relaxed/simple;
-	bh=Btn/e79eN7ovQAPmHnhb0d8yhq10fIOSyLkws8LR2uE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gifw/DZp2tVEdqc/Da4RbT1nauRF8V2oke3Mp+hNk7+FG3FcqNJ+nr3OheNoskmCLPv8Scps8pzZpoxV3ZfE1nA/MuYinnJDOqHb9LAkNBAN3oDHSuHgg10UQPfSgVyNSQf3950kG43Du8WxiV96uEPMYSMVvyuBTfVLbueLuiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mdGlgC/4; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-596ba07504dso6144584e87.1
-        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 10:12:37 -0800 (PST)
+	s=arc-20240116; t=1765995529; c=relaxed/simple;
+	bh=KPCoPks2Y2/j+fWOc0DjbN2flfAgVDX5MiFdzCmlPxI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Goi8jO9gpPhojCM4xXLkO2nQDrUtlBO8ZJNHx3qhWjHIzZLE2lTAMxhcwP460AuPX6OhAvQlMeBVJk+DGf5zsvUINRr4n0lE5zNc9HtrV1jEAc0vOCwMQbkYOuHcfcTheQzbDihcxjQpj02bRlHFXWicJdNhkB+vCTWPLrgaL48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=XX0FTlGh; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=dnHvZqcR; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BHCKrOK2683556
+	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 18:18:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	wBmu9AzZ9xdbtIOjudSzxPBr2BE5g0gg/z6YBjxDbIE=; b=XX0FTlGhGcl0GgQl
+	ByTU7cTPlDPk/BXambHGMBBrAFNZaJfIcs6xA6ew4ZJ9tR7UJQS+gqePcy3CuHsP
+	vAotqv37mohmAfVk+eAvIYj7rZG2V0YacO0NNdP0m9w3yE0WWFoEoPEvo6maf4xs
+	6DWw+J4IIVBayH2jAWjYTnjijGyHuVPMpR0JkPMA9P0/h03K2SoFh/RKObvRsWpV
+	eE00BccsGUxbyFdW7MIQrXSXW3cfy70VmIAoj7vErrMdAHU142riKXQR00XrVdgA
+	bnC0PryPEaCZPZzqHVwAwn49yCO1jVtKSjP0r7hhODK19mvYysQxYak3xA0We1cb
+	FKeYhQ==
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com [209.85.215.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4b3kketx4u-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 18:18:37 +0000 (GMT)
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-bc0de474d4eso12689720a12.0
+        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 10:18:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1765995155; x=1766599955; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YWDVTcbeN5bBA7b/fB7A8gJyMmAFiIZBGr/pLyGnvWw=;
-        b=mdGlgC/4bGskD8vhG1bF6wfwggtrbIVUqUKc0jeWmrX0OXpDzcOG5esv177Upxk4eb
-         Z7tNO16HKVWRRsisHP2qDSCkbFmMn0mdNpc0I0QDOjyaZlH8Jo2nf+7Rru4y5JiQ3IE2
-         lR4zBE3SXnQm/ifLg2X2G9XF2o4Q8lS+Fj9n900r9pvFaPue3Ldo0jXPTUwCrNbvycPa
-         18/LGl7CvoelkAoioM+KuQHWPSHiwHV7zWvIJcWn8YmTnnq7+y5NRKZ61+NB2srUm4Ne
-         ZDKl/D/Vzn+38JMDsbHSyOUHId3vy0yDp0jwFH8vkY+bo3oQv7qQefwGOlOrY+cMo9QL
-         +CtA==
+        d=oss.qualcomm.com; s=google; t=1765995517; x=1766600317; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wBmu9AzZ9xdbtIOjudSzxPBr2BE5g0gg/z6YBjxDbIE=;
+        b=dnHvZqcRtWDUre1eSfogviBxCN1JzyHdKmapu2M1qOVC3dThbDQ2E46ZVgFM8YO8co
+         cnHlKpe30HIkVhPSD9wk/hsMp7B1QkWxRU19JFcDyyIEzwYb/ZIAijsxKCuCW7fxxnqf
+         H9TdxfWDcUZ21KsJEqIsUeHy3o7IW9H17uzg8Zet2kh9fuOoeTaHjx7WngyiYzksfqyy
+         vco0eLOEwX2L3/1Nph1uWmmQ/tK47ynkdnS9Orq8mVDCZK/eaQpSg8H5Um57U23qJsua
+         uWPp/Zo9/eMIL7nV83cZ87zQ+ybvd9sjX+wf1Kh/XvKANbAXYDIRumejZZVbL7vshHdZ
+         T0Tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1765995155; x=1766599955;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=YWDVTcbeN5bBA7b/fB7A8gJyMmAFiIZBGr/pLyGnvWw=;
-        b=oaW9AdGpacUa4c8DxAJqVmMo78fMv8eIjvWcZusdxWf2a8Ea3G1aJumYvSE9mJqrKb
-         Wf/toSMHTyex6xiIm40jqZX3fVfCcbkatkNHp0pnoGCqy4xPu4Ao3uvCP1NBLVt3uiyZ
-         7XmOBWAyiUyU/qiXHBsWtHhwpbOV87V6KQcx79N6sUN4Iq0zi/lIFYVv8GRItSzbx7e1
-         1PthmU4AawXVFhSjt643+LVKgHxrDZW6ycwSavXFSclNQtrVjWFeB1WvnkMjWZ3KA1/4
-         RzkwczMyUHiEiGBSWBOqbzxUA2U4fmnyNOXSHNlF8mEm8STfJVA6gYoqYxfwz9w85jqj
-         N+CQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWYRS9iuz3KmM0uziNJmzqhsm7uGKM9iO3e58vY/1/t2N4icAyDU/wyVCCxbvZCT/9sPsYkNXI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+t8iE/sg67twLHZEOZs8l4ybcEbx8eYAzbiPkmFPfETeIsZRl
-	0WVPQaK6664YggThnRqmne8A3efCNo9gzAOZDfcQvmNEdxsXrcsC/toI
-X-Gm-Gg: AY/fxX4stIUb+Z/96P2MBM0STuPor87pEGEr2WOISmmlJp8lh5exPdQNQ7lBCwz/VOZ
-	+IJfrWjJOip5sFZu2iLuWygmuLMmPu64Ybf7TITVjR15eoMmxX5kTkHwIpcyW35hsfQESkt9NCb
-	UgUiYEQf6bl/2DRm6lRAyuMoKSwSaGK7sOnX2F83/ZG7vbHDf2JRpQElAFI+SzAlOF425xtKacy
-	UO1+Kr9kBK/UC65462WsnWfRqysUe5cDGcwn+w4stCZ5GyjNnMqqTveX+4gW8CIZl4vtCAnYppk
-	C8TnhG7XAJrLSDpaB3Vz6LG6mwigpfma31zJ0brxLIkc1WGB3XNwZHWfyT0/WkkXtM7I+Ut6MWA
-	ZrlRQHBKQP9LfkR7Ctbs3NOPghg5AZbzeu0WtGsudFCMF/ZyrvCkoMVf2C0+VudR6UvuAONT0GC
-	YFlGc10LqTaP8=
-X-Google-Smtp-Source: AGHT+IGKE6+oXrVS7pwbxHPAdksD1QodGnRBGOe+h7uD8J+gXsamVw7BpLRSwSnFwpf8bb0Jng+hIA==
-X-Received: by 2002:a05:6512:3d07:b0:59a:107a:45a5 with SMTP id 2adb3069b0e04-59a107a46cdmr754855e87.23.1765995154644;
-        Wed, 17 Dec 2025 10:12:34 -0800 (PST)
-Received: from Ubuntu-2204-jammy-amd64-base.. ([2a01:4f9:6a:4e9f::2])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5990da790efsm2591419e87.102.2025.12.17.10.12.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Dec 2025 10:12:34 -0800 (PST)
-From: Melbin K Mathew <mlbnkm1@gmail.com>
-To: stefanha@redhat.com,
-	sgarzare@redhat.com
-Cc: kvm@vger.kernel.org,
-	netdev@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	mst@redhat.com,
-	jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	Melbin K Mathew <mlbnkm1@gmail.com>
-Subject: [PATCH net v4 4/4] vsock/test: add stream TX credit bounds test
-Date: Wed, 17 Dec 2025 19:12:06 +0100
-Message-Id: <20251217181206.3681159-5-mlbnkm1@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20251217181206.3681159-1-mlbnkm1@gmail.com>
-References: <20251217181206.3681159-1-mlbnkm1@gmail.com>
+        d=1e100.net; s=20230601; t=1765995517; x=1766600317;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wBmu9AzZ9xdbtIOjudSzxPBr2BE5g0gg/z6YBjxDbIE=;
+        b=SLWt5s6WS9NqgdFselipXE13iSXxMx3kE4gHluK8tphoFrW/T4pmW2QpGHVxsNm1XO
+         jZPRDErbWVHpr+v8/TZG2HNvCHd/c4dX3gHiCNrf8C/AJ1Jl4LpXmSslQ+jxGz+WBHKj
+         gdUQKiUMIjNaLjqHeF7bAozWg0AiqNzLdTq3sqWcZm04WPN/8Rt1qP52ipFcvsen4MxE
+         wrEfrQT8inHdN9h3iNtp5XCgngR3fawOZ6bCz8yJSZEavUVMhe+IYyC0u8UWBZW2ZKuQ
+         SidwW8efGVdCRgxf0fQ4uIg9jbpFknHptfPSCAGFnOnFR8cAQaeYPwoYZF3lYHDk97Bk
+         QpXw==
+X-Forwarded-Encrypted: i=1; AJvYcCWJqB2TQB/Sdhloz1S3VdHmfRD03KdVveRx1Z/13duK2bfy3TBEDUZWgjzEkpOO5OPsgolzgbY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGqjGiEqJ+0tvJSIvYzCzG83RwN3rNs3UdkE99mD/72CvzoToV
+	YB/v58xyqIRhQZQCrCOQkSHMeAU1ZKxPUKfvQFYl3+SCMgYzxMZ1vU3jWt7QawGCwa5+ANytUnI
+	Hj9R6tPtbIRNBA85V1jg6Eiymnhjpp0EQUWvQu/8wyjZLKEpt1wZ5DJOYgPY=
+X-Gm-Gg: AY/fxX6niqzodxTGjmFPoDP86EJOEhimfTBPufg+HbZI8Sm5podG2mCuuYdApXXjXLN
+	VDpm9VVjg/6wSArpq+3IDovYvpbo5EaPvVMbY+1gEeA7k6t5XiR0qXA12yN1wB2LPb5wueBNIS0
+	0dVn2kedDv4F5HdRZNx+TSgk+D0bpsAREYId01LwZx3RerWUTvHQYQkMcPwyvJfpWEw1DBQNzvs
+	k534EhkHlrMqwZRG6izTb6pqLaMXdBDaBzsSsfGLs4RsQPVzjcOixg4BInYrMubfZq3bAS6PEGp
+	8yIQy6bK89pdRrexxdDbwlCMMzH92l2zEMEBsuPe4C5b7zUsetX3c0gmI3R2HzOEyMj/lb2hnAR
+	s4d/QZv7mIBm8ppbl8QlCBBeyQldGmDKHLmgbgpuJTr6S9XdK+Uz2j08McVZgXVkAlw1QjA==
+X-Received: by 2002:a05:7301:182:b0:2a4:3592:cf83 with SMTP id 5a478bee46e88-2ac303958camr10594078eec.39.1765995517142;
+        Wed, 17 Dec 2025 10:18:37 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH6ScF6p2dbGaIAlfPTuofAf2/eZTtk6ONOKBGl/Qm27pAQp9ttnZa9kTtvsKTJrPW0AuH8SQ==
+X-Received: by 2002:a05:7301:182:b0:2a4:3592:cf83 with SMTP id 5a478bee46e88-2ac303958camr10594041eec.39.1765995516561;
+        Wed, 17 Dec 2025 10:18:36 -0800 (PST)
+Received: from [10.227.110.203] (i-global254.qualcomm.com. [199.106.103.254])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-12061a93616sm517453c88.14.2025.12.17.10.18.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 Dec 2025 10:18:36 -0800 (PST)
+Message-ID: <5e568034-20a3-4ed5-a8e0-c010e5aa7b82@oss.qualcomm.com>
+Date: Wed, 17 Dec 2025 10:18:34 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] net: qrtr: Drop the MHI auto_queue feature for IPCR
+ DL channels
+To: manivannan.sadhasivam@oss.qualcomm.com,
+        Jeff Hugo <jeff.hugo@oss.qualcomm.com>,
+        Carl Vanderlip <carl.vanderlip@oss.qualcomm.com>,
+        Oded Gabbay <ogabbay@kernel.org>,
+        Manivannan Sadhasivam <mani@kernel.org>,
+        Jeff Johnson <jjohnson@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Loic Poulain <loic.poulain@oss.qualcomm.com>,
+        Maxim Kochetkov <fido_max@inbox.ru>
+Cc: linux-arm-msm@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-kernel@vger.kernel.org, mhi@lists.linux.dev,
+        linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
+        ath12k@lists.infradead.org, netdev@vger.kernel.org,
+        Bjorn Andersson <andersson@kernel.org>,
+        Johan Hovold <johan@kernel.org>, Chris Lew <quic_clew@quicinc.com>,
+        stable@vger.kernel.org
+References: <20251217-qrtr-fix-v1-0-f6142a3ec9d8@oss.qualcomm.com>
+ <20251217-qrtr-fix-v1-1-f6142a3ec9d8@oss.qualcomm.com>
+From: Jeff Johnson <jeff.johnson@oss.qualcomm.com>
+Content-Language: en-US
+In-Reply-To: <20251217-qrtr-fix-v1-1-f6142a3ec9d8@oss.qualcomm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjE3MDE0NSBTYWx0ZWRfXxEui9aeyHQ2Q
+ HNlUAFdmuw+MLVIbk9/WdZyGzLExa/RK/i+2bpNsy8Tlq9nhqXyKuPpfLks8ALDL3kjcEP43Xym
+ RKU+D7Yk64nBsoXOUrQehwJeS4RT5quwUjmvnFlxQIfxxb/MBhQ7dwTRNvrnBOFzYKTOzQKlXaC
+ 1zoUMJeU/tsJ7fXhp0oVmUV0BzhP89XUgF6ppVmRlvzwwlrM1Jh+jFmP3XAmhpGVs+eNFI87XVq
+ ecN8s6F6WRxmndE4jaxryOxzfl1RFHFOS3BNnKSJWoiBrh0Plf8nPEk+QXT6W/G0jcQu4zQQHbA
+ bEhhiJIkRXzbgsYpwGIzI374Sn+Q7ug+EH0mUGyJVOuMh3B4RfXbQ4MdD+ZohWUKVrJ1eVnhKHv
+ 9msbL+UVioEL5NoHm3UvVkc/TUlXgQ==
+X-Proofpoint-GUID: 3p7q_IEwgxxAVtkx2d-dj2elGIJuBZ1b
+X-Authority-Analysis: v=2.4 cv=Fcw6BZ+6 c=1 sm=1 tr=0 ts=6942f3fd cx=c_pps
+ a=Qgeoaf8Lrialg5Z894R3/Q==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=zitRP-D0AAAA:8 a=EUspDBNiAAAA:8
+ a=COk6AnOGAAAA:8 a=isMaZ9OHK7bkWVW8W2QA:9 a=QEXdDO2ut3YA:10
+ a=x9snwWr2DeNwDh03kgHS:22 a=xwnAI6pc5liRhupp6brZ:22 a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-ORIG-GUID: 3p7q_IEwgxxAVtkx2d-dj2elGIJuBZ1b
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-12-17_03,2025-12-16_05,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 clxscore=1011 malwarescore=0 spamscore=0 suspectscore=0
+ impostorscore=0 priorityscore=1501 phishscore=0 bulkscore=0 adultscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2512170145
 
-Add a regression test for the TX credit bounds fix. The test verifies
-that a sender with a small local buffer size cannot queue excessive
-data even when the peer advertises a large receive buffer.
+On 12/17/2025 9:16 AM, Manivannan Sadhasivam via B4 Relay wrote:
+> From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+> 
+> MHI stack offers the 'auto_queue' feature, which allows the MHI stack to
+> auto queue the buffers for the RX path (DL channel). Though this feature
+> simplifies the client driver design, it introduces race between the client
+> drivers and the MHI stack. For instance, with auto_queue, the 'dl_callback'
+> for the DL channel may get called before the client driver is fully probed.
+> This means, by the time the dl_callback gets called, the client driver's
+> structures might not be initialized, leading to NULL ptr dereference.
+> 
+> Currently, the drivers have to workaround this issue by initializing the
+> internal structures before calling mhi_prepare_for_transfer_autoqueue().
+> But even so, there is a chance that the client driver's internal code path
+> may call the MHI queue APIs before mhi_prepare_for_transfer_autoqueue() is
+> called, leading to similar NULL ptr dereference. This issue has been
+> reported on the Qcom X1E80100 CRD machines affecting boot.
+> 
+> So to properly fix all these races, drop the MHI 'auto_queue' feature
+> altogether and let the client driver (QRTR) manage the RX buffers manually.
+> In the QRTR driver, queue the RX buffers based on the ring length during
+> probe and recycle the buffers in 'dl_callback' once they are consumed. This
+> also warrants removing the setting of 'auto_queue' flag from controller
+> drivers.
+> 
+> Currently, this 'auto_queue' feature is only enabled for IPCR DL channel.
+> So only the QRTR client driver requires the modification.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: 227fee5fc99e ("bus: mhi: core: Add an API for auto queueing buffers for DL channel")
+> Fixes: 68a838b84eff ("net: qrtr: start MHI channel after endpoit creation")
+> Reported-by: Johan Hovold <johan@kernel.org>
+> Closes: https://lore.kernel.org/linux-arm-msm/ZyTtVdkCCES0lkl4@hovoldconsulting.com
+> Suggested-by: Chris Lew <quic_clew@quicinc.com>
+> Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
 
-The client:
-  - Sets a small buffer size (64 KiB)
-  - Connects to server (which advertises 2 MiB buffer)
-  - Sends in non-blocking mode until EAGAIN
-  - Verifies total queued data is bounded
-
-This guards against the original vulnerability where a remote peer
-could cause unbounded kernel memory allocation by advertising a large
-buffer and reading slowly.
-
-Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
-Signed-off-by: Melbin K Mathew <mlbnkm1@gmail.com>
----
- tools/testing/vsock/vsock_test.c | 103 +++++++++++++++++++++++++++++++
- 1 file changed, 103 insertions(+)
-
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index 0e8e173dfbdc..9f4598ee45f9 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -347,6 +347,7 @@ static void test_stream_msg_peek_server(const struct test_opts *opts)
- }
- 
- #define SOCK_BUF_SIZE (2 * 1024 * 1024)
-+#define SMALL_SOCK_BUF_SIZE (64 * 1024ULL)
- #define MAX_MSG_PAGES 4
- 
- static void test_seqpacket_msg_bounds_client(const struct test_opts *opts)
-@@ -2203,6 +2204,103 @@ static void test_stream_nolinger_server(const struct test_opts *opts)
- 	close(fd);
- }
- 
-+static void test_stream_tx_credit_bounds_client(const struct test_opts *opts)
-+{
-+	unsigned long long sock_buf_size;
-+	char buf[4096];
-+	size_t total = 0;
-+	ssize_t sent;
-+	int fd;
-+	int flags;
-+
-+	memset(buf, 'A', sizeof(buf));
-+
-+	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
-+	if (fd < 0) {
-+		perror("connect");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	sock_buf_size = SMALL_SOCK_BUF_SIZE;
-+
-+	setsockopt_ull_check(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_MAX_SIZE,
-+			     sock_buf_size,
-+			     "setsockopt(SO_VM_SOCKETS_BUFFER_MAX_SIZE)");
-+
-+	setsockopt_ull_check(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_SIZE,
-+			     sock_buf_size,
-+			     "setsockopt(SO_VM_SOCKETS_BUFFER_SIZE)");
-+
-+	flags = fcntl(fd, F_GETFL);
-+	if (flags < 0) {
-+		perror("fcntl(F_GETFL)");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) < 0) {
-+		perror("fcntl(F_SETFL)");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	control_expectln("SRVREADY");
-+
-+	for (;;) {
-+		sent = send(fd, buf, sizeof(buf), 0);
-+		if (sent > 0) {
-+			total += sent;
-+			continue;
-+		}
-+		if (sent < 0 && (errno == EAGAIN || errno == EWOULDBLOCK))
-+			break;
-+
-+		perror("send");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	/*
-+	 * With TX credit bounded by local buffer size, sending should
-+	 * stall quickly. Allow some overhead but fail if we queued an
-+	 * unreasonable amount.
-+	 */
-+	if (total > (size_t)(SMALL_SOCK_BUF_SIZE * 4)) {
-+		fprintf(stderr,
-+			"TX credit too large: queued %zu bytes (expected <= %llu)\n",
-+			total, (unsigned long long)(SMALL_SOCK_BUF_SIZE * 4));
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	control_writeln("CLIDONE");
-+	close(fd);
-+}
-+
-+static void test_stream_tx_credit_bounds_server(const struct test_opts *opts)
-+{
-+	unsigned long long sock_buf_size;
-+	int fd;
-+
-+	fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
-+	if (fd < 0) {
-+		perror("accept");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	/* Server advertises large buffer; client should still be bounded */
-+	sock_buf_size = SOCK_BUF_SIZE;
-+
-+	setsockopt_ull_check(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_MAX_SIZE,
-+			     sock_buf_size,
-+			     "setsockopt(SO_VM_SOCKETS_BUFFER_MAX_SIZE)");
-+
-+	setsockopt_ull_check(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_SIZE,
-+			     sock_buf_size,
-+			     "setsockopt(SO_VM_SOCKETS_BUFFER_SIZE)");
-+
-+	control_writeln("SRVREADY");
-+	control_expectln("CLIDONE");
-+
-+	close(fd);
-+}
-+
- static struct test_case test_cases[] = {
- 	{
- 		.name = "SOCK_STREAM connection reset",
-@@ -2382,6 +2480,11 @@ static struct test_case test_cases[] = {
- 		.run_client = test_seqpacket_unread_bytes_client,
- 		.run_server = test_seqpacket_unread_bytes_server,
- 	},
-+	{
-+		.name = "SOCK_STREAM TX credit bounds",
-+		.run_client = test_stream_tx_credit_bounds_client,
-+		.run_server = test_stream_tx_credit_bounds_server,
-+	},
- 	{},
- };
- 
--- 
-2.34.1
+Acked-by: Jeff Johnson <jjohnson@kernel.org> # drivers/net/wireless/ath/...
 
 
