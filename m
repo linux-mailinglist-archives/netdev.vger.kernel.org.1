@@ -1,150 +1,158 @@
-Return-Path: <netdev+bounces-245120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 114FECC727E
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 11:48:22 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8586ECC739F
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 12:05:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id E9394304D449
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 10:47:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 7E69630072B1
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 11:05:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 558043BB813;
-	Wed, 17 Dec 2025 10:37:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D06723BDA94;
+	Wed, 17 Dec 2025 10:38:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="g+gODfQu"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27FAB3BB807;
-	Wed, 17 Dec 2025 10:37:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F39B93BDA8B
+	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 10:38:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1765967829; cv=none; b=KfnH8Zzg3t6Js4TdBUvRDx09wyXGugreI6hNisEwn3vHmYxUixqJWg28IZzyFtTVpBdZTg7dJ4SW2WA/7Ri/6hOaCXGKMi8/L48CMfl3yTwpq+Bp69d1tb36n2BqwzxLeosUOfScRmbMWwJb8mRjcNCOEYdNl9G14+MNWrha/kc=
+	t=1765967910; cv=none; b=dv9lXMeEhF+p0ySfctXODM1gH1Dw0kwCtiZsLHJ49nTPBUKYUiOLnkfEL/38Hu2d4YKEEp1MKIqadz0ebbp8ZVrRtRnw2roOdfVeRr9HYpFVXs90EIyiy08UgaNNMsi+aRu66S5bErLLUJPhvqhHQCo0Vur/a15C5+VgqTkKE4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1765967829; c=relaxed/simple;
-	bh=ZAurbEn4Rjr/4IqGe33WeHKAIf4V/9sq6tfp6SS8Jc4=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VroGwBOy81e7KJayjrA4H+0aICAXURuX8a7sdGosXCF/WVpKC+w6xOMdSdxHdiSp2s1b/Ld7+vCfqAM4WxkYbpbOyR8dh/b8surkPwxXJfy4eIqPtmK7uCx5kN5h1/DlcdJSjR2/9+hhcre88acJqPWNc9pDU4oJmCsBXNWKjko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.224.150])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4dWVbB5PQzzHnGdQ;
-	Wed, 17 Dec 2025 18:36:38 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id C116C4056A;
-	Wed, 17 Dec 2025 18:37:03 +0800 (CST)
-Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Wed, 17 Dec
- 2025 10:37:02 +0000
-Date: Wed, 17 Dec 2025 10:37:01 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: Jijie Shao <shaojijie@huawei.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
-	<Frank.Sae@motor-comm.com>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<shenjian15@huawei.com>, <liuyonglong@huawei.com>, <chenhao418@huawei.com>,
-	<salil.mehta@huawei.com>, <shiyongbang@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH RFC net-next 1/6] net: phy: change of_phy_leds() to
- fwnode_phy_leds()
-Message-ID: <20251217103701.000066f8@huawei.com>
-In-Reply-To: <20251215125705.1567527-2-shaojijie@huawei.com>
-References: <20251215125705.1567527-1-shaojijie@huawei.com>
-	<20251215125705.1567527-2-shaojijie@huawei.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1765967910; c=relaxed/simple;
+	bh=Bi0A5xyQzAzMmvhTPYb84wqht90XVitNk3J6taYf2/w=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eHv5PPLq2Dr4M1PdDFD39enLH+PDXcFX85yhLw2vHppv8+kCZeSZp2MSJkcOOEtv+wqiVlQl/N8N19yP0gf6txmjoE7gKTPC9EQcWj64gu3bsLiJIYzqU8aDzJ122HGWzMzEZrYmVq8WZUq7nK1VJKuvHi3FzbzA4FE6PM4xCCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=g+gODfQu; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1765967891;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=F/UoXNWt64owICESDRDCydShXt+IIujt1eIf5x6/3j4=;
+	b=g+gODfQu4MFyoWMUSbLujm7o9X0gkYPZBmTMY21kTnrGX3puyBpr5uleWgKaM/3fHpmlJL
+	Kp9Cpi5lOfmD85pWUox+9FuWBdIQnjKg4PtRlQFsAzngNagfB47a9wPDyRVnVh8ikzbnni
+	G9fOuzaZZ++o3Lr4/QGU62urGLTXf58=
+From: Menglong Dong <menglong.dong@linux.dev>
+To: menglong8.dong@gmail.com, ast@kernel.org, andrii@kernel.org,
+ bot+bpf-ci@kernel.org
+Cc: davem@davemloft.net, dsahern@kernel.org, daniel@iogearbox.net,
+ martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, tglx@linutronix.de,
+ mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+ hpa@zytor.com, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org, ast@kernel.org, andrii@kernel.org,
+ daniel@iogearbox.net, martin.lau@kernel.org, eddyz87@gmail.com,
+ yonghong.song@linux.dev, clm@meta.com, ihor.solodrai@linux.dev
+Subject:
+ Re: [PATCH bpf-next v4 9/9] selftests/bpf: test fsession mixed with fentry
+ and fexit
+Date: Wed, 17 Dec 2025 18:37:52 +0800
+Message-ID: <5955023.DvuYhMxLoT@7940hx>
+In-Reply-To:
+ <351b78207e3df166707b3f8c9fe446504167e35819d0dda26559559ebf548e83@mail.kernel.org>
+References:
+ <20251217095445.218428-10-dongml2@chinatelecom.cn>
+ <351b78207e3df166707b3f8c9fe446504167e35819d0dda26559559ebf548e83@mail.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500009.china.huawei.com (7.191.174.84) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, 15 Dec 2025 20:57:00 +0800
-Jijie Shao <shaojijie@huawei.com> wrote:
-
-> Change of_phy_leds() to fwnode_phy_leds(), to support
-> of node, acpi node, and software node together.
+On 2025/12/17 18:24 bot+bpf-ci@kernel.org write:
+> > diff --git a/tools/testing/selftests/bpf/progs/fsession_test.c b/tools/testing/selftests/bpf/progs/fsession_test.c
+> > index f7c96ef1c7a9..223a6ea47888 100644
+> > --- a/tools/testing/selftests/bpf/progs/fsession_test.c
+> > +++ b/tools/testing/selftests/bpf/progs/fsession_test.c
+> > @@ -190,3 +190,37 @@ int BPF_PROG(test10, int a)
+> >  		test10_exit_ok = *cookie == 0x1111222233334444ull;
+> >  	return 0;
+> >  }
+> > +
+> > +__u64 test11_entry_result = 0;
+> > +__u64 test11_exit_result = 0;
+> > +
+> > +SEC("fsession/bpf_fentry_test1")
+> > +int BPF_PROG(test11, int a, int ret)
+> > +{
+> > +	__u64 *cookie = bpf_fsession_cookie(ctx);
+> > +
+> > +	if (!bpf_fsession_is_return(ctx)) {
+> > +		test11_entry_result = a == 1 && ret == 0;
+> > +		*cookie = 0x123456ULL;
 > 
-> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+> Should the cookie pointer be checked for NULL before dereferencing?
+> 
+> Looking at the existing tests in this file, both test9 and test10 (which
+> also call bpf_fsession_cookie) explicitly check if the cookie pointer is
+> NULL before dereferencing it:
+> 
+>   test9: if (cookie) { *cookie = 0xAAAA...; }
+>   test10: if (cookie) { *cookie = 0x1111...; }
 
-One minor suggestion inline. It is a 'while you are here'
-and whilst there are uses of the _scoped loops
-in drivers/net I'm not sure how much appetite there is
-for using them wider.
+The checking is unnecessary, as bpf_fsession_cookie() can't
+return NULL. I'll remove such checking in the test in the next
+version.
 
-Jonathan
+Thanks!
+Menglong Dong
 
-
+> 
+> test11 dereferences cookie without this check. If cookie were NULL or
+> invalid, test11 would crash rather than fail gracefully like test9/test10
+> do. While the BPF verifier likely ensures cookie is valid when the
+> program is loaded, following the established pattern would make the test
+> more robust.
+> 
+> The same issue occurs in the exit path:
+> 
+> > +		return 0;
+> > +	}
+> > +
+> > +	test11_exit_result = a == 1 && ret == 2 && *cookie == 0x123456ULL;
+>                                                     ^^^^^^^
+> 
+> > +	return 0;
+> > +}
+> > +
+> > +__u64 test12_result = 0;
+> > +SEC("fexit/bpf_fentry_test1")
+> > +int BPF_PROG(test12, int a, int ret)
+> > +{
+> > +	test12_result = a == 1 && ret == 2;
+> > +	return 0;
+> > +}
+> > +
+> > +__u64 test13_result = 0;
+> > +SEC("fentry/bpf_fentry_test1")
+> > +int BPF_PROG(test13, int a)
+> > +{
+> > +	test13_result = a == 1;
+> > +	return 0;
+> > +}
+> 
+> 
 > ---
->  drivers/net/phy/phy_device.c | 37 +++++++++++++++++-------------------
->  1 file changed, 17 insertions(+), 20 deletions(-)
+> AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+> See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 > 
-> diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-> index 81984d4ebb7c..c5ce057f88ff 100644
-> --- a/drivers/net/phy/phy_device.c
-> +++ b/drivers/net/phy/phy_device.c
+> CI run summary: https://github.com/kernel-patches/bpf/actions/runs/20299185010
+> 
 
 
-> -static int of_phy_leds(struct phy_device *phydev)
-> +static int fwnode_phy_leds(struct phy_device *phydev)
->  {
-> -	struct device_node *node = phydev->mdio.dev.of_node;
-> -	struct device_node *leds;
-> +	struct fwnode_handle *fwnode = dev_fwnode(&phydev->mdio.dev);
-> +	struct fwnode_handle *leds, *led;
->  	int err;
->  
-> -	if (!IS_ENABLED(CONFIG_OF_MDIO))
-> -		return 0;
-> -
-> -	if (!node)
-> +	if (!fwnode)
->  		return 0;
->  
-> -	leds = of_get_child_by_name(node, "leds");
-> +	leds = fwnode_get_named_child_node(fwnode, "leds");
->  	if (!leds)
->  		return 0;
->  
-> @@ -3311,17 +3308,17 @@ static int of_phy_leds(struct phy_device *phydev)
->  		goto exit;
->  	}
->  
-> -	for_each_available_child_of_node_scoped(leds, led) {
-> -		err = of_phy_led(phydev, led);
-> +	fwnode_for_each_available_child_node(leds, led) {
 
-Maybe use the _scoped version to simplify this a little given
-you are changing it.
-
-> +		err = fwnode_phy_led(phydev, led);
->  		if (err) {
-> -			of_node_put(leds);
-> +			fwnode_handle_put(leds);
->  			phy_leds_unregister(phydev);
->  			return err;
->  		}
->  	}
->  
->  exit:
-> -	of_node_put(leds);
-> +	fwnode_handle_put(leds);
->  	return 0;
->  }
->  
-> @@ -3516,7 +3513,7 @@ static int phy_probe(struct device *dev)
->  	 * LEDs for them.
->  	 */
->  	if (IS_ENABLED(CONFIG_PHYLIB_LEDS) && !phy_driver_is_genphy(phydev))
-> -		err = of_phy_leds(phydev);
-> +		err = fwnode_phy_leds(phydev);
->  
->  out:
->  	/* Re-assert the reset signal on error */
 
 
