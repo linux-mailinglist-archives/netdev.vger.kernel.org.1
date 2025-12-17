@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-245237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94AE3CC970C
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 20:50:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A49E9CC970F
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 20:50:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D0EC23033587
-	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 19:50:07 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A097B301CDB2
+	for <lists+netdev@lfdr.de>; Wed, 17 Dec 2025 19:50:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7A5C2C11D5;
-	Wed, 17 Dec 2025 19:50:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D2E2F8BC3;
+	Wed, 17 Dec 2025 19:50:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mHWQK98y"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="P+LkbpkD"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B024F2F6907
-	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 19:50:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F0742F6170
+	for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 19:50:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766001006; cv=none; b=B9zOCnbdINl+O4EgQUogO+FVBM2bHdMoCJqkrOdS0oyMAWJNrS7JBarcuipeRhLNhZMbvLbEojIPZAPYhQy8kulq+x1vZJ0kAceudzUgMX075JFUeCFSWyJVm30nT/8zEt45+rCZjGVVtybfrkBZfIEboNBJEZIgBtPEtInIkqA=
+	t=1766001007; cv=none; b=fn7dRArLMHa1QbvVDhFcjZ4DdLT8KHzcBk3p+M7YHRvqmRxrc3LXiffv5NzxmO3OGjpwE1gfiwVrfVuul3ZNxiQFwoY4dpWqukRXQBBxWk4yPl+0u6goPtCIWjXRLHfMCrIAngIHjM372eacYLtuIJtXWm0rZaj8yD05V0SvZhU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766001006; c=relaxed/simple;
-	bh=8+LMSFy8gKb1Gy0xiWDQ5E66KC9CwAY4G+f5ES/gbr0=;
+	s=arc-20240116; t=1766001007; c=relaxed/simple;
+	bh=Vfhq8bWSR5vPbQF3UAiZ7r9T4KAwwg1X8LJmbb1dips=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pZi//UA5tAXi7w+PDDb2bj62++qtAEeduDD2WzmRNSIGPm6VbHYEBz0Wo51Qt+6Y4sl/L3Yqc22boWg4ZnYKZOfsU/XPyMECKqNfAhTndr2P/+fUll0TqfnILp7HBNOiXucrbwbwS0aJSJxstSXV6Ve08o0yH7unRxxFki6yo/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mHWQK98y; arc=none smtp.client-ip=198.175.65.19
+	 MIME-Version; b=GgeConkHW5nYiLvO7h0j19Y0YOpe5w23lXRen6+/Dogoi9+I3eZwht1Rh9EcuJ0iwwdXId67zLm2ICWcsXVRUXH5+z+FUcJ4dtML4Lb50kbbsJHA+T1XlMekju5MPVZ91JRcXqQpqB6vVXNwAR102f90d+L0pj2RRNx4PmFMeQE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=P+LkbpkD; arc=none smtp.client-ip=198.175.65.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1766001005; x=1797537005;
+  t=1766001006; x=1797537006;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=8+LMSFy8gKb1Gy0xiWDQ5E66KC9CwAY4G+f5ES/gbr0=;
-  b=mHWQK98yE17q9/TFXoXnUALbEoKSD7qx5LdPSax9oQnq/I3koOECYotX
-   aeJFf2ESpgD0ilRprDqBs5WcNIVMTcjBgNKh9NaJgpg7YZxiegVuUrth8
-   98GZ/MtgifddSQkKx07A8iVwV30l+pez2mrqakIr1Dyl+kMbHLe27vTiJ
-   8tXk7Dln7QNlqAd4KK1kKjD7HdDiW+Hb5BiPnxdF51GCKSWM34ObVVW+A
-   Yy4sGDZst+EhZ1DnfvrfC+RCKFysqGi3cFkBMEGYPZBWge/i6B1TVMVQD
-   OYBYSHa9mfZ/aX3KbQ+bjCGA/Wjl6rFCtQ+g0W0Ppn4rvcojwDVJtSA3a
-   w==;
-X-CSE-ConnectionGUID: 0SnkYqc5RlmofIIS16BYhA==
-X-CSE-MsgGUID: E/2cD1bwSeCVpXrVPBqCvg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11645"; a="67841440"
+  bh=Vfhq8bWSR5vPbQF3UAiZ7r9T4KAwwg1X8LJmbb1dips=;
+  b=P+LkbpkD1r/NP2fmrFgg5JUqvDNCG3/oOky5gmOuvb5rX175c4itVW8u
+   unmm3tM4WVKEpA94JKEjr2ItzvWhZVvlZxZIEwcgqFMGncO10N/7hzRje
+   Pv5fgT5zpSo1AnO5G+hM2KatsoauV/57ga/9xR91OPzitKKnLd6dmVfli
+   sjDIoAxgxTi4RimtqDv7bLk6uFpSSuP3ZCy6fozEDMYpC03Q3ayxSCNbj
+   4sTMLpAl5u75rNNuasGTHPV5pfuXiBWi+m/EwcZd8sr4PXJ/Y/bWnDEJR
+   dkTGQPPwNhGX1HH9Is4TLqhQL2ktlKz+KuxnPOLLdw9DlyCKuXF/vM9ZR
+   Q==;
+X-CSE-ConnectionGUID: YicSn3xsSjy5eDM68DY9Fg==
+X-CSE-MsgGUID: LnSPjKOkQIWpKTMlAb6nMA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11645"; a="67841446"
 X-IronPort-AV: E=Sophos;i="6.21,156,1763452800"; 
-   d="scan'208";a="67841440"
+   d="scan'208";a="67841446"
 Received: from orviesa004.jf.intel.com ([10.64.159.144])
   by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Dec 2025 11:50:02 -0800
-X-CSE-ConnectionGUID: aqBXnwzyTYaYtkj97jvqSQ==
-X-CSE-MsgGUID: WY2DjFE+RT2YJcN7/dm4pg==
+X-CSE-ConnectionGUID: MOTF6ijOTx+ZrqMsnspUew==
+X-CSE-MsgGUID: uef/J1KVQPSNNfczrHmamg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.21,156,1763452800"; 
-   d="scan'208";a="202898046"
+   d="scan'208";a="202898049"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa004.jf.intel.com with ESMTP; 17 Dec 2025 11:50:02 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -63,16 +63,14 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
+Cc: Brian Vazquez <brianvv@google.com>,
 	anthony.l.nguyen@intel.com,
-	joshua.a.hay@intel.com,
-	tatyana.e.nikolova@intel.com,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	willemb@google.com,
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Krishneil Singh <krishneil.k.singh@intel.com>
-Subject: [PATCH net 4/6] idpf: fix LAN memory regions command on some NVMs
-Date: Wed, 17 Dec 2025 11:49:43 -0800
-Message-ID: <20251217194947.2992495-5-anthony.l.nguyen@intel.com>
+	Samuel Salin <Samuel.salin@intel.com>
+Subject: [PATCH net 5/6] idpf: reduce mbx_task schedule delay to 300us
+Date: Wed, 17 Dec 2025 11:49:44 -0800
+Message-ID: <20251217194947.2992495-6-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20251217194947.2992495-1-anthony.l.nguyen@intel.com>
 References: <20251217194947.2992495-1-anthony.l.nguyen@intel.com>
@@ -84,45 +82,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Larysa Zaremba <larysa.zaremba@intel.com>
+From: Brian Vazquez <brianvv@google.com>
 
-IPU SDK versions 1.9 through 2.0.5 require send buffer to contain a single
-empty memory region. Set number of regions to 1 and use appropriate send
-buffer size to satisfy this requirement.
+During the IDPF init phase, the mailbox runs in poll mode until it is
+configured to properly handle interrupts. The previous delay of 300ms is
+excessively long for the mailbox polling mechanism, which causes a slow
+initialization of ~2s:
 
-Fixes: 6aa53e861c1a ("idpf: implement get LAN MMIO memory regions")
-Suggested-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+echo 0000:06:12.4 > /sys/bus/pci/drivers/idpf/bind
+
+[   52.444239] idpf 0000:06:12.4: enabling device (0000 -> 0002)
+[   52.485005] idpf 0000:06:12.4: Device HW Reset initiated
+[   54.177181] idpf 0000:06:12.4: PTP init failed, err=-EOPNOTSUPP
+[   54.206177] idpf 0000:06:12.4: Minimum RX descriptor support not provided, using the default
+[   54.206182] idpf 0000:06:12.4: Minimum TX descriptor support not provided, using the default
+
+Changing the delay to 300us avoids the delays during the initial mailbox
+transactions, making the init phase much faster:
+
+[   83.342590] idpf 0000:06:12.4: enabling device (0000 -> 0002)
+[   83.384402] idpf 0000:06:12.4: Device HW Reset initiated
+[   83.518323] idpf 0000:06:12.4: PTP init failed, err=-EOPNOTSUPP
+[   83.547430] idpf 0000:06:12.4: Minimum RX descriptor support not provided, using the default
+[   83.547435] idpf 0000:06:12.4: Minimum TX descriptor support not provided, using the default
+
+Fixes: 4930fbf419a7 ("idpf: add core init and interrupt request")
+Signed-off-by: Brian Vazquez <brianvv@google.com>
 Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
-Tested-by: Krishneil Singh <krishneil.k.singh@intel.com>
+Tested-by: Samuel Salin <Samuel.salin@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ drivers/net/ethernet/intel/idpf/idpf_lib.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-index 44cd4b466c48..5bbe7d9294c1 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-@@ -1016,6 +1016,9 @@ static int idpf_send_get_lan_memory_regions(struct idpf_adapter *adapter)
- 	struct idpf_vc_xn_params xn_params = {
- 		.vc_op = VIRTCHNL2_OP_GET_LAN_MEMORY_REGIONS,
- 		.recv_buf.iov_len = IDPF_CTLQ_MAX_BUF_LEN,
-+		.send_buf.iov_len =
-+			sizeof(struct virtchnl2_get_lan_memory_regions) +
-+			sizeof(struct virtchnl2_mem_region),
- 		.timeout_ms = IDPF_VC_XN_DEFAULT_TIMEOUT_MSEC,
- 	};
- 	int num_regions, size;
-@@ -1028,6 +1031,8 @@ static int idpf_send_get_lan_memory_regions(struct idpf_adapter *adapter)
- 		return -ENOMEM;
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+index 7a7e101afeb6..7ce4eb71a433 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+@@ -1271,7 +1271,7 @@ void idpf_mbx_task(struct work_struct *work)
+ 		idpf_mb_irq_enable(adapter);
+ 	else
+ 		queue_delayed_work(adapter->mbx_wq, &adapter->mbx_task,
+-				   msecs_to_jiffies(300));
++				   usecs_to_jiffies(300));
  
- 	xn_params.recv_buf.iov_base = rcvd_regions;
-+	rcvd_regions->num_memory_regions = cpu_to_le16(1);
-+	xn_params.send_buf.iov_base = rcvd_regions;
- 	reply_sz = idpf_vc_xn_exec(adapter, &xn_params);
- 	if (reply_sz < 0)
- 		return reply_sz;
+ 	idpf_recv_mb_msg(adapter);
+ }
 -- 
 2.47.1
 
