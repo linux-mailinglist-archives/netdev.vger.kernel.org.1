@@ -1,159 +1,216 @@
-Return-Path: <netdev+bounces-245270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245271-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DA45CCA13D
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 03:25:17 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71CF6CCA14F
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 03:29:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C7BA7301EFBE
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 02:25:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 40E6F3015D0C
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 02:29:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51C822F7AD2;
-	Thu, 18 Dec 2025 02:25:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 519712FB997;
+	Thu, 18 Dec 2025 02:29:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="rGYQDKcQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="auPdLCaL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f67.google.com (mail-ot1-f67.google.com [209.85.210.67])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FBF21EF36E
-	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 02:24:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF0842F83C3
+	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 02:29:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766024700; cv=none; b=T929b8HYheOVCrp+X4RqFp/mdfIhILfgLmfTDzdrDcjWhlH4Chbdop6bdzWZgHOZSqRLqJGVkjBm/IUrfXWJeESbIRgenfh9U0EEt5XrO1kj+itSlJi4CRXNgtLIucLZADP/0eqF7W/WFwo7oHLpvY/mChiefNLwhhe33g7Ovec=
+	t=1766024995; cv=none; b=nJA+YH60aEal/+END1HnK6yPq0LA65sYkVLOcvb3qip8Y96K79EgKI5Oeb/tSiWjwPt2TC6nk+ISxA2F0hIPcO0IsaODuwpHtAht2h4A3GepxlWWyCj1w4x9cemd1Qp101o+fbF4hvN+wtZ2ygKktpsYwjCGn1qKLXKIOOrQriM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766024700; c=relaxed/simple;
-	bh=q2/AOVQqFfFu2Othv1PTDVvgn6iCLxX9QkHI7dBq/6s=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=WEas252m02tAfSyxmgpu4OpY1AWoHG3QecXRFfcEzSgaqLU9jQictjtoh+/qOUMeVz2U+B2rOfp3O2TovXs1j8e6muWBLO1Q5X3MEvON41C3TMqf1t4O6DcAsH437dYcYlB3nUh1OxWge4yIx2nG7wwalMJLKs0f6L8TRX5iT80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=rGYQDKcQ; arc=none smtp.client-ip=209.85.210.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-ot1-f67.google.com with SMTP id 46e09a7af769-7c730af8d69so79811a34.1
-        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 18:24:57 -0800 (PST)
+	s=arc-20240116; t=1766024995; c=relaxed/simple;
+	bh=zlziAxvPwJj8HgeZzSpcXhPCekluk2rCReJ0Fw/8umI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=UVjfrtdeIuEsl5MVGiNcyr9Ai3uYe3Em1rNUwo7b7ZLK0o0RIyZ4aUdnWxFfDVy48HrEgk51pa1G+Va7XJvkVq7E9XMvwQqKZMAdkMFQb5jW31KcJM22NmNwSIMbLN7Xi7o3/StFtnNJ6vogdZ8oCtoqhETNK4o++wlhuqko8ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=auPdLCaL; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7d481452732so381991b3a.1
+        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 18:29:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1766024696; x=1766629496; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=lbN2GZrogzd6ZoVf/l4oC+ehQnMHX6Enqblytpo7ffo=;
-        b=rGYQDKcQPdc/Zq6ann4XEeOOzE8CXkTV8rWrK4p1MFpffU+xE6Y09jll1t9kgczgGN
-         zk3UQDNySrR1t5oVBkFgESWuYzgCrEinRl4osrf/fYMVWJthjR2lK3nIXRj/diBjqBRo
-         jl8+ryePhuj2tGxxbtKC3UmviguSAe5hHmlkKTe87f+nhZLisyuJb47t93EsCvUPgQcb
-         c0ZshJzR10aJqy+yRSi01HnIMUUxGk+e8zjd6jm+g4rly6QYRyENOXzfC9vE5NrsT7La
-         j3ICCnso3LoQ5HkEVyS70crzR6vAAoSSOFP9jVHkb7VOz0oQ6/Bfw0W/0kc7yc175P7O
-         yb1w==
+        d=google.com; s=20230601; t=1766024993; x=1766629793; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Mbkt/LgClY9Ed+U/AqFg7ozVmIhVbSqVhAx0YrbLQGM=;
+        b=auPdLCaLlkQy1M/9nZdm6uFAKeS7L18O3gf6MxeCrUa3GCPDKcnXGec8Dgx0IUN+2h
+         JF7sGTiJqVE9U4QSixNOhow+OX+Q3vrxmJZgsgga1GQRplD7VxCtvFe/sB1uE47fPL83
+         +ra7aEqWsQ1RSVWi4zFov6YuI8wlJwXCtGp0C/Wvp0pEzDyt1e1Im6bM/QwRrBS9qaYB
+         zD540uwf/HPJqlWxgJ39x+cACzJVOvT0f4i4ap0EbJQmRjbD3njiBiphGi73th6rsq0w
+         Xh5+pRXwCNCpT1IPTU8HKQgEXOXlonyPE+dfoX5KTLI2FxNdnC9wfVTuhsBSGDJg7PiJ
+         mE+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766024696; x=1766629496;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lbN2GZrogzd6ZoVf/l4oC+ehQnMHX6Enqblytpo7ffo=;
-        b=GPdabvel752Eep7i9PjdY5QYViRkD9UqY0VNz6jFb8W2cOAWgefkZA/yUO9rgdn67d
-         Li6Y8nO4k0bZInjcyT9ofUIVVdm5TsCxk9ZScqy81PUJfATBYtNKeq+aXY5ebWId0lUq
-         If+o2ekSjSTzfJzLpTnvEJBkhz+trQw9957WB9k1fCTvMj1ceN/PMrGoBKvQftUfjJ5Y
-         YJubRhINEvS4w1xO6KqYuSmSFuBM5cKCTowbow4mM+shJt2BiarjyIxPPvQp1lF5olp+
-         /8Ts0A30YTxOC1G0avcQtbLzHpbyqQakpDs6GqcFxPzd7R9qeQ45wsJ3w7RY6hUDVV8K
-         U8rA==
-X-Gm-Message-State: AOJu0YwP3oRIleWtGzWa7dvhBYu+fXVYgMboaSm/U7ZgnAiXUy1Xl/69
-	AMNM1gYoao5xbpkBdwsVCRWXpcvjFpLr3Bhv322Cz5sroe4c/VK07TK7Q+o+mhjGZusnXyZW5OV
-	A5nG1eqL9GQ==
-X-Gm-Gg: AY/fxX6brYRQUCpXhJu169lo2zyDDYsW83VsnvHrI6wWyP3Lgmc4IasdSjl+xF6mRvZ
-	ZJkToays+LViduh9mw+9+FXc5p3hDrOfsISk6k5WtREx2IZCDSJPSPBsWWyBLp3msvQa+pjDy6F
-	DU9tkr32O/BBBKsJ/wkRhjJh1B1HjsbxGbsI2fCEVc2MTdtutqH3UofuG4hHmLoaL6o068LOBns
-	kmVE5kp5rvUM+ckPch9KLa2pUGd3vifBg7BsUrJZNHk4v4VcHq1antOJQiOADwmWCgmiWqnYfFs
-	2ZvXj9l+v24M5FFGSBbHdWxaXfma4wQ5wfPcWd75TVDdYMssIHtxi6NnAtp1gh87ar4VI0NobGk
-	HW0FQQLYwcMwcVUzropDExNUYn+bXcb66/4e7ZleyV76BGalQQcrc/x+/aOZmQXqAyZXfZH4dDT
-	rWf/ewcdYl
-X-Google-Smtp-Source: AGHT+IHru59lpPqzlvGXzgmyFGP7fEvQaY6UDPjGVSVy6vxz3iEEstCwYMUjK4gDkFpVUV0VR+Gi7w==
-X-Received: by 2002:a05:6808:3505:b0:450:d1ba:151b with SMTP id 5614622812f47-455ac87b97emr8372432b6e.29.1766024695880;
-        Wed, 17 Dec 2025 18:24:55 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-3fa17fc418fsm791220fac.19.2025.12.17.18.24.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Dec 2025 18:24:55 -0800 (PST)
-Message-ID: <72a26b79-a469-4e6e-b0f0-92c72014e7fb@kernel.dk>
-Date: Wed, 17 Dec 2025 19:24:53 -0700
+        d=1e100.net; s=20230601; t=1766024993; x=1766629793;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Mbkt/LgClY9Ed+U/AqFg7ozVmIhVbSqVhAx0YrbLQGM=;
+        b=xJ/t5RTbfDyXLsE9Olq+ArC4KF/vm/wvN9VLED2cDzWbS+Mx+cGBVC5SezJxEmcLOU
+         rXrss/1tvCRjMCg1L1c2eeJQpibXQn7Lh0y+rFp+0PEV1iEtsjSJfOdlTxLANPgSi35o
+         YvI8VFz6KrW4it0tcwgR3x1IGS3IMnEruXZjuiokGdQ4iC0lmQAq2+ubVI5zAZ87seuk
+         maVJXDzg5DUpemVJcO68qsqigZhVHQPWQoUIX24WNaqAqDyLUObcRSJlmUq/zO52wwDG
+         KuOcncU9Xe6biwPZ+YgoT1ynq4Sn/8l6nekaWS0Reh3nkAWTfRJuDzSc/U9O9J4fCGe9
+         mSWw==
+X-Gm-Message-State: AOJu0YzT4LgYHu1aCEgpIrsFG1EcGFIQz+kSFaeOnS5C+qC6SwJlkv3P
+	kqKwBrbI8YRFXRlYO+lYesd4fQiS6SnEGbgQTlf1ilG+5Pi65l+mGbCxAdSOF4wioqd7R1JYeNe
+	wVMX9FZd/DGLSoVuZXeOXjRDkX2yfN+BUOYnGUesUOaXNQ1X3DDpgPxlh61DVnBNuEuOGnGEx1M
+	78sI/JeFn+cn1JcnoiGg8qRZXM12QujsJ79cku28jDbdcXeSZ8KYZ7p0uFLEHi4l8=
+X-Google-Smtp-Source: AGHT+IFE6xajScfzbLpRFiQQS67W5ZN8gStF0mO1QPIpwdD4OiKSevZ12bwmQxwPQs3VZazL0vtBUS/b7RY63UwVGw==
+X-Received: from dlbrj5.prod.google.com ([2002:a05:7022:f405:b0:11f:2e2e:de3])
+ (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:701b:2902:b0:11b:8f02:a876 with SMTP id a92af1059eb24-11f354cce50mr11251803c88.23.1766024992932;
+ Wed, 17 Dec 2025 18:29:52 -0800 (PST)
+Date: Thu, 18 Dec 2025 02:29:36 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] af_unix: don't post cmsg for SO_INQ unless explicitly
- asked for
-From: Jens Axboe <axboe@kernel.dk>
-To: netdev <netdev@vger.kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
- Willem de Bruijn <willemb@google.com>
-References: <ca5fe77f-f7a8-4886-b874-0e7063622ab7@kernel.dk>
-Content-Language: en-US
-In-Reply-To: <ca5fe77f-f7a8-4886-b874-0e7063622ab7@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.313.g674ac2bdf7-goog
+Message-ID: <20251218022948.3288897-1-almasrymina@google.com>
+Subject: [PATCH net-next v2] idpf: export RX hardware timestamping information
+ to XDP
+From: Mina Almasry <almasrymina@google.com>
+To: netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: YiFei Zhu <zhuyifei@google.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Alexander Lobakin <aleksander.lobakin@intel.com>, 
+	Richard Cochran <richardcochran@gmail.com>, intel-wired-lan@lists.osuosl.org, 
+	Mina Almasry <almasrymina@google.com>, 
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 12/17/25 7:19 PM, Jens Axboe wrote:
-> A previous commit added SO_INQ support for AF_UNIX (SOCK_STREAM), but
-> it posts a SCM_INQ cmsg even if just msg->msg_get_inq is set. This is
-> incorrect, as ->msg_get_inq is just the caller asking for the remainder
-> to be passed back in msg->msg_inq, it has nothing to do with cmsg. The
-> original commit states that this is done to make sockets
-> io_uring-friendly", but it's actually incorrect as io_uring doesn't
-> use cmsg headers internally at all, and it's actively wrong as this
-> means that cmsg's are always posted if someone does recvmsg via
-> io_uring.
-> 
-> Fix that up by only posting cmsg if u->recvmsg_inq is set.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: df30285b3670 ("af_unix: Introduce SO_INQ.")
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> 
-> ---
-> 
-> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> index 55cdebfa0da0..110d716087b5 100644
-> --- a/net/unix/af_unix.c
-> +++ b/net/unix/af_unix.c
-> @@ -3086,12 +3086,16 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
->  
->  	mutex_unlock(&u->iolock);
->  	if (msg) {
-> +		bool do_cmsg;
-> +
->  		scm_recv_unix(sock, msg, &scm, flags);
->  
-> -		if (READ_ONCE(u->recvmsg_inq) || msg->msg_get_inq) {
-> +		do_cmsg = READ_ONCE(u->recvmsg_inq);
-> +		if (do_cmsg || msg->msg_get_inq) {
->  			msg->msg_inq = READ_ONCE(u->inq_len);
-> -			put_cmsg(msg, SOL_SOCKET, SCM_INQ,
-> -				 sizeof(msg->msg_inq), &msg->msg_inq);
-> +			if (do_cmsg)
-> +				put_cmsg(msg, SOL_SOCKET, SCM_INQ,
-> +					 sizeof(msg->msg_inq), &msg->msg_inq);
->  		}
->  	} else {
->  		scm_destroy(&scm);
-> 
+From: YiFei Zhu <zhuyifei@google.com>
 
-Note, on top of this bug, I also believe the correct check here should be:
+The logic is similar to idpf_rx_hwtstamp, but the data is exported
+as a BPF kfunc instead of appended to an skb.
 
-if ((do_cmsg || msg->msg_get_inq) && copied >= 0)
+A idpf_queue_has(PTP, rxq) condition is added to check the queue
+supports PTP similar to idpf_rx_process_skb_fields.
 
-rather than always post a cmsg (or pass back inq data) if the socket
-read has failed.
+Cc: intel-wired-lan@lists.osuosl.org
 
-Was going to post that patch separately, but can fold it into this one
-as well. Let me know.
+Signed-off-by: YiFei Zhu <zhuyifei@google.com>
+Signed-off-by: Mina Almasry <almasrymina@google.com>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
-Also note that this is commit is actively breaking some io_uring uses on
-streamed sockets, as you can now end up with multiple SCM_INQ cmsg
-postings per socket with retries. These were not requested. So would
-appreciate if we can get this one sorted out soonish and post for stable
-too. It affects 6.17 and newer.
+---
 
+v2: https://lore.kernel.org/netdev/20251122140839.3922015-1-almasrymina@google.com/
+- Fixed alphabetical ordering
+- Use the xdp desc type instead of virtchnl one (required some added
+  helpers)
+
+---
+ drivers/net/ethernet/intel/idpf/xdp.c | 29 +++++++++++++++++++++++++++
+ drivers/net/ethernet/intel/idpf/xdp.h | 17 ++++++++++++++++
+ 2 files changed, 46 insertions(+)
+
+diff --git a/drivers/net/ethernet/intel/idpf/xdp.c b/drivers/net/ethernet/intel/idpf/xdp.c
+index 958d16f87424..7744d6898f74 100644
+--- a/drivers/net/ethernet/intel/idpf/xdp.c
++++ b/drivers/net/ethernet/intel/idpf/xdp.c
+@@ -2,6 +2,7 @@
+ /* Copyright (C) 2025 Intel Corporation */
+ 
+ #include "idpf.h"
++#include "idpf_ptp.h"
+ #include "idpf_virtchnl.h"
+ #include "xdp.h"
+ #include "xsk.h"
+@@ -391,8 +392,36 @@ static int idpf_xdpmo_rx_hash(const struct xdp_md *ctx, u32 *hash,
+ 				    pt);
+ }
+ 
++static int idpf_xdpmo_rx_timestamp(const struct xdp_md *ctx, u64 *timestamp)
++{
++	const struct libeth_xdp_buff *xdp = (typeof(xdp))ctx;
++	struct idpf_xdp_rx_desc desc __uninitialized;
++	const struct idpf_rx_queue *rxq;
++	u64 cached_time, ts_ns;
++	u32 ts_high;
++
++	idpf_xdp_get_qw1(&desc, xdp->desc);
++	rxq = libeth_xdp_buff_to_rq(xdp, typeof(*rxq), xdp_rxq);
++
++	if (!idpf_queue_has(PTP, rxq))
++		return -ENODATA;
++	if (!(idpf_xdp_rx_ts_low(&desc) & VIRTCHNL2_RX_FLEX_TSTAMP_VALID))
++		return -ENODATA;
++
++	cached_time = READ_ONCE(rxq->cached_phc_time);
++
++	idpf_xdp_get_qw3(&desc, xdp->desc);
++
++	ts_high = idpf_xdp_rx_ts_high(&desc);
++	ts_ns = idpf_ptp_tstamp_extend_32b_to_64b(cached_time, ts_high);
++
++	*timestamp = ts_ns;
++	return 0;
++}
++
+ static const struct xdp_metadata_ops idpf_xdpmo = {
+ 	.xmo_rx_hash		= idpf_xdpmo_rx_hash,
++	.xmo_rx_timestamp	= idpf_xdpmo_rx_timestamp,
+ };
+ 
+ void idpf_xdp_set_features(const struct idpf_vport *vport)
+diff --git a/drivers/net/ethernet/intel/idpf/xdp.h b/drivers/net/ethernet/intel/idpf/xdp.h
+index 479f5ef3c604..86be6cae9689 100644
+--- a/drivers/net/ethernet/intel/idpf/xdp.h
++++ b/drivers/net/ethernet/intel/idpf/xdp.h
+@@ -112,11 +112,13 @@ struct idpf_xdp_rx_desc {
+ 	aligned_u64		qw1;
+ #define IDPF_XDP_RX_BUF		GENMASK_ULL(47, 32)
+ #define IDPF_XDP_RX_EOP		BIT_ULL(1)
++#define IDPF_XDP_RX_TS_LOW	GENMASK_ULL(31, 24)
+ 
+ 	aligned_u64		qw2;
+ #define IDPF_XDP_RX_HASH	GENMASK_ULL(31, 0)
+ 
+ 	aligned_u64		qw3;
++#define IDPF_XDP_RX_TS_HIGH	GENMASK_ULL(63, 32)
+ } __aligned(4 * sizeof(u64));
+ static_assert(sizeof(struct idpf_xdp_rx_desc) ==
+ 	      sizeof(struct virtchnl2_rx_flex_desc_adv_nic_3));
+@@ -128,6 +130,8 @@ static_assert(sizeof(struct idpf_xdp_rx_desc) ==
+ #define idpf_xdp_rx_buf(desc)	FIELD_GET(IDPF_XDP_RX_BUF, (desc)->qw1)
+ #define idpf_xdp_rx_eop(desc)	!!((desc)->qw1 & IDPF_XDP_RX_EOP)
+ #define idpf_xdp_rx_hash(desc)	FIELD_GET(IDPF_XDP_RX_HASH, (desc)->qw2)
++#define idpf_xdp_rx_ts_low(desc)	FIELD_GET(IDPF_XDP_RX_TS_LOW, (desc)->qw1)
++#define idpf_xdp_rx_ts_high(desc)	FIELD_GET(IDPF_XDP_RX_TS_HIGH, (desc)->qw3)
+ 
+ static inline void
+ idpf_xdp_get_qw0(struct idpf_xdp_rx_desc *desc,
+@@ -166,6 +170,19 @@ idpf_xdp_get_qw2(struct idpf_xdp_rx_desc *desc,
+ #endif
+ }
+ 
++static inline void
++idpf_xdp_get_qw3(struct idpf_xdp_rx_desc *desc,
++		 const struct virtchnl2_rx_flex_desc_adv_nic_3 *rxd)
++{
++#ifdef __LIBETH_WORD_ACCESS
++	desc->qw3 = ((const typeof(desc))rxd)->qw3;
++#else
++	desc->qw3 = ((u64)le32_to_cpu(rxd->ts_high) << 32) |
++		    ((u64)le16_to_cpu(rxd->fmd6) << 16) |
++		    le16_to_cpu(rxd->l2tag1);
++#endif
++}
++
+ void idpf_xdp_set_features(const struct idpf_vport *vport);
+ 
+ int idpf_xdp(struct net_device *dev, struct netdev_bpf *xdp);
+
+base-commit: 8f7aa3d3c7323f4ca2768a9e74ebbe359c4f8f88
 -- 
-Jens Axboe
+2.52.0.313.g674ac2bdf7-goog
+
 
