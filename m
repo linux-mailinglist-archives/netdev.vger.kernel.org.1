@@ -1,127 +1,94 @@
-Return-Path: <netdev+bounces-245348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCED7CCBCBB
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 13:31:58 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4623ECCB2D8
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 10:31:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 1E348301FA41
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 12:31:56 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id B74163029B66
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 09:31:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A86963328EF;
-	Thu, 18 Dec 2025 12:31:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C12B72DC33F;
+	Thu, 18 Dec 2025 09:31:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5009331A70
-	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 12:31:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDF6E2EBBBC
+	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 09:31:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.136.29.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766061115; cv=none; b=PMN/paSV9JMSoFv20DMu6V3P7ZVHyyEWExII0w5pXEJk0vykMVfev3gwvP7ipuPAutYk6QSs2QHZgkUjM2yCb3047+qHM1ll5TwEZYFqrA49JKKd5HV9KV1HiUwXC/hDIn2TiofvJdbmKgrcebpYGKuREjlLr4MiLVKMHCSAKwg=
+	t=1766050288; cv=none; b=G9056LqtDfPQJZY+u7WCUoVyEYwpVHzSwFO8k66fo7EPqr0YbX7vrfdF3HF9cwxeWkMK+JL8Oc8+MQT8AY5zpkHhr6cTOmyryiAfDy9Pv6mkgwKalwh5N2k1racaEL25mrfwDgJ8Ek8DXzegU5f76Y+gXaXQdcYqBxGIkNR/0Ys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766061115; c=relaxed/simple;
-	bh=CbSKCaHmzirFzc0h654WTSlpU/IHl6PqJ/BRYl/AApI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Bs43qPaMm1/vV4pNvsP8zOi7uJtb2BWtSFR5VEx9q1REm4voPZv8uuLPE/Q3vRYOnUld7UjO07iqf5ZGEllM6A0jGQO/XjEtlQBTvYZw/1DRpjFlcHJYQMl3d3h7RqekrPnO3KCreaiz+7rGE4q4Z4UEg8rngPAEchq7D/0m6HE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1vWDAQ-0007wP-Hs; Thu, 18 Dec 2025 13:31:38 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1vWDAP-006HQU-01;
-	Thu, 18 Dec 2025 13:31:37 +0100
-Received: from blackshift.org (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id B68D14B8273;
-	Thu, 18 Dec 2025 12:31:36 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	linux-can@vger.kernel.org,
-	kernel@pengutronix.de,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Vincent Mailhol <mailhol@kernel.org>,
-	kernel test robot <lkp@intel.com>,
-	Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH net 3/3] can: fix build dependency
-Date: Thu, 18 Dec 2025 10:27:19 +0100
-Message-ID: <20251218123132.664533-4-mkl@pengutronix.de>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251218123132.664533-1-mkl@pengutronix.de>
-References: <20251218123132.664533-1-mkl@pengutronix.de>
+	s=arc-20240116; t=1766050288; c=relaxed/simple;
+	bh=JhbLteRyRtTT3gBDAvBvtJCQzZ0+fa8JnzcYDcM6b+0=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=kArQ2P/7ls3UHgAKYqTRhj45YI0mUskpEhYdVbYN4SGCiZYurL0uqSHX0xf/2g1Xl/bRRfw9eCgSxFZe6Kc1ytNSKZfxbrQc3L0Q0P1DoX9pN+YnBUtUcXIuePG/UEYU917x3tNpLbiRgrQxMxSLwAy9KFiHQzs6EO12Yyi5Z84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com; spf=pass smtp.mailfrom=proxmox.com; arc=none smtp.client-ip=94.136.29.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proxmox.com
+Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
+	by proxmox-new.maurer-it.com (Proxmox) with ESMTP id CB5D2473BA;
+	Thu, 18 Dec 2025 10:31:17 +0100 (CET)
+Message-ID: <8f8836dd-c46f-403c-b478-a9e89dd62912@proxmox.com>
+Date: Thu, 18 Dec 2025 10:31:15 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 7/8] tcp: stronger sk_rcvbuf checks
+From: Christian Ebner <c.ebner@proxmox.com>
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
+ Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com, lkolbe@sodiuswillert.com
+References: <20250711114006.480026-1-edumazet@google.com>
+ <20250711114006.480026-8-edumazet@google.com>
+ <cd44c0d2-17ed-460d-9f89-759987d423dc@proxmox.com>
+Content-Language: en-US, de-DE
+In-Reply-To: <cd44c0d2-17ed-460d-9f89-759987d423dc@proxmox.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Bm-Milter-Handled: 55990f41-d878-4baa-be0a-ee34c49e34d2
+X-Bm-Transport-Timestamp: 1766050265384
 
-Arnd Bergmann's patch [1] fixed the build dependency problem introduced by
-bugfix commit cb2dc6d2869a ("can: Kconfig: select CAN driver infrastructure
-by default"). This ended up as commit 6abd4577bccc ("can: fix build
-dependency"), but I broke Arnd's fix by removing a dependency that we
-thought was superfluous.
+Hi,
+to add some more information gained.
 
-[1] https://lore.kernel.org/all/20251204100015.1033688-1-arnd@kernel.org/
+pcaps obtained via tcpdump of the traffic while in a stale state show 
+the following recurring pattern:
 
-Meanwhile the problem was also found by intel's kernel test robot,
-complaining about undefined symbols:
+41	0.705618	10.xx.xx.aa	10.xx.xx.bb	TCP	66	[TCP ZeroWindow] 8007 → 55554 
+[ACK] Seq=1 Ack=28673 Win=0 Len=0 TSval=2656874280 TSecr=1348075902
+42	0.705662	10.xx.xx.aa	10.xx.xx.bb	TCP	66	[TCP Window Update] 8007 → 
+55554 [ACK] Seq=1 Ack=28673 Win=7 Len=0 TSval=2656874280 TSecr=1348075902
+90	0.914606	10.xx.xx.bb	10.xx.xx.aa	TCP	7234	55554 → 8007 [PSH, ACK] 
+Seq=28673 Ack=1 Win=139 Len=7168 TSval=1348076111 TSecr=2656874280
 
-| ERROR: modpost: "m_can_class_unregister" [drivers/net/can/m_can/m_can_platform.ko] undefined!
-| ERROR: modpost: "m_can_class_free_dev" [drivers/net/can/m_can/m_can_platform.ko] undefined!
-| ERROR: modpost: "m_can_class_allocate_dev" [drivers/net/can/m_can/m_can_platform.ko] undefined!
-| ERROR: modpost: "m_can_class_get_clocks" [drivers/net/can/m_can/m_can_platform.ko] undefined!
-| ERROR: modpost: "m_can_class_register" [drivers/net/can/m_can/m_can_platform.ko] undefined!
+Output of `ss -tim` show the sockets being severely limited in buffer size:
 
-To fix this problem, add the missing dependency again.
+ESTAB                          0                               0 
+  
+[::ffff:10.xx.xx.aa]:8007 
+       [::ffff:10.xx.xx.bb]:55554
+          skmem:(r0,rb7488,t0,tb332800,f0,w0,o0,bl0,d20) cubic 
+wscale:10,10 rto:201 rtt:0.085/0.015 ato:40 mss:8948 pmtu:9000 
+rcvmss:7168 advmss:8948 cwnd:10 bytes_sent:937478 bytes_acked:937478 
+bytes_received:1295747055 segs_out:301010 segs_in:162410 
+data_segs_out:1035 data_segs_in:161588 send 8.42Gbps lastsnd:3308 
+lastrcv:191 lastack:191 pacing_rate 16.7Gbps delivery_rate 2.74Gbps 
+delivered:1036 app_limited busy:437ms rcv_rtt:207.551 rcv_space:96242 
+rcv_ssthresh:903417 minrtt:0.049 rcv_ooopack:23 snd_wnd:142336 rcv_wnd:7168
 
-Cc: Vincent Mailhol <mailhol@kernel.org>
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202512132253.vO9WFDJK-lkp@intel.com/
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202512180808.fTAUQ2XN-lkp@intel.com/
-Reported-by: Arnd Bergmann <arnd@arndb.de>
-Closes: https://lore.kernel.org/all/7427949a-ea7d-4854-9fe4-e01db7d878c7@app.fastmail.com/
-Fixes: 6abd4577bccc ("can: fix build dependency")
-Fixes: cb2dc6d2869a ("can: Kconfig: select CAN driver infrastructure by default")
-Acked-by: Vincent Mailhol <mailhol@kernel.org>
-Link: https://patch.msgid.link/20251217-can-fix-dependency-v1-1-fd2d4f2a2bf5@pengutronix.de
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
- drivers/net/can/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This would indicate that the buffer size not growing while in this 
+state, therefore limiting the rcv_wnd?
 
-diff --git a/drivers/net/can/Kconfig b/drivers/net/can/Kconfig
-index 460a74ae6923..cfaea6178a71 100644
---- a/drivers/net/can/Kconfig
-+++ b/drivers/net/can/Kconfig
-@@ -17,7 +17,7 @@ menuconfig CAN_DEV
- 	  virtual ones. If you own such devices or plan to use the virtual CAN
- 	  interfaces to develop applications, say Y here.
- 
--if CAN_DEV
-+if CAN_DEV && CAN
- 
- config CAN_VCAN
- 	tristate "Virtual Local CAN Interface (vcan)"
--- 
-2.51.0
+Best regards,
+Christian Ebner
 
 
