@@ -1,147 +1,162 @@
-Return-Path: <netdev+bounces-245449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFD96CCDB9B
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 22:43:33 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC9E2CCDC6F
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 23:21:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6266730084E2
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 21:43:27 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id DB08D300CD6C
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 22:21:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2873329C7A;
-	Thu, 18 Dec 2025 21:43:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B39912E7BA3;
+	Thu, 18 Dec 2025 22:21:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K7eNDPVP"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="P6ktwkNQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f66.google.com (mail-ot1-f66.google.com [209.85.210.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12427332ECB;
-	Thu, 18 Dec 2025 21:43:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03D9D2D97AA
+	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 22:21:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766094206; cv=none; b=T6Y3n3Xw+dMXhcwINqF8IWJd8JQnZDqdURCnnxJuJNOeHS64HOyharvZYL1x6DfnLSMDt+afAKjC+T1y+sjLIAKABD13kFHCOS5uqh0ntPXyyr/Ul7DMKxgUTQv5ZwtTfoqZr4ANQsWAAjFuSVqNJdZKypRB/ZnArDyCAKK6LqQ=
+	t=1766096494; cv=none; b=ZqhJbfW1oiv6IxgEo3/db3G9b9Iei89RBTbxZApI5n97wW2UNNiz32kh0cRS3q+BVwW+EbomkXBvrdvLJuMfVSv7Qy0eAIQ4yYA6IZGjnfddeVAOXOD+nh9NVqmb9iV4vyxZsQPoCMhM17/ot4DHD0DZsLg5JgVj/uTQcgnGpKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766094206; c=relaxed/simple;
-	bh=BRaSFUALDAenYjZvPbVGgRX4WEahlNYz80Rfl+B6ISc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RrxBrvPJ36d6U2YZD205BVxlmqUR4MF5C0AzqPcqq7UAisYHU9bbbxO8UcX5OfjrLSQLeqoZEHnQG8H1NihY5TIhlCiSHAXZnUWJwGStOLY9jL4U2c93ZVuXZN+ZvWxwOL2IADceu3KpVbch9JZW2v3r1giJUKkw8x0MWbyRMGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K7eNDPVP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38E02C116D0;
-	Thu, 18 Dec 2025 21:43:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766094205;
-	bh=BRaSFUALDAenYjZvPbVGgRX4WEahlNYz80Rfl+B6ISc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=K7eNDPVPaqNxeefb6xOXgXi9Yy/aRTOhC2ntsaCci5BB7i5sM/pwxs2lxPTpUZXcq
-	 MXFhUD0Yit1Yzj8f4P7yDpOtRDq22j987ViSEQjGQSeLVamvBBrKHpAo5kUZQ1VNnJ
-	 fnRj1TcxvBh5TPJ2j2BpA5UxJfRaa0q8Fm5GN80sXcIgq7wPWATSY8D7m/tFP0ontb
-	 zo8on1RSiRmTwG9lNS7RmZmS244/KvbUBUxTh8/4xjfulQB/vRycoDPq3tGPZ+hKae
-	 FvRxZct9zOs1h9Y6WH7sxaXMNrr2xs9TQXkwlOI0kHcy1Dc5npFC5EVIhMzM+H9Nq0
-	 nBMkmPvz74Cvw==
-Date: Thu, 18 Dec 2025 22:43:20 +0100
-From: Alejandro Colomar <alx@kernel.org>
-To: Alyssa Ross <hi@alyssa.is>
-Cc: linux-man@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] man/man7/rtnetlink.7: document ifi_change
-Message-ID: <pni77nbzp4wi5p6yhe6j25bnyynebp66gujb2h5hknox3rlcwp@wz3smeklju22>
-References: <20251218185452.88205-1-hi@alyssa.is>
+	s=arc-20240116; t=1766096494; c=relaxed/simple;
+	bh=3WEOOBTimDyvI1edV6ZuvzqFIskxf4gd81QTKphek3k=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=SzGZccDJp7yruOf+f/oUrb+kyV9NKhkF1y19f6kZPbSZ811SHlHjqq244SAGdi3sqPY2yLFlkyp8D77C1dnivyUdr44cCFs2MkWDeRMZmy8aNFoKHNqsKclO3nMoL6INtIr+MZPI30xDqRKlyUvtzDZBFg/D915un8CLKNSnTao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=P6ktwkNQ; arc=none smtp.client-ip=209.85.210.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-ot1-f66.google.com with SMTP id 46e09a7af769-7c750b10e14so419920a34.2
+        for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 14:21:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1766096490; x=1766701290; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zQWK63y9E1OcVkpznLAWrv5TZ9nCwP1KJH375ok1pZM=;
+        b=P6ktwkNQ5QsM48RTmHDrxzCHHEtEoGLeSvpArvAfVLXorUvMfspyhQQ4EPoD3jvCeN
+         AaHeJ2ohMSWy2i/R6NilLjwzYi7dUhJO0Okwb1fruks9HTK9xmnHntsIQHBOPFhu72cO
+         ybP8XGr/kE2lOFcTMiY7wxA/P2r980lDZk/dymy5xtapohUeNXjA+EBHlWjzLcOE0Z1T
+         PHayrMUZRYBD03wzbN0c9xXICROZbECdzEGOX5cOOwyfedv06KrbYj8urOITrHOD37qF
+         ls4rCupjaj18UlV+YG/z7eu7vEcQimC5OkBrfdH1kVGUAnjzFER7HriBL9vkJVKTgDJU
+         ExgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766096490; x=1766701290;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zQWK63y9E1OcVkpznLAWrv5TZ9nCwP1KJH375ok1pZM=;
+        b=mFVDCC7IQAcJJLqYcT5LLfFJxFPDBj8Xscd2nQuFmhwgGg3bLh8PkYNd2vFuuawJma
+         KSlLqq2/oyPv6aOf+8eWPeVc64Z/WvDw4Fu47jMxakileUy0s7dLm7CklQT60FhbH3b5
+         31w/ZfWn/sops90Gdpa2uFojwT0sy9OLmAG1nE5/fbOOxYWhnUAs4IfWuENiaFPkR524
+         lRQYVQNdIh0qIWE3lYqCU4MeC+kvoW5ZXJLjnM9RyIhTIG5LQ5Ebu+/E2kTAtPe95Kw5
+         2GA1bauiCMzvJ98Cl+CyvCaqG429MFjliyiDzMSetblPxD+EIR8O6W1xqnICU8V0G6p2
+         D1WQ==
+X-Gm-Message-State: AOJu0YxupJVGgcIfFHeYmAFsUII82Kh0dWKLM9cXKfpqr2cS2+H6mjt7
+	RYxL78oR2dUu2my+jh2wEI6OKp32fnFFuxTlR4NSguR2Na9uhPQnwqEr+ojXfhKOY4x0+UNXV+R
+	sSg0AMN3e4g==
+X-Gm-Gg: AY/fxX5Oq+oFd7VmWwqcVwhnG+3+eROg+MuHWYFulyDPRcn9xQx056JkhGmc1PxFASF
+	AlL5ed+6VTaTDX4fRH7chpadQ9IMI7Nwa2nDoKShwVpOHwbxryjSuFsDwSdB/y0Q4c+diDSAWYX
+	KGjofb2hKfJCBs7M+SxNqPUs/TQIJ/nXb5wQuZEYJ5vM2dfeClkd80reTw650nai9dzNeKGRJEL
+	rAKd8VBsPjCNh11XIha+usylI4lLHblItq4qGEK90n+JWMPTOR3wdZ9K8oiUjZcnqhc8Zbgipfr
+	y7H/se57FDaCHGVDY4RpzliMWJ1vr+NNlHv2M0R/zdnY+UvmgdKNbV2lzjs+JdtFml8Di5BUuyU
+	ILDotZDDI636BqCqoS6BYAWfi4nfUtUsE9ITE9EAbBJRIGicBsj8CKMth6GbVH4JnODVl1+/io3
+	ZtYIWcteUG
+X-Google-Smtp-Source: AGHT+IEQ438WpetCan+wwE5um9TfPU1PFj1eNW/mV2nLvViqOs/wgUL+95TMY8z7MDOjWeTHk/fGZw==
+X-Received: by 2002:a05:6830:4c08:b0:7c7:65f4:1120 with SMTP id 46e09a7af769-7cc66a6f068mr519653a34.23.1766096490504;
+        Thu, 18 Dec 2025 14:21:30 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7cc667ebe98sm472901a34.21.2025.12.18.14.21.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 18 Dec 2025 14:21:29 -0800 (PST)
+Message-ID: <07adc0c2-2c3b-4d08-8af1-1c466a40b6a8@kernel.dk>
+Date: Thu, 18 Dec 2025 15:21:28 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="25amakqgzrurdo4e"
-Content-Disposition: inline
-In-Reply-To: <20251218185452.88205-1-hi@alyssa.is>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: netdev <netdev@vger.kernel.org>
+Cc: io-uring <io-uring@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+ Willem de Bruijn <willemb@google.com>, Kuniyuki Iwashima
+ <kuniyu@google.com>, Julian Orth <ju.orth@gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH v2] af_unix: don't post cmsg for SO_INQ unless explicitly
+ asked for
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+
+A previous commit added SO_INQ support for AF_UNIX (SOCK_STREAM), but it
+posts a SCM_INQ cmsg even if just msg->msg_get_inq is set. This is
+incorrect, as ->msg_get_inq is just the caller asking for the remainder
+to be passed back in msg->msg_inq, it has nothing to do with cmsg. The
+original commit states that this is done to make sockets
+io_uring-friendly", but it's actually incorrect as io_uring doesn't use
+cmsg headers internally at all, and it's actively wrong as this means
+that cmsg's are always posted if someone does recvmsg via io_uring.
+
+Fix that up by only posting a cmsg if u->recvmsg_inq is set.
+
+Additionally, mirror how TCP handles inquiry handling in that it should
+only be done for a successful return. This makes the logic for the two
+identical.
+
+Cc: stable@vger.kernel.org
+Fixes: df30285b3670 ("af_unix: Introduce SO_INQ.")
+Reported-by: Julian Orth <ju.orth@gmail.com>
+Link: https://github.com/axboe/liburing/issues/1509
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
+---
+
+V2:
+- Unify logic with tcp
+- Squash the two patches into one
+
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 55cdebfa0da0..a7ca74653d94 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -2904,6 +2904,7 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+ 	unsigned int last_len;
+ 	struct unix_sock *u;
+ 	int copied = 0;
++	bool do_cmsg;
+ 	int err = 0;
+ 	long timeo;
+ 	int target;
+@@ -2929,6 +2930,9 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+ 
+ 	u = unix_sk(sk);
+ 
++	do_cmsg = READ_ONCE(u->recvmsg_inq);
++	if (do_cmsg)
++		msg->msg_get_inq = 1;
+ redo:
+ 	/* Lock the socket to prevent queue disordering
+ 	 * while sleeps in memcpy_tomsg
+@@ -3088,10 +3092,11 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+ 	if (msg) {
+ 		scm_recv_unix(sock, msg, &scm, flags);
+ 
+-		if (READ_ONCE(u->recvmsg_inq) || msg->msg_get_inq) {
++		if (msg->msg_get_inq && (copied ?: err) >= 0) {
+ 			msg->msg_inq = READ_ONCE(u->inq_len);
+-			put_cmsg(msg, SOL_SOCKET, SCM_INQ,
+-				 sizeof(msg->msg_inq), &msg->msg_inq);
++			if (do_cmsg)
++				put_cmsg(msg, SOL_SOCKET, SCM_INQ,
++					 sizeof(msg->msg_inq), &msg->msg_inq);
+ 		}
+ 	} else {
+ 		scm_destroy(&scm);
+-- 
+Jens Axboe
 
 
---25amakqgzrurdo4e
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-From: Alejandro Colomar <alx@kernel.org>
-To: Alyssa Ross <hi@alyssa.is>
-Cc: linux-man@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] man/man7/rtnetlink.7: document ifi_change
-Message-ID: <pni77nbzp4wi5p6yhe6j25bnyynebp66gujb2h5hknox3rlcwp@wz3smeklju22>
-References: <20251218185452.88205-1-hi@alyssa.is>
-MIME-Version: 1.0
-In-Reply-To: <20251218185452.88205-1-hi@alyssa.is>
-
-Hi Alyssa,
-
-On Thu, Dec 18, 2025 at 07:54:52PM +0100, Alyssa Ross wrote:
-> This hasn't been "reserved for future use" since Linux 2.6.22 (commit
-
-lol!
-
-> 83b496e928db ("[RTNETLINK]: Allow changing of subsets of netdevice
-> flags in rtnl_setlink")), and it's used by iproute2.
->=20
-> Signed-off-by: Alyssa Ross <hi@alyssa.is>
-
-Thanks!  I've applied the patch.
-
-
-Have a lovely night!
-Alex
-
-> ---
->  man/man7/rtnetlink.7 | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->=20
-> diff --git a/man/man7/rtnetlink.7 b/man/man7/rtnetlink.7
-> index 56cb79bca..6e873dc71 100644
-> --- a/man/man7/rtnetlink.7
-> +++ b/man/man7/rtnetlink.7
-> @@ -83,7 +83,9 @@ is the unique interface index
->  message, thus creating a link with the given
->  .IR ifindex );
->  .I ifi_change
-> -is reserved for future use and should be always set to 0xFFFFFFFF.
-> +is a mask specifying which bits of
-> +.I ifi_flags
-> +should be applied to the device.
->  .TS
->  tab(:);
->  c s s
->=20
-> base-commit: 46950a0845de91c422efe6c639091ace42cb92f8
-> --=20
-> 2.51.0
->=20
-
---=20
-<https://www.alejandro-colomar.es>
-
---25amakqgzrurdo4e
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEES7Jt9u9GbmlWADAi64mZXMKQwqkFAmlEdXgACgkQ64mZXMKQ
-wqkgHRAAn/b9/PPmVRYjMmhTyLKTP2d+oTgDGYH0RPTYf7aZH0NcMPd7ui+KssFa
-Z1oXx/GUu/IqF8kjQNgHjtwHW6YrADOHoUMqbTrq4STRrNuXkfpBUcbKY77+Frl5
-OHOwLhZ2wXTitR0TSlmJEtfiUob0RFSTkWjvK/BovdVguwMaVx6L0KfKQtYc25MP
-QUR7n8kcITbOSJ6QGQCCJu2Z1mb7FouZmQIyWq2S5zXOBFGfS0NupKAwIGl3v3jR
-PDdtM4UjmEHdBbkMqrp/+L1HglRIYALAn5+gT7N6cRE2qg2c/wF5yhGfeutHkzBG
-U+4EwwcEyG+9B1dyQHXfVEXVZjiJaeH5dq3C0p0Feb7PxFCWED5MzxCJNFrdd57e
-9SegmnSTj2aku91dyeZFm3FeBwZXo+CL4iXiTkdtrsCuvzKON0nugKGsZW1V20Ll
-m4BIyd2aiadNEZjAXIlNqwAsNJHWxpK0yn/9lFqEX4CPIL6nR3HL9ShlIiLuGLvM
-EeGgnWGfUMm7pGNIPD0gJKu9T+gbjlCXIls5lRYPOxrcQBwo58bE823ui8faAsaZ
-JHRUwZTIeinjQYHkESzwrdOJchVNVK6GqwRYp4zNgfEPBDd07h29dHP4M2AcyTC7
-AqPYzVoAY8Gh1dXku41lnrP+Bog+Pw+mzRi7yB/0ZCokZstDxaA=
-=eLOH
------END PGP SIGNATURE-----
-
---25amakqgzrurdo4e--
 
