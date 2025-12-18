@@ -1,137 +1,139 @@
-Return-Path: <netdev+bounces-245433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3CECCCD2AE
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 19:28:05 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA364CCD499
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 19:57:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 3DF6E302ACD8
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 18:28:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6A65A300FE1B
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 18:56:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B3BB3161BB;
-	Thu, 18 Dec 2025 18:28:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB3E02D6E66;
+	Thu, 18 Dec 2025 18:56:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xj1cMl8Y"
+	dkim=pass (2048-bit key) header.d=alyssa.is header.i=@alyssa.is header.b="YDKZ+GRb";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="nD31AYW2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D30D13126BE;
-	Thu, 18 Dec 2025 18:28:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2B18301026;
+	Thu, 18 Dec 2025 18:56:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766082481; cv=none; b=n5AWmQp12d/c/pYZj6AuOShhiDCKGRn7Z6HkifbytwKF+/qVKk+q39csVJrYlmVCcqj6FFyXuuVqBYBkI0/1JrJGJEMmtod0dHI20QhWdgJDmZRcg/prUr4hDSEmbtG4Gue0MhzPEJXd/wq4bZAiTZEgeBDDJ2IR9+kGQ3yRynA=
+	t=1766084202; cv=none; b=XSFDytTHKH/c1IqyEtBaNmxtaFZeJIIHUvEuKW0xCYBzjDHh3oNwwI+q+oL+r8zVdCaKzwRiv7MPeZUAT+7Q0wMDONx1ovvA3TGKcaG2j6i1tGqMwEMpxiGs6+coBuTSp/8Rmy3JEHu2PPzoZOfK0ZaFPYnG8yJXFg/aWIxgKy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766082481; c=relaxed/simple;
-	bh=sOmCQApvY7MQRYUL2cFCwah6QCaJh7ECm+G7QeKmctY=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=JrNhHMBnGMttyPq6kW0t7rZU/EYMoSedtKpaC+0Lb3fefa8LPBpBK+VphI9tmFy2sg68mLfT2ZyX6VhLn0/cDWI/e4Eiw9wk8ozzNYYgmRyXCNXX3PVAdjl5sgYwdCc4ZfEuOQcvSltFLCPE/JWKPOyknyb69R/0Tkux6axa6Cc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xj1cMl8Y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D059C16AAE;
-	Thu, 18 Dec 2025 18:27:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766082478;
-	bh=sOmCQApvY7MQRYUL2cFCwah6QCaJh7ECm+G7QeKmctY=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=Xj1cMl8Ys+hcTQuaHtyW5wOtmtfENQ+tqKZMOapXSpCwOtxGOozC0iJeUNeqLloes
-	 XaWNDFVC55YOSnmsYPGsIT/f7SXmTbzktIuUhRNOp0N4I1sKn8E+3gakiYZbcF5gKS
-	 V+BgW7thdQr91U+QbK5vN8uj9JV1LrinrXBtDzGkYmsXTogtteboRvztMQlL+5ZPJY
-	 m+fX9O4G8b5BlmEfS6fbb3/pIZHY1NaiJsnNFGlKIbZxx7GxyDmB+s2f+YvDqL39QG
-	 bECeZKOaiTimQV0unnNo9zzwjqdIjBIfmUl6Ackzbk2jofCGMvnPSI6xXTpISIDIY8
-	 m7KcF/h8efwKw==
-Content-Type: multipart/mixed; boundary="===============3549994344081258731=="
+	s=arc-20240116; t=1766084202; c=relaxed/simple;
+	bh=MYDns1bWsdKBN6BLGCUUCrhm48+lQ8wYXyWftYPrFQw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mBMPh2u4mowTZKJ2YGjagmxT40teIEndBVRp8dmkZAuvMiMN5F4RgR+kIrHg/cPUsiPbi6SUosHZUOdDCpPY4uEQYv5SQ9lQRITbZtIFL7bjUjPyGiCNBNCmVZbxXKzHA/XUgO+10w/jNmsPpXa1J36M7PsN18cqySWLcndn4C4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alyssa.is; spf=pass smtp.mailfrom=alyssa.is; dkim=pass (2048-bit key) header.d=alyssa.is header.i=@alyssa.is header.b=YDKZ+GRb; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=nD31AYW2; arc=none smtp.client-ip=202.12.124.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=alyssa.is
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alyssa.is
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id A40957A007C;
+	Thu, 18 Dec 2025 13:56:38 -0500 (EST)
+Received: from phl-frontend-03 ([10.202.2.162])
+  by phl-compute-05.internal (MEProxy); Thu, 18 Dec 2025 13:56:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alyssa.is; h=cc
+	:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm3; t=1766084198; x=1766170598; bh=qXc2kEnUqVBs0sS7R27Ay
+	Hw6BXGydL4BD/S4wVan/pE=; b=YDKZ+GRbytEzwGMx5NI2tx+mcy/qxypeBtmu+
+	DtN8hU2Ybuk2FYTgcPM1gwfluIKM6PVJ98mmFudEChj5YC7vyBFKCkV2xTYacNPf
+	f+tiSQ1U/SBn7yP4qFSV/BG2M+xxS3qN7LVhlHpIPFRkuqzgV6Wv4ysBG/cO9knO
+	UXERnUIrnIjURqk4oj6hr/wMj9vyd+ov19QaFVwBIg2sxQO6jec3DQD8S+S5TVje
+	klJSJY2/5kNZoOxkAjvHyZS38fWwfjc7uWPj30jaWHE4TGpMxpSJZ7CaPdpdEiAu
+	wH6E2Z2AUOaTvCZYxZTxxx2+KaLjfcFqXPf1YZmyLJ/WOyh9w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
+	1766084198; x=1766170598; bh=qXc2kEnUqVBs0sS7R27AyHw6BXGydL4BD/S
+	4wVan/pE=; b=nD31AYW2PmLaew5flrNcRgNMSznTl12N/llkz1kfvFWsWMgyKzm
+	Sw+itEDu7vaDHepx2jgAHVrBMM4/TzOLjMw6Ds/KCPjjWe/+EiDXp9bhHPCuTUSP
+	hSADH+ByESrVR8zUnfALW/K6BcA8CnrRi4niyleWpCP6NN31CBm1jd/6EGCeEuty
+	nLW/7vBDbhEEd+lptV91YEwUq/6/rRd9AH5K02GwHJcQ/s9Hyp9PSAtHQuvzZd7Y
+	b9X5UZq7LdXKCcnzBxrWLBLog1ZombOry8xtFvSixLXcML5fBCj+Nj6zf+MEQoxf
+	sB/kvriv0/Q/YpHi3P/fTZBzXXXoG+NgqnQ==
+X-ME-Sender: <xms:Zk5EaW1le2n6tf4yn2dqffoul1omGGW1BsrQmC2_MlKPV7lGADYxJA>
+    <xme:Zk5EaZjTx97Uj-mDpsLzDbQFwUSz75FedygPuPaEq5iwNiUg8ntKc6mbAZ8UFP2s3
+    peT7GcTJdooFPSBiSXrkbu0lXXADzoxmp3lqub2BlnEfcJCpn7TAKA>
+X-ME-Received: <xmr:Zk5EafmjVgx5Hf_14ZHl3u7K5h3zuo_V6DZvtUIkg4Ck2c4sYDUqlcv0aEza3Fqvvk9lX7dVeLadhFXoJeSRHZySNuTzEFbmyJiHsw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdegiedvtdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeetlhihshhsrgcutfho
+    shhsuceohhhisegrlhihshhsrgdrihhsqeenucggtffrrghtthgvrhhnpeehkefgtdevte
+    dtkeduudeguefgudejheeugfelgeettdfhffduhfehudfhudeuhfenucevlhhushhtvghr
+    ufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehhihesrghlhihsshgrrdhish
+    dpnhgspghrtghpthhtohepledpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepuggr
+    vhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesgh
+    hoohhglhgvrdgtohhmpdhrtghpthhtoheprghlgieskhgvrhhnvghlrdhorhhgpdhrtghp
+    thhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhusggrsehkvg
+    hrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhr
+    tghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpd
+    hrtghpthhtoheplhhinhhugidqmhgrnhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgt
+    phhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:Zk5EafZtjafkIYVipOuRaRtN3BpAICSr4Um0X9xpQ3dStwXOVBVE4g>
+    <xmx:Zk5EaaEOcY7ANSbFyBMsTeZHzCWSmt81-fVL1z84Nsbe32l1FsbQOw>
+    <xmx:Zk5EaebhKIQCnp85EJ6xVfXR_Fv4Uu_BKRV2dXNe-N64dPY2L3K02Q>
+    <xmx:Zk5EaeyqghCsTaaPS8MQn7_UAmIN-P-3Vh088vUUOVkhXacngEaYEg>
+    <xmx:Zk5EaVHoQO-HAc73B9VaLe_35wcJwJfljF20jOc-ljqly8fTz4idRBxh>
+Feedback-ID: i12284293:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 18 Dec 2025 13:56:37 -0500 (EST)
+Received: by fw12.qyliss.net (Postfix, from userid 1000)
+	id 14FEF7CD84A3; Thu, 18 Dec 2025 19:56:35 +0100 (CET)
+From: Alyssa Ross <hi@alyssa.is>
+To: Alejandro Colomar <alx@kernel.org>
+Cc: linux-man@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] man/man7/rtnetlink.7: document ifi_change
+Date: Thu, 18 Dec 2025 19:54:52 +0100
+Message-ID: <20251218185452.88205-1-hi@alyssa.is>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <fe0e4007f3dac99d114d50ed365885795aa2c22f648e72b57c5ff7e8762f57ce@mail.kernel.org>
-In-Reply-To: <20251218175628.1460321-6-ameryhung@gmail.com>
-References: <20251218175628.1460321-6-ameryhung@gmail.com>
-Subject: Re: [PATCH bpf-next v3 05/16] bpf: Change local_storage->lock and b->lock to rqspinlock
-From: bot+bpf-ci@kernel.org
-To: ameryhung@gmail.com,bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,alexei.starovoitov@gmail.com,andrii@kernel.org,daniel@iogearbox.net,memxor@gmail.com,martin.lau@kernel.org,kpsingh@kernel.org,yonghong.song@linux.dev,song@kernel.org,haoluo@google.com,ameryhung@gmail.com,kernel-team@meta.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Thu, 18 Dec 2025 18:27:58 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
 
---===============3549994344081258731==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+This hasn't been "reserved for future use" since Linux 2.6.22 (commit
+83b496e928db ("[RTNETLINK]: Allow changing of subsets of netdevice
+flags in rtnl_setlink")), and it's used by iproute2.
 
-> diff --git a/kernel/bpf/bpf_local_storage.c b/kernel/bpf/bpf_local_storage.c
-> index fa629a180e9e..1d21ec11c80e 100644
-> --- a/kernel/bpf/bpf_local_storage.c
-> +++ b/kernel/bpf/bpf_local_storage.c
-
-[ ... ]
-
-> @@ -382,7 +390,10 @@ int bpf_selem_unlink(struct bpf_local_storage_elem *selem, bool reuse_now)
->  	local_storage = rcu_dereference_check(selem->local_storage,
->  					      bpf_rcu_lock_held());
->
-> -	raw_spin_lock_irqsave(&local_storage->lock, flags);
-> +	err = raw_res_spin_lock_irqsave(&local_storage->lock, flags);
-> +	if (err)
-> +		return err;
-
-This change makes bpf_selem_unlink() failable, but bpf_local_storage_map_free()
-calls it in a while loop that continues iterating while hlist_first_rcu()
-returns elements:
-
-    while ((selem = hlist_entry_safe(
-            rcu_dereference_raw(hlist_first_rcu(&b->list)), ...))) {
-        WARN_ON(bpf_selem_unlink(selem, true));
-    }
-
-If bpf_selem_unlink() fails (returns error), the selem is not removed from
-b->list, so hlist_first_rcu() returns the same selem again. Would this cause
-an infinite loop printing warnings until the system becomes unresponsive?
-
-[ ... ]
-
-> @@ -719,7 +743,7 @@ void bpf_local_storage_destroy(struct bpf_local_storage *local_storage)
->  	 * when unlinking elem from the local_storage->list and
->  	 * the map's bucket->list.
->  	 */
-> -	raw_spin_lock_irqsave(&local_storage->lock, flags);
-> +	WARN_ON(raw_res_spin_lock_irqsave(&local_storage->lock, flags));
->  	hlist_for_each_entry_safe(selem, n, &local_storage->list, snode) {
->  		/* Always unlink from map before unlinking from
->  		 * local_storage.
->  		 */
-> -		bpf_selem_unlink_map(selem);
-> +		WARN_ON(bpf_selem_unlink_map(selem));
-
-If raw_res_spin_lock_irqsave() fails, WARN_ON() prints a warning but does
-not prevent execution from continuing. The code then proceeds to iterate
-local_storage->list without holding local_storage->lock, and eventually
-calls raw_res_spin_unlock_irqrestore() at the end without having acquired
-the lock. Does this cause issues with the rqspinlock held-lock tracking,
-which unconditionally decrements its counter in res_spin_unlock()?
-
-Additionally, if bpf_selem_unlink_map() fails, the selem remains linked to
-the map's bucket list, but execution continues and
-bpf_selem_unlink_storage_nolock() removes it from local_storage->list and
-adds it to the free list. When the selem is later freed, would the map's
-bucket still hold a dangling reference to it?
-
-> @@ -734,7 +758,7 @@ void bpf_local_storage_destroy(struct bpf_local_storage *local_storage)
->  		free_storage = bpf_selem_unlink_storage_nolock(
->  			local_storage, selem, &free_selem_list);
->  	}
-> -	raw_spin_unlock_irqrestore(&local_storage->lock, flags);
-> +	raw_res_spin_unlock_irqrestore(&local_storage->lock, flags);
-
-[ ... ]
-
-
+Signed-off-by: Alyssa Ross <hi@alyssa.is>
 ---
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+ man/man7/rtnetlink.7 | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/20346662777
+diff --git a/man/man7/rtnetlink.7 b/man/man7/rtnetlink.7
+index 56cb79bca..6e873dc71 100644
+--- a/man/man7/rtnetlink.7
++++ b/man/man7/rtnetlink.7
+@@ -83,7 +83,9 @@ is the unique interface index
+ message, thus creating a link with the given
+ .IR ifindex );
+ .I ifi_change
+-is reserved for future use and should be always set to 0xFFFFFFFF.
++is a mask specifying which bits of
++.I ifi_flags
++should be applied to the device.
+ .TS
+ tab(:);
+ c s s
 
---===============3549994344081258731==--
+base-commit: 46950a0845de91c422efe6c639091ace42cb92f8
+-- 
+2.51.0
+
 
