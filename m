@@ -1,74 +1,76 @@
-Return-Path: <netdev+bounces-245273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4A69CCA1DF
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 03:59:44 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 370B5CCA1EB
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 03:59:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B0D6D3017EFC
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 02:59:43 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 9DBB13014F48
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 02:59:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C5D32BEFE3;
-	Thu, 18 Dec 2025 02:59:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDF562FB99A;
+	Thu, 18 Dec 2025 02:59:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kf/KF8kA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HR68igvG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87F4B25DB0D
-	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 02:59:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5873C261B6D
+	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 02:59:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766026782; cv=none; b=BgJ+LnbFUgHDobBwovYXsO9iCVLsghoTU4mGZHugIw1dyAEGt8Avk6z/JbnITe9aExfO4Fi+ItEMckv61HKTHvRyTqcCHRwMWMQVfxtb0UHaFgqMBYDWPJkgBg+SGeRObFvhq8CHETLW5EanfVLLJJ7nuaMqNG9b0lTGPSAkutc=
+	t=1766026788; cv=none; b=GoAVaWZLRpEb/Y6vxuWZe5/tDn+Ost+LYbSopMguyUuitTQuRc0bmOLK0W1/2XAXQtTcldGYkT9HaQjzziRkqbqhVFQdWdCimIShQN3qat+JGXas+JLMyJ0Q71PwNZw2hE4ukixZGUXekUtGl/yOO5Zd9XlFfH5QTZ3w5+8mvM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766026782; c=relaxed/simple;
-	bh=3yJqIUEUeZVkFXlqRTAntvExydA8frPoRSgPiza+JEo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=F3eMazALVMZYycJNeE29cfFhp1RSmQt3Jx7NntjErfIMtXBET4XYaHN77eBEJP9U7go8zem4ENmFicRQNwTN6+yIXIT/7J+p2p7Mkcgyopo9822O4BO/NMRAAH4WwlC1XxD3TZA0sFlyVg3ufXICPFIBF5v9K1z3hNfxgxz2pGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kf/KF8kA; arc=none smtp.client-ip=209.85.214.175
+	s=arc-20240116; t=1766026788; c=relaxed/simple;
+	bh=WyvPve5LAklKO1fh6O+R/c1D7j2AerWk5OXJqsIwmsw=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=kf6rSjl70wsP37dNOfuT7N3ClH2KOJH+IOsw/kc+vQqk2DyJxZlu6CcZ6mQ5NQqObn9aP/oO4dRPv2ZfAo8dIBHhzBNwZQ7O8LKQ1agEyLzCU1APHVRkeRvp+dYiXkLVXBa+VkQc+Uv9vwzGqVW4T/gSpKf9IYrhAonnxMDJiuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HR68igvG; arc=none smtp.client-ip=209.85.210.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2a0f3d2e503so272265ad.3
-        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 18:59:41 -0800 (PST)
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7e7a1b08e9dso9874b3a.2
+        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 18:59:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766026781; x=1766631581; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=oEuwYEAlKeJ7VBeR49Tc0CIfJrf1FLJO2ifR5/NXxnU=;
-        b=Kf/KF8kAWAhe5SrbJeFnD4qZOL2c/yZtigs/SYDh55h1EbUoBC9GJIBicGCpo3c07X
-         s81yVmQIEsl/2MLjjtD9SPQmJtCJX2DQRdeU8J0QNV/TPn5lbN547sxxwd+qT5l9E/CL
-         JfMok/nR5v7YSLRPjIoP1Yo2ijufYx/L/bK1tmwlddJp/9e8n8LrhwxnLzVBJUcaynYh
-         zzBvzyJRDhcjJZsDrZ3oeXnDiGcSWfGeHPwMciOvQylXcZoyWPnxpg6pjUBZkJ3Kq+lS
-         ORWy70qcbdst8NI/LsfK2UOIGtm1mGBKwNu2l9ZzVYc4KhC4c1jRMpH7JHIuM4XfpUuv
-         BEzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766026781; x=1766631581;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1766026786; x=1766631586; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oEuwYEAlKeJ7VBeR49Tc0CIfJrf1FLJO2ifR5/NXxnU=;
-        b=bFRbOb+xJiAzF0YJL25IIaac21JX4LY4HdOGkOQfMsJtEBK6l39o18wXjh2FKXA1KE
-         eNifinXiKi1SQxx2VXjNtjNCMLUoCkodfzNsIkPzx3f+Q1ZorZYHVRl1Rpc3/UbeOxAn
-         UJfGiYlIUBP8V0cFZKyOqKw3Tu+TjPVxazI1ziU6yxpgEeAlhTiK4UkZgYtp3JP5mUCM
-         d851fj4UnWL5aODUgqtXHqZk7o6lhKNNz9z2A9sdprb2llBaGtix+zHg3JWfkL3OemM4
-         pbVkpynOqReceHm8tFK++CNI+1Fy5F5gd1Fdl2LRS6BtlBWrPNjLcq/LaASUx0V4VmMN
-         PXdg==
-X-Gm-Message-State: AOJu0YwLh/I88oFpf00tZFj0G8WLWxcPz6JFo1ZKXJXQcg/RjxCkG/wJ
-	XEpqmNU0ETJ3F4OD9AGJZKX6JsrxR/trZsfxtkLryTcW76XXcEXqJbfDHpr9jFo5
-X-Gm-Gg: AY/fxX7jMq4NpjP0Oya+JCka3WrjFGBw6U12FuBMC77IM4ZEDwZ8CmkQzEIwHbxW7DJ
-	OUH7L2kIfgeGD0bj51oBMnBBmepdsTH/px8QZTGIkfQwUtdxFQpiivKp471qVSfoaaWnIz1eNSt
-	GPdOuwcnqy67+4S3ZHr/LH+IDQfnYn2DGj68zmcR705nclVwbVU16Sa8VWGFc4ocvaf1r/V7M2w
-	2+3NvypoaqRx0hBAN0aqAzgCIOlIl7AcRjSs9ASuAaHJjIccflHCVU7/OytyetUDKIzFmkeqiY+
-	IFPuOGzdPtLJblMhgmpugaUYsBogtW3uZNvIV04h5raTh6W1FLH2CMngi8clqxH/Ijd4bZoM0L7
-	ZaVb6XT6TRS1o+pTS4nTsetjfrZd1++of40V7KkXjxI/CaqYOLE84+buf5+AoyqBHdAW7fd0N9s
-	pgM0w7/dT2/qDdKwH23nZaaDmBNXusUU+RpyDcS2iaWjr8OUE0wu9HzbtxWKZTFJaSf9faxpYX
-X-Google-Smtp-Source: AGHT+IFCBiK4vkjcQkByNE/wNdhbQo7lMtKJmkgvLn2E0ZvZv7wYpskVlyPQVdr53mJhO4ELd2OXcA==
-X-Received: by 2002:a05:6a21:6da2:b0:341:fcbf:90b9 with SMTP id adf61e73a8af0-37590b7592amr547611637.4.1766026780872;
-        Wed, 17 Dec 2025 18:59:40 -0800 (PST)
+        bh=7Ue5x/b3wE4VR3QWVURKRvM1AZio0rSlcZc+u9XE/0k=;
+        b=HR68igvGDvwNSFIYkmtguxQl1/Vx5asDPIGt5adBK10eJS/PxJ0oXVlYENeO69BtK0
+         GtsPMRqLgkbX5jzqOlW/fAWTsbcNyEDGfygWzUxXgoDKxSo09KwQTxrnm3YVkh1/2wwL
+         2GaB7VMS5ZnCWU3PJXmEorAw/FD0c8nzUJZUd69fxBI2adAJjoXQOXtj6npIAotH6jZA
+         5bf9vd4SlHn+kGbXJYs8b1Hk6MRNPvKCYv7GiaEB3lLkgKKA/QX8JZM4MZo193YHIz6k
+         7VIMyaHuGk8S7ROoebHc188c4bMXtIGTNR9oG48A4lMTcLzeMG5S+snbpz1zW8Ce1AHp
+         G30A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766026786; x=1766631586;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=7Ue5x/b3wE4VR3QWVURKRvM1AZio0rSlcZc+u9XE/0k=;
+        b=fOxmY4sUXx++S4eBze1kEWTKDzSsMMgnClweZp+p05msTtcCcRnokjrnHJc62AMOQs
+         u9cBWvGKXxthfDgAR4BEB5q7dUfxKWPUPGPV9qc8O9DGEAT7CTICWkCQPhrFkFGZZboS
+         x2hd3Cd9NiV5khExpMCGdLGm4A3xssmKcwuQNLflV58r7o6Ix6Eaa27Sz21x06Pg7PLu
+         m4O4GRVOf0V5fe4WL6IGIAgFjswzWLVRZc444y0iLoLNR33yoGxQFjszXvZEaYj2QHEt
+         XhroWk+W9baZ0AHSG3irZHOXQ9OiGvXp5Lutv8Y5ruoEMPf1hjWpGaPLB/IrEARbRPQT
+         gqCg==
+X-Gm-Message-State: AOJu0YwfdeDOPi6LaqRtBe93zUQTCZByhZHniTRLaONEaCwK3eBSwB3e
+	U0wrFHiZCBLhl9O5E9wR9VjEh6JGL3F+q/s4ELorjfO44GCXw5NnbrwU63PrjtoU
+X-Gm-Gg: AY/fxX4gtqbrfknep8lKJ17mfcoKuaSC9NzL0E1JLmgd7YwAD79OwXwfk7tWKjB7AiG
+	ATINvSx4gUl2e20do2mxC16UA+Zy3NfnGPV4udc51hauS/d5PDQJ3k1T8HZ6UCIibIjc+M0nHB0
+	eH39aAsnzztYtijc0nvpU/bmZRZkB3rEgfKVgJUfjrUrxROmvGs02K4nrHo9ODzPG4bIinrXmKP
+	Ff0X94mlGXnOwucnFoE71JPOYOgdIpGgOiM0ShUlrmEYJ2vl0TFWCPbDqXzg1C7Exk2RfXbYuDN
+	MNP7IT/llF41127mUmXk2w/c6vvwoJrwmQaTvB/jjSYGt/jnpVXtEGxW4u0HQoZ4yh1QkFNmc8H
+	Vc9vK3RzW07EsFME8sjEl6ol7zX01+SVxL3ZVkjakUTM/YPk918Z5C15/HlnetCjP9M6Wr2RFTG
+	6ZUFSx+GMZlmcX6PDkq6xTztSN+wUtMKeMkY73LS6ld9PLtjk1XM27FdBWBYaAjYTWhf8cXCtd
+X-Google-Smtp-Source: AGHT+IGeJ+I3A3UGPKjnq4HN6ND6861/cZnOg8n9srw8IdydNPC11hCj3XY9cF8qTnRop/yukfUIkQ==
+X-Received: by 2002:a05:6a00:989:b0:7a2:855f:f88b with SMTP id d2e1a72fcca58-7fe53bbbe23mr551826b3a.3.1766026785647;
+        Wed, 17 Dec 2025 18:59:45 -0800 (PST)
 Received: from poi.localdomain (KD118158218050.ppp-bb.dion.ne.jp. [118.158.218.50])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7fe14a5727fsm800985b3a.69.2025.12.17.18.59.37
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7fe14a5727fsm800985b3a.69.2025.12.17.18.59.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Dec 2025 18:59:40 -0800 (PST)
+        Wed, 17 Dec 2025 18:59:45 -0800 (PST)
 From: Qianchang Zhao <pioooooooooip@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Krzysztof Kozlowski <krzk@kernel.org>,
@@ -81,10 +83,12 @@ Cc: Krzysztof Kozlowski <krzk@kernel.org>,
 	stable@vger.kernel.org,
 	Zhitong Liu <liuzhitong1993@gmail.com>,
 	Qianchang Zhao <pioooooooooip@gmail.com>
-Subject: [PATCH v3 0/2] nfc: llcp: fix double put/unlock on LLCP_CLOSED in recv handlers
-Date: Thu, 18 Dec 2025 11:59:21 +0900
-Message-Id: <20251218025923.22101-1-pioooooooooip@gmail.com>
+Subject: [PATCH v3 1/2] nfc: llcp: avoid double release/put on LLCP_CLOSED in nfc_llcp_recv_disc()
+Date: Thu, 18 Dec 2025 11:59:22 +0900
+Message-Id: <20251218025923.22101-2-pioooooooooip@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20251218025923.22101-1-pioooooooooip@gmail.com>
+References: <20251218025923.22101-1-pioooooooooip@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,21 +97,41 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Changes in v3:
-- Wrap commit messages to <= 75 columns
-- Use 12-char SHA in Fixes tags
-- Verify Fixes with git blame (both handlers trace back to d646960f7986)
-- Run scripts/checkpatch.pl --strict
+nfc_llcp_sock_get() takes a reference on the LLCP socket via sock_hold().
 
+In nfc_llcp_recv_disc(), when the socket is already in LLCP_CLOSED state,
+the code used to perform release_sock() and nfc_llcp_sock_put() in the
+CLOSED branch but then continued execution and later performed the same
+cleanup again on the common exit path. This results in refcount imbalance
+(double put) and unbalanced lock release.
 
-Qianchang Zhao (2):
-  nfc: llcp: avoid double release/put on LLCP_CLOSED in
-    nfc_llcp_recv_disc()
-  nfc: llcp: stop processing on LLCP_CLOSED in nfc_llcp_recv_hdlc()
+Remove the redundant CLOSED-branch cleanup so that release_sock() and
+nfc_llcp_sock_put() are performed exactly once via the common exit path, 
+while keeping the existing DM_DISC reply behavior.
 
- net/nfc/llcp_core.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+Fixes: d646960f7986 ("NFC: Initial LLCP support")
+Cc: stable@vger.kernel.org
+Signed-off-by: Qianchang Zhao <pioooooooooip@gmail.com>
+---
+ net/nfc/llcp_core.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
+diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
+index beeb3b4d2..ed37604ed 100644
+--- a/net/nfc/llcp_core.c
++++ b/net/nfc/llcp_core.c
+@@ -1177,11 +1177,6 @@ static void nfc_llcp_recv_disc(struct nfc_llcp_local *local,
+ 
+ 	nfc_llcp_socket_purge(llcp_sock);
+ 
+-	if (sk->sk_state == LLCP_CLOSED) {
+-		release_sock(sk);
+-		nfc_llcp_sock_put(llcp_sock);
+-	}
+-
+ 	if (sk->sk_state == LLCP_CONNECTED) {
+ 		nfc_put_device(local->dev);
+ 		sk->sk_state = LLCP_CLOSED;
 -- 
 2.34.1
 
