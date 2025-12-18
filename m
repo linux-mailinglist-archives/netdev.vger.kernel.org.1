@@ -1,127 +1,162 @@
-Return-Path: <netdev+bounces-245351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71998CCBF6C
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 14:19:20 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42FAECCBFB7
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 14:24:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BEDB530778E1
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 13:16:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7C5933078A58
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 13:19:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B3E933D50C;
-	Thu, 18 Dec 2025 13:11:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0704325483;
+	Thu, 18 Dec 2025 13:19:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="auh/lOWZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I+s3WPdH"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0281B33D4ED;
-	Thu, 18 Dec 2025 13:11:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B71433468F
+	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 13:19:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766063465; cv=none; b=kbZ0C7HJ40Zrx0A5k8HKxQpTc3t60wsekBH8jztlC5JSIVu2/1uMD5er98+zojEinCu+8y0z3n0qyAnpyWMuIA7N8ilq0bI3+QtCupuKVb19Pmx38J5KQIIrCIiJUQTcvDJfrpCBYCI6JD4eJ/VayffGeuIfFjQeTQ5DVnoj1F4=
+	t=1766063996; cv=none; b=FLniTEls8Xoxa6Z/qytg4frmMvopU7Dx4BF/7AdSsIGx/li5oT8jlCmDGgxJzi0/cVt8v++3EYVykhWH/cBMBxlaqgjLY40J32ZjgzhCbgzObpQ7NammaQqjd0Vk9XdHK33BbRY8J6Hh0OBDLxEdW1V0b9lVECBecXVGd1ay/SI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766063465; c=relaxed/simple;
-	bh=9uyvVoAwaaSXEm/9xYmGIpt0UEUWAvZjSJaIIGtK1HA=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=PGImaAJKA+Ip/C0RMoanL/OVitCz1gVwA9erZ/zAYIcTxVH23c/K9VPZ8SOOtkEoaYseRBeVFREJ0sZSqx2Amo9e/BdCeWjzqcw330g85dfOl0C6YfDJOmnDixE/Y3h6msIMclmUndKWzwAW69KDz5QNV7nwxIdy9Ms7OwCury0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=auh/lOWZ; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1204)
-	id 8E7142012434; Thu, 18 Dec 2025 05:10:54 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 8E7142012434
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1766063454;
-	bh=TMw9pOTn5uAMLC86wI4i4CWFIVExYXMjnk2FqSE3yTQ=;
-	h=Date:From:To:Subject:From;
-	b=auh/lOWZJw48s3fj389H5MBMpCBhPX40WBAt94f2gxI+CHapw5KantD460lU7gjsv
-	 ie8mt3v/uBZYboYaNJMXF38NDN9CQM9i3+cuyvrMBegZfwWZgrpTg/9YNnfs5gKtaJ
-	 3RxtS4xoCboBUAUj83cZLJaMPhZrUh11vvLFg2k0=
-Date: Thu, 18 Dec 2025 05:10:54 -0800
-From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-To: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
-	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
-	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	dipayanroy@microsoft.com
-Subject: [PATCH net, v2] net: mana: Fix use-after-free in reset service
- rescan path
-Message-ID: <20251218131054.GA3173@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	s=arc-20240116; t=1766063996; c=relaxed/simple;
+	bh=EnwfDLWUY+Fw2KC3MOQ+Ckn2SxrU12E1/NErfevgd60=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EGlu/ORKzeZd4BeNJjdMSPlijPjcFZHioS57U8VSDSFNRfDqUiFfOizXUFsQkAoPn/cgA/oD9dWCyYWFFz2XWrGUhYv344zhSORgh2I5O1EGHpUFoidR0UWSKJEY9QKClU63KFe4l34gg004e7Ylm37q/DScsyXv9E/XsYycjEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I+s3WPdH; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4ed82e82f0fso6156811cf.1
+        for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 05:19:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1766063994; x=1766668794; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GPlb2PglMzu8yHMN62qZs2ZNPe5MYbdq5uqzn5IaBQw=;
+        b=I+s3WPdH3oDtJvSDLJlJfGQUz+zd+/3ADD/lN2tXkOJSCPbt2C+QFkL0RWvU1NQfGZ
+         0KUB9JpLuJULXx87q5BrsioLzvMPEkg2WmtAafVOKF9mhKlRUxhyZLhJx7hPdIIJ7rc0
+         1Af2IIsTL66sJ9Jb7j5GIG8DrcwWRL+iXHneWXjqWrFs3m+5DOwwisTuQ6VvCFrfj7g8
+         urukwfqZ5D9pr6wJS5BZSy4SneE2wGy4foeFYRyx3C5ZWn7Sz03y1XZWsvTXIepkLIEL
+         231qA/ffJDDJe2qym/Vqx0Vlb2gJbdZQgkBJFECPuaC3dQyYtNDtfg766oeWx+PXkhfQ
+         d0mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766063994; x=1766668794;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=GPlb2PglMzu8yHMN62qZs2ZNPe5MYbdq5uqzn5IaBQw=;
+        b=RakphwGjq/zRKysv0OfRBc0/bWNMiOeQodtBb72fbS5f/m/zH/L6CfmppvJdaJ+2Xj
+         BtaXztNGmfi4eQcfPEilrSV8yi3DV+8XEUQuarz0KaQu7voaWFQdqBrScQB6QhM4W9jD
+         y983pFmyMJquS9WUb7MU+lq66i3YWQwiNgOLQd6Fv6EWukKsT2k3MCmu01Ryp/VHTY3M
+         K401pASK6VsPX5nt8qq67dOg7lWR21BlFF2g/wI3lUtAdGMWLZNyaBLd5YOd2ELdyiul
+         r6EAjU7j5COfUwjkkfso7sQvkqTNsPLSYJNPWfZENmhJ4IFjDeEtLtermChwM+f9CCWA
+         fx+A==
+X-Forwarded-Encrypted: i=1; AJvYcCXPlScylTU8RjGi9GKoWV9oFPZIOtrQY6+F+9OUDf8+FJDVAc8BUs5uBTVSxQO+IP6IUT4rFEQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnGmqtBCOQ6DKRr9wIDLTwUJou6XQjmfzrJRbFgXxKpQ27l4fT
+	Ps14OwnIAJSSMJUjCNP/F0wb6JlCROqyBTBfO/PrRJkImMivYbuLfZXnBOrVugGLA7F8pmUfWwG
+	QRnP1z+BTCkFuAQWfaI5g2X3kyIfMGMX/ZLpYDwys
+X-Gm-Gg: AY/fxX4jin8kNttGDQGgHA/9jRX86VuoaDl8wbZQAM71ROFEKyPmeeKTh/up3J0d0ZU
+	AUskYwY0CsYXDq9+15JbExYGtXqjdQzqH9pxHCcpbR8vibJIXEKHcXCcfr8bQK43GwqpQq0LewD
+	3zvNW1Y8H4h1s75RIQwzJvt8vgKpoRxJ9G0DD5E45M1B/Qac4JhEZONmBS7GQ/0ndP/e+Tx1SeY
+	fknjL9KI77P1BjH/SiDGw+pjzDbxCqRIrG6bFGyGDIKFyCSfMMHNi8oySKQKsId4TN6ra0H
+X-Google-Smtp-Source: AGHT+IGeKrn1BtwRLoY8U0eN5oWs+hlpIxXID3ee3RQos5MXwugX1v1GWHX0w4TPh+5BHUQAdA3xCb+sv8UQKM0dRUU=
+X-Received: by 2002:ac8:5a8c:0:b0:4e8:b9fd:59f0 with SMTP id
+ d75a77b69052e-4f1d0628505mr285636461cf.61.1766063993307; Thu, 18 Dec 2025
+ 05:19:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.5.21 (2010-09-15)
+References: <20250711114006.480026-1-edumazet@google.com> <20250711114006.480026-8-edumazet@google.com>
+ <cd44c0d2-17ed-460d-9f89-759987d423dc@proxmox.com> <8f8836dd-c46f-403c-b478-a9e89dd62912@proxmox.com>
+ <CANn89iL=MTgYygnFaCeaMpSzjooDgnzwUd_ueSnJFxasXwyMwg@mail.gmail.com> <c1ae58f7-cf31-4fb6-ac92-8f7b61272226@proxmox.com>
+In-Reply-To: <c1ae58f7-cf31-4fb6-ac92-8f7b61272226@proxmox.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 18 Dec 2025 14:19:40 +0100
+X-Gm-Features: AQt7F2qiRiRsfonJcan7tcn11I8CO5pdAJuDG8PRTH_e2bt1Li56XNKJRilbWxY
+Message-ID: <CANn89iJRCW3VNsY3vZwurvh52diE+scUfZvwx5bg5Tuoa3L_TQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 7/8] tcp: stronger sk_rcvbuf checks
+To: Christian Ebner <c.ebner@proxmox.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, 
+	Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	lkolbe@sodiuswillert.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-When mana_serv_reset() encounters -ETIMEDOUT or -EPROTO from
-mana_gd_resume(), it performs a PCI rescan via mana_serv_rescan().
+On Thu, Dec 18, 2025 at 1:28=E2=80=AFPM Christian Ebner <c.ebner@proxmox.co=
+m> wrote:
+>
+> Hi Eric,
+>
+> thank you for your reply!
+>
+> On 12/18/25 11:10 AM, Eric Dumazet wrote:
+> > Can you give us (on receive side) : cat /proc/sys/net/ipv4/tcp_rmem
+>
+> Affected users report they have the respective kernels defaults set, so:
+> - "4096 131072 6291456"  for v.617 builds
+> - "4096 131072 33554432" with the bumped max value of 32M for v6.18 build=
+s
+>
+> > It seems your application is enforcing a small SO_RCVBUF ?
+>
+> No, we can exclude that since the output of `ss -tim` show the default
+> buffer size after connection being established and growing up to the max
+> value during traffic (backups being performed).
+>
 
-mana_serv_rescan() calls pci_stop_and_remove_bus_device(), which can
-invoke the driver's remove path and free the gdma_context associated
-with the device. After returning, mana_serv_reset() currently jumps to
-the out label and attempts to clear gc->in_service, dereferencing a
-freed gdma_context.
+The trace you provided seems to show a very different picture ?
 
-The issue was observed with the following call logs:
-[  698.942636] BUG: unable to handle page fault for address: ff6c2b638088508d
-[  698.943121] #PF: supervisor write access in kernel mode
-[  698.943423] #PF: error_code(0x0002) - not-present page
-[S[  698.943793] Pat Dec  6 07:GD5 100000067 P4D 1002f7067 PUD 1002f8067 PMD 101bef067 PTE 0
-0:56 2025] hv_[n e 698.944283] Oops: Oops: 0002 [#1] SMP NOPTI
-tvsc f8615163-00[  698.944611] CPU: 28 UID: 0 PID: 249 Comm: kworker/28:1
-...
-[Sat Dec  6 07:50:56 2025] R10: [  699.121594] mana 7870:00:00.0 enP30832s1: Configured vPort 0 PD 18 DB 16
-000000000000001b R11: 0000000000000000 R12: ff44cf3f40270000
-[Sat Dec  6 07:50:56 2025] R13: 0000000000000001 R14: ff44cf3f402700c8 R15: ff44cf3f4021b405
-[Sat Dec  6 07:50:56 2025] FS:  0000000000000000(0000) GS:ff44cf7e9fcf9000(0000) knlGS:0000000000000000
-[Sat Dec  6 07:50:56 2025] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[Sat Dec  6 07:50:56 2025] CR2: ff6c2b638088508d CR3: 000000011fe43001 CR4: 0000000000b73ef0
-[Sat Dec  6 07:50:56 2025] Call Trace:
-[Sat Dec  6 07:50:56 2025]  <TASK>
-[Sat Dec  6 07:50:56 2025]  mana_serv_func+0x24/0x50 [mana]
-[Sat Dec  6 07:50:56 2025]  process_one_work+0x190/0x350
-[Sat Dec  6 07:50:56 2025]  worker_thread+0x2b7/0x3d0
-[Sat Dec  6 07:50:56 2025]  kthread+0xf3/0x200
-[Sat Dec  6 07:50:56 2025]  ? __pfx_worker_thread+0x10/0x10
-[Sat Dec  6 07:50:56 2025]  ? __pfx_kthread+0x10/0x10
-[Sat Dec  6 07:50:56 2025]  ret_from_fork+0x21a/0x250
-[Sat Dec  6 07:50:56 2025]  ? __pfx_kthread+0x10/0x10
-[Sat Dec  6 07:50:56 2025]  ret_from_fork_asm+0x1a/0x30
-[Sat Dec  6 07:50:56 2025]  </TASK>
+[::ffff:10.xx.xx.aa]:8007
+       [::ffff:10.xx.xx.bb]:55554
+          skmem:(r0,rb7488,t0,tb332800,f0,w0,o0,bl0,d20) cubic
+wscale:10,10 rto:201 rtt:0.085/0.015 ato:40 mss:8948 pmtu:9000
+rcvmss:7168 advmss:8948 cwnd:10 bytes_sent:937478 bytes_acked:937478
+bytes_received:1295747055 segs_out:301010 segs_in:162410
+data_segs_out:1035 data_segs_in:161588 send 8.42Gbps lastsnd:3308
+lastrcv:191 lastack:191 pacing_rate 16.7Gbps delivery_rate 2.74Gbps
+delivered:1036 app_limited busy:437ms rcv_rtt:207.551 rcv_space:96242
+rcv_ssthresh:903417 minrtt:0.049 rcv_ooopack:23 snd_wnd:142336 rcv_wnd:7168
 
-Fix this by returning immediately after mana_serv_rescan() to avoid
-accessing GC state that may no longer be valid.
+rb7488 would suggest the application has played with a very small SO_RCVBUF=
+,
+or some memory allocation constraint (memcg ?)
 
-Fixes: 9bf66036d686 ("net: mana: Handle hardware recovery events when probing the device")
-Reviewed-by: Simon Horman <horms@kernel.org>
-Reviewed-by: Long Li <longli@microsoft.com>
-Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
----
- drivers/net/ethernet/microsoft/mana/gdma_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index efb4e412ec7e..0055c231acf6 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -481,7 +481,7 @@ static void mana_serv_reset(struct pci_dev *pdev)
- 		/* Perform PCI rescan on device if we failed on HWC */
- 		dev_err(&pdev->dev, "MANA service: resume failed, rescanning\n");
- 		mana_serv_rescan(pdev);
--		goto out;
-+		return;
- 	}
- 
- 	if (ret)
--- 
-2.34.1
-
+> Might out-of-order packets and small (us scale) RTTs play a role?
+> `ss` reports `rcv_ooopack` when stale, the great majority of users
+> having MTU 9000 (default seems to reduce the likelihood of this
+> happening as well).
+>
+> > I would take a look at
+> >
+> > ecfea98b7d0d tcp: add net.ipv4.tcp_rcvbuf_low_rtt
+> > 416dd649f3aa tcp: add net.ipv4.tcp_comp_sack_rtt_percent
+> > aa251c84636c tcp: fix too slow tcp_rcvbuf_grow() action
+>
+> Thanks a lot for the hints, we did already provide a test build with
+> commit aa251c84636c cherry-picked on top of 6.17.11 to affected users,
+> but they were still running into stale connections.
+> So while this (and most likely the increased `tcp_rmem[2]` default)
+> seems to reduce the likelihood of stalls occurring, it does not fix them.
+>
+> > After applying these patches, you can on the receiver :
+> >
+> > perf record -a -e tcp:tcp_rcvbuf_grow sleep 30 ; perf script
+>
+> We now provided test builds with mentioned commits cherry-picked as well
+> and further asked for users to test with v6.18.1 stable.
+>
+> Let me get back to you with requested traces and test results.
+>
+> Best regards,
+> Christian Ebner
+>
 
