@@ -1,87 +1,86 @@
-Return-Path: <netdev+bounces-245329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB261CCB880
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 12:05:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E97FCCB8E0
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 12:10:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 16C80304B965
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 11:05:48 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A003A30E64F2
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 11:06:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C071B3148C9;
-	Thu, 18 Dec 2025 11:05:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09640319850;
+	Thu, 18 Dec 2025 11:06:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FelHrbQL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R1rStvbO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 519002E7F00
-	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 11:05:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5C44318143
+	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 11:06:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766055945; cv=none; b=N8MvLYvtD54/IfuMoNIwrH+DlTahUvRNo3M9T1bR4UCNjL15gSXVOgALZ0T0INlnTMtFhygF0R9LyLa4ZNA5JGS4g4Z35/6Z+tvVZfIlijmLhV8X1vhX7h9Osk1tuBq11Nc3Nds1SnVnLzF+ef7hKweyl6GOkUk5skH4upB5Nqg=
+	t=1766055992; cv=none; b=ASqIF9hdpdjFV0pPCF0KHl9F03JQ4LurU/2ud2NhEmrc/RzbKNlgqcmEqYlKqayltn7xH/Df+PTT/dI6P+vUNiIIbu8UXvyK2+OCb6CU9cHlwRKcSBIfG1MPEEEJfXg6w3PlaIsECY0DyirTSyK7nlC0sib+lEXCXKH5S34+9tc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766055945; c=relaxed/simple;
-	bh=h3ZC/RuhXgR3ZPLee6QKXin6sxuebHRmcV4+nyImDTA=;
+	s=arc-20240116; t=1766055992; c=relaxed/simple;
+	bh=YdmSp98VOpb4w/1T9TrcnGT6vsEQNrGtK2z/qAxMy0I=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZTHzkvyBaeR3T/QREibWmtRn6IXuP243Y3X3C05QIGEYz/3drxDtjmDYHlkCAlkYq88QkhJ/hKuvdJRBDWVsz0sVqwXqeRXp/rLa00Njeg4ZYqZhXKymHrbSLPzsKCm6ygjQXd4k3mzf7t5clsk4LtuuRYb6aY3F1wr6KtUEc7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FelHrbQL; arc=none smtp.client-ip=209.85.221.41
+	 To:Cc:Content-Type; b=jRrCdVlTaFIfCKNNV9ZCggnJhLgptry5jpRmglh1+5CvSGxIWlcLToCZIq8s6tvAXRLt374pCBSQORHusF5+xszqCBO3kAXVREKLm9l5Io78ivoqnQrjgfPSISBBwfuKR6TcvgCTgbRjT0o+6AawJM07DKwyDJ3EWrBexVCOUYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R1rStvbO; arc=none smtp.client-ip=209.85.128.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-42fbc305552so368230f8f.0
-        for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 03:05:43 -0800 (PST)
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-47a8195e515so4342995e9.0
+        for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 03:06:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1766055942; x=1766660742; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1766055989; x=1766660789; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=h3ZC/RuhXgR3ZPLee6QKXin6sxuebHRmcV4+nyImDTA=;
-        b=FelHrbQL3rC/08aYzxXNVQdi0CCoEVWav/ey7XvF6e9czJX/f66K2QXXjwX981w5dr
-         W/R4LUwOrzprYLHoPyFqKCmvM3AA85alKkQNrQwBTL9gb0VjV+PeMPKcuUB1+RIMbUg0
-         FU40kkx4VrpRsoXOiX1CugngzEzM2qOQTYHh4t+iWYpMRakNb/8+y1K4UkNn87btpght
-         zcLTqGS30jes0AyieFHbG/DeP3DFIQ9ERp68j89mrAXvvXWfwC6DIoWQU80iGjMHEgwD
-         MzXhgDYgkxrpNEACRYvtlTdJ6UBeQ+fRkEWbEODa+JDCWN6retcc8+U75+AY2MEMFHGf
-         evDg==
+        bh=YdmSp98VOpb4w/1T9TrcnGT6vsEQNrGtK2z/qAxMy0I=;
+        b=R1rStvbOQr7NSeZh4jY52XZ9TB7IioGPAQfJaZpIwuJOFmpU/F/IZ95KQ76/zXVMk9
+         7Yxdn2c18SGxPHCmJ3qAOWBmBZdrvEtaFg72nchPjiKuUMs5eK2cMBdNq4w/IOPXCB4v
+         mzVzrkQunocXzAAxtQUu7sH4LwetduVJXUONeSpvVfPRW9lvWUxGfE6FVrFtF3OER0h+
+         Ac0JRvJ5k7blRXFgtXiX7qo9MTGSspytwDOqkc7LV9T2IyXJPbl1wyhAIa31NhUyg5pX
+         yFibzmySo7nPrycOgG1M8g2cyVgNY+ECaSF424ueFbOktrFEabSaExPdH5mBH3yF4XX6
+         UeZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766055942; x=1766660742;
+        d=1e100.net; s=20230601; t=1766055989; x=1766660789;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=h3ZC/RuhXgR3ZPLee6QKXin6sxuebHRmcV4+nyImDTA=;
-        b=d4d3HWBXqNXVtGba93u622zfZ9skbrR7jij0ptkJ4jzlWMGZbpXzEnRwMoNOF3p5UM
-         dw0PIffkP1xSc17wWBHCdt+PngDY04r7zYV5Gm2zw+rKHCjOnXsodzBMrir1VMvliTkC
-         Mx+T8qXJsoj/NtSUvIdfjytafzyRn00VnQIQt1kmGB7TFvLLTIBC7b9KBHXuB/OCOG/k
-         ZCOcQKkGFrhqqHhvejpkIpiPBJmMUNIxwwzCbpCBuGSSUbRdCKtW2XGoN29Vd9L8ie/b
-         OQoTsj4DhQ9nOvCQsm2yIdu9wfLpwo5DzoOV6u+jecepdMnPD8U+F3KdUCyTXbUTtcbu
-         aaCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXv/jgb/539oE7C0A8yK7fpQeVSYfi5EFMeP+bMH/AWNbswnnPKCj6j6Gb+cL6aKy3pbFhZRc0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQCEzwqpL3S9pvPxe2KGhh5DnwOpOS0Xe5dIdd5+pjTxTAIF6W
-	VyGQPkcNGr6NOqAGLTp31mrtivM+20ZZQTPEtc9ldvHJpNZ0XCbGnE0mjdcSa/BIYt4NHlT6AKH
-	zSZL1bA3r5n+FSDQCXyLTbcbuK7cNhlMgLaeSvejq
-X-Gm-Gg: AY/fxX5lnbb7NezLt1YSrD9wCKqHbQUn59tJ46R1vgqFpE5uduIV56oeeNpKDv5G59H
-	/CD99kIM8aImO0N6r6xWverSRqze8CcrA3eszs7xbpnkfJAxziYWAXPOQYaDs272Lv2SvU6TyR6
-	pnj4wcu8ZyCGR6hLK+OfMgfl4e9ke105JAk2/nm+/Qe7K7ZVZpMFCQbYmJYL0KL3Hsfkiz7A/FT
-	uyUG8DJYCBdXynrIxDfArTHDbC71yg/RG4BJqH1ZrxW9+At9xdyvXCqTVt/HQ98/AB6xqeenloQ
-	a5WUQMew7w0BzV4BDlaXIuuHsA==
-X-Google-Smtp-Source: AGHT+IGXVDKrZjp+NvvA5/qC7WPXryh3eP96No0VLbAfD0dfrQ2PK6CbEoMBAf1PoLDqcVLWFCtzxrT0EkYfUfCTixI=
-X-Received: by 2002:a05:6000:4009:b0:430:f5dc:d34d with SMTP id
- ffacd0b85a97d-430f5dcd49dmr17076013f8f.52.1766055941437; Thu, 18 Dec 2025
- 03:05:41 -0800 (PST)
+        bh=YdmSp98VOpb4w/1T9TrcnGT6vsEQNrGtK2z/qAxMy0I=;
+        b=bQWm015cyKAouFh++3B8Tli9Z5XlZGDj4dd2WDA22aZK7jj+oNFc+9XR9tcLcawm16
+         SVDx0DvGGvVzBOme2UJWX5M7Dh4seCFCcqx4gMbJaes4NmQEWC+0yo2E8gHxlvbpC5/P
+         nUQs8UwPZOpqUybZhKg0NK1ARSdoL4mV7KVN88WNB9Kh09iMrXfkDPPPsPH4waiX4Gpd
+         Mo4zXD3rN6K1UN+Keh/gmChioT5ouFwExSiU0o8K15Rn/AXgf+GraYiy7XG7SNtNLw7y
+         4A7e+emwlpArc0htL6Weq3+wCMuLA9KJeWwfECjFH0OUVhnN85O6/zXKpFUL7W9JWoKG
+         4KAw==
+X-Forwarded-Encrypted: i=1; AJvYcCW6ONWTwszgDnkuTfvghFbmTcTlF1C5Pr7GC11eGpTC3PIG1BruYoYxmoVlS0HRheP4B6bp82g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2+VTNe2f7IS+VNC/OKKYxatcFsCCu3h68uTpT5SqbDv7TH+q5
+	rYs0wlz0LnYr7Pu+DGKoWKCnFkiWQ3R9G/n/w8xJ/1Hak/0WNEdsoY76yMYROuaTFBKkoFVSMnl
+	Az/nc1uSeI46mKL3LanB09UXcU/nU/9cAJa6hCb2W
+X-Gm-Gg: AY/fxX5Y6X1mTXmfX+Ra9kL3BcTjavnDwTr2mAeEiE5UEjZm8LDayZlhANKJUGDb7wH
+	YG8DDx56q/KsZIu1PS+fiqu7xideQo0n62GeWk3/kmGq3DJV5AJd/PdPd3H/KgQSGwcw+plGOGI
+	tiwsIOxFvupei7r5HRFvGCRYTPa1tPQtCZ0aN+c0JleFtGEdmaQ+lz9ZfqvnRTlSqLFuuP4ly66
+	6rVjh7P/01e0Bx3C03d2AX3/plssZrjQfkWbBuwqrCbmX5HDX6nMmJZsL6IETX3wkvDXg7I/4QB
+	LvvF0pnARLsdo8Aetj7ayrN/3A==
+X-Google-Smtp-Source: AGHT+IHUVbI/1P7zakDM7Wi5UCm2XC9PsUzzgUmoBdz1wcDrZw0JyEjKaERyGFb8Dk6P9ewUvmrPIJy5bf6RJ2inAko=
+X-Received: by 2002:a05:6000:2311:b0:431:266:d150 with SMTP id
+ ffacd0b85a97d-4310266d59dmr10262959f8f.44.1766055988640; Thu, 18 Dec 2025
+ 03:06:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aTV1KYdcDGvjXHos@redhat.com> <aTV1dc-I5vAw6i0n@redhat.com>
-In-Reply-To: <aTV1dc-I5vAw6i0n@redhat.com>
+References: <aTV1KYdcDGvjXHos@redhat.com> <aTV1aJVZ8B8_n2LE@redhat.com>
+In-Reply-To: <aTV1aJVZ8B8_n2LE@redhat.com>
 From: Alice Ryhl <aliceryhl@google.com>
-Date: Thu, 18 Dec 2025 12:05:29 +0100
-X-Gm-Features: AQt7F2onwZDT6I3RNp-8EABXxVlAZANhhJ-GMV1t61Vpqe-l1BJnOF3T8fFh0Lw
-Message-ID: <CAH5fLgjWQ2+eG=DV-m-1ybfs_Mu1UM2Zj0z8LvU4BbE0m9NXvA@mail.gmail.com>
-Subject: Re: [PATCH 2/7] android/binder: use same_thread_group(proc->tsk,
- current) in binder_mmap()
+Date: Thu, 18 Dec 2025 12:06:16 +0100
+X-Gm-Features: AQt7F2oOZgjISObSjjmOs0kcLH0arkernyhqWoUniY0Q3NRwv2tC-Isq-vwEzQQ
+Message-ID: <CAH5fLgiYyfrwvmPyVGYD=sbsyY_2G5Z3mbfNRDa4uC2PS6iQTQ@mail.gmail.com>
+Subject: Re: [PATCH 1/7] android/binder: don't abuse current->group_leader
 To: Oleg Nesterov <oleg@redhat.com>
 Cc: Todd Kjos <tkjos@android.com>, Martijn Coenen <maco@android.com>, 
 	Joel Fernandes <joelagnelf@nvidia.com>, Christian Brauner <brauner@kernel.org>, 
@@ -101,12 +100,14 @@ Cc: Todd Kjos <tkjos@android.com>, Martijn Coenen <maco@android.com>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Dec 7, 2025 at 1:40=E2=80=AFPM Oleg Nesterov <oleg@redhat.com> wrot=
+On Sun, Dec 7, 2025 at 1:39=E2=80=AFPM Oleg Nesterov <oleg@redhat.com> wrot=
 e:
 >
-> With or without this change the checked condition can be falsely true
-> if proc->tsk execs, but this is fine: binder_alloc_mmap_handler() checks
-> vma->vm_mm =3D=3D alloc->mm.
+> Cleanup and preparation to simplify the next changes.
+>
+> - Use current->tgid instead of current->group_leader->pid
+>
+> - Use the value returned by get_task_struct() to initialize proc->tsk
 >
 > Signed-off-by: Oleg Nesterov <oleg@redhat.com>
 
