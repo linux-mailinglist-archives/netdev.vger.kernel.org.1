@@ -1,172 +1,98 @@
-Return-Path: <netdev+bounces-245444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66B00CCDA5B
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 22:12:07 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0B94CCDA10
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 22:04:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id A0531302E1D3
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 21:11:59 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 8C3E6300BEFC
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 21:04:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD3B3352F9E;
-	Thu, 18 Dec 2025 20:45:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="26V+nrVJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1E3E21772A;
+	Thu, 18 Dec 2025 21:04:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f66.google.com (mail-ot1-f66.google.com [209.85.210.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay.hostedemail.com (smtprelay0013.hostedemail.com [216.40.44.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2CBB352953
-	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 20:45:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA23A946C;
+	Thu, 18 Dec 2025 21:04:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766090704; cv=none; b=j10DSmaWX5Y2apvDu0lQds3Dnp9G10x/XMnR9IkVfFCJobQsHl00cvT6zAyZO0J2Lh3D4ywnhXA9LRrBSzzInau8T+9LBUfrqpWqQUNKAwVvSOBYwKJqA/etBliBdkrd3dbzL7y6vlJScXTOBlyIa2INlbMPLivWdhoTiHLXfiw=
+	t=1766091883; cv=none; b=Hq5TOQyJ/vc4c1Tp0rsoUg1fsRJOHQUauMfmSpn8NzaPvk9VqjNXSE+yZmeYiD1AjyHRuQmBwqNsJBihHVdKDOXJ80jJCHdPzHFiAQADm5Nx37f4UY8dlx/AOc4JzHR1n0hNjkqsxr+a5CFaZUSJ39G6uRT4x05F8cFPXPrXLJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766090704; c=relaxed/simple;
-	bh=hxdyEoRAt3GAfwhKgxiNv1wl7oVIYwsDbSGze+lKbBY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=l4oppuWKnKpBYCdnFGN4rVscvkA6BB+9ESb8CE+Z1bBPLTt8ZDF7PPpNRcPZN63wF4k4Yp7O35ckcGYwE2SihsobLtTewyqV8L7Z2YT5H9dCCb04T1NUeJQpOqirlwDpUGQmM+2f4rrIhvOvnTDPbHEeadrMTmltak3OyJi/1Kk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=26V+nrVJ; arc=none smtp.client-ip=209.85.210.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-ot1-f66.google.com with SMTP id 46e09a7af769-7c76d855ddbso317891a34.3
-        for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 12:45:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1766090699; x=1766695499; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fBCUu4u/Yok2HpILA3UQoQtwdHQIiMmu2UId7ekcYW8=;
-        b=26V+nrVJxiP+w/zAw1caldDWE03MKBpMk6JZP6PyBspw5zyQagLSfK48DHZaAex2Ro
-         HlfjYsBUK+E10MwhEM1KQ6Qv6/zWzxLqEmU8jM8d4smefiQzD8s9iF1oJzIBuRI88MiD
-         qZUrYWBgE8WaJV7TVlYS+yGPtKf4ooNMJaNzeAxLpLIvvHxANKUojSeH5JbPnS4hM+qV
-         kt+RI2zg+ocGo5sKRsOUtNUdUwatBKCyK8qaQnXEeN11E4V+CcbErbbrJqOs8ZIom9CO
-         9RVgWapbeRLZ87SnIChGNWJT2w+p+R+gJDpXkyDBgE4N5cm0UIgrmPuQSKrafsrqiWs4
-         E3+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766090699; x=1766695499;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fBCUu4u/Yok2HpILA3UQoQtwdHQIiMmu2UId7ekcYW8=;
-        b=qyFuAonLWuxZfhooEtPyBKZ4PL/HlrTuCEUa4S4VlmegloSWSB13+D7B5vHgH2UpDV
-         OrE1P19yiVeYTu77jLsXOujnT4T2VN0T45E4Q4mR8ny2iFC3kNQqFNuLe1ryWxODTQ/g
-         kc+xy2NEhCsK+bKifzRW0CwxVodt1cwDo+V3Gf5QOf8BOeQfoNyngy/bvACRoJcSbSks
-         xtzXTmrGYAjbNkB1WXVS3KpkXYxrjEPxFwoU+8mBUeXfaToQ17aJIewMkslUKxRtZP1O
-         9pu6JazfGDEdy2Evju9zEea5XKmwxkzePNfSi+2y/JBE1jTAuQ5W+qX0cfcJI8rjXxdc
-         l2Xw==
-X-Forwarded-Encrypted: i=1; AJvYcCXXQy3e1zgymDUoCRxKV80aNnreVYl+m1Dmg9IFd2G3vc1aAF6ShRSGAI/JJVajLYwz7ybGMMc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw11ZPMNyUXjN9yvRXEhtQDjuH5zsOrI5elJ5UCnHR/gCJgpSFZ
-	kB5EQs6Zzmvb8spECbAkt5JF+yMDfbnRjuC2DXPLozYzUl5kdzEgRF53vY18SJ5cpg4=
-X-Gm-Gg: AY/fxX48D7cT87IxgDczulFprVAtw+uSPMv53a7YDNjX4Fsua2qxGk37gK4cDCuC4PS
-	25HOYC40VK/CEmG+ZHAAvk79FeYew+qZzvbBoGC9ubQFPipicZyAO1c4yHRyWV4Am20pM82r0CD
-	COu0Q1joYlgRANU2cpWd+E5+VeuN1QSGSuZ6i4KobHZNafTAaUUH1MFyXzFJ6tsd6ElGa7xuxX4
-	MWPKeaJzQLgY7F11TvS73eP9kZVzdgJKvLrsin5OyL9PAdlqCXP9Ww2/h9KpOvL5cyF+b7etJYq
-	oy7r/1Gir9Nt8Dpu/3cSJXeglcZo7b1dPMRzUWvpbxkDQ+vQooroh65RC7dNIshhCEcqJ2ipqKr
-	Oy25qwh/2bZdX8+ThUQcmd4j0lAYqlqZcvZoezappvMqBMqkZfsbc6D5ndwWMHVgycU5vbJ2aRN
-	YW+00ab2k0
-X-Google-Smtp-Source: AGHT+IFawL3v6fvfLFMk3e/U9FU/svP0NWIIO/mFK6ctWIhTbkl//sTKeQF17gtp45rMIWiu0Tz81g==
-X-Received: by 2002:a05:6830:6609:b0:7c7:69c8:2ce with SMTP id 46e09a7af769-7cc66a12323mr274721a34.27.1766090699664;
-        Thu, 18 Dec 2025 12:44:59 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7cc6673bdabsm327468a34.10.2025.12.18.12.44.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 Dec 2025 12:44:59 -0800 (PST)
-Message-ID: <2ed38b2d-6f87-4878-b988-450cd95f8679@kernel.dk>
-Date: Thu, 18 Dec 2025 13:44:57 -0700
+	s=arc-20240116; t=1766091883; c=relaxed/simple;
+	bh=Ftf6V3r3Zip5ge5N9Z7hCqESZ7wtkFQLwDCe4A8VW2s=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=d70LRu0qMQxcfYOQFZUboeRf3LH0//YkRAcbe97D4w0sCRn0bGUP78SRsEsaf7enIMNfNgKvMta9REc69TkTtjKZaY891gJPIUhq6bhwOOg3K/YTJxA9uK3Km0/2grDGTwFmDHWJUNQhIG8JqEjCerJ2zWL+yme+IiGDD/u4zF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org; spf=pass smtp.mailfrom=goodmis.org; arc=none smtp.client-ip=216.40.44.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=goodmis.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=goodmis.org
+Received: from omf13.hostedemail.com (a10.router.float.18 [10.200.18.1])
+	by unirelay09.hostedemail.com (Postfix) with ESMTP id 4D0958A3F0;
+	Thu, 18 Dec 2025 21:04:34 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: rostedt@goodmis.org) by omf13.hostedemail.com (Postfix) with ESMTPA id 7E6382000D;
+	Thu, 18 Dec 2025 21:04:31 +0000 (UTC)
+Date: Thu, 18 Dec 2025 16:06:10 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>, netdev@vger.kernel.org,
+ syzbot+9b35e9bc0951140d13e6@syzkaller.appspotmail.com, "David S. Miller"
+ <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Simon Horman
+ <horms@kernel.org>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Clark Williams <clrkwllms@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-rt-devel@lists.linux.dev
+Subject: Re: [PATCH net-next v1] ipv6: fix a BUG in rt6_get_pcpu_route()
+ under PREEMPT_RT
+Message-ID: <20251218160610.788b0bf8@gandalf.local.home>
+In-Reply-To: <280b18c6-2348-426f-a1b1-8c17d229c21c@redhat.com>
+References: <20251209124805.379112-1-jiayuan.chen@linux.dev>
+	<280b18c6-2348-426f-a1b1-8c17d229c21c@redhat.com>
+X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] af_unix: don't post cmsg for SO_INQ unless explicitly
- asked for
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
-Cc: io-uring@vger.kernel.org, kuba@kernel.org, kuniyu@google.com,
- willemb@google.com, stable@vger.kernel.org, Julian Orth <ju.orth@gmail.com>
-References: <20251218150114.250048-1-axboe@kernel.dk>
- <20251218150114.250048-2-axboe@kernel.dk>
- <willemdebruijn.kernel.2e22e5d8453bd@gmail.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <willemdebruijn.kernel.2e22e5d8453bd@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Stat-Signature: 5176k8bcqhqgndosue6ob497dre74ekh
+X-Rspamd-Server: rspamout04
+X-Rspamd-Queue-Id: 7E6382000D
+X-Session-Marker: 726F737465647440676F6F646D69732E6F7267
+X-Session-ID: U2FsdGVkX1/JNyIy4Sezb99pwWameEqN+xRHKird9jI=
+X-HE-Tag: 1766091871-587984
+X-HE-Meta: U2FsdGVkX1/YEVG6Il4gdYatoVu9UEzV9c4VIQR+8tM8qV/ag0rdaZjdJ6ilvyNps+ExLg+sFZW84GuUF6wGyyWVgNjRf7JwH9J2pHSTwzsFz/QAGjCBgyLS3LI8ev9GU3aK+pYgXtK4qG8DTesiNRQNdblcDiTKOx+qrdM8lOSQ0ONfFtEp9b8akqvH7UkCnffShUJIe7LVefltziYZ75xvHmFAP345TIyFZHVzu43mjw5wxB5cqDCkUzq0EgAXpqvG2Ror7KlFXD/cSDAqwEvNKxF615TePWENsQjQgVunpL2MP2eSYXJc6KH9IGyG2huJqOtU/5E0iX5now+qpGVQBKOAKzDx
 
-On 12/18/25 1:35 PM, Willem de Bruijn wrote:
-> Jens Axboe wrote:
->> A previous commit added SO_INQ support for AF_UNIX (SOCK_STREAM), but
->> it posts a SCM_INQ cmsg even if just msg->msg_get_inq is set. This is
->> incorrect, as ->msg_get_inq is just the caller asking for the remainder
->> to be passed back in msg->msg_inq, it has nothing to do with cmsg. The
->> original commit states that this is done to make sockets
->> io_uring-friendly", but it's actually incorrect as io_uring doesn't
->> use cmsg headers internally at all, and it's actively wrong as this
->> means that cmsg's are always posted if someone does recvmsg via
->> io_uring.
->>
->> Fix that up by only posting cmsg if u->recvmsg_inq is set.
->>
->> Cc: stable@vger.kernel.org
->> Fixes: df30285b3670 ("af_unix: Introduce SO_INQ.")
->> Reported-by: Julian Orth <ju.orth@gmail.com>
->> Link: https://github.com/axboe/liburing/issues/1509
->> Signed-off-by: Jens Axboe <axboe@kernel.dk>
->> ---
->>  net/unix/af_unix.c | 10 +++++++---
->>  1 file changed, 7 insertions(+), 3 deletions(-)
->>
->> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
->> index 55cdebfa0da0..110d716087b5 100644
->> --- a/net/unix/af_unix.c
->> +++ b/net/unix/af_unix.c
->> @@ -3086,12 +3086,16 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
->>  
->>  	mutex_unlock(&u->iolock);
->>  	if (msg) {
->> +		bool do_cmsg;
->> +
->>  		scm_recv_unix(sock, msg, &scm, flags);
->>  
->> -		if (READ_ONCE(u->recvmsg_inq) || msg->msg_get_inq) {
->> +		do_cmsg = READ_ONCE(u->recvmsg_inq);
->> +		if (do_cmsg || msg->msg_get_inq) {
->>  			msg->msg_inq = READ_ONCE(u->inq_len);
->> -			put_cmsg(msg, SOL_SOCKET, SCM_INQ,
->> -				 sizeof(msg->msg_inq), &msg->msg_inq);
->> +			if (do_cmsg)
->> +				put_cmsg(msg, SOL_SOCKET, SCM_INQ,
->> +					 sizeof(msg->msg_inq), &msg->msg_inq);
-> 
-> Is it intentional that msg_inq is set also if msg_get_inq is not set,
-> but do_cmsg is?
+On Thu, 18 Dec 2025 13:25:31 +0100
+Paolo Abeni <pabeni@redhat.com> wrote:
 
-It doesn't really matter, what matters is the actual cmsg posting be
-guarded. The msg_inq should only be used for a successful return anyway,
-I think we're better off reading it unconditionally than having multiple
-branches.
+> AFAICS, this part is not needed: local_bh_disable() ensures migrating is
+> already disabled, if !CONFIG_PREEMPT_RT_NEEDS_BH_LOCK or preemption is
+> disabled, when CONFIG_PREEMPT_RT_NEEDS_BH_LOCK==y
 
-Not really important, if you prefer to keep them consistent, that's fine
-with me too.
+As the code has this:
 
-> 
-> It just seems a bit surprising behavior.
-> 
-> That is an entangling of two separate things.
-> - msg_get_inq sets msg_inq, and
-> - cmsg_flags & TCP_CMSG_INQ inserts TCP_CM_INQ cmsg
-> 
-> The original TCP patch also entangles them, but in another way.
-> The cmsg is written only if msg_get_inq is requested.
+	/* First entry of a task into a BH disabled section? */
+	if (!current->softirq_disable_cnt) {
+		if (preemptible()) {
+			if (IS_ENABLED(CONFIG_PREEMPT_RT_NEEDS_BH_LOCK))
+				local_lock(&softirq_ctrl.lock);
+			else
+				migrate_disable();
 
-The cmsg is written iff TCP_CMSG_INQ is set, not if ->msg_get_inq is the
-only thing set. That part is important.
+			/* Required to meet the RCU bottomhalf requirements. */
+			rcu_read_lock();
+		} else {
+			DEBUG_LOCKS_WARN_ON(this_cpu_read(softirq_ctrl.cnt));
+		}
+	}
 
-But yes, both need the data left.
+It looks as though migration will always be disabled (local_lock() also
+disables migration). It will warn if preemption is disabled.
 
--- 
-Jens Axboe
+But yeah, the added migrate_disable() is not needed.
+
+-- Steve
 
