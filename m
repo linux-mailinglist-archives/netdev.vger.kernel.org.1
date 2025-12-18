@@ -1,77 +1,172 @@
-Return-Path: <netdev+bounces-245443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 478CECCD9CE
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 22:00:07 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66B00CCDA5B
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 22:12:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E25FC3081D42
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 20:54:24 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A0531302E1D3
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 21:11:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 183862E9EA1;
-	Thu, 18 Dec 2025 20:44:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD3B3352F9E;
+	Thu, 18 Dec 2025 20:45:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GJXgNefC"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="26V+nrVJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f66.google.com (mail-ot1-f66.google.com [209.85.210.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E21A12D7D30;
-	Thu, 18 Dec 2025 20:44:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2CBB352953
+	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 20:45:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766090644; cv=none; b=MBJVYLRD45h31RKQEw2WWTFJdQR5hlEhph8vi32qk9KJPdURyLyn8ky2fq9qrtVBtiMwg0MBSoGqGVDYo2LjMTPP8n1zIlG/FxJ/g8eCK6q5P/lZXmUmIdxuL3Wy4y6gI+bzFg0R2mlkemO4yBUqXU6BKH3fXzCAqjAC11Thw9M=
+	t=1766090704; cv=none; b=j10DSmaWX5Y2apvDu0lQds3Dnp9G10x/XMnR9IkVfFCJobQsHl00cvT6zAyZO0J2Lh3D4ywnhXA9LRrBSzzInau8T+9LBUfrqpWqQUNKAwVvSOBYwKJqA/etBliBdkrd3dbzL7y6vlJScXTOBlyIa2INlbMPLivWdhoTiHLXfiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766090644; c=relaxed/simple;
-	bh=zg1sBMnpte1guIIpHqW4Rpr4Rmt0OU2qBklgs+RANFg=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=lZz4odFBr3FX/Bc/ElTnRqwvkpfb+gTNbgJBTV6p+iYYeJ5yPtt2tWrOmMkJK3QNpo8sO844k7Wl53euSooK89RNMczyIU8eFRj8wFayliue6+4DzQShRfrIsLKn2kZAAvzTQrUy1CqiReYZRZFHWrUOAj2/PuXxVLxE6yw/FQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GJXgNefC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A9EEC4CEFB;
-	Thu, 18 Dec 2025 20:44:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766090643;
-	bh=zg1sBMnpte1guIIpHqW4Rpr4Rmt0OU2qBklgs+RANFg=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=GJXgNefCfAzU1ZZCZ+5nRAD/nblRWcvf3SyPe7EhTXukwiJC9D4o0hbjq+lsiJuq+
-	 kN2ZO2ZpcWcUCaUXKP/eKG+iQgCcpzvDnYlEOgf9UofhStaY1As/6olmukxRYvhTo7
-	 KpX82J+c8PibrXhWk98DpBazFsAAOlpo+yHBwnWJDRbDcGT5bYGIp6qTTSRgZsvsEl
-	 ZD2D9xRB9wttes9gb8wExPPdVKgpnni6LuyAxJwxSAGrmZcOM5Wo+ldcIW8qeN1zZY
-	 0o0d/8byMiJ8bRwfO4toWp0qIMECh0iarA2h9ubpnSwp+Nqf0XcdEMG9w9sSngTebz
-	 BELwY7VaZ52jg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F2A7C380AA41;
-	Thu, 18 Dec 2025 20:40:53 +0000 (UTC)
-Subject: Re: [GIT PULL] Networking for v6.19-rc2
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20251218174841.265968-1-pabeni@redhat.com>
-References: <20251218174841.265968-1-pabeni@redhat.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20251218174841.265968-1-pabeni@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.19-rc2
-X-PR-Tracked-Commit-Id: 21a88f5d9ce0c328486073b75d082d85a1e98a8b
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 7b8e9264f55a9c320f398e337d215e68cca50131
-Message-Id: <176609045240.3123986.14744749704822531851.pr-tracker-bot@kernel.org>
-Date: Thu, 18 Dec 2025 20:40:52 +0000
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+	s=arc-20240116; t=1766090704; c=relaxed/simple;
+	bh=hxdyEoRAt3GAfwhKgxiNv1wl7oVIYwsDbSGze+lKbBY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=l4oppuWKnKpBYCdnFGN4rVscvkA6BB+9ESb8CE+Z1bBPLTt8ZDF7PPpNRcPZN63wF4k4Yp7O35ckcGYwE2SihsobLtTewyqV8L7Z2YT5H9dCCb04T1NUeJQpOqirlwDpUGQmM+2f4rrIhvOvnTDPbHEeadrMTmltak3OyJi/1Kk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=26V+nrVJ; arc=none smtp.client-ip=209.85.210.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-ot1-f66.google.com with SMTP id 46e09a7af769-7c76d855ddbso317891a34.3
+        for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 12:45:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1766090699; x=1766695499; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fBCUu4u/Yok2HpILA3UQoQtwdHQIiMmu2UId7ekcYW8=;
+        b=26V+nrVJxiP+w/zAw1caldDWE03MKBpMk6JZP6PyBspw5zyQagLSfK48DHZaAex2Ro
+         HlfjYsBUK+E10MwhEM1KQ6Qv6/zWzxLqEmU8jM8d4smefiQzD8s9iF1oJzIBuRI88MiD
+         qZUrYWBgE8WaJV7TVlYS+yGPtKf4ooNMJaNzeAxLpLIvvHxANKUojSeH5JbPnS4hM+qV
+         kt+RI2zg+ocGo5sKRsOUtNUdUwatBKCyK8qaQnXEeN11E4V+CcbErbbrJqOs8ZIom9CO
+         9RVgWapbeRLZ87SnIChGNWJT2w+p+R+gJDpXkyDBgE4N5cm0UIgrmPuQSKrafsrqiWs4
+         E3+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766090699; x=1766695499;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fBCUu4u/Yok2HpILA3UQoQtwdHQIiMmu2UId7ekcYW8=;
+        b=qyFuAonLWuxZfhooEtPyBKZ4PL/HlrTuCEUa4S4VlmegloSWSB13+D7B5vHgH2UpDV
+         OrE1P19yiVeYTu77jLsXOujnT4T2VN0T45E4Q4mR8ny2iFC3kNQqFNuLe1ryWxODTQ/g
+         kc+xy2NEhCsK+bKifzRW0CwxVodt1cwDo+V3Gf5QOf8BOeQfoNyngy/bvACRoJcSbSks
+         xtzXTmrGYAjbNkB1WXVS3KpkXYxrjEPxFwoU+8mBUeXfaToQ17aJIewMkslUKxRtZP1O
+         9pu6JazfGDEdy2Evju9zEea5XKmwxkzePNfSi+2y/JBE1jTAuQ5W+qX0cfcJI8rjXxdc
+         l2Xw==
+X-Forwarded-Encrypted: i=1; AJvYcCXXQy3e1zgymDUoCRxKV80aNnreVYl+m1Dmg9IFd2G3vc1aAF6ShRSGAI/JJVajLYwz7ybGMMc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw11ZPMNyUXjN9yvRXEhtQDjuH5zsOrI5elJ5UCnHR/gCJgpSFZ
+	kB5EQs6Zzmvb8spECbAkt5JF+yMDfbnRjuC2DXPLozYzUl5kdzEgRF53vY18SJ5cpg4=
+X-Gm-Gg: AY/fxX48D7cT87IxgDczulFprVAtw+uSPMv53a7YDNjX4Fsua2qxGk37gK4cDCuC4PS
+	25HOYC40VK/CEmG+ZHAAvk79FeYew+qZzvbBoGC9ubQFPipicZyAO1c4yHRyWV4Am20pM82r0CD
+	COu0Q1joYlgRANU2cpWd+E5+VeuN1QSGSuZ6i4KobHZNafTAaUUH1MFyXzFJ6tsd6ElGa7xuxX4
+	MWPKeaJzQLgY7F11TvS73eP9kZVzdgJKvLrsin5OyL9PAdlqCXP9Ww2/h9KpOvL5cyF+b7etJYq
+	oy7r/1Gir9Nt8Dpu/3cSJXeglcZo7b1dPMRzUWvpbxkDQ+vQooroh65RC7dNIshhCEcqJ2ipqKr
+	Oy25qwh/2bZdX8+ThUQcmd4j0lAYqlqZcvZoezappvMqBMqkZfsbc6D5ndwWMHVgycU5vbJ2aRN
+	YW+00ab2k0
+X-Google-Smtp-Source: AGHT+IFawL3v6fvfLFMk3e/U9FU/svP0NWIIO/mFK6ctWIhTbkl//sTKeQF17gtp45rMIWiu0Tz81g==
+X-Received: by 2002:a05:6830:6609:b0:7c7:69c8:2ce with SMTP id 46e09a7af769-7cc66a12323mr274721a34.27.1766090699664;
+        Thu, 18 Dec 2025 12:44:59 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7cc6673bdabsm327468a34.10.2025.12.18.12.44.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 18 Dec 2025 12:44:59 -0800 (PST)
+Message-ID: <2ed38b2d-6f87-4878-b988-450cd95f8679@kernel.dk>
+Date: Thu, 18 Dec 2025 13:44:57 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] af_unix: don't post cmsg for SO_INQ unless explicitly
+ asked for
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
+Cc: io-uring@vger.kernel.org, kuba@kernel.org, kuniyu@google.com,
+ willemb@google.com, stable@vger.kernel.org, Julian Orth <ju.orth@gmail.com>
+References: <20251218150114.250048-1-axboe@kernel.dk>
+ <20251218150114.250048-2-axboe@kernel.dk>
+ <willemdebruijn.kernel.2e22e5d8453bd@gmail.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <willemdebruijn.kernel.2e22e5d8453bd@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The pull request you sent on Thu, 18 Dec 2025 18:48:41 +0100:
+On 12/18/25 1:35 PM, Willem de Bruijn wrote:
+> Jens Axboe wrote:
+>> A previous commit added SO_INQ support for AF_UNIX (SOCK_STREAM), but
+>> it posts a SCM_INQ cmsg even if just msg->msg_get_inq is set. This is
+>> incorrect, as ->msg_get_inq is just the caller asking for the remainder
+>> to be passed back in msg->msg_inq, it has nothing to do with cmsg. The
+>> original commit states that this is done to make sockets
+>> io_uring-friendly", but it's actually incorrect as io_uring doesn't
+>> use cmsg headers internally at all, and it's actively wrong as this
+>> means that cmsg's are always posted if someone does recvmsg via
+>> io_uring.
+>>
+>> Fix that up by only posting cmsg if u->recvmsg_inq is set.
+>>
+>> Cc: stable@vger.kernel.org
+>> Fixes: df30285b3670 ("af_unix: Introduce SO_INQ.")
+>> Reported-by: Julian Orth <ju.orth@gmail.com>
+>> Link: https://github.com/axboe/liburing/issues/1509
+>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>> ---
+>>  net/unix/af_unix.c | 10 +++++++---
+>>  1 file changed, 7 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+>> index 55cdebfa0da0..110d716087b5 100644
+>> --- a/net/unix/af_unix.c
+>> +++ b/net/unix/af_unix.c
+>> @@ -3086,12 +3086,16 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+>>  
+>>  	mutex_unlock(&u->iolock);
+>>  	if (msg) {
+>> +		bool do_cmsg;
+>> +
+>>  		scm_recv_unix(sock, msg, &scm, flags);
+>>  
+>> -		if (READ_ONCE(u->recvmsg_inq) || msg->msg_get_inq) {
+>> +		do_cmsg = READ_ONCE(u->recvmsg_inq);
+>> +		if (do_cmsg || msg->msg_get_inq) {
+>>  			msg->msg_inq = READ_ONCE(u->inq_len);
+>> -			put_cmsg(msg, SOL_SOCKET, SCM_INQ,
+>> -				 sizeof(msg->msg_inq), &msg->msg_inq);
+>> +			if (do_cmsg)
+>> +				put_cmsg(msg, SOL_SOCKET, SCM_INQ,
+>> +					 sizeof(msg->msg_inq), &msg->msg_inq);
+> 
+> Is it intentional that msg_inq is set also if msg_get_inq is not set,
+> but do_cmsg is?
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.19-rc2
+It doesn't really matter, what matters is the actual cmsg posting be
+guarded. The msg_inq should only be used for a successful return anyway,
+I think we're better off reading it unconditionally than having multiple
+branches.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/7b8e9264f55a9c320f398e337d215e68cca50131
+Not really important, if you prefer to keep them consistent, that's fine
+with me too.
 
-Thank you!
+> 
+> It just seems a bit surprising behavior.
+> 
+> That is an entangling of two separate things.
+> - msg_get_inq sets msg_inq, and
+> - cmsg_flags & TCP_CMSG_INQ inserts TCP_CM_INQ cmsg
+> 
+> The original TCP patch also entangles them, but in another way.
+> The cmsg is written only if msg_get_inq is requested.
+
+The cmsg is written iff TCP_CMSG_INQ is set, not if ->msg_get_inq is the
+only thing set. That part is important.
+
+But yes, both need the data left.
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Jens Axboe
 
