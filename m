@@ -1,216 +1,114 @@
-Return-Path: <netdev+bounces-245271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71CF6CCA14F
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 03:29:57 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4A69CCA1DF
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 03:59:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 40E6F3015D0C
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 02:29:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B0D6D3017EFC
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 02:59:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 519712FB997;
-	Thu, 18 Dec 2025 02:29:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C5D32BEFE3;
+	Thu, 18 Dec 2025 02:59:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="auPdLCaL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kf/KF8kA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF0842F83C3
-	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 02:29:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87F4B25DB0D
+	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 02:59:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766024995; cv=none; b=nJA+YH60aEal/+END1HnK6yPq0LA65sYkVLOcvb3qip8Y96K79EgKI5Oeb/tSiWjwPt2TC6nk+ISxA2F0hIPcO0IsaODuwpHtAht2h4A3GepxlWWyCj1w4x9cemd1Qp101o+fbF4hvN+wtZ2ygKktpsYwjCGn1qKLXKIOOrQriM=
+	t=1766026782; cv=none; b=BgJ+LnbFUgHDobBwovYXsO9iCVLsghoTU4mGZHugIw1dyAEGt8Avk6z/JbnITe9aExfO4Fi+ItEMckv61HKTHvRyTqcCHRwMWMQVfxtb0UHaFgqMBYDWPJkgBg+SGeRObFvhq8CHETLW5EanfVLLJJ7nuaMqNG9b0lTGPSAkutc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766024995; c=relaxed/simple;
-	bh=zlziAxvPwJj8HgeZzSpcXhPCekluk2rCReJ0Fw/8umI=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=UVjfrtdeIuEsl5MVGiNcyr9Ai3uYe3Em1rNUwo7b7ZLK0o0RIyZ4aUdnWxFfDVy48HrEgk51pa1G+Va7XJvkVq7E9XMvwQqKZMAdkMFQb5jW31KcJM22NmNwSIMbLN7Xi7o3/StFtnNJ6vogdZ8oCtoqhETNK4o++wlhuqko8ac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=auPdLCaL; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7d481452732so381991b3a.1
-        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 18:29:53 -0800 (PST)
+	s=arc-20240116; t=1766026782; c=relaxed/simple;
+	bh=3yJqIUEUeZVkFXlqRTAntvExydA8frPoRSgPiza+JEo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=F3eMazALVMZYycJNeE29cfFhp1RSmQt3Jx7NntjErfIMtXBET4XYaHN77eBEJP9U7go8zem4ENmFicRQNwTN6+yIXIT/7J+p2p7Mkcgyopo9822O4BO/NMRAAH4WwlC1XxD3TZA0sFlyVg3ufXICPFIBF5v9K1z3hNfxgxz2pGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kf/KF8kA; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2a0f3d2e503so272265ad.3
+        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 18:59:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1766024993; x=1766629793; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Mbkt/LgClY9Ed+U/AqFg7ozVmIhVbSqVhAx0YrbLQGM=;
-        b=auPdLCaLlkQy1M/9nZdm6uFAKeS7L18O3gf6MxeCrUa3GCPDKcnXGec8Dgx0IUN+2h
-         JF7sGTiJqVE9U4QSixNOhow+OX+Q3vrxmJZgsgga1GQRplD7VxCtvFe/sB1uE47fPL83
-         +ra7aEqWsQ1RSVWi4zFov6YuI8wlJwXCtGp0C/Wvp0pEzDyt1e1Im6bM/QwRrBS9qaYB
-         zD540uwf/HPJqlWxgJ39x+cACzJVOvT0f4i4ap0EbJQmRjbD3njiBiphGi73th6rsq0w
-         Xh5+pRXwCNCpT1IPTU8HKQgEXOXlonyPE+dfoX5KTLI2FxNdnC9wfVTuhsBSGDJg7PiJ
-         mE+A==
+        d=gmail.com; s=20230601; t=1766026781; x=1766631581; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=oEuwYEAlKeJ7VBeR49Tc0CIfJrf1FLJO2ifR5/NXxnU=;
+        b=Kf/KF8kAWAhe5SrbJeFnD4qZOL2c/yZtigs/SYDh55h1EbUoBC9GJIBicGCpo3c07X
+         s81yVmQIEsl/2MLjjtD9SPQmJtCJX2DQRdeU8J0QNV/TPn5lbN547sxxwd+qT5l9E/CL
+         JfMok/nR5v7YSLRPjIoP1Yo2ijufYx/L/bK1tmwlddJp/9e8n8LrhwxnLzVBJUcaynYh
+         zzBvzyJRDhcjJZsDrZ3oeXnDiGcSWfGeHPwMciOvQylXcZoyWPnxpg6pjUBZkJ3Kq+lS
+         ORWy70qcbdst8NI/LsfK2UOIGtm1mGBKwNu2l9ZzVYc4KhC4c1jRMpH7JHIuM4XfpUuv
+         BEzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766024993; x=1766629793;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Mbkt/LgClY9Ed+U/AqFg7ozVmIhVbSqVhAx0YrbLQGM=;
-        b=xJ/t5RTbfDyXLsE9Olq+ArC4KF/vm/wvN9VLED2cDzWbS+Mx+cGBVC5SezJxEmcLOU
-         rXrss/1tvCRjMCg1L1c2eeJQpibXQn7Lh0y+rFp+0PEV1iEtsjSJfOdlTxLANPgSi35o
-         YvI8VFz6KrW4it0tcwgR3x1IGS3IMnEruXZjuiokGdQ4iC0lmQAq2+ubVI5zAZ87seuk
-         maVJXDzg5DUpemVJcO68qsqigZhVHQPWQoUIX24WNaqAqDyLUObcRSJlmUq/zO52wwDG
-         KuOcncU9Xe6biwPZ+YgoT1ynq4Sn/8l6nekaWS0Reh3nkAWTfRJuDzSc/U9O9J4fCGe9
-         mSWw==
-X-Gm-Message-State: AOJu0YzT4LgYHu1aCEgpIrsFG1EcGFIQz+kSFaeOnS5C+qC6SwJlkv3P
-	kqKwBrbI8YRFXRlYO+lYesd4fQiS6SnEGbgQTlf1ilG+5Pi65l+mGbCxAdSOF4wioqd7R1JYeNe
-	wVMX9FZd/DGLSoVuZXeOXjRDkX2yfN+BUOYnGUesUOaXNQ1X3DDpgPxlh61DVnBNuEuOGnGEx1M
-	78sI/JeFn+cn1JcnoiGg8qRZXM12QujsJ79cku28jDbdcXeSZ8KYZ7p0uFLEHi4l8=
-X-Google-Smtp-Source: AGHT+IFE6xajScfzbLpRFiQQS67W5ZN8gStF0mO1QPIpwdD4OiKSevZ12bwmQxwPQs3VZazL0vtBUS/b7RY63UwVGw==
-X-Received: from dlbrj5.prod.google.com ([2002:a05:7022:f405:b0:11f:2e2e:de3])
- (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:701b:2902:b0:11b:8f02:a876 with SMTP id a92af1059eb24-11f354cce50mr11251803c88.23.1766024992932;
- Wed, 17 Dec 2025 18:29:52 -0800 (PST)
-Date: Thu, 18 Dec 2025 02:29:36 +0000
+        d=1e100.net; s=20230601; t=1766026781; x=1766631581;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oEuwYEAlKeJ7VBeR49Tc0CIfJrf1FLJO2ifR5/NXxnU=;
+        b=bFRbOb+xJiAzF0YJL25IIaac21JX4LY4HdOGkOQfMsJtEBK6l39o18wXjh2FKXA1KE
+         eNifinXiKi1SQxx2VXjNtjNCMLUoCkodfzNsIkPzx3f+Q1ZorZYHVRl1Rpc3/UbeOxAn
+         UJfGiYlIUBP8V0cFZKyOqKw3Tu+TjPVxazI1ziU6yxpgEeAlhTiK4UkZgYtp3JP5mUCM
+         d851fj4UnWL5aODUgqtXHqZk7o6lhKNNz9z2A9sdprb2llBaGtix+zHg3JWfkL3OemM4
+         pbVkpynOqReceHm8tFK++CNI+1Fy5F5gd1Fdl2LRS6BtlBWrPNjLcq/LaASUx0V4VmMN
+         PXdg==
+X-Gm-Message-State: AOJu0YwLh/I88oFpf00tZFj0G8WLWxcPz6JFo1ZKXJXQcg/RjxCkG/wJ
+	XEpqmNU0ETJ3F4OD9AGJZKX6JsrxR/trZsfxtkLryTcW76XXcEXqJbfDHpr9jFo5
+X-Gm-Gg: AY/fxX7jMq4NpjP0Oya+JCka3WrjFGBw6U12FuBMC77IM4ZEDwZ8CmkQzEIwHbxW7DJ
+	OUH7L2kIfgeGD0bj51oBMnBBmepdsTH/px8QZTGIkfQwUtdxFQpiivKp471qVSfoaaWnIz1eNSt
+	GPdOuwcnqy67+4S3ZHr/LH+IDQfnYn2DGj68zmcR705nclVwbVU16Sa8VWGFc4ocvaf1r/V7M2w
+	2+3NvypoaqRx0hBAN0aqAzgCIOlIl7AcRjSs9ASuAaHJjIccflHCVU7/OytyetUDKIzFmkeqiY+
+	IFPuOGzdPtLJblMhgmpugaUYsBogtW3uZNvIV04h5raTh6W1FLH2CMngi8clqxH/Ijd4bZoM0L7
+	ZaVb6XT6TRS1o+pTS4nTsetjfrZd1++of40V7KkXjxI/CaqYOLE84+buf5+AoyqBHdAW7fd0N9s
+	pgM0w7/dT2/qDdKwH23nZaaDmBNXusUU+RpyDcS2iaWjr8OUE0wu9HzbtxWKZTFJaSf9faxpYX
+X-Google-Smtp-Source: AGHT+IFCBiK4vkjcQkByNE/wNdhbQo7lMtKJmkgvLn2E0ZvZv7wYpskVlyPQVdr53mJhO4ELd2OXcA==
+X-Received: by 2002:a05:6a21:6da2:b0:341:fcbf:90b9 with SMTP id adf61e73a8af0-37590b7592amr547611637.4.1766026780872;
+        Wed, 17 Dec 2025 18:59:40 -0800 (PST)
+Received: from poi.localdomain (KD118158218050.ppp-bb.dion.ne.jp. [118.158.218.50])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7fe14a5727fsm800985b3a.69.2025.12.17.18.59.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Dec 2025 18:59:40 -0800 (PST)
+From: Qianchang Zhao <pioooooooooip@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Krzysztof Kozlowski <krzk@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org,
+	Zhitong Liu <liuzhitong1993@gmail.com>,
+	Qianchang Zhao <pioooooooooip@gmail.com>
+Subject: [PATCH v3 0/2] nfc: llcp: fix double put/unlock on LLCP_CLOSED in recv handlers
+Date: Thu, 18 Dec 2025 11:59:21 +0900
+Message-Id: <20251218025923.22101-1-pioooooooooip@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.52.0.313.g674ac2bdf7-goog
-Message-ID: <20251218022948.3288897-1-almasrymina@google.com>
-Subject: [PATCH net-next v2] idpf: export RX hardware timestamping information
- to XDP
-From: Mina Almasry <almasrymina@google.com>
-To: netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: YiFei Zhu <zhuyifei@google.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Alexander Lobakin <aleksander.lobakin@intel.com>, 
-	Richard Cochran <richardcochran@gmail.com>, intel-wired-lan@lists.osuosl.org, 
-	Mina Almasry <almasrymina@google.com>, 
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-From: YiFei Zhu <zhuyifei@google.com>
+Changes in v3:
+- Wrap commit messages to <= 75 columns
+- Use 12-char SHA in Fixes tags
+- Verify Fixes with git blame (both handlers trace back to d646960f7986)
+- Run scripts/checkpatch.pl --strict
 
-The logic is similar to idpf_rx_hwtstamp, but the data is exported
-as a BPF kfunc instead of appended to an skb.
 
-A idpf_queue_has(PTP, rxq) condition is added to check the queue
-supports PTP similar to idpf_rx_process_skb_fields.
+Qianchang Zhao (2):
+  nfc: llcp: avoid double release/put on LLCP_CLOSED in
+    nfc_llcp_recv_disc()
+  nfc: llcp: stop processing on LLCP_CLOSED in nfc_llcp_recv_hdlc()
 
-Cc: intel-wired-lan@lists.osuosl.org
+ net/nfc/llcp_core.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-Signed-off-by: YiFei Zhu <zhuyifei@google.com>
-Signed-off-by: Mina Almasry <almasrymina@google.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-
----
-
-v2: https://lore.kernel.org/netdev/20251122140839.3922015-1-almasrymina@google.com/
-- Fixed alphabetical ordering
-- Use the xdp desc type instead of virtchnl one (required some added
-  helpers)
-
----
- drivers/net/ethernet/intel/idpf/xdp.c | 29 +++++++++++++++++++++++++++
- drivers/net/ethernet/intel/idpf/xdp.h | 17 ++++++++++++++++
- 2 files changed, 46 insertions(+)
-
-diff --git a/drivers/net/ethernet/intel/idpf/xdp.c b/drivers/net/ethernet/intel/idpf/xdp.c
-index 958d16f87424..7744d6898f74 100644
---- a/drivers/net/ethernet/intel/idpf/xdp.c
-+++ b/drivers/net/ethernet/intel/idpf/xdp.c
-@@ -2,6 +2,7 @@
- /* Copyright (C) 2025 Intel Corporation */
- 
- #include "idpf.h"
-+#include "idpf_ptp.h"
- #include "idpf_virtchnl.h"
- #include "xdp.h"
- #include "xsk.h"
-@@ -391,8 +392,36 @@ static int idpf_xdpmo_rx_hash(const struct xdp_md *ctx, u32 *hash,
- 				    pt);
- }
- 
-+static int idpf_xdpmo_rx_timestamp(const struct xdp_md *ctx, u64 *timestamp)
-+{
-+	const struct libeth_xdp_buff *xdp = (typeof(xdp))ctx;
-+	struct idpf_xdp_rx_desc desc __uninitialized;
-+	const struct idpf_rx_queue *rxq;
-+	u64 cached_time, ts_ns;
-+	u32 ts_high;
-+
-+	idpf_xdp_get_qw1(&desc, xdp->desc);
-+	rxq = libeth_xdp_buff_to_rq(xdp, typeof(*rxq), xdp_rxq);
-+
-+	if (!idpf_queue_has(PTP, rxq))
-+		return -ENODATA;
-+	if (!(idpf_xdp_rx_ts_low(&desc) & VIRTCHNL2_RX_FLEX_TSTAMP_VALID))
-+		return -ENODATA;
-+
-+	cached_time = READ_ONCE(rxq->cached_phc_time);
-+
-+	idpf_xdp_get_qw3(&desc, xdp->desc);
-+
-+	ts_high = idpf_xdp_rx_ts_high(&desc);
-+	ts_ns = idpf_ptp_tstamp_extend_32b_to_64b(cached_time, ts_high);
-+
-+	*timestamp = ts_ns;
-+	return 0;
-+}
-+
- static const struct xdp_metadata_ops idpf_xdpmo = {
- 	.xmo_rx_hash		= idpf_xdpmo_rx_hash,
-+	.xmo_rx_timestamp	= idpf_xdpmo_rx_timestamp,
- };
- 
- void idpf_xdp_set_features(const struct idpf_vport *vport)
-diff --git a/drivers/net/ethernet/intel/idpf/xdp.h b/drivers/net/ethernet/intel/idpf/xdp.h
-index 479f5ef3c604..86be6cae9689 100644
---- a/drivers/net/ethernet/intel/idpf/xdp.h
-+++ b/drivers/net/ethernet/intel/idpf/xdp.h
-@@ -112,11 +112,13 @@ struct idpf_xdp_rx_desc {
- 	aligned_u64		qw1;
- #define IDPF_XDP_RX_BUF		GENMASK_ULL(47, 32)
- #define IDPF_XDP_RX_EOP		BIT_ULL(1)
-+#define IDPF_XDP_RX_TS_LOW	GENMASK_ULL(31, 24)
- 
- 	aligned_u64		qw2;
- #define IDPF_XDP_RX_HASH	GENMASK_ULL(31, 0)
- 
- 	aligned_u64		qw3;
-+#define IDPF_XDP_RX_TS_HIGH	GENMASK_ULL(63, 32)
- } __aligned(4 * sizeof(u64));
- static_assert(sizeof(struct idpf_xdp_rx_desc) ==
- 	      sizeof(struct virtchnl2_rx_flex_desc_adv_nic_3));
-@@ -128,6 +130,8 @@ static_assert(sizeof(struct idpf_xdp_rx_desc) ==
- #define idpf_xdp_rx_buf(desc)	FIELD_GET(IDPF_XDP_RX_BUF, (desc)->qw1)
- #define idpf_xdp_rx_eop(desc)	!!((desc)->qw1 & IDPF_XDP_RX_EOP)
- #define idpf_xdp_rx_hash(desc)	FIELD_GET(IDPF_XDP_RX_HASH, (desc)->qw2)
-+#define idpf_xdp_rx_ts_low(desc)	FIELD_GET(IDPF_XDP_RX_TS_LOW, (desc)->qw1)
-+#define idpf_xdp_rx_ts_high(desc)	FIELD_GET(IDPF_XDP_RX_TS_HIGH, (desc)->qw3)
- 
- static inline void
- idpf_xdp_get_qw0(struct idpf_xdp_rx_desc *desc,
-@@ -166,6 +170,19 @@ idpf_xdp_get_qw2(struct idpf_xdp_rx_desc *desc,
- #endif
- }
- 
-+static inline void
-+idpf_xdp_get_qw3(struct idpf_xdp_rx_desc *desc,
-+		 const struct virtchnl2_rx_flex_desc_adv_nic_3 *rxd)
-+{
-+#ifdef __LIBETH_WORD_ACCESS
-+	desc->qw3 = ((const typeof(desc))rxd)->qw3;
-+#else
-+	desc->qw3 = ((u64)le32_to_cpu(rxd->ts_high) << 32) |
-+		    ((u64)le16_to_cpu(rxd->fmd6) << 16) |
-+		    le16_to_cpu(rxd->l2tag1);
-+#endif
-+}
-+
- void idpf_xdp_set_features(const struct idpf_vport *vport);
- 
- int idpf_xdp(struct net_device *dev, struct netdev_bpf *xdp);
-
-base-commit: 8f7aa3d3c7323f4ca2768a9e74ebbe359c4f8f88
 -- 
-2.52.0.313.g674ac2bdf7-goog
+2.34.1
 
 
