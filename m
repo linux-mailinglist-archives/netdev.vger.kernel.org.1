@@ -1,154 +1,148 @@
-Return-Path: <netdev+bounces-245366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B53FCCC511
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 15:42:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 94216CCC50B
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 15:40:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 98B5A3029C4D
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 14:37:27 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 17A1630E0E11
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 14:37:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79A052E2850;
-	Thu, 18 Dec 2025 14:25:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A57A338591;
+	Thu, 18 Dec 2025 14:28:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.es header.i=@amazon.es header.b="DIcv+qqq"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="aI7kV/Vc"
 X-Original-To: netdev@vger.kernel.org
-Received: from fra-out-007.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-007.esa.eu-central-1.outbound.mail-perimeter.amazon.com [3.75.33.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0392F2D5C76;
-	Thu, 18 Dec 2025 14:25:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.75.33.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D663337BB6
+	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 14:28:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766067958; cv=none; b=fMhfJpqI/CXIWE5C2dNwL6Vj7tThdGN897Ty8+y2r+YU6OoS8f1VRtOoj4DqoLSW/N0xzhDSv/Xf6nKznKRoW+LaRscAWpHDHzlcwlVYAwL8CKvte4YGk2cYSdUlphqKCCjUTF1rQsWO7BanTwAbwal+rOm8Gk5RpGcxYBjnLlk=
+	t=1766068127; cv=none; b=oAU2/dRBF7JbfDl73RGB306D3380KXswuY1M9WUoJ0khDDxlUCA/b4P8nbhq1T6wETzbWj4s75oceLzw+i1Yl4PS1nO6guG2YG/2Atkhx7yrnIIrfZw+42SRW3UeLt08loDG3mxPa41S2D5yw4NGDSqgRpvOshwGruX1m5LVtAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766067958; c=relaxed/simple;
-	bh=aO7Tjufb11f1PRoAcbnABTZ6OyV5Uo9litZK8tNvmQU=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=p1gPFd4VAHPLyV9rqDoe7K5TV6FoQ8rzmDoOwfNhustnOJ1FUasaKNYgOV4bdMSxFhv/VUqpLJ/JiToI8ODNwimgBOaWGDwUMOxQmsN7PBBhctBHqvRg/kDTF29HTRqmQ60+NXBIax4WMr4zhRIS6RHTWAJT018EIzTQwAVdrjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.es; spf=pass smtp.mailfrom=amazon.es; dkim=pass (2048-bit key) header.d=amazon.es header.i=@amazon.es header.b=DIcv+qqq; arc=none smtp.client-ip=3.75.33.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.es
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.es
+	s=arc-20240116; t=1766068127; c=relaxed/simple;
+	bh=Qh/o0My9IXFqpNIxAnsLudR9BCeT6bwNQ7IvDYD6MXM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=a1BWkEotBagCVCbbQtbwvHUVkUDmKKU/NmOh4Snu3EfVKbnmsGX7AvCW8ruq7ZpE92by6k/tQoJdzJyF9v7O23lhjMQ/o6jMlP9hdEp+qKIckbc6tVveyOVX7SmGwzsEiiQQFPsdkzoV3r25ZSABPd+dxeewNU+cg8FjhOgLPXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=aI7kV/Vc; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-47928022b93so1541955e9.0
+        for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 06:28:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.es; i=@amazon.es; q=dns/txt; s=amazoncorp2;
-  t=1766067953; x=1797603953;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=j5lreQ2PPRNioC4Ff/bYXCd9XELkpenySvD+fVUVl7A=;
-  b=DIcv+qqqgtH7N1IBbV5qF45xq0EEIHMnCG0uB27WTFrv4EaLpP4ec46P
-   K7JUtS2heI3a5JnySqL/pXcPQyTZYHEpjWlwtoUG93de965eFe1dHgRsg
-   4vBKLwNKjD9/dcrW6BD3/h390zYYeOFeYN8YmzYBs8C4dYtVWsmLPhCEf
-   CLu7RFkQ+rkmimsQ+XbsKoe98SZf5Mg9ZH77abl0YUjFyXzCQOcAzpBZh
-   4vSsgAnary1uLD17F2jsNsBb3o1KqyZMAFI0uGyUJ0KXkSf6bo4y8n+3i
-   CIZ2xMC2tr1yjWYYK2XsOuIo0StBE+AgnXhtP29LKC/SUc7+AIyOwRv4M
-   A==;
-X-CSE-ConnectionGUID: +241mf1WQw2VURsOcYEdcg==
-X-CSE-MsgGUID: h7iyYJ67Qwu5mFAfndW9FA==
-X-IronPort-AV: E=Sophos;i="6.21,158,1763424000"; 
-   d="scan'208";a="6890564"
-Received: from ip-10-6-11-83.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.11.83])
-  by internal-fra-out-007.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2025 14:25:34 +0000
-Received: from EX19MTAEUB002.ant.amazon.com [54.240.197.224:19954]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.26.54:2525] with esmtp (Farcaster)
- id 910e6f9f-c171-4e3b-8480-8772ca7173c0; Thu, 18 Dec 2025 14:25:34 +0000 (UTC)
-X-Farcaster-Flow-ID: 910e6f9f-c171-4e3b-8480-8772ca7173c0
-Received: from EX19D012EUA003.ant.amazon.com (10.252.50.98) by
- EX19MTAEUB002.ant.amazon.com (10.252.51.79) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
- Thu, 18 Dec 2025 14:25:30 +0000
-Received: from EX19D012EUA001.ant.amazon.com (10.252.50.122) by
- EX19D012EUA003.ant.amazon.com (10.252.50.98) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
- Thu, 18 Dec 2025 14:25:29 +0000
-Received: from EX19D012EUA001.ant.amazon.com ([fe80::b7ea:84f7:2c4b:2719]) by
- EX19D012EUA001.ant.amazon.com ([fe80::b7ea:84f7:2c4b:2719%3]) with mapi id
- 15.02.2562.035; Thu, 18 Dec 2025 14:25:29 +0000
-From: "Chalios, Babis" <bchalios@amazon.es>
-To: "robh@kernel.org" <robh@kernel.org>, "krzk+dt@kernel.org"
-	<krzk+dt@kernel.org>, "conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"richardcochran@gmail.com" <richardcochran@gmail.com>, "dwmw2@infradead.org"
-	<dwmw2@infradead.org>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>
-CC: "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Chalios,
- Babis" <bchalios@amazon.es>, "Graf (AWS), Alexander" <graf@amazon.de>,
-	"mzxreary@0pointer.de" <mzxreary@0pointer.de>, "Cali, Marco"
-	<xmarcalx@amazon.co.uk>, "Woodhouse, David" <dwmw@amazon.co.uk>
-Subject: [PATCH v4 7/7] ptp: ptp_vmclock: return TAI not UTC
-Thread-Topic: [PATCH v4 7/7] ptp: ptp_vmclock: return TAI not UTC
-Thread-Index: AQHccCopy5YWVTK0WEK/jBfWAHQ0Lw==
-Date: Thu, 18 Dec 2025 14:25:29 +0000
-Message-ID: <20251218142408.8395-8-bchalios@amazon.es>
-References: <20251218142408.8395-1-bchalios@amazon.es>
-In-Reply-To: <20251218142408.8395-1-bchalios@amazon.es>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        d=6wind.com; s=google; t=1766068123; x=1766672923; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=wsG+uhBVnyABo0WRb8gG8p3JTTGBZ7OJ2w3pDH7XoxI=;
+        b=aI7kV/Vc36XwXOd7zN6MumgeXB1bd5dbvD7y6HWYp+dI+cJcjwiISpky+HWvwEsw9R
+         B6ChLTLXXEMmBDFt7U0W9pRtn7Wt+rUiPkQi9sFmSACgfiCCB7O0vRjJZRaT+yVTI5fs
+         KimzJHrIWBdBjHb3f1Uku3eF7sgfhs49ozrXoa7aIxbpKmIuBz+q7wiRLCgqVCVKonz3
+         mg5+4ADVGaEljJ6TcWSmIF9g42ojoEtLP6pg9yUhw8e/xN6AJQDzmWympiSnXnag4S3M
+         977pG70xLtQmaxIwVH9s+7AsHod6y6uFSDVsRZ8U4xFqGG6jYez6BJJjUKg14PlrH4sb
+         17Rg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766068123; x=1766672923;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wsG+uhBVnyABo0WRb8gG8p3JTTGBZ7OJ2w3pDH7XoxI=;
+        b=v1UwOdoqxQ04w0Vz0A6r6nXgZXJv3EAps4elsXHcUeRyL1HIYDDhJK53MFC7c9GGqd
+         s0cpwP1I4zUdrTRXsUnT3lzl6Ks90GmadJY971FBhBtdUSGnEdCx2MOloKy8ZAv04WZ2
+         mN24QccxLubBg3wJ+kGbrVn/46uFfzr1UEsrwgwWauNmWNGfxjRKfnZa0sogOZjoJp7M
+         OYzNkddnGA2bcr76Bq/Nvs1kdhsCglv5hP08zGTBZ4Om09v+ffolC7HGwV59b7cPNxxV
+         +OiFVIkpv1Cm9Z+JAV7nQyMEKE00i75hyexsb6d6jcMrwYjFZe165oq43IQAhoCQbNpZ
+         i6Zg==
+X-Forwarded-Encrypted: i=1; AJvYcCVMf8jBrKEaLOTJB7CPZCojxm8AqoyvLcg4laY5NtIW770dEzLnERHlYGEK6uzDHMkCH6rvY00=@vger.kernel.org
+X-Gm-Message-State: AOJu0YygJxlWmYq1UNbTF9z+JoZrxeM0XneI6VjeNE8RQemLfLXrLEU6
+	oxCgu68tTIQboxhcOsZyRdyzFfn5pupZ2iA3IKzFA6W38SbAfPkbA5aObn/wL/C9VgvQk/nWVtp
+	fIQrCzk0=
+X-Gm-Gg: AY/fxX4BU31tDuDYEg6F/nEwA97FGN4asNSz2d315ICNw3FpM7Wbg0jYlDgMxypozce
+	7oZEPaFV23jvAPc966a1cFaZxNwl+dxSJvA7ts6y6E3yt4tAHHZn3h5pUGX70+FqmVohIcxoBBv
+	bW7/V6zbxJZGxGM6zo5yIjLgtbbcMUrj3a1pu4jmS1J1OYHANSDzYq5UZkIk8C4jWqkjHS6n/2V
+	Sv6O0NZICgvNvtJI/I/M9672Znaot8Myu5fHIuUaP81D2njKebhn2pd01FL5yHFfelrgk7vWC9L
+	nUY73/qZFuJgzRukkLSWe1ZZ0HVdA4eVJQmJCwXStgOI45BEZnwdD1Q0kZvpJFzmTrVyWVabMTS
+	G/LfsjcF6CFH+FmOyCvymwo15VjdEr0PKtzE5grkwjXDpfGEpz7cxjyZQHhgHQ5/xhxkLBxt0YY
+	vko15FzWjxvOSMSgNU4WtlAhMy02lgy8HzjFA69Hma1tflrSc9lliPFnrMxAZr2O0=
+X-Google-Smtp-Source: AGHT+IGRpqq2j5/cFryODQP666Y4zlWz3rVkctq9z8wXzLm4joAqtBvzf1C9TK9x3m6rkgag3VUcJg==
+X-Received: by 2002:a05:600c:4e8a:b0:477:a6f1:499d with SMTP id 5b1f17b1804b1-47ce8776b26mr12151065e9.3.1766068123376;
+        Thu, 18 Dec 2025 06:28:43 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:b41:c160:6a1d:efff:fe52:1959? ([2a01:e0a:b41:c160:6a1d:efff:fe52:1959])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43244934cf5sm5391877f8f.1.2025.12.18.06.28.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 18 Dec 2025 06:28:42 -0800 (PST)
+Message-ID: <364fe528-87a1-4bc3-bcff-7fa73eb9eb44@6wind.com>
+Date: Thu, 18 Dec 2025 15:28:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH net] seg6: fix route leak for encap routes
+To: Paolo Abeni <pabeni@redhat.com>, Andrea Mayer <andrea.mayer@uniroma2.it>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ David Lebrun <david.lebrun@uclouvain.be>,
+ Paolo Lungaroni <paolo.lungaroni@uniroma2.it>,
+ David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+ stefano.salsano@uniroma2.it
+References: <20251208102434.3379379-1-nicolas.dichtel@6wind.com>
+ <20251210113745.145c55825034b2fe98522860@uniroma2.it>
+ <051053d9-65f2-43bf-936b-c12848367acd@6wind.com>
+ <20251214143942.ccc2ec1a46ce6a8fcc3ede55@uniroma2.it>
+ <3394763c-c546-4c80-8157-98467c8e8698@redhat.com>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Content-Language: en-US
+Organization: 6WIND
+In-Reply-To: <3394763c-c546-4c80-8157-98467c8e8698@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-From: David Woodhouse <dwmw@amazon.co.uk>=0A=
-=0A=
-To output UTC would involve complex calculations about whether the time=0A=
-elapsed since the reference time has crossed the end of the month when=0A=
-a leap second takes effect. I've prototyped that, but it made me sad.=0A=
-=0A=
-Much better to report TAI, which is what PHCs should do anyway.=0A=
-And much much simpler.=0A=
-=0A=
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>=0A=
-Signed-off-by: Babis Chalios <bchalios@amazon.es>=0A=
----=0A=
- drivers/ptp/ptp_vmclock.c | 10 +++++-----=0A=
- 1 file changed, 5 insertions(+), 5 deletions(-)=0A=
-=0A=
-diff --git a/drivers/ptp/ptp_vmclock.c b/drivers/ptp/ptp_vmclock.c=0A=
-index 7f342e5a6a92..deab3205601b 100644=0A=
---- a/drivers/ptp/ptp_vmclock.c=0A=
-+++ b/drivers/ptp/ptp_vmclock.c=0A=
-@@ -82,13 +82,13 @@ static uint64_t mul_u64_u64_shr_add_u64(uint64_t *res_h=
-i, uint64_t delta,=0A=
- =0A=
- static bool tai_adjust(struct vmclock_abi *clk, uint64_t *sec)=0A=
- {=0A=
--	if (likely(clk->time_type =3D=3D VMCLOCK_TIME_UTC))=0A=
-+	if (clk->time_type =3D=3D VMCLOCK_TIME_TAI)=0A=
- 		return true;=0A=
- =0A=
--	if (clk->time_type =3D=3D VMCLOCK_TIME_TAI &&=0A=
-+	if (clk->time_type =3D=3D VMCLOCK_TIME_UTC &&=0A=
- 	    (le64_to_cpu(clk->flags) & VMCLOCK_FLAG_TAI_OFFSET_VALID)) {=0A=
- 		if (sec)=0A=
--			*sec +=3D (int16_t)le16_to_cpu(clk->tai_offset_sec);=0A=
-+			*sec -=3D (int16_t)le16_to_cpu(clk->tai_offset_sec);=0A=
- 		return true;=0A=
- 	}=0A=
- 	return false;=0A=
-@@ -349,9 +349,9 @@ static struct ptp_clock *vmclock_ptp_register(struct de=
-vice *dev,=0A=
- 		return NULL;=0A=
- 	}=0A=
- =0A=
--	/* Only UTC, or TAI with offset */=0A=
-+	/* Accept TAI directly, or UTC with valid offset for conversion to TAI */=
-=0A=
- 	if (!tai_adjust(st->clk, NULL)) {=0A=
--		dev_info(dev, "vmclock does not provide unambiguous UTC\n");=0A=
-+		dev_info(dev, "vmclock does not provide unambiguous time\n");=0A=
- 		return NULL;=0A=
- 	}=0A=
- =0A=
--- =0A=
-2.34.1=0A=
-=0A=
+Le 18/12/2025 à 11:35, Paolo Abeni a écrit :
+> On 12/14/25 2:39 PM, Andrea Mayer wrote:
+>> On Wed, 10 Dec 2025 18:00:39 +0100
+>> Nicolas Dichtel <nicolas.dichtel@6wind.com> wrote:
+>>> Le 10/12/2025 à 11:37, Andrea Mayer a écrit :
+>>>> I've got your point. However, I'm still concerned about the implications of
+>>>> using the *dev* field in the root lookup. This field has been ignored for this
+>>>> purpose so far, so some existing configurations/scripts may need to be adapted
+>>>> to work again. The adjustments made to the self-tests below show what might
+>>>> happen.
+>>> Yes, I was wondering how users use this *dev* arg. Maybe adding a new attribute,
+>>> something like SEG6_IPTUNNEL_USE_NH_DEV will avoid any regressions.
+>>>
+>>
+>> IMHO using a new attribute seems to be a safer approach.
+I agree.
+
+> 
+> Given the functional implication I suggest using a new attribute. Given
+> that I also suggest targeting net-next for the next revision of this patch.
+I see this as a bug. A route such as
+cafe::1  encap seg6 mode encap segs 1 [ fc00:21:100::6046 ] dev veth0
+with veth0 completely ignored but mandatory is buggy.
+
+> 
+>>>>> diff --git a/net/ipv6/seg6_iptunnel.c b/net/ipv6/seg6_iptunnel.c
+>>>>> index 3e1b9991131a..9535aea28357 100644
+>>>>> --- a/net/ipv6/seg6_iptunnel.c
+>>>>> +++ b/net/ipv6/seg6_iptunnel.c
+>>>>> @@ -484,6 +484,12 @@ static int seg6_input_core(struct net *net, struct sock *sk,
+>>>>>  	 * now and use it later as a comparison.
+>>>>>  	 */
+>>>>>  	lwtst = orig_dst->lwtstate;
+>>>>> +	if (orig_dst->dev) {
+> 
+> Here you should probably use dst_dev_rcu(), under the rcu lock, avoiding
+> touching dev twice.
+Ok.
+
+Thanks,
+Nicolas
 
