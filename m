@@ -1,192 +1,309 @@
-Return-Path: <netdev+bounces-245355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE064CCC239
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 14:58:19 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7325DCCC30F
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 15:12:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 848EB30E48D8
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 13:53:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 22D973036DA4
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 14:12:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 245333451DB;
-	Thu, 18 Dec 2025 13:53:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4314034A76D;
+	Thu, 18 Dec 2025 14:04:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="qFohZZY8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="V/Jsw4+q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC6173451D4;
-	Thu, 18 Dec 2025 13:53:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766066035; cv=none; b=NZj4SwPVukajfbGdsmCD1LRKxdV9cP+rQoIRa6iMXrHz2Yh2mYOI5d+MPXFmQ9UEcQ8od/rG/NIVYLjIts6V0h+7lUwoBBh/ZhSYGIY2U+Z2hLx1WKUYrYY58nmZ64yKmzR/cMeeNrIkr2Nw9dq2bk9q1Jr0QHnXOB4OgECCwuE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766066035; c=relaxed/simple;
-	bh=Gb408fVHMLonuRAakmkxdDWU8SK3ZsmJh94vFt7tIrA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Sy5Kps4BUbytZho+L8HpW9BKnfO5Kj85SwMDBJSWLpyo3JS/FoTKpi4++TuNbNHmGfkQg1aEcyUyOKlFe2i7BMVn3fkicvH9mI+UboBNz0T4Ngr42S9ec8TdeLxeNjYErKwmtIcrU83JuJAsAxnk0UptTg02W6FLPtT8AHJZ+tw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=qFohZZY8; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id D8E6D4E41C86;
-	Thu, 18 Dec 2025 13:53:48 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id A4BEE606B6;
-	Thu, 18 Dec 2025 13:53:48 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 66249102F0B2D;
-	Thu, 18 Dec 2025 14:53:33 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1766066026; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=RhgSGQYStNGcdPoB3dTlM/CB5TE2tva/NS/z3ptd3wM=;
-	b=qFohZZY8adtmwbRo28+tcgXOIuD5T9ZV6GmStiiS0ZAEXQPvVe9Zcnoe53YsCQv7j9c1kT
-	pTrvVf3pcUkunP7HW/oQvdBg/Lk3nsGsCiYCx3SHIHn49cINe+SDypYYTUNdpwsJxK0JVh
-	ocSroqcU2Nk7str55AMgKkPgbWDRxk2+yhvbttnAqOzQlGRqdP2i4+xde+ODjyK3Zpm5be
-	ZSBh2N3dOdtUob6QOjlSHuVExl0oaNjoD8HBgFGaCPqRDPAFBwnRVvZxfM0UXeEISM/0Op
-	YG/ULfUWn7tCLkV8LWmaP9dHfiDTFdsnlQ2sM6hNfJi3OczZvwptkZvMOkvVJQ==
-Date: Thu, 18 Dec 2025 14:53:32 +0100
-From: Alexandre Belloni <alexandre.belloni@bootlin.com>
-To: Jens Wiklander <jens.wiklander@linaro.org>
-Cc: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Sumit Garg <sumit.garg@kernel.org>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Sumit Garg <sumit.garg@oss.qualcomm.com>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Jan Kiszka <jan.kiszka@siemens.com>,
-	Sudeep Holla <sudeep.holla@arm.com>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Mimi Zohar <zohar@linux.ibm.com>,
-	David Howells <dhowells@redhat.com>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Peter Huewe <peterhuewe@gmx.de>, op-tee@lists.trustedfirmware.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-rtc@vger.kernel.org,
-	linux-efi@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	Cristian Marussi <cristian.marussi@arm.com>,
-	arm-scmi@vger.kernel.org, linux-mips@vger.kernel.org,
-	netdev@vger.kernel.org, linux-integrity@vger.kernel.org,
-	keyrings@vger.kernel.org, linux-security-module@vger.kernel.org,
-	Jason Gunthorpe <jgg@ziepe.ca>
-Subject: Re: [PATCH v2 00/17] tee: Use bus callbacks instead of driver
- callbacks
-Message-ID: <20251218135332f323fa91@mail.local>
-References: <cover.1765791463.git.u.kleine-koenig@baylibre.com>
- <CAHUa44FrDZbvRvfN8obf80_k=Eqxe9YxHpjaE5jU7nkxPUwfag@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A6A334A3AE;
+	Thu, 18 Dec 2025 14:03:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1766066642; cv=fail; b=si/xPKfCGKpYxVMvPFqwMCABieyrFQZJB/gma3/egIXN5A2k5RKSEUJ8zUSjjoq8xqsjP6cIf1D8xqt1n6/egs/CQOj0u7gjBSH6lEpsT4vq4EKRfLaMCdD2k+qDbnDX7C9dmPSTXTwtmlGD5AmQ4VaQ1frlZmNFiZRqqINIY7o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1766066642; c=relaxed/simple;
+	bh=LV2eLoESOOmegas+t1xBZcLRzjwa3hEznoWRaoJYusI=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=IxRaNtGvomVn/rawFU7PFKkgaZtpR/r8pUkKm5hbvaCNH0lDOjVcy8ur/ROVJeoHytxbt2a0CDBA8S35WFCQ9cJFT4O+XH1iPuA0I1xGQh+YC4c4tDKcuOy2+Nk1BeEzmPlSZj9iBZT95A2q+dMrVuBgAQ8zXwOlAIfjW3+eDEw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=V/Jsw4+q; arc=fail smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1766066640; x=1797602640;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=LV2eLoESOOmegas+t1xBZcLRzjwa3hEznoWRaoJYusI=;
+  b=V/Jsw4+qkmnLy0C9igI+N9oRM2vKAWz7VXV7bI5D9wsdT83NNppe+ELQ
+   3q8C43tL1IVq8qu+vSwzeneQSa28OvS0IYNcvEHILNYd2qgjd1uflh1Y+
+   3T98/BjLKCWW/DAz6ylFTgWekJ7SKbYwA0xeq6NgcUkF7aGYXFFM0SuI2
+   c829V/1Mn/SRcLXD6G57OagBg3RGr05/jXR0ld04qaSaapjAaiQlNj+xS
+   WNOzsj7tx3cs/E5FU4cyefcFOfYTKYHw66ofw7vqQfIyuypEeCD9m0FCk
+   yODBlp3pU0c9g76zFV6qmmOYF8r+lnEGBwp/MTVi8X+s0V+CfJf12p2Bo
+   w==;
+X-CSE-ConnectionGUID: FCdNVh0NSdaPKUZLFR/VqA==
+X-CSE-MsgGUID: F0poxxLVR4WcVcLxkvZ5Cg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11646"; a="71879197"
+X-IronPort-AV: E=Sophos;i="6.21,158,1763452800"; 
+   d="scan'208";a="71879197"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2025 06:04:00 -0800
+X-CSE-ConnectionGUID: J0/lN9WmQp263uzmUR8RtQ==
+X-CSE-MsgGUID: WqlKKoBuQaGI7uQo7lbkOw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,158,1763452800"; 
+   d="scan'208";a="221998366"
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2025 06:03:59 -0800
+Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Thu, 18 Dec 2025 06:03:59 -0800
+Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
+ FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29 via Frontend Transport; Thu, 18 Dec 2025 06:03:59 -0800
+Received: from CH1PR05CU001.outbound.protection.outlook.com (52.101.193.63) by
+ edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.29; Thu, 18 Dec 2025 06:03:58 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=wCfc+RJz2km8usXmAMMyPMQnr9//VnSB1Wn7y4CxZNMTRHiSHg0icvXjOxcQbe4HsQP1VQ3vTvAIwrTN1/221s5knfKTztKU4z1+IDB0yyFxzXX521RMrtJ51GJPi4kUoXRVsE9FzG8mYmh+YcYUT/WQuiC0m66/9v7FvE84uhZJEZSZWwOTWsWSbs1cqnGfvVzFuJips77tT+o1iaje8Gl2eqSfGJkJsKgVJIqwnYY9szoYdpslhDYRzTNCbAGzcuJL3N/pzrdprMljWXdwrCsX344gf4vPQBGYrUpvH4KRD6rzqOYJs7vWZ7MNSkQ2EiSYmN5Q62hGHP9BwbEDBw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lvWrKWRhPN1+Ocb5hqqpIq7iPk2uJ/iymRT5vQHCWLQ=;
+ b=YNQUF/vgfXg19Mtq84NF9FzHduTczA3SzCrwNLG07dCJ0o6aX2dLRvhIdDNYxeBmSt5uYPHOeXkk+5zDE33tHd4x+YEVvuZa0PnwdWhhVJp0xL/V8paM57pqyaSPQzRTfhnIjCbB49qJuUWRToxbYOBZ7jQ+HVtEuiEHumQYZSGU6vXBPsLz2XvFRm1JUqKzvF1csm4ddPRQv6bpF1+0UYPSUhzS/74tAB5R2e0vLdu+vS/IGYaF0DY6DAoJdKmW5lwEVPLGMeHAIZPVlCizdty9ctvDtk3siILcMtLs+bnwRNEtIJyrgczkhHEjOjbYjZ2Sz6FIhtnjKNBLn9SQLA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by MN0PR11MB6110.namprd11.prod.outlook.com (2603:10b6:208:3ce::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9434.6; Thu, 18 Dec
+ 2025 14:03:55 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808%4]) with mapi id 15.20.9434.001; Thu, 18 Dec 2025
+ 14:03:55 +0000
+Message-ID: <73ab2fb8-6676-4d56-a512-24891191940a@intel.com>
+Date: Thu, 18 Dec 2025 15:02:27 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] idpf: export RX hardware timestamping
+ information to XDP
+To: Mina Almasry <almasrymina@google.com>
+CC: <netdev@vger.kernel.org>, <bpf@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, YiFei Zhu <zhuyifei@google.com>, "Alexei
+ Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, "David
+ S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, "Jesper
+ Dangaard Brouer" <hawk@kernel.org>, John Fastabend
+	<john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
+	<intel-wired-lan@lists.osuosl.org>, Aleksandr Loktionov
+	<aleksandr.loktionov@intel.com>
+References: <20251218022948.3288897-1-almasrymina@google.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+Content-Language: en-US
+In-Reply-To: <20251218022948.3288897-1-almasrymina@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: VI1PR0902CA0055.eurprd09.prod.outlook.com
+ (2603:10a6:802:1::44) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHUa44FrDZbvRvfN8obf80_k=Eqxe9YxHpjaE5jU7nkxPUwfag@mail.gmail.com>
-X-Last-TLS-Session-Version: TLSv1.3
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|MN0PR11MB6110:EE_
+X-MS-Office365-Filtering-Correlation-Id: 16471549-0fc9-48cc-5489-08de3e3e47fa
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?cmlrd2ZHTjdvbVhlbUdLa0I2Szk4cTdtaytMZFM5c3U5ZHAySGFhVDBaSUh1?=
+ =?utf-8?B?T3J0TFh5cFNyTHN5elAyR2xpUFBRTnptK1dSL1dKT2xyemx4empBS3pUZlJq?=
+ =?utf-8?B?QTNYTVE2enUrZXhJOWQxNTNzeVVuM2hrTlZxMmVORHBTOTcwenY0Wm9weWJp?=
+ =?utf-8?B?bGp6RVhneE82OGVUSmZhNzdJaG9vWkZROXRRYkZwRG56WDRaRGlOaUdmdUI1?=
+ =?utf-8?B?SFpVMHdsSFdHU29jQjZiSnRXMzFFeTlzOWRlMlMrTTNhc1F5VFkyYnJLQlph?=
+ =?utf-8?B?bDZLTEU4MVFwT0xPcXdiN2czN1FmdHFsZ0E0S0RXN2hpYjdPaHdrSy92eDFq?=
+ =?utf-8?B?M0ROYVNraStyU0dLQXgybGgvM0R5UkpwOHlPa2xKM0p3R3QxaWJGSjg2MzVo?=
+ =?utf-8?B?QS9rbUFsTmZYU1VVam9YbVppc3ZlaG9Ockx5UFU1M1FnNkVnNWtpeUpSazUz?=
+ =?utf-8?B?a0I5cklPU3hScExjajBoNHdlbnNMd0tMQWhFQlFGYUk5eWpKT1RNSG5uNVow?=
+ =?utf-8?B?ZXg3Y3kyZjBIaEloTE5KeTZCaWJsUVZ4MFpDU25HcjBXQ0xaQitITG1pNUk5?=
+ =?utf-8?B?Q2F6cGJmc3RnL2dYdG1kMVE5RmFDQVMrSzlENi9lQzlUdkllaEFsMWx6M0to?=
+ =?utf-8?B?WXhBK2J6L0lDREc5TmJiWnRQUStHc0pxaGpWZXJJTnh6N1lBSUhiSk1FNWYr?=
+ =?utf-8?B?NHlNZmx0UzdkMHBBZ1poenpLY0VCbjhDZmRaeFRRNFlSQlRiVmJHSmJwQ1k5?=
+ =?utf-8?B?a0JuenEzd0xtYy92NkJ0cUhOZkM5N0JESWhialprdGRJQmh1THpNU1BjQ0x6?=
+ =?utf-8?B?NWpvL01ZQ2FJdkVTRkVhVDVQb1EyUTdvUjFCQkh6eDNMN2l0bngzMmkrREE5?=
+ =?utf-8?B?YmU4dFZSbnpvYy90RUZCQS9uTU55eG80cGgycDRzblZFRGZzeS9pdno0bkpp?=
+ =?utf-8?B?VmtnRDBxb2pSMkc2d3JNdEFsL0d5bDZnZkRRd053UnF4RmswRGRlazhQOTY1?=
+ =?utf-8?B?RXA2TnNIdHNnRlJHaEhWMGJOeFV6SGN0NHpDdDIyc2x0R2JGeVEydHh5UDFw?=
+ =?utf-8?B?MzZ3bXphbzlFVlZtUVF6WHBFczJGdlN3N1dtNVpYd3Y2MmNuNWN0eUZhdU9J?=
+ =?utf-8?B?S2RseWNvblNHRUZFZDhUNmJVSzhrcnp3NFdjWjl5YSs0eCt4elNJMHV3aVNo?=
+ =?utf-8?B?UG5aZGNWc0dLZ3UrMjlFQXJiN1VqZUtneTQwU2dZQzFlL3dzVU4zcWpJZko4?=
+ =?utf-8?B?eFJKd3pyM00xNDJ6RytYN1VGMDcxaFg4ZGpnU0RRNlVNWThHUzhTN0pUZ0xG?=
+ =?utf-8?B?VnNCcjdmdkw1UU9uNW15ZVR5aEdXa3JSY09uVExnNzZWbjd4M3hIODd6U1N4?=
+ =?utf-8?B?aTFtZDBmS0gzNEVvZktEZTNiTTFaSUc4R2RReThNRW5SRE55QnBPSlBocEw0?=
+ =?utf-8?B?UVVjcXdWQWVQU1loTnZ4TFpYUURrQTdiOWFNU1Zrc25DVVJqVTZPcUNzVk9o?=
+ =?utf-8?B?aFNvcVE0ay84SUlVS0huVnhyMURVZHFoUjNTUjN2OVNzTG8yMVlvNWYzeFpO?=
+ =?utf-8?B?cXZkSEVXM3R5UWs1enhPVUFrbHJzS3RNd0N6RitRYXdabithQW5XeG92OE1s?=
+ =?utf-8?B?WTBFUitIRkFZMDRDdlNOQzRxUGpjcEQxVHIvWUlnY2V0NGdnditZTXM4a0ZY?=
+ =?utf-8?B?KzZWZVBSUFRBMTNFMThaM3VCakxCdStuQStEaVpIN1lWT3p4dnZaM0pDbC8r?=
+ =?utf-8?B?TDNWZEZRbkxTd0IxUHBQVGd1dE1JTVdMV2VyQU1ZbnpTSENiaXhleFBMSVp0?=
+ =?utf-8?B?NFk1eHVuellobG5vVUYwelZKVDlJeUNWb0t3OHFYNkdSaTZHalo5ZlJFRU5Z?=
+ =?utf-8?B?NnJlTHQyTWVJMGNvMFU4KzJ1aFhTQjVGaWtvWWl5OHNRQks1ckdZWlR5VnZP?=
+ =?utf-8?B?a0N3Y2orZ0FzQzEzdmZJVnlRb2ZBN2owWUsremVNZDlqYnJSN21hWmIzNHdB?=
+ =?utf-8?B?enNoNFRDM0dRPT0=?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YUc3WUlYNWpKT2FFemZpWERWU2RNWjdpV2RQZlpiTFpZWTFRNjV2T3U3eWFs?=
+ =?utf-8?B?a0t1bzVYNjRCdEpSQVBQY0ZhaGlRNHU3ZW1ZQVB0cmhKb1p4WWJqSkFkZG9q?=
+ =?utf-8?B?b2xsNU1PNWJaSkdCL25rSlIyZlpEUnB2b0xTQldSZE9QbEhySzZDTFVWWEFZ?=
+ =?utf-8?B?TkhzWnk3a1JvS1R3L1JGMGZPcDh5Zi9LK0EvZUhWRGpNWHdUdnhJQkJzMXFq?=
+ =?utf-8?B?VGxUR0FWZlkxZTZHSXdTZ1gwcTUzVG5nYkxBUmcwQUVTd0R1RWhTbGNYc2ow?=
+ =?utf-8?B?TlF0b1RZNkJMeWZLY3dheUtIL0dkNncyNm5JWmhhUHFvZHdndGZlY3plNEhD?=
+ =?utf-8?B?Snl0amp3UmJwSFpaRk54bU5iTUg2b084RUgxcTZVVDZrcm90RkFmUUlVSmx5?=
+ =?utf-8?B?YmZiQXd3cDdPbjd5NlBhWVlCRzFNWXRiaFlXajRqT3FZQVNQSksydG5lZVpE?=
+ =?utf-8?B?NEtXN2FGSml3Myt5VzFHVFBBZGxVUk1KNHh3RjdIaGVYUDNiMXNrMjk0NFkx?=
+ =?utf-8?B?SWtCV04xbDduMWpPMzZJWmpTMjZ5bFhRUFd2VWNXeEJyTWR1SDMvZU0vbXJx?=
+ =?utf-8?B?QmtTT1MvVzVrU3dwaXZwY29abEZzNnhhKzdLV1BBdjI1UzBuWEVvR3daREMz?=
+ =?utf-8?B?dnU1VkQ2SzMyaEZ0M0xOR1lUZnNiTWlYUVZqK3ZtT1dkR1Y1aDZOMkExSm9Z?=
+ =?utf-8?B?TUJQazNTUzFpUDhsKzNnc0tvcjRnbVhJZ3hvZXFvTWJwemduSVpiSlh2T0NH?=
+ =?utf-8?B?V1N5ZXB1MGhHS1FZcUZRMVhVdEVDMEFuVXgrQ0FYb0hJYzlHUEo3dE1kSTY3?=
+ =?utf-8?B?OEZvM0ZPb2xnTGRUWU12QW54RlRHcDdrUmRta2pyam1VeEQwRUlObkZDa3FW?=
+ =?utf-8?B?ZlI2THR1ZWRkd2RpTkRBY1Bhb2VSMlBLaUZGczgyWUpJbmxRRHErZWs2Tktn?=
+ =?utf-8?B?eC8ramFqRllrUjQyUEhwZ3pYK0RmcEpMOTZJamdXdUVlRTdheTFpTVV2cFVL?=
+ =?utf-8?B?RUFyekM5d0dMVExzWnJrWnM2dzhyUURzK2hGV1Zud3pIRndjUjF1OW1nSnk4?=
+ =?utf-8?B?R3hFWm84cHllZ2JhQmJsTi9ta0RxdmpyMjNrY2tudFprSmJNME1VMS9NbXc0?=
+ =?utf-8?B?ZzZsc3FDVzZoYlZJWUpoeFRvY0N4cGtSRlFGRUh2QjVzSzgxVXh1K21pZVZV?=
+ =?utf-8?B?UWpxM3J1NFJvY2JVN3VOS1BBblJlRm96S09IZjhVNHZkQThKRStNdWNpZndv?=
+ =?utf-8?B?bGJnaWpDZ2ZEeHhqOXVYRVV3ZTZVdEk1b3JyVFhMQm5RajJuRWZXUzR5eEhM?=
+ =?utf-8?B?dnlUQTdldUsxeU1TSGRJekFnSC9iaUdyUzMxNkpiTkNCcEtZeEoxMjNnZUJF?=
+ =?utf-8?B?bDMvM3o2ckVPcDRLdGEyV0tGNzlXemlCaWpFcHBKU21KbU5RNnNIeklieTFv?=
+ =?utf-8?B?Y0czN1hlMksvaWtuNGxlZUlicCtCejNvUU5XMDMwSVg5a2crMnNNczM3VjZ1?=
+ =?utf-8?B?bWRERTlWRGdwZUV1V0RpVmZobmpQcWJiRXp5a1hCUDdMWFEwdWpiOHdpbHgv?=
+ =?utf-8?B?ZWF0RTNZVDBrZU93Yjl0di9OL0xUMjZTV2c3SVVoa0pOT2NpbmhSUWJPZmVm?=
+ =?utf-8?B?N09xVlErWkhTK1RtbzBEY01qTzBWekpWcEwxenR3SGZDMGlPdVl3czMwd3Zh?=
+ =?utf-8?B?UFBVUTZESE5WcTE2SWdRUm1Kc3VXQ0xtTWZlZ2d4U1JxWUplTnJuMjJ1WFRj?=
+ =?utf-8?B?ZGxEK2tKcWVVVWNjN3RucWRBT1NMZGFYK2NMRDYrMVFOM1ZhK1pWbXdTcXNx?=
+ =?utf-8?B?cGRhTXJ1aEUvMDluUk56SzEwVXF6Z08yQWVNSVpodXhsdXIybFczUEwyaUpD?=
+ =?utf-8?B?OEozMU9maEZCVk5HdW9NeVpRRWwzanNhSGVvcEZjZUFjWWluTVY1L1M1bzNW?=
+ =?utf-8?B?NjlIeEdjcHVLVWZvNXBZY0YyUmFWYmJhakJNa2tzWmR6aStOVVN1WFJWN1RB?=
+ =?utf-8?B?ZzhCRHBFVnl6LzArYTZQZVRvaDQzN1dka1JhYklZQUtmWDNaL29XVTdvSS9u?=
+ =?utf-8?B?aG1ZNjhBd1N1TFkrWkUyZHhVMEZyTUZhaFNuT0cvYThGbkdLbWR4V0VHZ0Ri?=
+ =?utf-8?B?K1cvY1hRamZ2RTBYamdYdjcvNTFSdnlDNERPUHBoRUxWRFZWWlN0bVgybkV1?=
+ =?utf-8?B?U3c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 16471549-0fc9-48cc-5489-08de3e3e47fa
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Dec 2025 14:03:55.2460
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: JTOrUeRxe6zm6XfT3p4y9zX/B7JxE8x5yusBAVcfY4SZB/vPwF/ITA7eB7vebz90sF3Nw1dpAsVhU1J0aOriemTFybksxisdoOJVIOAJzvs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR11MB6110
+X-OriginatorOrg: intel.com
 
-On 18/12/2025 08:21:27+0100, Jens Wiklander wrote:
-> Hi,
-> 
-> On Mon, Dec 15, 2025 at 3:17 PM Uwe Kleine-König
-> <u.kleine-koenig@baylibre.com> wrote:
-> >
-> > Hello,
-> >
-> > the objective of this series is to make tee driver stop using callbacks
-> > in struct device_driver. These were superseded by bus methods in 2006
-> > (commit 594c8281f905 ("[PATCH] Add bus_type probe, remove, shutdown
-> > methods.")) but nobody cared to convert all subsystems accordingly.
-> >
-> > Here the tee drivers are converted. The first commit is somewhat
-> > unrelated, but simplifies the conversion (and the drivers). It
-> > introduces driver registration helpers that care about setting the bus
-> > and owner. (The latter is missing in all drivers, so by using these
-> > helpers the drivers become more correct.)
-> >
-> > v1 of this series is available at
-> > https://lore.kernel.org/all/cover.1765472125.git.u.kleine-koenig@baylibre.com
-> >
-> > Changes since v1:
-> >
-> >  - rebase to v6.19-rc1 (no conflicts)
-> >  - add tags received so far
-> >  - fix whitespace issues pointed out by Sumit Garg
-> >  - fix shutdown callback to shutdown and not remove
-> >
-> > As already noted in v1's cover letter, this series should go in during a
-> > single merge window as there are runtime warnings when the series is
-> > only applied partially. Sumit Garg suggested to apply the whole series
-> > via Jens Wiklander's tree.
-> > If this is done the dependencies in this series are honored, in case the
-> > plan changes: Patches #4 - #17 depend on the first two.
-> >
-> > Note this series is only build tested.
-> >
-> > Uwe Kleine-König (17):
-> >   tee: Add some helpers to reduce boilerplate for tee client drivers
-> >   tee: Add probe, remove and shutdown bus callbacks to tee_client_driver
-> >   tee: Adapt documentation to cover recent additions
-> >   hwrng: optee - Make use of module_tee_client_driver()
-> >   hwrng: optee - Make use of tee bus methods
-> >   rtc: optee: Migrate to use tee specific driver registration function
-> >   rtc: optee: Make use of tee bus methods
-> >   efi: stmm: Make use of module_tee_client_driver()
-> >   efi: stmm: Make use of tee bus methods
-> >   firmware: arm_scmi: optee: Make use of module_tee_client_driver()
-> >   firmware: arm_scmi: Make use of tee bus methods
-> >   firmware: tee_bnxt: Make use of module_tee_client_driver()
-> >   firmware: tee_bnxt: Make use of tee bus methods
-> >   KEYS: trusted: Migrate to use tee specific driver registration
-> >     function
-> >   KEYS: trusted: Make use of tee bus methods
-> >   tpm/tpm_ftpm_tee: Make use of tee specific driver registration
-> >   tpm/tpm_ftpm_tee: Make use of tee bus methods
-> >
-> >  Documentation/driver-api/tee.rst             | 18 +----
-> >  drivers/char/hw_random/optee-rng.c           | 26 ++----
-> >  drivers/char/tpm/tpm_ftpm_tee.c              | 31 +++++---
-> >  drivers/firmware/arm_scmi/transports/optee.c | 32 +++-----
-> >  drivers/firmware/broadcom/tee_bnxt_fw.c      | 30 ++-----
-> >  drivers/firmware/efi/stmm/tee_stmm_efi.c     | 25 ++----
-> >  drivers/rtc/rtc-optee.c                      | 27 ++-----
-> >  drivers/tee/tee_core.c                       | 84 ++++++++++++++++++++
-> >  include/linux/tee_drv.h                      | 12 +++
-> >  security/keys/trusted-keys/trusted_tee.c     | 17 ++--
-> >  10 files changed, 164 insertions(+), 138 deletions(-)
-> >
-> > base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
-> > --
-> > 2.47.3
-> >
-> 
-> Thank you for the nice cleanup, Uwe.
-> 
-> I've applied patch 1-3 to the branch tee_bus_callback_for_6.20 in my
-> tree at https://git.kernel.org/pub/scm/linux/kernel/git/jenswi/linux-tee.git/
-> 
-> The branch is based on v6.19-rc1, and I'll try to keep it stable for
-> others to depend on, if needed. Let's see if we can agree on taking
-> the remaining patches via that branch.
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 18 Dec 2025 02:29:36 +0000
 
-6 and 7 can go through your branch.
+> From: YiFei Zhu <zhuyifei@google.com>
+> 
+> The logic is similar to idpf_rx_hwtstamp, but the data is exported
+> as a BPF kfunc instead of appended to an skb.
+> 
+> A idpf_queue_has(PTP, rxq) condition is added to check the queue
+> supports PTP similar to idpf_rx_process_skb_fields.
 
--- 
-Alexandre Belloni, co-owner and COO, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+Much better now, one nit below.
+
+> 
+> Cc: intel-wired-lan@lists.osuosl.org
+> 
+> Signed-off-by: YiFei Zhu <zhuyifei@google.com>
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> 
+> ---
+> 
+> v2: https://lore.kernel.org/netdev/20251122140839.3922015-1-almasrymina@google.com/
+> - Fixed alphabetical ordering
+> - Use the xdp desc type instead of virtchnl one (required some added
+>   helpers)
+> 
+> ---
+>  drivers/net/ethernet/intel/idpf/xdp.c | 29 +++++++++++++++++++++++++++
+>  drivers/net/ethernet/intel/idpf/xdp.h | 17 ++++++++++++++++
+>  2 files changed, 46 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/intel/idpf/xdp.c b/drivers/net/ethernet/intel/idpf/xdp.c
+> index 958d16f87424..7744d6898f74 100644
+> --- a/drivers/net/ethernet/intel/idpf/xdp.c
+> +++ b/drivers/net/ethernet/intel/idpf/xdp.c
+> @@ -2,6 +2,7 @@
+>  /* Copyright (C) 2025 Intel Corporation */
+>  
+>  #include "idpf.h"
+> +#include "idpf_ptp.h"
+>  #include "idpf_virtchnl.h"
+>  #include "xdp.h"
+>  #include "xsk.h"
+> @@ -391,8 +392,36 @@ static int idpf_xdpmo_rx_hash(const struct xdp_md *ctx, u32 *hash,
+>  				    pt);
+>  }
+>  
+> +static int idpf_xdpmo_rx_timestamp(const struct xdp_md *ctx, u64 *timestamp)
+> +{
+> +	const struct libeth_xdp_buff *xdp = (typeof(xdp))ctx;
+> +	struct idpf_xdp_rx_desc desc __uninitialized;
+> +	const struct idpf_rx_queue *rxq;
+> +	u64 cached_time, ts_ns;
+> +	u32 ts_high;
+> +
+> +	idpf_xdp_get_qw1(&desc, xdp->desc);
+> +	rxq = libeth_xdp_buff_to_rq(xdp, typeof(*rxq), xdp_rxq);
+> +
+> +	if (!idpf_queue_has(PTP, rxq))
+> +		return -ENODATA;
+
+I think this could be optimized a little bit by reodering,
+
+	rxq = libeth_xdp_buff_to_rq(xdp, typeof(*rxq), xdp_rxq);
+
+	if (!idpf_queue_has(PTP, rxq))
+		return -ENODATA;
+
+	idpf_xdp_get_qw1(&desc, xdp->desc);
+
+to not read the desc if the Rx queue doesn't have the PTP bit set.
+Apart from this, LGTM.
+
+> +	if (!(idpf_xdp_rx_ts_low(&desc) & VIRTCHNL2_RX_FLEX_TSTAMP_VALID))
+> +		return -ENODATA;
+> +
+> +	cached_time = READ_ONCE(rxq->cached_phc_time);
+> +
+> +	idpf_xdp_get_qw3(&desc, xdp->desc);
+> +
+> +	ts_high = idpf_xdp_rx_ts_high(&desc);
+> +	ts_ns = idpf_ptp_tstamp_extend_32b_to_64b(cached_time, ts_high);
+> +
+> +	*timestamp = ts_ns;
+> +	return 0;
+> +}
+> +
+>  static const struct xdp_metadata_ops idpf_xdpmo = {
+>  	.xmo_rx_hash		= idpf_xdpmo_rx_hash,
+> +	.xmo_rx_timestamp	= idpf_xdpmo_rx_timestamp,
+>  };
+Thanks,
+Olek
 
