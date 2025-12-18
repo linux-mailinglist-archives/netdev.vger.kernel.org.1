@@ -1,141 +1,160 @@
-Return-Path: <netdev+bounces-245263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 055EDCC9EFE
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 01:57:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD1ECCC9F2C
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 02:12:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EDCDF301A34C
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 00:57:05 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 551E8302858E
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 01:12:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAF6223EA82;
-	Thu, 18 Dec 2025 00:57:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E14A42459ED;
+	Thu, 18 Dec 2025 01:12:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qmV4feUS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ap7m0XjS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A83F823C505
-	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 00:57:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766019424; cv=pass; b=s5r/x7Yh5kszKFnrMcq12fiaUTyIfRCrpmaTBFmiE3RdhNYk98H4TljobnpavoT39yUn8JR1K+IIyXRNr9+e73vV3BpRtf2+3/KxGsswvXfeb6gkqYEqIhGe0Cwz6iKiHBLAexNXSioMbHJ4jWw/tb+p9NTC4JAOV4lXzKjbH/I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766019424; c=relaxed/simple;
-	bh=Wn8IVSKBKjdKQd+Seeo1vN6CZx6+S91YD2RyKFE3rmk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IbJl3uC0AcgoK0V0dBYHAFPBScZEf5rjmEJOJSI21x/Oxubi0iWw4/FYQiHc3hbmdec56wh5EpTmal7QTXi9trErT68RUgdb2iuT7uEVSeKsGeOiGjgZVtLCrTwlaKKCDSFJ+hMo2YICGXjQ2GQ9I7iAR5cJNwK+vBV8IvM6F74=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qmV4feUS; arc=pass smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-59434b28624so2038e87.1
-        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 16:57:01 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1766019419; cv=none;
-        d=google.com; s=arc-20240605;
-        b=IxMX7CuceW0UTkXNVH1Kws2V9xDlCczmw3NhHK1HAoFi4JEObVd/FDLHLsRYNVbjFq
-         A5z1Qa8xVgh3ic6sa0nbppkyPV5Yh3MVkRhUQ0DL50qSeN8NXSrRFED/06PcurCYkRIn
-         UJFMARO+OP+gbtgs2D+MYgvhCIp40l89LIFqkAElKFLsrFp085W0iTD0IUFbIaZwr7XO
-         +pn0GLfO5k2E702sCyO0Vr4zy2x82qDiiUEX426SF4SMTFOg//+cgzmmTZDrvyPVSQ59
-         epnwli7QWVXAu2PJrYRsALkfSFEQMlZsyM0SWiCi50ZTKGXqRcRCWON4N8hFucZ6/KzK
-         cBwg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:dkim-signature;
-        bh=Wn8IVSKBKjdKQd+Seeo1vN6CZx6+S91YD2RyKFE3rmk=;
-        fh=h126AUibyR9sRDTOvFdK+MzzH+3ekWfJdhrkjWl+0iw=;
-        b=Nva6yNt8SHAoAJMm5YI4d+mn64ROHZPK+ieRmW/AySSZiFqiJUxXgnnH9kFA6JYWpQ
-         K9ExLu1B8Dtz7gBC5TOSD55Mj5Uz9+2pMmsapQfybdmVEuNse8BwGrop6IF4X7ZEw4nZ
-         7WgDuthnZvVvh9S/gYhT0cLfT1Dmw8JO+TLaXvruiHPkTV/+uMRgST+38nw+ZOR8xUR6
-         ItMHJFRley3qWkz+zYsBrT98P6epdyREX0S17JDZypbXESz4OduHLbTQaVNbn66y8ERH
-         8i4R+wRuyLKHrKxdxGSdYHdI4mZuxEBl5OoWEvxxHXwFiem3MGMmfTdqd/1/jfjvAdRi
-         0yEg==;
-        darn=vger.kernel.org
-ARC-Authentication-Results: i=1; mx.google.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57ECE2264AA
+	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 01:12:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1766020328; cv=none; b=LAPkAYUkKEdhef0G3OesVpEbilg5aqkv1C80Mijrih1aP3DlzGnjtWDNCd8ZMQtydYZToDwWQEkj5PrbNK2E3m/drHFAd9+tiRVrzKiwzRak5max4yDfmNLZyD0L8q05dfPbH3p0if1dybFfWKm/XXwvHwbltD7nT7yDgz0B6Aw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1766020328; c=relaxed/simple;
+	bh=s9PK0bqGZdNUz/UoLjF3yDZIxEKPvTCoS9DzPQLFNrg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pDJxgH4GoE332vuj1je02YCC+tt1j4RrLQN7l1ZG7vTpmAmoXLt7MD/wxZBoThGJS5YtiC5a/afvTmSmPuwbEgdBiUzCV/8RZMzAgBAHDOzuUWOcHUjDeskuokk0K81m/ss3aRfp0yj9WZSJl2LSuYNmIoXlbmf7et6SqC6lxtA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ap7m0XjS; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7f0db5700b2so127984b3a.0
+        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 17:12:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1766019419; x=1766624219; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Wn8IVSKBKjdKQd+Seeo1vN6CZx6+S91YD2RyKFE3rmk=;
-        b=qmV4feUSeuOEucoxkBxtp8oytidTHH6z7oFKaVjmzTV+BMEob3cTYF3ufrUmwCcY+L
-         cONw41Bl7/OHQRK+/RVcXZa50VN4k8QGJqmOI07gFR/C76jHO7CEonbc3nyB5z3n0bEI
-         Chww8XySGOZppk9O6qvz5+RKxPYcWfINQf5Uvx4zQ51rq5aDHOGGf65Rl1UM/M6kcgpg
-         2er4Ff0pPvsKngpwt2Yhdb7btDdAGMRcEI+CTaAEe9Fi2BZzJQBYPKdkqGw1Iy7Hnp44
-         FFup4AmSol9pP/WQQpl00mRrCC8D3eq5le7DFwjXDo5EnEfWa8B+1a82ek+sEAjCkTkh
-         uEaA==
+        d=gmail.com; s=20230601; t=1766020327; x=1766625127; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cqayJvvvEzIpD6BlpMcbxJqU7Fdf+Cn2lVBKmN/a5pI=;
+        b=ap7m0XjSpBKCyqavIKHmP5tMLvKYvc1rVaauYy9the7EBt1AtZ7Oiui9hzzMdMGAxC
+         mLQB0KvcjmCF8OC+QxI8ST3t937PqzQ+1KrO+zhlGt+OQX7DA2pqzHtZW07vjW+DGTzs
+         +A6BNXR5M3B2r1XoLxTwqM5XyOLdkoZSQWoGrF0zQaEB3CDRQXcROeet8/hVWldOX9zr
+         ono4BH8XRkGawgEAIrLsKHzcydDcUoNmRuLoFQTVC5niSGAmvmd9Kb4T9QFTG/vqX+2x
+         kRNms1RsFf7ZAgP12zYvjFHavQMha4tybpkRr47YbqxumepWqNPXSkZcJNJ4puG8QTsi
+         oWqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766019419; x=1766624219;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=Wn8IVSKBKjdKQd+Seeo1vN6CZx6+S91YD2RyKFE3rmk=;
-        b=wH1EUw9K5D2tbDEHlGTy20t1mwhZ9rhVF28LuwW5uN1MU6arHapsiN+JpmKSwf20fv
-         oJaK7Evh6PB/HNWY29I+UaRPQcbJAPd0mupbF5kWK/6U+s8b9hfYGGqAtKBse0JflNUq
-         nN9NQWHudJYZQXtCEwOP1q/xchSQUBcfXRx+t5E0vM1rFgk6HirFC0+ixBhAdYEobIs7
-         fHT4wCzLxaaXajOm4PGhmsj1pT4M+i9XbfEh+pjp0byZtRIzsqZUTCAgihM5mw1fRPz6
-         JRdXfoGSa9EGdpCzDDE21M7tQIAKhv9cXtH+SfNX793ye3Iar3pDeVZSgCvJDZ7Euxj/
-         TB/w==
-X-Forwarded-Encrypted: i=1; AJvYcCWJllQQZDJfuIxXNO6dN4AgiEJCcr9cEFR/Lsjn9u52ovfmQxntOnopJHKiIluyDVPwSiPU5+E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxkQhABMNV+mfbXIwrU7J5lI8GIaS/zG83ypehAMi3BylDdoms
-	rxDg2bdHlhmnYeCPpo64xV4VRJR0YXz7iD7MxVzKqeORr9Zn/+oTUrH+SjiquQHIdY0p5fmeVj3
-	t5QfuMS+wsxhNEMZZoZlrLZKsC9Kmt8N+EcD7Wsn2
-X-Gm-Gg: AY/fxX6HxPt0kvA2NhtVUYpuR/fcPNT+r4abkIrLEQjTi7xkzuL5VrwJN+WkcPFkcfY
-	93M42GOTPOmB/n4lUutoEqJzXY6ob0ATiQIgAJlwL77kVvSdHxNJAWs1+3855wX7LuzY8qGGoKl
-	r4D8VwtrhR/p073kegY/YX8J3L0IdPREnGnzugw7Rxx5zwAzQ/qymuRy2bRqJ+OLkmDZKzJFv9M
-	OO/3IiLsaJS7FDHXD6lh2RNmdCid+9IgE8RMqce1nNdjkj4CLbBbhajNb0KlDmP9i04Oug=
-X-Google-Smtp-Source: AGHT+IGGEASVHyPQ467f8qGv1ai9GzsgjLRnI7PhI1cmjlZrbY5wbMZyqExpji4t46A3XTEUAxJBJfUnsDWD8VEYR2U=
-X-Received: by 2002:ac2:41d0:0:b0:59a:1205:9c86 with SMTP id
- 2adb3069b0e04-59a143f4227mr7675e87.5.1766019419289; Wed, 17 Dec 2025 16:56:59
- -0800 (PST)
+        d=1e100.net; s=20230601; t=1766020327; x=1766625127;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cqayJvvvEzIpD6BlpMcbxJqU7Fdf+Cn2lVBKmN/a5pI=;
+        b=OeJB9nTNavN/jX2/iQlmVY1vwzKMt9WB8cXyhVajBP2WLuYi1pC9zPZ3nt6NJf6VJc
+         zE6Mp7wB1Y4dzpTVcp12peGZDfIlQnyzvotZ4rhGMrIDwis37Lv8LW2kKFVbZ1pFDoyb
+         K/tSX22YTfc8zimOm0mK/SPk57ca6Ya+VWqSYXNxh130QW1BLpTdVnqfEcm9F6ZRpf5M
+         vOTvdwaOStFbxdjoc/pfK8z0ClsJBSPJhej2hpksmxhlLOy2yChHqmkFxz6ZQOrnG5q8
+         htFdSrgmpdkVC9DffNa42FoLYgE/HdRXBCZL55STKT9tXow2LyvnRtZhPNEA12AAdLt0
+         8L6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUSVFWlfDtyVXXzmRAImxdp2kCG3Vn0WyQi542T9tcmmQkwLKLanKOOfCh/gjXgI2vxk4ftJis=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyE3tzLu/6xJTg+1S96ZZs2z233Z2gVBqHUc96W3kqTw+wxbwE4
+	8B511jeq/JmPuSAJuKykzw8F9Xy8cNWJY9csr35+LrxbyxAKNm7gcBIS
+X-Gm-Gg: AY/fxX6qN1bVjoxpZhZV2lrND4Gk+ULz55LKvNtiN/EkgOkDkf7kEmDQpuX6ZHnJN4I
+	8jQxzqNV4xbefzQr3ahvNMp3rQqDD98xyQRJgWtYOEaKpaGTnJfnP3foKVBAZZ1SFRiqa87DDEF
+	jNSyRRYS4b6bO0KIe30CPpFW6Et8JHa8Mta0ZolClul7eeoWtZ/7lzJKKFSS2TXnj9X6xFtl7Vb
+	EI8MRqcsFGcdLIHkvchF8+Z49p1UCuk3uBlI0Z8Nnkt/ute2OIUvYUAOcnHQB69lalG9ADxxBmg
+	5+DhOAuvJ8u7KiSFp9qIZQnkadjQDQWHsU9PwVI83LhLcayoRSDoL3Y2A/2Y92Ol8OATnWa9eu1
+	va41yKEWo9qOyfF7FSXPGEg8V6KCVwdM7kQQ+1FJ07iEQJ8fav2d5h/CDFRXWftx1fAMmYSXMra
+	ijWdsb27twrvxRqnYdb+En6/HtO1dv1DjPW+LkQ34CqN48Q0LOFuAVmqZGzcXlpLG+LNw=
+X-Google-Smtp-Source: AGHT+IFJqoTwqgKVjRcNNsxMRErlVDSEk/2rabThjD/yG3RsjGp4Bfvmj1fiJuJB/w7vsAffrQ/hLw==
+X-Received: by 2002:a05:6a00:1d9d:b0:7e8:4398:b368 with SMTP id d2e1a72fcca58-7f669a974c0mr18352826b3a.59.1766020326541;
+        Wed, 17 Dec 2025 17:12:06 -0800 (PST)
+Received: from deepanshu-kernel-hacker.. ([2405:201:682f:389d:a45b:c390:af5a:2503])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7fe70c4b853sm106470b3a.45.2025.12.17.17.12.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Dec 2025 17:12:05 -0800 (PST)
+From: Deepanshu Kartikey <kartikey406@gmail.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	khalasa@piap.pl,
+	andriy.shevchenko@linux.intel.com
+Cc: o.rempel@pengutronix.de,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Deepanshu Kartikey <kartikey406@gmail.com>,
+	syzbot+3d43c9066a5b54902232@syzkaller.appspotmail.com
+Subject: [PATCH v2] net: usb: asix: validate PHY address before use
+Date: Thu, 18 Dec 2025 06:41:56 +0530
+Message-ID: <20251218011156.276824-1-kartikey406@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250930212352.2263907-1-sreedevi.joshi@intel.com>
- <20250930212352.2263907-2-sreedevi.joshi@intel.com> <aN1MOnqvkl7nZxZ7@horms.kernel.org>
-In-Reply-To: <aN1MOnqvkl7nZxZ7@horms.kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 17 Dec 2025 16:56:47 -0800
-X-Gm-Features: AQt7F2pjn7YrRxFFZxTO5s7_cgbOTqFkxgvLmV7-sRm-KXT3E1OnbII5d1Z5Hm0
-Message-ID: <CAHS8izOW+TxLU9dzy08g8MBE+cZGeXwsPnrq7wWH_XrCzHHp7A@mail.gmail.com>
-Subject: Re: [PATCH v2 iwl-net 1/2] idpf: fix memory leak of flow steer list
- on rmmod
-To: Simon Horman <horms@kernel.org>
-Cc: Sreedevi Joshi <sreedevi.joshi@intel.com>, intel-wired-lan@lists.osuosl.org, 
-	netdev@vger.kernel.org, Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Oct 1, 2025 at 8:44=E2=80=AFAM Simon Horman <horms@kernel.org> wrot=
-e:
->
-> On Tue, Sep 30, 2025 at 04:23:51PM -0500, Sreedevi Joshi wrote:
-> > The flow steering list maintains entries that are added and removed as
-> > ethtool creates and deletes flow steering rules. Module removal with ac=
-tive
-> > entries causes memory leak as the list is not properly cleaned up.
-> >
-> > Prevent this by iterating through the remaining entries in the list and
-> > freeing the associated memory during module removal. Add a spinlock
-> > (flow_steer_list_lock) to protect the list access from multiple threads=
-.
-> >
-> > Fixes: ada3e24b84a0 ("idpf: add flow steering support")
-> > Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> > Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> > Signed-off-by: Sreedevi Joshi <sreedevi.joshi@intel.com>
->
-> Reviewed-by: Simon Horman <horms@kernel.org>
->
+The ASIX driver reads the PHY address from the USB device via
+asix_read_phy_addr(). A malicious or faulty device can return an
+invalid address (>= PHY_MAX_ADDR), which causes a warning in
+mdiobus_get_phy():
 
-Tested-by: Mina Almasry <almasrymina@google.com>
+  addr 207 out of range
+  WARNING: drivers/net/phy/mdio_bus.c:76
 
+Validate the PHY address in asix_read_phy_addr() and remove the
+now-redundant check in ax88172a.c.
 
---=20
-Thanks,
-Mina
+Reported-by: syzbot+3d43c9066a5b54902232@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=3d43c9066a5b54902232
+Tested-by: syzbot+3d43c9066a5b54902232@syzkaller.appspotmail.com
+Fixes: 7e88b11a862a ("net: usb: asix: refactor asix_read_phy_addr() and handle errors on return")
+Link: https://lore.kernel.org/all/20251217085057.270704-1-kartikey406@gmail.com/T/ [v1]
+Signed-off-by: Deepanshu Kartikey <kartikey406@gmail.com>
+---
+v2:
+  - Remove redundant validation check in ax88172a.c (Andrew Lunn)
+---
+ drivers/net/usb/asix_common.c | 5 +++++
+ drivers/net/usb/ax88172a.c    | 6 +-----
+ 2 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/usb/asix_common.c b/drivers/net/usb/asix_common.c
+index 7fd763917ae2..6ab3486072cb 100644
+--- a/drivers/net/usb/asix_common.c
++++ b/drivers/net/usb/asix_common.c
+@@ -335,6 +335,11 @@ int asix_read_phy_addr(struct usbnet *dev, bool internal)
+ 	offset = (internal ? 1 : 0);
+ 	ret = buf[offset];
+ 
++	if (ret >= PHY_MAX_ADDR) {
++		netdev_err(dev->net, "invalid PHY address: %d\n", ret);
++		return -ENODEV;
++	}
++
+ 	netdev_dbg(dev->net, "%s PHY address 0x%x\n",
+ 		   internal ? "internal" : "external", ret);
+ 
+diff --git a/drivers/net/usb/ax88172a.c b/drivers/net/usb/ax88172a.c
+index f613e4bc68c8..758a423a459b 100644
+--- a/drivers/net/usb/ax88172a.c
++++ b/drivers/net/usb/ax88172a.c
+@@ -210,11 +210,7 @@ static int ax88172a_bind(struct usbnet *dev, struct usb_interface *intf)
+ 	ret = asix_read_phy_addr(dev, priv->use_embdphy);
+ 	if (ret < 0)
+ 		goto free;
+-	if (ret >= PHY_MAX_ADDR) {
+-		netdev_err(dev->net, "Invalid PHY address %#x\n", ret);
+-		ret = -ENODEV;
+-		goto free;
+-	}
++
+ 	priv->phy_addr = ret;
+ 
+ 	ax88172a_reset_phy(dev, priv->use_embdphy);
+-- 
+2.43.0
+
 
