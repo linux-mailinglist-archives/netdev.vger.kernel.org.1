@@ -1,37 +1,41 @@
-Return-Path: <netdev+bounces-245343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E9FCCCBC91
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 13:29:02 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D720CCBD2A
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 13:43:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A9124302D2DF
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 12:29:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E7A8B30133A3
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 12:43:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B81F831B114;
-	Thu, 18 Dec 2025 12:28:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 568FE332EAA;
+	Thu, 18 Dec 2025 12:43:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AB4D4F881
-	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 12:28:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.136.29.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24CBD332EAE
+	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 12:43:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766060939; cv=none; b=JGZEqYmBPLGpoB2R4L1m5wGcS6sgb5G96lGnCaHRpkzHqn1aA5FW8egMEYE8NIkFk1gJfaDZPsHocisZ7NfY/A5q0pYXlgn2kHvohbA6LwlD8dPOVTdO2b1+RQseK+gMRv4sDT62K+52mqUK6C2zlG9RSGceOx3bhrfY+FIGtEI=
+	t=1766061818; cv=none; b=sQ5Nav06YVZZtVNt9jLiI+x1GhhsvD5yqRY/C+wMSL7QjEfwzQLj6Tx9OAhqo5zQ7+2S4wmuZwGXAoEl+YB4MptpaH1FFyhjVpduiVGpUFbf8kEFOPh5WnrPUX9liNv25ytQbTYp3h5ue+A3qOTE8VM3RmNSJ7MmwoIkkANeQCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766060939; c=relaxed/simple;
-	bh=+uaIBVRd4bL37XABDFQt7o35QRFd+YdqIkukVMHh454=;
+	s=arc-20240116; t=1766061818; c=relaxed/simple;
+	bh=CyWsAYtRberYWPLZGYgzcagZ6gMa3+8tytOYvNC6dj8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=J4KkfgZ06aEJaNyFAUSnD0BVy5woE9gBBreZfTEXzf1kT+SJphKinsbz4q++FY4YNqVManCNDllk0ipMYEd3YZViNDyF0sxR0HZu481B2tU0SmjmAVlm7faDKfsN8tLNY+K38/DuqRDzdgNZ0UGiP1DOODxZIGvhn2fKpgg8PMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com; spf=pass smtp.mailfrom=proxmox.com; arc=none smtp.client-ip=94.136.29.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proxmox.com
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
-	by proxmox-new.maurer-it.com (Proxmox) with ESMTP id E6B8848541;
-	Thu, 18 Dec 2025 13:28:54 +0100 (CET)
-Message-ID: <c1ae58f7-cf31-4fb6-ac92-8f7b61272226@proxmox.com>
-Date: Thu, 18 Dec 2025 13:28:53 +0100
+	 In-Reply-To:Content-Type; b=WQziTi2YkN+DjpIDrfhk1wU7fAazpgAhu5kgYGUiYSpwKTN86NATmnL8s23t+5/VjbpOtjFckI9eKyk+Fr4UQX0FQzUERsKRhZX3dIA86GU6f7SDsJAczGzToMspm5vKXugcNkhR+XSk7C5yatE6HezPLdHcJMyQ6SlCjUSLA0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.42] (g42.guest.molgen.mpg.de [141.14.220.42])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 5669D61E64852;
+	Thu, 18 Dec 2025 13:42:55 +0100 (CET)
+Message-ID: <981a3660-a853-4133-bf83-400ce513c3a6@molgen.mpg.de>
+Date: Thu, 18 Dec 2025 13:42:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -39,71 +43,79 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 7/8] tcp: stronger sk_rcvbuf checks
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Neal Cardwell <ncardwell@google.com>, Simon Horman <horms@kernel.org>,
- Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
- <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com,
- lkolbe@sodiuswillert.com
-References: <20250711114006.480026-1-edumazet@google.com>
- <20250711114006.480026-8-edumazet@google.com>
- <cd44c0d2-17ed-460d-9f89-759987d423dc@proxmox.com>
- <8f8836dd-c46f-403c-b478-a9e89dd62912@proxmox.com>
- <CANn89iL=MTgYygnFaCeaMpSzjooDgnzwUd_ueSnJFxasXwyMwg@mail.gmail.com>
-Content-Language: en-US, de-DE
-From: Christian Ebner <c.ebner@proxmox.com>
-In-Reply-To: <CANn89iL=MTgYygnFaCeaMpSzjooDgnzwUd_ueSnJFxasXwyMwg@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH net v2 1/2] i40e: drop
+ udp_tunnel_get_rx_info() call from i40e_open()
+To: mheib@redhat.com
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+ przemyslaw.kitszel@intel.com, davem@davemloft.net, aduyck@mirantis.com,
+ kuba@kernel.org, netdev@vger.kernel.org, jacob.e.keller@intel.com,
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+References: <20251218121322.154014-1-mheib@redhat.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20251218121322.154014-1-mheib@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Bm-Milter-Handled: 55990f41-d878-4baa-be0a-ee34c49e34d2
-X-Bm-Transport-Timestamp: 1766060922762
 
-Hi Eric,
+Dear Mohammad,
 
-thank you for your reply!
 
-On 12/18/25 11:10 AM, Eric Dumazet wrote:
-> Can you give us (on receive side) : cat /proc/sys/net/ipv4/tcp_rmem
+Thank you for your patch.
 
-Affected users report they have the respective kernels defaults set, so:
-- "4096 131072 6291456"  for v.617 builds
-- "4096 131072 33554432" with the bumped max value of 32M for v6.18 builds
-
-> It seems your application is enforcing a small SO_RCVBUF ?
-
-No, we can exclude that since the output of `ss -tim` show the default 
-buffer size after connection being established and growing up to the max 
-value during traffic (backups being performed).
-
-Might out-of-order packets and small (us scale) RTTs play a role?
-`ss` reports `rcv_ooopack` when stale, the great majority of users 
-having MTU 9000 (default seems to reduce the likelihood of this 
-happening as well).
-
-> I would take a look at
+Am 18.12.25 um 13:13 schrieb mheib@redhat.com:
+> From: Mohammad Heib <mheib@redhat.com>
 > 
-> ecfea98b7d0d tcp: add net.ipv4.tcp_rcvbuf_low_rtt
-> 416dd649f3aa tcp: add net.ipv4.tcp_comp_sack_rtt_percent
-> aa251c84636c tcp: fix too slow tcp_rcvbuf_grow() action
-
-Thanks a lot for the hints, we did already provide a test build with 
-commit aa251c84636c cherry-picked on top of 6.17.11 to affected users, 
-but they were still running into stale connections.
-So while this (and most likely the increased `tcp_rmem[2]` default) 
-seems to reduce the likelihood of stalls occurring, it does not fix them.
-
-> After applying these patches, you can on the receiver :
+> The i40e driver calls udp_tunnel_get_rx_info() during i40e_open().
+> This is redundant because UDP tunnel RX offload state is preserved
+> across device down/up cycles. The udp_tunnel core handles
+> synchronization automatically when required.
 > 
-> perf record -a -e tcp:tcp_rcvbuf_grow sleep 30 ; perf script
+> Furthermore, recent changes in the udp_tunnel infrastructure require
+> querying RX info while holding the udp_tunnel lock. Calling it
+> directly from the ndo_open path violates this requirement,
+> triggering the following lockdep warning:
+> 
+>    Call Trace:
+>     <TASK>
+>     ? __udp_tunnel_nic_assert_locked+0x39/0x40 [udp_tunnel]
+>     i40e_open+0x135/0x14f [i40e]
+>     __dev_open+0x121/0x2e0
+>     __dev_change_flags+0x227/0x270
+>     dev_change_flags+0x3d/0xb0
+>     devinet_ioctl+0x56f/0x860
+>     sock_do_ioctl+0x7b/0x130
+>     __x64_sys_ioctl+0x91/0xd0
+>     do_syscall_64+0x90/0x170
+>     ...
+>     </TASK>
+> 
+> Remove the redundant and unsafe call to udp_tunnel_get_rx_info() from
+> i40e_open() resolve the locking violation.
+> 
+> Fixes: 06a5f7f167c5 ("i40e: Move all UDP port notifiers to single function")
+> Signed-off-by: Mohammad Heib <mheib@redhat.com>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> ---
+>   drivers/net/ethernet/intel/i40e/i40e_main.c | 1 -
+>   1 file changed, 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> index 50be0a60ae13..72358a34438b 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> @@ -9029,7 +9029,6 @@ int i40e_open(struct net_device *netdev)
+>   						       TCP_FLAG_FIN |
+>   						       TCP_FLAG_CWR) >> 16);
+>   	wr32(&pf->hw, I40E_GLLAN_TSOMSK_L, be32_to_cpu(TCP_FLAG_CWR) >> 16);
+> -	udp_tunnel_get_rx_info(netdev);
+>   
+>   	return 0;
+>   }
 
-We now provided test builds with mentioned commits cherry-picked as well 
-and further asked for users to test with v6.18.1 stable.
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
-Let me get back to you with requested traces and test results.
 
-Best regards,
-Christian Ebner
+Kind regards,
 
+Paul
 
