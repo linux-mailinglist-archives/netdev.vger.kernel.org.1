@@ -1,152 +1,139 @@
-Return-Path: <netdev+bounces-245268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73590CCA066
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 02:58:11 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF683CCA128
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 03:19:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 395B6301E599
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 01:58:04 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id DA31E3016BAA
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 02:19:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DB13271470;
-	Thu, 18 Dec 2025 01:58:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E9C02741C6;
+	Thu, 18 Dec 2025 02:19:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dqI3vwE8"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="MErVgrfq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f51.google.com (mail-yx1-f51.google.com [74.125.224.51])
+Received: from mail-oo1-f66.google.com (mail-oo1-f66.google.com [209.85.161.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 331CF26F2B8
-	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 01:58:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 139262F657C
+	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 02:19:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766023083; cv=none; b=HA+wNOlAKkQSR09VDeEZppo9gnakpjTPPPTaWdH8Fdv7tFMu6bT0RK5kviWelOjufLd1GchonSodPHx2VJt7zpeNfOhUnmlkOCuWPYL5sUCFNlLe2Bt22nOt9nA29ZXv5asL1SEGM83jhYUO9ho1Ill1NqAg2tQ58d0Q4ECsZWc=
+	t=1766024354; cv=none; b=hOIQ56UcNVpJHEiz8wdrE0tbmKEg3rzAs1A4Ug1JdIByZLGWl6xzV0q4NkE51bLPsPIEwDBJ4/pMRPW1AGpA/HWZnRLdXR+nhrjfneJ9U9QftPXz1Hkm+HcaM7XFUanqjLm/OBW8xkMsZnjJdnku9v5DLPe9D6Rw42CkYM5qQs4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766023083; c=relaxed/simple;
-	bh=m5Qk89Nat20MUzAln1BuVH2Y8Xvr1iPdN2DmGMoekxQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EMLwBsgq5RdPmd7EOO7yoGaq8xw3Uz11Xv86jVrdlptbGbuuGiLhJJ08V/8zZE02U/cHgc1YD8e3D17+21xxeZH+2igqlHGgmJrlCkUAdpuDtDDtUB2eqXGHcu61xmnF/SGMGeTdbIBbJBnMbI8HL2QOWrxggofWyBp1Kl0nNIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dqI3vwE8; arc=none smtp.client-ip=74.125.224.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f51.google.com with SMTP id 956f58d0204a3-6446c1a7a1cso98175d50.3
-        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 17:58:01 -0800 (PST)
+	s=arc-20240116; t=1766024354; c=relaxed/simple;
+	bh=B2uc005GpL8q8ai+eEMsIAxk4TSez58qjlYe8cqdycQ=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Cc:Content-Type; b=pn4ljW78kxAo2HsEzVT/3Q8vpcY40c65DaDDhLbO8tzsrecWd1yyvaR1GG6YEfKmEqMo/3/bRDDEixGCLqnDnYKKKKDWMpWFgRyFLyny93DK9Tr3GSrI36hNtC1g3JmMtSfl90Ce9oelmrpODPIhLNU8br2ejooWHm1iOnukteM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=MErVgrfq; arc=none smtp.client-ip=209.85.161.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-oo1-f66.google.com with SMTP id 006d021491bc7-6597046fc87so44078eaf.0
+        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 18:19:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766023080; x=1766627880; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bQOfmftLH8KAfTXHZBw4TB9dKu3rPCHujQ+Dm7h606A=;
-        b=dqI3vwE8hzP9pjO43J98QNeZ81Py47Lo9X/O6ynZBnOUlIqp6ppvcV2HS8WQC3SH9X
-         bXpEzYZ8stg3kwd5FNcM9Q11uHdzQaJZzbbQi71/JCRa46HMAByYGp6rko8OslE6PCqu
-         GzsAR0wFptlDIwYyh5Exom85+wgrS7bWH0f8xlPPA4LK9GSjRBWvmzOjMtXUxVhBmGnh
-         D619rva1Z6FnfRMkwh/0mYX0rSv+xlpnaGVpme3rgQkRhVKLHsAV2muI2yDI/+QKjn1j
-         EtC8AXemEAHlGHizMH/XFteOtGbjBETmOE60Jc1RNZQQDct++PZUDSqq3bGYE1neiJbr
-         QWUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766023080; x=1766627880;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1766024351; x=1766629151; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bQOfmftLH8KAfTXHZBw4TB9dKu3rPCHujQ+Dm7h606A=;
-        b=vSUAPoQ56fjsGfN5K04gjoQpmUXNUbW9aZRTJamEFhQeifSbRUPLbUCGNykDz4DiAh
-         Fd0cEhpd2685LSkOstqAcC+u+KygddL3wXxfQln2S4INI7D2PL022mw0pQhU3UzuTwEa
-         546bjf9WdupIPQOSd5B3K9DOH1jYOgr6RUP/Me0swASTLZs9oM3caj0/r8qr14uXWkgz
-         j3YNy+daFdVXk9GpkbkhhE16sdHuyqhj3VAze1dHv/D/fUE5uIRa4q7UY/usDGDvJ+KH
-         /5LQxxPqebdcZh/94WgGP98ZFVi4SAmC6x9fXk6vzflBcKsRi3wJRSqQkeexYUlHtnBD
-         1mwg==
-X-Forwarded-Encrypted: i=1; AJvYcCXV0vAkQzRePnOGgLFU58RGHT0PDsKGBuhqAt0Qv/2HiD7sj2LnuC/gq4CliAqK+jLnHHEiaCI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxlEi9+LfHcWKjGF3WcMwL+pdheE2m1u3+ix+FqKC4HxtCyAzRG
-	qUkmaiG+2+pO7IdXvou2sfreNzXmNR3J2Zm5GAcp4KxfMXau4aoIZbzR
-X-Gm-Gg: AY/fxX58WbMfWrcf8bKFy3HKV8A56G35kCiAdX6cWV8C6yn8H1D7UJGiiezx8IK9qsE
-	xf/k3ZUFJv9sw90pG5t9HxmcNetWXxCZ5jRbFqIMHurz5+8p1ZvLc9q6a1OlHLXewcshRa+jKjh
-	v62b86jdKxmSk5hzDMGlr6IZOC0XHudjb8nWXsAKjYIYJ6mK9a962cfnilzphYEr40yBmUowUSd
-	/XHSz9CQH3RfTmnwhyWJ+E22UcV2AG86+GqLug0CkmL83v1PXlUBUQr/5c7A/4jbGCsMerrcobg
-	QmqnQiofqCk2G1BAzoEN5p2botHYDW8Z4tVV9d8gSxSXVVdIh8dFYF2kYexl9Bji19ENSjaRdLM
-	5tRtLJhoU9Qs9V1TkweYAhbtJVDWzI2igbviEeYkA3MHsrusT4zQTZhV+aAVOegNzESWz+T1TjM
-	F2CAdG84w=
-X-Google-Smtp-Source: AGHT+IF7Lkwj0sSdZaNQ3dsB15WX1orUqF+lFaxr1wSODVAJtotITBD0kMje1L4hZ+gr1DxEnLMwlw==
-X-Received: by 2002:a05:690e:1407:b0:644:60d9:865a with SMTP id 956f58d0204a3-6455567d629mr14606696d50.93.1766023080117;
-        Wed, 17 Dec 2025 17:58:00 -0800 (PST)
-Received: from localhost ([2601:346:0:79bd:52c0:aec0:bf15:a891])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-646636e86ccsm472527d50.5.2025.12.17.17.57.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Dec 2025 17:57:59 -0800 (PST)
-From: "Yury Norov (NVIDIA)" <yury.norov@gmail.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: "Yury Norov (NVIDIA)" <yury.norov@gmail.com>,
-	"Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-Subject: [PATCH v2] i40e: drop useless bitmap_weight() call in i40e_set_rxfh_fields()
-Date: Wed, 17 Dec 2025 20:57:57 -0500
-Message-ID: <20251218015758.682498-1-yury.norov@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        bh=1IbfBBdCc/I5EHKIRpc9KvniVEJwYrfz+MeqT54O8YU=;
+        b=MErVgrfqFN1qRsZmwk/kaPdDIwCj6gthBkoQG/ra3lzAvu6kyKAqtArv35VHtplEda
+         AbDsz3xWfFYEE8+r1G7qUFIccQT0BhM6jgA8PBrse5sRjQ2dWmGBjBRO6qgrhVltFrHA
+         Fu9L3zJAmLoIBEFMHy4jNghzenMPLFp8A56CUo3hGQTLKnpy5gm9UGCmFxa+76Hzunp5
+         IN65ejHUPSFzCySc1qZtUwg2A1N7srLqeHYdn4GBSSE4gpxYb29R7c7ys39RCQpjEfrG
+         By9anAirbmHjqN3GV4+XK16uYieRoXJZd3TUbDusYAqJeouJXil+/utX1bPfJYATDmiH
+         fMZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766024351; x=1766629151;
+        h=content-transfer-encoding:cc:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1IbfBBdCc/I5EHKIRpc9KvniVEJwYrfz+MeqT54O8YU=;
+        b=Bp43luHHtzJz7LE+e+ggMgfunVnPxQNZo/iyndOIxkJaLaZ51RwMnk1f5BjerPiGEM
+         KNfHGh96F1UAWgfwCZGQsd/eTy05aiexDmez4Q6sq9Ip+Tz/oSlLzPEXsN7LN4XF+cqm
+         6HO9lmGqnNyetZnJeSc/kWlmdWt0kZN6f4LbSyMce8mHljB3Q2Br0r/FDPkZEkY/40UZ
+         v2xSyogrL7ro+xjXKtiK2Lsj40qPgK6BslTXxn7YAR+vG52cQRtMU9dvODVbGLoovXC9
+         drBuczza30EzSYZALkIPT1hpkrKnbIJC7JTO5HkOX7TGsAjOjstY7YyXRYP2rNudroTr
+         d5UQ==
+X-Gm-Message-State: AOJu0YzwrdFKiiZS+aPl3uAJcrN1b3v8s3WK0ybSW2IdYh08uX8JZyW+
+	q+Ip1IbmaUSnQ8qUwrUmuBVpJ/VYo/CX1yuvUpTStJYlJsBrFMy4N/8FoVHoPJ0cwzcnz4Q0uj0
+	yFBoZPborfA==
+X-Gm-Gg: AY/fxX7oxb//ZTqp2nWyFk9GnYkeDHqpEY9gZgvsJBMLXeRINS0Jtk19rkRFcL4CmwO
+	K6lD1wickFAurNRvfgjK4JRRiRiXElThMQ3GuSXKYXsbxtKC+IrbVrvXyXZlM6O2YHOSm3uqsVp
+	JtZzYZS2ZV9aq3GLveO5Lyn+ur/LuggvEFcv3nADMHovm+VYv/I+cslWWzbcMWRuWj89crCXUSW
+	YR+ISO1oy9aBZiSuxQt/7ZPqB0sWOCWp+g2/DFV3ljpcLzNxfA3qFdmlCThO/+QmgG9onYpmiH4
+	NGyaYOxV78N6ODXNnV6NfuaxvWKHSPh8ikKx95VW5Sy0ojWJgHlugVxRNmc3rixl5ZEKJVuEdpd
+	8R9DRvum9w/YzhZPaTbihl5C9ITbGuQXm/N7H5LCFqNQP6BcSv++xS8RJq9DxS7Ax+OqYDOpO9Q
+	NXFuiRxYyY
+X-Google-Smtp-Source: AGHT+IE02v70C6yjy4rnCwdW5GLNxvKluZloWR13Gs8tjKXpOkFy0GoVyIWmp4KX9R8akbQ+1spL7g==
+X-Received: by 2002:a05:6820:22a5:b0:65d:30d:eaf3 with SMTP id 006d021491bc7-65d030dee1bmr93942eaf.42.1766024350627;
+        Wed, 17 Dec 2025 18:19:10 -0800 (PST)
+Received: from [192.168.1.150] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-3fa17d5cac0sm768580fac.6.2025.12.17.18.19.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 Dec 2025 18:19:09 -0800 (PST)
+Message-ID: <ca5fe77f-f7a8-4886-b874-0e7063622ab7@kernel.dk>
+Date: Wed, 17 Dec 2025 19:19:07 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: netdev <netdev@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] af_unix: don't post cmsg for SO_INQ unless explicitly asked
+ for
+Cc: Jakub Kicinski <kuba@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
+ Willem de Bruijn <willemb@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-bitmap_weight() is O(N) and useless here, because the following
-for_each_set_bit() returns immediately in case of empty flow_pctypes.
+A previous commit added SO_INQ support for AF_UNIX (SOCK_STREAM), but
+it posts a SCM_INQ cmsg even if just msg->msg_get_inq is set. This is
+incorrect, as ->msg_get_inq is just the caller asking for the remainder
+to be passed back in msg->msg_inq, it has nothing to do with cmsg. The
+original commit states that this is done to make sockets
+io_uring-friendly", but it's actually incorrect as io_uring doesn't
+use cmsg headers internally at all, and it's actively wrong as this
+means that cmsg's are always posted if someone does recvmsg via
+io_uring.
 
-Signed-off-by: Yury Norov (NVIDIA) <yury.norov@gmail.com>
+Fix that up by only posting cmsg if u->recvmsg_inq is set.
+
+Cc: stable@vger.kernel.org
+Fixes: df30285b3670 ("af_unix: Introduce SO_INQ.")
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
 ---
-v1: https://lore.kernel.org/all/20251216002852.334561-1-yury.norov@gmail.com/
-v2: don't drop flow_id (Aleksandr).
 
- .../net/ethernet/intel/i40e/i40e_ethtool.c    | 21 +++++++------------
- 1 file changed, 8 insertions(+), 13 deletions(-)
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 55cdebfa0da0..110d716087b5 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -3086,12 +3086,16 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+ 
+ 	mutex_unlock(&u->iolock);
+ 	if (msg) {
++		bool do_cmsg;
++
+ 		scm_recv_unix(sock, msg, &scm, flags);
+ 
+-		if (READ_ONCE(u->recvmsg_inq) || msg->msg_get_inq) {
++		do_cmsg = READ_ONCE(u->recvmsg_inq);
++		if (do_cmsg || msg->msg_get_inq) {
+ 			msg->msg_inq = READ_ONCE(u->inq_len);
+-			put_cmsg(msg, SOL_SOCKET, SCM_INQ,
+-				 sizeof(msg->msg_inq), &msg->msg_inq);
++			if (do_cmsg)
++				put_cmsg(msg, SOL_SOCKET, SCM_INQ,
++					 sizeof(msg->msg_inq), &msg->msg_inq);
+ 		}
+ 	} else {
+ 		scm_destroy(&scm);
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-index f2c2646ea298..e64880b6b047 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-@@ -3637,6 +3637,7 @@ static int i40e_set_rxfh_fields(struct net_device *netdev,
- 		   ((u64)i40e_read_rx_ctl(hw, I40E_PFQF_HENA(1)) << 32);
- 	DECLARE_BITMAP(flow_pctypes, FLOW_PCTYPES_SIZE);
- 	u64 i_set, i_setc;
-+	u8 flow_id;
- 
- 	bitmap_zero(flow_pctypes, FLOW_PCTYPES_SIZE);
- 
-@@ -3720,20 +3721,14 @@ static int i40e_set_rxfh_fields(struct net_device *netdev,
- 		return -EINVAL;
- 	}
- 
--	if (bitmap_weight(flow_pctypes, FLOW_PCTYPES_SIZE)) {
--		u8 flow_id;
-+	for_each_set_bit(flow_id, flow_pctypes, FLOW_PCTYPES_SIZE) {
-+		i_setc = (u64)i40e_read_rx_ctl(hw, I40E_GLQF_HASH_INSET(0, flow_id)) |
-+			 ((u64)i40e_read_rx_ctl(hw, I40E_GLQF_HASH_INSET(1, flow_id)) << 32);
-+		i_set = i40e_get_rss_hash_bits(&pf->hw, nfc, i_setc);
- 
--		for_each_set_bit(flow_id, flow_pctypes, FLOW_PCTYPES_SIZE) {
--			i_setc = (u64)i40e_read_rx_ctl(hw, I40E_GLQF_HASH_INSET(0, flow_id)) |
--				 ((u64)i40e_read_rx_ctl(hw, I40E_GLQF_HASH_INSET(1, flow_id)) << 32);
--			i_set = i40e_get_rss_hash_bits(&pf->hw, nfc, i_setc);
--
--			i40e_write_rx_ctl(hw, I40E_GLQF_HASH_INSET(0, flow_id),
--					  (u32)i_set);
--			i40e_write_rx_ctl(hw, I40E_GLQF_HASH_INSET(1, flow_id),
--					  (u32)(i_set >> 32));
--			hena |= BIT_ULL(flow_id);
--		}
-+		i40e_write_rx_ctl(hw, I40E_GLQF_HASH_INSET(0, flow_id), (u32)i_set);
-+		i40e_write_rx_ctl(hw, I40E_GLQF_HASH_INSET(1, flow_id), (u32)(i_set >> 32));
-+		hena |= BIT_ULL(flow_id);
- 	}
- 
- 	i40e_write_rx_ctl(hw, I40E_PFQF_HENA(0), (u32)hena);
 -- 
-2.43.0
+Jens Axboe
 
 
