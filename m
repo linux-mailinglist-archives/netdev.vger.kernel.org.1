@@ -1,84 +1,84 @@
-Return-Path: <netdev+bounces-245257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51ACACC9DDA
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 01:10:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6AD8CC9DEC
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 01:16:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 58BFF3018407
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 00:10:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D57643020343
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 00:16:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7013D1A267;
-	Thu, 18 Dec 2025 00:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 396611A8F84;
+	Thu, 18 Dec 2025 00:16:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nNjn1GvF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LHinvTbx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4A24171CD
-	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 00:10:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CCD717A2FC
+	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 00:16:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766016628; cv=none; b=IiPk+PTzJDoUrLOSsVX5SAJ2WN/Mc9H6fqsghdHhIFRRx8umk1bDzVMQKVZVIhTGlfWo+4F0L+jx0o8cHrY43Q65yOBKY6xuwHFG8WuNH+tHl6MfxnghDjK+n0JbyUUprTZwM9GmkL3obV5+kBpC8kt/of3yCpGuO4Yr+iGExq8=
+	t=1766016974; cv=none; b=ItYSlBGb7DHsLx0BOHqRrbDF1iGUrfqnLkS6iziqoksbehwdnCP/1NPvR5xB3Wo0fK+3TZbuMUDKdNzpuxxbtVLLMlmaVy2iRg+NGEY+1kKJkzKlPB0pDFmdV2iGeLjlBttPy8OOPu3ACmvnGhLghQmM0wKev7SWFnFvYgRs1DU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766016628; c=relaxed/simple;
-	bh=J5NyHXC+7Wm9QwKSKoWElXZBdxjlmPCyBCY86nHZirA=;
+	s=arc-20240116; t=1766016974; c=relaxed/simple;
+	bh=q1qmuBmza8VfaF3Afck0gRS869aOeEUoNVUKKya/bPI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H0+lvz4k2YukxjUlN/khxP9nS8N2uYp0C7sC2cpuQY0j+tXrn0Z8Umpy6hMJ0/G/yeNB/nnXQlH/ZzRA7VUqZiRlk+imAAZSZrEHQ9w3GrD+rRfiYg1DqmyXHM1OMqHRql4fm7toAz0qnNkQJIpgesFUqcv2DpSW2NoH2348Hu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nNjn1GvF; arc=none smtp.client-ip=209.85.128.175
+	 Content-Type:Content-Disposition:In-Reply-To; b=oAWB2SKiYkqGlsrPsDNsxcszoWsjkwTiPY+xIlWjM5MeOZ1YY0rKCsdTyQWOU2obD+F0P2+dm3nYuoo5PiIKeS7C3c05BUTJ2b8qfe7swezpkT/TeBB8PHG85zWlz2BWxXRN/drBhbBxkTzbQ8aT5oGdTMP1V3Momf/4yYHek/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LHinvTbx; arc=none smtp.client-ip=209.85.128.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-78c5adeb964so272527b3.1
-        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 16:10:26 -0800 (PST)
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-78e7ba9fc29so276967b3.2
+        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 16:16:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766016625; x=1766621425; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1766016971; x=1766621771; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=G3W89pyc3rg2AiFaQ7BjoDtkih3iRc+2gyLPHWeN7+U=;
-        b=nNjn1GvFh4xqK36Ukpr1ShbbCAwjDPghqhXIol2sUEj7lgY43bsKSHkqdlIYCkk71X
-         3An9DiXZhc3QgGdGfXjH0TxCvT6VKj7hcxGuvRPruMK5A+Vt5ICq7X5VAm9S0Eqnvh++
-         4SuAvKaulAEoLdvdjNi7lHDpEVOwknD48rCTnO7CLSGT59WR4IJo5pRrlSZAvXwC1ogS
-         tfuEwFd8bvho89+kFczWxVcvaFXygz2GZBYG3O+/8ZGzNt+TlDqOEpK1xaHRk61HFYSs
-         yuSZH0qMZKeR7h8DQcB+oaicUTjYsteelz0xHe6Iho+CtvyjgvybyaPiWnsZ5KHkBQAL
-         95tg==
+        bh=4wlE8EMvGYZyAfYwBWrqMm3bD5k/3jSk7d8mDOagPfI=;
+        b=LHinvTbxnwVcoDOIbtWzGxpZlxOsmfwb+PhUXmGfIRhBxuxtMVxZcUR4GGL+hMaqQG
+         uNkIG+DCd4rUIB5JgAJM4FQFAmF61ml3JA0E/amvqxN9bwDzlVN5A4fpdKRaMakQ2wpF
+         jEoZBl1sAYyRZg8laPBpj06jCLLXy7Z1wL/b6I6JQ4mJA1WquovXJ6M3/FHY8CZK/x7L
+         pPOF6uMlVbsb5LHLDkvQLBpxb+ao1cdEGrGCJV1xGAvRXG8fDPT4W3bUOnQkJ0jSFwy9
+         8qP3TbgjAPwwFjwzzNjdW3dN/+CNnzOJV9T+O8G3mX4zOzujZWYcYRX+2phof4ITj/MR
+         ZEYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766016625; x=1766621425;
+        d=1e100.net; s=20230601; t=1766016971; x=1766621771;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=G3W89pyc3rg2AiFaQ7BjoDtkih3iRc+2gyLPHWeN7+U=;
-        b=D5teyERagaLNlD4YVd/noKb58d4wt+wd0a87PcLwYD9ury6Jx4QuNcGQ6Bn4pEs2a7
-         0DCjD03k0GYWrYUmkaUNMo8fZp25BOp+FwNXz0Rufcfey/efXbWGY54Jhw9/KdV1jtGo
-         P+s//pWtBhv3X37xGJ1TR4NWlgvxzGrdJKBsIFSieOLHNYQx//jhmRABeLiwb7eDwCy6
-         GzxssS1MijhUrFItsDJcTRclshPns6quKsWIg6jEe3VWBVkTwUgeLuzLourCkgoWlC2Y
-         gWFgyFiL213GSmbvOzrCbI0DrLtHbRPOMOPJGItMnchubXMCA6Bu83urUShrkPgKJ1xv
-         9/Gw==
-X-Forwarded-Encrypted: i=1; AJvYcCUEMA+tMUO8gafQPuofHH+P2QEluXFdiBWqevzp8wHu97rFpcBXtJsGHw92l4Mfig8GLTGuGNg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwscALLnpgtcerDwzSFNY7MOsLbAW4yMxcF7Sf69SFNgbSsNI4o
-	GaFyuOQYKkJrJ+Bswk9A6mdsoEQ2/BL4EdnCNxBmJ5pu5ofQ6ik+trIZ
-X-Gm-Gg: AY/fxX5vPgjQnbsdl+i2EdLIU/tRq+76b/I/b38pVv0TczbeNRVc4sGU3qh/2wUdM6O
-	+z+tWVT3UVWUZ1R3hMIqFRW5aF4jMZ4mJW6iCcB//79y9suWZGae/tg+hjCgSOb+pl9WiO1Yk26
-	+GWpIZS2sg21AvfTG/6zdC1Koo84QznqO3+N+AvvtTfkfhIIARaDLboN0XXYmCnzb0WmaylktNC
-	9R+Yvs+iJ++Zedne0Bb6rVHt9YBNIrBB3x7NTXtIzkrWpI4xuOSvMZjT9JMNAPM8/Pr3t5GGBG4
-	9zvyJ68GSdGDsGYqDQt4b4i5GtAU3Y7CXuBUeIySlNOVAhImdWzbIWx/VvOpDtQUJVx1sUzR8sW
-	ILFrkq1pQ4CrusMUgRutk4u92pcCGI1Oz5zHhYu6oiVJqdeuQmReG5QzvFIgh2fM/4gtXaZrhMP
-	/W5OUm07I=
-X-Google-Smtp-Source: AGHT+IH2XIrCa3obcmS9LSxT+b2x4iIbstcTGrPYEvranoS2UiwzkeKdXa5tDCty5uxlxz7AlyzCTg==
-X-Received: by 2002:a05:690c:7088:b0:788:1086:8843 with SMTP id 00721157ae682-78e6694fc4dmr179993397b3.2.1766016625556;
-        Wed, 17 Dec 2025 16:10:25 -0800 (PST)
+        bh=4wlE8EMvGYZyAfYwBWrqMm3bD5k/3jSk7d8mDOagPfI=;
+        b=CkGdbhA4sIWKeLK8ToWogEo6YQtSzhUZ/FYl1B0y8MXp2b61Y1kMjKAhNuRc7zGiJF
+         ZpYAvf4iI7moD0b1qZQB4VEFDlxM4by7Lh6Go0onsu9NHpZ3sYTzH2m7nVnr24uvSiSQ
+         cvZSQ/dnqWijvS+h75Yq4hcho/5wx++jYC08krYIuahzs8lJwAnSn9zpHuAlxN6iXHC7
+         zgX/tC4yLCCgBZ/+eZIBvcZeQjx/pTOisDB05P7OxCFoTtCy7Z+k5S1HrrjcF5ohM7O3
+         jCfkt1lohLQTfaZBz51YHHmdp9iXHqn4wF4Uq3vlue1ZCuhJN+y2+LXlHvKqWCivbTaW
+         lMgA==
+X-Forwarded-Encrypted: i=1; AJvYcCXtz+RElA+J/j8mrrXWS79KbHIRHn9sI3vv/swdbcvxNvH51TN+L2nZY9W5tHvS7ODDIKJQ/pE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwX3ukS6WdXHlgFfRKP6y1otyyq+yYYH7Lz9DFvjcY7xLDebnbS
+	lxM8bqAHg3AyBDn0uqvSKi06sR99mF2WpYTvsevDgxOzu+NEdg78qH7r
+X-Gm-Gg: AY/fxX7H5Z6PcWzIa0IerYYlqOwj16D8E5CGDtU2JE0CdRn8HGTr5hs0L+MXxcqq5Gv
+	yCd8TsrorBj8L5xm1X59/aUVZIokaJptN8xmMpYY/irZVnoMpGPQ0M1bhabNcpqG9sn8wxsF2Qh
+	airJm26ZXMu9DJKVFsG1qc2vCdOYaQ3il4jnB9nvaHE+Cu7faXHxCZrYWcRQtVgVrwAEt6WK/Bt
+	fI/baTsVJevi+FFFgRZr6725Yghbo+zQJjj5MD/oo9LnxInz1Ih8gVLPQudlyOnHCaFmJYZaqt9
+	5RMJ/MXdc55zRjEG6Xk55sxHULEVE7yJhj2C/5nKkt6nZZePKTBHDmwtsBuxe1IQgYDNF5G18fA
+	RJorF6Y9sb3Gwl/uLwTF0yNdTBMH5tb0ds1Y5tDeS48HYTc+7v6c6g48aA9sav3pMBoy4dDHE04
+	YNKE6tvuE=
+X-Google-Smtp-Source: AGHT+IHqImXHRFrZT3XyJarbiuJdBni3A40c6SKiUdO+XjAYNcXK5lXxWE1jISl+My5MBXmoC4N2uA==
+X-Received: by 2002:a05:690c:6004:b0:786:5c6f:d242 with SMTP id 00721157ae682-78e66eaaba2mr159494997b3.69.1766016971272;
+        Wed, 17 Dec 2025 16:16:11 -0800 (PST)
 Received: from localhost ([2601:346:0:79bd:52c0:aec0:bf15:a891])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-78fa72bfb0bsm2440077b3.53.2025.12.17.16.10.25
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-78fa72aa1casm2473007b3.48.2025.12.17.16.16.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Dec 2025 16:10:25 -0800 (PST)
-Date: Wed, 17 Dec 2025 19:10:24 -0500
+        Wed, 17 Dec 2025 16:16:10 -0800 (PST)
+Date: Wed, 17 Dec 2025 19:16:10 -0500
 From: Yury Norov <yury.norov@gmail.com>
-To: David Laight <david.laight.linux@gmail.com>
-Cc: Jonathan Cameron <jonathan.cameron@huawei.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+To: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>,
 	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
 	Geert Uytterhoeven <geert+renesas@glider.be>,
 	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
 	Crt Mori <cmo@melexis.com>,
 	Richard Genoud <richard.genoud@bootlin.com>,
 	Andy Shevchenko <andriy.shevchenko@intel.com>,
@@ -89,13 +89,13 @@ Cc: Jonathan Cameron <jonathan.cameron@huawei.com>,
 	Mika Westerberg <mika.westerberg@linux.intel.com>,
 	Andreas Noever <andreas.noever@gmail.com>,
 	Yehezkel Bernat <YehezkelShB@gmail.com>,
-	Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
-Subject: Re: [PATCH v2 08/16] bitfield: Simplify __BF_FIELD_CHECK_REG()
-Message-ID: <aUNGcDLfe2AhWgkh@yury>
+	david.laight.linux@gmail.com
+Subject: Re: [PATCH v2 03/16] bitmap: Use FIELD_PREP() in expansion of
+ FIELD_PREP_WM16()
+Message-ID: <aUNHyjKS9b2KwdGJ@yury>
 References: <20251212193721.740055-1-david.laight.linux@gmail.com>
- <20251212193721.740055-9-david.laight.linux@gmail.com>
- <20251217102618.0000465f@huawei.com>
- <20251217223155.52249236@pumpkin>
+ <20251212193721.740055-4-david.laight.linux@gmail.com>
+ <5257288.LvFx2qVVIh@workhorse>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,66 +104,89 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251217223155.52249236@pumpkin>
+In-Reply-To: <5257288.LvFx2qVVIh@workhorse>
 
-On Wed, Dec 17, 2025 at 10:31:55PM +0000, David Laight wrote:
-> On Wed, 17 Dec 2025 10:26:18 +0000
-> Jonathan Cameron <jonathan.cameron@huawei.com> wrote:
-> 
-> > On Fri, 12 Dec 2025 19:37:13 +0000
-> > david.laight.linux@gmail.com wrote:
+On Wed, Dec 17, 2025 at 02:22:32PM +0100, Nicolas Frattaroli wrote:
+> On Friday, 12 December 2025 20:37:08 Central European Standard Time david.laight.linux@gmail.com wrote:
+> > From: David Laight <david.laight.linux@gmail.com>
 > > 
-> > > From: David Laight <david.laight.linux@gmail.com>
-
-...
-
-> > > ---
-> > > @@ -75,8 +59,8 @@
-> > >  	})
-> > >  
-> > >  #define __BF_FIELD_CHECK_REG(mask, reg, pfx)				\
-> > > -	BUILD_BUG_ON_MSG(__bf_cast_unsigned(mask, mask) >		\
-> > > -			 __bf_cast_unsigned(reg, ~0ull),		\
-> > > +	BUILD_BUG_ON_MSG((mask) + 0U + 0UL + 0ULL >			\
-> > > +			 ~0ULL >> (64 - 8 * sizeof (reg)),		\  
+> > Instead of directly expanding __BF_FIELD_CHECK() (which really ought
+> > not be used outside bitfield) and open-coding the generation of the
+> > masked value, just call FIELD_PREP() and add an extra check for
+> > the mask being at most 16 bits.
+> > The extra check is added after calling FIELD_PREP() to get a sane
+> > error message if 'mask' isn't constant.
 > > 
-> > Trivial.  sizeof(reg) is much more comment syntax in kernel code.
->                                      (common)
+> > Remove the leading _ from the formal parameter names.
+> > Prefix the local variables with _wm16_ to hopefully make them
+> > unique.
+> > 
+> > Signed-off-by: David Laight <david.laight.linux@gmail.com>
+> > ---
+> > 
+> > Changes for v2:
+> > - Update kerneldoc to match changed formal parameter names.
+> > - Change local variables to not collide with those in FIELD_PREP().
+> > 
+> > Most of the examples are constants and get optimised away.
+> > 
+> >  include/linux/hw_bitfield.h | 21 ++++++++++-----------
+> >  1 file changed, 10 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/include/linux/hw_bitfield.h b/include/linux/hw_bitfield.h
+> > index df202e167ce4..0bd1040a5f93 100644
+> > --- a/include/linux/hw_bitfield.h
+> > +++ b/include/linux/hw_bitfield.h
+> > @@ -12,8 +12,8 @@
+> >  
+> >  /**
+> >   * FIELD_PREP_WM16() - prepare a bitfield element with a mask in the upper half
+> > - * @_mask: shifted mask defining the field's length and position
+> > - * @_val:  value to put in the field
+> > + * @mask: shifted mask defining the field's length and position
+> > + * @val:  value to put in the field
+> >   *
+> >   * FIELD_PREP_WM16() masks and shifts up the value, as well as bitwise ORs the
+> >   * result with the mask shifted up by 16.
+> > @@ -23,15 +23,14 @@
+> >   * register, a bit in the lower half is only updated if the corresponding bit
+> >   * in the upper half is high.
+> >   */
+> > -#define FIELD_PREP_WM16(_mask, _val)					     \
+> > -	({								     \
+> > -		typeof(_val) __val = _val;				     \
+> > -		typeof(_mask) __mask = _mask;				     \
+> > -		__BF_FIELD_CHECK(__mask, ((u16)0U), __val,		     \
+> > -				 "HWORD_UPDATE: ");			     \
+> > -		(((typeof(__mask))(__val) << __bf_shf(__mask)) & (__mask)) | \
+> > -		((__mask) << 16);					     \
+> > -	})
+> > +#define FIELD_PREP_WM16(mask, val)				\
+> > +({								\
+> > +	__auto_type _wm16_mask = mask;				\
+> > +	u32 _wm16_val = FIELD_PREP(_wm16_mask, val);		\
+> > +	BUILD_BUG_ON_MSG(_wm16_mask > 0xffffu,			\
+> > +			 "FIELD_PREP_WM16: mask too large");	\
+> > +	_wm16_val | (_wm16_mask << 16);				\
+> > +})
+> >  
+> >  /**
+> >   * FIELD_PREP_WM16_CONST() - prepare a constant bitfield element with a mask in
+> > 
 > 
-> Hmm. sizeof is an operator not a function.
-> Its argument is either a variable/expression or a bracketed type
-> (I don't usually put variables in brackets).
-> So 'sizeof(reg)' is nearly as bad as 'return(reg)'.
+> Tested-by: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+> 
+> Compiled it with my usual config and booted it on a board that uses
+> drivers that make use of these macros, and checked that things are
+> working.
 
-Please re-read Documentation/process/coding-style.rst:
+Nicolas, thanks for testing! Would you also want to add an explicit
+ack or review tag?
 
-3.1) Spaces
-***********
+David, I'm OK with this change. Please add bloat-o-meter and code
+generation examples, and minimize the diff as I asked in v1, before I
+can merge it.
 
-Linux kernel style for use of spaces depends (mostly) on
-function-versus-keyword usage.  Use a space after (most) keywords.  The
-notable exceptions are sizeof, typeof, alignof, and __attribute__, which look
-somewhat like functions (and are usually used with parentheses in Linux,
-although they are not required in the language, as in: ``sizeof info`` after
-``struct fileinfo info;`` is declared).
-
-So use a space after these keywords::
-
-        if, switch, case, for, do, while
-
-but not with sizeof, typeof, alignof, or __attribute__.  E.g.,
-
-.. code-block:: c
-
-
-        s = sizeof(struct file);
-
-Do not add spaces around (inside) parenthesized expressions.  This example is
-**bad**:
-
-.. code-block:: c
-
-
-        s = sizeof( struct file );
-
+Thanks,
+Yury
 
