@@ -1,93 +1,92 @@
-Return-Path: <netdev+bounces-245262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B080ECC9EDD
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 01:52:40 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 055EDCC9EFE
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 01:57:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7123C300E0C4
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 00:52:37 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id EDCDF301A34C
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 00:57:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FF3B2264C0;
-	Thu, 18 Dec 2025 00:52:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAF6223EA82;
+	Thu, 18 Dec 2025 00:57:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="05P4ZzLA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qmV4feUS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E3552248A0
-	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 00:52:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A83F823C505
+	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 00:57:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=209.85.167.47
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766019156; cv=pass; b=UEz/MKUGAMwZhdUpO2TZNFFsLsjGbTBrHTA4Xhpew2cugSQbloE+g+5xiwEx5vE5hfNOLPfVWMlNqoBJjZ0T5RrDACQmavtX14vMC2G+zlZwM7Lm+OzEsPIFujvNwRtQR0qR+x1IwS5IH6aZFcrVtIK41F+nTyPYu/T2W/x8UFg=
+	t=1766019424; cv=pass; b=s5r/x7Yh5kszKFnrMcq12fiaUTyIfRCrpmaTBFmiE3RdhNYk98H4TljobnpavoT39yUn8JR1K+IIyXRNr9+e73vV3BpRtf2+3/KxGsswvXfeb6gkqYEqIhGe0Cwz6iKiHBLAexNXSioMbHJ4jWw/tb+p9NTC4JAOV4lXzKjbH/I=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766019156; c=relaxed/simple;
-	bh=AsW5OaEntsD4rUYnqwLi0pmEfurXPvw1+DhlLXSA3EM=;
+	s=arc-20240116; t=1766019424; c=relaxed/simple;
+	bh=Wn8IVSKBKjdKQd+Seeo1vN6CZx6+S91YD2RyKFE3rmk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VXIqBABl8jArtVjt4ZfpbE64j76aBbQonzhb2D/P+Uz20OG28M05UdGB6DdEhgT5xVoECbk2dRdOxwJ5Ww7KAcDWJlLROtakFfBGrKTD3jN+H557yHbg3hPSGbjXvYkEnji28gzsHA7scoKK9WdNAcl2yJchUv7i9vVuSDA02oE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=05P4ZzLA; arc=pass smtp.client-ip=209.85.167.43
+	 To:Cc:Content-Type; b=IbJl3uC0AcgoK0V0dBYHAFPBScZEf5rjmEJOJSI21x/Oxubi0iWw4/FYQiHc3hbmdec56wh5EpTmal7QTXi9trErT68RUgdb2iuT7uEVSeKsGeOiGjgZVtLCrTwlaKKCDSFJ+hMo2YICGXjQ2GQ9I7iAR5cJNwK+vBV8IvM6F74=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qmV4feUS; arc=pass smtp.client-ip=209.85.167.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5942f46ad87so2887e87.0
-        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 16:52:34 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1766019153; cv=none;
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-59434b28624so2038e87.1
+        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 16:57:01 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1766019419; cv=none;
         d=google.com; s=arc-20240605;
-        b=TmngHCmruJZUiQe/VFE7Xs4asBMkzE8VmXegZvn9eAcY4GduxTDg84oUBUrdRufUUw
-         3fnCqh4jE3WimcZLhDhYeeEE0uGKS5Y6fXngm86WkFuDzrsM1EWcoGsXXMZhCX//DOuj
-         jAiccFGLlGYI3dQmOL7mpBc7LkU1iOrmJjkZnuHafKKduzPVPHB8SYVS4hSEoqesWgRW
-         Lay1ygiUSyU5aBmi7tGddm/wY19ZaRn7CMymdr0EArgnjgmUBniLpUtXALIFzWZz9TYc
-         t4CUP9ruj25XXkkn+uH2wSvGGmu2FphS10jhJmD3NROG925JKUXkywJWAdnBLhBhOSW7
-         60AQ==
+        b=IxMX7CuceW0UTkXNVH1Kws2V9xDlCczmw3NhHK1HAoFi4JEObVd/FDLHLsRYNVbjFq
+         A5z1Qa8xVgh3ic6sa0nbppkyPV5Yh3MVkRhUQ0DL50qSeN8NXSrRFED/06PcurCYkRIn
+         UJFMARO+OP+gbtgs2D+MYgvhCIp40l89LIFqkAElKFLsrFp085W0iTD0IUFbIaZwr7XO
+         +pn0GLfO5k2E702sCyO0Vr4zy2x82qDiiUEX426SF4SMTFOg//+cgzmmTZDrvyPVSQ59
+         epnwli7QWVXAu2PJrYRsALkfSFEQMlZsyM0SWiCi50ZTKGXqRcRCWON4N8hFucZ6/KzK
+         cBwg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=arc-20240605;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:dkim-signature;
-        bh=du0kCtfi5QhpLe9dk7Ff2CQwdsFdE0qZL7AISkx1KXk=;
-        fh=GvLV+2TYrwYxI0HEmFYo97gsJw4eSbE4N1TZ9r3Zup4=;
-        b=ZJthy49Loi9NGWyDkOmzRJiVn7xdrc1rdStxxSIeCfhdA5ZF1JzAH9ZMjFE2vlqHOc
-         r1nGd6j6I5gFNPjvSLYjP8epMCeY052XelwLww7zin06jPilxVOrJAjJM66AF78+vIXf
-         jWItJx5t+zQIgdL0EZZXrScYj+uJwOyIzddPBZqymmuiRuvEoR8s+FM7HfvX1WhdVJii
-         eKz6DuRGXoDsVaUUelT4MqQZtQ1DL9J22oi0SIx2LhKTryQlNc2X1DarYKfKWp3bzOSv
-         dsaT3PLB1ImKjUNWu4t2LlNBPcLAdCM4HzIFPdyFlwNM2BwW5j/kXV9qZN4PleE4l3eE
-         /tWQ==;
+        bh=Wn8IVSKBKjdKQd+Seeo1vN6CZx6+S91YD2RyKFE3rmk=;
+        fh=h126AUibyR9sRDTOvFdK+MzzH+3ekWfJdhrkjWl+0iw=;
+        b=Nva6yNt8SHAoAJMm5YI4d+mn64ROHZPK+ieRmW/AySSZiFqiJUxXgnnH9kFA6JYWpQ
+         K9ExLu1B8Dtz7gBC5TOSD55Mj5Uz9+2pMmsapQfybdmVEuNse8BwGrop6IF4X7ZEw4nZ
+         7WgDuthnZvVvh9S/gYhT0cLfT1Dmw8JO+TLaXvruiHPkTV/+uMRgST+38nw+ZOR8xUR6
+         ItMHJFRley3qWkz+zYsBrT98P6epdyREX0S17JDZypbXESz4OduHLbTQaVNbn66y8ERH
+         8i4R+wRuyLKHrKxdxGSdYHdI4mZuxEBl5OoWEvxxHXwFiem3MGMmfTdqd/1/jfjvAdRi
+         0yEg==;
         darn=vger.kernel.org
 ARC-Authentication-Results: i=1; mx.google.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1766019153; x=1766623953; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1766019419; x=1766624219; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=du0kCtfi5QhpLe9dk7Ff2CQwdsFdE0qZL7AISkx1KXk=;
-        b=05P4ZzLA1CiD2TC0ahfqkxHZd3jV7bBMtgelY9HuzxvNhl5+EIWhwIbhd59eVTmH34
-         A7oP7KKB8ZuKDE0y6zQxt0jI9kpGXhryxObeA0tcjKk0S6bzpPR8p90EHoxRNJaN8Ydi
-         SIC4HWPduy3wJJte5l+HG5YDr22YTluuW2DWP4qoR8AjhQyzirhr+121Yo0t1712RUH3
-         +oR91WMmKrTLnvdRmRLDZ+4RpidQCIxfE+aCEJ6YaOXOgZCaZg7vM727k9F/10MzDwI+
-         auHFyXDyUhD2hE+O0B/MH/M4BkyQNNAmoZMSs1e7yZtInBpn5IlTRCeKVA/D+BLiBqD8
-         xmow==
+        bh=Wn8IVSKBKjdKQd+Seeo1vN6CZx6+S91YD2RyKFE3rmk=;
+        b=qmV4feUSeuOEucoxkBxtp8oytidTHH6z7oFKaVjmzTV+BMEob3cTYF3ufrUmwCcY+L
+         cONw41Bl7/OHQRK+/RVcXZa50VN4k8QGJqmOI07gFR/C76jHO7CEonbc3nyB5z3n0bEI
+         Chww8XySGOZppk9O6qvz5+RKxPYcWfINQf5Uvx4zQ51rq5aDHOGGf65Rl1UM/M6kcgpg
+         2er4Ff0pPvsKngpwt2Yhdb7btDdAGMRcEI+CTaAEe9Fi2BZzJQBYPKdkqGw1Iy7Hnp44
+         FFup4AmSol9pP/WQQpl00mRrCC8D3eq5le7DFwjXDo5EnEfWa8B+1a82ek+sEAjCkTkh
+         uEaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766019153; x=1766623953;
+        d=1e100.net; s=20230601; t=1766019419; x=1766624219;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=du0kCtfi5QhpLe9dk7Ff2CQwdsFdE0qZL7AISkx1KXk=;
-        b=CRfw1W0X4KqXPX/TrLRh0baPwlaHlCiZPc9j/RZY1Iy0lgynmgFeAVQ8D3BcuZICUy
-         5wTnEgSEh8lVkmmmkShZmwL5p+8KT1jgLhfdnCiN+xOSlSNt645MbfSq4SjzRFgfPIyP
-         wRCd91gH+RvEP84+zAuPuwkrN5yhmYXZnqFQN2FfklOmjV0NXR8WzGQ8LRJvOhzQgkbc
-         MoocKpjkOUHgV/W5kgmzX0bQiQMhgv2aQQds83mjKkBj2S/w3Ru3/K7FcV2vfPtecRAw
-         mPqfVIZtng+M/PuUaWyWXtyvzmavUr5vTvqcj5o9A1aUpe8TxybwQKaPS7uz4zV2ILUO
-         fk0A==
-X-Forwarded-Encrypted: i=1; AJvYcCVKwJrOvQiqN3pntPe5H4TqClbIplTKNqmOmYxYsv7bNYv2VjnP0rKzfr4VVfLKsH6F2RL1lBM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDMIcnrRNTwHm8y/oMbxpxhroLFaKSUilIiZHj57hutqOwcAuS
-	Ikb22vd/sdixCRAZFS8GTLeupD214XDQ4xybcuwXpeU3N8lLcrYJs28lLkSIiZJVYuFI1Oqjcxo
-	M/OGeKtGH+e2sa/YtPNAEsToz1n9vHsSOusme26Lm
-X-Gm-Gg: AY/fxX6QIy+cHTwPboWkk4oK1bP/xpxD3fV0OX18s1YNEbife4Ns3pYTxovK3Y/41TZ
-	86SkNRobJxF36pocuimsD8KvWMq6T2f39A4Q22+3rTDpBugmVM4yaCGF9xzrdNiOO2/GC+iIYvv
-	6hXe1qcFe4bvWj1ec1PkScYxOWGXWzsxHJJ5UDgo1t5LXJ6WrL0e2ERAuKGvivVjaQ349V1za1N
-	KNbj7dHq9ekcTtGpXFS3F42CemZNvsqyYNWMRAOPgzMNY+TKN3EhCOSqf+b1uz2B1b126duuAXK
-	GFNQIg==
-X-Google-Smtp-Source: AGHT+IGhRe6cacnalU4Sbbx0+P+c9GB+XE3RKJaZT80HPKy2K0IZ0T6hUEygSC8LmCwKJ+ato7ctj90QisAGmb29DwQ=
-X-Received: by 2002:a05:6512:6797:b0:594:2644:95c6 with SMTP id
- 2adb3069b0e04-59a143f2106mr6242e87.7.1766019152768; Wed, 17 Dec 2025 16:52:32
+        bh=Wn8IVSKBKjdKQd+Seeo1vN6CZx6+S91YD2RyKFE3rmk=;
+        b=wH1EUw9K5D2tbDEHlGTy20t1mwhZ9rhVF28LuwW5uN1MU6arHapsiN+JpmKSwf20fv
+         oJaK7Evh6PB/HNWY29I+UaRPQcbJAPd0mupbF5kWK/6U+s8b9hfYGGqAtKBse0JflNUq
+         nN9NQWHudJYZQXtCEwOP1q/xchSQUBcfXRx+t5E0vM1rFgk6HirFC0+ixBhAdYEobIs7
+         fHT4wCzLxaaXajOm4PGhmsj1pT4M+i9XbfEh+pjp0byZtRIzsqZUTCAgihM5mw1fRPz6
+         JRdXfoGSa9EGdpCzDDE21M7tQIAKhv9cXtH+SfNX793ye3Iar3pDeVZSgCvJDZ7Euxj/
+         TB/w==
+X-Forwarded-Encrypted: i=1; AJvYcCWJllQQZDJfuIxXNO6dN4AgiEJCcr9cEFR/Lsjn9u52ovfmQxntOnopJHKiIluyDVPwSiPU5+E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxkQhABMNV+mfbXIwrU7J5lI8GIaS/zG83ypehAMi3BylDdoms
+	rxDg2bdHlhmnYeCPpo64xV4VRJR0YXz7iD7MxVzKqeORr9Zn/+oTUrH+SjiquQHIdY0p5fmeVj3
+	t5QfuMS+wsxhNEMZZoZlrLZKsC9Kmt8N+EcD7Wsn2
+X-Gm-Gg: AY/fxX6HxPt0kvA2NhtVUYpuR/fcPNT+r4abkIrLEQjTi7xkzuL5VrwJN+WkcPFkcfY
+	93M42GOTPOmB/n4lUutoEqJzXY6ob0ATiQIgAJlwL77kVvSdHxNJAWs1+3855wX7LuzY8qGGoKl
+	r4D8VwtrhR/p073kegY/YX8J3L0IdPREnGnzugw7Rxx5zwAzQ/qymuRy2bRqJ+OLkmDZKzJFv9M
+	OO/3IiLsaJS7FDHXD6lh2RNmdCid+9IgE8RMqce1nNdjkj4CLbBbhajNb0KlDmP9i04Oug=
+X-Google-Smtp-Source: AGHT+IGGEASVHyPQ467f8qGv1ai9GzsgjLRnI7PhI1cmjlZrbY5wbMZyqExpji4t46A3XTEUAxJBJfUnsDWD8VEYR2U=
+X-Received: by 2002:ac2:41d0:0:b0:59a:1205:9c86 with SMTP id
+ 2adb3069b0e04-59a143f4227mr7675e87.5.1766019419289; Wed, 17 Dec 2025 16:56:59
  -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -96,91 +95,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20250930212352.2263907-1-sreedevi.joshi@intel.com>
- <20250930212352.2263907-3-sreedevi.joshi@intel.com> <aN1MSIO27C24q-gL@horms.kernel.org>
-In-Reply-To: <aN1MSIO27C24q-gL@horms.kernel.org>
+ <20250930212352.2263907-2-sreedevi.joshi@intel.com> <aN1MOnqvkl7nZxZ7@horms.kernel.org>
+In-Reply-To: <aN1MOnqvkl7nZxZ7@horms.kernel.org>
 From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 17 Dec 2025 16:52:20 -0800
-X-Gm-Features: AQt7F2rjkM-TcPM4FYbg46wjt_nAwd51pZtMcJTG3c8bX0EM5tdjUpRcCMo7RqQ
-Message-ID: <CAHS8izM9dFNtkbdR+_rCrEmb0L6r9vga0gDr8GXeHX5N_4=32g@mail.gmail.com>
-Subject: Re: [PATCH v2 iwl-net 2/2] idpf: fix issue with ethtool -n command display
+Date: Wed, 17 Dec 2025 16:56:47 -0800
+X-Gm-Features: AQt7F2pjn7YrRxFFZxTO5s7_cgbOTqFkxgvLmV7-sRm-KXT3E1OnbII5d1Z5Hm0
+Message-ID: <CAHS8izOW+TxLU9dzy08g8MBE+cZGeXwsPnrq7wWH_XrCzHHp7A@mail.gmail.com>
+Subject: Re: [PATCH v2 iwl-net 1/2] idpf: fix memory leak of flow steer list
+ on rmmod
 To: Simon Horman <horms@kernel.org>
 Cc: Sreedevi Joshi <sreedevi.joshi@intel.com>, intel-wired-lan@lists.osuosl.org, 
-	netdev@vger.kernel.org, Erik Gabriel Carrillo <erik.g.carrillo@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+	netdev@vger.kernel.org, Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 1, 2025 at 8:45=E2=80=AFAM Simon Horman <horms@kernel.org> wrot=
+On Wed, Oct 1, 2025 at 8:44=E2=80=AFAM Simon Horman <horms@kernel.org> wrot=
 e:
 >
-> On Tue, Sep 30, 2025 at 04:23:52PM -0500, Sreedevi Joshi wrote:
-> > From: Erik Gabriel Carrillo <erik.g.carrillo@intel.com>
+> On Tue, Sep 30, 2025 at 04:23:51PM -0500, Sreedevi Joshi wrote:
+> > The flow steering list maintains entries that are added and removed as
+> > ethtool creates and deletes flow steering rules. Module removal with ac=
+tive
+> > entries causes memory leak as the list is not properly cleaned up.
 > >
-> > When ethtool -n is executed on an interface to display the flow steerin=
-g
-> > rules, "rxclass: Unknown flow type" error is generated.
-> >
-> > The flow steering list maintained in the driver currently stores only t=
-he
-> > location and q_index but other fields of the ethtool_rx_flow_spec are n=
-ot
-> > stored. This may be enough for the virtchnl command to delete the entry=
+> > Prevent this by iterating through the remaining entries in the list and
+> > freeing the associated memory during module removal. Add a spinlock
+> > (flow_steer_list_lock) to protect the list access from multiple threads=
 .
-> > However, when the ethtool -n command is used to query the flow steering
-> > rules, the ethtool_rx_flow_spec returned is not complete causing the
-> > error below.
-> >
-> > Resolve this by storing the flow spec (fsp) when rules are added and
-> > returning the complete flow spec when rules are queried.
-> >
-> > Also, change the return value from EINVAL to ENOENT when flow steering
-> > entry is not found during query by location or when deleting an entry.
-> >
-> > Add logic to detect and reject duplicate filter entries at the same
-> > location and change logic to perform upfront validation of all error
-> > conditions before adding flow rules through virtchnl. This avoids the
-> > need for additional virtchnl delete messages when subsequent operations
-> > fail, which was missing in the original upstream code.
-> >
-> > Example:
-> > Before the fix:
-> > ethtool -n eth1
-> > 2 RX rings available
-> > Total 2 rules
-> >
-> > rxclass: Unknown flow type
-> > rxclass: Unknown flow type
-> >
-> > After the fix:
-> > ethtool -n eth1
-> > 2 RX rings available
-> > Total 2 rules
-> >
-> > Filter: 0
-> >         Rule Type: TCP over IPv4
-> >         Src IP addr: 10.0.0.1 mask: 0.0.0.0
-> >         Dest IP addr: 0.0.0.0 mask: 255.255.255.255
-> >         TOS: 0x0 mask: 0xff
-> >         Src port: 0 mask: 0xffff
-> >         Dest port: 0 mask: 0xffff
-> >         Action: Direct to queue 0
-> >
-> > Filter: 1
-> >         Rule Type: UDP over IPv4
-> >         Src IP addr: 10.0.0.1 mask: 0.0.0.0
-> >         Dest IP addr: 0.0.0.0 mask: 255.255.255.255
-> >         TOS: 0x0 mask: 0xff
-> >         Src port: 0 mask: 0xffff
-> >         Dest port: 0 mask: 0xffff
-> >         Action: Direct to queue 0
 > >
 > > Fixes: ada3e24b84a0 ("idpf: add flow steering support")
-> > Signed-off-by: Erik Gabriel Carrillo <erik.g.carrillo@intel.com>
-> > Co-developed-by: Sreedevi Joshi <sreedevi.joshi@intel.com>
-> > Signed-off-by: Sreedevi Joshi <sreedevi.joshi@intel.com>
 > > Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 > > Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> > Signed-off-by: Sreedevi Joshi <sreedevi.joshi@intel.com>
+>
+> Reviewed-by: Simon Horman <horms@kernel.org>
 >
 
 Tested-by: Mina Almasry <almasrymina@google.com>
