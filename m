@@ -1,81 +1,37 @@
-Return-Path: <netdev+bounces-245367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94216CCC50B
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 15:40:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B646CCC5DB
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 16:00:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 17A1630E0E11
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 14:37:16 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 117A2308D617
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 14:58:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A57A338591;
-	Thu, 18 Dec 2025 14:28:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="aI7kV/Vc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDAE6243968;
+	Thu, 18 Dec 2025 14:58:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D663337BB6
-	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 14:28:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 194CE2CCB9
+	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 14:58:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.136.29.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766068127; cv=none; b=oAU2/dRBF7JbfDl73RGB306D3380KXswuY1M9WUoJ0khDDxlUCA/b4P8nbhq1T6wETzbWj4s75oceLzw+i1Yl4PS1nO6guG2YG/2Atkhx7yrnIIrfZw+42SRW3UeLt08loDG3mxPa41S2D5yw4NGDSqgRpvOshwGruX1m5LVtAY=
+	t=1766069887; cv=none; b=oPgUW9j6U5MH4IhKq+/AyRhWmloeSX1iPg6crRnhwKhMIVSAZS5vR9ge7YSgmyqrgcbvR66Wy24zLABaZLhxs1ipvsI0WbOTxRVQgp/DJbwzpnuwnxL4CMbhmE4pSBUA+uOOnzvl1mdXXYd1knwfxx7AKFNHzFaWTTRyAHupY2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766068127; c=relaxed/simple;
-	bh=Qh/o0My9IXFqpNIxAnsLudR9BCeT6bwNQ7IvDYD6MXM=;
+	s=arc-20240116; t=1766069887; c=relaxed/simple;
+	bh=wpxxcQLdLnbtVyYOvN2Bs7hF9G39FLwvVvSoaTp7YpY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a1BWkEotBagCVCbbQtbwvHUVkUDmKKU/NmOh4Snu3EfVKbnmsGX7AvCW8ruq7ZpE92by6k/tQoJdzJyF9v7O23lhjMQ/o6jMlP9hdEp+qKIckbc6tVveyOVX7SmGwzsEiiQQFPsdkzoV3r25ZSABPd+dxeewNU+cg8FjhOgLPXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=aI7kV/Vc; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-47928022b93so1541955e9.0
-        for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 06:28:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1766068123; x=1766672923; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=wsG+uhBVnyABo0WRb8gG8p3JTTGBZ7OJ2w3pDH7XoxI=;
-        b=aI7kV/Vc36XwXOd7zN6MumgeXB1bd5dbvD7y6HWYp+dI+cJcjwiISpky+HWvwEsw9R
-         B6ChLTLXXEMmBDFt7U0W9pRtn7Wt+rUiPkQi9sFmSACgfiCCB7O0vRjJZRaT+yVTI5fs
-         KimzJHrIWBdBjHb3f1Uku3eF7sgfhs49ozrXoa7aIxbpKmIuBz+q7wiRLCgqVCVKonz3
-         mg5+4ADVGaEljJ6TcWSmIF9g42ojoEtLP6pg9yUhw8e/xN6AJQDzmWympiSnXnag4S3M
-         977pG70xLtQmaxIwVH9s+7AsHod6y6uFSDVsRZ8U4xFqGG6jYez6BJJjUKg14PlrH4sb
-         17Rg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766068123; x=1766672923;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wsG+uhBVnyABo0WRb8gG8p3JTTGBZ7OJ2w3pDH7XoxI=;
-        b=v1UwOdoqxQ04w0Vz0A6r6nXgZXJv3EAps4elsXHcUeRyL1HIYDDhJK53MFC7c9GGqd
-         s0cpwP1I4zUdrTRXsUnT3lzl6Ks90GmadJY971FBhBtdUSGnEdCx2MOloKy8ZAv04WZ2
-         mN24QccxLubBg3wJ+kGbrVn/46uFfzr1UEsrwgwWauNmWNGfxjRKfnZa0sogOZjoJp7M
-         OYzNkddnGA2bcr76Bq/Nvs1kdhsCglv5hP08zGTBZ4Om09v+ffolC7HGwV59b7cPNxxV
-         +OiFVIkpv1Cm9Z+JAV7nQyMEKE00i75hyexsb6d6jcMrwYjFZe165oq43IQAhoCQbNpZ
-         i6Zg==
-X-Forwarded-Encrypted: i=1; AJvYcCVMf8jBrKEaLOTJB7CPZCojxm8AqoyvLcg4laY5NtIW770dEzLnERHlYGEK6uzDHMkCH6rvY00=@vger.kernel.org
-X-Gm-Message-State: AOJu0YygJxlWmYq1UNbTF9z+JoZrxeM0XneI6VjeNE8RQemLfLXrLEU6
-	oxCgu68tTIQboxhcOsZyRdyzFfn5pupZ2iA3IKzFA6W38SbAfPkbA5aObn/wL/C9VgvQk/nWVtp
-	fIQrCzk0=
-X-Gm-Gg: AY/fxX4BU31tDuDYEg6F/nEwA97FGN4asNSz2d315ICNw3FpM7Wbg0jYlDgMxypozce
-	7oZEPaFV23jvAPc966a1cFaZxNwl+dxSJvA7ts6y6E3yt4tAHHZn3h5pUGX70+FqmVohIcxoBBv
-	bW7/V6zbxJZGxGM6zo5yIjLgtbbcMUrj3a1pu4jmS1J1OYHANSDzYq5UZkIk8C4jWqkjHS6n/2V
-	Sv6O0NZICgvNvtJI/I/M9672Znaot8Myu5fHIuUaP81D2njKebhn2pd01FL5yHFfelrgk7vWC9L
-	nUY73/qZFuJgzRukkLSWe1ZZ0HVdA4eVJQmJCwXStgOI45BEZnwdD1Q0kZvpJFzmTrVyWVabMTS
-	G/LfsjcF6CFH+FmOyCvymwo15VjdEr0PKtzE5grkwjXDpfGEpz7cxjyZQHhgHQ5/xhxkLBxt0YY
-	vko15FzWjxvOSMSgNU4WtlAhMy02lgy8HzjFA69Hma1tflrSc9lliPFnrMxAZr2O0=
-X-Google-Smtp-Source: AGHT+IGRpqq2j5/cFryODQP666Y4zlWz3rVkctq9z8wXzLm4joAqtBvzf1C9TK9x3m6rkgag3VUcJg==
-X-Received: by 2002:a05:600c:4e8a:b0:477:a6f1:499d with SMTP id 5b1f17b1804b1-47ce8776b26mr12151065e9.3.1766068123376;
-        Thu, 18 Dec 2025 06:28:43 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:b41:c160:6a1d:efff:fe52:1959? ([2a01:e0a:b41:c160:6a1d:efff:fe52:1959])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43244934cf5sm5391877f8f.1.2025.12.18.06.28.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 Dec 2025 06:28:42 -0800 (PST)
-Message-ID: <364fe528-87a1-4bc3-bcff-7fa73eb9eb44@6wind.com>
-Date: Thu, 18 Dec 2025 15:28:42 +0100
+	 In-Reply-To:Content-Type; b=jdceffEvwL3p6PYDVRFI1OTSq10UxMfR+87p0ttfXq6gVxO/k0RqU7tH+yG2EKlxh/ceoFnfn/iRS+zdItfdymeJqTeTtaFkaAr/BCUMHrQUtur8WVv/n0Xjr/5ZTGg6N2JXz9e+hqWW+ej76ErAffgNYn4ofd1YMwBFYBQVJ/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com; spf=pass smtp.mailfrom=proxmox.com; arc=none smtp.client-ip=94.136.29.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proxmox.com
+Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
+	by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 1611F4719C;
+	Thu, 18 Dec 2025 15:58:03 +0100 (CET)
+Message-ID: <64d8fa05-63a2-420e-8b97-c51cb581804a@proxmox.com>
+Date: Thu, 18 Dec 2025 15:58:01 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,66 +39,136 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH net] seg6: fix route leak for encap routes
-To: Paolo Abeni <pabeni@redhat.com>, Andrea Mayer <andrea.mayer@uniroma2.it>
+Subject: Re: [PATCH net-next 7/8] tcp: stronger sk_rcvbuf checks
+To: Eric Dumazet <edumazet@google.com>
 Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- David Lebrun <david.lebrun@uclouvain.be>,
- Paolo Lungaroni <paolo.lungaroni@uniroma2.it>,
- David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
- stefano.salsano@uniroma2.it
-References: <20251208102434.3379379-1-nicolas.dichtel@6wind.com>
- <20251210113745.145c55825034b2fe98522860@uniroma2.it>
- <051053d9-65f2-43bf-936b-c12848367acd@6wind.com>
- <20251214143942.ccc2ec1a46ce6a8fcc3ede55@uniroma2.it>
- <3394763c-c546-4c80-8157-98467c8e8698@redhat.com>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <3394763c-c546-4c80-8157-98467c8e8698@redhat.com>
-Content-Type: text/plain; charset=UTF-8
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Neal Cardwell <ncardwell@google.com>, Simon Horman <horms@kernel.org>,
+ Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
+ <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ lkolbe@sodiuswillert.com
+References: <20250711114006.480026-1-edumazet@google.com>
+ <20250711114006.480026-8-edumazet@google.com>
+ <cd44c0d2-17ed-460d-9f89-759987d423dc@proxmox.com>
+ <8f8836dd-c46f-403c-b478-a9e89dd62912@proxmox.com>
+ <CANn89iL=MTgYygnFaCeaMpSzjooDgnzwUd_ueSnJFxasXwyMwg@mail.gmail.com>
+ <c1ae58f7-cf31-4fb6-ac92-8f7b61272226@proxmox.com>
+ <CANn89iJRCW3VNsY3vZwurvh52diE+scUfZvwx5bg5Tuoa3L_TQ@mail.gmail.com>
+Content-Language: en-US, de-DE
+From: Christian Ebner <c.ebner@proxmox.com>
+In-Reply-To: <CANn89iJRCW3VNsY3vZwurvh52diE+scUfZvwx5bg5Tuoa3L_TQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Bm-Milter-Handled: 55990f41-d878-4baa-be0a-ee34c49e34d2
+X-Bm-Transport-Timestamp: 1766069870122
 
-Le 18/12/2025 à 11:35, Paolo Abeni a écrit :
-> On 12/14/25 2:39 PM, Andrea Mayer wrote:
->> On Wed, 10 Dec 2025 18:00:39 +0100
->> Nicolas Dichtel <nicolas.dichtel@6wind.com> wrote:
->>> Le 10/12/2025 à 11:37, Andrea Mayer a écrit :
->>>> I've got your point. However, I'm still concerned about the implications of
->>>> using the *dev* field in the root lookup. This field has been ignored for this
->>>> purpose so far, so some existing configurations/scripts may need to be adapted
->>>> to work again. The adjustments made to the self-tests below show what might
->>>> happen.
->>> Yes, I was wondering how users use this *dev* arg. Maybe adding a new attribute,
->>> something like SEG6_IPTUNNEL_USE_NH_DEV will avoid any regressions.
->>>
+On 12/18/25 2:19 PM, Eric Dumazet wrote:
+> On Thu, Dec 18, 2025 at 1:28 PM Christian Ebner <c.ebner@proxmox.com> wrote:
 >>
->> IMHO using a new attribute seems to be a safer approach.
-I agree.
-
+>> Hi Eric,
+>>
+>> thank you for your reply!
+>>
+>> On 12/18/25 11:10 AM, Eric Dumazet wrote:
+>>> Can you give us (on receive side) : cat /proc/sys/net/ipv4/tcp_rmem
+>>
+>> Affected users report they have the respective kernels defaults set, so:
+>> - "4096 131072 6291456"  for v.617 builds
+>> - "4096 131072 33554432" with the bumped max value of 32M for v6.18 builds
+>>
+>>> It seems your application is enforcing a small SO_RCVBUF ?
+>>
+>> No, we can exclude that since the output of `ss -tim` show the default
+>> buffer size after connection being established and growing up to the max
+>> value during traffic (backups being performed).
+>>
 > 
-> Given the functional implication I suggest using a new attribute. Given
-> that I also suggest targeting net-next for the next revision of this patch.
-I see this as a bug. A route such as
-cafe::1  encap seg6 mode encap segs 1 [ fc00:21:100::6046 ] dev veth0
-with veth0 completely ignored but mandatory is buggy.
-
+> The trace you provided seems to show a very different picture ?
 > 
->>>>> diff --git a/net/ipv6/seg6_iptunnel.c b/net/ipv6/seg6_iptunnel.c
->>>>> index 3e1b9991131a..9535aea28357 100644
->>>>> --- a/net/ipv6/seg6_iptunnel.c
->>>>> +++ b/net/ipv6/seg6_iptunnel.c
->>>>> @@ -484,6 +484,12 @@ static int seg6_input_core(struct net *net, struct sock *sk,
->>>>>  	 * now and use it later as a comparison.
->>>>>  	 */
->>>>>  	lwtst = orig_dst->lwtstate;
->>>>> +	if (orig_dst->dev) {
+> [::ffff:10.xx.xx.aa]:8007
+>         [::ffff:10.xx.xx.bb]:55554
+>            skmem:(r0,rb7488,t0,tb332800,f0,w0,o0,bl0,d20) cubic
+> wscale:10,10 rto:201 rtt:0.085/0.015 ato:40 mss:8948 pmtu:9000
+> rcvmss:7168 advmss:8948 cwnd:10 bytes_sent:937478 bytes_acked:937478
+> bytes_received:1295747055 segs_out:301010 segs_in:162410
+> data_segs_out:1035 data_segs_in:161588 send 8.42Gbps lastsnd:3308
+> lastrcv:191 lastack:191 pacing_rate 16.7Gbps delivery_rate 2.74Gbps
+> delivered:1036 app_limited busy:437ms rcv_rtt:207.551 rcv_space:96242
+> rcv_ssthresh:903417 minrtt:0.049 rcv_ooopack:23 snd_wnd:142336 rcv_wnd:7168
 > 
-> Here you should probably use dst_dev_rcu(), under the rcu lock, avoiding
-> touching dev twice.
-Ok.
+> rb7488 would suggest the application has played with a very small SO_RCVBUF,
+> or some memory allocation constraint (memcg ?)
 
-Thanks,
-Nicolas
+Thanks for the hint were to look, however we checked that the process is 
+not memory constrained and the host has no memory pressure.
+
+Also `strace -f -e socket,setsockopt -p $(pidof proxmox-backup-proxy)` 
+shows no syscalls which would change the socket buffer size (though this 
+still needs to be double checked by affected users for completeness).
+
+Further, the stalls most often happen mid transfer, starting with the 
+expected throughput and even might recover from the stall after some 
+time, continue at regular speed again.
+
+
+Status update for v6.18
+-----------------------
+
+In the meantime, a user reported 2 stale connections with running kernel 
+6.18+416dd649f3aa
+
+The tcpdump pattern looks slightly different, here we got repeating 
+sequences of:
+```
+224	5.407981	10.xx.xx.bb	10.xx.xx.aa	TCP	4162	40068 → 8007 [PSH, ACK] 
+Seq=106497 Ack=1 Win=3121 Len=4096 TSval=3198115973 TSecr=3048094015
+225	5.408064	10.xx.xx.aa	10.xx.xx.bb	TCP	66	8007 → 40068 [ACK] Seq=1 
+Ack=110593 Win=4 Len=0 TSval=3048094223 TSecr=3198115973
+```
+
+The perf trace for `tcp:tcp_rcvbuf_grow` came back empty while in stale 
+state, tracing with:
+```
+perf record -a -e tcp:tcp_rcv_space_adjust,tcp:tcp_rcvbuf_grow
+perf script
+```
+produced some output as shown below, so it seems that tcp_rcvbuf_grow() 
+is never called in that case, while tcp_rcv_space_adjust() is.
+
+```
+  tokio-runtime-w    4930 [002]  6094.017275: tcp:tcp_rcv_space_adjust: 
+family=AF_INET6 sport=8007 dport=40068 saddr=10.xx.xx.aa 
+daddr=10.xx.xx.bb saddrv6=::ffff:10.xx.xx.aa daddrv6=::ffff:10.xx.xx.bb 
+sock_cookie=101a
+  tokio-runtime-w    4930 [002]  6094.187083: tcp:tcp_rcv_space_adjust: 
+family=AF_INET6 sport=8007 dport=49944 saddr=10.xx.xx.aa 
+daddr=10.xx.xx.bb saddrv6=::ffff:10.xx.xx.aa daddrv6=::ffff:10.xx.xx.bb 
+sock_cookie=2
+```
+
+ss -tim
+```
+ESTAB 0      0      [::ffff:10.xx.xx.aa]:8007 [::ffff:10.xx.xx.bb]:40068
+          skmem:(r0,rb4352,t0,tb332800,f0,w0,o0,bl0,d199) cubic 
+wscale:7,10 rto:201 rtt:0.093/0.025 ato:40 mss:8948 pmtu:9000 
+rcvmss:4096 advmss:8948 cwnd:10 ssthresh:16 bytes_sent:451949 
+bytes_acked:451949 bytes_received:805775577 segs_out:59050 segs_in:72440 
+data_segs_out:392 data_segs_in:72287 send 7.7Gbps lastsnd:75880 
+lastrcv:167 lastack:167 pacing_rate 9.16Gbps delivery_rate 2.09Gbps 
+delivered:393 app_limited busy:756ms rcv_rtt:207.343 rcv_space:107600 
+rcv_ssthresh:312270 minrtt:0.055 rcv_ooopack:287 snd_wnd:399488 rcv_wnd:4096
+ESTAB 0      0      [::ffff:10.xx.xx.aa]:8007 [::ffff:10.xx.xx.bb]:49944
+          skmem:(r0,rb4352,t0,tb332800,f0,w0,o0,bl0,d286) cubic 
+wscale:7,10 rto:201 rtt:0.213/0.266 ato:40 mss:8948 pmtu:9000 
+rcvmss:4096 advmss:8948 cwnd:10 ssthresh:17 bytes_sent:1255369 
+bytes_acked:1255369 bytes_received:55175665 segs_out:11516 segs_in:8473 
+data_segs_out:354 data_segs_in:8038 send 3.36Gbps lastsnd:111496 
+lastrcv:14 lastack:14 pacing_rate 4.03Gbps delivery_rate 2.42Gbps 
+delivered:355 busy:103ms rcv_rtt:207.596 rcv_space:79779 
+rcv_ssthresh:198722 minrtt:0.07 rcv_ooopack:6 snd_wnd:439552 rcv_wnd:4096
+```
+
+Best regards,
+Christian Ebner
+
 
