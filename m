@@ -1,69 +1,68 @@
-Return-Path: <netdev+bounces-245361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70F15CCC457
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 15:25:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D1772CCC466
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 15:26:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3A62D30448EB
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 14:24:56 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 5E872305CB24
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 14:25:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 353EF2BD012;
-	Thu, 18 Dec 2025 14:24:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ECBF28D8DB;
+	Thu, 18 Dec 2025 14:25:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amazon.es header.i=@amazon.es header.b="tUGbPr+y"
+	dkim=pass (2048-bit key) header.d=amazon.es header.i=@amazon.es header.b="YTHdQhGS"
 X-Original-To: netdev@vger.kernel.org
-Received: from fra-out-013.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-013.esa.eu-central-1.outbound.mail-perimeter.amazon.com [63.178.132.221])
+Received: from fra-out-012.esa.eu-central-1.outbound.mail-perimeter.amazon.com (fra-out-012.esa.eu-central-1.outbound.mail-perimeter.amazon.com [52.57.120.243])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FA0729BD8E;
-	Thu, 18 Dec 2025 14:24:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.178.132.221
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05F3728F935;
+	Thu, 18 Dec 2025 14:25:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.57.120.243
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766067887; cv=none; b=jz3U8h4MiZcbJcmppedTP0Gn55fCEydtIlwU6V/9RcV8DBBWkOItAYEXRpODWbfsXp6dapdUJkfMm5BdTUP+bLeL38cetxHGROeWXxtlLCvXMRy9FQ7igUDnMqs+zhp+BZLiyCkhInEaSH7iM2Hf/S7pWqUc4CAtPU2gfPr97iA=
+	t=1766067911; cv=none; b=MXQi9ozko2wWQK1mZH44TRoGhM/PuTLA9Go6uKGYEBM89mKvS9rZMQyln63iYF8yF+0/XAAZPgGcvGjnHXeEPjQeWFhxF97u6ViK5/1nqgoKv8hGHBoSsq7FK9FzPCF3nl6M0Oxv7MDjpUByzJodYRK/Dc3b7Hqw2XTwBtc8vS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766067887; c=relaxed/simple;
-	bh=hjwSoy8zmoMoaKvz6nQHQMNV76rOwUAzQhcp/Thndhc=;
+	s=arc-20240116; t=1766067911; c=relaxed/simple;
+	bh=CMePqU7fDA/wHXd5/nycVWAvieQKAaHLSa+FSiuP0+0=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=AtiYgf6CKQr8RvdBHlh+zT5AzAu6oBGyRb0mYtQelE9tou+2fi0/eYIIh4xfTgfLpn8tBEi3AM+Py233jwmntnS0T0wEAmYFprGghzGe3btZfyMxa0BOzD9oboPcXG8uVkBHYyhLi3PoF+FqD9yXSPET6lIKkPwM8lXQPf/AVc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.es; spf=pass smtp.mailfrom=amazon.es; dkim=pass (2048-bit key) header.d=amazon.es header.i=@amazon.es header.b=tUGbPr+y; arc=none smtp.client-ip=63.178.132.221
+	 Content-Type:MIME-Version; b=t2qD90m77l6eL7EqZXXtljYRwK7ZyfeiKaoYpzuwZKY750qTmj6gPh4O5zg1vSfHW6ocjc+q4xE/BVkVe4x249iEoTPMV0dXu/HYiqDn7Ae61AWLchkoDs9oFZe4SM7sp5iyyGycGvGjmK3bsZsH9Y3RltE2/XTcEejpFs2dTsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.es; spf=pass smtp.mailfrom=amazon.es; dkim=pass (2048-bit key) header.d=amazon.es header.i=@amazon.es header.b=YTHdQhGS; arc=none smtp.client-ip=52.57.120.243
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.es
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.es
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.es; i=@amazon.es; q=dns/txt; s=amazoncorp2;
-  t=1766067885; x=1797603885;
+  t=1766067909; x=1797603909;
   h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=hjwSoy8zmoMoaKvz6nQHQMNV76rOwUAzQhcp/Thndhc=;
-  b=tUGbPr+yIYki4DTC5Wo90eyieZByauytEDRo7lSFLKTQigDPOpgJQ1uP
-   Mp3kWoorI66b/FzXk/rohsEfNECpu9zHqqT0WrlEZf9cOgvJJvoNEbLbc
-   J+f6gJN9s8ql04rXeoDvAJ9GJZYv4xE5sKLwi2iLHMsnXCM9SYY0mKSKp
-   k2aBPPS9c6nC4RSasx6yhNrROglWrCpZECmgEt3wXYLwWxI5UH1U1Pg4l
-   CdctTl/fnZ8X/cGJCuIyyDhIeRSMHFew04qRYzLLc4bvRe5+YkONIIzM+
-   sV8yhZ0vgM2LJVAMpwc7XGYai5vYtbgNhblOTj7hMn+3zJ9eKSswQJPv1
-   g==;
-X-CSE-ConnectionGUID: jlTlvtX5QD6S9F+zKfBUUw==
-X-CSE-MsgGUID: JT/F+cT1SdWklO7O0fbH3Q==
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=yIJepOPX3arqb5MyazZ+94RAcXRQ7bSmHnzahqj+Zso=;
+  b=YTHdQhGS7MEfNuakoyeEMm9pSj/7m+viAiPtziJVw7VGjTcyLNkhlY4q
+   iHo8VNrZp6jJXZpE+b0MzEXAI01PWVGT4PbbX/Oh6nYJHSPDc4UxHtscO
+   JyuSFBhtwRA/VGywHvx/N93999JrlAgjVg5qj2OIfgwHoiN8vNDIdnXKG
+   zTXG8YZhNLvVdKFPF4XyCbzPzw8ziRIQrBk9Gc2JQA3mjKraLNEodOh2S
+   9dyOr4JRgp9ZhsnbJYDFAC0z0rOJBdxxkmDbgMvRk6ylDgVlxn/BOW4Yg
+   0pNQuaknvndYm2w+lKRu5Dki3WT6QumZBhqqBT/ipG1//Vd8HYFPdXQaZ
+   Q==;
+X-CSE-ConnectionGUID: rgQK+gdMTs2pAUFYGqkPsw==
+X-CSE-MsgGUID: qkRuJN0+RpGrXpcNDRiDJQ==
 X-IronPort-AV: E=Sophos;i="6.21,158,1763424000"; 
-   d="scan'208";a="6788029"
-Received: from ip-10-6-3-216.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.3.216])
-  by internal-fra-out-013.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2025 14:24:44 +0000
-Received: from EX19MTAEUA001.ant.amazon.com [54.240.197.233:1270]
- by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.34.225:2525] with esmtp (Farcaster)
- id 38b9f7c4-1405-49fe-8164-21a6b99d6ff7; Thu, 18 Dec 2025 14:24:41 +0000 (UTC)
-X-Farcaster-Flow-ID: 38b9f7c4-1405-49fe-8164-21a6b99d6ff7
-Received: from EX19D012EUA003.ant.amazon.com (10.252.50.98) by
- EX19MTAEUA001.ant.amazon.com (10.252.50.223) with Microsoft SMTP Server
+   d="scan'208";a="6789740"
+Received: from ip-10-6-11-83.eu-central-1.compute.internal (HELO smtpout.naws.eu-central-1.prod.farcaster.email.amazon.dev) ([10.6.11.83])
+  by internal-fra-out-012.esa.eu-central-1.outbound.mail-perimeter.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Dec 2025 14:24:50 +0000
+Received: from EX19MTAEUC001.ant.amazon.com [54.240.197.233:1950]
+ by smtpin.naws.eu-central-1.prod.farcaster.email.amazon.dev [10.0.6.239:2525] with esmtp (Farcaster)
+ id d3207552-f9d3-450f-ae81-f228cd5aab97; Thu, 18 Dec 2025 14:24:50 +0000 (UTC)
+X-Farcaster-Flow-ID: d3207552-f9d3-450f-ae81-f228cd5aab97
+Received: from EX19D012EUA002.ant.amazon.com (10.252.50.32) by
+ EX19MTAEUC001.ant.amazon.com (10.252.51.155) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.29;
- Thu, 18 Dec 2025 14:24:33 +0000
+ Thu, 18 Dec 2025 14:24:44 +0000
 Received: from EX19D012EUA001.ant.amazon.com (10.252.50.122) by
- EX19D012EUA003.ant.amazon.com (10.252.50.98) with Microsoft SMTP Server
+ EX19D012EUA002.ant.amazon.com (10.252.50.32) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.2562.35;
- Thu, 18 Dec 2025 14:24:32 +0000
+ Thu, 18 Dec 2025 14:24:44 +0000
 Received: from EX19D012EUA001.ant.amazon.com ([fe80::b7ea:84f7:2c4b:2719]) by
  EX19D012EUA001.ant.amazon.com ([fe80::b7ea:84f7:2c4b:2719%3]) with mapi id
- 15.02.2562.035; Thu, 18 Dec 2025 14:24:32 +0000
+ 15.02.2562.035; Thu, 18 Dec 2025 14:24:44 +0000
 From: "Chalios, Babis" <bchalios@amazon.es>
 To: "robh@kernel.org" <robh@kernel.org>, "krzk+dt@kernel.org"
 	<krzk+dt@kernel.org>, "conor+dt@kernel.org" <conor+dt@kernel.org>,
@@ -77,21 +76,21 @@ CC: "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Chalios,
  Babis" <bchalios@amazon.es>, "Graf (AWS), Alexander" <graf@amazon.de>,
 	"mzxreary@0pointer.de" <mzxreary@0pointer.de>, "Cali, Marco"
-	<xmarcalx@amazon.co.uk>, "Woodhouse, David" <dwmw@amazon.co.uk>
-Subject: [PATCH v4 2/7] ptp: vmclock: support device notifications
-Thread-Topic: [PATCH v4 2/7] ptp: vmclock: support device notifications
-Thread-Index: AQHccCoHKiqhmMqx2kixR300dKT0fQ==
-Date: Thu, 18 Dec 2025 14:24:32 +0000
-Message-ID: <20251218142408.8395-3-bchalios@amazon.es>
+	<xmarcalx@amazon.co.uk>, "Woodhouse, David" <dwmw@amazon.co.uk>, "Krzysztof
+ Kozlowski" <krzysztof.kozlowski@oss.qualcomm.com>
+Subject: [PATCH v4 3/7] dt-bindings: ptp: Add amazon,vmclock
+Thread-Topic: [PATCH v4 3/7] dt-bindings: ptp: Add amazon,vmclock
+Thread-Index: AQHccCoORHkz0txS5kuznCiIu4jEzA==
+Date: Thu, 18 Dec 2025 14:24:44 +0000
+Message-ID: <20251218142408.8395-4-bchalios@amazon.es>
 References: <20251218142408.8395-1-bchalios@amazon.es>
 In-Reply-To: <20251218142408.8395-1-bchalios@amazon.es>
 Accept-Language: en-GB, en-US
 Content-Language: en-US
 X-MS-Has-Attach:
 X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <FFE7EA950F31214588761F89ED8618E5@amazon.com>
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,145 +98,94 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-QWRkIG9wdGlvbmFsIHN1cHBvcnQgZm9yIGRldmljZSBub3RpZmljYXRpb25zIGluIFZNQ2xvY2su
-IFdoZW4Kc3VwcG9ydGVkLCB0aGUgaHlwZXJ2aXNvciB3aWxsIHNlbmQgYSBkZXZpY2Ugbm90aWZp
-Y2F0aW9uIGV2ZXJ5IHRpbWUgaXQKdXBkYXRlcyB0aGUgc2VxX2NvdW50IHRvIGEgbmV3IGV2ZW4g
-dmFsdWUuCgpNb3Jlb3ZlciwgYWRkIHN1cHBvcnQgZm9yIHBvbGwoKSBpbiBWTUNsb2NrIGFzIGEg
-bWVhbnMgdG8gcHJvcGFnYXRlIHRoaXMKbm90aWZpY2F0aW9uIHRvIHVzZXIgc3BhY2UuIHBvbGwo
-KSB3aWxsIHJldHVybiBhIFBPTExJTiBldmVudCB0bwpsaXN0ZW5lcnMgZXZlcnkgdGltZSBzZXFf
-Y291bnQgY2hhbmdlcyB0byBhIHZhbHVlIGRpZmZlcmVudCB0aGFuIHRoZSBvbmUKbGFzdCBzZWVu
-IChzaW5jZSBvcGVuKCkgb3IgbGFzdCByZWFkKCkvcHJlYWQoKSkuIFRoaXMgbWVhbnMgdGhhdCB3
-aGVuCnBvbGwoKSByZXR1cm5zIGEgUE9MTElOIGV2ZW50LCBsaXN0ZW5lcnMgbmVlZCB0byB1c2Ug
-cmVhZCgpIHRvIG9ic2VydmUKd2hhdCBoYXMgY2hhbmdlZCBhbmQgdXBkYXRlIHRoZSByZWFkZXIn
-cyB2aWV3IG9mIHNlcV9jb3VudC4gSW4gb3RoZXIKd29yZHMsIGFmdGVyIGEgcG9sbCgpIHJldHVy
-bmVkLCBhbGwgc3Vic2VxdWVudCBjYWxscyB0byBwb2xsKCkgd2lsbAppbW1lZGlhdGVseSByZXR1
-cm4gd2l0aCBhIFBPTExJTiBldmVudCB1bnRpbCB0aGUgbGlzdGVuZXIgY2FsbHMgcmVhZCgpLgoK
-VGhlIGRldmljZSBhZHZlcnRpc2VzIHN1cHBvcnQgZm9yIHRoZSBub3RpZmljYXRpb24gbWVjaGFu
-aXNtIGJ5IHNldHRpbmcKZmxhZyBWTUNMT0NLX0ZMQUdfTk9USUZJQ0FUSU9OX1BSRVNFTlQgaW4g
-dm1jbG9ja19hYmkgZmxhZ3MgZmllbGQuIElmCnRoZSBmbGFnIGlzIG5vdCBwcmVzZW50IHRoZSBk
-cml2ZXIgd29uJ3Qgc2V0dXAgdGhlIEFDUEkgbm90aWZpY2F0aW9uCmhhbmRsZXIgYW5kIHBvbGwo
-KSB3aWxsIGFsd2F5cyBpbW1lZGlhdGVseSByZXR1cm4gUE9MTEhVUC4KClNpZ25lZC1vZmYtYnk6
-IEJhYmlzIENoYWxpb3MgPGJjaGFsaW9zQGFtYXpvbi5lcz4KUmV2aWV3ZWQtYnk6IERhdmlkIFdv
-b2Rob3VzZSA8ZHdtd0BhbWF6b24uY28udWs+Ci0tLQogZHJpdmVycy9wdHAvcHRwX3ZtY2xvY2su
-YyAgICAgICAgfCAxMjYgKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLQogaW5jbHVkZS91
-YXBpL2xpbnV4L3ZtY2xvY2stYWJpLmggfCAgIDUgKysKIDIgZmlsZXMgY2hhbmdlZCwgMTI0IGlu
-c2VydGlvbnMoKyksIDcgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvZHJpdmVycy9wdHAvcHRw
-X3ZtY2xvY2suYyBiL2RyaXZlcnMvcHRwL3B0cF92bWNsb2NrLmMKaW5kZXggYjNhODNiMDNkOWMx
-Li5hMjAzMzg2YzRiMDkgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvcHRwL3B0cF92bWNsb2NrLmMKKysr
-IGIvZHJpdmVycy9wdHAvcHRwX3ZtY2xvY2suYwpAQCAtNSw2ICs1LDkgQEAKICAqIENvcHlyaWdo
-dCDCqSAyMDI0IEFtYXpvbi5jb20sIEluYy4gb3IgaXRzIGFmZmlsaWF0ZXMuCiAgKi8KIAorI2lu
-Y2x1ZGUgImxpbnV4L3BvbGwuaCIKKyNpbmNsdWRlICJsaW51eC90eXBlcy5oIgorI2luY2x1ZGUg
-ImxpbnV4L3dhaXQuaCIKICNpbmNsdWRlIDxsaW51eC9hY3BpLmg+CiAjaW5jbHVkZSA8bGludXgv
-ZGV2aWNlLmg+CiAjaW5jbHVkZSA8bGludXgvZXJyLmg+CkBAIC0zOSw2ICs0Miw3IEBAIHN0cnVj
-dCB2bWNsb2NrX3N0YXRlIHsKIAlzdHJ1Y3QgcmVzb3VyY2UgcmVzOwogCXN0cnVjdCB2bWNsb2Nr
-X2FiaSAqY2xrOwogCXN0cnVjdCBtaXNjZGV2aWNlIG1pc2NkZXY7CisJd2FpdF9xdWV1ZV9oZWFk
-X3QgZGlzcnVwdF93YWl0OwogCXN0cnVjdCBwdHBfY2xvY2tfaW5mbyBwdHBfY2xvY2tfaW5mbzsK
-IAlzdHJ1Y3QgcHRwX2Nsb2NrICpwdHBfY2xvY2s7CiAJZW51bSBjbG9ja3NvdXJjZV9pZHMgY3Nf
-aWQsIHN5c19jc19pZDsKQEAgLTM1NywxMCArMzYxLDE1IEBAIHN0YXRpYyBzdHJ1Y3QgcHRwX2Ns
-b2NrICp2bWNsb2NrX3B0cF9yZWdpc3RlcihzdHJ1Y3QgZGV2aWNlICpkZXYsCiAJcmV0dXJuIHB0
-cF9jbG9ja19yZWdpc3Rlcigmc3QtPnB0cF9jbG9ja19pbmZvLCBkZXYpOwogfQogCitzdHJ1Y3Qg
-dm1jbG9ja19maWxlX3N0YXRlIHsKKwlzdHJ1Y3Qgdm1jbG9ja19zdGF0ZSAqc3Q7CisJYXRvbWlj
-X3Qgc2VxOworfTsKKwogc3RhdGljIGludCB2bWNsb2NrX21pc2NkZXZfbW1hcChzdHJ1Y3QgZmls
-ZSAqZnAsIHN0cnVjdCB2bV9hcmVhX3N0cnVjdCAqdm1hKQogewotCXN0cnVjdCB2bWNsb2NrX3N0
-YXRlICpzdCA9IGNvbnRhaW5lcl9vZihmcC0+cHJpdmF0ZV9kYXRhLAotCQkJCQkJc3RydWN0IHZt
-Y2xvY2tfc3RhdGUsIG1pc2NkZXYpOworCXN0cnVjdCB2bWNsb2NrX2ZpbGVfc3RhdGUgKmZzdCA9
-IGZwLT5wcml2YXRlX2RhdGE7CisJc3RydWN0IHZtY2xvY2tfc3RhdGUgKnN0ID0gZnN0LT5zdDsK
-IAogCWlmICgodm1hLT52bV9mbGFncyAmIChWTV9SRUFEfFZNX1dSSVRFKSkgIT0gVk1fUkVBRCkK
-IAkJcmV0dXJuIC1FUk9GUzsKQEAgLTM3OSwxMSArMzg4LDEyIEBAIHN0YXRpYyBpbnQgdm1jbG9j
-a19taXNjZGV2X21tYXAoc3RydWN0IGZpbGUgKmZwLCBzdHJ1Y3Qgdm1fYXJlYV9zdHJ1Y3QgKnZt
-YSkKIHN0YXRpYyBzc2l6ZV90IHZtY2xvY2tfbWlzY2Rldl9yZWFkKHN0cnVjdCBmaWxlICpmcCwg
-Y2hhciBfX3VzZXIgKmJ1ZiwKIAkJCQkgICAgc2l6ZV90IGNvdW50LCBsb2ZmX3QgKnBwb3MpCiB7
-Ci0Jc3RydWN0IHZtY2xvY2tfc3RhdGUgKnN0ID0gY29udGFpbmVyX29mKGZwLT5wcml2YXRlX2Rh
-dGEsCi0JCQkJCQlzdHJ1Y3Qgdm1jbG9ja19zdGF0ZSwgbWlzY2Rldik7CisJc3RydWN0IHZtY2xv
-Y2tfZmlsZV9zdGF0ZSAqZnN0ID0gZnAtPnByaXZhdGVfZGF0YTsKKwlzdHJ1Y3Qgdm1jbG9ja19z
-dGF0ZSAqc3QgPSBmc3QtPnN0OworCiAJa3RpbWVfdCBkZWFkbGluZSA9IGt0aW1lX2FkZChrdGlt
-ZV9nZXQoKSwgVk1DTE9DS19NQVhfV0FJVCk7CiAJc2l6ZV90IG1heF9jb3VudDsKLQl1aW50MzJf
-dCBzZXE7CisJdWludDMyX3Qgc2VxLCBvbGRfc2VxOwogCiAJaWYgKCpwcG9zID49IFBBR0VfU0la
-RSkKIAkJcmV0dXJuIDA7CkBAIC0zOTIsNiArNDAyLDcgQEAgc3RhdGljIHNzaXplX3Qgdm1jbG9j
-a19taXNjZGV2X3JlYWQoc3RydWN0IGZpbGUgKmZwLCBjaGFyIF9fdXNlciAqYnVmLAogCWlmIChj
-b3VudCA+IG1heF9jb3VudCkKIAkJY291bnQgPSBtYXhfY291bnQ7CiAKKwlvbGRfc2VxID0gYXRv
-bWljX3JlYWQoJmZzdC0+c2VxKTsKIAl3aGlsZSAoMSkgewogCQlzZXEgPSBsZTMyX3RvX2NwdShz
-dC0+Y2xrLT5zZXFfY291bnQpICYgfjFVOwogCQkvKiBQYWlycyB3aXRoIGh5cGVydmlzb3Igd21i
-ICovCkBAIC00MDIsOCArNDEzLDE2IEBAIHN0YXRpYyBzc2l6ZV90IHZtY2xvY2tfbWlzY2Rldl9y
-ZWFkKHN0cnVjdCBmaWxlICpmcCwgY2hhciBfX3VzZXIgKmJ1ZiwKIAogCQkvKiBQYWlycyB3aXRo
-IGh5cGVydmlzb3Igd21iICovCiAJCXZpcnRfcm1iKCk7Ci0JCWlmIChzZXEgPT0gbGUzMl90b19j
-cHUoc3QtPmNsay0+c2VxX2NvdW50KSkKLQkJCWJyZWFrOworCQlpZiAoc2VxID09IGxlMzJfdG9f
-Y3B1KHN0LT5jbGstPnNlcV9jb3VudCkpIHsKKwkJCS8qCisJCQkgKiBFaXRoZXIgd2UgdXBkYXRl
-ZCBmc3QtPnNlcSB0byBzZXEgKHRoZSBsYXRlc3QgdmVyc2lvbiB3ZSBvYnNlcnZlZCkKKwkJCSAq
-IG9yIHNvbWVvbmUgZWxzZSBkaWQgKG9sZF9zZXEgPT0gc2VxKSwgc28gd2UgY2FuIGJyZWFrLgor
-CQkJICovCisJCQlpZiAoYXRvbWljX3RyeV9jbXB4Y2hnKCZmc3QtPnNlcSwgJm9sZF9zZXEsIHNl
-cSkgfHwKKwkJCSAgICBvbGRfc2VxID09IHNlcSkgeworCQkJCWJyZWFrOworCQkJfQorCQl9CiAK
-IAkJaWYgKGt0aW1lX2FmdGVyKGt0aW1lX2dldCgpLCBkZWFkbGluZSkpCiAJCQlyZXR1cm4gLUVU
-SU1FRE9VVDsKQEAgLTQxMywxMCArNDMyLDU4IEBAIHN0YXRpYyBzc2l6ZV90IHZtY2xvY2tfbWlz
-Y2Rldl9yZWFkKHN0cnVjdCBmaWxlICpmcCwgY2hhciBfX3VzZXIgKmJ1ZiwKIAlyZXR1cm4gY291
-bnQ7CiB9CiAKK3N0YXRpYyBfX3BvbGxfdCB2bWNsb2NrX21pc2NkZXZfcG9sbChzdHJ1Y3QgZmls
-ZSAqZnAsIHBvbGxfdGFibGUgKndhaXQpCit7CisJc3RydWN0IHZtY2xvY2tfZmlsZV9zdGF0ZSAq
-ZnN0ID0gZnAtPnByaXZhdGVfZGF0YTsKKwlzdHJ1Y3Qgdm1jbG9ja19zdGF0ZSAqc3QgPSBmc3Qt
-PnN0OworCXVpbnQzMl90IHNlcTsKKworCS8qCisJICogSHlwZXJ2aXNvciB3aWxsIG5vdCBzZW5k
-IHVzIGFueSBub3RpZmljYXRpb25zLCBzbyBmYWlsIGltbWVkaWF0ZWx5CisJICogdG8gYXZvaWQg
-aGF2aW5nIGNhbGxlciBzbGVlcGluZyBmb3IgZXZlci4KKwkgKi8KKwlpZiAoIShsZTY0X3RvX2Nw
-dShzdC0+Y2xrLT5mbGFncykgJiBWTUNMT0NLX0ZMQUdfTk9USUZJQ0FUSU9OX1BSRVNFTlQpKQor
-CQlyZXR1cm4gUE9MTEhVUDsKKworCXBvbGxfd2FpdChmcCwgJnN0LT5kaXNydXB0X3dhaXQsIHdh
-aXQpOworCisJc2VxID0gbGUzMl90b19jcHUoc3QtPmNsay0+c2VxX2NvdW50KTsKKwlpZiAoYXRv
-bWljX3JlYWQoJmZzdC0+c2VxKSAhPSBzZXEpCisJCXJldHVybiBQT0xMSU4gfCBQT0xMUkROT1JN
-OworCisJcmV0dXJuIDA7Cit9CisKK3N0YXRpYyBpbnQgdm1jbG9ja19taXNjZGV2X29wZW4oc3Ry
-dWN0IGlub2RlICppbm9kZSwgc3RydWN0IGZpbGUgKmZwKQoreworCXN0cnVjdCB2bWNsb2NrX3N0
-YXRlICpzdCA9IGNvbnRhaW5lcl9vZihmcC0+cHJpdmF0ZV9kYXRhLAorCQkJCQkJc3RydWN0IHZt
-Y2xvY2tfc3RhdGUsIG1pc2NkZXYpOworCXN0cnVjdCB2bWNsb2NrX2ZpbGVfc3RhdGUgKmZzdCA9
-IGt6YWxsb2Moc2l6ZW9mKCpmc3QpLCBHRlBfS0VSTkVMKTsKKworCWlmICghZnN0KQorCQlyZXR1
-cm4gLUVOT01FTTsKKworCWZzdC0+c3QgPSBzdDsKKwlhdG9taWNfc2V0KCZmc3QtPnNlcSwgMCk7
-CisKKwlmcC0+cHJpdmF0ZV9kYXRhID0gZnN0OworCisJcmV0dXJuIDA7Cit9CisKK3N0YXRpYyBp
-bnQgdm1jbG9ja19taXNjZGV2X3JlbGVhc2Uoc3RydWN0IGlub2RlICppbm9kZSwgc3RydWN0IGZp
-bGUgKmZwKQoreworCWtmcmVlKGZwLT5wcml2YXRlX2RhdGEpOworCXJldHVybiAwOworfQorCiBz
-dGF0aWMgY29uc3Qgc3RydWN0IGZpbGVfb3BlcmF0aW9ucyB2bWNsb2NrX21pc2NkZXZfZm9wcyA9
-IHsKIAkub3duZXIgPSBUSElTX01PRFVMRSwKKwkub3BlbiA9IHZtY2xvY2tfbWlzY2Rldl9vcGVu
-LAorCS5yZWxlYXNlID0gdm1jbG9ja19taXNjZGV2X3JlbGVhc2UsCiAJLm1tYXAgPSB2bWNsb2Nr
-X21pc2NkZXZfbW1hcCwKIAkucmVhZCA9IHZtY2xvY2tfbWlzY2Rldl9yZWFkLAorCS5wb2xsID0g
-dm1jbG9ja19taXNjZGV2X3BvbGwsCiB9OwogCiAvKiBtb2R1bGUgb3BlcmF0aW9ucyAqLwpAQCAt
-NDU5LDYgKzUyNiw0NCBAQCBzdGF0aWMgYWNwaV9zdGF0dXMgdm1jbG9ja19hY3BpX3Jlc291cmNl
-cyhzdHJ1Y3QgYWNwaV9yZXNvdXJjZSAqYXJlcywgdm9pZCAqZGF0YQogCXJldHVybiBBRV9FUlJP
-UjsKIH0KIAorc3RhdGljIHZvaWQKK3ZtY2xvY2tfYWNwaV9ub3RpZmljYXRpb25faGFuZGxlcihh
-Y3BpX2hhbmRsZSBfX2Fsd2F5c191bnVzZWQgaGFuZGxlLAorCQkJCSAgdTMyIF9fYWx3YXlzX3Vu
-dXNlZCBldmVudCwgdm9pZCAqZGV2KQoreworCXN0cnVjdCBkZXZpY2UgKmRldmljZSA9IGRldjsK
-KwlzdHJ1Y3Qgdm1jbG9ja19zdGF0ZSAqc3QgPSBkZXZpY2UtPmRyaXZlcl9kYXRhOworCisJd2Fr
-ZV91cF9pbnRlcnJ1cHRpYmxlKCZzdC0+ZGlzcnVwdF93YWl0KTsKK30KKworc3RhdGljIGludCB2
-bWNsb2NrX3NldHVwX25vdGlmaWNhdGlvbihzdHJ1Y3QgZGV2aWNlICpkZXYsIHN0cnVjdCB2bWNs
-b2NrX3N0YXRlICpzdCkKK3sKKwlzdHJ1Y3QgYWNwaV9kZXZpY2UgKmFkZXYgPSBBQ1BJX0NPTVBB
-TklPTihkZXYpOworCWFjcGlfc3RhdHVzIHN0YXR1czsKKworCS8qCisJICogVGhpcyBzaG91bGQg
-bmV2ZXIgaGFwcGVuIGFzIHRoaXMgZnVuY3Rpb24gaXMgb25seSBjYWxsZWQgd2hlbgorCSAqIGhh
-c19hY3BpX2NvbXBhbmlvbihkZXYpIGlzIHRydWUsIGJ1dCB0aGUgbG9naWMgaXMgc3VmZmljaWVu
-dGx5CisJICogY29tcGxleCB0aGF0IENvdmVyaXR5IGNhbid0IHNlZSB0aGUgdGF1dG9sb2d5Lgor
-CSAqLworCWlmICghYWRldikKKwkJcmV0dXJuIC1FTk9ERVY7CisKKwkvKiBUaGUgZGV2aWNlIGRv
-ZXMgbm90IHN1cHBvcnQgbm90aWZpY2F0aW9ucy4gTm90aGluZyBlbHNlIHRvIGRvICovCisJaWYg
-KCEobGU2NF90b19jcHUoc3QtPmNsay0+ZmxhZ3MpICYgVk1DTE9DS19GTEFHX05PVElGSUNBVElP
-Tl9QUkVTRU5UKSkKKwkJcmV0dXJuIDA7CisKKwlzdGF0dXMgPSBhY3BpX2luc3RhbGxfbm90aWZ5
-X2hhbmRsZXIoYWRldi0+aGFuZGxlLCBBQ1BJX0RFVklDRV9OT1RJRlksCisJCQkJCSAgICAgdm1j
-bG9ja19hY3BpX25vdGlmaWNhdGlvbl9oYW5kbGVyLAorCQkJCQkgICAgIGRldik7CisJaWYgKEFD
-UElfRkFJTFVSRShzdGF0dXMpKSB7CisJCWRldl9lcnIoZGV2LCAiZmFpbGVkIHRvIGluc3RhbGwg
-bm90aWZpY2F0aW9uIGhhbmRsZXIiKTsKKwkJcmV0dXJuIC1FTk9ERVY7CisJfQorCisJcmV0dXJu
-IDA7Cit9CisKIHN0YXRpYyBpbnQgdm1jbG9ja19wcm9iZV9hY3BpKHN0cnVjdCBkZXZpY2UgKmRl
-diwgc3RydWN0IHZtY2xvY2tfc3RhdGUgKnN0KQogewogCXN0cnVjdCBhY3BpX2RldmljZSAqYWRl
-diA9IEFDUElfQ09NUEFOSU9OKGRldik7CkBAIC01NDksNiArNjU0LDExIEBAIHN0YXRpYyBpbnQg
-dm1jbG9ja19wcm9iZShzdHJ1Y3QgcGxhdGZvcm1fZGV2aWNlICpwZGV2KQogCWlmIChyZXQpCiAJ
-CXJldHVybiByZXQ7CiAKKwlpbml0X3dhaXRxdWV1ZV9oZWFkKCZzdC0+ZGlzcnVwdF93YWl0KTsK
-KwlyZXQgPSB2bWNsb2NrX3NldHVwX25vdGlmaWNhdGlvbihkZXYsIHN0KTsKKwlpZiAocmV0KQor
-CQlyZXR1cm4gcmV0OworCiAJLyoKIAkgKiBJZiB0aGUgc3RydWN0dXJlIGlzIGJpZyBlbm91Z2gs
-IGl0IGNhbiBiZSBtYXBwZWQgdG8gdXNlcnNwYWNlLgogCSAqIFRoZW9yZXRpY2FsbHkgYSBndWVz
-dCBPUyBldmVuIHVzaW5nIGxhcmdlciBwYWdlcyBjb3VsZCBzdGlsbApAQCAtNTgxLDYgKzY5MSw4
-IEBAIHN0YXRpYyBpbnQgdm1jbG9ja19wcm9iZShzdHJ1Y3QgcGxhdGZvcm1fZGV2aWNlICpwZGV2
-KQogCQlyZXR1cm4gLUVOT0RFVjsKIAl9CiAKKwlkZXYtPmRyaXZlcl9kYXRhID0gc3Q7CisKIAlk
-ZXZfaW5mbyhkZXYsICIlczogcmVnaXN0ZXJlZCAlcyVzJXNcbiIsIHN0LT5uYW1lLAogCQkgc3Qt
-Pm1pc2NkZXYubWlub3IgPyAibWlzY2RldiIgOiAiIiwKIAkJIChzdC0+bWlzY2Rldi5taW5vciAm
-JiBzdC0+cHRwX2Nsb2NrKSA/ICIsICIgOiAiIiwKZGlmZiAtLWdpdCBhL2luY2x1ZGUvdWFwaS9s
-aW51eC92bWNsb2NrLWFiaS5oIGIvaW5jbHVkZS91YXBpL2xpbnV4L3ZtY2xvY2stYWJpLmgKaW5k
-ZXggOTM3ZmUwMGU0ZjMzLi5kMzIwNjIzYjAxMTggMTAwNjQ0Ci0tLSBhL2luY2x1ZGUvdWFwaS9s
-aW51eC92bWNsb2NrLWFiaS5oCisrKyBiL2luY2x1ZGUvdWFwaS9saW51eC92bWNsb2NrLWFiaS5o
-CkBAIC0xMjEsNiArMTIxLDExIEBAIHN0cnVjdCB2bWNsb2NrX2FiaSB7CiAJICogbG9hZGVkIGZy
-b20gc29tZSBzYXZlIHN0YXRlIChyZXN0b3JlZCBmcm9tIGEgc25hcHNob3QpLgogCSAqLwogI2Rl
-ZmluZSBWTUNMT0NLX0ZMQUdfVk1fR0VOX0NPVU5URVJfUFJFU0VOVCAgICAgKDEgPDwgOCkKKwkv
-KgorCSAqIElmIHRoZSBOT1RJRklDQVRJT05fUFJFU0VOVCBmbGFnIGlzIHNldCwgdGhlIGh5cGVy
-dmlzb3Igd2lsbCBzZW5kCisJICogYSBub3RpZmljYXRpb24gZXZlcnkgdGltZSBpdCB1cGRhdGVz
-IHNlcV9jb3VudCB0byBhIG5ldyBldmVuIG51bWJlci4KKwkgKi8KKyNkZWZpbmUgVk1DTE9DS19G
-TEFHX05PVElGSUNBVElPTl9QUkVTRU5UICAgICAgICgxIDw8IDkpCiAKIAlfX3U4IHBhZFsyXTsK
-IAlfX3U4IGNsb2NrX3N0YXR1czsKLS0gCjIuMzQuMQoK
+From: David Woodhouse <dwmw@amazon.co.uk>=0A=
+=0A=
+The vmclock device provides a PTP clock source and precise timekeeping=0A=
+across live migration and snapshot/restore operations.=0A=
+=0A=
+The binding has a required memory region containing the vmclock_abi=0A=
+structure and an optional interrupt for clock disruption notifications.=0A=
+=0A=
+The full spec is at https://uapi-group.org/specifications/specs/vmclock/=0A=
+=0A=
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>=0A=
+Signed-off-by: Babis Chalios <bchalios@amazon.es>=0A=
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>=0A=
+---=0A=
+ .../bindings/ptp/amazon,vmclock.yaml          | 46 +++++++++++++++++++=0A=
+ MAINTAINERS                                   |  1 +=0A=
+ 2 files changed, 47 insertions(+)=0A=
+ create mode 100644 Documentation/devicetree/bindings/ptp/amazon,vmclock.ya=
+ml=0A=
+=0A=
+diff --git a/Documentation/devicetree/bindings/ptp/amazon,vmclock.yaml b/Do=
+cumentation/devicetree/bindings/ptp/amazon,vmclock.yaml=0A=
+new file mode 100644=0A=
+index 000000000000..357790df876f=0A=
+--- /dev/null=0A=
++++ b/Documentation/devicetree/bindings/ptp/amazon,vmclock.yaml=0A=
+@@ -0,0 +1,46 @@=0A=
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)=0A=
++%YAML 1.2=0A=
++---=0A=
++$id: http://devicetree.org/schemas/ptp/amazon,vmclock.yaml#=0A=
++$schema: http://devicetree.org/meta-schemas/core.yaml#=0A=
++=0A=
++title: Virtual Machine Clock=0A=
++=0A=
++maintainers:=0A=
++  - David Woodhouse <dwmw2@infradead.org>=0A=
++=0A=
++description:=0A=
++  The vmclock device provides a precise clock source and allows for=0A=
++  accurate timekeeping across live migration and snapshot/restore=0A=
++  operations. The full specification of the shared data structure is=0A=
++  available at https://uapi-group.org/specifications/specs/vmclock/=0A=
++=0A=
++properties:=0A=
++  compatible:=0A=
++    const: amazon,vmclock=0A=
++=0A=
++  reg:=0A=
++    description:=0A=
++      Specifies the shared memory region containing the vmclock_abi struct=
+ure.=0A=
++    maxItems: 1=0A=
++=0A=
++  interrupts:=0A=
++    description:=0A=
++      Interrupt used to notify when the contents of the vmclock_abi struct=
+ure=0A=
++      have been updated.=0A=
++    maxItems: 1=0A=
++=0A=
++required:=0A=
++  - compatible=0A=
++  - reg=0A=
++=0A=
++additionalProperties: false=0A=
++=0A=
++examples:=0A=
++  - |=0A=
++    #include <dt-bindings/interrupt-controller/arm-gic.h>=0A=
++    ptp@80000000 {=0A=
++      compatible =3D "amazon,vmclock";=0A=
++      reg =3D <0x80000000 0x1000>;=0A=
++      interrupts =3D <GIC_SPI 36 IRQ_TYPE_EDGE_RISING>;=0A=
++    };=0A=
+diff --git a/MAINTAINERS b/MAINTAINERS=0A=
+index e8f06145fb54..171813ea76a3 100644=0A=
+--- a/MAINTAINERS=0A=
++++ b/MAINTAINERS=0A=
+@@ -20728,6 +20728,7 @@ PTP VMCLOCK SUPPORT=0A=
+ M:	David Woodhouse <dwmw2@infradead.org>=0A=
+ L:	netdev@vger.kernel.org=0A=
+ S:	Maintained=0A=
++F:	Documentation/devicetree/bindings/ptp/amazon,vmclock.yaml=0A=
+ F:	drivers/ptp/ptp_vmclock.c=0A=
+ F:	include/uapi/linux/vmclock-abi.h=0A=
+ =0A=
+-- =0A=
+2.34.1=0A=
+=0A=
 
