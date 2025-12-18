@@ -1,155 +1,102 @@
-Return-Path: <netdev+bounces-245277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245278-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93C35CCA454
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 05:51:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E810CCA4B2
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 06:15:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 5E372301099A
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 04:51:29 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7F4B4301FC39
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 05:15:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3235224466D;
-	Thu, 18 Dec 2025 04:51:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1BFD2D7387;
+	Thu, 18 Dec 2025 05:15:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="guEYJvje"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FOwb3T5I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-06.mail-europe.com (mail-06.mail-europe.com [85.9.210.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f193.google.com (mail-qt1-f193.google.com [209.85.160.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C36315CD7E
-	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 04:51:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.9.210.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1959F220F49
+	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 05:15:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766033488; cv=none; b=Ax40J8yaNkNH0gARRGFjRev/sQsApIk3NbEaTC00HaqYJseqAKdy/S2uzRGtxsqoVJXl1gKey6eld7YdUuDQkiBjix4BuMRzhjwt9dwvZDXKrcVxtD3DxbMeTqhnE7DWMwJgsmUMqvFse5kAVil/mX4PSY8lR/JZL+zgOhghFsQ=
+	t=1766034929; cv=none; b=G0GC653DqqgVX8PGgvZlomhHpszMlwbhKGCUjRSGO3/LuVtwj4LcWN098jU7z4SywmIbiMofJaQT/mCcARqoVN87gTli1mQ5UgP/C+bke/ID4BXwMwxp4oESYsqtabT9OySH8bmCXB17WXtLHpiPrNLG4g2dMHM/oL5nHFU8J7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766033488; c=relaxed/simple;
-	bh=QvxlFRwO1KIHzUk2uGdbBVUqHnxfYVK2vrVz2h27E30=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=efZZXBq02ewvAgMVOQzm4T00n/QKkJEQtwxWmHs/QvQZjS398O+F1yekXLtw8ljII8oUY2x5gcOPR+eAOhr6ez8XlhB5EDjgoirpxJwTEu+6lwmpw9/8YPQ0FyWVAIvylGShxp+OgbGU9TnMIn7se0YhZHJXL/56sF8eFJlvSSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=guEYJvje; arc=none smtp.client-ip=85.9.210.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1766033475; x=1766292675;
-	bh=QvxlFRwO1KIHzUk2uGdbBVUqHnxfYVK2vrVz2h27E30=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=guEYJvje+jnmVQcPrx25fS5x3Y3rHDHi1krZdp3Z6T5pprjo4S4D3fdLpUcMHs5Fs
-	 YsnDCR3Kum16SSg/uAemSs06pPPg4k0QjLCT2H4Kn2KIjTt+4MqnaLBtmY45ctsRJD
-	 ta8Sbz9GNC58Yl2W6gYBEuk+jliJdqrAY7OpXBPElHBDyBiLXYxIw+KexYtqVsdh7z
-	 6zxCAxEkUPMjDR8v1C4USgn80g+ImsUh8bzq+Cocu9R4ofuCOY2C5yaorZvIkXin1x
-	 UfWCAmTV1UoFyJwJRJgqZZ88C90Y+pd5MKEtMFcXHtqmY5ZzQv+5piir/kHwI2xFNh
-	 XC0sbExKOvuZg==
-Date: Thu, 18 Dec 2025 04:51:11 +0000
-To: Linux Networking <netdev@vger.kernel.org>
-From: Turritopsis Dohrnii Teo En Ming <teo.en.ming@protonmail.com>
-Cc: "ceo@teo-en-ming-corp.com" <ceo@teo-en-ming-corp.com>
-Subject: Advanced Persistent Threat (APT) hackers had hacked into my Virtualmin Linux Virtual Private Server (VPS) on 15 Dec 2025 Monday around noon time
-Message-ID: <p6q1ZcmyQr1jf50qb0CTkQWCLEYt3BTyG_sNxtXAqj-Y40eMBWBjRueCvSmnXt3w6FSBYOBC4f5ck2-KinfmHiLsE_lklsrGZWlAJhPrHhI=@protonmail.com>
-Feedback-ID: 39510961:user:proton
-X-Pm-Message-ID: b20c0e316072974d925ef4a5fe1b497faf09a745
+	s=arc-20240116; t=1766034929; c=relaxed/simple;
+	bh=u+3q2hz/nd8BPnGO6+jN2WuurkJ9fqrUyAzTEQuxhR4=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=mMWfDpECWlHaFR2auFnp8aMUTTIfmOUKDa5p/DnCn+l1z0Ex1UTiu71j40mLsTpu5S/6eDxaAzG+cFqbBgz6h9pSXQBntWje2j5MynISgT0T0tKeUb0yzVgTqdOfo1jHrLWItjrMhQxOuUYvu45teTIjbvGbGsi9pCd6YXuv+2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FOwb3T5I; arc=none smtp.client-ip=209.85.160.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f193.google.com with SMTP id d75a77b69052e-4ee1fca7a16so2077771cf.3
+        for <netdev@vger.kernel.org>; Wed, 17 Dec 2025 21:15:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1766034927; x=1766639727; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=u+3q2hz/nd8BPnGO6+jN2WuurkJ9fqrUyAzTEQuxhR4=;
+        b=FOwb3T5IzJDWis2aV/A8I4cy31avy31iQkpwpsw1XyVTyQ3zziaDnhNJXjNcGYnoJ/
+         6CHZLoGPfamjdx/LkDYH5sK5ONaCvYS8GAJQgkK248Rd8dMLWL4kC82PT3bg+MZ3SX8S
+         iroxwXslsO4lDTNDfZNx4TuVCe8qh1zwyGdPOmKgGLZFoLasl1oR0ZH1j3V+KAlKZiJF
+         mUB1eVq0ujmGazzPIoVyn3w9giSf7GBKQ4v3cSmodM2wOgL9Ln01C3e4D2SuVaXQG1xF
+         IfV8Cg8Sux06Jhehe1bRIKV5wXVXUBZEH7HlMxOSAUWCsuaNoVlkKsZO0EtklT917/Yk
+         wnjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766034927; x=1766639727;
+        h=to:subject:message-id:date:from:mime-version:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=u+3q2hz/nd8BPnGO6+jN2WuurkJ9fqrUyAzTEQuxhR4=;
+        b=Lb5rsEULiZLRIhuHh15nTvZFV7+nkWfhfFMqzF5eqI7WkRLsxql1f4dw+yPDx6rcqC
+         9pJ9hDT0echxesTLCi8HK5JLJ3hrUbsyr9Xi+KKo3lZxAGGiXz2pIJmKp6XAJpzuRo0T
+         JWoTDF4PqrtCObzBnhmn98/nPKLIQXQV+M+clqad/vrlmXppWX9g5rsfmvzYNCjGSSHb
+         5Qnmx65fCqW5qiv3hiRXBEQsARCzNES2HWXN4lAh7vgBpycrp54bjrexO2KbyamxpD8L
+         xH5F61AsbFDs/w3zZhTbBXgLnocghrYHem3AO4zM6oNstszqorf2qRZ6cSMGiu5003Ag
+         pzjQ==
+X-Gm-Message-State: AOJu0YwePlY8dGauezHsCAHDf3W7eLYOk3A6oHw8xFt+2j0pkCYL1Pok
+	982FnTj5T9ja9gzoZH7cwrCldJH/Lv+P4g63XKBUup7D27dFHOHWbI22DF2rloUcID788qUg4VK
+	Ty3vQZEuC+2Dw+umjxt2RBTUg+nTHz9mO/780OrvEig==
+X-Gm-Gg: AY/fxX4CCC/T7f+Wg09tWpuyE1dQjv+cPDzNdLLTTyaER8jxrKDBaqOvSzKSQ8Iydb6
+	oPJ4EnRfqAa0BaQ5G5VlN6zzVxL7WpXWWKwkx26Ts8jMu9l2h3z1NALUvrRA5fHss0LvOBhQpNx
+	zs1F8f7aQE+ir8ALoTPKi/U7+vSif7LZBlUaQ9UF008F61kN1xs6+Gb7l9XbuwpLrtnapC+bN6l
+	cE9lKbGLzLH+IrMVIeEGVJ2IzHER5mJgcB9PCS1IMtpm2LEkj9IuqcOL8KaUjQTL1pzt0k=
+X-Google-Smtp-Source: AGHT+IHOvRoDaU4gNJCqgnpEtvojpVL6sTp0GDWTqz9xmwQw2WeMY6oiUFynVaJNThnIGV4/ZlnMF/2imqF3b2DijwQ=
+X-Received: by 2002:a05:622a:4c8e:b0:4f1:caed:da6b with SMTP id
+ d75a77b69052e-4f1d04fc64fmr272694071cf.35.1766034926837; Wed, 17 Dec 2025
+ 21:15:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Date: Wed, 17 Dec 2025 21:15:16 -0800
+X-Gm-Features: AQt7F2r2WKbSgqnKBbZrCqF3jc5YhdLKGXGFSQoBW0ZkOJ2eiZKmQd_-v-3M_Ww
+Message-ID: <CADkSEUgY=eQz+0VWzAZwH6r6THHEgJaO1-SYemANZGaKEaWkOA@mail.gmail.com>
+Subject: Merging uli526x and dmfe drivers
+To: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Subject: Advanced Persistent Threat (APT) hackers had hacked into my Virtua=
-lmin Linux Virtual Private Server (VPS) on 15 Dec 2025 Monday around noon t=
-ime
+I just noticed while investigating the state of lesser-used network
+drivers that uli526x appears to be a fork of dmfe. They are so similar
+that they could easily be merged (with the differences being selected
+by the device ID, as dmfe already does), reducing future maintainer
+workload.
 
-Good day from Singapore,
+This can easily be seen by:
+cp uli526x.c uli526x_undo_rename.c
+sed -i s/uli526x/dmfe/g uli526x_undo_rename.c
+sed -i s/ULI526X/DMFE/g uli526x_undo_rename.c
+sed -i s/uw32/dw32/g uli526x_undo_rename.c
+sed -i s/ur32/dr32/g uli526x_undo_rename.c
+sed -i 's/phy_read_/dmfe_&/g' uli526x_undo_rename.c
+sed -i 's/phy_write_/dmfe_&/g' uli526x_undo_rename.c
+diff -w dmfe.c uli526x_undo_rename.c
 
-Today 17 Dec 2025 Wednesday around 12.30 PM, I was trying to use GMail (Goo=
-gle Mail) to send email to my email accounts hosted in Virtualmin Linux Vir=
-tual Private Server (VPS) (aka web hosting control panel). GMail reported t=
-he error "554 5.7.1 Relay access denied". Which means all of my email accou=
-nts hosted in Virtualmin Linux VPS could no longer receive emails.
+uli526x has get_link_ksettings support and dmfe does not, and they
+have other small differences which might be bug fixes incorporated
+into one but not the other.
 
-Advanced Persistent Threat (APT) hackers must have hacked into my Virtualmi=
-n Linux VPS and changed my server configuration.
-
-Webmin version: 2.520
-Virtualmin version: 7.50.0 GPL
-Operating system: AlmaLinux 9.6
-Usermin version: 2.420
-Authentic theme version: 25.20
-Linux Kernel and CPU: Linux 5.14.0-570.51.1.el9_6.x86_64 on x86_64
-
-When I logged in to Roundcube Webmail, I noticed that I had stopped receivi=
-ng emails with the email accounts hosted in Virtualmin Linux VPS since 15 D=
-ec 2025 Monday around 12 noon Singapore Time.
-
-When I checked /var/log/maillog in Virtualmin Linux VPS, I observed that I =
-had started getting "554 5.7.1 Relay access denied" errors since 15 Dec 202=
-5 Monday around 12.28 PM (for my email accounts hosted in Virtualmin Linux =
-VPS).
-
-Advanced Persistent Threat (APT) hackers must have hacked into my Virtualmi=
-n Linux VPS and changed my server configuration.
-
-When I checked /etc/postfix/main.cf on my Virtualmin Linux VPS, Advanced Pe=
-rsistent Threat (APT) hackers had changed the following line to:
-
-mydestination =3D $myhostname, localhost.$mydomain, localhost, ns1.turritop=
-sis-dohrnii-teo-en-ming.com
-
-I had to change the above line back to:
-
-mydestination =3D $myhostname, localhost.$mydomain, localhost, ns1.turritop=
-sis-dohrnii-teo-en-ming.com, teo-en-ming.com, teo-en-ming-corp.com
-
-And then restart Postfix daemon/service (systemctl restart postfix).
-
-For Virtual Server teo-en-ming-corp.com in Virtualmin Linux VPS:
-
-Advanced Persistent Threat (APT) hackers had changed my email account user'=
-s Login access to Database, FTP and SSH. I had to change it back to Databas=
-e, Email, FTP and SSH.
-
-Advanced Persistent Threat (APT) hackers had also changed "Primary email ad=
-dress enabled" to No. I had to change it back to Yes.
-
-For Virtual Server teo-en-ming.com in Virtualmin Linux VPS:
-
-Advanced Persistent Threat (APT) hackers had changed my email account user'=
-s Login access to FTP and SSH. I had to change it back to Email, FTP and SS=
-H.
-
-Advanced Persistent Threat (APT) hackers had also changed "Primary email ad=
-dress enabled" to No. I had to change it back to Yes.
-
-After making all of the above changes, I am able to start receiving emails =
-with my email accounts hosted in Virtualmin Linux VPS since 1.15 PM today 1=
-7 Dec 2025 Wednesday.
-
-When I checked OpenSSH server logins and Virtualmin logins, only public IPv=
-4 addresses belonging to me were present. There were no traces of Advanced =
-Persistent Threat (APT) hackers gaining unauthorized entry into my Virtualm=
-in Linux VPS at all. Of course, if they are Advanced Persistent Threat (APT=
-) hackers, they must be very smart and intelligent (their intelligence quot=
-ient IQ sure way above me) to remove all traces of their unauthorized intru=
-sions into my Virtualmin Linux VPS.
-
-How can I make a request to Advanced Persistent Threat (APT) hackers so tha=
-t they will stop playing pranks on my Android (Linux) phones, home desktop =
-computer, laptops, Virtualmin and Webmin Linux servers and other various nu=
-merous online accounts not secured with 2FA / MFA?
-
-Please advise.
-
-Thank you very much.
-
-Regards,
-
-Mr. Turritopsis Dohrnii Teo En Ming
-Extremely Democratic People's Republic of Singapore
-17 Dec 2025 Wednesday 3.50 PM Singapore Time
-
-
-
-
-
+Would patches to combine them be welcomed? If I were to do so, would
+anyone be able to test the combined driver? I do not own the hardware.
 
