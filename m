@@ -1,129 +1,167 @@
-Return-Path: <netdev+bounces-245441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCCB5CCD7AD
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 21:12:29 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE0F3CCDBE6
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 22:59:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 97F7C301BEA7
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 20:12:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 7E42F3010CE1
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 21:59:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 164782BEC27;
-	Thu, 18 Dec 2025 20:12:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0C861E7C34;
+	Thu, 18 Dec 2025 21:59:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CDSEvCwo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f79.google.com (mail-oo1-f79.google.com [209.85.161.79])
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 552D929D270
-	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 20:12:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D440113D539
+	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 21:59:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766088748; cv=none; b=AhnhAGLlF3skWOHWvhPJLgvXyF60baqdjp4l1isjGY2lBsiFP1w6094y88b/ayZo8KrE1UU/ql4+UQtNtgztTZiMO/b+GSz7iBLuFhFg8IJms5BTYKFwD34VwwXuswi3nQ5N7hEVXX2pcOMsKVuyZVwFqdUuUc8KXKVeGv2fg0I=
+	t=1766095196; cv=none; b=F6Nory7i0wrfX+ViGLaursHHEUetTME/aY4/FLcypbfqiZBZXiQQcS/WJkfHGpgFbZApEsR0kIXlkpgL/zeH8rsDX2Nv2VwDDYV+kzAvujcR5aEc8KhqJ/vhLWa4/6tz2KlHGst4hbNs5T3SkagBmm5YLKifXiG920ESNv9OTlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766088748; c=relaxed/simple;
-	bh=SCmrBCTDFD5ubTjkA56SqENcQgdXvnofAPhlNZPj5ic=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=NlVjC2ly92wqmNJbj7nqB3/IjiP6BxfnY38CMQwhYJLsmraazb+CuyEdlDroRpSGeWP18J78WzW0x41JAzMgVL4byl1rp5BlkDKvWKQh2mvLod73M9KCc+iODTbIuERyppza/zhwh9RuM6GjygbET0FWeW7ZZW8kuzLqAJ35WYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f79.google.com with SMTP id 006d021491bc7-657486eb435so1323291eaf.1
-        for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 12:12:26 -0800 (PST)
+	s=arc-20240116; t=1766095196; c=relaxed/simple;
+	bh=XKkT2tZz7eWrLkWjuPs0kYDLhUmTVv+sxfAAI2qI3aw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NgEX3AHGZXLYCrf1u+zQ6LIJfh1wGQuowjFp2hL6BmySIYgRrhEA3KI3KibABPgihmO0WBo9JcKs0DX6cxjkvgU/9SZQOgQcr/Ratuan8NA5DkdF2rXnEe3GqCW6BWWodPU52kEXZKCOz3lR6Lh0dNphn7eILU9cLHXuhA8nbO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CDSEvCwo; arc=none smtp.client-ip=209.85.208.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-38107fadda2so8873791fa.1
+        for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 13:59:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1766095193; x=1766699993; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=t/sjp0jU275es5lIyrSH+clAsUhfyndmb5HbMmt8PNE=;
+        b=CDSEvCwo/RmhvQBSD8MBhkABZQrRU5MH1ISYQPvmoA/6IpisOCDm+l9tjrnSs9Bygf
+         JWIfSpTu7APfUU4qyOihTtWOyrnLuETicJLfYaddKRXCg9UW9tdkFg2Ta164NC/e5yHb
+         0bdVVXVzfJU8knNwmAur+CVYHfdJY6A9aL8OIpqmCH0Pk5WhBxFx2h1OzWhEJPOIlnIE
+         iWLFp7M7ff/pnuKGJWom/nPusu9uH+2JB+meiQ1EGy2sDCdVSpO29ITYvRY7U+FFAO+7
+         KFmAjgk52hXzliC7zwO9WNdehg+xlpDJVv7oKBtvIYoC3yFWpBwSZ0Y3RUg8ZKIpj5HE
+         Zp0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766088745; x=1766693545;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Tfr7FL5pZakXGk7tny8jsZuMcDvYO9J0q/4MvmwyG2E=;
-        b=fTnaJZnpRB3S7EUT/Qqfk4Y/moie1vFnyieufegvBlXjAOguiqPAHEPXvstuV0q+a2
-         LaSW/EKNTXZE/KQg+drUaL7xaL6C75A2/K0UluiSTC8pKcX2EsQGo+rXOjbwvBRiLueM
-         I1g6ej6nZYoHEZ0EZ4T5QTxVbErJXUQyNl1ymtzz8yYl1CzVrDUoCxGbgfT8cNR0R9dw
-         P4qBVHaK62wtG7Rgq3c9Fy8P7uIo0G+q2z6FbvFra+wTwRQXxV7LgoPajFNw6CYkwmNv
-         hqQb5uf3DPQtuCuhpFIHlCDQPUkMa4qn+wvH61kxM9B3VnuJkv/UpMWOLHHeT9WIOwlI
-         jvFg==
-X-Forwarded-Encrypted: i=1; AJvYcCV3ieKhzSB8nDer5+KuDnsA47dIAA1opZljK/1sKq7iW/SL2Fgcisc/NigiqV6+umhnsTSQyyQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzaEn/rRi8cr92NbubrSAHymzfR+VJMBmXdBgZRP4WU7uGo3YHt
-	1ozaCWVyk+ZK6WKfOiLagkzEJt8W6emTmhlxJ+oTrSejIDNO70Df3x9XtFLVv9/32/gTSjWXzGA
-	OEzt3qE1Eekex3EBsW5//QRGzIhm3C+RaSWGr269t8buCaevLpgKnpOlcQDg=
-X-Google-Smtp-Source: AGHT+IFDkWTsNoL3eU9I8Uu1JnhOI/l/+UygD1nN4dlXSN/0peBnV6HtRg2gNSDhC8VnFI3q2nIbSMXl8S0hJ/OeGZGikFDiCT6M
+        d=1e100.net; s=20230601; t=1766095193; x=1766699993;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=t/sjp0jU275es5lIyrSH+clAsUhfyndmb5HbMmt8PNE=;
+        b=TIa542+p7700I2doFwGzO4KZbcqsq+e/3wWrI6qlM04QsUjrDRslVEBjkz2z8fAJ0Y
+         mHHSQP9jc6+ebqsHe6KNm8OXIxeJKV616/yd2PgxdjJx8spcdRffQvcMrMZ+nMfAzjea
+         Xi3oB/NKXVIymtc61pNzOi4iAkEnSumZCbHfB0661CWrgcQDlkItAAX2hYUseho34a6A
+         oq/rVi6lDJ0OnjZO65XibQpIVEvVeRYt9bWIGBhIgvnp0r2k9c6QsvKHN3vZqvZHMVul
+         XJbg7UD9J1g8ghQG0m/CQPnvVR7x4635IeLNnYCWg0WHIzWPszKaGhu4LWflnq7i5XAv
+         7+4A==
+X-Forwarded-Encrypted: i=1; AJvYcCXeOlzlUA264aRpc33FUvgFfMhrgpQbk+OiGs7hVa73MET8nP6xzGsuZVtfwfgTbxM2DhEnPRM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywb79iCld/B930ZJ0wlOAVE4EpNZqUg+UJjd0/p+qOVwYKcbUF6
+	PJvtQS008BCDcRkfyjZ4vlY8GhVQ/WcuiHh+d8f13j/K/JxJsDFiOXnh5NJBQw==
+X-Gm-Gg: AY/fxX6XSV96DeBXpnYTfuPcNphbATkResCWgX/vrcud+HoTXrWnoyYkdZ6f5Z04GAQ
+	5e6gMhHpUmPC6eM1gCfrh7DiaDLOYYnC8ETPXFwnY759dEfmkeaWTy2AsikYuCCJe6y5sw9HTLA
+	n2Wzu91cphHP+0jSzALNavhl5zUpMQAyKYaHaK6gUnjwZ0Tg+uNvzbUL4FqjnM6czg72dfBJEeP
+	y9pd7OE4dTIkkM3PLn1LTjJ9HAlXjS7mMU0i4T3gX1FGKZTkYljRrYgoEvr6Wfx7tbTQrJRmtv6
+	bbZdGwcVxHkrjYhEta9d5vnPlGSfs1tKpHIqi3Y8jUJHWH/D+hLffQKYRFW9UA9VDFC2XRLGMk6
+	Qt/sNn8uk16Sk+uAA+aWEr2bsf12wmZKTE/Vm5wt6ihNJtdu+TIbv4855vzAMGzqZ8kjuHHW5Bp
+	cSnfpUTAPixXStO0ZKJ03kB6UgIQZTUrBcOY1WhtXUr0ayw8hQU2QV
+X-Google-Smtp-Source: AGHT+IHQbU+iOqzaiFiPp8MK9D9JLLWz5I3nysW2I9Q92SyiIPFWBxMnrn97EMLGECK7bx8NAmxYpg==
+X-Received: by 2002:a05:600c:4fc6:b0:465:a51d:d4 with SMTP id 5b1f17b1804b1-47d1953b768mr4547825e9.6.1766088919259;
+        Thu, 18 Dec 2025 12:15:19 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47be27c2260sm56813515e9.15.2025.12.18.12.15.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Dec 2025 12:15:18 -0800 (PST)
+Date: Thu, 18 Dec 2025 20:15:17 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: linux-kernel@vger.kernel.org, mptcp@lists.linux.dev,
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Mat
+ Martineau <martineau@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH 44/44] net/mptcp: Change some dubious min_t(int, ...) to
+ min()
+Message-ID: <20251218201517.2f2d91d4@pumpkin>
+In-Reply-To: <cd5d45f7-0d76-4f82-849e-2f2c1544d907@kernel.org>
+References: <20251119224140.8616-1-david.laight.linux@gmail.com>
+	<20251119224140.8616-45-david.laight.linux@gmail.com>
+	<cd5d45f7-0d76-4f82-849e-2f2c1544d907@kernel.org>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:4289:b0:657:4733:dde with SMTP id
- 006d021491bc7-65d0e94d6c4mr252189eaf.8.1766088745350; Thu, 18 Dec 2025
- 12:12:25 -0800 (PST)
-Date: Thu, 18 Dec 2025 12:12:25 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69446029.a70a0220.207337.00f1.GAE@google.com>
-Subject: [syzbot] [can?] INFO: task hung in cangw_pernet_exit_batch (5)
-From: syzbot <syzbot+6461a4c663b104fd1169@syzkaller.appspotmail.com>
-To: linux-can@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	mkl@pengutronix.de, netdev@vger.kernel.org, socketcan@hartkopp.net, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On Thu, 18 Dec 2025 18:33:26 +0100
+Matthieu Baerts <matttbe@kernel.org> wrote:
 
-syzbot found the following issue on:
+> Hi David,
+> 
+> On 19/11/2025 23:41, david.laight.linux@gmail.com wrote:
+> > From: David Laight <david.laight.linux@gmail.com>
+> > 
+> > There are two:
+> > 	min_t(int, xxx, mptcp_wnd_end(msk) - msk->snd_nxt);
+> > Both mptcp_wnd_end(msk) and msk->snd_nxt are u64, their difference
+> > (aka the window size) might be limited to 32 bits - but that isn't
+> > knowable from this code.
+> > So checks being added to min_t() detect the potential discard of
+> > significant bits.
+> > 
+> > Provided the 'avail_size' and return of mptcp_check_allowed_size()
+> > are changed to an unsigned type (size_t matches the type the caller
+> > uses) both min_t() can be changed to min().  
+> 
+> Thank you for the patch!
+> 
+> Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> 
+> I'm not sure what the status on your side: I don't know if you still
+> plan to send a specific series for all the modifications in the net, but
+> just in case, I just applied your patch in the MPTCP tree. I removed the
+> "net/" prefix from the subject. I will send this patch with others for
+> including in the net-next tree later on if you didn't do that in between.
 
-HEAD commit:    8f7aa3d3c732 Merge tag 'net-next-6.19' of git://git.kernel..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=175489b4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=9e5198eaf003f1d1
-dashboard link: https://syzkaller.appspot.com/bug?extid=6461a4c663b104fd1169
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=139e99c2580000
+I'll go through them again at some point.
+I'll check against 'next' (but probably not net-next).
+I actually need to look at the ones that seemed like real bugs when I
+did an allmodconfig build - that got to over 200 patches to get 'clean'.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/5fe312c4cf90/disk-8f7aa3d3.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/c7a1f54ef730/vmlinux-8f7aa3d3.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/64a3779458bb/bzImage-8f7aa3d3.xz
+It would be nice to get rid of a lot of the min_t(), but I might try
+to attack the dubious ones rather than the ones that appear to make
+no difference.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+6461a4c663b104fd1169@syzkaller.appspotmail.com
+I might propose some extra checks in minmax.h that would break W=1 builds.
+Detecting things like min_t(u8, u32_value, 0xff) where the cast makes the
+comparison always succeed.
+In reality any calls with casts to u8 and u16 are 'dubious'.
 
-INFO: task syz.0.17:6104 blocked for more than 148 seconds.
-      Not tainted syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz.0.17        state:D stack:25440 pid:6104  tgid:6104  ppid:5956   task_flags:0x400140 flags:0x00080002
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5256 [inline]
- __schedule+0x14bc/0x5000 kernel/sched/core.c:6863
- __schedule_loop kernel/sched/core.c:6945 [inline]
- schedule+0x165/0x360 kernel/sched/core.c:6960
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:7017
- __mutex_lock_common kernel/locking/mutex.c:692 [inline]
- __mutex_lock+0x7e6/0x1350 kernel/locking/mutex.c:776
- cangw_pernet_exit_batch+0x20/0x90 net/can/gw.c:1288
- ops_exit_list net/core/net_namespace.c:205 [inline]
- ops_undo_list+0x525/0x990 net/core/net_namespace.c:252
+That and changing checkpatch.pl to not suggest min_t() at all, and
+to reject the more dubious uses.
+After all with:
+	min(x, (int)y)
+it is clear to the reader that 'y' is being possibly truncated and converted
+to a signed value, but with:
+	min_t(int, x, y)
+you don't know which value needed the cast (and the line isn't even shorter).
+But what I've found all to often is actually:
+	a = min_t(typeof(a), x, y);
+and the similar:
+	x = min_t(typeof(x), x, y);
+where the type of the result is used and high bits get discarded.
 
+I've just been trying to build with #define clamp_val clamp.
+That requires a few minor changes and I'm pretty sure shows up
+a real bug.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+	David
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> 
+> Cheers,
+> Matt
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
