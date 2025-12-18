@@ -1,102 +1,127 @@
-Return-Path: <netdev+bounces-245352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4073CCC06E
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 14:36:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 71998CCBF6C
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 14:19:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DC73430A3DD6
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 13:31:56 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BEDB530778E1
+	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 13:16:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2272341ADF;
-	Thu, 18 Dec 2025 13:13:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B3E933D50C;
+	Thu, 18 Dec 2025 13:11:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ojvj+r0v"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="auh/lOWZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7BEA34165E;
-	Thu, 18 Dec 2025 13:13:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0281B33D4ED;
+	Thu, 18 Dec 2025 13:11:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766063603; cv=none; b=c+NwnpCrxFYyEia1AxD4pDh7J52zTjva1I7/kbbO5onDgA/+YEXKCo/8YJ7XscZHz8pi9dI0x6FGIMSlx1u5Y1DdG6OpK4qQASy+fliOS2Sw006Atd/d/upUcbz0p6XlgPu+pimEUjTykO0utMhMR9qEQQzm0jtMYXQhVgWwD8Y=
+	t=1766063465; cv=none; b=kbZ0C7HJ40Zrx0A5k8HKxQpTc3t60wsekBH8jztlC5JSIVu2/1uMD5er98+zojEinCu+8y0z3n0qyAnpyWMuIA7N8ilq0bI3+QtCupuKVb19Pmx38J5KQIIrCIiJUQTcvDJfrpCBYCI6JD4eJ/VayffGeuIfFjQeTQ5DVnoj1F4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766063603; c=relaxed/simple;
-	bh=vgVok/kR5phQdGcyQzsaXUO5SngPNNzKGfR3VoPT6Pg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Cl8JCSRy79zP1JSKiVs0YT1K58PMUcRke0QX3/Vrsf7UGJ0qM1nfYiCi1RkK/CD0xSKs4BeYuwpPEmlBwroOgqSLyZaufA7b4so29rQ9uuABLcNW84v3GNrF7cL9nDV7pMAuwwIm9APOAuEfQOdO4+qz2qpTxq8jpIEeNNK/rEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ojvj+r0v; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46641C4CEFB;
-	Thu, 18 Dec 2025 13:13:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766063602;
-	bh=vgVok/kR5phQdGcyQzsaXUO5SngPNNzKGfR3VoPT6Pg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ojvj+r0vzjlshyJ84ht0SoMMsSvM/VpR8MMwRC06guL76Xqjj1jh95iJJHk2GVPmi
-	 5mlEeLND3fH0Q3AAXu+AtfjBlLXDMnTqwLmWtlc33U5Z5veI9vIkViz3qIqZS3onu8
-	 qHkjLYbFKyLKtm43guKmtstJZEolW4nU++G2ya9Kmr9N1B0n7tpCyVU6g369GUeVuv
-	 KtnU9Oaj12ONcWg2eJQapHH0BvgTz4UoLwGC4wNpLwHc4kUz8B92RMP/z6Nx8jdAhd
-	 a338QWt8EWrgH8hSVkBDS3Heaq0VqBUCOnd0r65IHEx9VUdOGVC8m/pjii+7xZhOxl
-	 5kGaBDV2AHyoQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F33D1380A955;
-	Thu, 18 Dec 2025 13:10:12 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1766063465; c=relaxed/simple;
+	bh=9uyvVoAwaaSXEm/9xYmGIpt0UEUWAvZjSJaIIGtK1HA=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=PGImaAJKA+Ip/C0RMoanL/OVitCz1gVwA9erZ/zAYIcTxVH23c/K9VPZ8SOOtkEoaYseRBeVFREJ0sZSqx2Amo9e/BdCeWjzqcw330g85dfOl0C6YfDJOmnDixE/Y3h6msIMclmUndKWzwAW69KDz5QNV7nwxIdy9Ms7OwCury0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=auh/lOWZ; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id 8E7142012434; Thu, 18 Dec 2025 05:10:54 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 8E7142012434
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1766063454;
+	bh=TMw9pOTn5uAMLC86wI4i4CWFIVExYXMjnk2FqSE3yTQ=;
+	h=Date:From:To:Subject:From;
+	b=auh/lOWZJw48s3fj389H5MBMpCBhPX40WBAt94f2gxI+CHapw5KantD460lU7gjsv
+	 ie8mt3v/uBZYboYaNJMXF38NDN9CQM9i3+cuyvrMBegZfwWZgrpTg/9YNnfs5gKtaJ
+	 3RxtS4xoCboBUAUj83cZLJaMPhZrUh11vvLFg2k0=
+Date: Thu, 18 Dec 2025 05:10:54 -0800
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
+	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	dipayanroy@microsoft.com
+Subject: [PATCH net, v2] net: mana: Fix use-after-free in reset service
+ rescan path
+Message-ID: <20251218131054.GA3173@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/6] MAINTAINERS: Remove Jozsef Kadlecsik from
- MAINTAINERS
- file
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176606341180.2948593.16330889517640025371.git-patchwork-notify@kernel.org>
-Date: Thu, 18 Dec 2025 13:10:11 +0000
-References: <20251216190904.14507-2-fw@strlen.de>
-In-Reply-To: <20251216190904.14507-2-fw@strlen.de>
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, netfilter-devel@vger.kernel.org,
- pablo@netfilter.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-Hello:
+When mana_serv_reset() encounters -ETIMEDOUT or -EPROTO from
+mana_gd_resume(), it performs a PCI rescan via mana_serv_rescan().
 
-This series was applied to netdev/net.git (main)
-by Florian Westphal <fw@strlen.de>:
+mana_serv_rescan() calls pci_stop_and_remove_bus_device(), which can
+invoke the driver's remove path and free the gdma_context associated
+with the device. After returning, mana_serv_reset() currently jumps to
+the out label and attempts to clear gc->in_service, dereferencing a
+freed gdma_context.
 
-On Tue, 16 Dec 2025 20:08:59 +0100 you wrote:
-> From: Jozsef Kadlecsik <kadlec@netfilter.org>
-> 
-> I'm retiring from maintaining netfilter. I'll still keep an
-> eye on ipset and respond to anything related to it.
-> 
-> Thank you!
-> 
-> [...]
+The issue was observed with the following call logs:
+[  698.942636] BUG: unable to handle page fault for address: ff6c2b638088508d
+[  698.943121] #PF: supervisor write access in kernel mode
+[  698.943423] #PF: error_code(0x0002) - not-present page
+[S[  698.943793] Pat Dec  6 07:GD5 100000067 P4D 1002f7067 PUD 1002f8067 PMD 101bef067 PTE 0
+0:56 2025] hv_[n e 698.944283] Oops: Oops: 0002 [#1] SMP NOPTI
+tvsc f8615163-00[  698.944611] CPU: 28 UID: 0 PID: 249 Comm: kworker/28:1
+...
+[Sat Dec  6 07:50:56 2025] R10: [  699.121594] mana 7870:00:00.0 enP30832s1: Configured vPort 0 PD 18 DB 16
+000000000000001b R11: 0000000000000000 R12: ff44cf3f40270000
+[Sat Dec  6 07:50:56 2025] R13: 0000000000000001 R14: ff44cf3f402700c8 R15: ff44cf3f4021b405
+[Sat Dec  6 07:50:56 2025] FS:  0000000000000000(0000) GS:ff44cf7e9fcf9000(0000) knlGS:0000000000000000
+[Sat Dec  6 07:50:56 2025] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[Sat Dec  6 07:50:56 2025] CR2: ff6c2b638088508d CR3: 000000011fe43001 CR4: 0000000000b73ef0
+[Sat Dec  6 07:50:56 2025] Call Trace:
+[Sat Dec  6 07:50:56 2025]  <TASK>
+[Sat Dec  6 07:50:56 2025]  mana_serv_func+0x24/0x50 [mana]
+[Sat Dec  6 07:50:56 2025]  process_one_work+0x190/0x350
+[Sat Dec  6 07:50:56 2025]  worker_thread+0x2b7/0x3d0
+[Sat Dec  6 07:50:56 2025]  kthread+0xf3/0x200
+[Sat Dec  6 07:50:56 2025]  ? __pfx_worker_thread+0x10/0x10
+[Sat Dec  6 07:50:56 2025]  ? __pfx_kthread+0x10/0x10
+[Sat Dec  6 07:50:56 2025]  ret_from_fork+0x21a/0x250
+[Sat Dec  6 07:50:56 2025]  ? __pfx_kthread+0x10/0x10
+[Sat Dec  6 07:50:56 2025]  ret_from_fork_asm+0x1a/0x30
+[Sat Dec  6 07:50:56 2025]  </TASK>
 
-Here is the summary with links:
-  - [net,1/6] MAINTAINERS: Remove Jozsef Kadlecsik from MAINTAINERS file
-    https://git.kernel.org/netdev/net/c/99c6931fe1f5
-  - [net,2/6] netfilter: nf_nat: remove bogus direction check
-    https://git.kernel.org/netdev/net/c/5ec8ca26fe93
-  - [net,3/6] netfilter: nf_tables: remove redundant chain validation on register store
-    https://git.kernel.org/netdev/net/c/a67fd55f6a09
-  - [net,4/6] netfilter: nf_tables: avoid chain re-validation if possible
-    https://git.kernel.org/netdev/net/c/8e1a1bc4f5a4
-  - [net,5/6] netfilter: nf_tables: avoid softlockup warnings in nft_chain_validate
-    https://git.kernel.org/netdev/net/c/7e7a817f2dfd
-  - [net,6/6] selftests: netfilter: packetdrill: avoid failure on HZ=100 kernel
-    https://git.kernel.org/netdev/net/c/fec7b0795548
+Fix this by returning immediately after mana_serv_rescan() to avoid
+accessing GC state that may no longer be valid.
 
-You are awesome, thank you!
+Fixes: 9bf66036d686 ("net: mana: Handle hardware recovery events when probing the device")
+Reviewed-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Long Li <longli@microsoft.com>
+Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+---
+ drivers/net/ethernet/microsoft/mana/gdma_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+index efb4e412ec7e..0055c231acf6 100644
+--- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
++++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+@@ -481,7 +481,7 @@ static void mana_serv_reset(struct pci_dev *pdev)
+ 		/* Perform PCI rescan on device if we failed on HWC */
+ 		dev_err(&pdev->dev, "MANA service: resume failed, rescanning\n");
+ 		mana_serv_rescan(pdev);
+-		goto out;
++		return;
+ 	}
+ 
+ 	if (ret)
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.34.1
 
 
