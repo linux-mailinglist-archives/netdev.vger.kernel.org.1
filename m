@@ -1,188 +1,138 @@
-Return-Path: <netdev+bounces-245472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E324CCE7F6
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 06:13:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A24C0CCEA38
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 07:23:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0D5D730329F4
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 05:13:46 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 15E6B301A1F7
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 06:23:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E03A22C0263;
-	Fri, 19 Dec 2025 05:13:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACE822C21FC;
+	Fri, 19 Dec 2025 06:23:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rjq/AAtp"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="kvJDEDbs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A34BC22B5A3;
-	Fri, 19 Dec 2025 05:13:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB3C32C1581;
+	Fri, 19 Dec 2025 06:23:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766121224; cv=none; b=WBtqXsowQMt0gGWTiag2UolGCoVIN2josAy1dgsyxXlrLnv+hi4k2KU4qZTATnrbwljUKpiRxRcTVeuCfKTw2dqi8o3Ed1cMbDBxX1kIs1Q71VWzCwRMlzEgYi748x1Cchdq97PPwthZX4I2ZiClZmDcpS7cKptp1fb7TYXs8gw=
+	t=1766125382; cv=none; b=i3AUVEtmxK9Xn9GcnOqJAsyrdlkyRRCKxqYewZFUEdnxKdOg6aKVtlTuhGgU8Fsq/cEdF9sBg0jkLEi5l8fIGlmt3h8v/NrvvGW5QrElRclO95UipvJ7j/cTDAtzgWbLWEVLcq7yXddE0HsvA5iFxK14XJr9xpckn+rtJgdR3Vc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766121224; c=relaxed/simple;
-	bh=gsvvD4fusz8UOMAocP96M5y9o3JhQPWaOjsWz3Kq8bE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=hqG8V3Syb0HeLgZWMY894xQ9zxU9Agx5RZZ8JfyW130aWvvp8DTM+2DUgoY9rB8MBFZTCY+e376wsq9U/YBmv+rwXHjRcZQGRdqdHzgXkPPUsXqK2uScRie44Un5tmtirz06c6w4VPNQAbnq7fQScxl7V0uLE5TZzSlr1RC0GNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rjq/AAtp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53052C116D0;
-	Fri, 19 Dec 2025 05:13:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766121224;
-	bh=gsvvD4fusz8UOMAocP96M5y9o3JhQPWaOjsWz3Kq8bE=;
-	h=From:Date:Subject:To:Cc:From;
-	b=rjq/AAtpu2++A/EjejYLIgRcB0d9a7LoMcuTj2d6IJPcXtn58LE8ikZMO8i00goP5
-	 1f/7WYa5XcPrSf1Uzd94Dwei2Czb4Hp91v2QOGGRh1O+LL6we+3DrQFv6e28MYx3ux
-	 dGlycK2G5FWFSnFfhv+ghEpvmQucXV89FGcwunjO0Uhzka6tCor8NROjsg1zsRCaxf
-	 x2zNGMJaw3THo9P2DTOi1ODskmZ3j3ZVVmIdJah9LJ9W9qzr9yXkqEqn0SGvkczL97
-	 M51Ey8LZVP1f+HoNSr98z17EuUqdgTBolCAAG2atHzVwqoRmY/+kYJngT/iGhdBX7z
-	 q7H733E3kMxww==
-From: Daniel Gomez <da.gomez@kernel.org>
-Date: Fri, 19 Dec 2025 06:13:20 +0100
-Subject: [PATCH] netfilter: replace -EEXIST with -EBUSY
+	s=arc-20240116; t=1766125382; c=relaxed/simple;
+	bh=ubbCyFC+moXAwdJBRz+3upUvQOr5XxXbTrdKtzQsFic=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DsozkhKeBjUtXDiHjUGJetmMZgKbl2JBvgPD3tQS1Qu/YVnz5/km2gRV6dMOh1/liTTawJ6AktkFZBmPusQV0E9A3QxIf1hR3dQE21zzzuv41hArF0Nd/LCHwL588Or6RhivCM/bLeR/k9EpiZy3l53gTs9WG6Y+kovgUMNYMhA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=kvJDEDbs; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BIJjXsa680014;
+	Thu, 18 Dec 2025 22:22:38 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=izJW0mPNhaR99sT+kwlGB+h
+	4Yn54FKPFo0NvVBmxhUw=; b=kvJDEDbsjqYRYnSvdR0eagDGhQFA1FWPZRBCTvn
+	qgC6TYVVMxauruO/BmTwHbS+CAqYzXm7hkzC/V8gj4w0aibf3fSRJ8VwZA+MpjhP
+	lKwvaJGNd5bs6Cxuv33QLnUaOZzKPuHnYNJj65I03w9cZ2296CA13eSmus5+PUVl
+	zhHpcYu1OqbFIxPvhEWRbARn7L3KO/HPm1DtMtw3rvGPCSCN9gXcOqGgCNEoRf4I
+	SCH2h1j4toHU+hIiERPgS6k1gAUoDfu7KIlMIsl3M20pF+MWBctysW+0dnqAAI3M
+	+04ksvO0SkEFnZSSFWHKVXqBowzpyxSJVeoFDArnsNPpx2A==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4b4r2412qw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 18 Dec 2025 22:22:38 -0800 (PST)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Thu, 18 Dec 2025 22:22:50 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Thu, 18 Dec 2025 22:22:50 -0800
+Received: from hyd1vellox1.032marvell.com032caveonetworks.com (unknown [10.29.37.43])
+	by maili.marvell.com (Postfix) with ESMTP id EB3353F7093;
+	Thu, 18 Dec 2025 22:22:33 -0800 (PST)
+From: Anshumali Gaur <agaur@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: Anshumali Gaur <agaur@marvell.com>, Sunil Goutham <sgoutham@marvell.com>,
+        Geetha sowjanya <gakula@marvell.com>,
+        Subbaraya Sundeep
+	<sbhatta@marvell.com>,
+        hariprasad <hkelam@marvell.com>,
+        Bharat Bhushan
+	<bbhushan2@marvell.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S.
+ Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Christina Jacob
+	<cjacob@marvell.com>
+Subject: [PATCH] octeontx2-pf: fix "UBSAN: shift-out-of-bounds error"
+Date: Fri, 19 Dec 2025 11:52:26 +0530
+Message-ID: <20251219062226.524844-1-agaur@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251219-dev-module-init-eexists-netfilter-v1-1-efd3f62412dc@samsung.com>
-X-B4-Tracking: v=1; b=H4sIAO/eRGkC/x2NwQqDMBAFf0X23IUmNVL6K9JDNS+6YKNkowjiv
- xs8DgMzBymSQOlTHZSwicocC5hHRf34iwNYfGGyT+uMNW/22Pg/+3UqJkpmYBfNyhE5yJSR2DW
- hDt3LWd93VDpLQpD9frTf87wA+wCYS3MAAAA=
-X-Change-ID: 20251218-dev-module-init-eexists-netfilter-56f4fb352dcb
-To: Pablo Neira Ayuso <pablo@netfilter.org>, 
- Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>, 
- Phil Sutter <phil@nwl.cc>, Nikolay Aleksandrov <razor@blackwall.org>, 
- Ido Schimmel <idosch@nvidia.com>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>, 
- Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, 
- Aaron Tomlin <atomlin@atomlin.com>, Lucas De Marchi <demarchi@kernel.org>, 
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
- bridge@lists.linux.dev, netdev@vger.kernel.org, 
- linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Daniel Gomez <da.gomez@samsung.com>
-X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3967; i=da.gomez@samsung.com;
- h=from:subject:message-id; bh=aLysHjbqpI8FaFJ4wtkcZbXvdugD32ypDbpUfYtRcaE=;
- b=owEBbQKS/ZANAwAIAUCeo8QfGVH7AcsmYgBpRN77Y8OOuXAROsrdnRmMDgZy4zuf/ygiHytLh
- 91q+5GbhcmJAjMEAAEIAB0WIQTvdRrhHw9z4bnGPFNAnqPEHxlR+wUCaUTe+wAKCRBAnqPEHxlR
- +5xrD/9P2SgKSwKvpQRtM9kmAOh93wT4s4ZSnBztJZMV4mzJV40AOfTIDpHGgeDVem09lfB2ZMA
- YE1L912aK1qiUk9YDCjtn98C5xqtOXvZtHwRwl5dkStnYOqlpC+mA+bXUz+kEKsE/hKWmO7x2I1
- 7OADPTymgeGRDJIpLhkNx0OrLdbAAN8dbYs/eCpPkT0+YResXIsfbkYiINLmWeBdmbmxqwWbxzc
- usIaNiSl4OzDI7VPg8sHrsJz4sbMEOAz+VNoM6Wgq/3qnnKMRGdrg5X/iRWthcD6U8tggNdzNhg
- dQhusUZv2pQ1kw37mXwVJ6j3f/jpFeIS4CwKbF9S3nKd3+tle9CwfRfmAdCe5vhhjveAj3Yqhna
- milZZT5mIaBD6BTFNFr5Hb5nqpIrOivQocOmu2WlhFu1jFfCEMnQgv0t1/lgghzKM07Xos7nn60
- nPTTCNbgujniIVURYeEWDAn+mpu6pC8Is1R9EGMYajeZC26dGPqF0WcHJJtHdI30Jlnn3W3ab0n
- IprltDMy+1pga2kvqNg2U5/fGcNxlMn66D61RtQSoaBntfRaINhBt9LZINHDBGZEeC2M2zf2aTF
- IssZlq7yQb8wp5YFAkDTVpdKgCZeuIP7+xhywNLiWTo12iQez4so/XZurSTJNva36Vvc7UVpsIK
- 7UCpVRoBp8QWoHQ==
-X-Developer-Key: i=da.gomez@samsung.com; a=openpgp;
- fpr=B2A7A9CFDD03B540FF58B27185F56EA4E9E8138F
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjE5MDA1MSBTYWx0ZWRfX2B9a6uA1f5Hz
+ OntA7nMt4qSIhCPBI6rTaukXfHgQQYS0Nhrp1aGkDqG47L01nNBBWit9AQURocvI5ZRTM1er3wX
+ inWnyIWYPG+Pf0j4PPJe1g4V82osm/hNuBaoTxRNLN+FceTNr9YR0ObVf+riglQR5yLFnUhtjAz
+ ZZISjHuspXzWsySuk88IuIImiXwXJezQuF+LVQQqt0gJvcxjEPOn59xq3zzQVYJegw1WBrfdXGK
+ dk8E2qkdSNGSQ7zeybt0WMtZWaHb5R0vqZqO0CqIvvEnksZsMZ3FBpLsX3ZR1/QLU3Sg6o9gEQ7
+ YUEdolFekGb0oR07IPFxBxGQp2if04ORffcBm7yak+XFM/LDyszbIF2MvmHBPPZrxXhJdQIhJTv
+ wqrjW1QVTU7jmj4W86X4O2uJ1IDKvBxZg1uBZ837ilygOZ6ewDjQZjhS/KxTzL6bfwmvcNnGDkF
+ 330ms0Fpzakh8WPwP/Q==
+X-Proofpoint-ORIG-GUID: 1BPTf0TwqwpI9_Vw-1sMSN3L9xk7QznS
+X-Authority-Analysis: v=2.4 cv=T4uBjvKQ c=1 sm=1 tr=0 ts=6944ef2e cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=M5GUcnROAAAA:8
+ a=WZBPPPMKX3YK0b_eNZYA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-GUID: 1BPTf0TwqwpI9_Vw-1sMSN3L9xk7QznS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-12-19_02,2025-12-17_02,2025-10-01_01
 
-From: Daniel Gomez <da.gomez@samsung.com>
+This patch ensures that the RX ring size (rx_pending) is not
+set below the permitted length. This avoids UBSAN
+shift-out-of-bounds errors when users passes small or zero
+ring sizes via ethtool -G.
 
-The -EEXIST error code is reserved by the module loading infrastructure
-to indicate that a module is already loaded. When a module's init
-function returns -EEXIST, userspace tools like kmod interpret this as
-"module already loaded" and treat the operation as successful, returning
-0 to the user even though the module initialization actually failed.
-
-This follows the precedent set by commit 54416fd76770 ("netfilter:
-conntrack: helper: Replace -EEXIST by -EBUSY") which fixed the same
-issue in nf_conntrack_helper_register().
-
-Affected modules:
-  * ebtable_broute ebtable_filter ebtable_nat arptable_filter
-  * ip6table_filter ip6table_mangle ip6table_nat ip6table_raw
-  * ip6table_security iptable_filter iptable_mangle iptable_nat
-  * iptable_raw iptable_security
-
-Signed-off-by: Daniel Gomez <da.gomez@samsung.com>
+Fixes: d45d8979840d ("octeontx2-pf: Add basic ethtool support")
+Signed-off-by: Anshumali Gaur <agaur@marvell.com>
+Change-Id: I6de6770dbc0dd952725ccd71ce521f801bc7b15b
 ---
-The error code -EEXIST is reserved by the kernel module loader to
-indicate that a module with the same name is already loaded. When a
-module's init function returns -EEXIST, kmod interprets this as "module
-already loaded" and reports success instead of failure [1].
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-The kernel module loader will include a safety net that provides -EEXIST
-to -EBUSY with a warning [2], and a documentation patch has been sent to
-prevent future occurrences [3].
-
-These affected code paths were identified using a static analysis tool
-[4] that traces -EEXIST returns to module_init(). The tool was developed
-with AI assistance and all findings were manually validated.
-
-Link: https://lore.kernel.org/all/aKEVQhJpRdiZSliu@orbyte.nwl.cc/ [1]
-Link: https://lore.kernel.org/all/20251013-module-warn-ret-v1-0-ab65b41af01f@intel.com/ [2]
-Link: https://lore.kernel.org/all/20251218-dev-module-init-eexists-modules-docs-v1-0-361569aa782a@samsung.com/ [3]
-Link: https://gitlab.com/-/snippets/4913469 [4]
----
- net/bridge/netfilter/ebtables.c | 2 +-
- net/netfilter/nf_log.c          | 4 ++--
- net/netfilter/x_tables.c        | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/net/bridge/netfilter/ebtables.c b/net/bridge/netfilter/ebtables.c
-index 5697e3949a36..a04fc1757528 100644
---- a/net/bridge/netfilter/ebtables.c
-+++ b/net/bridge/netfilter/ebtables.c
-@@ -1299,7 +1299,7 @@ int ebt_register_template(const struct ebt_table *t, int (*table_init)(struct ne
- 	list_for_each_entry(tmpl, &template_tables, list) {
- 		if (WARN_ON_ONCE(strcmp(t->name, tmpl->name) == 0)) {
- 			mutex_unlock(&ebt_mutex);
--			return -EEXIST;
-+			return -EBUSY;
- 		}
- 	}
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
+index b90e23dc49de..b6449f0a9e7d 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
+@@ -418,6 +418,14 @@ static int otx2_set_ringparam(struct net_device *netdev,
+ 	 */
+ 	if (rx_count < pfvf->hw.rq_skid)
+ 		rx_count =  pfvf->hw.rq_skid;
++
++	if (ring->rx_pending < 16) {
++		netdev_err(netdev,
++			   "rx ring size %u invalid, min is 16\n",
++			   ring->rx_pending);
++		return -EINVAL;
++	}
++
+ 	rx_count = Q_COUNT(Q_SIZE(rx_count, 3));
  
-diff --git a/net/netfilter/nf_log.c b/net/netfilter/nf_log.c
-index 74cef8bf554c..62cf6a30875e 100644
---- a/net/netfilter/nf_log.c
-+++ b/net/netfilter/nf_log.c
-@@ -89,7 +89,7 @@ int nf_log_register(u_int8_t pf, struct nf_logger *logger)
- 	if (pf == NFPROTO_UNSPEC) {
- 		for (i = NFPROTO_UNSPEC; i < NFPROTO_NUMPROTO; i++) {
- 			if (rcu_access_pointer(loggers[i][logger->type])) {
--				ret = -EEXIST;
-+				ret = -EBUSY;
- 				goto unlock;
- 			}
- 		}
-@@ -97,7 +97,7 @@ int nf_log_register(u_int8_t pf, struct nf_logger *logger)
- 			rcu_assign_pointer(loggers[i][logger->type], logger);
- 	} else {
- 		if (rcu_access_pointer(loggers[pf][logger->type])) {
--			ret = -EEXIST;
-+			ret = -EBUSY;
- 			goto unlock;
- 		}
- 		rcu_assign_pointer(loggers[pf][logger->type], logger);
-diff --git a/net/netfilter/x_tables.c b/net/netfilter/x_tables.c
-index 90b7630421c4..48105ea3df15 100644
---- a/net/netfilter/x_tables.c
-+++ b/net/netfilter/x_tables.c
-@@ -1764,7 +1764,7 @@ EXPORT_SYMBOL_GPL(xt_hook_ops_alloc);
- int xt_register_template(const struct xt_table *table,
- 			 int (*table_init)(struct net *net))
- {
--	int ret = -EEXIST, af = table->af;
-+	int ret = -EBUSY, af = table->af;
- 	struct xt_template *t;
- 
- 	mutex_lock(&xt[af].mutex);
-
----
-base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
-change-id: 20251218-dev-module-init-eexists-netfilter-56f4fb352dcb
-
-Best regards,
---  
-Daniel Gomez <da.gomez@samsung.com>
+ 	/* Due pipelining impact minimum 2000 unused SQ CQE's
+-- 
+2.25.1
 
 
