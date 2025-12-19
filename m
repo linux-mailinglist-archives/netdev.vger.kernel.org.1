@@ -1,102 +1,129 @@
-Return-Path: <netdev+bounces-245479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A43FCCECC4
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 08:36:54 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CAEACCECCD
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 08:37:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E56F23011F95
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 07:36:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D61423006A5E
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 07:37:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07A57283CA3;
-	Fri, 19 Dec 2025 07:36:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ED61227EA8;
+	Fri, 19 Dec 2025 07:37:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SpBVSxT1"
+	dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b="5qnVYYht"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail-internal.sh.cz (mail-internal.sh.cz [95.168.196.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C77F34A0C;
-	Fri, 19 Dec 2025 07:36:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C141991CB
+	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 07:37:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.168.196.40
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766129790; cv=none; b=RzugNODfzSav4ELkEI+eUr+flO8sp17/BAiS4RI6MDZL1Qu1JBdwFLUEwcf8PK+N2YSZGQqjthxO79ZnRItmx4CfetJ2M3/0JcwnyQH7KQLzZcADX/cdUbcbv/hWzyGfmcAZ2+ciF/XXXrQBqNgsoWHCIHeay2mf4/AK/a2RLwo=
+	t=1766129844; cv=none; b=SuDPdwhPzI+h1/cODZR4ZKkJTUBn38nhpYoQPs+8mvUyAIXX73+acedIWAguOyIFuBtuaRlLLvEQHkz6tsiutniaUL+u9HJR+mcfUVLzThi1/Hwxbck8AuMrvHZ/uTlGXP8gQpPLBbHNxtyauQ+3N2ehRfqwraMTiw/4cJVjxXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766129790; c=relaxed/simple;
-	bh=aCodlFFXHQBWaHWICD9txtmi5ow3KNr2Et6gGaYS0Fk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=INEMBQK99CE6FE/sKHKNT9NsF3SCDpi3zl+4wCY0YERgY50Bo90Nh6Qhaapg6UexaRbYFMWiHdm21CzgYMr8kx19kOoVWkGQFCk1wQN4ggOa6YcbSFQ2vAtZHw1MY6hkrhaPm45kQqvxAn3NSmebDAdQ93STiY5kUqyfqi7rpDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SpBVSxT1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8AACC4CEF1;
-	Fri, 19 Dec 2025 07:36:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766129790;
-	bh=aCodlFFXHQBWaHWICD9txtmi5ow3KNr2Et6gGaYS0Fk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SpBVSxT1nNM8br11CaoNIEktIFCoo1I0t1wbvowO5w1uBfxPKJR6YohzaXTdMn5FN
-	 dm5ARDtTuLIZLHvdHRjEjbEzABBm99J8rjNn/Rs8aoh4aFh4kNgsBSPA3akHdWZtuY
-	 nY8TtyqnaSyRHkZ9dxrvqlAZDBuh4uCFSuwYspkCpOn/lTCEMvBdFKRDhzS8c5lTIj
-	 DTdhFRpgXZlemZqxLF8DkvUJX+dQsApoBBST1n3yhx49vQE7+K/qgdbG+BwZSmjZIX
-	 y9SBFwwn34HyJFm55RdVVkHZSqMNZc4MTZUVt7d/HOZEB5R/qxSCy9Nq946cuM3Cq5
-	 J35Lf7byM5s4w==
-Date: Fri, 19 Dec 2025 08:36:26 +0100
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: "irving.ch.lin" <irving-ch.lin@mediatek.com>
-Cc: Michael Turquette <mturquette@baylibre.com>, 
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Ulf Hansson <ulf.hansson@linaro.org>, 
-	Richard Cochran <richardcochran@gmail.com>, Qiqi Wang <qiqi.wang@mediatek.com>, linux-clk@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, linux-pm@vger.kernel.org, 
-	netdev@vger.kernel.org, Project_Global_Chrome_Upstream_Group@mediatek.com, 
-	sirius.wang@mediatek.com, vince-wl.liu@mediatek.com, jh.hsu@mediatek.com
-Subject: Re: [PATCH v4 02/21] dt-bindings: power: mediatek: Add MT8189 power
- domain definitions
-Message-ID: <20251219-hissing-chicken-of-poetry-5fbfd9@quoll>
-References: <20251215034944.2973003-1-irving-ch.lin@mediatek.com>
- <20251215034944.2973003-3-irving-ch.lin@mediatek.com>
+	s=arc-20240116; t=1766129844; c=relaxed/simple;
+	bh=Dk0J5SbprSuHIFt8EQMs4wy6zIcWkrCEIa//jFN4vaY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SUlMSUUKOVpoQGGIPW+ryciGyUFr4RfvEN9jPlbOLk1LGWpdtY/ugQHfr/w31wTE1n9Z4IgrX3svoTaA8I2jwe9eWYUeXc6EwQyobS+p5MSNBJH6dLfWlBqe+RLEPA5nWvUA07PK37qn1DV86ECIc2cv53w9v1seDtIySSjDixo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com; spf=pass smtp.mailfrom=cdn77.com; dkim=pass (1024-bit key) header.d=cdn77.com header.i=@cdn77.com header.b=5qnVYYht; arc=none smtp.client-ip=95.168.196.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cdn77.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cdn77.com
+DKIM-Signature: a=rsa-sha256; t=1766129839; x=1766734639; s=dkim2019; d=cdn77.com; c=relaxed/relaxed; v=1; bh=8Bbj5aG9+FyEl1569LcYPU6BfTLqdej1g96JkOLVTeM=; h=From:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:In-Reply-To:References;
+   b=5qnVYYhthMxjZM2HihqmWRntRGNMdidFCqwA2be3myjhmP3DcZOvarZchgUMcjwbvA9meM06GVEgjnBfX/hiAyjjxvRyCB+MQGyWmYSoXO7c+xJLjXII2MM5xc9zmTCeCnNFz6BesVRLWCa4HIlT5U138lsIKriuezzClcoLyAQ=
+Received: from [192.168.100.3] ([188.75.189.151])
+        by mail.sh.cz (14.2.0 build 9 ) with ASMTP (SSL) id 202512190837182895;
+        Fri, 19 Dec 2025 08:37:18 +0100
+Message-ID: <04828827-e664-4fbc-b96f-ce149da7c410@cdn77.com>
+Date: Fri, 19 Dec 2025 08:37:18 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20251215034944.2973003-3-irving-ch.lin@mediatek.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] tcp: clarify tcp_congestion_ops functions
+ comments
+To: Neal Cardwell <ncardwell@google.com>
+Cc: Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima
+ <kuniyu@google.com>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+References: <20251218105819.63906-1-daniel.sedlak@cdn77.com>
+ <CADVnQy=-UP9jJ5-bv=aRYL5fEtpjscDEAC1G=_cCM4gF10W8ew@mail.gmail.com>
+Content-Language: en-US
+From: Daniel Sedlak <daniel.sedlak@cdn77.com>
+In-Reply-To: <CADVnQy=-UP9jJ5-bv=aRYL5fEtpjscDEAC1G=_cCM4gF10W8ew@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-CTCH: RefID="str=0001.0A2D032B.694500AF.001B,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0"; Spam="Unknown"; VOD="Unknown"
 
-On Mon, Dec 15, 2025 at 11:49:11AM +0800, irving.ch.lin wrote:
-> From: Irving-CH Lin <irving-ch.lin@mediatek.com>
+Hi Neal,
+
+On 12/18/25 2:37 PM, Neal Cardwell wrote:
+
 > 
-> Add device tree bindings for the power domains of MediaTek MT8189 SoC.
+> Perhaps something like the following.
 > 
-> Signed-off-by: Irving-CH Lin <irving-ch.lin@mediatek.com>
-> ---
->  .../power/mediatek,power-controller.yaml      |  1 +
->  .../dt-bindings/power/mediatek,mt8189-power.h | 38 +++++++++++++++++++
->  2 files changed, 39 insertions(+)
->  create mode 100644 include/dt-bindings/power/mediatek,mt8189-power.h
+> diff --git a/include/net/tcp.h b/include/net/tcp.h
+> index 10706a1753e96..d35908bc977db 100644
+> --- a/include/net/tcp.h
+> +++ b/include/net/tcp.h
+> @@ -1326,12 +1326,28 @@ struct rate_sample {
+>   struct tcp_congestion_ops {
+>   /* fast path fields are put first to fill one cache line */
+> 
+> +       /* A congestion control (CC) must provide one of either:
+> +        *
+> +        * (a) a cong_avoid function, if the CC wants to use the core TCP
+> +        *     stack's default functionality to implement a "classic"
+> +        *     (Reno/CUBIC-style) response to packet loss, RFC3168 ECN,
+> +        *     idle periods, pacing rate computations, etc.
+> +        *
+> +        * (b) a cong_control function, if the CC wants custom behavior and
+> +        *      complete control of all congestion control behaviors
+> +        */
+> +       /* (a) "classic" response: calculate new cwnd.
+> +        */
+> +       void (*cong_avoid)(struct sock *sk, u32 ack, u32 acked);
+> +       /* (b) "custom" response: call when packets are delivered to update
+> +        * cwnd and pacing rate, after all the ca_state processing.
+> +        */
+> +       void (*cong_control)(struct sock *sk, u32 ack, int flag,
+> +                            const struct rate_sample *rs);
+> +
+>          /* return slow start threshold (required) */
+>          u32 (*ssthresh)(struct sock *sk);
+> 
+> -       /* do new cwnd calculation (required) */
+> -       void (*cong_avoid)(struct sock *sk, u32 ack, u32 acked);
+> -
+>          /* call before changing ca_state (optional) */
+>          void (*set_state)(struct sock *sk, u8 new_state);
+> 
+> @@ -1347,12 +1363,6 @@ struct tcp_congestion_ops {
+>          /* pick target number of segments per TSO/GSO skb (optional): */
+>          u32 (*tso_segs)(struct sock *sk, unsigned int mss_now);
+> 
+> -       /* call when packets are delivered to update cwnd and pacing rate,
+> -        * after all the ca_state processing. (optional)
+> -        */
+> -       void (*cong_control)(struct sock *sk, u32 ack, int flag, const
+> struct rate_sample *rs);
+> -
+> -
+>          /* new value of cwnd after loss (required) */
+>          u32  (*undo_cwnd)(struct sock *sk);
+>          /* returns the multiplier used in tcp_sndbuf_expand (optional) */
+> 
+> How does that sound?
+> 
 
-You did not cc maintainer of the binding, so either it's fake entry or
-you forgot to use tools.
+Thank you for your response & suggestions. This sounds like really nice 
+improvement, can I use it for v2 and add you as Co-developed-by (since 
+you've done most of the heavy lifting)?
 
-Please use scripts/get_maintainers.pl to get a list of necessary people
-and lists to CC (and consider --no-git-fallback argument, so you will
-not CC people just because they made one commit years ago). It might
-happen, that command when run on an older kernel, gives you outdated
-entries. Therefore please be sure you base your patches on recent Linux
-kernel.
-
-Tools like b4 or scripts/get_maintainer.pl provide you proper list of
-people, so fix your workflow. Tools might also fail if you work on some
-ancient tree (don't, instead use mainline) or work on fork of kernel
-(don't, instead use mainline). Just use b4 and everything should be
-fine, although remember about 'b4 prep --auto-to-cc' if you added new
-patches to the patchset.
-
-Best regards,
-Krzysztof
-
+Thanks!
+Daniel
 
