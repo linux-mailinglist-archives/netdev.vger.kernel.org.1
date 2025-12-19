@@ -1,102 +1,183 @@
-Return-Path: <netdev+bounces-245555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F103CD18B2
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 20:08:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EFB5CD1B2C
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 20:56:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3925D3025A64
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 19:06:26 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6078D3071A97
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 19:56:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9420227F754;
-	Fri, 19 Dec 2025 19:06:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D181B27E074;
+	Fri, 19 Dec 2025 19:56:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="JtJPNfPA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
+Received: from mail-oi1-f195.google.com (mail-oi1-f195.google.com [209.85.167.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0032A78F3A
-	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 19:06:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B04625487B
+	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 19:56:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766171185; cv=none; b=LusdlbyE4lSqnfzx/dV/KBSNBCnURkUQqGn/QVghDoCHCg3VJ/VRGAuoJsj7eBU5OY1sxlFhlG6Xt1671J5fh5cngdHakVLMlFVYUPvSQYyBhTSvh7pGSk7Qy7UytUmYk2K2KRYPCQ4o0sE3NmiXELhPUphVQWml5AtlmSX1yPs=
+	t=1766174167; cv=none; b=LMl+nUugcaFFXaTKnuvwRwF8Nc4Lsr6catJ/2svDt7odgCAPOMAerN5yNPP0WRFxq10Aimr1EUhnPD1ko7Zjg7gndxyaq5WXIS0krgTCzXfO7Se9ZZBR6QRjtVFhUDExzwt87azwZu6nxtaDNRpoGG5Zz5WARJ3e7NI4AsWdv2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766171185; c=relaxed/simple;
-	bh=ZXBYuFjKOlnbNNzA5W+Wu/Px5Y7AiOMjVXAj5q9Mppc=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=KLmnd7UScAsxe2vxdXPc9ZXXCQQmo00fXFJqkvBWpSjYmYK7nHnC71Y8vDHA4g0nbv0ogdzh3vDuPKRBpn04hrKkNqaYVwZFN7un0qKOnmWZBzg0aP03PHUXEBDQw/mU9/PqZPPbDbvWpix11ZIrZkhSgXiXFz+PID122HQVFps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-6597c6a8be9so3694271eaf.0
-        for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 11:06:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766171183; x=1766775983;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+	s=arc-20240116; t=1766174167; c=relaxed/simple;
+	bh=sjl0+XIeCBQe5ghIO11hweZd5kYgQ6YdOE4DG3SSKc8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ACDfBuTyKWPiPZk9snT9p2HYyyfmpFQq1FmE+Y6sQC3gIRxrgIj9NdazQl5I//lmKDyX7WaezEero6WCSIMPlSCkCnhpNPI9JzSwztZAyQmk8mtAUb/hAybVhVd3Ct3xBZc+LPMuQj1tE6MwsBtH3pQx8/6Jh8zRfFWVv+5jClM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=JtJPNfPA; arc=none smtp.client-ip=209.85.167.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-oi1-f195.google.com with SMTP id 5614622812f47-4507605e19aso1320185b6e.2
+        for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 11:56:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1766174160; x=1766778960; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=e/Oq5crcH8JUHCaRDZiBV0HlLww21wu+/yplBm+zYxc=;
-        b=eb5rQBoalU+nPkvqvKHTaJmZe87okdjf8nfsykro/ST6HxI0pFquAJhjE9zbIZQEbz
-         5FWf7axoXbbu04ORZobBffvbYbR9yGCtY6M8k13XwyxDg07IQoi5lb6r/UhNS8fmQm22
-         yROoGbze9rHz/7cjQWCloNBo8Y1dBKO0Q5ccDzuDlIPM+WD2No8mMrvHfYYjoryTrSRL
-         oNk5pC9V8KwB7wZaTnKk/80+lZTPlJqVv/c4ia+01f1FLHcS5x2bQ90A1Kp1prT84y95
-         HM4Nv9IrkzLoggCdRhbF7zedU48c9Ca+0Tv2LOohAoCzaGlXOy6zDo2VDlvT82fmvVbr
-         YjmA==
-X-Forwarded-Encrypted: i=1; AJvYcCWVnRyaWjNLBTX8EWOoS6GoK4HAZpG/Fj90jHs6/y7gxA2ZB7HdV4UiDE6zGDXCe2ZQKkS4vLY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPUX7EeFYyr7QlQSr8fhiMm2y4zI+WIjSxH/Ky7MSWitGCZMsh
-	3J78IUMIdJ1TuUla/6Fo/NVEvyriwOQ5Bh+GsSxAj7gXpTvz8YSp3zxXajEKej9cZ5KlvLTSXAq
-	nbM1VHVUxfpWbd5eREmvbQi2jkcAXRu1RMS8OA0P9BMNA/P9vf332DX62QPU=
-X-Google-Smtp-Source: AGHT+IFQzF7y4Et5r2AuQMnixLQkGFj7bjNy/5ynkz3924NMJawGqNwpKsLEsmB8nRcxREtBEl0B79inoXZr53u3rGzFL9qKhQ8Q
+        bh=1Hm6nkQNYnKJDfhN23z4T+46KIzI4PMKW+EpRlLkSF0=;
+        b=JtJPNfPA7/WOzyzZwxar5Njf/OplGXaoErGE7L3YohKvKfMh3kEV2idIVyxcytf7+w
+         PIZn1Oo3grOBdvGPYgmEbI179yRCJj7KFE1YrLPRB84NkG02ckmEfYlcgXDtoc/iEtR4
+         rfpxqcczptyX6ONahC4KTfdGmDzNod/Adm/0qpD8d+c9yq0JOUte02Qh7ltwllJRRcLD
+         p26oglxFBBPA5LUXNZQQM2h0KvqvfT+Hu+4x83dzupTtezu7CpcDp7nbB94jjfyui9pb
+         azRzR6++qD0Ykx6Y7SyQiAbzKlPhvHHtLEfTMiy4FC475sQEHhqzD8+rg3RAxy+D3ads
+         zzXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766174160; x=1766778960;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1Hm6nkQNYnKJDfhN23z4T+46KIzI4PMKW+EpRlLkSF0=;
+        b=er1c9F2ciWCZxFV0hZVZnMZZZ1KeeCSwYLRb2EhL/WOslTOApLOVXl6dlErxJsNk8t
+         Qkk6/3kWcwM4mH85bDxFyWvG1UihRseX0TB29S3SFugdNN1ScXzzUnYn5BQ9RcpCceHy
+         fNkB5lujC9SpuoPibfmvuQp888mEzjmO9T3M2kZ1SrqQu2JrEhK4ONgG9rdXDfaGahqF
+         rJtvUsklCQpMVhmYWwa9GXoMJsU7WX0T86ixp9jmDskm/crUvQiopVmKp5KVeHeDKSBT
+         7JirYiLtLDfXa6l57PWVCWKCaVSxAHOTss6tWN+O6Y++zpuS2LxFIlrshLaIa9RJWbK2
+         9eJw==
+X-Forwarded-Encrypted: i=1; AJvYcCXyoJmu2yxdlsakUMdH4hiF7MM+A1MAkFX91Onx6v/CK3L60X6blN+SrPE4umo4U49P0YEOR8s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxpCpcOu7+OpjvbOubM9yv5PD3J8DOWRugqUjWSTxozz65WvcAU
+	+NB57YHXB64fjBnMuoG6vrZ1FK1spux2jlOFyPXSe9V/2GhMYB7HzJM34+3DDDKigY0=
+X-Gm-Gg: AY/fxX7+ZGGdJiVrL4U2icRDTd5PHLnd9Nufq5TZEAGV1T/cz+tGNtrhRI/+2kznIMd
+	ZNPriu2Nxjsstl+uduY3UVFm0taX0SWaCTebeLX9LZKiEA11ODdEP8CZigXJ53zHeSSIux42Tq9
+	gzCIetJGqfZDPi7UIF4wZEmjKbN5wSkq/kTUV84TUdp6x4WD5uydDP8d6zQa5OE/zGJnOq/J6jB
+	S3trNTkcTkdWq12ctXiOaZP4tpatDvRA5iWBoNhtPJ1k3tNOynMEyE2J4Nj71ETkpnV22zQZvkb
+	nk3+HEgdW3y29XAy/IC7BAGFylVRM7gLtAlmSvUyeJAYBMVCyKiqvdrThFJM1vD4yyiSZsGrcpa
+	3fT/1CNDs0uEg1UfsUrGVDNcpqHjU2maOzcxLNdhO5bqDJxJfyGlNP3hZ+AbyGzkBPeg7IgCBFK
+	LrN4gHMXc=
+X-Google-Smtp-Source: AGHT+IHm5acKkwicIn0szUoRUloJtAO/102qG3bI2/0D5LzBeiwIWh6V+d5ppeu0AIUp3FWI15DkfQ==
+X-Received: by 2002:a05:6808:c22c:b0:450:d8ef:d804 with SMTP id 5614622812f47-457b20ca13amr1775276b6e.39.1766174159815;
+        Fri, 19 Dec 2025 11:55:59 -0800 (PST)
+Received: from [192.168.1.102] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-3fdaa931b0esm2031392fac.8.2025.12.19.11.55.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 19 Dec 2025 11:55:58 -0800 (PST)
+Message-ID: <fe9dbb70-c345-41b2-96d6-2788e2510886@kernel.dk>
+Date: Fri, 19 Dec 2025 12:55:57 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a4a:d744:0:b0:65c:f062:bdde with SMTP id
- 006d021491bc7-65cfe799322mr2375186eaf.36.1766171183065; Fri, 19 Dec 2025
- 11:06:23 -0800 (PST)
-Date: Fri, 19 Dec 2025 11:06:23 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6945a22f.a70a0220.207337.011a.GAE@google.com>
-Subject: [syzbot] bpf build error (5)
-From: syzbot <syzbot+876eead1deeef9d14785@syzkaller.appspotmail.com>
-To: ast@kernel.org, daniel@iogearbox.net, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] af_unix: don't post cmsg for SO_INQ unless explicitly
+ asked for
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ netdev <netdev@vger.kernel.org>
+Cc: io-uring <io-uring@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+ Willem de Bruijn <willemb@google.com>, Kuniyuki Iwashima
+ <kuniyu@google.com>, Julian Orth <ju.orth@gmail.com>
+References: <07adc0c2-2c3b-4d08-8af1-1c466a40b6a8@kernel.dk>
+ <willemdebruijn.kernel.18e89ba05fbac@gmail.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <willemdebruijn.kernel.18e89ba05fbac@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On 12/19/25 12:02 PM, Willem de Bruijn wrote:
+> Jens Axboe wrote:
+>> A previous commit added SO_INQ support for AF_UNIX (SOCK_STREAM), but it
+>> posts a SCM_INQ cmsg even if just msg->msg_get_inq is set. This is
+>> incorrect, as ->msg_get_inq is just the caller asking for the remainder
+>> to be passed back in msg->msg_inq, it has nothing to do with cmsg. The
+>> original commit states that this is done to make sockets
+>> io_uring-friendly", but it's actually incorrect as io_uring doesn't use
+>> cmsg headers internally at all, and it's actively wrong as this means
+>> that cmsg's are always posted if someone does recvmsg via io_uring.
+>>
+>> Fix that up by only posting a cmsg if u->recvmsg_inq is set.
+>>
+>> Additionally, mirror how TCP handles inquiry handling in that it should
+>> only be done for a successful return. This makes the logic for the two
+>> identical.
+>>
+>> Cc: stable@vger.kernel.org
+>> Fixes: df30285b3670 ("af_unix: Introduce SO_INQ.")
+>> Reported-by: Julian Orth <ju.orth@gmail.com>
+>> Link: https://github.com/axboe/liburing/issues/1509
+>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>>
+>> ---
+>>
+>> V2:
+>> - Unify logic with tcp
+>> - Squash the two patches into one
+>>
+>> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+>> index 55cdebfa0da0..a7ca74653d94 100644
+>> --- a/net/unix/af_unix.c
+>> +++ b/net/unix/af_unix.c
+>> @@ -2904,6 +2904,7 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+>>  	unsigned int last_len;
+>>  	struct unix_sock *u;
+>>  	int copied = 0;
+>> +	bool do_cmsg;
+>>  	int err = 0;
+>>  	long timeo;
+>>  	int target;
+>> @@ -2929,6 +2930,9 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+>>  
+>>  	u = unix_sk(sk);
+>>  
+>> +	do_cmsg = READ_ONCE(u->recvmsg_inq);
+>> +	if (do_cmsg)
+>> +		msg->msg_get_inq = 1;
+> 
+> I would avoid overwriting user written fields if it's easy to do so.
+> 
+> In this case it probably is harmless. But we've learned the hard way
+> that applications can even get confused by recvmsg setting msg_flags.
+> I've seen multiple reports of applications failing to scrub that field
+> inbetween calls.
+> 
+> Also just more similar to tcp:
+> 
+>        do_cmsg = READ_ONCE(u->recvmsg_inq);
+>        if ((do_cmsg || msg->msg_get_inq) && (copied ?: err) >= 0) {
 
-syzbot found the following issue on:
+I think you need to look closer, because this is actually what the tcp
+path does:
 
-HEAD commit:    ba34388912b5 bpf: Disable false positive -Wsuggest-attribu..
-git tree:       bpf
-console output: https://syzkaller.appspot.com/x/log.txt?x=111cb11a580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=9e5198eaf003f1d1
-dashboard link: https://syzkaller.appspot.com/bug?extid=876eead1deeef9d14785
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+if (tp->recvmsg_inq) {
+	[...]
+	msg->msg_get_inq = 1;
+}
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+876eead1deeef9d14785@syzkaller.appspotmail.com
+to avoid needing to check two things at the bottom. Which is actually
+why I did this for streams too, as the whole point was to unify the two
+and make them look the same.
 
-failed to run ["make" "KERNELVERSION=syzkaller" "KERNELRELEASE=syzkaller" "LOCALVERSION=-syzkaller" "-j" "64" "ARCH=x86_64" "LLVM=1" "bzImage"]: exit status 2
+Like I said, I'm happy to give you guys what you want, but you can't
+both ask for consistency and then want it different too. I just want the
+bug fixed and out of my hair and into a stable release, as it's causing
+regressions.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Let me know, and I'll send out a v3 if needed. But then let's please
+have that be it and move on.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-- 
+Jens Axboe
 
