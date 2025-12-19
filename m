@@ -1,99 +1,99 @@
-Return-Path: <netdev+bounces-245489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 413CECCF0F1
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 09:56:52 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BE74CCF10F
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 09:58:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 526313010CFD
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 08:56:24 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id 24CBD300E830
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 08:58:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DE432DA75B;
-	Fri, 19 Dec 2025 08:56:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED23F247DE1;
+	Fri, 19 Dec 2025 08:58:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P9C3HDJo";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="IkqYIwjC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Frhd7DbG";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ndkcv2dz"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92A272E0910
-	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 08:56:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23F49241CB7
+	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 08:58:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766134583; cv=none; b=enxfb2U57mBMLkkX15g0zeY2xiIGFfLPYuDkqP2rNYqyIKKCi160QVm2nthYyXy2iEFnrEociL3TxVkaexUPP3SMAPK/r1mLSechT2vc9UA64PNz6LDAcdGTNXc1nqL3w1Sy4WDG2wRHVULDP+hS4oL1QGOgGNlNwyM8Lnku6D0=
+	t=1766134685; cv=none; b=QEKWdi9tNsxerUCn9oS0vec5eww+FgAeNL0cAlKrECHJ9Z5YBigcaO/Hf5amO1LP0aVx77AyeJqIiztUizQYwDCQAQ53bfAladTYFzMucQ7Ulz42VmYDiVK0OFntLyhcuQsh8nW1HEpwdS8Mmi/zvz4kh5aEksFfGIeiB2M0BJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766134583; c=relaxed/simple;
-	bh=Eo3R8K9gss8aHXROU1Jlk39WBtUppS9+22tjosqU8CQ=;
+	s=arc-20240116; t=1766134685; c=relaxed/simple;
+	bh=lqdLSlV/+AAZvMvBSqFuAhhiAAi9gRXTfKrs46fdedc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=N+RXSfwyOtbd7oe9OetMapCHA/yiRl0i9Pbx/wbwlicRcAkpdpn4TF2dELpme3HsUsg/K7Eh4U66Z1phpku3gSMqLbXEfVzI6/5jCeRbQ93aQDPs4TLNqEJCgctt7GsjpvpMAQzwZDQmpDWSv7UPuMB2BTj7GHc6W/W5pF69Tyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P9C3HDJo; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=IkqYIwjC; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=pkrZOQ+S6NGXEFWDFtYWSbMEc+k82JxbFFRP/ZZvjZyas4BhmBkEzoBYUXMhmE7CE9G203F/5tZW/bnQvblgiU+xXQXY1sLJCDGfRc2o472WxgNgFGpZ0qininz/uIZCp+5jnEO8+pp19EHqdCHpIk2td//nTtNn/zWfbEAkXc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Frhd7DbG; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ndkcv2dz; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766134580;
+	s=mimecast20190719; t=1766134681;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=s+JMJ5VnFxbjB5KVqiESas8KT9IZBEfG1xzvLjV8WA4=;
-	b=P9C3HDJoW1CFcGy/hZ1P7MedhZvJ02RwDUDmYhwzwXr6eSdXopE3NspAoYFYJw8ql9gT8D
-	Zv7s8aZmvuHHbhNGo+GSh2zU8gJjetg04VEapz1cGWjoaS4nSBbEDXLfQaOb1UdTaaaM8Y
-	rpZePWPK0ZoV/OA6Pp1XyDB/1CyXkAQ=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=AJMoqd1fKO8OEBbwlJWa4SvNhhMZvfEzTXvf7u+dka0=;
+	b=Frhd7DbGjGPCMcdhdp09rrgELOGsA32Z/nxjibbKQj4Cal3haLodmbbP3OUeCjuZr+QSvT
+	AMLARzdVUsu0de9NOovSAu7dL1Ue+rqXywtvWlJLmH9Jhi1NgHmTpu5gqmQDvGLTWkyI41
+	V5cocbItyYFW5ySLY8gnanRkMcnjeLM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-241-6lcw-vnhNoG-ugSGuBZGlQ-1; Fri, 19 Dec 2025 03:56:18 -0500
-X-MC-Unique: 6lcw-vnhNoG-ugSGuBZGlQ-1
-X-Mimecast-MFC-AGG-ID: 6lcw-vnhNoG-ugSGuBZGlQ_1766134577
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-47788165c97so8353215e9.0
-        for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 00:56:18 -0800 (PST)
+ us-mta-631-ivTOqLZSMKS_YkPDl5U13A-1; Fri, 19 Dec 2025 03:58:00 -0500
+X-MC-Unique: ivTOqLZSMKS_YkPDl5U13A-1
+X-Mimecast-MFC-AGG-ID: ivTOqLZSMKS_YkPDl5U13A_1766134679
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-4310062d97bso683357f8f.0
+        for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 00:58:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1766134577; x=1766739377; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1766134679; x=1766739479; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=s+JMJ5VnFxbjB5KVqiESas8KT9IZBEfG1xzvLjV8WA4=;
-        b=IkqYIwjCIAX1/rPs8PhNu4m5stIJwOZa2aICHje55Fpp5nZRqWnk74BPCgW6L1pBAP
-         UVU10YtFx9pR30ASKU2l6OTa8UtyF5r4Kk7FSO3k4x8POvR7eCnuLJt3W8B4738AMolO
-         NS7pgDJVFI4xGMnA5AeuUOZoJ3G2J31s19mLq0xmK/XCwNRYEs5OI/oq+2s/OwfmJkwB
-         ozvpbdpdSyisGyaOdpKnDnwvvWB88qnmVW6FUWYy7jTArequpABFf8hlWKA3lIETkws1
-         b5e4IGfHiXNamm+D7f3w58KAR2Hc4q6qcAEmOZ1OsCEysFC7zyrMZTCQaqkOIWYBNmGu
-         Tgtw==
+        bh=AJMoqd1fKO8OEBbwlJWa4SvNhhMZvfEzTXvf7u+dka0=;
+        b=Ndkcv2dzxfjzgHnWSIQr0WMcd4J7T9tBBJIftDaTp8b+RM4+WP/QrXzFcxKJlpTBAG
+         F3HyFDYplKgsEweah0e205/x5Sq/thqHOuiqP1Q3CJFoPy05wC6JwwTRo0tuDGMZ6opD
+         qifTfnMWMO+wW6mTGWxvYMLBXq9ZdYh2w2Uz350zJAdT6n5H7WKxO58UCTnWsMOn5KZj
+         VrxTvzWxENaN2nnfZkSjXq/B7/nl/9kfcWG1GoviyTCPFE08j8qX2xQDGsX78qkQAkN/
+         7SNIsOJRrfvCkyQskvIqLd4QL+Jd8OGoVozLslMF3rggOgOZlxQTQEuzzei4miIemQqh
+         jxxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766134577; x=1766739377;
+        d=1e100.net; s=20230601; t=1766134679; x=1766739479;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=s+JMJ5VnFxbjB5KVqiESas8KT9IZBEfG1xzvLjV8WA4=;
-        b=pwPdRUAStuOXtP2zyOYg1VOLF81+HiLcyEn58dFeqcXMvnZSNwHDm4eywBt77Ik/yE
-         UDYTj0o6SiaIYSB1vvoJL6avYUNjWhHZVbHI4/ka5XT4mKOz38VPlG1cDGrCUr8PcqgU
-         4CVZ3p3RNxlkXaKhdF8k1LXRZoEHUBKjNRbVxvuVuF1VAY/TWhqtTrUDRmEBj7JmaaLh
-         Gsnusb/VMjZbz0HNLtoGtXLypvTP/BmIAwjy9pFc7tgNA2VmizBF3OeN3gTG/CxZs025
-         txrWXsq6Mv+BgjlXmJCju9fj62vVnsgi+DB+GE4CHZgwA2wupxU5HczrEgEHGqUllk9Y
-         fg8A==
-X-Forwarded-Encrypted: i=1; AJvYcCURW6aKIfSPcQEo2Sjaz2+vN+vxUTr0JaymZZEvyhJX0OvnjtoWgo3ciSpkNYWAUK4P3b7RNHs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyN4tGqyCIfpaF4BOHTOQX80zHaZ9VeQT0ld745ModiPXAG6NQ7
-	CQKvNKB9IcsPcGchiozNFC5/9qX7VGDqW+64imw6jxvxt9jt7NJhn2EnGFpZsnAfRoKZew5BNGO
-	qTYLK/0fMvTnniYA6hC6Ug0CtU4d1TSQzJsVofgGouQgyRFOV5t4f6RlCRg==
-X-Gm-Gg: AY/fxX5CBBM8WqoowhrCb/xv9Yw/HHyhTcNeiwvhXJvuzJzjBgUYJtk/pA1g9X3H48z
-	vfmB03ZVd/yufSaT04JSWJ8AjbFdPLoatExK2NjSQTaAbyYreUJj+rOliextvSPmSFC7LYMDM8i
-	2sr/Dft4Z2vrUlKKmXhhlyKg0/67UzrTDxKraaW06XftdJ/Pbmrtyfje0NvoLIv99OChC6E3+b9
-	vTsY8Dobfr4ZkC9YAvLbiUaVECccS8bMcZ3bD2tToLXE5rvvnS8F2krGBg64tfszBEyvzyeZtKl
-	7AHUCg+zVNwtEvx7E8iLPkHF+a8hL+BrlRn0vqV/WnqIO/i3dd1eldibXXhe0G4SAgCbTpAzfCE
-	9YFErA/7QnKlk
-X-Received: by 2002:a05:600c:4506:b0:477:79f8:daa8 with SMTP id 5b1f17b1804b1-47d1957da6cmr17214645e9.17.1766134577335;
-        Fri, 19 Dec 2025 00:56:17 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE2SopRIzfSkt9nakGLrDaY0xK/2S7FNdo1Fi24+qoNIbNZzNHch5Phee8ZaMOnmkm1HkCgow==
-X-Received: by 2002:a05:600c:4506:b0:477:79f8:daa8 with SMTP id 5b1f17b1804b1-47d1957da6cmr17214495e9.17.1766134576972;
-        Fri, 19 Dec 2025 00:56:16 -0800 (PST)
+        bh=AJMoqd1fKO8OEBbwlJWa4SvNhhMZvfEzTXvf7u+dka0=;
+        b=LYl+1Dk4PiywQukic74x8VttAX0Y1KrPWDrpNSenFNn1Ww1NWaewc4nklk6/4bEIly
+         q1b/LuzyR1ms+2hYgSOTkSG2NujKLEU2e8L4eu2CnWviLWomnJN2QX8AZ3nUPbGu0F22
+         WL+awoDCWPkLgvK3PRkfTp8J89xU44+RMP/DZJR+sgs0Pu+XPJqZSlQzEldkO2kdumgB
+         XnPyMK6D4KL2MJVSYJiaYFq3l0rHgpPFxGFl4dS73F/HiwMo6SKkNK53vL/7YGhJBlge
+         XTg3CNvhnXi/B06mbl3JOtMEjDcXNsrxDJliFVzyk6VTucs5bEsxRBItzfeApYslhaoW
+         6ldw==
+X-Forwarded-Encrypted: i=1; AJvYcCU8hq6vAeu4BG6IIql+5m1YUwEbuu6v4L3sQ4pNoZlRRgxpv9ezw+datzkFYgwOSy49+Mn4zek=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9w1b0ka7AqvEvyrejnZdgd+e9Yy3iJgW0MiCKIf7S0OM3oswt
+	DUzqyYcjaBn7pOZdYs6GtwCjZpH6GxCFKLG+k5YVT2xsMLG2y6zp9VGfBZO/xx7skjX5q+O9G11
+	lkhcNl/zuhbfCZNcjZ/kkW/i9IeAgSzXZTAK4Jg/ZJYaxB9lIWpLvTUk6mA==
+X-Gm-Gg: AY/fxX4xT4cFNGpo8uzk0RZlmLWeD4Mhl0z9w2b7tVr91T1aCRqRlSP2GFC8uih7BsN
+	eVV1d8WxOR8REvdrvO7Op5yrLfKfdGRRe8r6bQlnFp1gQi9SgTUDDohTQEp8Y2vYGtfPl2SJuY8
+	opDIdrMir7wXdciHYQRao9/vtprasXaiSxjeKlHEY1hYgFQrHPjWYvBlr0GIkOhtXGupEyN85r5
+	3AIEOJFLeKPFxpWvUKkzBc/7O3F/HzENX4hNrQBq7+MtGohEDdbSu5cwhJv+QF/lvVZNJLnqpTX
+	YvoI5xrZiJD2BofmblSe387NtWpLkrActWyNUZStLSDpuI9txXbS93cnenMVRj17gVGCLzqdz4W
+	iry3nQ81WTchG
+X-Received: by 2002:a05:6000:2dc7:b0:430:f449:5f18 with SMTP id ffacd0b85a97d-4324e50b88emr2398202f8f.46.1766134679126;
+        Fri, 19 Dec 2025 00:57:59 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFDZdQNlBKsvc8iTNlAZZskbFNld0WQ7P6WHIzHRIlQXsffoYDVBtRn4k62GVMfIP/FzJevzw==
+X-Received: by 2002:a05:6000:2dc7:b0:430:f449:5f18 with SMTP id ffacd0b85a97d-4324e50b88emr2398183f8f.46.1766134678751;
+        Fri, 19 Dec 2025 00:57:58 -0800 (PST)
 Received: from [192.168.88.32] ([216.128.11.227])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47be3a541d6sm29970625e9.8.2025.12.19.00.56.15
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324ea1af20sm3532794f8f.2.2025.12.19.00.57.57
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 Dec 2025 00:56:16 -0800 (PST)
-Message-ID: <71df49eb-ec13-4f17-9ee1-a2adef72f4d5@redhat.com>
-Date: Fri, 19 Dec 2025 09:56:15 +0100
+        Fri, 19 Dec 2025 00:57:58 -0800 (PST)
+Message-ID: <a9bbd491-28fe-4ecf-86db-629ac8a2d187@redhat.com>
+Date: Fri, 19 Dec 2025 09:57:56 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,26 +101,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] mdio: Make use of bus callbacks
-To: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Russell King <linux@armlinux.org.uk>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
-References: <20251216070333.2452582-2-u.kleine-koenig@baylibre.com>
+Subject: Re: [PATCH net-next v2 0/2] dsa: mxl-gsw1xx: Support R(G)MII slew
+ rate configuration
+To: "A. Sverdlin" <alexander.sverdlin@siemens.com>, netdev@vger.kernel.org
+Cc: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Daniel Golle <daniel@makrotopia.org>
+References: <20251216121705.65156-1-alexander.sverdlin@siemens.com>
 Content-Language: en-US
 From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251216070333.2452582-2-u.kleine-koenig@baylibre.com>
+In-Reply-To: <20251216121705.65156-1-alexander.sverdlin@siemens.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 12/16/25 8:03 AM, Uwe Kleine-König wrote:
-> Introduce a bus specific probe, remove and shutdown function.
+On 12/16/25 1:16 PM, A. Sverdlin wrote:
+> From: Alexander Sverdlin <alexander.sverdlin@siemens.com>
 > 
-> The objective is to get rid of users of struct device_driver callbacks
-> .probe(), .remove() and .shutdown() to eventually remove these.
+> Maxlinear GSW1xx switches offer slew rate configuration bits for R(G)MII
+> interface. The default state of the configuration bits is "normal", while
+> "slow" can be used to reduce the radiated emissions. Add the support for
+> the latter option into the driver as well as the new DT bindings.
 > 
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@baylibre.com>
+> Changelog:
+> v2:
+> - do not hijack gsw1xx_phylink_mac_select_pcs() for configuring the port,
+>   introduce struct gswip_hw_info::port_setup callback
+> - actively configure "normal" slew rate (if the new DT property is missing)
+> - properly use regmap_set_bits() (v1 had reg and value mixed up)
+> v1:
+> - https://lore.kernel.org/all/20251212204557.2082890-1-alexander.sverdlin@siemens.com/
 
 ## Form letter - net-next-closed
 
