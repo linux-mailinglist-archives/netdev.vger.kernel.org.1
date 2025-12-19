@@ -1,181 +1,120 @@
-Return-Path: <netdev+bounces-245502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95634CCF467
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 11:08:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 174E9CCF4C4
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 11:11:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id DF23D3090DC7
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 10:05:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A02DF300C6DF
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 10:08:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 264882FFFB2;
-	Fri, 19 Dec 2025 10:05:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E48BE1DED57;
+	Fri, 19 Dec 2025 10:08:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="GZkYxcI3"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="L04XhHI6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656CC2FF679;
-	Fri, 19 Dec 2025 10:05:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 040F62AD25;
+	Fri, 19 Dec 2025 10:08:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766138721; cv=none; b=jVrDHUI9yN2reoZMW2UNYvB05Wsorkkfvi9si929wq7FFB+T/7VH1ICR8URpImoVUQ5THAPfb67I41tl4uMsAPFEJtNhYjrHBQi3Nn37RYyYoGd3nzdJ8ozYR0bohqnsCs7uTg0WwnddJvJ4/tOz0yuRGoLrnLzhP7H5Mr1LQZ8=
+	t=1766138891; cv=none; b=T7ltRsfE8BH+L+UsuBgJSZZjGgsoeNxTwgVgVk2J+Duo3EbSrb7UH7n7z1v+dWGeln6CJ7Hc/XRJw8+v/EAuz05Ee5aq0xFyD2E9S8/OsCw5mnwYC/56rz9NTUQwnsXRMWe6gALefnPHpFnQ67E61Gb9I+Q3irYIVCEJuMzYHtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766138721; c=relaxed/simple;
-	bh=qvTbJcH39/BFQ9aHwMDRIzLhdc64pAOoaNQwNrs00CY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jrLCMWUb5N4jqE5+YQG+5Yi0BLhyS0aSIhF7ShPwizFeziATG5lTZJFx+rq7oi8dmWtU6tl9hzl/8UAl0XNSolkAYsQH1a90GV+KBIdzqpoFy5ESesV80Bk8BKIOklkusYgELlsxGIuhpmTEoe4EVgWxq2GcWYeAfnEoTqmq0h0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=GZkYxcI3; arc=none smtp.client-ip=67.231.148.174
+	s=arc-20240116; t=1766138891; c=relaxed/simple;
+	bh=UWbq08b0Hpu/lBLQ5OAmgYM6EFjmL0dDAyx92j59vyY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=d15z7EoD1IrItXU4qMUHMsI51V/nwhzQogFYMmbiPM9D++P3r3i7kKqaa6bkHef16TKkgSKdlSHJzj7E8z9j147eqQZtV7EGRtuqX3OHBrLxrFF4YV+Ci7bhiigGdpthswDYuQya1D3X2vWozC0jZBl8lp86FUlDgnfyAeZqYaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=L04XhHI6; arc=none smtp.client-ip=67.231.156.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BIJjX7F680014;
-	Fri, 19 Dec 2025 02:04:28 -0800
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BIJjQAV748899;
+	Fri, 19 Dec 2025 02:08:06 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=PBVYq6yiFYv4b2SACgENr1E4a
-	Ni8XV0ZxgX0rcrPAGk=; b=GZkYxcI32MsTUBg2UvzK5NVBdaP9s6EUH2N7B5ULg
-	ftMRdepOnYCwhmb1D1RXEG/z94J2UNi17ZBGYk28TpW0oORIqIg3saITvRnKp8RK
-	7EZoFdFD5egHgU+aZ/WxjeCr8Ux+kb2SP3cs1irViVgC9xb0gAl+EbG2zojCS6Fs
-	0WrOzctKwU4hcHMpCr5MbjrBUExFskEMMJX/ztKVZ148IWHraZV4SfKD6xtWKl+R
-	MRBW2xfokm20sRFIwXgdAS+u9U0SKtwI096vrEOD53NC6Rqhbw+5vb38U7OubhBC
-	eEBr/DcwMrgFSxHQuD4/2tCqmxNwa7DMlLtHWqOdcZvNg==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4b4r241eu1-1
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=eJ65JwEZyEnGBzukli50p+w
+	fdVbbv2fbYNyp8+ZXVCM=; b=L04XhHI6boVYryUM7Dwlca77Nof7uefGLxoBIH9
+	u6pLV3FHF+Ar7SI82ko8ao1RqijXytvMkd3qreL9yqJ6CgZ67mq8p8tiFuGMw1Oh
+	LZ9x2wlK7NwjtnJTV6cpjy/9ttUKuut3/qkbqNVtJTMN2N4xuWXrKDYWc4KxaCTY
+	4eiXpHPVOOWeqW8g+Prc0lKoPhFQpHR0axX9idEl1n4XdInJY+iyiaXrVfiocGwC
+	1G0xht65kbTGE+JE6lpXR/fzhP6tPicJJrPNSSJYNEKFLN1v2Nv8uqB7ig1/uJy4
+	GMjOe6K4TRVc3cZJucR84gfQEbeyPpeAzwku4KEmV8UhMrQ==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4b4r249gej-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 19 Dec 2025 02:04:27 -0800 (PST)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+	Fri, 19 Dec 2025 02:08:06 -0800 (PST)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Fri, 19 Dec 2025 02:04:40 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Fri, 19 Dec 2025 02:04:40 -0800
-Received: from test-OptiPlex-Tower-Plus-7010 (unknown [10.29.37.157])
-	by maili.marvell.com (Postfix) with SMTP id 56EA15B695F;
-	Fri, 19 Dec 2025 02:04:21 -0800 (PST)
-Date: Fri, 19 Dec 2025 15:34:20 +0530
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: Wei Fang <wei.fang@nxp.com>
-CC: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "mcoquelin.stm32@gmail.com" <mcoquelin.stm32@gmail.com>,
-        "alexandre.torgue@foss.st.com" <alexandre.torgue@foss.st.com>,
-        "ast@kernel.org" <ast@kernel.org>,
-        "daniel@iogearbox.net"
-	<daniel@iogearbox.net>,
-        "hawk@kernel.org" <hawk@kernel.org>,
-        "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
-        "sdf@fomichev.me"
-	<sdf@fomichev.me>,
-        "rmk+kernel@armlinux.org.uk" <rmk+kernel@armlinux.org.uk>,
-        "0x1207@gmail.com" <0x1207@gmail.com>,
-        "hayashi.kunihiko@socionext.com"
-	<hayashi.kunihiko@socionext.com>,
-        Vladimir Oltean <vladimir.oltean@nxp.com>,
-        "boon.leong.ong@intel.com" <boon.leong.ong@intel.com>,
-        "imx@lists.linux.dev"
-	<imx@lists.linux.dev>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-stm32@st-md-mailman.stormreply.com"
-	<linux-stm32@st-md-mailman.stormreply.com>,
-        "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-        "bpf@vger.kernel.org"
-	<bpf@vger.kernel.org>
-Subject: Re: [PATCH net] net: stmmac: fix the crash issue for zero copy
- XDP_TX action
-Message-ID: <aUUjJH1tQkN1UcYL@test-OptiPlex-Tower-Plus-7010>
-References: <20251204071332.1907111-1-wei.fang@nxp.com>
- <aUKPHdtAPDnMqB7X@test-OptiPlex-Tower-Plus-7010>
- <AS8PR04MB849779A6392D543049A3F5BE88ABA@AS8PR04MB8497.eurprd04.prod.outlook.com>
- <aUOddielBMkrmwhd@test-OptiPlex-Tower-Plus-7010>
- <PAXPR04MB8510499B65301187736D511088A8A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ 15.2.1544.25; Fri, 19 Dec 2025 02:08:05 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Fri, 19 Dec 2025 02:08:05 -0800
+Received: from sapphire1.sclab.marvell.com (unknown [10.111.132.245])
+	by maili.marvell.com (Postfix) with ESMTP id E71A15B695F;
+	Fri, 19 Dec 2025 02:08:04 -0800 (PST)
+From: Vimlesh Kumar <vimleshk@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <sedara@marvell.com>, <srasheed@marvell.com>, <hgani@marvell.com>,
+        "Vimlesh Kumar" <vimleshk@marvell.com>
+Subject: [PATCH net v2 0/3] disable interrupts and ensure dbell updation
+Date: Fri, 19 Dec 2025 10:07:46 +0000
+Message-ID: <20251219100751.3063135-1-vimleshk@marvell.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <PAXPR04MB8510499B65301187736D511088A8A@PAXPR04MB8510.eurprd04.prod.outlook.com>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjE5MDA4MiBTYWx0ZWRfX9GQmj9XB3SQL
- oH49VqzVFggN9rADC22341hevpvUlzCz5zG1MrgQuOsIMCNzc3+yjg5UdZhOVtkK4q6l8G3zdXY
- 0YrrsVUl2BmGnuRzGZujnJcMgtei4YwiBarLbJV7IJV9b3uwcAAOyOVhouAm9Inr25xZLPjTA+a
- JaPOlv+y1Gydv5xSuOc6A4/xsj4bYcDmU9v7F0q9bL8PwuMdzTX2C3QcpqTaNESo6ESjdLGnSQC
- UDOuFH5DTivmNSZA2j3S1tkFyrkRoKC4HpGf2brlqlFV0CzjrhplEEo1houxaNc50opKnfnSY0P
- UOGOX5Hnn5YvpB6OVT8DIQY93acypB0IZys4mklgv0j2nCVseYUkFi2ga82EOKJE72itirstiHr
- rEg3oD15Mm+229wHkEpCPXIGfjXRkwFgOKUVvMEJpIfH3pl71JKD/3c/WDzv6H5popQK4puDPER
- +Dd2qK9AGNJtDewE/Tg==
-X-Proofpoint-ORIG-GUID: lly9dLQ9twDymCjIyijl416JTD7HhVSR
-X-Authority-Analysis: v=2.4 cv=T4uBjvKQ c=1 sm=1 tr=0 ts=6945232b cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=w373o-ZMvzc93a0z:21 a=kj9zAlcOel0A:10 a=wP3pNCr1ah4A:10
- a=VkNPw1HP01LnGYTKEx00:22 a=8AirrxEcAAAA:8 a=M5GUcnROAAAA:8
- a=DZSnwkNSkk__NUsnbCUA:9 a=CjuIK1q_8ugA:10 a=ST-jHhOKWsTCqRlWije3:22
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-GUID: lly9dLQ9twDymCjIyijl416JTD7HhVSR
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Authority-Analysis: v=2.4 cv=csSWUl4i c=1 sm=1 tr=0 ts=69452406 cx=c_pps
+ a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
+ a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=M5GUcnROAAAA:8
+ a=p6aAtTO9TJaHXOhTCywA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjE5MDA4MyBTYWx0ZWRfX5bizsohWjY3P
+ AUE1olgePqkYRSlIJjqe2C1GrCybSjusrW7K7hOHvfWBxz4Fzr8Azc0Ryr331FoNbQofHF3cTq7
+ xsKbi5h44wjgD15lRZj6d5iLOX2NAmxYWYgvlcDc2OsiBnWmZud+b9ZebDZdCpk2Kg0U0clQmdS
+ 6bDDtBx4SOWOWuLDmyXhG9nwrHkHBxx/ZgWi8TcMCtsdG7Nvp9cxjVKH50NnzXAvS+QbpMPVRWq
+ iAEvqJWBwVjFs7Jej0y3r0WCzsX0TAC7BPg/d1e5ZGmZNyJVMDAd2wr9C8Yf/1VjANkFdQHcXv2
+ ZO2QShYshvx8kco4k15N7A5knEgvkoYom7Zns0/s9C8YyUzRxAdaPcTMuloyeS19ujIQmLc/Jmx
+ YGDC/5I5WkGvBvqfgIao3ckbzmvFw36V2CwzzcANceVsehjxgYlVvZD+uJXKuySrXURKvP31oZl
+ WrKWLPffy8a08LhjpCw==
+X-Proofpoint-ORIG-GUID: Vp42G9qEXQsaNBAFpgLvCg9uc9H66B5g
+X-Proofpoint-GUID: Vp42G9qEXQsaNBAFpgLvCg9uc9H66B5g
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
  definitions=2025-12-19_03,2025-12-17_02,2025-10-01_01
 
-On 2025-12-18 at 12:06:47, Wei Fang (wei.fang@nxp.com) wrote:
-> > On 2025-12-17 at 18:19:19, Wei Fang (wei.fang@nxp.com) wrote:
-> > > > > -	res = stmmac_xdp_xmit_xdpf(priv, queue, xdpf, false);
-> > > > > -	if (res == STMMAC_XDP_TX)
-> > > > > +	/* For zero copy XDP_TX action, dma_map is true */
-> > > > > +	res = stmmac_xdp_xmit_xdpf(priv, queue, xdpf, zc);
-> > > > 	Seems stmmac_xdp_xmit_xdpf is using dma_map_single if we pass zc is
-> > > > true.
-> > > >         Ideally in case of zc, driver can use
-> > > > page_pool_get_dma_addr, may be you
-> > > >         need pass zc param as false. Please check
-> > > >
-> > >
-> > > No, the memory type of xdpf->data is MEM_TYPE_PAGE_ORDER0 rather than
-> > > MEM_TYPE_PAGE_POOL, so we should use dma_map_single().
-> > > Otherwise, it will lead to invalid mappings and cause the crash.
-> > >
-> > >
-> >  ACK, found below code bit confusing
-> > 		case STMMAC_XDP_CONSUMED:
-> >  			xsk_buff_free(buf->xdp);
-> > +			fallthrough;
-> > +		case STMMAC_XSK_CONSUMED:
-> >  			rx_dropped++;
-> > 
-> >      Ideally in case of STMMAC_XSK_CONSUMED, driver needs to call
-> > xsk_buff_free.
-> >      And in case of STMMAC_XDP_CONSUMED, driver needs to call
-> > xdp_return_frame.
-> >      May be you can move all buffer free logic to stmmac_rx_zc with above
-> > suggested
-> >      changes.
-> 
-> For zero copy, the xdp_buff is freed by xdp_convert_buff_to_frame()
-> when converting the xdp_xdp to xdp_frame. So STMMAC_XSK_CONSUMED
-> means the xdp_buff has been freed, it tells stmmac_rx_zc() no to free a
-> xdp_buff that has been freed.
-> 
-> I have added a comment for STMMAC_XSK_CONSUMED, see
-> 
-> +       } else if (res == STMMAC_XDP_CONSUMED && zc) {
-> +               /* xdp has been freed by xdp_convert_buff_to_frame(),
-> +                * no need to call xsk_buff_free() again, so return
-> +                * STMMAC_XSK_CONSUMED.
-> +                */
-> +               res = STMMAC_XSK_CONSUMED;
-> +               xdp_return_frame(xdpf);
-> +       }
-> 
->
- ACK. 
-Reviewed-by: Hariprasad Kelam <hkelam@marvell.com> 
+Disable per ring interrupts when netdev goes down and ensure dbell BADDR
+updation for both PFs and VFs by adding wait and check for updated value.
+
+Vimlesh Kumar (3):
+  octeon_ep: disable per ring interrupts
+  octeon_ep: ensure dbell BADDR updation
+  octeon_ep_vf: ensure dbell BADDR updation
+
+V2: 
+- Use BIT_ULL macro wherever applicable.
+- Format code to avoid line exceeding 80 columns.
+- Use ULLONG_MAX and return standard err code.
+- Place limit to unbounded loop by adding timeout.
+ 
+V1: https://lore.kernel.org/all/20251212122304.2562229-1-vimleshk@marvell.com/
+
+ .../marvell/octeon_ep/octep_cn9k_pf.c         | 15 ++++++--
+ .../marvell/octeon_ep/octep_cnxk_pf.c         | 37 +++++++++++++++----
+ .../ethernet/marvell/octeon_ep/octep_main.h   |  6 ++-
+ .../net/ethernet/marvell/octeon_ep/octep_rx.c |  4 +-
+ .../marvell/octeon_ep_vf/octep_vf_cn9k.c      |  3 +-
+ .../marvell/octeon_ep_vf/octep_vf_cnxk.c      | 25 +++++++++++--
+ .../marvell/octeon_ep_vf/octep_vf_main.h      |  6 ++-
+ .../marvell/octeon_ep_vf/octep_vf_rx.c        |  4 +-
+ 8 files changed, 82 insertions(+), 18 deletions(-)
+
+-- 
+2.47.0
+
 
