@@ -1,254 +1,215 @@
-Return-Path: <netdev+bounces-245531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C310CD057C
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 15:45:26 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89DF0CD0555
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 15:43:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4020630A7497
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 14:39:54 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 0D01430335AD
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 14:42:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF8A2329E66;
-	Fri, 19 Dec 2025 14:39:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="BD/A165k"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9962324700;
+	Fri, 19 Dec 2025 14:42:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11012020.outbound.protection.outlook.com [52.101.66.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f80.google.com (mail-oa1-f80.google.com [209.85.160.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 828B1246BB2;
-	Fri, 19 Dec 2025 14:39:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.20
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766155193; cv=fail; b=sbb1NTxq9ueFQPDdjefEXhrpffgpMDoJsZGeWFvAFstGCYUr7+xOeQiluBWD7RoLe58UJ8Oo21lxCTFr1NWKjm4qPE452BSdiLL26rKh0FDcEDCuH78F+xxIf2FBf38fiqE9+BjgKyxIoc+1blvOxco309aGxW6e+sQOqwmY6Zk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766155193; c=relaxed/simple;
-	bh=kXgiYrON4eiLK3kwKNVNWO6DcEY9pVjtvOqtd4dnjPU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=d2xty7j0p8EKIoaGk7RS40s/wQ3QyRs3XDGY2MNPWnj4Iu6o5qSrMV8P2330e1XBLT5QPiqd9WBVZm3WXPsVsyVHWwgvo5ABRQu438PTs9MubCeSaD5RbasCS8V5UkM/W/pmcebrJn7fFcRPIYQ5FS0jqJ6HQ/DF0YFkIMfvJSU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=BD/A165k; arc=fail smtp.client-ip=52.101.66.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=VNSrWKc2SC1o3LGZQkh2EOaVzwa2vV7gN2XUvKyQT1h/n4d1NPcvpFzrSrgE6HwcBfWZCDdOxK1RaOAu0wBdwnqFQnaZ93zqiyc1j6sMIijaO1CBANAv9k30IKgOegt3kQm/pikUDl86FawP2bxsTHoYgIctl0q58/ivLV5Z2UKBis944Xsu1aNsdmjz7K0fC/m/lQH46NODe6yYZ38xoJEWYIFAaL31dveEOiwSQmGYoX+dSYqcwtBVTP4FgEChY/cUoMfAJpp8Fg42WJy7K7s//rtn3Jl9dmkjx3OFIQuPyUawaxTJVGzekrcja2MffITDoSvzvV2LHyhqEWOYJg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QUmXneIOMNJssUKDzBnJUFF/ilxJ4V+kQyoHRIal90E=;
- b=Y6wYukoCLrHFy8fYBFhjQMAyPW1cT9h+6J4fsVwbgy9pQThgKOvopgyVCFrjNKpR8iy3ZyqAlJLgcSyfsLrUK6BauxiVdNSB9JOlVc8D/0TNoeOTE1oawPpenFZSs3tsC6FuKPzwRyaIQwDIHMaHWxVeJyXlM+Xs+QifwxhWhkJYE0iZIyvzlTbpTLdgsWSFSslSfQu7DyYyXo3RP103TCL29lnMk8mdtZRhRtVyTwSLoaKyNot05XpzwUw1HUI6VcJFCmepDSdle5t3EhV24il/CkiZsBDv/6b4Ce38KukPmEc5HjozOvLE78YLqrQ+jhVemDXeS9gQfRgNPakDww==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QUmXneIOMNJssUKDzBnJUFF/ilxJ4V+kQyoHRIal90E=;
- b=BD/A165kt7g/V8Li8DpVb+0UCup2r67iHqWptyn1z+Fn19XVCeXzYy7C/54TdoNYQiUAbEPa9nl2j5TAkvenKvf+jZSYJFBXrC+bCqclJ7zxLfaAjJeYFVDnXUqUmDfdOv6floxBJWRosO7IM3fopZc4xEK6qZd886TBnlFHcFvrtI6MnCXqkulBN0U2ufRSqMq3FCNrcVDMwDuwAjyBIHt9WIRMZREHbh1DRnJtnxrfOM37jCI9iichgijao9dB5sI0lSDLPePpIX36MTPI8ns08Sl+emh2tUIa56ep40Y6AQsQbKK1pURTES37ahVsUb68SG9lrq1AJqIJ55OsVQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from DU2PR04MB8951.eurprd04.prod.outlook.com (2603:10a6:10:2e2::22)
- by PA6PR04MB11951.eurprd04.prod.outlook.com (2603:10a6:102:515::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9434.8; Fri, 19 Dec
- 2025 14:39:48 +0000
-Received: from DU2PR04MB8951.eurprd04.prod.outlook.com
- ([fe80::753c:468d:266:196]) by DU2PR04MB8951.eurprd04.prod.outlook.com
- ([fe80::753c:468d:266:196%4]) with mapi id 15.20.9434.001; Fri, 19 Dec 2025
- 14:39:48 +0000
-Date: Fri, 19 Dec 2025 09:39:37 -0500
-From: Frank Li <Frank.li@nxp.com>
-To: Koichiro Den <den@valinux.co.jp>
-Cc: dave.jiang@intel.com, ntb@lists.linux.dev, linux-pci@vger.kernel.org,
-	dmaengine@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	mani@kernel.org, kwilczynski@kernel.org, kishon@kernel.org,
-	bhelgaas@google.com, corbet@lwn.net, geert+renesas@glider.be,
-	magnus.damm@gmail.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, vkoul@kernel.org, joro@8bytes.org,
-	will@kernel.org, robin.murphy@arm.com, jdmason@kudzu.us,
-	allenbh@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	Basavaraj.Natikar@amd.com, Shyam-sundar.S-k@amd.com,
-	kurt.schwemmer@microsemi.com, logang@deltatee.com,
-	jingoohan1@gmail.com, lpieralisi@kernel.org, utkarsh02t@gmail.com,
-	jbrunet@baylibre.com, dlemoal@kernel.org, arnd@arndb.de,
-	elfring@users.sourceforge.net
-Subject: Re: [RFC PATCH v3 22/35] dmaengine: dw-edma: Serialize RMW on shared
- interrupt registers
-Message-ID: <aUVjqbk1tQjJ1AEh@lizhi-Precision-Tower-5810>
-References: <20251217151609.3162665-1-den@valinux.co.jp>
- <20251217151609.3162665-23-den@valinux.co.jp>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251217151609.3162665-23-den@valinux.co.jp>
-X-ClientProxiedBy: PH8PR02CA0014.namprd02.prod.outlook.com
- (2603:10b6:510:2d0::6) To DU2PR04MB8951.eurprd04.prod.outlook.com
- (2603:10a6:10:2e2::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1072C279358
+	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 14:42:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.80
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1766155346; cv=none; b=oSKwz2PBGqJWA3lVOg9O7c/dkwmsi5LGvCswXJ3UwdcCzgV8QGC4gFwe49iAANjmU7465Yq5TWaIvi3iiUfwoAJdVy6pKNqB0rnowWNbs33FJ8txyiE8w+aCT7Zf5bmh9I0Jmqr7DbAreOf/p4tvqV00nVfHa5bhmZkgbXqWebY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1766155346; c=relaxed/simple;
+	bh=6B4MyvS1hNUCMEQCMxIvsv5fBOybaaqj2n49TeA3h6Y=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=UCsX3q7AJmKsDeotDGUuKYnBJbUog1zxzT9nwm0VE3nFf+0csVhb3+gnS1EhefElULaGPWFOIugp11VkjfWwf5PJhuRm9p61G36y5mGHFD3Syl5RL7n80j4VTJc5qrg/ffidaJgRG9aU1152jMW4hKQee5lloER5x2vMaiePPjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.160.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oa1-f80.google.com with SMTP id 586e51a60fabf-3ec31d72794so5602126fac.0
+        for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 06:42:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766155344; x=1766760144;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SVj2wIEZZjG0CS/zcv2WjJgasxf2+VT5dyS4d3f0uVc=;
+        b=kaVl9QFI5+V+z3YhCLkNROr21XIiU7G95vgKW+iHL2EB/JXjDZYGB7U5vQxJZyNwp2
+         +tjkDvSIONqg1WbBKdUMaqYDp8Ed+2A4xgoXrVTZ5oB+lrn54NAg3ZBxnGSYYJmZVepY
+         3P3Q38xJqLewDKzb4a9u6cwwjxouVdPlpXzeyHb4T4G+ske4AqEs/n7w/5JLvMGpxQvj
+         HP2pEqUp6O0bpFxup1w6zHorujfC9hltwgIO9JFbmpUc/889eGC2KbH4KVmaIHZRy07u
+         YHfSiFqXEim6QQn3P7j2RIV303ocr8E35/6YGA5nqNuzD2Unw16LXse+H0J0rqFioY/o
+         adbw==
+X-Forwarded-Encrypted: i=1; AJvYcCU/X0Jg4N9kOW0XyPLr3GEu9yybtemsXbmRf6u6MyEPEXkG5CiCDfPUCM5vUPaU0qsq9nnMcyw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz95s/N/dPZ7nUSR4FsVbIIwq5WbK6k8YQVePbQa2SXBpHfx0T/
+	3oL/w82fcDsBZz18PfT67RcXUe0W4IeFjuYHjOVh7ejf/HiH3Pk5aGoCrDgCyHvDLzPN9KtPhQP
+	sBJg9+yHHFDTPN3CGwLA0BWS1Xuk5/6pl9e8mbMHkBOa6DYndp3gsOtJU9bs=
+X-Google-Smtp-Source: AGHT+IHb29t8haQdVrH3Nj2h5m4tc30WKXaZQWALhg109mgIzQRUeYOm8f2M9hniN/DXeHX6BTZlA0rlKJFLt/dM8V5B6rcrP/sM
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DU2PR04MB8951:EE_|PA6PR04MB11951:EE_
-X-MS-Office365-Filtering-Correlation-Id: 583aff54-c4cb-435e-0af6-08de3f0c75d6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|19092799006|376014|52116014|7416014|366016|38350700014|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?kI2yZcALdUY66vAuoCLuUa7bzhBkDlPA+ERbDpBDKkDqPFEjOuCW//xwqNjb?=
- =?us-ascii?Q?CH8U6dUgI6Lwi5/gSkLK9INmxQCcdLgcRHFuQ4/NtjnGLPXXYDO+K5UC8GT6?=
- =?us-ascii?Q?4aW063owhyK1LD0raHDdaCFFiMghuS2nCbbNRJJgHDndvvghDESLrCVP5xZ6?=
- =?us-ascii?Q?IiyQXPGKEpdakenJoArvuB5XQLnM2pled/Fp3E96RA/gAwpqvFsf6oSDJuaS?=
- =?us-ascii?Q?zMRcqU0e05ZUCgj0NRUS4tBYFh1Q7shun7cQjXL7qhzeOmHO0S+HDksIYHe1?=
- =?us-ascii?Q?dxDAB9VmrI6nOrE+ZjvPfez7r8JtFCW2tq0AkZLCwvQvswsaDgEKRpBp+4Bd?=
- =?us-ascii?Q?JMvXxLE/l3BTCBYiHOdyQXnR8GWofO1+sVTIuVMNBOlKoJKUQk3YbMiA8h8F?=
- =?us-ascii?Q?t4P4x9FbMul7Mv3qJkwT2gzeS65FaQIIWN17E3wAjh2F0UicKeAzjbfX5cuO?=
- =?us-ascii?Q?6/lBby4Sc+MZrik2DAw3kMCktdV1yy7wnw3CKsLEIuinp4Qq6FYSMmPj5hYG?=
- =?us-ascii?Q?wIKdFAcCANVjj2VRQSxTG7nbSARmU69s6/QVA2/Xz+AA2LIwQCOa3q/bVlUH?=
- =?us-ascii?Q?qmScRFCHsGN9H1NR3W6Z/W8hzK8B2BcZOsyCzYIk7dH4zYJxokWe2EGjD9HW?=
- =?us-ascii?Q?gNdgLl9g0S7AE/OBduKGyeRNKmP2FNl21aQpwMZCi3EkrT4s8nWr2CbmLrNF?=
- =?us-ascii?Q?bM9oPVn/bBdsyaGNDOE6rzU8lpS6gZp2/M2vFbNkMdiCQtamdSRqvJHiXL0y?=
- =?us-ascii?Q?eHrCcHSuhHPhsEIWXNfJCfTXkscTbe1rhQWi9W520kJ806kA/cbN/ZX/2TF7?=
- =?us-ascii?Q?OlRsObLlCwUtgSC4GuKY59G+YxBw2dy9c/bz8CP3G7MH0kLWAbpPIu/ok7LT?=
- =?us-ascii?Q?8f/m54gjJUDxaPtd3J8R2tNxVjZqU9cH0TIl+qsDFMrOGZTXLBZ0wPNiEvp9?=
- =?us-ascii?Q?+HktcV+uVHAGZVc1bn3GJnFhczlguZsnt4ZS80RU7l/OxQP8zx8f8OA0PmAa?=
- =?us-ascii?Q?K6ASO5SDPtK6Zoy6gcxMC02VdXP+bA58gIMzUXtLYrljYoKBl3aSrdlTmEQj?=
- =?us-ascii?Q?ZVuOzvYmlJSyQxIAC7IeDu+3ln+91ov2nCTntC7deq/Yah92dvJhsDmPJyuh?=
- =?us-ascii?Q?wVJoDGvgbwV1ReUZ7wEwKlYXKB0tlPzfjxTk3af+9YI33YyEs8ObEb1GqY+z?=
- =?us-ascii?Q?dt83ixRaCyUtnlPxj1IZTaB/0ctCtDj1TGwQ95suWpAR1hBkg7eZ0icu8o5v?=
- =?us-ascii?Q?3nOyV4VWyveRMRhPYX4ZD7Wom3VE92M7vV+ykC/EhrLVx9PosSkesZLid4PO?=
- =?us-ascii?Q?zioz+/l10MMKu7PZ84lMLVHdc+6PpFDIDAS0u7vJRuzOpPBa6eT0ST9JmBgP?=
- =?us-ascii?Q?mhNoB7gU4M/P7iWECaC/YYhVkvmBGBp4BnC9RIEAn3hBDKWL6t83KsPoMCwG?=
- =?us-ascii?Q?S0CaKjkpYRaYhKytXJMuTGuSSAu5q8KqfDX89j/N4EE0QyBQ1Wob6v30rdgI?=
- =?us-ascii?Q?aXzp2aiiNiDh9zLu5nuX21sBcLXKUjhPQ+X2?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU2PR04MB8951.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(19092799006)(376014)(52116014)(7416014)(366016)(38350700014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?MPZas5xSKfkgLPddC6taeiVG4/YXRWU+JuEKyD+NIrX8ZXkcpdJaDN8+jpPR?=
- =?us-ascii?Q?PWHH4p8SUjsOgpySthic/rWlCgz9qg8Vl4pLm2cRNR0ilc4DikInxMxPWJ0E?=
- =?us-ascii?Q?eFgBiqMStnY8ESvXDNWEXDAQjBwcyobLf03NVGH0SlJMHwVaYXB3MRh77Yjt?=
- =?us-ascii?Q?8zekz63NZysf2MTRFjomTwYEtyEe6zEHUx8Mv+37Bra+YGU1OziY+CNUMTiJ?=
- =?us-ascii?Q?job4Uzy7iTos5DMsXToUzL8j534p5OqKrsRbV5b0MUj3ODmMWEQ5M/FxOeHb?=
- =?us-ascii?Q?yUnGWyBb1n38VN+K55vfDgUvGVCZyZUXPkp1h6LK/aFBPnG/xw2RiZBxExdZ?=
- =?us-ascii?Q?kpSIW630j3RZ5BedimqmZT2SiUIFmrVJ0rlfMIYqm2VI7Vg3QpTR/xADaIyV?=
- =?us-ascii?Q?OnTuLsqcbkp/OCw1SwOgArnGgeBjOrytKliOfSCRM7aRaklBreYwhY2Cj0rX?=
- =?us-ascii?Q?C0KJ0QUKYfW2WnppeRCeXqKD0W4PoSORcqILNoqRdZAjFHrgLb+bNK4dyz+Y?=
- =?us-ascii?Q?1a5RyYVk5HW5lYK8AVlvIgGueUniDHuMJAYw/C5DKATqSr4LuBEJVeHViOjb?=
- =?us-ascii?Q?qKRjHHr+0hiEl/t7QsazC13HgyHfuDyt0IgxymqsJ3TcifD7RiIUw1a+zi6U?=
- =?us-ascii?Q?eRwWAAIT5DR2eUA9QAdYQPz/CiuyOcWCDuwrTD/L7AIFYu7V+BaNqncIttHE?=
- =?us-ascii?Q?JjGxk+FYRqgZ0LImjMDdscyGiGvlZDscbAAM+hL60sb//9JbKrD4kIShdKwx?=
- =?us-ascii?Q?E/Y0Hq0e1g2COJiKOPeGl8sAtCSetiTU3GUB/JBW3/A/AXh9sQyQ2cek3llv?=
- =?us-ascii?Q?P46unD2OjdIr5yQp6glWKOoECHiyMLvMCbNX+CNYLX4btfaaxGfXYaUQFmMR?=
- =?us-ascii?Q?yXTRSpeP9vt4bTavgy+Ssge6aaYFERZKB+D6jVfneBNmbXxNsj6DPfoiMyaX?=
- =?us-ascii?Q?c6ojd8gpFV57VkpzDzRMOgv98UXEqTOgvjE1l4JsS6APZop7J5ofta+GK8aJ?=
- =?us-ascii?Q?1myF2tLEQkL593Sm2VDUveRUCBPDOFW+c67Ui/MaGIaybn0jFdMe2wloq72F?=
- =?us-ascii?Q?PwtfWKveDxBj1JnRpwgABG1QmnE492U2lqDNyH8DJq9fmKyHIolGSHnGooBm?=
- =?us-ascii?Q?QMtjXJy7JyoBKC3gYLq3jy1rHhX6aSjxtvF17hwT1xzcEF8vkAnxC22lQmFU?=
- =?us-ascii?Q?SfKrHHWDktMzLwjTxzrWxQ/o7xyO1/PH8YiSD5DRkcsMRdYPqAcKiPpF4lvO?=
- =?us-ascii?Q?s3ecKCofjq6aeJ0EBRY8opEEwVpN7woeucoUOl5UTYxBGhm145B8JrHCX0jp?=
- =?us-ascii?Q?+NxThXst5EImmFbXgkplOpXdqh1URiGjiBBsMzbejPKUq6QzMMhBs92h5V0d?=
- =?us-ascii?Q?+xmxebNLxyCC2R4vO06pjnJHibrqSD9ZIYvt9W66pb5MpbEvkJaXCoTkDT1a?=
- =?us-ascii?Q?PSo7iXTi/Ee8yDgiBM1r5WNsDN6LJaz8AacQfm40lFy9S3ZKOo2hz1fo15eX?=
- =?us-ascii?Q?N1dWNKcKAwbP1RtreFjnTVv9K7Ko8/g+rfTELRQaJh18KVjQfo67N0m9u4D6?=
- =?us-ascii?Q?WoMpEh2Xvoqg9bk2SDiY0nt60i/pCEtFYOOToIiK?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 583aff54-c4cb-435e-0af6-08de3f0c75d6
-X-MS-Exchange-CrossTenant-AuthSource: DU2PR04MB8951.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Dec 2025 14:39:48.3604
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: X61kZzpJ71BUMGxLnRWacvtmuwBL3sg9VautrykprB+AaZRMt3y9wjokjNsxdrrswZzCK8JqqTyuiEW4iB0HSg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA6PR04MB11951
+X-Received: by 2002:a05:6820:328c:b0:659:7cb2:78b1 with SMTP id
+ 006d021491bc7-65cfe666db9mr2213580eaf.4.1766155343957; Fri, 19 Dec 2025
+ 06:42:23 -0800 (PST)
+Date: Fri, 19 Dec 2025 06:42:23 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6945644f.a70a0220.207337.0113.GAE@google.com>
+Subject: [syzbot] [net?] [usb?] kernel BUG in dql_completed
+From: syzbot <syzbot+5b55e49f8bbd84631a9c@syzkaller.appspotmail.com>
+To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+	netdev@vger.kernel.org, oneukum@suse.com, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Dec 18, 2025 at 12:15:56AM +0900, Koichiro Den wrote:
-> The per-direction int_mask and linked_list_err_en registers are shared
-> between all channels. Updating them requires a read-modify-write
-> sequence, which can lose concurrent updates when multiple channels are
-> started in parallel. This may leave interrupts masked and stall
-> transfers under high load.
->
-> Protect the RMW sequences with dw->lock.
->
-> Signed-off-by: Koichiro Den <den@valinux.co.jp>
-> ---
+Hello,
 
-I just posted a similar patch
-https://lore.kernel.org/imx/20251212-edma_ll-v1-1-fc863d9f5ca3@nxp.com/
+syzbot found the following issue on:
 
-It change some method and I am working on add new request during dma engine
-running.
+HEAD commit:    d358e5254674 Merge tag 'for-6.19/dm-changes' of git://git...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1191799c580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b60f8d9470fe9d28
+dashboard link: https://syzkaller.appspot.com/bug?extid=5b55e49f8bbd84631a9c
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+userspace arch: i386
 
-At least, you can base on above thread.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-Frank
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/6023f764316a/disk-d358e525.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/7d83b86d067e/vmlinux-d358e525.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/7fa17a04a4c5/bzImage-d358e525.xz
 
->  drivers/dma/dw-edma/dw-edma-core.h    |  3 ++-
->  drivers/dma/dw-edma/dw-edma-v0-core.c | 13 ++++++++++---
->  2 files changed, 12 insertions(+), 4 deletions(-)
->
-> diff --git a/drivers/dma/dw-edma/dw-edma-core.h b/drivers/dma/dw-edma/dw-edma-core.h
-> index f652d2e38843..d393976a8bfc 100644
-> --- a/drivers/dma/dw-edma/dw-edma-core.h
-> +++ b/drivers/dma/dw-edma/dw-edma-core.h
-> @@ -118,7 +118,8 @@ struct dw_edma {
->
->  	struct dw_edma_chan		*chan;
->
-> -	raw_spinlock_t			lock;		/* Only for legacy */
-> +	/* For legacy + shared regs RMW among channels */
-> +	raw_spinlock_t			lock;
->
->  	struct dw_edma_chip             *chip;
->
-> diff --git a/drivers/dma/dw-edma/dw-edma-v0-core.c b/drivers/dma/dw-edma/dw-edma-v0-core.c
-> index 42a254eb9379..770b011ba3e4 100644
-> --- a/drivers/dma/dw-edma/dw-edma-v0-core.c
-> +++ b/drivers/dma/dw-edma/dw-edma-v0-core.c
-> @@ -369,7 +369,8 @@ static void dw_edma_v0_core_start(struct dw_edma_chunk *chunk, bool first)
->  {
->  	struct dw_edma_chan *chan = chunk->chan;
->  	struct dw_edma *dw = chan->dw;
-> -	u32 tmp;
-> +	unsigned long flags;
-> +	u32 tmp, orig;
->
->  	dw_edma_v0_core_write_chunk(chunk);
->
-> @@ -413,7 +414,9 @@ static void dw_edma_v0_core_start(struct dw_edma_chunk *chunk, bool first)
->  			}
->  		}
->  		/* Interrupt mask/unmask - done, abort */
-> +		raw_spin_lock_irqsave(&dw->lock, flags);
->  		tmp = GET_RW_32(dw, chan->dir, int_mask);
-> +		orig = tmp;
->  		if (chan->irq_mode == DW_EDMA_CH_IRQ_REMOTE) {
->  			tmp |= FIELD_PREP(EDMA_V0_DONE_INT_MASK, BIT(chan->id));
->  			tmp |= FIELD_PREP(EDMA_V0_ABORT_INT_MASK, BIT(chan->id));
-> @@ -421,11 +424,15 @@ static void dw_edma_v0_core_start(struct dw_edma_chunk *chunk, bool first)
->  			tmp &= ~FIELD_PREP(EDMA_V0_DONE_INT_MASK, BIT(chan->id));
->  			tmp &= ~FIELD_PREP(EDMA_V0_ABORT_INT_MASK, BIT(chan->id));
->  		}
-> -		SET_RW_32(dw, chan->dir, int_mask, tmp);
-> +		if (tmp != orig)
-> +			SET_RW_32(dw, chan->dir, int_mask, tmp);
->  		/* Linked list error */
->  		tmp = GET_RW_32(dw, chan->dir, linked_list_err_en);
-> +		orig = tmp;
->  		tmp |= FIELD_PREP(EDMA_V0_LINKED_LIST_ERR_MASK, BIT(chan->id));
-> -		SET_RW_32(dw, chan->dir, linked_list_err_en, tmp);
-> +		if (tmp != orig)
-> +			SET_RW_32(dw, chan->dir, linked_list_err_en, tmp);
-> +		raw_spin_unlock_irqrestore(&dw->lock, flags);
->  		/* Channel control */
->  		SET_CH_32(dw, chan->dir, chan->id, ch_control1,
->  			  (DW_EDMA_V0_CCS | DW_EDMA_V0_LLE));
-> --
-> 2.51.0
->
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+5b55e49f8bbd84631a9c@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+kernel BUG at lib/dynamic_queue_limits.c:99!
+Oops: invalid opcode: 0000 [#1] SMP KASAN PTI
+CPU: 1 UID: 0 PID: 5197 Comm: udevd Tainted: G             L      syzkaller #0 PREEMPT(full) 
+Tainted: [L]=SOFTLOCKUP
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+RIP: 0010:dql_completed+0xbe1/0xbf0 lib/dynamic_queue_limits.c:99
+Code: 93 61 fd e9 ae fc ff ff 89 d9 80 e1 07 fe c1 38 c1 0f 8c c2 fc ff ff 48 89 df e8 8a 92 61 fd e9 b5 fc ff ff e8 d0 40 fb fc 90 <0f> 0b 66 66 66 66 2e 0f 1f 84 00 00 00 00 00 90 90 90 90 90 90 90
+RSP: 0018:ffffc90000a08a70 EFLAGS: 00010246
+RAX: ffffffff84c66fe0 RBX: 00000000000000f1 RCX: ffff88807df58000
+RDX: 0000000000000100 RSI: 0000000000000000 RDI: 00000000000000f1
+RBP: 0000000000000000 R08: 0000000000000003 R09: 0000000000000004
+R10: dffffc0000000000 R11: fffff52000141154 R12: 1ffff1100fc56520
+R13: 1ffff1100fc56519 R14: ffff88807e2b2904 R15: ffff88807e2b28c0
+FS:  00007fdf0904e880(0000) GS:ffff888125f3a000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000080159018 CR3: 000000007e786000 CR4: 00000000003526f0
+Call Trace:
+ <IRQ>
+ netdev_tx_completed_queue include/linux/netdevice.h:3864 [inline]
+ netdev_completed_queue include/linux/netdevice.h:3894 [inline]
+ usbnet_bh+0x793/0x1020 drivers/net/usb/usbnet.c:1601
+ process_one_work kernel/workqueue.c:3257 [inline]
+ process_scheduled_works+0xad1/0x1770 kernel/workqueue.c:3340
+ bh_worker+0x2b1/0x600 kernel/workqueue.c:3611
+ tasklet_action+0xc/0x70 kernel/softirq.c:952
+ handle_softirqs+0x27d/0x850 kernel/softirq.c:622
+ __do_softirq kernel/softirq.c:656 [inline]
+ invoke_softirq kernel/softirq.c:496 [inline]
+ __irq_exit_rcu+0xca/0x1f0 kernel/softirq.c:723
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:739
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1056 [inline]
+ sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1056
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
+RIP: 0010:mas_wr_append lib/maple_tree.c:3718 [inline]
+RIP: 0010:mas_wr_store_entry+0xe25/0x27b0 lib/maple_tree.c:3758
+Code: 24 40 48 8b 4c 24 48 48 8d 1c c1 48 89 d8 48 c1 e8 03 42 80 3c 28 00 44 0f b6 7c 24 1c 74 08 48 89 df e8 3e 39 d5 f6 4c 89 33 <49> 8d 5c 24 48 48 89 d8 48 c1 e8 03 42 80 3c 28 00 74 08 48 89 df
+RSP: 0018:ffffc90003106fe0 EFLAGS: 00000246
+RAX: ffffc900031077cd RBX: 1ffff92000620ebd RCX: dffffc0000000000
+RDX: 0000000000000000 RSI: 0000000000000009 RDI: 0000000000000008
+RBP: ffffc90003107570 R08: ffff88807df58000 R09: 000000000000000a
+R10: 0000000000000009 R11: 0000000000000000 R12: ffffc900031075c0
+R13: dffffc0000000000 R14: ffff88807e776640 R15: 0000000000000009
+ mas_insert+0x375/0x550 lib/maple_tree.c:4002
+ mas_alloc_cyclic+0x207/0x700 lib/maple_tree.c:4048
+ mtree_alloc_cyclic+0x181/0x220 lib/maple_tree.c:6092
+ simple_offset_add+0xdc/0x190 fs/libfs.c:297
+ shmem_mknod+0x232/0x360 mm/shmem.c:3884
+ lookup_open fs/namei.c:4440 [inline]
+ open_last_lookups fs/namei.c:4540 [inline]
+ path_openat+0x18bb/0x3dd0 fs/namei.c:4784
+ do_filp_open+0x1fa/0x410 fs/namei.c:4814
+ do_sys_openat2+0x121/0x200 fs/open.c:1430
+ do_sys_open fs/open.c:1436 [inline]
+ __do_sys_openat fs/open.c:1452 [inline]
+ __se_sys_openat fs/open.c:1447 [inline]
+ __x64_sys_openat+0x138/0x170 fs/open.c:1447
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xf80 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fdf088a7407
+Code: 48 89 fa 4c 89 df e8 38 aa 00 00 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 39 83 fa 08 75 de e8 23 ff ff ff
+RSP: 002b:00007fff05e7f490 EFLAGS: 00000202 ORIG_RAX: 0000000000000101
+RAX: ffffffffffffffda RBX: 00007fdf0904e880 RCX: 00007fdf088a7407
+RDX: 0000000000080141 RSI: 000055fcaafb702e RDI: ffffffffffffff9c
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+R10: 00000000000001a4 R11: 0000000000000202 R12: 00000000ffffffff
+R13: 00000000ffffffff R14: ffffffffffffffff R15: 0000000000000000
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:dql_completed+0xbe1/0xbf0 lib/dynamic_queue_limits.c:99
+Code: 93 61 fd e9 ae fc ff ff 89 d9 80 e1 07 fe c1 38 c1 0f 8c c2 fc ff ff 48 89 df e8 8a 92 61 fd e9 b5 fc ff ff e8 d0 40 fb fc 90 <0f> 0b 66 66 66 66 2e 0f 1f 84 00 00 00 00 00 90 90 90 90 90 90 90
+RSP: 0018:ffffc90000a08a70 EFLAGS: 00010246
+RAX: ffffffff84c66fe0 RBX: 00000000000000f1 RCX: ffff88807df58000
+RDX: 0000000000000100 RSI: 0000000000000000 RDI: 00000000000000f1
+RBP: 0000000000000000 R08: 0000000000000003 R09: 0000000000000004
+R10: dffffc0000000000 R11: fffff52000141154 R12: 1ffff1100fc56520
+R13: 1ffff1100fc56519 R14: ffff88807e2b2904 R15: ffff88807e2b28c0
+FS:  00007fdf0904e880(0000) GS:ffff888125f3a000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000080159018 CR3: 000000007e786000 CR4: 00000000003526f0
+----------------
+Code disassembly (best guess):
+   0:	24 40                	and    $0x40,%al
+   2:	48 8b 4c 24 48       	mov    0x48(%rsp),%rcx
+   7:	48 8d 1c c1          	lea    (%rcx,%rax,8),%rbx
+   b:	48 89 d8             	mov    %rbx,%rax
+   e:	48 c1 e8 03          	shr    $0x3,%rax
+  12:	42 80 3c 28 00       	cmpb   $0x0,(%rax,%r13,1)
+  17:	44 0f b6 7c 24 1c    	movzbl 0x1c(%rsp),%r15d
+  1d:	74 08                	je     0x27
+  1f:	48 89 df             	mov    %rbx,%rdi
+  22:	e8 3e 39 d5 f6       	call   0xf6d53965
+  27:	4c 89 33             	mov    %r14,(%rbx)
+* 2a:	49 8d 5c 24 48       	lea    0x48(%r12),%rbx <-- trapping instruction
+  2f:	48 89 d8             	mov    %rbx,%rax
+  32:	48 c1 e8 03          	shr    $0x3,%rax
+  36:	42 80 3c 28 00       	cmpb   $0x0,(%rax,%r13,1)
+  3b:	74 08                	je     0x45
+  3d:	48 89 df             	mov    %rbx,%rdi
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
