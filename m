@@ -1,199 +1,129 @@
-Return-Path: <netdev+bounces-245486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35392CCF050
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 09:46:08 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39CC3CCF082
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 09:49:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 7418F300E929
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 08:46:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 086E1300FF8E
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 08:49:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1AEC2DF3CC;
-	Fri, 19 Dec 2025 08:46:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0C722E717B;
+	Fri, 19 Dec 2025 08:49:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Qwr0qURZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EUjki3pC";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ETWZlwCU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F7953A1E9E
-	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 08:46:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B097B2D837B
+	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 08:49:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766133962; cv=none; b=FxRa76spzKpR9inEP0S09+M4tICNiHUDO5TMkMt/l3/HAFsT0aVEZ8n3gMaODeOwOj4DYAFSBmEMYmBCV6H93L/2rekEA75Aq4VWPnvcWBzzieq2rA+N/GgXEVrr4pkYFBDD4NO2IxO0/aFd9QGrg9KPq0qTnrXZHrJyTVFf+L8=
+	t=1766134165; cv=none; b=H7SEV20/bY+TUW/iZrv5ALrB+zTAHJsox4YfvpBmGx+OFpXuzX/SCyXUkDZfKXh5AjvPnQMTf1+WYkXb1BbUkXRd1XeJ1+Pd5U/Kw6tlqnNctSVUTBbtzS1XYoVHkOOUWp5RoCaFvvLhWAJ3DrEBOIL5nnUox0SXgXzy+89aosY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766133962; c=relaxed/simple;
-	bh=UPp5jXeYiYmHYmLqZeIb/XYMrk+d2yhwBE9nTU0yYHM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ffMuWefWS/pt5pwimjVDZzVo7VHOKqoRowigGa11+q/3om278ZipIfHJq41WqBdUcrIS/VhPvNLPIaaK0kQNng27CEhXPssfr/sSuJYHn54A3Qej3VBcrSONF8OsySZHMxl6bSNGL0otc8d76f1JoHHO9y3NX4BqBQWhpWwCaDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Qwr0qURZ; arc=none smtp.client-ip=209.85.222.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-8b5ccceb382so174290585a.1
-        for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 00:46:00 -0800 (PST)
+	s=arc-20240116; t=1766134165; c=relaxed/simple;
+	bh=uejryCLRQ1VNG1fvpKRtW4mcmwc1LynbGgyohhNlzCg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=atbE3y/9Ed0WVh2I4Y2PQuVwYYLXSzLkLgaJuhjIptr2TmDOOTASEQLlf7i2E4PkRRx9NCWlknb9WGrMclTMcFFYkAGTmQshQ39vQEw2v9CVY5zOfy58VMOV/hzav0VydtTyVjGA9QGXZWboReen18FUqH0f9pxDv2BfQb3waQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EUjki3pC; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ETWZlwCU; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1766134162;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sW5Hrxdsb7GUKzUzVoNy3hjRSNuogwTUTSagfAq9WHk=;
+	b=EUjki3pC8GqFaJBfHwhcK28stfrGS5m1KgPx+qWiHsD4RsmuvhFfYF+ckYw5h+P6VPfiAI
+	zs9+utdJcGKe7nBajY8yw23KvBNkg+p0D5ljY7cwdaLoiF/9AJ/cFgf6fjrzu4OxJ2wmZ2
+	I59yGzXmemg+OrSEb8N3RqAkXQm1Bx8=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-608-N7y_hWSJPj-1Aum_6YTe2w-1; Fri, 19 Dec 2025 03:49:21 -0500
+X-MC-Unique: N7y_hWSJPj-1Aum_6YTe2w-1
+X-Mimecast-MFC-AGG-ID: N7y_hWSJPj-1Aum_6YTe2w_1766134160
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4779ecc3cc8so10081625e9.3
+        for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 00:49:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1766133959; x=1766738759; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A4qUWAJSqSJdIDM6w+n372g6r53Iod/UGsz9hXTuXwo=;
-        b=Qwr0qURZAxZRSmBlOA2ehBiLnQTkUtJxicSEjWX71vf6xWLYlZKv/Hwn1iH5lrrbOQ
-         NXLyhfQAouaNiNTKwre4P34By0FqohmspMi0ORvIALbnRRi3xtAlgSlaYCuXQXItM+br
-         lDJf156GGR1EOqsH4hu3uIbXb6WwOcxfNEA6ImsRcIi3Ep2SDMiSfGMZqQ2IMLz1NOrw
-         u2sbadSs67kgZrnNHsGsjuUrpNXVUZUneRQZ05acOMyRokO5uPU/+FtaZ3n84BAyJOOy
-         sA8x8FcjKqZndOh+B5Ub87v2xsnE2txojUfsD6AXiw7iEeYhGpnsiQlX5EuzblCBckSB
-         Ho+w==
+        d=redhat.com; s=google; t=1766134160; x=1766738960; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sW5Hrxdsb7GUKzUzVoNy3hjRSNuogwTUTSagfAq9WHk=;
+        b=ETWZlwCUhoGaH9KlYqe5nEUYN28PxTDf2RLtaWC/qZS1DL11npGnMBGyjVsaRuhItQ
+         7NC3Fmk5GnUs5IIJHSBjKdC7a8p12jUc2+89rJEByE6tI44ZsLaScZQSc900d9ycxS8B
+         3FbuMfvLTKvEkf8hj1fJ0VVDs88D5ZwztBlAMy7Q4Y+0SE8Z/28kPnQIwRjI2vW60Gme
+         6IrJHARFMBDzbI5dfk9w0OOQTr2R9ssKjIO+bkVITt7GBNXuCDFdekX0M9A1+Qgilvlc
+         i8oFwlVHmlYHlnS9faoQHD4aEwyicG04MPBfO5reb0UhSlyi4Z4hk99DKIZ49NJ/Nr+x
+         1ekQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766133959; x=1766738759;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=A4qUWAJSqSJdIDM6w+n372g6r53Iod/UGsz9hXTuXwo=;
-        b=q1pCwfiQXSQLod5YCcJefYLniMg5amcu3LjeHKvPX0tc2ERtHftkKeMiF1EsgioR1b
-         paPpzxwzZazfUGZEfQpqDRVfGt/l7Ixp8ZPp8y5SFFt3u3goLvSoBNTkNAEte7EYbbme
-         YWico7+UWcedXzo3ig3rFiywZNuHsRj8Z/lVCj+PECusiOw0swuSemlP9RBIHxK/CXCH
-         lNsecVVBA42N0hS/acq2Cpt4L5sxWzWVe/f9dK//LJH3xSRQZwUjsmWvRCvrj7I9Kj4j
-         uSfI52XMtuObbo0W8sjZb1ry/lNDqHpxIwR6ZhE3xPt8kTkTLEiQuYfhh/hx72YOZiwA
-         tdUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU+3bxlwEH3JncTGm++zC4WicIIbTyx+OWxU7IJuf2/LODe2BpLDAa1hiLasstgYsmHB3u9VZc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxNAoL4HXKj4uURXx0rrYdM+74P1CxcrjiQsAwNhJzP13WB/+OK
-	+MX1aWtE2OPGBfia/jZ9xuQwuiT/3IoM9FZ3Z/oTxd2b2PPgSrGuE8oIU77+snUcDCMao3+DtYb
-	r7OWeYWSBd+H0yYKgSV1GvcI+mJzdL56GDSBMevQN
-X-Gm-Gg: AY/fxX54JFvSssmhQTsM/Dtx7RD323hQbQ6KFdS1uR1rTxLKcmgi7Y9x2/+ZK7Opr7B
-	9IhXBXe0Xc4YK76a+lu2tdQ3ornrBsM7vPzSRmQHcbRb5pfLaI7v7NtLinuWaj57Ex54NNJ3XHA
-	wt2xg4DTg6rAA9ofP8zcd9fi87n/96N54MUQjd5uLVPB5r2tvXgxM/QqA214Q+X8FM5c9Qw24JZ
-	UjoEPhvSR3Fwx7LJa5ugSas7HUmdbAtuCMQMzFSg6sIwvu6ytIwEQymkmH/1GG2zyS7RQ==
-X-Google-Smtp-Source: AGHT+IE5lpfln5PpERcfZxHwkaH7BBahCDvlCBdKIPsJ4uPnTakiAvM9i8QtHCuy5BK9pv3NvgT0F8udRST/S9q9KM0=
-X-Received: by 2002:ac8:5882:0:b0:4ee:4126:661c with SMTP id
- d75a77b69052e-4f4abdcb96emr28730731cf.81.1766133958752; Fri, 19 Dec 2025
- 00:45:58 -0800 (PST)
+        d=1e100.net; s=20230601; t=1766134160; x=1766738960;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sW5Hrxdsb7GUKzUzVoNy3hjRSNuogwTUTSagfAq9WHk=;
+        b=tQZoWzEWZibRhgcmgcRnvSkao2ZOh62gLJFqpP1zaIg0QWtdZ4Aj67S27X42RPnVEd
+         9f9w2lgZb4ts346OBSF+1HyjBp/+Zpkm9BbocibTgrPfY0uJa1eo/p63qon35qBTS8cQ
+         ywg0txvLT/UM1lcEGT7xf3tWdM74WWRxRaVeyezalw/YEv14vQ9o8JoRJYQXXj7klaEm
+         JKl/IQgRciuqochcO48QcAgsXBD7RDD2V/Y1rRN9f5ZGEVFSYRkdfpbcmadhVZ4bDTbG
+         uBy3BLqaEpwN+TzhRcJbps38P9O0b0zP8p+dAkXu6BHy1xKAISJNTmrE0Q8XnBzy3C1b
+         QK5w==
+X-Forwarded-Encrypted: i=1; AJvYcCUqgVB46y6Nyn4mKUZ/egLYz97d32JzYmZuiLy2wY2AZ1sWYuzmmrSayEIHcnv/AU6nQBEFr8Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzvpgdHvqaH3UwA0zjEKtlrfkgc2nne2R8+TIg2cg9yUEhgyBS5
+	c5bk9Ot2IWQm/baqK5/3NOFVhssI7uVPV4Y0uth9ZineB5WyDgwxW4BoO10bcApL59ZR/efKYL4
+	9uPQhihxSNaTrBfgPampKuMcvbpq0yp1nIhfrW5VIgLgL6RBneC7JK8T+4A==
+X-Gm-Gg: AY/fxX4TryhDMUSiAtB/tBMuWdRwvKhKiR/86Dfy2nCq9rjukVn69vtu4Ob6yEAG5Ad
+	bARW720cQpV6wZOR5ONZRNblV/AxuuUdJmLLo8KnPXFa/OpsQt3k0A12Bd0dutYDaVQQyPAi0gr
+	Zyu5hNfUT5EZsAHnMQS4R5GU9q6NDardOW93XQy9TmCQh25Loz/IMkx+BC4+oJ3oMP/9599WMQ3
+	lP66bhA5XUfzSQr/taP9CZFRNGVn8mj8OiavOFrfZ2ptf9hmF9j3ccscR2Pp5lAvxuilY9Geetn
+	WlcxDomGuCvOKYUE5JyDZOySBFhn72vkAyu2vvDKUOMxZlersDSlz5ntCPPgc82lEyqgi9mql2r
+	DwF9hfkFZ/YKk
+X-Received: by 2002:a05:600d:108:20b0:477:9986:5e6b with SMTP id 5b1f17b1804b1-47d1c038664mr8170945e9.28.1766134160054;
+        Fri, 19 Dec 2025 00:49:20 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEqUQk++ajFxa4Fltq1nQ3xd1vcqp5ri720kaNVCgS9smnN4G2iaVta3SyM5UhVrO4wmwHRzA==
+X-Received: by 2002:a05:600d:108:20b0:477:9986:5e6b with SMTP id 5b1f17b1804b1-47d1c038664mr8170815e9.28.1766134159715;
+        Fri, 19 Dec 2025 00:49:19 -0800 (PST)
+Received: from [192.168.88.32] ([216.128.11.227])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324ea82e9fsm3873617f8f.26.2025.12.19.00.49.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 19 Dec 2025 00:49:19 -0800 (PST)
+Message-ID: <9ebaa762-a12f-4748-9672-05b09706a5ca@redhat.com>
+Date: Fri, 19 Dec 2025 09:49:18 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250711114006.480026-1-edumazet@google.com> <20250711114006.480026-8-edumazet@google.com>
- <cd44c0d2-17ed-460d-9f89-759987d423dc@proxmox.com> <8f8836dd-c46f-403c-b478-a9e89dd62912@proxmox.com>
- <CANn89iL=MTgYygnFaCeaMpSzjooDgnzwUd_ueSnJFxasXwyMwg@mail.gmail.com>
- <c1ae58f7-cf31-4fb6-ac92-8f7b61272226@proxmox.com> <CANn89iJRCW3VNsY3vZwurvh52diE+scUfZvwx5bg5Tuoa3L_TQ@mail.gmail.com>
- <64d8fa05-63a2-420e-8b97-c51cb581804a@proxmox.com> <CANn89iKPVPHQMgMiA=sum_nAjDg6hK0WSzHjP4onUJhYkj1xUQ@mail.gmail.com>
-In-Reply-To: <CANn89iKPVPHQMgMiA=sum_nAjDg6hK0WSzHjP4onUJhYkj1xUQ@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 19 Dec 2025 09:45:47 +0100
-X-Gm-Features: AQt7F2rHLV9pYwtzuO4yUHRL3Bj2UPzGXcPeHP8mW9wSHfYXIIaGIgbyqv2O1Bo
-Message-ID: <CANn89iKhZ=Ofy45PBrvLLE=nqv6X7CTvrpMdYMLKeVjpN6c-3A@mail.gmail.com>
-Subject: Re: [PATCH net-next 7/8] tcp: stronger sk_rcvbuf checks
-To: Christian Ebner <c.ebner@proxmox.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, 
-	Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	lkolbe@sodiuswillert.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 0/3] pull-request: can 2025-12-18
+To: Marc Kleine-Budde <mkl@pengutronix.de>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, linux-can@vger.kernel.org,
+ kernel@pengutronix.de
+References: <20251218123132.664533-1-mkl@pengutronix.de>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251218123132.664533-1-mkl@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Dec 19, 2025 at 9:23=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Thu, Dec 18, 2025 at 3:58=E2=80=AFPM Christian Ebner <c.ebner@proxmox.=
-com> wrote:
-> >
-> > On 12/18/25 2:19 PM, Eric Dumazet wrote:
-> > > On Thu, Dec 18, 2025 at 1:28=E2=80=AFPM Christian Ebner <c.ebner@prox=
-mox.com> wrote:
-> > >>
-> > >> Hi Eric,
-> > >>
-> > >> thank you for your reply!
-> > >>
-> > >> On 12/18/25 11:10 AM, Eric Dumazet wrote:
-> > >>> Can you give us (on receive side) : cat /proc/sys/net/ipv4/tcp_rmem
-> > >>
-> > >> Affected users report they have the respective kernels defaults set,=
- so:
-> > >> - "4096 131072 6291456"  for v.617 builds
-> > >> - "4096 131072 33554432" with the bumped max value of 32M for v6.18 =
-builds
-> > >>
-> > >>> It seems your application is enforcing a small SO_RCVBUF ?
-> > >>
-> > >> No, we can exclude that since the output of `ss -tim` show the defau=
-lt
-> > >> buffer size after connection being established and growing up to the=
- max
-> > >> value during traffic (backups being performed).
-> > >>
-> > >
-> > > The trace you provided seems to show a very different picture ?
-> > >
-> > > [::ffff:10.xx.xx.aa]:8007
-> > >         [::ffff:10.xx.xx.bb]:55554
-> > >            skmem:(r0,rb7488,t0,tb332800,f0,w0,o0,bl0,d20) cubic
-> > > wscale:10,10 rto:201 rtt:0.085/0.015 ato:40 mss:8948 pmtu:9000
-> > > rcvmss:7168 advmss:8948 cwnd:10 bytes_sent:937478 bytes_acked:937478
-> > > bytes_received:1295747055 segs_out:301010 segs_in:162410
-> > > data_segs_out:1035 data_segs_in:161588 send 8.42Gbps lastsnd:3308
-> > > lastrcv:191 lastack:191 pacing_rate 16.7Gbps delivery_rate 2.74Gbps
-> > > delivered:1036 app_limited busy:437ms rcv_rtt:207.551 rcv_space:96242
-> > > rcv_ssthresh:903417 minrtt:0.049 rcv_ooopack:23 snd_wnd:142336 rcv_wn=
-d:7168
-> > >
-> > > rb7488 would suggest the application has played with a very small SO_=
-RCVBUF,
-> > > or some memory allocation constraint (memcg ?)
-> >
-> > Thanks for the hint were to look, however we checked that the process i=
-s
-> > not memory constrained and the host has no memory pressure.
-> >
-> > Also `strace -f -e socket,setsockopt -p $(pidof proxmox-backup-proxy)`
-> > shows no syscalls which would change the socket buffer size (though thi=
-s
-> > still needs to be double checked by affected users for completeness).
-> >
-> > Further, the stalls most often happen mid transfer, starting with the
-> > expected throughput and even might recover from the stall after some
-> > time, continue at regular speed again.
-> >
-> >
-> > Status update for v6.18
-> > -----------------------
-> >
-> > In the meantime, a user reported 2 stale connections with running kerne=
-l
-> > 6.18+416dd649f3aa
-> >
-> > The tcpdump pattern looks slightly different, here we got repeating
-> > sequences of:
-> > ```
-> > 224     5.407981        10.xx.xx.bb     10.xx.xx.aa     TCP     4162   =
- 40068 =E2=86=92 8007 [PSH, ACK]
-> > Seq=3D106497 Ack=3D1 Win=3D3121 Len=3D4096 TSval=3D3198115973 TSecr=3D3=
-048094015
-> > 225     5.408064        10.xx.xx.aa     10.xx.xx.bb     TCP     66     =
- 8007 =E2=86=92 40068 [ACK] Seq=3D1
-> > Ack=3D110593 Win=3D4 Len=3D0 TSval=3D3048094223 TSecr=3D3198115973
-> > ```
-> >
-> > The perf trace for `tcp:tcp_rcvbuf_grow` came back empty while in stale
-> > state, tracing with:
-> > ```
-> > perf record -a -e tcp:tcp_rcv_space_adjust,tcp:tcp_rcvbuf_grow
-> > perf script
-> > ```
-> > produced some output as shown below, so it seems that tcp_rcvbuf_grow()
-> > is never called in that case, while tcp_rcv_space_adjust() is.
->
-> Autotuning is not enabled for your case, somehow the application is
-> not behaving as expected,
-> so maybe you have to change tcp_rmem[2] if a driver is allocating
-> order-2 pages for the 9K frames.
+On 12/18/25 10:27 AM, Marc Kleine-Budde wrote:
+> this is a pull request of 3 patches for net/main.
+> 
+> Tetsuo Handa contributes 2 patches to fix race windows in the j1939
+> protocol to properly handle disappearing network devices.
+> 
+> The last patch is by me, it fixes a build dependency with the CAN
+> drivers, that got introduced while fixing a dependency between the CAN
+> protocol and CAN device code.
 
-I meant to say : change tcp_rmem[1]
+Pulled, thanks!
 
-echo "4096 262144 33554432" >/proc/sys/net/ipv4/tcp_rmem
+Paolo
 
->
-> You have not given what  was on the sender side (linux or other stack ?)
 
