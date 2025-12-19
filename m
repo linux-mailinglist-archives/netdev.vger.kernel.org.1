@@ -1,145 +1,189 @@
-Return-Path: <netdev+bounces-245533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75DD6CD0582
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 15:45:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C47FCD0697
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 15:57:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id D46CF300987E
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 14:45:08 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id CF400305769C
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 14:52:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AAAC329E75;
-	Fri, 19 Dec 2025 14:45:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE81433C526;
+	Fri, 19 Dec 2025 14:52:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HmH1wL14"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="N6MmhXPP";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="SGGuQf64";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="LEcu8Cl4";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Vmc8luXD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C006B27FB2F
-	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 14:45:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B40C33C19A
+	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 14:52:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766155507; cv=none; b=gvJr3qDxVaQOyGYY0gfLxZdqo7NGW0v+MBslk5w2oETLmp4KAtzzOauD+7dSnduaJoiEaEvCHd6PZqGounz+ASOml28mKE6Cwulx2WD3afBgsIvUbcbIqq4NzTxws0/OWO5JATt6TxHZvQkS06uWTS6Fg0rNaR5NHk9wA/3EFvs=
+	t=1766155938; cv=none; b=us+YJefnBGLOw8CVkKWK8Ya0dar7DIurfl433tEhir1Pc9af2frt9GEAutnX29tZYIlIU+GzrP8ryhNF9WVqnkHzFVjR81x2X0KUv9NHf+rPCoTCSHKwMcJ7f9nw6Ki6gSHjqyFkhlip1WrS/5NYMjdMHuxlpYotQdBGscqIESM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766155507; c=relaxed/simple;
-	bh=3RlN2LCALAxWJvAvyZXuDyzIaXTDNUMsyXjrjfXCGyE=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=fyP84kGjf9HTgwFMknMw2NCbOW+u3bpawOvbJCxLvuLJnYhrjgQi0QEW71nY5qbCCybVIWL8M1oiKzt3T7EqD60Vfo5e5C8qlSO3nx0lgAknLI0s+c1B9e4WXwo6iMb6PcxMxQWIxMx+aZj/QDqXZ998LtaJuhot7iETl82pcDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HmH1wL14; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-78e728e39f5so19111867b3.2
-        for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 06:45:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1766155501; x=1766760301; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=P5aiNzVJFJvsiKVqIxUm10fZYLmS8pwSKdQL1cdV4Eo=;
-        b=HmH1wL14KqMHRuG4utINsXttVcgD7boxmvMaOmaq0NpljcD0Llo5jR+6FUyweTIIR6
-         ad9oDjZ6shSe3ysemX7WDVuHAj9siHVPcermXuUF1WPftvthTLG/zNhjdyaWjxKtBP2l
-         YWUQllxeRmQbYyU1RKFXkaKLCaHg2V48HR+IW8UqvUSLCVIpMRrvgG50K3VUNvpMEZkO
-         WEPzF07p0UUvgzm1422U6NOp+dBqfj7wjREz+tSRfDgXzrm/J5h64X81bNY+knty7uwy
-         l2nGzYrc/MhxvFFeAwAc53A/qDNo//XAsGyg3F3ZdJbKecIq8UxZWXx27J4krig6GelY
-         SpOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766155501; x=1766760301;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=P5aiNzVJFJvsiKVqIxUm10fZYLmS8pwSKdQL1cdV4Eo=;
-        b=UXV1Ze+9Ig956KmBTVGnL6/gFKFJvzLVCAnZYAwS4+SqqTVmYUzWSh4USDRrWJEtUU
-         Cdrz38VQQVzHzDAdr2fKIiW3BI7IbbttR9tu2gv4b2SggVFJpOTow924YVEFB8JGQd83
-         sEiarygxePAa2ub4vrnoJgMNDhQPThA3LJm/lWMy0xvacHim3aiV1rlbWQiLadaKmcO4
-         YS+gcFIWH/D1acVD/ZTw7biEvdqRG91aHVsjsVaUU6b7TMEo1jpdrxEnoNgq4YBNvbFC
-         4+6VaxJ1jZSf7oKmoXKhGjRrmlb6NzRC6/oGiDmOZcnnBeYb93HjCsMkvOcka8oXVZp3
-         5lyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU+jTDqBvMTrHchGzLXsmN+RhDJaESgNza3hYGCLaqapMrrDv5EzDj5yjXyn1jBnvw/Fe7Q/oQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw19p0OPuhtPUQny2pdsK8HXoEpO21yX2pi50EnzSGKLNKuvxKe
-	DouN9BiNnZxQFVE50SjD3mxGcQPFbAb3D7Fpq47dCP26qx+jNpMSzxNhXjZJaviCFAkqOnQMNFv
-	Zm1EhY8VkiCVBzg==
-X-Google-Smtp-Source: AGHT+IHj7aEXyD96No2mv8WDslYNmLU0JQA+gtZdw499Ywwt4ZrNnEQ8iR/PVv/0KPtmCmn5kgYFNwhUQIVUfg==
-X-Received: from ywbis10.prod.google.com ([2002:a05:690c:6c8a:b0:782:fcc0:46fb])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:690c:6f92:b0:786:4860:21fd with SMTP id 00721157ae682-78fb41326bdmr27172247b3.39.1766155501277;
- Fri, 19 Dec 2025 06:45:01 -0800 (PST)
-Date: Fri, 19 Dec 2025 14:44:59 +0000
+	s=arc-20240116; t=1766155938; c=relaxed/simple;
+	bh=ImUUPMwAiw4KT2s5YfTK2bZEvXGjV1Z98li1PGQ6kp0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KZgR6b6BhxuLpb21yq9+B+Pwpe7YCuK+nw9oa99fiF1Jc6fMbSJsnsDZzPeIIdaRJoj9L59cSCaIUVnX06F48tZEMx7iv9YZbtAdAuiGRpG66/1svI3jmYQqki1r1LKQGPFWJaP+BdPreguvEt/DzLOmXtS3WzWxan1hx8AKYgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=N6MmhXPP; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=SGGuQf64; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=LEcu8Cl4; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Vmc8luXD; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id EBD9333714;
+	Fri, 19 Dec 2025 14:52:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1766155931; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EMdHZghCJaAoUjW3bhnhsD9W77RE+kIEL5WJG3veq0Y=;
+	b=N6MmhXPPF7TwerBpBQ6s+1oarjFB6RJiff20kYQQvJTmSKHvhshqefzj8m+g6EsU27o22O
+	add2yBdGtiOSB1EVd5YiYWQfZyexUPx5uZdwoDsnaqd2sQcH54cAOPf9bwDeSbzST7KBqq
+	XRo4w0HHB/aq4JNIikgnchXOD334V9w=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1766155931;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EMdHZghCJaAoUjW3bhnhsD9W77RE+kIEL5WJG3veq0Y=;
+	b=SGGuQf64rP5ZW2lN+FRvdwXOGiVMMb9mFGjpFNjRczgWE0Fcb5psv9l1AMWwptnoCgHj2m
+	XucDXlVi5GkSXyAg==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=LEcu8Cl4;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=Vmc8luXD
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1766155929; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EMdHZghCJaAoUjW3bhnhsD9W77RE+kIEL5WJG3veq0Y=;
+	b=LEcu8Cl4hnvP4f8Yz01rHmo2wSuHbjyCufUhA6y4QaIBsa3lwA9kLvwetZRTX79xhqg58Y
+	nIVWmkshMpWokamuRMFvj14LIqsKpXgU9akEMuOxf3m1AO+ck9i1TM6BzdPo+t0s5AOtHR
+	jm2sH0+ba9PrKyqPdJMNEwz37V+Jdi4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1766155929;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EMdHZghCJaAoUjW3bhnhsD9W77RE+kIEL5WJG3veq0Y=;
+	b=Vmc8luXDAyRfvVer1KSeZNqN7mlir5pi+76WjkF7qebNq7ufSHw21xPgTj60raKttTdWhf
+	/0E9eTVm2PNjmlDA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5E0B63EA63;
+	Fri, 19 Dec 2025 14:52:09 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id UQg+FJlmRWkJPwAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Fri, 19 Dec 2025 14:52:09 +0000
+Message-ID: <9a3f7b60-37e3-470e-b9f7-8cda5ddccb59@suse.de>
+Date: Fri, 19 Dec 2025 15:51:50 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.52.0.322.g1dd061c0dc-goog
-Message-ID: <20251219144459.692715-1-edumazet@google.com>
-Subject: [PATCH net] usbnet: avoid a possible crash in dql_completed()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot+5b55e49f8bbd84631a9c@syzkaller.appspotmail.com, 
-	Simon Schippers <simon.schippers@tu-dortmund.de>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] selftests: net: fib-onlink-tests: Set high metric for
+ default IPv6 route
+To: =?UTF-8?Q?Ricardo_B=2E_Marli=C3=A8re?= <rbm@suse.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ David Ahern <dsahern@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20251218-rbm-selftests-net-fib-onlink-v1-1-96302a5555c3@suse.com>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <20251218-rbm-selftests-net-fib-onlink-v1-1-96302a5555c3@suse.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	ARC_NA(0.00)[];
+	FREEMAIL_TO(0.00)[suse.com,davemloft.net,google.com,kernel.org,redhat.com,gmail.com];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_COUNT_TWO(0.00)[2];
+	RCPT_COUNT_SEVEN(0.00)[11];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.com:email,suse.de:dkim,suse.de:mid]
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spam-Level: 
+X-Rspamd-Queue-Id: EBD9333714
+X-Spam-Flag: NO
+X-Spam-Score: -4.51
 
-syzbot reported a crash [1] in dql_completed() after recent usbnet
-BQL adoption.
+On 12/18/25 1:20 PM, Ricardo B. Marlière wrote:
+> Currently, the test breaks if the SUT already has a default route
+> configured for IPv6. Fix by adding "metric 9999" to the `ip -6 ro add`
+> command, so that multiple default routes can coexist.
+> 
+> Fixes: 4ed591c8ab44 ("net/ipv6: Allow onlink routes to have a device mismatch if it is the default route")
+> Signed-off-by: Ricardo B. Marlière <rbm@suse.com>
+> ---
+>   tools/testing/selftests/net/fib-onlink-tests.sh | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/net/fib-onlink-tests.sh b/tools/testing/selftests/net/fib-onlink-tests.sh
+> index ec2d6ceb1f08..acf6b0617373 100755
+> --- a/tools/testing/selftests/net/fib-onlink-tests.sh
+> +++ b/tools/testing/selftests/net/fib-onlink-tests.sh
+> @@ -207,7 +207,7 @@ setup()
+>   		ip -netns ${PEER_NS} addr add ${V6ADDRS[p${n}]}/64 dev ${NETIFS[p${n}]} nodad
+>   	done
+>   
+> -	ip -6 ro add default via ${V6ADDRS[p3]/::[0-9]/::64}
+> +	ip -6 ro add default via ${V6ADDRS[p3]/::[0-9]/::64} metric 9999
+>   	ip -6 ro add table ${VRF_TABLE} default via ${V6ADDRS[p7]/::[0-9]/::64}
+> 
 
-The reason for the crash is that netdev_reset_queue() is called too soon.
+It would probably require some work on the test but I think it could 
+benefit from using two different network namespaces. Currently it is 
+using PEER_NS and the default. I think avoiding the default one is 
+beneficial for everyone as it ensures the state is clean and that the 
+test won't interrupt the system connectivity.
 
-It should be called after cancel_work_sync(&dev->bh_work) to make
-sure no more TX completion can happen.
+Other tests already do that, e.g some tests in fib_tests.sh use ns1 and 
+ns2 namespaces.
 
-[1]
-kernel BUG at lib/dynamic_queue_limits.c:99 !
-Oops: invalid opcode: 0000 [#1] SMP KASAN PTI
-CPU: 1 UID: 0 PID: 5197 Comm: udevd Tainted: G             L      syzkaller #0 PREEMPT(full)
-Tainted: [L]=SOFTLOCKUP
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
- RIP: 0010:dql_completed+0xbe1/0xbf0 lib/dynamic_queue_limits.c:99
-Call Trace:
- <IRQ>
-  netdev_tx_completed_queue include/linux/netdevice.h:3864 [inline]
-  netdev_completed_queue include/linux/netdevice.h:3894 [inline]
-  usbnet_bh+0x793/0x1020 drivers/net/usb/usbnet.c:1601
-  process_one_work kernel/workqueue.c:3257 [inline]
-  process_scheduled_works+0xad1/0x1770 kernel/workqueue.c:3340
-  bh_worker+0x2b1/0x600 kernel/workqueue.c:3611
-  tasklet_action+0xc/0x70 kernel/softirq.c:952
-  handle_softirqs+0x27d/0x850 kernel/softirq.c:622
-  __do_softirq kernel/softirq.c:656 [inline]
-  invoke_softirq kernel/softirq.c:496 [inline]
-  __irq_exit_rcu+0xca/0x1f0 kernel/softirq.c:723
-  irq_exit_rcu+0x9/0x30 kernel/softirq.c:739
+What do you all think?
 
-Fixes: 7ff14c52049e ("usbnet: Add support for Byte Queue Limits (BQL)")
-Reported-by: syzbot+5b55e49f8bbd84631a9c@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/6945644f.a70a0220.207337.0113.GAE@google.com/T/#u
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Simon Schippers <simon.schippers@tu-dortmund.de>
----
- drivers/net/usb/usbnet.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
-index 1d9faa70ba3b..36742e64cff7 100644
---- a/drivers/net/usb/usbnet.c
-+++ b/drivers/net/usb/usbnet.c
-@@ -831,7 +831,6 @@ int usbnet_stop(struct net_device *net)
- 
- 	clear_bit(EVENT_DEV_OPEN, &dev->flags);
- 	netif_stop_queue(net);
--	netdev_reset_queue(net);
- 
- 	netif_info(dev, ifdown, dev->net,
- 		   "stop stats: rx/tx %lu/%lu, errs %lu/%lu\n",
-@@ -875,6 +874,8 @@ int usbnet_stop(struct net_device *net)
- 	timer_delete_sync(&dev->delay);
- 	cancel_work_sync(&dev->kevent);
- 
-+	netdev_reset_queue(net);
-+
- 	if (!pm)
- 		usb_autopm_put_interface(dev->intf);
- 
--- 
-2.52.0.322.g1dd061c0dc-goog
+>   	set +e
+> 
+> ---
+> base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
+> change-id: 20251218-rbm-selftests-net-fib-onlink-873ad01e6884
+> 
+> Best regards,
 
 
