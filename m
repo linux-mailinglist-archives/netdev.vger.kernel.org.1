@@ -1,99 +1,46 @@
-Return-Path: <netdev+bounces-245510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B05E1CCF77D
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 11:51:12 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id B75F7CCF79E
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 11:52:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id D3723306BD6D
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 10:47:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id C684630B8610
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 10:48:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E12332ED17C;
-	Fri, 19 Dec 2025 10:47:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23A83301012;
+	Fri, 19 Dec 2025 10:48:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dz5/eDP3";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="oPe70/SG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L7bqolvB"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3340EEEB3
-	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 10:47:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E99EF2EC541;
+	Fri, 19 Dec 2025 10:48:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766141257; cv=none; b=bV2gONpwPPh1U4DISeUpoMgfcpF1yoMwm8GyXm7MDJoHjvrky7Ba0H7gHOIbq71UdvNeF7Nf7UCMRc0M54mClnFX/xeERNOJI27BTx75ehqhk3WB4lXmGq21yTXeI/bzPBzLwf0n4BjPnM1jXUlrENNYSx9kGNl2UzixhLvqD24=
+	t=1766141326; cv=none; b=PfUp8feIqYgbMPyKfW16U+sTGE5z1eKabEUJWdQ+iQ+YFDN1imYSNlJQ3+t6ku7U8a9wUscowpcptMJzU9qURCfSpIqTKj77ze2K+hCY7u5AGti9+P22+JFxdscqFjXukYrBcf4hWTfRd+GdtxFryy6IImlBHcgIteezJ+roVXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766141257; c=relaxed/simple;
-	bh=jcSLquhQd9vs3yycLTlkV962wYyg0ao0gWX1c4mC+3s=;
+	s=arc-20240116; t=1766141326; c=relaxed/simple;
+	bh=YjLoTYKDjQc7ykxQOyqOUVAmPo1a4U7SoiPnS819chY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PKMWiLf2LOVDshH98KVArjNV5xJ6XSo929h3841CxJH0J30he1wfj0MLxS9eVdW1iRQ9XOnYOvKl+TC6W9AaJTEz87gCRvX3L57o3N2NH6ZJNnOAcUbZseHgvuIIEVa+zhwM/tRd9DX4wOcI51+lIuUCPcKzCSFuitbxHs9FfiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dz5/eDP3; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=oPe70/SG; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766141254;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ohuBcRpV8beJcWGlYizxYN54dm2bkbetXdev9n84fy4=;
-	b=dz5/eDP3020w9siupbWHfqcVmqoISWgken2zCyHgBPFvd96l5Mbg2CO9B5+cam8yN9dtl4
-	jp9ITwyhwHX90hCo7qQZsvtRcjJuHnKNwIo51kFmFLeakdQYkQw0IsvKt/Us/lxEk4W+Rw
-	2EK7eJZ0+22HjPUI3h+WezXR+sVmz9Q=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-194-BcGUP2WfOk6PsP7bMMAE6Q-1; Fri, 19 Dec 2025 05:47:33 -0500
-X-MC-Unique: BcGUP2WfOk6PsP7bMMAE6Q-1
-X-Mimecast-MFC-AGG-ID: BcGUP2WfOk6PsP7bMMAE6Q_1766141252
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-477c49f273fso20608895e9.3
-        for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 02:47:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1766141252; x=1766746052; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ohuBcRpV8beJcWGlYizxYN54dm2bkbetXdev9n84fy4=;
-        b=oPe70/SGbEnIO1GuIo0AHGvbShooriHLnEi3edlRDk+bhgLoBfBUKQTQAG9LfwZ5yK
-         QIc8ZJD+eQOHgpLxYuBqRIbB9Hym14r99iWTpwFuoA+6hxr8bQa4sYG3w3rdpLEdYP9T
-         eOfd9bhjP1R2Itslw2R4MJNnvtQDtRNKRfqrzjQLEmWlZXV09sth9LL+zsZe//Pq0QTy
-         7tUjavN8S96ZVVz/30WhRP3YJjaKsWe/D/1BD3GvpcngDS/pFtgrk3UEefjRDsoO6vuN
-         JW2xnVsFLSPuxsq4GgdvueEpmLlG0eExwfijF80WDZikEKnn31UleMrS6FS2SDRAo2Qn
-         4TgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766141252; x=1766746052;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ohuBcRpV8beJcWGlYizxYN54dm2bkbetXdev9n84fy4=;
-        b=B+Vz9vozHcECIi0tY01fwHCCYmg9GZMytzOdN85YQW4SeQPdAEYQW3ZfNjoglliXws
-         VKDEsQZHxK71wgW09ocq6GJe5gYAqMlvKzbe6y4fcGFwqqTyENAyyxTgWRkT/tpojm1u
-         Cd1/a80LTJ2ukmGGk7zx6cYDv37rQD/vA6vlfyZh/52auZNcLjfDP4w/7zIW4SnWFGuX
-         kfIMSdecBk4DzILF06FH7FXO87+fcxflB3+SmhDY/ADF6R8c3mfIMLYbG3hrGwJE0de7
-         w0j5YqkfTZnI8CN7uc1weL8kiZ8yoG9bMatDmC052fF7F06SluTCIjpBoLOm2RGL5dIa
-         dfBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUGyJuWhjGJhK6AshIoFtyCvk8eVLVCRA1m3SNNO6/neHDkdpFIeSz5014Y3Mhqr01uL2S0hnY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPKtvCmEBpYl46CgPQoL347WjTOo5E66hXqHBmUzcvKYyahp8U
-	U+dmw4vMP0alVWPoRovU6OXVA4ASiPG1CuzOq8Rbc1nFN4JjvpdeRxsdPpSUWaAp2uDQnUp7zAq
-	i85qR/hPwtvwJPSRu4zm0QsFTb/zxmETrMzlCf+8p29/q++rXivMg42tPpA==
-X-Gm-Gg: AY/fxX53zl9v7a7tjGp0/s8b2INmkhjQgBhjl2cKIwSRrrTefIdA7svUVkG1NN8ro2Y
-	OdFWElKAwC54b7+vMSSheFY+j2gf4KNf0kxE6yBjQvVy6r9uu+sihy0zwraAQKYIV2CsyJigIxI
-	NC+BfjE/mVuNEXMGGmE1GZQl2nR9rMZRo4CXiAsWXiWIV0l7uEkRaVC1RGkV6oxSA01bywnGQBY
-	P5AnhTMJ1OfsSUGIAM4jIg83xqjCemybDPtOZS80fAajYo9VWlP2aArdscaSkj4KH3Bcb14CFpO
-	F7vAPXq4IX0hdTwrd/ffs7ZfNbQ8s2eIJsf90BRsWXJAya/4XF9l2VjeiOxcpYTqtMNgGC02rmJ
-	Cv/bxMP0PIeUL
-X-Received: by 2002:a05:600c:6812:b0:477:63b5:7148 with SMTP id 5b1f17b1804b1-47d1955b97cmr21387445e9.6.1766141252218;
-        Fri, 19 Dec 2025 02:47:32 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG0haeKdz6e1wVUfU68PetlUVJ262uD0U3xuzOT7CFHMjUWuxjHWC2bHGvwH3+5rKwg5RCnYg==
-X-Received: by 2002:a05:600c:6812:b0:477:63b5:7148 with SMTP id 5b1f17b1804b1-47d1955b97cmr21387045e9.6.1766141251798;
-        Fri, 19 Dec 2025 02:47:31 -0800 (PST)
-Received: from [192.168.88.32] ([216.128.11.227])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47be273f147sm92155575e9.7.2025.12.19.02.47.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 Dec 2025 02:47:31 -0800 (PST)
-Message-ID: <b547252f-9893-4c23-8b17-9808c8bdd0c9@redhat.com>
-Date: Fri, 19 Dec 2025 11:47:28 +0100
+	 In-Reply-To:Content-Type; b=laYrgEIlbJeQFqQ1Eha/tkUIMFbLwiHzevx3YTqXFCrG8f3PpSEvkibFuToFXuXjyjIPeTAxY7KPN2yjDQiq2osMO7SDMneYK96jWvHmj6yHqjEQ1nE7bfZNEVQ20Iz/AYdDX6V5Bn0gFl542enVhBC1lvIl7VCAmLki5nd72Hc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L7bqolvB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61349C4CEF1;
+	Fri, 19 Dec 2025 10:48:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766141325;
+	bh=YjLoTYKDjQc7ykxQOyqOUVAmPo1a4U7SoiPnS819chY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=L7bqolvBFOR101dxP5KRLI3a89z2sYRaD5NMDs6Ftuij/N0gZwi4QNAdCHeojZTnS
+	 sTmw64BxfL5fRcmcwE0zNkijE6ByCan7iAD/1xcIEITD9mANijFwiu6u4vqpCvBmdx
+	 rVhNGqtC3jylNs9DFq/plyoUdZN6FTZ9+Du71noT/eH0gK7qafW3x9wk2b66h1QmFU
+	 iHh8MIDUnindvn/xXUhcuigCG4S2n7szUwb9sjTlMSO4EFH89QNRR+Vpz3uEOG5TRA
+	 AIiZ2NmPwbFxNkh03fN6c4S2gDllgUQR+Es2ZssCD5m0x4BgFYlPkruIu6nqAfp3Rr
+	 aU7NU187DIl/g==
+Message-ID: <96b827e5-d8b7-4e0d-b5a8-1729f5177134@kernel.org>
+Date: Fri, 19 Dec 2025 11:48:39 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,75 +48,146 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/2] net: qrtr: Drop the MHI auto_queue feature for
- IPCR DL channels
-To: manivannan.sadhasivam@oss.qualcomm.com,
- Jeff Hugo <jeff.hugo@oss.qualcomm.com>,
- Carl Vanderlip <carl.vanderlip@oss.qualcomm.com>,
- Oded Gabbay <ogabbay@kernel.org>, Manivannan Sadhasivam <mani@kernel.org>,
- Jeff Johnson <jjohnson@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+Subject: Re: [PATCH 44/44] net/mptcp: Change some dubious min_t(int, ...) to
+ min()
+Content-Language: en-GB, fr-BE
+To: David Laight <david.laight.linux@gmail.com>
+Cc: linux-kernel@vger.kernel.org, mptcp@lists.linux.dev,
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Loic Poulain <loic.poulain@oss.qualcomm.com>,
- Maxim Kochetkov <fido_max@inbox.ru>
-Cc: linux-arm-msm@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linux-kernel@vger.kernel.org, mhi@lists.linux.dev,
- linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
- ath12k@lists.infradead.org, netdev@vger.kernel.org,
- Bjorn Andersson <andersson@kernel.org>, Johan Hovold <johan@kernel.org>,
- Chris Lew <quic_clew@quicinc.com>, stable@vger.kernel.org
-References: <20251218-qrtr-fix-v2-0-c7499bfcfbe0@oss.qualcomm.com>
- <20251218-qrtr-fix-v2-1-c7499bfcfbe0@oss.qualcomm.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251218-qrtr-fix-v2-1-c7499bfcfbe0@oss.qualcomm.com>
+ Mat Martineau <martineau@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <20251119224140.8616-1-david.laight.linux@gmail.com>
+ <20251119224140.8616-45-david.laight.linux@gmail.com>
+ <cd5d45f7-0d76-4f82-849e-2f2c1544d907@kernel.org>
+ <20251218201517.2f2d91d4@pumpkin>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20251218201517.2f2d91d4@pumpkin>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 12/18/25 5:51 PM, Manivannan Sadhasivam via B4 Relay wrote:
-> From: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
-> 
-> MHI stack offers the 'auto_queue' feature, which allows the MHI stack to
-> auto queue the buffers for the RX path (DL channel). Though this feature
-> simplifies the client driver design, it introduces race between the client
-> drivers and the MHI stack. For instance, with auto_queue, the 'dl_callback'
-> for the DL channel may get called before the client driver is fully probed.
-> This means, by the time the dl_callback gets called, the client driver's
-> structures might not be initialized, leading to NULL ptr dereference.
-> 
-> Currently, the drivers have to workaround this issue by initializing the
-> internal structures before calling mhi_prepare_for_transfer_autoqueue().
-> But even so, there is a chance that the client driver's internal code path
-> may call the MHI queue APIs before mhi_prepare_for_transfer_autoqueue() is
-> called, leading to similar NULL ptr dereference. This issue has been
-> reported on the Qcom X1E80100 CRD machines affecting boot.
-> 
-> So to properly fix all these races, drop the MHI 'auto_queue' feature
-> altogether and let the client driver (QRTR) manage the RX buffers manually.
-> In the QRTR driver, queue the RX buffers based on the ring length during
-> probe and recycle the buffers in 'dl_callback' once they are consumed. This
-> also warrants removing the setting of 'auto_queue' flag from controller
-> drivers.
-> 
-> Currently, this 'auto_queue' feature is only enabled for IPCR DL channel.
-> So only the QRTR client driver requires the modification.
-> 
-> Fixes: 227fee5fc99e ("bus: mhi: core: Add an API for auto queueing buffers for DL channel")
-> Fixes: 68a838b84eff ("net: qrtr: start MHI channel after endpoit creation")
-> Reported-by: Johan Hovold <johan@kernel.org>
-> Closes: https://lore.kernel.org/linux-arm-msm/ZyTtVdkCCES0lkl4@hovoldconsulting.com
-> Suggested-by: Chris Lew <quic_clew@quicinc.com>
-> Acked-by: Jeff Johnson <jjohnson@kernel.org> # drivers/net/wireless/ath/...
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Manivannan Sadhasivam <manivannan.sadhasivam@oss.qualcomm.com>
+Hi David,
 
-For net/...
+Thank you for your reply!
 
-Acked-by: Paolo Abeni <pabeni@redhat.com>
+On 18/12/2025 21:15, David Laight wrote:
+> On Thu, 18 Dec 2025 18:33:26 +0100
+> Matthieu Baerts <matttbe@kernel.org> wrote:
+> 
+>> Hi David,
+>>
+>> On 19/11/2025 23:41, david.laight.linux@gmail.com wrote:
+>>> From: David Laight <david.laight.linux@gmail.com>
+>>>
+>>> There are two:
+>>> 	min_t(int, xxx, mptcp_wnd_end(msk) - msk->snd_nxt);
+>>> Both mptcp_wnd_end(msk) and msk->snd_nxt are u64, their difference
+>>> (aka the window size) might be limited to 32 bits - but that isn't
+>>> knowable from this code.
+>>> So checks being added to min_t() detect the potential discard of
+>>> significant bits.
+>>>
+>>> Provided the 'avail_size' and return of mptcp_check_allowed_size()
+>>> are changed to an unsigned type (size_t matches the type the caller
+>>> uses) both min_t() can be changed to min().  
+>>
+>> Thank you for the patch!
+>>
+>> Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+>>
+>> I'm not sure what the status on your side: I don't know if you still
+>> plan to send a specific series for all the modifications in the net, but
+>> just in case, I just applied your patch in the MPTCP tree. I removed the
+>> "net/" prefix from the subject. I will send this patch with others for
+>> including in the net-next tree later on if you didn't do that in between.
+> 
+> I'll go through them again at some point.
 
-even if I don't see anything network specific there.
+Great, thank you!
 
-/P
+> I'll check against 'next' (but probably not net-next).
+
+net-next is in linux-next, so that should be fine.
+
+> I actually need to look at the ones that seemed like real bugs when I
+> did an allmodconfig build - that got to over 200 patches to get 'clean'.
+> 
+> It would be nice to get rid of a lot of the min_t(), but I might try
+> to attack the dubious ones rather than the ones that appear to make
+> no difference.
+> 
+> I might propose some extra checks in minmax.h that would break W=1 builds.
+> Detecting things like min_t(u8, u32_value, 0xff) where the cast makes the
+> comparison always succeed.
+> In reality any calls with casts to u8 and u16 are 'dubious'.
+> 
+> That and changing checkpatch.pl to not suggest min_t() at all, and
+> to reject the more dubious uses.
+> After all with:
+> 	min(x, (int)y)
+> it is clear to the reader that 'y' is being possibly truncated and converted
+> to a signed value, but with:
+> 	min_t(int, x, y)
+> you don't know which value needed the cast (and the line isn't even shorter).
+> But what I've found all to often is actually:
+> 	a = min_t(typeof(a), x, y);
+> and the similar:
+> 	x = min_t(typeof(x), x, y);
+> where the type of the result is used and high bits get discarded.
+
+Good idea to add extra checks and prevent future issues!
+> I've just been trying to build with #define clamp_val clamp.
+> That requires a few minor changes and I'm pretty sure shows up
+> a real bug.
+
+Thank you for looking at that!
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
 
