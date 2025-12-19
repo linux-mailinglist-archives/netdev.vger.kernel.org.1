@@ -1,128 +1,198 @@
-Return-Path: <netdev+bounces-245562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58378CD2021
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 22:36:48 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CFE2CD2135
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 23:03:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 445AA306818E
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 21:34:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DB6B03024124
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 22:03:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDD473446DA;
-	Fri, 19 Dec 2025 21:34:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0A5023278D;
+	Fri, 19 Dec 2025 22:03:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="exx4xAj+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J2tYGyiS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-yx1-f67.google.com (mail-yx1-f67.google.com [74.125.224.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AAED2D3A60
-	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 21:34:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35A891C8626
+	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 22:03:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766180077; cv=none; b=h0BUVKHLO4LY7xpSr0q002PyNzZxgobspUbLnlAFP9iO5uFSFCmAxUoLncDwRWoQutPFQJatxfOVnRnw/rUg5fvvXAbStLlLNSYJzi9wmxvigE1Fc8H5Qq32jsVEMnDuZisFyJ/e2rH4muHtxS7XgYavjD8aEV9BHhxyJyRDAI8=
+	t=1766181829; cv=none; b=LFG6dDMUAE4TWL30/qTUb2VhF6jOUsi1etWGHVeVFxD7tGyNfDIrHmrnzNUx4NdOmnbQNA3/0vbfhKoaxIDe5l6upkSLnOawmUhbF8JzG+b5lwtHAn/ujTww8x7KIILmlOfJItSmUgxlzd6UdtESRdb85/J4EzFzYxYD9LZ0BKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766180077; c=relaxed/simple;
-	bh=8FbHIXHWfLuxgf3xtxTNzDgOnCSoEu0+aZpZJeQ9mWo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=I7nqT0P8jrwV1tOJN56PY4PBsvN3sihLKfMl+5QIUqmfD0UVzNzy1Ck1eh/ZbL789EQLK6u7E0rYOuwys25kJj0gIa7yndLopjY6RwR4Ri4eIR1cBemkx35hNyNN2PY6ugAcn6cunif9qRFNWX8HXOah6YjLGvbFmSIr1swjWCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=exx4xAj+; arc=none smtp.client-ip=209.85.128.44
+	s=arc-20240116; t=1766181829; c=relaxed/simple;
+	bh=K65eQvVjrtr+R/qeNuGKbX+IGHno8mYV8ytfYwaYLXo=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=XLMw6AYHOaBiThDKs2s+kVG4okYHQKCQhUy9kQdCTA57yGLFVH8iYSkRXdJbLxz8KCdvv93JpEoeBiaQ8e6jkZcOG/HdzM/UCAIWzg8yXx9xl+3EasRZvyHT2PJ7sMW+Dh7T8Dpuskzpj+OXqzTkrzzTp6+2wpaJB2GehYAu4Xw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J2tYGyiS; arc=none smtp.client-ip=74.125.224.67
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-477563e28a3so14487175e9.1
-        for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 13:34:35 -0800 (PST)
+Received: by mail-yx1-f67.google.com with SMTP id 956f58d0204a3-64661975669so2304806d50.3
+        for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 14:03:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766180074; x=1766784874; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=OZLj05sYwE0LA7Tdl5LEJ2p4mWbQLxeYVPVLaNXSCeg=;
-        b=exx4xAj+4LABQ8uJfDlhJh9oZ43aFxdbM44Hs3pVLoSNwCsmujKj3ZasvHcBodTyYY
-         cay0HcxOc338owC1xZCzztDg7g57toE4JnbPbSyx9GPoVvIZ3pLAe3B/nNzDUTquzYOt
-         JdPZaFFYjCnuPUxAm4sGAGrbxkSMGy+4McTajS51T3qHK1Y0gnocvn8Ky156Ib23lzWw
-         IEsPc57Owt/w0yQWKv2bA812F3A0PdLiWs+JeWB/7sSa5hejKONwQWqJpv9aBNSbNc8i
-         PTwE1q7ZTvQZNRtk3O+3Wcpyh8wt4VLkdj76mUS6xloC6SQomwCXyXdPbIWIZKv8ROHW
-         3Dag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766180074; x=1766784874;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1766181827; x=1766786627; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OZLj05sYwE0LA7Tdl5LEJ2p4mWbQLxeYVPVLaNXSCeg=;
-        b=AR3f9deL1PISQ2hxaaN0V46IaMyTBwoSE5/aKVjoaEdcoicYX9nv4kkAH+ZXMps6fg
-         s3wNvhiOzRma3xDfsw6RIvgOVEWMF+3t7P+ehvhVolVjcWgz7zl9x0JTsPEHBx194yqa
-         7xT1ccoFU0lbY/+Ot9B49SPIhEXNk7lUbJEFjL8zUenOG40qkqXmltexJnr+QicOA4SD
-         Iq1GJRzcuykMPtBvJ0QJ51bgDIe+/HWy5NZrvME1lY6oAn/SmvYc0jIYdFsAwi6hLHZ3
-         4hEZD/tw9zruR20eu/CMem/nrVoWegnNluYr4A3KQjL/YaTj45vCyK2dk62+xie6R+Wo
-         CQjg==
-X-Forwarded-Encrypted: i=1; AJvYcCVIlz0R8AHTKbqhBVTyxDL7z4M2sKWPia+ZKnMcEP65XNko5omS24GEyWJJ1TOIvh/JfJTbyts=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXBzaZ6oCbpf0nHNRBoge9vjujUFzH3NkXeW7x3aB9iAjxGy+Q
-	kYLq9HfAQ2m+/7VvpejOhfg1M0IHUmtxsUQJQRZEA9APq1C9KawtT5c/
-X-Gm-Gg: AY/fxX49WEr3btMCk3y8nH6y5s8w0wsf61A/6MIKM5L3azzYzAroxYZcpPESQTeWw0B
-	WC/A6NC1rB+S92U/Vj65FO2keZwdxRlfsLuVm7OdNRuQuPRfsfMikEGzFBnHPKh2Wy5SbwQ2qxV
-	Aup4MTdBnW1HMaKDz9h5LCaidt8KufUqhuJG9XhanyvjeJ3MGGNB+SV5ft53JJnrbGv1Mv+wcoc
-	Zyv87MjVjSNzsDspZKeDaJbAGrKKp41JnexLMeQvEcnekXzEJg7GHRl/oYjpBCrRVnvRBxW/S9f
-	SzXd1V4/EyRsrQ+maKKkbeVGVljX4aw/O0Q/P4xch7C7iQak/zqPEnoQ+fBgV9QkffI5hKXwje+
-	xbofvdzpHeMMxe+ORTYGqy74fc0Yyp/pu6QFZltdWOjucFCmzVNFZ7gGg7n+H78q+aU9BiXb7ds
-	jdn2Su+cbyqNOZCwou6E+2
-X-Google-Smtp-Source: AGHT+IFMgP/enUl1la1BBSXs4ST33XxJjubSW4ZkC2dvmsZAfgmmEbWX+svxAlb0q4PiUvjqAs9RIw==
-X-Received: by 2002:a05:600c:1c85:b0:479:255f:8805 with SMTP id 5b1f17b1804b1-47d18b8307amr51508005e9.4.1766180074216;
-        Fri, 19 Dec 2025 13:34:34 -0800 (PST)
-Received: from localhost ([87.254.0.133])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47be2723b2bsm112596665e9.3.2025.12.19.13.34.33
+        bh=Lj1SJyG/89F30p8mVkC7c1DiowXQMB0L5Q80WibFOIY=;
+        b=J2tYGyiSyRNxEKgKYZc02XzeBUIGeXpkUDQasR10yhZFRB6PvS5H79cRpG5yWsIY5T
+         eTiRR+zV/+ey3o4/tGFknhUrk6jPP5cSPCzyAwqZX8uCpVurmxeuPxHjlHZ3VY1QT4U6
+         e0FtizqbmcyFCCpRyo/rvNTgFtLciP65Y6ignI+NlpW01TXBwNIyF7p34rWv+A6U0rKe
+         R6xs6f/PFsaSYfZciL81WNwXCqsQia+wc+IMJ0yW69w5bvQbFtLw+nHyh04KrmGKeKeg
+         duF+DNrv9xtmI4kxr58vvPqg7w70PofFHnsYEAPbXQCB2tibSkXDBxeS8ICTFYzF4Tws
+         GgtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766181827; x=1766786627;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Lj1SJyG/89F30p8mVkC7c1DiowXQMB0L5Q80WibFOIY=;
+        b=I3uqiweWf+tTehs2JdG5J9XO4pQlNFmMRerppn0bYcLkQTOEPTq/RVDuBhoGGh7VgX
+         vXnbBki04JfXeqZ2kgI2bMRjfJKsb7o/aMPLfAl73HnygN688PWZqDmehFA/k3w8gGhM
+         ujd1QZYoEmvKRG3emKACPj+BR/IU2YKy6lIOiwiqC8aFUlEFZF7OhBwgsc+GX+IgNwVO
+         VXqVyCSqa3DPzBmKnR07HgSNONJ1bcSKALU3p9ZNLXJe8O/hNrEzKTt0bqqIQQhN+PUD
+         Zrd/QV+V7YGd/laWmIgImZeLR1h3t7+a/hz1jbjbYpsisyPKu8GYbnDEUA8CGM4bpjlB
+         WtGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVB9yLVJ/w7G8nvPea9lJYw4OrWk38WkgJYZxJRPCnmWiG8WDcw/mmtyRJAsVqDWvnSYKMFvUw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxaSss7+gYW4eMbcHt5Hlg7nIJ3mHtd4ZHIBUBBL3ALIVkXQ9w
+	4uHU75Td0LFeY5EAWWFIZ5hgId7FLCXqJqi/c3ckIlnisJJbLiSYbA/b
+X-Gm-Gg: AY/fxX7GjlpdeHjfb4LijlhPEh7sZYRfOPyN0d/hnlBe0RJZ/qcjo6vtYB1D5xXy65M
+	LhZWmm6rdP8IxOqD8SAwRR69wTT7nXtQf1JLh6VvpqATmNid6JDIWblNiuygUumHPBUpoYuTvNx
+	j2brmxdQN7AksEifL4SL9SPeAHTQzrj01TgkwA37wm38id6Fqhgs3l2mTHfmGad46og+AkmzXB1
+	ibKKQCbKe3NbMnM0nEizDRpVmaiVIKKif6C2eysRRVd5EPsQqaN2PRUYgffwfSTJJaWUxwNQ33S
+	RMdnrMqs5NvFCSbD/kI1TvrohxUvHdQu2RAc23w7jTzliKDi3s2xDLvE88ViPVl9ftvCo6aHHVE
+	m5qpw1hmLVqQ+QcZavlb+Iro1uYcFvrYPE/dMLpLHSICJpN8A4djKVkaUTIsdBquCQ6Mq4EYjE9
+	Kzo2zz7WuvlEcU+sX4C6//hw/I3QA/bXgbk9o6CRvitwqww2RBdoUli5aeLEq4vMSfocNN9jwgn
+	0Uq/w==
+X-Google-Smtp-Source: AGHT+IEVGU00vwSi7v6iKm43/byfAJ7Qsim+j5WMdfV7lUcLiMPf+iJ/uOJzkmL8KzeK7aJGdiwuFg==
+X-Received: by 2002:a05:690e:11c2:b0:63f:beb2:9519 with SMTP id 956f58d0204a3-6466a87edf4mr3514400d50.5.1766181826945;
+        Fri, 19 Dec 2025 14:03:46 -0800 (PST)
+Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id 956f58d0204a3-6466a8bd4c3sm1720410d50.8.2025.12.19.14.03.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Dec 2025 13:34:33 -0800 (PST)
-From: Colin Ian King <colin.i.king@gmail.com>
-To: Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	netdev@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH][next] net: dsa: microchip: make read-only array ts_reg static const
-Date: Fri, 19 Dec 2025 21:33:34 +0000
-Message-ID: <20251219213334.492228-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.51.0
+        Fri, 19 Dec 2025 14:03:46 -0800 (PST)
+Date: Fri, 19 Dec 2025 17:03:45 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ netdev <netdev@vger.kernel.org>
+Cc: io-uring <io-uring@vger.kernel.org>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, 
+ Julian Orth <ju.orth@gmail.com>
+Message-ID: <willemdebruijn.kernel.24d8030f7a3de@gmail.com>
+In-Reply-To: <460fe33a-bf6d-4966-be04-abb6d89b9f9e@kernel.dk>
+References: <07adc0c2-2c3b-4d08-8af1-1c466a40b6a8@kernel.dk>
+ <willemdebruijn.kernel.18e89ba05fbac@gmail.com>
+ <fe9dbb70-c345-41b2-96d6-2788e2510886@kernel.dk>
+ <willemdebruijn.kernel.1996d0172c2e@gmail.com>
+ <460fe33a-bf6d-4966-be04-abb6d89b9f9e@kernel.dk>
+Subject: Re: [PATCH v2] af_unix: don't post cmsg for SO_INQ unless explicitly
+ asked for
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Don't populate the read-only array ts_reg on the stack at run time,
-instead make it static const.
+Jens Axboe wrote:
+> On 12/19/25 1:08 PM, Willem de Bruijn wrote:
+> > [PATCH net v2] assuming this is intended to go through the net tree.
+> 
+> Assuming this will hit -rc3 then, as netdev PRs usually go out on
+> thursdays?
+> 
+> > Jens Axboe wrote:
+> >> On 12/19/25 12:02 PM, Willem de Bruijn wrote:
+> >>> Jens Axboe wrote:
+> >>>> A previous commit added SO_INQ support for AF_UNIX (SOCK_STREAM), but it
+> >>>> posts a SCM_INQ cmsg even if just msg->msg_get_inq is set. This is
+> >>>> incorrect, as ->msg_get_inq is just the caller asking for the remainder
+> >>>> to be passed back in msg->msg_inq, it has nothing to do with cmsg. The
+> >>>> original commit states that this is done to make sockets
+> >>>> io_uring-friendly", but it's actually incorrect as io_uring doesn't use
+> >>>> cmsg headers internally at all, and it's actively wrong as this means
+> >>>> that cmsg's are always posted if someone does recvmsg via io_uring.
+> >>>>
+> >>>> Fix that up by only posting a cmsg if u->recvmsg_inq is set.
+> >>>>
+> >>>> Additionally, mirror how TCP handles inquiry handling in that it should
+> >>>> only be done for a successful return. This makes the logic for the two
+> >>>> identical.
+> >>>>
+> >>>> Cc: stable@vger.kernel.org
+> >>>> Fixes: df30285b3670 ("af_unix: Introduce SO_INQ.")
+> >>>> Reported-by: Julian Orth <ju.orth@gmail.com>
+> >>>> Link: https://github.com/axboe/liburing/issues/1509
+> >>>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> >>>>
+> >>>> ---
+> >>>>
+> >>>> V2:
+> >>>> - Unify logic with tcp
+> >>>> - Squash the two patches into one
+> >>>>
+> >>>> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> >>>> index 55cdebfa0da0..a7ca74653d94 100644
+> >>>> --- a/net/unix/af_unix.c
+> >>>> +++ b/net/unix/af_unix.c
+> >>>> @@ -2904,6 +2904,7 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+> >>>>  	unsigned int last_len;
+> >>>>  	struct unix_sock *u;
+> >>>>  	int copied = 0;
+> >>>> +	bool do_cmsg;
+> >>>>  	int err = 0;
+> >>>>  	long timeo;
+> >>>>  	int target;
+> >>>> @@ -2929,6 +2930,9 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+> >>>>  
+> >>>>  	u = unix_sk(sk);
+> >>>>  
+> >>>> +	do_cmsg = READ_ONCE(u->recvmsg_inq);
+> >>>> +	if (do_cmsg)
+> >>>> +		msg->msg_get_inq = 1;
+> >>>
+> >>> I would avoid overwriting user written fields if it's easy to do so.
+> >>>
+> >>> In this case it probably is harmless. But we've learned the hard way
+> >>> that applications can even get confused by recvmsg setting msg_flags.
+> >>> I've seen multiple reports of applications failing to scrub that field
+> >>> inbetween calls.
+> >>>
+> >>> Also just more similar to tcp:
+> >>>
+> >>>        do_cmsg = READ_ONCE(u->recvmsg_inq);
+> >>>        if ((do_cmsg || msg->msg_get_inq) && (copied ?: err) >= 0) {
+> >>
+> >> I think you need to look closer, because this is actually what the tcp
+> >> path does:
+> >>
+> >> if (tp->recvmsg_inq) {
+> >> 	[...]
+> >> 	msg->msg_get_inq = 1;
+> >> }
+> > 
+> > I indeed missed that TCP does the same. Ack. Indeed consistency was
+> > what I asked for.
+> 
+> FWIW, I don't disagree with you, but sorting that out should then be a
+> followup patch that would then touch both tcp and streams.
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
----
- drivers/net/dsa/microchip/ksz_ptp.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/dsa/microchip/ksz_ptp.c b/drivers/net/dsa/microchip/ksz_ptp.c
-index 997e4a76d0a6..839b0202076d 100644
---- a/drivers/net/dsa/microchip/ksz_ptp.c
-+++ b/drivers/net/dsa/microchip/ksz_ptp.c
-@@ -1088,8 +1088,11 @@ static void ksz_ptp_msg_irq_free(struct ksz_port *port, u8 n)
+Agreed. That's more for net-next. I'll take a look.
  
- static int ksz_ptp_msg_irq_setup(struct ksz_port *port, u8 n)
- {
--	u16 ts_reg[] = {REG_PTP_PORT_PDRESP_TS, REG_PTP_PORT_XDELAY_TS,
--			REG_PTP_PORT_SYNC_TS};
-+	static const u16 ts_reg[] = {
-+		REG_PTP_PORT_PDRESP_TS,
-+		REG_PTP_PORT_XDELAY_TS,
-+		REG_PTP_PORT_SYNC_TS
-+	};
- 	static const char * const name[] = {"pdresp-msg", "xdreq-msg",
- 					    "sync-msg"};
- 	const struct ksz_dev_ops *ops = port->ksz_dev->dev_ops;
--- 
-2.51.0
+> > Reviewed-by: Willem de Bruijn <willemb@google.com>
+> 
+> Thanks!
+> 
+> -- 
+> Jens Axboe
+
 
 
