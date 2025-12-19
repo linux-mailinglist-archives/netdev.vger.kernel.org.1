@@ -1,177 +1,181 @@
-Return-Path: <netdev+bounces-245501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE2F0CCF3FB
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 11:00:16 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95634CCF467
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 11:08:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id B02FD30164CD
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 10:00:15 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DF23D3090DC7
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 10:05:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E39CD2C0F83;
-	Fri, 19 Dec 2025 10:00:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 264882FFFB2;
+	Fri, 19 Dec 2025 10:05:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="GZkYxcI3"
 X-Original-To: netdev@vger.kernel.org
-Received: from proxmox-new.maurer-it.com (proxmox-new.maurer-it.com [94.136.29.106])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31AB228851E
-	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 10:00:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.136.29.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656CC2FF679;
+	Fri, 19 Dec 2025 10:05:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766138414; cv=none; b=T3ByU2UDnPupnWNjEA6nh5BZDNMiDjsTljdsIyrx38DL8foqCZ/xxW45pdOxq+H+tFfvujGflRGXnYlj0iUDZfZGM7gqwt8trKwS/x3jWSTEGb/zL1WRK+o6NuljpQu1DWYetKA/NqiChSNfZzTDilbROkA/Ooe8EvTfLjDUAUQ=
+	t=1766138721; cv=none; b=jVrDHUI9yN2reoZMW2UNYvB05Wsorkkfvi9si929wq7FFB+T/7VH1ICR8URpImoVUQ5THAPfb67I41tl4uMsAPFEJtNhYjrHBQi3Nn37RYyYoGd3nzdJ8ozYR0bohqnsCs7uTg0WwnddJvJ4/tOz0yuRGoLrnLzhP7H5Mr1LQZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766138414; c=relaxed/simple;
-	bh=8KBxPQCN/LuLpypmUHuZcdNyUFKhh1Ub3GqSQJ6G27M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=X/S7lFxH7aTMY2C9GMSDTqF36PK1fYbv3EP6JUiAf5WNuyRvhGEJ3hf84EvrUOjK7iNeseVoU2CVy9BrzLANd5oE0xaCbtgCnMkrLLK1vhEOpe+FT7QXC2+nYpBdwxjf35kdUn4JaP8qJf5SzhA3DZb/DoApQMIA7uHW8uQ8nsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com; spf=pass smtp.mailfrom=proxmox.com; arc=none smtp.client-ip=94.136.29.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=proxmox.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proxmox.com
-Received: from proxmox-new.maurer-it.com (localhost.localdomain [127.0.0.1])
-	by proxmox-new.maurer-it.com (Proxmox) with ESMTP id 3196E48CA8;
-	Fri, 19 Dec 2025 11:00:04 +0100 (CET)
-Message-ID: <4f1829d0-7d79-45bc-9006-65c4e3449a5e@proxmox.com>
-Date: Fri, 19 Dec 2025 11:00:01 +0100
+	s=arc-20240116; t=1766138721; c=relaxed/simple;
+	bh=qvTbJcH39/BFQ9aHwMDRIzLhdc64pAOoaNQwNrs00CY=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jrLCMWUb5N4jqE5+YQG+5Yi0BLhyS0aSIhF7ShPwizFeziATG5lTZJFx+rq7oi8dmWtU6tl9hzl/8UAl0XNSolkAYsQH1a90GV+KBIdzqpoFy5ESesV80Bk8BKIOklkusYgELlsxGIuhpmTEoe4EVgWxq2GcWYeAfnEoTqmq0h0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=GZkYxcI3; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BIJjX7F680014;
+	Fri, 19 Dec 2025 02:04:28 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=PBVYq6yiFYv4b2SACgENr1E4a
+	Ni8XV0ZxgX0rcrPAGk=; b=GZkYxcI32MsTUBg2UvzK5NVBdaP9s6EUH2N7B5ULg
+	ftMRdepOnYCwhmb1D1RXEG/z94J2UNi17ZBGYk28TpW0oORIqIg3saITvRnKp8RK
+	7EZoFdFD5egHgU+aZ/WxjeCr8Ux+kb2SP3cs1irViVgC9xb0gAl+EbG2zojCS6Fs
+	0WrOzctKwU4hcHMpCr5MbjrBUExFskEMMJX/ztKVZ148IWHraZV4SfKD6xtWKl+R
+	MRBW2xfokm20sRFIwXgdAS+u9U0SKtwI096vrEOD53NC6Rqhbw+5vb38U7OubhBC
+	eEBr/DcwMrgFSxHQuD4/2tCqmxNwa7DMlLtHWqOdcZvNg==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4b4r241eu1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 19 Dec 2025 02:04:27 -0800 (PST)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.25; Fri, 19 Dec 2025 02:04:40 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
+ Transport; Fri, 19 Dec 2025 02:04:40 -0800
+Received: from test-OptiPlex-Tower-Plus-7010 (unknown [10.29.37.157])
+	by maili.marvell.com (Postfix) with SMTP id 56EA15B695F;
+	Fri, 19 Dec 2025 02:04:21 -0800 (PST)
+Date: Fri, 19 Dec 2025 15:34:20 +0530
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: Wei Fang <wei.fang@nxp.com>
+CC: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "mcoquelin.stm32@gmail.com" <mcoquelin.stm32@gmail.com>,
+        "alexandre.torgue@foss.st.com" <alexandre.torgue@foss.st.com>,
+        "ast@kernel.org" <ast@kernel.org>,
+        "daniel@iogearbox.net"
+	<daniel@iogearbox.net>,
+        "hawk@kernel.org" <hawk@kernel.org>,
+        "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
+        "sdf@fomichev.me"
+	<sdf@fomichev.me>,
+        "rmk+kernel@armlinux.org.uk" <rmk+kernel@armlinux.org.uk>,
+        "0x1207@gmail.com" <0x1207@gmail.com>,
+        "hayashi.kunihiko@socionext.com"
+	<hayashi.kunihiko@socionext.com>,
+        Vladimir Oltean <vladimir.oltean@nxp.com>,
+        "boon.leong.ong@intel.com" <boon.leong.ong@intel.com>,
+        "imx@lists.linux.dev"
+	<imx@lists.linux.dev>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-stm32@st-md-mailman.stormreply.com"
+	<linux-stm32@st-md-mailman.stormreply.com>,
+        "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+        "bpf@vger.kernel.org"
+	<bpf@vger.kernel.org>
+Subject: Re: [PATCH net] net: stmmac: fix the crash issue for zero copy
+ XDP_TX action
+Message-ID: <aUUjJH1tQkN1UcYL@test-OptiPlex-Tower-Plus-7010>
+References: <20251204071332.1907111-1-wei.fang@nxp.com>
+ <aUKPHdtAPDnMqB7X@test-OptiPlex-Tower-Plus-7010>
+ <AS8PR04MB849779A6392D543049A3F5BE88ABA@AS8PR04MB8497.eurprd04.prod.outlook.com>
+ <aUOddielBMkrmwhd@test-OptiPlex-Tower-Plus-7010>
+ <PAXPR04MB8510499B65301187736D511088A8A@PAXPR04MB8510.eurprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 7/8] tcp: stronger sk_rcvbuf checks
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Neal Cardwell <ncardwell@google.com>, Simon Horman <horms@kernel.org>,
- Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
- <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com,
- lkolbe@sodiuswillert.com
-References: <20250711114006.480026-1-edumazet@google.com>
- <20250711114006.480026-8-edumazet@google.com>
- <cd44c0d2-17ed-460d-9f89-759987d423dc@proxmox.com>
- <8f8836dd-c46f-403c-b478-a9e89dd62912@proxmox.com>
- <CANn89iL=MTgYygnFaCeaMpSzjooDgnzwUd_ueSnJFxasXwyMwg@mail.gmail.com>
- <c1ae58f7-cf31-4fb6-ac92-8f7b61272226@proxmox.com>
- <CANn89iJRCW3VNsY3vZwurvh52diE+scUfZvwx5bg5Tuoa3L_TQ@mail.gmail.com>
- <64d8fa05-63a2-420e-8b97-c51cb581804a@proxmox.com>
- <CANn89iKPVPHQMgMiA=sum_nAjDg6hK0WSzHjP4onUJhYkj1xUQ@mail.gmail.com>
- <CANn89iKhZ=Ofy45PBrvLLE=nqv6X7CTvrpMdYMLKeVjpN6c-3A@mail.gmail.com>
-Content-Language: en-US, de-DE
-From: Christian Ebner <c.ebner@proxmox.com>
-In-Reply-To: <CANn89iKhZ=Ofy45PBrvLLE=nqv6X7CTvrpMdYMLKeVjpN6c-3A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Bm-Milter-Handled: 55990f41-d878-4baa-be0a-ee34c49e34d2
-X-Bm-Transport-Timestamp: 1766138389439
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <PAXPR04MB8510499B65301187736D511088A8A@PAXPR04MB8510.eurprd04.prod.outlook.com>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjE5MDA4MiBTYWx0ZWRfX9GQmj9XB3SQL
+ oH49VqzVFggN9rADC22341hevpvUlzCz5zG1MrgQuOsIMCNzc3+yjg5UdZhOVtkK4q6l8G3zdXY
+ 0YrrsVUl2BmGnuRzGZujnJcMgtei4YwiBarLbJV7IJV9b3uwcAAOyOVhouAm9Inr25xZLPjTA+a
+ JaPOlv+y1Gydv5xSuOc6A4/xsj4bYcDmU9v7F0q9bL8PwuMdzTX2C3QcpqTaNESo6ESjdLGnSQC
+ UDOuFH5DTivmNSZA2j3S1tkFyrkRoKC4HpGf2brlqlFV0CzjrhplEEo1houxaNc50opKnfnSY0P
+ UOGOX5Hnn5YvpB6OVT8DIQY93acypB0IZys4mklgv0j2nCVseYUkFi2ga82EOKJE72itirstiHr
+ rEg3oD15Mm+229wHkEpCPXIGfjXRkwFgOKUVvMEJpIfH3pl71JKD/3c/WDzv6H5popQK4puDPER
+ +Dd2qK9AGNJtDewE/Tg==
+X-Proofpoint-ORIG-GUID: lly9dLQ9twDymCjIyijl416JTD7HhVSR
+X-Authority-Analysis: v=2.4 cv=T4uBjvKQ c=1 sm=1 tr=0 ts=6945232b cx=c_pps
+ a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
+ a=w373o-ZMvzc93a0z:21 a=kj9zAlcOel0A:10 a=wP3pNCr1ah4A:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=8AirrxEcAAAA:8 a=M5GUcnROAAAA:8
+ a=DZSnwkNSkk__NUsnbCUA:9 a=CjuIK1q_8ugA:10 a=ST-jHhOKWsTCqRlWije3:22
+ a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-GUID: lly9dLQ9twDymCjIyijl416JTD7HhVSR
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-12-19_03,2025-12-17_02,2025-10-01_01
 
-On 12/19/25 9:45 AM, Eric Dumazet wrote:
-> On Fri, Dec 19, 2025 at 9:23 AM Eric Dumazet <edumazet@google.com> wrote:
->>
->> On Thu, Dec 18, 2025 at 3:58 PM Christian Ebner <c.ebner@proxmox.com> wrote:
->>>
->>> On 12/18/25 2:19 PM, Eric Dumazet wrote:
->>>> On Thu, Dec 18, 2025 at 1:28 PM Christian Ebner <c.ebner@proxmox.com> wrote:
->>>>>
->>>>> Hi Eric,
->>>>>
->>>>> thank you for your reply!
->>>>>
->>>>> On 12/18/25 11:10 AM, Eric Dumazet wrote:
->>>>>> Can you give us (on receive side) : cat /proc/sys/net/ipv4/tcp_rmem
->>>>>
->>>>> Affected users report they have the respective kernels defaults set, so:
->>>>> - "4096 131072 6291456"  for v.617 builds
->>>>> - "4096 131072 33554432" with the bumped max value of 32M for v6.18 builds
->>>>>
->>>>>> It seems your application is enforcing a small SO_RCVBUF ?
->>>>>
->>>>> No, we can exclude that since the output of `ss -tim` show the default
->>>>> buffer size after connection being established and growing up to the max
->>>>> value during traffic (backups being performed).
->>>>>
->>>>
->>>> The trace you provided seems to show a very different picture ?
->>>>
->>>> [::ffff:10.xx.xx.aa]:8007
->>>>          [::ffff:10.xx.xx.bb]:55554
->>>>             skmem:(r0,rb7488,t0,tb332800,f0,w0,o0,bl0,d20) cubic
->>>> wscale:10,10 rto:201 rtt:0.085/0.015 ato:40 mss:8948 pmtu:9000
->>>> rcvmss:7168 advmss:8948 cwnd:10 bytes_sent:937478 bytes_acked:937478
->>>> bytes_received:1295747055 segs_out:301010 segs_in:162410
->>>> data_segs_out:1035 data_segs_in:161588 send 8.42Gbps lastsnd:3308
->>>> lastrcv:191 lastack:191 pacing_rate 16.7Gbps delivery_rate 2.74Gbps
->>>> delivered:1036 app_limited busy:437ms rcv_rtt:207.551 rcv_space:96242
->>>> rcv_ssthresh:903417 minrtt:0.049 rcv_ooopack:23 snd_wnd:142336 rcv_wnd:7168
->>>>
->>>> rb7488 would suggest the application has played with a very small SO_RCVBUF,
->>>> or some memory allocation constraint (memcg ?)
->>>
->>> Thanks for the hint were to look, however we checked that the process is
->>> not memory constrained and the host has no memory pressure.
->>>
->>> Also `strace -f -e socket,setsockopt -p $(pidof proxmox-backup-proxy)`
->>> shows no syscalls which would change the socket buffer size (though this
->>> still needs to be double checked by affected users for completeness).
->>>
->>> Further, the stalls most often happen mid transfer, starting with the
->>> expected throughput and even might recover from the stall after some
->>> time, continue at regular speed again.
->>>
->>>
->>> Status update for v6.18
->>> -----------------------
->>>
->>> In the meantime, a user reported 2 stale connections with running kernel
->>> 6.18+416dd649f3aa
->>>
->>> The tcpdump pattern looks slightly different, here we got repeating
->>> sequences of:
->>> ```
->>> 224     5.407981        10.xx.xx.bb     10.xx.xx.aa     TCP     4162    40068 → 8007 [PSH, ACK]
->>> Seq=106497 Ack=1 Win=3121 Len=4096 TSval=3198115973 TSecr=3048094015
->>> 225     5.408064        10.xx.xx.aa     10.xx.xx.bb     TCP     66      8007 → 40068 [ACK] Seq=1
->>> Ack=110593 Win=4 Len=0 TSval=3048094223 TSecr=3198115973
->>> ```
->>>
->>> The perf trace for `tcp:tcp_rcvbuf_grow` came back empty while in stale
->>> state, tracing with:
->>> ```
->>> perf record -a -e tcp:tcp_rcv_space_adjust,tcp:tcp_rcvbuf_grow
->>> perf script
->>> ```
->>> produced some output as shown below, so it seems that tcp_rcvbuf_grow()
->>> is never called in that case, while tcp_rcv_space_adjust() is.
->>
->> Autotuning is not enabled for your case, somehow the application is
->> not behaving as expected,
-
-Is there a way for us to check if autotuning is enabled for the TCP 
-connection at this point in time? Some tracepoint to identify it being 
-deactivated?
-
->> so maybe you have to change tcp_rmem[2] if a driver is allocating
->> order-2 pages for the 9K frames.
-
-Same here, is there a way for us to check this? Note however that we 
-could not identify a specific NIC/driver to cause the behavior, it 
-appears for various vendor models.
-
+On 2025-12-18 at 12:06:47, Wei Fang (wei.fang@nxp.com) wrote:
+> > On 2025-12-17 at 18:19:19, Wei Fang (wei.fang@nxp.com) wrote:
+> > > > > -	res = stmmac_xdp_xmit_xdpf(priv, queue, xdpf, false);
+> > > > > -	if (res == STMMAC_XDP_TX)
+> > > > > +	/* For zero copy XDP_TX action, dma_map is true */
+> > > > > +	res = stmmac_xdp_xmit_xdpf(priv, queue, xdpf, zc);
+> > > > 	Seems stmmac_xdp_xmit_xdpf is using dma_map_single if we pass zc is
+> > > > true.
+> > > >         Ideally in case of zc, driver can use
+> > > > page_pool_get_dma_addr, may be you
+> > > >         need pass zc param as false. Please check
+> > > >
+> > >
+> > > No, the memory type of xdpf->data is MEM_TYPE_PAGE_ORDER0 rather than
+> > > MEM_TYPE_PAGE_POOL, so we should use dma_map_single().
+> > > Otherwise, it will lead to invalid mappings and cause the crash.
+> > >
+> > >
+> >  ACK, found below code bit confusing
+> > 		case STMMAC_XDP_CONSUMED:
+> >  			xsk_buff_free(buf->xdp);
+> > +			fallthrough;
+> > +		case STMMAC_XSK_CONSUMED:
+> >  			rx_dropped++;
+> > 
+> >      Ideally in case of STMMAC_XSK_CONSUMED, driver needs to call
+> > xsk_buff_free.
+> >      And in case of STMMAC_XDP_CONSUMED, driver needs to call
+> > xdp_return_frame.
+> >      May be you can move all buffer free logic to stmmac_rx_zc with above
+> > suggested
+> >      changes.
 > 
-> I meant to say : change tcp_rmem[1]
+> For zero copy, the xdp_buff is freed by xdp_convert_buff_to_frame()
+> when converting the xdp_xdp to xdp_frame. So STMMAC_XSK_CONSUMED
+> means the xdp_buff has been freed, it tells stmmac_rx_zc() no to free a
+> xdp_buff that has been freed.
 > 
-> echo "4096 262144 33554432" >/proc/sys/net/ipv4/tcp_rmem
-
-Okay, thanks for the suggestion, let me get back to you with results if 
-this changes anything.
-
-
->> You have not given what  was on the sender side (linux or other stack ?)
-
-Clients are all Linux hosts, running kernel versions 6.8, 6.14 or 6.17. 
-No other TCP stacks.
-
-Best regards,
-Christian Ebner
-
+> I have added a comment for STMMAC_XSK_CONSUMED, see
+> 
+> +       } else if (res == STMMAC_XDP_CONSUMED && zc) {
+> +               /* xdp has been freed by xdp_convert_buff_to_frame(),
+> +                * no need to call xsk_buff_free() again, so return
+> +                * STMMAC_XSK_CONSUMED.
+> +                */
+> +               res = STMMAC_XSK_CONSUMED;
+> +               xdp_return_frame(xdpf);
+> +       }
+> 
+>
+ ACK. 
+Reviewed-by: Hariprasad Kelam <hkelam@marvell.com> 
 
