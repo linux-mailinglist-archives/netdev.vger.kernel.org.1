@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-245460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245461-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 862F7CCE258
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 02:31:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BD36CCE2B8
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 02:43:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6F9D73020CC5
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 01:31:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E62133005FC4
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 01:42:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9806A228CB0;
-	Fri, 19 Dec 2025 01:31:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 678EE21D3F0;
+	Fri, 19 Dec 2025 01:42:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="o8jJhT7z"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vqLwAh1s"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 937D71F94A
-	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 01:31:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4F9AD2FB
+	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 01:42:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766107898; cv=none; b=i7CjuELkBZoYS3wqry6qk/RmjcmfXCCFzqHkaSfR9AJo2PxR89WwsJfAF8XJTXOLII7bzjdD9jj1xR+YqgfbLvQdH/n265dNX2u/bacnzK06oMErfI3opo1Y9ghrlLIObCQ1T00ffJzA1qNTAPYVJNP58BumcOgPRf+osOmzmmU=
+	t=1766108529; cv=none; b=NifoOPNxJ92zHZcx4br812CtNpL1pJim3A2lsCvPIld4N+Ixjbp4Vsid4upFuFmXJuDsLYzk9EJTxKbUBcaIRfRmgqYT4SFmP+rXkjSnPV5HZUMHLAxvzyHoy9lKA2gWgCGar3rVOPugD/rYBuBg42UAy2rdXI5VeqQSDXmVDAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766107898; c=relaxed/simple;
-	bh=0mcAgtKW5YfSfd0o76y1SFff2gIzdtO+pSy6ZXc0U90=;
+	s=arc-20240116; t=1766108529; c=relaxed/simple;
+	bh=LiwKkLnWNYCMnc6GlZIfQZrcjmH/6VT2FJhPLOpoyug=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QIVkNrqDfKVYOblx1J/K+Vw988V8n8xA3/QhHqRVoUjmyeoGsw18MIIKD+cqYWxLF0fWASmsLXJXpQcRGkZfKjcxufnDEbkNbVqjg3o+RV8l+zrQ4M0n6CAWz4zDCaRLBSkQNwc0MnGaQslmRaTG7uQQuH1pJ2KORdj3Irs8s6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=o8jJhT7z; arc=none smtp.client-ip=91.218.175.171
+	 MIME-Version:Content-Type; b=EOsqNUVt8HOkeGuM2wDu/h3StLbq6b/x+8Oq6hPXHHVtP73v0HHUs/hyhBvjCAMNLSsezarNymrdW4Rf7p/uXxbw1t4TRrI9yNGzwTtxN/1/pUO25x8EOvWk5GGOhRZaGgkj1l+Og2VFNinLkT9DLHNFHEk90EtrKdB1YLAjrqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vqLwAh1s; arc=none smtp.client-ip=95.215.58.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1766107879;
+	t=1766108524;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8DqlQx2Z2v0fASWsZ6YgDhJUlJqweRBPgJSWdzMub7g=;
-	b=o8jJhT7zZd/OGa0OoTEtN0nrtAS+Y+UcuD1lwd6PBa4ripfR84ppaga6k4K+lVWts7LFA4
-	IQNKjHzn0vZnRB+SSBRhkOC4Am95AqOukeoUxkPyBGuSHSGSUDG5rAVD3ESSY7jI4+cGko
-	pwTJR1v2DMZiDGrTqs6wwsq1nJ3ajjw=
+	bh=qjSg1OrEXDQUrBeStG87QDXijr2CA2Ftqkeu5gy91l4=;
+	b=vqLwAh1szzcflbnkRemThLxvnaAvY1F0FpmVx04/iqxEkpwJGM7/N89SQEPCaP0pNy2I+F
+	yQ1XCVuag/o64Iw8/3q/hn0x60AAIyBQJhAe/iDD3mpHytyu5Gwy/2ILg9zoH204ath/Pd
+	WgKgHmeAFmxmamnPHN8/jUNP6DCas5A=
 From: Menglong Dong <menglong.dong@linux.dev>
 To: Menglong Dong <menglong8.dong@gmail.com>,
  Andrii Nakryiko <andrii.nakryiko@gmail.com>
@@ -50,15 +50,17 @@ Cc: ast@kernel.org, andrii@kernel.org, davem@davemloft.net,
  haoluo@google.com, jolsa@kernel.org, tglx@linutronix.de, mingo@redhat.com,
  bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
  netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH bpf-next v4 4/9] bpf: add the kfunc bpf_fsession_cookie
-Date: Fri, 19 Dec 2025 09:31:05 +0800
-Message-ID: <2334439.iZASKD2KPV@7940hx>
+Subject:
+ Re: [PATCH bpf-next v4 6/9] bpf,x86: add tracing session supporting for
+ x86_64
+Date: Fri, 19 Dec 2025 09:41:06 +0800
+Message-ID: <9551014.CDJkKcVGEf@7940hx>
 In-Reply-To:
- <CAEf4Bza=Cuu-3LZs7XuK-d7FLKAU8ppkLneiuLqDejzfweHqqA@mail.gmail.com>
+ <CAEf4BzZOfB310d4_1eznUgkGwK5cwhZSEgc9SANJskCbctDoMQ@mail.gmail.com>
 References:
  <20251217095445.218428-1-dongml2@chinatelecom.cn>
- <20251217095445.218428-5-dongml2@chinatelecom.cn>
- <CAEf4Bza=Cuu-3LZs7XuK-d7FLKAU8ppkLneiuLqDejzfweHqqA@mail.gmail.com>
+ <20251217095445.218428-7-dongml2@chinatelecom.cn>
+ <CAEf4BzZOfB310d4_1eznUgkGwK5cwhZSEgc9SANJskCbctDoMQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,89 +75,115 @@ On 2025/12/19 08:55 Andrii Nakryiko <andrii.nakryiko@gmail.com> write:
 > On Wed, Dec 17, 2025 at 1:55=E2=80=AFAM Menglong Dong <menglong8.dong@gma=
 il.com> wrote:
 > >
-> > Implement session cookie for fsession. In order to limit the stack usag=
-e,
-> > we make 4 as the maximum of the cookie count.
+> > Add BPF_TRACE_SESSION supporting to x86_64, including:
 > >
-> > The offset of the current cookie is stored in the
-> > "(ctx[-1] >> BPF_TRAMP_M_COOKIE) & 0xFF". Therefore, we can get the
-> > session cookie with ctx[-offset].
-> >
-> > The stack will look like this:
-> >
-> >   return value  -> 8 bytes
-> >   argN          -> 8 bytes
-> >   ...
-> >   arg1          -> 8 bytes
-> >   nr_args       -> 8 bytes
-> >   ip(optional)  -> 8 bytes
-> >   cookie2       -> 8 bytes
-> >   cookie1       -> 8 bytes
-> >
-> > Inline the bpf_fsession_cookie() in the verifer too.
-> >
-> > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
-> > ---
-> > v4:
-> > - limit the maximum of the cookie count to 4
-> > - store the session cookies before nr_regs in stack
-> > ---
-> >  include/linux/bpf.h      | 16 ++++++++++++++++
-> >  kernel/bpf/trampoline.c  | 14 +++++++++++++-
-> >  kernel/bpf/verifier.c    | 20 ++++++++++++++++++--
-> >  kernel/trace/bpf_trace.c |  9 +++++++++
-> >  4 files changed, 56 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-> > index d165ace5cc9b..0f35c6ab538c 100644
-> > --- a/include/linux/bpf.h
-> > +++ b/include/linux/bpf.h
-> > @@ -1215,6 +1215,7 @@ enum {
-> >
-> >  #define BPF_TRAMP_M_NR_ARGS    0
-> >  #define BPF_TRAMP_M_IS_RETURN  8
-> > +#define BPF_TRAMP_M_COOKIE     9
-> >
-> >  struct bpf_tramp_links {
-> >         struct bpf_tramp_link *links[BPF_MAX_TRAMP_LINKS];
-> > @@ -1318,6 +1319,7 @@ struct bpf_trampoline {
-> >         struct mutex mutex;
-> >         refcount_t refcnt;
-> >         u32 flags;
-> > +       int cookie_cnt;
+> > 1. clear the return value in the stack before fentry to make the fentry
+> >    of the fsession can only get 0 with bpf_get_func_ret(). If we can li=
+mit
+> >    that bpf_get_func_ret() can only be used in the
+> >    "bpf_fsession_is_return() =3D=3D true" code path, we don't need do t=
+his
+> >    thing anymore.
 >=20
-> can't you just count this each time you need to know instead of
-> keeping track of this? it's not that expensive and won't happen that
-> frequently (and we keep lock on trampoline, so it's also safe and
-> race-free to count)
+> What does bpf_get_func_ret() return today for fentry? zero or just
+> random garbage? If the latter, we can keep the same semantics for
+> fsession on entry. Ultimately, result of bpf_get_func_ret() is
+> meaningless outside of fexit/session-exit
 
-There is a for-loop below that use the "cookie_cnt" to clear all the
-cookie to zero. We limited the maximum of cookie_cnt to 4, so
-I guess we can count it directly there. I'll change it in the
-next version.
+=46or fentry, bpf_get_func_ret() is not allowed to be called. For fsession,
+I think the best way is that we allow to call bpf_get_func_ret() in the
+"bpf_fsession_is_return() =3D=3D true"  branch, and prohibit it in
+"bpf_fsession_is_return() =3D=3D false" branch. However, we need to track
+such condition in verifier, which will make things complicated. So
+I think we can allow the usage of bpf_get_func_ret() in fsession and
+make sure it will always get zero in the fsession-fentry for now.
 
 Thanks!
 Menglong Dong
 
 >=20
-> >         u64 key;
-> >         struct {
-> >                 struct btf_func_model model;
-> > @@ -1762,6 +1764,7 @@ struct bpf_prog {
-> >                                 enforce_expected_attach_type:1, /* Enfo=
-rce expected_attach_type checking at attach time */
-> >                                 call_get_stack:1, /* Do we call bpf_get=
-_stack() or bpf_get_stackid() */
-> >                                 call_get_func_ip:1, /* Do we call get_f=
-unc_ip() */
-> > +                               call_session_cookie:1, /* Do we call bp=
-f_fsession_cookie() */
-> >                                 tstamp_type_access:1, /* Accessed __sk_=
-buff->tstamp_type */
-> >                                 sleepable:1;    /* BPF program is sleep=
-able */
-> >         enum bpf_prog_type      type;           /* Type of BPF program =
-*/
+> >
+> > 2. clear all the session cookies' value in the stack. If we can make su=
+re
+> >    that the reading to session cookie can only be done after initialize=
+ in
+> >    the verifier, we don't need this anymore.
+> >
+> > 2. store the index of the cookie to ctx[-1] before the calling to fsess=
+ion
+> >
+> > 3. store the "is_return" flag to ctx[-1] before the calling to fexit of
+> >    the fsession.
+> >
+> > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+> > Co-developed-by: Leon Hwang <leon.hwang@linux.dev>
+> > Signed-off-by: Leon Hwang <leon.hwang@linux.dev>
+> > ---
+> > v4:
+> > - some adjustment to the 1st patch, such as we get the fsession prog fr=
+om
+> >   fentry and fexit hlist
+> > - remove the supporting of skipping fexit with fentry return non-zero
+> >
+> > v2:
+> > - add session cookie support
+> > - add the session stuff after return value, instead of before nr_args
+> > ---
+> >  arch/x86/net/bpf_jit_comp.c | 36 +++++++++++++++++++++++++++++++-----
+> >  1 file changed, 31 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
+> > index 8cbeefb26192..99b0223374bd 100644
+> > --- a/arch/x86/net/bpf_jit_comp.c
+> > +++ b/arch/x86/net/bpf_jit_comp.c
+> > @@ -3086,12 +3086,17 @@ static int emit_cond_near_jump(u8 **pprog, void=
+ *func, void *ip, u8 jmp_cond)
+> >  static int invoke_bpf(const struct btf_func_model *m, u8 **pprog,
+> >                       struct bpf_tramp_links *tl, int stack_size,
+> >                       int run_ctx_off, bool save_ret,
+> > -                     void *image, void *rw_image)
+> > +                     void *image, void *rw_image, u64 nr_regs)
+> >  {
+> >         int i;
+> >         u8 *prog =3D *pprog;
+> >
+> >         for (i =3D 0; i < tl->nr_links; i++) {
+> > +               if (tl->links[i]->link.prog->call_session_cookie) {
+> > +                       /* 'stack_size + 8' is the offset of nr_regs in=
+ stack */
+> > +                       emit_st_r0_imm64(&prog, nr_regs, stack_size + 8=
+);
+> > +                       nr_regs -=3D (1 << BPF_TRAMP_M_COOKIE);
+>=20
+> you have to rename nr_regs to something more meaningful because it's
+> so weird to see some bit manipulations with *number of arguments*
+>=20
+> > +               }
+> >                 if (invoke_bpf_prog(m, &prog, tl->links[i], stack_size,
+> >                                     run_ctx_off, save_ret, image, rw_im=
+age))
+> >                         return -EINVAL;
+> > @@ -3208,8 +3213,9 @@ static int __arch_prepare_bpf_trampoline(struct b=
+pf_tramp_image *im, void *rw_im
+> >                                          struct bpf_tramp_links *tlinks,
+> >                                          void *func_addr)
+> >  {
+> > -       int i, ret, nr_regs =3D m->nr_args, stack_size =3D 0;
+> > -       int regs_off, nregs_off, ip_off, run_ctx_off, arg_stack_off, rb=
+x_off;
+> > +       int i, ret, nr_regs =3D m->nr_args, cookie_cnt, stack_size =3D =
+0;
+> > +       int regs_off, nregs_off, ip_off, run_ctx_off, arg_stack_off, rb=
+x_off,
+> > +           cookie_off;
+>=20
+> if it doesn't fit on a single line, just `int cookie_off;` on a
+> separate line, why wrap the line?
+>=20
+> >         struct bpf_tramp_links *fentry =3D &tlinks[BPF_TRAMP_FENTRY];
+> >         struct bpf_tramp_links *fexit =3D &tlinks[BPF_TRAMP_FEXIT];
+> >         struct bpf_tramp_links *fmod_ret =3D &tlinks[BPF_TRAMP_MODIFY_R=
+ETURN];
 >=20
 > [...]
 >=20
