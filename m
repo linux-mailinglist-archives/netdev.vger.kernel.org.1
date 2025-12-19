@@ -1,100 +1,117 @@
-Return-Path: <netdev+bounces-245465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 941F2CCE43D
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 03:28:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 07D1ACCE62F
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 04:47:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 0330C3014A2B
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 02:28:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 163E43016DE1
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 03:47:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7915928CF7C;
-	Fri, 19 Dec 2025 02:28:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="f9b6Yn9l"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB0631E230E;
+	Fri, 19 Dec 2025 03:47:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
+Received: from localhost.localdomain (unknown [147.136.157.0])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33C9E17BA6;
-	Fri, 19 Dec 2025 02:28:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 032FB481DD;
+	Fri, 19 Dec 2025 03:47:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=147.136.157.0
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766111290; cv=none; b=UXnosE11xu/UwIT4oZfYInsvoZl+ZXwpUAE+mFSjVGF6BUpW2us73wI5nNdRQnQB1+wDozsvz+861rIO46HGFrbdU9mq+wFPhGHE1CqAFfvZkMCXo5HkHyZ1GzgnkqV+gtg69MuPJ+DEj5VHlCR/NyTr97em7t8kmEpr9n14psw=
+	t=1766116037; cv=none; b=YNcLUbSYBY3rJJBD/yPpuk/9/22gQKtpu15Mo70t8LGbqP/HcQ+uO7tJiCAafu2zfDuGT06KTpH3G3dU5K8BZNZm0FTTMziXLh6pQsxREMa9U80Qqb0eH++k50kfMc2msXs3MjjXMj2urRkJpTIvCWoZQqzNjaZd+e3oleGp36Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766111290; c=relaxed/simple;
-	bh=zzWTfLen8COuX/q/sKLUzJAtj9cSvrwCqbBUYVz6l10=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
-	 MIME-Version:Message-ID; b=I5G29TdC8gOZBDnC68qr5FIncKImMIi+EDXI3W59NThfcjLpkimx27qrQr3ZEFSBafrLu9PfhbF17nAsjClV+crIl2N6H08/4eLo6Fm5irUPMJ5irElG3Qi7ccO8qG5bhUVhcxMkD0XqGvK0MZbd/qLXX2upzNF4J29FRUihEGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=f9b6Yn9l; arc=none smtp.client-ip=117.135.210.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:To:Subject:Content-Type:MIME-Version:
-	Message-ID; bh=zzWTfLen8COuX/q/sKLUzJAtj9cSvrwCqbBUYVz6l10=; b=f
-	9b6Yn9lpfldBIebFac8ZhjCAfipn5whg40ODcftNj/pMJAS2/R1nEXKECOUF7mwa
-	7En0Kk5Lg4n9rU5PPO6f68NY4XANcZg8Fzn5k6pqs6vSexPCUr0vRBgls48z1Tnh
-	g5amu67ah9mCP9PLJqN6C0uL0XSMwEiycAExhK7HFg=
-Received: from 15927021679$163.com ( [116.128.244.169] ) by
- ajax-webmail-wmsvr-40-107 (Coremail) ; Fri, 19 Dec 2025 10:27:09 +0800
- (CST)
-Date: Fri, 19 Dec 2025 10:27:09 +0800 (CST)
-From: =?GBK?B?0NzOsMPxICA=?= <15927021679@163.com>
-To: "Leon Romanovsky" <leon@kernel.org>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	"David Hildenbrand" <david@redhat.com>,
-	"Jason Wang" <jasowang@redhat.com>,
-	"Stefano Garzarella" <sgarzare@redhat.com>,
-	"Thomas Monjalon" <thomas@monjalon.net>,
-	"David Marchand" <david.marchand@redhat.com>,
-	"Luca Boccassi" <bluca@debian.org>,
-	"Kevin Traynor" <ktraynor@redhat.com>,
-	"Christian Ehrhardt" <christian.ehrhardt@canonical.com>,
-	"Xuan Zhuo" <xuanzhuo@linux.alibaba.com>,
-	=?GBK?Q?Eugenio_P=A8=A6rez?= <eperezma@redhat.com>,
-	"Xueming Li" <xuemingl@nvidia.com>,
-	"Maxime Coquelin" <maxime.coquelin@redhat.com>,
-	"Chenbo Xia" <chenbox@nvidia.com>,
-	"Bruce Richardson" <bruce.richardson@intel.com>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org,
-	"RDMA mailing list" <linux-rdma@vger.kernel.org>
-Subject: Re:Re: Implement initial driver for virtio-RDMA device(kernel)
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version 2023.4-cmXT build
- 20250723(a044bf12) Copyright (c) 2002-2025 www.mailtech.cn 163com
-In-Reply-To: <20251218163008.GH400630@unreal>
-References: <20251218091050.55047-1-15927021679@163.com>
- <20251218163008.GH400630@unreal>
-X-NTES-SC: AL_Qu2dBP2avkop7yKcYukfmU0VgOc9XsWwu/Uk2YRXc+AEvhn91i0NcGBfB13x3/C3Cw2orgSHdD9v4+NFc5ZjnscnuIaIph6uoKKQX33d3Q==
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=GBK
+	s=arc-20240116; t=1766116037; c=relaxed/simple;
+	bh=wWx04aQ6g06P4aDR+O3WO/Y3zLXaoh0Cs00LSg9xp4c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UjL+pSLMwMVQ11nsJp0NTTp2kh/1XD+34PhXj9IJOxGHJOX0zWgeXo1okzT86+qTTZiLa+Bhkj+73nrH+X0efNuOz2sKtktQQUYMJQ6coiEmqF/lpHS4G9C3g51ryHoUrZA9f/nqpVoghSQBawryIN8PffM3HhyH9I9q6mN/n0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.dev; spf=none smtp.mailfrom=localhost.localdomain; arc=none smtp.client-ip=147.136.157.0
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=localhost.localdomain
+Received: by localhost.localdomain (Postfix, from userid 1007)
+	id 0DC778B2A3F; Fri, 19 Dec 2025 10:52:02 +0800 (+08)
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: netdev@vger.kernel.org
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
+	syzbot+9b35e9bc0951140d13e6@syzkaller.appspotmail.com,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Clark Williams <clrkwllms@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	linux-kernel@vger.kernel.org,
+	linux-rt-devel@lists.linux.dev
+Subject: [PATCH net v2] ipv6: fix a BUG in rt6_get_pcpu_route() under PREEMPT_RT
+Date: Fri, 19 Dec 2025 10:51:39 +0800
+Message-ID: <20251219025140.77695-1-jiayuan.chen@linux.dev>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <7076944c.4ac4.19b346eb549.Coremail.15927021679@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:aygvCgBnhST9t0Rps8U_AA--.11607W
-X-CM-SenderInfo: jprvmjixqsilmxzbiqqrwthudrp/xtbC0R2YIWlEt-1cmgAA3U
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+Content-Transfer-Encoding: 8bit
 
-CgoKCgoKCgoKCgoKCgoKCgoKQXQgMjAyNS0xMi0xOSAwMDozMDowOCwgIkxlb24gUm9tYW5vdnNr
-eSIgPGxlb25Aa2VybmVsLm9yZz4gd3JvdGU6Cj5PbiBUaHUsIERlYyAxOCwgMjAyNSBhdCAwNTow
-OTo0MFBNICswODAwLCBYaW9uZyBXZWltaW4gd3JvdGU6Cj4+IEhpIGFsbCwKPj4gCj4+IFRoaXMg
-dGVzdGluZyBpbnN0cnVjdGlvbnMgYWltcyB0byBpbnRyb2R1Y2UgYW4gZW11bGF0aW5nIGEgc29m
-dCBST0NFIAo+PiBkZXZpY2Ugd2l0aCBub3JtYWwgTklDKG5vIFJETUEpLCB3ZSBoYXZlIGZpbmlz
-aGVkIGEgdmhvc3QtdXNlciBSRE1BCj4+IGRldmljZSBkZW1vLCB3aGljaCBjYW4gd29yayB3aXRo
-IFJETUEgZmVhdHVyZXMgc3VjaCBhcyBDTSwgUVAgdHlwZSBvZiAKPj4gVUMvVUQgYW5kIHNvIG9u
-Lgo+Cj5TYW1lIHF1ZXN0aW9uIGFzIG9uIHlvdXIgUUVNVSBwYXRjaGVzLgo+aHR0cHM6Ly9sb3Jl
-Lmtlcm5lbC5vcmcvYWxsLzIwMjUxMjE4MTYyMDI4LkdHNDAwNjMwQHVucmVhbC8KPgo+QW5kIGFz
-IGEgYmFyZSBtaW5pbXVtLCB5b3Ugc2hvdWxkIHJ1biBnZXRfbWFpbnRhaW5lcnMucGwgc2NyaXB0
-IG9uIHlvdXIKPnBhdGNoZXMgYW5kIGFkZCB0aGUgcmlnaHQgcGVvcGxlIGFuZCBNTCB0byB0aGUg
-Q0MvVE8gZmllbGRzLgo+Cgo+VGhhbmtzCgoKU2luY2UgdGhpcyBmZWF0dXJlIGludm9sdmVzIGNv
-b3JkaW5hdGVkIGNoYW5nZXMgYWNyb3NzIFFFTVUsIERQREssIGFuZCB0aGUga2VybmVsLCAKSSBo
-YXZlIHN1Ym1pdHRlZCBwYXRjaGVzIGZvciBhbGwgdGhyZWUgY29tcG9uZW50cyB0byBldmVyeSBt
-YWludGFpbmVyLiBUaGlzIGlzIHRvIAplbnN1cmUgdGhhdCBzZW5pb3IgZGV2ZWxvcGVycyBjYW4g
-cmV2aWV3IHRoZSBjb21wbGV0ZSBhcmNoaXRlY3R1cmUgYW5kIGNvZGUuCgoKVGhhbmtzLg==
+On PREEMPT_RT kernels, after rt6_get_pcpu_route() returns NULL, the
+current task can be preempted. Another task running on the same CPU
+may then execute rt6_make_pcpu_route() and successfully install a
+pcpu_rt entry. When the first task resumes execution, its cmpxchg()
+in rt6_make_pcpu_route() will fail because rt6i_pcpu is no longer
+NULL, triggering the BUG_ON(prev). It's easy to reproduce it by adding
+mdelay() after rt6_get_pcpu_route().
+
+Using preempt_disable/enable is not appropriate here because
+ip6_rt_pcpu_alloc() may sleep.
+
+Fix this by:
+1. Removing the BUG_ON and instead handling the race gracefully by
+   freeing our allocation and returning the existing pcpu_rt when
+   cmpxchg() fails.
+2. Keeping the BUG_ON for non-PREEMPT_RT kernels, since preemption
+   should not occur in this context and a cmpxchg failure would
+   indicate a real bug.
+
+Link: https://syzkaller.appspot.com/bug?extid=9b35e9bc0951140d13e6
+Fixes: 951f788a80ff ("ipv6: fix a BUG in rt6_get_pcpu_route()")
+Reported-by: syzbot+9b35e9bc0951140d13e6@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/6918cd88.050a0220.1c914e.0045.GAE@google.com/T/
+Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+
+---
+v1 -> v2: Drop migrate_{disable, enabled} suggested by Steven and Paolo.
+          https://lore.kernel.org/all/20251209124805.379112-1-jiayuan.chen@linux.dev/T/
+---
+ net/ipv6/route.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index aee6a10b112a..9e7afda7cba2 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -1470,7 +1470,18 @@ static struct rt6_info *rt6_make_pcpu_route(struct net *net,
+ 
+ 	p = this_cpu_ptr(res->nh->rt6i_pcpu);
+ 	prev = cmpxchg(p, NULL, pcpu_rt);
+-	BUG_ON(prev);
++	if (unlikely(prev)) {
++		/*
++		 * Another task on this CPU already installed a pcpu_rt.
++		 * This can happen on PREEMPT_RT where preemption is possible.
++		 * Free our allocation and return the existing one.
++		 */
++		BUG_ON(!IS_ENABLED(CONFIG_PREEMPT_RT));
++
++		dst_dev_put(&pcpu_rt->dst);
++		dst_release(&pcpu_rt->dst);
++		return prev;
++	}
+ 
+ 	if (res->f6i->fib6_destroying) {
+ 		struct fib6_info *from;
+-- 
+2.43.0
+
 
