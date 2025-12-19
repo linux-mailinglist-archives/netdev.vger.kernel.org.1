@@ -1,179 +1,159 @@
-Return-Path: <netdev+bounces-245522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 576E6CCFB1C
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 13:03:00 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9816ECCFE22
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 13:49:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 4BB343012945
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 12:02:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 78CC730652EE
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 12:44:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6EB3320A20;
-	Fri, 19 Dec 2025 12:01:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07BEC341653;
+	Fri, 19 Dec 2025 12:32:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oG0rZKVs"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="kxmvo9TW"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0CE3330663
-	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 12:01:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D347340A5D
+	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 12:32:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766145703; cv=none; b=EguI+ulv/GTfW1z9ex4hFx4Qzn6KKeDIb/XgRzN7vaw/HO8Aql54PwdKLehp+8bMwAmp3GJBzRHP8sP/2P3iwpr2ppKPhW4+oLbbCNGgAh9VJONFDDLQO+6RcmiZjzIPfEs8t6ydrinvTKXbsiF1e7AjdJhKuFsTPrSKo8ZLFX0=
+	t=1766147554; cv=none; b=kdDw0J7Rv3tB/SzqxyYgzUhnDsNlLM14YqWQ42jSxPjx23X2M64V5C8ZWXtTOgzjQibBtPNI15Gnsj8tJgvTouvS3ABXvGtynKa9gAUDdqLD6oPCJNrYMM4WzsCr658yZKH6g1+LpPoL4CIdlyU9F/4LMeLfgTkkf7qMgrykkPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766145703; c=relaxed/simple;
-	bh=awYHUy8VmQa2VJYND9fMHo+aIh4bT/3BQ/2xM8rW764=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QAgv/KG3es33auuEIn5ZsZyETKDqJJ4pN7iItgcYzpLWNbZqHwJSQVNn1TulKZdYynyeHz9zajgQrnAOFnB9I2I+7w80Lxls6L3P/XPzA+Mt/7614gJ3MPwUUThtBnvmTnny4qK3LMyb1SiA4ClcU2Nd3QjDsKIzy2e4/gM9wz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oG0rZKVs; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1766145687;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=X/h7COXsg2VJ9A30PFotoW9oYMmwM73seEz2N0UIoT0=;
-	b=oG0rZKVsveGZmdx80xZNUV1FU9qPjRLVbpe1JEE0o2DdcW0NbUB2cAmJfZzHnTrXB1JhQa
-	x6FoE4f/IODeLNfs5UU3YB/j6sF/D8p9IQhKPDjaw26cHjJNmm4R/U02PAVmCSbuKZNwlN
-	hDtRwi70Wdy5xhuSnOzHddxsfn/yT8A=
-From: Menglong Dong <menglong.dong@linux.dev>
-To: Menglong Dong <menglong8.dong@gmail.com>,
- Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: ast@kernel.org, andrii@kernel.org, davem@davemloft.net,
- dsahern@kernel.org, daniel@iogearbox.net, martin.lau@linux.dev,
- eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
- john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, tglx@linutronix.de, mingo@redhat.com,
- bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH bpf-next v4 4/9] bpf: add the kfunc bpf_fsession_cookie
-Date: Fri, 19 Dec 2025 20:01:02 +0800
-Message-ID: <12808306.O9o76ZdvQC@7950hx>
-In-Reply-To: <2334439.iZASKD2KPV@7940hx>
-References:
- <20251217095445.218428-1-dongml2@chinatelecom.cn>
- <CAEf4Bza=Cuu-3LZs7XuK-d7FLKAU8ppkLneiuLqDejzfweHqqA@mail.gmail.com>
- <2334439.iZASKD2KPV@7940hx>
+	s=arc-20240116; t=1766147554; c=relaxed/simple;
+	bh=eFrMD5uL1nwy5cPpuvrAC+K/yLYWd5uHwlgN2sqPlEQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CPjfKtdb0W/+UYhOEMG+6mLKsodFTcuCNGy0UNujs7ftoqq5bVeQU8kTzYiBQdUr5iilkFLoPO2qhMGjhFLqjukfMJBn7oE4HvcbQSfiDwZTHTZKsZHqcTY0YFY/Byik4harfNDvdc5VG1k/z6dTEym3TJpLdKpWnmGtUzPaMJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=kxmvo9TW; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5BJAXDL7013835;
+	Fri, 19 Dec 2025 12:11:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=f0Cfgy
+	pdL61FWUkPe4uOGQ5apciECSLktzd/p+oLJLc=; b=kxmvo9TWme49qiHph+fIaT
+	ifPHL1stae7VhutU83A1qHpz4wGPTmEXIZvsDOjZv60nLMp47MqRuFgRJy4hC/y8
+	XRFTy8d7reYQluutvR39mtV+4HCYoA4HH055DM5z+D/piXSgTl9luuhVFRrKGk2G
+	lV+J0JsCdo41YGMZvUFTQggryK3welkMg5mg9knhiALi9FjUGu8YFy9i3UaHKw/p
+	h8GVOr3NNQatoYsqN1LsnL/igzVt+n1JBJwNcE+uZLraGMkV+7yon/1utITQhmP0
+	+HMvVraveb37t2quRS0xyo8akxI6zH0POYBVYFCKCn5tl4hyNkeO9B77cu7fHBsA
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4b4r3d3grr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 19 Dec 2025 12:11:54 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5BJCBsZL027834;
+	Fri, 19 Dec 2025 12:11:54 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4b4r3d3grk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 19 Dec 2025 12:11:54 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5BJBqneB003663;
+	Fri, 19 Dec 2025 12:11:52 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4b4qvukm8s-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 19 Dec 2025 12:11:52 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5BJCBoGc18940214
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 19 Dec 2025 12:11:50 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BDFC220040;
+	Fri, 19 Dec 2025 12:11:50 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B499A20049;
+	Fri, 19 Dec 2025 12:11:47 +0000 (GMT)
+Received: from [9.124.223.136] (unknown [9.124.223.136])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 19 Dec 2025 12:11:47 +0000 (GMT)
+Message-ID: <bd79936a-685a-4509-b01d-a40be0fd6f65@linux.ibm.com>
+Date: Fri, 19 Dec 2025 17:41:46 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-X-Migadu-Flow: FLOW_OUT
-
-On 2025/12/19 09:31, Menglong Dong wrote:
-> On 2025/12/19 08:55 Andrii Nakryiko <andrii.nakryiko@gmail.com> write:
-> > On Wed, Dec 17, 2025 at 1:55=E2=80=AFAM Menglong Dong <menglong8.dong@g=
-mail.com> wrote:
-> > >
-> > > Implement session cookie for fsession. In order to limit the stack us=
-age,
-> > > we make 4 as the maximum of the cookie count.
-> > >
-> > > The offset of the current cookie is stored in the
-> > > "(ctx[-1] >> BPF_TRAMP_M_COOKIE) & 0xFF". Therefore, we can get the
-> > > session cookie with ctx[-offset].
-> > >
-> > > The stack will look like this:
-> > >
-> > >   return value  -> 8 bytes
-> > >   argN          -> 8 bytes
-> > >   ...
-> > >   arg1          -> 8 bytes
-> > >   nr_args       -> 8 bytes
-> > >   ip(optional)  -> 8 bytes
-> > >   cookie2       -> 8 bytes
-> > >   cookie1       -> 8 bytes
-> > >
-> > > Inline the bpf_fsession_cookie() in the verifer too.
-> > >
-> > > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
-> > > ---
-> > > v4:
-> > > - limit the maximum of the cookie count to 4
-> > > - store the session cookies before nr_regs in stack
-> > > ---
-> > >  include/linux/bpf.h      | 16 ++++++++++++++++
-> > >  kernel/bpf/trampoline.c  | 14 +++++++++++++-
-> > >  kernel/bpf/verifier.c    | 20 ++++++++++++++++++--
-> > >  kernel/trace/bpf_trace.c |  9 +++++++++
-> > >  4 files changed, 56 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-> > > index d165ace5cc9b..0f35c6ab538c 100644
-> > > --- a/include/linux/bpf.h
-> > > +++ b/include/linux/bpf.h
-> > > @@ -1215,6 +1215,7 @@ enum {
-> > >
-> > >  #define BPF_TRAMP_M_NR_ARGS    0
-> > >  #define BPF_TRAMP_M_IS_RETURN  8
-> > > +#define BPF_TRAMP_M_COOKIE     9
-> > >
-> > >  struct bpf_tramp_links {
-> > >         struct bpf_tramp_link *links[BPF_MAX_TRAMP_LINKS];
-> > > @@ -1318,6 +1319,7 @@ struct bpf_trampoline {
-> > >         struct mutex mutex;
-> > >         refcount_t refcnt;
-> > >         u32 flags;
-> > > +       int cookie_cnt;
-> >=20
-> > can't you just count this each time you need to know instead of
-> > keeping track of this? it's not that expensive and won't happen that
-> > frequently (and we keep lock on trampoline, so it's also safe and
-> > race-free to count)
->=20
-> There is a for-loop below that use the "cookie_cnt" to clear all the
-> cookie to zero. We limited the maximum of cookie_cnt to 4, so
-> I guess we can count it directly there. I'll change it in the
-> next version.
-
-Sorry I messed it up with the 5th patch. I'll remove this cookie_cnt
-and count it directly in __bpf_trampoline_link_prog(). And for the
-other comments in the patch, all ACK.
-
-Thanks!
-Menglong Dong
-
->=20
-> Thanks!
-> Menglong Dong
->=20
-> >=20
-> > >         u64 key;
-> > >         struct {
-> > >                 struct btf_func_model model;
-> > > @@ -1762,6 +1764,7 @@ struct bpf_prog {
-> > >                                 enforce_expected_attach_type:1, /* En=
-force expected_attach_type checking at attach time */
-> > >                                 call_get_stack:1, /* Do we call bpf_g=
-et_stack() or bpf_get_stackid() */
-> > >                                 call_get_func_ip:1, /* Do we call get=
-_func_ip() */
-> > > +                               call_session_cookie:1, /* Do we call =
-bpf_fsession_cookie() */
-> > >                                 tstamp_type_access:1, /* Accessed __s=
-k_buff->tstamp_type */
-> > >                                 sleepable:1;    /* BPF program is sle=
-epable */
-> > >         enum bpf_prog_type      type;           /* Type of BPF progra=
-m */
-> >=20
-> > [...]
-> >=20
->=20
->=20
->=20
->=20
->=20
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: avoid prefetching NULL pointers
+To: Eric Dumazet <edumazet@google.com>,
+        "David S . Miller"
+ <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+        eric.dumazet@gmail.com
+References: <20251218081844.809008-1-edumazet@google.com>
+Content-Language: en-US
+From: Aditya Gupta <adityag@linux.ibm.com>
+In-Reply-To: <20251218081844.809008-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=WYkBqkhX c=1 sm=1 tr=0 ts=6945410a cx=c_pps
+ a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
+ a=IkcTkHD0fZMA:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=VnNF1IyMAAAA:8 a=1XWaLZrsAAAA:8 a=-Q5EdLYdSmJ0yUwkDmcA:9
+ a=QEXdDO2ut3YA:10
+X-Proofpoint-GUID: xwlDh13q1OxwDX-9Rrzuh_NiibssqPFB
+X-Proofpoint-ORIG-GUID: DsJQ3dR-FacbHuIOHGY-Q25vtcy0VAF-
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjE5MDA5NyBTYWx0ZWRfX16nmS2C3vnjT
+ ep14h4V8i+4z0z3DhuWMA4RT3mK93Zo/KBPpt1vN9+i5deegFYmKeEtTqkROok3H2+UloYRQcAA
+ flpX5VWb0AZzM+RwDd9veZbVGU6ZfR4iG0oTOr2elHKWaPPYU8MWTkGn/TJr2mSZ4FobXGQx9Xk
+ ilFzY2cmmztmYFg20mjRLgP+8KXaP6QuZ3wsWi7VszgUwOdWrOfn1H8LC1SaBnmrVuJZdFAVdI/
+ pGV2jkerN0wx7opgJSWo3y57g6RVl5/2BFfB2CCjeCT6q0K2Ma/Nk1dBS/KoZ8we9lZEsYQZfUJ
+ +mu453Ovq/RyEjF0KmxWzmoey9NNImMn6+PMsNb4TWJg5BXN5c6WQ2kPIa7oh1Sp6nEW7twQMVD
+ D5+AzV9b0vDFTOdoNQO0AM31/h21ZtH2cj8kfZEZmJGDTvNVD0MvvkcpAlurR0QeQK9Kq9e9IVl
+ kWl2HH4TJ+oIpibOFFg==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-12-19_03,2025-12-17_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 adultscore=0 impostorscore=0 priorityscore=1501
+ bulkscore=0 malwarescore=0 spamscore=0 phishscore=0 clxscore=1011
+ suspectscore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2512120000
+ definitions=main-2512190097
 
 
+On 18/12/25 13:48, Eric Dumazet wrote:
+> Aditya Gupta reported PowerPC crashes bisected to the blamed commit.
+>
+> Apparently some platforms do not allow prefetch() on arbitrary pointers.
+>
+>    prefetch(next);
+>    prefetch(&next->priority); // CRASH when next == NULL
+>
+> Only NULL seems to be supported, with specific handling in prefetch().
+>
+> Add a conditional to avoid the two prefetches and the skb->next clearing
+> for the last skb in the list.
+>
+> Fixes: b2e9821cff6c ("net: prefech skb->priority in __dev_xmit_skb()")
+> Reported-by: Aditya Gupta <adityag@linux.ibm.com>
+> Closes: https://lore.kernel.org/netdev/e9f4abee-b132-440f-a50e-bced0868b5a7@linux.ibm.com/T/#mddc372b64ec5a3b181acc9ee3909110c391cc18a
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>   net/core/dev.c | 8 +++++---
+>   1 file changed, 5 insertions(+), 3 deletions(-)
+
+
+Thanks for the quick fix Eric.
+
+It fixes the reported kernel bug, hence:
+
+Tested-by: Aditya Gupta <adityag@linux.ibm.com>
+
+
+Thanks,
+
+- Aditya G
 
 
 
