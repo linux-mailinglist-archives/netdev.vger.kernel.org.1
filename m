@@ -1,145 +1,138 @@
-Return-Path: <netdev+bounces-245481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1733CCED18
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 08:44:06 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B864CCED59
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 08:48:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B1B863066DE5
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 07:42:54 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1274B3011A4D
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 07:48:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AC712DF13E;
-	Fri, 19 Dec 2025 07:42:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="piAFod+6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 955B52FD7D3;
+	Fri, 19 Dec 2025 07:48:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1F5E2DEA90;
-	Fri, 19 Dec 2025 07:42:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6D0C221F15;
+	Fri, 19 Dec 2025 07:48:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766130169; cv=none; b=kvpoGlT1x+x/YZyUzu5zyngipZ1KRCkFlCQ9CbWFaZO6DufFei+PYAci3v5pe0z5/d3uGRtYi+VXlf52sU+CO4B6yuR82HjD5RIFhSmXQusZIpADJkuY860ziHQU0Jl5lvu4GP/bP/Qm6XTYuPBdpXFtsjMmHVrx/d7kdlR4lRM=
+	t=1766130519; cv=none; b=KJLp90wRQ5a6TAOwIsVBCO36lBGaUqSiJvejVMIZu4o61EbXFMxDLdaZw0fdi9GX48CtdIidtVhIps1P+PGhrc6P2TD08BXpElA70qoGVnN0+9KkI0E16QcuZlF7KgT+i7d/EqW9BH5UInYQ+nJ8JSmw8sC1lzMVvCiRdL1MZ7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766130169; c=relaxed/simple;
-	bh=o9a0SgJqbUAbHYVm1/dOBkvhEKRMQ/ZhZBbv3LTvqwE=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=D0MMwtQe7uXWUmCqeWJoTG2VMHS5mrh5Rc1z5TOqNw/dEJW4pj6yPFbecgLKmvTNciszoJ026kQ1wNlm0+NtWLhZpouAFtcivyy5mmoiai46e+9AjEgqRsp4B0aL9NW9TAhJegIkyz9OLaNci9ksi1aU/Mde3WuiADEGJ0wAK2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=piAFod+6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12CF6C4AF09;
-	Fri, 19 Dec 2025 07:42:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766130167;
-	bh=o9a0SgJqbUAbHYVm1/dOBkvhEKRMQ/ZhZBbv3LTvqwE=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=piAFod+64TavKMIWyttR8IA+eh+DRbDTa8gZK/wB0wFaWe7VEutajQXWkfStNy9q8
-	 Q99Hi5WVlhhIHvNBm9YGkAfFPU78BMuGon7kmwCC8VJv900yf5KRtZXvlE1NTlCWZ+
-	 q2JS01SJjkLX6oe2vSZJt3ikdaYnJFScMJULP8xBFPnZ7ZOgmxFF+l8xFq2X0g0bzK
-	 T3rBFTcfytVw/YNq30R+fZRXaXIHHHe5koWg+uiVsBIn45vezulGqGAkI1/tIHM7u8
-	 O8q5B5rV8uwS+WZtaV6q7zAi19xKMkuydEVy0lUzKYVYZKGOePvkUjtHzWNK0R5oRE
-	 pHX9WW2yqV9CA==
-Message-ID: <a11bd4dc-6602-4ea1-b68b-e1450ea5f30f@kernel.org>
-Date: Fri, 19 Dec 2025 08:42:36 +0100
+	s=arc-20240116; t=1766130519; c=relaxed/simple;
+	bh=vq1exl23DZn4zlCEvIq0ovg5Fb2CUvggZ7vSzFMwSZo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fvwuTR3Y58DNsFogvSQUDfoRlKG+E8HaKIo/NEyk1eWvtnmyJ7gVQ0GmzC1NMsZlAAOxe+QqpDFrFw3dBnLgnXILz5/sn/wUpjWLtI6FD3n67OPodd9+1NSVCN70CdC8jgRafyAPO7HzgEhPc52yMrlhBlExTYaNYxDx7wDuU/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: by Chamillionaire.breakpoint.cc (Postfix, from userid 1003)
+	id D625260218; Fri, 19 Dec 2025 08:48:27 +0100 (CET)
+Date: Fri, 19 Dec 2025 08:48:27 +0100
+From: Florian Westphal <fw@strlen.de>
+To: Daniel Gomez <da.gomez@kernel.org>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>, Phil Sutter <phil@nwl.cc>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Petr Pavlu <petr.pavlu@suse.com>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Aaron Tomlin <atomlin@atomlin.com>,
+	Lucas De Marchi <demarchi@kernel.org>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	bridge@lists.linux.dev, netdev@vger.kernel.org,
+	linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Daniel Gomez <da.gomez@samsung.com>
+Subject: Re: [PATCH] netfilter: replace -EEXIST with -EBUSY
+Message-ID: <aUUDRGqMQ_Ss3bDJ@strlen.de>
+References: <20251219-dev-module-init-eexists-netfilter-v1-1-efd3f62412dc@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 02/21] dt-bindings: power: mediatek: Add MT8189 power
- domain definitions
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: "irving.ch.lin" <irving-ch.lin@mediatek.com>
-Cc: Michael Turquette <mturquette@baylibre.com>,
- Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Ulf Hansson <ulf.hansson@linaro.org>,
- Richard Cochran <richardcochran@gmail.com>,
- Qiqi Wang <qiqi.wang@mediatek.com>, linux-clk@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- linux-pm@vger.kernel.org, netdev@vger.kernel.org,
- Project_Global_Chrome_Upstream_Group@mediatek.com, sirius.wang@mediatek.com,
- vince-wl.liu@mediatek.com, jh.hsu@mediatek.com
-References: <20251215034944.2973003-1-irving-ch.lin@mediatek.com>
- <20251215034944.2973003-3-irving-ch.lin@mediatek.com>
- <20251219-hissing-chicken-of-poetry-5fbfd9@quoll>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <20251219-hissing-chicken-of-poetry-5fbfd9@quoll>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251219-dev-module-init-eexists-netfilter-v1-1-efd3f62412dc@samsung.com>
 
-On 19/12/2025 08:36, Krzysztof Kozlowski wrote:
-> On Mon, Dec 15, 2025 at 11:49:11AM +0800, irving.ch.lin wrote:
->> From: Irving-CH Lin <irving-ch.lin@mediatek.com>
->>
->> Add device tree bindings for the power domains of MediaTek MT8189 SoC.
->>
->> Signed-off-by: Irving-CH Lin <irving-ch.lin@mediatek.com>
->> ---
->>  .../power/mediatek,power-controller.yaml      |  1 +
->>  .../dt-bindings/power/mediatek,mt8189-power.h | 38 +++++++++++++++++++
->>  2 files changed, 39 insertions(+)
->>  create mode 100644 include/dt-bindings/power/mediatek,mt8189-power.h
+Daniel Gomez <da.gomez@kernel.org> wrote:
+> From: Daniel Gomez <da.gomez@samsung.com>
 > 
-> You did not cc maintainer of the binding, so either it's fake entry or
-> you forgot to use tools.
+> The -EEXIST error code is reserved by the module loading infrastructure
+> to indicate that a module is already loaded. When a module's init
+> function returns -EEXIST, userspace tools like kmod interpret this as
+> "module already loaded" and treat the operation as successful, returning
+> 0 to the user even though the module initialization actually failed.
+>
+> This follows the precedent set by commit 54416fd76770 ("netfilter:
+> conntrack: helper: Replace -EEXIST by -EBUSY") which fixed the same
+> issue in nf_conntrack_helper_register().
+> 
+> Affected modules:
+>   * ebtable_broute ebtable_filter ebtable_nat arptable_filter
+>   * ip6table_filter ip6table_mangle ip6table_nat ip6table_raw
+>   * ip6table_security iptable_filter iptable_mangle iptable_nat
+>   * iptable_raw iptable_security
 
-Although maintainer's entry for MandyJH Liu seems to be just bogus - no
-maintenance happening here, so I just sent patch to remove them.
+But this is very different from what 54416fd76770 fixes.
 
-I would prefer if Mediatek did care about these bindings. It's another
-piece to my complain list about very poor Mediatek company upstreaming.
+Before 54416fd76770. userspace can make a configuration entry that
+prevents and unrelated module from getting loaded but at the same time
+it doesn't provide any error to userspace.
 
-Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
+All these -EEXIST should not be possible unless the module is
+already loaded.
 
-Best regards,
-Krzysztof
+> diff --git a/net/bridge/netfilter/ebtables.c b/net/bridge/netfilter/ebtables.c
+> index 5697e3949a36..a04fc1757528 100644
+> --- a/net/bridge/netfilter/ebtables.c
+> +++ b/net/bridge/netfilter/ebtables.c
+> @@ -1299,7 +1299,7 @@ int ebt_register_template(const struct ebt_table *t, int (*table_init)(struct ne
+>  	list_for_each_entry(tmpl, &template_tables, list) {
+>  		if (WARN_ON_ONCE(strcmp(t->name, tmpl->name) == 0)) {
+>  			mutex_unlock(&ebt_mutex);
+> -			return -EEXIST;
+> +			return -EBUSY;
+
+As you can see from the WARN_ON, this cannot happen unless someone adds a new ebt kernel
+table module that tries to register the same name.
+
+> diff --git a/net/netfilter/nf_log.c b/net/netfilter/nf_log.c
+> index 74cef8bf554c..62cf6a30875e 100644
+> --- a/net/netfilter/nf_log.c
+> +++ b/net/netfilter/nf_log.c
+> @@ -89,7 +89,7 @@ int nf_log_register(u_int8_t pf, struct nf_logger *logger)
+>  	if (pf == NFPROTO_UNSPEC) {
+>  		for (i = NFPROTO_UNSPEC; i < NFPROTO_NUMPROTO; i++) {
+>  			if (rcu_access_pointer(loggers[i][logger->type])) {
+> -				ret = -EEXIST;
+> +				ret = -EBUSY;
+>  				goto unlock;
+
+I don't see how this can happen, unless someone adds a new kernel module
+that claims the same type as an existing kernel module.
+
+> diff --git a/net/netfilter/x_tables.c b/net/netfilter/x_tables.c
+> index 90b7630421c4..48105ea3df15 100644
+> --- a/net/netfilter/x_tables.c
+> +++ b/net/netfilter/x_tables.c
+> @@ -1764,7 +1764,7 @@ EXPORT_SYMBOL_GPL(xt_hook_ops_alloc);
+>  int xt_register_template(const struct xt_table *table,
+>  			 int (*table_init)(struct net *net))
+>  {
+> -	int ret = -EEXIST, af = table->af;
+> +	int ret = -EBUSY, af = table->af;
+>  	struct xt_template *t;
+
+Same, this requires someone adding a new kernel module with clashing
+name.
+
+I'll apply this patch but its not related to 54416fd76770 afaics.
 
