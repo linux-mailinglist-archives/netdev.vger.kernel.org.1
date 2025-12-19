@@ -1,93 +1,179 @@
-Return-Path: <netdev+bounces-245523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03719CCFCEA
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 13:36:26 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 576E6CCFB1C
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 13:03:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 03E99308B348
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 12:28:42 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4BB343012945
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 12:02:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32275326959;
-	Fri, 19 Dec 2025 12:05:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6EB3320A20;
+	Fri, 19 Dec 2025 12:01:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oG0rZKVs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx04.melco.co.jp (mx04.melco.co.jp [192.218.140.144])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E277D326951;
-	Fri, 19 Dec 2025 12:05:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.218.140.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0CE3330663
+	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 12:01:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766145906; cv=none; b=JraXVgAwXA+jRQS+VeceGVBCNN9UJanMTjJzq5CES2ceWCT1WadBnGeNn4BZp+4UeBzUhwB2sfd/LdhCqMByTJW8+8EyT3vs7urm6zVeClplFZgIVSQPKNk3rB0ogwK7N2K8HaU53lovMtl5+Q97wQw2B2jjIH/ugJnWnKr2u1k=
+	t=1766145703; cv=none; b=EguI+ulv/GTfW1z9ex4hFx4Qzn6KKeDIb/XgRzN7vaw/HO8Aql54PwdKLehp+8bMwAmp3GJBzRHP8sP/2P3iwpr2ppKPhW4+oLbbCNGgAh9VJONFDDLQO+6RcmiZjzIPfEs8t6ydrinvTKXbsiF1e7AjdJhKuFsTPrSKo8ZLFX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766145906; c=relaxed/simple;
-	bh=Py/no0h4h9biLN0454Kyu9lnA1lRRcRx782AVK4YzPY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qD+y/izIOP0Ct1BNgDLsvS9yUgrle2o5mvmRqQRYu7FDNIE26rg5RsOVuq3B6zzLhVtkkvRw1s52uFM9k4DToRs8QjpMki5cK+wquA17FlPBR+VAKB8w73AjGHzRGxG6VPjU9gEMbCcu5cqCAVueVv7go22pGmkz4IJQTw93EOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=da.MitsubishiElectric.co.jp; spf=pass smtp.mailfrom=da.MitsubishiElectric.co.jp; arc=none smtp.client-ip=192.218.140.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=da.MitsubishiElectric.co.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=da.MitsubishiElectric.co.jp
-Received: from mr06.melco.co.jp (mr06 [133.141.98.164])
-	by mx04.melco.co.jp (Postfix) with ESMTP id 4dXmCP2ktdzMvNbL;
-	Fri, 19 Dec 2025 20:53:53 +0900 (JST)
-Received: from mf04.melco.co.jp (unknown [192.168.20.184])
-	by mr06.melco.co.jp (Postfix) with ESMTP id 4dXmCP2gpxzMrL3y;
-	Fri, 19 Dec 2025 20:53:53 +0900 (JST)
-Received: from elgw.isl.melco.co.jp (unknown [133.141.13.130])
-	by mf04.melco.co.jp (Postfix) with ESMTP id 4dXmCP2cV6zMt2LR;
-	Fri, 19 Dec 2025 20:53:53 +0900 (JST)
-Received: from eliswall.isl.melco.co.jp (eliswall.isl.melco.co.jp [10.74.245.38])
-	by elgw.isl.melco.co.jp (Postfix) with ESMTP id 52A8D202EC0C;
-	Fri, 19 Dec 2025 20:53:53 +0900 (JST)
-Received: from elc1910004.ad.melco.co.jp (c1910004.isl.melco.co.jp [10.74.1.185])
-	by eliswall.isl.melco.co.jp (Postfix) with ESMTP id 49967355;
-	Fri, 19 Dec 2025 20:53:53 +0900 (JST)
-From: Yuto Hamaguchi <Hamaguchi.Yuto@da.MitsubishiElectric.co.jp>
-To: pablo@netfilter.org,
-	kadlec@netfilter.org,
-	netfilter-devel@vger.kernel.org
-Cc: coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	Hamaguchi.Yuto@da.MitsubishiElectric.co.jp
-Subject: [PATCH nf] netfilter: nf_conntrack: Add allow_clash to generic protocol handler
-Date: Fri, 19 Dec 2025 20:53:51 +0900
-Message-Id: <20251219115351.5662-1-Hamaguchi.Yuto@da.MitsubishiElectric.co.jp>
-X-Mailer: git-send-email 2.36.1
+	s=arc-20240116; t=1766145703; c=relaxed/simple;
+	bh=awYHUy8VmQa2VJYND9fMHo+aIh4bT/3BQ/2xM8rW764=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QAgv/KG3es33auuEIn5ZsZyETKDqJJ4pN7iItgcYzpLWNbZqHwJSQVNn1TulKZdYynyeHz9zajgQrnAOFnB9I2I+7w80Lxls6L3P/XPzA+Mt/7614gJ3MPwUUThtBnvmTnny4qK3LMyb1SiA4ClcU2Nd3QjDsKIzy2e4/gM9wz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oG0rZKVs; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1766145687;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=X/h7COXsg2VJ9A30PFotoW9oYMmwM73seEz2N0UIoT0=;
+	b=oG0rZKVsveGZmdx80xZNUV1FU9qPjRLVbpe1JEE0o2DdcW0NbUB2cAmJfZzHnTrXB1JhQa
+	x6FoE4f/IODeLNfs5UU3YB/j6sF/D8p9IQhKPDjaw26cHjJNmm4R/U02PAVmCSbuKZNwlN
+	hDtRwi70Wdy5xhuSnOzHddxsfn/yT8A=
+From: Menglong Dong <menglong.dong@linux.dev>
+To: Menglong Dong <menglong8.dong@gmail.com>,
+ Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: ast@kernel.org, andrii@kernel.org, davem@davemloft.net,
+ dsahern@kernel.org, daniel@iogearbox.net, martin.lau@linux.dev,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, tglx@linutronix.de, mingo@redhat.com,
+ bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH bpf-next v4 4/9] bpf: add the kfunc bpf_fsession_cookie
+Date: Fri, 19 Dec 2025 20:01:02 +0800
+Message-ID: <12808306.O9o76ZdvQC@7950hx>
+In-Reply-To: <2334439.iZASKD2KPV@7940hx>
+References:
+ <20251217095445.218428-1-dongml2@chinatelecom.cn>
+ <CAEf4Bza=Cuu-3LZs7XuK-d7FLKAU8ppkLneiuLqDejzfweHqqA@mail.gmail.com>
+ <2334439.iZASKD2KPV@7940hx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-Migadu-Flow: FLOW_OUT
 
-The upstream commit, 71d8c47fc653711c41bc3282e5b0e605b3727956
- ("netfilter: conntrack: introduce clash resolution on insertion race"),
-sets allow_clash=true in the UDP/UDPLITE protocol handler
-but does not set it in the generic protocol handler.
+On 2025/12/19 09:31, Menglong Dong wrote:
+> On 2025/12/19 08:55 Andrii Nakryiko <andrii.nakryiko@gmail.com> write:
+> > On Wed, Dec 17, 2025 at 1:55=E2=80=AFAM Menglong Dong <menglong8.dong@g=
+mail.com> wrote:
+> > >
+> > > Implement session cookie for fsession. In order to limit the stack us=
+age,
+> > > we make 4 as the maximum of the cookie count.
+> > >
+> > > The offset of the current cookie is stored in the
+> > > "(ctx[-1] >> BPF_TRAMP_M_COOKIE) & 0xFF". Therefore, we can get the
+> > > session cookie with ctx[-offset].
+> > >
+> > > The stack will look like this:
+> > >
+> > >   return value  -> 8 bytes
+> > >   argN          -> 8 bytes
+> > >   ...
+> > >   arg1          -> 8 bytes
+> > >   nr_args       -> 8 bytes
+> > >   ip(optional)  -> 8 bytes
+> > >   cookie2       -> 8 bytes
+> > >   cookie1       -> 8 bytes
+> > >
+> > > Inline the bpf_fsession_cookie() in the verifer too.
+> > >
+> > > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+> > > ---
+> > > v4:
+> > > - limit the maximum of the cookie count to 4
+> > > - store the session cookies before nr_regs in stack
+> > > ---
+> > >  include/linux/bpf.h      | 16 ++++++++++++++++
+> > >  kernel/bpf/trampoline.c  | 14 +++++++++++++-
+> > >  kernel/bpf/verifier.c    | 20 ++++++++++++++++++--
+> > >  kernel/trace/bpf_trace.c |  9 +++++++++
+> > >  4 files changed, 56 insertions(+), 3 deletions(-)
+> > >
+> > > diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+> > > index d165ace5cc9b..0f35c6ab538c 100644
+> > > --- a/include/linux/bpf.h
+> > > +++ b/include/linux/bpf.h
+> > > @@ -1215,6 +1215,7 @@ enum {
+> > >
+> > >  #define BPF_TRAMP_M_NR_ARGS    0
+> > >  #define BPF_TRAMP_M_IS_RETURN  8
+> > > +#define BPF_TRAMP_M_COOKIE     9
+> > >
+> > >  struct bpf_tramp_links {
+> > >         struct bpf_tramp_link *links[BPF_MAX_TRAMP_LINKS];
+> > > @@ -1318,6 +1319,7 @@ struct bpf_trampoline {
+> > >         struct mutex mutex;
+> > >         refcount_t refcnt;
+> > >         u32 flags;
+> > > +       int cookie_cnt;
+> >=20
+> > can't you just count this each time you need to know instead of
+> > keeping track of this? it's not that expensive and won't happen that
+> > frequently (and we keep lock on trampoline, so it's also safe and
+> > race-free to count)
+>=20
+> There is a for-loop below that use the "cookie_cnt" to clear all the
+> cookie to zero. We limited the maximum of cookie_cnt to 4, so
+> I guess we can count it directly there. I'll change it in the
+> next version.
 
-As a result, packets composed of connectionless protocols at each layer,
-such as UDP over IP-in-IP, still drop packets due to conflicts during conntrack insertion.
+Sorry I messed it up with the 5th patch. I'll remove this cookie_cnt
+and count it directly in __bpf_trampoline_link_prog(). And for the
+other comments in the patch, all ACK.
 
-To resolve this, this patch sets allow_clash in the nf_conntrack_l4proto_generic.
+Thanks!
+Menglong Dong
 
-Signed-off-by: Yuto Hamaguchi <Hamaguchi.Yuto@da.MitsubishiElectric.co.jp>
----
- net/netfilter/nf_conntrack_proto_generic.c | 1 +
- 1 file changed, 1 insertion(+)
+>=20
+> Thanks!
+> Menglong Dong
+>=20
+> >=20
+> > >         u64 key;
+> > >         struct {
+> > >                 struct btf_func_model model;
+> > > @@ -1762,6 +1764,7 @@ struct bpf_prog {
+> > >                                 enforce_expected_attach_type:1, /* En=
+force expected_attach_type checking at attach time */
+> > >                                 call_get_stack:1, /* Do we call bpf_g=
+et_stack() or bpf_get_stackid() */
+> > >                                 call_get_func_ip:1, /* Do we call get=
+_func_ip() */
+> > > +                               call_session_cookie:1, /* Do we call =
+bpf_fsession_cookie() */
+> > >                                 tstamp_type_access:1, /* Accessed __s=
+k_buff->tstamp_type */
+> > >                                 sleepable:1;    /* BPF program is sle=
+epable */
+> > >         enum bpf_prog_type      type;           /* Type of BPF progra=
+m */
+> >=20
+> > [...]
+> >=20
+>=20
+>=20
+>=20
+>=20
+>=20
 
-diff --git a/net/netfilter/nf_conntrack_proto_generic.c b/net/netfilter/nf_conntrack_proto_generic.c
-index e831637bc8ca..cb260eb3d012 100644
---- a/net/netfilter/nf_conntrack_proto_generic.c
-+++ b/net/netfilter/nf_conntrack_proto_generic.c
-@@ -67,6 +67,7 @@ void nf_conntrack_generic_init_net(struct net *net)
- const struct nf_conntrack_l4proto nf_conntrack_l4proto_generic =
- {
- 	.l4proto		= 255,
-+	.allow_clash            = true,
- #ifdef CONFIG_NF_CONNTRACK_TIMEOUT
- 	.ctnl_timeout		= {
- 		.nlattr_to_obj	= generic_timeout_nlattr_to_obj,
--- 
-2.36.1
+
+
 
 
