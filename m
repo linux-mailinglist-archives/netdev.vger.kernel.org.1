@@ -1,222 +1,188 @@
-Return-Path: <netdev+bounces-245471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33D29CCE7B7
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 06:03:45 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E324CCE7F6
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 06:13:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 280573014A97
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 05:03:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0D5D730329F4
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 05:13:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B87D629E0F7;
-	Fri, 19 Dec 2025 05:03:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E03A22C0263;
+	Fri, 19 Dec 2025 05:13:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Iyer4/7Z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rjq/AAtp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECDA422A4D6
-	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 05:03:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A34BC22B5A3;
+	Fri, 19 Dec 2025 05:13:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766120619; cv=none; b=XqEm744NzqqEufrBI4rHoiLMOqfFbsl1ydLrvQQ1eGYfTbj28p7LWDT6aak8Nx0INy3PpkXqX1JC7hJxeFd7iuzZZC6X8WI44nrcCVWmoHiR4YqJ7AYbEYQo8U1pCvNan33Z5F4GdSZXhaG6xxS7biAZfV4WiZqtEai6mG/mBCA=
+	t=1766121224; cv=none; b=WBtqXsowQMt0gGWTiag2UolGCoVIN2josAy1dgsyxXlrLnv+hi4k2KU4qZTATnrbwljUKpiRxRcTVeuCfKTw2dqi8o3Ed1cMbDBxX1kIs1Q71VWzCwRMlzEgYi748x1Cchdq97PPwthZX4I2ZiClZmDcpS7cKptp1fb7TYXs8gw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766120619; c=relaxed/simple;
-	bh=kaURwmhdJjY8j91/nuYsMJxS/M+9Ly7tIAquBQJLkUw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XEFux1sMDmQziu8NDXY6VIMTvDJMw3zhLUG5cHr5tlNbWmZIesmWGD5PQhLe0yxNgjm+/635i04sCrb7qQkevqBEteJMJ30BiuTmA4kI3qCZ5sIFnpezYKfc4/WcfK8ZPcNKEhSXMhyeZlhPAyn2vgbdHGPMfRrJ4FoxQcrY9gs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Iyer4/7Z; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2a12ebe4b74so21053995ad.0
-        for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 21:03:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766120617; x=1766725417; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zZTCvbTwNrP8p42X+dpd7k1dFq41aRyw/GMHSDy5acE=;
-        b=Iyer4/7ZW4Hy69dmR5GPqwHheqkmQR8/thVF17jlwpulr6jvINxSl1/A6a25uIhehg
-         /cI68wYritWKGcpHIAg8KIz20aieDnO7mfIxrj1txYe/Yz+aMRCeV9dgK4FVUBDU9b4S
-         xHvwhp7i/Z4M9r3gC0nrNUDjCEeTFGK6hWVNV+K1KkFqNpWV6g6IiPkJHd91AGlMqlXe
-         F9M2CRwSp3gMDbwoYJ2YJomLhLXxNgcTYISg5IWqHrlkbVYZX/ZRVpKSp+xdUcMVQ+9Q
-         ry7PR3yeVOt2GLMN5txlY4SlO90ZF2b6m2QCpaBn8Zl9N57ABQs/tZM+cT9WGDRWZFTq
-         5iRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766120617; x=1766725417;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zZTCvbTwNrP8p42X+dpd7k1dFq41aRyw/GMHSDy5acE=;
-        b=OHp0a8TCKbqJwLNUyGf8AXB6l0qkUxHI7k296J1I/ymJECIUdK8c0fZt9R399j7AJj
-         OjyIRpOCpOSOZzpOOcW5U2/ntSelfNJDM4UAQ7Xu8xReMhKcRM3SaIVUDV3Nt/MD1Yz7
-         Z5OvpLJSS2MLlcS8srEvRVQ6CV9r+eNGw1zwE2cv6Ot0iEmWNux07kgueR0+PcKRUl6w
-         gU06TO2U/yiiHGRdVQH8I6gA9OiiWL3626KBZYzreR7ycg1d00xdXoAJHnlIBoIKHSyC
-         1aAiqZ422pGUNKItSwMIX/n9xJEYyQsWarvLxxqad/YldRcbeNK/41BsZ+kE0Oz3Ho+N
-         2iLw==
-X-Gm-Message-State: AOJu0YweRETn1U5hsePEmGMk/ENbisevkooT+ElgEmqV0/Yjc2n1ShuZ
-	Tek0aKKnZ1WGaxN0ndyDvtG93cQNdy1FXuzgk/6V9OWX4l0T0rQ+sCNw
-X-Gm-Gg: AY/fxX5SUHWdFYLWxqyGZNZZMVDOrNmuyH9Jgjk6epK2S3f9rOaHIkQpu7iiI+GvsOl
-	mllkb1fYdoKJL9kk6OLvDUh6t9Ce3UjNx30xSN3RCEtERHNKrnRnwAGNIBQ5UAxjF+ACLsLIiZy
-	zI4C1uYUrNMM4HC2soCOWLro7z5gKHMph+89fwQt82xG102bBymcFPIPbwlDbSlO7fqQxIwZvOu
-	ulc/Z1DhtrLhKSpuk1sO1+/QyrVlLdlRYCy8CNoMCYaCr000jQGW3ZBC2kNPX7nPZaoM7Fe4zn2
-	PhmDvrzCzrITT9krwgqAJNuTrt+sTEVY0WMD9I7Q+pcIFu6lbZaFwwCnQsX0lTbkbc5r8JrVgmC
-	GXP6VYFgzuPv2NS3S3dFUXeSKCNyi5id/daO4YgPFrSVb5Qy0M/5Sm41lDbwSt6KVedHrH1D/mU
-	AXX04lzEcB9dZ7h+q5lDUDbiz58ad3FiAclrhuEt59n4fkwVuRwPEIt2h4XS4=
-X-Google-Smtp-Source: AGHT+IEMNwtnT5HSACs7KJDQv87Ul7tb9qZwcx6898sXznsIUuzVEP7oMOI9Ae1p0oHl8YKCnExepA==
-X-Received: by 2002:a17:902:e74c:b0:24b:270e:56c7 with SMTP id d9443c01a7336-2a2f22069e3mr16825885ad.7.1766120617119;
-        Thu, 18 Dec 2025 21:03:37 -0800 (PST)
-Received: from ?IPV6:2001:ee0:4f4c:210:2598:f3ef:512:c5a9? ([2001:ee0:4f4c:210:2598:f3ef:512:c5a9])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a2f3d77451sm8994465ad.96.2025.12.18.21.03.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 Dec 2025 21:03:36 -0800 (PST)
-Message-ID: <5434a67e-dd6e-4cd1-870b-fdd32ad34a28@gmail.com>
-Date: Fri, 19 Dec 2025 12:03:29 +0700
+	s=arc-20240116; t=1766121224; c=relaxed/simple;
+	bh=gsvvD4fusz8UOMAocP96M5y9o3JhQPWaOjsWz3Kq8bE=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=hqG8V3Syb0HeLgZWMY894xQ9zxU9Agx5RZZ8JfyW130aWvvp8DTM+2DUgoY9rB8MBFZTCY+e376wsq9U/YBmv+rwXHjRcZQGRdqdHzgXkPPUsXqK2uScRie44Un5tmtirz06c6w4VPNQAbnq7fQScxl7V0uLE5TZzSlr1RC0GNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rjq/AAtp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53052C116D0;
+	Fri, 19 Dec 2025 05:13:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766121224;
+	bh=gsvvD4fusz8UOMAocP96M5y9o3JhQPWaOjsWz3Kq8bE=;
+	h=From:Date:Subject:To:Cc:From;
+	b=rjq/AAtpu2++A/EjejYLIgRcB0d9a7LoMcuTj2d6IJPcXtn58LE8ikZMO8i00goP5
+	 1f/7WYa5XcPrSf1Uzd94Dwei2Czb4Hp91v2QOGGRh1O+LL6we+3DrQFv6e28MYx3ux
+	 dGlycK2G5FWFSnFfhv+ghEpvmQucXV89FGcwunjO0Uhzka6tCor8NROjsg1zsRCaxf
+	 x2zNGMJaw3THo9P2DTOi1ODskmZ3j3ZVVmIdJah9LJ9W9qzr9yXkqEqn0SGvkczL97
+	 M51Ey8LZVP1f+HoNSr98z17EuUqdgTBolCAAG2atHzVwqoRmY/+kYJngT/iGhdBX7z
+	 q7H733E3kMxww==
+From: Daniel Gomez <da.gomez@kernel.org>
+Date: Fri, 19 Dec 2025 06:13:20 +0100
+Subject: [PATCH] netfilter: replace -EEXIST with -EBUSY
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] virtio-net: enable all napis before scheduling
- refill work
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org, stable@vger.kernel.org
-References: <20251212152741.11656-1-minhquangbui99@gmail.com>
- <CACGkMEtzXmfDhiQiq=5qPGXG+rJcxGkWk0CZ4X_2cnr2UVH+eQ@mail.gmail.com>
- <3f5613e9-ccd0-4096-afc3-67ee94f6f660@gmail.com>
- <CACGkMEs+Mse7nhPPiqbd2doeGtPD2QD3BM_cztr6e=VfuiobHQ@mail.gmail.com>
-Content-Language: en-US
-From: Bui Quang Minh <minhquangbui99@gmail.com>
-In-Reply-To: <CACGkMEs+Mse7nhPPiqbd2doeGtPD2QD3BM_cztr6e=VfuiobHQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20251219-dev-module-init-eexists-netfilter-v1-1-efd3f62412dc@samsung.com>
+X-B4-Tracking: v=1; b=H4sIAO/eRGkC/x2NwQqDMBAFf0X23IUmNVL6K9JDNS+6YKNkowjiv
+ xs8DgMzBymSQOlTHZSwicocC5hHRf34iwNYfGGyT+uMNW/22Pg/+3UqJkpmYBfNyhE5yJSR2DW
+ hDt3LWd93VDpLQpD9frTf87wA+wCYS3MAAAA=
+X-Change-ID: 20251218-dev-module-init-eexists-netfilter-56f4fb352dcb
+To: Pablo Neira Ayuso <pablo@netfilter.org>, 
+ Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>, 
+ Phil Sutter <phil@nwl.cc>, Nikolay Aleksandrov <razor@blackwall.org>, 
+ Ido Schimmel <idosch@nvidia.com>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: Luis Chamberlain <mcgrof@kernel.org>, Petr Pavlu <petr.pavlu@suse.com>, 
+ Daniel Gomez <da.gomez@kernel.org>, Sami Tolvanen <samitolvanen@google.com>, 
+ Aaron Tomlin <atomlin@atomlin.com>, Lucas De Marchi <demarchi@kernel.org>, 
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+ bridge@lists.linux.dev, netdev@vger.kernel.org, 
+ linux-modules@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Daniel Gomez <da.gomez@samsung.com>
+X-Mailer: b4 0.15-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3967; i=da.gomez@samsung.com;
+ h=from:subject:message-id; bh=aLysHjbqpI8FaFJ4wtkcZbXvdugD32ypDbpUfYtRcaE=;
+ b=owEBbQKS/ZANAwAIAUCeo8QfGVH7AcsmYgBpRN77Y8OOuXAROsrdnRmMDgZy4zuf/ygiHytLh
+ 91q+5GbhcmJAjMEAAEIAB0WIQTvdRrhHw9z4bnGPFNAnqPEHxlR+wUCaUTe+wAKCRBAnqPEHxlR
+ +5xrD/9P2SgKSwKvpQRtM9kmAOh93wT4s4ZSnBztJZMV4mzJV40AOfTIDpHGgeDVem09lfB2ZMA
+ YE1L912aK1qiUk9YDCjtn98C5xqtOXvZtHwRwl5dkStnYOqlpC+mA+bXUz+kEKsE/hKWmO7x2I1
+ 7OADPTymgeGRDJIpLhkNx0OrLdbAAN8dbYs/eCpPkT0+YResXIsfbkYiINLmWeBdmbmxqwWbxzc
+ usIaNiSl4OzDI7VPg8sHrsJz4sbMEOAz+VNoM6Wgq/3qnnKMRGdrg5X/iRWthcD6U8tggNdzNhg
+ dQhusUZv2pQ1kw37mXwVJ6j3f/jpFeIS4CwKbF9S3nKd3+tle9CwfRfmAdCe5vhhjveAj3Yqhna
+ milZZT5mIaBD6BTFNFr5Hb5nqpIrOivQocOmu2WlhFu1jFfCEMnQgv0t1/lgghzKM07Xos7nn60
+ nPTTCNbgujniIVURYeEWDAn+mpu6pC8Is1R9EGMYajeZC26dGPqF0WcHJJtHdI30Jlnn3W3ab0n
+ IprltDMy+1pga2kvqNg2U5/fGcNxlMn66D61RtQSoaBntfRaINhBt9LZINHDBGZEeC2M2zf2aTF
+ IssZlq7yQb8wp5YFAkDTVpdKgCZeuIP7+xhywNLiWTo12iQez4so/XZurSTJNva36Vvc7UVpsIK
+ 7UCpVRoBp8QWoHQ==
+X-Developer-Key: i=da.gomez@samsung.com; a=openpgp;
+ fpr=B2A7A9CFDD03B540FF58B27185F56EA4E9E8138F
 
-On 12/17/25 09:58, Jason Wang wrote:
-> On Wed, Dec 17, 2025 at 12:23 AM Bui Quang Minh
-> <minhquangbui99@gmail.com> wrote:
->> On 12/16/25 11:16, Jason Wang wrote:
->>> On Fri, Dec 12, 2025 at 11:28 PM Bui Quang Minh
->>> <minhquangbui99@gmail.com> wrote:
->>>> Calling napi_disable() on an already disabled napi can cause the
->>>> deadlock. In commit 4bc12818b363 ("virtio-net: disable delayed refill
->>>> when pausing rx"), to avoid the deadlock, when pausing the RX in
->>>> virtnet_rx_pause[_all](), we disable and cancel the delayed refill work.
->>>> However, in the virtnet_rx_resume_all(), we enable the delayed refill
->>>> work too early before enabling all the receive queue napis.
->>>>
->>>> The deadlock can be reproduced by running
->>>> selftests/drivers/net/hw/xsk_reconfig.py with multiqueue virtio-net
->>>> device and inserting a cond_resched() inside the for loop in
->>>> virtnet_rx_resume_all() to increase the success rate. Because the worker
->>>> processing the delayed refilled work runs on the same CPU as
->>>> virtnet_rx_resume_all(), a reschedule is needed to cause the deadlock.
->>>> In real scenario, the contention on netdev_lock can cause the
->>>> reschedule.
->>>>
->>>> This fixes the deadlock by ensuring all receive queue's napis are
->>>> enabled before we enable the delayed refill work in
->>>> virtnet_rx_resume_all() and virtnet_open().
->>>>
->>>> Fixes: 4bc12818b363 ("virtio-net: disable delayed refill when pausing rx")
->>>> Reported-by: Paolo Abeni <pabeni@redhat.com>
->>>> Closes: https://netdev-ctrl.bots.linux.dev/logs/vmksft/drv-hw-dbg/results/400961/3-xdp-py/stderr
->>>> Cc: stable@vger.kernel.org
->>>> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
->>>> ---
->>>> Changes in v2:
->>>> - Move try_fill_recv() before rx napi_enable()
->>>> - Link to v1: https://lore.kernel.org/netdev/20251208153419.18196-1-minhquangbui99@gmail.com/
->>>> ---
->>>>    drivers/net/virtio_net.c | 71 +++++++++++++++++++++++++---------------
->>>>    1 file changed, 45 insertions(+), 26 deletions(-)
->>>>
->>>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
->>>> index 8e04adb57f52..4e08880a9467 100644
->>>> --- a/drivers/net/virtio_net.c
->>>> +++ b/drivers/net/virtio_net.c
->>>> @@ -3214,21 +3214,31 @@ static void virtnet_update_settings(struct virtnet_info *vi)
->>>>    static int virtnet_open(struct net_device *dev)
->>>>    {
->>>>           struct virtnet_info *vi = netdev_priv(dev);
->>>> +       bool schedule_refill = false;
->>>>           int i, err;
->>>>
->>>> -       enable_delayed_refill(vi);
->>>> -
->>>> +       /* - We must call try_fill_recv before enabling napi of the same receive
->>>> +        * queue so that it doesn't race with the call in virtnet_receive.
->>>> +        * - We must enable and schedule delayed refill work only when we have
->>>> +        * enabled all the receive queue's napi. Otherwise, in refill_work, we
->>>> +        * have a deadlock when calling napi_disable on an already disabled
->>>> +        * napi.
->>>> +        */
->>>>           for (i = 0; i < vi->max_queue_pairs; i++) {
->>>>                   if (i < vi->curr_queue_pairs)
->>>>                           /* Make sure we have some buffers: if oom use wq. */
->>>>                           if (!try_fill_recv(vi, &vi->rq[i], GFP_KERNEL))
->>>> -                               schedule_delayed_work(&vi->refill, 0);
->>>> +                               schedule_refill = true;
->>>>
->>>>                   err = virtnet_enable_queue_pair(vi, i);
->>>>                   if (err < 0)
->>>>                           goto err_enable_qp;
->>>>           }
->>> So NAPI could be scheduled and it may want to refill but since refill
->>> is not enabled, there would be no refill work.
->>>
->>> Is this a problem?
->> You are right. It is indeed a problem.
->>
->> I think we can unconditionally schedule the delayed refill after
->> enabling all the RX NAPIs (don't check the boolean schedule_refill
->> anymore) to ensure that we will have refill work. We can still keep the
->> try_fill_recv here to fill the receive buffer earlier in normal case.
->> What do you think?
-> Or we can have a reill_pending
+From: Daniel Gomez <da.gomez@samsung.com>
 
-Okay, let me implement this in the next version.
+The -EEXIST error code is reserved by the module loading infrastructure
+to indicate that a module is already loaded. When a module's init
+function returns -EEXIST, userspace tools like kmod interpret this as
+"module already loaded" and treat the operation as successful, returning
+0 to the user even though the module initialization actually failed.
 
-> but basically I think we need something
-> that is much more simple. That is, using a per rq work instead of a
-> global one?
+This follows the precedent set by commit 54416fd76770 ("netfilter:
+conntrack: helper: Replace -EEXIST by -EBUSY") which fixed the same
+issue in nf_conntrack_helper_register().
 
-I think we can leave this in a net-next patch later.
+Affected modules:
+  * ebtable_broute ebtable_filter ebtable_nat arptable_filter
+  * ip6table_filter ip6table_mangle ip6table_nat ip6table_raw
+  * ip6table_security iptable_filter iptable_mangle iptable_nat
+  * iptable_raw iptable_security
 
-Thanks,
-Quang Minh
+Signed-off-by: Daniel Gomez <da.gomez@samsung.com>
+---
+The error code -EEXIST is reserved by the kernel module loader to
+indicate that a module with the same name is already loaded. When a
+module's init function returns -EEXIST, kmod interprets this as "module
+already loaded" and reports success instead of failure [1].
 
->
-> Thanks
->
->>>
->>>> +       enable_delayed_refill(vi);
->>>> +       if (schedule_refill)
->>>> +               schedule_delayed_work(&vi->refill, 0);
->>>> +
->>>>           if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_STATUS)) {
->>>>                   if (vi->status & VIRTIO_NET_S_LINK_UP)
->>>>                           netif_carrier_on(vi->dev);
->>>> @@ -3463,39 +3473,48 @@ static void virtnet_rx_pause(struct virtnet_info *vi, struct receive_queue *rq)
->>>>           __virtnet_rx_pause(vi, rq);
->>>>    }
->>>>
->>> Thanks
->>>
->> Thanks,
->> Quang Minh.
->>
+The kernel module loader will include a safety net that provides -EEXIST
+to -EBUSY with a warning [2], and a documentation patch has been sent to
+prevent future occurrences [3].
+
+These affected code paths were identified using a static analysis tool
+[4] that traces -EEXIST returns to module_init(). The tool was developed
+with AI assistance and all findings were manually validated.
+
+Link: https://lore.kernel.org/all/aKEVQhJpRdiZSliu@orbyte.nwl.cc/ [1]
+Link: https://lore.kernel.org/all/20251013-module-warn-ret-v1-0-ab65b41af01f@intel.com/ [2]
+Link: https://lore.kernel.org/all/20251218-dev-module-init-eexists-modules-docs-v1-0-361569aa782a@samsung.com/ [3]
+Link: https://gitlab.com/-/snippets/4913469 [4]
+---
+ net/bridge/netfilter/ebtables.c | 2 +-
+ net/netfilter/nf_log.c          | 4 ++--
+ net/netfilter/x_tables.c        | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/net/bridge/netfilter/ebtables.c b/net/bridge/netfilter/ebtables.c
+index 5697e3949a36..a04fc1757528 100644
+--- a/net/bridge/netfilter/ebtables.c
++++ b/net/bridge/netfilter/ebtables.c
+@@ -1299,7 +1299,7 @@ int ebt_register_template(const struct ebt_table *t, int (*table_init)(struct ne
+ 	list_for_each_entry(tmpl, &template_tables, list) {
+ 		if (WARN_ON_ONCE(strcmp(t->name, tmpl->name) == 0)) {
+ 			mutex_unlock(&ebt_mutex);
+-			return -EEXIST;
++			return -EBUSY;
+ 		}
+ 	}
+ 
+diff --git a/net/netfilter/nf_log.c b/net/netfilter/nf_log.c
+index 74cef8bf554c..62cf6a30875e 100644
+--- a/net/netfilter/nf_log.c
++++ b/net/netfilter/nf_log.c
+@@ -89,7 +89,7 @@ int nf_log_register(u_int8_t pf, struct nf_logger *logger)
+ 	if (pf == NFPROTO_UNSPEC) {
+ 		for (i = NFPROTO_UNSPEC; i < NFPROTO_NUMPROTO; i++) {
+ 			if (rcu_access_pointer(loggers[i][logger->type])) {
+-				ret = -EEXIST;
++				ret = -EBUSY;
+ 				goto unlock;
+ 			}
+ 		}
+@@ -97,7 +97,7 @@ int nf_log_register(u_int8_t pf, struct nf_logger *logger)
+ 			rcu_assign_pointer(loggers[i][logger->type], logger);
+ 	} else {
+ 		if (rcu_access_pointer(loggers[pf][logger->type])) {
+-			ret = -EEXIST;
++			ret = -EBUSY;
+ 			goto unlock;
+ 		}
+ 		rcu_assign_pointer(loggers[pf][logger->type], logger);
+diff --git a/net/netfilter/x_tables.c b/net/netfilter/x_tables.c
+index 90b7630421c4..48105ea3df15 100644
+--- a/net/netfilter/x_tables.c
++++ b/net/netfilter/x_tables.c
+@@ -1764,7 +1764,7 @@ EXPORT_SYMBOL_GPL(xt_hook_ops_alloc);
+ int xt_register_template(const struct xt_table *table,
+ 			 int (*table_init)(struct net *net))
+ {
+-	int ret = -EEXIST, af = table->af;
++	int ret = -EBUSY, af = table->af;
+ 	struct xt_template *t;
+ 
+ 	mutex_lock(&xt[af].mutex);
+
+---
+base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
+change-id: 20251218-dev-module-init-eexists-netfilter-56f4fb352dcb
+
+Best regards,
+--  
+Daniel Gomez <da.gomez@samsung.com>
 
 
