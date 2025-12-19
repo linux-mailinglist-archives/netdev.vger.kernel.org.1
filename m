@@ -1,162 +1,100 @@
-Return-Path: <netdev+bounces-245451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC9E2CCDC6F
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 23:21:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C9C9FCCE172
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 01:50:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id DB08D300CD6C
-	for <lists+netdev@lfdr.de>; Thu, 18 Dec 2025 22:21:35 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id BAD37300645B
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 00:50:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B39912E7BA3;
-	Thu, 18 Dec 2025 22:21:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1CD21A76BB;
+	Fri, 19 Dec 2025 00:50:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="P6ktwkNQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aZ5uCJvH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f66.google.com (mail-ot1-f66.google.com [209.85.210.66])
+Received: from mail-qv1-f67.google.com (mail-qv1-f67.google.com [209.85.219.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03D9D2D97AA
-	for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 22:21:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BCA31A4F3C
+	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 00:50:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766096494; cv=none; b=ZqhJbfW1oiv6IxgEo3/db3G9b9Iei89RBTbxZApI5n97wW2UNNiz32kh0cRS3q+BVwW+EbomkXBvrdvLJuMfVSv7Qy0eAIQ4yYA6IZGjnfddeVAOXOD+nh9NVqmb9iV4vyxZsQPoCMhM17/ot4DHD0DZsLg5JgVj/uTQcgnGpKQ=
+	t=1766105403; cv=none; b=rIFPEBb0Lq1GScLd7mZ4QJTeYwyf9Tuov/J6iOXHrWZCBvx+y/MA/ZzPp9M1djBzwD3ZUNyzAGYUHDzZ3QYBC1DLYgmtaxSEGhrHiK8Z+N/UxxSX4J0IFbV3gjebQRsqaAWRq1+02im2buJLud2Wodk1mFbvrgBH/9k5NqdZxFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766096494; c=relaxed/simple;
-	bh=3WEOOBTimDyvI1edV6ZuvzqFIskxf4gd81QTKphek3k=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=SzGZccDJp7yruOf+f/oUrb+kyV9NKhkF1y19f6kZPbSZ811SHlHjqq244SAGdi3sqPY2yLFlkyp8D77C1dnivyUdr44cCFs2MkWDeRMZmy8aNFoKHNqsKclO3nMoL6INtIr+MZPI30xDqRKlyUvtzDZBFg/D915un8CLKNSnTao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=P6ktwkNQ; arc=none smtp.client-ip=209.85.210.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-ot1-f66.google.com with SMTP id 46e09a7af769-7c750b10e14so419920a34.2
-        for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 14:21:31 -0800 (PST)
+	s=arc-20240116; t=1766105403; c=relaxed/simple;
+	bh=oC84iq763iASMjCrObh9c2BxQ2m1CeFtY7gf/SdnUs0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 Cc:Content-Type; b=WtgEgq2ZmVmlAoDtJMhLsGLYrPlij+JV8Xr7i2JmhSEwTEHZ1msCTsm/bvssPWf/8C8GfxYpnPJMJn75WArsSxEG81o6cqXg4fOF5Q6xUXu+FpAoCUSAt0/9dT8U4RKk13oR4rUGzhThJmoNtcxcKeySj1Al11yWE0CglcKWos4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aZ5uCJvH; arc=none smtp.client-ip=209.85.219.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f67.google.com with SMTP id 6a1803df08f44-88888d80590so16117466d6.3
+        for <netdev@vger.kernel.org>; Thu, 18 Dec 2025 16:50:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1766096490; x=1766701290; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1766105401; x=1766710201; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zQWK63y9E1OcVkpznLAWrv5TZ9nCwP1KJH375ok1pZM=;
-        b=P6ktwkNQ5QsM48RTmHDrxzCHHEtEoGLeSvpArvAfVLXorUvMfspyhQQ4EPoD3jvCeN
-         AaHeJ2ohMSWy2i/R6NilLjwzYi7dUhJO0Okwb1fruks9HTK9xmnHntsIQHBOPFhu72cO
-         ybP8XGr/kE2lOFcTMiY7wxA/P2r980lDZk/dymy5xtapohUeNXjA+EBHlWjzLcOE0Z1T
-         PHayrMUZRYBD03wzbN0c9xXICROZbECdzEGOX5cOOwyfedv06KrbYj8urOITrHOD37qF
-         ls4rCupjaj18UlV+YG/z7eu7vEcQimC5OkBrfdH1kVGUAnjzFER7HriBL9vkJVKTgDJU
-         ExgQ==
+        bh=oC84iq763iASMjCrObh9c2BxQ2m1CeFtY7gf/SdnUs0=;
+        b=aZ5uCJvHq/xD578PTYfPFp/xa7evH+GYZ9Cjk9Scx5YWK9xZZw+C02Nv/f6I7dac+A
+         I9cEQLRJQwGIVOyhcnEMJhT3OmoULrbi5n94BUrI84GVRLQVKBrK26O5bU7T8BgHexvy
+         6meVwa8BWnwuhOW0fHm2t3jCx4pTMcQ/x6+jzirG7HsAAValQtyV4Ry33IFOjqIyFzPV
+         tL59jEJ8956VJN0JsrD+Z2Gmb0itb+QM2RbuubDEQx/J0rkfY51BSaZpA6FINeCbXsSI
+         LBkzoTlGktTzEwmFO2cJ3wVFWKQVlVCuOpAUGxKqjHt1llhasrvMC+uvFsEtT2Pe9Yld
+         MqSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766096490; x=1766701290;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zQWK63y9E1OcVkpznLAWrv5TZ9nCwP1KJH375ok1pZM=;
-        b=mFVDCC7IQAcJJLqYcT5LLfFJxFPDBj8Xscd2nQuFmhwgGg3bLh8PkYNd2vFuuawJma
-         KSlLqq2/oyPv6aOf+8eWPeVc64Z/WvDw4Fu47jMxakileUy0s7dLm7CklQT60FhbH3b5
-         31w/ZfWn/sops90Gdpa2uFojwT0sy9OLmAG1nE5/fbOOxYWhnUAs4IfWuENiaFPkR524
-         lRQYVQNdIh0qIWE3lYqCU4MeC+kvoW5ZXJLjnM9RyIhTIG5LQ5Ebu+/E2kTAtPe95Kw5
-         2GA1bauiCMzvJ98Cl+CyvCaqG429MFjliyiDzMSetblPxD+EIR8O6W1xqnICU8V0G6p2
-         D1WQ==
-X-Gm-Message-State: AOJu0YxupJVGgcIfFHeYmAFsUII82Kh0dWKLM9cXKfpqr2cS2+H6mjt7
-	RYxL78oR2dUu2my+jh2wEI6OKp32fnFFuxTlR4NSguR2Na9uhPQnwqEr+ojXfhKOY4x0+UNXV+R
-	sSg0AMN3e4g==
-X-Gm-Gg: AY/fxX5Oq+oFd7VmWwqcVwhnG+3+eROg+MuHWYFulyDPRcn9xQx056JkhGmc1PxFASF
-	AlL5ed+6VTaTDX4fRH7chpadQ9IMI7Nwa2nDoKShwVpOHwbxryjSuFsDwSdB/y0Q4c+diDSAWYX
-	KGjofb2hKfJCBs7M+SxNqPUs/TQIJ/nXb5wQuZEYJ5vM2dfeClkd80reTw650nai9dzNeKGRJEL
-	rAKd8VBsPjCNh11XIha+usylI4lLHblItq4qGEK90n+JWMPTOR3wdZ9K8oiUjZcnqhc8Zbgipfr
-	y7H/se57FDaCHGVDY4RpzliMWJ1vr+NNlHv2M0R/zdnY+UvmgdKNbV2lzjs+JdtFml8Di5BUuyU
-	ILDotZDDI636BqCqoS6BYAWfi4nfUtUsE9ITE9EAbBJRIGicBsj8CKMth6GbVH4JnODVl1+/io3
-	ZtYIWcteUG
-X-Google-Smtp-Source: AGHT+IEQ438WpetCan+wwE5um9TfPU1PFj1eNW/mV2nLvViqOs/wgUL+95TMY8z7MDOjWeTHk/fGZw==
-X-Received: by 2002:a05:6830:4c08:b0:7c7:65f4:1120 with SMTP id 46e09a7af769-7cc66a6f068mr519653a34.23.1766096490504;
-        Thu, 18 Dec 2025 14:21:30 -0800 (PST)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7cc667ebe98sm472901a34.21.2025.12.18.14.21.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 Dec 2025 14:21:29 -0800 (PST)
-Message-ID: <07adc0c2-2c3b-4d08-8af1-1c466a40b6a8@kernel.dk>
-Date: Thu, 18 Dec 2025 15:21:28 -0700
+        d=1e100.net; s=20230601; t=1766105401; x=1766710201;
+        h=content-transfer-encoding:cc:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=oC84iq763iASMjCrObh9c2BxQ2m1CeFtY7gf/SdnUs0=;
+        b=KFxmyNvoWkZSe3cJhoP1wZ0tAjF8ifrsJJJaDuKq6RUO1STyLtvaMSU5xLwuCTKIiT
+         Qo143WpdUX4gwOIql7qqgC3bTb8J1rNywHr2haIKopdidRYy8RgWGDTD+Dd3xj9dOMgE
+         DEce8Q9ufnjKhkp63zSvZit4PyKx71JAwjIKXz0keQjJNKtgmg8v9zln3pSH3pQ5dxkC
+         NgIDUUqQk2i+mUglhDawq/OpKN4EY+akPZLn8s5DK3CxMhofZ8Mzo3WV2Gurd+sp5980
+         UASnm7yv8ATML4J6K1wsi3k5QK689NOeTTX/NG5fDFVf2VuZmkeLLb6wsMNiI+yNsAWZ
+         IjtA==
+X-Gm-Message-State: AOJu0Yx3MarzqTJsd0HkuyuWgl17EbsvMjk2ZTfVbXSwLi45l5eZLFs4
+	dhmF2S2XqFr47m3js8djZ7gcxy98cdn7EVT75uNntPUKibFuVp6IW6GCdQEkcLuhOSUWfHqzzsp
+	9OREFDx/PKE6LdT+KCCg0qaLH77m/LTDqtvIB5FwkpA==
+X-Gm-Gg: AY/fxX4rOOeSHRBM93DQRJKr62kFMevBBKGhtHdIUUIkyAjf2D0kGtK5O6IbRoEQLdB
+	Qgb7cRehDTDxVkvjW9tmKvjUaliEFOSMBP56G/r4JeJAxUIF/t4DjdovdCZJ7CJ4b471W/1FPKp
+	BuuZA4eZhEHCtuCeUUJQpz+pI559NHsEHWFL13gN+DiatfAJabPdBAb1k7q9GNUjP+mlnCB18ec
+	zgRdxACwOkprD6S9MvDcbYtOFWFtM8aUc8fsMTKQSeXbkOI/S7mlS0LprF+xD3iR51L7ev/IPfH
+	0RBLpC+j/AiMWqET+BW7e0PLo+yiUqlLu/tWv54lLIG1KNpsQVu2mXTg7rAzacWLjA==
+X-Google-Smtp-Source: AGHT+IExaglDZDG8B3getYeAcFfGFgeMN/+uk81/wHXy0DVDVzDT4p7VbTOA1X4uNH0dDVq4bs01jJ9jWi8sCacwZwk=
+X-Received: by 2002:a05:6214:1803:b0:88a:449e:81a0 with SMTP id
+ 6a1803df08f44-88d851fc364mr19969626d6.3.1766105401080; Thu, 18 Dec 2025
+ 16:50:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: netdev <netdev@vger.kernel.org>
-Cc: io-uring <io-uring@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- Willem de Bruijn <willemb@google.com>, Kuniyuki Iwashima
- <kuniyu@google.com>, Julian Orth <ju.orth@gmail.com>
-From: Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v2] af_unix: don't post cmsg for SO_INQ unless explicitly
- asked for
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <CADkSEUgY=eQz+0VWzAZwH6r6THHEgJaO1-SYemANZGaKEaWkOA@mail.gmail.com>
+ <ebb762b3-d69d-446f-a94f-fa27e66ddfbb@lunn.ch>
+In-Reply-To: <ebb762b3-d69d-446f-a94f-fa27e66ddfbb@lunn.ch>
+From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Date: Thu, 18 Dec 2025 16:49:50 -0800
+X-Gm-Features: AQt7F2ppeu_ki9ACqz357rYNRe4ulTQh1KmDqLrB23b2Tp-3JACUon-Nj5eC230
+Message-ID: <CADkSEUh06rmVWYzswCWrX=E+c_3jSzW8qJkmv67UmF1s5h3Aog@mail.gmail.com>
+Subject: Re: Merging uli526x and dmfe drivers
+Cc: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-A previous commit added SO_INQ support for AF_UNIX (SOCK_STREAM), but it
-posts a SCM_INQ cmsg even if just msg->msg_get_inq is set. This is
-incorrect, as ->msg_get_inq is just the caller asking for the remainder
-to be passed back in msg->msg_inq, it has nothing to do with cmsg. The
-original commit states that this is done to make sockets
-io_uring-friendly", but it's actually incorrect as io_uring doesn't use
-cmsg headers internally at all, and it's actively wrong as this means
-that cmsg's are always posted if someone does recvmsg via io_uring.
+Hi, Andrew,
 
-Fix that up by only posting a cmsg if u->recvmsg_inq is set.
+These two drivers are not for actual DEC hardware. They are in the
+tulip folder because they are for hardware whose design was heavily
+inspired by the DEC Tulip. uli526x was part of chipsets used on
+motherboards new enough to support 64-bit AMD Socket AM3 CPUs, and
+dmfe was at least used on PCI cards (I'll have to check where else).
 
-Additionally, mirror how TCP handles inquiry handling in that it should
-only be done for a successful return. This makes the logic for the two
-identical.
-
-Cc: stable@vger.kernel.org
-Fixes: df30285b3670 ("af_unix: Introduce SO_INQ.")
-Reported-by: Julian Orth <ju.orth@gmail.com>
-Link: https://github.com/axboe/liburing/issues/1509
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-
----
-
-V2:
-- Unify logic with tcp
-- Squash the two patches into one
-
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 55cdebfa0da0..a7ca74653d94 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -2904,6 +2904,7 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
- 	unsigned int last_len;
- 	struct unix_sock *u;
- 	int copied = 0;
-+	bool do_cmsg;
- 	int err = 0;
- 	long timeo;
- 	int target;
-@@ -2929,6 +2930,9 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
- 
- 	u = unix_sk(sk);
- 
-+	do_cmsg = READ_ONCE(u->recvmsg_inq);
-+	if (do_cmsg)
-+		msg->msg_get_inq = 1;
- redo:
- 	/* Lock the socket to prevent queue disordering
- 	 * while sleeps in memcpy_tomsg
-@@ -3088,10 +3092,11 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
- 	if (msg) {
- 		scm_recv_unix(sock, msg, &scm, flags);
- 
--		if (READ_ONCE(u->recvmsg_inq) || msg->msg_get_inq) {
-+		if (msg->msg_get_inq && (copied ?: err) >= 0) {
- 			msg->msg_inq = READ_ONCE(u->inq_len);
--			put_cmsg(msg, SOL_SOCKET, SCM_INQ,
--				 sizeof(msg->msg_inq), &msg->msg_inq);
-+			if (do_cmsg)
-+				put_cmsg(msg, SOL_SOCKET, SCM_INQ,
-+					 sizeof(msg->msg_inq), &msg->msg_inq);
- 		}
- 	} else {
- 		scm_destroy(&scm);
--- 
-Jens Axboe
-
-
+On Thu, Dec 18, 2025 at 2:24=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
+> When did you last see a DEC machine? Probably in a museum? There is no
+> point working on such old drivers unless you happen to maintain the
+> museum and like to keep a modem kernel running on these old machines.
 
