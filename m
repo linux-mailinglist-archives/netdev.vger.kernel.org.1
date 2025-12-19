@@ -1,205 +1,184 @@
-Return-Path: <netdev+bounces-245553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E251CD1532
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 19:16:40 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7CBACD188B
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 20:05:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 6A0F830053F6
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 18:11:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D5F3B3013EC6
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 19:02:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B02433DED7;
-	Fri, 19 Dec 2025 18:11:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE17B27F754;
+	Fri, 19 Dec 2025 19:02:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="fhy/uWJQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M32unRe5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+Received: from mail-yx1-f65.google.com (mail-yx1-f65.google.com [74.125.224.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8433F33A714
-	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 18:11:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D67329E117
+	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 19:02:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766167900; cv=none; b=ri5MbzkeVIwmHnrVP+biuHO9Gv2S4t2Xay5jiI74XIQLT9HyfKPMWoZULMVmo9TstOxFmP18xn6EFmuToTSyLfY06DJQwBxvEk+u5oTU0iDwcBQlQJeqwcSHt+ykFzk3Mb5YqddY1FKlkr3ZEC9yw/UAVQBYGvrzPDy9pKVmOXk=
+	t=1766170956; cv=none; b=OfJG5ziHbCIFuyy3gY0OKl4Xjc0AfSuPi3k5LAqfJhvH2aUxyfbFJk3FXtuAsHUxKxGBUkCRQ5JMtRwU8jn0HlGjw+PVED52AZT2rmeqKc/2tQdMz+c0TKI0GvI1E2khbVgZsrd2AsXzXGGEYpAcLjMj3Gr2VFQA1RmXlJu2jKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766167900; c=relaxed/simple;
-	bh=XNVLrwpsXPHzXFeydYjN1QOG9WtOH5XaaQ/9OFUM3QI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EAPmRAXq28OjA90btXHrI+odA/f9OpA0cpLc0ZDxKyxfxpzp7FZKg1H9bSOXddJXPFpa5MepWoIvNXBK5HQW794JJnWgfs5jpAGZq6Bq45yWiZoAn2HcnIUKutYxk7CRQkiUHKkXTWat1+9wAeWbooSnZg7cQaZuoAAqj+qUgMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=fhy/uWJQ; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-34c565b888dso2304023a91.0
-        for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 10:11:38 -0800 (PST)
+	s=arc-20240116; t=1766170956; c=relaxed/simple;
+	bh=5wMt2CG+Z+ii4XVh3y1doob6qBG9tQAKPZshXhT9lzo=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=aQomVQn7cMvxi/SyWAjKTROH4kodyN/XR2mG1Ls8e9UBCDYr17+iYCE4JkMK+U7rNsoWH4QloHwxv3uPAsp3/Ezd8RRB8+fA4od5WFlYSFo9TGtSdG2tuLWjtC/Ds9T261weDArZDCOC/agsiwINkDuUAnWnpYuamjeIJuiPsk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M32unRe5; arc=none smtp.client-ip=74.125.224.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f65.google.com with SMTP id 956f58d0204a3-6446bae1e17so1720315d50.0
+        for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 11:02:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1766167898; x=1766772698; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1766170954; x=1766775754; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XKmnc8sQT0m90A1EGL7X+BZsX0x2H9PAUpCfvRKuOns=;
-        b=fhy/uWJQEnwuHQK6GrBszkZiA30aSElJt4WuGgay6/vCXQHpS43BCl7VGEAM+DgD5v
-         tVrQCPwxA4QywSn5EBktu3hpNyVj18/tWZs4eIV/oP4jNl4Dil0LAGNPwUOuimfOKS8/
-         YlMuQbtZ/89xVhBc0/MwMJO+QbH9qc41SKelNsjwQM7wJ2EC2fkegLJcCIMc/aJlMEKc
-         gG5atqaySJG3DyUzuDGzwhXeQjee1Up2DVfo/n9aIYcCiho60r3Gl3n8SM0AHsUiXbb6
-         TBCV5tWDeprdYU7G2NuLrmLIux39MtHlmreBZFB6pN807X62xlEuAQI6f1Rvl9qfNd8y
-         yk/A==
+        bh=+7X6ScpTubi9V6KNGf+Mxp/fxYlQRd+flt+Jmf08SOs=;
+        b=M32unRe5kAbiNvmWcseT7CiEv2bsHPTzrYFrWUVayJwCZ9yYiN3nb1oVrNRUM3pX9p
+         wbekbSgfpTl+gbKAJNCeQOfCHuLQHHtqOsOTRUWQJ/1GMHMn9dOunbJR5NI+V2LGHggh
+         8e+8bVRuJas1JA/hZUoi8nMVH37StiJVXfSvDVxTSTDpTyFTELNBuu3qHjwR46Aykulv
+         GsyFMnW1e/lrRwbTHzQAdTbdk4orZlS7of5sxXDrK6c0whbd1rxQLkxzSQe7kLh7ALET
+         10Rl7uNgeU1WsdSc3ZPxYbQwb33Q0hdue7eyfF0KzyQudbtyHgFH4033/MCX90ZYqQzd
+         2REg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766167898; x=1766772698;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=XKmnc8sQT0m90A1EGL7X+BZsX0x2H9PAUpCfvRKuOns=;
-        b=UxwGLOc+CtNNNIaSbk18Yej9pu1H+wdjv1gJD2NunfBM5eHeoPDayIZC8vszzYJEx1
-         wy+nillPqW6cl0LbEQtWTnUnmQFJrx9dJgV0Xk3X2gr/v1PzeIin6oQWuqKG45Eru1NR
-         /9HQMk3w6sn6Q7EhCiLTcg3epaqCRqmLrT0pqavfYyg3bJhfWWj5i8/s440Bum7HvQ+H
-         bijxU2CztNZq3/6ML9LX7TT7YZ/gke4fMCjOhxVgDnopRoai2UlaySGbyTd0l0QtvQL1
-         PXL8Yqu+O3I9kwaMydfiwbvXKo75PggDlrjngRAcJhZvLbgFIE+ldR7Zc4DiSPXNVxSF
-         d+XQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUvKfLESH1TYR1W7bWHvMd7nXk/cLIGh/WjH5hwwPRtS7BGkVWwleBvPW0Rbj83TExBCnQQOjc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywb9JMQFs3eOFdTZIXy9bQmOY8r6yu43t3t7h7eeHFng1OGHRhG
-	hARYUVv0XaLcHHZW5tgfydNNMp1Wx8Hnaf4ewyF+8exBoi+4TX6cp4BKRUDXLZl96icFbs7uARw
-	5VGoPDDZK9QmY8zbTIihBNOjdjVRtNz+20AfVMeav1/thy/Mu69k=
-X-Gm-Gg: AY/fxX7sbFr5P6x7xftthnB6BKuGoGmedRFtbBsLZMeP5TbIFSQSV4dAtkz4c0pa6vW
-	cqr2DcP91gVVyVHfSkU41XJgwbOwIP7BkwT0l6MhUWUpijoQvxuxsFGKIb7B5qXe0Hj2DivQYJi
-	lVDpDzL7M6VkG7n5//nL81/5ScI0e0j/1jbrFZvGoAW6iv4F3KXtMs8+fyKlWGIsB8IoCqEhE2C
-	p7O0eGqpbbxWn64w5eaWvejzxMvyqTyYPauqvYy9VS9RLY5NbTZ5zL9BOVwiOQ3GVqr7Gk=
-X-Google-Smtp-Source: AGHT+IF0rXHFwu13e8zRdTaDEgLFU70atv3Zw0sMr2VMnWLKs7QsHVB9ThIJkD6W/Hmqc3AjQdBCoUbBbHebtBzaA7w=
-X-Received: by 2002:a17:90b:35d2:b0:340:776d:f4ca with SMTP id
- 98e67ed59e1d1-34e921e057cmr3557162a91.26.1766167897674; Fri, 19 Dec 2025
- 10:11:37 -0800 (PST)
+        d=1e100.net; s=20230601; t=1766170954; x=1766775754;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+7X6ScpTubi9V6KNGf+Mxp/fxYlQRd+flt+Jmf08SOs=;
+        b=Pu+xa/F7pmRmwL5F7ogX5pxHK5UNHDlN6IhmVXd80pOd6Avx/CmyIGvHOgLg5a8wjW
+         a1KTRptNeRqvv5RIQXVMfg+E7Q+x6IFahWGGZuwT0kTJ5Um8qBs4BefqQSPexKNVhWBZ
+         UU2uOp/dBJ9JYNCPaYDYP70rVhIhJiV22WR0DGMBXicxxhkVsEDAK8Mg+PFJMOzJ7Pbq
+         QBtPU7kDhI3ODnN5vwaPTWrAkt/5FJPWdRfDCchOXhiJLkxEqbwfMizgflGNWbM0RAl/
+         oHKyLFBXAb11myjzJTSMp1gx8Ii/VHAndZd2y8RCC5qNmsgpZmyx0u0S5YRuBqLXvU0H
+         2FsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVafy0Uxc9E9SScHuQ5uLx4j8S4UmV0YQBVi6Om5pBkLimBOWNcntShYW1leduDTC7U1msVf8k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8VzOMN0ElioEzobhiAa+5FHfNTGcKe7ZcFXi8VF6m/TJOuTnG
+	MHdWYAb2cmi+fMPXG4igTVpaP6t5lQQPBFDGG575WEC11uko5bRfmWI0
+X-Gm-Gg: AY/fxX4Qn/TARqDZWiKQ59pSeKLoxAv6Uc/GswN2roWq93o91EiGTTuCONX7fupCVPh
+	qNNxdPLNPdxj4+8pKNpSuCWg4PencDV+M2KmyWKEaQhekWmA0towJOGWaXOVMXxfqFl8aUuBbRX
+	n5nOpZintEgKUlp/6TWeWKulYGJYkYhCbZDSUccYPzzYc2eCgRHl22V28p3mwVIuqu1dt/1Wexi
+	vi8m9pVcF4cvKxqBFOaxhBcazQdqKqulwvL03qJK6QrgFhH87h1mw0BaM/Ssnk4rmzcq6wrAs/s
+	NrhGr/mwRNpiwqxQssiD9R2iJ1xeZ+g4rjxkpt4F2bD8WGFRqYRVqDul5jMFcudFX8s3pXhufMN
+	MrVAnUk5/BduYvB9NoQH61LoBeSIYA2XYN4Z+rWF5HPhyyj6lmLXpKGru5OJBQclwNvfx5muBBj
+	3ToYq8DXe9Hw8FL7DWlVdr/teWbbng/ImDqR4XjQHlBwy/cKWDYZnZ0JK542QWyyinMc/vjYmlQ
+	Qzh3A==
+X-Google-Smtp-Source: AGHT+IHQMi0rtWTe20QiMK70YtJOLFwClFCN26ZMDPjLIROVmTmp6qGUNhPVGFDejdQzPRmxA+UUaw==
+X-Received: by 2002:a53:d204:0:b0:645:5540:2cd4 with SMTP id 956f58d0204a3-6466a8a517dmr2507235d50.6.1766170953745;
+        Fri, 19 Dec 2025 11:02:33 -0800 (PST)
+Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-78fb44f0e3csm12855847b3.28.2025.12.19.11.02.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Dec 2025 11:02:32 -0800 (PST)
+Date: Fri, 19 Dec 2025 14:02:32 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jens Axboe <axboe@kernel.dk>, 
+ netdev <netdev@vger.kernel.org>
+Cc: io-uring <io-uring@vger.kernel.org>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Kuniyuki Iwashima <kuniyu@google.com>, 
+ Julian Orth <ju.orth@gmail.com>
+Message-ID: <willemdebruijn.kernel.18e89ba05fbac@gmail.com>
+In-Reply-To: <07adc0c2-2c3b-4d08-8af1-1c466a40b6a8@kernel.dk>
+References: <07adc0c2-2c3b-4d08-8af1-1c466a40b6a8@kernel.dk>
+Subject: Re: [PATCH v2] af_unix: don't post cmsg for SO_INQ unless explicitly
+ asked for
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251219173637.797418-1-whrosenb@asu.edu>
-In-Reply-To: <20251219173637.797418-1-whrosenb@asu.edu>
-From: Paul Moore <paul@paul-moore.com>
-Date: Fri, 19 Dec 2025 13:11:26 -0500
-X-Gm-Features: AQt7F2r673eNS1MvXH_LmuvBf0t193_GTzqos_6szr64npgBWaYAbu_wr6q-mvo
-Message-ID: <CAHC9VhQmR8A2vz0W-VrrhYNQ2wgCYxHbAmdgmM2yTL-uh4qiOg@mail.gmail.com>
-Subject: Re: [PATCH] ipv6: BUG() in pskb_expand_head() as part of calipso_skbuff_setattr()
-To: Will Rosenberg <whrosenb@asu.edu>
-Cc: security@kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Huw Davies <huw@codeweavers.com>, netdev@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Dec 19, 2025 at 12:37=E2=80=AFPM Will Rosenberg <whrosenb@asu.edu> =
-wrote:
->
-> There exists a kernel oops caused by a BUG_ON(nhead < 0) at
-> net/core/skbuff.c:2232 in pskb_expand_head().
-> This bug is triggered as part of the calipso_skbuff_setattr()
-> routine when skb_cow() is passed headroom > INT_MAX
-> (i.e. (int)(skb_headroom(skb) + len_delta) < 0).
->
-> The root cause of the bug is due to an implicit integer cast in
-> __skb_cow(). The check (headroom > skb_headroom(skb)) is meant to ensure
-> that delta =3D headroom - skb_headroom(skb) is never negative, otherwise
-> we will trigger a BUG_ON in pskb_expand_head(). However, if
-> headroom > INT_MAX and delta <=3D -NET_SKB_PAD, the check passes, delta
-> becomes negative, and pskb_expand_head() is passed a negative value for
-> nhead.
->
-> Fix the trigger condition in calipso_skbuff_setattr(). Avoid passing
-> "negative" headroom sizes to skb_cow() within calipso_skbuff_setattr()
-> by only using skb_cow() to grow headroom.
->
-> PoC:
->         Using `netlabelctl` tool:
->
->         netlabelctl map del default
->         netlabelctl calipso add pass doi:7
->         netlabelctl map add default address:0::1/128 protocol:calipso,7
->
->         Then run the following PoC:
->
->         int fd =3D socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
->
->         // setup msghdr
->         int cmsg_size =3D 2;
->         int cmsg_len =3D 0x60;
->         struct msghdr msg;
->         struct sockaddr_in6 dest_addr;
->         struct cmsghdr * cmsg =3D (struct cmsghdr *) calloc(1,
->                         sizeof(struct cmsghdr) + cmsg_len);
->         msg.msg_name =3D &dest_addr;
->         msg.msg_namelen =3D sizeof(dest_addr);
->         msg.msg_iov =3D NULL;
->         msg.msg_iovlen =3D 0;
->         msg.msg_control =3D cmsg;
->         msg.msg_controllen =3D cmsg_len;
->         msg.msg_flags =3D 0;
->
->         // setup sockaddr
->         dest_addr.sin6_family =3D AF_INET6;
->         dest_addr.sin6_port =3D htons(31337);
->         dest_addr.sin6_flowinfo =3D htonl(31337);
->         dest_addr.sin6_addr =3D in6addr_loopback;
->         dest_addr.sin6_scope_id =3D 31337;
->
->         // setup cmsghdr
->         cmsg->cmsg_len =3D cmsg_len;
->         cmsg->cmsg_level =3D IPPROTO_IPV6;
->         cmsg->cmsg_type =3D IPV6_HOPOPTS;
->         char * hop_hdr =3D (char *)cmsg + sizeof(struct cmsghdr);
->         hop_hdr[1] =3D 0x9; //set hop size - (0x9 + 1) * 8 =3D 80
->
->         sendmsg(fd, &msg, 0);
->
-> Fixes: 2917f57b6bc1 ("calipso: Allow the lsm to label the skbuff directly=
-.")
-> Signed-off-by: Will Rosenberg <whrosenb@asu.edu>
+Jens Axboe wrote:
+> A previous commit added SO_INQ support for AF_UNIX (SOCK_STREAM), but it
+> posts a SCM_INQ cmsg even if just msg->msg_get_inq is set. This is
+> incorrect, as ->msg_get_inq is just the caller asking for the remainder
+> to be passed back in msg->msg_inq, it has nothing to do with cmsg. The
+> original commit states that this is done to make sockets
+> io_uring-friendly", but it's actually incorrect as io_uring doesn't use
+> cmsg headers internally at all, and it's actively wrong as this means
+> that cmsg's are always posted if someone does recvmsg via io_uring.
+> 
+> Fix that up by only posting a cmsg if u->recvmsg_inq is set.
+> 
+> Additionally, mirror how TCP handles inquiry handling in that it should
+> only be done for a successful return. This makes the logic for the two
+> identical.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: df30285b3670 ("af_unix: Introduce SO_INQ.")
+> Reported-by: Julian Orth <ju.orth@gmail.com>
+> Link: https://github.com/axboe/liburing/issues/1509
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> 
 > ---
->
-> Notes:
->     -Changing __skb_cow() would likely require an audit of all its use
->     cases due to its long legacy in the kernel. After private discussions=
-,
->     it was decided that this patch should be applied to calipso to remedy
->     the immediate symptoms and allow for easy backporting. However, net
->     devs should consider remedying the root cause through __skb_cow()
->     and skb_cow().
->
->     -Paul, please let me know if I should add any form of credit for
->     the patch code, such as "Suggested-By."
->
->  net/ipv6/calipso.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> V2:
+> - Unify logic with tcp
+> - Squash the two patches into one
+> 
+> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> index 55cdebfa0da0..a7ca74653d94 100644
+> --- a/net/unix/af_unix.c
+> +++ b/net/unix/af_unix.c
+> @@ -2904,6 +2904,7 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+>  	unsigned int last_len;
+>  	struct unix_sock *u;
+>  	int copied = 0;
+> +	bool do_cmsg;
+>  	int err = 0;
+>  	long timeo;
+>  	int target;
+> @@ -2929,6 +2930,9 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+>  
+>  	u = unix_sk(sk);
+>  
+> +	do_cmsg = READ_ONCE(u->recvmsg_inq);
+> +	if (do_cmsg)
+> +		msg->msg_get_inq = 1;
 
-Folks can add my Suggested-by if they like, but I'm not bothered
-either way; getting it fixed upstream is the important part.  Thanks
-for your work on this Will!
+I would avoid overwriting user written fields if it's easy to do so.
 
-Acked-by: Paul Moore <paul@paul-moore.com>
+In this case it probably is harmless. But we've learned the hard way
+that applications can even get confused by recvmsg setting msg_flags.
+I've seen multiple reports of applications failing to scrub that field
+inbetween calls.
 
-> diff --git a/net/ipv6/calipso.c b/net/ipv6/calipso.c
-> index df1986973430..21f6ed126253 100644
-> --- a/net/ipv6/calipso.c
-> +++ b/net/ipv6/calipso.c
-> @@ -1342,7 +1342,8 @@ static int calipso_skbuff_setattr(struct sk_buff *s=
-kb,
->         /* At this point new_end aligns to 4n, so (new_end & 4) pads to 8=
-n */
->         pad =3D ((new_end & 4) + (end & 7)) & 7;
->         len_delta =3D new_end - (int)end + pad;
-> -       ret_val =3D skb_cow(skb, skb_headroom(skb) + len_delta);
-> +       ret_val =3D skb_cow(skb,
-> +                         skb_headroom(skb) + (len_delta > 0 ? len_delta =
-: 0));
->         if (ret_val < 0)
->                 return ret_val;
->
->
-> base-commit: ea1013c1539270e372fc99854bc6e4d94eaeff66
-> --
-> 2.34.1
+Also just more similar to tcp:
 
---=20
-paul-moore.com
+       do_cmsg = READ_ONCE(u->recvmsg_inq);
+       if ((do_cmsg || msg->msg_get_inq) && (copied ?: err) >= 0) {
+
+>  redo:
+>  	/* Lock the socket to prevent queue disordering
+>  	 * while sleeps in memcpy_tomsg
+> @@ -3088,10 +3092,11 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+>  	if (msg) {
+>  		scm_recv_unix(sock, msg, &scm, flags);
+>  
+> -		if (READ_ONCE(u->recvmsg_inq) || msg->msg_get_inq) {
+> +		if (msg->msg_get_inq && (copied ?: err) >= 0) {
+>  			msg->msg_inq = READ_ONCE(u->inq_len);
+> -			put_cmsg(msg, SOL_SOCKET, SCM_INQ,
+> -				 sizeof(msg->msg_inq), &msg->msg_inq);
+> +			if (do_cmsg)
+> +				put_cmsg(msg, SOL_SOCKET, SCM_INQ,
+> +					 sizeof(msg->msg_inq), &msg->msg_inq);
+>  		}
+>  	} else {
+>  		scm_destroy(&scm);
+> -- 
+> Jens Axboe
+> 
+> 
+
+
 
