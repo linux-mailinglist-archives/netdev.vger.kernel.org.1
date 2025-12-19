@@ -1,290 +1,135 @@
-Return-Path: <netdev+bounces-245550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FB8DCD11EF
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 18:23:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C705CD1201
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 18:24:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EE4AB30BB2B5
-	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 17:20:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B48A830194D4
+	for <lists+netdev@lfdr.de>; Fri, 19 Dec 2025 17:21:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0F3B3195E4;
-	Fri, 19 Dec 2025 17:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 652AE31A575;
+	Fri, 19 Dec 2025 17:21:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mathematik.uni-marburg.de header.i=@mathematik.uni-marburg.de header.b="x0vTNqam"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Iy/mmZa5"
 X-Original-To: netdev@vger.kernel.org
-Received: from vhrz1173.hrz.uni-marburg.de (vhrz1173.HRZ.Uni-Marburg.DE [137.248.1.43])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF86930C610;
-	Fri, 19 Dec 2025 17:20:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=137.248.1.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6CA3339B41
+	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 17:21:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766164836; cv=none; b=J2ISdgz0/mqGpdeUThKH+5lDm4ebTDg1mVOn19Eei7ovG5sv2DqM/T9EMGmZ4S/8cRQeL92CjFqMgKBpfRkod2je5+KIpLALs+KmEgl/CSjcTKFWZabL19X7y2PJ6tDG7UZdeccR5Fv9ihlLG+wjLMuaNo0DLsdDCaxx3gdWRQ8=
+	t=1766164884; cv=none; b=QARkXbu7jdFR6KjaVQUFL2CdVgTBuTRLrIp+AYiBGPdjmRSQdGWwCJ/Oh1gCgZpExQh07N74Lhd4FRgkU0pZ0F86h8ozbX7u6jaVo63JMniWcpy7Xac/WOuyf//t82Y2fqIdV8QtDdr8CkdVV+//6wYikvKnhOx0al1DjHCvaMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766164836; c=relaxed/simple;
-	bh=cPBEh00fgKNw/ntamUaTH96OVCc3mCrdtjHLoxeLylo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
-	 In-Reply-To:Content-Type; b=FLnfZXXQDkidRU1BKVIVCVNeOdzF5LeXebPpYKyxOk3RPKJQ1yrw7Kp/KoUKORPnYK/IZSoBqIcaLVjAMx1w0YAUSdRivStzT7svhz2/3svfgh/aLd47soCAlNAerFaL3QrNB9NA/QxlyLvUyOrCsYzmf7kMyiih0SXcwWS4DNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mathematik.uni-marburg.de; spf=pass smtp.mailfrom=mathematik.uni-marburg.de; dkim=pass (1024-bit key) header.d=mathematik.uni-marburg.de header.i=@mathematik.uni-marburg.de header.b=x0vTNqam; arc=none smtp.client-ip=137.248.1.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mathematik.uni-marburg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mathematik.uni-marburg.de
-Received: from vhrz1173.hrz.uni-marburg.de (vhrz1173.HRZ.Uni-Marburg.DE [137.248.1.43])
+	s=arc-20240116; t=1766164884; c=relaxed/simple;
+	bh=sPdvCaqzHL1BNrBCKwAotEVYl2eJOECD8r+TGqurXPc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=UV+HqP6g2qwWTNvRdjMrGhYeh5uHagXzXBpkF95xpzOP0n45HMYY7f6mxE0Lm3Ek5MjxFQP38diqVjtTqHIjGUJixcF+jhbleFm2bDneoAjlTluiKHSFJEzbA0fHeErsUwQldInTwRQJXWHgO3GGJ0R8QxHOo9n3NX7R9iubhuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Iy/mmZa5; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1766164880;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=pPnhyw/i/3SzlIuWdiWigNi8X6TDLr93j9cN8Sri8f4=;
+	b=Iy/mmZa5kQBMFDKLMrTgcfbIomzmkyPJqdKxgeHwwgPdeLbrBtV2Uhjvq9Y3ZeLFbv/77H
+	TEbFKyGTLqtMoqtMfgMAAQWMtDR7oo5TJU4LLWjFwHL4WSrVX/jUmJ43Hv2tasqTADCktE
+	HW18jYNcXx6CdAzDaGci7pn0qTEaH1Y=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-460-8M2yYNr4P8C71VC9hEOD4A-1; Fri,
+ 19 Dec 2025 12:21:18 -0500
+X-MC-Unique: 8M2yYNr4P8C71VC9hEOD4A-1
+X-Mimecast-MFC-AGG-ID: 8M2yYNr4P8C71VC9hEOD4A_1766164878
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by vhrz1865.HRZ.Uni-Marburg.DE (Postfix) with ESMTPS id 4dXvKV5Kl6zyg3;
-	Fri, 19 Dec 2025 18:14:38 +0100 (CET)
-Authentication-Results: smtpd-out;
-	dkim=pass header.d=mathematik.uni-marburg.de header.s=default header.b=x0vTNqam;
-	spf=pass (smtpd-out: domain of rschwarzkopf@mathematik.uni-marburg.de designates 137.248.1.43 as permitted sender) smtp.mailfrom=rschwarzkopf@mathematik.uni-marburg.de
-Received: from pc12216.mathematik.uni-marburg.de (pc12216.Mathematik.Uni-Marburg.DE [137.248.123.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by vhrz1865.HRZ.Uni-Marburg.DE (Postfix) with ESMTPS id 4dXvKH5K7HzyhT;
-	Fri, 19 Dec 2025 18:14:27 +0100 (CET)
-Received: from [137.248.109.88] (mvpn2188.VPN.Uni-Marburg.DE [137.248.109.88])
-	(authenticated bits=0)
-	by pc12216.mathematik.uni-marburg.de (8.14.4/8.14.4) with ESMTP id 5BJHEOEn088785
-	(version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 19 Dec 2025 18:14:25 +0100
-DKIM-Filter: OpenDKIM Filter v2.11.0 pc12216.mathematik.uni-marburg.de 5BJHEOEn088785
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=mathematik.uni-marburg.de; s=default; t=1766164467;
-	bh=2ymR/MBpNuFIRThwX8ZYZ+U/ecsF7BfXRXD3pwLbnvY=;
-	h=Date:Subject:To:References:From:Cc:In-Reply-To:From;
-	b=x0vTNqamgS5LpOw2laVYBjb+zWIsr6IFahCEBdCni/kDz5a341gNeosp8E5UUG40k
-	 UuTKfTOqlSetWtzqRNi3u4TWRWcF1FPZNq4YlIWe68ig6ZQMjrWyGuSXT4fvisIG0V
-	 fwMnBQhmrfi0Y80T4c/oDgrqvH6Qq1jHL+XKCxaU=
-Message-ID: <10af99d0-9a52-4ae0-9ee9-a02b5370f034@mathematik.uni-marburg.de>
-Date: Fri, 19 Dec 2025 18:14:24 +0100
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F073A18005AE
+	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 17:21:17 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.44.32.215])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3488F30001A2
+	for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 17:21:16 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: netdev@vger.kernel.org
+Subject: [PATCH net] trace: fix UBSAN warning in __remove_instance
+Date: Fri, 19 Dec 2025 18:21:03 +0100
+Message-ID: <9c3f30d166d7d4e08afd81d462413dff1703776a.1766164851.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [regression 5.10.y] Libvirt can no longer delete macvtap devices
- after backport of a6cec0bcd342 ("net: rtnetlink: add bulk delete support
- flag") to 5.10.y series (Debian 11)
-To: Salvatore Bonaccorso <carnil@debian.org>,
-        Nikolay Aleksandrov <razor@blackwall.org>,
-        David Ahern <dsahern@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Sasha Levin <sashal@kernel.org>
-References: <0b06eb09-b1a9-41f9-8655-67397be72b22@mathematik.uni-marburg.de>
- <aUMEVm1vb7bdhlcK@eldamar.lan>
- <e8bcfe99-5522-4430-9826-ed013f529403@mathematik.uni-marburg.de>
- <176608738558.457059.16166844651150713799@eldamar.lan>
-Content-Language: en-US
-From: Roland Schwarzkopf <rschwarzkopf@mathematik.uni-marburg.de>
-Cc: debian-kernel@lists.debian.org, Ben Hutchings <benh@debian.org>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org, regressions@lists.linux.dev
-In-Reply-To: <176608738558.457059.16166844651150713799@eldamar.lan>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Score: -6.23 / 12.00 / 15.00
-X-Rspamd-Queue-Id: 4dXvKV5Kl6zyg3
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Hi all,
+From: Darrick J. Wong <djwong@kernel.org>
 
-On 12/18/25 20:50, Salvatore Bonaccorso wrote:
-> Hi all,
->
-> Roland Schwarzkopf reported to the Debian mailing list a problem which
-> he encountered once updating in Debian from 5.10.244 to 5.10.247. The
-> report is quoted below and found in
-> https://lists.debian.org/debian-kernel/2025/12/msg00223.html
->
-> Roland did bisect the changes between 5.10.244 to 5.10.247 and found
-> that the issue is introduced with 1550f3673972 ("net: rtnetlink: add
-> bulk delete support flag") which is the backport to the 5.10.y series.
->
-> On Thu, Dec 18, 2025 at 02:59:55PM +0100, Roland Schwarzkopf wrote:
->> Hi Salvatore,
->>
->> On 12/17/25 20:28, Salvatore Bonaccorso wrote:
->>> Hi Roland,
->>>
->>> I'm CC'ing Ben Hutchings directly as well as he takes care of the
->>> Debian LTS kernel updates. Idellly we make this as well a proper bug
->>> for easier tracking.
->>>
->>> On Wed, Dec 17, 2025 at 01:35:54PM +0100, Roland Schwarzkopf wrote:
->>>> Hi there,
->>>>
->>>> after upgrading to the latest kernel on Debian 11
->>>> (linux-image-5.10.0-37-amd64) I have an issue using libvirt with qemu/kvm
->>>> virtual machines and macvtap networking. When a machine is shut down,
->>>> libvirt can not delete the corresponding macvtap device. Thus, starting the
->>>> machine again is not possible. After manually removing the macvtap device
->>>> using `ip link delete` the vm can be started again.
->>>>
->>>> In the journal the following message is shown:
->>>>
->>>> Dec 17 13:19:27 iblis libvirtd[535]: error destroying network device macvtap0: Operation not supported
->>>>
->>>> After downgrading the kernel to linux-image-5.10.0-36-amd64, the problem
->>>> disappears. I tested this on a fresh minimal install of Debian 11 - to
->>>> exclude that anything else on my production machines is causing this issue.
->>>>
->>>> Since the older kernel does not have this issue, I assume this is related to
->>>> the kernel and not to libvirt?
->>>>
->>>> I tried to check for bug reports of the kernel package, but the bug tracker
->>>> finds no reports and even states that the package does not exist (I used the
->>>> "Bug reports" link on
->>>> https://packages.debian.org/bullseye/linux-image-5.10.0-37-amd64). This left
->>>> me a bit puzzled. Since I don't have experience with the debian bug
->>>> reporting process, I had no other idea than writing to this list.
->>> You would need to search for inhttps://bugs.debian.org/src:linux ,
->>> but that said I'm not aware of any bug reports in that direction.
->>>
->>> Would you be in the position of bisecting the problem as you can say
->>> that 5.10.244 is good and 5.10.247 is bad and regressed? If you can do
->>> that that would involve compiling a couple of kernels to narrow down
->>> where the problem is introduced:
->>>
->>>       git clone --single-branch -b linux-5.10.yhttps://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
->>>       cd linux-stable
->>>       git checkout v5.10.244
->>>       cp /boot/config-$(uname -r) .config
->>>       yes '' | make localmodconfig
->>>       make savedefconfig
->>>       mv defconfig arch/x86/configs/my_defconfig
->>>
->>>       # test 5.10.244 to ensure this is "good"
->>>       make my_defconfig
->>>       make -j $(nproc) bindeb-pkg
->>>       ... install the resulting .deb package and confirm it successfully boots / problem does not exist
->>>
->>>       # test 5.10.247 to ensure this is "bad"
->>>       git checkout v5.10.247
->>>       make my_defconfig
->>>       make -j $(nproc) bindeb-pkg
->>>       ... install the resulting .deb package and confirm it fails to boot / problem exists
->>>
->>> With that confirmed, the bisection can start:
->>>
->>>       git bisect start
->>>       git bisect good v5.10.244
->>>       git bisect bad v5.10.247
->>>
->>> In each bisection step git checks out a state between the oldest
->>> known-bad and the newest known-good commit. In each step test using:
->>>
->>>       make my_defconfig
->>>       make -j $(nproc) bindeb-pkg
->>>       ... install, try to boot / verify if problem exists
->>>
->>> and if the problem is hit run:
->>>
->>>       git bisect bad
->>>
->>> and if the problem doesn't trigger run:
->>>
->>>       git bisect good
->>>
->>> . Please pay attention to always select the just built kernel for
->>> booting, it won't always be the default kernel picked up by grub.
->>>
->>> Iterate until git announces to have identified the first bad commit.
->>>
->>> Then provide the output of
->>>
->>>       git bisect log
->>>
->>> In the course of the bisection you might have to uninstall previous
->>> kernels again to not exhaust the disk space in /boot. Also in the end
->>> uninstall all self-built kernels again.
->> I just did my first bisection \o/ (sorry)
->>
->> Here are the results:
->>
->> git bisect start
->> # bad: [f964b940099f9982d723d4c77988d4b0dda9c165] Linux 5.10.247
->> git bisect bad f964b940099f9982d723d4c77988d4b0dda9c165
->> # good: [863b76df7d1e327979946a2d3893479c3275bfa4] Linux 5.10.244
->> git bisect good f52ee6ea810273e527a5d319e5f400be8c8424c1
->> # good: [dc9fdb7586b90e33c766eac52b6f3d1c9ec365a1] net: usb: lan78xx: Add error handling to lan78xx_init_mac_address
->> git bisect good dc9fdb7586b90e33c766eac52b6f3d1c9ec365a1
->> # bad: [2272d5757ce5d3fb416d9f2497b015678eb85c0d] phy: cadence: cdns-dphy: Enable lower resolutions in dphy
->> git bisect bad 2272d5757ce5d3fb416d9f2497b015678eb85c0d
->> # bad: [547539f08b9e3629ce68479889813e58c8087e70] ALSA: usb-audio: fix control pipe direction
->> git bisect bad 547539f08b9e3629ce68479889813e58c8087e70
->> # bad: [3509c748e79435d09e730673c8c100b7f0ebc87c] most: usb: hdm_probe: Fix calling put_device() before device initialization
->> git bisect bad 3509c748e79435d09e730673c8c100b7f0ebc87c
->> # bad: [a6ebcafc2f5ff7f0d1ce0c6dc38ac09a16a56ec0] net: add ndo_fdb_del_bulk
->> git bisect bad a6ebcafc2f5ff7f0d1ce0c6dc38ac09a16a56ec0
->> # good: [b8a72692aa42b7dcd179a96b90bc2763ac74576a] hfsplus: fix KMSAN uninit-value issue in __hfsplus_ext_cache_extent()
->> git bisect good b8a72692aa42b7dcd179a96b90bc2763ac74576a
->> # good: [2b42a595863556b394bd702d46f4a9d0d2985aaa] m68k: bitops: Fix find_*_bit() signatures
->> git bisect good 2b42a595863556b394bd702d46f4a9d0d2985aaa
->> # good: [9d9f7d71d46cff3491a443a3cf452cecf87d51ef] net: rtnetlink: use BIT for flag values
->> git bisect good 9d9f7d71d46cff3491a443a3cf452cecf87d51ef
->> # bad: [1550f3673972c5cfba714135f8bf26784e6f2b0f] net: rtnetlink: add bulk delete support flag
->> git bisect bad 1550f3673972c5cfba714135f8bf26784e6f2b0f
->> # good: [c8879afa24169e504f78c9ca43a4d0d7397049eb] net: netlink: add NLM_F_BULK delete request modifier
->> git bisect good c8879afa24169e504f78c9ca43a4d0d7397049eb
->> # first bad commit: [1550f3673972c5cfba714135f8bf26784e6f2b0f] net: rtnetlink: add bulk delete support flag
->>
->> Is there anything else I can do to help?
-> Is there soemthing missing?
->
-> Roland I think it would be helpful if you can test as well more recent
-> stable series versions to confirm if the issue is present there as
-> well or not, which might indicate a 5.10.y specific backporting
-> problem.
+xfs/558 triggers the following UBSAN warning:
 
-I tested this on some newer kernel versions: stable 6.18.2 and 6.17.13 
-as well as mainline 6.19-rc1. With all three kernel versions, a 
-different problem occurs: I can't even start the virtual machine.
+ ------------[ cut here ]------------
+ UBSAN: shift-out-of-bounds in /storage/home/djwong/cdev/work/linux-xfs/kernel/trace/trace.c:10510:10
+ shift exponent 32 is too large for 32-bit type 'int'
+ CPU: 1 UID: 0 PID: 888674 Comm: rmdir Not tainted 6.19.0-rc1-xfsx #rc1 PREEMPT(lazy)  dbf607ef4c142c563f76d706e71af9731d7b9c90
+ Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.0-4.module+el8.8.0+21164+ed375313 04/01/2014
+ Call Trace:
+  <TASK>
+  dump_stack_lvl+0x4a/0x70
+  ubsan_epilogue+0x5/0x2b
+  __ubsan_handle_shift_out_of_bounds.cold+0x5e/0x113
+  __remove_instance.part.0.constprop.0.cold+0x18/0x26f
+  instance_rmdir+0xf3/0x110
+  tracefs_syscall_rmdir+0x4d/0x90
+  vfs_rmdir+0x139/0x230
+  do_rmdir+0x143/0x230
+  __x64_sys_rmdir+0x1d/0x20
+  do_syscall_64+0x44/0x230
+  entry_SYSCALL_64_after_hwframe+0x4b/0x53
+ RIP: 0033:0x7f7ae8e51f17
+ Code: f0 ff ff 73 01 c3 48 8b 0d de 2e 0e 00 f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 b8 54 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 01 c3 48 8b 15 b1 2e 0e 00 f7 d8 64 89 02 b8
+ RSP: 002b:00007ffd90743f08 EFLAGS: 00000246 ORIG_RAX: 0000000000000054
+ RAX: ffffffffffffffda RBX: 00007ffd907440f8 RCX: 00007f7ae8e51f17
+ RDX: 00007f7ae8f3c5c0 RSI: 00007ffd90744a21 RDI: 00007ffd90744a21
+ RBP: 0000000000000002 R08: 0000000000000000 R09: 0000000000000000
+ R10: 00007f7ae8f35ac0 R11: 0000000000000246 R12: 00007ffd90744a21
+ R13: 0000000000000001 R14: 00007f7ae8f8b000 R15: 000055e5283e6a98
+  </TASK>
+ ---[ end trace ]---
 
-The relevant journal entry is:
+whilst tearing down an ftrace instance.  TRACE_FLAGS_MAX_SIZE is now 64,
+so the mask comparison expression must be typecast to a u64 value to
+avoid an overflow.  AFAICT, ZEROED_TRACE_FLAGS is already cast to ULL
+so this is ok.
 
-Dec 19 17:25:41 iblis libvirtd[438]: error creating macvtap interface 
-macvtap0@eno1 (08:00:27:25:16:0c): Operation not supported
+Fixes: bbec8e28cac592 ("tracing: Allow tracer to add more than 32 options")
+Signed-off-by: "Darrick J. Wong" <djwong@kernel.org>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+---
+Note: DO NOT MERGE on net nor net-next. Reshared on the netdev ML to fix
+CI failures caused by the blamed commit above. Will rot on PW until the
+net PR or someone can access the CI hosts, whatever come first.
+---
+ kernel/trace/trace.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I then searched in the commit log for the upstream commit of the one I 
-found when bisecting the issue. It is a6cec0bcd342, which git describe 
-says is v5.18-rc1-423-ga6cec0bcd342. Therefore I decided to also test 
-the two longterm versions before and after that commit was introduced: 
-5.15.197 and 6.1.159. With both kernel versions I found the same 
-behavior as with the stable and mainline versions.
-
-So on all newer kernel versions I tested behave identical, but different 
-than the latest release in the 5.10.y branch.
-
-I'm not sure if I caused this behaviour by making a mistake during 
-building the kernels - I don't have much experience in that area. I used 
-the same steps Salvatore gave me for bisecting the issue for the 
-different versions, i.e.,
-
-      cp /boot/config-$(uname -r) .config
-      yes '' | make localmodconfig
-      make savedefconfig
-      mv defconfig arch/x86/configs/my_defconfig
-      make my_defconfig
-      make -j $(nproc) bindeb-pkg
-
-Best regards,
-
-Roland
-
->
-> #regzbot introduced: 1550f3673972c5cfba714135f8bf26784e6f2b0f
->
-> Regards,
-> Salvatore
-
+diff --git a/kernel/trace/trace.c b/kernel/trace/trace.c
+index e575956ef9b5..6f2148df14d9 100644
+--- a/kernel/trace/trace.c
++++ b/kernel/trace/trace.c
+@@ -10507,7 +10507,7 @@ static int __remove_instance(struct trace_array *tr)
+ 
+ 	/* Disable all the flags that were enabled coming in */
+ 	for (i = 0; i < TRACE_FLAGS_MAX_SIZE; i++) {
+-		if ((1 << i) & ZEROED_TRACE_FLAGS)
++		if ((1ULL << i) & ZEROED_TRACE_FLAGS)
+ 			set_tracer_flag(tr, 1ULL << i, 0);
+ 	}
+ 
 -- 
-Dr. Roland Schwarzkopf <rschwarzkopf@mathematik.uni-marburg.de>
-Dept. of Mathematics and Computer Science, IT Solutions
-University of Marburg, Hans-Meerwein-Str. 6, D-35032 Marburg, Germany
-Tel: +4964212821523, Fax: +4964212821573
+2.52.0
 
 
