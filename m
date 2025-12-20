@@ -1,116 +1,92 @@
-Return-Path: <netdev+bounces-245614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71790CD38B0
-	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 00:06:02 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BE91CD38D2
+	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 00:36:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6010C30007B2
-	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 23:06:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0C8603007271
+	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 23:36:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0F412EF66E;
-	Sat, 20 Dec 2025 23:05:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB7512FB962;
+	Sat, 20 Dec 2025 23:36:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="F3dIwu2B"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cNXrcC1k"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B5D823C4FF
-	for <netdev@vger.kernel.org>; Sat, 20 Dec 2025 23:05:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA7FF26A1CF;
+	Sat, 20 Dec 2025 23:36:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766271959; cv=none; b=VU1X3xXYv40WpwLa5Bxu/ma7PTOAoyvJTwx5CvGkN1PHIQcd2dH3IRVsLfmnWYb/2YOSzKpDLm8FSneib+p/TuHMpiD96/Lirt1fNHvsJTEnB2o4X/GAHnXAYvVaFkeGJWI3/+5kWlShs8um/X0KJOQ0oroJPqypYupruDotUXI=
+	t=1766273799; cv=none; b=B0GMftQoDA3InSznA9IqKrbKjzlN9UpBzBB/sW+NQPL92jjsR9oHIM0p9KeK0J2LAbY6OfOlCPADSKPkCRdrpHyZf7rB5SPdcWWWtEaJJUwnKyywWpoKIsucWtES4AaPM0NX07WnZ+IY5ku4VoCCf0vcpE7ddipY2DnZZui9G+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766271959; c=relaxed/simple;
-	bh=IjXLtzP3AHv0rDolqNzJMPlS8UH+kMA4oC34g/dpx9A=;
+	s=arc-20240116; t=1766273799; c=relaxed/simple;
+	bh=vC5fU+fTzGjQTiDjhCHNJ4VGuHwaJ8Hy/6qGl11E1eo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fehe96MvRt7OuzOgzi3QiFfvRZOw0fKQ6WvOet4KJ5ExvthFrbMKmT4Mz814hHbEt47NEYCEI5jCFv8LMsUWe6sYZ1724H0nwbqUEBv/Ypdu2pBT50MxoqGi88hIX/uRJ+wRXk4a6JjDT1lBYABJuvupvmmLUrQtkRVRVlu4yd0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=F3dIwu2B; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <8f623d8e-cd83-4610-83fa-794295576dac@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1766271950;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ppTibUaZ/aJOjyfk4Y0rqjTvbdqNWKVIiAjytncOa3E=;
-	b=F3dIwu2BPP/5ZYeROfKWYm8NnLATWoCZybSKu2QE37IBCMW3VyVpw5Z3JTHo3YiU9YAkbV
-	0HTq5vvYfAIh6eyfxUVuHYCL4LZWaXZuDyLIuT0DVaMZ0vJ+NHhAqq1laRcFiQzQtNlWQS
-	beOGCSna71VZm4EGV+xV2v9UkOt4nN8=
-Date: Sat, 20 Dec 2025 15:05:43 -0800
+	 In-Reply-To:Content-Type; b=JIVwQCLPEUsDMEJcli5u+KRKx40k3ErCY6Y9GYvrt6Ud5lcPuEQ9tZDBChePpWkETqonfPps7GoZ9SDcwAiAA+huZwd4aBL1A8UDdvH827bUqp8jVu79ypQxgSib8v0WktFo0npBndSJByTqJhAUWL4pP7hUSCkiu7PL8HzG5iA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cNXrcC1k; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB364C4CEF5;
+	Sat, 20 Dec 2025 23:36:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766273799;
+	bh=vC5fU+fTzGjQTiDjhCHNJ4VGuHwaJ8Hy/6qGl11E1eo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=cNXrcC1kss3cX6lVK2eK8znmHtmpJxAXTFZ8ikOyMW9Mlkadac2rbYd4WhD07yj0u
+	 WE79d5mI+We6k/IhuUDkawjtJ1c+VUaABviEFTDUNiM3feXZEfqXjCd0apyEd/vYvh
+	 VN0gPgtq+KCNlx+kRPeymqM3CeLS7uwvCe2918FoHfOywqeIFNnPqbCBv3wYHMyQHV
+	 WhFnN/XslI5KLXjohwTluhke8vanTYOvvOdUuiAZqulm3FaJHyNySJcWVpK5vkMF4A
+	 XijQxAJvN6LpLe8/LJzqWvokPli7zRN72ciD7R57hFdXkNLJdodhcViB9j64MM5nXx
+	 9PHmwgxFW4u6Q==
+Message-ID: <e1fb9a40-9580-4c6b-8272-2d306a581cd1@kernel.org>
+Date: Sat, 20 Dec 2025 16:36:38 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] RDMA/rxe: let rxe_reclassify_recv_socket() call
- sk_owner_put()
-To: Stefan Metzmacher <metze@samba.org>, linux-rdma@vger.kernel.org
-Cc: Zhu Yanjun <zyjzyj2000@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
- Leon Romanovsky <leon@kernel.org>,
- Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, netdev@vger.kernel.org,
- linux-cifs@vger.kernel.org
-References: <20251219140408.2300163-1-metze@samba.org>
- <9ccc0635-7c0e-4a18-8469-9c5b6d9b268f@linux.dev>
- <01cd3f5a-2976-45ad-8a2d-32b3e39c6317@samba.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <01cd3f5a-2976-45ad-8a2d-32b3e39c6317@samba.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2-next v3] lib/bpf_legacy: Use userspace SHA-1 code
+ instead of AF_ALG
+To: Eric Biggers <ebiggers@kernel.org>,
+ Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+Cc: bpf@vger.kernel.org, linux-crypto@vger.kernel.org,
+ Ard Biesheuvel <ardb@kernel.org>, Alexei Starovoitov <ast@kernel.org>
+References: <20251218200910.159349-1-ebiggers@kernel.org>
+Content-Language: en-US
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20251218200910.159349-1-ebiggers@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 12/18/25 1:09 PM, Eric Biggers wrote:
+> diff --git a/include/sha1.h b/include/sha1.h
+> new file mode 100644
+> index 00000000..4a2ed513
+> --- /dev/null
+> +++ b/include/sha1.h
+> @@ -0,0 +1,18 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> +/*
+> + * SHA-1 message digest algorithm
+> + *
+> + * Copyright 2025 Google LLC
+> + */
+> +#ifndef __SHA1_H__
+> +#define __SHA1_H__
+> +
+> +#include <linux/types.h>
+> +#include <stddef.h>
+> +
+> +#define SHA1_DIGEST_SIZE 20
+> +#define SHA1_BLOCK_SIZE 64
 
-在 2025/12/20 5:05, Stefan Metzmacher 写道:
-> Am 20.12.25 um 04:51 schrieb Zhu Yanjun:
->> 在 2025/12/19 6:04, Stefan Metzmacher 写道:
->>> On kernels build with CONFIG_PROVE_LOCKING, CONFIG_MODULES
->>> and CONFIG_DEBUG_LOCK_ALLOC 'rmmod rdma_rxe' is no longer
->>> possible.
->>>
->>> For the global recv sockets rxe_net_exit() is where we
->>> call rxe_release_udp_tunnel-> udp_tunnel_sock_release(),
->>> which means the sockets are destroyed before 'rmmod rdma_rxe'
->>> finishes, so there's no need to protect against
->>> rxe_recv_slock_key and rxe_recv_sk_key disappearing
->>> while the sockets are still alive.
->>>
->>> Fixes: 80a85a771deb ("RDMA/rxe: reclassify sockets in order to avoid 
->>> false positives from lockdep")
->>> Cc: Zhu Yanjun <zyjzyj2000@gmail.com>
->>> Cc: Jason Gunthorpe <jgg@ziepe.ca>
->>> Cc: Leon Romanovsky <leon@kernel.org>
->>> Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
->>> Cc: linux-rdma@vger.kernel.org
->>> Cc: netdev@vger.kernel.org
->>> Cc: linux-cifs@vger.kernel.org
->>> Signed-off-by: Stefan Metzmacher <metze@samba.org>
->>
->> Thanks a lot. IIRC, there is a similar commit for SIW driver. Thus, I 
->> am not sure if there is a similar problem in SIW driver or not.
->
-> I don't think so, siw and the other place in rxe  are attached to 
-> specific connections
-> and there the reference is ok and needed.
+How come these are not part of the uapi?
 
-
-Make sense. Thanks.
-
-Yanjun.Zhu
-
-
->
-> The problem was only related to the two global sockets with the lifetime
-> the rdma_rxe is loaded.
->
-> metze
-
--- 
-Best Regards,
-Yanjun.Zhu
-
+I applied this to iproute2-next to get as much soak time as possible.
+Anyone using legacy bpf (added Toke in case he knows) in particular
+should test with top of tree.
 
