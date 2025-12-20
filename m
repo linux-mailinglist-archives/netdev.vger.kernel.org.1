@@ -1,278 +1,211 @@
-Return-Path: <netdev+bounces-245574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3F20CD2B69
-	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 10:02:10 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9809CD2E27
+	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 12:35:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3524E300F584
-	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 09:01:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A26A23014AEB
+	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 11:35:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62C8C2D94B0;
-	Sat, 20 Dec 2025 09:01:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 092B13090CC;
+	Sat, 20 Dec 2025 11:35:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aUfj1HTV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QH0aiJ6r"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C853262D27
-	for <netdev@vger.kernel.org>; Sat, 20 Dec 2025 09:01:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42E022D8DA3
+	for <netdev@vger.kernel.org>; Sat, 20 Dec 2025 11:35:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766221302; cv=none; b=awWpBrN+urQ/AXKQmw/3t9VmWERDQtuOiXIhfFJEhDN7PcDfy1L5b+TmSrAf9vmhygBcfeW1NJhC6acuduQuqIXZEMosUVjGKfvtn7AZL8biwSjOd9BxW4kaPzOjxa9q0zi5VaN/h9CAqkFZQLlqnWzqtJooIORMpyJ5767Abys=
+	t=1766230544; cv=none; b=RrsetgFeCqdewL7CIBAilwjjSgcPfuMvFGfeBoXde3vXeFGoc38ZDNtrVXyUVKEolk51SQ9owMFjUd88R9EEzwsJo3g2AXeXVK8iowkKu/Rs2SFrDaGvAw/Sfuh/IaWSe6ZxFk0AhzJwA3w2jKsNpckB+xNyaaVyWlZq94lIP6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766221302; c=relaxed/simple;
-	bh=4d+O9OuZ4RRNCWdOVZ0WRa+EtjazEcsVoEBPPFfY6zk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hUKx0rqnb+Q4LWzTOtBZRkoUSLmot5hQarKIJ8/H70SmdU5dViLcHG3W24aGKA8lx6esqeOdhLpR+/Wr99iPK8hU6g/OWpOOb3PHQlB0athM/xJvZDyzbK7zwSPmaj7wGP2n2FfVxPBy0TMReNPPF8Eh0KwPbuB3yU/byNAra+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aUfj1HTV; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1766221287;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WR8YAfzmmuv6Sn9sLH28S4YXG3HmYocRCaop46ntYtM=;
-	b=aUfj1HTVKbxAWoFKoFpJ3kIxoY+ntKqEQ2fy/+eA1MtuV/ycA0jvGrhKAbiuDLwz5mrBHB
-	LUzbgAptu8kvzMQVzjuSexV7Zt988XqydaxraPo8T9Xbu4JczIHxA0fzxPLPRFbb/N3kET
-	MMdf9vP+JUFvdBx3WOAEY3/EWqCCeCk=
-From: Menglong Dong <menglong.dong@linux.dev>
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: Menglong Dong <menglong8.dong@gmail.com>, ast@kernel.org,
- andrii@kernel.org, davem@davemloft.net, dsahern@kernel.org,
- daniel@iogearbox.net, martin.lau@linux.dev, eddyz87@gmail.com,
- song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com,
- kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org,
- tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH bpf-next v4 0/9] bpf: tracing session supporting
-Date: Sat, 20 Dec 2025 17:01:06 +0800
-Message-ID: <6114986.MhkbZ0Pkbq@7950hx>
-In-Reply-To: <2393471.ElGaqSPkdT@7950hx>
-References:
- <20251217095445.218428-1-dongml2@chinatelecom.cn>
- <CAEf4BzYm3=zzmCRg3zr1F99sBkxEZ_pDgjtKMBurb9LGu6JJKQ@mail.gmail.com>
- <2393471.ElGaqSPkdT@7950hx>
+	s=arc-20240116; t=1766230544; c=relaxed/simple;
+	bh=vXafQvDXbxhmRy9/A/k3bNzYbmfkT2tbUIk9/L+02a4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=T/IKI2jQGbFNbf6OF4yg6yfUcfHnCH74MLtfNjg3fWGfnFUNm0aHK25GGGJogPPKEI9pNBAgp6hc8hmcfiqAgDDcH4kW8c3fumjb8albywibIiKS6IdkpVr/3rhFsaApSBSLQ8m8G0p8oDa3Cnc3vruUG69+QbHMaeuszyr15lo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QH0aiJ6r; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-34cf1e31f85so2092686a91.1
+        for <netdev@vger.kernel.org>; Sat, 20 Dec 2025 03:35:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1766230542; x=1766835342; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=93uwlo3kvewJRRDvy0FK7OcjMcJRt550CMeXmSvT00w=;
+        b=QH0aiJ6rsw4tZaqLi611WNvFwdPTnpjNztQcg7rEoSTvu6EsxoLesAfGFrNvil0RMz
+         EmO5ffmErxTnZyQQ6bktByK0m07HhypRYfvDrOR6gVnYg7vHkHKvQyh0eLgxhMgmCUGK
+         I9g1Ut6cIJN++C3YmtL9i2FepjfPCdmie+80lG8hGYMFxbeL9CUxSGiZOfauxPC3DYnJ
+         0rUIAT7FeGuRqcdod6vV3nrZ88PZmbcqIqdMi+/NcJigqEVm+yaez+5UGoOYJy0aRpBf
+         EFb1xhCQZG2H5DU5miBHlWvtl3h8+W5qDDbd+dM53qecTcAu5AkYRDGvoCWB8wvQpRwS
+         OOLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766230542; x=1766835342;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=93uwlo3kvewJRRDvy0FK7OcjMcJRt550CMeXmSvT00w=;
+        b=TgRHuaNoy7fT5rfVZno2HIhloRSu189mtGHlDwlg/2PEAndjd/xGXzoJNJT6cS/3ss
+         pV/N5H2dCdPDaMY4rnW9giHQqYTkpIUHoVMv+5wsJVMI/dt21s0JDKdnbzPv+b5FEqRw
+         si6jDYBz6yCK6InB8HQDdfI/0v3QENWhxu/QGheILiKA02IuWwI9mENOeOzIGBHEO+U1
+         HX+oDm4RugcptcAOowL//M/41541g3BV0B3ex1zHC4o43sBjstl2Hay4z6JWVcJavWsY
+         2aMFgnT31cSjqCpWkLsawI7F9b317HBAw8aAA6iPbrp2F2mNkF9u4vFWpPH3xSJCqXis
+         W/dg==
+X-Forwarded-Encrypted: i=1; AJvYcCUW/guP48EkFP6gUwb0jXoMi8EwO8upVr+tjPTEyYCIiri25K4GnwfZI4Cm5VrzBRrEnYkcavo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxvss23ehZCP2j5e616chI/Vdm2MMefC3VInMCxD7i7f6Luu0LZ
+	GQndzmDw4qb9vsM99PdnffjBjrFa/lsKrGbECPGP0TBuA9bi28s3twzO
+X-Gm-Gg: AY/fxX4SCZawK4mU7XBl+sZfebDvXJ2I2PUXWX4CO4yZ/c6G5h12CH8lH3pga96+5qu
+	KvRzemHEzd9NZVNvu9sULkN3fpgilSZp7XW1Apf0W8PQfhJKJMBvsPxN8m7oD/KhYuCvSyopeO8
+	WTjiR8QXc++NGYQCstM+z53ceJ+riCg/QB9CZuB0CbGQWHSrMPuku6tRiHMDG6VlGRxO67vsykT
+	1gpA59dWRIUDyhK+xzo3pGdxN6tKZqWIVSiQPI1OxKELiezcImOLwrqKfYxxJ/FCkcJRm1E/ryC
+	dZ1BIj/rClmOp13Ss3HAOIX+LHHirXZH7Buf6TEflGsLQNm1SWpMcBdMgcB+CQVQYaiJb3Z8tqR
+	ho1pNyXR9mqmQFszAR8Q+RFC8H8+mtsxYP7CDc84Y0VaOyBhaDZM+6w8b0LSc5+SLi0xsfIQqvM
+	j2pJSv5CsGBqE9xh/v0eD6Sw==
+X-Google-Smtp-Source: AGHT+IHZeSJ8DIPXHLFiAU6EtpaggaD6/tEfpVwHzU5oxuvR3r0N7paTuMWLmHBPXJh6SE6mjTO3lQ==
+X-Received: by 2002:a17:90b:1e4b:b0:343:684c:f8a0 with SMTP id 98e67ed59e1d1-34e921ad83fmr4533520a91.23.1766230541794;
+        Sat, 20 Dec 2025 03:35:41 -0800 (PST)
+Received: from [127.0.0.1] ([188.253.121.153])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34e70d65653sm7799389a91.5.2025.12.20.03.35.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 20 Dec 2025 03:35:41 -0800 (PST)
+From: Zesen Liu <ftyghome@gmail.com>
+Subject: [RFC bpf PATCH 0/2] bpf: Fix memory access tags in helper
+ prototypes
+Date: Sat, 20 Dec 2025 19:35:03 +0800
+Message-Id: <20251220-helper_proto-v1-0-2206e0d9422d@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset="utf-8"
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAOeJRmkC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDI1NDIyMD3YzUnILUoviCovySfN20JLNUMxNDCyMTM3MloJaCotS0zAqwcdG
+ xtbUANTIgfV4AAAA=
+X-Change-ID: 20251220-helper_proto-fb6e64182467
+To: Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, 
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, Matt Bobrowski <mattbobrowski@google.com>, 
+ Steven Rostedt <rostedt@goodmis.org>, 
+ Masami Hiramatsu <mhiramat@kernel.org>, 
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Daniel Xu <dxu@dxuuu.xyz>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, Zesen Liu <ftyghome@gmail.com>, 
+ Shuran Liu <electronlsr@gmail.com>, Peili Gao <gplhust955@gmail.com>, 
+ Haoran Ni <haoran.ni.cs@gmail.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4329; i=ftyghome@gmail.com;
+ h=from:subject:message-id; bh=vXafQvDXbxhmRy9/A/k3bNzYbmfkT2tbUIk9/L+02a4=;
+ b=owGbwMvMwCXWI1/u+8bXqJ3xtFoSQ6ZbF8vKqrWzJlu5nDi75d8B27tP6917sp8J9E9ntX6/1
+ DdYx35uRykLgxgXg6yYIkvvD8O7KzPNjbfZLDgIM4eVCWQIAxenAEzkkRwjw6O7ro4bL03gj6sw
+ i5i4SutYvzh38qXLsYEX3l7/8nXLBidGhs3zuFdpnAzhuNCcMOfUBsmnv8941xqVL53xl8Xw2eV
+ wQQ4A
+X-Developer-Key: i=ftyghome@gmail.com; a=openpgp;
+ fpr=8DF831DDA9693733B63CA0C18C1F774DEC4D3287
 
-On 2025/12/20 09:12, Menglong Dong wrote:
-> On 2025/12/20 00:55, Andrii Nakryiko wrote:
-> > On Thu, Dec 18, 2025 at 5:18=E2=80=AFPM Menglong Dong <menglong.dong@li=
-nux.dev> wrote:
-> > >
-> > > On 2025/12/19 08:55 Andrii Nakryiko <andrii.nakryiko@gmail.com> write:
-> > > > On Wed, Dec 17, 2025 at 1:54=E2=80=AFAM Menglong Dong <menglong8.do=
-ng@gmail.com> wrote:
-> > > > >
-> > > > > Hi, all.
-> > > > >
-> > > > > In this version, I combined Alexei and Andrii's advice, which mak=
-es the
-> > > > > architecture specific code much simpler.
-> > > > >
-> > > > > Sometimes, we need to hook both the entry and exit of a function =
-with
-> > > > > TRACING. Therefore, we need define a FENTRY and a FEXIT for the t=
-arget
-> > > > > function, which is not convenient.
-> > > > >
-> > > > > Therefore, we add a tracing session support for TRACING. Generally
-> > > > > speaking, it's similar to kprobe session, which can hook both the=
- entry
-> > > > > and exit of a function with a single BPF program. Session cookie =
-is also
-> > > > > supported with the kfunc bpf_fsession_cookie(). In order to limit=
- the
-> > > > > stack usage, we limit the maximum number of cookies to 4.
-> > > > >
-> > > > > The kfunc bpf_fsession_is_return() and bpf_fsession_cookie() are =
-both
-> > > > > inlined in the verifier.
-> > > >
-> > > > We have generic bpf_session_is_return() and bpf_session_cookie() (t=
-hat
-> > > > currently works for ksession), can't you just implement them for the
-> > > > newly added program type instead of adding type-specific kfuncs?
-> > >
-> > > Hi, Andrii. I tried and found that it's a little hard to reuse them. =
-The
-> > > bpf_session_is_return() and bpf_session_cookie() are defined as kfunc=
-, which
-> > > makes we can't implement different functions for different attach typ=
-e, like
-> > > what bpf helper does.
-> >=20
-> > Are you sure? We certainly support kfunc implementation specialization
-> > for sleepable vs non-sleepable BPF programs. Check specialize_kfunc()
-> > in verifier.c
->=20
-> Ah, I remember it now. We do can use different kfunc version
-> for different case in specialize_kfunc().
->=20
-> >=20
-> > >
-> > > The way we store "is_return" and "cookie" in fsession is different wi=
-th
-> > > ksession. For ksession, it store the "is_return" in struct bpf_sessio=
-n_run_ctx.
-> > > Even if we move the "nr_regs" from stack to struct bpf_tramp_run_ctx,
-> > > it's still hard to reuse the bpf_session_is_return() or bpf_session_c=
-ookie(),
-> > > as the way of storing the "is_return" and "cookie" in fsession and ks=
-ession
-> > > is different, and it's a little difficult and complex to unify them.
-> >=20
-> > I'm not saying we should unify the implementation, you have to
-> > implement different version of logically the same kfunc, of course.
->=20
-> I see. The problem now is that the prototype of bpf_session_cookie()
-> or bpf_session_is_return() don't satisfy our need. For bpf_session_cookie=
-(),
-> we at least need the context to be the argument. However, both
-> of them don't have any function argument. After all, the prototype of
-> different version of logically the same kfunc should be the same.
+Hi,
 
-Hi, Andrii. I see that you want to make the API consistent between
-ksession and fsession, which is more friendly for the user.
+This series adds missing memory access tags (MEM_RDONLY or MEM_WRITE) to
+several bpf helper function prototypes that use ARG_PTR_TO_MEM but lack the
+correct type annotation.
 
-After my analysis, I think we have following approach:
-1. change the function prototype of bpf_session_cookie and bpf_session_is_r=
-eturn
-to:
-    bool bpf_session_is_return(void *ctx);
-    bool bpf_session_cookie(void *ctx);
-And we do the fix up in specialize_kfunc(), which I think is the easiest
-way. The defect is that it will break existing users.
+Missing memory access tags in helper prototypes can lead to critical
+correctness issues when the verifier tries to perform code optimization.
+After commit 37cce22dbd51 ("bpf: verifier: Refactor helper access type
+tracking"), the verifier relies on the memory access tags, rather than
+treating all arguments in helper functions as potentially modifying the
+pointed-to memory.
 
-2. We define a fixup_kfunc_call_early() and call it in add_subprog_and_kfun=
-c.
-In the fixup_kfunc_call_early(), we will change the target kfunc(which is i=
-nsn->imm)
-from bpf_session_cookie() to bpf_fsession_cookie(). For the bpf_session_coo=
-kie(),
-we make its prototype to:
-    __bpf_kfunc __u64 *bpf_session_cookie(void *ctx__ign)
-Therefore, it won't break the existing users. For the ksession that uses the
-old prototype, it can pass the verifier too. Following is a demo patch of t=
-his
-approach. In this way, we can allow a extension in the prototype for a kfunc
-in the feature too.
+We have already seen several reports regarding this:
 
-What do you think?
+- commit ac44dcc788b9 ("bpf: Fix verifier assumptions of bpf_d_path's
+   output buffer") adds MEM_WRITE to bpf_d_path;
+- commit 2eb7648558a7 ("bpf: Specify access type of bpf_sysctl_get_name
+   args") adds MEM_WRITE to bpf_sysctl_get_name.
 
-Thanks!
-Menglong Dong
+This series looks through all prototypes in the kernel and completes the
+tags. In addition, this series also adds selftests for some of these
+functions.
 
->patch<
+I marked the series as RFC since the introduced selftests are fragile and
+ad hoc (similar to the previously added selftests). The original goal of
+these tests is to reproduce the case where the verifier wrongly optimizes
+reads after the helper function is called. However, triggering the error
+often requires carefully designed code patterns. For example, I had to
+explicitly use "if (xx != 0)" in my attached tests, because using memcmp
+will not reproduce the issue. This makes the reproduction heavily dependent
+on the verifier's internal optimization logic and clutters the selftests
+with specific, unnatural patterns.
 
-+static int fixup_kfunc_call_early(struct bpf_verifier_env *env, struct bpf=
-_insn *insn)
-+{
-+       struct bpf_prog *prog =3D env->prog;
-+
-+       if (prog->expected_attach_type =3D=3D BPF_TRACE_FSESSION) {
-+               if (insn->imm =3D=3D special_kfunc_list[KF_bpf_session_cook=
-ie])
-+                       insn->imm =3D special_kfunc_list[KF_bpf_fsession_co=
-okie];
-+               else if (insn->imm =3D=3D special_kfunc_list[KF_bpf_session=
-_is_return])
-+                       insn->imm =3D special_kfunc_list[KF_bpf_fsession_is=
-_return];
-+       }
-+
-+       return 0;
-+}
+Some cases are also hard to trigger by selftests. For example, I couldn't
+find a triggering pattern for bpf_read_branch_records, since the
+execution of program seems to be messed up by wrong tags. For
+bpf_skb_fib_lookup, I also failed to reproduce it because the argument
+needs content on entry, but the verifier seems to only enable this
+optimization for fully empty buffers.
 
-@@ -3489,10 +3490,12 @@ static int add_subprog_and_kfunc(struct bpf_verifie=
-r_env *env)
-                        return -EPERM;
-                }
-=20
-=2D               if (bpf_pseudo_func(insn) || bpf_pseudo_call(insn))
-+               if (bpf_pseudo_func(insn) || bpf_pseudo_call(insn)) {
-                        ret =3D add_subprog(env, i + insn->imm + 1);
-=2D               else
-=2D                       ret =3D add_kfunc_call(env, insn->imm, insn->off);
-+               } else {
-+                       ret =3D fixup_kfunc_call_early(env, insn);
-+                       ret =3D ret ?: add_kfunc_call(env, insn->imm, insn-=
->off);
-+               }
+Since adding selftests does not help with existing issues or prevent future
+occurrences of similar problems, I believe one way to resolve it is to
+statically restrict ARG_PTR_TO_MEM from appearing without memory access
+tags. Using ARG_PTR_TO_MEM alone without tags is nonsensical because:
 
-@@ -3316,7 +3321,7 @@ static u64 bpf_uprobe_multi_entry_ip(struct bpf_run_c=
-tx *ctx)
-=20
- __bpf_kfunc_start_defs();
-=20
-=2D__bpf_kfunc bool bpf_session_is_return(void)
-+__bpf_kfunc bool bpf_session_is_return(void *ctx__ign)
- {
-        struct bpf_session_run_ctx *session_ctx;
-=20
-@@ -3324,7 +3329,7 @@ __bpf_kfunc bool bpf_session_is_return(void)
-        return session_ctx->is_return;
- }
-=20
-=2D__bpf_kfunc __u64 *bpf_session_cookie(void)
-+__bpf_kfunc __u64 *bpf_session_cookie(void *ctx__ign)
- {
-        struct bpf_session_run_ctx *session_ctx;
+- If the helper does not change the argument, missing MEM_RDONLY causes
+   the verifier to incorrectly reject a read-only buffer.
+- If the helper does change the argument, missing MEM_WRITE causes the
+   verifier to incorrectly assume the memory is unchanged, leading to
+   potential errors.
 
->=20
-> I think it's not a good idea to modify the prototype of existing kfunc,
-> can we?
->=20
-> >=20
-> > >
-> > > What's more, we will lose the advantage of inline bpf_fsession_is_ret=
-urn
-> > > and bpf_fsession_cookie in verifier.
-> > >
-> >=20
-> > I'd double check that either. BPF verifier and JIT do know program
-> > type, so you can pick how to inline
-> > bpf_session_is_return()/bpf_session_cookie() based on that.
->=20
-> Yeah, we can inline it depend on the program type if we can solve
-> the prototype problem.
->=20
-> Thanks!
-> Menglong Dong
->=20
->=20
-> >=20
-> > > I'll check more to see if there is a more simple way to reuse them.
-> > >
-> > > Thanks!
-> > > Menglong Dong
-> > >
-> > > >
-> [...]
-> > >
-> > >
-> > >
-> > >
->=20
->=20
->=20
->=20
->=20
+I am still wondering, if we agree on the above, how should we enforce this
+restriction? Should we let ARG_PTR_TO_MEM imply MEM_WRITE semantics by
+default, and change ARG_PTR_TO_MEM | MEM_RDONLY to ARG_CONST_PTR_TO_MEM? Or
+should we add a check in the verifier to ensure ARG_PTR_TO_MEM always comes
+with an access tag (though this seems to only catch errors at
+runtime/testing)?
 
+Any insights and comments are welcome. If the individual fix patches for
+the prototypes look correct, I would also really appreciate it if they
+could be merged ahead of the discussion.
 
+Thanks,
 
+Zesen Liu
+
+Signed-off-by: Zesen Liu <ftyghome@gmail.com>
+---
+Zesen Liu (2):
+      bpf: Fix memory access tags in helper prototypes
+      selftests/bpf: add regression tests for snprintf and get_stack helpers
+
+ kernel/bpf/helpers.c                                      |  2 +-
+ kernel/trace/bpf_trace.c                                  |  6 +++---
+ net/core/filter.c                                         |  8 ++++----
+ tools/testing/selftests/bpf/prog_tests/get_stack_raw_tp.c | 15 +++++++++++++--
+ tools/testing/selftests/bpf/prog_tests/snprintf.c         |  6 ++++++
+ tools/testing/selftests/bpf/prog_tests/snprintf_btf.c     |  3 +++
+ tools/testing/selftests/bpf/progs/netif_receive_skb.c     | 13 ++++++++++++-
+ tools/testing/selftests/bpf/progs/test_get_stack_rawtp.c  | 11 ++++++++++-
+ tools/testing/selftests/bpf/progs/test_snprintf.c         | 12 ++++++++++++
+ 9 files changed, 64 insertions(+), 12 deletions(-)
+---
+base-commit: 22cc16c04b7893d8fc22810599f49a305d600b9e
+change-id: 20251220-helper_proto-fb6e64182467
+
+Best regards,
+-- 
+Zesen Liu <ftyghome@gmail.com>
 
 
