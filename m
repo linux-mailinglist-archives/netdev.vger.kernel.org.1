@@ -1,179 +1,112 @@
-Return-Path: <netdev+bounces-245566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 237FBCD24CD
-	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 02:13:04 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E28BCD259E
+	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 03:12:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 212E830146D6
-	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 01:13:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4EAE43010E59
+	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 02:12:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 644F425487B;
-	Sat, 20 Dec 2025 01:13:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BGDJHXsm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7934E2EBBAA;
+	Sat, 20 Dec 2025 02:12:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 704B9202F9C
-	for <netdev@vger.kernel.org>; Sat, 20 Dec 2025 01:13:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2A5427FB28
+	for <netdev@vger.kernel.org>; Sat, 20 Dec 2025 02:12:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766193182; cv=none; b=ImOOpCgG/ixLm0lPMb936x3FogZUKC6lSt3V6Gc0wqSic0ltP4VykddTzc4hJjVNdzV5cz8sRU5p3GQcj3VoK3+bTA1ESkt+79g3W43T+E02nwsCD7Fst6nYTPoAL4vG73iOl7NVDkrjapJhITUT8Tx33uQugrbUpzIV4KkEYDs=
+	t=1766196735; cv=none; b=mqMCGVvFJHMF9lpfeEbEaRbayzvy3g9NWvETrKI6F7MLIGxrWlDB8bC+DkIFwrtMylXnP0jjc0CuEhf349bGKSj0CwlU3vl1kYufCAwIxNkj0JLjMwiaZzWbHYnLKGJMLLBIkxWcDdO6gRAu+niaPsX0o3dIB3QQyUZzwfewaNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766193182; c=relaxed/simple;
-	bh=bcM5Uxjsmcm1Jd6vgHbr0jpv+c+NE27oaULZHHa3psk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jbZU0wXxmD0595vZmynwNv/3N1k9IDGII7A+NHh6zzLstFpIJ6RR5oS8wk8AE31ldDLERCHYdLazJY6u21wO0Za2vlM+BGPzSihJMeTM0p5yzyu0GJdxMS+3fMaj2XqpcqFF3IybJthIjRwKpm8D8E+sUXmpGc+djfXmcG/7nVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BGDJHXsm; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1766193178;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bcM5Uxjsmcm1Jd6vgHbr0jpv+c+NE27oaULZHHa3psk=;
-	b=BGDJHXsm5+8Pho9Qno6FGfschMqUt6W9L7KFUVGxNoz8LcNLRqGdZIDLGmZz0mW0Q4FhTd
-	3yfyLEREXoLmTmfVDS9xEJ+vdymf5hKxLItVqlT+vqBbPzHJ+43C9x0YVDUdk3tLAQDpCz
-	d4B1zpNmjNcmRteOnc0/5StEgMoWyxU=
-From: Menglong Dong <menglong.dong@linux.dev>
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: Menglong Dong <menglong8.dong@gmail.com>, ast@kernel.org,
- andrii@kernel.org, davem@davemloft.net, dsahern@kernel.org,
- daniel@iogearbox.net, martin.lau@linux.dev, eddyz87@gmail.com,
- song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com,
- kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org,
- tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH bpf-next v4 0/9] bpf: tracing session supporting
-Date: Sat, 20 Dec 2025 09:12:37 +0800
-Message-ID: <2393471.ElGaqSPkdT@7950hx>
-In-Reply-To:
- <CAEf4BzYm3=zzmCRg3zr1F99sBkxEZ_pDgjtKMBurb9LGu6JJKQ@mail.gmail.com>
-References:
- <20251217095445.218428-1-dongml2@chinatelecom.cn> <1943128.tdWV9SEqCh@7940hx>
- <CAEf4BzYm3=zzmCRg3zr1F99sBkxEZ_pDgjtKMBurb9LGu6JJKQ@mail.gmail.com>
+	s=arc-20240116; t=1766196735; c=relaxed/simple;
+	bh=TDHTZgVlW1GSIin1tanUkWYuVfOrl0J2iiC9+QKJzi0=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=AnEpzZHVdUNEeZYs7UTNALHMjWw9P2ActVjkdf+cCXmlR7amQKxuJ4o28+BUWSHraTRjhJc8mIN9Sy2dLHRa61q05PcrntAMxyWFs42VLqnLz7fJpZJ9lxyKLfYzN4ngODNBjJj9/OUH2vvWIlZexb4nCip9EVJQn1Pl1kg36oQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 5BK2BYNB061454;
+	Sat, 20 Dec 2025 11:11:34 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 5BK2BX52061451
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Sat, 20 Dec 2025 11:11:34 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <80749a85-cbe2-460c-8451-42516013f9fa@I-love.SAKURA.ne.jp>
+Date: Sat, 20 Dec 2025 11:11:33 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH] RDMA/core: always drop device refcount in
+ ib_del_sub_device_and_put()
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+To: Mark Zhang <markzhang@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>,
+        Leon Romanovsky <leon@kernel.org>
+Cc: OFED mailing list <linux-rdma@vger.kernel.org>,
+        Network Development <netdev@vger.kernel.org>,
+        Majd Dibbiny <majd@mellanox.com>, Doug Ledford <dledford@redhat.com>,
+        Yuval Shaia <yshaia@marvell.com>,
+        Bernard Metzler <bernard.metzler@linux.dev>
+References: <30ec01df-6c32-490c-aa26-c41653f5a257@I-love.SAKURA.ne.jp>
+ <8f90fba8-60b9-46e2-8990-45311c7b1540@I-love.SAKURA.ne.jp>
+ <1722eff3-14c1-408b-999b-1be3e8fbfe5a@I-love.SAKURA.ne.jp>
+ <9b4ce0df-1fbf-4052-9eb9-1f3d6ad6a685@I-love.SAKURA.ne.jp>
+ <13f54775-7a36-48f2-b9cd-62ab9f15a82b@I-love.SAKURA.ne.jp>
+ <ace1ebe4-4fdb-49f4-a3fa-bbf11e1b40ed@I-love.SAKURA.ne.jp>
+ <20251216140512.GC6079@nvidia.com>
+ <10caea5b-9ad1-44ce-9eaf-a0f4023f2017@I-love.SAKURA.ne.jp>
+ <b4457da3-be2e-4de3-ae16-5580e1fb625c@I-love.SAKURA.ne.jp>
+ <98907ad9-2f85-49ff-9baf-cff7fcbc3cbf@I-love.SAKURA.ne.jp>
+Content-Language: en-US
+In-Reply-To: <98907ad9-2f85-49ff-9baf-cff7fcbc3cbf@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Anti-Virus-Server: fsav201.rs.sakura.ne.jp
+X-Virus-Status: clean
 
-On 2025/12/20 00:55, Andrii Nakryiko wrote:
-> On Thu, Dec 18, 2025 at 5:18=E2=80=AFPM Menglong Dong <menglong.dong@linu=
-x.dev> wrote:
-> >
-> > On 2025/12/19 08:55 Andrii Nakryiko <andrii.nakryiko@gmail.com> write:
-> > > On Wed, Dec 17, 2025 at 1:54=E2=80=AFAM Menglong Dong <menglong8.dong=
-@gmail.com> wrote:
-> > > >
-> > > > Hi, all.
-> > > >
-> > > > In this version, I combined Alexei and Andrii's advice, which makes=
- the
-> > > > architecture specific code much simpler.
-> > > >
-> > > > Sometimes, we need to hook both the entry and exit of a function wi=
-th
-> > > > TRACING. Therefore, we need define a FENTRY and a FEXIT for the tar=
-get
-> > > > function, which is not convenient.
-> > > >
-> > > > Therefore, we add a tracing session support for TRACING. Generally
-> > > > speaking, it's similar to kprobe session, which can hook both the e=
-ntry
-> > > > and exit of a function with a single BPF program. Session cookie is=
- also
-> > > > supported with the kfunc bpf_fsession_cookie(). In order to limit t=
-he
-> > > > stack usage, we limit the maximum number of cookies to 4.
-> > > >
-> > > > The kfunc bpf_fsession_is_return() and bpf_fsession_cookie() are bo=
-th
-> > > > inlined in the verifier.
-> > >
-> > > We have generic bpf_session_is_return() and bpf_session_cookie() (that
-> > > currently works for ksession), can't you just implement them for the
-> > > newly added program type instead of adding type-specific kfuncs?
-> >
-> > Hi, Andrii. I tried and found that it's a little hard to reuse them. The
-> > bpf_session_is_return() and bpf_session_cookie() are defined as kfunc, =
-which
-> > makes we can't implement different functions for different attach type,=
- like
-> > what bpf helper does.
->=20
-> Are you sure? We certainly support kfunc implementation specialization
-> for sleepable vs non-sleepable BPF programs. Check specialize_kfunc()
-> in verifier.c
+Since nldev_deldev() (introduced by commit 060c642b2ab8 ("RDMA/nldev: Add
+support to add/delete a sub IB device through netlink") grabs a reference
+using ib_device_get_by_index() before calling ib_del_sub_device_and_put(),
+we need to drop that reference before returning -EOPNOTSUPP error.
 
-Ah, I remember it now. We do can use different kfunc version
-for different case in specialize_kfunc().
+Reported-by: syzbot+881d65229ca4f9ae8c84@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84
+Fixes: bca51197620a ("RDMA/core: Support IB sub device with type "SMI"")
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+---
+The reproducer syzbot finally found was not for what I was investigating,
+but this is a bug which I can reproduce and test using the reproducer.
 
->=20
-> >
-> > The way we store "is_return" and "cookie" in fsession is different with
-> > ksession. For ksession, it store the "is_return" in struct bpf_session_=
-run_ctx.
-> > Even if we move the "nr_regs" from stack to struct bpf_tramp_run_ctx,
-> > it's still hard to reuse the bpf_session_is_return() or bpf_session_coo=
-kie(),
-> > as the way of storing the "is_return" and "cookie" in fsession and kses=
-sion
-> > is different, and it's a little difficult and complex to unify them.
->=20
-> I'm not saying we should unify the implementation, you have to
-> implement different version of logically the same kfunc, of course.
+drivers/infiniband/core/device.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-I see. The problem now is that the prototype of bpf_session_cookie()
-or bpf_session_is_return() don't satisfy our need. For bpf_session_cookie(),
-we at least need the context to be the argument. However, both
-of them don't have any function argument. After all, the prototype of
-different version of logically the same kfunc should be the same.
-
-I think it's not a good idea to modify the prototype of existing kfunc,
-can we?
-
->=20
-> >
-> > What's more, we will lose the advantage of inline bpf_fsession_is_return
-> > and bpf_fsession_cookie in verifier.
-> >
->=20
-> I'd double check that either. BPF verifier and JIT do know program
-> type, so you can pick how to inline
-> bpf_session_is_return()/bpf_session_cookie() based on that.
-
-Yeah, we can inline it depend on the program type if we can solve
-the prototype problem.
-
-Thanks!
-Menglong Dong
-
-
->=20
-> > I'll check more to see if there is a more simple way to reuse them.
-> >
-> > Thanks!
-> > Menglong Dong
-> >
-> > >
-[...]
-> >
-> >
-> >
-> >
-
-
+diff --git a/drivers/infiniband/core/device.c b/drivers/infiniband/core/device.c
+index 13e8a1714bbd..1174ab7da629 100644
+--- a/drivers/infiniband/core/device.c
++++ b/drivers/infiniband/core/device.c
+@@ -2881,8 +2881,10 @@ int ib_del_sub_device_and_put(struct ib_device *sub)
+ {
+ 	struct ib_device *parent = sub->parent;
+ 
+-	if (!parent)
++	if (!parent) {
++		ib_device_put(sub);
+ 		return -EOPNOTSUPP;
++	}
+ 
+ 	mutex_lock(&parent->subdev_lock);
+ 	list_del(&sub->subdev_list);
+-- 
+2.47.3
 
 
 
