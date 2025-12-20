@@ -1,216 +1,172 @@
-Return-Path: <netdev+bounces-245585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81A88CD3142
-	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 15:57:24 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CE8FCD3152
+	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 16:00:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 7374E300908E
-	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 14:57:23 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 5FCC93002756
+	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 15:00:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CF4A2C3271;
-	Sat, 20 Dec 2025 14:57:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43B9D2DC333;
+	Sat, 20 Dec 2025 15:00:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SA8zPB/F"
 X-Original-To: netdev@vger.kernel.org
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8951F2D061D
-	for <netdev@vger.kernel.org>; Sat, 20 Dec 2025 14:57:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6556D2D94A9;
+	Sat, 20 Dec 2025 15:00:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766242642; cv=none; b=ipk0PPhILkvIDrYacLfL9U9Xo8m7W+YblQ966593UXsM2R9LS0uyQv9g0P8GvAsGtW9NVo1WIJ5arz11H69d/FrUJpbHyEEfo0+yydEz12UsUE3gd7JxvMYvjDpSNaIXedcW3A+LNPOdRnkoxlTIw8zvfr9q89S+QdQkCeLRV80=
+	t=1766242821; cv=none; b=rPQyw+ADIFGiBYRgKKtboSWnKDZRlk1xENHtUzaMh8zlbwLPq9O3ZdzVIUgtmgV9oC+S/DMYH/GRs1i5zd+uSHwqJS/xq2M6Pgy8M/pxhYAczMxdKZPolDtDIH3TLAxWJK36Vx9LSHXXiTE3cwXBmussnQveCnKU1MxOXmALvO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766242642; c=relaxed/simple;
-	bh=3vt6uOKAIKiUqg1JxVaQlDVdsp7i8O4CIqLounDvN0I=;
-	h=Content-Type:Message-ID:Date:MIME-Version:To:From:Subject; b=Wv27AVV2PnwNhMcJ/4OPMz6iPmWJvsvbLVzDQuz2UN6FHEaoTLeWetcjcBIhoAR7mmeZSGFCe6KMONXs9IaKCyR4X6r09P74ZYODi8CoAbvw1lxB4GTxmPQcAqme+Djjq9TetNob1WLuuKGnl6bLfH1GW7z/kdniWlQNhFgq8dY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
-Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 5BKEv8Ha087269;
-	Sat, 20 Dec 2025 23:57:08 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-	(authenticated bits=0)
-	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 5BKEv70k087266
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-	Sat, 20 Dec 2025 23:57:08 +0900 (JST)
-	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Content-Type: multipart/mixed; boundary="------------btIfSDusQku0MRu4n31ChAqq"
-Message-ID: <d943f806-4da6-4970-ac28-b9373b0e63ac@I-love.SAKURA.ne.jp>
-Date: Sat, 20 Dec 2025 23:57:06 +0900
+	s=arc-20240116; t=1766242821; c=relaxed/simple;
+	bh=nAnK3wG0RXziPz7E4YON0DH/0jR4RzGtYIeGV6e9eM4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I9toDTl2u+4CTdrJXyIdhCQVTi+Mu010kQlXa7yy2qMWwzYEJFNFBbWQWvSjweq7K4iEVCswkozTPj8iMV8k0eYgXrBLCaco+I9WZRrHykSgHd+M2afzpFig8OYaNiluC1Qs8aV6VoH54LhnziE4CIlO8bFdVtaZCXZXTL18M3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SA8zPB/F; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1766242820; x=1797778820;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=nAnK3wG0RXziPz7E4YON0DH/0jR4RzGtYIeGV6e9eM4=;
+  b=SA8zPB/F25dXNfUQWSddSWwq9NYRdSspS6vv0u/f4B4V6GwQxFVZaSO4
+   AxQ8brZ6lU8Okj2p//7NBoKr5TT2sOU8g2eQoX0Xecxub9n2d/PoV/vMd
+   vYbPTHJTDDuqwT8IhE2ela1zehRlftJUmyJsGXtFUZTAQc2lW0jrzSJQk
+   uW+GiPIWgAhJuNjY2winYYFdw0El1XnP4ELFFmJUvq1mkmoZCsbkaIAHN
+   xrRjZ46sHG70D6UdgWeaqVhmiQUSjX3u+CNc0oGYD6NTf1+sGviE5CeqC
+   p4OD4WnTQciVt8mlfb/kGI9lXebn80hLl1bgZfQwLA6xOlrRod5kbWN9+
+   w==;
+X-CSE-ConnectionGUID: FIIq50q7Tv6dWGyn1brQCg==
+X-CSE-MsgGUID: iYoF0BeXQKiuxSB0xilDrg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11648"; a="72034868"
+X-IronPort-AV: E=Sophos;i="6.21,164,1763452800"; 
+   d="scan'208";a="72034868"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2025 07:00:19 -0800
+X-CSE-ConnectionGUID: eWNAbC0nRfCspnSKssnnHQ==
+X-CSE-MsgGUID: YNbLtCx4Tp+NnLAk2qHUvQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,164,1763452800"; 
+   d="scan'208";a="198359996"
+Received: from lkp-server01.sh.intel.com (HELO 0d09efa1b85f) ([10.239.97.150])
+  by orviesa010.jf.intel.com with ESMTP; 20 Dec 2025 07:00:12 -0800
+Received: from kbuild by 0d09efa1b85f with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vWyRF-000000004hZ-0SYh;
+	Sat, 20 Dec 2025 15:00:09 +0000
+Date: Sat, 20 Dec 2025 22:59:32 +0800
+From: kernel test robot <lkp@intel.com>
+To: Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	cgroups@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	bpf@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Yu Kuai <yukuai@fnnas.com>, Jens Axboe <axboe@kernel.dk>,
+	Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Pablo Neira Ayuso <pablo@netfilter.org>
+Subject: Re: [PATCH 2/4] cgroup: Introduce cgroup_level() helper
+Message-ID: <202512202230.1uoB5chV-lkp@intel.com>
+References: <20251217162744.352391-3-mkoutny@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: David Ahern <dsahern@kernel.org>, "David S. Miller"
- <davem@davemloft.net>,
-        Kuniyuki Iwashima <kuniyu@google.com>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Network Development <netdev@vger.kernel.org>
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Subject: [BUG nexthop] refcount leak in "struct nexthop" handling
-X-Anti-Virus-Server: fsav301.rs.sakura.ne.jp
-X-Virus-Status: clean
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251217162744.352391-3-mkoutny@suse.com>
 
-This is a multi-part message in MIME format.
---------------btIfSDusQku0MRu4n31ChAqq
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Hi Michal,
 
-syzbot is reporting refcount leak in "struct nexthop" handling
-which manifests as a hung up with below message.
+kernel test robot noticed the following build errors:
 
-  unregister_netdevice: waiting for lo to become free. Usage count = 2
-  ref_tracker: netdev@ffff88803a65e618 has 1/1 users at
-       __netdev_tracker_alloc include/linux/netdevice.h:4400 [inline]
-       netdev_tracker_alloc include/linux/netdevice.h:4412 [inline]
-       netdev_get_by_index+0x7c/0xb0 net/core/dev.c:1008
-       fib6_nh_init+0x791/0x1fb0 net/ipv6/route.c:3590
-       nh_create_ipv6 net/ipv4/nexthop.c:2875 [inline]
-       nexthop_create net/ipv4/nexthop.c:2926 [inline]
-       nexthop_add net/ipv4/nexthop.c:2963 [inline]
-       rtm_new_nexthop+0x244b/0x87d0 net/ipv4/nexthop.c:3277
-       rtnetlink_rcv_msg+0x95e/0xe90 net/core/rtnetlink.c:6958
-       netlink_rcv_skb+0x158/0x420 net/netlink/af_netlink.c:2550
-       netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
-       netlink_unicast+0x5aa/0x870 net/netlink/af_netlink.c:1344
-       netlink_sendmsg+0x8c8/0xdd0 net/netlink/af_netlink.c:1894
-       sock_sendmsg_nosec net/socket.c:727 [inline]
-       __sock_sendmsg net/socket.c:742 [inline]
-       ____sys_sendmsg+0xa5d/0xc30 net/socket.c:2592
-       ___sys_sendmsg+0x134/0x1d0 net/socket.c:2646
-       __sys_sendmsg+0x16d/0x220 net/socket.c:2678
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0xcd/0xf80 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+[auto build test ERROR on 8f0b4cce4481fb22653697cced8d0d04027cb1e8]
 
-Commit ab84be7e54fc ("net: Initial nexthop code") says
+url:    https://github.com/intel-lab-lkp/linux/commits/Michal-Koutn/cgroup-Eliminate-cgrp_ancestor_storage-in-cgroup_root/20251218-004346
+base:   8f0b4cce4481fb22653697cced8d0d04027cb1e8
+patch link:    https://lore.kernel.org/r/20251217162744.352391-3-mkoutny%40suse.com
+patch subject: [PATCH 2/4] cgroup: Introduce cgroup_level() helper
+config: sparc64-randconfig-r134-20251218 (https://download.01.org/0day-ci/archive/20251220/202512202230.1uoB5chV-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251220/202512202230.1uoB5chV-lkp@intel.com/reproduce)
 
-  Nexthop notifications are sent when a nexthop is added or deleted,
-  but NOT if the delete is due to a device event or network namespace
-  teardown (which also involves device events).
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202512202230.1uoB5chV-lkp@intel.com/
 
-which I guess that it is an intended behavior that
-nexthop_notify(RTM_DELNEXTHOP) is not called from remove_nexthop() from
-flush_all_nexthops() from nexthop_net_exit_rtnl() from ops_undo_list()
- from cleanup_net() because remove_nexthop() passes nlinfo == NULL.
+All errors (new ones prefixed by >>):
 
-However, like the attached reproducer demonstrates, it is inevitable that
-a userspace process terminates and network namespace teardown automatically
-happens without explicitly invoking RTM_DELNEXTHOP request. The kernel is
-not currently prepared for such scenario. How to fix this problem?
+>> block/blk-iocost.c:3006:53: error: expected ';' after expression
+    3006 |         iocg->level = cgroup_level(blkg->blkcg->css.cgroup)
+         |                                                            ^
+         |                                                            ;
+   1 error generated.
 
-Link: https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84
---------------btIfSDusQku0MRu4n31ChAqq
-Content-Type: text/plain; charset=UTF-8; name="repro.c"
-Content-Disposition: attachment; filename="repro.c"
-Content-Transfer-Encoding: base64
 
-I2RlZmluZSBfR05VX1NPVVJDRQojaW5jbHVkZSA8c2NoZWQuaD4KI2luY2x1ZGUgPHN0ZGlu
-dC5oPgojaW5jbHVkZSA8c3RyaW5nLmg+CiNpbmNsdWRlIDxzeXMvc3lzY2FsbC5oPgojaW5j
-bHVkZSA8dW5pc3RkLmg+CgpzdGF0aWMgdm9pZCBleGVjdXRlMShjb25zdCBpbnQgZmQpCnsK
-CS8vICBzZW5kbXNnJG5sX3JvdXRlIGFyZ3VtZW50czogWwoJLy8gICAgZmQ6IHNvY2tfbmxf
-cm91dGUgKHJlc291cmNlKQoJLy8gICAgbXNnOiBwdHJbaW4sIG1zZ2hkcl9uZXRsaW5rW25l
-dGxpbmtfbXNnX3JvdXRlXV0gewoJLy8gICAgICBtc2doZHJfbmV0bGlua1tuZXRsaW5rX21z
-Z19yb3V0ZV0gewoJLy8gICAgICAgIGFkZHI6IG5pbAoJLy8gICAgICAgIGFkZHJsZW46IGxl
-biA9IDB4MCAoNCBieXRlcykKCS8vICAgICAgICBwYWQgPSAweDAgKDQgYnl0ZXMpCgkvLyAg
-ICAgICAgdmVjOiBwdHJbaW4sIGlvdmVjW2luLCBuZXRsaW5rX21zZ19yb3V0ZV1dIHsKCS8v
-ICAgICAgICAgIGlvdmVjW2luLCBuZXRsaW5rX21zZ19yb3V0ZV0gewoJLy8gICAgICAgICAg
-ICBhZGRyOiBwdHJbaW4sIG5ldGxpbmtfbXNnX3JvdXRlXSB7CgkvLyAgICAgICAgICAgICAg
-dW5pb24gbmV0bGlua19tc2dfcm91dGUgewoJLy8gICAgICAgICAgICAgICAgaXB2Nl9uZXdu
-ZXh0aG9wOiBuZXRsaW5rX21zZ190W2NvbnN0W1JUTV9ORVdORVhUSE9QLCBpbnQxNl0sCgkv
-LyAgICAgICAgICAgICAgICBuaG1zZ19uZXdbQUZfSU5FVDZdLCBydG1fbmhfcG9saWN5X25l
-d10gewoJLy8gICAgICAgICAgICAgICAgICBsZW46IGxlbiA9IDB4MWMgKDQgYnl0ZXMpCgkv
-LyAgICAgICAgICAgICAgICAgIHR5cGU6IGNvbnN0ID0gMHg2OCAoMiBieXRlcykKCS8vICAg
-ICAgICAgICAgICAgICAgZmxhZ3M6IG5ldGxpbmtfbXNnX2ZsYWdzID0gMHg1ZmI5YTgxOGZi
-NzM3OGU5ICgyIGJ5dGVzKQoJLy8gICAgICAgICAgICAgICAgICBzZXE6IGludDMyID0gMHgw
-ICg0IGJ5dGVzKQoJLy8gICAgICAgICAgICAgICAgICBwaWQ6IGludDMyID0gMHgwICg0IGJ5
-dGVzKQoJLy8gICAgICAgICAgICAgICAgICBwYXlsb2FkOiBuaG1zZ1tBRl9JTkVUNiwgZmxh
-Z3NbcnRtX3Byb3RvY29sLCBpbnQ4XSwKCS8vICAgICAgICAgICAgICAgICAgZmxhZ3NbcnRu
-aF9mbGFncywgaW50MzJdXSB7CgkvLyAgICAgICAgICAgICAgICAgICAgbmhfZmFtaWx5OiBj
-b25zdCA9IDB4YSAoMSBieXRlcykKCS8vICAgICAgICAgICAgICAgICAgICBuaF9zY29wZTog
-Y29uc3QgPSAweDAgKDEgYnl0ZXMpCgkvLyAgICAgICAgICAgICAgICAgICAgbmhfcHJvdG9j
-b2w6IHJ0bV9wcm90b2NvbCA9IDB4MCAoMSBieXRlcykKCS8vICAgICAgICAgICAgICAgICAg
-ICByZXN2ZDogY29uc3QgPSAweDAgKDEgYnl0ZXMpCgkvLyAgICAgICAgICAgICAgICAgICAg
-bmhfZmxhZ3M6IHJ0bmhfZmxhZ3MgPSAweDAgKDQgYnl0ZXMpCgkvLyAgICAgICAgICAgICAg
-ICAgIH0KCS8vICAgICAgICAgICAgICAgICAgYXR0cnM6IGFycmF5W3J0bV9uaF9wb2xpY3lf
-bmV3XSB7CgkvLyAgICAgICAgICAgICAgICAgICAgdW5pb24gcnRtX25oX3BvbGljeV9uZXcg
-ewoJLy8gICAgICAgICAgICAgICAgICAgICAgTkhBX0JMQUNLSE9MRTogbmxhdHRyX3RbY29u
-c3RbTkhBX0JMQUNLSE9MRSwgaW50MTZdLAoJLy8gICAgICAgICAgICAgICAgICAgICAgdm9p
-ZF0gewoJLy8gICAgICAgICAgICAgICAgICAgICAgICBubGFfbGVuOiBvZmZzZXRvZiA9IDB4
-NCAoMiBieXRlcykKCS8vICAgICAgICAgICAgICAgICAgICAgICAgbmxhX3R5cGU6IGNvbnN0
-ID0gMHg0ICgyIGJ5dGVzKQoJLy8gICAgICAgICAgICAgICAgICAgICAgICBwYXlsb2FkOiBi
-dWZmZXI6IHt9IChsZW5ndGggMHgwKQoJLy8gICAgICAgICAgICAgICAgICAgICAgICBzaXpl
-OiBidWZmZXI6IHt9IChsZW5ndGggMHgwKQoJLy8gICAgICAgICAgICAgICAgICAgICAgfQoJ
-Ly8gICAgICAgICAgICAgICAgICAgIH0KCS8vICAgICAgICAgICAgICAgICAgfQoJLy8gICAg
-ICAgICAgICAgICAgfQoJLy8gICAgICAgICAgICAgIH0KCS8vICAgICAgICAgICAgfQoJLy8g
-ICAgICAgICAgICBsZW46IGxlbiA9IDB4MWMgKDggYnl0ZXMpCgkvLyAgICAgICAgICB9Cgkv
-LyAgICAgICAgfQoJLy8gICAgICAgIHZsZW46IGNvbnN0ID0gMHgxICg4IGJ5dGVzKQoJLy8g
-ICAgICAgIGN0cmw6IGNvbnN0ID0gMHgwICg4IGJ5dGVzKQoJLy8gICAgICAgIGN0cmxsZW46
-IGNvbnN0ID0gMHgwICg4IGJ5dGVzKQoJLy8gICAgICAgIGY6IHNlbmRfZmxhZ3MgPSAweDAg
-KDQgYnl0ZXMpCgkvLyAgICAgICAgcGFkID0gMHgwICg0IGJ5dGVzKQoJLy8gICAgICB9Cgkv
-LyAgICB9CgkvLyAgICBmOiBzZW5kX2ZsYWdzID0gMHgwICg4IGJ5dGVzKQoJLy8gIF0KCSoo
-dWludDY0X3QqKTB4MjAwMDAwMDAwMTAwID0gMDsKCSoodWludDMyX3QqKTB4MjAwMDAwMDAw
-MTA4ID0gMDsKCSoodWludDY0X3QqKTB4MjAwMDAwMDAwMTEwID0gMHgyMDAwMDAwMDAwYzA7
-CgkqKHVpbnQ2NF90KikweDIwMDAwMDAwMDBjMCA9IDB4MjAwMDAwMDAwMTQwOwoJKih1aW50
-MzJfdCopMHgyMDAwMDAwMDAxNDAgPSAweDFjOwoJKih1aW50MTZfdCopMHgyMDAwMDAwMDAx
-NDQgPSAweDY4OwoJKih1aW50MTZfdCopMHgyMDAwMDAwMDAxNDYgPSAweDc4ZTk7CgkqKHVp
-bnQzMl90KikweDIwMDAwMDAwMDE0OCA9IDA7CgkqKHVpbnQzMl90KikweDIwMDAwMDAwMDE0
-YyA9IDA7CgkqKHVpbnQ4X3QqKTB4MjAwMDAwMDAwMTUwID0gMHhhOwoJKih1aW50OF90Kikw
-eDIwMDAwMDAwMDE1MSA9IDA7CgkqKHVpbnQ4X3QqKTB4MjAwMDAwMDAwMTUyID0gMDsKCSoo
-dWludDhfdCopMHgyMDAwMDAwMDAxNTMgPSAwOwoJKih1aW50MzJfdCopMHgyMDAwMDAwMDAx
-NTQgPSAwOwoJKih1aW50MTZfdCopMHgyMDAwMDAwMDAxNTggPSA0OwoJKih1aW50MTZfdCop
-MHgyMDAwMDAwMDAxNWEgPSA0OwoJKih1aW50NjRfdCopMHgyMDAwMDAwMDAwYzggPSAweDFj
-OwoJKih1aW50NjRfdCopMHgyMDAwMDAwMDAxMTggPSAxOwoJKih1aW50NjRfdCopMHgyMDAw
-MDAwMDAxMjAgPSAwOwoJKih1aW50NjRfdCopMHgyMDAwMDAwMDAxMjggPSAwOwoJKih1aW50
-MzJfdCopMHgyMDAwMDAwMDAxMzAgPSAwOwoJc3lzY2FsbChfX05SX3NlbmRtc2csIC8qZmQ9
-Ki9mZCwgLyptc2c9Ki8weDIwMDAwMDAwMDEwMHVsLCAvKmY9Ki8wdWwpOwp9CgpzdGF0aWMg
-dm9pZCBleGVjdXRlMihjb25zdCBpbnQgZmQpCnsKCS8vICBzZW5kbXNnJG5sX3JvdXRlIGFy
-Z3VtZW50czogWwoJLy8gICAgZmQ6IHNvY2tfbmxfcm91dGUgKHJlc291cmNlKQoJLy8gICAg
-bXNnOiBwdHJbaW4sIG1zZ2hkcl9uZXRsaW5rW25ldGxpbmtfbXNnX3JvdXRlXV0gewoJLy8g
-ICAgICBtc2doZHJfbmV0bGlua1tuZXRsaW5rX21zZ19yb3V0ZV0gewoJLy8gICAgICAgIGFk
-ZHI6IG5pbAoJLy8gICAgICAgIGFkZHJsZW46IGxlbiA9IDB4MCAoNCBieXRlcykKCS8vICAg
-ICAgICBwYWQgPSAweDAgKDQgYnl0ZXMpCgkvLyAgICAgICAgdmVjOiBwdHJbaW4sIGlvdmVj
-W2luLCBuZXRsaW5rX21zZ19yb3V0ZV1dIHsKCS8vICAgICAgICAgIGlvdmVjW2luLCBuZXRs
-aW5rX21zZ19yb3V0ZV0gewoJLy8gICAgICAgICAgICBhZGRyOiBwdHJbaW5vdXQsIGFycmF5
-W0FOWVVOSU9OXV0gewoJLy8gICAgICAgICAgICAgIGFycmF5W0FOWVVOSU9OXSB7CgkvLyAg
-ICAgICAgICAgICAgICB1bmlvbiBBTllVTklPTiB7CgkvLyAgICAgICAgICAgICAgICAgIEFO
-WUJMT0I6IGJ1ZmZlcjogezMwIDAwIDAwIDAwIDE4IDAwIGRkIDhkIDAwIDAwIDAwIDAwIDAw
-CgkvLyAgICAgICAgICAgICAgICAgIDAwIDAwIDAwIDAyIDAwIDAwIDAwIDAwIDAwIDAwIDA2
-IDAwIDAwIDAwIDAwIDA4IDAwIDFlIDAwCgkvLyAgICAgICAgICAgICAgICAgIDAyfSAobGVu
-Z3RoIDB4MjEpCgkvLyAgICAgICAgICAgICAgICB9CgkvLyAgICAgICAgICAgICAgfQoJLy8g
-ICAgICAgICAgICB9CgkvLyAgICAgICAgICAgIGxlbjogbGVuID0gMHgzMCAoOCBieXRlcykK
-CS8vICAgICAgICAgIH0KCS8vICAgICAgICB9CgkvLyAgICAgICAgdmxlbjogY29uc3QgPSAw
-eDEgKDggYnl0ZXMpCgkvLyAgICAgICAgY3RybDogY29uc3QgPSAweDAgKDggYnl0ZXMpCgkv
-LyAgICAgICAgY3RybGxlbjogY29uc3QgPSAweDAgKDggYnl0ZXMpCgkvLyAgICAgICAgZjog
-c2VuZF9mbGFncyA9IDB4MCAoNCBieXRlcykKCS8vICAgICAgICBwYWQgPSAweDAgKDQgYnl0
-ZXMpCgkvLyAgICAgIH0KCS8vICAgIH0KCS8vICAgIGY6IHNlbmRfZmxhZ3MgPSAweDQwOTAg
-KDggYnl0ZXMpCgkvLyAgXQoJKih1aW50NjRfdCopMHgyMDAwMDAwMDAxODAgPSAwOwoJKih1
-aW50MzJfdCopMHgyMDAwMDAwMDAxODggPSAwOwoJKih1aW50NjRfdCopMHgyMDAwMDAwMDAx
-OTAgPSAweDIwMDAwMDAwMDc4MDsKCSoodWludDY0X3QqKTB4MjAwMDAwMDAwNzgwID0gMHgy
-MDAwMDAwMDAzODA7CgltZW1jcHkoKHZvaWQqKTB4MjAwMDAwMDAwMzgwLAoJICAgICAgICJc
-eDMwXHgwMFx4MDBceDAwXHgxOFx4MDBceGRkXHg4ZFx4MDBceDAwXHgwMFx4MDBceDAwXHgw
-MFx4MDBceDAwXHgwMiIKCSAgICAgICAiXHgwMFx4MDBceDAwXHgwMFx4MDBceDAwXHgwNlx4
-MDBceDAwXHgwMFx4MDBceDA4XHgwMFx4MWVceDAwXHgwMiIsCgkgICAgICAgMzMpOwoJKih1
-aW50NjRfdCopMHgyMDAwMDAwMDA3ODggPSAweDMwOwoJKih1aW50NjRfdCopMHgyMDAwMDAw
-MDAxOTggPSAxOwoJKih1aW50NjRfdCopMHgyMDAwMDAwMDAxYTAgPSAwOwoJKih1aW50NjRf
-dCopMHgyMDAwMDAwMDAxYTggPSAwOwoJKih1aW50MzJfdCopMHgyMDAwMDAwMDAxYjAgPSAw
-OwoJc3lzY2FsbChfX05SX3NlbmRtc2csIC8qZmQ9Ki9mZCwgLyptc2c9Ki8weDIwMDAwMDAw
-MDE4MHVsLAoJCS8qZj1NU0dfUFJPQkV8TVNHX05PU0lHTkFMfE1TR19FT1IqLyAweDQwOTB1
-bCk7Cn0KCmludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pCnsKCXN5c2NhbGwoX19O
-Ul9tbWFwLCAvKmFkZHI9Ki8weDIwMDAwMDAwMDAwMHVsLCAvKmxlbj0qLzB4MTAwMDAwMHVs
-LAoJCS8qcHJvdD1QUk9UX1dSSVRFfFBST1RfUkVBRHxQUk9UX0VYRUMqLyA3dWwsCgkJLypm
-bGFncz1NQVBfRklYRUR8TUFQX0FOT05ZTU9VU3xNQVBfUFJJVkFURSovIDB4MzJ1bCwKCQkv
-KmZkPSovKGludHB0cl90KS0xLCAvKm9mZnNldD0qLzB1bCk7CglpZiAodW5zaGFyZShDTE9O
-RV9ORVdORVQpKQoJCXJldHVybiAxOwoJaW50IGZkID0gc3lzY2FsbChfX05SX3NvY2tldCwg
-Lypkb21haW49Ki8weDEwdWwsIC8qdHlwZT0qLzN1bCwgLypwcm90bz0qLzApOwoJaWYgKGZk
-ID09IC0xKQoJCXJldHVybiAxOwoJZXhlY3V0ZTEoZmQpOwoJZXhlY3V0ZTEoZmQpOwoJZXhl
-Y3V0ZTIoZmQpOwoJcmV0dXJuIDA7Cn0K
+vim +3006 block/blk-iocost.c
 
---------------btIfSDusQku0MRu4n31ChAqq--
+  2981	
+  2982	static void ioc_pd_init(struct blkg_policy_data *pd)
+  2983	{
+  2984		struct ioc_gq *iocg = pd_to_iocg(pd);
+  2985		struct blkcg_gq *blkg = pd_to_blkg(&iocg->pd);
+  2986		struct ioc *ioc = q_to_ioc(blkg->q);
+  2987		struct ioc_now now;
+  2988		struct blkcg_gq *tblkg;
+  2989		unsigned long flags;
+  2990	
+  2991		ioc_now(ioc, &now);
+  2992	
+  2993		iocg->ioc = ioc;
+  2994		atomic64_set(&iocg->vtime, now.vnow);
+  2995		atomic64_set(&iocg->done_vtime, now.vnow);
+  2996		atomic64_set(&iocg->active_period, atomic64_read(&ioc->cur_period));
+  2997		INIT_LIST_HEAD(&iocg->active_list);
+  2998		INIT_LIST_HEAD(&iocg->walk_list);
+  2999		INIT_LIST_HEAD(&iocg->surplus_list);
+  3000		iocg->hweight_active = WEIGHT_ONE;
+  3001		iocg->hweight_inuse = WEIGHT_ONE;
+  3002	
+  3003		init_waitqueue_head(&iocg->waitq);
+  3004		hrtimer_setup(&iocg->waitq_timer, iocg_waitq_timer_fn, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
+  3005	
+> 3006		iocg->level = cgroup_level(blkg->blkcg->css.cgroup)
+  3007	
+  3008		for (tblkg = blkg; tblkg; tblkg = tblkg->parent) {
+  3009			struct ioc_gq *tiocg = blkg_to_iocg(tblkg);
+  3010			iocg->ancestors[tiocg->level] = tiocg;
+  3011		}
+  3012	
+  3013		spin_lock_irqsave(&ioc->lock, flags);
+  3014		weight_updated(iocg, &now);
+  3015		spin_unlock_irqrestore(&ioc->lock, flags);
+  3016	}
+  3017	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
