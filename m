@@ -1,178 +1,116 @@
-Return-Path: <netdev+bounces-245613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4900DCD37A6
-	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 22:50:00 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71790CD38B0
+	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 00:06:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id A9E5230022F2
-	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 21:49:59 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6010C30007B2
+	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 23:06:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94CB52E62C0;
-	Sat, 20 Dec 2025 21:49:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0F412EF66E;
+	Sat, 20 Dec 2025 23:05:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="j622IMLR"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="F3dIwu2B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C50351A3154;
-	Sat, 20 Dec 2025 21:49:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B5D823C4FF
+	for <netdev@vger.kernel.org>; Sat, 20 Dec 2025 23:05:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766267397; cv=none; b=NCjVuofxyNUbgXVYoLFtjyZVhg/F9hquwxjeCoIkNWQ9VMl+zre0KnTNXyPKcNlUexrSDY0jsn/qLIn8sP6zM5mp+hoD0sngA2vIK7w/o16s8xd7bOguRFFfGbgVZj9wmEJ1imr1I40nnMJ7Ji57+vakfwwv1G56vfexfsWKIe8=
+	t=1766271959; cv=none; b=VU1X3xXYv40WpwLa5Bxu/ma7PTOAoyvJTwx5CvGkN1PHIQcd2dH3IRVsLfmnWYb/2YOSzKpDLm8FSneib+p/TuHMpiD96/Lirt1fNHvsJTEnB2o4X/GAHnXAYvVaFkeGJWI3/+5kWlShs8um/X0KJOQ0oroJPqypYupruDotUXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766267397; c=relaxed/simple;
-	bh=p5MfNjz+/wJNYDsq5XB9RKtrRlUy9BblRhiK8tcu5I0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KGYOPDY+183zYs7Wqhcnw8p5eSkPUrNoeJ6LqLLNAD57EHe6fDt3wBiVS/uOrDizTnngX2qN/v6Pj8PWYVYUdAdquaQxMfmXVUN8EGj2svtvoC9ajMzH9+R7UIEL+q0jdfb2p//E4cw391dKVFvOsyxPSkPNrWaA/eGpjG+q/0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=j622IMLR; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1766267395; x=1797803395;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=p5MfNjz+/wJNYDsq5XB9RKtrRlUy9BblRhiK8tcu5I0=;
-  b=j622IMLR7KyLeACZ4jH8UvGIInaHSOEd38t0nqKgntu/4pYxBU5iPf/K
-   p/Lw69n1T7zRvicgX5SOGHS5Hby2UagpnZsAwTnkXhYjX67leHqcw4SNd
-   lPPol+dR3gqVLPBEDGwK8qyT1lyF8MG/DhyKDiCUybwH3ZY9H9c9ohQ4w
-   CHDgnzeSfJgSUu+iBVEdf/7X/s0ujfoDJorO/Sc6L58bxXW6Z70u9kc0u
-   yzX4sQf/uRYcKZqBbIJmK9NyNPRt+hs9+w+blBWyzNjXY6j1Hyw/0d2FF
-   S6lye/tdRz2vCur34XUErREEw/Rxc+q3qc+eJ0rsRACxUhuLhdy3slkJ6
-   Q==;
-X-CSE-ConnectionGUID: ILbP2eevTnyz2eZqrHCj/A==
-X-CSE-MsgGUID: iw0IUMj1R9CCBmuhidwiig==
-X-IronPort-AV: E=McAfee;i="6800,10657,11648"; a="71818555"
-X-IronPort-AV: E=Sophos;i="6.21,164,1763452800"; 
-   d="scan'208";a="71818555"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2025 13:49:54 -0800
-X-CSE-ConnectionGUID: HA+sPQP0SAWiXeVfc3FElQ==
-X-CSE-MsgGUID: jt+gQQj+TOmrkp7T1EFbrQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,164,1763452800"; 
-   d="scan'208";a="229832146"
-Received: from lkp-server01.sh.intel.com (HELO 0d09efa1b85f) ([10.239.97.150])
-  by orviesa002.jf.intel.com with ESMTP; 20 Dec 2025 13:49:46 -0800
-Received: from kbuild by 0d09efa1b85f with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vX4pb-0000000059d-2H5N;
-	Sat, 20 Dec 2025 21:49:43 +0000
-Date: Sun, 21 Dec 2025 05:49:37 +0800
-From: kernel test robot <lkp@intel.com>
-To: Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	cgroups@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-	bpf@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Yu Kuai <yukuai@fnnas.com>, Jens Axboe <axboe@kernel.dk>,
-	Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Pablo Neira Ayuso <pablo@netfilter.org>
-Subject: Re: [PATCH 2/4] cgroup: Introduce cgroup_level() helper
-Message-ID: <202512210532.ziNaxDJf-lkp@intel.com>
-References: <20251217162744.352391-3-mkoutny@suse.com>
+	s=arc-20240116; t=1766271959; c=relaxed/simple;
+	bh=IjXLtzP3AHv0rDolqNzJMPlS8UH+kMA4oC34g/dpx9A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fehe96MvRt7OuzOgzi3QiFfvRZOw0fKQ6WvOet4KJ5ExvthFrbMKmT4Mz814hHbEt47NEYCEI5jCFv8LMsUWe6sYZ1724H0nwbqUEBv/Ypdu2pBT50MxoqGi88hIX/uRJ+wRXk4a6JjDT1lBYABJuvupvmmLUrQtkRVRVlu4yd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=F3dIwu2B; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <8f623d8e-cd83-4610-83fa-794295576dac@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1766271950;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ppTibUaZ/aJOjyfk4Y0rqjTvbdqNWKVIiAjytncOa3E=;
+	b=F3dIwu2BPP/5ZYeROfKWYm8NnLATWoCZybSKu2QE37IBCMW3VyVpw5Z3JTHo3YiU9YAkbV
+	0HTq5vvYfAIh6eyfxUVuHYCL4LZWaXZuDyLIuT0DVaMZ0vJ+NHhAqq1laRcFiQzQtNlWQS
+	beOGCSna71VZm4EGV+xV2v9UkOt4nN8=
+Date: Sat, 20 Dec 2025 15:05:43 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251217162744.352391-3-mkoutny@suse.com>
-
-Hi Michal,
-
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on 8f0b4cce4481fb22653697cced8d0d04027cb1e8]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Michal-Koutn/cgroup-Eliminate-cgrp_ancestor_storage-in-cgroup_root/20251218-004346
-base:   8f0b4cce4481fb22653697cced8d0d04027cb1e8
-patch link:    https://lore.kernel.org/r/20251217162744.352391-3-mkoutny%40suse.com
-patch subject: [PATCH 2/4] cgroup: Introduce cgroup_level() helper
-config: nios2-allmodconfig (https://download.01.org/0day-ci/archive/20251221/202512210532.ziNaxDJf-lkp@intel.com/config)
-compiler: nios2-linux-gcc (GCC) 11.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251221/202512210532.ziNaxDJf-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202512210532.ziNaxDJf-lkp@intel.com/
-
-All error/warnings (new ones prefixed by >>):
-
-   block/blk-iocost.c: In function 'ioc_pd_init':
->> block/blk-iocost.c:3006:60: error: expected ';' before 'for'
-    3006 |         iocg->level = cgroup_level(blkg->blkcg->css.cgroup)
-         |                                                            ^
-         |                                                            ;
-    3007 | 
-    3008 |         for (tblkg = blkg; tblkg; tblkg = tblkg->parent) {
-         |         ~~~                                                 
->> block/blk-iocost.c:2988:26: warning: unused variable 'tblkg' [-Wunused-variable]
-    2988 |         struct blkcg_gq *tblkg;
-         |                          ^~~~~
+Subject: Re: [PATCH] RDMA/rxe: let rxe_reclassify_recv_socket() call
+ sk_owner_put()
+To: Stefan Metzmacher <metze@samba.org>, linux-rdma@vger.kernel.org
+Cc: Zhu Yanjun <zyjzyj2000@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Leon Romanovsky <leon@kernel.org>,
+ Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>, netdev@vger.kernel.org,
+ linux-cifs@vger.kernel.org
+References: <20251219140408.2300163-1-metze@samba.org>
+ <9ccc0635-7c0e-4a18-8469-9c5b6d9b268f@linux.dev>
+ <01cd3f5a-2976-45ad-8a2d-32b3e39c6317@samba.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <01cd3f5a-2976-45ad-8a2d-32b3e39c6317@samba.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
 
-vim +3006 block/blk-iocost.c
+在 2025/12/20 5:05, Stefan Metzmacher 写道:
+> Am 20.12.25 um 04:51 schrieb Zhu Yanjun:
+>> 在 2025/12/19 6:04, Stefan Metzmacher 写道:
+>>> On kernels build with CONFIG_PROVE_LOCKING, CONFIG_MODULES
+>>> and CONFIG_DEBUG_LOCK_ALLOC 'rmmod rdma_rxe' is no longer
+>>> possible.
+>>>
+>>> For the global recv sockets rxe_net_exit() is where we
+>>> call rxe_release_udp_tunnel-> udp_tunnel_sock_release(),
+>>> which means the sockets are destroyed before 'rmmod rdma_rxe'
+>>> finishes, so there's no need to protect against
+>>> rxe_recv_slock_key and rxe_recv_sk_key disappearing
+>>> while the sockets are still alive.
+>>>
+>>> Fixes: 80a85a771deb ("RDMA/rxe: reclassify sockets in order to avoid 
+>>> false positives from lockdep")
+>>> Cc: Zhu Yanjun <zyjzyj2000@gmail.com>
+>>> Cc: Jason Gunthorpe <jgg@ziepe.ca>
+>>> Cc: Leon Romanovsky <leon@kernel.org>
+>>> Cc: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+>>> Cc: linux-rdma@vger.kernel.org
+>>> Cc: netdev@vger.kernel.org
+>>> Cc: linux-cifs@vger.kernel.org
+>>> Signed-off-by: Stefan Metzmacher <metze@samba.org>
+>>
+>> Thanks a lot. IIRC, there is a similar commit for SIW driver. Thus, I 
+>> am not sure if there is a similar problem in SIW driver or not.
+>
+> I don't think so, siw and the other place in rxe  are attached to 
+> specific connections
+> and there the reference is ok and needed.
 
-  2981	
-  2982	static void ioc_pd_init(struct blkg_policy_data *pd)
-  2983	{
-  2984		struct ioc_gq *iocg = pd_to_iocg(pd);
-  2985		struct blkcg_gq *blkg = pd_to_blkg(&iocg->pd);
-  2986		struct ioc *ioc = q_to_ioc(blkg->q);
-  2987		struct ioc_now now;
-> 2988		struct blkcg_gq *tblkg;
-  2989		unsigned long flags;
-  2990	
-  2991		ioc_now(ioc, &now);
-  2992	
-  2993		iocg->ioc = ioc;
-  2994		atomic64_set(&iocg->vtime, now.vnow);
-  2995		atomic64_set(&iocg->done_vtime, now.vnow);
-  2996		atomic64_set(&iocg->active_period, atomic64_read(&ioc->cur_period));
-  2997		INIT_LIST_HEAD(&iocg->active_list);
-  2998		INIT_LIST_HEAD(&iocg->walk_list);
-  2999		INIT_LIST_HEAD(&iocg->surplus_list);
-  3000		iocg->hweight_active = WEIGHT_ONE;
-  3001		iocg->hweight_inuse = WEIGHT_ONE;
-  3002	
-  3003		init_waitqueue_head(&iocg->waitq);
-  3004		hrtimer_setup(&iocg->waitq_timer, iocg_waitq_timer_fn, CLOCK_MONOTONIC, HRTIMER_MODE_ABS);
-  3005	
-> 3006		iocg->level = cgroup_level(blkg->blkcg->css.cgroup)
-  3007	
-  3008		for (tblkg = blkg; tblkg; tblkg = tblkg->parent) {
-  3009			struct ioc_gq *tiocg = blkg_to_iocg(tblkg);
-  3010			iocg->ancestors[tiocg->level] = tiocg;
-  3011		}
-  3012	
-  3013		spin_lock_irqsave(&ioc->lock, flags);
-  3014		weight_updated(iocg, &now);
-  3015		spin_unlock_irqrestore(&ioc->lock, flags);
-  3016	}
-  3017	
+
+Make sense. Thanks.
+
+Yanjun.Zhu
+
+
+>
+> The problem was only related to the two global sockets with the lifetime
+> the rdma_rxe is loaded.
+>
+> metze
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Best Regards,
+Yanjun.Zhu
+
 
