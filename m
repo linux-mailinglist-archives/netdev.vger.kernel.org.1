@@ -1,297 +1,144 @@
-Return-Path: <netdev+bounces-245579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53A31CD2EAC
-	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 13:23:41 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87DD1CD2ED0
+	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 13:47:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 073923016FBE
-	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 12:23:11 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 54E303013E86
+	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 12:47:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FB32267B92;
-	Sat, 20 Dec 2025 12:23:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E4D2205E26;
+	Sat, 20 Dec 2025 12:46:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CdS/u7ZI"
+	dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b="Y80MlP0f"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DE1878F2B;
-	Sat, 20 Dec 2025 12:23:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FC341F8691
+	for <netdev@vger.kernel.org>; Sat, 20 Dec 2025 12:46:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766233389; cv=none; b=Sv1IDxpGAUUBPghM5SGmRJEa0XcTyvxjGXHS9BLlgIrUHlZRqoZDyHX8eHHn94V7u1FvAvsnkhzn5rImXiW1iCK2mkucy2P/5FmZz10FxQ9qWkFT2nlJ5wwjNX80VXyIBw+spEwQwEYF1gc2Mt/cNGwDJ72gQ9wflVulNJrwi3g=
+	t=1766234818; cv=none; b=q7B8InD2tfKfyXd09TQsdyAoEw6I2iwimLSA3v8yvjrqnRlIGhAKiPW8oIxbAy1r5g4QYDCEsHtCGFuamqAaihphLV2pbzpye87bVzNZRc2G+ucytdsE1vXwWXJYFn0vDHcmZaF+e79bt0CYzGzTkb8C5SEb364FiQyEeQdkjEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766233389; c=relaxed/simple;
-	bh=hJRvZ4Gdkybxy0JF+ENyKK0h6jb7JewEdZUX5tn74Xw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OCSQaDHNY3SEsLcILgxtF5Hw05zLskpbIedPDJLtgWb6+5TtavaFrwXJ1PpeR4tow9XeV9sZXxkb2u8uCFUDVAYK1uPxa+K3AabxNK7PkWIsr+GvyJ5djrvnvv8/v+qQkJp2xXaq9QiT/rFqYCuq1ZTkWdE7LCQI5wXOiAhYHOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CdS/u7ZI; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1766233375;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0RWb6IwcbG0/TBs8nwby4PiJFSmoftzLuD932v6h31A=;
-	b=CdS/u7ZIJzjEudaXW/7qP5w1cW9CB0srT+R1kZ/9vBw3VPcIxpXDRYUDEQZRPunjvGhhjV
-	fYfAOhGETnGocrKCUQO78GRPEeeQF4ZIvr8eIbCgeEtJHUqIQLqSUhhlbzH1nKvOPz9auJ
-	rA387xLjh+Y7mKeZYg7JHsqRBbaBjXk=
-From: Menglong Dong <menglong.dong@linux.dev>
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: Menglong Dong <menglong8.dong@gmail.com>, ast@kernel.org,
- andrii@kernel.org, davem@davemloft.net, dsahern@kernel.org,
- daniel@iogearbox.net, martin.lau@linux.dev, eddyz87@gmail.com,
- song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com,
- kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org,
- tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH bpf-next v4 0/9] bpf: tracing session supporting
-Date: Sat, 20 Dec 2025 20:22:37 +0800
-Message-ID: <1946544.CQOukoFCf9@7950hx>
-In-Reply-To: <6114986.MhkbZ0Pkbq@7950hx>
-References:
- <20251217095445.218428-1-dongml2@chinatelecom.cn> <2393471.ElGaqSPkdT@7950hx>
- <6114986.MhkbZ0Pkbq@7950hx>
+	s=arc-20240116; t=1766234818; c=relaxed/simple;
+	bh=BMqWG7tVLRpE0d5CCcucZYfHD30N453xL0DULNwoUjE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qh0SwQZFuMdn5F8nogtD1r+/rH/8FSr94wSB0rbWAyoZodrx1ycgedNX+GbbhGV0R52Gtx0vskpDLSTCXaYqiQsNW3sRfe36/XF295tMJvNj1SDBhWgs/zUAfS4kSEIqJNmi//nmicJCTjXoYcBBhbRlCKvoptZkMhwtfV8Y4Qc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com; spf=pass smtp.mailfrom=googlemail.com; dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b=Y80MlP0f; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=googlemail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2a09d981507so18564645ad.1
+        for <netdev@vger.kernel.org>; Sat, 20 Dec 2025 04:46:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=googlemail.com; s=20230601; t=1766234814; x=1766839614; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PnLeQHT6gKO5LrS+1ND5Ys5FEsU3x/z5LzPcGERhZEM=;
+        b=Y80MlP0fmDp8tm4zieU3AulAPFsuZnuiz+9owEEQqyJqTATrexNsDnR76R4JpTFEyG
+         D589R+STSY6H58P+zUmUonSEQOPIihahjMibqy7il6/G/yl9m5FxjuP0NO2VA7AJR2B4
+         ANrZ8WfbRm5zJI7HsdBWwBZ3WNSlGT/WnjGTXCPCTszc2V5jcPB58ADfOEXna1r1d+QX
+         dIUAZ7JjUtEZUv8/qoIzP4o7BuMRoBE0SjyeqSu2Zqv35Zf5ciVGE+QLao3y/wd8EPvh
+         cfHz42rxGzucWgI6TZh4ZA0Jd7EkEkm+V18BwdgCNfCTBQsZqR73SD3ecY6HKLmygYGA
+         m2hg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766234814; x=1766839614;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=PnLeQHT6gKO5LrS+1ND5Ys5FEsU3x/z5LzPcGERhZEM=;
+        b=p7LZLa5a2YYFCt0XdjviGjTFBXyk1/5kiswKUVC9Hmn10XueQS2x+Fv0TJR0BymwGa
+         a4Z9kkgVyN/RF6HQb+H+IPZ7nCToShkwKlruzw2u873BGmu3lSm7AByQF5hvVxHkqcxq
+         6FpAbwglknzDD3qRgogutUogxY2JmOUfVmOQ8nWHsbtAM4kuReWz0jLcZZgVvPFYS2uj
+         xGrvVFJtnB6/TsYRc1qHGzzuJCA1k7zVQAJ8FshqiIOFMck9W0mw+fEO9GSxGxi8NCxb
+         S1jyDmy/lFCPQ2f8iy99w+KusaXPYMAJGOmkARkgZmyd6vH7KygbCpos1Vdb7v3x3958
+         aXhA==
+X-Forwarded-Encrypted: i=1; AJvYcCWg4D3rLZNMInMtd97NltW08FU5TXgrRwvE1x3ShR60pZU/PGVDAX8T8S6KIjmUSGumbve9+EY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUSDcsps0kIVAf9e/WWWr+S6IUVgRKwgUSgwiROuemO2OFLUkp
+	sPImLcjLzoayHTr5NjGbMJAd1riFtd9AE2LDcQgHlVti1CzPlhjgR1zsffAEDHoaxa5/8jCZpGw
+	cE98AMXteEW2WOSehN86bh40V8lKzsAs=
+X-Gm-Gg: AY/fxX6XoSikhqZsohNh701Cq3BWxKaMvUDMWbBmPU4wy5k2j6fEIGT/UDysCy49/Ie
+	PTKl5VMRV2Tak4T6m3GsnT4GFjH7vAERZmWtd0xY5nzxvCxckD+mkSo5NtJ46LKkBRQtqVew/k2
+	+Nkjp/mffOBoP9Yo/RmX1ojy8biCu4XuFjQnf1HmE4zbmeXIPrv0ek6jwJ3ujy/5Jf+IHQ0uao7
+	aMoZm+aTXdkVJRWCjlBlOdqQOpqm6CpfQVUstvMHoj9TH1L8nMyiw6ksHrU0B64HS40/f7HeMH2
+	7m/P01AiKqJJ6xIwjOL9L4G/qg6OHToH7+fEZ/M=
+X-Google-Smtp-Source: AGHT+IGTZVFXf6rAC1bEGZmO7YaQs0mj72/Bxua6dbMs1yZR8CidcfGRl/4LVrNe9mb+pBaCXI6UiiHmEjBYB9UahrA=
+X-Received: by 2002:a17:903:198e:b0:2a0:99f7:67b4 with SMTP id
+ d9443c01a7336-2a2f0cbc904mr55199135ad.8.1766234813931; Sat, 20 Dec 2025
+ 04:46:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20251219-qcom-sa8255p-emac-v6-0-487f1082461e@oss.qualcomm.com> <20251219-qcom-sa8255p-emac-v6-1-487f1082461e@oss.qualcomm.com>
+In-Reply-To: <20251219-qcom-sa8255p-emac-v6-1-487f1082461e@oss.qualcomm.com>
+From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date: Sat, 20 Dec 2025 13:46:43 +0100
+X-Gm-Features: AQt7F2qpxOToWQKPYlABMJwLqho0Xychdf9rQln23uKf9MMkpqj4U-v6YeXkrYo
+Message-ID: <CAFBinCAXb87FKwA_=UEx5YTekevVUun1gieUfMux=oQAgjZS7w@mail.gmail.com>
+Subject: Re: [PATCH v6 1/7] dt-bindings: net: qcom: document the ethqos device
+ for SCMI-based systems
+To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Cc: Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Richard Cochran <richardcochran@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Vinod Koul <vkoul@kernel.org>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, Chen-Yu Tsai <wens@kernel.org>, 
+	Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>, 
+	Matthew Gerlach <matthew.gerlach@altera.com>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	Kevin Hilman <khilman@baylibre.com>, Jerome Brunet <jbrunet@baylibre.com>, 
+	Keguang Zhang <keguang.zhang@gmail.com>, Shawn Guo <shawnguo@kernel.org>, 
+	Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>, 
+	Fabio Estevam <festevam@gmail.com>, Jan Petrous <jan.petrous@oss.nxp.com>, s32@nxp.com, 
+	Romain Gantois <romain.gantois@bootlin.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>, Heiko Stuebner <heiko@sntech.de>, 
+	Chen Wang <unicorn_wang@outlook.com>, Inochi Amaoto <inochiama@gmail.com>, 
+	Emil Renner Berthing <kernel@esmil.dk>, Minda Chen <minda.chen@starfivetech.com>, 
+	Drew Fustini <fustini@kernel.org>, Guo Ren <guoren@kernel.org>, Fu Wei <wefu@redhat.com>, 
+	Nobuhiro Iwamatsu <nobuhiro.iwamatsu.x90@mail.toshiba>, 
+	Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, 
+	Maxime Ripard <mripard@kernel.org>, Shuang Liang <liangshuang@eswincomputing.com>, 
+	Zhi Li <lizhi2@eswincomputing.com>, Shangjuan Wei <weishangjuan@eswincomputing.com>, 
+	"G. Jaya Kumaran" <vineetha.g.jaya.kumaran@intel.com>, Clark Wang <xiaoning.wang@nxp.com>, 
+	Linux Team <linux-imx@nxp.com>, Frank Li <Frank.Li@nxp.com>, David Wu <david.wu@rock-chips.com>, 
+	Samin Guo <samin.guo@starfivetech.com>, 
+	Christophe Roullier <christophe.roullier@foss.st.com>, Swathi K S <swathi.ks@samsung.com>, 
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, Drew Fustini <dfustini@tenstorrent.com>, 
+	linux-sunxi@lists.linux.dev, linux-amlogic@lists.infradead.org, 
+	linux-mips@vger.kernel.org, imx@lists.linux.dev, 
+	linux-renesas-soc@vger.kernel.org, linux-rockchip@lists.infradead.org, 
+	sophgo@lists.linux.dev, linux-riscv@lists.infradead.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-X-Migadu-Flow: FLOW_OUT
 
-On 2025/12/20 17:01, Menglong Dong wrote:
-> On 2025/12/20 09:12, Menglong Dong wrote:
-> > On 2025/12/20 00:55, Andrii Nakryiko wrote:
-> > > On Thu, Dec 18, 2025 at 5:18=E2=80=AFPM Menglong Dong <menglong.dong@=
-linux.dev> wrote:
-> > > >
-> > > > On 2025/12/19 08:55 Andrii Nakryiko <andrii.nakryiko@gmail.com> wri=
-te:
-> > > > > On Wed, Dec 17, 2025 at 1:54=E2=80=AFAM Menglong Dong <menglong8.=
-dong@gmail.com> wrote:
-> > > > > >
-> > > > > > Hi, all.
-> > > > > >
-> > > > > > In this version, I combined Alexei and Andrii's advice, which m=
-akes the
-> > > > > > architecture specific code much simpler.
-> > > > > >
-> > > > > > Sometimes, we need to hook both the entry and exit of a functio=
-n with
-> > > > > > TRACING. Therefore, we need define a FENTRY and a FEXIT for the=
- target
-> > > > > > function, which is not convenient.
-> > > > > >
-> > > > > > Therefore, we add a tracing session support for TRACING. Genera=
-lly
-> > > > > > speaking, it's similar to kprobe session, which can hook both t=
-he entry
-> > > > > > and exit of a function with a single BPF program. Session cooki=
-e is also
-> > > > > > supported with the kfunc bpf_fsession_cookie(). In order to lim=
-it the
-> > > > > > stack usage, we limit the maximum number of cookies to 4.
-> > > > > >
-> > > > > > The kfunc bpf_fsession_is_return() and bpf_fsession_cookie() ar=
-e both
-> > > > > > inlined in the verifier.
-> > > > >
-> > > > > We have generic bpf_session_is_return() and bpf_session_cookie() =
-(that
-> > > > > currently works for ksession), can't you just implement them for =
-the
-> > > > > newly added program type instead of adding type-specific kfuncs?
-> > > >
-> > > > Hi, Andrii. I tried and found that it's a little hard to reuse them=
-=2E The
-> > > > bpf_session_is_return() and bpf_session_cookie() are defined as kfu=
-nc, which
-> > > > makes we can't implement different functions for different attach t=
-ype, like
-> > > > what bpf helper does.
-> > >=20
-> > > Are you sure? We certainly support kfunc implementation specialization
-> > > for sleepable vs non-sleepable BPF programs. Check specialize_kfunc()
-> > > in verifier.c
-> >=20
-> > Ah, I remember it now. We do can use different kfunc version
-> > for different case in specialize_kfunc().
-> >=20
-> > >=20
-> > > >
-> > > > The way we store "is_return" and "cookie" in fsession is different =
-with
-> > > > ksession. For ksession, it store the "is_return" in struct bpf_sess=
-ion_run_ctx.
-> > > > Even if we move the "nr_regs" from stack to struct bpf_tramp_run_ct=
-x,
-> > > > it's still hard to reuse the bpf_session_is_return() or bpf_session=
-_cookie(),
-> > > > as the way of storing the "is_return" and "cookie" in fsession and =
-ksession
-> > > > is different, and it's a little difficult and complex to unify them.
-> > >=20
-> > > I'm not saying we should unify the implementation, you have to
-> > > implement different version of logically the same kfunc, of course.
-> >=20
-> > I see. The problem now is that the prototype of bpf_session_cookie()
-> > or bpf_session_is_return() don't satisfy our need. For bpf_session_cook=
-ie(),
-> > we at least need the context to be the argument. However, both
-> > of them don't have any function argument. After all, the prototype of
-> > different version of logically the same kfunc should be the same.
->=20
-> Hi, Andrii. I see that you want to make the API consistent between
-> ksession and fsession, which is more friendly for the user.
->=20
-> After my analysis, I think we have following approach:
-> 1. change the function prototype of bpf_session_cookie and bpf_session_is=
-_return
-> to:
->     bool bpf_session_is_return(void *ctx);
->     bool bpf_session_cookie(void *ctx);
-> And we do the fix up in specialize_kfunc(), which I think is the easiest
-> way. The defect is that it will break existing users.
->=20
-> 2. We define a fixup_kfunc_call_early() and call it in add_subprog_and_kf=
-unc.
-> In the fixup_kfunc_call_early(), we will change the target kfunc(which is=
- insn->imm)
-> from bpf_session_cookie() to bpf_fsession_cookie(). For the bpf_session_c=
-ookie(),
-> we make its prototype to:
->     __bpf_kfunc __u64 *bpf_session_cookie(void *ctx__ign)
-
-Ah, it's not a good idea. The libbpf will check if the
-prototype of bpf_session_cookie is compatible between local
-and vmlinux. We can skip the fields whose name has "__ign"
-in current libbpf in __bpf_core_types_are_compat(). But for
-the old libbpf, the compatible checking will fail, which means
-that it will still break the existing users :(
-
-> Therefore, it won't break the existing users. For the ksession that uses =
-the
-> old prototype, it can pass the verifier too. Following is a demo patch of=
- this
-> approach. In this way, we can allow a extension in the prototype for a kf=
-unc
-> in the feature too.
->=20
-> What do you think?
->=20
-> Thanks!
-> Menglong Dong
->=20
-> >patch<
->=20
-> +static int fixup_kfunc_call_early(struct bpf_verifier_env *env, struct b=
-pf_insn *insn)
-> +{
-> +       struct bpf_prog *prog =3D env->prog;
-> +
-> +       if (prog->expected_attach_type =3D=3D BPF_TRACE_FSESSION) {
-> +               if (insn->imm =3D=3D special_kfunc_list[KF_bpf_session_co=
-okie])
-> +                       insn->imm =3D special_kfunc_list[KF_bpf_fsession_=
-cookie];
-> +               else if (insn->imm =3D=3D special_kfunc_list[KF_bpf_sessi=
-on_is_return])
-> +                       insn->imm =3D special_kfunc_list[KF_bpf_fsession_=
-is_return];
-> +       }
-> +
-> +       return 0;
-> +}
->=20
-> @@ -3489,10 +3490,12 @@ static int add_subprog_and_kfunc(struct bpf_verif=
-ier_env *env)
->                         return -EPERM;
->                 }
-> =20
-> -               if (bpf_pseudo_func(insn) || bpf_pseudo_call(insn))
-> +               if (bpf_pseudo_func(insn) || bpf_pseudo_call(insn)) {
->                         ret =3D add_subprog(env, i + insn->imm + 1);
-> -               else
-> -                       ret =3D add_kfunc_call(env, insn->imm, insn->off);
-> +               } else {
-> +                       ret =3D fixup_kfunc_call_early(env, insn);
-> +                       ret =3D ret ?: add_kfunc_call(env, insn->imm, ins=
-n->off);
-> +               }
->=20
-> @@ -3316,7 +3321,7 @@ static u64 bpf_uprobe_multi_entry_ip(struct bpf_run=
-_ctx *ctx)
-> =20
->  __bpf_kfunc_start_defs();
-> =20
-> -__bpf_kfunc bool bpf_session_is_return(void)
-> +__bpf_kfunc bool bpf_session_is_return(void *ctx__ign)
->  {
->         struct bpf_session_run_ctx *session_ctx;
-> =20
-> @@ -3324,7 +3329,7 @@ __bpf_kfunc bool bpf_session_is_return(void)
->         return session_ctx->is_return;
->  }
-> =20
-> -__bpf_kfunc __u64 *bpf_session_cookie(void)
-> +__bpf_kfunc __u64 *bpf_session_cookie(void *ctx__ign)
->  {
->         struct bpf_session_run_ctx *session_ctx;
->=20
-> >=20
-> > I think it's not a good idea to modify the prototype of existing kfunc,
-> > can we?
-> >=20
-> > >=20
-> > > >
-> > > > What's more, we will lose the advantage of inline bpf_fsession_is_r=
-eturn
-> > > > and bpf_fsession_cookie in verifier.
-> > > >
-> > >=20
-> > > I'd double check that either. BPF verifier and JIT do know program
-> > > type, so you can pick how to inline
-> > > bpf_session_is_return()/bpf_session_cookie() based on that.
-> >=20
-> > Yeah, we can inline it depend on the program type if we can solve
-> > the prototype problem.
-> >=20
-> > Thanks!
-> > Menglong Dong
-> >=20
-> >=20
-> > >=20
-> > > > I'll check more to see if there is a more simple way to reuse them.
-> > > >
-> > > > Thanks!
-> > > > Menglong Dong
-> > > >
-> > > > >
-> > [...]
-> > > >
-> > > >
-> > > >
-> > > >
-> >=20
-> >=20
-> >=20
-> >=20
-> >=20
->=20
->=20
->=20
->=20
->=20
-
-
-
-
+On Fri, Dec 19, 2025 at 12:42=E2=80=AFPM Bartosz Golaszewski
+<bartosz.golaszewski@oss.qualcomm.com> wrote:
+>
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>
+> Describe the firmware-managed variant of the QCom DesignWare MAC. As the
+> properties here differ a lot from the HLOS-managed variant, lets put it
+> in a separate file. Since we need to update the maximum number of power
+> domains, let's update existing bindings referencing the top-level
+> snps,dwmac.yaml and limit their maxItems for power-domains to 1.
+>
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+> ---
+>  .../bindings/net/allwinner,sun7i-a20-gmac.yaml     |  3 +
+>  .../bindings/net/altr,socfpga-stmmac.yaml          |  3 +
+>  .../bindings/net/amlogic,meson-dwmac.yaml          |  3 +
+Amlogic SoCs have up to one power domain, so for the Amlogic part:
+Reviewed-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
 
