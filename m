@@ -1,166 +1,127 @@
-Return-Path: <netdev+bounces-245602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C78BCD34E5
-	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 19:15:06 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47930CD35C4
+	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 19:57:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 7FD64300D41E
-	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 18:15:04 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id EE5123000913
+	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 18:57:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB3EC2F2905;
-	Sat, 20 Dec 2025 18:15:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AFFF3009C3;
+	Sat, 20 Dec 2025 18:57:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="LT/dkbNW"
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="LjrsGaop"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
+Received: from out162-62-57-210.mail.qq.com (out162-62-57-210.mail.qq.com [162.62.57.210])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E493B2F1FCF
-	for <netdev@vger.kernel.org>; Sat, 20 Dec 2025 18:15:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0BAA209F5A
+	for <netdev@vger.kernel.org>; Sat, 20 Dec 2025 18:57:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766254503; cv=none; b=Pb9Z3AD14Bkdm0Y9/+dle6hUjSJcV+O5xfmOIe1RZFU+z48NA2grGV+U10DvjsFuZjGNxSB6EyyBowR3LPPlkQLBBozAkZg+7Yv4+Gi7lw2xEuwqMCnu1wd26yfYXCuoRDkvaQ90X/lN5PPvgVxH3K3CEP19Mgk+Su6oDGLaZDY=
+	t=1766257032; cv=none; b=c2Pq1e+P2w4NK0Vdlop9rEEn+bkiEwhcffWXavxQn+ZSpnMrAg7KwbAuXAqAKZgAq7m5HveBAWXAjhNerscX3NN0AiFlgEWS5iXJ/q6CqjABjOLwt+FMNedtbXnuVHx8I4beiAKCXzOn6Hbo1wNcqILGw46uBjdhqHLRsh4Gg00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766254503; c=relaxed/simple;
-	bh=k+SPZdPMwWc98ktZIo7q5BY0XYgtDIzCH8/+RnB2b3c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cX/v13QsM0ebCaGdDMBm3w+w5beEPJVBptAFCIglP6Ww7lQCwBPW+cpQk8TQrSTRUAIZiipn0kqvDmvkHP8ITU3K2j6MmUIXIYNvwETkYPBclyCHfdIOcZaAVlMsMhbyKWzCb5oDkEsLCtH9oRbZUb5fuA4msOpqWRJl+0tlCUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=LT/dkbNW; arc=none smtp.client-ip=202.12.124.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
-	by mailfout.stl.internal (Postfix) with ESMTP id D081D1D0006F;
-	Sat, 20 Dec 2025 13:14:59 -0500 (EST)
-Received: from phl-frontend-04 ([10.202.2.163])
-  by phl-compute-03.internal (MEProxy); Sat, 20 Dec 2025 13:15:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1766254499; x=1766340899; bh=pfFs/8rFHEBhpLWxwjTmnncIxuLwjWkRpNF
-	Oly5ZCEU=; b=LT/dkbNW72G7GKGVd/zsR+Gc7XlVKMrX1sF70nYq/4+hOp/qBsA
-	b013uiYraX8QCKXaEdlHnKXHnUCB6YLDB7Zcv66XUe9PYDAcgCY2DbqWoRg00SQC
-	uWDlx+GP9+4OgFcISDQVOv2bTTa68Kd+tBKswFHyfzRaXt5ghyxgf6k6wpwDo5DD
-	b49jabO81A/YHs1/l+2DpGsdpIU2sHPg9iRjrsCqI9DqtuxrJq03uEHXJ0sd+mwQ
-	tf4Cd1gbfHA3PPNfKUUp7PHx5VVLzBcLRvp7VIcPhwQgS6rvrXdh4EndkmGUBO2g
-	VrkkLlgt2wW91lHZ01INw2dw1DlgLn0Wddw==
-X-ME-Sender: <xms:oudGaR9rUaonMUwXAEH1jw7V7k54ePE2VCxSMv-Z5-J2m4SMDVZ4Nw>
-    <xme:oudGafzVyZ9SrH0TkdhXFgyAxTQtekXhqr8abyqI1pn7HEHtyKk06RHhXrNnHNb03
-    Nq40BzWBJbwU3LYPPVCVHDLToSnN1HgrNaV8dGLk_Ubhh5gTG0>
-X-ME-Received: <xmr:oudGae7fWp-5lIM2q1T6H2y4HpOcaRvi_7xN0xnEi2GY7OPNbHhWQYUdmVbKJvBAlyaKSQ4Yy9G0O2NRaZRE7YhWDVxy9g>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefgedrtddtgdehudekkecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpuffrtefokffrpgfnqfghnecuuegr
-    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
-    hrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfutghh
-    ihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtthgvrh
-    hnpeevgeeguefgudeuudeuveelgefgjeeftdelgeffgfejjeduudfffefftddthedtteen
-    ucffohhmrghinhepshihiihkrghllhgvrhdrrghpphhsphhothdrtghomhenucevlhhush
-    htvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiughoshgthhesihgu
-    ohhstghhrdhorhhgpdhnsggprhgtphhtthhopeejpdhmohguvgepshhmthhpohhuthdprh
-    gtphhtthhopegushgrhhgvrhhnsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehpvghn
-    ghhuihhnqdhkvghrnhgvlhesihdqlhhovhgvrdhsrghkuhhrrgdrnhgvrdhjphdprhgtph
-    htthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepkhhunhhi
-    hihusehgohhoghhlvgdrtghomhdprhgtphhtthhopegvughumhgriigvthesghhoohhglh
-    gvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthho
-    pehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:oudGaW8nsuB4Uzef-U2scoCIfnvNGwz63P6YK0zJEoWZoeRE1xZGHw>
-    <xmx:oudGaTpCKevhBXdewiny6ri7VSGJY9Rhp5nETmQLaYACziIvNs3NoQ>
-    <xmx:oudGaXpscgD6AJ42njQtUZzWz--Dj44MS7Bp8Z_OZIHlCdA-hRo1Tw>
-    <xmx:oudGaW1a5PJMWvFkH3szaY_XKhL8IfbeIm4bC1uwTckJQMOVrj3wcw>
-    <xmx:o-dGab69hGDRfP8vRH-h9KHWeUQzkHX_qbKQ8eVNZ4DfNqB8e1nkEhSV>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
- 20 Dec 2025 13:14:58 -0500 (EST)
-Date: Sat, 20 Dec 2025 20:14:55 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: David Ahern <dsahern@kernel.org>
-Cc: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	"David S. Miller" <davem@davemloft.net>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Network Development <netdev@vger.kernel.org>
-Subject: Re: [BUG nexthop] refcount leak in "struct nexthop" handling
-Message-ID: <aUbnn0uZ3BW997Mx@shredder>
-References: <d943f806-4da6-4970-ac28-b9373b0e63ac@I-love.SAKURA.ne.jp>
- <4a682f36-44a0-42c9-a82a-25fed5024cb2@kernel.org>
+	s=arc-20240116; t=1766257032; c=relaxed/simple;
+	bh=vdirJ98rx4Lw3LOnt1dX2HKmALhZP5GwUyJA9y3V/3o=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=qWMJR482b20Bs5KHy7a6/VClOJWbTDEH49DUYlv6bJYr2HWR02ljTd9H34dcukx9Om1i+f0x8f1H0qiyyUBpJY9BxjwzQu+yI0INMmib3g/wnhdLt4sJhRfEFTZ2XWHZ4T+VT8o1ZnYgOTSt8X0aZD7Xw5bslKWdv86S7klBC80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=LjrsGaop; arc=none smtp.client-ip=162.62.57.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1766257017;
+	bh=MrG3hgZbZN223ywIzuLV1B6U7mfgl3LQz4DzSdiGcFA=;
+	h=From:To:Cc:Subject:Date;
+	b=LjrsGaopLOuh5fWtNFLKgnT/DuSMOlv08+O4Z6A7LTly+v7PbLCjmEvl1vncK2S6q
+	 7F3N04OsSJ+j9ZhbUt5hquXTOefU9iHyua3Tj9QO/VY6zo4f9syMyVqOOmfJxGS5cr
+	 AEAPCjgwWfE5LFC15KXRGIdTEH0kIFzonHNdVjBg=
+Received: from 7erry.customer.ask4.lan ([31.205.230.119])
+	by newxmesmtplogicsvrszb51-1.qq.com (NewEsmtp) with SMTP
+	id E3295CD7; Sun, 21 Dec 2025 02:56:50 +0800
+X-QQ-mid: xmsmtpt1766257010tgavabu04
+Message-ID: <tencent_03A0A4FC04B804E36C8245084CD6052D8406@qq.com>
+X-QQ-XMAILINFO: NYXSVuwhoxRbzOK1Mb8R/+HEK5SNs2Zb5+ks/01Xa9BhMMa4WvIk3HGkd4sdZB
+	 3+aIrBzQ4hB4UXxzde9OwKBptfHsnueHY1Sy/pvtKDIOBhHFJQNCHopV3ZBwOiSPj9a/Q6iKJeGe
+	 klcFyQD575qPqnkK94YFTT2+JeQh3mnQCgO4XmfzhL9Nepvx/gdZs92Orno7K+aK6tUB7Ep1l/wj
+	 uYhKXK04GCXLVldDPIzeJkAWB3fO8n+ht0r++3x6yLBWlU7YkfCufFcPp/keaF+x1RnvAZS7re5a
+	 CCDLuJJoPcIiyBMU+s+czlRX7n4nkIzb2Q7vV4GC8cinpCqnw8tchbHo8AbTHXQibdqusfMo+HYi
+	 UdFOhT9grNdG2qyjnZK0cT3MEG72NTQeGxaxx+9Gvs04n1ZlvIH/taL5v/KZq3xmVYUdsLYydtoM
+	 MRswJgIFqznfgrpTUFuf7wbTSiki6hraINSvUBhv/NNCFKB1+yIkxgALb0Hx5SxsBBVQB6SyNCoT
+	 RNXiSec0+joJlR0naQBMzal9C+4Ux8UEBw9IdBN3yF2QvGHXqyc/kzwKVztfzBcPZ/pPfO4EJPz6
+	 nw7koN09oZGieZyNLHAvJfkr1w29sfqxDr7EQJcLaWlAVpdBgl7CNWyjLIYtkBGWUaGFivn5Nqv/
+	 tgEWpys5CS+t0+IjxgkBPIVF1Z3Rrsi4iLoTUlFUqk4Q/1p7KiqVpF2cZU3Ifqd8HQPI2YAIr4q+
+	 bYTi5puUUibYm5bRPo3q1G90WDLsd6K0TfLnp++NL8MaG3w1vA5tBmyPO4oJ+A+6WQM+JOr55BpO
+	 7g+UtgLxzxouplqFpp3oDbtKm2j7H8W60DUAKDmv/y/YQF3ZlyiFJ2+aASvqaP9HsiqamV+LSFZ6
+	 5O93lwY/5rT3Y/bJ07/8fuBvEQvyZ1p1kXCVysP463OBaNhpdCAiI9fDu3gcobpxsyzn0y+weOZ2
+	 qrR11rbqZNEOVsZEMaMauIkvpE+B7+Wjdh/chyqF3TxCeWQBsRQBcfTNuPtc78XSvP9Pb3nH2Fx8
+	 WN9Aca3ncBv+xI2hBXVOoAMELjcu9Jmz3oxoZNSp07D9ESjJRMK7288ocapcvt46LQfz+CWQ==
+X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
+From: Jerry Wu <w.7erry@foxmail.com>
+To: vladimir.oltean@nxp.com
+Cc: claudiu.manoil@nxp.com,
+	alexandre.belloni@bootlin.com,
+	UNGLinuxDriver@microchip.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jerry Wu <w.7erry@foxmail.com>
+Subject: [PATCH net v2] net: mscc: ocelot: Fix crash when adding interface under a lag
+Date: Sat, 20 Dec 2025 18:56:34 +0000
+X-OQ-MSGID: <20251220185634.25985-1-w.7erry@foxmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4a682f36-44a0-42c9-a82a-25fed5024cb2@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Sat, Dec 20, 2025 at 10:54:27AM -0700, David Ahern wrote:
-> On 12/20/25 7:57 AM, Tetsuo Handa wrote:
-> > syzbot is reporting refcount leak in "struct nexthop" handling
-> > which manifests as a hung up with below message.
-> > 
-> 
-> ...
-> 
-> > 
-> > Commit ab84be7e54fc ("net: Initial nexthop code") says
-> > 
-> >   Nexthop notifications are sent when a nexthop is added or deleted,
-> >   but NOT if the delete is due to a device event or network namespace
-> >   teardown (which also involves device events).
-> > 
-> > which I guess that it is an intended behavior that
-> > nexthop_notify(RTM_DELNEXTHOP) is not called from remove_nexthop() from
-> > flush_all_nexthops() from nexthop_net_exit_rtnl() from ops_undo_list()
-> >  from cleanup_net() because remove_nexthop() passes nlinfo == NULL.
-> > 
-> > However, like the attached reproducer demonstrates, it is inevitable that
-> > a userspace process terminates and network namespace teardown automatically
-> > happens without explicitly invoking RTM_DELNEXTHOP request. The kernel is
-> > not currently prepared for such scenario. How to fix this problem?
-> > 
-> > Link: https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84
-> 
-> thanks for the report and a reproducer. I am about to go offline for a
-> week, so I will not have time to take a look until the last few days of
-> December. Adding Ido in case he has time between now and then.
+Commit 15faa1f67ab4 ("lan966x: Fix crash when adding interface under a lag")
+fixed a similar issue in the lan966x driver caused by a NULL pointer dereference.
+The ocelot_set_aggr_pgids() function in the ocelot driver has similar logic
+and is susceptible to the same crash.
 
-Thanks for the detailed report. The following is derived from the C
-reproducer and works for me:
+This issue specifically affects the ocelot_vsc7514.c frontend, which leaves
+unused ports as NULL pointers. The felix_vsc9959.c frontend is unaffected as
+it uses the DSA framework which registers all ports.
 
-ip netns add ns1
-ip -n ns1 -6 nexthop add id 1 blackhole
-ip -n ns1 route add blackhole 0.0.0.0/0 nhid 1
-ip netns del ns1
+Fix this by checking if the port pointer is valid before accessing it.
 
-Nexthops are flushed when the network namespace is dismantled, but the
-error route that is using the nexthop does not release its reference
-from the nexthop. Therefore, the nexthop is not deleted and does not
-release the reference from its nexthop device (lo in this case).
+Fixes: 528d3f190c98 ("net: mscc: ocelot: drop the use of the "lags" array")
+Signed-off-by: Jerry Wu <w.7erry@foxmail.com>
+---
+ drivers/net/ethernet/mscc/ocelot.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-The following fixes the issue for me:
-
-diff --git a/net/ipv4/fib_trie.c b/net/ipv4/fib_trie.c
-index 59a6f0a9638f..7e2c17fec3fc 100644
---- a/net/ipv4/fib_trie.c
-+++ b/net/ipv4/fib_trie.c
-@@ -2053,10 +2053,11 @@ int fib_table_flush(struct net *net, struct fib_table *tb, bool flush_all)
- 				continue;
- 			}
+diff --git a/drivers/net/ethernet/mscc/ocelot.c b/drivers/net/ethernet/mscc/ocelot.c
+index 08bee56aea35..6f917fd7af4d 100644
+--- a/drivers/net/ethernet/mscc/ocelot.c
++++ b/drivers/net/ethernet/mscc/ocelot.c
+@@ -2307,14 +2307,16 @@ static void ocelot_set_aggr_pgids(struct ocelot *ocelot)
  
--			/* Do not flush error routes if network namespace is
--			 * not being dismantled
-+			/* When not flushing the entire table, skip error
-+			 * routes that are not marked for deletion.
- 			 */
--			if (!flush_all && fib_props[fa->fa_type].error) {
-+			if (!flush_all && fib_props[fa->fa_type].error &&
-+			    !(fi->fib_flags & RTNH_F_DEAD)) {
- 				slen = fa->fa_slen;
- 				continue;
- 			}
+ 	/* Now, set PGIDs for each active LAG */
+ 	for (lag = 0; lag < ocelot->num_phys_ports; lag++) {
+-		struct net_device *bond = ocelot->ports[lag]->bond;
++		struct ocelot_port *ocelot_port = ocelot->ports[lag];
+ 		int num_active_ports = 0;
++		struct net_device *bond;
+ 		unsigned long bond_mask;
+ 		u8 aggr_idx[16];
+ 
+-		if (!bond || (visited & BIT(lag)))
++		if (!port || !port->bond || (visited & BIT(lag)))
+ 			continue;
+ 
++		bond = port->bond;
+ 		bond_mask = ocelot_get_bond_mask(ocelot, bond);
+ 
+ 		for_each_set_bit(port, &bond_mask, ocelot->num_phys_ports) {
+-- 
+2.52.0
 
-Will post it later this week assuming I don't find problems with it.
 
