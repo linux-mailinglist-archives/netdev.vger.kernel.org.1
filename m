@@ -1,266 +1,179 @@
-Return-Path: <netdev+bounces-245565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FABFCD2484
-	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 01:58:34 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 237FBCD24CD
+	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 02:13:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 39FE83011EED
-	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 00:58:33 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 212E830146D6
+	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 01:13:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBB8523ABBF;
-	Sat, 20 Dec 2025 00:58:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 644F425487B;
+	Sat, 20 Dec 2025 01:13:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BGDJHXsm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f79.google.com (mail-oo1-f79.google.com [209.85.161.79])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFA04239E80
-	for <netdev@vger.kernel.org>; Sat, 20 Dec 2025 00:58:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 704B9202F9C
+	for <netdev@vger.kernel.org>; Sat, 20 Dec 2025 01:13:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766192311; cv=none; b=GdtB5QMW1Z3KM1VYBEznHznkkHKL5mYAPCdi4xQ+SraO1RhIR9shCaWF1KrPrwAAJ+46Mxb7WRokuWLDoEVovWriRt0pb23yn8+bSscVYqqo4jOW1ha65njP/XY+CtowT1I1EQY4QJcDNV8wBK6ZhKR7NkXNW6BmuXFcLHpRe7k=
+	t=1766193182; cv=none; b=ImOOpCgG/ixLm0lPMb936x3FogZUKC6lSt3V6Gc0wqSic0ltP4VykddTzc4hJjVNdzV5cz8sRU5p3GQcj3VoK3+bTA1ESkt+79g3W43T+E02nwsCD7Fst6nYTPoAL4vG73iOl7NVDkrjapJhITUT8Tx33uQugrbUpzIV4KkEYDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766192311; c=relaxed/simple;
-	bh=76RkY53A53TE5vjruyOQ+9fxoxR/g3EA2S0do+GOSEM=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=VK2qRtQaeV95HVOx3fFOXXmF9bUQn71q2EqEFXD33qFJepvyQychsSaBgvflKoipL7AvQJAvq7/Ws/e08Wbvpf1G0REmrznDJ+r+qJGlzNlWkfH1agUYLywo5efZaDnaMg1LP9C69db/z61c4+BpeoW7aNHCbQpbepej06jWkRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f79.google.com with SMTP id 006d021491bc7-656c35cd5b4so1499268eaf.0
-        for <netdev@vger.kernel.org>; Fri, 19 Dec 2025 16:58:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766192309; x=1766797109;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WwApJ4ymW9qNlyX/ux7Ad8vgCZzQe62XlTOBLNe3WJU=;
-        b=UvsPDWwrKmiNvRWUc3ntnTNLJKBGlx3KDSTXos+6VSHMdgS8TUKrW8SWVIRdI4dXto
-         8VVqMh0FyeVF0e7nCEULQbN9KpCSuQxyNTFG//3gpKnqEcslmyU+pu13UEdIQxt0gMWR
-         K6NHPBychyGb6++lKfNsIjC2PVpssNQnDubYan8l+lFJ1/Cj7P4l7NmWtySFyVmeqY3K
-         B01UYZohSzSXaPbNwcQwPcAmqC3/NkMAGlqyfu4zwzPCpAyVeWx+mOMD6iKhCzeByZzu
-         aKVnt4nI+Ikc3HbUMAFYxFYJX7lAy92Y4mILxATTndfZ5pDFxBZRV9a7IGmAXTQU2ZbM
-         1XbA==
-X-Forwarded-Encrypted: i=1; AJvYcCUkeqmvr7UmSjsFyVO63twx5BhXHn3QyFqFtUmM71Lv6GGkn8mkqNeIbjoQTlom4Do7p/xA/18=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzAiyUhyO7EfPEbEbJIoWF/XQVk1LevtNPhTOP330OAoF1nTyls
-	po7otQO72PHfPn0IB2r0RRQHfzuVgv7OWisfhe5TWducKvw5TVzlhcRZ+t1lvzWFPr/BK5JYNqg
-	LxYD4U+ENsREUUjqI+40RxERSDXpIA+fBfMsowgq6fmhJ7wqCdBjZoaG8DZ8=
-X-Google-Smtp-Source: AGHT+IH8z1xizs4/DgR2IxHVW2LrMd5szXgAdwV5XL5euymH4jWKMKV+aCIvYtTvLOOuayuVfcBFOkKm2lJ4xW/Uj4mdduejdkIc
+	s=arc-20240116; t=1766193182; c=relaxed/simple;
+	bh=bcM5Uxjsmcm1Jd6vgHbr0jpv+c+NE27oaULZHHa3psk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jbZU0wXxmD0595vZmynwNv/3N1k9IDGII7A+NHh6zzLstFpIJ6RR5oS8wk8AE31ldDLERCHYdLazJY6u21wO0Za2vlM+BGPzSihJMeTM0p5yzyu0GJdxMS+3fMaj2XqpcqFF3IybJthIjRwKpm8D8E+sUXmpGc+djfXmcG/7nVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BGDJHXsm; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1766193178;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bcM5Uxjsmcm1Jd6vgHbr0jpv+c+NE27oaULZHHa3psk=;
+	b=BGDJHXsm5+8Pho9Qno6FGfschMqUt6W9L7KFUVGxNoz8LcNLRqGdZIDLGmZz0mW0Q4FhTd
+	3yfyLEREXoLmTmfVDS9xEJ+vdymf5hKxLItVqlT+vqBbPzHJ+43C9x0YVDUdk3tLAQDpCz
+	d4B1zpNmjNcmRteOnc0/5StEgMoWyxU=
+From: Menglong Dong <menglong.dong@linux.dev>
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: Menglong Dong <menglong8.dong@gmail.com>, ast@kernel.org,
+ andrii@kernel.org, davem@davemloft.net, dsahern@kernel.org,
+ daniel@iogearbox.net, martin.lau@linux.dev, eddyz87@gmail.com,
+ song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com,
+ kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org,
+ tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH bpf-next v4 0/9] bpf: tracing session supporting
+Date: Sat, 20 Dec 2025 09:12:37 +0800
+Message-ID: <2393471.ElGaqSPkdT@7950hx>
+In-Reply-To:
+ <CAEf4BzYm3=zzmCRg3zr1F99sBkxEZ_pDgjtKMBurb9LGu6JJKQ@mail.gmail.com>
+References:
+ <20251217095445.218428-1-dongml2@chinatelecom.cn> <1943128.tdWV9SEqCh@7940hx>
+ <CAEf4BzYm3=zzmCRg3zr1F99sBkxEZ_pDgjtKMBurb9LGu6JJKQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a4a:e602:0:b0:65d:bee:4c7 with SMTP id 006d021491bc7-65d0eb1f940mr1539827eaf.42.1766192308685;
- Fri, 19 Dec 2025 16:58:28 -0800 (PST)
-Date: Fri, 19 Dec 2025 16:58:28 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6945f4b4.a70a0220.207337.0121.GAE@google.com>
-Subject: [syzbot] [netfilter?] possible deadlock in nf_tables_dumpreset_obj
-From: syzbot <syzbot+ff16b505ec9152e5f448@syzkaller.appspotmail.com>
-To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
-	fw@strlen.de, horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
-	phil@nwl.cc, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-Migadu-Flow: FLOW_OUT
 
-Hello,
+On 2025/12/20 00:55, Andrii Nakryiko wrote:
+> On Thu, Dec 18, 2025 at 5:18=E2=80=AFPM Menglong Dong <menglong.dong@linu=
+x.dev> wrote:
+> >
+> > On 2025/12/19 08:55 Andrii Nakryiko <andrii.nakryiko@gmail.com> write:
+> > > On Wed, Dec 17, 2025 at 1:54=E2=80=AFAM Menglong Dong <menglong8.dong=
+@gmail.com> wrote:
+> > > >
+> > > > Hi, all.
+> > > >
+> > > > In this version, I combined Alexei and Andrii's advice, which makes=
+ the
+> > > > architecture specific code much simpler.
+> > > >
+> > > > Sometimes, we need to hook both the entry and exit of a function wi=
+th
+> > > > TRACING. Therefore, we need define a FENTRY and a FEXIT for the tar=
+get
+> > > > function, which is not convenient.
+> > > >
+> > > > Therefore, we add a tracing session support for TRACING. Generally
+> > > > speaking, it's similar to kprobe session, which can hook both the e=
+ntry
+> > > > and exit of a function with a single BPF program. Session cookie is=
+ also
+> > > > supported with the kfunc bpf_fsession_cookie(). In order to limit t=
+he
+> > > > stack usage, we limit the maximum number of cookies to 4.
+> > > >
+> > > > The kfunc bpf_fsession_is_return() and bpf_fsession_cookie() are bo=
+th
+> > > > inlined in the verifier.
+> > >
+> > > We have generic bpf_session_is_return() and bpf_session_cookie() (that
+> > > currently works for ksession), can't you just implement them for the
+> > > newly added program type instead of adding type-specific kfuncs?
+> >
+> > Hi, Andrii. I tried and found that it's a little hard to reuse them. The
+> > bpf_session_is_return() and bpf_session_cookie() are defined as kfunc, =
+which
+> > makes we can't implement different functions for different attach type,=
+ like
+> > what bpf helper does.
+>=20
+> Are you sure? We certainly support kfunc implementation specialization
+> for sleepable vs non-sleepable BPF programs. Check specialize_kfunc()
+> in verifier.c
 
-syzbot found the following issue on:
+Ah, I remember it now. We do can use different kfunc version
+for different case in specialize_kfunc().
 
-HEAD commit:    8f0b4cce4481 Linux 6.19-rc1
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=104f2d92580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a11e0f726bfb6765
-dashboard link: https://syzkaller.appspot.com/bug?extid=ff16b505ec9152e5f448
-compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+>=20
+> >
+> > The way we store "is_return" and "cookie" in fsession is different with
+> > ksession. For ksession, it store the "is_return" in struct bpf_session_=
+run_ctx.
+> > Even if we move the "nr_regs" from stack to struct bpf_tramp_run_ctx,
+> > it's still hard to reuse the bpf_session_is_return() or bpf_session_coo=
+kie(),
+> > as the way of storing the "is_return" and "cookie" in fsession and kses=
+sion
+> > is different, and it's a little difficult and complex to unify them.
+>=20
+> I'm not saying we should unify the implementation, you have to
+> implement different version of logically the same kfunc, of course.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+I see. The problem now is that the prototype of bpf_session_cookie()
+or bpf_session_is_return() don't satisfy our need. For bpf_session_cookie(),
+we at least need the context to be the argument. However, both
+of them don't have any function argument. After all, the prototype of
+different version of logically the same kfunc should be the same.
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-8f0b4cce.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/64c9a36f3f29/vmlinux-8f0b4cce.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/27a5e8a8a4b8/bzImage-8f0b4cce.xz
+I think it's not a good idea to modify the prototype of existing kfunc,
+can we?
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+ff16b505ec9152e5f448@syzkaller.appspotmail.com
+>=20
+> >
+> > What's more, we will lose the advantage of inline bpf_fsession_is_return
+> > and bpf_fsession_cookie in verifier.
+> >
+>=20
+> I'd double check that either. BPF verifier and JIT do know program
+> type, so you can pick how to inline
+> bpf_session_is_return()/bpf_session_cookie() based on that.
 
-======================================================
-WARNING: possible circular locking dependency detected
-syzkaller #0 Not tainted
-------------------------------------------------------
-syz.3.970/9330 is trying to acquire lock:
-ffff888012d4ccd8 (&nft_net->commit_mutex){+.+.}-{4:4}, at: nf_tables_dumpreset_obj+0x6f/0xa0 net/netfilter/nf_tables_api.c:8491
+Yeah, we can inline it depend on the program type if we can solve
+the prototype problem.
 
-but task is already holding lock:
-ffff88802bce36f0 (nlk_cb_mutex-NETFILTER){+.+.}-{4:4}, at: __netlink_dump_start+0x150/0x990 net/netlink/af_netlink.c:2404
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #2 (nlk_cb_mutex-NETFILTER){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/mutex.c:614 [inline]
-       __mutex_lock+0x1aa/0x1ca0 kernel/locking/mutex.c:776
-       __netlink_dump_start+0x150/0x990 net/netlink/af_netlink.c:2404
-       netlink_dump_start include/linux/netlink.h:341 [inline]
-       ip_set_dump+0x17f/0x210 net/netfilter/ipset/ip_set_core.c:1717
-       nfnetlink_rcv_msg+0x9fc/0x1200 net/netfilter/nfnetlink.c:302
-       netlink_rcv_skb+0x158/0x420 net/netlink/af_netlink.c:2550
-       nfnetlink_rcv+0x1b3/0x430 net/netfilter/nfnetlink.c:669
-       netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
-       netlink_unicast+0x5aa/0x870 net/netlink/af_netlink.c:1344
-       netlink_sendmsg+0x8c8/0xdd0 net/netlink/af_netlink.c:1894
-       sock_sendmsg_nosec net/socket.c:727 [inline]
-       __sock_sendmsg net/socket.c:742 [inline]
-       ____sys_sendmsg+0xa5d/0xc30 net/socket.c:2592
-       ___sys_sendmsg+0x134/0x1d0 net/socket.c:2646
-       __sys_sendmsg+0x16d/0x220 net/socket.c:2678
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0xcd/0xf80 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #1 (nfnl_subsys_ipset){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/mutex.c:614 [inline]
-       __mutex_lock+0x1aa/0x1ca0 kernel/locking/mutex.c:776
-       ip_set_nfnl_get_byindex+0x7c/0x290 net/netfilter/ipset/ip_set_core.c:909
-       set_target_v1_checkentry+0x1ac/0x570 net/netfilter/xt_set.c:313
-       xt_check_target+0x27c/0xa40 net/netfilter/x_tables.c:1038
-       nft_target_init+0x459/0x7d0 net/netfilter/nft_compat.c:267
-       nf_tables_newexpr net/netfilter/nf_tables_api.c:3527 [inline]
-       nf_tables_newrule+0xedd/0x2910 net/netfilter/nf_tables_api.c:4358
-       nfnetlink_rcv_batch+0x190d/0x2350 net/netfilter/nfnetlink.c:526
-       nfnetlink_rcv_skb_batch net/netfilter/nfnetlink.c:649 [inline]
-       nfnetlink_rcv+0x3c1/0x430 net/netfilter/nfnetlink.c:667
-       netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
-       netlink_unicast+0x5aa/0x870 net/netlink/af_netlink.c:1344
-       netlink_sendmsg+0x8c8/0xdd0 net/netlink/af_netlink.c:1894
-       sock_sendmsg_nosec net/socket.c:727 [inline]
-       __sock_sendmsg net/socket.c:742 [inline]
-       ____sys_sendmsg+0xa5d/0xc30 net/socket.c:2592
-       ___sys_sendmsg+0x134/0x1d0 net/socket.c:2646
-       __sys_sendmsg+0x16d/0x220 net/socket.c:2678
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0xcd/0xf80 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #0 (&nft_net->commit_mutex){+.+.}-{4:4}:
-       check_prev_add kernel/locking/lockdep.c:3165 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3284 [inline]
-       validate_chain kernel/locking/lockdep.c:3908 [inline]
-       __lock_acquire+0x1669/0x2890 kernel/locking/lockdep.c:5237
-       lock_acquire kernel/locking/lockdep.c:5868 [inline]
-       lock_acquire+0x179/0x330 kernel/locking/lockdep.c:5825
-       __mutex_lock_common kernel/locking/mutex.c:614 [inline]
-       __mutex_lock+0x1aa/0x1ca0 kernel/locking/mutex.c:776
-       nf_tables_dumpreset_obj+0x6f/0xa0 net/netfilter/nf_tables_api.c:8491
-       netlink_dump+0x539/0xd30 net/netlink/af_netlink.c:2325
-       __netlink_dump_start+0x6d6/0x990 net/netlink/af_netlink.c:2440
-       netlink_dump_start include/linux/netlink.h:341 [inline]
-       nft_netlink_dump_start_rcu+0x81/0x1f0 net/netfilter/nf_tables_api.c:1286
-       nf_tables_getobj_reset+0x56b/0x6b0 net/netfilter/nf_tables_api.c:8626
-       nfnetlink_rcv_msg+0x583/0x1200 net/netfilter/nfnetlink.c:290
-       netlink_rcv_skb+0x158/0x420 net/netlink/af_netlink.c:2550
-       nfnetlink_rcv+0x1b3/0x430 net/netfilter/nfnetlink.c:669
-       netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
-       netlink_unicast+0x5aa/0x870 net/netlink/af_netlink.c:1344
-       netlink_sendmsg+0x8c8/0xdd0 net/netlink/af_netlink.c:1894
-       sock_sendmsg_nosec net/socket.c:727 [inline]
-       __sock_sendmsg net/socket.c:742 [inline]
-       ____sys_sendmsg+0xa5d/0xc30 net/socket.c:2592
-       ___sys_sendmsg+0x134/0x1d0 net/socket.c:2646
-       __sys_sendmsg+0x16d/0x220 net/socket.c:2678
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0xcd/0xf80 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
-Chain exists of:
-  &nft_net->commit_mutex --> nfnl_subsys_ipset --> nlk_cb_mutex-NETFILTER
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(nlk_cb_mutex-NETFILTER);
-                               lock(nfnl_subsys_ipset);
-                               lock(nlk_cb_mutex-NETFILTER);
-  lock(&nft_net->commit_mutex);
-
- *** DEADLOCK ***
-
-1 lock held by syz.3.970/9330:
- #0: ffff88802bce36f0 (nlk_cb_mutex-NETFILTER){+.+.}-{4:4}, at: __netlink_dump_start+0x150/0x990 net/netlink/af_netlink.c:2404
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 9330 Comm: syz.3.970 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
- print_circular_bug+0x275/0x340 kernel/locking/lockdep.c:2043
- check_noncircular+0x146/0x160 kernel/locking/lockdep.c:2175
- check_prev_add kernel/locking/lockdep.c:3165 [inline]
- check_prevs_add kernel/locking/lockdep.c:3284 [inline]
- validate_chain kernel/locking/lockdep.c:3908 [inline]
- __lock_acquire+0x1669/0x2890 kernel/locking/lockdep.c:5237
- lock_acquire kernel/locking/lockdep.c:5868 [inline]
- lock_acquire+0x179/0x330 kernel/locking/lockdep.c:5825
- __mutex_lock_common kernel/locking/mutex.c:614 [inline]
- __mutex_lock+0x1aa/0x1ca0 kernel/locking/mutex.c:776
- nf_tables_dumpreset_obj+0x6f/0xa0 net/netfilter/nf_tables_api.c:8491
- netlink_dump+0x539/0xd30 net/netlink/af_netlink.c:2325
- __netlink_dump_start+0x6d6/0x990 net/netlink/af_netlink.c:2440
- netlink_dump_start include/linux/netlink.h:341 [inline]
- nft_netlink_dump_start_rcu+0x81/0x1f0 net/netfilter/nf_tables_api.c:1286
- nf_tables_getobj_reset+0x56b/0x6b0 net/netfilter/nf_tables_api.c:8626
- nfnetlink_rcv_msg+0x583/0x1200 net/netfilter/nfnetlink.c:290
- netlink_rcv_skb+0x158/0x420 net/netlink/af_netlink.c:2550
- nfnetlink_rcv+0x1b3/0x430 net/netfilter/nfnetlink.c:669
- netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
- netlink_unicast+0x5aa/0x870 net/netlink/af_netlink.c:1344
- netlink_sendmsg+0x8c8/0xdd0 net/netlink/af_netlink.c:1894
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg net/socket.c:742 [inline]
- ____sys_sendmsg+0xa5d/0xc30 net/socket.c:2592
- ___sys_sendmsg+0x134/0x1d0 net/socket.c:2646
- __sys_sendmsg+0x16d/0x220 net/socket.c:2678
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xcd/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fb7e7b8f7c9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fb7e8a9c038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fb7e7de5fa0 RCX: 00007fb7e7b8f7c9
-RDX: 0000000004004004 RSI: 0000200000000140 RDI: 0000000000000003
-RBP: 00007fb7e7c13f91 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fb7e7de6038 R14: 00007fb7e7de5fa0 R15: 00007fffe518fab8
- </TASK>
+Thanks!
+Menglong Dong
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+>=20
+> > I'll check more to see if there is a more simple way to reuse them.
+> >
+> > Thanks!
+> > Menglong Dong
+> >
+> > >
+[...]
+> >
+> >
+> >
+> >
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
