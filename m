@@ -1,233 +1,112 @@
-Return-Path: <netdev+bounces-245572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40ED4CD284D
-	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 07:00:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E199ACD2B17
+	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 09:48:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 81DB030184ED
-	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 06:00:55 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 129433011774
+	for <lists+netdev@lfdr.de>; Sat, 20 Dec 2025 08:48:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F0AC18DF80;
-	Sat, 20 Dec 2025 06:00:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD67E2DFF28;
+	Sat, 20 Dec 2025 08:48:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pZK2YNnU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D57D17D6;
-	Sat, 20 Dec 2025 06:00:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 728E123313E;
+	Sat, 20 Dec 2025 08:48:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766210454; cv=none; b=D4PIrmQcDzEWYuyUhfdQlPI6wGl1dBH84lOI72W66B0ymnz/zQFZscljMbzNrvefM3DseI3Bz9G/j77LgynDr7chnaXKTiqp9q7HJwt72RRwR27twWBTG5xuV9N62nA//1hYbjFQ4k2eW/eEFduGjn1hvoKxH+fkxG+MpJnH4eY=
+	t=1766220495; cv=none; b=tTTDsK153RwctMvpkezVEsfeO/2JeXfMY2DlHM1omAAbD2P94KcqDlWnEfgJpc8vElbDZROhFlqpfFF8/H5cvu2su2tylBpjEu8v3fDrkBHTtSn22PwkWszP1+T1m1zWRY6JoPCPmlgFyrp0UL6QJ74B+bIO/P2iwV8TkSo4GB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766210454; c=relaxed/simple;
-	bh=JMYAGsDtRqFpoUc68os4/2Iiud/e7rP8txG3URKFb7M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mtN5bW8uS3fR1qe3cVw4IHVG7zi7vQbTxIJ8yHPeL59WPx0hZzFeCLrtDl+hyUiNNVxaYzrqESkgkeQt3XJ87FBMqEnooHWVd0I2V6AhHSF7/0p1UXgDaCoM5fa/Q8AggG2nfPkWxqmLwBoFKmow9SRmqMGrIG8jz0/p1YxQQWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [172.16.11.154] (i68975BB5.versanet.de [104.151.91.181])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id AD54761E64851;
-	Sat, 20 Dec 2025 06:59:37 +0100 (CET)
-Message-ID: <ae8fce57-ffbd-4a10-b57b-9dd49ae3b091@molgen.mpg.de>
-Date: Sat, 20 Dec 2025 06:59:35 +0100
+	s=arc-20240116; t=1766220495; c=relaxed/simple;
+	bh=18qrj7yg+u8XLv0nD5iwxa5zywxEGxn2/r6db/iLYss=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PZvAtRqwoESYkur7MGEv7+7bZBCIupIbqldYgt5SWlEmNOJWk4eDaK1q6REarD+lPZkvdG6WreHwK/e4S4ralTs8JWX/adfzhi4qFX9UyRIw34dgihrEM9YnSuuxYUQf6ffcNT8Mq294U2rn3elRzFKs0Rr9wFC5VourGNpgj/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pZK2YNnU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0A18C4CEF5;
+	Sat, 20 Dec 2025 08:48:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766220494;
+	bh=18qrj7yg+u8XLv0nD5iwxa5zywxEGxn2/r6db/iLYss=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pZK2YNnUaWn4dEJxlhskLRLooxac+p0uhMtIX0u2IGB063em/I4qic9nj32KHxwYL
+	 n5H3ygVyfsMxF9JRjGM+zodtf9rMgT+ZFL4RHvhVY13VjQHFIw6gTSyAVYr2daGPwO
+	 JYpspcMQNs4Ccd0CuHbSt/ZtE3GdkZznCBxqkBkeMixJ7FcnFzbip/QBzBGpI128Ir
+	 PnO+ummT309J/jMPFiP3tsJY+qOxsIutRgvo4QFcYXjgqX8MVPftY+uBXX8zkyxqCU
+	 ep57SFzIbCJ5R+HBRH0+YFl7OVfA9YXDW/Sc7HVSAHgRfZpvFrrz/hev/mku3UM3n7
+	 ftJPGM6g+0R5w==
+Date: Sat, 20 Dec 2025 09:48:10 +0100
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Cc: Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Richard Cochran <richardcochran@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Vinod Koul <vkoul@kernel.org>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, Chen-Yu Tsai <wens@kernel.org>, 
+	Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>, 
+	Matthew Gerlach <matthew.gerlach@altera.com>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	Kevin Hilman <khilman@baylibre.com>, Jerome Brunet <jbrunet@baylibre.com>, 
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>, Keguang Zhang <keguang.zhang@gmail.com>, 
+	Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, 
+	Pengutronix Kernel Team <kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>, 
+	Jan Petrous <jan.petrous@oss.nxp.com>, s32@nxp.com, Romain Gantois <romain.gantois@bootlin.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>, Heiko Stuebner <heiko@sntech.de>, 
+	Chen Wang <unicorn_wang@outlook.com>, Inochi Amaoto <inochiama@gmail.com>, 
+	Emil Renner Berthing <kernel@esmil.dk>, Minda Chen <minda.chen@starfivetech.com>, 
+	Drew Fustini <fustini@kernel.org>, Guo Ren <guoren@kernel.org>, Fu Wei <wefu@redhat.com>, 
+	Nobuhiro Iwamatsu <nobuhiro.iwamatsu.x90@mail.toshiba>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Magnus Damm <magnus.damm@gmail.com>, Maxime Ripard <mripard@kernel.org>, 
+	Shuang Liang <liangshuang@eswincomputing.com>, Zhi Li <lizhi2@eswincomputing.com>, 
+	Shangjuan Wei <weishangjuan@eswincomputing.com>, "G. Jaya Kumaran" <vineetha.g.jaya.kumaran@intel.com>, 
+	Clark Wang <xiaoning.wang@nxp.com>, Linux Team <linux-imx@nxp.com>, Frank Li <Frank.Li@nxp.com>, 
+	David Wu <david.wu@rock-chips.com>, Samin Guo <samin.guo@starfivetech.com>, 
+	Christophe Roullier <christophe.roullier@foss.st.com>, Swathi K S <swathi.ks@samsung.com>, 
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, Drew Fustini <dfustini@tenstorrent.com>, 
+	linux-sunxi@lists.linux.dev, linux-amlogic@lists.infradead.org, linux-mips@vger.kernel.org, 
+	imx@lists.linux.dev, linux-renesas-soc@vger.kernel.org, 
+	linux-rockchip@lists.infradead.org, sophgo@lists.linux.dev, linux-riscv@lists.infradead.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH v6 1/7] dt-bindings: net: qcom: document the ethqos
+ device for SCMI-based systems
+Message-ID: <20251220-spiritual-barracuda-of-champagne-34eb91@quoll>
+References: <20251219-qcom-sa8255p-emac-v6-0-487f1082461e@oss.qualcomm.com>
+ <20251219-qcom-sa8255p-emac-v6-1-487f1082461e@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH net-next v3] idpf: export RX hardware
- timestamping information to XDP
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, YiFei Zhu <zhuyifei@google.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Richard Cochran <richardcochran@gmail.com>,
- intel-wired-lan@lists.osuosl.org,
- Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-References: <20251219202957.2309698-1-almasrymina@google.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20251219202957.2309698-1-almasrymina@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20251219-qcom-sa8255p-emac-v6-1-487f1082461e@oss.qualcomm.com>
 
-Dear Mina,
-
-
-Thank you for the patch.
-
-Am 19.12.25 um 21:29 schrieb Mina Almasry via Intel-wired-lan:
-> From: YiFei Zhu <zhuyifei@google.com>
+On Fri, Dec 19, 2025 at 12:42:16PM +0100, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > 
-> The logic is similar to idpf_rx_hwtstamp, but the data is exported
-> as a BPF kfunc instead of appended to an skb.
-
-Could you add the reason, why it’s done this way?
-
-> A idpf_queue_has(PTP, rxq) condition is added to check the queue
-> supports PTP similar to idpf_rx_process_skb_fields.
-
-It’d be great if you added test information.
-
-> Cc: intel-wired-lan@lists.osuosl.org
+> Describe the firmware-managed variant of the QCom DesignWare MAC. As the
+> properties here differ a lot from the HLOS-managed variant, lets put it
+> in a separate file. Since we need to update the maximum number of power
+> domains, let's update existing bindings referencing the top-level
+> snps,dwmac.yaml and limit their maxItems for power-domains to 1.
 > 
-
-Remove the blank line.
-
-> Signed-off-by: YiFei Zhu <zhuyifei@google.com>
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
-> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> 
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
 > ---
-> 
-> v3: https://lore.kernel.org/netdev/20251218022948.3288897-1-almasrymina@google.com/
-> - Do the idpf_queue_has(PTP) check before we read qw1 (lobakin)
-> - Fix _qw1 not copying over ts_low on on !__LIBETH_WORD_ACCESS systems
->    (AI)
-> 
-> v2: https://lore.kernel.org/netdev/20251122140839.3922015-1-almasrymina@google.com/
-> - Fixed alphabetical ordering
-> - Use the xdp desc type instead of virtchnl one (required some added
->    helpers)
-> 
-> ---
->   drivers/net/ethernet/intel/idpf/xdp.c | 31 +++++++++++++++++++++++++++
->   drivers/net/ethernet/intel/idpf/xdp.h | 22 ++++++++++++++++++-
->   2 files changed, 52 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/idpf/xdp.c b/drivers/net/ethernet/intel/idpf/xdp.c
-> index 958d16f87424..0916d201bf98 100644
-> --- a/drivers/net/ethernet/intel/idpf/xdp.c
-> +++ b/drivers/net/ethernet/intel/idpf/xdp.c
-> @@ -2,6 +2,7 @@
->   /* Copyright (C) 2025 Intel Corporation */
->   
->   #include "idpf.h"
-> +#include "idpf_ptp.h"
->   #include "idpf_virtchnl.h"
->   #include "xdp.h"
->   #include "xsk.h"
-> @@ -391,8 +392,38 @@ static int idpf_xdpmo_rx_hash(const struct xdp_md *ctx, u32 *hash,
->   				    pt);
->   }
->   
-> +static int idpf_xdpmo_rx_timestamp(const struct xdp_md *ctx, u64 *timestamp)
-> +{
-> +	const struct libeth_xdp_buff *xdp = (typeof(xdp))ctx;
-> +	struct idpf_xdp_rx_desc desc __uninitialized;
-> +	const struct idpf_rx_queue *rxq;
-> +	u64 cached_time, ts_ns;
-> +	u32 ts_high;
-> +
-> +	rxq = libeth_xdp_buff_to_rq(xdp, typeof(*rxq), xdp_rxq);
-> +
-> +	if (!idpf_queue_has(PTP, rxq))
-> +		return -ENODATA;
-> +
-> +	idpf_xdp_get_qw1(&desc, xdp->desc);
-> +
-> +	if (!(idpf_xdp_rx_ts_low(&desc) & VIRTCHNL2_RX_FLEX_TSTAMP_VALID))
-> +		return -ENODATA;
-> +
-> +	cached_time = READ_ONCE(rxq->cached_phc_time);
-> +
-> +	idpf_xdp_get_qw3(&desc, xdp->desc);
-> +
-> +	ts_high = idpf_xdp_rx_ts_high(&desc);
-> +	ts_ns = idpf_ptp_tstamp_extend_32b_to_64b(cached_time, ts_high);
-> +
-> +	*timestamp = ts_ns;
-> +	return 0;
-> +}
-> +
->   static const struct xdp_metadata_ops idpf_xdpmo = {
->   	.xmo_rx_hash		= idpf_xdpmo_rx_hash,
-> +	.xmo_rx_timestamp	= idpf_xdpmo_rx_timestamp,
->   };
->   
->   void idpf_xdp_set_features(const struct idpf_vport *vport)
-> diff --git a/drivers/net/ethernet/intel/idpf/xdp.h b/drivers/net/ethernet/intel/idpf/xdp.h
-> index 479f5ef3c604..9daae445bde4 100644
-> --- a/drivers/net/ethernet/intel/idpf/xdp.h
-> +++ b/drivers/net/ethernet/intel/idpf/xdp.h
-> @@ -112,11 +112,13 @@ struct idpf_xdp_rx_desc {
->   	aligned_u64		qw1;
->   #define IDPF_XDP_RX_BUF		GENMASK_ULL(47, 32)
->   #define IDPF_XDP_RX_EOP		BIT_ULL(1)
-> +#define IDPF_XDP_RX_TS_LOW	GENMASK_ULL(31, 24)
->   
->   	aligned_u64		qw2;
->   #define IDPF_XDP_RX_HASH	GENMASK_ULL(31, 0)
->   
->   	aligned_u64		qw3;
-> +#define IDPF_XDP_RX_TS_HIGH	GENMASK_ULL(63, 32)
->   } __aligned(4 * sizeof(u64));
->   static_assert(sizeof(struct idpf_xdp_rx_desc) ==
->   	      sizeof(struct virtchnl2_rx_flex_desc_adv_nic_3));
-> @@ -128,6 +130,8 @@ static_assert(sizeof(struct idpf_xdp_rx_desc) ==
->   #define idpf_xdp_rx_buf(desc)	FIELD_GET(IDPF_XDP_RX_BUF, (desc)->qw1)
->   #define idpf_xdp_rx_eop(desc)	!!((desc)->qw1 & IDPF_XDP_RX_EOP)
->   #define idpf_xdp_rx_hash(desc)	FIELD_GET(IDPF_XDP_RX_HASH, (desc)->qw2)
-> +#define idpf_xdp_rx_ts_low(desc)	FIELD_GET(IDPF_XDP_RX_TS_LOW, (desc)->qw1)
-> +#define idpf_xdp_rx_ts_high(desc)	FIELD_GET(IDPF_XDP_RX_TS_HIGH, (desc)->qw3)
->   
->   static inline void
->   idpf_xdp_get_qw0(struct idpf_xdp_rx_desc *desc,
-> @@ -149,7 +153,10 @@ idpf_xdp_get_qw1(struct idpf_xdp_rx_desc *desc,
->   	desc->qw1 = ((const typeof(desc))rxd)->qw1;
->   #else
->   	desc->qw1 = ((u64)le16_to_cpu(rxd->buf_id) << 32) |
-> -		    rxd->status_err0_qw1;
-> +			((u64)rxd->ts_low << 24) |
-> +			((u64)rxd->fflags1 << 16) |
-> +			((u64)rxd->status_err1 << 8) |
-> +			rxd->status_err0_qw1;
->   #endif
->   }
->   
-> @@ -166,6 +173,19 @@ idpf_xdp_get_qw2(struct idpf_xdp_rx_desc *desc,
->   #endif
->   }
->   
-> +static inline void
-> +idpf_xdp_get_qw3(struct idpf_xdp_rx_desc *desc,
-> +		 const struct virtchnl2_rx_flex_desc_adv_nic_3 *rxd)
-> +{
-> +#ifdef __LIBETH_WORD_ACCESS
-> +	desc->qw3 = ((const typeof(desc))rxd)->qw3;
-> +#else
-> +	desc->qw3 = ((u64)le32_to_cpu(rxd->ts_high) << 32) |
-> +		    ((u64)le16_to_cpu(rxd->fmd6) << 16) |
-> +		    le16_to_cpu(rxd->l2tag1);
-> +#endif
-> +}
-> +
->   void idpf_xdp_set_features(const struct idpf_vport *vport);
->   
->   int idpf_xdp(struct net_device *dev, struct netdev_bpf *xdp);
-The diff looks fine.
 
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@oss.qualcomm.com>
 
+Best regards,
+Krzysztof
 
-Kind regards,
-
-Paul
 
