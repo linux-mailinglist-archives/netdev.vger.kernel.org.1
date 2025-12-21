@@ -1,184 +1,426 @@
-Return-Path: <netdev+bounces-245648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7641CD437F
-	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 18:51:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68892CD43F2
+	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 19:33:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9584530006EE
-	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 17:51:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CF51530062DF
+	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 18:33:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69F632F7ACA;
-	Sun, 21 Dec 2025 17:51:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CBA6283FC9;
+	Sun, 21 Dec 2025 18:33:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J0dLjUEW"
+	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="n8kBLuNL";
+	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="P0ZaMWnv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 983EF209F5A
-	for <netdev@vger.kernel.org>; Sun, 21 Dec 2025 17:50:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766339460; cv=none; b=NFCy7NQl/Eziy05bMvqeEQgoWNT64ECs9D0NBghapgcpMGkU2sSaSwKkWTI2HGBg5LmltEbRA7ubR2a88G6B/khulJZxMtMn7+WOoQ8HhMAHf9hMfa9I/E6ufs7Ll4cyMEwekbpLfSliPdZZj3ywOV0eZOr97AX/9nLVbvBBDU8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766339460; c=relaxed/simple;
-	bh=epSW5plZjS8UYWxcHI10OatTECq1epqYBY6IjBHxIwg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=mEcWp6vx6m8FZC72NJYpK9wL8e9RBO33qxS+vP64Aqu9TGMMO97i3Nd7BdlVbphX0SQHE0I+K/rosjewQBFfUbaHdeLZceBk1u6ix7yiM5fq2d9ueKywK8Zt+oDBohMMYiER37czUIG9s9AkaB9/hVgF4zLD5bgkoHzImjWXBok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J0dLjUEW; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-430f9ffd4e8so1951091f8f.0
-        for <netdev@vger.kernel.org>; Sun, 21 Dec 2025 09:50:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766339457; x=1766944257; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=b40qSYP/L7CB/omuDFXHgbe5i3kgzEE7rep8JC5Ab/s=;
-        b=J0dLjUEWEjVf4mRFBd8IotdlIhUrkJOPztsjdClycNnV43zeejcx8L/I2fo6TRhnCv
-         0cIRbhU+v8nhQNNAGBHEljRk3PYjqpHqnDnaUJAcfW7OMqNMpmlqgLUk76V9M3gnhiAa
-         om3M3YF9BiMJMs4PRl9OSLgGsArXxvAHT3E5yX0lPqcaBXgg7p5P3eFi0FqkUgNT+vFR
-         t22mAQgzVK91L6UmWwuWsdZaMjXr8OdpZwWJS8KOjUZQQ45gm+Bb4zg0bAEtx8IoQ2ZS
-         +6U4NZksEEBmikHk+KHEW70leplj2DlSX9BYgwVj6/9HLXyJhJf1jdI5VGyFrMQyOTbW
-         jtsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766339457; x=1766944257;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=b40qSYP/L7CB/omuDFXHgbe5i3kgzEE7rep8JC5Ab/s=;
-        b=xRlW4OpjPFRivuHNWkphD96wVly1tKuAp3ECt8dWhWjImLSjRF4RweIKrutindEo/u
-         2h1iqRpgp//hUHrz7Trz4pLe8b10Bh4uVkRj/WVA+6EKSb277F/DhuBhaVHaq/XAqxrq
-         bMJhUchgI7Orb+Dtp+VgrubO5rt5DCs6AkuwDXM4Yetv9tbQDj8QoH42ULoFKoS0MnSU
-         BHGjR117ItBC63LeQQCKq9IzeVC/IOqIcaJZq7TJkJO/bSnMOy9VAxIN979AG6irgAFc
-         MYK4BgPIS+FQrd9Pr9OL1Fyou95SpJGVj5PtPcCjK/I9iMHHsjMGxdEQplQFWnKg2mBl
-         Vl/Q==
-X-Gm-Message-State: AOJu0YxAGkAjyPuHAYIWVeEsxzbyleIRa0MzDivkMOHW8qSkW1yifupI
-	VQ5Qa4uAagsgQT/3yiJLBHEkatdzm5NR/eWsDAgl32AB1HpKXjALvsrkH1lGjQ==
-X-Gm-Gg: AY/fxX7QZxyGPj+SoFcR36ZE5ryn3MJ+oBgdD2dyPvhg3kA/t0LfvOg7SCNCmCy8dbu
-	qTL5lCuX7y4k4SMHqLq4l9YLbv82FzmflwODH10M8yrKC4UocbqIwe34j3ugi9tVy5lGxeujm2q
-	yehkqHlO0CzWgZw8Hdy+ngMGdnqCGhNZBosE3ooluQNJUiW2p23NgkvSGgAxqc/HaJtZJTTlyJt
-	vcPxgjn22hvVuk7EmXN6gEEqoVNCFVisDFSZLh953bUAi+aDtErxJc1QjCeEW7Tf0HCf3kMysEk
-	wqAJ3WmZJ9m7EWNvvYYgBdtXYYtTAz3B0noFXMJwLsFTqRSaofpXw840Orn2q07Ir0eOsZY3PaK
-	f3Ap7/tPHz0n5af3xH/U63NJSuYQOURZw7ghlb9YgH6TGPh7cn2BIcfXl2oIjonlgcqB0svDt+i
-	Ujf280LyTmJoh2jHUChyey0Gq1KFZNRnRi6D0GgmvudKNV0PggkQM=
-X-Google-Smtp-Source: AGHT+IGWoyRr3tQbin4r2oRpD/Ez8P8OhpeJJf2EhPilp9xbWQ5v4lYSoVrUZucnQz7RuAvYeEEHSA==
-X-Received: by 2002:a05:6000:2c10:b0:431:397:4c4f with SMTP id ffacd0b85a97d-4324e3f5beamr10634604f8f.7.1766339456376;
-        Sun, 21 Dec 2025 09:50:56 -0800 (PST)
-Received: from pve.home (bzq-79-181-180-225.red.bezeqint.net. [79.181.180.225])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324ea2253csm17733076f8f.14.2025.12.21.09.50.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Dec 2025 09:50:55 -0800 (PST)
-From: "Noam D. Eliyahu" <noam.d.eliyahu@gmail.com>
-To: netdev@vger.kernel.org
-Cc: pavan.chebbi@broadcom.com,
-	mchan@broadcom.com
-Subject: [DISCUSS] tg3 reboot handling on Dell T440 (BCM5720)
-Date: Sun, 21 Dec 2025 19:50:50 +0200
-Message-Id: <20251221175050.14089-1-noam.d.eliyahu@gmail.com>
-X-Mailer: git-send-email 2.39.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D77B2253A0;
+	Sun, 21 Dec 2025 18:32:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1766341980; cv=pass; b=oaQG0jsF0dUa4SebBg6Ku2Fsh2Jplo5/9yOqAVClM99/cnvlSmtsayKGJo8SD0ebQayv/IMt8WgBOdgTDxpS7oA5N1ksuzhU520RO01Z8uB/3lNdiX4gfQ6bpz5lGK3wSiEzfAsOGgFcFTqtYc8PalT+eJfrCgTHSxxu/N0lqE0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1766341980; c=relaxed/simple;
+	bh=GRBv4PxglNVAKp0jLNkgX9bwCGCpNQdv5QiEntFT8eE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rILOKAxx/ZWOR/GtM/+ZlhDeUftyxn4qrbNOheoHeNMZDAYg08xGtNrTP3bgiv8puFLEMJaycXn7zI38PfjQKAW9uR+ukQtvnnZ6Y4x+ecub6l+nnIowkMC81SskhZyIWRnLq5C08A02IqWeYvCZk12z9YHkzAVi5cXHSiggA2k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=n8kBLuNL; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=P0ZaMWnv; arc=pass smtp.client-ip=85.215.255.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
+ARC-Seal: i=1; a=rsa-sha256; t=1766341784; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=pQjW36HA0jOJ+gK9x221B9TOCIQspuUW9inetocmmAccAsYJgiYUn8JAgCpFQ8RLC+
+    2f1Sox0z5CJmKrM4kQkrXP7h5B7gujHVwFydW748ZrfrbkvENNDaar0VeUF+vjz2fpGB
+    Jvl8zPJHY0pWZld0C/JBsBRJ/WGrldBZyubrcGkkyj3np+xXD5ehqXfvtup215ZQQQeK
+    Wnx0af14RK/CDwDHNl0oJ0uEOFm8DU9Xt/6eS8nDghOAMR9J5ItoSHxxDVpKsSLBSCKI
+    G8nEyks6/yx3tIaZqeqiMZBY9ejWdJqpaIu1k4oPJZdZmVF4lVcg2HOuU+PtbEjvWqsH
+    oFzg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1766341784;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=HKwAn7f3+TtsckzLHgRWpWRHke/UNCAnjpKX4WLx6a8=;
+    b=nx0hQJMDbdjgTF1AXB2k21CL+NqAhmMsQVg/G6Yyy/TNHjP/BzCj9joepQRPWD48fy
+    2ZOtoSVSnAvPhnDz+BlkkjMAI7yHEL9vn9+eIDLUAA+4B51v0nG1xk164DWhU2p/5r1U
+    t0BoyvzadCmCr9lhSkWzIjr/Ta3vqDSIK2wDM3WjprSGFFTrX163TWjAutDBBsFlSKVq
+    AvakBRHbDdqAAPGT0yXrMl/+MhVZKm/F6005nkna0KBU3yuFKcGkOyfGiUShzfu1Am3z
+    UcFFMXLvDYprpPkq1/RA5IPhQy7hZy9qzekjUVCO3MG48Za8Ne04uLEXfD2xV3ZgdeDL
+    +bLQ==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1766341784;
+    s=strato-dkim-0002; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=HKwAn7f3+TtsckzLHgRWpWRHke/UNCAnjpKX4WLx6a8=;
+    b=n8kBLuNLSGvf6Pwb8sgO6jfl0z60B4pXGiqBdfY/xqAh3O1Ajx+f5nuD9V5lUVYIF7
+    QPLW5peIu+7mUq/42gebmvY2LtgBY3lJNN9JS9RM324n8uyQwQpsbjSi2w9ZwjulEUeC
+    sM34+0LKooRdJet05l6nBnNT2AGucOQ2/vVbweChpq4bgIY8mn4dIIGfZa8TiC4oLxh+
+    IWxhw5CullpNbCg0BuYSj3VSnzGGLCra8AC23n3mglKYpPDeIFIukdnq/SFxeV1y9OdJ
+    toRlbl+vMTfy2a3llX/Rd56firktkpNuUDTMOEw1Kp365V60TG0NFp22uU7TdbEa0oQM
+    0hxg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1766341784;
+    s=strato-dkim-0003; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=HKwAn7f3+TtsckzLHgRWpWRHke/UNCAnjpKX4WLx6a8=;
+    b=P0ZaMWnvdZM8hfE24XS5wA289AUyjh/CxgwPl7/O05M/Ax1DbDlNJRDr2r2N5DnKWk
+    yTrRdhP/8BfDqbA9U9DA==
+X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tTUsMrZpkO3Mw3lZ/t54cFxeFQ7s8bGWj0Q=="
+Received: from [IPV6:2a00:6020:4a38:6800::9f3]
+    by smtp.strato.de (RZmta 54.1.0 AUTH)
+    with ESMTPSA id K0e68b1BLITiDpV
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Sun, 21 Dec 2025 19:29:44 +0100 (CET)
+Message-ID: <01190c40-d348-4521-a2ab-3e9139cc832e@hartkopp.net>
+Date: Sun, 21 Dec 2025 19:29:37 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: [bpf, xdp] headroom - was: Re: Question about to KMSAN: uninit-value
+ in can_receive
+To: Andrii Nakryiko <andrii@kernel.org>, Prithvi <activprithvi@gmail.com>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org,
+ linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+ netdev@vger.kernel.org
+References: <20251117173012.230731-1-activprithvi@gmail.com>
+ <0c98b1c4-3975-4bf5-9049-9d7f10d22a6d@hartkopp.net>
+ <c2cead0a-06ed-4da4-a4e4-8498908aae3e@hartkopp.net>
+ <aSx++4VrGOm8zHDb@inspiron>
+ <d6077d36-93ed-4a6d-9eed-42b1b22cdffb@hartkopp.net>
+ <20251220173338.w7n3n4lkvxwaq6ae@inspiron>
+Content-Language: en-US
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+In-Reply-To: <20251220173338.w7n3n4lkvxwaq6ae@inspiron>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi all,
+Hello Andrii,
 
-I have not contributed to the Linux kernel before, but after following and learning from the work here for several years, I am now trying to make my first contribution.
+we have a "KMSAN: uninit value" problem which is created by 
+netif_skb_check_for_xdp() and later pskb_expand_head().
 
-I would like to discuss a reboot-related issue I am seeing on a Dell PowerEdge T440 with a BCM5720 NIC. With recent stable kernels (6.17+) and up-to-date Dell firmware, the system hits AER fatal errors during ACPI _PTS. On older kernels (starting around 6.6.2), the behavior is different and appears related to the conditional tg3_power_down flow introduced by commit 9931c9d04f4d.
+The CAN netdev interfaces (ARPHRD_CAN) don't have XDP support and the 
+CAN bus related skbs allocate 16 bytes of pricate headroom.
 
-Below is a short summary of how the driver logic evolved.
+Although CAN netdevs don't support XDP the KMSAN issue shows that the 
+headroom is expanded for CAN skbs and a following access to the CAN skb 
+private data via skb->head now reads from the beginning of the XDP 
+expanded head which is (of course) uninitialized.
 
-### Relevant driver evolution
+Prithvi thankfully did some investigation (see below!) which proved my 
+estimation about "someone is expanding our CAN skb headroom".
 
-* **9931c9d04f4d – tg3: power down device only on SYSTEM_POWER_OFF**
-  Added to avoid reboot hangs when the NIC was initialized via SNP (PXE):
+Prithvi also proposed two ways to solve the issue (at the end of his 
+mail below), where I think the first one is a bad hack (although it was 
+my idea).
 
-```
-- tg3_power_down(tp);
-+ if (system_state == SYSTEM_POWER_OFF)
-+     tg3_power_down(tp);
-```
+The second idea is a change for dev_xdp_attach() where your expertise 
+would be necessary.
 
-* **2ca1c94ce0b6 – tg3: Disable tg3 device on system reboot to avoid triggering AER**
-  Addressed a separate issue and partially reverted earlier behavior:
+My sugestion would rather go into the direction to extend dev_xdp_mode()
 
-```
-+ tg3_reset_task_cancel(tp);
-+
-  rtnl_lock();
-+
-  netif_device_detach(dev);
+https://elixir.bootlin.com/linux/v6.19-rc1/source/net/core/dev.c#L10170
 
-  if (netif_running(dev))
-      dev_close(dev);
+in a way that it allows to completely disable XDP for CAN skbs, e.g. 
+with a new XDP_FLAGS_DISABLED that completely keeps the hands off such skbs.
 
-- if (system_state == SYSTEM_POWER_OFF)
--     tg3_power_down(tp);
-+ tg3_power_down(tp);  /* unconditional again */
+Do you have any (better) idea how to preserve the private data in the 
+skb->head of CAN related skbs?
 
-  rtnl_unlock();
-+
-+ pci_disable_device(pdev);
-```
+Many thanks and best regards,
+Oliver
 
-* **e0efe83ed3252 – tg3: Disable tg3 PCIe AER on system reboot**
-  Combined both approaches, resulting in:
+ps. original mail thread at 
+https://lore.kernel.org/linux-can/68bae75b.050a0220.192772.0190.GAE@google.com/
 
-  * Conditional tg3_power_down based on SYSTEM_STATE
-  * A DMI-based whitelist for AER handling
-
-```
-static const struct dmi_system_id tg3_restart_aer_quirk_table[] = {
-    {
-        .matches = {
-            DMI_MATCH(DMI_SYS_VENDOR, "Dell Inc."),
-            DMI_MATCH(DMI_PRODUCT_NAME, "PowerEdge R440"),
-        },
-    },
-    /* other R-series entries omitted */
-    {}
-};
-```
-
-```
-else if (system_state == SYSTEM_RESTART &&
-         dmi_first_match(tg3_restart_aer_quirk_table) &&
-         pdev->current_state != PCI_D3cold &&
-         pdev->current_state != PCI_UNKNOWN) {
-    pcie_capability_clear_word(pdev, PCI_EXP_DEVCTL,
-                               PCI_EXP_DEVCTL_CERE |
-                               PCI_EXP_DEVCTL_NFERE |
-                               PCI_EXP_DEVCTL_FERE |
-                               PCI_EXP_DEVCTL_URRE);
-}
-```
-
-On my T440, this combined design is what causes problems. Simply removing the DMI table does not help, since the conditional tg3_power_down logic itself also causes issues on this hardware. Adding “PowerEdge T440” to the DMI list avoids the AER error, but this does not scale well and requires constant maintenance.
-
-I also could not reproduce the original reboot hang that motivated 9931c9d04f4d when running current firmware, even when initializing the NICs via SNP (PXE). This makes it look like the original problem has been resolved in firmware, while the workaround logic now causes trouble on up to date systems.
-
-### Possible ways forward (from cleanest to minimal)
-
-1. **Cleanest (recent firmware only)**
-   Remove both the conditional tg3_power_down and the AER disablement, and always call tg3_power_down. This restores the pre-workaround behavior and works reliably on my system.
-
-2. **Flip the conditioning**
-   Keep the DMI list, but use it to guard the conditional tg3_power_down instead (only for models where the original issue was observed, e.g. R650xs). Drop the AER handling entirely. This limits risk to known systems while simplifying the flow.
-
-3. **Minimal change**
-   Add “T” variants (e.g. T440) to the existing DMI table. This fixes my system but keeps the current complexity and maintenance burden.
-
-I wanted to start with a discussion and a detailed report before sending any patches, to get guidance on what approach makes sense upstream. I can provide logs, kernel versions, and test results if useful. My testing (down to 6.6.1) was done on my own hardware. I could not reproduce either the original SNP reboot hang (9931c9d04f4d) or the AER ACPI _PTS failure (e0efe83ed3252) on current firmware so currently only (2ca1c94ce0b6) seems required, which suggests both issues may now be firmware-resolved.
-
-Thanks for taking the time to read this.
-
-Best regards,
-Noam D. Eliyahu
+On 20.12.25 18:33, Prithvi wrote:
+> On Sun, Nov 30, 2025 at 08:09:48PM +0100, Oliver Hartkopp wrote:
+>> Hi Prithvi,
+>>
+>> On 30.11.25 18:29, Prithvi Tambewagh wrote:
+>>> On Sun, Nov 30, 2025 at 01:44:32PM +0100, Oliver Hartkopp wrote:
+>>
+>>>>> shall I send this patch upstream and mention your name in
+>>>> Suggested-by tag?
+>>>>
+>>>> No. Neither of that - as it will not fix the root cause.
+>>>>
+>>>> IMO we need to check who is using the headroom in CAN skbs and for
+>>>> what reason first. And when we are not able to safely control the
+>>>> headroom for our struct can_skb_priv content we might need to find
+>>>> another way to store that content.
+>>>> E.g. by creating this space behind skb->data or add new attributes
+>>>> to struct sk_buff.
+>>>
+>>> I will work in this direction. Just to confirm, what you mean is
+>>> that first it should be checked where the headroom is used while also
+>>> checking whether the data from region covered by struct can_skb_priv is
+>>> intact, and if not then we need to ensure that it is intact by other
+>>> measures, right?
+>>
+>> I have added skb_dump(KERN_WARNING, skb, true) in my local dummy_can.c
+>> an sent some CAN frames with cansend.
+>>
+>> CAN CC:
+>>
+>> [ 3351.708018] skb len=16 headroom=16 headlen=16 tailroom=288
+>>                 mac=(16,0) mac_len=0 net=(16,0) trans=16
+>>                 shinfo(txflags=0 nr_frags=0 gso(size=0 type=0 segs=0))
+>>                 csum(0x0 start=0 offset=0 ip_summed=1 complete_sw=0 valid=0
+>> level=0)
+>>                 hash(0x0 sw=0 l4=0) proto=0x000c pkttype=5 iif=0
+>>                 priority=0x0 mark=0x0 alloc_cpu=5 vlan_all=0x0
+>>                 encapsulation=0 inner(proto=0x0000, mac=0, net=0, trans=0)
+>> [ 3351.708151] dev name=can0 feat=0x0000000000004008
+>> [ 3351.708159] sk family=29 type=3 proto=0
+>> [ 3351.708166] skb headroom: 00000000: 07 00 00 00 00 00 00 00 00 00 00 00
+>> 00 00 00 00
+>> [ 3351.708173] skb linear:   00000000: 23 01 00 00 04 00 00 00 11 22 33 44
+>> 00 00 00 00
+>>
+>> (..)
+>>
+>> CAN FD:
+>>
+>> [ 3557.069471] skb len=72 headroom=16 headlen=72 tailroom=232
+>>                 mac=(16,0) mac_len=0 net=(16,0) trans=16
+>>                 shinfo(txflags=0 nr_frags=0 gso(size=0 type=0 segs=0))
+>>                 csum(0x0 start=0 offset=0 ip_summed=1 complete_sw=0 valid=0
+>> level=0)
+>>                 hash(0x0 sw=0 l4=0) proto=0x000d pkttype=5 iif=0
+>>                 priority=0x0 mark=0x0 alloc_cpu=6 vlan_all=0x0
+>>                 encapsulation=0 inner(proto=0x0000, mac=0, net=0, trans=0)
+>> [ 3557.069499] dev name=can0 feat=0x0000000000004008
+>> [ 3557.069507] sk family=29 type=3 proto=0
+>> [ 3557.069513] skb headroom: 00000000: 07 00 00 00 00 00 00 00 00 00 00 00
+>> 00 00 00 00
+>> [ 3557.069520] skb linear:   00000000: 33 03 00 00 10 05 00 00 00 11 22 33
+>> 44 55 66 77
+>> [ 3557.069526] skb linear:   00000010: 88 aa bb cc dd ee ff 00 00 00 00 00
+>> 00 00 00 00
+>>
+>> (..)
+>>
+>> CAN XL:
+>>
+>> [ 5477.498205] skb len=908 headroom=16 headlen=908 tailroom=804
+>>                 mac=(16,0) mac_len=0 net=(16,0) trans=16
+>>                 shinfo(txflags=0 nr_frags=0 gso(size=0 type=0 segs=0))
+>>                 csum(0x0 start=0 offset=0 ip_summed=1 complete_sw=0 valid=0
+>> level=0)
+>>                 hash(0x0 sw=0 l4=0) proto=0x000e pkttype=5 iif=0
+>>                 priority=0x0 mark=0x0 alloc_cpu=6 vlan_all=0x0
+>>                 encapsulation=0 inner(proto=0x0000, mac=0, net=0, trans=0)
+>> [ 5477.498236] dev name=can0 feat=0x0000000000004008
+>> [ 5477.498244] sk family=29 type=3 proto=0
+>> [ 5477.498251] skb headroom: 00000000: 07 00 00 00 00 00 00 00 00 00 00 00
+>> 00 00 00 00
+>> [ 5477.498258] skb linear:   00000000: b0 05 92 00 81 cd 80 03 cd b4 92 58
+>> 4c a1 f6 0c
+>> [ 5477.498264] skb linear:   00000010: 1a c9 6d 0a 4c a1 f6 0c 1a c9 6d 0a
+>> 4c a1 f6 0c
+>> [ 5477.498269] skb linear:   00000020: 1a c9 6d 0a 4c a1 f6 0c 1a c9 6d 0a
+>> 4c a1 f6 0c
+>> [ 5477.498275] skb linear:   00000030: 1a c9 6d 0a 4c a1 f6 0c 1a c9 6d 0a
+>> 4c a1 f6 0c
+>>
+>>
+>> I will also add skb_dump(KERN_WARNING, skb, true) in the CAN receive path to
+>> see what's going on there.
+>>
+>> My main problem with the KMSAN message
+>> https://lore.kernel.org/linux-can/68bae75b.050a0220.192772.0190.GAE@google.com/
+>> is that it uses
+>>
+>> NAPI, XDP and therefore pskb_expand_head():
+>>
+>>   kmalloc_reserve+0x23e/0x4a0 net/core/skbuff.c:609
+>>   pskb_expand_head+0x226/0x1a60 net/core/skbuff.c:2275
+>>   netif_skb_check_for_xdp net/core/dev.c:5081 [inline]
+>>   netif_receive_generic_xdp net/core/dev.c:5112 [inline]
+>>   do_xdp_generic+0x9e3/0x15a0 net/core/dev.c:5180
+>>   __netif_receive_skb_core+0x25c3/0x6f10 net/core/dev.c:5524
+>>   __netif_receive_skb_one_core net/core/dev.c:5702 [inline]
+>>   __netif_receive_skb+0xca/0xa00 net/core/dev.c:5817
+>>   process_backlog+0x4ad/0xa50 net/core/dev.c:6149
+>>   __napi_poll+0xe7/0x980 net/core/dev.c:6902
+>>   napi_poll net/core/dev.c:6971 [inline]
+>>
+>> As you can see in
+>> https://syzkaller.appspot.com/x/log.txt?x=144ece64580000
+>>
+>> [pid  5804] socket(AF_CAN, SOCK_DGRAM, CAN_ISOTP) = 5
+>> [pid  5804] ioctl(5, SIOCGIFINDEX, {ifr_name="vxcan0", ifr_ifindex=20}) = 0
+>>
+>> they are using the vxcan driver which is mainly derived from vcan.c and
+>> veth.c (~2017). The veth.c driver supports all those GRO, NAPI and XDP
+>> features today which vxcan.c still does NOT support.
+>>
+>> Therefore I wonder how the NAPI and XDP code can be used together with
+>> vxcan. And if this is still the case today, as the syzcaller kernel
+>> 6.13.0-rc7-syzkaller-00039-gc3812b15000c is already one year old.
+>>
+>> Many questions ...
+>>
+>> Best regards,
+>> Oliver
+> 
+> Hello Oliver,
+> 
+> I tried investigating further why the XDP path was chosen inspite of using
+> vxcan. I tried looking for dummy_can.c in upstream tree but could not find
+> it; I might be missing something here - could you please tell where can I
+> find it? Meanwhile, I tried using GDB for the analysis.
+> 
+> I observed in the bug's strace log:
+> 
+> [pid  5804] bpf(BPF_PROG_LOAD, {prog_type=BPF_PROG_TYPE_XDP, insn_cnt=3, insns=0x200000c0, license="syzkaller", log_level=0, log_size=0, log_buf=NULL, kern_version=KERNEL_VERSION(0, 0, 0), prog_flags=0, prog_name="", prog_ifindex=0, expected_attach_type=BPF_XDP, prog_btf_fd=-1, func_info_rec_size=8, func_info=NULL, func_info_cnt=0, line_info_rec_size=16, line_info=NULL, line_info_cnt=0, attach_btf_id=0, attach_prog_fd=0, fd_array=NULL, ...}, 144) = 3
+> [pid  5804] socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE) = 4
+> [pid  5804] sendmsg(4, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="\x34\x00\x00\x00\x10\x00\x01\x08\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80\x40\x01\x00\x00\x00\x01\x00\x0c\x00\x2b\x80\x08\x00\x01\x00\x03\x00\x00\x00\x08\x00\x1b\x00\x00\x00\x00\x00", iov_len=52}], msg_iovlen=1, msg_controllen=0, msg_flags=MSG_DONTWAIT|MSG_FASTOPEN}, 0) = 52
+> [pid  5804] socket(AF_CAN, SOCK_DGRAM, CAN_ISOTP) = 5
+> [pid  5804] ioctl(5, SIOCGIFINDEX, {ifr_name="vxcan0", ifr_ifindex=20}) = 0
+> 
+> Notably, before binding vxcan0 to the CAN socket, a BPF program is loaded.
+> I then tried using GDB to check and got the following insights:
+> 
+> (gdb) b vxcan_xmit
+> Breakpoint 23 at 0xffffffff88ca899e: file drivers/net/can/vxcan.c, line 38.
+> (gdb) delete 23
+> (gdb) b __sys_bpf
+> Breakpoint 24 at 0xffffffff81d2653e: file kernel/bpf/syscall.c, line 5752.
+> (gdb) b bpf_prog_load
+> Breakpoint 25 at 0xffffffff81d2cd80: file kernel/bpf/syscall.c, line 2736.
+> (gdb) b vxcan_xmit if (oskb->dev->name[0]=='v' && ((oskb->dev->name[1]=='x' && oskb->dev->name[2]=='c' && oskb->dev->name[3]=='a' && oskb->dev->name[4]=='n') || (oskb->dev->name[1]=='c' && oskb->dev->name[2]=='a' && oskb->dev->name[3]=='n')))
+> Breakpoint 26 at 0xffffffff88ca899e: file drivers/net/can/vxcan.c, line 38.
+> (gdb) b __netif_receive_skb if (skb->dev->name[0]=='v' && ((skb->dev->name[1]=='x' && skb->dev->name[2]=='c' && skb->dev->name[3]=='a' && skb->dev->name[4]=='n') || (skb->dev->name[1]=='c' && skb->dev->name[2]=='a' && skb->dev->name[3]=='n')))
+> Breakpoint 27 at 0xffffffff8ce3c310: file net/core/dev.c, line 5798.
+> (gdb) b do_xdp_generic if (pskb->dev->name[0]=='v' && ((pskb->dev->name[1]=='x' && pskb->dev->name[2]=='c' && pskb->dev->name[3]=='a' && pskb->dev->name[4]=='n') || (pskb->dev->name[1]=='c' && pskb->dev->name[2]=='a' && pskb->dev->name[3]=='n')))
+> Breakpoint 28 at 0xffffffff8cdfccd7: file net/core/dev.c, line 5171.
+> (gdb) b dev_xdp_attach if (dev->name[0]=='v' && ((dev->name[1]=='x' && dev->name[2]=='c' && dev->name[3]=='a' && dev->name[4]=='n') || (dev->name[1]=='c' && dev->name[2]=='a' && dev->name[3]=='n')))
+> Breakpoint 29 at 0xffffffff8ce18b4e: file net/core/dev.c, line 9610.
+> 
+> Thread 2 hit Breakpoint 24, __sys_bpf (cmd=cmd@entry=BPF_PROG_LOAD, uattr=..., size=size@entry=144) at kernel/bpf/syscall.c:5752
+> 5752    {
+> (gdb) c
+> Continuing.
+> 
+> Thread 2 hit Breakpoint 25, bpf_prog_load (attr=attr@entry=0xffff88811c987d60, uattr=..., uattr_size=144) at kernel/bpf/syscall.c:2736
+> 2736    {
+> (gdb) c
+> Continuing.
+> [Switching to Thread 1.1]
+> 
+> Thread 1 hit Breakpoint 29, dev_xdp_attach (dev=dev@entry=0xffff888124e78000, extack=extack@entry=0xffff88811c987858, link=link@entry=0x0 <fixed_percpu_data>, new_prog=new_prog@entry=0xffffc9000a516000, old_prog=old_prog@entry=0x0 <fixed_percpu_data>, flags=flags@entry=0) at net/core/dev.c:9610
+> 9610    {
+> (gdb) p dev->name
+> $104 = "vcan0\000\000\000\000\000\000\000\000\000\000"
+> (gdb) p dev->xdp_prog
+> $105 = (struct bpf_prog *) 0x0 <fixed_percpu_data>
+> (gdb) c
+> Continuing.
+> 
+> Thread 1 hit Breakpoint 29, dev_xdp_attach (dev=dev@entry=0xffff88818e918000, extack=extack@entry=0xffff88811c987858, link=link@entry=0x0 <fixed_percpu_data>, new_prog=new_prog@entry=0xffffc9000a516000, old_prog=old_prog@entry=0x0 <fixed_percpu_data>, flags=flags@entry=0) at net/core/dev.c:9610
+> 9610    {
+> (gdb) p dev->name
+> $106 = "vxcan0\000\000\000\000\000\000\000\000\000"
+> (gdb) p dev->xdp_prog
+> $107 = (struct bpf_prog *) 0x0 <fixed_percpu_data>
+> (gdb) c
+> Continuing.
+> 
+> Thread 1 hit Breakpoint 29, dev_xdp_attach (dev=dev@entry=0xffff88818e910000, extack=extack@entry=0xffff88811c987858, link=link@entry=0x0 <fixed_percpu_data>, new_prog=new_prog@entry=0xffffc9000a516000, old_prog=old_prog@entry=0x0 <fixed_percpu_data>, flags=flags@entry=0) at net/core/dev.c:9610
+> 9610    {
+> (gdb) p dev->name
+> $108 = "vxcan1\000\000\000\000\000\000\000\000\000"
+> (gdb) p dev->xdp_prog
+> $109 = (struct bpf_prog *) 0x0 <fixed_percpu_data>
+> (gdb) c
+> Continuing.
+> [Switching to Thread 1.2]
+> 
+> Here, it is attempted to attach the eariler BPF program to each of the CAN
+> devices present (I checked only for CAN devices since we are dealing with
+> effect of XDP in CAN networing stack). Earlier they didn't seem to have any
+> BPF program attached due to which  XDP wasn't attempted for these CAN devices
+> earlier.
+> 
+> Thread 2 hit Breakpoint 26, vxcan_xmit (oskb=0xffff888115d8a400, dev=0xffff88818e918000) at drivers/net/can/vxcan.c:38
+> 38      {
+> (gdb) p oskb->dev->name
+> $110 = "vxcan0\000\000\000\000\000\000\000\000\000"
+> (gdb) p oskb->dev->xdp_prog
+> $111 = (struct bpf_prog *) 0xffffc9000a516000
+> (gdb) c
+> Continuing.
+> 
+> Thread 2 hit Breakpoint 27, __netif_receive_skb (skb=skb@entry=0xffff888115d8ab00) at net/core/dev.c:5798
+> 5798    {
+> (gdb) p skb->dev->name
+> $112 = "vxcan1\000\000\000\000\000\000\000\000\000"
+> (gdb) p skb->dev->xdp_prog
+> $113 = (struct bpf_prog *) 0xffffc9000a516000
+> (gdb) c
+> Continuing.
+> 
+> Thread 2 hit Breakpoint 28, do_xdp_generic (xdp_prog=0xffffc9000a516000, pskb=0xffff88843fc05af8) at net/core/dev.c:5171
+> 5171    {
+> (gdb) p pskb->dev->name
+> $114 = "vxcan1\000\000\000\000\000\000\000\000\000"
+> (gdb) p pskb->dev->xdp_prog
+> $115 = (struct bpf_prog *) 0xffffc9000a516000
+> (gdb) c
+> Continuing.
+> 
+> After this, the KMSAN bug is triggered. Hence, we can conclude that due to the
+> BPF program loaded earlier, the CAN device undertakes generic XDP path during RX,
+> which is accessible even if vxcan doesn't support XDP by itself.
+> 
+> It seems that the way CAN devices use the headroom for storing private skb related
+> data might be incompatible for XPD path, due to which the generic networking stack
+> at RX requires to expand the head, and it is done in such a way that the yet
+> uninitialized expanded headroom is accesssed by can_skb_prv() using skb->head.
+> 
+> So, I think we can solve this bug in the following ways:
+> 
+> 1. As you suggested earlier, access struct can_skb_priv using:
+> struct can_skb_priv *)(skb->data - sizeof(struct can_skb_priv)
+> This method ensures that the remaining CAN networking stack, which expects can_skb_priv
+> just before skb->data, as well as maintain compatibility with headroom expamnsion during
+> generic XDP.
+> 
+> 2. Try to find some way so that XDP pathway is rejected by CAN devices at the beginning
+> itself, like for example in function dev_xdp_attach():
+> 
+> /* don't call drivers if the effective program didn't change */
+> if (new_prog != cur_prog) {
+> 	bpf_op = dev_xdp_bpf_op(dev, mode);
+> 	if (!bpf_op) {
+> 		NL_SET_ERR_MSG(extack, "Underlying driver does not support XDP in native mode");
+> 		return -EOPNOTSUPP;
+> 	}
+> 
+> 	err = dev_xdp_install(dev, mode, bpf_op, extack, flags, new_prog);
+> 	if (err)
+> 		return err;
+> }
+> 
+> or in some other appropriate way.
+> 
+> What do you think what should be done ahead?
+> 
+> Best Regards,
+> Prithvi
+> 
 
 
