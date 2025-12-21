@@ -1,126 +1,233 @@
-Return-Path: <netdev+bounces-245627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1736FCD3C70
-	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 08:27:45 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F651CD3C88
+	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 08:58:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id AB44E3008188
-	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 07:27:43 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 085293007233
+	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 07:58:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7C9122126D;
-	Sun, 21 Dec 2025 07:27:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dHLwz4sz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BE7F23D7C8;
+	Sun, 21 Dec 2025 07:58:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f195.google.com (mail-pg1-f195.google.com [209.85.215.195])
+Received: from mail-oo1-f80.google.com (mail-oo1-f80.google.com [209.85.161.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 614B81E7C08
-	for <netdev@vger.kernel.org>; Sun, 21 Dec 2025 07:27:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D365239E7E
+	for <netdev@vger.kernel.org>; Sun, 21 Dec 2025 07:58:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766302062; cv=none; b=HVW8GB3spB5NjYmH5wQODExcQSuW772wI2y8MvNL4KWsGVdkDQa3+yKyTgEfL4vJlx+S0850pFMD1y3lWgmQgM7Z6vTKOuDJahjgNqUdkARM9V2NW6JUpoASmIRAHth0G3sPaYzFId0XoFKptFqXJgcsDsQYugEcu/AOc2C1tx0=
+	t=1766303905; cv=none; b=nl+rBlUuOKked7WMVKw8GSeCihtZBIOuuINc+D/4hJomzYa7R4tPzg/SIbGKfsD5XHtsz22Vn6KkuRzRRF2QEt3wspEGGXRAzCYzQjNYUeLv9fL0BbvVk4j0rROZh4MM7gSvEVeMLZkcv6JY84e33/PEMjyZ8CHKIqiyf4PW6SI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766302062; c=relaxed/simple;
-	bh=OFBH9JXYTuzwL7xJMrI7r72JcUFWjPidM4uwnB32Ccc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Un4/d/A04NAwJh8XcV3LN7sb5+cEyGnxgiH6h7sAERGom4lwQaefr8ogaaERPNJaFHaXlw/tku7KIpojnEvefmJp29s10eu/L+ScqHH0Csbn9Eakd3QAtQsCWMV1L/WvfThyADuT9iIrsMH1OH5yqz05aaHyUpeyaTt6TgiwVk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dHLwz4sz; arc=none smtp.client-ip=209.85.215.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f195.google.com with SMTP id 41be03b00d2f7-c1cf2f0523eso2025064a12.3
-        for <netdev@vger.kernel.org>; Sat, 20 Dec 2025 23:27:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766302061; x=1766906861; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=l5nVr4F2IsFNHBVH0b376Wrsf2MVlBQ/1H7ahoWdGv8=;
-        b=dHLwz4sz7So8RNrbwwLCSLfsJtHM0U6KPbEFMsCzM13wBFtohj0PlzzDf0VAJGWYZf
-         c8cKMH35R+wH8rQitTHyplf62U2Vh+bkZPJyKrknxAr2hQ1BNtOhGLT5D6PSyhI2E9EY
-         DvT1kMbIS6fMDlDswnF/8Dxmj+ViZ/2XZM6G/kPnIymvig7hVr7gOsL22zdZLil/vUSY
-         h25pkjbQymcGM2WP8mH1OZUMDsqnFzkGXw8cuc275pZrx6txcgVsnW/IKJ6Fg/de9A2M
-         elk3LExmy5lyP9JsEM+mU2htsL5tl1HSGp7uZx18rpGWFdbZIHGa3BJSXPMzfCO4W4t2
-         jjHQ==
+	s=arc-20240116; t=1766303905; c=relaxed/simple;
+	bh=SbIusgOI5pRRntlm+EoVtwvzVxBU9gR2VdOsbNO/QMM=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=OkNjWwyElseR8Rvmwq+Agwdlw/lnqjjDdl8t1b2ND6UcRTEejyv41VeKqLJOsYxpLMYPODgSzLcu+ni8BJHfsGW5YgkbLYK8i7jOsggVkCcLz8j2zYZLHRkhPI0XPEG7Y2i8z6oPpqftuBnV4xMf7OZmjcMeJR4pa+RMV5xavjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-oo1-f80.google.com with SMTP id 006d021491bc7-656b3efc41aso3789220eaf.3
+        for <netdev@vger.kernel.org>; Sat, 20 Dec 2025 23:58:23 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766302061; x=1766906861;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=l5nVr4F2IsFNHBVH0b376Wrsf2MVlBQ/1H7ahoWdGv8=;
-        b=ppL3fl5sDUq7Gp/xSqgP4eTz9AYVlbqBkNbhlKPayd6ltk8yT2WJphciFtro4o8W5e
-         vddegcUgNs1whQBGOnJFqOXwY4vcFkeudlBazhElDxE8yZ7jfyC/A+tDjOWP1m1qj1SP
-         mJ5JTsiCf48z/zYXx9SynUjF8bYgtc5AdBBJCRVyp41i2ZSbFoRbJzC6W3SEDiEAIxUv
-         mSy+LyTsJPc5FrkPfsX8MPQBZH2o/AwXuEFXVb1XGyBsIA20H7yQlIwkCxmydtbP3V0b
-         UEqGaVqT8Yo3cesPZcfctBBCe2XP/Sm13POHCD9C4fU5Ct4WUuYOyuQYor9M4qhMfVzO
-         6Hjw==
-X-Gm-Message-State: AOJu0YyGeqKuCjeE0EkKIRdrSjh7gEDGJjyuek5BzkpTt0nJJFNngnc9
-	V5g2B/FkD2AuY/C467lEe7UWE4BMVmrAdjiTggX/EKVSJAUJIIy04eg+Ca6BnbRIoNk=
-X-Gm-Gg: AY/fxX7vcXY0qNViz9XF0coRKa2sWca2pf9p6BCjYEc6Ku8Q3cuqXq0SgSYQ19gO+mS
-	YVCgKpGr5deEnHbb6RixnJ9hct0Sz2e0CHKv9k55kZLV8itMl1jlEMwUTem3veZBR+9Qmw1ROZG
-	AYlhZzLQV2v3Jkt4d9OWQeJDSe/rMVJe1kcT8lFdDwMUZ9tzTjBd/27Px/lpVPndO4xl4L8bftv
-	2Zbu5aQJ5cS8sU1vc7Qb84IVgY4/804jH0GfYxUIsfgbOYJgnu3O/xCoOkpH5wfe3tJXLxsYlAH
-	zHtsAXp8xbc1XXrUQfSLlZp1/UZCE1de9Z9wTnXDlWPejJ3ghc7AC4KXi7lJSzYuugcnuLaY+b8
-	YbMTo2fxipsUl0GWQfbTw1IB9L3hC8Kq9xwl4sZW8ggRruazpg2UQWXTyqRvki1vyTtOfi1213r
-	IEDwcTalFgw3ozempq6FRqLYPiAAecLikiAxqyX8ejaey98V4OhEG1WYqPFTqKvvtB4PEv1kV0R
-	xtg4DwcvAziZJuotqkEY2yJutDRjakEv8vpzCzud4ms7VFeByNDkAQWIiO5x05ZgPPpc9yZ39b7
-	1ggVfRXzsK7sESk=
-X-Google-Smtp-Source: AGHT+IHYhBbx1sfAleA1fyjs27t/9A+6UeX0264Df2HtgYmcmrVoMwf2Od39C4y5eb9Fjzzeuyceug==
-X-Received: by 2002:a05:7022:b883:b0:11b:923d:7735 with SMTP id a92af1059eb24-121722abe66mr5765860c88.1.1766302060552;
-        Sat, 20 Dec 2025 23:27:40 -0800 (PST)
-Received: from ethan-latitude5420.. (host-127-24.cafrjco.fresno.ca.us.clients.pavlovmedia.net. [68.180.127.24])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-121725548b5sm30289115c88.17.2025.12.20.23.27.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 20 Dec 2025 23:27:40 -0800 (PST)
-From: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-To: netdev@vger.kernel.org
-Cc: linux-stable@vger.kernel.org,
-	Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Subject: [PATCH] net: usb: sr9700: fix incorrect command used to write single register
-Date: Sat, 20 Dec 2025 23:27:32 -0800
-Message-ID: <20251221072732.41426-1-enelsonmoore@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1766303902; x=1766908702;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OAruRVPXr1EjccfFCABV7O3DDyN3ztR8ygjJsF2RwNc=;
+        b=IjRhFNXWVcLOZLxNmGCOT+iS00KG4iLUCvAdjszFdPm6+OsnADhQRmEAvOW7wotVJr
+         ztMMo6glPgFzYrfQhV0Gb875TCpnFee1p6eH3MfUfehaWTkaOcowjIiALsyLIQPIUxEq
+         Q1MU+PJbplvaBJJ8nR3J904t6Xt76HqUXC6YbbmThqPfSlTnAdFAYn8ptNJlsFcrnG+p
+         qMHILTbG9B2DN1k+hMe6GO9Bi551c/T9LIoEpep/7ukIcuqpep7h5G5brJWTKTkwEviF
+         Rk1PJP5XIUP6wt8a5krtCzyTH5BKjK9hKhAtlo15KQ0I6kRMF+SPr/xGmME6nzNS6Zk4
+         tZ+A==
+X-Forwarded-Encrypted: i=1; AJvYcCWwZqZFaZRBE1fXxPaMxYSRkHqX04wEX4LWbmIa+hOBXBHRwMCmgSy9DmOag/o57ztLH5P67Nw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxhkd5f3f6xkr91SJfgru/kHH1etCM2JU5+OUIMDjUDRWV4aY+E
+	OnX/OIZuMXpmtOocJspOjLTwdbPX0MAWxzu1ACQTe44hqaG7BXVkh7wFIBbb1A4aRzAFlBGnFK0
+	H1+WlLA1EQgI6BuIJa4cusYsowOY5/olMODStL6jwMpZXGqYoWEQTerRZAtA=
+X-Google-Smtp-Source: AGHT+IE9sHwH/4Ex1o9zdWfJGhE7eallQLBhwBykS8FPmoMcbjnF7HHbt3COR2gH+H0UQZAtdupmLbd0R1jSVR+dGOPEbQQeKCQ6
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6820:6283:b0:659:81f1:fec4 with SMTP id
+ 006d021491bc7-65d0e94dfbamr2455545eaf.6.1766303902591; Sat, 20 Dec 2025
+ 23:58:22 -0800 (PST)
+Date: Sat, 20 Dec 2025 23:58:22 -0800
+In-Reply-To: <00000000000060446d060af10f08@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6947a89e.a70a0220.25eec0.006f.GAE@google.com>
+Subject: Re: [syzbot] [can?] memory leak in j1939_netdev_start
+From: syzbot <syzbot+1d37bef05da87b99c5a6@syzkaller.appspotmail.com>
+To: davem@davemloft.net, eadavis@qq.com, edumazet@google.com, 
+	kernel@pengutronix.de, kuba@kernel.org, linux-can@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, mkl@pengutronix.de, n.zhandarovich@fintech.ru, 
+	netdev@vger.kernel.org, o.rempel@pengutronix.de, pabeni@redhat.com, 
+	robin@protonic.nl, socketcan@hartkopp.net, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-This fixes the device failing to initialize with "error reading MAC
-address" for me, probably because the incorrect write to
-NCR_RST is not actually resetting the device.
+syzbot has found a reproducer for the following issue on:
 
-Fixes: c9b37458e95629b1d1171457afdcc1bf1eb7881d ("USB2NET : SR9700 : One chip USB 1.1 USB2NET SR9700Device Driver Support")
-Cc: linux-stable@vger.kernel.org
-Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+HEAD commit:    d8ba32c5a460 Merge tag 'block-6.19-20251218' of git://git...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=13989392580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d60836e327fd6756
+dashboard link: https://syzkaller.appspot.com/bug?extid=1d37bef05da87b99c5a6
+compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=155c4358580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10d1777c580000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/075f0ee95918/disk-d8ba32c5.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/8219d2472799/vmlinux-d8ba32c5.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/5d07c95aef4d/bzImage-d8ba32c5.xz
+mounted in repro: https://storage.googleapis.com/syzbot-assets/2fd2ba265dd2/mount_9.gz
+  fsck result: failed (log: https://syzkaller.appspot.com/x/fsck.log?x=105f562a580000)
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+1d37bef05da87b99c5a6@syzkaller.appspotmail.com
+
+BUG: memory leak
+unreferenced object 0xffff88812437e000 (size 8192):
+  comm "syz.3.27", pid 6191, jiffies 4294942739
+  hex dump (first 32 bytes):
+    00 e0 37 24 81 88 ff ff 00 e0 37 24 81 88 ff ff  ..7$......7$....
+    00 00 00 00 00 00 00 00 00 80 67 14 81 88 ff ff  ..........g.....
+  backtrace (crc 9710eadb):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4958 [inline]
+    slab_alloc_node mm/slub.c:5263 [inline]
+    __kmalloc_cache_noprof+0x3b2/0x570 mm/slub.c:5771
+    kmalloc_noprof include/linux/slab.h:957 [inline]
+    kzalloc_noprof include/linux/slab.h:1094 [inline]
+    j1939_priv_create net/can/j1939/main.c:131 [inline]
+    j1939_netdev_start+0x160/0x6f0 net/can/j1939/main.c:268
+    j1939_sk_bind+0x247/0x590 net/can/j1939/socket.c:504
+    __sys_bind_socket net/socket.c:1874 [inline]
+    __sys_bind_socket net/socket.c:1866 [inline]
+    __sys_bind+0x132/0x160 net/socket.c:1905
+    __do_sys_bind net/socket.c:1910 [inline]
+    __se_sys_bind net/socket.c:1908 [inline]
+    __x64_sys_bind+0x1c/0x30 net/socket.c:1908
+    do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+    do_syscall_64+0xa4/0xf80 arch/x86/entry/syscall_64.c:94
+    entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+BUG: memory leak
+unreferenced object 0xffff88810cc00e00 (size 240):
+  comm "softirq", pid 0, jiffies 4294942739
+  hex dump (first 32 bytes):
+    68 8a 63 24 81 88 ff ff 68 8a 63 24 81 88 ff ff  h.c$....h.c$....
+    00 80 67 14 81 88 ff ff 00 00 00 00 00 00 00 00  ..g.............
+  backtrace (crc 467a0d54):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4958 [inline]
+    slab_alloc_node mm/slub.c:5263 [inline]
+    kmem_cache_alloc_node_noprof+0x384/0x5a0 mm/slub.c:5315
+    __alloc_skb+0xe8/0x2b0 net/core/skbuff.c:679
+    alloc_skb include/linux/skbuff.h:1383 [inline]
+    j1939_session_fresh_new net/can/j1939/transport.c:1532 [inline]
+    j1939_xtp_rx_rts_session_new net/can/j1939/transport.c:1630 [inline]
+    j1939_xtp_rx_rts+0x3e4/0xb30 net/can/j1939/transport.c:1751
+    j1939_tp_cmd_recv net/can/j1939/transport.c:2073 [inline]
+    j1939_tp_recv+0x1b9/0x800 net/can/j1939/transport.c:2160
+    j1939_can_recv+0x35f/0x4d0 net/can/j1939/main.c:108
+    deliver net/can/af_can.c:575 [inline]
+    can_rcv_filter+0xdd/0x2c0 net/can/af_can.c:609
+    can_receive+0xf0/0x140 net/can/af_can.c:666
+    can_rcv+0xf6/0x130 net/can/af_can.c:690
+    __netif_receive_skb_one_core+0xeb/0x100 net/core/dev.c:6137
+    __netif_receive_skb+0x1d/0x80 net/core/dev.c:6250
+    process_backlog+0xd5/0x1e0 net/core/dev.c:6602
+    __napi_poll+0x44/0x3a0 net/core/dev.c:7666
+    napi_poll net/core/dev.c:7729 [inline]
+    net_rx_action+0x492/0x560 net/core/dev.c:7881
+    handle_softirqs+0xe1/0x2e0 kernel/softirq.c:622
+    __do_softirq kernel/softirq.c:656 [inline]
+    invoke_softirq kernel/softirq.c:496 [inline]
+    __irq_exit_rcu+0x98/0xc0 kernel/softirq.c:723
+    instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1056 [inline]
+    sysvec_apic_timer_interrupt+0x73/0x80 arch/x86/kernel/apic/apic.c:1056
+
+BUG: memory leak
+unreferenced object 0xffff88810a549e40 (size 704):
+  comm "softirq", pid 0, jiffies 4294942739
+  hex dump (first 32 bytes):
+    0e 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace (crc fd324075):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4958 [inline]
+    slab_alloc_node mm/slub.c:5263 [inline]
+    kmem_cache_alloc_node_noprof+0x384/0x5a0 mm/slub.c:5315
+    kmalloc_reserve+0xe6/0x180 net/core/skbuff.c:586
+    __alloc_skb+0x111/0x2b0 net/core/skbuff.c:690
+    alloc_skb include/linux/skbuff.h:1383 [inline]
+    j1939_session_fresh_new net/can/j1939/transport.c:1532 [inline]
+    j1939_xtp_rx_rts_session_new net/can/j1939/transport.c:1630 [inline]
+    j1939_xtp_rx_rts+0x3e4/0xb30 net/can/j1939/transport.c:1751
+    j1939_tp_cmd_recv net/can/j1939/transport.c:2073 [inline]
+    j1939_tp_recv+0x1b9/0x800 net/can/j1939/transport.c:2160
+    j1939_can_recv+0x35f/0x4d0 net/can/j1939/main.c:108
+    deliver net/can/af_can.c:575 [inline]
+    can_rcv_filter+0xdd/0x2c0 net/can/af_can.c:609
+    can_receive+0xf0/0x140 net/can/af_can.c:666
+    can_rcv+0xf6/0x130 net/can/af_can.c:690
+    __netif_receive_skb_one_core+0xeb/0x100 net/core/dev.c:6137
+    __netif_receive_skb+0x1d/0x80 net/core/dev.c:6250
+    process_backlog+0xd5/0x1e0 net/core/dev.c:6602
+    __napi_poll+0x44/0x3a0 net/core/dev.c:7666
+    napi_poll net/core/dev.c:7729 [inline]
+    net_rx_action+0x492/0x560 net/core/dev.c:7881
+    handle_softirqs+0xe1/0x2e0 kernel/softirq.c:622
+    __do_softirq kernel/softirq.c:656 [inline]
+    invoke_softirq kernel/softirq.c:496 [inline]
+    __irq_exit_rcu+0x98/0xc0 kernel/softirq.c:723
+
+BUG: memory leak
+unreferenced object 0xffff888124638a00 (size 512):
+  comm "softirq", pid 0, jiffies 4294942739
+  hex dump (first 32 bytes):
+    00 e0 37 24 81 88 ff ff 28 f0 37 24 81 88 ff ff  ..7$....(.7$....
+    28 f0 37 24 81 88 ff ff 18 8a 63 24 81 88 ff ff  (.7$......c$....
+  backtrace (crc 965e5f06):
+    kmemleak_alloc_recursive include/linux/kmemleak.h:44 [inline]
+    slab_post_alloc_hook mm/slub.c:4958 [inline]
+    slab_alloc_node mm/slub.c:5263 [inline]
+    __kmalloc_cache_noprof+0x3b2/0x570 mm/slub.c:5771
+    kmalloc_noprof include/linux/slab.h:957 [inline]
+    kzalloc_noprof include/linux/slab.h:1094 [inline]
+    j1939_session_new+0x55/0x1d0 net/can/j1939/transport.c:1495
+    j1939_session_fresh_new net/can/j1939/transport.c:1543 [inline]
+    j1939_xtp_rx_rts_session_new net/can/j1939/transport.c:1630 [inline]
+    j1939_xtp_rx_rts+0x47a/0xb30 net/can/j1939/transport.c:1751
+    j1939_tp_cmd_recv net/can/j1939/transport.c:2073 [inline]
+    j1939_tp_recv+0x1b9/0x800 net/can/j1939/transport.c:2160
+    j1939_can_recv+0x35f/0x4d0 net/can/j1939/main.c:108
+    deliver net/can/af_can.c:575 [inline]
+    can_rcv_filter+0xdd/0x2c0 net/can/af_can.c:609
+    can_receive+0xf0/0x140 net/can/af_can.c:666
+    can_rcv+0xf6/0x130 net/can/af_can.c:690
+    __netif_receive_skb_one_core+0xeb/0x100 net/core/dev.c:6137
+    __netif_receive_skb+0x1d/0x80 net/core/dev.c:6250
+    process_backlog+0xd5/0x1e0 net/core/dev.c:6602
+    __napi_poll+0x44/0x3a0 net/core/dev.c:7666
+    napi_poll net/core/dev.c:7729 [inline]
+    net_rx_action+0x492/0x560 net/core/dev.c:7881
+    handle_softirqs+0xe1/0x2e0 kernel/softirq.c:622
+    __do_softirq kernel/softirq.c:656 [inline]
+    invoke_softirq kernel/softirq.c:496 [inline]
+    __irq_exit_rcu+0x98/0xc0 kernel/softirq.c:723
+    instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1056 [inline]
+    sysvec_apic_timer_interrupt+0x73/0x80 arch/x86/kernel/apic/apic.c:1056
+
+connection error: failed to recv *flatrpc.ExecutorMessageRawT: EOF
+
+
 ---
- drivers/net/usb/sr9700.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/usb/sr9700.c b/drivers/net/usb/sr9700.c
-index 091bc2aca7e8..5d97e95a17b0 100644
---- a/drivers/net/usb/sr9700.c
-+++ b/drivers/net/usb/sr9700.c
-@@ -52,7 +52,7 @@ static int sr_read_reg(struct usbnet *dev, u8 reg, u8 *value)
- 
- static int sr_write_reg(struct usbnet *dev, u8 reg, u8 value)
- {
--	return usbnet_write_cmd(dev, SR_WR_REGS, SR_REQ_WR_REG,
-+	return usbnet_write_cmd(dev, SR_WR_REG, SR_REQ_WR_REG,
- 				value, reg, NULL, 0);
- }
- 
-@@ -65,7 +65,7 @@ static void sr_write_async(struct usbnet *dev, u8 reg, u16 length,
- 
- static void sr_write_reg_async(struct usbnet *dev, u8 reg, u8 value)
- {
--	usbnet_write_cmd_async(dev, SR_WR_REGS, SR_REQ_WR_REG,
-+	usbnet_write_cmd_async(dev, SR_WR_REG, SR_REQ_WR_REG,
- 			       value, reg, NULL, 0);
- }
- 
--- 
-2.43.0
-
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
