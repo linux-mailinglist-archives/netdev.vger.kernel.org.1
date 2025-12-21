@@ -1,228 +1,302 @@
-Return-Path: <netdev+bounces-245644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C8B7CD4299
-	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 16:59:24 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AB14CD4320
+	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 17:58:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id ADAC63005284
-	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 15:59:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6D0F230054AC
+	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 16:58:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF8602FDC40;
-	Sun, 21 Dec 2025 15:59:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A064420A5EA;
+	Sun, 21 Dec 2025 16:58:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SDb1qHg4"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="W5wGtHlm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11010020.outbound.protection.outlook.com [52.101.193.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56D51230BF6
-	for <netdev@vger.kernel.org>; Sun, 21 Dec 2025 15:59:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766332761; cv=none; b=iVS69fXPWp4Gfy/E6uIa3juI1h7ycHxFXZdNzmqhXPk4tZrmYXDOh5vYzn14tJZL7+m1D3woSqDqcCWCawhbqGfoQt66Wlbo2UsaxzzHp/ndXw2rsS5IVDWdiJmLy7XP6ip3RrUkE4t6p4aRcvhMUDbzFaH7KaHLa4O9OO3Ms6s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766332761; c=relaxed/simple;
-	bh=MtUBS4xGnK4wE5fi/FDlNFa/0vKaJk4Ms38RWj5+L1c=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=jvr2sjSyNpBzQLDwypCHCwTDQanCSSnlU68fdCEac67R5ti0yJVuaxmAtnfNPE9xihqrs4OMOjaAbmdBtRYJ/Ob1ZzAiheqGInat27/YcuwNEwQvbNxSstdKKLr3nCYKV6WWSebdXOHunYIgFGtlRZjEL95u8vwjvqUITGEY3UM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SDb1qHg4; arc=none smtp.client-ip=209.85.128.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-78fd6189c88so2151407b3.0
-        for <netdev@vger.kernel.org>; Sun, 21 Dec 2025 07:59:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766332759; x=1766937559; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hNSdPBk3V0ReeruxDeFVBGsdwB3Xhk69mnYONF3p3NM=;
-        b=SDb1qHg4CXi44XKIphQ2ei1Ab7cJt+MbOY9863ewnAkumb7BHM3KSziVLeLw1cWQxz
-         uWQf39QJLgTEpz7CYF29GMhaVmsQxFTM0xIxiVUYCe0+diWUAkotDWefkt9dZPoEZfh5
-         fq1x9CixhCQ++pBWWWQUYJCo/dKqkyrie/O0pxz9k7tofsdnxaEMEaSbPIguygQXlsIV
-         8Zb5erUlp55i65Tc4zuxZsEnFxJEj4UX6KVGu7+Jze6WKn+EWFUgdqbDEOL5aDeE7+lE
-         aWIXLkJMVTdKXMeY8feLU/Yu3KHRLHlRvt8udEklh9pVgXl2UQOlHf3DpyraaRCpFJd6
-         K9CQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766332759; x=1766937559;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hNSdPBk3V0ReeruxDeFVBGsdwB3Xhk69mnYONF3p3NM=;
-        b=ZQsipgshfYJBfgdHEHL16Xk1DBbpBksZkAoHqHfleDIrOU9sHJlOEErRCKrsfB7dsJ
-         dCjBCk1oBA5Z/iCkEVpbKvwb6mPgMThHxj7QvcfAg6oFrzZa2WTNfv9Fqvs1A5miNG8J
-         njdPt0wvuaNiki414ttyrHl6evu9T9W6PQPLr8K/rAI381Uwypv3fw5AkUFk1DMQMCP+
-         GZVQ51tIqazIk0VT+BW7geESkGr67TUl35Et8m4E77Mt8o/d3z7PyyyAqMMEm9mXc/VI
-         CGVvlb8wSQ2cYa44JXj1sWlqOMIUERGzd7eJIQMwJkui3h/Z/FGsuH+Du21PM4b6n6IA
-         wcxw==
-X-Forwarded-Encrypted: i=1; AJvYcCUyLqQCpbWUxYvz739IVjNc9j02leWykC20r1mfYVs718vjecCxw7vKR5CyDSDKE1SdvLaiN/0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YytrLUTIwJhq0hLty5wtAl8isCsIeX+elHxUq1ivdO0R34nVIaa
-	SUVqn7FXF/1wml0QAro//5UjhtrzFSmIhcJkIl9oIWZtFx+UAYmTt1KI
-X-Gm-Gg: AY/fxX4oJNAzVDY4BXg1JE0P+AJRAWwJiGvB+fTpBGOmu+3b2D2FwB43wyyH41fulKk
-	FC464ZzfzSOKEe5LCwaUG1/r+iN4yKr9jd+Yr+K7ILPDIAqdtu2JSyPatKWa3vrmYUMKf35iqpD
-	enw4NguwZYQNbjssv8wwpkslc3FMRyxDGgkc/BWCHj8FsbtQau6GSUNJLbdkrcFOc/WNXtolSii
-	AFStgynZzi35zTutsttvOAcONFOXYf6KDrAUJmkQNmPFq4pDeyRUAEokLlLzy6psHxn4Q42MpCB
-	VP5Waa9PMuC7321SZHbZZeT6L/pEKBgBFs9NtlHuG7EfpwR1mr5xtNP2oYzeJcKbpcJhLQfasHK
-	ftddEwEr2fLbRF6GLWWuQLNmVIoeI5ODIsiX61pCOwL8fhuyuqA2Co/bPJKhbGTTtEaPAE3W08n
-	KhzinptzzEMDokc/fHNV8Zmzn65ahLtjYkbWQ7D+BlrtCh7/h0XSONXg+yJSbhaaaZiOQ=
-X-Google-Smtp-Source: AGHT+IGF+VpTiOMDUWzWEtigEDLCqB+tCQ//FVIu/7r5ZeP1B6gsQjy211tNlXOlJsHzAdCr9FTJlA==
-X-Received: by 2002:a05:690c:905:b0:78d:b1e9:85e7 with SMTP id 00721157ae682-78fb4059869mr75758977b3.53.1766332759276;
-        Sun, 21 Dec 2025 07:59:19 -0800 (PST)
-Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
-        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-78fb451ba61sm33755087b3.39.2025.12.21.07.59.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Dec 2025 07:59:18 -0800 (PST)
-Date: Sun, 21 Dec 2025 10:59:18 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
- "David S. Miller" <davem@davemloft.net>, 
- David Ahern <dsahern@kernel.org>, 
- Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Willem de Bruijn <willemb@google.com>, 
- Jakub Kicinski <kuba@kernel.org>
-Cc: Shuah Khan <shuah@kernel.org>, 
- Ido Schimmel <idosch@nvidia.com>, 
- netdev@vger.kernel.org, 
- Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Message-ID: <willemdebruijn.kernel.14a486c1824f2@gmail.com>
-In-Reply-To: <20251220032335.3517241-2-vadim.fedorenko@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D09951428F4
+	for <netdev@vger.kernel.org>; Sun, 21 Dec 2025 16:58:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.20
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1766336297; cv=fail; b=St9yNV38/4hj5h5tqJDN74KygiWTZBVa4/lWRd9goQI5jXsCdDGAqA1sC52Wa4Vzf2o/k3pHVvgYjbX+1yWFQm0VcU7eoBipnXTyjofrt/9GTbDleqs7o3+7nkdN+oHvzd5zKihqZxvFJVL6Xx7jFQM51xds6Zii7tg78yp7AOs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1766336297; c=relaxed/simple;
+	bh=LdGFwXnXKtCBvNitYQOKR6cu6kHXYTfws04e1RlZotI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=aS8HiFZLDC+8ZlNXdYwF5os4paqweQaYvFdPkgPG8iymqirZOJa5IPFrhbAix9PJuRPJ/Vp6oIMC15X/jNqUbBq1q0YWgk7ut3fXU5vsHeNLgjq98+iTjSGSK2H6alUPGAXyMCj4VF5phv64rG3Aoe41Tmg62AZJlB1QNwAFovM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=W5wGtHlm; arc=fail smtp.client-ip=52.101.193.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qM6qLBvsxvnETJse6D/b4hxrD1cqivAbvkJunZiih2m8ZzellPfQbfcm1EaZvcqkkUjwv4M/U/0+elU1quY1v367ZphcTTs3kaNatnC68ibdX4JTzJsajWsqIkhU2YQUuF8ykn9USTS+nKxfDtL7PluQvJAw3zq8oWOK4gjupsrJ2imXH0Le8UsPi0OXnbowpaQ687FLygd0MHpOHbaYvDn4AelpF1YMgzxtDiao2iscMah1sFVlULHujCQ7MD7TPx0rzUSjzzAjXKXYS/xrWm//58c3HNSA3M9MAIVdk+z6PzTpL6V/wzrMmrhUlC1MhMdQ+LtMU61xqNAAGbRbbg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cg7GeERWO0W7xUVhOMzNGSdbS8LDgD1uZtq4DGR6osM=;
+ b=Q6MYdzfs+UUhyrxZmwO7gGYA2Qo/2JCJwEOu1+j3/G5lxuDG7l+ROwBmdHJJRdSi7XF8C8gDlB2LzFNGdX7dIyPm4qA6BFnbBrerZv56/+gZlIY4dhuVPDmApgT4JpOl8XUlejTxL/gw548J0Y5mE3GJ8k0847tfN4NvyVVmO+S7ED90GzjupU8F/Eb5RzqNGtU+sMb3vXj6mJ9uFkatO1C6Ex1grb1V3x5QfxHKJQfJVyAqpgblq2WIyouOH7SEmoG+ObJzS5DxwqO6heFXw5qu7DnR8wdQxHZhT8V16ZUj5bcQG3FI72jVIT2lr9H82y8Fpvi+cf8ZgjJlukU3Bw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cg7GeERWO0W7xUVhOMzNGSdbS8LDgD1uZtq4DGR6osM=;
+ b=W5wGtHlmq2R/4aDqFqad+AegttIWdEschgt7w1MJT1+l0KA0fT78qWaqTkGtozdvTalETR0FOtGaXiUjZMg4q1D582d0vdcDW5ECA/wnL/L8rUqf3dUEZUE4qLJr6HZ/f6hwW4dF0wpwW9Dl8CVL1uZuESEctBe1OsQLvDIBeRuOyokL9SMMprUx8cPnfsjLE6l8INez0G+tY1CdTgx3smke3VLTyTjilvuER8TGXHEBzA+tNauX9Qk8WE5RV89r90MAVAuuyRf3yAoY+G1Vd+8ak7y5vdIEeC2G8Q1fd0RvePrx+OhcJqtoQR6vo7QlL97KwTuBn4xmyOqnGis1Vw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by BN5PR12MB9510.namprd12.prod.outlook.com (2603:10b6:408:2ac::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9434.10; Sun, 21 Dec
+ 2025 16:58:12 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2%2]) with mapi id 15.20.9434.009; Sun, 21 Dec 2025
+ 16:58:12 +0000
+Date: Sun, 21 Dec 2025 18:58:01 +0200
+From: Ido Schimmel <idosch@nvidia.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Willem de Bruijn <willemb@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net v2 1/2] net: fib: restore ECMP balance from loopback
+Message-ID: <aUgnGahB9uXbvrbh@shredder>
 References: <20251220032335.3517241-1-vadim.fedorenko@linux.dev>
- <20251220032335.3517241-2-vadim.fedorenko@linux.dev>
-Subject: Re: [PATCH net v2 2/2] selftests: fib_test: Add test case for ipv4
- multi nexthops
+ <willemdebruijn.kernel.25af879fdb851@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <willemdebruijn.kernel.25af879fdb851@gmail.com>
+X-ClientProxiedBy: TL2P290CA0002.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:2::12) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|BN5PR12MB9510:EE_
+X-MS-Office365-Filtering-Correlation-Id: a217313f-d2ff-44ce-f70a-08de40b22008
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?9KpOqG4DjV8Vwemmkq9uF0XDhp6eOjh1H4y0d8uLOkBRE4iKA99LoTnFU7YM?=
+ =?us-ascii?Q?vVLxT7tiTfTyCmwCYkf9LdFSxT9rG6pLfj7Jh0McYNsvMsoiacgPfMdGeml+?=
+ =?us-ascii?Q?ASk0IraW3j9t3NrnFEnStl5J5QlaPz6eBhRtCY3Ybc1JLd43CWE/TBSq7Dxo?=
+ =?us-ascii?Q?J7FrwfyZQOrVPOHNRh1+uqqPEpJ7QYVwjTitkxIhl7bhahiYw64GLPzIW4RL?=
+ =?us-ascii?Q?1N9erThB1vEyzV5BjGbm8+/RPEGJHt4eHcW1DLFKEFN8XwxqCCfZTP2TwDMk?=
+ =?us-ascii?Q?nY32WdcNRjnEgPiEn931zkkywLOwfSvjwVD4/dzYitGdbgFRXgx7eGesBdVO?=
+ =?us-ascii?Q?mFWxrspkVBN0flNms2ITb6yhE8GP4d36VaZWj25/DhuUmrn5BVIa4zcscv8J?=
+ =?us-ascii?Q?ORBR364xtzCzUoyTp7pYHudtRfHMzDqbv4c62jni+nPVCHCRr/YbIVHkLXyi?=
+ =?us-ascii?Q?q/VFF15FGtJb1cDH46nqZWvwhkOnHE3imeAwy39+6yGtoWibmX5ck4f1j0IA?=
+ =?us-ascii?Q?v32Ks2TiGP2YVxeCB7RY9cPYOzGLKNHjOp8Gfxb3/IaHPg5beNiAKUiNleup?=
+ =?us-ascii?Q?8gN2YputSP18ri++UyHwE96Xug0Wp4u3Zd3DAnjOJoCfcuzJO9rWkpvFdbZc?=
+ =?us-ascii?Q?ajE0ADeBeB37GJ3pQDhybuezRgVmGY/0BULdcToLVm/KQtdd0iETbKPL1t1o?=
+ =?us-ascii?Q?3c0j4wdF+USK/c3LrgvpDqpoBO8EcEvtdUlYw/kqpg1DcN7RZuFLi9Uq+0VB?=
+ =?us-ascii?Q?JIm2BrkeWUb4H0MjlB2NwcsPmTphirwzGBhr3/dif5LeYImaIh4LFNZlhrrL?=
+ =?us-ascii?Q?K1zZ+bc1CuLz7FSyaG94D6j2a/4Zjw+uHb9SjQaaWDuX/OowU+Hc5aXFlvp7?=
+ =?us-ascii?Q?B+rOGhUbloMxi/NxeAFiDf9ZIwgArrgPo1n05cIqtlBqPP81kvMxrMP1QJ/b?=
+ =?us-ascii?Q?52OzjgRyGyWb7poISVQyCzPOQOOHW1qZ6ZfcOAQWWRJ+Lt5DMAZwDxGHEp+I?=
+ =?us-ascii?Q?VvsvEXuly2QtbJnT1Kt2HSXkQETShn+yJYrQX5W9U/ktYE/itRtCHEGPk3wb?=
+ =?us-ascii?Q?0fm66ZLLHQ4lsW0pmp73KYZV8H20TOmfVwR/csS5jvLZhqzv7gXPR+a63Ide?=
+ =?us-ascii?Q?GiOOCMpbgHxBsYJhunLE/gfz7CQJ4PzyDkxH1xY2j9PKpv0PYZ5vt65CIvej?=
+ =?us-ascii?Q?7Y91IR7w9mEe0dpXakVTymKK8Gu1W1r8GqdcbrN8f9xJhrz03IWHb4bmIdlT?=
+ =?us-ascii?Q?5zEiP/+i4rIOjL58k+iMfecaHPrR6P5XMFnTG/69s/N9c4MmOsIXb+/qkPDm?=
+ =?us-ascii?Q?/dKIb7pk1MbMG06w+Rbt+CML6snXpdHR6+GqmAyEL+yD2tNi5a08TaMok8eE?=
+ =?us-ascii?Q?nUfD0aAZxzzMDu3S2blPyy0/SxAx3/crxh+eMCKpS2ridN9xIm5WoH1QkIOh?=
+ =?us-ascii?Q?xThnBhQKoSr8+ryEIJsQHECneJ8AybhA?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?9J+/TMYHGoWZItA209Avt/Q4pIkCVZPwoyN23wx4oNwuerck+ogxFWJKr57o?=
+ =?us-ascii?Q?88/EwqDl9QucePKw91VlN40t8Q6NtIe3XGrIdZ/3lToa6qm5/3Vz50JQMOoq?=
+ =?us-ascii?Q?9z9b+mmj7LDVpydpj94/I984oqQM5xHSOJrQcck2WgrvmMzEVEL3nZUNsaIN?=
+ =?us-ascii?Q?riR7ciUqJsnAvfe2LSYpLVeHcBN+1XIaxZjL02/Kn/tyRZOJNN5wKrshvHhz?=
+ =?us-ascii?Q?ZXknsOA2JwbV01axHU9XySsKQc0grsm3Q6yH314zpJfj7VOtRrOsuXY8SXk0?=
+ =?us-ascii?Q?4idEZwD7DrpqcbU2yCNDphrMy0wVNtPjOooDNW5knjw3cTPyUJvrIOa04tEY?=
+ =?us-ascii?Q?W6bV+Z6uOMhrEW5ZBVJ6M/PopH8BeqzkFR7A3w5FjtjIj9zftR1svo3xARCq?=
+ =?us-ascii?Q?LisW3/5wqk970E5+vHHAKVvQ4bLx8GoPyJASxBwaosV+x1mXcPpRs/5C1hyM?=
+ =?us-ascii?Q?q36TXGpSDk27YS/bVyAYwu29Mh4zaw/escZSuagDQbuZskNU7m+WUqBFt0Am?=
+ =?us-ascii?Q?JL90GplKNMHqJi9Tw/Jlkro9J2z2/5tJWpziIatK8FTSPpTaH2yRChiT8h5O?=
+ =?us-ascii?Q?jVOZnPjglJ4ovvt1R2HvbnevRXxXoF7AooYW0YFqhd8Iu2bxSGQxsvQxqf0c?=
+ =?us-ascii?Q?La2wCebA+SjGwYmqULp9dNom3stB4kFh6mX4IXTOh5EvtTy7RGoZFAe0SCGY?=
+ =?us-ascii?Q?FkYfNoe0E+kInmip3FQ4HLzZtwM/FdEBk+zDHqEYG9ZOWCt8gc24kzrVVuQr?=
+ =?us-ascii?Q?YZxXEhqeg+FgeyU09WD3uyv3UFPn+TQaSk3id9aUd7BF0VR4FflSxU2hRTpx?=
+ =?us-ascii?Q?cWEBOA/+7uctaF9Y4B793CN9TBNjvhLyjySr0janH496glv2P2hPKi4TVRUA?=
+ =?us-ascii?Q?fKlwOHJ4bKfQcKjNhXIuLsXNDMDl1P+mC//UMDwgMMex992Z6QcvukhK9bpK?=
+ =?us-ascii?Q?ClN44+t5RGZDdqzRtEWcFY66uO2e4fBbqIM0cH3vmh/0XshagtwJrsgz3Eir?=
+ =?us-ascii?Q?OvfA5Dn4MBjZzg48QuDoPY4M+lhOv0VqtJ/eemE/G65e/b/zB/qVRD6r7xOk?=
+ =?us-ascii?Q?/ykQWOTSmycAMjUPMiIbfjoqgwN/1CsFT2rL+XfWFsMMlRvwIIRoah5kzhOc?=
+ =?us-ascii?Q?HQvpmUQ9oIpk8sO6B6qYjibOBA6/GgSQBuML04GHxEclh0HFqhZaZjajFYJw?=
+ =?us-ascii?Q?+ljVVrRNW8dPg1OywUhmql7HZm6Cgqn7Ny68CSeytmR2KI5y2br7bAwP44HV?=
+ =?us-ascii?Q?JdwyMcsZ7xHESA/vLRovuq7LSaqz0DzPsj4Ti8V0e9K5MnVuN6rc0sX9VWPz?=
+ =?us-ascii?Q?NgNaBKJwCy3TYD6eAAQopl8wSEpVdWzBhTH/R/dE4E7MiSM9Z5S1uHVgeGZ5?=
+ =?us-ascii?Q?Rk9TSG9GWEplAxjYBrWDRxhWgyM60ua+vqU/HFQFXy/k3pEyLsofuky2LBrX?=
+ =?us-ascii?Q?PhPck1UIIiw9w6529YDVMnBoA5abeWJuka03Bcr5x+6tuPFrUvZajuIECGmH?=
+ =?us-ascii?Q?mtJXuUe7fslwr3A62vgseneivr2PZ4ih6Q7TPeIz4W93Ds/CH/VIbHb1g+9i?=
+ =?us-ascii?Q?Ims0mjEFd/pKLgqgYTjqmg6g+eu2liHw+qTu/KKELbti0h1sgTyTpBX9ka/O?=
+ =?us-ascii?Q?y3WTGG3dtxo4ptLSryuFCSbUG/gwUlvv4lXlUfFUa6o28OYYu2P87q6nmlXq?=
+ =?us-ascii?Q?NVs5cgO1+4LLWSy07QpwI6+/Ewbbq/3HnGWaUtv8ncokwkCT?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a217313f-d2ff-44ce-f70a-08de40b22008
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Dec 2025 16:58:12.0273
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: KQV6RsJnjtvSyO5B+BIMcLJ9faevAthGCMiqOqPiVTrKmFkVKX+ZsK8UACHlhVhGy0QISF1cXtq0iflhtWmpxw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN5PR12MB9510
 
-Vadim Fedorenko wrote:
-> The test checks that with multi nexthops route the preferred route is the
-> one which matches source ip. In case when source ip is on dummy
-> interface, it checks that the routes are balanced.
+On Sun, Dec 21, 2025 at 10:55:15AM -0500, Willem de Bruijn wrote:
+> Vadim Fedorenko wrote:
+> > Preference of nexthop with source address broke ECMP for packets with
+> > source addresses which are not in the broadcast domain, but rather added
+> > to loopback/dummy interfaces. Original behaviour was to balance over
+> > nexthops while now it uses the latest nexthop from the group.
+> > 
+> > For the case with 198.51.100.1/32 assigned to dummy0 and routed using
+> > 192.0.2.0/24 and 203.0.113.0/24 networks:
+> > 
+> > 2: dummy0: <BROADCAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
+> >     link/ether d6:54:8a:ff:78:f5 brd ff:ff:ff:ff:ff:ff
+> >     inet 198.51.100.1/32 scope global dummy0
+> >        valid_lft forever preferred_lft forever
+> > 7: veth1@if6: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+> >     link/ether 06:ed:98:87:6d:8a brd ff:ff:ff:ff:ff:ff link-netnsid 0
+> >     inet 192.0.2.2/24 scope global veth1
+> >        valid_lft forever preferred_lft forever
+> >     inet6 fe80::4ed:98ff:fe87:6d8a/64 scope link proto kernel_ll
+> >        valid_lft forever preferred_lft forever
+> > 9: veth3@if8: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+> >     link/ether ae:75:23:38:a0:d2 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+> >     inet 203.0.113.2/24 scope global veth3
+> >        valid_lft forever preferred_lft forever
+> >     inet6 fe80::ac75:23ff:fe38:a0d2/64 scope link proto kernel_ll
+> >        valid_lft forever preferred_lft forever
+> > 
+> > ~ ip ro list:
+> > default
+> > 	nexthop via 192.0.2.1 dev veth1 weight 1
+> > 	nexthop via 203.0.113.1 dev veth3 weight 1
+> > 192.0.2.0/24 dev veth1 proto kernel scope link src 192.0.2.2
+> > 203.0.113.0/24 dev veth3 proto kernel scope link src 203.0.113.2
+> > 
+> > before:
+> >    for i in {1..255} ; do ip ro get 10.0.0.$i; done | grep veth | awk ' {print $(NF-2)}' | sort | uniq -c:
+> >     255 veth3
+> > 
+> > after:
+> >    for i in {1..255} ; do ip ro get 10.0.0.$i; done | grep veth | awk ' {print $(NF-2)}' | sort | uniq -c:
+> >     122 veth1
+> >     133 veth3
+
+The commit message only explains the problem, but not the solution...
+
+> > 
+> > Fixes: 32607a332cfe ("ipv4: prefer multipath nexthop that matches source address")
+> > Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> > ---
+> > v1 -> v2:
+> > 
+> > - add score calculation for nexthop to keep original logic
+> > - adjust commit message to explain the config
+> > - use dummy device instead of loopback
+> > ---
+> > 
+> >  net/ipv4/fib_semantics.c | 24 ++++++++----------------
+> >  1 file changed, 8 insertions(+), 16 deletions(-)
+> > 
+> > diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
+> > index a5f3c8459758..4d3650d20ff2 100644
+> > --- a/net/ipv4/fib_semantics.c
+> > +++ b/net/ipv4/fib_semantics.c
+> > @@ -2167,8 +2167,8 @@ void fib_select_multipath(struct fib_result *res, int hash,
+> >  {
+> >  	struct fib_info *fi = res->fi;
+> >  	struct net *net = fi->fib_net;
+> > -	bool found = false;
+> >  	bool use_neigh;
+> > +	int score = -1;
+> >  	__be32 saddr;
+> >  
+> >  	if (unlikely(res->fi->nh)) {
+> > @@ -2180,7 +2180,7 @@ void fib_select_multipath(struct fib_result *res, int hash,
+> >  	saddr = fl4 ? fl4->saddr : 0;
+> >  
+> >  	change_nexthops(fi) {
+> > -		int nh_upper_bound;
+> > +		int nh_upper_bound, nh_score = 0;
+> >  
+> >  		/* Nexthops without a carrier are assigned an upper bound of
+> >  		 * minus one when "ignore_routes_with_linkdown" is set.
+> > @@ -2190,24 +2190,16 @@ void fib_select_multipath(struct fib_result *res, int hash,
+> >  		    (use_neigh && !fib_good_nh(nexthop_nh)))
+> >  			continue;
+> >  
+> > -		if (!found) {
+> > +		if (saddr && nexthop_nh->nh_saddr == saddr)
+> > +			nh_score += 2;
+> > +		if (hash <= nh_upper_bound)
+> > +			nh_score++;
+> > +		if (score < nh_score) {
+> >  			res->nh_sel = nhsel;
+> >  			res->nhc = &nexthop_nh->nh_common;
+> > -			found = !saddr || nexthop_nh->nh_saddr == saddr;
 > 
-> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> if score == 3 return immediately?
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+We can also return early in the input path (!saddr) when score is 1.
+This seems to work:
 
-> ---
-> v1 -> v2:
-> - move tests to fib_tests.sh
-> ---
->  tools/testing/selftests/net/fib_tests.sh | 70 +++++++++++++++++++++++-
->  1 file changed, 69 insertions(+), 1 deletion(-)
+diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
+index 4d3650d20ff2..0caf38e44c73 100644
+--- a/net/ipv4/fib_semantics.c
++++ b/net/ipv4/fib_semantics.c
+@@ -2197,6 +2197,8 @@ void fib_select_multipath(struct fib_result *res, int hash,
+ 		if (score < nh_score) {
+ 			res->nh_sel = nhsel;
+ 			res->nhc = &nexthop_nh->nh_common;
++			if (nh_score == 3 || (!saddr && nh_score == 1))
++				return;
+ 			score = nh_score;
+ 		}
+
+Tested with net/fib_tests.sh and forwarding/router_multipath.sh
+
 > 
-> diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing/selftests/net/fib_tests.sh
-> index a88f797c549a..c5694cc4ddd2 100755
-> --- a/tools/testing/selftests/net/fib_tests.sh
-> +++ b/tools/testing/selftests/net/fib_tests.sh
-> @@ -12,7 +12,7 @@ TESTS="unregister down carrier nexthop suppress ipv6_notify ipv4_notify \
->         ipv4_route_metrics ipv4_route_v6_gw rp_filter ipv4_del_addr \
->         ipv6_del_addr ipv4_mangle ipv6_mangle ipv4_bcast_neigh fib6_gc_test \
->         ipv4_mpath_list ipv6_mpath_list ipv4_mpath_balance ipv6_mpath_balance \
-> -       fib6_ra_to_static"
-> +       ipv4_mpath_balance_preferred fib6_ra_to_static"
->  
->  VERBOSE=0
->  PAUSE_ON_FAIL=no
-> @@ -2751,6 +2751,73 @@ ipv4_mpath_balance_test()
->  	forwarding_cleanup
->  }
->  
-> +get_route_dev_src()
-> +{
-> +	local pfx="$1"
-> +	local src="$2"
-
-only with my highly pedantic hat on, and only if respinning: these can be local -r
-
-> +	local out
-> +
-> +	if out=$($IP -j route get "$pfx" from "$src" | jq -re ".[0].dev"); then
-> +		echo "$out"
-> +	fi
-> +}
-> +
-> +ipv4_mpath_preferred()
-> +{
-> +	local src_ip=$1
-> +	local pref_dev=$2
-> +	local dev routes
-> +	local route0=0
-> +	local route1=0
-> +	local pref_route=0
-> +	num_routes=254
-> +
-> +	for i in $(seq 1 $num_routes) ; do
-> +		dev=$(get_route_dev_src 172.16.105.$i $src_ip)
-
-Similarly, I was going to ask to avoid open coding the ip prefixes
-repeatedly. But that is the style in this file, so fine to follow.
-
-> +		if [ "$dev" = "$pref_dev" ]; then
-> +			pref_route=$((pref_route+1))
-> +		elif [ "$dev" = "veth1" ]; then
-> +			route0=$((route0+1))
-> +		elif [ "$dev" = "veth3" ]; then
-> +			route1=$((route1+1))
-> +		fi
-> +	done
-> +
-> +	routes=$((route0+route1))
-> +
-> +	[ "$VERBOSE" = "1" ] && echo "multipath: routes seen: ($route0,$route1,$pref_route)"
-> +
-> +	if [ x"$pref_dev" = x"" ]; then
-> +		[[ $routes -ge $num_routes ]] && [[ $route0 -gt 0 ]] && [[ $route1 -gt 0 ]]
-> +	else
-> +		[[ $pref_route -ge $num_routes ]]
-> +	fi
-> +
-> +}
-> +
-> +ipv4_mpath_balance_preferred_test()
-> +{
-> +	echo
-> +	echo "IPv4 multipath load balance preferred route"
-> +
-> +	forwarding_setup
-> +
-> +	$IP route add 172.16.105.0/24 \
-> +		nexthop via 172.16.101.2 \
-> +		nexthop via 172.16.103.2
-> +
-> +	ipv4_mpath_preferred 172.16.101.1 veth1
-> +	log_test $? 0 "IPv4 multipath loadbalance from veth1"
-> +
-> +	ipv4_mpath_preferred 172.16.103.1 veth3
-> +	log_test $? 0 "IPv4 multipath loadbalance from veth3"
-> +
-> +	ipv4_mpath_preferred 198.51.100.1
-> +	log_test $? 0 "IPv4 multipath loadbalance from dummy"
-> +
-> +	forwarding_cleanup
-> +}
-> +
->  ipv6_mpath_balance_test()
->  {
->  	echo
-> @@ -2861,6 +2928,7 @@ do
->  	ipv6_mpath_list)		ipv6_mpath_list_test;;
->  	ipv4_mpath_balance)		ipv4_mpath_balance_test;;
->  	ipv6_mpath_balance)		ipv6_mpath_balance_test;;
-> +	ipv4_mpath_balance_preferred)	ipv4_mpath_balance_preferred_test;;
->  	fib6_ra_to_static)		fib6_ra_to_static;;
->  
->  	help) echo "Test names: $TESTS"; exit 0;;
-> -- 
-> 2.47.3
+> > +			score = nh_score;
+> >  		}
+> >  
+> > -		if (hash > nh_upper_bound)
+> > -			continue;
+> > -
+> > -		if (!saddr || nexthop_nh->nh_saddr == saddr) {
+> > -			res->nh_sel = nhsel;
+> > -			res->nhc = &nexthop_nh->nh_common;
+> > -			return;
+> > -		}
+> > -
+> > -		if (found)
+> > -			return;
+> > -
+> >  	} endfor_nexthops(fi);
+> >  }
+> >  #endif
+> > -- 
+> > 2.47.3
+> > 
 > 
-
-
+> 
 
