@@ -1,177 +1,157 @@
-Return-Path: <netdev+bounces-245653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB062CD44CC
-	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 20:27:29 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 374F0CD4508
+	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 20:45:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CC617300727E
-	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 19:27:19 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 066B93004414
+	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 19:45:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74B6B30EF69;
-	Sun, 21 Dec 2025 19:27:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75A3228750B;
+	Sun, 21 Dec 2025 19:45:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KILJ2U4P"
+	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="VtQxNaAE";
+	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="FgpDFrgJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C32AE30DD13
-	for <netdev@vger.kernel.org>; Sun, 21 Dec 2025 19:27:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766345238; cv=none; b=M72WB1wku8ofuwzxaTdFaJKjDckQC6+d2fsySmnO7OnvPH3yOiBVYVYAGY8rnfzQJulEOE5Aer4heSLEL1YyS7ZyCH+W3/C49Vpt6WsWhDtOLywsGyVrrsJmTCKFuN7M7NVmEwOMpb70ACBVJeaK/JVqDcukZRvdn6bDRcST6DU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766345238; c=relaxed/simple;
-	bh=bUpuiE7gbk9+jtqlipRSBKneusT7oW5+1AxJqtzri0g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BbGE3CeqM60hMuOJXgKCbvxUOZHVXfXbj3Bq9aOdxhRMPl6OToZTBL6lwIu170rb2gjUEPz25qMQGSelijmu7O7DqKa5u+oajmFuVU0G/HFQd52wEpqCKQNkr8VuIPXu2T83YrPiZtxH8L9gjuh/p1HULqmqMiiFAmt3dWsKvtM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KILJ2U4P; arc=none smtp.client-ip=95.215.58.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1766345233;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HFmFSljUtS3RILM0AuV3uVdm75tke+wlsQWpV0SDano=;
-	b=KILJ2U4P6d+JmFSHDcW7P3ZDYLsWZQFWdZjvnItqU1X97zL2O/bWP8TmXCRVhYQBsPMbNp
-	METxZL1YvgQR9K1bWAzMFGWGMjJgRBa9sRfMuqS8XABVxj8gfQ2JJuLfabZDV/KdZb0TO2
-	2bzMaSC0IAJQQrt5/k114sds+/GlU2E=
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-To: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Willem de Bruijn <willemb@google.com>,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: Shuah Khan <shuah@kernel.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	netdev@vger.kernel.org,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Subject: [PATCH net v3 2/2] selftests: fib_test: Add test case for ipv4 multi nexthops
-Date: Sun, 21 Dec 2025 19:26:39 +0000
-Message-ID: <20251221192639.3911901-2-vadim.fedorenko@linux.dev>
-In-Reply-To: <20251221192639.3911901-1-vadim.fedorenko@linux.dev>
-References: <20251221192639.3911901-1-vadim.fedorenko@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB33450276;
+	Sun, 21 Dec 2025 19:45:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1766346324; cv=pass; b=pO3BWWfCx47l6fZJA6DOr1PrXHrEZeJADrg46O+78KG2PToWjHTlhvTQgZE9aUV6Pr8DkA1UdgqUJEqGpcLIc/pLqPzh7pN+VxhQbzZrUwjRMtpPHGjAnltqeVRVTnmBo7FXodlv1Igpg/59NaTTOKlBhKr36dV4TkoZAfGrXQE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1766346324; c=relaxed/simple;
+	bh=i++1cctCPW5K7SGM/RAotmNGTpyNeau6wRii2AA4gpQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ix1FKa2o5kwJzRLhVgeskiPx2KFfV9NrNurmRP8mYZZpuszdaizZQkQuf5Y70pQSRfSBjJ57nB8uARMSIoRYFleMMP/Bz9IlL/hoN6v662PcqPQQD3yayO9gXNl/xM48zMqsjQ0XnuKpLGFQmill5Ko4ca19UxtM+dNGkN/p6OE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=VtQxNaAE; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=FgpDFrgJ; arc=pass smtp.client-ip=85.215.255.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
+ARC-Seal: i=1; a=rsa-sha256; t=1766346137; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=aEBxyLqjOrTKNjjQtp9+JI+Uuj+aYgNDYZQurSVUFpk6lTodf++G2qR4QC3ZOktoR1
+    DkkeijDSjn+txRogZyg9FCAcZbhyT7AiVXDO6nRkgHarKg/qdivlTXlzquA7rA3zz5N9
+    8alem3KZ32iofZca7Ujmz6a+hpCXdzw73Cd0EQI1ppDKpKrZH+PSIqwbhUe3PnVFfsjJ
+    M4pkTrBRJBRJnnmwAR+gfD/t8uWiTtq90wTR9LYE53/gcmCdC1aYK2pAn7vyUOGB5RFF
+    PP5bc68XMGPmvksTT2qq5SEiewpM0o9RpGHayCpuZTw1JYN35eImRcvV+OgSEdFoDVLF
+    FCJA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1766346137;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=9A23g+fJ13s8kWcxp/C6OaQZwQpjkbSEThho02wFN7Q=;
+    b=I2fu6/MnuB6RMi0iyQ4DKE/oimf9k2CwV1CTX//wm+QCkMGB6CUYzqG1kKNE6odQQl
+    dum0q+HwKlciMsQXSbk8uFNg9ft8h6y3l8bA6dETLQ9wgtZspTYFKdKP4KbFazFQhS5/
+    u6qI/lFBoq5HDfXSnou9FSxgni8vzDfXp8YGB8nQPrgI7YECKIFxXVP4YhXClbVhEsx3
+    q1OrALDKnc53PsXr9lKbyYyaLLZJYFcMX//riVlrjcxNh2B6gEFi7qTb0K0N6oeeGr3I
+    yNpoRt1IPQ93d3o6iypqQucX1bbLWZurwf97epx9XJUI20drvyOqhnjUvD9tObZ25kGI
+    PDNw==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1766346137;
+    s=strato-dkim-0002; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=9A23g+fJ13s8kWcxp/C6OaQZwQpjkbSEThho02wFN7Q=;
+    b=VtQxNaAElacSC/iSg2K4Ig++0zncS8C4e21ZZlTv7g0JSaXYor777otArlgvbmDllO
+    gmwJvnT4mg6dOlTNNOELVhfrTWd31r4TcZa+ejQSHbu0kp2iZUfNWdheF7h9najQIMru
+    BguVYfpkNkZ6q1QgPu4ZzH4wwpSKbLDC4ls3PU6G4LSwqVS4RiJj6T8jthdJ94E7/+h3
+    k8JWrqWt8qzR9TqczuXn9Vj4hMNaO+13uYMYO+b+lfxHJoPw3ZC5jQRR+AQdSoqr1Whk
+    BKs2inlFhCOpTiCoctCuzb6RV4PoAj+8PhquoUhaa5NOxglv/ctayXWmd8hYnA+oTKss
+    Q9Kw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1766346137;
+    s=strato-dkim-0003; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=9A23g+fJ13s8kWcxp/C6OaQZwQpjkbSEThho02wFN7Q=;
+    b=FgpDFrgJRJzXFCe8lkfIZH7dk2uvWx3u8SuUyk6i+h6h/z8o0Jya+5d0J9I5b6UNZ5
+    GxxGvoKkOVu5w1Ye0oAA==
+X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjH4JKvMdQv2tTUsMrZpkO3Mw3lZ/t54cFxeFQ7s8bGWj0Q=="
+Received: from [IPV6:2a00:6020:4a38:6800::9f3]
+    by smtp.strato.de (RZmta 54.1.0 AUTH)
+    with ESMTPSA id K0e68b1BLJgGDvq
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Sun, 21 Dec 2025 20:42:16 +0100 (CET)
+Message-ID: <d3fe10bf-1505-4c0d-ab46-5c56615e328a@hartkopp.net>
+Date: Sun, 21 Dec 2025 20:42:10 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [bpf, xdp] headroom - was: Re: Question about to KMSAN:
+ uninit-value in can_receive
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: Andrii Nakryiko <andrii@kernel.org>, Prithvi <activprithvi@gmail.com>,
+ linux-can@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com, netdev@vger.kernel.org
+References: <20251117173012.230731-1-activprithvi@gmail.com>
+ <0c98b1c4-3975-4bf5-9049-9d7f10d22a6d@hartkopp.net>
+ <c2cead0a-06ed-4da4-a4e4-8498908aae3e@hartkopp.net>
+ <aSx++4VrGOm8zHDb@inspiron>
+ <d6077d36-93ed-4a6d-9eed-42b1b22cdffb@hartkopp.net>
+ <20251220173338.w7n3n4lkvxwaq6ae@inspiron>
+ <01190c40-d348-4521-a2ab-3e9139cc832e@hartkopp.net>
+ <20251221-ochre-macaw-of-serenity-f3ed07-mkl@pengutronix.de>
+Content-Language: en-US
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+In-Reply-To: <20251221-ochre-macaw-of-serenity-f3ed07-mkl@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The test checks that with multi nexthops route the preferred route is the
-one which matches source ip. In case when source ip is on dummy
-interface, it checks that the routes are balanced.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
----
- tools/testing/selftests/net/fib_tests.sh | 70 +++++++++++++++++++++++-
- 1 file changed, 69 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing/selftests/net/fib_tests.sh
-index a88f797c549a..c5694cc4ddd2 100755
---- a/tools/testing/selftests/net/fib_tests.sh
-+++ b/tools/testing/selftests/net/fib_tests.sh
-@@ -12,7 +12,7 @@ TESTS="unregister down carrier nexthop suppress ipv6_notify ipv4_notify \
-        ipv4_route_metrics ipv4_route_v6_gw rp_filter ipv4_del_addr \
-        ipv6_del_addr ipv4_mangle ipv6_mangle ipv4_bcast_neigh fib6_gc_test \
-        ipv4_mpath_list ipv6_mpath_list ipv4_mpath_balance ipv6_mpath_balance \
--       fib6_ra_to_static"
-+       ipv4_mpath_balance_preferred fib6_ra_to_static"
- 
- VERBOSE=0
- PAUSE_ON_FAIL=no
-@@ -2751,6 +2751,73 @@ ipv4_mpath_balance_test()
- 	forwarding_cleanup
- }
- 
-+get_route_dev_src()
-+{
-+	local pfx="$1"
-+	local src="$2"
-+	local out
-+
-+	if out=$($IP -j route get "$pfx" from "$src" | jq -re ".[0].dev"); then
-+		echo "$out"
-+	fi
-+}
-+
-+ipv4_mpath_preferred()
-+{
-+	local src_ip=$1
-+	local pref_dev=$2
-+	local dev routes
-+	local route0=0
-+	local route1=0
-+	local pref_route=0
-+	num_routes=254
-+
-+	for i in $(seq 1 $num_routes) ; do
-+		dev=$(get_route_dev_src 172.16.105.$i $src_ip)
-+		if [ "$dev" = "$pref_dev" ]; then
-+			pref_route=$((pref_route+1))
-+		elif [ "$dev" = "veth1" ]; then
-+			route0=$((route0+1))
-+		elif [ "$dev" = "veth3" ]; then
-+			route1=$((route1+1))
-+		fi
-+	done
-+
-+	routes=$((route0+route1))
-+
-+	[ "$VERBOSE" = "1" ] && echo "multipath: routes seen: ($route0,$route1,$pref_route)"
-+
-+	if [ x"$pref_dev" = x"" ]; then
-+		[[ $routes -ge $num_routes ]] && [[ $route0 -gt 0 ]] && [[ $route1 -gt 0 ]]
-+	else
-+		[[ $pref_route -ge $num_routes ]]
-+	fi
-+
-+}
-+
-+ipv4_mpath_balance_preferred_test()
-+{
-+	echo
-+	echo "IPv4 multipath load balance preferred route"
-+
-+	forwarding_setup
-+
-+	$IP route add 172.16.105.0/24 \
-+		nexthop via 172.16.101.2 \
-+		nexthop via 172.16.103.2
-+
-+	ipv4_mpath_preferred 172.16.101.1 veth1
-+	log_test $? 0 "IPv4 multipath loadbalance from veth1"
-+
-+	ipv4_mpath_preferred 172.16.103.1 veth3
-+	log_test $? 0 "IPv4 multipath loadbalance from veth3"
-+
-+	ipv4_mpath_preferred 198.51.100.1
-+	log_test $? 0 "IPv4 multipath loadbalance from dummy"
-+
-+	forwarding_cleanup
-+}
-+
- ipv6_mpath_balance_test()
- {
- 	echo
-@@ -2861,6 +2928,7 @@ do
- 	ipv6_mpath_list)		ipv6_mpath_list_test;;
- 	ipv4_mpath_balance)		ipv4_mpath_balance_test;;
- 	ipv6_mpath_balance)		ipv6_mpath_balance_test;;
-+	ipv4_mpath_balance_preferred)	ipv4_mpath_balance_preferred_test;;
- 	fib6_ra_to_static)		fib6_ra_to_static;;
- 
- 	help) echo "Test names: $TESTS"; exit 0;;
--- 
-2.47.3
+On 21.12.25 20:06, Marc Kleine-Budde wrote:
+> On 21.12.2025 19:29:37, Oliver Hartkopp wrote:
+>> we have a "KMSAN: uninit value" problem which is created by
+>> netif_skb_check_for_xdp() and later pskb_expand_head().
+>>
+>> The CAN netdev interfaces (ARPHRD_CAN) don't have XDP support and the CAN
+>> bus related skbs allocate 16 bytes of pricate headroom.
+>>
+>> Although CAN netdevs don't support XDP the KMSAN issue shows that the
+>> headroom is expanded for CAN skbs and a following access to the CAN skb
+>> private data via skb->head now reads from the beginning of the XDP expanded
+>> head which is (of course) uninitialized.
+>>
+>> Prithvi thankfully did some investigation (see below!) which proved my
+>> estimation about "someone is expanding our CAN skb headroom".
+>>
+>> Prithvi also proposed two ways to solve the issue (at the end of his mail
+>> below), where I think the first one is a bad hack (although it was my idea).
+>>
+>> The second idea is a change for dev_xdp_attach() where your expertise would
+>> be necessary.
+>>
+>> My sugestion would rather go into the direction to extend dev_xdp_mode()
+>>
+>> https://elixir.bootlin.com/linux/v6.19-rc1/source/net/core/dev.c#L10170
+>>
+>> in a way that it allows to completely disable XDP for CAN skbs, e.g. with a
+>> new XDP_FLAGS_DISABLED that completely keeps the hands off such skbs.
+> 
+> That sounds not like a good idea to me.
+> 
+>> Do you have any (better) idea how to preserve the private data in the
+>> skb->head of CAN related skbs?
+> 
+> We probably have to place the data somewhere else.
+
+Maybe in the tail room or inside struct sk_buff with some #ifdef 
+CONFIG_CAN handling?
+
+But let's wait for Andrii's feedback first, whether he is generally 
+aware of this XDP behavior effect on CAN skbs.
+
+Best regards,
+Oliver
 
 
