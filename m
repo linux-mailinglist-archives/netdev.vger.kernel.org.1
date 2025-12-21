@@ -1,231 +1,249 @@
-Return-Path: <netdev+bounces-245638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245639-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53AF4CD4092
-	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 14:21:06 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id 450E2CD40B9
+	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 14:43:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 69F9830004F6
-	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 13:21:05 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id B928330010E9
+	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 13:43:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21C4027BF7C;
-	Sun, 21 Dec 2025 13:21:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0288E2F9C37;
+	Sun, 21 Dec 2025 13:43:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bMtASqsP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H7pM1cfj";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lu0gqx/v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77DD6239E9D
-	for <netdev@vger.kernel.org>; Sun, 21 Dec 2025 13:21:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766323264; cv=fail; b=O0nJTw7G8H898QNazO9CszmKWX8P0nyYTpv2ZNgmtC5w2/MmAaGx/fSF25cfv6AT3Ok5d+pPLhQsr67x9VHC3AGeuS0Z0xFdRlC30kcY/uurVAKIAtWbiatevSbCuk8SC00xi7May1rxC0LSpUThI6Z0/2/0seUFGPC1Bsk/ySY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766323264; c=relaxed/simple;
-	bh=A8MXwS4NWgKV9JRiHBHOqysT9T/64AfWQgpWSGvz+7M=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=uTZvqppIruobHLMWvkLOeIjbCpIDo4glw582+au7Jqt7tQwq4wsJe1PCcjRdnTJ/L6Gr/Ol4pb3kkOs64ehRYvdkrXq9ireSj0v7AFt6YLXcnZeRebrdJ13lTjwUVkq+U3tL/rh6pkYfvX6FcgAntWwRtKFWe6mWnFl3OwbTb74=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bMtASqsP; arc=fail smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1766323262; x=1797859262;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=A8MXwS4NWgKV9JRiHBHOqysT9T/64AfWQgpWSGvz+7M=;
-  b=bMtASqsP6SzqSAmsXriR0bimk8Xg8w+1gADtWY/qLYji+UW/lD6c+geo
-   9Ztsy3PzY4tSmGl9SuNk0nUZpoEPdqSleSyP88MeXtTcIMP1n/tFWy7lX
-   5PliqL6NPcA2Vd86+SheGMTSKotEyFLQgoCtjo6oAe48ajVm10dUTUtnB
-   zCkcHQ3EdkCIDNtzX1E3ru6/88+eGzVzeYzIht3Z4C57nxHhnZySTHdBF
-   JekCb6ydeBS4h6qGxK1a8Esrl7PUhYZ9N8B4qqx7RaWFD3GuisRBDnJJG
-   3a2SFHnbismUORa7wAQ6rguEsXBt95vLdVl08lY8BFvAu4VssnjI9W/w7
-   w==;
-X-CSE-ConnectionGUID: Tc1TEKgHRg++gSwbH6ZXiw==
-X-CSE-MsgGUID: 5XTN8K2KS3auwvHscpj90g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11649"; a="85790737"
-X-IronPort-AV: E=Sophos;i="6.21,166,1763452800"; 
-   d="scan'208";a="85790737"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2025 05:21:02 -0800
-X-CSE-ConnectionGUID: y+xSFdnYR/65gKJLKTxW2A==
-X-CSE-MsgGUID: MZZr93qRS2e3LBZGLnx0NA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,166,1763452800"; 
-   d="scan'208";a="200184489"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2025 05:21:01 -0800
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Sun, 21 Dec 2025 05:21:01 -0800
-Received: from fmsedg903.ED.cps.intel.com (10.1.192.145) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29 via Frontend Transport; Sun, 21 Dec 2025 05:21:01 -0800
-Received: from CY7PR03CU001.outbound.protection.outlook.com (40.93.198.0) by
- edgegateway.intel.com (192.55.55.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.29; Sun, 21 Dec 2025 05:21:00 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=te3Q56rPz+gALvWAL1/o7BigIo7bEhLWv59TLQNPHH31LcaVw/HjSi8vusTCcQIgkp10NLshT5CAgQFCMBuQZN/TojTWybA7K+CvBGFUaHBV5sZKfZgRfGn3WbqE+ulSjF6u29Mw8MUt/rneehLNbR8URFbZA5K0JJkdAmecQ1A+lJwo/3VIDurZ9F53jRk231QTdIH7Ujg58kfMPR06GdOT+wk0XlJAHIa9AR2aZH0QbluD25sDn5bW9o+Hb7xsFmcQH/BTM06kTB5MwlpzfshPXaAFq+FnHnD7pXm6s+Y29RBsI+vBZgIbavuoRn6jT0dpAEyK4UOQuFj90+2QnA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ytzvfLK+dVUMWaErng1fJRsX78GWEkXlowbHoEkTYiw=;
- b=ymMcGVrE4GptO+PnFTagxbd0nt5vUSb8w9IXseCf7pCYRuHfmVOIqWIt+oE0ng6yhNSxbGsrz3O9Bg5ThBUvmTkqTeqF9MINt7wGzDYLiWpbbvmjSEtpEkKQlguhxN7THUHgQPBoIbQkHcVXgtKOuIBKnLHLKNxCZ4chVdge+7PkVqM8/g0h5em8WY45evPG3YXueG/vz0DhwTJEkN1wytO/noKOZwRK1l3s5fyiDk+Z8qOXpr9lPeB38VRIcWZIocLJ1csbOuD8uY1kPupm84Z5ZiSA031onBmH6kfBQytc7MN9MMZiwUysW13geAihx6UZuapteD3GEzC+GH5Zkg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BY1PR11MB8032.namprd11.prod.outlook.com (2603:10b6:a03:524::8)
- by SA3PR11MB7533.namprd11.prod.outlook.com (2603:10b6:806:306::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9434.10; Sun, 21 Dec
- 2025 13:20:58 +0000
-Received: from BY1PR11MB8032.namprd11.prod.outlook.com
- ([fe80::f469:1c21:72a6:af47]) by BY1PR11MB8032.namprd11.prod.outlook.com
- ([fe80::f469:1c21:72a6:af47%6]) with mapi id 15.20.9434.001; Sun, 21 Dec 2025
- 13:20:58 +0000
-Message-ID: <43f866f6-0448-475e-9fa2-e79be1ca5fd3@intel.com>
-Date: Sun, 21 Dec 2025 15:20:52 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v1 3/3] igc: allow configuring
- RSS key via ethtool set_rxfh
-To: Kohei Enju <enjuk@amazon.com>, <intel-wired-lan@lists.osuosl.org>,
-	<netdev@vger.kernel.org>
-CC: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
-	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	<kohei.enju@gmail.com>
-References: <20251025150136.47618-1-enjuk@amazon.com>
- <20251025150136.47618-4-enjuk@amazon.com>
-Content-Language: en-US
-From: Avigail Dahan <Avigailx.dahan@intel.com>
-In-Reply-To: <20251025150136.47618-4-enjuk@amazon.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: TL0P290CA0003.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:5::18) To BY1PR11MB8032.namprd11.prod.outlook.com
- (2603:10b6:a03:524::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86806230D35
+	for <netdev@vger.kernel.org>; Sun, 21 Dec 2025 13:42:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1766324581; cv=none; b=Bg1uckjb88r91ORJdwa+ecGDcMEPBD/+EnynVTXAZz5Se73SempHlK25VI9EBwjfw3btrbS64ZM3RGnr8jCHWZvImgnr+aHSC9+mjq4yb7aA1PO+rYhMPg5zyvT2rDLW4Z0o+r+DhWJfPWht3cfNSsua+zg7fLNnND3eZLlTFZY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1766324581; c=relaxed/simple;
+	bh=g1OpVRc/favQfUiIRE8TO5sJVwwB3PHfeg+/jvw5UK4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tbp21hdB6r94q95YaiauIvRMNR5ZPREdRGmzk/0D2M/+auKDDShoNdpPZZPK+5+whSgFxNqzWW9bdUhQbTPbWj20P2UNZxZOnY2/wguPMotlKgcR67crmhBlncDFxl0bdj1nH+GlaopgPrQSL4sf1LUreTGybfoEqrR0/dFB9Vc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H7pM1cfj; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Lu0gqx/v; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1766324578;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LL1YiW+qcmDAfO6Y9bCrMUIb9gMq0TIVlGP94jNrCWo=;
+	b=H7pM1cfj2qPLFDQxs2U3GSn+w7NTQBVSpWRK7L8dDRDMXmAmh3AvQzK+MPP9zMqms0qzTJ
+	R3LcnWv7oPVi8lnuMXOw1gTR8CitBYLcJcMaXcr2x0aDG3RX9GdOecMXyjnUGe+ATuspvp
+	zJNTpMDslqxtMyG4J00By/ZmdXKnoTQ=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-450-avWRBEmuOLiD2qPbGrYdvQ-1; Sun, 21 Dec 2025 08:42:57 -0500
+X-MC-Unique: avWRBEmuOLiD2qPbGrYdvQ-1
+X-Mimecast-MFC-AGG-ID: avWRBEmuOLiD2qPbGrYdvQ_1766324576
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4792bd2c290so30454045e9.1
+        for <netdev@vger.kernel.org>; Sun, 21 Dec 2025 05:42:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1766324576; x=1766929376; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=LL1YiW+qcmDAfO6Y9bCrMUIb9gMq0TIVlGP94jNrCWo=;
+        b=Lu0gqx/vokHoclYo+wIaOJhtatLZBz4FWnYOZXn6wqtHZHCHl+3KYHgxAdWn9HUoRZ
+         Yd/67e4rDcvbrnCloiASf3fM0N3/tm+tOy5C+6LNySvsymJx9IeT19SlytNsBbx8pKVE
+         N09WOnNUE4xEK3cnjRhBXj0OwdtBrWgWmZTNZQRShyyV7JRkA/EB1/l61mtkAbj7B8zn
+         d1Ley931mbm7GIewZNYr7qSLfeyBOdKDNKmheEySxBgvy7yXtE30Gvmjieyv9fgRTPK/
+         QQzqZHqhdRGm65r2wPMwSSvaZ7GypPXVqNcorNhEPtKvGlscd2zjC8LEr4hrEQgRJuIL
+         gUTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766324576; x=1766929376;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LL1YiW+qcmDAfO6Y9bCrMUIb9gMq0TIVlGP94jNrCWo=;
+        b=VXBTSpsXNb4fJyNBLjP7NbhrnaTZnx01a36MXaECVmYTXuJZCF+01rSR5aAe2Kt+Dr
+         N2mxCZE167l+ao6KJ5iYHctsYMZX7bkn3qmjGj2OmGb8jDCbB+XGui+Hm+KCM95nIPz6
+         HUBeHSpyYBo1PvVP+E/8u2w0cREsNKLYBptzRRaz2yEHiw9yUdZ0jvWcROd+jbnozMc4
+         aetwrVQDnbpWuXoFFAgDLGW9rCuhue/chC8VI1Eyw2DrA+sB+V1nsnLy2TzVcjqI9YZ/
+         q5JjHISOEOfC6BqrK0LEbf7VGym7U9QokOdmH0PZjY/yL2a5he2CA8Nl/2ZN09chw+Fd
+         709Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU/QzhnVm5aylEwgxYIad3awcvoXOmkg5jnTyXJ9AUF/Txl24xeyIDg/pY6j2HbESn/8oAT/mQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJm0Flfp/L+zAQyr7BxxNXjMMGKS7GIQeWDp9QrNAPQOdPswcr
+	fY+KSs9ffuDJlb0+khRo1SIlIPucvxOHjlXUy53BqjWuY+hHDKYGaRew4Rt81OS87hD85FCbQNj
+	vfQPsSH4lIRgguQHbWPeZN2wmPMV9Abj+g53ZdaTLncu+TQs4IH1RMFt6fA==
+X-Gm-Gg: AY/fxX7nTuy4PuMs9/6wpmVp3WQ1vKd+zMRoGxUBkMv+azCDfnrHoK95/Pjt42vM0Pd
+	z64WdIjCyJ70CAa3IPQNqqBIEza/e9hxYox8ICFkwgIYiVr2mB61dmj8hiC8T09wpmENy63q3zI
+	bgKBPH3MGrXMq4Y9t0ij0FlATfahAU52W2r0IBSvTxyOTgh3I6gLjAzMi90Ajs/LRMgYN77sEVk
+	Qdrdo0+IditA/bPTZJ0iRhLiLKn6bfpQXbqs2PWD3okWtNLuQY1yOAmjO6xAV8lTDANAJtj+D3+
+	HOtY/VfG1KXRH1n5q1QvKUawbiMi+4wJNNrlGNV6xTqfZ7hOpUbERSaLPQOw7rTTaCcgMOVXFi6
+	FgJKf8QSbWei2Pw67Dkb3j95L2NyXFUDyNQ==
+X-Received: by 2002:a05:600c:198d:b0:46e:35a0:3587 with SMTP id 5b1f17b1804b1-47d195a06a0mr78888905e9.27.1766324575730;
+        Sun, 21 Dec 2025 05:42:55 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGndUGZlLP7dF9QsIdTkQlYcFSwsza8K4tRMm6Y1+UEUb2YQun2bVAVDpswkOGEHQO9izRXxw==
+X-Received: by 2002:a05:600c:198d:b0:46e:35a0:3587 with SMTP id 5b1f17b1804b1-47d195a06a0mr78888685e9.27.1766324575102;
+        Sun, 21 Dec 2025 05:42:55 -0800 (PST)
+Received: from redhat.com (IGLD-80-230-31-118.inter.net.il. [80.230.31.118])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d193621c8sm139563755e9.7.2025.12.21.05.42.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 21 Dec 2025 05:42:54 -0800 (PST)
+Date: Sun, 21 Dec 2025 08:42:51 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Bui Quang Minh <minhquangbui99@gmail.com>
+Cc: Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net v2] virtio-net: enable all napis before scheduling
+ refill work
+Message-ID: <20251221084218-mutt-send-email-mst@kernel.org>
+References: <20251212152741.11656-1-minhquangbui99@gmail.com>
+ <CACGkMEtzXmfDhiQiq=5qPGXG+rJcxGkWk0CZ4X_2cnr2UVH+eQ@mail.gmail.com>
+ <3f5613e9-ccd0-4096-afc3-67ee94f6f660@gmail.com>
+ <CACGkMEs+Mse7nhPPiqbd2doeGtPD2QD3BM_cztr6e=VfuiobHQ@mail.gmail.com>
+ <5434a67e-dd6e-4cd1-870b-fdd32ad34a28@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BY1PR11MB8032:EE_|SA3PR11MB7533:EE_
-X-MS-Office365-Filtering-Correlation-Id: fdeb449d-d6bf-4009-931b-08de4093c759
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?TjE5QVlxeWNDQzBzWnhXc3o0ajlqK3A1NFRlSjdsL2UrS25Fc0tZUXBadmFy?=
- =?utf-8?B?RkFXbFUvQXRtdlF6eXduU0FMVnA3TzdNWlJER0tKVlhrMG9rOG96N0lFck11?=
- =?utf-8?B?TkVISnhESHJFV0pqNTRvR2c2UjhUb0NGdXNxbEVuSUpvVkJCcDVQR2lXM1Mr?=
- =?utf-8?B?alRrU3FuOXJxQU9lNUxGUlZqamhIWTFMVmlqbTZxVjRYSHVnWDdHS3dJaGta?=
- =?utf-8?B?RHRGdkVJMmx3aVF1VlJaY3RIK1dBd005RHMxR0tnVmZodzd2UmlHZlJIcU43?=
- =?utf-8?B?ak9hM0lrVkJjUkZ3QUdCTDRBYVM2V1dROWZpMzdwSnpwbllNalZKT1ZDWVBT?=
- =?utf-8?B?TVVDWU1Wd3JDV0hnVHQ1N2VvNXlBRk5BYTNyWE9MdnJiTkprdmVxeVROMGZ3?=
- =?utf-8?B?SExaOHNoYVNUVUNvYnc4dVNCV1RlNXg4dkRVNktkaTRXemhPU1BsTVFQc09M?=
- =?utf-8?B?NTk3VXlDcnJHa0VNVkF2aUliK0xrc09SRUlwME1vYUcxdWxHeTliRlUrVUhF?=
- =?utf-8?B?WHRDZFBQVGJPQldHazF2SjRLMG1ZQ0V3aUltZ3V6MDdUMXVodnJTUnJXN1dv?=
- =?utf-8?B?RnRrSjVBQXltOVhIcjBHKzBxZldIc3plOERGMTh3U3lMVFdaZFA5WTFtSWlk?=
- =?utf-8?B?T0RJYVVzTnJ6ZzZ1NjJoc05kRFZRbVVYS2N3WUdXNVFLMmNFQzJ6VVJZdUFW?=
- =?utf-8?B?NGVXeDN3Y01KcEhpZkNyYkV1NEhZMmdxNWY2Y0N5bW9tRStpbUtnemhJeDZ5?=
- =?utf-8?B?L2NITTJRdzVncG9mSWREOTdnNERmV3ZoK2E3Qk1SZWl1YzJ1U1FwbmVWSm12?=
- =?utf-8?B?dFg4N2RVWXRDWi94ZWU0cDJUMEFEOHI4cDM3a1hyWmtpcTFEa3hjdGR4VTli?=
- =?utf-8?B?d0FXMzJmSzJybWdKV2dTSzJwMGpybjVDTXQxaFQyY2hMb21zejBpMXBlY1ho?=
- =?utf-8?B?WDR1MlVYOE5CTHBKc1ZuZkRucjhxc0JjZnpnWDYzcC9uMGRhMEdLNENGZDd5?=
- =?utf-8?B?N01EUVpaUzFEOUJzZnlJdW1VYktJemFZZjFIS3ZmUS9MQzZmc0FhODFPc2ZL?=
- =?utf-8?B?QXdWSFpKOEl0TlQxenNnWTN2NFlaMlBvNUgyNVJKZGp3MTVad1BoZ2JzOWxK?=
- =?utf-8?B?c3RIZGZSZHBZWGdxVXc5TVp3QjZnUWYySXRHTEpmT1ZXZ0U5Q1hMQkFGdDRS?=
- =?utf-8?B?RWx4NW00TmU5NVFOeUFkOWw1OFB2OUlDVnFGTjA1VjA0RTF5Z2VoSTFiQWpH?=
- =?utf-8?B?YkxQN0w3OC9tVVlDcEFkaG54aXQxUWRkbUFDZkJ6RzdGZXhONTkzZFlGcC9v?=
- =?utf-8?B?Y1dLUFM3THJXUnkwbVFkRjNONGJTN0grNllyVmYvaVZlNENiMkFnQnpscmFq?=
- =?utf-8?B?TmVyN1ZyQlhFUE1TQUo3TXVyNjZ1UXdCYmZvMXo3MXJCaG9vcHZJNk1waVpt?=
- =?utf-8?B?bld2cHY4K2tuWXhXOEJtUWR4WXZLaGM2b3FBWW5LdEZMZnY2VngrMjd6dVdW?=
- =?utf-8?B?d3REWjd0TEVXdStmYjNqVUlEVjYyK1lIUWNya3FWK000c2JtMldKWVpkbFZa?=
- =?utf-8?B?WG1xc001cGlQcll6VlpKRVJJVFFjUGxORzNUcERIV3E3Q2d2elowS0tnZFVL?=
- =?utf-8?B?WGN5aXRwa2V2Rys4SDhwTGpndzl0eXE2bTFTSE9ra3JIYXlmVnh2cTRQSC9s?=
- =?utf-8?B?VVUrNWREbGJUcTNOWEcySmtYWDgzVTRMYmFodkJ0QXl1ZTQyZjhtVWNMeUJJ?=
- =?utf-8?B?am9WZkw3RFE1SWdiZWFTZWhOZGdGRkR5VjdsWm43ZWx1Q08yYkNxOFo4cWcy?=
- =?utf-8?B?UFRVaW52NWdmZHd4SVhSVzNJR0RDWnN1Y1RBb1dUK3VvNkxRblVTU1p6WHk2?=
- =?utf-8?B?MS9HbEFmY3k1ZDFIV0tHSXJ0UWd6T3FrbXkzSE41Vk5vaTBXcjJRRHpKaXhy?=
- =?utf-8?Q?PavlyDdvP0vJZEDSiUrrsIGZkkm3SIf1?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY1PR11MB8032.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WGVESlUxbWFKRGNBVzBKUXZ3ejZXNk93aFRvYkppWkdGKy9IWStnQkZZMHcw?=
- =?utf-8?B?V1F5dGd4ejdUNE96UUJLUkJXYTRQQ1NZMm5HakNLZ0RZY2ZHWnVjY3lWUHdl?=
- =?utf-8?B?T0VEMmFFbC9LUUs0R3htUytPU1c2RUt3Z2ZaMUh0MnkwVHBZWE16U0UwUUly?=
- =?utf-8?B?M1U2VFZ1djczQmpobWtQRDVqcVZ4eFdaNlhuSW9mdDQvWDU0THBvYWtvTjJv?=
- =?utf-8?B?b2sra3lMUWU0dVVXL0xQQW1GcjhWSWJ0RVAyRnBubi9DQm9nQzNtWWZsNkZZ?=
- =?utf-8?B?VnVDbzhRMTVlZnQwNWF2RCtINFJhUXk3Ly81NkhmakozRkRZOXpoelBNeUZ0?=
- =?utf-8?B?aFFIRXl4SUt4ZWxhUTFUK1dIMVQ2a2NIaGVlUnZDOHl6VjYyVElORE94a3Ry?=
- =?utf-8?B?ODdGK2JoeEwrWHpFeExZSU5xUHlUOGJ4R2hXd2cvWk5OL3VQT2VHTXBWNmJN?=
- =?utf-8?B?T2EwUDJONmo3R2IxSGM1L2FsbWlqaVQ1VEU1R1hJVHVrbldiQk5rb2FJRklq?=
- =?utf-8?B?anQ1b2hCQXBXdlpDeFdKcEJFajhRM2dNcHFQV0gwOFRIYlgxK0JmNWprWUxH?=
- =?utf-8?B?WmtlUlV3SHo2dkJQeERScUJTc3FaMFVGYW0zMEpKamV4VnJ1WmtGbVdXdE13?=
- =?utf-8?B?bUllaTltQ2hHeE1DbnR1N2xJcCsrbU14UnpqNm1LTzlrNVcyNnBaQjhyVDJQ?=
- =?utf-8?B?UDhsLzdTV0x1Tm0zUThvTU13VllDcmlETUZwbzdkdnBFWmp3QVBvUVRDMmhJ?=
- =?utf-8?B?WFJUNXYwcXNua2VPODZndGVSR0pHcmFnbmNoOWJFZFdwL1FhamwraEFPVGJh?=
- =?utf-8?B?akJtYU5vanRJeGVsa0c2REh0QXJobzVtSGFEWUVoeDRPUW9hekladVJhcmRK?=
- =?utf-8?B?VFQvRnY4Y2RwS3lFempYN0w3QXAwNUFiVzJycWw1OVpVMjBNbnlVVHRmcXpa?=
- =?utf-8?B?dFZ4WGhzSndWK3c5MEo5WFgzTFM4R1ZlMFhwRmFFYm9abGp6c2trNnZIM2ht?=
- =?utf-8?B?NUNLa2ZhR01BZXl3NUsyTXZKNEF4U1ZZclpNS1JlUldiTmlrZHV0b21RWkQ1?=
- =?utf-8?B?K1I0eWRtVThXa2FqZVFUZ1pJZ2IvcnFVNnBBbTlWZjFSVUpTVHQ5TWQyOUln?=
- =?utf-8?B?SVh5Q0RpRUtVNlk5RllYWFlHelRuQzErM2FYK2ExbS9pa3BTbVRGSnZnbG9r?=
- =?utf-8?B?VkdSWmtZMmp5aTZWNUpIcmNDUjYzYnhNN0RpR1dmOWFINjIzSVlJdGhZZkZl?=
- =?utf-8?B?bG10dGJiV3ozdXlFRTZDSVZFS0RGaE0wc1JuZ3VhRk04S3E4NnlHb1E4dDB1?=
- =?utf-8?B?Q1Ira2c3U3EwdHRLU1d6VkF5dmovTUlkVHpQaG5TdFFPcnFlVjNqdHEveXJh?=
- =?utf-8?B?VHEvaGFzSmFnZGZ0NXZwMTY2elJiT05WRjVGckZPc0c2d2dkU0hxU1lHWWVr?=
- =?utf-8?B?TzRoWkh2M3d3ZXArN0Z1eXh1K0FKcUo0U1dtbEZvNmd4S0p0aEJOU01EVVFa?=
- =?utf-8?B?QlkwRjlQSi8zY1lYMEF6bmc4dVBlQ3h2blg2RlY0YzY5UnJ0V0xoeUZHanZP?=
- =?utf-8?B?aGFudm00aEUvMjhFc1RLTlNoTnZucHlNMnZ1MWcyVWdQNFJZRUR1OU9rYlZt?=
- =?utf-8?B?MXhEeVo0dVIxdTlqUnpnMlE3Qjg0ZHdGUEhYeStPbmk0djlPcXVIS0ltaXJn?=
- =?utf-8?B?andXS1VXd0tIV3l2WkpaUnM3bzRRSEJYYXdDKzdKTW1mbjg3QlRCNXllaEpO?=
- =?utf-8?B?S2ZNbkVSZzBLQWg2bjVyV2piWEx2VDlRZVlvVmwwUXN0bVZYMzlZNEgwdHNv?=
- =?utf-8?B?RlJGT291UU5iYVZFalNXZXB3NkJtd1dsb1A1S21BNXpkeVBFSEtmQjZIclY3?=
- =?utf-8?B?ZGo0VkJ2ZlFBVEUzVGE3VlJOSFFxYzVsZjBhTU43RGJQVXF4YVUrRGk2QkFt?=
- =?utf-8?B?US9PZElxbDljSmdQbWcxRXNJTmQxWFJjMGF2S1lobmJCZ0xaejVuMkYrOGdX?=
- =?utf-8?B?QXR0bEhKNWtLRnNpSUlDSTFLMTNXbDA0cE5rb0NDY3hTUjV4cDNLQTN0eTV3?=
- =?utf-8?B?OVNUN1RFcng4RUdOYjRnSFRGRjBka0hLdHZacHk4WDBzYml1MXc4S01JVE12?=
- =?utf-8?B?QktaR2Z4bGNUYnRoS0Y4dEtJRXVpZmhJSEdITTBKTmRNQXFCSDU4L1VDREln?=
- =?utf-8?B?dDluOUxNa0NYR1ArTmtnTTYxaThFaWErUE50akZ4TThmOU94T3UyMzU3aWU3?=
- =?utf-8?B?d3JzRXdYRzk5V1BMb1RsNWEzRU1hV2JkYVIvb0VVVTVTS25tSDdUKzlCVnJh?=
- =?utf-8?B?Q3puVGViVExRY0cxUmRXZ3JnSjNLY252VTdZZ3lJakhxZndzM0RxVnJZdGdo?=
- =?utf-8?Q?zjOFrRvKv0ODJF2Y=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: fdeb449d-d6bf-4009-931b-08de4093c759
-X-MS-Exchange-CrossTenant-AuthSource: BY1PR11MB8032.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Dec 2025 13:20:58.5684
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: kp8i3vWI17Kt+tM0PuwkAknuJRb8E4myUsT8lWynYT7kqmPKE61sEH4ST7Qx8J0KcD78l9J7SYfwJL2KSA8lV41gZ7e567Q2xrR6EmWKQRk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR11MB7533
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <5434a67e-dd6e-4cd1-870b-fdd32ad34a28@gmail.com>
 
-
-
-On 25/10/2025 18:01, Kohei Enju wrote:
-> Change igc_ethtool_set_rxfh() to accept and save a userspace-provided
-> RSS key. When a key is provided, store it in the adapter and write the
-> RSSRK registers accordingly.
+On Fri, Dec 19, 2025 at 12:03:29PM +0700, Bui Quang Minh wrote:
+> On 12/17/25 09:58, Jason Wang wrote:
+> > On Wed, Dec 17, 2025 at 12:23 AM Bui Quang Minh
+> > <minhquangbui99@gmail.com> wrote:
+> > > On 12/16/25 11:16, Jason Wang wrote:
+> > > > On Fri, Dec 12, 2025 at 11:28 PM Bui Quang Minh
+> > > > <minhquangbui99@gmail.com> wrote:
+> > > > > Calling napi_disable() on an already disabled napi can cause the
+> > > > > deadlock. In commit 4bc12818b363 ("virtio-net: disable delayed refill
+> > > > > when pausing rx"), to avoid the deadlock, when pausing the RX in
+> > > > > virtnet_rx_pause[_all](), we disable and cancel the delayed refill work.
+> > > > > However, in the virtnet_rx_resume_all(), we enable the delayed refill
+> > > > > work too early before enabling all the receive queue napis.
+> > > > > 
+> > > > > The deadlock can be reproduced by running
+> > > > > selftests/drivers/net/hw/xsk_reconfig.py with multiqueue virtio-net
+> > > > > device and inserting a cond_resched() inside the for loop in
+> > > > > virtnet_rx_resume_all() to increase the success rate. Because the worker
+> > > > > processing the delayed refilled work runs on the same CPU as
+> > > > > virtnet_rx_resume_all(), a reschedule is needed to cause the deadlock.
+> > > > > In real scenario, the contention on netdev_lock can cause the
+> > > > > reschedule.
+> > > > > 
+> > > > > This fixes the deadlock by ensuring all receive queue's napis are
+> > > > > enabled before we enable the delayed refill work in
+> > > > > virtnet_rx_resume_all() and virtnet_open().
+> > > > > 
+> > > > > Fixes: 4bc12818b363 ("virtio-net: disable delayed refill when pausing rx")
+> > > > > Reported-by: Paolo Abeni <pabeni@redhat.com>
+> > > > > Closes: https://netdev-ctrl.bots.linux.dev/logs/vmksft/drv-hw-dbg/results/400961/3-xdp-py/stderr
+> > > > > Cc: stable@vger.kernel.org
+> > > > > Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
+> > > > > ---
+> > > > > Changes in v2:
+> > > > > - Move try_fill_recv() before rx napi_enable()
+> > > > > - Link to v1: https://lore.kernel.org/netdev/20251208153419.18196-1-minhquangbui99@gmail.com/
+> > > > > ---
+> > > > >    drivers/net/virtio_net.c | 71 +++++++++++++++++++++++++---------------
+> > > > >    1 file changed, 45 insertions(+), 26 deletions(-)
+> > > > > 
+> > > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > > > > index 8e04adb57f52..4e08880a9467 100644
+> > > > > --- a/drivers/net/virtio_net.c
+> > > > > +++ b/drivers/net/virtio_net.c
+> > > > > @@ -3214,21 +3214,31 @@ static void virtnet_update_settings(struct virtnet_info *vi)
+> > > > >    static int virtnet_open(struct net_device *dev)
+> > > > >    {
+> > > > >           struct virtnet_info *vi = netdev_priv(dev);
+> > > > > +       bool schedule_refill = false;
+> > > > >           int i, err;
+> > > > > 
+> > > > > -       enable_delayed_refill(vi);
+> > > > > -
+> > > > > +       /* - We must call try_fill_recv before enabling napi of the same receive
+> > > > > +        * queue so that it doesn't race with the call in virtnet_receive.
+> > > > > +        * - We must enable and schedule delayed refill work only when we have
+> > > > > +        * enabled all the receive queue's napi. Otherwise, in refill_work, we
+> > > > > +        * have a deadlock when calling napi_disable on an already disabled
+> > > > > +        * napi.
+> > > > > +        */
+> > > > >           for (i = 0; i < vi->max_queue_pairs; i++) {
+> > > > >                   if (i < vi->curr_queue_pairs)
+> > > > >                           /* Make sure we have some buffers: if oom use wq. */
+> > > > >                           if (!try_fill_recv(vi, &vi->rq[i], GFP_KERNEL))
+> > > > > -                               schedule_delayed_work(&vi->refill, 0);
+> > > > > +                               schedule_refill = true;
+> > > > > 
+> > > > >                   err = virtnet_enable_queue_pair(vi, i);
+> > > > >                   if (err < 0)
+> > > > >                           goto err_enable_qp;
+> > > > >           }
+> > > > So NAPI could be scheduled and it may want to refill but since refill
+> > > > is not enabled, there would be no refill work.
+> > > > 
+> > > > Is this a problem?
+> > > You are right. It is indeed a problem.
+> > > 
+> > > I think we can unconditionally schedule the delayed refill after
+> > > enabling all the RX NAPIs (don't check the boolean schedule_refill
+> > > anymore) to ensure that we will have refill work. We can still keep the
+> > > try_fill_recv here to fill the receive buffer earlier in normal case.
+> > > What do you think?
+> > Or we can have a reill_pending
 > 
-> This can be tested using `ethtool -X <dev> hkey <key>`.
+> Okay, let me implement this in the next version.
 > 
-> Signed-off-by: Kohei Enju <enjuk@amazon.com>
-> ---
->   drivers/net/ethernet/intel/igc/igc.h         |  1 +
->   drivers/net/ethernet/intel/igc/igc_ethtool.c | 31 ++++++++++++--------
->   drivers/net/ethernet/intel/igc/igc_main.c    |  3 +-
->   3 files changed, 21 insertions(+), 14 deletions(-)
+> > but basically I think we need something
+> > that is much more simple. That is, using a per rq work instead of a
+> > global one?
 > 
+> I think we can leave this in a net-next patch later.
+> 
+> Thanks,
+> Quang Minh
 
-Tested-by: Avigail Dahan <avigailx.dahan@intel.com>
+i am not sure per rq is not simpler than this pile of tricks.
+
+
+> > 
+> > Thanks
+> > 
+> > > > 
+> > > > > +       enable_delayed_refill(vi);
+> > > > > +       if (schedule_refill)
+> > > > > +               schedule_delayed_work(&vi->refill, 0);
+> > > > > +
+> > > > >           if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_STATUS)) {
+> > > > >                   if (vi->status & VIRTIO_NET_S_LINK_UP)
+> > > > >                           netif_carrier_on(vi->dev);
+> > > > > @@ -3463,39 +3473,48 @@ static void virtnet_rx_pause(struct virtnet_info *vi, struct receive_queue *rq)
+> > > > >           __virtnet_rx_pause(vi, rq);
+> > > > >    }
+> > > > > 
+> > > > Thanks
+> > > > 
+> > > Thanks,
+> > > Quang Minh.
+> > > 
+
 
