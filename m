@@ -1,115 +1,220 @@
-Return-Path: <netdev+bounces-245642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95AD9CD41A4
-	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 15:59:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 524F5CD427B
+	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 16:55:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 49B0A30081AA
-	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 14:59:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A07063007FCF
+	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 15:55:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47D4C2FE577;
-	Sun, 21 Dec 2025 14:59:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9CDF27F4F5;
+	Sun, 21 Dec 2025 15:55:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="SDXNpG2/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZLfcU/tG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-yx1-f44.google.com (mail-yx1-f44.google.com [74.125.224.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D1CC2F99B8
-	for <netdev@vger.kernel.org>; Sun, 21 Dec 2025 14:59:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 454981E0DE8
+	for <netdev@vger.kernel.org>; Sun, 21 Dec 2025 15:55:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766329167; cv=none; b=tReEf4vxKL8t5CePtv4SEevoQ+bwzd1GeSabO3f5qZLo9IAt1mVEzW94K45+9lYcLxr1PuDT8ia1B+atBkHx7jdZjFku1C9ItEhDmMZVJOuOGUbO+ttZV2YcCumPqfEEXKbPWF7LqfJW85Tzfv6pb6/yewgri89splIlVbtk3u8=
+	t=1766332519; cv=none; b=M/u6Gwg5fl8lZeMoihn6GoayzKtLnkT045DSGHFFk3ku6TAE6+SkAoDYfErfM5xiPF8W2LwXhXFCF2xewUu805gv/EUdEmWA1rwEs0hzhjGi1b2nMuQaP2KzrtpGkMzXrXunbg0oB1v9mEF5XMj8IpZ7OxA5uVjD5S2zPrwpQg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766329167; c=relaxed/simple;
-	bh=wnhdy8ymoLVKqvtAArSDJZar79glM7NZ+Vgw3IPa3BI=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
-	 References:In-Reply-To; b=oSR+J9nADWxvNLzama51kM2t59ivMI0HnAbrNawvZJPhl9wBFhMydOx8vmQojvXUyiYXloUEYzRdQaTmf9X2OrIU5furh4RD4Byz2h1o0cbLb+4KJ4B5qQcphpl5jjiDyRWoVzw6+zm4TNbYg0Q9NXaXD9t59jJP+s7VLt+MdIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=SDXNpG2/; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-b79f98adea4so476629466b.0
-        for <netdev@vger.kernel.org>; Sun, 21 Dec 2025 06:59:24 -0800 (PST)
+	s=arc-20240116; t=1766332519; c=relaxed/simple;
+	bh=xAVqKYQqH5p1m2EUPU2jKA353ieyMlaSPI9JB3XVtLA=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=hkf6/fVF0CYIK2H7iFF/6Q+b29oINDmyng+gYtQLN7+ciis3oS49elTvX3lpzamKPpWQNM+cmY69E68mI32sjLrtUIv4pfwavtOojob3a8Vn6nMi7pERhZSGxKJfU257pTOQ5WBQkWMND6GC3Q/mk4vxL8984tGiYBz8tRWx6Xo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZLfcU/tG; arc=none smtp.client-ip=74.125.224.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f44.google.com with SMTP id 956f58d0204a3-640d4f2f13dso2959912d50.1
+        for <netdev@vger.kernel.org>; Sun, 21 Dec 2025 07:55:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1766329163; x=1766933963; darn=vger.kernel.org;
-        h=in-reply-to:references:from:to:cc:subject:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1766332517; x=1766937317; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wnhdy8ymoLVKqvtAArSDJZar79glM7NZ+Vgw3IPa3BI=;
-        b=SDXNpG2/ld8oxG6q4wzAY9mDZkd95ie5pS5hnsNWsiavXY/Lggr8dGW3NjeZrb+7T0
-         luUg6UBF+tu5XyFUt0gylCNWsiyAewfmLpladrt2nZ3xmzO/go70ltE99pfnZ77tXARh
-         uZv+Qh58ImqRIiwFtkn4S9iDJyrmguRyilP8cPdF2oceNT8pMMXqiNvpIkSVIpZKVA3P
-         shy68+t3dcfW2L6eaJNBz1mbqjAr8VjuiffSWGbUPBkupyxQ0UCvPMgKe6GBEm0/FmKB
-         lPZtrXeRbTC9SFh3elm7xloLhQb3AvqkJbM06sKvIpTnURxLXsezdB/1EnbsDsoSi3gj
-         DjDQ==
+        bh=jxyOoQXu4bPScAbfzbTe73o8NfnxBUXH8BThcQExm/s=;
+        b=ZLfcU/tG+Rv6lr+xKQ+orHD5QsmJP3q09rNDNKAaYDMbnWoiVInA5yDj33nwGIFzKr
+         mYIGbgeIIUWGJAPj4kW0HnhXxZFGkg5qLMnMeaQTtYfL+wL9S3n/Uz1aobIE22G90tzL
+         4hj1RuEJXIN1FSzEWSegfJ+/HMMEHWqU5BxYNAifW6+Np3C9uotkDpZBjejG6mx54K2U
+         ZkmiTkaqSRmwxQ8N91GFkaPDFyKYDBaZ2br+N8lYvWP1e/yPpxEDiLCJ9FyRkCJaICmJ
+         4rIo5pnDEKtTMB0GrYRQNkMNejrrazwfbSbSEYLtewFzTZwiaNEGUn4QfMXhPQtxV014
+         lXdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766329163; x=1766933963;
-        h=in-reply-to:references:from:to:cc:subject:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-gg:x-gm-message-state
+        d=1e100.net; s=20230601; t=1766332517; x=1766937317;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=wnhdy8ymoLVKqvtAArSDJZar79glM7NZ+Vgw3IPa3BI=;
-        b=UVupw9Q7RnV4udVUOCpBvXP4f0Y4DflotKv17zTVffHlxxypoBcxLqoF5td+PHrsIq
-         2SOq4gXPGX59Hd5FOwz6RPpzNKLD4RarDYNxplE8rNFjkXTRYLeRPPKAdLp77KLTYIEM
-         tswnzhM/9Zq2VPtAbPNnJonVYICFy7ujEpryGMIrE3Ajr4sQp2xeVTxBgkSJ7cHroeZt
-         +vezq8yXcM/xc3sGYET8wYB7LAdb2lEnQcNL7vg7tMIZLMo9PQMTBqSZ3oAaokNgXW4n
-         e4aelz5u+aSgq5VbiSJf0rAEZfkP036KSAhWhmQVOA15cU+WLgeRaM7CzQlyEQAgd83V
-         ukXQ==
-X-Gm-Message-State: AOJu0YxkggZ84q4Jf+z1u8HnIPKuNq1z2hyq1GUelhmalconCW2+hKye
-	mbetGLDeMfwhkEjJe7VltBzXSv0XoRgyB24y75K9vPBipDShuTpR3gzNGpCsksGMLAA=
-X-Gm-Gg: AY/fxX6l3buuN+DJvbddMkp3ZPhHEy98OW8JpLEx+iP67Mssph1rm7qRdYwu7Ctpb3j
-	HwYsZSGMalazIKjLCDg4cCYN5Ugsv6UKgclLLz4Zsw3YWSdI09gN4Jct3BfMJz5uDCBK+kaIVmK
-	5peSVABDOk8t3raFrf25XEXW4hsaiPPhRtW/EFrnOHtKQMVU+f2IaC6xoKB4TziwEqlBGBoSa+f
-	0JoQxUHNmUUT1S456EOfvvM+Ow1NNquS6EvYZ+a40+C0A2GyopLBW75kARRy6Ry7btUuVM4pL/7
-	TdprUOp1/iX1xtNMOWfhF5XBwcAbwU+4an7SU00s4VAwI5TAxhoS9wk4pSpycNQ3mMfw0N8xdP3
-	Zab6M2wQo/5pVzKVe5xXbKLIY6PnzP2+HRMy4rz99hawVXTVAtB/bcSTiLW9FZTglQVv/8UOlJQ
-	==
-X-Google-Smtp-Source: AGHT+IEkCPNzQ5e82IsVboI0n7YYBJlXdYsfKuIyWXfeqElgjGBXzeXsUbx4p69DY/H06b3K/k07KA==
-X-Received: by 2002:a17:907:d2a:b0:b73:3e15:a370 with SMTP id a640c23a62f3a-b80371d6c20mr977219466b.57.1766329163464;
-        Sun, 21 Dec 2025 06:59:23 -0800 (PST)
-Received: from localhost ([177.94.145.206])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-65d0f69b9e9sm5197702eaf.12.2025.12.21.06.59.19
+        bh=jxyOoQXu4bPScAbfzbTe73o8NfnxBUXH8BThcQExm/s=;
+        b=qyGYxqoGfri0s8LCIddWU8yROgEfyuvolWAX4ew0ZbbyRr22cR2MXYx+O1/lE+Zxhn
+         opQc57FN/UIITBv6uHMH0BYVcbGwQtKf1hvGuajVvo81JJ+zjVNt56B+IJo9fIQp52fe
+         rBOIlWaZ6z59Gv26h8ILZoGdj1H0nar8Ij6E/oZsC7n+ItYzhwzVAxFcc/XO754Ts3nG
+         dv5vwGVAc0caBxIEvzQ2KFVyjnX9sfal4WRSbbJG/eODmWmDc4ilb7UhGU6Nw7vm6DlX
+         0KB25fVcEjAB2c00RIfYQuNvCR/sEOM44UV9FUWYADCOubp0UOzSa1hy914bYEHtRmNe
+         FdBw==
+X-Forwarded-Encrypted: i=1; AJvYcCURVWqMNgYFDCZ1zBIhehQ56oVEgZISPulAgLYHoFHz2qR4/hDN6j2L2X9pQODA3t7h14MSVtI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6hzCMrljfp/hw1hj0WVPFlmw83SarN0HSB+urUOqdf6YRjDHq
+	ONurbSoUXu+4alKYi2RK51JJeb+HDhErBBsC0hFNFMm98QhnDcrKpzGj
+X-Gm-Gg: AY/fxX6Mz9m1xu8mSgV3mdwDZ/SfmuIbxqJYlBeUNfzXmZlDCZxF8goZD0T5zZkuGLS
+	m+Bz/JGJwIawYcK4lQq1sTEq7J6J6xd2aJQio3/2eRLBgTI85LY35mMcoJt/tWBAu7ZLBFzFSFd
+	PVh4CdiDEapDQBAIWEoFj7CU33K+6Ey13meVtkYlCxD4w+8A1hUgejpGfhZ6kiK1fBqGZ6Zisu+
+	d7jS4UnQHAAIxWpRcf2p1AVpVkJliAiHIpgDcDBoyMD/73sLOs8gbdh4qo2/wrGoUjYTSLRb9jF
+	FTMzNol2/0sPyxKkbKac0gmU/X8/j5NByfLdIm7NBcLIa+jfpCyOpGdvK+uW69FhnNwRgokdn6J
+	0VNlwrP8M7HefgWb/nAO2D+9DSc5LlSCZQneBS1GEkjKdowYgr+IqVJg3ADs7WZxzQb21n+gsi7
+	V0BK5PVXlK32fIVSnw1+8t1mBtdKQdG84y4XQ98hG5M1FVISmM1jGfy4pfwSlFPGksf48=
+X-Google-Smtp-Source: AGHT+IEj2J9elYoopXA4R1zbYfW1Tl0fVj72prczCf/KLUiss5IoJl46J0dbWt1JpN00Cx2VMnytcg==
+X-Received: by 2002:a53:d68e:0:b0:645:443d:10df with SMTP id 956f58d0204a3-6466a837720mr5920527d50.10.1766332517216;
+        Sun, 21 Dec 2025 07:55:17 -0800 (PST)
+Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-78fb416b32csm34099707b3.0.2025.12.21.07.55.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Dec 2025 06:59:21 -0800 (PST)
+        Sun, 21 Dec 2025 07:55:16 -0800 (PST)
+Date: Sun, 21 Dec 2025 10:55:15 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ David Ahern <dsahern@kernel.org>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>
+Cc: Shuah Khan <shuah@kernel.org>, 
+ Ido Schimmel <idosch@nvidia.com>, 
+ netdev@vger.kernel.org, 
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Message-ID: <willemdebruijn.kernel.25af879fdb851@gmail.com>
+In-Reply-To: <20251220032335.3517241-1-vadim.fedorenko@linux.dev>
+References: <20251220032335.3517241-1-vadim.fedorenko@linux.dev>
+Subject: Re: [PATCH net v2 1/2] net: fib: restore ECMP balance from loopback
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Sun, 21 Dec 2025 11:59:17 -0300
-Message-Id: <DF3ZFGNY9DYU.HO1EOLMCRT8T@suse.com>
-Subject: Re: [PATCH] selftests: net: fib-onlink-tests: Set high metric for
- default IPv6 route
-Cc: <netdev@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-To: "David Ahern" <dsahern@gmail.com>, "Fernando Fernandez Mancera"
- <fmancera@suse.de>, =?utf-8?b?UmljYXJkbyBCLiBNYXJsacOocmU=?=
- <rbm@suse.com>, "David S. Miller" <davem@davemloft.net>, "Eric Dumazet"
- <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni"
- <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>, "Shuah Khan"
- <shuah@kernel.org>
-From: =?utf-8?b?UmljYXJkbyBCLiBNYXJsacOocmU=?= <rbm@suse.com>
-X-Mailer: aerc 0.21.0-0-g5549850facc2
-References: <20251218-rbm-selftests-net-fib-onlink-v1-1-96302a5555c3@suse.com> <9a3f7b60-37e3-470e-b9f7-8cda5ddccb59@suse.de> <9c979662-cdd9-4733-911d-b1071b7c2912@gmail.com>
-In-Reply-To: <9c979662-cdd9-4733-911d-b1071b7c2912@gmail.com>
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Fri Dec 19, 2025 at 12:51 PM -03, David Ahern wrote:
-> On 12/19/25 7:51 AM, Fernando Fernandez Mancera wrote:
->> It would probably require some work on the test but I think it could
->> benefit from using two different network namespaces. Currently it is
->> using PEER_NS and the default. I think avoiding the default one is
->> beneficial for everyone as it ensures the state is clean and that the
->> test won't interrupt the system connectivity.
->>=20
->> Other tests already do that, e.g some tests in fib_tests.sh use ns1 and
->> ns2 namespaces.
->>=20
->> What do you all think?
->
-> agreed.
+Vadim Fedorenko wrote:
+> Preference of nexthop with source address broke ECMP for packets with
+> source addresses which are not in the broadcast domain, but rather added
+> to loopback/dummy interfaces. Original behaviour was to balance over
+> nexthops while now it uses the latest nexthop from the group.
+> 
+> For the case with 198.51.100.1/32 assigned to dummy0 and routed using
+> 192.0.2.0/24 and 203.0.113.0/24 networks:
+> 
+> 2: dummy0: <BROADCAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
+>     link/ether d6:54:8a:ff:78:f5 brd ff:ff:ff:ff:ff:ff
+>     inet 198.51.100.1/32 scope global dummy0
+>        valid_lft forever preferred_lft forever
+> 7: veth1@if6: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+>     link/ether 06:ed:98:87:6d:8a brd ff:ff:ff:ff:ff:ff link-netnsid 0
+>     inet 192.0.2.2/24 scope global veth1
+>        valid_lft forever preferred_lft forever
+>     inet6 fe80::4ed:98ff:fe87:6d8a/64 scope link proto kernel_ll
+>        valid_lft forever preferred_lft forever
+> 9: veth3@if8: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+>     link/ether ae:75:23:38:a0:d2 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+>     inet 203.0.113.2/24 scope global veth3
+>        valid_lft forever preferred_lft forever
+>     inet6 fe80::ac75:23ff:fe38:a0d2/64 scope link proto kernel_ll
+>        valid_lft forever preferred_lft forever
+> 
+> ~ ip ro list:
+> default
+> 	nexthop via 192.0.2.1 dev veth1 weight 1
+> 	nexthop via 203.0.113.1 dev veth3 weight 1
+> 192.0.2.0/24 dev veth1 proto kernel scope link src 192.0.2.2
+> 203.0.113.0/24 dev veth3 proto kernel scope link src 203.0.113.2
+> 
+> before:
+>    for i in {1..255} ; do ip ro get 10.0.0.$i; done | grep veth | awk ' {print $(NF-2)}' | sort | uniq -c:
+>     255 veth3
+> 
+> after:
+>    for i in {1..255} ; do ip ro get 10.0.0.$i; done | grep veth | awk ' {print $(NF-2)}' | sort | uniq -c:
+>     122 veth1
+>     133 veth3
+> 
+> Fixes: 32607a332cfe ("ipv4: prefer multipath nexthop that matches source address")
+> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> ---
+> v1 -> v2:
+> 
+> - add score calculation for nexthop to keep original logic
+> - adjust commit message to explain the config
+> - use dummy device instead of loopback
+> ---
+> 
+>  net/ipv4/fib_semantics.c | 24 ++++++++----------------
+>  1 file changed, 8 insertions(+), 16 deletions(-)
+> 
+> diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
+> index a5f3c8459758..4d3650d20ff2 100644
+> --- a/net/ipv4/fib_semantics.c
+> +++ b/net/ipv4/fib_semantics.c
+> @@ -2167,8 +2167,8 @@ void fib_select_multipath(struct fib_result *res, int hash,
+>  {
+>  	struct fib_info *fi = res->fi;
+>  	struct net *net = fi->fib_net;
+> -	bool found = false;
+>  	bool use_neigh;
+> +	int score = -1;
+>  	__be32 saddr;
+>  
+>  	if (unlikely(res->fi->nh)) {
+> @@ -2180,7 +2180,7 @@ void fib_select_multipath(struct fib_result *res, int hash,
+>  	saddr = fl4 ? fl4->saddr : 0;
+>  
+>  	change_nexthops(fi) {
+> -		int nh_upper_bound;
+> +		int nh_upper_bound, nh_score = 0;
+>  
+>  		/* Nexthops without a carrier are assigned an upper bound of
+>  		 * minus one when "ignore_routes_with_linkdown" is set.
+> @@ -2190,24 +2190,16 @@ void fib_select_multipath(struct fib_result *res, int hash,
+>  		    (use_neigh && !fib_good_nh(nexthop_nh)))
+>  			continue;
+>  
+> -		if (!found) {
+> +		if (saddr && nexthop_nh->nh_saddr == saddr)
+> +			nh_score += 2;
+> +		if (hash <= nh_upper_bound)
+> +			nh_score++;
+> +		if (score < nh_score) {
+>  			res->nh_sel = nhsel;
+>  			res->nhc = &nexthop_nh->nh_common;
+> -			found = !saddr || nexthop_nh->nh_saddr == saddr;
 
-Thanks, I'll send a new version later on this week then!
+if score == 3 return immediately?
+
+> +			score = nh_score;
+>  		}
+>  
+> -		if (hash > nh_upper_bound)
+> -			continue;
+> -
+> -		if (!saddr || nexthop_nh->nh_saddr == saddr) {
+> -			res->nh_sel = nhsel;
+> -			res->nhc = &nexthop_nh->nh_common;
+> -			return;
+> -		}
+> -
+> -		if (found)
+> -			return;
+> -
+>  	} endfor_nexthops(fi);
+>  }
+>  #endif
+> -- 
+> 2.47.3
+> 
+
+
 
