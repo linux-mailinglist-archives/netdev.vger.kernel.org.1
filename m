@@ -1,32 +1,32 @@
-Return-Path: <netdev+bounces-245655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1870ACD459A
-	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 21:30:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C0427CD45A3
+	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 21:42:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 83FFE30057D3
-	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 20:29:40 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0966630056E1
+	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 20:42:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 411863090EB;
-	Sun, 21 Dec 2025 20:29:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DD8D23D7F0;
+	Sun, 21 Dec 2025 20:42:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XLykvq0P"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="OGZZ/Drc"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 899A71FC0EF;
-	Sun, 21 Dec 2025 20:29:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31DBF23C8C7;
+	Sun, 21 Dec 2025 20:42:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766348978; cv=none; b=HjZ03WsWw4xWrZgMqu3cFbvvsJFV5VE64cyZ/2slU7rAxyMYHXUWQIh29KLCWcU9X4Lj2tmay5i+mX3HOGe+DqOUZdW9eWhSVn9RTJreLHnoN2zk76nxvHWwMinvZKEjojED1phHKFC+ugS4C8S45qBqsbTAye/ofCfkc87ZzFk=
+	t=1766349761; cv=none; b=mvfAQIOccm45ekomD3/osXOJJ5lWJLL3GYfPJThfkMuFETxRFYn51ui+Q3hka6Esr6yc6pxm9a/UzKf9AVPdv7ZrU2jM+vrjmEPbwtRSkTRxf2zV+kxxEl22pZLIXLT39cKVNGci5rttnmTSudFX8XstPGzw5L6EmLIhKThO6lw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766348978; c=relaxed/simple;
-	bh=wpjud/DML7ZdFV1/4BvPN/b+8Qm25K0rqeX5Yfk2V10=;
+	s=arc-20240116; t=1766349761; c=relaxed/simple;
+	bh=DrAbw5+cSf4kHXSekg/6dnJ6qsWzOO86vNbOOL4jUos=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kwIjQ3Uvp8qW5XdpuW5KRLzfCZ55uPwwBqUtrMWYatkDL4YdBAVhHcCClGs7gAvdCU8g7J5VTNh2qgQI2ln10dS7Xcb6WOKHH5XeVeKnRYoVUwIWskVsBcTovT5qSPelUmQt6aJmB2uts2DgFDWFzaU2WjrsndVln8YJtFRaMnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=XLykvq0P; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=hY1t7MbRIyis72p/s08XJqLh3UEawWEBz6VSxsQVq568idqkgG1cU7Gxn0PPxseHEsinLwgyPUGAa99l7ebMOxxLdl8qVH2cuDHxGaXx83QYv1VtzFPqgtcLzzsHFrqG7FFx/6jZn6cQbs3RM4TsrBi24Kg/fYLwCyi9qSe6WvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=OGZZ/Drc; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -34,13 +34,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=iXlgYh0CQtosUN+iPFR2GAsQw4bjRf0NFv+vaUVqhIs=; b=XLykvq0Pvo/cpzO08bPp3u673u
-	Qr8S4Nq7TSrI1P2fmSn/Eu/ft+hH60Pw/nU6kLCQkNZrgkepPGrxzY8/NJJr1G6rh5NtY3ioy1Xfk
-	Sxzk1nCoRKuQaPUF/lVRSkG1m883g08VjBplWUKff3zz4zJYBPTi+8Qt+h8aDXEmMC3E=;
+	bh=B3ra9k/QRHqlZWeluAGFEmUoSmChFoDZ++tRFEuZSjw=; b=OGZZ/DrcSW6Y4hnDDsoITw9HvC
+	QaxJMBToKn79QjxxnXta7fTWMwKfnUKMZr6gQE+wWotJyrQbwdyM/ysCqoNDxuUQipSX3T+yL8kcA
+	uh37zwgrRFd0rDcfv/L8mWm9h4is/XZ4B04ADiHeFbTlF5qvBe+lEgB9VvboMHLIlueY=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vXQ33-0006lm-WD; Sun, 21 Dec 2025 21:29:02 +0100
-Date: Sun, 21 Dec 2025 21:29:01 +0100
+	id 1vXQFw-0006oA-NS; Sun, 21 Dec 2025 21:42:20 +0100
+Date: Sun, 21 Dec 2025 21:42:20 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: Yao Zi <me@ziyao.cc>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -56,12 +56,13 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Chen-Yu Tsai <wens@csie.org>, Jisheng Zhang <jszhang@kernel.org>,
 	Furong Xu <0x1207@gmail.com>, linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org, Mingcong Bai <jeffbai@aosc.io>,
-	Kexy Biscuit <kexybiscuit@aosc.io>
-Subject: Re: [RFC PATCH net-next v4 1/3] net: phy: motorcomm: Support YT8531S
- PHY in YT6801 Ethernet controller
-Message-ID: <5365dc9f-310a-4532-9987-ae0e1849f46b@lunn.ch>
+	Kexy Biscuit <kexybiscuit@aosc.io>, Runhua He <hua@aosc.io>,
+	Xi Ruoyao <xry111@xry111.site>
+Subject: Re: [RFC PATCH net-next v4 2/3] net: stmmac: Add glue driver for
+ Motorcomm YT6801 ethernet controller
+Message-ID: <36d87587-d40d-4258-a05f-b7923aea7982@lunn.ch>
 References: <20251216180331.61586-1-me@ziyao.cc>
- <20251216180331.61586-2-me@ziyao.cc>
+ <20251216180331.61586-3-me@ziyao.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,38 +71,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251216180331.61586-2-me@ziyao.cc>
+In-Reply-To: <20251216180331.61586-3-me@ziyao.cc>
 
-On Tue, Dec 16, 2025 at 06:03:29PM +0000, Yao Zi wrote:
-> YT6801's internal PHY is confirmed as a GMII-capable variant of YT8531S
-> by a previous series[1] and reading PHY ID. Add support for
-> PHY_INTERFACE_MODE_GMII for YT8531S to allow the Ethernet driver to
-> reuse the PHY code for its internal PHY.
-> 
-> Link: https://lore.kernel.org/all/a48d76ac-db08-46d5-9528-f046a7b541dc@motor-comm.com/ # [1]
-> Co-developed-by: Frank Sae <Frank.Sae@motor-comm.com>
-> Signed-off-by: Frank Sae <Frank.Sae@motor-comm.com>
-> Signed-off-by: Yao Zi <me@ziyao.cc>
-> ---
->  drivers/net/phy/motorcomm.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/drivers/net/phy/motorcomm.c b/drivers/net/phy/motorcomm.c
-> index 89b5b19a9bd2..b751fbc6711a 100644
-> --- a/drivers/net/phy/motorcomm.c
-> +++ b/drivers/net/phy/motorcomm.c
-> @@ -910,6 +910,10 @@ static int ytphy_rgmii_clk_delay_config(struct phy_device *phydev)
->  		val |= FIELD_PREP(YT8521_RC1R_RX_DELAY_MASK, rx_reg) |
->  		       FIELD_PREP(YT8521_RC1R_GE_TX_DELAY_MASK, tx_reg);
->  		break;
-> +	case PHY_INTERFACE_MODE_GMII:
-> +		if (phydev->drv->phy_id != PHY_ID_YT8531S)
-> +			return -EOPNOTSUPP;
-> +		break;
+> +static int motorcomm_efuse_read_patch(struct dwmac_motorcomm_priv *priv,
+> +				      u8 index,
+> +				      struct motorcomm_efuse_patch *patch)
+> +{
+> +	u8 buf[sizeof(*patch)], offset;
+> +	int i, ret;
+> +
+> +	for (i = 0; i < sizeof(*patch); i++) {
+> +		offset = EFUSE_PATCH_REGION_OFFSET + sizeof(*patch) * index + i;
+> +
+> +		ret = motorcomm_efuse_read_byte(priv, offset, &buf[i]);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+> +	memcpy(patch, buf, sizeof(*patch));
 
-You have a break here. So the write to RGMII delay register will be
-performed, even thought this is an GMII PHY. Does the register exists?
-Would it be better to just return 0;
+Why do you write it into a temporary buffer and then copy it to patch?
+Why not put it straight into patch?
 
-      Andrew
+> +	ret = motorcomm_efuse_read_mac(priv, res.mac);
+> +	if (ret == -ENOENT) {
+> +		dev_warn(&pdev->dev, "eFuse contains no valid MAC address\n");
+> +		dev_warn(&pdev->dev, "fallback to random MAC address\n");
+> +
+> +		memset(res.mac, 0, sizeof(res.mac));
+
+It is not clear how setting this to zero results in a random MAC
+address. Maybe actually call eth_random_addr()?
+
+	 Andrew 
 
