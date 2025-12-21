@@ -1,249 +1,203 @@
-Return-Path: <netdev+bounces-245639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245640-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 450E2CD40B9
-	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 14:43:06 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4B7ACD418F
+	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 15:50:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id B928330010E9
-	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 13:43:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 46B413006F46
+	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 14:49:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0288E2F9C37;
-	Sun, 21 Dec 2025 13:43:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6E6A2D6E4B;
+	Sun, 21 Dec 2025 14:49:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H7pM1cfj";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lu0gqx/v"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="bqV4O26H"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011032.outbound.protection.outlook.com [40.107.208.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86806230D35
-	for <netdev@vger.kernel.org>; Sun, 21 Dec 2025 13:42:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766324581; cv=none; b=Bg1uckjb88r91ORJdwa+ecGDcMEPBD/+EnynVTXAZz5Se73SempHlK25VI9EBwjfw3btrbS64ZM3RGnr8jCHWZvImgnr+aHSC9+mjq4yb7aA1PO+rYhMPg5zyvT2rDLW4Z0o+r+DhWJfPWht3cfNSsua+zg7fLNnND3eZLlTFZY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766324581; c=relaxed/simple;
-	bh=g1OpVRc/favQfUiIRE8TO5sJVwwB3PHfeg+/jvw5UK4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tbp21hdB6r94q95YaiauIvRMNR5ZPREdRGmzk/0D2M/+auKDDShoNdpPZZPK+5+whSgFxNqzWW9bdUhQbTPbWj20P2UNZxZOnY2/wguPMotlKgcR67crmhBlncDFxl0bdj1nH+GlaopgPrQSL4sf1LUreTGybfoEqrR0/dFB9Vc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H7pM1cfj; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Lu0gqx/v; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766324578;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LL1YiW+qcmDAfO6Y9bCrMUIb9gMq0TIVlGP94jNrCWo=;
-	b=H7pM1cfj2qPLFDQxs2U3GSn+w7NTQBVSpWRK7L8dDRDMXmAmh3AvQzK+MPP9zMqms0qzTJ
-	R3LcnWv7oPVi8lnuMXOw1gTR8CitBYLcJcMaXcr2x0aDG3RX9GdOecMXyjnUGe+ATuspvp
-	zJNTpMDslqxtMyG4J00By/ZmdXKnoTQ=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-450-avWRBEmuOLiD2qPbGrYdvQ-1; Sun, 21 Dec 2025 08:42:57 -0500
-X-MC-Unique: avWRBEmuOLiD2qPbGrYdvQ-1
-X-Mimecast-MFC-AGG-ID: avWRBEmuOLiD2qPbGrYdvQ_1766324576
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4792bd2c290so30454045e9.1
-        for <netdev@vger.kernel.org>; Sun, 21 Dec 2025 05:42:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1766324576; x=1766929376; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=LL1YiW+qcmDAfO6Y9bCrMUIb9gMq0TIVlGP94jNrCWo=;
-        b=Lu0gqx/vokHoclYo+wIaOJhtatLZBz4FWnYOZXn6wqtHZHCHl+3KYHgxAdWn9HUoRZ
-         Yd/67e4rDcvbrnCloiASf3fM0N3/tm+tOy5C+6LNySvsymJx9IeT19SlytNsBbx8pKVE
-         N09WOnNUE4xEK3cnjRhBXj0OwdtBrWgWmZTNZQRShyyV7JRkA/EB1/l61mtkAbj7B8zn
-         d1Ley931mbm7GIewZNYr7qSLfeyBOdKDNKmheEySxBgvy7yXtE30Gvmjieyv9fgRTPK/
-         QQzqZHqhdRGm65r2wPMwSSvaZ7GypPXVqNcorNhEPtKvGlscd2zjC8LEr4hrEQgRJuIL
-         gUTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766324576; x=1766929376;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LL1YiW+qcmDAfO6Y9bCrMUIb9gMq0TIVlGP94jNrCWo=;
-        b=VXBTSpsXNb4fJyNBLjP7NbhrnaTZnx01a36MXaECVmYTXuJZCF+01rSR5aAe2Kt+Dr
-         N2mxCZE167l+ao6KJ5iYHctsYMZX7bkn3qmjGj2OmGb8jDCbB+XGui+Hm+KCM95nIPz6
-         HUBeHSpyYBo1PvVP+E/8u2w0cREsNKLYBptzRRaz2yEHiw9yUdZ0jvWcROd+jbnozMc4
-         aetwrVQDnbpWuXoFFAgDLGW9rCuhue/chC8VI1Eyw2DrA+sB+V1nsnLy2TzVcjqI9YZ/
-         q5JjHISOEOfC6BqrK0LEbf7VGym7U9QokOdmH0PZjY/yL2a5he2CA8Nl/2ZN09chw+Fd
-         709Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU/QzhnVm5aylEwgxYIad3awcvoXOmkg5jnTyXJ9AUF/Txl24xeyIDg/pY6j2HbESn/8oAT/mQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJm0Flfp/L+zAQyr7BxxNXjMMGKS7GIQeWDp9QrNAPQOdPswcr
-	fY+KSs9ffuDJlb0+khRo1SIlIPucvxOHjlXUy53BqjWuY+hHDKYGaRew4Rt81OS87hD85FCbQNj
-	vfQPsSH4lIRgguQHbWPeZN2wmPMV9Abj+g53ZdaTLncu+TQs4IH1RMFt6fA==
-X-Gm-Gg: AY/fxX7nTuy4PuMs9/6wpmVp3WQ1vKd+zMRoGxUBkMv+azCDfnrHoK95/Pjt42vM0Pd
-	z64WdIjCyJ70CAa3IPQNqqBIEza/e9hxYox8ICFkwgIYiVr2mB61dmj8hiC8T09wpmENy63q3zI
-	bgKBPH3MGrXMq4Y9t0ij0FlATfahAU52W2r0IBSvTxyOTgh3I6gLjAzMi90Ajs/LRMgYN77sEVk
-	Qdrdo0+IditA/bPTZJ0iRhLiLKn6bfpQXbqs2PWD3okWtNLuQY1yOAmjO6xAV8lTDANAJtj+D3+
-	HOtY/VfG1KXRH1n5q1QvKUawbiMi+4wJNNrlGNV6xTqfZ7hOpUbERSaLPQOw7rTTaCcgMOVXFi6
-	FgJKf8QSbWei2Pw67Dkb3j95L2NyXFUDyNQ==
-X-Received: by 2002:a05:600c:198d:b0:46e:35a0:3587 with SMTP id 5b1f17b1804b1-47d195a06a0mr78888905e9.27.1766324575730;
-        Sun, 21 Dec 2025 05:42:55 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGndUGZlLP7dF9QsIdTkQlYcFSwsza8K4tRMm6Y1+UEUb2YQun2bVAVDpswkOGEHQO9izRXxw==
-X-Received: by 2002:a05:600c:198d:b0:46e:35a0:3587 with SMTP id 5b1f17b1804b1-47d195a06a0mr78888685e9.27.1766324575102;
-        Sun, 21 Dec 2025 05:42:55 -0800 (PST)
-Received: from redhat.com (IGLD-80-230-31-118.inter.net.il. [80.230.31.118])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d193621c8sm139563755e9.7.2025.12.21.05.42.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Dec 2025 05:42:54 -0800 (PST)
-Date: Sun, 21 Dec 2025 08:42:51 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Bui Quang Minh <minhquangbui99@gmail.com>
-Cc: Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH net v2] virtio-net: enable all napis before scheduling
- refill work
-Message-ID: <20251221084218-mutt-send-email-mst@kernel.org>
-References: <20251212152741.11656-1-minhquangbui99@gmail.com>
- <CACGkMEtzXmfDhiQiq=5qPGXG+rJcxGkWk0CZ4X_2cnr2UVH+eQ@mail.gmail.com>
- <3f5613e9-ccd0-4096-afc3-67ee94f6f660@gmail.com>
- <CACGkMEs+Mse7nhPPiqbd2doeGtPD2QD3BM_cztr6e=VfuiobHQ@mail.gmail.com>
- <5434a67e-dd6e-4cd1-870b-fdd32ad34a28@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21D5228B4FE
+	for <netdev@vger.kernel.org>; Sun, 21 Dec 2025 14:49:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.208.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1766328597; cv=fail; b=ig3865D9tR16POVNftSnDjBg3+K7uDsqjg+MBkXrYUPKTwtFBHXdxqn9a/bMXcCW8jHEiN4w5DVqc8FBfp9VrHvC+h501dFJndDrX3ttympEUMpThjWlgWK4N/WEgm2uVCivkxSOJmGaOGWXztMQDZnJeOxdWV6xJv6nYfbbB/M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1766328597; c=relaxed/simple;
+	bh=KXeCl2HR80bwxPOToGt6iudepGK0ICcITI5G5BUH/4k=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Rd8RbiVMP/ohLKX4+p/8gLZFLd6oV+8REmjxZAB3YHsA39W2QKR/CAPIP7K2CmZZPNKMJcIKCUgdtdWIRzh/PXpiayBFLq4Kmw2RBowuDoh7PHvGv2KPxEvsk0ggKY9Ls0EayQ3NkHiQhlIkzHiM/poRZh+d12lUTP8t0nuaX8k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=bqV4O26H; arc=fail smtp.client-ip=40.107.208.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=yCg20uspf06d5+xH1BzqJp7sy1wKIMRoNCEBuMqEC64bgcgKCfjhIEJTymgZQPHTcdn5CtIPG9Yh5aeb5Cd0uFlndtAqwMi73G8eCRpnA9We/Cu2h638USdGE4uX5umy7Nic9Xv5jeSqtq2LEf713XxIoIQ9SqXOS29LEWhUcOt8s5W33W2PzyrBhpIuFvPQcz/fYDuuPtrzJ6Pua7QPbxERAGaxWujGIpe0Yv/RYwSJj6A5g21Zp+cV01DBQBVJrWcNiiTcCmn2RNbHtO5ipgymIfwoKiH5XYdmgX4vUdvWDPNFiHqqyUOby4DLbMIE91yK/rvO4H+mVhe1+3jaeA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=UYDKIqFGvMi4B4Pfimkr3DUsXToThwReZstusdOfXkE=;
+ b=Zlw4e8GQy8PWHtP3lrViczK04wdrlBLq+bNw3kpZbEqDWweyjxMvdAezKedJNWQVOn9lq90qm7yJV8Vobl1I79ou3lNd2gTUr0CDfARZcXRXOnbKwdEJTB0RXKwGDd6xvUV8MnVVeY5xbo8XM690Y62aoneegPEOydt39h35bBrqa/UAmBzL23K97Jq3W0KzowbHEJ6/hRdjkPCRfJR7HCg4Np4x4WrkC9TggD5t7L3bzEVGirT9DHQuk1V5Dc7u8IDt8GNEqF3/zrKwkFFRIpeLDTFVNv8QestO63MQmbXrZgdBQghAavUddJNUjIcGbeRq/EhTUKHtI0Oqz5VI1w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UYDKIqFGvMi4B4Pfimkr3DUsXToThwReZstusdOfXkE=;
+ b=bqV4O26HVJaIDz3ZxQ2247/hbPoG90nMt4CK5/Mkt94eC2WwZfME23dAZ//Jc0E0LfQ+qjtfc2UC+gNKzQACYASFmH2gMWaghnLCV/6yGNx6yzcaeTVC1ETrRyS1evskzq9AURF/W1HbWF0Q1qyFqCQjNNwgsD3/rSD4tHT/xZ3saLJMr69Tc6ECiktOnCCK4grgD6BdzUshhR2G7uNu5zXERccycPd8mjYH2TR7+Xkx3DS0ZS+ZkEQLaMgl9Q+t4yKc56mQScv2sTWYxvfsXP1grsA9txbVuz9vy0Lw0OxP/64qF5o5ZmWRq4CC4HkijFjDOQ7ZqPwN5/cq6v6CFQ==
+Received: from BYAPR05CA0033.namprd05.prod.outlook.com (2603:10b6:a03:c0::46)
+ by CY8PR12MB7291.namprd12.prod.outlook.com (2603:10b6:930:54::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9434.10; Sun, 21 Dec
+ 2025 14:49:51 +0000
+Received: from SJ1PEPF000026C8.namprd04.prod.outlook.com
+ (2603:10b6:a03:c0:cafe::14) by BYAPR05CA0033.outlook.office365.com
+ (2603:10b6:a03:c0::46) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9434.6 via Frontend Transport; Sun,
+ 21 Dec 2025 14:49:51 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ SJ1PEPF000026C8.mail.protection.outlook.com (10.167.244.105) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9456.9 via Frontend Transport; Sun, 21 Dec 2025 14:49:51 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 21 Dec
+ 2025 06:49:37 -0800
+Received: from shredder.nvidia.com (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Sun, 21 Dec
+ 2025 06:49:34 -0800
+From: Ido Schimmel <idosch@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<edumazet@google.com>, <dsahern@kernel.org>, <horms@kernel.org>,
+	<penguin-kernel@I-love.SAKURA.ne.jp>, Ido Schimmel <idosch@nvidia.com>
+Subject: [PATCH net 1/2] ipv4: Fix reference count leak when using error routes with nexthop objects
+Date: Sun, 21 Dec 2025 16:48:28 +0200
+Message-ID: <20251221144829.197694-1-idosch@nvidia.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <5434a67e-dd6e-4cd1-870b-fdd32ad34a28@gmail.com>
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF000026C8:EE_|CY8PR12MB7291:EE_
+X-MS-Office365-Filtering-Correlation-Id: 81ec2a44-4187-43db-ac8a-08de40a0323d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700013|376014|82310400026|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?LAQNdiMFAi0Rc+AGA7/NbPiihtE34pj2etHlpHyJiZc9SuAYVdRFH7ucCHRe?=
+ =?us-ascii?Q?ZVLgIyQuGTGGdsRmYUsZb+aUzyF8ntt9+lYgOOsGMay7zu/1jLgX1dqYkdJS?=
+ =?us-ascii?Q?F8oDhP62fy8uR0jTXS+R4l5bR3XMp6QKE27xqkj2f3DupC/SmBIPUBv9Ocu2?=
+ =?us-ascii?Q?dVhqdAkXobaYFtSEj+KB+Gnzdg9zcqsnIiS8vNa6vN0H2mPEybyhLf/SmkU5?=
+ =?us-ascii?Q?hfDk7V3I12XWWqtBxAKxdLegNBoKTLpPvR8Cy0b3TxzzsrOPBco9UtIc5rq1?=
+ =?us-ascii?Q?J/MPn+Ll8CEVoVWWrw88uCaRtZE6cM5XZsiEgJKvV+VZT0FWFVt1tmjXD4pK?=
+ =?us-ascii?Q?zmAel38hZzd7aulCRF9N1srSjNB0F2DVEsKTVAhXpGObLQfz+aghEMQCx+5W?=
+ =?us-ascii?Q?jxaSLi7mMrakAFGokoQO/yQLVAaNI7U21+eG0jo2IH59+Xq0m3BoBIQMAkSv?=
+ =?us-ascii?Q?OT70xtea8MfwQokywqbJF6KfKbPJXs7gvnfXFADTwBrNRiJyNtuVrdq+6s8n?=
+ =?us-ascii?Q?suuaRtbuqVWcwD6v3ytpiCW6dCR76q9q0Pe0AKdU1NKTsI5/UHWnrVyWxebX?=
+ =?us-ascii?Q?iT3tJBYURRRFaQlxwbUYDcppDvWZnvnktpHFEPus6lBwOfh+PZt+B0ZhHmrK?=
+ =?us-ascii?Q?SbNu9HLaG8VutwKGPsEpdvczn0KtPDotdSw8KfkAkDoR0AXYILch7W0Qr+ks?=
+ =?us-ascii?Q?U0Okom3CoAfT0OT/OJaT02vnp6nDniRWuAFYeVVWbxAThQAZoxmwDHcWo3vQ?=
+ =?us-ascii?Q?Q7kkuknlSeJxiBms1+K+RrzEF4MQysE3xhHEF6axqBUHUa+zhTdCETfJFZLW?=
+ =?us-ascii?Q?YlGQP5FrBpBGtfcTvQfaN9FeOi5MtKiQj8xBmb6tVqispI2dARAOo233ZPRY?=
+ =?us-ascii?Q?JRCeQHJCSCrUY3Fvm8xtpgxbgYTWM/SvP+BnmXkHzIcy6awbOp48p7zDkSY5?=
+ =?us-ascii?Q?iq9SiJgoPQvlKIpQ+nD7s1X7IV5EfFd76C5YFXrA9NTt4psctlR0n9kYFu8Z?=
+ =?us-ascii?Q?+ZOh8SC6ZeC8hUrviqYMHisDYiN4G+l2Yyva/+37qNMReZbC4xq0823DrElR?=
+ =?us-ascii?Q?5Nca7wmW/hBfjVgJKTV9XTx0kIao5OgSbn0Be2Zjgm3gaBS+EsSQRXpgO2lf?=
+ =?us-ascii?Q?NbaeZ1hmEV515m/1me1UZ/sX9XCiQXnW04RAbqi8ubxv7olBxZXqGnWT4NrO?=
+ =?us-ascii?Q?ew9P8o2dnuKaYdIaBVG/FPVeN+BKIuFFVCw4XgyDYEcHFVW91VhFCrPFlqxZ?=
+ =?us-ascii?Q?LXCmP2vJ7/z6rhKEgxT8Gl5adSBaiGKEHpLoLmf5BH22MYeFoQtkoePAxgVA?=
+ =?us-ascii?Q?Oryuh2x3+8h2dfSLsTuJRKde9c84mV6Al9D4zXCtHRZwAgwAFmZ8An5CiRga?=
+ =?us-ascii?Q?c+VlQeHdhGxSiAvDwE5DjKJ9BE5qkEPIvTNtPhu5BYfFOXjJjz4XIz37dVS+?=
+ =?us-ascii?Q?4JNjW/0ar5KDKRY5L1UC20bEXNpaSuUGjU5nQa3faD6NDGgPe+Ke8+p/Hzi5?=
+ =?us-ascii?Q?nl6j8TkEvIKENzDYdU6WkKPTb/Qi5dQifWHUI+CGROppIgEwwbz3UraN3jsE?=
+ =?us-ascii?Q?7xq0w4r+dMOn4Wocieg=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(376014)(82310400026)(13003099007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Dec 2025 14:49:51.3609
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 81ec2a44-4187-43db-ac8a-08de40a0323d
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF000026C8.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7291
 
-On Fri, Dec 19, 2025 at 12:03:29PM +0700, Bui Quang Minh wrote:
-> On 12/17/25 09:58, Jason Wang wrote:
-> > On Wed, Dec 17, 2025 at 12:23 AM Bui Quang Minh
-> > <minhquangbui99@gmail.com> wrote:
-> > > On 12/16/25 11:16, Jason Wang wrote:
-> > > > On Fri, Dec 12, 2025 at 11:28 PM Bui Quang Minh
-> > > > <minhquangbui99@gmail.com> wrote:
-> > > > > Calling napi_disable() on an already disabled napi can cause the
-> > > > > deadlock. In commit 4bc12818b363 ("virtio-net: disable delayed refill
-> > > > > when pausing rx"), to avoid the deadlock, when pausing the RX in
-> > > > > virtnet_rx_pause[_all](), we disable and cancel the delayed refill work.
-> > > > > However, in the virtnet_rx_resume_all(), we enable the delayed refill
-> > > > > work too early before enabling all the receive queue napis.
-> > > > > 
-> > > > > The deadlock can be reproduced by running
-> > > > > selftests/drivers/net/hw/xsk_reconfig.py with multiqueue virtio-net
-> > > > > device and inserting a cond_resched() inside the for loop in
-> > > > > virtnet_rx_resume_all() to increase the success rate. Because the worker
-> > > > > processing the delayed refilled work runs on the same CPU as
-> > > > > virtnet_rx_resume_all(), a reschedule is needed to cause the deadlock.
-> > > > > In real scenario, the contention on netdev_lock can cause the
-> > > > > reschedule.
-> > > > > 
-> > > > > This fixes the deadlock by ensuring all receive queue's napis are
-> > > > > enabled before we enable the delayed refill work in
-> > > > > virtnet_rx_resume_all() and virtnet_open().
-> > > > > 
-> > > > > Fixes: 4bc12818b363 ("virtio-net: disable delayed refill when pausing rx")
-> > > > > Reported-by: Paolo Abeni <pabeni@redhat.com>
-> > > > > Closes: https://netdev-ctrl.bots.linux.dev/logs/vmksft/drv-hw-dbg/results/400961/3-xdp-py/stderr
-> > > > > Cc: stable@vger.kernel.org
-> > > > > Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
-> > > > > ---
-> > > > > Changes in v2:
-> > > > > - Move try_fill_recv() before rx napi_enable()
-> > > > > - Link to v1: https://lore.kernel.org/netdev/20251208153419.18196-1-minhquangbui99@gmail.com/
-> > > > > ---
-> > > > >    drivers/net/virtio_net.c | 71 +++++++++++++++++++++++++---------------
-> > > > >    1 file changed, 45 insertions(+), 26 deletions(-)
-> > > > > 
-> > > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > > > > index 8e04adb57f52..4e08880a9467 100644
-> > > > > --- a/drivers/net/virtio_net.c
-> > > > > +++ b/drivers/net/virtio_net.c
-> > > > > @@ -3214,21 +3214,31 @@ static void virtnet_update_settings(struct virtnet_info *vi)
-> > > > >    static int virtnet_open(struct net_device *dev)
-> > > > >    {
-> > > > >           struct virtnet_info *vi = netdev_priv(dev);
-> > > > > +       bool schedule_refill = false;
-> > > > >           int i, err;
-> > > > > 
-> > > > > -       enable_delayed_refill(vi);
-> > > > > -
-> > > > > +       /* - We must call try_fill_recv before enabling napi of the same receive
-> > > > > +        * queue so that it doesn't race with the call in virtnet_receive.
-> > > > > +        * - We must enable and schedule delayed refill work only when we have
-> > > > > +        * enabled all the receive queue's napi. Otherwise, in refill_work, we
-> > > > > +        * have a deadlock when calling napi_disable on an already disabled
-> > > > > +        * napi.
-> > > > > +        */
-> > > > >           for (i = 0; i < vi->max_queue_pairs; i++) {
-> > > > >                   if (i < vi->curr_queue_pairs)
-> > > > >                           /* Make sure we have some buffers: if oom use wq. */
-> > > > >                           if (!try_fill_recv(vi, &vi->rq[i], GFP_KERNEL))
-> > > > > -                               schedule_delayed_work(&vi->refill, 0);
-> > > > > +                               schedule_refill = true;
-> > > > > 
-> > > > >                   err = virtnet_enable_queue_pair(vi, i);
-> > > > >                   if (err < 0)
-> > > > >                           goto err_enable_qp;
-> > > > >           }
-> > > > So NAPI could be scheduled and it may want to refill but since refill
-> > > > is not enabled, there would be no refill work.
-> > > > 
-> > > > Is this a problem?
-> > > You are right. It is indeed a problem.
-> > > 
-> > > I think we can unconditionally schedule the delayed refill after
-> > > enabling all the RX NAPIs (don't check the boolean schedule_refill
-> > > anymore) to ensure that we will have refill work. We can still keep the
-> > > try_fill_recv here to fill the receive buffer earlier in normal case.
-> > > What do you think?
-> > Or we can have a reill_pending
-> 
-> Okay, let me implement this in the next version.
-> 
-> > but basically I think we need something
-> > that is much more simple. That is, using a per rq work instead of a
-> > global one?
-> 
-> I think we can leave this in a net-next patch later.
-> 
-> Thanks,
-> Quang Minh
+When a nexthop object is deleted, it is marked as dead and then
+fib_table_flush() is called to flush all the routes that are using the
+dead nexthop.
 
-i am not sure per rq is not simpler than this pile of tricks.
+The current logic in fib_table_flush() is to only flush error routes
+(e.g., blackhole) when it is called as part of network namespace
+dismantle (i.e., with flush_all=true). Therefore, error routes are not
+flushed when their nexthop object is deleted:
 
+ # ip link add name dummy1 up type dummy
+ # ip nexthop add id 1 dev dummy1
+ # ip route add 198.51.100.1/32 nhid 1
+ # ip route add blackhole 198.51.100.2/32 nhid 1
+ # ip nexthop del id 1
+ # ip route show
+ blackhole 198.51.100.2 nhid 1 dev dummy1
 
-> > 
-> > Thanks
-> > 
-> > > > 
-> > > > > +       enable_delayed_refill(vi);
-> > > > > +       if (schedule_refill)
-> > > > > +               schedule_delayed_work(&vi->refill, 0);
-> > > > > +
-> > > > >           if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_STATUS)) {
-> > > > >                   if (vi->status & VIRTIO_NET_S_LINK_UP)
-> > > > >                           netif_carrier_on(vi->dev);
-> > > > > @@ -3463,39 +3473,48 @@ static void virtnet_rx_pause(struct virtnet_info *vi, struct receive_queue *rq)
-> > > > >           __virtnet_rx_pause(vi, rq);
-> > > > >    }
-> > > > > 
-> > > > Thanks
-> > > > 
-> > > Thanks,
-> > > Quang Minh.
-> > > 
+As such, they keep holding a reference on the nexthop object which in
+turn holds a reference on the nexthop device, resulting in a reference
+count leak:
+
+ # ip link del dev dummy1
+ [   70.516258] unregister_netdevice: waiting for dummy1 to become free. Usage count = 2
+
+Fix by flushing error routes when their nexthop is marked as dead.
+
+IPv6 does not suffer from this problem.
+
+Fixes: 493ced1ac47c ("ipv4: Allow routes to use nexthop objects")
+Reported-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Closes: https://lore.kernel.org/netdev/d943f806-4da6-4970-ac28-b9373b0e63ac@I-love.SAKURA.ne.jp/
+Reported-by: syzbot+881d65229ca4f9ae8c84@syzkaller.appspotmail.com
+Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+---
+ net/ipv4/fib_trie.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/net/ipv4/fib_trie.c b/net/ipv4/fib_trie.c
+index 59a6f0a9638f..7e2c17fec3fc 100644
+--- a/net/ipv4/fib_trie.c
++++ b/net/ipv4/fib_trie.c
+@@ -2053,10 +2053,11 @@ int fib_table_flush(struct net *net, struct fib_table *tb, bool flush_all)
+ 				continue;
+ 			}
+ 
+-			/* Do not flush error routes if network namespace is
+-			 * not being dismantled
++			/* When not flushing the entire table, skip error
++			 * routes that are not marked for deletion.
+ 			 */
+-			if (!flush_all && fib_props[fa->fa_type].error) {
++			if (!flush_all && fib_props[fa->fa_type].error &&
++			    !(fi->fib_flags & RTNH_F_DEAD)) {
+ 				slen = fa->fa_slen;
+ 				continue;
+ 			}
+-- 
+2.52.0
 
 
