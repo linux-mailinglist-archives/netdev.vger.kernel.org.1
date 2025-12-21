@@ -1,118 +1,145 @@
-Return-Path: <netdev+bounces-245646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3649CCD433C
-	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 18:03:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D3CA7CD437C
+	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 18:49:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C6CC630062F6
-	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 17:03:21 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 9CD403006A9D
+	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 17:49:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 357EC2236E0;
-	Sun, 21 Dec 2025 17:03:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3689283FE3;
+	Sun, 21 Dec 2025 17:49:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="qDAtxnzn"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="bRLCm1Oy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48399224FA
-	for <netdev@vger.kernel.org>; Sun, 21 Dec 2025 17:03:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8008C2FF147
+	for <netdev@vger.kernel.org>; Sun, 21 Dec 2025 17:49:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766336601; cv=none; b=sBEk5h2CvwUGZDBs5mPLc/joH0CAOWS9AZwVYnYPbiKon1UImWOkJUEz5Sx452wrt16CQSFfmw8HXjooa2isylIHSnLu1Z8rXiRJVj3KQ7SUvytucNrYFmjuhWQrbhz2X4QMn4sVuSWJMyzMzjj2aU7dfEKQBCfzXaBdYVllNq0=
+	t=1766339394; cv=none; b=HTPj6kJTjRnDcIGHkrE8ZRVxYWFVMHgcjAwRF35FNxmcxAHGRKLxqXqPrb0FfBvGSl8mIRXja7VzmHdnJi+DXk/YUzYDEYyfG6s5hCvrP3h9thgMavxnVdxhlG8CmPU4bw0pgMDP98YpcdUddr6mXrci5unZMbAllkoYl8MWh9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766336601; c=relaxed/simple;
-	bh=8+S42+/mAnbpxEsrbwQkafA3PxBnQ1Ls+D/Wdu9w3II=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GORlPrnnvlBPLCRb9OJrzzkMUVREmM+tdu7evA89MVnNCzIVs9s+gge27es6Aj4wvCPpOBlRIPeD+lqBU5Ooj5CrKhhVrCcovxZdZcfjzNME6Mc1gON366v8oFtqk9sOfBmfYGpjZDvSSbmB8liFmWLA+ql18IffA66871YqCQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=qDAtxnzn; arc=none smtp.client-ip=209.85.221.42
+	s=arc-20240116; t=1766339394; c=relaxed/simple;
+	bh=fk2pEYDrRaibSF8Fp4jhW9Nqqawahtk/5CmDc78Ib6w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FRbilUvHrd8JMhzmjPiZK6yo5hDelsF9YV4sh/N5FuL65Tpea9nfGNLOHdpyd0iVpAfln7fpujJe6zmAtlVgJ3cIfpmpGmrH5NTOEc2LCcqdtr6XYksSZapm+Y7GCtRHWSccgDxmb+sBt+QukfuuuZPt4ICiNi4kSi5bYoWiIKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=bRLCm1Oy; arc=none smtp.client-ip=209.85.221.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-42fb5810d39so1495552f8f.2
-        for <netdev@vger.kernel.org>; Sun, 21 Dec 2025 09:03:18 -0800 (PST)
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-42fbc544b09so2486085f8f.1
+        for <netdev@vger.kernel.org>; Sun, 21 Dec 2025 09:49:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1766336597; x=1766941397; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=T3xMgZXtM33QBle/Xa3xfiOz7CIUOf3uArBMCoy7EDY=;
-        b=qDAtxnznIg1P72S+FF08qBjjwfORrn40kJD0EipFZAtfuXVqd7Lz5JX6BVns4xPzMD
-         tLgteVMH5kFH2De0PluQBdwhsJezAIQF2IaJAkBdmCBStNfYwy1C9UqP9zljdmu3m0E+
-         GAqRhvE46D7VubIc4NtxC5WHQoMcM8eL2+fuHvreDZ6xDWEA4Owk9vc4IWHYOVLVlpKa
-         xFeCgeP5LQyeLsCPepCqkcX5J5g3pr+KjOuT5lhA9ECC1LIW5341bbPb67/yt3DunilT
-         pNB+k0JSWwiFXGgzXIk23x5FpaifzgML2X3gVe1W52uFsyVoUk7nAjSfVUBRTXqIhc/V
-         zPzQ==
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1766339391; x=1766944191; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8lu1MTTPGFaX2niuw1oWMpIJBCK10vZmjUILBJklfoc=;
+        b=bRLCm1OyPm9RUaeUNrrvaBtH3lcVdKh/DZFNACKxzSek/YjCPXZK6mxWqnJQtMvDcs
+         Q/oUS95hrtOFqUlCTA13AAT402FHF1YaGBhzQoo0RWzz+jvr60FoqR9brf5D33xK19vI
+         rGznvdD6aAvWFbNt7mWTpSZmEOXvnZs2ePEl38pXbNDYI6qODr21MWar0lZIF9pMfmz/
+         v0OlZHNIOJ1p+BWf9BBZQ2qeX+QZlNGwtv8vkrbuml9j/KU+70fsnWqG3uA73tl8xbVM
+         bIXmfDdVeEi89nhcMOV1FEwdMY4NATqF/jhO7rEkYbPqNAG3Ob0kmAQn1IC2vEt7SZjz
+         rQHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766336597; x=1766941397;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=T3xMgZXtM33QBle/Xa3xfiOz7CIUOf3uArBMCoy7EDY=;
-        b=C1994q0neV5WqrwwmPpgIqNWkmFYi10Tok3mQ2GpL0VgII5h64jmpsk6C/dlkWG2S7
-         qX9tFDyRpnGnFJzhGw0uZFiKO6F4vRWE1Fiz4k6FGR7FBsX1rKAc118t3V+jJHvcDfaU
-         EqP9TcRZ3gi5jknLQaJfHLYkrPhVwL2DV5w41jFc9qrvfmW1XYOOrX1XmgDmw07p4STW
-         w8giDb9uyCw7kqROCKggFWcq2kHvtPsugM0xbdavJY9HIWIK/e6C4p6wKwp9qDgycvA0
-         cNOxKgJv0r4tG1vXOs4wpXC3NxkLYPUh5wrZVCW6Fe5Q6ezD2ZIn+rg4Y+Hnv1LMctoA
-         LeBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVPyR+rpRaQh1fwfTMkA6i16LZA+UHhdDAnYY6DKpjrkon10Z71bFjzJe1cuiYGcqiqQfHaPTQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwaGxXAv4EQY6z/nPz7TzNSmGQ2H/IOhJYgoLWnEj+2YEftJbHP
-	9VBihaydyJP5xI6XZiJcIr7mtTCdSLsVTbnoceqbofH+MHHN3qCU+pvd5GP6ALbN2rM=
-X-Gm-Gg: AY/fxX4oxcvh3ZTS3zgsJ4VFnophPB3qrIB02LnmHoJ/ir/DBlD/57ByZiX2ppEyflR
-	E6ziKzbLWxb+mG/g8xbsJQ1W0FKTsmTn0UavhSX9+24NutVeL9dxNugXMZ0om4ALyuAHHB5zKSa
-	bhtqxsO4i5ouGlMtrwZNtPF2yAV2XbAwRVCQsRUU3avIQxWQPOGI0AWJ+17l8PTyDDs8gX/XqIZ
-	bQ4Xwnj7Uen2bxcnivgdsN6yUruOZ8b2GImbAaeDlx7a5FVynJ/5EqpDbGy28YMxLYuwAGlOske
-	E1Y4BRKPXVlLFwrXeaKngZHMk25J/qDpIkX5aP7D+avjOab+QGx/7Y9N9WBNkT1GiNhJ+3xMXOr
-	poShkIYIYppGyMsKxmz003EuJJGgaNz5j7Ml4Jpj4XTwDaRjVHeLe5QAq8ifedXuvhOBIsYj8C5
-	hWHYfJtseDRRPC5DSYnWxrW290bUE340g7VUy0u8+7CW3m3mEooUj8
-X-Google-Smtp-Source: AGHT+IHDHNbr+z7QKBBlKH2stc/0qqBXIxmxmogpiATCnuMx30ffiXiaj+Foaw0ogwYXfWWbHTamIA==
-X-Received: by 2002:a05:6000:2301:b0:431:266:d134 with SMTP id ffacd0b85a97d-4324e50c2ccmr9939087f8f.53.1766336597479;
-        Sun, 21 Dec 2025 09:03:17 -0800 (PST)
-Received: from phoenix.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324ea1af2bsm17589101f8f.1.2025.12.21.09.03.14
+        d=1e100.net; s=20230601; t=1766339391; x=1766944191;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8lu1MTTPGFaX2niuw1oWMpIJBCK10vZmjUILBJklfoc=;
+        b=RDrrk+hYg8cU6eHM+tkihS5yfTvEmGrytDtPe1d7zEPHVGc71AeOpiMmRBHKy+VUsD
+         ah6nTbSw09b0BAgtzT38/PuGsACVGyV4IQ6axrAqgf6Fc+Gm6ZJ8zQd3jy8FmWRbYNjZ
+         3O45ICZYKVMv3dF2QCyH1qQPkmfgJ8Pz5gUf7Qt0oo/44Z0h9qIzRx8CMadrpBVsQlnf
+         E/WYjzRsE4YWI8MK7j/W/QGX5S9S5Uq76RhS7lgaSYyxKhMxhDirLSUcvCypyq1o2Q0g
+         lThe0y+VAJ6+nTjcBfW6gou9ucZdBiHO0bxjbfwOHIdjjzaWNA2jzEfGfALIbBcBP+pJ
+         zHBw==
+X-Gm-Message-State: AOJu0YzzCS1WJ78mHCTN5VGkSD1t9So7XRGlRmereJ+6rxlNzOmgtLrO
+	iIkoBtU85+RnrBwjiKShK0AQf2UqvoMcNNIMeE4OLgT5rhqi4vrab+pPywpZC+mXXLmQrRQa9fi
+	+RLnDenM=
+X-Gm-Gg: AY/fxX7DoWJ8HJyEMhtVKNzQ4EUx/q1bSxHuorbJaZf/FVodwHWY6dFawg27jCZEdow
+	ryuBUJSMJrwbn+KkeRt5SqS3/RR2JyICuRo9R6B+V1xoE8ByGnPWeYZvMcRqEHq6qwkzcxE3lpD
+	qMs+ORbuoo6ug6WchgZwaxv/b4LUzVkozga9U1S1r5WT7aTOETHH5xdicNoxNZ/FxITF12UpsCU
+	wg+F5hfRlnBarcmA7iwK8o/TZelJlJ8pecocpzw1izaS3SLiP7hni5eVUbe1MG6gT9j6SIbdbTG
+	NHBjuGjbm/3kWgk5wSo33szvO1UZ44qWzIdHA6glEN+s1evBqbJLKpVYmSbq7WDAnreQdvNKK8D
+	Dpf3XTUvU49GBIzHJD4hv25GLLcPYJ4XKtNdacFy7FJdAN49s+nlkXMzqbCItXx94YDO31mxTMt
+	O/fvUn/JwDIGZHhvKF2Rca3lrbiEhkVMzL7TwYdiz/sJd2T4yxTA==
+X-Google-Smtp-Source: AGHT+IHXEPynciFqgyviCesGmATX10R0hL/t/zXX7BXoZcW+0pT514Xo94osC39CATzUrf9uKPwrtA==
+X-Received: by 2002:a5d:5887:0:b0:42b:38b1:e32e with SMTP id ffacd0b85a97d-4324e50d611mr9715335f8f.46.1766339390658;
+        Sun, 21 Dec 2025 09:49:50 -0800 (PST)
+Received: from phoenix.lan (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324eaa64cesm17491358f8f.35.2025.12.21.09.49.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Dec 2025 09:03:16 -0800 (PST)
-Date: Sun, 21 Dec 2025 09:03:10 -0800
+        Sun, 21 Dec 2025 09:49:50 -0800 (PST)
 From: Stephen Hemminger <stephen@networkplumber.org>
-To: Manas Ghandat <ghandatmanas@gmail.com>
-Cc: xiyou.wangcong@gmail.com, Jiri Pirko <jiri@resnulli.us>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, netdev@vger.kernel.org
-Subject: Re: net/sched: Fix divide error in tabledist
-Message-ID: <20251221090310.60bc803d@phoenix.local>
-In-Reply-To: <166583a8-272f-4e93-890e-3dabfa0b2390@gmail.com>
-References: <f69b2c8f-8325-4c2e-a011-6dbc089f30e4@gmail.com>
-	<20251212171856.37cfb4dd@stephen-xps.local>
-	<81d4181d-484a-458d-b0dd-e5d0a79f85d9@gmail.com>
-	<166583a8-272f-4e93-890e-3dabfa0b2390@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>
+Subject: [PATCH iproute2] utils: do not be restrictive about alternate network device names
+Date: Sun, 21 Dec 2025 09:49:45 -0800
+Message-ID: <20251221174945.8346-1-stephen@networkplumber.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Wed, 17 Dec 2025 23:57:40 +0530
-Manas Ghandat <ghandatmanas@gmail.com> wrote:
+The kernel does not impose restrictions on alternate interface
+names; therefore ip commands should not either.
 
-> Just a friendly reminder
-> 
-> On 12/12/25 20:47, Manas Ghandat wrote:
-> >
-> > On 12/12/25 13:48, Stephen Hemminger wrote:  
-> >> The whole netem_in_tree check is problematic as well.  
-> > Can you mention the issues. Maybe I can include that in my patch as well.  
-> >> Your mail system is corrupting the patch.  
-> > I will resend the patch.  
-> >> Is this the same as earlier patch  
-> > I have just moved the check before the values in qdisc are changed. 
-> > This would prevent the values being affected in case we bail out 
-> > taking the error path.  
+This allows colon, slash, even .. as alternate names.
 
-The check_netem_in_tree code caused a regression where some valid configurations
-using multiple queues are HTB stopped working.  A better solution is needed
-and Cong et al are working on it.
+Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+---
+ lib/utils.c | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
+
+diff --git a/lib/utils.c b/lib/utils.c
+index 0719281a..13e8c098 100644
+--- a/lib/utils.c
++++ b/lib/utils.c
+@@ -847,10 +847,15 @@ int nodev(const char *dev)
+ 	return -1;
+ }
+ 
+-static int __check_ifname(const char *name)
++/* These checks mimic kernel checks in dev_valid_name */
++int check_ifname(const char *name)
+ {
+-	if (*name == '\0')
++	if (*name == '\0' || strnlen(name, IFNAMSIZ) == IFNAMSIZ)
++		return -1;
++
++	if (!strcmp(name, ".") || !strcmp(name, ".."))
+ 		return -1;
++
+ 	while (*name) {
+ 		if (*name == '/' || isspace(*name))
+ 			return -1;
+@@ -859,17 +864,13 @@ static int __check_ifname(const char *name)
+ 	return 0;
+ }
+ 
+-int check_ifname(const char *name)
++/* Many less restrictions on altername names */
++int check_altifname(const char *name)
+ {
+-	/* These checks mimic kernel checks in dev_valid_name */
+-	if (strlen(name) >= IFNAMSIZ)
++	if (*name == '\0' || strnlen(name, ALTIFNAMSIZ) == ALTIFNAMSIZ)
+ 		return -1;
+-	return __check_ifname(name);
+-}
+ 
+-int check_altifname(const char *name)
+-{
+-	return __check_ifname(name);
++	return 0;
+ }
+ 
+ /* buf is assumed to be IFNAMSIZ */
+-- 
+2.51.0
+
 
