@@ -1,43 +1,45 @@
-Return-Path: <netdev+bounces-245652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AA29CD44C9
-	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 20:27:20 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB062CD44CC
+	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 20:27:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C5F5530054BA
-	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 19:27:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CC617300727E
+	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 19:27:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E94F630E839;
-	Sun, 21 Dec 2025 19:27:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74B6B30EF69;
+	Sun, 21 Dec 2025 19:27:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Qn1sxazC"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KILJ2U4P"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B76B330DD3D
-	for <netdev@vger.kernel.org>; Sun, 21 Dec 2025 19:27:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C32AE30DD13
+	for <netdev@vger.kernel.org>; Sun, 21 Dec 2025 19:27:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766345237; cv=none; b=pOsLpnfO50Z7/Lcfycs/GEgmBd6RHhjzBXgAamzuMwS1lkG7h7nj1IVlFJB9MIhJZ2+n41gYLFMskqh0AjXkOoiUP6CaNEt5Kba95kYmB0YOXw8OBn/PmsuXR3HDWKYP0DrUiJ2HN/Umo57iFE6dIUehDQF0iOt87VvgcdvM3z8=
+	t=1766345238; cv=none; b=M72WB1wku8ofuwzxaTdFaJKjDckQC6+d2fsySmnO7OnvPH3yOiBVYVYAGY8rnfzQJulEOE5Aer4heSLEL1YyS7ZyCH+W3/C49Vpt6WsWhDtOLywsGyVrrsJmTCKFuN7M7NVmEwOMpb70ACBVJeaK/JVqDcukZRvdn6bDRcST6DU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766345237; c=relaxed/simple;
-	bh=BJLuhj97g7Q+UOrjTrZHe1+yCx6iPYucW7P+RNAgnTg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DnNv5kTS1qK3Ja3yv+mS/hosxE5hMS2nHj0MfMEsDg73lahSq8M4+PbapNhWf2B8sTq+dMde/rsWceof4YpeQH1o7yE/vAfuG4DDDFN8dOP/R4WMF2Lkvhwa5NV35TTL/WbYm5377D4JcRATh4CQvYy9ore11GLghYuwxx0gTw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Qn1sxazC; arc=none smtp.client-ip=95.215.58.180
+	s=arc-20240116; t=1766345238; c=relaxed/simple;
+	bh=bUpuiE7gbk9+jtqlipRSBKneusT7oW5+1AxJqtzri0g=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=BbGE3CeqM60hMuOJXgKCbvxUOZHVXfXbj3Bq9aOdxhRMPl6OToZTBL6lwIu170rb2gjUEPz25qMQGSelijmu7O7DqKa5u+oajmFuVU0G/HFQd52wEpqCKQNkr8VuIPXu2T83YrPiZtxH8L9gjuh/p1HULqmqMiiFAmt3dWsKvtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KILJ2U4P; arc=none smtp.client-ip=95.215.58.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1766345232;
+	t=1766345233;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=JuVWF9IqyykpsNh+vlGB5mztCxwDtgi6Ahu314m2ByI=;
-	b=Qn1sxazCspokboW4Pw5Fmw055zlF11UwmnvdDBTFFTHqUG5ZFAgThbq93l+R19L4PBwpxm
-	cOvnJu2830WPEDB/8nu/B1FSN7bvDBRX+VoCSobU29cA0NdQf55kRIPy5acAOJtfQhQANo
-	pZzpiXz2YQBUKxx+2OtFd8Zq6Ew6/VI=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HFmFSljUtS3RILM0AuV3uVdm75tke+wlsQWpV0SDano=;
+	b=KILJ2U4P6d+JmFSHDcW7P3ZDYLsWZQFWdZjvnItqU1X97zL2O/bWP8TmXCRVhYQBsPMbNp
+	METxZL1YvgQR9K1bWAzMFGWGMjJgRBa9sRfMuqS8XABVxj8gfQ2JJuLfabZDV/KdZb0TO2
+	2bzMaSC0IAJQQrt5/k114sds+/GlU2E=
 From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 To: "David S. Miller" <davem@davemloft.net>,
 	David Ahern <dsahern@kernel.org>,
@@ -50,9 +52,11 @@ Cc: Shuah Khan <shuah@kernel.org>,
 	Ido Schimmel <idosch@nvidia.com>,
 	netdev@vger.kernel.org,
 	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Subject: [PATCH net v3 1/2] net: fib: restore ECMP balance from loopback
-Date: Sun, 21 Dec 2025 19:26:38 +0000
-Message-ID: <20251221192639.3911901-1-vadim.fedorenko@linux.dev>
+Subject: [PATCH net v3 2/2] selftests: fib_test: Add test case for ipv4 multi nexthops
+Date: Sun, 21 Dec 2025 19:26:39 +0000
+Message-ID: <20251221192639.3911901-2-vadim.fedorenko@linux.dev>
+In-Reply-To: <20251221192639.3911901-1-vadim.fedorenko@linux.dev>
+References: <20251221192639.3911901-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,119 +66,111 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Preference of nexthop with source address broke ECMP for packets with
-source addresses which are not in the broadcast domain, but rather added
-to loopback/dummy interfaces. Original behaviour was to balance over
-nexthops while now it uses the latest nexthop from the group. To fix the
-issue introduce next hop scoring system where next hops with source
-address equal to requested will always have higher priority.
+The test checks that with multi nexthops route the preferred route is the
+one which matches source ip. In case when source ip is on dummy
+interface, it checks that the routes are balanced.
 
-For the case with 198.51.100.1/32 assigned to dummy0 and routed using
-192.0.2.0/24 and 203.0.113.0/24 networks:
-
-2: dummy0: <BROADCAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
-    link/ether d6:54:8a:ff:78:f5 brd ff:ff:ff:ff:ff:ff
-    inet 198.51.100.1/32 scope global dummy0
-       valid_lft forever preferred_lft forever
-7: veth1@if6: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
-    link/ether 06:ed:98:87:6d:8a brd ff:ff:ff:ff:ff:ff link-netnsid 0
-    inet 192.0.2.2/24 scope global veth1
-       valid_lft forever preferred_lft forever
-    inet6 fe80::4ed:98ff:fe87:6d8a/64 scope link proto kernel_ll
-       valid_lft forever preferred_lft forever
-9: veth3@if8: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
-    link/ether ae:75:23:38:a0:d2 brd ff:ff:ff:ff:ff:ff link-netnsid 0
-    inet 203.0.113.2/24 scope global veth3
-       valid_lft forever preferred_lft forever
-    inet6 fe80::ac75:23ff:fe38:a0d2/64 scope link proto kernel_ll
-       valid_lft forever preferred_lft forever
-
-~ ip ro list:
-default
-	nexthop via 192.0.2.1 dev veth1 weight 1
-	nexthop via 203.0.113.1 dev veth3 weight 1
-192.0.2.0/24 dev veth1 proto kernel scope link src 192.0.2.2
-203.0.113.0/24 dev veth3 proto kernel scope link src 203.0.113.2
-
-before:
-   for i in {1..255} ; do ip ro get 10.0.0.$i; done | grep veth | awk ' {print $(NF-2)}' | sort | uniq -c:
-    255 veth3
-
-after:
-   for i in {1..255} ; do ip ro get 10.0.0.$i; done | grep veth | awk ' {print $(NF-2)}' | sort | uniq -c:
-    122 veth1
-    133 veth3
-
-Fixes: 32607a332cfe ("ipv4: prefer multipath nexthop that matches source address")
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 ---
-v2 -> v3:
-- add early break in case next hop with the highest possible score is
-  found (Ido)
-v1 -> v2:
-- add score calculation for nexthop to keep original logic
-- adjust commit message to explain the config
-- use dummy device instead of loopback
----
- net/ipv4/fib_semantics.c | 26 ++++++++++----------------
- 1 file changed, 10 insertions(+), 16 deletions(-)
+ tools/testing/selftests/net/fib_tests.sh | 70 +++++++++++++++++++++++-
+ 1 file changed, 69 insertions(+), 1 deletion(-)
 
-diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
-index a5f3c8459758..0caf38e44c73 100644
---- a/net/ipv4/fib_semantics.c
-+++ b/net/ipv4/fib_semantics.c
-@@ -2167,8 +2167,8 @@ void fib_select_multipath(struct fib_result *res, int hash,
- {
- 	struct fib_info *fi = res->fi;
- 	struct net *net = fi->fib_net;
--	bool found = false;
- 	bool use_neigh;
-+	int score = -1;
- 	__be32 saddr;
+diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing/selftests/net/fib_tests.sh
+index a88f797c549a..c5694cc4ddd2 100755
+--- a/tools/testing/selftests/net/fib_tests.sh
++++ b/tools/testing/selftests/net/fib_tests.sh
+@@ -12,7 +12,7 @@ TESTS="unregister down carrier nexthop suppress ipv6_notify ipv4_notify \
+        ipv4_route_metrics ipv4_route_v6_gw rp_filter ipv4_del_addr \
+        ipv6_del_addr ipv4_mangle ipv6_mangle ipv4_bcast_neigh fib6_gc_test \
+        ipv4_mpath_list ipv6_mpath_list ipv4_mpath_balance ipv6_mpath_balance \
+-       fib6_ra_to_static"
++       ipv4_mpath_balance_preferred fib6_ra_to_static"
  
- 	if (unlikely(res->fi->nh)) {
-@@ -2180,7 +2180,7 @@ void fib_select_multipath(struct fib_result *res, int hash,
- 	saddr = fl4 ? fl4->saddr : 0;
- 
- 	change_nexthops(fi) {
--		int nh_upper_bound;
-+		int nh_upper_bound, nh_score = 0;
- 
- 		/* Nexthops without a carrier are assigned an upper bound of
- 		 * minus one when "ignore_routes_with_linkdown" is set.
-@@ -2190,24 +2190,18 @@ void fib_select_multipath(struct fib_result *res, int hash,
- 		    (use_neigh && !fib_good_nh(nexthop_nh)))
- 			continue;
- 
--		if (!found) {
-+		if (saddr && nexthop_nh->nh_saddr == saddr)
-+			nh_score += 2;
-+		if (hash <= nh_upper_bound)
-+			nh_score++;
-+		if (score < nh_score) {
- 			res->nh_sel = nhsel;
- 			res->nhc = &nexthop_nh->nh_common;
--			found = !saddr || nexthop_nh->nh_saddr == saddr;
-+			if (nh_score == 3 || (!saddr && nh_score == 1))
-+				return;
-+			score = nh_score;
- 		}
- 
--		if (hash > nh_upper_bound)
--			continue;
--
--		if (!saddr || nexthop_nh->nh_saddr == saddr) {
--			res->nh_sel = nhsel;
--			res->nhc = &nexthop_nh->nh_common;
--			return;
--		}
--
--		if (found)
--			return;
--
- 	} endfor_nexthops(fi);
+ VERBOSE=0
+ PAUSE_ON_FAIL=no
+@@ -2751,6 +2751,73 @@ ipv4_mpath_balance_test()
+ 	forwarding_cleanup
  }
- #endif
+ 
++get_route_dev_src()
++{
++	local pfx="$1"
++	local src="$2"
++	local out
++
++	if out=$($IP -j route get "$pfx" from "$src" | jq -re ".[0].dev"); then
++		echo "$out"
++	fi
++}
++
++ipv4_mpath_preferred()
++{
++	local src_ip=$1
++	local pref_dev=$2
++	local dev routes
++	local route0=0
++	local route1=0
++	local pref_route=0
++	num_routes=254
++
++	for i in $(seq 1 $num_routes) ; do
++		dev=$(get_route_dev_src 172.16.105.$i $src_ip)
++		if [ "$dev" = "$pref_dev" ]; then
++			pref_route=$((pref_route+1))
++		elif [ "$dev" = "veth1" ]; then
++			route0=$((route0+1))
++		elif [ "$dev" = "veth3" ]; then
++			route1=$((route1+1))
++		fi
++	done
++
++	routes=$((route0+route1))
++
++	[ "$VERBOSE" = "1" ] && echo "multipath: routes seen: ($route0,$route1,$pref_route)"
++
++	if [ x"$pref_dev" = x"" ]; then
++		[[ $routes -ge $num_routes ]] && [[ $route0 -gt 0 ]] && [[ $route1 -gt 0 ]]
++	else
++		[[ $pref_route -ge $num_routes ]]
++	fi
++
++}
++
++ipv4_mpath_balance_preferred_test()
++{
++	echo
++	echo "IPv4 multipath load balance preferred route"
++
++	forwarding_setup
++
++	$IP route add 172.16.105.0/24 \
++		nexthop via 172.16.101.2 \
++		nexthop via 172.16.103.2
++
++	ipv4_mpath_preferred 172.16.101.1 veth1
++	log_test $? 0 "IPv4 multipath loadbalance from veth1"
++
++	ipv4_mpath_preferred 172.16.103.1 veth3
++	log_test $? 0 "IPv4 multipath loadbalance from veth3"
++
++	ipv4_mpath_preferred 198.51.100.1
++	log_test $? 0 "IPv4 multipath loadbalance from dummy"
++
++	forwarding_cleanup
++}
++
+ ipv6_mpath_balance_test()
+ {
+ 	echo
+@@ -2861,6 +2928,7 @@ do
+ 	ipv6_mpath_list)		ipv6_mpath_list_test;;
+ 	ipv4_mpath_balance)		ipv4_mpath_balance_test;;
+ 	ipv6_mpath_balance)		ipv6_mpath_balance_test;;
++	ipv4_mpath_balance_preferred)	ipv4_mpath_balance_preferred_test;;
+ 	fib6_ra_to_static)		fib6_ra_to_static;;
+ 
+ 	help) echo "Test names: $TESTS"; exit 0;;
 -- 
 2.47.3
 
