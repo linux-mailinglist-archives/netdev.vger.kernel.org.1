@@ -1,84 +1,110 @@
-Return-Path: <netdev+bounces-245636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A9ECCD3F92
-	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 12:46:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CF44BCD4032
+	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 13:35:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 4510430084CF
-	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 11:46:03 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id D47DB300A37C
+	for <lists+netdev@lfdr.de>; Sun, 21 Dec 2025 12:34:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2CE12F6165;
-	Sun, 21 Dec 2025 11:46:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DB5827EFE9;
+	Sun, 21 Dec 2025 12:34:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dOPmom45"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="fXyN8uZc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A752F549F;
-	Sun, 21 Dec 2025 11:46:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB4062F8BCA;
+	Sun, 21 Dec 2025 12:34:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766317562; cv=none; b=okVINaziByyYW1GResESb8bZp4dPjUo3SaSrmiu1kWS7NujiJscjzTGtdvPApuioat8qovLBKFCwFoNLGc6gbRymdM3P9qB6SwdZgNaxK26LkVJf00TI+KHtiI1Z2BLJmuupiAvwlZ55Ui0LDaJeAJqxMieizlXMk6EnB2QMaUs=
+	t=1766320488; cv=none; b=GQMJdBk1b/Tb3e+1MpBphCh7K7yE8JDjdYl2dgtbjolVDLPhLmI/0VBw8k2jlUvcvIaGHe3yukWdzV7zzWM1hyfpSQs/qoB+BDElIcXVLb+6ev+JZDzC5GOzmNPjxOweN0fsGTA42wyQ4Z7ABOPJUmzUavHy/j/zxPXny3hUdVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766317562; c=relaxed/simple;
-	bh=jXwFWySBBH0YZeNh9mYVtAnWUXBpPAqk5kwxwQR/5pQ=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=En7h/ofv68YIFfdQZBC23VFNUcWVZ69B5XlAaEso1uIR3VBcpvwgIelYIyvccr5jlX0gvPAfTgQEG9AnKHh2NHlzUiQYHS6jweo6t6HLMPo17PJZiu0ZQa50eVnvEmfhWS0+a4bDLGC1DdEqQviBvicIqZA1ucdIu6fTsh96Xi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dOPmom45; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBD9AC4CEFB;
-	Sun, 21 Dec 2025 11:46:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766317562;
-	bh=jXwFWySBBH0YZeNh9mYVtAnWUXBpPAqk5kwxwQR/5pQ=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=dOPmom45D9x6RfoneuZYyVo1bFcWe/ECy3VQIhCVzGpewTQdNRBwn4zmFx7hhn9NS
-	 d37hGMrXh0bSRjvrP3+NdPvi0S9/dLzK61D3+7bxBDo2RBBml6wMIymTzF3akjw8Se
-	 LUaC0COnF4fBm2+HM9/0aK2HsLYFqK6AwrP5jy5wgWCCbcTcZcmgKWEbaT6deHqPEx
-	 GCNnRv1PnIK2e0oHDgrlqu2vMssTS/pbjls6Qk4naRTuahXaxyty42d25xkb5JUy3C
-	 oMx+2GwRyxREmYgf0CtegiDgjB0L9y/1MdHVc+Ytph9N6ryl3xOnle8L+9WnmaOXN5
-	 x9CW+rCYg5sZQ==
-From: Leon Romanovsky <leon@kernel.org>
-To: Mark Zhang <markzhang@nvidia.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
- Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Cc: OFED mailing list <linux-rdma@vger.kernel.org>, 
- Network Development <netdev@vger.kernel.org>, 
- Majd Dibbiny <majd@mellanox.com>, Doug Ledford <dledford@redhat.com>, 
- Yuval Shaia <yshaia@marvell.com>, 
- Bernard Metzler <bernard.metzler@linux.dev>
-In-Reply-To: <80749a85-cbe2-460c-8451-42516013f9fa@I-love.SAKURA.ne.jp>
-References: <80749a85-cbe2-460c-8451-42516013f9fa@I-love.SAKURA.ne.jp>
-Subject: Re: [PATCH] RDMA/core: always drop device refcount in
- ib_del_sub_device_and_put()
-Message-Id: <176631755924.2405560.15903138508114158525.b4-ty@kernel.org>
-Date: Sun, 21 Dec 2025 06:45:59 -0500
+	s=arc-20240116; t=1766320488; c=relaxed/simple;
+	bh=obY40gWwQl2DIwxk6CF1/T/Xpqzv0Pyrip73ZSZn7cg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XKYg35HXxikP14IzrxXWn7btMC/na+DNYdQfynqYVRPBFPPb2mtEFa5vqLs6iE+uKa2TXEbD8RIzdLwZuxjHWuTLaTmsPJWezFVH0lSLTsz6teZlr93Lkv5hfs9Fwq+YtIXVZVzI2OVOhBgdUFL74oDL/XmTPBK1PAGR+Xu1J9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=fXyN8uZc; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Yj8b4wc2kO8O3h5rkpVBnAqWpely2jUEjwXeapDzC5E=; b=fXyN8uZc5KCDJL79JEokJSKs7J
+	n81OQ/mjxB9anrDXD7/iidJ0P/nkzW2neJoERkc+qKLo8N1/lOFMUZ0Lpz41ecYdlSdFYXslHoHl/
+	8GI6cU/Xwk0QugpSdlxjzDfiCqEgu+YiBdcKYpd19O80Ha2MLuLRKJnB2aOs+Bb3dR9Q=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vXIdx-0004A7-20; Sun, 21 Dec 2025 13:34:37 +0100
+Date: Sun, 21 Dec 2025 13:34:37 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v2] net: usb: sr9700: fix incorrect command used to write
+ single register
+Message-ID: <4eb474ac-5e12-4237-bec8-f0cc08b00bb1@lunn.ch>
+References: <20251221082400.50688-1-enelsonmoore@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15-dev-a6db3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251221082400.50688-1-enelsonmoore@gmail.com>
 
-
-On Sat, 20 Dec 2025 11:11:33 +0900, Tetsuo Handa wrote:
-> Since nldev_deldev() (introduced by commit 060c642b2ab8 ("RDMA/nldev: Add
-> support to add/delete a sub IB device through netlink") grabs a reference
-> using ib_device_get_by_index() before calling ib_del_sub_device_and_put(),
-> we need to drop that reference before returning -EOPNOTSUPP error.
+On Sun, Dec 21, 2025 at 12:24:00AM -0800, Ethan Nelson-Moore wrote:
+> This fixes the device failing to initialize with "error reading MAC
+> address" for me, probably because the incorrect write of NCR_RST to
+> SR_NCR is not actually resetting the device.
 > 
+> Fixes: c9b37458e95629b1d1171457afdcc1bf1eb7881d ("USB2NET : SR9700 : One chip USB 1.1 USB2NET SR9700Device Driver Support")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Ethan Nelson-Moore <enelsonmoore@gmail.com>
+> ---
+>  drivers/net/usb/sr9700.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
+> diff --git a/drivers/net/usb/sr9700.c b/drivers/net/usb/sr9700.c
+> index 091bc2aca7e8..5d97e95a17b0 100644
+> --- a/drivers/net/usb/sr9700.c
+> +++ b/drivers/net/usb/sr9700.c
+> @@ -52,7 +52,7 @@ static int sr_read_reg(struct usbnet *dev, u8 reg, u8 *value)
+>  
+>  static int sr_write_reg(struct usbnet *dev, u8 reg, u8 value)
+>  {
+> -	return usbnet_write_cmd(dev, SR_WR_REGS, SR_REQ_WR_REG,
+> +	return usbnet_write_cmd(dev, SR_WR_REG, SR_REQ_WR_REG,
+>  				value, reg, NULL, 0);
+>  }
+>  
+> @@ -65,7 +65,7 @@ static void sr_write_async(struct usbnet *dev, u8 reg, u16 length,
+>  
+>  static void sr_write_reg_async(struct usbnet *dev, u8 reg, u8 value)
+>  {
+> -	usbnet_write_cmd_async(dev, SR_WR_REGS, SR_REQ_WR_REG,
+> +	usbnet_write_cmd_async(dev, SR_WR_REG, SR_REQ_WR_REG,
+>  			       value, reg, NULL, 0);
+>  }
 
-Applied, thanks!
+I don't know anything about this hardware, but there are four calls using SR_WR_REG:
 
-[1/1] RDMA/core: always drop device refcount in ib_del_sub_device_and_put()
-      https://git.kernel.org/rdma/rdma/c/fa3c411d21ebc2
+https://elixir.bootlin.com/linux/v6.18.2/source/drivers/net/usb/sr9700.h#L157
 
-Best regards,
--- 
-Leon Romanovsky <leon@kernel.org>
+You only change two here? Are the other two correct?
 
+It might be worth while also changing the name of one of these:
+
+#define	SR_WR_REGS		0x01
+#define	SR_WR_REG		0x03
+
+to make it clearer what each is actually used for, so they don't get
+used wrongly again.
+
+	Andrew
 
