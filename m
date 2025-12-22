@@ -1,214 +1,153 @@
-Return-Path: <netdev+bounces-245733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CFADCD6607
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 15:34:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 500F3CD66D0
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 15:52:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 56FBD3009F3E
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 14:34:18 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 4CF5C30090BC
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 14:52:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECE742F5A28;
-	Mon, 22 Dec 2025 14:34:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hale.at header.i=@hale.at header.b="sKpwPblK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 194C32E54BB;
+	Mon, 22 Dec 2025 14:52:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from gw.hale.at (gw.hale.at [89.26.116.210])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A46B2F549D;
-	Mon, 22 Dec 2025 14:34:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.26.116.210
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93C2E221721
+	for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 14:52:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766414056; cv=none; b=AbzwJEohlQwtVVqKw25BVUCRGCWmFSrO/kfoRmO46zvBU43ejNiuPHTBVHXWzISZfbJJnHxnA5fbuasBmEdB5xrCIKTQ1cqlI6EXLqscyYEiY0KdQG3I4tfvvhwYV/OSgSGluhpmTriJ3XOFb+T0/RVjqYUzs6snOuvQdo6Sv8s=
+	t=1766415150; cv=none; b=i0z0SHruQDwqrY0z/WINsLOXpOLNorlk6EGtcUT+Wn12qXoOlcv6m/YBzivX/K6gUpZBGi7gYt++LDqAyUBGIp0Ho4ZYVfpz3vKdOHh53v8OYi+CtMF7RFT3dRA01wqHSKCCXRTHacCrwjL9qOXrZg9TUbw9gkINtO/40C6Ach4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766414056; c=relaxed/simple;
-	bh=hbM1rbMEZ+VaDZVdM49IE5tPorBBIKZtbuA5oZ+B2dA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UgQ/q/MA410+084dnVH3Ju+SCMqBjbs5qL3zyWC2hpRl8r8VAAfNp5Sw0+Oi+TKGmN5jlVMoYQLJ+hNJRaR1iKHyTn5BOJnhQ8tO09b3r3gM876PUoPX9eXlpYn292vBH1SnS0TmaCeU74WgXvOtH43l6VAsAahnVvnjbtulZkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hale.at; spf=pass smtp.mailfrom=hale.at; dkim=pass (2048-bit key) header.d=hale.at header.i=@hale.at header.b=sKpwPblK; arc=none smtp.client-ip=89.26.116.210
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hale.at
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hale.at
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=hale.at; i=@hale.at; q=dns/txt; s=mail;
-  t=1766414053; x=1797950053;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=hbM1rbMEZ+VaDZVdM49IE5tPorBBIKZtbuA5oZ+B2dA=;
-  b=sKpwPblKTG5zU5ls4Xf/2fHzprXenuSb90rCN1nqeRgaXLLWLAuZ+Lap
-   w7HwM8kyV6hdNI1+WWX8KpfcbH4AVDcYDUwnsLHPHUrO9aPorcAGXQu0k
-   tDaUwyaDAjYdYLBDy2n6rP4ZT/IDNajzrP8bidfsit9vlnAt9h2dey6UQ
-   B846tqsO2W878WmKI1/3bnHxhT127i3aOfpsch1bGkU/7zTcXOFMpzc1s
-   GB9lft51/1ULKRbACXWjD6YSJonz6Wu9Y+YWC+P0+ST1j3YKZxNMQT7sF
-   1vWYWsYlyy/NxyglZBUakMBYNgaTMNDX390xKWQut9iXQcHSMQxYzDKxU
-   A==;
-X-CSE-ConnectionGUID: XtMHzF4KScSBJ+PjaNeypQ==
-X-CSE-MsgGUID: DtomocKGSvOWPV6pp14uIQ==
-IronPort-SDR: 69495686_tuW2OEydzexllEdhchzKLiQQMRlqkJVYB/o6YXbMqRNj4EC
- 8xt4npR/RKkG02ajaF8nXYQHOnftgabEllj3wBg==
-X-IronPort-AV: E=Sophos;i="6.21,168,1763420400"; 
-   d="scan'208";a="1524745"
-Received: from unknown (HELO mail4.hale.at) ([192.168.100.5])
-  by mgmt.hale.at with ESMTP; 22 Dec 2025 15:32:38 +0100
-Received: from mail4.hale.at (localhost.localdomain [127.0.0.1])
-	by mail4.hale.at (Postfix) with ESMTPS id B39E913005B9;
-	Mon, 22 Dec 2025 15:32:18 +0100 (CET)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail4.hale.at (Postfix) with ESMTP id 9BBB8130071B;
-	Mon, 22 Dec 2025 15:32:18 +0100 (CET)
-X-Virus-Scanned: amavis at mail4.hale.at
-Received: from mail4.hale.at ([127.0.0.1])
- by localhost (mail4.hale.at [127.0.0.1]) (amavis, port 10026) with ESMTP
- id w0HKwjJ4D92D; Mon, 22 Dec 2025 15:32:18 +0100 (CET)
-Received: from entw47.HALE.at (entw47 [192.168.100.117])
-	by mail4.hale.at (Postfix) with ESMTPSA id 7CDB513005B9;
-	Mon, 22 Dec 2025 15:32:18 +0100 (CET)
-From: Michael Thalmeier <michael.thalmeier@hale.at>
-To: Deepak Sharma <deepak.sharma.472935@gmail.com>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Simon Horman <horms@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Michael Thalmeier <michael@thalmeier.at>,
-	Michael Thalmeier <michael.thalmeier@hale.at>,
-	stable@vger.kernel.org
-Subject: [PATCH net v3] net: nfc: nci: Fix parameter validation for packet data
-Date: Mon, 22 Dec 2025 15:31:43 +0100
-Message-ID: <20251222143143.256980-1-michael.thalmeier@hale.at>
-X-Mailer: git-send-email 2.52.0
+	s=arc-20240116; t=1766415150; c=relaxed/simple;
+	bh=Lpyn9tsJg0zwSeavaT29XnRv2mvoX0IosORFt8lYkTA=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=lmIQhAV1UEX65MchXigEDhXvttRSDWD793J0/y29FfCJLF8IGNPA1BLfAVlBd43+irX0vYnqvsXW52gcJML6S11qVrX5N66D618zp9RaXT9Zhi+ShrvqkL8yiG8EzDuaJd/w2qPgyAvePfL8KeVosEeZGIKd1xSSEbozRNbkUAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-7c6dbdaced8so3179935a34.1
+        for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 06:52:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766415147; x=1767019947;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SSmO9rSpf1HE0AkJMJvsQtYeDJHt5UKP07FlrQBAlfE=;
+        b=oqEynJV0+XCIOF5kC8vIn4IfOgah6SoTYRJqYt+Nd6LVxGBljpnAbQiBsD6J4fPnu8
+         fVmupiLZga3vm5DeXQAwcamoJmjn4EgrRsOW2RmGnnSGFLs6nbBkEvEf0vY9DqSJx/L2
+         Qq3C/9Waqk8HNeZpS2Ds8jiA4RUCt7mVogc9mwaYsgtBBMgyBEivqwhjaZl3Jnlvi7c2
+         VvvZZgkVCrchsYk/aj2ZMAzXrAI8/DR0bOfzREOybEZzPGgJbgkryyGuuwlUBTY31QKk
+         ejrmdLXwLmX4a6bPqNPAm538NNrc3YQHpunu+6lEzgzwilMMW504FpTlXPOpAg6RYPR/
+         EEyg==
+X-Gm-Message-State: AOJu0YyoZJgZPOMBOJRXIA83nerIuCku++hxN+ecoFem2e1UpR1Qh3th
+	YXU/9Vm8b5TeZQVhY984yHj3/xXzfERgeMbcWWNAvpOU+r1FPQnkEh3ECWH+lw==
+X-Gm-Gg: AY/fxX6aqOFTEbe5chA4x5yJ8c9BstVKS5bvgucn65mtfR0aksxggsZJTcq6qscv3Za
+	VG7BCLqmrnyAv7qQ6M/GJVwBbHKqae5CHYiIoDtdY5DDRg4JjC/0fQZWGIJnavYJ8/Gne+86sri
+	ePEt2cLmLsnAq+D7uWAW5TJnLVtMxFgDYPxHfUgWXEphcekgdktUfstKRclI/QvAm6IvRAMrrQ+
+	57sboCBqc8BdMA7AQB7ITHgdfD5kYy407kftAJ3j43EZZvFgEgcmWILKG1eezZMknPB9kEQCSWQ
+	Nl/7l1CdxMYSvSi1xpddbn/iom/CnIYfBD1LKDx6D70QmX0v7vz2rh19bpFNShUFENYnNgmp8u7
+	5qPX6pN8xf7EMGXV5BbLQMbYPRpkfwOYee8whIFcvtMrIWrqn9aTMddYO9ZXJANffyjTc7z2DxR
+	/CltOib77xBs91
+X-Google-Smtp-Source: AGHT+IGAwhuUsx7Fd/+/3NrcQAUltcFLRbhiXbvn1mIlfuHyEFiPeZMxXjTgjycIu24XHR+wcgJmRA==
+X-Received: by 2002:a05:6830:82ca:b0:7cc:4d72:586f with SMTP id 46e09a7af769-7cc66a9564dmr6576897a34.31.1766415147262;
+        Mon, 22 Dec 2025 06:52:27 -0800 (PST)
+Received: from localhost ([2a03:2880:10ff:2::])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7cc667281fesm7465677a34.6.2025.12.22.06.52.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Dec 2025 06:52:26 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net-next 0/2] net: netconsole: convert to NBCON console
+ infrastructure
+Date: Mon, 22 Dec 2025 06:52:09 -0800
+Message-Id: <20251222-nbcon-v1-0-65b43c098708@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIABpbSWkC/x3MQQqAIBAF0KsMf52QVkheJVqUjTWbKTQiiO4e9
+ A7wHhTOwgWBHmS+pMiuCGQrQtwmXdnIgkBwteustd7oHHc1ybWt93HqU8OoCEfmJPf/DFA+jfJ
+ 9YnzfDzkHwJJhAAAA
+X-Change-ID: 20251117-nbcon-f24477ca9f3e
+To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ asantostc@gmail.com, efault@gmx.de, gustavold@gmail.com, calvin@wbinvd.org, 
+ jv@jvosburgh.net, kernel-team@meta.com, Petr Mladek <pmladek@suse.com>, 
+ Simon Horman <horms@kernel.org>
+X-Mailer: b4 0.15-dev-47773
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1994; i=leitao@debian.org;
+ h=from:subject:message-id; bh=Lpyn9tsJg0zwSeavaT29XnRv2mvoX0IosORFt8lYkTA=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpSVspfbVqnsPu5Bv/eEfAvgPigf9yjHuN+XdBW
+ KFG0jk6BISJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaUlbKQAKCRA1o5Of/Hh3
+ bdKcEACKJ6DK6qsLWkMiEWLXkcxGcNJb20WewGochuocoGF9IsFwzjENEDck74TDOnTRc42Cyhh
+ qpfCL6xAB8HgzotaHmzfX990TOq3pDl1Fq0hxvWCREKti5OfepCr9QoY+bW3MGvmlusT+Iifcyq
+ L/8pOtX1fWmmLMG64k0n8HK7GER37HzLfxKLJwsRChOAAPSn6D/mbQYkFr3WvSK0XhSSRWM0Vji
+ P2rCTw/wy6XBoKGaQBGuF2IQ7R54xbtg7Je6hkE5BFPGHhvxzTWq4PfTDVeNFeafn3Fa08kc1xZ
+ HQCoxDprem7OcLfxJ/GvNayn667HnFOyyMEX2EMBLXE6uPDotVUdIfppjMyAm7GuE0DcMPpmMhQ
+ cEf/mQh64GiW4j5O4kjGqFSpyRgP+wCOaIxcHcJDJd4YtHCLBL7aVqgLvoIN/BpgxCkugvTMa+O
+ rYnSg28bEqcXC//bKJgdfs1I+/npjsXlnPnDirogI+50euYEpmk6e9l3Y3uywGxhgJfon4D6MDp
+ z4pz3g4MZ3mR5TIhSz6Q5unbbLvautKhblISe7PyPIYIU5X4lxpYgr+B3IbSiOVPqOy/D41QPA2
+ oC65NPCxHYauRsXi0V/EdlhX9Ea4dumPtsdTlIsyJrrMJDAPRWkZDGv5vPey/SgLgziqpddgyWm
+ X3BX5mu1KvusANQ==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-Since commit 9c328f54741b ("net: nfc: nci: Add parameter validation for
-packet data") communication with nci nfc chips is not working any more.
+This series adds support for the nbcon (new buffer console) infrastructure
+to netconsole, enabling lock-free, priority-based console operations that
+are safer in crash scenarios.
 
-The mentioned commit tries to fix access of uninitialized data, but
-failed to understand that in some cases the data packet is of variable
-length and can therefore not be compared to the maximum packet length
-given by the sizeof(struct).
+The implementation is introduced in three steps:
 
-Fixes: 9c328f54741b ("net: nfc: nci: Add parameter validation for packet =
-data")
-Cc: stable@vger.kernel.org
-Signed-off-by: Michael Thalmeier <michael.thalmeier@hale.at>
+1) Refactor the message fragmentation logic into a reusable helper function
+2) Extend nbcon support to non-extended (basic) consoles using the same
+infrastructure.
+
+The initial discussion about it appeared a while ago in [1], in order to
+solve Mike's HARDIRQ-safe -> HARDIRQ-unsafe lock order warning, and the root
+cause is that some hosts were calling IRQ unsafe locks from inside console
+lock.
+
+At that time, we didn't have the CON_NBCON_ATOMIC_UNSAFE yet. John
+kindly implemented CON_NBCON_ATOMIC_UNSAFE in 187de7c212e5 ("printk:
+nbcon: Allow unsafe write_atomic() for panic"), and now we can
+implement netconsole on top of nbcon.
+
+Important to note that netconsole continues to call netpoll and the
+network TX helpers with interrupt disable, given the TX are called with
+target_list_lock.
+
+Link:
+https://lore.kernel.org/all/b2qps3uywhmjaym4mht2wpxul4yqtuuayeoq4iv4k3zf5wdgh3@tocu6c7mj4lt/
+[1]
+
+Signed-off-by: Breno Leitao <leitao@debian.org>
+
+Changes from RFC:
+  * Removed the extra CONFIG for NBCON, given we don't want to support
+    both console. Move to nbcon as the only console framework supported
+  * Incorporated the changes from Petr.
+  * Some renames to make the code more consistent.
+  * Link: https://lore.kernel.org/all/20251121-nbcon-v1-0-503d17b2b4af@debian.org/
+
 ---
-v3:
-- perform complete checks
-- replace magic numbers with offsetofend and sizeof
+Breno Leitao (2):
+      netconsole: extract message fragmentation into send_msg_udp()
+      netconsole: convert to NBCON console infrastructure
 
-v2:
-- Reference correct commit hash
-
+ drivers/net/netconsole.c | 109 +++++++++++++++++++++++++++++------------------
+ 1 file changed, 68 insertions(+), 41 deletions(-)
 ---
- net/nfc/nci/ntf.c | 25 ++++++++++++++++++++++---
- 1 file changed, 22 insertions(+), 3 deletions(-)
+base-commit: 7b8e9264f55a9c320f398e337d215e68cca50131
+change-id: 20251117-nbcon-f24477ca9f3e
 
-diff --git a/net/nfc/nci/ntf.c b/net/nfc/nci/ntf.c
-index 418b84e2b260..0190332cf454 100644
---- a/net/nfc/nci/ntf.c
-+++ b/net/nfc/nci/ntf.c
-@@ -58,7 +58,7 @@ static int nci_core_conn_credits_ntf_packet(struct nci_=
-dev *ndev,
- 	struct nci_conn_info *conn_info;
- 	int i;
-=20
--	if (skb->len < sizeof(struct nci_core_conn_credit_ntf))
-+	if (skb->len < offsetofend(struct nci_core_conn_credit_ntf, num_entries=
-))
- 		return -EINVAL;
-=20
- 	ntf =3D (struct nci_core_conn_credit_ntf *)skb->data;
-@@ -68,6 +68,10 @@ static int nci_core_conn_credits_ntf_packet(struct nci=
-_dev *ndev,
- 	if (ntf->num_entries > NCI_MAX_NUM_CONN)
- 		ntf->num_entries =3D NCI_MAX_NUM_CONN;
-=20
-+	if (skb->len < offsetofend(struct nci_core_conn_credit_ntf, num_entries=
-) +
-+			ntf->num_entries * sizeof(struct conn_credit_entry))
-+		return -EINVAL;
-+
- 	/* update the credits */
- 	for (i =3D 0; i < ntf->num_entries; i++) {
- 		ntf->conn_entries[i].conn_id =3D
-@@ -364,7 +368,7 @@ static int nci_rf_discover_ntf_packet(struct nci_dev =
-*ndev,
- 	const __u8 *data;
- 	bool add_target =3D true;
-=20
--	if (skb->len < sizeof(struct nci_rf_discover_ntf))
-+	if (skb->len < offsetofend(struct nci_rf_discover_ntf, rf_tech_specific=
-_params_len))
- 		return -EINVAL;
-=20
- 	data =3D skb->data;
-@@ -380,6 +384,10 @@ static int nci_rf_discover_ntf_packet(struct nci_dev=
- *ndev,
- 	pr_debug("rf_tech_specific_params_len %d\n",
- 		 ntf.rf_tech_specific_params_len);
-=20
-+	if (skb->len < (data - skb->data) +
-+                ntf.rf_tech_specific_params_len + sizeof(ntf.ntf_type))
-+		return -EINVAL;
-+
- 	if (ntf.rf_tech_specific_params_len > 0) {
- 		switch (ntf.rf_tech_and_mode) {
- 		case NCI_NFC_A_PASSIVE_POLL_MODE:
-@@ -596,7 +604,7 @@ static int nci_rf_intf_activated_ntf_packet(struct nc=
-i_dev *ndev,
- 	const __u8 *data;
- 	int err =3D NCI_STATUS_OK;
-=20
--	if (skb->len < sizeof(struct nci_rf_intf_activated_ntf))
-+	if (skb->len < offsetofend(struct nci_rf_intf_activated_ntf, rf_tech_sp=
-ecific_params_len))
- 		return -EINVAL;
-=20
- 	data =3D skb->data;
-@@ -628,6 +636,9 @@ static int nci_rf_intf_activated_ntf_packet(struct nc=
-i_dev *ndev,
- 	if (ntf.rf_interface =3D=3D NCI_RF_INTERFACE_NFCEE_DIRECT)
- 		goto listen;
-=20
-+	if (skb->len < (data - skb->data) + ntf.rf_tech_specific_params_len)
-+		return -EINVAL;
-+
- 	if (ntf.rf_tech_specific_params_len > 0) {
- 		switch (ntf.activation_rf_tech_and_mode) {
- 		case NCI_NFC_A_PASSIVE_POLL_MODE:
-@@ -668,6 +679,11 @@ static int nci_rf_intf_activated_ntf_packet(struct n=
-ci_dev *ndev,
- 		}
- 	}
-=20
-+	if (skb->len < (data - skb->data) + sizeof(ntf.data_exch_rf_tech_and_mo=
-de) +
-+				sizeof(ntf.data_exch_tx_bit_rate) + sizeof (ntf.data_exch_rx_bit_rat=
-e) +
-+				sizeof(ntf.activation_params_len))
-+		return -EINVAL;
-+
- 	ntf.data_exch_rf_tech_and_mode =3D *data++;
- 	ntf.data_exch_tx_bit_rate =3D *data++;
- 	ntf.data_exch_rx_bit_rate =3D *data++;
-@@ -679,6 +695,9 @@ static int nci_rf_intf_activated_ntf_packet(struct nc=
-i_dev *ndev,
- 	pr_debug("data_exch_rx_bit_rate 0x%x\n", ntf.data_exch_rx_bit_rate);
- 	pr_debug("activation_params_len %d\n", ntf.activation_params_len);
-=20
-+	if (skb->len < (data - skb->data) + ntf.activation_params_len)
-+		return -EINVAL;
-+
- 	if (ntf.activation_params_len > 0) {
- 		switch (ntf.rf_interface) {
- 		case NCI_RF_INTERFACE_ISO_DEP:
---=20
-2.52.0
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
 
 
