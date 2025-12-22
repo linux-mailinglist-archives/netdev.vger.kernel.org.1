@@ -1,318 +1,357 @@
-Return-Path: <netdev+bounces-245672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0595DCD4B73
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 06:27:37 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F225CD4BD7
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 06:54:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 6F214300A565
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 05:27:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1E3893006AAE
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 05:54:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 116513002BB;
-	Mon, 22 Dec 2025 05:27:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A04A307481;
+	Mon, 22 Dec 2025 05:54:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Z0Yk9191"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f78.google.com (mail-oo1-f78.google.com [209.85.161.78])
+Received: from mail-pl1-f226.google.com (mail-pl1-f226.google.com [209.85.214.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0683C20DD48
-	for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 05:27:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C414935975
+	for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 05:54:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766381254; cv=none; b=bqVong4j99cOaBNRpEqG0KPehitpsa71LWlogeCQwCrUkfU/bkQBC21sxnPBiaRt9V3sFh33ml5AB0HGtbCniRNi425HHtTqJN+6S9zCquaYK/Ptl6mEj5Ivn5jWkDGRpptTSnhqr/KlRC7c6ux1Kg2sK0PoNnEa9xG8oT+56qk=
+	t=1766382844; cv=none; b=rexd9AF0bOXHmkGeVMUAY/dKW89QdA7+JKXkEA0s/epMSc+HB+YE1Lw1JfaqEzRnrkYfYz2DcrbZWvocjdfGF43YNmXCKo0bDtQAmjeKSVbdyJg9q1z92XH+PyRhOe4dElnzHjyJ+Sn5m0+n5Fmt5o2wDmOUZS2F/F+WJf+8Vdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766381254; c=relaxed/simple;
-	bh=olYZ2QJhbLNSmZAb0alt5I/tBibMERu4ZcJefncBZM4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=p+wkHc9e1sYaAJlFefpMFkEouzEfc82HoedLzBWYZgOq1sDsGIP3QNwSJWhjueaVc8sjXZDM5Tq1Coa88IjckCvSZLbiTmDrabsYsjtJSGnfu9WfVx6FtNmCS05rzJi8SzajDOA4KiV0uRNTRxPaHc4wvzlFKURO8y0wieZPdG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f78.google.com with SMTP id 006d021491bc7-656b2edce07so6188698eaf.0
-        for <netdev@vger.kernel.org>; Sun, 21 Dec 2025 21:27:31 -0800 (PST)
+	s=arc-20240116; t=1766382844; c=relaxed/simple;
+	bh=w7R+AhyadAFCW3QpmMni1EfNUY/CThdKLMoagvOydmQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ojPCR4HEjzAtRYWY9aDe33hiB0VhT17ytrM6MS1Bcr51iAvocD5f3g3Gl2gG9srNZmLwG+TCqwkZDnXrXEWj8CzZhWh7UZm1Tivu4SPSDUrd5cclmJC590bfKrQYSq6/DwGx+JI3M1P5XD3HjCoyHHB0fEsSUYCgJuYojNkEiMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Z0Yk9191; arc=none smtp.client-ip=209.85.214.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f226.google.com with SMTP id d9443c01a7336-2a0d52768ccso44914685ad.1
+        for <netdev@vger.kernel.org>; Sun, 21 Dec 2025 21:54:01 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766381251; x=1766986051;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xLNdxcCVCL/XjnGiW5sUArE7woaQiWfVTKp8d6MzjxA=;
-        b=mBa9yMpvkWTcduppMiGi0bYKMcQnwNpBzHG3mZwQeg66NT2AeE55dAmjq6sdKtk65Y
-         kSt2C2aG4c4T7Kj1kOQ3tze1nXEyRPWqhgT57/BPranKq8IW6HGJtX0Nahadom9FhBrK
-         sZRML8R+SiAS3gdCytoKKgp3spxTUhuuoyhhJQIa8FE8y5ANxtnoEYHS9vy31Tcco0Sn
-         8fCUxNc5K5ayb0r6i8u8LAzYpJttIJh6mjtZDm/IQ8gqjvc1HKqJ6WALv4I2naNeApR4
-         GhSYK3EmIOUYkTxTu/gOjJJPGcyAyn0FA++B9Rl28/6xxTHOD9n66iHCLZB0SzNV2HOA
-         F58Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVud8JWWKwGhcDdQTDpuF0M6LvWlFA93Hh6nP8vaK00dY3JRKldR00XVAE5Ad1KmJTu4H4YvlQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzn8MYdLeBaGhhH09+ngA6loMCTG4ZHYU2ZPEYGJICUGI33eLhS
-	Wc/ir0i3E9smJq6/9hL149/VmxmC19UCcEVHRWb8D3GgW/FSXAL96NSIiYdhae0rGDkKm5fvHQd
-	pN0EJwmOcutaXLTRGU/iV3FjJYviFoAf+WPMqbI1kYnk/l9xqn0jbPP2zccI=
-X-Google-Smtp-Source: AGHT+IHoqMcU2jPDdYKOABZYg9/Gss9VjYM10tpiWXlE35MC2i2lFveumAVUDZgC4sVN70jEBaYF7rQxWt/G1nPzrSiL8YbeD3zo
+        d=1e100.net; s=20230601; t=1766382841; x=1766987641;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=O1V+a3qnB4tJcq8IWAyloGp41KKdmZlkcM30iqrOpgk=;
+        b=IeBt+Ucvl1FLUhNCzOF44IFJ6i0Ireowwf50eA8YzxCvHLfmF9QUUISCmv3KhCg9zd
+         upUgiZloelaU/mbTveAPc6jjL8gKAytGJDGm+XZ85AgKfiM3GIdWRXbiAcuNq9LJr3Pl
+         wbJqEt0EDxx7ZOHGO/ulwILhiOAUIOznhn/xPzK5YYfcxYPmKAuhEp7WzvO2Juq1jvua
+         97XPI5fY2dUTZz7jjCvHQ0JnZeMsRoEWuM+bN+BDkWEbmZdAEWAqaJPC26OuYlKGE2lc
+         owfmZKeVlriXRlhzlNZWVpCN6RGyx3DA4QnvHSjgNwYPFeML/dbH+JxEopUOygHyND89
+         1skw==
+X-Gm-Message-State: AOJu0Yz8iCPcuQ1XoAq3SuwNxHPuIR1vjQx/3GLmRMswQeynUQNUs+mI
+	YqSf796A5W6VkVWNlKtrQwaEVKrZ6hoAcqAeXVD5lpBbw6+qEYVIu+WqvHWvg2vH4BARd/E7DlY
+	yAaH6NhOfnNedS7IK1sFrvNJwsWnLZKmmRLAf7V+LZovXUK1unXTzQKsYgUey4dvVf2Q+eSP9As
+	4fA/B2T3Dxg4j/xgsRJVq3hPP12UoDHDtk+N2mKT2R6xYejBtSLmUTctTsxtzjf6oe2gN7JZNqJ
+	N3hJaOqXCs=
+X-Gm-Gg: AY/fxX59x8vFm2YcItoffEZ13qm3B3Utl30SXJZ92FJda1p6gWlzc4YSSo95RRCAzdX
+	rH4dciXfHjqfWyVSgjh7jOZYmGD0v+sfTIxIEuIlJ91/8SBhSFYJY+McLzAJeY316QoXCHla7xN
+	8+mppylQL42svs2czLRPkPUb6edYSabMqCPfwq/BDEJ2dsWmWE9P23mrZifWI8DtbNAa8UCuUsv
+	My4rVPN5sPUOTSmAdRg6nQIOt/uWIQZNWhI7aAEb8KaO9sO5NfcIGNXLkdcY5jyDcemT+lWnD9w
+	qiPhjMGfBmFrNeWqA9Rh1aVsqKFNKvd+8Qu0m/N8OIaAtQ5g7JGFbnbg/WEM+7K1D20M90HhgZ0
+	Ed+oecJ03DJ+8sLg90iJ7p9y2JWIGMJ1g7hHNBDYJVDJH2MUJAczUkEfVelAz188ICsqtny/Hmm
+	gRKEnak6yL15o0jCUC+nDiw4ejSWOBYVI09nus3RLyczxg
+X-Google-Smtp-Source: AGHT+IESkrBkO6Rb6V+aZfWRM7w+90yyymEAWiCRLDKQPrEda3ts0+2DpWyjXX7P43tvxfc1c1bUVuGE305s
+X-Received: by 2002:a17:903:4b4c:b0:2a2:ecb6:545b with SMTP id d9443c01a7336-2a2f220307amr119944605ad.2.1766382840955;
+        Sun, 21 Dec 2025 21:54:00 -0800 (PST)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-19.dlp.protect.broadcom.com. [144.49.247.19])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2a2f3d06992sm10632295ad.32.2025.12.21.21.54.00
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 21 Dec 2025 21:54:00 -0800 (PST)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-29efd658fadso117482135ad.0
+        for <netdev@vger.kernel.org>; Sun, 21 Dec 2025 21:53:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1766382839; x=1766987639; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=O1V+a3qnB4tJcq8IWAyloGp41KKdmZlkcM30iqrOpgk=;
+        b=Z0Yk9191et3hXP/QwpFUjIfPYQBxn9LHMvA5I1x3aSM0M8uhFzx5oceoIE66naZDYn
+         S/FaEwQoA00+TO6PwQ85IIYUpLkoU2cLSWmZDszGXSzurcB0xZ7vjqMkwMAB8KmFRNhS
+         1Oy7WMMlUpaIqKUHTklfPV35SMwJdlEwVB/nI=
+X-Received: by 2002:a17:902:e548:b0:295:8a2a:9595 with SMTP id d9443c01a7336-2a2f283de59mr95744525ad.39.1766382838612;
+        Sun, 21 Dec 2025 21:53:58 -0800 (PST)
+X-Received: by 2002:a17:902:e548:b0:295:8a2a:9595 with SMTP id
+ d9443c01a7336-2a2f283de59mr95744185ad.39.1766382837396; Sun, 21 Dec 2025
+ 21:53:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:2288:b0:659:7c9a:942d with SMTP id
- 006d021491bc7-65d0e6c390amr4406808eaf.0.1766381250987; Sun, 21 Dec 2025
- 21:27:30 -0800 (PST)
-Date: Sun, 21 Dec 2025 21:27:30 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6948d6c2.a70a0220.25eec0.0083.GAE@google.com>
-Subject: [syzbot] [batman?] INFO: rcu detected stall in batadv_iv_send_outstanding_bat_ogm_packet
- (6)
-From: syzbot <syzbot+62348313fb96b25955aa@syzkaller.appspotmail.com>
-To: antonio@mandelbit.com, b.a.t.m.a.n@lists.open-mesh.org, 
-	davem@davemloft.net, edumazet@google.com, horms@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, marek.lindner@mailbox.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, sven@narfation.org, 
-	sw@simonwunderlich.de, syzkaller-bugs@googlegroups.com
+References: <20251221175050.14089-1-noam.d.eliyahu@gmail.com>
+In-Reply-To: <20251221175050.14089-1-noam.d.eliyahu@gmail.com>
+From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Date: Mon, 22 Dec 2025 11:23:46 +0530
+X-Gm-Features: AQt7F2r_9bCJfxY9dGDzlP0AEG3bj7O_-fHXNDfktmmqYh_sekV_k_487_t94wY
+Message-ID: <CALs4sv0EYR=bMSW6pF6W=W_mZHhQBpkeg=ugwTtpBc7_FyPDug@mail.gmail.com>
+Subject: Re: [DISCUSS] tg3 reboot handling on Dell T440 (BCM5720)
+To: "Noam D. Eliyahu" <noam.d.eliyahu@gmail.com>
+Cc: netdev@vger.kernel.org, mchan@broadcom.com
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000a8f6a20646840d02"
+
+--000000000000a8f6a20646840d02
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Sun, Dec 21, 2025 at 11:20=E2=80=AFPM Noam D. Eliyahu
+<noam.d.eliyahu@gmail.com> wrote:
+>
+> Hi all,
+>
+> I have not contributed to the Linux kernel before, but after following an=
+d learning from the work here for several years, I am now trying to make my=
+ first contribution.
+>
+> I would like to discuss a reboot-related issue I am seeing on a Dell Powe=
+rEdge T440 with a BCM5720 NIC. With recent stable kernels (6.17+) and up-to=
+-date Dell firmware, the system hits AER fatal errors during ACPI _PTS. On =
+older kernels (starting around 6.6.2), the behavior is different and appear=
+s related to the conditional tg3_power_down flow introduced by commit 9931c=
+9d04f4d.
+>
+> Below is a short summary of how the driver logic evolved.
+>
+> ### Relevant driver evolution
+>
+> * **9931c9d04f4d =E2=80=93 tg3: power down device only on SYSTEM_POWER_OF=
+F**
 
-syzbot found the following issue on:
+I think this commit id is wrong. Anyway, I know the commit.
 
-HEAD commit:    516471569089 Merge tag 'libcrypto-fixes-for-linus' of git:..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=10ead77c580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a11e0f726bfb6765
-dashboard link: https://syzkaller.appspot.com/bug?extid=62348313fb96b25955aa
-compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=147f4d58580000
+>   Added to avoid reboot hangs when the NIC was initialized via SNP (PXE):
+>
+> ```
+> - tg3_power_down(tp);
+> + if (system_state =3D=3D SYSTEM_POWER_OFF)
+> +     tg3_power_down(tp);
+> ```
+>
+> * **2ca1c94ce0b6 =E2=80=93 tg3: Disable tg3 device on system reboot to av=
+oid triggering AER**
+>   Addressed a separate issue and partially reverted earlier behavior:
+>
+> ```
+> + tg3_reset_task_cancel(tp);
+> +
+>   rtnl_lock();
+> +
+>   netif_device_detach(dev);
+>
+>   if (netif_running(dev))
+>       dev_close(dev);
+>
+> - if (system_state =3D=3D SYSTEM_POWER_OFF)
+> -     tg3_power_down(tp);
+> + tg3_power_down(tp);  /* unconditional again */
+>
+>   rtnl_unlock();
+> +
+> + pci_disable_device(pdev);
+> ```
+>
+> * **e0efe83ed3252 =E2=80=93 tg3: Disable tg3 PCIe AER on system reboot**
+>   Combined both approaches, resulting in:
+>
+>   * Conditional tg3_power_down based on SYSTEM_STATE
+>   * A DMI-based whitelist for AER handling
+>
+> ```
+> static const struct dmi_system_id tg3_restart_aer_quirk_table[] =3D {
+>     {
+>         .matches =3D {
+>             DMI_MATCH(DMI_SYS_VENDOR, "Dell Inc."),
+>             DMI_MATCH(DMI_PRODUCT_NAME, "PowerEdge R440"),
+>         },
+>     },
+>     /* other R-series entries omitted */
+>     {}
+> };
+> ```
+>
+> ```
+> else if (system_state =3D=3D SYSTEM_RESTART &&
+>          dmi_first_match(tg3_restart_aer_quirk_table) &&
+>          pdev->current_state !=3D PCI_D3cold &&
+>          pdev->current_state !=3D PCI_UNKNOWN) {
+>     pcie_capability_clear_word(pdev, PCI_EXP_DEVCTL,
+>                                PCI_EXP_DEVCTL_CERE |
+>                                PCI_EXP_DEVCTL_NFERE |
+>                                PCI_EXP_DEVCTL_FERE |
+>                                PCI_EXP_DEVCTL_URRE);
+> }
+> ```
+>
+> On my T440, this combined design is what causes problems. Simply removing=
+ the DMI table does not help, since the conditional tg3_power_down logic it=
+self also causes issues on this hardware. Adding =E2=80=9CPowerEdge T440=E2=
+=80=9D to the DMI list avoids the AER error, but this does not scale well a=
+nd requires constant maintenance.
+>
+> I also could not reproduce the original reboot hang that motivated 9931c9=
+d04f4d when running current firmware, even when initializing the NICs via S=
+NP (PXE). This makes it look like the original problem has been resolved in=
+ firmware, while the workaround logic now causes trouble on up to date syst=
+ems.
+>
+> ### Possible ways forward (from cleanest to minimal)
+>
+> 1. **Cleanest (recent firmware only)**
+>    Remove both the conditional tg3_power_down and the AER disablement, an=
+d always call tg3_power_down. This restores the pre-workaround behavior and=
+ works reliably on my system.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/5a94a2d04644/disk-51647156.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/31d4eeac4086/vmlinux-51647156.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/e58508861b69/bzImage-51647156.xz
+This is going to be a problem, please follow the discussion here:
+https://lore.kernel.org/netdev/CALs4sv1-6mgQ2JfF9MYiRADxumJD7m7OGWhCB5aWj1t=
+GP0OPJg@mail.gmail.com/
+where regression risk is flagged and it came true in
+https://lore.kernel.org/netdev/CALs4sv2_JZd5K-ZgBkjL=3DQpXVEXnoJrjuqwwKg0+j=
+o2-4taHJw@mail.gmail.com/
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+62348313fb96b25955aa@syzkaller.appspotmail.com
+>
+> 2. **Flip the conditioning**
+>    Keep the DMI list, but use it to guard the conditional tg3_power_down =
+instead (only for models where the original issue was observed, e.g. R650xs=
+). Drop the AER handling entirely. This limits risk to known systems while =
+simplifying the flow.
 
-rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-rcu: 	Tasks blocked on level-0 rcu_node (CPUs 0-1): P5953/1:b..l P3819/1:b..l P36/1:b..l
-rcu: 	(detected by 0, t=10502 jiffies, g=8897, q=377 ncpus=2)
-task:kworker/u8:2    state:R  running task     stack:22840 pid:36    tgid:36    ppid:2      task_flags:0x24248060 flags:0x00080000
-Workqueue: writeback wb_workfn (flush-8:0)
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5256 [inline]
- __schedule+0x1139/0x6150 kernel/sched/core.c:6863
- preempt_schedule_irq+0x51/0x90 kernel/sched/core.c:7190
- irqentry_exit+0x1d8/0x8c0 kernel/entry/common.c:216
- asm_sysvec_reschedule_ipi+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-RIP: 0010:cpu_max_bits_warn include/linux/cpumask.h:138 [inline]
-RIP: 0010:cpumask_check include/linux/cpumask.h:145 [inline]
-RIP: 0010:cpumask_test_cpu include/linux/cpumask.h:649 [inline]
-RIP: 0010:cpu_online include/linux/cpumask.h:1231 [inline]
-RIP: 0010:trace_lock_acquire include/trace/events/lock.h:24 [inline]
-RIP: 0010:lock_acquire+0x3b/0x330 kernel/locking/lockdep.c:5831
-Code: 89 d5 41 54 45 89 c4 55 89 cd 53 48 89 fb 48 83 ec 38 65 48 8b 05 cd b4 18 12 48 89 44 24 30 31 c0 66 90 65 8b 05 e9 b4 18 12 <83> f8 07 0f 87 a2 02 00 00 89 c0 48 0f a3 05 72 b8 ee 0e 0f 82 74
-RSP: 0018:ffffc90000ac66d0 EFLAGS: 00000246
-RAX: 0000000000000000 RBX: ffffffff8e3c9620 RCX: 0000000000000002
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffffff8e3c9620
-RBP: 0000000000000002 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000002 R11: 0000000000008490 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
- rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
- rcu_read_lock include/linux/rcupdate.h:867 [inline]
- class_rcu_constructor include/linux/rcupdate.h:1195 [inline]
- unwind_next_frame+0xd1/0x20b0 arch/x86/kernel/unwind_orc.c:495
- arch_stack_walk+0x94/0x100 arch/x86/kernel/stacktrace.c:25
- stack_trace_save+0x8e/0xc0 kernel/stacktrace.c:122
- kasan_save_stack+0x33/0x60 mm/kasan/common.c:56
- kasan_save_track+0x14/0x30 mm/kasan/common.c:77
- unpoison_slab_object mm/kasan/common.c:339 [inline]
- __kasan_slab_alloc+0x89/0x90 mm/kasan/common.c:365
- kasan_slab_alloc include/linux/kasan.h:252 [inline]
- slab_post_alloc_hook mm/slub.c:4953 [inline]
- slab_alloc_node mm/slub.c:5263 [inline]
- kmem_cache_alloc_noprof+0x25e/0x770 mm/slub.c:5270
- mempool_alloc_noprof+0x1b4/0x2f0 mm/mempool.c:567
- bio_alloc_bioset+0x3de/0x8c0 block/bio.c:565
- bio_alloc_clone block/bio.c:873 [inline]
- bio_split+0x13b/0x440 block/bio.c:1711
- bio_submit_split_bioset+0x31/0xa40 block/blk-merge.c:122
- bio_submit_split+0xa8/0x160 block/blk-merge.c:152
- __bio_split_to_limits block/blk.h:402 [inline]
- blk_mq_submit_bio+0x67b/0x2c50 block/blk-mq.c:3184
- __submit_bio+0x3cc/0x690 block/blk-core.c:637
- __submit_bio_noacct_mq block/blk-core.c:724 [inline]
- submit_bio_noacct_nocheck+0x53d/0xbe0 block/blk-core.c:755
- submit_bio_noacct+0x5bd/0x1f40 block/blk-core.c:879
- ext4_io_submit+0xa6/0x140 fs/ext4/page-io.c:404
- ext4_do_writepages+0xe42/0x3c80 fs/ext4/inode.c:2952
- ext4_writepages+0x37a/0x7d0 fs/ext4/inode.c:3026
- do_writepages+0x27a/0x600 mm/page-writeback.c:2598
- __writeback_single_inode+0x168/0x14a0 fs/fs-writeback.c:1737
- writeback_sb_inodes+0x72e/0x1ce0 fs/fs-writeback.c:2030
- __writeback_inodes_wb+0xf8/0x2d0 fs/fs-writeback.c:2107
- wb_writeback+0x799/0xae0 fs/fs-writeback.c:2218
- wb_check_old_data_flush fs/fs-writeback.c:2322 [inline]
- wb_do_writeback fs/fs-writeback.c:2375 [inline]
- wb_workfn+0x8a0/0xbb0 fs/fs-writeback.c:2403
- process_one_work+0x9ba/0x1b20 kernel/workqueue.c:3257
- process_scheduled_works kernel/workqueue.c:3340 [inline]
- worker_thread+0x6c8/0xf10 kernel/workqueue.c:3421
- kthread+0x3c5/0x780 kernel/kthread.c:463
- ret_from_fork+0x983/0xb10 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
- </TASK>
-task:kworker/u8:14   state:R  running task     stack:25480 pid:3819  tgid:3819  ppid:2      task_flags:0x4208060 flags:0x00080000
-Workqueue: bat_events batadv_iv_send_outstanding_bat_ogm_packet
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5256 [inline]
- __schedule+0x1139/0x6150 kernel/sched/core.c:6863
- preempt_schedule_irq+0x51/0x90 kernel/sched/core.c:7190
- irqentry_exit+0x1d8/0x8c0 kernel/entry/common.c:216
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
-RIP: 0010:lock_acquire+0x79/0x330 kernel/locking/lockdep.c:5872
-Code: 82 74 02 00 00 8b 35 0a e9 ee 0e 85 f6 0f 85 8d 00 00 00 48 8b 44 24 30 65 48 2b 05 89 b4 18 12 0f 85 ad 02 00 00 48 83 c4 38 <5b> 5d 41 5c 41 5d 41 5e 41 5f e9 08 38 e1 09 65 8b 05 95 b4 18 12
-RSP: 0018:ffffc9000d107a00 EFLAGS: 00000296
-RAX: 0000000000000000 RBX: ffffffff8e3c9620 RCX: 0000000042e2d81e
-RDX: 0000000000000000 RSI: ffffffff8daa7da3 RDI: ffffffff8bf2b380
-RBP: 0000000000000002 R08: 000000007a5a0105 R09: 0000000057a5a010
-R10: 0000000000000002 R11: ffff888033fc0b30 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
- rcu_lock_acquire include/linux/rcupdate.h:331 [inline]
- rcu_read_lock include/linux/rcupdate.h:867 [inline]
- batadv_iv_ogm_slide_own_bcast_window net/batman-adv/bat_iv_ogm.c:761 [inline]
- batadv_iv_ogm_schedule_buff+0x5d0/0x14c0 net/batman-adv/bat_iv_ogm.c:833
- batadv_iv_ogm_schedule net/batman-adv/bat_iv_ogm.c:873 [inline]
- batadv_iv_ogm_schedule net/batman-adv/bat_iv_ogm.c:866 [inline]
- batadv_iv_send_outstanding_bat_ogm_packet+0x329/0x920 net/batman-adv/bat_iv_ogm.c:1709
- process_one_work+0x9ba/0x1b20 kernel/workqueue.c:3257
- process_scheduled_works kernel/workqueue.c:3340 [inline]
- worker_thread+0x6c8/0xf10 kernel/workqueue.c:3421
- kthread+0x3c5/0x780 kernel/kthread.c:463
- ret_from_fork+0x983/0xb10 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
- </TASK>
-task:udevd           state:R  running task     stack:27112 pid:5953  tgid:5953  ppid:5190   task_flags:0x400140 flags:0x00080000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5256 [inline]
- __schedule+0x1139/0x6150 kernel/sched/core.c:6863
- preempt_schedule_notrace+0x62/0xe0 kernel/sched/core.c:7140
- preempt_schedule_notrace_thunk+0x16/0x30 arch/x86/entry/thunk.S:13
- rcu_is_watching+0x8e/0xc0 kernel/rcu/tree.c:752
- trace_lock_release include/trace/events/lock.h:69 [inline]
- lock_release+0x201/0x2d0 kernel/locking/lockdep.c:5879
- rcu_lock_release include/linux/rcupdate.h:341 [inline]
- rcu_read_unlock include/linux/rcupdate.h:897 [inline]
- class_rcu_destructor include/linux/rcupdate.h:1195 [inline]
- unwind_next_frame+0x3f9/0x20b0 arch/x86/kernel/unwind_orc.c:495
- arch_stack_walk+0x94/0x100 arch/x86/kernel/stacktrace.c:25
- stack_trace_save+0x8e/0xc0 kernel/stacktrace.c:122
- kasan_save_stack+0x33/0x60 mm/kasan/common.c:56
- kasan_save_track+0x14/0x30 mm/kasan/common.c:77
- unpoison_slab_object mm/kasan/common.c:339 [inline]
- __kasan_slab_alloc+0x89/0x90 mm/kasan/common.c:365
- kasan_slab_alloc include/linux/kasan.h:252 [inline]
- slab_post_alloc_hook mm/slub.c:4953 [inline]
- slab_alloc_node mm/slub.c:5263 [inline]
- kmem_cache_alloc_noprof+0x25e/0x770 mm/slub.c:5270
- lsm_file_alloc security/security.c:169 [inline]
- security_file_alloc+0x34/0x2b0 security/security.c:2380
- init_file+0x93/0x4c0 fs/file_table.c:159
- alloc_empty_file+0x73/0x1e0 fs/file_table.c:241
- path_openat+0xde/0x3140 fs/namei.c:4773
- do_filp_open+0x20b/0x470 fs/namei.c:4814
- do_sys_openat2+0x121/0x290 fs/open.c:1430
- do_sys_open fs/open.c:1436 [inline]
- __do_sys_openat fs/open.c:1452 [inline]
- __se_sys_openat fs/open.c:1447 [inline]
- __x64_sys_openat+0x174/0x210 fs/open.c:1447
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xcd/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f0d5b8a7407
-RSP: 002b:00007ffee52231a0 EFLAGS: 00000202 ORIG_RAX: 0000000000000101
-RAX: ffffffffffffffda RBX: 00007f0d5c0b1880 RCX: 00007f0d5b8a7407
-RDX: 0000000000080000 RSI: 0000559b925f46d0 RDI: ffffffffffffff9c
-RBP: 0000559b925f46d0 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000009
- </TASK>
-rcu: rcu_preempt kthread starved for 10623 jiffies! g8897 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x0 ->cpu=1
-rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
-rcu: RCU grace-period kthread stack dump:
-task:rcu_preempt     state:R  running task     stack:28328 pid:16    tgid:16    ppid:2      task_flags:0x208040 flags:0x00080000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5256 [inline]
- __schedule+0x1139/0x6150 kernel/sched/core.c:6863
- __schedule_loop kernel/sched/core.c:6945 [inline]
- schedule+0xe7/0x3a0 kernel/sched/core.c:6960
- schedule_timeout+0x123/0x290 kernel/time/sleep_timeout.c:99
- rcu_gp_fqs_loop+0x1ea/0xaf0 kernel/rcu/tree.c:2083
- rcu_gp_kthread+0x26d/0x380 kernel/rcu/tree.c:2285
- kthread+0x3c5/0x780 kernel/kthread.c:463
- ret_from_fork+0x983/0xb10 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:246
- </TASK>
-rcu: Stack dump where RCU GP kthread last ran:
-Sending NMI from CPU 0 to CPUs 1:
-NMI backtrace for cpu 1
-CPU: 1 UID: 0 PID: 6101 Comm: syz.1.30 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
-RIP: 0010:__lock_acquire+0x58/0x2890 kernel/locking/lockdep.c:5098
-Code: 18 12 48 89 44 24 68 31 c0 85 db 0f 84 54 04 00 00 48 8b 07 49 89 fd 48 3d 00 86 b9 93 0f 84 42 04 00 00 44 8b 1d c8 b5 92 0c <45> 89 c7 89 f5 89 d3 45 89 c8 45 85 db 74 5d 48 3d 10 86 b9 93 74
-RSP: 0018:ffffc90002fe78f8 EFLAGS: 00000006
-RAX: ffffffff9ac2cf60 RBX: 0000000000000001 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff888079e8d510
-RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000000
-R10: ffffc90002fe7bd8 R11: 0000000000000001 R12: ffff88802db2c980
-R13: ffff888079e8d510 R14: 0000000000000000 R15: 0000000000000000
-FS:  00007fa9d7eb66c0(0000) GS:ffff8881249f5000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fa9d7eb5f98 CR3: 000000005b10e000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- lock_acquire kernel/locking/lockdep.c:5868 [inline]
- lock_acquire+0x179/0x330 kernel/locking/lockdep.c:5825
- __mutex_lock_common kernel/locking/mutex.c:614 [inline]
- __mutex_lock+0x1aa/0x1ca0 kernel/locking/mutex.c:776
- seccomp_do_user_notification.constprop.0+0xaa/0xe80 kernel/seccomp.c:1173
- __seccomp_filter+0x8ea/0x11f0 kernel/seccomp.c:1338
- __secure_computing+0x287/0x3b0 kernel/seccomp.c:1404
- syscall_trace_enter+0x89/0x220 kernel/entry/syscall-common.c:44
- syscall_enter_from_user_mode_work include/linux/entry-common.h:78 [inline]
- syscall_enter_from_user_mode include/linux/entry-common.h:109 [inline]
- do_syscall_64+0x42b/0xf80 arch/x86/entry/syscall_64.c:90
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fa9d6f8f749
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fa9d7eb60e8 EFLAGS: 00000246 ORIG_RAX: 00000000000000ca
-RAX: ffffffffffffffda RBX: 00007fa9d71e5fa8 RCX: 00007fa9d6f8f749
-RDX: 0000000000000000 RSI: 0000000000000080 RDI: 00007fa9d71e5fa8
-RBP: 00007fa9d71e5fa0 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fa9d71e6038 R14: 00007ffd414eed50 R15: 00007ffd414eee38
- </TASK>
+But I am not sure how systems affected in the commit e0efe83ed3252
+will react. Can't tell 100pc without testing.
 
+>
+> 3. **Minimal change**
+>    Add =E2=80=9CT=E2=80=9D variants (e.g. T440) to the existing DMI table=
+. This fixes my system but keeps the current complexity and maintenance bur=
+den.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+I can understand the burden. But unless Dell gets involved I don't see
+a better way. Intel i40e also has a similar work around.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+>
+> I wanted to start with a discussion and a detailed report before sending =
+any patches, to get guidance on what approach makes sense upstream. I can p=
+rovide logs, kernel versions, and test results if useful. My testing (down =
+to 6.6.1) was done on my own hardware. I could not reproduce either the ori=
+ginal SNP reboot hang (9931c9d04f4d) or the AER ACPI _PTS failure (e0efe83e=
+d3252) on current firmware so currently only (2ca1c94ce0b6) seems required,=
+ which suggests both issues may now be firmware-resolved.
+>
+> Thanks for taking the time to read this.
+>
+> Best regards,
+> Noam D. Eliyahu
+>
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+--000000000000a8f6a20646840d02
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+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
+/HTPxpDrr4vzZL0yoc9XefyCbdiwfyFl99oBekp+1ZxXc5bZsVhRPVyEWFtCys66nqu5cU2GPT3a
+ySQEHOtIKyGGgzMVvitOzO2suQkoMvu/swsftfgCY/PObdlBZhv0BD97+WwR6CQJh/YEuDDEHYCy
+NDeiVtF3/jwT04bHB7lR9n+AiCSLr9wlgBHGdBFIOmT/XMX3K8fuMMGLq9PpGQEMvYa9QTkE9+zc
+MddiNNh1xtCTG0+kC7KIttdXTnffisXKsX44B8ECAwEAAaOCAd0wggHZMA4GA1UdDwEB/wQEAwIF
+oDAMBgNVHRMBAf8EAjAAMIGTBggrBgEFBQcBAQSBhjCBgzBGBggrBgEFBQcwAoY6aHR0cDovL3Nl
+Y3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyNnNtaW1lY2EyMDIzLmNydDA5BggrBgEF
+BQcwAYYtaHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzMGUGA1Ud
+IAReMFwwCQYHZ4EMAQUDAzALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgoDAjA0MDIGCCsGAQUFBwIB
+FiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzBBBgNVHR8EOjA4MDagNKAy
+hjBodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWltZWNhMjAyMy5jcmwwJAYDVR0R
+BB0wG4EZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBQAKTaeXHq6D68tUC3boCOFGLCgkjAdBgNVHQ4EFgQUxJ6fps/yOGneJRYDWUKPuLPk
+miYwDQYJKoZIhvcNAQELBQADggIBAI2j2qBMKYV8SLK1ysjOOS54Lpm3geezjBYrWor/BAKGP7kT
+QN61VWg3QlZqiX21KLNeBWzJH7r+zWiS8ykHApTnBlTjfNGF8ihZz7GkpBTa3xDW5rT/oLfyVQ5k
+Wr2OZ268FfZPyAgHYnrfhmojupPS4c7bT9fQyep3P0sAm6TQxmhLDh/HcsloIn7w1QywGRyesbRw
+CFkRbTnhhTS9Tz3pYs5kHbphHY5oF3HNdKgFPrfpF9ei6dL4LlwvQgNlRB6PhdUBL80CJ0UlY2Oz
+jIAKPusiSluFH+NvwqsI8VuId34ug+B5VOM2dWXR/jY0as0Va5Fpjpn1G+jG2pzr1FQu2OHR5GAh
+6Uw50Yh3H77mYK67fCzQVcHrl0qdOLSZVsz/T3qjRGjAZlIDyFRjewxLNunJl/TGtu1jk1ij7Uzh
+PtF4nfZaVnWJowp/gE+Hr21BXA1nj+wBINHA0eufDHd/Y0/MLK+++i3gPTermGBIfadXUj8NGCGe
+eIj4fd2b29HwMCvfX78QR4JQM9dkDoD1ZFClV17bxRPtxhwEU8DzzcGlLfKJhj8IxkLoww9hqNul
+Md+LwA5kUTLPBBl9irP7Rn3jfftdK1MgrNyomyZUZSI1pisbv0Zn/ru3KD3QZLE17esvHAqCfXAZ
+a2vE+o+ZbomB5XkihtQpb/DYrfjAMYICVzCCAlMCAQEwYjBSMQswCQYDVQQGEwJCRTEZMBcGA1UE
+ChMQR2xvYmFsU2lnbiBudi1zYTEoMCYGA1UEAxMfR2xvYmFsU2lnbiBHQ0MgUjYgU01JTUUgQ0Eg
+MjAyMwIMClwVCDIzIfrgd31IMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCDAdUr1
+RhrdPQSXktpCtVsieYP2WWHELXmRFcp9M6KP0DAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
+CSqGSIb3DQEJBTEPFw0yNTEyMjIwNTUzNTlaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
+MAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsGCWCG
+SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCvzWjMx+eeM1bJRZOQaKzrQGktGaBfZj5nJywWYVbn
+NxycKoUrZFrXn5NGMV/nFr0ntWGjT0eYhw+ysXAVKk2wMqyruShe/G/aQWsd4h0Y+ryhhZASC1fe
+NHJ/j4b2R54jGk2NCefA7eGdPr7AWCC3FIfa2aPRWLVerOqu9LBRgTacBDaMUhySmCPc//yJviXc
+xWSuVzEClvZk2Dm09y84O12r/kzc93tCiG7+ofeoSw9lNh9nziEJw2Na5sCBGY7/8zwrXd5w4eZW
+jXMgC5bLKK5v01jhUrRI9QL+VEwQQ1sfDnhbGgxfvqGbH4Z+4qMuRlKFczDjennhYfU2zg60
+--000000000000a8f6a20646840d02--
 
