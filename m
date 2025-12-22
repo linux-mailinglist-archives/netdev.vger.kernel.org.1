@@ -1,107 +1,139 @@
-Return-Path: <netdev+bounces-245774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5230CCD75F9
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 23:51:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1833BCD7617
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 23:53:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 470BC309FC14
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 22:46:51 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 938B030625BD
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 22:51:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61634346796;
-	Mon, 22 Dec 2025 22:22:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A568430C608;
+	Mon, 22 Dec 2025 22:42:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=savoirfairelinux.com header.i=@savoirfairelinux.com header.b="S2rH0lBq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JAry3Sag"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.savoirfairelinux.com (mail.savoirfairelinux.com [208.88.110.44])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69132344023;
-	Mon, 22 Dec 2025 22:22:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=208.88.110.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED94730FC05
+	for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 22:42:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766442170; cv=none; b=FJMcizU2UjM2BQqVzJGSA+zoWgSXSizXkXRqOpaUTJnuLBsbc4pgXwnfCGyqcaSqaNNSpX4eCxny6PAZb55m0AiRwEkz47mtlmBe+85HvGBR3FTFrpn5feXv6RHCH+yyVZXre4B/NTleT0+38Rhad4tQC9gbVbw/1xSb1GDBrQc=
+	t=1766443352; cv=none; b=FH085Pl86nwvww0wUy1xzUuXgtVw2HbdYHLjkDab9VBZ4iI8VNhqkChdNosDx31QsF9zDU2HvuOIzlZK8DsUnDVVHIkNMBkXnqmm8H7Q5EDaJFSkj8MtBnED9heJYCiUsB15KfyL4GDOo5eUmB2AeCtTPpVgjvclb7XYGsaq/I4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766442170; c=relaxed/simple;
-	bh=h9sTwFcIF2VoWEebs9idiacVbrmeZIQUrGoTM2DVzn8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Q9hq8ofkV/YhljSeNEwn6dgwHHdMBbThE/fbp2QGr66u/BJifMwonULr1StUHbk0g5YhkC7s9BdP2acj6rWpjLAwOB4SfmNwjzk/kWyhwLbbShhD7BRqF0vIq1FjmJtrKP29211X+hvOaaMSq1ZIumkwNyfOys1g34U/xv9PKXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=savoirfairelinux.com; spf=pass smtp.mailfrom=savoirfairelinux.com; dkim=pass (2048-bit key) header.d=savoirfairelinux.com header.i=@savoirfairelinux.com header.b=S2rH0lBq; arc=none smtp.client-ip=208.88.110.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=savoirfairelinux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=savoirfairelinux.com
-Received: from localhost (localhost [127.0.0.1])
-	by mail.savoirfairelinux.com (Postfix) with ESMTP id A15AE3D854FB;
-	Mon, 22 Dec 2025 17:22:38 -0500 (EST)
-Received: from mail.savoirfairelinux.com ([127.0.0.1])
- by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavis, port 10032)
- with ESMTP id k3YkhkqvBxDi; Mon, 22 Dec 2025 17:22:38 -0500 (EST)
-Received: from localhost (localhost [127.0.0.1])
-	by mail.savoirfairelinux.com (Postfix) with ESMTP id E7B083D85543;
-	Mon, 22 Dec 2025 17:22:37 -0500 (EST)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.savoirfairelinux.com E7B083D85543
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=savoirfairelinux.com; s=DFC430D2-D198-11EC-948E-34200CB392D2;
-	t=1766442157; bh=t6ij3OOLAh2RZ+jwSAyw28TaVj70IDoE5ZWQNr5Jk48=;
-	h=From:To:Date:Message-ID:MIME-Version;
-	b=S2rH0lBqri/Bj+au49yl3wPpxDMsvdk2/+T1VnD5csWKpj7G6hyMyJtWBFkT++ofb
-	 5zd2umqkp/zpLWqAi0qdsdacV479LwQqNZ2w5ThF/W380Is/Kfv8jGLSAKExz1W4Nt
-	 I+kFe+DIKFttOvzGJSKF0JJy3VvIRtGsNCi2eKXlfopxgfhGH+zNYGvLimFXu4n3Lp
-	 cHJkmY6cCXysCQYWTXJBt5LOdk2d6InhYRbPYU2d7bzeyRQTociTqs2lela0RCKh+b
-	 gTTo79taW08llJdsZkCQXtXO9kF1/mrNGBCHSw/r+98ZAxXYkPlRGpD4Pj88M9/ZA9
-	 4FL+Yv42cclng==
-X-Virus-Scanned: amavis at mail.savoirfairelinux.com
-Received: from mail.savoirfairelinux.com ([127.0.0.1])
- by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavis, port 10026)
- with ESMTP id x5KuDn4koreS; Mon, 22 Dec 2025 17:22:37 -0500 (EST)
-Received: from oitua-pc.mtl.sfl (unknown [192.168.51.254])
-	by mail.savoirfairelinux.com (Postfix) with ESMTPSA id CC6D13D854B3;
-	Mon, 22 Dec 2025 17:22:37 -0500 (EST)
-From: Osose Itua <osose.itua@savoirfairelinux.com>
-To: netdev@vger.kernel.org
-Cc: devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	michael.hennerich@analog.com,
-	jerome.oufella@savoirfairelinux.com,
-	Osose Itua <osose.itua@savoirfairelinux.com>
-Subject: [PATCH v2 2/2] dt-bindings: net: adi,adin: document LP Termination property
-Date: Mon, 22 Dec 2025 17:21:05 -0500
-Message-ID: <20251222222210.3651577-3-osose.itua@savoirfairelinux.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251222222210.3651577-1-osose.itua@savoirfairelinux.com>
-References: <20251222222210.3651577-1-osose.itua@savoirfairelinux.com>
+	s=arc-20240116; t=1766443352; c=relaxed/simple;
+	bh=nbvAp9lGgmeAHI82ou9Vpof0xEI/gJTFJ/RcmIgs90M=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=S9CrqytFjp1JudTn/HCwvDkJGcBWwVlDfxZ7PATqrD3v2VRch1NXBw4xBBOUlGLQ7eviGiYQGJYCRAV+aHbu4dzsgxFOuFw3fkXrteegDXKoFxKM2G6nhlNwignXCPG2oDISqFNDsXs5xuNDIuJ+iMUc035/m5W/zmQfOxwgibA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JAry3Sag; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1766443350;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+Nf8Y09hX+6ivSEyGT21ZNlAYEnQHEoRA/5t14BpHSg=;
+	b=JAry3SagyoOVvsnTl596xylzozAXIfSv14JTXVGBsPekOr/j0s07a34lBMn6UrnhX1AxcQ
+	26BLIov4JPN/ZW76VUYJwc8qzly5oTXqmL0BrSVX0iiX6LMXv7q9NFVeZ2UYEwyCgosC0h
+	BFSri4UTIFsmBvuxpmIVdDfupWA2UoU=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-397-KbwvaoBrNy6oUzT24nfA5g-1; Mon,
+ 22 Dec 2025 17:42:26 -0500
+X-MC-Unique: KbwvaoBrNy6oUzT24nfA5g-1
+X-Mimecast-MFC-AGG-ID: KbwvaoBrNy6oUzT24nfA5g_1766443345
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A1A6418002DE;
+	Mon, 22 Dec 2025 22:42:25 +0000 (UTC)
+Received: from localhost (unknown [10.64.240.82])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 48DD8180049F;
+	Mon, 22 Dec 2025 22:42:23 +0000 (UTC)
+Date: Tue, 23 Dec 2025 07:42:22 +0900 (JST)
+Message-Id: <20251223.074222.1040526801542772515.yamato@redhat.com>
+To: stephen@networkplumber.org
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH iproute2 1/2] man: explain the naming convention of
+ files under .d dir
+From: Masatake YAMATO <yamato@redhat.com>
+In-Reply-To: <20251222103209.0f9e03bd@phoenix.local>
+References: <20251217154354.2410098-1-yamato@redhat.com>
+	<20251222103209.0f9e03bd@phoenix.local>
+Organization: Red Hat Japan, K.K.
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Add "adi,low-cmode-impedance" boolean property which, when present,
-configures the PHY for the lowest common-mode impedance on the receive
-pair for 100BASE-TX operation.
+From: Stephen Hemminger <stephen@networkplumber.org>
+Subject: Re: [PATCH iproute2 1/2] man: explain the naming convention of files under .d dir
+Date: Mon, 22 Dec 2025 10:32:09 -0800
 
-Signed-off-by: Osose Itua <osose.itua@savoirfairelinux.com>
----
- Documentation/devicetree/bindings/net/adi,adin.yaml | 6 ++++++
- 1 file changed, 6 insertions(+)
+> On Thu, 18 Dec 2025 00:43:53 +0900
+> Masatake YAMATO <yamato@redhat.com> wrote:
+> 
+>> Signed-off-by: Masatake YAMATO <yamato@redhat.com>
+>> ---
+>>  man/man8/ip-address.8.in | 7 +++++++
+>>  man/man8/ip-link.8.in    | 7 +++++--
+>>  2 files changed, 12 insertions(+), 2 deletions(-)
+>> 
+>> diff --git a/man/man8/ip-address.8.in b/man/man8/ip-address.8.in
+>> index 79942c1a..e88a114f 100644
+>> --- a/man/man8/ip-address.8.in
+>> +++ b/man/man8/ip-address.8.in
+>> @@ -331,6 +331,13 @@ values have a fixed interpretation. Namely:
+>>  The rest of the values are not reserved and the administrator is free
+>>  to assign (or not to assign) protocol tags.
+>>  
+>> +When scanning
+>> +.BR rt_addrprotos.d
+>> +directory, only files ending
+>> +.BR .conf
+>> +are considered.
+>> +Files beginning with a dot are ignored.
+>> +
+>>  .SS ip address delete - delete protocol address
+>>  .B Arguments:
+>>  coincide with the arguments of
+>> diff --git a/man/man8/ip-link.8.in b/man/man8/ip-link.8.in
+>> index ef45fe08..67f9e2f0 100644
+>> --- a/man/man8/ip-link.8.in
+>> +++ b/man/man8/ip-link.8.in
+>> @@ -2315,8 +2315,11 @@ down on the switch port.
+>>  .BR "protodown_reason PREASON on " or " off"
+>>  set
+>>  .B PROTODOWN
+>> -reasons on the device. protodown reason bit names can be enumerated under
+>> -/etc/iproute2/protodown_reasons.d/. possible reasons bits 0-31
+>> +reasons on the device. protodown reason bit names can be enumerated in the
+>> +.BR *.conf
+>> +files under
+>> +.BR @SYSCONF_USR_DIR@/protodown_reasons.d " or " @SYSCONF_ETC_DIR@/protodown_reasons.d "."
+>> +possible reasons bits 0-31
+>>  
+>>  .TP
+>>  .BR "dynamic on " or " dynamic off"
+> 
+> 
+> The man page is slightly redundant here. Already have a README file in the
+> directory.
+> 
 
-diff --git a/Documentation/devicetree/bindings/net/adi,adin.yaml b/Docume=
-ntation/devicetree/bindings/net/adi,adin.yaml
-index c425a9f1886d..d3c8c5cc4bb1 100644
---- a/Documentation/devicetree/bindings/net/adi,adin.yaml
-+++ b/Documentation/devicetree/bindings/net/adi,adin.yaml
-@@ -52,6 +52,12 @@ properties:
-     description: Enable 25MHz reference clock output on CLK25_REF pin.
-     type: boolean
-=20
-+  adi,low-cmode-impedance:
-+    description: |
-+      Ability to configure for the lowest common-mode impedance on the
-+      receive pair for 100BASE-TX.
-+    type: boolean
-+
- unevaluatedProperties: false
-=20
- examples:
+I didn't know the README files. I would like to withdraw the proposal of
+this change.
+
+Masatake YAMATO
+
 
