@@ -1,128 +1,135 @@
-Return-Path: <netdev+bounces-245739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9F02CD6A63
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 17:21:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE9F1CD6C91
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 18:16:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id CA47A300F71C
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 16:21:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6974730198BF
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 17:12:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33935311953;
-	Mon, 22 Dec 2025 16:21:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76D4732D7E0;
+	Mon, 22 Dec 2025 17:12:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kJ7o9twT"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ABDF322B82
-	for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 16:21:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3BFB322B73;
+	Mon, 22 Dec 2025 17:12:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766420480; cv=none; b=PojgqTEmW1uQGyxfScQQPyGA1C3J1Umnk9PUsnPNL+mH4hV2pPNuq5t3h6DTvk0KWEYzo9UzbRy406YVejntiPdWKPOODYU5f/24LaxTGlwsmzYCo4TX7hCxCbkrnHN65Z2K74cUeq8Pfq7onpEQnOefRYBpObkY7qx4JHqzY5M=
+	t=1766423547; cv=none; b=n3VrB2p3iIXtxoIPB5psFk6GBySqc75BEczt8sLFwSyKvGfjNDi+7CXg9KL2IgTt+JR+08BWUg0eSiMs+Z5zy8ss9gu+6o9+TEN41hbNSBfY0FRj3gmW9Iv6L781XXfEXs8Gj8DjkOu+1UPtAdbShstIukrElwMAS8gVKNL+wrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766420480; c=relaxed/simple;
-	bh=RHfkqee+3g9nSYlyyUZ23eocZzUqzMj5vznMA7wzwQU=;
+	s=arc-20240116; t=1766423547; c=relaxed/simple;
+	bh=OhoBkjnY0xpu56sErDgnqNkAe2///XrHKr2YYE9m49Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tLnT5YG/IMxX45UgzZETD8Arc6iEn3+FQDDLRzchYqKh0JX6pZ1kNlir3VBBIOhoH4j7uPCQVShxXucEDgWQKzN0DHVqQNXmMMepo8XArMNnyZjKrN/zqilUzFUtbNjAZde/vJms9sxyaBOQirPNVfJGgCh0RbAJGlS89siHou0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1vXieU-0006q9-Kk; Mon, 22 Dec 2025 17:20:54 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1vXieS-006xlV-3D;
-	Mon, 22 Dec 2025 17:20:53 +0100
-Received: from pengutronix.de (2a02-8206-24fb-1700-38f4-91de-2aaa-7f2a.dynamic.ewe-ip-backbone.de [IPv6:2a02:8206:24fb:1700:38f4:91de:2aaa:7f2a])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 50FAD4BCF51;
-	Mon, 22 Dec 2025 16:20:52 +0000 (UTC)
-Date: Mon, 22 Dec 2025 17:20:49 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Ondrej Ille <ondrej.ille@gmail.com>
-Cc: Andrea Daoud <andreadaoud6@gmail.com>, 
-	Pavel Pisa <pisa@cmp.felk.cvut.cz>, linux-can@vger.kernel.org, 
-	Wolfgang Grandegger <wg@grandegger.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
-	netdev@vger.kernel.org
-Subject: Re: ctucanfd: possible coding error in
- ctucan_set_secondary_sample_point causing SSP not enabled
-Message-ID: <20251222-kickass-oyster-of-sorcery-c39bb7-mkl@pengutronix.de>
-References: <CAOprWotBRv_cvD3GCSe7N2tiLooZBoDisSwbu+VBAmt_2izvwQ@mail.gmail.com>
- <CAA7ZjpY-q6pynoDpo6OwW80zd7rq3dfFjQ1RMGzJR4pKSu7Zzg@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=UnQbHexdY3tHyDrFlbzTvzHBtuwHktDfijK5nUYDW8xTkvc5g2QtVGmUDDOlD81iBWIVhFYv2T4+0IueyqEj1Mw+ApBiPT4dLUF7k8kWCb2/EilCwAv+tURVa6M/gW/xQoLKn8eONVpbw11dHQ6+iSY7F6uXC0VLhx1dXhBbABM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kJ7o9twT; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1766423546; x=1797959546;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=OhoBkjnY0xpu56sErDgnqNkAe2///XrHKr2YYE9m49Q=;
+  b=kJ7o9twTwt0ipMji2xRzYUh0oj2AZbwIRewNMUjO7juye8qGQcu7zNaq
+   Zy/ubhF7MsFdIfID5eJ+vGX0tLnYeGb1aB1fzfkF1cEtsfbQyY3ztn8WD
+   6Cu3YLEfZAy4WnmocZNp89g+gVKy/vw54ucQxF37uJOYH8skj4e+VNhcN
+   uP5NxOAujgfIWIVzzRxP/HIZxkn5Ghd72zXlyjAzME3AVkZUyGQgxYNXK
+   m3/t/9r2Fvngx/9YdRmHjIiFKYvVgr8MJKz8nAxRc1KagHx2cbiTHdYVV
+   W7ANFJTmUJ+TNe6NWC2l1JIFGFckf2wxU67nXSIYH/r8thddG5zoZqr5W
+   g==;
+X-CSE-ConnectionGUID: lwxx9r9KQmSdNhzZAjDp1Q==
+X-CSE-MsgGUID: bC7/NDMmTMmfyocdNIkFxA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11650"; a="78597816"
+X-IronPort-AV: E=Sophos;i="6.21,168,1763452800"; 
+   d="scan'208";a="78597816"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Dec 2025 09:12:25 -0800
+X-CSE-ConnectionGUID: ABC+28DlTxmt6hXgPIzs/A==
+X-CSE-MsgGUID: nDZNxFzbQoGY51lH+MPhJg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,168,1763452800"; 
+   d="scan'208";a="198710127"
+Received: from igk-lkp-server01.igk.intel.com (HELO 8a0c053bdd2a) ([10.211.93.152])
+  by orviesa006.jf.intel.com with ESMTP; 22 Dec 2025 09:12:22 -0800
+Received: from kbuild by 8a0c053bdd2a with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vXjSG-000000005Yy-23k6;
+	Mon, 22 Dec 2025 17:12:20 +0000
+Date: Mon, 22 Dec 2025 18:11:48 +0100
+From: kernel test robot <lkp@intel.com>
+To: "Rusydi H. Makarim" <rusydi.makarim@kriptograf.id>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Biggers <ebiggers@kernel.org>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Ard Biesheuvel <ardb@kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	"Rusydi H. Makarim" <rusydi.makarim@kriptograf.id>
+Subject: Re: [PATCH 1/3] lib/crypto: Add KUnit test vectors for Ascon-Hash256
+Message-ID: <202512221855.nLchuL2R-lkp@intel.com>
+References: <20251215-ascon_hash256-v1-1-24ae735e571e@kriptograf.id>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="4ialxhezysaxggjo"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAA7ZjpY-q6pynoDpo6OwW80zd7rq3dfFjQ1RMGzJR4pKSu7Zzg@mail.gmail.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <20251215-ascon_hash256-v1-1-24ae735e571e@kriptograf.id>
+
+Hi Rusydi,
+
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on 92de2d349e02c2dd96d8d1b7016cc78cf80fc085]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Rusydi-H-Makarim/lib-crypto-Add-KUnit-test-vectors-for-Ascon-Hash256/20251215-215114
+base:   92de2d349e02c2dd96d8d1b7016cc78cf80fc085
+patch link:    https://lore.kernel.org/r/20251215-ascon_hash256-v1-1-24ae735e571e%40kriptograf.id
+patch subject: [PATCH 1/3] lib/crypto: Add KUnit test vectors for Ascon-Hash256
+config: x86_64-rhel-9.4-kunit (https://download.01.org/0day-ci/archive/20251222/202512221855.nLchuL2R-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251222/202512221855.nLchuL2R-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202512221855.nLchuL2R-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   In file included from lib/crypto/tests/ascon_hash_kunit.c:6:
+>> include/crypto/ascon_hash.h:24:18: warning: 'ascon_p_rndc' defined but not used [-Wunused-const-variable=]
+      24 | static const u64 ascon_p_rndc[] = {
+         |                  ^~~~~~~~~~~~
 
 
---4ialxhezysaxggjo
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: ctucanfd: possible coding error in
- ctucan_set_secondary_sample_point causing SSP not enabled
-MIME-Version: 1.0
+vim +/ascon_p_rndc +24 include/crypto/ascon_hash.h
 
-On 22.12.2025 16:51:07, Ondrej Ille wrote:
-> yes, your thinking is correct, there is a bug there.
->
-> This was pointed to by another user right in the CTU CAN FD repository
-> where the Linux driver also lives:
-> https://github.com/Blebowski/CTU-CAN-FD/pull/2
->
-> It is as you say, it should be:
->
-> -- ssp_cfg |=3D FIELD_PREP(REG_TRV_DELAY_SSP_SRC, 0x1);
-> ++ ssp_cfg |=3D FIELD_PREP(REG_TRV_DELAY_SSP_SRC, 0x0);
+    18	
+    19	/*
+    20	 * The standard of Ascon permutation in NIST SP 800-232 specifies 16 round
+    21	 * constants to accomodate potential functionality extensions in the future
+    22	 * (see page 2).
+    23	 */
+  > 24	static const u64 ascon_p_rndc[] = {
+    25		0x000000000000003cULL, 0x000000000000002dULL, 0x000000000000001eULL,
+    26		0x000000000000000fULL, 0x00000000000000f0ULL, 0x00000000000000e1ULL,
+    27		0x00000000000000d2ULL, 0x00000000000000c3ULL, 0x00000000000000b4ULL,
+    28		0x00000000000000a5ULL, 0x0000000000000096ULL, 0x0000000000000087ULL,
+    29		0x0000000000000078ULL, 0x0000000000000069ULL, 0x000000000000005aULL,
+    30		0x000000000000004bULL,
+    31	};
+    32	
 
-This statement has no effect, as 'ssp_cfg |=3D 0x0' is still 'ssp_cfg'.
-IMHO it's better to add a comment that says, why you don't set
-REG_TRV_DELAY_SSP_SRC. Another option is to add create a define that
-replaces 0x1 and 0x0 for REG_TRV_DELAY_SSP_SRC with a speaking name.
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---4ialxhezysaxggjo
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmlJb9gACgkQDHRl3/mQ
-kZyzfgf/SfPB5HD+R0CUspItF3HhUjEbcFL919kOplwJYBtTpw8OeoZWx8KK7EzU
-YLlJ/pxBOqgvWRaS04/T8mER+4uyzO3XXM06HIH6+weo86uDLSBm5PhVatgsxKD7
-QcDTaw2WNZk78tb+yyMZjQwAoSXIQyFNpM8S/zQYLLoBYygssJXx5AipPdiFFUS2
-IhnFhYFXToQ1XsbHC2Ec0w/Ombsdf5N0ZGb7kyb11ldtEocnLc2UA11XlF70Sqwb
-vSvIK1wA4fbnAObjtICQD4np3VqeaHeRqr+eEizkUIOjj6YJ8mIcaFPIAF6QqQfR
-nDMy7OjY1M2cLhiDyC7CrJdjWNZC6w==
-=F78G
------END PGP SIGNATURE-----
-
---4ialxhezysaxggjo--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
