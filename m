@@ -1,241 +1,196 @@
-Return-Path: <netdev+bounces-245752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5576CD6F92
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 20:31:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 14DF9CD7073
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 20:57:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id EF8D93025FBC
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 19:29:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CE55B3025587
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 19:57:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83DF133B949;
-	Mon, 22 Dec 2025 19:29:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3D9A33CE87;
+	Mon, 22 Dec 2025 19:57:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iAvcvXGg"
+	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="pFZJUB+P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A81933B6F3
-	for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 19:29:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A74533A9C1
+	for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 19:57:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766431777; cv=none; b=Ezb7UY2PUgbhXR3k/7lN2tptTdvhVLYeHd36GgghK+uVj9La6zac6JklKNeZg6+7rWLv/OHWwt+oxxF8w1GoAyG9vTvn1UW213oidMdcvAkRDQK3bmp3oDUxJisgXrhr0MM5hUeTYZ5NBI9VHVdtpuPaJE4T8+r4MGUFThHZovk=
+	t=1766433449; cv=none; b=XIMhgVVG3vpWp21vy49EkOSbbU/WNhX6WyV8y27mcAmV1s/Ir/ee80d1LcDvWx3kM5vig0IVr+vzPnDxgXmEWFTN6QFpcUTw4U4KsuDUGtxIgYjRaF8GK+PaD5wQ2WhQnqGLZv/onRrIuvYCKjQjC6J/rEpDYviYkO1693Upmpk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766431777; c=relaxed/simple;
-	bh=Is9aSf/556bxuYegPxbnD7uS9JeESwjbDVKpFVqADsE=;
+	s=arc-20240116; t=1766433449; c=relaxed/simple;
+	bh=gqq7zNg4tUJJ0SmUCTR/rfb6bSKF7C5JMh5yMLNWhsw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=h5hWo0Ve7YgWNimHJdmCgBxcz0CfD7y5b5akXfJ+aqVIiJJutriilSXKKBQ2ne1P2JDDtMszuW3IPVx/Th/isb8vPvhTwT1cEwj0J3MUVIHkJhlokm1UvNZnviq5n57k8PBWFY+VHBZ3Fsiz7ahfIGTtObqxAMzQSA9Fcjqy2kE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iAvcvXGg; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-78fba1a1b1eso39666507b3.1
-        for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 11:29:35 -0800 (PST)
+	 To:Cc:Content-Type; b=pgWLhntH6sCY8LXX+wXWJTMHmtO81WWMQHDuxmd8s7TQXio+TfhbLAaCakIbRs9HKvHpTruQmiT1bL/YoYmx5AL6IwTDUPWD2Q8J8XM+kygYe8qTJ+zoZrNePUJVGzi25VrQ9epHJpIpVelyK0Ltg4xOZfjpmYZ3LBrkZs4OQlM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=pFZJUB+P; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-b7636c96b9aso747847866b.2
+        for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 11:57:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766431774; x=1767036574; darn=vger.kernel.org;
+        d=sartura.hr; s=sartura; t=1766433445; x=1767038245; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BqJ3vVbWHzFYZqmxVIV93Fa7xe1lg+sgSuO3WlwgABY=;
-        b=iAvcvXGg2H9rivpKHem3r0p1kXijGk3A9PDSo+o9fe5SjWLHUiquZCbbGAIB2HZ5I8
-         JFSrKb0SEGgH7xpZoCHxEI7XbQSYkHGxJagSVeYkJ7THgQBPQllnXQtu/SOK5q2SMubp
-         8q6K1QQ/LWYFkNtqb8ni2Ib6wjTjJOxSVngeg3GYacC0XaJumrJUwdJEZbF0hfSHuDpp
-         GfFXiS04j6WI7jmVUAw7hqnISc+FbOsJolCTgIVkE1rhivdA170H9gAHyWTbLBX+S7NP
-         K4dbn1w9wQVuF8aL4AaVjnmuCJDhxIOsLIPR2gWiAv83dbTtdjE5OZhgUPBk0rnGROC/
-         tiew==
+        bh=h1Ffz7SUjA9uiSla9hHoS8dAeCi7tewQV/vP2Eehn8A=;
+        b=pFZJUB+PHZWLjPcQpowiytkshEGhxGj5eXPYicVBekCOyv5edtd/D/8QBRD4WducvS
+         rVpLJLuIAiUIWS2Km205Ah9T/sgmRQOZ9OER7gw0sEWH7OPUrzpo5AnmT6KDq00vmhqT
+         rBAs+UNDSUzDVSyWeqrZ7/t88wbpQXA7+rjHwGcjOD8V5mBeydw3VSesk/wA0KPiQC2/
+         tjj+RokSHTTJfyDwGuAWCGrrUkqM8ridBPmhsAs205vnT73lATgHhsCYpiusiPmgDrnx
+         3SiCZo4Noj8qZLChLZyEKiDBavbPc5IJU72tnwwaSUuh+9kbmKY3J/twONeia8BofiN+
+         Y9Gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766431774; x=1767036574;
+        d=1e100.net; s=20230601; t=1766433445; x=1767038245;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=BqJ3vVbWHzFYZqmxVIV93Fa7xe1lg+sgSuO3WlwgABY=;
-        b=Tte2BtH2liGs591GO5i6i691BvP7HWcAgODnz2uUfbBQFaHcF+n8anIp73LnEi5FRc
-         rOpBOR6/vWsgda3//R62ycPf5T0gBGQfZOVckUL9/syf4zBMedKNpcSA2hGJQuoDJR/I
-         /ef9JdcO0gTRZvITD8ptWfsiGa9tT6FGMWoQ2dXtPDns44n67MOZLerSUzlwZURQAFTV
-         TbqBB2qhpyUSjSJfW0EfYa7Rpe0S9DzGArFN9X2wEKnppzysmkIlXbZASxPv8SstQoXQ
-         NQaivQ+k+p5hmtlVs8UB0w2Ir7joaLVfxhayaKd7Ew0XpQG9aKWXLp3j2frcHHKTS0KI
-         jU6A==
-X-Forwarded-Encrypted: i=1; AJvYcCVUzj23mY0w/hyUT9YANK4BUSN/RHMxBDsodKFnWoa/lwICPN/ssF7Jyfp+/9vZBBbcLztOtzc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxH0sfk3mrOFHTg4PvdoJilHj4KUVnjaCbah2b2Ij70B4msGy/H
-	Ssa7OGmEN42legiVxz47U020z/odcwdfuZgc69I3CVTjgNgSNGWN0Rmu/+MvnnsyfJNb4OrgIL2
-	QBLMLaIJHPKrcym5xA91vJHxXxnEZqIY=
-X-Gm-Gg: AY/fxX5Dcpb3p59dQ8UI1zJaiehNUDmfNobiHvpr+T3ulmQI7QaYS3DOqBrds64QrK5
-	QaufNCtVxFErAp9ssv2ZbFTinm6TVyXE62LTXOaTH/StNIjpqgSFcTh2UjCQ2l4sq2tz992Wf4U
-	9/eAVloOtaOrNKCQ6Iq601DPCz7udmTREvSLqfyug5nIqS7PXFuAah7NlYWfFBQig9sVlYr3uDB
-	6N/co5GAcOh0mKbL/I+1ca2PEw5nlR1zzUztouQ0tBs7ljskngc6+1f0ivH+GxIXGwpcWc=
-X-Google-Smtp-Source: AGHT+IGfJ1R+UhaNH+BChkiIplciIHenxvpUV2olWqYwJU4lw3QKMILZdvQq85AWhawDfzzu+vZNVwSHrL8y7hLR1Pg=
-X-Received: by 2002:a05:690c:a0a2:10b0:786:8abd:bbcf with SMTP id
- 00721157ae682-78fa5b58cbamr104575537b3.31.1766431774246; Mon, 22 Dec 2025
- 11:29:34 -0800 (PST)
+        bh=h1Ffz7SUjA9uiSla9hHoS8dAeCi7tewQV/vP2Eehn8A=;
+        b=rgCNj9JJB9GSXfjQZSHWutjT49L1Xppvzgv5oqIEIgYUqvnhcAiK8qKOalOj/LSrzQ
+         KlrYxWO0w5HBFvXVed9TuKNqeUwXPcODK/n+MZrmQMzfOqAoayd7HC2igNSVJBxGVkKp
+         7MqAdr5pWpyYoTvcuESfR0iBwi1C1bTsv5nQ23U++eSwiUT80rIgvXngJAFRgLyVL7+O
+         EUcgBaNlyFQofB0McY3i9EVdRHHKmBY+bV4uqn0+gjSjKvKDgA/k1/MM6usARZnkOGN7
+         WA92ofFUE9Cr0uGesZ0ujGfSC/fdnZYA5pqQgn8tL88xNoBN9u1WFx1Ljz1UeR69nPTF
+         +FzQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXDyVtQzW5tNJNk/liK5i/Ijh7NGZ3cmRK8wXcQMX1G5zqjYUaI01L+yXeywGwlG2BVcxLC4Zc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYSIcTG/n2DBgFrtu5sPV/PbMbkPv/lntEtgWc1GqhY+ovmyuA
+	ePVHEvdQSLq0TzKYZed9GWkqB1AUSz/rd0KePDAHcS4jxD62GibIvv/SrffexsBFq+G8QrcnskM
+	Xcv9pfEp2l3MQZVnWpHAP+GSwHgNo8M+uzytDfBS3+A==
+X-Gm-Gg: AY/fxX5bwBKdPxoDru48C0zfKFT6u+dzA4qgqcq6+JUlwYUugdcy/ubDAdyUPO20IBX
+	bO+NG1/v8Y101yvfkdrtKApLTeJijJ1u5cXasqFJx533VxSfL/Gp7aDwxvLJnmABVc/zA3Ds26K
+	GR20WB31QMkWBBVVasju0iVPVPlxaBKZHiuiBqcxq3h126DGVRJQl3ECZOdCbbi9yHP0a3DTPGY
+	qswvPbhEHAwNWw4Mqc45/9D8aOrw40Ij+z7GgQnjrriwA2kuhNtb7ToYZ4CpoWhndQ5TVYO0SmB
+	frWfdrN3rxncRWNAKC8ZAwPZoCgSNthQrA+f6e0laiWswDPQag==
+X-Google-Smtp-Source: AGHT+IEdtGGJL6owR7mmmwSv2zTvtla84ek3MFk4eZNiNP2lYiWN2sfcs6M8h0fxDoYpaxxvqE+4ieXBeUSoFs/4WBA=
+X-Received: by 2002:a17:907:3ccb:b0:b73:8cea:62bb with SMTP id
+ a640c23a62f3a-b80371a3d87mr1355933366b.31.1766433444769; Mon, 22 Dec 2025
+ 11:57:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251220-helper_proto-v1-0-2206e0d9422d@gmail.com> <20251220-helper_proto-v1-1-2206e0d9422d@gmail.com>
-In-Reply-To: <20251220-helper_proto-v1-1-2206e0d9422d@gmail.com>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Mon, 22 Dec 2025 11:29:23 -0800
-X-Gm-Features: AQt7F2pDTOhbo20J9mti2Iv2uBWiCpet64TbGM459wgMokEFKr31y9F3TMfRC0w
-Message-ID: <CAMB2axPcJ=U69xyyyY_7og8OALRCbOgeppQv416k9yvMiD9CvQ@mail.gmail.com>
-Subject: Re: [RFC PATCH bpf 1/2] bpf: Fix memory access tags in helper prototypes
-To: Zesen Liu <ftyghome@gmail.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Matt Bobrowski <mattbobrowski@google.com>, 
-	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Daniel Xu <dxu@dxuuu.xyz>, Shuah Khan <shuah@kernel.org>, 
-	bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, Shuran Liu <electronlsr@gmail.com>, 
-	Peili Gao <gplhust955@gmail.com>, Haoran Ni <haoran.ni.cs@gmail.com>
+References: <20251215163820.1584926-1-robert.marko@sartura.hr>
+ <20251215163820.1584926-16-robert.marko@sartura.hr> <20251216-payback-ceremony-cfb7adad8ef1@spud>
+In-Reply-To: <20251216-payback-ceremony-cfb7adad8ef1@spud>
+From: Robert Marko <robert.marko@sartura.hr>
+Date: Mon, 22 Dec 2025 20:57:14 +0100
+X-Gm-Features: AQt7F2rDm7ZgyJ9ixNo09GJcdYbsF1DFNHNC0FIPR01SjncTPp1tTulCOrRyRyg
+Message-ID: <CA+HBbNESUZ6KB0BbpZUMfh1rjZTZMgY1SwmFQbx+CRP+a_1x9g@mail.gmail.com>
+Subject: Re: [PATCH v2 16/19] dt-bindings: pinctrl: pinctrl-microchip-sgpio:
+ add LAN969x
+To: Conor Dooley <conor@kernel.org>
+Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
+	nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com, 
+	claudiu.beznea@tuxon.dev, Steen.Hegelund@microchip.com, 
+	daniel.machon@microchip.com, UNGLinuxDriver@microchip.com, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org, 
+	linux@roeck-us.net, andi.shyti@kernel.org, lee@kernel.org, 
+	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, linusw@kernel.org, olivia@selenic.com, 
+	radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com, 
+	gregkh@linuxfoundation.org, jirislaby@kernel.org, mturquette@baylibre.com, 
+	sboyd@kernel.org, richardcochran@gmail.com, wsa+renesas@sang-engineering.com, 
+	romain.sioen@microchip.com, Ryan.Wanner@microchip.com, 
+	lars.povlsen@microchip.com, tudor.ambarus@linaro.org, 
+	charan.pedumuru@microchip.com, kavyasree.kotagiri@microchip.com, 
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	dmaengine@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, netdev@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-spi@vger.kernel.org, linux-serial@vger.kernel.org, 
+	linux-usb@vger.kernel.org, linux-clk@vger.kernel.org, mwalle@kernel.org, 
+	luka.perkov@sartura.hr
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Dec 20, 2025 at 3:35=E2=80=AFAM Zesen Liu <ftyghome@gmail.com> wrot=
-e:
+On Tue, Dec 16, 2025 at 6:34=E2=80=AFPM Conor Dooley <conor@kernel.org> wro=
+te:
 >
-> After commit 37cce22dbd51 ("bpf: verifier: Refactor helper access type tr=
-acking"),
-> the verifier started relying on the access type tags in helper
-> function prototypes to perform memory access optimizations.
+> On Mon, Dec 15, 2025 at 05:35:33PM +0100, Robert Marko wrote:
+> > Document LAN969x compatibles for SGPIO.
+> >
+> > Signed-off-by: Robert Marko <robert.marko@sartura.hr>
+> > ---
+> >  .../pinctrl/microchip,sparx5-sgpio.yaml       | 20 ++++++++++++++-----
+> >  1 file changed, 15 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/Documentation/devicetree/bindings/pinctrl/microchip,sparx5=
+-sgpio.yaml b/Documentation/devicetree/bindings/pinctrl/microchip,sparx5-sg=
+pio.yaml
+> > index fa47732d7cef..9fbbafcdc063 100644
+> > --- a/Documentation/devicetree/bindings/pinctrl/microchip,sparx5-sgpio.=
+yaml
+> > +++ b/Documentation/devicetree/bindings/pinctrl/microchip,sparx5-sgpio.=
+yaml
+> > @@ -21,10 +21,15 @@ properties:
+> >      pattern: '^gpio@[0-9a-f]+$'
+> >
+> >    compatible:
+> > -    enum:
+> > -      - microchip,sparx5-sgpio
+> > -      - mscc,ocelot-sgpio
+> > -      - mscc,luton-sgpio
+> > +    oneOf:
+> > +      - enum:
+> > +          - microchip,sparx5-sgpio
+> > +          - mscc,ocelot-sgpio
+> > +          - mscc,luton-sgpio
+> > +      - items:
+> > +          - enum:
+> > +              - microchip,lan9691-sgpio
+> > +          - const: microchip,sparx5-sgpio
+> >
+> >    '#address-cells':
+> >      const: 1
+> > @@ -80,7 +85,12 @@ patternProperties:
+> >      type: object
+> >      properties:
+> >        compatible:
+> > -        const: microchip,sparx5-sgpio-bank
 >
-> Currently, several helper functions utilizing ARG_PTR_TO_MEM lack the
-> corresponding MEM_RDONLY or MEM_WRITE tags. This omission causes the
-> verifier to incorrectly assume that the buffer contents are unchanged
-> across the helper call. Consequently, the verifier may optimize away
-> subsequent reads based on this wrong assumption, leading to correctness
-> issues.
->
-> Similar issues were recently addressed for specific helpers in commit
-> ac44dcc788b9 ("bpf: Fix verifier assumptions of bpf_d_path's output buffe=
-r")
-> and commit 2eb7648558a7 ("bpf: Specify access type of bpf_sysctl_get_name=
- args").
->
-> Fix these prototypes by adding the correct memory access tags.
->
-> Fixes: 37cce22dbd51 ("bpf: verifier: Refactor helper access type tracking=
-")
-> Co-developed-by: Shuran Liu <electronlsr@gmail.com>
-> Signed-off-by: Shuran Liu <electronlsr@gmail.com>
-> Co-developed-by: Peili Gao <gplhust955@gmail.com>
-> Signed-off-by: Peili Gao <gplhust955@gmail.com>
-> Co-developed-by: Haoran Ni <haoran.ni.cs@gmail.com>
-> Signed-off-by: Haoran Ni <haoran.ni.cs@gmail.com>
-> Signed-off-by: Zesen Liu <ftyghome@gmail.com>
-> ---
->  kernel/bpf/helpers.c     | 2 +-
->  kernel/trace/bpf_trace.c | 6 +++---
->  net/core/filter.c        | 8 ++++----
->  3 files changed, 8 insertions(+), 8 deletions(-)
->
-> diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
-> index db72b96f9c8c..f66284f8ec2c 100644
-> --- a/kernel/bpf/helpers.c
-> +++ b/kernel/bpf/helpers.c
-> @@ -1077,7 +1077,7 @@ const struct bpf_func_proto bpf_snprintf_proto =3D =
-{
->         .func           =3D bpf_snprintf,
->         .gpl_only       =3D true,
->         .ret_type       =3D RET_INTEGER,
-> -       .arg1_type      =3D ARG_PTR_TO_MEM_OR_NULL,
-> +       .arg1_type      =3D ARG_PTR_TO_MEM_OR_NULL | MEM_WRITE,
->         .arg2_type      =3D ARG_CONST_SIZE_OR_ZERO,
->         .arg3_type      =3D ARG_PTR_TO_CONST_STR,
->         .arg4_type      =3D ARG_PTR_TO_MEM | PTR_MAYBE_NULL | MEM_RDONLY,
-> diff --git a/kernel/trace/bpf_trace.c b/kernel/trace/bpf_trace.c
-> index fe28d86f7c35..59c2394981c7 100644
-> --- a/kernel/trace/bpf_trace.c
-> +++ b/kernel/trace/bpf_trace.c
-> @@ -1022,7 +1022,7 @@ const struct bpf_func_proto bpf_snprintf_btf_proto =
-=3D {
->         .func           =3D bpf_snprintf_btf,
->         .gpl_only       =3D false,
->         .ret_type       =3D RET_INTEGER,
-> -       .arg1_type      =3D ARG_PTR_TO_MEM,
-> +       .arg1_type      =3D ARG_PTR_TO_MEM | MEM_WRITE,
->         .arg2_type      =3D ARG_CONST_SIZE,
->         .arg3_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
->         .arg4_type      =3D ARG_CONST_SIZE,
-> @@ -1526,7 +1526,7 @@ static const struct bpf_func_proto bpf_read_branch_=
-records_proto =3D {
->         .gpl_only       =3D true,
->         .ret_type       =3D RET_INTEGER,
->         .arg1_type      =3D ARG_PTR_TO_CTX,
-> -       .arg2_type      =3D ARG_PTR_TO_MEM_OR_NULL,
-> +       .arg2_type      =3D ARG_PTR_TO_MEM_OR_NULL | MEM_WRITE,
->         .arg3_type      =3D ARG_CONST_SIZE_OR_ZERO,
->         .arg4_type      =3D ARG_ANYTHING,
->  };
-> @@ -1661,7 +1661,7 @@ static const struct bpf_func_proto bpf_get_stack_pr=
-oto_raw_tp =3D {
->         .gpl_only       =3D true,
->         .ret_type       =3D RET_INTEGER,
->         .arg1_type      =3D ARG_PTR_TO_CTX,
-> -       .arg2_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
-> +       .arg2_type      =3D ARG_PTR_TO_UNINIT_MEM,
->         .arg3_type      =3D ARG_CONST_SIZE_OR_ZERO,
->         .arg4_type      =3D ARG_ANYTHING,
->  };
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 616e0520a0bb..6e07bb994aa7 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -6399,7 +6399,7 @@ static const struct bpf_func_proto bpf_xdp_fib_look=
-up_proto =3D {
->         .gpl_only       =3D true,
->         .ret_type       =3D RET_INTEGER,
->         .arg1_type      =3D ARG_PTR_TO_CTX,
-> -       .arg2_type      =3D ARG_PTR_TO_MEM,
-> +       .arg2_type      =3D ARG_PTR_TO_MEM | MEM_WRITE,
->         .arg3_type      =3D ARG_CONST_SIZE,
->         .arg4_type      =3D ARG_ANYTHING,
->  };
-> @@ -6454,7 +6454,7 @@ static const struct bpf_func_proto bpf_skb_fib_look=
-up_proto =3D {
->         .gpl_only       =3D true,
->         .ret_type       =3D RET_INTEGER,
->         .arg1_type      =3D ARG_PTR_TO_CTX,
-> -       .arg2_type      =3D ARG_PTR_TO_MEM,
-> +       .arg2_type      =3D ARG_PTR_TO_MEM | MEM_WRITE,
->         .arg3_type      =3D ARG_CONST_SIZE,
->         .arg4_type      =3D ARG_ANYTHING,
->  };
-> @@ -8010,7 +8010,7 @@ static const struct bpf_func_proto bpf_tcp_raw_gen_=
-syncookie_ipv4_proto =3D {
->         .ret_type       =3D RET_INTEGER,
->         .arg1_type      =3D ARG_PTR_TO_FIXED_SIZE_MEM,
->         .arg1_size      =3D sizeof(struct iphdr),
-> -       .arg2_type      =3D ARG_PTR_TO_MEM,
-> +       .arg2_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
->         .arg3_type      =3D ARG_CONST_SIZE_OR_ZERO,
->  };
->
-> @@ -8042,7 +8042,7 @@ static const struct bpf_func_proto bpf_tcp_raw_gen_=
-syncookie_ipv6_proto =3D {
->         .ret_type       =3D RET_INTEGER,
->         .arg1_type      =3D ARG_PTR_TO_FIXED_SIZE_MEM,
->         .arg1_size      =3D sizeof(struct ipv6hdr),
-> -       .arg2_type      =3D ARG_PTR_TO_MEM,
-> +       .arg2_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
->         .arg3_type      =3D ARG_CONST_SIZE_OR_ZERO,
->  };
->
+> This should just be able to become "compatible: contains: const: microchi=
+p,sparx5-sgpio-bank.
+> pw-bot: changes-requested
 
-I did a quick search and there is one helper slipping. We should also
-annotate arg1_type of bpf_kallsyms_lookup_name with MEM_RDONLY.
+Hi Conor,
+I have tried using contains, but it would fail to match with the
+following error:
+arch/arm64/boot/dts/microchip/lan9696-ev23x71a.dtb:
+/axi/gpio@e2010230/gpio@0: failed to match any schema with compatible:
+['microchip,lan9691-sgpio-bank', 'microchip,sparx5-sgpio-bank']
+arch/arm64/boot/dts/microchip/lan9696-ev23x71a.dtb:
+/axi/gpio@e2010230/gpio@1: failed to match any schema with compatible:
+['microchip,lan9691-sgpio-bank', 'microchip,sparx5-sgpio-bank']
+
+Regards,
+Robert
+>
+> > +        oneOf:
+> > +          - items:
+> > +              - enum:
+> > +                  - microchip,lan9691-sgpio-bank
+> > +              - const: microchip,sparx5-sgpio-bank
+> > +          - const: microchip,sparx5-sgpio-bank
+> >
+> >        reg:
+> >          description: |
+> > --
+> > 2.52.0
+> >
 
 
->
-> --
-> 2.43.0
->
->
+
+--=20
+Robert Marko
+Staff Embedded Linux Engineer
+Sartura d.d.
+Lendavska ulica 16a
+10000 Zagreb, Croatia
+Email: robert.marko@sartura.hr
+Web: www.sartura.hr
 
