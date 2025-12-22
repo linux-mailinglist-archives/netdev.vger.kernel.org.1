@@ -1,196 +1,133 @@
-Return-Path: <netdev+bounces-245753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14DF9CD7073
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 20:57:58 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 114CDCD7092
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 21:04:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CE55B3025587
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 19:57:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 47D103019B5F
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 20:04:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3D9A33CE87;
-	Mon, 22 Dec 2025 19:57:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D072133C1A3;
+	Mon, 22 Dec 2025 20:04:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="pFZJUB+P"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ks4sEbD4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A74533A9C1
-	for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 19:57:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FC941DEFF5;
+	Mon, 22 Dec 2025 20:04:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766433449; cv=none; b=XIMhgVVG3vpWp21vy49EkOSbbU/WNhX6WyV8y27mcAmV1s/Ir/ee80d1LcDvWx3kM5vig0IVr+vzPnDxgXmEWFTN6QFpcUTw4U4KsuDUGtxIgYjRaF8GK+PaD5wQ2WhQnqGLZv/onRrIuvYCKjQjC6J/rEpDYviYkO1693Upmpk=
+	t=1766433861; cv=none; b=VlBhSziaKRTLWj6xSAO8+kqiMSrpD8oS4cyrFOpuqserMwj6fgnyl+2L5e3KacdnSxacNV1hD3wXW6+z8NLoSUjylptAFHV/3SABiuRTTLpNqhL6Pnpw6vhENiv/PnoMUXstSCiD0cDK+zyBtVE9J+z+fqs6Zyk/IE6+OVi9jQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766433449; c=relaxed/simple;
-	bh=gqq7zNg4tUJJ0SmUCTR/rfb6bSKF7C5JMh5yMLNWhsw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pgWLhntH6sCY8LXX+wXWJTMHmtO81WWMQHDuxmd8s7TQXio+TfhbLAaCakIbRs9HKvHpTruQmiT1bL/YoYmx5AL6IwTDUPWD2Q8J8XM+kygYe8qTJ+zoZrNePUJVGzi25VrQ9epHJpIpVelyK0Ltg4xOZfjpmYZ3LBrkZs4OQlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=pFZJUB+P; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-b7636c96b9aso747847866b.2
-        for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 11:57:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sartura.hr; s=sartura; t=1766433445; x=1767038245; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h1Ffz7SUjA9uiSla9hHoS8dAeCi7tewQV/vP2Eehn8A=;
-        b=pFZJUB+PHZWLjPcQpowiytkshEGhxGj5eXPYicVBekCOyv5edtd/D/8QBRD4WducvS
-         rVpLJLuIAiUIWS2Km205Ah9T/sgmRQOZ9OER7gw0sEWH7OPUrzpo5AnmT6KDq00vmhqT
-         rBAs+UNDSUzDVSyWeqrZ7/t88wbpQXA7+rjHwGcjOD8V5mBeydw3VSesk/wA0KPiQC2/
-         tjj+RokSHTTJfyDwGuAWCGrrUkqM8ridBPmhsAs205vnT73lATgHhsCYpiusiPmgDrnx
-         3SiCZo4Noj8qZLChLZyEKiDBavbPc5IJU72tnwwaSUuh+9kbmKY3J/twONeia8BofiN+
-         Y9Gg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766433445; x=1767038245;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=h1Ffz7SUjA9uiSla9hHoS8dAeCi7tewQV/vP2Eehn8A=;
-        b=rgCNj9JJB9GSXfjQZSHWutjT49L1Xppvzgv5oqIEIgYUqvnhcAiK8qKOalOj/LSrzQ
-         KlrYxWO0w5HBFvXVed9TuKNqeUwXPcODK/n+MZrmQMzfOqAoayd7HC2igNSVJBxGVkKp
-         7MqAdr5pWpyYoTvcuESfR0iBwi1C1bTsv5nQ23U++eSwiUT80rIgvXngJAFRgLyVL7+O
-         EUcgBaNlyFQofB0McY3i9EVdRHHKmBY+bV4uqn0+gjSjKvKDgA/k1/MM6usARZnkOGN7
-         WA92ofFUE9Cr0uGesZ0ujGfSC/fdnZYA5pqQgn8tL88xNoBN9u1WFx1Ljz1UeR69nPTF
-         +FzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXDyVtQzW5tNJNk/liK5i/Ijh7NGZ3cmRK8wXcQMX1G5zqjYUaI01L+yXeywGwlG2BVcxLC4Zc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYSIcTG/n2DBgFrtu5sPV/PbMbkPv/lntEtgWc1GqhY+ovmyuA
-	ePVHEvdQSLq0TzKYZed9GWkqB1AUSz/rd0KePDAHcS4jxD62GibIvv/SrffexsBFq+G8QrcnskM
-	Xcv9pfEp2l3MQZVnWpHAP+GSwHgNo8M+uzytDfBS3+A==
-X-Gm-Gg: AY/fxX5bwBKdPxoDru48C0zfKFT6u+dzA4qgqcq6+JUlwYUugdcy/ubDAdyUPO20IBX
-	bO+NG1/v8Y101yvfkdrtKApLTeJijJ1u5cXasqFJx533VxSfL/Gp7aDwxvLJnmABVc/zA3Ds26K
-	GR20WB31QMkWBBVVasju0iVPVPlxaBKZHiuiBqcxq3h126DGVRJQl3ECZOdCbbi9yHP0a3DTPGY
-	qswvPbhEHAwNWw4Mqc45/9D8aOrw40Ij+z7GgQnjrriwA2kuhNtb7ToYZ4CpoWhndQ5TVYO0SmB
-	frWfdrN3rxncRWNAKC8ZAwPZoCgSNthQrA+f6e0laiWswDPQag==
-X-Google-Smtp-Source: AGHT+IEdtGGJL6owR7mmmwSv2zTvtla84ek3MFk4eZNiNP2lYiWN2sfcs6M8h0fxDoYpaxxvqE+4ieXBeUSoFs/4WBA=
-X-Received: by 2002:a17:907:3ccb:b0:b73:8cea:62bb with SMTP id
- a640c23a62f3a-b80371a3d87mr1355933366b.31.1766433444769; Mon, 22 Dec 2025
- 11:57:24 -0800 (PST)
+	s=arc-20240116; t=1766433861; c=relaxed/simple;
+	bh=zwpPZI3aCzU701r+bt49CUPkrH2uvexax+yCoGFo4dk=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=a1SDRZJsVLetj3lRd+Z3FcidGLtkZh/rWrbU1Km3ExQX0ooL96QrIqksEkD2l1L4k3TP0bydRq7mk+gaUDILcd0i4LW73HRolFdS4foqhtvURH7GFoS6oLaZ3eCQzji7O3/xREPkIuu/XIcL6ZcTh/l0hFm6qyRrgvRPdAtVggE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ks4sEbD4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FB36C4CEF1;
+	Mon, 22 Dec 2025 20:04:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766433861;
+	bh=zwpPZI3aCzU701r+bt49CUPkrH2uvexax+yCoGFo4dk=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
+	b=Ks4sEbD4BmEIL+iZbfylQlhQIi6pN3LrZ83VQb9hSJU3r7XUizrxcsW6e/FeWfUvd
+	 gUHvKlGB9e7kpSWLMwSsxLIajsEJesvz+egvwY9KfQKhXq5lWNSDo7ad5p76ERuwYn
+	 nx733ghtCo2Vv0USO877gmZtEIAvFFkMMf4O5yXdUVX8g1KzsKgmEYf13snZfFswn2
+	 UzB43OXM0N2SIksoQEeMUYVUD9pc+B9Qd24TzWGVxk7U11h1w87whOpqfCRkCfjgCG
+	 trJawH2puCyAErsYIAFuNf7WoKp1zQJIft2VjIy4xRgaq9BOtNkaBPi2FfphiVKZ71
+	 5RKGWht8ECTkQ==
+From: Mark Brown <broonie@kernel.org>
+To: "Rafael J. Wysocki" <rafael@kernel.org>, 
+ Viresh Kumar <viresh.kumar@linaro.org>, Miguel Ojeda <ojeda@kernel.org>, 
+ Alex Gaynor <alex.gaynor@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, 
+ Gary Guo <gary@garyguo.net>, 
+ =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+ Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
+ Alice Ryhl <aliceryhl@google.com>, Trevor Gross <tmgross@umich.edu>, 
+ Danilo Krummrich <dakr@kernel.org>, 
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+ FUJITA Tomonori <fujita.tomonori@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Michael Turquette <mturquette@baylibre.com>, 
+ Stephen Boyd <sboyd@kernel.org>, Breno Leitao <leitao@debian.org>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
+ Dave Ertman <david.m.ertman@intel.com>, Ira Weiny <ira.weiny@intel.com>, 
+ Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
+ =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+ Arnd Bergmann <arnd@arndb.de>, Brendan Higgins <brendan.higgins@linux.dev>, 
+ David Gow <davidgow@google.com>, Jens Axboe <axboe@kernel.dk>, 
+ Alexandre Courbot <acourbot@nvidia.com>, 
+ Alexander Viro <viro@zeniv.linux.org.uk>, 
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+ Liam Girdwood <lgirdwood@gmail.com>, Rae Moar <raemoar63@gmail.com>, 
+ Tamir Duberstein <tamird@gmail.com>
+Cc: linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ rust-for-linux@vger.kernel.org, nouveau@lists.freedesktop.org, 
+ dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, 
+ linux-clk@vger.kernel.org, linux-pci@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
+ linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+In-Reply-To: <20250925-core-cstr-cstrings-v2-0-78e0aaace1cd@gmail.com>
+References: <20250925-core-cstr-cstrings-v2-0-78e0aaace1cd@gmail.com>
+Subject: Re: (subset) [PATCH v2 00/19] rust: replace `kernel::c_str!` with
+ C-Strings
+Message-Id: <176643385114.959021.16173066477128119135.b4-ty@kernel.org>
+Date: Mon, 22 Dec 2025 20:04:11 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251215163820.1584926-1-robert.marko@sartura.hr>
- <20251215163820.1584926-16-robert.marko@sartura.hr> <20251216-payback-ceremony-cfb7adad8ef1@spud>
-In-Reply-To: <20251216-payback-ceremony-cfb7adad8ef1@spud>
-From: Robert Marko <robert.marko@sartura.hr>
-Date: Mon, 22 Dec 2025 20:57:14 +0100
-X-Gm-Features: AQt7F2rDm7ZgyJ9ixNo09GJcdYbsF1DFNHNC0FIPR01SjncTPp1tTulCOrRyRyg
-Message-ID: <CA+HBbNESUZ6KB0BbpZUMfh1rjZTZMgY1SwmFQbx+CRP+a_1x9g@mail.gmail.com>
-Subject: Re: [PATCH v2 16/19] dt-bindings: pinctrl: pinctrl-microchip-sgpio:
- add LAN969x
-To: Conor Dooley <conor@kernel.org>
-Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
-	nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com, 
-	claudiu.beznea@tuxon.dev, Steen.Hegelund@microchip.com, 
-	daniel.machon@microchip.com, UNGLinuxDriver@microchip.com, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org, 
-	linux@roeck-us.net, andi.shyti@kernel.org, lee@kernel.org, 
-	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, linusw@kernel.org, olivia@selenic.com, 
-	radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com, 
-	gregkh@linuxfoundation.org, jirislaby@kernel.org, mturquette@baylibre.com, 
-	sboyd@kernel.org, richardcochran@gmail.com, wsa+renesas@sang-engineering.com, 
-	romain.sioen@microchip.com, Ryan.Wanner@microchip.com, 
-	lars.povlsen@microchip.com, tudor.ambarus@linaro.org, 
-	charan.pedumuru@microchip.com, kavyasree.kotagiri@microchip.com, 
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	dmaengine@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, netdev@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-spi@vger.kernel.org, linux-serial@vger.kernel.org, 
-	linux-usb@vger.kernel.org, linux-clk@vger.kernel.org, mwalle@kernel.org, 
-	luka.perkov@sartura.hr
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.15-dev-47773
 
-On Tue, Dec 16, 2025 at 6:34=E2=80=AFPM Conor Dooley <conor@kernel.org> wro=
-te:
->
-> On Mon, Dec 15, 2025 at 05:35:33PM +0100, Robert Marko wrote:
-> > Document LAN969x compatibles for SGPIO.
-> >
-> > Signed-off-by: Robert Marko <robert.marko@sartura.hr>
-> > ---
-> >  .../pinctrl/microchip,sparx5-sgpio.yaml       | 20 ++++++++++++++-----
-> >  1 file changed, 15 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/Documentation/devicetree/bindings/pinctrl/microchip,sparx5=
--sgpio.yaml b/Documentation/devicetree/bindings/pinctrl/microchip,sparx5-sg=
-pio.yaml
-> > index fa47732d7cef..9fbbafcdc063 100644
-> > --- a/Documentation/devicetree/bindings/pinctrl/microchip,sparx5-sgpio.=
-yaml
-> > +++ b/Documentation/devicetree/bindings/pinctrl/microchip,sparx5-sgpio.=
-yaml
-> > @@ -21,10 +21,15 @@ properties:
-> >      pattern: '^gpio@[0-9a-f]+$'
-> >
-> >    compatible:
-> > -    enum:
-> > -      - microchip,sparx5-sgpio
-> > -      - mscc,ocelot-sgpio
-> > -      - mscc,luton-sgpio
-> > +    oneOf:
-> > +      - enum:
-> > +          - microchip,sparx5-sgpio
-> > +          - mscc,ocelot-sgpio
-> > +          - mscc,luton-sgpio
-> > +      - items:
-> > +          - enum:
-> > +              - microchip,lan9691-sgpio
-> > +          - const: microchip,sparx5-sgpio
-> >
-> >    '#address-cells':
-> >      const: 1
-> > @@ -80,7 +85,12 @@ patternProperties:
-> >      type: object
-> >      properties:
-> >        compatible:
-> > -        const: microchip,sparx5-sgpio-bank
->
-> This should just be able to become "compatible: contains: const: microchi=
-p,sparx5-sgpio-bank.
-> pw-bot: changes-requested
+On Thu, 25 Sep 2025 09:53:48 -0400, Tamir Duberstein wrote:
+> This series depends on step 3[0].
+> 
+> Subsystem maintainers: I would appreciate your `Acked-by`s so that this
+> can be taken through Miguel's tree (where the previous series must go).
+> 
+> Link: https://lore.kernel.org/all/20250925-cstr-core-v16-0-5cdcb3470ec2@gmail.com/ [0]
+> 
+> [...]
 
-Hi Conor,
-I have tried using contains, but it would fail to match with the
-following error:
-arch/arm64/boot/dts/microchip/lan9696-ev23x71a.dtb:
-/axi/gpio@e2010230/gpio@0: failed to match any schema with compatible:
-['microchip,lan9691-sgpio-bank', 'microchip,sparx5-sgpio-bank']
-arch/arm64/boot/dts/microchip/lan9696-ev23x71a.dtb:
-/axi/gpio@e2010230/gpio@1: failed to match any schema with compatible:
-['microchip,lan9691-sgpio-bank', 'microchip,sparx5-sgpio-bank']
+Applied to
 
-Regards,
-Robert
->
-> > +        oneOf:
-> > +          - items:
-> > +              - enum:
-> > +                  - microchip,lan9691-sgpio-bank
-> > +              - const: microchip,sparx5-sgpio-bank
-> > +          - const: microchip,sparx5-sgpio-bank
-> >
-> >        reg:
-> >          description: |
-> > --
-> > 2.52.0
-> >
+   https://git.kernel.org/pub/scm/linux/kernel/git/broonie/regulator.git for-next
 
+Thanks!
 
+[19/19] rust: regulator: replace `kernel::c_str!` with C-Strings
+        commit: b0655377aa5a410df02d89170c20141a1a5bbc28
 
---=20
-Robert Marko
-Staff Embedded Linux Engineer
-Sartura d.d.
-Lendavska ulica 16a
-10000 Zagreb, Croatia
-Email: robert.marko@sartura.hr
-Web: www.sartura.hr
+All being well this means that it will be integrated into the linux-next
+tree (usually sometime in the next 24 hours) and sent to Linus during
+the next merge window (or sooner if it is a bug fix), however if
+problems are discovered then the patch may be dropped or reverted.
+
+You may get further e-mails resulting from automated or manual testing
+and review of the tree, please engage with people reporting problems and
+send followup patches addressing any issues that are reported if needed.
+
+If any updates are required or you are submitting further changes they
+should be sent as incremental updates against current git, existing
+patches will not be replaced.
+
+Please add any relevant lists and maintainers to the CCs when replying
+to this mail.
+
+Thanks,
+Mark
+
 
