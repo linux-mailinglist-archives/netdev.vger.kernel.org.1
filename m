@@ -1,141 +1,151 @@
-Return-Path: <netdev+bounces-245728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49C00CD643D
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 14:57:34 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AA5DCD6510
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 15:05:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E9DF53020C6B
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 13:55:27 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 224933016A1B
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 14:05:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F4F032B994;
-	Mon, 22 Dec 2025 13:55:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0998429AB05;
+	Mon, 22 Dec 2025 14:05:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="A5f3sGZg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LqWNEFek"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEA8D32ABF9;
-	Mon, 22 Dec 2025 13:55:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EE0E299AAA
+	for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 14:05:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766411726; cv=none; b=DfU9dGA7N25KF80Dp7u5E9b9Ptaq9KLXQKPnFR32rxzssiscRMNGkQEpU2nXvOIeazeYs2WTS1j2zIq3uCzFrp66Rhv++Jzr8eGFm5dI79WgllHYajdm+mFrlJIM8dZSK4sggPsKJLuOPKKkFesJY7TH2BjGkIvZ7leRoeginh8=
+	t=1766412332; cv=none; b=JpFiX8ZPGke1l0t0iXHKzRkJTjloeCTtdcyp3WerkRXv1xnu2tgCvwtUKhH3ml0hKNA1zs9Tmz8OM/oT3T85dzqOe9lBqtTqIIM13QzD4fnXtZsWn4nYs7BOE9AxNo5BzEYCJzRSpXKfw6vWREEUHH9u1A3qcCteLFwQ+zMgViM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766411726; c=relaxed/simple;
-	bh=iVUOQTvyAcWMUm5+vyDIUFL9gPJNw55kGB/8CyiS6Xw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q3bD6vTiQ2gFFOagpjIYlCbdN6hSEutTPGEp6iDNFvv1whKvvAyTWjgz3HFB49RBs6LfHY2EfG0qgoIwC0h2sc1XqXbhCJaMoSvMYEgIiIOHxYfJEmNxbvd+cb1ZP5emH5JKwvU4KMf56HAdy3ACMRcDuB1aQVL8vX3Dj6XWqII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=A5f3sGZg; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1766411725; x=1797947725;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=iVUOQTvyAcWMUm5+vyDIUFL9gPJNw55kGB/8CyiS6Xw=;
-  b=A5f3sGZgg5MqcLHPt47TJllqRc84ZPr4kyBfGAsj/AxOiSwlBDCophrD
-   2FQX8k6BV7AiVQ6u1fK4Ostq5yHO+s6m6H+g5k9Q7UIfBSB11DCZXbuiv
-   pquOGA/xPOZdzcdzgicquoYNXjCU0WiohLI0IcwQnQ9BlRzsSSeGjPMBu
-   pFyS9lj8WadY+2mrBjqV8PEihr2/su92iTnqQCFDa6NbLwZFJfsY7JOLP
-   RsW7ElmEiqOlql+cyaeaRPbyTLx3P4a2E9JxIfeIQvLYQ7VVO6Nln3MZx
-   K5BEMjJjpT37N2T77EM44ZV7RNYwhBBE2f2DcxYHzag1kQQ+wBCTaVhA2
-   Q==;
-X-CSE-ConnectionGUID: uDE9yGd1TDedFfBec93Jrg==
-X-CSE-MsgGUID: If21tjQcROi5gg6Gqampeg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11650"; a="79626641"
-X-IronPort-AV: E=Sophos;i="6.21,168,1763452800"; 
-   d="scan'208";a="79626641"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Dec 2025 05:55:24 -0800
-X-CSE-ConnectionGUID: X0Vl+MZxQImF2H9r2iO1ug==
-X-CSE-MsgGUID: NVxBXRpWSZCr2WjBm09GQw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,168,1763452800"; 
-   d="scan'208";a="204584115"
-Received: from igk-lkp-server01.igk.intel.com (HELO 8a0c053bdd2a) ([10.211.93.152])
-  by orviesa005.jf.intel.com with ESMTP; 22 Dec 2025 05:55:20 -0800
-Received: from kbuild by 8a0c053bdd2a with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vXgNZ-000000005V2-3P73;
-	Mon, 22 Dec 2025 13:55:17 +0000
-Date: Mon, 22 Dec 2025 14:54:18 +0100
-From: kernel test robot <lkp@intel.com>
-To: Naga Bhavani Akella <naga.akella@oss.qualcomm.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	anubhavg@qti.qualcomm.com, mohamull@qti.qualcomm.com,
-	hbandi@qti.qualcomm.com, Simon Horman <horms@kernel.org>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Naga Bhavani Akella <naga.akella@oss.qualcomm.com>
-Subject: Re: [PATCH v1] Bluetooth: hci_sync: Initial LE Channel Sounding
- support by defining required HCI command/event structures.
-Message-ID: <202512221453.cZfzdvAS-lkp@intel.com>
-References: <20251216113753.3969183-1-naga.akella@oss.qualcomm.com>
+	s=arc-20240116; t=1766412332; c=relaxed/simple;
+	bh=rCbhBCG3kuZSHT0Z+tcW/TLBtQcP4XcZxoEU4yC1TYs=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=fAK/b9vr2gOZQyQwRK/LbQQ+Ti+iCyTJCEQMuoglPfy4fH7gbxeHeOasnjNlygQNeZh4t6+6Ld7ehqs9j+xzayFcdWkBjppL8fblqtgwdqyPPENIJ9GsPHCqpZqWbhsMLzdnlizHuMBa4HztAD4tdxtbdH7h96MsqSJ5c/AGMCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LqWNEFek; arc=none smtp.client-ip=209.85.128.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-78fc0f33998so19457267b3.0
+        for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 06:05:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1766412330; x=1767017130; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=g5xJgwDc/I3k6P8a8DERXiS6hBpdBmZn1zN7X8eAh88=;
+        b=LqWNEFeksTDJwAepeAu+ou9Vhw4HxfS6l6kpzW98C3Yx6x0FPTKvQi38CIsLqZqBBV
+         lI6nUWrRZD9YFA0AS6emNSbB6wJSt3mTItm1u2C0BYuQexemkUWo5wkpwQUE2zXXe/HB
+         6fSuD97+H6zywFRIk/YsFaXKNha8pMnpKKhOQAeDu9WUNISP1dn56Q92C0pC3kpN5GwF
+         p7N7mn0HwAhS81zU7B0PVkGOWV9YGFLehlfD2UVS9rptjITMT8F6VguSkijeAdxQuox3
+         93Tg17cR6vvq/O12beaTmzcfdCuiNuuyevlPHmdO9bDH3lHPrlN/oFY1XTq9udj7B0MM
+         oHFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766412330; x=1767017130;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=g5xJgwDc/I3k6P8a8DERXiS6hBpdBmZn1zN7X8eAh88=;
+        b=sbEmPMF62ziTvWxIE0NNEWMYi0oqJUfGr2m/iSw/ZpGSeqhfJjWE43kt3LnQdrJUYz
+         TRrpQ02gSJ7uTb9GZ3n1gsgTCi2p+sSdZ3TVMg1PnQ/ejpH8VGMWHmui7G0IdnoeECJB
+         Cr4eUKxgf3r5GxhtEFQp1bS9Y3u51Rwn4SLsazA5FBJJtMmxNJ3i4hjZh31BJ5hKtq9n
+         vYEoUFdcBgKLaPzGhu/r4qFqr/jXpUu9T2YMZbztk5RuZElB9HgSZPcL8C5OYvoCF1Rz
+         ZFP3WVadycto6fD/KG5WE55VHGbM8KWT13w03kF6dT7HHhZS6C7LIiWkpATcQCDujMHw
+         77Gw==
+X-Forwarded-Encrypted: i=1; AJvYcCV4A8uGOQhEQc3OZqrNnZZ+F9vZtB0xLLpD3XReHWDM2PBxW+ZRbCR8Ij8y2obom1N4aGvH2AE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxrj4/KqOJRPcYpdYZu3d2wGzFVcZqDCP0fFGeX0GlRWhITaTYA
+	7LCnPjTog7NQbOv7Zm+OUl8zXKrzn0sRtYZDtcJuvyQNgMFZXnawGlgV
+X-Gm-Gg: AY/fxX76mhxDDq3cLQ1M8WlEoW4uvGczqTb3EdLQrTnlTqblK2qJmugQTbBaNQnNpk2
+	CykvCcuAseEEzpNis+p9AmQiVr+tGuandasrIofHa/D5OlVbHB/N9ANliq31mdtdv93eEU59uRq
+	AsJpFmtl/xf++NDSnquJ00iiBDc3Y+smUI1CdBGiarAzPccXgjEjNfGzV1kdqiEAsJ1UOmc3Ipe
+	T5RD/xhlEn4+bsrouRy4bojK6gSMddiuuYHJNY8B9HNRYmk4NlmibAQfYxO7ZdHc+jBWbxQPDZy
+	Cm4v/N5LXO+Dhr32fOogNDRm2lOIUx2FyCcFnf18vcTmWZii/WUmcl3XxZZzLpuXMtZ4jSxLbyh
+	HNgbL7eNvF8gYPWSdTOWcTZLq9C16231s9gfKh6eshHWhKXushZe0gWGAGB1HmLUWGHyMSlnC3D
+	sazdCTatqr4LY+scUNcZ6McopUHztpHdToYS3bJtXCV+P+U4PF0DlEnHgSx1zPaj8OmOE=
+X-Google-Smtp-Source: AGHT+IFiYy/DTQmfD2ngTMnemVnYy9HxKB7ZtEM8oUBGcMYzdxIovMGajHGYerKCyJ51HTDGAyq5Qw==
+X-Received: by 2002:a05:690c:6903:b0:786:4459:cb84 with SMTP id 00721157ae682-78fb3f709d9mr184034947b3.29.1766412330132;
+        Mon, 22 Dec 2025 06:05:30 -0800 (PST)
+Received: from gmail.com (141.139.145.34.bc.googleusercontent.com. [34.145.139.141])
+        by smtp.gmail.com with UTF8SMTPSA id 00721157ae682-78fb4377f5csm43645607b3.2.2025.12.22.06.05.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Dec 2025 06:05:29 -0800 (PST)
+Date: Mon, 22 Dec 2025 09:05:28 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ David Ahern <dsahern@kernel.org>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>
+Cc: Shuah Khan <shuah@kernel.org>, 
+ Ido Schimmel <idosch@nvidia.com>, 
+ netdev@vger.kernel.org, 
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Message-ID: <willemdebruijn.kernel.7a5aa1f215dd@gmail.com>
+In-Reply-To: <20251221192639.3911901-1-vadim.fedorenko@linux.dev>
+References: <20251221192639.3911901-1-vadim.fedorenko@linux.dev>
+Subject: Re: [PATCH net v3 1/2] net: fib: restore ECMP balance from loopback
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251216113753.3969183-1-naga.akella@oss.qualcomm.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hi Naga,
+Vadim Fedorenko wrote:
+> Preference of nexthop with source address broke ECMP for packets with
+> source addresses which are not in the broadcast domain, but rather added
+> to loopback/dummy interfaces. Original behaviour was to balance over
+> nexthops while now it uses the latest nexthop from the group. To fix the
+> issue introduce next hop scoring system where next hops with source
+> address equal to requested will always have higher priority.
+> 
+> For the case with 198.51.100.1/32 assigned to dummy0 and routed using
+> 192.0.2.0/24 and 203.0.113.0/24 networks:
+> 
+> 2: dummy0: <BROADCAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
+>     link/ether d6:54:8a:ff:78:f5 brd ff:ff:ff:ff:ff:ff
+>     inet 198.51.100.1/32 scope global dummy0
+>        valid_lft forever preferred_lft forever
+> 7: veth1@if6: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+>     link/ether 06:ed:98:87:6d:8a brd ff:ff:ff:ff:ff:ff link-netnsid 0
+>     inet 192.0.2.2/24 scope global veth1
+>        valid_lft forever preferred_lft forever
+>     inet6 fe80::4ed:98ff:fe87:6d8a/64 scope link proto kernel_ll
+>        valid_lft forever preferred_lft forever
+> 9: veth3@if8: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
+>     link/ether ae:75:23:38:a0:d2 brd ff:ff:ff:ff:ff:ff link-netnsid 0
+>     inet 203.0.113.2/24 scope global veth3
+>        valid_lft forever preferred_lft forever
+>     inet6 fe80::ac75:23ff:fe38:a0d2/64 scope link proto kernel_ll
+>        valid_lft forever preferred_lft forever
+> 
+> ~ ip ro list:
+> default
+> 	nexthop via 192.0.2.1 dev veth1 weight 1
+> 	nexthop via 203.0.113.1 dev veth3 weight 1
+> 192.0.2.0/24 dev veth1 proto kernel scope link src 192.0.2.2
+> 203.0.113.0/24 dev veth3 proto kernel scope link src 203.0.113.2
+> 
+> before:
+>    for i in {1..255} ; do ip ro get 10.0.0.$i; done | grep veth | awk ' {print $(NF-2)}' | sort | uniq -c:
+>     255 veth3
+> 
+> after:
+>    for i in {1..255} ; do ip ro get 10.0.0.$i; done | grep veth | awk ' {print $(NF-2)}' | sort | uniq -c:
+>     122 veth1
+>     133 veth3
+> 
+> Fixes: 32607a332cfe ("ipv4: prefer multipath nexthop that matches source address")
+> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on bluetooth-next/master]
-[also build test ERROR on net-next/main net/main]
-[cannot apply to bluetooth/master linus/master v6.16-rc1 next-20251219]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Naga-Bhavani-Akella/Bluetooth-hci_sync-Initial-LE-Channel-Sounding-support-by-defining-required-HCI-command-event-structures/20251216-202908
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-patch link:    https://lore.kernel.org/r/20251216113753.3969183-1-naga.akella%40oss.qualcomm.com
-patch subject: [PATCH v1] Bluetooth: hci_sync: Initial LE Channel Sounding support by defining required HCI command/event structures.
-config: x86_64-rhel-9.4-ltp (https://download.01.org/0day-ci/archive/20251222/202512221453.cZfzdvAS-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251222/202512221453.cZfzdvAS-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202512221453.cZfzdvAS-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from include/net/bluetooth/hci_core.h:35,
-                    from net/bluetooth/hci_core.c:39:
->> include/net/bluetooth/hci.h:2430:8: error: redefinition of 'struct hci_cp_le_cs_set_proc_param'
-    2430 | struct hci_cp_le_cs_set_proc_param {
-         |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/net/bluetooth/hci.h:2407:8: note: originally defined here
-    2407 | struct hci_cp_le_cs_set_proc_param {
-         |        ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-vim +2430 include/net/bluetooth/hci.h
-
-  2428	
-  2429	#define HCI_OP_LE_CS_SET_PROC_ENABLE		0x2094
-> 2430	struct hci_cp_le_cs_set_proc_param {
-  2431		__le16  conn_hdl;
-  2432		__u8	config_id;
-  2433		__u8	enable;
-  2434	} __packed;
-  2435	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
