@@ -1,371 +1,123 @@
-Return-Path: <netdev+bounces-245678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC5EBCD5144
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 09:36:49 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FB72CD52F1
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 09:53:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AF57C30069A5
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 08:36:41 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 46F793006A7D
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 08:51:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF0E03148A3;
-	Mon, 22 Dec 2025 08:20:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0448531076B;
+	Mon, 22 Dec 2025 08:51:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmo-cybersecurity.com header.i=@gmo-cybersecurity.com header.b="UcYgICMm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ibFuBbcz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A3EA309EF4
-	for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 08:20:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 520E630F925
+	for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 08:51:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766391642; cv=none; b=TMSpr42317QggnAeqjkA1ijdf8/eIa6ksPdHfxx5jy4G9DK0bZstoiUUMFDRB1I3uAHzkmRDi/kKIij8fqe4Qinr0Ttgq0/sLjokvOnzzpPIUe9b7q6UGZpleZ85BR+Kw+AHSzJ/Sdi8yk4P0dCD9ynD8WoYDhx7s2+FKtviVWI=
+	t=1766393472; cv=none; b=G8CjKpiilyeWLMfqseyFlISR2wbxZx9bY+RsGwSaUI5WzRafdRhPVxjDEL9+K1jAMpf31P0WsgBVR4YEkS7+4f4a1sy7KNhcy9glaScYbQLz5eKtEmNVP480oK+Ckpo8BLeoHC8D/lcskV8lYGGlE0lLG4x0ucjPzJf1i3652l4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766391642; c=relaxed/simple;
-	bh=TfXKPvtAwYa3TXExy4kQk1h5Bl9Hq5LwnLjyUl82o4s=;
+	s=arc-20240116; t=1766393472; c=relaxed/simple;
+	bh=ruXs5/RFst6fuaU8dBOLXd+Sk9KuNS19f9hQyg/KEWA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FhVUsQStgQF+11aZUM/S/jzLTpAStQKyZNv8Iifp2hdOTdLIMuQn4plEsk7XixvowXOVLGyIl/Ec1VoITEh2zkkwZi8dhS8svpRcukdrQqZUjbdLlfCS7iqqx39848Jwz3CeqiVqz77xKyhOi9VqEWCK0uIckutcWA5ndxibPdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmo-cybersecurity.com; spf=pass smtp.mailfrom=gmo-cybersecurity.com; dkim=pass (2048-bit key) header.d=gmo-cybersecurity.com header.i=@gmo-cybersecurity.com header.b=UcYgICMm; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmo-cybersecurity.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmo-cybersecurity.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-640e9f5951aso7215805a12.1
-        for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 00:20:40 -0800 (PST)
+	 To:Cc:Content-Type; b=isY0/QibhEdmEAi/N81WVkm0/NC6F/J0H7xT/2UMR2D3DKGhyinJXN3PK6i4vfjAmSjQw2lVq1dQ2lXXy8+DnctU/VA+mhNHoEhpGE+X2A3ojqysBSuNf49C5CCG0gBostJOEwoao9PTLuN4MgZybXkOt+ZbTaxlb6fmiOTdYsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ibFuBbcz; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4ed66b5abf7so48011951cf.1
+        for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 00:51:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmo-cybersecurity.com; s=google; t=1766391639; x=1766996439; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1766393470; x=1766998270; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4vFrug2aexRUXQele0J+Z94eTfXsf6Puge4QHqxZySA=;
-        b=UcYgICMmj9NGOYKtq1yYHngJ0Hk9VwZvRur+o/eiLwPngbTa9XugckifrIX6p6YpYc
-         SmNY7t17AdD5xf2HZj7S5DFtxDwGiwBFq32PsXvFKHaRXwXiFbK+5ebqbgzgpRJWYM0+
-         dJr16CuYBwTjbpJOX4Jaemv5lMESGg6DBeMsATpJQhNhKZy5D1HlSYFgUQVTim1Bn5F5
-         51mQw6qa+UkgiPUan7+bQgQXaogqfy7OUFZZg7/cX7GxrBOkfvpik9wNdyLw46joMeVX
-         FfD0smR8tp8iEt338wiLjO0l0+fxJ7vWls+ZF9elLc79HKTRfkcMJSaeNqTrL2KFMM5Y
-         LqSQ==
+        bh=YTcRCL2LSV7oA+h6PPnW7Xs5s3C4m6VV54Y7cZ/iahc=;
+        b=ibFuBbczG72CkBFTMpB1AcD2VzO8ZFJruEEyihmMeQ+LUHV4nLBAQ3PKRp7ZF2nhzQ
+         q0v8uhR0DTO8N1vpd8UHV9SmrjL04kE2QOsLP62x9ve6fOkmkGthXLutTGrbIoZEWceo
+         YlGuV/szMdmNxNpvA9wOvJxgBzjzoK2xmt2818xzwPCrizFRIqtwX3u2hBfnNVcNvbsN
+         9Vrtf3L3p8EwMFFnm3RS2F8ZjScb8V67bZm0kI2qRoMPOh5mSI+F0Z+Nrqucrtx3XN52
+         AdhkJRGNDGdJ6a42IaJ+xTdDZ/FtT8t+QzQR4zV6GRpPm5E4YGdbB3nRQoW/TtUTYnsA
+         /qmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766391639; x=1766996439;
+        d=1e100.net; s=20230601; t=1766393470; x=1766998270;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=4vFrug2aexRUXQele0J+Z94eTfXsf6Puge4QHqxZySA=;
-        b=Fk8/yW4Aq2SR7PGURa5JIyn5fs+SfjFULQLvcOWPhvG64UfM5VvG7j+foJCtARNbdp
-         6LXHcPhreBIQji+96waCK+dskWrbkldfe7HL0Dk9RfbNB9PT6qL7LzZqioQup7tRTclx
-         5kYzSfcp2VPYiF8a2ZJVQLhlX4wJb8+5+/h9DOKEgv9fi9Wd06TEjWFNidS4G1DJh4N1
-         Fw97Iom/4WxE2zC4v2huUwSUlEvHCGxijYxE+ppFEMgn9WJ5tEYdpgdSzDFTJ1hRhjVN
-         wR/+2cET+0C4HZZgg15zQSmK/mNC329UWBZO+mAULqt51x37mGIkaan7brTidUAwEqlj
-         fLrw==
-X-Forwarded-Encrypted: i=1; AJvYcCXF82XIjW7qd9RSWgmP+r/RUiOoPH5RZlh0BZUWKO8DJL+R4Rfnz1jxJD6TLJVyrVH2/xt6tSI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwulKtfwFuUYjFCM7q6xEIFxCNe4BnmRaG/fRpoLXjpHlDox0/U
-	IxA3vrzzD7I9Z6PC8zdys6IRzxPRub8UztcA/o46FptDEa5c/quFNDL5L7yohpXabkaOZxxFNeS
-	p+YvfovGeIqDkfXiUyAA8kMSftd9MZxl/sjJblLF0uw==
-X-Gm-Gg: AY/fxX7YtO4gfLX95pR4B6AYiLzZW3g8GyuBAYPAMc3djJuMlmZ1zvFB9OvH1+Iez58
-	TCgy8xd/oOuDmORx1FxfdZpMbIdc5ufyyZbPYnmNpIN42TsrWomGS3EPyIJxcOC+WR5XeDKXBGH
-	h8poLIZNj1JPeT0PEoHia4OiMEpn5rb+RzLQFGzWTx4tb2SVjsqcDeUMItcAUnpGsbcAdOY7yV7
-	Dj5SXAZy/oo6BcRPg3MpAmOoDgZhrErsnKg45aqK417IAlWZXt3LcyGmPLjYsJS/am9asmAXQ==
-X-Google-Smtp-Source: AGHT+IEhuT1EpOHmHrxi2B/NBYWIYd2nesuOmJD1H+aT4j28E6IFQZcK1380CiXvJUOUXu5hkAV5YV6sGOhZqT5IgP0=
-X-Received: by 2002:a17:907:6ea3:b0:b76:cf68:72a7 with SMTP id
- a640c23a62f3a-b80205ea0e2mr1344813766b.27.1766391638508; Mon, 22 Dec 2025
- 00:20:38 -0800 (PST)
+        bh=YTcRCL2LSV7oA+h6PPnW7Xs5s3C4m6VV54Y7cZ/iahc=;
+        b=xTdG+a2DdapAdf+e4AZNtAQmjVSscUft715IwR1EY2pSGBs43gbgzKvcy08gd1XxQv
+         jWNWImB0Jqid5ytpbNha/BD1gdv2NrxOCD6cAm9Ndg/V6ZLjXfTZs09+9z7ABpk+pCwY
+         Y5jj+UysMwkNnpFQmH2fi8eeuoNSX/c3CeqMdRqUFelvL+siL8s7oVW2SkVvc/jEVCDA
+         95Hh2CJB1AEWD/14CgcAdOw+7lmhFnZdMo6LlRJ4AkLvoD4+az1ETtiG2qp7rBgDo7VN
+         vNtsv+UUX3oAv75oGdX9q0K9c/77nbKQjZKpri7MkuTUn22CX6yKWFn5Vxv8BoIe3Cso
+         jbCg==
+X-Gm-Message-State: AOJu0Yy/fxrl35EC9/g/vFxQn8tbNUG+YBek5cNsyCxmJ0csxT8rEsOT
+	vcYOcER1UST7AfxfpL/r8kvg55H5p9m7NZI14nrmqHe5GkWm8E1QctIVSwE7NICmUOiBOnL3Vhj
+	cN11Hpy7f4AjqJfcEKNKnmuPWFYb8nKxkrc44UlG3
+X-Gm-Gg: AY/fxX6GdwM4uTj5tfyydat+OWhiAxvIdZuXkD+EIgrGP5EzAMuv/B808j4B9dPYCG1
+	wNkSeTG2UFNEbOU3zwxHI3Y/Q/OGQ3DvYjTPBqXljvl+VpSFGicOWWipY/LLHW67ej9+YJhZbU/
+	kmnXVA1unr/DWSBuji/nlRlcZINPCwhj0h33yKd8dSnbJY1N6m0L+K+v63RGRarQ1SJ/JdZaIjn
+	8L6dT6+pO9TM/wQvfS8x7hghKHW/pEACO46sXPZAm6r5HUKwI4Um10aKj/Xa+0ybZ9OlRGFTUSg
+	mkcS7w==
+X-Google-Smtp-Source: AGHT+IHpKtcGoaFcyM3/Nnwpgy7rFN8gVX4PgeFXdHVXhC+0aIRi5LCrcg4VI3/B0/Uxs1K2zrDKvlcc+64V830emrU=
+X-Received: by 2002:a05:622a:1f8a:b0:4f1:83e4:70d0 with SMTP id
+ d75a77b69052e-4f4aadb1131mr181306581cf.34.1766393469958; Mon, 22 Dec 2025
+ 00:51:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAA3_Gnogt7GR0gZVZwQ4vXXav6TpXMK6t=QTLsqKOaX3Bo_tNA@mail.gmail.com>
- <CANn89iLVq=3d7Ra7gKmTpLcMzuWv+KamYs=KjUHH2z3cPpDBDA@mail.gmail.com>
- <CAA3_GnrVyeXtLjhZ_d9=0x58YmK+a9yADfp+LRCBHQo_TEDyvw@mail.gmail.com> <CANn89iJN-fcx-szsR3Azp8wQ0zhXp0XiYJofQU1zqqtdj7SWTA@mail.gmail.com>
-In-Reply-To: <CANn89iJN-fcx-szsR3Azp8wQ0zhXp0XiYJofQU1zqqtdj7SWTA@mail.gmail.com>
-From: =?UTF-8?B?5bCP5rGg5oKg55Sf?= <yuki.koike@gmo-cybersecurity.com>
-Date: Mon, 22 Dec 2025 17:20:02 +0900
-X-Gm-Features: AQt7F2qyOV1gIjrNuXaLe1luyTOq-SD-YtCiBIsiJJaBmLWRU9dL9WBmrTLwjPs
-Message-ID: <CACwEKLp42TwpK_3FEp85bq81eA1zg3777guNMonW9cm2i7aN2Q@mail.gmail.com>
-Subject: Re: [PATCH net] bonding: Fix header_ops type confusion
-To: Eric Dumazet <edumazet@google.com>
-Cc: =?UTF-8?B?5oi455Sw5pmD5aSq?= <kota.toda@gmo-cybersecurity.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
+References: <20251219025140.77695-1-jiayuan.chen@linux.dev>
+In-Reply-To: <20251219025140.77695-1-jiayuan.chen@linux.dev>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 22 Dec 2025 09:50:58 +0100
+X-Gm-Features: AQt7F2qlaUdi_Ael9gRYCKCL6sZMzKdOsY2sFDrI0SpdgEap_PpnZPFgW9I7Sh8
+Message-ID: <CANn89iLeASUZyonYSLX0AG5mbC=gxux0efehkBc_j1bbj6xrvA@mail.gmail.com>
+Subject: Re: [PATCH net v2] ipv6: fix a BUG in rt6_get_pcpu_route() under PREEMPT_RT
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: netdev@vger.kernel.org, 
+	syzbot+9b35e9bc0951140d13e6@syzkaller.appspotmail.com, 
+	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Clark Williams <clrkwllms@kernel.org>, 
+	Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org, 
+	linux-rt-devel@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hello, Eric and other maintainers,
-
-I'm deeply sorry to have left the patch suggestion for this long period.
-I became extremely busy, and that took its toll on my health, causing
-me to take sick leave for nearly half a year (And my colleague Kota
-had been waiting for me to come back).
-As fortunately I've recovered and returned to work, I hope to move
-forward with this matter as well.
-
-Recalling the issue Eric raised, I understand it was a concern about
-potential race conditions arising from the `bond_header_ops` and
-`header_slave_dev` added to the `struct bonding`. For example, one
-could imagine a situation where `header_slave_dev` is rewritten to a
-different type, and at that exact moment a function from the old
-`bond_header_ops` gets called, or vice versa.
-
-However, I am actually skeptical that this can happen. The reason is
-that `bond_setup_by_slave` is only called when there are no slaves at
-all:
-
-```
-bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
-             struct netlink_ext_ack *extack)
-...
-  if (!bond_has_slaves(bond)) {
-...
-      if (slave_dev->type !=3D ARPHRD_ETHER)
-        bond_setup_by_slave(bond_dev, slave_dev);
-```
-
-In other words, in order to trigger a race condition, one would need
-to remove the slave once and make the slave list empty first. However,
-as shown below, in `bond_release_and_destroy`, when the slave list
-becomes empty, it appears that the bond interface itself is removed.
-This makes it seem impossible to "quickly remove a slave and
-re-register it.":
-
-```
-static int bond_slave_netdev_event(unsigned long event,
-           struct net_device *slave_dev)
-...
-  switch (event) {
-  case NETDEV_UNREGISTER:
-    if (bond_dev->type !=3D ARPHRD_ETHER)
-      bond_release_and_destroy(bond_dev, slave_dev);
-...
-}
-...
-/* First release a slave and then destroy the bond if no more slaves are le=
-ft.
- * Must be under rtnl_lock when this function is called.
- */
-static int bond_release_and_destroy(struct net_device *bond_dev,
-            struct net_device *slave_dev)
-{
-  struct bonding *bond =3D netdev_priv(bond_dev);
-  int ret;
-
-  ret =3D __bond_release_one(bond_dev, slave_dev, false, true);
-  if (ret =3D=3D 0 && !bond_has_slaves(bond) &&
-      bond_dev->reg_state !=3D NETREG_UNREGISTERING) {
-    bond_dev->priv_flags |=3D IFF_DISABLE_NETPOLL;
-    netdev_info(bond_dev, "Destroying bond\n");
-    bond_remove_proc_entry(bond);
-    unregister_netdevice(bond_dev);
-  }
-  return ret;
-}
-```
-
-Moreover, as noted in the comments, these functions are executed under
-the netlink-side lock. Therefore, my conclusion is that a race
-condition cannot actually occur. I also think that the fact that, even
-before our patch, these code paths had almost no explicit locking
-anywhere serves as circumstantial evidence for this view. As Kota
-said, as far as I saw, the past syzkaller-bot's report is seemingly
-only NULL pointer dereference due to the root cause we reported, and
-this patch should fix them.
-
-That said, even so, I agree that the kind of countermeasures Eric
-suggests are worth applying if they do not cause problems in terms of
-execution speed or code size. However, I am concerned that addressing
-this with READ_ONCE or RCU would imply a somewhat large amount of
-rewriting.
-`header_ops` is designed to allow various types of devices to be
-handled in an object-oriented way, and as such it is used throughout
-many parts of the Linux kernel. Using READ_ONCE or RCU every time
-header_ops is accessed simply because we are worried about a race
-condition in bond=E2=80=99s header_ops seems to imply changes like the
-following, for example:
-
-```
-diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-index 92dc1f1788de..d9aad38746ad 100644
---- a/net/core/neighbour.c
-+++ b/net/core/neighbour.c
-@@ -1538,7 +1538,7 @@ static void neigh_hh_init(struct neighbour *n)
-  * hh_cache entry.
-  */
-  if (!hh->hh_len)
-- dev->header_ops->cache(n, hh, prot);
-+ READ_ONCE(dev->header_ops->cache)(n, hh, prot);
-
-  write_unlock_bh(&n->lock);
- }
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -3131,35 +3131,41 @@ static inline int dev_hard_header(struct
-sk_buff *skb, struct net_device *dev,
-   const void *daddr, const void *saddr,
-   unsigned int len)
- {
-- if (!dev->header_ops || !dev->header_ops->create)
-+ int (*create)(struct sk_buff *skb, struct net_device *dev,
-+      unsigned short type, const void *daddr,
-+      const void *saddr, unsigned int len);
-+ if (!dev->header_ops || !(create =3D READ_ONCE(dev->header_ops->create)))
-  return 0;
-
-- return dev->header_ops->create(skb, dev, type, daddr, saddr, len);
-+ return create(skb, dev, type, daddr, saddr, len);
- }
-
- static inline int dev_parse_header(const struct sk_buff *skb,
-    unsigned char *haddr)
- {
-+ int (*parse)(const struct sk_buff *skb, unsigned char *haddr);
-  const struct net_device *dev =3D skb->dev;
-
-- if (!dev->header_ops || !dev->header_ops->parse)
-+ if (!dev->header_ops || !(parse =3D READ_ONCE(dev->header_ops->parse)))
-  return 0;
-- return dev->header_ops->parse(skb, haddr);
-+ return parse(skb, haddr);
- }
-... (and so on)
-```
-
-It looks like we would end up rewriting on the order of a dozen or so
-places with this kind of pattern, but from the perspective of the
-maintainers (or in terms of Linux kernel culture), would this be
-considered an acceptable change?
-If this differs from what you intended, please correct me.
-
-Best regards,
-Yuki Koike
-
-2025=E5=B9=B45=E6=9C=8829=E6=97=A5(=E6=9C=A8) 0:10 Eric Dumazet <edumazet@g=
-oogle.com>:
+On Fri, Dec 19, 2025 at 3:52=E2=80=AFAM Jiayuan Chen <jiayuan.chen@linux.de=
+v> wrote:
 >
-> On Wed, May 28, 2025 at 7:36=E2=80=AFAM =E6=88=B8=E7=94=B0=E6=99=83=E5=A4=
-=AA <kota.toda@gmo-cybersecurity.com> wrote:
-> >
-> > Thank you for your review.
-> >
-> > 2025=E5=B9=B45=E6=9C=8826=E6=97=A5(=E6=9C=88) 17:23 Eric Dumazet <eduma=
-zet@google.com>:
-> > >
-> > > On Sun, May 25, 2025 at 10:08=E2=80=AFPM =E6=88=B8=E7=94=B0=E6=99=83=
-=E5=A4=AA <kota.toda@gmo-cybersecurity.com> wrote:
-> > > >
-> > > > In bond_setup_by_slave(), the slave=E2=80=99s header_ops are uncond=
-itionally
-> > > > copied into the bonding device. As a result, the bonding device may=
- invoke
-> > > > the slave-specific header operations on itself, causing
-> > > > netdev_priv(bond_dev) (a struct bonding) to be incorrectly interpre=
-ted
-> > > > as the slave's private-data type.
-> > > >
-> > > > This type-confusion bug can lead to out-of-bounds writes into the s=
-kb,
-> > > > resulting in memory corruption.
-> > > >
-> > > > This patch adds two members to struct bonding, bond_header_ops and
-> > > > header_slave_dev, to avoid type-confusion while keeping track of th=
-e
-> > > > slave's header_ops.
-> > > >
-> > > > Fixes: 1284cd3a2b740 (bonding: two small fixes for IPoIB support)
-> > > > Signed-off-by: Kota Toda <kota.toda@gmo-cybersecurity.com>
-> > > > Signed-off-by: Yuki Koike <yuki.koike@gmo-cybersecurity.com>
-> > > > Co-Developed-by: Yuki Koike <yuki.koike@gmo-cybersecurity.com>
-> > > > Reviewed-by: Paolo Abeni <pabeni@redhat.com>
-> > > > Reported-by: Kota Toda <kota.toda@gmo-cybersecurity.com>
-> > > > ---
-> > > >  drivers/net/bonding/bond_main.c | 61
-> > > > ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
-> > > >  include/net/bonding.h           |  5 +++++
-> > > >  2 files changed, 65 insertions(+), 1 deletion(-)
-> > > >
-> > > > diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/=
-bond_main.c
-> > > > index 8ea183da8d53..690f3e0971d0 100644
-> > > > --- a/drivers/net/bonding/bond_main.c
-> > > > +++ b/drivers/net/bonding/bond_main.c
-> > > > @@ -1619,14 +1619,65 @@ static void bond_compute_features(struct bo=
-nding *bond)
-> > > >      netdev_change_features(bond_dev);
-> > > >  }
-> > > >
-> > > > +static int bond_hard_header(struct sk_buff *skb, struct net_device=
- *dev,
-> > > > +        unsigned short type, const void *daddr,
-> > > > +        const void *saddr, unsigned int len)
-> > > > +{
-> > > > +    struct bonding *bond =3D netdev_priv(dev);
-> > > > +    struct net_device *slave_dev;
-> > > > +
-> > > > +    slave_dev =3D bond->header_slave_dev;
-> > > > +
-> > > > +    return dev_hard_header(skb, slave_dev, type, daddr, saddr, len=
-);
-> > > > +}
-> > > > +
-> > > > +static void bond_header_cache_update(struct hh_cache *hh, const
-> > > > struct net_device *dev,
-> > > > +        const unsigned char *haddr)
-> > > > +{
-> > > > +    const struct bonding *bond =3D netdev_priv(dev);
-> > > > +    struct net_device *slave_dev;
-> > > > +
-> > > > +    slave_dev =3D bond->header_slave_dev;
-> > >
-> > > I do not see any barrier ?
-> > >
-> > > > +
-> > > > +    if (!slave_dev->header_ops || !slave_dev->header_ops->cache_up=
-date)
-> > > > +        return;
-> > > > +
-> > > > +    slave_dev->header_ops->cache_update(hh, slave_dev, haddr);
-> > > > +}
-> > > > +
-> > > >  static void bond_setup_by_slave(struct net_device *bond_dev,
-> > > >                  struct net_device *slave_dev)
-> > > >  {
-> > > > +    struct bonding *bond =3D netdev_priv(bond_dev);
-> > > >      bool was_up =3D !!(bond_dev->flags & IFF_UP);
-> > > >
-> > > >      dev_close(bond_dev);
-> > > >
-> > > > -    bond_dev->header_ops        =3D slave_dev->header_ops;
-> > > > +    /* Some functions are given dev as an argument
-> > > > +     * while others not. When dev is not given, we cannot
-> > > > +     * find out what is the slave device through struct bonding
-> > > > +     * (the private data of bond_dev). Therefore, we need a raw
-> > > > +     * header_ops variable instead of its pointer to const header_=
-ops
-> > > > +     * and assign slave's functions directly.
-> > > > +     * For the other case, we set the wrapper functions that pass
-> > > > +     * slave_dev to the wrapped functions.
-> > > > +     */
-> > > > +    bond->bond_header_ops.create =3D bond_hard_header;
-> > > > +    bond->bond_header_ops.cache_update =3D bond_header_cache_updat=
-e;
-> > > > +    if (slave_dev->header_ops) {
-> > > > +        bond->bond_header_ops.parse =3D slave_dev->header_ops->par=
-se;
-> > > > +        bond->bond_header_ops.cache =3D slave_dev->header_ops->cac=
-he;
-> > > > +        bond->bond_header_ops.validate =3D slave_dev->header_ops->=
-validate;
-> > > > +        bond->bond_header_ops.parse_protocol =3D
-> > > > slave_dev->header_ops->parse_protocol;
-> > >
-> > > All these updates probably need WRITE_ONCE(), and corresponding
-> > > READ_ONCE() on reader sides, at a very minimum ...
-> > >
-> > > RCU would even be better later.
-> > >
-> > I believe that locking is not necessary in this patch. The update of
-> > `header_ops` only happens when a slave is newly enslaved to a bond.
-> > Under such circumstances, members of `header_ops` are not called in
-> > parallel with updating. Therefore, there is no possibility of race
-> > conditions occurring.
+> On PREEMPT_RT kernels, after rt6_get_pcpu_route() returns NULL, the
+> current task can be preempted. Another task running on the same CPU
+> may then execute rt6_make_pcpu_route() and successfully install a
+> pcpu_rt entry. When the first task resumes execution, its cmpxchg()
+> in rt6_make_pcpu_route() will fail because rt6i_pcpu is no longer
+> NULL, triggering the BUG_ON(prev). It's easy to reproduce it by adding
+> mdelay() after rt6_get_pcpu_route().
 >
-> bond_dev can certainly be live, and packets can flow.
+> Using preempt_disable/enable is not appropriate here because
+> ip6_rt_pcpu_alloc() may sleep.
 >
-> I have seen enough syzbot reports hinting at this precise issue.
+> Fix this by:
+> 1. Removing the BUG_ON and instead handling the race gracefully by
+>    freeing our allocation and returning the existing pcpu_rt when
+>    cmpxchg() fails.
+> 2. Keeping the BUG_ON for non-PREEMPT_RT kernels, since preemption
+>    should not occur in this context and a cmpxchg failure would
+>    indicate a real bug.
+>
+> Link: https://syzkaller.appspot.com/bug?extid=3D9b35e9bc0951140d13e6
+> Fixes: 951f788a80ff ("ipv6: fix a BUG in rt6_get_pcpu_route()")
+
+I would rather find when PREEMPT_RT was added/enabled, there is no
+point blaming such an old commit
+which was correct at the time, and forcing pointless backports to old
+linux kernels.
 
