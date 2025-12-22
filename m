@@ -1,173 +1,151 @@
-Return-Path: <netdev+bounces-245697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA15DCD5D65
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 12:44:16 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9109ECD5D80
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 12:48:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AB091300BA31
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 11:44:15 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 4AA8E3015767
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 11:48:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B675C31AA8F;
-	Mon, 22 Dec 2025 11:44:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 467E431B107;
+	Mon, 22 Dec 2025 11:48:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WkHek4/R";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="AsA6dKwd"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h2zMOafh";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="KcXpt6J+"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05CB631A80E
-	for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 11:44:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 667EF31A7F6
+	for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 11:48:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766403854; cv=none; b=dSkRCO5RA/ZeHmQfbVU8deiho9M8lpxW2wy3tnHWcMp2wuxSuFGSBsiZ2OGW950BGwrFDSUSr28RuzeK3y9faI9nuwTYy/N+Y7rJPHRX3/sCE6rXQpzRoPBMJIxy2ms8kM5JqsLh1TMW/q8G8PvDSWN5GBzMnfkHx+jVwdUCRwY=
+	t=1766404101; cv=none; b=XGBMNHBxpb8JUtV0W4H5v+Can7bkWzUEXDXkQjK1STfprW24y+fNQ1YgBnSdIGqVMHgp0Neb/moWgx5qbTT2AEXipG7AZenzvb8rDg7nFaJNCOJNXm0N7BNPbvbj3pWAly7DWLN66NyGWWkJEHUnMCnXEbhYEFyeETBserRHnck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766403854; c=relaxed/simple;
-	bh=0sfgBkK79JwX8MkXUfHrCJdJ2/kUJNYSOoZ4tbCudrk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XrghmkJiDWmZmIpODkVpoDv5V7UAsJVZGrMdq0eXC2zdrWXoLYAu1hBffmaQzuCWJGJGyQICgQqTuBDzG8mnkOxJctrBKP9esOy2oyb2BjkOiuARs6BsJNZeBx97QPGfDWmHQoBKDwbcxzN7zwi3HFyAJIF+lsTfm+a+RF9HuMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WkHek4/R; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=AsA6dKwd; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1766404101; c=relaxed/simple;
+	bh=lYuLP9aLBqUlpP+urfkQzNeqIQUc+NMj+DtIqhGgHuU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RgM/MHnGPP5m6Fg4m4BeQcw9Q+GD7kMRqJfTEkr9EQBHap0YU2U7fzVIOPQkUUHRldYdQS3+tMM+/0+MNoEj4punhbpbPhw43uqbaGLaorme7n+sOo+KOtgmBoDzOyQbiyYbQBxhMtvlS8zmOx8LvGcSUChgIlqU0uj3hayb4GU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h2zMOafh; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=KcXpt6J+; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766403851;
+	s=mimecast20190719; t=1766404098;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0sfgBkK79JwX8MkXUfHrCJdJ2/kUJNYSOoZ4tbCudrk=;
-	b=WkHek4/R9MtjVg7fNmWmLeiLrYt9TzagXycA78zcHvD/jIziS6lS3lyKmbg+57pj4C4ItQ
-	XTE2Y7B2LZp4EHd/zCLXl401iFFY9s8O5vyZ4SoMLB2yLMK+eD/+Y5eGKlTed5EJ2gMqmN
-	awMtVQmbzHBqEiNGbZAapEYdYY0t2JM=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=5OThu/IjAGzkBq+quJ/q8oM4R3JgY1MkWRoPROf/868=;
+	b=h2zMOafhSBS7dNcfXcVZSr/csE187+awzbXW/rNl/PQ+XAyQHRh1nTqYEnZgvk3/QGI7gN
+	m6MRkw3XBvB75crwIoFaVURztPjEJJGEtgI5uRn2P/If1HAHmoo3HqFqrlvr7NrFBO+fTi
+	BnFIzVb4X/5GY/HxqmpMCjutOI52U7Q=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-680-XMMzXcPXPvuPmjOBT6k8XA-1; Mon, 22 Dec 2025 06:44:10 -0500
-X-MC-Unique: XMMzXcPXPvuPmjOBT6k8XA-1
-X-Mimecast-MFC-AGG-ID: XMMzXcPXPvuPmjOBT6k8XA_1766403849
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-b7d28772a67so385964266b.1
-        for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 03:44:10 -0800 (PST)
+ us-mta-340-tYOYE5OrO1mrzLEHYYQ5-A-1; Mon, 22 Dec 2025 06:48:16 -0500
+X-MC-Unique: tYOYE5OrO1mrzLEHYYQ5-A-1
+X-Mimecast-MFC-AGG-ID: tYOYE5OrO1mrzLEHYYQ5-A_1766404096
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4779b3749a8so28152655e9.1
+        for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 03:48:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1766403849; x=1767008649; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0sfgBkK79JwX8MkXUfHrCJdJ2/kUJNYSOoZ4tbCudrk=;
-        b=AsA6dKwdlvaLW3pkm/oCTxgltfk6LTAOZcN1pS+xxYNWe8Ttbydm9/otCV0pxdaU8i
-         kfO5ejQPYoD1uv1arAAcum0a83fqk31lwHQC3fvkJfcLatUKNFh1GTYFOHl6WD3ZIhT0
-         rm7GROT9r7t8UkH0zlOCCblt45SX26nlp3O97jy9aq3THxzRld5Wf+x0wLGF+TkSVcsk
-         s5RHsG6uPMLtVxlHKSdiR04+mMPckPscBTd7JvSAlV9ruFmih+SmF2bdkNs5v7mm0JQE
-         bikc/ZmzkXheNArk8V1tkSiVY9nsXaQ1NGuyoaIROhllzuKxmrVvpapUkdo7bwvgD4Xp
-         syyA==
+        d=redhat.com; s=google; t=1766404096; x=1767008896; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5OThu/IjAGzkBq+quJ/q8oM4R3JgY1MkWRoPROf/868=;
+        b=KcXpt6J+SH2JEd02GpQnONOXAPKKleQtqc0k+06N/hKHJj7W+xakWc/YOxaGEF+Yay
+         ncPAlBoAltso9V81i0/BQN47TVtvwwTXlEY4Pz0oS7WELECXpbvDmaGgMVEIcJl4VxPN
+         7R5AW3FLLKYOjomsAJ+H7FL9SXXa8syrFdBAF6i8QhEFb56u4NCIkSKUyYuur76RRua8
+         ejV+jBe6R8kaRVB5uClBpgWaCM1XB2gwcQLu6W+Ra67FHhHMRJVNkHuzLPVBLq6lIaj/
+         3mvw+9Fmbei/sBYCbmF2yLteFU+1s1jiKoycpqHCvfvsElM1ETySzaeorNJIwKgUfWyY
+         a6gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766403849; x=1767008649;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=0sfgBkK79JwX8MkXUfHrCJdJ2/kUJNYSOoZ4tbCudrk=;
-        b=oZv0ah3v1xNi68cpmHWx91eN1H01f6IfAOx00I15+Rks6MvLQx3yQGHxIiNd5Eeleg
-         f9dCVRJf21/hkF4OmEyjJUa10/xrGzGyO5H6NEwM8mloXJEwRDEcc8IvkcxHIH+P8Ca+
-         3YniaBcQpUH6aAj9sZaNhraFo4B0gqCuiFv2fG9MGO1JAewqZKHSICyZN64lbfpub3XD
-         tCNZJL72XWGnF+VkGbtbz2QNo+tUq8vd8wwtCiuxao8VArU+HxCdPIVVqcNmqR4W2dPu
-         4kxbh8xkXS3uPxzQmrWCx0lXIVTwC+rw9KSyCgB8jvjguONA1/F7yCrwX7mms36E42ZG
-         QBAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXhuk99hDBRy3hXAubDfoLZPGAUb4wbHeUly6o8SCEW0F+rtbw3HM0YwySlUqt62/pRmpKXGqs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzcdTqsf03N58wRs9lpN+bh0IEOkfl8nTBLuQL8jCwNtnsrAN0X
-	LOABUsnBi3Njk67c+RmSi0ZNLZcSwQSTjq6Js6nEGyWvYhyFXK4KdJPes6f+cUTQUMKSm5vkCrZ
-	Ttk+lIrL0mxEd/ATYnD00rRnaGX98ZYMrHtl2JpVZR9rRfIsmW9JGK/fw2w==
-X-Gm-Gg: AY/fxX7GJJsUOMWoBu8yaI/3hB+MSsdYbifiz4MpsPiwDSDmcMH3o5X96rj/28budq0
-	qU/p8X+F6fvj8Fe+B9fkru6QSW5BeuJMldkcufxx2pmQjcKrpWcC0gkNH+YVmUpoAQaFUYCmz1y
-	Bp6K8Mhw7UCy8o77Sd8KIOJX/Q7stVEUeVqVvE0FWos7L96eVtj4JQ4lr8fdHWsedfNijtGdiEF
-	57JiJHOHHVpZsw+6wxwvEDziqbWwRSiAHwx0eUdS/IluQKwp1urK9z7szy0ZHVd3KvwzKX8iDWn
-	3XCwArTOtFQVpywG2oG6rfT6Rl4bE9lNUPL4f2wv1eWuQ3cuCH7m8f1WO+HGOELS5IMEnrEwGfm
-	BdTHiARIHs5G38QhzsO7wFMQFP7yv5RrAJ2oBPG7savZ03e4EXWt4P3E1uA==
-X-Received: by 2002:a17:907:9622:b0:b80:18f1:2815 with SMTP id a640c23a62f3a-b803718028dmr1134701566b.51.1766403849138;
-        Mon, 22 Dec 2025 03:44:09 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGWTPUmIb6vaxjcRtNN7UibXUB8o+Xe+TQCcaOYlIqPLa3/hTmfsQrLh95ikYqN5KlBr5XfCw==
-X-Received: by 2002:a17:907:9622:b0:b80:18f1:2815 with SMTP id a640c23a62f3a-b803718028dmr1134697566b.51.1766403848648;
-        Mon, 22 Dec 2025 03:44:08 -0800 (PST)
-Received: from [172.16.2.76] (5920ab7b.static.cust.trined.nl. [89.32.171.123])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8037f13847sm1031163966b.57.2025.12.22.03.44.07
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 22 Dec 2025 03:44:08 -0800 (PST)
-From: Eelco Chaudron <echaudro@redhat.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: =?utf-8?b?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>,
- Adrian Moreno <amorenoz@redhat.com>, Aaron Conole <aconole@redhat.com>,
- Ilya Maximets <i.maximets@ovn.org>, Alexei Starovoitov <ast@kernel.org>,
- Jesse Gross <jesse@nicira.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, dev@openvswitch.org
-Subject: Re: [PATCH v2] net: openvswitch: Avoid needlessly taking the RTNL on
- vport destroy
-Date: Mon, 22 Dec 2025 12:44:07 +0100
-X-Mailer: MailMate (2.0r6290)
-Message-ID: <961802A0-4E7F-4D11-8944-46B35EDF83D0@redhat.com>
-In-Reply-To: <edd72057-61b3-4bb3-b2ee-446d71e6f427@redhat.com>
-References: <20251211115006.228876-1-toke@redhat.com>
- <198C2570-F384-4385-8A6B-84DCC38BB5F5@redhat.com> <87qzswklc7.fsf@toke.dk>
- <E6D49A6B-A0F7-46B6-BC32-A5C4ADAFD6DC@redhat.com>
- <edd72057-61b3-4bb3-b2ee-446d71e6f427@redhat.com>
+        d=1e100.net; s=20230601; t=1766404096; x=1767008896;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5OThu/IjAGzkBq+quJ/q8oM4R3JgY1MkWRoPROf/868=;
+        b=cii3yIDjCqVgDv7/5381CkiFliIMeRfvm+gRn/ulz9gH8JEfWbZ+MwpOXPQbqKk3/0
+         Freg03MeKNRSFjIf4WRGG/AL2T1TOqQhMQQ50uH/F04wbGxebre4/PD03QILr/5Iww2X
+         7GLuETJIi3W6RwonmtEbF9/d3PySnvz7Kdo2+F1Ymv1rGjyKG4Xlz3EVesZEL85XKZxQ
+         1LjoLHEX4tOR50foDWt/c1ZZpLj8iDRahs15qQO2mDq50/m/+q87iF3oPM8VB4TqrR1k
+         ADW8EaxNcmvtGOpPaBnUxu3XOLHNizyBoNHMaX5I/zqSBCelHKq0O3Kqxbajh508dhjb
+         Z/8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUPYBWHKWe2bvjl/7JGpznByrloQkMmOI/lHM3MhoO3rsca5QRY4w3iXLcpnoNrzDbxc4Ksxnw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0hsIrxLeG+JHN7ldQMWE6liFOcF0GsUk5tf/XIiHPuXFHeWzG
+	396sn6JvMgYDpUzoptRTcCA6pIjYAti3A3LhSKRAoun44jJOA8kfMNX747wMfJGjhnH9WMact8G
+	cInkKrvjga85oUOnCOqoIU9uUqgfNJZ2tCROxQvelDxLzwBv/GIsHncdDTw==
+X-Gm-Gg: AY/fxX4+ag+iMck/1C1MYoT8ESpQUYjDPoVJKRSrK8XKBxMKqT72BqEAPJZ1Stjg9pi
+	wK988LZqjA1Cw7VM9MTf37Sz0bseiWRoZ5TpCBAvBxiUio436eXmge+hyPhvsKgh9FAwYAMOvRZ
+	OdYwtbM/s2yoCNdWILzynpLKdAnC7FGUtPErIxvdd/FowC0FWq8cXP/W5PNaQAbsyHK7awiJyT9
+	yvVvLNq8Gl0hy1z/4aZLOtSxasz4KWUzR9hTJoEHkDMJkw0Wcsonc4tFHvkmnZPDHCWehPN0qlE
+	bpHTgyHAQIa+TOniqhHeislqhFBQlbcGzdsnaHq1BwHQqPPAQiqjex4knE5qxJBgFDklruwy7Xe
+	MZOpn0scsCV3n
+X-Received: by 2002:a05:600c:1d1d:b0:479:1348:c61e with SMTP id 5b1f17b1804b1-47d1957d746mr102206345e9.20.1766404095689;
+        Mon, 22 Dec 2025 03:48:15 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEXcVpJ9XpL3tNS1cQvFyqPl/3DvxNFYL21GwwhDXV+oXv+RLFBPB9kKJPW2oylc2cqKXev9g==
+X-Received: by 2002:a05:600c:1d1d:b0:479:1348:c61e with SMTP id 5b1f17b1804b1-47d1957d746mr102206145e9.20.1766404095316;
+        Mon, 22 Dec 2025 03:48:15 -0800 (PST)
+Received: from [192.168.88.32] ([216.128.11.164])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324eab2ebfsm21330135f8f.40.2025.12.22.03.48.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 Dec 2025 03:48:14 -0800 (PST)
+Message-ID: <2ce23c9d-f348-45ce-a2e2-583c45b0fc31@redhat.com>
+Date: Mon, 22 Dec 2025 12:48:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3] idpf: export RX hardware timestamping
+ information to XDP
+To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: YiFei Zhu <zhuyifei@google.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ intel-wired-lan@lists.osuosl.org,
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+References: <20251219202957.2309698-1-almasrymina@google.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251219202957.2309698-1-almasrymina@google.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
+On 12/19/25 9:29 PM, Mina Almasry wrote:
+> From: YiFei Zhu <zhuyifei@google.com>
+> 
+> The logic is similar to idpf_rx_hwtstamp, but the data is exported
+> as a BPF kfunc instead of appended to an skb.
+> 
+> A idpf_queue_has(PTP, rxq) condition is added to check the queue
+> supports PTP similar to idpf_rx_process_skb_fields.
+> 
+> Cc: intel-wired-lan@lists.osuosl.org
+> 
+> Signed-off-by: YiFei Zhu <zhuyifei@google.com>
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
+@YiFei and Mina: I believe this patch should go first via the intel
+tree: please replace the 'net-next' tag prefix with 'iwl-next' on later
+revision, if any.
 
-On 22 Dec 2025, at 12:29, Paolo Abeni wrote:
+Thanks,
 
-> On 12/15/25 1:31 PM, Eelco Chaudron wrote:
->> On 15 Dec 2025, at 12:58, Toke Høiland-Jørgensen wrote:
->>> Eelco Chaudron <echaudro@redhat.com> writes:
->>>> On 11 Dec 2025, at 12:50, Toke Høiland-Jørgensen wrote:
->>>>> The openvswitch teardown code will immediately call
->>>>> ovs_netdev_detach_dev() in response to a NETDEV_UNREGISTER notification.
->>>>> It will then start the dp_notify_work workqueue, which will later end up
->>>>> calling the vport destroy() callback. This callback takes the RTNL to do
->>>>> another ovs_netdev_detach_port(), which in this case is unnecessary.
->>>>> This causes extra pressure on the RTNL, in some cases leading to
->>>>> "unregister_netdevice: waiting for XX to become free" warnings on
->>>>> teardown.
->>>>>
->>>>> We can straight-forwardly avoid the extra RTNL lock acquisition by
->>>>> checking the device flags before taking the lock, and skip the locking
->>>>> altogether if the IFF_OVS_DATAPATH flag has already been unset.
->>>>>
->>>>> Fixes: b07c26511e94 ("openvswitch: fix vport-netdev unregister")
->>>>> Tested-by: Adrian Moreno <amorenoz@redhat.com>
->>>>> Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
->>>>
->>>> Guess the change looks good, but I’m waiting for some feedback from
->>>> Adrian to see if this change makes sense.
->>>
->>> OK.
->>>
->>>> Any luck reproducing the issue it’s supposed to fix?
->>>
->>> We got a report from the customer that originally reported it (who had
->>> their own reproducer) that this patch fixes their issue to the point
->>> where they can now delete ~2000 pods/node without triggering the
->>> unregister_netdevice warning at all (where before it triggered at around
->>> ~500 pod deletions). So that's encouraging :)
->>
->> That’s good news; just wanted to make sure we are not chasing a red herring :)
->>
->> Acked-by: Eelco Chaudron echaudro@redhat.com
->
-> @Eelco: your SoB above is lacking the required <> around the email
-> address. I'm fixing that while applying the patch, but please take care
-> of it in the next reviews.
-
-Thanks Paolo, no idea what happened here :(
->
-> Thanks,
->
-> Paolo
+Paolo
 
 
