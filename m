@@ -1,247 +1,221 @@
-Return-Path: <netdev+bounces-245750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78861CD6E96
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 20:02:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA687CD6F80
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 20:30:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 6F6BB300E81F
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 19:02:28 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 418DA301D599
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 19:29:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF58430595B;
-	Mon, 22 Dec 2025 19:02:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80D3E31A07B;
+	Mon, 22 Dec 2025 19:29:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Je6SUgB+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f78.google.com (mail-oo1-f78.google.com [209.85.161.78])
+Received: from mail-yx1-f52.google.com (mail-yx1-f52.google.com [74.125.224.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC9BD14AD20
-	for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 19:02:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D4F62D879F
+	for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 19:29:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766430146; cv=none; b=Im5eXdN7T7cD7+c1wNjsYojud+oAuIDUwWANNHOzy9td/z0Lw9LGxoCcY873UvBpoB5pJpPveF/IWc27AxqhhyYa04GEaDkeA7cMR8kVCkVYa1Mg4WKtMI1wI5fbT8p0YXbsJqkosENgwVb3B+eYr9692MOtdtYd/6DNptYLoBQ=
+	t=1766431772; cv=none; b=VJxUqAiNJmQs7XeCsINgp3y3vqtMlCGDcXBIPvrruuee180M0CCuxHruGm2JkgBYqHzuYS7UMLc1cy13lsVJ2rNvAGEbHFkNOuJ1BMFPUxF10DTbCWgJlH33ebdN3Yacq3V0zcM/Phh8LYfr0bEfVTuua5pmFaVD1TRyFPTZvwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766430146; c=relaxed/simple;
-	bh=lvG7/KC5SdV3rZD1gR4ypoAC7Du/+a94VdGRIiKI2Iw=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ML3cx+vm2xt9MeC9c2xhlrOfVZSodahx/dI5ORvGS82gH+V6vn1Hn2m86d+LPsAnivI6Qqch+wFZE66eDryzDDQ6Y70cI/z7c9ChNKH6HYcvr0/PpVlpjFmtBmuJC3uEddY5jrXykQym80xN6MhmPxWY9y+i1fQT8xMli+lD4II=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.161.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-oo1-f78.google.com with SMTP id 006d021491bc7-65d004d4e48so7911660eaf.3
-        for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 11:02:24 -0800 (PST)
+	s=arc-20240116; t=1766431772; c=relaxed/simple;
+	bh=CyShxEjbMhDuuoeaYBTednz/l/07QYESM4eZ3C+wF0A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TYHSzpmaqUjWeUjdUP+jFQ20SyqNFWFbKxoezGyiBbzhomvrccHZ+VbTnYmc/k0XGNobJ3IWsCIg2JCyIDtc5NEclu+2rHwfCNo60zkvRRwVBUjm3jYWvOgGw1IisCxP5aEE8rFhQhoRqZDEmGjbj5i7tgobMmoOxoGCEsDRENE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Je6SUgB+; arc=none smtp.client-ip=74.125.224.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-64455a2a096so3390073d50.3
+        for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 11:29:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1766431770; x=1767036570; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=y0HZvemBGrTiy88qS3/KTaFBN6UnJEpXmvRl4aHyOPA=;
+        b=Je6SUgB+JDe6nJ1mq+9ijAa8jFXKa6vizIJpnUYBsRPQRHwc+fEP1KdA5eBxchItn6
+         YZwvyZnidf6mecrWOI/fyGPvLDqXvBuW/uamsshoEsvp4DIobzXYn4lLfe2nmuLGwhgs
+         RczgVcWwNgXIcNXARRup9BcQ9NejEaN4J15p4wPMs0NtIQbckHW4WMpR1t/lMpJm0AJ8
+         dUR+Lp4fLbjdv+wlX/53mJ6UZkjd75J7FVQ9+GIywPkne8U8Leqq8UdXXVboOgO/1IKP
+         U08Cv9uIlGnX8z1/XDZXsMnVw74bypyeQw1fLTDSY95M9BEn+UINFxsgXt/r6KE15Ljt
+         30Zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766430144; x=1767034944;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4cMOxTqUUgv+8e1Z9FqvuS1Js6UAgEL5Z9Ux+JNrZ+k=;
-        b=AeUwyf9eOrWHnK+Ox0s2au0fgNlbL0AW2KrOaVTL4qvl4bahnFUO/x9X3XYgKiGBvw
-         2rYMCJ15N/sfkoRotDBAoJRK14HPDD4AZVo0McsTmUPQeMEx9f6zknUxuWmW7y0pMde5
-         cj0I7WkAzRXLN7HOP61pFKcwU48dsR0W43rV+rVy38Vqsu+ECpFvoWmeUhrv0Fx7RMQ7
-         IIGahwUosFmGSKrqW9XfK0uCYrDG8EDn6GLNqBSnYV1b22fwtO0cmKIcMkJZM9rcHKAg
-         c/DB4fPHN8bnC7Dbso7+DPi2fknvmrgvbDI8Ktd20xZzi3SOIWOqNCSNlq/Eot8N8sHU
-         Q2vA==
-X-Forwarded-Encrypted: i=1; AJvYcCXdXjT6rZGFRoZ3WMaiYwQjRFcUVWCF+8Fs0LiDraHYO/fOkbAstaPW3/G+cipKEbXoe2COoh8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywq4vdn/wQ0xym2B0XuGKVYUVKgWNYPZ4//NstA8TZ3Y7O4OJSx
-	zJH1xd9hCEhPiIhuKlINDOAyATtDn384+JcTdVJndL0uCeX8EL6iJqb2tjvykXusa+nZW3Q6zu8
-	iEtYUOkLjLqKsgTr2dWO+bL23V2MLm/sknid/lfDRVj+uBuLP2bXdFviiQDI=
-X-Google-Smtp-Source: AGHT+IG8xsBpwxKwnuEzoTqUck+mAcaQLOvcJWRggN9Vr/d4tU//JYtoopA2qNRb6K5HMb5FG28mRzDwALIfonSK+6At43SyGXUd
+        d=1e100.net; s=20230601; t=1766431770; x=1767036570;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=y0HZvemBGrTiy88qS3/KTaFBN6UnJEpXmvRl4aHyOPA=;
+        b=FJuEE9c0kx3kGMc7pKhqCm7eua0/RAZ7yhSi6+DAI1ONi0Kq3HzLYyOqBgeLlXjHHx
+         +ZHYfmPJldVZywedjZBRNsQIM9o8HiJeDALRWD39advpZ2xm9IPJqGEVkCvi88rIq/11
+         sE95iwx7aSTAP+upHzWBcVfYDu4R1hEEoFPu58kuKtSDH2tabpo+KND/Z4JXhbm/Z7Pq
+         SVtrwdkZZiksax53ZdIGEI+8DgSbEV8ygoCbWKmlitKCwNVZL1xuOHjV9U7fCbikrLUu
+         ubQL9K7dqzOyG3py1zUQ8plmqgq5JVX9EKjRPg3yPUowUBSesmC6S2piLROkiTpViCEz
+         qB1g==
+X-Forwarded-Encrypted: i=1; AJvYcCUGPKzAzEhraZ44zf57m8D73teiqlstw7OOFDZsmLzclD07C3NmcWLDx40J4UNkieCSZnV9EZo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9IWstfpN9xYlftSru33R/sd572kV+bXa4X4SIdL4gXF4s1LjS
+	+CmjOTYNy6hM6Q+PSjSRdtnENnD9phKsKWpYLruDyhHsv53ULz19AXiKlb9slKPZAY1DFWgw8f+
+	244S9Acz4ReiZ/HRM2rCfDsnt5JPWua4ubz61
+X-Gm-Gg: AY/fxX5pEDg4r7Awek2jXbGuxT2meVFQFxa9DMaBk5erUwp+VOaCjE+jvAnFzWUU9F9
+	6yepapQ8R6zlXhiLeHRNiTLwNQDFgvABqcl53lhFt04DA3smuiinf/hsKUgZaMVLvsLK9VwBsNx
+	BICsN1pydAMHxSSDsy8TUSIoGO8LOqec9nJobVopJDb00amzNh+qpJ9vJHmt/cBxgoCxfDJ40ct
+	VVc/xHFLWxkgZucx5ETgumT1ecSM4OrVbUf/jD2qs6LRqm23X/VSXSlFQZQGDiW+CazRQY=
+X-Google-Smtp-Source: AGHT+IFN7r6MdsN+3u+BWquyqDiAUfI+IXjZ78DS8TNKJjhl/MtcmlawVNvxSFgEW+f6oLFDkN8lhc1JOLCQ/pq1OA8=
+X-Received: by 2002:a05:690c:6187:b0:786:62bb:f6f5 with SMTP id
+ 00721157ae682-78fb3f36848mr215482237b3.17.1766431769660; Mon, 22 Dec 2025
+ 11:29:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6820:827:b0:65b:32b4:83e7 with SMTP id
- 006d021491bc7-65d0ea341dcmr5150529eaf.19.1766430143807; Mon, 22 Dec 2025
- 11:02:23 -0800 (PST)
-Date: Mon, 22 Dec 2025 11:02:23 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <694995bf.050a0220.2fb209.01a1.GAE@google.com>
-Subject: [syzbot] [bpf?] inconsistent lock state in bpf_lru_push_free
-From: syzbot <syzbot+c69a0a2c816716f1e0d5@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com, 
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
-	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
-	sdf@fomichev.me, song@kernel.org, syzkaller-bugs@googlegroups.com, 
-	yonghong.song@linux.dev
+References: <20251220-helper_proto-v1-0-2206e0d9422d@gmail.com>
+In-Reply-To: <20251220-helper_proto-v1-0-2206e0d9422d@gmail.com>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Mon, 22 Dec 2025 11:29:17 -0800
+X-Gm-Features: AQt7F2pDre-9Uf33VZRt52PeSiSug36qR3S9wTTSvNriR_c0NcOhfhR59Bftfrw
+Message-ID: <CAMB2axPpB7Km=_7J_QTcQV8SvuFMKqg-_fCyRHEZKNfr7WL2Gg@mail.gmail.com>
+Subject: Re: [RFC bpf PATCH 0/2] bpf: Fix memory access tags in helper prototypes
+To: Zesen Liu <ftyghome@gmail.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Matt Bobrowski <mattbobrowski@google.com>, 
+	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Daniel Xu <dxu@dxuuu.xyz>, Shuah Khan <shuah@kernel.org>, 
+	bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Shuran Liu <electronlsr@gmail.com>, 
+	Peili Gao <gplhust955@gmail.com>, Haoran Ni <haoran.ni.cs@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Sat, Dec 20, 2025 at 3:35=E2=80=AFAM Zesen Liu <ftyghome@gmail.com> wrot=
+e:
+>
+> Hi,
+>
+> This series adds missing memory access tags (MEM_RDONLY or MEM_WRITE) to
+> several bpf helper function prototypes that use ARG_PTR_TO_MEM but lack t=
+he
+> correct type annotation.
+>
+> Missing memory access tags in helper prototypes can lead to critical
+> correctness issues when the verifier tries to perform code optimization.
+> After commit 37cce22dbd51 ("bpf: verifier: Refactor helper access type
+> tracking"), the verifier relies on the memory access tags, rather than
+> treating all arguments in helper functions as potentially modifying the
+> pointed-to memory.
+>
+> We have already seen several reports regarding this:
+>
+> - commit ac44dcc788b9 ("bpf: Fix verifier assumptions of bpf_d_path's
+>    output buffer") adds MEM_WRITE to bpf_d_path;
+> - commit 2eb7648558a7 ("bpf: Specify access type of bpf_sysctl_get_name
+>    args") adds MEM_WRITE to bpf_sysctl_get_name.
+>
+> This series looks through all prototypes in the kernel and completes the
+> tags. In addition, this series also adds selftests for some of these
+> functions.
+>
+> I marked the series as RFC since the introduced selftests are fragile and
+> ad hoc (similar to the previously added selftests). The original goal of
+> these tests is to reproduce the case where the verifier wrongly optimizes
+> reads after the helper function is called. However, triggering the error
+> often requires carefully designed code patterns. For example, I had to
+> explicitly use "if (xx !=3D 0)" in my attached tests, because using memcm=
+p
+> will not reproduce the issue. This makes the reproduction heavily depende=
+nt
+> on the verifier's internal optimization logic and clutters the selftests
+> with specific, unnatural patterns.
+>
+> Some cases are also hard to trigger by selftests. For example, I couldn't
+> find a triggering pattern for bpf_read_branch_records, since the
+> execution of program seems to be messed up by wrong tags. For
+> bpf_skb_fib_lookup, I also failed to reproduce it because the argument
+> needs content on entry, but the verifier seems to only enable this
+> optimization for fully empty buffers.
+>
+> Since adding selftests does not help with existing issues or prevent futu=
+re
+> occurrences of similar problems, I believe one way to resolve it is to
+> statically restrict ARG_PTR_TO_MEM from appearing without memory access
+> tags. Using ARG_PTR_TO_MEM alone without tags is nonsensical because:
+>
+> - If the helper does not change the argument, missing MEM_RDONLY causes
+>    the verifier to incorrectly reject a read-only buffer.
 
-syzbot found the following issue on:
+Perhaps you are conflating one of your proposals here? This is fine
+currently. ARG_PTR_TO_MEM without any annotation is viewed as BPF_READ
+so passing a read-only buffer should work.
 
-HEAD commit:    f785a31395d9 bpf: arm64: Fix sparse warnings
-git tree:       bpf-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1122d392580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a4aa52bacc0658d1
-dashboard link: https://syzkaller.appspot.com/bug?extid=c69a0a2c816716f1e0d5
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1780f584580000
+> - If the helper does change the argument, missing MEM_WRITE causes the
+>    verifier to incorrectly assume the memory is unchanged, leading to
+>    potential errors.
+>
+> I am still wondering, if we agree on the above, how should we enforce thi=
+s
+> restriction? Should we let ARG_PTR_TO_MEM imply MEM_WRITE semantics by
+> default, and change ARG_PTR_TO_MEM | MEM_RDONLY to ARG_CONST_PTR_TO_MEM? =
+Or
+> should we add a check in the verifier to ensure ARG_PTR_TO_MEM always com=
+es
+> with an access tag (though this seems to only catch errors at
+> runtime/testing)?
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/7e044cc52f4d/disk-f785a313.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/5af05af9fe6f/vmlinux-f785a313.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/e8bd1bb41f24/bzImage-f785a313.xz
+I think it is better to make the MEM_WRITE, MEM_RDONLY annotation
+explicit and check it in the verifier.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+c69a0a2c816716f1e0d5@syzkaller.appspotmail.com
+Flipping the default MEM_RDONLY semantic to MEM_WRITE does not prevent
+a similar bug in the future when we have helpers/optimizations/checks
+rely on an implicit semantic.
 
-================================
-WARNING: inconsistent lock state
-syzkaller #0 Not tainted
---------------------------------
-inconsistent {INITIAL USE} -> {IN-NMI} usage.
-syz.0.17/5989 [HC1[1]:SC0[0]:HE0:SE1] takes:
-ffffe8ffffc2f8d8 (&l->lock#2){....}-{2:2}, at: bpf_lru_push_free+0x13e/0x520 kernel/bpf/bpf_lru_list.c:-1
-{INITIAL USE} state was registered at:
-  lock_acquire+0x117/0x340 kernel/locking/lockdep.c:5868
-  __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
-  _raw_spin_lock_irqsave+0xa7/0xf0 kernel/locking/spinlock.c:162
-  bpf_percpu_lru_pop_free kernel/bpf/bpf_lru_list.c:407 [inline]
-  bpf_lru_pop_free+0xcb/0x19b0 kernel/bpf/bpf_lru_list.c:494
-  prealloc_lru_pop kernel/bpf/hashtab.c:299 [inline]
-  htab_lru_map_update_elem+0x168/0x8a0 kernel/bpf/hashtab.c:1215
-  bpf_map_update_value+0x751/0x920 kernel/bpf/syscall.c:294
-  generic_map_update_batch+0x5a9/0x810 kernel/bpf/syscall.c:2038
-  bpf_map_do_batch+0x39b/0x630 kernel/bpf/syscall.c:5647
-  __sys_bpf+0x750/0x8a0 kernel/bpf/syscall.c:-1
-  __do_sys_bpf kernel/bpf/syscall.c:6320 [inline]
-  __se_sys_bpf kernel/bpf/syscall.c:6318 [inline]
-  __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:6318
-  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-  do_syscall_64+0xfa/0xf80 arch/x86/entry/syscall_64.c:94
-  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-irq event stamp: 19654
-hardirqs last  enabled at (19653): [<ffffffff8b5b413e>] syscall_enter_from_user_mode include/linux/entry-common.h:108 [inline]
-hardirqs last  enabled at (19653): [<ffffffff8b5b413e>] do_syscall_64+0xbe/0xf80 arch/x86/entry/syscall_64.c:90
-hardirqs last disabled at (19654): [<ffffffff8b5b8058>] exc_debug_kernel+0x68/0x150 arch/x86/kernel/traps.c:1233
-softirqs last  enabled at (19590): [<ffffffff81d3246b>] bpf_prog_load+0x14fb/0x1a10 kernel/bpf/syscall.c:3118
-softirqs last disabled at (19588): [<ffffffff81d0e0bd>] spin_lock_bh include/linux/spinlock.h:356 [inline]
-softirqs last disabled at (19588): [<ffffffff81d0e0bd>] bpf_ksym_add+0x2d/0x340 kernel/bpf/core.c:640
-
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-       ----
-  lock(&l->lock#2);
-  <Interrupt>
-    lock(&l->lock#2);
-
- *** DEADLOCK ***
-
-no locks held by syz.0.17/5989.
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 5989 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
-Call Trace:
- <#DB>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- print_usage_bug+0x28b/0x2e0 kernel/locking/lockdep.c:4042
- lock_acquire+0x1f8/0x340 kernel/locking/lockdep.c:5859
- __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
- _raw_spin_lock_irqsave+0xa7/0xf0 kernel/locking/spinlock.c:162
- bpf_lru_push_free+0x13e/0x520 kernel/bpf/bpf_lru_list.c:-1
- htab_lru_push_free kernel/bpf/hashtab.c:1183 [inline]
- htab_lru_map_delete_elem+0x3a3/0x410 kernel/bpf/hashtab.c:1464
- bpf_prog_464bc2be3fc7c272+0x43/0x4b
- bpf_dispatcher_nop_func include/linux/bpf.h:1378 [inline]
- __bpf_prog_run include/linux/filter.h:723 [inline]
- bpf_prog_run include/linux/filter.h:730 [inline]
- bpf_overflow_handler kernel/events/core.c:10303 [inline]
- __perf_event_overflow+0x39c/0xe70 kernel/events/core.c:10402
- perf_swevent_overflow kernel/events/core.c:10536 [inline]
- perf_swevent_event+0x4f8/0x5e0 kernel/events/core.c:10574
- perf_bp_event+0x251/0x300 kernel/events/core.c:11395
- hw_breakpoint_handler arch/x86/kernel/hw_breakpoint.c:556 [inline]
- hw_breakpoint_exceptions_notify+0x244/0x680 arch/x86/kernel/hw_breakpoint.c:587
- notifier_call_chain+0x19d/0x3a0 kernel/notifier.c:85
- atomic_notifier_call_chain+0xda/0x180 kernel/notifier.c:223
- notify_die+0x130/0x180 kernel/notifier.c:588
- notify_debug+0x2e/0x50 arch/x86/kernel/traps.c:1208
- exc_debug_kernel+0xbe/0x150 arch/x86/kernel/traps.c:1270
- asm_exc_debug+0x1e/0x40 arch/x86/include/asm/idtentry.h:654
-RIP: 0010:rep_movs_alternative+0x4a/0x90 arch/x86/lib/copy_user_64.S:74
-Code: 48 04 00 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 48 8b 06 48 89 07 48 83 c6 08 48 83 c7 08 83 e9 08 74 db 83 f9 08 73 e8 eb c5 <f3> a4 e9 8f 48 04 00 48 8b 06 48 89 07 48 8d 47 08 48 83 e0 f8 48
-RSP: 0018:ffffc90003697cf8 EFLAGS: 00050202
-RAX: 00007ffffffff001 RBX: 0000000000000050 RCX: 000000000000000f
-RDX: 0000000000000001 RSI: 0000200000000301 RDI: ffffc90003697da1
-RBP: ffffc90003697ea8 R08: ffffc90003697daf R09: 1ffff920006d2fb5
-R10: dffffc0000000000 R11: fffff520006d2fb6 R12: ffffc90003697d60
-R13: 0000000000000050 R14: ffffc90003697d60 R15: 00002000000002c0
- </#DB>
- <TASK>
- copy_user_generic arch/x86/include/asm/uaccess_64.h:126 [inline]
- raw_copy_from_user arch/x86/include/asm/uaccess_64.h:141 [inline]
- _inline_copy_from_user include/linux/uaccess.h:185 [inline]
- _copy_from_user+0x7a/0xb0 lib/usercopy.c:18
- copy_from_user include/linux/uaccess.h:223 [inline]
- copy_from_bpfptr_offset include/linux/bpfptr.h:53 [inline]
- copy_from_bpfptr include/linux/bpfptr.h:59 [inline]
- __sys_bpf+0x1f2/0x8a0 kernel/bpf/syscall.c:6180
- __do_sys_bpf kernel/bpf/syscall.c:6320 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:6318 [inline]
- __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:6318
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xf80 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7efcc198f749
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007efcc2754038 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-RAX: ffffffffffffffda RBX: 00007efcc1be5fa0 RCX: 00007efcc198f749
-RDX: 0000000000000050 RSI: 00002000000002c0 RDI: 000000000000000a
-RBP: 00007efcc1a13f91 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007efcc1be6038 R14: 00007efcc1be5fa0 R15: 00007ffd9db831a8
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	48 04 00             	rex.W add $0x0,%al
-   3:	66 2e 0f 1f 84 00 00 	cs nopw 0x0(%rax,%rax,1)
-   a:	00 00 00
-   d:	0f 1f 00             	nopl   (%rax)
-  10:	48 8b 06             	mov    (%rsi),%rax
-  13:	48 89 07             	mov    %rax,(%rdi)
-  16:	48 83 c6 08          	add    $0x8,%rsi
-  1a:	48 83 c7 08          	add    $0x8,%rdi
-  1e:	83 e9 08             	sub    $0x8,%ecx
-  21:	74 db                	je     0xfffffffe
-  23:	83 f9 08             	cmp    $0x8,%ecx
-  26:	73 e8                	jae    0x10
-  28:	eb c5                	jmp    0xffffffef
-* 2a:	f3 a4                	rep movsb %ds:(%rsi),%es:(%rdi) <-- trapping instruction
-  2c:	e9 8f 48 04 00       	jmp    0x448c0
-  31:	48 8b 06             	mov    (%rsi),%rax
-  34:	48 89 07             	mov    %rax,(%rdi)
-  37:	48 8d 47 08          	lea    0x8(%rdi),%rax
-  3b:	48 83 e0 f8          	and    $0xfffffffffffffff8,%rax
-  3f:	48                   	rex.W
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+>
+> Any insights and comments are welcome. If the individual fix patches for
+> the prototypes look correct, I would also really appreciate it if they
+> could be merged ahead of the discussion.
+>
+> Thanks,
+>
+> Zesen Liu
+>
+> Signed-off-by: Zesen Liu <ftyghome@gmail.com>
+> ---
+> Zesen Liu (2):
+>       bpf: Fix memory access tags in helper prototypes
+>       selftests/bpf: add regression tests for snprintf and get_stack help=
+ers
+>
+>  kernel/bpf/helpers.c                                      |  2 +-
+>  kernel/trace/bpf_trace.c                                  |  6 +++---
+>  net/core/filter.c                                         |  8 ++++----
+>  tools/testing/selftests/bpf/prog_tests/get_stack_raw_tp.c | 15 +++++++++=
+++++--
+>  tools/testing/selftests/bpf/prog_tests/snprintf.c         |  6 ++++++
+>  tools/testing/selftests/bpf/prog_tests/snprintf_btf.c     |  3 +++
+>  tools/testing/selftests/bpf/progs/netif_receive_skb.c     | 13 +++++++++=
++++-
+>  tools/testing/selftests/bpf/progs/test_get_stack_rawtp.c  | 11 +++++++++=
++-
+>  tools/testing/selftests/bpf/progs/test_snprintf.c         | 12 +++++++++=
++++
+>  9 files changed, 64 insertions(+), 12 deletions(-)
+> ---
+> base-commit: 22cc16c04b7893d8fc22810599f49a305d600b9e
+> change-id: 20251220-helper_proto-fb6e64182467
+>
+> Best regards,
+> --
+> Zesen Liu <ftyghome@gmail.com>
+>
+>
 
