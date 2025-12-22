@@ -1,190 +1,167 @@
-Return-Path: <netdev+bounces-245744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6F91CD6D87
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 18:42:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B1967CD6DCC
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 18:57:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CDB69301A709
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 17:42:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 37CFE301D5BD
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 17:57:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90328335544;
-	Mon, 22 Dec 2025 17:42:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D33033890B;
+	Mon, 22 Dec 2025 17:57:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nk6MCFhD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LNa3vbgR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f67.google.com (mail-ed1-f67.google.com [209.85.208.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBBEE320A17;
-	Mon, 22 Dec 2025 17:42:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92B79337BA1
+	for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 17:57:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766425350; cv=none; b=oAG6TSICj0bnUJC4pqrEgU/SEJC1xNIvo7HE/91G90eH/JW85JrhQ/Aw3KrFoo9gA2MLdx0k8jB8G+wYTlHQa314+3wOgy+FdPcpTEN0GhLYsS+byEXAEVuFJ1b+Q5l6upsbaLwdHnRQNxUlbuKoib1yzA9B4fkvJy0Ie1tfcqw=
+	t=1766426250; cv=none; b=YoUt96cttee9towCX/RNfwApw8aoDHqgb70GnrL5Ldn+J/h/0HUOAifkZFqZQLzzUjqMw6p9iqNLSxyhrbYiEA1eyevXzS4/bsuqRcLnzYoBIY8th6mgav/Z+LdIXlIX/l3x34xvSXcp4j2LnR9beTNceVH7AxfXuUfPGVSZl3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766425350; c=relaxed/simple;
-	bh=9r2J2BeMZsqV64gs8m9CzDJDduEmUqA6Dih2rwLyGRo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eBefgX+ooOnP7U2NVCeR6crC9fTH5FrmJcTO7zign/b9mTKnI2xOd1WjcEZoUSruLh3QHN0ZdPG/041v/Vstur3CKUJ0mD0ZVdsOsWDFIPBpIdSROJxtuhqaUBaMhSIo0tT9iCJtwM9WdI07dYMIcYGUBOcX2VfFb4bkg5LaJro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nk6MCFhD; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1766425349; x=1797961349;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=9r2J2BeMZsqV64gs8m9CzDJDduEmUqA6Dih2rwLyGRo=;
-  b=nk6MCFhD6/DYx7EbRiF3hK30SlI4VsvLnrpi/pz0ZghplOrbF7C6GxtH
-   LPuZ+pPDMNmIcckZ3BAOrRqYh/+9wWMM2IKQqa8bT0d6jWwCSmyzrnSMX
-   oj+4QJiNhY8bp55y6v2iL10T3chj5ZWbKElCGsl0rDKWtSRrUKxNeVe6F
-   FeI6yEZ+LLtB0KbMV7uXMmRPSuwZ/JIRr1ZlE7Fp1osF0JIwY4uBWNxJ6
-   sC1Vnzw5VP7JL/KyI9PiZb74yZaujY0RhHrSE8TYQleQ5LOGNYXQ0W2P5
-   mmh2Zr/PINGtKURzNxKlfBaaGAAT27fAHHHuiCrfjXSxBkAYIWJTnn0fj
-   Q==;
-X-CSE-ConnectionGUID: zSJp0U+tSiqDsq2ROgEXbg==
-X-CSE-MsgGUID: OnlnyjZbRYWNIrE8bAkMGg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11650"; a="68325645"
-X-IronPort-AV: E=Sophos;i="6.21,168,1763452800"; 
-   d="scan'208";a="68325645"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Dec 2025 09:42:28 -0800
-X-CSE-ConnectionGUID: e3Q2RjwOTDWCARgz7v5k0g==
-X-CSE-MsgGUID: K8/Yi7lyQLiOJwxA+U5K+Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.21,168,1763452800"; 
-   d="scan'208";a="203704509"
-Received: from igk-lkp-server01.igk.intel.com (HELO 8a0c053bdd2a) ([10.211.93.152])
-  by orviesa003.jf.intel.com with ESMTP; 22 Dec 2025 09:42:24 -0800
-Received: from kbuild by 8a0c053bdd2a with local (Exim 4.98.2)
-	(envelope-from <lkp@intel.com>)
-	id 1vXjvI-000000005ZM-3FWF;
-	Mon, 22 Dec 2025 17:42:20 +0000
-Date: Mon, 22 Dec 2025 18:41:42 +0100
-From: kernel test robot <lkp@intel.com>
-To: "Rusydi H. Makarim" <rusydi.makarim@kriptograf.id>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Biggers <ebiggers@kernel.org>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Ard Biesheuvel <ardb@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	"Rusydi H. Makarim" <rusydi.makarim@kriptograf.id>
-Subject: Re: [PATCH 2/3] lib/crypto: Initial implementation of Ascon-Hash256
-Message-ID: <202512221849.wfygt22c-lkp@intel.com>
-References: <20251215-ascon_hash256-v1-2-24ae735e571e@kriptograf.id>
+	s=arc-20240116; t=1766426250; c=relaxed/simple;
+	bh=wBha3d01qjiMew7UlnJKYluL6OwpP6oM7rEy/5DQKRo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dlmV9So6ZfGhuvxckVwODT6O3yQeHDWB17CFZxjdfOFb90OPIR7fWclVMk/11bCmTg8hq7rJ0EVpmUv4Sb0jMtXBPbgdko4giNsNNTeTaZhV9mLvEANGDKMaEGzpfhpHL4UIBBjFTeIReIJ8f5C0D+cq9WhAlR6uvwMjm3v5oDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LNa3vbgR; arc=none smtp.client-ip=209.85.208.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f67.google.com with SMTP id 4fb4d7f45d1cf-64bea6c5819so3830453a12.3
+        for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 09:57:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1766426247; x=1767031047; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wBha3d01qjiMew7UlnJKYluL6OwpP6oM7rEy/5DQKRo=;
+        b=LNa3vbgR/8VDkKsgceoMQFQpTBdDrdaU7Ix0pVzNoL1MeQOtmi+a+PQDJi0Ca3XF8q
+         ppxU8XvnRPEihqkwhUIRDYfy+jTu7hrjHD9X1de+Qzmtkd5ulyDu9AS5/7YCXO0ra7/E
+         Q0myErxYccGUCiRDFhCDFK2M+hsYT5qUpMBx/jFLE9KlXcij37RNBBsz+dTt16lB4gsI
+         jVffezsPbNvK++8pGGKoN/Z221V1Ao2pbdLY6VC+WFJrj4wsxbx6KEr7nfJBrxj/wGHQ
+         BblWoKp/04rWMM8Aik1GIgXD8oarLZMnU4h8JYlmqp1QixKO0k3CVpxpPi2trsNVpAoU
+         vA1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766426247; x=1767031047;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=wBha3d01qjiMew7UlnJKYluL6OwpP6oM7rEy/5DQKRo=;
+        b=r0QerEseeod0MmHhM+4Ib4P+RNSp7GcQtX1nE8iY3HtYfgYxW+GGbcd4JAT5E8kGQA
+         /4l6OLTPFLy1UMPgqjBgAlgzji9a5E0lweczSdwVnbxq6IgmrYOys/D4Isc6b8EF5arw
+         PapPIMK39RwfAuIM3sZoqq0ti5EOswYAUAwx7BgcGOm/uxjG2B6fRWwyQb9Yt9Wd5Dnn
+         GkbA+8wEJKd6YXZAWzKPpgnM1tV8i+NqQMrdA5fMrH7WySv4FjjfbBWzSxGBeOjuolxw
+         74f8skKAjtK1ZxEXcMfLAgOOMh43ZWxh9yt4jQBNsTvPBQqS8r61CflLD1xXo4nSVoht
+         av2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVjgkqyyiM4x3yI06hUBs9jGXdxCUm+WJmhijWwnwTUFRpOzCExTd5UYLgn95tig2WVtxMeYiY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmckjKZxckwhsGO7Bg794uQGHHiKf6Jb1X1B5CQ+iJIfmog3E1
+	g120xBb/kSan25npJIIT6TAPj/GcnRl3o2hwKp4503AXCtdtVBHSQ1K/QD+lrGsxVxusMHKASPl
+	EnJ9LaiNmxhSIYefLmEl/BWrvZYvH94s=
+X-Gm-Gg: AY/fxX6qR7cXRXUpL5RUDjkyHv8QJ1nV9degoF1TxFYOpEqoBuukvtKGtrfuvzP+qIQ
+	obKlW/u4GIPp3FplmskS6CFeUIcb94IBNrSgRtcIZSxPbkWwzosXn742pAJ209fQSewBlJeKuaX
+	12D7QXiGJ+RKpsDbYiVJzcxhwdhBjRpqAHFRoZWfN0ghLV3lwV8dcGjAb8OzSFfx6EsUQz+QtZ2
+	iVrUEVrRf1sASfyeLcLz7oYWKaIPPi7dM2AsDXcA5aGhMtajaos2bQvMTENh8a5zWWe90O/WjiS
+	BsXr
+X-Google-Smtp-Source: AGHT+IHGjnM4tssmgrpgdS+QyfppBwGcEa/TtaSTVo3x3z2X4MIp6+nQ00I9y9UQh1U0WtN9dG4OQo1+7sN+Qmf+nvg=
+X-Received: by 2002:a17:907:3f25:b0:b80:117d:46e5 with SMTP id
+ a640c23a62f3a-b8036f62257mr1197264466b.29.1766426246688; Mon, 22 Dec 2025
+ 09:57:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251215-ascon_hash256-v1-2-24ae735e571e@kriptograf.id>
+References: <CAOprWotBRv_cvD3GCSe7N2tiLooZBoDisSwbu+VBAmt_2izvwQ@mail.gmail.com>
+ <CAA7ZjpY-q6pynoDpo6OwW80zd7rq3dfFjQ1RMGzJR4pKSu7Zzg@mail.gmail.com>
+In-Reply-To: <CAA7ZjpY-q6pynoDpo6OwW80zd7rq3dfFjQ1RMGzJR4pKSu7Zzg@mail.gmail.com>
+From: Andrea Daoud <andreadaoud6@gmail.com>
+Date: Tue, 23 Dec 2025 01:57:15 +0800
+X-Gm-Features: AQt7F2pbRWy0Y3qdReSvX4Mn03sO7NEaq-NkFe6B_tFRTn8ukhodMW_kVgnL2-o
+Message-ID: <CAOprWov+j6V8XmtQD-K6pBj+7CVP_QJM0ODbJxtPZqG=y2RW3w@mail.gmail.com>
+Subject: Re: ctucanfd: possible coding error in ctucan_set_secondary_sample_point
+ causing SSP not enabled
+To: Ondrej Ille <ondrej.ille@gmail.com>
+Cc: Pavel Pisa <pisa@cmp.felk.cvut.cz>, Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org, 
+	Wolfgang Grandegger <wg@grandegger.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Rusydi,
+Thanks for your reply!
 
-kernel test robot noticed the following build errors:
+On Mon, Dec 22, 2025 at 11:51=E2=80=AFPM Ondrej Ille <ondrej.ille@gmail.com=
+> wrote:
+>
+> Hello Andrea,
+>
+> yes, your thinking is correct, there is a bug there.
+>
+> This was pointed to by another user right in the CTU CAN FD repository wh=
+ere the Linux driver also lives:
+> https://github.com/Blebowski/CTU-CAN-FD/pull/2
+>
+> It is as you say, it should be:
+>
+> -- ssp_cfg |=3D FIELD_PREP(REG_TRV_DELAY_SSP_SRC, 0x1);
+> ++ ssp_cfg |=3D FIELD_PREP(REG_TRV_DELAY_SSP_SRC, 0x0);
+>
+> Unfortunately, we have not processed this in the CTU CAN FD repo either.
+> I can send it as a patch, but TBH, I have never done this before (the dri=
+ver was contributed to Kernel by Pavel Pisa, he is the maintainer).
+> If you point me in the right direction to the steps I should follow, I wi=
+ll be glad to do so.
+>
+> With Regards
+> Ondrej Ille
+>
+> PS: The changes are dummy enough that they will likely not cause a large =
+review, so it seems like an ideal case for trying to contribute for the fir=
+st time.
 
-[auto build test ERROR on 92de2d349e02c2dd96d8d1b7016cc78cf80fc085]
+Unfortunately I do not have an environment right now to make patches
+sent, so it would be better if someone else can send the patch.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Rusydi-H-Makarim/lib-crypto-Add-KUnit-test-vectors-for-Ascon-Hash256/20251215-215114
-base:   92de2d349e02c2dd96d8d1b7016cc78cf80fc085
-patch link:    https://lore.kernel.org/r/20251215-ascon_hash256-v1-2-24ae735e571e%40kriptograf.id
-patch subject: [PATCH 2/3] lib/crypto: Initial implementation of Ascon-Hash256
-config: x86_64-rhel-9.4 (https://download.01.org/0day-ci/archive/20251222/202512221849.wfygt22c-lkp@intel.com/config)
-compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251222/202512221849.wfygt22c-lkp@intel.com/reproduce)
+> PPS: I will go on and fix it in CTU CAN FD repo too. However, ATM I don't=
+ have a setup where to really test this.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202512221849.wfygt22c-lkp@intel.com/
+I have tested it on my setup. I run this core on a FPGA, with PCIe
+connected to Linux host. After changing this to zero, I can see the
+relative phase of sample_sec has changed to a more ideal phase in the
+received bit.
 
-All error/warnings (new ones prefixed by >>):
-
->> lib/crypto/hash_info.c:35:10: error: 'HASH_ALGO_ASCON_HASH256' undeclared here (not in a function); did you mean 'HASH_ALGO_SHA3_256'?
-      35 |         [HASH_ALGO_ASCON_HASH256] = "ascon-hash256",
-         |          ^~~~~~~~~~~~~~~~~~~~~~~
-         |          HASH_ALGO_SHA3_256
->> lib/crypto/hash_info.c:35:10: error: array index in initializer not of integer type
-   lib/crypto/hash_info.c:35:10: note: (near initialization for 'hash_algo_name')
->> lib/crypto/hash_info.c:35:37: warning: excess elements in array initializer
-      35 |         [HASH_ALGO_ASCON_HASH256] = "ascon-hash256",
-         |                                     ^~~~~~~~~~~~~~~
-   lib/crypto/hash_info.c:35:37: note: (near initialization for 'hash_algo_name')
-   lib/crypto/hash_info.c:63:10: error: array index in initializer not of integer type
-      63 |         [HASH_ALGO_ASCON_HASH256] = ASCON_HASH256_DIGEST_SIZE,
-         |          ^~~~~~~~~~~~~~~~~~~~~~~
-   lib/crypto/hash_info.c:63:10: note: (near initialization for 'hash_digest_size')
->> lib/crypto/hash_info.c:63:37: error: 'ASCON_HASH256_DIGEST_SIZE' undeclared here (not in a function); did you mean 'SHA256_DIGEST_SIZE'?
-      63 |         [HASH_ALGO_ASCON_HASH256] = ASCON_HASH256_DIGEST_SIZE,
-         |                                     ^~~~~~~~~~~~~~~~~~~~~~~~~
-         |                                     SHA256_DIGEST_SIZE
-   lib/crypto/hash_info.c:63:37: warning: excess elements in array initializer
-   lib/crypto/hash_info.c:63:37: note: (near initialization for 'hash_digest_size')
-
-
-vim +35 lib/crypto/hash_info.c
-
-    10	
-    11	const char *const hash_algo_name[HASH_ALGO__LAST] = {
-    12		[HASH_ALGO_MD4]		= "md4",
-    13		[HASH_ALGO_MD5]		= "md5",
-    14		[HASH_ALGO_SHA1]	= "sha1",
-    15		[HASH_ALGO_RIPE_MD_160]	= "rmd160",
-    16		[HASH_ALGO_SHA256]	= "sha256",
-    17		[HASH_ALGO_SHA384]	= "sha384",
-    18		[HASH_ALGO_SHA512]	= "sha512",
-    19		[HASH_ALGO_SHA224]	= "sha224",
-    20		[HASH_ALGO_RIPE_MD_128]	= "rmd128",
-    21		[HASH_ALGO_RIPE_MD_256]	= "rmd256",
-    22		[HASH_ALGO_RIPE_MD_320]	= "rmd320",
-    23		[HASH_ALGO_WP_256]	= "wp256",
-    24		[HASH_ALGO_WP_384]	= "wp384",
-    25		[HASH_ALGO_WP_512]	= "wp512",
-    26		[HASH_ALGO_TGR_128]	= "tgr128",
-    27		[HASH_ALGO_TGR_160]	= "tgr160",
-    28		[HASH_ALGO_TGR_192]	= "tgr192",
-    29		[HASH_ALGO_SM3_256]	= "sm3",
-    30		[HASH_ALGO_STREEBOG_256] = "streebog256",
-    31		[HASH_ALGO_STREEBOG_512] = "streebog512",
-    32		[HASH_ALGO_SHA3_256]    = "sha3-256",
-    33		[HASH_ALGO_SHA3_384]    = "sha3-384",
-    34		[HASH_ALGO_SHA3_512]    = "sha3-512",
-  > 35		[HASH_ALGO_ASCON_HASH256] = "ascon-hash256",
-    36	};
-    37	EXPORT_SYMBOL_GPL(hash_algo_name);
-    38	
-    39	const int hash_digest_size[HASH_ALGO__LAST] = {
-    40		[HASH_ALGO_MD4]		= MD5_DIGEST_SIZE,
-    41		[HASH_ALGO_MD5]		= MD5_DIGEST_SIZE,
-    42		[HASH_ALGO_SHA1]	= SHA1_DIGEST_SIZE,
-    43		[HASH_ALGO_RIPE_MD_160]	= RMD160_DIGEST_SIZE,
-    44		[HASH_ALGO_SHA256]	= SHA256_DIGEST_SIZE,
-    45		[HASH_ALGO_SHA384]	= SHA384_DIGEST_SIZE,
-    46		[HASH_ALGO_SHA512]	= SHA512_DIGEST_SIZE,
-    47		[HASH_ALGO_SHA224]	= SHA224_DIGEST_SIZE,
-    48		[HASH_ALGO_RIPE_MD_128]	= RMD128_DIGEST_SIZE,
-    49		[HASH_ALGO_RIPE_MD_256]	= RMD256_DIGEST_SIZE,
-    50		[HASH_ALGO_RIPE_MD_320]	= RMD320_DIGEST_SIZE,
-    51		[HASH_ALGO_WP_256]	= WP256_DIGEST_SIZE,
-    52		[HASH_ALGO_WP_384]	= WP384_DIGEST_SIZE,
-    53		[HASH_ALGO_WP_512]	= WP512_DIGEST_SIZE,
-    54		[HASH_ALGO_TGR_128]	= TGR128_DIGEST_SIZE,
-    55		[HASH_ALGO_TGR_160]	= TGR160_DIGEST_SIZE,
-    56		[HASH_ALGO_TGR_192]	= TGR192_DIGEST_SIZE,
-    57		[HASH_ALGO_SM3_256]	= SM3256_DIGEST_SIZE,
-    58		[HASH_ALGO_STREEBOG_256] = STREEBOG256_DIGEST_SIZE,
-    59		[HASH_ALGO_STREEBOG_512] = STREEBOG512_DIGEST_SIZE,
-    60		[HASH_ALGO_SHA3_256]    = SHA3_256_DIGEST_SIZE,
-    61		[HASH_ALGO_SHA3_384]    = SHA3_384_DIGEST_SIZE,
-    62		[HASH_ALGO_SHA3_512]    = SHA3_512_DIGEST_SIZE,
-  > 63		[HASH_ALGO_ASCON_HASH256] = ASCON_HASH256_DIGEST_SIZE,
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+>
+> On Mon, Dec 22, 2025 at 3:17=E2=80=AFPM Andrea Daoud <andreadaoud6@gmail.=
+com> wrote:
+>>
+>> Hi,
+>>
+>> In ctucan_set_secondary_sample_point(), there's a line which runs when
+>> data bitrate is >1Mbps:
+>>
+>> ssp_cfg |=3D FIELD_PREP(REG_TRV_DELAY_SSP_SRC, 0x1);
+>>
+>> In the datasheet [1] of ctucanfd, we can see the meaning of SSP_SRC:
+>>
+>> SSP_SRC: Source of Secondary sampling point.
+>> 0b00 - SSP_SRC_MEAS_N_OFFSET - SSP position =3D TRV_DELAY (Measured
+>> Transmitter delay) + SSP_OFFSET.
+>> 0b01 - SSP_SRC_NO_SSP - SSP is not used. Transmitter uses regular
+>> Sampling Point during data bit rate.
+>> 0b10 - SSP_SRC_OFFSET - SSP position =3D SSP_OFFSET. Measured
+>> Transmitter delay value is ignored.
+>>
+>> Therefore, setting it to 1 disables SSP (NO_SSP). We should probably
+>> set it to 0 (MEAS_N_OFFSET).
+>>
+>> Is this correct? Would like to hear some inputs.
+>>
+>> Regards,
+>>
+>> Andrea
+>>
+>> [1]: https://canbus.pages.fel.cvut.cz/ctucanfd_ip_core/doc/Datasheet.pdf
 
