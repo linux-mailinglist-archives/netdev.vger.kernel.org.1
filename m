@@ -1,167 +1,177 @@
-Return-Path: <netdev+bounces-245745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1967CD6DCC
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 18:57:33 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D2BBCD6DDB
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 19:00:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 37CFE301D5BD
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 17:57:31 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id E9AF8301C938
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 18:00:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D33033890B;
-	Mon, 22 Dec 2025 17:57:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5D5E327C1C;
+	Mon, 22 Dec 2025 18:00:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LNa3vbgR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ry6vyLnW";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="c3FHLG6d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f67.google.com (mail-ed1-f67.google.com [209.85.208.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92B79337BA1
-	for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 17:57:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6BF627A103
+	for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 18:00:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766426250; cv=none; b=YoUt96cttee9towCX/RNfwApw8aoDHqgb70GnrL5Ldn+J/h/0HUOAifkZFqZQLzzUjqMw6p9iqNLSxyhrbYiEA1eyevXzS4/bsuqRcLnzYoBIY8th6mgav/Z+LdIXlIX/l3x34xvSXcp4j2LnR9beTNceVH7AxfXuUfPGVSZl3U=
+	t=1766426445; cv=none; b=Ebp8HveeOgbsG5OeVeTNKF0L3QXxajzo6fg6FPkuBcdpcyxeT3D3giN2VgM/X+lGlUSwDB0y62VIZFYK2+dVM2QdDhjoxbHXDkNBCCn9d2NgkZQufDbDRa1j1vQZ46MFOstkF+lkRQ/FOPiXAtBNkHcpC0iHxMciLxSC4LM6VQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766426250; c=relaxed/simple;
-	bh=wBha3d01qjiMew7UlnJKYluL6OwpP6oM7rEy/5DQKRo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dlmV9So6ZfGhuvxckVwODT6O3yQeHDWB17CFZxjdfOFb90OPIR7fWclVMk/11bCmTg8hq7rJ0EVpmUv4Sb0jMtXBPbgdko4giNsNNTeTaZhV9mLvEANGDKMaEGzpfhpHL4UIBBjFTeIReIJ8f5C0D+cq9WhAlR6uvwMjm3v5oDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LNa3vbgR; arc=none smtp.client-ip=209.85.208.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f67.google.com with SMTP id 4fb4d7f45d1cf-64bea6c5819so3830453a12.3
-        for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 09:57:28 -0800 (PST)
+	s=arc-20240116; t=1766426445; c=relaxed/simple;
+	bh=cbyuGkfXpqUbhzcI1BkQa3K8cyZUe/N+4bGTpsNbH5I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FEQmZHEatB0FJWoyE0CsbVjLwRjbYRzk/5+Zp3KH78F2fBMqoYwaMtGJ74SR3xw4ek6JBAw+5JHd6uPhas+eH0fuidYKJ1e5TLhp80Qi/NTPwIi5NWdWQpvuw3apkT/Aej7QbjI2NANfySpcWCRRwqOuJKLHd9TlX6qLrM3fnio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ry6vyLnW; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=c3FHLG6d; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1766426443;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dXo0XmPhzaeXOxCnEx9hH+u3QjRF1RyUWpvNBcumJRc=;
+	b=Ry6vyLnWOpv6vdCtcaxjD6ub2uDlsXaj2G/lFujiZUG/YLehECkr8BAT5TM/MSGW/Jo9Wo
+	T5z6dK8KIELK0NDltbV2MLsSjJ4ei+6LcNShzLA8d2uWfh6n/oi510EAgmgdjg4vUszIvM
+	kuSaGpoK51c5pvPCPBEUl4xfGXNGH0U=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-541-_6A-wz-LMoGTFZgObvf1Vw-1; Mon, 22 Dec 2025 13:00:41 -0500
+X-MC-Unique: _6A-wz-LMoGTFZgObvf1Vw-1
+X-Mimecast-MFC-AGG-ID: _6A-wz-LMoGTFZgObvf1Vw_1766426441
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-88a3929171bso89675216d6.3
+        for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 10:00:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766426247; x=1767031047; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=redhat.com; s=google; t=1766426441; x=1767031241; darn=vger.kernel.org;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wBha3d01qjiMew7UlnJKYluL6OwpP6oM7rEy/5DQKRo=;
-        b=LNa3vbgR/8VDkKsgceoMQFQpTBdDrdaU7Ix0pVzNoL1MeQOtmi+a+PQDJi0Ca3XF8q
-         ppxU8XvnRPEihqkwhUIRDYfy+jTu7hrjHD9X1de+Qzmtkd5ulyDu9AS5/7YCXO0ra7/E
-         Q0myErxYccGUCiRDFhCDFK2M+hsYT5qUpMBx/jFLE9KlXcij37RNBBsz+dTt16lB4gsI
-         jVffezsPbNvK++8pGGKoN/Z221V1Ao2pbdLY6VC+WFJrj4wsxbx6KEr7nfJBrxj/wGHQ
-         BblWoKp/04rWMM8Aik1GIgXD8oarLZMnU4h8JYlmqp1QixKO0k3CVpxpPi2trsNVpAoU
-         vA1g==
+        bh=dXo0XmPhzaeXOxCnEx9hH+u3QjRF1RyUWpvNBcumJRc=;
+        b=c3FHLG6dt1utePC4BAhCOu9bsRZBsYxoAjdwgugSfG2kwnsR9xoQY2c8lm8j0YrcDy
+         M+lX19ls1AlHMCcFSvHxmN/kcFgWd7SwRSVd1zydUqsiVTZaMKn0/FpQpUBXX1vWQw4S
+         M6EfyBys6JvnnpynZbpenEdTazny5H+3wqe78ZD7tS9lpqpsWKv8JPlEXO+78QhPd+H5
+         dfoSALSttX1C+oo+nbRg258lBYwWPT/zRcNhuuCCf8HNOZqgnCN/+s/RX7088DKiIipn
+         kLPso4ZirxBnefCbTOV3GFWgojQWRrfEQ92GtDGfz7M1Ni2zO6xZGNq6mQpGtaSuVHbM
+         tFqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766426247; x=1767031047;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1766426441; x=1767031241;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=wBha3d01qjiMew7UlnJKYluL6OwpP6oM7rEy/5DQKRo=;
-        b=r0QerEseeod0MmHhM+4Ib4P+RNSp7GcQtX1nE8iY3HtYfgYxW+GGbcd4JAT5E8kGQA
-         /4l6OLTPFLy1UMPgqjBgAlgzji9a5E0lweczSdwVnbxq6IgmrYOys/D4Isc6b8EF5arw
-         PapPIMK39RwfAuIM3sZoqq0ti5EOswYAUAwx7BgcGOm/uxjG2B6fRWwyQb9Yt9Wd5Dnn
-         GkbA+8wEJKd6YXZAWzKPpgnM1tV8i+NqQMrdA5fMrH7WySv4FjjfbBWzSxGBeOjuolxw
-         74f8skKAjtK1ZxEXcMfLAgOOMh43ZWxh9yt4jQBNsTvPBQqS8r61CflLD1xXo4nSVoht
-         av2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVjgkqyyiM4x3yI06hUBs9jGXdxCUm+WJmhijWwnwTUFRpOzCExTd5UYLgn95tig2WVtxMeYiY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxmckjKZxckwhsGO7Bg794uQGHHiKf6Jb1X1B5CQ+iJIfmog3E1
-	g120xBb/kSan25npJIIT6TAPj/GcnRl3o2hwKp4503AXCtdtVBHSQ1K/QD+lrGsxVxusMHKASPl
-	EnJ9LaiNmxhSIYefLmEl/BWrvZYvH94s=
-X-Gm-Gg: AY/fxX6qR7cXRXUpL5RUDjkyHv8QJ1nV9degoF1TxFYOpEqoBuukvtKGtrfuvzP+qIQ
-	obKlW/u4GIPp3FplmskS6CFeUIcb94IBNrSgRtcIZSxPbkWwzosXn742pAJ209fQSewBlJeKuaX
-	12D7QXiGJ+RKpsDbYiVJzcxhwdhBjRpqAHFRoZWfN0ghLV3lwV8dcGjAb8OzSFfx6EsUQz+QtZ2
-	iVrUEVrRf1sASfyeLcLz7oYWKaIPPi7dM2AsDXcA5aGhMtajaos2bQvMTENh8a5zWWe90O/WjiS
-	BsXr
-X-Google-Smtp-Source: AGHT+IHGjnM4tssmgrpgdS+QyfppBwGcEa/TtaSTVo3x3z2X4MIp6+nQ00I9y9UQh1U0WtN9dG4OQo1+7sN+Qmf+nvg=
-X-Received: by 2002:a17:907:3f25:b0:b80:117d:46e5 with SMTP id
- a640c23a62f3a-b8036f62257mr1197264466b.29.1766426246688; Mon, 22 Dec 2025
- 09:57:26 -0800 (PST)
+        bh=dXo0XmPhzaeXOxCnEx9hH+u3QjRF1RyUWpvNBcumJRc=;
+        b=FRxcrqBbrtCNp4xLg/bgEgCQPEBxmUYQU+BBBuAA2TbDxPqiP8Npwly4oa3DIPbEE8
+         Af3miMnHE9OufSQCtcqNusKZ2tedCPKfLk/78y09e+w/UfzRiYFyrIACXfRuUcbhyzh3
+         SRMRt7eLfFiLxF43LOhNijeyJ67LasdRO8lokBXgLDt6GYImvW92V1Jut3O9X5gqQ6+Z
+         S2S8NbkFsXM7cjh9x/OkwWp9z9/5wmRKapguKS5ih9pMhyUcZTKDD3Y+mjBkPkbr4wMY
+         xMfwDsfZspKFKAz5gv9zCuC+IN6aVSp4izoJ3yHWYxJymWNUnZfvIiXq+DRn1kqqz1cf
+         eQOg==
+X-Forwarded-Encrypted: i=1; AJvYcCXB3ZLqf96XMoglnE4CuoHzYMsIr69HC5Jodu3kkl6uqfDXFBe2mnGT5lHZ+wwuZ7hFnCJlegc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyh9tHXYvx+puo9J9Y8CgGirR0OxzpklAS3U+WpkIqpYRxWaeXD
+	DDg+ZMDWOMGa11rFEh5dTKoRwIZM15xJl1WnrR2tAiR+QNXQB3m37w1YMipG7BDgEPdQFsBd14d
+	+u4NmV1KZ+mGB0K7O+yhU6amkX//XoJVmJ/CZA94l6EYxxOGt8PvEuB917w==
+X-Gm-Gg: AY/fxX4x0jEX1HGoDmeNFwnhw2sIlZ5oDeIg7/px/Y4vnRfxpOEEviNy0aUOn/AylJb
+	IcBTnq88HaGpBWDgLPm977nCtahjDWjQpx9t3qc6mnV3haHv9a5F0UgnWaoX2oDwgPz66fRgQtO
+	Wvz8/4LHq7Rxf3FyixJLopEqR42E6DRY7cNyzo6R/pytV3qoHhn5c8mhDjvwDSXqH1Vga7zAYTt
+	7wODsn63zzwKK+A+OG7q5pAN7XbrBJGmehHsnk/pEbUiIJ6FkHzAUqqMPIB5w7yO2D80OD0yix+
+	ZnVuPIox5BIIGu1hsaXS8XarMmKH1tfnOF4W6MS1JcxY+aJK+hY45m+kb4o+2FHeCIPK9dCbxr0
+	lsSb2hY4Hlj5RqUMnzqJL+CqS2aAveQAfRJ991MYOLhiN
+X-Received: by 2002:a05:6214:27c6:b0:88a:306b:820b with SMTP id 6a1803df08f44-88d83d670e7mr209995436d6.57.1766426440673;
+        Mon, 22 Dec 2025 10:00:40 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFShBd6/ILCtyh9OhdnIzWfY3dp9JmiO74dGqZBOXDUCJ4lowAybkSiEsS44d+2GsPo84wwMA==
+X-Received: by 2002:a05:6214:27c6:b0:88a:306b:820b with SMTP id 6a1803df08f44-88d83d670e7mr209994116d6.57.1766426440046;
+        Mon, 22 Dec 2025 10:00:40 -0800 (PST)
+Received: from redhat.com (c-73-183-52-120.hsd1.pa.comcast.net. [73.183.52.120])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-88d9a63e296sm86625536d6.52.2025.12.22.10.00.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Dec 2025 10:00:39 -0800 (PST)
+Date: Mon, 22 Dec 2025 13:00:36 -0500
+From: Brian Masney <bmasney@redhat.com>
+To: "irving.ch.lin" <irving-ch.lin@mediatek.com>
+Cc: Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Qiqi Wang <qiqi.wang@mediatek.com>, linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-pm@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Project_Global_Chrome_Upstream_Group@mediatek.com,
+	sirius.wang@mediatek.com, vince-wl.liu@mediatek.com,
+	jh.hsu@mediatek.com
+Subject: Re: [PATCH v4 04/21] clk: mediatek: Add MT8189 apmixedsys clock
+ support
+Message-ID: <aUmHRCXNy45PrVLG@redhat.com>
+References: <20251215034944.2973003-1-irving-ch.lin@mediatek.com>
+ <20251215034944.2973003-5-irving-ch.lin@mediatek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAOprWotBRv_cvD3GCSe7N2tiLooZBoDisSwbu+VBAmt_2izvwQ@mail.gmail.com>
- <CAA7ZjpY-q6pynoDpo6OwW80zd7rq3dfFjQ1RMGzJR4pKSu7Zzg@mail.gmail.com>
-In-Reply-To: <CAA7ZjpY-q6pynoDpo6OwW80zd7rq3dfFjQ1RMGzJR4pKSu7Zzg@mail.gmail.com>
-From: Andrea Daoud <andreadaoud6@gmail.com>
-Date: Tue, 23 Dec 2025 01:57:15 +0800
-X-Gm-Features: AQt7F2pbRWy0Y3qdReSvX4Mn03sO7NEaq-NkFe6B_tFRTn8ukhodMW_kVgnL2-o
-Message-ID: <CAOprWov+j6V8XmtQD-K6pBj+7CVP_QJM0ODbJxtPZqG=y2RW3w@mail.gmail.com>
-Subject: Re: ctucanfd: possible coding error in ctucan_set_secondary_sample_point
- causing SSP not enabled
-To: Ondrej Ille <ondrej.ille@gmail.com>
-Cc: Pavel Pisa <pisa@cmp.felk.cvut.cz>, Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org, 
-	Wolfgang Grandegger <wg@grandegger.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251215034944.2973003-5-irving-ch.lin@mediatek.com>
+User-Agent: Mutt/2.2.14 (2025-02-20)
 
-Thanks for your reply!
+On Mon, Dec 15, 2025 at 11:49:13AM +0800, irving.ch.lin wrote:
+> From: Irving-CH Lin <irving-ch.lin@mediatek.com>
+> 
+> Add support for the MT8189 apmixedsys clock controller, which provides
+> PLLs generated from SoC 26m.
+> 
+> Signed-off-by: Irving-CH Lin <irving-ch.lin@mediatek.com>
+> ---
+>  drivers/clk/mediatek/Kconfig                 |  13 ++
+>  drivers/clk/mediatek/Makefile                |   1 +
+>  drivers/clk/mediatek/clk-mt8189-apmixedsys.c | 192 +++++++++++++++++++
+                        ^^^^^^^^^^^^^^^^^^^^^^^
 
-On Mon, Dec 22, 2025 at 11:51=E2=80=AFPM Ondrej Ille <ondrej.ille@gmail.com=
-> wrote:
->
-> Hello Andrea,
->
-> yes, your thinking is correct, there is a bug there.
->
-> This was pointed to by another user right in the CTU CAN FD repository wh=
-ere the Linux driver also lives:
-> https://github.com/Blebowski/CTU-CAN-FD/pull/2
->
-> It is as you say, it should be:
->
-> -- ssp_cfg |=3D FIELD_PREP(REG_TRV_DELAY_SSP_SRC, 0x1);
-> ++ ssp_cfg |=3D FIELD_PREP(REG_TRV_DELAY_SSP_SRC, 0x0);
->
-> Unfortunately, we have not processed this in the CTU CAN FD repo either.
-> I can send it as a patch, but TBH, I have never done this before (the dri=
-ver was contributed to Kernel by Pavel Pisa, he is the maintainer).
-> If you point me in the right direction to the steps I should follow, I wi=
-ll be glad to do so.
->
-> With Regards
-> Ondrej Ille
->
-> PS: The changes are dummy enough that they will likely not cause a large =
-review, so it seems like an ideal case for trying to contribute for the fir=
-st time.
+This file, along with others in this series, is not listed in
+MAINTAINERS. This is the current entry:
 
-Unfortunately I do not have an environment right now to make patches
-sent, so it would be better if someone else can send the patch.
+MEDIATEK MT6735 CLOCK & RESET DRIVERS
+M:      Yassine Oudjana <y.oudjana@protonmail.com>
+L:      linux-clk@vger.kernel.org
+L:      linux-mediatek@lists.infradead.org (moderated for non-subscribers)
+S:      Maintained
+F:      drivers/clk/mediatek/clk-mt6735-apmixedsys.c
+F:      drivers/clk/mediatek/clk-mt6735-imgsys.c
+F:      drivers/clk/mediatek/clk-mt6735-infracfg.c
+F:      drivers/clk/mediatek/clk-mt6735-mfgcfg.c
+F:      drivers/clk/mediatek/clk-mt6735-pericfg.c
+F:      drivers/clk/mediatek/clk-mt6735-topckgen.c
+F:      drivers/clk/mediatek/clk-mt6735-vdecsys.c
+F:      drivers/clk/mediatek/clk-mt6735-vencsys.c
+F:      include/dt-bindings/clock/mediatek,mt6735-apmixedsys.h
+F:      include/dt-bindings/clock/mediatek,mt6735-imgsys.h
+F:      include/dt-bindings/clock/mediatek,mt6735-infracfg.h
+F:      include/dt-bindings/clock/mediatek,mt6735-mfgcfg.h
+F:      include/dt-bindings/clock/mediatek,mt6735-pericfg.h
+F:      include/dt-bindings/clock/mediatek,mt6735-topckgen.h
+F:      include/dt-bindings/clock/mediatek,mt6735-vdecsys.h
+F:      include/dt-bindings/clock/mediatek,mt6735-vencsys.h
+F:      include/dt-bindings/reset/mediatek,mt6735-infracfg.h
+F:      include/dt-bindings/reset/mediatek,mt6735-mfgcfg.h
+F:      include/dt-bindings/reset/mediatek,mt6735-pericfg.h
+F:      include/dt-bindings/reset/mediatek,mt6735-vdecsys.h
 
-> PPS: I will go on and fix it in CTU CAN FD repo too. However, ATM I don't=
- have a setup where to really test this.
+Should the entries to MAINTAINERS be simplified to the following?
 
-I have tested it on my setup. I run this core on a FPGA, with PCIe
-connected to Linux host. After changing this to zero, I can see the
-relative phase of sample_sec has changed to a more ideal phase in the
-received bit.
+F:      drivers/clk/mediatek/
+F:      include/dt-bindings/clock/mediatek,*
 
->
-> On Mon, Dec 22, 2025 at 3:17=E2=80=AFPM Andrea Daoud <andreadaoud6@gmail.=
-com> wrote:
->>
->> Hi,
->>
->> In ctucan_set_secondary_sample_point(), there's a line which runs when
->> data bitrate is >1Mbps:
->>
->> ssp_cfg |=3D FIELD_PREP(REG_TRV_DELAY_SSP_SRC, 0x1);
->>
->> In the datasheet [1] of ctucanfd, we can see the meaning of SSP_SRC:
->>
->> SSP_SRC: Source of Secondary sampling point.
->> 0b00 - SSP_SRC_MEAS_N_OFFSET - SSP position =3D TRV_DELAY (Measured
->> Transmitter delay) + SSP_OFFSET.
->> 0b01 - SSP_SRC_NO_SSP - SSP is not used. Transmitter uses regular
->> Sampling Point during data bit rate.
->> 0b10 - SSP_SRC_OFFSET - SSP position =3D SSP_OFFSET. Measured
->> Transmitter delay value is ignored.
->>
->> Therefore, setting it to 1 disables SSP (NO_SSP). We should probably
->> set it to 0 (MEAS_N_OFFSET).
->>
->> Is this correct? Would like to hear some inputs.
->>
->> Regards,
->>
->> Andrea
->>
->> [1]: https://canbus.pages.fel.cvut.cz/ctucanfd_ip_core/doc/Datasheet.pdf
+Brian
+
 
