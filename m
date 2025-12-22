@@ -1,94 +1,85 @@
-Return-Path: <netdev+bounces-245748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245749-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42D6FCD6E35
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 19:22:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D647CD6E5E
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 19:32:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8FCB03022A9F
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 18:22:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1E1AD302A951
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 18:32:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6D4A2F5313;
-	Mon, 22 Dec 2025 18:22:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8354428751D;
+	Mon, 22 Dec 2025 18:32:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KQGEt8v2"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="E+QKCXdv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1342F1DF980
-	for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 18:22:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2102913635E
+	for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 18:32:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766427736; cv=none; b=s36KiSLGGxW1SQuQOwwgv9oEAV7dr4dEJ/SrFKguU6RgV+uLCCBxCun9nbxNJJGtkeJCZPzuvprR9sSr/lUwzvjx/vODXuX1rIr0OAsHXSyLfpkFVBrB5P6+ZhiQElE6ZYDsRmel0Dh7ruor2j9RXECGWDjBB0yugStil5CHoVE=
+	t=1766428339; cv=none; b=rc7Ln0znDCbUwYrRBzHO8T+VWFFKEE39UxEk9Ui2aH7zxVIiA0mKzFWgwfu3cJoNbnlxniwBnEMzH5skA9iXNrOazB7Rv6ZxcrzBOxxEc0gP8B6c53oWRfUVlAm52tE2QARNPiA+2+PERWWKnjz9F0lG+0isx998/JFpTwKA5NU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766427736; c=relaxed/simple;
-	bh=PspIumBe+iTtYPSn0/F9OZy3n3LfxhvhqBjwakNUly8=;
+	s=arc-20240116; t=1766428339; c=relaxed/simple;
+	bh=n3ea/aH2BHpTlM1CeqgY3mZukIew1SUR2MWc6fVgMwY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IWTLzy7WYlj0cQHksMj5Qvd6CbGZwT8xrdX+0KbGuxtNxf3mexibfnMovnOvcx/6znEHrQZYKfCSb8LVLNIJMWmC1T2eRbB0o5nuukmkCuN3g59dGXM8JL5glvv6eyAfn1+gtOXLw7fYnQJrQYDv47kxxO8JGnIhLqS3DxqsCkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KQGEt8v2; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-477b198f4bcso27798635e9.3
-        for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 10:22:14 -0800 (PST)
+	 MIME-Version:Content-Type; b=KOjsg1JUAtoVd3KW1DlNv95rRIs/UnSlm9YHTwdGfDqA36awI7cfFL6Ettkfz0OgRRNP3D/dNMyhSW92BBanA3eOX/TbG/CwUAt+6V4DQ/HQhjABuOY5+ySValNuJc3ZbIvAoTMvA7ptgwSsBD6XOWafvKdZLdTIb6WJAblv3ZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=E+QKCXdv; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-477a219dbcaso36127505e9.3
+        for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 10:32:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766427733; x=1767032533; darn=vger.kernel.org;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1766428335; x=1767033135; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oR2rep0bhoWET14XJZVLvIr5MH7A34XNIPdTSdrxt3E=;
-        b=KQGEt8v2xMySAHqnS1OcalKe3qeS8bY56p/w708ZkRbK631XiFjWI7zcd59VKbwmsf
-         Jk279P6tCp/qO8rAOrrokAeqwYidXk5onQWzE1edFqnWMdqyH81AAy+uo93wsBmj9JaP
-         DYq4mz4vdKt/7uHdodw6DI1TTr+XciLkW83btjBWM1vbm3WuPQNozxbo3qxkl/xWE+Lq
-         6+iShKri31noAsqcnmlqI8yKeiggJF+QGh0DgXO98dFG6ZhjcZsRJxkEzHOZHd6KZcPi
-         u/ERo6vnYiWoz0v96brPForLP82T/cP6lPffF7onUFVRCct9+R/XUH8ZIg1bd95iawmA
-         bOvw==
+        bh=6+yb6h0ECI3KX22nI1fSNyqaGpSlCBOwjfFLZeBjxoM=;
+        b=E+QKCXdv1t+6FXhDsuSQ7Kdj4/vXi7p9IxX1Z/E8uAB3seqCS9VQUtdTqxI7J6jYLf
+         N57RhlWhbsEldXhxkB4Wmxx79IP/fiTMj435AvQPT6/i8Hf63Y6NXzx4aamoOljwPY55
+         281NJ9JeVIZZdoCWOO/fqFnMfcHAnb0Br2z3mYFd9+B1w4vSGuoEwmzlIy3j+vBCa8u3
+         tv3cTtPL2/diBNT0RUF4tFAt4oCWvdOVnxBcmonsa/9PIAjsCQlGXiZWGas/dtmNOJ1R
+         uVGUGbYLTVgm1E33GsHSPE/PwY1kveTB88xoPdlFrR77HRIn+AJqbOczj7U750JYGc2w
+         TiRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766427733; x=1767032533;
+        d=1e100.net; s=20230601; t=1766428335; x=1767033135;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=oR2rep0bhoWET14XJZVLvIr5MH7A34XNIPdTSdrxt3E=;
-        b=dLdFlAeHiRrAKwpdKp3Wa1XwMIMSLMNO+tu1FnrcBa/XDixq6GOQ+wFPNxLpgbF9BC
-         IKQg412v1GvKGWng2p6uQSuNDg6e9ZaAf1MBVYdeNLuKtIl6MusNUp8H3CUz2rkL+4Kt
-         UVJTIZShIwKsf4xt37dWhq+1YCGGrCTCN2k2IW8sHyVyOTA5eJ/omI4oBOLJy7U+VCNm
-         727Q2nqN7htxrQ10jhdixGWlNWlSfvmkyM81Kfi0zg3BQeC4/8KiYG8vPdjUncdTGl5x
-         3Br7gG9b0H+bbdcI8nMFOOkAhyMUqmbZ2Z7LQAFG6jlf8tg83YrJ3Bj1WvWkkz+MlE41
-         A8mA==
-X-Forwarded-Encrypted: i=1; AJvYcCUv132qLTN7DhaMFAjaXtwI//wL1DVC5ncowvVDa41R5dGd1r4S6yEf5I5HqllDOos5a3vjgCw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoEakQozSo9cX9+fowZucyNkzKCihqrPDOdqmMRXGZF/mEppoe
-	wRSiitWwbotU+rk3z0/CgItpEWiFOr5ckcyNqSQ/hYLiCpEna8YkofMh
-X-Gm-Gg: AY/fxX4sFKBBecUjE01fGo7ftVGAnVzhdjgyfoM+v7rS09A6bDJY+nKYhiktbWg46my
-	vK7Psjll4EpLjJ9wkZp4c3AKijWXeHt7gXTH1CM+27inkQPUBmavfb+g/k71QxEKXjUzh/P2HwD
-	CWCEcaMS0Y9XPORtHKxTOOv/pL2n55RDM8JbfFF+MXsENq2L36vS63eNJaLCQ+yTGa7zib3bYKE
-	a6OZxrwV55f7me/gcZIzaRZz0f0FEL9XP0bRnQJ3OEDKECCZopJidLTaY5/9OVfbt81joSRa1xB
-	bcUBr99oeQEzTamS+hvCqML2AaNlTNp+r4/l2KcX/NgNvUI80yeY3XYQvptR+utfm/OW/kLYEqP
-	roEqVmPU3hB49Un5/Wd/QsyZ1gqXG+DFtBmgRoJnr9ni6nBywvpTbXLrTzBIm45ZdQhM+jwOFlE
-	o5LiC6qIcBEqX1Df7AkMFDce66pOc+NfGFW8kxRxmX9mfYX8Tt6W63+rwLKXhHow==
-X-Google-Smtp-Source: AGHT+IEVWzbNFvXXJ94RvZjNEhXIYaVOr65NRyrf0Wy3hxmQf6dr1+8Au8WvTRtTjC4EBhedJMWEmg==
-X-Received: by 2002:a05:600c:628c:b0:47a:7fbf:d5c8 with SMTP id 5b1f17b1804b1-47d1958296bmr109337795e9.26.1766427733286;
-        Mon, 22 Dec 2025 10:22:13 -0800 (PST)
-Received: from pumpkin (host-2-103-239-165.as13285.net. [2.103.239.165])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-43264613923sm6651697f8f.26.2025.12.22.10.22.12
+        bh=6+yb6h0ECI3KX22nI1fSNyqaGpSlCBOwjfFLZeBjxoM=;
+        b=igxb6WIX3lmulV6FUutuXnWuJw9cNRtV7YbXhJB3b/7XNxOTo31cVA9NfafLDfOTGD
+         AmLkxC68fwYTMp2s96s6Crvfr4dYbLgj2SFJJEA2NDFzVgmAK0HQ453Xx/7DOlVZb6LB
+         lapGsXQUcDZu6CBSowEEVG5spfWTBwhIvK//tVwYhdlRBXMkOFcOoI7v8A8CwMD3UtP5
+         um5SbQW7b2DpWZG3XkYIbJC2zo4eexyt485uZbj8gn25GC70Wf0/fQs1JT0xtDaLNv4A
+         karFAtjAZ0eHOid73l5A6PWTwdz49sLZoStJCO4OpHqnvTI4J1amZYUfZVvpzBCTMgg1
+         WjBw==
+X-Gm-Message-State: AOJu0Ywpth6uYfhr3b9N+V8cdLzvcDSLBhdk0YTYGjAi+iMAjoNdvJxT
+	ue/JMHivBXuxBfgx4gDkfKv5ZWrCETtX0YvGyy8lKK+S4MY2IGzF/ORf4MEQfbIniAk=
+X-Gm-Gg: AY/fxX4vzl+rLg2GhNfcWThtp2oZCzRAzu37dLC+Urxni1SATA7s4A5aT72YNQ1FNIl
+	NbSV2WvbgezfUTFmKCBTIUVsHTB47RS/FZ2FxJyEWweKXvvqYsg6f+PKWRMNgovRnoaWull0moW
+	khlo+49DTOJVJrCh2Wdugq/rqtcJ71F0AxjnPyl66gmI458a1Edm5zWNikAFQCxKXs24+h1bZ2v
+	nlXod4Wq0lDInFHCXqJn1A0XEepTPBbpNQ7PUigK43XwKh7/BbDcye98Lf46IJ4He4feZ0PsXAv
+	ory4sp3mDyAEMX3C6DoL7Ob26cbHcNW/bCuXfrbXSGoCduC/gVjCTlRVC0sUmVayXWBpWdjIqLT
+	5kbF1lI2ZvdV3iSm0GE6fy0qOROrjAihgl6chlBvt1ut/4XxTBlqxB4WbBjH3zZsCV/fik0yGVY
+	EYe49+YRTegYWl/pNn+59wBBUlb4AnlpLiKuZqTH8AyWQZPkJmg1BG
+X-Google-Smtp-Source: AGHT+IFhJmt1mK6QhL1e1lj3QjqCYLXY33vBfcj+daLhtmnyhfmDwUsTWUl2RkKIKKB9lvYT3BNtSA==
+X-Received: by 2002:a05:600c:4fc6:b0:477:755b:5587 with SMTP id 5b1f17b1804b1-47d1955b35fmr111300875e9.8.1766428334856;
+        Mon, 22 Dec 2025 10:32:14 -0800 (PST)
+Received: from phoenix.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47be3a203d4sm99188405e9.1.2025.12.22.10.32.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Dec 2025 10:22:12 -0800 (PST)
-Date: Mon, 22 Dec 2025 18:22:11 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: Ondrej Ille <ondrej.ille@gmail.com>, Andrea Daoud
- <andreadaoud6@gmail.com>, Pavel Pisa <pisa@cmp.felk.cvut.cz>,
- linux-can@vger.kernel.org, Wolfgang Grandegger <wg@grandegger.com>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Christophe
- JAILLET <christophe.jaillet@wanadoo.fr>, netdev@vger.kernel.org
-Subject: Re: ctucanfd: possible coding error in
- ctucan_set_secondary_sample_point causing SSP not enabled
-Message-ID: <20251222182211.26893b94@pumpkin>
-In-Reply-To: <20251222-kickass-oyster-of-sorcery-c39bb7-mkl@pengutronix.de>
-References: <CAOprWotBRv_cvD3GCSe7N2tiLooZBoDisSwbu+VBAmt_2izvwQ@mail.gmail.com>
-	<CAA7ZjpY-q6pynoDpo6OwW80zd7rq3dfFjQ1RMGzJR4pKSu7Zzg@mail.gmail.com>
-	<20251222-kickass-oyster-of-sorcery-c39bb7-mkl@pengutronix.de>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        Mon, 22 Dec 2025 10:32:14 -0800 (PST)
+Date: Mon, 22 Dec 2025 10:32:09 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Masatake YAMATO <yamato@redhat.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH iproute2 1/2] man: explain the naming convention of
+ files under .d dir
+Message-ID: <20251222103209.0f9e03bd@phoenix.local>
+In-Reply-To: <20251217154354.2410098-1-yamato@redhat.com>
+References: <20251217154354.2410098-1-yamato@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,43 +89,53 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 22 Dec 2025 17:20:49 +0100
-Marc Kleine-Budde <mkl@pengutronix.de> wrote:
+On Thu, 18 Dec 2025 00:43:53 +0900
+Masatake YAMATO <yamato@redhat.com> wrote:
 
-> On 22.12.2025 16:51:07, Ondrej Ille wrote:
-> > yes, your thinking is correct, there is a bug there.
-> >
-> > This was pointed to by another user right in the CTU CAN FD repository
-> > where the Linux driver also lives:
-> > https://github.com/Blebowski/CTU-CAN-FD/pull/2
-> >
-> > It is as you say, it should be:
-> >
-> > -- ssp_cfg |= FIELD_PREP(REG_TRV_DELAY_SSP_SRC, 0x1);
-> > ++ ssp_cfg |= FIELD_PREP(REG_TRV_DELAY_SSP_SRC, 0x0);  
+> Signed-off-by: Masatake YAMATO <yamato@redhat.com>
+> ---
+>  man/man8/ip-address.8.in | 7 +++++++
+>  man/man8/ip-link.8.in    | 7 +++++--
+>  2 files changed, 12 insertions(+), 2 deletions(-)
 > 
-> This statement has no effect, as 'ssp_cfg |= 0x0' is still 'ssp_cfg'.
+> diff --git a/man/man8/ip-address.8.in b/man/man8/ip-address.8.in
+> index 79942c1a..e88a114f 100644
+> --- a/man/man8/ip-address.8.in
+> +++ b/man/man8/ip-address.8.in
+> @@ -331,6 +331,13 @@ values have a fixed interpretation. Namely:
+>  The rest of the values are not reserved and the administrator is free
+>  to assign (or not to assign) protocol tags.
+>  
+> +When scanning
+> +.BR rt_addrprotos.d
+> +directory, only files ending
+> +.BR .conf
+> +are considered.
+> +Files beginning with a dot are ignored.
+> +
+>  .SS ip address delete - delete protocol address
+>  .B Arguments:
+>  coincide with the arguments of
+> diff --git a/man/man8/ip-link.8.in b/man/man8/ip-link.8.in
+> index ef45fe08..67f9e2f0 100644
+> --- a/man/man8/ip-link.8.in
+> +++ b/man/man8/ip-link.8.in
+> @@ -2315,8 +2315,11 @@ down on the switch port.
+>  .BR "protodown_reason PREASON on " or " off"
+>  set
+>  .B PROTODOWN
+> -reasons on the device. protodown reason bit names can be enumerated under
+> -/etc/iproute2/protodown_reasons.d/. possible reasons bits 0-31
+> +reasons on the device. protodown reason bit names can be enumerated in the
+> +.BR *.conf
+> +files under
+> +.BR @SYSCONF_USR_DIR@/protodown_reasons.d " or " @SYSCONF_ETC_DIR@/protodown_reasons.d "."
+> +possible reasons bits 0-31
+>  
+>  .TP
+>  .BR "dynamic on " or " dynamic off"
 
-The compiler will optimise it away - so it is the same as a comment.
 
-> IMHO it's better to add a comment that says, why you don't set
-> REG_TRV_DELAY_SSP_SRC. Another option is to add create a define that
-> replaces 0x1 and 0x0 for REG_TRV_DELAY_SSP_SRC with a speaking name.
-
-Looking at the header, the 'field' is two bits wide.
-So what you really want the code to look like is:
-	ssp_cfg |= REG_TRV_DELAY_SSP_SRC(n);
-There is nothing to stop working - it just needs the right defines.
-Sort of FIELD_PREP(GENMASK(25, 24), n) - but you can do a lot better than that.
-The inverse is also possible:
-	val = GET_VAL(REG_TRV_DELAY_SSP_SRC, reg_val);
-#define GET_VAL(x, reg) ((reg & x(-1))/x(1))
-
-    David
-
-> 
-> regards,
-> Marc
-> 
-
+The man page is slightly redundant here. Already have a README file in the
+directory.
 
