@@ -1,79 +1,89 @@
-Return-Path: <netdev+bounces-245766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BF55CD72AC
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 21:59:27 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E469CD72FC
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 22:22:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AC67D3018301
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 20:59:15 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 7BDB630011B4
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 21:22:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FC3833B6E9;
-	Mon, 22 Dec 2025 20:59:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAADA3081B8;
+	Mon, 22 Dec 2025 21:22:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RUqebg/p"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aiHukJxK"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A45E3346A1
-	for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 20:59:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 289F2302165
+	for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 21:22:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766437153; cv=none; b=GjwSHQ/EDZEpSAXOQVgNdJJZfB6wzDJCmcwv1DVKCYmRIR4aN830YzkF0FF+cdFBPwtetc5CwntB4HP1L/kQzBlefRgwnBxxLz/xctvfqJXVR5dbKbViK4hpcGROl6sq2ARNVW3deyr9QdrSECQj74spfNUOHEJkWjCFLJ9H7K8=
+	t=1766438564; cv=none; b=Lyr+FY/y8GBADgN5vNtMAsh26JwvRKjORu1Ebbi0/qPTK7LlmPLasvnwqKv34MJhZkmNKFDsNJCFkYByMlnU/U/o83tVcU+3abRx9ZTcWLtNUID5c9SFx3zOI4U6jDuxSVnNUHdZWhwLsCnBAHv6hvYb9+e3WZvWl2QJDPHsMVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766437153; c=relaxed/simple;
-	bh=8hKC9YGfhL4MRAcw/dhkZDa+uzoxqh7YN+/UgVGtICg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DtZxFi7qLPHPwKERGuU9HYPPJbloljF1UX6nVpVGFF3SFfYOLPgI8UhfVoNReZetYXSNxoRtTEJQGsBwLmP0BRzpovb3S2G+KZqIVL4Zm4KY+Ye22uIwJmcoR7ud1I4p+VxJfNml2CdFuGVZx/ALm8Zk0IQXxK9SaLh75lSqdsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RUqebg/p; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766437147;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XlA6U9YCOue9Zq4ZIOjb0uaIXIXNuOQnLJ08V3zdjh8=;
-	b=RUqebg/pHlnp82R/Fiq218p9pPoG79sZA3HrMyvluc335tUtpLcuA7adfEMdN239ODvmU2
-	BHhptb9JeXfLHFEufGBaKUvzAEs059kZYIejysXgtZiPvlvlmMiKELi4rWDIXpbZ+cW1Rm
-	V4sDlXphZnacyIvYqHtDUqhyup0FjY4=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-75-KRngBhCwMzO-g43hn2QcGg-1; Mon,
- 22 Dec 2025 15:59:03 -0500
-X-MC-Unique: KRngBhCwMzO-g43hn2QcGg-1
-X-Mimecast-MFC-AGG-ID: KRngBhCwMzO-g43hn2QcGg_1766437141
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CA3EA1956094;
-	Mon, 22 Dec 2025 20:59:01 +0000 (UTC)
-Received: from thinkpad.redhat.com (unknown [10.44.32.178])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 390361800352;
-	Mon, 22 Dec 2025 20:58:57 +0000 (UTC)
-From: Felix Maurer <fmaurer@redhat.com>
-To: netdev@vger.kernel.org
+	s=arc-20240116; t=1766438564; c=relaxed/simple;
+	bh=8eo4J8AK+aRH1j7peYCAA3rXxRM4PIYen6KnK8j4OuQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Zr0y5dfPfOo/XGznEGnQRLUPIvs98fpCofetG4FGbUZSbjNB62XkjvLROnRg6txKf2h7RYFwIZineZSn5hhPpNtuktZ8u0yAOZxUTCc0jL4hZrgP+nkhv1TQuBjqJCgs8bGxpY4/n0/H2G1DpX0nlqdEUdOtSkDwVtrkU7bdrV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aiHukJxK; arc=none smtp.client-ip=209.85.128.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-78fc0f33998so23002127b3.0
+        for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 13:22:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1766438562; x=1767043362; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=avc6gMhjIypMIzGq7rfC6eXw+5jZGUWEN+YMRJgojxw=;
+        b=aiHukJxK83O7ZoypcjCD1sIWTA2+gBWpxgAMVqeSswY2OtzqNqe/ChcFTAf/zZUgey
+         N8Nj/syt0OUm+Ef8swU9DMJG8tqYkyMkE1dcrd+7FjeTn4H8iaA5v+v3k5YWH7VoAURs
+         WlHHLyVU1tBWoEgbU7wpZTHC+37aL9qjf9vt12tFBUwCxjKHOVKXmC5sFkwfzKRKcvbX
+         hGPf6aoSfTU233hw3kJFnr4mKvxWD9TbWHa6w6mWadFRSeK7zu1mw5l4pfh9DIgto0lT
+         kjppY5lIBJZRgJ43hqenCyiPQjmAiJbMbroGA6pXKO2xz3QLEwE1VrZaJ5UznqwGBr6S
+         jHbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766438562; x=1767043362;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=avc6gMhjIypMIzGq7rfC6eXw+5jZGUWEN+YMRJgojxw=;
+        b=rGQMEpKZg1PUlckGOLA0FYV3ABOJGYemjnLVeYhoEhDzZqlTkazg9AHqwjWEmULjeW
+         eSTI0HBqIkplNz2fr9XELIvQUcuS4n3QPwLjWAGu7vWwO1SvkpDvdAujT3XFDTzAIi3I
+         IxruY4aOkYyfQt1+PLfOsaMp9xM6Odcc1DJBqZTELDbhqyUz8+rxV7fM7WqByE/lHyKv
+         11nge59V9ek/49pgOahRR5/PYwWqYEMGEI43TjW5EPwWghAe/ElMqt827SdCIYJ37tMp
+         95Gua88rF44yUhCXcUCG9sPN4YOJEzshCDhdBQkOMleYgtwm7k+kvQSvwz6VKWjnRRJ4
+         I7Lg==
+X-Forwarded-Encrypted: i=1; AJvYcCXOPhLw26Nyrm27eh321+XTRS91+trvWK5lLTVcOryL9xAuzXTLcKurNFVYTtFCdirmJgdN1h4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1hjlRCiBjZLKIWmfgJ6qPruA2ArJALiruSJUIGbNfYBxoqVox
+	7VRs0a2Fo/vCrr2J5rTGUnRWUasndtil497iku7uVStNGGGrz/83Vbqg
+X-Gm-Gg: AY/fxX6KnJYiTQxTeRWOjbwUb+8V5pJcUwR53WaJoYz7ALPQC7NYTXlDKFHqRGqmF7E
+	Qv9dtX6E9o3GeEm9TtMQsxNMqmWR5iOySvtLjYnyOpKgJg5A3hWz2BTS3dW4LwxMH8gVeCUEzr4
+	5XwQ5jifWnVAOF+TSlaKo69HIYTU9haB9NzJCdR5/TaHmcC0kzsnZulsqFSUvHkPDrDtt/n8Nac
+	JXpcdusybayBKVmEGvD6P5Nn8g0auSvc+aAy3HrKekhSjm9/XRdWoZ6NyPEcnL0FyhJOsrBJK+s
+	moW1s9CbHlaQ6Q9qoXKejF/hsX3vAlVHpJvPShBGV3934yx7jVQXSuqAjAauWVKddviM8qdja50
+	2Jc8PNTnK35nIXnyqWA00j1k7hkIqyUybHXl21HLTCb7GGQm8EJDmJxLGepeWoIHntIwIpteORC
+	FaoXGsw6ffCCtlOUQFEefcfmgLsx1GHNne
+X-Google-Smtp-Source: AGHT+IG+t+vm07IfI0JY8xSOL4QtCu7revhabIMBVxAC10bzdwWyO0GXifIxbCOnzbItWz3g+CPpsQ==
+X-Received: by 2002:a05:690c:3709:b0:787:f043:1f10 with SMTP id 00721157ae682-78fb40d9267mr233032437b3.66.1766438561947;
+        Mon, 22 Dec 2025 13:22:41 -0800 (PST)
+Received: from guava.tail5f562.ts.net ([128.210.0.165])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-6466a8bcc06sm6008624d50.7.2025.12.22.13.22.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Dec 2025 13:22:41 -0800 (PST)
+From: Sai Ritvik Tanksalkar <ritviktanksalkar@gmail.com>
+To: kuba@kernel.org,
+	pabeni@redhat.com
 Cc: davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
 	horms@kernel.org,
-	jkarrenpalo@gmail.com,
-	tglx@linutronix.de,
-	mingo@kernel.org,
-	allison.henderson@oracle.com,
-	matttbe@kernel.org,
-	petrm@nvidia.com,
-	bigeasy@linutronix.de
-Subject: [RFC net 6/6] selftests: hsr: Add more link fault tests for HSR
-Date: Mon, 22 Dec 2025 21:57:36 +0100
-Message-ID: <6d1fab1aa78d643141e070228937ed53d0c191f7.1766433800.git.fmaurer@redhat.com>
-In-Reply-To: <cover.1766433800.git.fmaurer@redhat.com>
-References: <cover.1766433800.git.fmaurer@redhat.com>
+	netdev@vger.kernel.org,
+	linux-hams@vger.kernel.org,
+	Pwnverse <stanksal@purdue.edu>,
+	Fatma Alwasmi <falwasmi@purdue.edu>
+Subject: [PATCH net] net: rose: fix invalid array index in rose_kill_by_device()
+Date: Mon, 22 Dec 2025 21:22:27 +0000
+Message-ID: <20251222212227.4116041-1-ritviktanksalkar@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,173 +91,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Run the packet loss and reordering tests also for both HSR versions. Now
-they can be removed from the hsr_ping tests completly. Note that the tests
-currently fail because the HSR duplicate discard algorithm does not
-sufficiently take faulty links into account.
+From: Pwnverse <stanksal@purdue.edu>
 
-The timeout needs to be increased because there are 15 link fault test
-cases now, with each of them taking 5-6sec for the test and at most 5sec
-for the HSR node tables to get merged and we also want some room to make
-the test runs stable.
+rose_kill_by_device() collects sockets into a local array[] and then
+iterates over them to disconnect sockets bound to a device being brought
+down.
 
-Signed-off-by: Felix Maurer <fmaurer@redhat.com>
+The loop mistakenly indexes array[cnt] instead of array[i]. For cnt <
+ARRAY_SIZE(array), this reads an uninitialized entry; for cnt ==
+ARRAY_SIZE(array), it is an out-of-bounds read. Either case can lead to
+an invalid socket pointer dereference and also leaks references taken
+via sock_hold().
+
+Fix the index to use i.
+
+Fixes: 64b8bc7d5f143 ("net/rose: fix races in rose_kill_by_device()")
+Co-developed-by: Fatma Alwasmi <falwasmi@purdue.edu>
+Signed-off-by: Fatma Alwasmi <falwasmi@purdue.edu>
+Signed-off-by: Pwnverse <stanksal@purdue.edu>
 ---
- tools/testing/selftests/net/hsr/hsr_ping.sh   | 32 +++-------------
- .../testing/selftests/net/hsr/link_faults.sh  | 38 +++++++++++++++++++
- tools/testing/selftests/net/hsr/settings      |  2 +-
- 3 files changed, 44 insertions(+), 28 deletions(-)
+ net/rose/af_rose.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/net/hsr/hsr_ping.sh b/tools/testing/selftests/net/hsr/hsr_ping.sh
-index 7cb752c25ff2..1ff074dcf93e 100755
---- a/tools/testing/selftests/net/hsr/hsr_ping.sh
-+++ b/tools/testing/selftests/net/hsr/hsr_ping.sh
-@@ -90,27 +90,6 @@ do_ping_tests()
- 	stop_if_error "Longer ping test failed (ns3)."
- }
+diff --git a/net/rose/af_rose.c b/net/rose/af_rose.c
+index fd67494f2815..c0f5a515a8ce 100644
+--- a/net/rose/af_rose.c
++++ b/net/rose/af_rose.c
+@@ -205,7 +205,7 @@ static void rose_kill_by_device(struct net_device *dev)
+ 	spin_unlock_bh(&rose_list_lock);
  
--do_link_problem_tests()
--{
--	echo "INFO: Running link problem tests."
--
--	echo "INFO: Delay the link and drop a few packages."
--	tc -net "$ns3" qdisc add dev ns3eth1 root netem delay 50ms
--	tc -net "$ns2" qdisc add dev ns2eth1 root netem delay 5ms loss 25%
--
--	do_ping_long "$ns1" 100.64.0.2
--	do_ping_long "$ns1" 100.64.0.3
--	stop_if_error "Failed with delay and packetloss (ns1)."
--
--	do_ping_long "$ns2" 100.64.0.1
--	do_ping_long "$ns2" 100.64.0.3
--	stop_if_error "Failed with delay and packetloss (ns2)."
--
--	do_ping_long "$ns3" 100.64.0.1
--	do_ping_long "$ns3" 100.64.0.2
--	stop_if_error "Failed with delay and packetloss (ns3)."
--}
--
- setup_hsr_interfaces()
- {
- 	local HSRv="$1"
-@@ -187,11 +166,10 @@ setup_vlan_interfaces() {
- 
- }
- 
--run_complete_ping_tests()
-+run_ping_tests()
- {
--	echo "INFO: Running complete ping tests."
-+	echo "INFO: Running ping tests."
- 	do_ping_tests 0
--	do_link_problem_tests
- }
- 
- run_vlan_tests()
-@@ -201,7 +179,7 @@ run_vlan_tests()
- 	vlan_challenged_hsr3=$(ip net exec "$ns3" ethtool -k hsr3 | grep "vlan-challenged" | awk '{print $2}')
- 
- 	if [[ "$vlan_challenged_hsr1" = "off" || "$vlan_challenged_hsr2" = "off" || "$vlan_challenged_hsr3" = "off" ]]; then
--		echo "INFO: Running VLAN tests"
-+		echo "INFO: Running VLAN ping tests"
- 		setup_vlan_interfaces
- 		do_ping_tests 2
- 	else
-@@ -214,12 +192,12 @@ trap cleanup_all_ns EXIT
- 
- setup_ns ns1 ns2 ns3
- setup_hsr_interfaces 0
--run_complete_ping_tests
-+run_ping_tests
- run_vlan_tests
- 
- setup_ns ns1 ns2 ns3
- setup_hsr_interfaces 1
--run_complete_ping_tests
-+run_ping_tests
- run_vlan_tests
- 
- exit $ret
-diff --git a/tools/testing/selftests/net/hsr/link_faults.sh b/tools/testing/selftests/net/hsr/link_faults.sh
-index 11a55ba5cd7d..e246a38abb7c 100755
---- a/tools/testing/selftests/net/hsr/link_faults.sh
-+++ b/tools/testing/selftests/net/hsr/link_faults.sh
-@@ -6,8 +6,16 @@ source ../lib.sh
- ALL_TESTS="
- 	test_clean_hsrv0
- 	test_cut_link_hsrv0
-+	test_packet_loss_hsrv0
-+	test_high_packet_loss_hsrv0
-+	test_reordering_hsrv0
-+
- 	test_clean_hsrv1
- 	test_cut_link_hsrv1
-+	test_packet_loss_hsrv1
-+	test_high_packet_loss_hsrv1
-+	test_reordering_hsrv1
-+
- 	test_clean_prp
- 	test_cut_link_prp
- 	test_packet_loss_prp
-@@ -290,11 +298,31 @@ test_packet_loss()
- 	log_test "${tname}"
- }
- 
-+test_packet_loss_hsrv0()
-+{
-+	test_packet_loss "HSRv0" "20%"
-+}
-+
-+test_packet_loss_hsrv1()
-+{
-+	test_packet_loss "HSRv1" "20%"
-+}
-+
- test_packet_loss_prp()
- {
- 	test_packet_loss "PRP" "20%"
- }
- 
-+test_high_packet_loss_hsrv0()
-+{
-+	test_packet_loss "HSRv0" "80%"
-+}
-+
-+test_high_packet_loss_hsrv1()
-+{
-+	test_packet_loss "HSRv1" "80%"
-+}
-+
- test_high_packet_loss_prp()
- {
- 	test_packet_loss "PRP" "80%"
-@@ -321,6 +349,16 @@ test_reordering()
- 	log_test "${tname}"
- }
- 
-+test_reordering_hsrv0()
-+{
-+	test_reordering "HSRv0"
-+}
-+
-+test_reordering_hsrv1()
-+{
-+	test_reordering "HSRv1"
-+}
-+
- test_reordering_prp()
- {
- 	test_reordering "PRP"
-diff --git a/tools/testing/selftests/net/hsr/settings b/tools/testing/selftests/net/hsr/settings
-index ba4d85f74cd6..a953c96aa16e 100644
---- a/tools/testing/selftests/net/hsr/settings
-+++ b/tools/testing/selftests/net/hsr/settings
-@@ -1 +1 @@
--timeout=90
-+timeout=180
+ 	for (i = 0; i < cnt; i++) {
+-		sk = array[cnt];
++		sk = array[i];
+ 		rose = rose_sk(sk);
+ 		lock_sock(sk);
+ 		spin_lock_bh(&rose_list_lock);
 -- 
-2.52.0
+2.43.0
 
 
