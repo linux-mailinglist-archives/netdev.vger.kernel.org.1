@@ -1,122 +1,70 @@
-Return-Path: <netdev+bounces-245682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 550B0CD5547
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 10:31:05 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDA5ACD5565
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 10:34:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 981AE300F179
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 09:31:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 90FDF3004B95
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 09:34:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C51830BF6A;
-	Mon, 22 Dec 2025 09:31:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54A4D3101A7;
+	Mon, 22 Dec 2025 09:34:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="H40IQNVz"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BwnmJbN0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCD9C8287E;
-	Mon, 22 Dec 2025 09:31:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4BFF1E5018
+	for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 09:34:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766395863; cv=none; b=moY4pgpKlXmhMkEAdmhMf1B7B6eYt9qyvwXuHR1LAeOo//AdI2eIn9LCNmT99eEEdrqSDU1p2IDr5uPOODd+2nw8o1agGVeAo3Po4UOBWJpvexYoc+aNyiRIj4gTm69svchj70f563XRoW7hNdyotTjk8FkVaH+GXsurDwJRSF0=
+	t=1766396093; cv=none; b=qCS5aSN4RZ7x92HsMCveQ3j8ivNMHs2oyEsyaJPsd0tmyHM82iVE2tbTz6pk6vBjAVSNs2h5a0qYL9SRb+eLtme8OP/6XqWxkurf835n+W+8aCYvgJ0nmg3AIIraLmkpW1vGAeTvtZm92hc3eaU+BwuCCQ3d/BcWIOPle32YviU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766395863; c=relaxed/simple;
-	bh=3OO+3ZPR19k/mVRyA0dejoWRH4Phos7oIP4vf/OLsvI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gcmSIL7u0KPdv67fHzAzTNXAhfDYvaQHxXtO7y4Sn6ELupDnlqn2crtpUhSvwZqP3NvWrJ5M7c1nKzVA7wGe6B08fCG+P9a1U2IEbBr/dHdxO4k5EhA1Cveyng4bybUZettcZdUPOfVL1AyG//aZMt4WrSZslGeaLgiHd73V3v0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=H40IQNVz; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 7CAC960264;
-	Mon, 22 Dec 2025 10:30:58 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1766395858;
-	bh=IHoo/OWsZqDGI30RmZhtzHVe2nfVCkr0l/qihTNP570=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=H40IQNVzdVRjhKnN2Zhc9XUIcNpUWcHHho4Dd4Y2vZwDMcxQ98INFintcCjmm/sNp
-	 5UTAuhw8GUD97PQcTIH4LPNCzeJ6tbaEmvCoRVf61MTjNrHyA1C8FFLEttwdKRTsde
-	 ZaRln6DRB4ENvknOkhZf5XRNDWmVFkNbt2fTl6Hdd9lix4K/wugMA7tHQipXd875YN
-	 CIFhAd6ziB+2Wtt9WiPsQq5kViEoTmRt9uvN8Xxf3dC6wFqWIBXv47fKlbpadGC22t
-	 iZYJMR7quDo2zw951a/OTiX/db24Id7EsrDgeEhstNHKtHFZ/bLClZFa/yWOaKKf1/
-	 wxyYxVd81eLyQ==
-Date: Mon, 22 Dec 2025 10:30:55 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: syzbot <syzbot+ff16b505ec9152e5f448@syzkaller.appspotmail.com>,
-	coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com,
-	horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, pabeni@redhat.com, phil@nwl.cc,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [netfilter?] possible deadlock in
- nf_tables_dumpreset_obj
-Message-ID: <aUkPz0extqKuB7Bl@chamomile>
-References: <6945f4b4.a70a0220.207337.0121.GAE@google.com>
- <aUh_3mVRV8OrGsVo@strlen.de>
- <aUkNtgPyic8_fBd5@chamomile>
+	s=arc-20240116; t=1766396093; c=relaxed/simple;
+	bh=Yuh0UlcHJPPpLxL6quNb2fIFWrsAC8T7M0bEg0sTCOw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PiUgZ7gQZfVGg7JPt945J4gobRd7HUoJKZFTfvJdB9GZYvUQmoDb6vmGDWmRxH2MLF2/pHkT51jhEBBpLM4vJKBesZQBTiseM5qyqc+N8L1aagxI0LReh15vLpIBWkrvijgknw//ckpnHkQ31vj+cy8pTufPd2MnZVVPZaleA1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BwnmJbN0; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <cfb231cd-17bc-41aa-9533-f1a048eeb1be@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1766396089;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Yuh0UlcHJPPpLxL6quNb2fIFWrsAC8T7M0bEg0sTCOw=;
+	b=BwnmJbN0khyfPHz+EhlpgZiGpq20M4MQdpTrS6PdJdW6y6knFR51Q3ZMNvTnM/9QFdVvfr
+	+tg8dweNEFaEQtz/WGCARD33SJ6pCvLBiRHQI5BeEe6HdTsF396i9xN8sLnmjo1fkMR1gq
+	Cjf/QwmK4cdOEsALW6M32TUmNGe+UUQ=
+Date: Mon, 22 Dec 2025 09:34:43 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aUkNtgPyic8_fBd5@chamomile>
+Subject: Re: [PATCH RFC net 5/5] selftests/net: use scapy for
+ no_bcastnull_poison
+To: =?UTF-8?B?TWFyYyBTdcOxw6k=?= <marcdevel@gmail.com>, kuba@kernel.org,
+ willemdebruijn.kernel@gmail.com, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, dborkman@kernel.org
+References: <cover.1766349632.git.marcdevel@gmail.com>
+ <3cfd28edb2c2b055e74b975623a3d38ade0237f1.1766349632.git.marcdevel@gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <3cfd28edb2c2b055e74b975623a3d38ade0237f1.1766349632.git.marcdevel@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Sorry, I pressed sent too fast... see below.
+On 21/12/2025 21:19, Marc SuÃ±Ã© wrote:
+> Use Scapy to generate ARP/ND packets for ARP/ND no bcast/NULL MAC
+> poisoning.
 
-On Mon, Dec 22, 2025 at 10:22:02AM +0100, Pablo Neira Ayuso wrote:
-> On Mon, Dec 22, 2025 at 12:16:53AM +0100, Florian Westphal wrote:
-> > syzbot <syzbot+ff16b505ec9152e5f448@syzkaller.appspotmail.com> wrote:
-> > > syz.3.970/9330 is trying to acquire lock:
-> > > ffff888012d4ccd8 (&nft_net->commit_mutex){+.+.}-{4:4}, at: nf_tables_dumpreset_obj+0x6f/0xa0 net/netfilter/nf_tables_api.c:8491
-> > > 
-> > > but task is already holding lock:
-> > > ffff88802bce36f0 (nlk_cb_mutex-NETFILTER){+.+.}-{4:4}, at: __netlink_dump_start+0x150/0x990 net/netlink/af_netlink.c:2404
-> > > 
-> > > which lock already depends on the new lock.
-> > 
-> > I think this is a real bug:
-> 
-> Yes, I think so too, it was a bad idea to use the commit_mutex for this.
-> 
-> > CPU0: 'nft reset'.
-> > CPU1: 'ipset list' (anything in ipset doing a netlink dump op)
-> > CPU2: 'iptables-nft -A ... -m set ...'
-> > 
-> > ... can result in:
-> > 
-> > CPU0                    CPU1                            CPU2
-> > ----                    ----                            ----
-> > lock(nlk_cb_mutex-NETFILTER);
-> >                         lock(nfnl_subsys_ipset);
-> >                                                        lock(&nft_net->commit_mutex);
-> >                         lock(nlk_cb_mutex-NETFILTER);
-> >                                                        lock(nfnl_subsys_ipset);
-> > lock(&nft_net->commit_mutex);
-
-Would it work to use a separated mutex for reset itself?
-
-> > CPU0 is waiting for CPU2 to release transaction mutex.
-> > CPU1 is waiting for CPU0 to release the netlink dump mutex
-> > CPU2 is waiting for CPU1 to release the ipset subsys mutex
-> > 
-> > This bug was added when 'nft reset' started to grab the transaction
-> > mutex from the dump callback path in nf_tables.
-> > 
-> > Not yet sure how to avoid it.
-> > Maybe we could get rid of 'lock(nfnl_subsys_ipset);'
-> > from the xt_set module call paths.
-> > 
-> > Or add a new lock (spinlock?) to protect the 'reset' object info
-> > instead of using the transaction mutex.
-> > 
-> > I haven't given it much thought yet and will likely not
-> > investigate further for the next two weeks.
-> 
-> 
+What's wrong with current implementation in arp_send.c and ndisc_send.c?
 
