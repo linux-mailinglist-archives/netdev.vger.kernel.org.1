@@ -1,80 +1,116 @@
-Return-Path: <netdev+bounces-245680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BEEFCD53DE
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 10:07:49 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AE0BCD54D2
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 10:22:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id C7D693001518
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 09:07:46 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id C91D1300F587
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 09:22:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 424F924677A;
-	Mon, 22 Dec 2025 09:07:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEB1B31065B;
+	Mon, 22 Dec 2025 09:22:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="aq3mkN1S"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="eiu6jdbg"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AD69226CF1;
-	Mon, 22 Dec 2025 09:07:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB49713959D;
+	Mon, 22 Dec 2025 09:22:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766394464; cv=none; b=EY0jwuUf9qZhcmzYVBTWXFS4hczyD7qOm81gf/TUlgKwPA6gvOzYY820MEFv5qGEFS9TdO8Gr8NDnN3tybktQe4hhh8ABNcqfzCzlknYN52pzeVZ82HqO5Gt56RIV2+QTw5n3nQI15+Wi2a2O233MFKYNfusqyQh86X2Jh0kLdk=
+	t=1766395333; cv=none; b=CWBrPCbSE8o7z5DDdaAO2UzKuZ/sAQltkkQAP6T/J0T2cXwNfF/uNhjnWNwn39850MAQrMPmFRfmqpkaKfJUSac8Z0KSW1NMahTfR23Tkj7qrhgv++nQspYwcqz0AFFbtc1YhezMUaCAxhkgzJsXIzW1RskF4Y6gj/15CdkEA7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766394464; c=relaxed/simple;
-	bh=FZO8A1oCiEKduFgK/VgdOVArquSOAEjpCTbXaSs51Cw=;
+	s=arc-20240116; t=1766395333; c=relaxed/simple;
+	bh=v1EYkBRsBpJjxKhwYyzdpeuhUom9rWY/UrpMKpWCNi0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EqcfB/gQ3j+Q92vQ/m/UP/JHhZt9HQNVD7b8PUGPzkw2iGrzDAczPbC2mJ1yrgY9vpDyJ9dIHBAvT9DR7o22TcpUTryA8XFfWVEAz9ViK5t+F2A9v+3dcDy6Ykw/W5/fku/Bd7d4bDx3jlnwvWG64vvUGijhTWQtu23b22Rvn44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=aq3mkN1S; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=UFJ2hQrr9TPFdahxPW3to7FdtjsagKdsAQCxdi7EZ5M=; b=aq
-	3mkN1SgkcbPpgiwudxWF3Oy7LjZkw1CDM4pXywR5aZl1TgA6NfF34n/FLdXYdYsF1qqeMW5aefh03
-	weW052WjwuQSQDpQFXZoYkK/3bjfLCpr5z5YtzBK5iVStLrxge/DZaqWR9BCGWk2C56vckpeQYAbF
-	0OoF52PGlS+RmB0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vXbtC-000A56-IC; Mon, 22 Dec 2025 10:07:38 +0100
-Date: Mon, 22 Dec 2025 10:07:38 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ethan Nelson-Moore <enelsonmoore@gmail.com>
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v2] net: usb: sr9700: fix incorrect command used to write
- single register
-Message-ID: <5be10af1-e7ca-4bed-bf19-0127e2eeb556@lunn.ch>
-References: <20251221082400.50688-1-enelsonmoore@gmail.com>
- <4eb474ac-5e12-4237-bec8-f0cc08b00bb1@lunn.ch>
- <CADkSEUhW5+=mo8nLK9cSa7Nh0SKP-RXV=_z7RY73BZgUH=kV9w@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=SK3Yh+aksr/vXnNaDFfAIcKnde5NKug7kQ1JSvcWC8YdCR7+GGXZ42OsoDYxgPKO7Mg2o6xKMczz2s3PcZ6joh+8zfvWSCCFBjBFKdNcxjqDQLL7DjFaG+DimOlTWcc/VQ7VCz9z7sZVJQkf5lrfsqlXYDc5DDySxJD1H6YR2ds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=eiu6jdbg; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with UTF8SMTPSA id 9A51A60251;
+	Mon, 22 Dec 2025 10:22:01 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1766395321;
+	bh=rdu1D57wAQi3ZdLkda8em9q9mtPZF8NA3WQHzdvVqH0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eiu6jdbgqvk4uYwvec+qMey0kZzq9Y81dXqKggGjICJsUYP4AU4OQps1fpIa7ZJSZ
+	 OmYxYVFQeJZ30aUPUiGo84JQIPFAdZ2AzcHKb84Pq1+ZNeE+sQq9nXnxsD3edKp2U5
+	 uFaV8OUQZmwHvASeHLIj07qXhZdrXVI/WfjFyvSHiK+N1EzhMoO1GFGV2cvg9/r5us
+	 vuyB20XcMdLhK6izUuk5gjzuM38NY7U6iKijUn5Zkxn/tkXViIDsMBkbozhzy6O1M5
+	 Mt6kJUWq8GCdY3RbX7fFOav8L/eNml2Qt/C74QGTReSnMtUIfgGJgsOtK6e1eF91MT
+	 Nr7wJe0CBl7TQ==
+Date: Mon, 22 Dec 2025 10:21:58 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: syzbot <syzbot+ff16b505ec9152e5f448@syzkaller.appspotmail.com>,
+	coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com,
+	horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com, phil@nwl.cc,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [netfilter?] possible deadlock in
+ nf_tables_dumpreset_obj
+Message-ID: <aUkNtgPyic8_fBd5@chamomile>
+References: <6945f4b4.a70a0220.207337.0121.GAE@google.com>
+ <aUh_3mVRV8OrGsVo@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADkSEUhW5+=mo8nLK9cSa7Nh0SKP-RXV=_z7RY73BZgUH=kV9w@mail.gmail.com>
+In-Reply-To: <aUh_3mVRV8OrGsVo@strlen.de>
 
-On Sun, Dec 21, 2025 at 03:42:58PM -0800, Ethan Nelson-Moore wrote:
-> Hi, Andrew,
+On Mon, Dec 22, 2025 at 12:16:53AM +0100, Florian Westphal wrote:
+> syzbot <syzbot+ff16b505ec9152e5f448@syzkaller.appspotmail.com> wrote:
+> > syz.3.970/9330 is trying to acquire lock:
+> > ffff888012d4ccd8 (&nft_net->commit_mutex){+.+.}-{4:4}, at: nf_tables_dumpreset_obj+0x6f/0xa0 net/netfilter/nf_tables_api.c:8491
+> > 
+> > but task is already holding lock:
+> > ffff88802bce36f0 (nlk_cb_mutex-NETFILTER){+.+.}-{4:4}, at: __netlink_dump_start+0x150/0x990 net/netlink/af_netlink.c:2404
+> > 
+> > which lock already depends on the new lock.
 > 
-> The other two are correct because they intend to write multiple registers -
-> they are used with a length parameter. 
+> I think this is a real bug:
 
-Please don't top post.
+Yes, I think so too, it was a bad idea to use the commit_mutex for this.
 
-How finished do you think this driver is? Are there likely to be more
-instances of SR_WR_REG/SR_WR_REGS added in the future? If so, it might
-make sense to change the code to make this sort of error less likely.
+> CPU0: 'nft reset'.
+> CPU1: 'ipset list' (anything in ipset doing a netlink dump op)
+> CPU2: 'iptables-nft -A ... -m set ...'
+> 
+> ... can result in:
+> 
+> CPU0                    CPU1                            CPU2
+> ----                    ----                            ----
+> lock(nlk_cb_mutex-NETFILTER);
+>                         lock(nfnl_subsys_ipset);
+>                                                        lock(&nft_net->commit_mutex);
+>                         lock(nlk_cb_mutex-NETFILTER);
+>                                                        lock(nfnl_subsys_ipset);
+> lock(&nft_net->commit_mutex);
+> 
+> CPU0 is waiting for CPU2 to release transaction mutex.
+> CPU1 is waiting for CPU0 to release the netlink dump mutex
+> CPU2 is waiting for CPU1 to release the ipset subsys mutex
+> 
+> This bug was added when 'nft reset' started to grab the transaction
+> mutex from the dump callback path in nf_tables.
+> 
+> Not yet sure how to avoid it.
+> Maybe we could get rid of 'lock(nfnl_subsys_ipset);'
+> from the xt_set module call paths.
+> 
+> Or add a new lock (spinlock?) to protect the 'reset' object info
+> instead of using the transaction mutex.
+> 
+> I haven't given it much thought yet and will likely not
+> investigate further for the next two weeks.
 
-SR_WR_MULTIPLE_REG and SR_WR_ONE_REG?
 
-		   Andrew
 
