@@ -1,142 +1,119 @@
-Return-Path: <netdev+bounces-245674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 571B0CD4C64
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 07:13:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBF48CD4DA8
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 08:19:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 5573F3004CA7
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 06:13:20 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BE2D53008E99
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 07:19:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92277302CD5;
-	Mon, 22 Dec 2025 06:13:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADFD1219303;
+	Mon, 22 Dec 2025 07:19:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hIoDhPWz"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="BQKDIotx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 107AE2F83A1
-	for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 06:13:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51D5C1DF963;
+	Mon, 22 Dec 2025 07:19:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766383999; cv=none; b=MWpNMC47kB2oQk3I/XJ05Hz/LTUR35lCNwBYWr0aT2oIptxFDIq+XSKKE3ihwSPzy+rWtinsdhtLJr/18bR1sAYl7eVfJxwVMwhZoMK4OforbRWDzBHj0rHLJxotje35tsp4ta2hFv3kphLVkzAj2qKc/X1Zfu9nknOuSL6IjSs=
+	t=1766387954; cv=none; b=k+o4q20NOUFcdvcr8d2/dVe5vfaIUAsV6/gXqOLT4n0zzR0A7YNsPFHPxlWUfPgzmGX7tjwsUhQ1n6yzO/ICgKLAIe+QJy5FGy8yJOVgJBSwXwSfvX5f22n1La6hL1jLsq+VJ+ai/vVtqYOZ6E2gRNDAtjN+o8JeHOf1T4Zo0Rc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766383999; c=relaxed/simple;
-	bh=dcMfJF0tfihPZgBMo5BBEeuPQtcGmMrTlcKB8HaQNso=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nXx8rpP7hIm+wzXM8P5+W6lClqKgtlCk/GSMcxKOKVUC5A7ngQYfNx3K7z6H573j+zjDifHi13Dx28/snveUv0Oopd/N9K8j9fdp9qNoPdT+M7cAlG9PnAqYFp3GQqQBKvg+8PgY96w4aDqHEAQ/fP1Br0ZcP87o2HEfYVmeYGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hIoDhPWz; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2a0d5c365ceso46015525ad.3
-        for <netdev@vger.kernel.org>; Sun, 21 Dec 2025 22:13:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766383997; x=1766988797; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3S4jAgS6Y3OH5s26cfxtt4FgF9TFQpYXvTl4gwzt3WM=;
-        b=hIoDhPWz5jKGkn4gif9iQmmoeP3Bc1PbqPAPPAdiI6moHcTMpwvJX0/28RCtupLwgg
-         bcGsYyt8Pw0dKiE2wJNJi+rhxlIBn59KVW1nK5g+Tns7QdF2r4yZu/CsS1zkjNQvXN9w
-         BnNR7fJsrRaRReeIaf0sCorpgZ9oJQ3AbGfNdsVMTaKxm6xb2bChcvi5l5XURktJ6o6d
-         BI2iEdgPxZPY2gR26J/tlgaRR6VftTwUvp/76WA/K5/JVwbJ0hvt2dCWMUc7wmcL6cal
-         7JUJe+mWcVFIqrDzBkOrri67Zhotqs+1WKj0TjNYJjuvmfsmnk5mV1fgQX7tbCL3Ywvl
-         Hakw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766383997; x=1766988797;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3S4jAgS6Y3OH5s26cfxtt4FgF9TFQpYXvTl4gwzt3WM=;
-        b=OPa3XivBURtz+Q+C7akePCh4kgycXAmqi2umLQ9zJD6tHfJMb+tkrFN6JBV/7zk1DA
-         lDo1RJpcU3qwNq9yaYg+XYtpHR/wxtzHV0C6W583TLwhtQ9Tw7bnWjwYUqdlCvhZIe6b
-         V872wKDRgHMTOLvsGsCXEItv0jottSAn1r4m42uOGednYThr9M3+9AQyH9QobzuHlf6q
-         8yewstZ0Ak6mVwicLGNVFZ0McN6lFcLlWhKnWOYboHdh0C/XSBxTiSsbQfIrAmWDm891
-         WS5iF/2Ef8Na9GwjGYzcauKF5pryuJeyqpHafGnY8s/kn0j7MCkv0VzQ9RR0B3rp32dF
-         83vg==
-X-Forwarded-Encrypted: i=1; AJvYcCX51qDK26ZYQHPMzLQbrsERCgQLHMkRuN3MMXCzaLp3crR+wGVBIt3ZEExbVvrNPb7RrAaspH0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxdiaMaDnTgb0q9jdjpu2lzojhvIxLRKbNt5WEc+M1vQtzVYFfh
-	nY/DWshObyeoWtwb2MSTW3GgfzpWtqATsJ1CbBkE+fPhP76A06OazTI7
-X-Gm-Gg: AY/fxX7JklmidXkUibjGwTM830kptb6Yn2EoPFaVN+fvX+cH+dZF9kRitlhSbPwUfss
-	vAMzwCSRhVeWE6yCu/7Ec8Yh3PiDchfRB/9SSqj3NT7I44gkymFhU90t10lx+BzgrWlXAu6B23P
-	XPKMKhjvk29diXPCXLja42M+tzM8K8U3xokDV1zfTGwM8nBdhOTiOZbiKtzmuodLnJ/EQkUyip5
-	n67CwRrz3MZoLjvLc5RBaaxVeUoZs41M6fo35iD2V7IdB3taE/ogHxIqLSfW0Pmp6x9bQGA2+kf
-	yfxdQk0L1JHziVwtmqxz6LnmIDcZwKoSiv21c6G93af+JkWtHx0f7qFvL4cTUCL6oRdhZFcifDG
-	M04hw+ncpJsHt8JCG82DL70dGY0Q4gB7Ou8BMbMvXLnhLlY3vz64FmMBy4KjjWpvdiQL0WwBKxd
-	FIzEjDiA==
-X-Google-Smtp-Source: AGHT+IFm4l8dcKmr0PiWYkDopuxXg0BxrY4X6KsefFxFPAmT83JBEAf3V2esc+K5Zqovpr54R5R52w==
-X-Received: by 2002:a17:903:41cd:b0:298:55c8:eb8d with SMTP id d9443c01a7336-2a2f272bd8fmr96236925ad.35.1766383997351;
-        Sun, 21 Dec 2025 22:13:17 -0800 (PST)
-Received: from lmao.. ([2405:201:2c:5868:68b9:5b3c:f13:3fb2])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a2f3c82ab4sm86453845ad.32.2025.12.21.22.13.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Dec 2025 22:13:16 -0800 (PST)
-From: Manas <ghandatmanas@gmail.com>
-To: stephen@networkplumber.org
-Cc: jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Manas <ghandatmanas@gmail.com>
-Subject: [PATCH v2] net/sched: Fix divide error in tabledist
-Date: Mon, 22 Dec 2025 11:43:06 +0530
-Message-ID: <20251222061306.28902-1-ghandatmanas@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1766387954; c=relaxed/simple;
+	bh=gKrVj/b3vzYU0nS6L7oQCHNd5I4NDUKlkrmxZ4IBe/g=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=PaOVeN6SPXgptXmmVqy+sKFs3PyQaQ8evNa2RAaTgJAwZpPxPIOsXhjh8hkPR6H6NTuU/00BCsiql8TMWunna5DO2PFPjr7AOIrgtf+IYOUETxdcC7gUX3nyOKLqWaMdbNQLzbJXkCf5AHx5J+vaiWsTo9k956FgPBIa1DvgBhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=BQKDIotx; arc=none smtp.client-ip=115.124.30.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1766387940; h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type;
+	bh=oEB9Yb9iwUuBjbpOCOGlEyboO6qKpx5MuNSNNkj0O/Q=;
+	b=BQKDIotxITS5pjxhR4N7KCmgCGfn+Uxn9wCuVpkwrYxZyxMQj2wsubHA/QeKZRPP9jt1SM/eivNAuWyQd/1Zq3vAuL6JIpZfJ8whBqO1/oHE6i1sy+vwIgPjBS+l0wFNJnqt08TRJnMjfBzc6PHZtybwKaEAFVIoKo0HD1pwz5c=
+Received: from 30.221.129.67(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WvMt44U_1766387899 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 22 Dec 2025 15:18:59 +0800
+Message-ID: <957500e7-5753-488d-872d-4dbbdcac0bb2@linux.alibaba.com>
+Date: Mon, 22 Dec 2025 15:18:19 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+From: Wen Gu <guwen@linux.alibaba.com>
+Subject: Re: [PATCH net-next v5 1/2] ptp: introduce Alibaba CIPU PHC driver
+To: Jakub Kicinski <kuba@kernel.org>, Thomas Gleixner <tglx@linutronix.de>
+Cc: Richard Cochran <richardcochran@gmail.com>, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ xuanzhuo@linux.alibaba.com, dust.li@linux.alibaba.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20251030121314.56729-1-guwen@linux.alibaba.com>
+ <20251030121314.56729-2-guwen@linux.alibaba.com>
+ <20251031165820.70353b68@kernel.org>
+ <8a74f801-1de5-4a1d-adc7-66a91221485d@linux.alibaba.com>
+ <20251105162429.37127978@kernel.org>
+ <34b30157-6d67-46ec-abde-da9087fbf318@linux.alibaba.com>
+ <20251127083610.6b66a728@kernel.org>
+ <f2afb292-287e-4f2f-b131-50a1650bbb1d@linux.alibaba.com>
+ <20251128102437.7657f88f@kernel.org>
+ <9a75e3b2-4d1c-4911-81e4-cab988c24b77@linux.alibaba.com>
+ <c92b47cf-3da0-446d-8b8f-674830256143@linux.alibaba.com>
+ <20251213075028.2f570f23@kernel.org>
+ <fb01b35d-55a8-4313-ad14-b529b63c9e04@linux.alibaba.com>
+ <20251216135848.174e010f@kernel.org>
+In-Reply-To: <20251216135848.174e010f@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Previously, a duplication check was added to ensure that a
-duplicating netem cannot exist in a tree with other netems. When
-check_netem_in_tree() fails after parameter updates, the qdisc
-structure is left in an inconsistent state with some new values
-applied but duplicate not updated. Move the tree validation check
-before modifying any qdisc parameters
 
-v1 -> v2: Fix whitespace
----
- net/sched/sch_netem.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-index 32a5f3304046..1a2b498ada83 100644
---- a/net/sched/sch_netem.c
-+++ b/net/sched/sch_netem.c
-@@ -1055,6 +1055,11 @@ static int netem_change(struct Qdisc *sch, struct nlattr *opt,
- 		q->loss_model = CLG_RANDOM;
- 	}
- 
-+	ret = check_netem_in_tree(sch, qopt->duplicate, extack);
-+	if (ret)
-+		goto unlock;
-+	q->duplicate = qopt->duplicate;
-+
- 	if (delay_dist)
- 		swap(q->delay_dist, delay_dist);
- 	if (slot_dist)
-@@ -1068,12 +1073,6 @@ static int netem_change(struct Qdisc *sch, struct nlattr *opt,
- 	q->counter = 0;
- 	q->loss = qopt->loss;
- 
--	ret = check_netem_in_tree(sch, qopt->duplicate, extack);
--	if (ret)
--		goto unlock;
--
--	q->duplicate = qopt->duplicate;
--
- 	/* for compatibility with earlier versions.
- 	 * if gap is set, need to assume 100% probability
- 	 */
--- 
-2.43.0
+On 2025/12/17 05:58, Jakub Kicinski wrote:
+> On Sun, 14 Dec 2025 22:03:57 +0800 Wen Gu wrote:
+>> If you're suggesting creating a new subsystem, I think we should first
+>> answer this question: why can't it be part of the current ptp subsystem,
+>> and what are the differences between the drivers under `drivers/ptp`
+>> and those in the new subsystem?
+> 
+> I can't explain it any better than I already did here:
+> https://lore.kernel.org/all/20251127083610.6b66a728@kernel.org/
+> 
+> I talked to Thomas Gleixner (added to CC) during LPC and he seemed
+> open to creating a PHC subsystem for pure time devices in virtualized
+> environments. Please work with him and other vendors trying to
+> upstream similar drivers.
+
+Hi Jakub and Thomas,
+
+I thought about it a bit more. If we create a new clock class
+(say a "ptc"), its helpers and structure would likely end up being
+almost identical to the current ptp ones, since the pure phc drivers
+under drivers/ptp (e.g. ptp_kvm, ptp_vmw, ptp_s390, ptp_cipu) are
+implemented on top of the existing ptp helpers. That would give us
+two near-identical classes, which may be confusing.
+
+Also, changing the userspace device node for existing pure phc drivers
+from /dev/ptpX to something else (e.g. /dev/ptcX) seems impractical.
+The same applies to ptp_cipu, since it is already used and relies on
+exposing /dev/ptpX.
+
+Given the historical baggage, it seems better to keep using the
+existing ptp framework, but separate these pure phc drivers into a
+new subsystem with a dedicated directory (e.g. drivers/phc/) and a
+MAINTAINERS entry, moving them out of the netdev maintenance scope.
+This should also address the concern that these pure phc drivers are
+not a good fit to be maintained under the networking subsystem.
+
+If this works for you, I'll send an RFC about this.
+
+Regards.
+
+
+
 
 
