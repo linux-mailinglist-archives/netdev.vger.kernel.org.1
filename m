@@ -1,47 +1,85 @@
-Return-Path: <netdev+bounces-245703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04982CD5FC2
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 13:32:56 +0100 (CET)
+Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFE9DCD602B
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 13:41:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 81E583002D1E
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 12:32:51 +0000 (UTC)
+	by sto.lore.kernel.org (Postfix) with ESMTP id 6ADDD3001812
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 12:41:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 439BD29B783;
-	Mon, 22 Dec 2025 12:32:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43FFF29BDB3;
+	Mon, 22 Dec 2025 12:41:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G4NNOnN+"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="CXz7hjLI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011036.outbound.protection.outlook.com [40.93.194.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15E1629A9C9;
-	Mon, 22 Dec 2025 12:32:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766406766; cv=none; b=rJKDsrOp7mjrNuVwuHTLBF0g2InzWK+F9RwKqOua6+2L5Rs6MezB67PErqXTRnu9GNA+ZZ/KJoIf7B+x2KtCcvJ54tIEZQgkn3T5P9XgmdgXI4LYMCEcG14VXxXvm2OyRx/TDuqs7ZgcMLn0EI1abIFNKRzGKPS70Ingq1R5qLQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766406766; c=relaxed/simple;
-	bh=rVJgVGH4Fpaz3UiKYsv72cjgvV26VOoXo87zsGHkKME=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=O8RRTvQKMBb1mWYlrA5FmTQ96QbsH/zWA6zhZtbnTiqR4ZsA0Qj++Kta5kWSPRKbGYHvwz2shui4GxAw0gm+JDSGIvZGpioeuQM+3T83MnvPuNzXg7HYc0s/dCy1CtvS/EYXWLSTRYzLcoCVkN+e/Dcxe+TyqI9NZWCOIrEykds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G4NNOnN+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDE53C116C6;
-	Mon, 22 Dec 2025 12:32:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766406765;
-	bh=rVJgVGH4Fpaz3UiKYsv72cjgvV26VOoXo87zsGHkKME=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=G4NNOnN+0FP0h2QkzoFp7+mtrrWHQoy3YhHlFfvp1LvJmr3V8XAyTFuZOfLp4XCC0
-	 4xzXx9VVyvhbT6Y/YlTBDIqexCVKQWKkofSegSMZRGnklv3v5VUBzTZBpT7M/pwQ8+
-	 PQWOn3F6hKEIXjmYREVGN4QrijmgnGQgE7zZB49I2qNz+umysgQHlCTXE/aXeZ/7wS
-	 NJSz+ODU7ieieILpt0k2tgPqIanBbqTsUsan/LbQnJKpkg5NCIKlVU6N7CnnZGMNdo
-	 mABVJZiSdDjieT8NZlmNJ9I/Uwp7veKrmEMUbIYSchehGmSt9P6hrJd7dj87T2d3id
-	 G/fnlVNkqMqcw==
-From: Tamir Duberstein <tamird@kernel.org>
-Date: Mon, 22 Dec 2025 13:32:28 +0100
-Subject: [PATCH 2/2] drivers: net: replace `kernel::c_str!` with C-Strings
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACFD225DB12;
+	Mon, 22 Dec 2025 12:41:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.36
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1766407267; cv=fail; b=npvlO1y9YtbDT7WB0W6xrMz/1JJfdxLWRG+SwypGVD0O3DPS0xyOfPY7qG1LdbMQRCulJTP1vG1wrTDpnGoDCTFJu0FPiIRQdqItnzYVLILLW1EPtOnasVvAPGbyF/GP2tw1NwTCZHm11aKEurBRHmPwyYqBosGU8EGFG5FCDLU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1766407267; c=relaxed/simple;
+	bh=T4nEALWUlfPYeFmIqNzONrC2rR1J683StrOUzF9QxpU=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=f735aZicAr3HUoyxVzcbHq6Wi+1PVrYsFowKaDUmHU4ur3l5rCSvRgUa6cIp1yO5EK3RMFqCBY4D7aqC08rMB1F5VEakskqSLQS0K25tGquB1b+bR0dq+aon1594qPz2HFftnWY6oUXYIviJS3/0thCkPHuiEHAScTp5ZiR90hw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=CXz7hjLI; arc=fail smtp.client-ip=40.93.194.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=OP1ra/gupy3s9MwLeNn5CNZg87ABlZyq19/AAIXwdd5hlSKPKLOSg+ezFcCK5JMDhdd8HLu2o56SsxUteBWFHlS6thXzXRE0Q0mhqujmA2LVB0An2vtpWnIIcPFTiMmTKvDsbPvIWoBAGfzRRmH2WBVL5tnQQiEPBpMqYkoxVaLb2SjClfnOuTb2yWaJticXARcobqpsituvoavsbubLsbRMJvFceqyoP3+5rFM62b7ktplZP0jajtxlHqUZhlcXS+VUJgVswe/zams0Zzt6xXBtFEeHRW2USdT1cQq6uaeCsI7Yh/4OmFv/faER+safOxedemuXqEj05dYyVJiMtA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=lw4hCceYq4sahPWnDn5fwion6deqOQB2zEXmSojZTdk=;
+ b=q+sXkPJHUnQm/M+AHVvLqZ50bll8QM3/DItadVGn6nu4MAg7WfW/8XM05p2SBgteMI8wXP/Kmn+WuhaJ1P1spNqctIHIQKba2mxXSqDffPxbxkULJQNGmpbVbET/QXYTdKgH2ngWBKm33gKAiOOb0hE/RSqC5VfOCvwHIhngMx9/J7DeNeQdcP6Yi1EKyS1xNDgTEZi2+8Ey0g9MLlkrL9QO44IUyUX50R9Pd/E7X4UFuL8jK0XWTwHSoCGOB7hDAh2siYrtCcly2I4iwNPis1+dk80OJlrY8rgkSgfx7k/cf5BAMKHZgm2sLlkWJ5bBcOsHUY3l27iGga9uDY3yOg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=lw4hCceYq4sahPWnDn5fwion6deqOQB2zEXmSojZTdk=;
+ b=CXz7hjLIIbJssFfbUtPC6q93+qAJerkfMUGF8W1gf4JA7nqPge3NdIXT6pt3JhdOxxewp1E3d+K/dS7KXLpIjLabBrSTWwUH3PLXa4LnAgU6I7bxW+Dw7VDYUiIYy2xlvgU19x8rPW9D6oaQSIF9eBm6F+RvLgDoXVPPI8sr6yc9bfz9F/4aGGZL9V60xWjRRvAzGXyMxUOGjYJNaUPmpblz8yij5ap3FGb5OhsVs1zmh5yi2tfO0kPT74jeOkANFZvgwrwmAVFM9hFO9pzg4HoK9AGeLtom0aw8GXaD2gm+3sETwmQI03r01PRNB3YUPYk0cLNt4u4EBhVdBM/i3w==
+Received: from BY5PR17CA0010.namprd17.prod.outlook.com (2603:10b6:a03:1b8::23)
+ by BL4PR12MB9479.namprd12.prod.outlook.com (2603:10b6:208:58e::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9434.11; Mon, 22 Dec
+ 2025 12:41:00 +0000
+Received: from SJ1PEPF000026C9.namprd04.prod.outlook.com
+ (2603:10b6:a03:1b8:cafe::67) by BY5PR17CA0010.outlook.office365.com
+ (2603:10b6:a03:1b8::23) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9434.11 via Frontend Transport; Mon,
+ 22 Dec 2025 12:41:03 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SJ1PEPF000026C9.mail.protection.outlook.com (10.167.244.106) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9456.9 via Frontend Transport; Mon, 22 Dec 2025 12:40:59 +0000
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 22 Dec
+ 2025 04:40:50 -0800
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail203.nvidia.com
+ (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 22 Dec
+ 2025 04:40:49 -0800
+Received: from c-237-150-60-063.mtl.labs.mlnx (10.127.8.10) by mail.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server id 15.2.2562.20 via Frontend
+ Transport; Mon, 22 Dec 2025 04:40:45 -0800
+From: Edward Srouji <edwards@nvidia.com>
+Subject: [PATCH rdma-next v2 00/11] RDMA/core: Introduce FRMR pools
+ infrastructure
+Date: Mon, 22 Dec 2025 14:40:35 +0200
+Message-ID: <20251222-frmr_pools-v2-0-f06a99caa538@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,118 +88,220 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251222-cstr-net-v1-2-cd9e30a5467e@gmail.com>
-References: <20251222-cstr-net-v1-0-cd9e30a5467e@gmail.com>
-In-Reply-To: <20251222-cstr-net-v1-0-cd9e30a5467e@gmail.com>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>, 
- Trevor Gross <tmgross@umich.edu>, Miguel Ojeda <ojeda@kernel.org>, 
- Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
- Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
- Alice Ryhl <aliceryhl@google.com>, Danilo Krummrich <dakr@kernel.org>, 
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Tamir Duberstein <tamird@gmail.com>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openssh-sha256; t=1766406750; l=3383;
- i=tamird@gmail.com; h=from:subject:message-id;
- bh=zXV+NZPWpohaJE1iUOz8SzewbnqLoHtSzsEhxH3GDh8=;
- b=U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgtYz36g7iDMSkY5K7Ab51ksGX7hJgs
- MRt+XVZTrIzMVIAAAAGcGF0YXR0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5AAAA
- QIZ8AvJlJQ8Z8jdj0WqLoIE+Cg9btKGt2Zp8gNpS6sev9NuvTN5UzE/AatduG+JGiI84B2Ogy+1
- vjd2PvFivyw8=
-X-Developer-Key: i=tamird@gmail.com; a=openssh;
- fpr=SHA256:264rPmnnrb+ERkS7DDS3tuwqcJss/zevJRzoylqMsbc
+X-B4-Tracking: v=1; b=H4sIAEQ8SWkC/22NwQrCMBBEf0X2bKRJjURP/ocUiduNXbBJ2ZRQK
+ f13Q88eHzPzZoVMwpThdlhBqHDmFCuY4wFw8PFNivvKYBpjtdYXFWSU55TSJ6vgTItoyXnroA4
+ mocDLLnuA9KNXkZYZuhoNnOck3/2m6L3wz1i0apSlV4suWLzi+R4L9+xPmEbotm37AW870VSwA
+ AAA
+X-Change-ID: 20251116-frmr_pools-f823cc5e8a58
+To: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, "Saeed
+ Mahameed" <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Mark Bloch
+	<mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: <linux-kernel@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<netdev@vger.kernel.org>, Michael Guralnik <michaelgur@nvidia.com>, "Edward
+ Srouji" <edwards@nvidia.com>, Chiara Meiohas <cmeiohas@nvidia.com>, "Yishai
+ Hadas" <yishaih@nvidia.com>, Patrisious Haddad <phaddad@nvidia.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1766407244; l=5917;
+ i=edwards@nvidia.com; s=20251029; h=from:subject:message-id;
+ bh=T4nEALWUlfPYeFmIqNzONrC2rR1J683StrOUzF9QxpU=;
+ b=6htRRzbXihT2k8LRTfu5huhmeMskV/UinbUUs82p61tf5Bu3T9Nrd8DG3hqFYFnfXJJNsXKKt
+ 3W13kuFHh1NBpCd29pW4r2xoRMFD54LSabvzZ16mgBSi8ZTocnIaMC8
+X-Developer-Key: i=edwards@nvidia.com; a=ed25519;
+ pk=VME+d2WbMZT5AY+AolKh2XIdrnXWUwwzz/XLQ3jXgDM=
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF000026C9:EE_|BL4PR12MB9479:EE_
+X-MS-Office365-Filtering-Correlation-Id: 729ee03a-ae91-4d5d-12e7-08de41575c3e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|36860700013|1800799024|82310400026|13003099007|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Z2F4UXJ5dlVlRHVNMkQ0RXNDVlV0aWM5WktSQW14RDNmY0ZVbENvOGt5Y3F4?=
+ =?utf-8?B?dHhvSEVkNHowR2tab1JjKytuam9RRGpzOFB0U21scEQ3bzNCUTE0YjlsbUpB?=
+ =?utf-8?B?bjFUb2RMMVp1eml0RzFTcHQ1eTk3Q3NQRTBBTW5TRnM0UTV2dVplS2h6eUJN?=
+ =?utf-8?B?aWI1R3NlNHlmalFEODRlMHJOd1QzdWxaZ083UTNaT2JiVk10aWd5cEJlQWVt?=
+ =?utf-8?B?cFpXcXhDK1NHSXk2emFWSWtBWXB6NTZ1NnJnQUVtc0dTTTBMQmFiZkEydk5X?=
+ =?utf-8?B?ZzBWcUhnMDUrbUZZdjJkK01zYzFwYUR2emlUaHE0ZktCWko3dW5IRHlSNStr?=
+ =?utf-8?B?Q1lyUXM2WHlUNlVhQ3E5TlVSRDBaWWZtRTUwNm5FU2twdTBPbjdvcFhud3d1?=
+ =?utf-8?B?QWNuV251OWFnUGZkUFg5WStzTWp1V0pzQkFzNCsyeGJJV0RhNHJ6SExZc1NO?=
+ =?utf-8?B?K0VPTmhKRW12NEZlQkpYQnFRb0NlTXVwVnR3c2Fjc0YrclgyUEJUSGs2Y210?=
+ =?utf-8?B?cVZqL1RZZENTSGMvRWltN3orZG9yKzg1cFBSWGRNZVBGanVKRTNXUDhoNVoz?=
+ =?utf-8?B?bWhQTHhvU2lWMkhYSlI5YldsdjhNUk4zbDg1aEo4L0Z3YTNmbHZ0WVY4R041?=
+ =?utf-8?B?VGh4bVNHd25YOVM2RmptazFlRG5YdUVOWmozOGtNcUZYYVFHM2VuOUVNSkpU?=
+ =?utf-8?B?ZkhGbWJIUzk4eldWNDdyS3gyMmE2WlZJYTFpOE1OZTB5clpYQmZVUXBsZ3pl?=
+ =?utf-8?B?aVJYRjFiV0VVUDVoVEd3RGlRNm5kWExMV1lib1U3WVRhUnFIVHV1dGQ4eTNS?=
+ =?utf-8?B?Wmd4QmlEVVFpSTBlS2ZtOWo4QjJOVjlYWDVjeDVqa1A1TzBFeVJrZnlHK2Vw?=
+ =?utf-8?B?WEFpeTAyb0prUktWZnZCN3ROeFlyV3VwUXVsL0pwaXhHSlFqd1JhN0dyT2xU?=
+ =?utf-8?B?U0g3NHU5Q3FyK2RxaHlOMzNsWUY2bmlWV0NPaDJTZ3ByQ25JZ09QVlgrZXQz?=
+ =?utf-8?B?UnVxS2ROemZDZ2M1ZVlIamx4UU1XZ28zRU9vU1QzdXZmQmFCOEVyQ2VYb3NQ?=
+ =?utf-8?B?a2h2MjBwTXJQRkN4SG1aeVRCOGM5aHljQkMzUVZVZVNIMHorUktJWVVON0Qr?=
+ =?utf-8?B?dGxESmhtY1pMbktqZklORE92L3hoV3IwYWFoMTNQM0MwM2daekpqNkNjZDVB?=
+ =?utf-8?B?WlVhRFJJUXhoSHc3UEpEVmI1NnV3TjN0SDRpbktIZEZtR1NORStzeWt2UlRP?=
+ =?utf-8?B?R2tFZzdqWU5tekJoK1Fpay83Y01WMmIyaGl2N2R5NXhMT3kyNmtNTEdZbUJF?=
+ =?utf-8?B?MnQ3UHFTMEttNnQ5aW5PdFNVYTQ2dzAxZ0trT24xNFNIaGhiQllkZG4xdnhG?=
+ =?utf-8?B?TVVwcUZudzNNYXBSVzRodXE0Qm1IU0tQWHA5NjY3ZGJPY1RWU253eGxTc3B1?=
+ =?utf-8?B?RDBkM0pEa2l2MndCZ3Y5c2FvSUcyR0F3TU9HSFJQbmtHc2lxaXo0U1NTakF4?=
+ =?utf-8?B?aTkzUEkzS2VUaDdBcTY1T1NXN2VsNDJKZUgydmpIVkxxSWRPcDY5ZTBmV09a?=
+ =?utf-8?B?UHRNUWY3NTRLZTJBYXM3dzZyUFdCRFVVNmdmMWhpNTJFa1V1c3JLK2tIaG85?=
+ =?utf-8?B?TC9Xa1Iwb3RMYVdVa0RlaUorU2RoaE11UG9ZMEROVUloYlpTRkhkalorTFdC?=
+ =?utf-8?B?c3BGd2p1RWlacy9qWit1UHpHWTBPMm1ZZ1ltNHNCeEc1SXREczNDVWpGRmdP?=
+ =?utf-8?B?L0srMkI0TkozTWU1UHlPTDdSQ1c2ZVozZWdlS01XRC9YdEVEbFQ4eHMydFlH?=
+ =?utf-8?B?aHlmZlZOSUFVRHhBN1diaGFTbDVDRndiQXdSRTlVK0M5eG52UEExSDVXMmpo?=
+ =?utf-8?B?R2ZKMXd0QjNYWUR2RFcxYXUzYmpkSG04M25sTVdidE1OSmhjakh0Z2ZDRHZi?=
+ =?utf-8?B?MTlSbUhlMmlMSC9PaDFNeUxEa0YvWUI1b1ZOdGVWeHRpUGVWYVRxeHpDS2tQ?=
+ =?utf-8?B?RjNTb0xNNmE0VDlVTVdrVGJxRkVEOElBTnpFQy9OMXFwQVMvaTBQU2hHblF2?=
+ =?utf-8?B?T1RQbm1yb1VTSFFLL2hMckFWQitqdW03Yy9ZNGgrNU5CVDJndnk0Tk9wVTB4?=
+ =?utf-8?Q?JgYezvXgmTRv5tzoFjvDTaQUt?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(376014)(36860700013)(1800799024)(82310400026)(13003099007)(921020);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Dec 2025 12:40:59.7962
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 729ee03a-ae91-4d5d-12e7-08de41575c3e
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF000026C9.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL4PR12MB9479
 
-From: Tamir Duberstein <tamird@gmail.com>
+From Michael:
 
-C-String literals were added in Rust 1.77. Replace instances of
-`kernel::c_str!` with C-String literals where possible.
+This patch series introduces a new FRMR (Fast Registration Memory Region)
+pool infrastructure for the RDMA core subsystem. The goal is to provide
+efficient management and allow reuse of MRs (Memory Regions) for RDMA
+device drivers.
 
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Reviewed-by: Alice Ryhl <aliceryhl@google.com>
-Reviewed-by: Benno Lossin <lossin@kernel.org>
-Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+Background
+==========
+
+Memory registration and deregistration can be a significant bottleneck in
+RDMA applications that need to register memory regions dynamically in
+their data path or must re-register memory on application restart.
+Repeatedly allocating and freeing these resources introduces overhead,
+particularly in high-throughput or latency-sensitive environments where
+memory regions are frequently cycled. Notably, the mlx5_ib driver has
+already adopted memory registration reuse mechanisms and has demonstrated
+notable performance improvements as a result.
+
+FRMR pools will store handles of the reusable objects, giving drivers
+the flexibility to choose what to store (e.g: pointers or indexes).
+Device driver integration requires the ability to modify the hardware
+objects underlying MRs when reusing FRMR handles, allowing the update
+of pre-allocated handles to fit the parameters of requested MR
+registrations. The FRMR pools manage memory region handles with respect
+to attributes that cannot be changed after allocation such as access flags,
+ATS capabilities, vendor keys, and DMA block size so each pool is uniquely
+characterized by these non-modifiable attributes.
+This ensures compatibility and correctness while allowing drivers
+flexibility in managing other aspects of the MR lifecycle.
+
+Solution Overview
+=================
+
+This patch series introduces a centralized, per-device FRMR pooling
+infrastructure that provides:
+
+1. Pool Organization: Uses an RB-tree to organize pools by FRMR
+   characteristics (ATS support, access flags, vendor-specific keys,
+   and DMA block count). This allows efficient lookup and reuse of
+   compatible FRMR handles.
+
+2. Dynamic Allocation: Pools grow dynamically on demand when no cached
+   handles are available, ensuring optimal memory usage without
+   sacrificing performance.
+
+3. Aging Mechanism: Implements an aging system. Unused handles are
+   gradually moved to the freed after a configurable aging period
+   (default: 60 seconds), preventing memory bloat during idle periods.
+
+4. Pinned Handles: Supports pinning a minimum number of handles per
+   pool to maintain performance for latency-sensitive workloads, avoiding
+   allocation overhead on critical paths.
+
+5. Driver Flexibility: Provides a callback-based interface
+   (ib_frmr_pool_ops) that allows drivers to implement their own FRMR
+   creation/destruction logic while leveraging the common pooling
+   infrastructure.
+
+API
+===
+
+The infrastructure exposes the following APIs:
+
+- ib_frmr_pools_init(): Initialize FRMR pools for a device
+- ib_frmr_pools_cleanup(): Clean up all pools for a device
+- ib_frmr_pool_pop(): Get an FRMR handle from the pool
+- ib_frmr_pool_push(): Return an FRMR handle to the pool
+- ib_frmr_pools_set_aging_period(): Configure aging period
+- ib_frmr_pools_set_pinned(): Set minimum pinned handles per pool
+
+mlx5_ib
+=======
+
+The partial control and visability we had only over the 'persistent'
+cache entries through debugfs is replaced by the netlink FRMR API that
+allows showing and setting properties of all available pools.
+This series also changes the default behavior MR cache had for PFs
+(Physical Functions) by dropping the pre-allocation of MKEYs that was
+costing 100MB of memory per PF and slowing down the loading and
+unloading of the driver.
+
+Signed-off-by: Michael Guralnik <michaelgur@nvidia.com>
+Signed-off-by: Edward Srouji <edwards@nvidia.com>
 ---
- drivers/net/phy/ax88796b_rust.rs | 7 +++----
- drivers/net/phy/qt2025.rs        | 5 ++---
- 2 files changed, 5 insertions(+), 7 deletions(-)
+Changes in v2:
+- Fix stack size warning in netlink set_pinned flow.
+- Add commit to move async command context init and cleanup out of MR
+  cache logic.
+- Add enforcement of access flags in set_pinned flow and enforce used
+  bits in vendor specific fields to ensure old kernels fail if any
+  unknown parameter is passed.
+- Add an option to expose kernel-internal pools through netlink.
+- Link to v1: https://lore.kernel.org/r/20251116-frmr_pools-v1-0-5eb3c8f5c9c4@nvidia.com
 
-diff --git a/drivers/net/phy/ax88796b_rust.rs b/drivers/net/phy/ax88796b_rust.rs
-index bc73ebccc2aa..2d24628a4e58 100644
---- a/drivers/net/phy/ax88796b_rust.rs
-+++ b/drivers/net/phy/ax88796b_rust.rs
-@@ -5,7 +5,6 @@
- //!
- //! C version of this driver: [`drivers/net/phy/ax88796b.c`](./ax88796b.c)
- use kernel::{
--    c_str,
-     net::phy::{self, reg::C22, DeviceId, Driver},
-     prelude::*,
-     uapi,
-@@ -41,7 +40,7 @@ fn asix_soft_reset(dev: &mut phy::Device) -> Result {
- #[vtable]
- impl Driver for PhyAX88772A {
-     const FLAGS: u32 = phy::flags::IS_INTERNAL;
--    const NAME: &'static CStr = c_str!("Asix Electronics AX88772A");
-+    const NAME: &'static CStr = c"Asix Electronics AX88772A";
-     const PHY_DEVICE_ID: DeviceId = DeviceId::new_with_exact_mask(0x003b1861);
- 
-     // AX88772A is not working properly with some old switches (NETGEAR EN 108TP):
-@@ -105,7 +104,7 @@ fn link_change_notify(dev: &mut phy::Device) {
- #[vtable]
- impl Driver for PhyAX88772C {
-     const FLAGS: u32 = phy::flags::IS_INTERNAL;
--    const NAME: &'static CStr = c_str!("Asix Electronics AX88772C");
-+    const NAME: &'static CStr = c"Asix Electronics AX88772C";
-     const PHY_DEVICE_ID: DeviceId = DeviceId::new_with_exact_mask(0x003b1881);
- 
-     fn suspend(dev: &mut phy::Device) -> Result {
-@@ -125,7 +124,7 @@ fn soft_reset(dev: &mut phy::Device) -> Result {
- 
- #[vtable]
- impl Driver for PhyAX88796B {
--    const NAME: &'static CStr = c_str!("Asix Electronics AX88796B");
-+    const NAME: &'static CStr = c"Asix Electronics AX88796B";
-     const PHY_DEVICE_ID: DeviceId = DeviceId::new_with_model_mask(0x003b1841);
- 
-     fn soft_reset(dev: &mut phy::Device) -> Result {
-diff --git a/drivers/net/phy/qt2025.rs b/drivers/net/phy/qt2025.rs
-index aaaead6512a0..470d89a0ac00 100644
---- a/drivers/net/phy/qt2025.rs
-+++ b/drivers/net/phy/qt2025.rs
-@@ -9,7 +9,6 @@
- //!
- //! The QT2025 PHY integrates an Intel 8051 micro-controller.
- 
--use kernel::c_str;
- use kernel::error::code;
- use kernel::firmware::Firmware;
- use kernel::io::poll::read_poll_timeout;
-@@ -38,7 +37,7 @@
- 
- #[vtable]
- impl Driver for PhyQT2025 {
--    const NAME: &'static CStr = c_str!("QT2025 10Gpbs SFP+");
-+    const NAME: &'static CStr = c"QT2025 10Gpbs SFP+";
-     const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_exact_mask(0x0043a400);
- 
-     fn probe(dev: &mut phy::Device) -> Result<()> {
-@@ -71,7 +70,7 @@ fn probe(dev: &mut phy::Device) -> Result<()> {
-         // The micro-controller will start running from the boot ROM.
-         dev.write(C45::new(Mmd::PCS, 0xe854), 0x00c0)?;
- 
--        let fw = Firmware::request(c_str!("qt2025-2.0.3.3.fw"), dev.as_ref())?;
-+        let fw = Firmware::request(c"qt2025-2.0.3.3.fw", dev.as_ref())?;
-         if fw.data().len() > SZ_16K + SZ_8K {
-             return Err(code::EFBIG);
-         }
+---
+Chiara Meiohas (1):
+      RDMA/mlx5: Move device async_ctx initialization
 
+Michael Guralnik (10):
+      IB/core: Introduce FRMR pools
+      RDMA/core: Add aging to FRMR pools
+      RDMA/core: Add FRMR pools statistics
+      RDMA/core: Add pinned handles to FRMR pools
+      RDMA/mlx5: Switch from MR cache to FRMR pools
+      net/mlx5: Drop MR cache related code
+      RDMA/nldev: Add command to get FRMR pools
+      RDMA/core: Add netlink command to modify FRMR aging
+      RDMA/nldev: Add command to set pinned FRMR handles
+      RDMA/nldev: Expose kernel-internal FRMR pools in netlink
+
+ drivers/infiniband/core/Makefile               |    2 +-
+ drivers/infiniband/core/frmr_pools.c           |  557 ++++++++++++
+ drivers/infiniband/core/frmr_pools.h           |   63 ++
+ drivers/infiniband/core/nldev.c                |  286 ++++++
+ drivers/infiniband/hw/mlx5/main.c              |   10 +-
+ drivers/infiniband/hw/mlx5/mlx5_ib.h           |   86 +-
+ drivers/infiniband/hw/mlx5/mr.c                | 1145 ++++--------------------
+ drivers/infiniband/hw/mlx5/odp.c               |   19 -
+ drivers/infiniband/hw/mlx5/umr.h               |    1 +
+ drivers/net/ethernet/mellanox/mlx5/core/main.c |   67 +-
+ include/linux/mlx5/driver.h                    |   11 -
+ include/rdma/frmr_pools.h                      |   39 +
+ include/rdma/ib_verbs.h                        |    8 +
+ include/uapi/rdma/rdma_netlink.h               |   22 +
+ 14 files changed, 1171 insertions(+), 1145 deletions(-)
+---
+base-commit: d056bc45b62b5981ebcd18c4303a915490b8ebe9
+change-id: 20251116-frmr_pools-f823cc5e8a58
+
+Best regards,
 -- 
-2.52.0
+Edward Srouji <edwards@nvidia.com>
 
 
