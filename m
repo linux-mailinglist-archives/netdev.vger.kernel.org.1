@@ -1,130 +1,88 @@
-Return-Path: <netdev+bounces-245771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1A53CD73E0
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 23:09:30 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5892CCD75F0
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 23:51:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BEF463013963
-	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 22:09:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B9E323096163
+	for <lists+netdev@lfdr.de>; Mon, 22 Dec 2025 22:46:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DCDB266EE9;
-	Mon, 22 Dec 2025 22:09:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4AB734403D;
+	Mon, 22 Dec 2025 22:22:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RX8rGQVt"
+	dkim=pass (2048-bit key) header.d=savoirfairelinux.com header.i=@savoirfairelinux.com header.b="I3caB1Ys"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from mail.savoirfairelinux.com (mail.savoirfairelinux.com [208.88.110.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 027DC1DE4E1
-	for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 22:09:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 313F1343D6F;
+	Mon, 22 Dec 2025 22:22:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=208.88.110.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766441352; cv=none; b=ud9vecWbkJo4YrarUzhLQJ6TCub1SRjW1bA8dth3Lp9fZu88PX0f2sHD42oS6GN64kamEw+d/40c0kbMI8+Dv1jxbuZdUpvbC09mra0wKl6Qq6FnjzQyXlkCt83mli9NOpxtcFAHmoA963BXdGjdtI9DKIcT6MnsobzWqVD5mgI=
+	t=1766442166; cv=none; b=WWuLWiKGXLabH9/OSdp0gW+6fyHjPogd/kMO4+yAcOnYCvW9P7VMdrGSBDKXO8eHYefRhZtShcFMOLQrum01/WzpecdDbea62WKW3xaexQDwyrq9XguHDM/DooLdDG3TwXO5GH7QOQo7P1kMGZTKqVSFjUoYXMbJK7bkBqIVpFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766441352; c=relaxed/simple;
-	bh=n6NsL7t0E3hr021rvI2bJe4MeW/7173JoX6PaUB0znk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uf5Lqg75CwW/1MlZUNb5io4pnIPoRkppaga2KjZ5+cBVFf5KRhCxTldBirYTiQogwMlBeMQ7gsVT1JGJabQIwXG408D29KSHRv6N/PDO8D/j5/vQUdpJwaj7cydI7/O5OBjQt6fxQJGufGaxlOyc6Kd/ZoZMsHNgEcE3iesD0wI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RX8rGQVt; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <c2c9959f-8df0-4a78-8064-733a643351fc@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1766441341;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3/AjJKHwpoDaNbpB2cbwNJpKLjkrT12IVah9PmKAFJU=;
-	b=RX8rGQVt9Uu9K/3SZxok6J9rR0zdjJSuFAr8mvYy4nieamnCc71IW75ZkonxC3pGs2bwfH
-	kjJkZQp3/K/NKUkKkCuaxXDD2fDfFl6BrIifYYEH1j1o0Ugqbca4aBy7/8SZenmKnwrXIg
-	oFAPvwkQlRoBnpHvWLW4WXySt1i5coU=
-Date: Mon, 22 Dec 2025 22:08:59 +0000
+	s=arc-20240116; t=1766442166; c=relaxed/simple;
+	bh=em6AuAjkhg0Miv5zFCn7aoCFEFKmUyO0s6Axg8mdbhc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sYwKWKzzQxEuCK8LHMbZ8GIVIk8gCJlovJFO87Rfr1snGDL8oDEzxrveRovQb90AI0N1Utjf3Bjuyu2Cmip75LCyZwF0zU7FgIAhySsAzo9xagdCG6IR9M7jtMBJCjWGbzjze2nW0zBbD8bRk0AQRTTYyXl0YcFPOw6DqN1uAyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=savoirfairelinux.com; spf=pass smtp.mailfrom=savoirfairelinux.com; dkim=pass (2048-bit key) header.d=savoirfairelinux.com header.i=@savoirfairelinux.com header.b=I3caB1Ys; arc=none smtp.client-ip=208.88.110.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=savoirfairelinux.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=savoirfairelinux.com
+Received: from localhost (localhost [127.0.0.1])
+	by mail.savoirfairelinux.com (Postfix) with ESMTP id 827F43D85112;
+	Mon, 22 Dec 2025 17:22:36 -0500 (EST)
+Received: from mail.savoirfairelinux.com ([127.0.0.1])
+ by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavis, port 10032)
+ with ESMTP id mlXR9Zo6Iy6V; Mon, 22 Dec 2025 17:22:35 -0500 (EST)
+Received: from localhost (localhost [127.0.0.1])
+	by mail.savoirfairelinux.com (Postfix) with ESMTP id BE5393D854B3;
+	Mon, 22 Dec 2025 17:22:35 -0500 (EST)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.savoirfairelinux.com BE5393D854B3
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=savoirfairelinux.com; s=DFC430D2-D198-11EC-948E-34200CB392D2;
+	t=1766442155; bh=4sm3FPJlwRzqq+O5mhWZ8WmmFjK5dUSbglYFTFSLABE=;
+	h=From:To:Date:Message-ID:MIME-Version;
+	b=I3caB1Ys33euK/mUJfaY+sppLAdch+HK8rJ8Srbv/IsyPZF7JA7zArbK0dX5KdAMK
+	 R0RVJky5t70lgTbrNLFrb5v5gIuNaGGz42UQHlahEtMLZtuyg8OhdGLUT4OByB3B3Y
+	 YwAthmj9koz+OQNWO+Qz6Qz8wtTb1KmTZH6wNq43XjexLhpRy8r0JdFH3V8ihZgDxW
+	 JXrDNBKH7Z5qq/LOZ0mRE7ZjfrnvajLHiHCuVy08TjPukXOmrH7xMrjy7Ad3qFtFCY
+	 bYJ8F5rW7gnkskHPxKb8pgKzaU0ab8bJMAk79A72QGfdc2qnNDACAIyxejZlGF5ZGd
+	 cPrAj94VCRRvg==
+X-Virus-Scanned: amavis at mail.savoirfairelinux.com
+Received: from mail.savoirfairelinux.com ([127.0.0.1])
+ by localhost (mail.savoirfairelinux.com [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id P4Bla7W1GYSP; Mon, 22 Dec 2025 17:22:35 -0500 (EST)
+Received: from oitua-pc.mtl.sfl (unknown [192.168.51.254])
+	by mail.savoirfairelinux.com (Postfix) with ESMTPSA id 904713D85112;
+	Mon, 22 Dec 2025 17:22:35 -0500 (EST)
+From: Osose Itua <osose.itua@savoirfairelinux.com>
+To: netdev@vger.kernel.org
+Cc: devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	michael.hennerich@analog.com,
+	jerome.oufella@savoirfairelinux.com,
+	Osose Itua <osose.itua@savoirfairelinux.com>
+Subject: [PATCH v2 0/2] net: phy: adin: enable configuration of the LP Termination Register
+Date: Mon, 22 Dec 2025 17:21:03 -0500
+Message-ID: <20251222222210.3651577-1-osose.itua@savoirfairelinux.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH RFC net 1/5] arp: discard sha bcast/null (bcast ARP
- poison)
-To: Marc Sune <marcdevel@gmail.com>
-Cc: kuba@kernel.org, willemdebruijn.kernel@gmail.com, pabeni@redhat.com,
- netdev@vger.kernel.org, dborkman@kernel.org
-References: <cover.1766349632.git.marcdevel@gmail.com>
- <99815e3b40dccf5971b7e9e0edb18c8df11af403.1766349632.git.marcdevel@gmail.com>
- <4ab8135d-75b8-4aa0-b5ce-f917e4a34e18@linux.dev>
- <CA+3n-TrGSs-rPswMmCaUjYnM=f1APBWtmAguMUaAOvwuKm30+Q@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <CA+3n-TrGSs-rPswMmCaUjYnM=f1APBWtmAguMUaAOvwuKm30+Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: quoted-printable
 
-On 22/12/2025 21:37, Marc Sune wrote:
-> Missatge de Vadim Fedorenko <vadim.fedorenko@linux.dev> del dia dl.,
-> 22 de des. 2025 a les 10:47:
->>
->> On 21/12/2025 21:19, Marc SuÃ±Ã© wrote:
->>>
->>>    /*
->>> + *   For Ethernet devices, Broadcast/Multicast and zero MAC addresses should
->>> + *   never be announced and accepted as sender HW address (prevent BCAST MAC
->>> + *   and NULL ARP poisoning attack).
->>> + */
->>> +     if (dev->addr_len == ETH_ALEN &&
->>
->> dev_type == ARPHRD_ETHER ?
-> 
-> This is discussed in the cover letter, comments section d). I would
-> think more dev_types than that need to check this, at least:
-> 
-> +       case ARPHRD_ETHER:
-> +       case ARPHRD_EETHER:
-> +       case ARPHRD_FDDI:
-> +       case ARPHRD_IEEE802:
-> +       case ARPHRD_IEEE80211:
-> 
-> but as said, I _think_ it's sufficient to check for HW addrlen == ETH_ALEN.
+Changes since v1:
+- rework phy_read_mmd() error handling
 
-ARPHRD_EETHER and ARPHRD_IEEE80211 are not really used in the kernel.
-For other 3 we already have such case a bit earlier in arp_process(),
-it's fine to be aligned with the existing code.
+Osose Itua (2):
+  net: phy: adin: enable configuration of the LP Termination Register
+  dt-bindings: net: adi,adin: document LP Termination property
 
-> 
->>
->>
->>> +         (is_broadcast_ether_addr(sha) || is_zero_ether_addr(sha)))
->>
->> RFC says that neither broadcast, nor multicast must be believed. You
->> check for broadcast only. The better check would be:
->>
->> !is_unicast_ether_addr(sha)
-> 
-> This is discussed in the cover letter, comments section b). In short,
-> some NLBs announce MCAST MAC addresses.
-> 
-> Mind the context there, but I think it's safe. This is applicable to
-> ARP and NDP, so I would suggest to follow up there.
-> 
-> Btw, the is_zero_ether_addr(addr) check is still needed.
-> is_unicast_ether_addr(addr) is implemented as
-> !is_multicast_ether_addr(addr), and the NULL mac (00:00:00:00:00:00)
-> doesn't have the "MCAST bit" set to 1.
-
-Yeah, "!is_valid_ether_addr(sha)" is better in this case.
-
-> 
->>
->>> +             goto out_free_skb;
->>> +
->>> + /*
->>>     *     Special case: We must set Frame Relay source Q.922 address
->>>     */
->>>        if (dev_type == ARPHRD_DLCI)
->>
+ .../devicetree/bindings/net/adi,adin.yaml     |  6 ++++
+ drivers/net/phy/adin.c                        | 34 +++++++++++++++++++
+ 2 files changed, 40 insertions(+)
 
 
