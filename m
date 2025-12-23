@@ -1,187 +1,169 @@
-Return-Path: <netdev+bounces-245879-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245880-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43E36CD9D69
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 16:47:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 504C8CD9D5D
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 16:46:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 17ED630B01D9
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 15:40:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 935D730AAC9E
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 15:40:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F216A34D4ED;
-	Tue, 23 Dec 2025 15:27:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AA9B34F478;
+	Tue, 23 Dec 2025 15:29:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dEEOpmP1"
+	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="lDOkL1Fy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F70834D4C0
-	for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 15:27:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79E9334F250
+	for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 15:29:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766503640; cv=none; b=M10xD1GEwmcSScb1FjVmbPU/p8jbnP8FdYGvLPJdUNNWdXrKeEf4aDhtcUMhoqygos7LnX1tTkCNBZoJxR+ifnEumcaLYlYWJNYYJrmrn8js6hdPHr/68uT7M1tgWfVmmYrwWXaaMOdsGWEp+yqgLQ0jMZKGtCuZybjJ/I5gsF4=
+	t=1766503778; cv=none; b=eczpUzVBwpFyPoF323Hb19FIN3WlKUgt+c57VwG4A6ajL/nf+R5kf9M7dvrYtJKz8ypLItIs2tQCoqUrG5aHApDtX33F6XooaGSoqkKmFRSM55RoRCQlO5C3ZaRD7sWCAin8yXB3UqTrGhS//Tcbio6WI5CqnOABBOAJRkXZQcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766503640; c=relaxed/simple;
-	bh=dqAVCd406spP927ct6RgvB4a8I1dOdU+v808mOA7XuI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gLO4dd/MTPMoLiI6HqJw3D82tyBWUICIRRqv0eb7EccfivGdhVSN2clG4sfURpFk8tdrRU9BRV3c5qrstX49ECNzv+p9ABH/87aCr4nPhFIUFSw8/6zipdUNHMu2NBvnL7B6lkVB5ayv8/bNYsTGcZTKRK651RZe4/ri74PJfDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dEEOpmP1; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-34a4078f669so5093902a91.1
-        for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 07:27:19 -0800 (PST)
+	s=arc-20240116; t=1766503778; c=relaxed/simple;
+	bh=UJ4a8K9wry/JPIeGH5DwpGba6bA4R4gax6qub7x2SY4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rBt2ZEaIiPxOafzHPJbHVD6c3heqB43ly9UbrnjQL6o6Jl50q2HeJYXj3VbshbkZJagUxh2Z1VcklH2Uz0ywRnGnDtJqvLSzc3A2ivw5TRcMBQpqZNArgHYSAUjyq/KZQntu0+CSghiFnZg56B9aC7r7toJRB5CN/VwbpvznGdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=lDOkL1Fy; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b727f452fffso986226066b.1
+        for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 07:29:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766503638; x=1767108438; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=sartura.hr; s=sartura; t=1766503774; x=1767108574; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ze9XAlqzMbfmN07PhRbHKjr9BLXv6+joNuOst0RuStI=;
-        b=dEEOpmP1FdgkOa3ktWP8RLJupssR+p8a0ID+w0AEfkGuW8t9R5zULSqd5pllEznehv
-         eGj7xgm98JtQGTmKza/LZkAFZPDb+24cAJy1ubomu5FCY4xz113NQe/PVfsQBWWUJEFJ
-         Rlr/PuHgHsP2/aAdgYQsr1/9OxCdN2OCEgp8hehA28jtPza3s5gDuJ8dnPJFjbqXsB9D
-         PVyC2ufQqtWqe86Om883mdJIaHvf0dgwTTOg1dJssCdLoUiu5r2meFWox6zaG1PvIkLD
-         iuEJms2dHp9YZPCO1ib/Ujhcgt9MXadBCN8TWkbdupyJ2BlEBQe/L0Urx31DCC7TUxPa
-         DupQ==
+        bh=cLjISIOInag6cJNCp9GAXmtvydDuwUZOD3O+6EuGMpA=;
+        b=lDOkL1FyHZFJ/9/OvPdkMyYxnkNuTkuKFAJlUBUCP6HN0MqcClWvGh955PsXfCG+TE
+         XTJ9K//mvDtqzzy+8UpL1y6RStVl9cIPSZrvePcdWuCn+ocgGrIKDtG9+54W1w2//ou8
+         OA5XU6YHOGYGLPwmx49l4TBtdurcyXq+U5KGyoNvmaVZMCeozr9d58t7zZ1j+zZEQDsh
+         Kf3pekwyW72hmnLuSoSmitxCpGyWf6IWLHLSubohN8Q1uFEJ0jlLdVAnxp2afKolq/Di
+         Hpo3XANTXWdDsDg7UaN6dPqi5wLfeRPeuisBuru1875FAqqqDaYDIxgxJJ2SJLG7SJGQ
+         +dlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766503638; x=1767108438;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1766503774; x=1767108574;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Ze9XAlqzMbfmN07PhRbHKjr9BLXv6+joNuOst0RuStI=;
-        b=eQPRsJO0NqJGdTk0oQTzSWIN0pj/kBTnsfASd6ngMdffYQJIrtSb1x4XIlz7qntG34
-         U7KqlzoFek8Br5qKhuT8LnIbUZSrk/DLuJvNweMq20eLzK6kfFw9iKNBLQYUtWBPcvpv
-         pplhXOSz01xRZ/c46Xt1E1RkXwDNLsbrnSQ2Ofw1pl2R6svpVoSP7NhsSpa+ZwwhCJ1G
-         YlzvLCT0/VzMhAtqOjJcjipJXVQXlLifdxjbdIwHpYa5i+6iAV5IugdWTPbbUIgfthCT
-         C6SHBmlAYI0c9Ujtsov1M4Fuv3Kd6DnZCniHE12/ZbUA0FrLNvmhx/8QNQE1Tnn4XXx+
-         JD1A==
-X-Gm-Message-State: AOJu0Yx/p56wk8UnSaQaw4ynvZLNtOaSIgCRdz0NT5BWP8VAk2GeHXHU
-	c/5Aq43Ojsk12j5QeQjE71aismet5yT3s2qRH3ynBaq8QgeylIfsP9xEhtGBN5CF
-X-Gm-Gg: AY/fxX4IhhMbDP8Qt770GEfOnhZ+MBpq7Tcey3JRz3cFtRVNsK9e6cZT2NW47nK1fMK
-	oCeStjWMh5TZ8M5GYh/XTq17F4uy//ORv2j48ykO81aSvdXzJ3mNTQziugKFKHYDJ2v+sriTlAX
-	7q2oemmmbSm9bF0OF85NXDwGvxnKlDLykCnUHlrCsMYGokH/5lQalLWQWOdCoOoiHvqiychQBfD
-	UipTTc1rg8SDlChdVEaZSi1ieRSEzybX6MCYUOYsk8zQMDlaATMfIVerXv85Fz/zke85AojMdC0
-	+RrZH9Cvr+FziWOL1UhemtgikaflWQCdLAIUF9H4NPIeq/3nCULwWcEysRtwXvmGaLloqbczsIM
-	N5NA8ugyY0TuNd+GezGlAifWmQeOFfNdZSmJDNr/IJzOCa3j2H0LNYkpqq0lIDDSuxWqpJEMuTF
-	PfbuMcswg/uFlY7BX86Y5Rs14p
-X-Google-Smtp-Source: AGHT+IEk5kNaKT2vsTzXqOJuqMCa8BgC7mYYuynqk5le798li0SZVD/6VGOpORiTUPiHf0D9J/Vgsw==
-X-Received: by 2002:a17:90b:3ccf:b0:349:162d:ae1e with SMTP id 98e67ed59e1d1-34e921f7eb0mr11071309a91.33.1766503638325;
-        Tue, 23 Dec 2025 07:27:18 -0800 (PST)
-Received: from minh.192.168.1.1 ([2001:ee0:4f4c:210:3523:f373:4d1d:e7f0])
-        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-34e76ae7618sm8006138a91.1.2025.12.23.07.27.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Dec 2025 07:27:17 -0800 (PST)
-From: Bui Quang Minh <minhquangbui99@gmail.com>
-To: netdev@vger.kernel.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	virtualization@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	Bui Quang Minh <minhquangbui99@gmail.com>
-Subject: [PATCH net 3/3] virtio-net: schedule the pending refill work after being enabled
-Date: Tue, 23 Dec 2025 22:25:33 +0700
-Message-ID: <20251223152533.24364-4-minhquangbui99@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251223152533.24364-1-minhquangbui99@gmail.com>
-References: <20251223152533.24364-1-minhquangbui99@gmail.com>
+        bh=cLjISIOInag6cJNCp9GAXmtvydDuwUZOD3O+6EuGMpA=;
+        b=K0Re5b9CoBk1cDtZa1M9dNy75Is246SJmIHU4/hX8CAZVIttTrYp3O/90/s3JxOlNW
+         KtNZT5eAxt40fad5Rd54WSkIhZc+Pqwg8yeWphQFVe0swlhMagD04nK5psK69ZdvtHjv
+         DqSxKmR3Im/jb68oVZ8uFAyt5Lc9WV4Tm5KMb3nx0dHJdgu9WduFQRhH/gzxeQafpDHt
+         F5zVJ1CTAXBGJajRZ8VRY+wI+JREFEj2psa5R3MjpiT4VkEC6SUwq9JtX8CyKkSmJ8LV
+         hHFLZR/CG8kREtxp8uwQJN3smUThuFoTF2wNId5tqSFbivBkIEw5zWDmlSNc4Q1QHqgk
+         iV6A==
+X-Forwarded-Encrypted: i=1; AJvYcCX/MNhocbOavINDsPk+p4YgQxDb+ObZ/D1eJcoWjUqgn3pF4gzuaylWNj+nCVQjRsgt3D2x1Dw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlykZEyW7BqufejvyuuDAZSLnMx7zLnjJ5KmFtFme2+KlfeVZF
+	9mWhlRximVQ31FgfAYka4T+tpMZ5bY3scoCpGkR0qSrEZpr9WkPGAWe8H7rOXtsa0wmNbeNdnPf
+	Dy9P6R0CXlRCLVcOxc0hLEBi2EhUR2jkobslyAlhVhA==
+X-Gm-Gg: AY/fxX6E7WlQIGKgtIH/JBsHQSHeV3Z//afpPHuWUk67mV0pYH0C3PGlYm7LM/NgmKS
+	iMBpTosxNKb1Nskwp+6t9r6JpTrNlZkFQjGlDaCtzVi5WvNIj/VNid/V0vylohawXgJVYCfgTwu
+	SKE4REG7jqgcsRTvC9fsS4dcM3LDFmU9gUtU2V0AcpjscLxXWoNi142yV2PDmibyzrT0grh13yB
+	n7Hu1fGcl4+o/41TJKJQwb3U4RRal7gXTG1K/2BOKgBulTdmd1SdDk1rYjhmQj8GxN8DRRFsFCf
+	KIoGYS7EmedK372sxDh8tr+Kr3v++cEA1bJuh+lr8ImAGAowqw==
+X-Google-Smtp-Source: AGHT+IE+xxKz9WunQGu5xp3nWvZrKUFIZLNano4iauMvK7wBVyl981tNBySUR5mcD+g4BmTew6KluXuH/rQplznm+8E=
+X-Received: by 2002:a17:906:30d4:b0:b7c:cc8d:14f4 with SMTP id
+ a640c23a62f3a-b8020400995mr1538956066b.4.1766503773539; Tue, 23 Dec 2025
+ 07:29:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20251215163820.1584926-1-robert.marko@sartura.hr>
+ <20251215163820.1584926-18-robert.marko@sartura.hr> <20251216-endorse-password-ae692dda5a9c@spud>
+ <CA+HBbNF-=W7A3Joftsqn+A6s170sqOZ77jpS105s5HPqkskQzA@mail.gmail.com> <20251223-chrome-simile-8cf1e9afe155@spud>
+In-Reply-To: <20251223-chrome-simile-8cf1e9afe155@spud>
+From: Robert Marko <robert.marko@sartura.hr>
+Date: Tue, 23 Dec 2025 16:29:22 +0100
+X-Gm-Features: AQt7F2rjEyMDZrOpK1oplok3NPPf4ZxKJg97_UNzU27UIMOHDSKt5OOOHzhM_mA
+Message-ID: <CA+HBbNFhVVoaiVJtH-fB3Wmeh6O3C_H=bwz2vBDR2MO4o0qy_w@mail.gmail.com>
+Subject: Re: [PATCH v2 18/19] dt-bindings: arm: microchip: document EV23X71A board
+To: Conor Dooley <conor@kernel.org>
+Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
+	nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com, 
+	claudiu.beznea@tuxon.dev, Steen.Hegelund@microchip.com, 
+	daniel.machon@microchip.com, UNGLinuxDriver@microchip.com, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org, 
+	linux@roeck-us.net, andi.shyti@kernel.org, lee@kernel.org, 
+	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, linusw@kernel.org, olivia@selenic.com, 
+	radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com, 
+	gregkh@linuxfoundation.org, jirislaby@kernel.org, mturquette@baylibre.com, 
+	sboyd@kernel.org, richardcochran@gmail.com, wsa+renesas@sang-engineering.com, 
+	romain.sioen@microchip.com, Ryan.Wanner@microchip.com, 
+	lars.povlsen@microchip.com, tudor.ambarus@linaro.org, 
+	kavyasree.kotagiri@microchip.com, devicetree@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org, 
+	linux-hwmon@vger.kernel.org, linux-i2c@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-gpio@vger.kernel.org, linux-spi@vger.kernel.org, 
+	linux-serial@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-clk@vger.kernel.org, mwalle@kernel.org, luka.perkov@sartura.hr
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-As we need to move the enable_delayed_refill after napi_enable, it's
-possible that a refill work needs to be scheduled in virtnet_receive but
-it cannot. This can make the receive side stuck because if we don't have
-any receive buffers, there will be nothing trigger the refill logic. So
-in case it happens, in virtnet_receive, set the rx queue's
-refill_pending, then when the refill work is enabled again, a refill
-work will be scheduled.
+On Tue, Dec 23, 2025 at 3:43=E2=80=AFPM Conor Dooley <conor@kernel.org> wro=
+te:
+>
+> On Tue, Dec 23, 2025 at 11:34:55AM +0100, Robert Marko wrote:
+> > On Tue, Dec 16, 2025 at 6:32=E2=80=AFPM Conor Dooley <conor@kernel.org>=
+ wrote:
+> > >
+> > > On Mon, Dec 15, 2025 at 05:35:35PM +0100, Robert Marko wrote:
+> > > > Microchip EV23X71A board is an LAN9696 based evaluation board.
+> > > >
+> > > > Signed-off-by: Robert Marko <robert.marko@sartura.hr>
+> > > > ---
+> > > >  Documentation/devicetree/bindings/arm/microchip.yaml | 8 ++++++++
+> > > >  1 file changed, 8 insertions(+)
+> > > >
+> > > > diff --git a/Documentation/devicetree/bindings/arm/microchip.yaml b=
+/Documentation/devicetree/bindings/arm/microchip.yaml
+> > > > index 910ecc11d5d7..b20441edaac7 100644
+> > > > --- a/Documentation/devicetree/bindings/arm/microchip.yaml
+> > > > +++ b/Documentation/devicetree/bindings/arm/microchip.yaml
+> > > > @@ -239,6 +239,14 @@ properties:
+> > > >            - const: microchip,lan9668
+> > > >            - const: microchip,lan966
+> > > >
+> > > > +      - description: The LAN969x EVB (EV23X71A) is a 24x 1G + 4x 1=
+0G
+> > > > +          Ethernet development system board.
+> > > > +      - items:
+> > > > +          - enum:
+> > > > +              - microchip,ev23x71a
+> > > > +              - microchip,lan9696
+> > >
+> > > This looks wrong, unless "microchip,lan9696" is a board (which I susp=
+ect
+> > > it isn't).
+> >
+> > Hi,
+> > No, LAN9696 is the exact SoC SKU used on the board.
+> > I will drop it in v3.
+>
+> Instead of dropping it, this should become an items list with 3 consts I
+> think.
 
-Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
----
- drivers/net/virtio_net.c | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
+Ok, that lines up with what other boards in the binding do, will do that in=
+ v3.
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 8016d2b378cf..ddc62dab2f9a 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -383,6 +383,9 @@ struct receive_queue {
- 	/* Is delayed refill enabled? */
- 	bool refill_enabled;
- 
-+	/* A refill work needs to be scheduled when delayed refill is enabled */
-+	bool refill_pending;
-+
- 	/* The lock to synchronize the access to refill_enabled */
- 	spinlock_t refill_lock;
- 
-@@ -720,10 +723,13 @@ static void virtnet_rq_free_buf(struct virtnet_info *vi,
- 		put_page(virt_to_head_page(buf));
- }
- 
--static void enable_delayed_refill(struct receive_queue *rq)
-+static void enable_delayed_refill(struct receive_queue *rq,
-+				  bool schedule_refill)
- {
- 	spin_lock_bh(&rq->refill_lock);
- 	rq->refill_enabled = true;
-+	if (rq->refill_pending || schedule_refill)
-+		schedule_delayed_work(&rq->refill, 0);
- 	spin_unlock_bh(&rq->refill_lock);
- }
- 
-@@ -3032,6 +3038,8 @@ static int virtnet_receive(struct receive_queue *rq, int budget,
- 			spin_lock(&rq->refill_lock);
- 			if (rq->refill_enabled)
- 				schedule_delayed_work(&rq->refill, 0);
-+			else
-+				rq->refill_pending = true;
- 			spin_unlock(&rq->refill_lock);
- 		}
- 	}
-@@ -3228,11 +3236,8 @@ static int virtnet_open(struct net_device *dev)
- 		if (err < 0)
- 			goto err_enable_qp;
- 
--		if (i < vi->curr_queue_pairs) {
--			enable_delayed_refill(&vi->rq[i]);
--			if (schedule_refill)
--				schedule_delayed_work(&vi->rq[i].refill, 0);
--		}
-+		if (i < vi->curr_queue_pairs)
-+			enable_delayed_refill(&vi->rq[i], schedule_refill);
- 	}
- 
- 	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_STATUS)) {
-@@ -3480,9 +3485,7 @@ static void __virtnet_rx_resume(struct virtnet_info *vi,
- 	if (running)
- 		virtnet_napi_enable(rq);
- 
--	enable_delayed_refill(rq);
--	if (schedule_refill)
--		schedule_delayed_work(&rq->refill, 0);
-+	enable_delayed_refill(rq, schedule_refill);
- }
- 
- static void virtnet_rx_resume_all(struct virtnet_info *vi)
--- 
-2.43.0
+Regards,
+Robert
 
+
+
+--=20
+Robert Marko
+Staff Embedded Linux Engineer
+Sartura d.d.
+Lendavska ulica 16a
+10000 Zagreb, Croatia
+Email: robert.marko@sartura.hr
+Web: www.sartura.hr
 
