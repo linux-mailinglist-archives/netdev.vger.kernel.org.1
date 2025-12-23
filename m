@@ -1,136 +1,169 @@
-Return-Path: <netdev+bounces-245859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26616CD9543
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 13:41:56 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A7B9CD952B
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 13:41:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id DBDB230208E3
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 12:40:36 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 0005E302E146
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 12:38:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D60C2C028B;
-	Tue, 23 Dec 2025 12:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 761B7335091;
+	Tue, 23 Dec 2025 12:38:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=blackhole.kfki.hu header.i=@blackhole.kfki.hu header.b="dsap1GJ1"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="csgi6Iyz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out.kfki.hu (smtp-out.kfki.hu [148.6.0.49])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF1492C11E2;
-	Tue, 23 Dec 2025 12:40:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.6.0.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E31F13DDAE;
+	Tue, 23 Dec 2025 12:38:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766493629; cv=none; b=F8919LIYj+pKFG5C3t2I2Q+ShtyDW5kB3XyNxzetGP6t3nEpoO46xyZ1zppo7eIMAGdxrpiLSfzTuVunzQwaCcU9nE1WjTPT1vOwyzfyvWFuHxXpqsYUzvpPRhohgahfJyH65gZ3ZroCUUu3r+L/ojiUb7LboAz5ThFqUnQZwo8=
+	t=1766493492; cv=none; b=pePf5YsTtkIbHelid+eKfe+oMpSmjsvZeQNZm1h/VvPA8NJsQ3pqeMWuL0x1L7UZHe9N531vnA0sNHLUnoBlOR7TF1TTIuCSg9K6jhuFdgVg/LYbFobZaq1DamDBEu4f5naMfH+UMMFvfO1TpdGYqg4SXIiuC3fIgnU6ecWPf+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766493629; c=relaxed/simple;
-	bh=iHZkWUprqi5MDi+sdCv+B6RvA6q+yXVB+agqsq30lvw=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=DYS0xvJqC6SjJzOyXNUkHOYqbid0f7WZxlB1BuZ7EMB4eC0dAug0LMbfiKaW1vf24XePGEGFS+LdUz3sB3xfvVyX1e14fnlxWvjzOICXJf4NU16613EVb8bU8WtiAVacuMCPMO1IptLl/qbcZm1sffqxfBH1ni5u+m/xe+2vZIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=blackhole.kfki.hu; spf=pass smtp.mailfrom=blackhole.kfki.hu; dkim=pass (1024-bit key) header.d=blackhole.kfki.hu header.i=@blackhole.kfki.hu header.b=dsap1GJ1; arc=none smtp.client-ip=148.6.0.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=blackhole.kfki.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=blackhole.kfki.hu
-Received: from localhost (localhost [127.0.0.1])
-	by smtp0.kfki.hu (Postfix) with ESMTP id 4dbDsn5wZWz3sb8d;
-	Tue, 23 Dec 2025 13:32:13 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	blackhole.kfki.hu; h=mime-version:references:message-id
-	:in-reply-to:from:from:date:date:received:received:received
-	:received; s=20151130; t=1766493131; x=1768307532; bh=Z72d/b1Axk
-	BiRXZajisn1BNLwwoimbxFqXF2IWlBu8k=; b=dsap1GJ1tJ3MKGoWHvug74GYQl
-	i0FiGu2hIWQBJqYxF/dSHOspNRmlvxfvK2AL335DU6EfYu5GVr5RfTDLarPBXcJ4
-	CQiBij38WLYu9p//KQZpqgRb+7nBL0V6Pmsh5gv1Z26Donf3epMh4FSRfBWRcdLh
-	xr781vV1z4JkJcgZE=
-X-Virus-Scanned: Debian amavis at smtp0.kfki.hu
-Received: from smtp0.kfki.hu ([127.0.0.1])
- by localhost (smtp0.kfki.hu [127.0.0.1]) (amavis, port 10026) with ESMTP
- id bCBjsIHCtwVJ; Tue, 23 Dec 2025 13:32:11 +0100 (CET)
-Received: from blackhole.kfki.hu (blackhole.szhk.kfki.hu [IPv6:2001:738:5001:1::240:2])
-	by smtp0.kfki.hu (Postfix) with ESMTP id 4dbDsl1br9z3sb7m;
-	Tue, 23 Dec 2025 13:32:10 +0100 (CET)
-Received: by blackhole.kfki.hu (Postfix, from userid 1000)
-	id 9CFC434316A; Tue, 23 Dec 2025 13:32:10 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by blackhole.kfki.hu (Postfix) with ESMTP id 9B66C340D75;
-	Tue, 23 Dec 2025 13:32:10 +0100 (CET)
-Date: Tue, 23 Dec 2025 13:32:10 +0100 (CET)
-From: Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
-To: Florian Westphal <fw@strlen.de>
-cc: syzbot <syzbot+ff16b505ec9152e5f448@syzkaller.appspotmail.com>, 
-    coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
-    horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-    netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, pabeni@redhat.com, 
-    pablo@netfilter.org, phil@nwl.cc, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [netfilter?] possible deadlock in
- nf_tables_dumpreset_obj
-In-Reply-To: <aUh_3mVRV8OrGsVo@strlen.de>
-Message-ID: <42671512-7b14-57ac-7722-a5739bb59976@blackhole.kfki.hu>
-References: <6945f4b4.a70a0220.207337.0121.GAE@google.com> <aUh_3mVRV8OrGsVo@strlen.de>
+	s=arc-20240116; t=1766493492; c=relaxed/simple;
+	bh=MH9fsXSV4/vV6yKbXRdvMNE0YpZl2llUQZEnqF7AiOk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Dht7wrF4ggaHsNvpo77xgP+mpA3/o1xl8LxDHpNFzLeY/qWqDAbaFhT3DVazL8ZZRg42cEA4MAM1NUOnT3eBfplbe9tVqiyrUZUsj5u6Z9piqOzzyEeU+2hT9At7LLckArCu5GZpC8Y43Py9zPKePYXCOd3YA/3ZLBsVA/lCrGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=csgi6Iyz; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1766493488;
+	bh=MH9fsXSV4/vV6yKbXRdvMNE0YpZl2llUQZEnqF7AiOk=;
+	h=From:Subject:Date:To:Cc:From;
+	b=csgi6IyzSpYebZafa8FL7wsKRbM22ngs+jJ7BpB+XrUjwmC4SFUnLzerEgK+BwpBb
+	 1foEC3ridBpWgKVySzNKpRHRh9EbMkOEO5rxhendeaYaVr88Gqc45ULnrvVzt84xkj
+	 UOBbeEWDCiPwpOuTKc6VBA2Npm2tEHYDq/0iWb2GzeRrhFlqi2xRvT/UKlUp3zBgEa
+	 tkzDHcvGVirvHkvaPaCrNeG7dxFSH/fP5Jiv/m7H3sKrg0FRXYSyzxp4siwvOCOV7A
+	 Hwv4/FgWjWWOnbNenW2/rhJ65pLGzM/1uIEOHAxHjx1iNCNiR/xbVXHe2ihq3nCrQQ
+	 7AxoU5fIb3/WA==
+Received: from beast.luon.net (unknown [IPv6:2a10:3781:2531:0:f337:3245:2545:b505])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: sjoerd)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 987B417E0C2E;
+	Tue, 23 Dec 2025 13:38:08 +0100 (CET)
+Received: by beast.luon.net (Postfix, from userid 1000)
+	id 4202E117A066D; Tue, 23 Dec 2025 13:38:08 +0100 (CET)
+From: Sjoerd Simons <sjoerd@collabora.com>
+Subject: [PATCH v5 0/8] arm64: dts: mediatek: Add Openwrt One AP
+ functionality
+Date: Tue, 23 Dec 2025 13:37:50 +0100
+Message-Id: <20251223-openwrt-one-network-v5-0-7d1864ea3ad5@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAB+NSmkC/x3MMQqAMAxA0atIZgNtsYJeRRy0Rg1CKqmoIN7d4
+ viG/x9IpEwJ2uIBpZMTR8nwZQFhHWQh5CkbnHHeGltj3EkuPTAKodBxRd2wMmNohmBH5wPkcle
+ a+f6vXf++H//+2pFlAAAA
+X-Change-ID: 20251016-openwrt-one-network-40bc9ac1b25c
+To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+ Ryder Lee <ryder.lee@mediatek.com>, 
+ Jianjun Wang <jianjun.wang@mediatek.com>, 
+ Bjorn Helgaas <bhelgaas@google.com>, 
+ Lorenzo Pieralisi <lpieralisi@kernel.org>, 
+ =?utf-8?q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>, 
+ Manivannan Sadhasivam <mani@kernel.org>, 
+ Chunfeng Yun <chunfeng.yun@mediatek.com>, Vinod Koul <vkoul@kernel.org>, 
+ Kishon Vijay Abraham I <kishon@kernel.org>, Lee Jones <lee@kernel.org>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>
+Cc: kernel@collabora.com, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, linux-pci@vger.kernel.org, 
+ linux-phy@lists.infradead.org, netdev@vger.kernel.org, 
+ Daniel Golle <daniel@makrotopia.org>, Bryan Hinton <bryan@bryanhinton.com>, 
+ Sjoerd Simons <sjoerd@collabora.com>, 
+ Conor Dooley <conor.dooley@microchip.com>
+X-Mailer: b4 0.14.3
 
-Hi,
+Significant changes in V5:
+  * Rebase against linux v6.19-rc2, dropping merged patches
+  * Drop note about disable pci_aspm in cover letter, not required anymore
+Significant changes in V4:
+  * Drop patches that were picked up
+  * Improve mediatek,net dt bindings:
+    - Move back to V2 version (widening global constraint, constraining
+      per compatible)
+    - Ensure all compatibles are constraint in the amount of WEDs (2 for
+      everything apart from mt7981). Specifically adding constraints for
+      mediatek,mt7622-eth and ralink,rt5350-eth
+Significant changes in V3:
+  * Drop patches that were picked up
+  * Re-order patches so changes that don't require dt binding changes
+    come first (Requested by Angelo)
+  * Specify drive power directly rather then using MTK_DRIVE_...
+  * Simply mediatek,net binding changes to avoid accidental changes to
+    other compatibles then mediatek,mt7981-eth
+Significant changes in V2:
+  * https://lore.kernel.org/lkml/20251016-openwrt-one-network-v1-0-de259719b6f2@collabora.com/
+  * Only introduce labels in mt7981b.dtsi when required
+  * Switch Airoha EN8811H phy irq to level rather then edge triggered
+  * Move uart0 pinctrl from board dts to soc dtsi
+  * Only overwrite constraints with non-default values in MT7981 bindings
+  * Make SPI NOR nvmem cell labels more meaningfull
+  * Seperate fixing and disable-by-default for the mt7981 in seperate
+    patches
 
-On Mon, 22 Dec 2025, Florian Westphal wrote:
+This series add various peripherals to the Openwrt One, to make it
+actually useful an access point:
 
-> syzbot <syzbot+ff16b505ec9152e5f448@syzkaller.appspotmail.com> wrote:
-> > syz.3.970/9330 is trying to acquire lock:
-> > ffff888012d4ccd8 (&nft_net->commit_mutex){+.+.}-{4:4}, at: nf_tables_dumpreset_obj+0x6f/0xa0 net/netfilter/nf_tables_api.c:8491
-> > 
-> > but task is already holding lock:
-> > ffff88802bce36f0 (nlk_cb_mutex-NETFILTER){+.+.}-{4:4}, at: __netlink_dump_start+0x150/0x990 net/netlink/af_netlink.c:2404
-> > 
-> > which lock already depends on the new lock.
-> 
-> I think this is a real bug:
-> 
-> CPU0: 'nft reset'.
-> CPU1: 'ipset list' (anything in ipset doing a netlink dump op)
-> CPU2: 'iptables-nft -A ... -m set ...'
-> 
-> ... can result in:
-> 
-> CPU0                    CPU1                            CPU2
-> ----                    ----                            ----
-> lock(nlk_cb_mutex-NETFILTER);
->                         lock(nfnl_subsys_ipset);
->                                                        lock(&nft_net->commit_mutex);
->                         lock(nlk_cb_mutex-NETFILTER);
->                                                        lock(nfnl_subsys_ipset);
-> lock(&nft_net->commit_mutex);
-> 
-> CPU0 is waiting for CPU2 to release transaction mutex.
-> CPU1 is waiting for CPU0 to release the netlink dump mutex
-> CPU2 is waiting for CPU1 to release the ipset subsys mutex
-> 
-> This bug was added when 'nft reset' started to grab the transaction
-> mutex from the dump callback path in nf_tables.
-> 
-> Not yet sure how to avoid it.
-> Maybe we could get rid of 'lock(nfnl_subsys_ipset);'
-> from the xt_set module call paths.
+* Pcie express (tested with nvme storage)
+* Wired network interfaces
+* Wireless network interfaces (2.4g, 5ghz wifi)
+* Status leds
+* SPI NOR for factory data
 
-I don't know how calling it could be avoided: userspace commands (ipset + 
-iptables checkentry using ipset match/target) are serialized by 
-nfnl_subsys_ipset.
+Unsurprisingly the series is a mix of dt binding updates, extensions of
+the mt7981b and the openwrt one dtb. All driver support required is
+already available.
 
-Is there a way to force acquiring nlk_cb_mutex-NETFILTER first and then 
-nfnl_subsys_ipset when doing a netlink dump?
+Sadly during testing i've found various quirks requiring kernel
+arguments. Documenting those here both as note to self and making it
+easier for others to test :)
 
-> Or add a new lock (spinlock?) to protect the 'reset' object info
-> instead of using the transaction mutex.
-> 
-> I haven't given it much thought yet and will likely not
-> investigate further for the next two weeks.
+* fw_devlink=permissive: the nvmem fixed-layout doesn't create a layout
+  device, so doesn't trigger fw_devlink
+* clk_ignore_unused: Needed when building CONFIG_NET_MEDIATEK_SOC as a
+  module. If the ethernet related clocks (gp1/gp2) get disabled the
+  mac ends up in a weird state causing it not to function correctly.
+
+Patches are against linux v6.19-rc2
+
+Signed-off-by: Sjoerd Simons <sjoerd@collabora.com>
+---
+Sjoerd Simons (8):
+      dt-bindings: PCI: mediatek-gen3: Add MT7981 PCIe compatible
+      arm64: dts: mediatek: mt7981b: Add PCIe and USB support
+      arm64: dts: mediatek: mt7981b-openwrt-one: Enable PCIe and USB
+      arm64: dts: mediatek: mt7981b: Add Ethernet and WiFi offload support
+      arm64: dts: mediatek: mt7981b-openwrt-one: Enable Ethernet
+      arm64: dts: mediatek: mt7981b: Disable wifi by default
+      arm64: dts: mediatek: mt7981b: Add wifi memory region
+      arm64: dts: mediatek: mt7981b-openwrt-one: Enable wifi
+
+ .../bindings/pci/mediatek-pcie-gen3.yaml           |   1 +
+ .../boot/dts/mediatek/mt7981b-openwrt-one.dts      | 125 ++++++++++++
+ arch/arm64/boot/dts/mediatek/mt7981b.dtsi          | 222 ++++++++++++++++++++-
+ 3 files changed, 346 insertions(+), 2 deletions(-)
+---
+base-commit: b927546677c876e26eba308550207c2ddf812a43
+change-id: 20251016-openwrt-one-network-40bc9ac1b25c
 
 Best regards,
-Jozsef
 -- 
-E-mail : kadlec@netfilter.org, kadlec@blackhole.kfki.hu, kadlecsik.jozsef@wigner.hu
-Address: Wigner Research Centre for Physics
-          H-1525 Budapest 114, POB. 49, Hungary
+Sjoerd Simons <sjoerd@collabora.com>
+
 
