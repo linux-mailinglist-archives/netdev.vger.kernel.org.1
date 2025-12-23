@@ -1,99 +1,141 @@
-Return-Path: <netdev+bounces-245870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8135CD9B10
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 15:39:36 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1908CD9B3F
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 15:43:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 378AE3018367
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 14:39:33 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 04D043033D45
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 14:43:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABD6933FE20;
-	Tue, 23 Dec 2025 14:39:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 893353446D8;
+	Tue, 23 Dec 2025 14:43:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4p+PDjdA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MfAKWHuF"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCC8F30C61D;
-	Tue, 23 Dec 2025 14:39:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28E171DE4CE;
+	Tue, 23 Dec 2025 14:43:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766500770; cv=none; b=LTbqnnq3/c1JkXHF9c6pNsRu/XMz3E/bFiK/R6p56byHiAjLuOexb9Ti+tJTr89abMlN1VTP6/J17CMvKn6+6rsfbaDPmoRwMAGrj4kbzxvpgkGV/E2cOsXUPa4uxyCZ5/UXq/txlXYVEKPes5gqIHytTVms9roRjWCze+VLlo0=
+	t=1766501031; cv=none; b=diOwc07pYdXh/CE6PdckCZ+vuIr2S1DP7rpnEXSrcnEwec5mo7V89RloxCP01LztlMCLs18rTEAd496xWPsmWSIK2XpfKWUKTUbLAQZU9zkKIUwdbnPrK1DhdgU4uHbg87+T21A7vvmH3R4JkGUNcwwWw1KGYX9OwMVAqjKDJQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766500770; c=relaxed/simple;
-	bh=6TTN29y+PWS/l3rr55eYaeynFlLWeN5aD3GULWrG0+A=;
+	s=arc-20240116; t=1766501031; c=relaxed/simple;
+	bh=dB/+cWWuWt5zZaOF4WBQgVGeqRwXMeabHbV/nLVmbvY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MZwjKowe9ATpQVp+vmCx35RQCrGWuSNAYpYxFRa2i7m2XpjJwoLmlfbToEJ2lzGn3T0sTj6IUkW9eDDBUJuqdxb+YE53Ptgys9aH+1HUrAOXCAO3UnION0MTwq1MQu9jdYShoFYuae2eKFUUg6Eh6i1hyboaUzAg+fq+xpWoD4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4p+PDjdA; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=MM9Pj+PXuCZ6pYBf+KPnNr4iahWd8btyo39UXWREDuo=; b=4p+PDjdAX2dWsIgQPmZBfeDGt4
-	c5FGae3HbLpfh6kynusQjD+o4CxkkpKbIYIhUNrCdRuf1zQqmJed0iUcb4fJ7MQiAfrfQ8W/ClUXB
-	L8A6PmL/GKWFyr1Szs71DwqSCoesmk2Nm6guQmB0vPM5LMhY/hV/zAVznsPdIIb1XxX0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vY3Xo-000JH2-Sb; Tue, 23 Dec 2025 15:39:24 +0100
-Date: Tue, 23 Dec 2025 15:39:24 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Stefan Eichenberger <eichest@gmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	horms@kernel.org,
-	Stefan Eichenberger <stefan.eichenberger@toradex.com>
-Subject: Re: [PATCH v1 2/2] dt-bindings: net: micrel: Convert
- micrel-ksz90x1.txt to DT schema
-Message-ID: <84bd049b-3c60-47e0-a404-be764758f5b1@lunn.ch>
-References: <20251223133446.22401-1-eichest@gmail.com>
- <20251223133446.22401-3-eichest@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=afUMqXPURdEdsimcOfigUyw5QTDYU7iMSSmt2aHwZ7z7fgWsfGcWOSA9xefcJgLg7etEHbptUaWlqGnFyqaj8YIapBwr8GRVcwqRgZU/lJmBtdyO53iND/d2BoxdzRg8ANHYnonqNf/hLURzHfmK2YT0k/Zmab1RHv7W2ALggcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MfAKWHuF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 193F0C113D0;
+	Tue, 23 Dec 2025 14:43:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766501030;
+	bh=dB/+cWWuWt5zZaOF4WBQgVGeqRwXMeabHbV/nLVmbvY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MfAKWHuFbtD0xW1u7oSpiVKbCSBZjKXbHZgHHl/15nnW/uyFFf4XJP00SoR3z9JdD
+	 rYuxJy4cH27U8+zKbhG9PznjFiDGu1ksCvBhMD3oJNWdMMZASOUQMjEAt3urdm9mD/
+	 bHhglQTjnotVIWBdxXhf5rB20ugMOrsi+w8SGJeJyft2KAgP42HsndKPDkA3fEyKC6
+	 qrkF48gedAccR7Gu+3jMczbHecCVYIrFS8TL1t1oj9DsyxGEVyc/jq3ddSmGNNhEcq
+	 iXl7U4o2uZdWtSEG6/m1F/+GqTMGBBhPJN8lA5bBa172Z5ogGGJV9RTOqtTP98FPAF
+	 hNURvzP+WpGwQ==
+Date: Tue, 23 Dec 2025 14:43:39 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Robert Marko <robert.marko@sartura.hr>
+Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+	nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com,
+	claudiu.beznea@tuxon.dev, Steen.Hegelund@microchip.com,
+	daniel.machon@microchip.com, UNGLinuxDriver@microchip.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org,
+	linux@roeck-us.net, andi.shyti@kernel.org, lee@kernel.org,
+	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linusw@kernel.org, olivia@selenic.com,
+	radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com,
+	gregkh@linuxfoundation.org, jirislaby@kernel.org,
+	mturquette@baylibre.com, sboyd@kernel.org, richardcochran@gmail.com,
+	wsa+renesas@sang-engineering.com, romain.sioen@microchip.com,
+	Ryan.Wanner@microchip.com, lars.povlsen@microchip.com,
+	tudor.ambarus@linaro.org, kavyasree.kotagiri@microchip.com,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	dmaengine@vger.kernel.org, linux-hwmon@vger.kernel.org,
+	linux-i2c@vger.kernel.org, netdev@vger.kernel.org,
+	linux-gpio@vger.kernel.org, linux-spi@vger.kernel.org,
+	linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
+	linux-clk@vger.kernel.org, mwalle@kernel.org,
+	luka.perkov@sartura.hr
+Subject: Re: [PATCH v2 18/19] dt-bindings: arm: microchip: document EV23X71A
+ board
+Message-ID: <20251223-chrome-simile-8cf1e9afe155@spud>
+References: <20251215163820.1584926-1-robert.marko@sartura.hr>
+ <20251215163820.1584926-18-robert.marko@sartura.hr>
+ <20251216-endorse-password-ae692dda5a9c@spud>
+ <CA+HBbNF-=W7A3Joftsqn+A6s170sqOZ77jpS105s5HPqkskQzA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="pLErx9Z52ADLmcrz"
 Content-Disposition: inline
-In-Reply-To: <20251223133446.22401-3-eichest@gmail.com>
+In-Reply-To: <CA+HBbNF-=W7A3Joftsqn+A6s170sqOZ77jpS105s5HPqkskQzA@mail.gmail.com>
 
-> +      patternProperties:
-> +        '^([rt]xd[0-3]|[rt]xc|rxdv|txen)-skew-ps$':
-> +          description: |
-> +            Skew control of the pad in picoseconds. A value of 0 equals to a
-> +            skew of -840ps.
-> +            The actual increment on the chip is 120ps ranging from -840ps to
-> +            960ps, this mismatch comes from a documentation error before
-> +            datasheet revision 1.2 (Feb 2014):
 
-> -  Device Tree Value	Delay	Pad Skew Register Value
-> -  -----------------------------------------------------
-> -	0   		-840ps		0000
-> -	200 		-720ps		0001
-> -	400 		-600ps		0010
-> -	600 		-480ps		0011
-> -	800 		-360ps		0100
-> -	1000		-240ps		0101
-> -	1200		-120ps		0110
-> -	1400		   0ps		0111
-> -	1600		 120ps		1000
-> -	1800		 240ps		1001
-> -	2000		 360ps		1010
-> -	2200		 480ps		1011
-> -	2400		 600ps		1100
-> -	2600		 720ps		1101
-> -	2800		 840ps		1110
-> -	3000		 960ps		1111
+--pLErx9Z52ADLmcrz
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I think this table is more readable? But maybe without the register
-value, which is an implementation detail.
+On Tue, Dec 23, 2025 at 11:34:55AM +0100, Robert Marko wrote:
+> On Tue, Dec 16, 2025 at 6:32=E2=80=AFPM Conor Dooley <conor@kernel.org> w=
+rote:
+> >
+> > On Mon, Dec 15, 2025 at 05:35:35PM +0100, Robert Marko wrote:
+> > > Microchip EV23X71A board is an LAN9696 based evaluation board.
+> > >
+> > > Signed-off-by: Robert Marko <robert.marko@sartura.hr>
+> > > ---
+> > >  Documentation/devicetree/bindings/arm/microchip.yaml | 8 ++++++++
+> > >  1 file changed, 8 insertions(+)
+> > >
+> > > diff --git a/Documentation/devicetree/bindings/arm/microchip.yaml b/D=
+ocumentation/devicetree/bindings/arm/microchip.yaml
+> > > index 910ecc11d5d7..b20441edaac7 100644
+> > > --- a/Documentation/devicetree/bindings/arm/microchip.yaml
+> > > +++ b/Documentation/devicetree/bindings/arm/microchip.yaml
+> > > @@ -239,6 +239,14 @@ properties:
+> > >            - const: microchip,lan9668
+> > >            - const: microchip,lan966
+> > >
+> > > +      - description: The LAN969x EVB (EV23X71A) is a 24x 1G + 4x 10G
+> > > +          Ethernet development system board.
+> > > +      - items:
+> > > +          - enum:
+> > > +              - microchip,ev23x71a
+> > > +              - microchip,lan9696
+> >
+> > This looks wrong, unless "microchip,lan9696" is a board (which I suspect
+> > it isn't).
+>=20
+> Hi,
+> No, LAN9696 is the exact SoC SKU used on the board.
+> I will drop it in v3.
 
-	Andrew
+Instead of dropping it, this should become an items list with 3 consts I
+think.
+
+--pLErx9Z52ADLmcrz
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaUqqhAAKCRB4tDGHoIJi
+0kmEAPwMbSydapbKFensNMM3LBSQavqvbhont2R2vwPmXc9oUAEA++sW5lHhwJ+e
+9LfhPrkmqekkXDEYUUHTET78Ply7Xgw=
+=FgUt
+-----END PGP SIGNATURE-----
+
+--pLErx9Z52ADLmcrz--
 
