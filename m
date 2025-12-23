@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-245883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8CADCD9EED
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 17:23:21 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 061E3CD9EFB
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 17:24:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 675283019E0A
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 16:23:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3C4B1303D9E9
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 16:23:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35B61335545;
-	Tue, 23 Dec 2025 16:23:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 008DC33B6EE;
+	Tue, 23 Dec 2025 16:23:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nq7tIh2k"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KPO1QXmK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80260279324
-	for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 16:23:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63A7732C30A
+	for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 16:23:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766506989; cv=none; b=mwgqUh6dH8YHsXN3Usl6W1CJfaRtxFfEb3cz+qIUo/YZh696wqXmxGgURdsAogs55PgpKfaO/fry1ZHMb8bTK0EwcvN0TecEkspCHEWEaFkzCIpiMsPUmYwH/xm3jFwR52/3t2y4BwJ81F0US8YGDFQGOEB+GuB42hFmUuP1uYg=
+	t=1766506989; cv=none; b=NMy1kCU9JrQUI8S6OA7DVeAa7QD1xf+nylYL8LOv+z2o+JL++Nnsak1V/PqyekSBKoqVG3jbgolmCEbaNgk3M+kXwXStZnZ6lAnAkdAoCBBIX4ziFdjF88MqQ1xbO8YnBNiY2SVDDGryNRRgqJ5vyK/oVeSKuWkL4i2q9bGKvpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1766506989; c=relaxed/simple;
-	bh=W7Kmewx74CQUT/jw/IRpbzAwhK2jEyGtRXl+6mNIgrE=;
+	bh=GKPaNY7QWTY19RuVeufMVEXbo/uVc4+Y/Ah38ODdTZc=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kMqRjydrMVbCK9NHhhIQ4U+U9V67mUq1iOBDv1kGs8xGaaejzCR8d/faIA2rXrv0fryL4+YzMfJr9UBEDkpCvZu4aq4LMAMVmxzZ+EXq4/KBVO3ZkK9dOpPLj6O4iQ8Sj9GJfv7BPnZE4V8CpjJR+iQQHPe1Hkubnfe/uIBb5Lw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nq7tIh2k; arc=none smtp.client-ip=74.125.224.43
+	 MIME-Version; b=Bq796jqKMtEgXRMDcs4eGJmmqp0WHUQWDfX2/wZfOsdd228EfHtkkgsiD3omhhNICTUn/Bi6zA3SekrKlflZljOKp+gi+SWRxqb1X8Cb4PkBovY1q+In5tNJH8VFQ26zebGgTlG5jM3B85sqtW/DlM/4CVtBZ/MbQypYrhtAcKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KPO1QXmK; arc=none smtp.client-ip=209.85.128.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-640c9c85255so5299530d50.3
-        for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 08:23:07 -0800 (PST)
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-7881b67da53so42625017b3.1
+        for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 08:23:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766506986; x=1767111786; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1766506987; x=1767111787; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Bu9hANCrqcrzn01CQ6+qCySerDAxUYWA0/vX02ujpFY=;
-        b=nq7tIh2kzYWqMiVm/Q8VV2UVz2XH0jrChkZxwqvFiCXxFP/xkSeEpLoRP+u0i9mV56
-         fR603QXjP82JJw0/Q/uZEOUSQpwfSt3hmrD9UIMnCwiwagzGvR9yzQzAxa4dhbEMGx0T
-         rizA829xQ2ErDAtt+N0r+YfbGqAqUZcv2HQ3CUQ2IYE6xUfVH0hXCI6HmmrjysCTukW4
-         7B72ks7aNTcMa8nw8lNS9PeUkt1DHzRr2xoCmLFhGBQleB9E6T8gmDPTq5lC7wtR+s3A
-         VpZlb/bCtmF44PDw7AfkK7ONSTqM95EsI53X2L4LewkVTbfW4Wi3R9PqyxivGqAsi+m4
-         1etw==
+        bh=QxTdv+ra6WTSrvAACCD5473883LzKfjRBEu683WsRJ4=;
+        b=KPO1QXmKF0lB4WIpRSrEqMViusHH8RnNZqtPaCCtIIU/LoinZVMUwseXnn1PJPxPYe
+         T6jZw8xavdCndk127FPSAV0Oz/IuoSrzSU9vUIDVQv8fiZxkyFTdPpfl89W/hhe24jSC
+         nSx1BNRNM/kShnqs2XM8EpCXj5qC6JcdXloyPk25IdqSF2eA+VovGXXZ5NUYS/sEttdm
+         duCyw133AN/lLzlPR/xOhwl2AK517FfZS14iHo/A2shQz8oVV9k5bq4yJaczfGk8LKJW
+         aICNmKFiztBwiydJmB9Sk4ujx0jnLVJZ1gP6OUHGF3iCjyA55MaFf3QBgy0xw24Lzuke
+         xY+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766506986; x=1767111786;
+        d=1e100.net; s=20230601; t=1766506987; x=1767111787;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=Bu9hANCrqcrzn01CQ6+qCySerDAxUYWA0/vX02ujpFY=;
-        b=kIADrTOdnYXU4vEPTughry27pDqJNfpO2USsnIp54Ma04MujRC3TSEqiujFfaav3D2
-         aINnJqHthXhNM8WPjTQ2brmj/ip16Ch5CLySuR+/NmB05BZjSWsfk0dx3Ko/A8TFiNdp
-         TsAD1IvZFQor652sbIZdpUVmakrB7UeYcaFJxqkf+CKOR1LkByBMHwn9AVOjs5kn94mi
-         F6EMwk31qG33noqgoGL22oLjGPaZM5W2KlsPQSwhWw5J7e7ctJm3GAwNx2T0bnMQew5c
-         ELzl/TlEGUUbb2cLSX+JK2HCovsbZ5JmurLPdjpyhihcVGeLtI/ZGoI2pZkz7oECi9mX
-         ImZg==
-X-Forwarded-Encrypted: i=1; AJvYcCW8UYUcI87vm+JZ1t87cvCPwwYNt4RHEGmxrYwYpcPv9n72DvM+9H/cM50bCbqZfH4Mw+2alj4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwkA4vjlwLJAgRpbgMpfRDIL0EOLF/HZDkHb56Qx1c09jHUS4Vu
-	AI+Ld+ZnBVK/JQEkcwoStw+xLYO5TvMS4tl9W5KKDI5v0+UN24H8t+Jk
-X-Gm-Gg: AY/fxX5nEF+nskaxGS2XVRthbSGD4nLcegXCANHETHW6AcJmkTp0qr3RTgSJmerI/Z+
-	Ov9kXI0FMXF3fM/u22WzEyi9s238dNs5oVqWrzP4DbQVLph7zLJ5bwSLyGGw9d8hrwVmlDBY5om
-	J7HiKGz6OVZITRQajZLICeee7mEKXA6kcImWrGDlzLDns8y3TbBZjAJdbBBKYueznjRSszSZg5b
-	hrY2xI3oL5daU1Nhqk8E7OUpxdAjADi43CVejPsjtPgPQG5nKcXHDKotQXnNOGwgwUGGFaYSwbE
-	c4DjABmiqOq1Cd8T4geEQmUXG424kyactTCWq2ksaqaK7gI69gQFAH/tusovJpz83xdnz4+xRK/
-	doxrENQgbE4QnJY7z7O+0lgQFevlKDzVQ0rvYyuWGKrBe+qhDCQGCjdtpXtbA5vUpEeYbQV/gcn
-	S+j7jwAAM=
-X-Google-Smtp-Source: AGHT+IExQlcrRvP5bpGZsniR6NEoCL2BesRdWqeHSXBthxN++RkTXQKi6hOc4cN4HB6bL+lo8PUVtA==
-X-Received: by 2002:a53:da86:0:b0:63f:9c11:cfed with SMTP id 956f58d0204a3-6466a842daamr9378345d50.32.1766506986363;
-        Tue, 23 Dec 2025 08:23:06 -0800 (PST)
+        bh=QxTdv+ra6WTSrvAACCD5473883LzKfjRBEu683WsRJ4=;
+        b=a4/02AcKtvmTDj5tcDWlMWXWYSNsWNsX3a/do70cL7lrYYF6+UpPqd1KWcy9SJiRdh
+         4EVnjg0PgdjqoVANj2gKQMppcfqcN3UowslLM3MLtn6jOdNVTq+ms7oYiWe3UbkJitJx
+         UpjJI3FntrWrHQTz6r4+ZGq5wysCzDhNUvA/1aru+RIlGlS0AsmxQLf1oCyFErj8vFzG
+         8pjgJoHWnDnwTEs6ADJ7XBGMfEjEeE9UxvLmxOn7c9FC6UENcT/XoalrXhxLN+oJXRrq
+         f4qr0aM81l49W8G5YtaKw/4btPOKnsOuQrM0kk1yxdphuQnW78UcfsZBexbPb6wKN5rW
+         j4jA==
+X-Forwarded-Encrypted: i=1; AJvYcCX3phupbNSNwFmnsqJMaaBDRR4O6Ma4x5IaYIyj3OxahVWUqLnHR5IdA1diqjd3gI0kESdM6Jc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyttTbxKQz36HCf5fobW0ptD6dhnHWesRMyfpYP0rweXsvYOUg1
+	jZ7DWUA5eMYraPBpzKXDzLnCPVHE2sRaFRZKhIym7AzffOgjfuYWbASg
+X-Gm-Gg: AY/fxX6BbuRBpFJJW1poT4RPzLqihkGnQNYSOlygi/xnxRDyh5Di/hWPyFib0ihRF/c
+	AD3mJsS25O6lrhaTGs5uKo96naHilK1RSu9PldDKP9Thd/YpiydDQnGCPEZWhLMg+ccUIFV5MI/
+	OJlK0XM7AKL41D99r1ILKRaYMkvORugWv14WgHNVfQdmsvyw4yriAOooDUR+vEqrO/s4JpaHf87
+	6cTJ15shGtgfKpMPJu6m3wSh9ohwDjRFiOgBb32OzogZoH1Tag2D02bMVFzqNdD2OaeRencQTr8
+	U0tTWhAxSPoMFP0OKvdRyPBca8/v+Xhwmyqsms8vs2ZMoDY85LRknqvBsUpfkzCfLwEkJ7tFTU0
+	YM6sdbnNLJfDlmSdiL8Dsq+XLiIwxylUgwIj02qZ8sv1JpKLbUT4OH51PLuoiYcXh3JzhmmqVav
+	AKSsD5pHU=
+X-Google-Smtp-Source: AGHT+IEGEhV4TsQdUzp8xMXw7tvphhY7j9O64Fl0+gPJd1P63myvvp3KKR6dH1soGRGdQRJHWMAQUA==
+X-Received: by 2002:a05:690c:c83:b0:784:abe3:4454 with SMTP id 00721157ae682-78fb4067fc8mr122715137b3.47.1766506987336;
+        Tue, 23 Dec 2025 08:23:07 -0800 (PST)
 Received: from localhost ([2601:346:0:79bd:4913:14a4:1114:ff0d])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-6466a8b16e2sm7101778d50.2.2025.12.23.08.23.05
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-78fb4377c99sm56081067b3.3.2025.12.23.08.23.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Dec 2025 08:23:06 -0800 (PST)
+        Tue, 23 Dec 2025 08:23:07 -0800 (PST)
 From: "Yury Norov (NVIDIA)" <yury.norov@gmail.com>
 To: Tony Nguyen <anthony.l.nguyen@intel.com>,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
@@ -86,9 +86,9 @@ To: Tony Nguyen <anthony.l.nguyen@intel.com>,
 	intel-wired-lan@lists.osuosl.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/3] bitmap: introduce bitmap_weighted_xor()
-Date: Tue, 23 Dec 2025 11:23:00 -0500
-Message-ID: <20251223162303.434659-2-yury.norov@gmail.com>
+Subject: [PATCH 2/3] ice: use bitmap_weighted_xor() in ice_find_free_recp_res_idx()
+Date: Tue, 23 Dec 2025 11:23:01 -0500
+Message-ID: <20251223162303.434659-3-yury.norov@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251223162303.434659-1-yury.norov@gmail.com>
 References: <20251223162303.434659-1-yury.norov@gmail.com>
@@ -100,65 +100,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The function helps to XOR bitmaps and calculate Hamming weight of
-the result in one pass.
+Use the right helper and save one bitmaps traverse. 
 
 Signed-off-by: Yury Norov (NVIDIA) <yury.norov@gmail.com>
 ---
- include/linux/bitmap.h | 14 ++++++++++++++
- lib/bitmap.c           |  7 +++++++
- 2 files changed, 21 insertions(+)
+ drivers/net/ethernet/intel/ice/ice_switch.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/include/linux/bitmap.h b/include/linux/bitmap.h
-index 0f4789e1f7cb..7ecf56e0d3b5 100644
---- a/include/linux/bitmap.h
-+++ b/include/linux/bitmap.h
-@@ -169,6 +169,8 @@ void __bitmap_or(unsigned long *dst, const unsigned long *bitmap1,
- 		 const unsigned long *bitmap2, unsigned int nbits);
- unsigned int __bitmap_weighted_or(unsigned long *dst, const unsigned long *bitmap1,
- 				  const unsigned long *bitmap2, unsigned int nbits);
-+unsigned int __bitmap_weighted_xor(unsigned long *dst, const unsigned long *bitmap1,
-+				  const unsigned long *bitmap2, unsigned int nbits);
- void __bitmap_xor(unsigned long *dst, const unsigned long *bitmap1,
- 		  const unsigned long *bitmap2, unsigned int nbits);
- bool __bitmap_andnot(unsigned long *dst, const unsigned long *bitmap1,
-@@ -355,6 +357,18 @@ unsigned int bitmap_weighted_or(unsigned long *dst, const unsigned long *src1,
- 	}
+diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c b/drivers/net/ethernet/intel/ice/ice_switch.c
+index 84848f0123e7..903417477929 100644
+--- a/drivers/net/ethernet/intel/ice/ice_switch.c
++++ b/drivers/net/ethernet/intel/ice/ice_switch.c
+@@ -4984,10 +4984,8 @@ ice_find_free_recp_res_idx(struct ice_hw *hw, const unsigned long *profiles,
+ 			  hw->switch_info->recp_list[bit].res_idxs,
+ 			  ICE_MAX_FV_WORDS);
+ 
+-	bitmap_xor(free_idx, used_idx, possible_idx, ICE_MAX_FV_WORDS);
+-
+ 	/* return number of free indexes */
+-	return (u16)bitmap_weight(free_idx, ICE_MAX_FV_WORDS);
++	return (u16)bitmap_weighted_xor(free_idx, used_idx, possible_idx, ICE_MAX_FV_WORDS);
  }
  
-+static __always_inline
-+unsigned int bitmap_weighted_xor(unsigned long *dst, const unsigned long *src1,
-+				const unsigned long *src2, unsigned int nbits)
-+{
-+	if (small_const_nbits(nbits)) {
-+		*dst = *src1 ^ *src2;
-+		return hweight_long(*dst & BITMAP_LAST_WORD_MASK(nbits));
-+	} else {
-+		return __bitmap_weighted_xor(dst, src1, src2, nbits);
-+	}
-+}
-+
- static __always_inline
- void bitmap_xor(unsigned long *dst, const unsigned long *src1,
- 		const unsigned long *src2, unsigned int nbits)
-diff --git a/lib/bitmap.c b/lib/bitmap.c
-index 698d15933c84..bed32b8cd23a 100644
---- a/lib/bitmap.c
-+++ b/lib/bitmap.c
-@@ -382,6 +382,13 @@ unsigned int __bitmap_weighted_or(unsigned long *dst, const unsigned long *bitma
- 	return BITMAP_WEIGHT(({dst[idx] = bitmap1[idx] | bitmap2[idx]; dst[idx]; }), bits);
- }
- 
-+unsigned int __bitmap_weighted_xor(unsigned long *dst, const unsigned long *bitmap1,
-+				  const unsigned long *bitmap2, unsigned int bits)
-+{
-+	return BITMAP_WEIGHT(({dst[idx] = bitmap1[idx] ^ bitmap2[idx]; dst[idx]; }), bits);
-+}
-+EXPORT_SYMBOL(__bitmap_weighted_xor);
-+
- unsigned long __bitmap_weight_from(const unsigned long *bitmap,
- 				   unsigned int start, unsigned int nbits)
- {
+ /**
 -- 
 2.43.0
 
