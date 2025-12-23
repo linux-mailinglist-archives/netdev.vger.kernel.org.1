@@ -1,109 +1,166 @@
-Return-Path: <netdev+bounces-245848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11AD1CD93B1
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 13:26:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A70BCD9423
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 13:31:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 95F2C301B829
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 12:26:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 1A055302C8CF
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 12:29:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA80233D4EC;
-	Tue, 23 Dec 2025 12:21:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 082813346AB;
+	Tue, 23 Dec 2025 12:29:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="QOtj+tOn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw1.hygon.cn (unknown [101.204.27.37])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D9642C235B
-	for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 12:20:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.204.27.37
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F32E332901
+	for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 12:29:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766492473; cv=none; b=jycpZLJtFmYaQQPSsSkOtfP3gv6HsT/84cjxiM69Y3ocquTqX7B8EcHNUTKCcKBOlwPbj5jle6zAIb7xOSj2Z5+3v7HGNlMJOekHv1zyxmYvKmZR6wDbhKo+oYA5QJf/RIzm/YYqrRUr3fBhSTloZzSnkSr4dIIiPfPfxRrZGwc=
+	t=1766492989; cv=none; b=XuzvKelM4qYWf6drWbUUFcB/9aFri40xc4me8Cw5y3I5msG6FWzZVI2+46efrdgOK3I4UrZlIa4Kgu8gWPVT2nSqsz4+F6sNHmu+3d4DclaTTISLkAKa+icGdcjgtL1eUfVtQkb7cYoS7kvdtUtfH/Ah5SuZxvUO5SImyz5Kixs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766492473; c=relaxed/simple;
-	bh=+ecacnhXoEhIYOhGyErXJQ08fyfhGIKE0jeTT9YEC8c=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ay4pAvmeRQbVVaIY9WCfEsvVKDcFNPNY44r5fuEh5Mi2IHHyU3N5k85FlDzs/r2A2kjNX3EV/SXblOl7CpZGI/3m4LRG66q4zGXeTri4fNR5qp9X4kJO7b4jw1UZSLDa3ly9CJ9VwzP0oCqncV2fSEzzcR+NkFYNbzZJ1t3YDTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hygon.cn; spf=pass smtp.mailfrom=hygon.cn; arc=none smtp.client-ip=101.204.27.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hygon.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hygon.cn
-Received: from maildlp2.hygon.cn (unknown [127.0.0.1])
-	by mailgw1.hygon.cn (Postfix) with ESMTP id 4dbDcW6MrDzVcB5;
-	Tue, 23 Dec 2025 20:20:43 +0800 (CST)
-Received: from maildlp2.hygon.cn (unknown [172.23.18.61])
-	by mailgw1.hygon.cn (Postfix) with ESMTP id 4dbDcV3Bj8zVcB5;
-	Tue, 23 Dec 2025 20:20:42 +0800 (CST)
-Received: from cncheex03.Hygon.cn (unknown [172.23.18.113])
-	by maildlp2.hygon.cn (Postfix) with ESMTPS id 9B22431AC4EA;
-	Tue, 23 Dec 2025 20:16:13 +0800 (CST)
-Received: from cncheex04.Hygon.cn (172.23.18.114) by cncheex03.Hygon.cn
- (172.23.18.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Tue, 23 Dec
- 2025 20:20:43 +0800
-Received: from cncheex04.Hygon.cn ([fe80::1b6f:6c58:58a4:430d]) by
- cncheex04.Hygon.cn ([fe80::1b6f:6c58:58a4:430d%10]) with mapi id
- 15.02.1544.036; Tue, 23 Dec 2025 20:20:43 +0800
-From: Zhud <zhud@hygon.cn>
-To: Paolo Abeni <pabeni@redhat.com>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "horms@kernel.org" <horms@kernel.org>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-CC: Jing Li <lijing@hygon.cn>, Zhiwei Ying <yingzhiwei@hygon.cn>
-Subject: RE: [PATCH net] netdev: increment TSO only if TSO is not enabled on
- any slave device
-Thread-Topic: [PATCH net] netdev: increment TSO only if TSO is not enabled on
- any slave device
-Thread-Index: AQHcbmlNWOTIX90gx02lh/ymGCh5arUukjiAgACaXqA=
-Date: Tue, 23 Dec 2025 12:20:43 +0000
-Message-ID: <fe236a552f594780a4b2ead63b4bc329@hygon.cn>
-References: <20251216085210.132387-1-zhud@hygon.cn>
- <eae60389-27a5-4e8f-af49-7f75d4c116d8@redhat.com>
-In-Reply-To: <eae60389-27a5-4e8f-af49-7f75d4c116d8@redhat.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1766492989; c=relaxed/simple;
+	bh=h6OXWNpcTZmo3fq5/Hn/HjwTOV2GaxRDyFEHGkPfSDM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BI6PzIHYh8mrFJG4BTFT4fExPenfRLwcNix1mqcgHsnoByD6kCzMKB7ELLFlZ3u877KVImnLqRL70FgQiN3tKDl2cL/oU+Q7ayM3i/LOZzHRpWtq6Pi9lpS2CtOugG5A6ScHAInbIUnpCRpUpvcEN0313IYIg1y3HnRckD7Oxug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=QOtj+tOn; arc=none smtp.client-ip=209.85.208.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-37a33b06028so43409491fa.2
+        for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 04:29:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1766492985; x=1767097785; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=h6OXWNpcTZmo3fq5/Hn/HjwTOV2GaxRDyFEHGkPfSDM=;
+        b=QOtj+tOnk77e/E8O8/ET07YerSFV0MRT8YSfTVTk7gl9w07eOiuKVn4sm9friFlEIk
+         2GH8gACOi3UtbF+jOtSpZfdWlDtejs1sp1UndIjaaNWO87LJUqyRP5wmYr531BXA3Y9y
+         F5IQOGkct3gm7B18p66Bvo3RQEEuTeX1LvtU5RQTsCPqGHQLcyxMuDFLepICVnI99h3i
+         nReSlsQP+M5UwpU6kZT3keayPL9hEuPTACUIbgJOcVui+ev/lcuQTlzmEkM2gByWn3Xj
+         KJJ4l+Zx3vrbLIlpXewyqP8JZHpNCk1CiCDs1vdCv4dwoFlRFT5vu29XUVzZoasviJOu
+         PjGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766492985; x=1767097785;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=h6OXWNpcTZmo3fq5/Hn/HjwTOV2GaxRDyFEHGkPfSDM=;
+        b=VnZkKGkcGFeKskkca9ikhGGGMqkkxNYaclYgOWgDY9UZ+c88MUjGZv1t+9X9S8Y3kx
+         lp9QzIgk+fGWFmHZN+34bm1QY5WVV+o8/7I2lYQ42QRWnq2tiq4DkcIj+G9PL4Hi2a9+
+         f/D9HuFOeEkOWWwvgJlqZ0zKgfIKaK/XRgZZ00Ti8Xi7TrAjsK1SP0vF6BrnRtUDl83V
+         jfAE1kLd+paitaTbRmh4NkNG/SP0AoSwS036LLeQQf146oDfWg962CHBA12muMCMLvY1
+         le2OUSBq5mYsHlaTvLxwCz7/arSnmN7f2EimG63f2xkNbKQeAgeFbRcikJieKqDI8CGL
+         O5jQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVp0xKvNpd+MFyuvWcpINJK2fLTQLejI+TV1iEJQmBbmKP65I8ywbzm0r/Sjo/WaqMeBF84FMQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxADqliF1Pg0wAwWPZ6SH6cxDZ9hiyrJnOQvZuCQDEmITC47Mg9
+	dhYc2SHtn653fE7Gvf1bczLLfdmgXpPMyubQGXV/pSwN0cq2XAC3c/2A16O2mwrW8LJbq/ca8Xs
+	s744NJmKDYzGeFNWpNDFtqmCmypaq58j40O9QKxpzSA==
+X-Gm-Gg: AY/fxX6Hgs7yM4KdtzbLGifJFQ8b25ZOh3GNvxRaE7oyueLVXvOQFRtMTnBQ9jZJ+/3
+	raFDVBL9Pq6WHFtNNH25yMOCww0CnGWlTKfT9Y09T+/E+1GQ4VxHq6alG1wtXqESFQH7WQHILx+
+	HklznkklliKBMe+3JJonQSGzsYMqUmQ8nKXP3ThgsHiCMVWYlFmdRqLhFUaNDTM/VJ4ICMvvnRk
+	4mp5IYPh5eRFcUVdzrHf9bkZhQqTvvD+myV4SfNyKVpWAJVHjSFsIdacyHx995sK3jmLsNZ/vJy
+	vV1FGL+JAqC1EL1Vb80mbfJLIyYX5tca4womwA==
+X-Google-Smtp-Source: AGHT+IEBOhkGPqyyAQ1vT8Z9LQwcalYcPegEonjbT0vsHKYCaYN4/Y7HunNV2ZOFRdC/NVauUA6SJStJulcaNDLUuvw=
+X-Received: by 2002:a2e:a7cf:0:b0:37a:45b0:467a with SMTP id
+ 38308e7fff4ca-3812158ffe9mr48663611fa.5.1766492985167; Tue, 23 Dec 2025
+ 04:29:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20251219-qcom-sa8255p-emac-v6-0-487f1082461e@oss.qualcomm.com> <51c7048a-52dc-47e1-97c3-2aa0d6555643@redhat.com>
+In-Reply-To: <51c7048a-52dc-47e1-97c3-2aa0d6555643@redhat.com>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Tue, 23 Dec 2025 13:29:32 +0100
+X-Gm-Features: AQt7F2oUd4L6z6INXPzdFurDETLUQbJOAVCbMRjbjb79EkFyrJjgdrXB0o2w2nA
+Message-ID: <CAMRc=Me7++jcT8SpA309F-0XoZvHPQF2Hfr17+Kt=Jmdy635pg@mail.gmail.com>
+Subject: Re: [PATCH v6 0/7] net: stmmac: qcom-ethqos: add support for SCMI
+ power domains
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Richard Cochran <richardcochran@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Vinod Koul <vkoul@kernel.org>, 
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Chen-Yu Tsai <wens@kernel.org>, Jernej Skrabec <jernej.skrabec@gmail.com>, 
+	Samuel Holland <samuel@sholland.org>, Matthew Gerlach <matthew.gerlach@altera.com>, 
+	Neil Armstrong <neil.armstrong@linaro.org>, Kevin Hilman <khilman@baylibre.com>, 
+	Jerome Brunet <jbrunet@baylibre.com>, 
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>, 
+	Keguang Zhang <keguang.zhang@gmail.com>, Shawn Guo <shawnguo@kernel.org>, 
+	Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>, 
+	Fabio Estevam <festevam@gmail.com>, Jan Petrous <jan.petrous@oss.nxp.com>, s32@nxp.com, 
+	Romain Gantois <romain.gantois@bootlin.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>, Heiko Stuebner <heiko@sntech.de>, 
+	Chen Wang <unicorn_wang@outlook.com>, Inochi Amaoto <inochiama@gmail.com>, 
+	Emil Renner Berthing <kernel@esmil.dk>, Minda Chen <minda.chen@starfivetech.com>, 
+	Drew Fustini <fustini@kernel.org>, Guo Ren <guoren@kernel.org>, Fu Wei <wefu@redhat.com>, 
+	Nobuhiro Iwamatsu <nobuhiro.iwamatsu.x90@mail.toshiba>, 
+	Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, 
+	Maxime Ripard <mripard@kernel.org>, Shuang Liang <liangshuang@eswincomputing.com>, 
+	Zhi Li <lizhi2@eswincomputing.com>, Shangjuan Wei <weishangjuan@eswincomputing.com>, 
+	"G. Jaya Kumaran" <vineetha.g.jaya.kumaran@intel.com>, Clark Wang <xiaoning.wang@nxp.com>, 
+	Linux Team <linux-imx@nxp.com>, Frank Li <Frank.Li@nxp.com>, David Wu <david.wu@rock-chips.com>, 
+	Samin Guo <samin.guo@starfivetech.com>, 
+	Christophe Roullier <christophe.roullier@foss.st.com>, Swathi K S <swathi.ks@samsung.com>, 
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, Drew Fustini <dfustini@tenstorrent.com>, 
+	linux-sunxi@lists.linux.dev, linux-amlogic@lists.infradead.org, 
+	linux-mips@vger.kernel.org, imx@lists.linux.dev, 
+	linux-renesas-soc@vger.kernel.org, linux-rockchip@lists.infradead.org, 
+	sophgo@lists.linux.dev, linux-riscv@lists.infradead.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-DQo+IE9uIDEyLzE2LzI1IDk6NTIgQU0sIERpIFpodSB3cm90ZToNCj4gPiBVbmNvbmRpdGlvbmFs
-bHkgaW5jcmVtZW50IHRoZSBUU08gZmxhZyBoYXMgYSBzaWRlIGVmZmVjdDogaXQgd2lsbCBhbHNv
-DQo+IA0KPiBUaGlzIGNoYW5nZWxvZyBpcyBJTUhPIHF1aXRlIGNvbmZ1c2luZy4gVGhlIGNvZGUg
-ZG9lcyBub3QgJ2luY3JlbWVudCBUU08nLiBJbnN0ZWFkDQo+IGl0IGluY3JlbWVudHMgdGhlIGZl
-YXR1cmVzIHNldCB0byBpbmNsdWRlIEFMTF9UU08uDQo+IA0KPiBQbGVhc2UgcmV3b3JkIHRoZSBj
-aGFuZ2Vsb2cgYWNjb3JkaW5nbHkuDQo+IA0KPiA+IGRpcmVjdGx5IGNsZWFyIHRoZSBmbGFncyBp
-biBORVRJRl9GX0FMTF9GT1JfQUxMIG9uIHRoZSBtYXN0ZXIgZGV2aWNlLA0KPiA+IHdoaWNoIGNh
-biBjYXVzZSBpc3N1ZXMgc3VjaCBhcyB0aGUgaW5hYmlsaXR5IHRvIGVuYWJsZSB0aGUgbm9jYWNo
-ZQ0KPiA+IGNvcHkgZmVhdHVyZSBvbiB0aGUgYm9uZGluZyBuZXR3b3JrIGNhcmQuDQo+IA0KPiBi
-b25kaW5nIG5ldHdvcmsgY2FyZCAtPiBib25kaW5nIGRyaXZlci4NCj4gDQo+ID4gU28sIHdoZW4g
-YXQgbGVhc3Qgb25lIHNsYXZlIGRldmljZSdzIFRTTyBpcyBlbmFibGVkLCB0aGVyZSBpcyBubyBu
-ZWVkDQo+ID4gdG8gZXhwbGljaXRseSBpbmNyZW1lbnQgdGhlIFRTTyBmbGFnIHRvIHRoZSBtYXN0
-ZXIgZGV2aWNlLg0KPiA+DQo+ID4gRml4ZXM6IGIwY2UzNTA4YjI1ZSAoImJvbmRpbmc6IGFsbG93
-IFRTTyBiZWluZyBzZXQgb24gYm9uZGluZyBtYXN0ZXIiKQ0KPiA+IFNpZ25lZC1vZmYtYnk6IERp
-IFpodSA8emh1ZEBoeWdvbi5jbj4NCj4gPiAtLS0NCj4gPiAgaW5jbHVkZS9saW51eC9uZXRkZXZp
-Y2UuaCB8IDMgKystDQo+ID4gIDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKyksIDEgZGVs
-ZXRpb24oLSkNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2xpbnV4L25ldGRldmljZS5o
-IGIvaW5jbHVkZS9saW51eC9uZXRkZXZpY2UuaA0KPiA+IGluZGV4IGJmOTlmZTg2MjJkYS4uMmFj
-YTM5ZjdmOWUxIDEwMDY0NA0KPiA+IC0tLSBhL2luY2x1ZGUvbGludXgvbmV0ZGV2aWNlLmgNCj4g
-PiArKysgYi9pbmNsdWRlL2xpbnV4L25ldGRldmljZS5oDQo+ID4gQEAgLTUzMjIsNyArNTMyMiw4
-IEBAIG5ldGRldl9mZWF0dXJlc190DQo+ID4gbmV0ZGV2X2luY3JlbWVudF9mZWF0dXJlcyhuZXRk
-ZXZfZmVhdHVyZXNfdCBhbGwsICBzdGF0aWMgaW5saW5lDQo+IG5ldGRldl9mZWF0dXJlc190IG5l
-dGRldl9hZGRfdHNvX2ZlYXR1cmVzKG5ldGRldl9mZWF0dXJlc190IGZlYXR1cmVzLA0KPiA+ICAJ
-CQkJCQkJbmV0ZGV2X2ZlYXR1cmVzX3QgbWFzaykNCj4gPiAgew0KPiA+IC0JcmV0dXJuIG5ldGRl
-dl9pbmNyZW1lbnRfZmVhdHVyZXMoZmVhdHVyZXMsIE5FVElGX0ZfQUxMX1RTTywgbWFzayk7DQo+
-ID4gKwlyZXR1cm4gKGZlYXR1cmVzICYgTkVUSUZfRl9BTExfVFNPKSA/IGZlYXR1cmVzIDoNCj4g
-PiArCQluZXRkZXZfaW5jcmVtZW50X2ZlYXR1cmVzKGZlYXR1cmVzLCBORVRJRl9GX0FMTF9UU08s
-IG1hc2spOw0KPiANCj4gTkVUSUZfRl9BTExfVFNPIGlzIG5vdCBhIHNpbmdsZSBiaXQsIGJ1dCBh
-IChsYXRlciBsYXJnZSkgYml0IG1hc2s7IHRoZSBhYm92ZSB3aWxsIHlpZWxkDQo+IGluY29ycmVj
-dCByZXN1bHQgd2hlbjoNCj4gDQo+IAlmZWF0dXJlcyAmIE5FVElGX0ZfQUxMX1RTTyAhPSBORVRJ
-Rl9GX0FMTF9UU08NCg0KWWVzLCBpdCBpcyBpbmRlZWQgbmVjZXNzYXJ5IHRvIHNldCBhbGwgdHNv
-IGZsYWdzIHRvIGF2b2lkIEdTTyBhdCB0aGUgYm9uZGluZyBsYXllci4NCkkgd2lsbCByZXZpc2Ug
-dGhlIGNvZGUgYW5kIGl0cyByZWxhdGVkIGNoYW5nbG9uZywgdGhhbmtzLg0KDQo+IA0KPiAvUA0K
-PiANCg0K
+On Tue, Dec 23, 2025 at 12:42=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wr=
+ote:
+>
+> On 12/19/25 12:42 PM, Bartosz Golaszewski wrote:
+> > Add support for the firmware-managed variant of the DesignWare MAC on
+> > the sa8255p platform. This series contains new DT bindings and driver
+> > changes required to support the MAC in the STMMAC driver.
+> >
+> > It also reorganizes the ethqos code quite a bit to make the introductio=
+n
+> > of power domains into the driver a bit easier on the eye.
+> >
+> > The DTS changes will go in separately.
+> >
+> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.co=
+m>
+>
+> Quite unusual SoB chain... I think it would be better if you could stick
+> to one or the other; also the subj prefix should include the target tree
+> (net-next in this case); finally...
+>
 
+That's totally normal. I did most of the work on this series while
+still on Linaro payroll and credit is due. However I'm respinning them
+now as a Qualcomm employee and it's no different than taking someone
+else's patches and resending them - you have to add your SoB.
+
+> ## Form letter - net-next-closed
+>
+> The net-next tree is closed for new drivers, features, code refactoring
+> and optimizations due to the merge window and the winter break. We are
+> currently accepting bug fixes only.
+>
+> Please repost when net-next reopens after Jan 2nd.
+
+Sure, thanks.
+
+Bart
 
