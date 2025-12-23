@@ -1,141 +1,105 @@
-Return-Path: <netdev+bounces-245871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1908CD9B3F
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 15:43:58 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B564CD9B66
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 15:44:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 04D043033D45
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 14:43:55 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id A4B143028319
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 14:44:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 893353446D8;
-	Tue, 23 Dec 2025 14:43:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2469D3451C8;
+	Tue, 23 Dec 2025 14:44:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MfAKWHuF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DdigqN1V"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28E171DE4CE;
-	Tue, 23 Dec 2025 14:43:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC43534104C;
+	Tue, 23 Dec 2025 14:44:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766501031; cv=none; b=diOwc07pYdXh/CE6PdckCZ+vuIr2S1DP7rpnEXSrcnEwec5mo7V89RloxCP01LztlMCLs18rTEAd496xWPsmWSIK2XpfKWUKTUbLAQZU9zkKIUwdbnPrK1DhdgU4uHbg87+T21A7vvmH3R4JkGUNcwwWw1KGYX9OwMVAqjKDJQA=
+	t=1766501074; cv=none; b=Jv2sBg27370Eov9H0WjnaWDGX82UBkAbdSaSdRH/rs4qFISryPrbF+2F4HNGiQF9PecnozKcaAR1mlvtIbBvODMor1tXFF9GjPN6G1QHp8lMXoSnA5MgZD8j2uqkoch7zu/xEsc9ewQzBPsOsGxHtsq2BypJq3947BPPzL5Cn1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766501031; c=relaxed/simple;
-	bh=dB/+cWWuWt5zZaOF4WBQgVGeqRwXMeabHbV/nLVmbvY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=afUMqXPURdEdsimcOfigUyw5QTDYU7iMSSmt2aHwZ7z7fgWsfGcWOSA9xefcJgLg7etEHbptUaWlqGnFyqaj8YIapBwr8GRVcwqRgZU/lJmBtdyO53iND/d2BoxdzRg8ANHYnonqNf/hLURzHfmK2YT0k/Zmab1RHv7W2ALggcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MfAKWHuF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 193F0C113D0;
-	Tue, 23 Dec 2025 14:43:41 +0000 (UTC)
+	s=arc-20240116; t=1766501074; c=relaxed/simple;
+	bh=0e8i/+zYOZa82CpwZOmg+9pj1LZxEOkKYgYx8ZI7HpE=;
+	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=ifgUuA1O1TA+vpKkMsTG4Ci4ESXIj8J+8lR1vpqLyYKiD+1SJE3XtlCqjljA0LX/lFmda8G0xK5Uqf9AEsBqe3dERvTqsqAkY9P/viWzIN/ExofliCV/jsfzXgo5nr0oSldtSUAW2nyHtHuzeR69o/DeVDH81MK01utOMWc1gXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DdigqN1V; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E71CC113D0;
+	Tue, 23 Dec 2025 14:44:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766501030;
-	bh=dB/+cWWuWt5zZaOF4WBQgVGeqRwXMeabHbV/nLVmbvY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MfAKWHuFbtD0xW1u7oSpiVKbCSBZjKXbHZgHHl/15nnW/uyFFf4XJP00SoR3z9JdD
-	 rYuxJy4cH27U8+zKbhG9PznjFiDGu1ksCvBhMD3oJNWdMMZASOUQMjEAt3urdm9mD/
-	 bHhglQTjnotVIWBdxXhf5rB20ugMOrsi+w8SGJeJyft2KAgP42HsndKPDkA3fEyKC6
-	 qrkF48gedAccR7Gu+3jMczbHecCVYIrFS8TL1t1oj9DsyxGEVyc/jq3ddSmGNNhEcq
-	 iXl7U4o2uZdWtSEG6/m1F/+GqTMGBBhPJN8lA5bBa172Z5ogGGJV9RTOqtTP98FPAF
-	 hNURvzP+WpGwQ==
-Date: Tue, 23 Dec 2025 14:43:39 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Robert Marko <robert.marko@sartura.hr>
-Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com,
-	claudiu.beznea@tuxon.dev, Steen.Hegelund@microchip.com,
-	daniel.machon@microchip.com, UNGLinuxDriver@microchip.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org,
-	linux@roeck-us.net, andi.shyti@kernel.org, lee@kernel.org,
-	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, linusw@kernel.org, olivia@selenic.com,
-	radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com,
-	gregkh@linuxfoundation.org, jirislaby@kernel.org,
-	mturquette@baylibre.com, sboyd@kernel.org, richardcochran@gmail.com,
-	wsa+renesas@sang-engineering.com, romain.sioen@microchip.com,
-	Ryan.Wanner@microchip.com, lars.povlsen@microchip.com,
-	tudor.ambarus@linaro.org, kavyasree.kotagiri@microchip.com,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	dmaengine@vger.kernel.org, linux-hwmon@vger.kernel.org,
-	linux-i2c@vger.kernel.org, netdev@vger.kernel.org,
-	linux-gpio@vger.kernel.org, linux-spi@vger.kernel.org,
-	linux-serial@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-clk@vger.kernel.org, mwalle@kernel.org,
-	luka.perkov@sartura.hr
-Subject: Re: [PATCH v2 18/19] dt-bindings: arm: microchip: document EV23X71A
- board
-Message-ID: <20251223-chrome-simile-8cf1e9afe155@spud>
-References: <20251215163820.1584926-1-robert.marko@sartura.hr>
- <20251215163820.1584926-18-robert.marko@sartura.hr>
- <20251216-endorse-password-ae692dda5a9c@spud>
- <CA+HBbNF-=W7A3Joftsqn+A6s170sqOZ77jpS105s5HPqkskQzA@mail.gmail.com>
+	s=k20201202; t=1766501073;
+	bh=0e8i/+zYOZa82CpwZOmg+9pj1LZxEOkKYgYx8ZI7HpE=;
+	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
+	b=DdigqN1V0coElfWSnTjQggsI7MDF04hbrIlTItPkflHJf6+TYjhAIJj5YAqSHJkc4
+	 IU2oUm/KIPZLr2WEqpIykW1r0+XS45Mxy42bDzjKhbTYHI9QNPp3aWse4kb+KpGeVF
+	 x7gG7e6wCKUV33t03oTxL9I8c5JuLcKhG64b+Xgc3cKHCS2i40uEii2q+5hk/SdBlg
+	 8y9n7Zfg54kgOo9a4hzLW9A6/wpSWmHvJAy9dKvjJ9ideyY5r6PbDQXbmUqoD2o9O0
+	 yfvdnq1qLmSTP6jHne8GWhAOXX3o+2tZnWqiCL4ErcFPpY2xa6xn6E0r20dRQFmqZr
+	 Yv2bFQ+zQfwUQ==
+Date: Tue, 23 Dec 2025 08:44:32 -0600
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="pLErx9Z52ADLmcrz"
-Content-Disposition: inline
-In-Reply-To: <CA+HBbNF-=W7A3Joftsqn+A6s170sqOZ77jpS105s5HPqkskQzA@mail.gmail.com>
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: kuba@kernel.org, davem@davemloft.net, conor+dt@kernel.org, 
+ Stefan Eichenberger <stefan.eichenberger@toradex.com>, 
+ linux-kernel@vger.kernel.org, horms@kernel.org, devicetree@vger.kernel.org, 
+ pabeni@redhat.com, krzk+dt@kernel.org, edumazet@google.com, 
+ netdev@vger.kernel.org, andrew+netdev@lunn.ch
+To: Stefan Eichenberger <eichest@gmail.com>
+In-Reply-To: <20251223133446.22401-2-eichest@gmail.com>
+References: <20251223133446.22401-1-eichest@gmail.com>
+ <20251223133446.22401-2-eichest@gmail.com>
+Message-Id: <176650107245.3268721.11717483612280730663.robh@kernel.org>
+Subject: Re: [PATCH v1 1/2] dt-bindings: net: micrel: Convert to DT schema
 
 
---pLErx9Z52ADLmcrz
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Tue, 23 Dec 2025 14:33:39 +0100, Stefan Eichenberger wrote:
+> From: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+> 
+> Convert the devicetree bindings for the Micrel PHYs and switches to DT
+> schema.
+> 
+> Signed-off-by: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+> ---
+>  .../devicetree/bindings/net/micrel.txt        |  57 --------
+>  .../devicetree/bindings/net/micrel.yaml       | 132 ++++++++++++++++++
+>  2 files changed, 132 insertions(+), 57 deletions(-)
+>  delete mode 100644 Documentation/devicetree/bindings/net/micrel.txt
+>  create mode 100644 Documentation/devicetree/bindings/net/micrel.yaml
+> 
 
-On Tue, Dec 23, 2025 at 11:34:55AM +0100, Robert Marko wrote:
-> On Tue, Dec 16, 2025 at 6:32=E2=80=AFPM Conor Dooley <conor@kernel.org> w=
-rote:
-> >
-> > On Mon, Dec 15, 2025 at 05:35:35PM +0100, Robert Marko wrote:
-> > > Microchip EV23X71A board is an LAN9696 based evaluation board.
-> > >
-> > > Signed-off-by: Robert Marko <robert.marko@sartura.hr>
-> > > ---
-> > >  Documentation/devicetree/bindings/arm/microchip.yaml | 8 ++++++++
-> > >  1 file changed, 8 insertions(+)
-> > >
-> > > diff --git a/Documentation/devicetree/bindings/arm/microchip.yaml b/D=
-ocumentation/devicetree/bindings/arm/microchip.yaml
-> > > index 910ecc11d5d7..b20441edaac7 100644
-> > > --- a/Documentation/devicetree/bindings/arm/microchip.yaml
-> > > +++ b/Documentation/devicetree/bindings/arm/microchip.yaml
-> > > @@ -239,6 +239,14 @@ properties:
-> > >            - const: microchip,lan9668
-> > >            - const: microchip,lan966
-> > >
-> > > +      - description: The LAN969x EVB (EV23X71A) is a 24x 1G + 4x 10G
-> > > +          Ethernet development system board.
-> > > +      - items:
-> > > +          - enum:
-> > > +              - microchip,ev23x71a
-> > > +              - microchip,lan9696
-> >
-> > This looks wrong, unless "microchip,lan9696" is a board (which I suspect
-> > it isn't).
->=20
-> Hi,
-> No, LAN9696 is the exact SoC SKU used on the board.
-> I will drop it in v3.
+My bot found errors running 'make dt_binding_check' on your patch:
 
-Instead of dropping it, this should become an items list with 3 consts I
-think.
+yamllint warnings/errors:
 
---pLErx9Z52ADLmcrz
-Content-Type: application/pgp-signature; name="signature.asc"
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/renesas,ether.example.dtb: ethernet-phy@1 (ethernet-phy-id0022.1537): compatible: ['ethernet-phy-id0022.1537', 'ethernet-phy-ieee802.3-c22'] is too long
+	from schema $id: http://devicetree.org/schemas/net/micrel.yaml
 
------BEGIN PGP SIGNATURE-----
+doc reference errors (make refcheckdocs):
 
-iHUEABYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCaUqqhAAKCRB4tDGHoIJi
-0kmEAPwMbSydapbKFensNMM3LBSQavqvbhont2R2vwPmXc9oUAEA++sW5lHhwJ+e
-9LfhPrkmqekkXDEYUUHTET78Ply7Xgw=
-=FgUt
------END PGP SIGNATURE-----
+See https://patchwork.kernel.org/project/devicetree/patch/20251223133446.22401-2-eichest@gmail.com
 
---pLErx9Z52ADLmcrz--
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
+
 
