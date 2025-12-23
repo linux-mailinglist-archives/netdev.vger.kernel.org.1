@@ -1,186 +1,133 @@
-Return-Path: <netdev+bounces-245862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3172FCD96B4
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 14:21:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D86D1CD96D1
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 14:23:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id C8641300B288
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 13:20:53 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id A17CC3011F8F
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 13:23:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C057C313E08;
-	Tue, 23 Dec 2025 13:20:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D71FB33A03D;
+	Tue, 23 Dec 2025 13:23:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DUpOlarj";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="LyTgG69S"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FKZsI7lk"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 310C9313281
-	for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 13:20:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC0512F616C;
+	Tue, 23 Dec 2025 13:23:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766496051; cv=none; b=QGKjitoDIgevrutQBIXXr+7Na1ouPGVnw+G4YwsslhUb18rkKFL+h6gES1W4sImZgqvEb2sQiSoMMCbMtrEd0XHeOSxoereLLX+ofhmqfjJjUn8bjuLngCSonyPqcXiORF0V071nPR83HUI0AcuFn+3YqvRdMrez6/rlvdKyQiw=
+	t=1766496204; cv=none; b=kOF36eq9gZNETa2Nu2csmGUL3mJilAE8BVAsmxbAWbVpzkPpfEYm1AGAixhCeqRR1Bjix7f83oYBpI65MAQw0zM1RabxHLUvWhGkaaHf/t+Yn9Gz73BfhcA7IPqHLpqmUEipSGKQkjtiCxyAJorL2CMjXqjGtVAtYCg+haDtgzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766496051; c=relaxed/simple;
-	bh=6FEDJWDEXPwDHq5FjNeQDR7NvGRqzZXVeWMPQBaC+T4=;
+	s=arc-20240116; t=1766496204; c=relaxed/simple;
+	bh=rqjKymunayEwPeDVegrNhyGlPplhOK5dBWljWTlzY08=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y4+yJbWpXQf/CNo7NkHXR9rvvdQ2a1rABpquA7x9GXXr8ZaliaxPxg7brUQ5jbbCCvt6F7WDcxRnhYXiqrM2n7WjNlb9N8Pq5o0MovrcYyDgwj4PJ2hveOWStriZzAFfR9R62cx7Rgw7gZDvsbCnlUNEQPDdBDp3wz+uyPOqhHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DUpOlarj; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=LyTgG69S; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766496049;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BRe1EnOv1GyxckqNmcBvauEG3PWqIpBb6cBk/IR9fzc=;
-	b=DUpOlarjvKtxYSG4oGZKGuvQtTt5TKl+J8tKd5/Vjf8ENAiMExODEUAJP+jVewEC5YIMDb
-	0/9GavbE8/lrToj6My2rE+HHu9mLmV3ZXRw2IXjhgV5RZ2wmT46TyK9R/a1cE4mQCfLQJs
-	aIVYYHMyFOKGzAhsLf61x9rlsJg0u5A=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-83-veyakkhLNTmA39OFiSwwyw-1; Tue, 23 Dec 2025 08:20:47 -0500
-X-MC-Unique: veyakkhLNTmA39OFiSwwyw-1
-X-Mimecast-MFC-AGG-ID: veyakkhLNTmA39OFiSwwyw_1766496046
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-64da80b3699so1318716a12.2
-        for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 05:20:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1766496046; x=1767100846; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BRe1EnOv1GyxckqNmcBvauEG3PWqIpBb6cBk/IR9fzc=;
-        b=LyTgG69SXP93yfrY91gMPSWg+ZPkre0EEwXRY4y5Kt7awgaVxcG+KOgPk/FwrFx7Jq
-         mAZ79KrdEUjfmeu9FgCJI0NiIVx59TvamZOmG4NHl1AcAJBUG2dZQd0Q9hOAkD7jrDLz
-         QBny5DBIZ/rjJ5NMbq2ESawjnIc8pBdQ1i7bDRWvN+smRHRRT1b7uri/PQjeTo+v/RcI
-         wIooAwfoocbffEwf2E7U6m5iVkGGXJdEyrUk90mLIE+3m+u+mFxysw4JX9PaehwLd9WN
-         UL6x1UfXPUXPrxZX/Aqsl0ZLSF82nH/dFA3Ne20oV54d2vPtfiKd1j50rBgVm5yi0zoO
-         XBYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766496046; x=1767100846;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BRe1EnOv1GyxckqNmcBvauEG3PWqIpBb6cBk/IR9fzc=;
-        b=H3pF3n8Y2cz6Zn0nWLTQJtEdqLVujOg8BIJOdU8JK91O9eyS52g95I+n7gh5bljzUB
-         pC3thbl/fk0Xr9uly55UyqTkl1vfY68OyKN7saDKRDBZgbx26ZacAPNMSQySotDRZDkq
-         WuWwQ/6ofuwDDzBE/Fc2ey02/vL+hREbw9/8jXrHMmyJNQ1+pn3rkPj6ul5dJQktutaM
-         9vsjZaJI86cPC5ZuMb4pyXfASjDi1GSb8Sc+gAsDHbf8IQr4VvlP/DZZ7L/LvXCA5z0p
-         Qau7MJcXYFrsxEfJ/4xhdZylI/qKfkuQ7PF5YAbpbSXKsVSzAPIrQaKlwNorG0vtmc6X
-         OlWw==
-X-Forwarded-Encrypted: i=1; AJvYcCX2og7B5rP8jrPLgX8G2lTLYjWTXcaBm21mZWpFIZZRMAZy7KfSJfk1XdvakpgmtRvCY6IO1uA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6EF1fgnn/QMhKJOw6/Z7UiONTVRCYFCcpA5d1Etja+DbRFmXN
-	fyGiHD8ZvP37o/1JYg7msCKiTnaC0ajmWBqMsi7FscESLvhrUqHoMchTaBx0gsx/SoPVBVbjBT7
-	uJqvm0YKNIqhXqmb1IndNazeMXevtvThyJd22bqrL0zvBmgyTlMx9XtvD+A==
-X-Gm-Gg: AY/fxX4zUkR8a80WsHxTSYCYi4VDFy973TLtAKme5UPSWMrIeAZnoAdncTb9vlMGboe
-	abn8kNIFmpHTbqtHIvSRVDKTtyEzTeu17U6VXfCqJCQWb5JBeK6T362EAZ4ifwYQOvqcc/rA/vm
-	0n+LgTi35waIW7uEUv3lHNfyh1Uec6EKs0tfdkGW38xJxvrlWuCmt3nYb91qXKnxGBBVuCcpwx+
-	SeLO81CfqZGNq42RMzBLHTMe99XufrssH5NrspihucoKhZbgrD6uQ+abiwXtRFWOThYJS27mOIY
-	/ZckhLAHf73OVMQlMq8mwVQDxbY+ery/th/LMTftfFBCgM8dy43vXOYy/4H24tUJ7uEyyELzIhy
-	qwMUPanCvikl4yQ==
-X-Received: by 2002:a05:6402:1ed5:b0:64b:7885:c985 with SMTP id 4fb4d7f45d1cf-64b8e93c197mr14856997a12.3.1766496046295;
-        Tue, 23 Dec 2025 05:20:46 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEIaPvpBqA5VZRBxV0Qq8GuLUjF3OOea4Sszi0hglkQxPEQuXCT2471wtxRSPlrlUlo7MvZvQ==
-X-Received: by 2002:a05:6402:1ed5:b0:64b:7885:c985 with SMTP id 4fb4d7f45d1cf-64b8e93c197mr14856958a12.3.1766496045806;
-        Tue, 23 Dec 2025 05:20:45 -0800 (PST)
-Received: from sgarzare-redhat ([193.207.125.9])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-64b9105a9d8sm13549743a12.11.2025.12.23.05.20.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Dec 2025 05:20:44 -0800 (PST)
-Date: Tue, 23 Dec 2025 14:20:33 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Arseniy Krasnov <avkrasnov@salutedevices.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 2/2] vsock/test: Test setting SO_ZEROCOPY on
- accept()ed socket
-Message-ID: <aUqWtwr0n2RO7IB-@sgarzare-redhat>
-References: <20251223-vsock-child-sock-custom-sockopt-v1-0-4654a75d0f58@rbox.co>
- <20251223-vsock-child-sock-custom-sockopt-v1-2-4654a75d0f58@rbox.co>
- <aUpualKwJbT9W1ia@sgarzare-redhat>
- <1c877a67-778e-424c-8c23-9e4d799fac2f@rbox.co>
+	 Content-Type:Content-Disposition:In-Reply-To; b=EKtRdn6dMJ0DJ2gRGpql6G8D9Z+ClL84rHn1SKNoiNlTjHNifj6jhw1qKPyMh7ArF3owU9pxt96QsiTFLqUJBOdFqt1/lkKqqwtdlF0/46kiedkO76iKtj/ljXwGu/g518gnG7LNLmV2YFVHyEnBvxneHyNptSWF5unZaZc26Nk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FKZsI7lk; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1766496203; x=1798032203;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=rqjKymunayEwPeDVegrNhyGlPplhOK5dBWljWTlzY08=;
+  b=FKZsI7lkGCH5NYj4VvvWKMf5we/lJffbYCPubsPcLBxyh4f7VCIjkALs
+   GlKLOFJb3tCalEuETYTf8VNj2y4rFO9pm1+MDBHInA3IVC0T6GARw6WjR
+   g82pk7+YyIn8P5afI5d5HjHIuQKxpZLEi77eCVGVlaF0YLxoD0BmWSjBK
+   In6chCSVYt7EY6PSC7QEo5AYdi9+ul+3S3AliXSo3HaYSG7szNoSlMJx5
+   FbJxwjL8xhqiSVcyIm75wV/vkDBtQWaAlrKl2Jw8BPskdP0wnyF4xn31y
+   cyvXRBRX8SmCjSIAa5SfOaRLZhmlaEdXvjcXGutbyh20fITw4CD2F6Bbe
+   g==;
+X-CSE-ConnectionGUID: HoTNlDT4RDG5kJqAnOjejg==
+X-CSE-MsgGUID: HNMcfUP3Tyi72jdsUL96dg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11651"; a="68226161"
+X-IronPort-AV: E=Sophos;i="6.21,170,1763452800"; 
+   d="scan'208";a="68226161"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Dec 2025 05:23:22 -0800
+X-CSE-ConnectionGUID: MglQWePLRHij/XYMpZ4S+w==
+X-CSE-MsgGUID: UiQRl1yoQZOfG/sl/2q93g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.21,170,1763452800"; 
+   d="scan'208";a="199691760"
+Received: from lkp-server02.sh.intel.com (HELO dd3453e2b682) ([10.239.97.151])
+  by fmviesa006.fm.intel.com with ESMTP; 23 Dec 2025 05:23:20 -0800
+Received: from kbuild by dd3453e2b682 with local (Exim 4.98.2)
+	(envelope-from <lkp@intel.com>)
+	id 1vY2MA-000000001xf-2OQE;
+	Tue, 23 Dec 2025 13:23:18 +0000
+Date: Tue, 23 Dec 2025 21:22:28 +0800
+From: kernel test robot <lkp@intel.com>
+To: Osose Itua <osose.itua@savoirfairelinux.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, michael.hennerich@analog.com,
+	jerome.oufella@savoirfairelinux.com,
+	Osose Itua <osose.itua@savoirfairelinux.com>
+Subject: Re: [PATCH v2 1/2] net: phy: adin: enable configuration of the LP
+ Termination Register
+Message-ID: <202512232150.85cDPKrJ-lkp@intel.com>
+References: <20251222222210.3651577-2-osose.itua@savoirfairelinux.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1c877a67-778e-424c-8c23-9e4d799fac2f@rbox.co>
+In-Reply-To: <20251222222210.3651577-2-osose.itua@savoirfairelinux.com>
 
-On Tue, Dec 23, 2025 at 12:10:25PM +0100, Michal Luczaj wrote:
->On 12/23/25 11:27, Stefano Garzarella wrote:
->> On Tue, Dec 23, 2025 at 10:15:29AM +0100, Michal Luczaj wrote:
->>> Make sure setsockopt(SOL_SOCKET, SO_ZEROCOPY) on an accept()ed socket is
->>> handled by vsock's implementation.
->>>
->>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
->>> ---
->>> tools/testing/vsock/vsock_test.c | 33 +++++++++++++++++++++++++++++++++
->>> 1 file changed, 33 insertions(+)
->>>
->>> diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->>> index 9e1250790f33..8ec8f0844e22 100644
->>> --- a/tools/testing/vsock/vsock_test.c
->>> +++ b/tools/testing/vsock/vsock_test.c
->>> @@ -2192,6 +2192,34 @@ static void test_stream_nolinger_server(const struct test_opts *opts)
->>> 	close(fd);
->>> }
->>>
->>> +static void test_stream_accepted_setsockopt_client(const struct test_opts *opts)
->>> +{
->>> +	int fd;
->>> +
->>> +	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
->>> +	if (fd < 0) {
->>> +		perror("connect");
->>> +		exit(EXIT_FAILURE);
->>> +	}
->>> +
->>> +	vsock_wait_remote_close(fd);
->>> +	close(fd);
->>> +}
->>> +
->>> +static void test_stream_accepted_setsockopt_server(const struct test_opts *opts)
->>> +{
->>> +	int fd;
->>> +
->>> +	fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
->>> +	if (fd < 0) {
->>> +		perror("accept");
->>> +		exit(EXIT_FAILURE);
->>> +	}
->>> +
->>> +	enable_so_zerocopy_check(fd);
->>
->> This test is passing on my env also without the patch applied.
->>
->> Is that expected?
->
->Oh, no, definitely not. It fails for me:
->36 - SOCK_STREAM accept()ed socket custom setsockopt()...36 - SOCK_STREAM
->accept()ed socket custom setsockopt()...setsockopt err: Operation not
->supported (95)
->setsockopt SO_ZEROCOPY val 1
+Hi Osose,
 
-aaa, right, the server is failing, sorry ;-)
+kernel test robot noticed the following build errors:
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
->
->I have no idea what's going on :)
->
+[auto build test ERROR on net/main]
+[also build test ERROR on net-next/main linus/master horms-ipvs/master v6.19-rc2 next-20251219]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-In my suite, I'm checking the client, and if the last test fails only on 
-the server, I'm missing it. I'd fix my suite, and maybe also vsock_test 
-adding another sync point.
+url:    https://github.com/intel-lab-lkp/linux/commits/Osose-Itua/net-phy-adin-enable-configuration-of-the-LP-Termination-Register/20251223-064926
+base:   net/main
+patch link:    https://lore.kernel.org/r/20251222222210.3651577-2-osose.itua%40savoirfairelinux.com
+patch subject: [PATCH v2 1/2] net: phy: adin: enable configuration of the LP Termination Register
+config: parisc-randconfig-001-20251223 (https://download.01.org/0day-ci/archive/20251223/202512232150.85cDPKrJ-lkp@intel.com/config)
+compiler: hppa-linux-gcc (GCC) 8.5.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251223/202512232150.85cDPKrJ-lkp@intel.com/reproduce)
 
-Thanks,
-Stefano
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202512232150.85cDPKrJ-lkp@intel.com/
 
+All errors (new ones prefixed by >>):
+
+>> drivers/net/phy/adin.c:7:10: fatal error: cerrno: No such file or directory
+    #include <cerrno>
+             ^~~~~~~~
+   compilation terminated.
+
+
+vim +7 drivers/net/phy/adin.c
+
+   > 7	#include <cerrno>
+     8	#include <linux/kernel.h>
+     9	#include <linux/bitfield.h>
+    10	#include <linux/delay.h>
+    11	#include <linux/errno.h>
+    12	#include <linux/ethtool_netlink.h>
+    13	#include <linux/init.h>
+    14	#include <linux/module.h>
+    15	#include <linux/mii.h>
+    16	#include <linux/phy.h>
+    17	#include <linux/property.h>
+    18	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
