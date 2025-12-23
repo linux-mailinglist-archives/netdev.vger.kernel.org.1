@@ -1,242 +1,196 @@
-Return-Path: <netdev+bounces-245894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D1F2CDA6A6
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 20:49:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 400C0CDA76D
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 21:20:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id CD9FE3098300
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 19:46:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 334AA30303B2
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 20:19:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62F7034B438;
-	Tue, 23 Dec 2025 19:46:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28B5634C9B7;
+	Tue, 23 Dec 2025 20:19:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SNtAp4R4"
+	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="sp/p1grd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pf1-f196.google.com (mail-pf1-f196.google.com [209.85.210.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0041288522
-	for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 19:46:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1EBF34AAF6
+	for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 20:19:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766519217; cv=none; b=rAbgBN5m0Fvkp3RZOujG/wYXYb6o0pHJJjCZuVIum+aonwmn+feZSKOXq6lBjkI2tKn55q3RNf8j2XFTZGdp3Um2iGgKmnend+ao7AxXM0w5uwLQBtpdVnW84JmOhbj0yiOBu9+bI8bMH3i2ojaP4Vkx7cKXyLcYMWq2Ypwt9OU=
+	t=1766521183; cv=none; b=f8MXEVgdfkF9JDiB7v+J1b05SP1bIFiQxJWQGYNPODsUBmaUgkQ0CXTjvrlAFAiwF1tPMdS8AhGKXNa9co0GhCyzr0948cgwXImniyXd7SjpRAWun3biGaPol5KZzkLAC4GeCohaYRlAkvb+GKZUxJUdm5BCP2tKXcT+IUC39Q0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766519217; c=relaxed/simple;
-	bh=kKaH5TI9H57dhaFvYsDSpKcrupT9XXs5S87wxyfBwwA=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=RhmdG2WCsO9hGuUMhWZ21mOLphWKwVgjgh0mbtUi/68ihvCPbn0bUQOK0qUjeM8FKmHqSBAM7WXrkDCf1onm+zaexF7E6savjuLCY3CQBRNMBzZV5NIhAcDyuR6OZbUdDHPfZl23XPaV9RJcQmxT6B1FQgOt5E24N8LweBLdNE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SNtAp4R4; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-bddf9ce4931so8997496a12.0
-        for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 11:46:54 -0800 (PST)
+	s=arc-20240116; t=1766521183; c=relaxed/simple;
+	bh=dIzeT2bAtbNpWCzGPjuV3B4HClIyvUup/5uZSPzsL1M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k0ZpHnK4qxMueqyC8CcsHurmyZRtoZYKtH6uc5uQiRcaJBVCP5468XODzdSJ+gVqjVHUQgY09xgs7xebCMqYyYMobaAEFMLlZMUwUVgIbdBN9Go1CdgQqbKe1qAE+zosxIp1q5aXhfn803WT8UOYnkizoaDUlk7otPOJ7Lewn1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=sp/p1grd; arc=none smtp.client-ip=209.85.210.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
+Received: by mail-pf1-f196.google.com with SMTP id d2e1a72fcca58-7d26a7e5639so6111619b3a.1
+        for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 12:19:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1766519214; x=1767124014; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=hbB5fUieYbbC54wlKkzCPogs80Zc6SurLe7o2Jqsn5A=;
-        b=SNtAp4R4uyXLIsGx6HINs7OOnN741fFKMSKu+3Y2tP3fRGCQbGgs2po/mCOwHOghh1
-         f3G/2htRcxvKCb+7uSFC8YeFrS4TZ0kP2uHqi1sATHCS5kgvPD9cKC9GE92d4wxoj/4x
-         yM0/Wup5NpCvX7+HLG55y37rftGniDX6ltv6rXCbrD2REl6EgByRgYWJQItBQC2qoBaF
-         ohlskmnjQewuxH96zfQttGN5MlqolVifUD/sCla10cKu8Q1VxweDXjRDEVmPjGaRFLB4
-         plvJAmP3ZN8v6kNtaAGX3FKAmaDWGjbEid82opujLXF1d/86buRtKkF3KoGkLrVdrL+4
-         ZmYA==
+        d=sartura.hr; s=sartura; t=1766521179; x=1767125979; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=g1vfXs4RxjLrMI0+CYv1SSuI1FXB9RtpNik5CYzHMIg=;
+        b=sp/p1grd5lkwv7sdu7MGJVw2B0P0H5QVE8/lQhc+Z2UZNVOBBoNa5ucm40go5i/fj9
+         3bRj50JzDaFFJsr8MI2FZzYTHMYcmCqt9nTPUe/PVXN/Ps5bwDnjgwZbERarBuwr46lB
+         OuKPXCXNsGCklL60xZHfTLjhhnEY5kVGOl2EbzI7+pE0JMk7XTcTMKO3iF8NqtWdSiPq
+         CtXHKt9XfTwL4LnbC9WBGzL1k8xf/LnpbWEJ8S0okPTAwOoUaB65017hanldfEULAnHn
+         jvXLRNVzVHerjoc6u2P31IfxpTha4cFgFpF8CMffs77aGOMk+4Me/DGg/qiGyEx6ff9o
+         EWtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766519214; x=1767124014;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hbB5fUieYbbC54wlKkzCPogs80Zc6SurLe7o2Jqsn5A=;
-        b=GlToegZrGfTLNrW+g09HlQ/r2Fy6Q4G5UpKwTGaMbrQCuvylvbGv4po/ZqGl5vY8FN
-         uYjggbLMfmUvpqMrHtviAcC2rZZhT9WnSPm3eCFltZ+DdQogTZB1YqXVJnDsY202B82T
-         ZOBeknMfHkAV1bCrFdSUY+P1ajOQoEyyEI+pb7mpKxX6xGSwZtH4wtK5OkIva9dwuLtE
-         QTVI0EogjdP1MXqEN5yG/FR+gcsWto1LQPjaMpZIJn7QmLZaaVdsmyZK/vENIUvOA8o7
-         3dktErfvI2pQvodD/nTK3vnuA9JDdIUIiy2ZO14TdcbIe1Mawf7VoldNbHVdSmdPanSr
-         EnPg==
-X-Gm-Message-State: AOJu0Ywjm2DlDRcRvA3uA8DIrIWBweFPI1pi7veAsCb+ooqRjPABax9O
-	qNMVuXM36g2w12nVl3tqRa8UDBd88c4a5Z+hoBleYWtB/oIAtqKBSEaUtkVlNO8JBJgI1/PZW+T
-	YK74tvZxoQHF+i+lDd2ULsfTmwC+iaUZuSuZhpKEMyNcEl5OTYJWnBnPdoqd1jSMNQrFEi3e308
-	h+AKy8JsmGvG0tOCI1yVg6JnWaSkKWVO1YA/Ee6hyMO1qFDItSpEUbaBQKutGRpJM=
-X-Google-Smtp-Source: AGHT+IEh1TfXoem2rb5nypJkE6ogSfqwPsTdfFfptU3SHsuL6LuN7SgwxjclA75NJmfB/kBCOkuzh1nebLdLVZ71NQ==
-X-Received: from dycuf3.prod.google.com ([2002:a05:7300:103:b0:2a4:7587:4d39])
- (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:7300:c393:b0:2a4:6bb6:c84a with SMTP id 5a478bee46e88-2b05ebdd512mr14772248eec.6.1766519213635;
- Tue, 23 Dec 2025 11:46:53 -0800 (PST)
-Date: Tue, 23 Dec 2025 19:46:46 +0000
+        d=1e100.net; s=20230601; t=1766521179; x=1767125979;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=g1vfXs4RxjLrMI0+CYv1SSuI1FXB9RtpNik5CYzHMIg=;
+        b=ZkqFVMkQfqGH2cofU1eLMNqiQcJ2git1Z3cQkwVzvdKSVdtxELSPgzub4c0uk7xyZe
+         pLrGCYuXlQWrbdQMlr7j7Um1RyQBbaio+tXyXNzM7FUWuBFb++WO5JRXBiXWQN8Wc2zx
+         Zb461mYvrb0Jn9wR6eIDGmkxtibAvoIzm9UPJDMrrZ5UwLXCpDmyjVKVulZdPrHWFNPT
+         DReldJG7dBqElg1KWeb+JOfxyf6skH58DXhBYvJ77rcC1rKmQ18msg2c2Zrz8qlszBjU
+         XlYX3CjbNh1BkGeTW+StseGCioXDYWYSZpvT0gPHXEaYQENrF7E5biYbGbErrQqMfa0T
+         uAkw==
+X-Forwarded-Encrypted: i=1; AJvYcCWTEw+Piv57ik1g+9dQsq2Ou5LnwPALYxSbJK/dz9g1wb4IE6ix/W/xyOn/iPifVcRPB6FjwEs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxB+6Hww2mrC1lXl5qssgtjOrty50NvnyOpiwT4FYf7GFV6n2/A
+	x4qX67vbf77YbhhLDRjpSsJ80J3s8XlgBeMVQH6TnxiOBfgcyvtYNWFmRRSYkZJdsvk=
+X-Gm-Gg: AY/fxX4LDZBKZxPE7PaBpTHOv8RtnDP6GmR8uz20nLSCL/a5OJjD/o4EM2VJ3bXjPR+
+	w7px30kXd/OB8U6ulQLJ7NvPO8TXAHNeYjhtBPekcCw/YDVi1C7TDqR5T4fQN4yGRxVAGsyYF9S
+	+g6LFI86TIekNVIxYdTrqH6t/l6TD6Tysp7WwPcGeOTZlvKqqflWjaD+rchfLuq6ao7KGPpO0oH
+	xq9lQq/R/0Ln14/R350i2vC3WYB8OXz3/izbkjiXnEb5NixyiDaPvcJtFG+XciOOkARR+bXTwzU
+	q6Z5deCjQl1yNn84tQ+U4mZxh7X8mtPPeIi5k0iOLfDnGKNHO31F19J9Aq9eQPZKjfsqIY6ATLd
+	Z8FhFOLGC/R8ccfUjz1KPyixg9TUlNFi87FgCv44c2GWj/dHe+X5vioUlFD8u9M/4PBXO18+6yl
+	9rgLRr9XYn2JUIopK6105Cik9g6xZqI4PVpFtIvC6xcwNZK+S1p+v3DAsfNEHO0V0V7xfvNVEKG
+	+fI/WN3
+X-Google-Smtp-Source: AGHT+IElu2DeQr7IoImhfsWaHg06ftf4nZ3LUQN+WUZ/izPfinsCvzTpfHsJa/ze8aScZK07T0eUkA==
+X-Received: by 2002:a05:6a20:918d:b0:35d:d477:a801 with SMTP id adf61e73a8af0-376a7eed254mr14238755637.13.1766521179192;
+        Tue, 23 Dec 2025 12:19:39 -0800 (PST)
+Received: from fedora (dh207-15-53.xnet.hr. [88.207.15.53])
+        by smtp.googlemail.com with ESMTPSA id 41be03b00d2f7-c1e7cbfa619sm12567549a12.36.2025.12.23.12.19.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Dec 2025 12:19:38 -0800 (PST)
+From: Robert Marko <robert.marko@sartura.hr>
+To: robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	nicolas.ferre@microchip.com,
+	alexandre.belloni@bootlin.com,
+	claudiu.beznea@tuxon.dev,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	vkoul@kernel.org,
+	andi.shyti@kernel.org,
+	lee@kernel.org,
+	andrew+netdev@lunn.ch,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linusw@kernel.org,
+	Steen.Hegelund@microchip.com,
+	daniel.machon@microchip.com,
+	UNGLinuxDriver@microchip.com,
+	olivia@selenic.com,
+	radu_nicolae.pirea@upb.ro,
+	richard.genoud@bootlin.com,
+	gregkh@linuxfoundation.org,
+	jirislaby@kernel.org,
+	broonie@kernel.org,
+	mturquette@baylibre.com,
+	sboyd@kernel.org,
+	lars.povlsen@microchip.com,
+	devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	dmaengine@vger.kernel.org,
+	linux-i2c@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	linux-spi@vger.kernel.org,
+	linux-serial@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	linux-clk@vger.kernel.org
+Cc: luka.perkov@sartura.hr,
+	Robert Marko <robert.marko@sartura.hr>
+Subject: [PATCH v3 00/15] Add support for Microchip LAN969x
+Date: Tue, 23 Dec 2025 21:16:11 +0100
+Message-ID: <20251223201921.1332786-1-robert.marko@sartura.hr>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.52.0.351.gbe84eed79e-goog
-Message-ID: <20251223194649.3050648-1-almasrymina@google.com>
-Subject: [PATCH iwl-next v4] idpf: export RX hardware timestamping information
- to XDP
-From: Mina Almasry <almasrymina@google.com>
-To: netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: YiFei Zhu <zhuyifei@google.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Alexander Lobakin <aleksander.lobakin@intel.com>, 
-	Richard Cochran <richardcochran@gmail.com>, intel-wired-lan@lists.osuosl.org, 
-	Mina Almasry <almasrymina@google.com>, 
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-From: YiFei Zhu <zhuyifei@google.com>
+This series adds support for the Microchip LAN969x switch SoC family.
 
-The logic is similar to idpf_rx_hwtstamp, but the data is exported
-as a BPF kfunc instead of appended to an skb to support grabbing
-timestamps in xsk packets.
+Series is a bit long since after discussions in previous versions, it was
+recommended[1][2] to add SoC specific compatibles for device nodes so it
+includes the required bindings updates.
 
-A idpf_queue_has(PTP, rxq) condition is added to check the queue
-supports PTP similar to idpf_rx_process_skb_fields.
+[1] https://lore.kernel.org/all/20251203-splendor-cubbyhole-eda2d6982b46@spud/
+[2] https://lore.kernel.org/all/173412c8-c2fb-4c38-8de7-5b1c2eebdbf9@microchip.com/
+[3] https://lore.kernel.org/all/20251203-duly-leotard-86b83bd840c6@spud/
 
-Tested using an xsk connection and checking xdp timestamps are
-retreivable in received packets.
+Signed-off-by: Robert Marko <robert.marko@sartura.hr>
 
-Cc: intel-wired-lan@lists.osuosl.org
-Signed-off-by: YiFei Zhu <zhuyifei@google.com>
-Signed-off-by: Mina Almasry <almasrymina@google.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Changes in v3:
+* Pick Acked-by from Conor
+* Drop HWMON binding as it was picked into hwmon already
+* Document EV23X71A into AT91 binding
+* Drop SparX-5 and AT91 bindings merge
+* Apply remark from Conor on DMA binding regarding merging cases
 
----
+Changes in v2:
+* Change LAN969x wildcards to LAN9691 in patches
+* Split SoC DTSI and evaluation board patches
+* Add the suggested binding changes required for SoC specific compatibles
+* Merge SparX-5 and AT91 bindings as suggested[3]
 
-v4: https://lore.kernel.org/netdev/20251219202957.2309698-1-almasrymina@google.com/
-- Fix indentation (lobakin)
-- I kept the (u64) casts for all bit shifted bits in idpf_xdp_get_qw3
-  and friends as I see all idpf_xdp_get_qw* functions do the cast in all
-  bit-shifted variables.
+Robert Marko (15):
+  include: dt-bindings: add LAN969x clock bindings
+  dt-bindings: usb: Add Microchip LAN969x support
+  dt-bindings: mfd: atmel,sama5d2-flexcom: add microchip,lan9691-flexcom
+  dt-bindings: serial: atmel,at91-usart: add microchip,lan9691-usart
+  dt-bindings: spi: at91: add microchip,lan9691-spi
+  dt-bindings: i2c: atmel,at91sam: add microchip,lan9691-i2c
+  dt-bindings: rng: atmel,at91-trng: add microchip,lan9691-trng
+  dt-bindings: crypto: atmel,at91sam9g46-aes: add microchip,lan9691-aes
+  dt-bindings: crypto: atmel,at91sam9g46-sha: add microchip,lan9691-sha
+  dt-bindings: dma: atmel: add microchip,lan9691-dma
+  dt-bindings: net: mscc-miim: add microchip,lan9691-miim
+  dt-bindings: pinctrl: pinctrl-microchip-sgpio: add LAN969x
+  arm64: dts: microchip: add LAN969x support
+  dt-bindings: arm: AT91: document EV23X71A board
+  arm64: dts: microchip: add EV23X71A board
 
-v3: https://lore.kernel.org/netdev/20251218022948.3288897-1-almasrymina@google.com/
-- Do the idpf_queue_has(PTP) check before we read qw1 (lobakin)
-- Fix _qw1 not copying over ts_low on on !__LIBETH_WORD_ACCESS systems
-  (AI)
+ .../devicetree/bindings/arm/atmel-at91.yaml   |   6 +
+ .../crypto/atmel,at91sam9g46-aes.yaml         |   1 +
+ .../crypto/atmel,at91sam9g46-sha.yaml         |   1 +
+ .../bindings/dma/atmel,sama5d4-dma.yaml       |   4 +-
+ .../bindings/i2c/atmel,at91sam-i2c.yaml       |   1 +
+ .../bindings/mfd/atmel,sama5d2-flexcom.yaml   |   1 +
+ .../devicetree/bindings/net/mscc,miim.yaml    |  11 +-
+ .../pinctrl/microchip,sparx5-sgpio.yaml       |  20 +-
+ .../bindings/rng/atmel,at91-trng.yaml         |   1 +
+ .../bindings/serial/atmel,at91-usart.yaml     |   1 +
+ .../bindings/spi/atmel,at91rm9200-spi.yaml    |   1 +
+ .../bindings/usb/microchip,lan9691-dwc3.yaml  |  68 ++
+ arch/arm64/boot/dts/microchip/Makefile        |   1 +
+ arch/arm64/boot/dts/microchip/lan9691.dtsi    | 487 +++++++++++
+ .../boot/dts/microchip/lan9696-ev23x71a.dts   | 757 ++++++++++++++++++
+ include/dt-bindings/clock/microchip,lan9691.h |  24 +
+ 16 files changed, 1376 insertions(+), 9 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/usb/microchip,lan9691-dwc3.yaml
+ create mode 100644 arch/arm64/boot/dts/microchip/lan9691.dtsi
+ create mode 100644 arch/arm64/boot/dts/microchip/lan9696-ev23x71a.dts
+ create mode 100644 include/dt-bindings/clock/microchip,lan9691.h
 
-v2: https://lore.kernel.org/netdev/20251122140839.3922015-1-almasrymina@google.com/
-- Fixed alphabetical ordering
-- Use the xdp desc type instead of virtchnl one (required some added
-  helpers)
-
----
- drivers/net/ethernet/intel/idpf/xdp.c | 31 +++++++++++++++++++++++++++
- drivers/net/ethernet/intel/idpf/xdp.h | 20 +++++++++++++++++
- 2 files changed, 51 insertions(+)
-
-diff --git a/drivers/net/ethernet/intel/idpf/xdp.c b/drivers/net/ethernet/intel/idpf/xdp.c
-index 958d16f87424..0916d201bf98 100644
---- a/drivers/net/ethernet/intel/idpf/xdp.c
-+++ b/drivers/net/ethernet/intel/idpf/xdp.c
-@@ -2,6 +2,7 @@
- /* Copyright (C) 2025 Intel Corporation */
- 
- #include "idpf.h"
-+#include "idpf_ptp.h"
- #include "idpf_virtchnl.h"
- #include "xdp.h"
- #include "xsk.h"
-@@ -391,8 +392,38 @@ static int idpf_xdpmo_rx_hash(const struct xdp_md *ctx, u32 *hash,
- 				    pt);
- }
- 
-+static int idpf_xdpmo_rx_timestamp(const struct xdp_md *ctx, u64 *timestamp)
-+{
-+	const struct libeth_xdp_buff *xdp = (typeof(xdp))ctx;
-+	struct idpf_xdp_rx_desc desc __uninitialized;
-+	const struct idpf_rx_queue *rxq;
-+	u64 cached_time, ts_ns;
-+	u32 ts_high;
-+
-+	rxq = libeth_xdp_buff_to_rq(xdp, typeof(*rxq), xdp_rxq);
-+
-+	if (!idpf_queue_has(PTP, rxq))
-+		return -ENODATA;
-+
-+	idpf_xdp_get_qw1(&desc, xdp->desc);
-+
-+	if (!(idpf_xdp_rx_ts_low(&desc) & VIRTCHNL2_RX_FLEX_TSTAMP_VALID))
-+		return -ENODATA;
-+
-+	cached_time = READ_ONCE(rxq->cached_phc_time);
-+
-+	idpf_xdp_get_qw3(&desc, xdp->desc);
-+
-+	ts_high = idpf_xdp_rx_ts_high(&desc);
-+	ts_ns = idpf_ptp_tstamp_extend_32b_to_64b(cached_time, ts_high);
-+
-+	*timestamp = ts_ns;
-+	return 0;
-+}
-+
- static const struct xdp_metadata_ops idpf_xdpmo = {
- 	.xmo_rx_hash		= idpf_xdpmo_rx_hash,
-+	.xmo_rx_timestamp	= idpf_xdpmo_rx_timestamp,
- };
- 
- void idpf_xdp_set_features(const struct idpf_vport *vport)
-diff --git a/drivers/net/ethernet/intel/idpf/xdp.h b/drivers/net/ethernet/intel/idpf/xdp.h
-index 479f5ef3c604..1748a0d73547 100644
---- a/drivers/net/ethernet/intel/idpf/xdp.h
-+++ b/drivers/net/ethernet/intel/idpf/xdp.h
-@@ -112,11 +112,13 @@ struct idpf_xdp_rx_desc {
- 	aligned_u64		qw1;
- #define IDPF_XDP_RX_BUF		GENMASK_ULL(47, 32)
- #define IDPF_XDP_RX_EOP		BIT_ULL(1)
-+#define IDPF_XDP_RX_TS_LOW	GENMASK_ULL(31, 24)
- 
- 	aligned_u64		qw2;
- #define IDPF_XDP_RX_HASH	GENMASK_ULL(31, 0)
- 
- 	aligned_u64		qw3;
-+#define IDPF_XDP_RX_TS_HIGH	GENMASK_ULL(63, 32)
- } __aligned(4 * sizeof(u64));
- static_assert(sizeof(struct idpf_xdp_rx_desc) ==
- 	      sizeof(struct virtchnl2_rx_flex_desc_adv_nic_3));
-@@ -128,6 +130,8 @@ static_assert(sizeof(struct idpf_xdp_rx_desc) ==
- #define idpf_xdp_rx_buf(desc)	FIELD_GET(IDPF_XDP_RX_BUF, (desc)->qw1)
- #define idpf_xdp_rx_eop(desc)	!!((desc)->qw1 & IDPF_XDP_RX_EOP)
- #define idpf_xdp_rx_hash(desc)	FIELD_GET(IDPF_XDP_RX_HASH, (desc)->qw2)
-+#define idpf_xdp_rx_ts_low(desc)	FIELD_GET(IDPF_XDP_RX_TS_LOW, (desc)->qw1)
-+#define idpf_xdp_rx_ts_high(desc)	FIELD_GET(IDPF_XDP_RX_TS_HIGH, (desc)->qw3)
- 
- static inline void
- idpf_xdp_get_qw0(struct idpf_xdp_rx_desc *desc,
-@@ -149,6 +153,9 @@ idpf_xdp_get_qw1(struct idpf_xdp_rx_desc *desc,
- 	desc->qw1 = ((const typeof(desc))rxd)->qw1;
- #else
- 	desc->qw1 = ((u64)le16_to_cpu(rxd->buf_id) << 32) |
-+		    ((u64)rxd->ts_low << 24) |
-+		    ((u64)rxd->fflags1 << 16) |
-+		    ((u64)rxd->status_err1 << 8) |
- 		    rxd->status_err0_qw1;
- #endif
- }
-@@ -166,6 +173,19 @@ idpf_xdp_get_qw2(struct idpf_xdp_rx_desc *desc,
- #endif
- }
- 
-+static inline void
-+idpf_xdp_get_qw3(struct idpf_xdp_rx_desc *desc,
-+		 const struct virtchnl2_rx_flex_desc_adv_nic_3 *rxd)
-+{
-+#ifdef __LIBETH_WORD_ACCESS
-+	desc->qw3 = ((const typeof(desc))rxd)->qw3;
-+#else
-+	desc->qw3 = ((u64)le32_to_cpu(rxd->ts_high) << 32) |
-+		    ((u64)le16_to_cpu(rxd->fmd6) << 16) |
-+		    le16_to_cpu(rxd->l2tag1);
-+#endif
-+}
-+
- void idpf_xdp_set_features(const struct idpf_vport *vport);
- 
- int idpf_xdp(struct net_device *dev, struct netdev_bpf *xdp);
-
-base-commit: 7b8e9264f55a9c320f398e337d215e68cca50131
 -- 
-2.52.0.351.gbe84eed79e-goog
+2.52.0
 
 
