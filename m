@@ -1,129 +1,108 @@
-Return-Path: <netdev+bounces-245915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA9FACDAB7D
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 22:55:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BEA7CDAB8F
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 22:57:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E817B302EF64
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 21:54:38 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id B890730198C7
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 21:57:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1187313268;
-	Tue, 23 Dec 2025 21:54:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08F6D3128C4;
+	Tue, 23 Dec 2025 21:57:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cjFbg3Tx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b4QZGC50"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 743982ECD37;
-	Tue, 23 Dec 2025 21:54:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D687E266B72
+	for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 21:57:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766526877; cv=none; b=D5tOUh9ZNI8cbZk4JZoit6giXPHQu57BEBTkAOxY6WEBEB7T7tUYXOz2cJSdMNRSyP1HAKrF/ki3iEZbo7kN90SIek5w4jGfQIA+NvyFlZna2TPvNq1mb0N5vZFpGh3FnmeAyIXebYpYgmMbGlon8cVdNIGmK2Fx/VqGSl1Mp/0=
+	t=1766527030; cv=none; b=nFyWfGT0qVQDAHF17H/OphaahixgB6DRfkH6Npymhb2DfwfXtBrjaZoloFrjBmqNpKOwHcWBtdpFn3L0zmSQWXgAeZ4w75gIUcYtYqKyrUrKJLmfDaCrAu/xzez/4DSsfZl9EvRIWsfNPom4xZ+UEjL/PWWIIt1Xhhy2iaCq+LY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766526877; c=relaxed/simple;
-	bh=WjBoMucTJzMCotHr+d+oZ2zQOT8QQxP/yyGSLmhTzPE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KryHBizSgzHvppIfQMWFKbHFMhBdB+QlIqeEcpkO/SKahV9v+wQz7ZOWZab4/BUMA8LdNIfXx60Y50D9rW0FxQLPoz/hCwldP8EWCrGFVz0CCEYJLf9MG0hgn6cHzqBSKLq4xDXL+KUsHFLkM8JjGSNJU2MKUoPewQKus19IJoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cjFbg3Tx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BEEAC113D0;
-	Tue, 23 Dec 2025 21:54:34 +0000 (UTC)
+	s=arc-20240116; t=1766527030; c=relaxed/simple;
+	bh=68ngR6r337s4Uq5yOPMzXnBFuiUfzKPli0oTxvM83W0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=YPsircVvbdRJHp22G2IMYGpuJ9BtqZfaxKbTSMz4LeRqQDzJGAHeReEjjdWcXZj17S/KjsZBuZqyanW7576XYsVbsPkYcLAOg8CXkh5SnWcN/Y5DVI1frIV1477Pk00vpO6KNIKUxdfUqlscjtdbrnyqmFDIC2jSjwtnpKmbPnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b4QZGC50; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE7E2C113D0;
+	Tue, 23 Dec 2025 21:57:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766526877;
-	bh=WjBoMucTJzMCotHr+d+oZ2zQOT8QQxP/yyGSLmhTzPE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cjFbg3TxpD+h++93PzGsiIr29b5ENlY1dwH9QdhOD5X0AOUMdnpmIvAGQMG63xAG5
-	 OlSbr6fg8ToRWZZf1EU3ABM1g04Aplc/gVoqJrCSkLFvyr2/VygHU8pZdweBg8jgsw
-	 yP4KXezT1hhLdmYRYHkRcKsz2B6PG1Y0BTxn3Dv+qry5wQPHl3MtdEXBzUVrZXQWHp
-	 I2/lBdpLFkp3f5OY1VY/iL7kco4P0rEMMw9IEgpniZgFYQJNInLmHjQTHXxZmb2d+M
-	 1DQwu2kpg2Hu9afMUREFKSBEbaMGggjCRmcaiP/QEc/DzfJRdcjXq3ByKA4uy+Jk4j
-	 vc5dVk6DhJ4zw==
-Date: Tue, 23 Dec 2025 14:54:31 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
-Cc: Mario Limonciello <superm1@kernel.org>, Felix Fietkau <nbd@nbd.name>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	linux-wireless@vger.kernel.org, linux-mediatek@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2] wifi: mt76: Fix strscpy buffer overflow in
- mt76_connac2_load_patch
-Message-ID: <20251223215431.GA3327658@ax162>
-References: <CABXGCsMeAZyNJ-Axt_CUCXgyieWPV3rrcLpWsveMPT8R0YPGnQ@mail.gmail.com>
- <20251205161202.48409-1-mikhail.v.gavrilov@gmail.com>
+	s=k20201202; t=1766527030;
+	bh=68ngR6r337s4Uq5yOPMzXnBFuiUfzKPli0oTxvM83W0=;
+	h=From:Date:Subject:To:Cc:From;
+	b=b4QZGC50KfAQ7gYvxY+MWAp22RzTzyQs67qxPcvyZINmf/y593JrBMcKIr9mwpFp4
+	 kq5jHqDCVY1ljeblsmZgMHxcaZW6qY/p/Se9ySRO4uMUB6VWwKj/yWKbhKzS+7OgPZ
+	 AzTvcFMkCoCGAMci9KltNav+y6hcOkjg/YBr9gxo8xjjV70WWSRtZb1KlK+o8qiXJD
+	 s/fLIFy5sXSiPomYSW5iWGczGPYdLGfxSzOafAQU+DxxvOGVEmsWyNMv3cHJF/mfeR
+	 YsLP7AaS3x02oqd0VT96zSTd9OR1ktQNoNpDLkhHUJwfjEnqy98b8OfadfRKbKKgxP
+	 rPf8psNWtTkWA==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Tue, 23 Dec 2025 22:56:44 +0100
+Subject: [PATCH net] net: airoha: Fix schedule while atomic in
+ airoha_ppe_deinit()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251205161202.48409-1-mikhail.v.gavrilov@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20251223-airoha-fw-ethtool-v1-1-1dbd1568c585@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAAAAAAAC/x3MQQqAIBBA0avErBvQKaG6SrSwGnMgMjQqiO6et
+ HyL/x9IHIUTdMUDkU9JErYMXRYwebstjDJnAykymqhCKzF4i+5CPvwRwoqknalHRVPbjJC7PbK
+ T+3/2w/t+3r/+5mMAAAA=
+X-Change-ID: 20251223-airoha-fw-ethtool-21f54b02c98b
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+X-Mailer: b4 0.14.2
 
-+ netdev and wireless/networking maintainers
+Rely on rcu_replace_pointer in airoha_ppe_deinit routine in order to fix
+schedule while atomic issue.
 
-On Fri, Dec 05, 2025 at 09:12:02PM +0500, Mikhail Gavrilov wrote:
-> Commit f804a5895eba ("wifi: mt76: Strip whitespace from build ddate") introduced
-> a kernel panic/WARN on systems using MediaTek MT7921e (and potentially others
-> using mt76_connac_lib) due to an incorrect buffer size calculation.
-> 
-> The error logged is:
-> "strnlen: detected buffer overflow: 17 byte read of buffer size 16"
-> 
-> This occurs because the field 'hdr->build_date' is a fixed-size array of 16 bytes.
-> The patch allocated a 17-byte local buffer 'build_date' but used 'sizeof(build_date)'
-> (17) as the read limit for strscpy, causing Fortify Source to correctly detect
-> an attempt to read 17 bytes from the 16-byte source field.
-> 
-> To fix this, replace strscpy with memcpy, which is appropriate for raw data
-> copying, and explicitly use the size of the source field (sizeof(hdr->build_date) = 16)
-> to limit the read, followed by manual null termination.
-> 
-> Fixes: f804a5895eba ("wifi: mt76: Strip whitespace from build ddate")
-> Signed-off-by: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
+Fixes: 00a7678310fe3 ("net: airoha: Introduce flowtable offload support")
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+ drivers/net/ethernet/airoha/airoha_ppe.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-I got bit by this regression when installing v6.19-rc2 on my new test
-machine, which has an MT7925 (RZ717) chip in it. I don't see this in
-either Felix's or the main wireless tree yet but I do understand it is
-the end of the year with breaks and such (along with Johannes not
-actually being on CC since he is not in the output of get_maintainers.pl
-for drivers/net/wireless/mediatek/mt76). If there is not going to be a
-wireless pull soon, can this be applied to net directly so that it gets
-to Linus soon? It was rather annoying to do a bisect for a regression
-that already has a pending fix.
+diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
+index 0caabb0c3aa06948e46ad087c50eba5babc81994..2221bafaf7c9fed73dcf8d30ff3b1c5eecc463d4 100644
+--- a/drivers/net/ethernet/airoha/airoha_ppe.c
++++ b/drivers/net/ethernet/airoha/airoha_ppe.c
+@@ -1547,13 +1547,16 @@ void airoha_ppe_deinit(struct airoha_eth *eth)
+ {
+ 	struct airoha_npu *npu;
+ 
+-	rcu_read_lock();
+-	npu = rcu_dereference(eth->npu);
++	mutex_lock(&flow_offload_mutex);
++
++	npu = rcu_replace_pointer(eth->npu, NULL,
++				  lockdep_is_held(&flow_offload_mutex));
+ 	if (npu) {
+ 		npu->ops.ppe_deinit(npu);
+ 		airoha_npu_put(npu);
+ 	}
+-	rcu_read_unlock();
++
++	mutex_unlock(&flow_offload_mutex);
+ 
+ 	rhashtable_destroy(&eth->ppe->l2_flows);
+ 	rhashtable_destroy(&eth->flow_table);
 
-Tested-by: Nathan Chancellor <nathan@kernel.org>
+---
+base-commit: 7b8e9264f55a9c320f398e337d215e68cca50131
+change-id: 20251223-airoha-fw-ethtool-21f54b02c98b
 
-> ---
->  drivers/net/wireless/mediatek/mt76/mt76_connac_mcu.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/wireless/mediatek/mt76/mt76_connac_mcu.c b/drivers/net/wireless/mediatek/mt76/mt76_connac_mcu.c
-> index ea99167765b0..d2c4c65ec464 100644
-> --- a/drivers/net/wireless/mediatek/mt76/mt76_connac_mcu.c
-> +++ b/drivers/net/wireless/mediatek/mt76/mt76_connac_mcu.c
-> @@ -3125,8 +3125,11 @@ int mt76_connac2_load_patch(struct mt76_dev *dev, const char *fw_name)
->  	}
->  
->  	hdr = (const void *)fw->data;
-> -	strscpy(build_date, hdr->build_date, sizeof(build_date));
-> -	build_date[16] = '\0';
-> +	/* hdr->build_date is 16 bytes. Copy exactly 16 bytes to the 17-byte buffer,
-> +	 * and then add the null terminator at index 16.
-> +	 */
-> +	memcpy(build_date, hdr->build_date, sizeof(hdr->build_date));
-> +	build_date[sizeof(hdr->build_date)] = '\0';
->  	strim(build_date);
->  	dev_info(dev->dev, "HW/SW Version: 0x%x, Build Time: %.16s\n",
->  		 be32_to_cpu(hdr->hw_sw_ver), build_date);
-> -- 
-> 2.52.0
-> 
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
+
 
