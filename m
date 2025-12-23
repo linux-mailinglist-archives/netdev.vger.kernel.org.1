@@ -1,223 +1,160 @@
-Return-Path: <netdev+bounces-245875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [IPv6:2600:3c09:e001:a7::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31833CD9C01
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 16:18:02 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id A39F9CD9D06
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 16:42:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 1A57B3002B95
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 15:18:01 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 6FEBF30ED18E
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 15:37:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 758CD28C014;
-	Tue, 23 Dec 2025 15:17:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02A3932FA1B;
+	Tue, 23 Dec 2025 15:27:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qWsF7jIJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k15WHd2V"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41E63267B05;
-	Tue, 23 Dec 2025 15:17:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EEEF34B1A4
+	for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 15:27:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766503079; cv=none; b=CIosTCerC0lkl5M7eTBpxjee5ZoY/VrKdM7co9sEhwT7es16+iPA9ztfBt3DEYCTp8ABvykLYFIMhA0W1Vge2Q0DD8AK+3dw60smSDB/khSUTlk67WkWy4zZLll3s6lNcqSjdk72rNP4UYYmVub0yrHoQXTTJnF5Vjc9C7vvVh4=
+	t=1766503624; cv=none; b=ttx3TZLX880zuOcyXtGtDy/KVsGsNiKwz5J+1wI1n9UgsVzplN03boYj3vIPOKkA9KdnCBulyhDGHkQ/lXEwLbbGZEVPro/fYTs+HM7nKTaydYRWC/xyNsN/8ZTm5GVa2Vag3pZqCYwm787qtmhfJS7PLq6oYMsDUt5C57Tev4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766503079; c=relaxed/simple;
-	bh=xHMvPjpKyxjB5+zEUkjOy7aEQZr7/WEBY7QJCb1Hs8U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aYLhlUluZYh0eXhoparq8da2VSzA8CUCx9fZw+azcpyCrbzvZvco5ZWCtbozPauP7z0DWNVRMY6rxkuz1eJrX1OKvq+o/algB45CptW404VHYVh9xnWVWihSVnSNEbJ/sW/vAMAuFngHt56msCjZK662nsfawc+myRhoWNpubqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qWsF7jIJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C86DC113D0;
-	Tue, 23 Dec 2025 15:17:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766503078;
-	bh=xHMvPjpKyxjB5+zEUkjOy7aEQZr7/WEBY7QJCb1Hs8U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qWsF7jIJOslT8s1S7u/8bjnxl+YQ/1ByeQ1ewt/+rY/9WYG7O1ARU2wUEC0MpvUkt
-	 nJ29+l60fflZZupPoGJY+iB2n0drXAFhG9mh6pnuMBJb+Q3dWKObeiO7STxE+Fl2lq
-	 /KJl7wC7I4QxiKm6M1Zpl1TE/4K8VCzBQpRQArSOLRIrhIRdNuylIsV4o8rCr8jETr
-	 eubw6Onv5VRePw33jttvcPvJiaJCMvHFthEnaBXxiGC8xSNdWgKZcgBD+Fs1McLBoa
-	 6Zqxp/0BvGVhgeE0KZ5Sh8GsmQJZ+tbuC+UMA/z97aVCaWhHitaOxuz7S+m+nR/Dcu
-	 HtgrcvRm/JsRw==
-Date: Tue, 23 Dec 2025 16:17:55 +0100
-From: Frederic Weisbecker <frederic@kernel.org>
-To: Chen Ridong <chenridong@huaweicloud.com>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1766503624; c=relaxed/simple;
+	bh=FNjOWXAmMiSFDurxbAY5FmfDgB2timg7UJONSCEV91w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dt1tH6n+d6s3xVXA28MtCVtqmZ3Fd7Rd7eIjciz77yIesRl0wnW+GEr2E9opCaR3b5+SJ4OKQBj57ooBxvTNqx5hmBf4XcuT3S9RUvujV1bzNTXvvYk8AQOMdbXNqTcNW1O6GmJ289DIYT2xZ0hjctxj8Ola/3ugDUO7zsLFIL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k15WHd2V; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-34c2f52585fso4355705a91.1
+        for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 07:27:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1766503622; x=1767108422; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/Te/v2waHQmamwOq0sULQpKzWYSQXa6/bK0ITErWJeQ=;
+        b=k15WHd2VIufNkdpblfKci8MzzeVOy1Ncf+fxBh8ETyfDdupbC4aLvdk00c5ye5al+U
+         Z/gzHx31H37y+wR2Xmkn3VjZhd2/xfg+xFqdsmBOSjv+4M1onxcNZ7jaAC27OuxZWxsY
+         V4bhyVoeAiQxfa8gWd+1ne0IsC9H4gflTIXbMMnQLQYcfHnZLd3I/Wle/okp3JgV0V3O
+         ElTRON3u6nqmSCq28s50tSoKUqr2/7xwO0sy9dtygFuaakiprW15Z+grIZjgmhWLyDls
+         FwhPPi3sKarqEITBToCmgIcFguWEe8OCLiOar4EzlPVSL43DW6a4xhwAgD/9d9QibxBQ
+         Nmhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766503622; x=1767108422;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/Te/v2waHQmamwOq0sULQpKzWYSQXa6/bK0ITErWJeQ=;
+        b=XiS+G14f+INsDuX5tUSXTECbzhMJ+fi9ehgM+INMn+VLkMHdEnEbpyyfuf4ehhhFqo
+         ZlGIIuvFmRx1OXKmXEjlVhtvjWd1ND9mjOi/lsahP20Zfyz9s+KRyqW6FPwFJfCN1yWH
+         iLlYrQOW9d+U69NKolR3YIcL0mzue2p5snzt7NwMklCuG37DqN/bJDCzDAsIV3cF/k7m
+         8CRIfkAgQ1uywpen64K5KyohZVeyQrJa8v4tyizuvGtYHMsXB5bvyaSboEJF7LRUV9bw
+         spW/l3jPn3aispnzWJDiEaRVlFXwtvfdojI3C6ZgiML0aJY2ceR1r2kpGUKt7jkR0VbZ
+         HoDw==
+X-Gm-Message-State: AOJu0Yx7/YA8OKkzpNv+xD4KqaHeAyy+P0wiicRG9+e/1L+2xIZIcsk7
+	lWybyTzQmHgoKOncwDGYwCUVS3WVS3qMzvXe5XN38sndkpasQY2U77VVMno6Xn3w
+X-Gm-Gg: AY/fxX6Ts66ZR8fDxNLPt+3LuFmV5pMfyVfio5YstTzNxD1YXLKFAPZj7xclCBlQslK
+	N/cmeGugc5cdkPQNiUMoMkg1orBVUDE39debzYKSwo+7zdiMtAHU+UWrWNkTahcbUXvtAkHrhT6
+	M20vJayNXkSWA1mXC8ds5L6U+NoqctF6Z/LVlWE8e97ho0uH32kTIUGmRFL/4LhQgmyiTPPoozg
+	bU5qSPLwrOOtF1ahtkX4EI7grLVQteBHBV50to41ZiyaPsmVkZaFk1I8C2UMjCzfdhjxp4sXfr8
+	p2ZARCGp1cfyZ2W4kTtqMX4/RuJgQ9Pook0NLswSMaL96+pU0OcFNSs1ZV0S34PkPsIDLD7ZdHH
+	heCkxjaQFGi2xrQ2/gko0AI6IL5P4rbQyxHeDQjMmvf45pcOFRB3/Nv9dIQLBDZYVwV1ktSrRdv
+	QyJbFZVV6oEFIRHKy5j8unbjh4W3JZk+QymWw=
+X-Google-Smtp-Source: AGHT+IHs+VCzqx2tYFavwNoq09qWoQGNowOUFffowxOLdmg82RfmPo0+b2W9UfBUYK3AtZWwo3w3Lg==
+X-Received: by 2002:a17:90b:5608:b0:34a:9d9a:3f67 with SMTP id 98e67ed59e1d1-34e921f010bmr11520195a91.33.1766503622215;
+        Tue, 23 Dec 2025 07:27:02 -0800 (PST)
+Received: from minh.192.168.1.1 ([2001:ee0:4f4c:210:3523:f373:4d1d:e7f0])
+        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-34e76ae7618sm8006138a91.1.2025.12.23.07.26.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Dec 2025 07:27:01 -0800 (PST)
+From: Bui Quang Minh <minhquangbui99@gmail.com>
+To: netdev@vger.kernel.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Gabriele Monaco <gmonaco@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
-	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
-	linux-mm@kvack.org, linux-pci@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 17/31] cpuset: Propagate cpuset isolation update to
- workqueue through housekeeping
-Message-ID: <aUqyo58-CDReEm10@localhost.localdomain>
-References: <20251105210348.35256-1-frederic@kernel.org>
- <20251105210348.35256-18-frederic@kernel.org>
- <e0b3f050-ef2e-478e-9e22-5f800b86ee42@huaweicloud.com>
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	virtualization@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	Bui Quang Minh <minhquangbui99@gmail.com>
+Subject: [PATCH net 0/3] virtio-net: fix the deadlock when disabling rx NAPI
+Date: Tue, 23 Dec 2025 22:25:30 +0700
+Message-ID: <20251223152533.24364-1-minhquangbui99@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <e0b3f050-ef2e-478e-9e22-5f800b86ee42@huaweicloud.com>
 
-Le Thu, Nov 06, 2025 at 08:55:42AM +0800, Chen Ridong a écrit :
-> 
-> 
-> On 2025/11/6 5:03, Frederic Weisbecker wrote:
-> > Until now, cpuset would propagate isolated partition changes to
-> > workqueues so that unbound workers get properly reaffined.
-> > 
-> > Since housekeeping now centralizes, synchronize and propagates isolation
-> > cpumask changes, perform the work from that subsystem for consolidation
-> > and consistency purposes.
-> > 
-> > For simplification purpose, the target function is adapted to take the
-> > new housekeeping mask instead of the isolated mask.
-> > 
-> > Suggested-by: Tejun Heo <tj@kernel.org>
-> > Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
-> > ---
-> >  include/linux/workqueue.h |  2 +-
-> >  init/Kconfig              |  1 +
-> >  kernel/cgroup/cpuset.c    | 14 ++++++--------
-> >  kernel/sched/isolation.c  |  4 +++-
-> >  kernel/workqueue.c        | 17 ++++++++++-------
-> >  5 files changed, 21 insertions(+), 17 deletions(-)
-> > 
-> > diff --git a/include/linux/workqueue.h b/include/linux/workqueue.h
-> > index dabc351cc127..a4749f56398f 100644
-> > --- a/include/linux/workqueue.h
-> > +++ b/include/linux/workqueue.h
-> > @@ -588,7 +588,7 @@ struct workqueue_attrs *alloc_workqueue_attrs_noprof(void);
-> >  void free_workqueue_attrs(struct workqueue_attrs *attrs);
-> >  int apply_workqueue_attrs(struct workqueue_struct *wq,
-> >  			  const struct workqueue_attrs *attrs);
-> > -extern int workqueue_unbound_exclude_cpumask(cpumask_var_t cpumask);
-> > +extern int workqueue_unbound_housekeeping_update(const struct cpumask *hk);
-> >  
-> >  extern bool queue_work_on(int cpu, struct workqueue_struct *wq,
-> >  			struct work_struct *work);
-> > diff --git a/init/Kconfig b/init/Kconfig
-> > index cab3ad28ca49..a1b3a3b66bfc 100644
-> > --- a/init/Kconfig
-> > +++ b/init/Kconfig
-> > @@ -1247,6 +1247,7 @@ config CPUSETS
-> >  	bool "Cpuset controller"
-> >  	depends on SMP
-> >  	select UNION_FIND
-> > +	select CPU_ISOLATION
-> >  	help
-> >  	  This option will let you create and manage CPUSETs which
-> >  	  allow dynamically partitioning a system into sets of CPUs and
-> > diff --git a/kernel/cgroup/cpuset.c b/kernel/cgroup/cpuset.c
-> > index b04a4242f2fa..ea102e4695a5 100644
-> > --- a/kernel/cgroup/cpuset.c
-> > +++ b/kernel/cgroup/cpuset.c
-> > @@ -1392,7 +1392,7 @@ static bool partition_xcpus_del(int old_prs, struct cpuset *parent,
-> >  	return isolcpus_updated;
-> >  }
-> >  
-> > -static void update_unbound_workqueue_cpumask(bool isolcpus_updated)
-> > +static void update_housekeeping_cpumask(bool isolcpus_updated)
-> >  {
-> >  	int ret;
-> >  
-> > @@ -1401,8 +1401,6 @@ static void update_unbound_workqueue_cpumask(bool isolcpus_updated)
-> >  	if (!isolcpus_updated)
-> >  		return;
-> >  
-> > -	ret = workqueue_unbound_exclude_cpumask(isolated_cpus);
-> > -	WARN_ON_ONCE(ret < 0);
-> >  	ret = housekeeping_update(isolated_cpus, HK_TYPE_DOMAIN);
-> >  	WARN_ON_ONCE(ret < 0);
-> >  }
-> > @@ -1558,7 +1556,7 @@ static int remote_partition_enable(struct cpuset *cs, int new_prs,
-> >  	list_add(&cs->remote_sibling, &remote_children);
-> >  	cpumask_copy(cs->effective_xcpus, tmp->new_cpus);
-> >  	spin_unlock_irq(&callback_lock);
-> > -	update_unbound_workqueue_cpumask(isolcpus_updated);
-> > +	update_housekeeping_cpumask(isolcpus_updated);
-> >  	cpuset_force_rebuild();
-> >  	cs->prs_err = 0;
-> >  
-> > @@ -1599,7 +1597,7 @@ static void remote_partition_disable(struct cpuset *cs, struct tmpmasks *tmp)
-> >  	compute_excpus(cs, cs->effective_xcpus);
-> >  	reset_partition_data(cs);
-> >  	spin_unlock_irq(&callback_lock);
-> > -	update_unbound_workqueue_cpumask(isolcpus_updated);
-> > +	update_housekeeping_cpumask(isolcpus_updated);
-> >  	cpuset_force_rebuild();
-> >  
-> >  	/*
-> > @@ -1668,7 +1666,7 @@ static void remote_cpus_update(struct cpuset *cs, struct cpumask *xcpus,
-> >  	if (xcpus)
-> >  		cpumask_copy(cs->exclusive_cpus, xcpus);
-> >  	spin_unlock_irq(&callback_lock);
-> > -	update_unbound_workqueue_cpumask(isolcpus_updated);
-> > +	update_housekeeping_cpumask(isolcpus_updated);
-> >  	if (adding || deleting)
-> >  		cpuset_force_rebuild();
-> >  
-> > @@ -2027,7 +2025,7 @@ static int update_parent_effective_cpumask(struct cpuset *cs, int cmd,
-> >  		WARN_ON_ONCE(parent->nr_subparts < 0);
-> >  	}
-> >  	spin_unlock_irq(&callback_lock);
-> > -	update_unbound_workqueue_cpumask(isolcpus_updated);
-> > +	update_housekeeping_cpumask(isolcpus_updated);
-> >  
-> >  	if ((old_prs != new_prs) && (cmd == partcmd_update))
-> >  		update_partition_exclusive_flag(cs, new_prs);
-> > @@ -3047,7 +3045,7 @@ static int update_prstate(struct cpuset *cs, int new_prs)
-> >  	else if (isolcpus_updated)
-> >  		isolated_cpus_update(old_prs, new_prs, cs->effective_xcpus);
-> >  	spin_unlock_irq(&callback_lock);
-> > -	update_unbound_workqueue_cpumask(isolcpus_updated);
-> > +	update_housekeeping_cpumask(isolcpus_updated);
-> >  
-> 
-> The patch [1] has been applied to cgroup/for-next, you may have to adapt it.
-> 
-> [1]:
-> https://lore.kernel.org/cgroups/20251105043848.382703-6-longman@redhat.com/T/#u
+Calling napi_disable() on an already disabled napi can cause the
+deadlock. In commit 4bc12818b363 ("virtio-net: disable delayed refill
+when pausing rx"), to avoid the deadlock, when pausing the RX in
+virtnet_rx_pause[_all](), we disable and cancel the delayed refill work.
+However, in the virtnet_rx_resume_all(), we enable the delayed refill
+work too early before enabling all the receive queue napis.
 
-Right, I just waited for -rc1 to pop-up before doing that.
-v5 will follow shortly.
+The deadlock can be reproduced by running
+selftests/drivers/net/hw/xsk_reconfig.py with multiqueue virtio-net
+device and inserting a cond_resched() inside the for loop in
+virtnet_rx_resume_all() to increase the success rate. Because the worker
+processing the delayed refilled work runs on the same CPU as
+virtnet_rx_resume_all(), a reschedule is needed to cause the deadlock.
+In real scenario, the contention on netdev_lock can cause the
+reschedule.
 
-Thanks.
+In this series, we make the refill work a per receive queue work instead
+so that we can manage them separately and avoid further mistakes.
 
-> 
-> -- 
-> Best regards,
-> Ridong
-> 
+- Patch 1 makes the refill work a per receive queue work. It fixes the
+deadlock in reproducer because now we only need to ensure refill work is
+scheduled after NAPI of its receive queue is enabled not all NAPIs of all
+queues. After this patch, enable_delayed_refill is stilled called before
+napi_enable in virtnet_rx_resume[_all] but I don't how the work can be
+scheduled in that window.
+- Patch 2 moves the enable_delayed_refill after napi_enable and fixes the
+deadlock variant in virtnet_open.
+- Patch 3 fixes the issue arises when enable_delayed_refill is moved after
+napi_enable. The issue is that a refill work might need to be scheduled in
+virtnet_receive but cannot because refill work is disabled. This can lead
+to receive side stuck.So we need to set a pending bit, later when refill
+work is enabled, the work is scheduled.
+
+All 3 patches need to be applied to fix the issue so does it mean I need
+to add Fixes and Cc stable for all 3?
+
+Link to the previous approach and discussion:
+https://lore.kernel.org/netdev/20251212152741.11656-1-minhquangbui99@gmail.com/
+
+Reported-by: Paolo Abeni <pabeni@redhat.com>
+Closes: https://netdev-ctrl.bots.linux.dev/logs/vmksft/drv-hw-dbg/results/400961/3-xdp-py/stderr
+
+Thanks,
+Quang Minh.
+
+Bui Quang Minh (3):
+  virtio-net: make refill work a per receive queue work
+  virtio-net: ensure rx NAPI is enabled before enabling refill work
+  virtio-net: schedule the pending refill work after being enabled
+
+ drivers/net/virtio_net.c | 173 ++++++++++++++++++++-------------------
+ 1 file changed, 91 insertions(+), 82 deletions(-)
 
 -- 
-Frederic Weisbecker
-SUSE Labs
+2.43.0
+
 
