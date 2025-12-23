@@ -1,102 +1,93 @@
-Return-Path: <netdev+bounces-245881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD030CD9ECB
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 17:22:26 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D9D8CD9ED7
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 17:23:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id AE72E30194F1
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 16:22:23 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 69026301FBCD
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 16:23:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA547327BE4;
-	Tue, 23 Dec 2025 16:22:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 111CC293C4E;
+	Tue, 23 Dec 2025 16:23:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MKkfjva4";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="m6b9kBHM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YrLnMcNz"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05F93318151
-	for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 16:22:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FE4A1E5B94
+	for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 16:23:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766506941; cv=none; b=n1/b6lWRFYfA+OFpruPfAi2VC4qu57EU2KHk/1sjgk0d+I+mXFehLEUVXeUPztmygDSk69Rhp1Jw/ibHYvD6gWKC6P7OnPDn0CctIYK4n8cuONmN90uU2jPHT07Kd7lG2jAuV5+sAefAMmaq/okQs1JhsUkBiUbPibES8AUb+vc=
+	t=1766506988; cv=none; b=CUAo/o4EaYHDloqJvHzUtJlytDoZRllIRZXeEalv4ti9YNy2zZ74Y1ye4tV4y55G/YI8kuxFVk5TStxt7L7/3sKF+obUCDoKQ7b3Cf+aFvQAPlbXW54lkY2TyclfIaELBbT7n2qXfBAfNwS/ldBOzGO9p3zwphglzETAzjr8RH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766506941; c=relaxed/simple;
-	bh=/0xYbPL616qbJH7DAEtPJytxbsCIUKJ6b4pgntLCSRQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HJ2ihZMZK4pJr04PI74HencIyJ+T3fgfJaO8GnMDzL/MiC6gvIN/JbQcmmWLrxGi/vNvWHR324jNN/nVxmahw/+tTaDRW5ex1d4nDh+HLwa1EdT/WoBPYJC9geR4t6Cx2sJpfmthwZulV7BR0qpavo6ohKmqU9V8IAH0/w56sOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MKkfjva4; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=m6b9kBHM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766506938;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=K4/UC+SmvFgSpwuzCxbdSjOFAReaxeGhgnIyBtkiDoY=;
-	b=MKkfjva42wQWf0cTi4gynQdZYbZD2kDw4MXi3mmscq/Q9EPgdmu1kE74LA/ORqZ3Yqmxvk
-	L3jlyGR6yqnKAtfi8ryQlTRszEAjj7sPZIxAv9gleDcoqGg07ROxgrF2752rsHCx4kqccg
-	ouw2nA4tfyn3XebmJd+PO7NIcMfe1nc=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-389-ibUzQB4fNneU7bunOHle3Q-1; Tue, 23 Dec 2025 11:22:17 -0500
-X-MC-Unique: ibUzQB4fNneU7bunOHle3Q-1
-X-Mimecast-MFC-AGG-ID: ibUzQB4fNneU7bunOHle3Q_1766506936
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-64b4b64011dso726272a12.2
-        for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 08:22:17 -0800 (PST)
+	s=arc-20240116; t=1766506988; c=relaxed/simple;
+	bh=0sO+ExfMY98pSy0ByNVbYOkWKC295gC8jZXiSQWmh4s=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Ufn/vswxsozoNaWcyDkXlH8gQOi28HL5/A+QmXS4VNyONfoVSpz+/a4MA5MoJRDzM01WndtKoKwN+0JwarbxNvoGWS5pc2L4zVDUdvfFmUAcP3TCKXKxC8U/7hAXfT78PVPrsHebPA6+uJQl3osxje6AIVDrTRf7J74waYV7yKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YrLnMcNz; arc=none smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-787da30c53dso50326177b3.0
+        for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 08:23:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1766506935; x=1767111735; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=K4/UC+SmvFgSpwuzCxbdSjOFAReaxeGhgnIyBtkiDoY=;
-        b=m6b9kBHMYlyIZDwxBQRVYBjfUvCItBpwinS2MMpd3WKPrNhWEHLfqRoWAJu8sFTXwQ
-         ihawGFSYHmRpl1WcTN5d67iAnNw1NqwZ/ZPW2d5AJJB7hofdw0Sy01DFAFqpxg0Cs6Cq
-         uwLHJB75jf5JRwj0Vzbmn/7stH07efhupAEa16gt33JvlWzOB/qZ7TdoPB/ZSooU6vp4
-         4xj6iRbdVPyp9yiWx97I9CcoQGdoPvVMTUaAIT4BtEYlbpPWNvhXw6AZBmSxr7bTirdm
-         wsRR4uWP7Bwn63K38T47WNLjzvAmuBuoY5ooaLKUjiiuxjUScStS1rgX1qrnVxQtmEvR
-         Ng3g==
+        d=gmail.com; s=20230601; t=1766506985; x=1767111785; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Qk54TIE8w4c5rJwH2KoEkkMPQcoEF2GBpS3X0YnMXkw=;
+        b=YrLnMcNz9UvjeYqCmVQIsBVW6YwLQm73G6VOE3VqzA9UuEGGDybIyORdfNUby65x+3
+         PfKV8GFiaSxN3yhz0i8GUWGFxRXkD+ZjVVyc+ayofqO3Eza/pvvGY1siz2yc6LCKUOz7
+         5EC4hLhUH+NOLAA8Nn3VN00mKaDBs5cI3j2WZaNXzi4cnezIWZXXHOllnuUXZcpp3qj/
+         3+7atByuhtCreisvp06O487reL9RbqG9I4A8S27J3R70O3e99dmW3tNyWDu9o0VMGgiP
+         f9MyZbt0PXNC5lUpfDldKXY9/1n4s3VYWhGBSBTQJoesCJwVpt2jT+BC8TGQ6I2CP59p
+         lzsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766506935; x=1767111735;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=K4/UC+SmvFgSpwuzCxbdSjOFAReaxeGhgnIyBtkiDoY=;
-        b=DI9Sz/1Z8CVE+NGYzEI1Ja4PRiuXIbrcgLCpvBRPecaSsdjORajZBU241MunLyTlbK
-         ViK83r0MD8d+/s+3aiQ9oXCcy3Y53D1LVEz8tBjgq8VpeFC2XmJS59/NHHd+tkAcw8SM
-         +uPBjC0jPgioVul5Rw/Jhz7X02gr5DQu/9+5PvN1JscQburLsHv6J5kQNIw91bk59UaN
-         +/CcRRLLq+YuNX9+X7qctoJ/H7VxYpB4WjHsTOtL4FLsS7F5AZGrDPOqc1hub9Yl2gl0
-         UdRVrBOyR3BQsA+LV2TSl5dlUpsv0TcSGGR4Qz5CaUogBx70lioSkN7U3ZTxTNK7x3v+
-         S9Jw==
-X-Gm-Message-State: AOJu0YxkOtO4JNMejWmNOjJN4lLJnoPuzNNtlkHwBlJcmnngBrrhltau
-	YgWKaWzdl6qjK0sRnmM2MQrTZ5Wm8gPbhuS1Pr6bqVnGJ8JKgSNcSdH1+M6jkvZmZGfAzWaRMCf
-	96xvOCkKfYV+LPXYNg/xS5y8sz5+I3ontZPU7Kb3Ych9htnpB9cI6GFCRYi+U+//ACirwuIMZM8
-	C45pxiTDcriDbf3B5kw/4Aw8+vIu0i5PXNDp4JIGVxzDMD+zM=
-X-Gm-Gg: AY/fxX5Dtno30olEa8wpRnJbbxgdv8EJydCm3mjDDBZbhW9E9fX6xKLMwPZHL2Nxnbp
-	XLB0SIZ5JEdMJEvZ2vHi2F+k6+a352R9jf44pmbXK5cfMOIxrGCWKkUX1+/xCPEJRkmkskrylW/
-	YUHyAOUGzCp79e5MubJTmQ1wmMGHfiSEokdpvGWPrXxjFkHAxP56bKhxorREdwbWCBAATwVipv7
-	RRSq24flbhNGOZW+iw+zt322is4YrKBCKp6hJxGwgZ6Aenz/kI5uaGtuXE7xXMNoCHW3kVZyQd5
-	jS6kx+dZAXvrbHS+HMuSY6P/zh5vUFfq80VVrAjUFZt4/rAetEjA5x4Vu0STZPwr/3jpEe0aYrK
-	NLUE=
-X-Received: by 2002:a17:906:4fd0:b0:b73:7715:ac83 with SMTP id a640c23a62f3a-b80371d345bmr1471768866b.44.1766506935491;
-        Tue, 23 Dec 2025 08:22:15 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFDgtKwDEeqrVZ92+4oKCndyc9wVzJFED1Ykvg3bZfeGJ2owsbM3Hp1YtZvXRag/anoxgIQeQ==
-X-Received: by 2002:a17:906:4fd0:b0:b73:7715:ac83 with SMTP id a640c23a62f3a-b80371d345bmr1471765766b.44.1766506934984;
-        Tue, 23 Dec 2025 08:22:14 -0800 (PST)
-Received: from stex1 ([193.207.129.231])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8037ab7f7bsm1449868866b.18.2025.12.23.08.22.12
+        d=1e100.net; s=20230601; t=1766506985; x=1767111785;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Qk54TIE8w4c5rJwH2KoEkkMPQcoEF2GBpS3X0YnMXkw=;
+        b=fsTS3ykDTiUPud0OkZFUn22di1vdnTspQD8IDbm7fYJpQnrWI7y+w/mu5T1WCfrRds
+         TrDZuMVsa4Xo6ObozhgYkm3xIanP2AEqijssq757z2dMBmS2jVWOzUTKgD52awWtoKIE
+         KtSewTyBWXgYr9qJXXx1MCx+ze53SWeZw2PNZNCNpgyOFEbTaju3mHUPtJTKzMypof4/
+         Vtf3SKR5CKx006gsM/yg/GlEfduKWRwSF5u4yBg0XA1zU3fIjhvO1QspsMUx92itU5zK
+         FuIofTWkJwcq9ak7Z78PaBH+5OTPmrUZnQmxsdbC9CdYDE364zI137OhIDZ1sCx84qKM
+         hhKg==
+X-Forwarded-Encrypted: i=1; AJvYcCVTZthjNY1kts6QqaeOig7VrJdJPwW27iNjp0lQjOiiGk1GfbXXnur0U5kyibCv/VqZ5b/jN58=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1VwbKm4hwPBE0EQxsSv5sKLspwtlxLexHfizUBGYY+TCYgHkG
+	kxDhjntPi7Pjs1BN6hI51U96NfThPnGMOmjla2NrRi+P2SHK1wdx+UUidc6sQQ==
+X-Gm-Gg: AY/fxX4hCK6dWixwtPu00RCUyMcs4gbc/Wb+UrzpoZlDLvEAFCJmMQJn4pWbnODrNJf
+	qcGZsfEGyXVQ3a77WLFhpPUhQubHuzHsvj6V0RUcLQDHt/T3NXxWd+ttX0r0y9xg78+oXEnoRv+
+	zaktxRcbsUnfEAPWAdojFfyPW1Sp4lowTVP08Lm7ZtX9fJj/yiD0/UDKboUKyexTVdUHoGk6zq7
+	uODjI3cmMFt0Dy8ufoWNXKJOjY1vReUTHq+SXkAoXsHpDCC3SodjLS+4yyY1EJPL3JvKNxg6DJc
+	rJp9gWjeb77nQ7FzavzbqGvXitmIa81dzjpk9veG4ljRkNl0jnXntTCwfp/5KijThl70XqW8Pc9
+	lQM+hS6vTgU7oNGL8noCo/+1II/bbEGa3UfIf3GgyAOjMec0h1jftW3sztIxrswNLGhffmENf7X
+	78CPwVHXI=
+X-Google-Smtp-Source: AGHT+IEg2VOV6xQFyK5bxxWkakIqXvU6e21ZRjY5vePVFUMHZX0s4GdRKrmFH3ID33eGm49ucr5Sxw==
+X-Received: by 2002:a05:690c:6289:b0:784:8673:6f6f with SMTP id 00721157ae682-78fb418d412mr129503467b3.58.1766506985420;
+        Tue, 23 Dec 2025 08:23:05 -0800 (PST)
+Received: from localhost ([2601:346:0:79bd:4913:14a4:1114:ff0d])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-78fb4562df4sm55596637b3.55.2025.12.23.08.23.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Dec 2025 08:22:14 -0800 (PST)
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: netdev@vger.kernel.org
-Cc: virtualization@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Stefano Garzarella <sgarzare@redhat.com>
-Subject: [PATCH net-next] vsock/test: add a final full barrier after run all tests
-Date: Tue, 23 Dec 2025 17:22:10 +0100
-Message-ID: <20251223162210.43976-1-sgarzare@redhat.com>
-X-Mailer: git-send-email 2.52.0
+        Tue, 23 Dec 2025 08:23:05 -0800 (PST)
+From: "Yury Norov (NVIDIA)" <yury.norov@gmail.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Yury Norov <yury.norov@gmail.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/3] ice: use better bitmap API
+Date: Tue, 23 Dec 2025 11:22:59 -0500
+Message-ID: <20251223162303.434659-1-yury.norov@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,44 +96,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Stefano Garzarella <sgarzare@redhat.com>
+Use better bitmap API where appropriate.
 
-If the last test fails, the other side still completes correctly,
-which could lead to false positives.
+Yury Norov (NVIDIA) (3):
+  bitmap_weighted_xor()
+  ice: use bitmap_weighted_xor()
+  ice: use bitmap_empty() in ice_vf_has_no_qs_ena
 
-Let's add a final barrier that ensures that the last test has finished
-correctly on both sides, but also that the two sides agree on the
-number of tests to be performed.
+ drivers/net/ethernet/intel/ice/ice_switch.c |  4 +---
+ drivers/net/ethernet/intel/ice/ice_vf_lib.c |  4 ++--
+ include/linux/bitmap.h                      | 14 ++++++++++++++
+ lib/bitmap.c                                |  7 +++++++
+ 4 files changed, 24 insertions(+), 5 deletions(-)
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
----
- tools/testing/vsock/util.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
-diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
-index d843643ced6b..9430ef5b8bc3 100644
---- a/tools/testing/vsock/util.c
-+++ b/tools/testing/vsock/util.c
-@@ -511,6 +511,18 @@ void run_tests(const struct test_case *test_cases,
- 
- 		printf("ok\n");
- 	}
-+
-+	printf("All tests have been executed. Waiting other peer...");
-+	fflush(stdout);
-+
-+	/*
-+	 * Final full barrier, to ensure that all tests have been run and
-+	 * that even the last one has been successful on both sides.
-+	 */
-+	control_writeln("COMPLETED");
-+	control_expectln("COMPLETED");
-+
-+	printf("ok\n");
- }
- 
- void list_tests(const struct test_case *test_cases)
 -- 
-2.52.0
+2.43.0
 
 
