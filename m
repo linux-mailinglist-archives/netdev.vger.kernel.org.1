@@ -1,90 +1,90 @@
-Return-Path: <netdev+bounces-245787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B5A4CD7F3A
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 04:16:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6600ACD7F5F
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 04:23:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id BB4373019893
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 03:16:18 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 073BE303BBD0
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 03:22:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C59192D0C8A;
-	Tue, 23 Dec 2025 03:16:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B96C62D4816;
+	Tue, 23 Dec 2025 03:22:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ag6QkYLR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OOJs8TTA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F9C870824
-	for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 03:16:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32FE92D1F6B
+	for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 03:22:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766459777; cv=none; b=YMCZrwrLiJa6x8+tltdd5Ai5EV9l20+DfOBXzyVuh24v1yEq04pWEBLf7qg3r48VwhH3Ob7gBo3Lc0LDJEwQvrU3tBaJxoxQFkDBNB6SvM8nK3Ib1vdOmIZMvSUWtu69O5xU5K+ieJzPIO0bLzHoP+jFCrRKCCCPJKlqLZzuXl0=
+	t=1766460169; cv=none; b=ZoD5Djse8kUgSBtsOEesURbzavBsEbLhTFUML+TO/9j6D9DGaowE623kFmTXRHCNx4nqI/xqzVijXkF1AI59XWIBmEMEZGRaIdnIdvYxGmsWdWqWVUiSZqPMR7JCHZ4mUc0hNG/Fj1SeGKnM/nuT00a/7hWpvlNYOMXZa6n0mRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766459777; c=relaxed/simple;
-	bh=Mx/UmQpiIIEj3g1XtLjsQrkIbpEb1sO7h8QPcpp78vQ=;
+	s=arc-20240116; t=1766460169; c=relaxed/simple;
+	bh=nXx4iU/G89xerhbNe+u8rqRV/ooGUpUr+zBdOwqNUIk=;
 	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=MdnznC5dlEPHTjIzLHvQ4ioNj7CKFY8yzxCDrmYv2fwTmf9esqvdOrOyIsxyZpQPShWlyMguX4iTTvDgJWW+B8j8i72WPoTpyQ5i7a5MU91uF2x1tihl5zJvp4o5vWQn88889qBzrUVA8v+s/5YMpsUfD6myDUun9AeLxHy/TEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ag6QkYLR; arc=none smtp.client-ip=209.85.214.196
+	 Message-Id:References:To; b=WuSTggxN5yHVNbzPfc9wFc/j2NZCV2HojnQEEHvanSzrEnFKmLPPLG+uIUUc4NxtoXPypAz+/IW0BFPuhpVZWXpPWQaBC/kcFVs7lCQS7px2SO03K2sDHdSHll3dnEs6fu0JDJlCvuGpcCgl7ME3lfB5kEeNqKDD+uITTRwUwV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OOJs8TTA; arc=none smtp.client-ip=209.85.210.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-2a110548cdeso64340695ad.0
-        for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 19:16:16 -0800 (PST)
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7b9c17dd591so4005871b3a.3
+        for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 19:22:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766459775; x=1767064575; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1766460166; x=1767064966; darn=vger.kernel.org;
         h=to:references:message-id:content-transfer-encoding:cc:date
          :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BlWmvPevLxcZ1ApfaQlGkISYTXnx0tCKi7KeQn9/wc8=;
-        b=ag6QkYLRk36oKpnYOVqgLPh9o9181RmjXFoyiLT63EuKe78sZah1GlVwTUSrq6Zuuk
-         s+UWzZ2HudOohOlaeebWVMqG/sI5FR25EOZqh+guqxKv7LVYbG6XG/dRPgoDtsat7y8w
-         irXdEIYEa+LBW6DlhPIwOCeu9HAr8ZFS5/4NMVcuFkiXlVjPmwyg+LVcx3WpQJEgIqFt
-         2osYRs1Ed5vkH13O40DkU9Wo67J/qLwHJa2WiKrmI1uj9kgjG3gZ4aBZliDbcLSTUF0O
-         U8jgwRIUXUd3Ga+o+LMK9WzBtbpVbeT2Ip1BwVHercOIEJNjiYxolNwHfUsFKF5lOcsJ
-         042w==
+        bh=BIaw2BBgy4X6/8TUgYX4ddYdgedGRr8vnnHyY6AzWWg=;
+        b=OOJs8TTA9zmASvFlalfZRRHcw7yjthb+sktasAWSRJyLbmTTDv1yaZ7LIbgFhJYnZT
+         nfUzuSnWLKv2q1ygvKeNTVKLf2wR5OBafiWucKTrG2UYbw8+y0peq9wZxuPrhDKLvptO
+         gnnmC/8tur1l8TywRFHit5z2BnmOEzuCgYE8TtrdChDS9mqecZrUwIdOxWT1U5vyKSMW
+         kTResLiGzZJtxMkhmWAILe55gGIXsVFEvuiBNWDV00YqEnySMmjDxKIFhcCPF6IBJXqb
+         /0cDYRXtyIIq5GKcd4JK9xw7mCGR/WvmKV0LRzKwaGQ6xZ8IOUYVhuxEAIMj8Yk4mIIp
+         8/cA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766459775; x=1767064575;
+        d=1e100.net; s=20230601; t=1766460166; x=1767064966;
         h=to:references:message-id:content-transfer-encoding:cc:date
          :in-reply-to:from:subject:mime-version:x-gm-gg:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=BlWmvPevLxcZ1ApfaQlGkISYTXnx0tCKi7KeQn9/wc8=;
-        b=j7focfO8N79qT5C8SRpxsESQ3Ny+1YL63ZbtFmmkcVGU71jsG5TX3PYeW+i12vSLoM
-         7bM5J85G6WksDg4hMUqu7PIhNy/FwE4WNd2PkS/fsQFQzj6x/7fA5xCTrCPPrQHiisaK
-         QFFA54gGsV76AYMm9UGl1F4T0+IqTAysMC3HDi63aDKmNj/3w7QEUicJ1KlKTtLpemtI
-         SMnvoSieSnj3dZtuCL3Jc5OEeV7f1+k/cwWFRrJvW5Q5cKuX5TyCbdyrdsHdcYdH/K1k
-         2bA+C0tgyHaUreczxk7KkQqu3HF7WN6A17Z/oSdkvIkD9vgYbenMoUWaoGQExJznh5Kr
-         98Eg==
-X-Forwarded-Encrypted: i=1; AJvYcCWq75ruyu5z9LnR6AQerp8/1DbPEJ+IFkyBFq6QjDD6/y/A3u4Zjm67ZroeYH+0T2PNYGQoSCs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyRxHjfhMqrdRxPDE+Latk14hLTnDtg/crvrAqdT9o28lmHiF/x
-	DCg+c1TgOMY6smdWjC9qDZAYLsrI//gIkm7ir3/wQb/4mtTnCerbVO7L
-X-Gm-Gg: AY/fxX75owTvF678h6vBWu4PMVCUi7FNIGUUohsvmvrf1tyOR4GI9KHicpZBt0QnB7T
-	vxPZo2wyNFRBYjm4+owAguybpgFN/wjOU5XjrURzY4a6ShHZe7V+7NgcG+kr51ts9IVrRmhXpxN
-	DIEkrnEAs20XddOFm4OjOaaTj5Rkz/A+gril4QUPkW7MsnjdZN4Nn/E2t87gEiSV+1BoGC7eDzr
-	GUflR6NEFP9E6pPzaHJZZFNTLpJ5KUmA3Oo4ZKWYleirNNTLTiF5m1Ass5Hv1tyPYR6LT3thv3v
-	4Hq1gp0AK50MatyoLSZJPlG8rnejjcnp941hsLVUsEcEu5KuaWUf8UHunr+mmKLJljx9PwbzIYR
-	yh0T91Gb0twXCKQsyDaGiol1exB5kaBIPX32EPhRiDE/yr758/a0QQPGHeOSusEpG6OFNbjCQBo
-	WXN9eo/3Scjohss3CYFA==
-X-Google-Smtp-Source: AGHT+IHsJHcvBEd1oY/Js4mF4dqnLZlZO6zVgt/BH5AZODSD/0YmbnGfhPQbR6X+bCQGU0pLbsm+xg==
-X-Received: by 2002:a17:903:2a8b:b0:298:1422:510d with SMTP id d9443c01a7336-2a2f293daefmr125439995ad.48.1766459775168;
-        Mon, 22 Dec 2025 19:16:15 -0800 (PST)
+        bh=BIaw2BBgy4X6/8TUgYX4ddYdgedGRr8vnnHyY6AzWWg=;
+        b=Rk2HtdBnFBj3CmWIRV7ZXgYthMY4kh2dA2DWni9YaChYQHJyYklwPs215oioxTDz3m
+         3VT2yGOiOkNe8wiHvCRYt8GcQl8m1PGIYYWwI/oAzyZCtJ/m8f7EAhgFAuAWLDczuGQC
+         KcR6H5Ss57Ho9hwgKv+TicSVu33viAThpoNDTEYbCuAJEXkApOXB5WbsyTzI+TM1wjPu
+         h3mck25gPyYVqgnMUiyPHOrdQJZuSXwXFRJIJXCVIpo97dNfqp0vIW3S/2GzRpAuTCo+
+         CEjeojwZxGY+CP8oPzuL7eqSnFj/xvFcJJmpAtz3OGcZ7bHoeb1u9wr6uFYexN7kpnE+
+         CjYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVNS/jNKLFGHz/n4NmSO8YkwaBH+n06vi65GXi5ipfT2yaFQnckLHIm7cbtYu7tMNsoJMsHE48=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBWScOdEtpvB2Ygrov2KqC6KgC2PiPAjA7lnYMzj7j1xgu4+u2
+	7BjUf5fuSJoPWU+72ojel6LS2T1ER08ogG6B3GQy+AjZS6XhGxrD5/dy
+X-Gm-Gg: AY/fxX55t47se+t+Z5Xl9kG3gwICphogJaFOI+9rJJ4BH66AY8HvSCyy3uzM5IZdSaj
+	6kOb6MH6HSI+NsvxxMT8Th/b5oG+mUSMIYCSUW4HAs3YeBOxdODNnbymtcwZyd1PesVGe7pHaKD
+	WST271G+2UnMepc2SSyyDpP5eSsOZJuOBX9Kng87A9khCtvFuXnzPwZqFdfBsb2qx5GifEuyCmu
+	Pyf9gGlnjqH6BBVGZp7Rr8u2ta9nUVbchLQRpUXabT5HmfNlj+bwrThItC4zpUoRwQNrbF6eyYV
+	kghCWVhkOuGEjV5SSAkKkJxQXlKEU9DdPgafvXA1yt5+nVLeEPJXmjp6r1QBZ0tks8AJyPx3H2e
+	Jrf9BZUFFaSJn+ckjleJnlxWl3T5vavbxNwl061SUXm5FUpAJAnZ3VDC7tk9YvET0pbkV7jvKMo
+	GHJ//+H/6j7VGPR2xqdg==
+X-Google-Smtp-Source: AGHT+IGyFG9HgVkid7kCIt03WV3OP+yzvzYv8vgTEUV5lnnwd8VTxqHvW5riW9AUU8KdGUm/0KVsJA==
+X-Received: by 2002:a05:6a20:7291:b0:35d:d477:a7ea with SMTP id adf61e73a8af0-376a7af69f6mr12887207637.19.1766460166103;
+        Mon, 22 Dec 2025 19:22:46 -0800 (PST)
 Received: from smtpclient.apple ([188.253.121.152])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a2f3c65d66sm109554945ad.20.2025.12.22.19.15.59
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-c1e79a13f95sm10355774a12.9.2025.12.22.19.22.37
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 22 Dec 2025 19:16:14 -0800 (PST)
+        Mon, 22 Dec 2025 19:22:45 -0800 (PST)
 Content-Type: text/plain;
-	charset=utf-8
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81.1.4\))
-Subject: Re: [RFC bpf PATCH 0/2] bpf: Fix memory access tags in helper
+Subject: Re: [RFC PATCH bpf 1/2] bpf: Fix memory access tags in helper
  prototypes
 From: Zesen Liu <ftyghome@gmail.com>
-In-Reply-To: <CAMB2axPpB7Km=_7J_QTcQV8SvuFMKqg-_fCyRHEZKNfr7WL2Gg@mail.gmail.com>
-Date: Tue, 23 Dec 2025 11:15:46 +0800
+In-Reply-To: <CAMB2axPcJ=U69xyyyY_7og8OALRCbOgeppQv416k9yvMiD9CvQ@mail.gmail.com>
+Date: Tue, 23 Dec 2025 11:22:26 +0800
 Cc: Alexei Starovoitov <ast@kernel.org>,
  Daniel Borkmann <daniel@iogearbox.net>,
  Andrii Nakryiko <andrii@kernel.org>,
@@ -116,52 +116,24 @@ Cc: Alexei Starovoitov <ast@kernel.org>,
  Shuran Liu <electronlsr@gmail.com>,
  Peili Gao <gplhust955@gmail.com>,
  Haoran Ni <haoran.ni.cs@gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <991C3D59-65D5-4B31-B667-EDAF348F9F7F@gmail.com>
+Content-Transfer-Encoding: 7bit
+Message-Id: <0C2A0E4A-F35B-4247-B0C4-42C52C6786B7@gmail.com>
 References: <20251220-helper_proto-v1-0-2206e0d9422d@gmail.com>
- <CAMB2axPpB7Km=_7J_QTcQV8SvuFMKqg-_fCyRHEZKNfr7WL2Gg@mail.gmail.com>
+ <20251220-helper_proto-v1-1-2206e0d9422d@gmail.com>
+ <CAMB2axPcJ=U69xyyyY_7og8OALRCbOgeppQv416k9yvMiD9CvQ@mail.gmail.com>
 To: Amery Hung <ameryhung@gmail.com>
 X-Mailer: Apple Mail (2.3826.700.81.1.4)
 
-Apologies for the resend due to an incorrect configuration in my mail =
-client.
-
-Thanks for your comment!
 
 > On Dec 23, 2025, at 03:29, Amery Hung <ameryhung@gmail.com> wrote:
->=20
-> Perhaps you are conflating one of your proposals here? This is fine
-> currently. ARG_PTR_TO_MEM without any annotation is viewed as BPF_READ
-> so passing a read-only buffer should work.
+> 
+> I did a quick search and there is one helper slipping. We should also
+> annotate arg1_type of bpf_kallsyms_lookup_name with MEM_RDONLY.
 
 
-Actually, that is not the case. I tested this again, and ARG_PTR_TO_MEM
-without MEM_RDONLY does reject read-only buffers. You can reproduce this
-behavior with test_d_path_check_rdonly_mem in selftests by removing its
-arg2=E2=80=99s MEM_WRITE tag.
-
-> I think it is better to make the MEM_WRITE, MEM_RDONLY annotation
-> explicit and check it in the verifier.
->=20
-> Flipping the default MEM_RDONLY semantic to MEM_WRITE does not prevent
-> a similar bug in the future when we have helpers/optimizations/checks
-> rely on an implicit semantic.
-
-The current default semantic is in an inconsistent state: it implies
-neither MEM_RDONLY nor MEM_WRITE. A naked ARG_PTR_TO_MEM rejects
-read-only buffers, yet tells the verifier that the helper does not =
-modify the memory.
-
-I see two ways to resolve this ambiguity:
-1) Enforce explicit memory access tags (disallow naked ARG_PTR_TO_MEM) =
-as I
-proposed eariler; or
-2) Change ARG_PTR_TO_MEM semantics to behave exactly like
-   ARG_PTR_TO_MEM | MEM_RDONLY.
-
-I would appreciate your thoughts on this. :)
-
+Good catch, thanks! I will address this once we reach a conclusion
+on the ARG_PTR_TO_MEM semantics.
 
 Thanks,
-Zesen Liu=
+Zesen Liu
 
