@@ -1,169 +1,121 @@
-Return-Path: <netdev+bounces-245805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E7E7CD80AB
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 05:22:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0691CCD8156
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 05:54:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 3D995300EDC9
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 04:22:00 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 754DD3019846
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 04:54:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C8082DA76C;
-	Tue, 23 Dec 2025 04:21:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88EB02EFDA1;
+	Tue, 23 Dec 2025 04:54:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="SCKY2EKN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aARXnC5R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A570B17C211;
-	Tue, 23 Dec 2025 04:21:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1219F2C0F9E
+	for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 04:54:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766463719; cv=none; b=USvGgW/18cW+jU0rGvsWxSIueTTNx5ua+p7VT8O2+H6oJ5lCbDmqfgpA26iu+nFG+qCuARDn8sK46cvmlsswmqBQLw/77yeD+LX+xEc0T7CvmJwCe0dcQ1HiY2lBxmDkOl6ehRkdjC7ywYSgKmjpeQtt9Uy4m2SALzClTfIY/NE=
+	t=1766465644; cv=none; b=ikHBxy04IoEvhBcK9UnwKA3lcWlira21q4aD7Lcva/cBDmsnjVhj2V9Io/1vegNyozATfy6jpRKUohGRZ2znM+YCckHV8tOGq4TsdrBixfjJdCAnFxT550h4LiV8CpOL4E1s1N+4iuZZkusQONPVApMarNjfqY6RjjALhujd1tk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766463719; c=relaxed/simple;
-	bh=ZucMsqwBXyyGLkTHcrn0L9mT4uNd10mnt8iid8e/6Sg=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mGSP8WrROWsi/LhNT1AG87gvHO4IXbPWQPfcFgoW6RopuMAa7QuKZlDt479uFCfTbxAcUF97LegxSkeF0X7yJ2EsGaKDBtRsqKAEqmf78+uXLRsZUBm4kSTwtk/+ubDRevvnxcUgPPAYw1PJ8Md+O5Y34tS61ps9ttX1Odae11c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=SCKY2EKN; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BMNRrDk2748926;
-	Mon, 22 Dec 2025 20:21:24 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=slnD4MPrfPlk092s27dE/kqcR
-	tDBKwpnX9dTnNllAI8=; b=SCKY2EKNUvxWDfCAU5n6ngeHMEyMp220yIMhEBUeI
-	qf3JfWx4iYnL/SOmu0A4ZFzQBZsa9q/2iHvIt15Ky7jufyvNFc8CDy2NXkOcOpB9
-	EF3RjaoK0ca95AMQZbsRrsMwDx5NIdCMbz6ef+xD3th2Cx90l3isp1KlXH1PDonJ
-	1V7qYekbYIA+oug2Mu7B+hmWlfbN9/VMsDTRlob8tulENHsXlxjzya5geowDjPZl
-	AK4BiR50BAWYvZRQfmB7LalJkTwojgEyz3Nfbbhzhx2PySUDR9yfUIYdoNUdqFml
-	lh511j8aNeN31vFx4f2+ji/jofL9RkMVVGbWpgl19Cnsg==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 4b7fpb8dh5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 22 Dec 2025 20:21:24 -0800 (PST)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 22 Dec 2025 20:21:23 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Mon, 22 Dec 2025 20:21:23 -0800
-Received: from kernel-ep2 (unknown [10.29.36.53])
-	by maili.marvell.com (Postfix) with SMTP id 3A7305B6939;
-	Mon, 22 Dec 2025 20:21:20 -0800 (PST)
-Date: Tue, 23 Dec 2025 09:51:19 +0530
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: Breno Leitao <leitao@debian.org>
-CC: Joshua Washington <joshwash@google.com>,
-        Harshitha Ramamurthy
-	<hramamurthy@google.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: gve: convert to use .get_rx_ring_count
-Message-ID: <20251223042119.GA319551@kernel-ep2>
-References: <20251222-gxring_google-v1-1-35e7467e5c1a@debian.org>
+	s=arc-20240116; t=1766465644; c=relaxed/simple;
+	bh=qLpP523aAmyAJ41p9m75RrcgnIuRG0JYZTi48i2BLGk=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=q3LjmMvMiHsmi8oeNMoaZnWulcOan8BDhuzw+v6K8/b5xo81yhS9233wUZ1r2GRez9ktfIjUS2iIl4Bk8Q6xI4SmISLL3FEZAZHDJ/6UORpI0581yjp0z4BKe9AooP4Y+rwiAtsL7qRMC4LJ0NG+cxUiCJvAbcrF0ojv9sg8KV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aARXnC5R; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-bcfd82f55ebso2125938a12.1
+        for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 20:54:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1766465641; x=1767070441; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Wq+2iFrosRcl8h/Pjv1SkVbM8N3eRAOAbbgT8dXVoCY=;
+        b=aARXnC5Rwnu5Kjw4wc3Ekhvh3Ucg1gqNy2/Ev1yJ4pQqhT0lfpposnvYeqy1dWLM6U
+         Hj5znCCekstPeX3iOIcaU7iJu/e9QOofkhRA5HQog9Ulzp/cyTj2IXRBlf5UX5L+ubHx
+         JiFGtZ7Z0Yc1Ei04cY9mbZo6p6QxtNQPIHBhykbBhOY3qj8/EohEKHsJ0pQMzRItbo0x
+         P3574ZepERegH/XxPkj87kDi7P5LzJ4JRlmXuSi7fUCdOzgP2wspDHMLhkyB8WmWTGum
+         jYKQbdTodRGflVGE+0Wnnw/MbYW+gE9ypGIKkCaVnBVRwbY7lBb0A4QG1mtJN/95caOj
+         iTAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766465641; x=1767070441;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Wq+2iFrosRcl8h/Pjv1SkVbM8N3eRAOAbbgT8dXVoCY=;
+        b=MurXUxJ89R/H9QyIUX7pfnbjxKS6xDacWBEpqazYQmMEE1oQhyhU6Tf2b+oqdsDu44
+         A/Ck9mw5YpfrrNxjGAhq67tnMEPVlxwBe/J9NtULKxNa3PF2kNxyNBjkngnrA6MSGWzv
+         pT4VMjR83LrI33nJdfP9rFuWMN0CQJxs8zIJ8mOt39x1aHT9SPMvTvrzekew2+p3f3tX
+         GT6SJAjI4gqt+octp/mKCysRIQYKz/dJIUfJaGgnxPkhkPWccwJ7o05Qp5DNgcIOMalN
+         4Cp6HIoL4iT+NF9ABM49KUuOW/XbgI/Bhx3eIoazkJF1i8cJP0qErq6HXTRz+Gq3nflI
+         BIeA==
+X-Forwarded-Encrypted: i=1; AJvYcCWHQhv6D2Zk9EQbVdKGT+ce9aQzozILydm5RVA/rFcBBmIhBrEWVupWysxE64mMJaaa3p7bFKA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxg907tK+kFEF94lpfGRY1K1ALRfAtloM8eC6N5VzU6NmX8sy8r
+	Ud+aG+RCF6m9H1wSIekXqLe9/Y2qjGM/8zQGNOceSeTQbp6LVQqw44Pt
+X-Gm-Gg: AY/fxX6fBB+yO/rvzI24xl2i2D7Dumi1zOcAClki4vyRaMMyXjB/Zw07i3+vqLR1Kv5
+	a+wEAazRMvQHM8xA+pPw12RBWg2eufYbpjeKUnmKBeWS0oehD5qf1FwU5wHeZ3Bs/K8jqqB8cTl
+	32jmM+Ev03G0mrl57rA+f588Dld5MvfbCIJ8Adzn2zOM6MP+NtI4FneFIkT89FuqZV/ZHAzryDh
+	Pbt6DInZ/RPpGclJJcY04Q0oq1kcaj8F8eD0M3Hmi5y64nmWxsNCiog10T/2hRmxeLyI//UBCfI
+	a89lrGCnVivP23didjE9I8829bxjtxbP/NG5dEP6o2m5zPRzWH9jonhBZ1/MHTcpdVCeyF/7rry
+	7Aa9lqJLMofgMS1XCK7HyVJZOOpvtOe8XVvOph6oFEyvRsxtso7q5CHx4WghyT7P1ob/d8GQ5ML
+	5tEx+hFsZ9ErLmQjLL772k9uGC3Kn0vBTEaf3hyc1P4qqKXOPoexD+aGxeZmkbT/e+BCg=
+X-Google-Smtp-Source: AGHT+IEnueW9XJWReJEoENzLygv/WqzFObA6mLnZX3ys+kdkGpI1RYUpgPanB28I1VK0QGm/vDzE+A==
+X-Received: by 2002:a17:902:ebc1:b0:2a0:a33d:1385 with SMTP id d9443c01a7336-2a2cab16191mr172702915ad.17.1766465641326;
+        Mon, 22 Dec 2025 20:54:01 -0800 (PST)
+Received: from localhost (p5342157-ipxg23901hodogaya.kanagawa.ocn.ne.jp. [180.39.242.157])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a2f3d776b2sm113451265ad.98.2025.12.22.20.53.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Dec 2025 20:54:00 -0800 (PST)
+Date: Tue, 23 Dec 2025 13:53:39 +0900 (JST)
+Message-Id: <20251223.135339.1140460779640053821.fujita.tomonori@gmail.com>
+To: tamird@kernel.org
+Cc: fujita.tomonori@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
+ boqun.feng@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
+ lossin@kernel.org, a.hindborg@kernel.org, aliceryhl@google.com,
+ dakr@kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org,
+ tamird@gmail.com, gregkh@linuxfoundation.org
+Subject: Re: [PATCH 0/2] rust: net: replace `kernel::c_str!` with C-Strings
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <20251222-cstr-net-v1-0-cd9e30a5467e@gmail.com>
+References: <20251222-cstr-net-v1-0-cd9e30a5467e@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20251222-gxring_google-v1-1-35e7467e5c1a@debian.org>
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjIzMDAzNCBTYWx0ZWRfX7g3XvpuB622U
- cw08Z1B0m/xybNbCysy+fAqmuXlHw/oV6RBx+Koq2IJmOQ85lQHu8edPH9ymIfcgs0Au2lwCOv/
- mzQcx61Zzcth5oHjFoOMPyG+RiqXPFujPqIcoJFu3JPBhehsfJ8mmDqmcrQNC73ipOyzUtr/l5q
- +OrdmpGpzO+BBgkK9shf09AZviGwSFLocmk9lzQRYgYSW2NLOGlaYJRGbwo07tn8hfBlXKa66tM
- RvDYVBgThQ8ZqswP7f+2DmDovMcWp81x1bGLq5SyTXqOjnkLqCYszTn6fLD5Cns3SgRAeCJEae8
- bjt0hZlfwBN2zW8RlaaCpj5LL+P3AKaWShK7oEgvaloRhByUUp/5P1mq6OH1/7Zm82h0R2A7QcC
- XH25xxKPcepHcb1818OTA0DzStnN6O/xEgEVOoxcaLUFuX+BcSsZSRPUCunZLLLOMqeYDU/x21H
- CgAjGdOKxahbyDVvwCw==
-X-Proofpoint-ORIG-GUID: oLYAo691sjOnw2pdluf5saBlQypyq0G7
-X-Proofpoint-GUID: oLYAo691sjOnw2pdluf5saBlQypyq0G7
-X-Authority-Analysis: v=2.4 cv=eakwvrEH c=1 sm=1 tr=0 ts=694a18c4 cx=c_pps
- a=gIfcoYsirJbf48DBMSPrZA==:117 a=gIfcoYsirJbf48DBMSPrZA==:17
- a=kj9zAlcOel0A:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=xNf9USuDAAAA:8 a=M5GUcnROAAAA:8 a=SnqcOUTi_U0GFHmG1jsA:9 a=CjuIK1q_8ugA:10
- a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-23_01,2025-12-22_01,2025-10-01_01
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-On 2025-12-22 at 22:46:27, Breno Leitao (leitao@debian.org) wrote:
-> Convert the Google Virtual Ethernet (GVE) driver to use the new
-> .get_rx_ring_count ethtool operation instead of handling
-> ETHTOOL_GRXRINGS in .get_rxnfc. This simplifies the code by moving the
-> ring count query to a dedicated callback.
+On Mon, 22 Dec 2025 13:32:26 +0100
+Tamir Duberstein <tamird@kernel.org> wrote:
+
+> C-String literals were added in Rust 1.77. Replace instances of
+> `kernel::c_str!` with C-String literals where possible.
 > 
-> The new callback provides the same functionality in a more direct way,
-> following the ongoing ethtool API modernization.
-> 
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-
-Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
-
-Please repost after net-next is open.
-
-Thanks,
-Sundeep
+> Signed-off-by: Tamir Duberstein <tamird@gmail.com>
 > ---
-> PS: This was compile-tested only.
+> Tamir Duberstein (2):
+>       rust: net: replace `kernel::c_str!` with C-Strings
+>       drivers: net: replace `kernel::c_str!` with C-Strings
+> 
+>  drivers/net/phy/ax88796b_rust.rs | 7 +++----
+>  drivers/net/phy/qt2025.rs        | 5 ++---
+>  rust/kernel/net/phy.rs           | 6 ++----
+>  3 files changed, 7 insertions(+), 11 deletions(-)
 > ---
->  drivers/net/ethernet/google/gve/gve_ethtool.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/google/gve/gve_ethtool.c b/drivers/net/ethernet/google/gve/gve_ethtool.c
-> index 52500ae8348e..9ed1d4529427 100644
-> --- a/drivers/net/ethernet/google/gve/gve_ethtool.c
-> +++ b/drivers/net/ethernet/google/gve/gve_ethtool.c
-> @@ -815,15 +815,19 @@ static int gve_set_rxnfc(struct net_device *netdev, struct ethtool_rxnfc *cmd)
->  	return err;
->  }
->  
-> +static u32 gve_get_rx_ring_count(struct net_device *netdev)
-> +{
-> +	struct gve_priv *priv = netdev_priv(netdev);
-> +
-> +	return priv->rx_cfg.num_queues;
-> +}
-> +
->  static int gve_get_rxnfc(struct net_device *netdev, struct ethtool_rxnfc *cmd, u32 *rule_locs)
->  {
->  	struct gve_priv *priv = netdev_priv(netdev);
->  	int err = 0;
->  
->  	switch (cmd->cmd) {
-> -	case ETHTOOL_GRXRINGS:
-> -		cmd->data = priv->rx_cfg.num_queues;
-> -		break;
->  	case ETHTOOL_GRXCLSRLCNT:
->  		if (!priv->max_flow_rules)
->  			return -EOPNOTSUPP;
-> @@ -966,6 +970,7 @@ const struct ethtool_ops gve_ethtool_ops = {
->  	.get_channels = gve_get_channels,
->  	.set_rxnfc = gve_set_rxnfc,
->  	.get_rxnfc = gve_get_rxnfc,
-> +	.get_rx_ring_count = gve_get_rx_ring_count,
->  	.get_rxfh_indir_size = gve_get_rxfh_indir_size,
->  	.get_rxfh_key_size = gve_get_rxfh_key_size,
->  	.get_rxfh = gve_get_rxfh,
-> 
-> ---
-> base-commit: 7b8e9264f55a9c320f398e337d215e68cca50131
-> change-id: 20251222-gxring_google-d6c76c372f76
-> 
-> Best regards,
-> --  
-> Breno Leitao <leitao@debian.org>
-> 
+> base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
+> change-id: 20251222-cstr-net-3bfd7b35acc1
+
+Reviewed-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+
 
