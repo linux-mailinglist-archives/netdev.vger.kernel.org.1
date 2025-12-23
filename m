@@ -1,118 +1,117 @@
-Return-Path: <netdev+bounces-245807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51F8BCD8163
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 06:03:51 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A25CCD81C0
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 06:14:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 8BA4830022DA
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 05:03:50 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 03DAF3018961
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 05:14:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E8ED2D3A60;
-	Tue, 23 Dec 2025 05:03:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D3tPFnPA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E22A2FCC01;
+	Tue, 23 Dec 2025 05:14:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from localhost.localdomain (unknown [147.136.157.0])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ECFB2F290E
-	for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 05:03:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A41592F7AB1;
+	Tue, 23 Dec 2025 05:14:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=147.136.157.0
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766466228; cv=none; b=QLh8vJXBfTO4OkX39eDpKJ1R2SviJbC/50x3PrPPZHu9qWKkM07XawWBQTcWSWgyIy9bPrPnsv9cxmfIPr2lqLeoRSqixCS+jP+I0Tt1HvjLUvXpDNZP7mmoe/QhZJ6GuCIsX74cx7YtOrvmOSNme6fuffz7yTTWTJSY1xnT4ew=
+	t=1766466864; cv=none; b=ViEvKIOP99TYCV5lldhUaj47+PxmoCNJyyelrUi2sJjbOE2GM1Njfh4Xxy0qECMxV6sdJy36CAv2/4CWp657fv/hXDLp4+HKyw38uOLQAVCas5ZAzXglhGXKa3Y2t6yUDKl6AdzNwy/0rS7Jk5ot2fjOiAJIO+wsP31LJBJUjBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766466228; c=relaxed/simple;
-	bh=a6bMG1ygbOgllwQV/xEFnD86doxRXT3uJEPvX1pBaWE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EfHPlbOUTS7C5G46YCleoQHrsS9sfkBHI4k3L505FgN55/io2jJKwEsl/5oHsJ8Stg5GS6R+JSOF0GS5bARdzXn1lJ6vjzf1yLiA7ufcEAdOS3cWSZZ32opAfvJLI4UoZvrRBwAGJY002VUIVud4iKO5xMjLTu0rotsHZw4pggk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=D3tPFnPA; arc=none smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4ee13dc0c52so37864231cf.2
-        for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 21:03:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1766466224; x=1767071024; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a6bMG1ygbOgllwQV/xEFnD86doxRXT3uJEPvX1pBaWE=;
-        b=D3tPFnPAYtkFYloPeyyz5ldSTVG3day4Q2dkoBJ/37EXwsnVetPikYX+J1H5gDpGyl
-         M8CJRXv4j7VzsBUJi7vnzEPY/nGisayE5bGutuH9Cgsu+aGucIpuRvN68acX2qenD3ve
-         gCRa3oCGTGuby7B1uDCqnAvFKboSd2erffJ9ur/WLInNyVpD9cAT89ZYPwfKiUWezBLg
-         fatZER9tnp71hdDNI0lC2yTtZzfhagKTEpmVsmArbh9dkJYbEo+ul/EESWQZNL+hYEyh
-         +R12wq8/02FxVJal7yed+xf8LKtxJkNxLZ7H7lFuYrYUcHomFpGrQgIlzXg8aAdiHTDX
-         T6EA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766466224; x=1767071024;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=a6bMG1ygbOgllwQV/xEFnD86doxRXT3uJEPvX1pBaWE=;
-        b=bZ6NRTRr9TKUi43y9U2+xvwMOBzF8IZesot3eEaWpKUrP5PXjxelcZ0anQvxQWGKon
-         6IXoym3V/oxUJbWA1rRQ5HcmQMPqb2L1l0wOlYHcRTP7U3p47shHSLvwzoNL8aEOh3Vi
-         pmUQTORuxGY2IdkwuNma9lYe6NepAI+twCObO1mIYooSoQ9GyHeDUHdoDniq/YSbP8iN
-         CMPpJa/FcdqF3UXpzXsn8334nL/3xd1O0iFrcST7qpb/ARBYmRAXgrPQvb/Cp7x+oixN
-         nRRYYwCr/HVj+jKla13Jn3Unzc41mMwAUHmx5GZGPZzeYvrpLjxeyxqZe5ftOthjqeeI
-         sj9g==
-X-Forwarded-Encrypted: i=1; AJvYcCXcntXWw/tl9x0GMBDxVftSwf471/O+alVwo1wjEXg0dLQDyE8hbDhoy5JucE5w0qhDnj2YJL4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/29pRKHfLV3zYEDQhmqjWKvY1I5pqflAytAc4dtfpajjhIpS9
-	EdHn58FiNuTiKaDNsWdmK4pifNyHodjqhTnhZmbOE4Q/3f3g8zfXirA8PIUaKY9tJwLfFzIlpMu
-	aqWjKERT1qCvNXjEYFjF5j00W0ec0MOUI2fADJm2j
-X-Gm-Gg: AY/fxX6PcWDtbEIzhTA0pq2h/g2uyQGmEU/tZg5PmKRjEL0dOKRy02KDMBmge3Quz+R
-	0W6cOlauegA1qDzmkCBXDxkWvITOZYgJJ7ybpYTUv0TEUUBmGJa7Cn7QD6Buft2L4jQfN9nRrYZ
-	WYDlC51ACY/wTD/tmWm9lYU08iur0VHbFeBTqBDEJVxEpVxraKNN/LAFgd/uHVdNEe4EeFqZkcX
-	TfPuovDmab1qsopyZXsFEv8Ijj4Hq/eOC4+WN6+ZgJ9TZusE+SpqJo3KG7FaoeQ/zNYzA==
-X-Google-Smtp-Source: AGHT+IHSMQ7km7uj/qZUz88xhjl4F3P8UGddMsjOUsPEO2WzoGX1/e3XfBk5oBbzGpDbHUInyGR0sL13O2o0KVMWJzY=
-X-Received: by 2002:a05:622a:4a09:b0:4ee:2510:198a with SMTP id
- d75a77b69052e-4f4abd75629mr185166151cf.39.1766466224170; Mon, 22 Dec 2025
- 21:03:44 -0800 (PST)
+	s=arc-20240116; t=1766466864; c=relaxed/simple;
+	bh=ehR8ygWgcSZgp7QcRdkbVgjM7oRsnj7ikVKj0+gVjIU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Guwt4Z0OaZ9iUn/YUHJ3DdVKdVQs1DMMcy9P93GBMeh3VCdu2iGW/n5/tjZzPB+X5IOhO1qXyPj1rAClyophQG5CI7bid2xsndsb2ahKmx5VPAJlgY9gErV4LgOSCJdHwbNYDjhZqKo5lnl+g4WFrHuo/7AgnEVInYAztTNGijk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.dev; spf=none smtp.mailfrom=localhost.localdomain; arc=none smtp.client-ip=147.136.157.0
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=localhost.localdomain
+Received: by localhost.localdomain (Postfix, from userid 1007)
+	id BFEF88AA382; Tue, 23 Dec 2025 13:14:20 +0800 (+08)
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: netdev@vger.kernel.org,
+	jiayuan.chen@linux.dev
+Cc: syzbot+9b35e9bc0951140d13e6@syzkaller.appspotmail.com,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Clark Williams <clrkwllms@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	linux-kernel@vger.kernel.org,
+	linux-rt-devel@lists.linux.dev
+Subject: [PATCH net v4] ipv6: fix a BUG in rt6_get_pcpu_route() under PREEMPT_RT
+Date: Tue, 23 Dec 2025 13:14:12 +0800
+Message-ID: <20251223051413.124687-1-jiayuan.chen@linux.dev>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251113154545.594580-1-edumazet@google.com> <c6020af6-83d0-46c9-aad9-2187b7f07cbe@intel.com>
- <CANn89iJzcb_XO9oCApKYfRxsMMmg7BHukRDqWTca3ZLQ8HT0iQ@mail.gmail.com> <d97e33e0-0b23-4f58-b1a4-5e171defe732@intel.com>
-In-Reply-To: <d97e33e0-0b23-4f58-b1a4-5e171defe732@intel.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 23 Dec 2025 06:03:33 +0100
-X-Gm-Features: AQt7F2qJr3YSIDla9HFp4bZYO3Ppr9L-IgvWSUtxSosBHqOjSzPsgIU9KkAx3cs
-Message-ID: <CANn89iK6hwMo_i3F8pnCUQmCJ+wWq8HJOu-dGz94REZr+2oSGQ@mail.gmail.com>
-Subject: Re: [PATCH] x86_64: inline csum_ipv6_magic()
-To: Dave Hansen <dave.hansen@intel.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H . Peter Anvin" <hpa@zytor.com>, "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, linux-kernel <linux-kernel@vger.kernel.org>, 
-	Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
-	Eric Dumazet <eric.dumazet@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 13, 2025 at 7:40=E2=80=AFPM Dave Hansen <dave.hansen@intel.com>=
- wrote:
->
-> On 11/13/25 10:18, Eric Dumazet wrote:
-> > So it would seem the patch saves 371 bytes for this config.
-> >
-> >> Or, is there a discrete, measurable performance gain from doing this?
-> > IPv6 incoming TCP/UDP paths call this function twice per packet, which =
-is sad...
-> > One call per TX packet.
-> >
-> > Depending on the cpus I can see csum_ipv6_magic() using up to 0.75 %
-> > of cpu cycles.
-> > Then there is the cost in the callers, harder to measure...
->
-> Oh, wow. That's more than I was expecting. But it does make sense.
-> Thanks for the info. I'll stick this in the queue to apply in a month or
-> so after the next -rc1, unless it needs more urgency.
->
-> Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
+On PREEMPT_RT kernels, after rt6_get_pcpu_route() returns NULL, the
+current task can be preempted. Another task running on the same CPU
+may then execute rt6_make_pcpu_route() and successfully install a
+pcpu_rt entry. When the first task resumes execution, its cmpxchg()
+in rt6_make_pcpu_route() will fail because rt6i_pcpu is no longer
+NULL, triggering the BUG_ON(prev). It's easy to reproduce it by adding
+mdelay() after rt6_get_pcpu_route().
 
-Gentle ping, I have not seen this patch reaching the tip tree.
+Using preempt_disable/enable is not appropriate here because
+ip6_rt_pcpu_alloc() may sleep.
 
-Thanks a lot !
+Fix this by handling the cmpxchg() failure gracefully on PREEMPT_RT:
+free our allocation and return the existing pcpu_rt installed by
+another task. The BUG_ON is replaced by WARN_ON_ONCE for non-PREEMPT_RT
+kernels where such races should not occur.
+
+Link: https://syzkaller.appspot.com/bug?extid=9b35e9bc0951140d13e6
+Fixes: d2d6422f8bd1 ("x86: Allow to enable PREEMPT_RT.")
+Reported-by: syzbot+9b35e9bc0951140d13e6@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/6918cd88.050a0220.1c914e.0045.GAE@google.com/T/
+Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+
+---
+v2 -> v4: Use correct Fixes tag; Replace BUG_ON by WARN_ON_ONCE.
+          https://lore.kernel.org/netdev/20251219025140.77695-1-jiayuan.chen@linux.dev/
+v1 -> v2: Drop migrate_{disable, enabled} suggested by Steven and Paolo.
+          https://lore.kernel.org/all/20251209124805.379112-1-jiayuan.chen@linux.dev/T/
+---
+ net/ipv6/route.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index aee6a10b112a..a3e051dc66ee 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -1470,7 +1470,18 @@ static struct rt6_info *rt6_make_pcpu_route(struct net *net,
+ 
+ 	p = this_cpu_ptr(res->nh->rt6i_pcpu);
+ 	prev = cmpxchg(p, NULL, pcpu_rt);
+-	BUG_ON(prev);
++	if (unlikely(prev)) {
++		/*
++		 * Another task on this CPU already installed a pcpu_rt.
++		 * This can happen on PREEMPT_RT where preemption is possible.
++		 * Free our allocation and return the existing one.
++		 */
++		WARN_ON_ONCE(!IS_ENABLED(CONFIG_PREEMPT_RT));
++
++		dst_dev_put(&pcpu_rt->dst);
++		dst_release(&pcpu_rt->dst);
++		return prev;
++	}
+ 
+ 	if (res->f6i->fib6_destroying) {
+ 		struct fib6_info *from;
+-- 
+2.43.0
+
 
