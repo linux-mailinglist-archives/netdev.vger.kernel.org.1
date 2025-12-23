@@ -1,195 +1,167 @@
-Return-Path: <netdev+bounces-245786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABA8BCD7ED3
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 03:57:59 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B5A4CD7F3A
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 04:16:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id AD59A301D318
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 02:57:58 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id BB4373019893
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 03:16:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 031C32BEFEF;
-	Tue, 23 Dec 2025 02:57:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C59192D0C8A;
+	Tue, 23 Dec 2025 03:16:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="GvCYdH5P"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ag6QkYLR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C21C29E0E9;
-	Tue, 23 Dec 2025 02:57:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F9C870824
+	for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 03:16:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766458677; cv=none; b=jKh+16uR7oAR6Fwhvr3EfZQJjeW3Lu6t0pHDtMu5rTURkTy6UuweVDbWK6p2RLyqE0VJQ/HyXIZ+OHTyHCK3mefVOFPgMEfIj15dWIH1l3MkdB440rDkt1hLzedy5ork2pHDd2ziknZakBNBxx0IMWFvxgmPN9CT2Z8uwG6q/OQ=
+	t=1766459777; cv=none; b=YMCZrwrLiJa6x8+tltdd5Ai5EV9l20+DfOBXzyVuh24v1yEq04pWEBLf7qg3r48VwhH3Ob7gBo3Lc0LDJEwQvrU3tBaJxoxQFkDBNB6SvM8nK3Ib1vdOmIZMvSUWtu69O5xU5K+ieJzPIO0bLzHoP+jFCrRKCCCPJKlqLZzuXl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766458677; c=relaxed/simple;
-	bh=9cGE2tRq6P+0tNDoHJjTvFR6nB3IKMQtn6sQf3V8heE=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TAtNf9/O9HZr/yF6Fa+9wkWQuafN+iPJVqSJJZTDkAcu/INHD/0Jil6G+3IfZA7WbRK7B+dGsd7dhgGDQLCqeNceWLuzDU2iZuzPAU4+/x9gYu7f4dhePHyMBIeJBgpbpFLV0wgWAki222zT95RX87FJQyzOqfAKGz31e1mTZwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=GvCYdH5P; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5BMNScOX3134322;
-	Mon, 22 Dec 2025 18:57:41 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=mj5nFdjzeG1QZUj5sHBM7NhZg
-	N49Qp4a7ZK4MvGDiQA=; b=GvCYdH5PuNFUYwZ9FTs4Q5e/yj/dG4B/fs3+CtIyN
-	1Ikw2JLOm/+82aJt2SL1HNlCD6HcEJjLNt1tfk+jGdgDaVcEc7/CPH2++FQ61dUR
-	uXS+sJ+auTgJQBVck8dn9R5qcmrno0Lt5FO5IQfmtPZ1FzU40aEvFDq1SBBeEAQg
-	u39sa5tcAakiDEJ82mlVZk4Eq9BY3YocQX008qpEZvSL9SpjJ+0J6faKbErsg4YV
-	GmKBGgz+lh2TvtZQdek3rS+JipEsWcYdXKGFlA+GEpmrGRdt+yCSZmxn4T1nPQj2
-	4T2z7WcOPXDQGM66ocedBG25gP1q/2ZBkvIiCyr7JIlfg==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 4b7fpjra54-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 22 Dec 2025 18:57:41 -0800 (PST)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.25; Mon, 22 Dec 2025 18:57:54 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.25 via Frontend
- Transport; Mon, 22 Dec 2025 18:57:54 -0800
-Received: from kernel-ep2 (unknown [10.29.36.53])
-	by maili.marvell.com (Postfix) with SMTP id B85015B6939;
-	Mon, 22 Dec 2025 18:57:38 -0800 (PST)
-Date: Tue, 23 Dec 2025 08:27:37 +0530
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: Osose Itua <osose.itua@savoirfairelinux.com>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <michael.hennerich@analog.com>,
-        <jerome.oufella@savoirfairelinux.com>
-Subject: Re: [PATCH v2 1/2] net: phy: adin: enable configuration of the LP
- Termination Register
-Message-ID: <20251223025737.GA319469@kernel-ep2>
-References: <20251222222210.3651577-1-osose.itua@savoirfairelinux.com>
- <20251222222210.3651577-2-osose.itua@savoirfairelinux.com>
+	s=arc-20240116; t=1766459777; c=relaxed/simple;
+	bh=Mx/UmQpiIIEj3g1XtLjsQrkIbpEb1sO7h8QPcpp78vQ=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=MdnznC5dlEPHTjIzLHvQ4ioNj7CKFY8yzxCDrmYv2fwTmf9esqvdOrOyIsxyZpQPShWlyMguX4iTTvDgJWW+B8j8i72WPoTpyQ5i7a5MU91uF2x1tihl5zJvp4o5vWQn88889qBzrUVA8v+s/5YMpsUfD6myDUun9AeLxHy/TEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ag6QkYLR; arc=none smtp.client-ip=209.85.214.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-2a110548cdeso64340695ad.0
+        for <netdev@vger.kernel.org>; Mon, 22 Dec 2025 19:16:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1766459775; x=1767064575; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BlWmvPevLxcZ1ApfaQlGkISYTXnx0tCKi7KeQn9/wc8=;
+        b=ag6QkYLRk36oKpnYOVqgLPh9o9181RmjXFoyiLT63EuKe78sZah1GlVwTUSrq6Zuuk
+         s+UWzZ2HudOohOlaeebWVMqG/sI5FR25EOZqh+guqxKv7LVYbG6XG/dRPgoDtsat7y8w
+         irXdEIYEa+LBW6DlhPIwOCeu9HAr8ZFS5/4NMVcuFkiXlVjPmwyg+LVcx3WpQJEgIqFt
+         2osYRs1Ed5vkH13O40DkU9Wo67J/qLwHJa2WiKrmI1uj9kgjG3gZ4aBZliDbcLSTUF0O
+         U8jgwRIUXUd3Ga+o+LMK9WzBtbpVbeT2Ip1BwVHercOIEJNjiYxolNwHfUsFKF5lOcsJ
+         042w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766459775; x=1767064575;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BlWmvPevLxcZ1ApfaQlGkISYTXnx0tCKi7KeQn9/wc8=;
+        b=j7focfO8N79qT5C8SRpxsESQ3Ny+1YL63ZbtFmmkcVGU71jsG5TX3PYeW+i12vSLoM
+         7bM5J85G6WksDg4hMUqu7PIhNy/FwE4WNd2PkS/fsQFQzj6x/7fA5xCTrCPPrQHiisaK
+         QFFA54gGsV76AYMm9UGl1F4T0+IqTAysMC3HDi63aDKmNj/3w7QEUicJ1KlKTtLpemtI
+         SMnvoSieSnj3dZtuCL3Jc5OEeV7f1+k/cwWFRrJvW5Q5cKuX5TyCbdyrdsHdcYdH/K1k
+         2bA+C0tgyHaUreczxk7KkQqu3HF7WN6A17Z/oSdkvIkD9vgYbenMoUWaoGQExJznh5Kr
+         98Eg==
+X-Forwarded-Encrypted: i=1; AJvYcCWq75ruyu5z9LnR6AQerp8/1DbPEJ+IFkyBFq6QjDD6/y/A3u4Zjm67ZroeYH+0T2PNYGQoSCs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyRxHjfhMqrdRxPDE+Latk14hLTnDtg/crvrAqdT9o28lmHiF/x
+	DCg+c1TgOMY6smdWjC9qDZAYLsrI//gIkm7ir3/wQb/4mtTnCerbVO7L
+X-Gm-Gg: AY/fxX75owTvF678h6vBWu4PMVCUi7FNIGUUohsvmvrf1tyOR4GI9KHicpZBt0QnB7T
+	vxPZo2wyNFRBYjm4+owAguybpgFN/wjOU5XjrURzY4a6ShHZe7V+7NgcG+kr51ts9IVrRmhXpxN
+	DIEkrnEAs20XddOFm4OjOaaTj5Rkz/A+gril4QUPkW7MsnjdZN4Nn/E2t87gEiSV+1BoGC7eDzr
+	GUflR6NEFP9E6pPzaHJZZFNTLpJ5KUmA3Oo4ZKWYleirNNTLTiF5m1Ass5Hv1tyPYR6LT3thv3v
+	4Hq1gp0AK50MatyoLSZJPlG8rnejjcnp941hsLVUsEcEu5KuaWUf8UHunr+mmKLJljx9PwbzIYR
+	yh0T91Gb0twXCKQsyDaGiol1exB5kaBIPX32EPhRiDE/yr758/a0QQPGHeOSusEpG6OFNbjCQBo
+	WXN9eo/3Scjohss3CYFA==
+X-Google-Smtp-Source: AGHT+IHsJHcvBEd1oY/Js4mF4dqnLZlZO6zVgt/BH5AZODSD/0YmbnGfhPQbR6X+bCQGU0pLbsm+xg==
+X-Received: by 2002:a17:903:2a8b:b0:298:1422:510d with SMTP id d9443c01a7336-2a2f293daefmr125439995ad.48.1766459775168;
+        Mon, 22 Dec 2025 19:16:15 -0800 (PST)
+Received: from smtpclient.apple ([188.253.121.152])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a2f3c65d66sm109554945ad.20.2025.12.22.19.15.59
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 22 Dec 2025 19:16:14 -0800 (PST)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20251222222210.3651577-2-osose.itua@savoirfairelinux.com>
-X-Proofpoint-GUID: 6gq_iqXHrUtAzJiERRwXwu3jMlqrNzEc
-X-Proofpoint-ORIG-GUID: 6gq_iqXHrUtAzJiERRwXwu3jMlqrNzEc
-X-Authority-Analysis: v=2.4 cv=TIJIilla c=1 sm=1 tr=0 ts=694a0525 cx=c_pps
- a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17
- a=kj9zAlcOel0A:10 a=wP3pNCr1ah4A:10 a=VkNPw1HP01LnGYTKEx00:22
- a=9R54UkLUAAAA:8 a=VwQbUJbxAAAA:8 a=aRxQL1JOAAAA:8 a=VmpaGiyl27xw82UiNMQA:9
- a=CjuIK1q_8ugA:10 a=5hNPEnYuNAgA:10 a=YTcpBFlVQWkNscrzJ_Dz:22
- a=lBRdisTmIr2YKkuu8atg:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMjIzMDAyMyBTYWx0ZWRfX2N+5TZxW2um9
- vDS+BtBPwSML2YC0hBpxS5EoK1qPbJK4sGUjboR3XCgIy8p+XibEUJ332/9EWvrD53XWDEH21Lw
- kNqbeBztaqMJcikdjtQaiDa1EuKGqOZSs/L3f7qd9WYdAfbPeVBqDvEmwaTfE2LFDYN/9/6VluF
- I39ugojNXMAVAr7lRGJ04lT23IG6mLl2T9MgpVcgWWHh9BusCEqG5DtZ7y4SIIgYvZRTk3hcGv+
- tYWJ0jphhpzL4k9xbAh3G3ZYH+gwZbZMwOd7k7c41DZCiOZhM+V42YqRPxq4tHL0g/v6LsTtI13
- Ufn0/xqpizDVsbHiETz2VGgpQsnmyq7wh3IYocEQC2hBu/ghRXfxdxw4DadT5eLPXscVwo6XXhr
- vcnTIErJJwoSYDNjDlPB2b52CBPkTNV7xcZ12dJdLz4C4O43F9encW2u6vPmZSspUClhqFPCgkP
- 2PN6Z1AGbyJSyMhCfAg==
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-12-23_01,2025-12-22_01,2025-10-01_01
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81.1.4\))
+Subject: Re: [RFC bpf PATCH 0/2] bpf: Fix memory access tags in helper
+ prototypes
+From: Zesen Liu <ftyghome@gmail.com>
+In-Reply-To: <CAMB2axPpB7Km=_7J_QTcQV8SvuFMKqg-_fCyRHEZKNfr7WL2Gg@mail.gmail.com>
+Date: Tue, 23 Dec 2025 11:15:46 +0800
+Cc: Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>,
+ Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>,
+ KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>,
+ Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>,
+ Matt Bobrowski <mattbobrowski@google.com>,
+ Steven Rostedt <rostedt@goodmis.org>,
+ Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>,
+ Daniel Xu <dxu@dxuuu.xyz>,
+ Shuah Khan <shuah@kernel.org>,
+ bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org,
+ netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org,
+ Shuran Liu <electronlsr@gmail.com>,
+ Peili Gao <gplhust955@gmail.com>,
+ Haoran Ni <haoran.ni.cs@gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <991C3D59-65D5-4B31-B667-EDAF348F9F7F@gmail.com>
+References: <20251220-helper_proto-v1-0-2206e0d9422d@gmail.com>
+ <CAMB2axPpB7Km=_7J_QTcQV8SvuFMKqg-_fCyRHEZKNfr7WL2Gg@mail.gmail.com>
+To: Amery Hung <ameryhung@gmail.com>
+X-Mailer: Apple Mail (2.3826.700.81.1.4)
 
-Hi,
+Apologies for the resend due to an incorrect configuration in my mail =
+client.
 
-On 2025-12-23 at 03:51:04, Osose Itua (osose.itua@savoirfairelinux.com) wrote:
-> The ADIN1200/ADIN1300 provide a control bit that selects between normal
-> receive termination and the lowest common mode impedance for 100BASE-TX
-> operation. This behavior is controlled through the Low Power Termination
-> register (B_100_ZPTM_EN_DIMRX).
-> 
-> Bit 0 of this register enables normal termination when set (this is the
-> default), and selects the lowest common mode impedance when cleared.
-> 
-> Signed-off-by: Osose Itua <osose.itua@savoirfairelinux.com>
-> ---
->  drivers/net/phy/adin.c | 34 ++++++++++++++++++++++++++++++++++
->  1 file changed, 34 insertions(+)
-> 
-> diff --git a/drivers/net/phy/adin.c b/drivers/net/phy/adin.c
-> index 7fa713ca8d45..e8b778cb191d 100644
-> --- a/drivers/net/phy/adin.c
-> +++ b/drivers/net/phy/adin.c
-> @@ -4,6 +4,7 @@
->   *
->   * Copyright 2019 Analog Devices Inc.
->   */
-> +#include <cerrno>
->  #include <linux/kernel.h>
->  #include <linux/bitfield.h>
->  #include <linux/delay.h>
-> @@ -89,6 +90,9 @@
->  #define ADIN1300_CLOCK_STOP_REG			0x9400
->  #define ADIN1300_LPI_WAKE_ERR_CNT_REG		0xa000
->  
-> +#define ADIN1300_B_100_ZPTM_DIMRX		0xB685
-> +#define ADIN1300_B_100_ZPTM_EN_DIMRX		BIT(0)
-> +
->  #define ADIN1300_CDIAG_RUN			0xba1b
->  #define   ADIN1300_CDIAG_RUN_EN			BIT(0)
->  
-> @@ -522,6 +526,32 @@ static int adin_config_clk_out(struct phy_device *phydev)
->  			      ADIN1300_GE_CLK_CFG_MASK, sel);
->  }
->  
-> +static int adin_config_zptm100(struct phy_device *phydev)
-> +{
-> +	struct device *dev = &phydev->mdio.dev;
-> +	int reg;
-> +	int rc;
-> +
-> +	if (!(device_property_read_bool(dev, "adi,low-cmode-impedance")))
-> +		return 0;
-> +
-> +	/* set to 0 to configure for lowest common-mode impedance */
-> +	rc = phy_write_mmd(phydev, MDIO_MMD_VEND1, ADIN1300_B_100_ZPTM_DIMRX, 0x0);
+Thanks for your comment!
 
-This clears full register instead of just bit 0. Is that intended?
+> On Dec 23, 2025, at 03:29, Amery Hung <ameryhung@gmail.com> wrote:
+>=20
+> Perhaps you are conflating one of your proposals here? This is fine
+> currently. ARG_PTR_TO_MEM without any annotation is viewed as BPF_READ
+> so passing a read-only buffer should work.
 
-> +	if (rc < 0)
-> +		return rc;
-> +
-> +	reg = phy_read_mmd(phydev, MDIO_MMD_VEND1, ADIN1300_B_100_ZPTM_DIMRX);
-> +	if (reg < 0)
-> +		return reg;
-> +
-> +	if (!(reg & ADIN1300_B_100_ZPTM_EN_DIMRX)) {
 
-From commit description, check should be if (reg & ADIN1300_B_100_ZPTM_EN_DIMRX)
-AI review also caught this:
-https://netdev-ai.bots.linux.dev/ai-review.html?id=05b38bb2-1244-46fc-a4d9-311ca8c825ee#patch-0
+Actually, that is not the case. I tested this again, and ARG_PTR_TO_MEM
+without MEM_RDONLY does reject read-only buffers. You can reproduce this
+behavior with test_d_path_check_rdonly_mem in selftests by removing its
+arg2=E2=80=99s MEM_WRITE tag.
 
-Fix the build errors reported at:
-https://patchwork.kernel.org/project/netdevbpf/patch/20251222222210.3651577-2-osose.itua@savoirfairelinux.com/
+> I think it is better to make the MEM_WRITE, MEM_RDONLY annotation
+> explicit and check it in the verifier.
+>=20
+> Flipping the default MEM_RDONLY semantic to MEM_WRITE does not prevent
+> a similar bug in the future when we have helpers/optimizations/checks
+> rely on an implicit semantic.
 
-Also net-next is closed till Jan 2. Please post v3 after that.
+The current default semantic is in an inconsistent state: it implies
+neither MEM_RDONLY nor MEM_WRITE. A naked ARG_PTR_TO_MEM rejects
+read-only buffers, yet tells the verifier that the helper does not =
+modify the memory.
+
+I see two ways to resolve this ambiguity:
+1) Enforce explicit memory access tags (disallow naked ARG_PTR_TO_MEM) =
+as I
+proposed eariler; or
+2) Change ARG_PTR_TO_MEM semantics to behave exactly like
+   ARG_PTR_TO_MEM | MEM_RDONLY.
+
+I would appreciate your thoughts on this. :)
+
 
 Thanks,
-Sundeep
-> +		phydev_err(phydev, "Failed to set lowest common-mode impedance.\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static int adin_config_init(struct phy_device *phydev)
->  {
->  	int rc;
-> @@ -548,6 +578,10 @@ static int adin_config_init(struct phy_device *phydev)
->  	if (rc < 0)
->  		return rc;
->  
-> +	rc = adin_config_zptm100(phydev);
-> +	if (rc < 0)
-> +		return rc;
-> +
->  	phydev_dbg(phydev, "PHY is using mode '%s'\n",
->  		   phy_modes(phydev->interface));
->  
+Zesen Liu=
 
