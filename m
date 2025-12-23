@@ -1,159 +1,113 @@
-Return-Path: <netdev+bounces-245873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F6E0CD9B75
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 15:48:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E3C2CD9BF4
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 16:16:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 1AD7E300E17E
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 14:47:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2B39C3000CF4
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 15:16:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B5ED1EBA19;
-	Tue, 23 Dec 2025 14:47:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 484E12264DC;
+	Tue, 23 Dec 2025 15:16:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eAzK0Eg1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GNmmWNv5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA2C74A02
-	for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 14:47:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B0378460;
+	Tue, 23 Dec 2025 15:16:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766501278; cv=none; b=l7D9lPk8j0gVIOWaxVQFB8YC9HQc7xyLQKmWALYAdS8bPbHxqgk4hojQc2IKMPDuuJJ9ITJF0Mu7e4KNDT7/asWhoYg9NUkrHcEbbq4Iuha30GXRIKzV4ZwxcLuqp6tc7HQvb6kr0vJYgnFc+FH9TmIO+4+qy90S1E+de8diR1s=
+	t=1766502993; cv=none; b=BWJD/qyZIFIPnkOsv3VbWTH2lk2rNmOzNpZuQS4XbncEJpsqE5Gr5UffY54HYq+f+H8YhzHwElGY9XMSKRVW4sOmFFx9HVwrgZKu6a+AAUkQW+GKKDEkm8CpUug5sr/2dpq+OzZspib3N5OB5p0Q/VxXLeiqpO+FlGaMqePODsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766501278; c=relaxed/simple;
-	bh=TJAb3LSEswLx6+Xq5HMafxcqRqMeL+50z2ZbDFhOoXA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qGNeIB2ihPKabQ9pL1WmV/wJh4dz4EBiGXs6Ey+WyKaPBCdCFc2wUZRPs2sNTwgnnld0idSkSfKEQ/EW7slP8M6/32F7yYGPbQjzrw0aDIZ+eZcUV+V8jmrpPYBUPMEkxlTyKc2gXHfV9QfdOjmurll5yoyTmXpiKpdiwQLyX0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eAzK0Eg1; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4f34c5f2f98so56901181cf.1
-        for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 06:47:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1766501276; x=1767106076; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mAzJy0lgB1c+UVH+AtIu+Y5rJu4WuxyR3+U/AZMozPQ=;
-        b=eAzK0Eg1vFLYB03Z/HLW5pyRcSIiLbR0p2oOkDTP+CqHO2k8TMUkiLXAcdu5q5LYtW
-         gOlFA7RUOcUoWCzJPVtpXcrGinlXn0F2uSNiM2V3lq6qMQMLxWv20himMnlHq3wcccyJ
-         LkaHfM9Ah4O4XlK5DrZU2IlEy3poY5ccAMOpXholqAyIm4th3fP0GlOifxd6FpzI4P8k
-         FnMZ+v59qZfkJMaEPYqhnqWXhsfs8uJq7uopO4CF2D6y2LESbQ3pknaDMDfklg9yoeT9
-         F6WSTAJMeEbiUmqca/y45Sq24bR9o8gOplmu5a2xyonfyxTZV+b/+aGb/+sYA9OePkcG
-         Mawg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766501276; x=1767106076;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=mAzJy0lgB1c+UVH+AtIu+Y5rJu4WuxyR3+U/AZMozPQ=;
-        b=T5/Bx2vQ8MPPeFbqHyqZUJ3t0ARIeNJD1Myrs2RkLmG/FdlAdXk9qBcoVghIOTXk5h
-         qqmVW1NoZLvkMImQi+FUTOMmMxEc0MSethTWv9U89Lk6PD5DDTaFO4qO0diybli6j4Oe
-         SizIbe2VHWepBtxtdwxVeGIopYRMjiEXYP7TJnWBYlDO3qkAJAn5VQtV7bg1DvY/HD/9
-         mHZlezIAMqS/5WSypwVmi1jHtr60QCqkX709X7iIZZTi8emrDZd1nTLPWId2Rn83D9eH
-         1rCwMvETyvkOkaDbctwUAMwgpxh5pKLPk7ATHfOeNYsTcxQDGta+T76+VywaLReEdqJe
-         KXzg==
-X-Forwarded-Encrypted: i=1; AJvYcCXhtYSZnv+ceR6W/pux/ZMPnahylSSGX8AN4Iw0KKXBsFx78+lEJsQ4TFIHpDWy5THa8EX1efY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx2BPCDI3k6hSPV/lixGHPskkcMlVUCeUVH4wkYFUhf0btc4ejL
-	hs/eVRqVMKeMzOP+LuQ0mBGryA/+A8vMlBMPcgCXC51rKyI/wX+S882WLB6RTMSkDVXGLAFLMWs
-	AEDiGeOpp5Q2j+/BI9JstO3+Zhu4zNT2EcigcJIRM
-X-Gm-Gg: AY/fxX7gkrRgIWjqcerWv/IGyBqGbnCtBwdAzEx459JQtqNh5G5zCd6eHUi8Lf+xaEe
-	q7EF1UBvUESTWehVylEJPFTi6a91F6mk9uIFPPy1F0MN4xuqtObaIBdACqC4g0joVcwGfvATeys
-	v/APBR/czu7XLf/nl/mqGLLsMlcb60srxMOvowu7RhazSiZrDZj6+gll+Qw0pypXVi9VEQFAHTL
-	wJUKcl6OJSUHNF0742PCV5VXu2BB4p9vSnFVZ/LL3p1SvF3m9HwcEFEwRFmfdCzGYVo+Uk=
-X-Google-Smtp-Source: AGHT+IG+bK0INBRB5f1BYJgGla5CI09WKL3nTen8lH07NVd0pbImimo6mTlkqVPu86EmBKTzVShh6iPeviZGJ4+R7p8=
-X-Received: by 2002:ac8:584c:0:b0:4ec:b599:2879 with SMTP id
- d75a77b69052e-4f4abdbf154mr206820651cf.66.1766501275316; Tue, 23 Dec 2025
- 06:47:55 -0800 (PST)
+	s=arc-20240116; t=1766502993; c=relaxed/simple;
+	bh=MX0UEBGbGjeyT7I+fhRvt8AzC7Kbdy82QaHX7EWOjB4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AIEhlbK/vQP53zOQZmuo1cI5z1RyIXA6jpZMZdrHF0emLQX6qEfJc1uPIXoTw2V31Az2p9HvDNRRgCw+woZ9BNlpOc6Ue2vYpRI7R1wGdSAYXVOj8fwFXc0+mEgkk4JhPCVEZpiarqdXivkNlMSosgj4HNszFaXd5dBHusNb1Gg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GNmmWNv5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00827C113D0;
+	Tue, 23 Dec 2025 15:16:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766502992;
+	bh=MX0UEBGbGjeyT7I+fhRvt8AzC7Kbdy82QaHX7EWOjB4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GNmmWNv5axguqpzzF5TE4K9OHVqQuwUPYn7m9Xy4O5zQEcBhdYuWYACcupNC3GUbK
+	 oW2+cfENHoMcqbRbby7jWn2BmUXrd1fauW3pFEup7BKEk47nyIqle6LD9w6eOTMd9J
+	 MAZqcMh2EGy49IdXJUbrDxuE/UiNrY1dxeXDWBoB4oPhLs9w0s/VtwK9L1yAqkvUhU
+	 shf41UdhHRQXcM2m+TWEW/Amg+72ajreOtvYGVs4EFEnbxlGuB9fq0Yu/V+s3AuQkW
+	 bEj1psfGTsi3frtp7vlRosrykLLEo7oh/Z2lOA3Qv6uVrDq80/wGYWOfg0mzPNyeo+
+	 4OWUjWsJreuuw==
+Date: Tue, 23 Dec 2025 16:16:29 +0100
+From: Frederic Weisbecker <frederic@kernel.org>
+To: Chen Ridong <chenridong@huaweicloud.com>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gabriele Monaco <gmonaco@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
+	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+	linux-mm@kvack.org, linux-pci@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 13/31] cpuset: Update HK_TYPE_DOMAIN cpumask from cpuset
+Message-ID: <aUqyTUm2NipItcVu@localhost.localdomain>
+References: <20251105210348.35256-1-frederic@kernel.org>
+ <20251105210348.35256-14-frederic@kernel.org>
+ <e0c0f8b7-112f-40d7-b211-89065e9003b2@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251216085210.132387-1-zhud@hygon.cn> <eae60389-27a5-4e8f-af49-7f75d4c116d8@redhat.com>
- <fe236a552f594780a4b2ead63b4bc329@hygon.cn>
-In-Reply-To: <fe236a552f594780a4b2ead63b4bc329@hygon.cn>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 23 Dec 2025 15:47:43 +0100
-X-Gm-Features: AQt7F2rshnGdOxahnZaE5tMJbC9XMqC4q4O5M5phiwBsbfn29XGQNc0m4AoCmNI
-Message-ID: <CANn89i+p0UX1VW9Pm6_B5tJ-_b_iwJP5Dkk_Agnf+46FD2jY-g@mail.gmail.com>
-Subject: Re: [PATCH net] netdev: increment TSO only if TSO is not enabled on
- any slave device
-To: Zhud <zhud@hygon.cn>
-Cc: Paolo Abeni <pabeni@redhat.com>, "davem@davemloft.net" <davem@davemloft.net>, 
-	"kuba@kernel.org" <kuba@kernel.org>, "horms@kernel.org" <horms@kernel.org>, 
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	Jing Li <lijing@hygon.cn>, Zhiwei Ying <yingzhiwei@hygon.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e0c0f8b7-112f-40d7-b211-89065e9003b2@huaweicloud.com>
 
-On Tue, Dec 23, 2025 at 1:20=E2=80=AFPM Zhud <zhud@hygon.cn> wrote:
->
->
-> > On 12/16/25 9:52 AM, Di Zhu wrote:
-> > > Unconditionally increment the TSO flag has a side effect: it will als=
-o
-> >
-> > This changelog is IMHO quite confusing. The code does not 'increment TS=
-O'. Instead
-> > it increments the features set to include ALL_TSO.
-> >
-> > Please reword the changelog accordingly.
-> >
-> > > directly clear the flags in NETIF_F_ALL_FOR_ALL on the master device,
-> > > which can cause issues such as the inability to enable the nocache
-> > > copy feature on the bonding network card.
-> >
-> > bonding network card -> bonding driver.
-> >
-> > > So, when at least one slave device's TSO is enabled, there is no need
-> > > to explicitly increment the TSO flag to the master device.
-> > >
-> > > Fixes: b0ce3508b25e ("bonding: allow TSO being set on bonding master"=
-)
-> > > Signed-off-by: Di Zhu <zhud@hygon.cn>
-> > > ---
-> > >  include/linux/netdevice.h | 3 ++-
-> > >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> > > index bf99fe8622da..2aca39f7f9e1 100644
-> > > --- a/include/linux/netdevice.h
-> > > +++ b/include/linux/netdevice.h
-> > > @@ -5322,7 +5322,8 @@ netdev_features_t
-> > > netdev_increment_features(netdev_features_t all,  static inline
-> > netdev_features_t netdev_add_tso_features(netdev_features_t features,
-> > >                                                     netdev_features_t=
- mask)
-> > >  {
-> > > -   return netdev_increment_features(features, NETIF_F_ALL_TSO, mask)=
-;
-> > > +   return (features & NETIF_F_ALL_TSO) ? features :
-> > > +           netdev_increment_features(features, NETIF_F_ALL_TSO, mask=
-);
-> >
-> > NETIF_F_ALL_TSO is not a single bit, but a (later large) bit mask; the =
-above will yield
-> > incorrect result when:
-> >
-> >       features & NETIF_F_ALL_TSO !=3D NETIF_F_ALL_TSO
->
-> Yes, it is indeed necessary to set all tso flags to avoid GSO at the bond=
-ing layer.
-> I will revise the code and its related changlong, thanks.
+Le Sat, Nov 08, 2025 at 05:05:10PM +0800, Chen Ridong a écrit :
+> > +int housekeeping_update(struct cpumask *mask, enum hk_type type)
+> > +{
+> > +	struct cpumask *trial, *old = NULL;
+> > +
+> > +	if (type != HK_TYPE_DOMAIN)
+> > +		return -ENOTSUPP;
+> > +
+> > +	trial = kmalloc(cpumask_size(), GFP_KERNEL);
+> > +	if (!trial)
+> > +		return -ENOMEM;
+> > +
+> > +	cpumask_andnot(trial, housekeeping_cpumask(HK_TYPE_DOMAIN_BOOT), mask);
+> 
+> Since there's no comment for the 'mask' parameter, would it be better to name it 'isol_mask'? This
+> would make it clearer that this is the isolation mask input and what is doing
+> here.
 
-What about this instead ?
+Good point! I made the change.
 
- static inline netdev_features_t
-netdev_add_tso_features(netdev_features_t features,
-                                                        netdev_features_t m=
-ask)
- {
--       return netdev_increment_features(features, NETIF_F_ALL_TSO, mask);
-+       return netdev_increment_features(features, NETIF_F_ALL_TSO |
-+                                        NETIF_F_ALL_FOR_ALL, mask);
- }
+Thanks.
+
+-- 
+Frederic Weisbecker
+SUSE Labs
 
