@@ -1,116 +1,116 @@
-Return-Path: <netdev+bounces-245840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245841-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sto.lore.kernel.org (sto.lore.kernel.org [172.232.135.74])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43718CD9024
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 12:04:02 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
+	by mail.lfdr.de (Postfix) with ESMTPS id D54A0CD9088
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 12:10:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sto.lore.kernel.org (Postfix) with ESMTP id 9209930012D4
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 11:04:01 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id A554E30136D2
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 11:10:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 653B133D6C0;
-	Tue, 23 Dec 2025 11:04:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0D01322B70;
+	Tue, 23 Dec 2025 11:10:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="EzID2cVS"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A98D2609C5
-	for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 11:03:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397F6302773;
+	Tue, 23 Dec 2025 11:10:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766487840; cv=none; b=f8zsNB+R0wHW9+R+KljXiFMuQXP92exqTcjvMiX52b3NoqbfvUYDUpFlT3UJPRo4qx4vw6Jl+NEkE2kspN59/CVAP5SJpEYk5QqTifDZ02VtU1atJ3G0uPmRG5OvGDOD+Qr6IgIan7QSbgvxbkg8Oq+yoawqDgmFH0Sh+elMGz0=
+	t=1766488205; cv=none; b=cOYdPjFT7g9jIPbeImKG4CHZxT5CKrJMjOsRmohyq0xkJDBDNTLEZTnyjS+AMiRiXNbZxcumxmRWRzMnsbreAVu22Prkq1job///LdQB9UXl8eHWlqeWVmBxtHEMTV/dWUTENfmKXe2c2D8r5r0hy7JvvvDuifAd6DmVdpRZH3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766487840; c=relaxed/simple;
-	bh=J+B+7xahjB5B+x8xFad/pE1SwM93uwXgihriBfK/wVM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iL5yW9EkQOltmsmYmD2YkJrPUj0dCOcyr1gCfVxdz5TrZD06o0iv+aHZBe8fxjkzH3x8CS7fhnKlYrh1nG1MrnpP1w1stznYgZwAjEpjNfkEQRhWw6o0CBIWPXdjIqqidumjL5/C3rMEs34xz/sKmV8gMYByv+MNvvKA9PCLiuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.99)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vY0BB-000000005s6-324s;
-	Tue, 23 Dec 2025 11:03:49 +0000
-Date: Tue, 23 Dec 2025 11:03:43 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Rasmus Villemoes <ravi@prevas.dk>
-Cc: netdev@vger.kernel.org, "Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>
-Subject: Re: question on gswip_pce_table_entry_write() in
- lantiq_gswip_common.c
-Message-ID: <aUp3D45Ka-rYL44u@makrotopia.org>
-References: <87sed1shwl.fsf@prevas.dk>
+	s=arc-20240116; t=1766488205; c=relaxed/simple;
+	bh=DCzJrlCFPHbdhH4pbfSMyoU+QTjhhTiWeIA0RAA5y+I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Z6kG0efUTUKJSU6zuj9clHbxBFtUTPMI6dpHk0ijiRrwYei4U8bgm1kgtnx1dqKMS1pFhR+xr/8PDWhrN9GBNRZmItQwHelrcp6khxpY5hxFq9uglHm1WL08olWsp9Hqd81cg+tyjL4IxfOSQ2cxtc4xu43uLjOYuPGwC7ROTns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=EzID2cVS; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1vY0H5-00ASKL-DL; Tue, 23 Dec 2025 12:09:55 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=1+u1IBrky6sWhAl4AMkGYqMEEOxNVXZ8krlwQcI38ww=; b=EzID2cVSOXnDT4F1sBDPCMd/z8
+	OtqjC5JeuyMVmpkC7R5RSc+QzB4I12FZWJs5jcZmxfCwdLTIl+Im6RxZjTiqUEVlQvqTPrW/ZPuS0
+	3vt/Ypyum3r+QnuirYmBxPreInRPgIIcQxVfJuTyhfdeQeQi+ogt3ZXoMEh9ErJ8GzhoDl7rQQ9bs
+	5NfMonlaD5Cxo8fqcSGWw/Ve4gcHUEXQ81RM79l0uqKG04TW6MeQoLGaP8lksgw8/ZcXawTzoaD9Y
+	lyzKlTF61XkGNl3KGJZ7wUhCR4YH4dlQLXsVXt4WDQy5bHCSNeVWuS5TcvDOIX0ISNzPTJS2GdN2X
+	2gkgMG4Q==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1vY0H4-0005Gl-Kj; Tue, 23 Dec 2025 12:09:54 +0100
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1vY0H2-009YYH-NW; Tue, 23 Dec 2025 12:09:52 +0100
+Message-ID: <ff469a0f-091b-4260-8a54-e620024e0ec9@rbox.co>
+Date: Tue, 23 Dec 2025 12:09:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87sed1shwl.fsf@prevas.dk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/2] vsock: Make accept()ed sockets use custom
+ setsockopt()
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Arseniy Krasnov <avkrasnov@salutedevices.com>,
+ virtualization@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20251223-vsock-child-sock-custom-sockopt-v1-0-4654a75d0f58@rbox.co>
+ <20251223-vsock-child-sock-custom-sockopt-v1-1-4654a75d0f58@rbox.co>
+ <aUptJ2ECAPbLEZNp@sgarzare-redhat>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <aUptJ2ECAPbLEZNp@sgarzare-redhat>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Rasmus,
-
-On Tue, Dec 23, 2025 at 09:48:26AM +0100, Rasmus Villemoes wrote:
-> Hi
+On 12/23/25 11:26, Stefano Garzarella wrote:
+> On Tue, Dec 23, 2025 at 10:15:28AM +0100, Michal Luczaj wrote:
+...
+>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>> index adcba1b7bf74..c093db8fec2d 100644
+>> --- a/net/vmw_vsock/af_vsock.c
+>> +++ b/net/vmw_vsock/af_vsock.c
+>> @@ -1787,6 +1787,7 @@ static int vsock_accept(struct socket *sock, struct socket *newsock,
+>> 		} else {
+>> 			newsock->state = SS_CONNECTED;
+>> 			sock_graft(connected, newsock);
+>> +			set_bit(SOCK_CUSTOM_SOCKOPT, &newsock->flags);
 > 
-> Reading gswip_pce_table_entry_write() in lantiq_gswip_common.c, I'm
-> wondering if it really has to do all that it does. In particular, it
-> seems to write the same value to (a subset of) the GSWIP_PCE_TBL_CTRL
-> reg twice, then it reads the reg value back, manually tweaks the
-> remaining bits appropriately and folds in the "start access bit", then
-> writes the whole value to the register.
-
-My understanding of GSWIP_PCE_TBL_CTRL is that this register is used to
-set the table and address/index to used for subsequent access with the
-GSWIP_PCE_TBL_* registers.
-
-It also looks weird to me, but I didn't have much time to try to
-optimize it, the sequence of register access is present since the
-initial support for VLAN unaware bridge offloading
-
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=8206e0ce96b33e6513615de9151e794bbc9f3786
-
+> I was a bit confused about next lines calling set_bit on 
+> `connected->sk_socket->flags`, but after `sock_graft(connected, 
+> newsock)` they are equivalent.
 > 
-> Why couldn't that be done by reading the register, do all the masking
-> and bit setting, then doing a single write of the whole thing?
+> So, maybe I would move the new line before the sock_graft() call or use 
+> `connected->sk_socket->flags` if you want to keep it after it.
+...
+>> 			if (vsock_msgzerocopy_allow(vconnected->transport))
+>> 				set_bit(SOCK_SUPPORT_ZC,
+>> 					&connected->sk_socket->flags);
 
-I agree, and it looks like it could be improved in this way, the only
-"special" bit there is probably GSWIP_PCE_TBL_CTRL_BAS.
+Hmm, isn't using both `connected->sk_socket->flags` and `newsock->flags` a
+bit confusing? `connected->sk_socket->flags` feels unnecessary long to me.
+So how about a not-so-minimal-patch to have
 
-> 
-> The data sheet doesn't say anything about this complicated scheme being
-> necessary.
-> 
-> Another thing: I'd really appreciate it if someone could point me to
-> documentation on the various tables, i.e. what does val[2] of an entry
-> in GSWIP_TABLE_VLAN_MAPPING actually mean? I can see that BIT(port) is
-> either set or cleared from it depending on 'untagged', so I can
-> sort-of-guess, but I'd prefer to have it documented so I don't have to
-> guess. AFAICT, none of the documents I can download from MaxLinear spell
-> this out in any way.
+	newsock->state = SS_CONNECTED;
+	set_bit(SOCK_CUSTOM_SOCKOPT, &newsock->flags);
+	if (vsock_msgzerocopy_allow(vconnected->transport))
+		set_bit(SOCK_SUPPORT_ZC, &newsock->flags);
+	sock_graft(connected, newsock);
 
-I also don't have any for-human documentation for the switch table entry
-formats and registers. I doubt any documentation of that actually
-exists.
+?
 
-Most of the switching engine itself is covered in
-
-GSW12x_GSW14x_Register_Description_PR_Rev1.1.pdf
-
-but also that doesn't describe the individual tables. My reference for
-that is the old/proprietary SW-API driver which describes some (but not
-all) of the table entry formats in code at least...
-
-You find the SW-API as part of various GPL leaks, all files there are
-under a dual BSD/GPLv2 license, so I can also share my (latest/official)
-version of that driver with you in case you don't have it.
-
-
-Cheers
-
-
-Daniel
 
