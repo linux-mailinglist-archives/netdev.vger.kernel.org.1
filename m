@@ -1,127 +1,90 @@
-Return-Path: <netdev+bounces-245910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245911-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id D98BACDA990
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 21:51:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 15006CDA8F6
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 21:44:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B608230BE599
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 20:46:59 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 006203089451
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 20:41:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80FF535A923;
-	Tue, 23 Dec 2025 20:21:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 967EA3164B7;
+	Tue, 23 Dec 2025 20:36:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="zBrQPJfe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mCNdZTx2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EE33359FBA
-	for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 20:21:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 781C8315760
+	for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 20:36:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766521316; cv=none; b=leTLU1SovrB57YWLu1e4wnNgyQrE4Eg1mQmDOQKWcer/r1j/LgIstX5mm+2cL5MYAAOOnGIdVTjglJijCIiTUN/dUhQVJ6R8TLmO3Bb0/IFw4nUoSFG1cKmoKtIWFwMm1WCjjN0y9QUSEXlCLf9h3qJeE6860C5WauCA8iP3VHQ=
+	t=1766522183; cv=none; b=k9reWP/kyYCjAF8WowLGefhrsV1KwEKTqZNDEbckfry/1hOvxUv5lBPBhnRw2QpgpHFXk+1C4j9uPZQcddaHXtx3uef37Hc18oKxqd4gh3BXwRQJWeN4n1+nnWLW3rIZthc4IkBae8hdA5tPhZyKbHVrouOfGVOEbLBhFb3yIRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766521316; c=relaxed/simple;
-	bh=mlFnmlaUzPjU4vJlQ+AT4Cwx7NsbLl4m+5vs+lqei2I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nfsOS8sF46r7vHafD/nIGHiiYrvdxQ9uYvqxk2R5zxAnHCJKJQYIJgPkstQVpg+eNKE0swiisTtz2MJ+OKhLmUCIFckCF5N2nMoVjCi4LyYWUzgEByzg/hEDqiu2r2f3qVAmH2sMOQpy3PgOXJ4Y3aRwQuUmOP/525I3pl4oDy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=zBrQPJfe; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7f89d0b37f0so3191650b3a.0
-        for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 12:21:53 -0800 (PST)
+	s=arc-20240116; t=1766522183; c=relaxed/simple;
+	bh=/Nccpglg2sCNvCsF7vVOy9nrDSxd6FnWQS59wgWVhtg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HJU5IN3oZ5MbTvs7WY1Y+nWlTPbEXR/3u2CYkUhakjZxqd2pgAlVkJbdO0G+0xpNiT21/ygWKK5HPfB6ir9RjIB9r0lodiSw99LVth730pRsrvvkD30cgGzhGGvdo4pFRdhE+cX/WQXK6/SwPJ8En/D6CFAcWHpf34+efPe006A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mCNdZTx2; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2a0d5c365ceso67720295ad.3
+        for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 12:36:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sartura.hr; s=sartura; t=1766521313; x=1767126113; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OOoWnK0gf2o6iG3x9q5l/DfQ9p+Pp5dHWYttnlxZz9g=;
-        b=zBrQPJfe12OfCq1WHO44PD35DFOx6z3XZoZri53UoZcmEFqhczyAh8mRIVQdvMmzqm
-         cqNlGp2xGTXMK4xw5co6CSI7+MCeOv5GBSWbs0l0l894Ihe3/kj7sq08Kuqh2jCNiLgu
-         /EK2kF5TOYIONG/VwFqBTBjLf9DV5jY6ZJ1iAMiz+XywxA25USFpYlBCx0XECkN3r3f6
-         2k7GUPy379dWsuXBQlJhuhO+iVtOWW/V4NHGwnhbIMp7xtO29eXZhBiFiC+HdJmKuFE7
-         YfSnYQ13i/3nzNEcHqPR60fWvECXoftYrXto3bAROZspKQqewysOsnx578mtHD7sToc8
-         I5EA==
+        d=gmail.com; s=20230601; t=1766522180; x=1767126980; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8W0pAdXDwSRhdNtMWGqkI9+0Gzu+9fko+sM3+ZxRRks=;
+        b=mCNdZTx2ojHNEWkI1YZBFecoT0TZ+u+TvBfE+FzagYl0njXisdLIYjFv5g9tqW0U0F
+         hR2XcJjYA9lqQMvopoiP7KZYl4RFvhsAAeFgiiVfI9mY3FdWWQzpmyEp7SER+4VwgJSl
+         dB6GF2cyluF6DV6BFnPfmeyFnbGkjTfjKRuYKGXbAY92jYwHlAy8EJS/foNdT+heVVk9
+         M0wJPCetbdikz2cCyN0yC8Iik6nPtifUz52SddIIML2ExcGtAtPLReUS+8MOMU8lIIuh
+         FDnlsuShEDIEsLyW5b4OgkRXFY5ozB6Q2JJ7VnR13vTHYteg1xg622lkVVXNUNHOhlCC
+         9u7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766521313; x=1767126113;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=OOoWnK0gf2o6iG3x9q5l/DfQ9p+Pp5dHWYttnlxZz9g=;
-        b=G7gb2uEmuLYpMlHcZS2daKd/G6kO2ozhwQdT7kh1pN0hgQsoyoVcOGtI9AsINxqXk4
-         HDAXLqw90DtyvT3S5NWp9yhXhyKtXPbH8JP97PX1Jk+dLp7L93INpxbl+nkHeaTvgKod
-         a9GrFwpgDPxho2ZfDl5VESx/jrWY4zMwlxX8ABni0za9lIhW6U/VZepjUAYk3i7VG/5F
-         cx5HqBAzZteroyA40GxvfSl+GHWTTfVq9pOICrmH5PZe4KZjYESg+oI5WLAv5BRGr5P2
-         whSDKoNvzCXnROkUtD5C7j+uFfQ5axAdinQFdDj99zwbqEqhYe2Z2lvLD4KFOLFr6Qtl
-         /4JQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXPVcr/7TAoht6IxsT+En3YplmTyLFeQpMvSJ6D9tOTvaBE7on6+wA1S9UImjB3Zdt8/5bjbp4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNL3ILBPoYzs18YpP8taqtyVDvmYWowvOdFowQ8gVE9jMYHaxV
-	WN1A3Udh+dSTHQFDK+ZU4nsLOXUiX5KaMkWxn4OycnR8NhsmXpgaPlmADxKLqlaMiLA=
-X-Gm-Gg: AY/fxX6BwnVyyw4LoYQcgoVIQk5J+Crol/XUyUQx7VwQ9WBBU33KRWjTN2eWkReF9u+
-	xCgdkgzD8kF5IznSFrSmjWhBkgQex952w/erAHZrQ8wGN9fcx9RuzF544SJ0CozT6VgF+ytPzf+
-	GBt8Tr+MNRNPKtjv3FdqFyqb+fb0VvTNjJjlXQlLgc0DDcc1zzqqtQ1Qrv0VlRWIXowLP4f1m0c
-	PCEJIeYJuoEBtyV0GUNLMd12uc6hFyvepllrP7WdCI8Fi7AFKgkCgX0qlBEx2n6B2CzZ9DuKh9i
-	UhsgJg4ulRwoEJL5fR/bPy2nyJjLedGek+sFVcHBvOilcALtdwBohrNPLkuPAYerkvJ5z4z1ouw
-	0RDP5mSSNYN3xdAWt0nnoVIxz0kE9/2lmibC+RW3mjNu6DOKrX8L5c7zIafg5alZu/zbFvF4Nbd
-	p6pEVIVjRX9RWtI8dOg+eyQ0dmxnmiymcQDoCbpQVhAqNz8ueWnp06Np9gs9Sg03MZ/38BO2oBA
-	1AuEH0w
-X-Google-Smtp-Source: AGHT+IF4V44eMfw9lW/nTVt3lc7E8IAyyFwXFzPqzG1x8JEQuNgrQFhuWoFlYOlAXic0m8UdzgYkcQ==
-X-Received: by 2002:a05:6a20:748e:b0:341:2c7b:ed13 with SMTP id adf61e73a8af0-3769d4ba0bemr15547677637.5.1766521312725;
-        Tue, 23 Dec 2025 12:21:52 -0800 (PST)
-Received: from fedora (dh207-15-53.xnet.hr. [88.207.15.53])
-        by smtp.googlemail.com with ESMTPSA id 41be03b00d2f7-c1e7cbfa619sm12567549a12.36.2025.12.23.12.21.44
+        d=1e100.net; s=20230601; t=1766522180; x=1767126980;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8W0pAdXDwSRhdNtMWGqkI9+0Gzu+9fko+sM3+ZxRRks=;
+        b=H8x4Z4K53EK9DSmPaXhi0JeRj+1Pz35Pq/qXo50vM2OrLsEZMxDpzjHzhpt+Vm4WWr
+         ojB8mQxD5eNeTENcuyD9A9ilvNhOYSfcKmAmQEUesnLxVbS9FwzIyFHR/zDrTfs2JR7O
+         b3SjSOrFwvu1wzCmaNoYpEXuJKb7oD2/EcuogpQSJgyctY+w8hcBl/PbA/Mb6+Ec7hB7
+         qc1sKgEWgjhXltZX99qII6eY6OJdF/m59PtqXg971TjvuqWE70Bw/LRMGzVAyWO5BJ7h
+         ywXrVm2WKlM5TnC4Sq1Hlfz1W3QcYvEKaMZMyw6V9VF63viVit1/6lWYb0JhjLU9paBe
+         RrzQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUwkp+ngWFXBkeNMMYjkUfEEbsIQFOe4YRc6NR7EDaz/Vv3m7c8DdC0+ElGLI3AQ5VJ98HxrZg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzgFsssp3pOo9KoW+C9zeBCGLx8DXYtwqVCNdaS71+g8S02CEoh
+	JnfeQtEDf59QVsvqC9iwuii3P6fRVHd6cuVh/fOwEHk8aLoP3bxQ42Dp
+X-Gm-Gg: AY/fxX5ixW3LHNHM2lbZMhYz/CpiR8COH+4olcsxU+vaLUyOmC6yaWBbZNSDlufXlMN
+	HfeJlOQSw4h46Yo0zaEgH0+wZ+JO4wnSFtEEUOPDCyRQ7ePUi9jjMVDRH+swX6PITLmknNbN5UR
+	pnWjDKlbcFSvwto7cM/qtY2o9uCC+2seZ5yGfSkpyYa/Q2oOuNzopyxWZIzhl002WXQdqriY8M6
+	RLuwnBjrf4vk+d/YeLVefzrYCkwLzFCWR6QkhLNjZZOATouDd2WWq1dU7ctg4WfarNC4fNekWtT
+	3tmspiko+5WzbKPcc/FrlEJniEVGTTjt0/nXx/rR4o+rIFr/56AQtFfU6F30jKq0J3Nw9YsLbvL
+	w1b74wveqNFSwSLb3DAHOTVX9iwScVQSEh/ccIig2Vwsq0JhywuYkGCBpUAzXMvU66MmuSip54M
+	7GFmQYyKHRvdUghRg9PtR0gPG5gGzgVNvoeRnIhEc=
+X-Google-Smtp-Source: AGHT+IEWmGBvaWT9oSau2/R/fh/7OvDd5bOP9C8tPlI4eGo18oCy4AueFhwKRM0vwQ0K6zZg/1vwXg==
+X-Received: by 2002:a17:902:f684:b0:2a1:3ee3:c6ae with SMTP id d9443c01a7336-2a2f293faedmr142818705ad.59.1766522179629;
+        Tue, 23 Dec 2025 12:36:19 -0800 (PST)
+Received: from SLSGDTSWING002.tail0ac356.ts.net ([129.126.109.177])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2a2f3d4cb25sm137245175ad.56.2025.12.23.12.36.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Dec 2025 12:21:52 -0800 (PST)
-From: Robert Marko <robert.marko@sartura.hr>
-To: robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	nicolas.ferre@microchip.com,
-	alexandre.belloni@bootlin.com,
-	claudiu.beznea@tuxon.dev,
-	herbert@gondor.apana.org.au,
+        Tue, 23 Dec 2025 12:36:17 -0800 (PST)
+From: bestswngs@gmail.com
+To: security@kernel.org
+Cc: edumazet@google.com,
 	davem@davemloft.net,
-	vkoul@kernel.org,
-	andi.shyti@kernel.org,
-	lee@kernel.org,
-	andrew+netdev@lunn.ch,
-	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	linusw@kernel.org,
-	Steen.Hegelund@microchip.com,
-	daniel.machon@microchip.com,
-	UNGLinuxDriver@microchip.com,
-	olivia@selenic.com,
-	radu_nicolae.pirea@upb.ro,
-	richard.genoud@bootlin.com,
-	gregkh@linuxfoundation.org,
-	jirislaby@kernel.org,
-	broonie@kernel.org,
-	mturquette@baylibre.com,
-	sboyd@kernel.org,
-	lars.povlsen@microchip.com,
-	devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	dmaengine@vger.kernel.org,
-	linux-i2c@vger.kernel.org,
+	horms@kernel.org,
 	netdev@vger.kernel.org,
-	linux-gpio@vger.kernel.org,
-	linux-spi@vger.kernel.org,
-	linux-serial@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	linux-clk@vger.kernel.org
-Cc: luka.perkov@sartura.hr,
-	Robert Marko <robert.marko@sartura.hr>
-Subject: [PATCH v3 15/15] arm64: dts: microchip: add EV23X71A board
-Date: Tue, 23 Dec 2025 21:16:26 +0100
-Message-ID: <20251223201921.1332786-16-robert.marko@sartura.hr>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20251223201921.1332786-1-robert.marko@sartura.hr>
-References: <20251223201921.1332786-1-robert.marko@sartura.hr>
+	linux-kernel@vger.kernel.org,
+	xmei5@asu.edu,
+	Weiming Shi <bestswngs@gmail.com>
+Subject: [PATCH net v5] net: sock: fix hardened usercopy panic in sock_recv_errqueue
+Date: Wed, 24 Dec 2025 04:35:35 +0800
+Message-ID: <20251223203534.1392218-2-bestswngs@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -130,796 +93,112 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Microchip EV23X71A is an LAN9696 based evaluation board.
+From: Weiming Shi <bestswngs@gmail.com>
 
-Signed-off-by: Robert Marko <robert.marko@sartura.hr>
+skbuff_fclone_cache was created without defining a usercopy region,
+[1] unlike skbuff_head_cache which properly whitelists the cb[] field.
+[2] This causes a usercopy BUG() when CONFIG_HARDENED_USERCOPY is
+enabled and the kernel attempts to copy sk_buff.cb data to userspace
+via sock_recv_errqueue() -> put_cmsg().
+
+The crash occurs when: 1. TCP allocates an skb using alloc_skb_fclone()
+   (from skbuff_fclone_cache) [1]
+2. The skb is cloned via skb_clone() using the pre-allocated fclone
+[3] 3. The cloned skb is queued to sk_error_queue for timestamp
+reporting 4. Userspace reads the error queue via recvmsg(MSG_ERRQUEUE)
+5. sock_recv_errqueue() calls put_cmsg() to copy serr->ee from skb->cb
+[4] 6. __check_heap_object() fails because skbuff_fclone_cache has no
+   usercopy whitelist [5]
+
+When cloned skbs allocated from skbuff_fclone_cache are used in the
+socket error queue, accessing the sock_exterr_skb structure in skb->cb
+via put_cmsg() triggers a usercopy hardening violation:
+
+[    5.379589] usercopy: Kernel memory exposure attempt detected from SLUB object 'skbuff_fclone_cache' (offset 296, size 16)!
+[    5.382796] kernel BUG at mm/usercopy.c:102!
+[    5.383923] Oops: invalid opcode: 0000 [#1] SMP KASAN NOPTI
+[    5.384903] CPU: 1 UID: 0 PID: 138 Comm: poc_put_cmsg Not tainted 6.12.57 #7
+[    5.384903] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
+[    5.384903] RIP: 0010:usercopy_abort+0x6c/0x80
+[    5.384903] Code: 1a 86 51 48 c7 c2 40 15 1a 86 41 52 48 c7 c7 c0 15 1a 86 48 0f 45 d6 48 c7 c6 80 15 1a 86 48 89 c1 49 0f 45 f3 e8 84 27 88 ff <0f> 0b 490
+[    5.384903] RSP: 0018:ffffc900006f77a8 EFLAGS: 00010246
+[    5.384903] RAX: 000000000000006f RBX: ffff88800f0ad2a8 RCX: 1ffffffff0f72e74
+[    5.384903] RDX: 0000000000000000 RSI: 0000000000000004 RDI: ffffffff87b973a0
+[    5.384903] RBP: 0000000000000010 R08: 0000000000000000 R09: fffffbfff0f72e74
+[    5.384903] R10: 0000000000000003 R11: 79706f6372657375 R12: 0000000000000001
+[    5.384903] R13: ffff88800f0ad2b8 R14: ffffea00003c2b40 R15: ffffea00003c2b00
+[    5.384903] FS:  0000000011bc4380(0000) GS:ffff8880bf100000(0000) knlGS:0000000000000000
+[    5.384903] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[    5.384903] CR2: 000056aa3b8e5fe4 CR3: 000000000ea26004 CR4: 0000000000770ef0
+[    5.384903] PKRU: 55555554
+[    5.384903] Call Trace:
+[    5.384903]  <TASK>
+[    5.384903]  __check_heap_object+0x9a/0xd0
+[    5.384903]  __check_object_size+0x46c/0x690
+[    5.384903]  put_cmsg+0x129/0x5e0
+[    5.384903]  sock_recv_errqueue+0x22f/0x380
+[    5.384903]  tls_sw_recvmsg+0x7ed/0x1960
+[    5.384903]  ? srso_alias_return_thunk+0x5/0xfbef5
+[    5.384903]  ? schedule+0x6d/0x270
+[    5.384903]  ? srso_alias_return_thunk+0x5/0xfbef5
+[    5.384903]  ? mutex_unlock+0x81/0xd0
+[    5.384903]  ? __pfx_mutex_unlock+0x10/0x10
+[    5.384903]  ? __pfx_tls_sw_recvmsg+0x10/0x10
+[    5.384903]  ? _raw_spin_lock_irqsave+0x8f/0xf0
+[    5.384903]  ? _raw_read_unlock_irqrestore+0x20/0x40
+[    5.384903]  ? srso_alias_return_thunk+0x5/0xfbef5
+
+The crash offset 296 corresponds to skb2->cb within skbuff_fclones:
+  - sizeof(struct sk_buff) = 232 - offsetof(struct sk_buff, cb) = 40 -
+  offset of skb2.cb in fclones = 232 + 40 = 272 - crash offset 296 =
+  272 + 24 (inside sock_exterr_skb.ee)
+
+This patch uses a local stack variable as a bounce buffer to avoid the hardened usercopy check failure.
+
+[1] https://elixir.bootlin.com/linux/v6.12.62/source/net/ipv4/tcp.c#L885 
+[2] https://elixir.bootlin.com/linux/v6.12.62/source/net/core/skbuff.c#L5104
+[3] https://elixir.bootlin.com/linux/v6.12.62/source/net/core/skbuff.c#L5566
+[4] https://elixir.bootlin.com/linux/v6.12.62/source/net/core/skbuff.c#L5491
+[5] https://elixir.bootlin.com/linux/v6.12.62/source/mm/slub.c#L5719
+
+Fixes: 6d07d1cd300f ("usercopy: Restrict non-usercopy caches to size 0")
+Reported-by: Xiang Mei <xmei5@asu.edu> 
+Signed-off-by: Weiming Shi <bestswngs@gmail.com>
 ---
-Changes in v2:
-* Split from SoC DTSI commit
-* Apply DTS coding style
-* Enclose array in i2c-mux
-* Alphanumericaly sort nodes
-* Change management port mode to RGMII-ID 
+v2: Fix the Commit Message
+v3: Add "From" email address, Fix "CC" and "TO" email address
+v4: Fix The Patch Code
+v5: Use a bounce buffer for copying skb->mark
 
- arch/arm64/boot/dts/microchip/Makefile        |   1 +
- .../boot/dts/microchip/lan9696-ev23x71a.dts   | 757 ++++++++++++++++++
- 2 files changed, 758 insertions(+)
- create mode 100644 arch/arm64/boot/dts/microchip/lan9696-ev23x71a.dts
+ net/core/sock.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/boot/dts/microchip/Makefile b/arch/arm64/boot/dts/microchip/Makefile
-index c6e0313eea0f..09d16fc1ce9a 100644
---- a/arch/arm64/boot/dts/microchip/Makefile
-+++ b/arch/arm64/boot/dts/microchip/Makefile
-@@ -1,4 +1,5 @@
- # SPDX-License-Identifier: GPL-2.0
-+dtb-$(CONFIG_ARCH_LAN969X) += lan9696-ev23x71a.dtb
- dtb-$(CONFIG_ARCH_SPARX5) += sparx5_pcb125.dtb
- dtb-$(CONFIG_ARCH_SPARX5) += sparx5_pcb134.dtb sparx5_pcb134_emmc.dtb
- dtb-$(CONFIG_ARCH_SPARX5) += sparx5_pcb135.dtb sparx5_pcb135_emmc.dtb
-diff --git a/arch/arm64/boot/dts/microchip/lan9696-ev23x71a.dts b/arch/arm64/boot/dts/microchip/lan9696-ev23x71a.dts
-new file mode 100644
-index 000000000000..435df455b078
---- /dev/null
-+++ b/arch/arm64/boot/dts/microchip/lan9696-ev23x71a.dts
-@@ -0,0 +1,757 @@
-+// SPDX-License-Identifier: (GPL-2.0-or-later OR MIT)
-+/*
-+ * Copyright (c) 2025 Microchip Technology Inc. and its subsidiaries.
-+ */
-+
-+/dts-v1/;
-+
-+#include <dt-bindings/gpio/gpio.h>
-+#include <dt-bindings/leds/common.h>
-+#include "lan9691.dtsi"
-+
-+/ {
-+	model = "Microchip EV23X71A";
-+	compatible = "microchip,ev23x71a", "microchip,lan9696", "microchip,lan9691";
-+
-+	aliases {
-+		serial0 = &usart0;
-+	};
-+
-+	chosen {
-+		stdout-path = "serial0:115200n8";
-+	};
-+
-+	gpio-restart {
-+		compatible = "gpio-restart";
-+		gpios = <&gpio 60 GPIO_ACTIVE_LOW>;
-+		open-source;
-+		priority = <200>;
-+	};
-+
-+	i2c-mux {
-+		compatible = "i2c-mux-gpio";
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+		i2c-parent = <&i2c3>;
-+		idle-state = <0x8>;
-+		mux-gpios = <&sgpio_out 0 1 GPIO_ACTIVE_HIGH>,
-+			    <&sgpio_out 0 2 GPIO_ACTIVE_HIGH>,
-+			    <&sgpio_out 0 3 GPIO_ACTIVE_HIGH>;
-+		settle-time-us = <100>;
-+
-+		i2c_sfp0: i2c@0 {
-+			reg = <0x0>;
-+		};
-+
-+		i2c_sfp1: i2c@1 {
-+			reg = <0x1>;
-+		};
-+
-+		i2c_sfp2: i2c@2 {
-+			reg = <0x2>;
-+		};
-+
-+		i2c_sfp3: i2c@3 {
-+			reg = <0x3>;
-+		};
-+
-+		i2c_poe: i2c@7 {
-+			reg = <0x7>;
-+		};
-+	};
-+
-+	leds {
-+		compatible = "gpio-leds";
-+
-+		led-status {
-+			color = <LED_COLOR_ID_GREEN>;
-+			function = LED_FUNCTION_STATUS;
-+			gpios = <&gpio 61 GPIO_ACTIVE_LOW>;
-+		};
-+
-+		led-sfp1-green {
-+			color = <LED_COLOR_ID_GREEN>;
-+			function = LED_FUNCTION_LAN;
-+			function-enumerator = <0>;
-+			gpios = <&sgpio_out 6 0 GPIO_ACTIVE_LOW>;
-+			default-state = "off";
-+		};
-+
-+		led-sfp1-yellow {
-+			color = <LED_COLOR_ID_YELLOW>;
-+			function = LED_FUNCTION_LAN;
-+			function-enumerator = <0>;
-+			gpios = <&sgpio_out 6 1 GPIO_ACTIVE_LOW>;
-+			default-state = "off";
-+		};
-+
-+		led-sfp2-green {
-+			color = <LED_COLOR_ID_GREEN>;
-+			function = LED_FUNCTION_LAN;
-+			function-enumerator = <1>;
-+			gpios = <&sgpio_out 7 0 GPIO_ACTIVE_LOW>;
-+			default-state = "off";
-+		};
-+
-+		led-sfp2-yellow {
-+			color = <LED_COLOR_ID_YELLOW>;
-+			function = LED_FUNCTION_LAN;
-+			function-enumerator = <1>;
-+			gpios = <&sgpio_out 7 1 GPIO_ACTIVE_LOW>;
-+			default-state = "off";
-+		};
-+
-+		led-sfp3-green {
-+			color = <LED_COLOR_ID_GREEN>;
-+			function = LED_FUNCTION_LAN;
-+			function-enumerator = <2>;
-+			gpios = <&sgpio_out 8 0 GPIO_ACTIVE_LOW>;
-+			default-state = "off";
-+		};
-+
-+		led-sfp3-yellow {
-+			color = <LED_COLOR_ID_YELLOW>;
-+			function = LED_FUNCTION_LAN;
-+			function-enumerator = <2>;
-+			gpios = <&sgpio_out 8 1 GPIO_ACTIVE_LOW>;
-+			default-state = "off";
-+		};
-+
-+		led-sfp4-green {
-+			color = <LED_COLOR_ID_GREEN>;
-+			function = LED_FUNCTION_LAN;
-+			function-enumerator = <3>;
-+			gpios = <&sgpio_out 9 0 GPIO_ACTIVE_LOW>;
-+			default-state = "off";
-+		};
-+
-+		led-sfp4-yellow {
-+			color = <LED_COLOR_ID_YELLOW>;
-+			function = LED_FUNCTION_LAN;
-+			function-enumerator = <3>;
-+			gpios = <&sgpio_out 9 1 GPIO_ACTIVE_LOW>;
-+			default-state = "off";
-+		};
-+	};
-+
-+	mux-controller {
-+		compatible = "gpio-mux";
-+		#mux-control-cells = <0>;
-+		mux-gpios = <&sgpio_out 1 2 GPIO_ACTIVE_LOW>,
-+			    <&sgpio_out 1 3 GPIO_ACTIVE_LOW>;
-+	};
-+
-+	sfp0: sfp0 {
-+		compatible = "sff,sfp";
-+		i2c-bus = <&i2c_sfp0>;
-+		tx-disable-gpios = <&sgpio_out 6 2 GPIO_ACTIVE_HIGH>;
-+		los-gpios = <&sgpio_in 6 0 GPIO_ACTIVE_HIGH>;
-+		mod-def0-gpios = <&sgpio_in 6 1 GPIO_ACTIVE_LOW>;
-+		tx-fault-gpios = <&sgpio_in 6 2 GPIO_ACTIVE_HIGH>;
-+	};
-+
-+	sfp1: sfp1 {
-+		compatible = "sff,sfp";
-+		i2c-bus = <&i2c_sfp1>;
-+		tx-disable-gpios = <&sgpio_out 7 2 GPIO_ACTIVE_HIGH>;
-+		los-gpios = <&sgpio_in 7 0 GPIO_ACTIVE_HIGH>;
-+		mod-def0-gpios = <&sgpio_in 7 1 GPIO_ACTIVE_LOW>;
-+		tx-fault-gpios = <&sgpio_in 7 2 GPIO_ACTIVE_HIGH>;
-+	};
-+
-+	sfp2: sfp2 {
-+		compatible = "sff,sfp";
-+		i2c-bus = <&i2c_sfp2>;
-+		tx-disable-gpios = <&sgpio_out 8 2 GPIO_ACTIVE_HIGH>;
-+		los-gpios = <&sgpio_in 8 0 GPIO_ACTIVE_HIGH>;
-+		mod-def0-gpios = <&sgpio_in 8 1 GPIO_ACTIVE_LOW>;
-+		tx-fault-gpios = <&sgpio_in 8 2 GPIO_ACTIVE_HIGH>;
-+	};
-+
-+	sfp3: sfp3 {
-+		compatible = "sff,sfp";
-+		i2c-bus = <&i2c_sfp3>;
-+		tx-disable-gpios = <&sgpio_out 9 2 GPIO_ACTIVE_HIGH>;
-+		los-gpios = <&sgpio_in 9 0 GPIO_ACTIVE_HIGH>;
-+		mod-def0-gpios = <&sgpio_in 9 1 GPIO_ACTIVE_LOW>;
-+		tx-fault-gpios = <&sgpio_in 9 2 GPIO_ACTIVE_HIGH>;
-+	};
-+};
-+
-+&gpio {
-+	emmc_sd_pins: emmc-sd-pins {
-+		/* eMMC_SD - CMD, CLK, D0, D1, D2, D3, D4, D5, D6, D7, RSTN */
-+		pins = "GPIO_14", "GPIO_15", "GPIO_16", "GPIO_17",
-+		       "GPIO_18", "GPIO_19", "GPIO_20", "GPIO_21",
-+		       "GPIO_22", "GPIO_23", "GPIO_24";
-+		function = "emmc_sd";
-+	};
-+
-+	fan_pins: fan-pins {
-+		pins = "GPIO_25", "GPIO_26";
-+		function = "fan";
-+	};
-+
-+	fc0_pins: fc0-pins {
-+		pins = "GPIO_3", "GPIO_4";
-+		function = "fc";
-+	};
-+
-+	fc2_pins: fc2-pins {
-+		pins = "GPIO_64", "GPIO_65", "GPIO_66";
-+		function = "fc";
-+	};
-+
-+	fc3_pins: fc3-pins {
-+		pins = "GPIO_55", "GPIO_56";
-+		function = "fc";
-+	};
-+
-+	mdio_pins: mdio-pins {
-+		pins = "GPIO_9", "GPIO_10";
-+		function = "miim";
-+	};
-+
-+	mdio_irq_pins: mdio-irq-pins {
-+		pins = "GPIO_11";
-+		function = "miim_irq";
-+	};
-+
-+	sgpio_pins: sgpio-pins {
-+		/* SCK, D0, D1, LD */
-+		pins = "GPIO_5", "GPIO_6", "GPIO_7", "GPIO_8";
-+		function = "sgpio_a";
-+	};
-+
-+	usb_ulpi_pins: usb-ulpi-pins {
-+		pins = "GPIO_30", "GPIO_31", "GPIO_32", "GPIO_33",
-+		       "GPIO_34", "GPIO_35", "GPIO_36", "GPIO_37",
-+		       "GPIO_38", "GPIO_39", "GPIO_40", "GPIO_41";
-+		function = "usb_ulpi";
-+	};
-+
-+	usb_rst_pins: usb-rst-pins {
-+		pins = "GPIO_12";
-+		function = "usb2phy_rst";
-+	};
-+
-+	usb_over_pins: usb-over-pins {
-+		pins = "GPIO_13";
-+		function = "usb_over_detect";
-+	};
-+
-+	usb_power_pins: usb-power-pins {
-+		pins = "GPIO_1";
-+		function = "usb_power";
-+	};
-+
-+	ptp_out_pins: ptp-out-pins {
-+		pins = "GPIO_58";
-+		function = "ptpsync_4";
-+	};
-+
-+	ptp_ext_pins: ptp-ext-pins {
-+		pins = "GPIO_59";
-+		function = "ptpsync_5";
-+	};
-+};
-+
-+&flx0 {
-+	atmel,flexcom-mode = <ATMEL_FLEXCOM_MODE_USART>;
-+	status = "okay";
-+};
-+
-+&flx2 {
-+	atmel,flexcom-mode = <ATMEL_FLEXCOM_MODE_SPI>;
-+	status = "okay";
-+};
-+
-+&flx3 {
-+	atmel,flexcom-mode = <ATMEL_FLEXCOM_MODE_TWI>;
-+	status = "okay";
-+};
-+
-+&i2c3 {
-+	pinctrl-0 = <&fc3_pins>;
-+	pinctrl-names = "default";
-+	i2c-analog-filter;
-+	i2c-digital-filter;
-+	i2c-digital-filter-width-ns = <35>;
-+	i2c-sda-hold-time-ns = <1500>;
-+	status = "okay";
-+};
-+
-+&mdio0 {
-+	pinctrl-0 = <&mdio_pins>, <&mdio_irq_pins>;
-+	pinctrl-names = "default";
-+	reset-gpios = <&gpio 62 GPIO_ACTIVE_LOW>;
-+	status = "okay";
-+
-+	phy3: phy@3 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <3>;
-+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-+		interrupt-parent = <&gpio>;
-+	};
-+
-+	phy4: phy@4 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <4>;
-+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-+		interrupt-parent = <&gpio>;
-+	};
-+
-+	phy5: phy@5 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <5>;
-+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-+		interrupt-parent = <&gpio>;
-+	};
-+
-+	phy6: phy@6 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <6>;
-+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-+		interrupt-parent = <&gpio>;
-+	};
-+
-+	phy7: phy@7 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <7>;
-+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-+		interrupt-parent = <&gpio>;
-+	};
-+
-+	phy8: phy@8 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <8>;
-+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-+		interrupt-parent = <&gpio>;
-+	};
-+
-+	phy9: phy@9 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <9>;
-+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-+		interrupt-parent = <&gpio>;
-+	};
-+
-+	phy10: phy@10 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <10>;
-+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-+		interrupt-parent = <&gpio>;
-+	};
-+
-+	phy11: phy@11 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <11>;
-+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-+		interrupt-parent = <&gpio>;
-+	};
-+
-+	phy12: phy@12 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <12>;
-+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-+		interrupt-parent = <&gpio>;
-+	};
-+
-+	phy13: phy@13 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <13>;
-+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-+		interrupt-parent = <&gpio>;
-+	};
-+
-+	phy14: phy@14 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <14>;
-+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-+		interrupt-parent = <&gpio>;
-+	};
-+
-+	phy15: phy@15 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <15>;
-+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-+		interrupt-parent = <&gpio>;
-+	};
-+
-+	phy16: phy@16 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <16>;
-+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-+		interrupt-parent = <&gpio>;
-+	};
-+
-+	phy17: phy@17 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <17>;
-+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-+		interrupt-parent = <&gpio>;
-+	};
-+
-+	phy18: phy@18 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <18>;
-+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-+		interrupt-parent = <&gpio>;
-+	};
-+
-+	phy19: phy@19 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <19>;
-+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-+		interrupt-parent = <&gpio>;
-+	};
-+
-+	phy20: phy@20 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <20>;
-+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-+		interrupt-parent = <&gpio>;
-+	};
-+
-+	phy21: phy@21 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <21>;
-+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-+		interrupt-parent = <&gpio>;
-+	};
-+
-+	phy22: phy@22 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <22>;
-+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-+		interrupt-parent = <&gpio>;
-+	};
-+
-+	phy23: phy@23 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <23>;
-+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-+		interrupt-parent = <&gpio>;
-+	};
-+
-+	phy24: phy@24 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <24>;
-+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-+		interrupt-parent = <&gpio>;
-+	};
-+
-+	phy25: phy@25 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <25>;
-+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-+		interrupt-parent = <&gpio>;
-+	};
-+
-+	phy26: phy@26 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <26>;
-+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-+		interrupt-parent = <&gpio>;
-+	};
-+
-+	phy27: phy@27 {
-+		compatible = "ethernet-phy-ieee802.3-c22";
-+		reg = <27>;
-+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-+		interrupt-parent = <&gpio>;
-+	};
-+};
-+
-+&serdes {
-+	status = "okay";
-+};
-+
-+&sgpio {
-+	pinctrl-0 = <&sgpio_pins>;
-+	pinctrl-names = "default";
-+	microchip,sgpio-port-ranges = <0 1>, <6 9>;
-+	status = "okay";
-+
-+	gpio@0 {
-+		ngpios = <128>;
-+	};
-+	gpio@1 {
-+		ngpios = <128>;
-+	};
-+};
-+
-+&spi2 {
-+	pinctrl-0 = <&fc2_pins>;
-+	pinctrl-names = "default";
-+	cs-gpios = <&gpio 63 GPIO_ACTIVE_LOW>;
-+	status = "okay";
-+};
-+
-+&switch {
-+	pinctrl-0 = <&ptp_out_pins>, <&ptp_ext_pins>;
-+	pinctrl-names = "default";
-+	status = "okay";
-+
-+	ethernet-ports {
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+
-+		port0: port@0 {
-+			reg = <0>;
-+			phy-handle = <&phy4>;
-+			phy-mode = "qsgmii";
-+			phys = <&serdes 0>;
-+			microchip,bandwidth = <1000>;
-+		};
-+
-+		port1: port@1 {
-+			reg = <1>;
-+			phy-handle = <&phy5>;
-+			phy-mode = "qsgmii";
-+			phys = <&serdes 0>;
-+			microchip,bandwidth = <1000>;
-+		};
-+
-+		port2: port@2 {
-+			reg = <2>;
-+			phy-handle = <&phy6>;
-+			phy-mode = "qsgmii";
-+			phys = <&serdes 0>;
-+			microchip,bandwidth = <1000>;
-+		};
-+
-+		port3: port@3 {
-+			reg = <3>;
-+			phy-handle = <&phy7>;
-+			phy-mode = "qsgmii";
-+			phys = <&serdes 0>;
-+			microchip,bandwidth = <1000>;
-+		};
-+
-+		port4: port@4 {
-+			reg = <4>;
-+			phy-handle = <&phy8>;
-+			phy-mode = "qsgmii";
-+			phys = <&serdes 1>;
-+			microchip,bandwidth = <1000>;
-+		};
-+
-+		port5: port@5 {
-+			reg = <5>;
-+			phy-handle = <&phy9>;
-+			phy-mode = "qsgmii";
-+			phys = <&serdes 1>;
-+			microchip,bandwidth = <1000>;
-+		};
-+
-+		port6: port@6 {
-+			reg = <6>;
-+			phy-handle = <&phy10>;
-+			phy-mode = "qsgmii";
-+			phys = <&serdes 1>;
-+			microchip,bandwidth = <1000>;
-+		};
-+
-+		port7: port@7 {
-+			reg = <7>;
-+			phy-handle = <&phy11>;
-+			phy-mode = "qsgmii";
-+			phys = <&serdes 1>;
-+			microchip,bandwidth = <1000>;
-+		};
-+
-+		port8: port@8 {
-+			reg = <8>;
-+			phy-handle = <&phy12>;
-+			phy-mode = "qsgmii";
-+			phys = <&serdes 2>;
-+			microchip,bandwidth = <1000>;
-+		};
-+
-+		port9: port@9 {
-+			reg = <9>;
-+			phy-handle = <&phy13>;
-+			phy-mode = "qsgmii";
-+			phys = <&serdes 2>;
-+			microchip,bandwidth = <1000>;
-+		};
-+
-+		port10: port@10 {
-+			reg = <10>;
-+			phy-handle = <&phy14>;
-+			phy-mode = "qsgmii";
-+			phys = <&serdes 2>;
-+			microchip,bandwidth = <1000>;
-+		};
-+
-+		port11: port@11 {
-+			reg = <11>;
-+			phy-handle = <&phy15>;
-+			phy-mode = "qsgmii";
-+			phys = <&serdes 2>;
-+			microchip,bandwidth = <1000>;
-+		};
-+
-+		port12: port@12 {
-+			reg = <12>;
-+			phy-handle = <&phy16>;
-+			phy-mode = "qsgmii";
-+			phys = <&serdes 3>;
-+			microchip,bandwidth = <1000>;
-+		};
-+
-+		port13: port@13 {
-+			reg = <13>;
-+			phy-handle = <&phy17>;
-+			phy-mode = "qsgmii";
-+			phys = <&serdes 3>;
-+			microchip,bandwidth = <1000>;
-+		};
-+
-+		port14: port@14 {
-+			reg = <14>;
-+			phy-handle = <&phy18>;
-+			phy-mode = "qsgmii";
-+			phys = <&serdes 3>;
-+			microchip,bandwidth = <1000>;
-+		};
-+
-+		port15: port@15 {
-+			reg = <15>;
-+			phy-handle = <&phy19>;
-+			phy-mode = "qsgmii";
-+			phys = <&serdes 3>;
-+			microchip,bandwidth = <1000>;
-+		};
-+
-+		port16: port@16 {
-+			reg = <16>;
-+			phy-handle = <&phy20>;
-+			phy-mode = "qsgmii";
-+			phys = <&serdes 4>;
-+			microchip,bandwidth = <1000>;
-+		};
-+
-+		port17: port@17 {
-+			reg = <17>;
-+			phy-handle = <&phy21>;
-+			phy-mode = "qsgmii";
-+			phys = <&serdes 4>;
-+			microchip,bandwidth = <1000>;
-+		};
-+
-+		port18: port@18 {
-+			reg = <18>;
-+			phy-handle = <&phy22>;
-+			phy-mode = "qsgmii";
-+			phys = <&serdes 4>;
-+			microchip,bandwidth = <1000>;
-+		};
-+
-+		port19: port@19 {
-+			reg = <19>;
-+			phy-handle = <&phy23>;
-+			phy-mode = "qsgmii";
-+			phys = <&serdes 4>;
-+			microchip,bandwidth = <1000>;
-+		};
-+
-+		port20: port@20 {
-+			reg = <20>;
-+			phy-handle = <&phy24>;
-+			phy-mode = "qsgmii";
-+			phys = <&serdes 5>;
-+			microchip,bandwidth = <1000>;
-+		};
-+
-+		port21: port@21 {
-+			reg = <21>;
-+			phy-handle = <&phy25>;
-+			phy-mode = "qsgmii";
-+			phys = <&serdes 5>;
-+			microchip,bandwidth = <1000>;
-+		};
-+
-+		port22: port@22 {
-+			reg = <22>;
-+			phy-handle = <&phy26>;
-+			phy-mode = "qsgmii";
-+			phys = <&serdes 5>;
-+			microchip,bandwidth = <1000>;
-+		};
-+
-+		port23: port@23 {
-+			reg = <23>;
-+			phy-handle = <&phy27>;
-+			phy-mode = "qsgmii";
-+			phys = <&serdes 5>;
-+			microchip,bandwidth = <1000>;
-+		};
-+
-+		port24: port@24 {
-+			reg = <24>;
-+			phys = <&serdes 6>;
-+			phy-mode = "10gbase-r";
-+			sfp = <&sfp0>;
-+			managed = "in-band-status";
-+			microchip,bandwidth = <10000>;
-+			microchip,sd-sgpio = <24>;
-+		};
-+
-+		port25: port@25 {
-+			reg = <25>;
-+			phys = <&serdes 7>;
-+			phy-mode = "10gbase-r";
-+			sfp = <&sfp1>;
-+			managed = "in-band-status";
-+			microchip,bandwidth = <10000>;
-+			microchip,sd-sgpio = <28>;
-+		};
-+
-+		port26: port@26 {
-+			reg = <26>;
-+			phys = <&serdes 8>;
-+			phy-mode = "10gbase-r";
-+			sfp = <&sfp2>;
-+			managed = "in-band-status";
-+			microchip,bandwidth = <10000>;
-+			microchip,sd-sgpio = <32>;
-+		};
-+
-+		port27: port@27 {
-+			reg = <27>;
-+			phys = <&serdes 9>;
-+			phy-mode = "10gbase-r";
-+			sfp = <&sfp3>;
-+			managed = "in-band-status";
-+			microchip,bandwidth = <10000>;
-+			microchip,sd-sgpio = <36>;
-+		};
-+
-+		port29: port@29 {
-+			reg = <29>;
-+			phys = <&serdes 11>;
-+			phy-handle = <&phy3>;
-+			phy-mode = "rgmii-id";
-+			microchip,bandwidth = <1000>;
-+		};
-+	};
-+};
-+
-+&tmon {
-+	pinctrl-0 = <&fan_pins>;
-+	pinctrl-names = "default";
-+};
-+
-+&usart0 {
-+	pinctrl-0 = <&fc0_pins>;
-+	pinctrl-names = "default";
-+	status = "okay";
-+};
-+
-+&usb {
-+	pinctrl-0 = <&usb_ulpi_pins>, <&usb_rst_pins>, <&usb_over_pins>, <&usb_power_pins>;
-+	pinctrl-names = "default";
-+	status = "okay";
-+};
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 45c98bf524b2..a1c8b47b0d56 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -3896,7 +3896,7 @@ void sock_enable_timestamp(struct sock *sk, enum sock_flags flag)
+ int sock_recv_errqueue(struct sock *sk, struct msghdr *msg, int len,
+ 		       int level, int type)
+ {
+-	struct sock_exterr_skb *serr;
++	struct sock_extended_err ee;
+ 	struct sk_buff *skb;
+ 	int copied, err;
+ 
+@@ -3916,8 +3916,9 @@ int sock_recv_errqueue(struct sock *sk, struct msghdr *msg, int len,
+ 
+ 	sock_recv_timestamp(msg, sk, skb);
+ 
+-	serr = SKB_EXT_ERR(skb);
+-	put_cmsg(msg, level, type, sizeof(serr->ee), &serr->ee);
++	/* We must use a bounce buffer for CONFIG_HARDENED_USERCOPY=y */
++	ee = SKB_EXT_ERR(skb)->ee;
++	put_cmsg(msg, level, type, sizeof(ee), &ee);
+ 
+ 	msg->msg_flags |= MSG_ERRQUEUE;
+ 	err = copied;
 -- 
-2.52.0
+2.43.0
 
 
