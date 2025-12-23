@@ -1,188 +1,156 @@
-Return-Path: <netdev+bounces-245825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 169BFCD8BD0
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 11:12:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 91F15CD8E4D
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 11:44:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 73F493074341
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 10:06:23 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id CEB4E3010999
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 10:39:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58A5C340A47;
-	Tue, 23 Dec 2025 10:03:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75581357A20;
+	Tue, 23 Dec 2025 10:05:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="oCy7WE21"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dgS9t4gl"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82D9D33893E;
-	Tue, 23 Dec 2025 10:03:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B310357736;
+	Tue, 23 Dec 2025 10:05:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766484191; cv=none; b=E0Txa/fh53hCPzwcdLxz2O266kt3kddOM+n+WXTwegS1rcXwp4q/l2f7sVefi+2QzmI6WgvrfB+XVqLW7qR6hE08tbpobwJD0MFdBhntOSXV4rcXYyv1tKmcWrNWMpYu3TH0FXvcAqqkbwMt+XM/q5pocUzfmUpKn/yIbVmY0s8=
+	t=1766484334; cv=none; b=JgAMDvL3R8/zJcyC4n4+cmYYIH00qkKvGuyst/JaorAcmBJtq2Q3GhT/OcU+kqqRe6Ua/DjcaavC5/4L6N+/LSkU1U5tlVYMEPNlYsd0jvbCeRm1fT8G7ZcyBfg6dSJk2LvbXXodFazgC4H0CJHwRCR0QfylhPZHq+3TiOybnwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766484191; c=relaxed/simple;
-	bh=U+tbKM4F+Du3elwL7/+bSqYSagS2tMs6YYP5KjJHgpk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H4iaxB/zxKs+JrwQjGJsRHjacRcbx/mDy839m6AHEJnwyAGr2OMhoqc6cE77uB/m81te5If939kUf0dByPG8lGbCMByMF09hgXnJxkZ3XRbSKrjQk+cFvuBoMCWZFDb1Bmmo8zReyLzk7ukwebb8SSbB34PfnjsfTb6TqGeLDEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=oCy7WE21; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=AQFDYWqSkDriuWAbN7InAfyNwsqwAPRnfhoRrmIYFKc=; b=oCy7WE21C1bdo4sF0tAANbR4Sv
-	mCUh9rW51XPkefJyihI9ocBlqz/eLZZPj/vdp/8zjq9h1cFTRzVcp6MO3OcLYqMuVKb0YQzFMQv9H
-	wUz4eFXVSqPgznljnurfg7nspu99Bf+XOIrQqc8PCOFQ8yTWTSSzqX1Vgl3FggonF0JU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vXzEJ-000HdJ-CK; Tue, 23 Dec 2025 11:02:59 +0100
-Date: Tue, 23 Dec 2025 11:02:59 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "illusion.wang" <illusion.wang@nebula-matrix.com>
-Cc: dimon.zhao@nebula-matrix.com, alvin.wang@nebula-matrix.com,
-	sam.chen@nebula-matrix.com, netdev@vger.kernel.org,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v1 net-next 01/15] net/nebula-matrix: add minimum nbl
- build framework
-Message-ID: <b5c1c892-540b-495a-a138-781f12c3ddd7@lunn.ch>
-References: <20251223035113.31122-1-illusion.wang@nebula-matrix.com>
- <20251223035113.31122-2-illusion.wang@nebula-matrix.com>
+	s=arc-20240116; t=1766484334; c=relaxed/simple;
+	bh=ooUhopMYufXyAl/z2LDIuz1qbAKdAy+jWWrh58kah7E=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KLJANotiSitrjsC4Yq+VfKV/h0R8p4QDcyl+jasFs9ik7dgxDvIbb12WFW6AC/ohA/ckfuM5TIQDGK+F0WU14ZY7HYrIwPVvdtgEsihnFucj5IU1MYs/6fQJtw4zonz66YlW3JtAZE/oLArkJ6uNcGu+lG2/8QdgdxoNZja/aUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dgS9t4gl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02AFBC19425;
+	Tue, 23 Dec 2025 10:05:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766484333;
+	bh=ooUhopMYufXyAl/z2LDIuz1qbAKdAy+jWWrh58kah7E=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=dgS9t4glFL32JT6hXoJYPCGgS0xk4nWiOkYQ9aHEAbJtzHojprOCT+gAkoUsqddoZ
+	 x7NmmX60JPBqYmKjpCmBKBO0x6V2401JiM7aCAAjIdUsRxS1DugQrW7HAaxPVJJqDq
+	 OYqta96g0YrT0OKJEQv5/OzUNnvQb1CZyGVUBqIkkl5YwZ2u3TpcA0wYNL0SMXbdVD
+	 W20RKpZUPCX5Q1ATpP2ffYDimfj8hD3DbC8dwAA/fMvELsLzC0Yeo014oVZetMay1C
+	 1QqPnBIEXonP3C6g0u/iEwk1IL3KbooMmnqQUziLId9Vb1GsfmaoMN50WNzXR9Fjho
+	 o6TNTTHi2sIzQ==
+From: Sasha Levin <sashal@kernel.org>
+To: patches@lists.linux.dev,
+	stable@vger.kernel.org
+Cc: Marcus Hughes <marcus.hughes@betterinternet.ltd>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	linux@armlinux.org.uk,
+	andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.18-6.12] net: sfp: extend Potron XGSPON quirk to cover additional EEPROM variant
+Date: Tue, 23 Dec 2025 05:05:15 -0500
+Message-ID: <20251223100518.2383364-11-sashal@kernel.org>
+X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20251223100518.2383364-1-sashal@kernel.org>
+References: <20251223100518.2383364-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251223035113.31122-2-illusion.wang@nebula-matrix.com>
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.18.2
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-> @@ -27628,6 +27628,16 @@ F:	Documentation/networking/device_drivers/ethernet/wangxun/*
->  F:	drivers/net/ethernet/wangxun/
->  F:	drivers/net/pcs/pcs-xpcs-wx.c
->  
-> +NEBULA-MATRIX ETHERNET DRIVER (nebula-matrix)
-> +M:	Illusion.Wang <illusion.wang@nebula-matrix.com>
-> +M:	Dimon.Zhao <dimon.zhao@nebula-matrix.com>
-> +M:	Alvin.Wang <alvin.wang@nebula-matrix.com>
-> +M:	Sam Chen <sam.chen@nebula-matrix.com>
-> +L:	netdev@vger.kernel.org
-> +S:	Maintained
-> +F:	Documentation/networking/device_drivers/ethernet/nebula-matrix/*
-> +F:	drivers/net/ethernet/nebula-matrix/
+From: Marcus Hughes <marcus.hughes@betterinternet.ltd>
 
-This file is sorted, so please insert in the correct location.
+[ Upstream commit 71cfa7c893a05d09e7dc14713b27a8309fd4a2db ]
 
-> +
->  WATCHDOG DEVICE DRIVERS
->  M:	Wim Van Sebroeck <wim@linux-watchdog.org>
->  M:	Guenter Roeck <linux@roeck-us.net>
-> diff --git a/drivers/net/ethernet/Kconfig b/drivers/net/ethernet/Kconfig
-> index 4a1b368ca7e6..3995f75f1016 100644
-> --- a/drivers/net/ethernet/Kconfig
-> +++ b/drivers/net/ethernet/Kconfig
-> @@ -204,5 +204,6 @@ source "drivers/net/ethernet/wangxun/Kconfig"
->  source "drivers/net/ethernet/wiznet/Kconfig"
->  source "drivers/net/ethernet/xilinx/Kconfig"
->  source "drivers/net/ethernet/xircom/Kconfig"
-> +source "drivers/net/ethernet/nebula-matrix/Kconfig"
+Some Potron SFP+ XGSPON ONU sticks are shipped with different EEPROM
+vendor ID and vendor name strings, but are otherwise functionally
+identical to the existing "Potron SFP+ XGSPON ONU Stick" handled by
+sfp_quirk_potron().
 
-Also sorted.
+These modules, including units distributed under the "Better Internet"
+branding, use the same UART pin assignment and require the same
+TX_FAULT/LOS behaviour and boot delay. Re-use the existing Potron
+quirk for this EEPROM variant.
 
->  
->  endif # ETHERNET
-> diff --git a/drivers/net/ethernet/Makefile b/drivers/net/ethernet/Makefile
-> index 2e18df8ca8ec..632dac9c4b75 100644
-> --- a/drivers/net/ethernet/Makefile
-> +++ b/drivers/net/ethernet/Makefile
-> @@ -108,4 +108,5 @@ obj-$(CONFIG_NET_VENDOR_XILINX) += xilinx/
->  obj-$(CONFIG_NET_VENDOR_XIRCOM) += xircom/
->  obj-$(CONFIG_NET_VENDOR_SYNOPSYS) += synopsys/
->  obj-$(CONFIG_NET_VENDOR_PENSANDO) += pensando/
-> +obj-$(CONFIG_NET_VENDOR_NEBULA_MATRIX) += nebula-matrix/
-
-This is not strictly sorted, but mostly sorted. Please insert in the
-correct location.
-
-Sorting avoids merge conflicts when everybody adds to the end of the
-file.
-
-> +if NET_VENDOR_NEBULA_MATRIX
-> +
-> +config NBL_CORE
-
-Why core? Is it shared by multiple other drivers?
-
-> +#define NBL_CAP_SET_BIT(loc)			(1 << (loc))
-
-Please don't re-implement existing functionality. Why are you not using BIT()?
-
-> +++ b/drivers/net/ethernet/nebula-matrix/nbl/nbl_include/nbl_include.h
-
-Please include the needed headers in the .c file. A large proportion
-of compile time is spent processing headers. So including headers you
-don't actually need into every C file just slows down the build for
-everybody.
-
-> +#define NBL_DRIVER_VERSION				"25.11-1.16"
-
-Driver versions are generally pointless, since they never change, but
-the kernel around it is changing all the time.
-
-> +
-> +#define NBL_FLOW_INDEX_BYTE_LEN				8
-> +
-> +#define NBL_RATE_MBPS_100G				(100000)
-> +#define NBL_RATE_MBPS_25G				(25000)
-> +#define NBL_RATE_MBPS_10G				(10000)
-
-Pointless ()
-
-> +#define NBL_NEXT_ID(id, max)	({ typeof(id) _id = (id); ((_id) == (max) ? 0 : (_id) + 1); })
-> +#define NBL_IPV6_U32LEN					4
-> +
-> +#define NBL_MAX_FUNC					(520)
-> +#define NBL_MAX_MTU					15
-
-You can only send 15 byte packets? Very odd hardware.
-
-> +static int nbl_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *id)
-> +{
-> +	struct device *dev = &pdev->dev;
-> +
-> +	dev_info(dev, "nbl probe finished\n");
-
-Please don't spam the log in the 'happy case'. dev_dbg(), or nothing
-at all.
-
-
-> +static int __maybe_unused nbl_suspend(struct device *dev)
-> +{
-> +	return 0;
-> +}
-> +
-> +static int __maybe_unused nbl_resume(struct device *dev)
-> +{
-> +	return 0;
-> +}
-
-You should be able to add these when you add suspend/resume support.
-
-> +static int __init nbl_module_init(void)
-> +{
-> +	int status;
-> +
-> +	status = pci_register_driver(&nbl_driver);
-
-There are helpers for PCI drivers which should mean you don't need
-this or nbl_module_exit().
-
-    Andrew
-
+Signed-off-by: Marcus Hughes <marcus.hughes@betterinternet.ltd>
+Link: https://patch.msgid.link/20251207210355.333451-1-marcus.hughes@betterinternet.ltd
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
-pw-bot: cr
+
+LLM Generated explanations, may be completely bogus:
+
+## SUMMARY
+
+**What the commit does**: Adds a single entry to the SFP quirks array
+for hardware that has a different vendor/part ID ("BIDB"/"X-ONU-SFPP")
+but requires identical handling to already-supported Potron modules.
+
+**Does it meet stable kernel rules?**
+
+1. ✅ **Obviously correct**: It's a one-line addition using existing,
+   proven quirk infrastructure
+2. ✅ **Fixes a real bug**: Without this quirk, the hardware doesn't work
+   properly (TX_FAULT/LOS pins are misinterpreted)
+3. ✅ **Important issue**: Hardware that users have purchased doesn't
+   function
+4. ✅ **Small and contained**: Single line addition to an array
+5. ✅ **No new features**: Just extends existing quirk to another device
+   ID
+
+**Dependency check**: The `sfp_fixup_potron()` function was introduced
+in commit `dfec1c14aece` (June 2025) and has already been backported to
+stable trees (confirmed by seeing backport commit `34a890983183`). This
+commit requires that parent commit to be present.
+
+**Risk vs Benefit**:
+- **Risk**: Near zero - only affects specific hardware identified by
+  exact vendor/part match
+- **Benefit**: High for affected users - enables hardware to work
+  properly
+
+## CONCLUSION
+
+This commit is a textbook example of a hardware quirk addition that IS
+appropriate for stable backporting. It:
+- Uses existing, tested infrastructure
+- Has minimal code change (1 line)
+- Enables real hardware that users have in the field
+- Has zero risk of regression for anyone else
+- The parent quirk function is already in stable trees
+
+The only caveat is that stable kernels must have the original Potron
+quirk commit (`dfec1c14aece`) first, which based on the git history
+appears to have already been backported.
+
+**YES**
+
+ drivers/net/phy/sfp.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+index 0401fa6b24d2..6166e9196364 100644
+--- a/drivers/net/phy/sfp.c
++++ b/drivers/net/phy/sfp.c
+@@ -497,6 +497,8 @@ static const struct sfp_quirk sfp_quirks[] = {
+ 	SFP_QUIRK("ALCATELLUCENT", "3FE46541AA", sfp_quirk_2500basex,
+ 		  sfp_fixup_nokia),
+ 
++	SFP_QUIRK_F("BIDB", "X-ONU-SFPP", sfp_fixup_potron),
++
+ 	// FLYPRO SFP-10GT-CS-30M uses Rollball protocol to talk to the PHY.
+ 	SFP_QUIRK_F("FLYPRO", "SFP-10GT-CS-30M", sfp_fixup_rollball),
+ 
+-- 
+2.51.0
+
 
