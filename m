@@ -1,139 +1,109 @@
-Return-Path: <netdev+bounces-245847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245848-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74AF5CD92D2
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 13:10:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 11AD1CD93B1
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 13:26:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 8D045300EA1F
-	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 12:10:13 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 95F2C301B829
+	for <lists+netdev@lfdr.de>; Tue, 23 Dec 2025 12:26:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE7AC32D0EA;
-	Tue, 23 Dec 2025 12:10:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kGE+F6Rm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA80233D4EC;
+	Tue, 23 Dec 2025 12:21:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12BFA2882CE
-	for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 12:10:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+Received: from mailgw1.hygon.cn (unknown [101.204.27.37])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D9642C235B
+	for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 12:20:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=101.204.27.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766491811; cv=none; b=QhsBnFxtNon5mivBDwP/LbpRYn6svQoO7jKHR8aljWrY1gd0O+Xvhyqi6hPFqeFL67WvjR6HcMdUlvE/uvepWGHIkQEBLZP0rmZh5B9qnOBTGc3EYoWq2ndXGCP+u11SfCEV7LcaKXRo7qLZNh8txoUKm8OC7H0W5tpj6yw/2wE=
+	t=1766492473; cv=none; b=jycpZLJtFmYaQQPSsSkOtfP3gv6HsT/84cjxiM69Y3ocquTqX7B8EcHNUTKCcKBOlwPbj5jle6zAIb7xOSj2Z5+3v7HGNlMJOekHv1zyxmYvKmZR6wDbhKo+oYA5QJf/RIzm/YYqrRUr3fBhSTloZzSnkSr4dIIiPfPfxRrZGwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766491811; c=relaxed/simple;
-	bh=XgUw0g/NEIgEW+VG/XOEKDs722Z5GJubVhMQ0qWhJG8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=o2WlaL6aGBeKimfAD9NdXsSvsB8+nJmXMWLf2akvIhXIIqpVLX+ouTw2+yLb2K0bs8sg/U8J2k6OzKcJ7syYJlbKH9Rs81q0HFHkWIzTppxSI2xct13sr4AhKrC24qxKy74sKPMMznqge79CbRfC42uHtrd8XkjG0y+ElJAUBfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kGE+F6Rm; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-47a95efd2ceso42853035e9.2
-        for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 04:10:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766491808; x=1767096608; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/f9HflRnwVkXbTIRr+dIQ1TlNT2yG1b0bvlXXsWw0A0=;
-        b=kGE+F6RmCspfYh6ZbeNfo8ll6FpqfrTfWviJ6UkWjqWG18q5P7WXUMew68cSmbvF4L
-         eYzXdJ2BwC/mjrZUp4mp7ZBOFjDs160S+0lCah7ENoaOfRbXxJ1Ow5VwoZDyhtw/ZEAd
-         EsC3+b2/cpwWc3qW5UmCDcycmvISC6p2HaRYAoBcnjCnR0jRYqebrpz24pWo7pgOtQx0
-         UDW92r/BjTf4s/tOohHGdYwmsPeLqjoxJblibQOFwjQsWW1GJ1hdyCEcCoNuPKPj2/IY
-         afgCUbh7VUTsC6qURXCArvNWVokaeslR01Ppj8rXaj2NFrQt6sH/dCxKe3BudhGiCd9v
-         msDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766491808; x=1767096608;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/f9HflRnwVkXbTIRr+dIQ1TlNT2yG1b0bvlXXsWw0A0=;
-        b=gCAjtIyKg3Be4KatgluI7MIzCsk8JGV7EM0yqM4wCmjD2R+IJIkZFNaYWcZ7/BovPA
-         AUkIdV0WNJo4voKhmSTG+bl1RJzO47NcUFyU1e6kl3YyM7X1ChfF2P9JS0g01WYIMVb3
-         o4koN12gIGnT7PJ4xP6v57cMK/eTktvN4Lb3JMmW/6aBqtLy1ZAJsU1eAEI4ThWfmnc7
-         FvMRcmv+ljmIW4hQWh6yd8b+bvup42yBqy0j6QNzs/DWsUj/niBlueiz2gnBGpPB6YZ4
-         VyHhzal4o0kYpvQxjsGHfdPkZ+CdxMweYCzstl/5S4sEz/Lx2aJ6Ze71ddM7Gsje1BJa
-         2R3w==
-X-Gm-Message-State: AOJu0YzIbtwIXfVcLobVzalTW1NdDbhpfqnUNv2bYoOmUk1hQuBheU7j
-	F5idb6QVk1Mj6UxnyX9E7+KSaRA3UGn7bwS7MfHGUExY105n0Ei58zcKGBHQJQ==
-X-Gm-Gg: AY/fxX4QGFykPpvgaDJ/YV6Ybw1jI9I8Er/frWygpx4Aa/xU66XA/9Zj2d4C5Cfo71J
-	LfTayfGjH/zz5+4aaIZ+8gFJJwisaEYh7kcfq0CNro0fOXBVd3DlvWkCE6+LHEvNKntx2OH/OnQ
-	0u0VLH1E3NxZBuRNQBDwu+RoZO7A+Wk7fi+VK+k6G3LubKlZ0EM2ZwL7AeR/BLISqPaEAGLiTly
-	BmpvYObBOdHPdOvi0IKsZmzFxBmdRlDwS2z8nHbFlikk/rdaWt23NlCXBPD6XmTkE59Bj2fHiRw
-	Ilz03U2mCz8zvOi2DtXCVZZK8cJcDdDjZEl3seeiU+mrbWREHwdRBF4n7GLBnPx9Ht1iuCPFBHz
-	FOAFEkiagMkBkLcr6DUvIG+nyab4PB2aUKoU5pfNH0k/SgWQYmNMe+ZOV4PQTJ5JbzL0JGZdxrc
-	EdTFuptHhGBpt26s5AnC6G41mDpk/UJf87johxrFQF2/yI7adCDat8aJWzf2CmrccFPBTQ5bY5F
-	IzbLebmvBvfJxCeiUD8
-X-Google-Smtp-Source: AGHT+IFoUZg6EVilZOy8UUnejX8ATFVdzOSIn5a3i4NKr2lM7SWQebsdVEsArAovjaNX7gydswaCrg==
-X-Received: by 2002:a05:600c:3111:b0:477:b642:9dc6 with SMTP id 5b1f17b1804b1-47d195aa79cmr141220775e9.34.1766491808025;
-        Tue, 23 Dec 2025 04:10:08 -0800 (PST)
-Received: from Lord-Beerus.station (net-5-94-28-220.cust.vodafonedsl.it. [5.94.28.220])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d19346e48sm234347685e9.2.2025.12.23.04.10.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Dec 2025 04:10:07 -0800 (PST)
-From: Stefano Radaelli <stefano.radaelli21@gmail.com>
-X-Google-Original-From: Stefano Radaelli <stefano.r@variscite.com>
-To: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Stefano Radaelli <stefano.r@variscite.com>,
-	Xu Liang <lxu@maxlinear.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Stefano Radaelli <stefano.radaelli21@gmail.com>
-Subject: [PATCH net v2] net: phy: mxl-86110: Add power management and soft reset support
-Date: Tue, 23 Dec 2025 13:09:39 +0100
-Message-ID: <20251223120940.407195-1-stefano.r@variscite.com>
-X-Mailer: git-send-email 2.47.3
+	s=arc-20240116; t=1766492473; c=relaxed/simple;
+	bh=+ecacnhXoEhIYOhGyErXJQ08fyfhGIKE0jeTT9YEC8c=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=ay4pAvmeRQbVVaIY9WCfEsvVKDcFNPNY44r5fuEh5Mi2IHHyU3N5k85FlDzs/r2A2kjNX3EV/SXblOl7CpZGI/3m4LRG66q4zGXeTri4fNR5qp9X4kJO7b4jw1UZSLDa3ly9CJ9VwzP0oCqncV2fSEzzcR+NkFYNbzZJ1t3YDTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hygon.cn; spf=pass smtp.mailfrom=hygon.cn; arc=none smtp.client-ip=101.204.27.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hygon.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hygon.cn
+Received: from maildlp2.hygon.cn (unknown [127.0.0.1])
+	by mailgw1.hygon.cn (Postfix) with ESMTP id 4dbDcW6MrDzVcB5;
+	Tue, 23 Dec 2025 20:20:43 +0800 (CST)
+Received: from maildlp2.hygon.cn (unknown [172.23.18.61])
+	by mailgw1.hygon.cn (Postfix) with ESMTP id 4dbDcV3Bj8zVcB5;
+	Tue, 23 Dec 2025 20:20:42 +0800 (CST)
+Received: from cncheex03.Hygon.cn (unknown [172.23.18.113])
+	by maildlp2.hygon.cn (Postfix) with ESMTPS id 9B22431AC4EA;
+	Tue, 23 Dec 2025 20:16:13 +0800 (CST)
+Received: from cncheex04.Hygon.cn (172.23.18.114) by cncheex03.Hygon.cn
+ (172.23.18.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Tue, 23 Dec
+ 2025 20:20:43 +0800
+Received: from cncheex04.Hygon.cn ([fe80::1b6f:6c58:58a4:430d]) by
+ cncheex04.Hygon.cn ([fe80::1b6f:6c58:58a4:430d%10]) with mapi id
+ 15.02.1544.036; Tue, 23 Dec 2025 20:20:43 +0800
+From: Zhud <zhud@hygon.cn>
+To: Paolo Abeni <pabeni@redhat.com>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "horms@kernel.org" <horms@kernel.org>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: Jing Li <lijing@hygon.cn>, Zhiwei Ying <yingzhiwei@hygon.cn>
+Subject: RE: [PATCH net] netdev: increment TSO only if TSO is not enabled on
+ any slave device
+Thread-Topic: [PATCH net] netdev: increment TSO only if TSO is not enabled on
+ any slave device
+Thread-Index: AQHcbmlNWOTIX90gx02lh/ymGCh5arUukjiAgACaXqA=
+Date: Tue, 23 Dec 2025 12:20:43 +0000
+Message-ID: <fe236a552f594780a4b2ead63b4bc329@hygon.cn>
+References: <20251216085210.132387-1-zhud@hygon.cn>
+ <eae60389-27a5-4e8f-af49-7f75d4c116d8@redhat.com>
+In-Reply-To: <eae60389-27a5-4e8f-af49-7f75d4c116d8@redhat.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-From: Stefano Radaelli <stefano.r@variscite.com>
-
-Implement soft_reset, suspend, and resume callbacks using
-genphy_soft_reset(), genphy_suspend(), and genphy_resume()
-to fix PHY initialization and power management issues.
-
-The soft_reset callback is needed to properly recover the PHY after an
-ifconfig down/up cycle. Without it, the PHY can remain in power-down
-state, causing MDIO register access failures during config_init().
-The soft reset ensures the PHY is operational before configuration.
-
-The suspend/resume callbacks enable proper power management during
-system suspend/resume cycles.
-
-Fixes: b2908a989c59 ("net: phy: add driver for MaxLinear MxL86110 PHY")
-Signed-off-by: Stefano Radaelli <stefano.r@variscite.com>
----
-v2:
-- Fix From:/Signed-off-by address mismatch
-
- drivers/net/phy/mxl-86110.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/net/phy/mxl-86110.c b/drivers/net/phy/mxl-86110.c
-index e5d137a37a1d..42a5fe3f115f 100644
---- a/drivers/net/phy/mxl-86110.c
-+++ b/drivers/net/phy/mxl-86110.c
-@@ -938,6 +938,9 @@ static struct phy_driver mxl_phy_drvs[] = {
- 		PHY_ID_MATCH_EXACT(PHY_ID_MXL86110),
- 		.name			= "MXL86110 Gigabit Ethernet",
- 		.config_init		= mxl86110_config_init,
-+		.suspend		= genphy_suspend,
-+		.resume			= genphy_resume,
-+		.soft_reset		= genphy_soft_reset,
- 		.get_wol		= mxl86110_get_wol,
- 		.set_wol		= mxl86110_set_wol,
- 		.led_brightness_set	= mxl86110_led_brightness_set,
--- 
-2.47.3
+DQo+IE9uIDEyLzE2LzI1IDk6NTIgQU0sIERpIFpodSB3cm90ZToNCj4gPiBVbmNvbmRpdGlvbmFs
+bHkgaW5jcmVtZW50IHRoZSBUU08gZmxhZyBoYXMgYSBzaWRlIGVmZmVjdDogaXQgd2lsbCBhbHNv
+DQo+IA0KPiBUaGlzIGNoYW5nZWxvZyBpcyBJTUhPIHF1aXRlIGNvbmZ1c2luZy4gVGhlIGNvZGUg
+ZG9lcyBub3QgJ2luY3JlbWVudCBUU08nLiBJbnN0ZWFkDQo+IGl0IGluY3JlbWVudHMgdGhlIGZl
+YXR1cmVzIHNldCB0byBpbmNsdWRlIEFMTF9UU08uDQo+IA0KPiBQbGVhc2UgcmV3b3JkIHRoZSBj
+aGFuZ2Vsb2cgYWNjb3JkaW5nbHkuDQo+IA0KPiA+IGRpcmVjdGx5IGNsZWFyIHRoZSBmbGFncyBp
+biBORVRJRl9GX0FMTF9GT1JfQUxMIG9uIHRoZSBtYXN0ZXIgZGV2aWNlLA0KPiA+IHdoaWNoIGNh
+biBjYXVzZSBpc3N1ZXMgc3VjaCBhcyB0aGUgaW5hYmlsaXR5IHRvIGVuYWJsZSB0aGUgbm9jYWNo
+ZQ0KPiA+IGNvcHkgZmVhdHVyZSBvbiB0aGUgYm9uZGluZyBuZXR3b3JrIGNhcmQuDQo+IA0KPiBi
+b25kaW5nIG5ldHdvcmsgY2FyZCAtPiBib25kaW5nIGRyaXZlci4NCj4gDQo+ID4gU28sIHdoZW4g
+YXQgbGVhc3Qgb25lIHNsYXZlIGRldmljZSdzIFRTTyBpcyBlbmFibGVkLCB0aGVyZSBpcyBubyBu
+ZWVkDQo+ID4gdG8gZXhwbGljaXRseSBpbmNyZW1lbnQgdGhlIFRTTyBmbGFnIHRvIHRoZSBtYXN0
+ZXIgZGV2aWNlLg0KPiA+DQo+ID4gRml4ZXM6IGIwY2UzNTA4YjI1ZSAoImJvbmRpbmc6IGFsbG93
+IFRTTyBiZWluZyBzZXQgb24gYm9uZGluZyBtYXN0ZXIiKQ0KPiA+IFNpZ25lZC1vZmYtYnk6IERp
+IFpodSA8emh1ZEBoeWdvbi5jbj4NCj4gPiAtLS0NCj4gPiAgaW5jbHVkZS9saW51eC9uZXRkZXZp
+Y2UuaCB8IDMgKystDQo+ID4gIDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKyksIDEgZGVs
+ZXRpb24oLSkNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2xpbnV4L25ldGRldmljZS5o
+IGIvaW5jbHVkZS9saW51eC9uZXRkZXZpY2UuaA0KPiA+IGluZGV4IGJmOTlmZTg2MjJkYS4uMmFj
+YTM5ZjdmOWUxIDEwMDY0NA0KPiA+IC0tLSBhL2luY2x1ZGUvbGludXgvbmV0ZGV2aWNlLmgNCj4g
+PiArKysgYi9pbmNsdWRlL2xpbnV4L25ldGRldmljZS5oDQo+ID4gQEAgLTUzMjIsNyArNTMyMiw4
+IEBAIG5ldGRldl9mZWF0dXJlc190DQo+ID4gbmV0ZGV2X2luY3JlbWVudF9mZWF0dXJlcyhuZXRk
+ZXZfZmVhdHVyZXNfdCBhbGwsICBzdGF0aWMgaW5saW5lDQo+IG5ldGRldl9mZWF0dXJlc190IG5l
+dGRldl9hZGRfdHNvX2ZlYXR1cmVzKG5ldGRldl9mZWF0dXJlc190IGZlYXR1cmVzLA0KPiA+ICAJ
+CQkJCQkJbmV0ZGV2X2ZlYXR1cmVzX3QgbWFzaykNCj4gPiAgew0KPiA+IC0JcmV0dXJuIG5ldGRl
+dl9pbmNyZW1lbnRfZmVhdHVyZXMoZmVhdHVyZXMsIE5FVElGX0ZfQUxMX1RTTywgbWFzayk7DQo+
+ID4gKwlyZXR1cm4gKGZlYXR1cmVzICYgTkVUSUZfRl9BTExfVFNPKSA/IGZlYXR1cmVzIDoNCj4g
+PiArCQluZXRkZXZfaW5jcmVtZW50X2ZlYXR1cmVzKGZlYXR1cmVzLCBORVRJRl9GX0FMTF9UU08s
+IG1hc2spOw0KPiANCj4gTkVUSUZfRl9BTExfVFNPIGlzIG5vdCBhIHNpbmdsZSBiaXQsIGJ1dCBh
+IChsYXRlciBsYXJnZSkgYml0IG1hc2s7IHRoZSBhYm92ZSB3aWxsIHlpZWxkDQo+IGluY29ycmVj
+dCByZXN1bHQgd2hlbjoNCj4gDQo+IAlmZWF0dXJlcyAmIE5FVElGX0ZfQUxMX1RTTyAhPSBORVRJ
+Rl9GX0FMTF9UU08NCg0KWWVzLCBpdCBpcyBpbmRlZWQgbmVjZXNzYXJ5IHRvIHNldCBhbGwgdHNv
+IGZsYWdzIHRvIGF2b2lkIEdTTyBhdCB0aGUgYm9uZGluZyBsYXllci4NCkkgd2lsbCByZXZpc2Ug
+dGhlIGNvZGUgYW5kIGl0cyByZWxhdGVkIGNoYW5nbG9uZywgdGhhbmtzLg0KDQo+IA0KPiAvUA0K
+PiANCg0K
 
 
