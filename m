@@ -1,196 +1,243 @@
-Return-Path: <netdev+bounces-246027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [104.64.211.4])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41F51CDCEE7
-	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 18:30:06 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
+	by mail.lfdr.de (Postfix) with ESMTPS id C39DDCDCF74
+	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 18:52:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 031A7302D38D
-	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 17:30:03 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 81B81300EDF8
+	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 17:52:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DFF02C0F6F;
-	Wed, 24 Dec 2025 17:30:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09B7F329C74;
+	Wed, 24 Dec 2025 17:50:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ildueq/B"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nCYro+8z"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFE5A239E65
-	for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 17:29:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF068329C5B
+	for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 17:49:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766597401; cv=none; b=orDxcl/p6Q2oR8CpTyQRS4/qetY03NvZNcMv/75ILtwQByBk1XDFb5T+Q5ae+FzXULY7aiv5efUElSvL73CVjSAPBVjADDyHfJBJlov5f7r5vmIVCVL9HkrmxCOKqdW9LJRnFnJfp4EvgLeCkcVcFYfpmIZRnls0t3i6LDW72Vg=
+	t=1766598602; cv=none; b=Fr2e/ettxDdN6+z5IiC+y92Bg40HC50rzudEDazjK0SxSfZgqOtPGY9WbtPeaScRw2dF3+qXKAnz+xZsB5gJwG5a3wxy0UZ3rXOWaLOGUkszgg/AtBIirircsnQzzrrv6DzVfKT98z040/Dh9kXCZS+3WsWCfNZi9LtOjJumeyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766597401; c=relaxed/simple;
-	bh=LoZqE7u5aBpdhmb4MeI+l+qt4otgrofBxxw/teKS9bw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eWdjk3xI4y71BDJvOMxXKQkeyO0unR96ihlExRTKBSbSO/KXwGYyxyHzkZGh+zPGbzkwe/Z5LXOkuTHO6AJoY6KYyVB8ZCJdUx+HXrRBqu6B2SqBWJMOdQboSKPP6Wv59zG2gbc28kAT0GaaL/1JsvNlgagGAsDUZo6CyUzCZ9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ildueq/B; arc=none smtp.client-ip=209.85.210.174
+	s=arc-20240116; t=1766598602; c=relaxed/simple;
+	bh=Uy2GuzMWLXSScd2jys7HD/4lMT6yYktAwCAK7y1dxs0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aFTPCh0gbRj+ipiTYaqd2ivxLHO3I7N8XzhhKRo+27p4HAyEsOFy7ynZ56VsjpwzNIdTckC6netY5Nxh06gZq799COpMoY/1BvwJLl3kuitfgR6rkOAaiMEpFHZWS7y/skSQgYA+/GWN/EL1j9xP0XFt/BeBOZkrtKuulQAZ4hs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nCYro+8z; arc=none smtp.client-ip=209.85.210.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-7ade456b6abso5100117b3a.3
-        for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 09:29:59 -0800 (PST)
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-7a9c64dfa8aso4750126b3a.3
+        for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 09:49:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766597399; x=1767202199; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=jsjeRNtyMZNxTqBCZZQHNG0tbOqaUHsh6LXIYvXiP04=;
-        b=ildueq/BV1AvCCvBGs5gVjS4BjdQJ9yDhq9dLUSQeXlppgh8acREnafic6QW1fWKph
-         X88zLu3Q6H0qyqgtZePy4RoAjZjIlpEyBkoAC7ofEweOLRA3MdzDAsFYfVpEzxx6VyMZ
-         HpTBBfuQfCOBAAvFxNfDJ8UnhKpaxSGVc8w4F/SdTlfwhsk7AylWmk6uVYzAkH4XLoMq
-         OiRtAY2FzeA6IFIExzw8jkDw5oxLSy+uGIBUfGc2H3EGzRZkzqY/2AZYad+yUK8HNBp2
-         8XTlDu4AWG/fbWYDeNCb3WTRNS8t6zrA9mO3aFSj/LuGJrzqjqpfVpy4zPlCZrTO2Uyz
-         te2g==
+        d=gmail.com; s=20230601; t=1766598596; x=1767203396; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dyaIVMgw4ATEaUXqxaNcG5tML3N8wIlrK8h87W4urnk=;
+        b=nCYro+8zzvCeE6Xo914YmQ4yIBts6jU6oEjNKLyBU/AFVWdhLGZVeA/lsRPsk7zwny
+         8l6aI1dRonJ54hb2ARkUggAYIexArm6icOOrJxR89jO384d8zAaB+YCqRuay/cnxYAOH
+         J+kAMe3tc9YVAcsezF+3d2cMEEIwkyjWmgFFcvMidNs3heR2lXmy5CAkeypAWJqCgoQZ
+         pg90xoG67xAd1XdTyZCinpl1zwiAy9cAH2rVMNkBpR+6VCOqGed3TiLs5CR/8i8Y5+r2
+         ZSWpYHxtxBCktIwFzTmwiS6wBM6m+rMorD093XijjNekJnxMKtVtuberh5cv3tipq9/C
+         Dp8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766597399; x=1767202199;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jsjeRNtyMZNxTqBCZZQHNG0tbOqaUHsh6LXIYvXiP04=;
-        b=r8OlUwZq57wOIj4IrLqsnwwBTM/owghSFAo8r1/ywa76Rd+dvgsJhxtfkExWz9u/HQ
-         JhqnPxHdBe9cphA1B+iAOA3hS9E5sP1YU6xZnZpfnK4bBOdEap7L34jVnSwUVWhNfv4A
-         k78MJMnReG4dptqy3MXkLqGD3lRqW5VN/hoZkRYKfbK5H+mqzh62ODsxJgYP58b5wz4o
-         wTVYWSlpvRKT1WI4nzg7JVVKNBAOYR5IAGWsRH522pU8hhXZ2bdEn+1IErf2oL8/F/Tk
-         UULbFJSt9CKI+RjE1i2LtKQqHdwVZxiPrBPs9QIapvNh27HoBRIsmeADAM3WFXcEFn64
-         kq/A==
-X-Forwarded-Encrypted: i=1; AJvYcCWRN/xjkoOZjtVC7Oqdxx5CoH1owy74TO3BTp5deVPcjJ0UnnYl6QzA2H6AJPjEvDAKfK24hhI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YylfanhSMW9RhXHRv0NJ445SOcQV8xqi619/94ArGdeKr0j5vWI
-	AJhvsjmNWWd4qfU+SBcd/d98/lkAPT82RyPiU6RxB3beTs7oGlRPlrd4
-X-Gm-Gg: AY/fxX63hxHTZdOYAD7mc8rXGJYbQ7znEUJC+Gja1Z4dDdMGq3OH6NAEfBbsawr2PdN
-	bAZOdnO+C+5/1BbjwH5cuu0vIdzYBykKLPBmR9VzfqEvhC6Gm/DtayUAGy7Y5tr9v3aLoIeFCIz
-	qMdmGfgYHPA0o+fE5NiT4txYUnQGbDOFUYK8KwE6VAwp1c0LzlsxwuNgnrDqrrgbg2a6eUPYni9
-	yZGAc6qslVpxnvHJR2OedhVhv77/kzlwpfy8ji18g7Mpirz75ukFPVtV5IVtZ5E0f5watZOqRIB
-	AAW/uMnvp1uY5eVsJQ0o8RThibbT0Zy+kr/4r0TGirQnfHS2fqY/w9OixqZkFJaGaoy4gSiRx6H
-	zefXFIt8dW8Ws4DsxtLa9Mg/iaVqe0+uPsy9qv7VOqxF/E8nTFnO5oc0+vKC7o+MHMXqyJnk9p2
-	NcSyeuOOoD
-X-Google-Smtp-Source: AGHT+IFjFX//4ixGyykoiuzl18S6UFN+jgJkT3GDZ6w2fclvSzNAzJwCHzhbDSAB3/GANNuFdndN0Q==
-X-Received: by 2002:a05:7022:248a:b0:11b:9152:b3ad with SMTP id a92af1059eb24-121722dff70mr19702723c88.31.1766597399031;
-        Wed, 24 Dec 2025 09:29:59 -0800 (PST)
-Received: from Air.local ([198.176.50.157])
-        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1217253c0c6sm78519697c88.12.2025.12.24.09.29.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Dec 2025 09:29:58 -0800 (PST)
-Date: Thu, 25 Dec 2025 01:29:53 +0800
-From: Weiming Shi <bestswngs@gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	xmei5@asu.edu
-Subject: Re: [PATCH net v5] net: sock: fix hardened usercopy panic in
- sock_recv_errqueue
-Message-ID: <aUwOoEaZKvrU0IjP@Air.local>
-References: <20251223203534.1392218-2-bestswngs@gmail.com>
- <CANn89iKpH0MO36JHbM=vS9ga=9UzgdtFahNR4+dvNr2oUtNLuA@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1766598596; x=1767203396;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dyaIVMgw4ATEaUXqxaNcG5tML3N8wIlrK8h87W4urnk=;
+        b=M69LoFp70UIQjCAhrYM1KxtG5I7qye8v+4Tpx25TiMV5SU25W0gveN/mgfhhYBoHF3
+         lP382oz8Zv9jCe5ggomXAVENiNAk0kdo8khiOMp8axat/o09L9MMyKTJORQneG9qomWZ
+         Oum7F/GJlUIBnFApyCQqlmWT2w0PSKxYE+vfcarbAGmKMTjdwL2YVmDH2k0mDNFGMRaG
+         oABmDV9UP9UKjWsklfc3/Jpfoa5+ycpbZqgx91rOYhMDvKujMoHV9IMY9oHiZsE7xzaY
+         4bFY61CsHPKzKJ6vLw6AR/SdUQYxMdGGMCxd5fBM8kVpTKWfBL+2K/FWeVdxw0B3zxrF
+         cDIA==
+X-Gm-Message-State: AOJu0Yxe6TGL4XQ85m8R/BxW7z7i3N6SkX810z5FK66mht1ttMoxfsYo
+	oti0ILLRidnFk+kghcxJ5LM+qk1Q4ouWgueWdyQdRVgJNsLK7TEGNu3e
+X-Gm-Gg: AY/fxX50WVsuetQLyy6WBC2ZtB6WKuZAg4sHcFH8F+v6RviEb41RImr+I1diNnLQ9dI
+	heiEdga+HaBlq1kA8QOFw0RQfDprVleX/1xg3DBkdoaqhCSEKXM1k2S8ZIB2GOMD7N4R2qc0uu4
+	IoRzioJ+28/CdWsQ0Ud1227oiC13MW6ec37YwSbqKZErq+lKFvLqdLzxIoxd2NIvkYoA6SvF77d
+	ZHa3i7fv4qYn2mmyaqBnDeUbIKzav9hqxgMD6YuFrr+TMQlPYNtaCq3FoPPlKnAq1CeDeQ5xVWP
+	efYB2ed8i/xs+Lw56VOzw28L6IOdukLbDzvttZvxS2FPqcVcx5DUrAazNUa9+oQRndYs3Ga7JBK
+	poAI6y6jMpgRXtyM9LsaueIv5d8KENYC440BkNJVZ+OJm6ZINvRQx7XHOqJiWM0cIdsd+9wjRWi
+	LlXgqFWoUUw0t8jf9EYSKnjkmLwITmTJYjivqxUoWML/5ryGGKYLpf0em+CqQ=
+X-Google-Smtp-Source: AGHT+IGqeYfA0scfRJSZs642UZrJmT7+8QWmvt0tszu/L1Nmzf2uk5Nb/WZyy+4ewshxFonCJ6CNgQ==
+X-Received: by 2002:a05:6a00:e13:b0:781:2291:1045 with SMTP id d2e1a72fcca58-7ff64fc5fd4mr15854544b3a.8.1766598596164;
+        Wed, 24 Dec 2025 09:49:56 -0800 (PST)
+Received: from ?IPV6:2001:ee0:4f4c:210:c711:242:cd10:6c98? ([2001:ee0:4f4c:210:c711:242:cd10:6c98])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7ff7e0a19besm17215370b3a.40.2025.12.24.09.49.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Dec 2025 09:49:55 -0800 (PST)
+Message-ID: <3acaaca3-37b3-4104-ac5a-441f3d4243c6@gmail.com>
+Date: Thu, 25 Dec 2025 00:49:49 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 2/3] virtio-net: ensure rx NAPI is enabled before
+ enabling refill work
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, virtualization@lists.linux.dev,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+References: <20251223152533.24364-1-minhquangbui99@gmail.com>
+ <20251223152533.24364-3-minhquangbui99@gmail.com>
+ <20251223203908-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+From: Bui Quang Minh <minhquangbui99@gmail.com>
+In-Reply-To: <20251223203908-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iKpH0MO36JHbM=vS9ga=9UzgdtFahNR4+dvNr2oUtNLuA@mail.gmail.com>
 
-On 25-12-24 09:52, Eric Dumazet wrote:
-> On Tue, Dec 23, 2025 at 9:36 PM <bestswngs@gmail.com> wrote:
-> >
-> > From: Weiming Shi <bestswngs@gmail.com>
-> >
-> > skbuff_fclone_cache was created without defining a usercopy region,
-> > [1] unlike skbuff_head_cache which properly whitelists the cb[] field.
-> > [2] This causes a usercopy BUG() when CONFIG_HARDENED_USERCOPY is
-> > enabled and the kernel attempts to copy sk_buff.cb data to userspace
-> > via sock_recv_errqueue() -> put_cmsg().
-> >
-> > The crash occurs when: 1. TCP allocates an skb using alloc_skb_fclone()
-> >    (from skbuff_fclone_cache) [1]
-> > 2. The skb is cloned via skb_clone() using the pre-allocated fclone
-> > [3] 3. The cloned skb is queued to sk_error_queue for timestamp
-> > reporting 4. Userspace reads the error queue via recvmsg(MSG_ERRQUEUE)
-> > 5. sock_recv_errqueue() calls put_cmsg() to copy serr->ee from skb->cb
-> > [4] 6. __check_heap_object() fails because skbuff_fclone_cache has no
-> >    usercopy whitelist [5]
-> >
-> > When cloned skbs allocated from skbuff_fclone_cache are used in the
-> > socket error queue, accessing the sock_exterr_skb structure in skb->cb
-> > via put_cmsg() triggers a usercopy hardening violation:
-> >
-> > [    5.379589] usercopy: Kernel memory exposure attempt detected from SLUB object 'skbuff_fclone_cache' (offset 296, size 16)!
-> > [    5.382796] kernel BUG at mm/usercopy.c:102!
-> > [    5.383923] Oops: invalid opcode: 0000 [#1] SMP KASAN NOPTI
-> > [    5.384903] CPU: 1 UID: 0 PID: 138 Comm: poc_put_cmsg Not tainted 6.12.57 #7
-> > [    5.384903] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
-> > [    5.384903] RIP: 0010:usercopy_abort+0x6c/0x80
-> > [    5.384903] Code: 1a 86 51 48 c7 c2 40 15 1a 86 41 52 48 c7 c7 c0 15 1a 86 48 0f 45 d6 48 c7 c6 80 15 1a 86 48 89 c1 49 0f 45 f3 e8 84 27 88 ff <0f> 0b 490
-> > [    5.384903] RSP: 0018:ffffc900006f77a8 EFLAGS: 00010246
-> > [    5.384903] RAX: 000000000000006f RBX: ffff88800f0ad2a8 RCX: 1ffffffff0f72e74
-> > [    5.384903] RDX: 0000000000000000 RSI: 0000000000000004 RDI: ffffffff87b973a0
-> > [    5.384903] RBP: 0000000000000010 R08: 0000000000000000 R09: fffffbfff0f72e74
-> > [    5.384903] R10: 0000000000000003 R11: 79706f6372657375 R12: 0000000000000001
-> > [    5.384903] R13: ffff88800f0ad2b8 R14: ffffea00003c2b40 R15: ffffea00003c2b00
-> > [    5.384903] FS:  0000000011bc4380(0000) GS:ffff8880bf100000(0000) knlGS:0000000000000000
-> > [    5.384903] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > [    5.384903] CR2: 000056aa3b8e5fe4 CR3: 000000000ea26004 CR4: 0000000000770ef0
-> > [    5.384903] PKRU: 55555554
-> > [    5.384903] Call Trace:
-> > [    5.384903]  <TASK>
-> > [    5.384903]  __check_heap_object+0x9a/0xd0
-> > [    5.384903]  __check_object_size+0x46c/0x690
-> > [    5.384903]  put_cmsg+0x129/0x5e0
-> > [    5.384903]  sock_recv_errqueue+0x22f/0x380
-> > [    5.384903]  tls_sw_recvmsg+0x7ed/0x1960
-> > [    5.384903]  ? srso_alias_return_thunk+0x5/0xfbef5
-> > [    5.384903]  ? schedule+0x6d/0x270
-> > [    5.384903]  ? srso_alias_return_thunk+0x5/0xfbef5
-> > [    5.384903]  ? mutex_unlock+0x81/0xd0
-> > [    5.384903]  ? __pfx_mutex_unlock+0x10/0x10
-> > [    5.384903]  ? __pfx_tls_sw_recvmsg+0x10/0x10
-> > [    5.384903]  ? _raw_spin_lock_irqsave+0x8f/0xf0
-> > [    5.384903]  ? _raw_read_unlock_irqrestore+0x20/0x40
-> > [    5.384903]  ? srso_alias_return_thunk+0x5/0xfbef5
-> >
-> 
-> Nit : Next time you send a stack trace, please run it though
-> scripts/decode_stacktrace.sh
-> to get meaningful symbols.
-> 
-> > The crash offset 296 corresponds to skb2->cb within skbuff_fclones:
-> >   - sizeof(struct sk_buff) = 232 - offsetof(struct sk_buff, cb) = 40 -
-> >   offset of skb2.cb in fclones = 232 + 40 = 272 - crash offset 296 =
-> >   272 + 24 (inside sock_exterr_skb.ee)
-> >
-> > This patch uses a local stack variable as a bounce buffer to avoid the hardened usercopy check failure.
-> >
-> > [1] https://elixir.bootlin.com/linux/v6.12.62/source/net/ipv4/tcp.c#L885
-> > [2] https://elixir.bootlin.com/linux/v6.12.62/source/net/core/skbuff.c#L5104
-> > [3] https://elixir.bootlin.com/linux/v6.12.62/source/net/core/skbuff.c#L5566
-> > [4] https://elixir.bootlin.com/linux/v6.12.62/source/net/core/skbuff.c#L5491
-> > [5] https://elixir.bootlin.com/linux/v6.12.62/source/mm/slub.c#L5719
-> >
-> > Fixes: 6d07d1cd300f ("usercopy: Restrict non-usercopy caches to size 0")
-> > Reported-by: Xiang Mei <xmei5@asu.edu>
-> > Signed-off-by: Weiming Shi <bestswngs@gmail.com>
-> > ---
-> 
-> Reviewed-by: Eric Dumazet <edumazet@google.com>
-> 
-> Also please next time do not CC security@kernel.org if you made the
-> bug public (say on netdev@kernel.org),
-> because security@kernel.org will be of no help.
-> 
-> Congratulations on your first linux contribution !
+On 12/24/25 08:45, Michael S. Tsirkin wrote:
+> On Tue, Dec 23, 2025 at 10:25:32PM +0700, Bui Quang Minh wrote:
+>> Calling napi_disable() on an already disabled napi can cause the
+>> deadlock. Because the delayed refill work will call napi_disable(), we
+>> must ensure that refill work is only enabled and scheduled after we have
+>> enabled the rx queue's NAPI.
+>>
+>> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
+>> ---
+>>   drivers/net/virtio_net.c | 31 ++++++++++++++++++++++++-------
+>>   1 file changed, 24 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+>> index 63126e490bda..8016d2b378cf 100644
+>> --- a/drivers/net/virtio_net.c
+>> +++ b/drivers/net/virtio_net.c
+>> @@ -3208,16 +3208,31 @@ static int virtnet_open(struct net_device *dev)
+>>   	int i, err;
+>>   
+>>   	for (i = 0; i < vi->max_queue_pairs; i++) {
+>> +		bool schedule_refill = false;
+>
+>
+>> +
+>> +		/* - We must call try_fill_recv before enabling napi of the same
+>> +		 * receive queue so that it doesn't race with the call in
+>> +		 * virtnet_receive.
+>> +		 * - We must enable and schedule delayed refill work only when
+>> +		 * we have enabled all the receive queue's napi. Otherwise, in
+>> +		 * refill_work, we have a deadlock when calling napi_disable on
+>> +		 * an already disabled napi.
+>> +		 */
+>
+> I would do:
+>
+> 	bool refill = i < vi->curr_queue_pairs;
+>
+> in fact this is almost the same as resume with
+> one small difference. pass a flag so we do not duplicate code?
 
-Hi Eric,
+I'll fix it in next version.
 
-Thank you very much for your quick review and encouragement.
-I will take note of your suggestions next time.
+>
+>>   		if (i < vi->curr_queue_pairs) {
+>> -			enable_delayed_refill(&vi->rq[i]);
+>>   			/* Make sure we have some buffers: if oom use wq. */
+>>   			if (!try_fill_recv(vi, &vi->rq[i], GFP_KERNEL))
+>> -				schedule_delayed_work(&vi->rq[i].refill, 0);
+>> +				schedule_refill = true;
+>>   		}
+>>   
+>>   		err = virtnet_enable_queue_pair(vi, i);
+>>   		if (err < 0)
+>>   			goto err_enable_qp;
+>> +
+>> +		if (i < vi->curr_queue_pairs) {
+>> +			enable_delayed_refill(&vi->rq[i]);
+>> +			if (schedule_refill)
+>> +				schedule_delayed_work(&vi->rq[i].refill, 0);
+>
+> hmm. should not schedule be under the lock?
 
-Best regards,
-Weiming
+I see that schedule is safe to be called concurrently.
+
+     struct work_struct {
+         atomic_long_t data;
+         struct list_head entry;
+         work_func_t func;
+     #ifdef CONFIG_LOCKDEP
+         struct lockdep_map lockdep_map;
+     #endif
+     };
+
+The atomic_long_t field to set pending bit and worker pool's lock help 
+with the synchronization.
 
 
+>
+>> +		}
+>>   	}
+>>   
+>>   	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_STATUS)) {
+>> @@ -3456,11 +3471,16 @@ static void __virtnet_rx_resume(struct virtnet_info *vi,
+>>   	bool running = netif_running(vi->dev);
+>>   	bool schedule_refill = false;
+>>   
+>> +	/* See the comment in virtnet_open for the ordering rule
+>> +	 * of try_fill_recv, receive queue napi_enable and delayed
+>> +	 * refill enable/schedule.
+>> +	 */
+> so maybe common code?
+>
+>>   	if (refill && !try_fill_recv(vi, rq, GFP_KERNEL))
+>>   		schedule_refill = true;
+>>   	if (running)
+>>   		virtnet_napi_enable(rq);
+>>   
+>> +	enable_delayed_refill(rq);
+>>   	if (schedule_refill)
+>>   		schedule_delayed_work(&rq->refill, 0);
+> hmm. should not schedule be under the lock?
+>
+>>   }
+>> @@ -3470,18 +3490,15 @@ static void virtnet_rx_resume_all(struct virtnet_info *vi)
+>>   	int i;
+>>   
+>>   	for (i = 0; i < vi->max_queue_pairs; i++) {
+>> -		if (i < vi->curr_queue_pairs) {
+>> -			enable_delayed_refill(&vi->rq[i]);
+>> +		if (i < vi->curr_queue_pairs)
+>>   			__virtnet_rx_resume(vi, &vi->rq[i], true);
+>> -		} else {
+>> +		else
+>>   			__virtnet_rx_resume(vi, &vi->rq[i], false);
+>> -		}
+>>   	}
+>>   }
+>>   
+>>   static void virtnet_rx_resume(struct virtnet_info *vi, struct receive_queue *rq)
+>>   {
+>> -	enable_delayed_refill(rq);
+>>   	__virtnet_rx_resume(vi, rq, true);
+>>   }
+> so I would add bool to virtnet_rx_resume and call it everywhere,
+> removing __virtnet_rx_resume. can be a patch on top.
+
+I'll create another patch after this patch to clean up the 
+__virtnet_rx_resume in the next version.
+
+Thanks,
+Quang Minh.
+
+>
+>>   
+>> -- 
+>> 2.43.0
 
 
