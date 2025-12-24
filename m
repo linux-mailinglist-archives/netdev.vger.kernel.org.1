@@ -1,144 +1,162 @@
-Return-Path: <netdev+bounces-245936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39C4ACDB1C4
-	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 02:48:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 02888CDB392
+	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 04:12:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E69A030204B8
-	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 01:48:00 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DC7DB303295E
+	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 03:12:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71EB925A2C9;
-	Wed, 24 Dec 2025 01:48:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D2MY99Sz";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="bOyPIJtj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24D7E25C821;
+	Wed, 24 Dec 2025 03:11:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D26AF18A6CF
-	for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 01:47:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CF85224240;
+	Wed, 24 Dec 2025 03:11:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766540880; cv=none; b=H0jnHUiPYw/aIKdBvrHKZy9aKsVWlIVulxszmpMLr5S2TVdUyw6IGroUtS4qDFTxW8O7lbt9RyQ1fCFR8rXkba6yjL1VXe1EOUbxQ9JQLfgnVnunqxou+N1ffZ+Qsj6Cx1MPYJ/JXV2AhPMKQll8Xz191FV8ZVRHY2CVP8SuAyQ=
+	t=1766545919; cv=none; b=fidACER3NarqKtSoFJ9Jy59LyVvw2RRUOyAUVcUO4UqMfFNNhxmx2gHsChw9B70rY/sCU1SOH2qGz3mNqe/YkSW0tcYbpCSWpr+ZTVmJ1bHRdHm7QS1vdrmM7fgNH9XH86pKEl7Z9MhcCndgqp0OdML3QMEuDnAyiiqOZoS9a8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766540880; c=relaxed/simple;
-	bh=rlBORRVqCuCCDKKTRMpReJJ+tKBroym5f9pOqNZrTI8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q0hjIDkvH27gYhRVYGMmmpphErveakid41NMXD1VArT9x0jTURpvLukwi3iflxa39BQy8AsbfVajcrh4iQzBiwwkKb+nXD9xiEIc7MyGthNkKItRX4FWIgjaT+lJLbc4ciq5oyd97iXqu3Z/LgsyABjvdCfseI3kn+DAPbsGJNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D2MY99Sz; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=bOyPIJtj; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766540878;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EfLuOi85d1FraY7+0q787i/gVvs6BEvd92Xlu3j3K0Q=;
-	b=D2MY99SzKCXazxcjf8a9zG2fq5bSLZ8veo5lQu3wUDfONcRp3uzL52glLairIlaI8ZAUMP
-	QGUovddPw3XI329hjgZZeef6RbXQ9LviL0vvw9oXtB4zsX0rL5gFkQlTb0nMDMFo0jL1IX
-	Lw6sxtx8FjUVj72QRVPvGqvmIc9PvoU=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-250-FRumhjo6MgKgkk-jsYPEGg-1; Tue, 23 Dec 2025 20:47:56 -0500
-X-MC-Unique: FRumhjo6MgKgkk-jsYPEGg-1
-X-Mimecast-MFC-AGG-ID: FRumhjo6MgKgkk-jsYPEGg_1766540875
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-430f433419aso5341345f8f.0
-        for <netdev@vger.kernel.org>; Tue, 23 Dec 2025 17:47:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1766540875; x=1767145675; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EfLuOi85d1FraY7+0q787i/gVvs6BEvd92Xlu3j3K0Q=;
-        b=bOyPIJtjHQrXBSMYwqGZgR3N5yIKaTh+qSdhPNKF5FMgpymdc854lHm7HNoUY8Fni/
-         dt79Yg/vt3DxoEfgCA/VHrubKzUL6Dv0VDfPvwZnPQF35W4DhyxxaC2xDT2/fkwzg9HL
-         vH7+sIILWX6RvBQ9q6KHt2fWzZO8kGy6ueuderXEyjYVE6YGpZAdjnC+8wzt9mtgJryv
-         JGax1cT/V0e/RGiezEz5oOqmS+GhrRzfH7cgnP06txF45spneLGkG2aFcnQYs0qxR0XD
-         oNxJFBPjipMN0D7tor4vbvhyaUbI3z2gf8nfUuAy1ghAP8oCBHUj5GbCScTA+Pt6o76K
-         rOCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766540875; x=1767145675;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EfLuOi85d1FraY7+0q787i/gVvs6BEvd92Xlu3j3K0Q=;
-        b=Nh1f+vGqBddv5rqzim1mRkIuW7XwH9QqRsN1j5zcdrozQTzi0PAah45BnSZs3C4GIz
-         38Pw2WJrBXirIytyckUFCi8Rc8VoZUzOrHuRxrbXbK3JLzt5f4KBTPAUt18GzyF7jEgq
-         HyeKEvY4efyBQpjNGfJafljzg2iRtFO7SVLVxZ3Ethh8U/uwv3YYTnLiUYQpmjTc4fAh
-         niEq7/uM+8fvM+ndwgUxkRzAYU3FG1KGvv31QK4aUle08UDB4e7epSPlaHDD4XvysC81
-         /4FPs805PID7htkjuviWsTE8YBVU6VVgqsFKlpu5jLzCJc/qmK5cAPtd0MgOEPfB61MY
-         ph5w==
-X-Forwarded-Encrypted: i=1; AJvYcCWCE0ohK2euvUACf9u26t29x0q+YddVUmfb3GS2offEI7g+xRLvrdBwK9hxwrcHXKj2SU051/g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIx2QR8+nmIY67YdVHiESP2dxFRwv1AWOaN/1y5jQZXN3CZUUZ
-	HKtWOEW2Lzh3TeXNdW6FXZjMyjF4LAzGyDYAUc33KO63PM8FSVBFcW6PgRlLpdWU1HJSjy324qQ
-	dJBj1HNBdcRMEehUA0QA0Vrc28B5Uw2Gxz89P1uz/NcJ4Nr3kPhMOv7Cwow==
-X-Gm-Gg: AY/fxX4Hb+/kXDMu7XjG+VoTYUZpCROKGX8Kkmd3QgH4s1IYvXWMCynaOtWH9hpCI3a
-	aeQICjNLjWAiAr+CcwNX+7nIU4wwGGPn6MoPiXQFfbKTIIfmK4foLMXR1KTTuBuhbqRGcXKInT/
-	iKcQty+17CTSSSIrmVOj5H4d89ELCJF7GxSNjJly5znzchCFUdv1gptP27bWfzIcLr6m3GIVad8
-	y0E9yGkB2I3JMq2KH7fBywODAqoTq/YyT8JIaWQvtRiSDAfnBIf3h+CchieEV5Rykdp5rKxQysl
-	Oif/mFZivpT2wD/wyFPjg/+QIYTo4pf7xYSl/tz4sf2vD/MIIEOcoxRfK2a0roSaXhMcI82Yq7h
-	s
-X-Received: by 2002:a05:6000:26c3:b0:42f:b581:c69a with SMTP id ffacd0b85a97d-4324e4c3e13mr17469858f8f.5.1766540875203;
-        Tue, 23 Dec 2025 17:47:55 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFxAidHJN/0HxTdnoimsgwBvjgcKtPCXXltUV2xjreKTHHI6FxPbiJNRx2xvom7ebYh/UDBIw==
-X-Received: by 2002:a05:6000:26c3:b0:42f:b581:c69a with SMTP id ffacd0b85a97d-4324e4c3e13mr17469842f8f.5.1766540874789;
-        Tue, 23 Dec 2025 17:47:54 -0800 (PST)
-Received: from redhat.com ([31.187.78.137])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324ea8311fsm31060662f8f.28.2025.12.23.17.47.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Dec 2025 17:47:54 -0800 (PST)
-Date: Tue, 23 Dec 2025 20:47:50 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org, Bui Quang Minh <minhquangbui99@gmail.com>
-Subject: Re: [PATCH net 1/3] virtio-net: make refill work a per receive queue
- work
-Message-ID: <20251223204555-mutt-send-email-mst@kernel.org>
-References: <20251223152533.24364-1-minhquangbui99@gmail.com>
- <20251223152533.24364-2-minhquangbui99@gmail.com>
- <CACGkMEvXkPiTGxZ6nuC72-VGdLHVXzrGa9bAF=TcP8nqPjeZ_w@mail.gmail.com>
- <1766540234.3618076-1-xuanzhuo@linux.alibaba.com>
+	s=arc-20240116; t=1766545919; c=relaxed/simple;
+	bh=sS9LfN9Q/+TRaUozkjEs8lYT27TG3wjd+SaphM+vkuc=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ZvnSgTTMgspc5T095iwRImRMvb3XGg1lAlUztkEzptN6yA81nYPWjzGLVm1G1L2ZWnCos121fRSeT2odqXs3bLdzdDniGvd1frJGpd9vY52KQkO2GJDIegOOOhE91DuTkV0DVbpFnVE0AP32XBYiaLrEU4zXcmx9mBPmv6L76zU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from [127.0.0.2] (unknown [114.241.82.59])
+	by APP-05 (Coremail) with SMTP id zQCowADHXBDPWUtpQzS6AQ--.32153S2;
+	Wed, 24 Dec 2025 11:11:11 +0800 (CST)
+From: Vivian Wang <wangruikang@iscas.ac.cn>
+Subject: [PATCH 0/5] PCI/MSI: Generalize no_64bit_msi into msi_addr_mask
+Date: Wed, 24 Dec 2025 11:10:48 +0800
+Message-Id: <20251224-pci-msi-addr-mask-v1-0-05a6fcb4b4c0@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1766540234.3618076-1-xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIALhZS2kC/yXMWwqDMBCF4a2Eee4UE1HRrRQLMZm2Q4mXiZVCy
+ N4b6uN34PwJIglThEElEDo48jIX6IsC97Lzk5B9MZjKNNqYGlfHGCKj9V4w2PhG47u2sR1NdV9
+ B+a1CD/7+m7fxtND2Ken9HGGykdAtIfA+qKO96h7F6XvKMOb8A9YopX2TAAAA
+X-Change-ID: 20251223-pci-msi-addr-mask-2d765a7eb390
+To: Madhavan Srinivasan <maddy@linux.ibm.com>, 
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
+ "Christophe Leroy (CS GROUP)" <chleroy@kernel.org>, 
+ Alex Deucher <alexander.deucher@amd.com>, 
+ =?utf-8?q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+ Brett Creeley <brett.creeley@amd.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Bjorn Helgaas <bhelgaas@google.com>, Jaroslav Kysela <perex@perex.cz>, 
+ Takashi Iwai <tiwai@suse.com>
+Cc: Han Gao <gaohan@iscas.ac.cn>, linuxppc-dev@lists.ozlabs.org, 
+ linux-kernel@vger.kernel.org, amd-gfx@lists.freedesktop.org, 
+ dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, 
+ linux-pci@vger.kernel.org, linux-sound@vger.kernel.org, 
+ Vivian Wang <wangruikang@iscas.ac.cn>
+X-Mailer: b4 0.14.3
+X-CM-TRANSID:zQCowADHXBDPWUtpQzS6AQ--.32153S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxJFy3ZFy7CrWxur4kCw15urg_yoW5Kw1DpF
+	W5GayagF40y34xWFZrAw4UZFWayFs5Ka47KrWDK3sa9an0qry8XrnxtF45X347Wr1xXr40
+	qrW7Kw1kWFWkuaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r1I6r4UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY1x0262kKe7AKxVW8ZVWrXwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
+	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
+	VFxhVjvjDU0xZFpf9x0pRHUDLUUUUU=
+X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
 
-On Wed, Dec 24, 2025 at 09:37:14AM +0800, Xuan Zhuo wrote:
-> 
-> Hi Jason,
-> 
-> I'm wondering why we even need this refill work. Why not simply let NAPI retry
-> the refill on its next run if the refill fails? That would seem much simpler.
-> This refill work complicates maintenance and often introduces a lot of
-> concurrency issues and races.
-> 
-> Thanks.
+The Sophgo SG2042 is a cursed machine in more ways than one.
 
-refill work can refill from GFP_KERNEL, napi only from ATOMIC.
+The one way relevant to this patch series is that its PCIe controller
+has neither INTx nor a low-address MSI doorbell wired up. Instead, the
+only usable MSI doorbell is a SoC one at 0x7030010300, which is above
+32-bit space.
 
-And if GFP_ATOMIC failed, aggressively retrying might not be a great idea.
+Currently, the no_64bit_msi flag on a PCI device declares that a device
+needs a 32-bit MSI address. Since no more precise indication is
+possible, devices supporting less than 64 bits of MSI addresses are all
+lumped into one "need 32-bit MSI address" bucket. This of course
+prevents these devices from working with MSI enabled on SG2042 because a
+32-bit MSI doorbell address is not possible. Combined with a lack of
+INTx, some of them have trouble working on SG2042 at all.
 
-Not saying refill work is a great hack, but that is the reason for it.
+There were previous dirtier attempts to allow overriding no_64bit_msi
+for radeon [1] and hda/intel [2].
+
+To fix this, generalize the single bit no_64bit_msi into a full address
+mask msi_addr_mask to more precisely describe the restriction. The
+existing DMA masks seems insufficient, as for e.g. radeon the
+msi_addr_mask and coherent_dma_mask seems to be different on more recent
+devices.
+
+The patches are structured as follows:
+
+- Patch 1 conservatively introduces msi_addr_mask, without introducing
+  any functional changes (hopefully, if I've done everything right), by
+  only using DMA_BIT_MASK(32) and DMA_BIT_MASK(64).
+- The rest of the series actually make use of intermediate values of
+  msi_addr_mask, and should be independently appliable. Patch 2 relaxes
+  msi_verify_entries() to allow intermediate values of msi_addr_mask.
+  Patch 3 onwards raises msi_addr_mask in individual device drivers.
+
+Tested on SG2042 with a Radeon R5 220 which makes use of radeon and
+hda/intel. PPC changes and pensanto/ionic changes are compile-tested
+only, since I do not have the hardware.
+
+I would appreciate if driver maintainers can take a look and see whether
+the masks I've set makes sense, although I believe they shouldn't cause
+problems on existing platforms. I'm also not familiar with PPC enough to
+touch the arch/powerpc firmware calls further - help would be
+appreciated.
+
+My intention is that the first two patches are taken up by PCI
+maintainers, and the rest go through the maintainers of individual
+drivers since they could use more device-specific testing and review. If
+this is not convenient I'll be happy to split it up or something.
+
+[1]: https://lore.kernel.org/all/20251220163338.3852399-1-gaohan@iscas.ac.cn/
+[2]: https://lore.kernel.org/all/20251220170501.3972438-1-gaohan@iscas.ac.cn/
+
+---
+Vivian Wang (5):
+      PCI/MSI: Conservatively generalize no_64bit_msi into msi_addr_mask
+      PCI/MSI: Check msi_addr_mask in msi_verify_entries()
+      drm/radeon: Raise msi_addr_mask to 40 bits for pre-Bonaire
+      ALSA: hda/intel: Raise msi_addr_mask to dma_bits
+      [RFC net-next] net: ionic: Set msi_addr_mask to IONIC_ADDR_LEN-bit everywhere
+
+ arch/powerpc/platforms/powernv/pci-ioda.c           |  2 +-
+ arch/powerpc/platforms/pseries/msi.c                |  4 ++--
+ drivers/gpu/drm/radeon/radeon_irq_kms.c             |  4 ++--
+ drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c |  4 +---
+ drivers/pci/msi/msi.c                               | 11 +++++++----
+ drivers/pci/msi/pcidev_msi.c                        |  2 +-
+ drivers/pci/probe.c                                 |  7 +++++++
+ include/linux/pci.h                                 |  8 +++++++-
+ sound/hda/controllers/intel.c                       | 10 +++++-----
+ 9 files changed, 33 insertions(+), 19 deletions(-)
+---
+base-commit: 8f0b4cce4481fb22653697cced8d0d04027cb1e8
+change-id: 20251223-pci-msi-addr-mask-2d765a7eb390
+
+Best regards,
 -- 
-MST
+Vivian "dramforever" Wang
 
 
