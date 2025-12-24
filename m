@@ -1,243 +1,152 @@
-Return-Path: <netdev+bounces-246028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C39DDCDCF74
-	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 18:52:31 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABE49CDD076
+	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 20:12:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id 81B81300EDF8
-	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 17:52:30 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 18088302034E
+	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 19:11:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09B7F329C74;
-	Wed, 24 Dec 2025 17:50:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6525B2C030E;
+	Wed, 24 Dec 2025 19:11:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nCYro+8z"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="cukYXBVV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-qv1-f97.google.com (mail-qv1-f97.google.com [209.85.219.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF068329C5B
-	for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 17:49:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C30E1296BC2
+	for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 19:11:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766598602; cv=none; b=Fr2e/ettxDdN6+z5IiC+y92Bg40HC50rzudEDazjK0SxSfZgqOtPGY9WbtPeaScRw2dF3+qXKAnz+xZsB5gJwG5a3wxy0UZ3rXOWaLOGUkszgg/AtBIirircsnQzzrrv6DzVfKT98z040/Dh9kXCZS+3WsWCfNZi9LtOjJumeyE=
+	t=1766603517; cv=none; b=LSMCjkhW6TF+OmpBj3w+REWWSl++bYUEeZIgO2vvNSn2rl7fIXUzq/pJ0f1jeZCrlOmxVDRGSJCB0vwl9tPit1beDGXwjFZhB5oYraQ+uUcLJgIndX5qENOKHqu81r/yd8rsa18uS40Poy02lag5kiCGioHvpY/160Rk5sw8okA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766598602; c=relaxed/simple;
-	bh=Uy2GuzMWLXSScd2jys7HD/4lMT6yYktAwCAK7y1dxs0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aFTPCh0gbRj+ipiTYaqd2ivxLHO3I7N8XzhhKRo+27p4HAyEsOFy7ynZ56VsjpwzNIdTckC6netY5Nxh06gZq799COpMoY/1BvwJLl3kuitfgR6rkOAaiMEpFHZWS7y/skSQgYA+/GWN/EL1j9xP0XFt/BeBOZkrtKuulQAZ4hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nCYro+8z; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-7a9c64dfa8aso4750126b3a.3
-        for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 09:49:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766598596; x=1767203396; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dyaIVMgw4ATEaUXqxaNcG5tML3N8wIlrK8h87W4urnk=;
-        b=nCYro+8zzvCeE6Xo914YmQ4yIBts6jU6oEjNKLyBU/AFVWdhLGZVeA/lsRPsk7zwny
-         8l6aI1dRonJ54hb2ARkUggAYIexArm6icOOrJxR89jO384d8zAaB+YCqRuay/cnxYAOH
-         J+kAMe3tc9YVAcsezF+3d2cMEEIwkyjWmgFFcvMidNs3heR2lXmy5CAkeypAWJqCgoQZ
-         pg90xoG67xAd1XdTyZCinpl1zwiAy9cAH2rVMNkBpR+6VCOqGed3TiLs5CR/8i8Y5+r2
-         ZSWpYHxtxBCktIwFzTmwiS6wBM6m+rMorD093XijjNekJnxMKtVtuberh5cv3tipq9/C
-         Dp8Q==
+	s=arc-20240116; t=1766603517; c=relaxed/simple;
+	bh=2BSiEw1ralWUVM5G5qwgNDbThdDXhA8AZ01SnFYbsnQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jdN+X0kXamC8soGpMHYMgfnJxLC7lxM5qRIBmu2okOKe4ZaP7rCg+Ubg5+je9I2g+l12CB47SSdLh+KFfOvogasAtDFPuNwVr6NtaVPmDcoOg01tdL4l3ti6baTlEgoAFVRd8/IEb4RuushOoaGTWTtFXLhHnUnNH6bQkvdu8dk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=cukYXBVV; arc=none smtp.client-ip=209.85.219.97
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-qv1-f97.google.com with SMTP id 6a1803df08f44-88a34450f19so68990806d6.1
+        for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 11:11:55 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766598596; x=1767203396;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dyaIVMgw4ATEaUXqxaNcG5tML3N8wIlrK8h87W4urnk=;
-        b=M69LoFp70UIQjCAhrYM1KxtG5I7qye8v+4Tpx25TiMV5SU25W0gveN/mgfhhYBoHF3
-         lP382oz8Zv9jCe5ggomXAVENiNAk0kdo8khiOMp8axat/o09L9MMyKTJORQneG9qomWZ
-         Oum7F/GJlUIBnFApyCQqlmWT2w0PSKxYE+vfcarbAGmKMTjdwL2YVmDH2k0mDNFGMRaG
-         oABmDV9UP9UKjWsklfc3/Jpfoa5+ycpbZqgx91rOYhMDvKujMoHV9IMY9oHiZsE7xzaY
-         4bFY61CsHPKzKJ6vLw6AR/SdUQYxMdGGMCxd5fBM8kVpTKWfBL+2K/FWeVdxw0B3zxrF
-         cDIA==
-X-Gm-Message-State: AOJu0Yxe6TGL4XQ85m8R/BxW7z7i3N6SkX810z5FK66mht1ttMoxfsYo
-	oti0ILLRidnFk+kghcxJ5LM+qk1Q4ouWgueWdyQdRVgJNsLK7TEGNu3e
-X-Gm-Gg: AY/fxX50WVsuetQLyy6WBC2ZtB6WKuZAg4sHcFH8F+v6RviEb41RImr+I1diNnLQ9dI
-	heiEdga+HaBlq1kA8QOFw0RQfDprVleX/1xg3DBkdoaqhCSEKXM1k2S8ZIB2GOMD7N4R2qc0uu4
-	IoRzioJ+28/CdWsQ0Ud1227oiC13MW6ec37YwSbqKZErq+lKFvLqdLzxIoxd2NIvkYoA6SvF77d
-	ZHa3i7fv4qYn2mmyaqBnDeUbIKzav9hqxgMD6YuFrr+TMQlPYNtaCq3FoPPlKnAq1CeDeQ5xVWP
-	efYB2ed8i/xs+Lw56VOzw28L6IOdukLbDzvttZvxS2FPqcVcx5DUrAazNUa9+oQRndYs3Ga7JBK
-	poAI6y6jMpgRXtyM9LsaueIv5d8KENYC440BkNJVZ+OJm6ZINvRQx7XHOqJiWM0cIdsd+9wjRWi
-	LlXgqFWoUUw0t8jf9EYSKnjkmLwITmTJYjivqxUoWML/5ryGGKYLpf0em+CqQ=
-X-Google-Smtp-Source: AGHT+IGqeYfA0scfRJSZs642UZrJmT7+8QWmvt0tszu/L1Nmzf2uk5Nb/WZyy+4ewshxFonCJ6CNgQ==
-X-Received: by 2002:a05:6a00:e13:b0:781:2291:1045 with SMTP id d2e1a72fcca58-7ff64fc5fd4mr15854544b3a.8.1766598596164;
-        Wed, 24 Dec 2025 09:49:56 -0800 (PST)
-Received: from ?IPV6:2001:ee0:4f4c:210:c711:242:cd10:6c98? ([2001:ee0:4f4c:210:c711:242:cd10:6c98])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7ff7e0a19besm17215370b3a.40.2025.12.24.09.49.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Dec 2025 09:49:55 -0800 (PST)
-Message-ID: <3acaaca3-37b3-4104-ac5a-441f3d4243c6@gmail.com>
-Date: Thu, 25 Dec 2025 00:49:49 +0700
+        d=1e100.net; s=20230601; t=1766603515; x=1767208315;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:dkim-signature:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fwZxeEygJOhPXHTv8N39MsQtbUPLmm9QKziUOzy1N+A=;
+        b=dlVGOurPTpcOCQv2QTN2hTCMUsPJlgwim5DL1+lnLEpCDRMjgSuJSPZBlFKirzW5ml
+         7jtLf7q5m/MM9R0XwWCNeEVNBqsGVrbepfnbCqkDQPZCTFYzEZ0tDEn6tdVuOZAmA+Cv
+         d4WLhQaOTPq5c/a7+0MizafMD3gIZ3iRaZWtS7YNKH2DjtZBJ8atus3u/om6Tic3BR/A
+         aM87Q+xebC7Pj4/9fzKZhOeqckiz6REVTqT+HItn9PPsG+476f1Lm2R/umtzROwfxawN
+         KuBYwTS/GVZoSteu2XeIORgakAyBga2kvFsENGIimonmrjbjuQrXUP6Q3CEz2t7uMU0G
+         Giew==
+X-Gm-Message-State: AOJu0YwbCV8uoo908ruDWK74nq00k8yLvvRQZ9deBESMRBmSLV9H+224
+	6eNL9wUuLVF2Prd58bmlDCCX97Q+9elh6q9jjFpEHSZUrmFogtCWfb4Vt53DvMCidc81KfRyFMG
+	XzFQkPlO1KmehMkzMtJL2CRxKcwXT/N+E0HE+RsKa7dNq3zqOPnTvuHfThYC7XPA89XjZ0hs3BY
+	0HudpGGuqeEjS0hQy/OjqjB0P54OIiHZQP0p7e7AuQLhGAaCfXqVhGdRQOYEz1DjFkA1UluZ6MF
+	1+6BGvOwt0=
+X-Gm-Gg: AY/fxX4ROrZW7h6x7qtBza0S5cBvdVwGwP8E3zGVxmXLTLBlITp7+xVFUHmVBalOVDs
+	FGXG41cE/E3dF+qXpj2vLOLuv35DkQVFOmijnv8qBHFdoAcnuFS76CWtfmUI0i+a7PubkNF4pCJ
+	ekYweUS4l7wl0DaNU/Wc2fwERZNiTCVy8jRySbIuLZvcF8UDk1PnSTC9GkpHgpeTIxYZNdw1UNm
+	sUD1eigkGMDaRR6YFPvGR8kAy0pKXTfAYLR6G4dDli5icA7Jp49BUT0WInUje+NucBM1eMBuPCp
+	k6Krn1rihE4SRiuv7hSKc5L0NS6K6roOgBtbjyiBCGtMH37FqBdOfXHB5BfFwD3ZkXQ6RgYL2hX
+	ErL417xGQcebZ2GTrTMjF25GcQ+sS9gz1YHN+Ig6UyDI4y/t7Q/8yZy3gaZQDNTSRSzf0jeQcFO
+	qbF09NVTSqPmN7yPVJ+i94jxPt1CT8KNxTRfrW0MW8kIp/
+X-Google-Smtp-Source: AGHT+IE5TsGeQOuslgv5niWBvRIKAeE5m5QYs/DGMgkkhQAu48CHs41GKJ6dFNJ/UMllkG00Ton7DSNrOADZ
+X-Received: by 2002:a0c:e705:0:b0:880:5d59:fddf with SMTP id 6a1803df08f44-88d82234459mr214751186d6.28.1766603514708;
+        Wed, 24 Dec 2025 11:11:54 -0800 (PST)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-10.dlp.protect.broadcom.com. [144.49.247.10])
+        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-88d980505aesm22204286d6.23.2025.12.24.11.11.53
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 24 Dec 2025 11:11:54 -0800 (PST)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-34c66cb671fso8787961a91.3
+        for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 11:11:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1766603513; x=1767208313; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fwZxeEygJOhPXHTv8N39MsQtbUPLmm9QKziUOzy1N+A=;
+        b=cukYXBVVn2uKRlsOJC/0ijWeVMjRWIKaRI3c46p8zwUuWxmNQxN/1Bhz1r8HW/6F9J
+         NDsnzLEY/4Dsvaw/KPzj1yeLcMEwoW3mbxys8+37UdFoFJtDuUgdTnX8xid8kLA0n3yF
+         a89xqX3TCsj5D5fgpW83Nl52pDPH0RmBO5CJQ=
+X-Received: by 2002:a05:7022:989:b0:11e:3e9:3e8c with SMTP id a92af1059eb24-12172300173mr23106319c88.49.1766603512770;
+        Wed, 24 Dec 2025 11:11:52 -0800 (PST)
+X-Received: by 2002:a05:7022:989:b0:11e:3e9:3e8c with SMTP id a92af1059eb24-12172300173mr23106301c88.49.1766603512209;
+        Wed, 24 Dec 2025 11:11:52 -0800 (PST)
+Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id a92af1059eb24-1217253c0c6sm79252054c88.12.2025.12.24.11.11.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Dec 2025 11:11:51 -0800 (PST)
+From: Michael Chan <michael.chan@broadcom.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	pavan.chebbi@broadcom.com,
+	andrew.gospodarek@broadcom.com,
+	Srijit Bose <srijit.bose@broadcom.com>,
+	Ray Jui <ray.jui@broadcom.com>
+Subject: [PATCH net] bnxt_en: Fix potential data corruption with HW GRO/LRO
+Date: Wed, 24 Dec 2025 11:11:16 -0800
+Message-ID: <20251224191116.3526999-1-michael.chan@broadcom.com>
+X-Mailer: git-send-email 2.45.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 2/3] virtio-net: ensure rx NAPI is enabled before
- enabling refill work
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-References: <20251223152533.24364-1-minhquangbui99@gmail.com>
- <20251223152533.24364-3-minhquangbui99@gmail.com>
- <20251223203908-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-From: Bui Quang Minh <minhquangbui99@gmail.com>
-In-Reply-To: <20251223203908-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-On 12/24/25 08:45, Michael S. Tsirkin wrote:
-> On Tue, Dec 23, 2025 at 10:25:32PM +0700, Bui Quang Minh wrote:
->> Calling napi_disable() on an already disabled napi can cause the
->> deadlock. Because the delayed refill work will call napi_disable(), we
->> must ensure that refill work is only enabled and scheduled after we have
->> enabled the rx queue's NAPI.
->>
->> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
->> ---
->>   drivers/net/virtio_net.c | 31 ++++++++++++++++++++++++-------
->>   1 file changed, 24 insertions(+), 7 deletions(-)
->>
->> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
->> index 63126e490bda..8016d2b378cf 100644
->> --- a/drivers/net/virtio_net.c
->> +++ b/drivers/net/virtio_net.c
->> @@ -3208,16 +3208,31 @@ static int virtnet_open(struct net_device *dev)
->>   	int i, err;
->>   
->>   	for (i = 0; i < vi->max_queue_pairs; i++) {
->> +		bool schedule_refill = false;
->
->
->> +
->> +		/* - We must call try_fill_recv before enabling napi of the same
->> +		 * receive queue so that it doesn't race with the call in
->> +		 * virtnet_receive.
->> +		 * - We must enable and schedule delayed refill work only when
->> +		 * we have enabled all the receive queue's napi. Otherwise, in
->> +		 * refill_work, we have a deadlock when calling napi_disable on
->> +		 * an already disabled napi.
->> +		 */
->
-> I would do:
->
-> 	bool refill = i < vi->curr_queue_pairs;
->
-> in fact this is almost the same as resume with
-> one small difference. pass a flag so we do not duplicate code?
+From: Srijit Bose <srijit.bose@broadcom.com>
 
-I'll fix it in next version.
+Fix the max number of bits passed to find_first_zero_bit() in
+bnxt_alloc_agg_idx().  We were incorrectly passing the number of
+long words.  find_first_zero_bit() may fail to find a zero bit and
+cause a wrong ID to be used.  If the wrong ID is already in use, this
+can cause data corruption.  Sometimes an error like this can also be
+seen:
 
->
->>   		if (i < vi->curr_queue_pairs) {
->> -			enable_delayed_refill(&vi->rq[i]);
->>   			/* Make sure we have some buffers: if oom use wq. */
->>   			if (!try_fill_recv(vi, &vi->rq[i], GFP_KERNEL))
->> -				schedule_delayed_work(&vi->rq[i].refill, 0);
->> +				schedule_refill = true;
->>   		}
->>   
->>   		err = virtnet_enable_queue_pair(vi, i);
->>   		if (err < 0)
->>   			goto err_enable_qp;
->> +
->> +		if (i < vi->curr_queue_pairs) {
->> +			enable_delayed_refill(&vi->rq[i]);
->> +			if (schedule_refill)
->> +				schedule_delayed_work(&vi->rq[i].refill, 0);
->
-> hmm. should not schedule be under the lock?
+bnxt_en 0000:83:00.0 enp131s0np0: TPA end agg_buf 2 != expected agg_bufs 1
 
-I see that schedule is safe to be called concurrently.
+Fix it by passing the correct number of bits MAX_TPA_P5.  Add a sanity
+BUG_ON() check if find_first_zero_bit() fails.  It should never happen.
 
-     struct work_struct {
-         atomic_long_t data;
-         struct list_head entry;
-         work_func_t func;
-     #ifdef CONFIG_LOCKDEP
-         struct lockdep_map lockdep_map;
-     #endif
-     };
+Fixes: ec4d8e7cf024 ("bnxt_en: Add TPA ID mapping logic for 57500 chips.")
+Reviewed-by: Ray Jui <ray.jui@broadcom.com>
+Signed-off-by: Srijit Bose <srijit.bose@broadcom.com>
+Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-The atomic_long_t field to set pending bit and worker pool's lock help 
-with the synchronization.
-
-
->
->> +		}
->>   	}
->>   
->>   	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_STATUS)) {
->> @@ -3456,11 +3471,16 @@ static void __virtnet_rx_resume(struct virtnet_info *vi,
->>   	bool running = netif_running(vi->dev);
->>   	bool schedule_refill = false;
->>   
->> +	/* See the comment in virtnet_open for the ordering rule
->> +	 * of try_fill_recv, receive queue napi_enable and delayed
->> +	 * refill enable/schedule.
->> +	 */
-> so maybe common code?
->
->>   	if (refill && !try_fill_recv(vi, rq, GFP_KERNEL))
->>   		schedule_refill = true;
->>   	if (running)
->>   		virtnet_napi_enable(rq);
->>   
->> +	enable_delayed_refill(rq);
->>   	if (schedule_refill)
->>   		schedule_delayed_work(&rq->refill, 0);
-> hmm. should not schedule be under the lock?
->
->>   }
->> @@ -3470,18 +3490,15 @@ static void virtnet_rx_resume_all(struct virtnet_info *vi)
->>   	int i;
->>   
->>   	for (i = 0; i < vi->max_queue_pairs; i++) {
->> -		if (i < vi->curr_queue_pairs) {
->> -			enable_delayed_refill(&vi->rq[i]);
->> +		if (i < vi->curr_queue_pairs)
->>   			__virtnet_rx_resume(vi, &vi->rq[i], true);
->> -		} else {
->> +		else
->>   			__virtnet_rx_resume(vi, &vi->rq[i], false);
->> -		}
->>   	}
->>   }
->>   
->>   static void virtnet_rx_resume(struct virtnet_info *vi, struct receive_queue *rq)
->>   {
->> -	enable_delayed_refill(rq);
->>   	__virtnet_rx_resume(vi, rq, true);
->>   }
-> so I would add bool to virtnet_rx_resume and call it everywhere,
-> removing __virtnet_rx_resume. can be a patch on top.
-
-I'll create another patch after this patch to clean up the 
-__virtnet_rx_resume in the next version.
-
-Thanks,
-Quang Minh.
-
->
->>   
->> -- 
->> 2.43.0
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index d17d0ea89c36..6704cbbc1b24 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -1482,9 +1482,10 @@ static u16 bnxt_alloc_agg_idx(struct bnxt_rx_ring_info *rxr, u16 agg_id)
+ 	struct bnxt_tpa_idx_map *map = rxr->rx_tpa_idx_map;
+ 	u16 idx = agg_id & MAX_TPA_P5_MASK;
+ 
+-	if (test_bit(idx, map->agg_idx_bmap))
+-		idx = find_first_zero_bit(map->agg_idx_bmap,
+-					  BNXT_AGG_IDX_BMAP_SIZE);
++	if (test_bit(idx, map->agg_idx_bmap)) {
++		idx = find_first_zero_bit(map->agg_idx_bmap, MAX_TPA_P5);
++		BUG_ON(idx >= MAX_TPA_P5);
++	}
+ 	__set_bit(idx, map->agg_idx_bmap);
+ 	map->agg_id_tbl[agg_id] = idx;
+ 	return idx;
+-- 
+2.51.0
 
 
