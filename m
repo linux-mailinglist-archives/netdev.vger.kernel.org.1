@@ -1,40 +1,41 @@
-Return-Path: <netdev+bounces-246021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3202CDCD71
-	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 17:19:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 246B6CDCD77
+	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 17:19:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 38BD430213C9
-	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 16:19:06 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2EFCA3030FD5
+	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 16:19:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84A8D32938C;
-	Wed, 24 Dec 2025 16:19:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE5EE328B54;
+	Wed, 24 Dec 2025 16:19:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="OLb57ekG"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="TZlPvJ7u"
 X-Original-To: netdev@vger.kernel.org
-Received: from PH0PR06CU001.outbound.protection.outlook.com (mail-westus3azon11011004.outbound.protection.outlook.com [40.107.208.4])
+Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11010031.outbound.protection.outlook.com [52.101.56.31])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63FFE328B4C
-	for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 16:18:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.208.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCF5D2E8B6B
+	for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 16:18:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.31
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766593142; cv=fail; b=TPsPQnJQ3YEqMz/ratzpwVcyl++ZzAkiWM0Pwo7ngtrHpHMBE2GboLwezuizxbqkHxxzUMe4OfyXVm/VSxpV10NA2tfOnONh/peCGn3NnCSEFKhA8t2lsjb30tnGOnfgbC4YTgfvlEfILUGWQrZuQwFVgQtIBDwyb7jMnrcN+wo=
+	t=1766593145; cv=fail; b=qeRtmXjs/Zex/nG/5JHu6841eHV0bP1gHzKpDTA0n+bGHmWqLm2gtvN4kr11/rBh2Nk2uVketrsApo3/qgPj0X5JCGywzILRZg9rggUxdlYlF+yRRdpCJEQ6VhQEJsw1ElkK/woptFl6m7iFdeL0xbWfxhlsTxedtJxJprKmXKA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766593142; c=relaxed/simple;
-	bh=m9zdF07ApWFa+gIqMyjdsLXKFmecE+UEytKAs96JvuY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mDmwhqp8XOUv9rM5FPPCBvngz6CUO6BNWKxB0Hqs4+Eu5HADhaQYL+Tt2EoRQp93Xr0ys40jyW/Zpq/P8yJ5R8DT253vqGJtF/jkJORXBGacfr36O0lHWO59vVxPSHh4U34yGXvh/SxDaa+rwZu0U0kvyhDIj2ADSYdmBdDcDYc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=OLb57ekG; arc=fail smtp.client-ip=40.107.208.4
+	s=arc-20240116; t=1766593145; c=relaxed/simple;
+	bh=LtpXIvWL0P+z9q5MH6Iw43lQmsIZn8VaglDu9XeBTuk=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=G+Ptf/zwMP2SztG1ul9C0YLkaQGtIWXdX8VAtOP6lFCO7wv6tG2xWRHNpeXk687ed4Mi93SjQ8NIXNtq2gC447Qh7DAimebhnAUC9+uh902h0XqsvqY00KLILQxdkj95ZX0+fB+9WJJWiyQhvye5XcAOei8Iogip5eqeNMfuNc8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=TZlPvJ7u; arc=fail smtp.client-ip=52.101.56.31
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NiW9mk5iTGK8wsdbXgClae1khJqsHoufdGuvak9OFZOOk0sNJPlnkoJm2wXFrZkpnq7QV97UjNxpHou3uGSbRv3MvOncOIldP1quxXoNprorKTV1alExRDENYBZTAifQ9Bz0pescn6rNNazMHsteawYPZWdwnI9OSrqnC1ksny1K2Yhjj0Fu9cR1hQD1rY32kyOLS0gO9mayKSgHME6cExkMC61JulBgR0MY7nI23jyleDU0JjlEuCu08giqexBPxIsuuqTVa42umoTbBtEHW1opY+ovevmcNu/GudvF8/WiIC7ukg7u/a5OXUsqsH6FCnK/2uIvDvOff8N7FfkkJw==
+ b=yCn+yUEU4Wf7TbgSLUsy/LuhXeWjK+IiU5VAMOTFaYcOES8ATNlDGg/Gn/Z1zz81ZM5CsIVU71b2jEvwGQ2EHTI1n+qLDW5msKoDA/CqOaztPzWNHUCElp/CjlxBrXw+c5kbbgierTc0LjQtM+BGyhvzYPJSbv9fY/SWFiY17htVpXYPAlYCHjCpcIW2+jSMYMU7rZYkWKUCxvy3USXAAlcHKtYlms2rWbmZJJVi2qloRcZXSnK7ST+9CJ93vXUigqpQLlpnDFwrLGzVhESoLcaNqOzGPeq7IjHWJVqiyxVeomH+I4WgDcgq2FN38SLI/HMQsmsL93Et091D5+gTgA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5+JxW7FsUJft3N8Td1WI+vRSJbIZnX8OpyoOp9GNOxA=;
- b=E0zMKDjRlQCf7XU6gsK30x5bAKr4L1IGudxxw9/k9b8eT+fFHlMOmqbq8qgK+7ESVKwBrdoICznfnFxK+jg8AozkZAmlLvhDrmnocCD3DPklAhoH/2o3bWdCZUbWSBBUK0EEyb4wlpd+tVYSsgXqBCKaxgyXWIFtXUIES0x4cIT6nmf+7+iKVMXTxjuyml1Oo+trvDW70wpNh37oCe7qjhu4PyjpFy9Od9IrA8QCa85f84cyiE++2YNQgBGbR8rPpyC2/th4z6gLO5RZoKdrhjNQgYF/4qhcxXfvygjm/OVeLyeH1CPfF8OuX+I2mE5hu51VzOVuAktp0P/ArYg51w==
+ bh=iF4Gwhwr8lqxsRDNP9z4wU0bmcHJrhu4wBDpieNrYcU=;
+ b=Ou0kK6KAs09ttCdz9Pg+m4tPXUB6mWSAcKDIrX0AlnmdKPow/yxHIXgAi7q0MJ7UAUOWwA9NAng6TUnmdF4A7xEWdpz45SDVBizgdNAYHXI2JWvwve2itMu92gJ4Xi2tkrz6pCGqy075ImB7GS0XV8P5XyY/xvAfhlPILeCgCdHnzWeSp58A0y/Mq1XJrx7Tiratyl5uPOkKHziMC3J2vzrUByALLQxmq8BUyIrnfKLAKlwSGlzMmlU3+Sh8tTwYfgfgQSL2W14MIATq2bs/celfj4OZfd0RW5nriPVosSzhqrf4JRswEY6yJIpDIAkun2Y5SK90XxGjGehJ3DofGw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -42,18 +43,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5+JxW7FsUJft3N8Td1WI+vRSJbIZnX8OpyoOp9GNOxA=;
- b=OLb57ekGZpQPGZZlLa6NaKjpBD5P1S9fgeVVySw+tstlVWzTsJsTLHWFFEi4XKYLBnxvX/GirU9ZCC5SNEEERdnB3dpyM1JxOkMoRT/89iFX6iVlncXZtaFS8AI5pEpCynZScMkQXjIcj8S6CD4ALRczuwzVyDpOJN+OL99uxNlnAqFZDDBLYqxuscwHP31lTdz1c6cMQfrcgV8ETPBu22QG+0iW1wfSdlsCa0JNilPhuteUKqbEk6HRt3FK3B0sz9QY0Cu/x0oSRbZ8VaJ4i8p4h39cw5arE7M1lh88gCDA++WM184zwZXCu0dZ4gpnF3W32dxt4lk/tKkNrsGR9A==
-Received: from PH7P221CA0061.NAMP221.PROD.OUTLOOK.COM (2603:10b6:510:328::15)
- by DS0PR12MB7874.namprd12.prod.outlook.com (2603:10b6:8:141::11) with
+ bh=iF4Gwhwr8lqxsRDNP9z4wU0bmcHJrhu4wBDpieNrYcU=;
+ b=TZlPvJ7uz7boczdJFGs/rO86PpQL96z7fVisOymqW8oWvbXsVDS0tbpAkAscURByCFd/Lbwa3r+a+c/QNdMjAtjXaiSWpXd8yqTJguMwKglDxgM2YWMfQkYuJkTsqNg0lrM6kXnw4gI4eg1CCEKuPYUf8WBj7iVV+r215GmGGOj6Fza50qZ5GWF6PHCwjh1RGQIXDS0bTr4aJwpOKY03V67Quo0iBPjhPTJglso156yC7Pff/e9k4TEGZ/4GXM8V2KnZCDXCW81u1MLgCAKsppnluxVOdtxV0HHXe+P+uGzchCkHWh5F1mWthWkyruO+GMYk9LX5UY/The3fVWnVLQ==
+Received: from SA9PR13CA0057.namprd13.prod.outlook.com (2603:10b6:806:22::32)
+ by MN2PR12MB4096.namprd12.prod.outlook.com (2603:10b6:208:1dc::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9456.11; Wed, 24 Dec
- 2025 16:18:47 +0000
-Received: from SN1PEPF00036F40.namprd05.prod.outlook.com
- (2603:10b6:510:328:cafe::7c) by PH7P221CA0061.outlook.office365.com
- (2603:10b6:510:328::15) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9456.11 via Frontend Transport; Wed,
- 24 Dec 2025 16:18:47 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9434.11; Wed, 24 Dec
+ 2025 16:18:51 +0000
+Received: from SN1PEPF00036F42.namprd05.prod.outlook.com
+ (2603:10b6:806:22:cafe::e2) by SA9PR13CA0057.outlook.office365.com
+ (2603:10b6:806:22::32) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9456.9 via Frontend Transport; Wed,
+ 24 Dec 2025 16:18:51 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -61,26 +62,28 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.161 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.161) by
- SN1PEPF00036F40.mail.protection.outlook.com (10.167.248.24) with Microsoft
+ SN1PEPF00036F42.mail.protection.outlook.com (10.167.248.26) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9456.9 via Frontend Transport; Wed, 24 Dec 2025 16:18:47 +0000
+ 15.20.9456.9 via Frontend Transport; Wed, 24 Dec 2025 16:18:51 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 24 Dec
- 2025 08:18:39 -0800
+ 2025 08:18:43 -0800
 Received: from shredder.lan (10.126.231.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 24 Dec
- 2025 08:18:36 -0800
+ 2025 08:18:39 -0800
 From: Ido Schimmel <idosch@nvidia.com>
 To: <netdev@vger.kernel.org>
 CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
 	<edumazet@google.com>, <dsahern@kernel.org>, <horms@kernel.org>, Ido Schimmel
 	<idosch@nvidia.com>
-Subject: [RFC PATCH net-next 1/2] ipv6: Honor oif when choosing nexthop for locally generated traffic
-Date: Wed, 24 Dec 2025 18:18:00 +0200
-Message-ID: <20251224161801.824589-1-idosch@nvidia.com>
+Subject: [RFC PATCH net-next 2/2] selftests: fib_tests: Add test cases for route lookup with oif
+Date: Wed, 24 Dec 2025 18:18:01 +0200
+Message-ID: <20251224161801.824589-2-idosch@nvidia.com>
 X-Mailer: git-send-email 2.52.0
+In-Reply-To: <20251224161801.824589-1-idosch@nvidia.com>
+References: <20251224161801.824589-1-idosch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,157 +96,236 @@ X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF00036F40:EE_|DS0PR12MB7874:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7d95d6e1-2824-49d5-a364-08de43081e03
+X-MS-TrafficTypeDiagnostic: SN1PEPF00036F42:EE_|MN2PR12MB4096:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4c856e00-3baa-4f8e-4f8c-08de43082055
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|376014|82310400026|7142099003;
+	BCL:0;ARA:13230040|376014|36860700013|1800799024|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?t6BMrpaz8xN6qcTyBxic+uJzmLmO073GW12Kz6XILwT5bBORrj+SLGIL0tWm?=
- =?us-ascii?Q?s1m3NHDIOnbBLhk9L/E3FVDlbeLfnCkrm1kLSJPMmlUHJdFffbLHDapKqjyq?=
- =?us-ascii?Q?mU3tHwqABevBnXRsowV5JMBMrylPUhze90ho0VfkftmVQyR9aQvOGPegFwCs?=
- =?us-ascii?Q?Va8iVOLyZpvemkGTaNx+uyLWs0CYNkvznkdxyPcl4rwiezLhnJPWxAxHH8gS?=
- =?us-ascii?Q?KSOO1Jzu545eyspYVKU4KAO6+P9Wxejl0/pFflFr1P1M8D8k4sGE8I9uHPxR?=
- =?us-ascii?Q?BvZ2RI77rAYjlXKRQI1qVKLZ07oYszsKu1ig5gfmt60weBfnWaI2SeIsG4cE?=
- =?us-ascii?Q?hryNAm6M1MMvzOw9W2I6tMmf86xrN8ECiuKek0ZElfyLxJozrFwqUtyiJOvx?=
- =?us-ascii?Q?3+IwBCNskI5k2BUFEvbGi6LGE+AL37kBKlE55Z7Dw02ZyyNYTe1gOd1Vu+pX?=
- =?us-ascii?Q?42dfjY/Pp5wasq0v8sfVdV3Rlcu4Q20wXxrjWa5rzO+JvMRUWe3MqdkRvFVg?=
- =?us-ascii?Q?U7vK9TBKAUKbySfVQoheDQwyVK6NgjM2lHH51I86VneVv4qSTn7eCA4iPv64?=
- =?us-ascii?Q?PrLFfbX9pDlh1NVsb783r2UcRnuC5WThXNXN/4T7FEjbwpbqtFonpuups6Q4?=
- =?us-ascii?Q?3v1dWh5bIErdPn0vQi/jCTa52sK7OU5GFKbWZGGL4kRlgLP4tpNLqWgObpiE?=
- =?us-ascii?Q?qcuESkb1oLa753yr/1ol5qFDd/8vos0OPxUPgEbk1ylnEqq9i6QcQvBIyDKG?=
- =?us-ascii?Q?CUUduaRYFb7uxCQGjNzR4A7YlBwxXehJi4bmcJmgSb529dlEdrZV28NYZKz3?=
- =?us-ascii?Q?/4lNF3xDmetscjGKwjC7zjotHrvzo7z0dK2owkTc3p68W0gsV8GfFCTpzvvC?=
- =?us-ascii?Q?1ECUrKUyy0pYlUaH6P5Qep0jJISxJs/SgkJ6ZDlxzu8rPTDGB7ochmsIIq0L?=
- =?us-ascii?Q?1N5wHsP2BNa73d8YEyCbk+qHYC3sfJ3+EMBorqtxBvFVbfpdy/n4bmfqh6B3?=
- =?us-ascii?Q?uImfGZdIoTq3hEKz35SUtaKN0mh+sKPW6IeT2cIzdTO/fcSpPneLsRg76Wo7?=
- =?us-ascii?Q?vZJb1HQz1+E6fwVgKpCWImHNITIr+Jvb8oPf9zfUSJUacJEfKsr+7AAJRj0X?=
- =?us-ascii?Q?kQMuac96oR+OP2zMOEhrLeQm4QOaBJjeJEgGJO5MUTnmm/AS3spBchnU4CE9?=
- =?us-ascii?Q?cZArYoORLKwx2z2OdFZfC0yooCt9xrUIRotddjLfZtIbPCkhRGQ4Us/UvXvE?=
- =?us-ascii?Q?tRXtu4rEp/sCehjK7Tp9V5mTTfe4MR6vj3TWjHF5rLwS2K98PItpjUBOYEmf?=
- =?us-ascii?Q?31+wYHyUsMcYUXB4LGF/tbt92ImhSqsT3xQSBR/uUHJG3ikbHrwRslN4HG0j?=
- =?us-ascii?Q?VuAUa65BvD33mGufncSmcVqaDJXzXUtCl4aOM1OpsmpUfS1+C6tbUMsxW8Zs?=
- =?us-ascii?Q?sD8W+RUcb00iteJi3RmF5DjIY7t3I+DDS60hRVQS6u4NrK7/qEmFTIljKuVc?=
- =?us-ascii?Q?9q/kXakKAciVbYmgRSo7udusFkY+N2QiJCgCMxtUYLHRmre0Wy0wpKDSwAYS?=
- =?us-ascii?Q?ybR1upeIH+VABYYLbcs=3D?=
+	=?us-ascii?Q?7teY9JmlU0fNitxnolcpLqeOknbfKVVCpR3CDFT1P0U6Bs5o4ARUaEQwqjnt?=
+ =?us-ascii?Q?iZKep18ympAES1qcKCOkWa2n6s2Ol85y5UW0uzvkp4vgBnm+p9krUz2xqOAO?=
+ =?us-ascii?Q?XvKdVesqRGgSjZahjD3tVB+ndciUHr01YFdtjp8CD1/WylAsVNTz3jvXAbyh?=
+ =?us-ascii?Q?xdMIEJkJwy5IhvKfXchzS8v4LRhWmza77WkD8EseexSi6eqhUFHY+En+mNNX?=
+ =?us-ascii?Q?MoBmG5A9DnV/MFgYUP8zHvQ7qnqhlHRg/n/wdbqXIKoP3UtvIXH25ccFPwDc?=
+ =?us-ascii?Q?QkunV//0R7WvzfJafEHw34mb8IV8fi5frstR4i0yKlmu9wfjkTUjFAXBoNlD?=
+ =?us-ascii?Q?j0paM4cMlUeBJKlrImJa0s7HCmH4IgFTH81WAPvL6hTGKdF/UrlEJbZMSFbn?=
+ =?us-ascii?Q?zvBwXwhx6+qJ6ssvgNWzSh8exctnuzkycR5DWg5CVPsVvvXJGOT6LuUm/Fbq?=
+ =?us-ascii?Q?5Qlx4v9kHhJ7LZgdpf/DX6zxdoVYjkNeU54+XsU6iSio7zXUWtl2YVaCGDBw?=
+ =?us-ascii?Q?V11qmqHgFIgyKQZV9fxpsQUdCxJI7aJBOYlXQZ2mwbX5HpM7m79R/jsA7DpT?=
+ =?us-ascii?Q?fOqubrinrom3YxqqgLk+SeFwQLOG4FU4UQ7Qx5viTGDiC52lg5mwZ/9fi2Qj?=
+ =?us-ascii?Q?owHsn7TbE+QV9Ne6ExG188CDSBcLRCWfA4mQau+/iv3x+1ITnmF5OGNLk+xm?=
+ =?us-ascii?Q?xO1eXGRavgVAdWSwlVVdKbdAwWAtVgHUvm8LuR0X04Od63yCfTOjsi7nQhxE?=
+ =?us-ascii?Q?/hOXuVmSlLjlIFypsKV2XmfirN0+XgMcXEx1/tQsCoD54r7X73VqevXKMwWp?=
+ =?us-ascii?Q?aBLpgN70d6RO5tm48KT2mLW07B5FmXOdsdA1BIa+1CKSVjCU9iHmy+aTNnPy?=
+ =?us-ascii?Q?ybkQL2Fs15bEd03lPUco+dQtVVfXg2OAwHp/CB62hnfWWL3tIFuvCiYnHar2?=
+ =?us-ascii?Q?A0hK2vpxWw7kheFHzNBUdaxmJFxgyydFNf2W0+BvzO8OCRZaFdtB/5JP7pGj?=
+ =?us-ascii?Q?cQm/Cs8nip4TnHF+FZD7nLuXACMepchfW4mWhxswvjJN3lzn97jQ/adl4UvL?=
+ =?us-ascii?Q?iFtAFtiwHjHOVwQkXHfMDHUR+8O7vDxcSH58QkekuveJI43h9TBDI4IVW5qx?=
+ =?us-ascii?Q?XfysqR9OJwPqOf4MjcyvH195w0usNbiHZTbPOeKVwNiVU4XK8BetlQak3eUK?=
+ =?us-ascii?Q?45bblhjLw/hfUVqSqYTeN+q9G+aNibIFoCq96YrY8iMoTOTRvSI9oZwVqb7e?=
+ =?us-ascii?Q?gA0Bueq33YMwvdoPBGVeTdjFDOUQLrr/LIK2ssopEDd6CaGG/NNu/4cKZOCS?=
+ =?us-ascii?Q?Tu1if/oDqf1lagDHUzsLZCLtafYFR3GoQ4FnKkADB9ML5bljotI848A1JjXL?=
+ =?us-ascii?Q?2WwCuYOSq6HQ0Pr+VC9En77zzkVvsK/s+hEZR+bzbGdhohLAxqkbNXdXcdSz?=
+ =?us-ascii?Q?3BN6YiJ9h3mf8m6WYJjiGRgzaIdNKq1kqZvDY1KfIlzjHInpfvGw5dGcKupj?=
+ =?us-ascii?Q?sL7uURFMtyxWWKak8nkcAmnE7PL2BXwy3Ek3Ic7rcI/xYVleCh/KKZ89Sxjw?=
+ =?us-ascii?Q?S10QPNBYixG8X5XRStQ=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(376014)(82310400026)(7142099003);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(36860700013)(1800799024)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Dec 2025 16:18:47.4167
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Dec 2025 16:18:51.3525
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7d95d6e1-2824-49d5-a364-08de43081e03
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4c856e00-3baa-4f8e-4f8c-08de43082055
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF00036F40.namprd05.prod.outlook.com
+	SN1PEPF00036F42.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7874
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4096
 
-Commit 741a11d9e410 ("net: ipv6: Add RT6_LOOKUP_F_IFACE flag if oif is
-set") made the kernel honor the oif parameter when specified as part of
-output route lookup:
+Test that both address families respect the oif parameter when a
+matching multipath route is found, regardless of the presence of a
+source address.
 
- # ip route add 2001:db8:1::/64 dev dummy1
- # ip route add ::/0 dev dummy2
- # ip route get 2001:db8:1::1 oif dummy2 fibmatch
- default dev dummy2 metric 1024 pref medium
+Output without "ipv6: Honor oif when choosing nexthop for locally
+generated traffic":
 
-Due to regression reports, the behavior was partially reverted in commit
-d46a9d678e4c ("net: ipv6: Dont add RT6_LOOKUP_F_IFACE flag if saddr
-set") to only honor the oif if source address is not specified:
+ # ./fib_tests.sh -t "ipv4_mpath_oif ipv6_mpath_oif"
 
- # ip route get 2001:db8:1::1 from 2001:db8:2::1 oif dummy2 fibmatch
- 2001:db8:1::/64 dev dummy1 metric 1024 pref medium
+ IPv4 multipath oif test
+     TEST: IPv4 multipath via first nexthop                              [ OK ]
+     TEST: IPv4 multipath via second nexthop                             [ OK ]
+     TEST: IPv4 multipath via first nexthop with source address          [ OK ]
+     TEST: IPv4 multipath via second nexthop with source address         [ OK ]
 
-That is, when source address is specified, the kernel will choose the
-most specific route even if its nexthop device does not match the
-specified oif.
+ IPv6 multipath oif test
+     TEST: IPv6 multipath via first nexthop                              [ OK ]
+     TEST: IPv6 multipath via second nexthop                             [ OK ]
+     TEST: IPv6 multipath via first nexthop with source address          [FAIL]
+     TEST: IPv6 multipath via second nexthop with source address         [FAIL]
 
-This creates a problem for multipath routes. After looking up a route,
-when source address is not specified, the kernel will choose a nexthop
-whose nexthop device matches the specified oif:
+ Tests passed:   6
+ Tests failed:   2
 
- # sysctl -wq net.ipv6.conf.all.forwarding=1
- # ip route add 2001:db8:10::/64 nexthop via fe80::1 dev dummy1 nexthop via fe80::2 dev dummy2
- # for i in {1..100}; do ip route get 2001:db8:10::${i} oif dummy2; done | grep -o dummy[0-9] | sort | uniq -c
-      100 dummy2
+Output with "ipv6: Honor oif when choosing nexthop for locally generated
+traffic":
 
-But will disregard the oif when source address is specified despite the
-fact that a matching nexthop exists:
+ # ./fib_tests.sh -t "ipv4_mpath_oif ipv6_mpath_oif"
 
- # for i in {1..100}; do ip route get 2001:db8:10::${i} from 2001:db8:2::1 oif dummy2; done | grep -o dummy[0-9] | sort | uniq -c
-      53 dummy1
-      47 dummy2
+ IPv4 multipath oif test
+     TEST: IPv4 multipath via first nexthop                              [ OK ]
+     TEST: IPv4 multipath via second nexthop                             [ OK ]
+     TEST: IPv4 multipath via first nexthop with source address          [ OK ]
+     TEST: IPv4 multipath via second nexthop with source address         [ OK ]
 
-This behavior differs from IPv4:
+ IPv6 multipath oif test
+     TEST: IPv6 multipath via first nexthop                              [ OK ]
+     TEST: IPv6 multipath via second nexthop                             [ OK ]
+     TEST: IPv6 multipath via first nexthop with source address          [ OK ]
+     TEST: IPv6 multipath via second nexthop with source address         [ OK ]
 
- # ip address add 192.0.2.1/32 dev lo
- # ip route add 198.51.100.0/24 nexthop via inet6 fe80::1 dev dummy1 nexthop via inet6 fe80::2 dev dummy2
- # for i in {1..100}; do ip route get 198.51.100.${i} from 192.0.2.1 oif dummy2; done | grep -o dummy[0-9] | sort | uniq -c
-     100 dummy2
-
-What happens is that fib6_table_lookup() returns a route with a matching
-nexthop device (assuming it exists):
-
- # perf record -e fib6:fib6_table_lookup -- bash -c "for i in {1..100}; do ip route get 2001:db8:10::${i} from 2001:db8:2::1 oif dummy2; done > /dev/null"
- # perf script | grep -o dummy[0-9] | sort | uniq -c
-      100 dummy2
-
-But it is later overwritten during path selection in fib6_select_path()
-which instead chooses a nexthop according to the calculated hash.
-
-Solve this by telling fib6_select_path() to skip path selection if we
-have an oif match during output route lookup (iif being
-LOOPBACK_IFINDEX).
-
-Behavior after the change:
-
- # sysctl -wq net.ipv6.conf.all.forwarding=1
- # ip route add 2001:db8:10::/64 nexthop via fe80::1 dev dummy1 nexthop via fe80::2 dev dummy2
- # for i in {1..100}; do ip route get 2001:db8:10::${i} from 2001:db8:2::1 oif dummy2; done | grep -o dummy[0-9] | sort | uniq -c
-     100 dummy2
-
-Note that enabling forwarding is only needed because we did not add
-neighbor entries for the gateway addresses. When forwarding is disabled
-and CONFIG_IPV6_ROUTER_PREF is not enabled in kernel config, the kernel
-will treat non-existing neighbor entries as errors and perform
-round-robin between the nexthops:
-
- # sysctl -wq net.ipv6.conf.all.forwarding=0
- # for i in {1..100}; do ip route get 2001:db8:10::${i} from 2001:db8:2::1 oif dummy2; done | grep -o dummy[0-9] | sort | uniq -c
-      50 dummy1
-      50 dummy2
+ Tests passed:   8
+ Tests failed:   0
 
 Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 ---
- net/ipv6/route.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ tools/testing/selftests/net/fib_tests.sh | 108 ++++++++++++++++++++++-
+ 1 file changed, 107 insertions(+), 1 deletion(-)
 
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index aee6a10b112a..0795473ecd9b 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -2254,6 +2254,7 @@ struct rt6_info *ip6_pol_route(struct net *net, struct fib6_table *table,
- {
- 	struct fib6_result res = {};
- 	struct rt6_info *rt = NULL;
-+	bool have_oif_match;
- 	int strict = 0;
+diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing/selftests/net/fib_tests.sh
+index a88f797c549a..8ae0adbcafe9 100755
+--- a/tools/testing/selftests/net/fib_tests.sh
++++ b/tools/testing/selftests/net/fib_tests.sh
+@@ -12,7 +12,7 @@ TESTS="unregister down carrier nexthop suppress ipv6_notify ipv4_notify \
+        ipv4_route_metrics ipv4_route_v6_gw rp_filter ipv4_del_addr \
+        ipv6_del_addr ipv4_mangle ipv6_mangle ipv4_bcast_neigh fib6_gc_test \
+        ipv4_mpath_list ipv6_mpath_list ipv4_mpath_balance ipv6_mpath_balance \
+-       fib6_ra_to_static"
++       ipv4_mpath_oif ipv6_mpath_oif fib6_ra_to_static"
  
- 	WARN_ON_ONCE((flags & RT6_LOOKUP_F_DST_NOREF) &&
-@@ -2270,7 +2271,9 @@ struct rt6_info *ip6_pol_route(struct net *net, struct fib6_table *table,
- 	if (res.f6i == net->ipv6.fib6_null_entry)
- 		goto out;
+ VERBOSE=0
+ PAUSE_ON_FAIL=no
+@@ -2776,6 +2776,110 @@ ipv6_mpath_balance_test()
+ 	forwarding_cleanup
+ }
  
--	fib6_select_path(net, &res, fl6, oif, false, skb, strict);
-+	have_oif_match = fl6->flowi6_iif == LOOPBACK_IFINDEX &&
-+			 oif == res.nh->fib_nh_dev->ifindex;
-+	fib6_select_path(net, &res, fl6, oif, have_oif_match, skb, strict);
++ipv4_mpath_oif_test_common()
++{
++	local get_param=$1; shift
++	local expected_oif=$1; shift
++	local test_name=$1; shift
++	local tmp_file
++
++	tmp_file=$(mktemp)
++
++	for i in {1..100}; do
++		$IP route get 203.0.113.${i} $get_param >> "$tmp_file"
++	done
++
++	[[ $(grep "$expected_oif" "$tmp_file" | wc -l) -eq 100 ]]
++	log_test $? 0 "$test_name"
++
++	rm "$tmp_file"
++}
++
++ipv4_mpath_oif_test()
++{
++	echo
++	echo "IPv4 multipath oif test"
++
++	setup
++
++	set -e
++	$IP link add dummy1 type dummy
++	$IP link set dev dummy1 up
++	$IP address add 192.0.2.1/28 dev dummy1
++	$IP address add 192.0.2.17/32 dev lo
++
++	$IP route add 203.0.113.0/24 \
++		nexthop via 198.51.100.2 dev dummy0 \
++		nexthop via 192.0.2.2 dev dummy1
++	set +e
++
++	ipv4_mpath_oif_test_common "oif dummy0" "dummy0" \
++		"IPv4 multipath via first nexthop"
++
++	ipv4_mpath_oif_test_common "oif dummy1" "dummy1" \
++		"IPv4 multipath via second nexthop"
++
++	ipv4_mpath_oif_test_common "oif dummy0 from 192.0.2.17" "dummy0" \
++		"IPv4 multipath via first nexthop with source address"
++
++	ipv4_mpath_oif_test_common "oif dummy1 from 192.0.2.17" "dummy1" \
++		"IPv4 multipath via second nexthop with source address"
++
++	cleanup
++}
++
++ipv6_mpath_oif_test_common()
++{
++	local get_param=$1; shift
++	local expected_oif=$1; shift
++	local test_name=$1; shift
++	local tmp_file
++
++	tmp_file=$(mktemp)
++
++	for i in {1..100}; do
++		$IP route get 2001:db8:10::${i} $get_param >> "$tmp_file"
++	done
++
++	[[ $(grep "$expected_oif" "$tmp_file" | wc -l) -eq 100 ]]
++	log_test $? 0 "$test_name"
++
++	rm "$tmp_file"
++}
++
++ipv6_mpath_oif_test()
++{
++	echo
++	echo "IPv6 multipath oif test"
++
++	setup
++
++	set -e
++	$IP link add dummy1 type dummy
++	$IP link set dev dummy1 up
++	$IP address add 2001:db8:2::1/64 dev dummy1
++	$IP address add 2001:db8:100::1/128 dev lo
++
++	$IP route add 2001:db8:10::/64 \
++		nexthop via 2001:db8:1::2 dev dummy0 \
++		nexthop via 2001:db8:2::2 dev dummy1
++	set +e
++
++	ipv6_mpath_oif_test_common "oif dummy0" "dummy0" \
++		"IPv6 multipath via first nexthop"
++
++	ipv6_mpath_oif_test_common "oif dummy1" "dummy1" \
++		"IPv6 multipath via second nexthop"
++
++	ipv6_mpath_oif_test_common "oif dummy0 from 2001:db8:100::1" "dummy0" \
++		"IPv6 multipath via first nexthop with source address"
++
++	ipv6_mpath_oif_test_common "oif dummy1 from 2001:db8:100::1" "dummy1" \
++		"IPv6 multipath via second nexthop with source address"
++
++	cleanup
++}
++
+ ################################################################################
+ # usage
  
- 	/*Search through exception table */
- 	rt = rt6_find_cached_rt(&res, &fl6->daddr, &fl6->saddr);
+@@ -2861,6 +2965,8 @@ do
+ 	ipv6_mpath_list)		ipv6_mpath_list_test;;
+ 	ipv4_mpath_balance)		ipv4_mpath_balance_test;;
+ 	ipv6_mpath_balance)		ipv6_mpath_balance_test;;
++	ipv4_mpath_oif)			ipv4_mpath_oif_test;;
++	ipv6_mpath_oif)			ipv6_mpath_oif_test;;
+ 	fib6_ra_to_static)		fib6_ra_to_static;;
+ 
+ 	help) echo "Test names: $TESTS"; exit 0;;
 -- 
 2.52.0
 
