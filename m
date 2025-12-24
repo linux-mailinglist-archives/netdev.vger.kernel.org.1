@@ -1,157 +1,141 @@
-Return-Path: <netdev+bounces-245969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245970-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48190CDC4DE
-	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 14:02:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 35205CDC505
+	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 14:05:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 418E1304A2BF
-	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 13:01:24 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 3D8023030908
+	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 13:05:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A83A82F3614;
-	Wed, 24 Dec 2025 13:01:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A2B3334C29;
+	Wed, 24 Dec 2025 13:05:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HMUq+Muy";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="uNMtlKXN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HpRVyWuh"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACEE932E738
-	for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 13:01:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A27A2C0281;
+	Wed, 24 Dec 2025 13:05:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766581283; cv=none; b=YwA8pnTvPSUqO+y4Uzwip/8okkc76cxiUuAjeOHHbWSf0s3kloJ8SssHH8VGWqfY8a5nvTn6V4DYSY0VnlsoAuDYt6Dzm64jBt4Ts5DXtsDQavjzDpW+gxVAUmAtMGZRPB8VdtLjKidT167D1H0/G21K5w0Vs25eRKGQnjWxiVA=
+	t=1766581520; cv=none; b=oLmu0cj2zu/AAGq9qkYevnzIQYZQCKpI0F4+gD0IwD9+rlFfTYfMFd46yWnDH74gE3rc7I+qD2O28b1p92FMmHxcjDc5zpjTx/nuTm99Fr3sE+GRxXY0PDt9xIXa527ew0NRCzBv3ICmAD+V3MYBDfivRwTeinXDRgRDpS5kL+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766581283; c=relaxed/simple;
-	bh=ZPltMTzBETTQT1CqF+sZl3/fAao1GzI/HXVbssWVgUQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rIQ/0Elmmv5kMumUXofScKeIb1Uk4NINp5PKSX/NxsCYyMWayZmJmkhHZy2+sH58aqh96ROWck5Tw93NRvPsNhOURjDrjc3Qa1gLAxLQVBiEs6WWT0sPVSgfEETZ0FBcEyhJaJ2YDIzSZEGR4Tn1BeTE24YbI0mKlonOCOpM5Vc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HMUq+Muy; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=uNMtlKXN; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766581280;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZPltMTzBETTQT1CqF+sZl3/fAao1GzI/HXVbssWVgUQ=;
-	b=HMUq+MuyGZHA6d99A+C6BhSX15Q8YXI7cATgLlfkJI/nIcgUowfSGjMc1wMh0OI8sfUd4G
-	0VppZ/WzAyX5R8LBBguLG4ashCJhnI8TTObn+w2k4Yl05v11rku8nqth6dGnzuu7Y7wmnw
-	HdlOxO7xvAgEqFY1hi7PrY3OL7dwvg4=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-589-rtGNt1GtMnu1lNKjCw5T4g-1; Wed, 24 Dec 2025 08:01:19 -0500
-X-MC-Unique: rtGNt1GtMnu1lNKjCw5T4g-1
-X-Mimecast-MFC-AGG-ID: rtGNt1GtMnu1lNKjCw5T4g_1766581278
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-47904cdb9bbso57717845e9.1
-        for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 05:01:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1766581278; x=1767186078; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZPltMTzBETTQT1CqF+sZl3/fAao1GzI/HXVbssWVgUQ=;
-        b=uNMtlKXNNG/lVwjdQjqTUwZPFSWRlFQpHTOF0uphMYaQKf/d/C7lSmZDkUCJOFAson
-         9ac5Ekf5eRJRCTZmwMZ6F3EMvIxTZLrhD05Rn918KZP4A2xl4mIe4K/7PeBMYBoquE6Z
-         QjspJV/d5vPuMqkA0jDsr3nR4+GJfDpflJ7IX3NWbDE/11IPowFo4UMVsW0q8jGvxLH4
-         E9II5bWbrrh19qy5G5+7dC0vzeaCZ7y9SGjUrMN8fTaJ/z931MxXo1pL1NaF9Y+l1D3n
-         LcSvPDkcSLvsZpkoDowQn1FNfDGmsq1hazpyMLfgyA9qEJ1w15RUlPmP7RQXRD93fT9O
-         lD7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766581278; x=1767186078;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZPltMTzBETTQT1CqF+sZl3/fAao1GzI/HXVbssWVgUQ=;
-        b=KKx/UIxuh9A0DgUDnIS+gg2gJC1kQ/IsqyoED8ObcSyZdKdI5w9HuoFqxlyk0UfHQO
-         3xYo7DAzQFTXfH32/w81pEVYv/v4/9kDQtSlCEZvqlCHVhmoEO8Uc8GDytvycRO4OU54
-         WCz16ab7xGncscgVzE3bnRRpMrrZRxEeKB6DFZoPJhNgEc6an9TZOZJ8yomOywy8h7jh
-         m01nn+MbSFnTYBzSr7i0vdIe+7Aouwtn4uoTmMlR7awqZv0/fVNUXBpmNtghOFsTnVNW
-         mBE93u/Cn9E6+EpU5KTdj7YCw8kUIjAK057Jt3eVpEIP5ttIT5ncor1kSS6UZzmyfazT
-         Wz5w==
-X-Forwarded-Encrypted: i=1; AJvYcCUekGcdgOgLcOL1YmBxrSG+Agaa/ASDilNyp50sc1xbET0SmDDfcTA4eGz7z8LZUmxg8m2pHps=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4NASFMJRJ/rKbB3kLGdA8eY1sfk9RkXc2JPKH0nTEkOlDXIip
-	re1K/5WUx5+5QSSSVRf7XCMw4+TA1A3roz5DOMPav8ByTp/3RvHuLaZbmBRLfLLJ15g7hTfF34R
-	hAsP2RfqSsgRLW7Vku4Bd371DpnR+4dsTg1KjAwMUu1MkYbiTwgMmJULcng==
-X-Gm-Gg: AY/fxX7iToP8M29a/AfdsA6g3QfH5geGvvQY/jPJB0wIprSSOA4w8RJMTGaah4Xkm2f
-	2ZUkdRG+0h2p57FOLlUbZguXr5XsHSsYJQmQUspPrVeaNHcR4u3sDa9d95+BBmMd7ta5hbUe/Wv
-	4k8Z5N+03Z6JLaaF5rWDQOQF0AGraVrfZeVfNTD4KmXioZJbjfDqkZY8EhmfjHs5h3YPaM9vyq7
-	oWFtwdGw4pA1T0DL5Aa7fdg5niqogi3MQlbymB/0NO3gH5XxL05bj7htT/KQ8zd4Yl452lMkGfw
-	/s2cfStHM25haSAoAFPGj76X02SwhaaEhWRndMqdBaWwZQrKs9sf3DxSg7IGULmBDDi/TqQiTl0
-	Cv5uq2Qf99WNIVAzQ
-X-Received: by 2002:a05:600c:3508:b0:479:1348:c63e with SMTP id 5b1f17b1804b1-47d18bd57bemr161759405e9.9.1766581278030;
-        Wed, 24 Dec 2025 05:01:18 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHybeuqcZcHlfztr3bbKh1cFE8NLb3cLhTczAcvHp67h5Q0r41aRhsvZBwseTxwsTVGzvf/GQ==
-X-Received: by 2002:a05:600c:3508:b0:479:1348:c63e with SMTP id 5b1f17b1804b1-47d18bd57bemr161759125e9.9.1766581277580;
-        Wed, 24 Dec 2025 05:01:17 -0800 (PST)
-Received: from sgarzare-redhat ([193.207.128.114])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47be272e46fsm339791035e9.4.2025.12.24.05.01.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Dec 2025 05:01:16 -0800 (PST)
-Date: Wed, 24 Dec 2025 14:01:03 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
-	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, linux-kselftest@vger.kernel.org, berrange@redhat.com, 
-	Sargun Dhillon <sargun@sargun.me>, Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v12 04/12] vsock: add netns support to virtio
- transports
-Message-ID: <aUvjj1HyEG6_hoLR@sgarzare-redhat>
-References: <20251126-vsock-vmtest-v12-0-257ee21cd5de@meta.com>
- <20251126-vsock-vmtest-v12-4-257ee21cd5de@meta.com>
- <6cef5a68-375a-4bb6-84f8-fccc00cf7162@redhat.com>
- <aS8oMqafpJxkRKW5@devvm11784.nha0.facebook.com>
- <06b7cfea-d366-44f7-943e-087ead2f25c2@redhat.com>
- <aS9hoOKb7yA5Qgod@devvm11784.nha0.facebook.com>
- <aTw0F6lufR/nT7OY@devvm11784.nha0.facebook.com>
- <uidarlot7opjsuozylevyrlgdpjd32tsi7mwll2lsvce226v24@75sq4jdo5tgv>
- <aUC0Op2trtt3z405@devvm11784.nha0.facebook.com>
- <aUs0no+ni8/R8/1N@devvm11784.nha0.facebook.com>
+	s=arc-20240116; t=1766581520; c=relaxed/simple;
+	bh=q5eo8oyOG7rs4EkVAYvzCMl0bwxtQsHGQbVAbgKKz5Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=A6qhbnDtdCmWwvAr3z/Xhd4qhEuLV2+tbwgUJCe5gKZAu9KXCnHsHpTlptyINkxt6y2mCo7dpGvL0ddiN7f7d1hqO5wfcdI5FL1pP39+2iw8RxxoaIhnAYVR22arnS+u3KSuwTRctsfjXRst4vuBmfzUVgr8uEfrxDdjGQr/BuM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HpRVyWuh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F09CCC4CEFB;
+	Wed, 24 Dec 2025 13:05:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1766581519;
+	bh=q5eo8oyOG7rs4EkVAYvzCMl0bwxtQsHGQbVAbgKKz5Q=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=HpRVyWuhOAmJ41Xo8nod3G07Cq6QamhE6jxfLPpSjrdK0B840LoSS7uElAkdFINnU
+	 wzoILIw9jv2Q8UBV4MKkweFM7GUehIcBIpkBV0a7t/7YecmO1GuyFb3yzsdaYdVeDS
+	 6aKlOmEZGnZUakENMg07AGXSU0n71sYf37vrgVUUJULSg3UzF+/+4Cj7A7tK10Tk4+
+	 qeXqDnALEnPm9M2oQU1dBiBdY389WCkTI2JAsbXWy53odA6LdKN/m98vhVOhWCccTF
+	 isI3s8ykSr6IxOTeAZgoZqoe8iJ8N0MnQdaaRCtfFyhXYdPlHYoOhSgo1R2ke7Zk43
+	 6YDucPkRlUJNQ==
+Message-ID: <78bf252c-fd5e-4a36-b1a3-ca8ed26fde7a@kernel.org>
+Date: Wed, 24 Dec 2025 14:05:04 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <aUs0no+ni8/R8/1N@devvm11784.nha0.facebook.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 01/15] include: dt-bindings: add LAN969x clock bindings
+To: Robert Marko <robert.marko@sartura.hr>
+Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com,
+ claudiu.beznea@tuxon.dev, herbert@gondor.apana.org.au, davem@davemloft.net,
+ vkoul@kernel.org, andi.shyti@kernel.org, lee@kernel.org,
+ andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, linusw@kernel.org, Steen.Hegelund@microchip.com,
+ daniel.machon@microchip.com, UNGLinuxDriver@microchip.com,
+ olivia@selenic.com, radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com,
+ gregkh@linuxfoundation.org, jirislaby@kernel.org, broonie@kernel.org,
+ mturquette@baylibre.com, sboyd@kernel.org, lars.povlsen@microchip.com,
+ devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+ dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
+ netdev@vger.kernel.org, linux-gpio@vger.kernel.org,
+ linux-spi@vger.kernel.org, linux-serial@vger.kernel.org,
+ linux-usb@vger.kernel.org, linux-clk@vger.kernel.org, luka.perkov@sartura.hr
+References: <20251223201921.1332786-1-robert.marko@sartura.hr>
+ <20251223201921.1332786-2-robert.marko@sartura.hr>
+ <20251224-berserk-mackerel-of-snow-4cae54@quoll>
+ <CA+HBbNGym6Q9b166n-P=h_JssOHm0yfyL73JZ+G9P81muK=g4A@mail.gmail.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 a/A=
+In-Reply-To: <CA+HBbNGym6Q9b166n-P=h_JssOHm0yfyL73JZ+G9P81muK=g4A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Dec 23, 2025 at 04:32:30PM -0800, Bobby Eshleman wrote:
->On Mon, Dec 15, 2025 at 05:22:02PM -0800, Bobby Eshleman wrote:
->> On Mon, Dec 15, 2025 at 03:11:22PM +0100, Stefano Garzarella wrote:
+On 24/12/2025 11:30, Robert Marko wrote:
+> On Wed, Dec 24, 2025 at 11:21 AM Krzysztof Kozlowski <krzk@kernel.org> wrote:
+>>
+>> On Tue, Dec 23, 2025 at 09:16:12PM +0100, Robert Marko wrote:
+>>> Add the required LAN969x clock bindings.
+>>
+>> I do not see clock bindings actually here. Where is the actual binding?
+>> Commit msg does not help me at all to understand why you are doing this
+>> without actual required bindings.
+> 
+> I guess it is a bit confusing, there is no schema here, these are the
+> clock indexes that
+> reside in dt-bindings and are used by the SoC DTSI.
 
-[...]
+I understand as not used by drivers? Then no ABI and there is no point
+in putting them into bindings.
 
->> >
->> > FYI I'll be off from Dec 25 to Jan 6, so if we want to do an RFC in the
->> > middle, I'll do my best to take a look before my time off.
->> >
->> > Thanks,
->> > Stefano
->
->Just sent this out, though I acknowledge its pretty last minute WRT
->your time off.
-
-Thanks for that, but yeah I didn't have time to take a closer look :-(
-I'll do as soon I'm back!
-
->
->If I don't hear from you before then, have a good holiday!
-
-Thanks, you too if you will have the opportunity!
-
-Thanks,
-Stefano
-
+Best regards,
+Krzysztof
 
