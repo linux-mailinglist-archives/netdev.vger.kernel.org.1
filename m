@@ -1,141 +1,251 @@
-Return-Path: <netdev+bounces-245970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35205CDC505
-	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 14:05:53 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFAE7CDC517
+	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 14:09:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3D8023030908
-	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 13:05:22 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 43EDC303D9E9
+	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 13:07:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A2B3334C29;
-	Wed, 24 Dec 2025 13:05:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65D123375D5;
+	Wed, 24 Dec 2025 13:07:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HpRVyWuh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ePLu+a0s"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f195.google.com (mail-pf1-f195.google.com [209.85.210.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A27A2C0281;
-	Wed, 24 Dec 2025 13:05:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD7D3337699
+	for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 13:07:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766581520; cv=none; b=oLmu0cj2zu/AAGq9qkYevnzIQYZQCKpI0F4+gD0IwD9+rlFfTYfMFd46yWnDH74gE3rc7I+qD2O28b1p92FMmHxcjDc5zpjTx/nuTm99Fr3sE+GRxXY0PDt9xIXa527ew0NRCzBv3ICmAD+V3MYBDfivRwTeinXDRgRDpS5kL+Q=
+	t=1766581676; cv=none; b=G4WfSTyo3Di4qdrhKkKakw2N+idVNISj6cVR+mFgFliYfpxo4o4+wPOnXw8A11ny6E4VbbymqnAD0RhS42+p80YP4SXehvURzTQkdA2qcjM/flPKb5wfYfoKQfOaqjq0kr/2hkYFXsv7DzBhAxKI3+Su+WJ8xQ7+pTdkCucfLO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766581520; c=relaxed/simple;
-	bh=q5eo8oyOG7rs4EkVAYvzCMl0bwxtQsHGQbVAbgKKz5Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A6qhbnDtdCmWwvAr3z/Xhd4qhEuLV2+tbwgUJCe5gKZAu9KXCnHsHpTlptyINkxt6y2mCo7dpGvL0ddiN7f7d1hqO5wfcdI5FL1pP39+2iw8RxxoaIhnAYVR22arnS+u3KSuwTRctsfjXRst4vuBmfzUVgr8uEfrxDdjGQr/BuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HpRVyWuh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F09CCC4CEFB;
-	Wed, 24 Dec 2025 13:05:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766581519;
-	bh=q5eo8oyOG7rs4EkVAYvzCMl0bwxtQsHGQbVAbgKKz5Q=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=HpRVyWuhOAmJ41Xo8nod3G07Cq6QamhE6jxfLPpSjrdK0B840LoSS7uElAkdFINnU
-	 wzoILIw9jv2Q8UBV4MKkweFM7GUehIcBIpkBV0a7t/7YecmO1GuyFb3yzsdaYdVeDS
-	 6aKlOmEZGnZUakENMg07AGXSU0n71sYf37vrgVUUJULSg3UzF+/+4Cj7A7tK10Tk4+
-	 qeXqDnALEnPm9M2oQU1dBiBdY389WCkTI2JAsbXWy53odA6LdKN/m98vhVOhWCccTF
-	 isI3s8ykSr6IxOTeAZgoZqoe8iJ8N0MnQdaaRCtfFyhXYdPlHYoOhSgo1R2ke7Zk43
-	 6YDucPkRlUJNQ==
-Message-ID: <78bf252c-fd5e-4a36-b1a3-ca8ed26fde7a@kernel.org>
-Date: Wed, 24 Dec 2025 14:05:04 +0100
+	s=arc-20240116; t=1766581676; c=relaxed/simple;
+	bh=ijgRwIZ2WyS5O3fxKXnj2S+dvc+/SEjeaUYwefCiYS4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TU3jce8RN7yUDzN0L1feAQ93X6lqadjgJCGHA2/XH1qKK2MCVmn1dgpuCy8I9OMmojVg00IZfHnSxNPdwvLo4XHLmkhLtZv+w6SHAcktbW1mf3j/7cGTe0tl4sn5SwfZveSnYwYyA/dQJiok2699bvjxzsBhQgfQsdDUqLoHh68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ePLu+a0s; arc=none smtp.client-ip=209.85.210.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f195.google.com with SMTP id d2e1a72fcca58-7b75e366866so2885410b3a.2
+        for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 05:07:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1766581674; x=1767186474; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=CitBfUePYs5GCUDI2dLSn/KA/gCZ6X/S0VxjxwaQ4so=;
+        b=ePLu+a0spyGFV+NqqmAuUs2jAFLjPmU0h4ASaKpNyx1mUVh3rX6s4kyzyIf8Rl00HK
+         b9mEi2hGOw9UeJO00nsZUakKSDvzKirD9fHgOk8stWjRv+eZlaok3yieFHf5wav3CXCD
+         Obylw3viEzvNi+QNc77lUA8HBLaIU68CDBGeDgwFd6bmsTqMObv7y6r9JBkSdnnUR1Sx
+         n+xYWfYg0gZ5451gvcD39gQdPBucmIBtfQ71xK1ylxh2gU0okoEQ4eOGqi3CI2K6TbF1
+         1TWNBHMjn3hYOWdacc1hLPZ776WfwiLudejxbfG+2pD+zIIrJnGxzU/X350s3n6tVY6X
+         GCcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766581674; x=1767186474;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CitBfUePYs5GCUDI2dLSn/KA/gCZ6X/S0VxjxwaQ4so=;
+        b=DCS+xoPNlRs1i9TOvj7IpB+dfkvSyOPbA5NSTm0HfrQ5ss+9dJ5tNeuXu3aEA/r+q+
+         2I7t1WuTNa0apgn1HK5RjxDt8lukG4gMdyO7HpeILfZBZ4w9eUicqL4yHkdBCOIl2nRu
+         zbD2H6Ty253CimWboOs5qCfO6Y0K5drjxsUpARDbDf2cpeEwVc6AjCTrEpcY8ph9j9GP
+         72wKlJGsoWYP7ctdAMMhYywh9QXOpsDOAFuwpkrULIqJ2cERvBLK8txTG4nG56s18Ao+
+         E7msssoJhJzPBr9ueIjWOifQ/Hx2cjuxN9vewjzJhzmJrTvteXnghWZnOeR1YReY7Qhk
+         Cghg==
+X-Forwarded-Encrypted: i=1; AJvYcCVyAVIc7DS5aGs8c+p27nP4QlnkFNX7/dJ6+soNk1r7roqoj1vyC3Y1eGxkIe801qYWNGnCst8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyS0d2B/xTjjwF7FhHdEOSykYvctFlS+Ulbzx0Hun70vwBGzM3f
+	yrHEkkll+Wh5IonhUQuz9oCgVBADgPNsZRQX6FHDseu/vt03A6y+7fQS
+X-Gm-Gg: AY/fxX5sAvdRdawN29YSdAzsCl6GfFTu9aJFj3Gg2vn9lLhZEmlRXJpj/CYsNAxkKvz
+	ukp6xyeFH7c54FF8cxnP0T4iIkS606aTQW+4obqKPKxEc/AxmUQbsK1/R/FoDlpl2OUDgTDDBCV
+	b/+xyTYTH7ckjYm+LaKIhwpze+g28ovqn6oLGWdDkX5ZQpHVAs7y2qdE+F0SQsvA8K1z+AO9TH8
+	rmFDm/nn1sniI2y76xyB5oDiLEBWtxPanrzEIE0bUy1lhY7hTeRgaRvPDNl4zFJUiKE26+nn1VN
+	/IHW9oc/sXbKbh0r7f9DlSsrf2WuXmZwZYHNRgzEv4alUWUvL8dEYkJ1m+Oo0Sajq6wRN8hxfa9
+	69rmT3/OLYo6r3Yxabw7JuVIChYkEYF78pZH9uNh3dq+yRgial4b0iIx40zEegTMT6p5P+vESd9
+	vHuV5Pum0=
+X-Google-Smtp-Source: AGHT+IH0TjP897Ge7QpOC3WEt49VubNg6uR3s1cx4POJalLNzTQKlMQxT9fotL1q6NcA610DGZPlmA==
+X-Received: by 2002:a05:6a00:4105:b0:7f0:d758:3143 with SMTP id d2e1a72fcca58-7ff654b8108mr15239388b3a.20.1766581673851;
+        Wed, 24 Dec 2025 05:07:53 -0800 (PST)
+Received: from 7950hx ([160.187.0.149])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7ff7dfac28fsm16841173b3a.32.2025.12.24.05.07.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Dec 2025 05:07:53 -0800 (PST)
+From: Menglong Dong <menglong8.dong@gmail.com>
+X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
+To: ast@kernel.org,
+	andrii@kernel.org
+Cc: daniel@iogearbox.net,
+	martin.lau@linux.dev,
+	eddyz87@gmail.com,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	sdf@fomichev.me,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	tglx@linutronix.de,
+	mingo@redhat.com,
+	jiang.biao@linux.dev,
+	bp@alien8.de,
+	dave.hansen@linux.intel.com,
+	x86@kernel.org,
+	hpa@zytor.com,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH bpf-next v5 00/10] bpf: fsession support
+Date: Wed, 24 Dec 2025 21:07:25 +0800
+Message-ID: <20251224130735.201422-1-dongml2@chinatelecom.cn>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 01/15] include: dt-bindings: add LAN969x clock bindings
-To: Robert Marko <robert.marko@sartura.hr>
-Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com,
- claudiu.beznea@tuxon.dev, herbert@gondor.apana.org.au, davem@davemloft.net,
- vkoul@kernel.org, andi.shyti@kernel.org, lee@kernel.org,
- andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, linusw@kernel.org, Steen.Hegelund@microchip.com,
- daniel.machon@microchip.com, UNGLinuxDriver@microchip.com,
- olivia@selenic.com, radu_nicolae.pirea@upb.ro, richard.genoud@bootlin.com,
- gregkh@linuxfoundation.org, jirislaby@kernel.org, broonie@kernel.org,
- mturquette@baylibre.com, sboyd@kernel.org, lars.povlsen@microchip.com,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
- dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
- netdev@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-spi@vger.kernel.org, linux-serial@vger.kernel.org,
- linux-usb@vger.kernel.org, linux-clk@vger.kernel.org, luka.perkov@sartura.hr
-References: <20251223201921.1332786-1-robert.marko@sartura.hr>
- <20251223201921.1332786-2-robert.marko@sartura.hr>
- <20251224-berserk-mackerel-of-snow-4cae54@quoll>
- <CA+HBbNGym6Q9b166n-P=h_JssOHm0yfyL73JZ+G9P81muK=g4A@mail.gmail.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 a/A=
-In-Reply-To: <CA+HBbNGym6Q9b166n-P=h_JssOHm0yfyL73JZ+G9P81muK=g4A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 24/12/2025 11:30, Robert Marko wrote:
-> On Wed, Dec 24, 2025 at 11:21 AM Krzysztof Kozlowski <krzk@kernel.org> wrote:
->>
->> On Tue, Dec 23, 2025 at 09:16:12PM +0100, Robert Marko wrote:
->>> Add the required LAN969x clock bindings.
->>
->> I do not see clock bindings actually here. Where is the actual binding?
->> Commit msg does not help me at all to understand why you are doing this
->> without actual required bindings.
-> 
-> I guess it is a bit confusing, there is no schema here, these are the
-> clock indexes that
-> reside in dt-bindings and are used by the SoC DTSI.
+Hi, all.
 
-I understand as not used by drivers? Then no ABI and there is no point
-in putting them into bindings.
+In this version, I did some modifications according to Andrii's
+suggestion.
 
-Best regards,
-Krzysztof
+overall
+-------
+Sometimes, we need to hook both the entry and exit of a function with
+TRACING. Therefore, we need define a FENTRY and a FEXIT for the target
+function, which is not convenient.
+
+Therefore, we add a tracing session support for TRACING. Generally
+speaking, it's similar to kprobe session, which can hook both the entry
+and exit of a function with a single BPF program.
+
+We allow the usage of bpf_get_func_ret() to get the return value in the
+fentry of the tracing session, as it will always get "0", which is safe
+enough and is OK.
+
+Session cookie is also supported with the kfunc bpf_fsession_cookie().
+In order to limit the stack usage, we limit the maximum number of cookies
+to 4.
+
+kfunc design
+------------
+The kfunc bpf_fsession_is_return() and bpf_fsession_cookie() are
+introduced, and they are both inlined in the verifier.
+
+In current solution, we can't reuse the existing bpf_session_cookie() and
+bpf_session_is_return(), as their prototype is different from
+bpf_fsession_is_return() and bpf_fsession_cookie(). In
+bpf_fsession_cookie(), we need the function argument "void *ctx" to get
+the cookie. However, the prototype of bpf_session_cookie() is "void".
+
+Maybe it's possible to reuse the existing bpf_session_cookie() and
+bpf_session_is_return(). First, we move the nr_regs from stack to struct
+bpf_tramp_run_ctx, as Andrii suggested before. Then, we define the session
+cookies as flexible array in bpf_tramp_run_ctx like this:
+    struct bpf_tramp_run_ctx {
+    	struct bpf_run_ctx run_ctx;
+    	u64 bpf_cookie;
+    	struct bpf_run_ctx *saved_run_ctx;
+    	u64 func_meta; /* nr_args, cookie_index, etc */
+    	u64 fsession_cookies[];
+    };
+
+The problem of this approach is that we can't inlined the bpf helper
+anymore, such as get_func_arg, get_func_ret, get_func_arg_cnt, etc, as
+we can't use the "current" in BPF assembly.
+
+So maybe it's better to use the new kfunc for now? And I'm analyzing that
+if it is possible to inline "current" in verifier. Maybe we can convert to
+the solution above if it success.
+
+architecture
+------------
+The fsession stuff is arch related, so the -EOPNOTSUPP will be returned if
+it is not supported yet by the arch. In this series, we only support
+x86_64. And later, other arch will be implemented.
+
+Changes since v4:
+* use fsession terminology consistently in all patches
+* 1st patch:
+  - use more explicit way in __bpf_trampoline_link_prog()
+* 4th patch:
+  - remove "cookie_cnt" in struct bpf_trampoline
+* 6th patch:
+  - rename nr_regs to func_md
+  - define cookie_off in a new line
+* 7th patch:
+  - remove the handling of BPF_TRACE_SESSION in legacy fallback path for
+    BPF_RAW_TRACEPOINT_OPEN
+
+Changes since v3:
+* instead of adding a new hlist to progs_hlist in trampoline, add the bpf
+  program to both the fentry hlist and the fexit hlist.
+* introduce the 2nd patch to reuse the nr_args field in the stack to
+  store all the information we need(except the session cookies).
+* limit the maximum number of cookies to 4.
+* remove the logic to skip fexit if the fentry return non-zero.
+
+Changes since v2:
+* squeeze some patches:
+  - the 2 patches for the kfunc bpf_tracing_is_exit() and
+    bpf_fsession_cookie() are merged into the second patch.
+  - the testcases for fsession are also squeezed.
+
+* fix the CI error by move the testcase for bpf_get_func_ip to
+  fsession_test.c
+
+Changes since v1:
+* session cookie support.
+  In this version, session cookie is implemented, and the kfunc
+  bpf_fsession_cookie() is added.
+
+* restructure the layout of the stack.
+  In this version, the session stuff that stored in the stack is changed,
+  and we locate them after the return value to not break
+  bpf_get_func_ip().
+
+* testcase enhancement.
+  Some nits in the testcase that suggested by Jiri is fixed. Meanwhile,
+  the testcase for get_func_ip and session cookie is added too.
+
+Menglong Dong (10):
+  bpf: add tracing session support
+  bpf: use last 8-bits for the nr_args in trampoline
+  bpf: add the kfunc bpf_fsession_is_return
+  bpf: add the kfunc bpf_fsession_cookie
+  bpf,x86: introduce emit_st_r0_imm64() for trampoline
+  bpf,x86: add tracing session support for x86_64
+  libbpf: add support for tracing session
+  selftests/bpf: add testcases for fsession
+  selftests/bpf: add testcases for fsession cookie
+  selftests/bpf: test fsession mixed with fentry and fexit
+
+ arch/x86/net/bpf_jit_comp.c                   |  47 ++++-
+ include/linux/bpf.h                           |  38 ++++
+ include/uapi/linux/bpf.h                      |   1 +
+ kernel/bpf/btf.c                              |   2 +
+ kernel/bpf/syscall.c                          |  18 +-
+ kernel/bpf/trampoline.c                       |  54 ++++-
+ kernel/bpf/verifier.c                         |  76 +++++--
+ kernel/trace/bpf_trace.c                      |  56 ++++-
+ net/bpf/test_run.c                            |   1 +
+ net/core/bpf_sk_storage.c                     |   1 +
+ tools/bpf/bpftool/common.c                    |   1 +
+ tools/include/uapi/linux/bpf.h                |   1 +
+ tools/lib/bpf/bpf.c                           |   1 +
+ tools/lib/bpf/libbpf.c                        |   3 +
+ .../selftests/bpf/prog_tests/fsession_test.c  | 115 ++++++++++
+ .../bpf/prog_tests/tracing_failure.c          |   2 +-
+ .../selftests/bpf/progs/fsession_test.c       | 198 ++++++++++++++++++
+ 17 files changed, 573 insertions(+), 42 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/fsession_test.c
+ create mode 100644 tools/testing/selftests/bpf/progs/fsession_test.c
+
+-- 
+2.52.0
+
 
