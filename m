@@ -1,109 +1,109 @@
-Return-Path: <netdev+bounces-245950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id E900ACDB73C
-	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 07:08:43 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
+	by mail.lfdr.de (Postfix) with ESMTPS id 523D5CDB86F
+	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 07:38:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id EB34130090A1
-	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 06:08:42 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 199B03032ABC
+	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 06:37:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D4642E2665;
-	Wed, 24 Dec 2025 06:08:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D75A72C237F;
+	Wed, 24 Dec 2025 06:37:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WexLsb+9"
+	dkim=pass (1024-bit key) header.d=ucloud.cn header.i=@ucloud.cn header.b="J6L2wKYj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail-m49239.qiye.163.com (mail-m49239.qiye.163.com [45.254.49.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 523CD21B195;
-	Wed, 24 Dec 2025 06:08:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6706929B204
+	for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 06:37:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766556520; cv=none; b=R45+WBRS5rwEQecHjoGub8tlOkyqdBz4GaUYyrh1cgK6q98uTGeEtCTq7TmqD0XlYSkJU+lqKc8WeWoVGJPL+24vWiaoSa9y29eRvD/x5u1etzwXfolcD1Fa9QuKNujeH7JpuTt5f4o07V27uzFinDilvpwE/G//JdGj9K4Xxl4=
+	t=1766558252; cv=none; b=u/B4kBgvn9N0Z9XITGZLWz13HjEcZS/YfUi57kqQCr6+1IEueHsJpFFwMPMOORL8Kt/m3YUGtsocCs6czJVmActYwIhZxGUUVdJOxGf1Blq6YSfws0SqUz+JLntmAa1BgFi/qQ2jO9JPpHN+K0E4K8UPfSRA1E+sDxygKfvqgfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766556520; c=relaxed/simple;
-	bh=JmH0zrSQ6+/EEWnA8Jl67AkZZt0WzstjnoWbZwRqWXk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gRadw2+ZkT8c5uo7Ly40+uIDq8RdXKlaD5w9mEMF0hWF8JXXo40KxioNTylhLaMLvlL1j+VDpdHrVkRL4JvrYn+PeFnASLdaU5dpcaYIX62OCndLnr47cog6FwKX0PNDTkz3K2p3nwchhOaiSX9qi9FQd5wC6k7qT66WJFJl5tg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WexLsb+9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF739C116B1;
-	Wed, 24 Dec 2025 06:08:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1766556519;
-	bh=JmH0zrSQ6+/EEWnA8Jl67AkZZt0WzstjnoWbZwRqWXk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WexLsb+9YsXtBtLsPdeTHDff8l+q8PX4ihuseK4LgObaSgUxp3yNzPAA/74jk3jG5
-	 6zyLW9UZDLd8isVonziadSa3MdunoEpzcjtqYmCtVCHSIxT2DwQR+FtjvjQLx1i4Ym
-	 y0j+Nue84n/FHcdW7h9qe/PpYbJLgq313rPZ5v4Rm5dTst3zEpPukggKYbjPXza4YE
-	 B/h0X3ThVQucsor8s6viCdcy2TV7SE2kvkiT0AcMmyPQ1XczVUMABj0/mFgnj81vW9
-	 g5ruN+FywnjBaAyHBEIicDwGS+Fau/UPPJ9mXz30t/qGdal2UmNNeteq+przhD8wg/
-	 CMYoKfouPaLVQ==
-Date: Wed, 24 Dec 2025 11:38:33 +0530
-From: Manivannan Sadhasivam <mani@kernel.org>
-To: vivek pernamitta <vivek.pernamitta@oss.qualcomm.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	mhi@lists.linux.dev, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v6 1/2] net: mhi: Enable Ethernet interface support
-Message-ID: <lt7fco4vaztcodh7q32h2umzzksuhjwzmma4j6qxemskznycws@frmdzto3ca35>
-References: <20251209-vdev_next-20251208_eth_v6-v6-0-80898204f5d8@quicinc.com>
- <20251209-vdev_next-20251208_eth_v6-v6-1-80898204f5d8@quicinc.com>
- <20251210183827.7024a8cf@kernel.org>
- <0235cdaf-4c91-4bb3-9581-9eb24cd1aa47@oss.qualcomm.com>
+	s=arc-20240116; t=1766558252; c=relaxed/simple;
+	bh=p8R1rg8MgFKGxMJfWxTDIlz+lFNXNAGHqT9vNuTdZ4k=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SF9Qn2idAqdhswhQJ47RlAAsw9G/brSMlkR8HryXvXiwYcXqx3dTdnEVbU/sa0/yvEE7E/ceOd+XaEkEAUdC1k26n5GR7o+IaCWsR0umyQ5lhXTQ4OOzsvxz5AuRXvXz2UwiGN0jIfCwli/RKA7femD3N7DMTLbC9wLeWX6Nevc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ucloud.cn; spf=pass smtp.mailfrom=ucloud.cn; dkim=pass (1024-bit key) header.d=ucloud.cn header.i=@ucloud.cn header.b=J6L2wKYj; arc=none smtp.client-ip=45.254.49.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ucloud.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ucloud.cn
+Received: from yuangap.. (unknown [106.75.220.2])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 14bcb6d18;
+	Wed, 24 Dec 2025 14:32:12 +0800 (GMT+08:00)
+From: yuan.gao@ucloud.cn
+To: davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	segoon@openwall.com
+Cc: netdev@vger.kernel.org,
+	yuan.gao@ucloud.cn
+Subject: [PATCH] inet: ping: Fix icmp out counting
+Date: Wed, 24 Dec 2025 14:31:45 +0800
+Message-Id: <20251224063145.3615282-1-yuan.gao@ucloud.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <0235cdaf-4c91-4bb3-9581-9eb24cd1aa47@oss.qualcomm.com>
+X-HM-Tid: 0a9b4f0eda2e0229kunm1ff5929760255
+X-HM-MType: 1
+X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFJQjdXWS1ZQUlXWQ8JGhUIEh9ZQVlCTx5OVh9ITEIZTUhCGhpNT1YVFAkWGhdVGRETFh
+	oSFyQUDg9ZV1kYEgtZQVlKS01VTE5VSUlLVUlZV1kWGg8SFR0UWUFZT0tIVUpLSU9PT0hVSktLVU
+	pCS0tZBg++
+DKIM-Signature: a=rsa-sha256;
+	b=J6L2wKYjv3kcseRkPempx/fRwNkjELAQP7DKS69flhEAb6HQJEvLSqIZNJTRh44W9yBQ9bI8IPriOkwJrXHpiPOCfkgXc7wIwHCyNrxuouhoONcxdRY/DKfDF+Zlr2I2ieUiugIzqWJPq+3EIqy5eUF3AAIWmLQrO5JVmR88xks=; c=relaxed/relaxed; s=default; d=ucloud.cn; v=1;
+	bh=gdLYGMcYTs6dKDUfMelNeZy5jBu+tsm7t2ysbJ6CnXw=;
+	h=date:mime-version:subject:message-id:from;
 
-On Mon, Dec 22, 2025 at 04:13:11PM +0530, vivek pernamitta wrote:
-> 
-> 
-> On 12/10/2025 3:08 PM, Jakub Kicinski wrote:
-> > On Tue, 09 Dec 2025 16:55:38 +0530 Vivek Pernamitta wrote:
-> > > Add support to configure a new client as Ethernet type over MHI by
-> > > setting "mhi_device_info.ethernet_if = true". Create a new Ethernet
-> > > interface named eth%d. This complements existing NET driver support.
-> > > 
-> > > Introduce IP_SW1, ETH0, and ETH1 network interfaces required for
-> > > M-plane, NETCONF, and S-plane components.
-> > > 
-> > > M-plane:
-> > > Implement DU M-Plane software for non-real-time O-RAN management
-> > > between O-DU and O-RU using NETCONF/YANG and O-RAN WG4 M-Plane YANG
-> > > models. Provide capability exchange, configuration management,
-> > > performance monitoring, and fault management per O-RAN.WG4.TS.MP.0-
-> > > R004-v18.00.
-> > 
-> > Noob question perhaps, what does any of this have to do with Ethernet?
-> > You need Ethernet to exchange NETCONF messages?
-> 
-> The patch primarily addresses host-to-DU communication. However, the
-> NETCONF/M-Plane packets originating from the host will eventually be
-> transmitted from the DU to the RU over the fronthaul, which uses
-> Ethernet. Bridging is therefore required to forward packets received
-> from the host towards the fronthaul Ethernet interface.
-> For additional details on this architecture and data flow, please
-> refer to the O-RAN Management Plane Specification:
-> 
+From: "yuan.gao" <yuan.gao@ucloud.cn>
 
-You missed one obvious point. The actual link between the device (QDU100) and
-the host is PCIe/MHI. The device has the Etherent inteface and is exposed as the
-MHI channel to the host. So this patch creates the Ethernet interface on the
-host based on the 'IP_ETH' channel so that the host can use this interface for
-exchaning the NETCONF packets.
+When the ping program uses an IPPROTO_ICMP socket to send ICMP_ECHO
+messages, ICMP_MIB_OUTMSGS is counted twice.
 
-All the rest of the O-RAN management details are irrelevant.
+    ping_v4_sendmsg
+      ping_v4_push_pending_frames
+        ip_push_pending_frames
+          ip_finish_skb
+            __ip_make_skb
+              icmp_out_count(net, icmp_type); // first count
+      icmp_out_count(sock_net(sk), user_icmph.type); // second count
 
-- Mani
+However, when the ping program uses an IPPROTO_RAW socket,
+ICMP_MIB_OUTMSGS is counted correctly only once.
 
+Therefore, the first count should be removed.
+
+Fixes: c319b4d76b9e ("net: ipv4: add IPPROTO_ICMP socket kind")
+Signed-off-by: yuan.gao <yuan.gao@ucloud.cn>
+---
+ net/ipv4/ping.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/net/ipv4/ping.c b/net/ipv4/ping.c
+index 4cb0c896c..c662d6821 100644
+--- a/net/ipv4/ping.c
++++ b/net/ipv4/ping.c
+@@ -833,10 +833,8 @@ static int ping_v4_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+ out_free:
+ 	if (free)
+ 		kfree(ipc.opt);
+-	if (!err) {
+-		icmp_out_count(sock_net(sk), user_icmph.type);
++	if (!err)
+ 		return len;
+-	}
+ 	return err;
+ 
+ do_confirm:
 -- 
-மணிவண்ணன் சதாசிவம்
+2.32.0
+
 
