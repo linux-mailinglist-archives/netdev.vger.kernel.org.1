@@ -1,196 +1,232 @@
-Return-Path: <netdev+bounces-245952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73FDFCDBB47
-	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 09:52:21 +0100 (CET)
+Received: from tor.lore.kernel.org (tor.lore.kernel.org [IPv6:2600:3c04:e001:36c::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id D32FBCDBC5C
+	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 10:16:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 3DC993015176
-	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 08:52:20 +0000 (UTC)
+	by tor.lore.kernel.org (Postfix) with ESMTP id 55FDB3009950
+	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 09:16:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A762A2DAFBD;
-	Wed, 24 Dec 2025 08:52:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 003B2330B36;
+	Wed, 24 Dec 2025 09:16:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qHDnKRvo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bz9fe//q";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="OY0bHzso"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFD8E30E0ED
-	for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 08:52:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4087C330B21
+	for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 09:16:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766566338; cv=none; b=p8ZIZerGGnAumfgfotWix57ZblqKyxL/FamNIVyFbWOkF8ADkXkPr06qz5R8vqAN8bc61MZEnnM5kRqH1BBbB4dkoQwpd/eVtu0ofVdjbHsuBFSkyk6ThGWEst1bb29MxoYhj30br2S5ClAG4nLQmuwyP0ryz6QfyQpKxTwwKoE=
+	t=1766567786; cv=none; b=Wi3Zkcm7qlobukFCs0AKR5ZnEh/GRs4OvsRVXXYz7Clokq7zUhqAFrksiOZgRgW5qSPWw2H85LgJMra5On+HMhOVML66xZHDHzmaSeYsS1fQ2s/dd7mvn9ogKIfwkbXVsX0LB0HQc835BI7Djsbv5IC8ZtzyPN2nD+fbQyWqv5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766566338; c=relaxed/simple;
-	bh=cRTAkTSkJ0kUkqvKqxRIfL74IB8jZh4q+w+gv4yzhTk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tHqYjcZbnbklqnprR+WWMxkmA44WfzkPci2b4Qs8I4vwdMcPEWc+PG7E8fQpNOelbaF6OpYfR4qc7kEIlV19swhqkOAEGi2JBe44ns7UD500kHcR/F9HWeq8yfGq1EEsiMyhRRH0r/IXuf/dp6SQdMSRKbxfREYIMYWn5YweZw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qHDnKRvo; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4eda6c385c0so44388991cf.3
-        for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 00:52:16 -0800 (PST)
+	s=arc-20240116; t=1766567786; c=relaxed/simple;
+	bh=W5FPgoGpUmgPhjWL8T1Mrolt+NR9LunlkkjtHM6j/dA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qMzV7734zG/UDkqLHOJmrYxOhPJljbZ0xE4jwbNfOleN7WCM7B2b5RgSZDXVtmwxgh808y4wYyyDiVWIsr8KRYnl/x+hkLwBR3CYnEKgfilM2E2c6NsPDIGoV+Tv0pRYk1wWb+qr8BtaQKc9zrrAI2Gn1VlqnsIpFHXNOCs8X/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bz9fe//q; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=OY0bHzso; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1766567781;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TG9qFMYYZ4oH8GV5uabpqY3JSsJR+DkIvS2mHVZ4zRo=;
+	b=bz9fe//qYTWbpmllI4vQrIzc2P+mKeHgcnDdJdGLvbp3gkJbCKCdmfqeZT9lsNV+dPTUDN
+	uwCWHU0VndWzfokrzOJrRgjuL6odF9O8ZNHMzwB74e49Rzn/m2ZB1skimd/JzkaZAHXrgX
+	Mt9yibscDzSKzxSVXdUOsPLZ2gBblT0=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-365-zv-BgA5BMgSpACiLy3Q54w-1; Wed, 24 Dec 2025 04:16:19 -0500
+X-MC-Unique: zv-BgA5BMgSpACiLy3Q54w-1
+X-Mimecast-MFC-AGG-ID: zv-BgA5BMgSpACiLy3Q54w_1766567779
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b802843b0bbso237199366b.3
+        for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 01:16:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1766566336; x=1767171136; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=u2s5WoFk/75sEHcHIya1H+VZ8teHuyXpvYW0UorztRo=;
-        b=qHDnKRvoifcqr7QebpIojKRC/4nIYwczLBVKFHrpnfDwb6XHqDwMHPBHH84Sl55DUj
-         cUhUjOoLKjj2N3c3iX79e0G7D7KKQ9rRJDUu7o3holaRtlJa8QyuHIRyfrLUsmWbJ87N
-         0mcynHteh+9aj/qPXXlt8kc6Vm6Iq4cC3W9q70kI+i3jcDbu3WIoxBpbFnCatPd9RftN
-         nB2XtwTHl7NXrSeyRAchcpx5tytvxoA4zwl7dWj+6SdsGtJtiYpaDvNWFlecoNP3oFir
-         xD+qkkP6oL+BGcKJTsYmLJ3akpLUD8iRLuFKAbIWqAsY5JyJh1lJ4LzO4yfeec3zbh5t
-         PXMw==
+        d=redhat.com; s=google; t=1766567778; x=1767172578; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=TG9qFMYYZ4oH8GV5uabpqY3JSsJR+DkIvS2mHVZ4zRo=;
+        b=OY0bHzsoISnZV4y0jlNSHyBT3pdxUKDH18bjBQU0f9720/S8PMz5vFTWVWJK/gho/v
+         Jqo8pr+G6Eryb9U/8LGV9rAnqcRTQEchpfOOyt0uDrg0SmB1x+vMUxE9ATJJQJvCFECZ
+         zb1M3WxNVJJbHsM895UhbvlxQWfU1J9Hd4L7zFtdxoDF/+tcE3O1BX+wsP3bq+1nVNMI
+         5AoOyZXUC6MvtH6KCCXi+KJG4MnysavsyvGV6rQkgvP+52CeIjXpKh+pra+TwLotyA2I
+         OmkmUHZVZ8OMZJJJjrme8ZH+DwmbpdAFvv9SFIvjHs1ig5R+IJztMsfuQAQhwCEnT3cV
+         ij+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766566336; x=1767171136;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=u2s5WoFk/75sEHcHIya1H+VZ8teHuyXpvYW0UorztRo=;
-        b=dXmSaAAysw2AFD5o96/LKAyOghZTCiEIoA7S7iNc6UqN/h4rlgqaiv0fK+5j7KrMvJ
-         etwxHa1tTDf6OLKNi4AYSkxrWQ1t1Lv/HZNCZf/3AMxIcRjqmMrZ0pIQV8D9XSG7izO4
-         p1a3V6iWx4ShZqkD05+IXu8QS2ixoZpDxfF18NFf/EfvsPc/sGekICqSrrsgJ3F6jpvh
-         qtm+wVLXHqxDUocDQBs1XSvl7JQv8XwiZqlYJ3JdvIWT5miTz3vXiIqlLvYmQ4sfGO8o
-         irNcmKrKsCp7H6zhp0QytWunmjb/YiNH/7x4aCla/mDT6qS4ieQjxy7QijQT8a/wuFWk
-         rmmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU7E5t5mnYPcvoBqTXRcJykAeuOK73VWAxney6OspGrNb6MRuX94rlQ3e2XQN08ujJ6kM87ykE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIvAOV7Iw3co0Eobv5ooDvia74yi5EUXz5hFQ5wK6PP1d4TMDD
-	yAr3CxIF7rR+I2DXWcIOUKFVC0YC8eF4PADATTY2nepybeKnrXheqjQ+RFukJE+svp7sMP+mrRW
-	4jlAXMVwcyHGk1g/f0ZOL8eXjpPuoZ1Egsi6WfVbp9Cl1g+g1e8/ggz+h1fk=
-X-Gm-Gg: AY/fxX7iCirNZ2ZzIbfoDXrU/AddkAp/n+mO1kDkQoJAbV381C+2lYv8k+5JbuXcr9R
-	zOWqAVf8ev7ZNjsFAL2GvFqM66WGvDT2V8/1+J5YRGcD8RRhVf2jU76kcTN5LOpt59e4tZR6ZkH
-	1D13Cbn/rZ9trg9GzrHLUR1UniqphEPZYufXb86jcaJAYLc+iUNU7Tt/7lkcy/w69tWtxE6GI2W
-	8TUcy6NL88AIdsIKmW3qogVtn8N7VgtmoP1LOk9JoEuwQM9Qj6KnS4nr3fcLPe5vrAFgZ9ROj5R
-	mhsSbg==
-X-Google-Smtp-Source: AGHT+IFAOEXSKsQF77KPLT1Jc8ZBpbsS+KclaSawplctPso95w0PgnFVtp+wfVXsiVuUEmG/qLyzqcSempwElAcIqHI=
-X-Received: by 2002:a05:622a:2443:b0:4ed:b7d6:7c6d with SMTP id
- d75a77b69052e-4f4abd27209mr254471961cf.34.1766566335515; Wed, 24 Dec 2025
- 00:52:15 -0800 (PST)
+        d=1e100.net; s=20230601; t=1766567778; x=1767172578;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TG9qFMYYZ4oH8GV5uabpqY3JSsJR+DkIvS2mHVZ4zRo=;
+        b=kalw41yqj0i/ATJmrfKqE66jZERmFo2qRfIgPetPsjBc7jW9f7CgBQOtY6tMDuHNNJ
+         p3Uzy9b6Wg38l+U7ERaQANiGgM9+IHGpiBxJCbjdPBtJDuihrej9Y2vzXGOzRM6Hier2
+         og/WN2PiEZLCATLUt4v5nlGaJqGThfTfK5xKTbBUPhAqs+7iP14dfkZkLnqnI44K8Lkw
+         K44wLthg1RWQd/q3mVGHfyNnPXY3SgTMK9JYmok4+U8GfbrwIuANBf3JTlV8Mswh0t94
+         yibpjUv0Fq3pcVkYIjBW/oC7lfb7TWdRZSlABluPhHidHi/vwM5bG/o/ejilbdf3MNh7
+         726g==
+X-Forwarded-Encrypted: i=1; AJvYcCUuJdTW+0LX3CCDb3D8a9WsNZ7b77Gn3j4ThvoIu9xM1bcQWE4iZnqVR6fEFA14Rdv4Eu5vzZs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyOhFR7OgwVaj08u2WsIk/Jt/xPog+mOATtj8i3c1qcD+Ypq8sF
+	621VrAkbY9wCA2iEyDvGO68CQ5i3+BlGjU9it3L7icuyMdCL1sMP9By8dnc+XmZshf/4I557i+l
+	6bUkWs6RvF7d37LJv3/3NeZpCRRf18dHF9U29XCKq+ud5NK5iQaflE2bLoA==
+X-Gm-Gg: AY/fxX6/llI+/Me4p0/rxnHpbur15U3ReaXdK1G03agjEgr+aDjaLS4zToRvDXMcF/W
+	3Pc7Bn8eMLn5dRN9hsJ+LuVpnR6ZUNwPbvF/r+wFcj9tWv4M8MrWj/wh6oJm0hYkToIlM5rsnBn
+	zK2DCP4xvq/nlSMqt9UHL76P4W+t9Bn+T6TMB8+PlofqswF0ZGyKLvGRfTV7nCjAjrl/SsyACpo
+	VKYc4mwY7gPPnbQmEM0HRZXF5bAY+KMa8UZ3PLDeOSzJAOtAuA9UX+0gtWENa9uxf93XStKAh5F
+	0oXQ+VRgW997HWx71hO6AqcUeIDrFzqDqRuojIVjV0eagRI4QDjBLhO3KsYaDY74tqfTERjRGXK
+	K8+z2UG6rhNWamjuJ
+X-Received: by 2002:a17:907:7f1c:b0:b83:976:50f9 with SMTP id a640c23a62f3a-b83097652a7mr168592666b.61.1766567778468;
+        Wed, 24 Dec 2025 01:16:18 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF2zROeUVFL1dzpYZqyjYvkN4o8L5fjhHfHOKDDCOidKMgMKBQP5VHD8MGw0Ju06pc+b5i0KA==
+X-Received: by 2002:a17:907:7f1c:b0:b83:976:50f9 with SMTP id a640c23a62f3a-b83097652a7mr168590266b.61.1766567777909;
+        Wed, 24 Dec 2025 01:16:17 -0800 (PST)
+Received: from sgarzare-redhat ([193.207.144.111])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b8037f0cc52sm1685076666b.52.2025.12.24.01.16.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Dec 2025 01:16:17 -0800 (PST)
+Date: Wed, 24 Dec 2025 10:15:52 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Arseniy Krasnov <avkrasnov@salutedevices.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 2/2] vsock/test: Test setting SO_ZEROCOPY on
+ accept()ed socket
+Message-ID: <aUut_Avq3t_xk0Uh@sgarzare-redhat>
+References: <20251223-vsock-child-sock-custom-sockopt-v1-0-4654a75d0f58@rbox.co>
+ <20251223-vsock-child-sock-custom-sockopt-v1-2-4654a75d0f58@rbox.co>
+ <aUpualKwJbT9W1ia@sgarzare-redhat>
+ <1c877a67-778e-424c-8c23-9e4d799fac2f@rbox.co>
+ <aUqWtwr0n2RO7IB-@sgarzare-redhat>
+ <aUrIDT-Tg5SpXhlO@sgarzare-redhat>
+ <8b76f6f8-3f5c-4bea-8084-577712ec028b@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251223203534.1392218-2-bestswngs@gmail.com>
-In-Reply-To: <20251223203534.1392218-2-bestswngs@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 24 Dec 2025 09:52:04 +0100
-X-Gm-Features: AQt7F2pL9ZxzX5oM1FVmR7FzWxKcyJ9Siw57qr-nPTlAIVNDpQGYHlXEubv67mo
-Message-ID: <CANn89iKpH0MO36JHbM=vS9ga=9UzgdtFahNR4+dvNr2oUtNLuA@mail.gmail.com>
-Subject: Re: [PATCH net v5] net: sock: fix hardened usercopy panic in sock_recv_errqueue
-To: bestswngs@gmail.com
-Cc: security@kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, xmei5@asu.edu
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <8b76f6f8-3f5c-4bea-8084-577712ec028b@rbox.co>
 
-On Tue, Dec 23, 2025 at 9:36=E2=80=AFPM <bestswngs@gmail.com> wrote:
+On Tue, Dec 23, 2025 at 09:38:07PM +0100, Michal Luczaj wrote:
+>On 12/23/25 17:50, Stefano Garzarella wrote:
+>> On Tue, Dec 23, 2025 at 02:20:33PM +0100, Stefano Garzarella wrote:
+>>> On Tue, Dec 23, 2025 at 12:10:25PM +0100, Michal Luczaj wrote:
+>>>> On 12/23/25 11:27, Stefano Garzarella wrote:
+>>>>> On Tue, Dec 23, 2025 at 10:15:29AM +0100, Michal Luczaj wrote:
+>>>>>> Make sure setsockopt(SOL_SOCKET, SO_ZEROCOPY) on an accept()ed socket is
+>>>>>> handled by vsock's implementation.
+>>>>>>
+>>>>>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>>>>>> ---
+>>>>>> tools/testing/vsock/vsock_test.c | 33 +++++++++++++++++++++++++++++++++
+>>>>>> 1 file changed, 33 insertions(+)
+>>>>>>
+>>>>>> diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>>>>>> index 9e1250790f33..8ec8f0844e22 100644
+>>>>>> --- a/tools/testing/vsock/vsock_test.c
+>>>>>> +++ b/tools/testing/vsock/vsock_test.c
+>>>>>> @@ -2192,6 +2192,34 @@ static void test_stream_nolinger_server(const struct test_opts *opts)
+>>>>>> 	close(fd);
+>>>>>> }
+>>>>>>
+>>>>>> +static void test_stream_accepted_setsockopt_client(const struct test_opts *opts)
+>>>>>> +{
+>>>>>> +	int fd;
+>>>>>> +
+>>>>>> +	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
+>>>>>> +	if (fd < 0) {
+>>>>>> +		perror("connect");
+>>>>>> +		exit(EXIT_FAILURE);
+>>>>>> +	}
+>>>>>> +
+>>>>>> +	vsock_wait_remote_close(fd);
+>>
+>> On a second look, why we need to wait the remote close?
+>> can we just have a control message?
 >
-> From: Weiming Shi <bestswngs@gmail.com>
+>I think we can. I've used vsock_wait_remote_close() simply as a sync
+>primitive. It's one line of code less.
 >
-> skbuff_fclone_cache was created without defining a usercopy region,
-> [1] unlike skbuff_head_cache which properly whitelists the cb[] field.
-> [2] This causes a usercopy BUG() when CONFIG_HARDENED_USERCOPY is
-> enabled and the kernel attempts to copy sk_buff.cb data to userspace
-> via sock_recv_errqueue() -> put_cmsg().
+>> I'm not sure even on that, I mean why this peer can't close the
+>> connection while the other is checking if it's able to set zerocopy?
 >
-> The crash occurs when: 1. TCP allocates an skb using alloc_skb_fclone()
->    (from skbuff_fclone_cache) [1]
-> 2. The skb is cloned via skb_clone() using the pre-allocated fclone
-> [3] 3. The cloned skb is queued to sk_error_queue for timestamp
-> reporting 4. Userspace reads the error queue via recvmsg(MSG_ERRQUEUE)
-> 5. sock_recv_errqueue() calls put_cmsg() to copy serr->ee from skb->cb
-> [4] 6. __check_heap_object() fails because skbuff_fclone_cache has no
->    usercopy whitelist [5]
+>I was worried that without any sync, client-side close() may race
+>server-side accept(), but I've just checked and it doesn't seem to cause
+>any issues, at least for the virtio transports.
+
+Okay, I see. Feel free to leave it, but if it's not really needed, I'd 
+prefer to keep the tests as simple as possible.
+
 >
-> When cloned skbs allocated from skbuff_fclone_cache are used in the
-> socket error queue, accessing the sock_exterr_skb structure in skb->cb
-> via put_cmsg() triggers a usercopy hardening violation:
+>>>>>> +	close(fd);
+>>>>>> +}
+>>>>>> +
+>>>>>> +static void test_stream_accepted_setsockopt_server(const struct test_opts *opts)
+>>>>>> +{
+>>>>>> +	int fd;
+>>>>>> +
+>>>>>> +	fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+>>>>>> +	if (fd < 0) {
+>>>>>> +		perror("accept");
+>>>>>> +		exit(EXIT_FAILURE);
+>>>>>> +	}
+>>>>>> +
+>>>>>> +	enable_so_zerocopy_check(fd);
+>>>>>
+>>>>> This test is passing on my env also without the patch applied.
+>>>>>
+>>>>> Is that expected?
+>>>>
+>>>> Oh, no, definitely not. It fails for me:
+>>>> 36 - SOCK_STREAM accept()ed socket custom setsockopt()...36 - SOCK_STREAM
+>>>> accept()ed socket custom setsockopt()...setsockopt err: Operation not
+>>>> supported (95)
+>>>> setsockopt SO_ZEROCOPY val 1
+>>>
+>>> aaa, right, the server is failing, sorry ;-)
+>>>
+>>> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+>>>>
+>>>> I have no idea what's going on :)
+>>>>
+>>>
+>>> In my suite, I'm checking the client, and if the last test fails only
+>>> on the server, I'm missing it. I'd fix my suite, and maybe also
+>>> vsock_test adding another sync point.
+>>
+>> Added a full barrier here:
+>> https://lore.kernel.org/netdev/20251223162210.43976-1-sgarzare@redhat.com
 >
-> [    5.379589] usercopy: Kernel memory exposure attempt detected from SLU=
-B object 'skbuff_fclone_cache' (offset 296, size 16)!
-> [    5.382796] kernel BUG at mm/usercopy.c:102!
-> [    5.383923] Oops: invalid opcode: 0000 [#1] SMP KASAN NOPTI
-> [    5.384903] CPU: 1 UID: 0 PID: 138 Comm: poc_put_cmsg Not tainted 6.12=
-.57 #7
-> [    5.384903] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIO=
-S rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
-> [    5.384903] RIP: 0010:usercopy_abort+0x6c/0x80
-> [    5.384903] Code: 1a 86 51 48 c7 c2 40 15 1a 86 41 52 48 c7 c7 c0 15 1=
-a 86 48 0f 45 d6 48 c7 c6 80 15 1a 86 48 89 c1 49 0f 45 f3 e8 84 27 88 ff <=
-0f> 0b 490
-> [    5.384903] RSP: 0018:ffffc900006f77a8 EFLAGS: 00010246
-> [    5.384903] RAX: 000000000000006f RBX: ffff88800f0ad2a8 RCX: 1ffffffff=
-0f72e74
-> [    5.384903] RDX: 0000000000000000 RSI: 0000000000000004 RDI: ffffffff8=
-7b973a0
-> [    5.384903] RBP: 0000000000000010 R08: 0000000000000000 R09: fffffbfff=
-0f72e74
-> [    5.384903] R10: 0000000000000003 R11: 79706f6372657375 R12: 000000000=
-0000001
-> [    5.384903] R13: ffff88800f0ad2b8 R14: ffffea00003c2b40 R15: ffffea000=
-03c2b00
-> [    5.384903] FS:  0000000011bc4380(0000) GS:ffff8880bf100000(0000) knlG=
-S:0000000000000000
-> [    5.384903] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [    5.384903] CR2: 000056aa3b8e5fe4 CR3: 000000000ea26004 CR4: 000000000=
-0770ef0
-> [    5.384903] PKRU: 55555554
-> [    5.384903] Call Trace:
-> [    5.384903]  <TASK>
-> [    5.384903]  __check_heap_object+0x9a/0xd0
-> [    5.384903]  __check_object_size+0x46c/0x690
-> [    5.384903]  put_cmsg+0x129/0x5e0
-> [    5.384903]  sock_recv_errqueue+0x22f/0x380
-> [    5.384903]  tls_sw_recvmsg+0x7ed/0x1960
-> [    5.384903]  ? srso_alias_return_thunk+0x5/0xfbef5
-> [    5.384903]  ? schedule+0x6d/0x270
-> [    5.384903]  ? srso_alias_return_thunk+0x5/0xfbef5
-> [    5.384903]  ? mutex_unlock+0x81/0xd0
-> [    5.384903]  ? __pfx_mutex_unlock+0x10/0x10
-> [    5.384903]  ? __pfx_tls_sw_recvmsg+0x10/0x10
-> [    5.384903]  ? _raw_spin_lock_irqsave+0x8f/0xf0
-> [    5.384903]  ? _raw_read_unlock_irqrestore+0x20/0x40
-> [    5.384903]  ? srso_alias_return_thunk+0x5/0xfbef5
+>Which reminds me of discussion in
+>https://lore.kernel.org/netdev/151bf5fe-c9ca-4244-aa21-8d7b8ff2470f@rbox.co/
+
+Oh, I forgot that we already discussed that.
+
+My first attempt was exactly that, but then discovered that it didn't 
+add too much except for the last one since for the others we have 2 full 
+barriers back to back, so I preferred to move outside the loop. In that 
+way we can also be sure the 2 `vsock_tests` are in sync with the amount 
+of tests to run.
+
+But yeah, also that one fix the issue.
+
+>. Sorry for postponing, I've put it on my vsock-cleanups branch and kept
+>adding more little fixes, and it was never the right time to post the series.
 >
 
-Nit : Next time you send a stack trace, please run it though
-scripts/decode_stacktrace.sh
-to get meaningful symbols.
+Nah, don't apologize, you're doing an amazing job!
 
-> The crash offset 296 corresponds to skb2->cb within skbuff_fclones:
->   - sizeof(struct sk_buff) =3D 232 - offsetof(struct sk_buff, cb) =3D 40 =
--
->   offset of skb2.cb in fclones =3D 232 + 40 =3D 272 - crash offset 296 =
-=3D
->   272 + 24 (inside sock_exterr_skb.ee)
->
-> This patch uses a local stack variable as a bounce buffer to avoid the ha=
-rdened usercopy check failure.
->
-> [1] https://elixir.bootlin.com/linux/v6.12.62/source/net/ipv4/tcp.c#L885
-> [2] https://elixir.bootlin.com/linux/v6.12.62/source/net/core/skbuff.c#L5=
-104
-> [3] https://elixir.bootlin.com/linux/v6.12.62/source/net/core/skbuff.c#L5=
-566
-> [4] https://elixir.bootlin.com/linux/v6.12.62/source/net/core/skbuff.c#L5=
-491
-> [5] https://elixir.bootlin.com/linux/v6.12.62/source/mm/slub.c#L5719
->
-> Fixes: 6d07d1cd300f ("usercopy: Restrict non-usercopy caches to size 0")
-> Reported-by: Xiang Mei <xmei5@asu.edu>
-> Signed-off-by: Weiming Shi <bestswngs@gmail.com>
-> ---
+Thanks,
+Stefano
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-
-Also please next time do not CC security@kernel.org if you made the
-bug public (say on netdev@kernel.org),
-because security@kernel.org will be of no help.
-
-Congratulations on your first linux contribution !
 
