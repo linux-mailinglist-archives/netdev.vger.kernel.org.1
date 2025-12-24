@@ -1,149 +1,156 @@
-Return-Path: <netdev+bounces-245981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-245982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from tor.lore.kernel.org (tor.lore.kernel.org [172.105.105.114])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5511CDC563
-	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 14:16:50 +0100 (CET)
+Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9222CDC57C
+	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 14:18:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by tor.lore.kernel.org (Postfix) with ESMTP id A5FD83015E2F
-	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 13:16:44 +0000 (UTC)
+	by sin.lore.kernel.org (Postfix) with ESMTP id C5B713009067
+	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 13:18:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53AB5348896;
-	Wed, 24 Dec 2025 13:10:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BB5B30EF66;
+	Wed, 24 Dec 2025 13:18:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CLba7lP5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gHk0gwKU";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="rWi8zJs/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f193.google.com (mail-pf1-f193.google.com [209.85.210.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E33BD2BE02D
-	for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 13:10:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E03BB23D7CA
+	for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 13:18:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766581808; cv=none; b=bQ+VFVySySps6enPyYbuGxFTVjEQxpe/Za09e+coD8fP+azQsH6UEoZIojNgls5ScZz22Etp6CZF/4jkQpPMAHK38QYD+ktUEVUNmdQCLcnrjiylWJud5oV0yhlD2lURH93dvVSQsznsAz8XE60sggr6JGSZFXqYe5uEI15wl3M=
+	t=1766582307; cv=none; b=fzOB8ktXWG5lPyDkvzaSbz7ywXgmrQ/IIfMNwxYQNugMxTupMIbMsrivUE/2kf9lDPogwRlSU1eMUQlFpX1RYUHDNuzz/Iim3mGccPBeIC23sXaR4as5yn9KO+mVB8Y5PqOwwBJtme/I4wLaDkkJEQvISzZRV7EnzdNYIZTI8jo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766581808; c=relaxed/simple;
-	bh=ARq0/QucFj/sxPqr+22ybRos7rUcjBBi5nq/Y4PoAvU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bCHxzagBIzcduND1BUKhu2VdQ583mT55nd/YuZANIs5COLB3Kds8Hl6EspYP0Nn1gI0lYhLs6X2alNPX0jPBh2Mzy2s23orAjuYxhS0T3wUbv+nKj5M/ckuJMu5q+Qe94D0zZfoDDq/znIQe9K3IY3FUZWDZtE3Qhto5wT0P9wg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CLba7lP5; arc=none smtp.client-ip=209.85.210.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f193.google.com with SMTP id d2e1a72fcca58-7f0db5700b2so5301683b3a.0
-        for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 05:10:06 -0800 (PST)
+	s=arc-20240116; t=1766582307; c=relaxed/simple;
+	bh=Z1vwCpy3xpWeWvKjBKC069x7b13vg9BDJ+FjLOjAjPg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=njstrGyoCTpIpPKzaNIDtDPh+SuXg8nUNnt/sB009Zo1iq1Rfdzoc2JoV47GCb8FSxZVTipOKDlt3LGcZaKYazE9Lp+wa6EEE/AkTJAiGNKMZ9TLuEG6uhMzlOQDMLOam+5glgkfcJlfdTk0N8s9bZFxwkNaM5fuQSkmoao+ito=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gHk0gwKU; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=rWi8zJs/; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1766582303;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pnyVa0gL9PqRyxoGgad9ZgIf7TrhLDmrnLDL5gmFISs=;
+	b=gHk0gwKUC4+MKK9ny/Fz/hPjg9snSdywOoSsDIGKQyXJII8lFdp1Pm5vKCm5JOxRL4FMfL
+	m+jjYe9CQZ9leLuBK3hrJdLLRieGMLAbRRHidw1ykJhoT0dxT3aSYEzTKuSKRUYpt4PcDA
+	cyI8p5+yjjL5mQkbSi0lRL61dft7ofQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-283-jEQ-Y-GqO1SZksMuOPY9Pw-1; Wed, 24 Dec 2025 08:18:21 -0500
+X-MC-Unique: jEQ-Y-GqO1SZksMuOPY9Pw-1
+X-Mimecast-MFC-AGG-ID: jEQ-Y-GqO1SZksMuOPY9Pw_1766582301
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-477b8a667bcso81946445e9.2
+        for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 05:18:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766581806; x=1767186606; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ki8yj47Ksf2sOkp6JBKCA9cB1ptX2Wx6sb0cvY7RlMA=;
-        b=CLba7lP5VtaP3jg1Zy6VGKj+qXkZLv2HZF6wTH5Gx89eYoaKF0H8yXxGIRJt0mpXh9
-         3nKjeer/OTbF5GqczyIJxslYO4lRGRJ6ditMguttBKCAazkSOwixtLf4hxTpBWm0ilqK
-         xmT0YfaxIe0xWDz40sftNxLYOxVhbqxazqKzt8U0eM++PbjEmMmAFStasJaUrYFMtDA8
-         tkc+UVy5dpf5zkv6qc8FiVlf+9bgophfRUZ1pI5H1UJBRrwFUrhL2I3wTK9b7bajPqpV
-         OK1TkjHR0SeVsceQ9Q+APS2z5QVlVl+6cYZZaQMT1N+UvjwxkzD2ABmINL9jM29yL+Xr
-         rq0w==
+        d=redhat.com; s=google; t=1766582300; x=1767187100; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pnyVa0gL9PqRyxoGgad9ZgIf7TrhLDmrnLDL5gmFISs=;
+        b=rWi8zJs/stENPkTwFR5cuv8ZF5kDJpVB37mXM86ZyFmJ0Ri8qE87MoqIm3IRLYvpZ6
+         uGzwz1XH+6wW+LK4PqK60uEN1Qdnn037FfyYwErehbKdxnaSl6X9uonwPQXEZl+w6BuV
+         3NKzdxuyTFvO2Yr/0fi4Du7qHEyJhVZWSGtFSzwRQiN37JyPXy31cidXqO3+co7wrUVJ
+         SX4H7Uch3T9Nen3lBW0vaSXuKTzvxPSdLAap+FD+J8AjaGc2+AzlqS5DgHGp1rrXxE4I
+         aY0Um2QLwyfWMmAUVqjTUganSRV5pJjQEkXncdY+RDyFK9MttjTe9TSxnotX9KbRWJYA
+         CftQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766581806; x=1767186606;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ki8yj47Ksf2sOkp6JBKCA9cB1ptX2Wx6sb0cvY7RlMA=;
-        b=Px3EiA8bnpWw4GFwgie2CJIW2uu3+m47r6LKB6UVq5qoIXgnbZA4xTZ/yImlw7I30y
-         f6R47kUtX3FpefmCbWxLF0HYXWc85AAF1S8Wy0LqaKMJ9wtKjvLu8kWfM73mFZLnEYPW
-         FRcoZr7XfYLsYrlNg6sFLzFGDWpwF5s/WUQYsKeOQpnihVAAD9O2R2IbgL6f3Pi2aoQz
-         DoK4v60/u0uvn5gHwPWZo6oyi/0ld5FMb+J145dtHvr/oIUCWNEwRXi6mahFeFQSum5M
-         +IgyzOYOUDDBK0WILbcFLXeigujzyHehFzhpBeQNJR7RhI3fyZSSSjevB3zZW1jTiUOw
-         Lo4A==
-X-Forwarded-Encrypted: i=1; AJvYcCUPwmJWDl8gn80Z0TkWHB7yg0SwI6WGh9RgaY+HXSwrnmJc2/ZRMMwHQAP1yxRke5a+3KwMzO4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxuzcoje2zrMt+WFtha4i3zGFcHQWTARpB4RvrpVZ35yAcF/1/+
-	Rwl0pdnmwn96ldKFpz4MhID5Poseb53A7cRgHie7vAtFJ76sw5aadepa
-X-Gm-Gg: AY/fxX7Xady7B7g0hHlcxchVOWQlz0VQmmAdyUs+6kuFcjsA9osN1EyHKsPOi2nkLD/
-	hcPcIbf/L+jc2VIQjoVZf5mwQmlm5ZseG9rblMXsKLeUPDU9vPC2/NfXYMunfZRNf3CB5EKPnJH
-	3+aL4vPT6sA8Jk8IAIoieyElyeIXmhfK0M0/zEiGynoq6b4Ze5QLseYX+o8hnTBExJdz5dTdEJs
-	kjloQ6FjykdiBAsGxSECWSrdnR5Zpf5T50zT1hA6PyPe8SGvj9GBjOR/Q4JtY3JnmyQYS8PjfKA
-	fOMBcfWOI1QFBu4WL2gw4av3Q1aghoWt+0saymBxHrwcbYmXog+l/eAKTZ+QfHNehqfPIqv04cR
-	LdxlYTPNhr7h3AZyUpPtbc7KYfGREwq7iTOxJQfmrgmmLmT0Sx4CCBVw62w2yWb649D8GrdaRC2
-	t8104cDV0WiRwwPM1Wcg==
-X-Google-Smtp-Source: AGHT+IEsQ3y6BfEUuR6gPcWe8dQ3+JU2VN7JGTtTSLSdiP5hgCSTgDCloIJCRNjxPEDqHrTRUmPDCA==
-X-Received: by 2002:a05:6a00:2c85:b0:7ac:3529:afbb with SMTP id d2e1a72fcca58-7ff648e9b90mr15231794b3a.20.1766581806344;
-        Wed, 24 Dec 2025 05:10:06 -0800 (PST)
-Received: from 7950hx ([160.187.0.149])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7ff7dfac28fsm16841173b3a.32.2025.12.24.05.09.54
+        d=1e100.net; s=20230601; t=1766582300; x=1767187100;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pnyVa0gL9PqRyxoGgad9ZgIf7TrhLDmrnLDL5gmFISs=;
+        b=BJugihBEv2njZkyDU3PaT4FPnB93Qa12epNfquyrHHi2Z6VIz+hjlnvch1+qjhCkJu
+         bHNvpTnVN3/URApdFr9P/ZVsB+tGabOg3Y5BhlqDo0dAm7XimV1cJN5w7/fyU55q7fLe
+         g9D35kM3KK9mKuiw5C0cmNXWlNyYdut47PSw2Xn45r4SpZsDUhROEwZNpkWf7JOCeED9
+         JnE3gwl0CQzZ2mEcEu1SR/qnp+fkcd7q06W94AOdhBmLF3T8h9kDO3tWEgQPNiAk2r4s
+         4uaklab3jgD2sRh1UlT02oeU/RtLkfy/xqqBdohRZF6tmlS2uNT2JL4zDJvng15kyfDg
+         Amhg==
+X-Gm-Message-State: AOJu0YwUgt0nZig5kxba2ow5meHyfMe/PAMUX7OHF2ZL5sUoFhKTdJjR
+	cYX2UPNrWmrJ0UXaCCtyBx1YCAvOLBcfhB1FtzXm6kWz//lsx0Y0BbFhsxsmQfQj3rzb6rH49NJ
+	K+01tOrmT1iV1MkLpwLtouF71UUko/ZDVeJ20bggQGhvCsGa9m0APo4QxZA==
+X-Gm-Gg: AY/fxX5sZ/Uu96XvB+nZU1tc4I4JbUCZaFKaQ1uwAXBU9f6yYxxz/H5YkRP5VCStifo
+	OYewl+SLp1BMkjeZgrtY+ye93RvKYxiUb4Q+PQuyOQBE2wN4bEw7DnjI5OH2erRJBg4rjWIbiFx
+	0QDGdNTej8abgNxrMZSSJCDlYShNS2FATKJpywo/beRIiP9+EEOf8Eap7IBnRkaC6TY+lxh/PIB
+	1nIhDFd6F02EC05Qf8GCUjLYUxps4UwsdOlf5mxS+FdZDwhBWdvtzS/EiBqPJwstFjCAPh2n3k0
+	8U+7vtUss4ECuyxpGyScm/+mtFVg7aYo1471al58KcRpREmPQzUJvfESxV3nXqn/e6jikeoGiuV
+	iSZ0PPJtu5nzXeew=
+X-Received: by 2002:a05:600c:1f84:b0:477:5c58:3d42 with SMTP id 5b1f17b1804b1-47d34de4cb7mr63019745e9.10.1766582300584;
+        Wed, 24 Dec 2025 05:18:20 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF/SlkuvhiTEvzYbTpBDDuJpHJEzzSjm3eiNJ/Fe6ZgvJBNGCeEN2QpRSXh5vQwgRwhpvCKLg==
+X-Received: by 2002:a05:600c:1f84:b0:477:5c58:3d42 with SMTP id 5b1f17b1804b1-47d34de4cb7mr63019525e9.10.1766582300181;
+        Wed, 24 Dec 2025 05:18:20 -0800 (PST)
+Received: from leonardi-redhat ([176.206.16.134])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324eaa64cesm34326729f8f.35.2025.12.24.05.18.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Dec 2025 05:10:05 -0800 (PST)
-From: Menglong Dong <menglong8.dong@gmail.com>
-X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
-To: ast@kernel.org,
-	andrii@kernel.org
-Cc: daniel@iogearbox.net,
-	martin.lau@linux.dev,
-	eddyz87@gmail.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@fomichev.me,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	tglx@linutronix.de,
-	mingo@redhat.com,
-	jiang.biao@linux.dev,
-	bp@alien8.de,
-	dave.hansen@linux.intel.com,
-	x86@kernel.org,
-	hpa@zytor.com,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
+        Wed, 24 Dec 2025 05:18:19 -0800 (PST)
+Date: Wed, 24 Dec 2025 14:18:17 +0100
+From: Luigi Leonardi <leonardi@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev, 
 	linux-kernel@vger.kernel.org
-Subject: [PATCH bpf-next v5 10/10] selftests/bpf: test fsession mixed with fentry and fexit
-Date: Wed, 24 Dec 2025 21:07:35 +0800
-Message-ID: <20251224130735.201422-11-dongml2@chinatelecom.cn>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20251224130735.201422-1-dongml2@chinatelecom.cn>
-References: <20251224130735.201422-1-dongml2@chinatelecom.cn>
+Subject: Re: [PATCH net-next] vsock/test: add a final full barrier after run
+ all tests
+Message-ID: <aUvn7yVoSPG_FIiD@leonardi-redhat>
+References: <20251223162210.43976-1-sgarzare@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20251223162210.43976-1-sgarzare@redhat.com>
 
-Test the fsession when it is used together with fentry, fexit.
+On Tue, Dec 23, 2025 at 05:22:10PM +0100, Stefano Garzarella wrote:
+>From: Stefano Garzarella <sgarzare@redhat.com>
+>
+>If the last test fails, the other side still completes correctly,
+>which could lead to false positives.
+>
+>Let's add a final barrier that ensures that the last test has finished
+>correctly on both sides, but also that the two sides agree on the
+>number of tests to be performed.
+>
+>Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>---
+> tools/testing/vsock/util.c | 12 ++++++++++++
+> 1 file changed, 12 insertions(+)
+>
+>diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
+>index d843643ced6b..9430ef5b8bc3 100644
+>--- a/tools/testing/vsock/util.c
+>+++ b/tools/testing/vsock/util.c
+>@@ -511,6 +511,18 @@ void run_tests(const struct test_case *test_cases,
+>
+> 		printf("ok\n");
+> 	}
+>+
+>+	printf("All tests have been executed. Waiting other peer...");
+>+	fflush(stdout);
+>+
+>+	/*
+>+	 * Final full barrier, to ensure that all tests have been run and
+>+	 * that even the last one has been successful on both sides.
+>+	 */
+>+	control_writeln("COMPLETED");
+>+	control_expectln("COMPLETED");
+>+
+>+	printf("ok\n");
+> }
+>
+> void list_tests(const struct test_case *test_cases)
+>-- 
+>2.52.0
+>
 
-Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
----
- .../testing/selftests/bpf/progs/fsession_test.c  | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+LGTM!
 
-diff --git a/tools/testing/selftests/bpf/progs/fsession_test.c b/tools/testing/selftests/bpf/progs/fsession_test.c
-index 5630cf3bbd8b..acf76e20284b 100644
---- a/tools/testing/selftests/bpf/progs/fsession_test.c
-+++ b/tools/testing/selftests/bpf/progs/fsession_test.c
-@@ -180,3 +180,19 @@ int BPF_PROG(test11, int a, int ret)
- 	*cookie = 0;
- 	return 0;
- }
-+
-+__u64 test12_result = 0;
-+SEC("fexit/bpf_fentry_test1")
-+int BPF_PROG(test12, int a, int ret)
-+{
-+	test12_result = a == 1 && ret == 2;
-+	return 0;
-+}
-+
-+__u64 test13_result = 0;
-+SEC("fentry/bpf_fentry_test1")
-+int BPF_PROG(test13, int a)
-+{
-+	test13_result = a == 1;
-+	return 0;
-+}
--- 
-2.52.0
+Reviewed-by: Luigi Leonardi <leonardi@redhat.com>
 
 
