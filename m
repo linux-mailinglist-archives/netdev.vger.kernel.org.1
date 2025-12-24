@@ -1,135 +1,167 @@
-Return-Path: <netdev+bounces-246024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246025-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94612CDCE1D
-	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 17:50:19 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CBC9CDCE68
+	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 17:53:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 19447301F25A
-	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 16:50:12 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id DBF753023784
+	for <lists+netdev@lfdr.de>; Wed, 24 Dec 2025 16:53:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3A4C32827F;
-	Wed, 24 Dec 2025 16:50:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B7C230C616;
+	Wed, 24 Dec 2025 16:53:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cz/La5V0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mh4ysnGZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B9B28D8FD
-	for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 16:50:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9C82327205
+	for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 16:53:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766595010; cv=none; b=OqU8QZA+CfZaeaAHBV+JLVsdw8xYP4ImueRJFrgHyPXNnMCKUw2H4wzWq48EOQlXssuUvHC3IHxQkeWaTLc+bBIE1Irt5OtPcKVTzj6Js7tey8oFz1Pn8v77yGWNPg+jDWE5L2iAggbeuPi4EdngekYPPZKCEIBo9fb38ryZPJw=
+	t=1766595187; cv=none; b=g4umfzVt4Io8ZBBKcNvhmlkLWIuDZlPsdGgu2FuYakqNPn1Y/X7ZRi1+Ke++JrQ/2yx5DsSfcUsIu+CYWAYo4nrM+sy1bxgYszAMVsmWfpwZUBLqjt+FOfE4c/gt7iz3qurwvf80dI7u1fLaGQ8IGZlw5bfXvRA8UCkvCHRONEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766595010; c=relaxed/simple;
-	bh=pD8YfDZ8KDvIJ2txTMDBnlCOh6vlZTyz6vhh+e8d2W8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lES0oURgro+xaUwq8TlaRmiPu2/+DphuWZbBjrRSMcr7Zv5RDW4FxvsCWxSQv8UttwOacOOFoYYGiHy3/5mBTNpCLHn9F3v2fiIXng3iLo44ZQgWhUkAgqDSHRSV5sry2DG9zMTnDM5ip02scY1zB7LrCSKJOLMp2rX128DVXFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cz/La5V0; arc=none smtp.client-ip=209.85.216.51
+	s=arc-20240116; t=1766595187; c=relaxed/simple;
+	bh=Zlyiz29ztFkTY3fwzYZbKNetxy6G4O9TFMXn8qeIViY=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bK9L8uRYrM/i3vbIy/s9Y7U2wyxnfwEqfMmLTsSTGF5+Geo3AjE0Pns1sH1kBtREhi9ui7Xg0LY5wLUWX3g6Z/Kl+1HNF4mNiclbsxzS+xrNh0t9FvxzF9GyVNMi0qgBDSR8BzEV4d9kEDyMKI88kb5g+NNODBWdwtKjQpTD5t8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mh4ysnGZ; arc=none smtp.client-ip=209.85.128.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-34c5f0222b0so5156046a91.3
-        for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 08:50:08 -0800 (PST)
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-47795f6f5c0so33761765e9.1
+        for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 08:53:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766595007; x=1767199807; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cnHqqpgJDbRv/a/D7gH1Mi4jXPMVJ5IBYITwv6FaifY=;
-        b=Cz/La5V0IS2jWtSCTwPYxgGBPlIImyTU9hHDxzRUyWE1/AJ/Pk6VX4L4ax9ougmTOR
-         +p8VEFCGM7DOpz87af4RVWlfK1yGgk5gYvV8PwH6QiIsNkHMrzz9DKWrBhrN+CAUCOpA
-         GlZo4OWn/VooTBqxdjgnvdDngpOtQz5B0cFu5roID5Bv6kryrpdz8+lFHoMm0WNtwv7m
-         4BGRgmneL04o967UkndgtTxfR42ft38hqPptGy1iK5D1CrxOzjbnxsoyumGG7wfuqgRA
-         3JGMADqeb5k0pvl5PYG/FZDoPTI4fhbB9xyjvi15kkli/21w9Bph6F3LZmm44KDgqlV1
-         QbLw==
+        d=gmail.com; s=20230601; t=1766595184; x=1767199984; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4RZ2hsPcgIKGhVb38CaAYiaLlx/2d9pEX5qXtrrGncM=;
+        b=Mh4ysnGZZc0Y6dvrOLJw0hCxuT3sd6022dkPvY1oxTPNVUVxGVBLE+2FvRMAAEIlLT
+         LwTSxM5Hq76xWi7ZIl/29vHgkGHTxBh11QSdWewNA4IIhs7lCpAGXJb+/x9YkVADqJF/
+         1lC0/pcw7czvVYRtb0vFzhRCZOQabOYxwRGcdhEHJbtIcZIK7d5rx8DCIafrahLSi52K
+         O2qqQvViWKUdmpxEPlLFSPwKm8KCMiTs6SnnZa383r9Sg2AGxV7T+psZ4nyERd+e8eEs
+         LxykfUznJ2ejDP64EiK8z3ruV/8EKOy+xB2YDJfse7rE7D8xdtNU/rAv83GAPjOljH9U
+         2tBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766595007; x=1767199807;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cnHqqpgJDbRv/a/D7gH1Mi4jXPMVJ5IBYITwv6FaifY=;
-        b=O+VaXqNCcmJ9E8MX8pqqHMCReyVafE7ALABnrQDJapPZUM8E3ItFODn8Mm4nbA+WXx
-         09Saz6PhvqxQLXi2xUAG3fI5SKENHe+ijCpeURMnxYCOpd0r3xT7SjoZ3AqkHYO0gAHp
-         UZpy0HnRbsQi11ZSMXLTVzvTIVCxENRDtDHXyToNfsSgCkCtwZ9aB8A1ISVxYkvaY619
-         xdQfFYiCxOgwTKSO/Fm8iNdnkH9pL282c9PRLrfrwSWHvl2f/MjnCIFU82KvtTBkLInu
-         X8W4aeNUyqv9VjT20VCMou4XwAlriQwIlm4khvXCvsu4km/2vTfybdVP1ZaaQGgtu2pz
-         aU5w==
-X-Forwarded-Encrypted: i=1; AJvYcCVTQyk+UQa6xBq/qDetfr9kFst4ukHNH03tS1tTvgD+P4+YMPwzHlOKqvGzt/nFpejezrVQxmQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBB4NluS+6xipq2SxMf2yl5quRR2heKJk3fjIrYno3Ah4wyyG4
-	FIE7WsFKB1GyBLmD0E2m6r8Q4lHGnRLiLq0Wn8N1RUI/WayV8dybJAZz
-X-Gm-Gg: AY/fxX6DNYRt70bS8Ecei7xf/eJ5UNXa6ab9fpxQhikkp6w7ICjV8FmlgoAI5Rzuhip
-	gP/TG114csQyeM4fBfBd3n+qaZS+WDyb7XzE2Dt31shi3yNl30GIOV4x34xWEqhxB7xdWqmyKhi
-	ng9rzDxCtbUkD6slsXwp+9o1BJj/bNG6dlNRD30tCV9q0+k7UvH3h6izYgiMOS+90PjmlOxiQqG
-	OzhsXXdO6ZxzNO+K747lV527ZwKxo8L39lnxqe8ZnwtC/7QT9OLohGxCZaTlWHo/mV+jShMZ1ew
-	a+z6IFRfRPJW/vplzkh4i8w6ARixLNfRhrRMRA0rEcXCz8zrI7yljet3+89z0DwUFUe4yt0XJuQ
-	iWXJe/g4O6aZPoS8+JmYwtakEqAoBFQrVh+DXU2KihJmB8SE1o1oRX0dxByg6b07/MfZsKPbO8v
-	xld81Jyi/xDXMY6te6BDcE6yiuuSoHbHrEiUnK8XRXR9hjQt4YVK4EOQzW053rJOmJ8EEwiw==
-X-Google-Smtp-Source: AGHT+IFbzQ7yMQch0JLVgEhdJ9FTN364+UnyPdio+VpjXb21RfQOByyL0xWkrHKOy6iC60/tY4/H+A==
-X-Received: by 2002:a17:90b:580e:b0:340:d511:e164 with SMTP id 98e67ed59e1d1-34e921ae4camr14319741a91.19.1766595007324;
-        Wed, 24 Dec 2025 08:50:07 -0800 (PST)
-Received: from ?IPV6:2001:ee0:4f4c:210:c711:242:cd10:6c98? ([2001:ee0:4f4c:210:c711:242:cd10:6c98])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7ff7e48f26asm17027776b3a.52.2025.12.24.08.50.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Dec 2025 08:50:05 -0800 (PST)
-Message-ID: <75e32d60-51b1-4c46-bd43-d17af7440e74@gmail.com>
-Date: Wed, 24 Dec 2025 23:49:59 +0700
+        d=1e100.net; s=20230601; t=1766595184; x=1767199984;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=4RZ2hsPcgIKGhVb38CaAYiaLlx/2d9pEX5qXtrrGncM=;
+        b=ObpuhhkzRquEV0Fg8igInFnsRJZko1GcJIXhzLMnHmuJ/KQTVMaMM+pS8wkjF7jD3G
+         RwJGp2pv0n/rstj/PkxwIn6YFQvCg1uiuGjuHuSpiMQF6TfXdoK9DJcukmQSK6dubby/
+         drDfwM4yjEV1yFUojT3bd3xhk8U3LlHjuguGNmMkouQjHgfPw9gAuOQt6thC8YO7dX1X
+         vwJmzcWwLYHNFMHrkSJRihOZpwTp1kn7OfRRak/Jsd27plGw6ZjLRy8oBQ2gKRH5Dx4D
+         tOxL387O1suzMbcjtinyMSstQSiqTW3R+RO1ZBcJz57BpaLwlDjf/yqmPwps5mILj7eP
+         M7oA==
+X-Forwarded-Encrypted: i=1; AJvYcCUS+Bk6mG8ScBdLZJHsrQKW9HAesi0q4dB4PB7RV/r+bSYOsk+rDqqcfv21iU9g4zhBZEYk06s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyjuBycIeaKWTEv7XTfiGpq4hVUbM6ePB8iXYYeKT/OAjIiEFQp
+	Rn8vzH/bpL0Nmd83HwE4MnZiF3zGv6Xsk3GU02v8p9iq7aAelX9ZCjkK
+X-Gm-Gg: AY/fxX6hkBz0uzB5f0h1p18mfCp5kyNpYxAUJlHFFe8iNatEiXWyW/DAnyiK6bVE9S8
+	zNSQ8bvcAiHwvxaegUOu90It2tuC91wrShU3Y4DK0jbpFylnc9oqkgVB4VQR6GrVBmjRFyWsjto
+	PwjGqnpwhvZLAlCCMfWIaHuM4kD0MrJx4hsfZNj2usqri5bsDGB0aXYjqlt97u2h5l8Mj7OA2kd
+	ZXAvMUtcQLoZBn4IZTruGfM/pdSsSIWiqBp+ansygESDLSOXFvOfLsL0DnOAmNEUbl2TQdy7MEP
+	BE7M32cCfbmN4xO0peXDNmNlzFZIAZHiCt5vM1kFcCpUEnieZBBYsSUkyuWYmgYZMZwegHYcONN
+	WkqcYFSpa2JJ8RvPC6FuPvs7WiRz7Xan/ZScOFQtlFGTsmSehqpkacY5UR1Tb7N1AGsH0r+9FiE
+	M26JM3MDyDw8Dt2K9dQhBqgrrKCTTNL/kyEFnG7mNQwdeVKm0o9w==
+X-Google-Smtp-Source: AGHT+IGW8GWXhUmn+dTMjfkTURqaoZblmSnMmGvjVbuG4EIUwwWZvmN6nxDOvQshezdHBAUjXoy2lw==
+X-Received: by 2002:a05:600c:83c8:b0:477:7b9a:bb0a with SMTP id 5b1f17b1804b1-47d404f8adfmr18948755e9.21.1766595183979;
+        Wed, 24 Dec 2025 08:53:03 -0800 (PST)
+Received: from pve.home (bzq-79-181-178-61.red.bezeqint.net. [79.181.178.61])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47d1936d220sm327075195e9.8.2025.12.24.08.53.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Dec 2025 08:53:03 -0800 (PST)
+From: "Noam D. Eliyahu" <noam.d.eliyahu@gmail.com>
+To: pavan.chebbi@broadcom.com
+Cc: mchan@broadcom.com,
+	netdev@vger.kernel.org
+Subject: Re: [DISCUSS] tg3 reboot handling on Dell T440 (BCM5720)
+Date: Wed, 24 Dec 2025 18:53:01 +0200
+Message-Id: <20251224165301.2794-1-noam.d.eliyahu@gmail.com>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <CALs4sv0EYR=bMSW6pF6W=W_mZHhQBpkeg=ugwTtpBc7_FyPDug@mail.gmail.com>
+References: <CALs4sv0EYR=bMSW6pF6W=W_mZHhQBpkeg=ugwTtpBc7_FyPDug@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/3] virtio-net: make refill work a per receive queue
- work
-To: "Michael S. Tsirkin" <mst@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
- =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-References: <20251223152533.24364-1-minhquangbui99@gmail.com>
- <20251223152533.24364-2-minhquangbui99@gmail.com>
- <CACGkMEvXkPiTGxZ6nuC72-VGdLHVXzrGa9bAF=TcP8nqPjeZ_w@mail.gmail.com>
- <1766540234.3618076-1-xuanzhuo@linux.alibaba.com>
- <20251223204555-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-From: Bui Quang Minh <minhquangbui99@gmail.com>
-In-Reply-To: <20251223204555-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 12/24/25 08:47, Michael S. Tsirkin wrote:
-> On Wed, Dec 24, 2025 at 09:37:14AM +0800, Xuan Zhuo wrote:
->> Hi Jason,
->>
->> I'm wondering why we even need this refill work. Why not simply let NAPI retry
->> the refill on its next run if the refill fails? That would seem much simpler.
->> This refill work complicates maintenance and often introduces a lot of
->> concurrency issues and races.
->>
->> Thanks.
-> refill work can refill from GFP_KERNEL, napi only from ATOMIC.
+Thanks for the quick reply!
+
+On Mon, Dec 22, 2025 at 11:23 AM Pavan Chebbi <pavan.chebbi@broadcom.com> wrote:
 >
-> And if GFP_ATOMIC failed, aggressively retrying might not be a great idea.
+> On Sun, Dec 21, 2025 at 11:20 PM Noam D. Eliyahu
+> <noam.d.eliyahu@gmail.com> wrote:
+> >
+> > ### Relevant driver evolution
+> >
+> > * **9931c9d04f4d – tg3: power down device only on SYSTEM_POWER_OFF**
 >
-> Not saying refill work is a great hack, but that is the reason for it.
+> I think this commit id is wrong. Anyway, I know the commit.
 
-In case no allocated received buffer and NAPI refill fails, the host 
-will not send any packets. If there is no busy polling loop either, the 
-RX will be stuck. That's also the reason why we need refill work. Is it 
-correct?
+My apologies, I likely copied a local hash; the upstream commit ID is 9fc3bc764334.
 
-Thanks,
-Quang Minh.
+> This is going to be a problem, please follow the discussion here:
+> https://lore.kernel.org/netdev/CALs4sv1-6mgQ2JfF9MYiRADxumJD7m7OGWhCB5aWj1tGP0OPJg@mail.gmail.com/
+> where regression risk is flagged and it came true in
+> https://lore.kernel.org/netdev/CALs4sv2_JZd5K-ZgBkjL=QpXVEXnoJrjuqwwKg0+jo2-4taHJw@mail.gmail.com/
 
+Thank you for the links.
+I understand the need to prevent regressions, especially in an area where it happened before.
+That said, I still think the design of the first and second fixes is problematic and needs adjusting.
 
+The original bug (Fixed in: 9fc3bc764334) was triggered by SNP initialization on specific models (R650xs with BCM5720).
+The fix, the conditional tg3_power_down call, *was applied globally regardless of models*.
+
+The second bug I mentioned (Fixed in: e0efe83ed3252) was triggered mainly due to the conditional tg3_power_down call.
+Look again at the changes made in the commit referenced by e0efe83ed3252 (2ca1c94ce0b6 as the original fix):
+```
++	tg3_reset_task_cancel(tp);
++
+ 	rtnl_lock();
++
+ 	netif_device_detach(dev);
+ 
+ 	if (netif_running(dev))
+ 		dev_close(dev);
+ 
+-	if (system_state == SYSTEM_POWER_OFF)
+-		tg3_power_down(tp);
++	tg3_power_down(tp); /* NOTE: the conditional system state based tg3_power_down call was problematic */
+ 
+ 	rtnl_unlock();
++
++	pci_disable_device(pdev);
+ }
+```
+
+The changes in 2ca1c94ce0b6 caused the regression which later led to the AER disablement in e0efe83ed3252.
+The problem is that it was decided to apply the change to a specific set of models, even though it originated from 9fc3bc764334 which was applied globally.
+
+If we apply the conditional tg3_power_down specifically for the R650xs, we can guarantee no regression, as the logic for the models with the first bug stays the same, just now limited to their set of models.
+By applying the conditional tg3_power_down this way, we won't need the AER disablement at all.
+
+> >
+> > 2. **Flip the conditioning**
+> >    Keep the DMI list, but use it to guard the conditional tg3_power_down instead (only for models where the original issue was observed, e.g. R650xs). Drop the AER handling entirely. This limits risk to known systems while simplifying the flow.
+
+> But I am not sure how systems affected in the commit e0efe83ed3252 will react. Can't tell 100pc without testing.
+
+Regarding your concern about systems affected in e0efe83ed3252: my hardware (Dell PowerEdge T440) is one of the models affected in e0efe83ed3252 but not listed in the initial DMI match list.
+I tested all of the solutions I suggested, others have reported the same regarding my first suggestion (to remove both the conditional tg3_power_down and the AER disablement) online, and most importantly, the e0efe83ed3252 commit itself references the original fix (2ca1c94ce0b6) which didn't include a specific set of models and was considered a viable fix.
+
+If we restrict the system_state check (from 9fc3bc764334) to a DMI table for the R650xs, all other systems would revert to the 'unconditional' tg3_power_down which was the standard for years. This would naturally prevent the AER errors (as I and others had seen on our machines) without needing to touch the AER registers at all.
+
+For reference:
+- https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=e0efe83ed3252
+- https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=2ca1c94ce0b6
+- https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=9fc3bc764334
+
+Best regards,
+Noam D. Eliyahu
 
