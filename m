@@ -1,97 +1,92 @@
-Return-Path: <netdev+bounces-246067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sin.lore.kernel.org (sin.lore.kernel.org [IPv6:2600:3c15:e001:75::12fc:5321])
-	by mail.lfdr.de (Postfix) with ESMTPS id B88DFCDE0BA
-	for <lists+netdev@lfdr.de>; Thu, 25 Dec 2025 19:56:07 +0100 (CET)
+Received: from sea.lore.kernel.org (sea.lore.kernel.org [IPv6:2600:3c0a:e001:db::12fc:5321])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC750CDE0C5
+	for <lists+netdev@lfdr.de>; Thu, 25 Dec 2025 19:56:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sin.lore.kernel.org (Postfix) with ESMTP id 9E12430010D4
-	for <lists+netdev@lfdr.de>; Thu, 25 Dec 2025 18:56:04 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 91E143011A59
+	for <lists+netdev@lfdr.de>; Thu, 25 Dec 2025 18:56:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D701C28643C;
-	Thu, 25 Dec 2025 18:56:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5856286D55;
+	Thu, 25 Dec 2025 18:56:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xkk9RQxx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e2H86K9x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22C4B284884
-	for <netdev@vger.kernel.org>; Thu, 25 Dec 2025 18:55:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4E05238C0A
+	for <netdev@vger.kernel.org>; Thu, 25 Dec 2025 18:56:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766688962; cv=none; b=j7HFJjX72ri+rAG5mNU96HhlUZoHT8dQpMZX0EqDKXxu7M6vgAsyVjpztfEctCJwv525NDx8Xj0bOQr5kuN+Ix8qUGCjm6r8zY1gSTue3+RH0NJpfyrrHxQ7lq3Id4HxkN6/oFACBfuFCwtOInU7IZYQj8TMm+Vn+s/xrR2vMxA=
+	t=1766688969; cv=none; b=lmiTZFIe4NZSw0TMc0gRmvtpg5b5j+9K4CVhpGu5oCrmjt/BjHKbAMgIe1QVFklFK/sKS9XaThe59f/YwvxRLD1JmgdNbnN8FGNW879lKcubpK8ZCmHgdkj6oFWSGfXGW4MSVpenJV3zVDzLa1hcTcLaTU3o4EdY1/hq8/eHw3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766688962; c=relaxed/simple;
-	bh=LhT+mQXLhy3jwH2mvHBGQlPuedibQNAjS/N+mXdaSkM=;
+	s=arc-20240116; t=1766688969; c=relaxed/simple;
+	bh=pkU1vhyxVPsa80QtcLTzS24f0f7U2mlqk1sxVZuFAN8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=O95N6R0ey44184M+JR59pmyTFC86J+Vht5rvKojVKoe7+9WXliyFu6x4q6fudQ1Ib3kZ8VY5omkatLMM/njjvX78j43xP0qT0e419s6hOfJ/qsPStTP1cY99eg8fK+1POUtWslIgLS4JqODmNgforW9ypJ6b2eO+PqfUIYCWjQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xkk9RQxx; arc=none smtp.client-ip=209.85.167.41
+	 MIME-Version; b=MqYmz9kPt+2ovJIQZP4R4uyqcyGnC30ZWWubturTG/C/xAQxlJXikjh5b3GLwtbzQxgm9Qo2/MmNZYxms8OB8pwGuyPFGtJZo1HqbMaZCiRZ+Q991SuxpD1x7Gueg7cNPmlzLUVdnATQnk1M1FbnXUDAmMLVZSbgIQSQ46ogKi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e2H86K9x; arc=none smtp.client-ip=209.85.167.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-59581e32163so7920840e87.1
-        for <netdev@vger.kernel.org>; Thu, 25 Dec 2025 10:55:59 -0800 (PST)
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-594285c6509so7320193e87.0
+        for <netdev@vger.kernel.org>; Thu, 25 Dec 2025 10:56:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1766688958; x=1767293758; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1766688961; x=1767293761; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8Hnp4CCKm5hMDmmhEr3eJy4R9xlVd76/JWbHSOZ14Io=;
-        b=Xkk9RQxx9XbKWOb7v81hoUQZhbozGcdglSoliAQGZwe7+mrG7Xjv3EARDtF7oI2SBf
-         q/dNh6z6VbuqBJfKXYkIO1vU+nRIFQimEmzW5v2jfVcPziySbq8Fo2XHEhw3dBUiaCLr
-         Sp6d2q1C9kJFdcKuN05/KUvI5p1anPNdNwZUhJMa4oPxlm9msBRAV+Jh3hrEqXuAI48T
-         HBEj/LN7t0oOr1m8XPK7kTyj2amWJq0C3FsF6RViX6ti4zQYPOM+1NhHef4jS3Ubrs/F
-         1Lnzrx1D5EK77aj/6ym1e7mb/wDfkj9eBNDXZ4pR5Tv5LVzytwmrpQZQN9qLEZWkcmW7
-         G4qg==
+        bh=M1aK8peXC2B82T7cDIp2oaMCByBh7JADsCX835eYT7k=;
+        b=e2H86K9xz20vvDSQqU2HzzmjDBSe1Pwk2gFt9x46DiYulwNrdD8Kz9vkE4INyGjQuD
+         oI/D/aDhG1nCeLSKWmd/0xHZjvgLgU7T10JyoOaxa+queDCmvUX5vfSl9Zi4yt5S/fNs
+         CtODRNwG3rjPVpOwKxu+AKzZ2xLAm0Cu1Aw62cfz5sBvtfgjph3HYoxDpBLG0o8kQfg8
+         vu+7j137hFJcYPavG9OwJNlWs2WTAt5SpjwARoKTsi3RD2LWmDFkO5V9HIXhz82EZ/t2
+         0ERWrrfRQtr2kdsenO0sk3ya6THvxrifkKJA0QXAKOgHFAviEWmc7WcAQeZ2NQyXsoGJ
+         QFdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766688958; x=1767293758;
+        d=1e100.net; s=20230601; t=1766688961; x=1767293761;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=8Hnp4CCKm5hMDmmhEr3eJy4R9xlVd76/JWbHSOZ14Io=;
-        b=L4EtGs9spKxkuazhFV358LhFY/5E9CzPjWdYhQOvXyGdv/6knPfnjfIyCzzuVK0nK3
-         48NSWym36/ZNkaGqiHD/Wa2bGYH9KTP1JM4FkmbHLO1BpSAmckcipfgxzxK8XykgWoCn
-         5siI6XP97LKaEDvPcqkVtxTYbmgJxrDpS+VeQNlly/vLWkwCfnmTtmShVeZHIIMeKiX3
-         jhBqWtBLSfpghUJtFkW6PDx4SizE5oe8hymg3AnKlRp9brW1iBoSojlrUm/41BLQTaX+
-         0ito9J5eDdO16WqjyKy54OUCXC0mLwXMRVOXteFVXBrGqQPE3H3ZsDzGHb/d8BQVVvAt
-         5z2w==
-X-Gm-Message-State: AOJu0Yz9VwKSNAKojgPOcMDdRhhoZYSItWgtZzE/+FPx1KxVgpucqAGE
-	bEmX6YmQ7mGHa6ZLEESzdJEVPQtP3m9/mNsnNXgohnNZkVwyJHGUTsIdy4TBsyZEegY=
-X-Gm-Gg: AY/fxX7H4ggwzsm0nRQlNLy/KBrJbMbSDDMvp8X3VajELXqRrkNkstmQnZatOks5xmL
-	+1SRCJtE9OeaC4OCI236oRiScjWCoRou5L0uEQD6Ik3h9w7ScsO9Jn9q/YDfuX8WEqUxlrzxz1d
-	c4E4+OqFOItWScLbWs+xzSsDp+vGMmInDhvGNwv8ERCByCQyLBdhwX7gaOm6h9HmFzppq/egB+6
-	3AMmdiPMMbnoa5L3Sed5wE2D5DgccLuu+j0IQZmf/LB0qeJUzyndk6tpuO9yZkiB4heCFJGmBVO
-	vAD1ALXovNHuJeDNNfhYe5BGUzvnNzIkxTQVMFUHnnIhQlRSyPFfEXy/WTldRf6f+ySDUKIjhpi
-	4nPt6uSccJDOTF4WXQlY9fYBNrtYJzsf/pJaC1d2rKS/xVcNTE09UwXyc6/0zsUpxfaMb5lyfta
-	jXgST6EE3NEVFqfyE6udfsMH4KauS/YZrSMaUWYl3OSR3Uz+XjQjSj94PwSeim+rcGSkjcbZzGT
-	uKGjg==
-X-Google-Smtp-Source: AGHT+IG3kA8UpWGcP6SRcOsatjgxjhtqRcs3jw46Gr9B4pyF2nxWAu4cfHINTv+6ctTTB0vuvO4ssw==
-X-Received: by 2002:a05:6512:33d2:b0:598:ee62:32de with SMTP id 2adb3069b0e04-59a17d57756mr7393601e87.24.1766688957521;
-        Thu, 25 Dec 2025 10:55:57 -0800 (PST)
+        bh=M1aK8peXC2B82T7cDIp2oaMCByBh7JADsCX835eYT7k=;
+        b=v1LMTvW3f/E9wX6Epi1Ge587YIyydY8J/xfHfYKcZZ2hWn4vgGnjCAC3HeOmT8jqRr
+         xk6LMTh7EWCOeMAM+TMkUiusERXmVpMnd3+PbYBd+hSUzbN/t3lFUen80p2YpbNUOyDC
+         6iexTfJAcL1MjapKtRbSifwSWxNAUp5AHBaEptvFpHUkQ2zhJH5SfpT7nsU6ZGVqPAKZ
+         VR5JxX2Nu9D867jmbeUwksVxy4kyZ/AEQbcp4ShdQjshNxo5Jm6oS89I9pgVd1h5fzlL
+         AhVzbd6gfL/aglLu+J1hUdZl3aWFSDixlT98X2HuTU2YXyjURNq+7Hr8XL7Q3OuB3xRP
+         Qf2Q==
+X-Gm-Message-State: AOJu0YwMuQCveci6EE+BZ3DCv1HF3f32hTAGz0tLvOF2CHLgWJb3jvN5
+	b1gTZBM6ksYGpsQn0cP2AzfbXHgsXrkjumD7XfhbyxQK4DoWTemGX/Z+n1fDiZ9gBMc=
+X-Gm-Gg: AY/fxX5ggxEcpRvvfoGHTv3bBSO3JreZjV84KVNbTDLg97i0N6CsqJyRQxKn+szePA4
+	Wv+n5aBHEc3nkvLPva/QLDyh+1Y/1OrCVKia2tvmmYd9vxqOrhstkVZs//r/TEUPuSMWpbKX5of
+	oKDq1QmdwqfB84+1ijTj8clbhJMeVKxaTakxBzsD0jrJpDwKD22hUc223JKk9y04cCaFEm5f116
+	CEGemm9zuDR9x1nr6nF2b2A41mAnzOtJs2BMXhc7fyVzC0+GNJWXarcCETAOl6tnHM7JHxsACk7
+	XwP8TB59Yh/TDyZahlPkvkTDwg1UO0ZqpBTAVG7ysby1Ij9sc6WWXj6qnvlV2h2iw1tH/ZXat0u
+	UOHHx9qLeNZZV6G1Zm7z99ZmYHZV9sbNP4bF3oZlxk1QgqIwOti+3gQjNS8Mi71YXlg2CcYnKql
+	bvAGAQc0VsFstgYdLZ8jBDPEyfDln2dGQYcGORi3wjV5yKQosL6vbT1SxEepCkZuQqR/sfNRUr5
+	i9DNbtlJ4TbOmbG
+X-Google-Smtp-Source: AGHT+IHNodzROWG00OZtD9XAVBI/12GdF0BJwnFJoCI+sHM6hIAnNnf7LvT6ycqlxfjJpXo6K0YBzw==
+X-Received: by 2002:a05:6512:128c:b0:598:faf1:3c95 with SMTP id 2adb3069b0e04-59a17d46185mr7446288e87.36.1766688960692;
+        Thu, 25 Dec 2025 10:56:00 -0800 (PST)
 Received: from huawei-System-Product-Name.. ([159.138.216.22])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-59a185ddd78sm6057675e87.39.2025.12.25.10.55.56
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-59a185ddd78sm6057675e87.39.2025.12.25.10.56.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Dec 2025 10:55:57 -0800 (PST)
+        Thu, 25 Dec 2025 10:56:00 -0800 (PST)
 From: Dmitry Skorodumov <dskr99@gmail.com>
 X-Google-Original-From: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
 To: netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	Dmitry Skorodumov <skorodumov.dmitry@huawei.com>,
-	Xiao Liang <shaw.leon@gmail.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Julian Vetter <julian@outer-limits.org>,
-	Guillaume Nault <gnault@redhat.com>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Etienne Champetier <champetier.etienne@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Cc: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>,
 	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-Subject: [PATCH net 1/2] ipvlan: Make the addrs_lock be per port
-Date: Thu, 25 Dec 2025 21:55:33 +0300
-Message-ID: <20251225185543.1459044-2-skorodumov.dmitry@huawei.com>
+	Shuah Khan <shuah@kernel.org>
+Subject: [PATCH net 2/2] selftests: net: simple selftest for ipvtap
+Date: Thu, 25 Dec 2025 21:55:34 +0300
+Message-ID: <20251225185543.1459044-3-skorodumov.dmitry@huawei.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251225185543.1459044-1-skorodumov.dmitry@huawei.com>
 References: <20251225185543.1459044-1-skorodumov.dmitry@huawei.com>
@@ -103,283 +98,231 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Make the addrs_lock be per port, not per ipvlan dev.
+This is a simple ipvtap test to do simple test
+on handling IP-address assigning to ipvlan interface.
 
-Initial code seems to be written in the assumption,
-that any address change must occur under RTNL.
-But it is not so for the case of IPv6. So
+It creates a veth-interface and then creates several
+network-namespace with ipvlan0 interface in it linked to veth.
 
-1) Introduce per-port addrs_lock.
+Then it starts to add/remove addresses on ipvlan0 interfaces
+in several threads.
 
-2) It was needed to fix places where it was forgotten
-to take lock (ipvlan_open/ipvlan_close)
+At finish, it checks that there is no duplicated addresses.
 
-This appears to be a very minor problem though.
-Since it's highly unlikely that ipvlan_add_addr() will
-be called on 2 CPU simultaneously. But nevertheless,
-this could cause:
-
-1) False-negative of ipvlan_addr_busy(): one interface
-iterated through all port->ipvlans + ipvlan->addrs
-under some ipvlan spinlock, and another added IP
-under its own lock. Though this is only possible
-for IPv6, since looks like only ipvlan_addr6_event() can be
-called without rtnl_lock.
-
-2) Race since ipvlan_ht_addr_add(port) is called under
-different ipvlan->addrs_lock locks
-
-This should not affect performance, since add/remove IP
-is a rare situation and spinlock is not taken on fast
-paths.
-
-Fixes: 8230819494b3 ("ipvlan: use per device spinlock to protect addrs list updates")
 Signed-off-by: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
-CC: Paolo Abeni <pabeni@redhat.com>
 ---
- drivers/net/ipvlan/ipvlan.h      |  2 +-
- drivers/net/ipvlan/ipvlan_core.c | 16 +++++------
- drivers/net/ipvlan/ipvlan_main.c | 49 +++++++++++++++++++-------------
- 3 files changed, 37 insertions(+), 30 deletions(-)
+ tools/testing/selftests/net/Makefile       |   1 +
+ tools/testing/selftests/net/config         |   2 +
+ tools/testing/selftests/net/ipvtap_test.sh | 167 +++++++++++++++++++++
+ 3 files changed, 170 insertions(+)
+ create mode 100755 tools/testing/selftests/net/ipvtap_test.sh
 
-diff --git a/drivers/net/ipvlan/ipvlan.h b/drivers/net/ipvlan/ipvlan.h
-index 50de3ee204db..80f84fc87008 100644
---- a/drivers/net/ipvlan/ipvlan.h
-+++ b/drivers/net/ipvlan/ipvlan.h
-@@ -69,7 +69,6 @@ struct ipvl_dev {
- 	DECLARE_BITMAP(mac_filters, IPVLAN_MAC_FILTER_SIZE);
- 	netdev_features_t	sfeatures;
- 	u32			msg_enable;
--	spinlock_t		addrs_lock;
- };
- 
- struct ipvl_addr {
-@@ -90,6 +89,7 @@ struct ipvl_port {
- 	struct net_device	*dev;
- 	possible_net_t		pnet;
- 	struct hlist_head	hlhead[IPVLAN_HASH_SIZE];
-+	spinlock_t		addrs_lock; /* guards hash-table and addrs */
- 	struct list_head	ipvlans;
- 	u16			mode;
- 	u16			flags;
-diff --git a/drivers/net/ipvlan/ipvlan_core.c b/drivers/net/ipvlan/ipvlan_core.c
-index 2efa3ba148aa..bdb3a46b327c 100644
---- a/drivers/net/ipvlan/ipvlan_core.c
-+++ b/drivers/net/ipvlan/ipvlan_core.c
-@@ -107,17 +107,15 @@ void ipvlan_ht_addr_del(struct ipvl_addr *addr)
- struct ipvl_addr *ipvlan_find_addr(const struct ipvl_dev *ipvlan,
- 				   const void *iaddr, bool is_v6)
- {
--	struct ipvl_addr *addr, *ret = NULL;
-+	struct ipvl_addr *addr;
- 
--	rcu_read_lock();
--	list_for_each_entry_rcu(addr, &ipvlan->addrs, anode) {
--		if (addr_equal(is_v6, addr, iaddr)) {
--			ret = addr;
--			break;
--		}
-+	assert_spin_locked(&ipvlan->port->addrs_lock);
+diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+index b66ba04f19d9..45c4ea381bc3 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -48,6 +48,7 @@ TEST_PROGS := \
+ 	ipv6_flowlabel.sh \
+ 	ipv6_force_forwarding.sh \
+ 	ipv6_route_update_soft_lockup.sh \
++	ipvtap_test.sh \
+ 	l2_tos_ttl_inherit.sh \
+ 	l2tp.sh \
+ 	link_netns.py \
+diff --git a/tools/testing/selftests/net/config b/tools/testing/selftests/net/config
+index 1e1f253118f5..5702ab8fa5ad 100644
+--- a/tools/testing/selftests/net/config
++++ b/tools/testing/selftests/net/config
+@@ -48,6 +48,7 @@ CONFIG_IPV6_SEG6_LWTUNNEL=y
+ CONFIG_IPV6_SIT=y
+ CONFIG_IPV6_VTI=y
+ CONFIG_IPVLAN=m
++CONFIG_IPVTAP=m
+ CONFIG_KALLSYMS=y
+ CONFIG_L2TP=m
+ CONFIG_L2TP_ETH=m
+@@ -122,6 +123,7 @@ CONFIG_TEST_BPF=m
+ CONFIG_TLS=m
+ CONFIG_TRACEPOINTS=y
+ CONFIG_TUN=y
++CONFIG_TAP=m
+ CONFIG_USER_NS=y
+ CONFIG_VETH=y
+ CONFIG_VLAN_8021Q=y
+diff --git a/tools/testing/selftests/net/ipvtap_test.sh b/tools/testing/selftests/net/ipvtap_test.sh
+new file mode 100755
+index 000000000000..751793f26fed
+--- /dev/null
++++ b/tools/testing/selftests/net/ipvtap_test.sh
+@@ -0,0 +1,168 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0
++#
++# Simple tests for ipvtap
 +
-+	list_for_each_entry(addr, &ipvlan->addrs, anode) {
-+		if (addr_equal(is_v6, addr, iaddr))
-+			return addr;
- 	}
--	rcu_read_unlock();
--	return ret;
-+	return NULL;
- }
- 
- bool ipvlan_addr_busy(struct ipvl_port *port, void *iaddr, bool is_v6)
-diff --git a/drivers/net/ipvlan/ipvlan_main.c b/drivers/net/ipvlan/ipvlan_main.c
-index 660f3db11766..baccdad695fd 100644
---- a/drivers/net/ipvlan/ipvlan_main.c
-+++ b/drivers/net/ipvlan/ipvlan_main.c
-@@ -75,6 +75,7 @@ static int ipvlan_port_create(struct net_device *dev)
- 	for (idx = 0; idx < IPVLAN_HASH_SIZE; idx++)
- 		INIT_HLIST_HEAD(&port->hlhead[idx]);
- 
-+	spin_lock_init(&port->addrs_lock);
- 	skb_queue_head_init(&port->backlog);
- 	INIT_WORK(&port->wq, ipvlan_process_multicast);
- 	ida_init(&port->ida);
-@@ -181,6 +182,7 @@ static void ipvlan_uninit(struct net_device *dev)
- static int ipvlan_open(struct net_device *dev)
- {
- 	struct ipvl_dev *ipvlan = netdev_priv(dev);
-+	struct ipvl_port *port = ipvlan->port;
- 	struct ipvl_addr *addr;
- 
- 	if (ipvlan->port->mode == IPVLAN_MODE_L3 ||
-@@ -189,10 +191,10 @@ static int ipvlan_open(struct net_device *dev)
- 	else
- 		dev->flags &= ~IFF_NOARP;
- 
--	rcu_read_lock();
--	list_for_each_entry_rcu(addr, &ipvlan->addrs, anode)
-+	spin_lock_bh(&port->addrs_lock);
-+	list_for_each_entry(addr, &ipvlan->addrs, anode)
- 		ipvlan_ht_addr_add(ipvlan, addr);
--	rcu_read_unlock();
-+	spin_unlock_bh(&port->addrs_lock);
- 
- 	return 0;
- }
-@@ -206,10 +208,10 @@ static int ipvlan_stop(struct net_device *dev)
- 	dev_uc_unsync(phy_dev, dev);
- 	dev_mc_unsync(phy_dev, dev);
- 
--	rcu_read_lock();
--	list_for_each_entry_rcu(addr, &ipvlan->addrs, anode)
-+	spin_lock_bh(&ipvlan->port->addrs_lock);
-+	list_for_each_entry(addr, &ipvlan->addrs, anode)
- 		ipvlan_ht_addr_del(addr);
--	rcu_read_unlock();
-+	spin_unlock_bh(&ipvlan->port->addrs_lock);
- 
- 	return 0;
- }
-@@ -579,7 +581,6 @@ int ipvlan_link_new(struct net_device *dev, struct rtnl_newlink_params *params,
- 	if (!tb[IFLA_MTU])
- 		ipvlan_adjust_mtu(ipvlan, phy_dev);
- 	INIT_LIST_HEAD(&ipvlan->addrs);
--	spin_lock_init(&ipvlan->addrs_lock);
- 
- 	/* TODO Probably put random address here to be presented to the
- 	 * world but keep using the physical-dev address for the outgoing
-@@ -657,13 +658,13 @@ void ipvlan_link_delete(struct net_device *dev, struct list_head *head)
- 	struct ipvl_dev *ipvlan = netdev_priv(dev);
- 	struct ipvl_addr *addr, *next;
- 
--	spin_lock_bh(&ipvlan->addrs_lock);
-+	spin_lock_bh(&ipvlan->port->addrs_lock);
- 	list_for_each_entry_safe(addr, next, &ipvlan->addrs, anode) {
- 		ipvlan_ht_addr_del(addr);
- 		list_del_rcu(&addr->anode);
- 		kfree_rcu(addr, rcu);
- 	}
--	spin_unlock_bh(&ipvlan->addrs_lock);
-+	spin_unlock_bh(&ipvlan->port->addrs_lock);
- 
- 	ida_free(&ipvlan->port->ida, dev->dev_id);
- 	list_del_rcu(&ipvlan->pnode);
-@@ -817,6 +818,8 @@ static int ipvlan_add_addr(struct ipvl_dev *ipvlan, void *iaddr, bool is_v6)
- {
- 	struct ipvl_addr *addr;
- 
-+	assert_spin_locked(&ipvlan->port->addrs_lock);
 +
- 	addr = kzalloc(sizeof(struct ipvl_addr), GFP_ATOMIC);
- 	if (!addr)
- 		return -ENOMEM;
-@@ -847,16 +850,16 @@ static void ipvlan_del_addr(struct ipvl_dev *ipvlan, void *iaddr, bool is_v6)
- {
- 	struct ipvl_addr *addr;
- 
--	spin_lock_bh(&ipvlan->addrs_lock);
-+	spin_lock_bh(&ipvlan->port->addrs_lock);
- 	addr = ipvlan_find_addr(ipvlan, iaddr, is_v6);
- 	if (!addr) {
--		spin_unlock_bh(&ipvlan->addrs_lock);
-+		spin_unlock_bh(&ipvlan->port->addrs_lock);
- 		return;
- 	}
- 
- 	ipvlan_ht_addr_del(addr);
- 	list_del_rcu(&addr->anode);
--	spin_unlock_bh(&ipvlan->addrs_lock);
-+	spin_unlock_bh(&ipvlan->port->addrs_lock);
- 	kfree_rcu(addr, rcu);
- }
- 
-@@ -878,14 +881,14 @@ static int ipvlan_add_addr6(struct ipvl_dev *ipvlan, struct in6_addr *ip6_addr)
- {
- 	int ret = -EINVAL;
- 
--	spin_lock_bh(&ipvlan->addrs_lock);
-+	spin_lock_bh(&ipvlan->port->addrs_lock);
- 	if (ipvlan_addr_busy(ipvlan->port, ip6_addr, true))
- 		netif_err(ipvlan, ifup, ipvlan->dev,
- 			  "Failed to add IPv6=%pI6c addr for %s intf\n",
- 			  ip6_addr, ipvlan->dev->name);
- 	else
- 		ret = ipvlan_add_addr(ipvlan, ip6_addr, true);
--	spin_unlock_bh(&ipvlan->addrs_lock);
-+	spin_unlock_bh(&ipvlan->port->addrs_lock);
- 	return ret;
- }
- 
-@@ -924,21 +927,24 @@ static int ipvlan_addr6_validator_event(struct notifier_block *unused,
- 	struct in6_validator_info *i6vi = (struct in6_validator_info *)ptr;
- 	struct net_device *dev = (struct net_device *)i6vi->i6vi_dev->dev;
- 	struct ipvl_dev *ipvlan = netdev_priv(dev);
-+	int ret = NOTIFY_OK;
- 
- 	if (!ipvlan_is_valid_dev(dev))
- 		return NOTIFY_DONE;
- 
- 	switch (event) {
- 	case NETDEV_UP:
-+		spin_lock_bh(&ipvlan->port->addrs_lock);
- 		if (ipvlan_addr_busy(ipvlan->port, &i6vi->i6vi_addr, true)) {
- 			NL_SET_ERR_MSG(i6vi->extack,
- 				       "Address already assigned to an ipvlan device");
--			return notifier_from_errno(-EADDRINUSE);
-+			ret = notifier_from_errno(-EADDRINUSE);
- 		}
-+		spin_unlock_bh(&ipvlan->port->addrs_lock);
- 		break;
- 	}
- 
--	return NOTIFY_OK;
-+	return ret;
- }
- #endif
- 
-@@ -946,14 +952,14 @@ static int ipvlan_add_addr4(struct ipvl_dev *ipvlan, struct in_addr *ip4_addr)
- {
- 	int ret = -EINVAL;
- 
--	spin_lock_bh(&ipvlan->addrs_lock);
-+	spin_lock_bh(&ipvlan->port->addrs_lock);
- 	if (ipvlan_addr_busy(ipvlan->port, ip4_addr, false))
- 		netif_err(ipvlan, ifup, ipvlan->dev,
- 			  "Failed to add IPv4=%pI4 on %s intf.\n",
- 			  ip4_addr, ipvlan->dev->name);
- 	else
- 		ret = ipvlan_add_addr(ipvlan, ip4_addr, false);
--	spin_unlock_bh(&ipvlan->addrs_lock);
-+	spin_unlock_bh(&ipvlan->port->addrs_lock);
- 	return ret;
- }
- 
-@@ -995,21 +1001,24 @@ static int ipvlan_addr4_validator_event(struct notifier_block *unused,
- 	struct in_validator_info *ivi = (struct in_validator_info *)ptr;
- 	struct net_device *dev = (struct net_device *)ivi->ivi_dev->dev;
- 	struct ipvl_dev *ipvlan = netdev_priv(dev);
-+	int ret = NOTIFY_OK;
- 
- 	if (!ipvlan_is_valid_dev(dev))
- 		return NOTIFY_DONE;
- 
- 	switch (event) {
- 	case NETDEV_UP:
-+		spin_lock_bh(&ipvlan->port->addrs_lock);
- 		if (ipvlan_addr_busy(ipvlan->port, &ivi->ivi_addr, false)) {
- 			NL_SET_ERR_MSG(ivi->extack,
- 				       "Address already assigned to an ipvlan device");
--			return notifier_from_errno(-EADDRINUSE);
-+			ret = notifier_from_errno(-EADDRINUSE);
- 		}
-+		spin_unlock_bh(&ipvlan->port->addrs_lock);
- 		break;
- 	}
- 
--	return NOTIFY_OK;
-+	return ret;
- }
- 
- static struct notifier_block ipvlan_addr4_notifier_block __read_mostly = {
++#
++# The testing environment looks this way:
++#
++# |------HOST------|     |------PHY-------|
++# |      veth<----------------->veth      |
++# |------|--|------|     |----------------|
++#        |  |
++#        |  |            |-----TST0-------|
++#        |  |------------|----ipvlan      |
++#        |               |----------------|
++#        |
++#        |               |-----TST1-------|
++#        |---------------|----ipvlan      |
++#                        |----------------|
++#
++
++ALL_TESTS="
++	test_ip_set
++"
++
++source lib.sh
++
++DEBUG=0
++
++VETH_HOST=vethtst.h
++VETH_PHY=vethtst.p
++
++NS_COUNT=32
++IP_ITERATIONS=1024
++
++ns_run() {
++	ns=$1
++	shift
++	if [[ "$ns" == "global" ]]; then
++		"$@" >/dev/null
++	else
++		ip netns exec "$ns" "$@" >/dev/null
++	fi
++}
++
++test_ip_setup_env() {
++	modprobe -q tap
++	modprobe -q ipvlan
++	modprobe -q ipvtap
++
++	setup_ns NS_PHY
++
++	# setup simulated other-host (phy) and host itself
++	ip link add $VETH_HOST type veth peer name $VETH_PHY \
++		netns "$NS_PHY" >/dev/null
++	ip link set $VETH_HOST up
++	ns_run "$NS_PHY" ip link set $VETH_PHY up
++
++	for ((i=0; i<NS_COUNT; i++)); do
++		setup_ns ipvlan_ns_$i
++		ns="ipvlan_ns_$i"
++		if [ "$DEBUG" = "1" ]; then
++			echo "created NS ${!ns}"
++		fi
++		if ! ip link add netns ${!ns} ipvlan0 link $VETH_HOST \
++		    type ipvtap mode l2 bridge; then
++			exit_error "FAIL: Failed to configure ipvlan link."
++		fi
++	done
++}
++
++test_ip_cleanup_env() {
++	ip link del $VETH_HOST
++	cleanup_all_ns
++}
++
++exit_error() {
++	echo "$1"
++	exit $ksft_fail
++}
++
++rnd() {
++	echo $(( RANDOM % 32 + 16 ))
++}
++
++test_ip_set_thread() {
++	ip link set ipvlan0 up
++	for ((i=0; i<IP_ITERATIONS; i++)); do
++		v=$(rnd)
++		ip a a "172.25.0.$v/24" dev ipvlan0 2>/dev/null
++		ip a a "fc00::$v/64" dev ipvlan0 2>/dev/null
++		v=$(rnd)
++		ip a d "172.25.0.$v/24" dev ipvlan0 2>/dev/null
++		ip a d "fc00::$v/64" dev ipvlan0 2>/dev/null
++	done
++}
++
++test_ip_set() {
++	RET=0
++
++	modprobe -q tap
++	modprobe -q ipvlan
++	modprobe -q ipvtap
++
++	trap test_ip_cleanup_env EXIT
++
++	test_ip_setup_env
++
++	declare -A ns_pids
++	for ((i=0; i<NS_COUNT; i++)); do
++		ns="ipvlan_ns_$i"
++		ns_run ${!ns} bash -c "$0 test_ip_set_thread"&
++		ns_pids[$i]=$!
++	done
++
++	for ((i=0; i<NS_COUNT; i++)); do
++		wait "${ns_pids[$i]}"
++	done
++
++	declare -A all_ips
++	for ((i=0; i<NS_COUNT; i++)); do
++		ns="ipvlan_ns_$i"
++		ip_output=$(ip netns exec ${!ns} ip a l dev ipvlan0 | grep inet)
++		while IFS= read -r nsip_out; do
++			if [[ -z $nsip_out ]]; then
++				continue;
++			fi
++			nsip=$(awk '{print $2}' <<< "$nsip_out")
++			if [[ -v all_ips[$nsip] ]]; then
++				RET=$ksft_fail
++				log_test "conflict for $nsip"
++				return "$RET"
++			else
++				all_ips[$nsip]=$i
++			fi
++		done <<< "$ip_output"
++	done
++
++	if [ "$DEBUG" = "1" ]; then
++		for key in "${!all_ips[@]}"; do
++			echo "$key: ${all_ips[$key]}"
++		done
++	fi
++
++	trap - EXIT
++	test_ip_cleanup_env
++
++	log_test "test multithreaded ip set"
++}
++
++if [[ "$1" == "-d" ]]; then
++	DEBUG=1
++	shift
++fi
++
++if [[ "$1" == "-t" ]]; then
++	shift
++	TESTS="$*"
++fi
++
++if [[ "$1" == "test_ip_set_thread" ]]; then
++	test_ip_set_thread
++else
++	require_command ip
++
++	tests_run
++fi
 -- 
 2.43.0
 
