@@ -1,171 +1,143 @@
-Return-Path: <netdev+bounces-246032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65A29CDD33D
-	for <lists+netdev@lfdr.de>; Thu, 25 Dec 2025 03:13:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B3088CDD426
+	for <lists+netdev@lfdr.de>; Thu, 25 Dec 2025 04:47:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id B53F73019B77
-	for <lists+netdev@lfdr.de>; Thu, 25 Dec 2025 02:13:43 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 8091630169A0
+	for <lists+netdev@lfdr.de>; Thu, 25 Dec 2025 03:47:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1395223FC54;
-	Thu, 25 Dec 2025 02:13:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9F5C25A359;
+	Thu, 25 Dec 2025 03:47:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QUAXBxL/";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="JSzMxfdM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kZJz9eda"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7646238176
-	for <netdev@vger.kernel.org>; Thu, 25 Dec 2025 02:13:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12DD1238C0F
+	for <netdev@vger.kernel.org>; Thu, 25 Dec 2025 03:47:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766628823; cv=none; b=hu3Tfo+vAfystY7Y+s2jNbIdnU74F8nNKcX6CD8CPGxeYhRB6yS+O6cd065B/dDGNY7nVgTnfh7CuLiM4droEqPTFflWzTlxZFN/KqhvwfMN68DWzfvne8rSJx0KJvk6zzzj7nqFJCF2ii1E1jmQwxA3FEtR26iW6PEyrny2T48=
+	t=1766634441; cv=none; b=EycYIlwmWmqr/aF3nq92qcMbfUtmpUN+5Rsl685SXjib7bvEOkQWOR+WUv3eb2uAGDEgfNAPaEKYKOt+V+wNvUB97HiuxNQEWZSe1g/co0PRVhMXvA4FBA31GQGErfh/CWuvu47GsrOEbbm0lBwB9YeaC6yDv6sYNsMxd5+ecnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766628823; c=relaxed/simple;
-	bh=7YpexbkHgi8MYJCeKGa6NmPLNo8dJlqBsM1QFzG+dqc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=C4dG1C7MBB+a+moPBhncoI9EBFV0n4Nf8xVEt9tIturFbCJCWm5o6mfaGY2a8G8oalUgXYGfhV9sWONi3Cx+A1d8PN0wEqWQIupRkzyYt6AETgDXbJ3w5XTrvruAF0but7r1f79azK6IPgTkM1/bpxDLI6/MMpFIPBc+0pN5Hhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QUAXBxL/; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=JSzMxfdM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1766628819;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7YpexbkHgi8MYJCeKGa6NmPLNo8dJlqBsM1QFzG+dqc=;
-	b=QUAXBxL/D/x/8Nm5E36UZfbqhOudhhUrrT+WPzF4bDSb3+3uSg15pScX3SUjGNjmn+FHNy
-	DbpYy7wkY20PGJRQcgEFsHFbwmuY16HIMFLqx+IbwG8mrXoZU3kgO3g2mqJdmLg4U8l2Z9
-	9xH1iPQZpEyDIBAwkjKUWHDVNWkSB0g=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-617-AroNlCUoNBuL0dooMJTYhw-1; Wed, 24 Dec 2025 21:13:38 -0500
-X-MC-Unique: AroNlCUoNBuL0dooMJTYhw-1
-X-Mimecast-MFC-AGG-ID: AroNlCUoNBuL0dooMJTYhw_1766628817
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-34e5a9f0d6aso6353813a91.0
-        for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 18:13:37 -0800 (PST)
+	s=arc-20240116; t=1766634441; c=relaxed/simple;
+	bh=zdHcXv7gthuNoETqRDRcPpK1gbnRFnQ98u0O7g8q1PQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mU+H0YwR6TcC3bSuIv8Uu+Nyp+mw/d8STtwUD73Ugi8vvSEKIRSIdXUoCzo+xYPVSWDYNyCN5eHJYpgFiBRUNnL7RdxtfmUVHqCKE1FTNyt641uR9VxaRZLc4+CMfM6hE3bUVbmiNMgO63sksYWIGHGx4UYeF5S4VkfQEISXdzU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kZJz9eda; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-42e2d02a3c9so4028272f8f.3
+        for <netdev@vger.kernel.org>; Wed, 24 Dec 2025 19:47:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1766628817; x=1767233617; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7YpexbkHgi8MYJCeKGa6NmPLNo8dJlqBsM1QFzG+dqc=;
-        b=JSzMxfdMJyuCsS2OBbrEAl+zrz6JqtaRczEID9eoCqvzYVhaDJwxX7yolyRTjueKSE
-         gGhoKuN3bk1fehz3M7+kC/9kpUNlt3abGkxiVM7LPrWRsrYptYLfrgcp75gIPTNtgxF0
-         OBe1sAw4BfegBgPc3GGLiKUxWdsMGB1CR3DZOqos2cB1D855fGBiRP5e/SFe8T6kb3z4
-         FA0ofUTRi1m1Q232GXnMWgUGuqYfdaWfrJTsNpfWZdMsO1ZmgHrc7MXtZ7bj389jHGdA
-         5PlR1YrvRoBzyG1qYkPQtvG9MoQYky0+gtPmHW7KCzEZnS7bEOaiguWRakghW/hqG93k
-         KmcQ==
+        d=gmail.com; s=20230601; t=1766634438; x=1767239238; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HQeB5Svb9ckkH6BmtFvtVbZNlGDfQ9LAipz/Mvve9Ng=;
+        b=kZJz9edawFkRKwviwG7TfCgS0SFLHXPFPjzRuF6W6thgerxF/2YCU6PxpeMRiv5vPM
+         s0YY5QiNQDlLtMSDAvKRNGSFJ+/yKqiS4ahd5GW+TZBwaiC7EDOvIJRPrFzdin25AtQF
+         shRNG69hRpZz4D5dxoppiXf5MdXVUb2u/0xJOplKikHdY+8XFDqlkXNgU2DvnUe609D1
+         b02C4xKMB5f3hT5JrbQiMf3viWdENyUEFBRlE79MktW1B5NZHmRAKpBiOnukhhg5BgFe
+         nz+jmaBFRolpfDI5yAxb5lbWoqcD6OCnVaVYetWy06WaKCmWF3mbss4ZeuuxoxCoXHe/
+         koAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1766628817; x=1767233617;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=7YpexbkHgi8MYJCeKGa6NmPLNo8dJlqBsM1QFzG+dqc=;
-        b=f/rIFw+tVGn3D4He/sN76dDkx4zz+UWJCVdKA1Ra7GXp/DuxzvzjCRaQrMCJhdhX5w
-         fY3TJGrk9mBMp7fOtG9i+8jK1oCTOJL5Ha4BOhUgcdoM9J1VfzsbsoidzNKYY4z4v+NB
-         elP/y+MWG98kpurG2viAjI+IzPttcu6tnnqZfg/+Fa00fXyDAeHbkr+c6Hn5ka91mRgo
-         ZDhLuH9HXjraFs45snjgxYlm3bLmVvzGXGQMgYc4hbIMV/HkCsz1SeYeisoSMnuH08Jp
-         WrkzepjvP5MrjSSGYDIhoPnB75RLzce04ECWxXAai4pnryI8OkW5FuAol46SCMIG3vAt
-         FOyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU3GyEPduDCY/XHgEmRpE7gmP5ClORpqAWqfV9uC8t3Jwp2b0zre8R1wjgys0utaO57T2kxws0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7b4cIaIdz48XkFb0S1HNWpS9sUWCt9xOi1yJykRnBmuwq3NIn
-	JgvuWcOXNq+bw8xWrUkTI6M52P2tjfsnQN8MN4uUTaBrM1/YESaCNMkr4z/8mXVHcMCm1kv+xNK
-	uu7wQJ5ux6xaOl2KN/AMhqGPBEQgflnMlY5WyEDLvgE7rRxgxPPZQfqD28KPN5KQfUu+YOIvJ4U
-	3Sd31rZO2oDs9VquCfuspQnMqTfvlMuuRR
-X-Gm-Gg: AY/fxX5yWIG5i2gGrqa6WlMrlN3am/RHl+ZH5xBz/gRFbc97Wnzd3AI0J3h2+1MnkEG
-	HB8CdhEZQrbbeJm8uC9jK/l5TB3bjnKJrna6bYX3boBCivMXL2vZekNc4OjegpKxuR9mNFCs/zb
-	NGeKyS5VAlqHE+lA4aJAw5wZQUdbupkqynuD7Z51SoAeAjQ5JSCWGsc61dhq0YQnpIxr30
-X-Received: by 2002:a17:90b:17cf:b0:34b:75f4:96d3 with SMTP id 98e67ed59e1d1-34e71d80c4bmr18119983a91.5.1766628816953;
-        Wed, 24 Dec 2025 18:13:36 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEwhbsMVHrIOb+o/clMZRBZzzVHUxqhhpyOgjv8QLYkGMTunA2LZlvhWcPpsC0hOAXEzKg6bxSfXCXXoKtYoEA=
-X-Received: by 2002:a17:90b:17cf:b0:34b:75f4:96d3 with SMTP id
- 98e67ed59e1d1-34e71d80c4bmr18119967a91.5.1766628816541; Wed, 24 Dec 2025
- 18:13:36 -0800 (PST)
+        d=1e100.net; s=20230601; t=1766634438; x=1767239238;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HQeB5Svb9ckkH6BmtFvtVbZNlGDfQ9LAipz/Mvve9Ng=;
+        b=OPc5qNkLGujU802wo/OwdPD/LlPkdNC5QFtiJukTJo5GlduJ2ISjC9deWeokhd6+v1
+         i5mSsTXu184eUvJW+GFw6sTudM6UQoJhd9ZNYmypU3/zK40KFxMv7OfQ1MaycE3QnSao
+         3lrpWahJmGH3FORyh8yiHJyWL6IVuc6DXHRAnPkjyC32lQv6U0agvC/t6nkdgaiyTe3T
+         jpp26WE18/079caKMJxpEK1X+mTeR8Qgrf/v1OyWuHUK7kSudVSu+EB6RfKhGmROsWN0
+         J5OjYhB0secLXpEampnhtUnDFcmjmF8tNxLzTDAmD9n9tjno6+PlWXb255/UR7IJUHJZ
+         0iWw==
+X-Gm-Message-State: AOJu0YwnjI0V2/zzhquPI2pzcbed3VSS7ccL93AjM5GGukDNLG+DIxkN
+	rsnhkqdD8EErp39jksYfjrP1d9GT0ZZAHgzPEYYgacuWJswBaRU8iAg3QOz6Q2WL
+X-Gm-Gg: AY/fxX4yvJVmclMZHqCG4vtSKNRz/E7r0p0SInI7F5/9lCqCbHDg5Wyqf3f7EZc7aOF
+	Nye8vLOGWCeMeyNMnEALlCbOg1a8jJsfb1/NZx9jD4GaTMp5blLz3FhOjHC+u+LF7ukFPDcyMxp
+	cpl6bjNBqPrxZ6veY7Z1P/iav3cIxr8XmRBeofBRg4JhWgo92bRBdba1Pw9B8SsJ61OH0sGIQqZ
+	QJFxo969tTgVztFOJFfrfFqENJ5CwUS0+/yGq78JeQXG93TCUgvvrIKsQLMJIH56f5JvRaJBwM9
+	/fJeNXOfsynVr/eN3Jc+IaFBsarKJ+lxwVkBRb5SZUaMf58zz8xR0PQ+dWVxWBQectanv/qDrHq
+	7TbsUmaAPY0IABw9JigV8fEXUGBvfP7C21gjt+YlFMrsb3HC+SM/Sig1ELgDca6qmUOFZyClGSf
+	VoRWO1lT3C5+CFX+ll
+X-Google-Smtp-Source: AGHT+IHXxJ3PNrv8tMkh/YpvZIeiLQuPs5WX2+gcKW6UX4KIXgk+ZKzP4CKg9wLB3mGwZ3G4vLN9dQ==
+X-Received: by 2002:a05:6000:2889:b0:430:fb00:108f with SMTP id ffacd0b85a97d-4324e4c9eefmr21340980f8f.18.1766634438165;
+        Wed, 24 Dec 2025 19:47:18 -0800 (PST)
+Received: from Arch-Spectre.home ([92.19.101.73])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-4324eaa0908sm37102865f8f.31.2025.12.24.19.47.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Dec 2025 19:47:17 -0800 (PST)
+From: Yicong Hui <yiconghui@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	skhan@linuxfoundation.org,
+	david.hunter.linux@gmail.com,
+	Yicong Hui <yiconghui@gmail.com>
+Subject: [PATCH net] net: Fix typo of "software" in driver comments
+Date: Thu, 25 Dec 2025 03:43:53 +0000
+Message-ID: <20251225034353.140374-1-yiconghui@gmail.com>
+X-Mailer: git-send-email 2.52.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251218091050.55047-1-15927021679@163.com> <CACGkMEvbrF=g0_yedXKsccVN6vmfm+oQVbRkR1PGtQgFHH+v3g@mail.gmail.com>
- <3a4733b.8bcf.19b4fb2b303.Coremail.15927021679@163.com>
-In-Reply-To: <3a4733b.8bcf.19b4fb2b303.Coremail.15927021679@163.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 25 Dec 2025 10:13:25 +0800
-X-Gm-Features: AQt7F2qv14pEjpotcQVKXINUs_y7jmmFmHc1_NfnTrxSaTXcN2AvZ9sBp2_RjGE
-Message-ID: <CACGkMEtZUpTG5fG5+JvJw=4RGDo89xoXQjkLyLnWVXHx1gUW7g@mail.gmail.com>
-Subject: Re: Re: Implement initial driver for virtio-RDMA device(kernel)
-To: =?UTF-8?B?54aK5Lyf5rCR?= <15927021679@163.com>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>, 
-	Stefano Garzarella <sgarzare@redhat.com>, Thomas Monjalon <thomas@monjalon.net>, 
-	David Marchand <david.marchand@redhat.com>, Luca Boccassi <bluca@debian.org>, 
-	Kevin Traynor <ktraynor@redhat.com>, Christian Ehrhardt <christian.ehrhardt@canonical.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Xueming Li <xuemingl@nvidia.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, 
-	Chenbo Xia <chenbox@nvidia.com>, Bruce Richardson <bruce.richardson@intel.com>, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	Yongji Xie <xieyongji@bytedance.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Dec 24, 2025 at 5:32=E2=80=AFPM =E7=86=8A=E4=BC=9F=E6=B0=91 <159270=
-21679@163.com> wrote:
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
->
-> At 2025-12-23 09:16:40, "Jason Wang" <jasowang@redhat.com> wrote:
-> >On Thu, Dec 18, 2025 at 5:11=E2=80=AFPM Xiong Weimin <15927021679@163.co=
-m> wrote:
-> >>
-> >> Hi all,
-> >>
-> >> This testing instructions aims to introduce an emulating a soft ROCE
-> >> device with normal NIC(no RDMA), we have finished a vhost-user RDMA
-> >> device demo, which can work with RDMA features such as CM, QP type of
-> >> UC/UD and so on.
-> >>
-> >
-> >I think we need
-> >
-> >1) to know the difference between this and [1]
-> >2) the spec patch
-> >
-> >Thanks
-> >
->
-> >[1] https://yhbt.net/lore/virtio-dev/CACycT3sShxOR41Kk1znxC7Mpw73N0LAP66=
-cC3-iqeS_jp8trvw@mail.gmail.com/T/#m0602ee71de0fe389671cbd81242b5f3ceeab010=
-1
->
->
-> Sorry, I can't access this webpage link. Is there another way to view it?
+Fix misspelling of "software" as "softare" and "sotware" in code comments
 
-How about this?
+Signed-off-by: Yicong Hui <yiconghui@gmail.com>
+---
+ drivers/net/ethernet/emulex/benet/be_hw.h | 2 +-
+ drivers/net/ethernet/micrel/ks8842.c      | 2 +-
+ drivers/net/xen-netback/hash.c            | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-https://lore.kernel.org/virtio-comment/20220511095900.343-1-xieyongji@byted=
-ance.com/
-
-Thanks
+diff --git a/drivers/net/ethernet/emulex/benet/be_hw.h b/drivers/net/ethernet/emulex/benet/be_hw.h
+index 3476194f0855..5b953800d94d 100644
+--- a/drivers/net/ethernet/emulex/benet/be_hw.h
++++ b/drivers/net/ethernet/emulex/benet/be_hw.h
+@@ -16,7 +16,7 @@
+  * The software must write this register twice to post any command. First,
+  * it writes the register with hi=1 and the upper bits of the physical address
+  * for the MAILBOX structure. Software must poll the ready bit until this
+- * is acknowledged. Then, sotware writes the register with hi=0 with the lower
++ * is acknowledged. Then, software writes the register with hi=0 with the lower
+  * bits in the address. It must poll the ready bit until the command is
+  * complete. Upon completion, the MAILBOX will contain a valid completion
+  * queue entry.
+diff --git a/drivers/net/ethernet/micrel/ks8842.c b/drivers/net/ethernet/micrel/ks8842.c
+index 541c41a9077a..936658bc61c5 100644
+--- a/drivers/net/ethernet/micrel/ks8842.c
++++ b/drivers/net/ethernet/micrel/ks8842.c
+@@ -242,7 +242,7 @@ static void ks8842_reset(struct ks8842_adapter *adapter)
+ 		msleep(10);
+ 		iowrite16(0, adapter->hw_addr + REG_GRR);
+ 	} else {
+-		/* The KS8842 goes haywire when doing softare reset
++		/* The KS8842 goes haywire when doing software reset
+ 		* a work around in the timberdale IP is implemented to
+ 		* do a hardware reset instead
+ 		ks8842_write16(adapter, 3, 1, REG_GRR);
+diff --git a/drivers/net/xen-netback/hash.c b/drivers/net/xen-netback/hash.c
+index 45ddce35f6d2..c6b2eba3511b 100644
+--- a/drivers/net/xen-netback/hash.c
++++ b/drivers/net/xen-netback/hash.c
+@@ -3,7 +3,7 @@
+  *
+  * This program is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU General Public License version 2
+- * as published by the Free Softare Foundation; or, when distributed
++ * as published by the Free Software Foundation; or, when distributed
+  * separately from the Linux kernel or incorporated into other
+  * software packages, subject to the following license:
+  *
+-- 
+2.52.0
 
 
