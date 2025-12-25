@@ -1,123 +1,75 @@
-Return-Path: <netdev+bounces-246030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76F7DCDD28E
-	for <lists+netdev@lfdr.de>; Thu, 25 Dec 2025 01:39:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A493CDD319
+	for <lists+netdev@lfdr.de>; Thu, 25 Dec 2025 03:06:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id 37F893019BBC
-	for <lists+netdev@lfdr.de>; Thu, 25 Dec 2025 00:39:39 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 5469A3017EC2
+	for <lists+netdev@lfdr.de>; Thu, 25 Dec 2025 02:06:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B36B1A08A3;
-	Thu, 25 Dec 2025 00:39:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="bWH2mfr0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CDCF2288D5;
+	Thu, 25 Dec 2025 02:04:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from xmbghk7.mail.qq.com (xmbghk7.mail.qq.com [43.163.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp20.cstnet.cn [159.226.251.20])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B90BEACE;
-	Thu, 25 Dec 2025 00:39:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.163.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1135C2248A5;
+	Thu, 25 Dec 2025 02:04:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766623178; cv=none; b=P7UU53ZhV5T/OP+RJy7hueyM34cqUJjzwrFsbpr4td8VPk3hQguoizqSli/+lssBbm81hGDX1MUvbX07+T3o9CTF4DAW9qWHYMn3dQ5j4wHrtOXLVENSIspdFnETjBVbUiNPyjPW6XBjcvVP6OBAitylltZgyivB6uOaYPkHQW8=
+	t=1766628287; cv=none; b=FDd11pgPqO9lXQwM0FNjNhE6ffPr2velPldZdBdhCZfaori5seyV0PatSMkS34tPCV5TkTPiv64zDr8BlbDy1r00NJwsi4PZ9ZG4mET5E+V+uydjJDFHUdxNIRZbRP5sF9ZMV8nF8aazwE4AYyyyM2OYhnUvzbYvazPG0mAd3L4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766623178; c=relaxed/simple;
-	bh=cTpa9slDDP8mIuLtQ0c8nEGgOjtP9nDATw4cwgNi+R8=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=ARqg4f165kyXc9Po3nEl3vONhQm+3W2NLu2yDyu/slxLjaVsonaBEcpPiVug+1fILx5lDmZaqqxJJJk91nUMvgwGgif6xcw2jiFpQGPfmKUJGbVGVou+vwma2CiHTDii19MWdWZ54bKhyfs/2qRoabRxr284DEs4zzi/9aE8VoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=bWH2mfr0; arc=none smtp.client-ip=43.163.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1766623167; bh=9lDPljmxxpWOrB9/2KIpPiYqV9rnijI2OneHK6N8CvQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=bWH2mfr0YhOCwi+i4EgP61AoNc/yJJsvAZbGH1qijARno3qsYXTJvAmusYn3x5ZUq
-	 fso648Sc2n7DJ8oGYEIONp4dl0LnE3JtLDIV2WDl26eaHPLV2H1ikeN8IpcFbyT90J
-	 XxSGaF7b93a7W114weRAC1VBRjsD3mdESTx1JUkg=
-Received: from lxu-ped-host.. ([111.201.7.117])
-	by newxmesmtplogicsvrszc43-0.qq.com (NewEsmtp) with SMTP
-	id 902AAEFF; Thu, 25 Dec 2025 08:36:02 +0800
-X-QQ-mid: xmsmtpt1766622962tlrisy3kd
-Message-ID: <tencent_ED8C80A7CB46C0D2FF064E4987AED7AEDC06@qq.com>
-X-QQ-XMAILINFO: MqswyhUqVe0CiLLBdYSKfHubH75ygG1My3V5D0YPUyeHZDYmCRmgGZOT+/jksz
-	 pAogx2tp5jPf5xHHCCAfTqTZp2COMoBSPT3KBFOLKs204FVsev85p6RRmgtVLEAPJCq3KeVaRP25
-	 l/pX2NilOqLP5VErfK7x4aerYdoIy8GnMIO3zjaQcn5IUvhh482RbBCNFY9mNCsKONqem3w345Rp
-	 7rXGYj/gwDkwegKTi+dqzdAM7GjoY9evtvT14VGwVpkYqW3W+xXfpjfQigoiQkW+KJ3GvvNXMyC9
-	 fPb1+pSQKYumbscBITqJogiEmmSrq5r1k6paHym42Zl4EhQZt7hVHvMPjThzYnlcnnqEhsfRwn+B
-	 n/YfWFJ9CSg/8ZzSmHcvL6vo+SNV+nOCBCJJJkk3g1+5h29/clNI5r/IjQymt3Pofv92qY1GsgS1
-	 xYrCVgOiKZ3DhHjWIRsaA6OkP08EOfqFAGo2M4DkuHqTo7JkLhcycQaZRSUeszV7NzisSx3jaKwl
-	 pBBj6Aoi0BvzXKJ4yRpzh6VrTwK8KN8glhtxw+Bcfmng+sEhYTUmAkyQOKvde3elGmXzuDVeNuie
-	 EQfkCUk3gXn+Mzwj3+CZjBgsZp4WLkaVt2+luQ1xSP0rJnLGqhUkyhUxJtv73x67IfbWqkdeVy3b
-	 ALxtGcjmTSrt4J6k9vBM+AxskvzLT2Nu4pg3IdQs28DqZu79vZzSCjoSC2xcyIsauEJaRuFSGvW0
-	 LMbxkKEDYZbecNNe1gkxDxL1OOQB68WL5Y58gDRDGzkgqKkCditjqTgm4ohLLaFUfHowv2aY+B/6
-	 2bAhVRewwL5BJJDnVV3z6RPDlLwOawwADdZNYXSM/hcBSScDOOvnQnU47E3KbEyc5UC2ovVG6MGB
-	 HGjQJzvaPptWnj4Dn3cxtQUEfrPOggxvjS3ghd33I6Tzielige6c/6Cwr8xTb95uzMY7RpdUj43c
-	 cSUbMArCf8i7h7BOjnUB1rRdXw2S2PrKbPqLjHpARH2jtgxyO9/u7vyM06AFOLwYzVMLPsAb8=
-X-QQ-XMRINFO: Nq+8W0+stu50tPAe92KXseR0ZZmBTk3gLg==
-From: Edward Adam Davis <eadavis@qq.com>
-To: syzbot+dfffb6c26ee592ff9e83@syzkaller.appspotmail.com
-Cc: chuck.lever@oracle.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	horms@kernel.org,
-	kernel-tls-handshake@lists.linux.dev,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com
-Subject: [PATCH] net/handshake: fix null-ptr-deref in handshake_complete
-Date: Thu, 25 Dec 2025 08:36:02 +0800
-X-OQ-MSGID: <20251225003601.34147-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <694bcddd.050a0220.35954c.001c.GAE@google.com>
-References: <694bcddd.050a0220.35954c.001c.GAE@google.com>
+	s=arc-20240116; t=1766628287; c=relaxed/simple;
+	bh=ytEtfJQ9V1cKs+COBBRfZEJTKB613VkFcA+IP3T5B2A=;
+	h=Date:From:To:Cc:Subject:Content-Type:MIME-Version:Message-ID; b=FZ0sjadgLoCbe4E9PENXZ2mDXqN+T+XrmXja4NsreketiDDBoQt7OMPkqg9hEj8XM+vMCh+N4yzGt7P4zOA2z+ArUmLe6/774MS1yUoiputdjeUbLcc71eF9jvdH67PGRDt48GjtzDNE2TRXzxyqfwO4pD8BCYYBVVRrYQSnHDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mails.ucas.ac.cn; spf=pass smtp.mailfrom=mails.ucas.ac.cn; arc=none smtp.client-ip=159.226.251.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mails.ucas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mails.ucas.ac.cn
+Received: from xujiakai24$mails.ucas.ac.cn ( [210.73.43.101] ) by
+ ajax-webmail-APP-10 (Coremail) ; Thu, 25 Dec 2025 09:56:51 +0800
+ (GMT+08:00)
+Date: Thu, 25 Dec 2025 09:56:51 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From: "Jiakai Xu" <xujiakai24@mails.ucas.ac.cn>
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Cc: horms@kernel.org, pabeni@redhat.com, kuba@kernel.org, 
+	edumazet@google.com, davem@davemloft.net
+Subject: [BUG] net: Bad page state in skb_pp_cow_data
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version 2024.1-cmXT5 build
+ 20240627(e6c6db66) Copyright (c) 2002-2025 www.mailtech.cn cnic.cn
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Message-ID: <338e2eb7.723e4.19b53391fa8.Coremail.xujiakai24@mails.ucas.ac.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:tACowAA3T+LjmUxpz2wDAA--.20602W
+X-CM-SenderInfo: 50xmxthndljko6pdxz3voxutnvoduhdfq/1tbiBgsHE2lMkj0WkwA
+	AsW
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+	daVFxhVjvjDU=
 
-When retrieving the next request that has not yet completed the
-three-way handshake, a null pointer is returned if the operation fails.
-Patch fe67b063f687 did not consider this scenario, which triggered the
-issue reported by syzbot [1].
-
-Added handling for the case where there are no requests.
-
-[1]
-Oops: general protection fault, probably for non-canonical address 0xdffffc0000000005: 0000 [#1] SMP KASAN PTI
-KASAN: null-ptr-deref in range [0x0000000000000028-0x000000000000002f]
-RIP: 0010:handshake_complete+0x36/0x350 net/handshake/request.c:288
-Call Trace:
- handshake_nl_accept_doit+0x3c9/0x7f0 net/handshake/netlink.c:128
- genl_family_rcv_msg_doit+0x215/0x300 net/netlink/genetlink.c:1115
-
-Fixes: fe67b063f687 ("net/handshake: convert handshake_nl_accept_doit() to FD_PREPARE()")
-Reported-by: syzbot+dfffb6c26ee592ff9e83@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=dfffb6c26ee592ff9e83
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
----
- net/handshake/netlink.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/net/handshake/netlink.c b/net/handshake/netlink.c
-index 1d33a4675a48..a36441d4372b 100644
---- a/net/handshake/netlink.c
-+++ b/net/handshake/netlink.c
-@@ -124,6 +124,8 @@ int handshake_nl_accept_doit(struct sk_buff *skb, struct genl_info *info)
- 		fd_publish(fdf);
- 		return 0;
- 	}
-+	else
-+		goto out_status;
- 
- out_complete:
- 	handshake_complete(req, -EIO, NULL);
--- 
-2.43.0
-
+SGkgYWxsLAoKSSBoYXZlIGVuY291bnRlcmVkIGEgIkJhZCBwYWdlIHN0YXRlIiBidWcgd2hpbGUg
+ZnV6emluZyB0aGUga2VybmVsLgoKVGhlIGlzc3VlIHdhcyBpbml0aWFsbHkgZm91bmQgb24gYSBS
+SVNDLVYgYnJhbmNoLiBBZnRlciBhbmFseXppbmcgdGhlIGtlcm5lbCBsb2dzLCAKSSBzdXNwZWN0
+ZWQgdGhlIGJ1ZyB3YXMgYXJjaGl0ZWN0dXJlLWluZGVwZW5kZW50LiBUbyB2ZXJpZnkgdGhpcywg
+SSByZXByb2R1Y2VkIAppdCBvbiB0aGUgbGF0ZXN0IG1haW5saW5lIHg4NiBrZXJuZWwgKGNvbW1p
+dDogY2NkMWNkY2E1Y2Q0MzNjOGE1ZGZmNzhiNjlhNzliMzFkOWI3N2VlMSksIAphbmQgaXQgcmVw
+cm9kdWNlZCBzdWNjZXNzZnVsbHkuCgpUaGUgYnVnIGFwcGVhcnMgdG8gYmUgdHJpZ2dlcmVkIHdo
+ZW4gYSBHZW5lcmljIFhEUCBwcm9ncmFtIGNhbGxzIGJwZl94ZHBfYWRqdXN0X3RhaWwgCnRvIHNo
+cmluayBhIHBhY2tldCwgY2F1c2luZyBhIHBhZ2VfcG9vbCBtYW5hZ2VkIHBhZ2UgdG8gYmUgaW5j
+b3JyZWN0bHkgZnJlZWQgdmlhIHRoZSAKc3RhbmRhcmQgcGFnZSBhbGxvY2F0b3IuCgpJIGhhdmUg
+dXBsb2FkZWQgdGhlIGZvbGxvd2luZyBtYXRlcmlhbHMgdG8gR2l0SHViIGZvciByZWZlcmVuY2U6
+Ci0gS2VybmVsIGNvbmZpZyBmaWxlcyAoeDg2KSAgCi0gQyByZXByb2R1Y2VyICAKLSBLZXJuZWwg
+bG9ncyBmb3IgYm90aCB4ODYgYW5kIFJJU0MtViAgCiAKTGluazogaHR0cHM6Ly9naXRodWIuY29t
+L2oxYWthaS90ZW1wL3RyZWUvbWFpbi8yMDI1MTIyNQoKRG9lcyBhbnlvbmUgaGF2ZSBzdWdnZXN0
+aW9ucyBmb3IgYSBmaXg/IEkgd291bGQgYmUgdmVyeSBoYXBweSB0byBoZWxwIGZpeCBpdCBhbmQg
+CnRlc3QgYW55IHBhdGNoZXMuCgpCZXN0IHJlZ2FyZHMsIEppYWthaQoKCg==
 
