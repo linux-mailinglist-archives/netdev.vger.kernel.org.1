@@ -1,82 +1,102 @@
-Return-Path: <netdev+bounces-246070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-246071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sea.lore.kernel.org (sea.lore.kernel.org [172.234.253.10])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43972CDE163
-	for <lists+netdev@lfdr.de>; Thu, 25 Dec 2025 21:37:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A7B5CDE1B6
+	for <lists+netdev@lfdr.de>; Thu, 25 Dec 2025 22:02:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (conduit.subspace.kernel.org [100.90.174.1])
-	by sea.lore.kernel.org (Postfix) with ESMTP id E736F3006AB2
-	for <lists+netdev@lfdr.de>; Thu, 25 Dec 2025 20:37:57 +0000 (UTC)
+	by sea.lore.kernel.org (Postfix) with ESMTP id 2155A3009F8B
+	for <lists+netdev@lfdr.de>; Thu, 25 Dec 2025 21:02:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F20D9267B05;
-	Thu, 25 Dec 2025 20:37:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BCC623EA8A;
+	Thu, 25 Dec 2025 21:02:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="UqJCFfxk"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="eiBMlunc"
 X-Original-To: netdev@vger.kernel.org
-Received: from xmbghk7.mail.qq.com (xmbghk7.mail.qq.com [43.163.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6824027EFE3
-	for <netdev@vger.kernel.org>; Thu, 25 Dec 2025 20:37:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.163.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FBB6212560
+	for <netdev@vger.kernel.org>; Thu, 25 Dec 2025 21:02:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1766695076; cv=none; b=nAYMXpRgAXpEGL+iXxg7x7CqfnBy6ofqcnexugGHYTFj8gvPJlHT14uQLY+3AGnbvfW12cafYFxcbadBYpBX5tIazKHSYNpJu0mYOg7gS9rGxNzJ+ojqVB0hiIQsgnW0Qq7UcDC80ExY18kXzYitxv36Gl8OFMofJHFyYuHhbM0=
+	t=1766696566; cv=none; b=I+GYcP4xRUw5WtmJpokFkmuNL793gXet0FEeqx7jU1d37UkTge5m3k+yQaS4J9PiMEsZBRc44P9oUIfeJNo51qZyOMJ0VhXhFnQvRKSmmx5BgB3xAx4azMibu1EuOMnWTcNS8fp6w2CwI3HkQ1aaK98/5JsDdBB44d1tzfv+Nyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1766695076; c=relaxed/simple;
-	bh=WwlEOAr1t6ductPkmsXqGNb2jZ3SbztP5QxHrDM2z9o=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=PxY2wXsV5nQutCyjc7QAv7mvwdAF0FYih9GDYOH2rgQjcQSUvs/OfNnHdU0rGe+n8Lym99M9Yd0tpFFDjTg0/dp0h0g86vLhA7K5TCpyMox/S+Tt9bJ016YBUqLeRqw0OdRT+iS3cXGpr/LZP2wFic2SjDunHuAfUeCIJc63/2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=UqJCFfxk; arc=none smtp.client-ip=43.163.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1766695070;
-	bh=3xKQ5QKGOtFosXXsFS4kNKY9y6GjUouDkstUkEJnWAE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=UqJCFfxkHT/3QPl9ciP9O4m57VMkeTHTSCcXdNjvoocOQgxCz+TKHV6bggtXRx199
-	 YSD2il3iiC5FEyiZh2Nxr7YMGAc5opFuhcoKEfIDKr0iaJLr1cHTxKLILYeSyhXDyT
-	 hv3SOr2pyjE6JmQ71nXbyItWa1yOBPDtdm6nr5Ag=
-Received: from 7erry.customer.ask4.lan ([31.205.230.119])
-	by newxmesmtplogicsvrsza63-0.qq.com (NewEsmtp) with SMTP
-	id 92399661; Fri, 26 Dec 2025 04:36:35 +0800
-X-QQ-mid: xmsmtpt1766694995tzuk8mnx0
-Message-ID: <tencent_75EF812B305E26B0869C673DD1160866C90A@qq.com>
-X-QQ-XMAILINFO: NQp/UN4soYLTTuGP/agmWdwX9ssNAYBVQ/mWH1aB2n4ElujSIood7fUZGWerUr
-	 ug8+kKgzmo/WY7NQ3o1rR7pLlQYW0k0G+OwquC6BOuWyRoh+Rdq8e4EWX5+JsQpOL6AihXw6N6nF
-	 Yfh9fOqgiajWcXzcpsxE2RuKLi+0GDQ2qgkBttjQTxpzCMhJMRfsoXxmWmwnYoQMBHfIDlVsNu+s
-	 nhSw59yvtpickN5jjMUJ68FvAPV4K12uAZl3Udg9Y0NggaewlE9XKibDGNmfba5yqoaOuiTdwhVp
-	 IxN2hCnABWY1UnBhdLwjkJheyTxW0aEYas05Ss+/TOLXsC7ukVRKnBHFnC0tnQjQ8+WipwgTJ5Sm
-	 QNMUho1qQJCmXFyYtHPjQm8LNoTXK73LkVrJKz6aRbfZ2O9y8zNnKC/sa9zmJK6O11Lz8Io1yyOe
-	 jrz1ID4udtrd1DwZv3JFcPd4fCyQ0b3B8pvifhNiP6+YbGZqXlFhzFOPCivc7z3kySrXtQaUZIwC
-	 aMjmU2eNYV4O5s77UQcd+q6wI/8knyib7SLei79LMBERlmYr7l7FDS2CjdTzDsU7/gLxESd+/pYd
-	 14Daea5R06TCPpohkBzksFkEof3NdiBz9SExAq6HgLx6o1F1RHdOFYv4XCsI0GCJbx2geTdGqLXo
-	 DtVBNSMoo/rwr1vfahZ7rNN6KqAebjlE5QcVZqbBMq+AlhAVnkYPdp7HPMgE/NFGmYRXCMEujoKp
-	 GRFFh+Zol4iUamstXVZBKkmFUM2YRQqNOvhK11G0m1AQLc/XrqrmQp5yqo6AtQN8iACyusklSfow
-	 0ifD+A1wk06el/NQNHTjDR8Iy7PcJy21MCV4HMmt9lG1DdF88MZIRYeyLJmK/ckxNlBLGRF2olfr
-	 RBsb/hoeVC0zYgnj377ovOKP3TJU8t+q+MxP9lOizBJi1OAowoBd6hLc/6CU7DfTnnNrsyMZC7zn
-	 ucbxz54Fe3itDi7NzJbEc37HnzuEWwZxmjhK1gFdz+cxLfxo5N0prHGm9RALqx5K0lnz8akWpDeb
-	 XFCwO4xynXaL2Ff2mQot07V65vVNmq8xBlEjVFu4rsFAMLEb0nmVBffm8gCywDdrMqToU6YA==
-X-QQ-XMRINFO: NI4Ajvh11aEjEMj13RCX7UuhPEoou2bs1g==
-From: Jerry Wu <w.7erry@foxmail.com>
-To: vladimir.oltean@nxp.com
-Cc: UNGLinuxDriver@microchip.com,
-	alexandre.belloni@bootlin.com,
-	andrew+netdev@lunn.ch,
-	christophe.jaillet@wanadoo.fr,
-	claudiu.manoil@nxp.com,
-	davem@davemloft.net,
+	s=arc-20240116; t=1766696566; c=relaxed/simple;
+	bh=5/mJ+GM77wd9yVHoRhoZ6HzRdQGOxB4xaIBCLekK+Rk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IqD2+v3mqMsUaWVubNi4jwUdV28cA4Xq2sA5F6S04UWRwNo7ewPoYgA7+rgi0vsXH68E4f0o/LETgktQWK1ejJ6HyHsO4dn/K+oPbQJHKbKYHqFLv7iOhuHu3ijOy4brcITuKfZaK6WXbt5Lg8F6JJ7lVThxgFaNtCNBOYkBo0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=eiBMlunc; arc=none smtp.client-ip=209.85.219.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-8888a16d243so60250966d6.1
+        for <netdev@vger.kernel.org>; Thu, 25 Dec 2025 13:02:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1766696563; x=1767301363; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=E9rsTX5Yid/6usuz603tSD+vnaGi2M2iqYSzD/+yP+A=;
+        b=eiBMluncCm6QL23KKmyKDjNf5pCoKgS55KIVOuGfsD1mDrLS57VCxgHmqEc1D87kVv
+         j3j5cYkd0kUikTTBXuZI64UFLOUEFCZRU/rMEbFjVXbhYhtYWNR4bWqrXHThI4E9gDIv
+         zRFuIlVVM3mTj2DVlkx7NGSr6r+2BNQbiY52Ph9GpRltsRzFkcM5dWceW+fTJMFUxMqv
+         uBfapAV3r99PXlgRBysqWQBxKS99huAmRu6F0eXVGxhRwMln/rIFu0C8a2szX0x8jiCl
+         du6hW456SYf/zV08YkoHLUMIWtFUbc6EaekyfmRLu2Y90DW/OppCS2zotOCE+fXP3TkU
+         tM9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1766696563; x=1767301363;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=E9rsTX5Yid/6usuz603tSD+vnaGi2M2iqYSzD/+yP+A=;
+        b=WUosjYO8cSTk9wMCTnhhc1eHf9vy4Hi6/si7/qUQ3ZHorwKOzjbzNKet5AXvFilVlM
+         5dCUeGsVft2xGPL+m6jaYfnCNpNNRXVlFzoyXWHZkoNKd1bscHPgYgSa8D8Rs9cwQsrA
+         7PyG68rsWJC7QA5GBjLZaK4UJnuVlie/TCrARtNKpEOA4j18q27Cfv+5itVlFhq2R4W3
+         mMCacdt/jWgzXsNFAFPRpltC8To2lTJ9EJDapMO7h4tHdqQz6pWMNWWqWdr+xQ5bqZUl
+         U4tzUfY+ua8IpEG4kWuN7QrYtmZWDO/1ysIgJOyipWUjd8QCiqe4j7ZLZvoq7ETjDoT4
+         ddtA==
+X-Gm-Message-State: AOJu0Yy8kEzfgVaR5dLmtVEIm8RVA2XR4qAyRW3Fort7BQchFXXWadxV
+	IpQr28M24YgNMBumVfL+hI9OOHq4SUtPNPGam676h9sWZJYElcfYR853qkwOoERzdA==
+X-Gm-Gg: AY/fxX6m7DGHQ2+mSJ3aaI3wJMUTLV/bPBUz1RH48Xnrv2ma9fw3q4H102PIqF0noHG
+	MKgOHkDjf7sDBZyFqHo1i12eHR5DuD5jXi8Q/VYngft4BgOK1jutBACi4P9yRkW4HKBLF0WHLGA
+	V0VzqsBXDnBrvyBfAhmnSl+KjVP2FSqrjQx57zFdpbP7Qs8IlrCmykY6d+zGHApJviwCtnO8OzM
+	yNoNDCFxVrQHt8Rwh/Qv3vHo+TcfYrG+d7ssmcTtr2fhE+6m4czwGF9wYOybsZln07nwA5uR7yU
+	LOmpic+Y0o5fFCwUGTSnvwi0YYRuWMXvEhcs3vlJEowSMF/0ij/ZwsHvYyh1FzHfsrz9i2ydjCd
+	O8rE8cyiO1Mp3ZyYCzV2FKqOJuzhmsLkFDRPOmLmt40OypZA/9p8/OjTlD/yHtNkDJHImNGRvn/
+	j2a5NijuAO4o+RtM9Pcq6ZDw==
+X-Google-Smtp-Source: AGHT+IEhxElW9Wxc4MWiMp2RDmmsBUDoUeYPP1kJv7VCYwX3ped446mLuxxgktp8zI8BF72G+c8emw==
+X-Received: by 2002:a05:6214:1873:b0:88a:2343:3ae0 with SMTP id 6a1803df08f44-88d851fd745mr248900036d6.3.1766696558666;
+        Thu, 25 Dec 2025 13:02:38 -0800 (PST)
+Received: from majuu.waya ([70.50.89.69])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-88d99d7e926sm149254146d6.42.2025.12.25.13.02.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Dec 2025 13:02:37 -0800 (PST)
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+To: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
 	pabeni@redhat.com,
-	w.7erry@foxmail.com
-Subject: [PATCH net v3] net: mscc: ocelot: Fix crash when adding interface under a lag
-Date: Thu, 25 Dec 2025 20:36:17 +0000
-X-OQ-MSGID: <20251225203617.13034-1-w.7erry@foxmail.com>
-X-Mailer: git-send-email 2.52.0
-In-Reply-To: <20251220210808.325isrbvmhjp3tlg@skbuf>
-References: <20251220210808.325isrbvmhjp3tlg@skbuf>
+	horms@kernel.org,
+	andrew+netdev@lunn.ch
+Cc: netdev@vger.kernel.org,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	victor@mojatatu.com,
+	dcaratti@redhat.com,
+	lariel@nvidia.com,
+	daniel@iogearbox.net,
+	pablo@netfilter.org,
+	kadlec@netfilter.org,
+	fw@strlen.de,
+	phil@nwl.cc,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	will@willsroot.io,
+	stephen@networkplumber.org,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	kernel test robot <lkp@intel.com>
+Subject: [PATCH RFC net v4 1/1] net: sched: Fix ethx:ingress -> ethy:egress -> ethx:ingress mirred loop
+Date: Thu, 25 Dec 2025 16:02:21 -0500
+Message-Id: <20251225210221.152189-1-jhs@mojatatu.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,63 +105,257 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Commit 15faa1f67ab4 ("lan966x: Fix crash when adding interface under a lag")
-fixed a similar issue in the lan966x driver caused by a NULL pointer dereference.
-The ocelot_set_aggr_pgids() function in the ocelot driver has similar logic
-and is susceptible to the same crash.
+Changes since V1:
+1) Fix compile issues found by Intel bot. Thank you bot
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202512121401.3NRi0dUf-lkp@intel.com/
+2) Fix other issues found by patchwork
+ - https://patchwork.kernel.org/project/netdevbpf/patch/20251210172554.1071864-1-jhs@mojatatu.com/
+3) The AI reviewer claimed there was an issue but the link was a 404
+ - https://netdev-ai.bots.linux.dev/ai-review.html?id=23b3f0a5-ca6c-4cd2-962e-34cbf46f9d24
 
-This issue specifically affects the ocelot_vsc7514.c frontend, which leaves
-unused ports as NULL pointers. The felix_vsc9959.c frontend is unaffected as
-it uses the DSA framework which registers all ports.
+Changes since V2:
+Fix compile issues found by Intel bot. Thank you bot!
+The bot created the issue by unselecting ifb.
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202512140745.hsk9Cf0J-lkp@intel.com/
 
-Fix this by checking if the port pointer is valid before accessing it.
+Changes since v3:
+From Victor - add support for netem loop fix.
+Post RFC would need for William's patch to be reverted.
 
-Fixes: 528d3f190c98 ("net: mscc: ocelot: drop the use of the "lags" array")
-Signed-off-by: Jerry Wu <w.7erry@foxmail.com>
+This patch could be broken down into multiple patches(at least three), but
+posted as one because it is an RFC.
+
+For netem, see Will's current fix: ec8e0e3d7ade ("net/sched: Restrict conditions for adding duplicating netems to qdisc tree")
+
+A simple test:
+
+tc qdisc add dev lo root handle 1: netem limit 1 duplicate 100%
+tc qdisc add dev lo parent 1: handle 2: netem gap 1 limit 1 duplicate 100% delay 1us reorder 100%
+ping -I lo -f -c1 -s48 -W0.001 127.0.0.1
+
+For the mirred case:
+When mirred redirects from egress to ingress the loop state is lost.
+This is because the current loop detection mechanism depends on the device
+being rememebred on the sched_mirred_dev array; however, that array is
+cleared when we go from egress->ingress because the packet ends up in the
+backlog and when we restart from the backlog the loop is amplified, on and
+on...
+
+A simple test case:
+
+tc qdisc add dev ethx clsact
+tc qdisc add dev ethy clsact
+tc filter add dev ethx ingress protocol ip \
+   prio 10 matchall action mirred egress redirect dev ethy
+tc filter add dev ethy egress protocol ip \
+   prio 10 matchall action mirred ingress redirect dev ethx
+
+ping such that packets arrive on ethx. Puff and sweat while the cpu
+consumption goes up. Or just delete those two qdiscs from above
+on ethx and ethy.
+
+For this to work we need to _remember the loop state in the skb_.
+We reclaim the bit "skb->from_ingress" to the qdisc_skb_cb since its use
+is constrained for ifb. We then use an extra bit that was available on
+the skb for a total of 2 "skb->ttl" bits.
+Mirred increments the ttl whenever it sees the same skb. We then
+catch it when it exceeds MIRRED_NEST_LIMIT iterations of the loop.
+
+Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
 ---
-v3:
-  - Resending the correct version that compiles properly.
-  - Retained the 'bond' variable as confirmed necessary in discussion with Vladimir Oltean.
-  - Added links to previous versions as requested.
-  - Thanks to the reviewers for the gentle and detailed feedback and guidance.
+ drivers/net/ifb.c              |  2 +-
+ include/linux/skbuff.h         | 24 ++----------------------
+ include/net/sch_generic.h      | 27 +++++++++++++++++++++++++++
+ net/netfilter/nft_fwd_netdev.c |  1 +
+ net/sched/act_mirred.c         |  4 +++-
+ net/sched/sch_netem.c          |  7 +++----
+ 6 files changed, 37 insertions(+), 28 deletions(-)
 
-v2: https://lore.kernel.org/netdev/20251220210808.325isrbvmhjp3tlg@skbuf/T/
-  - Addressed comments from v1 regarding variable name and null checking.
-  - Sent by accident as a draft.
-
-v1: https://lore.kernel.org/lkml/20251220180113.724txltmrkxzyaql@skbuf/T/
-  - Try to fix the crash in the same way as previous patch did but failed for
-    - improper variable name that is shadowing the "int port" definition.
-	- unnecessary and incorrect hunk for null checking.
-	- improper commit commit title.
-
- drivers/net/ethernet/mscc/ocelot.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/mscc/ocelot.c b/drivers/net/ethernet/mscc/ocelot.c
-index 08bee56aea35..c345d9b17c89 100644
---- a/drivers/net/ethernet/mscc/ocelot.c
-+++ b/drivers/net/ethernet/mscc/ocelot.c
-@@ -2307,14 +2307,16 @@ static void ocelot_set_aggr_pgids(struct ocelot *ocelot)
+diff --git a/drivers/net/ifb.c b/drivers/net/ifb.c
+index d3dc0914450a..137a20e4bf8c 100644
+--- a/drivers/net/ifb.c
++++ b/drivers/net/ifb.c
+@@ -124,7 +124,7 @@ static void ifb_ri_tasklet(struct tasklet_struct *t)
+ 		rcu_read_unlock();
+ 		skb->skb_iif = txp->dev->ifindex;
  
- 	/* Now, set PGIDs for each active LAG */
- 	for (lag = 0; lag < ocelot->num_phys_ports; lag++) {
--		struct net_device *bond = ocelot->ports[lag]->bond;
-+		struct ocelot_port *ocelot_port = ocelot->ports[lag];
- 		int num_active_ports = 0;
-+		struct net_device *bond;
- 		unsigned long bond_mask;
- 		u8 aggr_idx[16];
+-		if (!skb->from_ingress) {
++		if (!qdisc_skb_cb(skb)->from_ingress) {
+ 			dev_queue_xmit(skb);
+ 		} else {
+ 			skb_pull_rcsum(skb, skb->mac_len);
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index 86737076101d..7f18b0c28728 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -840,6 +840,7 @@ enum skb_tstamp_type {
+  *	@no_fcs:  Request NIC to treat last 4 bytes as Ethernet FCS
+  *	@encapsulation: indicates the inner headers in the skbuff are valid
+  *	@encap_hdr_csum: software checksum is needed
++ *	@ttl: time to live count when a packet loops.
+  *	@csum_valid: checksum is already valid
+  *	@csum_not_inet: use CRC32c to resolve CHECKSUM_PARTIAL
+  *	@csum_complete_sw: checksum was completed by software
+@@ -1000,6 +1001,7 @@ struct sk_buff {
+ 	/* Indicates the inner headers are valid in the skbuff. */
+ 	__u8			encapsulation:1;
+ 	__u8			encap_hdr_csum:1;
++	__u8			ttl:2;
+ 	__u8			csum_valid:1;
+ #ifdef CONFIG_IPV6_NDISC_NODETYPE
+ 	__u8			ndisc_nodetype:2;
+@@ -1016,9 +1018,6 @@ struct sk_buff {
+ 	__u8			offload_l3_fwd_mark:1;
+ #endif
+ 	__u8			redirected:1;
+-#ifdef CONFIG_NET_REDIRECT
+-	__u8			from_ingress:1;
+-#endif
+ #ifdef CONFIG_NETFILTER_SKIP_EGRESS
+ 	__u8			nf_skip_egress:1;
+ #endif
+@@ -5352,30 +5351,11 @@ static inline bool skb_is_redirected(const struct sk_buff *skb)
+ 	return skb->redirected;
+ }
  
--		if (!bond || (visited & BIT(lag)))
-+		if (!ocelot_port || !ocelot_port->bond || (visited & BIT(lag)))
- 			continue;
+-static inline void skb_set_redirected(struct sk_buff *skb, bool from_ingress)
+-{
+-	skb->redirected = 1;
+-#ifdef CONFIG_NET_REDIRECT
+-	skb->from_ingress = from_ingress;
+-	if (skb->from_ingress)
+-		skb_clear_tstamp(skb);
+-#endif
+-}
+-
+ static inline void skb_reset_redirect(struct sk_buff *skb)
+ {
+ 	skb->redirected = 0;
+ }
  
-+		bond = ocelot_port->bond;
- 		bond_mask = ocelot_get_bond_mask(ocelot, bond);
+-static inline void skb_set_redirected_noclear(struct sk_buff *skb,
+-					      bool from_ingress)
+-{
+-	skb->redirected = 1;
+-#ifdef CONFIG_NET_REDIRECT
+-	skb->from_ingress = from_ingress;
+-#endif
+-}
+-
+ static inline bool skb_csum_is_sctp(struct sk_buff *skb)
+ {
+ #if IS_ENABLED(CONFIG_IP_SCTP)
+diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+index c3a7268b567e..b34a1ba258c1 100644
+--- a/include/net/sch_generic.h
++++ b/include/net/sch_generic.h
+@@ -459,6 +459,14 @@ struct qdisc_skb_cb {
+ 	u8			post_ct:1;
+ 	u8			post_ct_snat:1;
+ 	u8			post_ct_dnat:1;
++#ifdef CONFIG_NET_REDIRECT
++	/* XXX: For RFC,  we should review and/or fix CONFIG_NET_REDIRECT
++	 * dependency or totally get rid of the NET_REDIRECT Kconfig (which
++	 * would work assuming qdisc_skb_cb is omni present; need to check
++	 * on netfilter dependency; everything else depends on mirred.
++	 */
++	u8			from_ingress:1;
++#endif
+ };
  
- 		for_each_set_bit(port, &bond_mask, ocelot->num_phys_ports) {
+ typedef void tcf_chain_head_change_t(struct tcf_proto *tp_head, void *priv);
+@@ -1140,6 +1148,25 @@ static inline void qdisc_dequeue_drop(struct Qdisc *q, struct sk_buff *skb,
+ 	q->to_free = skb;
+ }
+ 
++static inline void skb_set_redirected(struct sk_buff *skb, bool from_ingress)
++{
++	skb->redirected = 1;
++#ifdef CONFIG_NET_REDIRECT
++	qdisc_skb_cb(skb)->from_ingress = from_ingress;
++	if (qdisc_skb_cb(skb)->from_ingress)
++		skb_clear_tstamp(skb);
++#endif
++}
++
++static inline void skb_set_redirected_noclear(struct sk_buff *skb,
++					      bool from_ingress)
++{
++	skb->redirected = 1;
++#ifdef CONFIG_NET_REDIRECT
++	qdisc_skb_cb(skb)->from_ingress = from_ingress;
++#endif
++}
++
+ /* Instead of calling kfree_skb() while root qdisc lock is held,
+  * queue the skb for future freeing at end of __dev_xmit_skb()
+  */
+diff --git a/net/netfilter/nft_fwd_netdev.c b/net/netfilter/nft_fwd_netdev.c
+index 152a9fb4d23a..d62c856ef96a 100644
+--- a/net/netfilter/nft_fwd_netdev.c
++++ b/net/netfilter/nft_fwd_netdev.c
+@@ -16,6 +16,7 @@
+ #include <net/netfilter/nf_dup_netdev.h>
+ #include <net/neighbour.h>
+ #include <net/ip.h>
++#include <net/sch_generic.h>
+ 
+ struct nft_fwd_netdev {
+ 	u8	sreg_dev;
+diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+index 91c96cc625bd..4a945ea00197 100644
+--- a/net/sched/act_mirred.c
++++ b/net/sched/act_mirred.c
+@@ -318,8 +318,10 @@ static int tcf_mirred_to_dev(struct sk_buff *skb, struct tcf_mirred *m,
+ 
+ 		skb_set_redirected(skb_to_send, skb_to_send->tc_at_ingress);
+ 
++		skb_to_send->ttl++;
+ 		err = tcf_mirred_forward(at_ingress, want_ingress, skb_to_send);
+ 	} else {
++		skb_to_send->ttl++;
+ 		err = tcf_mirred_forward(at_ingress, want_ingress, skb_to_send);
+ 	}
+ 	if (err)
+@@ -434,7 +436,7 @@ TC_INDIRECT_SCOPE int tcf_mirred_act(struct sk_buff *skb,
+ #else
+ 	xmit = this_cpu_ptr(&softnet_data.xmit);
+ #endif
+-	if (unlikely(xmit->sched_mirred_nest >= MIRRED_NEST_LIMIT)) {
++	if (skb->ttl >= MIRRED_NEST_LIMIT - 1) {
+ 		net_warn_ratelimited("Packet exceeded mirred recursion limit on dev %s\n",
+ 				     netdev_name(skb->dev));
+ 		return TC_ACT_SHOT;
+diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
+index 32a5f3304046..7363e13286de 100644
+--- a/net/sched/sch_netem.c
++++ b/net/sched/sch_netem.c
+@@ -461,7 +461,8 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 	skb->prev = NULL;
+ 
+ 	/* Random duplication */
+-	if (q->duplicate && q->duplicate >= get_crandom(&q->dup_cor, &q->prng))
++	if (q->duplicate && !skb->ttl &&
++	    q->duplicate >= get_crandom(&q->dup_cor, &q->prng))
+ 		++count;
+ 
+ 	/* Drop packet? */
+@@ -539,11 +540,9 @@ static int netem_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ 	 */
+ 	if (skb2) {
+ 		struct Qdisc *rootq = qdisc_root_bh(sch);
+-		u32 dupsave = q->duplicate; /* prevent duplicating a dup... */
+ 
+-		q->duplicate = 0;
++		skb2->ttl++; /* prevent duplicating a dup... */
+ 		rootq->enqueue(skb2, rootq, to_free);
+-		q->duplicate = dupsave;
+ 		skb2 = NULL;
+ 	}
+ 
 -- 
-2.52.0
+2.34.1
 
 
